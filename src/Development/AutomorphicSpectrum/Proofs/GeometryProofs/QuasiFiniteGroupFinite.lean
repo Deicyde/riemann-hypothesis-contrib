@@ -10,12 +10,16 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorusPointOv
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.BT
 
-theorem QFGroup.finite_of_qfGroup : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] (Γ : BT.QFGroup R T), Finite T := by
+theorem QFGroup.finite_of_qfGroup
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] (Γ : BT.QFGroup R T),
+      Finite T := by
   intro R _ _ T _ Γ
   have hqf : LocallyQuasiFinite Γ.G.hom := Γ.quasiFinite
   have hqc : QuasiCompact Γ.G.hom := Γ.quasiCompact
@@ -23,11 +27,11 @@ theorem QFGroup.finite_of_qfGroup : ∀ (R : Type) [CommRing R] [IsDomain R] (T 
   let g : F ⟶ Spec (CommRingCat.of (FractionRing R)) := pullback.snd Γ.G.hom (genPt R).hom
   have hK : ∀ u v : Spec (CommRingCat.of (FractionRing R)), u = v := fun u v =>
     Subsingleton.elim (α := PrimeSpectrum (FractionRing R)) u v
-  let b : Spec (CommRingCat.of (FractionRing R)) := (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum (FractionRing R))
+  let b : Spec (CommRingCat.of (FractionRing R)) :=
+    (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum (FractionRing R))
   have hgqf : LocallyQuasiFinite g := inferInstance
   have hgqc : QuasiCompact g := inferInstance
-  have huniv : g ⁻¹' {b} = Set.univ := by
-    ext x; simp [hK (g x) b]
+  have huniv : g ⁻¹' {b} = Set.univ := by ext x; simp [hK (g x) b]
   have hfin : Finite F := by
     have h := g.finite_preimage_singleton b
     rw [huniv] at h

@@ -9,24 +9,31 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_lift_to_complete_dvr_of_finite : ∀ (A R : Type) [CommRing A] [CommRing R] [Algebra A R], Function.Injective (algebraMap A R) →
-    Module.Finite A R → ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V],
-    IsAdicComplete (maximalIdeal V) V → ∀ h : A →+* V,
-    ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsDiscreteValuationRing V') (_ : CharZero V')
-      (f : V →+* V') (ρ : R →+* V'), IsAdicComplete (maximalIdeal V') V' ∧
-      Function.Injective f ∧ IsLocalHom f ∧ ρ.comp (algebraMap A R) = f.comp h := by
+theorem exists_lift_to_complete_dvr_of_finite
+    : ∀ (A R : Type) [CommRing A] [CommRing R] [Algebra A R],
+      Function.Injective (algebraMap A R) → Module.Finite A R
+        → ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V],
+          IsAdicComplete (maximalIdeal V) V
+            → ∀ h : A →+* V,
+              ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsDiscreteValuationRing V')
+                  (_ : CharZero V') (f : V →+* V') (ρ : R →+* V'),
+                IsAdicComplete (maximalIdeal V') V' ∧ Function.Injective f ∧ IsLocalHom f
+                  ∧ ρ.comp (algebraMap A R) = f.comp h := by
   intro A R _ _ _ hinj hfin V _ _ _ _ hC h
   classical
   let p : Ideal A := RingHom.ker h
   haveI : p.IsPrime := RingHom.ker_isPrime h
   haveI : Algebra.IsIntegral A R := Algebra.IsIntegral.of_finite A R
-  obtain ⟨Q, -, hQ, hQp⟩ := Ideal.exists_ideal_over_prime_of_isIntegral p (⊥ : Ideal R) (by
-    rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]; exact bot_le)
+  obtain ⟨Q, -, hQ, hQp⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral p (⊥ : Ideal R)
+      (by rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]; exact bot_le)
   let K := FractionRing V
   let Ω := AlgebraicClosure K
   letI : Algebra (A ⧸ p) (R ⧸ Q) := Ideal.Quotient.algebraQuotientOfLEComap (le_of_eq hQp.symm)
-  have hcomp : (algebraMap (A ⧸ p) (R ⧸ Q)).comp (Ideal.Quotient.mk p) =
-      (Ideal.Quotient.mk Q).comp (algebraMap A R) := rfl
+  have hcomp
+      : (algebraMap (A ⧸ p) (R ⧸ Q)).comp (Ideal.Quotient.mk p)
+        = (Ideal.Quotient.mk Q).comp (algebraMap A R) :=
+    rfl
   haveI : Algebra.IsIntegral (A ⧸ p) (R ⧸ Q) := by
     constructor
     intro x
@@ -37,7 +44,8 @@ theorem exists_lift_to_complete_dvr_of_finite : ∀ (A R : Type) [CommRing A] [C
     Ideal.quotientMap_injective' (le_of_eq hQp)
   let g0 : (A ⧸ p) →+* Ω := (algebraMap K Ω).comp ((algebraMap V K).comp (RingHom.kerLift h))
   have hg0 : Function.Injective g0 :=
-    (algebraMap K Ω).injective.comp ((IsFractionRing.injective V K).comp (RingHom.kerLift_injective h))
+    (algebraMap K Ω).injective.comp
+      ((IsFractionRing.injective V K).comp (RingHom.kerLift_injective h))
   letI : Algebra (A ⧸ p) Ω := g0.toAlgebra
   haveI : Module.IsTorsionFree (A ⧸ p) (R ⧸ Q) :=
     Module.isTorsionFree_iff_algebraMap_injective.2 hinj0
@@ -45,8 +53,7 @@ theorem exists_lift_to_complete_dvr_of_finite : ∀ (A R : Type) [CommRing A] [C
   haveI : Algebra.IsAlgebraic (A ⧸ p) (R ⧸ Q) := Algebra.IsIntegral.isAlgebraic
   let σ : (R ⧸ Q) →ₐ[A ⧸ p] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let ρ1 : R →+* Ω := σ.toRingHom.comp (Ideal.Quotient.mk Q)
   have hρ1 : ∀ a : A, ρ1 (algebraMap A R a) = algebraMap K Ω (algebraMap V K (h a)) := by
@@ -79,9 +86,19 @@ theorem exists_lift_to_complete_dvr_of_finite : ∀ (A R : Type) [CommRing A] [C
   haveI hdvr := Formalism.L2.G.IntCl.isDVR V K M hC
   have hfinj := Formalism.L2.G.IntCl.alg_injective V K M
   haveI : FaithfulSMul V (integralClosure V M) := (faithfulSMul_iff_algebraMap_injective _ _).2 hfinj
-  refine ⟨integralClosure V M, inferInstance, inferInstance, hdvr,
-    (RingHom.charZero_iff hfinj).1 inferInstance, algebraMap V (integralClosure V M), ρ,
-    Formalism.L2.G.IntCl.complete V K M hC, hfinj, Algebra.IsIntegral.isLocalHom _ _, ?_⟩
+  refine ⟨
+    integralClosure V M,
+    inferInstance,
+    inferInstance,
+    hdvr,
+    (RingHom.charZero_iff hfinj).1 inferInstance,
+    algebraMap V (integralClosure V M),
+    ρ,
+    Formalism.L2.G.IntCl.complete V K M hC,
+    hfinj,
+    Algebra.IsIntegral.isLocalHom _ _,
+    ?_
+  ⟩
   ext a
   show ρ1 (algebraMap A R a) = (algebraMap V M (h a) : Ω)
   rw [hρ1]

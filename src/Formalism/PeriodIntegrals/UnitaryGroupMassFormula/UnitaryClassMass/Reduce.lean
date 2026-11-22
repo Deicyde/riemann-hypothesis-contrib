@@ -14,16 +14,18 @@ namespace PI.UnitaryGroupMassFormula.UJClassMass
 section Abstract
 
 variable {G : Type*} [Group G] (Γ Kf : Subgroup G)
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
   (h : V →ₗ⋆[K] V →ₗ[K] K) (L0 : Submodule (𝓞 K) V)
 
 structure IsDict (Λ : G → Submodule (𝓞 K) V) (ι : Γ → V ≃ₗ[K] V) : Prop where
   mem : ∀ g, Λ g ∈ genus h L0
   isIsom : ∀ γ, ι γ ∈ isom h
   equiv : ∀ g (γ : Γ) (k : Kf), Λ ((γ : G) * g * k) = gmap (ι γ) (Λ g)
-  inj : ∀ g g' (u : V ≃ₗ[K] V), u ∈ isom h → gmap u (Λ g') = Λ g →
-    ∃ (γ : Γ) (k : Kf), g = (γ : G) * g' * k
+  inj
+    : ∀ g g' (u : V ≃ₗ[K] V),
+      u ∈ isom h → gmap u (Λ g') = Λ g → ∃ (γ : Γ) (k : Kf), g = (γ : G) * g' * k
   surj : ∀ N ∈ genus h L0, ∃ g, Λ g = N
   card : ∀ g, Nat.card (PI.UJClassMass.stab Γ Kf g) = Nat.card (autL h (Λ g))
 
@@ -95,17 +97,17 @@ private lemma sum_inv_card_autL_eq_of_isClassReps {s t : Finset (Submodule (𝓞
     rw [e'] at hc
     rw [hc]
 
-theorem mass_eq_of_reps {s : Finset (Submodule (𝓞 K) V)} (hs : IsClassReps h L0 s) :
-    mass h L0 = ∑ N ∈ s, ((Nat.card (autL h N) : ℕ) : ℝ)⁻¹ := by
+theorem mass_eq_of_reps {s : Finset (Submodule (𝓞 K) V)} (hs : IsClassReps h L0 s)
+    : mass h L0 = ∑ N ∈ s, ((Nat.card (autL h N) : ℕ) : ℝ)⁻¹ := by
   have hex : ∃ t, IsClassReps h L0 t := ⟨s, hs⟩
   rw [Formalism.HermitianLatticesTheory.mass, dite_eq_left hex]
   exact sum_inv_card_autL_eq_of_isClassReps hex.choose_spec hs
 
-theorem sum_eq_mass {Λ : G → Submodule (𝓞 K) V} {ι : Γ → V ≃ₗ[K] V} (D : IsDict Γ Kf h L0 Λ ι)
-    (n : ℕ) (g : Fin n → G)
-    (hcov : ∀ x, ∃ i, ∃ γ : Γ, ∃ k : Kf, x = (γ : G) * g i * k)
-    (hdisj : ∀ i j (γ γ' : Γ) (k k' : Kf), (γ : G) * g i * k = (γ' : G) * g j * k' → i = j) :
-    ∑ i, ((Nat.card (PI.UJClassMass.stab Γ Kf (g i)) : ℝ))⁻¹ = mass h L0 := by
+theorem sum_eq_mass
+    {Λ : G → Submodule (𝓞 K) V} {ι : Γ → V ≃ₗ[K] V} (D : IsDict Γ Kf h L0 Λ ι)
+    (n : ℕ) (g : Fin n → G) (hcov : ∀ x, ∃ i, ∃ γ : Γ, ∃ k : Kf, x = (γ : G) * g i * k)
+    (hdisj : ∀ i j (γ γ' : Γ) (k k' : Kf), (γ : G) * g i * k = (γ' : G) * g j * k' → i = j)
+    : ∑ i, ((Nat.card (PI.UJClassMass.stab Γ Kf (g i)) : ℝ))⁻¹ = mass h L0 := by
   classical
   have hR : ∀ i j (u : V ≃ₗ[K] V), u ∈ isom h → gmap u (Λ (g j)) = Λ (g i) → i = j := by
     intro i j u hu huj
@@ -124,8 +126,11 @@ theorem sum_eq_mass {Λ : G → Submodule (𝓞 K) V} {ι : Γ → V ≃ₗ[K] V
     · intro M hM
       obtain ⟨x, rfl⟩ := D.surj M hM
       obtain ⟨i, γ, k, rfl⟩ := hcov x
-      refine ⟨Λ (g i), ⟨Finset.mem_image_of_mem _ (Finset.mem_univ i), ι γ, D.isIsom γ,
-        (D.equiv (g i) γ k).symm⟩, ?_⟩
+      refine ⟨
+        Λ (g i),
+        ⟨Finset.mem_image_of_mem _ (Finset.mem_univ i), ι γ, D.isIsom γ, (D.equiv (g i) γ k).symm⟩,
+        ?_
+      ⟩
       rintro N ⟨hN, u, hu, huN⟩
       obtain ⟨j, -, hj⟩ := Finset.mem_image.1 hN
       have hj' : Λ (g j) = N := hj

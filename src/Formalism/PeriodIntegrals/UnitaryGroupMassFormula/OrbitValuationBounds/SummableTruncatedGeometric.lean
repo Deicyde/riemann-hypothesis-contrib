@@ -8,37 +8,44 @@ noncomputable section
 
 open scoped BigOperators
 open Classical
-open NumberField IsDedekindDomain Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions.G Formalism.MainNotions.OrbitPlaces
+open NumberField IsDedekindDomain Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.BasicNotions.DV Formalism.MainNotions.G Formalism.MainNotions.OrbitPlaces
 
 namespace PI.OrbBoundFW
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem orbit_map_add_natCast (D : D7) (p : ℕ) (z : Pl D) (s : ZMod (nP D p)) (e : ℕ) :
-    orbMap D p z (s + (e : ZMod (nP D p))) = posPl D p (orbMap D p z s) e := by
+theorem orbit_map_add_natCast (D : D7) (p : ℕ) (z : Pl D) (s : ZMod (nP D p)) (e : ℕ)
+    : orbMap D p z (s + (e : ZMod (nP D p))) = posPl D p (orbMap D p z s) e := by
   unfold orbMap
   rw [posPl_add, ← posPl_mod D p z (s.val + e), ZMod.val_add, ZMod.val_natCast, Nat.add_mod_mod]
 
-theorem base_shift_add_nsmul (X : Inst D L) (h t : HH D) (m : ℕ) : X.bs h (t + m • h) = X.bs h t := by
+theorem base_shift_add_nsmul (X : Inst D L) (h t : HH D) (m : ℕ)
+    : X.bs h (t + m • h) = X.bs h t := by
   induction m with
   | zero => simp
   | succ k ih => rw [succ_nsmul, ← add_assoc, X.bs_step, ih]
 
 theorem base_shift_idempotent (X : Inst D L) (h t : HH D) : X.bs h (X.bs h t) = X.bs h t := by
   obtain ⟨i, hi⟩ := X.bs_orb h t
-  calc X.bs h (X.bs h t) = X.bs h (X.bs h t + i • h) := (base_shift_add_nsmul X h (X.bs h t) i).symm
+  calc
+    X.bs h (X.bs h t)
+      = X.bs h (X.bs h t + i • h) := (base_shift_add_nsmul X h (X.bs h t) i).symm
     _ = X.bs h t := by rw [hi]
 
-theorem posPl_false_eq_odd_add_nsmul {p : ℕ} (hsg : IsSg D p) (t0 : HH D) (n : ℕ) :
-    posPl D p (false, t0) n = (decide (Odd n), t0 + n • hP D p) := by
+theorem posPl_false_eq_odd_add_nsmul {p : ℕ} (hsg : IsSg D p) (t0 : HH D) (n : ℕ)
+    : posPl D p (false, t0) n = (decide (Odd n), t0 + n • hP D p) := by
   first
-    | (simp [posPl, Formalism.MainNotions.G.partner]; try exact fun _ => hsg)
-    | (simp [posPl, Formalism.BasicNotions.partner]; try exact fun _ => hsg)
+  | (simp [posPl, Formalism.MainNotions.G.partner]; try exact fun _ => hsg)
+  | (simp [posPl, Formalism.BasicNotions.partner]; try exact fun _ => hsg)
 
-theorem sum_tops_on_orbit (X : Inst D L) {p : ℕ} (hsg : IsSg D p) {t0 : HH D} (ht0 : t0 ∈ reps X p)
+theorem sum_tops_on_orbit
+    (X : Inst D L)
+    {p : ℕ} (hsg : IsSg D p)
+    {t0 : HH D} (ht0 : t0 ∈ reps X p)
     (TT : Finset (ZMod (nP D p))) (hTT : ∀ s, s ∈ TT ↔ IsTopPl D (orbMap D p (false, t0) s))
-    (F : HH D → ℝ) :
-    ∑ t ∈ topsOn X p t0, F t = ∑ s ∈ TT, F (orbMap D p (false, t0) s).2 := by
+    (F : HH D → ℝ)
+    : ∑ t ∈ topsOn X p t0, F t = ∑ s ∈ TT, F (orbMap D p (false, t0) s).2 := by
   have hst : stepP D p = 2 • hP D p := if_pos hsg
   have hb0 : X.bs (2 • hP D p) t0 = t0 := by
     unfold reps at ht0
@@ -56,13 +63,15 @@ theorem sum_tops_on_orbit (X : Inst D L) {p : ℕ} (hsg : IsSg D p) {t0 : HH D} 
     obtain ⟨m, hm⟩ := Nat.not_odd_iff_even.1 hev
     simp only [topsOn, Finset.mem_filter]
     refine ⟨hT.2, ?_⟩
-    rw [hst, hm, show (m + m) • hP D p = m • (2 • hP D p) by rw [smul_smul, mul_two], base_shift_add_nsmul, hb0]
+    rw [hst, hm, show (m + m) • hP D p = m • (2 • hP D p) by rw [smul_smul, mul_two],
+      base_shift_add_nsmul, hb0]
   · intro s1 hs1 s2 hs2 heq
     have hT1 := (hTT s1).1 hs1
     have hT2 := (hTT s2).1 hs2
     have : orbMap D p (false, t0) s1 = orbMap D p (false, t0) s2 :=
       Prod.ext (hT1.1.trans hT2.1.symm) heq
-    exact ZMod.val_injective _ (posPl_inj D p (false, t0) _ _ (ZMod.val_lt s1) (ZMod.val_lt s2) this)
+    exact ZMod.val_injective _
+      (posPl_inj D p (false, t0) _ _ (ZMod.val_lt s1) (ZMod.val_lt s2) this)
   · intro t ht
     have ht' := Finset.mem_coe.1 ht
     simp only [topsOn, Finset.mem_filter] at ht'
@@ -83,39 +92,46 @@ theorem sum_tops_on_orbit (X : Inst D L) {p : ℕ} (hsg : IsSg D p) {t0 : HH D} 
     · show (orbMap D p (false, t0) _).2 = t
       rw [ho]
 
-theorem tsum_le_tsum_of_nonneg_le {f g : ℕ → ℝ} (hf0 : ∀ e, 0 ≤ f e) (hle : ∀ e, f e ≤ g e) (hg : Summable g) :
-    ∑' e, f e ≤ ∑' e, g e := by
+theorem tsum_le_tsum_of_nonneg_le
+    {f g : ℕ → ℝ} (hf0 : ∀ e, 0 ≤ f e) (hle : ∀ e, f e ≤ g e) (hg : Summable g)
+    : ∑' e, f e ≤ ∑' e, g e := by
   have hfs : Summable f := Summable.of_nonneg_of_le hf0 hle hg
-  first
-    | exact Summable.tsum_le_tsum hle hfs hg
-    | exact tsum_le_tsum hle hfs hg
+  first | exact Summable.tsum_le_tsum hle hfs hg | exact tsum_le_tsum hle hfs hg
 
-theorem orbit_local_term_nonneg (Lc : Formalism.MainNotions.product_zeroth_first_parts.Loc) (s : ZMod Lc.d) : 0 ≤ Lc.baseTerm s := by
+theorem orbit_local_term_nonneg
+    (Lc : Formalism.MainNotions.product_zeroth_first_parts.Loc) (s : ZMod Lc.d)
+    : 0 ≤ Lc.baseTerm s := by
   apply tsum_nonneg
   intro e
   split_ifs
   · exact le_max_right _ _
   · exact le_rfl
 
-theorem mem_top_orbit_set_iff (E : Ent D) (p : ℕ) [Fact p.Prime] (h : OrbOK D p) (u : D.what₂.Word) (i : ℕ) (z : Pl D)
-    (Th : MvPowerSeries (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) ℂ_[p]) (s : ZMod (nP D p)) :
-    s ∈ (orbLoc E p h u i z Th).TT ↔ IsTopPl D (orbMap D p z s) := by
-  first
-    | exact Finset.mem_filter.trans (and_iff_right (Finset.mem_univ _))
-    | simp [orbLoc]
+theorem mem_top_orbit_set_iff
+    (E : Ent D)
+    (p : ℕ) [Fact p.Prime]
+    (h : OrbOK D p) (u : D.what₂.Word)
+    (i : ℕ)
+    (z : Pl D) (Th : MvPowerSeries (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) ℂ_[p])
+    (s : ZMod (nP D p))
+    : s ∈ (orbLoc E p h u i z Th).TT ↔ IsTopPl D (orbMap D p z s) := by
+  first | exact Finset.mem_filter.trans (and_iff_right (Finset.mem_univ _)) | simp [orbLoc]
 
-theorem orbit_local_capacity_eq (E : Ent D) (p : ℕ) [Fact p.Prime] (h : OrbOK D p) (u : D.what₂.Word) (i : ℕ) (z : Pl D)
-    (Th : MvPowerSeries (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) ℂ_[p]) (s : ZMod (nP D p)) :
-    (((orbLoc E p h u i z Th).cap s : ℕ) : ℝ) = E.cap u i (orbMap D p z s) := by
+theorem orbit_local_capacity_eq
+    (E : Ent D)
+    (p : ℕ) [Fact p.Prime]
+    (h : OrbOK D p) (u : D.what₂.Word)
+    (i : ℕ)
+    (z : Pl D) (Th : MvPowerSeries (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) ℂ_[p])
+    (s : ZMod (nP D p))
+    : (((orbLoc E p h u i z Th).cap s : ℕ) : ℝ) = E.cap u i (orbMap D p z s) := by
   have hT := mem_top_orbit_set_iff E p h u i z Th s
   simp only [Formalism.MainNotions.product_zeroth_first_parts.Loc.cap, Ent.cap, Nat.cast_ite]
-  split_ifs <;> first
-    | (simp [Ent.row, orbLoc]; done)
-    | tauto
-    | simp_all
+  split_ifs <;> first | (simp [Ent.row, orbLoc]; done) | tauto | simp_all
 
-theorem summable_truncated_geometric (x l : ℝ) (hl : 1 < l) (c : ℕ → ℝ) (hc : ∀ e, 0 ≤ c e) (P : ℕ → Prop) [DecidablePred P] :
-    Summable fun e : ℕ => if P e then max (x / l ^ e - c e) 0 else 0 := by
+theorem summable_truncated_geometric
+    (x l : ℝ) (hl : 1 < l) (c : ℕ → ℝ) (hc : ∀ e, 0 ≤ c e) (P : ℕ → Prop) [DecidablePred P]
+    : Summable fun e : ℕ => if P e then max (x / l ^ e - c e) 0 else 0 := by
   have hl0 : (0 : ℝ) < l := by linarith
   have hq0 : (0 : ℝ) ≤ 1 / l := one_div_nonneg.2 hl0.le
   have hq1 : 1 / l < 1 := (div_lt_one hl0).2 hl
@@ -130,18 +146,23 @@ theorem summable_truncated_geometric (x l : ℝ) (hl : 1 < l) (c : ℕ → ℝ) 
     have h1 : x / l ^ e ≤ |x| * (1 / l) ^ e := by
       rw [one_div_pow, ← div_eq_mul_one_div]
       first
-        | exact div_le_div_of_nonneg_right (le_abs_self x) hpow.le
-        | exact (div_le_div_iff_of_pos_right hpow).2 (le_abs_self x)
-        | exact (div_le_div_right hpow).2 (le_abs_self x)
+      | exact div_le_div_of_nonneg_right (le_abs_self x) hpow.le
+      | exact (div_le_div_iff_of_pos_right hpow).2 (le_abs_self x)
+      | exact (div_le_div_right hpow).2 (le_abs_self x)
     split_ifs
     · exact max_le (by linarith [hc e]) h2
     · exact h2
 
-theorem orbit_place_term_le_sum {X : Inst D L} {E : Ent D} (hS : Shape D L X E) (K : Consts) (hK1 : 0 ≤ K.dl1)
-    (hK2 : 0 ≤ K.dl2) {p : ℕ} [Fact p.Prime] (h : OrbOK D p) (u : D.what₂.Word) {i : ℕ} (hi : i < D.R.m)
+theorem orbit_place_term_le_sum
+    {X : Inst D L} {E : Ent D} (hS : Shape D L X E)
+    (K : Consts) (hK1 : 0 ≤ K.dl1) (hK2 : 0 ≤ K.dl2)
+    {p : ℕ} [Fact p.Prime]
+    (h : OrbOK D p) (u : D.what₂.Word)
+    {i : ℕ} (hi : i < D.R.m)
     {r : Pl D} (hr : r ∈ repsPl X p) (hk : r ∈ kindBC D p)
-    (Th : MvPowerSeries (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) ℂ_[p]) :
-    g0Pl X K p (i + 1) r ≤ ∑ s ∈ (orbLoc E p h u i r Th).TT, (orbLoc E p h u i r Th).baseTerm s := by
+    (Th : MvPowerSeries (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) ℂ_[p])
+    : g0Pl X K p (i + 1) r
+      ≤ ∑ s ∈ (orbLoc E p h u i r Th).TT, (orbLoc E p h u i r Th).baseTerm s := by
   have hnn : 0 ≤ ∑ s ∈ (orbLoc E p h u i r Th).TT, (orbLoc E p h u i r Th).baseTerm s :=
     Finset.sum_nonneg fun s _ => orbit_local_term_nonneg _ s
   unfold g0Pl
@@ -168,9 +189,11 @@ theorem orbit_place_term_le_sum {X : Inst D L} {E : Ent D} (hS : Shape D L X E) 
       (mul_nonneg (mul_nonneg hK2 (Nat.cast_nonneg _)) (sq_nonneg _))
   unfold g0
   refine (sub_le_self _ hdl).trans ?_
-  rw [sum_tops_on_orbit X hsg ht0 (orbLoc E p h u i (false, t0) Th).TT (mem_top_orbit_set_iff E p h u i (false, t0) Th)]
+  rw [sum_tops_on_orbit X hsg ht0 (orbLoc E p h u i (false, t0) Th).TT
+    (mem_top_orbit_set_iff E p h u i (false, t0) Th)]
   refine Finset.sum_le_sum fun s hs => ?_
-  have hs' : IsTopPl D (orbMap D p (false, t0) s) := (mem_top_orbit_set_iff E p h u i (false, t0) Th s).1 hs
+  have hs' : IsTopPl D (orbMap D p (false, t0) s) :=
+    (mem_top_orbit_set_iff E p h u i (false, t0) Th s).1 hs
   set t := (orbMap D p (false, t0) s).2 with ht
   have hom : orbMap D p (false, t0) s = (false, t) := Prod.ext hs'.1 rfl
   have htT : t ∈ D.host.TT := hs'.2
@@ -211,9 +234,10 @@ theorem orbit_place_term_le_sum {X : Inst D L} {E : Ent D} (hS : Shape D L X E) 
       have hcap := hS.capG u i hi (orbMap D p (false, t0) (s + (e : ZMod (nP D p))))
       rw [← orbit_local_capacity_eq E p h u i (false, t0) Th, hpart] at hcap
       have hpe : (0 : ℝ) < (p : ℝ) ^ e := pow_pos (by linarith) e
-      have hrow : ((((orbLoc E p h u i (false, t0) Th).nu s).rowLen 0 : ℕ) : ℝ) -
-          ((((orbLoc E p h u i (false, t0) Th).nu s).rowLen 1 : ℕ) : ℝ) =
-          E.row u i (false, t) 0 - E.row u i (false, t) 1 := by
+      have hrow
+          : ((((orbLoc E p h u i (false, t0) Th).nu s).rowLen 0 : ℕ) : ℝ)
+              - ((((orbLoc E p h u i (false, t0) Th).nu s).rowLen 1 : ℕ) : ℝ)
+            = E.row u i (false, t) 0 - E.row u i (false, t) 1 := by
         rw [← hom]; rfl
       rw [hl, hrow]
       unfold capU

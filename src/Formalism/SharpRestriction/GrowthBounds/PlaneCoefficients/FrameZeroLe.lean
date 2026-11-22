@@ -12,7 +12,10 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics
 open Formalism.MainNotions.G.WittFrameLocaliserOrders
 
 namespace G2
@@ -28,9 +31,11 @@ theorem frame_zero_le (hV : Fr.Valid L₁ N₁) (j : ℤ) : Fr.fr j 0 ≤ Fr.fr 
     | succ i ih => intro hi; exact (ih (by omega)).trans (hinc j i (by omega)).le
   exact key (r - 1) le_rfl
 
-theorem zstep (hV : Fr.Valid L₁ N₁) (a : ℤ) : Fr.fr a (r - 1) < Fr.fr (a + 1) (r - 1) := (hV.2.2.2.1 a).trans_le (frame_zero_le hV (a + 1))
+theorem zstep (hV : Fr.Valid L₁ N₁) (a : ℤ) : Fr.fr a (r - 1) < Fr.fr (a + 1) (r - 1) :=
+  (hV.2.2.2.1 a).trans_le (frame_zero_le hV (a + 1))
 
-theorem zmono (hV : Fr.Valid L₁ N₁) (a b : ℤ) (hab : a ≤ b) : Fr.fr a (r - 1) ≤ Fr.fr b (r - 1) := by
+theorem zmono (hV : Fr.Valid L₁ N₁) (a b : ℤ) (hab : a ≤ b)
+    : Fr.fr a (r - 1) ≤ Fr.fr b (r - 1) := by
   have key : ∀ k : ℕ, Fr.fr a (r - 1) ≤ Fr.fr (a + k) (r - 1) := by
     intro k
     induction k with
@@ -42,9 +47,11 @@ theorem zmono (hV : Fr.Valid L₁ N₁) (a b : ℤ) (hab : a ≤ b) : Fr.fr a (r
   have heq : a + (↑(b - a).toNat : ℤ) = b := by omega
   simpa only [heq] using h
 
-theorem seg' (hV : Fr.Valid L₁ N₁) {J : ℕ} [NeZero J] {nL : ZMod J → ℕ}
-    (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (x : TL J nL r) :
-    Fr.fr (segZ x.1 - 1) (r - 1) < posTL Fr x ∧ posTL Fr x ≤ Fr.fr (segZ x.1) (r - 1) := by
+theorem seg'
+    (hV : Fr.Valid L₁ N₁)
+    {J : ℕ} [NeZero J]
+    {nL : ZMod J → ℕ} (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (x : TL J nL r)
+    : Fr.fr (segZ x.1 - 1) (r - 1) < posTL Fr x ∧ posTL Fr x ≤ Fr.fr (segZ x.1) (r - 1) := by
   obtain ⟨j, l | m⟩ := x
   · have h := (mem_LLset Fr _ _).1 (llPos_mem Fr (segZ j) l.val (by rw [← hnL]; exact l.isLt))
     exact ⟨h.1.1, le_trans (le_of_lt h.1.2) (frame_zero_le hV (segZ j))⟩
@@ -69,7 +76,8 @@ theorem restGeo : RestGeo := by
   have hj0 : (0 : ℤ) ≤ (j : ℤ) := by positivity
   have hlast : Fr.fr ((Fr.J : ℤ) - 1) (r - 1) = Fr.fr (-1) (r - 1) + n' := by
     have := hper (-1) (r - 1)
-    rw [← this]; congr 1
+    rw [← this]
+    congr 1
   have w1 := G2.zmono hV (-1) (segZ x'.1 - 1) (by omega)
   have w2 := G2.zmono hV (segZ x'.1) ((Fr.J : ℤ) - 1) (by omega)
   have w3 := G2.zmono hV (j : ℤ) ((Fr.J : ℤ) - 1) (by omega)
@@ -78,7 +86,8 @@ theorem restGeo : RestGeo := by
   unfold Frames.dist
   apply Int.toNat_le_toNat
   by_cases hc : Fr.fr (-1) (r - 1) + 1 ≤ y
-  · have hy' : posTL Fr x' = y := residue_position_injective_window n' _ _ _ hwin ⟨hc, by omega⟩ hpos
+  · have hy' : posTL Fr x' = y :=
+      residue_position_injective_window n' _ _ _ hwin ⟨hc, by omega⟩ hpos
     have hs : segZ x'.1 ≤ (j : ℤ) := by
       by_contra hlt
       have := G2.zmono hV (j : ℤ) (segZ x'.1 - 1) (by omega)
@@ -92,7 +101,8 @@ theorem restGeo : RestGeo := by
     have hJ1 : (1 : ℤ) ≤ (Fr.J : ℤ) := by omega
     have a4 := G2.zmono hV (-1) ((j : ℤ) - 2 + Fr.J) (by omega)
     have hy' : posTL Fr x' = y + n' :=
-      residue_position_injective_window n' _ _ _ hwin ⟨by omega, by omega⟩ (by rw [DdG.posOf_add_n]; exact hpos)
+      residue_position_injective_window n' _ _ _ hwin ⟨by omega, by omega⟩
+        (by rw [DdG.posOf_add_n]; exact hpos)
     have a5 : Fr.fr ((j : ℤ) + Fr.J) (r - 1) = Fr.fr (j : ℤ) (r - 1) + n' := hper _ _
     have a6 := G2.zmono hV (segZ x'.1) ((j : ℤ) + Fr.J) (by omega)
     omega

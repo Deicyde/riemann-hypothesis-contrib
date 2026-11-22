@@ -6,12 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.UpperTriangularMul
 
-theorem upperTriangular_mul :
-    ∀ {n : ℕ} {R : Type} [inst : CommRing R] {M N : Matrix (Fin n) (Fin n) R},
-      (∀ (a i : Fin n), i < a → M a i = (0 : R)) →
-      (∀ (a i : Fin n), i < a → N a i = (0 : R)) →
-      (∀ (a i : Fin n), i < a → (M * N) a i = (0 : R)) ∧
-        ∀ (i : Fin n), (M * N) i i = M i i * N i i := by
+theorem upperTriangular_mul
+    : ∀ {n : ℕ} {R : Type} [inst : CommRing R] {M N : Matrix (Fin n) (Fin n) R},
+      (∀ (a i : Fin n), i < a → M a i = (0 : R)) → (∀ (a i : Fin n), i < a → N a i = (0 : R))
+        → (∀ (a i : Fin n), i < a → (M * N) a i = (0 : R))
+          ∧ ∀ (i : Fin n), (M * N) i i = M i i * N i i := by
   intro n R _ M N hM hN
   refine ⟨fun a i hia => ?_, fun i => ?_⟩
   · rw [Matrix.mul_apply]

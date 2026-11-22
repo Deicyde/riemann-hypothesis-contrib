@@ -22,8 +22,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DatumPeri
 @[expose] public section
 
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions
-open GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.IndefiniteRowSideFullHecke.WeightedChainData
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+  Formalism.L2.Ker Formalism.MainNotions
+open GlobalTheory.IndefiniteRowSideFullHecke
+  GlobalTheory.IndefiniteRowSideFullHecke.WeightedChainData
 
 noncomputable section
 
@@ -39,19 +41,20 @@ section Red
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} {P : HeightOneSpectrum (𝓞 E)}
 
-
-
-
-
-
 end Red
 
 section Primes
 
-variable {X : Fields} {Pr : Primes X} {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
+variable
+  {X : Fields}
+  {Pr : Primes X} {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
 
-theorem notMem_of_QE (hs : IsSel X sel) (mu : Tup X.F X.E X.K S) {P : HeightOneSpectrum (𝓞 X.E)}
-    (hP : P ∈ QE sel (mu : Chr X.F X.E X.K)) {p : ℕ} (hp : p.Prime) (hS : p ∈ S) : (p : 𝓞 X.E) ∉ P.asIdeal := by
+theorem notMem_of_QE
+    (hs : IsSel X sel)
+    (mu : Tup X.F X.E X.K S)
+    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ QE sel (mu : Chr X.F X.E X.K))
+    {p : ℕ} (hp : p.Prime) (hS : p ∈ S)
+    : (p : 𝓞 X.E) ∉ P.asIdeal := by
   classical
   intro hm
   unfold QE at hP
@@ -77,15 +80,19 @@ theorem notMem_of_QE (hs : IsSel X sel) (mu : Tup X.F X.E X.K S) {P : HeightOneS
   show ringChar (𝓞 X.F ⧸ v.asIdeal) ∈ S
   rwa [h4]
 
-theorem g_mem_of_vGs (hP : Pr.Ok) {w : HeightOneSpectrum (𝓞 X.E)} (hw : w ∈ Pr.vGs) :
-    ∃ k, (Pr.g k : 𝓞 X.E) ∈ w.asIdeal := by
+theorem g_mem_of_vGs (hP : Pr.Ok) {w : HeightOneSpectrum (𝓞 X.E)} (hw : w ∈ Pr.vGs)
+    : ∃ k, (Pr.g k : 𝓞 X.E) ∈ w.asIdeal := by
   classical
   rcases Finset.mem_union.1 hw with h | h
   · exact ⟨0, hP.g_mem h⟩
   · exact ⟨1, hP.g_mem h⟩
 
-theorem disj (hP : Pr.Ok) (hs : IsSel X sel) (mu : Tup X.F X.E X.K S) (hg : ∀ k, Pr.g k ∈ S)
-    {P : HeightOneSpectrum (𝓞 X.E)} (hQ : P ∈ QE sel (mu : Chr X.F X.E X.K)) : P ∉ Pr.vGs := fun hw => by
+theorem disj
+    (hP : Pr.Ok) (hs : IsSel X sel)
+    (mu : Tup X.F X.E X.K S)
+    (hg : ∀ k, Pr.g k ∈ S)
+    {P : HeightOneSpectrum (𝓞 X.E)} (hQ : P ∈ QE sel (mu : Chr X.F X.E X.K))
+    : P ∉ Pr.vGs := fun hw => by
   obtain ⟨k, hk⟩ := g_mem_of_vGs hP hw
   exact notMem_of_QE hs mu hQ (hP.g_prime k) (hg k) hk
 
@@ -101,8 +108,6 @@ section Levels
 
 variable {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} (T : ChainData D u μ)
 
-
-
 variable {T}
 
 end Levels
@@ -113,15 +118,16 @@ variable {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} (T : ChainData D u �
 
 abbrev APt (i : ℕ) : Type := AmbientLatticeAvoidance.Pt (R := D.R) T.sel T.xi T.L T.w i
 
-
 variable {T}
 
 end Points
 
 section Moves
 
-variable {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} (T : ChainData D u μ)
-  (abelian₂ : HeightOneSpectrum (𝓞 T.X.E) → Submodule (𝓞 T.X.E) (Sp T.X.E (AmbientLatticeAvoidance.rkTop D.R)))
+variable
+  {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} (T : ChainData D u μ)
+  (abelian₂ : HeightOneSpectrum (𝓞 T.X.E)
+    → Submodule (𝓞 T.X.E) (Sp T.X.E (AmbientLatticeAvoidance.rkTop D.R)))
   (dep : HeightOneSpectrum (𝓞 T.X.E) → ℕ)
 
 variable {T abelian₂ dep}
@@ -130,25 +136,25 @@ end Moves
 
 section Classes
 
-variable {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} {T : ChainData D u μ}
-  {abelian₂ : HeightOneSpectrum (𝓞 T.X.E) → Submodule (𝓞 T.X.E) (Sp T.X.E (AmbientLatticeAvoidance.rkTop D.R))}
+variable
+  {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} {T : ChainData D u μ}
+  {abelian₂ : HeightOneSpectrum (𝓞 T.X.E)
+    → Submodule (𝓞 T.X.E) (Sp T.X.E (AmbientLatticeAvoidance.rkTop D.R))}
   {dep : HeightOneSpectrum (𝓞 T.X.E) → ℕ}
 
-
 variable {rep : ∀ i, (D.chTw u μ).cls i → APt T i}
-
 
 end Classes
 
 section Kernels
 
-variable {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} {T : ChainData D u μ}
+variable
+  {D : D7} {u : D.what₂.Word} {μ : D.what₂.Tup} {T : ChainData D u μ}
   {rep : ∀ i, (D.chTw u μ).cls i → APt T i}
 
-
-
-
-variable {abelian₂ : HeightOneSpectrum (𝓞 T.X.E) → Submodule (𝓞 T.X.E) (Sp T.X.E (AmbientLatticeAvoidance.rkTop D.R))}
+variable
+  {abelian₂ : HeightOneSpectrum (𝓞 T.X.E)
+    → Submodule (𝓞 T.X.E) (Sp T.X.E (AmbientLatticeAvoidance.rkTop D.R))}
   {dep : HeightOneSpectrum (𝓞 T.X.E) → ℕ}
 
 end Kernels

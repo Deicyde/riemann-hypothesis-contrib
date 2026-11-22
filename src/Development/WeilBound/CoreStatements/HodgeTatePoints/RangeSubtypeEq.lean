@@ -96,9 +96,12 @@ lemma sq_pull (φ : X →+ N) (M : Submodule R (N → C)) (M' : Submodule R (X �
 
 variable {v : Valuation C NNReal}
 
-theorem exists_res (hv : v.Integers R) [Fintype N] [DecidableEq N] [Fintype X] [DecidableEq X]
-    (AA : HopfOrder (C := C) R N) (ι : X →+ N) (hι : Function.Injective ι) :
-    ∃ AK : HopfOrder (C := C) R X, AK.carrier = AA.carrier.map (LinearMap.funLeft R C ι) := by
+theorem exists_res
+    (hv : v.Integers R)
+    [Fintype N] [DecidableEq N] [Fintype X] [DecidableEq X]
+    (AA : HopfOrder (C := C) R N)
+    (ι : X →+ N) (hι : Function.Injective ι)
+    : ∃ AK : HopfOrder (C := C) R X, AK.carrier = AA.carrier.map (LinearMap.funLeft R C ι) := by
   classical
   obtain ⟨K, hK⟩ : ∃ K, ι.range = K := ⟨_, rfl⟩
   obtain ⟨e, he⟩ := exists_subEquiv ι hι K hK
@@ -108,9 +111,12 @@ theorem exists_res (hv : v.Integers R) [Fintype N] [DecidableEq N] [Fintype X] [
   rw [map_res_eq _ ι _ e he, ← hAK]
   rfl
 
-theorem exists_quo (hv : v.Integers R) [Fintype N] [DecidableEq N] [Fintype Q] [DecidableEq Q]
-    (AA : HopfOrder (C := C) R N) (ψ : N →+ Q) (hψ : Function.Surjective ψ) :
-    ∃ AQ : HopfOrder (C := C) R Q, AQ.carrier = AA.carrier.comap (LinearMap.funLeft R C ψ) := by
+theorem exists_quo
+    (hv : v.Integers R)
+    [Fintype N] [DecidableEq N] [Fintype Q] [DecidableEq Q]
+    (AA : HopfOrder (C := C) R N)
+    (ψ : N →+ Q) (hψ : Function.Surjective ψ)
+    : ∃ AQ : HopfOrder (C := C) R Q, AQ.carrier = AA.carrier.comap (LinearMap.funLeft R C ψ) := by
   classical
   obtain ⟨e, he⟩ := exists_quoEquiv ψ hψ ψ.ker rfl
   have : Fintype (N ⧸ ψ.ker) := Fintype.ofFinite _
@@ -119,20 +125,24 @@ theorem exists_quo (hv : v.Integers R) [Fintype N] [DecidableEq N] [Fintype Q] [
   rw [comap_quo_eq _ ψ _ e he, ← hAQ]
   rfl
 
-theorem colen_ses [IsAlgClosed C] [CharZero C] (hv : v.Integers R) [Fintype N] [DecidableEq N]
-    [Fintype X] [DecidableEq X] [Fintype Q] [DecidableEq Q]
-    (AA : HopfOrder (C := C) R N) (ι : X →+ N) (hι : Function.Injective ι)
-    (ψ : N →+ Q) (hψ : Function.Surjective ψ) (hex : ι.range = ψ.ker) (c cQ cK : NNReal)
-    (hc : HasColen R v AA.carrier c)
+theorem colen_ses
+    [IsAlgClosed C] [CharZero C]
+    (hv : v.Integers R)
+    [Fintype N] [DecidableEq N] [Fintype X] [DecidableEq X] [Fintype Q] [DecidableEq Q]
+    (AA : HopfOrder (C := C) R N)
+    (ι : X →+ N) (hι : Function.Injective ι)
+    (ψ : N →+ Q) (hψ : Function.Surjective ψ) (hex : ι.range = ψ.ker)
+    (c cQ cK : NNReal) (hc : HasColen R v AA.carrier c)
     (hQ : HasColen R v (AA.carrier.comap (LinearMap.funLeft R C ψ)) cQ)
-    (hK : HasColen R v (AA.carrier.map (LinearMap.funLeft R C ι)) cK) :
-    c = cQ ^ Fintype.card X * cK ^ Fintype.card Q := by
+    (hK : HasColen R v (AA.carrier.map (LinearMap.funLeft R C ι)) cK)
+    : c = cQ ^ Fintype.card X * cK ^ Fintype.card Q := by
   classical
   obtain ⟨K, hKd⟩ : ∃ K, ι.range = K := ⟨_, rfl⟩
   obtain ⟨e, he⟩ := exists_subEquiv ι hι K hKd
   obtain ⟨e', he'⟩ := exists_quoEquiv ψ hψ K (hKd ▸ hex)
   have : Fintype (N ⧸ K) := Fintype.ofFinite _
-  obtain ⟨-, -, h3iii, -⟩ := ReciprocityTheory.PGsh.L2.h3 C R inferInstance inferInstance v hv N K AA
+  obtain ⟨-, -, h3iii, -⟩ :=
+    ReciprocityTheory.PGsh.L2.h3 C R inferInstance inferInstance v hv N K AA
   rw [map_res_eq _ ι _ e he] at hK
   rw [comap_quo_eq _ ψ _ e' he'] at hQ
   have hK' := hasColen_map v e.symm _ _ hK
@@ -141,32 +151,42 @@ theorem colen_ses [IsAlgClosed C] [CharZero C] (hv : v.Integers R) [Fintype N] [
   rw [Fintype.card_congr e.toEquiv, Fintype.card_congr e'.toEquiv]
   exact h3iii c cQ cK hc hQ' hK'
 
-theorem om_exact [IsAlgClosed C] [CharZero C] (hv : v.Integers R) [Fintype N] [DecidableEq N]
-    (AA : HopfOrder (C := C) R N) (ι : X →+ N)
-    (ψ : N →+ Q) (hψ : Function.Surjective ψ) (hι : Function.Injective ι) (hex : ι.range = ψ.ker)
+theorem om_exact
+    [IsAlgClosed C] [CharZero C]
+    (hv : v.Integers R)
+    [Fintype N] [DecidableEq N]
+    (AA : HopfOrder (C := C) R N)
+    (ι : X →+ N)
+    (ψ : N →+ Q) (hψ : Function.Surjective ψ)
+    (hι : Function.Injective ι) (hex : ι.range = ψ.ker)
     (g : N → C) (hg : g ∈ augIdeal AA.carrier)
-    (hr : LinearMap.funLeft R C ι g ∈
-      sqIdeal (augIdeal (AA.carrier.map (LinearMap.funLeft R C ι)))) :
-    ∃ b ∈ augIdeal (AA.carrier.comap (LinearMap.funLeft R C ψ)),
+    (hr : LinearMap.funLeft R C ι g ∈ sqIdeal (augIdeal (AA.carrier.map (LinearMap.funLeft R C ι))))
+    : ∃ b ∈ augIdeal (AA.carrier.comap (LinearMap.funLeft R C ψ)),
       g - LinearMap.funLeft R C ψ b ∈ sqIdeal (augIdeal AA.carrier) := by
   classical
   obtain ⟨e, he⟩ := exists_subEquiv ι hι _ rfl
   obtain ⟨e', he'⟩ := exists_quoEquiv ψ hψ ι.range hex
   have : Fintype (N ⧸ ι.range) := Fintype.ofFinite _
-  obtain ⟨-, -, -, h3iv⟩ := ReciprocityTheory.PGsh.L2.h3 C R inferInstance inferInstance v hv N ι.range AA
-  have hres : ∀ f : N → C, LinearMap.funLeft R C (e.symm : ι.range →+ X)
-      (LinearMap.funLeft R C ι f) = resK (R := R) ι.range f := by
+  obtain ⟨-, -, -, h3iv⟩ :=
+    ReciprocityTheory.PGsh.L2.h3 C R inferInstance inferInstance v hv N ι.range AA
+  have hres
+      : ∀ f : N → C,
+        LinearMap.funLeft R C (e.symm : ι.range →+ X) (LinearMap.funLeft R C ι f)
+          = resK (R := R) ι.range f := by
     intro f
     funext k
     show f (ι (e.symm k)) = f k
     rw [← he, AddEquiv.apply_symm_apply]
-  have h1 := sq_pull (e.symm : ι.range →+ X) _ (AA.carrier.map (resK (R := R) ι.range))
-    (by rintro _ ⟨f, hf, rfl⟩; rw [hres]; exact ⟨f, hf, rfl⟩) hr
+  have h1 :=
+    sq_pull (e.symm : ι.range →+ X) _ (AA.carrier.map (resK (R := R) ι.range))
+      (by rintro _ ⟨f, hf, rfl⟩; rw [hres]; exact ⟨f, hf, rfl⟩) hr
   rw [hres, sq_eq_mul] at h1
   obtain ⟨u, hu, w, hw, huw⟩ := Submodule.mem_sup.1 (h3iv g hg h1)
   obtain ⟨b, hb, rfl⟩ := hu
-  have hp : ∀ b : N ⧸ ι.range → C, LinearMap.funLeft R C ψ
-      (LinearMap.funLeft R C (e' : Q →+ N ⧸ ι.range) b) = pullQ (R := R) ι.range b := by
+  have hp
+      : ∀ b : N ⧸ ι.range → C,
+        LinearMap.funLeft R C ψ (LinearMap.funLeft R C (e' : Q →+ N ⧸ ι.range) b)
+          = pullQ (R := R) ι.range b := by
     intro b
     funext x
     show b (e' (ψ x)) = b x
@@ -211,7 +231,33 @@ lemma range_subtype_eq (K : Submodule F N) :
 
 end Scalars
 
-theorem subquo : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable (F := F) AA.carrier → ∀ (K : Submodule F N) [Fintype K] [DecidableEq K] [Fintype (N ⧸ K)] [DecidableEq (N ⧸ K)], (∃ AK : HopfOrder (C := C) R K, AK.carrier = (AA.carrier.map (LinearMap.funLeft R C (Subtype.val : K → N))) ∧ FStable (F := F) AK.carrier) ∧ (∃ AQ : HopfOrder (C := C) R (N ⧸ K), AQ.carrier = (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))) ∧ FStable (F := F) AQ.carrier) ∧ invFun AA.carrier K.toAddSubgroup = (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))).map (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K)) ∧ ∀ c cQ cK, HasColen R v AA.carrier c → HasColen R v (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))) cQ → HasColen R v (AA.carrier.map (LinearMap.funLeft R C (Subtype.val : K → N))) cK → c = cQ ^ Fintype.card K * cK ^ Fintype.card (N ⧸ K) := by
+theorem subquo
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable (F := F) AA.carrier
+                → ∀ (K : Submodule F N) [Fintype K] [DecidableEq K] [Fintype (N ⧸ K)]
+                    [DecidableEq (N ⧸ K)],
+                  (∃ AK : HopfOrder (C := C) R K,
+                      AK.carrier = (AA.carrier.map (LinearMap.funLeft R C (Subtype.val : K → N)))
+                        ∧ FStable (F := F) AK.carrier)
+                    ∧ (∃ AQ : HopfOrder (C := C) R (N ⧸ K),
+                      AQ.carrier = (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K)))
+                        ∧ FStable (F := F) AQ.carrier)
+                    ∧ invFun AA.carrier K.toAddSubgroup
+                      = (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))).map
+                        (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))
+                    ∧ ∀ c cQ cK,
+                      HasColen R v AA.carrier c
+                        → HasColen R v
+                          (AA.carrier.comap (LinearMap.funLeft R C (K.mkQ : N → N ⧸ K))) cQ
+                        → HasColen R v
+                          (AA.carrier.map (LinearMap.funLeft R C (Subtype.val : K → N))) cK
+                        → c = cQ ^ Fintype.card K * cK ^ Fintype.card (N ⧸ K) := by
   intro p _ C _ _ _ v R _ _ hv _ F _ _ _ _ f _ N _ _ _ _ AA hAA K _ _ _ _
   refine ⟨?_, ?_, ?_, ?_⟩
   · obtain ⟨AK, hAK⟩ := exists_res hv AA K.subtype.toAddMonoidHom Subtype.val_injective

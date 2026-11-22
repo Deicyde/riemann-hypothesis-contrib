@@ -6,10 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-theorem UpperTheory.V.LDataCardLeFinrank.decActRoots :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 → ∀ (m : ℕ), m.Coprime l → ∀ g ∈ Dec (F := F) A, ∃ k : ℕ, ∀ ζ : Ω, ζ ^ m = 1 → g ζ = ζ ^ l ^ k := by
+theorem UpperTheory.V.LDataCardLeFinrank.decActRoots
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (A : ValuationSubring Ω),
+      A.valuation (l : Ω) < 1
+        → ∀ (m : ℕ),
+          m.Coprime l → ∀ g ∈ Dec (F := F) A, ∃ k : ℕ, ∀ ζ : Ω, ζ ^ m = 1 → g ζ = ζ ^ l ^ k := by
   intro F Ω _ _ _ _ _ l _ A hA m hm g hg
   have hl : l.Prime := Fact.out
   have hm0 : m ≠ 0 := by
@@ -39,17 +44,22 @@ theorem UpperTheory.V.LDataCardLeFinrank.decActRoots :
   let z0 : A := ⟨ζ0, hmemA ζ0 hζ0.pow_eq_one⟩
   let ω : IsLocalRing.ResidueField A := IsLocalRing.residue A z0
   have hσω : g' • ω = ω ^ a := by
-    have hz : g' • z0 = z0 ^ a := Subtype.ext (by
-      change g ζ0 = ζ0 ^ a
-      exact ha.symm)
+    have hz : g' • z0 = z0 ^ a :=
+      Subtype.ext (by
+        change g ζ0 = ζ0 ^ a
+        exact ha.symm)
     simp only [ω]
     rw [← IsLocalRing.ResidueField.residue_smul, hz, map_pow]
-  let σ : IsLocalRing.ResidueField A →ₐ[ZMod l] IsLocalRing.ResidueField A :=
-    { MulSemiringAction.toRingHom _ (IsLocalRing.ResidueField A) g' with
-      commutes' := fun r => RingHom.congr_fun (RingHom.ext_zmod
-        ((MulSemiringAction.toRingHom _ (IsLocalRing.ResidueField A) g').comp
+  let σ : IsLocalRing.ResidueField A →ₐ[ZMod l] IsLocalRing.ResidueField A := {
+    MulSemiringAction.toRingHom _ (IsLocalRing.ResidueField A) g' with
+    commutes' := fun r =>
+      RingHom.congr_fun
+        (RingHom.ext_zmod
+          ((MulSemiringAction.toRingHom _ (IsLocalRing.ResidueField A) g').comp
+            (algebraMap (ZMod l) (IsLocalRing.ResidueField A)))
           (algebraMap (ZMod l) (IsLocalRing.ResidueField A)))
-        (algebraMap (ZMod l) (IsLocalRing.ResidueField A))) r }
+        r
+  }
   have hσ : ∀ x, σ x = g' • x := fun x => rfl
   let E := IntermediateField.adjoin (ZMod l) ({ω} : Set (IsLocalRing.ResidueField A))
   have hωE : ω ∈ E := IntermediateField.mem_adjoin_simple_self _ _
@@ -58,9 +68,10 @@ theorem UpperTheory.V.LDataCardLeFinrank.decActRoots :
     have h1 : ω ^ m = 1 := by
       simp only [ω]
       rw [← map_pow]
-      have : z0 ^ m = 1 := Subtype.ext (by
-        change ζ0 ^ m = 1
-        exact hζ0.pow_eq_one)
+      have : z0 ^ m = 1 :=
+        Subtype.ext (by
+          change ζ0 ^ m = 1
+          exact hζ0.pow_eq_one)
       rw [this, map_one]
     rw [h1]
     exact isIntegral_one
@@ -72,13 +83,14 @@ theorem UpperTheory.V.LDataCardLeFinrank.decActRoots :
     rw [hσ, hσω]
     exact pow_mem hωE a
   have hmapE : ∀ x ∈ E, σ x ∈ E := fun x hx => hEle hx
-  let τ : E →ₐ[ZMod l] E :=
-    { toFun := fun x => ⟨σ x, hmapE x.1 x.2⟩
-      map_one' := Subtype.ext (map_one σ)
-      map_mul' := fun x y => Subtype.ext (map_mul σ x.1 y.1)
-      map_zero' := Subtype.ext (map_zero σ)
-      map_add' := fun x y => Subtype.ext (map_add σ x.1 y.1)
-      commutes' := fun r => Subtype.ext (σ.commutes r) }
+  let τ : E →ₐ[ZMod l] E := {
+    toFun := fun x => ⟨σ x, hmapE x.1 x.2⟩
+    map_one' := Subtype.ext (map_one σ)
+    map_mul' := fun x y => Subtype.ext (map_mul σ x.1 y.1)
+    map_zero' := Subtype.ext (map_zero σ)
+    map_add' := fun x y => Subtype.ext (map_add σ x.1 y.1)
+    commutes' := fun r => Subtype.ext (σ.commutes r)
+  }
   obtain ⟨n, hn⟩ := (FiniteField.bijective_frobeniusAlgHom_pow (ZMod l) E).2 τ
   have hτω : τ ⟨ω, hωE⟩ = ⟨ω, hωE⟩ ^ (l ^ (n : ℕ)) := by
     rw [← hn]
@@ -93,8 +105,7 @@ theorem UpperTheory.V.LDataCardLeFinrank.decActRoots :
     rw [← ha]
     have hroot : (ζ0 ^ (l ^ (n : ℕ))) ^ m = 1 := by
       rw [← pow_mul, mul_comm, pow_mul, hζ0.pow_eq_one, one_pow]
-    have hroota : (ζ0 ^ a) ^ m = 1 := by
-      rw [← pow_mul, mul_comm, pow_mul, hζ0.pow_eq_one, one_pow]
+    have hroota : (ζ0 ^ a) ^ m = 1 := by rw [← pow_mul, mul_comm, pow_mul, hζ0.pow_eq_one, one_pow]
     refine (UpperTheory.V.LDataCardLeFinrank.ineFixRoots F Ω l A hA m hm _ hroot).1 _ hroota ?_
     have hsub : (z0 ^ a - z0 ^ (l ^ (n : ℕ))) ∈ IsLocalRing.maximalIdeal A := by
       rw [← IsLocalRing.residue_eq_zero_iff, map_sub, map_pow, map_pow, sub_eq_zero]

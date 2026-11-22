@@ -11,23 +11,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TiltIsDomain
 
 @[expose] public section
 
-open GlobalTheory GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv GlobalTheory.HTLat Matrix TensorProduct
+open GlobalTheory GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps
+  GlobalTheory.DetInv GlobalTheory.HTLat Matrix TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.MuDivides
 
-private theorem mem_span_pow_smul_univ_iff_dvd {R : Type} [CommRing R] (q x : R) (n : ℕ) :
-    x ∈ (Ideal.span {q} ^ n • ⊤ : Submodule R R) ↔ q ^ n ∣ x := by
+private theorem mem_span_pow_smul_univ_iff_dvd {R : Type} [CommRing R] (q x : R) (n : ℕ)
+    : x ∈ (Ideal.span {q} ^ n • ⊤ : Submodule R R) ↔ q ^ n ∣ x := by
   rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
 
-theorem dvd_of_step {R : Type} [CommRing R] (q a : R) [IsAdicComplete (Ideal.span {q}) R]
-    (P : R → Prop) (h : ∀ z, P z → ∃ y z₁, z = a * y + q * z₁ ∧ P z₁) (z : R) (hz : P z) :
-    a ∣ z := by
+theorem dvd_of_step
+    {R : Type} [CommRing R]
+    (q a : R) [IsAdicComplete (Ideal.span {q}) R]
+    (P : R → Prop) (h : ∀ z, P z → ∃ y z₁, z = a * y + q * z₁ ∧ P z₁)
+    (z : R) (hz : P z)
+    : a ∣ z := by
   choose Y Z hYZ using h
 
-  let s : ℕ → {w : R // P w} := fun n =>
-    Nat.rec ⟨z, hz⟩ (fun _ w => ⟨Z w.1 w.2, (hYZ w.1 w.2).2⟩) n
+  let s : ℕ → {w : R // P w} := fun n => Nat.rec ⟨z, hz⟩ (fun _ w => ⟨Z w.1 w.2, (hYZ w.1 w.2).2⟩) n
   obtain ⟨w, y, hw0, hw⟩ : ∃ w y : ℕ → R, w 0 = z ∧ ∀ n, w n = a * y n + q * w (n + 1) :=
     ⟨fun n => (s n).1, fun n => Y (s n).1 (s n).2, rfl, fun n => (hYZ _ _).1⟩
 
@@ -38,14 +41,16 @@ theorem dvd_of_step {R : Type} [CommRing R] (q a : R) [IsAdicComplete (Ideal.spa
     | succ n ih =>
       rw [Finset.sum_range_succ, ih, hw n]
       ring
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := Ideal.span {q}) (M := R) inferInstance
-    (f := fun n => ∑ k ∈ Finset.range n, q ^ k * y k) (by
-      intro m n hmn
-      rw [SModEq.sub_mem, mem_span_pow_smul_univ_iff_dvd]
-      obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmn
-      refine ⟨-∑ j ∈ Finset.range d, q ^ j * y (m + j), ?_⟩
-      rw [Finset.sum_range_add, mul_neg, Finset.mul_sum]
-      simp only [pow_add, mul_assoc, sub_add_cancel_left])
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec (I := Ideal.span {q}) (M := R) inferInstance
+      (f := fun n => ∑ k ∈ Finset.range n, q ^ k * y k)
+      (by
+        intro m n hmn
+        rw [SModEq.sub_mem, mem_span_pow_smul_univ_iff_dvd]
+        obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmn
+        refine ⟨- ∑ j ∈ Finset.range d, q ^ j * y (m + j), ?_⟩
+        rw [Finset.sum_range_add, mul_neg, Finset.mul_sum]
+        simp only [pow_add, mul_assoc, sub_add_cancel_left])
   refine ⟨L, ?_⟩
   rw [← sub_eq_zero]
   refine IsHausdorff.haus (I := Ideal.span {q}) (M := R) inferInstance _ fun n => ?_
@@ -55,13 +60,15 @@ theorem dvd_of_step {R : Type} [CommRing R] (q a : R) [IsAdicComplete (Ideal.spa
   obtain ⟨c, hc⟩ := hn
   exact ⟨a * c + w n, by linear_combination key n + a * hc⟩
 
-variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-  {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-  [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
-
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal} {O : Type}
+  [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
 
 omit [IsAlgClosed C] [IsAdicComplete (Ideal.span {(p : O)}) O] in
-theorem modP_isNilpotent_of_not_isUnit (hv : v.Integers O) (x : ModP O p) (hx : ¬IsUnit x) : IsNilpotent x := by
+theorem modP_isNilpotent_of_not_isUnit (hv : v.Integers O) (x : ModP O p) (hx : ¬ IsUnit x)
+    : IsNilpotent x := by
   obtain ⟨o, rfl⟩ := Ideal.Quotient.mk_surjective (I := Ideal.span {(p : O)}) x
 
   have hlt : v (algebraMap O C o) < 1 := by
@@ -77,11 +84,12 @@ theorem modP_isNilpotent_of_not_isUnit (hv : v.Integers O) (x : ModP O p) (hx : 
   rw [← map_pow]
   exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton.2 hdvd)
 
-
 omit [IsAlgClosed C] [IsAdicComplete (Ideal.span {(p : O)}) O] in
-theorem eq_zero_of_forall_pow_dvd (hv : v.Integers O) (c m : PreTilt O p) (hc : ¬IsUnit c)
-    (h : ∀ n, c ^ p ^ n ∣ m) : m = 0 := by
-  have h0 : ¬IsUnit (PreTilt.coeff 0 c) := fun hu => hc (GlobalTheory.AinfXi.isUnit_of_coeff_zero hu)
+theorem eq_zero_of_forall_pow_dvd
+    (hv : v.Integers O) (c m : PreTilt O p) (hc : ¬ IsUnit c) (h : ∀ n, c ^ p ^ n ∣ m)
+    : m = 0 := by
+  have h0 : ¬ IsUnit (PreTilt.coeff 0 c) := fun hu =>
+    hc (GlobalTheory.AinfXi.isUnit_of_coeff_zero hu)
   obtain ⟨N, hN⟩ := modP_isNilpotent_of_not_isUnit hv _ h0
   refine Perfection.ext (R := ModP O p) (p := p) fun k => ?_
   rw [← PreTilt.coeff_def, ← PreTilt.coeff_def, map_zero]
@@ -94,8 +102,11 @@ omit [IsAdicComplete (Ideal.span {(p : O)}) O] in
 theorem root_iterate_pow (n : ℕ) (ε : PreTilt O p) : (root^[n] ε) ^ p ^ n = ε :=
   iterate_frobeniusEquiv_symm_pow_p_pow (PreTilt O p) p ε n
 
-theorem tilt_dvd (hv : v.Integers O) (ε : PreTilt O p) (hm : ε - 1 ≠ 0) (w : PreTilt O p)
-    (h : ∀ n : ℕ, ε - 1 ∣ (root^[n] ε - 1) * w) : ε - 1 ∣ w := by
+theorem tilt_dvd
+    (hv : v.Integers O)
+    (ε : PreTilt O p) (hm : ε - 1 ≠ 0)
+    (w : PreTilt O p) (h : ∀ n : ℕ, ε - 1 ∣ (root^[n] ε - 1) * w)
+    : ε - 1 ∣ w := by
   obtain ⟨hD, hV⟩ := GlobalTheory.TiltValuation.tilt_isDomain_valuationRing p C v O hv
 
   have ht : ∀ n : ℕ, (root^[n] ε - 1) ^ p ^ n = ε - 1 := fun n => by
@@ -120,12 +131,15 @@ theorem constantCoeff_mu (ε : PreTilt O p) : WittVector.constantCoeff (mu ε) =
       WittVector.teichmuller_coeff_zero p ε]
 
 omit [IsAdicComplete (Ideal.span {(p : O)}) O] in
-theorem exists_eq_p_mul (x : Ainf p O) (hx : WittVector.constantCoeff x = 0) :
-    ∃ y, x = (p : Ainf p O) * y :=
+theorem exists_eq_p_mul (x : Ainf p O) (hx : WittVector.constantCoeff x = 0)
+    : ∃ y, x = (p : Ainf p O) * y :=
   Ideal.mem_span_singleton.1 ((WittVector.mem_span_p_iff_coeff_zero_eq_zero x).2 hx)
 
-theorem dvd_of_dvd_p_mul (hv : v.Integers O) (ε : PreTilt O p) (hm : ε - 1 ≠ 0) (w : Ainf p O)
-    (h : mu ε ∣ (p : Ainf p O) * w) : mu ε ∣ w := by
+theorem dvd_of_dvd_p_mul
+    (hv : v.Integers O)
+    (ε : PreTilt O p) (hm : ε - 1 ≠ 0)
+    (w : Ainf p O) (h : mu ε ∣ (p : Ainf p O) * w)
+    : mu ε ∣ w := by
   obtain ⟨hD, -⟩ := GlobalTheory.TiltValuation.tilt_isDomain_valuationRing p C v O hv
   obtain ⟨c, hc⟩ := h
 
@@ -137,7 +151,14 @@ theorem dvd_of_dvd_p_mul (hv : v.Integers O) (ε : PreTilt O p) (hm : ε - 1 ≠
   refine ⟨c', sub_eq_zero.1 (WittVector.eq_zero_of_p_mul_eq_zero _ ?_)⟩
   linear_combination hc
 
-theorem mu_dvd_of_forall_dvd : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O], v.Integers O → ∀ (ε : PreTilt O p), IsPrimitiveRoot (root ε).untilt p → ∀ z : Ainf p O, (∀ n : ℕ, mu ε ∣ mu (root^[n] ε) * z) → mu ε ∣ z := by
+theorem mu_dvd_of_forall_dvd
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p),
+          IsPrimitiveRoot (root ε).untilt p
+            → ∀ z : Ainf p O, (∀ n : ℕ, mu ε ∣ mu (root^[n] ε) * z) → mu ε ∣ z := by
   intro p _ C _ _ _ v O _ _ _ _ hv ε hε z hz
   have hm : ε - 1 ≠ 0 := by
     rw [← constantCoeff_mu]
@@ -150,10 +171,11 @@ theorem mu_dvd_of_forall_dvd : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
     have h1 := map_dvd WittVector.constantCoeff (hx n)
     rwa [map_mul, constantCoeff_mu, constantCoeff_mu] at h1
 
-  obtain ⟨z₁, hz₁⟩ := exists_eq_p_mul (x - mu ε * WittVector.teichmuller p b) (by
-    rw [map_sub, map_mul, constantCoeff_mu, hb, sub_eq_zero,
-      show WittVector.constantCoeff (WittVector.teichmuller p b) = b from
-        WittVector.teichmuller_coeff_zero p b])
+  obtain ⟨z₁, hz₁⟩ :=
+    exists_eq_p_mul (x - mu ε * WittVector.teichmuller p b) (by
+      rw [map_sub, map_mul, constantCoeff_mu, hb, sub_eq_zero,
+        show WittVector.constantCoeff (WittVector.teichmuller p b) = b from
+          WittVector.teichmuller_coeff_zero p b])
   refine ⟨WittVector.teichmuller p b, z₁, by rw [← hz₁]; ring, fun n => ?_⟩
 
   apply dvd_of_dvd_p_mul hv ε hm

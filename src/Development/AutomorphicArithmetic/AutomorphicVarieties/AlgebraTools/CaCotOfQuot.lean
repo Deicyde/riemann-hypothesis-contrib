@@ -10,16 +10,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-private theorem card_le_dim (R : Type) [CommRing R] [IsRegularLocalRing R] (r : ℕ) (x : Fin r → R)
-    (hx : CotInd R x) : (r : WithBot ℕ∞) ≤ ringKrullDim R := by
+private theorem card_le_dim
+    (R : Type) [CommRing R] [IsRegularLocalRing R] (r : ℕ) (x : Fin r → R) (hx : CotInd R x)
+    : (r : WithBot ℕ∞) ≤ ringKrullDim R := by
   obtain ⟨s, y, -, -, hc⟩ := cotInd_extend R _ x hx
   rw [← IsRegularLocalRing.spanFinrank_maximalIdeal, ← hc, Fintype.card_fin]
   exact_mod_cast Nat.le_add_right r s
 
-private theorem exists_max (R : Type) [CommRing R] [IsRegularLocalRing R] (I : Ideal R)
-    (hI : I ≤ maximalIdeal R) :
-    ∃ (r : ℕ) (x : Fin r → R), CotInd R x ∧ (∀ k, x k ∈ I) ∧
-      I ≤ Ideal.span (Set.range x) ⊔ maximalIdeal R ^ 2 := by
+private theorem exists_max
+    (R : Type) [CommRing R] [IsRegularLocalRing R] (I : Ideal R) (hI : I ≤ maximalIdeal R)
+    : ∃ (r : ℕ) (x : Fin r → R),
+      CotInd R x ∧ (∀ k, x k ∈ I) ∧ I ≤ Ideal.span (Set.range x) ⊔ maximalIdeal R ^ 2 := by
   classical
   let P : ℕ → Prop := fun r => ∃ x : Fin r → R, CotInd R x ∧ ∀ k, x k ∈ I
   have h0 : P 0 := ⟨Fin.elim0, ⟨fun k => k.elim0, fun _ _ k => k.elim0⟩, fun k => k.elim0⟩
@@ -48,14 +49,13 @@ private theorem exists_max (R : Type) [CommRing R] [IsRegularLocalRing R] (I : I
         rw [← Ideal.unit_mul_mem_iff_mem _ hu']
         have h2 : ∑ i, a i.succ * x i ∈ Ideal.span (Set.range x) :=
           Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
-        have h3 := sub_mem (Ideal.mem_sup_right (S := Ideal.span (Set.range x)) ha)
-          (Ideal.mem_sup_left h2)
+        have h3 :=
+          sub_mem (Ideal.mem_sup_right (S := Ideal.span (Set.range x)) ha) (Ideal.mem_sup_left h2)
         simpa using h3
       have h4 : a 0 * t ∈ maximalIdeal R ^ 2 := by
         rw [sq]
         exact Ideal.mul_mem_mul ha0 (hI ht)
-      have h5 : ∑ i, a i.succ * x i ∈ maximalIdeal R ^ 2 := by
-        simpa using sub_mem ha h4
+      have h5 : ∑ i, a i.succ * x i ∈ maximalIdeal R ^ 2 := by simpa using sub_mem ha h4
       intro k
       exact Fin.cases ha0 (fun j => hx.indep (fun i => a i.succ) h5 j) k
     · intro k
@@ -64,9 +64,10 @@ private theorem exists_max (R : Type) [CommRing R] [IsRegularLocalRing R] (I : I
       · exact hxI j
   exact Nat.findGreatest_is_greatest (Nat.lt_succ_self _) (hb _ h1) h1
 
-theorem UpperTheory.V.AlgebraTools.exists_cotInd_of_regular_quotient :
-    ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (I : Ideal R) [IsRegularLocalRing (R ⧸ I)],
-      ∃ (r : ℕ) (x : Fin r → R), CotInd R x ∧ Ideal.span (Set.range x) = I := by
+theorem UpperTheory.V.AlgebraTools.exists_cotInd_of_regular_quotient
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (I : Ideal R) [IsRegularLocalRing (R ⧸ I)],
+      ∃ (r : ℕ) (x : Fin r → R),
+        CotInd R x ∧ Ideal.span (Set.range x) = I := by
   intro R _ _ I _
   have hne : I ≠ ⊤ := Ideal.Quotient.nontrivial_iff.mp inferInstance
   have hI : I ≤ maximalIdeal R := le_maximalIdeal hne
@@ -83,8 +84,9 @@ theorem UpperTheory.V.AlgebraTools.exists_cotInd_of_regular_quotient :
   have hy : CotInd (R ⧸ I) (fun j => Ideal.Quotient.mk I (y j)) := by
     refine ⟨fun j => hmax ▸ Ideal.mem_map_of_mem _ (hxy.mem (Sum.inr j)), fun a ha => ?_⟩
     choose b hb using fun j => Ideal.Quotient.mk_surjective (a j)
-    have h1 : Ideal.Quotient.mk I (∑ j, b j * y j) ∈
-        Ideal.map (Ideal.Quotient.mk I) (maximalIdeal R ^ 2) := by
+    have h1
+        : Ideal.Quotient.mk I (∑ j, b j * y j)
+          ∈ Ideal.map (Ideal.Quotient.mk I) (maximalIdeal R ^ 2) := by
       rw [Ideal.map_pow, hmax]
       simpa [hb] using ha
     rw [Ideal.mem_quotient_iff_mem_sup] at h1
@@ -105,9 +107,10 @@ theorem UpperTheory.V.AlgebraTools.exists_cotInd_of_regular_quotient :
   have : IsDomain (R ⧸ Ideal.span (Set.range x)) := (Ideal.Quotient.isDomain_iff_prime _).2 hp
   have h0 : Ideal.Quotient.mk (Ideal.span (Set.range x)) t ≠ 0 := by
     rwa [Ne, Ideal.Quotient.eq_zero_iff_mem]
-  have h4 := ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor hJ)
-    (Ideal.Quotient.factor_surjective hJ) (mem_nonZeroDivisors_of_ne_zero h0)
-    (by rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]; exact ht)
+  have h4 :=
+    ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor hJ)
+      (Ideal.Quotient.factor_surjective hJ) (mem_nonZeroDivisors_of_ne_zero h0)
+      (by rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]; exact ht)
   have h5 : ((s : WithBot ℕ∞) + 1) + (Fintype.card (Fin r) : ℕ) ≤ ringKrullDim R := by
     rw [← hd]
     gcongr

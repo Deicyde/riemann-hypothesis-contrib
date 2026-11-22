@@ -11,11 +11,14 @@ noncomputable section
 
 namespace MainStatements.WeightKernel.PVanish
 
-def mul3 {n : ℕ} (A B C : MainStatements.WeightKernel.Mx n) : MainStatements.WeightKernel.Mx n := fun a b => (of A * of B * of C) a b
+def mul3 {n : ℕ} (A B C : MainStatements.WeightKernel.Mx n) : MainStatements.WeightKernel.Mx n :=
+  fun a b => (of A * of B * of C) a b
 
-theorem contDiff_triple_matrix_product {n : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {f g h : E → MainStatements.WeightKernel.Mx n}
-    (hf : ContDiff ℝ ∞ f) (hg : ContDiff ℝ ∞ g) (hh : ContDiff ℝ ∞ h) :
-    ContDiff ℝ ∞ fun x => mul3 (f x) (g x) (h x) := by
+theorem contDiff_triple_matrix_product
+    {n : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {f g h : E → MainStatements.WeightKernel.Mx n}
+    (hf : ContDiff ℝ ∞ f) (hg : ContDiff ℝ ∞ g) (hh : ContDiff ℝ ∞ h)
+    : ContDiff ℝ ∞ fun x => mul3 (f x) (g x) (h x) := by
   have e : ∀ (u : E → Mx n), ContDiff ℝ ∞ u → ∀ a b : Fin n, ContDiff ℝ ∞ fun x => u x a b :=
     fun u hu a b => contDiff_pi.1 (contDiff_pi.1 hu a) b
   refine contDiff_pi.2 fun a => contDiff_pi.2 fun b => ?_
@@ -23,8 +26,9 @@ theorem contDiff_triple_matrix_product {n : ℕ} {E : Type} [NormedAddCommGroup 
   exact ContDiff.sum fun j _ =>
     (ContDiff.sum fun k _ => (e f hf a k).mul (e g hg k j)).mul (e h hh j b)
 
-theorem triple_product_matrix_coordinates {H : Type} [Group H] {n : ℕ} (ι : H →* Matrix (Fin n) (Fin n) ℂ) (g h l : H) :
-    mul3 (matCoord ι g) (matCoord ι h) (matCoord ι l) = matCoord ι (g * h * l) := by
+theorem triple_product_matrix_coordinates
+    {H : Type} [Group H] {n : ℕ} (ι : H →* Matrix (Fin n) (Fin n) ℂ) (g h l : H)
+    : mul3 (matCoord ι g) (matCoord ι h) (matCoord ι l) = matCoord ι (g * h * l) := by
   funext a b
   show (ι g * ι h * ι l) a b = ι (g * h * l) a b
   rw [map_mul, map_mul]
@@ -33,7 +37,8 @@ end MainStatements.WeightKernel.PVanish
 
 open MainStatements.WeightKernel.PVanish in
 theorem MainStatements.WeightKernel.vanish : KerSwap → IdentOne → IdentTwo → Vanish := by
-  intro hSwap hOne hTwo H _ _ _ _ _ _ _ _ n ι hemb s B hB μ _ _ dt _ _ Ω I _ _ m _ c q hK hq hInv φ hφ hOrb
+  intro hSwap hOne hTwo H _ _ _ _ _ _ _ _ n ι hemb s B hB μ _ _ dt _ _ Ω I _ _ m _ c q hK hq hInv φ
+    hφ hOrb
   obtain ⟨hφc, Φφ, hΦφ, hφeq⟩ := hφ
   have hmc : Continuous (matCoord ι) := hemb.continuous
   have hφcont : Continuous φ := by
@@ -66,13 +71,17 @@ theorem MainStatements.WeightKernel.vanish : KerSwap → IdentOne → IdentTwo �
   have hW₂ : ContDiff ℝ ∞ W₂ :=
     ((hΦφ.comp hM2).mul (Complex.ofRealCLM.contDiff.comp (hB.smooth.comp (hM2.prodMk hA)))).mul
       (Complex.ofRealCLM.contDiff.comp (bp.contDiff.comp hfst))
-  have hW₁pt : ∀ y k : H, W₁ (matCoord ι y, p k) =
-      φ y * ((B (matCoord ι y, matCoord ι k) : ℂ) * (ψ (k⁻¹ * y * k) : ℂ)) := by
+  have hW₁pt
+      : ∀ y k : H,
+        W₁ (matCoord ι y, p k)
+          = φ y * ((B (matCoord ι y, matCoord ι k) : ℂ) * (ψ (k⁻¹ * y * k) : ℂ)) := by
     intro y k
     simp only [W₁, p, ψ]
     rw [triple_product_matrix_coordinates, hφeq, mul_assoc]
-  have hW₂pt : ∀ y k : H, W₂ (matCoord ι y, p k) =
-      φ (k * y * k⁻¹) * (B (matCoord ι (k * y * k⁻¹), matCoord ι k) : ℂ) * (ψ y : ℂ) := by
+  have hW₂pt
+      : ∀ y k : H,
+        W₂ (matCoord ι y, p k)
+          = φ (k * y * k⁻¹) * (B (matCoord ι (k * y * k⁻¹), matCoord ι k) : ℂ) * (ψ y : ℂ) := by
     intro y k
     simp only [W₂, p, ψ]
     rw [triple_product_matrix_coordinates, hφeq]
@@ -108,23 +117,26 @@ theorem MainStatements.WeightKernel.vanish : KerSwap → IdentOne → IdentTwo �
       exact subset_tsupport _ (Function.mem_support.2 (fun h0 => h3 (by simp [h0])))
     · rw [e1]
       exact fun h0 => h2 (by simp [h0])
-  have h1 := hSwap H n ι hemb μ Ω I m c q hK (Mx n × Mx n) W₁ p Kset (tsupport φ) hW₁ hp hKc
-    hφc.isCompact (by
-      intro k _ y hy
-      have : φ y = 0 := by
-        by_contra h0
-        exact hy (subset_tsupport _ h0)
-      rw [hW₁pt, this, zero_mul])
-  have h2 := hSwap H n ι hemb μ Ω I m c q hK (Mx n × Mx n) W₂ p Kset (tsupport ψ) hW₂ hp hKc
-    hψcs.isCompact (by
-      intro k _ y hy
-      have : ψ y = 0 := by
-        by_contra h0
-        exact hy (subset_tsupport _ h0)
-      rw [hW₂pt, this]
-      simp)
-  have hR1 : ∫ x, ker c q (fun y => ∫ k in Kset, W₁ (matCoord ι y, p k) ∂μ) x ∂m =
-      a * ∫ x, ker c q φ x ∂m := by
+  have h1 :=
+    hSwap H n ι hemb μ Ω I m c q hK (Mx n × Mx n) W₁ p Kset (tsupport φ) hW₁ hp hKc hφc.isCompact
+      (by
+        intro k _ y hy
+        have : φ y = 0 := by
+          by_contra h0
+          exact hy (subset_tsupport _ h0)
+        rw [hW₁pt, this, zero_mul])
+  have h2 :=
+    hSwap H n ι hemb μ Ω I m c q hK (Mx n × Mx n) W₂ p Kset (tsupport ψ) hW₂ hp hKc hψcs.isCompact
+      (by
+        intro k _ y hy
+        have : ψ y = 0 := by
+          by_contra h0
+          exact hy (subset_tsupport _ h0)
+        rw [hW₂pt, this]
+        simp)
+  have hR1
+      : ∫ x, ker c q (fun y => ∫ k in Kset, W₁ (matCoord ι y, p k) ∂μ) x ∂m
+        = a * ∫ x, ker c q φ x ∂m := by
     rw [← integral_const_mul]
     congr 1
     funext x
@@ -137,8 +149,10 @@ theorem MainStatements.WeightKernel.vanish : KerSwap → IdentOne → IdentTwo �
     simp only [hW₁pt]
     rw [integral_const_mul, ha z]
     ring
-  have hstep : ∀ k : H, ∫ x, ker c q (fun y => W₁ (matCoord ι y, p k)) x ∂m =
-      ∫ x, ker c q (fun y => W₂ (matCoord ι y, p k)) x ∂m := by
+  have hstep
+      : ∀ k : H,
+        ∫ x, ker c q (fun y => W₁ (matCoord ι y, p k)) x ∂m
+          = ∫ x, ker c q (fun y => W₂ (matCoord ι y, p k)) x ∂m := by
     intro k
     have hmem : (fun y => W₂ (matCoord ι y, p k)) ∈ CcMat ι := by
       refine ⟨?_, fun Y => W₂ (Y, p k), hW₂.comp (contDiff_id.prodMk contDiff_const), fun g => rfl⟩
@@ -149,8 +163,8 @@ theorem MainStatements.WeightKernel.vanish : KerSwap → IdentOne → IdentTwo �
       apply hy
       rw [hW₂pt, h0]
       simp
-    have hfun : (fun y => W₁ (matCoord ι y, p k)) =
-        fun y => W₂ (matCoord ι (k⁻¹ * y * k⁻¹⁻¹), p k) := by
+    have hfun
+        : (fun y => W₁ (matCoord ι y, p k)) = fun y => W₂ (matCoord ι (k⁻¹ * y * k⁻¹⁻¹), p k) := by
       funext y
       rw [hW₂pt, hW₁pt]
       have e : k * (k⁻¹ * y * k⁻¹⁻¹) * k⁻¹ = y := by group

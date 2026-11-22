@@ -5,35 +5,43 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
-private noncomputable def Bf {F : Type} [Field F] [NumberField F] (δ : F)
-    (a y : Fin 4 → FiniteAdeleRing (𝓞 F) F) : FiniteAdeleRing (𝓞 F) F :=
+private noncomputable def Bf
+    {F : Type} [Field F] [NumberField F] (δ : F) (a y : Fin 4 → FiniteAdeleRing (𝓞 F) F)
+    : FiniteAdeleRing (𝓞 F) F :=
   2 * (a 2 * y 2 - algebraMap F (FiniteAdeleRing (𝓞 F) F) δ * (a 3 * y 3)) - a 1 * y 0 - a 0 * y 1
 
-private theorem continuous_Bf {F : Type} [Field F] [NumberField F] (δ : F) :
-    Continuous fun p : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) =>
+private theorem continuous_Bf {F : Type} [Field F] [NumberField F] (δ : F)
+    : Continuous fun p : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) =>
       Bf δ p.1 p.2 := by
   unfold Bf
   fun_prop
 
-private theorem fin_level {F : Type} [Field F] [NumberField F] (δ : F)
-    {g : (Fin 4 → FiniteAdeleRing (𝓞 F) F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F (ι := Fin 4)) :
-    ∃ Λ : OpenAddSubgroup (FiniteAdeleRing (𝓞 F) F), ∀ a : Fin 4 → FiniteAdeleRing (𝓞 F) F,
+private theorem fin_level
+    {F : Type} [Field F] [NumberField F]
+    (δ : F)
+    {g : (Fin 4 → FiniteAdeleRing (𝓞 F) F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F (ι := Fin 4))
+    : ∃ Λ : OpenAddSubgroup (FiniteAdeleRing (𝓞 F) F), ∀ a : Fin 4 → FiniteAdeleRing (𝓞 F) F,
       (∀ i, a i ∈ Λ) → ∀ y, g (y + a) = g y ∧ (finiteAdelicChar F (Bf δ a y) : ℂ) * g y = g y := by
   obtain ⟨hl, hc⟩ := hg
   have hev := IsLocallyConstant.iff_eventually_eq g |>.1 hl
-  have hP1 : IsOpen {p : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) |
-      g (p.2 + p.1) = g p.2} := by
+  have hP1 : IsOpen
+      {p : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) |
+        g (p.2 + p.1) = g p.2} := by
     rw [isOpen_iff_eventually]
     intro p hp
-    have h1 : ∀ᶠ q : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) in 𝓝 p,
-        g (q.2 + q.1) = g (p.2 + p.1) :=
+    have h1
+        : ∀ᶠ q : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) in 𝓝 p,
+          g (q.2 + q.1) = g (p.2 + p.1) :=
       ((continuous_snd.add continuous_fst).tendsto p).eventually (hev _)
-    have h2 : ∀ᶠ q : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) in 𝓝 p,
-        g q.2 = g p.2 :=
+    have h2
+        : ∀ᶠ q : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) in 𝓝 p,
+          g q.2 = g p.2 :=
       (continuous_snd.tendsto p).eventually (hev _)
     filter_upwards [h1, h2] with q e1 e2
     change g (q.2 + q.1) = g q.2
@@ -42,17 +50,20 @@ private theorem fin_level {F : Type} [Field F] [NumberField F] (δ : F)
   have hχ : IsLocallyConstant fun x : FiniteAdeleRing (𝓞 F) F => (finiteAdelicChar F x : ℂ) := by
     have := isLocallyConstant_finiteAdelicChar_mul (K := F) (1 : FiniteAdeleRing (𝓞 F) F)
     simpa using this
-  have hP2 : IsOpen {p : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) |
-      (finiteAdelicChar F (Bf δ p.1 p.2) : ℂ) = 1} :=
+  have hP2 : IsOpen
+      {p : (Fin 4 → FiniteAdeleRing (𝓞 F) F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) |
+        (finiteAdelicChar F (Bf δ p.1 p.2) : ℂ) = 1} :=
     (hχ.isOpen_fiber 1).preimage (continuous_Bf δ)
-  obtain ⟨u, w, hu, -, h0u, hSw, huw⟩ := generalized_tube_lemma (isCompact_singleton (x := (0 : Fin 4 → FiniteAdeleRing (𝓞 F) F)))
-    (t := tsupport g) hc (hP1.inter hP2) (by
-      rintro ⟨a, y⟩ ⟨ha, -⟩
-      obtain rfl : a = 0 := ha
-      refine ⟨by simp, ?_⟩
-      change (finiteAdelicChar F (Bf δ 0 y) : ℂ) = 1
-      have : Bf δ 0 y = 0 := by simp [Bf]
-      rw [this, AddChar.map_zero_eq_one, Circle.coe_one])
+  obtain ⟨u, w, hu, -, h0u, hSw, huw⟩ :=
+    generalized_tube_lemma (isCompact_singleton (x := (0 : Fin 4 → FiniteAdeleRing (𝓞 F) F)))
+      (t := tsupport g) hc (hP1.inter hP2)
+      (by
+        rintro ⟨a, y⟩ ⟨ha, -⟩
+        obtain rfl : a = 0 := ha
+        refine ⟨by simp, ?_⟩
+        change (finiteAdelicChar F (Bf δ 0 y) : ℂ) = 1
+        have : Bf δ 0 y = 0 := by simp [Bf]
+        rw [this, AddChar.map_zero_eq_one, Circle.coe_one])
   have hu0 : u ∈ 𝓝 (0 : Fin 4 → FiniteAdeleRing (𝓞 F) F) := hu.mem_nhds (h0u rfl)
   rw [nhds_pi, Filter.mem_pi] at hu0
   obtain ⟨I, -, t, ht, hIt⟩ := hu0
@@ -78,22 +89,29 @@ private theorem fin_level {F : Type} [Field F] [NumberField F] (δ : F)
     · rw [hy0]
       exact image_eq_zero_of_notMem_tsupport hy'
 
-private theorem quaternaryForm_polarization {F : Type} [Field F] [NumberField F] (δ : F) (a v : V4 F)
-    (ha : ∀ i, (a i).1 = 0) :
-    ψ (B4 δ a v) = (finiteAdelicChar F (Bf δ (finPartPi a) (finPartPi v)) : ℂ) := by
+private theorem quaternaryForm_polarization
+    {F : Type} [Field F] [NumberField F] (δ : F) (a v : V4 F) (ha : ∀ i, (a i).1 = 0)
+    : ψ (B4 δ a v) = (finiteAdelicChar F (Bf δ (finPartPi a) (finPartPi v)) : ℂ) := by
   have : B4 δ a v = finiteAdeleInr (Bf δ (finPartPi a) (finPartPi v)) := by
     refine Prod.ext ?_ ?_
-    · change (2 : InfiniteAdeleRing F) * ((a 2).1 * (v 2).1 - (rt δ).1 * ((a 3).1 * (v 3).1)) - (a 1).1 * (v 0).1 - (a 0).1 * (v 1).1 = 0
+    · change (2 : InfiniteAdeleRing F) * ((a 2).1 * (v 2).1 - (rt δ).1 * ((a 3).1 * (v 3).1))
+          - (a 1).1 * (v 0).1 - (a 0).1 * (v 1).1
+        = 0
       simp [ha]
-    · have h2 : (2 : A F).2 = (2 : FiniteAdeleRing (𝓞 F) F) := map_ofNat (RingHom.snd (InfiniteAdeleRing F) (FiniteAdeleRing (𝓞 F) F)) 2
-      change (2 : FiniteAdeleRing (𝓞 F) F) * ((a 2).2 * (v 2).2 - (rt δ).2 * ((a 3).2 * (v 3).2)) - (a 1).2 * (v 0).2 - (a 0).2 * (v 1).2 = Bf δ (finPartPi a) (finPartPi v)
+    · have h2 : (2 : A F).2 = (2 : FiniteAdeleRing (𝓞 F) F) :=
+        map_ofNat (RingHom.snd (InfiniteAdeleRing F) (FiniteAdeleRing (𝓞 F) F)) 2
+      change (2 : FiniteAdeleRing (𝓞 F) F) * ((a 2).2 * (v 2).2 - (rt δ).2 * ((a 3).2 * (v 3).2))
+          - (a 1).2 * (v 0).2 - (a 0).2 * (v 1).2
+        = Bf δ (finPartPi a) (finPartPi v)
       rfl
   rw [ψ, this, finiteAdelicChar_apply]
 
-private theorem level_of_mem {F : Type} [Field F] [NumberField F] (δ : F) {f : V4 F → ℂ}
-    (hf : f ∈ schwartzBruhatPi (K := F) (ι := Fin 4)) :
-    ∃ Λ : OpenAddSubgroup (FiniteAdeleRing (𝓞 F) F), ∀ a : V4 F, (∀ i, (a i).1 = 0 ∧ (a i).2 ∈ Λ) →
-      ∀ v, f (v + a) = f v ∧ ψ (B4 δ a v) * f v = f v := by
+private theorem level_of_mem
+    {F : Type} [Field F] [NumberField F]
+    (δ : F)
+    {f : V4 F → ℂ} (hf : f ∈ schwartzBruhatPi (K := F) (ι := Fin 4))
+    : ∃ Λ : OpenAddSubgroup (FiniteAdeleRing (𝓞 F) F), ∀ a : V4 F,
+      (∀ i, (a i).1 = 0 ∧ (a i).2 ∈ Λ) → ∀ v, f (v + a) = f v ∧ ψ (B4 δ a v) * f v = f v := by
   induction hf using Submodule.span_induction with
   | mem G hG =>
     obtain ⟨φ, g, hg, rfl⟩ := hG
@@ -132,8 +150,9 @@ private theorem level_of_mem {F : Type} [Field F] [NumberField F] (δ : F) {f : 
     · simp only [Pi.smul_apply, smul_eq_mul]
       rw [mul_left_comm, e2]
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.fixEx :
-    ∀ (F : Type) [Field F] [NumberField F] (δ : F), (∀ φ : S4 F, ∃ Λ, φ ∈ Fix δ Λ) ∧ ∀ Λ Λ', Λ ≤ Λ' → Fix δ Λ' ≤ Fix δ Λ := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.fixEx
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F),
+      (∀ φ : S4 F, ∃ Λ, φ ∈ Fix δ Λ) ∧ ∀ Λ Λ', Λ ≤ Λ' → Fix δ Λ' ≤ Fix δ Λ := by
   intro F _ _ δ
   refine ⟨fun φ => ?_, fun Λ Λ' h φ hφ a ha v => hφ a (fun i => ⟨(ha i).1, h (ha i).2⟩) v⟩
   obtain ⟨Λ, hΛ⟩ := level_of_mem δ φ.2

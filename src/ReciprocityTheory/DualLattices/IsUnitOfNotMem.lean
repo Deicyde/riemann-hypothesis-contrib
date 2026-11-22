@@ -20,8 +20,9 @@ def mI (hv : v.Integers R) : Ideal R where
   zero_mem' := by simp
   smul_mem' c x hx := by
     simp only [Set.mem_ofPred_eq, smul_eq_mul, map_mul] at *
-    calc v (algebraMap R C c) * v (algebraMap R C x) ≤ 1 * v (algebraMap R C x) :=
-          mul_le_mul_of_nonneg_right (hv.map_le_one c) zero_le
+    calc
+      v (algebraMap R C c) * v (algebraMap R C x)
+        ≤ 1 * v (algebraMap R C x) := mul_le_mul_of_nonneg_right (hv.map_le_one c) zero_le
       _ < 1 := by rwa [one_mul]
 
 theorem mem_mI (hv : v.Integers R) (r : R) : r ∈ mI hv ↔ v (algebraMap R C r) < 1 := Iff.rfl
@@ -41,9 +42,13 @@ theorem mI_isMaximal (hv : v.Integers R) : (mI hv).IsMaximal := by
   simpa using this
 
 theorem isDomain (hv : v.Integers R) : IsDomain R := by
-  have : Nontrivial R := ⟨0, 1, fun h => by
-    have := congrArg (fun r => v (algebraMap R C r)) h
-    simp at this⟩
+  have : Nontrivial R := ⟨
+    0,
+    1,
+    fun h => by
+      have := congrArg (fun r => v (algebraMap R C r)) h
+      simp at this
+  ⟩
   exact hv.hom_inj.isDomain (algebraMap R C)
 
 abbrev res (hv : v.Integers R) : R →+* R ⧸ mI hv := Ideal.Quotient.mk (mI hv)
@@ -58,22 +63,23 @@ instance instField (hv : v.Integers R) : Field (R ⧸ mI hv) :=
   haveI := mI_isMaximal hv
   Ideal.Quotient.field _
 
-theorem charP (p : ℕ) [hp : Fact p.Prime] (hv : v.Integers R)
-    (hpv : v (algebraMap R C (p : R)) < 1) : CharP (R ⧸ mI hv) p := by
-  have h0 : ((p : R ⧸ mI hv)) = 0 := by
-    rw [← map_natCast (res hv), res_eq_zero]; exact hpv
+theorem charP (p : ℕ) [hp : Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R C (p : R)) < 1)
+    : CharP (R ⧸ mI hv) p := by
+  have h0 : ((p : R ⧸ mI hv)) = 0 := by rw [← map_natCast (res hv), res_eq_zero]; exact hpv
   exact (CharP.charP_iff_prime_eq_zero hp.out).2 h0
 
-theorem idem_eq_zero (hv : v.Integers R) {n : Type} [Fintype n] [DecidableEq n]
-    (e : Matrix n n R) (he : e * e = e) (hm : ∀ a b, e a b ∈ mI hv) : e = 0 := by
-  have hmap : e.map (res hv) = 0 := by
-    ext a b; simpa [Ideal.Quotient.eq_zero_iff_mem] using hm a b
+theorem idem_eq_zero
+    (hv : v.Integers R)
+    {n : Type} [Fintype n] [DecidableEq n]
+    (e : Matrix n n R) (he : e * e = e) (hm : ∀ a b, e a b ∈ mI hv)
+    : e = 0 := by
+  have hmap : e.map (res hv) = 0 := by ext a b; simpa [Ideal.Quotient.eq_zero_iff_mem] using hm a b
   have hdet : IsUnit (1 - e).det := by
     apply isUnit_of_not_mem hv
     intro h
     have h1 : res hv (1 - e).det = 0 := Ideal.Quotient.eq_zero_iff_mem.2 h
-    rw [RingHom.map_det, map_sub, map_one, RingHom.mapMatrix_apply, hmap, sub_zero,
-      Matrix.det_one] at h1
+    rw [RingHom.map_det, map_sub, map_one, RingHom.mapMatrix_apply, hmap, sub_zero, Matrix.det_one]
+      at h1
     exact one_ne_zero h1
   have hu : IsUnit (1 - e) := (Matrix.isUnit_iff_isUnit_det _).2 hdet
   have : e * (1 - e) = 0 := by rw [mul_sub, mul_one, he, sub_self]

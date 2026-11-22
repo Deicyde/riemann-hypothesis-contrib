@@ -19,8 +19,11 @@ section Generators
 
 variable (K : Type) [Field K] [Fintype K]
 
-theorem exists_root_over {F : Type} [Field F] {N M : ℕ} (hM : 0 < M) (hNM : N ∣ M) {z w : F}
-    (hz : IsPrimitiveRoot z N) (hw : IsPrimitiveRoot w M) : ∃ z' : F, IsPrimitiveRoot z' M ∧ z' ^ (M / N) = z := by
+theorem exists_root_over
+    {F : Type} [Field F]
+    {N M : ℕ} (hM : 0 < M) (hNM : N ∣ M)
+    {z w : F} (hz : IsPrimitiveRoot z N) (hw : IsPrimitiveRoot w M)
+    : ∃ z' : F, IsPrimitiveRoot z' M ∧ z' ^ (M / N) = z := by
   have hN : 0 < N := Nat.pos_of_dvd_of_pos hNM hM
   haveI : NeZero N := ⟨hN.ne'⟩
   haveI : NeZero M := ⟨hM.ne'⟩
@@ -37,8 +40,8 @@ theorem exists_root_over {F : Type} [Field F] {N M : ℕ} (hM : 0 < M) (hNM : N 
 theorem lev_pos {d : ℕ} (hd : 0 < d) : 0 < Fintype.card K ^ d - 1 :=
   Nat.sub_pos_of_lt (Nat.one_lt_pow hd.ne' Fintype.one_lt_card)
 
-theorem exists_prim {d : ℕ} (hd : 0 < d) :
-    ∃ w : AlgebraicClosure K, IsPrimitiveRoot w (Fintype.card K ^ d - 1) := by
+theorem exists_prim {d : ℕ} (hd : 0 < d)
+    : ∃ w : AlgebraicClosure K, IsPrimitiveRoot w (Fintype.card K ^ d - 1) := by
   have h1 : 1 ≤ Fintype.card K ^ d := Nat.one_le_pow _ _ Fintype.card_pos
   have hq : ((Fintype.card K : ℕ) : AlgebraicClosure K) = 0 := by
     rw [← map_natCast (algebraMap K (AlgebraicClosure K)), Nat.cast_card_eq_zero, map_zero]
@@ -48,50 +51,75 @@ theorem exists_prim {d : ℕ} (hd : 0 < d) :
   haveI : NeZero (Fintype.card K ^ d - 1) := ⟨(lev_pos K hd).ne'⟩
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ _
 
-noncomputable def tower : (k : ℕ) → {z : AlgebraicClosure K // IsPrimitiveRoot z (Fintype.card K ^ k.factorial - 1)}
-  | 0 => ⟨(exists_prim K (Nat.factorial_pos 0)).choose, (exists_prim K (Nat.factorial_pos 0)).choose_spec⟩
+noncomputable def tower
+    : (k : ℕ) → {z : AlgebraicClosure K // IsPrimitiveRoot z (Fintype.card K ^ k.factorial - 1)}
+  | 0 => ⟨
+    (exists_prim K (Nat.factorial_pos 0)).choose,
+    (exists_prim K (Nat.factorial_pos 0)).choose_spec
+  ⟩
   | k + 1 =>
-    have h := exists_root_over (lev_pos K (Nat.factorial_pos (k + 1)))
-      (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial (Nat.le_succ k))) (tower k).2
-      (exists_prim K (Nat.factorial_pos (k + 1))).choose_spec
+    have h :=
+      exists_root_over (lev_pos K (Nat.factorial_pos (k + 1)))
+        (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial (Nat.le_succ k)))
+        (tower k).2 (exists_prim K (Nat.factorial_pos (k + 1))).choose_spec
     ⟨h.choose, h.choose_spec.1⟩
 
-theorem tower_succ (k : ℕ) :
-    (tower K (k + 1)).1 ^ ((Fintype.card K ^ (k + 1).factorial - 1) / (Fintype.card K ^ k.factorial - 1)) =
-      (tower K k).1 :=
+theorem tower_succ (k : ℕ)
+    : (tower K (k + 1)).1
+        ^ ((Fintype.card K ^ (k + 1).factorial - 1) / (Fintype.card K ^ k.factorial - 1))
+      = (tower K k).1 :=
   (exists_root_over (lev_pos K (Nat.factorial_pos (k + 1)))
-      (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial (Nat.le_succ k))) (tower K k).2
-      (exists_prim K (Nat.factorial_pos (k + 1))).choose_spec).choose_spec.2
+    (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial (Nat.le_succ k))) (tower K k).2
+    (exists_prim K (Nat.factorial_pos (k + 1))).choose_spec).choose_spec.2
 
-theorem tower_le {k l : ℕ} (h : k ≤ l) :
-    (tower K l).1 ^ ((Fintype.card K ^ l.factorial - 1) / (Fintype.card K ^ k.factorial - 1)) = (tower K k).1 := by
+theorem tower_le {k l : ℕ} (h : k ≤ l)
+    : (tower K l).1 ^ ((Fintype.card K ^ l.factorial - 1) / (Fintype.card K ^ k.factorial - 1))
+      = (tower K k).1 := by
   induction l, h using Nat.le_induction with
   | base => rw [Nat.div_self (lev_pos K (Nat.factorial_pos k)), pow_one]
   | succ l hl ih =>
-    rw [← Nat.div_mul_div (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial (Nat.le_succ l)))
-      (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial hl)), pow_mul, tower_succ, ih]
+    rw [← Nat.div_mul_div
+        (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial (Nat.le_succ l)))
+        (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial hl)),
+      pow_mul, tower_succ, ih]
 
-theorem exists_genSys : ∃ ζ : ℕ → AlgebraicClosure K, ∀ d, 0 < d → orderOf (ζ d) = Fintype.card K ^ d - 1 ∧
-    ∀ d', d ∣ d' → 0 < d' → ζ d' ^ ((Fintype.card K ^ d' - 1) / (Fintype.card K ^ d - 1)) = ζ d := by
-  refine ⟨fun d => (tower K d).1 ^ ((Fintype.card K ^ d.factorial - 1) / (Fintype.card K ^ d - 1)),
-    fun d hd => ⟨?_, fun d' hdd hd' => ?_⟩⟩
+theorem exists_genSys
+    : ∃ ζ : ℕ → AlgebraicClosure K, ∀ d,
+      0 < d
+        → orderOf (ζ d) = Fintype.card K ^ d - 1
+          ∧ ∀ d',
+            d ∣ d' → 0 < d'
+              → ζ d' ^ ((Fintype.card K ^ d' - 1) / (Fintype.card K ^ d - 1)) = ζ d := by
+  refine ⟨
+    fun d => (tower K d).1 ^ ((Fintype.card K ^ d.factorial - 1) / (Fintype.card K ^ d - 1)),
+    fun d hd => ⟨?_, fun d' hdd hd' => ?_⟩
+  ⟩
   · have hdv := Nat.pow_sub_one_dvd_pow_sub_one (Fintype.card K) (Nat.dvd_factorial hd le_rfl)
-    exact ((tower K d).2.pow (lev_pos K (Nat.factorial_pos d)) (Nat.div_mul_cancel hdv).symm).eq_orderOf.symm
+    exact ((tower K d).2.pow (lev_pos K (Nat.factorial_pos d))
+      (Nat.div_mul_cancel hdv).symm).eq_orderOf.symm
   · have hle : d ≤ d' := Nat.le_of_dvd hd' hdd
     show ((tower K d').1 ^ _) ^ _ = (tower K d).1 ^ _
-    rw [← pow_mul, Nat.div_mul_div (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.dvd_factorial hd' le_rfl))
-      (Nat.pow_sub_one_dvd_pow_sub_one _ hdd), ← tower_le K hle, ← pow_mul,
+    rw [← pow_mul,
+      Nat.div_mul_div (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.dvd_factorial hd' le_rfl))
+        (Nat.pow_sub_one_dvd_pow_sub_one _ hdd),
+      ← tower_le K hle, ← pow_mul,
       Nat.div_mul_div (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.factorial_dvd_factorial hle))
         (Nat.pow_sub_one_dvd_pow_sub_one _ (Nat.dvd_factorial hd le_rfl))]
 
-theorem nonempty_labelConv [DecidableEq K] : Nonempty (Formalism.IrreducibleCountingLemmas.TYPES.LabelConv K) := by
+theorem nonempty_labelConv [DecidableEq K]
+    : Nonempty (Formalism.IrreducibleCountingLemmas.TYPES.LabelConv K) := by
   obtain ⟨θ, hθ⟩ := GlobalTheory.CuspGL.TeichEmb.exists_teichmuller K
   obtain ⟨ζ, hζ⟩ := exists_genSys K
-  exact ⟨{ ι := θ, ι_inj := hθ, gen := ζ, gen_order := fun d hd => (hζ d hd).1
-           gen_norm := fun d e hd he => (hζ d hd).2 (d * e) (Dvd.intro _ rfl) (Nat.mul_pos hd he) }⟩
+  exact ⟨{
+    ι := θ
+    ι_inj := hθ
+    gen := ζ
+    gen_order := fun d hd => (hζ d hd).1
+    gen_norm := fun d e hd he => (hζ d hd).2 (d * e) (Dvd.intro _ rfl) (Nat.mul_pos hd he)
+  }⟩
 
-theorem exists_monic_irreducible (d : ℕ) (hd : 1 ≤ d) :
-    ∃ P : K[X], P.Monic ∧ Irreducible P ∧ P ≠ X ∧ P.natDegree = d := by
+theorem exists_monic_irreducible (d : ℕ) (hd : 1 ≤ d)
+    : ∃ P : K[X], P.Monic ∧ Irreducible P ∧ P ≠ X ∧ P.natDegree = d := by
   haveI : Fact (Nat.Prime (ringChar K)) := ⟨CharP.char_is_prime K (ringChar K)⟩
   haveI : NeZero d := ⟨by omega⟩
   let E := FiniteField.Extension K (ringChar K) d
@@ -121,14 +149,18 @@ def transportRep (ρ : Representation ℂ G V) (e : V ≃ₗ[ℂ] W) : Represent
   map_one' := by ext; simp
   map_mul' g h := by ext; simp
 
-theorem transportRep_apply (ρ : Representation ℂ G V) (e : V ≃ₗ[ℂ] W) (g : G) (w : W) :
-    transportRep ρ e g w = e (ρ g (e.symm w)) := rfl
+theorem transportRep_apply (ρ : Representation ℂ G V) (e : V ≃ₗ[ℂ] W) (g : G) (w : W)
+    : transportRep ρ e g w = e (ρ g (e.symm w)) :=
+  rfl
 
 end Transport
 
-theorem isIrreducible_transportRep {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] (ρ : Representation ℂ G V) (e : V ≃ₗ[ℂ] W) (hV : Nontrivial V)
-    (h : ∀ U : Submodule ℂ V, (∀ g, ∀ v ∈ U, ρ g v ∈ U) → U = ⊥ ∨ U = ⊤) : (transportRep ρ e).IsIrreducible := by
+theorem isIrreducible_transportRep
+    {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ G V)
+    (e : V ≃ₗ[ℂ] W) (hV : Nontrivial V)
+    (h : ∀ U : Submodule ℂ V, (∀ g, ∀ v ∈ U, ρ g v ∈ U) → U = ⊥ ∨ U = ⊤)
+    : (transportRep ρ e).IsIrreducible := by
   refine (GlobalTheory.CuspRep.isIrreducible_iff _).2 ⟨e.symm.toEquiv.nontrivial, fun U hU => ?_⟩
   have hinv : ∀ g, ∀ v ∈ U.comap e.toLinearMap, ρ g v ∈ U.comap e.toLinearMap := by
     intro g v hv
@@ -149,9 +181,12 @@ theorem isIrreducible_transportRep {G V W : Type} [Group G] [AddCommGroup V] [Mo
     have h2 : e (e.symm w) ∈ U := h1
     rwa [e.apply_symm_apply] at h2
 
-theorem isCuspidal_transportRep {K : Type} [Field K] [Fintype K] [DecidableEq K] {N : ℕ} {W : Type} [AddCommGroup W]
-    [Module ℂ W] (τ : FDRep ℂ (GL (Fin N) K)) (h : Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal K τ) (e : τ ≃ₗ[ℂ] W) :
-    GlobalTheory.FiniteGL.IsCuspidal (transportRep τ.ρ e) := by
+theorem isCuspidal_transportRep
+    {K : Type} [Field K] [Fintype K] [DecidableEq K]
+    {N : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+    (τ : FDRep ℂ (GL (Fin N) K))
+    (h : Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal K τ) (e : τ ≃ₗ[ℂ] W)
+    : GlobalTheory.FiniteGL.IsCuspidal (transportRep τ.ρ e) := by
   rw [GlobalTheory.FiniteGL.isCuspidal_iff_twoBlocks]
   intro a ha haN w hw
   let b : Fin N → Fin 2 := fun i => if (i : ℕ) < a then 0 else 1
@@ -179,14 +214,22 @@ theorem isCuspidal_transportRep {K : Type} [Field K] [Fintype K] [DecidableEq K]
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists
 
-theorem GlobalTheory.CompanionTheory.Hypotheses₂.cuspidalExists_holds : GlobalTheory.Published.CuspidalExists := by
+theorem GlobalTheory.CompanionTheory.Hypotheses₂.cuspidalExists_holds
+    : GlobalTheory.Published.CuspidalExists := by
   intro k _ _ n
   classical
   obtain ⟨C⟩ := GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.nonempty_labelConv k
-  obtain ⟨P, h1, h2, h3, h4⟩ := GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.exists_monic_irreducible k (n + 1) (by omega)
-  obtain ⟨τ, hs, hc, -⟩ := GlobalTheory.CompanionTheory.TyFin.CuspLabel.exists_cuspidal_label k C (n + 1) (by omega) P h1 h2 h3 h4
+  obtain ⟨P, h1, h2, h3, h4⟩ :=
+    GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.exists_monic_irreducible k (n + 1)
+      (by omega)
+  obtain ⟨τ, hs, hc, -⟩ :=
+    GlobalTheory.CompanionTheory.TyFin.CuspLabel.exists_cuspidal_label k C (n + 1) (by omega) P h1
+      h2 h3 h4
   have hI := (GlobalTheory.CompanionTheory.TyFin.simpleIffIrr.1 _ τ).1 hs
   let e := (Module.finBasis ℂ τ).equivFun
-  exact ⟨_, GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.transportRep τ.ρ e,
+  exact ⟨
+    _,
+    GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.transportRep τ.ρ e,
     GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.isIrreducible_transportRep τ.ρ e hI.1 hI.2,
-    GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.isCuspidal_transportRep τ hc e⟩
+    GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.isCuspidal_transportRep τ hc e
+  ⟩

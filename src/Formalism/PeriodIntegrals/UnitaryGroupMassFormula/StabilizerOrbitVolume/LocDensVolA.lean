@@ -12,16 +12,19 @@ namespace PI.VolStabSW
 namespace VolAAW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes SdUniqW
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes SdUniqW
 
 def CondAA : Prop :=
-  ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsCharAF F ψ →
-    ∀ᶠ v in cofinite, ∀ t : Fv F v,
-      (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (s * t) = 1) ↔ t ∈ v.adicCompletionIntegers F
+  ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+    IsCharAF F ψ
+      → ∀ᶠ v in cofinite, ∀ t : Fv F v,
+          (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (s * t) = 1) ↔ t ∈ v.adicCompletionIntegers F
 
 section Vol
 
-variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+variable
+  {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
   [MeasurableSpace V] [BorelSpace V]
 
 end Vol

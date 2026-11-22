@@ -12,10 +12,12 @@ namespace GlobalTheory.BK
 
 open PowerSeries
 
-theorem exists_pow_E_smul_EN_mem_Man : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K]
-    [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
-    [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] (P : PhiMod O K l e a ι),
-    ∃ n : ℕ, ∀ m ∈ P.M, E K l e ^ n • P.EN m ∈ P.Man := by
+theorem exists_pow_E_smul_EN_mem_Man
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] (P : PhiMod O K l e a ι),
+      ∃ n : ℕ, ∀ m ∈ P.M,
+        E K l e ^ n • P.EN m ∈ P.Man := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ P
   obtain ⟨α, β, hα, hβ⟩ := P.exists_exponents
   have hk : 1 / ((e : ℝ) * l) < 1 / (e : ℝ) := by
@@ -33,13 +35,16 @@ theorem exists_pow_E_smul_EN_mem_Man : ∀ (O K : Type) [CommRing O] [NormedFiel
       mem_tot.2 fun τ i => N_mem (derivative_mem_R l (mem_tot.1 hw τ i))
     have h1 : P.conn (P.xiExt w) ∈ P.ext (Rpi O K l e) := by
       rw [PhiMod.conn_xiExt]
-      exact (GlobalTheory.T.breuilKisin_xiExt_mem_rigidTensor_iff O K l e a ι P (1 / (e : ℝ)) hk _).2 hNw
+      exact
+        (GlobalTheory.T.breuilKisin_xiExt_mem_rigidTensor_iff O K l e a ι P (1 / (e : ℝ)) hk _).2
+          hNw
     exact P.smul_mem_Mext_of_basis (fun i => hα _ (P.phi_mem_L (P.bas_mem_M i))) (A_le_Rpi l e) h1
   refine ⟨α + β, fun m hm => ?_⟩
   have hv := hL _ (hβ m hm)
   rw [PhiMod.conn_smul, smul_add, smul_smul, smul_smul, ← pow_add] at hv
   have h2 : (E K l e ^ α * N K (E K l e ^ β)) • m ∈ P.Man :=
-    P.smul_mem_Man (mul_mem (pow_mem (E_mem l e _) α) (N_mem (derivative_mem_R l (pow_mem (E_mem l e _) β))))
+    P.smul_mem_Man
+      (mul_mem (pow_mem (E_mem l e _) α) (N_mem (derivative_mem_R l (pow_mem (E_mem l e _) β))))
       (P.M_le_Man hm)
   have h3 : E K l e ^ (α + β) • P.conn m ∈ P.Man := by
     have := sub_mem hv h2

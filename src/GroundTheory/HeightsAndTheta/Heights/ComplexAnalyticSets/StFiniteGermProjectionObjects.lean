@@ -13,20 +13,26 @@ open Topology Filter
 
 noncomputable section
 
-def coordGerm {σ : Type} [Fintype σ] (w : σ → ℂ) (i : σ) : holGerms w :=
-  ⟨↑(fun z : σ → ℂ => z i), fun z => z i,
-    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) i).analyticAt w, rfl⟩
+def coordGerm {σ : Type} [Fintype σ] (w : σ → ℂ) (i : σ) : holGerms w := ⟨
+  ↑(fun z : σ → ℂ => z i),
+  fun z => z i,
+  (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) i).analyticAt w,
+  rfl
+⟩
 
-def IsFiniteGermProjection {σ : Type} [Fintype σ] (w : σ → ℂ) (P : Ideal (holGerms w)) {d : ℕ}
-    (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) : Prop :=
-  (∀ φ : holGerms (A w), germPull A (A.analyticAt w) rfl φ ∈ P → φ = 0) ∧
-  (∀ ψ : holGerms w, ∃ F : MvPolynomial σ (holGerms (A w)),
-      ψ - MvPolynomial.eval₂ (germPull A (A.analyticAt w) rfl) (coordGerm w) F ∈ P) ∧
-  (∀ i : σ, ∃ q : Polynomial (holGerms (A w)), q.Monic ∧
-      q.eval₂ (germPull A (A.analyticAt w) rfl) (coordGerm w i) ∈ P)
+def IsFiniteGermProjection
+    {σ : Type} [Fintype σ]
+    (w : σ → ℂ) (P : Ideal (holGerms w))
+    {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ))
+    : Prop :=
+  (∀ φ : holGerms (A w), germPull A (A.analyticAt w) rfl φ ∈ P → φ = 0)
+    ∧ (∀ ψ : holGerms w, ∃ F : MvPolynomial σ (holGerms (A w)),
+      ψ - MvPolynomial.eval₂ (germPull A (A.analyticAt w) rfl) (coordGerm w) F ∈ P)
+    ∧ (∀ i : σ, ∃ q : Polynomial (holGerms (A w)),
+      q.Monic ∧ q.eval₂ (germPull A (A.analyticAt w) rfl) (coordGerm w i) ∈ P)
 
-theorem isFiniteGermProjection_bot {σ : Type} [Fintype σ] (w : σ → ℂ) :
-    ∃ (d : ℕ) (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)), IsFiniteGermProjection w ⊥ A := by
+theorem isFiniteGermProjection_bot {σ : Type} [Fintype σ] (w : σ → ℂ)
+    : ∃ (d : ℕ) (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)), IsFiniteGermProjection w ⊥ A := by
   classical
   let e : (σ → ℂ) ≃L[ℂ] (Fin (Fintype.card σ) → ℂ) :=
     (LinearEquiv.funCongrLeft ℂ ℂ (Fintype.equivFin σ).symm).toContinuousLinearEquiv

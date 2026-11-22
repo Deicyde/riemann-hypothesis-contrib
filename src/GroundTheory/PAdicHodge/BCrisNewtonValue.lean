@@ -19,7 +19,6 @@ open _root_.WittVector Laurent Polynomial WittTilt
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-
 variable (p) in
 def sig (ρ : ℝ) : ℝ := Real.log ρ / Real.log (p : ℝ)⁻¹
 
@@ -52,10 +51,11 @@ theorem norm_p_algCl : ‖(p : PadicAlgCl p)‖ = (p : ℝ)⁻¹ := by
 theorem pow_rpow_comm {x : ℝ} (hx : 0 ≤ x) (n : ℕ) (s : ℝ) : (x ^ n) ^ s = (x ^ s) ^ n := by
   rw [← Real.rpow_natCast, ← Real.rpow_mul hx, mul_comm, Real.rpow_mul hx, Real.rpow_natCast]
 
-theorem gn_padicInt {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (c : ℤ_[p]) :
-    gn ℂ_[p] p ρ (algebraMap (AInf ℂ_[p] p) (Localization.Away (p : AInf ℂ_[p] p))
-      (IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p c)) =
-      ‖c‖ ^ sig p ρ := by
+theorem gn_padicInt {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (c : ℤ_[p])
+    : gn ℂ_[p] p ρ
+        (algebraMap (AInf ℂ_[p] p) (Localization.Away (p : AInf ℂ_[p] p))
+          (IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p c))
+      = ‖c‖ ^ sig p ρ := by
   by_cases hc : c = 0
   · subst hc
     rw [map_zero, map_zero, gn_zero, norm_zero, Real.zero_rpow (sig_pos hρ0 hρ1).ne']
@@ -70,8 +70,8 @@ theorem gn_padicInt {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (c : ℤ_[p]) :
 theorem natDegree_minpoly_pos (y : PadicAlgCl p) : 0 < (minpoly ℚ_[p] y).natDegree :=
   minpoly.natDegree_pos (Algebra.IsIntegral.isIntegral y)
 
-theorem norm_minpoly_coeff_le (y : PadicAlgCl p) {i : ℕ} (hi : i ≤ (minpoly ℚ_[p] y).natDegree) :
-    ‖(minpoly ℚ_[p] y).coeff i‖ ≤ ‖y‖ ^ ((minpoly ℚ_[p] y).natDegree - i) := by
+theorem norm_minpoly_coeff_le (y : PadicAlgCl p) {i : ℕ} (hi : i ≤ (minpoly ℚ_[p] y).natDegree)
+    : ‖(minpoly ℚ_[p] y).coeff i‖ ≤ ‖y‖ ^ ((minpoly ℚ_[p] y).natDegree - i) := by
   set q := minpoly ℚ_[p] y with hq
   rcases hi.lt_or_eq with hi | hi
   · have h1 : ‖q.coeff i‖ ^ (1 / (q.natDegree - i : ℝ)) ≤ ‖y‖ := by
@@ -81,31 +81,35 @@ theorem norm_minpoly_coeff_le (y : PadicAlgCl p) {i : ℕ} (hi : i ≤ (minpoly 
     have hpos : (0 : ℝ) < (q.natDegree - i : ℝ) := by
       have : (i : ℝ) < q.natDegree := by exact_mod_cast hi
       linarith
-    have hcast : ((q.natDegree - i : ℕ) : ℝ) = (q.natDegree - i : ℝ) := by
-      rw [Nat.cast_sub hi.le]
-    calc ‖q.coeff i‖ = (‖q.coeff i‖ ^ (1 / (q.natDegree - i : ℝ))) ^ ((q.natDegree - i : ℕ) : ℝ) := by
-          rw [← Real.rpow_mul (norm_nonneg _), hcast, one_div, inv_mul_cancel₀ hpos.ne', Real.rpow_one]
+    have hcast : ((q.natDegree - i : ℕ) : ℝ) = (q.natDegree - i : ℝ) := by rw [Nat.cast_sub hi.le]
+    calc
+      ‖q.coeff i‖ = (‖q.coeff i‖ ^ (1 / (q.natDegree - i : ℝ))) ^ ((q.natDegree - i : ℕ) : ℝ) := by
+        rw [← Real.rpow_mul (norm_nonneg _), hcast, one_div, inv_mul_cancel₀ hpos.ne',
+          Real.rpow_one]
       _ ≤ ‖y‖ ^ ((q.natDegree - i : ℕ) : ℝ) :=
-          Real.rpow_le_rpow (by positivity) h1 (Nat.cast_nonneg _)
+        Real.rpow_le_rpow (by positivity) h1 (Nat.cast_nonneg _)
       _ = ‖y‖ ^ (q.natDegree - i) := Real.rpow_natCast _ _
-  · rw [hi, Nat.sub_self, pow_zero, (minpoly.monic (Algebra.IsIntegral.isIntegral y)).coeff_natDegree,
-      norm_one]
+  · rw [hi, Nat.sub_self, pow_zero,
+      (minpoly.monic (Algebra.IsIntegral.isIntegral y)).coeff_natDegree, norm_one]
 
-theorem norm_minpoly_coeff_zero (y : PadicAlgCl p) :
-    ‖(minpoly ℚ_[p] y).coeff 0‖ = ‖y‖ ^ (minpoly ℚ_[p] y).natDegree := by
+theorem norm_minpoly_coeff_zero (y : PadicAlgCl p)
+    : ‖(minpoly ℚ_[p] y).coeff 0‖ = ‖y‖ ^ (minpoly ℚ_[p] y).natDegree := by
   have h := spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow (K := ℚ_[p]) (L := PadicAlgCl p) y
   rw [PadicAlgCl.spectralNorm_eq] at h
   have hd : (0 : ℝ) < (minpoly ℚ_[p] y).natDegree := by exact_mod_cast natDegree_minpoly_pos y
   rw [h, ← Real.rpow_natCast, ← Real.rpow_mul (norm_nonneg _), one_div, inv_mul_cancel₀ hd.ne',
     Real.rpow_one]
 
-theorem eq_of_no_dominant {d : ℕ} (hd : 1 ≤ d) {Fa Fb μ ρk : ℝ} (hFa : 0 < Fa) (hFb : 0 < Fb)
-    (hμ : 0 < μ) (hρk : 0 < ρk) (G : ℕ → ℝ) (hG : ∀ i ≤ d, 0 ≤ G i ∧ G i ≤ ρk * μ ^ (d - i))
-    (hG0 : G 0 = ρk * μ ^ d) (hGd : G d = ρk)
-    (hnd : ∀ j ∈ Finset.range (d + 1), 0 < G j * Fa ^ j * Fb ^ (d - j) →
-      ¬ ∀ i ∈ Finset.range (d + 1), i ≠ j →
-        G i * Fa ^ i * Fb ^ (d - i) < G j * Fa ^ j * Fb ^ (d - j)) :
-    Fa = μ * Fb := by
+theorem eq_of_no_dominant
+    {d : ℕ} (hd : 1 ≤ d)
+    {Fa Fb μ ρk : ℝ} (hFa : 0 < Fa) (hFb : 0 < Fb) (hμ : 0 < μ) (hρk : 0 < ρk)
+    (G : ℕ → ℝ)
+    (hG : ∀ i ≤ d, 0 ≤ G i ∧ G i ≤ ρk * μ ^ (d - i)) (hG0 : G 0 = ρk * μ ^ d) (hGd : G d = ρk)
+    (hnd : ∀ j ∈ Finset.range (d + 1),
+      0 < G j * Fa ^ j * Fb ^ (d - j)
+        → ¬ ∀ i ∈ Finset.range (d + 1),
+          i ≠ j → G i * Fa ^ i * Fb ^ (d - i) < G j * Fa ^ j * Fb ^ (d - j))
+    : Fa = μ * Fb := by
   rcases lt_trichotomy Fa (μ * Fb) with hlt | heq | hgt
   · exfalso
     refine hnd 0 (Finset.mem_range.2 (by omega)) ?_ fun i hi hi0 => ?_
@@ -117,31 +121,36 @@ theorem eq_of_no_dominant {d : ℕ} (hd : 1 ≤ d) {Fa Fb μ ρk : ℝ} (hFa : 0
         rw [mul_pow]
         have h1 : μ ^ (d - i) * μ ^ i = μ ^ d := by rw [← pow_add, Nat.sub_add_cancel hid]
         have h2 : Fb ^ i * Fb ^ (d - i) = Fb ^ d := by rw [← pow_add, Nat.add_sub_cancel' hid]
-        calc ρk * μ ^ (d - i) * (μ ^ i * Fb ^ i) * Fb ^ (d - i)
+        calc
+          ρk * μ ^ (d - i) * (μ ^ i * Fb ^ i) * Fb ^ (d - i)
             = ρk * (μ ^ (d - i) * μ ^ i) * (Fb ^ i * Fb ^ (d - i)) := by ring
           _ = _ := by rw [h1, h2]
       rw [hG0, Nat.sub_zero, pow_zero, mul_one, ← e1]
-      calc G i * Fa ^ i * Fb ^ (d - i) ≤ ρk * μ ^ (d - i) * Fa ^ i * Fb ^ (d - i) := by
-            gcongr
+      calc
+        G i * Fa ^ i * Fb ^ (d - i)
+          ≤ ρk * μ ^ (d - i) * Fa ^ i * Fb ^ (d - i) := by gcongr
         _ < ρk * μ ^ (d - i) * (μ * Fb) ^ i * Fb ^ (d - i) := by
-            have : 0 < ρk * μ ^ (d - i) := by positivity
-            have : 0 < Fb ^ (d - i) := by positivity
-            gcongr
+          have : 0 < ρk * μ ^ (d - i) := by positivity
+          have : 0 < Fb ^ (d - i) := by positivity
+          gcongr
   · exact heq
   · exfalso
     refine hnd d (Finset.mem_range.2 (by omega)) ?_ fun i hi hid' => ?_
     · rw [hGd, Nat.sub_self, pow_zero, mul_one]; positivity
     · have hid : i < d := lt_of_le_of_ne (Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)) hid'
       obtain ⟨hG1, hG2⟩ := hG i hid.le
-      have hpow : (μ * Fb) ^ (d - i) < Fa ^ (d - i) := pow_lt_pow_left₀ hgt (by positivity) (by omega)
+      have hpow : (μ * Fb) ^ (d - i) < Fa ^ (d - i) :=
+        pow_lt_pow_left₀ hgt (by positivity) (by omega)
       have e1 : ρk * Fa ^ i * Fa ^ (d - i) = ρk * Fa ^ d := by
         rw [mul_assoc, ← pow_add, Nat.add_sub_cancel' hid.le]
       rw [hGd, Nat.sub_self, pow_zero, mul_one, ← e1]
-      calc G i * Fa ^ i * Fb ^ (d - i) ≤ ρk * μ ^ (d - i) * Fa ^ i * Fb ^ (d - i) := by gcongr
+      calc
+        G i * Fa ^ i * Fb ^ (d - i)
+          ≤ ρk * μ ^ (d - i) * Fa ^ i * Fb ^ (d - i) := by gcongr
         _ = ρk * Fa ^ i * (μ * Fb) ^ (d - i) := by rw [mul_pow]; ring
         _ < ρk * Fa ^ i * Fa ^ (d - i) := by
-            have : 0 < ρk * Fa ^ i := by positivity
-            gcongr
+          have : 0 < ρk * Fa ^ i := by positivity
+          gcongr
 
 end ACris
 

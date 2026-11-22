@@ -10,9 +10,11 @@ open MvPolynomial Matrix
 
 namespace GlobalTheory.MaxIdealJointEigen
 
-theorem iSupIndep_of_joint_eigen {K E I : Type} [Field K] [AddCommGroup E] [Module K E]
+theorem iSupIndep_of_joint_eigen
+    {K E I : Type} [Field K] [AddCommGroup E] [Module K E]
     (h : I → Module.End K E) (V : (I → K) → Submodule K E)
-    (hV : ∀ x, ∀ v ∈ V x, ∀ i, h i v = x i • v) : iSupIndep V := by
+    (hV : ∀ x, ∀ v ∈ V x, ∀ i, h i v = x i • v)
+    : iSupIndep V := by
   classical
   have stab : ∀ (s : Finset (I → K)) (i : I), ∀ u ∈ ⨆ y ∈ s, V y, h i u ∈ ⨆ y ∈ s, V y := by
     intro s i
@@ -33,8 +35,9 @@ theorem iSupIndep_of_joint_eigen {K E I : Type} [Field K] [AddCommGroup E] [Modu
       obtain ⟨i, hi⟩ := Function.ne_iff.mp hx.1
       have e : (x i - y i) • v = h i u - y i • u := by
         rw [sub_smul, ← hV x v hvx i, ← hsum, map_add (f := _), hV y w hw i, smul_add]; abel
-      have h0 := ih hx.2 ((x i - y i) • v) (Submodule.smul_mem _ _ hvx)
-        (e ▸ Submodule.sub_mem _ (stab s i u hu) (Submodule.smul_mem _ _ hu))
+      have h0 :=
+        ih hx.2 ((x i - y i) • v) (Submodule.smul_mem _ _ hvx)
+          (e ▸ Submodule.sub_mem _ (stab s i u hu) (Submodule.smul_mem _ _ hu))
       exact (smul_eq_zero.mp h0).resolve_left (sub_ne_zero.mpr hi)
   intro x
   rw [Submodule.disjoint_def]
@@ -46,11 +49,12 @@ theorem iSupIndep_of_joint_eigen {K E I : Type} [Field K] [AddCommGroup E] [Modu
     obtain ⟨⟨y, hy⟩, -, e⟩ := Finset.mem_image.mp hx
     exact hy e
   · refine (iSup₂_le fun y hy => ?_ : (⨆ y ∈ s, V y.1) ≤ _) hs
-    exact le_iSup₂_of_le (f := fun y (_ : y ∈ s.image Subtype.val) => V y) y.1
-      (Finset.mem_image_of_mem _ hy) le_rfl
+    exact le_iSup₂_of_le
+      (f := fun y (_ : y ∈ s.image Subtype.val) => V y)
+      y.1 (Finset.mem_image_of_mem _ hy) le_rfl
 
-theorem finite_joint_eigen {K I : Type} [Field K] {n : ℕ} (T : I → Matrix (Fin n) (Fin n) K) :
-    {θ : I → K | ∃ c : Fin n → K, c ≠ 0 ∧ ∀ i, (T i).mulVec c = θ i • c}.Finite := by
+theorem finite_joint_eigen {K I : Type} [Field K] {n : ℕ} (T : I → Matrix (Fin n) (Fin n) K)
+    : {θ : I → K | ∃ c : Fin n → K, c ≠ 0 ∧ ∀ i, (T i).mulVec c = θ i • c}.Finite := by
   classical
   let V : (I → K) → Submodule K (Fin n → K) := fun θ =>
     ⨅ i, Module.End.eigenspace (Matrix.toLin' (T i)) (θ i)
@@ -70,17 +74,21 @@ theorem finite_joint_eigen {K I : Type} [Field K] {n : ℕ} (T : I → Matrix (F
   rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply]
   exact hc i
 
-theorem mulVec_eval₂ {O K I : Type} [CommRing O] [Field K] (emb : O →+* K) {n : ℕ}
-    (ρ : MvPolynomial I O →ₐ[O] Matrix (Fin n) (Fin n) O) (θ : I → K) (c : Fin n → K)
-    (hc : ∀ i, ((ρ (X i)).map emb).mulVec c = θ i • c) (p : MvPolynomial I O) :
-    ((ρ p).map emb).mulVec c = eval₂ emb θ p • c := by
+theorem mulVec_eval₂
+    {O K I : Type} [CommRing O] [Field K]
+    (emb : O →+* K)
+    {n : ℕ} (ρ : MvPolynomial I O →ₐ[O] Matrix (Fin n) (Fin n) O)
+    (θ : I → K) (c : Fin n → K) (hc : ∀ i, ((ρ (X i)).map emb).mulVec c = θ i • c)
+    (p : MvPolynomial I O)
+    : ((ρ p).map emb).mulVec c = eval₂ emb θ p • c := by
   induction p using MvPolynomial.induction_on with
   | C a =>
     rw [← MvPolynomial.algebraMap_eq, AlgHom.commutes, Matrix.algebraMap_eq_diagonal]
     ext j
     simp [Matrix.mulVec_diagonal]
   | add p q hp hq =>
-    rw [map_add (f := _), Matrix.map_add _ (map_add emb), Matrix.add_mulVec, hp, hq, eval₂_add, add_smul]
+    rw [map_add (f := _), Matrix.map_add _ (map_add emb), Matrix.add_mulVec, hp, hq, eval₂_add,
+      add_smul]
   | mul_X p i hp =>
     rw [map_mul, Matrix.map_mul, ← Matrix.mulVec_mulVec, hc, Matrix.mulVec_smul, hp, eval₂_mul,
       eval₂_X, smul_smul, mul_comm]
@@ -91,13 +99,16 @@ namespace GlobalTheory
 
 open MvPolynomial Matrix GlobalTheory.MaxIdealJointEigen
 
-theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O]
-    (emb : O →+* PadicAlgCl l), (∀ c, ‖emb c‖ ≤ 1) → (∀ c, ‖emb c‖ = 1 → IsUnit c) →
-    ∀ (I : Type) (n : ℕ) (ρ : MvPolynomial I O →ₐ[O] Matrix (Fin n) (Fin n) O)
-    (m : Ideal (MvPolynomial I O)), m.IsMaximal → RingHom.ker ρ ≤ m →
-    ∃ θ : I → PadicAlgCl l, (∀ i, ‖θ i‖ ≤ 1) ∧ (∀ p, p ∈ m ↔ ‖MvPolynomial.eval₂ emb θ p‖ < 1) ∧
-      ∃ c : Fin n → PadicAlgCl l, c ≠ 0 ∧
-        ∀ i, ((ρ (MvPolynomial.X i)).map emb).mulVec c = θ i • c := by
+theorem maximal_ideal_eq_joint_eigen
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] (emb : O →+* PadicAlgCl l),
+      (∀ c, ‖emb c‖ ≤ 1) → (∀ c, ‖emb c‖ = 1 → IsUnit c)
+        → ∀ (I : Type) (n : ℕ) (ρ : MvPolynomial I O →ₐ[O] Matrix (Fin n) (Fin n) O)
+            (m : Ideal (MvPolynomial I O)),
+          m.IsMaximal → RingHom.ker ρ ≤ m
+            → ∃ θ : I → PadicAlgCl l,
+              (∀ i, ‖θ i‖ ≤ 1) ∧ (∀ p, p ∈ m ↔ ‖MvPolynomial.eval₂ emb θ p‖ < 1)
+                ∧ ∃ c : Fin n → PadicAlgCl l,
+                  c ≠ 0 ∧ ∀ i, ((ρ (MvPolynomial.X i)).map emb).mulVec c = θ i • c := by
   intro l _ O _ emb h1 hu I n ρ m hm hker
   classical
   set K := PadicAlgCl l
@@ -106,19 +117,21 @@ theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [
   have hfin : Θ.Finite := finite_joint_eigen T
   have hint : ∀ θ ∈ Θ, ∀ p, ‖eval₂ emb θ p‖ ≤ 1 := by
     rintro θ ⟨c, hc0, hc⟩ p
-    exact GlobalTheory.T.norm_eigenvalue_le_one_of_integral_matrix_ultrametric O K emb h1 n (ρ p) _ c hc0 (mulVec_eval₂ emb ρ θ c hc p)
+    exact GlobalTheory.T.norm_eigenvalue_le_one_of_integral_matrix_ultrametric O K emb h1 n (ρ p) _
+      c hc0 (mulVec_eval₂ emb ρ θ c hc p)
 
-  let J : (I → K) → Ideal (MvPolynomial I O) := fun θ =>
-    { carrier := {p | ∀ r, ‖eval₂ emb θ (r * p)‖ < 1}
-      add_mem' := by
-        intro a b ha hb r
-        simp only [Set.mem_setOf_eq, mul_add, eval₂_add] at *
-        exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt (ha r) (hb r))
-      zero_mem' := by intro r; simp
-      smul_mem' := by
-        intro a b hb r
-        simp only [Set.mem_setOf_eq, smul_eq_mul, ← mul_assoc] at *
-        exact hb (r * a) }
+  let J : (I → K) → Ideal (MvPolynomial I O) := fun θ => {
+    carrier := {p | ∀ r, ‖eval₂ emb θ (r * p)‖ < 1}
+    add_mem' := by
+      intro a b ha hb r
+      simp only [Set.mem_setOf_eq, mul_add, eval₂_add] at *
+      exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt (ha r) (hb r))
+    zero_mem' := by intro r; simp
+    smul_mem' := by
+      intro a b hb r
+      simp only [Set.mem_setOf_eq, smul_eq_mul, ← mul_assoc] at *
+      exact hb (r * a)
+  }
   have hJmem : ∀ θ ∈ Θ, ∀ p, p ∈ J θ ↔ ‖eval₂ emb θ p‖ < 1 := by
     intro θ hθ p
     constructor
@@ -149,7 +162,8 @@ theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [
     · rw [heq]; exact hJmem θ ⟨c, hc0, hc⟩ p
   · exfalso
     push_neg at hex
-    have hnot : ¬ ((m : Set (MvPolynomial I O)) ⊆ ⋃ θ ∈ (hfin.toFinset : Set (I → K)), (J θ : Set _)) := by
+    have hnot
+        : ¬((m : Set (MvPolynomial I O)) ⊆ ⋃ θ ∈ (hfin.toFinset : Set (I → K)), (J θ : Set _)) := by
       rw [Ideal.subset_union_prime (0 : I → K) (0 : I → K)
         (fun θ hθ _ _ => hJprime θ (by simpa using hθ))]
       rintro ⟨θ, hθ, hle⟩
@@ -160,7 +174,8 @@ theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [
       refine le_antisymm (hint θ hθ q) (not_lt.mp fun h => hq ?_)
       exact Set.mem_biUnion (x := θ) (by simpa using hθ) ((hJmem θ hθ q).mpr h)
     let B : Matrix (Fin n) (Fin n) K := (ρ q).map emb
-    have hcomm : ∀ p p', ((ρ p).map emb) * ((ρ p').map emb) = ((ρ p').map emb) * ((ρ p).map emb) := by
+    have hcomm
+        : ∀ p p', ((ρ p).map emb) * ((ρ p').map emb) = ((ρ p').map emb) * ((ρ p).map emb) := by
       intro p p'
       rw [← Matrix.map_mul, ← Matrix.map_mul, ← map_mul, ← map_mul, mul_comm]
     have hroot : ∀ μ ∈ B.charpoly.roots, ‖μ‖ = 1 := by
@@ -188,11 +203,13 @@ theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [
         rw [hcomm, ← Matrix.mulVec_mulVec]
         change (ρ (X i)).map emb *ᵥ (B *ᵥ w) = _
         rw [hw, Matrix.mulVec_smul]
-      obtain ⟨c, hcW, hc0, hc⟩ := GlobalTheory.exists_common_eigenvector_mem
-        (fun i => Matrix.toLin' (T i))
-        (fun i j w => by
-          simp only [Matrix.toLin'_apply, Matrix.mulVec_mulVec]
-          exact congrArg (· *ᵥ w) (hcomm (X i) (X j))) W hW0 hWs
+      obtain ⟨c, hcW, hc0, hc⟩ :=
+        GlobalTheory.exists_common_eigenvector_mem
+          (fun i => Matrix.toLin' (T i))
+          (fun i j w => by
+            simp only [Matrix.toLin'_apply, Matrix.mulVec_mulVec]
+            exact congrArg (· *ᵥ w) (hcomm (X i) (X j)))
+          W hW0 hWs
       choose θ hθ using hc
       have hθ' : ∀ i, (T i) *ᵥ c = θ i • c := fun i => by simpa [Matrix.toLin'_apply] using hθ i
       have hθΘ : θ ∈ Θ := ⟨c, hc0, hθ'⟩
@@ -209,8 +226,11 @@ theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [
       exact hq1 θ hθΘ
     have hdetB : ‖emb (ρ q).det‖ = 1 := by
       rw [RingHom.map_det, RingHom.mapMatrix_apply, Matrix.det_eq_prod_roots_charpoly]
-      exact Multiset.prod_induction (fun x => ‖x‖ = 1) _
-        (fun a b ha hb => by rw [norm_mul, ha, hb, one_mul]) norm_one hroot
+      exact Multiset.prod_induction
+        (fun x => ‖x‖ = 1)
+        _
+        (fun a b ha hb => by rw [norm_mul, ha, hb, one_mul])
+        norm_one hroot
     have hunit : IsUnit (ρ q).det := hu _ hdetB
     set P := (ρ q).charpoly with hPdef
     have hP : Polynomial.aeval q P ∈ m := by
@@ -223,12 +243,10 @@ theorem maximal_ideal_eq_joint_eigen : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [
         rw [Ideal.Quotient.mkₐ_eq_mk]; exact Ideal.Quotient.eq_zero_iff_mem.mpr hqm
       have e := Polynomial.aeval_algHom_apply (Ideal.Quotient.mkₐ O m) q P
       rw [hq0, ← Polynomial.coeff_zero_eq_aeval_zero'] at e
-      calc Ideal.Quotient.mk m (C (P.coeff 0))
-          = algebraMap O (MvPolynomial I O ⧸ m) (P.coeff 0) := by
-            rw [← MvPolynomial.algebraMap_eq]
-            first
-              | exact Ideal.Quotient.mk_algebraMap _ _ _
-              | rfl
+      calc
+        Ideal.Quotient.mk m (C (P.coeff 0)) = algebraMap O (MvPolynomial I O ⧸ m) (P.coeff 0) := by
+          rw [← MvPolynomial.algebraMap_eq]
+          first | exact Ideal.Quotient.mk_algebraMap _ _ _ | rfl
         _ = Ideal.Quotient.mkₐ O m (Polynomial.aeval q P) := e
         _ = 0 := by rw [Ideal.Quotient.mkₐ_eq_mk]; exact hP
     have hu0 : IsUnit (P.coeff 0) := by

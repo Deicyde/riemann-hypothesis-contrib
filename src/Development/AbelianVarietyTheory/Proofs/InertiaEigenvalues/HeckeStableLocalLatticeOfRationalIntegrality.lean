@@ -9,15 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HeckeSt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 NumberField IsDedekindDomain Polynomial GlobalTheory.EtaJoin GlobalTheory.CoefDuty
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 NumberField IsDedekindDomain Polynomial GlobalTheory.EtaJoin GlobalTheory.CoefDuty
 
 noncomputable section
 
 namespace GlobalTheory.LatTied
 
-theorem latStable_tied : ∀ (D : D7) (M : MtFam D) (Tn : NormalizedLocalCompatibility D M) (Q : D.what₂.places.Pl → Finset (PlE D.host)),
-    (∀ i, D.nd.Q i = Q (D.nd.w i)) → (∀ j h1 h2 w, D.what₂.muAt w ≠ D.what₂.mu0 → LatInt D M (Q w) j h1 h2 w) →
-    ∀ j w, 1 ≤ j → j ≤ D.R.m → D.what₂.muAt w ≠ D.what₂.mu0 → GlobalTheory.EtaJoin.LatStable Tn.B j w := by
+theorem latStable_tied
+    : ∀ (D : D7) (M : MtFam D) (Tn : NormalizedLocalCompatibility D M)
+        (Q : D.what₂.places.Pl → Finset (PlE D.host)),
+      (∀ i, D.nd.Q i = Q (D.nd.w i))
+        → (∀ j h1 h2 w, D.what₂.muAt w ≠ D.what₂.mu0 → LatInt D M (Q w) j h1 h2 w)
+        → ∀ j w,
+          1 ≤ j → j ≤ D.R.m → D.what₂.muAt w ≠ D.what₂.mu0
+            → GlobalTheory.EtaJoin.LatStable Tn.B j w := by
   intro D M Tn Q hQ hI j w h1 h2 hw
   classical
   by_cases hne : (D.nd.locs j w).Nonempty
@@ -25,7 +32,8 @@ theorem latStable_tied : ∀ (D : D7) (M : MtFam D) (Tn : NormalizedLocalCompati
     have hwi : D.nd.w i = w := ((D.nd.locs_mem j w i).1 hi).2
     have hQc : Tn.B.Qc j w = Q w := by rw [← Tn.Q_eq j w i hi, hQ i, hwi]
     apply GlobalTheory.T.heckeStableLocalLattice_of_integral D M Tn.B j h1 h2 w
-    rw [hQc]; exact hI j h1 h2 w hw
+    rw [hQc]
+    exact hI j h1 h2 w hw
   · have hsub : Subsingleton (heckeAlg Tn.B j w) := by
       by_contra hns
       rw [not_subsingleton_iff_nontrivial] at hns

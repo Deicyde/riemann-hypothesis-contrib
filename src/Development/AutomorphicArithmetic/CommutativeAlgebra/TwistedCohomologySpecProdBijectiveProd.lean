@@ -7,40 +7,44 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleChainsD
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace UpperTheory.SectionRestriction
 
 variable {R : Type} [CommRing R]
 
-private theorem pl_comp {K L M : Cx R} (f : K ⟶ L) (g : L ⟶ M) (F : Shv R) (n : ℤ) (x : HK R M F n) :
-    HK.pull R (f ≫ g) F n x = HK.pull R f F n (HK.pull R g F n x) := by
+private theorem pl_comp {K L M : Cx R} (f : K ⟶ L) (g : L ⟶ M) (F : Shv R) (n : ℤ) (x : HK R M F n)
+    : HK.pull R (f ≫ g) F n x = HK.pull R f F n (HK.pull R g F n x) := by
   obtain ⟨x, rfl⟩ := x.mk_surjective
   refine congrArg CohomologyClass.mk (Cocycle.ext ?_)
   simp [zcomp, Cochain.ofHom_comp]
 
-private theorem pl_id {K : Cx R} (F : Shv R) (n : ℤ) (x : HK R K F n) : HK.pull R (𝟙 K) F n x = x := by
+private theorem pl_id {K : Cx R} (F : Shv R) (n : ℤ) (x : HK R K F n)
+    : HK.pull R (𝟙 K) F n x = x := by
   obtain ⟨x, rfl⟩ := x.mk_surjective
   refine congrArg CohomologyClass.mk (Cocycle.ext ?_)
   simp [zcomp]
 
-private theorem pl_zero {K L : Cx R} (F : Shv R) (n : ℤ) (x : HK R L F n) :
-    HK.pull R (0 : K ⟶ L) F n x = 0 := by
+private theorem pl_zero {K L : Cx R} (F : Shv R) (n : ℤ) (x : HK R L F n)
+    : HK.pull R (0 : K ⟶ L) F n x = 0 := by
   obtain ⟨x, rfl⟩ := x.mk_surjective
   rw [← CohomologyClass.mk_zero]
   refine congrArg CohomologyClass.mk (Cocycle.ext ?_)
   simp [zcomp]
 
-private theorem pl_add {K L : Cx R} (f g : K ⟶ L) (F : Shv R) (n : ℤ) (x : HK R L F n) :
-    HK.pull R (f + g) F n x = HK.pull R f F n x + HK.pull R g F n x := by
+private theorem pl_add {K L : Cx R} (f g : K ⟶ L) (F : Shv R) (n : ℤ) (x : HK R L F n)
+    : HK.pull R (f + g) F n x = HK.pull R f F n x + HK.pull R g F n x := by
   obtain ⟨x, rfl⟩ := x.mk_surjective
-  rw [HK.pull, HK.pull, HK.pull, HK.pre, HK.pre, HK.pre, cpre_mk, cpre_mk, cpre_mk, ← CohomologyClass.mk_add]
+  rw [HK.pull, HK.pull, HK.pull, HK.pre, HK.pre, HK.pre, cpre_mk, cpre_mk, cpre_mk,
+    ← CohomologyClass.mk_add]
   refine congrArg CohomologyClass.mk (Cocycle.ext ?_)
   simp [zcomp, Cochain.ofHom_add]
 
-private theorem split_bij {K₁ K₂ L : Cx R} (c₁ : K₁ ⟶ L) (c₂ : K₂ ⟶ L) (hd : IsIso (biprod.desc c₁ c₂))
-    (F : Shv R) (n : ℤ) :
-    Function.Bijective fun x : HK R L F n => (HK.pull R c₁ F n x, HK.pull R c₂ F n x) := by
+private theorem split_bij
+    {K₁ K₂ L : Cx R} (c₁ : K₁ ⟶ L) (c₂ : K₂ ⟶ L) (hd : IsIso (biprod.desc c₁ c₂))
+    (F : Shv R) (n : ℤ)
+    : Function.Bijective fun x : HK R L F n => (HK.pull R c₁ F n x, HK.pull R c₂ F n x) := by
   set d := biprod.desc c₁ c₂ with hdd
   let r₁ : L ⟶ K₁ := inv d ≫ biprod.fst
   let r₂ : L ⟶ K₂ := inv d ≫ biprod.snd
@@ -52,10 +56,13 @@ private theorem split_bij {K₁ K₂ L : Cx R} (c₁ : K₁ ⟶ L) (c₂ : K₂ 
   have h22 : c₂ ≫ r₂ = 𝟙 _ := by simp [r₂, e₂]
   have hs : r₁ ≫ c₁ + r₂ ≫ c₂ = 𝟙 _ := by
     have : d = biprod.fst ≫ c₁ + biprod.snd ≫ c₂ := biprod.desc_eq
-    calc r₁ ≫ c₁ + r₂ ≫ c₂ = inv d ≫ (biprod.fst ≫ c₁ + biprod.snd ≫ c₂) := by
-          simp [r₁, r₂, Preadditive.comp_add]
+    calc
+      r₁ ≫ c₁ + r₂ ≫ c₂
+        = inv d ≫ (biprod.fst ≫ c₁ + biprod.snd ≫ c₂) := by simp [r₁, r₂, Preadditive.comp_add]
       _ = 𝟙 _ := by rw [← this]; simp
-  have hx : ∀ x : HK R L F n, x = HK.pull R r₁ F n (HK.pull R c₁ F n x) + HK.pull R r₂ F n (HK.pull R c₂ F n x) := by
+  have hx
+      : ∀ x : HK R L F n,
+        x = HK.pull R r₁ F n (HK.pull R c₁ F n x) + HK.pull R r₂ F n (HK.pull R c₂ F n x) := by
     intro x
     rw [← pl_comp, ← pl_comp, ← pl_add, hs, pl_id]
   constructor
@@ -71,33 +78,40 @@ private theorem split_bij {K₁ K₂ L : Cx R} (c₁ : K₁ ⟶ L) (c₂ : K₂ 
     · simp only [map_add (f := _)]
       rw [← pl_comp, ← pl_comp, h21, h22, pl_id, pl_zero, zero_add]
 
-private theorem sec_nat {F G : Shv R} (φ : F ⟶ G) {V U : Scheme.{0}} (g : V ⟶ U) (x : Sec F U) :
-    Sec.res g (Sec.map φ x) = Sec.map φ (Sec.res g x) :=
+private theorem sec_nat {F G : Shv R} (φ : F ⟶ G) {V U : Scheme.{0}} (g : V ⟶ U) (x : Sec F U)
+    : Sec.res g (Sec.map φ x) = Sec.map φ (Sec.res g x) :=
   ConcreteCategory.congr_hom (φ.hom.naturality g.op).symm x
 
-private theorem sec_comp {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}} (x : Sec F U) :
-    Sec.map (φ ≫ ψ) x = Sec.map ψ (Sec.map φ x) := rfl
+private theorem sec_comp {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}} (x : Sec F U)
+    : Sec.map (φ ≫ ψ) x = Sec.map ψ (Sec.map φ x) :=
+  rfl
 
-private theorem res_comp {F : Shv R} {W V U : Scheme.{0}} (h : W ⟶ V) (g : V ⟶ U) (x : Sec F U) :
-    Sec.res (h ≫ g) x = Sec.res h (Sec.res g x) := by
+private theorem res_comp {F : Shv R} {W V U : Scheme.{0}} (h : W ⟶ V) (g : V ⟶ U) (x : Sec F U)
+    : Sec.res (h ≫ g) x = Sec.res h (Sec.res g x) := by
   simp [Sec.res]
 
-private theorem sec_bij (F : Shv R) (A B : Type) [CommRing A] [CommRing B] :
-    Function.Bijective fun s : Sec F (Spec (CommRingCat.of (A × B))) =>
-      ((Sec.res (Spec.map (CommRingCat.ofHom (RingHom.fst A B))) s : Sec F (Spec (CommRingCat.of A))),
-       (Sec.res (Spec.map (CommRingCat.ofHom (RingHom.snd A B))) s : Sec F (Spec (CommRingCat.of B)))) := by
+private theorem sec_bij (F : Shv R) (A B : Type) [CommRing A] [CommRing B]
+    : Function.Bijective fun s : Sec F (Spec (CommRingCat.of (A × B))) => (
+      (Sec.res (Spec.map (CommRingCat.ofHom (RingHom.fst A B))) s
+        : Sec F (Spec (CommRingCat.of A))),
+      (Sec.res (Spec.map (CommRingCat.ofHom (RingHom.snd A B))) s : Sec F (Spec (CommRingCat.of B)))
+    ) := by
   let G : Scheme.{0}ᵒᵖ ⥤ Type 1 := F.obj ⋙ forget _
   have hG : Presieve.IsSheaf Scheme.zariskiTopology G :=
     Presieve.isSheaf_of_le _ Scheme.zariskiTopology_le_etaleTopology
       ((isSheaf_iff_isSheaf_of_type _ _).1 ((sheafCompose _ (forget _)).obj F).property)
   have : PreservesLimitsOfShape (Discrete WalkingPair) G :=
     preservesLimitsOfShape_discrete_of_isSheaf_zariskiTopology hG
-  let a : Spec (CommRingCat.of A) ⟶ Spec (CommRingCat.of (A × B)) := Spec.map (CommRingCat.ofHom (RingHom.fst A B))
-  let b : Spec (CommRingCat.of B) ⟶ Spec (CommRingCat.of (A × B)) := Spec.map (CommRingCat.ofHom (RingHom.snd A B))
+  let a : Spec (CommRingCat.of A) ⟶ Spec (CommRingCat.of (A × B)) :=
+    Spec.map (CommRingCat.ofHom (RingHom.fst A B))
+  let b : Spec (CommRingCat.of B) ⟶ Spec (CommRingCat.of (A × B)) :=
+    Spec.map (CommRingCat.ofHom (RingHom.snd A B))
   have ea : coprod.inl ≫ coprodSpec A B = a := coprodSpec_inl A B
   have eb : coprod.inr ≫ coprodSpec A B = b := coprodSpec_inr A B
   have hop : IsLimit (BinaryFan.mk a.op b.op) := by
-    refine BinaryFan.IsLimit.mk _ (fun f g => (inv (coprodSpec A B) ≫ coprod.desc f.unop g.unop).op) ?_ ?_ ?_
+    refine BinaryFan.IsLimit.mk _
+      (fun f g => (inv (coprodSpec A B) ≫ coprod.desc f.unop g.unop).op)
+      ?_ ?_ ?_
     · intro T f g
       apply Quiver.Hom.unop_inj
       change a ≫ inv (coprodSpec A B) ≫ coprod.desc f.unop g.unop = f.unop
@@ -121,9 +135,11 @@ private theorem sec_bij (F : Shv R) (A B : Type) [CommRing A] [CommRing B] :
   have he := (isIso_iff_bijective e.hom).1 inferInstance
   exact he
 
-private theorem free_iso {X Y Z : Scheme.{0}} (a : Y ⟶ X) (b : Z ⟶ X)
-    (hb : ∀ F : Shv R, Function.Bijective fun s : Sec F X => ((Sec.res a s : Sec F Y), (Sec.res b s : Sec F Z))) :
-    IsIso (biprod.desc ((free R).map (yoneda.map a)) ((free R).map (yoneda.map b))) := by
+private theorem free_iso
+    {X Y Z : Scheme.{0}} (a : Y ⟶ X) (b : Z ⟶ X)
+    (hb : ∀ F : Shv R,
+      Function.Bijective fun s : Sec F X => ((Sec.res a s : Sec F Y), (Sec.res b s : Sec F Z)))
+    : IsIso (biprod.desc ((free R).map (yoneda.map a)) ((free R).map (yoneda.map b))) := by
   let P₁ : PSh := yoneda.obj Y
   let P₂ : PSh := yoneda.obj Z
   let Q : PSh := yoneda.obj X
@@ -180,9 +196,16 @@ private theorem free_iso {X Y Z : Scheme.{0}} (a : Y ⟶ X) (b : Z ⟶ X)
 
 end UpperTheory.SectionRestriction
 
-theorem UpperTheory.twistedCohomology_specProd_bijective_prod :
-    ∀ (q : ℕ) (A B : Type) [CommRing A] [CommRing B] (n i : ℤ), Function.Bijective fun x : Ht q (sp (A × B)) n i => (pull _ (spMap (RingHom.fst A B)) (tw q i) n x, pull _ (spMap (RingHom.snd A B)) (tw q i) n x) := by
+theorem UpperTheory.twistedCohomology_specProd_bijective_prod
+    : ∀ (q : ℕ) (A B : Type) [CommRing A] [CommRing B] (n i : ℤ),
+      Function.Bijective fun x : Ht q (sp (A × B)) n i => (
+        pull _ (spMap (RingHom.fst A B)) (tw q i) n x,
+        pull _ (spMap (RingHom.snd A B)) (tw q i) n x
+      ) := by
   intro q A B _ _ n i
-  have h2 := GlobalTheory.EtC.chains_disc_biprod_isIso (ZMod q) _ _ (UpperTheory.SectionRestriction.free_iso _ _ fun F => UpperTheory.SectionRestriction.sec_bij F A B)
+  have h2 :=
+    GlobalTheory.EtC.chains_disc_biprod_isIso (ZMod q) _ _
+      (UpperTheory.SectionRestriction.free_iso _ _ fun F =>
+        UpperTheory.SectionRestriction.sec_bij F A B)
   exact UpperTheory.SectionRestriction.split_bij ((chains (ZMod q)).map (spMap (RingHom.fst A B)))
     ((chains (ZMod q)).map (spMap (RingHom.snd A B))) h2 (tw q i) n

@@ -12,12 +12,13 @@ namespace GlobalTheory.CompanionTheory.Ar.PB
 
 open MvPolynomial GroundTheory.Heights₂.Heights
 
-theorem mem_antisymSpace_of_pointwise :
-    ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (R : MvPolynomial (Ψ × Fin N) ℝ),
-      R.IsHomogeneous (antisymDegree Ψ N + 1) →
-      (∀ (τ : Ψ) (a b : Fin N), (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ)) →
-        ∀ lam : Ψ × Fin N → ℝ, eval lam R + eval (lam ∘ Equiv.swap (τ, a) (τ, b)) R = 0) →
-      R ∈ antisymSpace Ψ N j := by
+theorem mem_antisymSpace_of_pointwise
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (R : MvPolynomial (Ψ × Fin N) ℝ),
+      R.IsHomogeneous (antisymDegree Ψ N + 1)
+        → (∀ (τ : Ψ) (a b : Fin N),
+          (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ))
+            → ∀ lam : Ψ × Fin N → ℝ, eval lam R + eval (lam ∘ Equiv.swap (τ, a) (τ, b)) R = 0)
+        → R ∈ antisymSpace Ψ N j := by
   intro Ψ _ _ N j R hR h
   refine ⟨(mem_homogeneousSubmodule _ _).2 hR, ?_⟩
   rintro σ ⟨τ, a, b, hab, hblock, rfl⟩

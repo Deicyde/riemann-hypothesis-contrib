@@ -5,11 +5,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open NumberField Matrix UpperTheory.V.KT UpperTheory.V.Af.BA ComplexOrder in
-theorem UpperTheory.adelicBaseChange_realPart :
-    UpperTheory.V.Af.BA.RePart := by
+theorem UpperTheory.adelicBaseChange_realPart : UpperTheory.V.Af.BA.RePart := by
   intro L _ _ N σ hσ k
-  let A : InfinitePlace L → Matrix (Fin N) (Fin N) ℂ :=
-    fun w => Matrix.of fun i j => (((mat k w) i j).re : ℂ)
+  let A : InfinitePlace L → Matrix (Fin N) (Fin N) ℂ := fun w =>
+    Matrix.of fun i j => (((mat k w) i j).re : ℂ)
   have hre : ∀ w i j, ((mat k w) j i).re = ((mat k w) i j).re := by
     intro w i j
     have := (mat_herm k w).apply i j

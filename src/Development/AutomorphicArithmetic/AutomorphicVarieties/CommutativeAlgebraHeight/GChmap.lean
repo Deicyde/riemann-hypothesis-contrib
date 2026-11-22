@@ -10,11 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-private theorem mem_iff {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Group G] [Algebra A B] (D : GDet n A G)
-    (x : MonoidAlgebra B G) :
-    x ∈ TwoSidedIdeal.span (D.map (algebraMap A B)).CH ↔ toT A G B x ∈
-      Submodule.span B ((fun z : MonoidAlgebra A G => (1 : B) ⊗ₜ[A] z) ''
-        (TwoSidedIdeal.span D.CH : Set (MonoidAlgebra A G))) := by
+private theorem mem_iff
+    {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Group G] [Algebra A B]
+    (D : GDet n A G) (x : MonoidAlgebra B G)
+    : x ∈ TwoSidedIdeal.span (D.map (algebraMap A B)).CH
+      ↔ toT A G B x ∈ Submodule.span B
+        ((fun z : MonoidAlgebra A G => (1 : B) ⊗ₜ[A] z)
+          '' (TwoSidedIdeal.span D.CH : Set (MonoidAlgebra A G))) := by
   rw [← d_toDet_CH, ← d_toDet_CH, d_toDet_map, ← SetLike.mem_coe (p := Submodule.span B _),
     ← (d_chS D.toDet B).2.1, SetLike.mem_coe]
   obtain ⟨-, -, h1, h2⟩ := d_pull (D.toDet.baseChange B) (toT A G B)
@@ -23,8 +25,9 @@ private theorem mem_iff {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Grou
   have : y = x := by rw [← ofT_toT (A := A) y, e, ofT_toT]
   exact this ▸ hy
 
-private theorem map_mem {A B : Type} [Ring A] [Ring B] (f : A →+* B) (S : Set A) (z : A)
-    (hz : z ∈ TwoSidedIdeal.span S) : f z ∈ TwoSidedIdeal.span (f '' S) := by
+private theorem map_mem
+    {A B : Type} [Ring A] [Ring B] (f : A →+* B) (S : Set A) (z : A) (hz : z ∈ TwoSidedIdeal.span S)
+    : f z ∈ TwoSidedIdeal.span (f '' S) := by
   induction hz using TwoSidedIdeal.span_induction with
   | mem x hx => exact TwoSidedIdeal.subset_span ⟨x, hx, rfl⟩
   | zero => rw [map_zero]; exact zero_mem _
@@ -33,14 +36,18 @@ private theorem map_mem {A B : Type} [Ring A] [Ring B] (f : A →+* B) (S : Set 
   | left_absorb a x _ hx => rw [map_mul]; exact TwoSidedIdeal.mul_mem_left _ _ _ hx
   | right_absorb b x _ hx => rw [map_mul]; exact TwoSidedIdeal.mul_mem_right _ _ _ hx
 
-theorem UpperTheory.V.CA.g_chmap :
-    ∀ {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Group G] (D : GDet n A G) (f : A →+* B), TwoSidedIdeal.span (D.map f).CH = TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G f '' D.CH) := by
+theorem UpperTheory.V.CA.g_chmap
+    : ∀ {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Group G] (D : GDet n A G) (f : A →+* B),
+      TwoSidedIdeal.span (D.map f).CH
+        = TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G f '' D.CH) := by
   intro n A B G _ _ _ D f
   letI : Algebra A B := f.toAlgebra
-  change TwoSidedIdeal.span (D.map (algebraMap A B)).CH =
-    TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G (algebraMap A B) '' D.CH)
-  have e : ∀ z : MonoidAlgebra A G, ofT A G B (1 ⊗ₜ z) = MonoidAlgebra.mapRingHom G (algebraMap A B) z :=
-    fun z => by rw [ofT_tmul, one_smul]
+  change TwoSidedIdeal.span (D.map (algebraMap A B)).CH
+    = TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G (algebraMap A B) '' D.CH)
+  have e
+      : ∀ z : MonoidAlgebra A G,
+        ofT A G B (1 ⊗ₜ z) = MonoidAlgebra.mapRingHom G (algebraMap A B) z := fun z => by
+    rw [ofT_tmul, one_smul]
   apply le_antisymm
   · intro x hx
     rw [mem_iff] at hx

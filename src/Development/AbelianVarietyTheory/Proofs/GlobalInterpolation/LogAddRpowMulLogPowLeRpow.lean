@@ -8,11 +8,11 @@ open Real Filter Asymptotics
 
 namespace GlobalTheory
 
-
 open Filter Asymptotics in
-theorem log_add_rpow_mul_log_pow_le_rpow :
-    ∀ a b c C κ : ℝ, ∀ p : ℕ, 0 ≤ a → a < b → 0 < κ → ∃ x0 : ℝ, ∀ x ≥ x0,
-      c * Real.log x + C * x ^ a * Real.log x ^ p + C ≤ κ * x ^ b := by
+theorem log_add_rpow_mul_log_pow_le_rpow
+    : ∀ a b c C κ : ℝ, ∀ p : ℕ,
+      0 ≤ a → a < b → 0 < κ
+        → ∃ x0 : ℝ, ∀ x ≥ x0, c * Real.log x + C * x ^ a * Real.log x ^ p + C ≤ κ * x ^ b := by
   intro a b c C κ p ha hab hκ
   have hb : 0 < b := lt_of_le_of_lt ha hab
   have h1 : (fun x : ℝ => c * Real.log x) =o[atTop] fun x => x ^ b :=
@@ -21,8 +21,9 @@ theorem log_add_rpow_mul_log_pow_le_rpow :
     have hl : (fun x : ℝ => Real.log x ^ p) =o[atTop] fun x => x ^ (b - a) := by
       have := isLittleO_log_rpow_rpow_atTop (p : ℝ) (sub_pos.2 hab)
       simpa [Real.rpow_natCast] using this
-    have hm : (fun x : ℝ => x ^ a * Real.log x ^ p) =o[atTop]
-        fun x => x ^ a * x ^ (b - a) :=
+    have hm
+        : (fun x : ℝ => x ^ a * Real.log x ^ p) =o[atTop]
+          fun x => x ^ a * x ^ (b - a) :=
       (isBigO_refl (fun x : ℝ => x ^ a) atTop).mul_isLittleO hl
     have hm' : (fun x : ℝ => x ^ a * Real.log x ^ p) =o[atTop] fun x => x ^ b := by
       refine hm.congr' (Eventually.of_forall fun _ => rfl) ?_

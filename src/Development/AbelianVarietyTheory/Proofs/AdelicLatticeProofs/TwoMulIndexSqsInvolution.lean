@@ -10,35 +10,34 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-private theorem mem_sqs_iff_exists_sq {G : Type} [CommGroup G] (U : Subgroup G) (x : G) :
-    x ∈ sqs U ↔ ∃ y ∈ U, y ^ 2 = x := by
+private theorem mem_sqs_iff_exists_sq {G : Type} [CommGroup G] (U : Subgroup G) (x : G)
+    : x ∈ sqs U ↔ ∃ y ∈ U, y ^ 2 = x := by
   simp [sqs, Subgroup.mem_map]
 
-theorem two_mul_index_sqs_involution :
-    ∀ (A : Type) [CommGroup A] (σ : A →* A) (ε : A), (∀ a, σ (σ a) = a) →
-      (∀ a, a * σ a = 1 → ∃ b, a = b / σ b) → ε ≠ 1 → ε ^ 2 = 1 → σ ε = ε →
-      (∀ a : A, a ^ 2 = 1 → a = 1 ∨ a = ε) →
-      2 * (sqs (⊤ : Subgroup A)).index =
-        (sqs (σ.eqLocus (MonoidHom.id A))).relIndex (σ.eqLocus (MonoidHom.id A)) *
-          (sqs (MonoidHom.id A * σ).ker).relIndex (MonoidHom.id A * σ).ker := by
+theorem two_mul_index_sqs_involution
+    : ∀ (A : Type) [CommGroup A] (σ : A →* A) (ε : A),
+      (∀ a, σ (σ a) = a) → (∀ a, a * σ a = 1 → ∃ b, a = b / σ b) → ε ≠ 1 → ε ^ 2 = 1 → σ ε = ε
+        → (∀ a : A, a ^ 2 = 1 → a = 1 ∨ a = ε)
+        → 2 * (sqs (⊤ : Subgroup A)).index
+          = (sqs (σ.eqLocus (MonoidHom.id A))).relIndex (σ.eqLocus (MonoidHom.id A))
+            * (sqs (MonoidHom.id A * σ).ker).relIndex (MonoidHom.id A * σ).ker := by
   intro A _ σ ε hσ h90 hε1 hε2 hσε h2
   set B : Subgroup A := σ.eqLocus (MonoidHom.id A) with hB
   set N : Subgroup A := (MonoidHom.id A * σ).ker with hN
   set S : Subgroup A := sqs (⊤ : Subgroup A) with hS
   have memB : ∀ a, a ∈ B ↔ σ a = a := fun a => Iff.rfl
   have memN : ∀ a, a ∈ N ↔ a * σ a = 1 := fun a => Iff.rfl
-  have memS : ∀ a, a ∈ S ↔ ∃ y, y ^ 2 = a := fun a => by
-    rw [hS, mem_sqs_iff_exists_sq]; simp
+  have memS : ∀ a, a ∈ S ↔ ∃ y, y ^ 2 = a := fun a => by rw [hS, mem_sqs_iff_exists_sq]; simp
   let f : A →* A := MonoidHom.id A / σ
   have hf : ∀ a, f a = a / σ a := fun a => rfl
-  have hker : ∀ a, f a = 1 ↔ a ∈ B := fun a => by
-    rw [hf, memB, div_eq_one, eq_comm]
+  have hker : ∀ a, f a = 1 ↔ a ∈ B := fun a => by rw [hf, memB, div_eq_one, eq_comm]
   have hrange : f.range = N := by
     ext x
     rw [memN, MonoidHom.mem_range]
     constructor
     · rintro ⟨a, rfl⟩
-      rw [hf, map_div, hσ]; simp
+      rw [hf, map_div, hσ]
+      simp
     · intro hx
       obtain ⟨b, hb⟩ := h90 x hx
       exact ⟨b, hb.symm⟩
@@ -57,15 +56,12 @@ theorem two_mul_index_sqs_involution :
       obtain ⟨c, hc, hca⟩ := ha
       rw [← hrange] at hc
       obtain ⟨b, rfl⟩ := hc
-      have h1 : a / b ^ 2 ∈ B := by
-        rw [← hker, map_div, map_pow, hca, div_self']
+      have h1 : a / b ^ 2 ∈ B := by rw [← hker, map_div, map_pow, hca, div_self']
       have : a = a / b ^ 2 * b ^ 2 := by simp
       rw [this]
       exact Subgroup.mul_mem_sup h1 ((memS _).2 ⟨b, rfl⟩)
-  have e1 : (B ⊔ S).index = (sqs N).relIndex N := by
-    rw [hcomap, Subgroup.index_comap, hrange]
-  have e2 : S.relIndex (B ⊔ S) * (B ⊔ S).index = S.index :=
-    Subgroup.relIndex_mul_index le_sup_right
+  have e1 : (B ⊔ S).index = (sqs N).relIndex N := by rw [hcomap, Subgroup.index_comap, hrange]
+  have e2 : S.relIndex (B ⊔ S) * (B ⊔ S).index = S.index := Subgroup.relIndex_mul_index le_sup_right
   have e3 : S.relIndex (B ⊔ S) = S.relIndex B := Subgroup.relIndex_sup_right B S
   have hle : sqs B ≤ S ⊓ B := by
     intro a ha
@@ -92,8 +88,7 @@ theorem two_mul_index_sqs_involution :
   rw [← hf] at ha0
   have e6 : (sqs B).relIndex (S ⊓ B) = 2 := by
     rw [Subgroup.relIndex, Subgroup.index_eq_two_iff]
-    have h0 : a0 ^ 2 ∈ S ⊓ B :=
-      ⟨(memS _).2 ⟨a0, rfl⟩, (hker _).1 (by rw [map_pow, ← ha0, hε2])⟩
+    have h0 : a0 ^ 2 ∈ S ⊓ B := ⟨(memS _).2 ⟨a0, rfl⟩, (hker _).1 (by rw [map_pow, ← ha0, hε2])⟩
     refine ⟨⟨a0 ^ 2, h0⟩, ?_⟩
     rintro ⟨x, hxS, hxB⟩
     obtain ⟨y, rfl⟩ := (memS x).1 hxS

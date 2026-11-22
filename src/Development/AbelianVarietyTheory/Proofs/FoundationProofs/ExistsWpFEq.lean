@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Weierstr
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 namespace GlobalTheory.EvenTheta

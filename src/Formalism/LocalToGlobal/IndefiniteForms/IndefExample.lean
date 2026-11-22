@@ -41,8 +41,10 @@ namespace two
 
 open scoped Classical
 
-variable (K : Type) [Field K] [NumberField K] [StarRing K] (v0 : InfinitePlace K)
-  (S : Finset (HeightOneSpectrum (𝓞 K))) (a : K) (kap l : InfinitePlace K → ℝ)
+variable
+  (K : Type) [Field K] [NumberField K] [StarRing K]
+  (v0 : InfinitePlace K) (S : Finset (HeightOneSpectrum (𝓞 K))) (a : K)
+  (kap l : InfinitePlace K → ℝ)
 
 variable {K v0 S a kap l}
 
@@ -55,7 +57,6 @@ end two
 section Pair
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
-
 
 end Pair
 

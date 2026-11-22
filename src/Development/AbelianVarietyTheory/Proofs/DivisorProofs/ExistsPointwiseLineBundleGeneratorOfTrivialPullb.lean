@@ -9,33 +9,41 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DualNumberPo
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
 open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.PtExt
 
-theorem le_pull_chart {X Y : Scheme.{0}} (L : LB X) (q : Y ⟶ X) {D : Type} [CommRing D] (x : Sp D ⟶ Y)
-    (i : L.ι) (h : ⊤ ≤ (x ≫ q) ⁻¹ᵁ L.U i) : ⊤ ≤ x ⁻¹ᵁ (L.pull q).U (fun _ ↦ i) :=
-  fun _ hp ↦ Set.mem_iInter.2 fun _ ↦ h hp
+theorem le_pull_chart
+    {X Y : Scheme.{0}} (L : LB X) (q : Y ⟶ X)
+    {D : Type} [CommRing D]
+    (x : Sp D ⟶ Y) (i : L.ι) (h : ⊤ ≤ (x ≫ q) ⁻¹ᵁ L.U i)
+    : ⊤ ≤ x ⁻¹ᵁ (L.pull q).U (fun _ ↦ i) := fun _ hp ↦
+  Set.mem_iInter.2 fun _ ↦ h hp
 
-theorem evU_mul {Y : Scheme.{0}} {D : Type} [CommRing D] (x : Sp D ⟶ Y) (U : Y.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U)
-    (a b : Γ(Y, U)) : evU x U (a * b) = evU x U a * evU x U b := by
+theorem evU_mul
+    {Y : Scheme.{0}} {D : Type} [CommRing D]
+    (x : Sp D ⟶ Y) (U : Y.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U) (a b : Γ(Y, U))
+    : evU x U (a * b) = evU x U a * evU x U b := by
   simpa only [evU, dite_eq_left h] using map_mul (evalAt x U h) a b
 
-theorem exists_isPtGen : ∀ (R : Type) [CommRing R] (X Y : Over (Sp R)) (L : LB X.left), L.IsLB →
-    ∀ q : Y ⟶ X, GlobalTheory.AbLaw.Triv (L.pull q.left) → ∃ t, IsPtGen L q t := by
+theorem exists_isPtGen
+    : ∀ (R : Type) [CommRing R] (X Y : Over (Sp R)) (L : LB X.left),
+      L.IsLB → ∀ q : Y ⟶ X, GlobalTheory.AbLaw.Triv (L.pull q.left) → ∃ t, IsPtGen L q t := by
   intro R _ X Y L _ q hT
   obtain ⟨s, hs⟩ := hT
-  refine ⟨fun E _ _ z i ↦ evU z.left ((L.pull q.left).U (fun _ ↦ i)) (s.s (fun _ ↦ i)).val, ?_, ?_, ?_⟩
+  refine
+    ⟨fun E _ _ z i ↦ evU z.left ((L.pull q.left).U (fun _ ↦ i)) (s.s (fun _ ↦ i)).val, ?_, ?_, ?_⟩
   · intro E _ _ z i hi
     have hz := le_pull_chart L q.left z.left i hi
-    simpa only [evU, dite_eq_left hz] using
-      (s.s (fun _ ↦ i)).isUnit.map (evalAt z.left _ hz)
+    simpa only [evU, dite_eq_left hz] using (s.s (fun _ ↦ i)).isUnit.map (evalAt z.left _ hz)
   · intro E _ _ E' _ _ ψ z i hi
     have hz := le_pull_chart L q.left z.left i hi
     exact evalSectionAtPointOrZero_specMap_comp _ E E' (ψ : E →+* E') z.left _ _ hz
@@ -48,14 +56,27 @@ theorem exists_isPtGen : ∀ (R : Type) [CommRing R] (X Y : Over (Sp R)) (L : LB
     have e := congrArg (fun u ↦ evU z.left _ (Units.val u)) (hs (fun _ ↦ i) (fun _ ↦ j))
     simp only [Units.val_mul] at e
     rw [evU_mul _ _ hV] at e
-    have e1 : evU z.left _ (ReciprocityTheory.ChartRestriction.G.Semi.res (inf_le_left : (L.pull q.left).U (fun _ ↦ i) ⊓
-        (L.pull q.left).U (fun _ ↦ j) ≤ (L.pull q.left).U (fun _ ↦ i)) (s.s (fun _ ↦ i))).val =
-        evU z.left _ (s.s (fun _ ↦ i)).val := evalSectionAtPointOrZero_restriction _ _ _ _ _ _ _ hV
-    have e2 : evU z.left _ (ReciprocityTheory.ChartRestriction.G.Semi.res (inf_le_right : (L.pull q.left).U (fun _ ↦ i) ⊓
-        (L.pull q.left).U (fun _ ↦ j) ≤ (L.pull q.left).U (fun _ ↦ j)) (s.s (fun _ ↦ j))).val =
-        evU z.left _ (s.s (fun _ ↦ j)).val := evalSectionAtPointOrZero_restriction _ _ _ _ _ _ _ hV
-    have e3 : evU z.left _ ((L.pull q.left).g (fun _ ↦ i) (fun _ ↦ j)).val =
-        evU (z ≫ q).left (L.U i ⊓ L.U j) (L.g i j).val := by
+    have e1
+        : evU z.left _
+            (ReciprocityTheory.ChartRestriction.G.Semi.res
+              (inf_le_left
+                : (L.pull q.left).U (fun _ ↦ i) ⊓ (L.pull q.left).U (fun _ ↦ j)
+                  ≤ (L.pull q.left).U (fun _ ↦ i))
+              (s.s (fun _ ↦ i))).val
+          = evU z.left _ (s.s (fun _ ↦ i)).val :=
+      evalSectionAtPointOrZero_restriction _ _ _ _ _ _ _ hV
+    have e2
+        : evU z.left _
+            (ReciprocityTheory.ChartRestriction.G.Semi.res
+              (inf_le_right
+                : (L.pull q.left).U (fun _ ↦ i) ⊓ (L.pull q.left).U (fun _ ↦ j)
+                  ≤ (L.pull q.left).U (fun _ ↦ j))
+              (s.s (fun _ ↦ j))).val
+          = evU z.left _ (s.s (fun _ ↦ j)).val :=
+      evalSectionAtPointOrZero_restriction _ _ _ _ _ _ _ hV
+    have e3
+        : evU z.left _ ((L.pull q.left).g (fun _ ↦ i) (fun _ ↦ j)).val
+          = evU (z ≫ q).left (L.U i ⊓ L.U j) (L.g i j).val := by
       rw [Over.comp_left]
       simpa only [evU, dite_eq_left hV, dite_eq_left hij] using
         (evalAt_pull_g L q.left z.left (fun _ ↦ i) (fun _ ↦ j) hij hV).symm

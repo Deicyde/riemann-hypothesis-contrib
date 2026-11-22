@@ -7,17 +7,20 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.G
 open scoped Classical ENNReal nonZeroDivisors
 
-private noncomputable def hJ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] :
-    (InfinitePlace F → ℝ) ≃ₜ InfiniteAdeleRing F where
+private noncomputable def hJ (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+    : (InfinitePlace F → ℝ) ≃ₜ InfiniteAdeleRing F where
   toEquiv := (TR.infEq F).toEquiv
   continuous_toFun := TR.continuous_infEq F
-  continuous_invFun := continuous_pi fun w =>
-    (InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal w)).continuous.comp
-      (continuous_apply w)
+  continuous_invFun :=
+    continuous_pi fun w =>
+      (InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal w)).continuous.comp
+        (continuous_apply w)
 
 private lemma map_hJ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] :
     ∃ c : NNReal, (infiniteAdeleMeasure F).map (hJ F).symm =
@@ -83,27 +86,42 @@ private lemma eval_mem {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (Q
     ext v
     simp [Polynomial.eval_monomial]
 
-theorem UpperTheory.ConvolutionTheory.R2.G.hermAdel :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (e : InfinitePlace F → ℕ), ∃ P : A F → ℂ, (fun v : V4 F => P (v 1)) ∈ polyFn (F := F) ∧
-    ∀ g : FiniteAdeleRing (𝓞 F) F → ℂ, Integrable g (finiteAdeleMeasure F) →
-    Integrable (fun s : A F => (∏ w, ((TR.pInf F s w : ℝ) : ℂ) ^ e w) * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F s w ^ 2 : ℝ) : ℂ)) * g s.2) (adeleMeasure F) ∧
-    ∀ x : A F, ∫ s : A F, (∏ w, ((TR.pInf F s w : ℝ) : ℂ) ^ e w) * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F s w ^ 2 : ℝ) : ℂ)) * g s.2 * ψ (-(s * x)) ∂(adeleMeasure F) =
-    P x * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F x w ^ 2 : ℝ) : ℂ)) *
-    ∫ s, g s * ((finiteAdelicChar F (-(s * x.2)) : Circle) : ℂ) ∂(finiteAdeleMeasure F) := by
+theorem UpperTheory.ConvolutionTheory.R2.G.hermAdel
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (e : InfinitePlace F → ℕ), ∃ P : A F → ℂ,
+      (fun v : V4 F => P (v 1)) ∈ polyFn (F := F)
+        ∧ ∀ g : FiniteAdeleRing (𝓞 F) F → ℂ,
+          Integrable g (finiteAdeleMeasure F)
+            → Integrable
+                (fun s : A F =>
+                  (∏ w, ((TR.pInf F s w : ℝ) : ℂ) ^ e w)
+                    * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F s w ^ 2 : ℝ) : ℂ)) * g s.2)
+                (adeleMeasure F)
+              ∧ ∀ x : A F,
+                ∫ s : A F, (∏ w, ((TR.pInf F s w : ℝ) : ℂ) ^ e w) * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F s w ^ 2 : ℝ) : ℂ)) * g s.2 * ψ (-(s * x)) ∂(adeleMeasure F)
+                  = P x * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F x w ^ 2 : ℝ) : ℂ))
+                    * ∫ s, g s * ((finiteAdelicChar F (-(s * x.2)) : Circle) : ℂ) ∂(finiteAdeleMeasure F) := by
   intro F _ _ _ e
   obtain ⟨c, hc⟩ := map_hJ F
   have hP := fun n => (hermite1 n).2
   choose Q hQ using hP
-  have hH : ∀ y : InfinitePlace F → ℝ, (∏ w, ((y w : ℝ) : ℂ) ^ e w) *
-      Complex.exp (-(Real.pi : ℂ) * ((∑ w, y w ^ 2 : ℝ) : ℂ)) =
-      ∏ w, ((y w : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (y w : ℂ) ^ 2)) := by
+  have hH
+      : ∀ y : InfinitePlace F → ℝ,
+        (∏ w, ((y w : ℝ) : ℂ) ^ e w) * Complex.exp (-(Real.pi : ℂ) * ((∑ w, y w ^ 2 : ℝ) : ℂ))
+          = ∏ w, ((y w : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (y w : ℂ) ^ 2)) := by
     intro y
     rw [gauss_prod, Finset.prod_mul_distrib]
-  refine ⟨fun x => (c : ℂ) * ∏ w, (Q (e w)).eval ((TR.pInf F x w : ℝ) : ℂ), ?_, fun g hg => ⟨?_, fun x => ?_⟩⟩
-  · have h1 : (fun v : V4 F => (∏ w, (Q (e w)).eval ((TR.pInf F (v 1) w : ℝ) : ℂ))) ∈ polyFn (F := F) := by
-      have := (polyFn (F := F)).prod_mem (t := Finset.univ)
-        (f := fun w => fun v : V4 F => (Q (e w)).eval ((TR.pInf F (v 1) w : ℝ) : ℂ))
-        (fun w _ => eval_mem _ w)
+  refine ⟨
+    fun x => (c : ℂ) * ∏ w, (Q (e w)).eval ((TR.pInf F x w : ℝ) : ℂ),
+    ?_,
+    fun g hg => ⟨?_, fun x => ?_⟩
+  ⟩
+  · have h1
+        : (fun v : V4 F => (∏ w, (Q (e w)).eval ((TR.pInf F (v 1) w : ℝ) : ℂ)))
+          ∈ polyFn (F := F) := by
+      have :=
+        (polyFn (F := F)).prod_mem (t := Finset.univ)
+          (f := fun w => fun v : V4 F => (Q (e w)).eval ((TR.pInf F (v 1) w : ℝ) : ℂ))
+          (fun w _ => eval_mem _ w)
       convert this using 1
       ext v
       simp [Finset.prod_apply]
@@ -111,30 +129,45 @@ theorem UpperTheory.ConvolutionTheory.R2.G.hermAdel :
     convert this using 1
     ext v
     simp
-  · have h := (split_int hc (fun w t => (t : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (t : ℂ) ^ 2))
-      (fun w => (hermite1 (e w)).1) g).1 hg
+  · have h :=
+      (split_int hc
+        (fun w t => (t : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (t : ℂ) ^ 2))
+        (fun w => (hermite1 (e w)).1)
+        g).1 hg
     refine h.congr (Filter.Eventually.of_forall fun s => ?_)
     simp only [hH]
   · have hS := (UpperTheory.ConvolutionTheory.R2.C.splitA F).2
-    have hint : ∀ w : InfinitePlace F, Integrable (fun t : ℝ => (t : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (t : ℂ) ^ 2) *
-        Complex.exp (2 * Real.pi * Complex.I * (t * (TR.pInf F x w : ℝ)))) := by
+    have hint
+        : ∀ w : InfinitePlace F,
+          Integrable (fun t : ℝ =>
+            (t : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (t : ℂ) ^ 2)
+              * Complex.exp (2 * Real.pi * Complex.I * (t * (TR.pInf F x w : ℝ)))) := by
       intro w
       refine (hermite1 (e w)).1.mono (Continuous.aestronglyMeasurable (by fun_prop))
         (Filter.Eventually.of_forall fun s => ?_)
       rw [norm_mul]
       have : ‖Complex.exp (2 * Real.pi * Complex.I * (s * (TR.pInf F x w : ℝ)))‖ = 1 := by
-        have e1 : (2 * Real.pi * Complex.I * (s * (TR.pInf F x w : ℝ)) : ℂ) =
-            ((2 * Real.pi * (s * TR.pInf F x w) : ℝ) : ℂ) * Complex.I := by
+        have e1
+            : (2 * Real.pi * Complex.I * (s * (TR.pInf F x w : ℝ)) : ℂ)
+              = ((2 * Real.pi * (s * TR.pInf F x w) : ℝ) : ℂ) * Complex.I := by
           push_cast; ring
         rw [e1, Complex.norm_exp_ofReal_mul_I]
       rw [this, mul_one]
-    have h := (split_int hc (fun w t => (t : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (t : ℂ) ^ 2) *
-        Complex.exp (2 * Real.pi * Complex.I * (t * (TR.pInf F x w : ℝ)))) hint
-      (fun a => g a * ((finiteAdelicChar F (-(a * x.2)) : Circle) : ℂ))).2
-    have hcongr : ∀ s : A F, (∏ w, ((TR.pInf F s w : ℝ) : ℂ) ^ e w) * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F s w ^ 2 : ℝ) : ℂ)) * g s.2 * ψ (-(s * x)) =
-        (∏ w, (((TR.pInf F s w : ℝ) : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * ((TR.pInf F s w : ℝ) : ℂ) ^ 2) *
-          Complex.exp (2 * Real.pi * Complex.I * (((TR.pInf F s w : ℝ) : ℂ) * (TR.pInf F x w : ℝ))))) *
-        (g s.2 * ((finiteAdelicChar F (-(s.2 * x.2)) : Circle) : ℂ)) := by
+    have h :=
+      (split_int hc
+        (fun w t =>
+          (t : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * (t : ℂ) ^ 2)
+            * Complex.exp (2 * Real.pi * Complex.I * (t * (TR.pInf F x w : ℝ))))
+        hint
+        (fun a => g a * ((finiteAdelicChar F (-(a * x.2)) : Circle) : ℂ))).2
+    have hcongr
+        : ∀ s : A F,
+          (∏ w, ((TR.pInf F s w : ℝ) : ℂ) ^ e w)
+              * Complex.exp (-(Real.pi : ℂ) * ((∑ w, TR.pInf F s w ^ 2 : ℝ) : ℂ)) * g s.2
+              * ψ (-(s * x))
+            = (∏ w, (((TR.pInf F s w : ℝ) : ℂ) ^ e w * Complex.exp (-(Real.pi : ℂ) * ((TR.pInf F s w : ℝ) : ℂ) ^ 2) *
+                Complex.exp (2 * Real.pi * Complex.I * (((TR.pInf F s w : ℝ) : ℂ) * (TR.pInf F x w : ℝ)))))
+              * (g s.2 * ((finiteAdelicChar F (-(s.2 * x.2)) : Circle) : ℂ)) := by
       intro s
       have e1 : (-(s * x)).2 = -(s.2 * x.2) := rfl
       have e2 : ∀ w, TR.pInf F (-(s * x)) w = -(TR.pInf F s w * TR.pInf F x w) := by
@@ -142,8 +175,11 @@ theorem UpperTheory.ConvolutionTheory.R2.G.hermAdel :
         rw [map_neg, map_mul]
         rfl
       rw [hS (-(s * x)), e1, hH, Finset.prod_mul_distrib (f := fun w => _ * _)]
-      have e3 : ∀ w, Complex.exp (-(2 * Real.pi * Complex.I) * ((TR.pInf F (-(s * x)) w : ℝ) : ℂ)) =
-          Complex.exp (2 * Real.pi * Complex.I * (((TR.pInf F s w : ℝ) : ℂ) * (TR.pInf F x w : ℝ))) := by
+      have e3
+          : ∀ w,
+            Complex.exp (-(2 * Real.pi * Complex.I) * ((TR.pInf F (-(s * x)) w : ℝ) : ℂ))
+              = Complex.exp
+                (2 * Real.pi * Complex.I * (((TR.pInf F s w : ℝ) : ℂ) * (TR.pInf F x w : ℝ))) := by
         intro w
         rw [e2]
         congr 1

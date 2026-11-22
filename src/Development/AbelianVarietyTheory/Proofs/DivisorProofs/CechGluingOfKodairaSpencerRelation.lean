@@ -17,7 +17,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogDerivativ
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (ev frX frVec)
 open GlobalTheory.FlagTan (psiSet HIx VIx TIx IsDef IsVert KSIso)
@@ -90,28 +91,65 @@ theorem chartPt_sub : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H 
     simp only [Matrix.of_apply, RingHom.comp_apply]
     ring
 
-theorem isCechKS_of_isKS : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (X : Scheme.{0}) (t : SAB H X) (V : X.Opens) (U : X.affineOpens) (n : ℕ) (v : Fin n → (Sp (DualNumber Γ(X, U.1)) ⟶ t.G.left)) (D : Γ(X, U.1) → Γ(X, U.1)) (Θ : Matrix (Fin n) (Fin n) Γ(X, U.1)), (∀ a, IsTanAtG t (LogKS.chart U) (v a)) → LogKS.IsKS t V U v D Θ → ∀ (K : Type) [Field K] (x0 : Sp K ⟶ X) (hU : ⊤ ≤ x0 ⁻¹ᵁ U.1), ⊤ ≤ x0 ⁻¹ᵁ V → ∀ (y1 : Sp (DualNumber K) ⟶ X) (hU' : ⊤ ≤ y1 ⁻¹ᵁ U.1), (∀ r, ev y1 U.1 hU' r = TrivSqZeroExt.inl (ev x0 U.1 hU r) + TrivSqZeroExt.inr (ev x0 U.1 hU (D r))) → ∀ (A : Over (Sp K)) [GrpObj A] (A' : Over (Sp (DualNumber K))) [GrpObj A'] (ι : A.left ⟶ t.G.left) (ι' : A'.left ⟶ t.G.left) (i : A.left ⟶ A'.left) (u : Fin n → (epsR K ⟶ A)), IsGrpPullback A A' (GlobalTheory.DeRham.epsRed K) i → IsGrpPullback A t.G x0 ι → IsGrpPullback A' t.G y1 ι' → i ≫ ι' = ι → (∀ a, (u a).left ≫ ι = spMap (dualMap (ev x0 U.1 hU)) ≫ v a) → ∀ (M : LB A.left), ⨆ k, M.U k = ⊤ → LBIso (t.PP.L.pull ι) M → GlobalTheory.CechKS.IsCechKS A A' i M u (Matrix.of fun a b => ev x0 U.1 hU (Θ a b)) := by
-  intro E _ _ _ H X t V U n v D Θ hv hKS K _ x0 hU hV y1 hU' hy1 A _ A' _ ι ι' i u hi hι hι' hιι' hu M hM hiso
+theorem isCechKS_of_isKS
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (X : Scheme.{0}) (t : SAB H X)
+        (V : X.Opens) (U : X.affineOpens) (n : ℕ)
+        (v : Fin n → (Sp (DualNumber Γ(X, U.1)) ⟶ t.G.left)) (D : Γ(X, U.1) → Γ(X, U.1))
+        (Θ : Matrix (Fin n) (Fin n) Γ(X, U.1)),
+      (∀ a, IsTanAtG t (LogKS.chart U) (v a)) → LogKS.IsKS t V U v D Θ
+        → ∀ (K : Type) [Field K] (x0 : Sp K ⟶ X) (hU : ⊤ ≤ x0 ⁻¹ᵁ U.1),
+          ⊤ ≤ x0 ⁻¹ᵁ V
+            → ∀ (y1 : Sp (DualNumber K) ⟶ X) (hU' : ⊤ ≤ y1 ⁻¹ᵁ U.1),
+              (∀ r,
+                  ev y1 U.1 hU' r
+                    = TrivSqZeroExt.inl (ev x0 U.1 hU r) + TrivSqZeroExt.inr (ev x0 U.1 hU (D r)))
+                → ∀ (A : Over (Sp K)) [GrpObj A] (A' : Over (Sp (DualNumber K))) [GrpObj A']
+                    (ι : A.left ⟶ t.G.left) (ι' : A'.left ⟶ t.G.left) (i : A.left ⟶ A'.left)
+                    (u : Fin n → (epsR K ⟶ A)),
+                  IsGrpPullback A A' (GlobalTheory.DeRham.epsRed K) i → IsGrpPullback A t.G x0 ι
+                    → IsGrpPullback A' t.G y1 ι' → i ≫ ι' = ι
+                    → (∀ a, (u a).left ≫ ι = spMap (dualMap (ev x0 U.1 hU)) ≫ v a)
+                    → ∀ (M : LB A.left),
+                      ⨆ k, M.U k = ⊤ → LBIso (t.PP.L.pull ι) M
+                        → GlobalTheory.CechKS.IsCechKS A A' i M u
+                          (Matrix.of fun a b => ev x0 U.1 hU (Θ a b)) := by
+  intro E _ _ _ H X t V U n v D Θ hv hKS K _ x0 hU hV y1 hU' hy1 A _ A' _ ι ι' i u hi hι hι' hιι' hu
+    M hM hiso
   obtain ⟨J₀, W₀, j, d, hcov, hWj, hfield, hlift, hdiff⟩ := hKS
   obtain ⟨wg, hwg⟩ := hiso
   have hW₀ : ∀ k, W₀ k ≤ t.G.hom ⁻¹ᵁ U.1 := fun k p hp => by
     have : p ∈ t.G.hom ⁻¹ᵁ (U.1 ⊓ V) := hcov ▸ (le_iSup W₀ k) hp
     exact this.1
   let θ : Matrix (Fin n) (Fin n) K := Matrix.of fun a b => ev x0 U.1 hU (Θ a b)
-  let lam : ∀ (_ : Σ k : J₀, {Ω : t.G.left.affineOpens // Ω.1 ≤ W₀ k} × M.ι) (B : Type) [CommRing B]
-      [Algebra (DualNumber K) B], (Sp B ⟶ A.left) → (Sp B ⟶ A'.left) :=
-    fun k B _ _ x => chartPt A' i ι ι' k.2.1.1.1 (d k.1 k.2.1.1.1) u θ
+  let lam
+      : ∀ (_ : Σ k : J₀, {Ω : t.G.left.affineOpens // Ω.1 ≤ W₀ k} × M.ι) (B : Type) [CommRing B]
+          [Algebra (DualNumber K) B],
+        (Sp B ⟶ A.left) → (Sp B ⟶ A'.left) := fun k B _ _ x =>
+    chartPt A' i ι ι' k.2.1.1.1 (d k.1 k.2.1.1.1) u θ
       (M.U k.2.2 ⊓ (t.PP.L.pull ι).U (fun _ => j k.1)) (wg.s (k.2.2, fun _ => j k.1)) x
-  have hex : ∀ (k : Σ k : J₀, {Ω : t.G.left.affineOpens // Ω.1 ≤ W₀ k} × M.ι) (B : Type) [CommRing B]
-      [Algebra (DualNumber K) B] (x : Sp B ⟶ A.left), x ≫ A.hom = spMap (baseMap K B) →
-      ⊤ ≤ x ⁻¹ᵁ (ι ⁻¹ᵁ k.2.1.1.1) →
-      IsChartPt A' ι ι' k.2.1.1.1 (d k.1 k.2.1.1.1) u θ (M.U k.2.2 ⊓ (t.PP.L.pull ι).U (fun _ => j k.1))
-        (wg.s (k.2.2, fun _ => j k.1)) x (lam k B x) := by
+  have hex
+      : ∀ (k : Σ k : J₀, {Ω : t.G.left.affineOpens // Ω.1 ≤ W₀ k} × M.ι) (B : Type) [CommRing B]
+          [Algebra (DualNumber K) B] (x : Sp B ⟶ A.left),
+        x ≫ A.hom = spMap (baseMap K B) → ⊤ ≤ x ⁻¹ᵁ (ι ⁻¹ᵁ k.2.1.1.1)
+          → IsChartPt A' ι ι' k.2.1.1.1 (d k.1 k.2.1.1.1) u θ
+            (M.U k.2.2 ⊓ (t.PP.L.pull ι).U (fun _ => j k.1)) (wg.s (k.2.2, fun _ => j k.1)) x
+            (lam k B x) := by
     intro k B _ _ x hx hxΩ
-    exact isChartPt_chartPt _ _ _ _ _ _ _ _ _ _ _ (GlobalTheory.CechKS.exists_isChartPt t U v D hv (W₀ k.1) (hW₀ k.1) (d k.1)
-      (hfield k.1) (hlift k.1 (hW₀ k.1)) x0 hU y1 hU' hy1 A A' ι ι' u hι hι' hu k.2.1.1 k.2.1.2 θ _ _ B x hx hxΩ)
-  refine ⟨Σ k : J₀, {Ω : t.G.left.affineOpens // Ω.1 ≤ W₀ k} × M.ι, fun k => ι ⁻¹ᵁ k.2.1.1.1 ⊓ M.U k.2.2,
-    fun k => k.2.2, lam, ?_, fun k => inf_le_right, ?_, ?_⟩
+    exact isChartPt_chartPt _ _ _ _ _ _ _ _ _ _ _
+      (GlobalTheory.CechKS.exists_isChartPt t U v D hv (W₀ k.1) (hW₀ k.1) (d k.1) (hfield k.1)
+        (hlift k.1 (hW₀ k.1)) x0 hU y1 hU' hy1 A A' ι ι' u hι hι' hu k.2.1.1 k.2.1.2 θ _ _ B x hx
+        hxΩ)
+  refine ⟨
+    Σ k : J₀, {Ω : t.G.left.affineOpens // Ω.1 ≤ W₀ k} × M.ι,
+    fun k => ι ⁻¹ᵁ k.2.1.1.1 ⊓ M.U k.2.2,
+    fun k => k.2.2,
+    lam,
+    ?_,
+    fun k => inf_le_right,
+    ?_,
+    ?_
+  ⟩
   · refine eq_top_iff.2 fun a _ => ?_
     have h1 : (ι ≫ t.G.hom).base a ∈ U.1 ⊓ V := by
       rw [hι.1.w]
@@ -120,7 +158,8 @@ theorem isCechKS_of_isKS : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
       rw [hcov]
       exact h1
     obtain ⟨k, hk⟩ := TopologicalSpace.Opens.mem_iSup.1 h2
-    obtain ⟨Ω, hΩB, haΩ, hΩk⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.1 t.G.left.isBasis_affineOpens hk
+    obtain ⟨Ω, hΩB, haΩ, hΩk⟩ :=
+      TopologicalSpace.Opens.isBasis_iff_nbhd.1 t.G.left.isBasis_affineOpens hk
     have h3 : a ∈ ⨆ p, M.U p := by
       rw [hM]
       trivial
@@ -129,21 +168,27 @@ theorem isCechKS_of_isKS : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
   · intro k B _ _ x hx hxW
     have hxΩ : ⊤ ≤ x ⁻¹ᵁ (ι ⁻¹ᵁ k.2.1.1.1) := fun p hp => (hxW hp).1
     have hP := hex k B x hx hxΩ
-    refine ⟨hP.1, GlobalTheory.T.deformationChartPoint_reduction_eq_specialFibre hi hι'.1 hιι' hx hxΩ hP, fun B' _ _ ρ => ?_⟩
+    refine ⟨
+      hP.1,
+      GlobalTheory.T.deformationChartPoint_reduction_eq_specialFibre hi hι'.1 hιι' hx hxΩ hP,
+      fun B' _ _ ρ => ?_
+    ⟩
     have hx' : (spMap (ρ : B →+* B') ≫ x) ≫ A.hom = spMap (baseMap K B') := by
       rw [Category.assoc, hx]
       show Spec.map _ ≫ Spec.map _ = Spec.map _
       rw [← Spec.map_comp, ← CommRingCat.ofHom_comp, ← RingHom.comp_assoc, AlgHom.comp_algebraMap]
-    have hxΩ' : ⊤ ≤ (spMap (ρ : B →+* B') ≫ x) ⁻¹ᵁ (ι ⁻¹ᵁ k.2.1.1.1) :=
-      fun p _ => hxΩ (Set.mem_univ ((spMap (ρ : B →+* B')).base p))
-    have hxWo : ⊤ ≤ x ⁻¹ᵁ (M.U k.2.2 ⊓ (t.PP.L.pull ι).U (fun _ => j k.1)) :=
-      fun p hp => ⟨(hxW hp).2, Set.mem_iInter.2 fun _ => hWj k.1 (k.2.1.2 (hxW hp).1)⟩
-    exact (GlobalTheory.T.isDeformationChartPoint_spec_map hx hxΩ hxWo (GlobalTheory.T.isTangent_of_fibre_pullback_tangent_at_chart t U v hv x0 hU A ι u hι hu) hP B' ρ).unique hι'.1 (hex k B' _ hx' hxΩ')
+    have hxΩ' : ⊤ ≤ (spMap (ρ : B →+* B') ≫ x) ⁻¹ᵁ (ι ⁻¹ᵁ k.2.1.1.1) := fun p _ =>
+      hxΩ (Set.mem_univ ((spMap (ρ : B →+* B')).base p))
+    have hxWo : ⊤ ≤ x ⁻¹ᵁ (M.U k.2.2 ⊓ (t.PP.L.pull ι).U (fun _ => j k.1)) := fun p hp =>
+      ⟨(hxW hp).2, Set.mem_iInter.2 fun _ => hWj k.1 (k.2.1.2 (hxW hp).1)⟩
+    exact (GlobalTheory.T.isDeformationChartPoint_spec_map hx hxΩ hxWo
+      (GlobalTheory.T.isTangent_of_fibre_pullback_tangent_at_chart t U v hv x0 hU A ι u hι hu) hP B'
+      ρ).unique hι'.1 (hex k B' _ hx' hxΩ')
   · intro k k' B _ _ x O f w hx hxW hxO hw
     have h₁ : ⊤ ≤ x ⁻¹ᵁ (ι ⁻¹ᵁ k.2.1.1.1) := fun p hp => (hxW hp).1.1
     have h₂ : ⊤ ≤ x ⁻¹ᵁ (ι ⁻¹ᵁ k'.2.1.1.1) := fun p hp => (hxW hp).2.1
-    exact chartPt_sub t V U v D Θ hv J₀ W₀ j d hcov hWj hfield hlift hdiff x0 hU y1 hU' hy1 A A' ι ι' i u hi hι
-      hι' hιι' hu M wg hwg k.1 k'.1 k.2.1.1 k'.2.1.1 k.2.1.2 k'.2.1.2 k.2.2 k'.2.2 B x O f w hx hxW hxO hw _ _
-      (hex k B x hx h₁) (hex k' B x hx h₂)
+    exact chartPt_sub t V U v D Θ hv J₀ W₀ j d hcov hWj hfield hlift hdiff x0 hU y1 hU' hy1 A A' ι
+      ι' i u hi hι hι' hιι' hu M wg hwg k.1 k'.1 k.2.1.1 k'.2.1.1 k.2.1.2 k'.2.1.2 k.2.2 k'.2.2 B x
+      O f w hx hxW hxO hw _ _ (hex k B x hx h₁) (hex k' B x hx h₂)
 
 end GlobalTheory.CechKS

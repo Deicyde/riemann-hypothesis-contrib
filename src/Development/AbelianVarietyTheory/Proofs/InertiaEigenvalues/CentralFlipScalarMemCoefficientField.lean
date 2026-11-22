@@ -9,10 +9,14 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Local
 @[expose] public section
 
 open NumberField Matrix Complex IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level Host
 open GlobalTheory.SW hiding Level IsSB
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -28,29 +32,32 @@ open Formalism.L2.Host
 def sqN {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) : ℝ :=
   Real.sqrt ((Ideal.absNorm v.asIdeal : ℕ) : ℝ)
 
-theorem absNorm_pos {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) :
-    (0 : ℝ) < ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
-  have : Ideal.absNorm v.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
+theorem absNorm_pos {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E))
+    : (0 : ℝ) < ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
+  have : Ideal.absNorm v.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
   exact_mod_cast Nat.pos_of_ne_zero this
 
 theorem sqN_pos {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) : 0 < sqN v :=
   Real.sqrt_pos.2 (absNorm_pos v)
 
-theorem sqN_sq {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) :
-    sqN v ^ 2 = ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) :=
+theorem sqN_sq {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E))
+    : sqN v ^ 2 = ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) :=
   Real.sq_sqrt (absNorm_pos v).le
 
-theorem cpow_neg_half (n : ℕ) :
-    ((n : ℕ) : ℂ) ^ (-(((-1 / 2 : ℝ)) : ℂ)) = ((Real.sqrt n : ℝ) : ℂ) := by
+theorem cpow_neg_half (n : ℕ)
+    : ((n : ℕ) : ℂ) ^ (-(((-1 / 2 : ℝ)) : ℂ)) = ((Real.sqrt n : ℝ) : ℂ) := by
   rw [Real.sqrt_eq_rpow, Complex.ofReal_cpow (Nat.cast_nonneg _)]
   push_cast
   congr 1
   ring
 
-theorem ordF_natCast {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) (u : Eˣ) (M₀ : ℕ)
-    (hu : (u : E) = ((M₀ : ℕ) : E)) :
-    ordF v u = ((Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {((M₀ : ℕ) : 𝓞 E)})).factors : ℤ) := by
+theorem ordF_natCast
+    {E : Type} [Field E] [NumberField E]
+    (v : HeightOneSpectrum (𝓞 E))
+    (u : Eˣ) (M₀ : ℕ) (hu : (u : E) = ((M₀ : ℕ) : E))
+    : ordF v u
+      = ((Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {((M₀ : ℕ) : 𝓞 E)})).factors
+        : ℤ) := by
   have h0 : ((M₀ : ℕ) : 𝓞 E) ≠ 0 := by
     intro h
     have : ((M₀ : ℕ) : E) = 0 := by
@@ -58,17 +65,35 @@ theorem ordF_natCast {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum
       simpa using this
     exact u.ne_zero (hu.trans this)
   have e : (u : E) = algebraMap (𝓞 E) E ((M₀ : ℕ) : 𝓞 E) := by rw [hu, map_natCast]
-  rw [ordF, e, HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_if_neg v h0,
-    WithZero.log_exp, neg_neg]
+  rw [ordF, e, HeightOneSpectrum.valuation_of_algebraMap,
+    HeightOneSpectrum.intValuation_if_neg v h0, WithZero.log_exp, neg_neg]
 
 end GlobalTheory.FlipScalField
 
 namespace GlobalTheory.FlipScalField
 open Formalism.L2.Host
 
-
 set_option maxHeartbeats 800000 in
-theorem mem_fieldRange : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalism.L2.Host.HChar E) (M₀ r w : ℕ) (u a : Eˣ) (T : Finset (HeightOneSpectrum (𝓞 E))) (k : Type) [Field k] (σ : k →+* ℂ), Odd w → (u : E) = ((M₀ : ℕ) : E) → IsIntegral ℤ (a : E) → (∀ v ∈ T, ((M₀ : ℕ) : 𝓞 E) ∈ v.asIdeal) → (∀ v : HeightOneSpectrum (𝓞 E), ((M₀ : ℕ) : 𝓞 E) ∉ v.asIdeal → χ.UnrAt v) → χ.ValuesIn (-1 / 2) σ → (∃ y : k, ((χ.inf a : ℂˣ) : ℂ) = σ y * ((|((Algebra.norm ℚ (a : E) : ℚ) : ℝ)| ^ (-(w : ℝ) / 2) : ℝ) : ℂ)) → (∀ v ∈ T, χ.locK v a = χ.locK v u ∧ v.valuation E (a : E) = v.valuation E ((M₀ : ℕ) : E)) → (∀ v : HeightOneSpectrum (𝓞 E), ((M₀ : ℕ) : 𝓞 E) ∈ v.asIdeal → v ∉ T → χ.locK v a = 1 ∧ v.valuation E (a : E) = 1) → (∏ PP ∈ T, ((χ.locK PP u : ℂˣ) : ℂ) ^ r) * ((Real.sqrt ((∏ PP ∈ T, Ideal.absNorm (PP.maxPowDividing (Ideal.span {((M₀ : ℕ) : 𝓞 E)})) ^ (r * w) : ℕ) : ℝ) : ℝ) : ℂ)⁻¹ ∈ σ.fieldRange := by
+theorem mem_fieldRange
+    : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalism.L2.Host.HChar E) (M₀ r w : ℕ) (u a : Eˣ)
+        (T : Finset (HeightOneSpectrum (𝓞 E))) (k : Type) [Field k] (σ : k →+* ℂ),
+      Odd w → (u : E) = ((M₀ : ℕ) : E) → IsIntegral ℤ (a : E)
+        → (∀ v ∈ T, ((M₀ : ℕ) : 𝓞 E) ∈ v.asIdeal)
+        → (∀ v : HeightOneSpectrum (𝓞 E), ((M₀ : ℕ) : 𝓞 E) ∉ v.asIdeal → χ.UnrAt v)
+        → χ.ValuesIn (-1 / 2) σ
+        → (∃ y : k,
+          ((χ.inf a : ℂˣ) : ℂ)
+            = σ y * ((|((Algebra.norm ℚ (a : E) : ℚ) : ℝ)| ^ (-(w : ℝ) / 2) : ℝ) : ℂ))
+        → (∀ v ∈ T, χ.locK v a = χ.locK v u ∧ v.valuation E (a : E) = v.valuation E ((M₀ : ℕ) : E))
+        → (∀ v : HeightOneSpectrum (𝓞 E),
+          ((M₀ : ℕ) : 𝓞 E) ∈ v.asIdeal → v ∉ T → χ.locK v a = 1 ∧ v.valuation E (a : E) = 1)
+        → (∏ PP ∈ T, ((χ.locK PP u : ℂˣ) : ℂ) ^ r) * ((Real.sqrt
+                ((∏ PP ∈ T, Ideal.absNorm (PP.maxPowDividing (Ideal.span {((M₀ : ℕ) : 𝓞 E)})) ^ (r * w)
+                    : ℕ)
+                  : ℝ)
+              : ℝ)
+            : ℂ)⁻¹
+          ∈ σ.fieldRange := by
   intro E _ _ χ M₀ r w u a T k _ σ hw hu ha hT hunr hval hinf hTa hST
   classical
   have hM0 : ((M₀ : ℕ) : 𝓞 E) ≠ 0 := by
@@ -89,14 +114,15 @@ theorem mem_fieldRange : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalis
   have hTS : T ⊆ S := fun v hv => (hmemS v).2 (hT v hv)
   have hoST : ∀ v ∈ S, v ∉ T → ordF v a = 0 := fun v hv hvT => by
     rw [ordF, (hST v ((hmemS v).1 hv) hvT).2, WithZero.log_one, neg_zero]
-  have hoT : ∀ v ∈ T, ordF v a = ordF v u := fun v hv => by
-    rw [ordF, ordF, (hTa v hv).2, hu]
-  have hPR := Formalism.L2.Host.HChar.productRule χ S (fun v hv => hunr v (fun h => hv ((hmemS v).2 h))) a
+  have hoT : ∀ v ∈ T, ordF v a = ordF v u := fun v hv => by rw [ordF, ordF, (hTa v hv).2, hu]
+  have hPR :=
+    Formalism.L2.Host.HChar.productRule χ S (fun v hv => hunr v (fun h => hv ((hmemS v).2 h))) a
   have hloc : ∏ v ∈ S, χ.locK v a = ∏ v ∈ T, χ.locK v u := by
     rw [← Finset.prod_subset hTS (fun v hv hvT => (hST v ((hmemS v).1 hv) hvT).1)]
     exact Finset.prod_congr rfl fun v hv => (hTa v hv).1
-  have hfin : (∏ᶠ (v : HeightOneSpectrum (𝓞 E)) (_ : v ∉ S), χ.val v ^ ordF v a) =
-      ∏ v ∈ R \ S, χ.val v ^ ordF v a := by
+  have hfin
+      : (∏ᶠ (v : HeightOneSpectrum (𝓞 E)) (_ : v ∉ S), χ.val v ^ ordF v a)
+        = ∏ v ∈ R \ S, χ.val v ^ ordF v a := by
     apply finprod_mem_eq_prod_of_subset (s := {v | v ∉ S})
     · rintro v ⟨hv1, hv2⟩
       simp only [Finset.coe_sdiff, Set.mem_diff, Finset.mem_coe]
@@ -122,7 +148,8 @@ theorem mem_fieldRange : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalis
   have hinfv : ((χ.inf a : ℂˣ) : ℂ) = σ y0 * (((Q ^ w)⁻¹ : ℝ) : ℂ) := by
     rw [hy0, hNa]
     congr 2
-    rw [← Real.rpow_natCast Q 2, ← Real.rpow_mul hQpos.le, ← Real.rpow_natCast, ← Real.rpow_neg hQpos.le]
+    rw [← Real.rpow_natCast Q 2, ← Real.rpow_mul hQpos.le, ← Real.rpow_natCast,
+      ← Real.rpow_neg hQpos.le]
     congr 1
     push_cast
     ring
@@ -139,8 +166,9 @@ theorem mem_fieldRange : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalis
     have e2 : ∏ v ∈ T, sqN v ^ ordF v a = ∏ v ∈ S, sqN v ^ ordF v a :=
       Finset.prod_subset hTS fun v hv hvT => by rw [hoST v hv hvT, zpow_zero]
     rw [e1, ← e2]
-  have hprodval : ∏ v ∈ R \ S, ((χ.val v : ℂˣ) : ℂ) ^ ordF v a =
-      σ (∏ v ∈ R \ S, y v ^ ordF v a) / ((B : ℝ) : ℂ) := by
+  have hprodval
+      : ∏ v ∈ R \ S, ((χ.val v : ℂˣ) : ℂ) ^ ordF v a
+        = σ (∏ v ∈ R \ S, y v ^ ordF v a) / ((B : ℝ) : ℂ) := by
     rw [map_prod, hB, Complex.ofReal_prod, ← Finset.prod_div_distrib]
     refine Finset.prod_congr rfl fun v hv => ?_
     rw [hvalv v (Finset.mem_sdiff.1 hv).2, map_zpow₀, Complex.ofReal_zpow, div_zpow]
@@ -159,8 +187,12 @@ theorem mem_fieldRange : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalis
     field_simp at key
     linear_combination key
 
-  have hsqrt : Real.sqrt ((∏ PP ∈ T, Ideal.absNorm (PP.maxPowDividing (Ideal.span {((M₀ : ℕ) : 𝓞 E)})) ^ (r * w) : ℕ) : ℝ) =
-      A ^ (r * w) := by
+  have hsqrt
+      : Real.sqrt
+          ((∏ PP ∈ T, Ideal.absNorm (PP.maxPowDividing (Ideal.span {((M₀ : ℕ) : 𝓞 E)})) ^ (r * w)
+              : ℕ)
+            : ℝ)
+        = A ^ (r * w) := by
     rw [← Real.sqrt_sq (pow_nonneg hApos.le _)]
     congr 1
     push_cast
@@ -176,18 +208,25 @@ theorem mem_fieldRange : ∀ (E : Type) [Field E] [NumberField E] (χ : Formalis
       rw [hq, hB, ← Finset.prod_pow]
       push_cast
       refine Finset.prod_congr rfl fun v _ => ?_
-      rw [← sqN_sq v, ← zpow_natCast, ← zpow_natCast, ← _root_.zpow_mul, ← _root_.zpow_mul, mul_comm]
+      rw [← sqN_sq v, ← zpow_natCast, ← zpow_natCast, ← _root_.zpow_mul, ← _root_.zpow_mul,
+        mul_comm]
     rw [← Complex.ofReal_ratCast, this, Complex.ofReal_pow]
   obtain ⟨m, rfl⟩ := hw
-  have heq : (∏ PP ∈ T, ((χ.locK PP u : ℂˣ) : ℂ) ^ r) *
-      ((Real.sqrt ((∏ PP ∈ T, Ideal.absNorm (PP.maxPowDividing (Ideal.span {((M₀ : ℕ) : 𝓞 E)})) ^ (r * (2 * m + 1)) : ℕ) : ℝ) : ℝ) : ℂ)⁻¹ =
-      (((q : ℚ) : ℂ) ^ (m + 1)) ^ r * ((σ y0 * σ Y)⁻¹) ^ r := by
+  have heq
+      : (∏ PP ∈ T, ((χ.locK PP u : ℂˣ) : ℂ) ^ r) * ((Real.sqrt
+              ((∏ PP ∈ T, Ideal.absNorm (PP.maxPowDividing (Ideal.span {((M₀ : ℕ) : 𝓞 E)})) ^ (r * (2 * m + 1))
+                  : ℕ)
+                : ℝ)
+            : ℝ)
+          : ℂ)⁻¹
+        = (((q : ℚ) : ℂ) ^ (m + 1)) ^ r * ((σ y0 * σ Y)⁻¹) ^ r := by
     rw [hsqrt, Finset.prod_pow, ← hPdef, hP, hqB]
     push_cast
     field_simp
     ring
   rw [heq]
-  refine mul_mem (pow_mem (pow_mem (SubfieldClass.ratCast_mem _ q) _) _) (pow_mem (inv_mem (mul_mem ?_ ?_)) _)
+  refine mul_mem (pow_mem (pow_mem (SubfieldClass.ratCast_mem _ q) _) _)
+    (pow_mem (inv_mem (mul_mem ?_ ?_)) _)
   · exact ⟨y0, rfl⟩
   · exact ⟨Y, rfl⟩
 

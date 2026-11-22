@@ -13,19 +13,21 @@ public import Development.AutomorphicArithmetic.PrimeDiscriminants.ExistsPrimiti
 
 open NumberField IsDedekindDomain Formalism.BasicNotions
 
-private theorem emb_sqd {R : Ranks} (H : Host R) (g : R.Psi) :
-    H.emb (g : R.GG) H.sqd = Complex.I * (Real.sqrt H.d : ℂ) := by
+private theorem emb_sqd {R : Ranks} (H : Host R) (g : R.Psi)
+    : H.emb (g : R.GG) H.sqd = Complex.I * (Real.sqrt H.d : ℂ) := by
   have hfix : (H.gal.symm (g : R.GG)) H.sqd = H.sqd := by
     have := (Formalism.HC.HostAx.galE_mem_Psi_iff H.toHostAx (H.gal.symm (g : R.GG))).1
     apply this
     simp [Formalism.HC.HostRaw.galE]
   have h0 := H.φ₀_mem
   simp only [Formalism.HC.HostRaw.cmType, Set.mem_setOf_eq] at h0
-  simp only [Formalism.BasicNotions.Host.emb, Formalism.BasicNotions.Host.sigmaOf, RingHom.comp_apply]
+  simp only [Formalism.BasicNotions.Host.emb, Formalism.BasicNotions.Host.sigmaOf,
+    RingHom.comp_apply]
   change H.φ₀ ((H.gal.symm (g : R.GG)) H.sqd) = _
   rw [hfix, h0]
 
-private theorem four_dvd {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) : 4 ∣ Nat.card φ.Psi := by
+private theorem four_dvd {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ)
+    : 4 ∣ Nat.card φ.Psi := by
   rw [Formalism.HC.Frame.natCard_Psi]
   have h1 : 4 ∣ 2 ^ φ.e := by
     have : (4 : ℕ) = 2 ^ 2 := by norm_num
@@ -33,19 +35,25 @@ private theorem four_dvd {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ)
     exact Nat.pow_dvd_pow 2 H.two_le_e
   exact Dvd.dvd.mul_left (h1.trans φ.two_pow_dvd_ord) 2
 
-private theorem val_sqrt {L : Type} [Field L] [NumberField L] (d : ℕ) (δ : L) (h : δ ^ 2 = -(d : L))
-    (P : HeightOneSpectrum (𝓞 L)) (hP : ((d : ℕ) : 𝓞 L) ∉ P.asIdeal) : P.valuation L δ = 1 := by
+private theorem val_sqrt
+    {L : Type} [Field L] [NumberField L]
+    (d : ℕ) (δ : L) (h : δ ^ 2 = -(d : L))
+    (P : HeightOneSpectrum (𝓞 L)) (hP : ((d : ℕ) : 𝓞 L) ∉ P.asIdeal)
+    : P.valuation L δ = 1 := by
   have hd : P.valuation L (d : L) = 1 := by
-    rw [← map_natCast (algebraMap (𝓞 L) L) d, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
+    rw [← map_natCast (algebraMap (𝓞 L) L) d,
+      IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
       IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff_mem_primeCompl]
     exact hP
-  have h2 : P.valuation L δ ^ 2 = 1 := by
-    rw [← map_pow, h, Valuation.map_neg, hd]
+  have h2 : P.valuation L δ ^ 2 = 1 := by rw [← map_pow, h, Valuation.map_neg, hd]
   exact sq_eq_one.mp h2
 
-private theorem val_one_add {L : Type} [Field L] [NumberField L] (N : ℕ) (hN : Even N) (hN0 : 0 < N) (z : L)
-    (hz : z ^ N = 1) (hne : z ≠ -1) (P : HeightOneSpectrum (𝓞 L)) (hP : ((N : ℕ) : 𝓞 L) ∉ P.asIdeal) :
-    P.valuation L (1 + z) = 1 := by
+private theorem val_one_add
+    {L : Type} [Field L] [NumberField L]
+    (N : ℕ) (hN : Even N) (hN0 : 0 < N)
+    (z : L) (hz : z ^ N = 1) (hne : z ≠ -1)
+    (P : HeightOneSpectrum (𝓞 L)) (hP : ((N : ℕ) : 𝓞 L) ∉ P.asIdeal)
+    : P.valuation L (1 + z) = 1 := by
   have hint : IsIntegral ℤ z := by
     refine ⟨Polynomial.X ^ N - 1, ?_, ?_⟩
     · exact Polynomial.monic_X_pow_sub_C 1 hN0.ne'
@@ -64,17 +72,20 @@ private theorem val_one_add {L : Type} [Field L] [NumberField L] (N : ℕ) (hN :
       simpa [sub_neg_eq_add, add_comm] using h
     have := congrArg (algebraMap (𝓞 L) L) this
     rwa [hcoe, map_neg, map_one] at this
-  have : (1 + z : L) = algebraMap (𝓞 L) L (1 + zi) := by
-    rw [map_add (f := _), map_one, hcoe]
+  have : (1 + z : L) = algebraMap (𝓞 L) L (1 + zi) := by rw [map_add (f := _), map_one, hcoe]
   rw [this, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
     IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff_mem_primeCompl]
   exact hmem
 
-theorem UpperTheory.exists_unit_eq_rootOfUnity_mul_conj_phase_one :
-    ∀ (R : Ranks) (H : Host R) (ι : Type) [Fintype ι] (eT : ι ≃ R.Psi) (z : H.E), (∃ m : ℕ, 0 < m ∧ z ^ m = 1) →
-      ∃ δ : (H.E)ˣ, (δ : H.E) = z * H.conj (δ : H.E) ∧
-        (∀ P : HeightOneSpectrum (𝓞 H.E), ((H.condN : ℕ) : 𝓞 H.E) ∉ P.asIdeal → P.valuation H.E (δ : H.E) = 1) ∧
-        ∏ τ, (H.emb ((eT τ : R.Psi) : R.GG) (δ : H.E) / ((‖H.emb ((eT τ : R.Psi) : R.GG) (δ : H.E)‖ : ℝ) : ℂ)) = 1 := by
+theorem UpperTheory.exists_unit_eq_rootOfUnity_mul_conj_phase_one
+    : ∀ (R : Ranks) (H : Host R) (ι : Type) [Fintype ι] (eT : ι ≃ R.Psi) (z : H.E),
+      (∃ m : ℕ, 0 < m ∧ z ^ m = 1)
+        → ∃ δ : (H.E)ˣ,
+          (δ : H.E) = z * H.conj (δ : H.E)
+            ∧ (∀ P : HeightOneSpectrum (𝓞 H.E),
+              ((H.condN : ℕ) : 𝓞 H.E) ∉ P.asIdeal → P.valuation H.E (δ : H.E) = 1)
+            ∧ ∏ τ, (H.emb ((eT τ : R.Psi) : R.GG) (δ : H.E) / ((‖H.emb ((eT τ : R.Psi) : R.GG) (δ : H.E)‖ : ℝ) : ℂ))
+              = 1 := by
   intro R H ι _ eT z hz
   by_cases hne : z = -1
   · subst hne
@@ -90,7 +101,9 @@ theorem UpperTheory.exists_unit_eq_rootOfUnity_mul_conj_phase_one :
       exact P.asIdeal.mul_mem_right _ hm
     · have hd : 0 < H.d := H.hyp.2.1.pos
       have hr : (0 : ℝ) < Real.sqrt H.d := Real.sqrt_pos.2 (by exact_mod_cast hd)
-      have ht : ∀ g : R.Psi, H.emb (g : R.GG) H.sqd / ((‖H.emb (g : R.GG) H.sqd‖ : ℝ) : ℂ) = Complex.I := fun g => by
+      have ht
+          : ∀ g : R.Psi,
+            H.emb (g : R.GG) H.sqd / ((‖H.emb (g : R.GG) H.sqd‖ : ℝ) : ℂ) = Complex.I := fun g => by
         rw [emb_sqd H g, norm_mul, Complex.norm_I, one_mul, Complex.norm_real,
           Real.norm_of_nonneg hr.le, mul_div_assoc, div_self (by exact_mod_cast hr.ne'), mul_one]
       simp only [Units.val_mk0, ht]
@@ -98,7 +111,8 @@ theorem UpperTheory.exists_unit_eq_rootOfUnity_mul_conj_phase_one :
       obtain ⟨k, hk⟩ : 4 ∣ Nat.card R.Psi := four_dvd H.toHostRaw
       rw [hk, pow_mul, Complex.I_pow_four, one_pow]
   · have hδ : 1 + z ≠ 0 := fun h0 => hne (by linear_combination h0)
-    have hconj : H.conj z = z⁻¹ := (UpperTheory.rootOfUnity_galois_action_CMDatum _ H.toHostAx z hz).2.1
+    have hconj : H.conj z = z⁻¹ :=
+      (UpperTheory.rootOfUnity_galois_action_CMDatum _ H.toHostAx z hz).2.1
     have hz0 : z ≠ 0 := UpperTheory.root_ne_zero hz
     refine ⟨Units.mk0 (1 + z) hδ, ?_, ?_, ?_⟩
     · rw [Units.val_mk0, map_add (f := _), map_one, hconj]
@@ -108,5 +122,6 @@ theorem UpperTheory.exists_unit_eq_rootOfUnity_mul_conj_phase_one :
       have hw : z ^ H.toHostRaw.w = 1 := (H.toHostRaw.isMu_iff z).1 hz
       obtain ⟨k, hk⟩ := H.toHostRaw.w_dvd_condN
       have hN : z ^ H.condN = 1 := by rw [hk, pow_mul, hw, one_pow]
-      exact val_one_add H.condN (even_iff_two_dvd.2 H.two_dvd_condN) (Nat.pos_of_ne_zero H.condN_ne_zero) z hN hne P hP
+      exact val_one_add H.condN (even_iff_two_dvd.2 H.two_dvd_condN)
+        (Nat.pos_of_ne_zero H.condN_ne_zero) z hN hne P hP
     · exact UpperTheory.prod_cmType_phase_one_add_rootOfUnity R H ι eT z hz hne

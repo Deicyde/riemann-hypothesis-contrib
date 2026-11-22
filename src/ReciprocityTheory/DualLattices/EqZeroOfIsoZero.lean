@@ -14,8 +14,11 @@ open ReciprocityTheory.PGsh.L2
 
 section LiftR
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 private lemma eq_zero_of_iso_zero {n : Type} [Fintype n] {M : Matrix n n R}
@@ -47,12 +50,13 @@ private lemma row_decomp {H : HodgeTateDatum p g v R O σ cp} (U : UnramData p g
   rw [key, Matrix.fromRows_mul, hb, Matrix.vecMul_fromRows]
   simp only [Matrix.add_vecMul, Matrix.vecMul_vecMul, Matrix.mul_assoc]
 
-theorem lifts_of (hG : EmbeddingSeparatingGroupStatement) (hE : EigenElementaryDivisorStatement) (hR : EigenRankStatement) :
-    EigenLiftsStatement := by
+theorem lifts_of
+    (hG : EmbeddingSeparatingGroupStatement) (hE : EigenElementaryDivisorStatement)
+    (hR : EigenRankStatement)
+    : EigenLiftsStatement := by
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hp2 hS H U X hX
   obtain ⟨G, _, _, β, hmul, h1, hcard, hfrob, hsepG, hnt⟩ := hG p g C v R O σ cp hp2 hS H U
-  obtain ⟨κ, Λ, ε, hΛdet, hΛblock, hεdiv, hεprod, hcard_n, hspan⟩ :=
-    hE p g C v R O σ cp hS H U X hX
+  obtain ⟨κ, Λ, ε, hΛdet, hΛblock, hεdiv, hεprod, hcard_n, hspan⟩ := hE p g C v R O σ cp hS H U X hX
   obtain ⟨hrank, hrzero⟩ := hR p g C v R O σ cp hS H U
   haveI : Nontrivial R := ⟨⟨(p : R), 0, fun h => hS.p_ne (by rw [h, map_zero, map_zero])⟩⟩
   have hεT : ∀ j, U.εT (κ j) ≠ 0 := by
@@ -61,13 +65,16 @@ theorem lifts_of (hG : EmbeddingSeparatingGroupStatement) (hE : EigenElementaryD
     rw [h0, Matrix.vecMul_zero] at hb
     apply hΛdet.ne_zero
     exact Matrix.det_eq_zero_of_row_eq_zero j (fun k => by rw [← hb]; rfl)
-  have hlift : ∀ j, ∃ u : Nb p g → C, (∀ y, v (u y) ≤ 1) ∧
-      (∀ y, v (u y - algebraMap R C (∑ k, Λ j k * ((y k).val : R))) < 1) ∧
-      (fun y => algebraMap R C (ε j) * u y) ∈ augIdeal H.AA.carrier ∧
-      (∀ δ t, u (red p g (H.ρ (β δ) *ᵥ t)) = algebraMap R C (U.sg (κ j) (β δ)) * u (red p g t)) := by
+  have hlift
+      : ∀ j, ∃ u : Nb p g → C,
+        (∀ y, v (u y) ≤ 1) ∧ (∀ y, v (u y - algebraMap R C (∑ k, Λ j k * ((y k).val : R))) < 1)
+          ∧ (fun y => algebraMap R C (ε j) * u y) ∈ augIdeal H.AA.carrier
+          ∧ (∀ δ t,
+            u (red p g (H.ρ (β δ) *ᵥ t)) = algebraMap R C (U.sg (κ j) (β δ)) * u (red p g t)) := by
     intro j
-    have hmem : ε j • Λ j ∈ Submodule.span R
-        (Set.range fun k => (fromRows H.Ht (bt2 H U) * U.εT (κ j)) k) := by
+    have hmem
+        : ε j • Λ j
+          ∈ Submodule.span R (Set.range fun k => (fromRows H.Ht (bt2 H U) * U.εT (κ j)) k) := by
       rw [hspan (κ j)]
       exact Submodule.subset_span ⟨j, rfl, rfl⟩
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 hmem
@@ -114,7 +121,8 @@ theorem lifts_of (hG : EmbeddingSeparatingGroupStatement) (hE : EigenElementaryD
     frobChar := fun j k => hfrob (κ j) _ (hεT j)
     sep := fun j j' hne => by
       obtain ⟨γ, hγ⟩ := hsepG (κ j) (κ j') (hεT j) (hεT j') hne
-      exact ⟨Fintype.equivFin G γ, by simpa using hγ⟩ }⟩
+      exact ⟨Fintype.equivFin G γ, by simpa using hγ⟩
+  }⟩
 
 end LiftR
 

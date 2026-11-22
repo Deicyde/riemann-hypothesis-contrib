@@ -11,15 +11,17 @@ public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.Semi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS
 
-theorem residue_embedding_unique {X : Scheme.{0}} {Ω : CommRingCat.{0}} [Nonempty (Spec Ω)]
+theorem residue_embedding_unique
+    {X : Scheme.{0}} {Ω : CommRingCat.{0}} [Nonempty (Spec Ω)]
     {p q : X} (φ : X.residueField p ⟶ Ω) (ψ : X.residueField q ⟶ Ω)
-    (h : Spec.map φ ≫ X.fromSpecResidueField p = Spec.map ψ ≫ X.fromSpecResidueField q) :
-    ∃ e : p = q, φ = (X.residueFieldCongr e).hom ≫ ψ := by
+    (h : Spec.map φ ≫ X.fromSpecResidueField p = Spec.map ψ ≫ X.fromSpecResidueField q)
+    : ∃ e : p = q, φ = (X.residueFieldCongr e).hom ≫ ψ := by
   obtain ⟨t⟩ := ‹Nonempty (Spec Ω)›
   have e : p = q := by
     have := congrArg (fun f => f t) h
@@ -29,22 +31,34 @@ theorem residue_embedding_unique {X : Scheme.{0}} {Ω : CommRingCat.{0}} [Nonemp
   rw [cancel_mono, Spec.map_inj] at h
   simpa using h
 
-theorem essFiniteType_residueField_of_locallyOfFiniteType {X : Scheme.{0}} {R : CommRingCat.{0}}
-    (s : X ⟶ Spec R) [LocallyOfFiniteType s] (p : X) (ψ : R ⟶ X.residueField p)
-    (h : Spec.map ψ = X.fromSpecResidueField p ≫ s) : ψ.hom.EssFiniteType := by
+theorem essFiniteType_residueField_of_locallyOfFiniteType
+    {X : Scheme.{0}} {R : CommRingCat.{0}} (s : X ⟶ Spec R) [LocallyOfFiniteType s]
+    (p : X) (ψ : R ⟶ X.residueField p) (h : Spec.map ψ = X.fromSpecResidueField p ≫ s)
+    : ψ.hom.EssFiniteType := by
   haveI : (s p).asIdeal.IsPrime := PrimeSpectrum.isPrime _
-  have e : ψ = CommRingCat.ofHom (algebraMap R (s p).asIdeal.ResidueField) ≫
-      (Scheme.Spec.residueFieldIso R (s p)).inv ≫ s.residueFieldMap p := by
+  have e
+      : ψ
+        = CommRingCat.ofHom (algebraMap R (s p).asIdeal.ResidueField)
+          ≫ (Scheme.Spec.residueFieldIso R (s p)).inv ≫ s.residueFieldMap p := by
     rw [← Spec.map_inj, h, Spec.map_comp, Spec.map_comp, Category.assoc,
       Scheme.Spec.map_residueFieldIso_inv_eq_fromSpecResidueField,
       Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField]
   rw [e]
-  refine .comp (RingHom.essFiniteType_algebraMap.mpr inferInstance) (.comp
-    (RingHom.FiniteType.of_surjective _
-      (ConcreteCategory.bijective_of_isIso (Scheme.Spec.residueFieldIso R (s p)).inv).2).essFiniteType
-    (RingHom.EssFiniteType.residueFieldMap (LocallyOfFiniteType.stalkMap s p)))
+  refine .comp (RingHom.essFiniteType_algebraMap.mpr inferInstance)
+    (.comp
+      (RingHom.FiniteType.of_surjective _
+        (ConcreteCategory.bijective_of_isIso (Scheme.Spec.residueFieldIso R
+          (s p)).inv).2).essFiniteType
+      (RingHom.EssFiniteType.residueFieldMap (LocallyOfFiniteType.stalkMap s p)))
 
-theorem exists_fieldOfValues : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (x : Sp Ω ⟶ X), ∃ E : Subfield Ω, (∀ τ τ' : Ω →+* Ω, spMap τ ≫ x = spMap τ' ≫ x ↔ ∀ c ∈ E, τ c = τ' c) ∧ (∀ (K' : Type) [Field K'] (j : K' →+* Ω), E ≤ j.fieldRange ↔ ∃ y : Sp K' ⟶ X, spMap j ≫ y = x) ∧ ∀ (K : Type) [Field K] [Algebra K Ω] (s : X ⟶ Sp K), LocallyOfFiniteType s → x ≫ s = spMap (algebraMap K Ω) → Algebra.IsAlgebraic K Ω → ∃ L : IntermediateField K Ω, FiniteDimensional K L ∧ L.toSubfield = E := by
+theorem exists_fieldOfValues
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (x : Sp Ω ⟶ X), ∃ E : Subfield Ω,
+      (∀ τ τ' : Ω →+* Ω, spMap τ ≫ x = spMap τ' ≫ x ↔ ∀ c ∈ E, τ c = τ' c)
+        ∧ (∀ (K' : Type) [Field K'] (j : K' →+* Ω),
+          E ≤ j.fieldRange ↔ ∃ y : Sp K' ⟶ X, spMap j ≫ y = x)
+        ∧ ∀ (K : Type) [Field K] [Algebra K Ω] (s : X ⟶ Sp K),
+          LocallyOfFiniteType s → x ≫ s = spMap (algebraMap K Ω) → Algebra.IsAlgebraic K Ω
+            → ∃ L : IntermediateField K Ω, FiniteDimensional K L ∧ L.toSubfield = E := by
   intro X Ω _ x
   obtain ⟨⟨p, φ⟩, hx⟩ := (Scheme.SpecToEquivOfField Ω X).symm.surjective x
   simp only [Scheme.SpecToEquivOfField_symm_apply] at hx
@@ -79,8 +93,10 @@ theorem exists_fieldOfValues : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (x : 
     have hess := essFiniteType_residueField_of_locallyOfFiniteType s p ψ hψ
     rw [Category.assoc, ← hψ, ← Spec.map_comp, Spec.map_inj] at hxs
     letI : Algebra K (X.residueField p) := ψ.hom.toAlgebra
-    let fa : X.residueField p →ₐ[K] Ω :=
-      { f with commutes' := fun c => congrArg (fun g => g.hom c) hxs }
+    let fa : X.residueField p →ₐ[K] Ω := {
+      f with
+      commutes' := fun c => congrArg (fun g => g.hom c) hxs
+    }
     haveI : Algebra.EssFiniteType K (X.residueField p) := hess
     haveI : Algebra.IsAlgebraic K (X.residueField p) :=
       Algebra.IsAlgebraic.of_injective fa f.injective

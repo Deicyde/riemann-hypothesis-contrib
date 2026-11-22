@@ -20,16 +20,19 @@ end Alg
 
 variable {a b : ℕ}
 
-theorem isCompact_unitary_GL (n : ℕ) : IsCompact {k : GL (Fin n) ℂ | k.val ∈ unitaryGroup (Fin n) ℂ} := by
+theorem isCompact_unitary_GL (n : ℕ)
+    : IsCompact {k : GL (Fin n) ℂ | k.val ∈ unitaryGroup (Fin n) ℂ} := by
   have hU : IsCompact (unitaryGroup (Fin n) ℂ : Set (Matrix (Fin n) (Fin n) ℂ)) := by
     have hcl : IsClosed (unitaryGroup (Fin n) ℂ : Set (Matrix (Fin n) (Fin n) ℂ)) := by
-      have e : (unitaryGroup (Fin n) ℂ : Set (Matrix (Fin n) (Fin n) ℂ)) =
-          (fun A : Matrix (Fin n) (Fin n) ℂ => A * star A) ⁻¹' {1} := by
+      have e
+          : (unitaryGroup (Fin n) ℂ : Set (Matrix (Fin n) (Fin n) ℂ))
+            = (fun A : Matrix (Fin n) (Fin n) ℂ => A * star A) ⁻¹' {1} := by
         ext A; exact Matrix.mem_unitaryGroup_iff
       rw [e]
       exact isClosed_singleton.preimage (continuous_id.mul continuous_star)
-    have hbd : (unitaryGroup (Fin n) ℂ : Set (Matrix (Fin n) (Fin n) ℂ)) ⊆
-        Set.univ.pi fun _ => Set.univ.pi fun _ => Metric.closedBall (0 : ℂ) 1 := by
+    have hbd
+        : (unitaryGroup (Fin n) ℂ : Set (Matrix (Fin n) (Fin n) ℂ))
+          ⊆ Set.univ.pi fun _ => Set.univ.pi fun _ => Metric.closedBall (0 : ℂ) 1 := by
       intro A hA i _ j _
       have h := congrFun (congrFun (Matrix.mem_unitaryGroup_iff.1 hA) i) i
       rw [Matrix.mul_apply, Matrix.one_apply_eq] at h
@@ -40,7 +43,8 @@ theorem isCompact_unitary_GL (n : ℕ) : IsCompact {k : GL (Fin n) ℂ | k.val �
       rw [Metric.mem_closedBall, dist_zero_right]
       rw [Complex.normSq_eq_norm_sq] at h3
       nlinarith [norm_nonneg (A i j)]
-    exact (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall 0 1).of_isClosed_subset hcl hbd
+    exact (isCompact_univ_pi fun _ =>
+      isCompact_univ_pi fun _ => isCompact_closedBall 0 1).of_isClosed_subset hcl hbd
   have : CompactSpace (unitaryGroup (Fin n) ℂ) := isCompact_iff_compactSpace.1 hU
   let φ : unitaryGroup (Fin n) ℂ → GL (Fin n) ℂ := fun u =>
     ⟨u.1, star u.1, Unitary.mul_star_self_of_mem u.2, Unitary.star_mul_self_of_mem u.2⟩

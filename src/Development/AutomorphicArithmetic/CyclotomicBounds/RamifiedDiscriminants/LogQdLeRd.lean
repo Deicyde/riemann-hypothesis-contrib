@@ -12,8 +12,11 @@ public import Development.AutomorphicArithmetic.FrobeniusLocalisation.VdTwo
 open UpperTheory.HF
 open NumberField Formalism.HC
 
-theorem UpperTheory.KR.log_qd_le_rd :
-    ∀ {φ : Frame} (H : HostAx φ), H.toHostRaw.PsQ → H.q ∈ H.ram ∧ Real.log H.q + Real.log H.d ≤ 2 * Real.log H.rd ∧ Real.sqrt ((H.q : ℝ) * H.d) ≤ H.rd ∧ 2 * Real.sqrt ((H.q : ℝ) * H.d) ≤ H.rd := by
+theorem UpperTheory.KR.log_qd_le_rd
+    : ∀ {φ : Frame} (H : HostAx φ),
+      H.toHostRaw.PsQ
+        → H.q ∈ H.ram ∧ Real.log H.q + Real.log H.d ≤ 2 * Real.log H.rd
+          ∧ Real.sqrt ((H.q : ℝ) * H.d) ≤ H.rd ∧ 2 * Real.sqrt ((H.q : ℝ) * H.d) ≤ H.rd := by
   intro φ H hP
   have hq : H.q ∈ H.ram := (UpperTheory.HF.inert_q H).2.2.2.2 hP
   obtain ⟨hA, hB, -⟩ := UpperTheory.HF.ram_eq H
@@ -30,8 +33,11 @@ theorem UpperTheory.KR.log_qd_le_rd :
     intro l hl
     simp only [Finset.mem_insert, Finset.mem_singleton] at hl
     rcases hl with rfl | rfl | rfl <;> assumption
-  have hle := Finset.sum_le_sum_of_subset_of_nonneg (f := fun l : ℕ => H.vdH l * Real.log l) hsub
-    (fun l _ _ => mul_nonneg (H.vdH_nonneg l) (Real.log_natCast_nonneg l))
+  have hle :=
+    Finset.sum_le_sum_of_subset_of_nonneg
+      (f := fun l : ℕ => H.vdH l * Real.log l)
+      hsub
+      (fun l _ _ => mul_nonneg (H.vdH_nonneg l) (Real.log_natCast_nonneg l))
   rw [← hs, Finset.sum_insert (by simp [n2q, n2d]), Finset.sum_pair nqd] at hle
   have lq := Real.log_natCast_nonneg H.q
   have ld := Real.log_natCast_nonneg H.d

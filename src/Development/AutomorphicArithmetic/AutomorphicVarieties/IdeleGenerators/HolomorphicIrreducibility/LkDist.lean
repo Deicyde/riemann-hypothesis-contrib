@@ -95,15 +95,20 @@ theorem lkDist : LkDist := by
     have hj : ∀ j : ℕ, HasDerivAt (fun y : ℂ => Lk (m + 1) (y * ζ ^ j)) (d j * ζ ^ j) x := by
       intro j
       exact (hd j).comp x (hasDerivAt_mul_const (ζ ^ j))
-    have hF : HasDerivAt (fun y : ℂ => ∑ j ∈ Finset.range w, Lk (m + 1) (y * ζ ^ j))
+    have hF : HasDerivAt
+        (fun y : ℂ => ∑ j ∈ Finset.range w, Lk (m + 1) (y * ζ ^ j))
         (∑ j ∈ Finset.range w, d j * ζ ^ j) x :=
-      HasDerivAt.fun_sum (u := Finset.range w) (A := fun j (y : ℂ) => Lk (m + 1) (y * ζ ^ j))
-        (A' := fun j => d j * ζ ^ j) (fun j _ => hj j)
-    have hG : HasDerivAt (fun y : ℂ => (w : ℂ) ^ (m + 1) * Lk (m + 1) (y ^ w))
+      HasDerivAt.fun_sum (u := Finset.range w)
+        (A := fun j (y : ℂ) => Lk (m + 1) (y * ζ ^ j))
+        (A' := fun j => d j * ζ ^ j)
+        (fun j _ => hj j)
+    have hG : HasDerivAt
+        (fun y : ℂ => (w : ℂ) ^ (m + 1) * Lk (m + 1) (y ^ w))
         ((w : ℂ) ^ (m + 1) * (e * ((w : ℂ) * x ^ (w - 1)))) x :=
       (he.comp x (hasDerivAt_pow w x)).const_mul _
-    have hev : (fun y : ℂ => ∑ j ∈ Finset.range w, Lk (m + 1) (y * ζ ^ j)) =ᶠ[nhds x]
-        (fun y : ℂ => (w : ℂ) ^ (m + 1) * Lk (m + 1) (y ^ w)) := by
+    have hev
+        : (fun y : ℂ => ∑ j ∈ Finset.range w, Lk (m + 1) (y * ζ ^ j)) =ᶠ[nhds x]
+          (fun y : ℂ => (w : ℂ) ^ (m + 1) * Lk (m + 1) (y ^ w)) := by
       have ho : IsOpen {y : ℂ | y ^ w ≠ 1} := isOpen_ne_fun (continuous_pow w) continuous_const
       filter_upwards [ho.mem_nhds hx] with y hy'
       exact ih ζ y hζ hy'
@@ -112,14 +117,14 @@ theorem lkDist : LkDist := by
       rw [← pow_succ']
       congr 1
       omega
-    calc ∑ j ∈ Finset.range w, Lk (m + 1 + 1) (x * ζ ^ j)
-        = x * ∑ j ∈ Finset.range w, d j * ζ ^ j := by
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl (fun j _ => ?_)
-          rw [← hdx j]
-          ring
+    calc
+      ∑ j ∈ Finset.range w, Lk (m + 1 + 1) (x * ζ ^ j) = x * ∑ j ∈ Finset.range w, d j * ζ ^ j := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun j _ => ?_)
+        rw [← hdx j]
+        ring
       _ = (w : ℂ) ^ (m + 1 + 1) * Lk (m + 1 + 1) (x ^ w) := by
-          rw [heq, ← hex, ← hw']
-          ring
+        rw [heq, ← hex, ← hw']
+        ring
 
 end UpperTheory.V.Sd

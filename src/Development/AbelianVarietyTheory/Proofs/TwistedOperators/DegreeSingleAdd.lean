@@ -24,8 +24,8 @@ lemma mulX_zv (i : ι) (α : ι →₀ ℕ) (v : V) :
     mulX i (zv (R := R) α v) = zv (Finsupp.single i 1 + α) v := by
   simp [mulX, zv, X, monomial_mul]
 
-def degLt (R : Type*) [CommRing R] (ι : Type*) (V : Type*) [AddCommGroup V] [Module R V] (n : ℕ) :
-    Submodule R (MvPolynomial ι R ⊗[R] V) :=
+def degLt (R : Type*) [CommRing R] (ι : Type*) (V : Type*) [AddCommGroup V] [Module R V] (n : ℕ)
+    : Submodule R (MvPolynomial ι R ⊗[R] V) :=
   Submodule.span R {m | ∃ (α : ι →₀ ℕ) (v : V), α.degree < n ∧ m = zv α v}
 
 lemma zv_mem {n : ℕ} {α : ι →₀ ℕ} (h : α.degree < n) (v : V) : zv α v ∈ degLt R ι V n :=
@@ -86,8 +86,9 @@ lemma exists_extend (D : (ι →₀ ℕ) → g →ₗ[R] V →ₗ[R] (MvPolynomi
     exact ext_zv fun α v => by rw [LinearMap.smul_apply, key, key]; simp
   · exact key
 
-def extend (D : (ι →₀ ℕ) → g →ₗ[R] V →ₗ[R] (MvPolynomial ι R ⊗[R] V)) :
-    g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) := (exists_extend D).choose
+def extend (D : (ι →₀ ℕ) → g →ₗ[R] V →ₗ[R] (MvPolynomial ι R ⊗[R] V))
+    : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) :=
+  (exists_extend D).choose
 
 lemma extend_zv (D : (ι →₀ ℕ) → g →ₗ[R] V →ₗ[R] (MvPolynomial ι R ⊗[R] V)) (x α v) :
     extend D x (zv α v) = D α x v := (exists_extend D).choose_spec x α v
@@ -107,8 +108,9 @@ lemma mulLin_mem {n : ℕ} (x : g) : ∀ m ∈ degLt R ι V n, mulLin c x m ∈ 
   rw [mulLin_apply]
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (mulX_mem i m hm)
 
-def rho (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) :
-    g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) := mulLin c + δ
+def rho (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V))
+    : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) :=
+  mulLin c + δ
 
 omit [LinearOrder ι] in
 lemma rho_apply (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) (x m) :
@@ -120,10 +122,10 @@ omit [Fintype ι] [LinearOrder ι] in
 lemma strip_apply (s : Finset ι) (x : g) : strip e c s x = x - ∑ j ∈ s, c j x • e j := by
   simp [strip, LinearMap.sum_apply]
 
-def straighten (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) (i : ι) :
-    g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) :=
-  (LinearMap.mulLeft R (rho c δ (e i)) ∘ₗ δ -
-    rho c δ ∘ₗ (LieAlgebra.ad R g (e i))) ∘ₗ strip e c (Finset.univ.filter (· ≤ i))
+def straighten (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) (i : ι)
+    : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) :=
+  (LinearMap.mulLeft R (rho c δ (e i)) ∘ₗ δ - rho c δ ∘ₗ (LieAlgebra.ad R g (e i)))
+    ∘ₗ strip e c (Finset.univ.filter (· ≤ i))
 
 lemma straighten_apply (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) (i : ι) (x m) :
     straighten e c δ i x m =
@@ -132,11 +134,13 @@ lemma straighten_apply (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] 
   rw [← lie_skew (strip e c (Finset.univ.filter (· ≤ i)) x), map_neg]
   simp [straighten, sub_eq_add_neg]
 
-def step (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) :
-    g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) :=
-  extend fun α => if h : α.support.Nonempty then
-    (straighten e c δ (α.support.min' h)).compl₂ (zv (α - Finsupp.single (α.support.min' h) 1))
-  else (act ∘ₗ strip e c Finset.univ).compr₂ (zv 0)
+def step (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V))
+    : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V) :=
+  extend fun α =>
+    if h : α.support.Nonempty then
+      (straighten e c δ (α.support.min' h)).compl₂ (zv (α - Finsupp.single (α.support.min' h) 1))
+    else
+      (act ∘ₗ strip e c Finset.univ).compr₂ (zv 0)
 
 lemma step_zero (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)) (x v) :
     step e c act δ x (zv 0 v) = zv 0 (act (strip e c Finset.univ x) v) := by
@@ -241,7 +245,8 @@ lemma exists_fixed : ∃ δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R]
 
 section Fixed
 
-variable {e c act} {δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)}
+variable
+  {e c act} {δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V)}
   (hce : ∀ i j, c i (e j) = if i = j then 1 else 0)
 
 include hce
@@ -299,9 +304,12 @@ lemma comm_high (i : ι) (J : ι →₀ ℕ) (hJ : ∀ j ∈ J.support, i ≤ j)
   · rw [map_smul, mulX_zv, mulX_zv,
       rho_e_le hce hf i _ (le_support_add hJ (not_le.mp hj).le), add_left_comm]
 
-def defect (c : ι → g →ₗ[R] R) (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V))
-    (m : MvPolynomial ι R ⊗[R] V) : g →ₗ[R] g →ₗ[R] (MvPolynomial ι R ⊗[R] V) :=
-  LinearMap.mk₂ R (fun x y => rho c δ x (rho c δ y m) - rho c δ y (rho c δ x m) - rho c δ ⁅x, y⁆ m)
+def defect
+    (c : ι → g →ₗ[R] R) (δ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V))
+    (m : MvPolynomial ι R ⊗[R] V)
+    : g →ₗ[R] g →ₗ[R] (MvPolynomial ι R ⊗[R] V) :=
+  LinearMap.mk₂ R
+    (fun x y => rho c δ x (rho c δ y m) - rho c δ y (rho c δ x m) - rho c δ ⁅x, y⁆ m)
     (by intros; simp only [add_lie, map_add (f := _), LinearMap.add_apply]; abel)
     (by intros; simp only [smul_lie, map_smul, LinearMap.smul_apply, smul_sub])
     (by intros; simp only [lie_add, map_add (f := _), LinearMap.add_apply]; abel)
@@ -418,17 +426,21 @@ lemma defect_eq_zero (hp : Pres δ)
 
 end Fixed
 
-theorem exists_rep (hce : ∀ i j, c i (e j) = if i = j then 1 else 0)
+theorem exists_rep
+    (hce : ∀ i j, c i (e j) = if i = j then 1 else 0)
     (hK : ∀ x y, (∀ j, c j x = 0) → (∀ j, c j y = 0) → ∀ j, c j ⁅x, y⁆ = 0)
-    (hact : ∀ x y, (∀ j, c j x = 0) → (∀ j, c j y = 0) →
-      act ⁅x, y⁆ = act x * act y - act y * act x) :
-    ∃ ρ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V),
-      (∀ x y, ρ ⁅x, y⁆ = ρ x * ρ y - ρ y * ρ x) ∧
-      (∀ x, (∀ j, c j x = 0) → ∀ v, ρ x (zv 0 v) = zv 0 (act x v)) ∧
-      ∀ n x, ∀ m ∈ degLt R ι V n, ρ x m - mulLin c x m ∈ degLt R ι V n := by
+    (hact : ∀ x y, (∀ j, c j x = 0) → (∀ j, c j y = 0) → act ⁅x, y⁆ = act x * act y - act y * act x)
+    : ∃ ρ : g →ₗ[R] Module.End R (MvPolynomial ι R ⊗[R] V),
+      (∀ x y, ρ ⁅x, y⁆ = ρ x * ρ y - ρ y * ρ x)
+        ∧ (∀ x, (∀ j, c j x = 0) → ∀ v, ρ x (zv 0 v) = zv 0 (act x v))
+        ∧ ∀ n x, ∀ m ∈ degLt R ι V n, ρ x m - mulLin c x m ∈ degLt R ι V n := by
   obtain ⟨δ, hp, hf⟩ := exists_fixed e c act
-  refine ⟨rho c δ, fun x y => ext_zv fun α v => ?_, fun x hx v => rho_zero_of_k hf x hx v,
-    fun n x m hm => by simpa [rho_apply] using hp n x m hm⟩
+  refine ⟨
+    rho c δ,
+    fun x y => ext_zv fun α v => ?_,
+    fun x hx v => rho_zero_of_k hf x hx v,
+    fun n x m hm => by simpa [rho_apply] using hp n x m hm
+  ⟩
   have := defect_eq_zero hce hf hp hK hact _ x y _ (zv_mem (Nat.lt_succ_self α.degree) v)
   rw [defect_apply, sub_eq_zero] at this
   exact this.symm

@@ -29,8 +29,7 @@ theorem zero_right (v : V) : φ v 0 = 0 := by
   have := h.smul v 0 0
   simpa using this
 
-theorem zero_left (v : V) : φ 0 v = 0 := by
-  rw [h.herm v 0, h.zero_right, star_zero]
+theorem zero_left (v : V) : φ 0 v = 0 := by rw [h.herm v 0, h.zero_right, star_zero]
 
 theorem add_left (v₁ v₂ w : V) : φ (v₁ + v₂) w = φ v₁ w + φ v₂ w := by
   rw [h.herm w (v₁ + v₂), h.add, star_add, ← h.herm w v₁, ← h.herm w v₂]
@@ -38,8 +37,8 @@ theorem add_left (v₁ v₂ w : V) : φ (v₁ + v₂) w = φ v₁ w + φ v₂ w 
 theorem smul_left (v w : V) (r : ℂ) : φ (r • v) w = star r * φ v w := by
   rw [h.herm w (r • v), h.smul, star_mul', ← h.herm w v]
 
-theorem sum_left {ι : Type*} (s : Finset ι) (c : ι → ℂ) (b : ι → V) (w : V) :
-    φ (∑ k ∈ s, c k • b k) w = ∑ k ∈ s, star (c k) * φ (b k) w := by
+theorem sum_left {ι : Type*} (s : Finset ι) (c : ι → ℂ) (b : ι → V) (w : V)
+    : φ (∑ k ∈ s, c k • b k) w = ∑ k ∈ s, star (c k) * φ (b k) w := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [h.zero_left]

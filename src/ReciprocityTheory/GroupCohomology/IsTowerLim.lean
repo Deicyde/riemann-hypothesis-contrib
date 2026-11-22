@@ -56,12 +56,14 @@ def Hom.H (φ : Hom A B) (n : ℕ) : A.H n →ₗ[R] B.H n :=
     | zero =>
       have hx' : x.1 = 0 := hx
       show φ.f 0 x.1 ∈ (⊥ : Submodule R _)
-      rw [hx', map_zero]; exact Submodule.zero_mem _
+      rw [hx', map_zero]
+      exact Submodule.zero_mem _
     | succ n =>
       obtain ⟨y, hy⟩ := hx
       refine ⟨φ.f n y, ?_⟩
       show B.d n (φ.f n y) = φ.f (n + 1) x.1
-      rw [← φ.comm, hy]; rfl
+      rw [← φ.comm, hy]
+      rfl
 
 def Hom.QuasiIso (φ : Hom A B) : Prop := ∀ n, Function.Bijective (φ.H n)
 
@@ -86,8 +88,9 @@ def FinLen (A : Cx R) (N : ℕ) : Prop :=
 def chi (A : Cx R) (N : ℕ) : ℤ :=
   ∑ n ∈ Finset.range (N + 1), (-1) ^ n * ((Module.length R (A.H n)).toNat : ℤ)
 
-structure IsTowerLim (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (L : Cx R) (π : ∀ m, Hom L (A m)) :
-    Prop where
+structure IsTowerLim
+    (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (L : Cx R) (π : ∀ m, Hom L (A m))
+    : Prop where
   surj : ∀ m n, Function.Surjective ((τ m).f n)
   compat : ∀ m n x, (τ m).f n ((π (m + 1)).f n x) = (π m).f n x
   ext : ∀ n (x : L.X n), (∀ m, (π m).f n x = 0) → x = 0

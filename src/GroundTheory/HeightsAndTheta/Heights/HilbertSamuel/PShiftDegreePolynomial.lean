@@ -19,10 +19,11 @@ noncomputable section
 
 namespace ShiftDegreePolynomial
 
-def toMultilinear {K : Type} {n : ℕ} (f : (Fin n → K → ℤ) → ℤ)
+def toMultilinear
+    {K : Type} {n : ℕ} (f : (Fin n → K → ℤ) → ℤ)
     (hadd : ∀ (bs : Fin n → K → ℤ) (j : Fin n) (x y : K → ℤ),
-      f (Function.update bs j (x + y)) = f (Function.update bs j x) + f (Function.update bs j y)) :
-    MultilinearMap (RingHom.id ℤ) (fun _ : Fin n => K → ℤ) ℤ where
+      f (Function.update bs j (x + y)) = f (Function.update bs j x) + f (Function.update bs j y))
+    : MultilinearMap (RingHom.id ℤ) (fun _ : Fin n => K → ℤ) ℤ where
   toFun := f
   map_update_add' := by
     intro inst m i x y
@@ -33,28 +34,35 @@ def toMultilinear {K : Type} {n : ℕ} (f : (Fin n → K → ℤ) → ℤ)
     obtain rfl : inst = instDecidableEqFin n := Subsingleton.elim _ _
     exact (AddMonoidHom.mk' (fun x => f (Function.update m i x)) (hadd m i)).map_zsmul c x
 
-theorem expand {K : Type} {n : ℕ} (f : (Fin n → K → ℤ) → ℤ)
+theorem expand
+    {K : Type} {n : ℕ} (f : (Fin n → K → ℤ) → ℤ)
     (hadd : ∀ (bs : Fin n → K → ℤ) (j : Fin n) (x y : K → ℤ),
       f (Function.update bs j (x + y)) = f (Function.update bs j x) + f (Function.update bs j y))
-    (q : ℤ) (a b : K → ℤ) :
-    f (fun _ => q • a + b) =
-      ∑ s : Finset (Fin n), q ^ s.card * f (s.piecewise (fun _ => a) (fun _ => b)) := by
+    (q : ℤ) (a b : K → ℤ)
+    : f (fun _ => q • a + b)
+      = ∑ s : Finset (Fin n), q ^ s.card * f (s.piecewise (fun _ => a) (fun _ => b)) := by
   have h1 := (toMultilinear f hadd).map_add_univ (fun _ => q • a) (fun _ => b)
   refine h1.trans (Finset.sum_congr rfl fun s _ => ?_)
-  have h2 := (toMultilinear f hadd).map_piecewise_smul (fun _ => q)
-    (s.piecewise (fun _ => a) (fun _ => b)) s
-  have h3 : s.piecewise (fun i => q • s.piecewise (fun _ => a) (fun _ => b) i)
-      (s.piecewise (fun _ => a) (fun _ => b)) = s.piecewise (fun _ => q • a) (fun _ => b) := by
+  have h2 :=
+    (toMultilinear f hadd).map_piecewise_smul (fun _ => q) (s.piecewise (fun _ => a) (fun _ => b)) s
+  have h3
+      : s.piecewise
+          (fun i => q • s.piecewise (fun _ => a) (fun _ => b) i)
+          (s.piecewise (fun _ => a) (fun _ => b))
+        = s.piecewise (fun _ => q • a) (fun _ => b) := by
     funext i
     by_cases hi : i ∈ s <;> simp [Finset.piecewise, hi]
   rw [h3, Finset.prod_const, RingHom.id_apply, smul_eq_mul] at h2
   exact h2
 
-theorem genericFibre {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} {D : ℕ} (hP : IsArithVar P (D + 1)) :
-    GroundTheory.Heights₂.Heights.NumbersDVR.IsMultiProjPrime (P.map (MvPolynomial.map (Int.castRingHom ℚ))) ∧
-      ringKrullDim (MvPolynomial (Σ k, ι k) ℚ ⧸ P.map (MvPolynomial.map (Int.castRingHom ℚ))) =
-        ((D + Fintype.card K : ℕ) : WithBot ℕ∞) := by
+theorem genericFibre
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {D : ℕ} (hP : IsArithVar P (D + 1))
+    : GroundTheory.Heights₂.Heights.NumbersDVR.IsMultiProjPrime (P.map (MvPolynomial.map
+        (Int.castRingHom ℚ)))
+      ∧ ringKrullDim (MvPolynomial (Σ k, ι k) ℚ ⧸ P.map (MvPolynomial.map (Int.castRingHom ℚ)))
+        = ((D + Fintype.card K : ℕ) : WithBot ℕ∞) := by
   obtain ⟨-, ⟨hPp, ⟨S, hS, hPS⟩, hrel⟩, hhor, hdim⟩ := hP
   have : P.IsPrime := hPp
   have hchar : ∀ m : ℤ, (C m : MvPolynomial (Σ k, ι k) ℤ) ∈ P → m = 0 := by

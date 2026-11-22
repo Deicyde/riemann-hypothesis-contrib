@@ -9,9 +9,11 @@ open scoped TensorProduct
 
 namespace LateralTheory.CohomologicalPurity.Hz
 
-theorem coeq_elem {A S S' : Type} [CommRing A] [CommRing S] [CommRing S'] (φ : A →+* S) (φ' : A →+* S')
-    (I : Ideal A) (u v : S →+* S') (hφ : Good φ I) (hu : u.comp φ = φ') (hv : v.comp φ = φ') :
-    ∃ e : S', (∀ s, (v s - u s) * e = 0) ∧ e - 1 ∈ I.map φ' := by
+theorem coeq_elem
+    {A S S' : Type} [CommRing A] [CommRing S] [CommRing S']
+    (φ : A →+* S) (φ' : A →+* S') (I : Ideal A) (u v : S →+* S')
+    (hφ : Good φ I) (hu : u.comp φ = φ') (hv : v.comp φ = φ')
+    : ∃ e : S', (∀ s, (v s - u s) * e = 0) ∧ e - 1 ∈ I.map φ' := by
   let := φ.toAlgebra
   let := φ'.toAlgebra
   have : Algebra.Etale A S := hφ.etale
@@ -34,16 +36,20 @@ theorem coeq_elem {A S S' : Type} [CommRing A] [CommRing S] [CommRing S'] (φ : 
       obtain ⟨a, ha⟩ := hφ.surj s
       have e1 : v s - u s = v (s - φ a) - u (s - φ a) := by
         have h1 : v (φ a) = u (φ a) := (RingHom.congr_fun hv a).trans (RingHom.congr_fun hu a).symm
-        rw [map_sub, map_sub, h1]; ring
+        rw [map_sub, map_sub, h1]
+        ring
       change Ideal.Quotient.mk _ (v s) = Ideal.Quotient.mk _ (u s)
       rw [Ideal.Quotient.eq, e1]
       exact Ideal.sub_mem _ (hmem _ ha).2 (hmem _ ha).1
-    have hprod : q.comp (Algebra.TensorProduct.productMap u' v') = q.comp (u'.comp (Algebra.TensorProduct.lmul' A)) := by
+    have hprod
+        : q.comp (Algebra.TensorProduct.productMap u' v')
+          = q.comp (u'.comp (Algebra.TensorProduct.lmul' A)) := by
       apply Algebra.TensorProduct.ext'
       intro a b
       have hb := AlgHom.congr_fun hqv b
       simp only [AlgHom.comp_apply, Algebra.TensorProduct.productMap_apply_tmul, map_mul,
-        Algebra.TensorProduct.lmul'_apply_tmul] at hb ⊢
+          Algebra.TensorProduct.lmul'_apply_tmul]
+        at hb ⊢
       rw [hb]
     have h := AlgHom.congr_fun hprod t
     simp only [AlgHom.comp_apply] at h

@@ -34,10 +34,12 @@ def IsSelfDual (H : Sesq V) (Λ : AddSubgroup V) : Prop := dualLat H Λ = Λ
 
 def relIdx (Λ₁ Λ₂ : AddSubgroup V) : ℕ := Λ₁.relIndex Λ₂
 
-def IsIsom {W : Type*} [AddCommGroup W] [Module ℂ W] (H : Sesq V) (H' : Sesq W) (g : V →ₗ[ℂ] W) : Prop :=
+def IsIsom {W : Type*} [AddCommGroup W] [Module ℂ W] (H : Sesq V) (H' : Sesq W) (g : V →ₗ[ℂ] W)
+    : Prop :=
   ∀ x y, H' (g x) (g y) = H x y
 
-def imgLat {W : Type*} [AddCommGroup W] [Module ℂ W] (g : V →ₗ[ℂ] W) (Λ : AddSubgroup V) : AddSubgroup W :=
+def imgLat {W : Type*} [AddCommGroup W] [Module ℂ W] (g : V →ₗ[ℂ] W) (Λ : AddSubgroup V)
+    : AddSubgroup W :=
   Λ.map g.toAddMonoidHom
 
 end General
@@ -49,9 +51,12 @@ section Coordinates
 variable {n : Type*} [Fintype n]
 
 def matH (h : Matrix n n ℂ) : Sesq (n → ℂ) :=
-  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun z w => ∑ i, ∑ j, z i * h i j * conj (w j))
+  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+    (fun z w => ∑ i, ∑ j, z i * h i j * conj (w j))
     (by intro a b c; simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib])
-    (by intro c a b; simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc])
+    (by
+      intro c a b
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc])
     (by intro a b c; simp only [Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib])
     (by
       intro c a b
@@ -75,8 +80,7 @@ def scalePair (L : PeriodPair) (c : ℂ) (hc : c ≠ 0) : PeriodPair where
     rw [LinearIndependent.pair_iff] at h ⊢
     intro s t hst
     apply h s t
-    have : c * (s • L.ω₁ + t • L.ω₂) = 0 := by
-      rw [← hst]; simp only [Complex.real_smul]; ring
+    have : c * (s • L.ω₁ + t • L.ω₂) = 0 := by rw [← hst]; simp only [Complex.real_smul]; ring
     exact (mul_eq_zero.mp this).resolve_left hc
 
 def cmTheta (b : ℤ) (d : ℕ) : ℂ := ((b : ℂ) + Complex.I * ((Real.sqrt d : ℝ) : ℂ)) / 2
@@ -105,26 +109,35 @@ def cmPair (a : ℕ) (b : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) : PeriodPair 
 def cmL (a : ℕ) (b : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0) : PeriodPair :=
   scalePair (cmPair a b d ha hd) lam hlam
 
-def CmOK (a : ℕ) (b c : ℤ) (d : ℕ) : Prop := 4 * (a : ℤ) * c = b ^ 2 + d ∧ Odd a ∧ d % 8 = 7 ∧ d.Prime
+def CmOK (a : ℕ) (b c : ℤ) (d : ℕ) : Prop :=
+  4 * (a : ℤ) * c = b ^ 2 + d ∧ Odd a ∧ d % 8 = 7 ∧ d.Prime
 
 end PI.ULS
 
 namespace PI
 
-
 open PI.ULS in
 def UnimodLocStd : Prop :=
-  ∀ (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0), CmOK a b c d →
-    ∀ (m : Type) [Fintype m] [DecidableEq m] (Λa : AddSubgroup (m → ℂ)),
-      IsSelfDual (stdH (cmL a b d ha hd lam hlam) m) Λa →
-      (∀ x ∈ Λa, cmTheta b d • x ∈ Λa) →
-      relIdx (stdLat (cmL a b d ha hd lam hlam) m) Λa ≠ 0 →
-      relIdx Λa (stdLat (cmL a b d ha hd lam hlam) m) ≠ 0 →
-      ∀ l : ℕ, l.Prime → ∃ δ : (m → ℂ) ≃ₗ[ℂ] (m → ℂ),
-        IsIsom (stdH (cmL a b d ha hd lam hlam) m) (stdH (cmL a b d ha hd lam hlam) m)
-          (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) ∧ (∀ x, δ x = x → x = 0) ∧
-        relIdx (stdLat (cmL a b d ha hd lam hlam) m) (imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa) ≠ 0 ∧
-        ¬ l ∣ relIdx (stdLat (cmL a b d ha hd lam hlam) m) (imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa) ∧
-        relIdx (imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa) (stdLat (cmL a b d ha hd lam hlam) m) ≠ 0
+  ∀ (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0),
+    CmOK a b c d
+      → ∀ (m : Type) [Fintype m] [DecidableEq m] (Λa : AddSubgroup (m → ℂ)),
+        IsSelfDual (stdH (cmL a b d ha hd lam hlam) m) Λa → (∀ x ∈ Λa, cmTheta b d • x ∈ Λa)
+          → relIdx (stdLat (cmL a b d ha hd lam hlam) m) Λa ≠ 0
+          → relIdx Λa (stdLat (cmL a b d ha hd lam hlam) m) ≠ 0
+          → ∀ l : ℕ,
+            l.Prime
+              → ∃ δ : (m → ℂ) ≃ₗ[ℂ] (m → ℂ),
+                IsIsom (stdH (cmL a b d ha hd lam hlam) m) (stdH (cmL a b d ha hd lam hlam) m)
+                    (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ))
+                  ∧ (∀ x, δ x = x → x = 0)
+                  ∧ relIdx (stdLat (cmL a b d ha hd lam hlam) m)
+                      (imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa)
+                    ≠ 0
+                  ∧ ¬ l
+                    ∣ relIdx (stdLat (cmL a b d ha hd lam hlam) m)
+                      (imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa)
+                  ∧ relIdx (imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa)
+                      (stdLat (cmL a b d ha hd lam hlam) m)
+                    ≠ 0
 
 end PI

@@ -16,13 +16,14 @@ variable {k r : ℕ}
 
 def InB (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val < r + k
 
-instance instDecInB (i : Fin (2 * r + k + 1)) : Decidable (InB k r i) := by unfold InB; infer_instance
+instance instDecInB (i : Fin (2 * r + k + 1)) : Decidable (InB k r i) := by
+  unfold InB; infer_instance
 
 def bl (k r : ℕ) (a : Fin k) : Fin (2 * r + k + 1) := ⟨r + a.val, by omega⟩
 
-def sub (k r : ℕ) (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    Matrix (Fin k) (Fin k) ℂ :=
-  fun a b => m (bl k r a) (bl k r b)
+def sub (k r : ℕ) (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Matrix (Fin k) (Fin k) ℂ := fun a b =>
+  m (bl k r a) (bl k r b)
 
 lemma inB_bl (a : Fin k) : InB k r (bl k r a) := by
   have := a.isLt
@@ -251,8 +252,8 @@ lemma bvec_apply (i j : Fin (2 * r + k + 1)) : bvec j i = if i = j then 1 else 0
   simp only [bvec, Pi.single_apply]
 
 def FixEW (k r : ℕ) (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Prop :=
-  (∀ a : Fin r, m *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ m *ᵥ bvec (esI k r a) = bvec (esI k r a)) ∧
-    m *ᵥ bvec (wI k r (Fin.last k)) = bvec (wI k r (Fin.last k))
+  (∀ a : Fin r, m *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ m *ᵥ bvec (esI k r a) = bvec (esI k r a))
+    ∧ m *ᵥ bvec (wI k r (Fin.last k)) = bvec (wI k r (Fin.last k))
 
 lemma fix_col {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hm : FixEW k r m)
     (j : Fin (2 * r + k + 1)) (hj : ¬ InB k r j) (i : Fin (2 * r + k + 1)) :
@@ -306,8 +307,10 @@ lemma fix_row {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU :
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem fix_block {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU : m ∈ UH (Hpk k r))
-    (hm : FixEW k r m) : sub k r m ∈ UJset (allPos k) ∧ m = blockW k r (sub k r m) := by
+theorem fix_block
+    {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (hU : m ∈ UH (Hpk k r)) (hm : FixEW k r m)
+    : sub k r m ∈ UJset (allPos k) ∧ m = blockW k r (sub k r m) := by
   have hb : m = blockW k r (sub k r m) := by
     ext i j
     by_cases hj : InB k r j

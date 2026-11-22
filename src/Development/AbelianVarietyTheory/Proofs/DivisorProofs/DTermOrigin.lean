@@ -17,12 +17,13 @@ def dTerm (φ : I → E →+* ℂ) (k : ℕ) (m : I → ℕ) (z : I → ℂ) (x 
   ∏ i, (((-1 : ℂ) ^ m i * ∏ j ∈ Finset.range (m i), ((k : ℂ) + j)) * (starRingEnd ℂ (φ i x)) ^ m i *
     (defCoord φ z x i)⁻¹ ^ (k + m i))
 
-theorem dTerm_zero (φ : I → E →+* ℂ) (k : ℕ) (z : I → ℂ) (x : E) :
-    dTerm φ k 0 z x = ∏ i, (defCoord φ z x i)⁻¹ ^ k := by
+theorem dTerm_zero (φ : I → E →+* ℂ) (k : ℕ) (z : I → ℂ) (x : E)
+    : dTerm φ k 0 z x = ∏ i, (defCoord φ z x i)⁻¹ ^ k := by
   simp [dTerm]
 
-theorem dTerm_origin (φ : I → E →+* ℂ) (k : ℕ) (m : I → ℕ) (x : E) :
-    dTerm φ k m 0 x = risingFactor k m * ∏ i, ((φ i x)⁻¹ ^ (k + m i) * (starRingEnd ℂ (φ i x)) ^ m i) := by
+theorem dTerm_origin (φ : I → E →+* ℂ) (k : ℕ) (m : I → ℕ) (x : E)
+    : dTerm φ k m 0 x
+      = risingFactor k m * ∏ i, ((φ i x)⁻¹ ^ (k + m i) * (starRingEnd ℂ (φ i x)) ^ m i) := by
   unfold dTerm risingFactor
   rw [← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun i _ => ?_

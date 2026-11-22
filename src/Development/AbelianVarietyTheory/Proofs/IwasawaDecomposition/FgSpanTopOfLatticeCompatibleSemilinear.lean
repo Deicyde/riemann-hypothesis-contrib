@@ -11,7 +11,13 @@ open scoped Matrix ComplexOrder
 
 namespace GlobalTheory
 
-theorem oLatTie_fg_span_top : ∀ {K : Type} [Field K] [NumberField K] [StarRing K] {n : ℕ} (σ : K →+* ℂ) {O : Type} [CommRing O] {φO : O →+* ℂ} {W : Type} [AddCommGroup W] [Module ℂ W] (M : Formalism.BasicNotions.Rows.OLat O φO W) (j : (Fin n → K) →ₛₗ[σ] W) (N : Submodule (𝓞 K) (Fin n → K)), (LinearIndependent ℂ fun i => j (Pi.single i 1)) → Formalism.L2.DIV.OLatTie σ M j N → N.FG ∧ Submodule.span K (N : Set (Fin n → K)) = ⊤ := by
+theorem oLatTie_fg_span_top
+    : ∀ {K : Type} [Field K] [NumberField K] [StarRing K] {n : ℕ} (σ : K →+* ℂ) {O : Type}
+        [CommRing O] {φO : O →+* ℂ} {W : Type} [AddCommGroup W] [Module ℂ W]
+        (M : Formalism.BasicNotions.Rows.OLat O φO W) (j : (Fin n → K) →ₛₗ[σ] W)
+        (N : Submodule (𝓞 K) (Fin n → K)),
+      (LinearIndependent ℂ fun i => j (Pi.single i 1)) → Formalism.L2.DIV.OLatTie σ M j N
+        → N.FG ∧ Submodule.span K (N : Set (Fin n → K)) = ⊤ := by
   intro K _ _ _ n σ O _ φO W _ _ M j N hli hT
   classical
   obtain ⟨hgen, hmem⟩ := hT
@@ -24,7 +30,8 @@ theorem oLatTie_fg_span_top : ∀ {K : Type} [Field K] [NumberField K] [StarRing
     rw [map_smulₛₗ]
     simp
   have hinj : Function.Injective j := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     rw [hj] at hx
     have h0 := Fintype.linearIndependent_iff.1 hli _ hx
@@ -51,7 +58,8 @@ theorem oLatTie_fg_span_top : ∀ {K : Type} [Field K] [NumberField K] [StarRing
   refine ⟨hN ▸ Submodule.fg_span ((M.gen.finite_toSet).image pre), ?_⟩
   rw [hN]
   by_contra hne
-  obtain ⟨f, hf0, hf⟩ := Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
+  obtain ⟨f, hf0, hf⟩ :=
+    Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
   let B := Module.Basis.span hli
   let F0 := B.constr ℂ (fun i => σ (f (Pi.single i 1)))
   obtain ⟨F, hFF⟩ := LinearMap.exists_extend F0
@@ -79,8 +87,7 @@ theorem oLatTie_fg_span_top : ∀ {K : Type} [Field K] [NumberField K] [StarRing
     rw [← hpre v hv, hF]
     have : f (pre v) ∈ (⊥ : Submodule K K) := by
       rw [← hf]
-      exact Submodule.mem_map_of_mem
-        (Submodule.subset_span (Submodule.subset_span ⟨v, hv, rfl⟩))
+      exact Submodule.mem_map_of_mem (Submodule.subset_span (Submodule.subset_span ⟨v, hv, rfl⟩))
     rw [(Submodule.mem_bot K).1 this]
     simp
   apply hf0

@@ -11,9 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 set_option autoImplicit false
 
@@ -21,20 +23,39 @@ noncomputable section
 
 namespace GlobalTheory.IdealPull
 
-theorem germ_appLE {X Y : Scheme.{0}} (t : Y ⟶ X) (U : X.Opens) (V : Y.Opens) (hV : V ≤ t ⁻¹ᵁ U)
-    (y : Y) (hy : y ∈ V) (a : Γ(X, U)) :
-    (Y.presheaf.germ V y hy).hom ((t.appLE U V hV).hom a) =
-      (t.stalkMap y).hom ((X.presheaf.germ U (t y) (show t y ∈ U from hV hy)).hom a) := by
+theorem germ_appLE
+    {X Y : Scheme.{0}}
+    (t : Y ⟶ X) (U : X.Opens) (V : Y.Opens) (hV : V ≤ t ⁻¹ᵁ U) (y : Y) (hy : y ∈ V) (a : Γ(X, U))
+    : (Y.presheaf.germ V y hy).hom ((t.appLE U V hV).hom a)
+      = (t.stalkMap y).hom ((X.presheaf.germ U (t y) (show t y ∈ U from hV hy)).hom a) := by
   show (Y.presheaf.germ V y hy).hom (resG Y hV ((t.app U).hom a)) = _
   rw [germ_resG]
   exact (Scheme.Hom.germ_stalkMap_apply t U y _ a).symm
 
-theorem regAt_and_unitAt_div_gen : ∀ (Y₀ Y₁ : Scheme.{0}) [IsIntegral Y₁] (t : Y₁ ⟶ Y₀) (I : Y₀.IdealSheafData) (y : Y₁) (U : Y₀.Opens) (hx : t y ∈ U) (n : ℕ) (b : Fin n → Γ(Y₀, U)), (∀ (k : Fin n) (W : Y₀.affineOpens) (h : W.1 ≤ U), resG Y₀ h (b k) ∈ I.ideal W) → (∀ (W : Y₀.affineOpens) (hxW : t y ∈ W.1) (a : Γ(Y₀, W.1)), a ∈ I.ideal W → Y₀.presheaf.germ W.1 (t y) hxW a ∈ Ideal.span (Set.range fun k => Y₀.presheaf.germ U (t y) hx (b k))) → ∀ (U' : Y₁.affineOpens) (f : Γ(Y₁, U'.1)) (hyU' : y ∈ U'.1), fnOf U'.1 (gen_mem hyU') f ≠ 0 → (I.comap t).ideal U' = Ideal.span {f} → ∀ (V : Y₁.Opens) (hV : V ≤ t ⁻¹ᵁ U) (hyV : y ∈ V), (∀ k, RegAt y (fnOf V (gen_mem hyV) (t.appLE U V hV (b k)) / fnOf U'.1 (gen_mem hyU') f)) ∧ ∃ k, UnitAt y (fnOf V (gen_mem hyV) (t.appLE U V hV (b k)) / fnOf U'.1 (gen_mem hyU') f) := by
+theorem regAt_and_unitAt_div_gen
+    : ∀ (Y₀ Y₁ : Scheme.{0}) [IsIntegral Y₁] (t : Y₁ ⟶ Y₀) (I : Y₀.IdealSheafData) (y : Y₁)
+        (U : Y₀.Opens) (hx : t y ∈ U) (n : ℕ) (b : Fin n → Γ(Y₀, U)),
+      (∀ (k : Fin n) (W : Y₀.affineOpens) (h : W.1 ≤ U), resG Y₀ h (b k) ∈ I.ideal W)
+        → (∀ (W : Y₀.affineOpens) (hxW : t y ∈ W.1) (a : Γ(Y₀, W.1)),
+          a ∈ I.ideal W
+            → Y₀.presheaf.germ W.1 (t y) hxW a
+              ∈ Ideal.span (Set.range fun k => Y₀.presheaf.germ U (t y) hx (b k)))
+        → ∀ (U' : Y₁.affineOpens) (f : Γ(Y₁, U'.1)) (hyU' : y ∈ U'.1),
+          fnOf U'.1 (gen_mem hyU') f ≠ 0 → (I.comap t).ideal U' = Ideal.span {f}
+            → ∀ (V : Y₁.Opens) (hV : V ≤ t ⁻¹ᵁ U) (hyV : y ∈ V),
+              (∀ k,
+                  RegAt y
+                    (fnOf V (gen_mem hyV) (t.appLE U V hV (b k)) / fnOf U'.1 (gen_mem hyU') f))
+                ∧ ∃ k,
+                  UnitAt y
+                    (fnOf V (gen_mem hyV) (t.appLE U V hV (b k)) / fnOf U'.1 (gen_mem hyU') f) := by
   intro Y₀ Y₁ _ t I y U hx n b hb hgerm U' f hyU' hf0 hU' V hV hyV
-  obtain ⟨_, ⟨W, hWa, rfl⟩, hxW, hWU⟩ := Y₀.isBasis_affineOpens.exists_subset_of_mem_open hx U.isOpen
+  obtain ⟨_, ⟨W, hWa, rfl⟩, hxW, hWU⟩ :=
+    Y₀.isBasis_affineOpens.exists_subset_of_mem_open hx U.isOpen
   have hWU' : W ≤ U := hWU
-  obtain ⟨_, ⟨V₀, hV₀a, rfl⟩, hyV₀, hV₀le⟩ := Y₁.isBasis_affineOpens.exists_subset_of_mem_open
-    (show y ∈ U'.1 ⊓ t ⁻¹ᵁ W from ⟨hyU', hxW⟩) (U'.1 ⊓ t ⁻¹ᵁ W).isOpen
+  obtain ⟨_, ⟨V₀, hV₀a, rfl⟩, hyV₀, hV₀le⟩ :=
+    Y₁.isBasis_affineOpens.exists_subset_of_mem_open (show y ∈ U'.1 ⊓ t ⁻¹ᵁ W from ⟨hyU', hxW⟩)
+      (U'.1 ⊓ t ⁻¹ᵁ W).isOpen
   have hV₀U' : V₀ ≤ U'.1 := fun z hz => (hV₀le hz).1
   have hV₀W : V₀ ≤ t ⁻¹ᵁ W := fun z hz => (hV₀le hz).2
   let R := Y₁.presheaf.stalk y
@@ -71,8 +92,10 @@ theorem regAt_and_unitAt_div_gen : ∀ (Y₀ Y₁ : Scheme.{0}) [IsIntegral Y₁
     exact h3
   have hfK : algebraMap R Y₁.functionField g = fnOf U'.1 (gen_mem hyU') f := algebraMap_germ hyU' f
   have hg0 : g ≠ 0 := fun h => hf0 (by rw [← hfK, h, map_zero])
-  have hFk : ∀ k, fnOf V (gen_mem hyV) (t.appLE U V hV (b k)) / fnOf U'.1 (gen_mem hyU') f =
-      algebraMap R Y₁.functionField (c k) := by
+  have hFk
+      : ∀ k,
+        fnOf V (gen_mem hyV) (t.appLE U V hV (b k)) / fnOf U'.1 (gen_mem hyU') f
+          = algebraMap R Y₁.functionField (c k) := by
     intro k
     rw [← algebraMap_germ hyV, ← hfK, germ_appLE]
     change algebraMap R _ (β k) / _ = _
@@ -88,8 +111,9 @@ theorem regAt_and_unitAt_div_gen : ∀ (Y₀ Y₁ : Scheme.{0}) [IsIntegral Y₁
   obtain ⟨k, hk⟩ : ∃ k, IsUnit (c k) := by
     by_contra hcon
     push_neg at hcon
-    have : (1 : R) ∈ IsLocalRing.maximalIdeal R := hsum ▸ Ideal.sum_mem _ fun k _ =>
-      Ideal.mul_mem_left _ _ ((IsLocalRing.mem_maximalIdeal _).2 (hcon k))
+    have : (1 : R) ∈ IsLocalRing.maximalIdeal R :=
+      hsum ▸ Ideal.sum_mem _ fun k _ =>
+        Ideal.mul_mem_left _ _ ((IsLocalRing.mem_maximalIdeal _).2 (hcon k))
     exact (Ideal.ne_top_iff_one _).1 (IsLocalRing.maximalIdeal.isMaximal R).ne_top this
   exact ⟨k, c k, hk, (hFk k).symm⟩
 

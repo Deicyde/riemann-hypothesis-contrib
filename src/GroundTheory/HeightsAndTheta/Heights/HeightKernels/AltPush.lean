@@ -31,23 +31,22 @@ theorem antisym_eq_sum (H : MvPolynomial ι ℚ) : antisym H = ∑ w, sgnP w * r
   rfl
 
 omit [DecidableEq ι] in
-theorem rename_permTerm (e : ι → ℕ) (w π : Equiv.Perm ι) :
-    rename w (permTerm e π) = permTerm e (w * π) := by
+theorem rename_permTerm (e : ι → ℕ) (w π : Equiv.Perm ι)
+    : rename w (permTerm e π) = permTerm e (w * π) := by
   simp [permTerm, map_prod, rename_X, Equiv.Perm.mul_apply]
 
 theorem permSign_mul₂ (a b : Equiv.Perm ι) : sgnP (a * b) = sgnP a * sgnP b := by
   simp [sgnP, Equiv.Perm.sign_mul]
 
-theorem permSign_inv₂ (a : Equiv.Perm ι) : sgnP a⁻¹ = sgnP a := by
-  simp [sgnP, Equiv.Perm.sign_inv]
+theorem permSign_inv₂ (a : Equiv.Perm ι) : sgnP a⁻¹ = sgnP a := by simp [sgnP, Equiv.Perm.sign_inv]
 
 theorem permSign_mul_self₂ (a : Equiv.Perm ι) : sgnP a * sgnP a = 1 := by
   unfold sgnP
   rw [← Int.cast_mul, ← Units.val_mul, Int.units_mul_self]
   simp
 
-theorem antisym_permTerm (e : ι → ℕ) (π : Equiv.Perm ι) :
-    antisym (permTerm e π) = sgnP π * alternant e := by
+theorem antisym_permTerm (e : ι → ℕ) (π : Equiv.Perm ι)
+    : antisym (permTerm e π) = sgnP π * alternant e := by
   rw [antisym_eq_sum, alternant_eq_sum, mul_sum]
   simp_rw [rename_permTerm]
   refine (Equiv.sum_comp (Equiv.mulRight π⁻¹) _).symm.trans ?_
@@ -55,25 +54,25 @@ theorem antisym_permTerm (e : ι → ℕ) (π : Equiv.Perm ι) :
   simp only [Equiv.coe_mulRight, inv_mul_cancel_right, permSign_mul₂, permSign_inv₂]
   ring
 
-theorem antisym_sum {κ : Type*} (s : Finset κ) (f : κ → MvPolynomial ι ℚ) :
-    antisym (∑ x ∈ s, f x) = ∑ x ∈ s, antisym (f x) := by
+theorem antisym_sum {κ : Type*} (s : Finset κ) (f : κ → MvPolynomial ι ℚ)
+    : antisym (∑ x ∈ s, f x) = ∑ x ∈ s, antisym (f x) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [antisym, map_sum, smul_sum]
   rw [sum_comm]
 
-theorem antisym_sign_mul (a : Equiv.Perm ι) (p : MvPolynomial ι ℚ) :
-    antisym (sgnP a * p) = sgnP a * antisym p := by
+theorem antisym_sign_mul (a : Equiv.Perm ι) (p : MvPolynomial ι ℚ)
+    : antisym (sgnP a * p) = sgnP a * antisym p := by
   simp only [antisym_eq_sum, map_mul, sgnP, map_intCast, mul_sum]
   refine sum_congr rfl fun w _ => ?_
   ring
 
 variable {r s : ℕ}
 
-theorem rename_mul_rename (α : Fin r → ℕ) (β : Fin s → ℕ) :
-    rename (Sum.inl : Fin r → Fin r ⊕ Fin s) (alternant α) *
-        rename (Sum.inr : Fin s → Fin r ⊕ Fin s) (alternant β) =
-      ∑ σ : Equiv.Perm (Fin r), ∑ τ : Equiv.Perm (Fin s),
-        sgnP (Equiv.Perm.sumCongr σ τ) * permTerm (Sum.elim α β) (Equiv.Perm.sumCongr σ τ) := by
+theorem rename_mul_rename (α : Fin r → ℕ) (β : Fin s → ℕ)
+    : rename (Sum.inl : Fin r → Fin r ⊕ Fin s) (alternant α)
+        * rename (Sum.inr : Fin s → Fin r ⊕ Fin s) (alternant β)
+      = ∑ σ : Equiv.Perm (Fin r), ∑ τ : Equiv.Perm (Fin s),
+          sgnP (Equiv.Perm.sumCongr σ τ) * permTerm (Sum.elim α β) (Equiv.Perm.sumCongr σ τ) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [alternant_eq_sum, alternant_eq_sum, map_sum, map_sum, sum_mul_sum]
   refine sum_congr rfl fun σ _ => sum_congr rfl fun τ _ => ?_
@@ -82,10 +81,11 @@ theorem rename_mul_rename (α : Fin r → ℕ) (β : Fin s → ℕ) :
     Equiv.Perm.sumCongr_apply, Sum.map_inl, Sum.map_inr, Sum.elim_inl, Sum.elim_inr]
   ring
 
-theorem antisym_rename_mul_rename (α : Fin r → ℕ) (β : Fin s → ℕ) :
-    antisym (rename (Sum.inl : Fin r → Fin r ⊕ Fin s) (alternant α) *
-        rename (Sum.inr : Fin s → Fin r ⊕ Fin s) (alternant β)) =
-      ((r.factorial : ℚ) * s.factorial) • alternant (Sum.elim α β) := by
+theorem antisym_rename_mul_rename (α : Fin r → ℕ) (β : Fin s → ℕ)
+    : antisym
+        (rename (Sum.inl : Fin r → Fin r ⊕ Fin s) (alternant α)
+          * rename (Sum.inr : Fin s → Fin r ⊕ Fin s) (alternant β))
+      = ((r.factorial : ℚ) * s.factorial) • alternant (Sum.elim α β) := by
   rw [rename_mul_rename, antisym_sum]
   simp_rw [antisym_sum, antisym_sign_mul, antisym_permTerm, ← mul_assoc, permSign_mul_self₂, one_mul]
   simp only [sum_const, card_univ, Fintype.card_perm, Fintype.card_fin]

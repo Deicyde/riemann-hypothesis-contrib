@@ -10,7 +10,6 @@ open Matrix DoubleCoset
 
 variable {n : ℕ} {k : Type*} [Field k]
 
-
 variable (n k) in
 def borel : Subgroup (GL (Fin n) k) where
   carrier := {g | (g : Matrix (Fin n) (Fin n) k).IsUpperTriangular}
@@ -31,7 +30,6 @@ def borel : Subgroup (GL (Fin n) k) where
 lemma mem_borel_iff (g : GL (Fin n) k) :
     g ∈ borel n k ↔ ∀ i j : Fin n, j < i → (g : Matrix (Fin n) (Fin n) k) i j = 0 :=
   Iff.rfl
-
 
 variable (k) in
 noncomputable def permGL : Equiv.Perm (Fin n) →* GL (Fin n) k :=
@@ -92,8 +90,8 @@ lemma perm_eq_one_of_forall_le (π : Equiv.Perm (Fin n)) (h : ∀ x, π x ≤ x)
   exact Equiv.ext fun x => by simpa using Fin.ext (heq x (Finset.mem_univ _))
 
 def RowsReduced (M : Matrix (Fin n) (Fin n) k) (t : ℕ) : Prop :=
-  ∃ p : Fin n → Fin n, ∀ i : Fin n, t ≤ i.val →
-    M i (p i) ≠ 0 ∧ (∀ c, c ≠ p i → M i c = 0) ∧ (∀ r, r ≠ i → M r (p i) = 0)
+  ∃ p : Fin n → Fin n, ∀ i : Fin n,
+    t ≤ i.val → M i (p i) ≠ 0 ∧ (∀ c, c ≠ p i → M i c = 0) ∧ (∀ r, r ≠ i → M r (p i) = 0)
 
 lemma rowsReduced_step (h : GL (Fin n) k) (t : ℕ) (ht : t < n)
     (hred : RowsReduced (h : Matrix (Fin n) (Fin n) k) (t + 1)) :
@@ -263,10 +261,13 @@ lemma exists_eq_mul_permGL_of_rowsReduced (g : GL (Fin n) k)
     rw [← hτ, e]
     simp
 
-theorem exists_mem_doubleCoset_permGL (g : GL (Fin n) k) :
-    ∃ σ : Equiv.Perm (Fin n), g ∈ doubleCoset (permGL k σ) (borel n k) (borel n k) := by
-  have key : ∀ d, d ≤ n → ∃ b₁ ∈ borel n k, ∃ b₂ ∈ borel n k,
-      RowsReduced ((b₁ * g * b₂ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) (n - d) := by
+theorem exists_mem_doubleCoset_permGL (g : GL (Fin n) k)
+    : ∃ σ : Equiv.Perm (Fin n), g ∈ doubleCoset (permGL k σ) (borel n k) (borel n k) := by
+  have key
+      : ∀ d,
+        d ≤ n
+          → ∃ b₁ ∈ borel n k, ∃ b₂ ∈ borel n k,
+            RowsReduced ((b₁ * g * b₂ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) (n - d) := by
     intro d
     induction d with
     | zero =>
@@ -285,17 +286,28 @@ theorem exists_mem_doubleCoset_permGL (g : GL (Fin n) k) :
   obtain ⟨b₁, hb₁, b₂, hb₂, hred⟩ := key n le_rfl
   rw [Nat.sub_self] at hred
   obtain ⟨σ, b, hb, hgb⟩ := exists_eq_mul_permGL_of_rowsReduced _ hred
-  refine ⟨σ, mem_doubleCoset.mpr ⟨b₁⁻¹ * b, (borel n k).mul_mem ((borel n k).inv_mem hb₁) hb,
-    b₂⁻¹, (borel n k).inv_mem hb₂, ?_⟩⟩
+  refine ⟨
+    σ,
+    mem_doubleCoset.mpr ⟨
+      b₁⁻¹ * b,
+      (borel n k).mul_mem ((borel n k).inv_mem hb₁) hb,
+      b₂⁻¹,
+      (borel n k).inv_mem hb₂,
+      ?_
+    ⟩
+  ⟩
   rw [mul_assoc b₁⁻¹, ← hgb]
   group
 
-theorem eq_of_permGL_mem_doubleCoset {σ τ : Equiv.Perm (Fin n)}
-    (h : permGL k τ ∈ doubleCoset (permGL k σ) (borel n k) (borel n k)) : σ = τ := by
+theorem eq_of_permGL_mem_doubleCoset
+    {σ τ : Equiv.Perm (Fin n)} (h : permGL k τ ∈ doubleCoset (permGL k σ) (borel n k) (borel n k))
+    : σ = τ := by
   obtain ⟨x, hx, y, hy, hxy⟩ := mem_doubleCoset.mp h
   have hy' : y⁻¹ ∈ borel n k := (borel n k).inv_mem hy
-  have hmat : (x : Matrix (Fin n) (Fin n) k) * (permGL k σ : Matrix (Fin n) (Fin n) k) =
-      (permGL k τ : Matrix (Fin n) (Fin n) k) * ((y⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
+  have hmat
+      : (x : Matrix (Fin n) (Fin n) k) * (permGL k σ : Matrix (Fin n) (Fin n) k)
+        = (permGL k τ : Matrix (Fin n) (Fin n) k)
+          * ((y⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
     rw [← Units.val_mul, ← Units.val_mul, hxy]
     congr 1
     group
@@ -308,16 +320,18 @@ theorem eq_of_permGL_mem_doubleCoset {σ τ : Equiv.Perm (Fin n)}
     have h0 := (mem_borel_iff x).mp hx (τ a) (σ a) hlt
     rw [hent, show τ⁻¹ (τ a) = a from τ.symm_apply_apply a] at h0
     exact borel_diag_ne_zero hy' a h0
-  have hπ := perm_eq_one_of_forall_le (τ * σ⁻¹) (fun x => by
-    simpa using hle (σ⁻¹ x))
+  have hπ := perm_eq_one_of_forall_le (τ * σ⁻¹) (fun x => by simpa using hle (σ⁻¹ x))
   have := congrArg (· * σ) hπ
   simpa using this.symm
 
-theorem doubleCoset_permGL_injective {σ τ : Equiv.Perm (Fin n)} {g : GL (Fin n) k}
+theorem doubleCoset_permGL_injective
+    {σ τ : Equiv.Perm (Fin n)} {g : GL (Fin n) k}
     (hσ : g ∈ doubleCoset (permGL k σ) (borel n k) (borel n k))
-    (hτ : g ∈ doubleCoset (permGL k τ) (borel n k) (borel n k)) : σ = τ := by
-  have e : doubleCoset (permGL k σ) (borel n k) (borel n k) =
-      doubleCoset (permGL k τ) (borel n k) (borel n k) :=
+    (hτ : g ∈ doubleCoset (permGL k τ) (borel n k) (borel n k))
+    : σ = τ := by
+  have e
+      : doubleCoset (permGL k σ) (borel n k) (borel n k)
+        = doubleCoset (permGL k τ) (borel n k) (borel n k) :=
     (doubleCoset_eq_of_mem hσ).symm.trans (doubleCoset_eq_of_mem hτ)
   have hmem := mem_doubleCoset_self (borel n k) (borel n k) (permGL k τ)
   rw [← e] at hmem

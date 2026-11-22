@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.exists_vert :
-    ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E}, Good q T → ∀ x ∈ posDual T, ∃ v : Vert q, x ∈ normalCone q v.1 := by
+theorem UpperTheory.V.ConeExtensionAcyclic.exists_vert
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+        {q : Y → E →L[ℝ] ℝ} {T : Set E},
+      Good q T → ∀ x ∈ posDual T, ∃ v : Vert q, x ∈ normalCone q v.1 := by
   intro E Y _ _ _ q T hG x hx
   obtain ⟨h0, hh0⟩ := hG.nonempty
   have hK := sublevel hG x hx (x h0)

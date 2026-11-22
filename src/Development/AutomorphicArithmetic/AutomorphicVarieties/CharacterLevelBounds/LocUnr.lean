@@ -11,40 +11,54 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 
-private theorem not_both {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {p l : ℕ} (h : Nat.Coprime p l)
-    (hp : A.valuation (p : Ω) < 1) : ¬ A.valuation (l : Ω) < 1 := by
+private theorem not_both
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {p l : ℕ} (h : Nat.Coprime p l) (hp : A.valuation (p : Ω) < 1)
+    : ¬ A.valuation (l : Ω) < 1 := by
   intro hl
-  have hg : ((Nat.gcd p l : ℕ) : ℤ) = (p : ℤ) * Nat.gcdA p l + (l : ℤ) * Nat.gcdB p l := Nat.gcd_eq_gcd_ab p l
+  have hg : ((Nat.gcd p l : ℕ) : ℤ) = (p : ℤ) * Nat.gcdA p l + (l : ℤ) * Nat.gcdB p l :=
+    Nat.gcd_eq_gcd_ab p l
   rw [h.gcd_eq_one, Nat.cast_one] at hg
   have hΩ : (1 : Ω) = (p : Ω) * ((Nat.gcdA p l : ℤ) : Ω) + (l : Ω) * ((Nat.gcdB p l : ℤ) : Ω) := by
     have := congrArg (fun z : ℤ => (z : Ω)) hg
     push_cast at this
     exact this
-  have hint : ∀ z : ℤ, A.valuation (z : Ω) ≤ 1 := fun z => A.valuation_le_one ⟨(z : Ω), intCast_mem A z⟩
+  have hint : ∀ z : ℤ, A.valuation (z : Ω) ≤ 1 := fun z =>
+    A.valuation_le_one ⟨(z : Ω), intCast_mem A z⟩
   have h1 : A.valuation ((p : Ω) * ((Nat.gcdA p l : ℤ) : Ω)) < 1 := by
     rw [Valuation.map_mul]
-    calc A.valuation (p : Ω) * A.valuation ((Nat.gcdA p l : ℤ) : Ω) ≤ A.valuation (p : Ω) * 1 := by
-          gcongr
-          exact hint _
+    calc
+      A.valuation (p : Ω) * A.valuation ((Nat.gcdA p l : ℤ) : Ω) ≤ A.valuation (p : Ω) * 1 := by
+        gcongr
+        exact hint _
       _ < 1 := by rw [mul_one]; exact hp
   have h2 : A.valuation ((l : Ω) * ((Nat.gcdB p l : ℤ) : Ω)) < 1 := by
     rw [Valuation.map_mul]
-    calc A.valuation (l : Ω) * A.valuation ((Nat.gcdB p l : ℤ) : Ω) ≤ A.valuation (l : Ω) * 1 := by
-          gcongr
-          exact hint _
+    calc
+      A.valuation (l : Ω) * A.valuation ((Nat.gcdB p l : ℤ) : Ω) ≤ A.valuation (l : Ω) * 1 := by
+        gcongr
+        exact hint _
       _ < 1 := by rw [mul_one]; exact hl
   have h3 := Valuation.map_add_lt A.valuation h1 h2
   rw [← hΩ, Valuation.map_one] at h3
   exact lt_irrefl _ h3
 
-theorem UpperTheory.V.Chr.locUnr :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (e n : ℕ) (ψ : G ℚ Ω →* Oˣ), e ≠ 0 → n ≠ 0 → IsOpen (ψ.ker : Set (G ℚ Ω)) → ψ ^ n = 1 →
-          ∀ (p : ℕ) (A : ValuationSubring Ω), p.Prime → p ≠ l → A.valuation (p : Ω) < 1 →
-          ∀ (U' U : Subgroup (G ℚ Ω)) (h : U' ≤ U), U' = Ine (F := ℚ) A → U = Dec (F := ℚ) A →
-          Module.length O (LinearMap.ker (resU (rho l e ψ) h)) ≤ (n.factorization l : ℕ∞) * eO l O ∧
-            (U' ≤ ψ.ker → Function.Injective (resU (rho l e ψ) h)) := by
+theorem UpperTheory.V.Chr.locUnr
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type)
+        [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
+        [Module.Finite ℤ_[l] O] (e n : ℕ) (ψ : G ℚ Ω →* Oˣ),
+      e ≠ 0 → n ≠ 0 → IsOpen (ψ.ker : Set (G ℚ Ω)) → ψ ^ n = 1
+        → ∀ (p : ℕ) (A : ValuationSubring Ω),
+          p.Prime → p ≠ l → A.valuation (p : Ω) < 1
+            → ∀ (U' U : Subgroup (G ℚ Ω)) (h : U' ≤ U),
+              U' = Ine (F := ℚ) A → U = Dec (F := ℚ) A
+                → Module.length O (LinearMap.ker (resU (rho l e ψ) h))
+                    ≤ (n.factorization l : ℕ∞) * eO l O
+                  ∧ (U' ≤ ψ.ker → Function.Injective (resU (rho l e ψ) h)) := by
   intro Ω _ _ _ l _ O _ _ _ _ _ e n ψ he hn hopen hpow p A hp hpl hAp U' U h hU' hU
   subst hU' hU
   obtain ⟨hnorm, _, γ, hγ, hcl, hcyc⟩ := decCyc Ω p A hp hAp
@@ -62,7 +76,8 @@ theorem UpperTheory.V.Chr.locUnr :
       rw [hkk]
       exact hopen
     exact (contTw ℚ Ω l).2.2 O ψ⁻¹ (-(e : ℤ)) hk
-  have hK := kerResCyc O (G ℚ Ω) (QO l O) (rho l e ψ) hcont (Ine (F := ℚ) A) (Dec (F := ℚ) A) h γ hγ hcl
+  have hK :=
+    kerResCyc O (G ℚ Ω) (QO l O) (rho l e ψ) hcont (Ine (F := ℚ) A) (Dec (F := ℚ) A) h γ hγ hcl
   have hact : ∀ g m, rho l e ψ g m = (((ψ g)⁻¹ * (chiO ℚ Ω l O g) ^ (-(e : ℤ)) : Oˣ) : O) • m := by
     intro g m
     rw [rho, twist₂, scalRep_apply]
@@ -90,8 +105,8 @@ theorem UpperTheory.V.Chr.locUnr :
       have hcU : c = 1 := Units.ext (sub_eq_zero.mp h0)
       have h2 : c ^ n = 1 := by rw [hcU, one_pow]
       have key : (chiO ℚ Ω l O γ) ^ (e * n) = (c ^ n)⁻¹ := by
-        rw [hcdef, mul_pow, inv_pow, hψn γ, inv_one, one_mul, ← zpow_natCast, ← zpow_natCast, ← zpow_mul,
-          ← zpow_neg]
+        rw [hcdef, mul_pow, inv_pow, hψn γ, inv_one, one_mul, ← zpow_natCast, ← zpow_natCast,
+          ← zpow_mul, ← zpow_neg]
         congr 1
         push_cast
         ring
@@ -123,15 +138,21 @@ theorem UpperTheory.V.Chr.locUnr :
       rw [MonoidHom.mem_ker]
       have : ((ψ g)⁻¹ : Oˣ) = 1 := Units.ext h1
       exact inv_eq_one.mp this
-    have hsub : H0U (rho l e ψ) (Ine (F := ℚ) A) ≤ ((ζ - 1) • LinearMap.id : QO l O →ₗ[O] QO l O).ker := by
+    have hsub
+        : H0U (rho l e ψ) (Ine (F := ℚ) A)
+          ≤ ((ζ - 1) • LinearMap.id : QO l O →ₗ[O] QO l O).ker := by
       intro m hm
       rw [H0U, mem_riemannRochSpace_iff_regularAt_everywhere] at hm
       have h1 := hm ⟨g, hg⟩
       rw [MonoidHom.comp_apply, Subgroup.coe_subtype, hact, hchiIne g hg] at h1
       simp only [one_zpow, mul_one] at h1
-      rw [LinearMap.mem_ker, LinearMap.smul_apply, LinearMap.id_apply, sub_smul, one_smul, hζdef, h1, sub_self]
-    have hbound : Module.length O (H0U (rho l e ψ) (Ine (F := ℚ) A)) ≤ (n.factorization l : ℕ∞) * eO l O := by
-      refine (Module.length_le_of_injective (Submodule.inclusion hsub) (Submodule.inclusion_injective hsub)).trans ?_
+      rw [LinearMap.mem_ker, LinearMap.smul_apply, LinearMap.id_apply, sub_smul, one_smul, hζdef,
+        h1, sub_self]
+    have hbound
+        : Module.length O (H0U (rho l e ψ) (Ine (F := ℚ) A))
+          ≤ (n.factorization l : ℕ∞) * eO l O := by
+      refine (Module.length_le_of_injective (Submodule.inclusion hsub)
+        (Submodule.inclusion_injective hsub)).trans ?_
       rw [(qoFacts l O).2.2.2]
       exact hζ ζ hζn hζ1
     have hfin : Module.length O (H0U (rho l e ψ) (Ine (F := ℚ) A)) ≠ ⊤ :=
@@ -141,5 +162,6 @@ theorem UpperTheory.V.Chr.locUnr :
       rw [H0U, mem_riemannRochSpace_iff_regularAt_everywhere] at hm ⊢
       intro g
       exact hm ⟨g, h g.2⟩
-    exact (hK.1 hfin).trans ((Module.length_le_of_injective (Submodule.inclusion hmono)
-      (Submodule.inclusion_injective hmono)).trans hbound)
+    exact (hK.1 hfin).trans
+      ((Module.length_le_of_injective (Submodule.inclusion hmono)
+        (Submodule.inclusion_injective hmono)).trans hbound)

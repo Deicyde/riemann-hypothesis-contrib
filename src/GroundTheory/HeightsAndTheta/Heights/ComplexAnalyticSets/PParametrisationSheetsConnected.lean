@@ -13,13 +13,15 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Filter MeasureTheory
 
-theorem exists_clm_ne_zero_of_countable {σ : Type} [Fintype σ] {T : Set (σ → ℂ)} (hT : T.Countable)
-    (h0 : (0 : σ → ℂ) ∉ T) : ∃ ℓ : (σ → ℂ) →L[ℂ] ℂ, ∀ u ∈ T, ℓ u ≠ 0 := by
+theorem exists_clm_ne_zero_of_countable
+    {σ : Type} [Fintype σ] {T : Set (σ → ℂ)} (hT : T.Countable) (h0 : (0 : σ → ℂ) ∉ T)
+    : ∃ ℓ : (σ → ℂ) →L[ℂ] ℂ, ∀ u ∈ T, ℓ u ≠ 0 := by
   classical
-  let φ : (σ → ℂ) → ((σ → ℂ) →ₗ[ℝ] ℂ) := fun u =>
-    { toFun := fun v => ∑ i, v i * u i
-      map_add' := fun a b => by simp [add_mul, Finset.sum_add_distrib]
-      map_smul' := fun c a => by simp [Finset.mul_sum, mul_assoc] }
+  let φ : (σ → ℂ) → ((σ → ℂ) →ₗ[ℝ] ℂ) := fun u => {
+    toFun := fun v => ∑ i, v i * u i
+    map_add' := fun a b => by simp [add_mul, Finset.sum_add_distrib]
+    map_smul' := fun c a => by simp [Finset.mul_sum, mul_assoc]
+  }
   have hφ : ∀ u v, φ u v = ∑ i, v i * u i := fun _ _ => rfl
   have hker : ∀ u ∈ T, volume (LinearMap.ker (φ u) : Set (σ → ℂ)) = 0 := by
     intro u hu
@@ -37,7 +39,8 @@ theorem exists_clm_ne_zero_of_countable {σ : Type} [Fintype σ] {T : Set (σ �
   obtain ⟨v, hv⟩ : ∃ v, v ∉ ⋃ u ∈ T, (LinearMap.ker (φ u) : Set (σ → ℂ)) := by
     by_contra h
     push Not at h
-    have hu : (Set.univ : Set (σ → ℂ)) ⊆ ⋃ u ∈ T, (LinearMap.ker (φ u) : Set (σ → ℂ)) := fun x _ => h x
+    have hu : (Set.univ : Set (σ → ℂ)) ⊆ ⋃ u ∈ T, (LinearMap.ker (φ u) : Set (σ → ℂ)) := fun x _ =>
+      h x
     have hpos := isOpen_univ.measure_pos (volume : Measure (σ → ℂ)) Set.univ_nonempty
     exact hpos.ne' (measure_mono_null hu hnull)
   refine ⟨∑ i, v i • ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) i, fun u hu => ?_⟩
@@ -45,8 +48,9 @@ theorem exists_clm_ne_zero_of_countable {σ : Type} [Fintype σ] {T : Set (σ �
   rw [hφ] at hvu
   simpa [ContinuousLinearMap.sum_apply] using hvu
 
-theorem ParametrisationSheetsConnected.proof (h₁ : SheetPieceProductAnalytic.Statement)
-    (h₂ : SheetPieceReachesCentre.Statement) : ParametrisationSheetsConnected.Statement := by
+theorem ParametrisationSheetsConnected.proof
+    (h₁ : SheetPieceProductAnalytic.Statement) (h₂ : SheetPieceReachesCentre.Statement)
+    : ParametrisationSheetsConnected.Statement := by
   classical
   intro σ _ X w B d A D δ N hP hirr
   obtain ⟨hB, hwXB, hD, -, hmaps, -, -, -, -, hcard, -, hdense⟩ := id hP
@@ -63,8 +67,9 @@ theorem ParametrisationSheetsConnected.proof (h₁ : SheetPieceProductAnalytic.S
   obtain ⟨q, hqS, hqw⟩ := mem_closure_iff_seq_limit.1 hwv
 
   have hfin : ∀ (U' : Set (σ → ℂ)), ∀ x ∈ S, {x' | x' ∈ X ∩ B ∧ x' ∈ U' ∧ A x' = A x}.Finite :=
-    fun U' x hx => (Set.finite_of_encard_eq_coe (hcard (A x) (hmaps hx.1) hx.2)).subset
-      fun x' hx' => ⟨hx'.1, hx'.2.2⟩
+    fun U' x hx =>
+      (Set.finite_of_encard_eq_coe (hcard (A x) (hmaps hx.1) hx.2)).subset fun x' hx' =>
+        ⟨hx'.1, hx'.2.2⟩
   set T : Set (σ → ℂ) :=
     (⋃ n, (fun x' => p n - x') '' {x' | x' ∈ X ∩ B ∧ x' ∈ v ∧ A x' = A (p n)}) ∪
       ⋃ n, (fun x' => q n - x') '' {x' | x' ∈ X ∩ B ∧ x' ∈ u ∧ A x' = A (q n)} with hT
@@ -72,8 +77,10 @@ theorem ParametrisationSheetsConnected.proof (h₁ : SheetPieceProductAnalytic.S
     (Set.countable_iUnion fun n => ((hfin v (p n) (hpS n).1).image _).countable).union
       (Set.countable_iUnion fun n => ((hfin u (q n) (hqS n).1).image _).countable)
   have hT0 : (0 : σ → ℂ) ∉ T := by
-    have key : ∀ (r : σ → ℂ) (U₁ U₂ : Set (σ → ℂ)), r ∈ S ∩ U₁ → S ∩ (U₁ ∩ U₂) = ∅ →
-        ∀ x' ∈ {x' | x' ∈ X ∩ B ∧ x' ∈ U₂ ∧ A x' = A r}, r - x' ≠ 0 := by
+    have key
+        : ∀ (r : σ → ℂ) (U₁ U₂ : Set (σ → ℂ)),
+          r ∈ S ∩ U₁ → S ∩ (U₁ ∩ U₂) = ∅
+            → ∀ x' ∈ {x' | x' ∈ X ∩ B ∧ x' ∈ U₂ ∧ A x' = A r}, r - x' ≠ 0 := by
       intro r U₁ U₂ hr hd x' hx' h0
       have hrx : r = x' := sub_eq_zero.1 h0
       have hx'S : x' ∈ S := ⟨hx'.1, by rw [hx'.2.2]; exact hr.1.2⟩
@@ -85,27 +92,30 @@ theorem ParametrisationSheetsConnected.proof (h₁ : SheetPieceProductAnalytic.S
   obtain ⟨f, hfan, hfeq⟩ := h₁ σ X w B d A D δ N u v ℓ hP hu hv hSuv hdisj
   obtain ⟨g, hgan, hgeq⟩ := h₁ σ X w B d A D δ N v u ℓ hP hv hu hSvu hdisj'
 
-  have hzero : ∀ (U' : Set (σ → ℂ)) (F : (σ → ℂ) → ℂ),
-      (∀ z, A z ∈ D → δ (A z) ≠ 0 →
-        F z = ∏ᶠ x ∈ {x | x ∈ X ∩ B ∧ x ∈ U' ∧ A x = A z}, (ℓ z - ℓ x)) →
-      ∀ x ∈ S, x ∈ U' → F x = 0 := by
+  have hzero
+      : ∀ (U' : Set (σ → ℂ)) (F : (σ → ℂ) → ℂ),
+        (∀ z,
+            A z ∈ D → δ (A z) ≠ 0 → F z = ∏ᶠ x ∈ {x | x ∈ X ∩ B ∧ x ∈ U' ∧ A x = A z}, (ℓ z - ℓ x))
+          → ∀ x ∈ S, x ∈ U' → F x = 0 := by
     intro U' F hF x hx hxU
     rw [hF x (hmaps hx.1) hx.2, finprod_mem_eq_finite_toFinset_prod _ (hfin U' x hx)]
     exact Finset.prod_eq_zero ((hfin U' x hx).mem_toFinset.2 ⟨hx.1, hxU, rfl⟩) (sub_self _)
 
-  have hne : ∀ (U' : Set (σ → ℂ)) (F : (σ → ℂ) → ℂ) (r : σ → ℂ),
-      (∀ z, A z ∈ D → δ (A z) ≠ 0 →
-        F z = ∏ᶠ x ∈ {x | x ∈ X ∩ B ∧ x ∈ U' ∧ A x = A z}, (ℓ z - ℓ x)) → r ∈ S →
-      (∀ x' ∈ {x' | x' ∈ X ∩ B ∧ x' ∈ U' ∧ A x' = A r}, r - x' ∈ T) → F r ≠ 0 := by
+  have hne
+      : ∀ (U' : Set (σ → ℂ)) (F : (σ → ℂ) → ℂ) (r : σ → ℂ),
+        (∀ z,
+            A z ∈ D → δ (A z) ≠ 0 → F z = ∏ᶠ x ∈ {x | x ∈ X ∩ B ∧ x ∈ U' ∧ A x = A z}, (ℓ z - ℓ x))
+          → r ∈ S → (∀ x' ∈ {x' | x' ∈ X ∩ B ∧ x' ∈ U' ∧ A x' = A r}, r - x' ∈ T)
+          → F r ≠ 0 := by
     intro U' F r hF hr hrT
     rw [hF r (hmaps hr.1) hr.2, finprod_mem_eq_finite_toFinset_prod _ (hfin U' r hr)]
     refine Finset.prod_ne_zero_iff.2 fun x' hx' => ?_
     rw [← map_sub]
     exact hℓ _ (hrT x' ((hfin U' r hr).mem_toFinset.1 hx'))
-  have hfq : ∀ n, f (q n) ≠ 0 := fun n => hne u f (q n) hfeq (hqS n).1
-    fun x' hx' => Or.inr (Set.mem_iUnion.2 ⟨n, x', hx', rfl⟩)
-  have hgp : ∀ n, g (p n) ≠ 0 := fun n => hne v g (p n) hgeq (hpS n).1
-    fun x' hx' => Or.inl (Set.mem_iUnion.2 ⟨n, x', hx', rfl⟩)
+  have hfq : ∀ n, f (q n) ≠ 0 := fun n =>
+    hne u f (q n) hfeq (hqS n).1 fun x' hx' => Or.inr (Set.mem_iUnion.2 ⟨n, x', hx', rfl⟩)
+  have hgp : ∀ n, g (p n) ≠ 0 := fun n =>
+    hne v g (p n) hgeq (hpS n).1 fun x' hx' => Or.inl (Set.mem_iUnion.2 ⟨n, x', hx', rfl⟩)
 
   have hprod : ∀ z ∈ X ∩ B, f z * g z = 0 := by
     intro z hz

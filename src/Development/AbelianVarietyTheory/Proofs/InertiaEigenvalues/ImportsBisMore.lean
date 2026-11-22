@@ -11,13 +11,15 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 namespace GlobalTheory.NonzeroScalarLattice
 
-theorem exists_ne_zero_smul_mem {G : Type} [Group G] {LL : Type} [Field LL] {O : Type}
-    [CommRing O] [Algebra O LL] {V : Type} [AddCommGroup V] [Module LL V] [Module O V]
-    [IsScalarTower O LL V] {ρ : Representation LL G V} [IsDomain O] [IsFractionRing O LL]
-    (L : Formalism.WeaklyAdmissibleFiltrations.Lattice (O := O) ρ) (w : V) :
-    ∃ (b : O), b ≠ (0 : O) ∧ b • w ∈ Formalism.WeaklyAdmissibleFiltrations.Lattice.T L := by
-  have hw : w ∈ Submodule.span LL (L.T : Set V) := by
-    rw [L.span]; exact Submodule.mem_top
+theorem exists_ne_zero_smul_mem
+    {G : Type} [Group G]
+    {LL : Type} [Field LL]
+    {O : Type} [CommRing O] [Algebra O LL]
+    {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+    {ρ : Representation LL G V} [IsDomain O] [IsFractionRing O LL]
+    (L : Formalism.WeaklyAdmissibleFiltrations.Lattice (O := O) ρ) (w : V)
+    : ∃ (b : O), b ≠ (0 : O) ∧ b • w ∈ Formalism.WeaklyAdmissibleFiltrations.Lattice.T L := by
+  have hw : w ∈ Submodule.span LL (L.T : Set V) := by rw [L.span]; exact Submodule.mem_top
   induction hw using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩

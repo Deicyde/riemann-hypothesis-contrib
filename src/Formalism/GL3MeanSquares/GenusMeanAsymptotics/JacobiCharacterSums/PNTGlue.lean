@@ -12,9 +12,10 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions
 
 open Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds Formalism.ZeroFreeDirichlet
 
-theorem glue_aux {S A B y η E E' F : ℝ} (h : S ≤ A * y * η * E) (hy : 0 ≤ y) (hη : 0 ≤ η)
-    (hE : 0 ≤ E) (hEE : E ≤ E') (hF : 0 ≤ F) (hAB : A ≤ B) (hB : 0 ≤ B) :
-    S ≤ B * y * η * (E' + F) := by
+theorem glue_aux
+    {S A B y η E E' F : ℝ} (h : S ≤ A * y * η * E) (hy : 0 ≤ y) (hη : 0 ≤ η) (hE : 0 ≤ E)
+    (hEE : E ≤ E') (hF : 0 ≤ F) (hAB : A ≤ B) (hB : 0 ≤ B)
+    : S ≤ B * y * η * (E' + F) := by
   have h1 : A * y * η * E ≤ B * y * η * E := by
     have : 0 ≤ y * η * E := by positivity
     nlinarith

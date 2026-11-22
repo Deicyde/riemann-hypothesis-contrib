@@ -14,26 +14,33 @@ namespace PI.ScMuExists.UnitaryGroupMassFormula
 
 section Bruhat
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem exists_bruhat_left (μS : Measure G) [SFinite μS] (S : Set G) (hSc : μS Sᶜ = 0)
-    (hinv : ∀ t ∈ S, μS.map (fun x => t * x) = μS)
+theorem exists_bruhat_left
+    (μS : Measure G) [SFinite μS]
+    (S : Set G) (hSc : μS Sᶜ = 0) (hinv : ∀ t ∈ S, μS.map (fun x => t * x) = μS)
     (hpos : ∀ U : Set G, IsOpen U → (1 : G) ∈ U → 0 < μS U)
-    (hfin : ∀ K : Set G, IsCompact K → μS K < ⊤) :
-    ∃ β : G → ℝ≥0∞, Measurable β ∧ ∀ y : G, ∫⁻ s, β (s⁻¹ * y) ∂μS = 1 := by
-
-  obtain ⟨O, hOo, hOc, hcov⟩ : ∃ O : ℕ → Set G, (∀ n, IsOpen (O n)) ∧
-      (∀ n, ∃ L : Set G, IsCompact L ∧ O n ⊆ L) ∧ ∀ y : G, ∃ n, y ∈ O n := by
+    (hfin : ∀ K : Set G, IsCompact K → μS K < ⊤)
+    : ∃ β : G → ℝ≥0∞, Measurable β ∧ ∀ y : G, ∫⁻ s, β (s⁻¹ * y) ∂μS = 1 := by
+  obtain ⟨O, hOo, hOc, hcov⟩
+      : ∃ O : ℕ → Set G,
+        (∀ n, IsOpen (O n)) ∧ (∀ n, ∃ L : Set G, IsCompact L ∧ O n ⊆ L)
+          ∧ ∀ y : G, ∃ n, y ∈ O n := by
     let K := CompactExhaustion.choice G
-    exact ⟨fun n => interior (K (n + 1)), fun n => isOpen_interior,
+    exact ⟨
+      fun n => interior (K (n + 1)),
+      fun n => isOpen_interior,
       fun n => ⟨K (n + 1), K.isCompact _, interior_subset⟩,
-      fun y => ⟨K.find y, K.subset_interior_succ _ (K.mem_find y)⟩⟩
+      fun y => ⟨K.find y, K.subset_interior_succ _ (K.mem_find y)⟩
+    ⟩
 
-  obtain ⟨f, hf⟩ : ∃ f : ℕ → G → ℝ≥0∞,
-      ∀ n y, f n y = ∫⁻ s, (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y) ∂μS := ⟨_, fun _ _ => rfl⟩
-  have hm : ∀ n y, Measurable (fun s : G => (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y)) :=
-    fun n y => (measurable_one.indicator (hOo n).measurableSet).comp (measurable_inv.mul_const y)
+  obtain ⟨f, hf⟩
+      : ∃ f : ℕ → G → ℝ≥0∞, ∀ n y, f n y = ∫⁻ s, (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y) ∂μS :=
+    ⟨_, fun _ _ => rfl⟩
+  have hm : ∀ n y, Measurable (fun s : G => (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y)) := fun n y =>
+    (measurable_one.indicator (hOo n).measurableSet).comp (measurable_inv.mul_const y)
   have hfm : ∀ n, Measurable (f n) := by
     intro n
     have h2 : Measurable (fun q : G × G => (O n).indicator (1 : G → ℝ≥0∞) (q.2⁻¹ * q.1)) :=
@@ -42,7 +49,8 @@ theorem exists_bruhat_left (μS : Measure G) [SFinite μS] (S : Set G) (hSc : μ
     exact h2.lintegral_prod_right'
   have hf_eq : ∀ n y, f n y = μS ((fun s : G => s⁻¹ * y) ⁻¹' O n) := by
     intro n y
-    rw [hf n y, ← lintegral_indicator_one ((hOo n).measurableSet.preimage (measurable_inv.mul_const y))]
+    rw [hf n y,
+      ← lintegral_indicator_one ((hOo n).measurableSet.preimage (measurable_inv.mul_const y))]
     rfl
   have hf_fin : ∀ n y, f n y < ⊤ := by
     intro n y
@@ -60,12 +68,13 @@ theorem exists_bruhat_left (μS : Measure G) [SFinite μS] (S : Set G) (hSc : μ
     rwa [inv_one, one_mul]
   have hf_inv : ∀ n, ∀ t ∈ S, ∀ y, f n (t⁻¹ * y) = f n y := by
     intro n t ht y
-    calc f n (t⁻¹ * y) = ∫⁻ r, (O n).indicator (1 : G → ℝ≥0∞) ((t * r)⁻¹ * y) ∂μS := by
-          rw [hf n]
-          refine lintegral_congr fun r => ?_
-          rw [mul_inv_rev, mul_assoc]
+    calc
+      f n (t⁻¹ * y) = ∫⁻ r, (O n).indicator (1 : G → ℝ≥0∞) ((t * r)⁻¹ * y) ∂μS := by
+        rw [hf n]
+        refine lintegral_congr fun r => ?_
+        rw [mul_inv_rev, mul_assoc]
       _ = ∫⁻ r, (O n).indicator (1 : G → ℝ≥0∞) (r⁻¹ * y) ∂(μS.map (fun x => t * x)) :=
-          (lintegral_map (hm n y) (measurable_const_mul t)).symm
+        (lintegral_map (hm n y) (measurable_const_mul t)).symm
       _ = f n y := by rw [hinv t ht, hf n y]
 
   have hZm : Measurable (fun x : G => ∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n x)⁻¹ * f n x) :=
@@ -74,8 +83,13 @@ theorem exists_bruhat_left (μS : Measure G) [SFinite μS] (S : Set G) (hSc : μ
       ∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n x)⁻¹ * (O n).indicator (1 : G → ℝ≥0∞) x) :=
     Measurable.tsum fun n =>
       (measurable_const.mul (hfm n).inv).mul (measurable_one.indicator (hOo n).measurableSet)
-  refine ⟨fun x => (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n x)⁻¹ * (O n).indicator (1 : G → ℝ≥0∞) x) *
-      (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n x)⁻¹ * f n x)⁻¹, hTm.mul hZm.inv, fun y => ?_⟩
+  refine ⟨
+    fun x =>
+      (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n x)⁻¹ * (O n).indicator (1 : G → ℝ≥0∞) x)
+        * (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n x)⁻¹ * f n x)⁻¹,
+    hTm.mul hZm.inv,
+    fun y => ?_
+  ⟩
   have hterm : ∀ n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y ≤ (2 : ℝ≥0∞)⁻¹ ^ n := by
     intro n
     rcases eq_or_ne (f n y) 0 with h | h
@@ -97,58 +111,61 @@ theorem exists_bruhat_left (μS : Measure G) [SFinite μS] (S : Set G) (hSc : μ
   have hae : ∀ᵐ s ∂μS, s ∈ S := by
     rw [ae_iff]
     exact hSc
-  calc ∫⁻ s, (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n (s⁻¹ * y))⁻¹ *
-          (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y)) *
-          (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n (s⁻¹ * y))⁻¹ * f n (s⁻¹ * y))⁻¹ ∂μS
+  calc
+    ∫⁻ s, (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n (s⁻¹ * y))⁻¹ *
+       (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y)) *
+       (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n (s⁻¹ * y))⁻¹ * f n (s⁻¹ * y))⁻¹ ∂μS
         = ∫⁻ s, (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ *
           (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y)) *
           (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y)⁻¹ ∂μS := by
-        refine lintegral_congr_ae ?_
-        filter_upwards [hae] with s hs
-        have hs' : ∀ n, f n (s⁻¹ * y) = f n y := fun n => hf_inv n s hs y
-        simp only [hs']
+      refine lintegral_congr_ae ?_
+      filter_upwards [hae] with s hs
+      have hs' : ∀ n, f n (s⁻¹ * y) = f n y := fun n => hf_inv n s hs y
+      simp only [hs']
     _ = (∫⁻ s, ∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ *
-          (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y) ∂μS) *
-          (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y)⁻¹ :=
-        lintegral_mul_const' _ _ (ENNReal.inv_ne_top.mpr hZ0)
-    _ = (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y) *
-          (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y)⁻¹ := by
-        rw [lintegral_tsum fun n => ((hm n y).const_mul _).aemeasurable]
-        congr 1
-        refine tsum_congr fun n => ?_
-        rw [lintegral_const_mul _ (hm n y), ← hf n y]
+          (O n).indicator (1 : G → ℝ≥0∞) (s⁻¹ * y) ∂μS)
+        * (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y)⁻¹ :=
+      lintegral_mul_const' _ _ (ENNReal.inv_ne_top.mpr hZ0)
+    _ = (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y)
+        * (∑' n, (2 : ℝ≥0∞)⁻¹ ^ n * (f n y)⁻¹ * f n y)⁻¹ := by
+      rw [lintegral_tsum fun n => ((hm n y).const_mul _).aemeasurable]
+      congr 1
+      refine tsum_congr fun n => ?_
+      rw [lintegral_const_mul _ (hm n y), ← hf n y]
     _ = 1 := ENNReal.mul_inv_cancel hZ0 hZtop
 
-theorem weil_of_bruhat (μG μS : Measure G) [SFinite μG] [μG.IsMulLeftInvariant] [SFinite μS]
-    (S : Set G) (_hS : MeasurableSet S) (hSc : μS Sᶜ = 0)
-    (hinv : ∀ t ∈ S, μS.map (fun x => t * x) = μS)
+theorem weil_of_bruhat
+    (μG μS : Measure G) [SFinite μG] [μG.IsMulLeftInvariant] [SFinite μS]
+    (S : Set G)
+    (_hS : MeasurableSet S) (hSc : μS Sᶜ = 0) (hinv : ∀ t ∈ S, μS.map (fun x => t * x) = μS)
     (hpos : ∀ U : Set G, IsOpen U → (1 : G) ∈ U → 0 < μS U)
-    (hfin : ∀ K : Set G, IsCompact K → μS K < ⊤) :
-    ∃ ν : Measure G, ∀ f : G → ℝ≥0∞, Measurable f →
-      ∫⁻ x, f x ∂μG = ∫⁻ x, (∫⁻ s, f (s * x) ∂μS) ∂ν := by
+    (hfin : ∀ K : Set G, IsCompact K → μS K < ⊤)
+    : ∃ ν : Measure G, ∀ f : G → ℝ≥0∞,
+      Measurable f → ∫⁻ x, f x ∂μG = ∫⁻ x, (∫⁻ s, f (s * x) ∂μS) ∂ν := by
   obtain ⟨β, hβm, hβ⟩ := exists_bruhat_left μS S hSc hinv hpos hfin
   refine ⟨μG.withDensity β, fun f hf => ?_⟩
   have hF : Measurable (fun x : G => ∫⁻ s, f (s * x) ∂μS) :=
     (hf.comp (measurable_snd.mul measurable_fst)).lintegral_prod_right'
   rw [lintegral_withDensity_eq_lintegral_mul _ hβm hF]
-  calc ∫⁻ x, f x ∂μG = ∫⁻ x, (∫⁻ s, β (s⁻¹ * x) ∂μS) * f x ∂μG := by
-        simp only [hβ, one_mul]
+  calc
+    ∫⁻ x, f x ∂μG
+      = ∫⁻ x, (∫⁻ s, β (s⁻¹ * x) ∂μS) * f x ∂μG := by simp only [hβ, one_mul]
     _ = ∫⁻ x, ∫⁻ s, β (s⁻¹ * x) * f x ∂μS ∂μG := by
-        refine lintegral_congr fun x => ?_
-        exact (lintegral_mul_const _ (hβm.comp (measurable_inv.mul_const x))).symm
+      refine lintegral_congr fun x => ?_
+      exact (lintegral_mul_const _ (hβm.comp (measurable_inv.mul_const x))).symm
     _ = ∫⁻ s, ∫⁻ x, β (s⁻¹ * x) * f x ∂μG ∂μS :=
-        lintegral_lintegral_swap ((hβm.comp (measurable_snd.inv.mul measurable_fst)).mul
-          (hf.comp measurable_fst)).aemeasurable
+      lintegral_lintegral_swap ((hβm.comp (measurable_snd.inv.mul measurable_fst)).mul
+        (hf.comp measurable_fst)).aemeasurable
     _ = ∫⁻ s, ∫⁻ x, β x * f (s * x) ∂μG ∂μS := by
-        refine lintegral_congr fun s => ?_
-        simpa only [inv_mul_cancel_left] using
-          (lintegral_mul_left_eq_self (fun x => β (s⁻¹ * x) * f x) s).symm
+      refine lintegral_congr fun s => ?_
+      simpa only [inv_mul_cancel_left] using
+        (lintegral_mul_left_eq_self (fun x => β (s⁻¹ * x) * f x) s).symm
     _ = ∫⁻ x, ∫⁻ s, β x * f (s * x) ∂μS ∂μG :=
-        lintegral_lintegral_swap ((hβm.comp measurable_snd).mul
-          (hf.comp (measurable_fst.mul measurable_snd))).aemeasurable
+      lintegral_lintegral_swap ((hβm.comp measurable_snd).mul
+        (hf.comp (measurable_fst.mul measurable_snd))).aemeasurable
     _ = ∫⁻ x, (β * fun x => ∫⁻ s, f (s * x) ∂μS) x ∂μG := by
-        refine lintegral_congr fun x => ?_
-        exact lintegral_const_mul _ (hf.comp (measurable_id.mul_const x))
+      refine lintegral_congr fun x => ?_
+      exact lintegral_const_mul _ (hf.comp (measurable_id.mul_const x))
 
 end Bruhat
 

@@ -8,20 +8,23 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem _root_.GlobalTheory.exists_basis_in_finite_domain_trace_mem (T C F K : Type) [CommRing T] [IsDomain T]
-    [IsIntegrallyClosed T] [CommRing C] [IsDomain C] [Field F] [Field K] [Algebra T C]
-    [Algebra T F] [IsFractionRing T F] [Algebra C K] [IsFractionRing C K] [Algebra T K]
-    [Algebra F K] [IsScalarTower T C K] [IsScalarTower T F K] [Module.Finite T C] :
-    ∃ (n : ℕ) (b : Module.Basis (Fin n) F K),
-      (∀ (i : Fin n), ∃ (c : C), (algebraMap C K : C → K) c = (b : Fin n → K) i) ∧
-        ∀ (i j : Fin n), ∃ (t : T), (algebraMap T F : T → F) t =
-          (Algebra.trace F K : K → F) ((b : Fin n → K) i * (b : Fin n → K) j) := by
+theorem _root_.GlobalTheory.exists_basis_in_finite_domain_trace_mem
+    (T C F K : Type)
+    [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CommRing C] [IsDomain C] [Field F] [Field K]
+    [Algebra T C] [Algebra T F] [IsFractionRing T F] [Algebra C K] [IsFractionRing C K]
+    [Algebra T K] [Algebra F K] [IsScalarTower T C K] [IsScalarTower T F K] [Module.Finite T C]
+    : ∃ (n : ℕ) (b : Module.Basis (Fin n) F K),
+      (∀ (i : Fin n), ∃ (c : C), (algebraMap C K : C → K) c = (b : Fin n → K) i)
+        ∧ ∀ (i j : Fin n), ∃ (t : T),
+          (algebraMap T F : T → F) t
+            = (Algebra.trace F K : K → F) ((b : Fin n → K) i * (b : Fin n → K) j) := by
   classical
   have hint : ∀ c : C, IsIntegral T (algebraMap C K c) := fun c =>
     (Algebra.IsIntegral.isIntegral c).map (IsScalarTower.toAlgHom T C K)
   obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := T) (M := C)
-  have hM0 : ∀ c : C,
-      algebraMap C K c ∈ Submodule.span F ((s.image (algebraMap C K) : Finset K) : Set K) := by
+  have hM0
+      : ∀ c : C,
+        algebraMap C K c ∈ Submodule.span F ((s.image (algebraMap C K) : Finset K) : Set K) := by
     intro c
     have hc : c ∈ Submodule.span T (s : Set C) := hs ▸ Submodule.mem_top
     induction hc using Submodule.span_induction with

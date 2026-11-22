@@ -11,7 +11,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1.SymB
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
 
 variable {k r : ℕ}
 
@@ -28,7 +29,8 @@ lemma cont_sand (A B : Mat k r) : Continuous (sandM (k := k) (r := r) A B) := by
   exact continuous_finsetSum _ fun m _ => (continuous_finsetSum _ fun l _ =>
     continuous_const.mul ((continuous_apply m).comp (continuous_apply l))).mul continuous_const
 
-def gb (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (x : Mt k r) : Mt k r := fun i j => gbar k r γ (Matrix.of x) i j
+def gb (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (x : Mt k r) : Mt k r := fun i j =>
+  gbar k r γ (Matrix.of x) i j
 
 lemma cont_gb (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) : Continuous (gb (k := k) (r := r) γ) := by
   have h1 := cont_sand (k := k) (r := r) (embWb k r γ)⁻¹ (embWb k r γ)
@@ -38,9 +40,18 @@ lemma cont_gb (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) : Continuous (gb (k 
       Complex.continuous_conj.comp ((continuous_apply j).comp ((continuous_apply i).comp h1))
   exact (cont_sand (k := k) (r := r) (embWb k r γ) (embWb k r γ)⁻¹).comp h2
 
-def mEquiv {α : Type*} [MeasurableSpace α] (f g : α → α) (hf : Measurable f) (hg : Measurable g)
-    (h1 : Function.LeftInverse g f) (h2 : Function.RightInverse g f) : α ≃ᵐ α :=
-  { toFun := f, invFun := g, left_inv := h1, right_inv := h2, measurable_toFun := hf, measurable_invFun := hg }
+def mEquiv
+    {α : Type*} [MeasurableSpace α]
+    (f g : α → α) (hf : Measurable f) (hg : Measurable g) (h1 : Function.LeftInverse g f)
+    (h2 : Function.RightInverse g f)
+    : α ≃ᵐ α := {
+  toFun := f
+  invFun := g
+  left_inv := h1
+  right_inv := h2
+  measurable_toFun := hf
+  measurable_invFun := hg
+}
 
 lemma sfin {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) : SigmaFinite μ := by
   have : IsFiniteMeasureOnCompacts μ := ⟨fun K hK => h.finite_compact K hK⟩
@@ -76,8 +87,9 @@ lemma emb_Sab {a b : Mat k r} (ha : IsUnit a.det) (hb : IsUnit b.det) : Measurab
   have := Sab_inv ha' hb' p
   rwa [Matrix.nonsing_inv_nonsing_inv _ ha, Matrix.nonsing_inv_nonsing_inv _ hb] at this
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 lemma mp_Sab (D : RealPlaceData k r Wp Wq) (hCI : ConjInv D) {a b : Mat k r} (ha : a ∈ UWset k r D.z)
     (hb : b ∈ UWset k r D.z') : MeasurePreserving (Sab a b) D.μSS D.μSS := by
@@ -108,17 +120,21 @@ section lie
 
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-def piLIE (z : Fin (2 * r + k + 1) → ℂ) (π : Mat k r → (V →L[ℂ] V)) (hrep : IsCRepOn (UWset k r z) π)
-    (hu : ∀ h ∈ UWset k r z, ∀ v, ‖π h v‖ = ‖v‖) (a : Mat k r) (ha : a ∈ UWset k r z) : V ≃ₗᵢ[ℂ] V where
-  toLinearEquiv := LinearEquiv.ofLinear (π a).toLinearMap (π a⁻¹).toLinearMap
-    (LinearMap.ext fun v => by
-      change ((π a).comp (π a⁻¹)) v = v
-      rw [← hrep.2 a ha _ (uw_inv ha), Matrix.mul_nonsing_inv _ (isUnit_of_uh ha.1), hrep.1]
-      rfl)
-    (LinearMap.ext fun v => by
-      change ((π a⁻¹).comp (π a)) v = v
-      rw [← hrep.2 _ (uw_inv ha) a ha, Matrix.nonsing_inv_mul _ (isUnit_of_uh ha.1), hrep.1]
-      rfl)
+def piLIE
+    (z : Fin (2 * r + k + 1) → ℂ) (π : Mat k r → (V →L[ℂ] V))
+    (hrep : IsCRepOn (UWset k r z) π) (hu : ∀ h ∈ UWset k r z, ∀ v, ‖π h v‖ = ‖v‖)
+    (a : Mat k r) (ha : a ∈ UWset k r z)
+    : V ≃ₗᵢ[ℂ] V where
+  toLinearEquiv :=
+    LinearEquiv.ofLinear (π a).toLinearMap (π a⁻¹).toLinearMap
+      (LinearMap.ext fun v => by
+        change ((π a).comp (π a⁻¹)) v = v
+        rw [← hrep.2 a ha _ (uw_inv ha), Matrix.mul_nonsing_inv _ (isUnit_of_uh ha.1), hrep.1]
+        rfl)
+      (LinearMap.ext fun v => by
+        change ((π a⁻¹).comp (π a)) v = v
+        rw [← hrep.2 _ (uw_inv ha) a ha, Matrix.nonsing_inv_mul _ (isUnit_of_uh ha.1), hrep.1]
+        rfl)
   norm_map' := hu a ha
 
 end lie
@@ -151,9 +167,11 @@ lemma rho_Sab (D : RealPlaceData k r Wp Wq) {a b : Mat k r} (ha : a ∈ UWset k 
     D.π'_rep.2 _ (uw_inv hp.2.2.1) _ (uw_inv hb)]
   simp only [rho, ContinuousLinearMap.comp_assoc]
 
-def Lab (D : RealPlaceData k r Wp Wq) {a b : Mat k r} (ha : a ∈ UWset k r D.z) (hb : b ∈ UWset k r D.z') :
-    (Wq →L[ℂ] Wp) ≃L[ℂ] (Wq →L[ℂ] Wp) :=
-  ContinuousLinearEquiv.arrowCongr (piLIE D.z' D.π' D.π'_rep D.π'_unitary b hb).toContinuousLinearEquiv
+def Lab
+    (D : RealPlaceData k r Wp Wq) {a b : Mat k r} (ha : a ∈ UWset k r D.z) (hb : b ∈ UWset k r D.z')
+    : (Wq →L[ℂ] Wp) ≃L[ℂ] (Wq →L[ℂ] Wp) :=
+  ContinuousLinearEquiv.arrowCongr
+    (piLIE D.z' D.π' D.π'_rep D.π'_unitary b hb).toContinuousLinearEquiv
     (piLIE D.z D.π D.π_rep D.π_unitary a ha).toContinuousLinearEquiv
 
 lemma Lab_apply (D : RealPlaceData k r Wp Wq) {a b : Mat k r} (ha : a ∈ UWset k r D.z) (hb : b ∈ UWset k r D.z')

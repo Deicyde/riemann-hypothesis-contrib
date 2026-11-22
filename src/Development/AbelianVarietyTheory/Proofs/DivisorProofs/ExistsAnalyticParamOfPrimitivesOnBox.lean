@@ -37,7 +37,21 @@ private lemma eq_of_fderiv_fibre_zero_convex {P : Type} [NormedAddCommGroup P] [
     (fun x hx => (hda x hx).differentiableAt.differentiableWithinAt)
     (fun x hx => by rw [fderivWithin_of_isOpen hC hx, (hda x hx).fderiv, hzero x hx]) hy hy'
 
-theorem exists_analytic_param_of_primitives_on_box : ∀ {P : Type} [NormedAddCommGroup P] [NormedSpace ℂ P] [FiniteDimensional ℂ P] {g : ℕ} {K : Type} (W : K → Set (P × (Fin g → ℂ))) (c : K → K → P × (Fin g → ℂ) → ℂ) (ω : K → Fin g → P × (Fin g → ℂ) → ℂ) (Z : Set P) (C : Set (Fin g → ℂ)) (G G' : K → P × (Fin g → ℂ) → ℂ), (∀ k, IsOpen (W k)) → IsOpen Z → IsOpen C → Convex ℝ C → C.Nonempty → (∀ p ∈ Z ×ˢ C, ∃ k, p ∈ W k) → ((∀ k, AnalyticOnNhd ℂ (G k) (W k ∩ Z ×ˢ C)) ∧ (∀ k a, ∀ p ∈ W k, p ∈ Z ×ˢ C → fderiv ℂ (G k) p (0, Pi.single a 1) = ω k a p) ∧ ∀ k l, ∀ p ∈ W k, p ∈ W l → p ∈ Z ×ˢ C → G k p - G l p = c k l p) → ((∀ k, AnalyticOnNhd ℂ (G' k) (W k ∩ Z ×ˢ C)) ∧ (∀ k a, ∀ p ∈ W k, p ∈ Z ×ˢ C → fderiv ℂ (G' k) p (0, Pi.single a 1) = ω k a p) ∧ ∀ k l, ∀ p ∈ W k, p ∈ W l → p ∈ Z ×ˢ C → G' k p - G' l p = c k l p) → ∃ h : P → ℂ, AnalyticOnNhd ℂ h Z ∧ ∀ k, ∀ p ∈ W k, p ∈ Z ×ˢ C → G k p = G' k p + h p.1 := by
+theorem exists_analytic_param_of_primitives_on_box
+    : ∀ {P : Type} [NormedAddCommGroup P] [NormedSpace ℂ P] [FiniteDimensional ℂ P] {g : ℕ}
+        {K : Type} (W : K → Set (P × (Fin g → ℂ))) (c : K → K → P × (Fin g → ℂ) → ℂ)
+        (ω : K → Fin g → P × (Fin g → ℂ) → ℂ) (Z : Set P) (C : Set (Fin g → ℂ))
+        (G G' : K → P × (Fin g → ℂ) → ℂ),
+      (∀ k, IsOpen (W k)) → IsOpen Z → IsOpen C → Convex ℝ C → C.Nonempty
+        → (∀ p ∈ Z ×ˢ C, ∃ k, p ∈ W k)
+        → ((∀ k, AnalyticOnNhd ℂ (G k) (W k ∩ Z ×ˢ C))
+          ∧ (∀ k a, ∀ p ∈ W k, p ∈ Z ×ˢ C → fderiv ℂ (G k) p (0, Pi.single a 1) = ω k a p)
+          ∧ ∀ k l, ∀ p ∈ W k, p ∈ W l → p ∈ Z ×ˢ C → G k p - G l p = c k l p)
+        → ((∀ k, AnalyticOnNhd ℂ (G' k) (W k ∩ Z ×ˢ C))
+          ∧ (∀ k a, ∀ p ∈ W k, p ∈ Z ×ˢ C → fderiv ℂ (G' k) p (0, Pi.single a 1) = ω k a p)
+          ∧ ∀ k l, ∀ p ∈ W k, p ∈ W l → p ∈ Z ×ˢ C → G' k p - G' l p = c k l p)
+        → ∃ h : P → ℂ,
+          AnalyticOnNhd ℂ h Z ∧ ∀ k, ∀ p ∈ W k, p ∈ Z ×ˢ C → G k p = G' k p + h p.1 := by
   intro P _ _ _ g K W c ω Z C G G' hW hZ hC hCc hCn hcov hG hG'
   obtain ⟨hGa, hGd, hGc⟩ := hG
   obtain ⟨hG'a, hG'd, hG'c⟩ := hG'
@@ -65,8 +79,7 @@ theorem exists_analytic_param_of_primitives_on_box : ∀ {P : Type} [NormedAddCo
   have hFd : ∀ a, ∀ p ∈ Z ×ˢ C, fderiv ℂ F p (0, Pi.single a 1) = 0 := by
     intro a p hp
     obtain ⟨k, hk⟩ := hcov p hp
-    have hs : HasFDerivAt (fun q => G k q - G' k q)
-        (fderiv ℂ (G k) p - fderiv ℂ (G' k) p) p :=
+    have hs : HasFDerivAt (fun q => G k q - G' k q) (fderiv ℂ (G k) p - fderiv ℂ (G' k) p) p :=
       (hGa k p ⟨hk, hp⟩).differentiableAt.hasFDerivAt.sub
         (hG'a k p ⟨hk, hp⟩).differentiableAt.hasFDerivAt
     rw [← (hFloc k p hk hp).fderiv_eq, hs.fderiv]

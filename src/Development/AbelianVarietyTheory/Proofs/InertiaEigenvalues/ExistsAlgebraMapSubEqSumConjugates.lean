@@ -10,7 +10,10 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem exists_algebraMap_sub_eq_sum_conjugates : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (y : Ω), ∃ (e : E) (s : Finset Ω), (∀ x ∈ s, x ≠ y ∧ ∃ σ : G E Ω, σ y = x) ∧ algebraMap E Ω e - y = ∑ x ∈ s, x := by
+theorem exists_algebraMap_sub_eq_sum_conjugates
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (y : Ω),
+      ∃ (e : E) (s : Finset Ω),
+        (∀ x ∈ s, x ≠ y ∧ ∃ σ : G E Ω, σ y = x) ∧ algebraMap E Ω e - y = ∑ x ∈ s, x := by
   intro E Ω _ _ _ _ _ y
   classical
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
@@ -20,7 +23,8 @@ theorem exists_algebraMap_sub_eq_sum_conjugates : ∀ (E Ω : Type) [Field E] [N
   set q := p.map (algebraMap E Ω) with hq
   have hirr : Irreducible p := minpoly.irreducible hy
   have hmon : p.Monic := minpoly.monic hy
-  have hsep : q.Separable := Polynomial.Separable.map (Algebra.IsSeparable.isSeparable E y : p.Separable)
+  have hsep : q.Separable :=
+    Polynomial.Separable.map (Algebra.IsSeparable.isSeparable E y : p.Separable)
   have hnd : q.roots.Nodup := nodup_roots hsep
   have hspl : q.Splits := IsAlgClosed.splits q
   have hsum : q.nextCoeff = -q.roots.sum := hspl.nextCoeff_eq_neg_sum_roots_of_monic (hmon.map _)
@@ -41,6 +45,7 @@ theorem exists_algebraMap_sub_eq_sum_conjugates : ∀ (E Ω : Type) [Field E] [N
     obtain ⟨σ, hσ⟩ := horb
     exact ⟨σ, hσ⟩
   · rw [Finset.sum_erase_eq_sub hyr, Finset.sum_eq_multiset_sum, Multiset.toFinset_val,
-      Multiset.dedup_eq_self.mpr hnd, Multiset.map_id', map_neg, ← nextCoeff_map_eq, ← hq, hsum, neg_neg]
+      Multiset.dedup_eq_self.mpr hnd, Multiset.map_id', map_neg, ← nextCoeff_map_eq, ← hq, hsum,
+      neg_neg]
 
 end GlobalTheory

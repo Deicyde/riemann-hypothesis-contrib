@@ -9,15 +9,19 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NonemptyA
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open Filter Topology
 
 namespace GlobalTheory.SplitEmbed
 
-theorem exists_algHom_of_splitsFully : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ v : Pl (F := F), SplitsFully E v → Nonempty (E →ₐ[F] Fv F v) := by
+theorem exists_algHom_of_splitsFully
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → ∀ v : Pl (F := F), SplitsFully E v → Nonempty (E →ₐ[F] Fv F v) := by
   intro F E _ _ _ _ _ σ h v hs
   classical
   haveI hprime : (v.asIdeal.under ℤ).IsPrime := Ideal.IsPrime.under ℤ v.asIdeal
@@ -34,8 +38,7 @@ theorem exists_algHom_of_splitsFully : ∀ (F E : Type) [Field F] [NumberField F
     exact hprime
   set p := q.natAbs with hpdef
   have hp : p.Prime := Int.prime_iff_natAbs_prime.1 hqp
-  have hspan : v.asIdeal.under ℤ = Ideal.span {(p : ℤ)} := by
-    rw [hq', hpdef, Int.span_natAbs]
+  have hspan : v.asIdeal.under ℤ = Ideal.span {(p : ℤ)} := by rw [hq', hpdef, Int.span_natAbs]
   have hpv : (p : 𝓞 F) ∈ v.asIdeal := by
     have : (p : ℤ) ∈ v.asIdeal.under ℤ := by rw [hspan]; exact Ideal.mem_span_singleton_self _
     rw [Ideal.under_def, Ideal.mem_comap] at this

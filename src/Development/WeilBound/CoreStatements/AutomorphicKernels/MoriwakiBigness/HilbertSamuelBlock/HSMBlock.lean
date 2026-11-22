@@ -40,25 +40,31 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.DegreeOfIsInte
 
 namespace PositivityTheory.LocalParametersCuspidal.MB.HSM
 
-open GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.HilbertSamuel ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4
+open GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.HilbertSamuel
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4
   ReciprocityTheory.ChartRestriction.G.AI.I1
 
-theorem theoremHSMBlock (hAIS : ArithIntersectionSystemStatement) (hResK : ResK.ResKStatement) :
-    TheoremHSMBlock.Statement := by
+theorem theoremHSMBlock (hAIS : ArithIntersectionSystemStatement) (hResK : ResK.ResKStatement)
+    : TheoremHSMBlock.Statement := by
   have hGr : GraphStatement := GlobalTheory.T.graph_statement_holds
-  have hAI3 : Inter.PushforwardArithIntersection.Statement := GlobalTheory.T.generic_degree_of_arith_system hAIS
+  have hAI3 : Inter.PushforwardArithIntersection.Statement :=
+    GlobalTheory.T.generic_degree_of_arith_system hAIS
   have hRes : ResExistsStatement := GlobalTheory.T.resolution_exists_of_resolution_statement hResK
-  have hPts : PtsIntegrableStatement := GlobalTheory.T.points_integrable_of_resolution_statement hResK
+  have hPts : PtsIntegrableStatement :=
+    GlobalTheory.T.points_integrable_of_resolution_statement hResK
   have hPF : PFCoordStatement := (GlobalTheory.T.degree_and_coordinates_of_resolution hRes).2
-  have hEU : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)],
-      ExistsUniqueStatement F ι := Targets.existsUniqueAll
+  have hEU
+      : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)],
+        ExistsUniqueStatement F ι :=
+    Targets.existsUniqueAll
   have hGF : GenFibreExistsStatement := Targets.genFibreExists
   have hIso : IsomInvariance.Statement := IsomInvariance.proof (Inter.RatR.proof hPts)
   have hCM : ChangeOfModelStatement :=
     Targets.ChangeOfModel.of_found hAI3 hGr hIso GraphIsometric.proof
   have hDim : FibreDimStatement := GlobalTheory.CompanionTheory.Ar.Giv.fibreDim
   have hDG : Inter.DegreeGeneric.Statement :=
-    GlobalTheory.CompanionTheory.Ar.Giv.degreeGeneric_of_degree (GlobalTheory.CompanionTheory.Ar.Giv.degree_of_system hAIS)
+    GlobalTheory.CompanionTheory.Ar.Giv.degreeGeneric_of_degree
+      (GlobalTheory.CompanionTheory.Ar.Giv.degree_of_system hAIS)
   have hAbs : Inter.PtsAbsIntegrable.Statement :=
     Inter.PtsAbsIntegrable.proof hPts (Inter.PtsAbsMeasurable.proof hRes)
   have h6 : ProjFrameGraphDeg.Statement :=

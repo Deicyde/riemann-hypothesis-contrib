@@ -9,13 +9,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem isLocalization_rat_tensor (B : Type) [CommRing B] :
-    letI := Algebra.TensorProduct.rightAlgebra (R := ℤ) (A := ℚ) (B := B);
-    IsLocalization (Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ)) (ℚ ⊗[ℤ] B) :=
+theorem isLocalization_rat_tensor (B : Type) [CommRing B]
+    : letI := Algebra.TensorProduct.rightAlgebra (R := ℤ) (A := ℚ) (B := B)
+      IsLocalization (Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ)) (ℚ ⊗[ℤ] B) :=
   IsLocalization.tensorRight ℚ (nonZeroDivisors ℤ)
 
-theorem intMap_le_nonZeroDivisors (B : Type) [CommRing B] [IsDomain B] [CharZero B] :
-    Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ) ≤ nonZeroDivisors B := by
+theorem intMap_le_nonZeroDivisors (B : Type) [CommRing B] [IsDomain B] [CharZero B]
+    : Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ) ≤ nonZeroDivisors B := by
   rintro _ ⟨n, hn, rfl⟩
   have h : n ≠ 0 := nonZeroDivisors.ne_zero hn
   exact mem_nonZeroDivisors_of_ne_zero (by simpa using h)
@@ -24,11 +24,25 @@ noncomputable def ratExtPoint {B : Type} [CommRing B] (x : B →+* ℂ) : ℚ �
   (Algebra.TensorProduct.lift (algebraMap ℚ ℂ).toIntAlgHom x.toIntAlgHom
     (fun _ _ => Commute.all _ _)).toRingHom
 
-theorem ratExtPoint_tmul {B : Type} [CommRing B] (x : B →+* ℂ) (q : ℚ) (b : B) :
-    ratExtPoint x (q ⊗ₜ[ℤ] b) = (q : ℂ) * x b := by
+theorem ratExtPoint_tmul {B : Type} [CommRing B] (x : B →+* ℂ) (q : ℚ) (b : B)
+    : ratExtPoint x (q ⊗ₜ[ℤ] b) = (q : ℂ) * x b := by
   simp [ratExtPoint]
 
-theorem local_max_principle_int : ∀ (B : Type) [CommRing B] [IsDomain B] [CharZero B] [Algebra.FiniteType ℤ B], (letI : TopologicalSpace (B →+* ℂ) := TopologicalSpace.induced (fun x : B →+* ℂ => (x : B → ℂ)) inferInstance; ∀ (ψ : (B →+* ℂ) → ℝ), Continuous ψ → ∀ s : B, s ≠ 0 → ∀ (x₀ : B →+* ℂ) (δ : ℝ), 0 < δ → ∃ (W K : Set (B →+* ℂ)), W ∈ nhds x₀ ∧ IsCompact K ∧ (∀ x ∈ K, x s ≠ 0) ∧ ∀ (N : ℕ) (f : B) (R : ℝ), (∀ x ∈ K, ‖x f‖ * Real.exp (-(N * ψ x)) ≤ R) → ∀ y ∈ W, ‖y f‖ * Real.exp (-(N * ψ y)) ≤ Real.exp (δ * N) * R) := by
+theorem local_max_principle_int
+    : ∀ (B : Type) [CommRing B] [IsDomain B] [CharZero B] [Algebra.FiniteType ℤ B],
+      (letI : TopologicalSpace (B →+* ℂ) :=
+         TopologicalSpace.induced (fun x : B →+* ℂ => (x : B → ℂ)) inferInstance
+       ∀ (ψ : (B →+* ℂ) → ℝ),
+         Continuous ψ
+           → ∀ s : B,
+             s ≠ 0
+               → ∀ (x₀ : B →+* ℂ) (δ : ℝ),
+                 0 < δ
+                   → ∃ (W K : Set (B →+* ℂ)),
+                     W ∈ nhds x₀ ∧ IsCompact K ∧ (∀ x ∈ K, x s ≠ 0)
+                       ∧ ∀ (N : ℕ) (f : B) (R : ℝ),
+                         (∀ x ∈ K, ‖x f‖ * Real.exp (-(N * ψ x)) ≤ R)
+                           → ∀ y ∈ W, ‖y f‖ * Real.exp (-(N * ψ y)) ≤ Real.exp (δ * N) * R) := by
   intro B _ _ _ _
   letI tB : TopologicalSpace (B →+* ℂ) :=
     TopologicalSpace.induced (fun x : B →+* ℂ => (x : B → ℂ)) inferInstance
@@ -61,10 +75,20 @@ theorem local_max_principle_int : ∀ (B : Type) [CommRing B] [IsDomain B] [Char
   have hcomp : ∀ x : B →+* ℂ, (ratExtPoint x).comp φ = x := fun x => by
     ext b
     simp [hφ', ratExtPoint_tmul]
-  obtain ⟨W, K, hW, hK, hKs, hb⟩ := GlobalTheory.T.local_maximum_principle_weight_finite_mvPolynomial d (ℚ ⊗[ℤ] B) hg (fun x => ψ (x.comp φ))
-    (hψ.comp hres) (φ s) (fun h => hs (hinj (h.trans (map_zero _).symm))) (ratExtPoint x₀) δ hδ
-  refine ⟨(fun x => ratExtPoint x) ⁻¹' W, (fun x => x.comp φ) '' K,
-    hext.continuousAt.preimage_mem_nhds hW, hK.image hres, ?_, ?_⟩
+  obtain ⟨W, K, hW, hK, hKs, hb⟩ :=
+    GlobalTheory.T.local_maximum_principle_weight_finite_mvPolynomial d (ℚ ⊗[ℤ] B) hg
+      (fun x => ψ (x.comp φ))
+      (hψ.comp hres) (φ s)
+      (fun h => hs (hinj (h.trans (map_zero _).symm)))
+      (ratExtPoint x₀) δ hδ
+  refine ⟨
+    (fun x => ratExtPoint x) ⁻¹' W,
+    (fun x => x.comp φ) '' K,
+    hext.continuousAt.preimage_mem_nhds hW,
+    hK.image hres,
+    ?_,
+    ?_
+  ⟩
   · rintro _ ⟨x, hx, rfl⟩
     exact hKs x hx
   · intro N f R hR y hy

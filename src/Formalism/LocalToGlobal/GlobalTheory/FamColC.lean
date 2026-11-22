@@ -88,7 +88,8 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.FamColC
 
-open Formalism Formalism.HN Formalism.LFunctionChainParameters Formalism.L2.Col Formalism.L2.GlobalTheoryTheory.FamCol
+open Formalism Formalism.HN Formalism.LFunctionChainParameters Formalism.L2.Col
+  Formalism.L2.GlobalTheoryTheory.FamCol
 
 section Obj
 
@@ -102,8 +103,10 @@ structure RowTr [Fintype I] (C : ColObj K I) (R : RowArg C) (x ε : ℝ) : Prop 
   cc_span : Submodule.span K (R.cc : Set R.Wd) = ⊤
   into : ∀ u, (C.Npr u).map ((R.B u).restrictScalars (𝓞 K)) ≤ R.cc
   ht : ∀ u, R.B u ≠ 0 → htMap (C.M u).b (C.M u).X R.b' R.X' (R.B u) ≤ R.h u
-  block : ∀ u (k : R.κ) (j : (C.M u).ι), R.Ball u (Sum.inl k) j =
-    (R.Y'⁻¹ * (LinearMap.toMatrix (C.M u).b R.b' (R.B u)).map R.v.embedding * R.Y u) k j
+  block
+    : ∀ u (k : R.κ) (j : (C.M u).ι),
+      R.Ball u (Sum.inl k) j
+        = (R.Y'⁻¹ * (LinearMap.toMatrix (C.M u).b R.b' (R.B u)).map R.v.embedding * R.Y u) k j
   γ : ∀ u, 0 < R.γ u
   Ball : ∀ u, R.Ball u = R.Bf u * C.Vr u R.v
   η0_ge : -1 ≤ R.η0
@@ -126,26 +129,43 @@ section Collected
 
 open Formalism.L2.Indef Formalism.L2.DIV Formalism.DivisionValues
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {I : Type}
-  {Bs : DefBase K} {Df : DefSide Bs} {Dc : DefCols Df} {Sp : SPer Dc} {N : IndefNum Bs}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {I : Type} {Bs : DefBase K} {Df : DefSide Bs} {Dc : DefCols Df} {Sp : SPer Dc} {N : IndefNum Bs}
 
 end Collected
 
 section Family
 
-open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain
-  Formalism.LFunctionChainParameters.LChain2 Formalism.LFunctionChainParameters.LHost Formalism.LFunctionChainParameters.LBrDiv Formalism.LFunctionChainParameters.LChain6
+open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LChain2
+  Formalism.LFunctionChainParameters.LHost Formalism.LFunctionChainParameters.LBrDiv
+  Formalism.LFunctionChainParameters.LChain6
 
-variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] {W : H → Type} [∀ u0, Fintype (W u0)] {m : ℕ}
+variable
+  {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
+  {W : H → Type} [∀ u0, Fintype (W u0)]
+  {m : ℕ}
 
 end Family
 
 section Core
 
-open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain
-  Formalism.LFunctionChainParameters.LChain2 Formalism.LFunctionChainParameters.LHost Formalism.LFunctionChainParameters.LBrDiv Formalism.LFunctionChainParameters.LChain6
+open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LChain2
+  Formalism.LFunctionChainParameters.LHost Formalism.LFunctionChainParameters.LBrDiv
+  Formalism.LFunctionChainParameters.LChain6
 
-variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] {W : H → Type} [∀ u0, Fintype (W u0)] {m : ℕ}
+variable
+  {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
+  {W : H → Type} [∀ u0, Fintype (W u0)]
+  {m : ℕ}
 
 end Core
 

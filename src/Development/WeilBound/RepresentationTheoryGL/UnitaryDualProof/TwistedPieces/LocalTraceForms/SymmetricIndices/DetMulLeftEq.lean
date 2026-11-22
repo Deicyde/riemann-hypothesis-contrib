@@ -15,11 +15,12 @@ open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF
 
 variable {k : Type} [Field k] {n : ℕ}
 
-theorem det_mulLeft_eq (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k)
+theorem det_mulLeft_eq
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k)
     (hsym : ∀ x ∈ Bz Z, ∀ y ∈ Bz Z, τ (x * y) = τ (y * x))
     (hnd : ∀ x ∈ Bz Z, (∀ y ∈ Bz Z, τ (x * y) = 0) → x = 0)
-    (a : Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))) :
-    LinearMap.det (LinearMap.mulLeft k a) = LinearMap.det (LinearMap.mulRight k a) := by
+    (a : Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)))
+    : LinearMap.det (LinearMap.mulLeft k a) = LinearMap.det (LinearMap.mulRight k a) := by
   let A := Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))
   have memA : ∀ x : Matrix (Fin n) (Fin n) k, x ∈ A ↔ x ∈ Bz Z := by
     intro x
@@ -46,10 +47,12 @@ theorem det_mulLeft_eq (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matri
     intro y
     rw [hD, LinearMap.dualMap_apply, he, he, hφ, hφ]
     simp only [LinearMap.mulRight_apply, Subalgebra.coe_mul]
-    have := hsym a ((memA a).1 a.2) ((x : Matrix (Fin n) (Fin n) k) * y)
-      ((memA _).1 (A.mul_mem x.2 y.2))
+    have :=
+      hsym a ((memA a).1 a.2) ((x : Matrix (Fin n) (Fin n) k) * y) ((memA _).1 (A.mul_mem x.2 y.2))
     rw [Matrix.mul_assoc (a : Matrix (Fin n) (Fin n) k), this, Matrix.mul_assoc]
-  have hconj : LinearMap.mulLeft k a = (e.symm : Module.Dual k A →ₗ[k] A) ∘ₗ D ∘ₗ (e : A →ₗ[k] Module.Dual k A) := by
+  have hconj
+      : LinearMap.mulLeft k a
+        = (e.symm : Module.Dual k A →ₗ[k] A) ∘ₗ D ∘ₗ (e : A →ₗ[k] Module.Dual k A) := by
     apply LinearMap.ext
     intro x
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearMap.mulLeft_apply]
@@ -58,11 +61,13 @@ theorem det_mulLeft_eq (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matri
   rw [LinearEquiv.symm_symm] at h2
   rw [hconj, h2, hD, LinearMap.det_dualMap]
 
-theorem det_conjB (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k)
+theorem det_conjB
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k)
     (hsym : ∀ x ∈ Bz Z, ∀ y ∈ Bz Z, τ (x * y) = τ (y * x))
     (hnd : ∀ x ∈ Bz Z, (∀ y ∈ Bz Z, τ (x * y) = 0) → x = 0)
     [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (h : GL (Fin n) k) (hh : h ∈ Gz Z) : LinearMap.det (conjB Z h hh) = 1 := by
+    (h : GL (Fin n) k) (hh : h ∈ Gz Z)
+    : LinearMap.det (conjB Z h hh) = 1 := by
   let A := Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))
   have hu : (h : Matrix (Fin n) (Fin n) k) ∈ A := (Subalgebra.mem_centralizer_iff k).2 hh
   have hv : ((h⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) ∈ A := by

@@ -47,14 +47,15 @@ theorem kerLow : KerLow := by
     exact h1.trans (hxi i)
   set w : ℂ := (x 0 : ℂ) * (z : ℂ) + (x 1 : ℂ) with hw
   have hwle : ‖w‖ ≤ n * (r + 1) := by
-    calc ‖w‖ ≤ ‖(x 0 : ℂ)‖ * r + ‖(x 1 : ℂ)‖ := by
-          rw [hw]
-          exact (norm_add_le _ _).trans (by rw [norm_mul])
+    calc
+      ‖w‖ ≤ ‖(x 0 : ℂ)‖ * r + ‖(x 1 : ℂ)‖ := by
+        rw [hw]
+        exact (norm_add_le _ _).trans (by rw [norm_mul])
       _ ≤ n * r + n := by
-          rw [Complex.norm_intCast, Complex.norm_intCast]
-          have := hxi 0
-          have := hxi 1
-          nlinarith
+        rw [Complex.norm_intCast, Complex.norm_intCast]
+        have := hxi 0
+        have := hxi 1
+        nlinarith
       _ = n * (r + 1) := by ring
   have hwne : w ≠ 0 := by
     intro h0
@@ -84,8 +85,7 @@ theorem kerLow : KerLow := by
   have hstep : (q / n ^ 2) ^ s ≤ (z.im / Complex.normSq w) ^ s :=
     Real.rpow_le_rpow hqn0 hbase (by linarith)
   have hsplit : (q / n ^ 2) ^ s = q ^ s * n ^ (-(2 * s)) := by
-    rw [Real.div_rpow hq0.le (by positivity), div_eq_mul_inv, Real.rpow_neg hn0,
-      Real.rpow_mul hn0]
+    rw [Real.div_rpow hq0.le (by positivity), div_eq_mul_inv, Real.rpow_neg hn0, Real.rpow_mul hn0]
     norm_num
   have hq2 : q ^ (2 : ℝ) ≤ q ^ s := Real.rpow_le_rpow_of_exponent_ge hq0 hq1 hs2
   have hq2' : 1 / 2 / (r + 1) ^ 4 ≤ q ^ (2 : ℝ) := by
@@ -94,8 +94,9 @@ theorem kerLow : KerLow := by
     apply div_le_div_of_nonneg_right _ (by positivity)
     nlinarith
   have hnpos : 0 ≤ n ^ (-(2 * s)) := Real.rpow_nonneg hn0 _
-  calc 1 / 2 / (r + 1) ^ 4 * n ^ (-(2 * s)) ≤ q ^ s * n ^ (-(2 * s)) :=
-        mul_le_mul_of_nonneg_right (hq2'.trans hq2) hnpos
+  calc
+    1 / 2 / (r + 1) ^ 4 * n ^ (-(2 * s))
+      ≤ q ^ s * n ^ (-(2 * s)) := mul_le_mul_of_nonneg_right (hq2'.trans hq2) hnpos
     _ = (q / n ^ 2) ^ s := hsplit.symm
     _ ≤ _ := hstep
 

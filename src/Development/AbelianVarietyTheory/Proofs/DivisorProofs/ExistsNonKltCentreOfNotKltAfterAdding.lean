@@ -10,16 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSpecia
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 namespace GlobalTheory.PairStep.Centre
 
 variable {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
 
-theorem centreAt_of_dominatesStalk {E : DivOver p} {z : X} (h : DominatesStalk E.ring z) :
-    CentreAt E z := by
+theorem centreAt_of_dominatesStalk {E : DivOver p} {z : X} (h : DominatesStalk E.ring z)
+    : CentreAt E z := by
   refine ⟨by rintro _ ⟨a, rfl⟩; exact h.1 a, ?_⟩
   rintro f ⟨a, ha⟩ h0
   have hinv : ((f⁻¹ : X.functionFieldˣ) : X.functionField) ∈ E.ring :=
@@ -33,20 +35,22 @@ theorem centreAt_of_dominatesStalk {E : DivOver p} {z : X} (h : DominatesStalk E
     exact f.mul_inv
   obtain ⟨u, rfl⟩ := hu
   refine ⟨((u⁻¹ : (X.presheaf.stalk z)ˣ) : X.presheaf.stalk z), ?_⟩
-  have e : algebraMap _ X.functionField
-      ((u⁻¹ : (X.presheaf.stalk z)ˣ) : X.presheaf.stalk z) * (f : X.functionField) = 1 := by
+  have e
+      : algebraMap _ X.functionField ((u⁻¹ : (X.presheaf.stalk z)ˣ) : X.presheaf.stalk z)
+          * (f : X.functionField)
+        = 1 := by
     rw [← ha, ← map_mul, Units.inv_mul, map_one]
   exact (Units.inv_eq_of_mul_eq_one_left e).symm
 
-theorem exists_centreAt {E : DivOver p} {x : X} (h : E.Through x) :
-    ∃ z, z ⤳ x ∧ CentreAt E z :=
+theorem exists_centreAt {E : DivOver p} {x : X} (h : E.Through x) : ∃ z, z ⤳ x ∧ CentreAt E z :=
   have ⟨z, hz, hd⟩ := exists_specializes_dominatesStalk_of_regAt X E.ring x h
   ⟨z, hz, centreAt_of_dominatesStalk hd⟩
 
-theorem exists_isLogEqn_add [IsLocallyNoetherian X] {n : ℕ} {Δ D : X → ℚ} {η : RatForms p n}
-    {x : X} {m : ℕ} {g : X.functionFieldˣ} (hD : IsQCart D) (hm : 0 < m)
-    (hg : IsLogEqn p Δ η x m g) :
-    ∃ (m' : ℕ) (g' : X.functionFieldˣ), 0 < m' ∧ IsLogEqn p (Δ + D) η x m' g' := by
+theorem exists_isLogEqn_add
+    [IsLocallyNoetherian X]
+    {n : ℕ} {Δ D : X → ℚ} {η : RatForms p n} {x : X} {m : ℕ} {g : X.functionFieldˣ}
+    (hD : IsQCart D) (hm : 0 < m) (hg : IsLogEqn p Δ η x m g)
+    : ∃ (m' : ℕ) (g' : X.functionFieldˣ), 0 < m' ∧ IsLogEqn p (Δ + D) η x m' g' := by
   obtain ⟨r, D₀, hr, -, rfl⟩ := hD
   obtain ⟨d, hd⟩ := D₀.exists_isEqn x
   obtain ⟨V, hV, hdV⟩ := hd.exists_nhds
@@ -61,10 +65,13 @@ theorem exists_isLogEqn_add [IsLocallyNoetherian X] {n : ℕ} {Δ D : X → ℚ}
   field_simp
   ring
 
-theorem exists_isNkltCentre : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
-    [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp ℂ) (n : ℕ), IsProjOver p → topologicalKrullDim X = n →
-    ∀ (Δ D : X → ℚ) (x : X), IsQCart D → KltAt p n Δ x → ¬ KltAt p n (Δ + D) x →
-    ∃ z, z ⤳ x ∧ IsNkltCentre p n (Δ + D) z := by
+theorem exists_isNkltCentre
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X]
+        (p : X ⟶ Sp ℂ) (n : ℕ),
+      IsProjOver p → topologicalKrullDim X = n
+        → ∀ (Δ D : X → ℚ) (x : X),
+          IsQCart D → KltAt p n Δ x → ¬ KltAt p n (Δ + D) x
+            → ∃ z, z ⤳ x ∧ IsNkltCentre p n (Δ + D) z := by
   intro X _ _ _ p n hp hn Δ D x hD hk hnk
   haveI : IsProper p := ((isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp).1
   obtain ⟨η, m, g, hη, hm, hg, -⟩ := hk

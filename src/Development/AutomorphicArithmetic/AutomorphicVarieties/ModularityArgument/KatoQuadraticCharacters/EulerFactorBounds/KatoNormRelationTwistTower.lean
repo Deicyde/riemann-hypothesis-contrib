@@ -14,16 +14,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open scoped MatrixGroups Matrix Classical
-open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4 UpperTheory.V.Z.Kato.Nb
+open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4
+  UpperTheory.V.Z.Kato.Nb
 
 namespace UpperTheory.V.Z.Kato.Nb.NormOneTrace
 
 private def rw0 (M : ℕ) (v : Fin 2 → ℤ) : Row M := fun i => (v i : ZMod M)
 
-private theorem val_cast {M D : ℕ} [NeZero M] (h : D ∣ M) (a : ℤ) : (((a : ZMod M).val : ℕ) : ZMod D) = (a : ZMod D) := by
+private theorem val_cast {M D : ℕ} [NeZero M] (h : D ∣ M) (a : ℤ)
+    : (((a : ZMod M).val : ℕ) : ZMod D) = (a : ZMod D) := by
   rw [ZMod.natCast_val, ZMod.cast_intCast h]
 
-private theorem exists_int_div_eq_toQ_rw0_add (M : ℕ) [NeZero M] (v : Fin 2 → ℤ) (i : Fin 2) : ∃ j : ℤ, (v i : ℚ) / (M : ℚ) = toQ M (rw0 M v) i + j := by
+private theorem exists_int_div_eq_toQ_rw0_add (M : ℕ) [NeZero M] (v : Fin 2 → ℤ) (i : Fin 2)
+    : ∃ j : ℤ, (v i : ℚ) / (M : ℚ) = toQ M (rw0 M v) i + j := by
   refine ⟨v i / (M : ℤ), ?_⟩
   have hM : (M : ℚ) ≠ 0 := by exact_mod_cast NeZero.ne M
   have h1 : (((v i : ZMod M).val : ℕ) : ℤ) = v i % (M : ℤ) := ZMod.val_intCast _
@@ -39,8 +42,11 @@ private theorem dn_rw0_mul_eq_rw0 (k M : ℕ) (v : Fin 2 → ℤ) : dn k M (rw0 
   funext i
   simp only [dn, rw0, map_intCast]
 
-private theorem two_ne {l M : ℕ} [Fact l.Prime] (hl : l ≠ 2) (h : l ∣ M) (v : Fin 2 → ℤ) (i : Fin 2) (hv : (v i : ZMod l) ≠ 0) :
-    (2 : ZMod M) • rw0 M v ≠ 0 := by
+private theorem two_ne
+    {l M : ℕ} [Fact l.Prime]
+    (hl : l ≠ 2) (h : l ∣ M)
+    (v : Fin 2 → ℤ) (i : Fin 2) (hv : (v i : ZMod l) ≠ 0)
+    : (2 : ZMod M) • rw0 M v ≠ 0 := by
   intro h0
   have h1 := congrFun h0 i
   simp only [Pi.smul_apply, smul_eq_mul, rw0, Pi.zero_apply] at h1
@@ -60,15 +66,17 @@ private def rU (l L N p : ℕ) (x : ZMod N) : Fin 2 → ℤ :=
 private def rV (l L N p : ℕ) : Fin 2 → ℤ :=
   ![bar l L N p * (topT l L N : ℤ) * (l : ℤ) ^ L * p, bar l L N p * N * p + N * (l : ℤ) ^ L]
 
-private theorem ixUT_eq (l L N p : ℕ) (x : ZMod N) (i : Fin 2) :
-    ixUT l L N p x i = (rU l L N p x i : ℚ) / ((N * l ^ L * p : ℕ) : ℚ) := by
+private theorem ixUT_eq (l L N p : ℕ) (x : ZMod N) (i : Fin 2)
+    : ixUT l L N p x i = (rU l L N p x i : ℚ) / ((N * l ^ L * p : ℕ) : ℚ) := by
   fin_cases i <;> rfl
 
-private theorem ixVT_eq (l L N p : ℕ) (i : Fin 2) : ixVT l L N p i = (rV l L N p i : ℚ) / ((N * l ^ L * p : ℕ) : ℚ) := by
+private theorem ixVT_eq (l L N p : ℕ) (i : Fin 2)
+    : ixVT l L N p i = (rV l L N p i : ℚ) / ((N * l ^ L * p : ℕ) : ℚ) := by
   fin_cases i <;> rfl
 
-private theorem bar_mul {l L N p D : ℕ} [NeZero (N * l ^ L)] (hp : Nat.Coprime p (N * l ^ L)) (h : D ∣ N * l ^ L) :
-    (bar l L N p : ZMod D) * p = 1 := by
+private theorem bar_mul
+    {l L N p D : ℕ} [NeZero (N * l ^ L)] (hp : Nat.Coprime p (N * l ^ L)) (h : D ∣ N * l ^ L)
+    : (bar l L N p : ZMod D) * p = 1 := by
   have h1 : ((p : ZMod (N * l ^ L)) * (p : ZMod (N * l ^ L))⁻¹) = 1 := ZMod.coe_mul_inv_eq_one p hp
   have h2 := congrArg (ZMod.castHom h (ZMod D)) h1
   simp only [map_mul, map_natCast, map_one, ZMod.castHom_apply] at h2
@@ -76,10 +84,13 @@ private theorem bar_mul {l L N p D : ℕ} [NeZero (N * l ^ L)] (hp : Nat.Coprime
   rw [Int.cast_natCast, ZMod.natCast_val, mul_comm]
   exact h2
 
-private theorem rows_l {l L N p : ℕ} [Fact l.Prime] [NeZero N] (x : ZMod N) (hL : 1 ≤ L) (hp : Nat.Coprime p (N * l ^ L)) :
-    (rU l L N p x 0 : ZMod l) = N ∧ (rV l L N p 1 : ZMod l) = N ∧ rU l L N p x 1 = 0 := by
+private theorem rows_l
+    {l L N p : ℕ} [Fact l.Prime] [NeZero N]
+    (x : ZMod N) (hL : 1 ≤ L) (hp : Nat.Coprime p (N * l ^ L))
+    : (rU l L N p x 0 : ZMod l) = N ∧ (rV l L N p 1 : ZMod l) = N ∧ rU l L N p x 1 = 0 := by
   haveI : NeZero (N * l ^ L) := ⟨Nat.mul_ne_zero (NeZero.ne N) (pow_ne_zero _ (Fact.out : l.Prime).ne_zero)⟩
-  have hb : (bar l L N p : ZMod l) * p = 1 := bar_mul hp (Dvd.dvd.mul_left (dvd_pow_self l (by omega)) N)
+  have hb : (bar l L N p : ZMod l) * p = 1 :=
+    bar_mul hp (Dvd.dvd.mul_left (dvd_pow_self l (by omega)) N)
   have h0 : (l : ZMod l) ^ L = 0 := by rw [ZMod.natCast_self, zero_pow (by omega)]
   refine ⟨?_, ?_, rfl⟩
   · simp only [rU, Matrix.cons_val_zero]
@@ -91,18 +102,21 @@ private theorem rows_l {l L N p : ℕ} [Fact l.Prime] [NeZero N] (x : ZMod N) (h
     rw [h0]
     linear_combination (N : ZMod l) * hb
 
-private theorem crt {m n : ℕ} (h : Nat.Coprime m n) {a b : ℤ} (h1 : (a : ZMod m) = b) (h2 : (a : ZMod n) = b) :
-    (a : ZMod (m * n)) = b := by
+private theorem crt
+    {m n : ℕ} (h : Nat.Coprime m n) {a b : ℤ} (h1 : (a : ZMod m) = b) (h2 : (a : ZMod n) = b)
+    : (a : ZMod (m * n)) = b := by
   rw [ZMod.intCast_eq_intCast_iff_dvd_sub] at h1 h2 ⊢
   push_cast
   exact (Nat.isCoprime_iff_coprime.2 h).mul_dvd h1 h2
 
-private theorem topT_succ {l L N : ℕ} [NeZero N] (h : Nat.Coprime l N) :
-    (topT l (L + 1) N : ZMod (N * l ^ L)) * (l : ZMod (N * l ^ L)) ^ (L + 1) = (topT l L N : ZMod (N * l ^ L)) * (l : ZMod (N * l ^ L)) ^ L := by
+private theorem topT_succ {l L N : ℕ} [NeZero N] (h : Nat.Coprime l N)
+    : (topT l (L + 1) N : ZMod (N * l ^ L)) * (l : ZMod (N * l ^ L)) ^ (L + 1)
+      = (topT l L N : ZMod (N * l ^ L)) * (l : ZMod (N * l ^ L)) ^ L := by
   have hc : Nat.Coprime N (l ^ L) := Nat.Coprime.pow_right L h.symm
   have hu : IsUnit (l : ZMod N) := (ZMod.unitOfCoprime l h).isUnit
-  have key : (((topT l (L + 1) N * l ^ (L + 1) : ℕ) : ℤ) : ZMod (N * l ^ L)) =
-      (((topT l L N * l ^ L : ℕ) : ℤ) : ZMod (N * l ^ L)) := by
+  have key
+      : (((topT l (L + 1) N * l ^ (L + 1) : ℕ) : ℤ) : ZMod (N * l ^ L))
+        = (((topT l L N * l ^ L : ℕ) : ℤ) : ZMod (N * l ^ L)) := by
     apply crt hc
     · push_cast
       simp only [topT, ZMod.natCast_val, ZMod.cast_id', id]
@@ -114,10 +128,14 @@ private theorem topT_succ {l L N : ℕ} [NeZero N] (h : Nat.Coprime l N) :
   push_cast at key
   exact key
 
-private theorem rows_succ {l L N p k : ℕ} [Fact l.Prime] [NeZero N] (x : ZMod N) (h : Nat.Coprime l N)
-    (hp : Nat.Coprime p (N * l ^ (L + 1))) (k1 : (k : ZMod (N * l ^ L)) = 1) (k2 : (k : ZMod p) = l) :
-    rw0 (N * l ^ L * p) (rU l (L + 1) N p x) = (k : ZMod (N * l ^ L * p)) • rw0 (N * l ^ L * p) (rU l L N p x) ∧
-    rw0 (N * l ^ L * p) (rV l (L + 1) N p) = (k : ZMod (N * l ^ L * p)) • rw0 (N * l ^ L * p) (rV l L N p) := by
+private theorem rows_succ
+    {l L N p k : ℕ} [Fact l.Prime] [NeZero N]
+    (x : ZMod N) (h : Nat.Coprime l N) (hp : Nat.Coprime p (N * l ^ (L + 1)))
+    (k1 : (k : ZMod (N * l ^ L)) = 1) (k2 : (k : ZMod p) = l)
+    : rw0 (N * l ^ L * p) (rU l (L + 1) N p x)
+        = (k : ZMod (N * l ^ L * p)) • rw0 (N * l ^ L * p) (rU l L N p x)
+      ∧ rw0 (N * l ^ L * p) (rV l (L + 1) N p)
+        = (k : ZMod (N * l ^ L * p)) • rw0 (N * l ^ L * p) (rV l L N p) := by
   have hpr : l.Prime := Fact.out
   have hdv : N * l ^ L ∣ N * l ^ (L + 1) := Nat.mul_dvd_mul_left N (pow_dvd_pow l (Nat.le_succ L))
   have hp' : Nat.Coprime p (N * l ^ L) := Nat.Coprime.coprime_dvd_right hdv hp
@@ -130,8 +148,10 @@ private theorem rows_succ {l L N p k : ℕ} [Fact l.Prime] [NeZero N] (x : ZMod 
   have e4 : (N : ZMod (N * l ^ L)) * (l : ZMod (N * l ^ L)) ^ L = 0 := by
     rw [← Nat.cast_pow, ← Nat.cast_mul, ZMod.natCast_self]
   have f0 : (p : ZMod p) = 0 := ZMod.natCast_self p
-  have lift : ∀ a b : ℤ, (a : ZMod (N * l ^ L)) = (k : ZMod (N * l ^ L)) * b → (a : ZMod p) = (k : ZMod p) * b →
-      (a : ZMod (N * l ^ L * p)) = (k : ZMod (N * l ^ L * p)) * b := by
+  have lift
+      : ∀ a b : ℤ,
+        (a : ZMod (N * l ^ L)) = (k : ZMod (N * l ^ L)) * b → (a : ZMod p) = (k : ZMod p) * b
+          → (a : ZMod (N * l ^ L * p)) = (k : ZMod (N * l ^ L * p)) * b := by
     intro a b h1 h2
     have h3 := crt hc (a := a) (b := (k : ℤ) * b) (by push_cast; exact h1) (by push_cast; exact h2)
     push_cast at h3
@@ -150,7 +170,8 @@ private theorem rows_succ {l L N p k : ℕ} [Fact l.Prime] [NeZero N] (x : ZMod 
         push_cast
         linear_combination ((bar l (L + 1) N p : ZMod p) * (N + x.val * topT l (L + 1) N * l ^ (L + 1))
           - k * bar l L N p * (N + x.val * topT l L N * l ^ L)) * f0 - ((N : ZMod p) * l ^ L) * k2
-    · simp only [rw0, Pi.smul_apply, smul_eq_mul, rU, Matrix.cons_val_one, Matrix.head_cons, Fin.mk_one]
+    · simp only [rw0, Pi.smul_apply, smul_eq_mul, rU, Matrix.cons_val_one, Matrix.head_cons,
+        Fin.mk_one]
       simp
   · funext i
     fin_cases i
@@ -176,16 +197,30 @@ private theorem rows_succ {l L N p k : ℕ} [Fact l.Prime] [NeZero N] (x : ZMod 
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ}
 
-private theorem down (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS : SXiScal)
-    (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n N M₀ M M' w c d : ℕ) [NeZero N] [NeZero M₀] [NeZero M] [NeZero M'] [NeZero (l * M₀)]
-    (g : SL(2, ℤ)) (lev : Lev l n N M₀ M g) (hL : LiftsWith X l N w (cL X l N w)) (h : M ∣ M') (e : M' = N * (l * M₀))
-    (ws) (law : Laws X l c d ws) (lv : Lv c d (l * M₀)) (x' y' : Row (l * M₀)) (x y : Row M₀) (ok : Ok x y)
-    (bas : Bas l N x' y') (ν : (ZMod M)ˣ) (n1 : ((ν : ZMod M).val : ZMod N) = 1) (n2 : ((ν : ZMod M).val : ZMod (l ^ n)) = 1)
-    (ex : dn l M₀ x' = ((ν : ZMod M).val : ZMod M₀) • x) (ey : dn l M₀ y' = ((ν : ZMod M).val : ZMod M₀) • y)
-    (A : Type) [CommGroup A] (π : (ZMod M)ˣ →* A) :
-    CohB X l N w n (fun s => (π (cycM M s))⁻¹)
-      (fun s t => Xi X l n N (l * M₀) M' w g x' y'
-        (fun z => π (Units.map (ZMod.castHom h (ZMod M)).toMonoidHom z) = t) (ws n (l * M₀) s))
+private theorem down
+    (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS : SXiScal)
+    (X : Tower Ω ε)
+    (l : ℕ) [Fact l.Prime]
+    (n N M₀ M M' w c d : ℕ) [NeZero N] [NeZero M₀] [NeZero M] [NeZero M'] [NeZero (l * M₀)]
+    (g : SL(2, ℤ)) (lev : Lev l n N M₀ M g)
+    (hL : LiftsWith X l N w (cL X l N w)) (h : M ∣ M') (e : M' = N * (l * M₀))
+    (ws) (law : Laws X l c d ws)
+    (lv : Lv c d (l * M₀))
+    (x' y' : Row (l * M₀))
+    (x y : Row M₀) (ok : Ok x y)
+    (bas : Bas l N x' y')
+    (ν : (ZMod M)ˣ)
+    (n1 : ((ν : ZMod M).val : ZMod N) = 1) (n2 : ((ν : ZMod M).val : ZMod (l ^ n)) = 1)
+    (ex : dn l M₀ x' = ((ν : ZMod M).val : ZMod M₀) • x)
+    (ey : dn l M₀ y' = ((ν : ZMod M).val : ZMod M₀) • y)
+    (A : Type) [CommGroup A]
+    (π : (ZMod M)ˣ →* A)
+    : CohB X l N w n
+      (fun s => (π (cycM M s))⁻¹)
+      (fun s t =>
+        Xi X l n N (l * M₀) M' w g x' y'
+          (fun z => π (Units.map (ZMod.castHom h (ZMod M)).toMonoidHom z) = t)
+          (ws n (l * M₀) s))
       (fun s t => Xi X l n N M₀ M w g x y (fun z => π z = t * π ν ^ 2) (ws n M₀ s)) := by
   have hpr : l.Prime := Fact.out
   haveI : NeZero l := ⟨hpr.ne_zero⟩
@@ -214,12 +249,17 @@ private theorem down (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
       exact cu.smul_left_cancel.1 (h0.trans (smul_zero _).symm)
     · rw [smul_comm] at h0
       exact cu.smul_left_cancel.1 (h0.trans (smul_zero _).symm)
-  refine EC.trans (y := fun s t => Xi X l n N M₀ M w g (dn l M₀ x') (dn l M₀ y') (fun z => π z = t)
-    (pushD X l M₀ (ws n (l * M₀) s))) ?_ ?_
+  refine EC.trans
+    (y := fun s t =>
+      Xi X l n N M₀ M w g (dn l M₀ x') (dn l M₀ y')
+        (fun z => π z = t)
+        (pushD X l M₀ (ws n (l * M₀) s)))
+    ?_ ?_
   · apply hC'.2.1
     intro s t
     exact hD Ω ε X l n N M₀ M w g lev M' h e x' y' bas (fun z => π z = t) (ws n (l * M₀) s)
-  refine EC.trans (hX Ω ε X l n N M₀ M w g lev hL (dn l M₀ x') (dn l M₀ y') okd A π _ _ (law.dist n l M₀ lv)) ?_
+  refine EC.trans
+    (hX Ω ε X l n N M₀ M w g lev hL (dn l M₀ x') (dn l M₀ y') okd A π _ _ (law.dist n l M₀ lv)) ?_
   rw [ex, ey]
   apply hC'.2.1
   intro s t
@@ -229,18 +269,32 @@ private theorem down (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
     rw [map_mul, map_pow, map_inv, inv_pow, mul_inv_eq_iff_eq_mul]
   rw [← key]
   have hs := hS Ω ε X l n N M₀ M w g lev x y (fun z => π z = t) (ws n M₀ s) ν n1
-  have e1 := sc _ (Xi X l n N M₀ M w g (((ν : ZMod M).val : ZMod M₀) • x) (((ν : ZMod M).val : ZMod M₀) • y)
-    (fun z => π z = t) (ws n M₀ s)) (dpow w)
+  have e1 :=
+    sc _
+      (Xi X l n N M₀ M w g (((ν : ZMod M).val : ZMod M₀) • x) (((ν : ZMod M).val : ZMod M₀) • y)
+        (fun z => π z = t)
+        (ws n M₀ s))
+      (dpow w)
   have e2 := sc _ (Xi X l n N M₀ M w g x y (fun z => π (z * ν⁻¹ ^ 2) = t) (ws n M₀ s)) (dpow 2)
   exact EF.trans (EF.symm e1) (EF.trans hs e2)
 
-private theorem topXi (hT : STopRel) (hB : SBridge)
-    (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n N M₀ M w c d : ℕ) [NeZero N] [NeZero M₀] [NeZero M]
-    (g : SL(2, ℤ)) (lev : Lev l n N M₀ M g) (hL : LiftsWith X l N w (cL X l N w))
-    (ws) (law : Laws X l c d ws) (lv : Lv c d M₀) (U V : Fin 2 → ℤ) (ok : Ok (rw0 M₀ U) (rw0 M₀ V)) (x' y' : Fin 2 → ℚ)
+private theorem topXi
+    (hT : STopRel) (hB : SBridge)
+    (X : Tower Ω ε)
+    (l : ℕ) [Fact l.Prime]
+    (n N M₀ M w c d : ℕ) [NeZero N] [NeZero M₀] [NeZero M]
+    (g : SL(2, ℤ)) (lev : Lev l n N M₀ M g)
+    (hL : LiftsWith X l N w (cL X l N w))
+    (ws) (law : Laws X l c d ws)
+    (lv : Lv c d M₀)
+    (U V : Fin 2 → ℤ) (ok : Ok (rw0 M₀ U) (rw0 M₀ V))
+    (x' y' : Fin 2 → ℚ)
     (hx : ∀ i, x' i = (U i : ℚ) / (M₀ : ℚ)) (hy : ∀ i, y' i = (V i : ℚ) / (M₀ : ℚ))
-    (A : Type) [Group A] [DecidableEq A] (π : (ZMod M)ˣ →* A) :
-    CohB X l N w n (fun s => (π (cycM M s))⁻¹) (GlobalTheory.KA.push π (shB X l M (clsG X l n N M w c d g x' y')))
+    (A : Type) [Group A] [DecidableEq A]
+    (π : (ZMod M)ˣ →* A)
+    : CohB X l N w n
+      (fun s => (π (cycM M s))⁻¹)
+      (GlobalTheory.KA.push π (shB X l M (clsG X l n N M w c d g x' y')))
       fun s t => Xi X l n N M₀ M w g (rw0 M₀ U) (rw0 M₀ V) (fun z => π z = t) (ws n M₀ s) := by
   have hx' : ∀ i, ∃ j : ℤ, x' i = toQ M₀ (rw0 M₀ U) i + j := fun i => by
     rw [hx i]
@@ -248,19 +302,25 @@ private theorem topXi (hT : STopRel) (hB : SBridge)
   have hy' : ∀ i, ∃ j : ℤ, y' i = toQ M₀ (rw0 M₀ V) i + j := fun i => by
     rw [hy i]
     exact exists_int_div_eq_toQ_rw0_add M₀ V i
-  obtain ⟨β, hβ, hc⟩ := hT Ω ε X l n N M₀ M w g lev hL c d ws law lv (rw0 M₀ U) (rw0 M₀ V) ok x' y' hx' hy'
-  exact hB Ω ε X l n N M₀ M w g lev hL (rw0 M₀ U) (rw0 M₀ V) ok (ws n M₀) (law.coc n M₀ lv) _ β hβ hc A π
+  obtain ⟨β, hβ, hc⟩ :=
+    hT Ω ε X l n N M₀ M w g lev hL c d ws law lv (rw0 M₀ U) (rw0 M₀ V) ok x' y' hx' hy'
+  exact hB Ω ε X l n N M₀ M w g lev hL (rw0 M₀ U) (rw0 M₀ V) ok (ws n M₀) (law.coc n M₀ lv) _ β hβ
+    hc A π
 
 private def rdH (l n r N p : ℕ) : (ZMod (lvT l n r N p))ˣ →* (ZMod p)ˣ × (ZMod (l ^ r))ˣ :=
   (Units.map (ZMod.castHom (Dvd.intro_left _ rfl : p ∣ lvT l n r N p) (ZMod p)).toMonoidHom).prod
-   (Units.map (ZMod.castHom ((Dvd.dvd.mul_right (pow_dvd_pow l (Nat.le_add_right r n)) (N * N)).mul_right p)
-     (ZMod (l ^ r))).toMonoidHom)
+    (Units.map (ZMod.castHom
+      ((Dvd.dvd.mul_right (pow_dvd_pow l (Nat.le_add_right r n)) (N * N)).mul_right p)
+      (ZMod (l ^ r))).toMonoidHom)
 
-private theorem rdH_comp (l n r N p : ℕ) (h : lvT l n r N p ∣ lvT l n (r + 1) N p) (z : (ZMod (lvT l n (r + 1) N p))ˣ) :
-    Prod.map id (redL l r) (rdT l n (r + 1) N p z) =
-      rdH l n r N p (Units.map (ZMod.castHom h (ZMod (lvT l n r N p))).toMonoidHom z) := by
-  have c1 : ∀ (a b c : ℕ) (h1 : b ∣ a) (h2 : c ∣ b) (u : ZMod a),
-      ZMod.castHom h2 (ZMod c) (ZMod.castHom h1 (ZMod b) u) = ZMod.castHom (h2.trans h1) (ZMod c) u := by
+private theorem rdH_comp
+    (l n r N p : ℕ) (h : lvT l n r N p ∣ lvT l n (r + 1) N p) (z : (ZMod (lvT l n (r + 1) N p))ˣ)
+    : Prod.map id (redL l r) (rdT l n (r + 1) N p z)
+      = rdH l n r N p (Units.map (ZMod.castHom h (ZMod (lvT l n r N p))).toMonoidHom z) := by
+  have c1
+      : ∀ (a b c : ℕ) (h1 : b ∣ a) (h2 : c ∣ b) (u : ZMod a),
+        ZMod.castHom h2 (ZMod c) (ZMod.castHom h1 (ZMod b) u)
+          = ZMod.castHom (h2.trans h1) (ZMod c) u := by
     intro a b c h1 h2 u
     exact RingHom.congr_fun (ZMod.castHom_comp h2 h1) u
   apply Prod.ext
@@ -269,13 +329,20 @@ private theorem rdH_comp (l n r N p : ℕ) (h : lvT l n r N p ∣ lvT l n (r + 1
   · apply Units.ext
     exact (c1 _ _ _ _ _ _).trans (c1 _ _ _ _ _ _).symm
 
-private theorem push_push {Γ Z A B B' M : Type} [Fintype Z] [Group A] [Fintype (A × B')] [DecidableEq (A × B')] [DecidableEq (A × B)]
-    [AddCommMonoid M] (π : Z → A × B') (f : B' → B) (π' : Z → A × B) (h : ∀ z, Prod.map id f (π z) = π' z) (u : A)
-    (Y : Γ → Z → M) (s : Γ) (y : A × B) :
-    GlobalTheory.KA.push (Prod.map id f) (fun s (y' : A × B') => GlobalTheory.KA.push π Y s (y'.1 * u, y'.2)) s y = GlobalTheory.KA.push π' Y s (y.1 * u, y.2) := by
+private theorem push_push
+    {Γ Z A B B' M : Type} [Fintype Z] [Group A] [Fintype (A × B')] [DecidableEq (A × B')]
+    [DecidableEq (A × B)] [AddCommMonoid M]
+    (π : Z → A × B') (f : B' → B) (π' : Z → A × B) (h : ∀ z, Prod.map id f (π z) = π' z)
+    (u : A) (Y : Γ → Z → M) (s : Γ) (y : A × B)
+    : GlobalTheory.KA.push (Prod.map id f)
+        (fun s (y' : A × B') => GlobalTheory.KA.push π Y s (y'.1 * u, y'.2))
+        s y
+      = GlobalTheory.KA.push π' Y s (y.1 * u, y.2) := by
   classical
-  have hmaps : ∀ z ∈ Finset.univ.filter (fun z => π' z = (y.1 * u, y.2)),
-      (fun z => ((π z).1 * u⁻¹, (π z).2)) z ∈ Finset.univ.filter (fun y' : A × B' => Prod.map id f y' = y) := by
+  have hmaps
+      : ∀ z ∈ Finset.univ.filter (fun z => π' z = (y.1 * u, y.2)),
+        (fun z => ((π z).1 * u⁻¹, (π z).2)) z
+          ∈ Finset.univ.filter (fun y' : A × B' => Prod.map id f y' = y) := by
     intro z hz
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hz ⊢
     rw [← h z] at hz
@@ -305,16 +372,22 @@ private theorem push_push {Γ Z A B B' M : Type} [Fintype Z] [Group A] [Fintype 
     rw [← hz]
     simp
 
-private theorem rdH_cyc (hG : SSlD) (hZ : SCycZ) (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n r N p : ℕ) [NeZero N] [NeZero p] :
-    (fun s : Ω ≃ₐ[ℚ] Ω => (rdH l n r N p (cycM (lvT l n r N p) s))⁻¹) = kT l r p := by
+private theorem rdH_cyc
+    (hG : SSlD) (hZ : SCycZ) (X : Tower Ω ε)
+    (l : ℕ) [Fact l.Prime]
+    (n r N p : ℕ) [NeZero N] [NeZero p]
+    : (fun s : Ω ≃ₐ[ℚ] Ω => (rdH l n r N p (cycM (lvT l n r N p) s))⁻¹) = kT l r p := by
   funext s
-  have h := ((hG Ω ε X N (Nat.pos_of_ne_zero (NeZero.ne N))).2.2.2.2.2.2.2 (lvT l n r N p) s).2.2.2.2
+  have h :=
+    ((hG Ω ε X N (Nat.pos_of_ne_zero (NeZero.ne N))).2.2.2.2.2.2.2 (lvT l n r N p) s).2.2.2.2
   unfold kT
   rw [(hZ Ω l r s).1]
   exact Prod.ext (congrArg Inv.inv (h p _)) (congrArg Inv.inv (h (l ^ r) _))
 
-private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS : SXiScal) (hG : SSlD)
-    (hT : STopRel) (hB : SBridge) (hZ : SCycZ) : KatoTwistedClassNormCompatibleCyclotomic := by
+private theorem main
+    (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS : SXiScal) (hG : SSlD)
+    (hT : STopRel) (hB : SBridge) (hZ : SCycZ)
+    : KatoTwistedClassNormCompatibleCyclotomic := by
   intro Ω _ _ _ ε X l _ N p _ _ x c d w g hyp hp hcop hws hL n r
   obtain ⟨ws, law⟩ := hws
   have hpr : l.Prime := Fact.out
@@ -330,7 +403,8 @@ private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
   have hpN : Nat.Coprime p N := Nat.Coprime.coprime_dvd_right ⟨l * c * d, by ring⟩ hcop
   have hpc : Nat.Coprime p c := Nat.Coprime.coprime_dvd_right ⟨l * N * d, by ring⟩ hcop
   have hpd : Nat.Coprime p d := Nat.Coprime.coprime_dvd_right ⟨l * N * c, by ring⟩ hcop
-  have hpNL : ∀ L, Nat.Coprime p (N * l ^ L) := fun L => Nat.Coprime.mul_right hpN (Nat.Coprime.pow_right L hpl)
+  have hpNL : ∀ L, Nat.Coprime p (N * l ^ L) := fun L =>
+    Nat.Coprime.mul_right hpN (Nat.Coprime.pow_right L hpl)
   have hNl : (N : ZMod l) ≠ 0 := by
     intro h0
     have h1 : l ∣ N := (CharP.cast_eq_zero_iff (ZMod l) l N).1 h0
@@ -355,28 +429,42 @@ private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
   have cN : Nat.Coprime c N := Nat.Coprime.coprime_dvd_right ⟨6 * l, by ring⟩ hyp.cc
   have dl : Nat.Coprime d l := Nat.Coprime.coprime_dvd_right ⟨6 * N, by ring⟩ hyp.cd
   have dN : Nat.Coprime d N := Nat.Coprime.coprime_dvd_right ⟨6 * l, by ring⟩ hyp.cd
-  have cop3 : ∀ {e : ℕ}, Nat.Coprime e l → Nat.Coprime e N → Nat.Coprime e p →
-      Nat.Coprime e (N * l ^ (r + n) * p) ∧ Nat.Coprime e (l * (N * l ^ (r + n) * p)) := fun a b q =>
-    ⟨Nat.Coprime.mul_right (Nat.Coprime.mul_right b (Nat.Coprime.pow_right _ a)) q,
-      Nat.Coprime.mul_right a (Nat.Coprime.mul_right (Nat.Coprime.mul_right b (Nat.Coprime.pow_right _ a)) q)⟩
+  have cop3
+      : ∀ {e : ℕ},
+        Nat.Coprime e l → Nat.Coprime e N → Nat.Coprime e p
+          → Nat.Coprime e (N * l ^ (r + n) * p)
+            ∧ Nat.Coprime e (l * (N * l ^ (r + n) * p)) := fun a b q => ⟨
+    Nat.Coprime.mul_right (Nat.Coprime.mul_right b (Nat.Coprime.pow_right _ a)) q,
+    Nat.Coprime.mul_right a
+      (Nat.Coprime.mul_right (Nat.Coprime.mul_right b (Nat.Coprime.pow_right _ a)) q)
+  ⟩
   have lv0 : Lv c d (N * l ^ (r + n) * p) :=
     ⟨Nat.pos_of_ne_zero i1.out, (cop3 cl cN hpc.symm).1, (cop3 dl dN hpd.symm).1⟩
   have lv1 : Lv c d (l * (N * l ^ (r + n) * p)) :=
     ⟨Nat.pos_of_ne_zero i2.out, (cop3 cl cN hpc.symm).2, (cop3 dl dN hpd.symm).2⟩
   have rl0 := rows_l (l := l) (L := r + n) (N := N) (p := p) x (by omega) (hpNL _)
   have rl1 := rows_l (l := l) (L := r + 1 + n) (N := N) (p := p) x (by omega) (hpNL _)
-  have hlQ : l ∣ N * l ^ (r + n) * p := Dvd.dvd.mul_right (Dvd.dvd.mul_left (dvd_pow_self l (by omega)) N) p
-  have ok0 : Ok (rw0 (N * l ^ (r + n) * p) (rU l (r + n) N p x)) (rw0 (N * l ^ (r + n) * p) (rV l (r + n) N p)) :=
-    And.intro (two_ne hl2 hlQ _ 0 (by rw [rl0.1]; exact hNl)) (two_ne hl2 hlQ _ 1 (by rw [rl0.2.1]; exact hNl))
+  have hlQ : l ∣ N * l ^ (r + n) * p :=
+    Dvd.dvd.mul_right (Dvd.dvd.mul_left (dvd_pow_self l (by omega)) N) p
+  have ok0 : Ok (rw0 (N * l ^ (r + n) * p) (rU l (r + n) N p x))
+      (rw0 (N * l ^ (r + n) * p) (rV l (r + n) N p)) :=
+    And.intro (two_ne hl2 hlQ _ 0 (by rw [rl0.1]; exact hNl))
+      (two_ne hl2 hlQ _ 1 (by rw [rl0.2.1]; exact hNl))
   have ok1 : Ok (rw0 (l * (N * l ^ (r + n) * p)) (rU l (r + 1 + n) N p x))
       (rw0 (l * (N * l ^ (r + n) * p)) (rV l (r + 1 + n) N p)) :=
     And.intro (two_ne hl2 (dvd_mul_right _ _) _ 0 (by rw [rl1.1]; exact hNl))
       (two_ne hl2 (dvd_mul_right _ _) _ 1 (by rw [rl1.2.1]; exact hNl))
   have e1n : N * l ^ (r + 1 + n) * p = l * (N * l ^ (r + n) * p) := by ring
-  have hx1 : ∀ i, ixUT l (r + 1 + n) N p x i = (rU l (r + 1 + n) N p x i : ℚ) / ((l * (N * l ^ (r + n) * p) : ℕ) : ℚ) :=
-    fun i => by rw [ixUT_eq, e1n]
-  have hy1 : ∀ i, ixVT l (r + 1 + n) N p i = (rV l (r + 1 + n) N p i : ℚ) / ((l * (N * l ^ (r + n) * p) : ℕ) : ℚ) :=
-    fun i => by rw [ixVT_eq, e1n]
+  have hx1
+      : ∀ i,
+        ixUT l (r + 1 + n) N p x i
+          = (rU l (r + 1 + n) N p x i : ℚ) / ((l * (N * l ^ (r + n) * p) : ℕ) : ℚ) := fun i => by
+    rw [ixUT_eq, e1n]
+  have hy1
+      : ∀ i,
+        ixVT l (r + 1 + n) N p i
+          = (rV l (r + 1 + n) N p i : ℚ) / ((l * (N * l ^ (r + n) * p) : ℕ) : ℚ) := fun i => by
+    rw [ixVT_eq, e1n]
   have hcp : Nat.Coprime (l ^ (r + n) * (N * N)) p :=
     (Nat.Coprime.mul_right (Nat.Coprime.pow_right _ hpl) (Nat.Coprime.mul_right hpN hpN)).symm
   obtain ⟨k, hk1, hk2⟩ := Nat.chineseRemainder hcp 1 l
@@ -394,7 +482,9 @@ private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
       exact hpl.symm
   obtain ⟨ν, hνk⟩ : ∃ ν : (ZMod (lvT l n r N p))ˣ, (ν : ZMod (lvT l n r N p)) = k :=
     ⟨ZMod.unitOfCoprime k kcop, ZMod.coe_unitOfCoprime k kcop⟩
-  have hν : ∀ D, D ∣ lvT l n r N p → (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod D) = k := fun D hD => by
+  have hν
+      : ∀ D,
+        D ∣ lvT l n r N p → (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod D) = k := fun D hD => by
     rw [ZMod.natCast_val, hνk, ZMod.cast_natCast hD]
   have n1 : (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod N) = 1 := by
     rw [hν N ⟨N * l ^ (r + n) * p, eMr⟩]
@@ -406,11 +496,15 @@ private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
   have rs := rows_succ (l := l) (L := r + n) (N := N) (p := p) (k := k) x hlN (hpNL _) hkQ hkp
   rw [show r + n + 1 = r + 1 + n by omega] at rs
   have hQM : N * l ^ (r + n) * p ∣ lvT l n r N p := ⟨N, by rw [eMr, mul_comm]⟩
-  have ex : dn l (N * l ^ (r + n) * p) (rw0 (l * (N * l ^ (r + n) * p)) (rU l (r + 1 + n) N p x)) =
-      (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod (N * l ^ (r + n) * p)) • rw0 (N * l ^ (r + n) * p) (rU l (r + n) N p x) := by
+  have ex
+      : dn l (N * l ^ (r + n) * p) (rw0 (l * (N * l ^ (r + n) * p)) (rU l (r + 1 + n) N p x))
+        = (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod (N * l ^ (r + n) * p))
+          • rw0 (N * l ^ (r + n) * p) (rU l (r + n) N p x) := by
     rw [dn_rw0_mul_eq_rw0, hν _ hQM, rs.1]
-  have ey : dn l (N * l ^ (r + n) * p) (rw0 (l * (N * l ^ (r + n) * p)) (rV l (r + 1 + n) N p)) =
-      (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod (N * l ^ (r + n) * p)) • rw0 (N * l ^ (r + n) * p) (rV l (r + n) N p) := by
+  have ey
+      : dn l (N * l ^ (r + n) * p) (rw0 (l * (N * l ^ (r + n) * p)) (rV l (r + 1 + n) N p))
+        = (((ν : ZMod (lvT l n r N p)).val : ℕ) : ZMod (N * l ^ (r + n) * p))
+          • rw0 (N * l ^ (r + n) * p) (rV l (r + n) N p) := by
     rw [dn_rw0_mul_eq_rw0, hν _ hQM, rs.2]
   have bas : Bas l N (rw0 (l * (N * l ^ (r + n) * p)) (rU l (r + 1 + n) N p x))
       (rw0 (l * (N * l ^ (r + n) * p)) (rV l (r + 1 + n) N p)) := by
@@ -424,42 +518,54 @@ private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
     rw [val_cast (dvd_mul_right l _), val_cast (dvd_mul_right l _), rl1.1, rl1.2.1]
     exact mul_ne_zero hNl hNl
   have hcyc := (hG Ω ε X 1 one_pos).2.2.2.2.2.2.2
-  have Cr := topXi hT hB X l n N (N * l ^ (r + n) * p) (lvT l n r N p) w c d g lev0 hL ws law lv0
-    (rU l (r + n) N p x) (rV l (r + n) N p) ok0 (ixUT l (r + n) N p x) (ixVT l (r + n) N p)
-    (ixUT_eq l (r + n) N p x) (ixVT_eq l (r + n) N p) _ (rdH l n r N p)
+  have Cr :=
+    topXi hT hB X l n N (N * l ^ (r + n) * p) (lvT l n r N p) w c d g lev0 hL ws law lv0
+      (rU l (r + n) N p x) (rV l (r + n) N p) ok0 (ixUT l (r + n) N p x) (ixVT l (r + n) N p)
+      (ixUT_eq l (r + n) N p x) (ixVT_eq l (r + n) N p) _ (rdH l n r N p)
   rw [rdH_cyc hG hZ X l n r N p] at Cr
-  have C1 := topXi hT hB X l n N (l * (N * l ^ (r + n) * p)) (lvT l n (r + 1) N p) w c d g lev1 hL ws law lv1
-    (rU l (r + 1 + n) N p x) (rV l (r + 1 + n) N p) ok1 (ixUT l (r + 1 + n) N p x) (ixVT l (r + 1 + n) N p)
-    hx1 hy1 _ ((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom))
-  have hκ' : (fun s : Ω ≃ₐ[ℚ] Ω => (((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom))
-      (cycM (lvT l n (r + 1) N p) s))⁻¹) = kT l r p := by
+  have C1 :=
+    topXi hT hB X l n N (l * (N * l ^ (r + n) * p)) (lvT l n (r + 1) N p) w c d g lev1 hL ws law lv1
+      (rU l (r + 1 + n) N p x) (rV l (r + 1 + n) N p) ok1 (ixUT l (r + 1 + n) N p x)
+      (ixVT l (r + 1 + n) N p) hx1 hy1 _
+      ((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom))
+  have hκ'
+      : (fun s : Ω ≃ₐ[ℚ] Ω =>
+          (((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom))
+            (cycM (lvT l n (r + 1) N p) s))⁻¹)
+        = kT l r p := by
     rw [← rdH_cyc hG hZ X l n r N p]
     funext s
-    exact congrArg (fun u => (rdH l n r N p u)⁻¹) ((hcyc (lvT l n (r + 1) N p) s).2.2.2.2 (lvT l n r N p) hMM)
+    exact congrArg
+      (fun u => (rdH l n r N p u)⁻¹)
+      ((hcyc (lvT l n (r + 1) N p) s).2.2.2.2 (lvT l n r N p) hMM)
   rw [hκ'] at C1
-  have Dn := down hA hC hX hD hS X l n N (N * l ^ (r + n) * p) (lvT l n r N p) (lvT l n (r + 1) N p) w c d g lev0 hL
-    hMM eM1 ws law lv1 _ _ _ _ ok0 bas ν n1 n2 ex ey _ (rdH l n r N p)
+  have Dn :=
+    down hA hC hX hD hS X l n N (N * l ^ (r + n) * p) (lvT l n r N p) (lvT l n (r + 1) N p) w c d g
+      lev0 hL hMM eM1 ws law lv1 _ _ _ _ ok0 bas ν n1 n2 ex ey _ (rdH l n r N p)
   rw [rdH_cyc hG hZ X l n r N p] at Dn
   have chain1 := C.1.trans C1 Dn
   have hνp : (((rdH l n r N p ν).1 : (ZMod p)ˣ) : ZMod p) = l := by
     show (ZMod.castHom _ (ZMod p)) (ν : ZMod (lvT l n r N p)) = l
     rw [hνk, map_natCast, hkp]
-  have hνl : (rdH l n r N p ν).2 = 1 := Units.ext (by
-    show (ZMod.castHom _ (ZMod (l ^ r))) (ν : ZMod (lvT l n r N p)) = 1
-    rw [hνk, map_natCast]
-    exact hkD _ ⟨l ^ n * (N * N), by ring⟩)
+  have hνl : (rdH l n r N p ν).2 = 1 :=
+    Units.ext (by
+      show (ZMod.castHom _ (ZMod (l ^ r))) (ν : ZMod (lvT l n r N p)) = 1
+      rw [hνk, map_natCast]
+      exact hkD _ ⟨l ^ n * (N * N), by ring⟩)
   have hinv : inv1 p l = ((rdH l n r N p ν).1)⁻¹ := by
     have hu : IsUnit (l : ZMod p) := by
       rw [← hνp]
       exact Units.isUnit _
     rw [inv1, dite_eq_left hu, inv_inj]
     exact Units.ext (by rw [IsUnit.unit_spec, hνp])
-  have htt : ((inv1 p l ^ (2 * (r + 1 + n)), (1 : (ZMod (l ^ r))ˣ)) : (ZMod p)ˣ × (ZMod (l ^ r))ˣ) * (rdH l n r N p ν) ^ 2 =
-      (inv1 p l ^ (2 * (r + n)), 1) := by
+  have htt
+      : ((inv1 p l ^ (2 * (r + 1 + n)), (1 : (ZMod (l ^ r))ˣ)) : (ZMod p)ˣ × (ZMod (l ^ r))ˣ)
+          * (rdH l n r N p ν) ^ 2
+        = (inv1 p l ^ (2 * (r + n)), 1) := by
     apply Prod.ext
     · show inv1 p l ^ (2 * (r + 1 + n)) * ((rdH l n r N p ν).1) ^ 2 = inv1 p l ^ (2 * (r + n))
-      rw [hinv, show 2 * (r + 1 + n) = 2 * (r + n) + 2 by ring, pow_add, mul_assoc, ← mul_pow, inv_mul_cancel,
-        one_pow, mul_one]
+      rw [hinv, show 2 * (r + 1 + n) = 2 * (r + n) + 2 by ring, pow_add, mul_assoc, ← mul_pow,
+        inv_mul_cancel, one_pow, mul_one]
     · show 1 * ((rdH l n r N p ν).2) ^ 2 = 1
       rw [hνl]
       simp
@@ -467,32 +573,45 @@ private theorem main (hA : SApi) (hC : SCohApi) (hX : SXiCoh) (hD : SXiDist) (hS
   have S0 := C.2.2.2.1 1 (inv1 p l ^ (2 * (r + n)), 1) _ _ Cr
   simp only [mul_assoc, htt] at S1
   have fin := C.1.trans S1 (C.1.symm S0)
-  have eqL : GlobalTheory.KA.push (Prod.map id (redL l r)) (YT X l n (r + 1) N p x c d w g) =
-      fun s y => (1 : ℤ_[l]) • GlobalTheory.KA.push
-        (⇑((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom)))
-        (shB X l (lvT l n (r + 1) N p) (clsT X l n (r + 1) N p x c d w g)) s
-        (y * (inv1 p l ^ (2 * (r + 1 + n)), 1)) := by
+  have eqL
+      : GlobalTheory.KA.push (Prod.map id (redL l r)) (YT X l n (r + 1) N p x c d w g)
+        = fun s y =>
+          (1 : ℤ_[l]) • GlobalTheory.KA.push
+            (⇑((rdH l n r N p).comp
+              (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom)))
+            (shB X l (lvT l n (r + 1) N p) (clsT X l n (r + 1) N p x c d w g)) s
+            (y * (inv1 p l ^ (2 * (r + 1 + n)), 1)) := by
     funext s y
     rw [one_smul]
     exact (push_push (rdT l n (r + 1) N p) (redL l r)
-      (⇑((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom)))
-      (fun z => rdH_comp l n r N p hMM z) (inv1 p l ^ (2 * (r + 1 + n)))
-      (shB X l (lvT l n (r + 1) N p) (clsT X l n (r + 1) N p x c d w g)) s y).trans
-      (congrArg _ (Prod.ext rfl (mul_one y.2).symm :
-        ((y.1 * inv1 p l ^ (2 * (r + 1 + n)), y.2) : (ZMod p)ˣ × (ZMod (l ^ r))ˣ) = y * (inv1 p l ^ (2 * (r + 1 + n)), 1)))
-  have eqR : YT X l n r N p x c d w g =
-      fun s y => (1 : ℤ_[l]) • GlobalTheory.KA.push (⇑(rdH l n r N p))
-        (shB X l (lvT l n r N p) (clsT X l n r N p x c d w g)) s (y * (inv1 p l ^ (2 * (r + n)), 1)) := by
+        (⇑((rdH l n r N p).comp (Units.map (ZMod.castHom hMM (ZMod (lvT l n r N p))).toMonoidHom)))
+        (fun z => rdH_comp l n r N p hMM z)
+        (inv1 p l ^ (2 * (r + 1 + n)))
+        (shB X l (lvT l n (r + 1) N p) (clsT X l n (r + 1) N p x c d w g)) s y).trans
+      (congrArg _
+        (Prod.ext rfl (mul_one y.2).symm
+          : ((y.1 * inv1 p l ^ (2 * (r + 1 + n)), y.2) : (ZMod p)ˣ × (ZMod (l ^ r))ˣ)
+            = y * (inv1 p l ^ (2 * (r + 1 + n)), 1)))
+  have eqR
+      : YT X l n r N p x c d w g
+        = fun s y =>
+          (1 : ℤ_[l]) • GlobalTheory.KA.push (⇑(rdH l n r N p))
+            (shB X l (lvT l n r N p) (clsT X l n r N p x c d w g)) s
+            (y * (inv1 p l ^ (2 * (r + n)), 1)) := by
     funext s y
     rw [one_smul]
-    exact congrArg (GlobalTheory.KA.push (rdT l n r N p) (shB X l (lvT l n r N p) (clsT X l n r N p x c d w g)) s)
-      (Prod.ext rfl (mul_one y.2).symm :
-        ((y.1 * inv1 p l ^ (2 * (r + n)), y.2) : (ZMod p)ˣ × (ZMod (l ^ r))ˣ) = y * (inv1 p l ^ (2 * (r + n)), 1))
+    exact congrArg
+      (GlobalTheory.KA.push (rdT l n r N p) (shB X l (lvT l n r N p) (clsT X l n r N p x c d w g))
+        s)
+      (Prod.ext rfl (mul_one y.2).symm
+        : ((y.1 * inv1 p l ^ (2 * (r + n)), y.2) : (ZMod p)ˣ × (ZMod (l ^ r))ˣ)
+          = y * (inv1 p l ^ (2 * (r + n)), 1))
   rw [eqL, eqR]
   exact fin
 
 end UpperTheory.V.Z.Kato.Nb.NormOneTrace
 
-theorem UpperTheory.V.Z.Kato.Nb.kato_normRelation_twistTower :
-    UpperTheory.V.Z.Kato.Nb.KatoTwistedClassNormCompatibleCyclotomic :=
-  UpperTheory.V.Z.Kato.Nb.NormOneTrace.main sApi sCohApi sXiCoh sXiDist sXiScal sSlD sTopRel sBridge sCycZ
+theorem UpperTheory.V.Z.Kato.Nb.kato_normRelation_twistTower
+    : UpperTheory.V.Z.Kato.Nb.KatoTwistedClassNormCompatibleCyclotomic :=
+  UpperTheory.V.Z.Kato.Nb.NormOneTrace.main sApi sCohApi sXiCoh sXiDist sXiScal sSlD sTopRel sBridge
+    sCycZ

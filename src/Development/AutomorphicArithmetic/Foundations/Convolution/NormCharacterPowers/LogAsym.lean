@@ -24,9 +24,13 @@ theorem logAsym : LogAsym := by
       split_ifs
       · linarith
       · exact one_ne_zero
-  have hc : ContinuousOn (fun t : ℝ => Real.log ‖F t‖) (Set.Icc 1 2) := ContinuousOn.log (fun t ht =>
-    ((hF t (by linarith [ht.1])).continuousAt.comp (f := fun t : ℝ => (t : ℂ))
-      Complex.continuous_ofReal.continuousAt).norm.continuousWithinAt) h0
+  have hc : ContinuousOn (fun t : ℝ => Real.log ‖F t‖) (Set.Icc 1 2) :=
+    ContinuousOn.log
+      (fun t ht =>
+        ((hF t (by linarith [ht.1])).continuousAt.comp
+          (f := fun t : ℝ => (t : ℂ))
+          Complex.continuous_ofReal.continuousAt).norm.continuousWithinAt)
+      h0
   obtain ⟨M, hM⟩ := isCompact_Icc.exists_bound_of_continuousOn hc
   refine ⟨M, fun σ h1 h2 => ?_⟩
   have h := hM σ ⟨h1.le, h2⟩

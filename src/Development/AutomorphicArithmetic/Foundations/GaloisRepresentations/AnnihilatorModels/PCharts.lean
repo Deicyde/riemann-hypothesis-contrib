@@ -8,13 +8,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.charts_of :
-    ChartsExist := by
+theorem UpperTheory.Gal.crystallineComparison.charts_of : ChartsExist := by
   intro l Y hY J _ T y
   haveI : ∀ j, IsFinite (T j).p := fun j => (T j).fin
   let S : Set Y := {y} ∪ ⋃ j, (T j).r '' ((T j).p ⁻¹' {y})
-  have hS : S.Finite := (Set.finite_singleton y).union
-    (Set.finite_iUnion fun j => ((T j).p.finite_preimage_singleton y).image _)
+  have hS : S.Finite :=
+    (Set.finite_singleton y).union
+      (Set.finite_iUnion fun j => ((T j).p.finite_preimage_singleton y).image _)
   obtain ⟨V, hV, hSV⟩ := hY hS.toFinset
   have hSV' : ∀ x ∈ S, x ∈ V := fun x hx => hSV x (hS.mem_toFinset.mpr hx)
   have hclosed : IsClosed (⋃ j, (T j).p '' ((T j).r ⁻¹ᵁ V : Set _)ᶜ) :=

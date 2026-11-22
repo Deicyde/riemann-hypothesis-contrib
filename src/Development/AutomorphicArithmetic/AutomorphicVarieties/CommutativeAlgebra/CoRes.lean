@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem complete_of_sq {R : Type} [CommRing R] (I : Ideal R) (h : I ^ 2 = ⊥) :
-    IsAdicComplete I R := by
+private theorem complete_of_sq {R : Type} [CommRing R] (I : Ideal R) (h : I ^ 2 = ⊥)
+    : IsAdicComplete I R := by
   have h0 : ∀ x : R, x ∈ (I ^ 2 • ⊤ : Submodule R R) → x = 0 := by
     intro x hx
     rw [Ideal.smul_eq_mul, Ideal.mul_top, h] at hx
@@ -27,8 +27,9 @@ private theorem complete_of_sq {R : Type} [CommRing R] (I : Ideal R) (h : I ^ 2 
       exact Submodule.zero_mem _
     · exact hf hn.le
 
-theorem UpperTheory.V.Alg.co_res :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O], IsCO O (ResidueField O) ∧ IsCO O (DualNumber (ResidueField O)) := by
+theorem UpperTheory.V.Alg.co_res
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O],
+      IsCO O (ResidueField O) ∧ IsCO O (DualNumber (ResidueField O)) := by
   intro O _ _
   constructor
   · refine IsCO.mk ?_ ?_ ?_
@@ -44,10 +45,11 @@ theorem UpperTheory.V.Alg.co_res :
       exact zero_mem _
   · have hm : ∀ x : DualNumber (ResidueField O), x ∈ maximalIdeal _ ↔ x.fst = 0 := by
       intro x
-      rw [mem_maximalIdeal, mem_nonunits_iff, TrivSqZeroExt.isUnit_iff_isUnit_fst, isUnit_iff_ne_zero,
-        not_not]
-    have hfst : ∀ a : O, (algebraMap O (DualNumber (ResidueField O)) a).fst =
-        algebraMap O (ResidueField O) a :=
+      rw [mem_maximalIdeal, mem_nonunits_iff, TrivSqZeroExt.isUnit_iff_isUnit_fst,
+        isUnit_iff_ne_zero, not_not]
+    have hfst
+        : ∀ a : O,
+          (algebraMap O (DualNumber (ResidueField O)) a).fst = algebraMap O (ResidueField O) a :=
       fun a => (TrivSqZeroExt.fstHom O (ResidueField O) (ResidueField O)).commutes a
     refine IsCO.mk ?_ ?_ ?_
     · apply complete_of_sq

@@ -15,8 +15,9 @@ section Nom
 variable {r K : ℕ}
 
 def NmH (c : ℤ) (h : ℕ) (J : Finset (Fin (r + K))) : Prop :=
-  (1 ≤ c → J.card = h ∧ (r ≤ h → ∀ a : Fin (r + K), a.val < r → a ∈ J) ∧ (h ≤ r → ∀ a ∈ J, a.val < r)) ∧
-  (¬ 1 ≤ c → ∀ a ∈ J, r ≤ a.val)
+  (1 ≤ c
+      → J.card = h ∧ (r ≤ h → ∀ a : Fin (r + K), a.val < r → a ∈ J) ∧ (h ≤ r → ∀ a ∈ J, a.val < r))
+    ∧ (¬ 1 ≤ c → ∀ a ∈ J, r ≤ a.val)
 
 lemma NmH_wedge_pos {c : ℤ} (hc : 1 ≤ c) {hP hN : ℕ} (hN' : hN = hP + 1) {J : Finset (Fin (r + K))} {m : Fin (r + K)}
     (hm : m ∈ J) (hmr : r ≤ m.val ↔ r ≤ hP) (H : NmH c hP (J.erase m)) : NmH c hN J := by
@@ -170,29 +171,46 @@ section Main
 
 variable {N r K : ℕ}
 
-structure TS {A : Type} [CommRing A] (p : ℕ) (W : A) (c : ℤ) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (pos : Fin N → ℤ)
+structure TS
+    {A : Type} [CommRing A]
+    (p : ℕ) (W : A) (c : ℤ) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (pos : Fin N → ℤ)
     (ζ y : Fin N → Fin (r + K) → A) where
   T : ℤ → (Finset (Fin (r + K)) → A) → (Finset (Fin (r + K)) → A)
-  step : ∀ (j : ℕ) (h : j < N) (Kv : Finset (Fin (r + K)) → A),
-    T (pos ⟨j, h⟩) (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (ζ ⟨j, h⟩) Kv) =
-      colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (y ⟨j, h⟩) (T (pos ⟨j, h⟩) Kv)
+  step
+    : ∀ (j : ℕ) (h : j < N) (Kv : Finset (Fin (r + K)) → A),
+      T (pos ⟨j, h⟩)
+          (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (ζ ⟨j, h⟩) Kv)
+        = colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (y ⟨j, h⟩)
+          (T (pos ⟨j, h⟩) Kv)
   base : ∀ s J, J ≠ ∅ → T s extOne J = 0
-  pw : ∀ (s s' : ℤ) (Kv : Finset (Fin (r + K)) → A) (o : ℕ), s ≤ s' → (∀ J, W ^ o ∣ T s Kv J) → ∀ J,
-    W ^ (o * p ^ (s' - s).toNat) ∣ T s' (powC (p ^ (s' - s).toNat) Kv) J ∧
-    (W ^ (o + 1) ∣ T s Kv J → W ^ (o * p ^ (s' - s).toNat + 1) ∣ T s' (powC (p ^ (s' - s).toNat) Kv) J ∧
-      (s < s' → W ^ (o * p ^ (s' - s).toNat + 2) ∣ T s' (powC (p ^ (s' - s).toNat) Kv) J))
-  inv : ∀ (s : ℤ) (Kv : Finset (Fin (r + K)) → A) (o : ℕ), (∀ J, W ^ o ∣ T s Kv J) → ∀ J, W ^ o ∣ Kv J
+  pw
+    : ∀ (s s' : ℤ) (Kv : Finset (Fin (r + K)) → A) (o : ℕ),
+      s ≤ s' → (∀ J, W ^ o ∣ T s Kv J)
+        → ∀ J,
+          W ^ (o * p ^ (s' - s).toNat) ∣ T s' (powC (p ^ (s' - s).toNat) Kv) J
+            ∧ (W ^ (o + 1) ∣ T s Kv J
+              → W ^ (o * p ^ (s' - s).toNat + 1) ∣ T s' (powC (p ^ (s' - s).toNat) Kv) J
+                ∧ (s < s'
+                  → W ^ (o * p ^ (s' - s).toNat + 2) ∣ T s' (powC (p ^ (s' - s).toNat) Kv) J))
+  inv
+    : ∀ (s : ℤ) (Kv : Finset (Fin (r + K)) → A) (o : ℕ), (∀ J, W ^ o ∣ T s Kv J) → ∀ J, W ^ o ∣ Kv J
 
-theorem Ord_main (p : ℕ) (hp0 : p ≠ 0) {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (w : O)
+theorem Ord_main
+    (p : ℕ) (hp0 : p ≠ 0)
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (w : O)
     (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (H : ColOK LL mu c)
     (hmono : Monotone LL.pos)
     (hposc : ∀ i j : Fin N, i < j → IsUsed mu c i → IsCostly mu c j → LL.pos i < LL.pos j)
     (ζ : Fin N → Fin (r + K) → MvPolynomial (Fin N × Fin (r + K)) O)
-    (ts : TS p (C w) c mu LL.pos ζ (yO w LL)) (j : ℕ) (hj : j ≤ N) :
-    ∀ s : ℤ, (∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s) → ∀ J,
-      C w ^ oS p LL.pos mu c j s ∣ ts.T s (ZZ p ζ LL.pos mu c j s) J ∧
-      (¬ NmH c (colH (mu ⟨j, by omega⟩) c) J →
-        C w ^ (oS p LL.pos mu c j s + 1) ∣ ts.T s (ZZ p ζ LL.pos mu c j s) J) := by
+    (ts : TS p (C w) c mu LL.pos ζ (yO w LL))
+    (j : ℕ) (hj : j ≤ N)
+    : ∀ s : ℤ,
+      (∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s)
+        → ∀ J,
+          C w ^ oS p LL.pos mu c j s ∣ ts.T s (ZZ p ζ LL.pos mu c j s) J
+            ∧ (¬ NmH c (colH (mu ⟨j, by omega⟩) c) J
+              → C w ^ (oS p LL.pos mu c j s + 1) ∣ ts.T s (ZZ p ζ LL.pos mu c j s) J) := by
   induction j with
   | zero =>
     intro s _ J
@@ -202,8 +220,10 @@ theorem Ord_main (p : ℕ) (hp0 : p ≠ 0) {O : Type} [CommRing O] [IsDomain O] 
       rintro rfl
       apply hn
       refine ⟨fun hc => ⟨by rw [H.start hc]; simp, fun hr a ha => ?_, by simp⟩, by simp⟩
-      rw [H.start hc] at hr; omega
-    rw [ts.base s J hJ]; exact dvd_zero _
+      rw [H.start hc] at hr
+      omega
+    rw [ts.base s J hJ]
+    exact dvd_zero _
   | succ j ih =>
     intro s hs J
     have h : j < N := hj
@@ -218,60 +238,92 @@ theorem Ord_main (p : ℕ) (hp0 : p ≠ 0) {O : Type} [CommRing O] [IsDomain O] 
         hmono (show i ≤ ⟨j, h⟩ from Fin.le_def.mpr (by simp; omega))
       have hWy : ∀ m : Fin (r + K), condUS LL ⟨j, h⟩ m → C w ∣ yO w LL ⟨j, h⟩ m := fun m hm => by
         rw [yO_cond _ _ _ _ hm]; exact Dvd.intro _ rfl
-      have stepA : ∀ J, C w ^ oS p LL.pos mu c (j + 1) s0 ∣
-            ts.T s0 (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (ζ ⟨j, h⟩)
-              (ZZ p ζ LL.pos mu c j s0)) J ∧
-          (¬ NmH c (colH (mu ⟨j + 1, by omega⟩) c) J → C w ^ (oS p LL.pos mu c (j + 1) s0 + 1) ∣
-            ts.T s0 (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (ζ ⟨j, h⟩)
-              (ZZ p ζ LL.pos mu c j s0)) J) := by
+      have stepA
+          : ∀ J,
+            C w ^ oS p LL.pos mu c (j + 1) s0
+                ∣ ts.T s0
+                  (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (ζ ⟨j, h⟩)
+                    (ZZ p ζ LL.pos mu c j s0))
+                  J
+              ∧ (¬ NmH c (colH (mu ⟨j + 1, by omega⟩) c) J
+                → C w ^ (oS p LL.pos mu c (j + 1) s0 + 1)
+                  ∣ ts.T s0
+                    (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c)
+                      (ζ ⟨j, h⟩) (ZZ p ζ LL.pos mu c j s0))
+                    J) := by
         intro J
         rw [hs0, ts.step j h, ← hs0, oS_succ p _ mu c s0 j h]
         by_cases hc : IsCostly mu c ⟨j, h⟩
-        · have hs1 : ∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s0 - 1 := fun i hi hui => by
+        · have hs1
+              : ∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s0 - 1 := fun i hi hui => by
             have := hposc i ⟨j, h⟩ (Fin.lt_def.mpr (by simpa using hi)) hui hc
             omega
           have e1 : (s0 - (s0 - 1)).toNat = 1 := by omega
-          have hpw := ts.pw (s0 - 1) s0 (ZZ p ζ LL.pos mu c j (s0 - 1)) (oS p LL.pos mu c j (s0 - 1)) (by omega)
-            (fun J => (ih' (s0 - 1) hs1 J).1)
+          have hpw :=
+            ts.pw (s0 - 1) s0 (ZZ p ζ LL.pos mu c j (s0 - 1)) (oS p LL.pos mu c j (s0 - 1))
+              (by omega) (fun J => (ih' (s0 - 1) hs1 J).1)
           rw [← ZZ_pow p hp0 _ _ mu c j (by omega) (s0 - 1) s0 (by omega) hs1,
-            ← oS_pow p _ mu c j (s0 - 1) s0 (by omega) hs1] at hpw
+              ← oS_pow p _ mu c j (s0 - 1) s0 (by omega) hs1]
+            at hpw
           have d0 : ∀ J', C w ^ oS p LL.pos mu c j s0 ∣ ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' :=
             fun J' => (hpw J').1
-          have d2 : ∀ J', ¬ NmH c (colH (mu ⟨j, by omega⟩) c) J' →
-              C w ^ (oS p LL.pos mu c j s0 + 2) ∣ ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' :=
+          have d2
+              : ∀ J',
+                ¬ NmH c (colH (mu ⟨j, by omega⟩) c) J'
+                  → C w ^ (oS p LL.pos mu c j s0 + 2) ∣ ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' :=
             fun J' hn => ((hpw J').2 ((ih' (s0 - 1) hs1 J').2 hn)).2 (by omega)
           rw [if_pos hc, ← hs0]
           simp only [sub_self, Int.toNat_zero, pow_zero]
-          have tcond : ∀ m J', condUS LL ⟨j, h⟩ m → C w ^ (oS p LL.pos mu c j s0 + 1) ∣
-              yO w LL ⟨j, h⟩ m * ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' := fun m J' hm => by
+          have tcond
+              : ∀ m J',
+                condUS LL ⟨j, h⟩ m
+                  → C w ^ (oS p LL.pos mu c j s0 + 1)
+                    ∣ yO w LL ⟨j, h⟩ m * ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' := fun m J' hm => by
             rw [pow_succ, mul_comm (C w ^ _)]; exact mul_dvd_mul (hWy m hm) (d0 J')
-          refine ⟨colStep_dvd _ c _ _ hu _ _ J fun m => ?_, fun hn => colStep_dvd _ c _ _ hu _ _ J fun m => ?_⟩
+          refine ⟨
+            colStep_dvd _ c _ _ hu _ _ J fun m => ?_,
+            fun hn => colStep_dvd _ c _ _ hu _ _ J fun m => ?_
+          ⟩
           · by_cases hm : condUS LL ⟨j, h⟩ m
             · exact ⟨fun _ _ => tcond m _ hm, fun _ _ => tcond m _ hm⟩
             · have hv := step_van LL mu c H j h hc m hm J
-              exact ⟨fun hw hmJ => Dvd.dvd.mul_left ((pow_dvd_pow _ (by omega)).trans (d2 _ (hv.1 hw hmJ))) _,
-                fun hw hmJ => Dvd.dvd.mul_left ((pow_dvd_pow _ (by omega)).trans (d2 _ (hv.2 hw hmJ))) _⟩
+              exact ⟨
+                fun hw hmJ =>
+                  Dvd.dvd.mul_left ((pow_dvd_pow _ (by omega)).trans (d2 _ (hv.1 hw hmJ))) _,
+                fun hw hmJ =>
+                  Dvd.dvd.mul_left ((pow_dvd_pow _ (by omega)).trans (d2 _ (hv.2 hw hmJ))) _
+              ⟩
           · by_cases hm : condUS LL ⟨j, h⟩ m
             · have hv := step_nom LL mu c H j h m (iff_of_true hm hc) J
-              exact ⟨fun hw hmJ => Dvd.dvd.mul_left (d2 _ (fun hh => hn (hv.1 hw hmJ hh))) _,
-                fun hw hmJ => Dvd.dvd.mul_left (d2 _ (fun hh => hn (hv.2 hw hmJ hh))) _⟩
+              exact ⟨
+                fun hw hmJ => Dvd.dvd.mul_left (d2 _ (fun hh => hn (hv.1 hw hmJ hh))) _,
+                fun hw hmJ => Dvd.dvd.mul_left (d2 _ (fun hh => hn (hv.2 hw hmJ hh))) _
+              ⟩
             · have hv := step_van LL mu c H j h hc m hm J
-              exact ⟨fun hw hmJ => Dvd.dvd.mul_left (d2 _ (hv.1 hw hmJ)) _,
-                fun hw hmJ => Dvd.dvd.mul_left (d2 _ (hv.2 hw hmJ)) _⟩
+              exact ⟨
+                fun hw hmJ => Dvd.dvd.mul_left (d2 _ (hv.1 hw hmJ)) _,
+                fun hw hmJ => Dvd.dvd.mul_left (d2 _ (hv.2 hw hmJ)) _
+              ⟩
         · have d0 := fun J' => (ih' s0 hprev J').1
           have d1 := fun J' => (ih' s0 hprev J').2
           rw [if_neg hc, add_zero]
-          refine ⟨colStep_dvd _ c _ _ hu _ _ J fun m =>
-            ⟨fun _ _ => Dvd.dvd.mul_left (d0 _) _, fun _ _ => Dvd.dvd.mul_left (d0 _) _⟩,
-            fun hn => colStep_dvd _ c _ _ hu _ _ J fun m => ?_⟩
+          refine ⟨
+            colStep_dvd _ c _ _ hu _ _ J fun m =>
+              ⟨fun _ _ => Dvd.dvd.mul_left (d0 _) _, fun _ _ => Dvd.dvd.mul_left (d0 _) _⟩,
+            fun hn => colStep_dvd _ c _ _ hu _ _ J fun m => ?_
+          ⟩
           by_cases hm : condUS LL ⟨j, h⟩ m
-          · have tcond : ∀ J', C w ^ (oS p LL.pos mu c j s0 + 1) ∣
-                yO w LL ⟨j, h⟩ m * ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' := fun J' => by
+          · have tcond
+                : ∀ J',
+                  C w ^ (oS p LL.pos mu c j s0 + 1)
+                    ∣ yO w LL ⟨j, h⟩ m * ts.T s0 (ZZ p ζ LL.pos mu c j s0) J' := fun J' => by
               rw [pow_succ, mul_comm (C w ^ _)]; exact mul_dvd_mul (hWy m hm) (d0 J')
             exact ⟨fun _ _ => tcond _, fun _ _ => tcond _⟩
           · have hv := step_nom LL mu c H j h m (iff_of_false hm hc) J
-            exact ⟨fun hw hmJ => Dvd.dvd.mul_left (d1 _ (fun hh => hn (hv.1 hw hmJ hh))) _,
-              fun hw hmJ => Dvd.dvd.mul_left (d1 _ (fun hh => hn (hv.2 hw hmJ hh))) _⟩
+            exact ⟨
+              fun hw hmJ => Dvd.dvd.mul_left (d1 _ (fun hh => hn (hv.1 hw hmJ hh))) _,
+              fun hw hmJ => Dvd.dvd.mul_left (d1 _ (fun hh => hn (hv.2 hw hmJ hh))) _
+            ⟩
       have hpw := ts.pw s0 s _ (oS p LL.pos mu c (j + 1) s0) hs0s (fun J => (stepA J).1) J
       have hle : ∀ i : Fin N, i.val < j + 1 → IsUsed mu c i → LL.pos i ≤ s0 := fun i hi _ =>
         hmono (show i ≤ ⟨j, h⟩ from Fin.le_def.mpr (by simp; omega))

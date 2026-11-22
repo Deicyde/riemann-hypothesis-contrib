@@ -11,12 +11,18 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc
 
-theorem image_kerP_pow_separated : ∀ (l : ℕ) [Fact l.Prime] (n : ℕ) (a : Per.Ainf l), (∀ k : ℕ, ∃ b : Per.Ainf l, algebraMap (Per.Ainf l) (Per.AinfP l) (a - ((l : ℕ) : Per.Ainf l) ^ k * b) ∈ Per.kerP l ^ n) → algebraMap (Per.Ainf l) (Per.AinfP l) a ∈ Per.kerP l ^ n := by
+theorem image_kerP_pow_separated
+    : ∀ (l : ℕ) [Fact l.Prime] (n : ℕ) (a : Per.Ainf l),
+      (∀ k : ℕ, ∃ b : Per.Ainf l,
+          algebraMap (Per.Ainf l) (Per.AinfP l) (a - ((l : ℕ) : Per.Ainf l) ^ k * b)
+            ∈ Per.kerP l ^ n)
+        → algebraMap (Per.Ainf l) (Per.AinfP l) a ∈ Per.kerP l ^ n := by
   intro l _ n a h
   obtain ⟨e, he⟩ : ∃ e : Per.Fl l, IsEps e := Model.exists_isEps l
   obtain ⟨-, -, -, -, -, hinj, hk⟩ := thetaP_facts l
   obtain ⟨h1, h2⟩ := GlobalTheory.T.ainf_quot_fontaineXi_pow_torsionFree_separated l e he n
-  have h3 : ∀ (j : ℕ) (c : Per.Ainf l), xi e ^ n ∣ ((l : ℕ) : Per.Ainf l) ^ j * c → xi e ^ n ∣ c := by
+  have h3
+      : ∀ (j : ℕ) (c : Per.Ainf l), xi e ^ n ∣ ((l : ℕ) : Per.Ainf l) ^ j * c → xi e ^ n ∣ c := by
     intro j
     induction j with
     | zero => intro c hc; simpa using hc
@@ -24,8 +30,9 @@ theorem image_kerP_pow_separated : ∀ (l : ℕ) [Fact l.Prime] (n : ℕ) (a : P
       intro c hc
       refine h1 c (ih _ ?_)
       rwa [← mul_assoc, ← pow_succ]
-  have key : ∀ c : Per.Ainf l, algebraMap (Per.Ainf l) (Per.AinfP l) c ∈ Per.kerP l ^ n ↔
-      xi e ^ n ∣ c := by
+  have key
+      : ∀ c : Per.Ainf l,
+        algebraMap (Per.Ainf l) (Per.AinfP l) c ∈ Per.kerP l ^ n ↔ xi e ^ n ∣ c := by
     intro c
     rw [hk e he, Ideal.span_singleton_pow, Ideal.mem_span_singleton, ← map_pow]
     refine ⟨fun ⟨y, hy⟩ => ?_, fun hc => map_dvd _ hc⟩

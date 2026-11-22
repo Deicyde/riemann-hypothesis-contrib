@@ -13,8 +13,8 @@ namespace Flasque
 
 section Site
 
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}]
+variable
+  {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}]
 
 noncomputable abbrev freeSheaf (U : C) : Sheaf J AddCommGrpCat.{v} :=
   (presheafToSheaf J _).obj (yoneda.obj U ⋙ AddCommGrpCat.free)
@@ -27,18 +27,18 @@ instance mono_freeSheafMap {V U : C} (i : V ⟶ U) [Mono i] : Mono (freeSheafMap
 
 variable {J}
 
-noncomputable def freeSheafHomEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v}) :
-    (freeSheaf J U ⟶ F) ≃+ F.obj.obj (op U) where
-  toEquiv := ((sheafificationAdjunction J _).homEquiv _ _).trans
-    (((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv _ _).trans yonedaEquiv)
-  map_add' f g := by
-    rfl
+noncomputable def freeSheafHomEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
+    : (freeSheaf J U ⟶ F) ≃+ F.obj.obj (op U) where
+  toEquiv :=
+    ((sheafificationAdjunction J _).homEquiv _ _).trans
+      (((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv _ _).trans yonedaEquiv)
+  map_add' f g := by rfl
 
 variable [HasExt.{w} (Sheaf J AddCommGrpCat.{v})]
 
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}] in
+variable
+  {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}] in
 variable {J} in
 variable [HasExt.{w} (Sheaf J AddCommGrpCat.{v})] in
 lemma _root_.GlobalTheory.Flasque.subsingleton_H'_of_injective (I : Sheaf J AddCommGrpCat.{v}) [Injective I]
@@ -66,7 +66,6 @@ lemma _root_.GlobalTheory.Flasque.injectiveShortComplex_shortExact [EnoughInject
     (_root_.GlobalTheory.Flasque.injectiveShortComplex F).ShortExact where
   exact := ShortComplex.exact_of_g_is_cokernel _ (cokernelIsCokernel _)
 
-
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
 variable {A : Type u} [Category.{v} A] [Abelian A] in
 lemma _root_.GlobalTheory.Flasque.exists_hom_τ₁_eq {S T : ShortComplex A} (hS : S.ShortExact)
@@ -88,8 +87,8 @@ section Space
 variable {X : TopCat.{u}}
 
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}] in
+variable
+  {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}] in
 variable {J} in
 private lemma freeSheafHomEquiv_eq_yonedaEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
     (h : _root_.GlobalTheory.Flasque.freeSheaf J U ⟶ F) :
@@ -98,8 +97,8 @@ private lemma freeSheafHomEquiv_eq_yonedaEquiv (U : C) (F : Sheaf J AddCommGrpCa
         ((sheafificationAdjunction J _).homEquiv _ _ h)) := rfl
 
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}] in
+variable
+  {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}] in
 variable {J} in
 private lemma freeSheafHomEquiv_freeSheafMap_comp' {V U : C} (i : V ⟶ U) (F : Sheaf J AddCommGrpCat.{v})
     (h : _root_.GlobalTheory.Flasque.freeSheaf J U ⟶ F) :
@@ -111,11 +110,11 @@ private lemma freeSheafHomEquiv_freeSheafMap_comp' {V U : C} (i : V ⟶ U) (F : 
   rw [← yonedaEquiv_naturality]
   rfl
 
-
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
 variable {X : TopCat.{u}} in
-theorem _root_.GlobalTheory.Flasque.isFlasque_of_injective (I : TopCat.Sheaf AddCommGrpCat.{u} X) [hI : Injective I] :
-    I.IsFlasque := by
+theorem _root_.GlobalTheory.Flasque.isFlasque_of_injective
+    (I : TopCat.Sheaf AddCommGrpCat.{u} X) [hI : Injective I]
+    : I.IsFlasque := by
   let I' : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u} := I
   haveI : Injective I' := hI
   refine ⟨fun {U V} i => ?_⟩
@@ -130,15 +129,15 @@ theorem _root_.GlobalTheory.Flasque.isFlasque_of_injective (I : TopCat.Sheaf Add
   rw [Injective.comp_factorThru] at key
   simpa [g] using key.symm
 
-instance isFlasque_injectiveShortComplex_X₂ (F : TopCat.Sheaf AddCommGrpCat.{u} X) :
-    (injectiveShortComplex F).X₂.IsFlasque :=
+instance isFlasque_injectiveShortComplex_X₂ (F : TopCat.Sheaf AddCommGrpCat.{u} X)
+    : (injectiveShortComplex F).X₂.IsFlasque :=
   isFlasque_of_injective _
 
 variable [HasExt.{w} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
 
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}] in
+variable
+  {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}] in
 variable {J} in
 private lemma freeSheafHomEquiv_comp' (U : C) {F G : Sheaf J AddCommGrpCat.{v}}
     (h : _root_.GlobalTheory.Flasque.freeSheaf J U ⟶ F) (f : F ⟶ G) :
@@ -150,12 +149,12 @@ private lemma freeSheafHomEquiv_comp' (U : C) {F G : Sheaf J AddCommGrpCat.{v}}
   rw [yonedaEquiv_comp]
   rfl
 
-
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
 variable {X : TopCat.{u}} in
 variable [HasExt.{w} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})] in
-theorem _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque (F : TopCat.Sheaf AddCommGrpCat.{u} X)
-    [hF : F.IsFlasque] (n : ℕ) (U : Opens X) : Subsingleton (F.H' (n + 1) U) := by
+theorem _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque
+    (F : TopCat.Sheaf AddCommGrpCat.{u} X) [hF : F.IsFlasque] (n : ℕ) (U : Opens X)
+    : Subsingleton (F.H' (n + 1) U) := by
   let Y : TopCat.Sheaf AddCommGrpCat.{u} X :=
     _root_.GlobalTheory.Flasque.freeSheaf (Opens.grothendieckTopology X) U
   letI : HasExt.{w} (TopCat.Sheaf AddCommGrpCat.{u} X) := ‹HasExt.{w} (Sheaf _ _)›
@@ -173,7 +172,9 @@ theorem _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque (F : TopCat.She
       (_root_.GlobalTheory.Flasque.freeSheafHomEquiv U _).symm t
     have hψ : ψ ≫ (_root_.GlobalTheory.Flasque.injectiveShortComplex F).g = φ := by
       apply (_root_.GlobalTheory.Flasque.freeSheafHomEquiv U _).injective
-      refine (freeSheafHomEquiv_comp' U ψ (_root_.GlobalTheory.Flasque.injectiveShortComplex F).g).trans ?_
+      refine
+        (freeSheafHomEquiv_comp' U ψ (_root_.GlobalTheory.Flasque.injectiveShortComplex F).g).trans
+          ?_
       simp only [ψ, AddEquiv.apply_symm_apply]
       exact ht
     rw [Ext.homEquiv₀_symm_apply, ← hψ, ← Ext.mk₀_comp_mk₀,
@@ -189,8 +190,9 @@ theorem _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque (F : TopCat.She
 open CategoryTheory Abelian Opposite Limits TopologicalSpace in
 variable {X : TopCat.{u}} in
 variable [HasExt.{w} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})] in
-theorem _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque_of_pos (F : TopCat.Sheaf AddCommGrpCat.{u} X)
-    [F.IsFlasque] {n : ℕ} (hn : 0 < n) (U : Opens X) : Subsingleton (F.H' n U) := by
+theorem _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque_of_pos
+    (F : TopCat.Sheaf AddCommGrpCat.{u} X) [F.IsFlasque] {n : ℕ} (hn : 0 < n) (U : Opens X)
+    : Subsingleton (F.H' n U) := by
   obtain ⟨m, rfl⟩ := Nat.exists_eq_add_one_of_ne_zero hn.ne'
   exact _root_.GlobalTheory.Flasque.subsingleton_H'_of_isFlasque F m U
 

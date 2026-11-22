@@ -8,10 +8,12 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_surj_localization_mvPolynomial_of_essFiniteType :
-    ∀ (Λ R : Type) [CommRing Λ] [CommRing R] [IsLocalRing R] [Algebra Λ R]
-      [Algebra.EssFiniteType Λ R], ∃ (n : ℕ) (P : Ideal (MvPolynomial (Fin n) Λ)) (_ : P.IsPrime)
-      (φ : Localization.AtPrime P →ₐ[Λ] R), Function.Surjective φ := by
+theorem exists_surj_localization_mvPolynomial_of_essFiniteType
+    : ∀ (Λ R : Type) [CommRing Λ] [CommRing R] [IsLocalRing R] [Algebra Λ R]
+        [Algebra.EssFiniteType Λ R],
+      ∃ (n : ℕ) (P : Ideal (MvPolynomial (Fin n) Λ)) (_ : P.IsPrime)
+          (φ : Localization.AtPrime P →ₐ[Λ] R),
+        Function.Surjective φ := by
   intro Λ R _ _ _ _ h
   obtain ⟨σ, hσ⟩ := (Algebra.essFiniteType_iff Λ R).mp h
   let y : Fin σ.card → R := fun i => (σ.equivFin.symm i : R)
@@ -30,7 +32,8 @@ theorem exists_surj_localization_mvPolynomial_of_essFiniteType :
     intro b
     by_contra hb
     exact b.2 ((mem_maximalIdeal _).mpr hb)
-  refine ⟨σ.card, P, inferInstance, IsLocalization.liftAlgHom (M := P.primeCompl) (f := φ₀) hunit, ?_⟩
+  refine
+    ⟨σ.card, P, inferInstance, IsLocalization.liftAlgHom (M := P.primeCompl) (f := φ₀) hunit, ?_⟩
   intro r
   obtain ⟨t, ht, htu, hrt⟩ := hσ r
   rw [hrange] at ht hrt

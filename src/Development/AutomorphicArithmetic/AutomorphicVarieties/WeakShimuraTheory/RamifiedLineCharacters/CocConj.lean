@@ -5,12 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.Gys.cocConj :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R (G F Ω) M), ∀ c ∈ Z1 ρ, ∀ (v : HeightOneSpectrum (𝓞 F)) (A A' : ValuationSubring Ω), IsPlaceOver A v → IsPlaceOver A' v →
-      ((∃ m, ∀ g ∈ Dec (F := F) A, c g = ρ g m - m) → ∃ m, ∀ g ∈ Dec (F := F) A', c g = ρ g m - m) ∧
-      ((∀ g ∈ Ine (F := F) A, ρ g = 1 ∧ c g = 0) → ∀ g ∈ Ine (F := F) A', c g = 0) := by
+theorem UpperTheory.V.Ws.Gys.cocConj
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M]
+        [DiscreteTopology M] (ρ : Representation R (G F Ω) M),
+      ∀ c ∈ Z1 ρ, ∀ (v : HeightOneSpectrum (𝓞 F)) (A A' : ValuationSubring Ω),
+        IsPlaceOver A v → IsPlaceOver A' v
+          → ((∃ m, ∀ g ∈ Dec (F := F) A, c g = ρ g m - m)
+              → ∃ m, ∀ g ∈ Dec (F := F) A', c g = ρ g m - m)
+            ∧ ((∀ g ∈ Ine (F := F) A, ρ g = 1 ∧ c g = 0) → ∀ g ∈ Ine (F := F) A', c g = 0) := by
   intro F Ω _ _ _ _ _ R M _ _ _ _ _ _ ρ c hc v A A' hA hA'
   obtain ⟨-, hco⟩ := hc
   obtain ⟨s, hs⟩ := exists_smul_eq_of_isPlaceOver hA hA'

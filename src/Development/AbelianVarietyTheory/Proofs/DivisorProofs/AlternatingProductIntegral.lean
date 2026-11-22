@@ -12,14 +12,18 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-theorem prodL_mem_forms_and_vanish {K : Type} [CommRing K] {V : Type} [AddCommGroup V] [Module K V]
+theorem prodL_mem_forms_and_vanish
+    {K : Type} [CommRing K]
+    {V : Type} [AddCommGroup V] [Module K V]
     {ι : Type} [LinearOrder ι]
     (f : ι → V →+ V) (h : ι → ι → V →+ K) (A : Subring K) (L : Set V) (s : Finset ι)
     (hf : ∀ i ∈ s, ∀ v ∈ L, ExteriorAlgebra.ι K (f i v) ∈ forms (A : Set K) L 1)
-    (hh : ∀ i ∈ s, ∀ j ∈ s, ∀ v ∈ L, h i j v ∈ A) :
-    ∀ (vs : List V), (∀ w ∈ vs, w ∈ L) → ∀ t : Finset ι,
-      (t ⊆ s → ∀ q, q + t.card = vs.length + 1 → prodL f h vs t ∈ forms (A : Set K) L q) ∧
-      (vs.length + 1 < t.card → prodL f h vs t = 0) := by
+    (hh : ∀ i ∈ s, ∀ j ∈ s, ∀ v ∈ L, h i j v ∈ A)
+    : ∀ (vs : List V),
+      (∀ w ∈ vs, w ∈ L)
+        → ∀ t : Finset ι,
+          (t ⊆ s → ∀ q, q + t.card = vs.length + 1 → prodL f h vs t ∈ forms (A : Set K) L q)
+            ∧ (vs.length + 1 < t.card → prodL f h vs t = 0) := by
   obtain ⟨hone, hmul, hsmul, -, -⟩ := GlobalTheory.T.exteriorFormsSpanOfSets_mul_smul_mono A L
   intro vs
   induction vs with
@@ -72,18 +76,21 @@ theorem prodL_mem_forms_and_vanish {K : Type} [CommRing K] {V : Type} [AddCommGr
         · rfl
       · rw [dite_eq_right ht]
 
-theorem alt_mem_forms : ∀ {K : Type} [CommRing K] {V : Type} [AddCommGroup V] [Module K V] {ι : Type}
-    [LinearOrder ι] (f : ι → V →+ V) (h : ι → ι → V →+ K) (A : Subring K) (L : Set V) (s : Finset ι),
-    (∀ i ∈ s, ∀ v ∈ L, ExteriorAlgebra.ι K (f i v) ∈ forms (A : Set K) L 1) →
-    (∀ i ∈ s, ∀ j ∈ s, ∀ v ∈ L, h i j v ∈ A) →
-    ∀ (a : ℕ) (v : Fin a → V) (t : Finset ι), (∀ k, v k ∈ L) → t ⊆ s →
-      ∀ q, q + t.card = a + 1 → alt f h a v t ∈ forms (A : Set K) L q := by
+theorem alt_mem_forms
+    : ∀ {K : Type} [CommRing K] {V : Type} [AddCommGroup V] [Module K V] {ι : Type} [LinearOrder ι]
+        (f : ι → V →+ V) (h : ι → ι → V →+ K) (A : Subring K) (L : Set V) (s : Finset ι),
+      (∀ i ∈ s, ∀ v ∈ L, ExteriorAlgebra.ι K (f i v) ∈ forms (A : Set K) L 1)
+        → (∀ i ∈ s, ∀ j ∈ s, ∀ v ∈ L, h i j v ∈ A)
+        → ∀ (a : ℕ) (v : Fin a → V) (t : Finset ι),
+          (∀ k, v k ∈ L) → t ⊆ s
+            → ∀ q, q + t.card = a + 1 → alt f h a v t ∈ forms (A : Set K) L q := by
   intro K _ V _ _ ι _ f h A L s hf hh a v t hv hts q hq
   rw [alt, Finset.sum_apply]
   refine AddSubgroup.sum_mem _ fun σ _ => ?_
   rw [Pi.smul_apply]
   refine zsmul_mem ?_ _
-  refine (prodL_mem_forms_and_vanish f h A L s hf hh _ ?_ t).1 hts q (by rw [List.length_ofFn]; exact hq)
+  refine (prodL_mem_forms_and_vanish f h A L s hf hh _ ?_ t).1 hts q
+    (by rw [List.length_ofFn]; exact hq)
   intro w hw
   obtain ⟨k, rfl⟩ := List.mem_ofFn.mp hw
   exact hv _

@@ -19,19 +19,21 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.I
 
 section Single
 
-variable {V ι : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι]
+variable
+  {V ι : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι]
   [DecidableEq ι]
-
 
 end Single
 
-theorem lcv_eq_mu {n : ℕ} (hn : 0 < n) (Y : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (hY : ∀ v, IsUnit (Y v).det)
-    (T : Submodule (𝓞 K) (Fin n → K)) (hfg : T.FG) (hrk : rkK T = n) :
-    Formalism.DivisionValues.lcv Y T = -(n : ℝ) * muDef (Pi.basisFun K (Fin n)) Y T := by
+theorem lcv_eq_mu
+    {n : ℕ} (hn : 0 < n) (Y : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+    (hY : ∀ v, IsUnit (Y v).det) (T : Submodule (𝓞 K) (Fin n → K)) (hfg : T.FG) (hrk : rkK T = n)
+    : Formalism.DivisionValues.lcv Y T = -(n : ℝ) * muDef (Pi.basisFun K (Fin n)) Y T := by
   have hsp : Submodule.span K (T : Set (Fin n → K)) = ⊤ := by
     apply Submodule.eq_top_of_finrank_eq
     have : finrank K (Submodule.span K (T : Set (Fin n → K))) = n := hrk
-    rw [this]; simp
+    rw [this]
+    simp
   let B : HLat K := { V := Fin n → K, ι := Fin n, b := Pi.basisFun K (Fin n), X := Y, L := T }
   have hB : B.Good := ⟨hY, hfg, hsp⟩
   have hBr : B.rank = n := hrk

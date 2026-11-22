@@ -8,17 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCombIn
 open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor
 namespace GlobalTheory.SecGlue
 
-theorem preimage_eq_of_comp_eq_of_sqZero : ∀ (S T : Type) [CommRing S] [CommRing T] (q : S →+* T),
-    Function.Surjective q → RingHom.ker q ^ 2 = ⊥ →
-    ∀ (Y : Scheme.{0}) (u w : Sp S ⟶ Y), spMap q ≫ u = spMap q ≫ w → ∀ V : Y.Opens,
-      u ⁻¹ᵁ V = w ⁻¹ᵁ V := by
+theorem preimage_eq_of_comp_eq_of_sqZero
+    : ∀ (S T : Type) [CommRing S] [CommRing T] (q : S →+* T),
+      Function.Surjective q → RingHom.ker q ^ 2 = ⊥
+        → ∀ (Y : Scheme.{0}) (u w : Sp S ⟶ Y),
+          spMap q ≫ u = spMap q ≫ w → ∀ V : Y.Opens, u ⁻¹ᵁ V = w ⁻¹ᵁ V := by
   intro S T _ _ q hq hsq Y u w huw V
   have hsurj : Function.Surjective (spMap q).base := by
     intro p
     have hker : RingHom.ker q ≤ p.asIdeal := by
       intro x hx
-      have hx2 : x * x ∈ RingHom.ker q ^ 2 := by
-        rw [sq]; exact Ideal.mul_mem_mul hx hx
+      have hx2 : x * x ∈ RingHom.ker q ^ 2 := by rw [sq]; exact Ideal.mul_mem_mul hx hx
       rw [hsq, Ideal.mem_bot] at hx2
       exact (p.isPrime.mem_or_mem (by rw [hx2]; exact p.asIdeal.zero_mem)).elim id id
     haveI := p.isPrime

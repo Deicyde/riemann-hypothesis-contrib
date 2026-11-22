@@ -31,7 +31,8 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
       have := congrArg (fun z : ℤ => (z : R)) h1
       push_cast at this
       exact this
-    have h3 : v (algebraMap R C ((p : R) * (Nat.gcdA p n : R) + (n : R) * (Nat.gcdB p n : R))) < 1 := by
+    have h3
+        : v (algebraMap R C ((p : R) * (Nat.gcdA p n : R) + (n : R) * (Nat.gcdB p n : R))) < 1 := by
       rw [map_add (f := _)]
       refine lt_of_le_of_lt (Valuation.map_add _ _ _) (max_lt ?_ ?_)
       · rw [map_mul, Valuation.map_mul]
@@ -48,21 +49,29 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
     exact hv.isUnit_of_one (isUnit_iff_ne_zero.2 (by rw [map_natCast]; exact hn0)) (hvnat n hn)
   have hp2' : ¬ p ∣ 2 := fun h => hp2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).1 h)
   have heig : ∀ a j, (H.ρ a).map (algebraMap ℤ_[p] R) * U.εT j = U.sg j a • U.εT j := U.εT_eig
-  have hres1 : FrobeniusGroupField.res hv 1 ≠ 0 := (FrobeniusGroupField.res_ne_zero hv 1).2 (by simp)
+  have hres1 : FrobeniusGroupField.res hv 1 ≠ 0 :=
+    (FrobeniusGroupField.res_ne_zero hv 1).2 (by simp)
 
-  have hex : ∀ t : Option (Fin U.m × Fin U.m × Bool), ∃ (b : O) (m : ℕ), 0 < m ∧ ¬ p ∣ m ∧
-      H.ρ b ^ m = 1 ∧
-      (match t with
-        | none => ∀ j, U.εT j ≠ 0 → v (algebraMap R C (U.sg j b - 1)) = 1
-        | some (i, k, e) => U.εT i ≠ 0 → U.εT k ≠ 0 → cond e (k ≠ U.φ i) (i ≠ k) →
-            FrobeniusGroupField.res hv (U.sg k b) ≠ FrobeniusGroupField.res hv (U.sg i b) ^ p ^ e.toNat) := by
+  have hex
+      : ∀ t : Option (Fin U.m × Fin U.m × Bool), ∃ (b : O) (m : ℕ),
+        0 < m ∧ ¬ p ∣ m ∧ H.ρ b ^ m = 1
+          ∧ (match t with
+            | none => ∀ j, U.εT j ≠ 0 → v (algebraMap R C (U.sg j b - 1)) = 1
+            | some (i, k, e) =>
+              U.εT i ≠ 0 → U.εT k ≠ 0 → cond e (k ≠ U.φ i) (i ≠ k)
+                → FrobeniusGroupField.res hv (U.sg k b)
+                  ≠ FrobeniusGroupField.res hv (U.sg i b) ^ p ^ e.toNat) := by
     intro t
     rcases t with _ | ⟨i, k, e⟩
     · obtain ⟨b, m, s, hm, hmp, hbm, hb⟩ := FrobeniusGroupField.seed p hv hpv H.ρ U.εT U.sg heig 0 2
       refine ⟨b, m, hm, hmp, hbm, ?_⟩
       intro j hj
-      have h2 : FrobeniusGroupField.res hv (U.sg j 0 + ((2 : ℤ) : R)) = FrobeniusGroupField.res hv 2 := by simp
-      have hr2 : FrobeniusGroupField.res hv 2 ≠ 0 := (FrobeniusGroupField.res_ne_zero hv 2).2 (by simpa using hvnat 2 hp2')
+      have h2
+          : FrobeniusGroupField.res hv (U.sg j 0 + ((2 : ℤ) : R))
+            = FrobeniusGroupField.res hv 2 := by
+        simp
+      have hr2 : FrobeniusGroupField.res hv 2 ≠ 0 :=
+        (FrobeniusGroupField.res_ne_zero hv 2).2 (by simpa using hvnat 2 hp2')
       have hfer : ∀ s : ℕ, FrobeniusGroupField.res hv 2 ^ p ^ s = FrobeniusGroupField.res hv 2 := by
         intro s
         induction s with
@@ -82,23 +91,30 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
       exact hres1
     · by_cases hall : U.εT i ≠ 0 ∧ U.εT k ≠ 0 ∧ cond e (k ≠ U.φ i) (i ≠ k)
       · obtain ⟨hi, hk, hik⟩ := hall
-        have ha : ∃ a, FrobeniusGroupField.res hv (U.sg k a) ≠ FrobeniusGroupField.res hv (U.sg i a) ^ p ^ e.toNat := by
+        have ha
+            : ∃ a,
+              FrobeniusGroupField.res hv (U.sg k a)
+                ≠ FrobeniusGroupField.res hv (U.sg i a) ^ p ^ e.toNat := by
           cases e
           · simp only [cond_false, Bool.toNat_false, pow_zero, pow_one] at hik ⊢
             obtain ⟨a, ha⟩ := U.distinct i k hik
             refine ⟨a, fun heq => ?_⟩
-            have h0 : FrobeniusGroupField.res hv (U.sg i a - U.sg k a) = 0 := by rw [map_sub, heq, sub_self]
+            have h0 : FrobeniusGroupField.res hv (U.sg i a - U.sg k a) = 0 := by
+              rw [map_sub, heq, sub_self]
             exact ((FrobeniusGroupField.res_ne_zero hv _).2 ha) h0
           · simp only [cond_true, Bool.toNat_true, pow_one] at hik ⊢
             obtain ⟨a, ha⟩ := U.distinct k (U.φ i) hik
             refine ⟨a, ?_⟩
-            have hfr : FrobeniusGroupField.res hv (U.sg (U.φ i) a) = FrobeniusGroupField.res hv (U.sg i a) ^ p := by
+            have hfr
+                : FrobeniusGroupField.res hv (U.sg (U.φ i) a)
+                  = FrobeniusGroupField.res hv (U.sg i a) ^ p := by
               have h0 := (FrobeniusGroupField.res_eq_zero hv _).2 (U.frob i a)
               rw [map_sub, map_pow, sub_eq_zero] at h0
               exact h0
             rw [← hfr]
             intro heq
-            have h0 : FrobeniusGroupField.res hv (U.sg k a - U.sg (U.φ i) a) = 0 := by rw [map_sub, heq, sub_self]
+            have h0 : FrobeniusGroupField.res hv (U.sg k a - U.sg (U.φ i) a) = 0 := by
+              rw [map_sub, heq, sub_self]
             exact ((FrobeniusGroupField.res_ne_zero hv _).2 ha) h0
         obtain ⟨a, ha⟩ := ha
         obtain ⟨b, m, hm, hmp, hbm, hb⟩ :=
@@ -122,9 +138,10 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
     exact Nat.mod_eq_of_lt (by have := hm0 t; show 1 < 2 * m0 t; omega)
   let G := ∀ t : Option (Fin U.m × Fin U.m × Bool), Multiplicative (ZMod (m t))
   let β : G → O := fun γ => ∏ t, b t ^ (Multiplicative.toAdd (γ t)).val
-  have key : ∀ (s : Finset (Option (Fin U.m × Fin U.m × Bool)))
-      (n : Option (Fin U.m × Fin U.m × Bool) → ℕ),
-      H.ρ (∏ t ∈ s, b t ^ n t) = H.ρ (∏ t ∈ s, b t ^ (n t % m t)) := by
+  have key
+      : ∀ (s : Finset (Option (Fin U.m × Fin U.m × Bool)))
+          (n : Option (Fin U.m × Fin U.m × Bool) → ℕ),
+        H.ρ (∏ t ∈ s, b t ^ n t) = H.ρ (∏ t ∈ s, b t ^ (n t % m t)) := by
     intro s n
     refine Finset.induction_on s (by simp) ?_
     intro a s ha ih
@@ -132,12 +149,15 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
       ← pow_eq_pow_mod _ (hbm a)]
   have hmul : ∀ γ γ' : G, H.ρ (β (γ * γ')) = H.ρ (β γ) * H.ρ (β γ') := by
     intro γ γ'
-    have e1 : β (γ * γ') = ∏ t, b t ^ (((Multiplicative.toAdd (γ t)).val +
-        (Multiplicative.toAdd (γ' t)).val) % m t) := by
+    have e1
+        : β (γ * γ')
+          = ∏ t, b t ^ (((Multiplicative.toAdd (γ t)).val +
+            (Multiplicative.toAdd (γ' t)).val) % m t) := by
       refine Finset.prod_congr rfl fun t _ => ?_
       rw [Pi.mul_apply, toAdd_mul, ZMod.val_add]
-    have k2 := key Finset.univ
-      (fun t => (Multiplicative.toAdd (γ t)).val + (Multiplicative.toAdd (γ' t)).val)
+    have k2 :=
+      key Finset.univ
+        (fun t => (Multiplicative.toAdd (γ t)).val + (Multiplicative.toAdd (γ' t)).val)
     beta_reduce at k2
     rw [e1, ← k2, ← map_mul]
     congr 1
@@ -156,7 +176,9 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
     rw [hc]
     exact hunit _ (hmp t)
   let gen : Option (Fin U.m × Fin U.m × Bool) → G := fun t =>
-    Pi.mulSingle (M := fun t => Multiplicative (ZMod (m t))) t (Multiplicative.ofAdd (1 : ZMod (m t)))
+    Pi.mulSingle
+      (M := fun t => Multiplicative (ZMod (m t)))
+      t (Multiplicative.ofAdd (1 : ZMod (m t)))
   have hgen : ∀ t, β (gen t) = b t := by
     intro t
     show ∏ u, b u ^ (Multiplicative.toAdd
@@ -168,8 +190,11 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
       rw [Pi.mulSingle_eq_of_ne hu, toAdd_one, ZMod.val_zero, pow_zero]
     · intro h
       exact absurd (Finset.mem_univ t) h
-  have hsep' : ∀ i k, U.εT i ≠ 0 → U.εT k ≠ 0 → i ≠ k →
-      FrobeniusGroupField.res hv (U.sg k (b (some (i, k, false)))) ≠ FrobeniusGroupField.res hv (U.sg i (b (some (i, k, false)))) := by
+  have hsep'
+      : ∀ i k,
+        U.εT i ≠ 0 → U.εT k ≠ 0 → i ≠ k
+          → FrobeniusGroupField.res hv (U.sg k (b (some (i, k, false))))
+            ≠ FrobeniusGroupField.res hv (U.sg i (b (some (i, k, false)))) := by
     intro i k hi hk hik
     have hq := hQ (some (i, k, false)) hi hk (by simpa using hik)
     simpa using hq
@@ -181,9 +206,14 @@ theorem embeddingSeparatingGroup : EmbeddingSeparatingGroupStatement := by
     exact hsep' j k hj hk hjk (by rw [heq])
   refine ⟨G, inferInstance, inferInstance, β, hmul, h1, hcard, ?_, ?_, ?_⟩
   · intro i γ hi
-    obtain ⟨j, hj, hψ⟩ := FrobeniusGroupField.proj p hv hpv hcard (fun γ => H.ρ (β γ)) hmul h1 U.εT U.εT_orth
-      U.εT_sum (fun j γ => U.sg j (β γ)) (fun j γ => U.εT_eig (β γ) j)
-      (fun j k hj hk hjk => hsepψ j k hj hk hjk) i hi
+    obtain ⟨j, hj, hψ⟩ :=
+      FrobeniusGroupField.proj p hv hpv hcard
+        (fun γ => H.ρ (β γ))
+        hmul h1 U.εT U.εT_orth U.εT_sum
+        (fun j γ => U.sg j (β γ))
+        (fun j γ => U.εT_eig (β γ) j)
+        (fun j k hj hk hjk => hsepψ j k hj hk hjk)
+        i hi
     have hjφ : j = U.φ i := by
       by_contra hne
       have hq := hQ (some (i, j, true)) hi hj (by simpa using hne)

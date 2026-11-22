@@ -29,9 +29,13 @@ theorem finPres : FinPres := by
     have : (θ ^ (m + 1) : Monoid.End G) x = x := by rw [hθl]; rfl
     rw [pow_succ'] at this
     exact this
-  let e : G ≃* G :=
-    { toFun := θ, invFun := (θ ^ m : Monoid.End G), left_inv := h1, right_inv := h2,
-      map_mul' := map_mul θ }
+  let e : G ≃* G := {
+    toFun := θ
+    invFun := (θ ^ m : Monoid.End G)
+    left_inv := h1
+    right_inv := h2
+    map_mul' := map_mul θ
+  }
   have hν : (Measure.map θ μ).IsHaarMeasure := MulEquiv.isHaarMeasure_map μ e hθ (hpow m)
   obtain ⟨c, hc⟩ : ∃ c : NNReal, Measure.map θ μ = c • μ :=
     ⟨_, Measure.isMulLeftInvariant_eq_smul (Measure.map θ μ) μ⟩
@@ -44,8 +48,8 @@ theorem finPres : FinPres := by
     | succ j ih =>
       have hcomp : ((θ ^ (j + 1) : Monoid.End G) : G → G) = (θ ^ j : Monoid.End G) ∘ θ := by
         rw [pow_succ]; rfl
-      rw [hcomp, ← Measure.map_map (hpow j).measurable hθ.measurable, hc, Measure.map_smul c (hpow j).aemeasurable, ih,
-        smul_smul, pow_succ']
+      rw [hcomp, ← Measure.map_map (hpow j).measurable hθ.measurable, hc,
+        Measure.map_smul c (hpow j).aemeasurable, ih, smul_smul, pow_succ']
   have hfin : c ^ (m + 1) • μ = μ := by
     rw [← hj, hθl]
     exact Measure.map_id

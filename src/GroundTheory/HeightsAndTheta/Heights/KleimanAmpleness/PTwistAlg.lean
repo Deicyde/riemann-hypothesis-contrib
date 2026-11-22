@@ -16,9 +16,12 @@ noncomputable section
 
 universe u w
 
-theorem twistMul_twist_twistMul {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-    {x : Fin (N + 1) → Ω} (M : SubSystem S x Ω) (a a' : ℕ) (c c' : ℤ) :
-    (twistMul M a c).twist (twistMul M a' c') = twistMul M (a + a') (c + c') := by
+theorem twistMul_twist_twistMul
+    {S : Type u} [CommRing S]
+    {Ω : Type w} [Field Ω] [Algebra S Ω]
+    {N : ℕ} {x : Fin (N + 1) → Ω} (M : SubSystem S x Ω)
+    (a a' : ℕ) (c c' : ℤ)
+    : (twistMul M a c).twist (twistMul M a' c') = twistMul M (a + a') (c + c') := by
   refine SubSystem.ext_sub fun I => ?_
   rw [SubSystem.twist_sub_eq_mul_of_line, twistMul_sub, twistMul_sub, twistMul_sub, pow_add,
     ← twistSys_sub_mul]

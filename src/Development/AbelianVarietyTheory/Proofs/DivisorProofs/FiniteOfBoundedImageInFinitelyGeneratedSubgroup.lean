@@ -6,17 +6,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MarkedSumIrr
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
-theorem finite_of_bounded_image_closure_finset :
-    ∀ {V E : Type} [AddCommGroup V] [Module ℚ V] [NormedAddCommGroup E] [NormedSpace ℝ E]
-      [FiniteDimensional ℝ E] (Φ : V →+ E),
-      (∀ (k : ℕ) (e : Fin k → V), LinearIndependent ℚ e → LinearIndependent ℝ (fun j => Φ (e j))) →
-      ∀ (S : Finset V) (Y : Set V), Y ⊆ (AddSubgroup.closure (S : Set V) : Set V) →
-        ∀ R : ℝ, (∀ y ∈ Y, ‖Φ y‖ ≤ R) → Y.Finite := by
+theorem finite_of_bounded_image_closure_finset
+    : ∀ {V E : Type} [AddCommGroup V] [Module ℚ V] [NormedAddCommGroup E] [NormedSpace ℝ E]
+        [FiniteDimensional ℝ E] (Φ : V →+ E),
+      (∀ (k : ℕ) (e : Fin k → V), LinearIndependent ℚ e → LinearIndependent ℝ (fun j => Φ (e j)))
+        → ∀ (S : Finset V) (Y : Set V),
+          Y ⊆ (AddSubgroup.closure (S : Set V) : Set V)
+            → ∀ R : ℝ, (∀ y ∈ Y, ‖Φ y‖ ≤ R) → Y.Finite := by
   intro V E _ _ _ _ _ Φ hΦ S Y hY R hR
   set M : Submodule ℤ V := Submodule.span ℤ (S : Set V) with hMdef
   have hMY : Y ⊆ (M : Set V) := by
@@ -45,8 +47,7 @@ theorem finite_of_bounded_image_closure_finset :
     have h1 := hMY hy
     have h2 := hMY hz
     rw [hfy y h1, hfy z h2] at hyz
-    have : b.repr ⟨y, h1⟩ = b.repr ⟨z, h2⟩ := by
-      ext j; exact congrFun hyz j
+    have : b.repr ⟨y, h1⟩ = b.repr ⟨z, h2⟩ := by ext j; exact congrFun hyz j
     have := b.repr.injective this
     simpa using congrArg Subtype.val this
   have hΦy : ∀ y (h : y ∈ M), Φ y = T (fun j => ((b.repr ⟨y, h⟩ j : ℤ) : ℝ)) := by
@@ -58,7 +59,7 @@ theorem finite_of_bounded_image_closure_finset :
       exact this.symm
     conv_lhs => rw [hs']
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [T, Fintype.linearCombination_apply, map_sum, map_zsmul, Int.cast_smul_eq_zsmul]
+    simp [T, Fintype.linearCombination_apply, map_sum, map_zsmul, Int.cast_smul_eq_zsmul]
   set N : ℤ := ⌈(K : ℝ) * R⌉
   have hsub : f '' Y ⊆ Set.Icc (fun _ => -N) (fun _ => N) := by
     rintro _ ⟨y, hy, rfl⟩

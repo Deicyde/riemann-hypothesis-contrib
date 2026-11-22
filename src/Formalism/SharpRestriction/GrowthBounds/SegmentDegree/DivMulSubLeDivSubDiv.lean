@@ -8,12 +8,16 @@ noncomputable section
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Finset Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Finset Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
-theorem div_mul_sub_le_div_sub_div (n s P Q ee kk rr : ℕ) (hP : 0 < P) (hQ : 0 < Q) (hs : s < kk * P) (he : ee < rr * Q) :
-    ((n / (P * Q) : ℕ) : ℤ) - ((kk + rr + 1 : ℕ) : ℤ) ≤ ((((n - s) / P - ee) / Q : ℕ) : ℤ) := by
-  have hA : ((n / (P * Q) : ℕ) : ℤ) * ((P : ℤ) * Q) ≤ n := by exact_mod_cast Nat.div_mul_le_self n (P * Q)
-  have hU : (((n - s : ℕ)) : ℤ) < (((n - s) / P : ℕ) : ℤ) * P + P := by exact_mod_cast Nat.lt_div_mul_add hP
+theorem div_mul_sub_le_div_sub_div
+    (n s P Q ee kk rr : ℕ) (hP : 0 < P) (hQ : 0 < Q) (hs : s < kk * P) (he : ee < rr * Q)
+    : ((n / (P * Q) : ℕ) : ℤ) - ((kk + rr + 1 : ℕ) : ℤ) ≤ ((((n - s) / P - ee) / Q : ℕ) : ℤ) := by
+  have hA : ((n / (P * Q) : ℕ) : ℤ) * ((P : ℤ) * Q) ≤ n := by
+    exact_mod_cast Nat.div_mul_le_self n (P * Q)
+  have hU : (((n - s : ℕ)) : ℤ) < (((n - s) / P : ℕ) : ℤ) * P + P := by
+    exact_mod_cast Nat.lt_div_mul_add hP
   have hW : ((((n - s) / P - ee : ℕ)) : ℤ) < ((((n - s) / P - ee) / Q : ℕ) : ℤ) * Q + Q := by
     exact_mod_cast Nat.lt_div_mul_add hQ
   have hns : (n : ℤ) - s ≤ ((n - s : ℕ) : ℤ) := by omega
@@ -44,14 +48,18 @@ section Pad
 
 variable {p n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K] {X : Dat n' r}
 
-theorem eZ_lt_mul_Qc (hX : X.Hyp p K) (la : Fin n' → Fin (r + K) → ℕ) (e : Fin X.F.J → Fin r → ℕ)
-    (he : e ∈ X.EE p K la) (j : ℤ) (i : Fin r) : X.eZ e j i < r * X.Qc p K j := by
+theorem eZ_lt_mul_Qc
+    (hX : X.Hyp p K)
+    (la : Fin n' → Fin (r + K) → ℕ) (e : Fin X.F.J → Fin r → ℕ) (he : e ∈ X.EE p K la)
+    (j : ℤ) (i : Fin r)
+    : X.eZ e j i < r * X.Qc p K j := by
   have hV := hX.valid
   have hJ : 0 < X.F.J := hV.1
   unfold Dat.eZ
   rw [dite_eq_left hJ]
-  have hmem := Fintype.mem_piFinset.1
-    (Fintype.mem_piFinset.1 he ⟨(j % (X.F.J : ℤ)).toNat % X.F.J, Nat.mod_lt _ hJ⟩) i
+  have hmem :=
+    Fintype.mem_piFinset.1
+      (Fintype.mem_piFinset.1 he ⟨(j % (X.F.J : ℤ)).toNat % X.F.J, Nat.mod_lt _ hJ⟩) i
   rw [Finset.mem_filter, Finset.mem_range] at hmem
   have h0 : (0 : ℤ) ≤ j % (X.F.J : ℤ) := Int.emod_nonneg _ (by exact_mod_cast hJ.ne')
   have h1 : j % (X.F.J : ℤ) < X.F.J := Int.emod_lt_of_pos _ (by exact_mod_cast hJ)
@@ -68,16 +76,20 @@ theorem eZ_lt_mul_Qc (hX : X.Hyp p K) (la : Fin n' → Fin (r + K) → ℕ) (e :
   rw [hq] at hmem
   exact hmem.1
 
-theorem sum_la_lt (hX : X.Hyp p K) (la : Fin n' → Fin (r + K) → ℕ) (hla : la ∈ X.LA p K) (j x : ℤ)
-    (hx : x ∈ X.toLate j) : ∑ c, la (posOf n' x) c < (r + K) * X.Pz p K j x := by
+theorem sum_la_lt
+    (hX : X.Hyp p K)
+    (la : Fin n' → Fin (r + K) → ℕ) (hla : la ∈ X.LA p K)
+    (j x : ℤ) (hx : x ∈ X.toLate j)
+    : ∑ c, la (posOf n' x) c < (r + K) * X.Pz p K j x := by
   classical
   have hmem := Fintype.mem_piFinset.1 hla (posOf n' x)
   have hmem2 := Finset.mem_filter.1 hmem
   have hlt := (hmem2.2.2 j x hx rfl).1
   have hne : (Finset.univ : Finset (Fin (r + K))).Nonempty :=
     ⟨⟨0, by have := NeZero.ne r; omega⟩, Finset.mem_univ _⟩
-  calc ∑ c, la (posOf n' x) c < ∑ _c : Fin (r + K), X.Pz p K j x :=
-        Finset.sum_lt_sum_of_nonempty hne (fun c _ => hlt c)
+  calc
+    ∑ c, la (posOf n' x) c
+      < ∑ _c : Fin (r + K), X.Pz p K j x := Finset.sum_lt_sum_of_nonempty hne (fun c _ => hlt c)
     _ = (r + K) * X.Pz p K j x := by simp
 
 end Pad
@@ -91,9 +103,12 @@ theorem restPad : RestPad 1088 := by
   constructor
   · intro x hx hW
     have hb := mem_letters_bounds hx
-    obtain ⟨i, hi, rfl⟩ := comb_frame_top X.F hV (j - 1) x hb.2.2 hb.1 (r - 1) (Nat.sub_lt hr Nat.one_pos) hW
-    have hval : X.bfam p K la e j (X.F.fr (j - 1) i) =
-        (X.nz p K la (j - 1) (X.F.fr (j - 1) i) - X.eZ e (j - 1) ⟨i, hi⟩) / X.Qc p K (j - 1) := by
+    obtain ⟨i, hi, rfl⟩ :=
+      comb_frame_top X.F hV (j - 1) x hb.2.2 hb.1 (r - 1) (Nat.sub_lt hr Nat.one_pos) hW
+    have hval
+        : X.bfam p K la e j (X.F.fr (j - 1) i)
+          = (X.nz p K la (j - 1) (X.F.fr (j - 1) i) - X.eZ e (j - 1) ⟨i, hi⟩)
+            / X.Qc p K (j - 1) := by
       unfold Dat.bfam
       rw [if_pos hx, if_pos hW, Finset.sum_eq_single (⟨i, hi⟩ : Fin r)]
       · rw [if_pos rfl]
@@ -114,8 +129,10 @@ theorem restPad : RestPad 1088 := by
     unfold Dat.Bw
     rw [← hPQ]
     unfold Dat.nz
-    exact div_mul_sub_le_div_sub_div _ _ _ _ _ (r + K) r (Pz_pos hp _ _) (by unfold Dat.Qc; exact pow_pos hp _)
-      (sum_la_lt hX la hla (j - 1) _ (sum_frlate X hV (j - 1) ⟨i, hi⟩)) (eZ_lt_mul_Qc hX la e he (j - 1) ⟨i, hi⟩)
+    exact div_mul_sub_le_div_sub_div _ _ _ _ _ (r + K) r (Pz_pos hp _ _)
+      (by unfold Dat.Qc; exact pow_pos hp _)
+      (sum_la_lt hX la hla (j - 1) _ (sum_frlate X hV (j - 1) ⟨i, hi⟩))
+      (eZ_lt_mul_Qc hX la e he (j - 1) ⟨i, hi⟩)
   · intro x hx
     have hl := sum_LLsub X hV j x hx
     obtain ⟨h1, h2, -, -⟩ := sum_late_mem hl.1

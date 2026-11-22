@@ -11,7 +11,8 @@ open NumberField MeasureTheory GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 def mLoc {n : ℕ} (a : Matrix (Fin n) (Fin n) ℂ) : M2 n := Matrix.fromBlocks a 0 0 (aᴴ)⁻¹
 
@@ -29,8 +30,11 @@ def GoodAway (w : InfinitePlace F) (Ψ : Mx F E d.m d.n → ℂ) : Prop :=
 
 end RD
 
-def GoodAwayEx : Prop := ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-  (d : SD σ) (R : RD d) (w : InfinitePlace F), ∃ Ψ, R.GoodAway w Ψ
+def GoodAwayEx : Prop :=
+  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
+      (d : SD σ) (R : RD d) (w : InfinitePlace F),
+    ∃ Ψ,
+      R.GoodAway w Ψ
 
 end PositivityTheory.SiegelWeilFormula
 

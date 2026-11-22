@@ -7,7 +7,9 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum
 open GlobalTheory.StdUnn
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -33,29 +35,33 @@ theorem continuous_reidx : Continuous (fun a : M2 n => reidx a) :=
 theorem Jst_map (τ : D.what₂.Tau) : (Jst D n).map (tauE D τ) = reidx (JJ n) := by
   ext i j
   simp only [Jst, blk4, reidx, JJ, Matrix.map_apply, Matrix.submatrix_apply]
-  rcases finSumFinEquiv.symm i with a | a <;> rcases finSumFinEquiv.symm j with b | b <;>
-    simp [Matrix.fromBlocks, Matrix.one_apply]
+  rcases finSumFinEquiv.symm i with a | a <;> rcases finSumFinEquiv.symm j with b | b
+    <;> simp [Matrix.fromBlocks, Matrix.one_apply]
 
 theorem mR_mul (a b : GR n) : mR (a * b) = mR a * mR b := rfl
 
 theorem mR_one : mR (1 : GR n) = 1 := rfl
 
-theorem mR_mul_inv (a : GR n) : mR a * mR a⁻¹ = 1 := by
-  rw [← mR_mul, mul_inv_cancel, mR_one]
+theorem mR_mul_inv (a : GR n) : mR a * mR a⁻¹ = 1 := by rw [← mR_mul, mul_inv_cancel, mR_one]
 
-theorem mR_inv_mul (a : GR n) : mR a⁻¹ * mR a = 1 := by
-  rw [← mR_mul, inv_mul_cancel, mR_one]
+theorem mR_inv_mul (a : GR n) : mR a⁻¹ * mR a = 1 := by rw [← mR_mul, inv_mul_cancel, mR_one]
 
-theorem reidx_unitary (τ : D.what₂.Tau) (y : GR n) :
-    (reidx (mR y))ᴴ * (Jst D n).map (tauE D τ) * reidx (mR y) = (Jst D n).map (tauE D τ) := by
+theorem reidx_unitary (τ : D.what₂.Tau) (y : GR n)
+    : (reidx (mR y))ᴴ * (Jst D n).map (tauE D τ) * reidx (mR y) = (Jst D n).map (tauE D τ) := by
   have h : (mR y)ᴴ * JJ n * mR y = JJ n := y.2
   rw [Jst_map, ← reidx_conjTranspose, ← reidx_mul, ← reidx_mul, h]
 
 def iotaF (τ : D.what₂.Tau) (y : GR n) : G D n :=
-  (⟨⟨atMN D τ (reidx (mR y)), atMN D τ (reidx (mR y⁻¹)),
-      by rw [← atMN_mul, ← reidx_mul, mR_mul_inv, reidx_one, atMN_one],
-      by rw [← atMN_mul, ← reidx_mul, mR_inv_mul, reidx_one, atMN_one]⟩,
-    atMN_unitary D τ (Jst D n) _ (reidx_unitary τ y)⟩ : HR (AF D.host.F) D.sp.cm.sig (Jst D n))
+  (⟨
+     ⟨
+       atMN D τ (reidx (mR y)),
+       atMN D τ (reidx (mR y⁻¹)),
+       by rw [← atMN_mul, ← reidx_mul, mR_mul_inv, reidx_one, atMN_one],
+       by rw [← atMN_mul, ← reidx_mul, mR_inv_mul, reidx_one, atMN_one]
+     ⟩,
+     atMN_unitary D τ (Jst D n) _ (reidx_unitary τ y)
+   ⟩
+    : HR (AF D.host.F) D.sp.cm.sig (Jst D n))
 
 def iota (τ : D.what₂.Tau) : GR n →* G D n where
   toFun := iotaF τ

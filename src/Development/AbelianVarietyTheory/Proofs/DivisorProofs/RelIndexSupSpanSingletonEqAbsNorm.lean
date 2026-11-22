@@ -5,16 +5,20 @@ public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 namespace GlobalTheory
 
 theorem relIndex_sup_span_singleton_eq_absNorm
     (F V : Type) [Field F] [NumberField F] [AddCommGroup V] [Module F V] [Module (𝓞 F) V]
-    [IsScalarTower (𝓞 F) F V] (N₀ : Submodule (𝓞 F) V) (u : V) (p : Ideal (𝓞 F))
-    (hp : p.IsMaximal) (hu : u ∉ N₀) (hpu : ∀ π ∈ p, π • u ∈ N₀) :
-    N₀.toAddSubgroup.relIndex (N₀ ⊔ Submodule.span (𝓞 F) {u}).toAddSubgroup
+    [IsScalarTower (𝓞 F) F V]
+    (N₀ : Submodule (𝓞 F) V) (u : V)
+    (p : Ideal (𝓞 F)) (hp : p.IsMaximal)
+    (hu : u ∉ N₀) (hpu : ∀ π ∈ p, π • u ∈ N₀)
+    : N₀.toAddSubgroup.relIndex (N₀ ⊔ Submodule.span (𝓞 F) {u}).toAddSubgroup
       = Ideal.absNorm p := by
   set M := N₀ ⊔ Submodule.span (𝓞 F) {u} with hM
   set K : Submodule (𝓞 F) M := N₀.comap M.subtype with hK

@@ -22,32 +22,34 @@ section PolynomialHeights
 
 variable {σ : Type*} [Finite σ]
 
-theorem ringKrullDim_mvPolynomial_dvr (O : Type*) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] :
-    ringKrullDim (MvPolynomial σ O) = ((Nat.card σ + 1 : ℕ) : WithBot ℕ∞) := by
+theorem ringKrullDim_mvPolynomial_dvr
+    (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    : ringKrullDim (MvPolynomial σ O) = ((Nat.card σ + 1 : ℕ) : WithBot ℕ∞) := by
   rw [MvPolynomial.ringKrullDim_of_isNoetherianRing, IsDiscreteValuationRing.ringKrullDim_eq_one]
   rw [ENat.card_eq_coe_natCard]
   push_cast
   ring
 
-theorem height_mvPolynomial_field_of_isMaximal {k : Type*} [Field k]
-    (M : Ideal (MvPolynomial σ k)) (hM : M.IsMaximal) :
-    (M.height : WithBot ℕ∞) = (Nat.card σ : WithBot ℕ∞) := by
-  have h := DimF.height_eq_ringKrullDim_of_forall
-    (DimF.height_eq_of_isMaximal_of_field (k := k)) M hM
+theorem height_mvPolynomial_field_of_isMaximal
+    {k : Type*} [Field k] (M : Ideal (MvPolynomial σ k)) (hM : M.IsMaximal)
+    : (M.height : WithBot ℕ∞) = (Nat.card σ : WithBot ℕ∞) := by
+  have h :=
+    DimF.height_eq_ringKrullDim_of_forall (DimF.height_eq_of_isMaximal_of_field (k := k)) M hM
   rw [h, MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field]
   simp [ENat.card_eq_coe_natCard]
 
-theorem le_height_of_isMaximal_of_uniformiser_mem {O : Type*} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] {ϖ : O} (hϖ : Irreducible ϖ) (m : Ideal (MvPolynomial σ O))
-    (hm : m.IsMaximal) (hϖm : (C ϖ : MvPolynomial σ O) ∈ m) :
-    ((Nat.card σ + 1 : ℕ) : ℕ∞) ≤ m.height := by
+theorem le_height_of_isMaximal_of_uniformiser_mem
+    {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    (m : Ideal (MvPolynomial σ O)) (hm : m.IsMaximal) (hϖm : (C ϖ : MvPolynomial σ O) ∈ m)
+    : ((Nat.card σ + 1 : ℕ) : ℕ∞) ≤ m.height := by
   set p0 : Ideal (MvPolynomial σ O) := Ideal.map C (IsLocalRing.maximalIdeal O) with hp0def
   have hp0 : p0 = Ideal.span {C ϖ} := by
     rw [hp0def, hϖ.maximalIdeal_eq, Ideal.map_span, Set.image_singleton]
   let e : (MvPolynomial σ O ⧸ p0) ≃+* MvPolynomial σ (IsLocalRing.ResidueField O) :=
     (MvPolynomial.quotientEquivQuotientMvPolynomial (IsLocalRing.maximalIdeal O)).symm.toRingEquiv
-  have hdom : IsDomain (MvPolynomial σ O ⧸ p0) := Function.Injective.isDomain e.toRingHom (by exact e.injective)
+  have hdom : IsDomain (MvPolynomial σ O ⧸ p0) :=
+    Function.Injective.isDomain e.toRingHom (by exact e.injective)
   have hp0p : p0.IsPrime := (Ideal.Quotient.isDomain_iff_prime p0).mp hdom
   have hle : p0 ≤ m := by
     rw [hp0]
@@ -57,8 +59,9 @@ theorem le_height_of_isMaximal_of_uniformiser_mem {O : Type*} [CommRing O] [IsDo
       (by rw [Ideal.mk_ker]; exact hle)
   have h1 : (m.map (Ideal.Quotient.mk p0)).height = Nat.card σ := by
     rw [← e.height_map]
-    have := height_mvPolynomial_field_of_isMaximal (k := IsLocalRing.ResidueField O) _
-      (Ideal.map_isMaximal_of_equiv e (p := m.map (Ideal.Quotient.mk p0)))
+    have :=
+      height_mvPolynomial_field_of_isMaximal (k := IsLocalRing.ResidueField O) _
+        (Ideal.map_isMaximal_of_equiv e (p := m.map (Ideal.Quotient.mk p0)))
     exact_mod_cast this
   have h0 : 1 ≤ p0.height := by
     rw [Order.one_le_iff_ne_zero, Ne, Ideal.height_eq_zero_iff_eq_bot, hp0,
@@ -66,19 +69,25 @@ theorem le_height_of_isMaximal_of_uniformiser_mem {O : Type*} [CommRing O] [IsDo
     exact hϖ.ne_zero
   have hfin : FiniteRingKrullDim (MvPolynomial σ O) := by
     rw [finiteRingKrullDim_iff_ne_bot_and_top, ringKrullDim_mvPolynomial_dvr]
-    exact ⟨by simp, by
-      rw [← WithBot.coe_natCast]
-      exact ne_of_lt (WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _))⟩
+    exact ⟨
+      by simp,
+      by
+        rw [← WithBot.coe_natCast]
+        exact ne_of_lt (WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _))
+    ⟩
   have h2 := DimF.height_add_height_map_le (q := p0) (M := m) hle
   rw [h1] at h2
-  calc ((Nat.card σ + 1 : ℕ) : ℕ∞) = 1 + (Nat.card σ : ℕ∞) := by push_cast; ring
+  calc
+    ((Nat.card σ + 1 : ℕ) : ℕ∞)
+      = 1 + (Nat.card σ : ℕ∞) := by push_cast; ring
     _ ≤ p0.height + (Nat.card σ : ℕ∞) := add_le_add h0 le_rfl
     _ ≤ m.height := h2
 
-theorem ringKrullDim_quotient_le_sub_height {A : Type*} [CommRing A] [IsNoetherianRing A]
-    [FiniteRingKrullDim A] (P : Ideal A) [P.IsPrime] (N h : ℕ)
-    (hmax : ∀ m : Ideal A, m.IsMaximal → m.height ≤ N) (hP : P.height = h) :
-    ringKrullDim (A ⧸ P) ≤ ((N - h : ℕ) : WithBot ℕ∞) := by
+theorem ringKrullDim_quotient_le_sub_height
+    {A : Type*} [CommRing A] [IsNoetherianRing A] [FiniteRingKrullDim A]
+    (P : Ideal A) [P.IsPrime]
+    (N h : ℕ) (hmax : ∀ m : Ideal A, m.IsMaximal → m.height ≤ N) (hP : P.height = h)
+    : ringKrullDim (A ⧸ P) ≤ ((N - h : ℕ) : WithBot ℕ∞) := by
   refine (ringKrullDim_le_iff_isMaximal_height_le _).mpr fun M hM => ?_
   have hc : (M.comap (Ideal.Quotient.mk P)).IsMaximal :=
     Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective
@@ -91,11 +100,14 @@ theorem ringKrullDim_quotient_le_sub_height {A : Type*} [CommRing A] [IsNoetheri
   have h2 := DimF.height_add_height_map_le (q := P) (M := M.comap (Ideal.Quotient.mk P)) hPle
   rw [e, hP] at h2
   have h3 := DimF.le_natSub_of_add_le (h2.trans (hmax _ hc))
-  calc (M.height : WithBot ℕ∞) ≤ (((N - h : ℕ) : ℕ∞) : WithBot ℕ∞) := WithBot.coe_le_coe.mpr h3
+  calc
+    (M.height : WithBot ℕ∞)
+      ≤ (((N - h : ℕ) : ℕ∞) : WithBot ℕ∞) := WithBot.coe_le_coe.mpr h3
     _ = ((N - h : ℕ) : WithBot ℕ∞) := WithBot.coe_natCast _
 
-theorem withBot_eq_of_le_of_add_one_le {x : WithBot ℕ∞} {c : ℕ} (h1 : (c : WithBot ℕ∞) ≤ x)
-    (h2 : x + 1 ≤ ((c + 1 : ℕ) : WithBot ℕ∞)) : x = c :=
+theorem withBot_eq_of_le_of_add_one_le
+    {x : WithBot ℕ∞} {c : ℕ} (h1 : (c : WithBot ℕ∞) ≤ x) (h2 : x + 1 ≤ ((c + 1 : ℕ) : WithBot ℕ∞))
+    : x = c :=
   _root_.UpperTheory.Reformulated.B.Ydd3.withBot_eq_of_le_of_add_one_le h1 h2
 
 end PolynomialHeights
@@ -131,11 +143,15 @@ theorem ComponentDim.proof : ComponentDim.Statement := by
   have hdimS := ringKrullDim_mvPolynomial_dvr (σ := Σ k, ι k) O
   have hfin : FiniteRingKrullDim (MRing ι O) := by
     rw [finiteRingKrullDim_iff_ne_bot_and_top, hdimS]
-    exact ⟨by rw [← WithBot.coe_natCast]; exact WithBot.coe_ne_bot, by
-      rw [← WithBot.coe_natCast]
-      exact ne_of_lt (WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _))⟩
-  have hmax : ∀ m' : Ideal (MRing ι O), m'.IsMaximal →
-      m'.height ≤ ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
+    exact ⟨
+      by rw [← WithBot.coe_natCast]; exact WithBot.coe_ne_bot,
+      by
+        rw [← WithBot.coe_natCast]
+        exact ne_of_lt (WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _))
+    ⟩
+  have hmax
+      : ∀ m' : Ideal (MRing ι O),
+        m'.IsMaximal → m'.height ≤ ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
     intro m' hm'
     have := Ideal.height_le_ringKrullDim_of_ne_top hm'.ne_top
     rw [hdimS] at this
@@ -144,8 +160,9 @@ theorem ComponentDim.proof : ComponentDim.Statement := by
 
   have hcat1 := DimF.height_eq_height_add_of_isRegularRing P W hPW
   have hcat2 := DimF.height_eq_height_add_of_isRegularRing W m hWm
-  have hsum : P.height + (W.map (Ideal.Quotient.mk P)).height + (m.map (Ideal.Quotient.mk W)).height
-      = ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
+  have hsum
+      : P.height + (W.map (Ideal.Quotient.mk P)).height + (m.map (Ideal.Quotient.mk W)).height
+        = ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
     rw [← hcat1, ← hcat2, hmeq]
   have hPfin : P.height ≠ ⊤ := fun h => by
     simp only [h, top_add] at hsum; exact ENat.top_ne_natCast _ hsum
@@ -167,14 +184,16 @@ theorem ComponentDim.proof : ComponentDim.Statement := by
   rw [hP.dim] at hPdim
   have hPdim' : d + 1 + Fintype.card K ≤ Nat.card (Σ k, ι k) + 1 - h0 := by exact_mod_cast hPdim
 
-  have hlow := Ideal.height_le_ringKrullDim_of_ne_top
-    (DimF.isPrime_map_mk (A := MRing ι O) (q := W) (M := m) hWm).ne_top
+  have hlow :=
+    Ideal.height_le_ringKrullDim_of_ne_top (DimF.isPrime_map_mk (A := MRing ι O) (q := W) (M := m)
+      hWm).ne_top
   rw [hb0] at hlow
   have hb' : d + Fintype.card K ≤ b0 := by omega
   have hlow' : ((d + Fintype.card K : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MRing ι O ⧸ W) :=
     le_trans (by exact_mod_cast hb') hlow
   rw [hP.dim] at hup
-  exact withBot_eq_of_le_of_add_one_le hlow' (by rw [show d + Fintype.card K + 1 = d + 1 + Fintype.card K by ring]; exact hup)
+  exact withBot_eq_of_le_of_add_one_le hlow'
+    (by rw [show d + Fintype.card K + 1 = d + 1 + Fintype.card K by ring]; exact hup)
 
 end
 

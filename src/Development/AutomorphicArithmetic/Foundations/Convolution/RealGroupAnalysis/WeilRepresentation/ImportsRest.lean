@@ -11,8 +11,8 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.red :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], St.Red F := by
+theorem UpperTheory.ConvolutionTheory.R2.red
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], St.Red F := by
   intro F _ _ _
   obtain ⟨t₀, ht₀, h⟩ := Reduction.exists_reduced (K := F)
   refine ⟨Real.sqrt t₀, Real.sqrt_pos.2 ht₀, fun g => ?_⟩

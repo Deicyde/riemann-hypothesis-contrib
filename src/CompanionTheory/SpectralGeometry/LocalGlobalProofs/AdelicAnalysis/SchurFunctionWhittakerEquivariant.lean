@@ -93,7 +93,8 @@ lemma indL_SB (ι : Type) [Fintype ι] {a : ℕ} (ha : 0 < a) :
     simp only [indL]
     exact Set.indicator_of_notMem hx _
 
-def Hs (F : Type) [Field F] [NumberField F] (N : ℕ) : Set (A F) := {x | ∃ y ∈ Oh F, x = (N : A F) * y}
+def Hs (F : Type) [Field F] [NumberField F] (N : ℕ) : Set (A F) :=
+  {x | ∃ y ∈ Oh F, x = (N : A F) * y}
 
 lemma hs_add {N : ℕ} {x y : A F} (hx : x ∈ Hs F N) (hy : y ∈ Hs F N) : x + y ∈ Hs F N := by
   obtain ⟨u, hu, rfl⟩ := hx
@@ -130,22 +131,28 @@ lemma hs_alg_iff {N : ℕ} (hN : 0 < N) {c : F} (h : algebraMap F (A F) c ∈ Hs
 
 def congN (F : Type) [Field F] [NumberField F] (N : ℕ) : Setoid F where
   r b b' := ∃ r : 𝓞 F, b - b' = (N : F) * (r : F)
-  iseqv :=
-    { refl := fun b => ⟨0, by simp⟩
-      symm := by
-        rintro b b' ⟨r, hr⟩
-        exact ⟨-r, by push_cast; rw [mul_neg, ← hr]; ring⟩
-      trans := by
-        rintro b b' b'' ⟨r, hr⟩ ⟨t, ht⟩
-        exact ⟨r + t, by push_cast; rw [mul_add, ← hr, ← ht]; ring⟩ }
+  iseqv := {
+    refl := fun b => ⟨0, by simp⟩
+    symm := by
+      rintro b b' ⟨r, hr⟩
+      exact ⟨-r, by push_cast; rw [mul_neg, ← hr]; ring⟩
+    trans := by
+      rintro b b' b'' ⟨r, hr⟩ ⟨t, ht⟩
+      exact ⟨r + t, by push_cast; rw [mul_add, ← hr, ← ht]; ring⟩
+  }
 
-theorem integrable_of_periodic [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F))
-    (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1) (f : A F → ℂ) {N : ℕ} (hN : 0 < N)
-    (hper : ∀ x ∈ Oh F, ∀ y, f (y + (N : A F) * x) = f y) {C : ℝ} {M : ℕ} (hM : 3 ≤ M)
-    (hdec : ∀ b : F, ‖f (algebraMap F (A F) b)‖ ≤ C * ((den b : ℝ) ^ M)⁻¹) : Integrable f lf := by
+theorem integrable_of_periodic
+    [MeasurableSpace (A F)] [BorelSpace (A F)]
+    (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1)
+    (f : A F → ℂ)
+    {N : ℕ} (hN : 0 < N) (hper : ∀ x ∈ Oh F, ∀ y, f (y + (N : A F) * x) = f y)
+    {C : ℝ} {M : ℕ}
+    (hM : 3 ≤ M) (hdec : ∀ b : F, ‖f (algebraMap F (A F) b)‖ ≤ C * ((den b : ℝ) ^ M)⁻¹)
+    : Integrable f lf := by
   haveI := hlf
   haveI : SecondCountableTopology (A F) := (GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F).2.1
-  have hdense : DenseRange (algebraMap F (A F)) := (GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F).2.2.2.2.2.1
+  have hdense : DenseRange (algebraMap F (A F)) :=
+    (GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F).2.2.2.2.2.1
   have hHo : IsOpen (Hs F N) := hs_isOpen hN
   let st := congN F N
   let s : Set F := Set.range (fun q : Quotient st => q.out)
@@ -172,7 +179,8 @@ theorem integrable_of_periodic [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : 
     have h : algebraMap F (A F) ((b : F) - (b' : F)) ∈ Hs F N := by
       have := hs_add hy' (hs_neg hy)
       convert this using 1
-      rw [map_sub]; ring
+      rw [map_sub]
+      ring
     exact hs _ b.2 _ b'.2 (hs_alg_iff hN h)
   have hTc : ⋃ b, T b = Set.univ := by
     refine Set.eq_univ_of_forall fun y => ?_
@@ -186,7 +194,8 @@ theorem integrable_of_periodic [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : 
     have h3 : q.out = b' + (N : F) * (r : F) := by rw [← hr]; ring
     have h4 := hs_neg (hs_add hb' h2)
     convert h4 using 1
-    rw [h3, map_add (f := _)]; ring
+    rw [h3, map_add (f := _)]
+    ring
   have hconst : ∀ b : s, ∀ y ∈ T b, f y = f (algebraMap F (A F) (b : F)) := by
     intro b y hy
     obtain ⟨u, hu, he⟩ := hy
@@ -194,7 +203,12 @@ theorem integrable_of_periodic [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : 
     rw [this, hper u hu]
   have hcont : Continuous f := by
     refine IsLocallyConstant.continuous ((IsLocallyConstant.iff_exists_open _).2 fun y => ?_)
-    refine ⟨{z | z - y ∈ Hs F N}, hHo.preimage (continuous_id.sub continuous_const), by simpa using hs_zero N, ?_⟩
+    refine ⟨
+      {z | z - y ∈ Hs F N},
+      hHo.preimage (continuous_id.sub continuous_const),
+      by simpa using hs_zero N,
+      ?_
+    ⟩
     intro z hz
     obtain ⟨u, hu, he⟩ := hz
     have : z = y + (N : A F) * u := by rw [← he]; ring
@@ -202,7 +216,7 @@ theorem integrable_of_periodic [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : 
   have hmeasT : ∀ b, lf (T b) ≤ 1 := by
     intro b
     have : lf (T b) = lf (Hs F N) := by
-      have := measure_preimage_add_right lf (-algebraMap F (A F) (b : F)) (Hs F N)
+      have := measure_preimage_add_right lf (- algebraMap F (A F) (b : F)) (Hs F N)
       rw [← this]
       congr 1
       ext y
@@ -213,20 +227,47 @@ theorem integrable_of_periodic [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : 
   have hnn : ∀ b : s, 0 ≤ C * ((den (b : F) : ℝ) ^ M)⁻¹ := fun b => (norm_nonneg _).trans (hdec b)
   have hb : ∫⁻ y, ‖f y‖ₑ ∂lf ≤ ENNReal.ofReal (∑' b : s, C * ((den (b : F) : ℝ) ^ M)⁻¹) := by
     rw [ENNReal.ofReal_tsum_of_nonneg hnn (hsum.mul_left C)]
-    calc ∫⁻ y, ‖f y‖ₑ ∂lf = ∫⁻ y in ⋃ b, T b, ‖f y‖ₑ ∂lf := by rw [hTc, Measure.restrict_univ]
+    calc
+      ∫⁻ y, ‖f y‖ₑ ∂lf
+        = ∫⁻ y in ⋃ b, T b, ‖f y‖ₑ ∂lf := by rw [hTc, Measure.restrict_univ]
       _ = ∑' b, ∫⁻ y in T b, ‖f y‖ₑ ∂lf := lintegral_iUnion (fun b => (hTo b).measurableSet) hTd _
       _ ≤ ∑' b : s, ENNReal.ofReal (C * ((den (b : F) : ℝ) ^ M)⁻¹) := by
         refine ENNReal.tsum_le_tsum fun b => ?_
-        calc ∫⁻ y in T b, ‖f y‖ₑ ∂lf = ∫⁻ _ in T b, ‖f (algebraMap F (A F) (b : F))‖ₑ ∂lf :=
-              setLIntegral_congr_fun (hTo b).measurableSet fun y hy => by rw [hconst b y hy]
+        calc
+          ∫⁻ y in T b, ‖f y‖ₑ ∂lf = ∫⁻ _ in T b, ‖f (algebraMap F (A F) (b : F))‖ₑ ∂lf :=
+            setLIntegral_congr_fun (hTo b).measurableSet fun y hy => by rw [hconst b y hy]
           _ = ‖f (algebraMap F (A F) (b : F))‖ₑ * lf (T b) := by rw [setLIntegral_const]
           _ ≤ ‖f (algebraMap F (A F) (b : F))‖ₑ * 1 := by gcongr; exact hmeasT b
           _ ≤ ENNReal.ofReal (C * ((den (b : F) : ℝ) ^ M)⁻¹) := by
-              rw [mul_one, ← ofReal_norm_eq_enorm]
-              exact ENNReal.ofReal_le_ofReal (hdec b)
+            rw [mul_one, ← ofReal_norm_eq_enorm]
+            exact ENNReal.ofReal_le_ofReal (hdec b)
   exact lt_of_le_of_lt hb ENNReal.ofReal_lt_top
 
-theorem density_main : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F)), lf.IsAddHaarMeasure → lf (Oh F) = 1 → ∀ ψ : AddChar (A F) ℂ, IsStdChar F ψ → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (M : ℕ) (B : Matrix ι ι F) (ρ : InfinitePlace F → (F →+* ℝ)) (P : InfinitePlace F → Matrix ι ι ℝ), QSetup M B ρ P → 3 ≤ M → ∀ a : ℕ, 0 < a → ∃ Df : A F → ℝ, Continuous Df ∧ (∀ y, 0 ≤ Df y) ∧ (∀ U : Set (A F), MeasurableSet U → (Measure.pi fun _ : ι => lf) {x | (∀ i, (a : A F) * x i ∈ Oh F) ∧ qf (hf F) (Bf B) x ∈ U} = ∫⁻ y in U, ENNReal.ofReal (Df y) ∂lf) ∧ Integrable (fstar ψ (hf F) (Bf B) (muF B lf) (indL a)) lf ∧ ∀ z : A F, ∫ y, fstar ψ (hf F) (Bf B) (muF B lf) (indL a) y * ψ (-z * y) ∂lf = ((kap F ^ (2 * M - 2) * (Real.sqrt |((Algebra.norm ℚ B.det : ℚ) : ℝ)|)⁻¹ * Df z : ℝ) : ℂ) := by
+theorem density_main
+    : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)] [BorelSpace (A F)]
+        (lf : Measure (A F)),
+      lf.IsAddHaarMeasure → lf (Oh F) = 1
+        → ∀ ψ : AddChar (A F) ℂ,
+          IsStdChar F ψ
+            → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (M : ℕ) (B : Matrix ι ι F)
+                (ρ : InfinitePlace F → (F →+* ℝ)) (P : InfinitePlace F → Matrix ι ι ℝ),
+              QSetup M B ρ P → 3 ≤ M
+                → ∀ a : ℕ,
+                  0 < a
+                    → ∃ Df : A F → ℝ,
+                      Continuous Df ∧ (∀ y, 0 ≤ Df y)
+                        ∧ (∀ U : Set (A F),
+                          MeasurableSet U
+                            → (Measure.pi fun _ : ι => lf)
+                                {x | (∀ i, (a : A F) * x i ∈ Oh F) ∧ qf (hf F) (Bf B) x ∈ U}
+                              = ∫⁻ y in U, ENNReal.ofReal (Df y) ∂lf)
+                        ∧ Integrable (fstar ψ (hf F) (Bf B) (muF B lf) (indL a)) lf
+                        ∧ ∀ z : A F,
+                          ∫ y, fstar ψ (hf F) (Bf B) (muF B lf) (indL a) y * ψ (-z * y) ∂lf
+                            = ((kap F ^ (2 * M - 2)
+                                  * (Real.sqrt |((Algebra.norm ℚ B.det : ℚ) : ℝ)|)⁻¹ * Df z
+                                : ℝ)
+                              : ℂ) := by
   intro F _ _ _ _ lf hlf h1 ψ hψ ι _ _ M B ρ P hQ hM a ha
   haveI := hlf
   obtain ⟨hLC, hSC, hT2, hOc, hOo, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
@@ -243,9 +284,12 @@ theorem density_main : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace
   let q : (ι → A F) → A F := qf (hf F) (Bf B)
   have hqc : Continuous q := by
     refine continuous_const.mul ?_
-    exact Continuous.dotProduct continuous_id (Continuous.matrix_mulVec continuous_const continuous_id)
+    exact Continuous.dotProduct continuous_id
+      (Continuous.matrix_mulVec continuous_const continuous_id)
   let m : Measure (A F) := (μ0.restrict L).map q
-  have mU : ∀ U : Set (A F), MeasurableSet U → m U = μ0 {x | (∀ i, (a : A F) * x i ∈ Oh F) ∧ q x ∈ U} := by
+  have mU
+      : ∀ U : Set (A F),
+        MeasurableSet U → m U = μ0 {x | (∀ i, (a : A F) * x i ∈ Oh F) ∧ q x ∈ U} := by
     intro U hU
     rw [Measure.map_apply hqc.measurable hU, Measure.restrict_apply (hqc.measurable hU)]
     congr 1
@@ -284,19 +328,31 @@ theorem density_main : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace
       simp only [opU, indL]
       rw [Set.indicator_of_notMem hu, mul_zero]
   have hint : Integrable fs lf := by
-    obtain ⟨N, hN, hper⟩ := GlobalTheory.T.weil_operator_integral_invariance F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a) (indL_SB ι ha)
-    obtain ⟨C, hC⟩ := GlobalTheory.T.fourier_coefficient_growth_bound F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a) (indL_SB ι ha)
+    obtain ⟨N, hN, hper⟩ :=
+      GlobalTheory.T.weil_operator_integral_invariance F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a)
+        (indL_SB ι ha)
+    obtain ⟨C, hC⟩ :=
+      GlobalTheory.T.fourier_coefficient_growth_bound F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a)
+        (indL_SB ι ha)
     exact integrable_of_periodic lf hlf h1 fs hN (fun x hx y => (hper x hx).2 y) hM hC
   have hmh : mh = fun y => ((c : ℂ))⁻¹ * fs y := by
     funext y
     rw [hfst y, ← mul_assoc, inv_mul_cancel₀ (by exact_mod_cast hc0.ne'), one_mul]
-  have hint' : Integrable mh lf := by
-    rw [hmh]; exact hint.const_mul _
+  have hint' : Integrable mh lf := by rw [hmh]; exact hint.const_mul _
   have hint'' : Integrable mh (ENNReal.ofReal (kap F) • lf) :=
     hint'.smul_measure ENNReal.ofReal_ne_top
-  obtain ⟨D, hDc, hD0, hDe, hDm⟩ := GlobalTheory.T.positive_definite_density (A F) (fun x y => ψ (x * y)) _
-    (GlobalTheory.T.adeles_self_dual F lf hlf h1 ψ hψ) m hmfin hint''
-  refine ⟨fun y => kap F * D y, continuous_const.mul hDc, fun y => mul_nonneg hk0.le (hD0 y), ?_, hint, ?_⟩
+  obtain ⟨D, hDc, hD0, hDe, hDm⟩ :=
+    GlobalTheory.T.positive_definite_density (A F)
+      (fun x y => ψ (x * y))
+      _ (GlobalTheory.T.adeles_self_dual F lf hlf h1 ψ hψ) m hmfin hint''
+  refine ⟨
+    fun y => kap F * D y,
+    continuous_const.mul hDc,
+    fun y => mul_nonneg hk0.le (hD0 y),
+    ?_,
+    hint,
+    ?_
+  ⟩
   · intro U hU
     have e1 := hDm U hU
     rw [mU U hU] at e1
@@ -311,16 +367,19 @@ theorem density_main : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace
     have e3 : ∫ y, fs y * ψ (-z * y) ∂lf = (c : ℂ) * ∫ y, mh y * ψ (-z * y) ∂lf := by
       rw [← integral_const_mul]
       refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
-      simp only [hfst y]; ring
+      simp only [hfst y]
+      ring
     show ∫ y, fs y * ψ (-z * y) ∂lf = _
     rw [e3]
     have e4 : (c : ℂ) = ((kap F ^ (2 * M - 2) * s⁻¹ * kap F * kap F : ℝ) : ℂ) := by
       have : kap F ^ (2 * M) = kap F ^ (2 * M - 2) * kap F * kap F := by
         rw [mul_assoc, ← pow_two, ← pow_add]; congr 1; omega
       simp only [c, hcard, this]
-      push_cast; ring
-    have e5 : (((kap F ^ (2 * M - 2) * s⁻¹ * (kap F * D z)) : ℝ) : ℂ) =
-        ((kap F ^ (2 * M - 2) * s⁻¹ * kap F : ℝ) : ℂ) * (D z : ℂ) := by
+      push_cast
+      ring
+    have e5
+        : (((kap F ^ (2 * M - 2) * s⁻¹ * (kap F * D z)) : ℝ) : ℂ)
+          = ((kap F ^ (2 * M - 2) * s⁻¹ * kap F : ℝ) : ℂ) * (D z : ℂ) := by
       push_cast; ring
     show _ = (((kap F ^ (2 * M - 2) * s⁻¹ * (kap F * D z)) : ℝ) : ℂ)
     rw [e5, e2, e4]

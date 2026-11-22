@@ -20,26 +20,29 @@ def LeadAt (f : PowerSeries K) (r : ℝ) (i : ℕ) : Prop :=
 theorem gauss_norm_add_of_lt {a b : K} (h : ‖b‖ < ‖a‖) : ‖a + b‖ = ‖a‖ := by
   rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h.ne', max_eq_left h.le]
 
-theorem gauss_norm_sum_lt {α : Type} (s : Finset α) (f : α → K) {r : ℝ} (hr : 0 < r)
-    (h : ∀ a ∈ s, ‖f a‖ < r) : ‖∑ a ∈ s, f a‖ < r := by
+theorem gauss_norm_sum_lt
+    {α : Type} (s : Finset α) (f : α → K) {r : ℝ} (hr : 0 < r) (h : ∀ a ∈ s, ‖f a‖ < r)
+    : ‖∑ a ∈ s, f a‖ < r := by
   rcases s.eq_empty_or_nonempty with rfl | hs
   · simpa using hr
   · obtain ⟨i, hi, hle⟩ := IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty hs f
     exact hle.trans_lt (h i hi)
 
-theorem LeadAt.mul {f g : PowerSeries K} {r s : ℝ} {i j : ℕ} (hf : LeadAt f r i) (hg : LeadAt g s j) :
-    LeadAt (f * g) (r * s) (i + j) := by
+theorem LeadAt.mul {f g : PowerSeries K} {r s : ℝ} {i j : ℕ} (hf : LeadAt f r i) (hg : LeadAt g s j)
+    : LeadAt (f * g) (r * s) (i + j) := by
   obtain ⟨hr, hf1, hf2, hf3⟩ := hf
   obtain ⟨hs, hg1, hg2, hg3⟩ := hg
   have small : ∀ p q : ℕ, (p < i ∨ q < j) → ‖coeff p f * coeff q g‖ < r * s := by
     intro p q hpq
     rw [norm_mul]
     rcases hpq with hp | hq
-    · calc ‖coeff p f‖ * ‖coeff q g‖ ≤ ‖coeff p f‖ * s :=
-            mul_le_mul_of_nonneg_left (hg1 q) (norm_nonneg _)
+    · calc
+        ‖coeff p f‖ * ‖coeff q g‖
+          ≤ ‖coeff p f‖ * s := mul_le_mul_of_nonneg_left (hg1 q) (norm_nonneg _)
         _ < r * s := mul_lt_mul_of_pos_right (hf2 p hp) hs
-    · calc ‖coeff p f‖ * ‖coeff q g‖ ≤ r * ‖coeff q g‖ :=
-            mul_le_mul_of_nonneg_right (hf1 p) (norm_nonneg _)
+    · calc
+        ‖coeff p f‖ * ‖coeff q g‖
+          ≤ r * ‖coeff q g‖ := mul_le_mul_of_nonneg_right (hf1 p) (norm_nonneg _)
         _ < r * s := mul_lt_mul_of_pos_left (hg2 q hq) hr
   refine ⟨mul_pos hr hs, fun n => ?_, fun n hn => ?_, ?_⟩
   · rw [coeff_mul]
@@ -50,9 +53,12 @@ theorem LeadAt.mul {f g : PowerSeries K} {r s : ℝ} {i j : ℕ} (hf : LeadAt f 
     refine gauss_norm_sum_lt _ _ (mul_pos hr hs) fun x hx => small _ _ ?_
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
     omega
-  · have hmem : (i, j) ∈ Finset.HasAntidiagonal.antidiagonal (i + j) := Finset.HasAntidiagonal.mem_antidiagonal.mpr rfl
+  · have hmem : (i, j) ∈ Finset.HasAntidiagonal.antidiagonal (i + j) :=
+      Finset.HasAntidiagonal.mem_antidiagonal.mpr rfl
     rw [coeff_mul, ← Finset.add_sum_erase _ _ hmem]
-    have hlt : ‖∑ x ∈ (Finset.HasAntidiagonal.antidiagonal (i + j)).erase (i, j), coeff x.1 f * coeff x.2 g‖ < r * s := by
+    have hlt
+        : ‖∑ x ∈ (Finset.HasAntidiagonal.antidiagonal (i + j)).erase (i, j), coeff x.1 f * coeff x.2 g‖
+          < r * s := by
       refine gauss_norm_sum_lt _ _ (mul_pos hr hs) fun x hx => small _ _ ?_
       obtain ⟨hne, hx⟩ := Finset.mem_erase.mp hx
       rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
@@ -72,8 +78,8 @@ theorem leadAt_C {c : K} (hc : c ≠ 0) : LeadAt (C c : PowerSeries K) ‖c‖ 0
   rw [coeff_C]
   split_ifs <;> simp
 
-theorem leadAt_factor {A : PowerSeries K} (hA : IntegralPS A) (hA0 : constantCoeff A = 1) (x : K) :
-    ∃ i, i ≤ 2 ∧ LeadAt (A - C x * X ^ 2) (max 1 ‖x‖) i := by
+theorem leadAt_factor {A : PowerSeries K} (hA : IntegralPS A) (hA0 : constantCoeff A = 1) (x : K)
+    : ∃ i, i ≤ 2 ∧ LeadAt (A - C x * X ^ 2) (max 1 ‖x‖) i := by
   have hc : ∀ n, coeff n (A - C x * X ^ 2) = coeff n A - if n = 2 then x else 0 := by
     intro n
     rw [map_sub, coeff_C_mul_X_pow]
@@ -84,14 +90,16 @@ theorem leadAt_factor {A : PowerSeries K} (hA : IntegralPS A) (hA0 : constantCoe
     · rw [hc]
       split_ifs
       · rw [sub_eq_add_neg]
-        exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hA n) (by rw [norm_neg]; exact hx))
+        exact (IsUltrametricDist.norm_add_le_max _ _).trans
+          (max_le (hA n) (by rw [norm_neg]; exact hx))
       · rw [sub_zero]; exact hA n
     · rw [hc, if_neg (by norm_num), sub_zero, coeff_zero_eq_constantCoeff_apply, hA0, norm_one]
   · push Not at hx
     refine ⟨2, le_rfl, ?_⟩
     rw [max_eq_right hx.le]
     have h2 : ‖coeff 2 A - x‖ = ‖x‖ := by
-      rw [sub_eq_neg_add, gauss_norm_add_of_lt (by rw [norm_neg]; exact (hA 2).trans_lt hx), norm_neg]
+      rw [sub_eq_neg_add, gauss_norm_add_of_lt (by rw [norm_neg]; exact (hA 2).trans_lt hx),
+        norm_neg]
     refine ⟨one_pos.trans hx, fun n => ?_, fun n hn => ?_, ?_⟩
     · rw [hc]
       split_ifs with h
@@ -101,9 +109,10 @@ theorem leadAt_factor {A : PowerSeries K} (hA : IntegralPS A) (hA0 : constantCoe
       exact (hA n).trans_lt hx
     · rw [hc, if_pos rfl, h2]
 
-theorem leadAt_prod {α : Type} (S : Finset α) (x : α → K) {A : PowerSeries K} (hA : IntegralPS A)
-    (hA0 : constantCoeff A = 1) :
-    ∃ i, i ≤ 2 * S.card ∧ LeadAt (∏ P ∈ S, (A - C (x P) * X ^ 2)) (∏ P ∈ S, max 1 ‖x P‖) i := by
+theorem leadAt_prod
+    {α : Type} (S : Finset α) (x : α → K)
+    {A : PowerSeries K} (hA : IntegralPS A) (hA0 : constantCoeff A = 1)
+    : ∃ i, i ≤ 2 * S.card ∧ LeadAt (∏ P ∈ S, (A - C (x P) * X ^ 2)) (∏ P ∈ S, max 1 ‖x P‖) i := by
   classical
   refine Finset.induction_on S ⟨0, le_rfl, by simpa using leadAt_one⟩ ?_
   intro a T ha ih
@@ -114,10 +123,11 @@ theorem leadAt_prod {α : Type} (S : Finset α) (x : α → K) {A : PowerSeries 
   · rw [Finset.prod_insert ha, Finset.prod_insert ha]
     exact h'.mul h
 
-theorem gauss_bound {α : Type} (S : Finset α) (x : α → K) (A : PowerSeries K) (hA : IntegralPS A)
-    (hA0 : constantCoeff A = 1) (c : K)
-    (hG : IntegralPS (C c * ∏ P ∈ S, (A - C (x P) * X ^ 2))) :
-    ‖c‖ * ∏ P ∈ S, max 1 ‖x P‖ ≤ 1 := by
+theorem gauss_bound
+    {α : Type} (S : Finset α) (x : α → K)
+    (A : PowerSeries K) (hA : IntegralPS A) (hA0 : constantCoeff A = 1)
+    (c : K) (hG : IntegralPS (C c * ∏ P ∈ S, (A - C (x P) * X ^ 2)))
+    : ‖c‖ * ∏ P ∈ S, max 1 ‖x P‖ ≤ 1 := by
   by_cases hc : c = 0
   · simp [hc]
   obtain ⟨i, -, h⟩ := leadAt_prod S x hA hA0
@@ -125,9 +135,11 @@ theorem gauss_bound {α : Type} (S : Finset α) (x : α → K) (A : PowerSeries 
   rw [← hl.2.2.2]
   exact hG _
 
-theorem gauss_unit {α : Type} (S : Finset α) (x : α → K) (A : PowerSeries K) (hA : IntegralPS A)
-    (hA0 : constantCoeff A = 1) (c : K) (hc : ‖c‖ * ∏ P ∈ S, max 1 ‖x P‖ = 1) :
-    ∃ i, i ≤ 2 * S.card ∧ ‖coeff i (C c * ∏ P ∈ S, (A - C (x P) * X ^ 2))‖ = 1 := by
+theorem gauss_unit
+    {α : Type} (S : Finset α) (x : α → K)
+    (A : PowerSeries K) (hA : IntegralPS A) (hA0 : constantCoeff A = 1)
+    (c : K) (hc : ‖c‖ * ∏ P ∈ S, max 1 ‖x P‖ = 1)
+    : ∃ i, i ≤ 2 * S.card ∧ ‖coeff i (C c * ∏ P ∈ S, (A - C (x P) * X ^ 2))‖ = 1 := by
   have hc0 : c ≠ 0 := by
     rintro rfl
     simp at hc
@@ -135,25 +147,37 @@ theorem gauss_unit {α : Type} (S : Finset α) (x : α → K) (A : PowerSeries K
   have hl := (leadAt_C hc0).mul h
   exact ⟨0 + i, by omega, hl.2.2.2.trans hc⟩
 
-theorem leadAt_first_unit {g : PowerSeries K} (hg : IntegralPS g) (h : ∃ i, ‖coeff i g‖ = 1) :
-    ∃ i₀, (∀ i, ‖coeff i g‖ = 1 → i₀ ≤ i) ∧ LeadAt g 1 i₀ := by
+theorem leadAt_first_unit {g : PowerSeries K} (hg : IntegralPS g) (h : ∃ i, ‖coeff i g‖ = 1)
+    : ∃ i₀, (∀ i, ‖coeff i g‖ = 1 → i₀ ≤ i) ∧ LeadAt g 1 i₀ := by
   classical
-  refine ⟨Nat.find h, fun i hi => Nat.find_min' h hi, one_pos, hg,
-    fun n hn => lt_of_le_of_ne (hg n) (Nat.find_min h hn), Nat.find_spec h⟩
+  refine ⟨
+    Nat.find h,
+    fun i hi => Nat.find_min' h hi,
+    one_pos,
+    hg,
+    fun n hn => lt_of_le_of_ne (hg n) (Nat.find_min h hn),
+    Nat.find_spec h
+  ⟩
 
-theorem unit_coeff_mul {f g : PowerSeries K} (hf : IntegralPS f) (hg : IntegralPS g)
-    (hf0 : ‖constantCoeff f‖ = 1) (N : ℕ) (h : ∃ i, i ≤ N ∧ ‖coeff i g‖ = 1) :
-    ∃ i, i ≤ N ∧ ‖coeff i (f * g)‖ = 1 := by
+theorem unit_coeff_mul
+    {f g : PowerSeries K} (hf : IntegralPS f) (hg : IntegralPS g) (hf0 : ‖constantCoeff f‖ = 1)
+    (N : ℕ) (h : ∃ i, i ≤ N ∧ ‖coeff i g‖ = 1)
+    : ∃ i, i ≤ N ∧ ‖coeff i (f * g)‖ = 1 := by
   obtain ⟨i, hiN, hi⟩ := h
   obtain ⟨i₀, hmin, hl⟩ := leadAt_first_unit hg ⟨i, hi⟩
-  have hf' : LeadAt f 1 0 := ⟨one_pos, hf, fun n hn => absurd hn (Nat.not_lt_zero _),
-    by rw [coeff_zero_eq_constantCoeff_apply, hf0]⟩
+  have hf' : LeadAt f 1 0 := ⟨
+    one_pos,
+    hf,
+    fun n hn => absurd hn (Nat.not_lt_zero _),
+    by rw [coeff_zero_eq_constantCoeff_apply, hf0]
+  ⟩
   have hm := hf'.mul hl
   refine ⟨0 + i₀, by have := hmin i hi; omega, ?_⟩
   rw [hm.2.2.2, one_mul]
 
-theorem unit_coeff_of_sq {e : PowerSeries K} (he : IntegralPS e) (N : ℕ)
-    (h : ∃ i, i ≤ 2 * N ∧ ‖coeff i (e ^ 2)‖ = 1) : ∃ i, i ≤ N ∧ ‖coeff i e‖ = 1 := by
+theorem unit_coeff_of_sq
+    {e : PowerSeries K} (he : IntegralPS e) (N : ℕ) (h : ∃ i, i ≤ 2 * N ∧ ‖coeff i (e ^ 2)‖ = 1)
+    : ∃ i, i ≤ N ∧ ‖coeff i e‖ = 1 := by
   obtain ⟨i, hiN, hi⟩ := h
   have hex : ∃ j, ‖coeff j e‖ = 1 := by
     by_contra hno
@@ -163,8 +187,9 @@ theorem unit_coeff_of_sq {e : PowerSeries K} (he : IntegralPS e) (N : ℕ)
       rw [sq, coeff_mul]
       refine gauss_norm_sum_lt _ _ one_pos fun x _ => ?_
       rw [norm_mul]
-      calc ‖coeff x.1 e‖ * ‖coeff x.2 e‖ ≤ ‖coeff x.1 e‖ * 1 :=
-            mul_le_mul_of_nonneg_left (he _) (norm_nonneg _)
+      calc
+        ‖coeff x.1 e‖ * ‖coeff x.2 e‖
+          ≤ ‖coeff x.1 e‖ * 1 := mul_le_mul_of_nonneg_left (he _) (norm_nonneg _)
         _ < 1 := by rw [mul_one]; exact hlt _
     exact this.ne hi
   obtain ⟨j, -, hl⟩ := leadAt_first_unit he hex
@@ -175,8 +200,10 @@ theorem unit_coeff_of_sq {e : PowerSeries K} (he : IntegralPS e) (N : ℕ)
   push Not at hc
   exact (hm.2.2.1 i (by omega)).ne hi
 
-theorem integral_of_sq_eq {e U G : PowerSeries K} (he : IntegralPS e) (he0 : constantCoeff e = 0)
-    (hU : IntegralPS U) (hU0 : constantCoeff U = 1) (h : e ^ 2 = X ^ 2 * U * G) : IntegralPS G := by
+theorem integral_of_sq_eq
+    {e U G : PowerSeries K} (he : IntegralPS e) (he0 : constantCoeff e = 0) (hU : IntegralPS U)
+    (hU0 : constantCoeff U = 1) (h : e ^ 2 = X ^ 2 * U * G)
+    : IntegralPS G := by
   obtain ⟨e', rfl⟩ := (PowerSeries.X_dvd_iff).mpr he0
   have he' : IntegralPS e' := fun n => by
     have := he (n + 1)

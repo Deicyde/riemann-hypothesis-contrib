@@ -13,8 +13,8 @@ namespace GlobalTheory.Mass.Witt
 
 variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
 
-theorem mem_perp (h : V →ₗ⋆[K] V →ₗ[K] K) (U : Submodule K V) (v : V) :
-    v ∈ perp h U ↔ ∀ x ∈ U, h x v = 0 := by
+theorem mem_perp (h : V →ₗ⋆[K] V →ₗ[K] K) (U : Submodule K V) (v : V)
+    : v ∈ perp h U ↔ ∀ x ∈ U, h x v = 0 := by
   simp [perp, Submodule.mem_iInf, LinearMap.mem_ker]
 
 private lemma h_sub_smul_sub_smul_eq_of_hww (h : V →ₗ⋆[K] V →ₗ[K] K) (hsym : ∀ a b, star (h a b) = h b a)
@@ -27,26 +27,28 @@ private lemma h_sub_smul_sub_smul_eq_of_hww (h : V →ₗ⋆[K] V →ₗ[K] K) (
   field_simp
   ring
 
-theorem exists_isom_move [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
-    (ha : ∀ x, h x x = 0 → x = 0) (x y : V) (hxy : h x x = h y y) :
-    ∃ g ∈ isom h, g x = y ∧ ∀ v, h (x - y) v = 0 → g v = v := by
-  have hsym : ∀ a b, star (h a b) = h b a := fun a b => by
-    rw [← starRingEnd_apply]; exact hs.eq a b
+theorem exists_isom_move
+    [FiniteDimensional K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (ha : ∀ x, h x x = 0 → x = 0)
+    (x y : V) (hxy : h x x = h y y)
+    : ∃ g ∈ isom h, g x = y ∧ ∀ v, h (x - y) v = 0 → g v = v := by
+  have hsym : ∀ a b, star (h a b) = h b a := fun a b => by rw [← starRingEnd_apply]; exact hs.eq a b
   have hww : h (x - y) (x - y) = h (x - y) x + star (h (x - y) x) := by
     rw [hsym]
     simp only [map_sub, LinearMap.sub_apply]
-    rw [hxy]; ring
+    rw [hxy]
+    ring
   by_cases hα : h (x - y) x = 0
   · have h0 : h (x - y) (x - y) = 0 := by rw [hww, hα, star_zero, add_zero]
     have hxy' : x = y := sub_eq_zero.mp (ha _ h0)
     exact ⟨1, (isom h).one_mem, by simp [hxy'], fun v _ => rfl⟩
-  · let f : V →ₗ[K] V :=
-      LinearMap.id - LinearMap.smulRight ((h (x - y) x)⁻¹ • h (x - y)) (x - y)
+  · let f : V →ₗ[K] V := LinearMap.id - LinearMap.smulRight ((h (x - y) x)⁻¹ • h (x - y)) (x - y)
     have hf : ∀ v, f v = v - ((h (x - y) x)⁻¹ * h (x - y) v) • (x - y) := fun v => rfl
     have key : ∀ a b, h (f a) (f b) = h a b := fun a b => by
       rw [hf, hf]; exact h_sub_smul_sub_smul_eq_of_hww h hsym (x - y) _ hα hww a b
     have hinj : Function.Injective f := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro a ha0
       apply ha a
       rw [← key a a, ha0, map_zero]
@@ -56,10 +58,11 @@ theorem exists_isom_move [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K]
     · rw [hg, hf, inv_mul_cancel₀ hα, one_smul, sub_sub_cancel]
     · rw [hg, hf, hv, mul_zero, zero_smul, sub_zero]
 
-theorem exists_isom_finset [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
-    (ha : ∀ x, h x x = 0 → x = 0) {ι : Type} (a b : ι → V)
-    (hab : ∀ i j, h (b i) (b j) = h (a i) (a j)) (t : Finset ι) :
-    ∃ g ∈ isom h, ∀ i ∈ t, g (a i) = b i := by
+theorem exists_isom_finset
+    [FiniteDimensional K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (ha : ∀ x, h x x = 0 → x = 0)
+    {ι : Type} (a b : ι → V) (hab : ∀ i j, h (b i) (b j) = h (a i) (a j)) (t : Finset ι)
+    : ∃ g ∈ isom h, ∀ i ∈ t, g (a i) = b i := by
   classical
   induction t using Finset.induction_on with
   | empty => exact ⟨1, (isom h).one_mem, by simp⟩
@@ -75,13 +78,18 @@ theorem exists_isom_finset [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[
     · rw [hgs i hi]
       apply hkfix
       have e1 : h (g (a j)) (b i) = h (b j) (b i) :=
-        calc h (g (a j)) (b i) = h (g (a j)) (g (a i)) := by rw [hgs i hi]
+        calc
+          h (g (a j)) (b i)
+            = h (g (a j)) (g (a i)) := by rw [hgs i hi]
           _ = h (a j) (a i) := hg' _ _
           _ = h (b j) (b i) := (hab j i).symm
       rw [map_sub, LinearMap.sub_apply, e1, sub_self]
 
-theorem isCompl_perp [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K)
-    (ha : ∀ x, h x x = 0 → x = 0) (U : Submodule K V) : IsCompl U (perp h U) := by
+theorem isCompl_perp
+    [FiniteDimensional K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (ha : ∀ x, h x x = 0 → x = 0)
+    (U : Submodule K V)
+    : IsCompl U (perp h U) := by
   have hdis : Disjoint U (perp h U) := by
     rw [Submodule.disjoint_def]
     intro x hxU hxP
@@ -114,8 +122,11 @@ theorem isCompl_perp [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K)
   have h5 := Submodule.finrank_le (U ⊔ perp h U)
   omega
 
-theorem perp_perp [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
-    (ha : ∀ x, h x x = 0 → x = 0) (U : Submodule K V) : perp h (perp h U) = U := by
+theorem perp_perp
+    [FiniteDimensional K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (ha : ∀ x, h x x = 0 → x = 0)
+    (U : Submodule K V)
+    : perp h (perp h U) = U := by
   have hle : U ≤ perp h (perp h U) := by
     intro u hu
     rw [mem_perp]
@@ -126,7 +137,15 @@ theorem perp_perp [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (hs
   have c2 := Submodule.finrank_add_eq_of_isCompl (isCompl_perp h ha (perp h U))
   exact (Submodule.eq_of_le_of_finrank_eq hle (by omega)).symm
 
-theorem witt_definite : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), IsCMUnram K → h.IsSymm → PD h → (∀ U U' : Submodule K V, ∀ e : U ≃ₗ[K] U', (∀ x y, h (e x : V) (e y : V) = h (x : V) (y : V)) → ∃ g ∈ isom h, ∀ x : U, g (x : V) = (e x : V)) ∧ ∀ U : Submodule K V, IsCompl U (perp h U) ∧ (hRes h U).IsSymm ∧ PD (hRes h U) ∧ perp h (perp h U) = U := by
+theorem witt_definite
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      IsCMUnram K → h.IsSymm → PD h
+        → (∀ U U' : Submodule K V, ∀ e : U ≃ₗ[K] U',
+            (∀ x y, h (e x : V) (e y : V) = h (x : V) (y : V))
+              → ∃ g ∈ isom h, ∀ x : U, g (x : V) = (e x : V))
+          ∧ ∀ U : Submodule K V,
+            IsCompl U (perp h U) ∧ (hRes h U).IsSymm ∧ PD (hRes h U) ∧ perp h (perp h U) = U := by
   intro K V _ _ _ _ _ _ _ _ h _ hs hpd
   have ha : ∀ x, h x x = 0 → x = 0 := by
     intro x hx
@@ -138,8 +157,12 @@ theorem witt_definite : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] 
   refine ⟨?_, fun U => ⟨isCompl_perp h ha U, ?_, ?_, perp_perp h hs ha U⟩⟩
   · intro U U' e he
     let bU := Module.finBasis K U
-    obtain ⟨g, hg, hgb⟩ := exists_isom_finset h hs ha (fun i => (bU i : V))
-      (fun i => (e (bU i) : V)) (fun i j => he _ _) Finset.univ
+    obtain ⟨g, hg, hgb⟩ :=
+      exists_isom_finset h hs ha
+        (fun i => (bU i : V))
+        (fun i => (e (bU i) : V))
+        (fun i j => he _ _)
+        Finset.univ
     refine ⟨g, hg, fun x => ?_⟩
     have hcomp : (g : V →ₗ[K] V).comp U.subtype = U'.subtype.comp (e : U →ₗ[K] U') := by
       apply bU.ext

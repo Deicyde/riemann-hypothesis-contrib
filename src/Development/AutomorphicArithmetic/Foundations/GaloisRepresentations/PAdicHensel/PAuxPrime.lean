@@ -5,17 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1 UpperTheory.Gal.Int.Geo GlobalTheory.CongL
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1 UpperTheory.Gal.Int.Geo GlobalTheory.CongL
 open scoped TensorProduct
 
-private theorem sq_of_dvd (p : ℕ) [Fact p.Prime] (d m : ℕ) (h1 : p ∣ m ^ 2 + d) (h2 : ¬ p ∣ 2 * m) :
-    IsSquare (-(d : ℚ_[p])) := by
+private theorem sq_of_dvd (p : ℕ) [Fact p.Prime] (d m : ℕ) (h1 : p ∣ m ^ 2 + d) (h2 : ¬ p ∣ 2 * m)
+    : IsSquare (-(d : ℚ_[p])) := by
   have hp : (p : ℤ) ∣ ((m ^ 2 + d : ℕ) : ℤ) := by exact_mod_cast h1
   have hq : ¬ (p : ℤ) ∣ ((2 * m : ℕ) : ℤ) := by exact_mod_cast h2
   set F : Polynomial ℤ_[p] := Polynomial.X ^ 2 + Polynomial.C (d : ℤ_[p]) with hF
   set a : ℤ_[p] := ((m : ℤ) : ℤ_[p]) with ha
-  have e1 : Polynomial.aeval a F = (((m ^ 2 + d : ℕ) : ℤ) : ℤ_[p]) := by
-    simp [hF, ha]
+  have e1 : Polynomial.aeval a F = (((m ^ 2 + d : ℕ) : ℤ) : ℤ_[p]) := by simp [hF, ha]
   have e2 : Polynomial.aeval a (Polynomial.derivative F) = (((2 * m : ℕ) : ℤ) : ℤ_[p]) := by
     simp [hF, ha]
     left
@@ -34,8 +35,7 @@ private theorem sq_of_dvd (p : ℕ) [Fact p.Prime] (d m : ℕ) (h1 : p ∣ m ^ 2
   refine ⟨(z : ℚ_[p]), ?_⟩
   linear_combination -hz''
 
-theorem UpperTheory.Gal.G1.exists_auxiliary_prime_cmDatum :
-    AuxiliaryInertOddPrime := by
+theorem UpperTheory.Gal.G1.exists_auxiliary_prime_cmDatum : AuxiliaryInertOddPrime := by
   intro d hd b
   set c := (max b (2 * d)).factorial with hc
   have hcpos : 0 < c := Nat.factorial_pos _

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.P22
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (ev frX frVec)
 open GlobalTheory.FlagTan (psiSet HIx VIx TIx IsDef IsVert KSIso)
@@ -22,21 +23,24 @@ noncomputable section
 
 namespace GlobalTheory.EtaleReducedEq
 
-theorem isRadical_map_of_etale {Q C : Type} [CommRing Q] [CommRing C] [Algebra Q C]
-    [Algebra.Etale Q C] (I : Ideal Q) (hI : I.IsRadical) :
-    (I.map (algebraMap Q C)).IsRadical := by
+theorem isRadical_map_of_etale
+    {Q C : Type} [CommRing Q] [CommRing C] [Algebra Q C] [Algebra.Etale Q C]
+    (I : Ideal Q) (hI : I.IsRadical)
+    : (I.map (algebraMap Q C)).IsRadical := by
   rw [Ideal.isRadical_iff_quotient_reduced] at hI ⊢
   have : _root_.IsReduced (TensorProduct Q (Q ⧸ I) C) :=
     GlobalTheory.isReduced_algebra_of_smooth_of_isReduced (Q ⧸ I) _
   have : _root_.IsReduced (TensorProduct Q C (Q ⧸ I)) :=
-    isReduced_of_injective (Algebra.TensorProduct.comm Q C (Q ⧸ I)).toRingEquiv (RingEquiv.injective _)
+    isReduced_of_injective (Algebra.TensorProduct.comm Q C (Q ⧸ I)).toRingEquiv
+      (RingEquiv.injective _)
   exact isReduced_of_injective (Algebra.TensorProduct.quotIdealMapEquivTensorQuot C I).toRingEquiv
     (RingEquiv.injective _)
 
-theorem etale_eval₂Hom_of_away {R A C ι : Type} [CommRing R] [CommRing A] [CommRing C]
-    [Algebra R A] (g : R) [IsLocalization.Away g A] (ψ : A →+* C) (N : ι → C)
-    (hE : (MvPolynomial.eval₂Hom (ψ.comp (algebraMap R A)) N).Etale) :
-    (MvPolynomial.eval₂Hom ψ N).Etale := by
+theorem etale_eval₂Hom_of_away
+    {R A C ι : Type} [CommRing R] [CommRing A] [CommRing C] [Algebra R A]
+    (g : R) [IsLocalization.Away g A]
+    (ψ : A →+* C) (N : ι → C) (hE : (MvPolynomial.eval₂Hom (ψ.comp (algebraMap R A)) N).Etale)
+    : (MvPolynomial.eval₂Hom ψ N).Etale := by
   have : Algebra.Etale R A := Algebra.Etale.of_isLocalizationAway g
   letI : Algebra (MvPolynomial ι R) (MvPolynomial ι A) := MvPolynomial.algebraMvPolynomial
   have : Algebra.Etale (MvPolynomial ι R) (MvPolynomial ι A) :=
@@ -51,33 +55,37 @@ theorem etale_eval₂Hom_of_away {R A C ι : Type} [CommRing R] [CommRing A] [Co
   have : Algebra.Etale (MvPolynomial ι R) C := hE
   exact Algebra.Etale.of_restrictScalars (MvPolynomial ι R) (MvPolynomial ι A) C
 
-theorem isRadical_span_of_away {R A C ι : Type} [CommRing R] [CommRing A] [CommRing C]
-    [Algebra R A] (g δ : R) [IsLocalization.Away g A] (ψ : A →+* C) (N : ι → C)
-    (hE : (MvPolynomial.eval₂Hom (ψ.comp (algebraMap R A)) N).Etale)
-    (hδ : (Ideal.span {algebraMap R A δ}).IsRadical) :
-    (Ideal.span {ψ (algebraMap R A δ)}).IsRadical := by
+theorem isRadical_span_of_away
+    {R A C ι : Type} [CommRing R] [CommRing A] [CommRing C] [Algebra R A]
+    (g δ : R) [IsLocalization.Away g A]
+    (ψ : A →+* C) (N : ι → C) (hE : (MvPolynomial.eval₂Hom (ψ.comp (algebraMap R A)) N).Etale)
+    (hδ : (Ideal.span {algebraMap R A δ}).IsRadical)
+    : (Ideal.span {ψ (algebraMap R A δ)}).IsRadical := by
   have he := etale_eval₂Hom_of_away g ψ N hE
   letI : Algebra (MvPolynomial ι A) C := (MvPolynomial.eval₂Hom ψ N).toAlgebra
   have : Algebra.Etale (MvPolynomial ι A) C := he
   have hI : (Ideal.map (MvPolynomial.C (σ := ι)) (Ideal.span {algebraMap R A δ})).IsRadical := by
     rw [Ideal.isRadical_iff_quotient_reduced] at hδ ⊢
     exact isReduced_of_injective
-      (MvPolynomial.quotientEquivQuotientMvPolynomial (σ := ι) (Ideal.span {algebraMap R A δ})).symm.toRingEquiv
+      (MvPolynomial.quotientEquivQuotientMvPolynomial (σ := ι)
+        (Ideal.span {algebraMap R A δ})).symm.toRingEquiv
       (RingEquiv.injective _)
   have h2 := isRadical_map_of_etale (C := C) _ hI
   rw [Ideal.map_map, Ideal.map_span, Set.image_singleton, RingHom.algebraMap_toAlgebra,
-    RingHom.comp_apply, MvPolynomial.eval₂Hom_C] at h2
+      RingHom.comp_apply, MvPolynomial.eval₂Hom_C]
+    at h2
   exact h2
 
-theorem resG_resG {X : Scheme.{0}} {U V W : X.Opens} (h : V ≤ U) (h' : W ≤ V) (a : Γ(X, U)) :
-    resG X h' (resG X h a) = resG X (h'.trans h) a := by
+theorem resG_resG {X : Scheme.{0}} {U V W : X.Opens} (h : V ≤ U) (h' : W ≤ V) (a : Γ(X, U))
+    : resG X h' (resG X h a) = resG X (h'.trans h) a := by
   change (X.presheaf.map _ ≫ X.presheaf.map _).hom a = _
   rw [← Functor.map_comp]
   rfl
 
-theorem isUnit_ger_iff_not_mem {X : Scheme.{0}} (Z : Closeds X) (U' : X.affineOpens)
-    (δ : Γ(X, U'.1)) (h : (Scheme.IdealSheafData.vanishingIdeal Z).ideal U' = Ideal.span {δ})
-    (x : X) (hx : x ∈ U'.1) : IsUnit (ger x hx δ) ↔ x ∉ Z := by
+theorem isUnit_ger_iff_not_mem
+    {X : Scheme.{0}} (Z : Closeds X) (U' : X.affineOpens) (δ : Γ(X, U'.1))
+    (h : (Scheme.IdealSheafData.vanishingIdeal Z).ideal U' = Ideal.span {δ}) (x : X) (hx : x ∈ U'.1)
+    : IsUnit (ger x hx δ) ↔ x ∉ Z := by
   obtain ⟨P, rfl⟩ : x ∈ Set.range U'.2.fromSpec := by rw [U'.2.range_fromSpec]; exact hx
   have hS : IsClosed (X := PrimeSpectrum Γ(X, U'.1)) (U'.2.fromSpec ⁻¹' (Z : Set X)) :=
     Z.isClosed.preimage U'.2.fromSpec.continuous
@@ -85,25 +93,44 @@ theorem isUnit_ger_iff_not_mem {X : Scheme.{0}} (Z : Closeds X) (U' : X.affineOp
   rw [← Scheme.mem_basicOpen, ← Scheme.Hom.mem_preimage, U'.2.fromSpec_preimage_basicOpen]
   change δ ∉ P.asIdeal ↔ _
   rw [not_iff_not]
-  have e := congrArg (P ∈ ·)
-    (PrimeSpectrum.zeroLocus_vanishingIdeal_eq_closure (U'.2.fromSpec ⁻¹' (Z : Set X)))
+  have e :=
+    congrArg (P ∈ ·)
+      (PrimeSpectrum.zeroLocus_vanishingIdeal_eq_closure (U'.2.fromSpec ⁻¹' (Z : Set X)))
   rw [hS.closure_eq, h, PrimeSpectrum.zeroLocus_span] at e
   have e3 : (δ ∈ P.asIdeal) = (P ∈ PrimeSpectrum.zeroLocus {δ}) :=
     propext ((PrimeSpectrum.mem_zeroLocus (P : PrimeSpectrum Γ(X, U'.1)) {δ}).trans
       Set.singleton_subset_iff).symm
   exact (e3.trans e).to_iff
 
-theorem mem_iff_not_isUnit_ger {Y : Scheme.{0}} {W : Y.Opens} (hW : IsAffineOpen W)
-    (P : Spec Γ(Y, W)) (hP : hW.fromSpec P ∈ W) (c : Γ(Y, W)) :
-    c ∈ P.asIdeal ↔ ¬ IsUnit (ger (hW.fromSpec P) hP c) := by
+theorem mem_iff_not_isUnit_ger
+    {Y : Scheme.{0}} {W : Y.Opens}
+    (hW : IsAffineOpen W) (P : Spec Γ(Y, W)) (hP : hW.fromSpec P ∈ W) (c : Γ(Y, W))
+    : c ∈ P.asIdeal ↔ ¬ IsUnit (ger (hW.fromSpec P) hP c) := by
   rw [← Scheme.mem_basicOpen, ← Scheme.Hom.mem_preimage, hW.fromSpec_preimage_basicOpen]
   change _ ↔ ¬ ¬ c ∈ P.asIdeal
   rw [not_not]
 
-theorem reducedEq_pullback_etale : ∀ (X Y : Scheme.{0}) [IsLocallyNoetherian X] (q : Y ⟶ X) (ι : Type) [Finite ι] (Vo : X.Opens) (U U' : X.affineOpens) (hU' : U'.1 ≤ U.1) (W : Y.Opens), IsAffineOpen W → ∀ (hWU : W ≤ q ⁻¹ᵁ U.1) (N : ι → Γ(Y, W)), (MvPolynomial.eval₂Hom (q.appLE U.1 W hWU).hom N).Etale → ∀ (δ : Γ(X, U.1)), (Scheme.IdealSheafData.vanishingIdeal Vo.compl).ideal U' = Ideal.span {resG X hU' δ} → (∀ (z : Y) (hz : z ∈ W), q z ∈ U'.1 → (IsUnit (ger z hz ((q.appLE U.1 W hWU).hom δ)) ↔ q z ∈ Vo)) ∧ ∀ (W' : Y.Opens) (hW' : W' ≤ W), W' ≤ q ⁻¹ᵁ U'.1 → ∀ f : Γ(Y, W'), (∀ (z : Y) (hz : z ∈ W'), q z ∉ Vo → ger z hz f ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk z)) → ∀ (z : Y) (hz : z ∈ W'), ger z (hW' hz) ((q.appLE U.1 W hWU).hom δ) ∣ ger z hz f := by
+theorem reducedEq_pullback_etale
+    : ∀ (X Y : Scheme.{0}) [IsLocallyNoetherian X] (q : Y ⟶ X) (ι : Type) [Finite ι] (Vo : X.Opens)
+        (U U' : X.affineOpens) (hU' : U'.1 ≤ U.1) (W : Y.Opens),
+      IsAffineOpen W
+        → ∀ (hWU : W ≤ q ⁻¹ᵁ U.1) (N : ι → Γ(Y, W)),
+          (MvPolynomial.eval₂Hom (q.appLE U.1 W hWU).hom N).Etale
+            → ∀ (δ : Γ(X, U.1)),
+              (Scheme.IdealSheafData.vanishingIdeal Vo.compl).ideal U' = Ideal.span {resG X hU' δ}
+                → (∀ (z : Y) (hz : z ∈ W),
+                    q z ∈ U'.1 → (IsUnit (ger z hz ((q.appLE U.1 W hWU).hom δ)) ↔ q z ∈ Vo))
+                  ∧ ∀ (W' : Y.Opens) (hW' : W' ≤ W),
+                    W' ≤ q ⁻¹ᵁ U'.1
+                      → ∀ f : Γ(Y, W'),
+                        (∀ (z : Y) (hz : z ∈ W'),
+                            q z ∉ Vo → ger z hz f ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk z))
+                          → ∀ (z : Y) (hz : z ∈ W'),
+                            ger z (hW' hz) ((q.appLE U.1 W hWU).hom δ) ∣ ger z hz f := by
   intro X Y _ q ι _ Vo U U' hU' W hW hWU N hEt δ hδ
-  have part1 : ∀ (z : Y) (hz : z ∈ W), q z ∈ U'.1 →
-      (IsUnit (ger z hz ((q.appLE U.1 W hWU).hom δ)) ↔ q z ∈ Vo) := by
+  have part1
+      : ∀ (z : Y) (hz : z ∈ W),
+        q z ∈ U'.1 → (IsUnit (ger z hz ((q.appLE U.1 W hWU).hom δ)) ↔ q z ∈ Vo) := by
     intro z hz hzU'
     rw [ger_appLE q hWU z hz δ, isUnit_map_iff, ← ger_resG hU' (q z) hzU' δ,
       isUnit_ger_iff_not_mem _ U' _ hδ]
@@ -128,8 +155,9 @@ theorem reducedEq_pullback_etale : ∀ (X Y : Scheme.{0}) [IsLocallyNoetherian X
       rw [Scheme.IdealSheafData.vanishingIdeal_ideal]
       exact PrimeSpectrum.isRadical_vanishingIdeal _
     rw [← e] at hrad
-    have e2 : algebraMap Γ(X, U.1) Γ(X, V) δ =
-        (X.presheaf.map (homOfLE (X.basicOpen_le g')).op).hom (resG X hU' δ) :=
+    have e2
+        : algebraMap Γ(X, U.1) Γ(X, V) δ
+          = (X.presheaf.map (homOfLE (X.basicOpen_le g')).op).hom (resG X hU' δ) :=
       (resG_resG hU' hVU' δ).symm
     rw [e2]
     exact hrad
@@ -141,9 +169,9 @@ theorem reducedEq_pullback_etale : ∀ (X Y : Scheme.{0}) [IsLocallyNoetherian X
   have hW1W' : W1 ≤ W' := hhle.trans inf_le_left
   have hW1 : IsAffineOpen W1 := hW.basicOpen h
   let ψ : Γ(X, V) →+* Γ(Y, W1) := (q.appLE V W1 hW1V).hom
-  have hcomp : MvPolynomial.eval₂Hom (ψ.comp (algebraMap Γ(X, U.1) Γ(X, V)))
-      (fun i => resG Y hW1W (N i)) =
-      (resG Y hW1W).comp (MvPolynomial.eval₂Hom (q.appLE U.1 W hWU).hom N) := by
+  have hcomp
+      : MvPolynomial.eval₂Hom (ψ.comp (algebraMap Γ(X, U.1) Γ(X, V))) (fun i => resG Y hW1W (N i))
+        = (resG Y hW1W).comp (MvPolynomial.eval₂Hom (q.appLE U.1 W hWU).hom N) := by
     apply MvPolynomial.ringHom_ext
     · intro r
       simp only [RingHom.comp_apply, MvPolynomial.eval₂Hom_C, RingHom.algebraMap_toAlgebra, ψ, resG]

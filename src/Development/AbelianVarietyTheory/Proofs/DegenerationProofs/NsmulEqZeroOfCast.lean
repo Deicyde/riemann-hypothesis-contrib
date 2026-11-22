@@ -9,29 +9,37 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.MemSpan
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH.WeightBundle
 
-theorem sum_pow_neg_val {o G : Type} [CommRing o] [IsDomain o] [AddCommGroup G] [Fintype G] {N : ℕ} [NeZero N]
-    {w : o} (hw : IsPrimitiveRoot w N) (f : G →+ ZMod N) :
-    ∑ a, w ^ (-(f a)).val = if f = 0 then (Fintype.card G : o) else 0 := by
+theorem sum_pow_neg_val
+    {o G : Type} [CommRing o] [IsDomain o] [AddCommGroup G] [Fintype G]
+    {N : ℕ} [NeZero N]
+    {w : o} (hw : IsPrimitiveRoot w N)
+    (f : G →+ ZMod N)
+    : ∑ a, w ^ (-(f a)).val = if f = 0 then (Fintype.card G : o) else 0 := by
   split_ifs with hf
   · simp [hf]
-  · have h := AddChar.sum_eq_zero_of_ne_one
-      (ψ := (AddChar.zmodChar N hw.pow_eq_one).compAddMonoidHom (-f)) (by
-        intro h
-        refine hf (AddMonoidHom.ext fun a => ?_)
-        have h1 := DFunLike.congr_fun h a
-        rw [AddChar.compAddMonoidHom_apply, AddChar.zmodChar_apply, AddChar.one_apply,
-          hw.pow_eq_one_iff_dvd] at h1
-        have h2 := Nat.eq_zero_of_dvd_of_lt h1 (ZMod.val_lt _)
-        simpa using h2)
+  · have h :=
+      AddChar.sum_eq_zero_of_ne_one (ψ := (AddChar.zmodChar N hw.pow_eq_one).compAddMonoidHom (-f))
+        (by
+          intro h
+          refine hf (AddMonoidHom.ext fun a => ?_)
+          have h1 := DFunLike.congr_fun h a
+          rw [AddChar.compAddMonoidHom_apply, AddChar.zmodChar_apply, AddChar.one_apply,
+              hw.pow_eq_one_iff_dvd]
+            at h1
+          have h2 := Nat.eq_zero_of_dvd_of_lt h1 (ZMod.val_lt _)
+          simpa using h2)
     simpa [AddChar.zmodChar_apply] using h
 
-theorem nsmul_eq_zero_of_cast {r N : ℕ} [NeZero (r * N)] (x : ZMod (r * N))
-    (h : ZMod.castHom (dvd_mul_left N r) (ZMod N) x = 0) : r • x = 0 := by
+theorem nsmul_eq_zero_of_cast
+    {r N : ℕ} [NeZero (r * N)]
+    (x : ZMod (r * N)) (h : ZMod.castHom (dvd_mul_left N r) (ZMod N) x = 0)
+    : r • x = 0 := by
   obtain ⟨n, rfl⟩ := ZMod.natCast_zmod_surjective x
   rw [map_natCast, ZMod.natCast_eq_zero_iff] at h
   rw [nsmul_eq_mul, ← Nat.cast_mul, ZMod.natCast_eq_zero_iff]
@@ -50,24 +58,29 @@ instance finite_hom (T : AddSubgroup S.Gam) : Finite (T →+ ZMod S.N) :=
 theorem isPrimitiveRoot_root : IsPrimitiveRoot S.ζN S.N :=
   S.prim.pow (Nat.pos_of_ne_zero (pow_ne_zero _ (NeZero.ne _))) (by ring)
 
-theorem sum_proj [IsDomain o] (T : AddSubgroup S.Gam) (hT : S.IsoFree T) [Fintype (T →+ ZMod S.N)] :
-    ∑ c, S.proj T c = 1 := by
+theorem sum_proj [IsDomain o] (T : AddSubgroup S.Gam) (hT : S.IsoFree T) [Fintype (T →+ ZMod S.N)]
+    : ∑ c, S.proj T c = 1 := by
   obtain ⟨d, ⟨e⟩⟩ := hT.2
   have hw := isPrimitiveRoot_root S
   have hu : IsUnit (Nat.card T : o) := by
     rw [Nat.card_congr e.toEquiv, Nat.card_fun, Nat.card_zmod, Nat.cast_pow]
     exact S.unit.pow _
-  have key : ∀ t : T, ∑ c : T →+ ZMod S.N, S.ζN ^ (-(c t)).val • S.ρ t =
-      (∑ c : T →+ ZMod S.N, S.ζN ^ (-(c t)).val) • (1 : Matrix S.J S.J o) := by
+  have key
+      : ∀ t : T,
+        ∑ c : T →+ ZMod S.N, S.ζN ^ (-(c t)).val • S.ρ t
+          = (∑ c : T →+ ZMod S.N, S.ζN ^ (-(c t)).val) • (1 : Matrix S.J S.J o) := by
     intro t
     rw [← Finset.sum_smul]
     have h := sum_pow_neg_val hw (AddMonoidHom.eval t : (T →+ ZMod S.N) →+ ZMod S.N)
     simp only [AddMonoidHom.eval_apply_apply] at h
     split_ifs at h with h0
     · rw [S.ρ_one]
-      have : S.r • e t = 0 := funext fun i => nsmul_eq_zero_of_cast _ (DFunLike.congr_fun h0
-        ((ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N)).toAddMonoidHom.comp
-          ((Pi.evalAddMonoidHom _ i).comp e.toAddMonoidHom)))
+      have : S.r • e t = 0 :=
+        funext fun i =>
+          nsmul_eq_zero_of_cast _
+            (DFunLike.congr_fun h0
+              ((ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N)).toAddMonoidHom.comp
+                ((Pi.evalAddMonoidHom _ i).comp e.toAddMonoidHom)))
       rw [← map_nsmul, map_eq_zero_iff e e.injective] at this
       exact congrArg Subtype.val this
     · rw [h, zero_smul, zero_smul]
@@ -85,25 +98,31 @@ abbrev gens (z : M.Z) : Set (S.J → Ω) :=
 
 theorem FF_mem (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N) (k) : S.FF T c k ∈ S.R := by
   rw [ThetaSys.FF, finsum_eq_sum_of_fintype]
-  exact sum_mem fun t _ => mul_mem (S.R.algebraMap_mem _)
-    (sum_mem fun j _ => mul_mem (S.R.algebraMap_mem _) (S.ev_mem _ _))
+  exact sum_mem fun t _ =>
+    mul_mem (S.R.algebraMap_mem _)
+      (sum_mem fun j _ => mul_mem (S.R.algebraMap_mem _) (S.ev_mem _ _))
 
-theorem span_gens_eq [IsDomain o] {U₀ : M.Z.Opens} (hA : S.admitted M U₀) (z : M.Z) (hT : S.IsoFree (S.TT M z))
-    (hF : ∀ c, S.FF (S.TT M z) c ≠ 0) {ξ : M.Z} (hξ : ξ ∈ U₀) :
-    Submodule.span (M.O ξ) (gens S M z) =
-      Submodule.span (M.O ξ) (Set.range fun i => Pi.single i (1 : Ω)) := by
+theorem span_gens_eq
+    [IsDomain o]
+    {U₀ : M.Z.Opens} (hA : S.admitted M U₀)
+    (z : M.Z) (hT : S.IsoFree (S.TT M z)) (hF : ∀ c, S.FF (S.TT M z) c ≠ 0)
+    {ξ : M.Z} (hξ : ξ ∈ U₀)
+    : Submodule.span (M.O ξ) (gens S M z)
+      = Submodule.span (M.O ξ) (Set.range fun i => Pi.single i (1 : Ω)) := by
   have hO : M.ringOn U₀ ≤ M.O ξ := RatModel.ringOn_le_O hξ
   have hR : S.R ≤ M.O ξ := hA.1.le.trans hO
   refine le_antisymm (Submodule.span_le.2 ?_) (Submodule.span_le.2 ?_)
   · rintro _ ⟨c, k, x₀, i, hk, -, rfl⟩
     refine (RatModel.Lat.mem_const_iff M).2 fun j => ?_
     rw [div_eq_mul_inv]
-    exact mul_mem (mul_mem (hR (S.th_mem _)) (hO (hA.1.FF_unit _ _ _ hT hk.1))) (Subalgebra.algebraMap_mem _ _)
+    exact mul_mem (mul_mem (hR (S.th_mem _)) (hO (hA.1.FF_unit _ _ _ hT hk.1)))
+      (Subalgebra.algebraMap_mem _ _)
   · rintro _ ⟨i, rfl⟩
     obtain ⟨x₀, hx⟩ := hA.1.div z
     have := Fintype.ofFinite (S.TT M z →+ ZMod S.N)
-    have e : (Pi.single i (1 : Ω) : S.J → Ω) =
-        ∑ c : S.TT M z →+ ZMod S.N, fun j => algebraMap o Ω (S.proj _ c j i) := by
+    have e
+        : (Pi.single i (1 : Ω) : S.J → Ω)
+          = ∑ c : S.TT M z →+ ZMod S.N, fun j => algebraMap o Ω (S.proj _ c j i) := by
       ext j
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Finset.sum_apply, ← map_sum, ← Matrix.sum_apply, sum_proj S _ hT]
@@ -112,9 +131,12 @@ theorem span_gens_eq [IsDomain o] {U₀ : M.Z.Opens} (hA : S.admitted M U₀) (z
     rw [e]
     refine sum_mem fun c _ => ?_
     obtain ⟨k, hk⟩ := hA.2 _ c hT (hF c) z
-    have hm : S.FF _ c k * (S.th x₀)⁻¹ ∈ M.O ξ := mul_mem (hR (FF_mem S _ _ _)) (hO (hA.1.th_unit _ hx.1))
-    have e2 : (fun j => algebraMap o Ω (S.proj _ c j i)) = (⟨_, hm⟩ : M.O ξ) •
-        fun j => S.th x₀ / S.FF _ c k * algebraMap o Ω (S.proj _ c j i) := by
+    have hm : S.FF _ c k * (S.th x₀)⁻¹ ∈ M.O ξ :=
+      mul_mem (hR (FF_mem S _ _ _)) (hO (hA.1.th_unit _ hx.1))
+    have e2
+        : (fun j => algebraMap o Ω (S.proj _ c j i))
+          = (⟨_, hm⟩ : M.O ξ)
+            • fun j => S.th x₀ / S.FF _ c k * algebraMap o Ω (S.proj _ c j i) := by
       ext j
       have h1 := hx.1
       have h2 := hk.1

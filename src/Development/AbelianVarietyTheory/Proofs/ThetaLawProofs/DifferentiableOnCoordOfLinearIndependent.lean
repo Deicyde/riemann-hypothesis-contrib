@@ -8,26 +8,35 @@ namespace GlobalTheory
 
 open Filter Topology
 
-theorem differentiableAt_det_of_entries {E I : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [Fintype I] [DecidableEq I] (A : E → Matrix I I ℂ) (x : E)
-    (h : ∀ i j, DifferentiableAt ℂ (fun e => A e i j) x) :
-    DifferentiableAt ℂ (fun e => (A e).det) x := by
+theorem differentiableAt_det_of_entries
+    {E I : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [Fintype I] [DecidableEq I]
+    (A : E → Matrix I I ℂ) (x : E) (h : ∀ i j, DifferentiableAt ℂ (fun e => A e i j) x)
+    : DifferentiableAt ℂ (fun e => (A e).det) x := by
   simp only [Matrix.det_apply']
   refine DifferentiableAt.fun_sum fun σ _ => DifferentiableAt.const_mul ?_ _
   exact (HasFDerivAt.finsetProd (fun i _ => (h (σ i) i).hasFDerivAt)).differentiableAt
 
-theorem differentiableOn_coord_of_linearIndependent :
-    ∀ (E Z I : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [Fintype I] (W : Set E) (Th : I → E → Z → ℂ) (F : E → Z → ℂ) (c : E → I → ℂ), IsOpen W → (∀ k z, DifferentiableOn ℂ (fun e => Th k e z) W) → (∀ z, DifferentiableOn ℂ (fun e => F e z) W) → (∀ e ∈ W, LinearIndependent ℂ (fun k => Th k e)) → (∀ e ∈ W, ∀ z, F e z = ∑ k, c e k * Th k e z) → ∀ k, DifferentiableOn ℂ (fun e => c e k) W := by
+theorem differentiableOn_coord_of_linearIndependent
+    : ∀ (E Z I : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [Fintype I] (W : Set E)
+        (Th : I → E → Z → ℂ) (F : E → Z → ℂ) (c : E → I → ℂ),
+      IsOpen W → (∀ k z, DifferentiableOn ℂ (fun e => Th k e z) W)
+        → (∀ z, DifferentiableOn ℂ (fun e => F e z) W)
+        → (∀ e ∈ W, LinearIndependent ℂ (fun k => Th k e))
+        → (∀ e ∈ W, ∀ z, F e z = ∑ k, c e k * Th k e z)
+        → ∀ k, DifferentiableOn ℂ (fun e => c e k) W := by
   intro E Z I _ _ _ W Th F c hW hTh hF hli hc k e₀ he₀
   classical
   apply DifferentiableAt.differentiableWithinAt
   have hnh : W ∈ 𝓝 e₀ := hW.mem_nhds he₀
   have hspan : Submodule.span ℂ (Set.range (flip (fun k => Th k e₀))) = ⊤ :=
     span_flip_eq_top_iff_linearIndependent.2 (hli e₀ he₀)
-  have hl : ∀ i : I, ∃ l : Z →₀ ℂ, ∀ j, (∑ z ∈ l.support, l z * Th j e₀ z) = (1 : Matrix I I ℂ) i j := by
+  have hl
+      : ∀ i : I, ∃ l : Z →₀ ℂ, ∀ j,
+        (∑ z ∈ l.support, l z * Th j e₀ z) = (1 : Matrix I I ℂ) i j := by
     intro i
-    have hm : (fun j => (1 : Matrix I I ℂ) i j) ∈
-        Submodule.span ℂ (Set.range (flip (fun k => Th k e₀))) := by
+    have hm
+        : (fun j => (1 : Matrix I I ℂ) i j)
+          ∈ Submodule.span ℂ (Set.range (flip (fun k => Th k e₀))) := by
       rw [hspan]; trivial
     obtain ⟨l, hl⟩ := Finsupp.mem_span_range_iff_exists_finsupp.1 hm
     refine ⟨l, fun j => ?_⟩
@@ -36,8 +45,7 @@ theorem differentiableOn_coord_of_linearIndependent :
   choose l hl using hl
   let A : E → Matrix I I ℂ := fun e => Matrix.of fun i j => ∑ z ∈ (l i).support, l i z * Th j e z
   let b : E → I → ℂ := fun e i => ∑ z ∈ (l i).support, l i z * F e z
-  have hA0 : A e₀ = 1 := by
-    ext i j; exact hl i j
+  have hA0 : A e₀ = 1 := by ext i j; exact hl i j
   have hAd : ∀ i j, DifferentiableAt ℂ (fun e => A e i j) e₀ := by
     intro i j
     simp only [A, Matrix.of_apply]

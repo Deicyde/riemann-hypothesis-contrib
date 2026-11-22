@@ -25,9 +25,10 @@ theorem stepWtSpan : PositivityTheory.RgDs.Hilb.StepWtSpan := by
   have hS'k : IsKStableSub ε (smE ε (rreg ε)) (S.comap (smD ε (rreg ε)).subtype) :=
     isKStableSub_of_kStable hσ hD _ hS'f fun k hk v hv =>
       ⟨⟨rreg ε k v, hD.kStable k hk _ v.2⟩, hSK' k hk _ hv, rfl⟩
-  let T : Fin n → Module.End ℂ (S.comap (smD ε (rreg ε)).subtype) :=
-    fun c => (smE ε (rreg ε) c c).restrict (hS'k c c rfl)
-  have hTs : ∀ c, (T c).IsSymmetric := fun c x z => hKU c c rfl (x : smD ε (rreg ε)) (z : smD ε (rreg ε))
+  let T : Fin n → Module.End ℂ (S.comap (smD ε (rreg ε)).subtype) := fun c =>
+    (smE ε (rreg ε) c c).restrict (hS'k c c rfl)
+  have hTs : ∀ c, (T c).IsSymmetric := fun c x z =>
+    hKU c c rfl (x : smD ε (rreg ε)) (z : smD ε (rreg ε))
   have hcomm : Pairwise (Function.onFun Commute T) := fun a c _ =>
     LinearMap.ext fun x => Subtype.ext (kUnit_diag_comm hE a c (x : smD ε (rreg ε)))
   have htop := LinearMap.IsSymmetric.iSup_iInf_eq_top_of_commute hTs hcomm
@@ -43,17 +44,22 @@ theorem stepWtSpan : PositivityTheory.RgDs.Hilb.StepWtSpan := by
     have hxc : ∀ c, smE ε (rreg ε) c c (x : smD ε (rreg ε)) = χ c • (x : smD ε (rreg ε)) := fun c =>
       congrArg Subtype.val (Module.End.mem_eigenspace_iff.mp ((Submodule.mem_iInf _).mp hx c))
     have hx0' : (x : smD ε (rreg ε)) ≠ 0 := fun h => hx0 (Subtype.ext h)
-    have hxν : ∀ c, smE ε (rreg ε) c c (x : smD ε (rreg ε)) =
-        (((χ c).re : ℝ) : ℂ) • (x : smD ε (rreg ε)) := fun c =>
-      (hxc c).trans (congrArg (· • (x : smD ε (rreg ε))) (kUnit_eig_real hKU hx0' (hxc c)))
-    exact hno (fun c => (χ c).re) (Submodule.comapSubtypeEquivOfLe hSD x)
-      ((isWtOn_iff hσ hD (x : smD ε (rreg ε)) _).2 hxν)
+    have hxν
+        : ∀ c,
+          smE ε (rreg ε) c c (x : smD ε (rreg ε)) = (((χ c).re : ℝ) : ℂ) • (x : smD ε (rreg ε)) :=
+      fun c => (hxc c).trans (congrArg (· • (x : smD ε (rreg ε))) (kUnit_eig_real hKU hx0' (hxc c)))
+    exact hno
+      (fun c => (χ c).re)
+      (Submodule.comapSubtypeEquivOfLe hSD x) ((isWtOn_iff hσ hD (x : smD ε (rreg ε)) _).2 hxν)
   have hker : LinearMap.ker e' = ⊤ := top_le_iff.mp (htop ▸ iSup_le hle)
   refine he (LinearMap.ext fun y => ?_)
-  have hy : (Submodule.comapSubtypeEquivOfLe hSD).symm y ∈ LinearMap.ker e' := hker ▸ Submodule.mem_top
+  have hy : (Submodule.comapSubtypeEquivOfLe hSD).symm y ∈ LinearMap.ker e' :=
+    hker ▸ Submodule.mem_top
   have h2 : e' ((Submodule.comapSubtypeEquivOfLe hSD).symm y) = 0 := hy
-  calc e y = e (Submodule.comapSubtypeEquivOfLe hSD ((Submodule.comapSubtypeEquivOfLe hSD).symm y)) := by
-        rw [LinearEquiv.apply_symm_apply]
+  calc
+    e y = e (Submodule.comapSubtypeEquivOfLe hSD
+        ((Submodule.comapSubtypeEquivOfLe hSD).symm y)) := by
+      rw [LinearEquiv.apply_symm_apply]
     _ = 0 := h2
 
 end GlobalTheory.CompanionTheory.RgDsHilb

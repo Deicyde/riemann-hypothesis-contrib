@@ -11,14 +11,15 @@ namespace Formalism.MainNotions.N.Ln03.Pf
 
 open Formalism.MainNotions.N.Ln03 Polynomial
 
-theorem teichOnto_toZMod_eq_zero_iff {p : ℕ} [Fact p.Prime] (x : ℤ_[p]) :
-    PadicInt.toZMod x = 0 ↔ ‖x‖ < 1 := by
+theorem teichOnto_toZMod_eq_zero_iff {p : ℕ} [Fact p.Prime] (x : ℤ_[p])
+    : PadicInt.toZMod x = 0 ↔ ‖x‖ < 1 := by
   rw [← RingHom.mem_ker, PadicInt.ker_toZMod, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
     ← PadicInt.mem_nonunits, mem_nonunits_iff]
 
-theorem teichOnto_norm_eq_one {p : ℕ} [Fact p.Prime] (x : ℤ_[p]) (h : PadicInt.toZMod x ≠ 0) :
-    ‖x‖ = 1 :=
-  le_antisymm (PadicInt.norm_le_one x) (not_lt.mp fun h' => h ((teichOnto_toZMod_eq_zero_iff x).mpr h'))
+theorem teichOnto_norm_eq_one {p : ℕ} [Fact p.Prime] (x : ℤ_[p]) (h : PadicInt.toZMod x ≠ 0)
+    : ‖x‖ = 1 :=
+  le_antisymm (PadicInt.norm_le_one x)
+    (not_lt.mp fun h' => h ((teichOnto_toZMod_eq_zero_iff x).mpr h'))
 
 theorem teichOnto_holds (p : ℕ) [Fact p.Prime] : TeichOnto p := by
   intro a ha

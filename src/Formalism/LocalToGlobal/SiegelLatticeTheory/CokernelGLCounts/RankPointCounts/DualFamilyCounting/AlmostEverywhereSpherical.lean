@@ -13,14 +13,15 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G1
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
 section VF
 
 variable {F : Type} [Field F] [NumberField F] {𝔭 : Ideal (𝓞 F)}
 
-theorem setOf_mem_pow_eq (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) :
-    {e : ℕ | n ∈ 𝔭 ^ e} = Set.Iic (multiplicity 𝔭 (Ideal.span {n})) := by
+theorem setOf_mem_pow_eq (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0)
+    : {e : ℕ | n ∈ 𝔭 ^ e} = Set.Iic (multiplicity 𝔭 (Ideal.span {n})) := by
   have hfin : FiniteMultiplicity 𝔭 (Ideal.span {n}) :=
     FiniteMultiplicity.of_not_isUnit (by rw [Ideal.isUnit_iff]; exact h𝔭.ne_top)
       (by rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hn)
@@ -28,17 +29,16 @@ theorem setOf_mem_pow_eq (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) :
   simp only [Set.mem_ofPred_eq, Set.mem_Iic]
   rw [← hfin.pow_dvd_iff_le_multiplicity, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
 
-theorem vF_eq_multiplicity (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) :
-    vF 𝔭 n = multiplicity 𝔭 (Ideal.span {n}) := by
+theorem vF_eq_multiplicity (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0)
+    : vF 𝔭 n = multiplicity 𝔭 (Ideal.span {n}) := by
   show sSup {e : ℕ | n ∈ 𝔭 ^ e} = _
   rw [setOf_mem_pow_eq h𝔭 hn, csSup_Iic]
 
-theorem mem_pow_iff (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) (e : ℕ) :
-    n ∈ 𝔭 ^ e ↔ e ≤ vF 𝔭 n := by
+theorem mem_pow_iff (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) (e : ℕ) : n ∈ 𝔭 ^ e ↔ e ≤ vF 𝔭 n := by
   rw [vF_eq_multiplicity h𝔭 hn, ← Set.mem_Iic, ← setOf_mem_pow_eq h𝔭 hn, Set.mem_ofPred_eq]
 
-theorem vF_mul (h𝔭 : 𝔭.IsMaximal) {a b : 𝓞 F} (ha : a ≠ 0) (hb : b ≠ 0) :
-    vF 𝔭 (a * b) = vF 𝔭 a + vF 𝔭 b := by
+theorem vF_mul (h𝔭 : 𝔭.IsMaximal) {a b : 𝓞 F} (ha : a ≠ 0) (hb : b ≠ 0)
+    : vF 𝔭 (a * b) = vF 𝔭 a + vF 𝔭 b := by
   have hz : ∀ {t : 𝓞 F}, t ≠ 0 → Ideal.span {t} ≠ 0 := fun ht => by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact ht
   have hne : 𝔭 ≠ ⊥ := fun h =>
@@ -55,8 +55,8 @@ theorem vF_of_notMem (h𝔭 : 𝔭.IsMaximal) {t : 𝓞 F} (ht : t ∉ 𝔭) : v
   have h1 := (mem_pow_iff h𝔭 ht0 1).not.mp (by rwa [pow_one])
   omega
 
-theorem vF_prod (h𝔭 : 𝔭.IsMaximal) {ι : Type*} (s : Finset ι) (f : ι → 𝓞 F) (hf : ∀ i, f i ≠ 0) :
-    vF 𝔭 (∏ i ∈ s, f i) = ∑ i ∈ s, vF 𝔭 (f i) := by
+theorem vF_prod (h𝔭 : 𝔭.IsMaximal) {ι : Type*} (s : Finset ι) (f : ι → 𝓞 F) (hf : ∀ i, f i ≠ 0)
+    : vF 𝔭 (∏ i ∈ s, f i) = ∑ i ∈ s, vF 𝔭 (f i) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · rw [Finset.prod_empty, Finset.sum_empty]
@@ -67,20 +67,25 @@ theorem vF_prod (h𝔭 : 𝔭.IsMaximal) {ι : Type*} (s : Finset ι) (f : ι �
 
 end VF
 
-theorem mem_pow_of_coprime {R : Type*} [CommRing R] {J : Ideal R} {u z : R}
-    (hc : Ideal.span {u} ⊔ J = ⊤) (m : ℕ) (h : u * z ∈ J ^ m) : z ∈ J ^ m := by
+theorem mem_pow_of_coprime
+    {R : Type*} [CommRing R]
+    {J : Ideal R} {u z : R} (hc : Ideal.span {u} ⊔ J = ⊤)
+    (m : ℕ) (h : u * z ∈ J ^ m)
+    : z ∈ J ^ m := by
   have h1 : Ideal.span {u} ⊔ J ^ m = ⊤ := Ideal.sup_pow_eq_top hc
   have h2 : (1 : R) ∈ Ideal.span {u} ⊔ J ^ m := by rw [h1]; exact Submodule.mem_top
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp h2
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp ha
   have e : z = c * (u * z) + z * b := by
-    calc z = z * (c * u + b) := by rw [hab, mul_one]
+    calc
+      z = z * (c * u + b) := by rw [hab, mul_one]
       _ = c * (u * z) + z * b := by ring
   rw [e]
   exact (J ^ m).add_mem ((J ^ m).mul_mem_left c h) ((J ^ m).mul_mem_left z hb)
 
-theorem sup_top_of_notMem {R : Type*} [CommRing R] {P : Ideal R} (hP : P.IsMaximal) {u : R}
-    (hu : u ∉ P) : Ideal.span {u} ⊔ P = ⊤ := by
+theorem sup_top_of_notMem
+    {R : Type*} [CommRing R] {P : Ideal R} (hP : P.IsMaximal) {u : R} (hu : u ∉ P)
+    : Ideal.span {u} ⊔ P = ⊤ := by
   by_contra hne
   apply hu
   rw [hP.eq_of_le hne le_sup_right]
@@ -88,16 +93,17 @@ theorem sup_top_of_notMem {R : Type*} [CommRing R] {P : Ideal R} (hP : P.IsMaxim
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem exists_unif_fin (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsMaximal) :
-    ∃ π : K, IsUnif (locRing P) π ∧ ∀ a : K, a ≠ 0 → ∃ N : ℕ, a * π⁻¹ ^ N ∉ locRing P := by
+theorem exists_unif_fin (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    : ∃ π : K, IsUnif (locRing P) π ∧ ∀ a : K, a ≠ 0 → ∃ N : ℕ, a * π⁻¹ ^ N ∉ locRing P := by
   obtain ⟨π, hπ, -, -⟩ := exists_isUnif hF hP
   refine ⟨π, hπ, fun a ha => ?_⟩
   have inj := IsFractionRing.injective (𝓞 K) K
   have hπ0 : π ≠ 0 := hπ.ne
   have hP1 : (1 : 𝓞 K) ∉ P := fun h => hP.ne_top ((Ideal.eq_top_iff_one _).mpr h)
 
-  have hc : ∀ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, s ∉ P ∧
-      ∀ s' : 𝓞 K, algebraMap (𝓞 K) K s' = star (algebraMap (𝓞 K) K s) → s' ∉ P := by
+  have hc
+      : ∀ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P,
+        s ∉ P ∧ ∀ s' : 𝓞 K, algebraMap (𝓞 K) K s' = star (algebraMap (𝓞 K) K s) → s' ∉ P := by
     intro s hs
     induction hs using Submonoid.closure_induction with
     | mem s hs => exact hs
@@ -140,9 +146,13 @@ theorem exists_unif_fin (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsMaximal
     exact nonZeroDivisors.ne_zero hY (inj (by rw [h, map_zero]))
   by_contra hall
   push Not at hall
-  have key : ∀ N, ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, ∃ r : 𝓞 K, s * X * s0 ^ N = r * Y * u ^ N := by
+  have key
+      : ∀ N, ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, ∃ r : 𝓞 K,
+        s * X * s0 ^ N = r * Y * u ^ N := by
     intro N
-    have hm : algebraMap (𝓞 K) K X / algebraMap (𝓞 K) K Y * π⁻¹ ^ N ∈ Formalism.HermitianLatticesTheory.locR (K := K) P :=
+    have hm
+        : algebraMap (𝓞 K) K X / algebraMap (𝓞 K) K Y * π⁻¹ ^ N
+          ∈ Formalism.HermitianLatticesTheory.locR (K := K) P :=
       hall N
     obtain ⟨s, hs, hr⟩ := (Formalism.HermitianLatticesTheory.locDual_mem_locR (K := K) P _).mp hm
     obtain ⟨r, hr⟩ := Submodule.mem_one.mp hr
@@ -180,7 +190,8 @@ theorem exists_unif_fin (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsMaximal
         have e := congrArg (fun w => star (algebraMap (𝓞 K) K w)) hsr
         simp only [map_mul, map_pow, star_mul', star_pow] at e
         rw [← hs', ← hX', ← hs0', ← hr', ← hY', ← ht] at e
-        have e' : s' * X' * s0' ^ N = r' * Y' * t ^ N := inj (by simpa only [map_mul, map_pow] using e)
+        have e' : s' * X' * s0' ^ N = r' * Y' * t ^ N :=
+          inj (by simpa only [map_mul, map_pow] using e)
         have hmem : s' * s0' ^ N * X' ∈ P ^ N := by
           rw [show s' * s0' ^ N * X' = r' * Y' * t ^ N by rw [← e']; ring]
           exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_pow htP N)
@@ -192,18 +203,24 @@ theorem exists_unif_fin (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsMaximal
   have h1 := (mem_pow_iff hP hZ0 (vF P Z + 1)).mp (hZ _)
   omega
 
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem mem_locF_span_iff (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) {n : ℕ} (x : Fin n → V) (v : V) :
-    v ∈ locF (P.comap (algebraMap (𝓞 F) (𝓞 K))) (Submodule.span (𝓞 K) (Set.range x)) ↔
-      v ∈ spanS (locRing P) x := by
+theorem mem_locF_span_iff
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    {n : ℕ} (x : Fin n → V)
+    (v : V)
+    : v ∈ locF (P.comap (algebraMap (𝓞 F) (𝓞 K))) (Submodule.span (𝓞 K) (Set.range x))
+      ↔ v ∈ spanS (locRing P) x := by
   rw [locF_eq_loc hK hF hP]
   have hPp := hP.isPrime
   constructor
   · intro hv
-    change ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, s • v ∈ Submodule.span (𝓞 K) (Set.range x) at hv
+    change ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P,
+        s • v ∈ Submodule.span (𝓞 K) (Set.range x)
+      at hv
     obtain ⟨s, hs, hsv⟩ := hv
     have h1 : s • v ∈ spanS (locRing P) x := by
       refine Submodule.span_induction (p := fun w _ => w ∈ spanS (locRing P) x) ?_ ?_ ?_ ?_ hsv
@@ -223,7 +240,9 @@ theorem mem_locF_span_iff (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
     exact smul_mem_spanS (div_mem_locRing hPp 1 hs) h1
   · intro hv
     refine spanS_induction
-      (p := fun w => ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, s • w ∈ Submodule.span (𝓞 K) (Set.range x))
+      (p := fun w =>
+        ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P,
+          s • w ∈ Submodule.span (𝓞 K) (Set.range x))
       ⟨1, Submonoid.one_mem _, by rw [smul_zero]; exact Submodule.zero_mem _⟩ ?_ ?_ ?_ v hv
     · rintro a b ⟨s, hs, hsa⟩ ⟨t, ht, htb⟩
       refine ⟨s * t, Submonoid.mul_mem _ hs ht, ?_⟩

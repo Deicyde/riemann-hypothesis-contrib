@@ -16,9 +16,10 @@ noncomputable section
 
 def NormalCurvePointDVR.Statement : Prop :=
   ∀ (σ : Type) [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ),
-    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) →
-    ringKrullDim (MvPolynomial σ ℂ ⧸ I) = (1 : ℕ) → w ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn I →
-      ∃ _ : IsDomain (pointLocalRing I w), IsDiscreteValuationRing (pointLocalRing I w)
+    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I)
+      → ringKrullDim (MvPolynomial σ ℂ ⧸ I) = (1 : ℕ)
+      → w ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn I
+      → ∃ _ : IsDomain (pointLocalRing I w), IsDiscreteValuationRing (pointLocalRing I w)
 
 end
 

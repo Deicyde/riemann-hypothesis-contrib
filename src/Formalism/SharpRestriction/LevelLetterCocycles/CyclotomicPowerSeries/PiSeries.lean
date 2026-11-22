@@ -29,8 +29,8 @@ theorem piSeries : PiSeriesStatement := by
       exact h i d hd
   · rw [isUnit_iff_constantCoeff, Pi.isUnit_iff]
     refine forall_congr' fun i => ?_
-    rw [isUnit_iff_constantCoeff, ← coeff_zero_eq_constantCoeff_apply, ← coeff_zero_eq_constantCoeff_apply,
-      coeff_map]
+    rw [isUnit_iff_constantCoeff, ← coeff_zero_eq_constantCoeff_apply,
+      ← coeff_zero_eq_constantCoeff_apply, coeff_map]
     rfl
 
 end LevelStatements.Lv

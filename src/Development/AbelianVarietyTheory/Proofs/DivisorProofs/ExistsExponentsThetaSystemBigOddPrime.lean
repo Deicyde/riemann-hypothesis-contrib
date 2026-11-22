@@ -8,20 +8,24 @@ public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.Imme
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem bigSizes_of (g N r : ℕ) (hN : 1 + 2 * g * 2 ^ g < N)
-    (hr : 6 * (N ^ g * g.factorial) + 2 * (N ^ g * g.factorial) * (g * 4 ^ g) < r) :
-    1 + 2 * (g : ℝ) * (2 : ℝ) ^ ((g : ℝ) / 2) < N ∧
-    2 * ((N ^ g * g.factorial : ℕ) : ℝ) * ((g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1)) * N
-      < (r * N : ℕ) ∧
-    6 * (N ^ g * g.factorial) < r * N := by
+theorem bigSizes_of
+    (g N r : ℕ) (hN : 1 + 2 * g * 2 ^ g < N)
+    (hr : 6 * (N ^ g * g.factorial) + 2 * (N ^ g * g.factorial) * (g * 4 ^ g) < r)
+    : 1 + 2 * (g : ℝ) * (2 : ℝ) ^ ((g : ℝ) / 2) < N
+      ∧ 2 * ((N ^ g * g.factorial : ℕ) : ℝ)
+          * ((g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1)) * N
+        < (r * N : ℕ)
+      ∧ 6 * (N ^ g * g.factorial) < r * N := by
   have hg0 : (0 : ℝ) ≤ g := Nat.cast_nonneg g
   have e1 : (2 : ℝ) ^ ((g : ℝ) / 2) ≤ 2 ^ g := by
     rw [← Real.rpow_natCast]
@@ -48,17 +52,27 @@ theorem bigSizes_of (g N r : ℕ) (hN : 1 + 2 * g * 2 ^ g < N)
       gcongr
     have h1 : 2 * (X : ℝ) * ((g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1)) < r := by
       have : 2 * (X : ℝ) * ((g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1))
-          ≤ 2 * X * (g * 4 ^ g) := by gcongr
+          ≤ 2 * X * (g * 4 ^ g) := by
+        gcongr
       have h6 : (0 : ℝ) ≤ 6 * X := by positivity
       linarith
     have hNr : (0 : ℝ) < N := by exact_mod_cast hNpos
     push_cast
     exact mul_lt_mul_of_pos_right h1 hNr
   · have h1 : 6 * (N ^ g * g.factorial) < r := by omega
-    calc 6 * (N ^ g * g.factorial) < r := h1
+    calc
+      6 * (N ^ g * g.factorial)
+        < r := h1
       _ ≤ r * N := Nat.le_mul_of_pos_right r hNpos
 
-theorem bigSizes : ∀ (g n : ℕ), n.Prime → Odd n → ∃ k j : ℕ, 2 ≤ k ∧ 1 ≤ j ∧ ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (S : GlobalTheory.ZH.ThetaSys o Ω), S.g = g → S.N = (n ^ k) ^ 2 → S.r = n ^ j → S.Big := by
+theorem bigSizes
+    : ∀ (g n : ℕ),
+      n.Prime → Odd n
+        → ∃ k j : ℕ,
+          2 ≤ k ∧ 1 ≤ j
+            ∧ ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω]
+                (S : GlobalTheory.ZH.ThetaSys o Ω),
+              S.g = g → S.N = (n ^ k) ^ 2 → S.r = n ^ j → S.Big := by
   intro g n hp _
   have hn : 1 < n := hp.one_lt
   set k := (1 + 2 * g * 2 ^ g) + 2 with hk

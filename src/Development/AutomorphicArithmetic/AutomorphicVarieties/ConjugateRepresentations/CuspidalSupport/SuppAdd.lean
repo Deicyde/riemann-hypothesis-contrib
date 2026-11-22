@@ -10,8 +10,19 @@ theorem suppAdd : SuppAdd := by
   intro E _ _ _ r s k l m₁ m₂ B₁ B₂ h₁ h₂
   obtain ⟨ι, _, n, π, μ, hk, hn, hs, hi, hm, hB⟩ := h₁
   obtain ⟨κ, _, n', π', μ', hk', hn', hs', hi', hm', hB'⟩ := h₂
-  refine ⟨ι ⊕ κ, inferInstance, Sum.elim n n', fun i => Sum.rec (fun i => π i) (fun i => π' i) i, Sum.elim μ μ',
-    ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    ι ⊕ κ,
+    inferInstance,
+    Sum.elim n n',
+    fun i => Sum.rec (fun i => π i) (fun i => π' i) i,
+    Sum.elim μ μ',
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Fintype.card_sum]
     exact Nat.add_le_add hk hk'
   · rintro (i | i)

@@ -68,9 +68,11 @@ lemma half_ite (P : Prop) [Decidable P] (u v : ℂ) :
 theorem bigCx_holds : BigCx := by
   intro E _ _ _ a Q _ _ lab s
   refine ⟨fun τ i j f => ?_, fun y p p' hp f => ?_⟩
-  · have hD : ∀ (z : ℂ) (I J : Q → Fin a), bigD lab s (toL (Matrix.single i j (atEmb τ z))) I J =
-        (∑ p, if (∀ r, r ≠ p → I r = J r) ∧ I p = i ∧ J p = j then coord (lab p) (atEmb τ z) else 0) -
-          if I = J ∧ i = j then (s : ℂ) * ∑ τ' : E →+* ℂ, coord τ' (atEmb τ z) else 0 := by
+  · have hD
+        : ∀ (z : ℂ) (I J : Q → Fin a),
+          bigD lab s (toL (Matrix.single i j (atEmb τ z))) I J
+            = (∑ p, if (∀ r, r ≠ p → I r = J r) ∧ I p = i ∧ J p = j then coord (lab p) (atEmb τ z) else 0)
+              - if I = J ∧ i = j then (s : ℂ) * ∑ τ' : E →+* ℂ, coord τ' (atEmb τ z) else 0 := by
       intro z I J
       simp only [bigD, Matrix.of_apply, toL, Matrix.of_symm_apply, Matrix.single_apply]
       congr 1
@@ -88,40 +90,53 @@ theorem bigCx_holds : BigCx := by
             rw [if_pos h1, if_pos ⟨h1, rfl⟩]
             congr 1
             refine Finset.sum_congr rfl fun τ' _ => ?_
-            simp only [and_self, apply_ite (coord τ'), map_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+            simp only [and_self, apply_ite (coord τ'), map_zero, Finset.sum_ite_eq, Finset.mem_univ,
+              if_true]
           · rw [if_pos h1, if_neg (fun h => h2 h.2)]
-            rw [Finset.sum_eq_zero fun τ' _ => Finset.sum_eq_zero fun k _ => by
-              rw [if_neg (fun h => h2 (h.1.trans h.2.symm)), map_zero]]
+            rw [Finset.sum_eq_zero fun τ' _ =>
+              Finset.sum_eq_zero fun k _ => by
+                rw [if_neg (fun h => h2 (h.1.trans h.2.symm)), map_zero]]
             simp
         · rw [if_neg h1, if_neg (fun h => h1 h.1)]
-    have hS : (1 / 2 : ℂ) * (∑ τ' : E →+* ℂ, coord τ' (atEmb τ 1) -
-        Complex.I * ∑ τ' : E →+* ℂ, coord τ' (atEmb τ Complex.I)) = 1 := by
+    have hS
+        : (1 / 2 : ℂ)
+            * (∑ τ' : E →+* ℂ, coord τ' (atEmb τ 1)
+              - Complex.I * ∑ τ' : E →+* ℂ, coord τ' (atEmb τ Complex.I))
+          = 1 := by
       simp only [Finset.mul_sum, ← Finset.sum_sub_distrib]
       simp only [cxkey, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-    have hE : ∀ I J : Q → Fin a, cx τ (bigD lab s) i j I J =
-        (∑ p, if (∀ r, r ≠ p → I r = J r) ∧ I p = i ∧ J p = j then (if lab p = τ then (1 : ℂ) else 0) else 0) -
-          if I = J ∧ i = j then (s : ℂ) else 0 := by
+    have hE
+        : ∀ I J : Q → Fin a,
+          cx τ (bigD lab s) i j I J
+            = (∑ p, if (∀ r, r ≠ p → I r = J r) ∧ I p = i ∧ J p = j then (if lab p = τ then (1 : ℂ) else 0) else 0)
+              - if I = J ∧ i = j then (s : ℂ) else 0 := by
       intro I J
-      simp only [cx, Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul, hD, half_comb, half_ite, cxkey]
+      simp only [cx, Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul, hD, half_comb, half_ite,
+        cxkey]
       congr 1
       split_ifs
       · linear_combination (s : ℂ) * hS
       · rfl
-    have hT : ∀ I : Q → Fin a, tE (fib lab τ) (0 : Fin a → Fin a → Module.End ℂ ℂ) i j f I =
-        ∑ p, if lab p = τ then (if I p = i then f (Function.update I p j) else 0) else 0 := by
+    have hT
+        : ∀ I : Q → Fin a,
+          tE (fib lab τ) (0 : Fin a → Fin a → Module.End ℂ ℂ) i j f I
+            = ∑ p, if lab p = τ then (if I p = i then f (Function.update I p j) else 0) else 0 := by
       intro I
       simp [tE, lift, eAt, fib, Finset.sum_filter]
       refine Finset.sum_congr rfl fun p _ => ?_
       by_cases hl : lab p = τ <;> by_cases hi : I p = i <;> simp [hl, hi]
     funext I
-    simp only [mulVec, dotProduct, hE, sub_mul, Finset.sum_sub_distrib, Finset.sum_mul, Pi.sub_apply, hT]
+    simp only [mulVec, dotProduct, hE, sub_mul, Finset.sum_sub_distrib, Finset.sum_mul,
+      Pi.sub_apply, hT]
     congr 1
     · rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun p _ => ?_
       by_cases hl : lab p = τ
       · by_cases hi : I p = i
         · rw [Finset.sum_eq_single (Function.update I p j)]
-          · have hc : (∀ r, r ≠ p → I r = Function.update I p j r) ∧ I p = i ∧ Function.update I p j p = j :=
+          · have hc
+                : (∀ r, r ≠ p → I r = Function.update I p j r) ∧ I p = i
+                  ∧ Function.update I p j p = j :=
               ⟨fun r hr => by rw [Function.update_of_ne hr], hi, by simp⟩
             rw [if_pos hc, if_pos hl, if_pos hl, if_pos hi, one_mul]
           · intro J _ hJ
@@ -145,15 +160,19 @@ theorem bigCx_holds : BigCx := by
       · rw [h1, hp]
       · rw [h2, hp]
       · rfl
-    have hM : ∀ I J : Q → Fin a,
-        bigM lab s y (I ∘ Equiv.swap p p') (J ∘ Equiv.swap p p') = bigM lab s y I J := by
+    have hM
+        : ∀ I J : Q → Fin a,
+          bigM lab s y (I ∘ Equiv.swap p p') (J ∘ Equiv.swap p p') = bigM lab s y I J := by
       intro I J
       simp only [bigM, Matrix.of_apply, Function.comp_apply]
       congr 1
       exact Fintype.prod_equiv (Equiv.swap p p') _ _ (fun r => by rw [hlab])
-    let e : (Q → Fin a) ≃ (Q → Fin a) :=
-      ⟨fun J => J ∘ Equiv.swap p p', fun J => J ∘ Equiv.swap p p',
-        fun J => by funext r; simp, fun J => by funext r; simp⟩
+    let e : (Q → Fin a) ≃ (Q → Fin a) := ⟨
+      fun J => J ∘ Equiv.swap p p',
+      fun J => J ∘ Equiv.swap p p',
+      fun J => by funext r; simp,
+      fun J => by funext r; simp
+    ⟩
     funext I
     simp only [mulVec, dotProduct, pm, LinearMap.pi_apply, LinearMap.proj_apply]
     exact Fintype.sum_equiv e _ _ (fun J => by simp only [e, Equiv.coe_fn_mk, hM])

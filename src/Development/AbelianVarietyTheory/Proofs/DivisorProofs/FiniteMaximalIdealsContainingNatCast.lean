@@ -7,13 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmHostUnitAd
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LowDat GlobalTheory.LowFilt
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LowDat
+  GlobalTheory.LowFilt
 
 namespace GlobalTheory.LowDat
 
-theorem finite_maximal_ideals_containing_natCast :
-    ∀ {E : Type} [Field E] [NumberField E] (n : ℕ) (hn : 0 < n),
-    {𝔮 : Ideal (𝓞 E) | 𝔮.IsMaximal ∧ (n : 𝓞 E) ∈ 𝔮}.Finite := by
+theorem finite_maximal_ideals_containing_natCast
+    : ∀ {E : Type} [Field E] [NumberField E] (n : ℕ) (hn : 0 < n),
+      {𝔮 : Ideal (𝓞 E) | 𝔮.IsMaximal ∧ (n : 𝓞 E) ∈ 𝔮}.Finite := by
   intro E _ _ n hn
   have hn0 : (n : 𝓞 E) ≠ 0 := by exact_mod_cast hn.ne'
   have hI : Ideal.span {(n : 𝓞 E)} ≠ 0 := by

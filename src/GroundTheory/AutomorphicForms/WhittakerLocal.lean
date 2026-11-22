@@ -13,22 +13,30 @@ namespace Whittaker
 
 open MeasureTheory Measure ValuativeRel
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-theorem biEquivariantSigmaInvariant_GL (ψ₀ : AddChar F ℂ) (hψ : Continuous ψ₀) (hψ₁ : ψ₀ ≠ 1) :
-    BiEquivariantSigmaInvariant (Iwasawa.unipotent F n)
-      (fun u => psiN ψ₀ (u : GL (Fin n) F)) sigmaHomeo := by
+theorem biEquivariantSigmaInvariant_GL (ψ₀ : AddChar F ℂ) (hψ : Continuous ψ₀) (hψ₁ : ψ₀ ≠ 1)
+    : BiEquivariantSigmaInvariant (Iwasawa.unipotent F n)
+      (fun u => psiN ψ₀ (u : GL (Fin n) F))
+      sigmaHomeo := by
   intro D hD f
-  have key := distribution_sigma_invariant ψ₀ hψ hψ₁ D (fun f u₁ u₂ hu₁ hu₂ => by
-    have e : (⟨fun x => (f : GL (Fin n) F → ℂ) (u₁⁻¹ * x * u₂), twoSided_mem f.2 u₁ u₂⟩ :
-        locallyConstantCompactSupport (GL (Fin n) F) ℂ ℂ) = biTranslL u₁ u₂ f :=
-      Subtype.ext (coe_biTranslL u₁ u₂ f).symm
-    rw [e]
-    exact hD f ⟨u₁, hu₁⟩ ⟨u₂, hu₂⟩) f
-  have e : compHomeoL sigmaHomeo f =
-      (⟨fun x => (f : GL (Fin n) F → ℂ) (sigma x), comp_sigma_mem f.2⟩ :
-        locallyConstantCompactSupport (GL (Fin n) F) ℂ ℂ) := Subtype.ext rfl
+  have key :=
+    distribution_sigma_invariant ψ₀ hψ hψ₁ D
+      (fun f u₁ u₂ hu₁ hu₂ => by
+        have e
+            : (⟨fun x => (f : GL (Fin n) F → ℂ) (u₁⁻¹ * x * u₂), twoSided_mem f.2 u₁ u₂⟩
+                : locallyConstantCompactSupport (GL (Fin n) F) ℂ ℂ)
+              = biTranslL u₁ u₂ f :=
+          Subtype.ext (coe_biTranslL u₁ u₂ f).symm
+        rw [e]
+        exact hD f ⟨u₁, hu₁⟩ ⟨u₂, hu₂⟩)
+      f
+  have e
+      : compHomeoL sigmaHomeo f
+        = (⟨fun x => (f : GL (Fin n) F → ℂ) (sigma x), comp_sigma_mem f.2⟩
+          : locallyConstantCompactSupport (GL (Fin n) F) ℂ ℂ) :=
+    Subtype.ext rfl
   rw [e]
   exact key
 
@@ -80,18 +88,22 @@ theorem map_sigma_eq (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] : μ.map s
 
 end Measure
 
-theorem rank_whittaker_le_one_of_contragredient (ψ₀ : AddChar F ℂ) (hψ : Continuous ψ₀)
-    (hψ₁ : ψ₀ ≠ 1) {V : Type*} [AddCommGroup V] [Module ℂ V]
+theorem rank_whittaker_le_one_of_contragredient
+    (ψ₀ : AddChar F ℂ) (hψ : Continuous ψ₀) (hψ₁ : ψ₀ ≠ 1)
+    {V : Type*} [AddCommGroup V] [Module ℂ V]
     (π : Representation ℂ (GL (Fin n) F) V) (hπ : IsAdmissible π) [π.IsIrreducible]
     (hne : equivariantFunctionals (contragredient π)
-      (fun u : Iwasawa.unipotent F n => (psiN ψ₀ (u : GL (Fin n) F))⁻¹) ≠ ⊥) :
-    Module.rank ℂ (equivariantFunctionals π
-      (fun u : Iwasawa.unipotent F n => psiN ψ₀ (u : GL (Fin n) F))) ≤ 1 := by
+        (fun u : Iwasawa.unipotent F n => (psiN ψ₀ (u : GL (Fin n) F))⁻¹)
+      ≠ ⊥)
+    : Module.rank ℂ
+        (equivariantFunctionals π (fun u : Iwasawa.unipotent F n => psiN ψ₀ (u : GL (Fin n) F)))
+      ≤ 1 := by
   let _ : MeasurableSpace (GL (Fin n) F) := _root_.borel _
   have : BorelSpace (GL (Fin n) F) := ⟨rfl⟩
   have : (haar : Measure (GL (Fin n) F)).IsInvInvariant := ⟨Measures.inv_eq_self_GL F n _⟩
   exact rank_le_one_of_ne_bot (haar : Measure (GL (Fin n) F)) (σ := sigmaHomeo)
-    (fun x y => sigma_mul x y) (map_sigma_eq _) (biEquivariantSigmaInvariant_GL ψ₀ hψ hψ₁) hπ hne
+    (fun x y => sigma_mul x y)
+    (map_sigma_eq _) (biEquivariantSigmaInvariant_GL ψ₀ hψ hψ₁) hπ hne
 
 end Whittaker
 

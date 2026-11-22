@@ -7,15 +7,17 @@ public import ReciprocityTheory.SemistableReduction.ComapInclusionIsLocalHom
 
 namespace ReciprocityTheory.MultiplicativeHeights
 
-theorem integralClosureRank (O F L : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Field F] [Algebra O F] [IsFractionRing O F] [Field L] [Algebra F L] [FiniteDimensional F L]
-    [Algebra.IsSeparable F L] [Algebra O L] [IsScalarTower O F L] :
-    IsDedekindDomain (integralClosure O L) ∧ Module.Finite O (integralClosure O L) ∧
-      Module.Free O (integralClosure O L) ∧
-      Module.finrank O (integralClosure O L) = Module.finrank F L ∧
-      {Q : Ideal (integralClosure O L) | Q.IsMaximal}.Finite ∧
-      ∑ᶠ Q : {Q : Ideal (integralClosure O L) // Q.IsMaximal},
-          Q.1.ramificationIdx O * Q.1.inertiaDeg O = Module.finrank F L := by
+theorem integralClosureRank
+    (O F L : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F] [Algebra O F]
+    [IsFractionRing O F] [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L]
+    [Algebra O L] [IsScalarTower O F L]
+    : IsDedekindDomain (integralClosure O L) ∧ Module.Finite O (integralClosure O L)
+      ∧ Module.Free O (integralClosure O L)
+      ∧ Module.finrank O (integralClosure O L) = Module.finrank F L
+      ∧ {Q : Ideal (integralClosure O L) | Q.IsMaximal}.Finite
+      ∧ ∑ᶠ Q : {Q : Ideal (integralClosure O L) // Q.IsMaximal},
+            Q.1.ramificationIdx O * Q.1.inertiaDeg O
+        = Module.finrank F L := by
   set C := integralClosure O L
   haveI hD : IsDedekindDomain C := integralClosure.isDedekindDomain O F L
   haveI hFin : Module.Finite O C := IsIntegralClosure.finite O F L C
@@ -57,12 +59,15 @@ theorem integralClosureRank (O F L : Type) [CommRing O] [IsDomain O] [IsDiscrete
 
 open MvPolynomial
 
-theorem algebraicIndependent_of_residue_lift {F₁ F₂ : Type} [Field F₁] [Field F₂] [Algebra F₁ F₂]
-    (V : ValuationSubring F₂) {ι : Type*} (y : ι → V)
-    (hx : letI := residueAlgebra V (algebraMap F₁ F₂)
-      AlgebraicIndependent (IsLocalRing.ResidueField (V.comap (algebraMap F₁ F₂)))
-        (fun i => IsLocalRing.residue V (y i))) :
-    AlgebraicIndependent F₁ (fun i => ((y i : V) : F₂)) := by
+theorem algebraicIndependent_of_residue_lift
+    {F₁ F₂ : Type} [Field F₁] [Field F₂] [Algebra F₁ F₂]
+    (V : ValuationSubring F₂)
+    {ι : Type*} (y : ι → V)
+    (hx
+      : letI := residueAlgebra V (algebraMap F₁ F₂)
+        AlgebraicIndependent (IsLocalRing.ResidueField (V.comap (algebraMap F₁ F₂)))
+          (fun i => IsLocalRing.residue V (y i)))
+    : AlgebraicIndependent F₁ (fun i => ((y i : V) : F₂)) := by
   classical
   letI := residueAlgebra V (algebraMap F₁ F₂)
   rw [algebraicIndependent_iff] at hx ⊢
@@ -70,8 +75,8 @@ theorem algebraicIndependent_of_residue_lift {F₁ F₂ : Type} [Field F₁] [Fi
   by_contra hne
   have hS : p.support.Nonempty := by
     rwa [Finset.nonempty_iff_ne_empty, Ne, MvPolynomial.support_eq_empty]
-  obtain ⟨m₀, hm₀, hmax⟩ := p.support.exists_max_image
-    (fun m => (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m)) hS
+  obtain ⟨m₀, hm₀, hmax⟩ :=
+    p.support.exists_max_image (fun m => (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m)) hS
   have hc : p.coeff m₀ ≠ 0 := MvPolynomial.mem_support_iff.1 hm₀
   have hvc : (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀) ≠ 0 :=
     (Valuation.ne_zero_iff _).2 hc
@@ -80,17 +85,19 @@ theorem algebraicIndependent_of_residue_lift {F₁ F₂ : Type} [Field F₁] [Fi
     intro m
     rw [← ValuationSubring.valuation_le_one_iff, map_mul, map_inv₀]
     by_cases hm : m ∈ p.support
-    · calc ((V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀))⁻¹ *
-            (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m)
-          ≤ ((V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀))⁻¹ *
-            (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀) := by
-            gcongr
-            exact hmax m hm
+    · calc
+        ((V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀))⁻¹
+              * (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m)
+            ≤ ((V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀))⁻¹
+              * (V.comap (algebraMap F₁ F₂)).valuation (p.coeff m₀) := by
+          gcongr
+          exact hmax m hm
         _ = 1 := inv_mul_cancel₀ hvc
     · rw [MvPolynomial.notMem_support_iff.1 hm]
       simp
-  have hpp : MvPolynomial.C (p.coeff m₀)⁻¹ * p ∈
-      Set.range (MvPolynomial.map (V.comap (algebraMap F₁ F₂)).subtype) := by
+  have hpp
+      : MvPolynomial.C (p.coeff m₀)⁻¹ * p
+        ∈ Set.range (MvPolynomial.map (V.comap (algebraMap F₁ F₂)).subtype) := by
     rw [MvPolynomial.mem_range_map_iff_coeffs_subset]
     intro a ha
     obtain ⟨m, -, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 ha
@@ -102,25 +109,33 @@ theorem algebraicIndependent_of_residue_lift {F₁ F₂ : Type} [Field F₁] [Fi
     exact Subtype.ext e
   have h0 : MvPolynomial.eval₂ (comapInclusion V (algebraMap F₁ F₂)) y qV = 0 := by
     apply Subtype.ext
-    have e1 : MvPolynomial.aeval (fun i => ((y i : V) : F₂))
-        (MvPolynomial.C (p.coeff m₀)⁻¹ * p) = 0 := by
+    have e1
+        : MvPolynomial.aeval (fun i => ((y i : V) : F₂)) (MvPolynomial.C (p.coeff m₀)⁻¹ * p)
+          = 0 := by
       rw [map_mul, hp, mul_zero]
     rw [MvPolynomial.aeval_def, ← hqV, MvPolynomial.eval₂_map] at e1
     have e2 := MvPolynomial.eval₂_comp_left V.subtype (comapInclusion V (algebraMap F₁ F₂)) y qV
-    have e3 : V.subtype.comp (comapInclusion V (algebraMap F₁ F₂)) =
-        (algebraMap F₁ F₂).comp (V.comap (algebraMap F₁ F₂)).subtype := RingHom.ext fun _ => rfl
+    have e3
+        : V.subtype.comp (comapInclusion V (algebraMap F₁ F₂))
+          = (algebraMap F₁ F₂).comp (V.comap (algebraMap F₁ F₂)).subtype :=
+      RingHom.ext fun _ => rfl
     rw [e3] at e2
     exact e2.trans e1
 
-  have h1 : MvPolynomial.aeval (fun i => IsLocalRing.residue V (y i))
-      (MvPolynomial.map (IsLocalRing.residue (V.comap (algebraMap F₁ F₂))) qV) = 0 := by
+  have h1
+      : MvPolynomial.aeval
+          (fun i => IsLocalRing.residue V (y i))
+          (MvPolynomial.map (IsLocalRing.residue (V.comap (algebraMap F₁ F₂))) qV)
+        = 0 := by
     rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_map]
-    have e4 := MvPolynomial.eval₂_comp_left (IsLocalRing.residue V)
-      (comapInclusion V (algebraMap F₁ F₂)) y qV
+    have e4 :=
+      MvPolynomial.eval₂_comp_left (IsLocalRing.residue V) (comapInclusion V (algebraMap F₁ F₂)) y
+        qV
     rw [h0, map_zero] at e4
-    have e5 : (algebraMap (IsLocalRing.ResidueField (V.comap (algebraMap F₁ F₂)))
-        (IsLocalRing.ResidueField V)).comp (IsLocalRing.residue (V.comap (algebraMap F₁ F₂))) =
-        (IsLocalRing.residue V).comp (comapInclusion V (algebraMap F₁ F₂)) :=
+    have e5
+        : (algebraMap (IsLocalRing.ResidueField (V.comap (algebraMap F₁ F₂)))
+            (IsLocalRing.ResidueField V)).comp (IsLocalRing.residue (V.comap (algebraMap F₁ F₂)))
+          = (IsLocalRing.residue V).comp (comapInclusion V (algebraMap F₁ F₂)) :=
       RingHom.ext fun r => IsLocalRing.ResidueField.map_residue _ r
     rw [e5]
     exact e4.symm
@@ -133,8 +148,8 @@ theorem residueTrdegLe : TRStatement := by
   letI := residueAlgebra V (algebraMap F₁ F₂)
   unfold Algebra.trdeg
   refine ciSup_le' fun s => ?_
-  have hy : ∀ a : s.1, ∃ v : V, IsLocalRing.residue V v = a :=
-    fun a => IsLocalRing.residue_surjective (a : IsLocalRing.ResidueField V)
+  have hy : ∀ a : s.1, ∃ v : V, IsLocalRing.residue V v = a := fun a =>
+    IsLocalRing.residue_surjective (a : IsLocalRing.ResidueField V)
   choose y hy using hy
   have hs : AlgebraicIndependent (IsLocalRing.ResidueField (V.comap (algebraMap F₁ F₂)))
       (fun a => IsLocalRing.residue V (y a)) := by

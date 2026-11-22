@@ -24,10 +24,11 @@ def χQ : GQ l →* ℚ_[l]ˣ := (Units.map (PadicInt.Coe.ringHom (p := l)).toMo
 
 variable {l}
 
-theorem χQ_coe (g : GQ l) : ((χQ l g : ℚ_[l]ˣ) : ℚ_[l]) = (((χZ l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := rfl
+theorem χQ_coe (g : GQ l) : ((χQ l g : ℚ_[l]ˣ) : ℚ_[l]) = (((χZ l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) :=
+  rfl
 
-theorem χZ_spec (g : GQ l) (m : ℕ) (ζ : Om l) (h : ζ ^ (l ^ m) = 1) :
-    g ζ = ζ ^ (((χZ l g : ℤ_[l]ˣ) : ℤ_[l]).toZModPow m).val :=
+theorem χZ_spec (g : GQ l) (m : ℕ) (ζ : Om l) (h : ζ ^ (l ^ m) = 1)
+    : g ζ = ζ ^ (((χZ l g : ℤ_[l]ˣ) : ℤ_[l]).toZModPow m).val :=
   cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (GQ l) (Om l) g) ζ h
 
 variable (l)
@@ -57,8 +58,7 @@ theorem ζQ_succ (m : ℕ) : ζQ l (m + 1) ^ l = ζQ l m := by
 theorem ζQ_pow (m k : ℕ) : ζQ l (m + k) ^ (l ^ k) = ζQ l m := by
   induction k with
   | zero => simp
-  | succ k ih =>
-    rw [← add_assoc, pow_succ, pow_mul', ζQ_succ, ih]
+  | succ k ih => rw [← add_assoc, pow_succ, pow_mul', ζQ_succ, ih]
 
 theorem ζQ_pow_eq_one (m : ℕ) : ζQ l m ^ (l ^ m) = 1 := by
   have h := ζQ_pow l 0 m

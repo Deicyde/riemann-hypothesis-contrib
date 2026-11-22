@@ -24,10 +24,9 @@ theorem SchAevalSignedRename.proof : SchAevalSignedRename.Statement := by
   have hd : (∑ i ∈ e.support, e i) = d := by
     have h := hP (mem_support_iff.mp he)
     simpa [Finsupp.weight_apply, Finsupp.sum] using h
-  rw [rename_monomial, aeval_monomial, monomial_eq, Finsupp.prod_mapDomain_index
-    (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _)]
-  simp only [algebraMap_eq, Finsupp.prod, mul_pow, Finset.prod_mul_distrib,
-    ← C_pow]
+  rw [rename_monomial, aeval_monomial, monomial_eq,
+    Finsupp.prod_mapDomain_index (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _)]
+  simp only [algebraMap_eq, Finsupp.prod, mul_pow, Finset.prod_mul_distrib, ← C_pow]
   rw [← map_prod, Finset.prod_pow_eq_pow_sum, hd]
   ring
 

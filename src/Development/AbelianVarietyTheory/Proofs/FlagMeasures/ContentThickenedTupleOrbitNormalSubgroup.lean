@@ -16,12 +16,16 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.ThickSplit
 
-theorem cont_iUnion_cosets {W : Type} [AddCommGroup W] (W0 : AddSubgroup W) {Γ : Type} [Group Γ]
-    (N H : Subgroup Γ) [N.Normal] (hN : N.index ≠ 0) (S : Γ → Set W) (c : ℝ)
-    (hco : ∀ a, IsCO W0 (S a)) (hc : ∀ a, cont W0 (S a) = c)
+theorem cont_iUnion_cosets
+    {W : Type} [AddCommGroup W]
+    (W0 : AddSubgroup W)
+    {Γ : Type} [Group Γ]
+    (N H : Subgroup Γ) [N.Normal]
+    (hN : N.index ≠ 0)
+    (S : Γ → Set W) (c : ℝ) (hco : ∀ a, IsCO W0 (S a)) (hc : ∀ a, cont W0 (S a) = c)
     (heq : ∀ a b, a⁻¹ * b ∈ N ⊔ H → S a = S b)
-    (hdis : ∀ a b, ¬ Disjoint (S a) (S b) → a⁻¹ * b ∈ N ⊔ H) :
-    cont W0 (⋃ a, S a) * (N.relIndex H : ℝ) = (N.index : ℝ) * c := by
+    (hdis : ∀ a b, ¬ Disjoint (S a) (S b) → a⁻¹ * b ∈ N ⊔ H)
+    : cont W0 (⋃ a, S a) * (N.relIndex H : ℝ) = (N.index : ℝ) * c := by
   have hidx : N.relIndex H * (N ⊔ H).index = N.index := by
     rw [← Subgroup.relIndex_sup_left H N]
     exact Subgroup.relIndex_mul_index le_sup_left
@@ -41,7 +45,10 @@ theorem cont_iUnion_cosets {W : Type} [AddCommGroup W] (W0 : AddSubgroup W) {Γ 
       exact ha
     · rintro ⟨q, hq⟩
       exact ⟨_, hq⟩
-  rw [hU, (GlobalTheory.T.commensurableCosetUnionContent_biUnion W0 Finset.univ (fun q : Γ ⧸ (N ⊔ H) => S q.out) (fun q _ => hco _)).2]
+  rw [hU,
+    (GlobalTheory.T.commensurableCosetUnionContent_biUnion W0 Finset.univ
+      (fun q : Γ ⧸ (N ⊔ H) => S q.out)
+      (fun q _ => hco _)).2]
   · simp only [hc, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
     rw [← hidx, Subgroup.index, Nat.card_eq_fintype_card]
     push_cast
@@ -56,8 +63,8 @@ section
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem rmul_rmul {n m : ℕ} (x : Fin m → Fin n → E) (A B : Matrix (Fin m) (Fin m) E) :
-    rmul (rmul x A) B = rmul x (A * B) := by
+theorem rmul_rmul {n m : ℕ} (x : Fin m → Fin n → E) (A B : Matrix (Fin m) (Fin m) E)
+    : rmul (rmul x A) B = rmul x (A * B) := by
   funext j
   simp only [rmul, Matrix.mul_apply, Finset.smul_sum, Finset.sum_smul, smul_smul]
   rw [Finset.sum_comm]
@@ -68,40 +75,48 @@ theorem rmul_one {n m : ℕ} (x : Fin m → Fin n → E) : rmul x 1 = x := by
   funext j
   simp [rmul, Matrix.one_apply]
 
-theorem map_rmul {n m : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x : Fin m → Fin n → E)
-    (A : Matrix (Fin m) (Fin m) E) : (fun a => g (rmul x A a)) = rmul (fun a => g (x a)) A := by
+theorem map_rmul
+    {n m : ℕ}
+    (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x : Fin m → Fin n → E) (A : Matrix (Fin m) (Fin m) E)
+    : (fun a => g (rmul x A a)) = rmul (fun a => g (x a)) A := by
   funext j
   simp [rmul]
 
-theorem hf_sum_sum (L : LocE F E) {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
-    (x : Fin m → Fin n → E) (u v : Fin m → E) :
-    hf L Hm (∑ i, u i • x i) (∑ j, v j • x j) = ∑ i, ∑ j, u i * L.cj (v j) * hf L Hm (x i) (x j) := by
+theorem hf_sum_sum
+    (L : LocE F E)
+    {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (u v : Fin m → E)
+    : hf L Hm (∑ i, u i • x i) (∑ j, v j • x j)
+      = ∑ i, ∑ j, u i * L.cj (v j) * hf L Hm (x i) (x j) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.sum_mul,
-    Finset.mul_sum]
-  calc _ = ∑ p : Fin n × Fin n, ∑ q : Fin m × Fin m,
+      Finset.mul_sum]
+  calc
+    _ = ∑ p : Fin n × Fin n, ∑ q : Fin m × Fin m,
         u q.1 * L.cj (v q.2) * (x q.1 p.1 * Hm p.1 p.2 * L.cj (x q.2 p.2)) := by
-        rw [Fintype.sum_prod_type]
-        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
-        rw [Fintype.sum_prod_type_right]
-        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
-        ring
+      rw [Fintype.sum_prod_type]
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
+      rw [Fintype.sum_prod_type_right]
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
+      ring
     _ = _ := by
-        rw [Finset.sum_comm, Fintype.sum_prod_type]
-        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
-        rw [Fintype.sum_prod_type]
+      rw [Finset.sum_comm, Fintype.sum_prod_type]
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
+      rw [Fintype.sum_prod_type]
 
-theorem gramT_rmul (L : LocE F E) {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
-    (x : Fin m → Fin n → E) (A : Matrix (Fin m) (Fin m) E) :
-    gramT L Hm (rmul x A) = cT L A * gramT L Hm x * A := by
+theorem gramT_rmul
+    (L : LocE F E)
+    {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (A : Matrix (Fin m) (Fin m) E)
+    : gramT L Hm (rmul x A) = cT L A * gramT L Hm x * A := by
   ext a b
   simp only [gramT, rmul, Matrix.of_apply, hf_sum_sum, Matrix.mul_apply, cT, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
   ring
 
-theorem mem_fixG (L : LocE F E) {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
-    (x : Fin m → Fin n → E) (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) :
-    g ∈ fixG L Hm (Submodule.span E (Set.range x)) ↔ g ∈ isomG L Hm ∧ ∀ a, g (x a) = x a := by
+theorem mem_fixG
+    (L : LocE F E)
+    {n m : ℕ}
+    (Hm : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (g : (Fin n → E) ≃ₗ[E] (Fin n → E))
+    : g ∈ fixG L Hm (Submodule.span E (Set.range x)) ↔ g ∈ isomG L Hm ∧ ∀ a, g (x a) = x a := by
   constructor
   · rintro ⟨h1, _, h3⟩
     refine ⟨h1, fun a => ?_⟩
@@ -124,11 +139,35 @@ end
 
 end GlobalTheory.HL.ThickSplit
 
-
 open GlobalTheory.HL.ThickSplit in
-theorem GlobalTheory.HL.cont_thick_torb_normal : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E), IsHermND L Hm → ∀ Λs, IsSD L Hm Λs → ∀ (m : ℕ) (x : Fin m → Fin n → E), IsUnit (gramT L Hm x).det → ∀ K K' : Subgroup ((Fin n → E) ≃ₗ[E] (Fin n → E)), K ≤ isomG L Hm → K' ≤ K → (∀ a ∈ K, MulAut.conj a • K' = K') → K'.relIndex K ≠ 0 → ∀ i : ℕ, 1 ≤ i → (∀ y ∈ torb K' x, ∀ A ∈ congK L ϖ m i, cT L A * gramT L Hm x * A = gramT L Hm x → rmul y A ∈ torb K' x) → IsCO (tupLat L Λs m) (thick L ϖ (torb K' x) i) → cont (tupLat L Λs m) (thick L ϖ (torb K x) i) * ((fixG L Hm (Submodule.span E (Set.range x)) ⊓ K').relIndex (fixG L Hm (Submodule.span E (Set.range x)) ⊓ K) : ℝ) = (K'.relIndex K : ℝ) * cont (tupLat L Λs m) (thick L ϖ (torb K' x) i) := by
+theorem GlobalTheory.HL.cont_thick_torb_normal
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E),
+            IsHermND L Hm
+              → ∀ Λs,
+                IsSD L Hm Λs
+                  → ∀ (m : ℕ) (x : Fin m → Fin n → E),
+                    IsUnit (gramT L Hm x).det
+                      → ∀ K K' : Subgroup ((Fin n → E) ≃ₗ[E] (Fin n → E)),
+                        K ≤ isomG L Hm → K' ≤ K → (∀ a ∈ K, MulAut.conj a • K' = K')
+                          → K'.relIndex K ≠ 0
+                          → ∀ i : ℕ,
+                            1 ≤ i
+                              → (∀ y ∈ torb K' x, ∀ A ∈ congK L ϖ m i,
+                                cT L A * gramT L Hm x * A = gramT L Hm x → rmul y A ∈ torb K' x)
+                              → IsCO (tupLat L Λs m) (thick L ϖ (torb K' x) i)
+                              → cont (tupLat L Λs m) (thick L ϖ (torb K x) i)
+                                  * ((fixG L Hm (Submodule.span E (Set.range x)) ⊓ K').relIndex
+                                      (fixG L Hm (Submodule.span E (Set.range x)) ⊓ K)
+                                    : ℝ)
+                                = (K'.relIndex K : ℝ)
+                                  * cont (tupLat L Λs m) (thick L ϖ (torb K' x) i) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ n Hm hH Λs hΛ m x _ K K' hK hK' hnorm hidx i hi hstab hco
-  obtain ⟨-, hgrp, -⟩ := GlobalTheory.T.matrixCongruentOneModUniformizerPow_group_and_orbits L ϖ hϖ m i hi
+  obtain ⟨-, hgrp, -⟩ :=
+    GlobalTheory.T.matrixCongruentOneModUniformizerPow_group_and_orbits L ϖ hϖ m i hi
   have hjac := (GlobalTheory.T.tuple_jacobian_rightMul_isometry L ϖ hϖ Hm hH Λs hΛ m).2
   have hconj : ∀ a ∈ K, ∀ k ∈ K', a * k * a⁻¹ ∈ K' := by
     intro a ha k hk
@@ -137,16 +176,32 @@ theorem GlobalTheory.HL.cont_thick_torb_normal : ∀ {F : Type} [Field F] [Valua
   haveI : (K'.subgroupOf K).Normal :=
     ⟨fun k hk a => hconj a a.2 k hk⟩
   set Fx := fixG L Hm (Submodule.span E (Set.range x)) with hFx
-  have hsub : ∀ a b : K, a⁻¹ * b ∈ K'.subgroupOf K ⊔ Fx.subgroupOf K →
-      (fun x c => (b : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) '' thick L ϖ (torb K' x) i ⊆
-      (fun x c => (a : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) '' thick L ϖ (torb K' x) i := by
+  have hsub
+      : ∀ a b : K,
+        a⁻¹ * b ∈ K'.subgroupOf K ⊔ Fx.subgroupOf K
+          → (fun x c => (b : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) '' thick L ϖ (torb K' x) i
+            ⊆ (fun x c => (a : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c))
+              '' thick L ϖ (torb K' x) i := by
     intro a b hab
     obtain ⟨k, hk, h, hh, hkh⟩ := Subgroup.mem_sup_of_normal_left.1 hab
     have hb : b = a * (k * h) := by rw [hkh]; group
     have hhx := ((mem_fixG L Hm x h).1 hh).2
     rintro _ ⟨_, ⟨_, ⟨k1, hk1, rfl⟩, A, hA, rfl⟩, rfl⟩
-    refine ⟨_, ⟨_, ⟨k * (h * k1 * (h : (Fin n → E) ≃ₗ[E] (Fin n → E))⁻¹),
-      K'.mul_mem hk (hconj h h.2 k1 hk1), rfl⟩, A, hA, rfl⟩, ?_⟩
+    refine ⟨
+      _,
+      ⟨
+        _,
+        ⟨
+          k * (h * k1 * (h : (Fin n → E) ≃ₗ[E] (Fin n → E))⁻¹),
+          K'.mul_mem hk (hconj h h.2 k1 hk1),
+          rfl
+        ⟩,
+        A,
+        hA,
+        rfl
+      ⟩,
+      ?_
+    ⟩
     simp only [map_rmul]
     congr 1
     funext c
@@ -155,14 +210,20 @@ theorem GlobalTheory.HL.cont_thick_torb_normal : ∀ {F : Type} [Field F] [Valua
       exact LinearEquiv.symm_apply_apply _ _
     rw [hb]
     simp only [Subgroup.coe_mul, LinearEquiv.mul_apply, this]
-  have main := cont_iUnion_cosets (tupLat L Λs m) (K'.subgroupOf K) (Fx.subgroupOf K) hidx
-    (fun a : K => (fun x c => (a : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) '' thick L ϖ (torb K' x) i)
-    (cont (tupLat L Λs m) (thick L ϖ (torb K' x) i))
-    (fun a => (hjac a (hK a.2) _ hco).1) (fun a => (hjac a (hK a.2) _ hco).2)
-    (fun a b hab => Set.Subset.antisymm
-      (hsub b a (by simpa using Subgroup.inv_mem _ hab)) (hsub a b hab)) ?_
-  · have hU : thick L ϖ (torb K x) i = ⋃ a : K, (fun x c => (a : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) ''
-        thick L ϖ (torb K' x) i := by
+  have main :=
+    cont_iUnion_cosets (tupLat L Λs m) (K'.subgroupOf K) (Fx.subgroupOf K) hidx
+      (fun a : K =>
+        (fun x c => (a : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) '' thick L ϖ (torb K' x) i)
+      (cont (tupLat L Λs m) (thick L ϖ (torb K' x) i))
+      (fun a => (hjac a (hK a.2) _ hco).1)
+      (fun a => (hjac a (hK a.2) _ hco).2)
+      (fun a b hab =>
+        Set.Subset.antisymm (hsub b a (by simpa using Subgroup.inv_mem _ hab)) (hsub a b hab))
+      ?_
+  · have hU
+        : thick L ϖ (torb K x) i
+          = ⋃ a : K, (fun x c => (a : (Fin n → E) ≃ₗ[E] (Fin n → E)) (x c)) ''
+            thick L ϖ (torb K' x) i := by
       ext w
       simp only [Set.mem_iUnion]
       constructor
@@ -178,12 +239,14 @@ theorem GlobalTheory.HL.cont_thick_torb_normal : ∀ {F : Type} [Field F] [Valua
     rw [hU, ← hI]
     exact main
   · intro a b hab
-    obtain ⟨w, ⟨_, ⟨_, ⟨k, hk, rfl⟩, A, hA, rfl⟩, rfl⟩, ⟨_, ⟨_, ⟨k', hk', rfl⟩, A', hA', rfl⟩, hw⟩⟩ :=
+    obtain
+        ⟨w, ⟨_, ⟨_, ⟨k, hk, rfl⟩, A, hA, rfl⟩, rfl⟩, ⟨_, ⟨_, ⟨k', hk', rfl⟩, A', hA', rfl⟩, hw⟩⟩ :=
       Set.not_disjoint_iff.1 hab
     obtain ⟨-, hdet, -, hinv, -, -⟩ := hgrp A' hA'
     have hB : A * A'⁻¹ ∈ congK L ϖ m i := (hgrp A hA).2.2.2.2.1 _ hinv
     set g : (Fin n → E) ≃ₗ[E] (Fin n → E) := k⁻¹ * (a : (Fin n → E) ≃ₗ[E] (Fin n → E))⁻¹ * b * k' with hg
-    have hgK : g ∈ K := K.mul_mem (K.mul_mem (K.mul_mem (K.inv_mem (hK' hk)) (K.inv_mem a.2)) b.2) (hK' hk')
+    have hgK : g ∈ K :=
+      K.mul_mem (K.mul_mem (K.mul_mem (K.inv_mem (hK' hk)) (K.inv_mem a.2)) b.2) (hK' hk')
     have h1 : rmul (fun c => g (x c)) A' = rmul x A := by
       rw [← map_rmul]
       funext c
@@ -210,10 +273,13 @@ theorem GlobalTheory.HL.cont_thick_torb_normal : ∀ {F : Type} [Field F] [Valua
       exact LinearEquiv.symm_apply_apply _ _
     have hmem : ∀ u (hu : u ∈ K'), (⟨u, hK' hu⟩ : K) ∈ K'.subgroupOf K ⊔ Fx.subgroupOf K :=
       fun u hu => Subgroup.mem_sup_left hu
-    have hmem' : (⟨k''⁻¹ * g, K.mul_mem (K.inv_mem (hK' hk'')) hgK⟩ : K) ∈
-        K'.subgroupOf K ⊔ Fx.subgroupOf K := Subgroup.mem_sup_right hfix
-    have hfin := Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ (hmem k hk) (hmem k'' hk''))
-      hmem') (Subgroup.inv_mem _ (hmem k' hk'))
+    have hmem'
+        : (⟨k''⁻¹ * g, K.mul_mem (K.inv_mem (hK' hk'')) hgK⟩ : K)
+          ∈ K'.subgroupOf K ⊔ Fx.subgroupOf K :=
+      Subgroup.mem_sup_right hfix
+    have hfin :=
+      Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ (hmem k hk) (hmem k'' hk'')) hmem')
+        (Subgroup.inv_mem _ (hmem k' hk'))
     convert hfin using 1
     apply Subtype.ext
     simp only [Subgroup.coe_mul, Subgroup.coe_inv, hg]

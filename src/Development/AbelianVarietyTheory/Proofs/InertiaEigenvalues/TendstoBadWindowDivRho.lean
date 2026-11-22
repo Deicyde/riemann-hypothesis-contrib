@@ -13,17 +13,18 @@ open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Desc Polynomial Filter Topolo
 
 namespace GlobalTheory.UnitLemma.Desc
 
-
 open Classical in
 noncomputable def badWinBox {ι : Type} (S I : Finset ι) (L k : ℕ) (i₀ i : ι) : Finset ℤ :=
-  if i ∈ S then (if i ∈ I then Finset.Icc (2 * (k : ℤ) - L) (2 * k + L) else Finset.Icc (-(L : ℤ)) L)
-  else if i = i₀ then Finset.Ico (-(L : ℤ)) L ∪ Finset.Ioc (2 * (k : ℤ) - L) (2 * k + L)
-  else Finset.Icc (-(L : ℤ)) (2 * k + L)
+  if i ∈ S then
+    (if i ∈ I then Finset.Icc (2 * (k : ℤ) - L) (2 * k + L) else Finset.Icc (-(L : ℤ)) L)
+  else if i = i₀ then
+    Finset.Ico (-(L : ℤ)) L ∪ Finset.Ioc (2 * (k : ℤ) - L) (2 * k + L)
+  else
+    Finset.Icc (-(L : ℤ)) (2 * k + L)
 
 open Classical in
-theorem card_badWinBox_le {ι : Type} (S I : Finset ι) (L k : ℕ) (i₀ i : ι) :
-    (badWinBox S I L k i₀ i).card ≤
-      2 * (2 * L + 1) * (if i ∈ insert i₀ S then 1 else k + 1) := by
+theorem card_badWinBox_le {ι : Type} (S I : Finset ι) (L k : ℕ) (i₀ i : ι)
+    : (badWinBox S I L k i₀ i).card ≤ 2 * (2 * L + 1) * (if i ∈ insert i₀ S then 1 else k + 1) := by
   unfold badWinBox
   by_cases hS : i ∈ S
   · have : i ∈ insert i₀ S := Finset.mem_insert_of_mem hS
@@ -34,45 +35,67 @@ theorem card_badWinBox_le {ι : Type} (S I : Finset ι) (L k : ℕ) (i₀ i : ι
     · subst h0
       rw [if_pos rfl, if_pos (Finset.mem_insert_self _ _)]
       refine (Finset.card_union_le _ _).trans ?_
-      simp [Int.card_Ico, Int.card_Ioc]; omega
+      simp [Int.card_Ico, Int.card_Ioc]
+      omega
     · rw [if_neg h0, if_neg (by simp [h0, hS])]
       simp [Int.card_Icc]
       nlinarith
 
 open Classical in
-theorem card_piFinset_badWinBox_le {ι : Type} [Fintype ι] (S I : Finset ι) (L k : ℕ) (i₀ : ι) (h₀ : i₀ ∉ S) :
-    (Fintype.piFinset (badWinBox S I L k i₀)).card ≤
-      (2 * (2 * L + 1)) ^ Fintype.card ι * (k + 1) ^ (Fintype.card ι - S.card - 1) := by
+theorem card_piFinset_badWinBox_le
+    {ι : Type} [Fintype ι] (S I : Finset ι) (L k : ℕ) (i₀ : ι) (h₀ : i₀ ∉ S)
+    : (Fintype.piFinset (badWinBox S I L k i₀)).card
+      ≤ (2 * (2 * L + 1)) ^ Fintype.card ι * (k + 1) ^ (Fintype.card ι - S.card - 1) := by
   rw [Fintype.card_piFinset]
-  refine (Finset.prod_le_prod₀ (fun _ _ => Nat.zero_le _) fun i _ => card_badWinBox_le S I L k i₀ i).trans ?_
-  rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Finset.prod_ite, Finset.prod_const_one,
-    one_mul, Finset.prod_const]
+  refine (Finset.prod_le_prod₀
+    (fun _ _ => Nat.zero_le _)
+    fun i _ => card_badWinBox_le S I L k i₀ i).trans ?_
+  rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Finset.prod_ite,
+    Finset.prod_const_one, one_mul, Finset.prod_const]
   have : (Finset.univ.filter fun i => i ∉ insert i₀ S).card = Fintype.card ι - S.card - 1 := by
     have h : (Finset.univ.filter fun i => i ∉ insert i₀ S) = (insert i₀ S)ᶜ := by ext; simp
-    rw [h, Finset.card_compl, Finset.card_insert_of_notMem h₀]; omega
+    rw [h, Finset.card_compl, Finset.card_insert_of_notMem h₀]
+    omega
   rw [this]
 
 end GlobalTheory.UnitLemma.Desc
 
 namespace GlobalTheory.UnitLemma.Desc
 
-theorem tendsto_badWindow_div_rho : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype ι] (e π : ι → B.A) (S : Finset ι) (a : K.O), B.P.Separable → K.Small a → IsFrame B e π S → ∀ (I I' : Finset ι), (∀ i ∈ S, i ∈ I ∨ i ∈ I') → ∀ (N L : ℕ) (D : ℚ) (f : ℕ → Submodule K.O B.A → ℚ), (∀ M ∈ B.Lin, ∃ p, Pos B a e N M p) → (∀ k M, |f k M| ≤ D) → (∀ k, L ≤ k → ∀ M ∈ B.Lin, ∀ p, Pos B a e N M p → f k M ≠ 0 → Win I I' L k p ∧ ¬ Mid S L k p) → Tendsto (fun k : ℕ => ((∑ᶠ M ∈ B.Lin, f k M : ℚ) : ℝ) / (B.rho (algebraMap K.O B.A a ^ k) : ℝ)) atTop (𝓝 0) := by
+theorem tendsto_badWindow_div_rho
+    : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype ι] (e π : ι → B.A) (S : Finset ι) (a : K.O),
+      B.P.Separable → K.Small a → IsFrame B e π S
+        → ∀ (I I' : Finset ι),
+          (∀ i ∈ S, i ∈ I ∨ i ∈ I')
+            → ∀ (N L : ℕ) (D : ℚ) (f : ℕ → Submodule K.O B.A → ℚ),
+              (∀ M ∈ B.Lin, ∃ p, Pos B a e N M p) → (∀ k M, |f k M| ≤ D)
+                → (∀ k,
+                  L ≤ k
+                    → ∀ M ∈ B.Lin, ∀ p,
+                      Pos B a e N M p → f k M ≠ 0 → Win I I' L k p ∧ ¬ Mid S L k p)
+                → Tendsto
+                  (fun k : ℕ =>
+                    ((∑ᶠ M ∈ B.Lin, f k M : ℚ) : ℝ) / (B.rho (algebraMap K.O B.A a ^ k) : ℝ))
+                  atTop (𝓝 0) := by
   intro K B ι _ e π S a hsep ha hfr I I' hI N L D f hpos hD hsupp
   classical
-  obtain ⟨C, hC⟩ := GlobalTheory.T.card_lattices_idempotent_position_bounded K B ι e π S a hsep ha hfr N
+  obtain ⟨C, hC⟩ :=
+    GlobalTheory.T.card_lattices_idempotent_position_bounded K B ι e π S a hsep ha hfr N
   have hrho := GlobalTheory.T.rho_pow_lower_bound_swappedPairs K B ι e π S a hsep ha hfr
   have hD0 : 0 ≤ D := le_trans (abs_nonneg _) (hD 0 ⊥)
   set n := Fintype.card ι
   set m := n - S.card
   set A : ℕ := 2 * (2 * L + 1)
-  have key : ∀ k, L ≤ k → |∑ᶠ M ∈ B.Lin, f k M| ≤ D * ((m * A ^ n * (k + 1) ^ (m - 1) * C : ℕ) : ℚ) := by
+  have key
+      : ∀ k, L ≤ k → |∑ᶠ M ∈ B.Lin, f k M| ≤ D * ((m * A ^ n * (k + 1) ^ (m - 1) * C : ℕ) : ℚ) := by
     intro k hk
     let W : Finset (ι → ℤ) :=
       (Finset.univ.filter (· ∉ S)).biUnion fun i₀ => Fintype.piFinset (badWinBox S I L k i₀)
     have hWcard : W.card ≤ m * A ^ n * (k + 1) ^ (m - 1) := by
       refine Finset.card_biUnion_le.trans ?_
-      have h1 : ∀ i₀ ∈ Finset.univ.filter (· ∉ S),
-          (Fintype.piFinset (badWinBox S I L k i₀)).card ≤ A ^ n * (k + 1) ^ (m - 1) := by
+      have h1
+          : ∀ i₀ ∈ Finset.univ.filter (· ∉ S),
+            (Fintype.piFinset (badWinBox S I L k i₀)).card ≤ A ^ n * (k + 1) ^ (m - 1) := by
         intro i₀ hi₀
         exact card_piFinset_badWinBox_le S I L k i₀ (Finset.mem_filter.1 hi₀).2
       refine (Finset.sum_le_sum h1).trans ?_
@@ -86,7 +109,8 @@ theorem tendsto_badWindow_div_rho : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fin
       obtain ⟨p, hp⟩ := hpos M hM
       obtain ⟨hw, hmid⟩ := hsupp k hk M hM p hp hf
       refine ⟨p, ?_, hp⟩
-      simp only [W, Finset.mem_biUnion, Finset.mem_filter, Finset.mem_univ, true_and, Fintype.mem_piFinset]
+      simp only [W, Finset.mem_biUnion, Finset.mem_filter, Finset.mem_univ, true_and,
+        Fintype.mem_piFinset]
       unfold Mid at hmid
       push_neg at hmid
       obtain ⟨i₀, hi₀, h₀⟩ := hmid
@@ -99,7 +123,8 @@ theorem tendsto_badWindow_div_rho : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fin
         · rw [if_pos hiI]; simp only [Finset.mem_Icc]; exact ⟨h3 hiI, h2⟩
         · rw [if_neg hiI]
           have := (hI i hS).resolve_left hiI
-          simp only [Finset.mem_Icc]; exact ⟨h1, h4 this⟩
+          simp only [Finset.mem_Icc]
+          exact ⟨h1, h4 this⟩
       · rw [if_neg hS]
         by_cases h0 : i = i₀
         · subst h0
@@ -145,25 +170,30 @@ theorem tendsto_badWindow_div_rho : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fin
     simpa using tendsto_one_div_add_atTop_nhds_zero_nat.const_mul c
   refine squeeze_zero_norm' ?_ hlim
   filter_upwards [eventually_ge_atTop L] with k hk
-  have hr : ((k + 1 : ℕ) : ℝ) ^ m ≤ (B.rho (algebraMap K.O B.A a ^ k) : ℝ) := by exact_mod_cast hrho k
+  have hr : ((k + 1 : ℕ) : ℝ) ^ m ≤ (B.rho (algebraMap K.O B.A a ^ k) : ℝ) := by
+    exact_mod_cast hrho k
   have hpos' : (0 : ℝ) < ((k + 1 : ℕ) : ℝ) ^ m := by positivity
   have hk' := key k hk
-  have hk'' : |((∑ᶠ M ∈ B.Lin, f k M : ℚ) : ℝ)| ≤ (D : ℝ) * ((m * A ^ n * (k + 1) ^ (m - 1) * C : ℕ) : ℝ) := by
+  have hk''
+      : |((∑ᶠ M ∈ B.Lin, f k M : ℚ) : ℝ)|
+        ≤ (D : ℝ) * ((m * A ^ n * (k + 1) ^ (m - 1) * C : ℕ) : ℝ) := by
     have := (Rat.cast_le (K := ℝ)).2 hk'
     push_cast at this ⊢
     simpa [Rat.cast_abs] using this
   rw [Real.norm_eq_abs, abs_div, Nat.abs_cast]
   rw [div_le_iff₀ (lt_of_lt_of_le hpos' hr)]
-  calc |((∑ᶠ M ∈ B.Lin, f k M : ℚ) : ℝ)|
+  calc
+    |((∑ᶠ M ∈ B.Lin, f k M : ℚ) : ℝ)|
       ≤ (D : ℝ) * ((m * A ^ n * (k + 1) ^ (m - 1) * C : ℕ) : ℝ) := hk''
     _ = c * (1 / ((k : ℝ) + 1)) * ((k + 1 : ℕ) : ℝ) ^ m := by
-        have h := congrArg (fun x : ℕ => (x : ℝ)) (hm k)
-        push_cast at h ⊢
-        field_simp
-        simp only [c]
-        linear_combination (D : ℝ) * (A : ℝ) ^ n * (C : ℝ) * h
+      have h := congrArg (fun x : ℕ => (x : ℝ)) (hm k)
+      push_cast at h ⊢
+      field_simp
+      simp only [c]
+      linear_combination (D : ℝ) * (A : ℝ) ^ n * (C : ℝ) * h
     _ ≤ c * (1 / ((k : ℝ) + 1)) * (B.rho (algebraMap K.O B.A a ^ k) : ℝ) := by
-        refine mul_le_mul_of_nonneg_left hr ?_
-        simp only [c]; positivity
+      refine mul_le_mul_of_nonneg_left hr ?_
+      simp only [c]
+      positivity
 
 end GlobalTheory.UnitLemma.Desc

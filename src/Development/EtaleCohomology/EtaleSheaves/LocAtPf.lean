@@ -38,8 +38,8 @@ lemma unit_of_le {a b : DivIdx S} (h : a ≤ b) :
   rw [e] at hb
   exact isUnit_of_mul_isUnit_left hb
 
-def tr {a b : DivIdx S} (h : a ≤ b) :
-    Localization.Away (a.val : A) →+* Localization.Away (b.val : A) :=
+def tr {a b : DivIdx S} (h : a ≤ b)
+    : Localization.Away (a.val : A) →+* Localization.Away (b.val : A) :=
   IsLocalization.Away.lift (a.val : A) (unit_of_le S h)
 
 lemma tr_alg {a b : DivIdx S} (h : a ≤ b) (x : A) :
@@ -52,16 +52,19 @@ def Dg : DivIdx S ⥤ CommRingCat.{0} where
   map_id a := by
     apply CommRingCat.hom_ext
     apply IsLocalization.ringHom_ext (Submonoid.powers (a.val : A))
-    ext x; simp [tr_alg]
+    ext x
+    simp [tr_alg]
   map_comp {a b c} f g := by
     apply CommRingCat.hom_ext
     apply IsLocalization.ringHom_ext (Submonoid.powers (a.val : A))
-    ext x; simp [tr_alg]
+    ext x
+    simp [tr_alg]
 
 def tN : (Functor.const (DivIdx S)).obj (CommRingCat.of A) ⟶ Dg S where
   app a := CommRingCat.ofHom (algebraMap A (Localization.Away (a.val : A)))
   naturality a b f := by
-    apply CommRingCat.hom_ext; ext x
+    apply CommRingCat.hom_ext
+    ext x
     exact (tr_alg S f.le x).symm
 
 lemma away_ext (a : DivIdx S) {R : CommRingCat.{0}} {f g : (Dg S).obj a ⟶ R}
@@ -84,8 +87,9 @@ def sN : Dg S ⟶ (Functor.const (DivIdx S)).obj (CommRingCat.of B) where
     apply CommRingCat.hom_ext
     refine IsLocalization.ringHom_ext (M := Submonoid.powers (a.val : A))
       (S := Localization.Away (a.val : A)) (RingHom.ext fun x => ?_)
-    change IsLocalization.Away.lift (b.val : A) (IsLocalization.map_units B b.val) (tr S f.le (algebraMap A _ x)) =
-      IsLocalization.Away.lift (a.val : A) (IsLocalization.map_units B a.val) (algebraMap A _ x)
+    change IsLocalization.Away.lift (b.val : A) (IsLocalization.map_units B b.val)
+        (tr S f.le (algebraMap A _ x))
+      = IsLocalization.Away.lift (a.val : A) (IsLocalization.map_units B a.val) (algebraMap A _ x)
     rw [tr_alg, IsLocalization.Away.lift_eq, IsLocalization.Away.lift_eq]
 
 lemma cocone_alg (c : Cocone (Dg S)) (a : DivIdx S) :
@@ -103,7 +107,9 @@ lemma awayDivisibilityCocone_baseHom_submonoid_isUnit (c : Cocone (Dg S)) (s : S
     (c.ι.app ⟨s⟩).hom
 
 def isColim : IsColimit (Cocone.mk (CommRingCat.of B) (sN S B)) where
-  desc c := CommRingCat.ofHom (IsLocalization.lift (M := S) (S := B) (g := g0 S c) (awayDivisibilityCocone_baseHom_submonoid_isUnit S c))
+  desc c :=
+    CommRingCat.ofHom (IsLocalization.lift (M := S) (S := B) (g := g0 S c)
+      (awayDivisibilityCocone_baseHom_submonoid_isUnit S c))
   fac c a := by
     apply away_ext S a
     intro x
@@ -123,13 +129,15 @@ def isColim : IsColimit (Cocone.mk (CommRingCat.of B) (sN S B)) where
     simp only [CategoryTheory.comp_apply] at this
     exact this
 
-theorem locIE (S : Submonoid A) (B : Type) [CommRing B] [Algebra A B] [IsLocalization S B] :
-    IE (CommRingCat.ofHom (algebraMap A B)) := by
-  refine ⟨DivIdx S, inferInstance, inferInstance, Dg S, tN S, sN S B, isColim S B, fun a => ⟨?_, ?_⟩⟩
+theorem locIE (S : Submonoid A) (B : Type) [CommRing B] [Algebra A B] [IsLocalization S B]
+    : IE (CommRingCat.ofHom (algebraMap A B)) := by
+  refine
+    ⟨DivIdx S, inferInstance, inferInstance, Dg S, tN S, sN S B, isColim S B, fun a => ⟨?_, ?_⟩⟩
   · show RingHom.Etale (CommRingCat.Hom.hom (CommRingCat.ofHom (algebraMap A (Localization.Away (a.val : A)))))
     rw [CommRingCat.hom_ofHom, RingHom.etale_algebraMap]
     infer_instance
-  · apply CommRingCat.hom_ext; ext x
+  · apply CommRingCat.hom_ext
+    ext x
     exact sApp_tN S B a x
 
 theorem LocAt_of : LateralTheory.E.SHExistsPf.LocAt := by

@@ -5,21 +5,27 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsNor
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
+open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.Amp
 
-theorem dyad_cauchySchwarz {X : Type} [MeasurableSpace X] (μ : Measure X) (A B : X → ℝ)
-    (hA : Measurable A) (hB : Measurable B) (P Q : ℝ) (hP : 0 < P) (hQ : 0 < Q)
-    (h1 : ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ ≤ ENNReal.ofReal (P ^ 2))
-    (h2 : ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ ≤ ENNReal.ofReal (Q ^ 2)) :
-    ∫⁻ x, ENNReal.ofReal (A x * B x) ∂μ ≤ ENNReal.ofReal (P * Q) := by
+theorem dyad_cauchySchwarz
+    {X : Type} [MeasurableSpace X]
+    (μ : Measure X)
+    (A B : X → ℝ) (hA : Measurable A) (hB : Measurable B)
+    (P Q : ℝ)
+    (hP : 0 < P) (hQ : 0 < Q) (h1 : ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ ≤ ENNReal.ofReal (P ^ 2))
+    (h2 : ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ ≤ ENNReal.ofReal (Q ^ 2))
+    : ∫⁻ x, ENNReal.ofReal (A x * B x) ∂μ ≤ ENNReal.ofReal (P * Q) := by
   have hc : 0 < Q / (2 * P) := by positivity
   have hd : 0 < P / (2 * Q) := by positivity
-  have hpt : ∀ x, ENNReal.ofReal (A x * B x) ≤
-      ENNReal.ofReal (Q / (2 * P)) * ENNReal.ofReal (A x ^ 2)
-        + ENNReal.ofReal (P / (2 * Q)) * ENNReal.ofReal (B x ^ 2) := by
+  have hpt
+      : ∀ x,
+        ENNReal.ofReal (A x * B x)
+          ≤ ENNReal.ofReal (Q / (2 * P)) * ENNReal.ofReal (A x ^ 2)
+            + ENNReal.ofReal (P / (2 * Q)) * ENNReal.ofReal (B x ^ 2) := by
     intro x
     rw [← ENNReal.ofReal_mul hc.le, ← ENNReal.ofReal_mul hd.le,
       ← ENNReal.ofReal_add (by positivity) (by positivity)]
@@ -31,26 +37,30 @@ theorem dyad_cauchySchwarz {X : Type} [MeasurableSpace X] (μ : Measure X) (A B 
     linarith
   have mA : Measurable fun x => ENNReal.ofReal (A x ^ 2) := by fun_prop
   have mB : Measurable fun x => ENNReal.ofReal (B x ^ 2) := by fun_prop
-  calc _ ≤ _ := lintegral_mono hpt
+  calc
+    _ ≤ _ := lintegral_mono hpt
     _ = ENNReal.ofReal (Q / (2 * P)) * ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ
         + ENNReal.ofReal (P / (2 * Q)) * ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ := by
       rw [lintegral_add_left (mA.const_mul _), lintegral_const_mul _ mA, lintegral_const_mul _ mB]
     _ ≤ ENNReal.ofReal (Q / (2 * P)) * ENNReal.ofReal (P ^ 2)
-        + ENNReal.ofReal (P / (2 * Q)) * ENNReal.ofReal (Q ^ 2) := by gcongr
+        + ENNReal.ofReal (P / (2 * Q)) * ENNReal.ofReal (Q ^ 2) := by
+      gcongr
     _ = _ := by
       rw [← ENNReal.ofReal_mul hc.le, ← ENNReal.ofReal_mul hd.le,
         ← ENNReal.ofReal_add (by positivity) (by positivity)]
       congr 1
-      field_simp; ring
+      field_simp
+      ring
 
-theorem dyad_exists_shell (H s : ℝ) (hH : 0 < H) :
-    ∃ i : ℕ, s ≤ 2 ^ (i + 1) * H ∧ (i = 0 ∨ 2 ^ i * H < s) := by
+theorem dyad_exists_shell (H s : ℝ) (hH : 0 < H)
+    : ∃ i : ℕ, s ≤ 2 ^ (i + 1) * H ∧ (i = 0 ∨ 2 ^ i * H < s) := by
   have hex : ∃ i : ℕ, s ≤ 2 ^ (i + 1) * H := by
     obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (s / H) (one_lt_two (α := ℝ))
     refine ⟨n, ?_⟩
     rw [div_lt_iff₀ hH] at hn
-    have : (0:ℝ) < 2 ^ n * H := by positivity
-    rw [pow_succ]; linarith
+    have : (0 : ℝ) < 2 ^ n * H := by positivity
+    rw [pow_succ]
+    linarith
   classical
   refine ⟨Nat.find hex, Nat.find_spec hex, ?_⟩
   rcases h : Nat.find hex with _ | k
@@ -59,49 +69,58 @@ theorem dyad_exists_shell (H s : ℝ) (hH : 0 < H) :
     have := Nat.find_min hex (m := k) (by omega)
     exact not_le.mp this
 
-theorem dyad_exists_down (M y : ℝ) (hy : 0 < y) (hM : y ≤ M) :
-    ∃ a : ℕ, M / 2 ^ (a + 1) < y ∧ y ≤ 2 * (M / 2 ^ (a + 1)) := by
-  obtain ⟨n, h1, h2⟩ := exists_nat_pow_near (x := M / y) (y := 2)
-    (by rw [le_div_iff₀ hy]; linarith) one_lt_two
+theorem dyad_exists_down (M y : ℝ) (hy : 0 < y) (hM : y ≤ M)
+    : ∃ a : ℕ, M / 2 ^ (a + 1) < y ∧ y ≤ 2 * (M / 2 ^ (a + 1)) := by
+  obtain ⟨n, h1, h2⟩ :=
+    exists_nat_pow_near (x := M / y) (y := 2) (by rw [le_div_iff₀ hy]; linarith) one_lt_two
   refine ⟨n, ?_, ?_⟩
   · rw [div_lt_iff₀ (by positivity)]
-    rw [div_lt_iff₀ hy] at h2; linarith
+    rw [div_lt_iff₀ hy] at h2
+    linarith
   · rw [le_div_iff₀ hy] at h1
     have : 2 * (M / 2 ^ (n + 1)) = M / 2 ^ n := by field_simp; ring
-    rw [this, le_div_iff₀ (by positivity)]; linarith
+    rw [this, le_div_iff₀ (by positivity)]
+    linarith
 
-theorem dyad_piece_real (r k e n : ℕ) (H De N sg u v w : ℝ) (hr : 1 ≤ r) (hH : 0 < H)
-    (hDe : 0 < De) (hN : 0 < N) (hsg : 1 ≤ sg) (hu : 0 < u) (hv : 0 < v) (hw : 0 < w)
-    (hwN : w ≤ N) (hwM : w ≤ ((u * (2 * H)) ^ r * De) ^ 2 * v)
-    (hNR : 1 ≤ N * (u * (2 * H)) ^ (2 * r)) (hsu : sg ≤ u ^ r) :
-    (u * (2 * H)) ^ e * w ^ (k + 1) * (u ^ (e + 4 * r + 1 + n))⁻¹ ≤
-      (2 * H) ^ (e + 4 * r) * De ^ 2 * N ^ (k + 1) * sg ^ (-((n : ℝ) / r)) * (u⁻¹ * v) := by
-  have hr' : (0:ℝ) < r := by exact_mod_cast hr
+theorem dyad_piece_real
+    (r k e n : ℕ)
+    (H De N sg u v w : ℝ)
+    (hr : 1 ≤ r) (hH : 0 < H) (hDe : 0 < De) (hN : 0 < N) (hsg : 1 ≤ sg) (hu : 0 < u) (hv : 0 < v)
+    (hw : 0 < w) (hwN : w ≤ N) (hwM : w ≤ ((u * (2 * H)) ^ r * De) ^ 2 * v)
+    (hNR : 1 ≤ N * (u * (2 * H)) ^ (2 * r)) (hsu : sg ≤ u ^ r)
+    : (u * (2 * H)) ^ e * w ^ (k + 1) * (u ^ (e + 4 * r + 1 + n))⁻¹
+      ≤ (2 * H) ^ (e + 4 * r) * De ^ 2 * N ^ (k + 1) * sg ^ (-((n : ℝ) / r)) * (u⁻¹ * v) := by
+  have hr' : (0 : ℝ) < r := by exact_mod_cast hr
   have h1 : (u ^ n)⁻¹ ≤ sg ^ (-((n : ℝ) / r)) := by
     rw [Real.rpow_neg (by linarith)]
     apply inv_anti₀ (by positivity)
-    calc sg ^ ((n : ℝ) / r) ≤ (u ^ r) ^ ((n : ℝ) / r) := by gcongr
+    calc
+      sg ^ ((n : ℝ) / r)
+        ≤ (u ^ r) ^ ((n : ℝ) / r) := by gcongr
       _ = u ^ n := by
         rw [← Real.rpow_natCast u r, ← Real.rpow_mul hu.le, ← Real.rpow_natCast u n]
-        congr 1; field_simp
+        congr 1
+        field_simp
   have h2 : w ^ (k + 1) ≤ N ^ (k + 1) * (u * (2 * H)) ^ (4 * r) * De ^ 2 * v := by
-    calc w ^ (k + 1) = w ^ k * w * 1 := by ring
-      _ ≤ N ^ k * (((u * (2 * H)) ^ r * De) ^ 2 * v) * (N * (u * (2 * H)) ^ (2 * r)) := by
-        gcongr
+    calc
+      w ^ (k + 1)
+        = w ^ k * w * 1 := by ring
+      _ ≤ N ^ k * (((u * (2 * H)) ^ r * De) ^ 2 * v) * (N * (u * (2 * H)) ^ (2 * r)) := by gcongr
       _ = _ := by ring
-  calc _ ≤ (u * (2 * H)) ^ e * (N ^ (k + 1) * (u * (2 * H)) ^ (4 * r) * De ^ 2 * v)
-        * (u ^ (e + 4 * r + 1 + n))⁻¹ := by gcongr
+  calc
+    _ ≤ (u * (2 * H)) ^ e * (N ^ (k + 1) * (u * (2 * H)) ^ (4 * r) * De ^ 2 * v)
+        * (u ^ (e + 4 * r + 1 + n))⁻¹ := by
+      gcongr
     _ = (2 * H) ^ (e + 4 * r) * De ^ 2 * N ^ (k + 1) * (u ^ n)⁻¹ * (u⁻¹ * v) := by
       rw [mul_pow u, mul_pow u]
       field_simp
       ring
     _ ≤ _ := by gcongr
 
-theorem dyad_tsum_four (c : ℝ≥0∞) :
-    ∑' p : ℕ × ℕ × ℕ × ℕ, c * (2⁻¹ ^ p.1 * (2⁻¹ ^ p.2.1 * (2⁻¹ ^ p.2.2.1 * 2⁻¹ ^ p.2.2.2)))
+theorem dyad_tsum_four (c : ℝ≥0∞)
+    : ∑' p : ℕ × ℕ × ℕ × ℕ, c * (2⁻¹ ^ p.1 * (2⁻¹ ^ p.2.1 * (2⁻¹ ^ p.2.2.1 * 2⁻¹ ^ p.2.2.2)))
       = 16 * c := by
-  have g : ∑' n : ℕ, (2⁻¹ : ℝ≥0∞) ^ n = 2 := by
-    rw [ENNReal.tsum_geometric]; simp
+  have g : ∑' n : ℕ, (2⁻¹ : ℝ≥0∞) ^ n = 2 := by rw [ENNReal.tsum_geometric]; simp
   rw [ENNReal.tsum_mul_left]
   simp only [ENNReal.tsum_prod', ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, g]
   ring

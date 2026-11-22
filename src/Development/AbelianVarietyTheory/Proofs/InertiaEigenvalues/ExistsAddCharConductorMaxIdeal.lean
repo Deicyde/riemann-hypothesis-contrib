@@ -17,8 +17,9 @@ namespace GlobalTheory.DZero.PsiM
 
 variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem valueGroupIso_uniformizer :
-    IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k (uniformizer k) = WithZero.exp (-1) := by
+theorem valueGroupIso_uniformizer
+    : IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k (uniformizer k)
+      = WithZero.exp (-1) := by
   set φ := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k
   have h0 : φ (uniformizer k) ≠ 0 := by simp
   apply le_antisymm

@@ -8,15 +8,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem isInternal_congr {ι M σ σ' : Type} [DecidableEq ι] [AddCommMonoid M] [SetLike σ M]
-    [AddSubmonoidClass σ M] [SetLike σ' M] [AddSubmonoidClass σ' M] (A : ι → σ) (A' : ι → σ')
-    (h : ∀ i x, x ∈ A' i ↔ x ∈ A i) (hA : DirectSum.IsInternal A) : DirectSum.IsInternal A' := by
-  let e : ∀ i, A' i ≃+ A i := fun i =>
-    { toFun := fun x => ⟨x.1, (h i _).1 x.2⟩
-      invFun := fun x => ⟨x.1, (h i _).2 x.2⟩
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl
-      map_add' := fun _ _ => rfl }
+private theorem isInternal_congr
+    {ι M σ σ' : Type} [DecidableEq ι] [AddCommMonoid M] [SetLike σ M] [AddSubmonoidClass σ M]
+    [SetLike σ' M] [AddSubmonoidClass σ' M]
+    (A : ι → σ) (A' : ι → σ') (h : ∀ i x, x ∈ A' i ↔ x ∈ A i)
+    (hA : DirectSum.IsInternal A)
+    : DirectSum.IsInternal A' := by
+  let e : ∀ i, A' i ≃+ A i := fun i => {
+    toFun := fun x => ⟨x.1, (h i _).1 x.2⟩
+    invFun := fun x => ⟨x.1, (h i _).2 x.2⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+    map_add' := fun _ _ => rfl
+  }
   let E : DirectSum ι (fun i => A' i) ≃+ DirectSum ι (fun i => A i) := DFinsupp.mapRange.addEquiv e
   have hE : DirectSum.coeAddMonoidHom A' = (DirectSum.coeAddMonoidHom A).comp E.toAddMonoidHom := by
     refine DirectSum.addHom_ext fun i x => ?_
@@ -29,21 +33,27 @@ private theorem isInternal_congr {ι M σ σ' : Type} [DecidableEq ι] [AddCommM
   rw [hE]
   exact hA.comp E.bijective
 
-private theorem gr_transfer (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
-    [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O ℤ R)
-    (hz : ∀ s, W.z s ∈ maximalIdeal R) (B A : Subalgebra O R) [Algebra B A]
-    (halg : ∀ b : B, ((algebraMap B A b : A) : R) = b) (gr : ℤ → Submodule B A)
-    (hB : ∀ y, y ∈ B ↔ y ∈ W.part 0) (hA : A = W.A) (hgr : ∀ j (a : A), a ∈ gr j ↔ (a : R) ∈ W.part j) :
-    DirectSum.IsInternal gr ∧ SetLike.GradedMonoid gr ∧ gr 0 = 1 ∧ (∀ j, (gr j).FG) ∧ Algebra.FiniteType B A ∧
-      IsNoetherianRing A := by
+private theorem gr_transfer
+    (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
+    (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+    (W : WPres O ℤ R) (hz : ∀ s, W.z s ∈ maximalIdeal R)
+    (B A : Subalgebra O R) [Algebra B A]
+    (halg : ∀ b : B, ((algebraMap B A b : A) : R) = b)
+    (gr : ℤ → Submodule B A)
+    (hB : ∀ y, y ∈ B ↔ y ∈ W.part 0) (hA : A = W.A)
+    (hgr : ∀ j (a : A), a ∈ gr j ↔ (a : R) ∈ W.part j)
+    : DirectSum.IsInternal gr ∧ SetLike.GradedMonoid gr ∧ gr 0 = 1 ∧ (∀ j, (gr j).FG)
+      ∧ Algebra.FiniteType B A ∧ IsNoetherianRing A := by
   subst hA
   obtain ⟨h1, h2, h3⟩ := gr_noeth O ℤ R W hz
   have h0 : ∀ a : W.A, a ∈ W.gr 0 → ∃ b : B, algebraMap B W.A b = a := fun a ha =>
     ⟨⟨a, (hB _).2 ha⟩, Subtype.ext (halg _)⟩
   refine ⟨isInternal_congr W.gr gr hgr (gr_internal O ℤ R W), ?_, ?_, fun j => ?_, ?_, h1⟩
-  · exact
-      { one_mem := (hgr _ _).2 (SetLike.GradedOne.one_mem : (1 : R) ∈ W.part 0)
-        mul_mem := fun _ _ _ _ ha hb => (hgr _ _).2 (SetLike.mul_mem_graded ((hgr _ _).1 ha) ((hgr _ _).1 hb)) }
+  · exact {
+      one_mem := (hgr _ _).2 (SetLike.GradedOne.one_mem : (1 : R) ∈ W.part 0)
+      mul_mem := fun _ _ _ _ ha hb =>
+        (hgr _ _).2 (SetLike.mul_mem_graded ((hgr _ _).1 ha) ((hgr _ _).1 hb))
+    }
   · ext a
     rw [Submodule.mem_one, hgr]
     refine ⟨h0 a, ?_⟩
@@ -82,8 +92,14 @@ private theorem gr_transfer (O : Type) [CommRing O] [IsLocalRing O] [IsNoetheria
     | add a b _ _ ha hb => exact add_mem ha hb
     | mul a b _ _ ha hb => exact mul_mem ha hb
 
-theorem UpperTheory.V.Fr.gr_A :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, DirectSum.IsInternal S.gr ∧ SetLike.GradedMonoid S.gr ∧ S.gr 0 = 1 ∧ (∀ j, (S.gr j).FG) ∧ Algebra.FiniteType S.B S.A ∧ IsNoetherianRing S.A ∧ ∀ g i j, S.u.r g i j ∈ S.gr (w n i - w n j) := by
+theorem UpperTheory.V.Fr.gr_A
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n,
+          DirectSum.IsInternal S.gr ∧ SetLike.GradedMonoid S.gr ∧ S.gr 0 = 1 ∧ (∀ j, (S.gr j).FG)
+            ∧ Algebra.FiniteType S.B S.A ∧ IsNoetherianRing S.A
+            ∧ ∀ g i j, S.u.r g i j ∈ S.gr (w n i - w n j) := by
   intro l _ O _ _ _ _ F C₀ n hF hn S
   obtain ⟨W, hz, hr, hB, hA, hgr⟩ := UpperTheory.V.Fr.wpres hF hn S
   obtain ⟨h1, h2, h3, h4, h5, h6⟩ := gr_transfer O S.R W hz S.B S.A (fun _ => rfl) S.gr hB hA hgr

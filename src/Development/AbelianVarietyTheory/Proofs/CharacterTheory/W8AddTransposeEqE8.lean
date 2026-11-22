@@ -76,8 +76,7 @@ theorem e8_posDef : (E8.map (fun x : ℤ => (x : ℝ))).PosDef := by
     rw [Matrix.conjTranspose_eq_transpose_of_trivial, Matrix.transpose_smul, Matrix.smul_mul,
       Matrix.mul_smul, h4, smul_smul, smul_smul]
     norm_num
-  have hs : (E8.map f).PosSemidef := by
-    rw [h]; exact Matrix.posSemidef_conjTranspose_mul_self _
+  have hs : (E8.map f).PosSemidef := by rw [h]; exact Matrix.posSemidef_conjTranspose_mul_self _
   rw [hs.posDef_iff_det_ne_zero]
   have : (E8.map f).det = f E8.det := (RingHom.map_det f E8).symm
   rw [this, e8_det_eq_one, map_one]

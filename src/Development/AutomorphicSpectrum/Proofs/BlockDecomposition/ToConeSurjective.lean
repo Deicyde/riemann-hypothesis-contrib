@@ -75,7 +75,9 @@ theorem coord_inj (k : Fin d) {g g' : Gam n d} (h : coord k g = coord k g') : g 
   · by_cases hjk : j = k
     · subst hjk
       unfold tdeg at ht
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ j), ← Finset.add_sum_erase _ _ (Finset.mem_univ j)] at ht
+      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ j),
+          ← Finset.add_sum_erase _ _ (Finset.mem_univ j)]
+        at ht
       have : ∑ x ∈ Finset.univ.erase j, g (Sum.inr x) = ∑ x ∈ Finset.univ.erase j, g' (Sum.inr x) :=
         Finset.sum_congr rfl fun x hx => hj x (Finset.ne_of_mem_erase hx)
       linarith
@@ -84,12 +86,12 @@ theorem coord_inj (k : Fin d) {g g' : Gam n d} (h : coord k g = coord k g') : g 
 def toCone (k : Fin d) : (E n d →₀ ℕ) →+ (cone {k} : AddSubmonoid (Gam n d)) :=
   Finsupp.liftAddHom fun e => multiplesHom _ ⟨wv k e, wv_mem (Finset.mem_singleton_self k) e⟩
 
-theorem toCone_single (k : Fin d) (e : E n d) :
-    toCone k (Finsupp.single e 1) = ⟨wv k e, wv_mem (Finset.mem_singleton_self k) e⟩ := by
+theorem toCone_single (k : Fin d) (e : E n d)
+    : toCone k (Finsupp.single e 1) = ⟨wv k e, wv_mem (Finset.mem_singleton_self k) e⟩ := by
   simp [toCone]
 
-theorem coord_toCone (k : Fin d) (f : E n d →₀ ℕ) (e : E n d) :
-    coord k (toCone k f : Gam n d) e = f e := by
+theorem coord_toCone (k : Fin d) (f : E n d →₀ ℕ) (e : E n d)
+    : coord k (toCone k f : Gam n d) e = f e := by
   induction f using Finsupp.induction_linear with
   | zero => simp [coord_zero]
   | add f g hf hg =>
@@ -99,8 +101,8 @@ theorem coord_toCone (k : Fin d) (f : E n d →₀ ℕ) (e : E n d) :
     induction b with
     | zero => simp [coord_zero]
     | succ b ih =>
-      rw [show Finsupp.single a (b + 1) = Finsupp.single a b + Finsupp.single a 1 by simp,
-        map_add, AddSubmonoid.coe_add, coord_add, Pi.add_apply, ih, toCone_single]
+      rw [show Finsupp.single a (b + 1) = Finsupp.single a b + Finsupp.single a 1 by simp, map_add,
+        AddSubmonoid.coe_add, coord_add, Pi.add_apply, ih, toCone_single]
       simp only [coord_wv, Finsupp.add_apply, Finsupp.single_apply]
       by_cases h : e = a
       · simp [h]
@@ -114,8 +116,9 @@ theorem toCone_injective (k : Fin d) : Function.Injective (toCone k : (E n d →
   rw [h, coord_toCone] at h1
   exact_mod_cast h1.symm
 
-theorem coord_nonneg (k : Fin d) {g : Gam n d} (hg : g ∈ (cone {k} : AddSubmonoid (Gam n d))) (e : E n d) :
-    0 ≤ coord k g e := by
+theorem coord_nonneg
+    (k : Fin d) {g : Gam n d} (hg : g ∈ (cone {k} : AddSubmonoid (Gam n d))) (e : E n d)
+    : 0 ≤ coord k g e := by
   rcases e with l | j
   · exact hg.1 l
   · by_cases h : j = k
@@ -132,16 +135,22 @@ theorem toCone_surjective (k : Fin d) : Function.Surjective (toCone k : (E n d �
 def coneEquiv (k : Fin d) : (E n d →₀ ℕ) ≃+ (cone {k} : AddSubmonoid (Gam n d)) :=
   AddEquiv.ofBijective (toCone k) ⟨toCone_injective k, toCone_surjective k⟩
 
-theorem chart_bijective {K : Type} [Field K] {n d : ℕ} (k : Fin d) :
-    Function.Bijective (MvPolynomial.aeval (R := K)
-      (fun e : E n d => mon K (wv k e) (wv_mem (Finset.mem_singleton_self k) e)) : Bp K n d →ₐ[K] R0 K n d {k}) := by
+theorem chart_bijective {K : Type} [Field K] {n d : ℕ} (k : Fin d)
+    : Function.Bijective
+      (MvPolynomial.aeval (R := K)
+          (fun e : E n d => mon K (wv k e) (wv_mem (Finset.mem_singleton_self k) e))
+        : Bp K n d →ₐ[K] R0 K n d {k}) := by
   let Φ : Bp K n d ≃ₐ[K] R0 K n d {k} := AddMonoidAlgebra.domCongr K K (coneEquiv k)
-  have h : (MvPolynomial.aeval (R := K)
-      (fun e : E n d => mon K (wv k e) (wv_mem (Finset.mem_singleton_self k) e)) : Bp K n d →ₐ[K] R0 K n d {k}) = Φ.toAlgHom := by
+  have h
+      : (MvPolynomial.aeval (R := K)
+            (fun e : E n d => mon K (wv k e) (wv_mem (Finset.mem_singleton_self k) e))
+          : Bp K n d →ₐ[K] R0 K n d {k})
+        = Φ.toAlgHom := by
     apply MvPolynomial.algHom_ext
     intro e
     rw [MvPolynomial.aeval_X]
-    change _ = AddMonoidAlgebra.domCongr K K (coneEquiv k) (AddMonoidAlgebra.single (Finsupp.single e 1) 1)
+    change _
+      = AddMonoidAlgebra.domCongr K K (coneEquiv k) (AddMonoidAlgebra.single (Finsupp.single e 1) 1)
     simp only [mon, coneEquiv]
     simp
     exact congrArg (fun m => AddMonoidAlgebra.single m (1 : K)) (toCone_single k e).symm

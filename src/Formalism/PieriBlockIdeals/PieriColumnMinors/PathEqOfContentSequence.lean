@@ -9,22 +9,26 @@ namespace Formalism.CohomologicalDescent.LC
 
 open Formalism.CohomologicalDescent.Symmetrization Formalism.CohomologicalDescent.BinaryFormsExample
 
-theorem lca_content_lt {q : ℕ} (κ : Fin q → ℕ) (h : Antitone κ) {a b : Fin q} (hab : a < b) :
-    (κ b : ℤ) - (b.val : ℤ) < (κ a : ℤ) - (a.val : ℤ) := by
+theorem lca_content_lt {q : ℕ} (κ : Fin q → ℕ) (h : Antitone κ) {a b : Fin q} (hab : a < b)
+    : (κ b : ℤ) - (b.val : ℤ) < (κ a : ℤ) - (a.val : ℤ) := by
   have h1 : κ b ≤ κ a := h hab.le
   have h2 : a.val < b.val := hab
   omega
 
-theorem lca_content_inj {q : ℕ} (κ : Fin q → ℕ) (h : Antitone κ) {a b : Fin q}
-    (e : (κ a : ℤ) - (a.val : ℤ) = (κ b : ℤ) - (b.val : ℤ)) : a = b := by
+theorem lca_content_inj
+    {q : ℕ} (κ : Fin q → ℕ) (h : Antitone κ)
+    {a b : Fin q} (e : (κ a : ℤ) - (a.val : ℤ) = (κ b : ℤ) - (b.val : ℤ))
+    : a = b := by
   rcases lt_trichotomy a b with hab | hab | hab
   · have := lca_content_lt κ h hab; omega
   · exact hab
   · have := lca_content_lt κ h hab; omega
 
-theorem path_eq_of_content_sequence {q n : ℕ} {lam2 tau tau' : Fin q → ℕ} {κ κ' : ℕ → Fin q → ℕ} {ρ ρ' : Fin n → Fin q}
-    (H : IsPath n lam2 tau κ ρ) (H' : IsPath n lam2 tau' κ' ρ') (m : ℕ) (hm : m ≤ n)
-    (hc : ∀ j : Fin n, j.val < m → cseq κ ρ j = cseq κ' ρ' j) : ∀ l ≤ m, κ l = κ' l := by
+theorem path_eq_of_content_sequence
+    {q n : ℕ} {lam2 tau tau' : Fin q → ℕ} {κ κ' : ℕ → Fin q → ℕ} {ρ ρ' : Fin n → Fin q}
+    (H : IsPath n lam2 tau κ ρ) (H' : IsPath n lam2 tau' κ' ρ')
+    (m : ℕ) (hm : m ≤ n) (hc : ∀ j : Fin n, j.val < m → cseq κ ρ j = cseq κ' ρ' j)
+    : ∀ l ≤ m, κ l = κ' l := by
   intro l
   induction l with
   | zero => intro _; rw [H.start, H'.start]
@@ -40,16 +44,19 @@ theorem path_eq_of_content_sequence {q n : ℕ} {lam2 tau tau' : Fin q → ℕ} 
     have h4 : ρ ⟨l, hln⟩ = ρ' ⟨l, hln⟩ := lca_content_inj (κ l) (H.dom l (by omega)) h1
     rw [h2, h3, h4]
 
-theorem lca_single_ne {q : ℕ} {r a : Fin q} (h : a ≠ r) (A : Fin q → ℕ) :
-    (A + Pi.single r 1 : Fin q → ℕ) a = A a := by
+theorem lca_single_ne {q : ℕ} {r a : Fin q} (h : a ≠ r) (A : Fin q → ℕ)
+    : (A + Pi.single r 1 : Fin q → ℕ) a = A a := by
   simp [Pi.single_apply, h]
 
-theorem lca_single_eq {q : ℕ} (r : Fin q) (A : Fin q → ℕ) :
-    (A + Pi.single r 1 : Fin q → ℕ) r = A r + 1 := by simp
+theorem lca_single_eq {q : ℕ} (r : Fin q) (A : Fin q → ℕ)
+    : (A + Pi.single r 1 : Fin q → ℕ) r = A r + 1 := by
+  simp
 
-theorem lca_rows_lt {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → ℕ} {ρ : Fin n → Fin q}
-    (H : IsPath n lam2 tau κ ρ) (j j' : Fin n) (hv : j'.val = j.val + 1) (hle : colSeq κ ρ j' ≤ colSeq κ ρ j) :
-    ρ j < ρ j' ∧ colSeq κ ρ j' = κ j.val (ρ j') := by
+theorem lca_rows_lt
+    {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → ℕ} {ρ : Fin n → Fin q}
+    (H : IsPath n lam2 tau κ ρ) (j j' : Fin n) (hv : j'.val = j.val + 1)
+    (hle : colSeq κ ρ j' ≤ colSeq κ ρ j)
+    : ρ j < ρ j' ∧ colSeq κ ρ j' = κ j.val (ρ j') := by
   have hjn := j'.isLt
   have s1 := H.step j
   have d1 := H.dom (j.val + 1) (by omega)
@@ -63,14 +70,18 @@ theorem lca_rows_lt {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q �
     rw [lca_single_eq] at h3
     omega
   refine ⟨hlt, ?_⟩
-  unfold colSeq; rw [hv, s1, lca_single_ne hlt.ne']
+  unfold colSeq
+  rw [hv, s1, lca_single_ne hlt.ne']
 
-theorem lca_swap {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → ℕ} {ρ : Fin n → Fin q}
-    (H : IsPath n lam2 tau κ ρ) (j j' : Fin n) (hv : j'.val = j.val + 1) (hlt : colSeq κ ρ j' < colSeq κ ρ j) :
-    2 ≤ cseq κ ρ j - cseq κ ρ j' ∧
-      ∃ κ' : ℕ → Fin q → ℕ, IsPath n lam2 tau κ' (ρ ∘ Equiv.swap j j') ∧
-        cseq κ' (ρ ∘ Equiv.swap j j') = cseq κ ρ ∘ Equiv.swap j j' ∧
-        colSeq κ' (ρ ∘ Equiv.swap j j') = colSeq κ ρ ∘ Equiv.swap j j' := by
+theorem lca_swap
+    {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → ℕ} {ρ : Fin n → Fin q}
+    (H : IsPath n lam2 tau κ ρ) (j j' : Fin n) (hv : j'.val = j.val + 1)
+    (hlt : colSeq κ ρ j' < colSeq κ ρ j)
+    : 2 ≤ cseq κ ρ j - cseq κ ρ j'
+      ∧ ∃ κ' : ℕ → Fin q → ℕ,
+        IsPath n lam2 tau κ' (ρ ∘ Equiv.swap j j')
+          ∧ cseq κ' (ρ ∘ Equiv.swap j j') = cseq κ ρ ∘ Equiv.swap j j'
+          ∧ colSeq κ' (ρ ∘ Equiv.swap j j') = colSeq κ ρ ∘ Equiv.swap j j' := by
   obtain ⟨hr, hc⟩ := lca_rows_lt H j j' hv hlt.le
   have hjn := j'.isLt
   have s1 := H.step j
@@ -83,8 +94,10 @@ theorem lca_swap {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → 
     have := hc; unfold colSeq at this; unfold cseq; rw [this]
   have hr' : (ρ j).val < (ρ j').val := hr
   refine ⟨by rw [hc']; unfold cseq; omega, ?_⟩
-  obtain ⟨κ', hκ'⟩ : ∃ κ' : ℕ → Fin q → ℕ,
-      ∀ l, κ' l = if l = j.val + 1 then κ j.val + Pi.single (ρ j') 1 else κ l := ⟨_, fun _ => rfl⟩
+  obtain ⟨κ', hκ'⟩
+      : ∃ κ' : ℕ → Fin q → ℕ, ∀ l,
+        κ' l = if l = j.val + 1 then κ j.val + Pi.single (ρ j') 1 else κ l :=
+    ⟨_, fun _ => rfl⟩
   have k1 : κ' (j.val + 1) = κ j.val + Pi.single (ρ j') 1 := by rw [hκ', if_pos rfl]
   have k2 : ∀ l, l ≠ j.val + 1 → κ' l = κ l := fun l h => by rw [hκ', if_neg h]
   have anti : Antitone (κ j.val + Pi.single (ρ j') 1) := by
@@ -102,7 +115,9 @@ theorem lca_swap {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → 
           rw [lca_single_eq, lca_single_ne hr.ne', lca_single_ne ha, lca_single_ne har.ne'] at h5
           exact h5
     · rw [lca_single_ne hb]
-      calc κ j.val b ≤ κ j.val a := d0 hab
+      calc
+        κ j.val b
+          ≤ κ j.val a := d0 hab
         _ ≤ (κ j.val + Pi.single (ρ j') 1 : Fin q → ℕ) a := by simp [Pi.add_apply]
   have hcol : colSeq κ' (ρ ∘ Equiv.swap j j') = colSeq κ ρ ∘ Equiv.swap j j' := by
     funext l
@@ -148,9 +163,11 @@ theorem swap_path_exists : SwapPath := by
   intro q n lam2 tau κ ρ H j hj hlt
   exact lca_swap H j ⟨j.val + 1, hj⟩ rfl hlt
 
-theorem lca_same {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → ℕ} {ρ : Fin n → Fin q}
-    (H : IsPath n lam2 tau κ ρ) (j j' : Fin n) (hv : j'.val = j.val + 1) (heq : colSeq κ ρ j' = colSeq κ ρ j) :
-    cseq κ ρ j' = cseq κ ρ j - 1 ∧ ¬ IsContentSeq lam2 (cseq κ ρ ∘ Equiv.swap j j') := by
+theorem lca_same
+    {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → ℕ} {ρ : Fin n → Fin q}
+    (H : IsPath n lam2 tau κ ρ) (j j' : Fin n) (hv : j'.val = j.val + 1)
+    (heq : colSeq κ ρ j' = colSeq κ ρ j)
+    : cseq κ ρ j' = cseq κ ρ j - 1 ∧ ¬ IsContentSeq lam2 (cseq κ ρ ∘ Equiv.swap j j') := by
   obtain ⟨hr, hc⟩ := lca_rows_lt H j j' hv heq.le
   have hjn := j'.isLt
   have s1 := H.step j
@@ -174,7 +191,9 @@ theorem lca_same {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → 
       rw [lca_single_eq, lca_single_ne hr.ne', lca_single_ne ha2.ne, lca_single_ne ha1.ne'] at h5
       have h6 := d0 ha1.le
       omega
-    rw [hc']; unfold cseq; omega
+    rw [hc']
+    unfold cseq
+    omega
   · rintro ⟨tau', κ', ρ', H', hcs⟩
     have hpre : ∀ i : Fin n, i.val < j.val → cseq κ ρ i = cseq κ' ρ' i := by
       intro i hi
@@ -184,7 +203,8 @@ theorem lca_same {q n : ℕ} {lam2 tau : Fin q → ℕ} {κ : ℕ → Fin q → 
       simp only [Function.comp] at h
       rw [Equiv.swap_apply_of_ne_of_ne h1 h2] at h
       exact h.symm
-    have e : κ j.val = κ' j.val := path_eq_of_content_sequence H H' j.val (by omega) hpre j.val le_rfl
+    have e : κ j.val = κ' j.val :=
+      path_eq_of_content_sequence H H' j.val (by omega) hpre j.val le_rfl
     have h1 := congrFun hcs j
     simp only [Function.comp, Equiv.swap_apply_left] at h1
     rw [hc'] at h1

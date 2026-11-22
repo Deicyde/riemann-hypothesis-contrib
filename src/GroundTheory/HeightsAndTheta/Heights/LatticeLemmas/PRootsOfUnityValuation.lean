@@ -17,13 +17,11 @@ namespace RootsOfUnityValuation
 
 variable {A : Type*} [CommRing A] [IsDomain A]
 
-
 omit [IsDomain A] in
-theorem associated_sub_comm (a b : A) : Associated (a - b) (b - a) :=
-  ⟨-1, by simp⟩
+theorem associated_sub_comm (a b : A) : Associated (a - b) (b - a) := ⟨-1, by simp⟩
 
-theorem one_sub_pow_associated {l : ℕ} (hl : l.Prime) {ζ : A} (hζ : IsPrimitiveRoot ζ l) :
-    Associated ((1 - ζ) ^ (l - 1)) (l : A) := by
+theorem one_sub_pow_associated {l : ℕ} (hl : l.Prime) {ζ : A} (hζ : IsPrimitiveRoot ζ l)
+    : Associated ((1 - ζ) ^ (l - 1)) (l : A) := by
   obtain ⟨n, rfl⟩ : ∃ n, l = n + 1 := ⟨l - 1, (Nat.sub_add_cancel hl.one_lt.le).symm⟩
   have h := hζ.prod_one_sub_pow_eq_order
   have h1 : (1 - ζ) ^ n = ∏ _k ∈ range n, (1 - ζ) := by simp

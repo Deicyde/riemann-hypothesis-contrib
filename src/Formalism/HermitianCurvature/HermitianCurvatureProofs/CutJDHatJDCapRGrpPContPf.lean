@@ -24,18 +24,24 @@ def K (lo : ℕ) : ℕ → R
   | n + 2 => a (lo + n + 1) * K lo (n + 1) - c (lo + n + 1) * d (lo + n) * K lo n
 
 def Sep : Prop :=
-  ∀ i j, i ≠ j → Commute (a i) (a j) ∧ Commute (a i) (c j) ∧ Commute (a i) (d j) ∧ Commute (c i) (c j) ∧
-    Commute (c i) (d j) ∧ Commute (d i) (d j)
+  ∀ i j,
+    i ≠ j
+      → Commute (a i) (a j) ∧ Commute (a i) (c j) ∧ Commute (a i) (d j) ∧ Commute (c i) (c j)
+        ∧ Commute (c i) (d j) ∧ Commute (d i) (d j)
 
 variable {a c d}
 
-theorem cp_K_both (h : Sep a c d) : ∀ n lo, K a c d lo (n + 2) =
-    a lo * K a c d (lo + 1) (n + 1) - c (lo + 1) * d lo * K a c d (lo + 2) n
+theorem cp_K_both (h : Sep a c d)
+    : ∀ n lo,
+      K a c d lo (n + 2) = a lo * K a c d (lo + 1) (n + 1) - c (lo + 1) * d lo * K a c d (lo + 2) n
   | 0, lo => by
     simp only [K, mul_one, Nat.add_zero]
     rw [(h lo (lo + 1) (by omega)).1.eq]
   | 1, lo => by
-    have e1 : K a c d lo 3 = a (lo + 2) * (a (lo + 1) * a lo - c (lo + 1) * d lo) - c (lo + 2) * d (lo + 1) * a lo := by
+    have e1
+        : K a c d lo 3
+          = a (lo + 2) * (a (lo + 1) * a lo - c (lo + 1) * d lo)
+            - c (lo + 2) * d (lo + 1) * a lo := by
       show a (lo + 1 + 1) * K a c d lo 2 - c (lo + 1 + 1) * d (lo + 1) * K a c d lo 1 = _
       simp only [K, mul_one, Nat.add_zero]
     have e2 : K a c d (lo + 1) 2 = a (lo + 2) * a (lo + 1) - c (lo + 2) * d (lo + 1) := by
@@ -60,17 +66,24 @@ theorem cp_K_both (h : Sep a c d) : ∀ n lo, K a c d lo (n + 2) =
   | n + 2, lo => by
     have ih1 := cp_K_both h (n + 1) lo
     have ih0 := cp_K_both h n lo
-    have eL : K a c d lo (n + 2 + 2) = a (lo + n + 3) * K a c d lo (n + 3) -
-        c (lo + n + 3) * d (lo + n + 2) * K a c d lo (n + 2) := by
+    have eL
+        : K a c d lo (n + 2 + 2)
+          = a (lo + n + 3) * K a c d lo (n + 3)
+            - c (lo + n + 3) * d (lo + n + 2) * K a c d lo (n + 2) := by
       show a (lo + (n + 2) + 1) * K a c d lo (n + 2 + 1) - c (lo + (n + 2) + 1) * d (lo + (n + 2)) * K a c d lo (n + 2) = _
       rw [show lo + (n + 2) + 1 = lo + n + 3 by omega, show lo + (n + 2) = lo + n + 2 by omega]
-    have eA : K a c d (lo + 1) (n + 2 + 1) = a (lo + n + 3) * K a c d (lo + 1) (n + 2) -
-        c (lo + n + 3) * d (lo + n + 2) * K a c d (lo + 1) (n + 1) := by
+    have eA
+        : K a c d (lo + 1) (n + 2 + 1)
+          = a (lo + n + 3) * K a c d (lo + 1) (n + 2)
+            - c (lo + n + 3) * d (lo + n + 2) * K a c d (lo + 1) (n + 1) := by
       show a (lo + 1 + (n + 1) + 1) * K a c d (lo + 1) (n + 1 + 1) -
         c (lo + 1 + (n + 1) + 1) * d (lo + 1 + (n + 1)) * K a c d (lo + 1) (n + 1) = _
-      rw [show lo + 1 + (n + 1) + 1 = lo + n + 3 by omega, show lo + 1 + (n + 1) = lo + n + 2 by omega]
-    have eB : K a c d (lo + 2) (n + 2) = a (lo + n + 3) * K a c d (lo + 2) (n + 1) -
-        c (lo + n + 3) * d (lo + n + 2) * K a c d (lo + 2) n := by
+      rw [show lo + 1 + (n + 1) + 1 = lo + n + 3 by omega,
+        show lo + 1 + (n + 1) = lo + n + 2 by omega]
+    have eB
+        : K a c d (lo + 2) (n + 2)
+          = a (lo + n + 3) * K a c d (lo + 2) (n + 1)
+            - c (lo + n + 3) * d (lo + n + 2) * K a c d (lo + 2) n := by
       show a (lo + 2 + n + 1) * K a c d (lo + 2) (n + 1) - c (lo + 2 + n + 1) * d (lo + 2 + n) * K a c d (lo + 2) n = _
       rw [show lo + 2 + n + 1 = lo + n + 3 by omega, show lo + 2 + n = lo + n + 2 by omega]
     rw [show n + 2 + 1 = n + 3 by omega] at eA
@@ -115,7 +128,11 @@ def bu : ℕ → R × R
 def td (r : ℕ) : ℕ → Fin 2 → R
   | 0, b => if b = 0 then 1 else 0
   | 1, b => if 1 ≤ r then (if b = 0 then a (r - 1) else d (r - 1)) else 0
-  | m + 2, b => if m + 2 ≤ r then a (r - (m + 2)) * td r (m + 1) b - c (r - (m + 1)) * d (r - (m + 2)) * td r m b else 0
+  | m + 2, b =>
+    if m + 2 ≤ r then
+      a (r - (m + 2)) * td r (m + 1) b - c (r - (m + 1)) * d (r - (m + 2)) * td r m b
+    else
+      0
 
 variable {a c d}
 
@@ -134,8 +151,11 @@ theorem cp_bu : ∀ i, (bu a c d i).1 = K a c d 0 i ∧ (bu a c d (i + 1)).2 = d
     show d (i + 2) * (bu a c d (i + 2)).1 = _
     rw [e]
 
-theorem cp_td (h : Sep a c d) (r : ℕ) : ∀ m, m ≤ r →
-    td a c d r m 0 = K a c d (r - m) m ∧ td a c d r (m + 1) 1 = (if m + 1 ≤ r then d (r - 1) * K a c d (r - (m + 1)) m else 0)
+theorem cp_td (h : Sep a c d) (r : ℕ)
+    : ∀ m,
+      m ≤ r
+        → td a c d r m 0 = K a c d (r - m) m
+          ∧ td a c d r (m + 1) 1 = (if m + 1 ≤ r then d (r - 1) * K a c d (r - (m + 1)) m else 0)
   | 0, _ => by
     refine ⟨by simp [td, K], ?_⟩
     simp only [td, zero_add]
@@ -143,12 +163,13 @@ theorem cp_td (h : Sep a c d) (r : ℕ) : ∀ m, m ≤ r →
   | 1, hm => by
     refine ⟨by simp [td, K, hm], ?_⟩
     by_cases h2 : 2 ≤ r
-    · simp only [td, show 0 + 2 ≤ r from h2, if_true, h2, show (1 : ℕ) ≤ r by omega, one_ne_zero, if_false]
+    · simp only [td, show 0 + 2 ≤ r from h2, if_true, h2, show (1 : ℕ) ≤ r by omega, one_ne_zero,
+        if_false]
       simp only [show ¬ (1 : Fin 2) = 0 from by decide, if_false, mul_zero, sub_zero]
       have hc := (h (r - (0 + 2)) (r - 1) (by omega)).2.2.1
       rw [hc.eq]
       simp [K]
-    · simp only [td, show ¬ (0 + 2 ≤ r) by omega, if_false, show ¬ (1 + 1 ≤ r) by omega]
+    · simp only [td, show ¬(0 + 2 ≤ r) by omega, if_false, show ¬(1 + 1 ≤ r) by omega]
   | m + 2, hm => by
     have ih1 := cp_td h r (m + 1) (by omega)
     have ih0 := cp_td h r m (by omega)
@@ -161,11 +182,14 @@ theorem cp_td (h : Sep a c d) (r : ℕ) : ∀ m, m ≤ r →
     · show (if m + 1 + 2 ≤ r then a (r - (m + 1 + 2)) * td a c d r (m + 1 + 1) 1 -
           c (r - (m + 1 + 1)) * d (r - (m + 1 + 2)) * td a c d r (m + 1) 1 else 0) = _
       by_cases h3 : m + 3 ≤ r
-      · rw [if_pos (by omega), if_pos (by omega), ih1.2, if_pos (by omega), ih0.2, if_pos (by omega)]
+      · rw [if_pos (by omega), if_pos (by omega), ih1.2, if_pos (by omega), ih0.2,
+          if_pos (by omega)]
         have hb2 := cp_K_both h m (r - (m + 3))
-        rw [show r - (m + 3) + 1 = r - (m + 2) by omega, show r - (m + 3) + 2 = r - (m + 1) by omega] at hb2
-        rw [show m + 1 + 2 = m + 3 by omega, show m + 1 + 1 = m + 2 by omega, show r - (m + 2 + 1) = r - (m + 3) by omega,
-          show m + 2 + 1 = m + 3 by omega]
+        rw [show r - (m + 3) + 1 = r - (m + 2) by omega,
+            show r - (m + 3) + 2 = r - (m + 1) by omega]
+          at hb2
+        rw [show m + 1 + 2 = m + 3 by omega, show m + 1 + 1 = m + 2 by omega,
+          show r - (m + 2 + 1) = r - (m + 3) by omega, show m + 2 + 1 = m + 3 by omega]
         rw [hb2, mul_sub]
         have ca := (h (r - (m + 3)) (r - 1) (by omega)).2.2.1
         have cc := (h (r - (m + 2)) (r - 1) (by omega)).2.2.2.2.1
@@ -177,8 +201,8 @@ theorem cp_td (h : Sep a c d) (r : ℕ) : ∀ m, m ≤ r →
 
 end chains
 
-theorem cp_td_bu {R : Type*} [Ring R] {a c d : ℕ → R} (h : Sep a c d) (r : ℕ) :
-    td a c d r r 0 = (bu a c d r).1 ∧ td a c d r r 1 = (bu a c d r).2 := by
+theorem cp_td_bu {R : Type*} [Ring R] {a c d : ℕ → R} (h : Sep a c d) (r : ℕ)
+    : td a c d r r 0 = (bu a c d r).1 ∧ td a c d r r 1 = (bu a c d r).2 := by
   refine ⟨?_, ?_⟩
   · rw [(cp_td h r r le_rfl).1, (cp_bu r).1, Nat.sub_self]
   · rcases r with _ | s
@@ -195,10 +219,10 @@ def opE (l : Fin r) (i : Fin 6) : Module.End ℂ (WSm r X) where
   map_add' f g := Subtype.ext (Formalism.FourierDecayAlt.P.PBN.MC.opL_add l i f.2 g.2)
   map_smul' s f := Subtype.ext (Formalism.FourierDecayAlt.P.PBN.MC.opL_smul l i f.2 s)
 
-theorem opE_comm (l k : Fin r) (hlk : l ≠ k) (p q : Fin 6) : Commute (opE (X := X) l p) (opE k q) := by
+theorem opE_comm (l k : Fin r) (hlk : l ≠ k) (p q : Fin 6)
+    : Commute (opE (X := X) l p) (opE k q) := by
   refine LinearMap.ext fun f => Subtype.ext ?_
   exact Formalism.QuantumDeterminants.commuting_functional_holds r X l k p q f f.2 (Or.inl hlk)
-
 
 variable (X) in
 def eS (i : ℕ) (p : Fin 6) : Module.End ℂ (WSm r X) := if h : i < r then opE ⟨i, h⟩ p else 0
@@ -218,14 +242,25 @@ theorem cp_sep (Y : ℂ) : Sep (aS (r := r) X Y) (eS X · 1) (eS X · 2) := by
   intro i j hij
   have hA : ∀ z : Module.End ℂ (WSm r X), Commute (eS X i 0) z → Commute (aS X Y i) z := fun z hz =>
     (Algebra.commute_algebraMap_left Y z).add_left hz
-  have hA' : ∀ z : Module.End ℂ (WSm r X), Commute (eS X j 0) z → Commute z (aS X Y j) := fun z hz =>
-    ((Algebra.commute_algebraMap_left Y z).add_left hz).symm
-  refine ⟨hA _ (hA' _ (eS_comm i j hij 0 0).symm), hA _ (eS_comm i j hij 0 1), hA _ (eS_comm i j hij 0 2),
-    eS_comm i j hij 1 1, eS_comm i j hij 1 2, eS_comm i j hij 2 2⟩
+  have hA' : ∀ z : Module.End ℂ (WSm r X), Commute (eS X j 0) z → Commute z (aS X Y j) :=
+    fun z hz => ((Algebra.commute_algebraMap_left Y z).add_left hz).symm
+  refine ⟨
+    hA _ (hA' _ (eS_comm i j hij 0 0).symm),
+    hA _ (eS_comm i j hij 0 1),
+    hA _ (eS_comm i j hij 0 2),
+    eS_comm i j hij 1 1,
+    eS_comm i j hij 1 2,
+    eS_comm i j hij 2 2
+  ⟩
 
-theorem cp_vAB (Y : ℂ) : ∀ i, i ≤ r → ∀ f : WSm r X,
-    (Q.vAB r Y i).1 (f : (Fin r → ℂ) → X) = (((bu (aS X Y) (eS X · 1) (eS X · 2) i).1 f : WSm r X) : (Fin r → ℂ) → X) ∧
-      (Q.vAB r Y i).2 (f : (Fin r → ℂ) → X) = (((bu (aS X Y) (eS X · 1) (eS X · 2) i).2 f : WSm r X) : (Fin r → ℂ) → X)
+theorem cp_vAB (Y : ℂ)
+    : ∀ i,
+      i ≤ r
+        → ∀ f : WSm r X,
+          (Q.vAB r Y i).1 (f : (Fin r → ℂ) → X)
+              = (((bu (aS X Y) (eS X · 1) (eS X · 2) i).1 f : WSm r X) : (Fin r → ℂ) → X)
+            ∧ (Q.vAB r Y i).2 (f : (Fin r → ℂ) → X)
+              = (((bu (aS X Y) (eS X · 1) (eS X · 2) i).2 f : WSm r X) : (Fin r → ℂ) → X)
   | 0, _, f => ⟨rfl, rfl⟩
   | i + 1, hi, f => by
     have ih := cp_vAB Y i (by omega) f
@@ -237,17 +272,19 @@ theorem cp_vAB (Y : ℂ) : ∀ i, i ≤ r → ∀ f : WSm r X,
     · rw [ih.1]
       rfl
 
-theorem cp_tdU (Y : ℂ) (b : Fin 2) : ∀ m, ∀ f : WSm r X,
-    tdU r Y m b (f : (Fin r → ℂ) → X) = ((td (aS X Y) (eS X · 1) (eS X · 2) r m b f : WSm r X) : (Fin r → ℂ) → X)
-  | 0, f => by
-    fin_cases b <;> simp [tdU, td]
+theorem cp_tdU (Y : ℂ) (b : Fin 2)
+    : ∀ m, ∀ f : WSm r X,
+      tdU r Y m b (f : (Fin r → ℂ) → X)
+        = ((td (aS X Y) (eS X · 1) (eS X · 2) r m b f : WSm r X) : (Fin r → ℂ) → X)
+  | 0, f => by fin_cases b <;> simp [tdU, td]
   | 1, f => by
     by_cases h1 : 1 ≤ r
     · have hr : r - 1 < r := by omega
       fin_cases b
       · simp only [tdU, td, dif_pos h1, if_pos h1, Fin.zero_eta, if_true, aS, eS, dif_pos hr]
         rfl
-      · simp only [tdU, td, dif_pos h1, if_pos h1, Fin.mk_one, one_ne_zero, if_false, eS, dif_pos hr]
+      · simp only [tdU, td, dif_pos h1, if_pos h1, Fin.mk_one, one_ne_zero, if_false, eS,
+          dif_pos hr]
         rfl
     · simp only [tdU, td, dif_neg h1, if_neg h1]
       rfl
@@ -292,22 +329,24 @@ theorem loc_ciOp (l : Fin r) : Loc (X := X) (ciOp l) := by
   filter_upwards [h] with y hy
   simp only [ciOp, hy]
 
-theorem loc_comp {S T : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) (hT : Loc T) :
-    Loc (fun f => S (T f)) := fun _ _ x h => hS _ _ x (hT _ _ x h)
+theorem loc_comp {S T : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) (hT : Loc T)
+    : Loc (fun f => S (T f)) := fun _ _ x h =>
+  hS _ _ x (hT _ _ x h)
 
-theorem loc_add {S T : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) (hT : Loc T) :
-    Loc (fun f => S f + T f) := by
+theorem loc_add {S T : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) (hT : Loc T)
+    : Loc (fun f => S f + T f) := by
   intro f₁ f₂ x h
   filter_upwards [hS _ _ x h, hT _ _ x h] with y h1 h2
   simp only [Pi.add_apply, h1, h2]
 
-theorem loc_sub {S T : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) (hT : Loc T) :
-    Loc (fun f => S f - T f) := by
+theorem loc_sub {S T : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) (hT : Loc T)
+    : Loc (fun f => S f - T f) := by
   intro f₁ f₂ x h
   filter_upwards [hS _ _ x h, hT _ _ x h] with y h1 h2
   simp only [Pi.sub_apply, h1, h2]
 
-theorem loc_smul (Y : ℂ) {S : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S) : Loc (fun f => Y • S f) := by
+theorem loc_smul (Y : ℂ) {S : ((Fin r → ℂ) → X) → (Fin r → ℂ) → X} (hS : Loc S)
+    : Loc (fun f => Y • S f) := by
   intro f₁ f₂ x h
   filter_upwards [hS _ _ x h] with y h1
   simp only [Pi.smul_apply, h1]
@@ -329,7 +368,8 @@ theorem loc_tdU (Y : ℂ) (b : Fin 2) : ∀ m, Loc (tdU (X := X) r Y m b)
     have ih0 := loc_tdU Y b m
     unfold tdU
     split_ifs
-    · exact loc_sub (loc_add (loc_smul Y ih1) (loc_comp (loc_pOp _) ih1)) (loc_comp (loc_cOp _) (loc_comp (loc_ciOp _) ih0))
+    · exact loc_sub (loc_add (loc_smul Y ih1) (loc_comp (loc_pOp _) ih1))
+        (loc_comp (loc_cOp _) (loc_comp (loc_ciOp _) ih0))
     · exact loc_zero
 
 theorem loc_vAB (Y : ℂ) : ∀ i, Loc (X := X) (Q.vAB r Y i).1 ∧ Loc (X := X) (Q.vAB r Y i).2
@@ -338,14 +378,18 @@ theorem loc_vAB (Y : ℂ) : ∀ i, Loc (X := X) (Q.vAB r Y i).1 ∧ Loc (X := X)
     have ih := loc_vAB Y i
     by_cases hi : i < r
     · simp only [Q.vAB, dif_pos hi]
-      exact ⟨loc_sub (loc_add (loc_smul Y ih.1) (loc_comp (loc_pOp _) ih.1)) (loc_comp (loc_cOp _) ih.2),
-        loc_comp (loc_ciOp _) ih.1⟩
+      exact ⟨
+        loc_sub (loc_add (loc_smul Y ih.1) (loc_comp (loc_pOp _) ih.1)) (loc_comp (loc_cOp _) ih.2),
+        loc_comp (loc_ciOp _) ih.1
+      ⟩
     · simp only [Q.vAB, dif_neg hi]
       exact ih
 
-theorem cp_cutoff (O : Set (Fin r → ℂ)) (hO : IsOpen O) (hOm : O ⊆ OmX r) (f : (Fin r → ℂ) → X)
-    (hf : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f O) (c : Fin r → ℂ) (hc : c ∈ O) :
-    ∃ f' ∈ WSm r X, f' =ᶠ[nhds c] f := by
+theorem cp_cutoff
+    (O : Set (Fin r → ℂ)) (hO : IsOpen O) (hOm : O ⊆ OmX r)
+    (f : (Fin r → ℂ) → X) (hf : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f O)
+    (c : Fin r → ℂ) (hc : c ∈ O)
+    : ∃ f' ∈ WSm r X, f' =ᶠ[nhds c] f := by
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.1 hO c hc
   let φ : ContDiffBump c := ⟨ε / 4, ε / 2, by positivity, by linarith⟩
   have hts : tsupport φ ⊆ O := by
@@ -362,8 +406,8 @@ theorem cp_cutoff (O : Set (Fin r → ℂ)) (hO : IsOpen O) (hOm : O ⊆ OmX r) 
     · have hn : x ∉ tsupport φ := fun h => hx (hts h)
       have hz : (φ : (Fin r → ℂ) → ℝ) =ᶠ[nhds x] 0 := by
         first
-          | exact not_mem_tsupport_iff_eventuallyEq.1 hn
-          | exact notMem_tsupport_iff_eventuallyEq.1 hn
+        | exact not_mem_tsupport_iff_eventuallyEq.1 hn
+        | exact notMem_tsupport_iff_eventuallyEq.1 hn
       apply (contDiffAt_const (c := (0 : X))).congr_of_eventuallyEq
       filter_upwards [hz] with y hy
       simp [hy]
@@ -371,8 +415,8 @@ theorem cp_cutoff (O : Set (Fin r → ℂ)) (hO : IsOpen O) (hOm : O ⊆ OmX r) 
     have hxO : x ∉ O := fun h => hx (hOm h)
     have h0 : φ x = 0 := by
       first
-        | exact image_eq_zero_of_nmem_tsupport (fun h => hxO (hts h))
-        | exact image_eq_zero_of_notMem_tsupport (fun h => hxO (hts h))
+      | exact image_eq_zero_of_nmem_tsupport (fun h => hxO (hts h))
+      | exact image_eq_zero_of_notMem_tsupport (fun h => hxO (hts h))
     simp [h0]
   · filter_upwards [Metric.ball_mem_nhds c φ.rIn_pos] with y hy
     rw [φ.one_of_mem_closedBall (Metric.ball_subset_closedBall hy)]
@@ -396,14 +440,14 @@ theorem residue_continuity_holds : JDRCont := by
   · have e2 : (Q.vAB r Y r).1 f c = (Q.vAB r Y r).1 f' c := (ev.1 f f' c hf'e.symm).eq_of_nhds
     simp only [Q.cmp, if_true]
     rw [e1, e2]
-    change tdU r Y r 0 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c =
-      (Q.vAB r Y r).1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+    change tdU r Y r 0 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+      = (Q.vAB r Y r).1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
     rw [h3, h4.1, h5.1]
   · have e2 : (Q.vAB r Y r).2 f c = (Q.vAB r Y r).2 f' c := (ev.2 f f' c hf'e.symm).eq_of_nhds
-    simp only [Q.cmp, show ¬ ((1 : Fin 2) = 0) by decide, if_false]
+    simp only [Q.cmp, show ¬((1 : Fin 2) = 0) by decide, if_false]
     rw [e1, e2]
-    change tdU r Y r 1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c =
-      (Q.vAB r Y r).2 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+    change tdU r Y r 1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+      = (Q.vAB r Y r).2 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
     rw [h3, h4.2, h5.2]
 
 end

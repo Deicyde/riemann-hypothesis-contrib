@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.FourierDecayAlt Finset
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.FourierDecayAlt
+  Finset
 open scoped nonZeroDivisors NumberField
 
 def SzfNormDD (D : D7) : Prop :=

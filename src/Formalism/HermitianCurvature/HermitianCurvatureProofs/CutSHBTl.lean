@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutSH2
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5
 
 theorem boundary_torus_adjoin : CutSH.BTlAdjoin := by
   intro Wp Wq _ _ _ _ _ _ k r z z' π π' X L hX S _ _ l w a b
@@ -17,7 +18,8 @@ theorem boundary_torus_adjoin : CutSH.BTlAdjoin := by
     ⟨Subalgebra.mul_mem _ hx.1 hy.1, Subalgebra.mul_mem _ hy.2 hx.2⟩
   have gadd : ∀ x y, good x → good y → good (x + y) := fun x y hx hy =>
     ⟨Subalgebra.add_mem _ hx.1 hy.1, Subalgebra.add_mem _ hx.2 hy.2⟩
-  have gneg : ∀ x, good x → good (-x) := fun x hx => ⟨Subalgebra.neg_mem _ hx.1, Subalgebra.neg_mem _ hx.2⟩
+  have gneg : ∀ x, good x → good (-x) := fun x hx =>
+    ⟨Subalgebra.neg_mem _ hx.1, Subalgebra.neg_mem _ hx.2⟩
   have gzero : good 0 := ⟨Subalgebra.zero_mem _, Subalgebra.zero_mem _⟩
   have gone : good 1 := ⟨Subalgebra.one_mem _, Subalgebra.one_mem _⟩
   have gstar : ∀ x, good x → good (star x) := fun x hx => ⟨hx.2, hx.1⟩
@@ -34,26 +36,33 @@ theorem boundary_torus_adjoin : CutSH.BTlAdjoin := by
     exact ⟨hop 2, hop 5⟩
   have hTs : ∀ (Y : ℂ) (i j : Fin 2), good ((Wd.Ts (site L l) Y) i j) := by
     intro Y i j
-    fin_cases i <;> fin_cases j <;>
-      simp only [Wd.Ts, site, Formalism.YangianSpanCharacter.T.Tm, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-        Matrix.cons_val_one, Matrix.head_cons, Matrix.empty_val', Matrix.cons_val_fin_one, Matrix.head_fin_const,
-        Fin.zero_eta, Fin.mk_one]
+    fin_cases i <;> fin_cases j
+      <;> simp only [Wd.Ts, site, Formalism.YangianSpanCharacter.T.Tm, Matrix.of_apply,
+        Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.empty_val', Matrix.cons_val_fin_one, Matrix.head_fin_const, Fin.zero_eta, Fin.mk_one]
     · exact gadd _ _ (galg Y) gp
     · exact gneg _ gc
     · exact gci
     · exact gzero
-  have hmulA : ∀ M N : Wd.SlopeTestRemainingChoices S (Pr (RadSp k r z z' π π')), (∀ a b, good (M a b)) → (∀ a b, good (N a b)) →
-      ∀ a b, good ((M * N) a b) := by
+  have hmulA
+      : ∀ M N : Wd.SlopeTestRemainingChoices S (Pr (RadSp k r z z' π π')),
+        (∀ a b, good (M a b)) → (∀ a b, good (N a b)) → ∀ a b, good ((M * N) a b) := by
     intro M N hM hN a b
     rw [Matrix.mul_apply]
     refine Finset.sum_induction _ good (fun x y hx hy => gadd x y hx hy) gzero (fun c _ => ?_)
     exact gmul _ _ (hM a c) (hN c b)
-  have hsumA : ∀ (ι : Type) (t : Finset ι) (f : ι → Wd.SlopeTestRemainingChoices S (Pr (RadSp k r z z' π π'))),
-      (∀ i, ∀ a b, good (f i a b)) → ∀ a b, good ((∑ i ∈ t, f i) a b) := by
+  have hsumA
+      : ∀ (ι : Type) (t : Finset ι)
+          (f : ι → Wd.SlopeTestRemainingChoices S (Pr (RadSp k r z z' π π'))),
+        (∀ i, ∀ a b, good (f i a b)) → ∀ a b, good ((∑ i ∈ t, f i) a b) := by
     intro ι t f hf a b
     rw [Matrix.sum_apply]
     exact Finset.sum_induction _ good (fun x y hx hy => gadd x y hx hy) gzero (fun i _ => hf i a b)
-  have heU : ∀ (x : S) (i j : Fin 2), ∀ a b, good ((Wd.eU (A := Pr (RadSp k r z z' π π')) x i j : Wd.SlopeTestRemainingChoices S _) a b) := by
+  have heU
+      : ∀ (x : S) (i j : Fin 2), ∀ a b,
+        good
+          ((Wd.eU (A := Pr (RadSp k r z z' π π')) x i j : Wd.SlopeTestRemainingChoices S _) a
+            b) := by
     intro x i j a b
     unfold Wd.eU
     simp only [Matrix.of_apply]

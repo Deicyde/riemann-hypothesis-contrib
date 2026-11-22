@@ -22,17 +22,17 @@ open Finset Matrix
 namespace ReciprocityTheory.ChartRestriction.DS.G2
 variable {n : ℕ}
 
-theorem rigid_multOne {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+theorem rigid_multOne
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     {ε : Fin n → Bool} {lam : Fin n → ℝ} (hgap : StdGap ε lam)
     {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : IsURepOn (UJset ε) σ)
     {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D} (hD : IsDerivedOn ε σ D E)
-    {V : Submodule ℂ D} (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
-    (j' : V →ₗ[ℂ] H) (hj : ∀ k ∈ Kset ε, ∀ v w : V, ((w : D) : H) = σ k ((v : D) : H) → j' w = σ k (j' v))
-    (hrange : ∀ v : V, j' v ∈ closGen E V)
-    (horth : ∀ v v' : V, inner ℂ (j' v') ((v : D) : H) = 0) :
-    j' = 0 := by
+    {V : Submodule ℂ D}
+    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) (j' : V →ₗ[ℂ] H)
+    (hj : ∀ k ∈ Kset ε, ∀ v w : V, ((w : D) : H) = σ k ((v : D) : H) → j' w = σ k (j' v))
+    (hrange : ∀ v : V, j' v ∈ closGen E V) (horth : ∀ v v' : V, inner ℂ (j' v') ((v : D) : H) = 0)
+    : j' = 0 := by
   apply LinearMap.ext
   intro v'
   have h0 : ∀ y ∈ closGen E V, inner ℂ (j' v') y = 0 := by

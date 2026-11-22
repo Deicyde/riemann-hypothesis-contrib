@@ -13,8 +13,8 @@ open CategoryTheory AlgebraicGeometry TopologicalSpace
 
 namespace FunctorialResolution.EmbeddedResolution.OpenImmersionRestriction
 
-private theorem exists_affineOpens_mem (X : Scheme.{u}) (x : ↥X) :
-    ∃ U : X.affineOpens, x ∈ U.1.1 := by
+private theorem exists_affineOpens_mem (X : Scheme.{u}) (x : ↥X)
+    : ∃ U : X.affineOpens, x ∈ U.1.1 := by
   have hx : x ∈ (⨆ U : X.affineOpens, (U : X.Opens)) := by
     rw [AlgebraicGeometry.iSup_affineOpens_eq_top X]
     trivial
@@ -22,8 +22,8 @@ private theorem exists_affineOpens_mem (X : Scheme.{u}) (x : ↥X) :
   exact ⟨U, hU⟩
 
 theorem maximalIdeal_stalk_ne_bot_of_specializes
-    (X : Scheme.{u}) (x y : ↥X) (h : y ⤳ x) (hne : y ≠ x) :
-    IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) ≠ ⊥ := by
+    (X : Scheme.{u}) (x y : ↥X) (h : y ⤳ x) (hne : y ≠ x)
+    : IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) ≠ ⊥ := by
   intro hbot
   obtain ⟨U, hxU0⟩ := exists_affineOpens_mem X x
   have hxU : x ∈ U.1 := hxU0
@@ -37,10 +37,8 @@ theorem maximalIdeal_stalk_ne_bot_of_specializes
     exact hy2
   have hind : Topology.IsInducing (⇑(hU.fromSpec)) :=
     (hU.fromSpec).isOpenEmbedding.toIsEmbedding.toIsInducing
-  have e1 : (⇑(hU.fromSpec)) (hU.primeIdealOf ⟨x, hxU⟩) = x :=
-    hU.fromSpec_primeIdealOf ⟨x, hxU⟩
-  have e2 : (⇑(hU.fromSpec)) (hU.primeIdealOf ⟨y, hyU⟩) = y :=
-    hU.fromSpec_primeIdealOf ⟨y, hyU⟩
+  have e1 : (⇑(hU.fromSpec)) (hU.primeIdealOf ⟨x, hxU⟩) = x := hU.fromSpec_primeIdealOf ⟨x, hxU⟩
+  have e2 : (⇑(hU.fromSpec)) (hU.primeIdealOf ⟨y, hyU⟩) = y := hU.fromSpec_primeIdealOf ⟨y, hyU⟩
   have hspec : hU.primeIdealOf ⟨y, hyU⟩ ⤳ hU.primeIdealOf ⟨x, hxU⟩ := by
     apply hind.specializes_iff.mp
     rw [e1, e2]
@@ -56,24 +54,27 @@ theorem maximalIdeal_stalk_ne_bot_of_specializes
     exact e2.symm.trans (by rw [hpe]; exact e1)
   obtain ⟨a, hap, haq⟩ := SetLike.exists_of_lt (lt_of_le_of_ne hqp hne')
   let _ : Algebra Γ(X, U.1) ↑(X.presheaf.stalk x) := (X.presheaf.germ U.1 x hxU).hom.toAlgebra
-  have hloc : IsLocalization (hU.primeIdealOf ⟨x, hxU⟩).asIdeal.primeCompl
-      ↑(X.presheaf.stalk x) := hU.isLocalization_stalk ⟨x, hxU⟩
-  have hmax : Ideal.map (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x))
-      (hU.primeIdealOf ⟨x, hxU⟩).asIdeal
-      = IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) :=
+  have hloc : IsLocalization (hU.primeIdealOf ⟨x, hxU⟩).asIdeal.primeCompl ↑(X.presheaf.stalk x) :=
+    hU.isLocalization_stalk ⟨x, hxU⟩
+  have hmax
+      : Ideal.map (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) (hU.primeIdealOf ⟨x, hxU⟩).asIdeal
+        = IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) :=
     IsLocalization.AtPrime.map_eq_maximalIdeal ..
-  have hmapmem : (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) a
-      ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) := by
+  have hmapmem
+      : (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) a
+        ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) := by
     rw [← hmax]
     exact Ideal.mem_map_of_mem _ hap
   have h0 : (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) a = 0 := by
     rw [hbot] at hmapmem
     simpa using hmapmem
-  have h1 : (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) a
-      = (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) 0 := by
+  have h1
+      : (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) a
+        = (algebraMap Γ(X, U.1) ↑(X.presheaf.stalk x)) 0 := by
     rw [h0, map_zero]
-  obtain ⟨c, hc⟩ := (IsLocalization.eq_iff_exists
-    (hU.primeIdealOf ⟨x, hxU⟩).asIdeal.primeCompl ↑(X.presheaf.stalk x)).mp h1
+  obtain ⟨c, hc⟩ :=
+    (IsLocalization.eq_iff_exists (hU.primeIdealOf ⟨x, hxU⟩).asIdeal.primeCompl
+      ↑(X.presheaf.stalk x)).mp h1
   have hca : (c : Γ(X, U.1)) * a = 0 := by
     rw [mul_zero] at hc
     exact hc
@@ -87,10 +88,11 @@ theorem maximalIdeal_stalk_ne_bot_of_specializes
   · exact haq haa
 
 theorem orderAt_vanishingIdeal_eq_one_of_not_mem_irreducibleComponents
-    (X : Scheme.{u}) [IsLocallyNoetherian X] (S : Closeds ↥X) (x : ↥X)
-    (hx : IsGenericPoint x (S : Set ↥X))
-    (hS : (S : Set ↥X) ∉ irreducibleComponents ↥X) :
-    FunctorialResolution.EmbeddedResolution.orderAt (Scheme.IdealSheafData.vanishingIdeal S) x = 1 := by
+    (X : Scheme.{u}) [IsLocallyNoetherian X]
+    (S : Closeds ↥X) (x : ↥X) (hx : IsGenericPoint x (S : Set ↥X))
+    (hS : (S : Set ↥X) ∉ irreducibleComponents ↥X)
+    : FunctorialResolution.EmbeddedResolution.orderAt (Scheme.IdealSheafData.vanishingIdeal S) x
+      = 1 := by
   have hx' : closure ({x} : Set ↥X) = (S : Set ↥X) := hx
   have hSirr : IsIrreducible (S : Set ↥X) := by
     rw [← hx']
@@ -129,13 +131,14 @@ theorem orderAt_vanishingIdeal_eq_one_of_not_mem_irreducibleComponents
     exact hy'
   have hbot : IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) ≠ ⊥ :=
     maximalIdeal_stalk_ne_bot_of_specializes X x y hyx hyne
-  exact _root_.FunctorialResolution.EmbeddedResolution.orderAt_vanishingIdeal_eq_one S x (S : Set ↥X) hMax hx hbot
+  exact _root_.FunctorialResolution.EmbeddedResolution.orderAt_vanishingIdeal_eq_one S x
+    (S : Set ↥X) hMax hx hbot
 
 theorem isLocallyNoetherian_subscheme_of_isSmoothDivisor
-    (k : Type u) [Field k] (W : Scheme.{u}) (p : W ⟶ Spec (CommRingCat.of k))
-    (U : W.Opens) (D : (U.toScheme).IdealSheafData)
-    (hD : IsSmoothDivisor (U.ι ≫ p) D) :
-    IsLocallyNoetherian D.subscheme := by
+    (k : Type u) [Field k]
+    (W : Scheme.{u}) (p : W ⟶ Spec (CommRingCat.of k)) (U : W.Opens)
+    (D : (U.toScheme).IdealSheafData) (hD : IsSmoothDivisor (U.ι ≫ p) D)
+    : IsLocallyNoetherian D.subscheme := by
   obtain ⟨_, hsm⟩ := hD
   have : AlgebraicGeometry.Smooth (D.subschemeι ≫ U.ι ≫ p) := hsm
   have : LocallyOfFiniteType (D.subschemeι ≫ U.ι ≫ p) := inferInstance

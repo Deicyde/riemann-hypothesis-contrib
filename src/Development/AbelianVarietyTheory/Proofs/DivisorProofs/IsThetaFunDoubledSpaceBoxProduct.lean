@@ -5,22 +5,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ActOOneOne
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
 open Formalism.IndefR.Datum
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-attribute [-instance] Formalism.DoubleCosetMeasures.instMeasMat GlobalTheory.SplitWeil.matrixMeasurableSpace
+attribute [-instance]
+  Formalism.DoubleCosetMeasures.instMeasMat GlobalTheory.SplitWeil.matrixMeasurableSpace
 
 namespace GlobalTheory.DblBoxTheta
 
 open GlobalTheory.DblBox
 
-theorem isThetaFunO_box : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S T : HSp D) (f₁ f₂ : Formalism.IndefR.Datum.WO S T → ℂ),
-    Formalism.IndefR.Datum.IsThetaFunO ψ S T f₁ → Formalism.IndefR.Datum.IsThetaFunO ψ S T f₂ →
-      Formalism.IndefR.Datum.IsThetaFunO ψ S (GlobalTheory.Doubling.dblSp T) (GlobalTheory.DblBox.box f₁ f₂) := by
+theorem isThetaFunO_box
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (S T : HSp D) (f₁ f₂ : Formalism.IndefR.Datum.WO S T → ℂ),
+          Formalism.IndefR.Datum.IsThetaFunO ψ S T f₁ → Formalism.IndefR.Datum.IsThetaFunO ψ S T f₂
+            → Formalism.IndefR.Datum.IsThetaFunO ψ S (GlobalTheory.Doubling.dblSp T)
+              (GlobalTheory.DblBox.box f₁ f₂) := by
   intro D ψ hψ S T f₁ f₂ h₁ h₂
   have ctop : Continuous (top : WO S (GlobalTheory.Doubling.dblSp T) → WO S T) :=
     continuous_id.matrix_submatrix _ _
@@ -30,8 +36,14 @@ theorem isThetaFunO_box : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdCh
   let botH : WO S (GlobalTheory.Doubling.dblSp T) →+ WO S T := AddMonoidHom.mk' bot bot_add
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro γ w
-    have e₁ : top (ratW (GlobalTheory.Doubling.dblSp T) S γ) = ratW T S (γ.submatrix (finSumFinEquiv ∘ Sum.inl) id) := rfl
-    have e₂ : bot (ratW (GlobalTheory.Doubling.dblSp T) S γ) = ratW T S (γ.submatrix (finSumFinEquiv ∘ Sum.inr) id) := rfl
+    have e₁
+        : top (ratW (GlobalTheory.Doubling.dblSp T) S γ)
+          = ratW T S (γ.submatrix (finSumFinEquiv ∘ Sum.inl) id) :=
+      rfl
+    have e₂
+        : bot (ratW (GlobalTheory.Doubling.dblSp T) S γ)
+          = ratW T S (γ.submatrix (finSumFinEquiv ∘ Sum.inr) id) :=
+      rfl
     simp only [box, top_add, bot_add, symplOH_dbl]
     rw [e₁, e₂, h₁.quasi, h₂.quasi]
     rw [sub_eq_add_neg, neg_add, AddChar.map_add_eq_mul, neg_neg]
@@ -54,13 +66,17 @@ theorem isThetaFunO_box : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdCh
   · exact (h₁.cont.comp ctop).mul ((h₂.cont.comp cbot).star)
   · intro k L hL hfin w
     have hf₁ :=
-      h₁.smooth k (topH.comp L) (ctop.comp hL) (fun t => by
-        ext i j
-        exact congrFun (congrFun (hfin t) (finSumFinEquiv (Sum.inl i))) j) (top w)
+      h₁.smooth k (topH.comp L) (ctop.comp hL)
+        (fun t => by
+          ext i j
+          exact congrFun (congrFun (hfin t) (finSumFinEquiv (Sum.inl i))) j)
+        (top w)
     have hf₂ :=
-      h₂.smooth k (botH.comp L) (cbot.comp hL) (fun t => by
-        ext i j
-        exact congrFun (congrFun (hfin t) (finSumFinEquiv (Sum.inr i))) j) (bot w)
+      h₂.smooth k (botH.comp L) (cbot.comp hL)
+        (fun t => by
+          ext i j
+          exact congrFun (congrFun (hfin t) (finSumFinEquiv (Sum.inr i))) j)
+        (bot w)
     exact ContDiff.mul hf₁ (Complex.conjCLE.contDiff.comp hf₂)
 
 end GlobalTheory.DblBoxTheta

@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsIsoIff
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 noncomputable section
@@ -20,10 +22,13 @@ namespace GlobalTheory
 
 namespace PointQuot
 
-theorem exists_grpObj_of_mono {𝒞 : Type*} [Category 𝒞] [CartesianMonoidalCategory 𝒞] {H A : 𝒞}
-    [GrpObj A] (i : H ⟶ A) [Mono i] (e : 𝟙_ 𝒞 ⟶ H) (m : H ⊗ H ⟶ H) (n : H ⟶ H)
-    (he : e ≫ i = 1) (hm : m ≫ i = (fst H H ≫ i) * (snd H H ≫ i)) (hn : n ≫ i = i⁻¹) :
-    ∃ _ : GrpObj H, IsMonHom i := by
+theorem exists_grpObj_of_mono
+    {𝒞 : Type*} [Category 𝒞] [CartesianMonoidalCategory 𝒞]
+    {H A : 𝒞} [GrpObj A]
+    (i : H ⟶ A) [Mono i]
+    (e : 𝟙_ 𝒞 ⟶ H) (m : H ⊗ H ⟶ H) (n : H ⟶ H)
+    (he : e ≫ i = 1) (hm : m ≫ i = (fst H H ≫ i) * (snd H H ≫ i)) (hn : n ≫ i = i⁻¹)
+    : ∃ _ : GrpObj H, IsMonHom i := by
   letI : MonObj H :=
     { one := e
       mul := m
@@ -86,11 +91,13 @@ def constPt (S : Scheme.{0}) {I : Type} (c : I) : 𝟙_ (Over S) ⟶ constObj S 
   Over.homMk (Sigma.ι (fun _ : I => S) c) (Sigma.ι_desc _ _)
 
 def constDesc {I : Type} {A : Over S} (x : I → (𝟙_ (Over S) ⟶ A)) : constObj S I ⟶ A :=
-  Over.homMk (Sigma.desc (f := fun _ : I => S) fun c => (x c).left) (Sigma.hom_ext _ _ fun c => by
-    change Sigma.ι (fun _ : I => S) c ≫ Sigma.desc (f := fun _ : I => S) (fun c => (x c).left) ≫ A.hom =
-      Sigma.ι (fun _ : I => S) c ≫ Sigma.desc fun _ : I => 𝟙 S
-    rw [Sigma.ι_desc_assoc, Sigma.ι_desc]
-    exact Over.w (x c))
+  Over.homMk (Sigma.desc (f := fun _ : I => S) fun c => (x c).left)
+    (Sigma.hom_ext _ _ fun c => by
+      change Sigma.ι (fun _ : I => S) c ≫ Sigma.desc (f := fun _ : I => S) (fun c => (x c).left)
+          ≫ A.hom
+        = Sigma.ι (fun _ : I => S) c ≫ Sigma.desc fun _ : I => 𝟙 S
+      rw [Sigma.ι_desc_assoc, Sigma.ι_desc]
+      exact Over.w (x c))
 
 lemma constPt_desc {I : Type} {A : Over S} (x : I → (𝟙_ (Over S) ⟶ A)) (c : I) :
     constPt S c ≫ constDesc x = x c :=
@@ -232,41 +239,59 @@ lemma existsUnique_desc {A B Y : Over S} (q : A ⟶ B) [Flat q.left] [Surjective
 
 end PointQuot
 
-
 open PointQuot in
-theorem exists_quotient_by_finite_group_of_points :
-    Out.Laws → ∀ (k : Type) [Field k] [IsAlgClosed k] (P : Out.PolAV (Sp k)) (C : Subgroup (𝟙_ (Over (Sp k)) ⟶ P.A)), Finite C → ∃ (B : Over (Sp k)) (_ : GrpObj B) (ψ : P.A ⟶ B), IsAbelianScheme B ∧ IsMonHom ψ ∧ IsFinite ψ.left ∧ Etale ψ.left ∧ Surjective ψ.left ∧ (∀ x : 𝟙_ (Over (Sp k)) ⟶ P.A, x ≫ ψ = 1 ↔ x ∈ C) ∧ ∀ (Y : Over (Sp k)) (f : P.A ⟶ Y), (∀ x ∈ C, ((toUnit P.A ≫ x) * 𝟙 P.A) ≫ f = f) → ∃! f' : B ⟶ Y, ψ ≫ f' = f := open PointQuot in by
-  intro L k _ _ P C hC
-  obtain ⟨n, ⟨e⟩⟩ := Finite.exists_equiv_fin C
-  let x : Fin n → (𝟙_ (Over (Sp k)) ⟶ P.A) := fun c => (e.symm c).1
-  have hx : Function.Injective x := Subtype.val_injective.comp e.symm.injective
-  have hr : Set.range x = C := by
-    ext y
-    exact ⟨by rintro ⟨c, rfl⟩; exact (e.symm c).2, fun hy => ⟨e ⟨y, hy⟩, by simp [x]⟩⟩
-  have mem : ∀ c, x c ∈ C := fun c => hr.le ⟨c, rfl⟩
-  have hmono := mono_constDesc x hx
-  obtain ⟨_, hi⟩ := exists_grpObj_constObj x C hr
-  have hs : FinEt.IsSplitOfRank (constObj (Sp k) (Fin n)).hom n :=
-    (FinEt.isSplitOfRank_iff_exists_iso _ _).mpr ⟨Iso.refl _, Category.id_comp _⟩
-  have het := hs.etale
-  obtain ⟨B, _, hB, q, hq, hfin, hflat, hsurj, hker⟩ :=
-    L.quotient k P (constObj (Sp k) (Fin n)) (constDesc x) hi hmono hs.isFinite inferInstance
-  have hw : constDesc x ≫ q = 1 := hker.w
-  refine ⟨B, inferInstance, q, hB, hq, hfin, ?_, hsurj, fun y => ⟨fun hy => ?_, fun hy => ?_⟩,
-    fun Y f hf => existsUnique_desc q f
-      (comp_eq_of_invariant x q hker f fun c => hf _ (mem c))⟩
-  · refine MorphismProperty.of_isPullback_of_descendsAlong (P := @Etale)
-      (Q := @Surjective ⊓ @Flat ⊓ @QuasiCompact)
-      ((H1.torsor_pullback (constDesc x) q hker).map (Over.forget _)).flip
-      ⟨⟨hsurj, hflat⟩, inferInstanceAs (QuasiCompact q.left)⟩ ?_
-    exact MorphismProperty.of_isPullback (P := @Etale) (IsPullback.of_hasPullback _ _) het
-  · obtain ⟨z⟩ : Nonempty (𝟙_ (Over (Sp k))).left := inferInstanceAs (Nonempty (PrimeSpectrum k))
-    obtain ⟨V, hV, c, hc⟩ := locally_const_desc x (hker.lift y (toUnit _) hy) z
-    have : Nonempty (openObj _ V).left := ⟨(⟨z, hV⟩ : V)⟩
-    have := epi_toUnit (openObj _ V)
-    rw [hker.lift_fst, toUnit_unique (openι _ V) (toUnit _), cancel_epi] at hc
-    exact hc ▸ mem c
-  · obtain ⟨c, rfl⟩ := hr.ge hy
-    rw [← constPt_desc x c, Category.assoc, hw, MonObj.comp_one]
+theorem exists_quotient_by_finite_group_of_points
+    : Out.Laws
+      → ∀ (k : Type) [Field k] [IsAlgClosed k] (P : Out.PolAV (Sp k))
+          (C : Subgroup (𝟙_ (Over (Sp k)) ⟶ P.A)),
+        Finite C
+          → ∃ (B : Over (Sp k)) (_ : GrpObj B) (ψ : P.A ⟶ B),
+            IsAbelianScheme B ∧ IsMonHom ψ ∧ IsFinite ψ.left ∧ Etale ψ.left ∧ Surjective ψ.left
+              ∧ (∀ x : 𝟙_ (Over (Sp k)) ⟶ P.A, x ≫ ψ = 1 ↔ x ∈ C)
+              ∧ ∀ (Y : Over (Sp k)) (f : P.A ⟶ Y),
+                (∀ x ∈ C, ((toUnit P.A ≫ x) * 𝟙 P.A) ≫ f = f) → ∃! f' : B ⟶ Y, ψ ≫ f' = f :=
+  open PointQuot in
+  by
+    intro L k _ _ P C hC
+    obtain ⟨n, ⟨e⟩⟩ := Finite.exists_equiv_fin C
+    let x : Fin n → (𝟙_ (Over (Sp k)) ⟶ P.A) := fun c => (e.symm c).1
+    have hx : Function.Injective x := Subtype.val_injective.comp e.symm.injective
+    have hr : Set.range x = C := by
+      ext y
+      exact ⟨by rintro ⟨c, rfl⟩; exact (e.symm c).2, fun hy => ⟨e ⟨y, hy⟩, by simp [x]⟩⟩
+    have mem : ∀ c, x c ∈ C := fun c => hr.le ⟨c, rfl⟩
+    have hmono := mono_constDesc x hx
+    obtain ⟨_, hi⟩ := exists_grpObj_constObj x C hr
+    have hs : FinEt.IsSplitOfRank (constObj (Sp k) (Fin n)).hom n :=
+      (FinEt.isSplitOfRank_iff_exists_iso _ _).mpr ⟨Iso.refl _, Category.id_comp _⟩
+    have het := hs.etale
+    obtain ⟨B, _, hB, q, hq, hfin, hflat, hsurj, hker⟩ :=
+      L.quotient k P (constObj (Sp k) (Fin n)) (constDesc x) hi hmono hs.isFinite inferInstance
+    have hw : constDesc x ≫ q = 1 := hker.w
+    refine ⟨
+      B,
+      inferInstance,
+      q,
+      hB,
+      hq,
+      hfin,
+      ?_,
+      hsurj,
+      fun y => ⟨fun hy => ?_, fun hy => ?_⟩,
+      fun Y f hf => existsUnique_desc q f (comp_eq_of_invariant x q hker f fun c => hf _ (mem c))
+    ⟩
+    · refine MorphismProperty.of_isPullback_of_descendsAlong (P := @Etale)
+        (Q := @Surjective ⊓ @Flat ⊓ @QuasiCompact)
+        ((H1.torsor_pullback (constDesc x) q hker).map (Over.forget _)).flip
+        ⟨⟨hsurj, hflat⟩, inferInstanceAs (QuasiCompact q.left)⟩ ?_
+      exact MorphismProperty.of_isPullback (P := @Etale) (IsPullback.of_hasPullback _ _) het
+    · obtain ⟨z⟩ : Nonempty (𝟙_ (Over (Sp k))).left := inferInstanceAs (Nonempty (PrimeSpectrum k))
+      obtain ⟨V, hV, c, hc⟩ := locally_const_desc x (hker.lift y (toUnit _) hy) z
+      have : Nonempty (openObj _ V).left := ⟨(⟨z, hV⟩ : V)⟩
+      have := epi_toUnit (openObj _ V)
+      rw [hker.lift_fst, toUnit_unique (openι _ V) (toUnit _), cancel_epi] at hc
+      exact hc ▸ mem c
+    · obtain ⟨c, rfl⟩ := hr.ge hy
+      rw [← constPt_desc x c, Category.assoc, hw, MonObj.comp_one]
 
 end GlobalTheory

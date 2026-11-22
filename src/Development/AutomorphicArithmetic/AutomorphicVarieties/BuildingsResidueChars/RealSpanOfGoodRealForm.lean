@@ -7,8 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 @[expose] public section
 
 open UpperTheory.V UpperTheory.V.KT UpperTheory.V.Af.BA in
-theorem UpperTheory.real_span_of_good_real_form :
-    UpperTheory.V.Af.BA.RePart → UpperTheory.V.Af.BA.ReInv → UpperTheory.V.Af.BA.GoodRe → UpperTheory.V.Af.BA.SpanRe := by
+theorem UpperTheory.real_span_of_good_real_form
+    : UpperTheory.V.Af.BA.RePart → UpperTheory.V.Af.BA.ReInv → UpperTheory.V.Af.BA.GoodRe
+      → UpperTheory.V.Af.BA.SpanRe := by
   intro hRP hRI hG L _ _ _ N σ hσ p t ht
   apply spanpsd
   intro k hk hzero

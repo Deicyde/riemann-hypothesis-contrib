@@ -8,15 +8,23 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.UnitaryAssembly
 
-theorem exists_unitary_assemble : ∀ {n D m : ℕ} (J : Matrix (Fin n) (Fin n) ℂ) (J' : Matrix (Fin m) (Fin m) ℂ) (C : Matrix (Fin n) (Fin D) ℂ) (R : Matrix (Fin n) (Fin m) ℂ), J * J = 1 → Jᴴ = J → Cᴴ * C = 1 → Cᴴ * J * C = 0 → Rᴴ * R = 1 → J * R = R * J' → Cᴴ * R = 0 → C * Cᴴ + J * C * Cᴴ * J + R * Rᴴ = 1 → ∀ k₀ ∈ Matrix.unitaryGroup (Fin D) ℂ, ∀ kR ∈ Matrix.unitaryGroup (Fin m) ℂ, kR * J' = J' * kR → ∃ k ∈ Matrix.unitaryGroup (Fin n) ℂ, k * J = J * k ∧ k * C = C * k₀ ∧ kᴴ * C = C * k₀ᴴ ∧ kᴴ * R = R * kRᴴ ∧ kᴴ * (J * C) = (J * C) * k₀ᴴ := by
+theorem exists_unitary_assemble
+    : ∀ {n D m : ℕ} (J : Matrix (Fin n) (Fin n) ℂ) (J' : Matrix (Fin m) (Fin m) ℂ)
+        (C : Matrix (Fin n) (Fin D) ℂ) (R : Matrix (Fin n) (Fin m) ℂ),
+      J * J = 1 → Jᴴ = J → Cᴴ * C = 1 → Cᴴ * J * C = 0 → Rᴴ * R = 1 → J * R = R * J' → Cᴴ * R = 0
+        → C * Cᴴ + J * C * Cᴴ * J + R * Rᴴ = 1
+        → ∀ k₀ ∈ Matrix.unitaryGroup (Fin D) ℂ, ∀ kR ∈ Matrix.unitaryGroup (Fin m) ℂ,
+          kR * J' = J' * kR
+            → ∃ k ∈ Matrix.unitaryGroup (Fin n) ℂ,
+              k * J = J * k ∧ k * C = C * k₀ ∧ kᴴ * C = C * k₀ᴴ ∧ kᴴ * R = R * kRᴴ
+                ∧ kᴴ * (J * C) = (J * C) * k₀ᴴ := by
   intro n D m J J' C R hJJ hJh hCC hCJC hRR hJR hCR hsum k₀ hk₀ kR hkR hkRJ
   rw [Matrix.mem_unitaryGroup_iff, star_eq_conjTranspose] at hk₀ hkR
   have hRC : Rᴴ * C = 0 := by
     have h := congrArg conjTranspose hCR
     simpa [conjTranspose_mul] using h
   have hJ'h : J'ᴴ = J' := by
-    have h1 : J' = Rᴴ * (J * R) := by
-      rw [hJR, ← Matrix.mul_assoc, hRR, Matrix.one_mul]
+    have h1 : J' = Rᴴ * (J * R) := by rw [hJR, ← Matrix.mul_assoc, hRR, Matrix.one_mul]
     rw [h1]
     simp [conjTranspose_mul, hJh, Matrix.mul_assoc]
   have hRJ : Rᴴ * J = J' * Rᴴ := by
@@ -45,14 +53,13 @@ theorem exists_unitary_assemble : ∀ {n D m : ℕ} (J : Matrix (Fin n) (Fin n) 
     rw [← Matrix.mul_assoc, hkR, Matrix.one_mul]
   have a11 : ∀ {p : Type} (X : Matrix (Fin m) p ℂ), kR * (J' * X) = J' * (kR * X) := fun X => by
     rw [← Matrix.mul_assoc, hkRJ, Matrix.mul_assoc]
-  have hs : C * Cᴴ + J * (C * (Cᴴ * J)) + R * Rᴴ = 1 := by
-    simpa only [Matrix.mul_assoc] using hsum
+  have hs : C * Cᴴ + J * (C * (Cᴴ * J)) + R * Rᴴ = 1 := by simpa only [Matrix.mul_assoc] using hsum
   refine ⟨C * k₀ * Cᴴ + J * C * k₀ * Cᴴ * J + R * kR * Rᴴ, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff, star_eq_conjTranspose]
     simp only [Matrix.add_mul, Matrix.mul_add, conjTranspose_add, conjTranspose_mul,
       conjTranspose_conjTranspose, hJh, Matrix.mul_assoc, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10,
-      hCC, c2, hCR, hRR, hRC, hJJ, hJR, hRJ, hk₀, hkR, Matrix.mul_zero, Matrix.zero_mul,
-      add_zero, zero_add, Matrix.mul_one, Matrix.one_mul]
+      hCC, c2, hCR, hRR, hRC, hJJ, hJR, hRJ, hk₀, hkR, Matrix.mul_zero, Matrix.zero_mul, add_zero,
+      zero_add, Matrix.mul_one, Matrix.one_mul]
     rw [← hs]
   all_goals
     simp only [Matrix.add_mul, Matrix.mul_add, conjTranspose_add, conjTranspose_mul,

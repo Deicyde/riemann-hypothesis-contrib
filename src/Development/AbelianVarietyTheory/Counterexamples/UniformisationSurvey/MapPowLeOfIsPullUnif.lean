@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.SelfT
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,12 +22,13 @@ noncomputable section
 
 namespace GlobalTheory.UnifPullGuards
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.UnifPullGuards.unifBaseChange_holds : _root_.ReciprocityTheory.ChartRestriction.G.Out.UnifBaseChangeSt :=
+theorem _root_.GlobalTheory.UnifPullGuards.unifBaseChange_holds
+    : _root_.ReciprocityTheory.ChartRestriction.G.Out.UnifBaseChangeSt :=
   _root_.GlobalTheory.unifBaseChange _root_.GlobalTheory.polBaseChange_holds
     _root_.GlobalTheory.globalFns_holds _root_.GlobalTheory.abelianSchemeLaws_all.1.secBaseChange
     _root_.GlobalTheory.twistBaseChange

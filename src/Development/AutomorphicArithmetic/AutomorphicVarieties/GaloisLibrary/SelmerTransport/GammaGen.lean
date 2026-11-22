@@ -6,12 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
 
-theorem UpperTheory.V.Base.gammaGen :
-    ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ) [Fact l.Prime] (U : Subgroup (G k Ω)), IsClosed (U : Set (G k Ω)) → U ≤ gamU l ⊤ → ¬ U ≤ (cycZ k Ω l).ker →
-      ∃ (κ : U →* Multiplicative ℤ_[l]) (γ : U), Continuous κ ∧ Function.Surjective κ ∧ κ.ker = (cycU l U).subgroupOf U ∧
-        κ γ = Multiplicative.ofAdd 1 ∧ U ≤ (Subgroup.zpowers γ.1 ⊔ cycU l U).topologicalClosure ∧ ¬ IsOfFinOrder (cycZ k Ω l γ.1) := by
+theorem UpperTheory.V.Base.gammaGen
+    : ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ)
+        [Fact l.Prime] (U : Subgroup (G k Ω)),
+      IsClosed (U : Set (G k Ω)) → U ≤ gamU l ⊤ → ¬ U ≤ (cycZ k Ω l).ker
+        → ∃ (κ : U →* Multiplicative ℤ_[l]) (γ : U),
+          Continuous κ ∧ Function.Surjective κ ∧ κ.ker = (cycU l U).subgroupOf U
+            ∧ κ γ = Multiplicative.ofAdd 1
+            ∧ U ≤ (Subgroup.zpowers γ.1 ⊔ cycU l U).topologicalClosure
+            ∧ ¬ IsOfFinOrder (cycZ k Ω l γ.1) := by
   intro k Ω _ _ _ _ _ l _ U hUc hUg hUk
   have hχc : Continuous (cycZ k Ω l) := continuous_cycZ k Ω l
   have hHc : IsClosed ((U.map (cycZ k Ω l) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ) := by
@@ -79,8 +85,7 @@ theorem UpperTheory.V.Base.gammaGen :
       apply Subgroup.mem_sup_right
       simp only [cycU, Subgroup.mem_inf, MonoidHom.mem_ker]
       exact ⟨(⟨u, hu⟩ * s⁻¹ : U).2, hq'⟩
-    have hu' : u = ((⟨u, hu⟩ * s⁻¹ : U) : G k Ω) * (s : G k Ω) := by
-      simp
+    have hu' : u = ((⟨u, hu⟩ * s⁻¹ : U) : G k Ω) * (s : G k Ω) := by simp
     rw [hu']
     exact V.mul_mem hmem hs
   · intro hfin

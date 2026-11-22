@@ -12,34 +12,38 @@ open MvPolynomial
 
 noncomputable section
 
-theorem norm_le_of_monic_root {A : Type*} [CommRing A] (p : Polynomial A) (hp : p.Monic)
-    (f : A →+* ℂ) (z : ℂ) (hz : p.eval₂ f z = 0) (M : ℕ → ℝ)
-    (hM : ∀ j < p.natDegree, ‖f (p.coeff j)‖ ≤ M j) :
-    ‖z‖ ≤ max 1 (∑ j ∈ Finset.range p.natDegree, M j) := by
+theorem norm_le_of_monic_root
+    {A : Type*} [CommRing A]
+    (p : Polynomial A) (hp : p.Monic)
+    (f : A →+* ℂ) (z : ℂ) (hz : p.eval₂ f z = 0)
+    (M : ℕ → ℝ) (hM : ∀ j < p.natDegree, ‖f (p.coeff j)‖ ≤ M j)
+    : ‖z‖ ≤ max 1 (∑ j ∈ Finset.range p.natDegree, M j) := by
   set m := p.natDegree with hm_def
   by_contra hcon
   rw [not_le] at hcon
   have h1 : 1 < ‖z‖ := lt_of_le_of_lt (le_max_left _ _) hcon
   have hS : (∑ j ∈ Finset.range m, M j) < ‖z‖ := lt_of_le_of_lt (le_max_right _ _) hcon
   rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, ← hm_def, hp.coeff_natDegree, map_one,
-    one_mul] at hz
-  have hzm : z ^ m = -∑ j ∈ Finset.range m, f (p.coeff j) * z ^ j := by
-    linear_combination hz
+      one_mul]
+    at hz
+  have hzm : z ^ m = - ∑ j ∈ Finset.range m, f (p.coeff j) * z ^ j := by linear_combination hz
   have hm : m ≠ 0 := by
     intro hm0
     rw [hm0, Finset.sum_range_zero, pow_zero, neg_zero] at hzm
     exact one_ne_zero hzm
   have hle : ‖z‖ ^ m ≤ (∑ j ∈ Finset.range m, M j) * ‖z‖ ^ (m - 1) := by
-    calc ‖z‖ ^ m = ‖z ^ m‖ := (norm_pow _ _).symm
+    calc
+      ‖z‖ ^ m
+        = ‖z ^ m‖ := (norm_pow _ _).symm
       _ = ‖∑ j ∈ Finset.range m, f (p.coeff j) * z ^ j‖ := by rw [hzm, norm_neg]
       _ ≤ ∑ j ∈ Finset.range m, ‖f (p.coeff j) * z ^ j‖ := norm_sum_le _ _
       _ ≤ ∑ j ∈ Finset.range m, M j * ‖z‖ ^ (m - 1) := by
-          refine Finset.sum_le_sum fun j hj ↦ ?_
-          have hjm : j < m := Finset.mem_range.mp hj
-          rw [norm_mul, norm_pow]
-          have hj' : j ≤ m - 1 := by omega
-          exact mul_le_mul (hM j hjm) (pow_le_pow_right₀ h1.le hj') (by positivity)
-            ((norm_nonneg _).trans (hM j hjm))
+        refine Finset.sum_le_sum fun j hj ↦ ?_
+        have hjm : j < m := Finset.mem_range.mp hj
+        rw [norm_mul, norm_pow]
+        have hj' : j ≤ m - 1 := by omega
+        exact mul_le_mul (hM j hjm) (pow_le_pow_right₀ h1.le hj') (by positivity)
+          ((norm_nonneg _).trans (hM j hjm))
       _ = _ := by rw [Finset.sum_mul]
   have hsplit : ‖z‖ ^ m = ‖z‖ * ‖z‖ ^ (m - 1) := by
     rw [← pow_succ']
@@ -50,9 +54,9 @@ theorem norm_le_of_monic_root {A : Type*} [CommRing A] (p : Polynomial A) (hp : 
   have := le_of_mul_le_mul_right hle hpos
   linarith
 
-theorem norm_eval₂_le_of_norm_eq_one {s : ℕ} (q : MvPolynomial (Fin s) ℚ) (z : Fin s → ℂ)
-    (hz : ∀ j, ‖z j‖ = 1) :
-    ‖eval₂ (algebraMap ℚ ℂ) z q‖ ≤ ∑ μ ∈ q.support, |((q.coeff μ : ℚ) : ℝ)| := by
+theorem norm_eval₂_le_of_norm_eq_one
+    {s : ℕ} (q : MvPolynomial (Fin s) ℚ) (z : Fin s → ℂ) (hz : ∀ j, ‖z j‖ = 1)
+    : ‖eval₂ (algebraMap ℚ ℂ) z q‖ ≤ ∑ μ ∈ q.support, |((q.coeff μ : ℚ) : ℝ)| := by
   rw [eval₂_eq]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun μ _ ↦ ?_)
   rw [norm_mul, norm_prod]
@@ -63,8 +67,8 @@ theorem norm_eval₂_le_of_norm_eq_one {s : ℕ} (q : MvPolynomial (Fin s) ℚ) 
 def ClearsDen {s : ℕ} (d : ℕ) (q : MvPolynomial (Fin s) ℚ) : Prop :=
   ∀ μ, ∃ k : ℤ, (d : ℚ) * q.coeff μ = k
 
-theorem clearsDen_prod_den {s : ℕ} (q : MvPolynomial (Fin s) ℚ) :
-    ClearsDen (∏ μ ∈ q.support, (q.coeff μ).den) q := by
+theorem clearsDen_prod_den {s : ℕ} (q : MvPolynomial (Fin s) ℚ)
+    : ClearsDen (∏ μ ∈ q.support, (q.coeff μ).den) q := by
   intro μ
   by_cases hμ : μ ∈ q.support
   · rw [← Finset.mul_prod_erase _ _ hμ]
@@ -75,38 +79,47 @@ theorem clearsDen_prod_den {s : ℕ} (q : MvPolynomial (Fin s) ℚ) :
   · rw [MvPolynomial.notMem_support_iff.mp hμ, mul_zero]
     exact ⟨0, by simp⟩
 
-theorem ClearsDen.mul_left {s : ℕ} {d : ℕ} {q : MvPolynomial (Fin s) ℚ} (h : ClearsDen d q) (e : ℕ) :
-    ClearsDen (e * d) q := by
+theorem ClearsDen.mul_left {s : ℕ} {d : ℕ} {q : MvPolynomial (Fin s) ℚ} (h : ClearsDen d q) (e : ℕ)
+    : ClearsDen (e * d) q := by
   intro μ
   obtain ⟨k, hk⟩ := h μ
   exact ⟨e * k, by push_cast; rw [mul_assoc, hk]⟩
 
-theorem isIntegral_mul_aeval {s : ℕ} {y : Fin s → AlgebraicClosure ℚ}
-    (hy : ∀ j, IsIntegral ℤ (y j)) {d : ℕ} {q : MvPolynomial (Fin s) ℚ} (hq : ClearsDen d q) :
-    IsIntegral ℤ ((d : AlgebraicClosure ℚ) * aeval y q) := by
+theorem isIntegral_mul_aeval
+    {s : ℕ} {y : Fin s → AlgebraicClosure ℚ} (hy : ∀ j, IsIntegral ℤ (y j))
+    {d : ℕ} {q : MvPolynomial (Fin s) ℚ} (hq : ClearsDen d q)
+    : IsIntegral ℤ ((d : AlgebraicClosure ℚ) * aeval y q) := by
   rw [← mem_integralClosure_iff, MvPolynomial.aeval_def, eval₂_eq, Finset.mul_sum]
   refine Subalgebra.sum_mem _ fun μ _ ↦ ?_
   obtain ⟨k, hk⟩ := hq μ
-  have h1 : (d : AlgebraicClosure ℚ) * (algebraMap ℚ (AlgebraicClosure ℚ) (q.coeff μ) *
-      ∏ i ∈ μ.support, y i ^ μ i) = (k : AlgebraicClosure ℚ) * ∏ i ∈ μ.support, y i ^ μ i := by
+  have h1
+      : (d : AlgebraicClosure ℚ)
+          * (algebraMap ℚ (AlgebraicClosure ℚ) (q.coeff μ) * ∏ i ∈ μ.support, y i ^ μ i)
+        = (k : AlgebraicClosure ℚ) * ∏ i ∈ μ.support, y i ^ μ i := by
     rw [← mul_assoc]
     congr 1
     have h2 : (d : AlgebraicClosure ℚ) = algebraMap ℚ (AlgebraicClosure ℚ) (d : ℚ) := by simp
     rw [h2, ← map_mul, hk, map_intCast]
   rw [h1]
   exact Subalgebra.mul_mem _ (intCast_mem _ k)
-    (Subalgebra.prod_mem _ fun i _ ↦ Subalgebra.pow_mem _ (by rw [mem_integralClosure_iff]; exact hy i) _)
+    (Subalgebra.prod_mem _ fun i _ ↦
+      Subalgebra.pow_mem _ (by rw [mem_integralClosure_iff]; exact hy i) _)
 
-theorem isIntegral_of_pow_eq_one {x : AlgebraicClosure ℚ} {N : ℕ} (hN : 0 < N) (hx : x ^ N = 1) :
-    IsIntegral ℤ x := by
+theorem isIntegral_of_pow_eq_one {x : AlgebraicClosure ℚ} {N : ℕ} (hN : 0 < N) (hx : x ^ N = 1)
+    : IsIntegral ℤ x := by
   refine ⟨Polynomial.X ^ N - 1, Polynomial.monic_X_pow_sub_C 1 hN.ne', ?_⟩
   simp [hx]
 
-theorem exists_integral_bound {B : Type*} [CommRing B] [Algebra ℚ B] {s : ℕ}
-    (g0 : MvPolynomial (Fin s) ℚ →ₐ[ℚ] B) (hint : g0.IsIntegral) (b : B) :
-    ∃ (δ : ℕ) (R : ℝ), 0 < δ ∧ 1 ≤ R ∧ ∀ ψ : B →ₐ[ℚ] AlgebraicClosure ℚ,
-      (∀ j, ∃ N : ℕ, 0 < N ∧ ψ (g0 (MvPolynomial.X j)) ^ N = 1) →
-      IsIntegral ℤ ((δ : AlgebraicClosure ℚ) * ψ b) ∧ ∀ σ : AlgebraicClosure ℚ →+* ℂ, ‖σ (ψ b)‖ ≤ R := by
+theorem exists_integral_bound
+    {B : Type*} [CommRing B] [Algebra ℚ B]
+    {s : ℕ} (g0 : MvPolynomial (Fin s) ℚ →ₐ[ℚ] B) (hint : g0.IsIntegral)
+    (b : B)
+    : ∃ (δ : ℕ) (R : ℝ),
+      0 < δ ∧ 1 ≤ R
+        ∧ ∀ ψ : B →ₐ[ℚ] AlgebraicClosure ℚ,
+          (∀ j, ∃ N : ℕ, 0 < N ∧ ψ (g0 (MvPolynomial.X j)) ^ N = 1)
+            → IsIntegral ℤ ((δ : AlgebraicClosure ℚ) * ψ b)
+              ∧ ∀ σ : AlgebraicClosure ℚ →+* ℂ, ‖σ (ψ b)‖ ≤ R := by
   obtain ⟨p, hpm, hpb⟩ := hint b
   set m := p.natDegree with hm_def
   set δ : ℕ := ∏ j ∈ Finset.range m, ∏ μ ∈ (p.coeff j).support, ((p.coeff j).coeff μ).den with hδ_def
@@ -130,16 +143,15 @@ theorem exists_integral_bound {B : Type*} [CommRing B] [Algebra ℚ B] {s : ℕ}
     rw [map_zero, Polynomial.hom_eval₂] at h
     exact h
   constructor
-  ·
-    set O := integralClosure ℤ (AlgebraicClosure ℚ)
+  · set O := integralClosure ℤ (AlgebraicClosure ℚ)
     set q : Polynomial (AlgebraicClosure ℚ) :=
       (p.map (φ : MvPolynomial (Fin s) ℚ →+* AlgebraicClosure ℚ)).scaleRoots (δ : AlgebraicClosure ℚ)
-    have hqm : q.Monic :=
-      (Polynomial.monic_scaleRoots_iff _).mpr (hpm.map _)
+    have hqm : q.Monic := (Polynomial.monic_scaleRoots_iff _).mpr (hpm.map _)
     have hq0 : q.eval ((δ : AlgebraicClosure ℚ) * ψ b) = 0 := by
-      have h := Polynomial.scaleRoots_eval₂_eq_zero (RingHom.id (AlgebraicClosure ℚ))
-        (s := (δ : AlgebraicClosure ℚ)) (r := ψ b) (p := p.map (φ : MvPolynomial (Fin s) ℚ →+* _))
-        (by rw [Polynomial.eval₂_map]; exact hw)
+      have h :=
+        Polynomial.scaleRoots_eval₂_eq_zero (RingHom.id (AlgebraicClosure ℚ))
+          (s := (δ : AlgebraicClosure ℚ)) (r := ψ b) (p := p.map (φ : MvPolynomial (Fin s) ℚ →+* _))
+          (by rw [Polynomial.eval₂_map]; exact hw)
       exact h
     have hnat : (p.map (φ : MvPolynomial (Fin s) ℚ →+* AlgebraicClosure ℚ)).natDegree = m :=
       hpm.natDegree_map _
@@ -148,8 +160,8 @@ theorem exists_integral_bound {B : Type*} [CommRing B] [Algebra ℚ B] {s : ℕ}
       rw [Polynomial.coeff_scaleRoots, hnat, Polynomial.coeff_map]
       rcases lt_trichotomy i m with hi | hi | hi
       · obtain ⟨e, he⟩ : ∃ e, m - i = e + 1 := ⟨m - i - 1, by omega⟩
-        rw [he, pow_succ, show ∀ a b c : AlgebraicClosure ℚ, a * (b * c) = (c * a) * b from
-          fun a b c ↦ by ring]
+        rw [he, pow_succ,
+          show ∀ a b c : AlgebraicClosure ℚ, a * (b * c) = (c * a) * b from fun a b c ↦ by ring]
         refine Subalgebra.mul_mem _ ?_ (Subalgebra.pow_mem _ (natCast_mem _ δ) _)
         · rw [mem_integralClosure_iff]
           simpa [hφ] using isIntegral_mul_aeval hy (hδ i hi)
@@ -167,16 +179,17 @@ theorem exists_integral_bound {B : Type*} [CommRing B] [Algebra ℚ B] {s : ℕ}
       ⟨q', hq'm, by rw [← Polynomial.eval_map, hq'map]; exact hq0⟩
     exact isIntegral_trans _ hO
   · intro σ
-    refine norm_le_of_monic_root p hpm
-      (σ.comp (φ : MvPolynomial (Fin s) ℚ →+* AlgebraicClosure ℚ)) (σ (ψ b)) ?_ M ?_
+    refine norm_le_of_monic_root p hpm (σ.comp (φ : MvPolynomial (Fin s) ℚ →+* AlgebraicClosure ℚ))
+      (σ (ψ b)) ?_ M ?_
     · rw [← Polynomial.hom_eval₂, hw, map_zero]
     · intro j _
       have hz : ∀ i, ‖σ (y i)‖ = 1 := fun i ↦ by
         obtain ⟨N, hN, h⟩ := hψ i
         have h' : y i ^ N = 1 := h
         exact Complex.norm_eq_one_of_pow_eq_one (by rw [← map_pow, h', map_one]) hN.ne'
-      have h1 : (σ.comp (φ : MvPolynomial (Fin s) ℚ →+* AlgebraicClosure ℚ)) (p.coeff j) =
-          eval₂ (algebraMap ℚ ℂ) (fun i ↦ σ (y i)) (p.coeff j) := by
+      have h1
+          : (σ.comp (φ : MvPolynomial (Fin s) ℚ →+* AlgebraicClosure ℚ)) (p.coeff j)
+            = eval₂ (algebraMap ℚ ℂ) (fun i ↦ σ (y i)) (p.coeff j) := by
         show σ (φ (p.coeff j)) = _
         rw [hφ, MvPolynomial.aeval_def, MvPolynomial.eval₂_comp_left]
         congr 1

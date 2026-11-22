@@ -8,22 +8,24 @@ namespace GlobalTheory.OrdMul
 
 open MvPolynomial
 
-theorem coeff_mem_of_mul {O : Type} [CommRing O] (I : Ideal O) {ι : Type} (K : Set ι) (q : ι)
-    (hq : q ∉ K) (a F : MvPolynomial ι O) (N : ℕ) (h0 : a.coeff 0 = 0)
-    (hu : IsUnit (a.coeff (Finsupp.single q 1)))
-    (H : ∀ m : ι →₀ ℕ, m.degree < N + 1 → (∀ j ∈ K, m j = 0) → (a * F).coeff m ∈ I) :
-    ∀ m : ι →₀ ℕ, m.degree < N → (∀ j ∈ K, m j = 0) → F.coeff m ∈ I := by
+theorem coeff_mem_of_mul
+    {O : Type} [CommRing O]
+    (I : Ideal O)
+    {ι : Type} (K : Set ι) (q : ι) (hq : q ∉ K) (a F : MvPolynomial ι O)
+    (N : ℕ)
+    (h0 : a.coeff 0 = 0) (hu : IsUnit (a.coeff (Finsupp.single q 1)))
+    (H : ∀ m : ι →₀ ℕ, m.degree < N + 1 → (∀ j ∈ K, m j = 0) → (a * F).coeff m ∈ I)
+    : ∀ m : ι →₀ ℕ, m.degree < N → (∀ j ∈ K, m j = 0) → F.coeff m ∈ I := by
   classical
-
-  have key : ∀ n : ℕ, ∀ m : ι →₀ ℕ, m q + 2 * (m.erase q).degree = n → m.degree < N →
-      (∀ j ∈ K, m j = 0) → F.coeff m ∈ I := by
+  have key
+      : ∀ n : ℕ, ∀ m : ι →₀ ℕ,
+        m q + 2 * (m.erase q).degree = n → m.degree < N → (∀ j ∈ K, m j = 0) → F.coeff m ∈ I := by
     intro n
     induction n using Nat.strong_induction_on with
     | _ n ih =>
       intro m hμ hm hK
       set m' : ι →₀ ℕ := m + Finsupp.single q 1 with hm'
-      have hdeg' : m'.degree < N + 1 := by
-        rw [hm', map_add (f := _), Finsupp.degree_single]; omega
+      have hdeg' : m'.degree < N + 1 := by rw [hm', map_add (f := _), Finsupp.degree_single]; omega
       have hK' : ∀ j ∈ K, m' j = 0 := by
         intro j hj
         have hqj : q ≠ j := fun h => hq (h ▸ hj)
@@ -33,8 +35,10 @@ theorem coeff_mem_of_mul {O : Type} [CommRing O] (I : Ideal O) {ι : Type} (K : 
       have hmem : (Finsupp.single q 1, m) ∈ Finset.HasAntidiagonal.antidiagonal m' := by
         rw [Finset.HasAntidiagonal.mem_antidiagonal, hm']; exact add_comm _ _
       rw [← Finset.add_sum_erase _ _ hmem] at hH
-      have hrest : ∑ x ∈ (Finset.HasAntidiagonal.antidiagonal m').erase (Finsupp.single q 1, m),
-          a.coeff x.1 * F.coeff x.2 ∈ I := by
+      have hrest
+          : ∑ x ∈ (Finset.HasAntidiagonal.antidiagonal m').erase (Finsupp.single q 1, m),
+              a.coeff x.1 * F.coeff x.2
+            ∈ I := by
         refine Ideal.sum_mem _ (fun x hx => ?_)
         obtain ⟨hne, hx⟩ := Finset.mem_erase.mp hx
         rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
@@ -64,10 +68,8 @@ theorem coeff_mem_of_mul {O : Type} [CommRing O] (I : Ideal O) {ι : Type} (K : 
             by_cases he : x.1.erase q = 0
             · have hs : Finsupp.single q (x.1 q) = x.1 := by
                 simpa [he] using Finsupp.single_add_erase q x.1
-              have h0' : x.1 q ≠ 0 := by
-                intro h; apply hi; rw [← hs, h, Finsupp.single_zero]
-              have h1' : x.1 q ≠ 1 := by
-                intro h; apply hiq; rw [← hs, h]
+              have h0' : x.1 q ≠ 0 := by intro h; apply hi; rw [← hs, h, Finsupp.single_zero]
+              have h1' : x.1 q ≠ 1 := by intro h; apply hiq; rw [← hs, h]
               omega
             · have : (x.1.erase q).degree ≠ 0 := fun h => he ((Finsupp.degree_eq_zero_iff _).mp h)
               omega
@@ -82,7 +84,13 @@ theorem coeff_mem_of_mul {O : Type} [CommRing O] (I : Ideal O) {ι : Type} (K : 
       exact (Ideal.unit_mul_mem_iff_mem I hu).mp hmain
   exact fun m hm hK => key _ m rfl hm hK
 
-theorem coeff_mem_of_pow_mul : ∀ (O : Type) [CommRing O] (I : Ideal O) (ι : Type) (K : Set ι) (q : ι), q ∉ K → ∀ (a F : MvPolynomial ι O) (N k : ℕ), a.coeff 0 = 0 → IsUnit (a.coeff (Finsupp.single q 1)) → (∀ m : ι →₀ ℕ, m.degree < N + k → (∀ j ∈ K, m j = 0) → (a ^ k * F).coeff m ∈ I) → ∀ m : ι →₀ ℕ, m.degree < N → (∀ j ∈ K, m j = 0) → F.coeff m ∈ I := by
+theorem coeff_mem_of_pow_mul
+    : ∀ (O : Type) [CommRing O] (I : Ideal O) (ι : Type) (K : Set ι) (q : ι),
+      q ∉ K
+        → ∀ (a F : MvPolynomial ι O) (N k : ℕ),
+          a.coeff 0 = 0 → IsUnit (a.coeff (Finsupp.single q 1))
+            → (∀ m : ι →₀ ℕ, m.degree < N + k → (∀ j ∈ K, m j = 0) → (a ^ k * F).coeff m ∈ I)
+            → ∀ m : ι →₀ ℕ, m.degree < N → (∀ j ∈ K, m j = 0) → F.coeff m ∈ I := by
   intro O _ I ι K q hq a F N k h0 hu H
   induction k generalizing F N with
   | zero =>

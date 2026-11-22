@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pHdSign :
-    HdSign := by
+theorem UpperTheory.Gal.W2.Seed.pHdSign : HdSign := by
   intro E _ _ _ A n τ i
   have hcim : ∀ σ : E →+* ℂ, (σ (A.c : E)).im = 0 := by
     intro σ

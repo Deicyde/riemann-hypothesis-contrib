@@ -7,18 +7,27 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
 open GlobalTheory.KeyUnitModels
 
 noncomputable section
 
 namespace GlobalTheory.LocArc
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O O' : Type} [CommRing O] [CommRing O'] {β : O →+* c.F} {β' : O' →+* c.F}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O O' : Type}
+  [CommRing O] [CommRing O']
+  {β : O →+* c.F} {β' : O' →+* c.F}
 
-@[reducible] def arcRestrict (b : O →+* O') (hb : β'.comp b = β) {O'' : Type} [CommRing O''] [IsDomain O'']
-    {b' : O' →+* O''} (a : ArcIn D l β' O'' b') : ArcIn D l β O'' (b'.comp b) where
+@[reducible]
+def arcRestrict
+    (b : O →+* O') (hb : β'.comp b = β)
+    {O'' : Type} [CommRing O''] [IsDomain O'']
+    {b' : O' →+* O''} (a : ArcIn D l β' O'' b')
+    : ArcIn D l β O'' (b'.comp b) where
   D₀ := a.D₀
   mod := a.mod
   oa := a.oa
@@ -34,25 +43,46 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Da
   be_dvd := a.be_dvd
   eta := a.eta
   etaA := a.etaA
-  geom := fun F _ _ _ r z hr hz => a.geom F (b r) (b z) (by rw [← hb] at hr; exact hr) (by rw [← hb] at hz; exact hz)
+  geom := fun F _ _ _ r z hr hz =>
+    a.geom F (b r) (b z) (by rw [← hb] at hr; exact hr) (by rw [← hb] at hz; exact hz)
 
-variable (Y : Model Xo c β) (b : O →+* O') (hb : β'.comp b = β) [IsPreimmersion (spMap b)] [Flat (spMap b)]
+variable
+  (Y : Model Xo c β) (b : O →+* O') (hb : β'.comp b = β) [IsPreimmersion (spMap b)] [Flat (spMap b)]
 
 theorem mono_locMap : Mono (locMap Y b).φ :=
   (MorphismProperty.monomorphisms Scheme.{0}).of_isPullback (locMap Y b).cart.1.flip
     (show Mono (pullback.fst Y.s (spMap b)) from inferInstance)
 
-theorem hasArcData_iff {O'' R : Type} [CommRing O''] [IsDomain O''] [CommRing R] [IsDomain R] {b' : O' →+* O''}
-    (a : ArcIn D l β' O'' b') (I : Ideal R) (f : O'' →+* R) (u : R) (χ : Sp R ⟶ (locModel Y b hb).X) :
-    (locModel Y b hb).HasArcData a I f u χ ↔
-      Y.HasArcData (arcRestrict b hb a) I f u (χ ≫ pullback.fst Y.s (spMap b)) := by
+theorem hasArcData_iff
+    {O'' R : Type} [CommRing O''] [IsDomain O''] [CommRing R] [IsDomain R]
+    {b' : O' →+* O''} (a : ArcIn D l β' O'' b')
+    (I : Ideal R) (f : O'' →+* R) (u : R) (χ : Sp R ⟶ (locModel Y b hb).X)
+    : (locModel Y b hb).HasArcData a I f u χ
+      ↔ Y.HasArcData (arcRestrict b hb a) I f u (χ ≫ pullback.fst Y.s (spMap b)) := by
   have ej := locModel_j Y b hb
   have em := locModel_m Y b hb
   constructor
   · rintro ⟨t, m, P, φ, he, w, e, h₁, h₂, h₃, h₄, h₅, h₆⟩
     obtain ⟨n, hn⟩ := ObjMaps.exists_sab_comp (locMap Y b) m
-    refine ⟨t, n, P, φ, he, w, e, h₁, h₂, h₃, h₄, h₅, fun F _ _ _ _ uF e₁ e₂ => ⟨(h₆ F uF e₁ e₂).1,
-      fun yF hy k p₀ σ hσ q₀ q x k₁ k₂ k₃ k₄ => (h₆ F uF e₁ e₂).2 yF ?_ k p₀ σ hσ q₀ q x k₁ k₂ k₃ ?_⟩⟩
+    refine ⟨
+      t,
+      n,
+      P,
+      φ,
+      he,
+      w,
+      e,
+      h₁,
+      h₂,
+      h₃,
+      h₄,
+      h₅,
+      fun F _ _ _ _ uF e₁ e₂ => ⟨
+        (h₆ F uF e₁ e₂).1,
+        fun yF hy k p₀ σ hσ q₀ q x k₁ k₂ k₃ k₄ =>
+          (h₆ F uF e₁ e₂).2 yF ?_ k p₀ σ hσ q₀ q x k₁ k₂ k₃ ?_
+      ⟩
+    ⟩
     · rw [← cancel_mono (pullback.fst Y.s (spMap b)), Category.assoc, ej, hy]
       simp only [Category.assoc]
     · have := mono_locMap Y b
@@ -62,8 +92,25 @@ theorem hasArcData_iff {O'' R : Type} [CommRing O''] [IsDomain O''] [CommRing R]
       exact k₄
   · rintro ⟨t, m, P, φ, he, w, e, h₁, h₂, h₃, h₄, h₅, h₆⟩
     obtain ⟨n, hn⟩ := ObjMaps.exists_sab_cancel (locMap Y b) m
-    refine ⟨t, n, P, φ, he, w, e, h₁, h₂, h₃, h₄, h₅, fun F _ _ _ _ uF e₁ e₂ => ⟨(h₆ F uF e₁ e₂).1,
-      fun yF hy k p₀ σ hσ q₀ q x k₁ k₂ k₃ k₄ => (h₆ F uF e₁ e₂).2 yF ?_ k p₀ σ hσ q₀ q x k₁ k₂ k₃ ?_⟩⟩
+    refine ⟨
+      t,
+      n,
+      P,
+      φ,
+      he,
+      w,
+      e,
+      h₁,
+      h₂,
+      h₃,
+      h₄,
+      h₅,
+      fun F _ _ _ _ uF e₁ e₂ => ⟨
+        (h₆ F uF e₁ e₂).1,
+        fun yF hy k p₀ σ hσ q₀ q x k₁ k₂ k₃ k₄ =>
+          (h₆ F uF e₁ e₂).2 yF ?_ k p₀ σ hσ q₀ q x k₁ k₂ k₃ ?_
+      ⟩
+    ⟩
     · rw [← ej, ← Category.assoc, hy]
       simp only [Category.assoc]
     · have := congrArg (· ≫ (locMap Y b).φ) k₄
@@ -71,8 +118,8 @@ theorem hasArcData_iff {O'' R : Type} [CommRing O''] [IsDomain O''] [CommRing R]
       rw [hn, ← em]
       exact this
 
-theorem mem_range_j_iff (x : (locModel Y b hb).X) :
-    x ∈ Set.range (locModel Y b hb).j ↔ pullback.fst Y.s (spMap b) x ∈ Set.range Y.j := by
+theorem mem_range_j_iff (x : (locModel Y b hb).X)
+    : x ∈ Set.range (locModel Y b hb).j ↔ pullback.fst Y.s (spMap b) x ∈ Set.range Y.j := by
   rw [← locModel_j Y b hb]
   constructor
   · rintro ⟨u, rfl⟩
@@ -81,8 +128,9 @@ theorem mem_range_j_iff (x : (locModel Y b hb).X) :
     refine ⟨u, (pullback.fst Y.s (spMap b)).isEmbedding.injective ?_⟩
     rw [← hu, Scheme.Hom.comp_apply]
 
-theorem spMap_comp' {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap (g.comp f) = spMap g ≫ spMap f := by
+theorem spMap_comp'
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap (g.comp f) = spMap g ≫ spMap f := by
   rw [spMap, spMap, spMap, ← Spec.map_comp]
   rfl
 
@@ -121,5 +169,10 @@ theorem locModel_arc (h : Y.N4) : (locModel Y b hb).N4 := by
 
 end GlobalTheory.LocArc
 
-theorem GlobalTheory.LocArc.arc_localise : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (O' : Type) [CommRing O'] (β' : O' →+* c.F) (b : O →+* O') (hb : β'.comp b = β) [IsPreimmersion (spMap b)] [Flat (spMap b)], Y.N4 → (locModel Y b hb).N4 :=
-  fun _ _ _ _ _ _ _ _ _ _ _ _ Y _ _ _ b hb _ _ h => GlobalTheory.LocArc.locModel_arc Y b hb h
+theorem GlobalTheory.LocArc.arc_localise
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (O' : Type) [CommRing O'] (β' : O' →+* c.F) (b : O →+* O') (hb : β'.comp b = β)
+        [IsPreimmersion (spMap b)] [Flat (spMap b)],
+      Y.N4 → (locModel Y b hb).N4 := fun _ _ _ _ _ _ _ _ _ _ _ _ Y _ _ _ b hb _ _ h =>
+  GlobalTheory.LocArc.locModel_arc Y b hb h

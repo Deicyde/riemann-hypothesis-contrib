@@ -12,7 +12,14 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace GlobalTheory.FibreProper
 
-theorem isProper_of_irreducible_of_isProper_specialFibre : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of O)), IrreducibleSpace X → IsSeparated f → LocallyOfFiniteType f → QuasiCompact f → (∃ x : X, f x = IsLocalRing.closedPoint O) → IsProper (pullback.snd f (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O)))) → IsProper f := by
+theorem isProper_of_irreducible_of_isProper_specialFibre
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (X : Scheme.{0})
+        (f : X ⟶ Spec (CommRingCat.of O)),
+      IrreducibleSpace X → IsSeparated f → LocallyOfFiniteType f → QuasiCompact f
+        → (∃ x : X, f x = IsLocalRing.closedPoint O)
+        → IsProper (pullback.snd f (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O))))
+        → IsProper f := by
   intro O _ _ _ _ X f hirr hsep hlft hqc hx hfib
   obtain ⟨x₀, hx₀⟩ := hx
   have hne : Nonempty X := ⟨x₀⟩
@@ -33,14 +40,19 @@ theorem isProper_of_irreducible_of_isProper_specialFibre : ∀ (O : Type) [CommR
     have := congrArg Subtype.val hv
     rwa [morphismRestrict_base_coe] at this
 
-  have hUirr : IsIrreducible (U : Set X) :=
-    ⟨hUne, (IrreducibleSpace.isIrreducible_univ X).isPreirreducible.open_subset U.isOpen (Set.subset_univ _)⟩
+  have hUirr : IsIrreducible (U : Set X) := ⟨
+    hUne,
+    (IrreducibleSpace.isIrreducible_univ X).isPreirreducible.open_subset U.isOpen
+      (Set.subset_univ _)
+  ⟩
   have hCirr : IsIrreducible C := by
     haveI : IrreducibleSpace (U : Set X) := Subtype.irreducibleSpace hUirr
     haveI : IrreducibleSpace (π ⁻¹ᵁ U).toScheme :=
       (Scheme.homeoOfIso (asIso (π ∣_ U))).irreducibleSpace_iff.2 (inferInstanceAs (IrreducibleSpace (U : Set X)))
-    have h := (IrreducibleSpace.isIrreducible_univ (π ⁻¹ᵁ U).toScheme).image (fun y => (π ⁻¹ᵁ U).ι y)
-      ((π ⁻¹ᵁ U).ι.continuous.continuousOn)
+    have h :=
+      (IrreducibleSpace.isIrreducible_univ (π ⁻¹ᵁ U).toScheme).image
+        (fun y => (π ⁻¹ᵁ U).ι y)
+        ((π ⁻¹ᵁ U).ι.continuous.continuousOn)
     convert h using 1
     ext y
     constructor
@@ -57,13 +69,20 @@ theorem isProper_of_irreducible_of_isProper_specialFibre : ∀ (O : Type) [CommR
     obtain ⟨y, hy, hyx⟩ : x₀ ∈ π '' closure C := hπT ▸ Set.mem_univ x₀
     refine ⟨y, hy, ?_⟩
     rw [hcomm, Scheme.Hom.comp_apply, hyx, hx₀]
-  have hfib' : IsProper (pullback.snd (q ≫ s) (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O)))) := by
-    rw [hcomm, (Iso.eq_inv_comp (pullbackRightPullbackFstIso f (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O))) π)).2
-      (pullbackRightPullbackFstIso_hom_snd (f := f) (g := Spec.map (CommRingCat.ofHom (IsLocalRing.residue O))) (f' := π))]
+  have hfib'
+      : IsProper (pullback.snd (q ≫ s) (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O)))) := by
+    rw [hcomm,
+      (Iso.eq_inv_comp (pullbackRightPullbackFstIso f
+          (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O))) π)).2
+        (pullbackRightPullbackFstIso_hom_snd (f := f)
+          (g := Spec.map (CommRingCat.ofHom (IsLocalRing.residue O))) (f' := π))]
     infer_instance
-  have hclosed := GlobalTheory.T.isClosed_image_closure_completeDVR_specialFibre O Y P q s C hs hq hfib' hCirr hmeet
+  have hclosed :=
+    GlobalTheory.T.isClosed_image_closure_completeDVR_specialFibre O Y P q s C hs hq hfib' hCirr
+      hmeet
   have huc : UniversallyClosed f :=
-    GlobalTheory.T.universallyClosed_of_closed_image_cover _ X Y P f π q s (closure C) inferInstance hq hcomm isClosed_closure hclosed hπT
+    GlobalTheory.T.universallyClosed_of_closed_image_cover _ X Y P f π q s (closure C) inferInstance
+      hq hcomm isClosed_closure hclosed hπT
   exact ⟨⟩
 
 end GlobalTheory.FibreProper

@@ -12,10 +12,12 @@ namespace Formalism.MainNotions.ModuliIntegralCharts.H1.GSplit
 
 open NumberField IsDedekindDomain UniqueFactorizationMonoid
 
-theorem split_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E) :
-    (normalizedFactors (Ideal.span {((p : ℕ) : 𝓞 E)})).card = Module.finrank ℚ E ∧
-      (normalizedFactors (Ideal.span {((p : ℕ) : 𝓞 E)})).Nodup := by
+theorem split_of_ncard
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime)
+    (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E)
+    : (normalizedFactors (Ideal.span {((p : ℕ) : 𝓞 E)})).card = Module.finrank ℚ E
+      ∧ (normalizedFactors (Ideal.span {((p : ℕ) : 𝓞 E)})).Nodup := by
   classical
   set I : Ideal (𝓞 E) := Ideal.span {((p : ℕ) : 𝓞 E)} with hIdef
   set p' : Ideal ℤ := Ideal.span {((p : ℕ) : ℤ)} with hp'def
@@ -31,7 +33,8 @@ theorem split_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Pr
     exact_mod_cast hp.ne_zero
   set M := normalizedFactors I with hMdef
 
-  have hmem : ∀ P : Ideal (𝓞 E), P ∈ M ↔ P.IsPrime ∧ I ≤ P := fun P => Ideal.mem_normalizedFactors_iff hI0
+  have hmem : ∀ P : Ideal (𝓞 E), P ∈ M ↔ P.IsPrime ∧ I ≤ P := fun P =>
+    Ideal.mem_normalizedFactors_iff hI0
   have hne : ∀ P ∈ M, P ≠ ⊥ := fun P hP h0 => hI0 (eq_bot_iff.2 (h0 ▸ ((hmem P).1 hP).2))
   have hlies : ∀ P ∈ M, P.LiesOver p' := by
     intro P hP
@@ -51,8 +54,9 @@ theorem split_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Pr
     exact ⟨hmax.eq_of_le hnt hle⟩
   have hcard1 : M.toFinset.card = Module.finrank ℚ E := by
     rw [← h, ← Set.ncard_coe_finset]
-    have himg : HeightOneSpectrum.asIdeal '' {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal} =
-        (M.toFinset : Set (Ideal (𝓞 E))) := by
+    have himg
+        : HeightOneSpectrum.asIdeal '' {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}
+          = (M.toFinset : Set (Ideal (𝓞 E))) := by
       ext P
       simp only [Set.mem_image, Set.mem_setOf_eq, Finset.mem_coe, Multiset.mem_toFinset]
       constructor
@@ -74,18 +78,20 @@ theorem split_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Pr
     have hPM : P ∈ M := Multiset.mem_toFinset.1 hP
     haveI := hlies P hPM
     haveI : P.IsPrime := ((hmem P).1 hPM).1
-    rw [Ideal.IsDedekindDomain.ramificationIdx'_eq_normalizedFactors_count (by rw [hmap]; exact hI0) ‹P.IsPrime› (hne P hPM), hmap]
+    rw [Ideal.IsDedekindDomain.ramificationIdx'_eq_normalizedFactors_count (by rw [hmap]; exact hI0)
+        ‹P.IsPrime› (hne P hPM),
+      hmap]
     exact Nat.le_mul_of_pos_right _ (Ideal.inertiaDeg'_pos p' P)
   have hcard : M.card = ∑ P ∈ M.toFinset, M.count P := (Multiset.toFinset_sum_count_eq M).symm
   have h1 : M.toFinset.card ≤ M.card := Multiset.toFinset_card_le M
   have hMc : M.card = Module.finrank ℚ E := le_antisymm (hcard ▸ hle) (hcard1 ▸ h1)
   exact ⟨hMc, Multiset.toFinset_card_eq_card_iff_nodup.1 (hcard1.trans hMc.symm)⟩
 
-
 open Formalism.BasicNotions in
-theorem g_splits (D : D7) (i : Fin 2) :
-    (normalizedFactors (Ideal.span {((D.host.g i : ℕ) : 𝓞 D.host.E)})).card = Module.finrank ℚ D.host.E ∧
-      (normalizedFactors (Ideal.span {((D.host.g i : ℕ) : 𝓞 D.host.E)})).Nodup :=
+theorem g_splits (D : D7) (i : Fin 2)
+    : (normalizedFactors (Ideal.span {((D.host.g i : ℕ) : 𝓞 D.host.E)})).card
+        = Module.finrank ℚ D.host.E
+      ∧ (normalizedFactors (Ideal.span {((D.host.g i : ℕ) : 𝓞 D.host.E)})).Nodup :=
   split_of_ncard (D.host.g_prime i) (D.nd.g_split i)
 
 end Formalism.MainNotions.ModuliIntegralCharts.H1.GSplit

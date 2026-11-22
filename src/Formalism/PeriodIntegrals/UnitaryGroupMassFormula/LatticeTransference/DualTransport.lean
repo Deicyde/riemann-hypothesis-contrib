@@ -13,8 +13,8 @@ noncomputable section
 
 namespace PI.Tr
 
-def dualLat {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (Λ : Submodule ℤ E) :
-    Submodule ℤ E where
+def dualLat {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (Λ : Submodule ℤ E)
+    : Submodule ℤ E where
   carrier := {y | ∀ x ∈ Λ, ∃ n : ℤ, inner ℝ x y = (n : ℝ)}
   add_mem' := by
     intro a b ha hb x hx
@@ -32,21 +32,25 @@ lemma mem_dualLat {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] {�
 
 def PoissonGauss : Prop :=
   ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
-    (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ],
-    (∀ t : ℝ, 0 < t → ∀ v : E, Summable fun x : Λ => Real.exp (-π * t * ‖(x : E) + v‖ ^ 2)) ∧
-    (∀ t : ℝ, 0 < t → Summable fun y : dualLat Λ => Real.exp (-π * ‖(y : E)‖ ^ 2 / t)) ∧
-    ∃ c : ℝ, 0 < c ∧ ∀ t : ℝ, 0 < t → ∀ v : E,
-      ∑' x : Λ, Real.exp (-π * t * ‖(x : E) + v‖ ^ 2) =
-        c * t ^ (-(finrank ℝ E : ℝ) / 2) *
-          ∑' y : dualLat Λ, Real.exp (-π * ‖(y : E)‖ ^ 2 / t) * Real.cos (2 * π * inner ℝ (y : E) v)
+      (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ],
+    (∀ t : ℝ, 0 < t → ∀ v : E, Summable fun x : Λ => Real.exp (-π * t * ‖(x : E) + v‖ ^ 2))
+      ∧ (∀ t : ℝ, 0 < t → Summable fun y : dualLat Λ => Real.exp (-π * ‖(y : E)‖ ^ 2 / t))
+      ∧ ∃ c : ℝ,
+        0 < c
+          ∧ ∀ t : ℝ,
+            0 < t
+              → ∀ v : E,
+                ∑' x : Λ, Real.exp (-π * t * ‖(x : E) + v‖ ^ 2)
+                  = c * t ^ (-(finrank ℝ E : ℝ) / 2)
+                    * ∑' y : dualLat Λ, Real.exp (-π * ‖(y : E)‖ ^ 2 / t) * Real.cos (2 * π * inner ℝ (y : E) v)
 
 def KeyDim (P : ℕ → Prop) : Prop :=
   ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
-    (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ] (lam : ℝ) (u : E), P (finrank ℝ E) →
-    0 < lam →
-    (∀ y : E, (∀ x ∈ Λ, ∃ n : ℤ, inner ℝ x y = (n : ℝ)) → ‖y‖ < lam →
-      ∃ m : ℤ, inner ℝ u y = (m : ℝ)) →
-    ∃ l ∈ Λ, ‖u - l‖ * lam ≤ (finrank ℝ E : ℝ) / 2
+      (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ] (lam : ℝ) (u : E),
+    P (finrank ℝ E) → 0 < lam
+      → (∀ y : E,
+        (∀ x ∈ Λ, ∃ n : ℤ, inner ℝ x y = (n : ℝ)) → ‖y‖ < lam → ∃ m : ℤ, inner ℝ u y = (m : ℝ))
+      → ∃ l ∈ Λ, ‖u - l‖ * lam ≤ (finrank ℝ E : ℝ) / 2
 
 def KeyLarge : Prop := KeyDim (fun n => 2 ≤ n)
 

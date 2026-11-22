@@ -9,8 +9,10 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 set_option backward.isDefEq.respectTransparency false
 open CategoryTheory CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.cohomology_vanishing_of_trivial_frame : ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {Φ : PDF R C} (E : Frame (Φ := Φ) 0) (F : C ⥤ ModuleCat.{0} R),
-    Subsingleton (F.obj E.D) → ∀ n, Subsingleton (CH.H F n) := by
+theorem _root_.GlobalTheory.T.cohomology_vanishing_of_trivial_frame
+    : ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {Φ : PDF R C} (E : Frame (Φ := Φ) 0)
+        (F : C ⥤ ModuleCat.{0} R),
+      Subsingleton (F.obj E.D) → ∀ n, Subsingleton (CH.H F n) := by
   intro R _ C _ Φ E F hD n
   have hInitial : Limits.IsInitial E.D := by
     refine Limits.IsInitial.ofUniqueHom (fun T => Classical.choice (E.ne T)) ?_

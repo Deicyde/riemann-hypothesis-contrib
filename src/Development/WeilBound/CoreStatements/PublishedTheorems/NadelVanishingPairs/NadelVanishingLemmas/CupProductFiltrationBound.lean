@@ -11,8 +11,9 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-private theorem card_filter_le_add_card_filter_ge {ι : Type} [LinearOrder ι] (u : Finset ι) (j : ι)
-    (hj : j ∈ u) : ({x ∈ u | x ≤ j}).card + ({x ∈ u | j ≤ x}).card = u.card + 1 := by
+private theorem card_filter_le_add_card_filter_ge
+    {ι : Type} [LinearOrder ι] (u : Finset ι) (j : ι) (hj : j ∈ u)
+    : ({x ∈ u | x ≤ j}).card + ({x ∈ u | j ≤ x}).card = u.card + 1 := by
   have hU : ({x ∈ u | x ≤ j}) ∪ ({x ∈ u | j ≤ x}) = u := by
     ext x
     simp only [Finset.mem_union, Finset.mem_filter]
@@ -34,12 +35,23 @@ private theorem card_filter_le_add_card_filter_ge {ι : Type} [LinearOrder ι] (
   rw [hU, hI, Finset.card_singleton] at h
   omega
 
-theorem cechZero_of_hypZero_of_closed_map : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E) (N T : ℕ → Finset ι → AddSubgroup E) (Φ : E →+ (Finset ι → E)), (∀ x, d (d x) = 0) → (∀ q s t, s.Nonempty → s ⊆ t → N q s ≤ N q t) → (∀ q s t, s.Nonempty → s ⊆ t → T q s ≤ T q t) → (∀ q s x, x ∈ T q s → d x ∈ T (q + 1) s) → (∀ x, Φ x ∅ = 0) → (∀ x, Dtot d (Φ x) = 0) → (∀ a u t x, u.Nonempty → t ⊆ u → x ∈ N a u → (∀ q, q + t.card = a + 1 → Φ x t ∈ T q u) ∧ (a + 1 < t.card → Φ x t = 0)) → (∀ s, ∀ j ∈ s, CartierAt d (fun x => Φ x {j}) (fun a => N a s) (fun a => T a s)) → ∀ a b, HypZero d T (a + b) → CechZero (N a) b := by
+theorem cechZero_of_hypZero_of_closed_map
+    : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E)
+        (N T : ℕ → Finset ι → AddSubgroup E) (Φ : E →+ (Finset ι → E)),
+      (∀ x, d (d x) = 0) → (∀ q s t, s.Nonempty → s ⊆ t → N q s ≤ N q t)
+        → (∀ q s t, s.Nonempty → s ⊆ t → T q s ≤ T q t) → (∀ q s x, x ∈ T q s → d x ∈ T (q + 1) s)
+        → (∀ x, Φ x ∅ = 0) → (∀ x, Dtot d (Φ x) = 0)
+        → (∀ a u t x,
+          u.Nonempty → t ⊆ u → x ∈ N a u
+            → (∀ q, q + t.card = a + 1 → Φ x t ∈ T q u) ∧ (a + 1 < t.card → Φ x t = 0))
+        → (∀ s, ∀ j ∈ s, CartierAt d (fun x => Φ x {j}) (fun a => N a s) (fun a => T a s))
+        → ∀ a b, HypZero d T (a + b) → CechZero (N a) b := by
   intro ι _ E _ d N T Φ hdd hN hT hd hΦ0 hΦD hΦT hC a b hH
-  let Ψ : (Finset ι → E) →+ (Finset ι → E) := AddMonoidHom.mk' (fun c => cup Φ c) (by
-    intro c c'
-    funext u
-    simp only [cup, Pi.add_apply, map_add (f := _), Finset.sum_add_distrib])
+  let Ψ : (Finset ι → E) →+ (Finset ι → E) :=
+    AddMonoidHom.mk' (fun c => cup Φ c) (by
+      intro c c'
+      funext u
+      simp only [cup, Pi.add_apply, map_add (f := _), Finset.sum_add_distrib])
   have hΨ : ∀ c, Ψ c = cup Φ c := fun c => rfl
   let γ : Finset ι → E → E := fun s x => if h : s.Nonempty then Φ x {s.max' h} else 0
   refine cechZero_of_hypZero_filtered d N T Ψ γ hdd hN hT hd ?_ ?_ ?_ ?_ a b hH

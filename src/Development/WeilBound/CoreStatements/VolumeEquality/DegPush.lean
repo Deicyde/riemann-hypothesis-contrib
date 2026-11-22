@@ -22,7 +22,7 @@ namespace SheetDecomposition
 
 theorem degPush : DegPush :=
   have hEq : NumEq := numEq ptDim numPull (unitZero ptDim)
-  degPush_of hEq (geoPF ptDim) (fibNum hEq) trdegU testRelabel geoTest numMap muMass fieldJoin genIso
-    (fibLink chartVal centre coordLat) (muLink chartVal centre coordLat)
+  degPush_of hEq (geoPF ptDim) (fibNum hEq) trdegU testRelabel geoTest numMap muMass fieldJoin
+    genIso (fibLink chartVal centre coordLat) (muLink chartVal centre coordLat)
 
 end SheetDecomposition

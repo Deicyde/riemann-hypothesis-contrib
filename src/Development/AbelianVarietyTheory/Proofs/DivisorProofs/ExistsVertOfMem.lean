@@ -5,37 +5,50 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SubsetSpanBy
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
 namespace GlobalTheory.Desc
 
-theorem exists_vert_of_mem (S : Type) [CommRing S] [IsDomain S] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
-    (p : X ⟶ Sp S) [IsDominant p] (f : S) (hf : f ≠ 0) (hx : ∃ x : X, f ∈ (p x).asIdeal) : ∃ z : X, Vert p f z := by
+theorem exists_vert_of_mem
+    (S : Type) [CommRing S] [IsDomain S]
+    (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
+    (p : X ⟶ Sp S) [IsDominant p]
+    (f : S) (hf : f ≠ 0) (hx : ∃ x : X, f ∈ (p x).asIdeal)
+    : ∃ z : X, Vert p f z := by
   obtain ⟨x, hfx⟩ := hx
   obtain ⟨U, hU, hx, -⟩ := exists_isAffineOpen_mem_and_subset (x := x) (U := ⊤) trivial
   haveI : Nonempty U := ⟨⟨x, hx⟩⟩
   haveI : IsNoetherianRing Γ(X, U) := IsLocallyNoetherian.component_noetherian ⟨U, hU⟩
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (hU.fromSpec ≫ p)
-  have key : ∀ q : PrimeSpectrum Γ(X, U), f ∈ (p (hU.fromSpec q)).asIdeal ↔ φ.hom f ∈ q.asIdeal := by
+  have key
+      : ∀ q : PrimeSpectrum Γ(X, U), f ∈ (p (hU.fromSpec q)).asIdeal ↔ φ.hom f ∈ q.asIdeal := by
     intro q
-    have h : p (hU.fromSpec q) = (Spec.map φ) q := by
-      rw [hφ]; rfl
-    rw [h]; rfl
+    have h : p (hU.fromSpec q) = (Spec.map φ) q := by rw [hφ]; rfl
+    rw [h]
+    rfl
   have key' : ∀ y : U, f ∈ (p y.1).asIdeal ↔ φ.hom f ∈ (hU.primeIdealOf y).asIdeal := by
     intro y
     rw [← key, hU.fromSpec_primeIdealOf]
   have ha : φ.hom f ≠ 0 := by
     intro h0
-    have hO : IsOpen ((PrimeSpectrum.basicOpen f : TopologicalSpace.Opens (PrimeSpectrum S)) : Set (PrimeSpectrum S)) :=
+    have hO : IsOpen
+        ((PrimeSpectrum.basicOpen f : TopologicalSpace.Opens (PrimeSpectrum S))
+          : Set (PrimeSpectrum S)) :=
       (PrimeSpectrum.basicOpen f).isOpen
-    have hne : ((PrimeSpectrum.basicOpen f : TopologicalSpace.Opens (PrimeSpectrum S)) : Set (PrimeSpectrum S)).Nonempty :=
+    have hne
+        : ((PrimeSpectrum.basicOpen f : TopologicalSpace.Opens (PrimeSpectrum S))
+          : Set (PrimeSpectrum S)).Nonempty :=
       ⟨⟨⊥, Ideal.isPrime_bot⟩, by simpa using hf⟩
     obtain ⟨y, hy⟩ := p.denseRange.exists_mem_open hO hne
-    obtain ⟨w, hwU, hw⟩ := nonempty_preirreducible_inter U.isOpen (hO.preimage p.continuous) ⟨x, hx⟩ ⟨y, hy⟩
+    obtain ⟨w, hwU, hw⟩ :=
+      nonempty_preirreducible_inter U.isOpen (hO.preimage p.continuous) ⟨x, hx⟩ ⟨y, hy⟩
     have : f ∈ (p w).asIdeal := (key' ⟨w, hwU⟩).2 (h0 ▸ Ideal.zero_mem _)
     exact hw this
   have hle : Ideal.span {φ.hom f} ≤ (hU.primeIdealOf ⟨x, hx⟩).asIdeal :=
@@ -60,10 +73,12 @@ theorem exists_vert_of_mem (S : Type) [CommRing S] [IsDomain S] (X : Scheme.{0})
   letI := X.presheaf.algebra_section_stalk z
   haveI := hU.isLocalization_stalk z
   refine ⟨z.1, ?_, (key' z).2 (by rw [hP]; exact haQ)⟩
-  have := IsLocalization.AtPrime.ringKrullDim_eq_height (hU.primeIdealOf z).asIdeal
-    (X.presheaf.stalk (z : X))
+  have :=
+    IsLocalization.AtPrime.ringKrullDim_eq_height (hU.primeIdealOf z).asIdeal
+      (X.presheaf.stalk (z : X))
   rw [this, hP]
   change ((Q.height : ℕ∞) : WithBot ℕ∞) = 1
-  rw [hQ1]; rfl
+  rw [hQ1]
+  rfl
 
 end GlobalTheory.Desc

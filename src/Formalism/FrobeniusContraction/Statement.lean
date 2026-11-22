@@ -32,8 +32,9 @@ def Base.p (B : Base O A) (s : ℕ) : A := (⇑B.φ)^[s] B.q
 
 def Base.I (B : Base O A) : Ideal A := Ideal.span {B.X, (B.ℓ : A)}
 
-structure Amb (B : Base O A) (AA : Type) [CommRing AA] [Algebra O AA] [Algebra A AA]
-    [IsScalarTower O A AA] where
+structure Amb
+    (B : Base O A)
+    (AA : Type) [CommRing AA] [Algebra O AA] [Algebra A AA] [IsScalarTower O A AA] where
   φ : AA →ₐ[O] AA
   γ : AA →ₐ[O] AA
   φ_ext : ∀ a : A, φ (algebraMap A AA a) = algebraMap A AA (B.φ a)
@@ -45,8 +46,11 @@ structure Amb (B : Base O A) (AA : Type) [CommRing AA] [Algebra O AA] [Algebra A
 
 variable {AA : Type} [CommRing AA] [Algebra O AA] [Algebra A AA] [IsScalarTower O A AA]
 
-structure WachDatum {B : Base O A} (E : Amb B AA) (n : ℕ) (V : Type) [AddCommGroup V] [Module AA V]
-    [Module A V] [IsScalarTower A AA V] [Module O V] [IsScalarTower O AA V] where
+structure WachDatum
+    {B : Base O A} (E : Amb B AA)
+    (n : ℕ)
+    (V : Type) [AddCommGroup V] [Module AA V] [Module A V] [IsScalarTower A AA V] [Module O V]
+    [IsScalarTower O AA V] where
   N : ZMod n → Submodule A V
   φ : ZMod n → V →ₗ[O] V
   γ : ZMod n → V →ₗ[O] V
@@ -64,8 +68,9 @@ structure WachDatum {B : Base O A} (E : Amb B AA) (n : ℕ) (V : Type) [AddCommG
 namespace WachDatum
 
 variable {B : Base O A} {E : Amb B AA} {n : ℕ}
-variable {V : Type} [AddCommGroup V] [Module AA V] [Module A V] [IsScalarTower A AA V]
-  [Module O V] [IsScalarTower O AA V]
+variable
+  {V : Type} [AddCommGroup V] [Module AA V] [Module A V] [IsScalarTower A AA V] [Module O V]
+  [IsScalarTower O AA V]
 variable (W : WachDatum E n V)
 
 end WachDatum
@@ -73,10 +78,12 @@ end WachDatum
 section Hom
 
 variable {B : Base O A} {E : Amb B AA} {n : ℕ}
-variable {V₁ : Type} [AddCommGroup V₁] [Module AA V₁] [Module A V₁] [IsScalarTower A AA V₁]
-  [Module O V₁] [IsScalarTower O AA V₁]
-variable {V₂ : Type} [AddCommGroup V₂] [Module AA V₂] [Module A V₂] [IsScalarTower A AA V₂]
-  [Module O V₂] [IsScalarTower O AA V₂]
+variable
+  {V₁ : Type} [AddCommGroup V₁] [Module AA V₁] [Module A V₁] [IsScalarTower A AA V₁] [Module O V₁]
+  [IsScalarTower O AA V₁]
+variable
+  {V₂ : Type} [AddCommGroup V₂] [Module AA V₂] [Module A V₂] [IsScalarTower A AA V₂] [Module O V₂]
+  [IsScalarTower O AA V₂]
 
 structure Hom (W₁ : WachDatum E n V₁) (W₂ : WachDatum E n V₂) where
   f : V₁ →ₗ[AA] V₂
@@ -94,16 +101,15 @@ end Hom
 
 def ContractBij : Prop :=
   ∀ (R P : Type) [CommRing R] [AddCommGroup P] [Module R P] (I : Ideal R) [IsAdicComplete I P]
-    (f : P →+ P),
-    (∀ k : ℕ, ∀ x ∈ (I ^ k • ⊤ : Submodule R P), f x ∈ (I ^ (k + 1) • ⊤ : Submodule R P)) →
-    Function.Bijective (fun x => f x - x)
+      (f : P →+ P),
+    (∀ k : ℕ, ∀ x ∈ (I ^ k • ⊤ : Submodule R P), f x ∈ (I ^ (k + 1) • ⊤ : Submodule R P))
+      → Function.Bijective (fun x => f x - x)
 
 def LenBound : Prop :=
-  ∀ (O M : Type) [CommRing O] [AddCommGroup M] [Module O M] (ℓ g e : ℕ)
-    (Z Bc I : Submodule O M) (s : Finset M),
-    s.card ≤ g → Submodule.span O (s : Set M) ⊔ Bc = Z → Bc ≤ I →
-    (∀ p ∈ Z, (ℓ ^ e : ℕ) • p ∈ I) →
-    Module.length O (↥Z ⧸ I.comap Z.subtype) ≤
-      (g : ℕ∞) * (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})
+  ∀ (O M : Type) [CommRing O] [AddCommGroup M] [Module O M] (ℓ g e : ℕ) (Z Bc I : Submodule O M)
+      (s : Finset M),
+    s.card ≤ g → Submodule.span O (s : Set M) ⊔ Bc = Z → Bc ≤ I → (∀ p ∈ Z, (ℓ ^ e : ℕ) • p ∈ I)
+      → Module.length O (↥Z ⧸ I.comap Z.subtype)
+        ≤ (g : ℕ∞) * (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})
 
 end Formalism.WachCohomologyFacts

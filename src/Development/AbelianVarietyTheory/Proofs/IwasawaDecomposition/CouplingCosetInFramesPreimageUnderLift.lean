@@ -10,19 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ProdA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT
+  Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.Mem.Col2.AdT
 
-
 open Classical GlobalTheory.TopStep in
-theorem sub_mem_stdAt_of_redV {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} (P : HeightOneSpectrum (𝓞 E))
-    (hq : ((qOf P : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (m : GLint E n P) (x : Sp E n)
-    (hx : (qOf P : E) • x ∈ stdAt E n P) (hred : ∀ v ∈ stdAt E n P, redV P (m.1 v) = redV P v) :
-    m.1 x - x ∈ stdAt E n P := by
+theorem sub_mem_stdAt_of_redV
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {n : ℕ}
+    (P : HeightOneSpectrum (𝓞 E)) (hq : ((qOf P : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (m : GLint E n P)
+    (x : Sp E n) (hx : (qOf P : E) • x ∈ stdAt E n P)
+    (hred : ∀ v ∈ stdAt E n P, redV P (m.1 v) = redV P v)
+    : m.1 x - x ∈ stdAt E n P := by
   have hq0 : (qOf P : E) ≠ 0 := qOf_ne_zero
   have hk0 := glint_mem m hx
   refine mem_stdAt.2 fun j => ?_
@@ -36,7 +41,6 @@ theorem sub_mem_stdAt_of_redV {E : Type} [Field E] [NumberField E] [StarRing E] 
   rw [LinearEquiv.map_smul]
   simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
   field_simp
-
 
 set_option maxHeartbeats 1600000 in
 open Classical GlobalTheory.TopStep in

@@ -7,15 +7,23 @@ public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.Unitar
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.WeilDeligne
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GalOfCusp UpperTheory.Zero.LLC UpperTheory.V.Af UpperTheory.V.Z.Gam
-open UpperTheory.GalN.V GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.LocLanglands GlobalTheory.GalOfCusp UpperTheory.Zero.LLC UpperTheory.V.Af
+  UpperTheory.V.Z.Gam
+open UpperTheory.GalN.V GroundTheory.Global.SemiLocal UpperTheory.V.Published
+  UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
 
-private theorem algSat_map_pow (n q f : ℕ) (B : Multiset ℂˣ) :
-    (algSat n q B).map (· ^ f) = algSat n (q ^ f) (B.map (· ^ f)) := by
-  have e : ∀ (q : ℕ) (C : Multiset ℂˣ),
-      algSat n q C = C.map fun α : ℂˣ => (((q : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) * (α : ℂ) := fun q C => by
-    simp only [algSat, Multiset.bind_def, Multiset.pure_def, Multiset.bind_singleton, Multiset.map_map, Function.comp_def]
+private theorem algSat_map_pow (n q f : ℕ) (B : Multiset ℂˣ)
+    : (algSat n q B).map (· ^ f) = algSat n (q ^ f) (B.map (· ^ f)) := by
+  have e
+      : ∀ (q : ℕ) (C : Multiset ℂˣ),
+        algSat n q C
+          = C.map fun α : ℂˣ => (((q : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) * (α : ℂ) := fun q C => by
+    simp only [algSat, Multiset.bind_def, Multiset.pure_def, Multiset.bind_singleton,
+      Multiset.map_map, Function.comp_def]
   simp only [e, Multiset.map_map, Function.comp_def]
   refine Multiset.map_congr rfl fun α _ => ?_
   have h : (((q ^ f : ℕ) : ℝ)) ^ (((n : ℝ) - 1) / 2) = ((q : ℝ) ^ (((n : ℝ) - 1) / 2)) ^ f := by

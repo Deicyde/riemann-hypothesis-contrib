@@ -12,8 +12,8 @@ section KrullAkizuki
 
 variable {A B : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [Ring.DimensionLEOne A]
 
-theorem isArtinianRing_quotient_of_dimensionLEOne {I : Ideal A} (hI : I ≠ ⊥) :
-    IsArtinianRing (A ⧸ I) := by
+theorem isArtinianRing_quotient_of_dimensionLEOne {I : Ideal A} (hI : I ≠ ⊥)
+    : IsArtinianRing (A ⧸ I) := by
   rw [isArtinianRing_iff_krullDimLE_zero, Ring.krullDimLE_zero_iff]
   intro p hp
   have h1 : (p.comap (Ideal.Quotient.mk I)).IsMaximal := by
@@ -25,7 +25,8 @@ theorem isArtinianRing_quotient_of_dimensionLEOne {I : Ideal A} (hI : I ≠ ⊥)
     simp [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.mpr hx]
   have h2 := Ideal.map_comap_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective p
   rcases Ideal.map_eq_top_or_isMaximal_of_surjective (Ideal.Quotient.mk I)
-    Ideal.Quotient.mk_surjective h1 with h | h
+      Ideal.Quotient.mk_surjective h1
+    with h | h
   · exact absurd (h2 ▸ h) hp.ne_top
   · exact h2 ▸ h
 
@@ -33,20 +34,24 @@ variable [CommRing B] [IsDomain B] [Algebra A B] [FaithfulSMul A B]
 
 theorem finite_quotient_span_of_birational
     (hB : ∀ x : B, ∃ c : A, c ≠ 0 ∧ ∃ b : A, algebraMap A B c * x = algebraMap A B b)
-    {a : A} (ha : a ≠ 0) : Module.Finite A (B ⧸ Ideal.span {algebraMap A B a}) := by
+    {a : A} (ha : a ≠ 0)
+    : Module.Finite A (B ⧸ Ideal.span {algebraMap A B a}) := by
   set α := algebraMap A B a with hα
   have hα0 : α ≠ 0 := by simpa [hα] using ha
   have hart : IsArtinianRing (A ⧸ Ideal.span {a}) :=
     isArtinianRing_quotient_of_dimensionLEOne (by simpa using ha)
-  let J : ℕ →o (Submodule (A ⧸ Ideal.span {a}) (A ⧸ Ideal.span {a}))ᵒᵈ :=
-    ⟨fun n => OrderDual.toDual
-      (((Ideal.span {α ^ n}).comap (algebraMap A B)).map (Ideal.Quotient.mk (Ideal.span {a}))),
-      fun m n hmn => by
-        apply OrderDual.toDual_le_toDual.mpr
-        exact Ideal.map_mono (Ideal.comap_mono
-          (Ideal.span_singleton_le_span_singleton.mpr (pow_dvd_pow α hmn)))⟩
+  let J : ℕ →o (Submodule (A ⧸ Ideal.span {a}) (A ⧸ Ideal.span {a}))ᵒᵈ := ⟨
+    fun n =>
+      OrderDual.toDual (((Ideal.span {α ^ n}).comap (algebraMap A B)).map
+        (Ideal.Quotient.mk (Ideal.span {a}))),
+    fun m n hmn => by
+      apply OrderDual.toDual_le_toDual.mpr
+      exact Ideal.map_mono (Ideal.comap_mono (Ideal.span_singleton_le_span_singleton.mpr
+        (pow_dvd_pow α hmn)))
+  ⟩
   obtain ⟨n, hn⟩ := IsArtinian.monotone_stabilizes J
-  let P : ℕ → B → Prop := fun h x => ∃ (u : B) (v : A), α ^ h * x = α ^ (h + 1) * u + algebraMap A B v
+  let P : ℕ → B → Prop := fun h x =>
+    ∃ (u : B) (v : A), α ^ h * x = α ^ (h + 1) * u + algebraMap A B v
   have up : ∀ h x, P h x → P (h + 1) x := by
     rintro h x ⟨u, v, e⟩
     refine ⟨u, a * v, ?_⟩
@@ -55,9 +60,12 @@ theorem finite_quotient_span_of_birational
   have down : ∀ h x, n ≤ h → P (h + 1) x → P h x := by
     rintro h x hh ⟨u, v, e⟩
     have h1 : J (h + 1) = J (h + 2) := (hn _ (by omega)).symm.trans (hn _ (by omega))
-    have h2 : ((Ideal.span {α ^ (h + 1)}).comap (algebraMap A B)).map
-        (Ideal.Quotient.mk (Ideal.span {a})) = ((Ideal.span {α ^ (h + 2)}).comap
-        (algebraMap A B)).map (Ideal.Quotient.mk (Ideal.span {a})) := OrderDual.toDual.injective h1
+    have h2
+        : ((Ideal.span {α ^ (h + 1)}).comap (algebraMap A B)).map
+            (Ideal.Quotient.mk (Ideal.span {a}))
+          = ((Ideal.span {α ^ (h + 2)}).comap (algebraMap A B)).map
+            (Ideal.Quotient.mk (Ideal.span {a})) :=
+      OrderDual.toDual.injective h1
     have h3 : v ∈ (Ideal.span {α ^ (h + 1)}).comap (algebraMap A B) := by
       rw [Ideal.mem_comap, Ideal.mem_span_singleton]
       exact ⟨x - α * u, by linear_combination -e⟩
@@ -77,17 +85,22 @@ theorem finite_quotient_span_of_birational
     obtain ⟨c, hc, b, hb⟩ := hB x
     have hart' : IsArtinianRing (A ⧸ Ideal.span {c}) :=
       isArtinianRing_quotient_of_dimensionLEOne (by simpa using hc)
-    obtain ⟨h, y, hy⟩ := IsArtinian.exists_pow_succ_smul_dvd
-      (Ideal.Quotient.mk (Ideal.span {c}) a) (1 : A ⧸ Ideal.span {c})
+    obtain ⟨h, y, hy⟩ :=
+      IsArtinian.exists_pow_succ_smul_dvd (Ideal.Quotient.mk (Ideal.span {c}) a)
+        (1 : A ⧸ Ideal.span {c})
     obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective y
     simp only [smul_eq_mul, mul_one, ← map_pow, ← map_mul] at hy
     rw [eq_comm, Ideal.Quotient.eq, Ideal.mem_span_singleton] at hy
     obtain ⟨s, hs⟩ := hy
     have hs' := congrArg (algebraMap A B) hs
     simp only [map_sub, map_mul, map_pow, ← hα, Nat.succ_eq_add_one] at hs'
-    have h0 : P h x := ⟨algebraMap A B r * x, b * s, by
-      rw [map_mul]
-      linear_combination x * hs' + algebraMap A B s * hb⟩
+    have h0 : P h x := ⟨
+      algebraMap A B r * x,
+      b * s,
+      by
+        rw [map_mul]
+        linear_combination x * hs' + algebraMap A B s * hb
+    ⟩
     have h1 : ∀ k, P (h + k) x := by
       intro k
       induction k with
@@ -123,8 +136,8 @@ theorem finite_quotient_span_of_birational
     exact ⟨-u, by ring⟩
 
 theorem krullAkizuki_of_birational
-    (hB : ∀ x : B, ∃ c : A, c ≠ 0 ∧ ∃ b : A, algebraMap A B c * x = algebraMap A B b) :
-    IsNoetherianRing B ∧ Ring.DimensionLEOne B := by
+    (hB : ∀ x : B, ∃ c : A, c ≠ 0 ∧ ∃ b : A, algebraMap A B c * x = algebraMap A B b)
+    : IsNoetherianRing B ∧ Ring.DimensionLEOne B := by
   have key : ∀ I : Ideal B, I ≠ ⊥ → ∃ a : A, a ≠ 0 ∧ algebraMap A B a ∈ I := by
     intro I hI
     obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
@@ -149,8 +162,8 @@ theorem krullAkizuki_of_birational
     obtain ⟨a, ha, hap⟩ := key p hp
     have h1 := finite_quotient_span_of_birational hB ha
     have h2 : Module.Finite A (B ⧸ p) :=
-      Module.Finite.of_surjective (Ideal.Quotient.factorₐ A
-        ((Ideal.span_singleton_le_iff_mem _).mpr hap)).toLinearMap
+      Module.Finite.of_surjective
+        (Ideal.Quotient.factorₐ A ((Ideal.span_singleton_le_iff_mem _).mpr hap)).toLinearMap
         (Ideal.Quotient.factor_surjective ((Ideal.span_singleton_le_iff_mem _).mpr hap))
     have h3 : ((⊥ : Ideal (B ⧸ p)).comap (algebraMap A (B ⧸ p))).IsMaximal := by
       refine Ring.DimensionLEOne.maximalOfPrime ?_ inferInstance
@@ -169,10 +182,11 @@ section Existence
 
 variable {L : Type*} [Field L]
 
-theorem exists_discreteValuationSubring_of_subring (B : Subring L) [IsNoetherianRing B]
-    (hB : ∀ z : L, ∃ c ∈ B, c ≠ 0 ∧ c * z ∈ B) {y : L} (hy : y ∈ B) (hy0 : y ≠ 0)
-    (hy1 : y⁻¹ ∉ B) :
-    ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧ B ≤ V.toSubring ∧ y ∈ V.nonunits := by
+theorem exists_discreteValuationSubring_of_subring
+    (B : Subring L) [IsNoetherianRing B]
+    (hB : ∀ z : L, ∃ c ∈ B, c ≠ 0 ∧ c * z ∈ B)
+    {y : L} (hy : y ∈ B) (hy0 : y ≠ 0) (hy1 : y⁻¹ ∉ B)
+    : ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧ B ≤ V.toSubring ∧ y ∈ V.nonunits := by
   set y' : B := ⟨y, hy⟩ with hy'
   have hyu : ¬ IsUnit y' := by
     intro h
@@ -181,8 +195,7 @@ theorem exists_discreteValuationSubring_of_subring (B : Subring L) [IsNoetherian
     apply hy1
     rw [← eq_inv_of_mul_eq_one_right hz']
     exact z.2
-  have hspan : Ideal.span {y'} ≠ ⊤ := by
-    rwa [Ne, Ideal.span_singleton_eq_top]
+  have hspan : Ideal.span {y'} ≠ ⊤ := by rwa [Ne, Ideal.span_singleton_eq_top]
   obtain ⟨p, hp⟩ : Nonempty (Ideal.span {y'}).minimalPrimes := Ideal.nonempty_minimalPrimes hspan
   haveI hpp : p.IsPrime := hp.1.1
   have hyp : y' ∈ p := hp.1.2 (Ideal.mem_span_singleton_self y')
@@ -209,8 +222,12 @@ theorem exists_discreteValuationSubring_of_subring (B : Subring L) [IsNoetherian
   have hbir : ∀ x : V, ∃ c : A0, c ≠ 0 ∧ ∃ b : A0, algebraMap A0 V c * x = algebraMap A0 V b := by
     intro x
     obtain ⟨c, hc, hc0, hcx⟩ := hB x
-    refine ⟨⟨c, LocalSubring.le_ofPrime B p hc⟩, fun h => hc0 (congrArg Subtype.val h),
-      ⟨c * x, LocalSubring.le_ofPrime B p hcx⟩, Subtype.ext rfl⟩
+    refine ⟨
+      ⟨c, LocalSubring.le_ofPrime B p hc⟩,
+      fun h => hc0 (congrArg Subtype.val h),
+      ⟨c * x, LocalSubring.le_ofPrime B p hcx⟩,
+      Subtype.ext rfl
+    ⟩
   have hKA := krullAkizuki_of_birational (A := A0) (B := V) hbir
   haveI : IsNoetherianRing V := hKA.1
   haveI : IsPrincipalIdealRing V := ((IsBezout.tfae (R := V)).out 1 2).mp hKA.1
@@ -225,11 +242,14 @@ theorem exists_discreteValuationSubring_of_subring (B : Subring L) [IsNoetherian
 
 variable {R : Type*} [CommRing R] [IsNoetherianRing R] [Algebra R L]
 
-theorem exists_discreteValuationSubring_of_valuationSubring [Algebra.EssFiniteType R L]
-    (W : ValuationSubring L) (hW : ∀ r, algebraMap R L r ∈ W) {s t : Set L} (hsf : s.Finite)
-    (htf : t.Finite) (hs : ∀ x ∈ s, x ∈ W) (ht : ∀ x ∈ t, x ∈ W.nonunits) (h0 : ∃ x ∈ t, x ≠ 0) :
-    ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧ (∀ r, algebraMap R L r ∈ V) ∧
-      (∀ x ∈ s, x ∈ V) ∧ ∀ x ∈ t, x ∈ V.nonunits := by
+theorem exists_discreteValuationSubring_of_valuationSubring
+    [Algebra.EssFiniteType R L]
+    (W : ValuationSubring L) (hW : ∀ r, algebraMap R L r ∈ W)
+    {s t : Set L} (hsf : s.Finite) (htf : t.Finite) (hs : ∀ x ∈ s, x ∈ W)
+    (ht : ∀ x ∈ t, x ∈ W.nonunits) (h0 : ∃ x ∈ t, x ≠ 0)
+    : ∃ V : ValuationSubring L,
+      IsDiscreteValuationRing V ∧ (∀ r, algebraMap R L r ∈ V) ∧ (∀ x ∈ s, x ∈ V)
+        ∧ ∀ x ∈ t, x ∈ V.nonunits := by
   classical
   obtain ⟨x₀, hx₀, hx₀0⟩ := h0
   obtain ⟨y, hyt, hy⟩ := Set.exists_max_image t W.valuation htf ⟨x₀, hx₀⟩
@@ -262,8 +282,10 @@ theorem exists_discreteValuationSubring_of_valuationSubring [Algebra.EssFiniteTy
   have hyB : y ∈ B := Algebra.subset_adjoin (Or.inr rfl)
   have hfrac : ∀ z : L, ∃ c ∈ B.toSubring, c ≠ 0 ∧ c * z ∈ B.toSubring := by
     let F := Subfield.closure (B : Set L)
-    let F' : Subalgebra R L :=
-      { F.toSubring with algebraMap_mem' := fun r => Subfield.subset_closure (B.algebraMap_mem r) }
+    let F' : Subalgebra R L := {
+      F.toSubring with
+      algebraMap_mem' := fun r => Subfield.subset_closure (B.algebraMap_mem r)
+    }
     have h1 : Algebra.adjoin R (σ : Set L) ≤ F' := by
       refine Algebra.adjoin_le fun e he => ?_
       have h2 : g e ∈ F :=
@@ -288,8 +310,13 @@ theorem exists_discreteValuationSubring_of_valuationSubring [Algebra.EssFiniteTy
     ((W.mem_nonunits_iff_or.mp (ht y hyt)).resolve_left hy0) (hBW h)
   obtain ⟨V, hV, hBV, hyV⟩ :=
     exists_discreteValuationSubring_of_subring B.toSubring hfrac hyB hy0 hy1
-  refine ⟨V, hV, fun r => hBV (B.algebraMap_mem r),
-    fun x hx => hBV (Algebra.subset_adjoin (Or.inl (Or.inl (Or.inr hx)))), fun x hx => ?_⟩
+  refine ⟨
+    V,
+    hV,
+    fun r => hBV (B.algebraMap_mem r),
+    fun x hx => hBV (Algebra.subset_adjoin (Or.inl (Or.inl (Or.inr hx)))),
+    fun x hx => ?_
+  ⟩
   have h1 : x / y ∈ V := hBV (Algebra.subset_adjoin (Or.inl (Or.inr ⟨x, hx, rfl⟩)))
   rw [V.mem_nonunits_iff] at hyV ⊢
   rw [← V.valuation_le_one_iff] at h1
@@ -302,9 +329,9 @@ section Domination
 
 variable {R L : Type*} [CommRing R] [IsLocalRing R] [Field L]
 
-theorem localSubring_range_le_valuationSubring_iff (f : R →+* L) (V : ValuationSubring L) :
-    LocalSubring.range f ≤ V.toLocalSubring ↔
-      (∀ r, f r ∈ V) ∧ ∀ r ∈ maximalIdeal R, f r ∈ V.nonunits := by
+theorem localSubring_range_le_valuationSubring_iff (f : R →+* L) (V : ValuationSubring L)
+    : LocalSubring.range f ≤ V.toLocalSubring
+      ↔ (∀ r, f r ∈ V) ∧ ∀ r ∈ maximalIdeal R, f r ∈ V.nonunits := by
   have hl : IsLocalHom f.rangeRestrict := .of_surjective _ f.rangeRestrict_surjective
   constructor
   · rintro ⟨h1, h2⟩
@@ -318,10 +345,9 @@ theorem localSubring_range_le_valuationSubring_iff (f : R →+* L) (V : Valuatio
     have hr : r ∈ maximalIdeal R := fun h => hn (h.map f.rangeRestrict)
     exact (ValuationSubring.coe_mem_nonunits_iff (a := ⟨f r, h1 r⟩)).mp (h2 r hr) hu
 
-theorem localSubring_range_le_valuationSubring_iff_isLocalHom (f : R →+* L)
-    (V : ValuationSubring L) :
-    LocalSubring.range f ≤ V.toLocalSubring ↔
-      ∃ h : ∀ r, f r ∈ V, IsLocalHom (f.codRestrict V h) := by
+theorem localSubring_range_le_valuationSubring_iff_isLocalHom (f : R →+* L) (V : ValuationSubring L)
+    : LocalSubring.range f ≤ V.toLocalSubring
+      ↔ ∃ h : ∀ r, f r ∈ V, IsLocalHom (f.codRestrict V h) := by
   rw [localSubring_range_le_valuationSubring_iff]
   constructor
   · rintro ⟨h1, h2⟩
@@ -334,34 +360,36 @@ theorem localSubring_range_le_valuationSubring_iff_isLocalHom (f : R →+* L)
 
 variable [IsNoetherianRing R] [Algebra R L]
 
-theorem exists_discreteValuationSubring_dominating_of_le [Algebra.EssFiniteType R L]
+theorem exists_discreteValuationSubring_dominating_of_le
+    [Algebra.EssFiniteType R L]
     (W : ValuationSubring L) (hW : LocalSubring.range (algebraMap R L) ≤ W.toLocalSubring)
-    {s t : Set L} (hsf : s.Finite) (htf : t.Finite) (hs : ∀ x ∈ s, x ∈ W)
-    (ht : ∀ x ∈ t, x ∈ W.nonunits)
-    (h0 : (∃ r ∈ maximalIdeal R, algebraMap R L r ≠ 0) ∨ ∃ x ∈ t, x ≠ 0) :
-    ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧
-      LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring ∧
-      (∀ x ∈ s, x ∈ V) ∧ ∀ x ∈ t, x ∈ V.nonunits := by
+    {s t : Set L}
+    (hsf : s.Finite) (htf : t.Finite) (hs : ∀ x ∈ s, x ∈ W) (ht : ∀ x ∈ t, x ∈ W.nonunits)
+    (h0 : (∃ r ∈ maximalIdeal R, algebraMap R L r ≠ 0) ∨ ∃ x ∈ t, x ≠ 0)
+    : ∃ V : ValuationSubring L,
+      IsDiscreteValuationRing V ∧ LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring
+        ∧ (∀ x ∈ s, x ∈ V) ∧ ∀ x ∈ t, x ∈ V.nonunits := by
   rw [localSubring_range_le_valuationSubring_iff] at hW
   obtain ⟨g, hg⟩ := (maximalIdeal R).fg_of_isNoetherianRing
   have hgm : ∀ r ∈ g, r ∈ maximalIdeal R := fun r hr => hg ▸ Ideal.subset_span hr
-  obtain ⟨V, hV, h1, h2, h3⟩ := exists_discreteValuationSubring_of_valuationSubring W hW.1
-    (t := algebraMap R L '' g ∪ t) hsf ((g.finite_toSet.image _).union htf) hs
-    (by
-      rintro x (⟨r, hr, rfl⟩ | hx)
-      · exact hW.2 r (hgm r hr)
-      · exact ht x hx)
-    (by
-      rcases h0 with ⟨r, hr, hr0⟩ | ⟨x, hx, hx0⟩
-      · by_contra hn
-        apply hr0
-        have : maximalIdeal R ≤ RingHom.ker (algebraMap R L) := by
-          rw [← hg, Ideal.span_le]
-          intro a ha
-          by_contra h
-          exact hn ⟨_, Or.inl ⟨a, ha, rfl⟩, h⟩
-        exact this hr
-      · exact ⟨x, Or.inr hx, hx0⟩)
+  obtain ⟨V, hV, h1, h2, h3⟩ :=
+    exists_discreteValuationSubring_of_valuationSubring W hW.1 (t := algebraMap R L '' g ∪ t) hsf
+      ((g.finite_toSet.image _).union htf) hs
+      (by
+        rintro x (⟨r, hr, rfl⟩ | hx)
+        · exact hW.2 r (hgm r hr)
+        · exact ht x hx)
+      (by
+        rcases h0 with ⟨r, hr, hr0⟩ | ⟨x, hx, hx0⟩
+        · by_contra hn
+          apply hr0
+          have : maximalIdeal R ≤ RingHom.ker (algebraMap R L) := by
+            rw [← hg, Ideal.span_le]
+            intro a ha
+            by_contra h
+            exact hn ⟨_, Or.inl ⟨a, ha, rfl⟩, h⟩
+          exact this hr
+        · exact ⟨x, Or.inr hx, hx0⟩)
   refine ⟨V, hV, ?_, h2, fun x hx => h3 x (Or.inr hx)⟩
   rw [localSubring_range_le_valuationSubring_iff]
   refine ⟨h1, fun r hr => ?_⟩
@@ -371,21 +399,23 @@ theorem exists_discreteValuationSubring_dominating_of_le [Algebra.EssFiniteType 
     exact (ValuationSubring.coe_mem_nonunits_iff (a := ⟨_, h1 a⟩)).mp (h3 _ (Or.inl ⟨a, ha, rfl⟩))
   exact (ValuationSubring.coe_mem_nonunits_iff (a := ⟨_, h1 r⟩)).mpr (this hr)
 
-theorem exists_discreteValuationSubring_dominating_of_essFiniteType [Algebra.EssFiniteType R L]
-    [FaithfulSMul R L] (hR : ¬ IsField R) :
-    ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧
-      LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring := by
+theorem exists_discreteValuationSubring_dominating_of_essFiniteType
+    [Algebra.EssFiniteType R L] [FaithfulSMul R L] (hR : ¬ IsField R)
+    : ∃ V : ValuationSubring L,
+      IsDiscreteValuationRing V ∧ LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring := by
   obtain ⟨W, hW⟩ := (LocalSubring.range (algebraMap R L)).exists_le_valuationSubring
-  obtain ⟨r, hr, hr0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-    (isField_iff_maximalIdeal_eq.not.mp hR)
-  obtain ⟨V, h1, h2, -⟩ := exists_discreteValuationSubring_dominating_of_le W hW
-    Set.finite_empty Set.finite_empty (by simp) (by simp) (Or.inl ⟨r, hr, by simpa using hr0⟩)
+  obtain ⟨r, hr, hr0⟩ :=
+    Submodule.exists_mem_ne_zero_of_ne_bot (isField_iff_maximalIdeal_eq.not.mp hR)
+  obtain ⟨V, h1, h2, -⟩ :=
+    exists_discreteValuationSubring_dominating_of_le W hW Set.finite_empty Set.finite_empty
+      (by simp) (by simp) (Or.inl ⟨r, hr, by simpa using hr0⟩)
   exact ⟨V, h1, h2⟩
 
-theorem exists_discreteValuationSubring_dominating_notMem [Algebra.EssFiniteType R L] {x : L}
-    (hx : ¬ IsIntegral R x) :
-    ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧
-      LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring ∧ x ∉ V := by
+theorem exists_discreteValuationSubring_dominating_notMem
+    [Algebra.EssFiniteType R L] {x : L} (hx : ¬ IsIntegral R x)
+    : ∃ V : ValuationSubring L,
+      IsDiscreteValuationRing V ∧ LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring
+        ∧ x ∉ V := by
   have hx0 : x ≠ 0 := by
     rintro rfl
     exact hx isIntegral_zero
@@ -394,34 +424,37 @@ theorem exists_discreteValuationSubring_dominating_notMem [Algebra.EssFiniteType
   let xinv : B := ⟨x⁻¹, Algebra.subset_adjoin rfl⟩
   have hne : (maximalIdeal R).map (algebraMap R B) ⊔ Ideal.span {xinv} ≠ ⊤ := by
     intro heq
-    obtain ⟨p, hp, hpx⟩ := Algebra.exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top
-      x⁻¹ _ (maximalIdeal.isMaximal R).ne_top heq
+    obtain ⟨p, hp, hpx⟩ :=
+      Algebra.exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top x⁻¹ _
+        (maximalIdeal.isMaximal R).ne_top heq
     have H : IsUnit p.leadingCoeff := of_not_not fun h ↦ by simpa using sub_mem h hp
-    refine hx ⟨Polynomial.C H.unit⁻¹.1 * p,
-      Polynomial.monic_C_mul_of_mul_leadingCoeff_eq_one (by simp), ?_⟩
+    refine hx
+      ⟨Polynomial.C H.unit⁻¹.1 * p, Polynomial.monic_C_mul_of_mul_leadingCoeff_eq_one (by simp), ?_⟩
     rw [invOf_eq_inv, inv_inv] at hpx
     rw [← Polynomial.aeval_def, map_mul, hpx, mul_zero]
   obtain ⟨W, hW, hW'⟩ := Ideal.image_subset_nonunits_valuationSubring (A := B.toSubring) _ hne
   have hWd : LocalSubring.range (algebraMap R L) ≤ W.toLocalSubring := by
     rw [localSubring_range_le_valuationSubring_iff]
-    exact ⟨fun r => hW (B.algebraMap_mem r), fun r hr =>
-      hW' ⟨_, Ideal.mem_sup_left (Ideal.mem_map_of_mem _ hr), rfl⟩⟩
+    exact ⟨
+      fun r => hW (B.algebraMap_mem r),
+      fun r hr => hW' ⟨_, Ideal.mem_sup_left (Ideal.mem_map_of_mem _ hr), rfl⟩
+    ⟩
   have hxW : x⁻¹ ∈ W.nonunits := hW' ⟨xinv, Ideal.mem_sup_right (Ideal.subset_span rfl), rfl⟩
-  obtain ⟨V, h1, h2, -, h3⟩ := exists_discreteValuationSubring_dominating_of_le W hWd
-    Set.finite_empty (Set.finite_singleton x⁻¹) (by simp) (by simpa using hxW)
-    (Or.inr ⟨_, rfl, inv_ne_zero hx0⟩)
+  obtain ⟨V, h1, h2, -, h3⟩ :=
+    exists_discreteValuationSubring_dominating_of_le W hWd Set.finite_empty
+      (Set.finite_singleton x⁻¹) (by simp) (by simpa using hxW) (Or.inr ⟨_, rfl, inv_ne_zero hx0⟩)
   exact ⟨V, h1, h2, (V.inv_mem_nonunits_iff.mp (h3 _ rfl)).resolve_left hx0⟩
 
-theorem integralClosure_eq_iInf_discreteValuationSubring [Algebra.EssFiniteType R L] :
-    (integralClosure R L).toSubring =
-      ⨅ V : {V : ValuationSubring L // IsDiscreteValuationRing V ∧
-        LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring}, V.1.toSubring := by
+theorem integralClosure_eq_iInf_discreteValuationSubring [Algebra.EssFiniteType R L]
+    : (integralClosure R L).toSubring
+      = ⨅ V : {V : ValuationSubring L // IsDiscreteValuationRing V ∧
+          LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring}, V.1.toSubring := by
   refine le_antisymm (le_iInf fun V x hx => ?_) fun x hx => ?_
   · have h := ((localSubring_range_le_valuationSubring_iff _ _).mp V.2.2).1
     letI : Algebra R V.1 := ((algebraMap R L).codRestrict V.1 h).toAlgebra
     have : IsScalarTower R V.1 L := .of_algebraMap_eq fun _ => rfl
-    obtain ⟨y, rfl⟩ := (IsIntegrallyClosed.isIntegral_iff (R := V.1) (K := L)).mp
-      (IsIntegral.tower_top (R := R) hx)
+    obtain ⟨y, rfl⟩ :=
+      (IsIntegrallyClosed.isIntegral_iff (R := V.1) (K := L)).mp (IsIntegral.tower_top (R := R) hx)
     exact y.2
   · by_contra hn
     obtain ⟨V, h1, h2, h3⟩ := exists_discreteValuationSubring_dominating_notMem (R := R) hn
@@ -431,10 +464,10 @@ end Domination
 
 section Completion
 
-theorem isDiscreteValuationRing_of_maximalIdeal_eq_span {S : Type*} [CommRing S] [IsLocalRing S]
-    [IsHausdorff (maximalIdeal S) S] {π : S} (hπ : maximalIdeal S = Ideal.span {π})
-    (hn : ¬ IsNilpotent π) :
-    ∃ _ : IsDomain S, IsDiscreteValuationRing S ∧ Irreducible π := by
+theorem isDiscreteValuationRing_of_maximalIdeal_eq_span
+    {S : Type*} [CommRing S] [IsLocalRing S] [IsHausdorff (maximalIdeal S) S]
+    {π : S} (hπ : maximalIdeal S = Ideal.span {π}) (hn : ¬ IsNilpotent π)
+    : ∃ _ : IsDomain S, IsDiscreteValuationRing S ∧ Irreducible π := by
   classical
   have key : ∀ x : S, x ≠ 0 → ∃ n : ℕ, Associated (π ^ n) x := by
     intro x hx
@@ -459,33 +492,38 @@ theorem isDiscreteValuationRing_of_maximalIdeal_eq_span {S : Type*} [CommRing S]
       rw [pow_succ]
       exact (mul_dvd_mul_left _ h4).trans (dvd_of_eq hu.symm)
     exact ⟨_, h3.unit, hu.symm⟩
-  have : NoZeroDivisors S := ⟨fun {x y} hxy => by
-    by_contra h
-    push Not at h
-    obtain ⟨m, hm⟩ := key x h.1
-    obtain ⟨n, hn'⟩ := key y h.2
-    have := hm.mul_mul hn'
-    rw [hxy, associated_zero_iff_eq_zero, ← pow_add] at this
-    exact hn ⟨_, this⟩⟩
+  have : NoZeroDivisors S :=
+    ⟨fun {x y} hxy => by
+      by_contra h
+      push Not at h
+      obtain ⟨m, hm⟩ := key x h.1
+      obtain ⟨n, hn'⟩ := key y h.2
+      have := hm.mul_mul hn'
+      rw [hxy, associated_zero_iff_eq_zero, ← pow_add] at this
+      exact hn ⟨_, this⟩⟩
   have hd : IsDomain S := NoZeroDivisors.to_isDomain S
   have hπ0 : π ≠ 0 := by
     rintro rfl
     exact hn IsNilpotent.zero
   have hirr : Irreducible π :=
     ((Ideal.span_singleton_prime hπ0).mp (hπ ▸ inferInstance)).irreducible
-  exact ⟨hd, IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
-    ⟨π, hirr, fun {x} hx => key x hx⟩, hirr⟩
+  exact ⟨
+    hd,
+    IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
+      ⟨π, hirr, fun {x} hx => key x hx⟩,
+    hirr
+  ⟩
 
 variable (V : Type*) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
 
-theorem algebraMap_adicCompletion_injective_of_dvr :
-    Function.Injective (algebraMap V (AdicCompletion (maximalIdeal V) V)) :=
+theorem algebraMap_adicCompletion_injective_of_dvr
+    : Function.Injective (algebraMap V (AdicCompletion (maximalIdeal V) V)) :=
   AdicCompletion.of_injective (maximalIdeal V) V
 
-theorem adicCompletion_isDVR_irreducible {π : V} (hπ : Irreducible π) :
-    ∃ _ : IsDomain (AdicCompletion (maximalIdeal V) V),
-      IsDiscreteValuationRing (AdicCompletion (maximalIdeal V) V) ∧
-      Irreducible (algebraMap V (AdicCompletion (maximalIdeal V) V) π) := by
+theorem adicCompletion_isDVR_irreducible {π : V} (hπ : Irreducible π)
+    : ∃ _ : IsDomain (AdicCompletion (maximalIdeal V) V),
+      IsDiscreteValuationRing (AdicCompletion (maximalIdeal V) V)
+        ∧ Irreducible (algebraMap V (AdicCompletion (maximalIdeal V) V) π) := by
   refine isDiscreteValuationRing_of_maximalIdeal_eq_span ?_ ?_
   · rw [AdicCompletion.maximalIdeal_eq_map]
     conv_lhs => enter [2]; rw [hπ.maximalIdeal_eq]
@@ -496,23 +534,25 @@ theorem adicCompletion_isDVR_irreducible {π : V} (hπ : Irreducible π) :
 instance isDomain_adicCompletion_of_dvr : IsDomain (AdicCompletion (maximalIdeal V) V) :=
   (adicCompletion_isDVR_irreducible V (IsDiscreteValuationRing.exists_irreducible V).choose_spec).1
 
-instance isDiscreteValuationRing_adicCompletion_of_dvr :
-    IsDiscreteValuationRing (AdicCompletion (maximalIdeal V) V) :=
-  (adicCompletion_isDVR_irreducible V (IsDiscreteValuationRing.exists_irreducible V).choose_spec).2.1
-
+instance isDiscreteValuationRing_adicCompletion_of_dvr
+    : IsDiscreteValuationRing (AdicCompletion (maximalIdeal V) V) :=
+  (adicCompletion_isDVR_irreducible V
+    (IsDiscreteValuationRing.exists_irreducible V).choose_spec).2.1
 
 variable {V} in
-theorem irreducible_algebraMap_adicCompletion_of_dvr {π : V} (hπ : Irreducible π) :
-    Irreducible (algebraMap V (AdicCompletion (maximalIdeal V) V) π) :=
+theorem irreducible_algebraMap_adicCompletion_of_dvr {π : V} (hπ : Irreducible π)
+    : Irreducible (algebraMap V (AdicCompletion (maximalIdeal V) V) π) :=
   (adicCompletion_isDVR_irreducible V hπ).2.2
 
 end Completion
 
 section KrullAkizukiFinite
 
-variable {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [Ring.DimensionLEOne A]
-  (K : Type*) {L : Type*} [Field K] [Algebra A K] [IsFractionRing A K] [Field L] [Algebra K L]
-  [Algebra A L] [IsScalarTower A K L] [FiniteDimensional K L]
+variable
+  {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [Ring.DimensionLEOne A]
+  (K : Type*)
+  {L : Type*} [Field K] [Algebra A K] [IsFractionRing A K] [Field L] [Algebra K L] [Algebra A L]
+  [IsScalarTower A K L] [FiniteDimensional K L]
 
 include K
 
@@ -525,8 +565,8 @@ theorem krullAkizuki (B : Subalgebra A L) : IsNoetherianRing B ∧ Ring.Dimensio
   have halg : Algebra.IsAlgebraic A L :=
     (IsFractionRing.comap_isAlgebraic_iff (A := A) (K := K) (C := L)).mpr inferInstance
   let T : Set L := {x | x ∈ B ∧ IsIntegral A x}
-  obtain ⟨s, hsT, hs⟩ := (Submodule.fg_span_iff_fg_span_finset_subset (R := K) T).mp
-    (IsNoetherian.noetherian _)
+  obtain ⟨s, hsT, hs⟩ :=
+    (Submodule.fg_span_iff_fg_span_finset_subset (R := K) T).mp (IsNoetherian.noetherian _)
   let C := Algebra.adjoin A (s : Set L)
   have hCB : C ≤ B := Algebra.adjoin_le fun x hx => (hsT hx).1
   have hCf : Module.Finite A C :=
@@ -534,8 +574,8 @@ theorem krullAkizuki (B : Subalgebra A L) : IsNoetherianRing B ∧ Ring.Dimensio
   have hCn : IsNoetherianRing C := IsNoetherianRing.of_finite A C
   have hCd : Ring.DimensionLEOne C := Ring.DimensionLEOne.of_isIntegral A C
   letI : Algebra C B := (Subalgebra.inclusion hCB).toAlgebra
-  have : FaithfulSMul C B := (faithfulSMul_iff_algebraMap_injective _ _).mpr
-    (Subalgebra.inclusion_injective hCB)
+  have : FaithfulSMul C B :=
+    (faithfulSMul_iff_algebraMap_injective _ _).mpr (Subalgebra.inclusion_injective hCB)
   refine krullAkizuki_of_birational (A := C) (B := B) fun x => ?_
   obtain ⟨c, hc, hcx⟩ := (halg.1 (x : L)).exists_integral_multiple
   have h1 : c • (x : L) ∈ Submodule.span K (s : Set L) :=
@@ -549,15 +589,14 @@ theorem krullAkizuki (B : Subalgebra A L) : IsNoetherianRing B ∧ Ring.Dimensio
   · change algebraMap A L (d * c) * x = (d : A) • c • (x : L)
     rw [← mul_smul, Algebra.smul_def]
 
-
 include K in
-theorem isDedekindDomain_integralClosure_of_dimensionLEOne :
-    IsDedekindDomain (integralClosure A L) := by
+theorem isDedekindDomain_integralClosure_of_dimensionLEOne
+    : IsDedekindDomain (integralClosure A L) := by
   obtain ⟨h1, h2⟩ := krullAkizuki K (integralClosure A L)
   have h3 : IsIntegrallyClosed (integralClosure A L) :=
     integralClosure.isIntegrallyClosedOfFiniteExtension K
-  have h4 : IsDedekindRing (integralClosure A L) := { }
-  exact { }
+  have h4 : IsDedekindRing (integralClosure A L) := {}
+  exact {}
 
 end KrullAkizukiFinite
 
@@ -565,85 +604,111 @@ section Main
 
 universe u v w
 
-variable (R : Type u) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
+variable
+  (R : Type u) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
   (K : Type v) [Field K] [Algebra R K] [IsFractionRing R K]
 
-theorem exists_discreteValuationSubring_dominating (L : Type w) [Field L] [Algebra K L]
-    [Algebra R L] [IsScalarTower R K L] [FiniteDimensional K L] (hR : ¬ IsField R) :
-    ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧
-      LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring := by
-  have : FaithfulSMul R L := (faithfulSMul_iff_algebraMap_injective _ _).mpr (by
-    rw [IsScalarTower.algebraMap_eq R K L]
-    exact (algebraMap K L).injective.comp (IsFractionRing.injective R K))
+theorem exists_discreteValuationSubring_dominating
+    (L : Type w) [Field L] [Algebra K L] [Algebra R L] [IsScalarTower R K L] [FiniteDimensional K L]
+    (hR : ¬ IsField R)
+    : ∃ V : ValuationSubring L,
+      IsDiscreteValuationRing V ∧ LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring := by
+  have : FaithfulSMul R L :=
+    (faithfulSMul_iff_algebraMap_injective _ _).mpr (by
+      rw [IsScalarTower.algebraMap_eq R K L]
+      exact (algebraMap K L).injective.comp (IsFractionRing.injective R K))
   have : Algebra.EssFiniteType R K := .of_isLocalization K (nonZeroDivisors R)
   have : Algebra.EssFiniteType R L := .comp R K L
   exact exists_discreteValuationSubring_dominating_of_essFiniteType hR
 
-theorem range_algebraMap_eq_iInf_discreteValuationSubring [IsIntegrallyClosed R] :
-    (algebraMap R K).range =
-      ⨅ V : {V : ValuationSubring K // IsDiscreteValuationRing V ∧
-        LocalSubring.range (algebraMap R K) ≤ V.toLocalSubring}, V.1.toSubring := by
+theorem range_algebraMap_eq_iInf_discreteValuationSubring [IsIntegrallyClosed R]
+    : (algebraMap R K).range
+      = ⨅ V : {V : ValuationSubring K // IsDiscreteValuationRing V ∧
+          LocalSubring.range (algebraMap R K) ≤ V.toLocalSubring}, V.1.toSubring := by
   have : Algebra.EssFiniteType R K := .of_isLocalization K (nonZeroDivisors R)
   rw [← integralClosure_eq_iInf_discreteValuationSubring]
   ext x
   exact (IsIntegrallyClosed.isIntegral_iff (R := R) (K := K)).symm
 
-
 variable {R K} in
-theorem exists_algebraMap_eq_of_forall_discreteValuationSubring [IsIntegrallyClosed R] {x : K}
-    (hx : ∀ V : ValuationSubring K, IsDiscreteValuationRing V → (∀ r, algebraMap R K r ∈ V) →
-      (∀ r ∈ maximalIdeal R, algebraMap R K r ∈ V.nonunits) → x ∈ V) :
-    ∃ r : R, algebraMap R K r = x := by
+theorem exists_algebraMap_eq_of_forall_discreteValuationSubring
+    [IsIntegrallyClosed R]
+    {x : K}
+    (hx : ∀ V : ValuationSubring K,
+      IsDiscreteValuationRing V → (∀ r, algebraMap R K r ∈ V)
+        → (∀ r ∈ maximalIdeal R, algebraMap R K r ∈ V.nonunits)
+        → x ∈ V)
+    : ∃ r : R, algebraMap R K r = x := by
   change x ∈ (algebraMap R K).range
   rw [range_algebraMap_eq_iInf_discreteValuationSubring, Subring.mem_iInf]
   rintro ⟨V, h1, h2⟩
   rw [localSubring_range_le_valuationSubring_iff] at h2
   exact hx V h1 h2.1 h2.2
 
-theorem injective_and_isLocalHom_adicCompletion_comp {S : Type*} [CommRing S] {V : Type*}
-    [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (f : S →+* V)
-    (hf : Function.Injective f) [IsLocalHom f] :
-    Function.Injective ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp f) ∧
-      IsLocalHom ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp f) :=
+theorem injective_and_isLocalHom_adicCompletion_comp
+    {S : Type*} [CommRing S]
+    {V : Type*} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (f : S →+* V) (hf : Function.Injective f) [IsLocalHom f]
+    : Function.Injective ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp f)
+      ∧ IsLocalHom ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp f) :=
   ⟨(algebraMap_adicCompletion_injective_of_dvr V).comp hf, RingHom.isLocalHom_comp _ _⟩
 
-theorem exists_complete_discreteValuationRing_dominating (hR : ¬ IsField R) :
-    ∃ (O : Type u) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
-      (_ : IsAdicComplete (maximalIdeal O) O) (φ : R →+* O),
+theorem exists_complete_discreteValuationRing_dominating (hR : ¬ IsField R)
+    : ∃ (O : Type u) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
+        (_ : IsAdicComplete (maximalIdeal O) O) (φ : R →+* O),
       Function.Injective φ ∧ IsLocalHom φ := by
   obtain ⟨V, hV, h⟩ :=
     exists_discreteValuationSubring_dominating R (FractionRing R) (FractionRing R) hR
   obtain ⟨h1, h2⟩ := (localSubring_range_le_valuationSubring_iff_isLocalHom _ _).mp h
-  exact ⟨AdicCompletion (maximalIdeal V) V, inferInstance, inferInstance, inferInstance,
-    inferInstance, _, injective_and_isLocalHom_adicCompletion_comp
-      ((algebraMap R (FractionRing R)).codRestrict V h1)
-      fun a b hab => IsFractionRing.injective R (FractionRing R) (congrArg Subtype.val hab)⟩
+  exact ⟨
+    AdicCompletion (maximalIdeal V) V,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    _,
+    injective_and_isLocalHom_adicCompletion_comp ((algebraMap R (FractionRing R)).codRestrict V h1)
+      fun a b hab => IsFractionRing.injective R (FractionRing R) (congrArg Subtype.val hab)
+  ⟩
 
-theorem map_maximalIdeal_pow_le {S O : Type*} [CommRing S] [IsLocalRing S] [CommRing O]
-    [IsLocalRing O] (φ : S →+* O) [IsLocalHom φ] (n : ℕ) :
-    (maximalIdeal S ^ n).map φ ≤ maximalIdeal O ^ n := by
+theorem map_maximalIdeal_pow_le
+    {S O : Type*} [CommRing S] [IsLocalRing S] [CommRing O] [IsLocalRing O]
+    (φ : S →+* O) [IsLocalHom φ]
+    (n : ℕ)
+    : (maximalIdeal S ^ n).map φ ≤ maximalIdeal O ^ n := by
   rw [Ideal.map_pow]
   exact Ideal.pow_right_mono (map_maximalIdeal_le φ) n
 
-
-theorem exists_complete_discreteValuationRing_ker_eq {S : Type u} [CommRing S]
-    [IsNoetherianRing S] [IsLocalRing S] (q : Ideal S) [q.IsPrime] (hq : q ≠ maximalIdeal S) :
-    ∃ (O : Type u) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
-      (_ : IsAdicComplete (maximalIdeal O) O) (φ : S →+* O),
+theorem exists_complete_discreteValuationRing_ker_eq
+    {S : Type u} [CommRing S] [IsNoetherianRing S] [IsLocalRing S]
+    (q : Ideal S) [q.IsPrime]
+    (hq : q ≠ maximalIdeal S)
+    : ∃ (O : Type u) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
+        (_ : IsAdicComplete (maximalIdeal O) O) (φ : S →+* O),
       RingHom.ker φ = q ∧ IsLocalHom φ := by
   have hl : IsLocalRing (S ⧸ q) := .of_surjective' _ Ideal.Quotient.mk_surjective
   have hm : IsLocalHom (Ideal.Quotient.mk q) := .of_surjective _ Ideal.Quotient.mk_surjective
   have hf : ¬ IsField (S ⧸ q) := fun h =>
     hq (eq_maximalIdeal (Ideal.Quotient.maximal_of_isField q h))
   obtain ⟨O, _, _, _, _, φ, h1, h2⟩ := exists_complete_discreteValuationRing_dominating (S ⧸ q) hf
-  refine ⟨O, inferInstance, inferInstance, inferInstance, inferInstance,
-    φ.comp (Ideal.Quotient.mk q), ?_, RingHom.isLocalHom_comp _ _⟩
+  refine ⟨
+    O,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    φ.comp (Ideal.Quotient.mk q),
+    ?_,
+    RingHom.isLocalHom_comp _ _
+  ⟩
   rw [RingHom.ker_comp_of_injective _ h1, Ideal.mk_ker]
 
-theorem exists_complete_discreteValuationRing_of_prime_lt {A : Type u} [CommRing A]
-    [IsNoetherianRing A] (q p : Ideal A) [q.IsPrime] [p.IsPrime] (hqp : q < p) :
-    ∃ (O : Type u) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
-      (_ : IsAdicComplete (maximalIdeal O) O) (φ : A →+* O),
+theorem exists_complete_discreteValuationRing_of_prime_lt
+    {A : Type u} [CommRing A] [IsNoetherianRing A]
+    (q p : Ideal A) [q.IsPrime] [p.IsPrime]
+    (hqp : q < p)
+    : ∃ (O : Type u) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
+        (_ : IsAdicComplete (maximalIdeal O) O) (φ : A →+* O),
       RingHom.ker φ = q ∧ (maximalIdeal O).comap φ = p := by
   let S := Localization.AtPrime p
   have hdis : Disjoint (p.primeCompl : Set A) q := by
@@ -653,21 +718,20 @@ theorem exists_complete_discreteValuationRing_of_prime_lt {A : Type u} [CommRing
     IsLocalization.isPrime_of_isPrime_disjoint p.primeCompl S q inferInstance hdis
   have hc : (q.map (algebraMap A S)).comap (algebraMap A S) = q :=
     IsLocalization.under_map_of_isPrime_disjoint p.primeCompl S inferInstance hdis
-  have hm : (maximalIdeal S).comap (algebraMap A S) = p :=
-    Localization.AtPrime.under_maximalIdeal
-  obtain ⟨O, _, _, _, _, φ, h1, h2⟩ := exists_complete_discreteValuationRing_ker_eq
-    (q.map (algebraMap A S)) (fun h => hqp.ne (by rw [← hc, h, hm]))
-  refine ⟨O, inferInstance, inferInstance, inferInstance, inferInstance,
-    φ.comp (algebraMap A S), ?_, ?_⟩
+  have hm : (maximalIdeal S).comap (algebraMap A S) = p := Localization.AtPrime.under_maximalIdeal
+  obtain ⟨O, _, _, _, _, φ, h1, h2⟩ :=
+    exists_complete_discreteValuationRing_ker_eq (q.map (algebraMap A S))
+      (fun h => hqp.ne (by rw [← hc, h, hm]))
+  refine
+    ⟨O, inferInstance, inferInstance, inferInstance, inferInstance, φ.comp (algebraMap A S), ?_, ?_⟩
   · rw [← RingHom.comap_ker, h1, hc]
   · rw [← Ideal.comap_comap, maximalIdeal_comap, hm]
 
-
 open AlgebraicGeometry CategoryTheory in
-theorem exists_complete_discreteValuationRing_of_specializes {X : Scheme.{u}}
-    [IsLocallyNoetherian X] {η x : X} (h : η ⤳ x) (hne : η ≠ x) :
-    ∃ (O : CommRingCat.{u}) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
-      (_ : IsAdicComplete (maximalIdeal O) O) (f : Spec O ⟶ X),
+theorem exists_complete_discreteValuationRing_of_specializes
+    {X : Scheme.{u}} [IsLocallyNoetherian X] {η x : X} (h : η ⤳ x) (hne : η ≠ x)
+    : ∃ (O : CommRingCat.{u}) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
+        (_ : IsAdicComplete (maximalIdeal O) O) (f : Spec O ⟶ X),
       f (⊥ : PrimeSpectrum O) = η ∧ f (closedPoint O) = x := by
   have h1 : η ∈ Set.range (X.fromSpecStalk x) := by
     rw [Scheme.range_fromSpecStalk]
@@ -688,33 +752,43 @@ theorem exists_complete_discreteValuationRing_of_specializes {X : Scheme.{u}}
       (Eq.trans (congrArg (X.fromSpecStalk x) ?_) (Scheme.fromSpecStalk_closedPoint (x := x)))
     exact comap_closedPoint φ
 
-theorem discreteValuationRing_dominating_noetherian_local (L : Type w) [Field L] [Algebra K L]
-    [Algebra R L] [IsScalarTower R K L] [FiniteDimensional K L] :
-    (¬ IsField R → ∃ V : ValuationSubring L, IsDiscreteValuationRing V ∧
-      LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring) ∧
-    (IsIntegrallyClosed R → (algebraMap R K).range =
-      ⨅ V : {V : ValuationSubring K // IsDiscreteValuationRing V ∧
-        LocalSubring.range (algebraMap R K) ≤ V.toLocalSubring}, V.1.toSubring) ∧
-    ∀ (V : ValuationSubring L) [IsDiscreteValuationRing V],
-      LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring →
-      IsDiscreteValuationRing (AdicCompletion (maximalIdeal V) V) ∧
-      IsAdicComplete (maximalIdeal (AdicCompletion (maximalIdeal V) V))
-        (AdicCompletion (maximalIdeal V) V) ∧
-      (∀ π : V, Irreducible π → Irreducible (algebraMap V (AdicCompletion (maximalIdeal V) V) π)) ∧
-      ∃ h : ∀ r, algebraMap R L r ∈ V,
-        Function.Injective ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp
-          ((algebraMap R L).codRestrict V h)) ∧
-        IsLocalHom ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp
-          ((algebraMap R L).codRestrict V h)) := by
-  refine ⟨exists_discreteValuationSubring_dominating R K L,
-    fun _ => range_algebraMap_eq_iInf_discreteValuationSubring R K, fun V _ h => ?_⟩
+theorem discreteValuationRing_dominating_noetherian_local
+    (L : Type w) [Field L] [Algebra K L] [Algebra R L] [IsScalarTower R K L] [FiniteDimensional K L]
+    : (¬ IsField R
+        → ∃ V : ValuationSubring L,
+          IsDiscreteValuationRing V ∧ LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring)
+      ∧ (IsIntegrallyClosed R
+        → (algebraMap R K).range
+          = ⨅ V : {V : ValuationSubring K // IsDiscreteValuationRing V ∧
+              LocalSubring.range (algebraMap R K) ≤ V.toLocalSubring}, V.1.toSubring)
+      ∧ ∀ (V : ValuationSubring L) [IsDiscreteValuationRing V],
+        LocalSubring.range (algebraMap R L) ≤ V.toLocalSubring
+          → IsDiscreteValuationRing (AdicCompletion (maximalIdeal V) V)
+            ∧ IsAdicComplete (maximalIdeal (AdicCompletion (maximalIdeal V) V))
+              (AdicCompletion (maximalIdeal V) V)
+            ∧ (∀ π : V,
+              Irreducible π → Irreducible (algebraMap V (AdicCompletion (maximalIdeal V) V) π))
+            ∧ ∃ h : ∀ r, algebraMap R L r ∈ V,
+              Function.Injective ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp
+                  ((algebraMap R L).codRestrict V h))
+                ∧ IsLocalHom ((algebraMap V (AdicCompletion (maximalIdeal V) V)).comp
+                  ((algebraMap R L).codRestrict V h)) := by
+  refine ⟨
+    exists_discreteValuationSubring_dominating R K L,
+    fun _ => range_algebraMap_eq_iInf_discreteValuationSubring R K,
+    fun V _ h => ?_
+  ⟩
   obtain ⟨h1, h2⟩ := (localSubring_range_le_valuationSubring_iff_isLocalHom _ _).mp h
   have hinj : Function.Injective (algebraMap R L) := by
     rw [IsScalarTower.algebraMap_eq R K L]
     exact (algebraMap K L).injective.comp (IsFractionRing.injective R K)
-  exact ⟨inferInstance, inferInstance, fun _ => irreducible_algebraMap_adicCompletion_of_dvr, h1,
-    injective_and_isLocalHom_adicCompletion_comp _
-      fun a b hab => hinj (congrArg Subtype.val hab)⟩
+  exact ⟨
+    inferInstance,
+    inferInstance,
+    fun _ => irreducible_algebraMap_adicCompletion_of_dvr,
+    h1,
+    injective_and_isLocalHom_adicCompletion_comp _ fun a b hab => hinj (congrArg Subtype.val hab)
+  ⟩
 
 end Main
 

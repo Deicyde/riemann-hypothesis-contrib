@@ -10,13 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-private theorem UpperTheory.V.AlgebraTools.Conn.exists_system_of_parameters {A : Type} [CommRing A] [IsLocalRing A]
-    [IsNoetherianRing A] (J : Ideal A) (hle : J ≤ maximalIdeal A) :
-    ∃ ys : List A, (∀ y ∈ ys, y ∈ maximalIdeal A) ∧
-      (ys.length : WithBot ℕ∞) = ringKrullDim (A ⧸ J) ∧
-      ∀ P : Ideal A, P.IsPrime → J ≤ P → (∀ y ∈ ys, y ∈ P) → P = maximalIdeal A := by
-  have hne : J ≠ ⊤ := fun h =>
-    (maximalIdeal.isMaximal A).ne_top (top_le_iff.mp (h ▸ hle))
+private theorem UpperTheory.V.AlgebraTools.Conn.exists_system_of_parameters
+    {A : Type} [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
+    (J : Ideal A) (hle : J ≤ maximalIdeal A)
+    : ∃ ys : List A,
+      (∀ y ∈ ys, y ∈ maximalIdeal A) ∧ (ys.length : WithBot ℕ∞) = ringKrullDim (A ⧸ J)
+        ∧ ∀ P : Ideal A, P.IsPrime → J ≤ P → (∀ y ∈ ys, y ∈ P) → P = maximalIdeal A := by
+  have hne : J ≠ ⊤ := fun h => (maximalIdeal.isMaximal A).ne_top (top_le_iff.mp (h ▸ hle))
   haveI : Nontrivial (A ⧸ J) := Ideal.Quotient.nontrivial_iff.mpr hne
   haveI : IsLocalRing (A ⧸ J) :=
     IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective
@@ -44,20 +44,21 @@ private theorem UpperTheory.V.AlgebraTools.Conn.exists_system_of_parameters {A :
       intro z hz
       rw [← hg z]
       exact Ideal.mem_map_of_mem π (hy _ (List.mem_map.2 ⟨z, Finset.mem_toList.2 hz, rfl⟩))
-    have hm : maximalIdeal (A ⧸ J) ≤ P.map π :=
-      hs.2 ⟨hP', hs'⟩ (le_maximalIdeal hP'.ne_top)
+    have hm : maximalIdeal (A ⧸ J) ≤ P.map π := hs.2 ⟨hP', hs'⟩ (le_maximalIdeal hP'.ne_top)
     refine le_antisymm (le_maximalIdeal hP.ne_top) fun a ha => ?_
     have h1 : π a ∈ P.map π := hm (map_nonunit π a ha)
     rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective π hsurj, ← RingHom.ker_eq_comap_bot,
-      sup_eq_left.2 hker] at h1
+        sup_eq_left.2 hker]
+      at h1
     exact h1
 
-private theorem UpperTheory.V.AlgebraTools.Conn.weakly_regular_mem_of_mul {A : Type} [CommRing A] (l w : List A) (a : A)
-    (h : RingTheory.Sequence.IsWeaklyRegular A (l ++ a :: w)) (x : A)
-    (hx : a * x ∈ Ideal.ofList l) : x ∈ Ideal.ofList l := by
+private theorem UpperTheory.V.AlgebraTools.Conn.weakly_regular_mem_of_mul
+    {A : Type} [CommRing A]
+    (l w : List A) (a : A) (h : RingTheory.Sequence.IsWeaklyRegular A (l ++ a :: w))
+    (x : A) (hx : a * x ∈ Ideal.ofList l)
+    : x ∈ Ideal.ofList l := by
   have h1 := h.regular_mod_prev l.length (by simp)
-  simp only [List.getElem_append_right, le_refl, Nat.sub_self,
-    List.getElem_cons_zero] at h1
+  simp only [List.getElem_append_right, le_refl, Nat.sub_self, List.getElem_cons_zero] at h1
   rw [List.take_left' rfl] at h1
   have e : (Ideal.ofList l • (⊤ : Submodule A A)) = Ideal.ofList l := by
     rw [smul_eq_mul, Ideal.mul_top]
@@ -68,11 +69,15 @@ private theorem UpperTheory.V.AlgebraTools.Conn.weakly_regular_mem_of_mul {A : T
     exact hx
   rwa [Submodule.Quotient.mk_eq_zero, e] at h2
 
-theorem UpperTheory.V.AlgebraTools.Conn.reg2 :
-    ∀ {A : Type} [CommRing A] [IsLocalRing A], ReciprocityTheory.CA.IsCM A → ∀ xs : List A, (∀ x ∈ xs, x ∈ maximalIdeal A) →
-      ringKrullDim (A ⧸ Ideal.ofList xs) + xs.length = ringKrullDim A → 2 ≤ ringKrullDim (A ⧸ Ideal.ofList xs) →
-      ∃ u ∈ maximalIdeal A, ∃ v ∈ maximalIdeal A, ∀ m K : ℕ,
-        Reg2 (Ideal.ofList (xs.map (· ^ (m + 1)))) (u ^ K) (v ^ K) := by
+theorem UpperTheory.V.AlgebraTools.Conn.reg2
+    : ∀ {A : Type} [CommRing A] [IsLocalRing A],
+      ReciprocityTheory.CA.IsCM A
+        → ∀ xs : List A,
+          (∀ x ∈ xs, x ∈ maximalIdeal A)
+            → ringKrullDim (A ⧸ Ideal.ofList xs) + xs.length = ringKrullDim A
+            → 2 ≤ ringKrullDim (A ⧸ Ideal.ofList xs)
+            → ∃ u ∈ maximalIdeal A, ∃ v ∈ maximalIdeal A, ∀ m K : ℕ,
+              Reg2 (Ideal.ofList (xs.map (· ^ (m + 1)))) (u ^ K) (v ^ K) := by
   intro A _ _ hA xs hxs hdim h2
   haveI := hA.1
   obtain ⟨ys, hys, hlen, hP⟩ := exists_system_of_parameters (Ideal.ofList xs) (Ideal.span_le.2 hxs)
@@ -105,20 +110,24 @@ theorem UpperTheory.V.AlgebraTools.Conn.reg2 :
         rw [Ring.krullDimLE_zero_iff]
         intro Q hQ
         have hp : (Q.comap (Ideal.Quotient.mk I)).IsPrime := Ideal.comap_isPrime _ _
-        have hmem : ∀ r ∈ l ++ u ^ (K + 1) :: v ^ (K + 1) :: w,
-            r ∈ Q.comap (Ideal.Quotient.mk I) := by
+        have hmem
+            : ∀ r ∈ l ++ u ^ (K + 1) :: v ^ (K + 1) :: w, r ∈ Q.comap (Ideal.Quotient.mk I) := by
           intro r hr
           have : r ∈ I := Ideal.subset_span hr
           rw [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.2 this]
           exact Q.zero_mem
-        have := hP _ hp (Ideal.span_le.2 fun x hx => hp.mem_of_pow_mem (m + 1)
-          (hmem _ (List.mem_append_left _ (List.mem_map.2 ⟨x, hx, rfl⟩)))) (by
-            intro y hy
-            simp only [List.mem_cons] at hy
-            rcases hy with rfl | rfl | hy
-            · exact hp.mem_of_pow_mem (K + 1) (hmem _ (by simp))
-            · exact hp.mem_of_pow_mem (K + 1) (hmem _ (by simp))
-            · exact hmem _ (by simp [hy]))
+        have :=
+          hP _ hp
+            (Ideal.span_le.2 fun x hx =>
+              hp.mem_of_pow_mem (m + 1)
+                (hmem _ (List.mem_append_left _ (List.mem_map.2 ⟨x, hx, rfl⟩))))
+            (by
+              intro y hy
+              simp only [List.mem_cons] at hy
+              rcases hy with rfl | rfl | hy
+              · exact hp.mem_of_pow_mem (K + 1) (hmem _ (by simp))
+              · exact hp.mem_of_pow_mem (K + 1) (hmem _ (by simp))
+              · exact hmem _ (by simp [hy]))
         have hmax : (Q.comap (Ideal.Quotient.mk I)).IsMaximal := this ▸ maximalIdeal.isMaximal A
         rw [← Ideal.map_comap_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective Q]
         refine (Ideal.map_eq_top_or_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntCZero
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.AwayOrb GlobalTheory.FinClsLoc
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.AwayOrb GlobalTheory.FinClsLoc
 open scoped TensorProduct Classical
 
 noncomputable section
@@ -16,24 +17,32 @@ namespace GlobalTheory.FinClsLoc
 
 open IsDedekindDomain
 
-theorem eventually_rat_mem_adicCompletionIntegers (q : ℚ) :
-    ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite,
-      algebraMap ℚ (v.adicCompletion ℚ) q ∈ v.adicCompletionIntegers ℚ := by
+theorem eventually_rat_mem_adicCompletionIntegers (q : ℚ)
+    : ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite,
+        algebraMap ℚ (v.adicCompletion ℚ) q ∈ v.adicCompletionIntegers ℚ := by
   have h := (algebraMap ℚ (FiniteAdeleRing ℤ ℚ) q).2
   filter_upwards [h] with v hv
   exact hv
 
-theorem intC_isIntegral : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p), ∀ᶠ w : AwayP p in Filter.cofinite,
-    ∀ x : w.1.adicCompletion ℚ ⊗[ℚ] G.C, IntC G w x → (∃ f : Polynomial (w.1.adicCompletion ℚ), f.Monic ∧
-      (∀ i, f.coeff i ∈ w.1.adicCompletionIntegers ℚ) ∧ Polynomial.aeval x f = 0) := by
+theorem intC_isIntegral
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p),
+      ∀ᶠ w : AwayP p in Filter.cofinite,
+        ∀ x : w.1.adicCompletion ℚ ⊗[ℚ] G.C, IntC G w x → (∃ f : Polynomial (w.1.adicCompletion ℚ), f.Monic ∧
+          (∀ i, f.coeff i ∈ w.1.adicCompletionIntegers ℚ) ∧ Polynomial.aeval x f = 0) := by
   intro p _ G
   set b := Module.finBasis ℚ G.C with hb
-  have hev : ∀ᶠ w : AwayP p in Filter.cofinite, ∀ k j l,
-      algebraMap ℚ (w.1.adicCompletion ℚ) (b.repr (b k * b j) l) ∈ w.1.adicCompletionIntegers ℚ := by
-    rw [Filter.eventually_all]; intro k
-    rw [Filter.eventually_all]; intro j
-    rw [Filter.eventually_all]; intro l
-    exact Subtype.val_injective.tendsto_cofinite.eventually (eventually_rat_mem_adicCompletionIntegers _)
+  have hev
+      : ∀ᶠ w : AwayP p in Filter.cofinite, ∀ k j l,
+        algebraMap ℚ (w.1.adicCompletion ℚ) (b.repr (b k * b j) l) ∈ w.1.adicCompletionIntegers ℚ :=
+    by
+      rw [Filter.eventually_all]
+      intro k
+      rw [Filter.eventually_all]
+      intro j
+      rw [Filter.eventually_all]
+      intro l
+      exact Subtype.val_injective.tendsto_cofinite.eventually
+        (eventually_rat_mem_adicCompletionIntegers _)
   filter_upwards [hev] with w hw
   intro x hx
   set B := Algebra.TensorProduct.basis (w.1.adicCompletion ℚ) b with hB
@@ -52,9 +61,12 @@ theorem intC_isIntegral : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p), ∀ᶠ w
     exact mul_mem (hx k) (hw k j i)
   refine ⟨(Algebra.leftMulMatrix B x).charpoly, Matrix.charpoly_monic _, ?_, ?_⟩
   · intro n
-    let M : Matrix (Fin (Module.finrank ℚ G.C)) (Fin (Module.finrank ℚ G.C)) (w.1.adicCompletionIntegers ℚ) :=
-      fun i j => ⟨_, hent i j⟩
-    have hM : Algebra.leftMulMatrix B x = M.map (algebraMap (w.1.adicCompletionIntegers ℚ) (w.1.adicCompletion ℚ)) := by
+    let M : Matrix (Fin (Module.finrank ℚ G.C)) (Fin (Module.finrank ℚ G.C))
+        (w.1.adicCompletionIntegers ℚ) := fun i j =>
+      ⟨_, hent i j⟩
+    have hM
+        : Algebra.leftMulMatrix B x
+          = M.map (algebraMap (w.1.adicCompletionIntegers ℚ) (w.1.adicCompletion ℚ)) := by
       ext i j; rfl
     rw [hM, Matrix.charpoly_map, Polynomial.coeff_map]
     exact (M.charpoly.coeff n).2

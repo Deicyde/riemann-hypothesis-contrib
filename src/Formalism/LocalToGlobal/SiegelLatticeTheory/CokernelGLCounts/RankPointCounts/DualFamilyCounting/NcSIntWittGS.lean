@@ -15,13 +15,17 @@ section GS
 
 variable {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (J : Matrix (Fin n) (Fin n) K)
 
-theorem exists_aniso (hσ : ∀ z, σ (σ z) = z) (hJ : IsHerm σ J) (h2 : (2 : K) ≠ 0) (u w : Fin n → K)
-    (huw : hform σ J u w ≠ 0) : ∃ r t : K, hform σ J (r • u + t • w) (r • u + t • w) ≠ 0 := by
+theorem exists_aniso
+    (hσ : ∀ z, σ (σ z) = z) (hJ : IsHerm σ J) (h2 : (2 : K) ≠ 0)
+    (u w : Fin n → K) (huw : hform σ J u w ≠ 0)
+    : ∃ r t : K, hform σ J (r • u + t • w) (r • u + t • w) ≠ 0 := by
   by_contra H
   push Not at H
-  have hexp : ∀ r t : K, hform σ J (r • u + t • w) (r • u + t • w) =
-      σ r * r * hform σ J u u + σ r * t * hform σ J u w + σ t * r * hform σ J w u +
-        σ t * t * hform σ J w w := by
+  have hexp
+      : ∀ r t : K,
+        hform σ J (r • u + t • w) (r • u + t • w)
+          = σ r * r * hform σ J u u + σ r * t * hform σ J u w + σ t * r * hform σ J w u
+            + σ t * t * hform σ J w w := by
     intro r t
     simp only [hform_add_left, hform_add_right, hform_smul_left, hform_smul_right]
     ring
@@ -36,7 +40,8 @@ theorem exists_aniso (hσ : ∀ z, σ (σ z) = z) (hJ : IsHerm σ J) (h2 : (2 : 
   have hst : σ t * hform σ J w u = 2⁻¹ := by
     rw [← hform_conj σ J hσ hJ u w, ← hq, ← map_mul, ht, map_inv₀, map_ofNat]
   have hinv : (2 : K) * 2⁻¹ = 1 := mul_inv_cancel₀ h2
-  exact one_ne_zero (by linear_combination h3 - h1 - (σ t * t) * h2' - ht - hst - hinv : (1 : K) = 0)
+  exact one_ne_zero
+    (by linear_combination h3 - h1 - (σ t * t) * h2' - ht - hst - hinv : (1 : K) = 0)
 
 end GS
 
@@ -55,30 +60,36 @@ theorem hermDiag : Formalism.L2.SG.Pf.NcS.IntWittPf.HermDiag := by
     simp only [mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply]
     rw [← e]
     exact Finset.sum_congr rfl fun l _ => mul_comm _ _
-  have hcW : ∀ c, comb c ∈ W := fun c => W.sum_mem fun l _ => W.smul_mem _ (Submodule.subset_span ⟨l, rfl⟩)
-  have main : ∀ k ≤ a, ∃ Z : Fin k → Fin n → K, (∀ i, Z i ∈ W) ∧
-      (∀ i j, i ≠ j → hform σ J (Z i) (Z j) = 0) ∧ ∀ i, hform σ J (Z i) (Z i) ≠ 0 := by
+  have hcW : ∀ c, comb c ∈ W := fun c =>
+    W.sum_mem fun l _ => W.smul_mem _ (Submodule.subset_span ⟨l, rfl⟩)
+  have main
+      : ∀ k ≤ a, ∃ Z : Fin k → Fin n → K,
+        (∀ i, Z i ∈ W) ∧ (∀ i j, i ≠ j → hform σ J (Z i) (Z j) = 0)
+          ∧ ∀ i, hform σ J (Z i) (Z i) ≠ 0 := by
     intro k
     induction k with
-    | zero => intro _; exact ⟨fun i => i.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩
+    | zero =>
+      intro _; exact ⟨fun i => i.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩
     | succ k ih =>
       intro hk
       obtain ⟨Z, hZW, hZo, hZd⟩ := ih (by omega)
-      let f : (Fin a → K) →ₗ[K] (Fin k → K) :=
-        { toFun := fun c i => hform σ J (Z i) (comb c)
-          map_add' := by
-            intro c d
-            funext i
-            simp only [comb, Pi.add_apply, add_smul, Finset.sum_add_distrib, hform_add_right]
-          map_smul' := by
-            intro r c
-            funext i
-            simp only [comb, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, ← smul_smul, ← Finset.smul_sum,
-              hform_smul_right] }
+      let f : (Fin a → K) →ₗ[K] (Fin k → K) := {
+        toFun := fun c i => hform σ J (Z i) (comb c)
+        map_add' := by
+          intro c d
+          funext i
+          simp only [comb, Pi.add_apply, add_smul, Finset.sum_add_distrib, hform_add_right]
+        map_smul' := by
+          intro r c
+          funext i
+          simp only [comb, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, ← smul_smul,
+            ← Finset.smul_sum, hform_smul_right]
+      }
       have hlt : Module.finrank K (Fin k → K) < Module.finrank K (Fin a → K) := by
         simp only [Module.finrank_fin_fun]
         omega
-      obtain ⟨c, hc, hc0⟩ := (Submodule.ne_bot_iff _).1 (LinearMap.ker_ne_bot_of_finrank_lt (f := f) hlt)
+      obtain ⟨c, hc, hc0⟩ :=
+        (Submodule.ne_bot_iff _).1 (LinearMap.ker_ne_bot_of_finrank_lt (f := f) hlt)
       have hcZ : ∀ i, hform σ J (Z i) (comb c) = 0 := fun i => congrFun (LinearMap.mem_ker.1 hc) i
       obtain ⟨j, hj⟩ : ∃ j, hform σ J (X0 j) (comb c) ≠ 0 := by
         by_contra H
@@ -99,12 +110,14 @@ theorem hermDiag : Formalism.L2.SG.Pf.NcS.IntWittPf.HermDiag := by
         · exact hj
         · intro i _
           rw [hcZ i, mul_zero]
-      have hwW : w ∈ W := W.sub_mem (Submodule.subset_span ⟨j, rfl⟩) (W.sum_mem fun i _ => W.smul_mem _ (hZW i))
+      have hwW : w ∈ W :=
+        W.sub_mem (Submodule.subset_span ⟨j, rfl⟩) (W.sum_mem fun i _ => W.smul_mem _ (hZW i))
       obtain ⟨r, t, hz⟩ := exists_aniso σ J hσ hJ h2 w (comb c) hwc
       set z := r • w + t • comb c with hzdef
       have hzZ : ∀ m, hform σ J (Z m) z = 0 := by
         intro m
-        rw [hzdef, hform_add_right, hform_smul_right, hform_smul_right, hwZ, hcZ, mul_zero, mul_zero, add_zero]
+        rw [hzdef, hform_add_right, hform_smul_right, hform_smul_right, hwZ, hcZ, mul_zero,
+          mul_zero, add_zero]
       refine ⟨Fin.snoc Z z, ?_, ?_, ?_⟩
       · intro i
         refine Fin.lastCases ?_ (fun i => ?_) i
@@ -130,8 +143,8 @@ theorem hermDiag : Formalism.L2.SG.Pf.NcS.IntWittPf.HermDiag := by
         · rw [Fin.snoc_castSucc]
           exact hZd i
   obtain ⟨Z, hZW, hZo, hZd⟩ := main a le_rfl
-  have hex : ∀ i, ∃ c : Fin a → K, ∑ l, c l • X0 l = Z i :=
-    fun i => (Submodule.mem_span_range_iff_exists_fun K).1 (hZW i)
+  have hex : ∀ i, ∃ c : Fin a → K, ∑ l, c l • X0 l = Z i := fun i =>
+    (Submodule.mem_span_range_iff_exists_fun K).1 (hZW i)
   choose C hC using hex
   let P : Matrix (Fin a) (Fin a) K := Matrix.of C
   have hPX : ∀ i, ∑ l, P i l • X0 l = Z i := fun i => hC i

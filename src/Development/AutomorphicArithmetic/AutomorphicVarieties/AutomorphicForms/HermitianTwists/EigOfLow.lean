@@ -5,11 +5,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Nf UpperTheory.V.Sd
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Nf UpperTheory.V.Sd
   UpperTheory.V.Br CongruenceSubgroup
 
-theorem UpperTheory.V.Af.Rn.eigOfLow :
-    UpperTheory.V.Sd.Wc.CentChar → UpperTheory.V.Af.Rn.EigOfLow := by
+theorem UpperTheory.V.Af.Rn.eigOfLow
+    : UpperTheory.V.Sd.Wc.CentChar → UpperTheory.V.Af.Rn.EigOfLow := by
   intro hCC k hk1 π hlw
   obtain ⟨N, ψ, ν, hN, hν, φ, hφ, h0, hlow, hfix⟩ := levelVec k π hlw
   have : NeZero N := ⟨by omega⟩
@@ -24,14 +25,15 @@ theorem UpperTheory.V.Af.Rn.eigOfLow :
     obtain ⟨γ, h, u, hu, rfl⟩ := decomp N hN g
     rw [hL γ h u hu]
     simp [nsl]
-  have hhol : IsHol k (lev N) ω φ := ⟨hcusp.1, fun w u hu => hfix _ (kLocal N hN w u hu), hc, hlow.wt, hlow.low⟩
+  have hhol : IsHol k (lev N) ω φ :=
+    ⟨hcusp.1, fun w u hu => hfix _ (kLocal N hN w u hu), hc, hlow.wt, hlow.low⟩
   obtain ⟨g, hg⟩ := eigEx N k hk1 χ f hf hf0 fun p => Classical.epsilon (IsEigAt k χ f p)
   have : NeZero (N * N) := ⟨mul_ne_zero (NeZero.ne N) (NeZero.ne N)⟩
-  have huntwist :
-      ∃ (χ' : DirichletCharacter ℂ (N * N)) (g' : Eigenform k (N * N) χ'),
-        ∀ p : ℕ, p.Prime → ¬ p ∣ N →
-          g'.a p * ψ (p : ZMod N) = g.a p ∧
-            χ' (p : ZMod (N * N)) * ψ (p : ZMod N) ^ 2 = χ (p : ZMod N) := by
+  have huntwist
+      : ∃ (χ' : DirichletCharacter ℂ (N * N)) (g' : Eigenform k (N * N) χ'), ∀ p : ℕ,
+        p.Prime → ¬ p ∣ N
+          → g'.a p * ψ (p : ZMod N) = g.a p
+            ∧ χ' (p : ZMod (N * N)) * ψ (p : ZMod N) ^ 2 = χ (p : ZMod N) := by
     obtain ⟨h, hc, hn⟩ := clTwist N k χ ψ⁻¹ g.f g.char
     have ht0 : h ≠ 0 := by
       rintro rfl
@@ -43,9 +45,11 @@ theorem UpperTheory.V.Af.Rn.eigOfLow :
     have hu : IsUnit (p : ZMod (N * N)) :=
       (ZMod.isUnit_prime_iff_not_dvd hp).2 fun e => hd ((hp.dvd_mul.1 e).elim id id)
     have hu' : IsUnit (p : ZMod N) := (ZMod.isUnit_prime_iff_not_dvd hp).2 hd
-    have e : DirichletCharacter.changeLevel (dvd_mul_right N N) (χ * ψ⁻¹ ^ 2) (p : ZMod (N * N)) =
-        χ (p : ZMod N) * ψ⁻¹ (p : ZMod N) ^ 2 := by
-      have := DirichletCharacter.changeLevel_eq_cast_of_dvd (χ * ψ⁻¹ ^ 2) (dvd_mul_right N N) hu.unit
+    have e
+        : DirichletCharacter.changeLevel (dvd_mul_right N N) (χ * ψ⁻¹ ^ 2) (p : ZMod (N * N))
+          = χ (p : ZMod N) * ψ⁻¹ (p : ZMod N) ^ 2 := by
+      have :=
+        DirichletCharacter.changeLevel_eq_cast_of_dvd (χ * ψ⁻¹ ^ 2) (dvd_mul_right N N) hu.unit
       rw [IsUnit.unit_spec, ZMod.cast_natCast (dvd_mul_right N N)] at this
       rw [this, MulChar.mul_apply, MulChar.pow_apply' _ two_ne_zero]
     have e1 : ψ⁻¹ (p : ZMod N) * ψ (p : ZMod N) = 1 := by
@@ -82,20 +86,23 @@ theorem UpperTheory.V.Af.Rn.eigOfLow :
   have hlevel : K1 w 0 = GlobalTheory.LFun.KGL w (n := 2) := by
     ext x
     refine ⟨fun ⟨u, _, e⟩ => ⟨u, e⟩, fun ⟨u, e⟩ => ⟨u, ?_, e⟩⟩
-    have : Subsingleton (w.adicCompletionIntegers ℚ ⧸ IsLocalRing.maximalIdeal (w.adicCompletionIntegers ℚ) ^ 0) :=
+    have : Subsingleton
+        (w.adicCompletionIntegers ℚ ⧸ IsLocalRing.maximalIdeal (w.adicCompletionIntegers ℚ) ^ 0) :=
       Ideal.Quotient.subsingleton_iff.2 (by simp)
     exact Subsingleton.elim _ _
   have hv : GlobalTheory.LFun.IsSatVecGL w (locSm ℚ w) φ {α * ν.val w, β * ν.val w} :=
-    (hT.2 ⟨φ, hφ⟩ (GlobalTheory.LGrp.mem_fixed.2 fun u hu => Subtype.ext (hfix _ (kLocal N hN w u (by
-      rwa [(places w).2.2.2 N hN hw, hlevel])))) fun e => h0 (congrArg Subtype.val e)).map
-      (π.twist ν).V.subtype (fun _ _ => rfl) h0
+    (hT.2 ⟨φ, hφ⟩
+      (GlobalTheory.LGrp.mem_fixed.2 fun u hu =>
+        Subtype.ext (hfix _ (kLocal N hN w u (by rwa [(places w).2.2.2 N hN hw, hlevel]))))
+      fun e => h0 (congrArg Subtype.val e)).map (π.twist ν).V.subtype (fun _ _ => rfl) h0
   obtain ⟨h1, h2⟩ := eigOf k N hk1 hN χ ω hχ f φ hL hhol w _ _ hw hv
   have h3 := Classical.epsilon_spec (p := IsEigAt k χ f (normV w)) ⟨_, h1⟩
-  have heig {a b : ℂ} (ha : IsEigAt k χ f (normV w) a) (hb : IsEigAt k χ f (normV w) b) : a = b := by
+  have heig {a b : ℂ} (ha : IsEigAt k χ f (normV w) a) (hb : IsEigAt k χ f (normV w) b)
+      : a = b := by
     by_contra h
     exact hf0 ((finDim N k).2 f fun n hn =>
-      (mul_eq_zero.1 (show (a - b) * coef f n = 0 by linear_combination hb n hn - ha n hn)).resolve_left
-        (sub_ne_zero.2 h))
+      (mul_eq_zero.1 (show (a - b) * coef f n = 0 by
+        linear_combination hb n hn - ha n hn)).resolve_left (sub_ne_zero.2 h))
   have h4 := (hg _ hp h3).trans (heig h3 h1)
   obtain ⟨h5, h6⟩ := hg' _ hp hw
   have h7 := (charVal N hN ψ ν hν).2 w hw
@@ -103,6 +110,8 @@ theorem UpperTheory.V.Af.Rn.eigOfLow :
   simp only [Units.val_mul, h7] at h2 h4 ⊢
   constructor
   · refine mul_right_cancel₀ h8 ?_
-    rw [h5, h4]; ring
+    rw [h5, h4]
+    ring
   · refine mul_right_cancel₀ (pow_ne_zero 2 h8) ?_
-    rw [h6, ← h2]; ring
+    rw [h6, ← h2]
+    ring

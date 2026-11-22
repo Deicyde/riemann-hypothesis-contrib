@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OddThetaF
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators Topology
 open Filter
 
@@ -25,12 +27,11 @@ open PowerSeries
 
 variable {R S : Type} [CommRing R] [CommRing S]
 
-def wSer (s : R) (A : R⟦X⟧) : R⟦X⟧ :=
-  d⁄dX A ^ 2 - A * d⁄dX (d⁄dX A) - C s * A ^ 2
+def wSer (s : R) (A : R⟦X⟧) : R⟦X⟧ := d⁄dX A ^ 2 - A * d⁄dX (d⁄dX A) - C s * A ^ 2
 
 def OdeSer (s a b : R) (A : R⟦X⟧) : Prop :=
-  (d⁄dX (wSer s A) * A - 2 * wSer s A * d⁄dX A) ^ 2 =
-    4 * wSer s A ^ 3 - C a * wSer s A * A ^ 4 - C b * A ^ 6
+  (d⁄dX (wSer s A) * A - 2 * wSer s A * d⁄dX A) ^ 2
+    = 4 * wSer s A ^ 3 - C a * wSer s A * A ^ 4 - C b * A ^ 6
 
 def homSer (m : ℕ) (q : ℕ → R) (s : R) (A : R⟦X⟧) : R⟦X⟧ :=
   ∑ k ∈ Finset.range (m + 1), C (q k) * (wSer s A ^ k * A ^ (2 * (m - k)))
@@ -353,11 +354,13 @@ lemma endSer_tay_iff (L : PeriodPair) {s α : ℂ} {f : Ent} {N m : ℕ} {q : �
     simp only [Subring.coe_pow, Subring.coe_mul, Pi.pow_apply, Pi.mul_apply, e2 z hz, sE, H z hz]
     ring
 
-def twist (c : ℂ) (f : Ent) : Ent :=
-  ⟨fun z => f.1 z * Complex.exp (c * z ^ 2), by
+def twist (c : ℂ) (f : Ent) : Ent := ⟨
+  fun z => f.1 z * Complex.exp (c * z ^ 2),
+  by
     have := Ent.diff f
     change Differentiable ℂ _
-    fun_prop⟩
+    fun_prop
+⟩
 
 lemma deriv_twist (c : ℂ) (f : Ent) : deriv (twist c f).1 =
     fun z => (deriv f.1 z + 2 * c * z * f.1 z) * Complex.exp (c * z ^ 2) := by
@@ -558,25 +561,29 @@ lemma liftM_coe (M : IntermediateField ℚ ℂ) (x : M) : liftM M (x : ℂ) = x 
 lemma coe_liftM {M : IntermediateField ℚ ℂ} {x : ℂ} (hx : x ∈ M) : (liftM M x : ℂ) = x := by
   simp [TaylorLogMetric.liftM, hx]
 
-theorem conj_sgStar (L : PeriodPair) (Λ : AddSubgroup ℂ) (hL : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
-    (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ] ℂ) {α : ℂ} {N : ℕ} (hαM : α ∈ M)
-    (hρ : cj M ρ α = α) (hα : α * (starRingEnd ℂ) α = N) (hα0 : α ≠ 0) (hαN : α ^ 2 ≠ N)
-    (hαL : ∀ ω ∈ Λ, α * ω ∈ Λ) (h2 : g2 Λ ∈ M) (h3 : g3 Λ ∈ M)
-    (hc : ∀ n, coef1 (sgStar Λ) n ∈ M) (n : ℕ) :
-    cj M ρ (coef1 (sgStar Λ) n) = coef1 (sgStar (lamConj M ρ Λ)) n := by
+theorem conj_sgStar
+    (L : PeriodPair) (Λ : AddSubgroup ℂ) (hL : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+    (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ] ℂ)
+    {α : ℂ} {N : ℕ} (hαM : α ∈ M) (hρ : cj M ρ α = α) (hα : α * (starRingEnd ℂ) α = N) (hα0 : α ≠ 0)
+    (hαN : α ^ 2 ≠ N) (hαL : ∀ ω ∈ Λ, α * ω ∈ Λ)
+    (h2 : g2 Λ ∈ M) (h3 : g3 Λ ∈ M) (hc : ∀ n, coef1 (sgStar Λ) n ∈ M) (n : ℕ)
+    : cj M ρ (coef1 (sgStar Λ) n) = coef1 (sgStar (lamConj M ρ Λ)) n := by
   obtain ⟨e2, e3, hΔ, -, -, -, hex⟩ := GlobalTheory.LatticeInvariants.invariants_dictionary L Λ hL
-  obtain ⟨L', a2, a3⟩ := hex (ρ (liftM M (g2 Λ))) (ρ (liftM M (g3 Λ))) (by
-    have : (liftM M (g2 Λ)) ^ 3 - 27 * (liftM M (g3 Λ)) ^ 2 ≠ 0 := fun h => hΔ (by
-      have := congrArg (algebraMap M ℂ) h
-      simp only [map_sub, map_mul, map_pow, map_ofNat, map_zero] at this
-      simpa [coe_liftM h2, coe_liftM h3, TaylorLogMetric.discr] using this)
-    have := (map_ne_zero ρ).2 this
-    simpa [map_ofNat] using this)
-  obtain ⟨b2, b3, -, -, -, huniq, -⟩ := GlobalTheory.LatticeInvariants.invariants_dictionary L'
-    L'.lattice.toAddSubgroup (fun _ => Iff.rfl)
+  obtain ⟨L', a2, a3⟩ :=
+    hex (ρ (liftM M (g2 Λ))) (ρ (liftM M (g3 Λ))) (by
+      have : (liftM M (g2 Λ)) ^ 3 - 27 * (liftM M (g3 Λ)) ^ 2 ≠ 0 := fun h =>
+        hΔ (by
+          have := congrArg (algebraMap M ℂ) h
+          simp only [map_sub, map_mul, map_pow, map_ofNat, map_zero] at this
+          simpa [coe_liftM h2, coe_liftM h3, TaylorLogMetric.discr] using this)
+      have := (map_ne_zero ρ).2 this
+      simpa [map_ofNat] using this)
+  obtain ⟨b2, b3, -, -, -, huniq, -⟩ :=
+    GlobalTheory.LatticeInvariants.invariants_dictionary L' L'.lattice.toAddSubgroup
+      (fun _ => Iff.rfl)
   have hspec : g2 (lamConj M ρ Λ) = ρ (liftM M (g2 Λ)) ∧ g3 (lamConj M ρ Λ) = ρ (liftM M (g3 Λ)) :=
-    Classical.epsilon_spec (p := fun Λ' : AddSubgroup ℂ =>
-      g2 Λ' = ρ (liftM M (g2 Λ)) ∧ g3 Λ' = ρ (liftM M (g3 Λ)))
+    Classical.epsilon_spec
+      (p := fun Λ' : AddSubgroup ℂ => g2 Λ' = ρ (liftM M (g2 Λ)) ∧ g3 Λ' = ρ (liftM M (g3 Λ)))
       ⟨L'.lattice.toAddSubgroup, b2.trans a2, b3.trans a3⟩
   have hL' : ∀ z, z ∈ lamConj M ρ Λ ↔ z ∈ L'.lattice := fun z => by
     rw [huniq _ (hspec.1.trans (b2.trans a2).symm) (hspec.2.trans (b3.trans a3).symm)]
@@ -593,8 +600,8 @@ theorem conj_sgStar (L : PeriodPair) (Λ : AddSubgroup ℂ) (hL : ∀ z, z ∈ �
   have hs : s ∈ M := by
     rw [ode.const_eq c0 c1 c2, coeff_tay]
     exact mul_mem (neg_mem (ofNat_mem M 2)) (hc 3)
-  obtain ⟨m, q, hq⟩ := exists_poly (Ent.diff f) f0 fo fp hα
-    (fun ω hω => (hL _).1 (hαL ω ((hL _).2 hω)))
+  obtain ⟨m, q, hq⟩ :=
+    exists_poly (Ent.diff f) f0 fo fp hα (fun ω hω => (hL _).1 (hαL ω ((hL _).2 hω)))
   have en := (endSer_tay_iff L fw (fun z hz h => hz ((f0 z).1 h))).2 hq
   have ι : ∀ {x : ℂ}, x ∈ M → algebraMap M ℂ (liftM M x) = x := fun hx => coe_liftM hx
   rw [← hA, ← ι hs, ← e2, ← e3, ← ι h2, ← ι h3] at ode
@@ -607,22 +614,31 @@ theorem conj_sgStar (L : PeriodPair) (Λ : AddSubgroup ℂ) (hL : ∀ z, z ∈ �
   rw [show ρ (liftM M α) = α from hρ] at en''
   obtain ⟨c, hcs⟩ : ∃ c, ρ (liftM M s) = s' - 2 * c := ⟨(s' - ρ (liftM M s)) / 2, by ring⟩
   rw [hcs] at ode' en''
-  have tw : ∀ z ∉ L'.lattice, (wE (s' - 2 * c) (twist c g)).1 z =
-      L'.weierstrassP z * (twist c g).1 z ^ 2 := fun z hz => by
+  have tw
+      : ∀ z ∉ L'.lattice,
+        (wE (s' - 2 * c) (twist c g)).1 z
+          = L'.weierstrassP z * (twist c g).1 z ^ 2 := fun z hz => by
     rw [wE_twist, gw z hz]; simp only [twist]; ring
-  obtain ⟨t0, t1, t2⟩ := coeff_tay_of_odd (f := twist c g)
-    (by simp [deriv_twist, g1]) (fun z => by simp [twist, go])
-  have cA : ∀ n, PowerSeries.coeff n (PowerSeries.map (ρ : M →+* ℂ) A) = cj M ρ (coef1 f.1 n) :=
-    fun n => by simp [A, cj]
+  obtain ⟨t0, t1, t2⟩ :=
+    coeff_tay_of_odd (f := twist c g) (by simp [deriv_twist, g1]) (fun z => by simp [twist, go])
+  have cA
+      : ∀ n,
+        PowerSeries.coeff n (PowerSeries.map (ρ : M →+* ℂ) A) = cj M ρ (coef1 f.1 n) := fun n => by
+    simp [A, cj]
   have l0 : liftM M 0 = 0 := liftM_coe M 0
   have l1 : liftM M 1 = 1 := liftM_coe M 1
-  have eq := theta_unique (by rw [cA, ← coeff_tay, c0, cj, l0, map_zero])
-    (by rw [cA, ← coeff_tay, c1, cj, l1, map_one]) (by rw [cA, ← coeff_tay, c2, cj, l0, map_zero])
-    t0 t1 t2 ode' (odeSer_tay L' tw)
-  rw [eq, endSer_tay_iff L' tw (fun z hz =>
-    mul_ne_zero (fun h => hz ((g0 z).1 h)) (Complex.exp_ne_zero _))] at en''
-  have hc0 : c = 0 := twist_eq_zero (Ent.diff g) g0 gp hα hα0 hαN
-    (R := fun x => ∑ j ∈ Finset.range (m + 1), ρ (q' j) * x ^ j) en''
+  have eq :=
+    theta_unique (by rw [cA, ← coeff_tay, c0, cj, l0, map_zero])
+      (by rw [cA, ← coeff_tay, c1, cj, l1, map_one]) (by rw [cA, ← coeff_tay, c2, cj, l0, map_zero])
+      t0 t1 t2 ode' (odeSer_tay L' tw)
+  rw [eq,
+      endSer_tay_iff L' tw
+        (fun z hz => mul_ne_zero (fun h => hz ((g0 z).1 h)) (Complex.exp_ne_zero _))]
+    at en''
+  have hc0 : c = 0 :=
+    twist_eq_zero (Ent.diff g) g0 gp hα hα0 hαN
+      (R := fun x => ∑ j ∈ Finset.range (m + 1), ρ (q' j) * x ^ j)
+      en''
   rw [← cA, eq, coeff_tay, hc0]
   simp [twist]
 
@@ -636,8 +652,8 @@ theorem galSg_all : ∀ D : D7, galSg D := by
     simp [L]
   obtain ⟨b, hb⟩ : ∃ b : D.host.K, b ^ 2 = -(D.host.d : D.host.K) :=
     ⟨_, Formalism.FrobeniusOrbits.SplitK.bK_sq (D.host.sqd_sq)⟩
-  have hbi : IsIntegral ℤ b := IsIntegral.of_pow two_pos (by
-    rw [hb]; exact (isIntegral_natCast _).neg)
+  have hbi : IsIntegral ℤ b :=
+    IsIntegral.of_pow two_pos (by rw [hb]; exact (isIntegral_natCast _).neg)
   have hd : (D.host.d : ℝ) ≠ 0 := by exact_mod_cast D.host.hyp.2.1.pos.ne'
   have hsq : D.host.φ₀ (b : D.host.E) ^ 2 = -(D.host.d : ℂ) := by
     have := congrArg (D.host.φ₀.comp (algebraMap D.host.K D.host.E)) hb
@@ -651,7 +667,9 @@ theorem galSg_all : ∀ D : D7, galSg D := by
   have hn : α * (starRingEnd ℂ) α = D.host.d := by
     rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, ← norm_pow, hsq]
     simp
-  exact conj_sgStar L _ hL M ρ hK'.1 hK'.2 hn (fun h0 => hdc (by simpa [h0] using hsq))
-    (fun h0 => hdc (by linear_combination (hsq - h0) / 2)) hcm' h2 h3 hc n
+  exact conj_sgStar L _ hL M ρ hK'.1 hK'.2 hn
+    (fun h0 => hdc (by simpa [h0] using hsq))
+    (fun h0 => hdc (by linear_combination (hsq - h0) / 2))
+    hcm' h2 h3 hc n
 
 end GlobalTheory.SigmaConj

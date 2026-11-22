@@ -160,14 +160,26 @@ private lemma natDegree_minpoly_pow_le {A S : Type*} [CommRing A] [IsDomain A]
     _ = (minpoly A g).natDegree := by
         rw [LinearMap.charpoly_natDegree, pb.finrank, AdjoinRoot.powerBasis'_dim]
 
-
 open MvPolynomial in
-theorem _root_.GlobalTheory.maxPrinciple_line_eval₂ : ∀ (d : ℕ) (B : Type) [CommRing B] [IsDomain B] [Algebra (MvPolynomial (Fin d) ℚ) B] [Module.Finite (MvPolynomial (Fin d) ℚ) B], Function.Injective (algebraMap (MvPolynomial (Fin d) ℚ) B) → ∀ (r : ℕ) (G : MvPolynomial (Fin r) B) (c : Fin r → ℂ) (z v : Fin d → ℂ) (R : ℝ), (∀ (x : B →+* ℂ) (w : ℂ), ‖w‖ = 1 → (∀ i, x (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i)) = z i + w * v i) → ‖MvPolynomial.eval₂ x c G‖ ≤ R) → ∀ x : B →+* ℂ, (∀ i, x (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i)) = z i) → ‖MvPolynomial.eval₂ x c G‖ ≤ R := by
+theorem _root_.GlobalTheory.maxPrinciple_line_eval₂
+    : ∀ (d : ℕ) (B : Type) [CommRing B] [IsDomain B] [Algebra (MvPolynomial (Fin d) ℚ) B]
+        [Module.Finite (MvPolynomial (Fin d) ℚ) B],
+      Function.Injective (algebraMap (MvPolynomial (Fin d) ℚ) B)
+        → ∀ (r : ℕ) (G : MvPolynomial (Fin r) B) (c : Fin r → ℂ) (z v : Fin d → ℂ) (R : ℝ),
+          (∀ (x : B →+* ℂ) (w : ℂ),
+              ‖w‖ = 1
+                → (∀ i,
+                  x (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i)) = z i + w * v i)
+                → ‖MvPolynomial.eval₂ x c G‖ ≤ R)
+            → ∀ x : B →+* ℂ,
+              (∀ i, x (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i)) = z i)
+                → ‖MvPolynomial.eval₂ x c G‖ ≤ R := by
   intro d B _ _ _ _ hinj r G c z v R hR x hx
   letI : Algebra (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (MvPolynomial (Fin r) B) :=
     (MvPolynomial.map (algebraMap (MvPolynomial (Fin d) ℚ) B)).toAlgebra
   have hinj' : Function.Injective (algebraMap (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ))
-      (MvPolynomial (Fin r) B)) := MvPolynomial.map_injective _ hinj
+      (MvPolynomial (Fin r) B)) :=
+    MvPolynomial.map_injective _ hinj
   haveI : Module.IsTorsionFree (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ))
       (MvPolynomial (Fin r) B) := Module.isTorsionFree_iff_algebraMap_injective.mpr hinj'
   haveI : Algebra.IsIntegral (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ))
@@ -191,14 +203,21 @@ theorem _root_.GlobalTheory.maxPrinciple_line_eval₂ : ∀ (d : ℕ) (B : Type)
     Algebra.IsIntegral.isIntegral G
   let φ : ℂ → (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ) →+* ℂ) := fun t =>
     MvPolynomial.eval₂Hom (MvPolynomial.eval₂Hom (algebraMap ℚ ℂ) (fun i => z i + t * v i)) c
-  have lift : ∀ (t : ℂ) (X' : MvPolynomial (Fin r) B →+* ℂ),
-      X'.comp (algebraMap (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (MvPolynomial (Fin r) B))
-        = φ t →
-      (∀ i, (X'.comp MvPolynomial.C) (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i))
-        = z i + t * v i) ∧ X' G = MvPolynomial.eval₂ (X'.comp MvPolynomial.C) c G := by
+  have lift
+      : ∀ (t : ℂ) (X' : MvPolynomial (Fin r) B →+* ℂ),
+        X'.comp (algebraMap (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ))
+              (MvPolynomial (Fin r) B))
+            = φ t
+          → (∀ i,
+              (X'.comp MvPolynomial.C) (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i))
+                = z i + t * v i)
+            ∧ X' G = MvPolynomial.eval₂ (X'.comp MvPolynomial.C) c G := by
     intro t X' hX'
-    have hC : ∀ a, X' (algebraMap (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ))
-        (MvPolynomial (Fin r) B) a) = φ t a := fun a => RingHom.congr_fun hX' a
+    have hC
+        : ∀ a,
+          X' (algebraMap (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (MvPolynomial (Fin r) B) a)
+            = φ t a := fun a =>
+      RingHom.congr_fun hX' a
     constructor
     · intro i
       have h1 := hC (MvPolynomial.C (MvPolynomial.X i))
@@ -215,16 +234,20 @@ theorem _root_.GlobalTheory.maxPrinciple_line_eval₂ : ∀ (d : ℕ) (B : Type)
         · intro j; simp [hX]
       conv_lhs => rw [hext]
       rfl
-  have hA : x.comp (algebraMap (MvPolynomial (Fin d) ℚ) B) =
-      MvPolynomial.eval₂Hom (algebraMap ℚ ℂ) (fun i => z i + 0 * v i) := by
+  have hA
+      : x.comp (algebraMap (MvPolynomial (Fin d) ℚ) B)
+        = MvPolynomial.eval₂Hom (algebraMap ℚ ℂ) (fun i => z i + 0 * v i) := by
     apply MvPolynomial.ringHom_ext
     · intro q
-      exact RingHom.congr_fun (RingHom.ext_rat
-        ((x.comp (algebraMap (MvPolynomial (Fin d) ℚ) B)).comp MvPolynomial.C)
-        ((MvPolynomial.eval₂Hom (algebraMap ℚ ℂ) (fun i => z i + 0 * v i)).comp MvPolynomial.C)) q
+      exact RingHom.congr_fun
+        (RingHom.ext_rat ((x.comp (algebraMap (MvPolynomial (Fin d) ℚ) B)).comp MvPolynomial.C)
+          ((MvPolynomial.eval₂Hom (algebraMap ℚ ℂ) (fun i => z i + 0 * v i)).comp MvPolynomial.C))
+        q
     · intro i; simp [hx i]
-  have h0 : (MvPolynomial.eval₂Hom x c).comp (algebraMap
-      (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (MvPolynomial (Fin r) B)) = φ 0 := by
+  have h0
+      : (MvPolynomial.eval₂Hom x c).comp
+          (algebraMap (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (MvPolynomial (Fin r) B))
+        = φ 0 := by
     apply MvPolynomial.ringHom_ext
     · intro a
       have := RingHom.congr_fun hA a
@@ -238,39 +261,57 @@ theorem _root_.GlobalTheory.maxPrinciple_line_eval₂ : ∀ (d : ℕ) (B : Type)
     have hdeg : ((minpoly _ G).map (φ 1)).degree ≠ 0 := by
       rw [(minpoly.monic hg).degree_map]; exact (minpoly.degree_pos hg).ne'
     obtain ⟨a, ha⟩ := IsAlgClosed.exists_root _ hdeg
-    obtain ⟨X', hX', -⟩ := (_root_.GlobalTheory.T.isRoot_map_minpoly_iff_exists_ringHom_extension _ _ hinj' G (φ 1) a).1 ha
+    obtain ⟨X', hX', -⟩ :=
+      (_root_.GlobalTheory.T.isRoot_map_minpoly_iff_exists_ringHom_extension _ _ hinj' G (φ 1) a).1
+        ha
     obtain ⟨hgen, -⟩ := lift 1 X' hX'
     exact (norm_nonneg _).trans (hR _ 1 norm_one hgen)
   set n := (minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) G).natDegree with hn_def
   have key : ∀ N : ℕ, ‖MvPolynomial.eval₂ x c G‖ ^ N ≤ 2 ^ n * R ^ N := by
     intro N
     have hmon := minpoly.monic (hg.pow N)
-    have hroots : ∀ w : ℂ, ‖w‖ = 1 → ∀ a,
-        ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).map (φ w)).IsRoot a →
-        ‖a‖ ≤ R ^ N := by
+    have hroots
+        : ∀ w : ℂ,
+          ‖w‖ = 1
+            → ∀ a,
+              ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).map (φ w)).IsRoot a
+                → ‖a‖ ≤ R ^ N := by
       intro w hw a ha
-      obtain ⟨X', hX', rfl⟩ := (_root_.GlobalTheory.T.isRoot_map_minpoly_iff_exists_ringHom_extension _ _ hinj' (G ^ N) (φ w) a).1 ha
+      obtain ⟨X', hX', rfl⟩ :=
+        (_root_.GlobalTheory.T.isRoot_map_minpoly_iff_exists_ringHom_extension _ _ hinj' (G ^ N)
+          (φ w) a).1 ha
       obtain ⟨hgen, hval⟩ := lift w X' hX'
       rw [map_pow, norm_pow, hval]
       exact pow_le_pow_left₀ (norm_nonneg _) (hR _ w hw hgen) N
-    have hcoef : ∀ k ≤ (minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).natDegree,
-        ‖(φ 0) ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).coeff k)‖ ≤
-        (((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).natDegree).choose k
-          : ℝ) * (R ^ N) ^
-          ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).natDegree - k) := by
+    have hcoef
+        : ∀ k ≤ (minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).natDegree,
+          ‖(φ 0) ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).coeff k)‖
+            ≤ (((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).natDegree).choose
+                  k
+                : ℝ)
+              * (R ^ N)
+                ^ ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).natDegree
+                  - k) := by
       intro k hk
-      apply norm_apply_zero_le_of_circle (f := fun t =>
-        φ t ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).coeff k))
+      apply norm_apply_zero_le_of_circle
+        (f := fun t =>
+          φ t ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).coeff k))
       · exact differentiable_eval_mvPolynomial_line₂ z v c _
       · intro w hw
-        have := norm_coeff_le_choose_mul_pow_of_roots_le (hmon.map (φ w)) (hmon.natDegree_map (φ w))
-          (pow_nonneg hR0 N) (hroots w hw) k hk
+        have :=
+          norm_coeff_le_choose_mul_pow_of_roots_le (hmon.map (φ w)) (hmon.natDegree_map (φ w))
+            (pow_nonneg hR0 N) (hroots w hw) k hk
         rwa [Polynomial.coeff_map] at this
-    have hroot0 : ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).map
-        (φ 0)).IsRoot (MvPolynomial.eval₂ x c G ^ N) :=
-      (_root_.GlobalTheory.T.isRoot_map_minpoly_iff_exists_ringHom_extension _ _ hinj' (G ^ N) (φ 0) _).2 ⟨_, h0, by simp⟩
-    have hb := norm_root_le_two_pow_mul_of_coeff_le (hmon.map (φ 0)) (hmon.natDegree_map (φ 0))
-      (pow_nonneg hR0 N) (fun k hk => by rw [Polynomial.coeff_map]; exact hcoef k hk.le) hroot0
+    have hroot0
+        : ((minpoly (MvPolynomial (Fin r) (MvPolynomial (Fin d) ℚ)) (G ^ N)).map (φ 0)).IsRoot
+          (MvPolynomial.eval₂ x c G ^ N) :=
+      (_root_.GlobalTheory.T.isRoot_map_minpoly_iff_exists_ringHom_extension _ _ hinj' (G ^ N) (φ 0)
+        _).2 ⟨_, h0, by simp⟩
+    have hb :=
+      norm_root_le_two_pow_mul_of_coeff_le (hmon.map (φ 0)) (hmon.natDegree_map (φ 0))
+        (pow_nonneg hR0 N)
+        (fun k hk => by rw [Polynomial.coeff_map]; exact hcoef k hk.le)
+        hroot0
     rw [norm_pow] at hb
     refine hb.trans ?_
     gcongr

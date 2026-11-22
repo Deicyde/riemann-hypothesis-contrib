@@ -6,14 +6,25 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.TwoPlaces
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
 
 namespace GlobalTheory.RunDepth
 
-theorem sizes_le_two_mul : ∀ (D : D7) (L : SizeData₂ D) (_ : ParameterChoice' D L), 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b → L.Sc + L.etaSz ≤ 2 * L.sc.b ∧ ∀ j, InR D j → (∀ τ, 0 ≤ wj D j τ ∧ wj D j τ ≤ 2 * L.sc.b) ∧ (∀ t, wj D j (plOf D (false, t)) ≤ 2 * L.sc.b') ∧ ∀ z, (numOf D L).w j z = wj D j (plOf D z) := by
+theorem sizes_le_two_mul
+    : ∀ (D : D7) (L : SizeData₂ D) (_ : ParameterChoice' D L),
+      3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b
+        → L.Sc + L.etaSz ≤ 2 * L.sc.b
+          ∧ ∀ j,
+            InR D j
+              → (∀ τ, 0 ≤ wj D j τ ∧ wj D j τ ≤ 2 * L.sc.b)
+                ∧ (∀ t, wj D j (plOf D (false, t)) ≤ 2 * L.sc.b')
+                ∧ ∀ z, (numOf D L).w j z = wj D j (plOf D z) := by
   intro D L P hx hkb
   have hk : (5 : ℝ) ≤ D.R.k := by
     have : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
@@ -59,14 +70,18 @@ theorem sizes_le_two_mul : ∀ (D : D7) (L : SizeData₂ D) (_ : ParameterChoice
       positivity
     unfold LevelStarExponents.rhoP at h2
     set A := LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k with hA
-    have h5 : 4 * LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k = 4 * A := by rw [hA]; ring
-    have h6 : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / D.R.k = A * L.sc.b' := by rw [hA]; ring
+    have h5 : 4 * LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k = 4 * A := by
+      rw [hA]; ring
+    have h6
+        : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / D.R.k
+          = A * L.sc.b' := by
+      rw [hA]; ring
     have h7 : A ≤ 1 / 4 := by linarith
     rw [h6] at h1
     nlinarith
   refine ⟨by linarith, fun j hj => ?_⟩
-  have hoff : ∀ τ, (D.eTau τ : D.R.GG) ∉ D.host.thickPlaces →
-      0 ≤ wj D j τ ∧ wj D j τ ≤ 2 * L.sc.b' := by
+  have hoff
+      : ∀ τ, (D.eTau τ : D.R.GG) ∉ D.host.thickPlaces → 0 ≤ wj D j τ ∧ wj D j τ ≤ 2 * L.sc.b' := by
     intro τ hτ
     by_cases htop : (D.eTau τ : D.R.GG) ∈ D.host.topPlaces
     · classical
@@ -89,8 +104,7 @@ theorem sizes_le_two_mul : ∀ (D : D7) (L : SizeData₂ D) (_ : ParameterChoice
     intro h
     unfold Host.thickPlaces at h
     obtain ⟨s, -, hs⟩ := Finset.mem_image.1 h
-    have h1 : (D.eTau (plOf D (false, t)) : D.R.GG) = D.R.tau1 t := by
-      simp [plOf]
+    have h1 : (D.eTau (plOf D (false, t)) : D.R.GG) = D.R.tau1 t := by simp [plOf]
     rw [h1] at hs
     have h2 := congrArg (fun g : D.R.GG => g.1.1) hs
     simp only [Formalism.HC.Frame.tau1, Formalism.HC.Frame.tau2] at h2

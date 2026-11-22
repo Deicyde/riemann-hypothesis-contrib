@@ -6,15 +6,16 @@ public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.AfsplitB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col
 open TensorProduct Formalism.UG Formalism.UG.P
 
 namespace GlobalTheory.OpenChrRam
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem inv_natCast_mem (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : 𝓞 F) ∉ v.asIdeal) :
-    (N : v.adicCompletion F) ≠ 0 ∧ (N : v.adicCompletion F)⁻¹ ∈ v.adicCompletionIntegers F := by
+theorem inv_natCast_mem (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : 𝓞 F) ∉ v.asIdeal)
+    : (N : v.adicCompletion F) ≠ 0 ∧ (N : v.adicCompletion F)⁻¹ ∈ v.adicCompletionIntegers F := by
   have h1 : Valued.v (N : v.adicCompletion F) = 1 := by
     have e : (N : v.adicCompletion F) = algebraMap (𝓞 F) (v.adicCompletion F) (N : 𝓞 F) := by simp
     have e2 : v.valuation F (algebraMap (𝓞 F) F (N : 𝓞 F)) = 1 := by
@@ -25,11 +26,12 @@ theorem inv_natCast_mem (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : �
   refine ⟨fun h => by rw [h] at h1; simp at h1, ?_⟩
   rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_inv₀, h1, inv_one]
 
-theorem inertAt_le_congN (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : 𝓞 F) ∉ v.asIdeal) :
-    inertAt E v ≤ congN F E N := by
+theorem inertAt_le_congN (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : 𝓞 F) ∉ v.asIdeal)
+    : inertAt E v ≤ congN F E N := by
   rintro x ⟨⟨hx, hx'⟩, hs⟩
   obtain ⟨hN0, hNi⟩ := inv_natCast_mem v N hN
-  let u : (RInt F E)ˣ := ⟨⟨x, hx⟩, ⟨(x⁻¹ : (AfE F E)ˣ), hx'⟩, Subtype.ext x.mul_inv, Subtype.ext x.inv_mul⟩
+  let u : (RInt F E)ˣ :=
+    ⟨⟨x, hx⟩, ⟨(x⁻¹ : (AfE F E)ˣ), hx'⟩, Subtype.ext x.mul_inv, Subtype.ext x.inv_mul⟩
   refine ⟨u, ?_, Units.ext rfl⟩
   have hn : (1 : E) ⊗ₜ[F] afsplitI v (N : v.adicCompletion F)⁻¹ ∈ RInt F E :=
     Subring.subset_closure (Or.inr ⟨⟨_, afsplitI_mem_intAd v _ hNi⟩, rfl⟩)
@@ -45,8 +47,9 @@ theorem inertAt_le_congN (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : �
     rw [afsplitI_self, mul_right_comm]
     have : (1 : E) ⊗ₜ[F] (N : w.adicCompletion F)⁻¹ * (N : E ⊗[F] w.adicCompletion F) = 1 := by
       have e : (N : E ⊗[F] w.adicCompletion F) = (1 : E) ⊗ₜ[F] (N : w.adicCompletion F) :=
-        (map_natCast (Algebra.TensorProduct.includeRight :
-          w.adicCompletion F →ₐ[F] E ⊗[F] w.adicCompletion F) N).symm
+        (map_natCast
+          (Algebra.TensorProduct.includeRight : w.adicCompletion F →ₐ[F] E ⊗[F] w.adicCompletion F)
+          N).symm
       rw [e, Algebra.TensorProduct.tmul_mul_tmul, inv_mul_cancel₀ hN0, one_mul]
       rfl
     rw [this, one_mul, sub_self]
@@ -55,8 +58,11 @@ theorem inertAt_le_congN (v : HeightOneSpectrum (𝓞 F)) (N : ℕ) (hN : (N : �
       exact congrArg Units.val (MonoidHom.mem_ker.1 h1)
     rw [map_sub, hw, map_one, sub_self, mul_zero, zero_mul, sub_self]
 
-theorem qprime_finite (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (L : Type) [Field L] (ξ : Chr F E L) (h : ξ ∈ openChr F E L) : (Qprime ξ).Finite := by
+theorem qprime_finite
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (L : Type) [Field L]
+    (ξ : Chr F E L) (h : ξ ∈ openChr F E L)
+    : (Qprime ξ).Finite := by
   obtain ⟨N, hN, hk⟩ := h
   have hne : Ideal.span {(N : 𝓞 F)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]

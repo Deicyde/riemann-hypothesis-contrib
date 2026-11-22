@@ -6,14 +6,18 @@ public import GroundTheory.AutomorphicForms.AnisotropicHeight
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4 GlobalTheory.CompanionTheory.TorusCh
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4
+  GlobalTheory.CompanionTheory.TorusCh
 open scoped Pointwise
 
 namespace GlobalTheory.CompanionTheory.TorusCh.CyclicVector
 
-theorem exists_ne_zero_aeval_mulVec_eq_zero {K : Type} [Field K] {n : ℕ}
-    (γ : Matrix (Fin n) (Fin n) K) (p : K[X]) (hp : Irreducible p) (hd : p ∣ γ.charpoly) :
-    ∃ w : Fin n → K, w ≠ 0 ∧ aeval γ p *ᵥ w = 0 := by
+theorem exists_ne_zero_aeval_mulVec_eq_zero
+    {K : Type} [Field K]
+    {n : ℕ} (γ : Matrix (Fin n) (Fin n) K)
+    (p : K[X]) (hp : Irreducible p) (hd : p ∣ γ.charpoly)
+    : ∃ w : Fin n → K, w ≠ 0 ∧ aeval γ p *ᵥ w = 0 := by
   classical
   apply Matrix.exists_mulVec_eq_zero_iff.2
   have : Fact (Irreducible p) := ⟨hp⟩
@@ -22,8 +26,8 @@ theorem exists_ne_zero_aeval_mulVec_eq_zero {K : Type} [Field K] {n : ℕ}
   let M' : Matrix (Fin n) (Fin n) L := γ.map (algebraMap K L)
   have hf : f (aeval γ p) = aeval M' p := (Polynomial.aeval_algHom_apply f γ p).symm
   have hroot : M'.charpoly.IsRoot (AdjoinRoot.root p) := by
-    rw [Matrix.charpoly_map, IsRoot.def, eval_map, ← aeval_def,
-      AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero]
+    rw [Matrix.charpoly_map, IsRoot.def, eval_map, ← aeval_def, AdjoinRoot.aeval_eq,
+      AdjoinRoot.mk_eq_zero]
     exact hd
   have hs : AdjoinRoot.root p ∈ spectrum L M' := Matrix.mem_spectrum_iff_isRoot_charpoly.2 hroot
   have h2 := spectrum.subset_polynomial_aeval M' (p.map (algebraMap K L)) ⟨_, hs, rfl⟩
@@ -40,9 +44,9 @@ theorem exists_ne_zero_aeval_mulVec_eq_zero {K : Type} [Field K] {n : ℕ}
     rfl
   exact (map_eq_zero_iff _ (algebraMap K L).injective).1 h4
 
-theorem exists_vector_annihilator_dvd {K : Type} [Field K] {n : ℕ}
-    (γ : Matrix (Fin n) (Fin n) K) (hs : γ.charpoly.Separable) :
-    ∃ v : Fin n → K, ∀ h : K[X], aeval γ h *ᵥ v = 0 → γ.charpoly ∣ h := by
+theorem exists_vector_annihilator_dvd
+    {K : Type} [Field K] {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (hs : γ.charpoly.Separable)
+    : ∃ v : Fin n → K, ∀ h : K[X], aeval γ h *ᵥ v = 0 → γ.charpoly ∣ h := by
   classical
   set χ := γ.charpoly with hχ
   have hχ0 : χ ≠ 0 := (Matrix.charpoly_monic γ).ne_zero
@@ -76,8 +80,10 @@ theorem exists_vector_annihilator_dvd {K : Type} [Field K] {n : ℕ}
         · exfalso
           apply hne
           have hass : Associated p' p := (hSirr p' hp').associated_of_dvd hpi h2
-          have e1 := UniqueFactorizationMonoid.normalize_normalized_factor p' (Multiset.mem_toFinset.1 hp')
-          have e2 := UniqueFactorizationMonoid.normalize_normalized_factor p (Multiset.mem_toFinset.1 hp)
+          have e1 :=
+            UniqueFactorizationMonoid.normalize_normalized_factor p' (Multiset.mem_toFinset.1 hp')
+          have e2 :=
+            UniqueFactorizationMonoid.normalize_normalized_factor p (Multiset.mem_toFinset.1 hp)
           rw [← e1, ← e2]
           exact normalize_eq_normalize_iff.2 ⟨hass.dvd, hass.symm.dvd⟩
         · exact h2
@@ -109,22 +115,26 @@ theorem exists_vector_annihilator_dvd {K : Type} [Field K] {n : ℕ}
   have hnorm := UniqueFactorizationMonoid.normalize_normalized_factor p hp
   exact (UniqueFactorizationMonoid.mem_normalizedFactors_iff' hh0).2 ⟨hSirr p hpS, hnorm, key p hpS⟩
 
-theorem exists_cyclic_vector : ∀ (K : Type) [Field K] (n : ℕ) (γ : Matrix (Fin n) (Fin n) K),
-    γ.charpoly.Separable → ∃ v : Fin n → K, ∀ y : Fin n → K, ∃ h : K[X], y = aeval γ h *ᵥ v := by
+theorem exists_cyclic_vector
+    : ∀ (K : Type) [Field K] (n : ℕ) (γ : Matrix (Fin n) (Fin n) K),
+      γ.charpoly.Separable → ∃ v : Fin n → K, ∀ y : Fin n → K, ∃ h : K[X], y = aeval γ h *ᵥ v := by
   intro K _ n γ hs
   obtain ⟨v, hv⟩ := exists_vector_annihilator_dvd γ hs
   refine ⟨v, ?_⟩
-  let T : K[X] →ₗ[K] (Fin n → K) :=
-    { toFun := fun h => aeval γ h *ᵥ v
-      map_add' := fun a b => by simp [Matrix.add_mulVec]
-      map_smul' := fun c a => by simp [Matrix.smul_mulVec] }
+  let T : K[X] →ₗ[K] (Fin n → K) := {
+    toFun := fun h => aeval γ h *ᵥ v
+    map_add' := fun a b => by simp [Matrix.add_mulVec]
+    map_smul' := fun c a => by simp [Matrix.smul_mulVec]
+  }
   let F : (Fin n → K) →ₗ[K] (Fin n → K) :=
     T ∘ₗ (degreeLT K n).subtype ∘ₗ (degreeLTEquiv K n).symm.toLinearMap
   have hinj : Function.Injective F := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro c hc
     have hd : γ.charpoly ∣ (((degreeLTEquiv K n).symm c : degreeLT K n) : K[X]) := hv _ hc
-    have hdeg : (((degreeLTEquiv K n).symm c : degreeLT K n) : K[X]).degree < γ.charpoly.degree := by
+    have hdeg
+        : (((degreeLTEquiv K n).symm c : degreeLT K n) : K[X]).degree < γ.charpoly.degree := by
       rw [Matrix.charpoly_degree_eq_dim, Fintype.card_fin]
       exact Polynomial.mem_degreeLT.1 ((degreeLTEquiv K n).symm c).2
     have h0 := Polynomial.eq_zero_of_dvd_of_degree_lt hd hdeg

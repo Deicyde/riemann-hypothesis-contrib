@@ -21,8 +21,16 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TraceDua
 namespace PositivityTheory.SiegelWeilFormula.Gunr
 
 theorem almostGood : AlmostGood :=
-  almostGood_ofE GlobalTheory.T.unramified_finite_integral GlobalTheory.T.basic_character_unramified GlobalTheory.T.character_conductor_condition
-    (locRingE_of GlobalTheory.T.residue_ring_structure GlobalTheory.T.fixed_field_structure GlobalTheory.T.uniformizer_existence
-      (quadAt_of GlobalTheory.T.unramified_quadratic_condition_one GlobalTheory.T.unramified_quadratic_condition_two GlobalTheory.T.unramified_quadratic_condition_three GlobalTheory.T.unramified_quadratic_condition_four GlobalTheory.T.unramified_quadratic_condition_five) GlobalTheory.T.trace_dual_at_place) GlobalTheory.T.local_matrix_integral
+  almostGood_ofE GlobalTheory.T.unramified_finite_integral GlobalTheory.T.basic_character_unramified
+    GlobalTheory.T.character_conductor_condition
+    (locRingE_of GlobalTheory.T.residue_ring_structure GlobalTheory.T.fixed_field_structure
+      GlobalTheory.T.uniformizer_existence
+      (quadAt_of GlobalTheory.T.unramified_quadratic_condition_one
+        GlobalTheory.T.unramified_quadratic_condition_two
+        GlobalTheory.T.unramified_quadratic_condition_three
+        GlobalTheory.T.unramified_quadratic_condition_four
+        GlobalTheory.T.unramified_quadratic_condition_five)
+      GlobalTheory.T.trace_dual_at_place)
+    GlobalTheory.T.local_matrix_integral
 
 end PositivityTheory.SiegelWeilFormula.Gunr

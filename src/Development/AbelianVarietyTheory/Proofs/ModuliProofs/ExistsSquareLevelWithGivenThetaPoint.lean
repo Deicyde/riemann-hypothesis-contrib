@@ -18,27 +18,35 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaLe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.LevelTheta
 
-theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap g ≫ spMap f = spMap (g.comp f) := by
+theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap g ≫ spMap f = spMap (g.comp f) := by
   rw [← Spec.map_comp]; rfl
 
 theorem spMap_id {A : Type} [CommRing A] : spMap (RingHom.id A) = 𝟙 _ := Spec.map_id _
 
-theorem lbIso_pull_comp {X Y Z : Scheme.{0}} {L : LB X} {M : LB Y} {ψ : Y ⟶ X} (φ : Z ⟶ Y) {χ : Z ⟶ X}
-    (H : LBIso M (L.pull ψ)) (e : χ = φ ≫ ψ) : LBIso (M.pull φ) (L.pull χ) :=
+theorem lbIso_pull_comp
+    {X Y Z : Scheme.{0}} {L : LB X} {M : LB Y} {ψ : Y ⟶ X} (φ : Z ⟶ Y)
+    {χ : Z ⟶ X}
+    (H : LBIso M (L.pull ψ)) (e : χ = φ ≫ ψ)
+    : LBIso (M.pull φ) (L.pull χ) :=
   H.chartPull (chartPullPull M φ φ rfl)
     (chartPullSame L (fun _ : PUnit => χ) (fun _ : PUnit => ψ) (fun _ => 1) φ (fun _ => e))
 
-theorem pow_push {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G'] {f : S' ⟶ S}
-    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (x' : Out.baseOver S' ⟶ G') (x : Out.baseOver S ⟶ G)
-    (e : x'.left ≫ φ = f ≫ x.left) (m : ℕ) : (x' ^ m).left ≫ φ = f ≫ (x ^ m).left := by
+theorem pow_push
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (x' : Out.baseOver S' ⟶ G') (x : Out.baseOver S ⟶ G) (e : x'.left ≫ φ = f ≫ x.left)
+    (m : ℕ)
+    : (x' ^ m).left ≫ φ = f ≫ (x ^ m).left := by
   let U : Over.mk ((Out.baseOver S').hom ≫ f) ⟶ Out.baseOver S := Over.homMk f (by simp)
   have e₁ : pushHom h _ x' = preHom U x := Over.OverMorphism.ext e
   have e₂ : pushHom h _ (x' ^ m) = preHom U (x ^ m) := by rw [map_pow, map_pow, e₁]
@@ -46,35 +54,56 @@ theorem pow_push {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [Grp
 
 variable {o : Type} [CommRing o] {g k : ℕ} {J : Type} {b : TBase o k}
 
-def Above {S S' : Scheme.{0}} (P : Out.PolAV S) (act : J → (P.A ⟶ P.A)) (Q : Fin (2 * g) → (Out.baseOver S ⟶ P.A))
-    (m : ℕ) {s' : S' ⟶ Sp o} (t : TObj g k J b s') (f : S' ⟶ S) (ψ : t.A.left ⟶ P.A.left) : Prop :=
-  IsGrpPullback t.A P.A f ψ ∧ LBIso t.L (P.L.pull ψ) ∧ (∀ i, (t.act i).left ≫ ψ = ψ ≫ (act i).left) ∧
-    ∀ i, (t.pt i ^ m).left ≫ ψ = f ≫ (Q i).left
+def Above
+    {S S' : Scheme.{0}}
+    (P : Out.PolAV S) (act : J → (P.A ⟶ P.A)) (Q : Fin (2 * g) → (Out.baseOver S ⟶ P.A))
+    (m : ℕ)
+    {s' : S' ⟶ Sp o} (t : TObj g k J b s')
+    (f : S' ⟶ S) (ψ : t.A.left ⟶ P.A.left)
+    : Prop :=
+  IsGrpPullback t.A P.A f ψ ∧ LBIso t.L (P.L.pull ψ) ∧ (∀ i, (t.act i).left ≫ ψ = ψ ≫ (act i).left)
+    ∧ ∀ i, (t.pt i ^ m).left ≫ ψ = f ≫ (Q i).left
 
-theorem Above.comp {S S' S'' : Scheme.{0}} {P : Out.PolAV S} {act : J → (P.A ⟶ P.A)}
-    {Q : Fin (2 * g) → (Out.baseOver S ⟶ P.A)} {m : ℕ} {s' : S' ⟶ Sp o} {s'' : S'' ⟶ Sp o} {t : TObj g k J b s'}
-    {u : TObj g k J b s''} {f : S' ⟶ S} {ψ : t.A.left ⟶ P.A.left} (h : Above P act Q m t f ψ) {f' : S'' ⟶ S'}
-    {φ : u.A.left ⟶ t.A.left} (h₁ : IsGrpPullback u.A t.A f' φ) (h₂ : LBIso u.L (t.L.pull φ))
-    (h₃ : ∀ i, (u.pt i).left ≫ φ = f' ≫ (t.pt i).left) (h₄ : ∀ j, (u.act j).left ≫ φ = φ ≫ (t.act j).left) :
-    Above P act Q m u (f' ≫ f) (φ ≫ ψ) := by
-  refine ⟨h₁.comp h.1, LBIso.trans u.isLB (pull_isLB t.isLB _) (pull_isLB P.isLB _) h₂
-    (lbIso_pull_comp φ h.2.1 rfl), fun i => ?_, fun i => ?_⟩
+theorem Above.comp
+    {S S' S'' : Scheme.{0}} {P : Out.PolAV S} {act : J → (P.A ⟶ P.A)}
+    {Q : Fin (2 * g) → (Out.baseOver S ⟶ P.A)} {m : ℕ} {s' : S' ⟶ Sp o} {s'' : S'' ⟶ Sp o}
+    {t : TObj g k J b s'} {u : TObj g k J b s''} {f : S' ⟶ S} {ψ : t.A.left ⟶ P.A.left}
+    (h : Above P act Q m t f ψ)
+    {f' : S'' ⟶ S'} {φ : u.A.left ⟶ t.A.left} (h₁ : IsGrpPullback u.A t.A f' φ)
+    (h₂ : LBIso u.L (t.L.pull φ)) (h₃ : ∀ i, (u.pt i).left ≫ φ = f' ≫ (t.pt i).left)
+    (h₄ : ∀ j, (u.act j).left ≫ φ = φ ≫ (t.act j).left)
+    : Above P act Q m u (f' ≫ f) (φ ≫ ψ) := by
+  refine ⟨
+    h₁.comp h.1,
+    LBIso.trans u.isLB (pull_isLB t.isLB _) (pull_isLB P.isLB _) h₂ (lbIso_pull_comp φ h.2.1 rfl),
+    fun i => ?_,
+    fun i => ?_
+  ⟩
   · rw [← Category.assoc, h₄, Category.assoc, h.2.2.1, Category.assoc]
   · rw [← Category.assoc, pow_push h₁ _ _ (h₃ i), Category.assoc, h.2.2.2, Category.assoc]
 
-theorem Above.compare {S S' : Scheme.{0}} {P : Out.PolAV S} {act : J → (P.A ⟶ P.A)}
+theorem Above.compare
+    {S S' : Scheme.{0}} {P : Out.PolAV S} {act : J → (P.A ⟶ P.A)}
     {Q : Fin (2 * g) → (Out.baseOver S ⟶ P.A)} {m : ℕ} {s' : S' ⟶ Sp o} {u u' : TObj g k J b s'}
-    {f : S' ⟶ S} {ψ : u.A.left ⟶ P.A.left} {ψ' : u'.A.left ⟶ P.A.left} (h : Above P act Q m u f ψ)
-    (h' : Above P act Q m u' f ψ') :
-    ∃ χ : u'.A.left ⟶ u.A.left, χ ≫ ψ = ψ' ∧ IsGrpPullback u'.A u.A (𝟙 _) χ ∧ LBIso u'.L (u.L.pull χ) ∧
-      (∀ i, (u'.pt i ^ m).left ≫ χ = (u.pt i ^ m).left) ∧ ∀ j, (u'.act j).left ≫ χ = χ ≫ (u.act j).left := by
+    {f : S' ⟶ S} {ψ : u.A.left ⟶ P.A.left} {ψ' : u'.A.left ⟶ P.A.left}
+    (h : Above P act Q m u f ψ) (h' : Above P act Q m u' f ψ')
+    : ∃ χ : u'.A.left ⟶ u.A.left,
+      χ ≫ ψ = ψ' ∧ IsGrpPullback u'.A u.A (𝟙 _) χ ∧ LBIso u'.L (u.L.pull χ)
+        ∧ (∀ i, (u'.pt i ^ m).left ≫ χ = (u.pt i ^ m).left)
+        ∧ ∀ j, (u'.act j).left ≫ χ = χ ≫ (u.act j).left := by
   have hp := h.1.1
   let χ : u'.A.left ⟶ u.A.left := hp.lift ψ' u'.A.hom h'.1.1.w
   have e₁ : χ ≫ ψ = ψ' := hp.lift_fst _ _ _
   have e₂ : χ ≫ u.A.hom = u'.A.hom := hp.lift_snd _ _ _
-  refine ⟨χ, e₁, h.1.cancel (h'.1.congr (Category.id_comp _).symm e₁.symm) (by rw [e₂, Category.comp_id]),
+  refine ⟨
+    χ,
+    e₁,
+    h.1.cancel (h'.1.congr (Category.id_comp _).symm e₁.symm) (by rw [e₂, Category.comp_id]),
     LBIso.trans u'.isLB (pull_isLB P.isLB _) (pull_isLB u.isLB _) h'.2.1
-      (lbIso_pull_comp χ h.2.1 e₁.symm).symm, fun i => ?_, fun j => ?_⟩
+      (lbIso_pull_comp χ h.2.1 e₁.symm).symm,
+    fun i => ?_,
+    fun j => ?_
+  ⟩
   · apply hp.hom_ext
     · rw [Category.assoc, e₁, h'.2.2.2, h.2.2.2]
     · rw [Category.assoc, e₂, Over.w, Over.w]

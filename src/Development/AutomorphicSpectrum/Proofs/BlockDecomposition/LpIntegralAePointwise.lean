@@ -14,28 +14,28 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.LpBochner
 
-variable {Y V : Type} [MeasurableSpace Y] {ν : Measure Y}
-  [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {Y V : Type} [MeasurableSpace Y] {ν : Measure Y} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-theorem integrableOn_of_memLp_two {h : Y → V} (hh : MemLp h 2 ν) {s : Set Y} (hs : ν s ≠ ⊤) :
-    IntegrableOn h s ν := by
+theorem integrableOn_of_memLp_two {h : Y → V} (hh : MemLp h 2 ν) {s : Set Y} (hs : ν s ≠ ⊤)
+    : IntegrableOn h s ν := by
   haveI : IsFiniteMeasure (ν.restrict s) := ⟨by simpa using hs.lt_top⟩
   have h2 : MemLp h 2 (ν.restrict s) := hh.restrict s
   exact memLp_one_iff_integrable.1 (h2.mono_exponent (by norm_num))
 
-theorem integral_norm_restrict_le {h : Y → V} (hh : MemLp h 2 ν) {s : Set Y} (hs : ν s ≠ ⊤) :
-    ∫ y in s, ‖h y‖ ∂ν ≤ ((ν s) ^ (1 / 2 : ℝ)).toReal * (eLpNorm h 2 ν).toReal := by
+theorem integral_norm_restrict_le {h : Y → V} (hh : MemLp h 2 ν) {s : Set Y} (hs : ν s ≠ ⊤)
+    : ∫ y in s, ‖h y‖ ∂ν ≤ ((ν s) ^ (1 / 2 : ℝ)).toReal * (eLpNorm h 2 ν).toReal := by
   haveI : IsFiniteMeasure (ν.restrict s) := ⟨by simpa using hs.lt_top⟩
   have hm : AEStronglyMeasurable h (ν.restrict s) := hh.aestronglyMeasurable.restrict
-  have h1 := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := ν.restrict s) (p := 1) (q := 2)
-    (by norm_num) hm
+  have h1 :=
+    eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := ν.restrict s) (p := 1) (q := 2) (by norm_num) hm
   have h3 : eLpNorm h 2 (ν.restrict s) ≤ eLpNorm h 2 ν := eLpNorm_restrict_le _ _ _ _
-  have hexp : (1 / (1 : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal) = (1 / 2 : ℝ) := by
-    norm_num
+  have hexp : (1 / (1 : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal) = (1 / 2 : ℝ) := by norm_num
   rw [hexp, Measure.restrict_apply_univ] at h1
   have hfin : (ν s) ^ (1 / 2 : ℝ) ≠ ⊤ := ENNReal.rpow_ne_top_of_nonneg (by norm_num) hs
   have h4 : eLpNorm h 1 (ν.restrict s) ≤ (ν s) ^ (1 / 2 : ℝ) * eLpNorm h 2 ν := by
-    calc _ ≤ _ := h1
+    calc
+      _ ≤ _ := h1
       _ ≤ eLpNorm h 2 ν * (ν s) ^ (1 / 2 : ℝ) := by gcongr
       _ = _ := mul_comm _ _
   have h5 : ∫ y in s, ‖h y‖ ∂ν = (eLpNorm h 1 (ν.restrict s)).toReal := by
@@ -47,7 +47,8 @@ variable [CompleteSpace V]
 
 def setIntegralCLM (ν : Measure Y) (s : Set Y) (hs : ν s ≠ ⊤) : Lp V 2 ν →L[ℝ] V :=
   LinearMap.mkContinuous
-    { toFun := fun h => ∫ y in s, h y ∂ν
+    {
+      toFun := fun h => ∫ y in s, h y ∂ν
       map_add' := fun f g => by
         have hf := integrableOn_of_memLp_two (Lp.memLp f) hs
         have hg := integrableOn_of_memLp_two (Lp.memLp g) hs
@@ -56,21 +57,24 @@ def setIntegralCLM (ν : Measure Y) (s : Set Y) (hs : ν s ≠ ⊤) : Lp V 2 ν 
       map_smul' := fun r f => by
         simp only [RingHom.id_apply]
         rw [← integral_smul]
-        exact integral_congr_ae (ae_restrict_of_ae (Lp.coeFn_smul r f)) }
+        exact integral_congr_ae (ae_restrict_of_ae (Lp.coeFn_smul r f))
+    }
     ((ν s) ^ (1 / 2 : ℝ)).toReal
     (fun h => by
       refine (norm_integral_le_integral_norm _).trans ?_
       refine (integral_norm_restrict_le (Lp.memLp h) hs).trans ?_
       rw [Lp.norm_def])
 
-theorem setIntegralCLM_apply (s : Set Y) (hs : ν s ≠ ⊤) (h : Lp V 2 ν) :
-    setIntegralCLM ν s hs h = ∫ y in s, h y ∂ν := rfl
+theorem setIntegralCLM_apply (s : Set Y) (hs : ν s ≠ ⊤) (h : Lp V 2 ν)
+    : setIntegralCLM ν s hs h = ∫ y in s, h y ∂ν :=
+  rfl
 
-theorem bochner_Lp_ae (A : Type) [MeasurableSpace A] (α : Measure A) [SFinite α]
-    [SigmaFinite ν] (c : A → Lp V 2 ν) (F : A → Y → V)
-    (hc : Integrable c α) (hF : AEStronglyMeasurable (Function.uncurry F) (α.prod ν))
-    (hcF : ∀ᵐ a ∂α, c a =ᵐ[ν] F a) :
-    (⇑(∫ a, c a ∂α) : Y → V) =ᵐ[ν] fun y => ∫ a, F a y ∂α := by
+theorem bochner_Lp_ae
+    (A : Type) [MeasurableSpace A]
+    (α : Measure A) [SFinite α] [SigmaFinite ν]
+    (c : A → Lp V 2 ν) (F : A → Y → V) (hc : Integrable c α)
+    (hF : AEStronglyMeasurable (Function.uncurry F) (α.prod ν)) (hcF : ∀ᵐ a ∂α, c a =ᵐ[ν] F a)
+    : (⇑(∫ a, c a ∂α) : Y → V) =ᵐ[ν] fun y => ∫ a, F a y ∂α := by
   have hFs : ∀ s : Set Y, AEStronglyMeasurable (Function.uncurry F) (α.prod (ν.restrict s)) := by
     intro s
     refine hF.mono_measure ?_
@@ -107,7 +111,13 @@ theorem bochner_Lp_ae (A : Type) [MeasurableSpace A] (α : Measure A) [SFinite �
     rw [h1, h2]
     exact integral_integral_swap (hint s hs.ne)
 
-theorem coe_integral_ae_eq : ∀ (A Y V : Type) [MeasurableSpace A] [MeasurableSpace Y] (α : Measure A) [SFinite α] (ν : Measure Y) [SigmaFinite ν] [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V] (c : A → Lp V 2 ν) (F : A → Y → V), Integrable c α → AEStronglyMeasurable (Function.uncurry F) (α.prod ν) → (∀ᵐ a ∂α, c a =ᵐ[ν] F a) → (⇑(∫ a, c a ∂α) : Y → V) =ᵐ[ν] fun y => ∫ a, F a y ∂α := by
+theorem coe_integral_ae_eq
+    : ∀ (A Y V : Type) [MeasurableSpace A] [MeasurableSpace Y] (α : Measure A) [SFinite α]
+        (ν : Measure Y) [SigmaFinite ν] [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        [CompleteSpace V] (c : A → Lp V 2 ν) (F : A → Y → V),
+      Integrable c α → AEStronglyMeasurable (Function.uncurry F) (α.prod ν)
+        → (∀ᵐ a ∂α, c a =ᵐ[ν] F a)
+        → (⇑(∫ a, c a ∂α) : Y → V) =ᵐ[ν] fun y => ∫ a, F a y ∂α := by
   intro A Y V _ _ α _ ν _ _ _ _ c F hc hF hcF
   exact bochner_Lp_ae A α c F hc hF hcF
 

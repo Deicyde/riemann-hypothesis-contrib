@@ -17,11 +17,10 @@ noncomputable def act (V : FDRep ℂ G) : MonoidAlgebra ℂ G →ₐ[ℂ] Module
   MonoidAlgebra.lift ℂ (Module.End ℂ V) G V.ρ
 
 def CharIdem : Prop :=
-  ∀ (G : Type) [Group G] [Fintype G] (V W : FDRep ℂ G), Simple V → Simple W →
-    act V (charIdem V) = 1 ∧
-    (IsEmpty (V ≅ W) → act W (charIdem V) = 0) ∧
-    IsIdempotentElem (charIdem V) ∧
-    (∀ x : MonoidAlgebra ℂ G, charIdem V * x = x * charIdem V) ∧
-    (IsEmpty (V ≅ W) → charIdem V * charIdem W = 0)
+  ∀ (G : Type) [Group G] [Fintype G] (V W : FDRep ℂ G),
+    Simple V → Simple W
+      → act V (charIdem V) = 1 ∧ (IsEmpty (V ≅ W) → act W (charIdem V) = 0)
+        ∧ IsIdempotentElem (charIdem V) ∧ (∀ x : MonoidAlgebra ℂ G, charIdem V * x = x * charIdem V)
+        ∧ (IsEmpty (V ≅ W) → charIdem V * charIdem W = 0)
 
 end PI.CharIdem

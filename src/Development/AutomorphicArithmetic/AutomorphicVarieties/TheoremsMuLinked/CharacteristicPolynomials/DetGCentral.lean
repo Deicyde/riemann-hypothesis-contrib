@@ -8,15 +8,16 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
 
-private theorem detG_central {K G : Type} [Field K] [Group G] {n : ℕ}
-    (m : G →* Matrix (Fin n) (Fin n) K) (χ : G →* Kˣ) (N : Subgroup G)
-    (w : G → Matrix (Fin n) (Fin n) K) (hc : commutator G ≤ N) (hk : N ≤ χ.ker) (hχ : χ ≠ 1)
-    (hspan : Submodule.span K (Set.range (m.comp N.subtype)) = ⊤)
-    (hw : ∀ g g', w (g * g') = w g + (χ g : K) • (m g * w g' * m g⁻¹))
-    (h0 : ∀ g ∈ N, w g = 0) :
-    ∃ A, ∀ g, w g = (χ g : K) • (m g * A * m g⁻¹) - A := by
+private theorem detG_central
+    {K G : Type} [Field K] [Group G]
+    {n : ℕ} (m : G →* Matrix (Fin n) (Fin n) K)
+    (χ : G →* Kˣ) (N : Subgroup G) (w : G → Matrix (Fin n) (Fin n) K) (hc : commutator G ≤ N)
+    (hk : N ≤ χ.ker) (hχ : χ ≠ 1) (hspan : Submodule.span K (Set.range (m.comp N.subtype)) = ⊤)
+    (hw : ∀ g g', w (g * g') = w g + (χ g : K) • (m g * w g' * m g⁻¹)) (h0 : ∀ g ∈ N, w g = 0)
+    : ∃ A, ∀ g, w g = (χ g : K) • (m g * A * m g⁻¹) - A := by
   have hinv : ∀ g, m g⁻¹ * m g = 1 := fun g => by rw [← map_mul, inv_mul_cancel, map_one]
   have hinv' : ∀ g, m g * m g⁻¹ = 1 := fun g => by rw [← map_mul, mul_inv_cancel, map_one]
   have hcom : ∀ g h : G, g * h * g⁻¹ * h⁻¹ ∈ N := fun g h =>
@@ -45,8 +46,7 @@ private theorem detG_central {K G : Type} [Field K] [Group G] {n : ℕ}
     | zero => simp
     | add x y _ _ h₁ h₂ => rw [mul_add, add_mul, h₁, h₂]
     | smul a x _ h₁ => rw [mul_smul_comm, smul_mul_assoc, h₁]
-  have hfix : ∀ g h, m g * w h * m g⁻¹ = w h := fun g h => by
-    rw [hcen, mul_assoc, hinv', mul_one]
+  have hfix : ∀ g h, m g * w h * m g⁻¹ = w h := fun g h => by rw [hcen, mul_assoc, hinv', mul_one]
   have hw' : ∀ g h, w (g * h) = w g + (χ g : K) • w h := fun g h => by rw [hw, hfix]
   have hsym : ∀ g h, w (g * h) = w (h * g) := by
     intro g h
@@ -64,8 +64,13 @@ private theorem detG_central {K G : Type} [Field K] [Group G] {n : ℕ}
   rw [mul_smul_comm, smul_mul_assoc, hfix, smul_comm, ← smul_sub, ← h2, smul_smul,
     inv_mul_cancel₀ hh', one_smul]
 
-theorem UpperTheory.V.Th.Det.detG :
-    ∀ {K G : Type} [Field K] [IsAlgClosed K] [Group G] {n : ℕ} (ρ : G →* GL (Fin n) K) (χ : G →* Kˣ) (N : Subgroup G) (z : G → Matrix (Fin n) (Fin n) K), 1 ≤ n → commutator G ≤ N → N ≤ χ.ker → χ ≠ 1 → U3.MatIrr N (W.mat ρ) → (∀ g g', z (g * g') = z g + (χ g : K) • (W.mat ρ g * z g' * W.mat ρ g⁻¹)) → (∀ g ∈ N, (z g * W.mat ρ g).trace = 0) → ∃ Y, ∀ g, z g = (χ g : K) • (W.mat ρ g * Y * W.mat ρ g⁻¹) - Y := by
+theorem UpperTheory.V.Th.Det.detG
+    : ∀ {K G : Type} [Field K] [IsAlgClosed K] [Group G] {n : ℕ} (ρ : G →* GL (Fin n) K)
+        (χ : G →* Kˣ) (N : Subgroup G) (z : G → Matrix (Fin n) (Fin n) K),
+      1 ≤ n → commutator G ≤ N → N ≤ χ.ker → χ ≠ 1 → U3.MatIrr N (W.mat ρ)
+        → (∀ g g', z (g * g') = z g + (χ g : K) • (W.mat ρ g * z g' * W.mat ρ g⁻¹))
+        → (∀ g ∈ N, (z g * W.mat ρ g).trace = 0)
+        → ∃ Y, ∀ g, z g = (χ g : K) • (W.mat ρ g * Y * W.mat ρ g⁻¹) - Y := by
   intro K G _ _ _ n ρ χ N z hn hc hk hχ hirr hz htr
   generalize W.mat ρ = m at hirr hz htr ⊢
   haveI : Nonempty (Fin n) := ⟨⟨0, hn⟩⟩
@@ -79,30 +84,35 @@ theorem UpperTheory.V.Th.Det.detG :
     let L : Matrix (Fin n) (Fin n) K →ₗ[K] (∀ _ : Unit, Matrix (Fin n) (Fin n) K) :=
       LinearMap.pi fun _ => LinearMap.id
     have hL : Function.Surjective L := fun x => ⟨x (), rfl⟩
-    have e : Set.range r = L '' Set.range (m.comp N.subtype) := by
-      rw [← Set.range_comp]; rfl
+    have e : Set.range r = L '' Set.range (m.comp N.subtype) := by rw [← Set.range_comp]; rfl
     rw [e, ← Submodule.map_span, hspan, Submodule.map_top, LinearMap.range_eq_top.mpr hL]
-  obtain ⟨Y₀, hY₀⟩ := UpperTheory.V.AlgebraTools.cocycle_trace_zero (K := K) (fun _ : Unit => Fin n) r
-    (fun g _ => z g) hspan'
-    (fun g h => by
-      funext s
-      have := hz g h
-      rw [hone g g.2, one_smul] at this
-      exact this)
-    (fun g => by
-      rw [Fintype.sum_unique]
-      exact htr g g.2)
+  obtain ⟨Y₀, hY₀⟩ :=
+    UpperTheory.V.AlgebraTools.cocycle_trace_zero (K := K)
+      (fun _ : Unit => Fin n)
+      r
+      (fun g _ => z g)
+      hspan'
+      (fun g h => by
+        funext s
+        have := hz g h
+        rw [hone g g.2, one_smul] at this
+        exact this)
+      (fun g => by
+        rw [Fintype.sum_unique]
+        exact htr g g.2)
   have hY : ∀ g ∈ N, z g = Y₀ () - m g * Y₀ () * m g⁻¹ := fun g hg => congrFun (hY₀ ⟨g, hg⟩) ()
   have hinv' : ∀ g, m g * m g⁻¹ = 1 := fun g => by rw [← map_mul, mul_inv_cancel, map_one]
-  obtain ⟨A, hA⟩ := detG_central m χ N
-    (fun g => z g + ((χ g : K) • (m g * Y₀ () * m g⁻¹) - Y₀ ())) hc hk hχ hspan
-    (fun g h => by
-      simp only [hz, map_mul, _root_.mul_inv_rev, Units.val_mul, mul_add, add_mul, mul_sub, sub_mul,
-        smul_add, smul_sub, mul_smul_comm, smul_mul_assoc, smul_smul, mul_assoc]
-      abel)
-    (fun g hg => by
-      simp only [hY g hg, hone g hg, one_smul]
-      abel)
+  obtain ⟨A, hA⟩ :=
+    detG_central m χ N
+      (fun g => z g + ((χ g : K) • (m g * Y₀ () * m g⁻¹) - Y₀ ()))
+      hc hk hχ hspan
+      (fun g h => by
+        simp only [hz, map_mul, _root_.mul_inv_rev, Units.val_mul, mul_add, add_mul, mul_sub,
+          sub_mul, smul_add, smul_sub, mul_smul_comm, smul_mul_assoc, smul_smul, mul_assoc]
+        abel)
+      (fun g hg => by
+        simp only [hY g hg, hone g hg, one_smul]
+        abel)
   refine ⟨A - Y₀ (), fun g => ?_⟩
   have := hA g
   simp only [mul_sub, sub_mul, smul_sub]

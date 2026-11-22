@@ -11,59 +11,83 @@ open scoped ComplexConjugate
 namespace PI.UnitaryGroupMassFormula.UnimodLocStd
 open PI.ULS
 
-def zT {m : Type} [DecidableEq m] (T : Finset m) (y : m → ℂ) : m → ℂ := fun i => if i ∈ T then 0 else y i
+def zT {m : Type} [DecidableEq m] (T : Finset m) (y : m → ℂ) : m → ℂ := fun i =>
+  if i ∈ T then 0 else y i
 
 theorem rep_sat_zero {m : Type} (l : ℕ) (Λ : AddSubgroup (m → ℂ)) (hl : l.Prime) : SatMem l Λ 0 :=
   ⟨1, hl.not_dvd_one, by rw [smul_zero]; exact zero_mem Λ⟩
 
-theorem rep_sat_zsmul {m : Type} (l : ℕ) (Λ : AddSubgroup (m → ℂ)) {v : m → ℂ} (hv : SatMem l Λ v) (r : ℤ) :
-    SatMem l Λ ((r : ℂ) • v) := by
+theorem rep_sat_zsmul
+    {m : Type} (l : ℕ) (Λ : AddSubgroup (m → ℂ)) {v : m → ℂ} (hv : SatMem l Λ v) (r : ℤ)
+    : SatMem l Λ ((r : ℂ) • v) := by
   obtain ⟨n, hn, hv⟩ := hv
   refine ⟨n, hn, ?_⟩
   rw [smul_comm, Int.cast_smul_eq_zsmul]
   exact zsmul_mem hv r
 
-theorem rep_sat_theta {m : Type} (l : ℕ) (Λ : AddSubgroup (m → ℂ)) {b : ℤ} {d : ℕ}
-    (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ) {v : m → ℂ} (hv : SatMem l Λ v) : SatMem l Λ (cmTheta b d • v) := by
+theorem rep_sat_theta
+    {m : Type}
+    (l : ℕ)
+    (Λ : AddSubgroup (m → ℂ))
+    {b : ℤ} {d : ℕ} (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ)
+    {v : m → ℂ} (hv : SatMem l Λ v)
+    : SatMem l Λ (cmTheta b d • v) := by
   obtain ⟨n, hn, hv⟩ := hv
   refine ⟨n, hn, ?_⟩
   rw [smul_comm]
   exact hθ _ hv
 
-theorem rep_sat_elt {m : Type} (l : ℕ) (Λ : AddSubgroup (m → ℂ)) (hl : l.Prime) {b : ℤ} {d : ℕ}
-    (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ) {v : m → ℂ} (hv : SatMem l Λ v) (n c s : ℤ) (hs : ¬ (l : ℤ) ∣ s) :
-    SatMem l Λ ((((n : ℂ) - c * conj (cmTheta b d)) / s) • v) := by
+theorem rep_sat_elt
+    {m : Type}
+    (l : ℕ)
+    (Λ : AddSubgroup (m → ℂ))
+    (hl : l.Prime)
+    {b : ℤ} {d : ℕ} (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ)
+    {v : m → ℂ} (hv : SatMem l Λ v)
+    (n c s : ℤ) (hs : ¬ (l : ℤ) ∣ s)
+    : SatMem l Λ ((((n : ℂ) - c * conj (cmTheta b d)) / s) • v) := by
   have hconj : conj (cmTheta b d) = b - cmTheta b d := by
     unfold cmTheta
-    simp only [map_div₀, map_add (f := _), map_mul, map_intCast, Complex.conj_I, Complex.conj_ofReal, map_ofNat]
+    simp only [map_div₀, map_add (f := _), map_mul, map_intCast, Complex.conj_I,
+      Complex.conj_ofReal, map_ofNat]
     ring
-  have e : (((n : ℂ) - c * conj (cmTheta b d)) / s) • v =
-      (((n - c * b : ℤ) : ℂ) / s) • v + ((c : ℂ) / s) • (cmTheta b d • v) := by
+  have e
+      : (((n : ℂ) - c * conj (cmTheta b d)) / s) • v
+        = (((n - c * b : ℤ) : ℂ) / s) • v + ((c : ℂ) / s) • (cmTheta b d • v) := by
     rw [hconj, smul_smul, ← add_smul]
     congr 1
     push_cast
     ring
   rw [e]
-  exact rep_sat_add (l := l) (Λ := Λ) hl (rep_sat_rat (l := l) (Λ := Λ) hl hv _ s hs) (rep_sat_rat (l := l) (Λ := Λ) hl (rep_sat_theta l Λ hθ hv) c s hs)
+  exact rep_sat_add (l := l) (Λ := Λ) hl (rep_sat_rat (l := l) (Λ := Λ) hl hv _ s hs)
+    (rep_sat_rat (l := l) (Λ := Λ) hl (rep_sat_theta l Λ hθ hv) c s hs)
 
 section Zero
 
-variable (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0)
+variable
+  (a : ℕ)
+  (b c : ℤ)
+  (d : ℕ)
+  (ha : 0 < a) (hd : 0 < d)
+  (lam : ℂ) (hlam : lam ≠ 0)
   (m : Type) [Fintype m] [DecidableEq m]
 
-theorem rep_single_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
+theorem rep_single_sat
+    (hOK : CmOK a b c d)
+    (Λ : AddSubgroup (m → ℂ))
     (hΛ : IsSelfDual (stdH (cmL a b d ha hd lam hlam) m) Λ) (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ)
-    {l : ℕ} (hl : l.Prime) (x y : ℤ) (hQ : ¬ (l : ℤ) ∣ a * x ^ 2 + b * x * y + c * y ^ 2) (j : m)
-    (hj : SatMem l Λ (Pi.single j (lam * ((x * a : ℂ) + y * cmTheta b d)))) {z : m → ℂ} (hz : z ∈ Λ) :
-    SatMem l Λ (Pi.single j (z j)) := by
+    {l : ℕ} (hl : l.Prime)
+    (x y : ℤ) (hQ : ¬ (l : ℤ) ∣ a * x ^ 2 + b * x * y + c * y ^ 2)
+    (j : m) (hj : SatMem l Λ (Pi.single j (lam * ((x * a : ℂ) + y * cmTheta b d))))
+    {z : m → ℂ} (hz : z ∈ Λ)
+    : SatMem l Λ (Pi.single j (z j)) := by
   obtain ⟨hc4, -, -, -⟩ := hOK
   set θ := cmTheta b d with hθdef
   have hsd : 0 < Real.sqrt d := Real.sqrt_pos.2 (by exact_mod_cast hd)
   have hsq : Real.sqrt d ^ 2 = d := Real.sq_sqrt (by positivity)
   have hθre : θ.re = b / 2 := by simp [hθdef, cmTheta]
   have hθim : θ.im = Real.sqrt d / 2 := by simp [hθdef, cmTheta]
-  have hconj : conj θ = b - θ := by
-    apply Complex.ext <;> simp [hθre, hθim] <;> ring
+  have hconj : conj θ = b - θ := by apply Complex.ext <;> simp [hθre, hθim] <;> ring
   set α : ℂ := (x * a : ℂ) + y * θ with hαdef
   set Q : ℤ := a * x ^ 2 + b * x * y + c * y ^ 2 with hQdef
 
@@ -95,8 +119,10 @@ theorem rep_single_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
     rw [e, Complex.im_ofReal_mul, hθim]
     exact abs_of_pos (by have := Complex.normSq_pos.2 hlam; positivity)
 
-  have hHs : ∀ u : ℂ, stdH (cmL a b d ha hd lam hlam) m z (Pi.single j u) =
-      z j * ((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ)⁻¹ * conj u := by
+  have hHs
+      : ∀ u : ℂ,
+        stdH (cmL a b d ha hd lam hlam) m z (Pi.single j u)
+          = z j * ((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ)⁻¹ * conj u := by
     intro u
     simp only [stdH, matH, LinearMap.mk₂'ₛₗ_apply]
     rw [Finset.sum_eq_single j, Finset.sum_eq_single j]
@@ -145,12 +171,12 @@ theorem rep_single_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
   have hX : X * (Real.sqrt d : ℂ) = 2 * ((m1 : ℂ) * θ - m2) := by
     apply Complex.ext
     · simp only [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, Complex.sub_re,
-        Complex.intCast_re, Complex.intCast_im, Complex.re_ofNat, Complex.im_ofNat, hθre, hθim, mul_zero,
-        sub_zero, zero_mul, Complex.mul_im, Complex.sub_im]
+        Complex.intCast_re, Complex.intCast_im, Complex.re_ofNat, Complex.im_ofNat, hθre, hθim,
+        mul_zero, sub_zero, zero_mul, Complex.mul_im, Complex.sub_im]
       linarith
-    · simp only [Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im, Complex.sub_im, Complex.sub_re,
-        Complex.intCast_re, Complex.intCast_im, Complex.re_ofNat, Complex.im_ofNat, hθre, hθim, mul_zero,
-        zero_mul, add_zero, sub_zero, Complex.mul_re, hm1]
+    · simp only [Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im, Complex.sub_im,
+        Complex.sub_re, Complex.intCast_re, Complex.intCast_im, Complex.re_ofNat, Complex.im_ofNat,
+        hθre, hθim, mul_zero, zero_mul, add_zero, sub_zero, Complex.mul_re, hm1]
       ring
 
   have hcl : conj lam = (Complex.normSq lam : ℂ) / lam := by
@@ -159,26 +185,35 @@ theorem rep_single_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
     rw [eq_div_iff hα0, mul_comm, Complex.mul_conj]
   have hsdC : (Real.sqrt d : ℂ) ≠ 0 := by exact_mod_cast hsd.ne'
   have hnlC : (Complex.normSq lam : ℂ) ≠ 0 := by exact_mod_cast hnl
-  have hzj : z j = ((((m1 * b - m2 : ℤ) : ℂ) - (m1 : ℂ) * conj θ) / ((N * Q : ℤ) : ℂ)) * (lam * α) := by
+  have hzj
+      : z j = ((((m1 * b - m2 : ℤ) : ℂ) - (m1 : ℂ) * conj θ) / ((N * Q : ℤ) : ℂ)) * (lam * α) := by
     have hareaC : ((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ) ≠ 0 := by
       rw [harea]
       push_cast
       exact mul_ne_zero (mul_ne_zero hnlC ha0) (div_ne_zero hsdC two_ne_zero)
-    have hK : ((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ)⁻¹ * conj ((N : ℂ) * (lam * α)) *
-        (Real.sqrt d : ℂ) ≠ 0 :=
-      mul_ne_zero (mul_ne_zero (inv_ne_zero hareaC)
-        ((map_ne_zero _).2 (mul_ne_zero hN0' (mul_ne_zero hlam hα0)))) hsdC
+    have hK
+        : ((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ)⁻¹ * conj ((N : ℂ) * (lam * α))
+            * (Real.sqrt d : ℂ)
+          ≠ 0 :=
+      mul_ne_zero
+        (mul_ne_zero (inv_ne_zero hareaC)
+          ((map_ne_zero _).2 (mul_ne_zero hN0' (mul_ne_zero hlam hα0))))
+        hsdC
     apply mul_right_cancel₀ hK
-    calc z j * (((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ)⁻¹ * conj ((N : ℂ) * (lam * α)) *
-          (Real.sqrt d : ℂ)) = X * (Real.sqrt d : ℂ) := by rw [hXdef]; ring
+    calc
+      z j * (((area (cmL a b d ha hd lam hlam) : ℝ) : ℂ)⁻¹ * conj ((N : ℂ) * (lam * α))
+          * (Real.sqrt d : ℂ))
+        = X * (Real.sqrt d : ℂ) := by rw [hXdef]; ring
       _ = 2 * ((m1 : ℂ) * θ - m2) := hX
       _ = _ := by
-          rw [harea, map_mul, map_mul, map_natCast, hcl, hca, hαn, hconj]
-          push_cast
-          field_simp
-          ring
-  have hsing : Pi.single j (z j) = ((((m1 * b - m2 : ℤ) : ℂ) - (m1 : ℂ) * conj θ) / ((N * Q : ℤ) : ℂ)) •
-      Pi.single j (lam * α) := by
+        rw [harea, map_mul, map_mul, map_natCast, hcl, hca, hαn, hconj]
+        push_cast
+        field_simp
+        ring
+  have hsing
+      : Pi.single j (z j)
+        = ((((m1 * b - m2 : ℤ) : ℂ) - (m1 : ℂ) * conj θ) / ((N * Q : ℤ) : ℂ))
+          • Pi.single j (lam * α) := by
     funext i
     by_cases hi : i = j
     · subst hi
@@ -193,13 +228,19 @@ theorem rep_single_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
   rw [hsing]
   exact rep_sat_elt l Λ hl hθ ⟨N, hN, hw⟩ (m1 * b - m2) m1 (N * Q) hs
 
-theorem rep_zT_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
+theorem rep_zT_sat
+    (hOK : CmOK a b c d)
+    (Λ : AddSubgroup (m → ℂ))
     (hΛ : IsSelfDual (stdH (cmL a b d ha hd lam hlam) m) Λ) (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ)
-    {l : ℕ} (hl : l.Prime) (x y : ℤ) (hQ : ¬ (l : ℤ) ∣ a * x ^ 2 + b * x * y + c * y ^ 2) (T : Finset m)
-    (hT : ∀ j ∈ T, SatMem l Λ (Pi.single j (lam * ((x * a : ℂ) + y * cmTheta b d)))) {z : m → ℂ} (hz : z ∈ Λ) :
-    SatMem l Λ (zT T z) := by
+    {l : ℕ} (hl : l.Prime)
+    (x y : ℤ) (hQ : ¬ (l : ℤ) ∣ a * x ^ 2 + b * x * y + c * y ^ 2)
+    (T : Finset m) (hT : ∀ j ∈ T, SatMem l Λ (Pi.single j (lam * ((x * a : ℂ) + y * cmTheta b d))))
+    {z : m → ℂ} (hz : z ∈ Λ)
+    : SatMem l Λ (zT T z) := by
   have hsum : SatMem l Λ (∑ j ∈ T, Pi.single j (z j)) :=
-    Finset.sum_induction _ (SatMem l Λ) (fun _ _ h1 h2 => rep_sat_add (l := l) (Λ := Λ) hl h1 h2) (rep_sat_zero l Λ hl)
+    Finset.sum_induction _ (SatMem l Λ)
+      (fun _ _ h1 h2 => rep_sat_add (l := l) (Λ := Λ) hl h1 h2)
+      (rep_sat_zero l Λ hl)
       (fun j hj => rep_single_sat a b c d ha hd lam hlam m hOK Λ hΛ hθ hl x y hQ j (hT j hj) hz)
   have e : zT T z = z - ∑ j ∈ T, Pi.single j (z j) := by
     funext i
@@ -209,8 +250,8 @@ theorem rep_zT_sat (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
   rw [e]
   exact rep_sat_sub (l := l) (Λ := Λ) hl (rep_sat_of_mem (l := l) (Λ := Λ) hz hl) hsum
 
-theorem rep_H_zT (T : Finset m) {z y : m → ℂ} (hz : ∀ j ∈ T, z j = 0) :
-    stdH (cmL a b d ha hd lam hlam) m z (zT T y) = stdH (cmL a b d ha hd lam hlam) m z y := by
+theorem rep_H_zT (T : Finset m) {z y : m → ℂ} (hz : ∀ j ∈ T, z j = 0)
+    : stdH (cmL a b d ha hd lam hlam) m z (zT T y) = stdH (cmL a b d ha hd lam hlam) m z y := by
   simp only [stdH, matH, LinearMap.mk₂'ₛₗ_apply]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   unfold zT

@@ -26,7 +26,8 @@ theorem pDerivZero : PDerivZero := pDerivZero_of sigmaDouble sigmaZero
 theorem discNeZero : DiscNeZero := discNeZero_of pDerivZero pInjective
 theorem zetaAdd : ZetaAdd := zetaAdd_of sigmaAdd sigmaLogDeriv sigmaZero
 theorem sigmaThree : SigmaThree :=
-  sigmaThree_of ellipticOnePole sigmaOrder sigmaQuasi sigmaZero sigmaEntire sigmaOdd sigmaSimple sigmaAdd
+  sigmaThree_of ellipticOnePole sigmaOrder sigmaQuasi sigmaZero sigmaEntire sigmaOdd sigmaSimple
+    sigmaAdd
 theorem sgStarThree : SgStarThree := sgStarThree_of sigmaThree
 theorem thetaLine : ThetaLine := thetaLine_of ellipticOnePole sgStarQuasi sgStarBasic
 

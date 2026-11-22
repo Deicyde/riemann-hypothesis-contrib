@@ -14,7 +14,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Eventuall
 @[expose] public section
 
 open scoped NNReal Matrix TensorProduct Topology
-open Filter NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.RegSW GlobalTheory.EisCont GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.EisLine
+open Filter NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+  GlobalTheory.RegSW GlobalTheory.EisCont GlobalTheory.SiegelSet GlobalTheory.UAut
+  GlobalTheory.EisLine
 open GlobalTheory.Core.Rk.SWLaw (dblDec zeroSp)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,13 +26,15 @@ namespace GlobalTheory.EisCont.LevelConj
 
 section Glue
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 omit [NumberField E] in
-theorem exists_proj_eq (x : ∀ v, GLoc σ J v) (S : Finset (HeightOneSpectrum (𝓞 F))) :
-    ∃ g : GAd σ J, (∀ v ∈ S, proj σ J v g = x v) ∧ (∀ v ∉ S, proj σ J v g = 1) ∧ ∀ w, projArch σ J w g = 1 := by
+theorem exists_proj_eq (x : ∀ v, GLoc σ J v) (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : ∃ g : GAd σ J,
+      (∀ v ∈ S, proj σ J v g = x v) ∧ (∀ v ∉ S, proj σ J v g = 1) ∧ ∀ w, projArch σ J w g = 1 := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨1, by simp, fun v _ => map_one _, fun w => map_one _⟩
@@ -44,10 +50,11 @@ theorem exists_proj_eq (x : ∀ v, GLoc σ J v) (S : Finset (HeightOneSpectrum (
       rw [map_mul, proj_emb_ne σ J hv.1, one_mul, h2 v hv.2]
     · rw [map_mul, projArch_emb, one_mul, h3]
 
-
 omit [NumberField E] in
-theorem exists_projArch_eq (x : ∀ w, GArch σ J w) (S : Finset (InfinitePlace F)) :
-    ∃ g : GAd σ J, (∀ w ∈ S, projArch σ J w g = x w) ∧ (∀ w ∉ S, projArch σ J w g = 1) ∧ ∀ v, proj σ J v g = 1 := by
+theorem exists_projArch_eq (x : ∀ w, GArch σ J w) (S : Finset (InfinitePlace F))
+    : ∃ g : GAd σ J,
+      (∀ w ∈ S, projArch σ J w g = x w) ∧ (∀ w ∉ S, projArch σ J w g = 1)
+        ∧ ∀ v, proj σ J v g = 1 := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨1, by simp, fun v _ => map_one _, fun w => map_one _⟩
@@ -63,9 +70,10 @@ theorem exists_projArch_eq (x : ∀ w, GArch σ J w) (S : Finset (InfinitePlace 
       rw [map_mul, projArch_embArch_ne σ J hv.1, one_mul, h2 v hv.2]
     · rw [map_mul, proj_embArch, one_mul, h3]
 
-private theorem eventually_latLoc_eq_std_of_selfDual {L : Submodule (𝓞 E) (Fin n → E)}
-    (hJ : J.det ≠ 0) (hL : Submodule.IsLattice E L) (hdual : ∀ v, IsSelfDualAt σ J L v) :
-    ∀ᶠ v in cofinite, latLoc F L v = latLoc F (stdLattice E n) v := by
+private theorem eventually_latLoc_eq_std_of_selfDual
+    {L : Submodule (𝓞 E) (Fin n → E)}
+    (hJ : J.det ≠ 0) (hL : Submodule.IsLattice E L) (hdual : ∀ v, IsSelfDualAt σ J L v)
+    : ∀ᶠ v in cofinite, latLoc F L v = latLoc F (stdLattice E n) v := by
   have hstd : Submodule.IsFullLattice E (stdLattice E n) := isLattice_stdLattice
   filter_upwards [eventually_latLoc_le (F := F) hL.fg hstd.span_eq_top,
     AdelicU.SelfDual.eventually_isSelfDualAt (σ := σ) hJ hstd] with v hle hv
@@ -76,15 +84,15 @@ private theorem eventually_latLoc_eq_std_of_selfDual {L : Submodule (𝓞 E) (Fi
   exact fun x hx => hy x (hle hx)
 
 omit [NumberField E] in
-theorem exists_conj_of_local {L L' : Submodule (𝓞 E) (Fin n → E)}
-    (hlat : ∀ᶠ v in cofinite, latLoc F L v = latLoc F L' v)
+theorem exists_conj_of_local
+    {L L' : Submodule (𝓞 E) (Fin n → E)} (hlat : ∀ᶠ v in cofinite, latLoc F L v = latLoc F L' v)
     (a a' : GL (Fin n) (AF F ⊗[F] E))
     (hf : ∀ v : HeightOneSpectrum (𝓞 F), ∃ g : GLoc σ J v, ∀ k : GLoc σ J v,
       k ∈ stabLoc σ J L' v ↔ g⁻¹ * k * g ∈ stabLoc σ J L v)
     (hi : ∀ w : InfinitePlace F, ∃ g : GArch σ J w, ∀ k : GArch σ J w,
-      k ∈ stabArch σ J w (Formalism.UG.bc (compInf F E w) a') ↔
-        g⁻¹ * k * g ∈ stabArch σ J w (Formalism.UG.bc (compInf F E w) a)) :
-    ∃ g : GAd σ J, ∀ k : GAd σ J, k ∈ levelAll σ J L' a' ↔ g⁻¹ * k * g ∈ levelAll σ J L a := by
+      k ∈ stabArch σ J w (Formalism.UG.bc (compInf F E w) a')
+        ↔ g⁻¹ * k * g ∈ stabArch σ J w (Formalism.UG.bc (compInf F E w) a))
+    : ∃ g : GAd σ J, ∀ k : GAd σ J, k ∈ levelAll σ J L' a' ↔ g⁻¹ * k * g ∈ levelAll σ J L a := by
   choose x hx using hf
   choose y hy using hi
   have hS := Filter.eventually_cofinite.1 hlat
@@ -104,13 +112,21 @@ theorem exists_conj_of_local {L L' : Submodule (𝓞 E) (Fin n → E)}
 
 end Glue
 
-theorem exists_conj : ∀ (D : D7) (T : HSp D) (L L' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (a a' : GL (Fin T.rank) (AE D)), IsLevel T L a → IsLevel T L' a' → ∃ g : GA D T, ∀ k : GA D T, k ∈ lev T L' a' ↔ g⁻¹ * k * g ∈ lev T L a := by
+theorem exists_conj
+    : ∀ (D : D7) (T : HSp D) (L L' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
+        (a a' : GL (Fin T.rank) (AE D)),
+      IsLevel T L a → IsLevel T L' a'
+        → ∃ g : GA D T, ∀ k : GA D T, k ∈ lev T L' a' ↔ g⁻¹ * k * g ∈ lev T L a := by
   intro D T L L' a a' h h'
   have hc := isCMExt_host D
   have hJ := isHermND_gram T
-  have hf := fun v => GlobalTheory.T.exists_conj_stabilizers_selfDual_lattices_unramified D.host.F D.host.E D.sp.cm.sig hc (GlobalTheory.HeckeAdjoint.unramified_host D) T.rank T.gram
-    hJ L L' h.lat h'.lat v (h.dual v) (h'.dual v)
-  have hi := fun w => GlobalTheory.T.archimedean_majorant_stabilisers_conjugate D.host.F D.host.E D.sp.cm.sig hc T.rank T.gram hJ a a' h.maj h'.maj w
+  have hf := fun v =>
+    GlobalTheory.T.exists_conj_stabilizers_selfDual_lattices_unramified D.host.F D.host.E
+      D.sp.cm.sig hc (GlobalTheory.HeckeAdjoint.unramified_host D) T.rank T.gram hJ L L' h.lat
+      h'.lat v (h.dual v) (h'.dual v)
+  have hi := fun w =>
+    GlobalTheory.T.archimedean_majorant_stabilisers_conjugate D.host.F D.host.E D.sp.cm.sig hc
+      T.rank T.gram hJ a a' h.maj h'.maj w
   have hlat : ∀ᶠ v in cofinite, latLoc D.host.F L v = latLoc D.host.F L' v := by
     filter_upwards [eventually_latLoc_eq_std_of_selfDual D.sp.cm.sig T.gram hJ.2 h.lat h.dual,
       eventually_latLoc_eq_std_of_selfDual D.sp.cm.sig T.gram hJ.2 h'.lat h'.dual] with v hv hv'

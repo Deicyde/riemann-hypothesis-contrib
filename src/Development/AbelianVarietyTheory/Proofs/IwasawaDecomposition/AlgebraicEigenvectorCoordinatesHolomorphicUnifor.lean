@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqOfC
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar
+  GlobalTheory.FlagBundle GlobalTheory.LieBase
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts
 open scoped Topology
 open ReciprocityTheory.L2DbarEstimates (V)
@@ -24,21 +26,26 @@ namespace GlobalTheory.HolCoordEv
 
 open GlobalTheory.ShFam.Hor.LogCh
 
-theorem exists_comb_of_exp {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H}
-    {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} {Z : Model Xo c β}
-    {σ : c.F →+* ℂ} {x x' : Sp ℂ ⟶ Z.X} (hxx : x' = x) {g : ℕ} (ex : (Fin g → ℂ) → (Over.mk x' ⟶ Z.t.G))
-    (hex : IsExpAt Z.t x' ex) (f : EigFrame Z σ x) (τ : E →+* ℂ) (δ : Fin (Dw.mult τ) → Fin g → ℂ)
-    (hδ : ∀ b, IsDerivAt0 (fun z => (ex z).left) (δ b) (f.v τ b)) (v' : Sp (DualNumber ℂ) ⟶ Z.t.G.left)
-    (hv' : IsTanAtG Z.t x v') (heig : ∀ a, v' ≫ (Z.t.act.act a).left = spMap (epsMul (σ (embK c τ a))) ≫ v')
-    (w : Fin g → ℂ) (hw : IsDerivAt0 (fun z => (ex z).left) w v') :
-    ∃ a : Fin (Dw.mult τ) → ℂ, IsCombAtG Z.t x (f.v τ) a v' ∧ w = ∑ b, a b • δ b := by
+theorem exists_comb_of_exp
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type}
+    [CommRing O]
+    {β : O →+* c.F} {Z : Model Xo c β} {σ : c.F →+* ℂ} {x x' : Sp ℂ ⟶ Z.X} (hxx : x' = x)
+    {g : ℕ} (ex : (Fin g → ℂ) → (Over.mk x' ⟶ Z.t.G)) (hex : IsExpAt Z.t x' ex)
+    (f : EigFrame Z σ x) (τ : E →+* ℂ)
+    (δ : Fin (Dw.mult τ) → Fin g → ℂ) (hδ : ∀ b, IsDerivAt0 (fun z => (ex z).left) (δ b) (f.v τ b))
+    (v' : Sp (DualNumber ℂ) ⟶ Z.t.G.left) (hv' : IsTanAtG Z.t x v')
+    (heig : ∀ a, v' ≫ (Z.t.act.act a).left = spMap (epsMul (σ (embK c τ a))) ≫ v')
+    (w : Fin g → ℂ) (hw : IsDerivAt0 (fun z => (ex z).left) w v')
+    : ∃ a : Fin (Dw.mult τ) → ℂ, IsCombAtG Z.t x (f.v τ) a v' ∧ w = ∑ b, a b • δ b := by
   subst hxx
   obtain ⟨a, ha, -⟩ := f.basis τ v' hv' heig
   have e1 : ex 0 = 1 := by
     have h := hex.1 0 0
     rw [add_zero] at h
     exact mul_eq_left.1 h.symm
-  have hd := GlobalTheory.ShFam.Hor.ExpDirs.isDerivAt0_of_comb (congrArg (·.left) e1) (f.tan τ) hδ hv' ha
+  have hd :=
+    GlobalTheory.ShFam.Hor.ExpDirs.isDerivAt0_of_comb (congrArg (·.left) e1) (f.tan τ) hδ hv' ha
   obtain ⟨w', -, hu⟩ := hex.2.2 v' hv'
   exact ⟨a, ha, (hu w hw).trans (hu _ hd).symm⟩
 

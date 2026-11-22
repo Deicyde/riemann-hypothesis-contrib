@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CombM
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -21,10 +24,12 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.FrameFix
 
-theorem coeff_mul_eq_of_same_combinations :
-    ∀ (g r r₀ : ℕ) (l l' : Fin r → Fin g → ℂ) (w : Fin r₀ → Fin g → ℂ) (c : Matrix (Fin r₀) (Fin r) ℤ)
-      (T : Matrix (Fin r) (Fin r) ℤ), LinearIndependent ℤ l → (∀ i, l' i = ∑ j, T i j • l j) →
-      (∀ i, w i = ∑ j, c i j • l j) → (∀ i, w i = ∑ j, c i j • l' j) → c * T = c := by
+theorem coeff_mul_eq_of_same_combinations
+    : ∀ (g r r₀ : ℕ) (l l' : Fin r → Fin g → ℂ) (w : Fin r₀ → Fin g → ℂ)
+        (c : Matrix (Fin r₀) (Fin r) ℤ) (T : Matrix (Fin r) (Fin r) ℤ),
+      LinearIndependent ℤ l → (∀ i, l' i = ∑ j, T i j • l j) → (∀ i, w i = ∑ j, c i j • l j)
+        → (∀ i, w i = ∑ j, c i j • l' j)
+        → c * T = c := by
   intro g r r₀ l l' w c T hl hl' h1 h2
   ext i m
   have key : ∑ j, c i j • l' j = ∑ m, (c * T) i m • l m := by

@@ -29,14 +29,14 @@ section Words
 
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem Rw_congr (w : List (Ix n)) {f h : Mat n → V} (e : Set.EqOn f h (GLs n)) :
-    Set.EqOn (Rw w f) (Rw w h) (GLs n) := by
+theorem Rw_congr (w : List (Ix n)) {f h : Mat n → V} (e : Set.EqOn f h (GLs n))
+    : Set.EqOn (Rw w f) (Rw w h) (GLs n) := by
   induction w with
   | nil => exact e
   | cons p w ih => exact RCalc.Rd_congr (bs p) ih
 
-theorem Rw_smooth (w : List (Ix n)) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) :
-    ContDiffOn ℝ ∞ (Rw w f) (GLs n) := by
+theorem Rw_smooth (w : List (Ix n)) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
+    : ContDiffOn ℝ ∞ (Rw w f) (GLs n) := by
   induction w with
   | nil => exact hf
   | cons p w ih => exact RCalc.Rd_contDiffOn (bs p) ih
@@ -52,7 +52,9 @@ end Words
 
 section HWords
 
-variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [MeasurableSpace (G n)] {μ : Measure (G n)}
+variable
+  {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [MeasurableSpace (G n)]
+  {μ : Measure (G n)}
 
 end HWords
 
@@ -72,7 +74,8 @@ theorem sum_cf (M : Mat n) : ∑ p : Ix n, cf M p • bs p = M := by
   conv_rhs => rw [Matrix.matrix_eq_sum_single M]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ext i j
-  simp only [cf, bs, if_true, Bool.false_eq_true, if_false, Matrix.add_apply, Matrix.smul_apply, Matrix.single_apply]
+  simp only [cf, bs, if_true, Bool.false_eq_true, if_false, Matrix.add_apply, Matrix.smul_apply,
+    Matrix.single_apply]
   by_cases h : a = i ∧ b = j
   · simp only [h, and_self, if_true]
     obtain ⟨rfl, rfl⟩ := h
@@ -81,8 +84,8 @@ theorem sum_cf (M : Mat n) : ∑ p : Ix n, cf M p • bs p = M := by
 
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem Rd_sum_cf (M : Mat n) (f : Mat n → V) (g : Mat n) :
-    Rd M f g = ∑ p : Ix n, ((cf M p : ℝ) : ℂ) • Rd (bs p) f g := by
+theorem Rd_sum_cf (M : Mat n) (f : Mat n → V) (g : Mat n)
+    : Rd M f g = ∑ p : Ix n, ((cf M p : ℝ) : ℂ) • Rd (bs p) f g := by
   conv_lhs => rw [← sum_cf M]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Rd, Finset.mul_sum, map_sum]
@@ -94,7 +97,9 @@ end Bracket
 
 section HBracket
 
-variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [MeasurableSpace (G n)] {μ : Measure (G n)}
+variable
+  {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [MeasurableSpace (G n)]
+  {μ : Measure (G n)}
 
 end HBracket
 

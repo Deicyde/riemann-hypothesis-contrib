@@ -73,9 +73,17 @@ theorem harmSplit : PI.FockDegreeTwoParts.HarmSplit := by
     have hfy : f - y ∈ homog (Ix p q × Ix r s) (d + 2) := Submodule.sub_mem _ hf (hRle hy)
     have hlow : f - y ∈ lowKer p q r s u1 u2 := by
       refine ⟨fun hu Z hZ => ?_, fun hu Z hZ => ?_⟩
-      · refine kill (fockAct1 p q r s) (fun Z hZ P Q => fockAct1_adj hZ P Q) hfy (fun Z' hZ' g hg => ?_) Z hZ
+      · refine kill (fockAct1 p q r s)
+          (fun Z hZ P Q => fockAct1_adj hZ P Q)
+          hfy
+          (fun Z' hZ' g hg => ?_)
+          Z hZ
         exact horth _ (Submodule.subset_span ⟨g, hg, Or.inl ⟨hu, Z', hZ', rfl⟩⟩)
-      · refine kill (fockAct2 p q r s) (fun Z hZ P Q => fockAct2_adj hZ P Q) hfy (fun Z' hZ' g hg => ?_) Z hZ
+      · refine kill (fockAct2 p q r s)
+          (fun Z hZ P Q => fockAct2_adj hZ P Q)
+          hfy
+          (fun Z' hZ' g hg => ?_)
+          Z hZ
         exact horth _ (Submodule.subset_span ⟨g, hg, Or.inr ⟨hu, Z', hZ', rfl⟩⟩)
     have hsplit : f = (f - y) + y := by abel
     rw [hsplit]

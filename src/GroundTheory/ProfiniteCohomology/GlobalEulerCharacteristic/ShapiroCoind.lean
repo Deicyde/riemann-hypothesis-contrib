@@ -21,55 +21,61 @@ section FunIso
 
 variable {k G : Type u} [CommRing k] [Group G] (U : Subgroup G) (A : Rep.{u} k G)
 
-theorem coindResSubtype_apply_mul (f : Rep.coind U.subtype (Rep.res U.subtype A)) (u : U) (y : G) :
-    f.1 ((u : G) * y) = A.ρ (u : G) (f.1 y) :=
+theorem coindResSubtype_apply_mul (f : Rep.coind U.subtype (Rep.res U.subtype A)) (u : U) (y : G)
+    : f.1 ((u : G) * y) = A.ρ (u : G) (f.1 y) :=
   f.2 u y
 
-def coindResToFun (f : Rep.coind U.subtype (Rep.res U.subtype A)) : G ⧸ U → A :=
-  fun c => Quotient.liftOn' c (fun y => A.ρ y (f.1 y⁻¹)) fun a b hab => by
-    rw [QuotientGroup.leftRel_apply] at hab
-    have h1 : b⁻¹ = ((⟨a⁻¹ * b, hab⟩⁻¹ : U) : G) * a⁻¹ := by simp
-    rw [h1, coindResSubtype_apply_mul, ← Module.End.mul_apply, ← map_mul]
-    congr 2
-    simp
+def coindResToFun (f : Rep.coind U.subtype (Rep.res U.subtype A)) : G ⧸ U → A := fun c =>
+  Quotient.liftOn' c
+    (fun y => A.ρ y (f.1 y⁻¹))
+    fun a b hab => by
+      rw [QuotientGroup.leftRel_apply] at hab
+      have h1 : b⁻¹ = ((⟨a⁻¹ * b, hab⟩⁻¹ : U) : G) * a⁻¹ := by simp
+      rw [h1, coindResSubtype_apply_mul, ← Module.End.mul_apply, ← map_mul]
+      congr 2
+      simp
 
 @[simp]
-theorem coindResToFun_mk (f : Rep.coind U.subtype (Rep.res U.subtype A)) (y : G) :
-    coindResToFun U A f (QuotientGroup.mk y) = A.ρ y (f.1 y⁻¹) :=
+theorem coindResToFun_mk (f : Rep.coind U.subtype (Rep.res U.subtype A)) (y : G)
+    : coindResToFun U A f (QuotientGroup.mk y) = A.ρ y (f.1 y⁻¹) :=
   rfl
 
-theorem funToCoindRes_mem (F : G ⧸ U → A) :
-    (fun y : G => A.ρ y (F (QuotientGroup.mk y⁻¹))) ∈
-      Representation.coindV U.subtype (Rep.res U.subtype A).ρ := by
+theorem funToCoindRes_mem (F : G ⧸ U → A)
+    : (fun y : G => A.ρ y (F (QuotientGroup.mk y⁻¹)))
+      ∈ Representation.coindV U.subtype (Rep.res U.subtype A).ρ := by
   intro u y
   have hq : (QuotientGroup.mk ((U.subtype u * y)⁻¹) : G ⧸ U) = QuotientGroup.mk y⁻¹ := by
     rw [QuotientGroup.eq]
     simp
-  change A.ρ (U.subtype u * y) (F (QuotientGroup.mk ((U.subtype u * y)⁻¹))) =
-    A.ρ (u : G) (A.ρ y (F (QuotientGroup.mk y⁻¹)))
+  change A.ρ (U.subtype u * y) (F (QuotientGroup.mk ((U.subtype u * y)⁻¹)))
+    = A.ρ (u : G) (A.ρ y (F (QuotientGroup.mk y⁻¹)))
   rw [hq, map_mul, Module.End.mul_apply]
   rfl
 
-def coindResEquivFunDiag :
-    (Rep.coind U.subtype (Rep.res U.subtype A)).ρ.Equiv (funDiagRepresentation (G ⧸ U) A.ρ) where
+def coindResEquivFunDiag
+    : (Rep.coind U.subtype (Rep.res U.subtype A)).ρ.Equiv (funDiagRepresentation (G ⧸ U) A.ρ) where
   toFun := coindResToFun U A
-  map_add' f f' := funext fun c => by
-    induction c using QuotientGroup.induction_on with
-    | H y => simp [coindResToFun_mk]
-  map_smul' r f := funext fun c => by
-    induction c using QuotientGroup.induction_on with
-    | H y => simp [coindResToFun_mk]
+  map_add' f f' :=
+    funext fun c => by
+      induction c using QuotientGroup.induction_on with
+      | H y => simp [coindResToFun_mk]
+  map_smul' r f :=
+    funext fun c => by
+      induction c using QuotientGroup.induction_on with
+      | H y => simp [coindResToFun_mk]
   invFun F := ⟨fun y => A.ρ y (F (QuotientGroup.mk y⁻¹)), funToCoindRes_mem U A F⟩
   left_inv f := by
     apply Subtype.ext
     funext y
     change A.ρ y (A.ρ y⁻¹ (f.1 y⁻¹⁻¹)) = f.1 y
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, inv_inv, Module.End.one_apply]
-  right_inv F := funext fun c => by
-    induction c using QuotientGroup.induction_on with
-    | H y =>
-      change A.ρ y (A.ρ y⁻¹ (F (QuotientGroup.mk y⁻¹⁻¹))) = F (QuotientGroup.mk y)
-      rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, inv_inv, Module.End.one_apply]
+  right_inv F :=
+    funext fun c => by
+      induction c using QuotientGroup.induction_on with
+      | H y =>
+        change A.ρ y (A.ρ y⁻¹ (F (QuotientGroup.mk y⁻¹⁻¹))) = F (QuotientGroup.mk y)
+        rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, inv_inv,
+          Module.End.one_apply]
   isIntertwining' g := by
     refine LinearMap.ext fun f => funext fun c => ?_
     induction c using QuotientGroup.induction_on with
@@ -92,8 +98,8 @@ def quotientComapMap : G ⧸ D.comap π → Γ ⧸ D :=
     simpa [Subgroup.mem_comap] using h
 
 @[simp]
-theorem quotientComapMap_mk (g : G) :
-    quotientComapMap π D (QuotientGroup.mk g) = QuotientGroup.mk (π g) :=
+theorem quotientComapMap_mk (g : G)
+    : quotientComapMap π D (QuotientGroup.mk g) = QuotientGroup.mk (π g) :=
   rfl
 
 variable {π} (hπ : Function.Surjective π)
@@ -131,17 +137,16 @@ theorem mul_out_mk_inv_mem (y : G) : y * (QuotientGroup.mk y⁻¹ : G ⧸ U).out
   rw [hh, mul_inv_cancel_left]
   exact h.2
 
-def coindCosetElt (y : G) : U :=
-  ⟨y * (QuotientGroup.mk y⁻¹ : G ⧸ U).out, mul_out_mk_inv_mem U y⟩
+def coindCosetElt (y : G) : U := ⟨y * (QuotientGroup.mk y⁻¹ : G ⧸ U).out, mul_out_mk_inv_mem U y⟩
 
-theorem coindCosetElt_mul (u : U) (y : G) :
-    coindCosetElt U ((u : G) * y) = u * coindCosetElt U y := by
+theorem coindCosetElt_mul (u : U) (y : G)
+    : coindCosetElt U ((u : G) * y) = u * coindCosetElt U y := by
   have hq : (QuotientGroup.mk ((u : G) * y)⁻¹ : G ⧸ U) = QuotientGroup.mk y⁻¹ := by
     rw [QuotientGroup.eq]
     simp
   apply Subtype.ext
-  change (u : G) * y * (QuotientGroup.mk ((u : G) * y)⁻¹ : G ⧸ U).out =
-    (u : G) * (y * (QuotientGroup.mk y⁻¹ : G ⧸ U).out)
+  change (u : G) * y * (QuotientGroup.mk ((u : G) * y)⁻¹ : G ⧸ U).out
+    = (u : G) * (y * (QuotientGroup.mk y⁻¹ : G ⧸ U).out)
   rw [hq, mul_assoc]
 
 theorem coindCosetElt_out_inv (c : G ⧸ U) : coindCosetElt U c.out⁻¹ = 1 := by
@@ -149,22 +154,23 @@ theorem coindCosetElt_out_inv (c : G ⧸ U) : coindCosetElt U c.out⁻¹ = 1 := 
   change c.out⁻¹ * (QuotientGroup.mk c.out⁻¹⁻¹ : G ⧸ U).out = 1
   rw [inv_inv, QuotientGroup.out_eq', inv_mul_cancel]
 
-theorem coe_coindCosetElt_mul_out_inv (y : G) :
-    (coindCosetElt U y : G) * ((QuotientGroup.mk y⁻¹ : G ⧸ U).out)⁻¹ = y := by
+theorem coe_coindCosetElt_mul_out_inv (y : G)
+    : (coindCosetElt U y : G) * ((QuotientGroup.mk y⁻¹ : G ⧸ U).out)⁻¹ = y := by
   change y * (QuotientGroup.mk y⁻¹ : G ⧸ U).out * ((QuotientGroup.mk y⁻¹ : G ⧸ U).out)⁻¹ = y
   rw [mul_inv_cancel_right]
 
-def coindOfCosetFun (φ : G ⧸ U → B) : Rep.coind U.subtype B :=
-  ⟨fun y => B.ρ (coindCosetElt U y) (φ (QuotientGroup.mk y⁻¹)), fun u y => by
+def coindOfCosetFun (φ : G ⧸ U → B) : Rep.coind U.subtype B := ⟨
+  fun y => B.ρ (coindCosetElt U y) (φ (QuotientGroup.mk y⁻¹)),
+  fun u y => by
     have hq : (QuotientGroup.mk ((U.subtype u * y)⁻¹) : G ⧸ U) = QuotientGroup.mk y⁻¹ := by
       rw [QuotientGroup.eq]
       simp
-    change B.ρ (coindCosetElt U ((u : G) * y)) (φ (QuotientGroup.mk ((U.subtype u * y)⁻¹))) =
-      B.ρ u (B.ρ (coindCosetElt U y) (φ (QuotientGroup.mk y⁻¹)))
-    rw [hq, coindCosetElt_mul, map_mul, Module.End.mul_apply]⟩
+    change B.ρ (coindCosetElt U ((u : G) * y)) (φ (QuotientGroup.mk ((U.subtype u * y)⁻¹)))
+      = B.ρ u (B.ρ (coindCosetElt U y) (φ (QuotientGroup.mk y⁻¹)))
+    rw [hq, coindCosetElt_mul, map_mul, Module.End.mul_apply]
+⟩
 
-def coindToCosetFun (f : Rep.coind U.subtype B) : G ⧸ U → B :=
-  fun c => f.1 c.out⁻¹
+def coindToCosetFun (f : Rep.coind U.subtype B) : G ⧸ U → B := fun c => f.1 c.out⁻¹
 
 theorem coindToCosetFun_bijective : Function.Bijective (coindToCosetFun U B) := by
   refine Function.bijective_iff_has_inverse.2 ⟨coindOfCosetFun U B, fun f => ?_, fun φ => ?_⟩
@@ -178,20 +184,22 @@ theorem coindToCosetFun_bijective : Function.Bijective (coindToCosetFun U B) := 
     change B.ρ (coindCosetElt U c.out⁻¹) (φ (QuotientGroup.mk c.out⁻¹⁻¹)) = φ c
     rw [coindCosetElt_out_inv, inv_inv, QuotientGroup.out_eq', map_one, Module.End.one_apply]
 
-theorem card_coind_eq [Finite (G ⧸ U)] :
-    Nat.card (Rep.coind U.subtype B) = Nat.card B ^ U.index := by
+theorem card_coind_eq [Finite (G ⧸ U)]
+    : Nat.card (Rep.coind U.subtype B) = Nat.card B ^ U.index := by
   rw [Nat.card_eq_of_bijective _ (coindToCosetFun_bijective U B), Nat.card_fun, Subgroup.index]
 
 end Card
 
 section Transport
 
-variable {k G H : Type u} [CommRing k] [Group G] [Group H] [TopologicalSpace G] [TopologicalSpace H]
+variable
+  {k G H : Type u} [CommRing k] [Group G] [Group H] [TopologicalSpace G] [TopologicalSpace H]
   [IsTopologicalGroup G] [IsTopologicalGroup H]
 
-theorem eulerChar_res_continuousMulEquiv (e : H ≃ₜ* G) (A : Rep.{u} k G) [IsDiscreteRep A]
-    [IsDiscreteRep (Rep.res e.toMulEquiv.toMonoidHom A)] :
-    eulerChar (Rep.res e.toMulEquiv.toMonoidHom A) = eulerChar A := by
+theorem eulerChar_res_continuousMulEquiv
+    (e : H ≃ₜ* G) (A : Rep.{u} k G)
+    [IsDiscreteRep A] [IsDiscreteRep (Rep.res e.toMulEquiv.toMonoidHom A)]
+    : eulerChar (Rep.res e.toMulEquiv.toMonoidHom A) = eulerChar A := by
   simp only [eulerChar]
   refine Finset.prod_congr rfl fun q _ => ?_
   rw [Nat.card_congr (cohomologyIsoOfContinuousMulEquiv e (Iso.refl _) q).toLinearEquiv.toEquiv]

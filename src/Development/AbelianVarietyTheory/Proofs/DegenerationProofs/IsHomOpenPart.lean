@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsU
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 namespace GlobalTheory.ZH.RatModel
@@ -32,7 +33,8 @@ theorem ptOpen_ι (V : M.Z.Opens) (hV : (V : Set M.Z).Nonempty) : M.ptOpen V hV 
 def openPart [IsNoetherianRing o] (V : M.Z.Opens) (hV : (V : Set M.Z).Nonempty) : RatModel o Ω :=
   haveI : Nonempty V.toScheme := ⟨⟨hV.some, hV.some_mem⟩⟩
   haveI : IsIntegral V.toScheme := isIntegral_of_isOpenImmersion V.ι
-  { Z := V.toScheme
+  {
+    Z := V.toScheme
     s := V.ι ≫ M.s
     sep := have := M.sep; inferInstance
     lft := have := M.lft; inferInstance
@@ -44,25 +46,32 @@ def openPart [IsNoetherianRing o] (V : M.Z.Opens) (hV : (V : Set M.Z).Nonempty) 
         apply V.ι.isOpenEmbedding.injective
         rw [genericPoint_eq_of_isOpenImmersion, ← M.pt_apply w, ← M.ptOpen_ι V hV]
         rfl
-      exact Set.eq_singleton_iff_unique_mem.2 ⟨⟨_, h (IsLocalRing.closedPoint Ω)⟩, by
-        rintro _ ⟨w, rfl⟩
-        exact h w⟩
+      exact Set.eq_singleton_iff_unique_mem.2 ⟨
+        ⟨_, h (IsLocalRing.closedPoint Ω)⟩,
+        by
+          rintro _ ⟨w, rfl⟩
+          exact h w
+      ⟩
     onto := fun x => by
       obtain ⟨U, f, hU, rfl⟩ := M.onto x
       obtain ⟨z, hz, hz'⟩ := M.nonempty_inf hU hV
       refine ⟨V.ι ⁻¹ᵁ U, V.ι.app U f, ⟨⟨z, hz'⟩, hz⟩, ?_⟩
       refine (valR_comp _ _ U f).symm.trans ?_
       rw [ptOpen_ι]
-      rfl }
+      rfl
+  }
 
-theorem isHom_openPart [IsNoetherianRing o] (V : M.Z.Opens) (hV : (V : Set M.Z).Nonempty) :
-    M.IsHom (M.openPart V hV) (AlgHom.id o Ω) V.ι :=
-  (M.ptOpen_ι V hV).trans ((Category.id_comp _).symm.trans (congrArg (· ≫ M.pt) (Spec.map_id _).symm))
+theorem isHom_openPart [IsNoetherianRing o] (V : M.Z.Opens) (hV : (V : Set M.Z).Nonempty)
+    : M.IsHom (M.openPart V hV) (AlgHom.id o Ω) V.ι :=
+  (M.ptOpen_ι V hV).trans
+    ((Category.id_comp _).symm.trans (congrArg (· ≫ M.pt) (Spec.map_id _).symm))
 
 variable {M}
 
-theorem IsHom.O_eq {N : RatModel o Ω} {j : N.Z ⟶ M.Z} (h : M.IsHom N (AlgHom.id o Ω) j) [IsOpenImmersion j]
-    (z : N.Z) : N.O z = M.O (j z) := by
+theorem IsHom.O_eq
+    {N : RatModel o Ω} {j : N.Z ⟶ M.Z} (h : M.IsHom N (AlgHom.id o Ω) j) [IsOpenImmersion j]
+    (z : N.Z)
+    : N.O z = M.O (j z) := by
   refine le_antisymm ?_ fun x hx => h.map_mem_O hx
   rintro _ ⟨U, g, hz, rfl⟩
   have hz' : j z ∈ j ''ᵁ U := ⟨z, hz, rfl⟩
@@ -76,17 +85,27 @@ variable (M)
 
 structure GenTriv (H : LB M.Z) (d : H.ι → Ω) : Prop where
   ne : ∀ k, d k ≠ 0
-  g_eq : ∀ k k', ((H.U k ⊓ H.U k' : M.Z.Opens) : Set M.Z).Nonempty →
-    valF M.pt (H.U k ⊓ H.U k') (H.g k k' : Γ(M.Z, H.U k ⊓ H.U k')) = d k' / d k
+  g_eq
+    : ∀ k k',
+      ((H.U k ⊓ H.U k' : M.Z.Opens) : Set M.Z).Nonempty
+        → valF M.pt (H.U k ⊓ H.U k') (H.g k k' : Γ(M.Z, H.U k ⊓ H.U k')) = d k' / d k
 
 def HasVal {H : LB M.Z} (d : H.ι → Ω) (σ : H.Sec) (x : Ω) : Prop :=
   ∀ k, (H.U k : Set M.Z).Nonempty → valF M.pt (H.U k) (σ.f k) = x / d k
 
-def ProjChart {Ω' : Type} [Field Ω'] [Algebra o Ω'] (N : RatModel o Ω') (φ : Ω →ₐ[o] Ω') (q : N.Z ⟶ M.Z)
-    (W : M.Z.Opens) {J : Type} (t : J → Ω') : Prop :=
-  (∀ z', q z' ∈ W → ∃ i, N.Div t i z') ∧ ∀ i, t i ≠ 0 → ∃ U : N.Z.Opens, IsAffineOpen U ∧
-    (U : Set N.Z) = {z' | q z' ∈ W ∧ N.Div t i z'} ∧
-    N.ringOn U = Algebra.adjoin o (φ '' (M.ringOn W : Set Ω) ∪ Set.range fun j => t j / t i)
+def ProjChart
+    {Ω' : Type} [Field Ω'] [Algebra o Ω']
+    (N : RatModel o Ω')
+    (φ : Ω →ₐ[o] Ω') (q : N.Z ⟶ M.Z) (W : M.Z.Opens)
+    {J : Type} (t : J → Ω')
+    : Prop :=
+  (∀ z', q z' ∈ W → ∃ i, N.Div t i z')
+    ∧ ∀ i,
+      t i ≠ 0
+        → ∃ U : N.Z.Opens,
+          IsAffineOpen U ∧ (U : Set N.Z) = {z' | q z' ∈ W ∧ N.Div t i z'}
+            ∧ N.ringOn U
+              = Algebra.adjoin o (φ '' (M.ringOn W : Set Ω) ∪ Set.range fun j => t j / t i)
 
 end GlobalTheory.ZH.RatModel
 end

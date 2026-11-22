@@ -5,21 +5,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RigOfOmegaIn
 
 @[expose] public section
 
-open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDiv
 
-variable {R A : Type} (R' : Type) [CommRing R] [CommRing A] [Bialgebra R A] [CommRing R']
-  [Algebra R R']
+variable
+  {R A : Type} (R' : Type) [CommRing R] [CommRing A] [Bialgebra R A] [CommRing R'] [Algebra R R']
 
-theorem cobOne_baseChange :
-    cobOne R' (R' ⊗[R] A) = (AlgebraTensorModule.distribBaseChange R R' A A).toLinearMap ∘ₗ
-      (cobOne R A).baseChange R' := by
+theorem cobOne_baseChange
+    : cobOne R' (R' ⊗[R] A)
+      = (AlgebraTensorModule.distribBaseChange R R' A A).toLinearMap
+        ∘ₗ (cobOne R A).baseChange R' := by
   refine AlgebraTensorModule.ext fun r a => ?_
   rw [← mul_one r, ← smul_eq_mul, ← smul_tmul', map_smul, map_smul]
   congr 1
-  have h : ∀ c : A ⊗[R] A, AlgebraTensorModule.tensorTensorTensorComm R R' R R' R' R' A A
-      (comul (R := R') (1 : R') ⊗ₜ[R] c) = AlgebraTensorModule.distribBaseChange R R' A A (1 ⊗ₜ c) := by
+  have h
+      : ∀ c : A ⊗[R] A,
+        AlgebraTensorModule.tensorTensorTensorComm R R' R R' R' R' A A
+            (comul (R := R') (1 : R') ⊗ₜ[R] c)
+          = AlgebraTensorModule.distribBaseChange R R' A A (1 ⊗ₜ c) := by
     intro c
     induction c with
     | add x y hx hy => simp only [tmul_add, map_add (f := _), hx, hy]
@@ -32,12 +37,13 @@ end GlobalTheory.PDiv
 
 namespace GlobalTheory.PDiv
 
-theorem liftSemi_prim_baseChange_bijective {R A : Type} (R' : Type) [CommRing R] [CommRing A]
-    [Bialgebra R A] [CommRing R'] [Algebra R R'] [Module.Flat R R'] :
-    Function.Bijective (liftSemi (toBaseChange R R' A).prim) := by
+theorem liftSemi_prim_baseChange_bijective
+    {R A : Type} (R' : Type)
+    [CommRing R] [CommRing A] [Bialgebra R A] [CommRing R'] [Algebra R R'] [Module.Flat R R']
+    : Function.Bijective (liftSemi (toBaseChange R R' A).prim) := by
   set K := LinearMap.ker (cobOne R A)
-  have hsub : ∀ y : R' ⊗[R] K,
-      (liftSemi (toBaseChange R R' A).prim y).1 = K.subtype.lTensor R' y := by
+  have hsub
+      : ∀ y : R' ⊗[R] K, (liftSemi (toBaseChange R R' A).prim y).1 = K.subtype.lTensor R' y := by
     intro y
     induction y with
     | add x y hx hy => simp only [map_add (f := _), Submodule.coe_add, hx, hy]
@@ -51,8 +57,9 @@ theorem liftSemi_prim_baseChange_bijective {R A : Type} (R' : Type) [CommRing R]
   · obtain ⟨x, hx⟩ := z
     have hz : (cobOne R A).lTensor R' x = 0 := by
       have h0 : cobOne R' (R' ⊗[R] A) x = 0 := hx
-      rw [cobOne_baseChange, LinearMap.comp_apply, LinearEquiv.coe_coe,
-        LinearEquiv.map_eq_zero_iff, LinearMap.baseChange_eq_ltensor] at h0
+      rw [cobOne_baseChange, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.map_eq_zero_iff,
+          LinearMap.baseChange_eq_ltensor]
+        at h0
       exact h0
     obtain ⟨y, hy⟩ := (hex x).1 hz
     exact ⟨y, Subtype.ext ((hsub y).trans hy)⟩

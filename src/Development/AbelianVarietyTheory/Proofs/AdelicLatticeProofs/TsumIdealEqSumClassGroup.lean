@@ -9,16 +9,19 @@ open scoped ContDiff nonZeroDivisors
 
 namespace GlobalTheory
 
-
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
-theorem _root_.GlobalTheory.existsUnique_isPrincipal_mul_classRep {K : Type} [Field K] [NumberField K]
+theorem _root_.GlobalTheory.existsUnique_isPrincipal_mul_classRep
+    {K : Type} [Field K] [NumberField K]
     (b : ClassGroup (𝓞 K) → (Ideal (𝓞 K))⁰)
-    (hb : Function.Bijective (fun c => ClassGroup.mk0 (b c))) (I : Ideal (𝓞 K)) (hI : I ≠ ⊥) :
-    ∃! c, (I * (b c : Ideal (𝓞 K))).IsPrincipal := by
+    (hb : Function.Bijective (fun c => ClassGroup.mk0 (b c)))
+    (I : Ideal (𝓞 K)) (hI : I ≠ ⊥)
+    : ∃! c, (I * (b c : Ideal (𝓞 K))).IsPrincipal := by
   have hI0 : I ∈ (Ideal (𝓞 K))⁰ := mem_nonZeroDivisors_of_ne_zero hI
-  have key : ∀ c, (I * (b c : Ideal (𝓞 K))).IsPrincipal ↔
-      ClassGroup.mk0 (b c) = (ClassGroup.mk0 ⟨I, hI0⟩)⁻¹ := by
+  have key
+      : ∀ c,
+        (I * (b c : Ideal (𝓞 K))).IsPrincipal
+          ↔ ClassGroup.mk0 (b c) = (ClassGroup.mk0 ⟨I, hI0⟩)⁻¹ := by
     intro c
     rw [eq_inv_iff_mul_eq_one, mul_comm, ← map_mul]
     rw [ClassGroup.mk0_eq_one_iff]
@@ -29,16 +32,16 @@ theorem _root_.GlobalTheory.existsUnique_isPrincipal_mul_classRep {K : Type} [Fi
   rw [(key c').1 hc']
   exact hc.symm
 
-
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
-theorem _root_.GlobalTheory.tsum_isPrincipal_mul_eq {K : Type} [Field K] [NumberField K]
-    (B : Ideal (𝓞 K)) (hB : B ≠ ⊥) (F : Ideal (𝓞 K) → ℂ) :
-    ∑' I : {I : Ideal (𝓞 K) // I ≠ ⊥ ∧ (I * B).IsPrincipal}, F (I * B) =
-      ∑' J : {J : Ideal (𝓞 K) // J ≠ ⊥ ∧ J.IsPrincipal ∧ J ≤ B}, F J := by
-  let e : {I : Ideal (𝓞 K) // I ≠ ⊥ ∧ (I * B).IsPrincipal} →
-      {J : Ideal (𝓞 K) // J ≠ ⊥ ∧ J.IsPrincipal ∧ J ≤ B} :=
-    fun I => ⟨I.1 * B, mul_ne_zero I.2.1 hB, I.2.2, Ideal.mul_le_inf.trans inf_le_right⟩
+theorem _root_.GlobalTheory.tsum_isPrincipal_mul_eq
+    {K : Type} [Field K] [NumberField K] (B : Ideal (𝓞 K)) (hB : B ≠ ⊥) (F : Ideal (𝓞 K) → ℂ)
+    : ∑' I : {I : Ideal (𝓞 K) // I ≠ ⊥ ∧ (I * B).IsPrincipal}, F (I * B)
+      = ∑' J : {J : Ideal (𝓞 K) // J ≠ ⊥ ∧ J.IsPrincipal ∧ J ≤ B}, F J := by
+  let e
+      : {I : Ideal (𝓞 K) // I ≠ ⊥ ∧ (I * B).IsPrincipal}
+        → {J : Ideal (𝓞 K) // J ≠ ⊥ ∧ J.IsPrincipal ∧ J ≤ B} := fun I =>
+    ⟨I.1 * B, mul_ne_zero I.2.1 hB, I.2.2, Ideal.mul_le_inf.trans inf_le_right⟩
   have he : Function.Bijective e := by
     constructor
     · intro I I' h

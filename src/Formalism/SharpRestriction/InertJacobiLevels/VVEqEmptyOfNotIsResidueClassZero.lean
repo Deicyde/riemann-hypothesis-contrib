@@ -16,14 +16,16 @@ section Places
 
 variable (D : D7)
 
-theorem natCast_mem_of_val_pos (w : D.what₂.places.Pl) (n : ℕ) (hn : n ≠ 0)
-    (h : (0 : WithTop ℤ) < D.what₂.places.val w (n : D.what₂.LL)) :
-    (n : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+theorem natCast_mem_of_val_pos
+    (w : D.what₂.places.Pl) (n : ℕ)
+    (hn : n ≠ 0) (h : (0 : WithTop ℤ) < D.what₂.places.val w (n : D.what₂.LL))
+    : (n : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
   by_contra hnm
   have hn0 : (n : D.what₂.LL) ≠ 0 := Nat.cast_ne_zero.2 hn
   rw [D.val_eq w _ hn0] at h
   have hv : (D.plEq w).valuation D.what₂.LL (n : D.what₂.LL) = 1 := by
-    have e : algebraMap (𝓞 D.what₂.LL) D.what₂.LL (n : 𝓞 D.what₂.LL) = (n : D.what₂.LL) := map_natCast _ n
+    have e : algebraMap (𝓞 D.what₂.LL) D.what₂.LL (n : 𝓞 D.what₂.LL) = (n : D.what₂.LL) :=
+      map_natCast _ n
     rw [← e, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
     exact le_antisymm ((D.plEq w).intValuation_le_one _)
       (not_lt.mp (fun hlt => hnm (((D.plEq w).intValuation_lt_one_iff_mem _).1 hlt)))
@@ -31,31 +33,36 @@ theorem natCast_mem_of_val_pos (w : D.what₂.places.Pl) (n : ℕ) (hn : n ≠ 0
   rw [hv, WithZero.log_one, neg_zero] at h
   norm_num at h
 
-theorem resChar_mem (w : D.what₂.places.Pl) :
-    ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+theorem resChar_mem (w : D.what₂.places.Pl)
+    : ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
   exact natCast_mem_of_val_pos D w _ (D.what₂.places.resChar_prime w).ne_zero
     (by rw [D.what₂.places.val_resChar]; exact_mod_cast D.what₂.places.ramIdx_pos w)
 
-theorem eq_resChar_of_mem (w : D.what₂.places.Pl) (p : ℕ) (hp : p.Prime)
-    (h : (p : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal) : D.what₂.places.resChar w = p := by
+theorem eq_resChar_of_mem
+    (w : D.what₂.places.Pl) (p : ℕ) (hp : p.Prime) (h : (p : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal)
+    : D.what₂.places.resChar w = p := by
   by_contra hne
   have hl := resChar_mem D w
   have hcop : Nat.Coprime (D.what₂.places.resChar w) p :=
     (Nat.coprime_primes (D.what₂.places.resChar_prime w) hp).2 hne
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 hcop
-  have h1 : ((u : 𝓞 D.what₂.LL) * ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) +
-      (v : 𝓞 D.what₂.LL) * (p : 𝓞 D.what₂.LL)) ∈ (D.plEq w).asIdeal :=
+  have h1
+      : ((u : 𝓞 D.what₂.LL) * ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL)
+          + (v : 𝓞 D.what₂.LL) * (p : 𝓞 D.what₂.LL))
+        ∈ (D.plEq w).asIdeal :=
     Ideal.add_mem _ (Ideal.mul_mem_left _ _ hl) (Ideal.mul_mem_left _ _ h)
-  have h2 : ((u : 𝓞 D.what₂.LL) * ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) +
-      (v : 𝓞 D.what₂.LL) * (p : 𝓞 D.what₂.LL)) = 1 := by
+  have h2
+      : ((u : 𝓞 D.what₂.LL) * ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL)
+          + (v : 𝓞 D.what₂.LL) * (p : 𝓞 D.what₂.LL))
+        = 1 := by
     have := congrArg (Int.cast : ℤ → 𝓞 D.what₂.LL) huv
     push_cast at this
     exact this
   rw [h2] at h1
   exact (D.plEq w).isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h1)
 
-theorem resChar_conj (w : D.what₂.places.Pl) :
-    D.what₂.places.resChar (D.what₂.places.conj w) = D.what₂.places.resChar w := by
+theorem resChar_conj (w : D.what₂.places.Pl)
+    : D.what₂.places.resChar (D.what₂.places.conj w) = D.what₂.places.resChar w := by
   apply eq_resChar_of_mem D _ _ (D.what₂.places.resChar_prime w)
   apply natCast_mem_of_val_pos D _ _ (D.what₂.places.resChar_prime w).ne_zero
   rw [D.conj_val, star_natCast, D.what₂.places.val_resChar]
@@ -75,7 +82,8 @@ theorem scale_b'_nonneg (sc : Scale) : 0 ≤ sc.b' := by
   have hX : 0 < sc.X' := Real.exp_pos _
   exact div_nonneg (mul_nonneg hx.le hb.le) hX.le
 
-theorem scale_w''_le (sc : Scale) (n : ℕ) (hn : 1 ≤ n) : sc.w'' n ≤ sc.b' / sc.x ∧ sc.w'' n ≤ sc.b := by
+theorem scale_w''_le (sc : Scale) (n : ℕ) (hn : 1 ≤ n)
+    : sc.w'' n ≤ sc.b' / sc.x ∧ sc.w'' n ≤ sc.b := by
   have hx : 0 < sc.x := by linarith [sc.one_lt_alt]
   have hb : 0 < sc.b := Real.exp_pos _
   have hX : 1 ≤ sc.X' := Real.one_le_exp (Real.rpow_nonneg hx.le _)
@@ -92,8 +100,7 @@ theorem scale_w''_le (sc : Scale) (n : ℕ) (hn : 1 ≤ n) : sc.w'' n ≤ sc.b' 
     exact div_le_self (mul_nonneg hx.le hb.le) hX
   exact ⟨h1, h1.trans h2⟩
 
-theorem ranks_one_le_n (R : Ranks) : 1 ≤ R.n := by
-  exact R.toFrame.ord_pos
+theorem ranks_one_le_n (R : Ranks) : 1 ≤ R.n := by exact R.toFrame.ord_pos
 
 section BaseA
 
@@ -163,7 +170,9 @@ theorem bsA_step (h t : φ.A) : bsA h (t + h) = bsA h t := by
     refine ⟨i + m, ?_⟩
     rw [add_nsmul]
     congr 1
-    calc t + h + (i • h + m • h) = t + i • h + (m • h + h) := by abel
+    calc
+      t + h + (i • h + m • h)
+        = t + i • h + (m • h + h) := by abel
       _ = t + i • h := by rw [hk, add_zero]
 
 theorem bsA_val_le (h t : φ.A) (i : ℕ) : (bsA h t).val ≤ (t + i • h).val := by
@@ -171,15 +180,18 @@ theorem bsA_val_le (h t : φ.A) (i : ℕ) : (bsA h t).val ≤ (t + i • h).val 
   unfold bsVA
   exact Nat.sInf_le ⟨i, rfl⟩
 
-theorem ord_nsmul_A (h : φ.A) : φ.ord • h = 0 := by
-  exact ord_nsmul_eq_zero h
+theorem ord_nsmul_A (h : φ.A) : φ.ord • h = 0 := by exact ord_nsmul_eq_zero h
 
 end BaseA
 
-
 open Classical in
 def offC (D : D7) (sc : Scale) (_j : ℕ) (z : Bool × G.HH D) : ℝ :=
-  if G.IsTopPl D z then sc.b' / sc.x else if G.IsThickPl D z then sc.b else sc.w'' D.R.n
+  if G.IsTopPl D z then
+    sc.b' / sc.x
+  else if G.IsThickPl D z then
+    sc.b
+  else
+    sc.w'' D.R.n
 
 section InstW
 
@@ -219,7 +231,8 @@ theorem plGG_top_iff (z : Bool × G.HH D) : G.plGG D z ∈ D.host.topPlaces ↔ 
     · intro h
       exact ⟨t, h, rfl⟩
   | true =>
-    simp only [plGG_true, Finset.mem_image, Bool.true_eq_false, false_and, iff_false, not_exists, not_and]
+    simp only [plGG_true, Finset.mem_image, Bool.true_eq_false, false_and, iff_false, not_exists,
+      not_and]
     intro s _ hst
     have h1 : ((1 : ℤˣ), (1 : ℤˣ)) = ((-1 : ℤˣ), (1 : ℤˣ)) := congrArg Prod.fst hst
     have h2 : (1 : ℤˣ) = -1 := congrArg Prod.fst h1
@@ -227,15 +240,14 @@ theorem plGG_top_iff (z : Bool × G.HH D) : G.plGG D z ∈ D.host.topPlaces ↔ 
 
 variable {D} (L : SizeData₂ D)
 
-
 end InstW
 
 section Comparison₂
 
 variable {D : D7} (L0 : SizeData₂ D) (X0 : G.Inst D L0) (K : G.Consts)
 
-theorem one_le_fill (hw : 1 ≤ L0.sc.w'' D.R.n) (j : ℕ) (z : Bool × G.HH D) :
-    1 ≤ G.fill X0 (G.bL L0) j z := by
+theorem one_le_fill (hw : 1 ≤ L0.sc.w'' D.R.n) (j : ℕ) (z : Bool × G.HH D)
+    : 1 ≤ G.fill X0 (G.bL L0) j z := by
   have hs := scale_w''_le L0.sc D.R.n (ranks_one_le_n D.R)
   have hb' := scale_b'_nonneg L0.sc
   unfold G.fill
@@ -248,7 +260,7 @@ theorem one_le_fill (hw : 1 ≤ L0.sc.w'' D.R.n) (j : ℕ) (z : Bool × G.HH D) 
       rw [dite_eq_left hc.2]
       exact hb'.trans (L0.bT_ge _)
     linarith [hs.1]
-  · have hc : ¬ (z.1 = false ∧ z.2 ∈ D.host.TT) := htop
+  · have hc : ¬(z.1 = false ∧ z.2 ∈ D.host.TT) := htop
     rw [if_neg hc, zero_add]
     by_cases hthick : G.IsThickPl D z
     · linarith [(X0.off_thick j z hthick).1, hs.2]
@@ -261,12 +273,10 @@ theorem TTP_subset (a b : G.HH D → ℤ) (p : ℕ) : ∀ t ∈ G.TTP X0 K a b p
   · exact ht
   · exact (Finset.mem_filter.1 ht).1
 
-
-
-
-variable (dr : Set ℕ) (len : D.what₂.Word → D.what₂.places.Pl → ℚ) (hw : 1 ≤ L0.sc.w'' D.R.n)
-    (hg : ∀ i, ¬ (G.IsResidueClassZero D (D.host.g i) ∨ G.IsSg D (D.host.g i)))
-    (hu : ∀ w, D.what₂.muAt w = D.what₂.mu0 → ∀ j, 1 ≤ j → j ≤ D.R.m → Fval L0 j w = 0)
+variable
+  (dr : Set ℕ) (len : D.what₂.Word → D.what₂.places.Pl → ℚ) (hw : 1 ≤ L0.sc.w'' D.R.n)
+  (hg : ∀ i, ¬(G.IsResidueClassZero D (D.host.g i) ∨ G.IsSg D (D.host.g i)))
+  (hu : ∀ w, D.what₂.muAt w = D.what₂.mu0 → ∀ j, 1 ≤ j → j ≤ D.R.m → Fval L0 j w = 0)
 
 end Comparison₂
 

@@ -10,28 +10,33 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.Local
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.Zero.LLC
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
   {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
-private theorem par_of_laws {a : Weil h →* (w.adicCompletion E)ˣ} {ha : IsLocalArtin h a}
-    {rc : IrrGL (k := w.adicCompletion E) → WD h} (L : LawsT a ha rc) {y : IrrGL (k := w.adicCompletion E)}
-    (hc : y.IsCusp) (hG : Good y) (hd : DZ y) : Par a y (rc y) := by
-  exact
-    { irr := L.cusp y hc
-      dim := L.dim y
-      tame := L.depth y hG hd
-      central ω hω := L.central y ω hG hω
-      type := (typeIff E Ω A w h rc).1 L.type y }
+private theorem par_of_laws
+    {a : Weil h →* (w.adicCompletion E)ˣ} {ha : IsLocalArtin h a}
+    {rc : IrrGL (k := w.adicCompletion E) → WD h} (L : LawsT a ha rc)
+    {y : IrrGL (k := w.adicCompletion E)} (hc : y.IsCusp) (hG : Good y) (hd : DZ y)
+    : Par a y (rc y) := by
+  exact {
+    irr := L.cusp y hc
+    dim := L.dim y
+    tame := L.depth y hG hd
+    central ω hω := L.central y ω hG hω
+    type := (typeIff E Ω A w h rc).1 L.type y
+  }
 
 end UpperTheory.Zero.LLC
 
-theorem UpperTheory.Zero.LLC.recTUnique :
-    UpperTheory.Zero.LLC.RecTUnique := by
+theorem UpperTheory.Zero.LLC.recTUnique : UpperTheory.Zero.LLC.RecTUnique := by
   rintro E Ω _ _ _ _ _ A w h rc rc' ⟨a, ha, L⟩ ⟨a', ha', L'⟩ x hx
   haveI : CharZero (w.adicCompletion E) :=
     charZero_of_injective_algebraMap (algebraMap E (w.adicCompletion E)).injective

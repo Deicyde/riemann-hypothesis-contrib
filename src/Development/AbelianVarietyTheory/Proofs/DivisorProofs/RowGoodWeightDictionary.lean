@@ -9,26 +9,32 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CnormMapConj
 @[expose] public section
 
 set_option synthInstance.maxHeartbeats 400000
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.CovTop.GoodWCore
 
-theorem fullLat_congr {K Rg : Type} [Field K] [NumberField K] [CommRing Rg] [Algebra K Rg] [Algebra (𝓞 K) Rg]
-    [IsScalarTower (𝓞 K) K Rg] {C C' : Submodule K Rg} (h : C = C')
+theorem fullLat_congr
+    {K Rg : Type} [Field K] [NumberField K] [CommRing Rg] [Algebra K Rg] [Algebra (𝓞 K) Rg]
+    [IsScalarTower (𝓞 K) K Rg]
+    {C C' : Submodule K Rg} (h : C = C')
     {Vs : HeightOneSpectrum (𝓞 K) → Set (Rg → EReal)} {hV : ∀ la, ∀ v ∈ Vs la, IsVal la v}
-    (hl : FullLat C Vs hV) : FullLat C' Vs hV := by
+    (hl : FullLat C Vs hV)
+    : FullLat C' Vs hV := by
   subst h
   exact hl
 
-
 set_option maxHeartbeats 8000000 in
-theorem goodW_core {D : D7} (T : CoreJ D) (hT : LawsJ T) (j : ℕ) (hj : InR D j) (w : WeightFamilies.Wt D j)
-    (hl : Submodule.IsFullLattice T.Q.c.F (supLat (T.cuspA j (wtA w) w.n))) :
-    GoodW (T.U j) (xiR D) (T.V j) (T.dict j) (wtZ (wtA w) w.n) := by
+theorem goodW_core
+    {D : D7} (T : CoreJ D) (hT : LawsJ T)
+    (j : ℕ) (hj : InR D j) (w : WeightFamilies.Wt D j)
+    (hl : Submodule.IsFullLattice T.Q.c.F (supLat (T.cuspA j (wtA w) w.n)))
+    : GoodW (T.U j) (xiR D) (T.V j) (T.dict j) (wtZ (wtA w) w.n) := by
   have hlat : Submodule.IsFullLattice T.Q.c.F (AllWt.latW (T.U j) (wtZ (wtA w) w.n)) := by
     rw [AllWt.latW, cuspW_wtZ]
     exact hl
@@ -45,10 +51,14 @@ theorem goodW_core {D : D7} (T : CoreJ D) (hT : LawsJ T) (j : ℕ) (hj : InR D j
   let ι := LinearEquiv.ofEq _ _ (cuspW_wtZ (Xo := T.Q.Xo j) (c := T.Q.c) (U := T.U j) (wtA w) w.n)
   let cf : ℝ := lieFac (T.Q.Dw j) (xiR D) (wtA w)
   have hcf : 0 < cf := lieFac_pos _ _ _
-  let J := uniformisationL2 (T.V j σ) σ (rdC (T.U j) σ (wtA w) w.n) (T.dict j σ) (T.mu j σ)
-    (hT.cuspidalL2Subspace j hj σ hσ (wtA w) w.n hD)
-  let Φ : cuspW (T.Q.Xo j) T.Q.c (T.U j) (wtZ (wtA w) w.n) →+ MeasureTheory.Lp ℂ 2 (muQ1 (T.V j σ)) :=
-    AddMonoidHom.mk' (fun f => (cf : ℂ) • J (ι f)) (fun f g => by rw [map_add (f := _), map_add (f := _), smul_add])
+  let J :=
+    uniformisationL2 (T.V j σ) σ (rdC (T.U j) σ (wtA w) w.n) (T.dict j σ) (T.mu j σ)
+      (hT.cuspidalL2Subspace j hj σ hσ (wtA w) w.n hD)
+  let Φ
+      : cuspW (T.Q.Xo j) T.Q.c (T.U j) (wtZ (wtA w) w.n) →+ MeasureTheory.Lp ℂ 2 (muQ1 (T.V j σ)) :=
+    AddMonoidHom.mk'
+      (fun f => (cf : ℂ) • J (ι f))
+      (fun f g => by rw [map_add (f := _), map_add (f := _), smul_add])
   have hΦ : ∀ f, Φ f = (cf : ℂ) • J (ι f) := fun _ => rfl
   have hs : ∀ (a : T.Q.c.F) f, Φ (a • f) = σ a • Φ f := fun a f => by
     rw [hΦ, hΦ, map_smul, map_smulₛₗ]
@@ -57,8 +67,7 @@ theorem goodW_core {D : D7} (T : CoreJ D) (hT : LawsJ T) (j : ℕ) (hj : InR D j
   · by_cases hg : GoodEmb T.Q.c v.embedding
     · left
       intro a f
-      have e' : σ a = v.embedding a := by
-        rw [hσdef]; unfold goodOf; rw [ite_eq_left hg]
+      have e' : σ a = v.embedding a := by rw [hσdef]; unfold goodOf; rw [ite_eq_left hg]
       rw [hs, e']
     · right
       intro a f
@@ -67,15 +76,19 @@ theorem goodW_core {D : D7} (T : CoreJ D) (hT : LawsJ T) (j : ℕ) (hj : InR D j
       rw [hs, e']
   · intro f
     have hf : (f : Rul (T.Q.Xo j) T.Q.c) ∈ cusp (T.Q.Xo j) T.Q.c (T.U j) (wtA w) w.n := (ι f).2
-    have e1 : normW (T.U j) (xiR D) (T.V j) (T.dict j) (wtZ (wtA w) w.n) v.embedding f =
-        petAt (T.U j σ) (xiR D) (T.V j σ) (T.dict j σ) (muQ1 (T.V j σ)) (wtZ (wtA w) w.n) f := rfl
-    rw [e1, petAt_wtZ (T.U j) (xiR D) (T.V j σ) (T.dict j σ) (T.mu j σ) (hT.muUnit j hj σ hσ) _ _
-      (hT.cuspidalL2Subspace j hj σ hσ (wtA w) w.n hD) hf, l2C, dite_eq_left hf, hΦ, norm_smul, Complex.norm_real,
-      Real.norm_of_nonneg hcf.le]
+    have e1
+        : normW (T.U j) (xiR D) (T.V j) (T.dict j) (wtZ (wtA w) w.n) v.embedding f
+          = petAt (T.U j σ) (xiR D) (T.V j σ) (T.dict j σ) (muQ1 (T.V j σ)) (wtZ (wtA w) w.n) f :=
+      rfl
+    rw [e1,
+      petAt_wtZ (T.U j) (xiR D) (T.V j σ) (T.dict j σ) (T.mu j σ) (hT.muUnit j hj σ hσ) _ _
+        (hT.cuspidalL2Subspace j hj σ hσ (wtA w) w.n hD) hf,
+      l2C, dite_eq_left hf, hΦ, norm_smul, Complex.norm_real, Real.norm_of_nonneg hcf.le]
     rfl
   · intro m e he
     have hi : LinearIndependent T.Q.c.F fun k => ι (e k) := he.map' ι.toLinearMap ι.ker
-    have h1 := (GlobalTheory.VolPairExists.adelic_linearIndependent D T hT j hj σ hσ (wtA w) w.n hD).2 m _ hi
+    have h1 :=
+      (GlobalTheory.VolPairExists.adelic_linearIndependent D T hT j hj σ hσ (wtA w) w.n hD).2 m _ hi
     rw [Fintype.linearIndependent_iff] at h1 ⊢
     intro c hc
     refine h1 c ?_

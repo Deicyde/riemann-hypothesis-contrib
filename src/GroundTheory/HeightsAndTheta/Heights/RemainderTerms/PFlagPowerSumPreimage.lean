@@ -17,8 +17,8 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem sum_Icc_one_eq_sum_fin {M : Type*} [AddCommMonoid M] (N : ℕ) (g : ℕ → M) :
-    ∑ l ∈ Finset.Icc 1 N, g l = ∑ i : Fin N, g (i.val + 1) := by
+theorem sum_Icc_one_eq_sum_fin {M : Type*} [AddCommMonoid M] (N : ℕ) (g : ℕ → M)
+    : ∑ l ∈ Finset.Icc 1 N, g l = ∑ i : Fin N, g (i.val + 1) := by
   have hI : Finset.Icc 1 N = Finset.Ico 1 (N + 1) := by
     ext l
     simp only [Finset.mem_Icc, Finset.mem_Ico]

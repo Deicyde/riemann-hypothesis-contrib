@@ -60,9 +60,10 @@ lemma sqBall_isClosed (r : ℕ) (R : ℝ) : IsClosed (sqBall r E R) := by
   exact isClosed_le (continuous_finsetSum _ fun k _ => (continuous_apply k).norm.pow 2)
     continuous_const
 
-variable {V W : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
-  [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W]
-  [MeasurableSpace V] [BorelSpace V]
+variable
+  {V W : Type*}
+  [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] [NormedAddCommGroup W]
+  [NormedSpace ℝ W] [FiniteDimensional ℝ W] [MeasurableSpace V] [BorelSpace V]
 
 end Generic
 

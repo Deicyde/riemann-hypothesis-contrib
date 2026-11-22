@@ -123,17 +123,18 @@ theorem perron_kernel_single_term : PerronKernel := by
     · have hy1 : y < 1 := (Real.log_neg_iff hy).mp (hl ▸ hneg)
       have h1 := line_bound_neg l c T hneg hc hT
       rw [← hJ, ← hEe] at h1
-      have hXe : X = r * ‖J‖ := by
-        rw [hX, if_neg (not_le.mpr hy1), sub_zero, norm_mul, hnr]
+      have hXe : X = r * ‖J‖ := by rw [hX, if_neg (not_le.mpr hy1), sub_zero, norm_mul, hnr]
       rw [hXe, abs_of_neg hneg]
       have hl' : 0 < -l := by linarith
-      calc T * -l * (r * ‖J‖) ≤ T * -l * (r * (2 * (E / (-l) / T))) := by gcongr
+      calc
+        T * -l * (r * ‖J‖)
+          ≤ T * -l * (r * (2 * (E / (-l) / T))) := by gcongr
         _ = (r * 2) * E := by
-            have hl0 : l ≠ 0 := hneg.ne
-            field_simp
+          have hl0 : l ≠ 0 := hneg.ne
+          field_simp
         _ ≤ 1 * E := by
-            gcongr
-            nlinarith
+          gcongr
+          nlinarith
         _ = E := one_mul _
     · rw [hzero]; simp [hE0.le]
     · have hy1 : 1 ≤ y := ((Real.log_pos_iff hy.le).mp (hl ▸ hpos)).le
@@ -145,11 +146,13 @@ theorem perron_kernel_single_term : PerronKernel := by
         have : (r : ℂ) * (2 * π) = 1 := by exact_mod_cast hr1
         linear_combination this
       rw [hXe, abs_of_pos hpos]
-      calc T * l * (r * ‖J - 2 * π‖) ≤ T * l * (r * (2 * (E / l / T))) := by gcongr
+      calc
+        T * l * (r * ‖J - 2 * π‖)
+          ≤ T * l * (r * (2 * (E / l / T))) := by gcongr
         _ = (r * 2) * E := by field_simp
         _ ≤ 1 * E := by
-            gcongr
-            nlinarith
+          gcongr
+          nlinarith
         _ = E := one_mul _
   refine ⟨?_, hb⟩
   by_cases hsm : T * |l| ≤ 1
@@ -161,16 +164,19 @@ theorem perron_kernel_single_term : PerronKernel := by
         exact Real.one_le_rpow hy1 hc.le
       · rw [norm_zero]; exact hE0.le
     have h2 : r * ‖J‖ ≤ E := by
-      calc r * ‖J‖ ≤ r * (E * (π + |l| * (2 * T))) := by gcongr
+      calc
+        r * ‖J‖
+          ≤ r * (E * (π + |l| * (2 * T))) := by gcongr
         _ ≤ r * (E * (π + 2)) := by
-            gcongr
-            nlinarith
+          gcongr
+          nlinarith
         _ ≤ r * (E * (2 * π)) := by
-            gcongr
-            linarith
+          gcongr
+          linarith
         _ = (r * (2 * π)) * E := by ring
         _ = E := by rw [hr1, one_mul]
-    calc X ≤ ‖(r : ℂ) * J‖ + ‖(if 1 ≤ y then 1 else 0 : ℂ)‖ := by rw [hX]; exact norm_sub_le _ _
+    calc
+      X ≤ ‖(r : ℂ) * J‖ + ‖(if 1 ≤ y then 1 else 0 : ℂ)‖ := by rw [hX]; exact norm_sub_le _ _
       _ = r * ‖J‖ + ‖(if 1 ≤ y then 1 else 0 : ℂ)‖ := by rw [norm_mul, hnr]
       _ ≤ 2 * E := by linarith
   · rw [not_le] at hsm

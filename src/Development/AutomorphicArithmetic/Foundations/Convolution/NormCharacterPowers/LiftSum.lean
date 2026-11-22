@@ -9,8 +9,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.Unitar
 
 open UpperTheory.ConvolutionTheory.R
 
-theorem UpperTheory.ConvolutionTheory.R.liftSum :
-    LiftSum := by
+theorem UpperTheory.ConvolutionTheory.R.liftSum : LiftSum := by
   intro K M _ _ _ _ _ _ _ _ _ ι _ κ _ n m π P h
   have h' := Filter.eventually_all.2 h
   refine h'.mono fun w hw f hf => ?_

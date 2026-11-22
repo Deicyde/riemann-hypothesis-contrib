@@ -24,17 +24,21 @@ namespace GlobalTheory.RowPartsOrth
 section Generic
 open MeasureTheory Formalism.IndefR.Bridge GlobalTheory.DoubleCosetAdjoint
 
-variable {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [MeasurableSpace H]
-  [BorelSpace H] (μ : Measure H) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-  (Γ : Subgroup H) [Countable Γ] (𝓕 : Set H)
+variable
+  {H : Type}
+  [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [MeasurableSpace H] [BorelSpace H]
+  (μ : Measure H) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
+  (Γ : Subgroup H) [Countable Γ]
+  (𝓕 : Set H)
 
 variable {μ Γ 𝓕}
 
-
-
-theorem isDC_of_local {H : Type} [Group H] (J L : Subgroup H) (x : H) (A : Finset H) (hx : x ∈ L)
-    (hs : ∀ k ∈ J, ∃ k₁ ∈ J, ∃ k₂ ∈ J, k₁ ∈ L ∧ k = k₁ * k₂ ∧ ∀ l ∈ L, Commute k₂ l)
-    (hL : ∀ a ∈ A, a ∈ L) (hA : IsDC (J ⊓ L) x A) : IsDC J x A := by
+theorem isDC_of_local
+    {H : Type} [Group H]
+    (J L : Subgroup H) (x : H) (A : Finset H)
+    (hx : x ∈ L) (hs : ∀ k ∈ J, ∃ k₁ ∈ J, ∃ k₂ ∈ J, k₁ ∈ L ∧ k = k₁ * k₂ ∧ ∀ l ∈ L, Commute k₂ l)
+    (hL : ∀ a ∈ A, a ∈ L) (hA : IsDC (J ⊓ L) x A)
+    : IsDC J x A := by
   refine ⟨fun a ha => ?_, ?_⟩
   · obtain ⟨k₁, k₂, e⟩ := hA.1 a ha
     exact ⟨⟨k₁, k₁.2.1⟩, ⟨k₂, k₂.2.1⟩, e⟩
@@ -53,7 +57,9 @@ theorem isDC_of_local {H : Type} [Group H] (J L : Subgroup H) (x : H) (A : Finse
 
 end Generic
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Cx NumberField IsDedekindDomain Polynomial
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

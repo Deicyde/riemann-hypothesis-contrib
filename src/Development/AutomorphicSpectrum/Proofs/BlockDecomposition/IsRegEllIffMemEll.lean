@@ -8,37 +8,42 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host
 open GlobalTheory.BCT PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.G8
 
 namespace GlobalTheory.CompanionTheory.NormPoly
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem norm_translate {u : GL (Fin n) E} (hu : IsTransl u) (d : GL (Fin n) E) :
-    (d * u⁻¹) * thE E n (d * u⁻¹) = nrm d := by
+theorem norm_translate {u : GL (Fin n) E} (hu : IsTransl u) (d : GL (Fin n) E)
+    : (d * u⁻¹) * thE E n (d * u⁻¹) = nrm d := by
   obtain ⟨h1, h2⟩ := hu
   have hθ : thetaE E n u = u⁻¹ := eq_inv_of_mul_eq_one_right h2
   rw [h1, map_mul, map_inv, hθ, inv_inv, nrm]
   group
 
-theorem polE_translate {u : GL (Fin n) E} (hu : IsTransl u) (d : GL (Fin n) E) :
-    polE (d * u⁻¹) = (nrm d).val.charpoly := by
+theorem polE_translate {u : GL (Fin n) E} (hu : IsTransl u) (d : GL (Fin n) E)
+    : polE (d * u⁻¹) = (nrm d).val.charpoly := by
   rw [polE, norm_translate hu]
 
-theorem map_thetaE (τ : E →+* ℂ) (d : GL (Fin n) E) :
-    GeneralLinearGroup.map τ (thetaE E n d) =
-      thetaR (starRingEnd ℂ) n (GeneralLinearGroup.map τ d) := by
+theorem map_thetaE (τ : E →+* ℂ) (d : GL (Fin n) E)
+    : GeneralLinearGroup.map τ (thetaE E n d)
+      = thetaR (starRingEnd ℂ) n (GeneralLinearGroup.map τ d) := by
   apply Units.ext
   ext i j
-  have hv : ∀ g : GL (Fin n) E, ((GeneralLinearGroup.map τ g : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) = g.val.map τ := fun _ => rfl
+  have hv
+      : ∀ g : GL (Fin n) E,
+        ((GeneralLinearGroup.map τ g : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) = g.val.map τ :=
+    fun _ => rfl
   rw [hv, thetaR_val, thetaR_val, ← map_inv, hv]
   simp only [Matrix.map_apply, Matrix.transpose_apply]
   exact IsCMField.complexEmbedding_complexConj E τ _
 
-theorem charpoly_map_nrm (τ : E →+* ℂ) (d : GL (Fin n) E) :
-    (GeneralLinearGroup.map τ d * thetaR (starRingEnd ℂ) n (GeneralLinearGroup.map τ d)).val.charpoly =
-      (nrm d).val.charpoly.map τ := by
+theorem charpoly_map_nrm (τ : E →+* ℂ) (d : GL (Fin n) E)
+    : (GeneralLinearGroup.map τ d
+        * thetaR (starRingEnd ℂ) n (GeneralLinearGroup.map τ d)).val.charpoly
+      = (nrm d).val.charpoly.map τ := by
   rw [← map_thetaE, ← map_mul, ← Matrix.charpoly_map]
   rfl
 

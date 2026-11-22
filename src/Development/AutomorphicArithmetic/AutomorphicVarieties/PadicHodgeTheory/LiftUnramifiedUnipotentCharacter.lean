@@ -10,19 +10,31 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc UpperTheory.V.Loc
 
-private theorem ul_exp_onto {A : Type} [CommRing A] [Algebra ℚ A] {n : A} (hn : IsNilpotent n) :
-    ∃ x, IsNilpotent x ∧ IsNilpotent.exp x = 1 + n :=
+private theorem ul_exp_onto {A : Type} [CommRing A] [Algebra ℚ A] {n : A} (hn : IsNilpotent n)
+    : ∃ x, IsNilpotent x ∧ IsNilpotent.exp x = 1 + n :=
   _root_.UpperTheory.Reformulated.B.UnipotentExponentialSurjective.ul_exp_onto hn
 
-private theorem t2Space_finite_padic_module {l : ℕ} [Fact l.Prime] {V : Type} [AddCommGroup V] [Module ℚ_[l] V]
-    [Module.Finite ℚ_[l] V] [TopologicalSpace V] [IsModuleTopology ℚ_[l] V] : T2Space V := by
+private theorem t2Space_finite_padic_module
+    {l : ℕ} [Fact l.Prime]
+    {V : Type} [AddCommGroup V] [Module ℚ_[l] V] [Module.Finite ℚ_[l] V] [TopologicalSpace V]
+    [IsModuleTopology ℚ_[l] V]
+    : T2Space V := by
   haveI : IsTopologicalAddGroup V := IsModuleTopology.topologicalAddGroup ℚ_[l] V
   let e0 := (Module.finBasis ℚ_[l] V).equivFun
   exact T2Space.of_injective_continuous e0.injective
     (IsModuleTopology.continuous_of_linearMap e0.toLinearMap)
 
-theorem UpperTheory.lift_unramified_unipotent_character :
-    ∀ {v l : ℕ} [Fact v.Prime] [Fact l.Prime] {B B' : Type} [CommRing B] [CommRing B'] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra ℚ_[l] B'] [Module.Finite ℚ_[l] B'] (p : B →ₐ[ℚ_[l]] B'), Function.Surjective p → (∀ a, p a = 0 → IsNilpotent a) → ∀ u' : GQ v →* B'ˣ, QCont l (fun g => (u' g : B')) → (∀ g ∈ Iq v, u' g = 1) → (∀ g, IsNilpotent ((u' g : B') - 1)) → ∃ u : GQ v →* Bˣ, QCont l (fun g => (u g : B)) ∧ (∀ g ∈ Iq v, u g = 1) ∧ ∀ g, p (u g : B) = (u' g : B') := by
+theorem UpperTheory.lift_unramified_unipotent_character
+    : ∀ {v l : ℕ} [Fact v.Prime] [Fact l.Prime] {B B' : Type} [CommRing B] [CommRing B']
+        [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra ℚ_[l] B'] [Module.Finite ℚ_[l] B']
+        (p : B →ₐ[ℚ_[l]] B'),
+      Function.Surjective p → (∀ a, p a = 0 → IsNilpotent a)
+        → ∀ u' : GQ v →* B'ˣ,
+          QCont l (fun g => (u' g : B')) → (∀ g ∈ Iq v, u' g = 1)
+            → (∀ g, IsNilpotent ((u' g : B') - 1))
+            → ∃ u : GQ v →* Bˣ,
+              QCont l (fun g => (u g : B)) ∧ (∀ g ∈ Iq v, u g = 1)
+                ∧ ∀ g, p (u g : B) = (u' g : B') := by
   intro v l _ _ B B' _ _ _ _ _ _ p hp hker u' hc' hI' hn'
   letI : Algebra ℚ B := ((algebraMap ℚ_[l] B).comp (algebraMap ℚ ℚ_[l])).toAlgebra
   letI : Algebra ℚ B' := ((algebraMap ℚ_[l] B').comp (algebraMap ℚ ℚ_[l])).toAlgebra
@@ -41,20 +53,26 @@ theorem UpperTheory.lift_unramified_unipotent_character :
   have hx : IsNilpotent x := by
     obtain ⟨k, hk⟩ := hx'
     exact (hker (x ^ k) (by rw [map_pow, hk])).of_pow
-  obtain ⟨c, ⟨hc, hcI, hcσ⟩, -⟩ := existsUnique_unramified_cocycle_frobenius_value (l := l) (A := ℚ_[l]) (V := ℚ_[l])
-    (1 : Representation ℚ_[l] (GQ v) ℚ_[l]) continuous_snd (fun _ _ => rfl) σ hσ 1
+  obtain ⟨c, ⟨hc, hcI, hcσ⟩, -⟩ :=
+    existsUnique_unramified_cocycle_frobenius_value (l := l) (A := ℚ_[l]) (V := ℚ_[l])
+      (1 : Representation ℚ_[l] (GQ v) ℚ_[l]) continuous_snd
+      (fun _ _ => rfl)
+      σ hσ 1
   have hadd : ∀ g h, c (g * h) = c g + c h := fun g h => hc.2 g h
   have hcc : Continuous c := hc.1
   have hc1 : c 1 = 0 := hcI 1 (one_mem _)
-  let f : GQ v →* B :=
-    { toFun := fun g => IsNilpotent.exp (c g • x)
-      map_one' := by rw [hc1, zero_smul, IsNilpotent.exp_zero]
-      map_mul' := fun g h => by
-        rw [hadd, add_smul, IsNilpotent.exp_add_of_commute (Commute.all _ _) (hx.smul _) (hx.smul _)] }
+  let f : GQ v →* B := {
+    toFun := fun g => IsNilpotent.exp (c g • x)
+    map_one' := by rw [hc1, zero_smul, IsNilpotent.exp_zero]
+    map_mul' := fun g h => by
+      rw [hadd, add_smul, IsNilpotent.exp_add_of_commute (Commute.all _ _) (hx.smul _) (hx.smul _)]
+  }
   have hf : Continuous f := by
     obtain ⟨k, hk⟩ := hx
-    have : (f : GQ v → B) = fun g => ∑ i ∈ Finset.range k,
-        ((((i.factorial : ℚ)⁻¹ : ℚ) : ℚ_[l]) * c g ^ i) • x ^ i := by
+    have : (f : GQ v → B)
+        = fun g =>
+          ∑ i ∈ Finset.range k,
+            ((((i.factorial : ℚ)⁻¹ : ℚ) : ℚ_[l]) * c g ^ i) • x ^ i := by
       funext g
       change IsNilpotent.exp (c g • x) = _
       rw [IsNilpotent.exp_eq_sum (k := k) (by rw [smul_pow, hk, smul_zero])]

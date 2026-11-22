@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BinaryHermiti
 
 namespace GlobalTheory
 
-theorem hermRepUnram : Formalism.HermitianLattices.Ext.L3.HermRepUnram := GlobalTheory.T.binaryHermitianForm_represents_totallyPositive
+theorem hermRepUnram : Formalism.HermitianLattices.Ext.L3.HermRepUnram :=
+  GlobalTheory.T.binaryHermitianForm_represents_totallyPositive
 
 instance : Fact (Formalism.HermitianLattices.Ext.L3.HermRepUnram) := ⟨hermRepUnram⟩
 

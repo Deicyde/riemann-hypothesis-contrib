@@ -41,11 +41,13 @@ theorem minorProdDegree : MinorProdDegree := minorProdBlockDegree
 theorem termBound : TermBound := TermBound_of e_one_identity e_one_integral
 theorem hhDecomp : HhDecomp := decomposition_of_hh
 theorem entryStar : EntryStar :=
-  EntryStar_of termBound hhDecomp classSubst Formalism.DworkPowerSeriesWeights.jet_pair_linearity starArith hasseDegree
-    minorProdDegree
+  EntryStar_of termBound hhDecomp classSubst Formalism.DworkPowerSeriesWeights.jet_pair_linearity
+    starArith hasseDegree minorProdDegree
 
-theorem entry_a_one : EntryExcessBound := entryExcessBound_of entryStar hitsCapPos entry_a_one_bound chargeLemma
-theorem entry_a_two : EntryCappedBound := entryCappedBound_of entryStar hitsCapPos Formalism.GrowthSums.cappedGainSubLE
+theorem entry_a_one : EntryExcessBound :=
+  entryExcessBound_of entryStar hitsCapPos entry_a_one_bound chargeLemma
+theorem entry_a_two : EntryCappedBound :=
+  entryCappedBound_of entryStar hitsCapPos Formalism.GrowthSums.cappedGainSubLE
 theorem entryB : EntryB := EntryB_of entryStar hitsCapPos hitsColumnsPos bCore
 
 end Formalism.InvariantFactorPaths.G7.Top

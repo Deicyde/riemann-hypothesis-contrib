@@ -17,15 +17,13 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
 local notation3 "L⁺" => maximalRealSubfield L
 
-theorem countable_field : Countable L :=
-  (Module.finBasis ℚ L).equivFun.toEquiv.injective.countable
+theorem countable_field : Countable L := (Module.finBasis ℚ L).equivFun.toEquiv.injective.countable
 
-theorem tmul_mem_ALint (o : 𝓞 L) {a : AFplus L} (ha : ∀ v, a v ∈ v.adicCompletionIntegers L⁺) :
-    ((o : L) ⊗ₜ[L⁺] a : AL L) ∈ ALint L := by
+theorem tmul_mem_ALint (o : 𝓞 L) {a : AFplus L} (ha : ∀ v, a v ∈ v.adicCompletionIntegers L⁺)
+    : ((o : L) ⊗ₜ[L⁺] a : AL L) ∈ ALint L := by
   have h1 : ((o : L) ⊗ₜ[L⁺] (1 : AFplus L) : AL L) ∈ ALint L :=
     Subring.subset_closure (Or.inl ⟨o, rfl⟩)
-  have h2 : ((1 : L) ⊗ₜ[L⁺] a : AL L) ∈ ALint L :=
-    Subring.subset_closure (Or.inr ⟨a, ha, rfl⟩)
+  have h2 : ((1 : L) ⊗ₜ[L⁺] a : AL L) ∈ ALint L := Subring.subset_closure (Or.inr ⟨a, ha, rfl⟩)
   have := Subring.mul_mem _ h1 h2
   rwa [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul] at this
 
@@ -37,8 +35,8 @@ theorem exists_nat_smul_int (e : L) : ∃ D : ℕ, 0 < D ∧ ∃ o : 𝓞 L, (o 
     exact (h e (Finset.mem_singleton_self e)).smul y
   exact ⟨⟨_, hi⟩, rfl⟩
 
-theorem exists_approx (M : ℕ) (hM : 0 < M) (x : AL L) :
-    ∃ c : L, ∃ y ∈ ALint L, x = c ⊗ₜ[L⁺] (1 : AFplus L) + M • y := by
+theorem exists_approx (M : ℕ) (hM : 0 < M) (x : AL L)
+    : ∃ c : L, ∃ y ∈ ALint L, x = c ⊗ₜ[L⁺] (1 : AFplus L) + M • y := by
   induction x using TensorProduct.inductionOn with
   | add x x' hx hx' =>
     obtain ⟨c, y, hy, rfl⟩ := hx
@@ -64,8 +62,8 @@ theorem exists_denom (x : AL L) : ∃ m : ℕ, 0 < m ∧ (m : AL L) * x ∈ ALin
 
 variable {n : ℕ}
 
-theorem exists_denom_matrix (G : Matrix (Fin n) (Fin n) (AL L)) :
-    ∃ m : ℕ, 0 < m ∧ ∀ i j, (m : AL L) * G i j ∈ ALint L := by
+theorem exists_denom_matrix (G : Matrix (Fin n) (Fin n) (AL L))
+    : ∃ m : ℕ, 0 < m ∧ ∀ i j, (m : AL L) * G i j ∈ ALint L := by
   classical
   choose m hm h using fun p : Fin n × Fin n => exists_denom (G p.1 p.2)
   refine ⟨∏ p, m p, Finset.prod_pos fun p _ => hm p, fun i j => ?_⟩
@@ -73,30 +71,32 @@ theorem exists_denom_matrix (G : Matrix (Fin n) (Fin n) (AL L)) :
   rw [hk, Nat.cast_mul, mul_comm ((m (i, j) : ℕ) : AL L), mul_assoc]
   exact Subring.mul_mem _ (natCast_mem _ _) (h (i, j))
 
-theorem exists_code (N : ℕ) (hN : 0 < N) (g : GAf L n) :
-    ∃ p : ℕ × (Fin n → Fin n → L), 0 < p.1 ∧
-      (∀ i j, (p.1 : AL L) * (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j ∈ ALint L) ∧
-      ∀ i j, ∃ y ∈ ALint L, (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j =
-        p.2 i j ⊗ₜ[L⁺] (1 : AFplus L) + (p.1 * N) • y := by
+theorem exists_code (N : ℕ) (hN : 0 < N) (g : GAf L n)
+    : ∃ p : ℕ × (Fin n → Fin n → L),
+      0 < p.1 ∧ (∀ i j, (p.1 : AL L) * (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j ∈ ALint L)
+        ∧ ∀ i j, ∃ y ∈ ALint L,
+          (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j
+            = p.2 i j ⊗ₜ[L⁺] (1 : AFplus L) + (p.1 * N) • y := by
   obtain ⟨m, hm, h⟩ := exists_denom_matrix (g.1 : Matrix (Fin n) (Fin n) (AL L))
   choose c y hy e using fun i j =>
     exists_approx (m * N) (Nat.mul_pos hm hN) ((g.1 : Matrix (Fin n) (Fin n) (AL L)) i j)
   exact ⟨(m, c), hm, h, fun i j => ⟨y i j, hy i j, e i j⟩⟩
 
-theorem inv_val (g : GAf L n) :
-    (((g⁻¹ : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) =
-      conjT (conjAL L) (g.1 : Matrix (Fin n) (Fin n) (AL L)) := by
+theorem inv_val (g : GAf L n)
+    : (((g⁻¹ : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L))
+      = conjT (conjAL L) (g.1 : Matrix (Fin n) (Fin n) (AL L)) := by
   have hm := g.2
   simp only [GA, UGroup, Subgroup.mem_mk] at hm
   exact Units.inv_eq_of_mul_eq_one_right hm
 
-theorem cong_of_code {N m : ℕ} {c : Fin n → Fin n → L} {g g' : GAf L n}
+theorem cong_of_code
+    {N m : ℕ} {c : Fin n → Fin n → L} {g g' : GAf L n}
     (hg : ∀ i j, (m : AL L) * (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j ∈ ALint L)
-    (e : ∀ i j, ∃ y ∈ ALint L, (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j =
-      c i j ⊗ₜ[L⁺] (1 : AFplus L) + (m * N) • y)
-    (e' : ∀ i j, ∃ y ∈ ALint L, (g'.1 : Matrix (Fin n) (Fin n) (AL L)) i j =
-      c i j ⊗ₜ[L⁺] (1 : AFplus L) + (m * N) • y) :
-    Cong L n N (g⁻¹ * g') := by
+    (e : ∀ i j, ∃ y ∈ ALint L,
+      (g.1 : Matrix (Fin n) (Fin n) (AL L)) i j = c i j ⊗ₜ[L⁺] (1 : AFplus L) + (m * N) • y)
+    (e' : ∀ i j, ∃ y ∈ ALint L,
+      (g'.1 : Matrix (Fin n) (Fin n) (AL L)) i j = c i j ⊗ₜ[L⁺] (1 : AFplus L) + (m * N) • y)
+    : Cong L n N (g⁻¹ * g') := by
   choose y hy ey using e
   choose y' hy' ey' using e'
   set A : Matrix (Fin n) (Fin n) (AL L) := (((g⁻¹ : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) with hAdef
@@ -108,15 +108,17 @@ theorem cong_of_code {N m : ℕ} {c : Fin n → Fin n → L} {g g' : GAf L n}
     rwa [map_mul, map_natCast] at this
   have hAG : A * (g.1 : Matrix (Fin n) (Fin n) (AL L)) = 1 := Units.inv_mul g.1
   set Y : Matrix (Fin n) (Fin n) (AL L) := Matrix.of fun i j => y' i j - y i j
-  have hG' : (g'.1 : Matrix (Fin n) (Fin n) (AL L)) =
-      (g.1 : Matrix (Fin n) (Fin n) (AL L)) + (N : AL L) • ((m : AL L) • Y) := by
+  have hG'
+      : (g'.1 : Matrix (Fin n) (Fin n) (AL L))
+        = (g.1 : Matrix (Fin n) (Fin n) (AL L)) + (N : AL L) • ((m : AL L) • Y) := by
     ext i j
     simp only [Matrix.add_apply, Matrix.smul_apply, Y, Matrix.of_apply, smul_eq_mul, ey, ey',
       nsmul_eq_mul]
     push_cast
     ring
-  have hk : (((g⁻¹ * g' : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) =
-      1 + (N : AL L) • (((m : AL L) • A) * Y) := by
+  have hk
+      : (((g⁻¹ * g' : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L))
+        = 1 + (N : AL L) • (((m : AL L) • A) * Y) := by
     change A * (g'.1 : Matrix (Fin n) (Fin n) (AL L)) = _
     rw [hG', Matrix.mul_add, hAG, Matrix.mul_smul, Matrix.mul_smul, Matrix.smul_mul]
   have hz : ∀ i j, (((m : AL L) • A) * Y) i j ∈ ALint L := by
@@ -139,9 +141,9 @@ theorem rt_mul (h h' : GAf L n) (f : GAf L n → ℂ) : rt L n (h * h') f = rt L
   funext x
   simp [rt, mul_assoc]
 
-theorem countable_range_rt {f : GAf L n → ℂ} {N : ℕ} (hN : 0 < N)
-    (hf : ∀ κ, Cong L n N κ → rt L n κ f = f) :
-    (Set.range fun h : GAf L n => rt L n h f).Countable := by
+theorem countable_range_rt
+    {f : GAf L n → ℂ} {N : ℕ} (hN : 0 < N) (hf : ∀ κ, Cong L n N κ → rt L n κ f = f)
+    : (Set.range fun h : GAf L n => rt L n h f).Countable := by
   classical
   haveI := countable_field (L := L)
   choose p _ hp2 hp3 using exists_code (L := L) (n := n) N hN
@@ -154,9 +156,10 @@ theorem countable_range_rt {f : GAf L n → ℂ} {N : ℕ} (hN : 0 < N)
     have e := hq.choose_spec
     have h3 := hp3 hq.choose
     rw [e] at h3
-    have hc : Cong L n N (g⁻¹ * hq.choose) :=
-      cong_of_code (c := (p g).2) (hp2 g) (hp3 g) h3
-    calc rt L n g f = rt L n g (rt L n (g⁻¹ * hq.choose) f) := by rw [hf _ hc]
+    have hc : Cong L n N (g⁻¹ * hq.choose) := cong_of_code (c := (p g).2) (hp2 g) (hp3 g) h3
+    calc
+      rt L n g f
+        = rt L n g (rt L n (g⁻¹ * hq.choose) f) := by rw [hf _ hc]
       _ = rt L n hq.choose f := by rw [← rt_mul, mul_inv_cancel_left]
   refine (Set.countable_range Ψ).mono ?_
   rintro _ ⟨g, rfl⟩
@@ -166,10 +169,10 @@ end GlobalTheory.FinTypCount
 
 namespace GlobalTheory
 
-
 open GlobalTheory.FinTypCount in
-theorem FinTyp.rank_le_aleph0 : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
-    (π : Formalism.L2.NG.FinTyp L n), Module.rank ℂ π.S ≤ Cardinal.aleph0 := by
+theorem FinTyp.rank_le_aleph0
+    : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} (π : Formalism.L2.NG.FinTyp L n),
+      Module.rank ℂ π.S ≤ Cardinal.aleph0 := by
   intro L _ _ _ n π
   obtain ⟨f, hfS, hf0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot π.ne
   obtain ⟨N, hN, hfix⟩ := π.smooth f hfS

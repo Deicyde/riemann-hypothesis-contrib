@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RelativeLatti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions Formalism.L2.Th1.H GlobalTheory.ThetaMove GlobalTheory.IndefiniteRowSideFullHecke.IndexExponentDegree
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions Formalism.L2.Th1.H
+  GlobalTheory.ThetaMove GlobalTheory.IndefiniteRowSideFullHecke.IndexExponentDegree
 
 namespace GlobalTheory.IdxDet
 
@@ -31,19 +33,24 @@ theorem intAt_iff_mem (w : HeightOneSpectrum (𝓞 E)) (a : E) : IntAt w a ↔ a
 theorem val_le_one (P : HeightOneSpectrum (𝓞 E)) (a : locRing P) : P.valuation E (a : E) ≤ 1 :=
   GlobalTheory.CharValCompare.intAt_iff.1 ((intAt_iff_mem P _).2 a.2)
 
-theorem val_unit (P : HeightOneSpectrum (𝓞 E)) (u : (locRing P)ˣ) :
-    P.valuation E ((u : locRing P) : E) = 1 := by
-  have h : P.valuation E ((u : locRing P) : E) * P.valuation E (((u⁻¹ : (locRing P)ˣ) : locRing P) : E) = 1 := by
+theorem val_unit (P : HeightOneSpectrum (𝓞 E)) (u : (locRing P)ˣ)
+    : P.valuation E ((u : locRing P) : E) = 1 := by
+  have h
+      : P.valuation E ((u : locRing P) : E) * P.valuation E (((u⁻¹ : (locRing P)ˣ) : locRing P) : E)
+        = 1 := by
     rw [← map_mul, ← Subalgebra.coe_mul, Units.mul_inv, Subalgebra.coe_one, map_one]
   refine le_antisymm (val_le_one P _) ?_
   rw [← h]
   exact mul_le_of_le_one_right' (val_le_one P _)
 
-theorem val_irreducible (P : HeightOneSpectrum (𝓞 E)) [IsDiscreteValuationRing (locRing P)]
-    {p : locRing P} (hp : Irreducible p) : P.valuation E (p : E) = WithZero.exp (-1 : ℤ) := by
+theorem val_irreducible
+    (P : HeightOneSpectrum (𝓞 E)) [IsDiscreteValuationRing (locRing P)]
+    {p : locRing P} (hp : Irreducible p)
+    : P.valuation E (p : E) = WithZero.exp (-1 : ℤ) := by
   obtain ⟨π, hπ⟩ := P.valuation_exists_uniformizer E
   have hπ1 : π ∈ locRing P := by
-    rw [← intAt_iff_mem, GlobalTheory.CharValCompare.intAt_iff, hπ, ← WithZero.exp_zero, WithZero.exp_le_exp]
+    rw [← intAt_iff_mem, GlobalTheory.CharValCompare.intAt_iff, hπ, ← WithZero.exp_zero,
+      WithZero.exp_le_exp]
     norm_num
   have hπ0 : (⟨π, hπ1⟩ : locRing P) ≠ 0 := by
     intro h
@@ -51,8 +58,7 @@ theorem val_irreducible (P : HeightOneSpectrum (𝓞 E)) [IsDiscreteValuationRin
     rw [this, map_zero] at hπ
     exact WithZero.exp_ne_zero hπ.symm
   obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.associated_pow_irreducible hπ0 hp
-  have h1 : π * ((u : locRing P) : E) = (p : E) ^ k := by
-    simpa using congrArg Subtype.val hu
+  have h1 : π * ((u : locRing P) : E) = (p : E) ^ k := by simpa using congrArg Subtype.val hu
   have h2 := congrArg (P.valuation E) h1
   rw [map_mul, val_unit, mul_one, hπ, map_pow] at h2
   have hp0 : P.valuation E (p : E) ≠ 0 := by
@@ -69,7 +75,12 @@ theorem val_irreducible (P : HeightOneSpectrum (𝓞 E)) [IsDiscreteValuationRin
   · omega
   · exact h
 
-theorem relIndex_mulVec : ∀ (E : Type) [Field E] [NumberField E] (ι : Type) [Fintype ι] [DecidableEq ι] (P : HeightOneSpectrum (𝓞 E)) (M : Matrix ι ι E) (L₀ L₁ : AddSubgroup (ι → E)), M.det ≠ 0 → (∀ x, x ∈ L₀ ↔ ∀ i, IntAt P (x i)) → (∀ x, x ∈ L₁ ↔ ∃ y ∈ L₀, x = M.mulVec y) → L₁ ≤ L₀ → ((L₁.relIndex L₀ : ℕ) : ℚ) = ((Ideal.absNorm P.asIdeal : ℕ) : ℚ) ^ ordE P M.det := by
+theorem relIndex_mulVec
+    : ∀ (E : Type) [Field E] [NumberField E] (ι : Type) [Fintype ι] [DecidableEq ι]
+        (P : HeightOneSpectrum (𝓞 E)) (M : Matrix ι ι E) (L₀ L₁ : AddSubgroup (ι → E)),
+      M.det ≠ 0 → (∀ x, x ∈ L₀ ↔ ∀ i, IntAt P (x i)) → (∀ x, x ∈ L₁ ↔ ∃ y ∈ L₀, x = M.mulVec y)
+        → L₁ ≤ L₀
+        → ((L₁.relIndex L₀ : ℕ) : ℚ) = ((Ideal.absNorm P.asIdeal : ℕ) : ℚ) ^ ordE P M.det := by
   intro E _ _ ι _ _ P M L₀ L₁ hdet h0 h1 hle
   haveI := P.isPrime
   haveI := P.isMaximal
@@ -89,8 +100,7 @@ theorem relIndex_mulVec : ∀ (E : Type) [Field E] [NumberField E] (ι : Type) [
     rw [intAt_iff_mem] at this
     simpa using this
   let N : Matrix ι ι (locRing P) := Matrix.of fun i j => ⟨_, hent i j⟩
-  have hN : N.map (algebraMap (locRing P) E) = M := by
-    ext i j; rfl
+  have hN : N.map (algebraMap (locRing P) E) = M := by ext i j; rfl
   have hNd : ((N.det : locRing P) : E) = M.det := by
     rw [← hN]
     exact RingHom.map_det (algebraMap (locRing P) E) N
@@ -114,11 +124,13 @@ theorem relIndex_mulVec : ∀ (E : Type) [Field E] [NumberField E] (ι : Type) [
     simp
   have hq : Nat.card (locRing P ⧸ Ideal.span {p}) = Ideal.absNorm P.asIdeal := by
     rw [← hp.maximalIdeal_eq, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-    exact (Nat.card_congr (IsLocalization.AtPrime.equivQuotMaximalIdeal P.asIdeal (locRing P)).toEquiv).symm
-  let e : (ι → locRing P) →+ (ι → E) :=
-    { toFun := fun x i => (x i : E)
-      map_zero' := rfl
-      map_add' := fun x y => rfl }
+    exact (Nat.card_congr (IsLocalization.AtPrime.equivQuotMaximalIdeal P.asIdeal
+      (locRing P)).toEquiv).symm
+  let e : (ι → locRing P) →+ (ι → E) := {
+    toFun := fun x i => (x i : E)
+    map_zero' := rfl
+    map_add' := fun x y => rfl
+  }
   have hei : Function.Injective e := by
     intro x y hxy
     funext i
@@ -145,7 +157,8 @@ theorem relIndex_mulVec : ∀ (E : Type) [Field E] [NumberField E] (ι : Type) [
     · rintro ⟨_, ⟨y, rfl⟩, rfl⟩
       exact ⟨_, ⟨y, trivial, rfl⟩, (hcomm y).symm⟩
   have : L₁.relIndex L₀ = Ideal.absNorm P.asIdeal ^ m := by
-    rw [hW1, hW0, AddSubgroup.relIndex_map_map_of_injective _ _ hei, AddSubgroup.relIndex_top_right, ← hq]
+    rw [hW1, hW0, AddSubgroup.relIndex_map_map_of_injective _ _ hei, AddSubgroup.relIndex_top_right,
+      ← hq]
     exact hc
   rw [this, hord, zpow_natCast, Nat.cast_pow]
 

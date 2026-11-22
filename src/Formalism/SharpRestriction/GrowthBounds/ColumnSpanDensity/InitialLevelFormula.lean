@@ -10,21 +10,26 @@ namespace Formalism.MainNotions.flipOneThree.Pf
 
 open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
 
-
 open Classical in
 def RestOddTops : Prop :=
-  ∀ (n' : ℕ) (TT : Finset (Fin n')), 2 ≤ numSeg TT → ∀ f : Fin n' → Fin n' → ℕ → ℝ,
-    ∑ j : Fin (numSeg TT), ∑ i : Fin (segS TT j), f (segPos TT j i) (segStart TT j) ((segDists TT j).get i) =
-      ∑ y ∈ TT.filter (fun y => ¬ IsTypeV y), f y (yPrev TT y) (dPrev TT y)
+  ∀ (n' : ℕ) (TT : Finset (Fin n')),
+    2 ≤ numSeg TT
+      → ∀ f : Fin n' → Fin n' → ℕ → ℝ,
+        ∑ j : Fin (numSeg TT), ∑ i : Fin (segS TT j), f (segPos TT j i) (segStart TT j) ((segDists TT j).get i)
+          = ∑ y ∈ TT.filter (fun y => ¬ IsTypeV y), f y (yPrev TT y) (dPrev TT y)
 
-theorem tle_abs (Ct C N N1 p k Q L ar a' b' La La' ccl cS n' S S' : ℝ) (hCt : 0 < Ct) (hC : 4 * Ct + 4 ≤ C)
+theorem tle_abs
+    (Ct C N N1 p k Q L ar a' b' La La' ccl cS n' S S' : ℝ) (hCt : 0 < Ct) (hC : 4 * Ct + 4 ≤ C)
     (hN : 1 ≤ N) (hN1 : 1 ≤ N1) (hp : 0 < p) (hk : 1 ≤ k) (hQ : 1 ≤ Q) (hL : 0 ≤ L) (har : 0 ≤ ar)
-    (ha0 : 0 ≤ a') (ha : a' ≤ 2 * ar) (hb : 0 < b') (hLa : 0 ≤ La) (hLa0 : 0 ≤ La') (hLa' : La' ≤ 2 * La)
-    (hccl : 0 ≤ ccl) (hcS : 0 ≤ cS) (hn' : 0 ≤ n') (hS : S' ≤ S + N * ccl) :
-    (S' + Ct * N * (a' / p ^ 2 + b' / p + La' * a' / (p * k) + La' * b' / k + k * Q +
-        Q * (cS + 2 * N * ccl + 2 * n' * ccl))) + N * (La' * b' / k) + 1 + 2 * n' * ccl ≤
-      S + C * N * N1 * (ar / p ^ 2 + b' / p + La * ar / (p * k) + La * b' / k) +
-        C * N * (Q * (cS + C * N * k * L + 4 * N * ccl + 2 * n' * ccl) + k * Q + k * L + ccl) + 2 * n' * ccl := by
+    (ha0 : 0 ≤ a') (ha : a' ≤ 2 * ar) (hb : 0 < b') (hLa : 0 ≤ La) (hLa0 : 0 ≤ La')
+    (hLa' : La' ≤ 2 * La) (hccl : 0 ≤ ccl) (hcS : 0 ≤ cS) (hn' : 0 ≤ n') (hS : S' ≤ S + N * ccl)
+    : (S' + Ct * N
+          * (a' / p ^ 2 + b' / p + La' * a' / (p * k) + La' * b' / k + k * Q
+            + Q * (cS + 2 * N * ccl + 2 * n' * ccl)))
+        + N * (La' * b' / k) + 1 + 2 * n' * ccl
+      ≤ S + C * N * N1 * (ar / p ^ 2 + b' / p + La * ar / (p * k) + La * b' / k)
+        + C * N * (Q * (cS + C * N * k * L + 4 * N * ccl + 2 * n' * ccl) + k * Q + k * L + ccl)
+        + 2 * n' * ccl := by
   have hN0 : 0 ≤ N := by linarith
   have hk0 : 0 < k := by linarith
   have hQ0 : 0 ≤ Q := by linarith
@@ -67,15 +72,18 @@ theorem tle_abs (Ct C N N1 p k Q L ar a' b' La La' ccl cS n' S S' : ℝ) (hCt : 
     have := one_le_mul_of_one_le_of_one_le hN hk
     exact one_le_mul_of_one_le_of_one_le this hQ
   have t5 : Ct * N * (k * Q) + 1 ≤ C * N * (k * Q) := by
-    have h2 := mul_le_mul_of_nonneg_right (by linarith : (4 : ℝ) ≤ C - Ct) (by linarith : (0 : ℝ) ≤ N * k * Q)
+    have h2 :=
+      mul_le_mul_of_nonneg_right (by linarith : (4 : ℝ) ≤ C - Ct)
+        (by linarith : (0 : ℝ) ≤ N * k * Q)
     nlinarith
   have hX0 : 0 ≤ cS + 2 * N * ccl + 2 * n' * ccl := by positivity
   have hXY : cS + 2 * N * ccl + 2 * n' * ccl ≤ cS + C * N * k * L + 4 * N * ccl + 2 * n' * ccl := by
     have : 0 ≤ C * N * k * L := by positivity
     have : 0 ≤ N * ccl := by positivity
     linarith
-  have t6 : Ct * N * (Q * (cS + 2 * N * ccl + 2 * n' * ccl)) ≤
-      C * N * (Q * (cS + C * N * k * L + 4 * N * ccl + 2 * n' * ccl)) := by
+  have t6
+      : Ct * N * (Q * (cS + 2 * N * ccl + 2 * n' * ccl))
+        ≤ C * N * (Q * (cS + C * N * k * L + 4 * N * ccl + 2 * n' * ccl)) := by
     apply mul_le_mul (mul_le_mul_of_nonneg_right (by linarith) hN0)
       (mul_le_mul_of_nonneg_left hXY hQ0) (mul_nonneg hQ0 hX0) (mul_nonneg hC0 hN0)
   have t7 : N * ccl ≤ C * N * (k * L + ccl) := by
@@ -84,13 +92,15 @@ theorem tle_abs (Ct C N N1 p k Q L ar a' b' La La' ccl cS n' S S' : ℝ) (hCt : 
     linarith
   linarith [t1, t2, t3, t4, t5, t6, t7]
 
-theorem initial_level_formula (K : Cst) (X : Dat) (A B : X.TT → ℕ) :
-    X.t0 K A B = (∑ j : Fin (numSeg X.TT), ∑ i : Fin (segS X.TT j),
-        min ((ex B (segPos X.TT j i) : ℕ) : ℝ)
-          (((ex A (segStart X.TT j) : ℕ) : ℝ) / (X.p : ℝ) ^ ((segDists X.TT j).get i))) +
-      K.Ct * X.N * ((X.a : ℝ) / (X.p : ℝ) ^ 2 + X.b' / X.p + LaI K.C₀ X.N₁ X.a * X.a / (X.p * X.k) +
-        LaI K.C₀ X.N₁ X.a * X.b' / X.k + X.k * (X.p : ℝ) ^ X.G' +
-        (X.p : ℝ) ^ X.G' * ((X.cStar : ℝ) + 2 * X.N * X.ccl + 2 * X.n' * X.ccl)) := by
+theorem initial_level_formula (K : Cst) (X : Dat) (A B : X.TT → ℕ)
+    : X.t0 K A B
+      = (∑ j : Fin (numSeg X.TT), ∑ i : Fin (segS X.TT j),
+          min ((ex B (segPos X.TT j i) : ℕ) : ℝ)
+            (((ex A (segStart X.TT j) : ℕ) : ℝ) / (X.p : ℝ) ^ ((segDists X.TT j).get i)))
+        + K.Ct * X.N
+          * ((X.a : ℝ) / (X.p : ℝ) ^ 2 + X.b' / X.p + LaI K.C₀ X.N₁ X.a * X.a / (X.p * X.k)
+            + LaI K.C₀ X.N₁ X.a * X.b' / X.k + X.k * (X.p : ℝ) ^ X.G'
+            + (X.p : ℝ) ^ X.G' * ((X.cStar : ℝ) + 2 * X.N * X.ccl + 2 * X.n' * X.ccl)) := by
   unfold Dat.t0 t0I t0G4 Dat.c4 Dat.N Dat.k
   push_cast
   ring

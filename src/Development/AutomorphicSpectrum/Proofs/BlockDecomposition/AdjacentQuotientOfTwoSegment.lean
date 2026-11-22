@@ -14,15 +14,18 @@ public import CompanionTheory.AutomorphicTheory.HeckeStandardModules.EqZeroOfCom
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.ProdReorder
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.SplitWeil
+  GlobalTheory.ProdReorder
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.AdjQuot
 
 section Linear
 
-theorem nontrivial_piTensorProduct {ι : Type} [Fintype ι] {X : ι → Type} [∀ a, AddCommGroup (X a)]
-    [∀ a, Module ℂ (X a)] [∀ a, Nontrivial (X a)] : Nontrivial (PiTensorProduct ℂ X) := by
+theorem nontrivial_piTensorProduct
+    {ι : Type} [Fintype ι]
+    {X : ι → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)] [∀ a, Nontrivial (X a)]
+    : Nontrivial (PiTensorProduct ℂ X) := by
   classical
   choose v hv using fun a => exists_ne (0 : X a)
   have hex : ∀ a, ∃ φ : Module.Dual ℂ (X a), φ (v a) ≠ 0 := fun a => by
@@ -43,34 +46,36 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 
 section Induction
 
-variable {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
-  [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n] {W W' : Type} [AddCommGroup W] [Module ℂ W]
-  [AddCommGroup W'] [Module ℂ W']
+variable
+  {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+  [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
+  {W W' : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
-theorem nontrivial_indSp (e : (Σ a, m a) ≃ n) {ρ : Representation ℂ (Levi k m) W} (hρ : IsSmooth ρ)
-    [Nontrivial W] : Nontrivial (IndSp e ρ) := by
+theorem nontrivial_indSp
+    (e : (Σ a, m a) ≃ n) {ρ : Representation ℂ (Levi k m) W} (hρ : IsSmooth ρ) [Nontrivial W]
+    : Nontrivial (IndSp e ρ) := by
   obtain ⟨u, hu⟩ := exists_ne (0 : W)
   obtain ⟨f, hf, -⟩ := GlobalTheory.SmGL.ProdIrr.exists_indSp_apply_one e ρ hρ u
   exact ⟨f, 0, fun h => hu (by rw [← hf, h]; rfl)⟩
 
 end Induction
 
-theorem nontrivial_prodIrr {h N : ℕ} (x : Fin h → IrrGL (k := k)) (hd : ∑ a, (x a).1 = N) :
-    Nontrivial (IndSp (stdBlocks (fun a => (x a).1) hd) (piTensor fun a => (x a).rep)) := by
+theorem nontrivial_prodIrr {h N : ℕ} (x : Fin h → IrrGL (k := k)) (hd : ∑ a, (x a).1 = N)
+    : Nontrivial (IndSp (stdBlocks (fun a => (x a).1) hd) (piTensor fun a => (x a).rep)) := by
   haveI : ∀ a, Nontrivial (x a).2.rep.V := fun a => GlobalTheory.SmGL.Model.nontrivial_of_isIrreducible (x a).2.rep.irr
   haveI := nontrivial_piTensorProduct (X := fun a => (x a).2.rep.V)
   exact nontrivial_indSp _ (isSmooth_piTensor fun a => (x a).2.rep.smooth)
 
 section Two
 
-variable {V U W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup U] [Module ℂ U] [AddCommGroup W] [Module ℂ W]
+variable
+  {V U W : Type}
+  [AddCommGroup V] [Module ℂ V] [AddCommGroup U] [Module ℂ U] [AddCommGroup W] [Module ℂ W]
   {r t N : ℕ}
 
 end Two
 
 section Concat
-
-
 
 end Concat
 

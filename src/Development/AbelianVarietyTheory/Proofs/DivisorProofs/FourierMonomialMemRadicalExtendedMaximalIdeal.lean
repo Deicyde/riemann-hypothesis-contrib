@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RangeAlge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -23,22 +26,27 @@ variable {s : ℕ} {W : Matrix (Fin s) (Fin s) ℤ} {X : Type} [AddCommGroup X]
 def polW (W : Matrix (Fin s) (Fin s) ℤ) (β : LinearMap.BilinForm ℤ X) (x y : Fin s → X) : ℤ :=
   ∑ u, ∑ v, W u v * (β (x u) (y v) + β (y u) (x v))
 
-theorem qW_smul_add (β : LinearMap.BilinForm ℤ X) (a : ℤ) (x y : Fin s → X) :
-    qW W β (a • x + y) = a ^ 2 * qW W β x + a * polW W β x y + qW W β y := by
-  simp only [qW, polW, Pi.add_apply, Pi.smul_apply, map_add (f := _), map_zsmul, LinearMap.add_apply,
-    LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+theorem qW_smul_add (β : LinearMap.BilinForm ℤ X) (a : ℤ) (x y : Fin s → X)
+    : qW W β (a • x + y) = a ^ 2 * qW W β x + a * polW W β x y + qW W β y := by
+  simp only [qW, polW, Pi.add_apply, Pi.smul_apply, map_add (f := _), map_zsmul,
+    LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum,
+    ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun v _ => ?_
   ring
 
-theorem qW_smul (β : LinearMap.BilinForm ℤ X) (a : ℤ) (x : Fin s → X) :
-    qW W β (a • x) = a ^ 2 * qW W β x := by
+theorem qW_smul (β : LinearMap.BilinForm ℤ X) (a : ℤ) (x : Fin s → X)
+    : qW W β (a • x) = a ^ 2 * qW W β x := by
   have h := qW_smul_add (W := W) β a x 0
   rw [add_zero] at h
   rw [h]
   simp [qW, polW]
 
-theorem polW_eq_zero (hW : PosW W) {β : LinearMap.BilinForm ℤ X} (hs : ∀ a b, β a b = β b a)
-    (hβ : ∀ y, 0 ≤ β y y) {x : Fin s → X} (hx : qW W β x = 0) (y : Fin s → X) : polW W β x y = 0 := by
+theorem polW_eq_zero
+    (hW : PosW W)
+    {β : LinearMap.BilinForm ℤ X} (hs : ∀ a b, β a b = β b a) (hβ : ∀ y, 0 ≤ β y y)
+    {x : Fin s → X} (hx : qW W β x = 0)
+    (y : Fin s → X)
+    : polW W β x y = 0 := by
   have h : ∀ a : ℤ, 0 ≤ a * polW W β x y + qW W β y := fun a => by
     have := qW_nonneg hW hs hβ (a • x + y)
     rw [qW_smul_add, hx, mul_zero, zero_add] at this
@@ -49,17 +57,21 @@ theorem polW_eq_zero (hW : PosW W) {β : LinearMap.BilinForm ℤ X} (hs : ∀ a 
   · exact hp
   · have := h (-(qW W β y + 1)); nlinarith
 
-theorem qW_add_eq_zero (hW : PosW W) {β : LinearMap.BilinForm ℤ X} (hs : ∀ a b, β a b = β b a)
-    (hβ : ∀ y, 0 ≤ β y y) {x y : Fin s → X} (hx : qW W β x = 0) (hy : qW W β y = 0) :
-    qW W β (x + y) = 0 := by
+theorem qW_add_eq_zero
+    (hW : PosW W)
+    {β : LinearMap.BilinForm ℤ X} (hs : ∀ a b, β a b = β b a) (hβ : ∀ y, 0 ≤ β y y)
+    {x y : Fin s → X} (hx : qW W β x = 0) (hy : qW W β y = 0)
+    : qW W β (x + y) = 0 := by
   have := qW_smul_add (W := W) β 1 x y
   rw [one_smul] at this
   rw [this, hx, hy, polW_eq_zero hW hs hβ hx]
   ring
 
-def nullSub (hW : PosW W) {m : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X)
-    (hs : ∀ k a b, δ k a b = δ k b a) (hn : ∀ k y, 0 ≤ δ k y y) (I : Fin m → Prop) :
-    AddSubgroup (Fin s → X) where
+def nullSub
+    (hW : PosW W)
+    {m : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X) (hs : ∀ k a b, δ k a b = δ k b a)
+    (hn : ∀ k y, 0 ≤ δ k y y) (I : Fin m → Prop)
+    : AddSubgroup (Fin s → X) where
   carrier := {mu | ∀ k, I k → qW W (δ k) mu = 0}
   add_mem' := fun ha hb k hk => qW_add_eq_zero hW (hs k) (hn k) (ha k hk) (hb k hk)
   zero_mem' := fun k _ => by simp [qW]
@@ -67,9 +79,12 @@ def nullSub (hW : PosW W) {m : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X)
     show qW W (δ k) (-x) = 0
     rw [← neg_one_smul ℤ x, qW_smul, ha k hk, mul_zero]
 
-theorem exists_qW_pos (hW : PosW W) {m : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X)
-    (hs : ∀ k a b, δ k a b = δ k b a) (hn : ∀ k y, 0 ≤ δ k y y) (hp : ∀ x, x ≠ 0 → ∃ k, 0 < δ k x x)
-    {mu : Fin s → X} (hmu : mu ≠ 0) : ∃ k, 0 < qW W (δ k) mu := by
+theorem exists_qW_pos
+    (hW : PosW W)
+    {m : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X) (hs : ∀ k a b, δ k a b = δ k b a)
+    (hn : ∀ k y, 0 ≤ δ k y y) (hp : ∀ x, x ≠ 0 → ∃ k, 0 < δ k x x)
+    {mu : Fin s → X} (hmu : mu ≠ 0)
+    : ∃ k, 0 < qW W (δ k) mu := by
   obtain ⟨u, hu⟩ : ∃ u, mu u ≠ 0 := by
     by_contra h
     push_neg at h
@@ -85,9 +100,11 @@ theorem exists_qW_pos (hW : PosW W) {m : ℕ} (δ : Fin m → LinearMap.BilinFor
     exact_mod_cast hk.trans_le h1
   exact_mod_cast h3.trans_le h2
 
-theorem mono_mem {V : Type} [CommRing V] {m : ℕ} (t : Fin m → V) (δ : Fin m → LinearMap.BilinForm ℤ X)
-    (mu : Fin s → X) (P : Ideal V) (k : Fin m) (hk : t k ∈ P) (hq : 0 < qW W (δ k) mu) :
-    mono W t δ mu ∈ P := by
+theorem mono_mem
+    {V : Type} [CommRing V]
+    {m : ℕ} (t : Fin m → V) (δ : Fin m → LinearMap.BilinForm ℤ X)
+    (mu : Fin s → X) (P : Ideal V) (k : Fin m) (hk : t k ∈ P) (hq : 0 < qW W (δ k) mu)
+    : mono W t δ mu ∈ P := by
   unfold mono
   refine Ideal.mem_of_dvd _ (Finset.dvd_prod_of_mem _ (Finset.mem_univ k)) ?_
   exact Ideal.pow_mem_of_mem _ hk _ (by omega)
@@ -100,16 +117,18 @@ open IsDiscreteValuationRing
 
 variable {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 
-theorem addVal_prod {J : Type*} (S : Finset J) (f : J → R) :
-    addVal R (∏ i ∈ S, f i) = ∑ i ∈ S, addVal R (f i) := by
+theorem addVal_prod {J : Type*} (S : Finset J) (f : J → R)
+    : addVal R (∏ i ∈ S, f i) = ∑ i ∈ S, addVal R (f i) := by
   classical
   induction S using Finset.induction_on with
   | empty => simp
   | insert a S ha ih => rw [Finset.prod_insert ha, Finset.sum_insert ha, addVal_mul, ih]
 
-theorem le_addVal_of_mem_pow (j : ℕ) (x : R) (hx : x ∈ IsLocalRing.maximalIdeal R ^ j) : (j : ℕ∞) ≤ addVal R x := by
+theorem le_addVal_of_mem_pow (j : ℕ) (x : R) (hx : x ∈ IsLocalRing.maximalIdeal R ^ j)
+    : (j : ℕ∞) ≤ addVal R x := by
   obtain ⟨ϖ, hϖ⟩ := exists_irreducible R
-  rw [(irreducible_iff_uniformizer ϖ).1 hϖ, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at hx
+  rw [(irreducible_iff_uniformizer ϖ).1 hϖ, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+    at hx
   have := (addVal_le_iff_dvd (a := ϖ ^ j) (b := x)).2 hx
   rwa [addVal_pow, addVal_uniformizer hϖ, nsmul_eq_mul, _root_.mul_one] at this
 
@@ -118,8 +137,8 @@ theorem addVal_unit {x : R} (hx : IsUnit x) : addVal R x = 0 := by
   rw [AddValuation.map_one] at this
   exact le_antisymm this zero_le
 
-theorem addVal_mem (x : R) (hx : x ∈ IsLocalRing.maximalIdeal R) (h0 : x ≠ 0) :
-    ∃ r : ℕ, 1 ≤ r ∧ addVal R x = r := by
+theorem addVal_mem (x : R) (hx : x ∈ IsLocalRing.maximalIdeal R) (h0 : x ≠ 0)
+    : ∃ r : ℕ, 1 ≤ r ∧ addVal R x = r := by
   obtain ⟨ϖ, hϖ⟩ := exists_irreducible R
   rw [(irreducible_iff_uniformizer ϖ).1 hϖ, Ideal.mem_span_singleton] at hx
   have h1 := (addVal_le_iff_dvd (a := ϖ) (b := x)).2 hx
@@ -138,11 +157,15 @@ namespace GlobalTheory.Poinc.RadQ
 
 open IsDiscreteValuationRing
 
-theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W : Matrix (Fin s) (Fin s) ℤ} {A : Type}
-    [CommRing A] [IsLocalRing A] (Φ : VPre bar q W A) (N₁ : ℕ) (hN : 3 ≤ N₁) (hE : Φ.Exact N₁) (y : Φ.Y)
-    (nu : Fin s → Φ.X y) (hnu : nu ≠ 0) (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    (φ : Φ.V y →+* R) [IsLocalHom φ] (hJ : ∀ a ∈ IsLocalRing.maximalIdeal A, φ (Φ.ev y a) = 0) :
-    φ (mono W (Φ.t y) (Φ.δ y) nu) = 0 := by
+theorem map_mono_eq_zero
+    {O : Type} [CommRing O]
+    {bar : O → O} {q s : ℕ} {W : Matrix (Fin s) (Fin s) ℤ} {A : Type} [CommRing A] [IsLocalRing A]
+    (Φ : VPre bar q W A) (N₁ : ℕ) (hN : 3 ≤ N₁) (hE : Φ.Exact N₁)
+    (y : Φ.Y) (nu : Fin s → Φ.X y) (hnu : nu ≠ 0)
+    (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    (φ : Φ.V y →+* R) [IsLocalHom φ]
+    (hJ : ∀ a ∈ IsLocalRing.maximalIdeal A, φ (Φ.ev y a) = 0)
+    : φ (mono W (Φ.t y) (Φ.δ y) nu) = 0 := by
   classical
   by_contra hm
   have hs : ∀ k a b, Φ.δ y k a b = Φ.δ y k b a := fun k => (Φ.bal y k).1
@@ -151,7 +174,8 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
   have hQ : ∀ k mu, 0 ≤ qW W (Φ.δ y k) mu := fun k mu => qW_nonneg hW (hs k) (hn k) mu
   let H := nullSub hW (Φ.δ y) hs hn (fun k => φ (Φ.t y k) = 0)
   have hmemH : ∀ mu, mu ∈ H ↔ ∀ k, φ (Φ.t y k) = 0 → qW W (Φ.δ y k) mu = 0 := fun mu => Iff.rfl
-  have hφmono : ∀ mu, φ (mono W (Φ.t y) (Φ.δ y) mu) = ∏ k, φ (Φ.t y k) ^ (qW W (Φ.δ y k) mu).toNat := by
+  have hφmono
+      : ∀ mu, φ (mono W (Φ.t y) (Φ.δ y) mu) = ∏ k, φ (Φ.t y k) ^ (qW W (Φ.δ y k) mu).toNat := by
     intro mu
     simp [mono, map_prod, map_pow]
   have hout : ∀ mu, mu ∉ H → φ (mono W (Φ.t y) (Φ.δ y) mu) = 0 := by
@@ -200,8 +224,10 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
     exact Finset.sum_congr rfl fun k _ => by ring
   have hvmono : ∀ mu ∈ H, addVal R (φ (mono W (Φ.t y) (Φ.δ y) mu)) = (e mu : ℕ∞) := by
     intro mu hmu
-    have hk : ∀ k, addVal R (φ (Φ.t y k) ^ (qW W (Φ.δ y k) mu).toNat) =
-        (((qW W (Φ.δ y k) mu).toNat * n k : ℕ) : ℕ∞) := by
+    have hk
+        : ∀ k,
+          addVal R (φ (Φ.t y k) ^ (qW W (Φ.δ y k) mu).toNat)
+            = (((qW W (Φ.δ y k) mu).toNat * n k : ℕ) : ℕ∞) := by
       intro k
       by_cases hk : φ (Φ.t y k) = 0
       · rw [(hmemH mu).1 hmu k hk]
@@ -219,8 +245,10 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
       omega
     rw [hβlin]
     have h1 : (n k : ℤ) * qW W (Φ.δ y k) mu ≤ ∑ j, (n j : ℤ) * qW W (Φ.δ y j) mu :=
-      Finset.single_le_sum (f := fun j => (n j : ℤ) * qW W (Φ.δ y j) mu)
-        (fun j _ => mul_nonneg (by positivity) (hQ j mu)) (Finset.mem_univ k)
+      Finset.single_le_sum
+        (f := fun j => (n j : ℤ) * qW W (Φ.δ y j) mu)
+        (fun j _ => mul_nonneg (by positivity) (hQ j mu))
+        (Finset.mem_univ k)
     have h2 : (1 : ℤ) ≤ n k := by exact_mod_cast (hnk k hk0).1
     have h3 : (0 : ℤ) < (n k : ℤ) * qW W (Φ.δ y k) mu := mul_pos (by omega) hk
     omega
@@ -234,8 +262,9 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
     have h1 := Nat.find_min' hex ⟨mu, hmu, h0, (Int.toNat_of_nonneg (hβ0 mu)).symm⟩
     have h2 := Int.toNat_of_nonneg (hβ0 mu)
     omega
-  have hcong : ∀ mu : Fin s → Φ.X y, (∀ w, CongMod N₁ (mu w) (mu₀ w)) →
-      ∃ w : Fin s → Φ.X y, mu = mu₀ + N₁ • w := by
+  have hcong
+      : ∀ mu : Fin s → Φ.X y,
+        (∀ w, CongMod N₁ (mu w) (mu₀ w)) → ∃ w : Fin s → Φ.X y, mu = mu₀ + N₁ • w := by
     intro mu h
     choose w hw using h
     exact ⟨w, funext fun i => by simp [hw i]⟩
@@ -253,7 +282,8 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
     have hw0 : w ≠ 0 := by
       rintro rfl
       simp at hne
-    exact GlobalTheory.T.least_vector_unique_in_class_mod s W hW (Φ.X y) β hβs hβn H hβpos mu₀ hmu₀H hmu₀0 hmin N₁ hN w hw hw0
+    exact GlobalTheory.T.least_vector_unique_in_class_mod s W hW (Φ.X y) β hβs hβn H hβpos mu₀ hmu₀H
+      hmu₀0 hmin N₁ hN w hw hw0
   have hz : ∀ mu : Fin s → Φ.X y, (∀ w, CongMod N₁ (mu w) (mu₀ w)) → mu ≠ 0 := by
     rintro mu hc rfl
     have h1 := hbig 0 H.zero_mem hc (Ne.symm hmu₀0)
@@ -263,7 +293,9 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
 
   obtain ⟨c, hc⟩ := Φ.u_unit y mu₀
   obtain ⟨h, hh⟩ := hE y mu₀ c
-  have hmaxV : ∀ mu : Fin s → Φ.X y, (∀ w, CongMod N₁ (mu w) (mu₀ w)) → Φ.term y mu c ∈ IsLocalRing.maximalIdeal (Φ.V y) := by
+  have hmaxV
+      : ∀ mu : Fin s → Φ.X y,
+        (∀ w, CongMod N₁ (mu w) (mu₀ w)) → Φ.term y mu c ∈ IsLocalRing.maximalIdeal (Φ.V y) := by
     intro mu hmu
     obtain ⟨k, hk⟩ := exists_qW_pos hW (Φ.δ y) hs hn (Φ.pos y) (hz mu hmu)
     exact Ideal.mul_mem_left _ _ (mono_mem _ _ _ _ k (Φ.t_mem y k).1 hk)
@@ -290,8 +322,9 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
     push_cast at h1
     omega
   have hsum : ((q₀ + 1 : ℕ) : ℕ∞) ≤ addVal R (φ (∑ mu ∈ S, Φ.term y mu c)) := by
-    have h1 : φ (Φ.ev y h - ∑ mu ∈ S, Φ.term y mu c) ∈
-        IsLocalRing.maximalIdeal R ^ (q₀ + 1 + (∑ i, qW W (Φ.δ y i) mu₀).toNat) :=
+    have h1
+        : φ (Φ.ev y h - ∑ mu ∈ S, Φ.term y mu c)
+          ∈ IsLocalRing.maximalIdeal R ^ (q₀ + 1 + (∑ i, qW W (Φ.δ y i) mu₀).toNat) :=
       GlobalTheory.map_maximalIdeal_pow_le φ _ (Ideal.mem_map_of_mem φ (by simpa using hS3))
     rw [map_sub, hφh, zero_sub] at h1
     have h2 := le_addVal_of_mem_pow _ _ h1
@@ -319,8 +352,9 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
     rw [VPre.term, map_mul, addVal_mul, addVal_unit (hc.map φ), hvmono mu₀ hmu₀H, he₀, zero_add]
   have hfinal : ((q₀ + 1 : ℕ) : ℕ∞) ≤ addVal R (φ (Φ.term y mu₀ c)) := by
     have hsplit := Finset.add_sum_erase S (fun mu => Φ.term y mu c) hmu₀S
-    have h1 : φ (Φ.term y mu₀ c) =
-        φ (∑ mu ∈ S, Φ.term y mu c) - φ (∑ mu ∈ S.erase mu₀, Φ.term y mu c) := by
+    have h1
+        : φ (Φ.term y mu₀ c)
+          = φ (∑ mu ∈ S, Φ.term y mu c) - φ (∑ mu ∈ S.erase mu₀, Φ.term y mu c) := by
       rw [← hsplit, map_add (f := _)]
       ring
     rw [h1]
@@ -329,9 +363,13 @@ theorem map_mono_eq_zero {O : Type} [CommRing O] {bar : O → O} {q s : ℕ} {W 
   have : q₀ + 1 ≤ q₀ := by exact_mod_cast hfinal
   omega
 
-theorem mono_mem_radical : ∀ (O : Type) [CommRing O] (bar : O → O) (q s : ℕ) (W : Matrix (Fin s) (Fin s) ℤ) (A : Type)
-    [CommRing A] [IsLocalRing A] (Φ : VPre bar q W A) (N₁ : ℕ), 3 ≤ N₁ → Φ.Exact N₁ → ∀ (y : Φ.Y)
-    (nu : Fin s → Φ.X y), nu ≠ 0 → mono W (Φ.t y) (Φ.δ y) nu ∈ ((IsLocalRing.maximalIdeal A).map (Φ.ev y)).radical := by
+theorem mono_mem_radical
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (q s : ℕ) (W : Matrix (Fin s) (Fin s) ℤ) (A : Type)
+        [CommRing A] [IsLocalRing A] (Φ : VPre bar q W A) (N₁ : ℕ),
+      3 ≤ N₁ → Φ.Exact N₁
+        → ∀ (y : Φ.Y) (nu : Fin s → Φ.X y),
+          nu ≠ 0
+            → mono W (Φ.t y) (Φ.δ y) nu ∈ ((IsLocalRing.maximalIdeal A).map (Φ.ev y)).radical := by
   intro O _ bar q s W A _ _ Φ N₁ hN hE y nu hnu
   by_contra hno
   rw [Ideal.radical_eq_sInf, Submodule.mem_sInf] at hno
@@ -343,7 +381,8 @@ theorem mono_mem_radical : ∀ (O : Type) [CommRing O] (bar : O → O) (q s : �
     obtain ⟨k, hk⟩ := exists_qW_pos Φ.posW (Φ.δ y) hs (Φ.nonneg y) (Φ.pos y) hnu
     exact hmp (mono_mem _ _ _ _ k (Φ.t_mem y k).1 hk)
   · haveI : IsNoetherianRing (Φ.V y) := (Φ.cn y).1
-    obtain ⟨R, _, _, _, _, φ, hker, hloc⟩ := GlobalTheory.exists_complete_discreteValuationRing_ker_eq p hpm
+    obtain ⟨R, _, _, _, _, φ, hker, hloc⟩ :=
+      GlobalTheory.exists_complete_discreteValuationRing_ker_eq p hpm
     apply hmp
     rw [← hker, RingHom.mem_ker]
     exact map_mono_eq_zero Φ N₁ hN hE y nu hnu R φ fun a ha => by

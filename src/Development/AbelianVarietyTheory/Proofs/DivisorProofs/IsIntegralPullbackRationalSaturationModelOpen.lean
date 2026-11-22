@@ -5,12 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsRatPoi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Models GlobalTheory.UPoinc GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.Models GlobalTheory.UPoinc GlobalTheory.ZH
 
 namespace GlobalTheory.UPoinc
 
-theorem isReduced_of_flat_isPreimmersion {X Y : Scheme.{0}} (f : X ⟶ Y) [Flat f] [IsPreimmersion f] [IsReduced Y] :
-    IsReduced X := by
+theorem isReduced_of_flat_isPreimmersion
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [Flat f] [IsPreimmersion f] [IsReduced Y]
+    : IsReduced X := by
   haveI : ∀ x : X, _root_.IsReduced (X.presheaf.stalk x) := fun x => by
     have hfl := Flat.stalkMap f x
     have hs := f.stalkMap_surjective x
@@ -24,7 +26,14 @@ theorem isReduced_of_flat_isPreimmersion {X Y : Scheme.{0}} (f : X ⟶ Y) [Flat 
     exact isReduced_of_injective (RingEquiv.ofBijective _ ⟨hi, hs⟩).symm (RingEquiv.injective _)
   exact isReduced_of_isReduced_stalk X
 
-theorem isIntegral_pullback_toRat : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [CharZero Ω] (M : RatModel o Ω) (U₀ : M.Z.Opens) (R : Subalgebra o Ω) (u₀ : U₀.toScheme ⟶ Sp R), (U₀ : Set M.Z).Nonempty → (∀ x : Sp Ω ⟶ U₀.toScheme, x ≫ U₀.ι = M.pt → x ≫ u₀ = spMap R.val.toRingHom) → IsIntegral (pullback u₀ (spMap (toRat R))) ∧ ∃ pt : Sp Ω ⟶ pullback u₀ (spMap (toRat R)), pt ≫ pullback.fst _ _ ≫ U₀.ι = M.pt ∧ Dense (Set.range pt) := by
+theorem isIntegral_pullback_toRat
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [CharZero Ω] (M : RatModel o Ω)
+        (U₀ : M.Z.Opens) (R : Subalgebra o Ω) (u₀ : U₀.toScheme ⟶ Sp R),
+      (U₀ : Set M.Z).Nonempty
+        → (∀ x : Sp Ω ⟶ U₀.toScheme, x ≫ U₀.ι = M.pt → x ≫ u₀ = spMap R.val.toRingHom)
+        → IsIntegral (pullback u₀ (spMap (toRat R)))
+          ∧ ∃ pt : Sp Ω ⟶ pullback u₀ (spMap (toRat R)),
+            pt ≫ pullback.fst _ _ ≫ U₀.ι = M.pt ∧ Dense (Set.range pt) := by
   intro o Ω _ _ _ _ M U₀ R u₀ hne hgen
   haveI := M.integral
   letI := (toRat R).toAlgebra
@@ -38,7 +47,9 @@ theorem isIntegral_pullback_toRat : ∀ (o Ω : Type) [CommRing o] [Field Ω] [A
     rw [Scheme.Opens.range_ι]
     exact M.top_le_preimage_pt hne (show w ∈ (⊤ : (Sp Ω).Opens) from trivial)
   have hx := IsOpenImmersion.lift_fac U₀.ι M.pt hr
-  have w : IsOpenImmersion.lift U₀.ι M.pt hr ≫ u₀ = spMap (ratHull R).val.toRingHom ≫ spMap (toRat R) :=
+  have w
+      : IsOpenImmersion.lift U₀.ι M.pt hr ≫ u₀
+        = spMap (ratHull R).val.toRingHom ≫ spMap (toRat R) :=
     (hgen _ hx).trans (spMap_val_toRat R).symm
   let pt := pullback.lift _ _ w
   let j : pullback u₀ (spMap (toRat R)) ⟶ M.Z := pullback.fst _ _ ≫ U₀.ι

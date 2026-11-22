@@ -4,13 +4,14 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qe22.aeval_inter :
-    ∀ {M N : Type} [inst : AddCommGroup M] [inst_1 : _root_.Module ℂ M]
-    [inst_2 : AddCommGroup N] [inst_3 : _root_.Module ℂ N] (f : M →ₗ[ℂ] N) (T : Module.End ℂ M) (T' : Module.End ℂ N),
-    (∀ (x : M), (f : M → N) ((T : M → M) x) = (T' : N → N) ((f : M → N) x)) →
-      ∀ (p : Polynomial ℂ) (x : M),
-        (f : M → N) (((Polynomial.aeval T : Polynomial ℂ → Module.End ℂ M) p : M → M) x) =
-          ((Polynomial.aeval T' : Polynomial ℂ → Module.End ℂ N) p : N → N) ((f : M → N) x) := by
+theorem UpperTheory.Reformulated.B.Qe22.aeval_inter
+    : ∀ {M N : Type} [inst : AddCommGroup M] [inst_1 : _root_.Module ℂ M] [inst_2 : AddCommGroup N]
+        [inst_3 : _root_.Module ℂ N] (f : M →ₗ[ℂ] N) (T : Module.End ℂ M) (T' : Module.End ℂ N),
+      (∀ (x : M), (f : M → N) ((T : M → M) x) = (T' : N → N) ((f : M → N) x))
+        → ∀ (p : Polynomial ℂ) (x : M),
+          (f : M → N) (((Polynomial.aeval T : Polynomial ℂ → Module.End ℂ M) p : M → M) x)
+            = ((Polynomial.aeval T' : Polynomial ℂ → Module.End ℂ N) p : N → N)
+              ((f : M → N) x) := by
   intro M N _ _ _ _ f T T' h p
   have hpow : ∀ (n : ℕ) (x : M), f ((T ^ n) x) = (T' ^ n) (f x) := by
     intro n
@@ -22,7 +23,8 @@ theorem UpperTheory.Reformulated.B.Qe22.aeval_inter :
   induction p using Polynomial.induction_on' with
   | add p q hp hq =>
     intro x
-    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, map_add (f := _), hp, hq]
+    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply,
+      map_add (f := _), hp, hq]
   | monomial n a =>
     intro x
     rw [Polynomial.aeval_monomial, Polynomial.aeval_monomial, ← Algebra.smul_def,

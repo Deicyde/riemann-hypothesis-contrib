@@ -4,17 +4,19 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qf4.pow_sub_one_mem :
-    ∀ {S : Type} [inst : CommRing S] (J : Ideal S) (p : ℕ),
-    Nat.Prime p → (↑p : S) ∈ J → ∀ (x : S), x - (1 : S) ∈ J → ∀ (j : ℕ), x ^ p ^ j - (1 : S) ∈ J ^ (j + (1 : ℕ)) := by
+theorem UpperTheory.Reformulated.B.Qf4.pow_sub_one_mem
+    : ∀ {S : Type} [inst : CommRing S] (J : Ideal S) (p : ℕ),
+      Nat.Prime p → (↑p : S) ∈ J
+        → ∀ (x : S), x - (1 : S) ∈ J → ∀ (j : ℕ), x ^ p ^ j - (1 : S) ∈ J ^ (j + (1 : ℕ)) := by
   intro S _ J p _ hp x hx j
   induction j with
   | zero => simpa using hx
   | succ j ih =>
     have h1 : x ^ p ^ j - 1 ∈ J := Ideal.pow_le_self (Nat.succ_ne_zero j) ih
     have h2 : (∑ i ∈ Finset.range p, (x ^ p ^ j) ^ i) ∈ J := by
-      have h3 : (∑ i ∈ Finset.range p, (x ^ p ^ j) ^ i)
-          = (∑ i ∈ Finset.range p, ((x ^ p ^ j) ^ i - 1)) + (p : S) := by
+      have h3
+          : (∑ i ∈ Finset.range p, (x ^ p ^ j) ^ i)
+            = (∑ i ∈ Finset.range p, ((x ^ p ^ j) ^ i - 1)) + (p : S) := by
         simp [Finset.sum_sub_distrib]
       rw [h3]
       refine J.add_mem (J.sum_mem fun i _ => ?_) hp

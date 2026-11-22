@@ -9,7 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TsumPiProdEnn
 
 @[expose] public section
 
-open NumberField MeasureTheory Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.TermLoc Formalism.L2.SG.RowsConc Formalism.L2.SG.NGCut Formalism.L2.SG.NGAnalytic Formalism.FourierDecayAlt GlobalTheory.Unfold GlobalTheory.LocOver GlobalTheory.GenMass
+open NumberField MeasureTheory Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.Full Formalism.L2.SG.TermLoc Formalism.L2.SG.RowsConc Formalism.L2.SG.NGCut
+  Formalism.L2.SG.NGAnalytic Formalism.FourierDecayAlt GlobalTheory.Unfold GlobalTheory.LocOver
+  GlobalTheory.GenMass
 open scoped Classical ENNReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -17,8 +21,10 @@ noncomputable section
 
 namespace GlobalTheory.GenMass
 
-theorem datum_wt_nonneg {D : D7} {Z : LocDat D} {FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS} (p : PlF D)
-    (a b : LocNG.Datum (FP p)) : 0 ≤ LocNG.Datum.wt a b := by
+theorem datum_wt_nonneg
+    {D : D7} {Z : LocDat D} {FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS}
+    (p : PlF D) (a b : LocNG.Datum (FP p))
+    : 0 ≤ LocNG.Datum.wt a b := by
   unfold LocNG.Datum.wt LocNG.volRel
   exact div_nonneg zero_le_one (div_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _))
 

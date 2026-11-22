@@ -8,7 +8,8 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.ValBoundDenom
 
-theorem exists_nat_le_exp (a : WithZero (Multiplicative ℤ)) : ∃ n : ℕ, a ≤ WithZero.exp (n : ℤ) := by
+theorem exists_nat_le_exp (a : WithZero (Multiplicative ℤ))
+    : ∃ n : ℕ, a ≤ WithZero.exp (n : ℤ) := by
   induction a using WithZero.recZeroCoe with
   | zero => exact ⟨0, zero_le'⟩
   | coe m =>
@@ -17,11 +18,15 @@ theorem exists_nat_le_exp (a : WithZero (Multiplicative ℤ)) : ∃ n : ℕ, a �
     rw [WithZero.coe_le_coe]
     exact Int.self_le_toNat (Multiplicative.toAdd m)
 
-theorem exists_common_denominator_of_valuation_le (E : Type) [Field E] [NumberField E]
+theorem exists_common_denominator_of_valuation_le
+    (E : Type) [Field E] [NumberField E]
     (β : IsDedekindDomain.HeightOneSpectrum (𝓞 E) → WithZero (Multiplicative ℤ))
-    (hβ : ∀ᶠ w in Filter.cofinite, β w ≤ 1) : ∃ D : 𝓞 E, D ≠ 0 ∧
-      ∀ x : E, (∀ w : IsDedekindDomain.HeightOneSpectrum (𝓞 E), w.valuation E x ≤ β w) →
-        IsIntegral ℤ ((D : E) * x) := by
+    (hβ : ∀ᶠ w in Filter.cofinite, β w ≤ 1)
+    : ∃ D : 𝓞 E,
+      D ≠ 0
+        ∧ ∀ x : E,
+          (∀ w : IsDedekindDomain.HeightOneSpectrum (𝓞 E), w.valuation E x ≤ β w)
+            → IsIntegral ℤ ((D : E) * x) := by
   classical
   have hfin : {w | ¬ β w ≤ 1}.Finite := Filter.eventually_cofinite.mp hβ
   set T := hfin.toFinset with hT
@@ -43,7 +48,8 @@ theorem exists_common_denominator_of_valuation_le (E : Type) [Field E] [NumberFi
         rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
         exact (IsDedekindDomain.HeightOneSpectrum.intValuation_le_pow_iff_mem _ _ _).mpr hmem
       have h2 : w.valuation E x ≤ WithZero.exp (k w : ℤ) := (hx w).trans (hk w)
-      calc w.valuation E (D : E) * w.valuation E x
+      calc
+        w.valuation E (D : E) * w.valuation E x
           ≤ WithZero.exp (-(k w : ℤ)) * WithZero.exp (k w : ℤ) := mul_le_mul' h1 h2
         _ = 1 := by rw [← WithZero.exp_add]; simp
     · have hw1 : β w ≤ 1 := by

@@ -9,12 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.GenMDetNe
 
 @[expose] public section
 
-open MvPolynomial NumberField IsDedekindDomain Formalism.GradedWeylDivisibility Formalism.MainNotions.G Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.GO GlobalTheory.ValCmp
+open MvPolynomial NumberField IsDedekindDomain Formalism.GradedWeylDivisibility
+  Formalism.MainNotions.G Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.BasicNotions
+  Formalism.L2.DIV GlobalTheory.GO GlobalTheory.ValCmp
 
 namespace GlobalTheory.ValCmp
 
-theorem initMinor_mem_dualWeyl_ind (R : Type) [CommRing R] {r n s : ℕ} (hs : s ≤ n) (I : Fin s → Fin r) :
-    initMinor R I hs ∈ dualWeyl R r n (fun t => if t.val < s then 1 else 0) := by
+theorem initMinor_mem_dualWeyl_ind
+    (R : Type) [CommRing R] {r n s : ℕ} (hs : s ≤ n) (I : Fin s → Fin r)
+    : initMinor R I hs ∈ dualWeyl R r n (fun t => if t.val < s then 1 else 0) := by
   have h := bidetMem R r n 1 (fun _ => s) (fun _ => hs) (fun _ => I)
   have e1 : bideterminant R (fun _ : Fin 1 => s) (fun _ => hs) (fun _ => I) = initMinor R I hs := by
     simp [bideterminant]
@@ -37,9 +40,11 @@ private lemma mul_mem_dualWeyl_add (R : Type) [CommRing R] {r n : ℕ} {ν₁ ν
   refine ⟨hf.1.mul hg.1, fun l j hlj => ?_⟩
   rw [map_mul, map_mul, hf.2 l j hlj, hg.2 l j hlj]
 
-theorem prod_mem_dualWeyl_sum (R : Type) [CommRing R] {r n : ℕ} {ι : Type} (S : Finset ι) (w : ι → Fin n → ℕ)
-    (g : ι → MvPolynomial (Fin r × Fin n) R) (hg : ∀ k, g k ∈ dualWeyl R r n (w k)) :
-    ∏ k ∈ S, g k ∈ dualWeyl R r n (∑ k ∈ S, w k) := by
+theorem prod_mem_dualWeyl_sum
+    (R : Type) [CommRing R]
+    {r n : ℕ} {ι : Type} (S : Finset ι) (w : ι → Fin n → ℕ) (g : ι → MvPolynomial (Fin r × Fin n) R)
+    (hg : ∀ k, g k ∈ dualWeyl R r n (w k))
+    : ∏ k ∈ S, g k ∈ dualWeyl R r n (∑ k ∈ S, w k) := by
   classical
   induction S using Finset.induction_on with
   | empty => simpa using one_mem_dualWeyl_zero R r n
@@ -47,8 +52,9 @@ theorem prod_mem_dualWeyl_sum (R : Type) [CommRing R] {r n : ℕ} {ι : Type} (S
     rw [Finset.prod_insert ha, Finset.sum_insert ha]
     exact mul_mem_dualWeyl_add R (hg a) ih
 
-theorem exists_cofAct_initMinor (R : Type) [CommRing R] [IsDomain R] {n s : ℕ} (hs : s ≤ n) (I : Fin s → Fin n) :
-    ∃ g ∈ dualWeyl R n n (fun t => if 0 < s ∧ t.val < n - s then 1 else 0),
+theorem exists_cofAct_initMinor
+    (R : Type) [CommRing R] [IsDomain R] {n s : ℕ} (hs : s ≤ n) (I : Fin s → Fin n)
+    : ∃ g ∈ dualWeyl R n n (fun t => if 0 < s ∧ t.val < n - s then 1 else 0),
       (genM R n).det ^ (s - 1) * g = cofAct R n (initMinor R I hs) := by
   classical
   rcases Nat.eq_zero_or_pos s with rfl | h1
@@ -69,12 +75,19 @@ theorem exists_cofAct_initMinor (R : Type) [CommRing R] [IsDomain R] {n s : ℕ}
     obtain ⟨ε, hε⟩ := cofAct_initMinor R n s hs h1 σ
     have hIσ : (fun a : Fin s => σ (Fin.castLE hs a)) = I := funext hσ
     rw [hIσ] at hε
-    refine ⟨(ε : ℤ) • initMinor R (fun a : Fin (n - s) => σ (Fin.rev (Fin.castLE (Nat.sub_le n s) a)))
-      (Nat.sub_le n s), ?_, ?_⟩
-    · have hm := initMinor_mem_dualWeyl_ind R (Nat.sub_le n s)
+    refine ⟨
+      (ε : ℤ) • initMinor R
         (fun a : Fin (n - s) => σ (Fin.rev (Fin.castLE (Nat.sub_le n s) a)))
-      have hw : (fun t : Fin n => if 0 < s ∧ t.val < n - s then 1 else 0) =
-          fun t : Fin n => if t.val < n - s then 1 else 0 := by
+        (Nat.sub_le n s),
+      ?_,
+      ?_
+    ⟩
+    · have hm :=
+        initMinor_mem_dualWeyl_ind R (Nat.sub_le n s)
+          (fun a : Fin (n - s) => σ (Fin.rev (Fin.castLE (Nat.sub_le n s) a)))
+      have hw
+          : (fun t : Fin n => if 0 < s ∧ t.val < n - s then 1 else 0)
+            = fun t : Fin n => if t.val < n - s then 1 else 0 := by
         funext t
         simp [h1]
       rw [hw]
@@ -88,20 +101,23 @@ theorem exists_cofAct_initMinor (R : Type) [CommRing R] [IsDomain R] {n s : ℕ}
       exact Matrix.det_zero_of_row_eq hne (by funext q; simp [hab])
     rw [h0, map_zero, mul_zero]
 
-theorem nuDual_shapeDeg {m K : ℕ} (sz : Fin K → ℕ) :
-    nuDual (shapeDeg sz : Fin (m + 1) → ℕ) =
-      ∑ k, fun t : Fin (m + 1) => if 0 < sz k ∧ t.val < m + 1 - sz k then 1 else 0 := by
+theorem nuDual_shapeDeg {m K : ℕ} (sz : Fin K → ℕ)
+    : nuDual (shapeDeg sz : Fin (m + 1) → ℕ)
+      = ∑ k, fun t : Fin (m + 1) => if 0 < sz k ∧ t.val < m + 1 - sz k then 1 else 0 := by
   funext t
-  have key : ∀ k, ((if t.rev.val < sz k then 1 else 0) +
-      (if 0 < sz k ∧ t.val < m + 1 - sz k then 1 else 0) : ℕ) =
-        if (0 : Fin (m + 1)).val < sz k then 1 else 0 := by
+  have key
+      : ∀ k,
+        ((if t.rev.val < sz k then 1 else 0) + (if 0 < sz k ∧ t.val < m + 1 - sz k then 1 else 0)
+            : ℕ)
+          = if (0 : Fin (m + 1)).val < sz k then 1 else 0 := by
     intro k
     have := t.isLt
     rw [Fin.val_rev]
     split_ifs <;> (try simp only [Fin.val_zero] at *) <;> omega
-  have hsum : ∑ k, (if t.rev.val < sz k then 1 else 0) +
-      ∑ k, (if 0 < sz k ∧ t.val < m + 1 - sz k then 1 else 0) =
-        ∑ k, (if (0 : Fin (m + 1)).val < sz k then 1 else 0) := by
+  have hsum
+      : ∑ k, (if t.rev.val < sz k then 1 else 0)
+          + ∑ k, (if 0 < sz k ∧ t.val < m + 1 - sz k then 1 else 0)
+        = ∑ k, (if (0 : Fin (m + 1)).val < sz k then 1 else 0) := by
     rw [← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun k _ => key k
   simp only [nuDual, shapeDeg, Finset.sum_apply, Finset.card_filter]
@@ -119,15 +135,18 @@ private lemma card_filter_fin_val_lt_eq_of_le {N a : ℕ} (h : a ≤ N) :
       exact j.isLt
   rw [e, Finset.card_map, Finset.card_univ, Fintype.card_fin]
 
-theorem sum_shapeDeg_sub {m K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ m + 1) :
-    ∑ i, (shapeDeg sz : Fin (m + 1) → ℕ) i - (shapeDeg sz : Fin (m + 1) → ℕ) 0 = ∑ k, (sz k - 1) := by
+theorem sum_shapeDeg_sub {m K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ m + 1)
+    : ∑ i, (shapeDeg sz : Fin (m + 1) → ℕ) i - (shapeDeg sz : Fin (m + 1) → ℕ) 0
+      = ∑ k, (sz k - 1) := by
   have h1 : ∑ i, (shapeDeg sz : Fin (m + 1) → ℕ) i = ∑ k, sz k := by
     simp only [shapeDeg, Finset.card_filter]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [← Finset.card_filter]
     exact card_filter_fin_val_lt_eq_of_le (hsz k)
-  have h0 : (shapeDeg sz : Fin (m + 1) → ℕ) 0 = ∑ k, (if (0 : Fin (m + 1)).val < sz k then 1 else 0) := by
+  have h0
+      : (shapeDeg sz : Fin (m + 1) → ℕ) 0
+        = ∑ k, (if (0 : Fin (m + 1)).val < sz k then 1 else 0) := by
     simp only [shapeDeg, Finset.card_filter]
   have h2 : ∑ k, (sz k - 1) + ∑ k, (if (0 : Fin (m + 1)).val < sz k then 1 else 0) = ∑ k, sz k := by
     rw [← Finset.sum_add_distrib]
@@ -136,7 +155,11 @@ theorem sum_shapeDeg_sub {m K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤
   rw [h1, h0]
   omega
 
-theorem exists_cofRel_dualWeyl : ∀ (R : Type) [CommRing R] [IsDomain R] (m : ℕ) (ν : Fin (m + 1) → ℕ), Antitone ν → ν (Fin.last m) = 0 → ∀ f ∈ dualWeyl R (m + 1) (m + 1) ν, ∃ g ∈ dualWeyl R (m + 1) (m + 1) (nuDual ν), CofRel R m ν f g := by
+theorem exists_cofRel_dualWeyl
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (m : ℕ) (ν : Fin (m + 1) → ℕ),
+      Antitone ν → ν (Fin.last m) = 0
+        → ∀ f ∈ dualWeyl R (m + 1) (m + 1) ν, ∃ g ∈ dualWeyl R (m + 1) (m + 1) (nuDual ν),
+          CofRel R m ν f g := by
   intro R _ _ m ν _ _ f hf
   obtain ⟨b, ⟨_, hspan, _⟩, hb⟩ := sSBasis R (m + 1) (m + 1) ν
   rw [← hspan] at hf
@@ -150,10 +173,11 @@ theorem exists_cofRel_dualWeyl : ∀ (R : Type) [CommRing R] [IsDomain R] (m : �
     · have hm := prod_mem_dualWeyl_sum R Finset.univ _ g hg
       rwa [← nuDual_shapeDeg sz, hsh] at hm
     · show (genM R (m + 1)).det ^ (∑ i, ν i - ν 0) * ∏ k, g k = cofAct R (m + 1) (bideterminant R sz hsz I)
-      rw [← hsh, sum_shapeDeg_sub sz hsz, ← Finset.prod_pow_eq_pow_sum, ← Finset.prod_mul_distrib, bideterminant,
-        map_prod]
+      rw [← hsh, sum_shapeDeg_sub sz hsz, ← Finset.prod_pow_eq_pow_sum, ← Finset.prod_mul_distrib,
+        bideterminant, map_prod]
       exact Finset.prod_congr rfl fun k _ => hgeq k
-  | zero => exact ⟨0, zero_mem _, by simp [CofRel]⟩
+  | zero =>
+    exact ⟨0, zero_mem _, by simp [CofRel]⟩
   | add x y _ _ hx hy =>
     obtain ⟨g₁, h₁, e₁⟩ := hx
     obtain ⟨g₂, h₂, e₂⟩ := hy

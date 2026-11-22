@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Multiset
 
-theorem exists_antitone_listing {α : Type*} (m : Multiset α) (f : α → ℝ) (P : α → α → Prop)
-    (hP : ∀ a b, P a b → f a < f b) :
-    ∃ (h : ℕ) (Δ : Fin h → α), Finset.univ.val.map Δ = m ∧ Antitone (f ∘ Δ) ∧
-      ∀ i j, i < j → ¬ P (Δ i) (Δ j) := by
+theorem exists_antitone_listing
+    {α : Type*} (m : Multiset α) (f : α → ℝ) (P : α → α → Prop) (hP : ∀ a b, P a b → f a < f b)
+    : ∃ (h : ℕ) (Δ : Fin h → α),
+      Finset.univ.val.map Δ = m ∧ Antitone (f ∘ Δ) ∧ ∀ i j, i < j → ¬ P (Δ i) (Δ j) := by
   classical
   obtain ⟨l, rfl⟩ := Quot.exists_rep m
   let r : α → α → Prop := fun a b => f b ≤ f a
@@ -23,7 +23,9 @@ theorem exists_antitone_listing {α : Type*} (m : Multiset α) (f : α → ℝ) 
     intro i j hij
     exact (List.pairwise_iff_get.mp hsort) i j hij
   refine ⟨l'.length, l'.get, ?_, ?_, ?_⟩
-  · have h1 : (Finset.univ : Finset (Fin l'.length)).val.map l'.get = ((List.ofFn l'.get : List α) : Multiset α) := by
+  · have h1
+        : (Finset.univ : Finset (Fin l'.length)).val.map l'.get
+          = ((List.ofFn l'.get : List α) : Multiset α) := by
       rw [Fin.univ_val_map]
     rw [h1, List.ofFn_get]
     exact Quot.sound hperm

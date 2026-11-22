@@ -11,7 +11,8 @@ open ReciprocityTheory.ChartRestriction.G.FD NumberField Complex MeasureTheory
 
 noncomputable section
 
-theorem fourierJacobi_differentiable {E : Type} [Field E] [NumberField E] [IsCMField E] : FjDiff E := by
+theorem fourierJacobi_differentiable {E : Type} [Field E] [NumberField E] [IsCMField E]
+    : FjDiff E := by
   intro r X la P ξ ν hP hξ
   exact CuspCoefficientFlow.fj_diffOn (X := X) la P hP hξ ν
 
@@ -23,16 +24,20 @@ theorem fourierJacobi_bounded {E : Type} [Field E] [NumberField E] [IsCMField E]
 theorem fourierJacobi_boundaryEq {E : Type} [Field E] [NumberField E] [IsCMField E] : FjBEq E := by
   intro r X la P ξ ν hP hξ x hx b hb
   classical
-  have hflow : ∀ s : X.Ψ → ℝ, X.flow ξ (fun τ => (s τ : ℂ)) (rmul x b) =
-      rmul (X.flow ξ (fun τ => (s τ : ℂ)) x) b := by
+  have hflow
+      : ∀ s : X.Ψ → ℝ,
+        X.flow ξ (fun τ => (s τ : ℂ)) (rmul x b) = rmul (X.flow ξ (fun τ => (s τ : ℂ)) x) b := by
     intro s
     funext τ
     show X.flowMat ξ τ (s τ : ℂ) * (mat x τ * mat b τ) = X.flowMat ξ τ (s τ : ℂ) * mat x τ * mat b τ
     rw [Matrix.mul_assoc]
-  have hP' : ∀ s : X.Ψ → ℝ,
-      P (X.flow ξ (fun τ => (s τ : ℂ)) (rmul x b)) * cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ) =
-        bchar la b * (P (X.flow ξ (fun τ => (s τ : ℂ)) x) *
-          cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ)) := by
+  have hP'
+      : ∀ s : X.Ψ → ℝ,
+        P (X.flow ξ (fun τ => (s τ : ℂ)) (rmul x b))
+            * cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ)
+          = bchar la b
+            * (P (X.flow ξ (fun τ => (s τ : ℂ)) x)
+              * cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ)) := by
     intro s
     rw [hflow, hP.2.1 _ (FlowCoefficientBounds.flow_real X hξ hx s la).1 b hb, mul_assoc]
   unfold Data.fj

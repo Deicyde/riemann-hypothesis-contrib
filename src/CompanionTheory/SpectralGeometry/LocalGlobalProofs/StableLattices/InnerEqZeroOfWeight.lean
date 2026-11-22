@@ -18,7 +18,8 @@ namespace GlobalTheory.CompanionTheory.KLowSpan
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-def KLower (ε : Fin n → Bool) (l : List (Fin n × Fin n)) : Prop := ∀ p ∈ l, p.2 < p.1 ∧ ε p.1 = ε p.2
+def KLower (ε : Fin n → Bool) (l : List (Fin n × Fin n)) : Prop :=
+  ∀ p ∈ l, p.2 < p.1 ∧ ε p.1 = ε p.2
 
 section Alg
 
@@ -180,7 +181,8 @@ end Alg
 
 section Unit
 
-variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V} {μ : Fin n → ℝ} {v : V}
 
 lemma inner_eq_zero_of_weight (hU : KUnit ε E) {ν ν' : Fin n → ℝ} {x y : V} (hx : IsWeight E ν x)
@@ -244,9 +246,15 @@ end Unit
 theorem lowSpan_holds : CompanionTheory.D.DSIC.LowSpan := by
   intro n ε V _ _ E μ v S hF hU hv0 hv hfd hS hvS
   have hle : kLowSpan ε E v ≤ S := kLowSpan_le hS hvS
-  refine ⟨kLowSpan ε E v, hle, kself_mem, kstab_kLowSpan hF hv, ?_,
+  refine ⟨
+    kLowSpan ε E v,
+    hle,
+    kself_mem,
+    kstab_kLowSpan hF hv,
+    ?_,
     fun ν x hx hx0 hν => cdom_of_weight hF hU hv.1 hx hx0 hν,
-    fun x hx hμ => eq_smul_of_top hF hU hv0 hv.1 hx hμ⟩
+    fun x hx hμ => eq_smul_of_top hF hU hv0 hv.1 hx hμ
+  ⟩
   intro L hL hst
   have : FiniteDimensional ℂ L := Submodule.finiteDimensional_of_le (hL.trans hle)
   have hst' := kstab_orthogonal hU hst

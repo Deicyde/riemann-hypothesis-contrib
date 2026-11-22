@@ -11,10 +11,12 @@ open scoped FourierTransform ContDiff
 
 namespace GlobalTheory.JSW
 
-theorem truncatedRow_unipotent_mul_and_ne_zero : ∀ (n : ℕ) (ρ : Fin n), ∀ g ∈ levSet n (ρ + 1),
-    (∀ u ∈ GlobalTheory.SmGL.unipB ℂ (Fin n), rowCut ρ ((u * g : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) =
-      rowCut ρ (g : Matrix (Fin n) (Fin n) ℂ)) ∧
-    ∃ j, j ≤ ρ ∧ rowCut ρ (g : Matrix (Fin n) (Fin n) ℂ) j ≠ 0 := by
+theorem truncatedRow_unipotent_mul_and_ne_zero
+    : ∀ (n : ℕ) (ρ : Fin n), ∀ g ∈ levSet n (ρ + 1),
+      (∀ u ∈ GlobalTheory.SmGL.unipB ℂ (Fin n),
+          rowCut ρ ((u * g : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ)
+            = rowCut ρ (g : Matrix (Fin n) (Fin n) ℂ))
+        ∧ ∃ j, j ≤ ρ ∧ rowCut ρ (g : Matrix (Fin n) (Fin n) ℂ) j ≠ 0 := by
   intro n ρ g hg
   constructor
   · intro u hu

@@ -13,7 +13,8 @@ namespace Formalism.L2.SG.Pf.QuotIndep
 
 namespace QuotIndepPf
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
 lemma exists_bruhat (S : Subgroup G) (hS : IsClosed (S : Set G)) (μS : Measure S)
@@ -42,7 +43,6 @@ lemma lintegral_eq_bruhat (S : Subgroup G) (μS : Measure S) (μ ν : Measure G)
     hbm.comp (measurable_subtype_coe.mul_const x)), hb1, one_mul]
 
 end QuotIndepPf
-
 
 open QuotIndepPf in
 theorem quotIndep : QuotIndep := by

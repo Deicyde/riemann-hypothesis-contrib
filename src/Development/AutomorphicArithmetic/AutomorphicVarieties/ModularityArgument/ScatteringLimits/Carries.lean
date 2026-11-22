@@ -6,7 +6,8 @@ public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.Trunca
 
 noncomputable section
 
-open MeasureTheory GroundTheory.Automorphic PositivityTheory.Rg.Tf.IntegralApplyAeEq Set Filter Topology
+open MeasureTheory GroundTheory.Automorphic PositivityTheory.Rg.Tf.IntegralApplyAeEq Set Filter
+  Topology
 open scoped InnerProductSpace
 
 namespace UpperTheory.V.Z.IntegralApplyAeEq
@@ -29,12 +30,14 @@ def rev : Flow H where
   norm t h := F.norm _ h
   cont h := (F.cont h).comp continuous_neg
 
-def av (ψ : ℝ → ℂ) : H →L[ℂ] H := Classical.epsilon fun A : H →L[ℂ] H => ∀ h, A h = ∫ t, ψ t • F.U t h
+def av (ψ : ℝ → ℂ) : H →L[ℂ] H :=
+  Classical.epsilon fun A : H →L[ℂ] H => ∀ h, A h = ∫ t, ψ t • F.U t h
 
 def Cob (h : H) : Prop := ∃ k : H, ∀ t : ℝ, ∫ s in (0 : ℝ)..t, F.U s h = F.U t k - k
 
 def Null : Prop :=
-  ∀ h h' : H, Tendsto (fun t => ⟪h', F.U t h⟫_ℂ) atTop (𝓝 0) ∧ Tendsto (fun t => ⟪h', F.U t h⟫_ℂ) atBot (𝓝 0)
+  ∀ h h' : H,
+    Tendsto (fun t => ⟪h', F.U t h⟫_ℂ) atTop (𝓝 0) ∧ Tendsto (fun t => ⟪h', F.U t h⟫_ℂ) atBot (𝓝 0)
 
 end Flow
 
@@ -52,7 +55,9 @@ section Line
 variable (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
 def sh (t : ℝ) : L V →L[ℂ] L V :=
-  (Lp.compMeasurePreservingₗᵢ ℂ (fun x : ℝ => x + t) (measurePreserving_add_right volume t)).toContinuousLinearMap
+  (Lp.compMeasurePreservingₗᵢ ℂ
+    (fun x : ℝ => x + t)
+    (measurePreserving_add_right volume t)).toContinuousLinearMap
 
 theorem sh_ae (t : ℝ) (u : L V) : ∀ᵐ x : ℝ, sh V t u x = u (x + t) :=
   Lp.coeFn_compMeasurePreserving u (measurePreserving_add_right volume t)
@@ -60,18 +65,29 @@ theorem sh_ae (t : ℝ) (u : L V) : ∀ᵐ x : ℝ, sh V t u x = u (x + t) :=
 def shF : Flow (L V) where
   U := sh V
   zero h := Lp.ext ((sh_ae V 0 h).mono fun x hx => by simpa using hx)
-  add s t h := Lp.ext (by
-    filter_upwards [sh_ae V (s + t) h, sh_ae V s (sh V t h),
-      (measurePreserving_add_right volume s).quasiMeasurePreserving.ae (sh_ae V t h)] with x h1 h2 h3
-    rw [h1, h2, h3, add_assoc])
-  norm t h := (Lp.compMeasurePreservingₗᵢ ℂ (fun x : ℝ => x + t) (measurePreserving_add_right volume t)).norm_map h
-  cont h := Continuous.compMeasurePreservingLp (f := fun _ : ℝ => h) (g := fun t : ℝ => (⟨fun x => x + t, by fun_prop⟩ : C(ℝ, ℝ)))
-    continuous_const (ContinuousMap.continuous_of_continuous_uncurry _ (continuous_snd.add continuous_fst))
-    (fun t => measurePreserving_add_right volume t) (by simp)
+  add s t h :=
+    Lp.ext (by
+      filter_upwards [sh_ae V (s + t) h, sh_ae V s (sh V t h),
+        (measurePreserving_add_right volume s).quasiMeasurePreserving.ae (sh_ae V t h)] with x h1 h2 h3
+      rw [h1, h2, h3, add_assoc])
+  norm t h :=
+    (Lp.compMeasurePreservingₗᵢ ℂ
+      (fun x : ℝ => x + t)
+      (measurePreserving_add_right volume t)).norm_map h
+  cont h :=
+    Continuous.compMeasurePreservingLp
+      (f := fun _ : ℝ => h)
+      (g := fun t : ℝ => (⟨fun x => x + t, by fun_prop⟩ : C(ℝ, ℝ)))
+      continuous_const
+      (ContinuousMap.continuous_of_continuous_uncurry _ (continuous_snd.add continuous_fst))
+      (fun t => measurePreserving_add_right volume t)
+      (by simp)
 
-def cut (s : Set ℝ) : L V →L[ℂ] L V := Classical.epsilon fun C : L V →L[ℂ] L V => ∀ u, ∀ᵐ x : ℝ, C u x = s.indicator u x
+def cut (s : Set ℝ) : L V →L[ℂ] L V :=
+  Classical.epsilon fun C : L V →L[ℂ] L V => ∀ u, ∀ᵐ x : ℝ, C u x = s.indicator u x
 
-def sv (φ : ℝ → ℂ) : V →L[ℂ] L V := Classical.epsilon fun C : V →L[ℂ] L V => ∀ e, ∀ᵐ x : ℝ, C e x = φ x • e
+def sv (φ : ℝ → ℂ) : V →L[ℂ] L V :=
+  Classical.epsilon fun C : V →L[ℂ] L V => ∀ e, ∀ᵐ x : ℝ, C e x = φ x • e
 
 def one : V →L[ℂ] L V := sv V ((Ioc (0 : ℝ) 1).indicator fun _ => 1)
 
@@ -89,28 +105,36 @@ variable {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
 def conv (κ : ℝ → V →L[ℂ] W) : L V →L[ℂ] L W :=
   Classical.epsilon fun C : L V →L[ℂ] L W => ∀ u, ∀ᵐ x : ℝ, C u x = ∫ t : ℝ, κ t (u (x + t))
 
-def kv (κ : ℝ → V →L[ℂ] W) : V →L[ℂ] L W := Classical.epsilon fun C : V →L[ℂ] L W => ∀ e, ∀ᵐ x : ℝ, C e x = κ (-x) e
+def kv (κ : ℝ → V →L[ℂ] W) : V →L[ℂ] L W :=
+  Classical.epsilon fun C : V →L[ℂ] L W => ∀ e, ∀ᵐ x : ℝ, C e x = κ (-x) e
 
-def sharp [CompleteSpace V] [CompleteSpace W] (κ : ℝ → V →L[ℂ] W) (t : ℝ) : W →L[ℂ] V := ContinuousLinearMap.adjoint (κ (-t))
+def sharp [CompleteSpace V] [CompleteSpace W] (κ : ℝ → V →L[ℂ] W) (t : ℝ) : W →L[ℂ] V :=
+  ContinuousLinearMap.adjoint (κ (-t))
 
-def scal (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (ψ : ℝ → ℂ) (t : ℝ) : V →L[ℂ] V := ψ t • ContinuousLinearMap.id ℂ V
+def scal (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (ψ : ℝ → ℂ) (t : ℝ)
+    : V →L[ℂ] V :=
+  ψ t • ContinuousLinearMap.id ℂ V
 
 end Line
 
-structure Sc (H V W : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    [NormedAddCommGroup W] [InnerProductSpace ℂ W] where
+structure Sc
+    (H V W : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup V]
+    [InnerProductSpace ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W] where
   J : L V ≃ₗᵢ[ℂ] H
   J' : L W ≃ₗᵢ[ℂ] H
   F : Flow H
   T₀ : ℝ
   hJ : ∀ t u, F.U t (J u) = J (sh V t u)
   hJ' : ∀ t v, F.U t (J' v) = J' (sh W (-t) v)
-  causal : ∀ (s : ℝ) (u : L V) (v : L W), ⟪J (cut V (Ioi s) u), J' (cut W (Ioi (2 * T₀ - s)) v)⟫_ℂ = 0
+  causal
+    : ∀ (s : ℝ) (u : L V) (v : L W), ⟪J (cut V (Ioi s) u), J' (cut W (Ioi (2 * T₀ - s)) v)⟫_ℂ = 0
 
 namespace Sc
 
-variable {H V W : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-  [NormedAddCommGroup W] [InnerProductSpace ℂ W] (M : Sc H V W)
+variable
+  {H V W : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup V]
+  [InnerProductSpace ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+  (M : Sc H V W)
 
 def swap : Sc H W V where
   J := M.J'
@@ -125,7 +149,8 @@ def swap : Sc H W V where
     rw [← inner_conj_symm, h, map_zero]
 
 def P (s : Set ℝ) : H →L[ℂ] H :=
-  (M.J.toContinuousLinearEquiv : L V →L[ℂ] H) ∘L cut V s ∘L (M.J.symm.toContinuousLinearEquiv : H →L[ℂ] L V)
+  (M.J.toContinuousLinearEquiv : L V →L[ℂ] H) ∘L cut V s
+    ∘L (M.J.symm.toContinuousLinearEquiv : H →L[ℂ] L V)
 
 def P' (s : Set ℝ) : H →L[ℂ] H := M.swap.P s
 

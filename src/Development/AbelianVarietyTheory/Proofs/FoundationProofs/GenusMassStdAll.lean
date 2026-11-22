@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GenusMass
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.StandardLattice Formalism.L2.GlobalTheoryTheory.GenusMassVolumes
+open Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes
 
 namespace GlobalTheory
 

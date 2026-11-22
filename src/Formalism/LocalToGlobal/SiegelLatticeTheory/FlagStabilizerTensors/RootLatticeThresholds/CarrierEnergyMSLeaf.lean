@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 
 noncomputable section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S IsDedekindDomain Function
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S IsDedekindDomain
+  Function
 
 namespace Formalism.L2.SG.Pf.Carrier.EnergyMS
 
@@ -23,23 +24,28 @@ def TypCount : Prop :=
 
 theorem typNorm_of (hG : StepGSplit) (hC : TypCount) : TypNorm := by
   intro D X
-  have hgA : ∀ p : TypX X, ((Ideal.absNorm p.1.asIdeal : ℕ) : ℝ) = ((gAt X p.1 : ℕ) : ℝ) := fun p => by
+  have hgA
+      : ∀ p : TypX X, ((Ideal.absNorm p.1.asIdeal : ℕ) : ℝ) = ((gAt X p.1 : ℕ) : ℝ) := fun p => by
     rw [(hG D X p).1]
   simp only [hgA]
-  rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun p : TypX X => gAt X p.1 = D.host.g 0)]
-  have h0 : ∀ p ∈ Finset.univ.filter (fun p : TypX X => gAt X p.1 = D.host.g 0),
-      ((gAt X p.1 : ℕ) : ℝ) = ((D.host.g 0 : ℕ) : ℝ) := fun p hp => by
+  rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ
+    (fun p : TypX X => gAt X p.1 = D.host.g 0)]
+  have h0
+      : ∀ p ∈ Finset.univ.filter (fun p : TypX X => gAt X p.1 = D.host.g 0),
+        ((gAt X p.1 : ℕ) : ℝ) = ((D.host.g 0 : ℕ) : ℝ) := fun p hp => by
     rw [(Finset.mem_filter.1 hp).2]
-  have h1 : ∀ p ∈ Finset.univ.filter (fun p : TypX X => ¬ gAt X p.1 = D.host.g 0),
-      ((gAt X p.1 : ℕ) : ℝ) = ((D.host.g 1 : ℕ) : ℝ) := fun p hp => by
+  have h1
+      : ∀ p ∈ Finset.univ.filter (fun p : TypX X => ¬ gAt X p.1 = D.host.g 0),
+        ((gAt X p.1 : ℕ) : ℝ) = ((D.host.g 1 : ℕ) : ℝ) := fun p hp => by
     have h := (Finset.mem_filter.1 hp).2
     unfold gAt at h ⊢
     split_ifs at h ⊢ with hg
     · exact absurd rfl h
     · rfl
   rw [Finset.prod_congr rfl h0, Finset.prod_congr rfl h1, Finset.prod_const, Finset.prod_const]
-  have hc1 : Finset.univ.filter (fun p : TypX X => ¬ gAt X p.1 = D.host.g 0) =
-      Finset.univ.filter (fun p : TypX X => gAt X p.1 = D.host.g 1) := by
+  have hc1
+      : Finset.univ.filter (fun p : TypX X => ¬ gAt X p.1 = D.host.g 0)
+        = Finset.univ.filter (fun p : TypX X => gAt X p.1 = D.host.g 1) := by
     ext p
     simp only [Finset.mem_filter, Finset.mem_univ, true_and]
     unfold gAt
@@ -47,9 +53,11 @@ theorem typNorm_of (hG : StepGSplit) (hC : TypCount) : TypNorm := by
     split_ifs <;> simp [hne, Ne.symm hne]
   rw [hc1, hC D X 0, hC D X 1, Formalism.MainNotions.S.Lat.gS, Nat.cast_mul, mul_pow]
 
-theorem dN_eq {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (v : PlX X) :
-    dN X v = ((Nat.castRingHom ℝ : ℕ →* ℝ).comp (Ideal.absNorm : Ideal (𝓞 X.B.I.F) →*₀ ℕ).toMonoidHom)
-      (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) := rfl
+theorem dN_eq {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (v : PlX X)
+    : dN X v
+      = ((Nat.castRingHom ℝ : ℕ →* ℝ).comp (Ideal.absNorm : Ideal (𝓞 X.B.I.F) →*₀ ℕ).toMonoidHom)
+        (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) :=
+  rfl
 
 theorem diffProd_holds : DiffProd := by
   intro D X
@@ -59,15 +67,19 @@ theorem diffProd_holds : DiffProd := by
     rw [h, Ideal.absNorm_bot] at h2
     exact NumberField.discr_ne_zero X.B.I.F (Int.natAbs_eq_zero.mp h2.symm)
   have hfin := Ideal.hasFiniteMulSupport hne
-  have hdN : dN X = fun v => ((Nat.castRingHom ℝ : ℕ →* ℝ).comp
-      (Ideal.absNorm : Ideal (𝓞 X.B.I.F) →*₀ ℕ).toMonoidHom) (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) :=
+  have hdN
+      : dN X
+        = fun v =>
+          ((Nat.castRingHom ℝ : ℕ →* ℝ).comp (Ideal.absNorm : Ideal (𝓞 X.B.I.F) →*₀ ℕ).toMonoidHom)
+            (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) :=
     funext (fun v => dN_eq X v)
   refine ⟨?_, ?_⟩
   · rw [hdN]
     exact hfin.subset (Function.mulSupport_comp_subset (map_one _) _)
   · rw [hdN, ← MonoidHom.map_finprod _ hfin, Ideal.finprod_heightOneSpectrum_factorization hne]
     show ((Ideal.absNorm (differentIdeal ℤ (𝓞 X.B.I.F)) : ℕ) : ℝ) = _
-    rw [NumberField.absNorm_differentIdeal (K := X.B.I.F) (𝓞 X.B.I.F), Nat.cast_natAbs, Int.cast_abs]
+    rw [NumberField.absNorm_differentIdeal (K := X.B.I.F) (𝓞 X.B.I.F), Nat.cast_natAbs,
+      Int.cast_abs]
 
 def DiscEF : Prop :=
   ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D),
@@ -95,9 +107,11 @@ theorem discRd_of (hE : DiscEF) (hd : DegE) : DiscRd := by
     field_simp
   rw [hex, Real.rpow_one]
 
-theorem lemmaMSStd_of_leaves (hO : MSOrd) (hT : MSTyp) (hG : StepGSplit) (hC : TypCount) (hE : DiscEF) (hd : DegE)
+theorem lemmaMSStd_of_leaves
+    (hO : MSOrd) (hT : MSTyp) (hG : StepGSplit) (hC : TypCount) (hE : DiscEF) (hd : DegE)
     {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word)
-    (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ) : Formalism.L2.SG.Pf.Carrier.EnergyConst2.LemmaMSStd X u u' ψ := by
+    (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ)
+    : Formalism.L2.SG.Pf.Carrier.EnergyConst2.LemmaMSStd X u u' ψ := by
   exact lemmaMSStd_of hO hT diffProd_holds (discRd_of hE hd) (typNorm_of hG hC) X u u' ψ
 
 end Formalism.L2.SG.Pf.Carrier.EnergyMS

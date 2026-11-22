@@ -31,8 +31,12 @@ theorem stProfile_holds : StProfile := by
       exact (hc.deriv_integral G 1 x)
     refine ⟨fun x => ∫ s in (1:ℝ)..x, G s, ?_, ?_, ?_, ?_⟩
     · rw [contDiff_infty_iff_deriv, hd]
-      exact ⟨fun x => (intervalIntegral.integral_hasDerivAt_right (hc.intervalIntegrable _ _)
-        (hc.stronglyMeasurableAtFilter _ _) hc.continuousAt).differentiableAt, h1⟩
+      exact ⟨
+        fun x =>
+          (intervalIntegral.integral_hasDerivAt_right (hc.intervalIntegrable _ _)
+            (hc.stronglyMeasurableAtFilter _ _) hc.continuousAt).differentiableAt,
+        h1
+      ⟩
     · intro x hx
       have : ∫ s in (1:ℝ)..x, G s = ∫ s in (1:ℝ)..x, (0:ℝ) := by
         apply intervalIntegral.integral_congr

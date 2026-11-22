@@ -48,19 +48,20 @@ theorem build : Build := by
     rw [uMat_one, Loc.LocFrame.M_one]
     exact (hπ v).2.2.1.1.1
   refine ⟨{
-      Vpi := Tens.TV H
-      piU := fun s => Tens.tensOp (A s)
-      piU_rep := ?_
-      Vloc := H
-      piLoc := pl
-      piLoc_type := hπ
-      wfr := w
-      wfr_on := fun v => (hw v).1
-      wfr_perp := fun v => (hw v).2
-      tensU := Tens.tensU
-      tensU_inner := Tens.inner_tensU
-      tensU_span := Tens.span_tensU
-      tensU_equiv := fun s _ x => Tens.tensOp_tensU (A s) x }⟩
+    Vpi := Tens.TV H
+    piU := fun s => Tens.tensOp (A s)
+    piU_rep := ?_
+    Vloc := H
+    piLoc := pl
+    piLoc_type := hπ
+    wfr := w
+    wfr_on := fun v => (hw v).1
+    wfr_perp := fun v => (hw v).2
+    tensU := Tens.tensU
+    tensU_inner := Tens.inner_tensU
+    tensU_span := Tens.span_tensU
+    tensU_equiv := fun s _ x => Tens.tensOp_tensU (A s) x
+  }⟩
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · show Tens.tensOp (A 1) = 1
     rw [hA1]
@@ -75,8 +76,12 @@ theorem build : Build := by
     exact (hπ v).2.2.1.1.2 _ ((L v).M_inUJ (inUJ_uMat I s v) (hs v)) _
       ((L v).M_inUJ (inUJ_uMat I t v) (ht v))
   · intro s hs x y
-    exact Tens.inner_tensOp (A s) (fun v u u' => inner_of_norm _
-      (fun y => (hπ v).2.2.1.2.1 _ ((L v).M_inUJ (inUJ_uMat I s v) (hs v)) y) u u') x y
+    exact Tens.inner_tensOp (A s)
+      (fun v u u' =>
+        inner_of_norm _
+          (fun y => (hπ v).2.2.1.2.1 _ ((L v).M_inUJ (inUJ_uMat I s v) (hs v)) y)
+          u u')
+      x y
   · intro s hs
     show Tens.tensOp (A s) = 1
     have : A s = fun _ => 1 := by
@@ -94,8 +99,8 @@ theorem build : Build := by
       apply continuous_pi
       intro b
       simp only [Loc.LocFrame.M, hJ]
-      exact continuous_const.dotProduct
-        (continuous_const.matrix_mulVec ((cont_uMat I v).matrix_mulVec continuous_const))
+      exact continuous_const.dotProduct (continuous_const.matrix_mulVec
+        ((cont_uMat I v).matrix_mulVec continuous_const))
     exact ((hπ v).2.2.1.2.2 y).comp hc.continuousOn
       (fun s hs => (L v).M_inUJ (inUJ_uMat I s v) (hs v))
 

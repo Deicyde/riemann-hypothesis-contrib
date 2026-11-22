@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.FlowIsotropicPairs
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FlowMajorantFlags
+open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FlowMajorantFlags
 open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
@@ -44,16 +45,18 @@ private lemma herm_smul_right_eq_cc_mul (G : Matrix (Fin r) (Fin r) E) (c : E) (
   simp only [Pi.smul_apply, smul_eq_mul, cc, map_mul]
   ring
 
-theorem isIsoPair_of (X : DataX E r) {ξ x : Fin r → E} (hξ : X.IsIso ξ) (hxξ : herm X.Gm x ξ = 0)
-    (hxx : herm X.Gm x x = 0) (hne : ∀ e : E, x ≠ e • ξ) :
-    IsIsoPair X.Gm ![ξ, (X.NC : E) • x] := by
+theorem isIsoPair_of
+    (X : DataX E r)
+    {ξ x : Fin r → E}
+    (hξ : X.IsIso ξ) (hxξ : herm X.Gm x ξ = 0) (hxx : herm X.Gm x x = 0) (hne : ∀ e : E, x ≠ e • ξ)
+    : IsIsoPair X.Gm ![ξ, (X.NC : E) • x] := by
   obtain ⟨-, hξξ, hξ0⟩ := hξ
   have hξx : herm X.Gm ξ x = 0 := herm_swap_eq_zero_of_eq_zero X.toData x ξ hxξ
   unfold IsIsoPair
   refine ⟨?_, LinearIndependent.pair_iff.mpr fun s t hst => ?_⟩
   · intro i k
-    fin_cases i <;> fin_cases k <;>
-      simp [herm_smul_left_fundamental_domains, herm_smul_right_eq_cc_mul, hξξ, hxξ, hxx, hξx]
+    fin_cases i <;> fin_cases k
+      <;> simp [herm_smul_left_fundamental_domains, herm_smul_right_eq_cc_mul, hξξ, hxξ, hxx, hξx]
   · by_cases ht : t = 0
     · subst ht
       simp only [zero_smul, add_zero] at hst
@@ -65,32 +68,33 @@ theorem isIsoPair_of (X : DataX E r) {ξ x : Fin r → E} (hξ : X.IsIso ξ) (hx
         rw [mul_smul]
         exact eq_neg_of_add_eq_zero_right hst
       apply hne (-(s / (t * X.NC)))
-      calc x = (t * X.NC)⁻¹ • ((t * X.NC) • x) := by rw [smul_smul, inv_mul_cancel₀ htn, one_smul]
+      calc
+        x = (t * X.NC)⁻¹ • ((t * X.NC) • x) := by rw [smul_smul, inv_mul_cancel₀ htn, one_smul]
         _ = -(s / (t * X.NC)) • ξ := by rw [h1, smul_neg, smul_smul, neg_smul, div_eq_inv_mul]
 
-theorem mem_pair (X : DataX E r) {ξ x : Fin r → E} (hξ : X.IsIso ξ) (hx : x ∈ X.L') :
-    ∀ i, (![ξ, (X.NC : E) • x] : Fin 2 → Fin r → E) i ∈ X.Λ := by
+theorem mem_pair (X : DataX E r) {ξ x : Fin r → E} (hξ : X.IsIso ξ) (hx : x ∈ X.L')
+    : ∀ i, (![ξ, (X.NC : E) • x] : Fin 2 → Fin r → E) i ∈ X.Λ := by
   obtain ⟨hξΛ, -, -⟩ := hξ
   intro i
   fin_cases i
   · exact hξΛ
   · exact X.NC_sub x hx
 
-theorem xp_facts (X : Data E r) {ξ x : Fin r → E} (hξξ : herm X.Gm ξ ξ = 0) (hξ0 : ξ ≠ 0)
-    (hxξ : herm X.Gm x ξ = 0) (hxx : herm X.Gm x x = 0) {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
-    (τ : X.Ψ) :
-    hermC τ.1 X.Gm (X.ucomp z0 ξ (X.embV x) τ) (Data.emb τ.1 ξ) = 0 ∧
-      hermC τ.1 X.Gm (X.ucomp z0 ξ (X.embV x) τ) (X.ucomp z0 ξ (X.embV x) τ) = 0 ∧
-      X.Hf z0 τ (X.ucomp z0 ξ (X.embV x) τ) (Data.emb τ.1 ξ) = 0 := by
+theorem xp_facts
+    (X : Data E r)
+    {ξ x : Fin r → E}
+    (hξξ : herm X.Gm ξ ξ = 0) (hξ0 : ξ ≠ 0) (hxξ : herm X.Gm x ξ = 0) (hxx : herm X.Gm x x = 0)
+    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
+    (τ : X.Ψ)
+    : hermC τ.1 X.Gm (X.ucomp z0 ξ (X.embV x) τ) (Data.emb τ.1 ξ) = 0
+      ∧ hermC τ.1 X.Gm (X.ucomp z0 ξ (X.embV x) τ) (X.ucomp z0 ξ (X.embV x) τ) = 0
+      ∧ X.Hf z0 τ (X.ucomp z0 ξ (X.embV x) τ) (Data.emb τ.1 ξ) = 0 := by
   set α := X.Hf z0 τ (Data.emb τ.1 x) (Data.emb τ.1 ξ) /
     X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) with hα
   have hxp : X.ucomp z0 ξ (X.embV x) τ = Data.emb τ.1 x - α • Data.emb τ.1 ξ := rfl
-  have h1 : hermC τ.1 X.Gm (Data.emb τ.1 x) (Data.emb τ.1 ξ) = 0 := by
-    rw [hermC_emb, hxξ, map_zero]
-  have h2 : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0 := by
-    rw [hermC_emb, hξξ, map_zero]
-  have h3 : hermC τ.1 X.Gm (Data.emb τ.1 x) (Data.emb τ.1 x) = 0 := by
-    rw [hermC_emb, hxx, map_zero]
+  have h1 : hermC τ.1 X.Gm (Data.emb τ.1 x) (Data.emb τ.1 ξ) = 0 := by rw [hermC_emb, hxξ, map_zero]
+  have h2 : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0 := by rw [hermC_emb, hξξ, map_zero]
+  have h3 : hermC τ.1 X.Gm (Data.emb τ.1 x) (Data.emb τ.1 x) = 0 := by rw [hermC_emb, hxx, map_zero]
   have h4 : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 x) = 0 := by
     rw [← hermC_conj τ.1 X.Gm_herm, h1, map_zero]
   have hne : X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) ≠ 0 := by
@@ -103,20 +107,32 @@ theorem xp_facts (X : Data E r) {ξ x : Fin r → E} (hξξ : herm X.Gm ξ ξ = 
     simp
   · rw [Hf_sub_left, Hf_smul_left, hα, div_mul_cancel₀ _ hne, sub_self]
 
-theorem e_facts (X : Data E r) {ξ x : Fin r → E} (hξξ : herm X.Gm ξ ξ = 0) (hξ0 : ξ ≠ 0)
-    (hxξ : herm X.Gm x ξ = 0) (hxx : herm X.Gm x x = 0) {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
-    (e : X.Ψ → Fin r → ℂ) (hxp0 : ∀ τ, X.ucomp z0 ξ (X.embV x) τ ≠ 0)
-    (he : ∀ τ, e τ = ((Real.sqrt (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)))⁻¹ : ℂ) •
-      X.ucomp z0 ξ (X.embV x) τ) :
-    X.IsIsoV e ∧ (∀ τ, hermC τ.1 X.Gm (e τ) (Data.emb τ.1 ξ) = 0) ∧
-      (∀ τ, X.Hf z0 τ (e τ) (Data.emb τ.1 ξ) = 0) ∧ (∀ τ, X.c τ * X.maj z0 τ (e τ) = 1) := by
-  have key : ∀ τ, ∃ k : ℝ, 0 < k ∧ e τ = (k : ℂ) • X.ucomp z0 ξ (X.embV x) τ ∧
-      k ^ 2 * (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)) = 1 := by
+theorem e_facts
+    (X : Data E r)
+    {ξ x : Fin r → E}
+    (hξξ : herm X.Gm ξ ξ = 0) (hξ0 : ξ ≠ 0) (hxξ : herm X.Gm x ξ = 0) (hxx : herm X.Gm x x = 0)
+    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
+    (e : X.Ψ → Fin r → ℂ)
+    (hxp0 : ∀ τ, X.ucomp z0 ξ (X.embV x) τ ≠ 0)
+    (he : ∀ τ,
+      e τ
+        = ((Real.sqrt (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)))⁻¹ : ℂ)
+          • X.ucomp z0 ξ (X.embV x) τ)
+    : X.IsIsoV e ∧ (∀ τ, hermC τ.1 X.Gm (e τ) (Data.emb τ.1 ξ) = 0)
+      ∧ (∀ τ, X.Hf z0 τ (e τ) (Data.emb τ.1 ξ) = 0) ∧ (∀ τ, X.c τ * X.maj z0 τ (e τ) = 1) := by
+  have key
+      : ∀ τ, ∃ k : ℝ,
+        0 < k ∧ e τ = (k : ℂ) • X.ucomp z0 ξ (X.embV x) τ
+          ∧ k ^ 2 * (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)) = 1 := by
     intro τ
     have hm : 0 < X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ) :=
       mul_pos (MajorantFamilyNorms.c_pos X τ) (X.maj_pos hz0 τ (hxp0 τ))
-    refine ⟨(Real.sqrt (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)))⁻¹,
-      inv_pos.mpr (Real.sqrt_pos.mpr hm), ?_, ?_⟩
+    refine ⟨
+      (Real.sqrt (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)))⁻¹,
+      inv_pos.mpr (Real.sqrt_pos.mpr hm),
+      ?_,
+      ?_
+    ⟩
     · simp only [he τ, Complex.ofReal_inv]
     · rw [inv_pow, Real.sq_sqrt hm.le, inv_mul_cancel₀ hm.ne']
   refine ⟨fun τ => ?_, fun τ => ?_, fun τ => ?_, fun τ => ?_⟩
@@ -134,12 +150,13 @@ theorem e_facts (X : Data E r) {ξ x : Fin r → E} (hξξ : herm X.Gm ξ ξ = 0
     rw [hek, maj_smul X hz0, ← hk2]
     ring
 
-theorem flow_facts (X : Data E r) {ξ : Fin r → E} {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.FramesOverBasis ξ)
-    (e : X.Ψ → Fin r → ℂ) (hiso : X.IsIsoV e)
-    (heξ : ∀ τ, hermC τ.1 X.Gm (e τ) (Data.emb τ.1 ξ) = 0)
+theorem flow_facts
+    (X : Data E r)
+    {ξ : Fin r → E} {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.FramesOverBasis ξ)
+    (e : X.Ψ → Fin r → ℂ) (hiso : X.IsIsoV e) (heξ : ∀ τ, hermC τ.1 X.Gm (e τ) (Data.emb τ.1 ξ) = 0)
     (hHe : ∀ τ, X.Hf z0 τ (e τ) (Data.emb τ.1 ξ) = 0) (hce : ∀ τ, X.c τ * X.maj z0 τ (e τ) = 1)
-    {z : Frame X.Ψ r} (hz : z ∈ X.dom) (hf : X.SameFlag z0 z) :
-    (∀ τ, X.ttV e z τ = 1) ∧ X.flowV e (fun _ => -(I / 2)) z ∈ X.FramesOverBasis ξ := by
+    {z : Frame X.Ψ r} (hz : z ∈ X.dom) (hf : X.SameFlag z0 z)
+    : (∀ τ, X.ttV e z τ = 1) ∧ X.flowV e (fun _ => -(I / 2)) z ∈ X.FramesOverBasis ξ := by
   have httv : ∀ τ, X.ttV e z τ = 1 := by
     intro τ
     rw [Data.ttV, maj_flag X hz0.1 hz hf, hce τ, div_one]

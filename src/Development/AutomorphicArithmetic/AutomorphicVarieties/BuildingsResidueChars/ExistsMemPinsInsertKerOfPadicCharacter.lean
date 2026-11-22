@@ -7,11 +7,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.Ws
 
-theorem UpperTheory.exists_mem_pins_insert_ker_of_padic_character :
-    ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] (I : Subgroup G), IsClosed (I : Set G) → ∀ ε : G →* ℤ_[l]ˣ, Continuous ε → ∃ s ∈ I, Pins l I (insert s {g | g ∈ I ∧ ε g = 1}) := by
+theorem UpperTheory.exists_mem_pins_insert_ker_of_padic_character
+    : ∀ (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+            (I : Subgroup G),
+          IsClosed (I : Set G)
+            → ∀ ε : G →* ℤ_[l]ˣ,
+              Continuous ε → ∃ s ∈ I, Pins l I (insert s {g | g ∈ I ∧ ε g = 1}) := by
   intro l _ hl G _ _ _ _ I hI ε hε
-  have hclo : ∀ K : Subgroup G, IsClosed (K : Set G) →
-      IsClosed ((K.map ε : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ) := by
+  have hclo
+      : ∀ K : Subgroup G,
+        IsClosed (K : Set G) → IsClosed ((K.map ε : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ) := by
     intro K hK
     rw [Subgroup.coe_map]
     exact (hK.isCompact.image hε).isClosed

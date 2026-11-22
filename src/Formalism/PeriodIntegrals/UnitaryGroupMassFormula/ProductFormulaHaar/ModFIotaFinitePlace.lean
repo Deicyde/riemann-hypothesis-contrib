@@ -14,19 +14,24 @@ namespace PI.ProdFormulaE
 
 section Local
 
-variable {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F))
+variable
+  {F : Type} [Field F] [NumberField F]
+  (p : HeightOneSpectrum (𝓞 F))
   {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (ι : F →+* K)
 
-theorem iota_mem_integer (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y)
-    (a : 𝓞 F) : ι (a : F) ∈ 𝒪[K] := by
+theorem iota_mem_integer
+    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y) (a : 𝓞 F)
+    : ι (a : F) ∈ 𝒪[K] := by
   rw [Valuation.mem_integer_iff, ← map_one (valuation K), ← Valuation.Compatible.vle_iff_le,
     ← map_one ι, hv, map_one]
   exact p.valuation_le_one a
 
-theorem modF_iota_int (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
-    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y) (a : 𝓞 F) (ha : a ≠ 0) :
-    modF K (ι (a : F)) = HeightOneSpectrum.adicAbv F p (a : F) := by
+theorem modF_iota_int
+    (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
+    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y)
+    (a : 𝓞 F) (ha : a ≠ 0)
+    : modF K (ι (a : F)) = HeightOneSpectrum.adicAbv F p (a : F) := by
   set t : 𝒪[K] := ⟨ι (a : F), iota_mem_integer p ι hv a⟩ with ht
   have ht0 : t ≠ 0 := by
     intro h
@@ -41,9 +46,10 @@ theorem modF_iota_int (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
     intro h0; rw [h0, mul_zero] at h1; exact zero_ne_one h1
   exact mul_right_cancel₀ hN (h1.trans h3.symm)
 
-theorem modF_iota (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
-    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y) (z : F) :
-    modF K (ι z) = HeightOneSpectrum.adicAbv F p z := by
+theorem modF_iota
+    (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
+    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y) (z : F)
+    : modF K (ι z) = HeightOneSpectrum.adicAbv F p z := by
   by_cases hz : z = 0
   · simp [hz, modF_zero]
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 F) z
@@ -65,21 +71,27 @@ end Global
 
 section LocAt
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-theorem modF_locAt (hI : IndexFormula) (hC : CardStep) (L : Formalism.MainNotions.S.Loc.LocAt F E sig p)
-    [IsNonarchimedeanLocalField L.Fp] (z : F) :
-    modF L.Fp (L.ιF z) = HeightOneSpectrum.adicAbv F p z :=
+theorem modF_locAt
+    (hI : IndexFormula) (hC : CardStep)
+    (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) [IsNonarchimedeanLocalField L.Fp]
+    (z : F)
+    : modF L.Fp (L.ιF z) = HeightOneSpectrum.adicAbv F p z :=
   modF_iota p L.ιF hI hC L.dense L.val z
 
 end LocAt
 
-theorem modF_iota_finitePlace {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F))
+theorem modF_iota_finitePlace
+    {F : Type} [Field F] [NumberField F]
+    (p : HeightOneSpectrum (𝓞 F))
     {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-    (ι : F →+* K) (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
-    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y) (z : F) :
-    modF K (ι z) = FinitePlace.mk p z := by
+    (ι : F →+* K)
+    (hI : IndexFormula) (hC : CardStep) (hd : DenseRange ι)
+    (hv : ∀ x y : F, (ι x ≤ᵥ ι y) ↔ p.valuation F x ≤ p.valuation F y) (z : F)
+    : modF K (ι z) = FinitePlace.mk p z := by
   rw [modF_iota p ι hI hC hd hv z, FinitePlace.mk_apply, FinitePlace.norm_embedding]
 
 end PI.ProdFormulaE

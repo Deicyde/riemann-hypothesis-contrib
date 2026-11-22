@@ -19,14 +19,18 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFr
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx
 open MeasureTheory GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames
-attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 noncomputable section
 namespace GlobalTheory.SmallKerInv
 open GlobalTheory.FinPl
@@ -119,7 +123,7 @@ theorem small_kernel_invariant : _root_.GlobalTheory.FunPr.ThetaLocalInputs → 
     have hy' : (algebraMap (𝓞 D.host.E) D.host.E a) • y ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
       Submodule.subset_span hy
     have := (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
-      (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy' 
+      (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy'
     change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ •
       ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _ at this
     rw [← smul_assoc, smul_eq_mul, inv_mul_cancel₀ ha0, one_smul] at this
@@ -168,19 +172,43 @@ end
 end
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx
 open MeasureTheory GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames
-attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.twist_small_kernel_invariant : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.SquareSt.WeilConvergence → GlobalTheory.SquareSt.LocalMatching → GlobalTheory.SquareSt.ThetaIntegralsAgree → BigR fun {D} _ _ _ _ T _ _ _ _ _ R sc => ∀ (G : GridData R.toLevCh sc) (W : G.Weil), W.Over R → ∀ (B : Frames G)
-  (ρ : RealMatch W), ρ.Over R → ∀ (t : T) (i j : Fin D.R.m) Θ Θ', IsMatched B t ρ i j Θ Θ' → ∀ g g₁,
-  ∃ (L : GlobalTheory.FinPl.Lat (G.V (.grid i j))) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))),
-    L.FG ∧ Submodule.span D.host.E (L : Set (Fin (G.V (.grid i j)).rank → D.host.E)) = ⊤ ∧
-    ∀ κ, GlobalTheory.FinPl.InK (G.V (.grid i j)) L (fun v => v ∉ S) κ → ∀ u, kerSmall W Θ' g g₁ (u * κ) = kerSmall W Θ' g g₁ u := by
-  first | exact @_root_.GlobalTheory.SmallKerInv.small_kernel_invariant | exact _root_.GlobalTheory.SmallKerInv.small_kernel_invariant | (intros; apply _root_.GlobalTheory.SmallKerInv.small_kernel_invariant <;> assumption)
+theorem _root_.GlobalTheory.T.twist_small_kernel_invariant
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.SquareSt.WeilConvergence → GlobalTheory.SquareSt.LocalMatching
+      → GlobalTheory.SquareSt.ThetaIntegralsAgree
+      → BigR fun {D} _ _ _ _ T _ _ _ _ _ R sc =>
+        ∀ (G : GridData R.toLevCh sc) (W : G.Weil),
+          W.Over R
+            → ∀ (B : Frames G) (ρ : RealMatch W),
+              ρ.Over R
+                → ∀ (t : T) (i j : Fin D.R.m) Θ Θ',
+                  IsMatched B t ρ i j Θ Θ'
+                    → ∀ g g₁,
+                      ∃ (L : GlobalTheory.FinPl.Lat (G.V (.grid i j)))
+                          (S : Finset (HeightOneSpectrum (𝓞 D.host.F))),
+                        L.FG
+                          ∧ Submodule.span D.host.E
+                              (L : Set (Fin (G.V (.grid i j)).rank → D.host.E))
+                            = ⊤
+                          ∧ ∀ κ,
+                            GlobalTheory.FinPl.InK (G.V (.grid i j)) L (fun v => v ∉ S) κ
+                              → ∀ u, kerSmall W Θ' g g₁ (u * κ) = kerSmall W Θ' g g₁ u := by
+  first
+  | exact @_root_.GlobalTheory.SmallKerInv.small_kernel_invariant
+  | exact _root_.GlobalTheory.SmallKerInv.small_kernel_invariant
+  | (intros; apply _root_.GlobalTheory.SmallKerInv.small_kernel_invariant <;> assumption)
 end

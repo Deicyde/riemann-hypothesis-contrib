@@ -294,18 +294,31 @@ lemma etaChoice (c d : ℝ) (hc : 0 < c) (hd : 0 < d) :
     have := mul_le_mul_of_nonneg_right hb hR0
     nlinarith [mul_nonneg (sub_nonneg.2 h4) (sub_nonneg.2 hl)]
 
-
 set_option maxHeartbeats 1000000 in
-theorem psiAP_relative : ∃ c₀ : ℝ, 0 < c₀ ∧ ∀ c₁ : ℝ, 0 < c₁ → c₁ ≤ c₀ → ∃ c₂ c₃ C : ℝ, 0 < c₂ ∧ 0 < c₃ ∧ 0 < C ∧ ∀ (M : ℕ) [NeZero M] (b : ℕ) (θ : ℤ) (β u : ℝ), 3 ≤ M → Nat.Coprime b M → ExcData c₁ M b θ β → (M : ℝ) ^ c₂ ≤ u → |(M.totient : ℝ) * psiAP M b u - (u - θ * (u ^ β / β))| ≤ C * (Real.exp (-c₃ * Real.log u / Real.log M) + Real.exp (-Real.sqrt (c₃ * Real.log u))) * (u - θ * (u ^ β / β)) := by
+theorem psiAP_relative
+    : ∃ c₀ : ℝ,
+      0 < c₀
+        ∧ ∀ c₁ : ℝ,
+          0 < c₁ → c₁ ≤ c₀
+            → ∃ c₂ c₃ C : ℝ,
+              0 < c₂ ∧ 0 < c₃ ∧ 0 < C
+                ∧ ∀ (M : ℕ) [NeZero M] (b : ℕ) (θ : ℤ) (β u : ℝ),
+                  3 ≤ M → Nat.Coprime b M → ExcData c₁ M b θ β → (M : ℝ) ^ c₂ ≤ u
+                    → |(M.totient : ℝ) * psiAP M b u - (u - θ * (u ^ β / β))|
+                      ≤ C
+                        * (Real.exp (-c₃ * Real.log u / Real.log M)
+                          + Real.exp (- Real.sqrt (c₃ * Real.log u)))
+                        * (u - θ * (u ^ β / β)) := by
   obtain ⟨c₀, hc₀, hX⟩ := GlobalTheory.T.exceptionalDirichletZero_unique_zeroFreeRegion
   refine ⟨c₀, hc₀, fun c₁ hc₁ hc₁' => ?_⟩
   obtain ⟨c, hc, hX⟩ := hX c₁ hc₁ hc₁'
   obtain ⟨d, hd, hD⟩ := GlobalTheory.T.one_sub_re_ge_of_exceptional_zero_repulsion
   obtain ⟨Ce, hCe, hE⟩ := GlobalTheory.T.explicit_formula_dirichlet_zeros_right_half
-  obtain ⟨A, Ca, η₀, hA, hCa, hη₀, hZ⟩ := GlobalTheory.T.exists_sum_characters_finsum_zeros_rpow_re_sub_one_le
+  obtain ⟨A, Ca, η₀, hA, hCa, hη₀, hZ⟩ :=
+    GlobalTheory.T.exists_sum_characters_finsum_zeros_rpow_re_sub_one_le
   obtain ⟨c', K, R₁, hc', hc'', hK, hη⟩ := etaChoice c d hc hd
-  obtain ⟨c₂, c₃, C, hc₂, hc₃, hC, hR⟩ := realEnd Ce Ca η₀ c' K (min 1 c) (max (max R₁ A) 8) hCe hCa hη₀ hc'
-    (by linarith) (by positivity)
+  obtain ⟨c₂, c₃, C, hc₂, hc₃, hC, hR⟩ :=
+    realEnd Ce Ca η₀ c' K (min 1 c) (max (max R₁ A) 8) hCe hCa hη₀ hc' (by linarith) (by positivity)
   refine ⟨c₂, c₃, C, hc₂, hc₃, hC, fun M _ b θ β u hM hb hexc hu => ?_⟩
   obtain ⟨hX1, hX2, hX3⟩ := hX M hM
   have hM3 : (3 : ℝ) ≤ M := by exact_mod_cast hM
@@ -315,10 +328,8 @@ theorem psiAP_relative : ∃ c₀ : ℝ, 0 < c₀ ∧ ∀ c₁ : ℝ, 0 < c₁ �
   rw [Real.log_exp]
   set m := Real.log M with hm
   have hMm : (M : ℝ) = Real.exp m := (Real.exp_log hM0).symm
-  have hm1 : 1 ≤ m := by
-    rw [hm, Real.le_log_iff_exp_le hM0]; linarith [Real.exp_one_lt_d9]
-  have hV : c₂ * m ≤ V := by
-    rw [hMm, ← Real.exp_mul, Real.exp_le_exp] at hu; linarith
+  have hm1 : 1 ≤ m := by rw [hm, Real.le_log_iff_exp_le hM0]; linarith [Real.exp_one_lt_d9]
+  have hV : c₂ * m ≤ V := by rw [hMm, ← Real.exp_mul, Real.exp_le_exp] at hu; linarith
   have hs0 : 0 ≤ √V := Real.sqrt_nonneg V
   have hL : max (max R₁ A) 8 * (10 * m + √V) ≤ V := (hR m V 1 hm1 hV).2.1
   have hV0 : 0 < V := (hR m V 1 hm1 hV).1
@@ -337,52 +348,67 @@ theorem psiAP_relative : ∃ c₀ : ℝ, 0 < c₀ ∧ ∀ c₁ : ℝ, 0 < c₁ �
   have hTu : T ≤ Real.exp V := Real.exp_le_exp.2 (by linarith)
   have hTA : ((M : ℝ) * T) ^ A ≤ Real.exp V := by
     rw [hMm, hT, ← Real.exp_add, ← Real.exp_mul, Real.exp_le_exp]; nlinarith
-  have hlog : ∀ ρ : ℂ, |ρ.im| ≤ T → 0 < Real.log (M * (|ρ.im| + 2)) ∧ Real.log (M * (|ρ.im| + 2)) ≤ L := by
+  have hlog
+      : ∀ ρ : ℂ,
+        |ρ.im| ≤ T → 0 < Real.log (M * (|ρ.im| + 2)) ∧ Real.log (M * (|ρ.im| + 2)) ≤ L := by
     intro ρ hρ
     have h0 := abs_nonneg ρ.im
     refine ⟨Real.log_pos (by nlinarith), ?_⟩
     rw [Real.log_le_iff_le_exp (by positivity)]
     have : Real.exp L = M * (M * T) := by
       rw [hMm, hT, ← Real.exp_add, ← Real.exp_add]; congr 1; rw [hLd]; ring
-    rw [this]; gcongr; nlinarith
-  have hzf : ∀ (χ : DirichletCharacter ℂ M), ∀ ρ ∈ zerosBox χ (1 / 2) T,
-      (ρ.im = 0 ∧ IsExc c₁ χ ρ.re) ∨ ρ.re ≤ 1 - c / L := by
+    rw [this]
+    gcongr
+    nlinarith
+  have hzf
+      : ∀ (χ : DirichletCharacter ℂ M), ∀ ρ ∈ zerosBox χ (1 / 2) T,
+        (ρ.im = 0 ∧ IsExc c₁ χ ρ.re) ∨ ρ.re ≤ 1 - c / L := by
     intro χ ρ hρ
     refine (hX3 χ ρ hρ.2.1 hρ.2.2.2).imp_right fun h => h.trans ?_
     obtain ⟨h1, h2⟩ := hlog ρ hρ.2.2.1
     gcongr
-  have core : ∀ a w : ℝ, 0 ≤ a → min 1 c * Real.exp (-(3 * m)) ≤ w →
-      Real.exp (-(a * (V / L) / 2)) ≤ K * w * Real.exp (-(c' * (V / L))) →
-      Real.exp V * w / 4 ≤ Real.exp V - θ * (Real.exp V ^ β / β) →
-      ((θ = 0 ∧ ∀ (χ : DirichletCharacter ℂ M), ∀ ρ ∈ zerosBox χ (1 / 2) T, ρ.re ≤ 1 - a / L) ∨
-      ∃ χ₁ : DirichletCharacter ℂ M, χ₁ ^ 2 = 1 ∧ χ₁ (b : ZMod M) = θ ∧ (β : ℂ) ∈ zerosBox χ₁ (1 / 2) T ∧
-        ord χ₁ β = 1 ∧ ∀ (χ : DirichletCharacter ℂ M), ∀ ρ ∈ zerosBox χ (1 / 2) T,
-          (χ = χ₁ ∧ ρ = β) ∨ ρ.re ≤ 1 - a / L) →
-      |(M.totient : ℝ) * psiAP M b (Real.exp V) - (Real.exp V - θ * (Real.exp V ^ β / β))| ≤
-        C * (Real.exp (-c₃ * V / m) + Real.exp (-√(c₃ * V))) * (Real.exp V - θ * (Real.exp V ^ β / β)) := by
+  have core
+      : ∀ a w : ℝ,
+        0 ≤ a → min 1 c * Real.exp (-(3 * m)) ≤ w
+          → Real.exp (-(a * (V / L) / 2)) ≤ K * w * Real.exp (-(c' * (V / L)))
+          → Real.exp V * w / 4 ≤ Real.exp V - θ * (Real.exp V ^ β / β)
+          → ((θ = 0 ∧ ∀ (χ : DirichletCharacter ℂ M), ∀ ρ ∈ zerosBox χ (1 / 2) T, ρ.re ≤ 1 - a / L)
+            ∨ ∃ χ₁ : DirichletCharacter ℂ M,
+              χ₁ ^ 2 = 1 ∧ χ₁ (b : ZMod M) = θ ∧ (β : ℂ) ∈ zerosBox χ₁ (1 / 2) T ∧ ord χ₁ β = 1
+                ∧ ∀ (χ : DirichletCharacter ℂ M), ∀ ρ ∈ zerosBox χ (1 / 2) T,
+                  (χ = χ₁ ∧ ρ = β) ∨ ρ.re ≤ 1 - a / L)
+          → |(M.totient : ℝ) * psiAP M b (Real.exp V) - (Real.exp V - θ * (Real.exp V ^ β / β))|
+            ≤ C * (Real.exp (-c₃ * V / m) + Real.exp (- √(c₃ * V)))
+              * (Real.exp V - θ * (Real.exp V ^ β / β)) := by
     intro a w ha hw h1 h2 h3
-    have s1 := struct M b hb θ β (Real.exp V) T (a / L) _ hu0 (by positivity)
-      (fun χ => hE M χ (Real.exp V) T hT2 hTu) h3
+    have s1 :=
+      struct M b hb θ β (Real.exp V) T (a / L) _ hu0 (by positivity)
+        (fun χ => hE M χ (Real.exp V) T hT2 hTu)
+        h3
     have s2 := hZ M T (Real.exp V) (a / L) hT2 hTA (by positivity)
     have s3 := hfin w hw
     have e1 : Real.log (M * Real.exp V * T) = m + V + (8 * m + √V) := by
       rw [hMm, hT, ← Real.exp_add, ← Real.exp_add, Real.log_exp]
     have e2 : Real.exp V / T = Real.exp V * Real.exp (-(8 * m + √V)) := by
       rw [Real.exp_neg, div_eq_mul_inv]
-    have e3 : √(Real.exp V) * (M : ℝ) ^ 3 = Real.exp V * (Real.exp (-(V / 2)) * Real.exp (3 * m)) := by
+    have e3
+        : √(Real.exp V) * (M : ℝ) ^ 3 = Real.exp V * (Real.exp (-(V / 2)) * Real.exp (3 * m)) := by
       rw [← Real.exp_half, hMm, ← Real.exp_nat_mul]
-      simp only [← Real.exp_add]; congr 1; push_cast; ring
+      simp only [← Real.exp_add]
+      congr 1
+      push_cast
+      ring
     have e4 : Real.exp V ^ (-(a / L) / 2) = Real.exp (-(a * (V / L) / 2)) := by
       rw [← Real.exp_mul]; congr 1; ring
-    have e5 : Real.exp V ^ (-η₀) = Real.exp (-(η₀ * V)) := by
-      rw [← Real.exp_mul]; congr 1; ring
+    have e5 : Real.exp V ^ (-η₀) = Real.exp (-(η₀ * V)) := by rw [← Real.exp_mul]; congr 1; ring
     rw [e1, e2, e3] at s1
     rw [e4, e5] at s2
     have s4 := s2.trans (mul_le_mul_of_nonneg_left (add_le_add h1 le_rfl) hCa.le)
     have s5 := mul_le_mul_of_nonneg_left s4 (show 0 ≤ 2 * Real.exp V by positivity)
     have s6 := mul_le_mul_of_nonneg_left s3 hu0.le
-    have s7 := mul_le_mul_of_nonneg_left h2
-      (show 0 ≤ C * (Real.exp (-c₃ * V / m) + Real.exp (-√(c₃ * V))) by positivity)
+    have s7 :=
+      mul_le_mul_of_nonneg_left h2
+        (show 0 ≤ C * (Real.exp (-c₃ * V / m) + Real.exp (- √(c₃ * V))) by positivity)
     rw [← hMm] at s6
     linarith
   have hx3 : Real.exp (-(3 * m)) ≤ 1 := Real.exp_le_one_iff.2 (by linarith)
@@ -390,10 +416,12 @@ theorem psiAP_relative : ∃ c₀ : ℝ, 0 < c₀ ∧ ∀ c₁ : ℝ, 0 < c₁ �
     mul_le_one₀ (min_le_left _ _) (Real.exp_pos _).le hx3
   have hVL : 0 ≤ V / L := by positivity
   rcases hexc with ⟨h0, hno⟩ | ⟨χ₁, hχ₁, hθ⟩
-  · refine core c 1 hc.le hmin1 ?_ ?_ (Or.inl ⟨h0, fun χ ρ hρ => (hzf χ ρ hρ).resolve_left fun h => hno _ _ h.2⟩)
+  · refine core c 1 hc.le hmin1 ?_ ?_
+      (Or.inl ⟨h0, fun χ ρ hρ => (hzf χ ρ hρ).resolve_left fun h => hno _ _ h.2⟩)
     · rw [mul_one]
       refine le_trans ?_ (le_mul_of_one_le_left (Real.exp_pos _).le hK)
-      apply Real.exp_le_exp.2; nlinarith
+      apply Real.exp_le_exp.2
+      nlinarith
     · rw [h0]; simp only [Int.cast_zero, zero_mul]; linarith
   · obtain ⟨hne, hβ1, hz, ho, hlow⟩ := hX2 χ₁ β hχ₁
     have hβ2 : β < 1 := hχ₁.2.2.1
@@ -406,13 +434,14 @@ theorem psiAP_relative : ∃ c₀ : ℝ, 0 < c₀ ∧ ∀ c₁ : ℝ, 0 < c₁ �
     · have h1 : Real.exp (-(3 * m)) = 1 / (M : ℝ) ^ 3 := by
         rw [hMm, ← Real.exp_nat_mul, Real.exp_neg, one_div]; norm_num
       have h2 : m ≤ M := by rw [hMm]; linarith [Real.add_one_le_exp m]
-      have h3 : c / (M : ℝ) ^ 3 ≤ c / ((M : ℝ) ^ 2 * m) := by
-        rw [pow_succ (M : ℝ) 2]; gcongr
+      have h3 : c / (M : ℝ) ^ 3 ≤ c / ((M : ℝ) ^ 2 * m) := by rw [pow_succ (M : ℝ) 2]; gcongr
       have h4 : min 1 c * (1 / (M : ℝ) ^ 3) ≤ c / (M : ℝ) ^ 3 := by
         rw [mul_one_div]; gcongr; exact min_le_right _ _
-      rw [h1]; nlinarith
+      rw [h1]
+      nlinarith
     · refine le_trans ?_ (mainLower θ β V hθ1 hβ1 hβ2 (by linarith))
-      gcongr; linarith
+      gcongr
+      linarith
     · simp only [Complex.ofReal_re]; linarith
     · simpa using hβ2
     · simp only [Complex.ofReal_im, abs_zero]; linarith
@@ -424,8 +453,9 @@ theorem psiAP_relative : ∃ c₀ : ℝ, 0 < c₀ ∧ ∀ c₁ : ℝ, 0 < c₁ �
       · by_cases h : χ = χ₁ ∧ ρ = β
         · exact Or.inl h
         · right
-          have := hD M χ₁ χ β L ρ hne hχ₁.1 hβ2 (by linarith) hz hρ.2.2.2 hρ.1 hρ.2.1
-            (by tauto) (hlog ρ hρ.2.2.1).2
+          have :=
+            hD M χ₁ χ β L ρ hne hχ₁.1 hβ2 (by linarith) hz hρ.2.2.2 hρ.1 hρ.2.1 (by tauto)
+              (hlog ρ hρ.2.2.1).2
           linarith
 
 end GlobalTheory.Lin.PsiRel

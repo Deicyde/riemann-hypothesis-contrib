@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedDualR
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 GlobalTheory.W1.Lef UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  GlobalTheory.W1.Lef UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system
@@ -73,7 +74,8 @@ private lemma pk_filter {d : ℕ} (I : Finset (Fin (d + 1))) (i : Fin (d + 1)) (
   · exact Finset.le_min' _ _ _ (fun y hy => Finset.min'_le _ _ (Finset.mem_filter.1 hy).1)
 
 section
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
 
 private lemma muP_tmul' (τ : DR ℂ K →ₗ[K] K) (w' w'' w : DR ℂ K) :
     muP F K τ (w' ⊗ₜ w'') w = (Algebra.trace F K (τ (w' * w))) ⊗ₜ[ℂ] w'' := by
@@ -143,21 +145,27 @@ end
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.pCup_of :
-    RCup → SysBasic → SysOk → ActsLin → GoodZ → PCup := by
+theorem UpperTheory.Gal.productCup_of_system.pCup_of
+    : RCup → SysBasic → SysOk → ActsLin → GoodZ → PCup := by
   intro hR hB hOk hA hG
   unfold PCup
   intro F K _ _ _ _ _ _ d x hfin τ hτ a p had c hc hdiag α hα
   obtain ⟨hcC, hcD⟩ := Submodule.mem_inf.1 hc
   obtain ⟨hαC, hαD⟩ := Submodule.mem_inf.1 hα
   have hAL := hA F K d x hfin τ hτ a
-  have h6 : ∀ (s : F ⊗[ℂ] K) m w, muP F K τ (actZ K (phi (F := F) (K := K) s) m) w =
-      (sysP K x a).act s (muP F K τ m w) := hAL.2.2.2.2.2
-  have hmono : ∀ (q : ℕ) (s t : Finset (Fin (d + 1))), s.Nonempty → s ⊆ t →
-      omB ℂ K (rB ℂ K (xv x) s) q ≤ omB ℂ K (rB ℂ K (xv x) t) q := fun q => (hG F K d x hfin q).2.2
+  have h6
+      : ∀ (s : F ⊗[ℂ] K) m w,
+        muP F K τ (actZ K (phi (F := F) (K := K) s) m) w = (sysP K x a).act s (muP F K τ m w) :=
+    hAL.2.2.2.2.2
+  have hmono
+      : ∀ (q : ℕ) (s t : Finset (Fin (d + 1))),
+        s.Nonempty → s ⊆ t → omB ℂ K (rB ℂ K (xv x) s) q ≤ omB ℂ K (rB ℂ K (xv x) t) q := fun q =>
+    (hG F K d x hfin q).2.2
   have hcv := (mem_acx_C _ _ _ c).1 hcC
-  have hcz : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
-      ¬ (I.card + J.card + L.card = d + 2 ∧ I.Nonempty ∧ J.Nonempty) → c (uni (uni I J) L) = 0 := by
+  have hcz
+      : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
+        ¬(I.card + J.card + L.card = d + 2 ∧ I.Nonempty ∧ J.Nonempty)
+          → c (uni (uni I J) L) = 0 := by
     intro I J L h
     have hv := hcv (uni (uni I J) L)
     rw [card_uni', card_uni', mixF, lft_uni', lft_uni', rgt_uni'] at hv
@@ -165,17 +173,24 @@ theorem UpperTheory.Gal.productCup_of_system.pCup_of :
     · exact absurd ⟨by push_cast at h1; omega, h2⟩ h
     · exact (Submodule.mem_bot _).1 hv
     · exact (Submodule.mem_bot _).1 hv
-  have hcm : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)), I.card + J.card + L.card = d + 2 →
-      I.Nonempty → J.Nonempty → c (uni (uni I J) L) ∈ ((sysZ K x a).M I J).map
-        ((sysZ K x a).act ((∏ l ∈ L, (sysZ K x a).u n11 (pk I) (pk J) l : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)) := by
+  have hcm
+      : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
+        I.card + J.card + L.card = d + 2 → I.Nonempty → J.Nonempty
+          → c (uni (uni I J) L) ∈ ((sysZ K x a).M I J).map
+            ((sysZ K x a).act
+              ((∏ l ∈ L, (sysZ K x a).u n11 (pk I) (pk J) l : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)) := by
     intro I J L h h1 h2
     have hv := hcv (uni (uni I J) L)
     rw [card_uni', card_uni', mixF, lft_uni', lft_uni', rgt_uni', if_pos (by push_cast; omega),
-      if_pos ⟨h1, h2⟩, rgt_uni'] at hv
+        if_pos ⟨h1, h2⟩, rgt_uni']
+      at hv
     exact hv
-  have hαv : ∀ s, α s ∈ (if s.Nonempty ∧ (s.card : ℤ) = (p : ℤ) + 1 then omB ℂ K (rB ℂ K (xv x) s) a else ⊥) :=
+  have hαv
+      : ∀ s,
+        α s
+          ∈ (if s.Nonempty ∧ (s.card : ℤ) = (p : ℤ) + 1 then omB ℂ K (rB ℂ K (xv x) s) a else ⊥) :=
     fun s => (Submodule.mem_pi.1 hαC) s (Set.mem_univ _)
-  have hαz : ∀ s, ¬ (s.Nonempty ∧ s.card = p + 1) → α s = 0 := by
+  have hαz : ∀ s, ¬(s.Nonempty ∧ s.card = p + 1) → α s = 0 := by
     intro s h
     have hv := hαv s
     rw [if_neg (fun h' => h ⟨h'.1, by omega⟩)] at hv
@@ -185,12 +200,20 @@ theorem UpperTheory.Gal.productCup_of_system.pCup_of :
     have hv := hαv s
     rw [if_pos ⟨h1, by omega⟩] at hv
     exact hv
-  have hterm : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)) (i : Fin (d + 1)), i ∈ I →
-      muP F K τ (c (uni (uni (I.filter (· ≤ i)) J) L)) (α (I.filter (i ≤ ·))) ∈
-        (if ((uni (uni I J) L).card : ℤ) = ↑d + ↑p + 2 then
-          mixF (fun I J => Submodule.map ((sysP K x a).act
-            ((∏ l ∈ L, (sysP K x a).u n11 (pk I) (pk J) l : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K)) ((sysP K x a).M I J))
-            (uni I J) else ⊥) := by
+  have hterm
+      : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)) (i : Fin (d + 1)),
+        i ∈ I
+          → muP F K τ (c (uni (uni (I.filter (· ≤ i)) J) L)) (α (I.filter (i ≤ ·)))
+            ∈ (if ((uni (uni I J) L).card : ℤ) = ↑d + ↑p + 2 then
+                 mixF
+                   (fun I J =>
+                     Submodule.map
+                       ((sysP K x a).act
+                         ((∏ l ∈ L, (sysP K x a).u n11 (pk I) (pk J) l : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K))
+                       ((sysP K x a).M I J))
+                   (uni I J)
+               else
+                 ⊥) := by
     intro I J L i hi
     have hfne : (I.filter (· ≤ i)).Nonempty := ⟨i, Finset.mem_filter.2 ⟨hi, le_rfl⟩⟩
     have hgne : (I.filter (i ≤ ·)).Nonempty := ⟨i, Finset.mem_filter.2 ⟨hi, le_rfl⟩⟩
@@ -204,7 +227,8 @@ theorem UpperTheory.Gal.productCup_of_system.pCup_of :
       exact Submodule.zero_mem _
     have hsplit := card_split I i hi
     have hIne : I.Nonempty := ⟨i, hi⟩
-    rw [if_pos (by rw [card_uni', card_uni']; push_cast; omega), mixF, lft_uni', rgt_uni', if_pos ⟨hIne, h1.2⟩]
+    rw [if_pos (by rw [card_uni', card_uni']; push_cast; omega), mixF, lft_uni', rgt_uni',
+      if_pos ⟨hIne, h1.2⟩]
     exact term_mem x hfin τ hτ a had h6 hmono I _ _ J L hfne hgne (Finset.filter_subset _ _)
       (Finset.filter_subset _ _) (pk_filter I i hi) _ (hcm _ _ _ h1.1 hfne h1.2) _ (hαm _ hgne h2)
   refine ⟨Submodule.mem_inf.2 ⟨?_, ?_⟩, ?_, ?_⟩
@@ -214,13 +238,12 @@ theorem UpperTheory.Gal.productCup_of_system.pCup_of :
       ⟨lft (lft s), rgt (lft s), rgt s, by rw [uni_lft_rgt', uni_lft_rgt']⟩
     have hsum := Submodule.sum_mem _ (fun i hi => hterm I J L i hi)
     simp only [rcup, lft_uni', rgt_uni']
-    first
-      | exact Submodule.smul_of_tower_mem _ _ hsum
-      | exact Submodule.smul_mem _ _ hsum
+    first | exact Submodule.smul_of_tower_mem _ _ hsum | exact Submodule.smul_mem _ _ hsum
   · rw [LinearMap.mem_ker]
-    have hz : ∀ (l : Mi d) (m : DR ℂ K ⊗[ℂ] DR ℂ K) (y : DR ℂ K),
-        muP F K τ ((sysZ K x a).act ((sysZ K x a).mu l) m) y =
-          (sysP K x a).act ((sysP K x a).mu l) (muP F K τ m y) := by
+    have hz
+        : ∀ (l : Mi d) (m : DR ℂ K ⊗[ℂ] DR ℂ K) (y : DR ℂ K),
+          muP F K τ ((sysZ K x a).act ((sysZ K x a).mu l) m) y
+            = (sysP K x a).act ((sysP K x a).mu l) (muP F K τ m y) := by
       intro l m y
       have := h6 ((sysP K x a).mu l) m y
       rw [phi_mu] at this
@@ -228,7 +251,8 @@ theorem UpperTheory.Gal.productCup_of_system.pCup_of :
     exact hR d _ _ (sysZ K x a) _ _ _ (sysP K x a) (Mi d) _ _ (muP F K τ) p c α hz
       (LinearMap.mem_ker.1 hcD)
       (fun J L => hcz _ _ _ (fun h => Finset.not_nonempty_empty h.2.1))
-      (LinearMap.mem_ker.1 hαD) (fun I h => hαz I (fun h' => h h'.2))
+      (LinearMap.mem_ker.1 hαD)
+      (fun I h => hαz I (fun h' => h h'.2))
   · intro b L hL
     simp only [rcup, lft_uni', rgt_uni']
     rw [Finset.sum_eq_zero, smul_zero]
@@ -263,7 +287,8 @@ theorem UpperTheory.Gal.productCup_of_system.pCup_of :
               exact le_antisymm hle (Finset.min'_le _ _ hy)
             · rintro rfl
               exact ⟨hmin, le_rfl⟩
-          have hf2 : I.filter (I.min' hI ≤ ·) = I := Finset.filter_true_of_mem (fun y hy => Finset.min'_le _ _ hy)
+          have hf2 : I.filter (I.min' hI ≤ ·) = I :=
+            Finset.filter_true_of_mem (fun y hy => Finset.min'_le _ _ hy)
           rw [hf1, hf2]
           have hact := hdiag (I.min' hI) j L hL _ hαI
           rw [LinearMap.map_smul_of_tower, hact, Finset.card_singleton, hL]

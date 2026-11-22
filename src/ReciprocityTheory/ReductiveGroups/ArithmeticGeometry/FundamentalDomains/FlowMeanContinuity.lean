@@ -7,8 +7,11 @@ public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.FourSum
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.FlowMeanContinuity
 
-open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
-  ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters
+open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+  ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns
+  ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity
+  ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters
 open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
@@ -36,8 +39,9 @@ lemma mean_haar {G : Type*} [NormedAddCommGroup G] [NormedSpace ℝ G] [FiniteDi
 
 variable (X : Data E r) (la : Wt X.Ψ r)
 
-noncomputable def fjI (ξ : Fin r → E) (ν : X.Ψ → ℝ) (P : Frame X.Ψ r → ℂ) (x : Frame X.Ψ r)
-    (s : X.Ψ → ℝ) : ℂ :=
+noncomputable def fjI
+    (ξ : Fin r → E) (ν : X.Ψ → ℝ) (P : Frame X.Ψ r → ℂ) (x : Frame X.Ψ r) (s : X.Ψ → ℝ)
+    : ℂ :=
   P (X.flow ξ (fun τ => (s τ : ℂ)) x) * cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ)
 
 lemma flow_differentiable (ξ : Fin r → E) (x : Frame X.Ψ r) :
@@ -134,14 +138,17 @@ lemma exists_basis : ∃ ω : Module.Basis (Fin (Fintype.card X.Ψ)) ℝ (X.Ψ �
   refine ⟨(b.ofZLatticeBasis ℝ (perL X la)).reindex (Fintype.equivFinOfCardEq hcard), ?_⟩
   rw [Module.Basis.range_reindex, Module.Basis.ofZLatticeBasis_span]
 
-theorem fj_eq_fourCoeff (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) {ξ : Fin r → E} (hξ : X.IsIso ξ)
-    {x : Frame X.Ψ r} (hx : x ∈ X.dom) {n : ℕ} (ω : Module.Basis (Fin n) ℝ (X.Ψ → ℝ))
-    (hω : Submodule.span ℤ (Set.range ω) = perL X la) (ν : X.Ψ → ℝ) (k : Fin n → ℤ)
-    (hk : ∀ j, 2 * ∑ τ, ν τ * ω j τ = k j) :
-    X.fj la ξ ν P x = ReciprocityTheory.L2DbarEstimates.Y.fourCoeff
-      (fun t => P (X.flow ξ (fun τ => ∑ j, t j * (ω j τ : ℂ)) x)) 0 k := by
+theorem fj_eq_fourCoeff
+    (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P)
+    {ξ : Fin r → E} (hξ : X.IsIso ξ)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    {n : ℕ} (ω : Module.Basis (Fin n) ℝ (X.Ψ → ℝ)) (hω : Submodule.span ℤ (Set.range ω) = perL X la)
+    (ν : X.Ψ → ℝ) (k : Fin n → ℤ) (hk : ∀ j, 2 * ∑ τ, ν τ * ω j τ = k j)
+    : X.fj la ξ ν P x
+      = ReciprocityTheory.L2DbarEstimates.Y.fourCoeff
+        (fun t => P (X.flow ξ (fun τ => ∑ j, t j * (ω j τ : ℂ)) x))
+        0 k := by
   classical
-
   have hper : X.periods la = (Submodule.span ℤ (Set.range ω)).toAddSubgroup := by
     rw [hω]
     rfl
@@ -160,11 +167,16 @@ theorem fj_eq_fourCoeff (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) {ξ : Fin
   have hF0 : IsAddFundamentalDomain (X.periods la) (ZSpan.fundamentalDomain ω) volume := by
     rw [hper]
     exact ZSpan.isAddFundamentalDomain ω volume
-  have hex : ∃ D : Set (X.Ψ → ℝ), MeasurableSet D ∧ IsAddFundamentalDomain (X.periods la) D volume ∧
-      0 < volume D ∧ volume D < ⊤ :=
-    ⟨_, ZSpan.fundamentalDomain_measurableSet ω, hF0,
-      pos_iff_ne_zero.mpr (ZSpan.measure_fundamentalDomain_ne_zero ω),
-      (ZSpan.fundamentalDomain_isBounded ω).measure_lt_top⟩
+  have hex
+      : ∃ D : Set (X.Ψ → ℝ),
+        MeasurableSet D ∧ IsAddFundamentalDomain (X.periods la) D volume ∧ 0 < volume D
+          ∧ volume D < ⊤ := ⟨
+    _,
+    ZSpan.fundamentalDomain_measurableSet ω,
+    hF0,
+    pos_iff_ne_zero.mpr (ZSpan.measure_fundamentalDomain_ne_zero ω),
+    (ZSpan.fundamentalDomain_isBounded ω).measure_lt_top
+  ⟩
   have hcount : ((X.periods la : Set (X.Ψ → ℝ))).Countable :=
     (Set.countable_range (fun c : Fin n → ℤ => ∑ j, c j • ω j)).mono fun p hp => by
       rw [hper] at hp
@@ -175,8 +187,9 @@ theorem fj_eq_fourCoeff (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) {ξ : Fin
   obtain ⟨-, hD, -, -⟩ := hex.choose_spec
   show ((volume hex.choose).toReal : ℂ)⁻¹ * ∫ s in hex.choose, fjI X ξ ν P x s = _
 
-  rw [hD.measure_eq hF0, hD.setIntegral_eq hF0 (f := fjI X ξ ν P x)
-    (fun g s => fjI_periodic X la P hP hξ.1 hξ.2.1 ν hcond hx g g.2 s)]
+  rw [hD.measure_eq hF0,
+    hD.setIntegral_eq hF0 (f := fjI X ξ ν P x)
+      (fun g s => fjI_periodic X la P hP hξ.1 hξ.2.1 ν hcond hx g g.2 s)]
 
   set T := ω.equivFunL.symm with hTdef
   haveI : (Measure.map T volume).IsAddHaarMeasure := T.isAddHaarMeasure_map volume
@@ -186,7 +199,8 @@ theorem fj_eq_fourCoeff (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) {ξ : Fin
   have hemb : MeasurableEmbedding T := T.toHomeomorph.measurableEmbedding
   rw [← hmp.setIntegral_preimage_emb hemb _ (ZSpan.fundamentalDomain ω),
     Measure.map_apply T.continuous.measurable (ZSpan.fundamentalDomain_measurableSet ω)]
-  have hpre : T ⁻¹' ZSpan.fundamentalDomain ω = Set.univ.pi (fun _ : Fin n => Set.Ico (0 : ℝ) 1) := by
+  have hpre
+      : T ⁻¹' ZSpan.fundamentalDomain ω = Set.univ.pi (fun _ : Fin n => Set.Ico (0 : ℝ) 1) := by
     ext t
     have hTt : T t = ω.equivFun.symm t := rfl
     have hrep : ∀ i, ω.repr (ω.equivFun.symm t) i = t i := fun i => by
@@ -196,8 +210,9 @@ theorem fj_eq_fourCoeff (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) {ξ : Fin
   have hvol : volume (Set.univ.pi (fun _ : Fin n => Set.Ico (0 : ℝ) 1)) = 1 := by
     rw [Real.volume_pi_Ico]
     simp
-  have hae : (Set.univ.pi fun _ : Fin n => Set.Ico (0 : ℝ) 1) =ᵐ[volume]
-      (Set.univ.pi fun _ : Fin n => Set.Ioc (0 : ℝ) 1) := by
+  have hae
+      : (Set.univ.pi fun _ : Fin n => Set.Ico (0 : ℝ) 1) =ᵐ[volume]
+        (Set.univ.pi fun _ : Fin n => Set.Ioc (0 : ℝ) 1) := by
     rw [MeasureTheory.volume_pi]
     exact Measure.univ_pi_Ico_ae_eq_Icc.trans Measure.univ_pi_Ioc_ae_eq_Icc.symm
   rw [hpre, hvol, ENNReal.toReal_one, Complex.ofReal_one, inv_one, one_mul,

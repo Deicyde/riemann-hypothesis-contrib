@@ -39,8 +39,7 @@ theorem nd_w''_le : L.sc.w'' D.R.n ≤ L.sc.b' := by
   unfold Scale.w''
   exact div_le_self nd_b'_nonneg (one_le_mul_of_one_le_of_one_le nd_x_ge nd_n_ge)
 
-theorem nd_m_ge : (2 : ℝ) ≤ (D.R.m : ℝ) := by
-  exact_mod_cast D.R.two_le_m
+theorem nd_m_ge : (2 : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast D.R.two_le_m
 
 theorem nd_k_ge : (5 : ℝ) ≤ (D.R.k : ℝ) := by
   have h1 := D.R.two_le_m
@@ -66,8 +65,11 @@ theorem nd_eta_le (hS : Formalism.MainNotions.SizesAt L) : L.etaSz ≤ L.sc.a :=
     exact_mod_cast h
   have hk : (1 : ℝ) ≤ (D.R.k : ℝ) := by have := nd_k_ge (D := D); linarith
   have hd : (1 : ℝ) ≤ (D.R.t : ℝ) ^ 3 * D.R.f * (D.R.k : ℝ) ^ 3 :=
-    one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le (one_le_pow₀ ht) hf) (one_le_pow₀ hk)
-  calc L.etaSz ≤ _ := h2
+    one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le (one_le_pow₀ ht) hf)
+      (one_le_pow₀ hk)
+  calc
+    L.etaSz
+      ≤ _ := h2
     _ ≤ L.sc.b := div_le_self hb hd
     _ ≤ L.sc.a := by unfold Scale.a; exact le_mul_of_one_le_left hb hx
 
@@ -89,8 +91,9 @@ theorem nd_Sc_le (hS : Formalism.MainNotions.SizesAt L) : 4 * L.Sc ≤ L.sc.a :=
   have hSc : 0 < L.Sc := L.Sc_pos
   have hL : L.sc.L ≤ L.sc.x := by
     unfold Scale.L
-    calc L.sc.x ^ L.sc.eps ≤ L.sc.x ^ (1 : ℝ) :=
-          Real.rpow_le_rpow_of_exponent_le hx (by linarith [L.sc.eps_lt])
+    calc
+      L.sc.x ^ L.sc.eps
+        ≤ L.sc.x ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hx (by linarith [L.sc.eps_lt])
       _ = L.sc.x := Real.rpow_one _
   have hwx : L.sc.w'' D.R.n * L.sc.x ≤ L.sc.b' := by
     unfold Scale.w''
@@ -109,7 +112,8 @@ theorem nd_Sc_le (hS : Formalism.MainNotions.SizesAt L) : 4 * L.Sc ≤ L.sc.a :=
     nlinarith [mul_le_mul_of_nonneg_left hX ha]
   linarith [mul_le_mul_of_nonneg_left hL hw0, mul_le_mul_of_nonneg_right hm (add_nonneg hSc.le heta)]
 
-theorem nd_bT_le (hS : Formalism.MainNotions.SizesAt L) (t : D.host.TT) : (L.bT t : ℝ) ≤ 5 / 4 * L.sc.a := by
+theorem nd_bT_le (hS : Formalism.MainNotions.SizesAt L) (t : D.host.TT)
+    : (L.bT t : ℝ) ≤ 5 / 4 * L.sc.a := by
   have hS' := hS
   unfold Formalism.MainNotions.SizesAt at hS'
   obtain ⟨hN, -, hK, -, -, -, -, -, hLa, -, hBot, -⟩ := hS'
@@ -129,15 +133,17 @@ theorem nd_bT_le (hS : Formalism.MainNotions.SizesAt L) (t : D.host.TT) : (L.bT 
   have hLa0 : 0 ≤ L.LaG := le_trans hxe0 hLa.1
   have hn0 : (0 : ℝ) ≤ (D.R.n : ℝ) := by positivity
   have hkey : (D.R.n : ℝ) * L.sc.x ^ L.sc.eps * L.LaG ≤ (D.R.k : ℝ) := by
-    calc (D.R.n : ℝ) * L.sc.x ^ L.sc.eps * L.LaG
-        ≤ L.sc.x ^ (2 + 8 * L.sc.eps + L.sc.eps / 100) * L.sc.x ^ L.sc.eps *
-            L.sc.x ^ (L.sc.eps + L.sc.eps / 100) :=
-          mul_le_mul (mul_le_mul_of_nonneg_right hN.2 hxe0) hLa.2 hLa0
-            (mul_nonneg (Real.rpow_nonneg hx0.le _) hxe0)
-      _ = L.sc.x ^ (2 + 8 * L.sc.eps + L.sc.eps / 100 + L.sc.eps + (L.sc.eps + L.sc.eps / 100)) := by
-          rw [← Real.rpow_add hx0, ← Real.rpow_add hx0]
+    calc
+      (D.R.n : ℝ) * L.sc.x ^ L.sc.eps * L.LaG
+          ≤ L.sc.x ^ (2 + 8 * L.sc.eps + L.sc.eps / 100) * L.sc.x ^ L.sc.eps
+            * L.sc.x ^ (L.sc.eps + L.sc.eps / 100) :=
+        mul_le_mul (mul_le_mul_of_nonneg_right hN.2 hxe0) hLa.2 hLa0
+          (mul_nonneg (Real.rpow_nonneg hx0.le _) hxe0)
+      _ = L.sc.x
+          ^ (2 + 8 * L.sc.eps + L.sc.eps / 100 + L.sc.eps + (L.sc.eps + L.sc.eps / 100)) := by
+        rw [← Real.rpow_add hx0, ← Real.rpow_add hx0]
       _ ≤ L.sc.x ^ (9 / 2 + 10 * L.sc.eps - L.sc.eps / 100) :=
-          Real.rpow_le_rpow_of_exponent_le hx (by linarith)
+        Real.rpow_le_rpow_of_exponent_le hx (by linarith)
       _ ≤ (D.R.k : ℝ) := hK.1
   have hd1 : L.sc.delta1 ≤ 1 := by
     unfold Scale.delta1
@@ -146,8 +152,9 @@ theorem nd_bT_le (hS : Formalism.MainNotions.SizesAt L) (t : D.host.TT) : (L.bT 
     unfold Scale.delta1
     exact Real.rpow_nonneg hx0.le _
   have hb' : 0 ≤ L.sc.b' := nd_b'_nonneg
-  have hE : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / (D.R.k : ℝ) ≤
-      2 * L.sc.b' := by
+  have hE
+      : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / (D.R.k : ℝ)
+        ≤ 2 * L.sc.b' := by
     rw [div_le_iff₀ hk0]
     nlinarith [mul_le_mul_of_nonneg_left hkey (mul_nonneg (mul_nonneg (by norm_num : (0 : ℝ) ≤ 2) hd0) hb'),
       mul_le_mul_of_nonneg_right hd1 (mul_nonneg (mul_nonneg (by norm_num : (0 : ℝ) ≤ 2) hb') hk0.le)]
@@ -200,7 +207,9 @@ theorem nd_N_le (hS : Formalism.MainNotions.SizesAt L) : (D.R.N D.R.m : ℝ) ≤
     have e4 : D.R.t * 3 ≤ D.R.t ^ 3 * (D.R.f * D.R.k ^ 2) :=
       Nat.mul_le_mul (Nat.le_self_pow (by norm_num) _) e3
     unfold Ranks.N
-    calc D.R.k + D.R.m * (D.R.t + 1) ≤ D.R.k * (D.R.t + 2) := by nlinarith [e1]
+    calc
+      D.R.k + D.R.m * (D.R.t + 1)
+        ≤ D.R.k * (D.R.t + 2) := by nlinarith [e1]
       _ ≤ D.R.k * (3 * D.R.t) := e2
       _ = D.R.k * (D.R.t * 3) := by ring
       _ ≤ D.R.k * (D.R.t ^ 3 * (D.R.f * D.R.k ^ 2)) := Nat.mul_le_mul_left _ e4
@@ -215,13 +224,18 @@ theorem nd_N_le (hS : Formalism.MainNotions.SizesAt L) : (D.R.N D.R.m : ℝ) ≤
   have hde : (D.R.t : ℝ) ^ 3 * D.R.f * (D.R.k : ℝ) ^ 3 * L.etaSz ≤ L.sc.b := by
     rw [le_div_iff₀ hdpos] at h2
     linarith
-  calc (D.R.N D.R.m : ℝ) ≤ (D.R.t : ℝ) ^ 3 * D.R.f * (D.R.k : ℝ) ^ 3 := hNr
+  calc
+    (D.R.N D.R.m : ℝ)
+      ≤ (D.R.t : ℝ) ^ 3 * D.R.f * (D.R.k : ℝ) ^ 3 := hNr
     _ ≤ (D.R.t : ℝ) ^ 3 * D.R.f * (D.R.k : ℝ) ^ 3 * L.etaSz := le_mul_of_one_le_right hdpos.le ht1
     _ ≤ L.sc.b := hde
     _ ≤ L.sc.a := by unfold Scale.a; exact le_mul_of_one_le_left hb hx
 
-theorem nd_fill_le (X : Formalism.MainNotions.G.Inst D L) (hS : Formalism.MainNotions.SizesAt L) (j : ℕ) (hj : 1 ≤ j) (t : Formalism.MainNotions.G.HH D) :
-    Formalism.MainNotions.G.fillG X (Formalism.MainNotions.G.bL L) j (false, t) ≤ 4 * L.sc.a := by
+theorem nd_fill_le
+    (X : Formalism.MainNotions.G.Inst D L) (hS : Formalism.MainNotions.SizesAt L)
+    (j : ℕ) (hj : 1 ≤ j)
+    (t : Formalism.MainNotions.G.HH D)
+    : Formalism.MainNotions.G.fillG X (Formalism.MainNotions.G.bL L) j (false, t) ≤ 4 * L.sc.a := by
   have hx : (1 : ℝ) ≤ L.sc.x := nd_x_ge
   have hb'a : L.sc.b' ≤ L.sc.a := nd_b'_le
   have hb'0 : 0 ≤ L.sc.b' := nd_b'_nonneg
@@ -249,7 +263,8 @@ theorem nd_fill_le (X : Formalism.MainNotions.G.Inst D L) (hS : Formalism.MainNo
     have hbx : L.sc.b' / L.sc.x ≤ L.sc.b' := div_le_self hb'0 hx
     linarith
   · have hthin : Formalism.MainNotions.G.IsThinPl D (false, t) := by
-      unfold Formalism.MainNotions.G.IsThinPl Formalism.MainNotions.G.IsTopPl Formalism.MainNotions.G.IsThickPl
+      unfold Formalism.MainNotions.G.IsThinPl Formalism.MainNotions.G.IsTopPl
+        Formalism.MainNotions.G.IsThickPl
       dsimp only
       exact ⟨fun h => hc ⟨rfl, h.2⟩, fun h => Bool.false_ne_true h.1⟩
     have ho := (X.off_thin j (false, t) hthin).2
@@ -263,17 +278,25 @@ theorem nd_size : nd_NeedSize := by
   have hj1 : 1 ≤ j := (Finset.mem_Icc.1 hj).1
   have hjm : j ≤ D.R.m := (Finset.mem_Icc.1 hj).2
   have ha := nc_a_ge (L := L)
-  have hc' : ((Y.Fl u w hg).c : ℝ) ≤ L.sc.a := le_trans hc (by unfold Formalism.MainNotions.G.cG; exact nd_Sc_le hS)
+  have hc' : ((Y.Fl u w hg).c : ℝ) ≤ L.sc.a :=
+    le_trans hc (by unfold Formalism.MainNotions.G.cG; exact nd_Sc_le hS)
   refine ⟨fun s => ?_, fun s => ?_⟩
   · by_cases hsT : s ∈ (Y.Fl u w hg).TT (Y.vOf u w hg t0)
     · obtain ⟨_, hTT, hab, _⟩ := hs s
       have h1 := nd_al_le (Y.Fl u w hg) (Y.vOf u w hg t0) s hsT hm
       have h2 := (hab hsT).1
-      have h3 : (al ((Y.Fl u w hg).TT (Y.vOf u w hg t0)) ((D.gat u w hg).P.lam0 (Y.vOf u w hg t0)) s : ℝ) ≤
-          (((Y.Fl u w hg).a (Y.vOf u w hg t0) s + ((Y.Fl u w hg).c : ℤ) : ℤ) : ℝ) := by exact_mod_cast h1
+      have h3
+          : (al ((Y.Fl u w hg).TT (Y.vOf u w hg t0)) ((D.gat u w hg).P.lam0 (Y.vOf u w hg t0)) s
+              : ℝ)
+            ≤ (((Y.Fl u w hg).a (Y.vOf u w hg t0) s + ((Y.Fl u w hg).c : ℤ) : ℤ) : ℝ) := by
+        exact_mod_cast h1
       rw [h2] at h3
       push_cast at h3
-      have h4 : (Formalism.MainNotions.G.aL L (t0 + s.val • Formalism.MainNotions.G.hP D (D.what₂.places.resChar w)) : ℝ) ≤ 2 * L.sc.a := by
+      have h4
+          : (Formalism.MainNotions.G.aL L
+                (t0 + s.val • Formalism.MainNotions.G.hP D (D.what₂.places.resChar w))
+              : ℝ)
+            ≤ 2 * L.sc.a := by
         unfold Formalism.MainNotions.G.aL
         rw [dite_eq_left (hTT.1 hsT)]
         exact nd_aT_le _
@@ -284,10 +307,15 @@ theorem nd_size : nd_NeedSize := by
       positivity
   · obtain ⟨_, _, _, hw⟩ := hs s
     have h1 := nd_lsz_le (Y.Fl u w hg) (Y.vOf u w hg t0) s hm j hj1
-    have h2 : (lsz (Y.Fl u w hg).t ((Y.Fl u w hg).TT (Y.vOf u w hg t0)) ((D.gat u w hg).P.lam0 (Y.vOf u w hg t0))
-        ((Y.Fl u w hg).w (Y.vOf u w hg t0)) j s : ℝ) ≤
-        (((NN (D.gat u w hg).P.m (Y.Fl u w hg).t j : ℤ) *
-          (((Y.Fl u w hg).c : ℤ) + (Y.Fl u w hg).w (Y.vOf u w hg t0) j s) : ℤ) : ℝ) := by exact_mod_cast h1
+    have h2
+        : (lsz (Y.Fl u w hg).t ((Y.Fl u w hg).TT (Y.vOf u w hg t0))
+              ((D.gat u w hg).P.lam0 (Y.vOf u w hg t0)) ((Y.Fl u w hg).w (Y.vOf u w hg t0)) j s
+            : ℝ)
+          ≤ (((NN (D.gat u w hg).P.m (Y.Fl u w hg).t j : ℤ)
+                * (((Y.Fl u w hg).c : ℤ) + (Y.Fl u w hg).w (Y.vOf u w hg t0) j s)
+              : ℤ)
+            : ℝ) := by
+      exact_mod_cast h1
     push_cast at h2
     have hk := hT.gat_k u w hg
     have hN1 : (NN (D.gat u w hg).P.m (Y.Fl u w hg).t j : ℝ) ≤ (D.R.N D.R.m : ℝ) := by
@@ -301,12 +329,15 @@ theorem nd_size : nd_NeedSize := by
       rw [hw j hj]; exact nd_fill_le X hS j hj1 _
     have hw0 : (0 : ℝ) ≤ ((Y.Fl u w hg).c : ℝ) + ((Y.Fl u w hg).w (Y.vOf u w hg t0) j s : ℝ) := by
       have h5 := nd_c_le_w (Y.Fl u w hg) (Y.vOf u w hg t0) s j hj1
-      have h6 : (((Y.Fl u w hg).c : ℤ) : ℝ) ≤ ((Y.Fl u w hg).w (Y.vOf u w hg t0) j s : ℝ) := by exact_mod_cast h5
+      have h6 : (((Y.Fl u w hg).c : ℤ) : ℝ) ≤ ((Y.Fl u w hg).w (Y.vOf u w hg t0) j s : ℝ) := by
+        exact_mod_cast h5
       have h7 : (0 : ℝ) ≤ ((Y.Fl u w hg).c : ℝ) := Nat.cast_nonneg _
       push_cast at h6
       linarith
-    have h8 : (NN (D.gat u w hg).P.m (Y.Fl u w hg).t j : ℝ) *
-        (((Y.Fl u w hg).c : ℝ) + ((Y.Fl u w hg).w (Y.vOf u w hg t0) j s : ℝ)) ≤ L.sc.a * (5 * L.sc.a) :=
+    have h8
+        : (NN (D.gat u w hg).P.m (Y.Fl u w hg).t j : ℝ)
+            * (((Y.Fl u w hg).c : ℝ) + ((Y.Fl u w hg).w (Y.vOf u w hg t0) j s : ℝ))
+          ≤ L.sc.a * (5 * L.sc.a) :=
       mul_le_mul hN (by linarith) hw0 (by linarith)
     have h9 : L.sc.a * (5 * L.sc.a) ≤ (2 * L.sc.a) ^ 4 := by
       have : 1 ≤ L.sc.a ^ 2 := by nlinarith

@@ -8,12 +8,17 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.LocFrLoc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.Frames
+open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.Frames
 
 namespace GlobalTheory.FlatLine.DefinitePoint
 
-theorem subsingleton_of_etale {K : Type} [Field K] {X : Scheme.{0}} (f : X ⟶ Sp K) [Etale f] {Z : Set X}
-    (hZ : IsIrreducible Z) : Z.Subsingleton := by
+theorem subsingleton_of_etale
+    {K : Type} [Field K]
+    {X : Scheme.{0}} (f : X ⟶ Sp K) [Etale f]
+    {Z : Set X} (hZ : IsIrreducible Z)
+    : Z.Subsingleton := by
   have : LocallyQuasiFinite f := by
     refine ⟨fun {U} hU {V} hV e => ?_⟩
     have h₁ := f.formallyUnramified_appLE hU hV e
@@ -27,8 +32,9 @@ theorem subsingleton_of_etale {K : Type} [Field K] {X : Scheme.{0}} (f : X ⟶ S
   have : DiscreteTopology X := isDiscrete_univ_iff.mp (hu ▸ hd)
   exact hZ.isPreirreducible.subsingleton
 
-theorem isOpenImmersion_of_section {X Y : Scheme.{0}} (f : X ⟶ Y) [Etale f] (s : Y ⟶ X) (hs : s ≫ f = 𝟙 _) :
-    IsOpenImmersion s := by
+theorem isOpenImmersion_of_section
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [Etale f] (s : Y ⟶ X) (hs : s ≫ f = 𝟙 _)
+    : IsOpenImmersion s := by
   haveI : MorphismProperty.HasOfPostcompProperty @IsOpenImmersion
       (MorphismProperty.diagonal @IsOpenImmersion) :=
     MorphismProperty.hasOfPostcompProperty_iff_le_diagonal.2 le_rfl
@@ -36,10 +42,13 @@ theorem isOpenImmersion_of_section {X Y : Scheme.{0}} (f : X ⟶ Y) [Etale f] (s
     (W' := MorphismProperty.diagonal @IsOpenImmersion) s f
     (inferInstanceAs (IsOpenImmersion (Limits.pullback.diagonal f))) (by rw [hs]; infer_instance)
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem etale_strK (Xo : Moduli Dw l) (c : Coeff l) (hq : Dw.q = 0) : Etale (strK (Xo := Xo) (c := c)) := by
+theorem etale_strK (Xo : Moduli Dw l) (c : Coeff l) (hq : Dw.q = 0)
+    : Etale (strK (Xo := Xo) (c := c)) := by
   have h0 : Dw.dim = 0 := by rw [Datum.dim, hq, mul_zero]
   have hs : SmoothOfRelativeDimension 0 Xo.s := h0 ▸ Xo.smooth
   have he : Etale Xo.s := (Etale.iff_smoothOfRelativeDimension_zero _).2 hs
@@ -48,8 +57,8 @@ theorem etale_strK (Xo : Moduli Dw l) (c : Coeff l) (hq : Dw.q = 0) : Etale (str
 theorem genSp_strK (Z : Comp Xo c) : genSp Z ≫ strK = spMap (algebraMap c.F (kap Z)) :=
   (Spec.map_preimage _).symm
 
-theorem isAlgebraic_kap (Z : Comp Xo c) (hZ : (Z : Set (Xo.XF c)).Subsingleton) :
-    Algebra.IsAlgebraic c.F (kap Z) := by
+theorem isAlgebraic_kap (Z : Comp Xo c) (hZ : (Z : Set (Xo.XF c)).Subsingleton)
+    : Algebra.IsAlgebraic c.F (kap Z) := by
   obtain ⟨L, _, _, j, g, hg, hgZ⟩ := exists_numberField_point Z
   obtain ⟨⟨p, φ⟩, rfl⟩ := (Scheme.SpecToEquivOfField L (Xo.XF c)).symm.surjective g
   simp only [Scheme.SpecToEquivOfField_symm_apply] at hg hgZ
@@ -64,10 +73,19 @@ theorem isAlgebraic_kap (Z : Comp Xo c) (hZ : (Z : Set (Xo.XF c)).Subsingleton) 
     Algebra.IsAlgebraic.of_injective (φ.hom.toRatAlgHom) φ.hom.injective
   exact Algebra.IsAlgebraic.tower_top (K := ℚ) c.F
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), Dw.q = 0 → FnAlgClosed (Xo := Xo) (c := c) → ∀ Z : Comp Xo c, ∃ y₀ : FrPt Xo c c.F, LiesOn Z y₀ ∧ ∀ (S : Type) [CommRing S] [Algebra c.F S] (y : FrPt Xo c S), LiesOn Z y → y.x = spMap (algebraMap c.F S) ≫ y₀.x := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      Dw.q = 0 → FnAlgClosed (Xo := Xo) (c := c)
+        → ∀ Z : Comp Xo c, ∃ y₀ : FrPt Xo c c.F,
+          LiesOn Z y₀
+            ∧ ∀ (S : Type) [CommRing S] [Algebra c.F S] (y : FrPt Xo c S),
+              LiesOn Z y → y.x = spMap (algebraMap c.F S) ≫ y₀.x := by
   intro E _ _ _ H Dw l Xo c hq hac Z
   have := etale_strK Xo c hq
-  have hZ := subsingleton_of_etale (strK (Xo := Xo) (c := c)) (Z.2.1 : IsIrreducible (Z : Set (Xo.XF c)))
+  have hZ :=
+    subsingleton_of_etale (strK (Xo := Xo) (c := c)) (Z.2.1 : IsIrreducible (Z : Set (Xo.XF c)))
   have halg := isAlgebraic_kap Z hZ
   have hsurj : Function.Surjective (algebraMap c.F (kap Z)) := fun a => by
     obtain ⟨b, hb⟩ := hac Z (algebraMap (kap Z) (Om Z) a) ((halg.isAlgebraic a).algebraMap)
@@ -84,7 +102,8 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Recip
     rw [Scheme.Hom.comp_apply]
     exact Scheme.fromSpecResidueField_apply _ _
   have := isOpenImmersion_of_section strK g₀ (hg₀.trans hid)
-  obtain ⟨y₀, hy₀⟩ := exists_frPt_local (c := c) GlobalTheory.abelianSchemeLaws_all.2.secTwist _ (prX_over hg₀)
+  obtain ⟨y₀, hy₀⟩ :=
+    exists_frPt_local (c := c) GlobalTheory.abelianSchemeLaws_all.2.secTwist _ (prX_over hg₀)
   refine ⟨y₀, fun s => ?_, fun S _ _ y hy => ?_⟩
   · rw [ptF_eq hg₀ hy₀, hpt]
     exact CompSplitPfB.cspB_genPt_mem Z

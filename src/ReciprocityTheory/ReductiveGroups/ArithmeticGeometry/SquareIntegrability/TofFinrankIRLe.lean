@@ -12,31 +12,38 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem tof_shell_term (d k : ℕ) (hd : 2 ≤ d) :
-    (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) ≤
-      (3 * (d : ℝ)) ^ d * (Real.exp (-1) * Real.exp (1 - Real.pi / 2) ^ k) := by
+theorem tof_shell_term (d k : ℕ) (hd : 2 ≤ d)
+    : (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2)
+      ≤ (3 * (d : ℝ)) ^ d * (Real.exp (-1) * Real.exp (1 - Real.pi / 2) ^ k) := by
   have hpi := Real.pi_gt_three
   have hd' : (2 : ℝ) ≤ d := by exact_mod_cast hd
-  have hE : Real.exp (-1) * Real.exp (1 - Real.pi / 2) ^ k =
-      Real.exp (-1 + k * (1 - Real.pi / 2)) := by
+  have hE
+      : Real.exp (-1) * Real.exp (1 - Real.pi / 2) ^ k = Real.exp (-1 + k * (1 - Real.pi / 2)) := by
     rw [← Real.exp_nat_mul, ← Real.exp_add]
   rw [hE]
-  have key : (3 * ((k : ℝ) + 1)) ^ d ≤
-      (3 * (d : ℝ)) ^ d * Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2))) := by
+  have key
+      : (3 * ((k : ℝ) + 1)) ^ d
+        ≤ (3 * (d : ℝ)) ^ d
+          * Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2))) := by
     rcases Nat.eq_zero_or_pos k with hk0 | hk
     · subst hk0
       have he : Real.exp 1 < 3 := lt_trans Real.exp_one_lt_d9 (by norm_num)
       have hdd : (4 : ℝ) ≤ (d : ℝ) ^ d := by
-        calc (4 : ℝ) = 2 ^ 2 := by norm_num
+        calc
+          (4 : ℝ)
+            = 2 ^ 2 := by norm_num
           _ ≤ (d : ℝ) ^ 2 := by gcongr
           _ ≤ (d : ℝ) ^ d := pow_le_pow_right₀ (by linarith) hd
-      have hQ : Real.pi / 2 * ((0 : ℕ) : ℝ) ^ 2 + (-1 + ((0 : ℕ) : ℝ) * (1 - Real.pi / 2)) = -1 := by
+      have hQ
+          : Real.pi / 2 * ((0 : ℕ) : ℝ) ^ 2 + (-1 + ((0 : ℕ) : ℝ) * (1 - Real.pi / 2)) = -1 := by
         simp
       rw [hQ, Real.exp_neg]
       have h1 : (1 : ℝ) ≤ (d : ℝ) ^ d * (Real.exp 1)⁻¹ := by
         rw [le_mul_inv_iff₀ (Real.exp_pos 1)]
         linarith
-      calc (3 * (((0 : ℕ) : ℝ) + 1)) ^ d = 3 ^ d * 1 := by simp
+      calc
+        (3 * (((0 : ℕ) : ℝ) + 1)) ^ d
+          = 3 ^ d * 1 := by simp
         _ ≤ 3 ^ d * ((d : ℝ) ^ d * (Real.exp 1)⁻¹) := by gcongr
         _ = (3 * (d : ℝ)) ^ d * (Real.exp 1)⁻¹ := by rw [mul_pow]; ring
     · have hk1 : (1 : ℝ) ≤ k := by exact_mod_cast hk
@@ -47,13 +54,16 @@ theorem tof_shell_term (d k : ℕ) (hd : 2 ≤ d) :
         have h2 : 0 ≤ Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2)) := by
           nlinarith [mul_nonneg (mul_nonneg (by linarith : (0 : ℝ) ≤ Real.pi / 2)
             (by linarith : (0 : ℝ) ≤ k)) (by linarith : (0 : ℝ) ≤ k - 1)]
-        calc (3 * ((k : ℝ) + 1)) ^ d ≤ (3 * (d : ℝ)) ^ d := h1
+        calc
+          (3 * ((k : ℝ) + 1)) ^ d
+            ≤ (3 * (d : ℝ)) ^ d := h1
           _ ≤ _ := le_mul_of_one_le_right (by positivity) (Real.one_le_exp h2)
       · have hdk : (d : ℝ) ≤ k := by exact_mod_cast (by omega : d ≤ k)
         have hk2 : (2 : ℝ) ≤ k := le_trans hd' hdk
         have h1 : ((k : ℝ) + 1) ^ d ≤ Real.exp ((k : ℝ) * k) := by
-          calc ((k : ℝ) + 1) ^ d ≤ (Real.exp k) ^ d :=
-                pow_le_pow_left₀ (by positivity) (by linarith [Real.add_one_le_exp (k : ℝ)]) d
+          calc
+            ((k : ℝ) + 1) ^ d ≤ (Real.exp k) ^ d :=
+              pow_le_pow_left₀ (by positivity) (by linarith [Real.add_one_le_exp (k : ℝ)]) d
             _ = Real.exp (d * k) := by rw [← Real.exp_nat_mul]
             _ ≤ Real.exp (k * k) := Real.exp_le_exp.mpr (by nlinarith)
         have h2 : (k : ℝ) * k ≤ Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2)) := by
@@ -61,28 +71,34 @@ theorem tof_shell_term (d k : ℕ) (hd : 2 ≤ d) :
           have hpp : (1 : ℝ) / 2 ≤ Real.pi / 2 - 1 := by linarith
           nlinarith [mul_le_mul hpp hkk (by norm_num) (by linarith)]
         have h3 : (1 : ℝ) ≤ (d : ℝ) ^ d := one_le_pow₀ (by linarith)
-        calc (3 * ((k : ℝ) + 1)) ^ d = 3 ^ d * ((k : ℝ) + 1) ^ d := mul_pow _ _ _
+        calc
+          (3 * ((k : ℝ) + 1)) ^ d
+            = 3 ^ d * ((k : ℝ) + 1) ^ d := mul_pow _ _ _
           _ ≤ 3 ^ d * Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2))) := by
             gcongr
             exact h1.trans (Real.exp_le_exp.mpr h2)
-          _ ≤ 3 ^ d * ((d : ℝ) ^ d *
-              Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2)))) := by
+          _ ≤ 3 ^ d
+              * ((d : ℝ) ^ d
+                * Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2)))) := by
             gcongr
             exact le_mul_of_one_le_left (Real.exp_pos _).le h3
           _ = _ := by rw [mul_pow]; ring
-  have hexp : Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2))) *
-      Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) = Real.exp (-1 + k * (1 - Real.pi / 2)) := by
+  have hexp
+      : Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2)))
+          * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2)
+        = Real.exp (-1 + k * (1 - Real.pi / 2)) := by
     rw [← Real.exp_add]
     congr 1
     ring
-  calc _ ≤ (3 * (d : ℝ)) ^ d * Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2))) *
-        Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) :=
-        mul_le_mul_of_nonneg_right key (Real.exp_pos _).le
+  calc
+    _ ≤ (3 * (d : ℝ)) ^ d * Real.exp (Real.pi / 2 * (k : ℝ) ^ 2 + (-1 + k * (1 - Real.pi / 2)))
+        * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) :=
+      mul_le_mul_of_nonneg_right key (Real.exp_pos _).le
     _ = _ := by rw [mul_assoc, hexp]
 
-theorem tof_shell_sum (d K : ℕ) (hd : 2 ≤ d) :
-    ∑ k ∈ Finset.range K, (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) ≤
-      2 * (3 * (d : ℝ)) ^ d := by
+theorem tof_shell_sum (d K : ℕ) (hd : 2 ≤ d)
+    : ∑ k ∈ Finset.range K, (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2)
+      ≤ 2 * (3 * (d : ℝ)) ^ d := by
   set r := Real.exp (1 - Real.pi / 2) with hr
   have hpi := Real.pi_gt_three
   have hr0 : 0 < r := Real.exp_pos _
@@ -105,19 +121,23 @@ theorem tof_shell_sum (d K : ℕ) (hd : 2 ≤ d) :
     have : 0 ≤ r ^ K := by positivity
     nlinarith
   have hd0 : (0 : ℝ) ≤ (3 * (d : ℝ)) ^ d := by positivity
-  calc ∑ k ∈ Finset.range K, (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2)
-      ≤ ∑ k ∈ Finset.range K, (3 * (d : ℝ)) ^ d * (Real.exp (-1) * r ^ k) :=
-        Finset.sum_le_sum (fun k _ => tof_shell_term d k hd)
+  calc
+    ∑ k ∈ Finset.range K, (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2)
+        ≤ ∑ k ∈ Finset.range K, (3 * (d : ℝ)) ^ d * (Real.exp (-1) * r ^ k) :=
+      Finset.sum_le_sum (fun k _ => tof_shell_term d k hd)
     _ = (3 * (d : ℝ)) ^ d * Real.exp (-1) * ∑ k ∈ Finset.range K, r ^ k := by
-        rw [Finset.mul_sum]
-        refine Finset.sum_congr rfl (fun k _ => ?_)
-        ring
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl (fun k _ => ?_)
+      ring
     _ ≤ (3 * (d : ℝ)) ^ d * (1 / 2) * 3 := by gcongr
     _ ≤ 2 * (3 * (d : ℝ)) ^ d := by nlinarith
 
-theorem tof_uMap_sep [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) {I : Submodule ℤ (Vsp X.dim)}
-    (hI : IsSplit P I) {x x' : Vsp X.dim} (hx : x ∈ X.L) (hx' : x' ∈ X.L)
-    (hne : uMap I x ≠ uMap I x') : 1 ≤ ‖uMap I x - uMap I x'‖ := by
+theorem tof_uMap_sep
+    [IsCMField E]
+    {X : PT E} {DF : ℕ} (P : Par X DF)
+    {I : Submodule ℤ (Vsp X.dim)} (hI : IsSplit P I)
+    {x x' : Vsp X.dim} (hx : x ∈ X.L) (hx' : x' ∈ X.L) (hne : uMap I x ≠ uMap I x')
+    : 1 ≤ ‖uMap I x - uMap I x'‖ := by
   have hsub : uMap I x - uMap I x' = uMap I (x - x') := (map_sub (uMap I) x x').symm
   have hne' : uMap I (x - x') ≠ 0 := by
     rw [← hsub]
@@ -130,8 +150,11 @@ theorem tof_uMap_sep [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) {I : Sub
   have h0 := norm_nonneg (uMap I (x - x'))
   nlinarith
 
-theorem tof_finrank_IR_le [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) {I : Submodule ℤ (Vsp X.dim)}
-    (hI : IsSplit P I) : Module.finrank ℝ (IR I) ≤ dstar (E := E) P.m := by
+theorem tof_finrank_IR_le
+    [IsCMField E]
+    {X : PT E} {DF : ℕ} (P : Par X DF)
+    {I : Submodule ℤ (Vsp X.dim)} (hI : IsSplit P I)
+    : Module.finrank ℝ (IR I) ≤ dstar (E := E) P.m := by
   obtain ⟨ρ, hρ, h⟩ := hI.rank
   rw [h]
   unfold dstar
@@ -141,14 +164,19 @@ theorem tof_two_le_dstar {X : PT E} {DF : ℕ} (P : Par X DF) : 2 ≤ dstar (E :
   have h1 : 1 ≤ PT.f E := le_trans (Nat.one_le_pow _ _ P.hm1) P.hmf
   have h2 := P.hm1
   unfold dstar
-  calc 2 = 2 * 1 * 1 := by norm_num
+  calc
+    2 = 2 * 1 * 1 := by norm_num
     _ ≤ 2 * PT.f E * P.m := by gcongr
 
-theorem tof_sep_sum [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) {I : Submodule ℤ (Vsp X.dim)}
-    (hI : IsSplit P I) (hP : Ext.PackingCount) (u : Vsp X.dim) (hu : u ∈ IR I)
-    (F : Finset (Vsp X.dim)) (hF : ∀ y ∈ F, ∃ x ∈ X.L, y = uMap I x) :
-    ∑ y ∈ F, Real.exp (-(Real.pi / 2) * ‖u - y‖ ^ 2) ≤
-      2 * (3 * (dstar (E := E) P.m : ℝ)) ^ dstar (E := E) P.m := by
+theorem tof_sep_sum
+    [IsCMField E]
+    {X : PT E} {DF : ℕ} (P : Par X DF)
+    {I : Submodule ℤ (Vsp X.dim)} (hI : IsSplit P I)
+    (hP : Ext.PackingCount)
+    (u : Vsp X.dim) (hu : u ∈ IR I)
+    (F : Finset (Vsp X.dim)) (hF : ∀ y ∈ F, ∃ x ∈ X.L, y = uMap I x)
+    : ∑ y ∈ F, Real.exp (-(Real.pi / 2) * ‖u - y‖ ^ 2)
+      ≤ 2 * (3 * (dstar (E := E) P.m : ℝ)) ^ dstar (E := E) P.m := by
   classical
   set d := dstar (E := E) P.m with hd
   have hd2 : 2 ≤ d := tof_two_le_dstar P
@@ -187,8 +215,9 @@ theorem tof_sep_sum [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) {I : Subm
   refine le_trans (Finset.sum_le_sum (fun k _ => ?_)) (tof_shell_sum d K hd2)
   set Fk := F.filter (fun y => ⌊‖u - y‖⌋₊ = k) with hFk
   have hFkF : ∀ y ∈ Fk, y ∈ F := fun y hy => (Finset.mem_filter.mp hy).1
-  have hterm : ∀ y ∈ Fk, Real.exp (-(Real.pi / 2) * ‖u - y‖ ^ 2) ≤
-      Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := by
+  have hterm
+      : ∀ y ∈ Fk,
+        Real.exp (-(Real.pi / 2) * ‖u - y‖ ^ 2) ≤ Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := by
     intro y hy
     have hk : ⌊‖u - y‖⌋₊ = k := (Finset.mem_filter.mp hy).2
     have hle : (k : ℝ) ≤ ‖u - y‖ := by
@@ -206,32 +235,35 @@ theorem tof_sep_sum [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) {I : Subm
     linarith
   have hcard : (Fk.card : ℝ) ≤ (3 * ((k : ℝ) + 1)) ^ Module.finrank ℝ (IR I) := by
     rw [← Finset.card_image_of_injOn hinj]
-    have hpk := hP (Module.finrank ℝ (IR I)) (Fk.image g) 1 ((k : ℝ) + 1) one_pos
-      (by linarith [(Nat.cast_nonneg k : (0 : ℝ) ≤ k)])
-      (by
-        intro p hp
-        obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hp
-        rw [hgn y (hFkF y hy)]
-        have hk : ⌊‖u - y‖⌋₊ = k := (Finset.mem_filter.mp hy).2
-        rw [← hk]
-        exact (Nat.lt_floor_add_one _).le)
-      (by
-        intro p hp p' hp' hne
-        obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hp
-        obtain ⟨y', hy', rfl⟩ := Finset.mem_image.mp hp'
-        rw [hgd y (hFkF y hy) y' (hFkF y' hy')]
-        exact hsep y (hFkF y hy) y' (hFkF y' hy') (fun h => hne (by rw [h])))
+    have hpk :=
+      hP (Module.finrank ℝ (IR I)) (Fk.image g) 1 ((k : ℝ) + 1) one_pos
+        (by linarith [(Nat.cast_nonneg k : (0 : ℝ) ≤ k)])
+        (by
+          intro p hp
+          obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hp
+          rw [hgn y (hFkF y hy)]
+          have hk : ⌊‖u - y‖⌋₊ = k := (Finset.mem_filter.mp hy).2
+          rw [← hk]
+          exact (Nat.lt_floor_add_one _).le)
+        (by
+          intro p hp p' hp' hne
+          obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hp
+          obtain ⟨y', hy', rfl⟩ := Finset.mem_image.mp hp'
+          rw [hgd y (hFkF y hy) y' (hFkF y' hy')]
+          exact hsep y (hFkF y hy) y' (hFkF y' hy') (fun h => hne (by rw [h])))
     simpa using hpk
-  calc ∑ y ∈ Fk, Real.exp (-(Real.pi / 2) * ‖u - y‖ ^ 2)
+  calc
+    ∑ y ∈ Fk, Real.exp (-(Real.pi / 2) * ‖u - y‖ ^ 2)
       ≤ ∑ y ∈ Fk, Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := Finset.sum_le_sum hterm
     _ = (Fk.card : ℝ) * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := by
-        rw [Finset.sum_const, nsmul_eq_mul]
-    _ ≤ (3 * ((k : ℝ) + 1)) ^ Module.finrank ℝ (IR I) * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := by
-        gcongr
+      rw [Finset.sum_const, nsmul_eq_mul]
+    _ ≤ (3 * ((k : ℝ) + 1)) ^ Module.finrank ℝ (IR I)
+        * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := by
+      gcongr
     _ ≤ (3 * ((k : ℝ) + 1)) ^ d * Real.exp (-(Real.pi / 2) * (k : ℝ) ^ 2) := by
-        gcongr
-        · have : (0 : ℝ) ≤ k := Nat.cast_nonneg k
-          linarith
+      gcongr
+      · have : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+        linarith
 
 end
 

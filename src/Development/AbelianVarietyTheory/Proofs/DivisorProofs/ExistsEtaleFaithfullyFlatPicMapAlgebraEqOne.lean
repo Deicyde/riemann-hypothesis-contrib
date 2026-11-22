@@ -7,23 +7,31 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PicPiIsOfFin
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.PicLoc
 
-theorem exists_away_mapAlgebra_eq_one : ∀ (A : Type) [CommRing A] (c : CommRing.Pic A) (p : Ideal A) [p.IsPrime], ∃ f ∉ p, CommRing.Pic.mapAlgebra A (Localization.Away f) c = 1 := by
+theorem exists_away_mapAlgebra_eq_one
+    : ∀ (A : Type) [CommRing A] (c : CommRing.Pic A) (p : Ideal A) [p.IsPrime], ∃ f ∉ p,
+      CommRing.Pic.mapAlgebra A (Localization.Away f) c = 1 := by
   intro A _ c p _
   letI := @Module.addCommMonoidToAddCommGroup A
   haveI : Module.FinitePresentation A c := Module.finitePresentation_of_projective A c
   haveI : Module.Free (Localization.AtPrime p) (LocalizedModule p.primeCompl c) :=
     Module.free_of_flat_of_isLocalRing
-  obtain ⟨f, hf, hfree, -⟩ := Module.FinitePresentation.exists_free_localizedModule_powers
-    p.primeCompl (LocalizedModule.mkLinearMap p.primeCompl c) (Localization.AtPrime p)
+  obtain ⟨f, hf, hfree, -⟩ :=
+    Module.FinitePresentation.exists_free_localizedModule_powers p.primeCompl
+      (LocalizedModule.mkLinearMap p.primeCompl c) (Localization.AtPrime p)
   refine ⟨f, hf, ?_⟩
   rw [CommRing.Pic.mapAlgebra_apply, CommRing.Pic.mk_eq_one_iff_free]
   exact Module.Free.of_equiv (LocalizedModule.equivTensorProduct (Submonoid.powers f) c)
 
-theorem exists_etale_faithfullyFlat_mapAlgebra_eq_one : ∀ (A : Type) [CommRing A] (c : CommRing.Pic A), ∃ (B : Type) (_ : CommRing B) (_ : Algebra A B) (_ : Algebra.Etale A B) (_ : Module.FaithfullyFlat A B), CommRing.Pic.mapAlgebra A B c = 1 := by
+theorem exists_etale_faithfullyFlat_mapAlgebra_eq_one
+    : ∀ (A : Type) [CommRing A] (c : CommRing.Pic A),
+      ∃ (B : Type) (_ : CommRing B) (_ : Algebra A B) (_ : Algebra.Etale A B)
+          (_ : Module.FaithfullyFlat A B),
+        CommRing.Pic.mapAlgebra A B c = 1 := by
   intro A _ c
   classical
   let T : Set A := {f | CommRing.Pic.mapAlgebra A (Localization.Away f) c = 1}

@@ -7,20 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ToMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.PMon
 
-theorem unramifiedToBst_algebraMap_padic {l : ℕ} [Fact l.Prime] (P : LocPrime l) (q : ℚ_[l]) :
-    ks P (algebraMap ℚ_[l] ↥(MaximalUnramifiedExtension l) q) = algebraMap ℚ_[l] (Bst P) q := by
+theorem unramifiedToBst_algebraMap_padic {l : ℕ} [Fact l.Prime] (P : LocPrime l) (q : ℚ_[l])
+    : ks P (algebraMap ℚ_[l] ↥(MaximalUnramifiedExtension l) q) = algebraMap ℚ_[l] (Bst P) q := by
   simp only [ks, RingHom.comp_apply]
   rw [← IsScalarTower.algebraMap_apply, Polynomial.algebraMap_apply]
 
-theorem frobeniusSemistablePow_unramifiedToBst {l : ℕ} [Fact l.Prime] (P : LocPrime l) (m : ℕ) (c : ↥(MaximalUnramifiedExtension l)) :
-    (phiSt P ^ m) (ks P c) = ks P (fr l m c) := by
+theorem frobeniusSemistablePow_unramifiedToBst
+    {l : ℕ} [Fact l.Prime] (P : LocPrime l) (m : ℕ) (c : ↥(MaximalUnramifiedExtension l))
+    : (phiSt P ^ m) (ks P c) = ks P (fr l m c) := by
   induction m with
   | zero => rfl
   | succ m ih =>
@@ -29,8 +31,9 @@ theorem frobeniusSemistablePow_unramifiedToBst {l : ℕ} [Fact l.Prime] (P : Loc
     rw [Polynomial.algebraMap_apply, Polynomial.algebraMap_apply] at this
     exact this
 
-theorem frobeniusSemistablePow_galoisAction_comm {l : ℕ} [Fact l.Prime] (P : LocPrime l) (g : GQ l) (m : ℕ) (b : Bst P) :
-    (phiSt P ^ m) (actSt P g b) = actSt P g ((phiSt P ^ m) b) := by
+theorem frobeniusSemistablePow_galoisAction_comm
+    {l : ℕ} [Fact l.Prime] (P : LocPrime l) (g : GQ l) (m : ℕ) (b : Bst P)
+    : (phiSt P ^ m) (actSt P g b) = actSt P g ((phiSt P ^ m) b) := by
   induction m generalizing b with
   | zero => rfl
   | succ m ih => rw [pow_succ', AlgHom.mul_apply, ih, phiSt_actSt, AlgHom.mul_apply]
@@ -39,15 +42,30 @@ end GlobalTheory.PMon
 
 namespace GlobalTheory.PMon
 
-theorem inv_entries_mem_finiteExtension_unramified {l : ℕ} [Fact l.Prime] {N : Type} [Fintype N] [DecidableEq N] (K : FinExt l)
-    (p : GL N ↥(MaximalUnramifiedExtension l)) (h : ∀ i j, (((p : Matrix N N ↥(MaximalUnramifiedExtension l)) i j : ↥(MaximalUnramifiedExtension l)) : Om l) ∈ K.1) (i j : N) :
-    ((((p⁻¹ : GL N ↥(MaximalUnramifiedExtension l)) : Matrix N N ↥(MaximalUnramifiedExtension l)) i j : ↥(MaximalUnramifiedExtension l)) : Om l) ∈ K.1 := by
-  let S : Subfield ↥(MaximalUnramifiedExtension l) := K.1.toSubfield.comap (algebraMap ↥(MaximalUnramifiedExtension l) (Om l))
-  let A : Matrix N N S := Matrix.of fun i j => ⟨(p : Matrix N N ↥(MaximalUnramifiedExtension l)) i j, h i j⟩
-  have hA : (S.subtype).mapMatrix A = (p : Matrix N N ↥(MaximalUnramifiedExtension l)) := by refine Matrix.ext fun i j => ?_; rfl
+theorem inv_entries_mem_finiteExtension_unramified
+    {l : ℕ} [Fact l.Prime]
+    {N : Type} [Fintype N] [DecidableEq N]
+    (K : FinExt l) (p : GL N ↥(MaximalUnramifiedExtension l))
+    (h : ∀ i j,
+      (((p : Matrix N N ↥(MaximalUnramifiedExtension l)) i j : ↥(MaximalUnramifiedExtension l))
+          : Om l)
+        ∈ K.1)
+    (i j : N)
+    : ((((p⁻¹ : GL N ↥(MaximalUnramifiedExtension l)) : Matrix N N ↥(MaximalUnramifiedExtension l))
+            i j
+          : ↥(MaximalUnramifiedExtension l))
+        : Om l)
+      ∈ K.1 := by
+  let S : Subfield ↥(MaximalUnramifiedExtension l) :=
+    K.1.toSubfield.comap (algebraMap ↥(MaximalUnramifiedExtension l) (Om l))
+  let A : Matrix N N S :=
+    Matrix.of fun i j => ⟨(p : Matrix N N ↥(MaximalUnramifiedExtension l)) i j, h i j⟩
+  have hA : (S.subtype).mapMatrix A = (p : Matrix N N ↥(MaximalUnramifiedExtension l)) := by
+    refine Matrix.ext fun i j => ?_; rfl
   have hmem : ((p : Matrix N N ↥(MaximalUnramifiedExtension l))⁻¹ i j) ∈ S := by
     rw [Matrix.inv_def, ← hA, ← RingHom.map_adjugate, ← RingHom.map_det]
-    simp only [Matrix.smul_apply, RingHom.mapMatrix_apply, Matrix.map_apply, smul_eq_mul, Ring.inverse_eq_inv']
+    simp only [Matrix.smul_apply, RingHom.mapMatrix_apply, Matrix.map_apply, smul_eq_mul,
+      Ring.inverse_eq_inv']
     exact S.mul_mem (S.inv_mem (A.det).2) (A.adjugate i j).2
   rw [Matrix.coe_units_inv]
   exact hmem

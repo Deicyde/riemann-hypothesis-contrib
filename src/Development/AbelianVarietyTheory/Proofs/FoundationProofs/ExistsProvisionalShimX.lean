@@ -14,8 +14,10 @@ noncomputable section
 
 namespace GlobalTheory
 
-def provisionalShimX (Tau : Type) [Fintype Tau] (N j : ℕ) (lev : Finset ℕ) (hj : 1 ≤ j)
-    (hjN : j < N) (hlev : ∀ p ∈ lev, p.Prime) : DV.ShimX Tau where
+def provisionalShimX
+    (Tau : Type) [Fintype Tau]
+    (N j : ℕ) (lev : Finset ℕ) (hj : 1 ≤ j) (hjN : j < N) (hlev : ∀ p ∈ lev, p.Prime)
+    : DV.ShimX Tau where
   N := N
   j := j
   j_pos := hj

@@ -23,25 +23,26 @@ def PcL' {t : Term V M r} (hg : GoodL H t) : H.Wb t.f' →ₗ[E] E × E :=
   coordW H t.f' (omP H t.f' t.f) (t.f' (Fin.last r))
     (omP_mem H t.f' t.f (unit_swap H t.f t.f' hg.2.2.2.1)) (z_mem H t.f' t.T' hg.2.2.1)
 
-theorem sharp_inl {t : Term V M r} (hg : GoodL H t) (u : ↥(MMsharp H t)) (a : Fin (r + 1)) :
-    (sharpEquiv H t (unit_gramH H hg) u (Sum.inl a) : E) = H.h u (t.f a) := by
+theorem sharp_inl {t : Term V M r} (hg : GoodL H t) (u : ↥(MMsharp H t)) (a : Fin (r + 1))
+    : (sharpEquiv H t (unit_gramH H hg) u (Sum.inl a) : E) = H.h u (t.f a) := by
   show H.h u (H.MMfam t (Sum.inl a)) = H.h u (t.f a)
   simp only [HermSp.MMfam, hg.1, Sum.elim_inl]
 
-theorem sharp_inr {t : Term V M r} (hg : GoodL H t) (u : ↥(MMsharp H t)) (b : Fin (r + 1)) :
-    (sharpEquiv H t (unit_gramH H hg) u (Sum.inr b) : E) = H.h u (t.f' b) := by
+theorem sharp_inr {t : Term V M r} (hg : GoodL H t) (u : ↥(MMsharp H t)) (b : Fin (r + 1))
+    : (sharpEquiv H t (unit_gramH H hg) u (Sum.inr b) : E) = H.h u (t.f' b) := by
   show H.h u (H.MMfam t (Sum.inr b)) = H.h u (t.f' b)
   simp only [HermSp.MMfam, hg.1, Sum.elim_inr]
 
-theorem mem_span_of_sharp {t : Term V M r} (hg : GoodL H t) (u : ↥(MMsharp H t)) :
-    (u : V) ∈ Submodule.span E (Set.range (Sum.elim t.f t.f')) := by
+theorem mem_span_of_sharp {t : Term V M r} (hg : GoodL H t) (u : ↥(MMsharp H t))
+    : (u : V) ∈ Submodule.span E (Set.range (Sum.elim t.f t.f')) := by
   have h := ((mem_MMsharp_iff H t u).1 u.2).1
   simp only [HermSp.MMfam, hg.1] at h
   exact h
 
-theorem gam_image {t : Term V M r} (hg : GoodL H t) :
-    (fun p => (Psi H hg p.1, PcL H hg p.2)) '' Gam H t =
-      GamC M.L.O (M.L.cj : E →+* E) (H.Zhat t.f t.f') (algebraMap F E t.T) (algebraMap F E t.T') := by
+theorem gam_image {t : Term V M r} (hg : GoodL H t)
+    : (fun p => (Psi H hg p.1, PcL H hg p.2)) '' Gam H t
+      = GamC M.L.O (M.L.cj : E →+* E) (H.Zhat t.f t.f') (algebraMap F E t.T)
+        (algebraMap F E t.T') := by
   ext ⟨d, c⟩
   constructor
   · rintro ⟨_, ⟨u, hu, rfl⟩, he⟩
@@ -81,9 +82,10 @@ theorem gam_image {t : Term V M r} (hg : GoodL H t) :
       rw [← sharp_inr H hg u, hYu]
       rfl
 
-theorem gam_image' {t : Term V M r} (hg : GoodL H t) :
-    (fun p => (Psi H hg p.1, PcL' H hg p.2)) '' Gam' H t =
-      GamC' M.L.O (M.L.cj : E →+* E) (H.Zhat t.f t.f') (algebraMap F E t.T) (algebraMap F E t.T') := by
+theorem gam_image' {t : Term V M r} (hg : GoodL H t)
+    : (fun p => (Psi H hg p.1, PcL' H hg p.2)) '' Gam' H t
+      = GamC' M.L.O (M.L.cj : E →+* E) (H.Zhat t.f t.f') (algebraMap F E t.T)
+        (algebraMap F E t.T') := by
   ext ⟨d, c⟩
   constructor
   · rintro ⟨_, ⟨u, hu, rfl⟩, he⟩
@@ -121,37 +123,41 @@ theorem gam_image' {t : Term V M r} (hg : GoodL H t) :
     · show H.h u (t.f' (Fin.last r)) = _
       rw [← sharp_inr H hg, hYu]
 
-theorem gam_sep {t₁ t₂ : Term V M r} (hg₁ : GoodL H t₁) (hg₂ : GoodL H t₂) (hT : t₂.T = t₁.T)
-    (φ : H.Wb t₁.f ≃ₗ[E] H.Wb t₂.f)
+theorem gam_sep
+    {t₁ t₂ : Term V M r}
+    (hg₁ : GoodL H t₁) (hg₂ : GoodL H t₂) (hT : t₂.T = t₁.T) (φ : H.Wb t₁.f ≃ₗ[E] H.Wb t₂.f)
     (hz : φ (H.mkW t₁.f ⟨_, z_mem H t₁.f t₁.T hg₁.2.1⟩) = H.mkW t₂.f ⟨_, z_mem H t₂.f t₂.T hg₂.2.1⟩)
-    (ho : φ (H.mkW t₁.f ⟨_, omP_mem H t₁.f t₁.f' hg₁.2.2.2.1⟩) =
-      H.mkW t₂.f ⟨_, omP_mem H t₂.f t₂.f' hg₂.2.2.2.1⟩) :
-    ∀ p ∈ Gam H t₁, ∀ q ∈ Gam H t₂, PcL H hg₂ q.2 = PcL H hg₁ p.2 → q.2 = φ p.2 := by
+    (ho : φ (H.mkW t₁.f ⟨_, omP_mem H t₁.f t₁.f' hg₁.2.2.2.1⟩)
+      = H.mkW t₂.f ⟨_, omP_mem H t₂.f t₂.f' hg₂.2.2.2.1⟩)
+    : ∀ p ∈ Gam H t₁, ∀ q ∈ Gam H t₂, PcL H hg₂ q.2 = PcL H hg₁ p.2 → q.2 = φ p.2 := by
   rintro _ ⟨u₁, hu₁, rfl⟩ _ ⟨u₂, hu₂, rfl⟩ hc
   simp only [PcL, coordW_mk, Prod.mk.injEq] at hc
   show H.mkW t₂.f ⟨u₂, hu₂⟩ = φ (H.mkW t₁.f ⟨u₁, hu₁⟩)
   rw [mkW_decomp H t₂.f t₂.f' t₂.T t₂.T' hg₂.2.1 hg₂.2.2.1 hg₂.2.2.2.1 hg₂.2.2.2.2 ⟨u₂, hu₂⟩
       (mem_span_of_sharp H hg₂ u₂),
     mkW_decomp H t₁.f t₁.f' t₁.T t₁.T' hg₁.2.1 hg₁.2.2.1 hg₁.2.2.2.1 hg₁.2.2.2.2 ⟨u₁, hu₁⟩
-      (mem_span_of_sharp H hg₁ u₁), map_add, map_smul, map_smul, hz, ho]
+      (mem_span_of_sharp H hg₁ u₁),
+    map_add, map_smul, map_smul, hz, ho]
   have hT' : algebraMap F E t₂.T = algebraMap F E t₁.T := by rw [hT]
   simp only at hc ⊢
   rw [hc.1, hc.2, hT']
 
-theorem gam_sep' {t₁ t₂ : Term V M r} (hg₁ : GoodL H t₁) (hg₂ : GoodL H t₂) (hT : t₂.T' = t₁.T')
-    (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb t₂.f')
-    (hz : φ' (H.mkW t₁.f' ⟨_, z_mem H t₁.f' t₁.T' hg₁.2.2.1⟩) =
-      H.mkW t₂.f' ⟨_, z_mem H t₂.f' t₂.T' hg₂.2.2.1⟩)
-    (ho : φ' (H.mkW t₁.f' ⟨_, omP_mem H t₁.f' t₁.f (unit_swap H t₁.f t₁.f' hg₁.2.2.2.1)⟩) =
-      H.mkW t₂.f' ⟨_, omP_mem H t₂.f' t₂.f (unit_swap H t₂.f t₂.f' hg₂.2.2.2.1)⟩) :
-    ∀ p ∈ Gam' H t₁, ∀ q ∈ Gam' H t₂, PcL' H hg₂ q.2 = PcL' H hg₁ p.2 → q.2 = φ' p.2 := by
+theorem gam_sep'
+    {t₁ t₂ : Term V M r}
+    (hg₁ : GoodL H t₁) (hg₂ : GoodL H t₂) (hT : t₂.T' = t₁.T') (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb t₂.f')
+    (hz : φ' (H.mkW t₁.f' ⟨_, z_mem H t₁.f' t₁.T' hg₁.2.2.1⟩)
+      = H.mkW t₂.f' ⟨_, z_mem H t₂.f' t₂.T' hg₂.2.2.1⟩)
+    (ho : φ' (H.mkW t₁.f' ⟨_, omP_mem H t₁.f' t₁.f (unit_swap H t₁.f t₁.f' hg₁.2.2.2.1)⟩)
+      = H.mkW t₂.f' ⟨_, omP_mem H t₂.f' t₂.f (unit_swap H t₂.f t₂.f' hg₂.2.2.2.1)⟩)
+    : ∀ p ∈ Gam' H t₁, ∀ q ∈ Gam' H t₂, PcL' H hg₂ q.2 = PcL' H hg₁ p.2 → q.2 = φ' p.2 := by
   rintro _ ⟨u₁, hu₁, rfl⟩ _ ⟨u₂, hu₂, rfl⟩ hc
   simp only [PcL', coordW_mk, Prod.mk.injEq] at hc
   show H.mkW t₂.f' ⟨u₂, hu₂⟩ = φ' (H.mkW t₁.f' ⟨u₁, hu₁⟩)
   rw [mkW_decomp' H t₂.f t₂.f' t₂.T t₂.T' hg₂.2.1 hg₂.2.2.1 hg₂.2.2.2.1 hg₂.2.2.2.2 ⟨u₂, hu₂⟩
       (mem_span_of_sharp H hg₂ u₂),
     mkW_decomp' H t₁.f t₁.f' t₁.T t₁.T' hg₁.2.1 hg₁.2.2.1 hg₁.2.2.2.1 hg₁.2.2.2.2 ⟨u₁, hu₁⟩
-      (mem_span_of_sharp H hg₁ u₁), map_add, map_smul, map_smul, hz, ho]
+      (mem_span_of_sharp H hg₁ u₁),
+    map_add, map_smul, map_smul, hz, ho]
   have hT' : algebraMap F E t₂.T' = algebraMap F E t₁.T' := by rw [hT]
   simp only at hc ⊢
   rw [hc.1, hc.2, hT']

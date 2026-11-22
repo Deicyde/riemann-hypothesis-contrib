@@ -15,10 +15,10 @@ noncomputable section
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem eval_parYF_comp (K : Type*) [Field K] [NumberField K] (e n : ℕ) :
-    (eval₂Hom (kToFrac K e n) (parYF K e n)).comp
-        (algebraMap (MvPolynomial (Par e n) (𝓞 K)) (MvPolynomial (Par e n) K)) =
-      algebraMap (MvPolynomial (Par e n) (𝓞 K)) (ParFrac K e n) := by
+theorem eval_parYF_comp (K : Type*) [Field K] [NumberField K] (e n : ℕ)
+    : (eval₂Hom (kToFrac K e n) (parYF K e n)).comp
+        (algebraMap (MvPolynomial (Par e n) (𝓞 K)) (MvPolynomial (Par e n) K))
+      = algebraMap (MvPolynomial (Par e n) (𝓞 K)) (ParFrac K e n) := by
   refine MvPolynomial.ringHom_ext (fun x => ?_) (fun p => ?_)
   · simp only [RingHom.coe_comp, Function.comp_apply, MvPolynomial.algebraMap_def, map_C,
       eval₂Hom_C]
@@ -31,7 +31,8 @@ theorem ParAlgIndep.proof : ParAlgIndep.Statement := by
   rw [algebraicIndependent_iff_injective_aeval]
   change Function.Injective (eval₂Hom (kToFrac K e n) (parYF K e n))
   let M : Submonoid (MvPolynomial (Par e n) (𝓞 K)) := (nonZeroDivisors (𝓞 K)).map C
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro z hz
   obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective M z
   have h := IsLocalization.mk'_spec (MvPolynomial (Par e n) K) a s

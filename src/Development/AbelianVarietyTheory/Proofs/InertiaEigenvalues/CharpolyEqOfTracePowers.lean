@@ -6,24 +6,28 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.RootsCharp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.TracePowCharpoly
 
 open Polynomial Finset
 
-theorem newton_fn {σ : Type} [Fintype σ] (f : σ → ℂ) (k : ℕ) :
-    (k : ℂ) * (univ.val.map f).esymm k = (-1) ^ (k + 1) *
-      ∑ a ∈ antidiagonal k with a.1 < k,
-        (-1) ^ a.1 * (univ.val.map f).esymm a.1 * ∑ i, f i ^ a.2 := by
+theorem newton_fn {σ : Type} [Fintype σ] (f : σ → ℂ) (k : ℕ)
+    : (k : ℂ) * (univ.val.map f).esymm k
+      = (-1) ^ (k + 1)
+        * ∑ a ∈ antidiagonal k with a.1 < k,
+            (-1) ^ a.1 * (univ.val.map f).esymm a.1 * ∑ i, f i ^ a.2 := by
   have h := congrArg (MvPolynomial.aeval f) (MvPolynomial.mul_esymm_eq_sum σ ℂ k)
   set_option synthInstance.maxHeartbeats 100000 in
-    simpa only [map_mul, map_sum, map_pow, map_neg, map_one, map_natCast,
-    MvPolynomial.aeval_esymm_eq_multiset_esymm, MvPolynomial.psum, MvPolynomial.aeval_X] using h
+  simpa only [map_mul, map_sum, map_pow, map_neg, map_one, map_natCast,
+      MvPolynomial.aeval_esymm_eq_multiset_esymm, MvPolynomial.psum, MvPolynomial.aeval_X]
+    using h
 
-theorem newton_multiset (s : Multiset ℂ) (k : ℕ) :
-    (k : ℂ) * s.esymm k = (-1) ^ (k + 1) *
-      ∑ a ∈ antidiagonal k with a.1 < k, (-1) ^ a.1 * s.esymm a.1 * (s.map (· ^ a.2)).sum := by
+theorem newton_multiset (s : Multiset ℂ) (k : ℕ)
+    : (k : ℂ) * s.esymm k
+      = (-1) ^ (k + 1)
+        * ∑ a ∈ antidiagonal k with a.1 < k, (-1) ^ a.1 * s.esymm a.1 * (s.map (· ^ a.2)).sum := by
   have hs : s = (univ : Finset (Fin s.toList.length)).val.map (fun i => s.toList.get i) := by
     rw [Fin.univ_val_map, List.ofFn_get, Multiset.coe_toList]
   have h := newton_fn (fun i : Fin s.toList.length => s.toList.get i) k
@@ -39,8 +43,8 @@ theorem newton_multiset (s : Multiset ℂ) (k : ℕ) :
     rfl
   exact (e a.2).symm
 
-theorem esymm_eq_of_psum_eq (s t : Multiset ℂ) (h : ∀ k, (s.map (· ^ k)).sum = (t.map (· ^ k)).sum) :
-    ∀ k, s.esymm k = t.esymm k := by
+theorem esymm_eq_of_psum_eq (s t : Multiset ℂ) (h : ∀ k, (s.map (· ^ k)).sum = (t.map (· ^ k)).sum)
+    : ∀ k, s.esymm k = t.esymm k := by
   intro k
   induction k using Nat.strong_induction_on with
   | _ k ih =>
@@ -53,9 +57,10 @@ theorem esymm_eq_of_psum_eq (s t : Multiset ℂ) (h : ∀ k, (s.map (· ^ k)).su
       refine Finset.sum_congr rfl fun a ha => ?_
       rw [ih a.1 (Finset.mem_filter.mp ha).2, h a.2]
 
-theorem prod_eq_of_psum_eq (s t : Multiset ℂ) (hc : Multiset.card s = Multiset.card t)
-    (h : ∀ k, (s.map (· ^ k)).sum = (t.map (· ^ k)).sum) :
-    (s.map (fun a => X - C a)).prod = (t.map (fun a => X - C a)).prod := by
+theorem prod_eq_of_psum_eq
+    (s t : Multiset ℂ)
+    (hc : Multiset.card s = Multiset.card t) (h : ∀ k, (s.map (· ^ k)).sum = (t.map (· ^ k)).sum)
+    : (s.map (fun a => X - C a)).prod = (t.map (fun a => X - C a)).prod := by
   ext k
   by_cases hk : k ≤ Multiset.card s
   · rw [Multiset.prod_X_sub_C_coeff s hk, Multiset.prod_X_sub_C_coeff t (hc ▸ hk), hc,
@@ -71,28 +76,33 @@ namespace GlobalTheory.TracePowCharpoly
 
 open Polynomial
 
-theorem trace_pow_eq_sum_roots {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (f : Module.End ℂ V) (k : ℕ) :
-    LinearMap.trace ℂ V (f ^ k) =
-      ((LinearMap.toMatrix (Module.finBasis ℂ V) (Module.finBasis ℂ V) f).charpoly.roots.map
+theorem trace_pow_eq_sum_roots
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (f : Module.End ℂ V) (k : ℕ)
+    : LinearMap.trace ℂ V (f ^ k)
+      = ((LinearMap.toMatrix (Module.finBasis ℂ V) (Module.finBasis ℂ V) f).charpoly.roots.map
         (· ^ k)).sum := by
   classical
-  rw [LinearMap.trace_eq_matrix_trace ℂ (Module.finBasis ℂ V), ← GlobalTheory.CharpolyPow.roots_charpoly_pow,
-    ← Matrix.trace_eq_sum_roots_charpoly]
+  rw [LinearMap.trace_eq_matrix_trace ℂ (Module.finBasis ℂ V),
+    ← GlobalTheory.CharpolyPow.roots_charpoly_pow, ← Matrix.trace_eq_sum_roots_charpoly]
   congr 1
   induction k with
   | zero => simp [LinearMap.toMatrix_one]
   | succ n ih => rw [pow_succ, LinearMap.toMatrix_mul, ih, pow_succ]
 
-theorem charpoly_eq_prod_roots {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (f : Module.End ℂ V) :
-    f.charpoly = ((LinearMap.toMatrix (Module.finBasis ℂ V) (Module.finBasis ℂ V) f).charpoly.roots.map
+theorem charpoly_eq_prod_roots
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (f : Module.End ℂ V)
+    : f.charpoly
+      = ((LinearMap.toMatrix (Module.finBasis ℂ V) (Module.finBasis ℂ V) f).charpoly.roots.map
         (fun a => X - C a)).prod := by
   classical
   rw [← LinearMap.charpoly_toMatrix f (Module.finBasis ℂ V)]
   exact (IsAlgClosed.splits _).eq_prod_roots_of_monic (Matrix.charpoly_monic _)
 
-theorem charpoly_eq_of_trace_pow_eq : ∀ (V V' : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [AddCommGroup V'] [Module ℂ V'] [FiniteDimensional ℂ V'] (f : Module.End ℂ V) (g : Module.End ℂ V'), (∀ k : ℕ, LinearMap.trace ℂ V (f ^ k) = LinearMap.trace ℂ V' (g ^ k)) → f.charpoly = g.charpoly := by
+theorem charpoly_eq_of_trace_pow_eq
+    : ∀ (V V' : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [AddCommGroup V']
+        [Module ℂ V'] [FiniteDimensional ℂ V'] (f : Module.End ℂ V) (g : Module.End ℂ V'),
+      (∀ k : ℕ, LinearMap.trace ℂ V (f ^ k) = LinearMap.trace ℂ V' (g ^ k))
+        → f.charpoly = g.charpoly := by
   intro V V' _ _ _ _ _ _ f g h
   have hdim : Module.finrank ℂ V = Module.finrank ℂ V' := by
     have h0 := h 0
@@ -100,7 +110,8 @@ theorem charpoly_eq_of_trace_pow_eq : ∀ (V V' : Type) [AddCommGroup V] [Module
     exact_mod_cast h0
   rw [charpoly_eq_prod_roots f, charpoly_eq_prod_roots g]
   apply prod_eq_of_psum_eq
-  · rw [GlobalTheory.CharpolyPow.card_roots_charpoly, GlobalTheory.CharpolyPow.card_roots_charpoly, hdim]
+  · rw [GlobalTheory.CharpolyPow.card_roots_charpoly, GlobalTheory.CharpolyPow.card_roots_charpoly,
+      hdim]
   · intro k
     rw [← trace_pow_eq_sum_roots, ← trace_pow_eq_sum_roots, h k]
 

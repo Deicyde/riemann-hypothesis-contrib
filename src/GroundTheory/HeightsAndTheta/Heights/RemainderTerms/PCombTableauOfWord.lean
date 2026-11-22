@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Finset Comb
 
-theorem CombTableauOfWord.proof (h1 : CombCellOfWordMem.Statement)
-    (h2 : CombCellOfWordInj.Statement) (h3 : CombCellOfWordMono.Statement) :
-    CombTableauOfWord.Statement := by
+theorem CombTableauOfWord.proof
+    (h1 : CombCellOfWordMem.Statement) (h2 : CombCellOfWordInj.Statement)
+    (h3 : CombCellOfWordMono.Statement)
+    : CombTableauOfWord.Statement := by
   intro m lam _hlam w hw
   have hL : IsLattice w := by
     simp only [latticeWords, mem_filter] at hw

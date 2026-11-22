@@ -54,7 +54,9 @@ theorem cauchy_inequality_on_torus : CauchyTorusStatement := by
     field_simp
   have hSFn : ‖lam‖ ≤ ‖∑ ψ ∈ F, c ψ * ∏ i, τ i ^ ψ i‖ := by
     rw [hSF, norm_mul]
-    calc ‖lam‖ = ‖lam‖ * 1 := (mul_one _).symm
+    calc
+      ‖lam‖
+        = ‖lam‖ * 1 := (mul_one _).symm
       _ ≤ ‖lam‖ * ‖∑ ψ ∈ F, a ψ * ∏ i, τ i ^ ψ i‖ := mul_le_mul_of_nonneg_left hτ1 (norm_nonneg _)
   have hsum : Summable (fun ψ => c ψ * ∏ i, τ i ^ ψ i) := by
     apply NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
@@ -68,8 +70,9 @@ theorem cauchy_inequality_on_torus : CauchyTorusStatement := by
     rw [Set.Finite.mem_toFinset] at hψ
     simp only [Set.mem_setOf_eq, not_not] at hψ
     exact le_of_lt hψ
-  have hne : ‖∑ ψ ∈ F, c ψ * ∏ i, τ i ^ ψ i‖ ≠
-      ‖∑' ψ : ↑((F : Set (Fin n → ℤ))ᶜ), c ψ * ∏ i, τ i ^ (ψ : Fin n → ℤ) i‖ := by
+  have hne
+      : ‖∑ ψ ∈ F, c ψ * ∏ i, τ i ^ ψ i‖
+        ≠ ‖∑' ψ : ↑((F : Set (Fin n → ℤ))ᶜ), c ψ * ∏ i, τ i ^ (ψ : Fin n → ℤ) i‖ := by
     intro h
     linarith
   have htot := IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hne
@@ -77,8 +80,9 @@ theorem cauchy_inequality_on_torus : CauchyTorusStatement := by
   have h1 := hτ τ hτu
   unfold torusSum at h1
   rw [htot] at h1
-  have h3 := le_max_left ‖∑ ψ ∈ F, c ψ * ∏ i, τ i ^ ψ i‖
-    ‖∑' ψ : ↑((F : Set (Fin n → ℤ))ᶜ), c ψ * ∏ i, τ i ^ (ψ : Fin n → ℤ) i‖
+  have h3 :=
+    le_max_left ‖∑ ψ ∈ F, c ψ * ∏ i, τ i ^ ψ i‖
+      ‖∑' ψ : ↑((F : Set (Fin n → ℤ))ᶜ), c ψ * ∏ i, τ i ^ (ψ : Fin n → ℤ) i‖
   linarith
 
 end ReciprocityTheory.MultiplicativeHeights

@@ -25,20 +25,24 @@ def xzMap (φ : Lt ↪ Lt') : XZ Lt N0 N1 → XZ Lt' N0 N1 :=
 def xzEmb (φ : Lt ↪ Lt') : XZ Lt N0 N1 ↪ XZ Lt' N0 N1 :=
   ⟨xzMap φ, Function.Injective.sumMap (pEmb φ _).injective (pEmb φ _).injective⟩
 
-theorem rename_minorXZ (φ : Lt ↪ Lt') (s : Lt) (p : ℕ) (I : Fin p ↪o Fin N1) :
-    MvPolynomial.rename (xzMap (N0 := N0) (N1 := N1) φ) (minorXZ N0 N1 s p I) = minorXZ N0 N1 (φ s) p I := by
+theorem rename_minorXZ (φ : Lt ↪ Lt') (s : Lt) (p : ℕ) (I : Fin p ↪o Fin N1)
+    : MvPolynomial.rename (xzMap (N0 := N0) (N1 := N1) φ) (minorXZ N0 N1 s p I)
+      = minorXZ N0 N1 (φ s) p I := by
   unfold minorXZ
-  have h := RingHom.map_det (MvPolynomial.rename (R := ℤ) (xzMap (N0 := N0) (N1 := N1) φ)).toRingHom
-    (Matrix.of fun i k : Fin p => ∑ a : Fin N0,
-      MvPolynomial.X (Sum.inl (s, (i : ℕ), a)) * MvPolynomial.X (Sum.inr (s, a, I k)))
+  have h :=
+    RingHom.map_det (MvPolynomial.rename (R := ℤ) (xzMap (N0 := N0) (N1 := N1) φ)).toRingHom
+      (Matrix.of fun i k : Fin p =>
+        ∑ a : Fin N0,
+          MvPolynomial.X (Sum.inl (s, (i : ℕ), a)) * MvPolynomial.X (Sum.inr (s, a, I k)))
   simp only [AlgHom.toRingHom_eq_coe, RingHom.coe_coe] at h
   rw [h]
   congr 1
   ext i k
   simp [xzMap, pEmb]
 
-theorem minorXZ_supported (s : Lt) (p : ℕ) (I : Fin p ↪o Fin N1) :
-    minorXZ N0 N1 s p I ∈ MvPolynomial.supported ℤ (xzLetter (Lt := Lt) (N0 := N0) (N1 := N1) ⁻¹' {s}) := by
+theorem minorXZ_supported (s : Lt) (p : ℕ) (I : Fin p ↪o Fin N1)
+    : minorXZ N0 N1 s p I
+      ∈ MvPolynomial.supported ℤ (xzLetter (Lt := Lt) (N0 := N0) (N1 := N1) ⁻¹' {s}) := by
   unfold minorXZ
   rw [Matrix.det_apply]
   refine Subalgebra.sum_mem _ fun σ _ => ?_
@@ -49,10 +53,12 @@ theorem minorXZ_supported (s : Lt) (p : ℕ) (I : Fin p ↪o Fin N1) :
   · exact MvPolynomial.X_mem_supported.mpr (by simp [xzLetter])
   · exact MvPolynomial.X_mem_supported.mpr (by simp [xzLetter])
 
-theorem split_embDomain (φ : Lt ↪ Lt') (μ : XZ Lt N0 N1 →₀ ℕ) :
-    Finsupp.sumFinsuppEquivProdFinsupp (Finsupp.embDomain (xzEmb φ) μ) =
-      (Finsupp.embDomain (pEmb φ (ℕ × Fin N0)) (Finsupp.sumFinsuppEquivProdFinsupp μ).1,
-        Finsupp.embDomain (pEmb φ (Fin N0 × Fin N1)) (Finsupp.sumFinsuppEquivProdFinsupp μ).2) := by
+theorem split_embDomain (φ : Lt ↪ Lt') (μ : XZ Lt N0 N1 →₀ ℕ)
+    : Finsupp.sumFinsuppEquivProdFinsupp (Finsupp.embDomain (xzEmb φ) μ)
+      = (
+        Finsupp.embDomain (pEmb φ (ℕ × Fin N0)) (Finsupp.sumFinsuppEquivProdFinsupp μ).1,
+        Finsupp.embDomain (pEmb φ (Fin N0 × Fin N1)) (Finsupp.sumFinsuppEquivProdFinsupp μ).2
+      ) := by
   refine Prod.ext ?_ ?_
   · ext y
     rw [Finsupp.fst_sumFinsuppEquivProdFinsupp]
@@ -81,20 +87,23 @@ theorem split_embDomain (φ : Lt ↪ Lt') (μ : XZ Lt N0 N1 →₀ ℕ) :
 
 variable [Fintype Lt] [DecidableEq Lt] [Fintype Lt'] [DecidableEq Lt'] (l : ℕ) [Fact l.Prime]
 
-theorem applyTerm_rename (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
-    (μ : XZ Lt N0 N1 →₀ ℕ) (c : ℤ) :
-    applyTerm l (MvPowerSeries.rename (pEmb φ (Fin N0 × Fin N1)) T) (Finsupp.embDomain (xzEmb φ) μ) c =
-      MvPolynomial.rename (pEmb φ (ℕ × Fin N0)) (applyTerm l T μ c) := by
+theorem applyTerm_rename
+    (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]) (μ : XZ Lt N0 N1 →₀ ℕ) (c : ℤ)
+    : applyTerm l (MvPowerSeries.rename (pEmb φ (Fin N0 × Fin N1)) T)
+        (Finsupp.embDomain (xzEmb φ) μ) c
+      = MvPolynomial.rename (pEmb φ (ℕ × Fin N0)) (applyTerm l T μ c) := by
   unfold applyTerm
   rw [split_embDomain, MvPolynomial.rename_monomial, ← Finsupp.embDomain_eq_mapDomain]
   congr 2
   · rw [Finsupp.prod_embDomain]
   · exact MvPowerSeries.coeff_embDomain_rename _ _ _
 
-theorem applyAt0_rename (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
-    (P : MvPolynomial (XZ Lt N0 N1) ℤ) :
-    applyAt0 N0 N1 l (MvPowerSeries.rename (pEmb φ (Fin N0 × Fin N1)) T) (MvPolynomial.rename (xzMap φ) P) =
-      MvPolynomial.rename (pEmb φ (ℕ × Fin N0)) (applyAt0 N0 N1 l T P) := by
+theorem applyAt0_rename
+    (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
+    (P : MvPolynomial (XZ Lt N0 N1) ℤ)
+    : applyAt0 N0 N1 l (MvPowerSeries.rename (pEmb φ (Fin N0 × Fin N1)) T)
+        (MvPolynomial.rename (xzMap φ) P)
+      = MvPolynomial.rename (pEmb φ (ℕ × Fin N0)) (applyAt0 N0 N1 l T P) := by
   induction P using MvPolynomial.induction_on' with
   | monomial μ c =>
     rw [MvPolynomial.rename_monomial, applyAt0_monomial, applyAt0_monomial,
@@ -105,8 +114,9 @@ theorem applyAt0_rename (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × Fin N0 × Fi
 
 end Rename₂
 
-theorem serIn_rename {Lt Lt' γ K : Type*} [CommSemiring K] (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × γ) K) :
-    SerIn {v : Lt' × γ | v.1 ∈ Set.range φ}
+theorem serIn_rename
+    {Lt Lt' γ K : Type*} [CommSemiring K] (φ : Lt ↪ Lt') (T : MvPowerSeries (Lt × γ) K)
+    : SerIn {v : Lt' × γ | v.1 ∈ Set.range φ}
       (MvPowerSeries.rename (φ.prodMap (Function.Embedding.refl γ)) T) := by
   intro ν hν v hv
   by_contra hvr
@@ -119,9 +129,13 @@ theorem serIn_rename {Lt Lt' γ K : Type*} [CommSemiring K] (φ : Lt ↪ Lt') (T
     exact hvr ⟨w.1, rfl⟩
   · exact hv (Finsupp.embDomain_of_notMem_range _ _ _ h)
 
-theorem norm_coeff_rename_le {σ τ K : Type*} [NormedCommRing K] (f : σ ↪ τ) (A : MvPolynomial σ K) {b : ℝ}
-    (hb : 0 ≤ b) (hA : ∀ m, ‖AddMonoidAlgebra.coeff A m‖ ≤ b) (m : τ →₀ ℕ) :
-    ‖AddMonoidAlgebra.coeff (MvPolynomial.rename f A) m‖ ≤ b := by
+theorem norm_coeff_rename_le
+    {σ τ K : Type*} [NormedCommRing K]
+    (f : σ ↪ τ)
+    (A : MvPolynomial σ K)
+    {b : ℝ} (hb : 0 ≤ b) (hA : ∀ m, ‖AddMonoidAlgebra.coeff A m‖ ≤ b)
+    (m : τ →₀ ℕ)
+    : ‖AddMonoidAlgebra.coeff (MvPolynomial.rename f A) m‖ ≤ b := by
   by_cases h : ∃ m', Finsupp.mapDomain f m' = m
   · obtain ⟨m', rfl⟩ := h
     rw [MvPolynomial.coeff_rename_mapDomain f f.injective]

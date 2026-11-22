@@ -9,21 +9,22 @@ open Polynomial
 
 namespace GlobalTheory.SymmetricSimilarTranspose
 
-theorem exists_bilin_cyclic {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0) :
-    ∃ B : (k[X] ⧸ Submodule.span k[X] {f}) →ₗ[k] (k[X] ⧸ Submodule.span k[X] {f}) →ₗ[k] k,
-      (∀ x y, B ((X : k[X]) • x) y = B x ((X : k[X]) • y)) ∧ (∀ y, (∀ x, B x y = 0) → y = 0) ∧
-        ∀ x y, B x y = B y x := by
+theorem exists_bilin_cyclic {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0)
+    : ∃ B : (k[X] ⧸ Submodule.span k[X] {f}) →ₗ[k] (k[X] ⧸ Submodule.span k[X] {f}) →ₗ[k] k,
+      (∀ x y, B ((X : k[X]) • x) y = B x ((X : k[X]) • y)) ∧ (∀ y, (∀ x, B x y = 0) → y = 0)
+        ∧ ∀ x y, B x y = B y x := by
   obtain ⟨l, h1, h2⟩ := GlobalTheory.SimilarTranspose.exists_form f hf
   let l' : (k[X] ⧸ Ideal.span {f}) →ₗ[k] k :=
     (((Ideal.span {f}).restrictScalars k).liftQ l
-      (fun a ha => h1 a (Ideal.mem_span_singleton.mp ha))).comp
+        (fun a ha => h1 a (Ideal.mem_span_singleton.mp ha))).comp
       (Submodule.Quotient.restrictScalarsEquiv k (Ideal.span {f})).symm.toLinearMap
   refine ⟨(LinearMap.mul k (k[X] ⧸ Ideal.span {f})).compr₂ l', ?_, ?_, ?_⟩
   · intro x y
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective (I := Ideal.span {f}) x
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective (I := Ideal.span {f}) y
     change l ((X * a) * b) = l (a * (X * b))
-    congr 1; ring
+    congr 1
+    ring
   · intro y hy
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective (I := Ideal.span {f}) y
     refine Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton.mpr (h2 b fun a => ?_))
@@ -36,10 +37,10 @@ theorem exists_bilin_cyclic {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0) :
     change l (a * b) = l (b * a)
     rw [mul_comm]
 
-theorem exists_bilin {k W : Type} [Field k] [AddCommGroup W] [Module k W] [FiniteDimensional k W]
-    (T : W →ₗ[k] W) :
-    ∃ B : W →ₗ[k] W →ₗ[k] k, (∀ x y, B (T x) y = B x (T y)) ∧ (∀ y, (∀ x, B x y = 0) → y = 0) ∧
-      ∀ x y, B x y = B y x := by
+theorem exists_bilin
+    {k W : Type} [Field k] [AddCommGroup W] [Module k W] [FiniteDimensional k W] (T : W →ₗ[k] W)
+    : ∃ B : W →ₗ[k] W →ₗ[k] k,
+      (∀ x y, B (T x) y = B x (T y)) ∧ (∀ y, (∀ x, B x y = 0) → y = 0) ∧ ∀ x y, B x y = B y x := by
   classical
   have htor : Module.IsTorsion k[X] (Module.AEval' T) :=
     Module.AEval.isTorsion_of_finiteDimensional k W T
@@ -76,8 +77,9 @@ theorem exists_bilin {k W : Type} [Field k] [AddCommGroup W] [Module k W] [Finit
     simp only [LinearMap.sum_apply, LinearMap.compl₁₂_apply]
     exact Finset.sum_congr rfl fun i _ => hB3 i _ _
 
-theorem main : ∀ (k ι : Type) [Field k] [Fintype ι] [DecidableEq ι] (A : Matrix ι ι k),
-    ∃ P : Matrix ι ι k, IsUnit P ∧ P.transpose = P ∧ P * A = A.transpose * P := by
+theorem main
+    : ∀ (k ι : Type) [Field k] [Fintype ι] [DecidableEq ι] (A : Matrix ι ι k), ∃ P : Matrix ι ι k,
+      IsUnit P ∧ P.transpose = P ∧ P * A = A.transpose * P := by
   intro k ι _ _ _ A
   obtain ⟨B, h1, h2, h3⟩ := exists_bilin (Matrix.toLin' A)
   obtain ⟨P, rfl⟩ := (Matrix.toBilin' (R₁ := k) (n := ι)).surjective B

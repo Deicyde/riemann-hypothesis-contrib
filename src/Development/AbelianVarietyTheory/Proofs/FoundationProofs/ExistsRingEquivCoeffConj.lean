@@ -19,26 +19,38 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem exists_ringEquiv_coeff_conj : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (s : Ω ≃+* Ω),
-    ∃ σ : GlobalTheory.FN.ring ε.range ≃+* GlobalTheory.FN.ring ε.range, ∀ (a : GlobalTheory.FN.ring ε.range) (h h' : HahnSeries ℚ Ω),
-      IsExp ε a h → IsExp ε (σ a : GlobalTheory.FN.ring ε.range) h' → ∀ r, h'.coeff r = s (h.coeff r) := by
+theorem exists_ringEquiv_coeff_conj
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (s : Ω ≃+* Ω),
+      ∃ σ : GlobalTheory.FN.ring ε.range ≃+* GlobalTheory.FN.ring ε.range,
+        ∀ (a : GlobalTheory.FN.ring ε.range) (h h' : HahnSeries ℚ Ω),
+          IsExp ε a h → IsExp ε (σ a : GlobalTheory.FN.ring ε.range) h'
+            → ∀ r, h'.coeff r = s (h.coeff r) := by
   intro Ω _ ε s
   obtain ⟨e, he_inj, he⟩ := GlobalTheory.T.exists_injective_cuspExpansion_ringHom Ω ε
   have hmem := (GlobalTheory.T.mem_modularFunctionRingOver_iff_hasSomeLevelOver ε.range).1
-  have key : ∀ t : Ω ≃+* Ω, ∃ c : ring ε.range → ring ε.range, ∀ a,
-      (∀ r, (e (c a)).coeff r = t ((e a).coeff r)) ∧
-      ∀ h h' : HahnSeries ℚ Ω, IsExp ε a h → IsExp ε (c a : ℍ → ℂ) h' → ∀ r, h'.coeff r = t (h.coeff r) := by
+  have key
+      : ∀ t : Ω ≃+* Ω, ∃ c : ring ε.range → ring ε.range, ∀ a,
+        (∀ r, (e (c a)).coeff r = t ((e a).coeff r))
+          ∧ ∀ h h' : HahnSeries ℚ Ω,
+            IsExp ε a h → IsExp ε (c a : ℍ → ℂ) h' → ∀ r, h'.coeff r = t (h.coeff r) := by
     intro t
-    have hex : ∀ a : ring ε.range, ∃ b : ring ε.range, ∀ h h' : HahnSeries ℚ Ω,
-        IsExp ε a h → IsExp ε (b : ℍ → ℂ) h' → ∀ r, h'.coeff r = t (h.coeff r) := by
+    have hex
+        : ∀ a : ring ε.range, ∃ b : ring ε.range, ∀ h h' : HahnSeries ℚ Ω,
+          IsExp ε a h → IsExp ε (b : ℍ → ℂ) h' → ∀ r, h'.coeff r = t (h.coeff r) := by
       intro a
-      obtain ⟨f', hf', hp⟩ := GlobalTheory.T.exists_galoisConjugate_modularFunction_someLevel Ω ε t a ((hmem a).1 a.2)
+      obtain ⟨f', hf', hp⟩ :=
+        GlobalTheory.T.exists_galoisConjugate_modularFunction_someLevel Ω ε t a ((hmem a).1 a.2)
       exact ⟨⟨f', (hmem f').2 hf'⟩, hp⟩
     choose c hc using hex
     exact ⟨c, fun a => ⟨hc a (e a) (e (c a)) (he a) (he (c a)), hc a⟩⟩
-  have mapc : ∀ t : Ω ≃+* Ω, ∃ Φ : HahnSeries ℚ Ω →+* HahnSeries ℚ Ω, ∀ h r, (Φ h).coeff r = t (h.coeff r) := by
+  have mapc
+      : ∀ t : Ω ≃+* Ω, ∃ Φ : HahnSeries ℚ Ω →+* HahnSeries ℚ Ω, ∀ h r,
+        (Φ h).coeff r = t (h.coeff r) := by
     intro t
-    obtain ⟨Φ, hΦ⟩ := GlobalTheory.T.exists_hahnSeries_scale_twist_ringHom Ω Ω t.toRingHom 1 (fun _ => 1) one_pos rfl (by simp)
+    obtain ⟨Φ, hΦ⟩ :=
+      GlobalTheory.T.exists_hahnSeries_scale_twist_ringHom Ω Ω t.toRingHom 1
+        (fun _ => 1)
+        one_pos rfl (by simp)
     exact ⟨Φ, fun h r => by simpa using hΦ h r⟩
   obtain ⟨c, hc⟩ := key s
   obtain ⟨d, hd⟩ := key s.symm
@@ -46,8 +58,10 @@ theorem exists_ringEquiv_coeff_conj : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* 
   have ec : ∀ a, e (c a) = Φ (e a) := fun a => by
     ext r
     rw [(hc a).1, hΦ]
-  refine ⟨{ toFun := c, invFun := d, left_inv := ?_, right_inv := ?_, map_add' := ?_, map_mul' := ?_ },
-    fun a h h' => (hc a).2 h h'⟩
+  refine ⟨
+    { toFun := c, invFun := d, left_inv := ?_, right_inv := ?_, map_add' := ?_, map_mul' := ?_ },
+    fun a h h' => (hc a).2 h h'
+  ⟩
   · intro a
     apply he_inj
     ext r

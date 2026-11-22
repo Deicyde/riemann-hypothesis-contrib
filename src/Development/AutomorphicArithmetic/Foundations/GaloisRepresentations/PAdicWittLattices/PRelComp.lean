@@ -6,14 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGeneri
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-theorem UpperTheory.Gal.G3.pRelComp :
-    RelComp := by
+theorem UpperTheory.Gal.G3.pRelComp : RelComp := by
   unfold UpperTheory.Gal.G3.RelComp
   intro p _ D G L R _ _ gb S s N₁ N₂ N₃ o₁ o₂ o₃ k _ t I₁ I₂ I₃ ψ₁ ψ₂ h₁ h₂ hψ₁ hψ₂ hint
   unfold UpperTheory.Gal.G3.Rel
@@ -32,8 +34,8 @@ theorem UpperTheory.Gal.G3.pRelComp :
       exact (IsMonHom.monoidHom ψ₁ (Over.mk t)).map_one
     obtain ⟨y, hy⟩ := (I₂.onto n hn _).1 htor
     obtain ⟨v₁, hv₁, e₁⟩ := (r₁ n hn hcop x y).1 hy.symm
-    rw [← Category.assoc, ← hy, r₂ n hn hcop y z, map_mul, Module.End.mul_apply, e₁, map_add (f := _),
-      map_nsmul]
+    rw [← Category.assoc, ← hy, r₂ n hn hcop y z, map_mul, Module.End.mul_apply, e₁,
+      map_add (f := _), map_nsmul]
     have hw := hint v₁ hv₁
     constructor
     · rintro ⟨v, hv, e⟩

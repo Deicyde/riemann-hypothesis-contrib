@@ -15,9 +15,9 @@ namespace GlobalTheory.CompanionTheory.FieldNumbers
 
 open GroundTheory.Heights₂.Heights.FieldNumbers GroundTheory.Heights₂.Heights.NumbersDVR
 
-theorem projectionFormulaDegree :
-    GroundTheory.Heights₂.Heights.FieldNumbers.ProjectionFormulaDegree.Statement.{0} :=
-  ProjectionFormulaDegree.of_divPushForward
-    (DivPushForward.proof ContractRelDimLe.proof DivPushForwardLocalZero)
+theorem projectionFormulaDegree
+    : GroundTheory.Heights₂.Heights.FieldNumbers.ProjectionFormulaDegree.Statement.{0} :=
+  ProjectionFormulaDegree.of_divPushForward (DivPushForward.proof ContractRelDimLe.proof
+    DivPushForwardLocalZero)
 
 end GlobalTheory.CompanionTheory.FieldNumbers

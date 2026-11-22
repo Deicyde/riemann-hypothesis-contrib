@@ -71,11 +71,14 @@ def GoodIdempotentFixesLocalisationForms (D : D7) : Prop :=
   ∀ (i : D.nd.Loc) (σ' : D.ntypes.Par), ∀ F ∈ D.ntypes.MtPar (D.nd.mu i) (D.nd.j i) σ',
     D.ntypes.goodPar σ' → D.ntypes.onMt (D.nd.mu i) (D.nd.j i) D.ntypes.e0 F = F
 
-def GoodIdempotentReadsAsGoodTypeProjector {D : D7} {cf : Formalism.L2.Host.CharFrame D} {nch : NChoice D} {tp : Formalism.L2.Host.TupTied D cf nch}
-    (X : GlobalTheory.NJoin.RealAt D cf nch tp) : Prop :=
+def GoodIdempotentReadsAsGoodTypeProjector
+    {D : D7} {cf : Formalism.L2.Host.CharFrame D} {nch : NChoice D}
+    {tp : Formalism.L2.Host.TupTied D cf nch} (X : GlobalTheory.NJoin.RealAt D cf nch tp)
+    : Prop :=
   ∀ μ (hμ : Formalism.IndefR.RecTie.Used0 D μ) (j : Fin D.R.m) (f : D.what₂.Mt μ (j.1 + 1)) y,
-    X.R.extV j (X.tupT μ) y = X.fn hμ j f →
-      (D.ntypes.onMt μ (j.1 + 1) D.ntypes.e0 f = f ↔ GlobalTheory.DownLift.GoodVt X.R j (X.tupT μ) y)
+    X.R.extV j (X.tupT μ) y = X.fn hμ j f
+      → (D.ntypes.onMt μ (j.1 + 1) D.ntypes.e0 f = f
+        ↔ GlobalTheory.DownLift.GoodVt X.R j (X.tupT μ) y)
 
 structure Tied (hL : GlobalTheory.Published.LocalLanglandsGL) (D : D7) : Type 1 where
   P : GlobalTheory.NPin.Pin hL D
@@ -92,20 +95,27 @@ structure Named {hL : GlobalTheory.Published.LocalLanglandsGL} {D : D7} (T : Tie
   ser : GlobalTheory.TypeLeaf.SerLoc D
   typeNZ : ∀ j t, GlobalTheory.DownLift.TypeNZ T.X.R j t
 
-structure Inputs (hL : GlobalTheory.Published.LocalLanglandsGL) (D : D7) : Type 1 extends toRowSideFamily : Tied hL D where
+structure Inputs (hL : GlobalTheory.Published.LocalLanglandsGL) (D : D7) : Type 1
+    extends toRowSideFamily : Tied hL D where
   named : Named toRowSideFamily
 
-theorem LamUsed.at {D : D7} (h : LamUsed D) {μ} (hμ : μ = D.what₂.mu0 ∨ ∃ w, μ = D.what₂.muAt w) {j : ℕ}
-    (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) : LamPos D μ j := by
+theorem LamUsed.at
+    {D : D7} (h : LamUsed D)
+    {μ} (hμ : μ = D.what₂.mu0 ∨ ∃ w, μ = D.what₂.muAt w)
+    {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    : LamPos D μ j := by
   obtain ⟨k, rfl⟩ : ∃ k, j = k + 1 := ⟨j - 1, by omega⟩
   exact h μ hμ ⟨k, by omega⟩
 
 theorem LamUsed.loc {D : D7} (h : LamUsed D) (i : D.nd.Loc) : LamPos D (D.nd.mu i) (D.nd.j i) :=
-  h.at (Or.inr ⟨D.nd.w i, (D.nd.mu_w i).trans ((D.what₂.muAt_or _).resolve_left (D.nd.w_tw i)).symm⟩)
+  h.at
+    (Or.inr ⟨D.nd.w i, (D.nd.mu_w i).trans ((D.what₂.muAt_or _).resolve_left (D.nd.w_tw i)).symm⟩)
     (D.nd.j_range i).1 (D.nd.j_range i).2
 
-theorem goodIdempotentFixes_of_onlySeriesOfLabelActs {D : D7} (h : GlobalTheory.TypeLeaf.SerLoc D) : GoodIdempotentFixesLocalisationForms D := fun i σ' F hF hg =>
-  (PlaceLabelTeichmuller.idempotent_action_on_forms D (D.ntypes.cenMt (D.nd.mu i) (D.nd.j i)) σ' F fun k v f hf => h i σ' k v f F hF hf).1 hg
+theorem goodIdempotentFixes_of_onlySeriesOfLabelActs {D : D7} (h : GlobalTheory.TypeLeaf.SerLoc D)
+    : GoodIdempotentFixesLocalisationForms D := fun i σ' F hF hg =>
+  (PlaceLabelTeichmuller.idempotent_action_on_forms D (D.ntypes.cenMt (D.nd.mu i) (D.nd.j i)) σ' F
+    fun k v f hf => h i σ' k v f F hF hf).1 hg
 
 namespace Inputs
 
@@ -125,7 +135,6 @@ theorem isot : SumRepresentations.adm8 D := I.named.isot
 theorem ser : GlobalTheory.TypeLeaf.SerLoc D := I.named.ser
 
 theorem typeNZ : ∀ j t, GlobalTheory.DownLift.TypeNZ I.X.R j t := I.named.typeNZ
-
 
 end Inputs
 

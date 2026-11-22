@@ -10,11 +10,13 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.TB
 
-theorem mvpoly_pderiv_comm {k σ : Type} [CommRing k] (i j : σ) (p : MvPolynomial σ k) :
-    MvPolynomial.pderiv i (MvPolynomial.pderiv j p) = MvPolynomial.pderiv j (MvPolynomial.pderiv i p) := by
+theorem mvpoly_pderiv_comm {k σ : Type} [CommRing k] (i j : σ) (p : MvPolynomial σ k)
+    : MvPolynomial.pderiv i (MvPolynomial.pderiv j p)
+      = MvPolynomial.pderiv j (MvPolynomial.pderiv i p) := by
   classical
-  have h : ⁅(MvPolynomial.pderiv i : Derivation k (MvPolynomial σ k) (MvPolynomial σ k)), MvPolynomial.pderiv j⁆ =
-      (0 : Derivation k (MvPolynomial σ k) (MvPolynomial σ k)) := by
+  have h
+      : ⁅(MvPolynomial.pderiv i : Derivation k (MvPolynomial σ k) (MvPolynomial σ k)), MvPolynomial.pderiv j⁆
+        = (0 : Derivation k (MvPolynomial σ k) (MvPolynomial σ k)) := by
     apply MvPolynomial.derivation_ext
     intro n
     rw [Derivation.commutator_apply, MvPolynomial.pderiv_X, MvPolynomial.pderiv_X, Pi.single_apply,
@@ -52,8 +54,8 @@ theorem harmSecond_holds : HarmSecondSt := by
     · rw [hc l l' h, map_zero, zero_mul]
   unfold secondOrder
   simp_rw [Fintype.sum_prod_type]
-  simp only [apply_ite MvPolynomial.C, ite_mul, map_zero, zero_mul, Finset.sum_ite_eq, Finset.mem_univ,
-    if_true]
+  simp only [apply_ite MvPolynomial.C, ite_mul, map_zero, zero_mul, Finset.sum_ite_eq,
+    Finset.mem_univ, if_true]
   apply Finset.sum_eq_zero
   intro l _
   rw [Finset.sum_comm]

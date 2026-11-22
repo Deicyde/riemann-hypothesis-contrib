@@ -15,9 +15,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory
 
-theorem monic_root_norm_le_one_add_sum :
-    ∀ (n : ℕ) (s : Fin n → ℂ) (y : ℂ), y ^ n + ∑ j, s j * y ^ (j : ℕ) = 0 →
-      ‖y‖ ≤ 1 + ∑ j, ‖s j‖ := by
+theorem monic_root_norm_le_one_add_sum
+    : ∀ (n : ℕ) (s : Fin n → ℂ) (y : ℂ),
+      y ^ n + ∑ j, s j * y ^ (j : ℕ) = 0 → ‖y‖ ≤ 1 + ∑ j, ‖s j‖ := by
   intro n s y h
   have hS : 0 ≤ ∑ j, ‖s j‖ := Finset.sum_nonneg (fun j _ => norm_nonneg _)
   by_cases hy : ‖y‖ ≤ 1
@@ -26,7 +26,7 @@ theorem monic_root_norm_le_one_add_sum :
   cases n with
   | zero => simp at h
   | succ m =>
-    have hyn : y ^ (m + 1) = -∑ j, s j * y ^ (j : ℕ) := eq_neg_of_add_eq_zero_left h
+    have hyn : y ^ (m + 1) = - ∑ j, s j * y ^ (j : ℕ) := eq_neg_of_add_eq_zero_left h
     have h1 : ‖y‖ ^ (m + 1) ≤ ∑ j, ‖s j‖ * ‖y‖ ^ (j : ℕ) := by
       rw [← norm_pow, hyn, norm_neg]
       refine (norm_sum_le _ _).trans (le_of_eq ?_)

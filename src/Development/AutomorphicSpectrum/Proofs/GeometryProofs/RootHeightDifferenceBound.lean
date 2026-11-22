@@ -11,7 +11,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Ht.CloseHt
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top GlobalTheory.CompanionTheory.Ar.Small GlobalTheory.CompanionTheory.Ar.Cmp GlobalTheory.CompanionTheory.Ar.Ht
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+  GlobalTheory.CompanionTheory.Ar.Small GlobalTheory.CompanionTheory.Ar.Cmp
+  GlobalTheory.CompanionTheory.Ar.Ht
 
 section Places
 
@@ -75,8 +78,9 @@ end Places
 
 section Join
 
-variable {K₁ K₂ : Type} [Fintype K₁] [Fintype K₂] {ι₁ : K₁ → Type} {ι₂ : K₂ → Type}
-  [∀ k, Fintype (ι₁ k)] [∀ k, Fintype (ι₂ k)]
+variable
+  {K₁ K₂ : Type} [Fintype K₁] [Fintype K₂]
+  {ι₁ : K₁ → Type} {ι₂ : K₂ → Type} [∀ k, Fintype (ι₁ k)] [∀ k, Fintype (ι₂ k)]
 
 lemma ptHt_sub_join (a₁ : K₁ → ℝ) (a₂ : K₂ → ℝ) (φ₁ : ((Σ k, ι₁ k) → ℂ) → ℝ) (φ₂ : ((Σ k, ι₂ k) → ℂ) → ℝ)
     (L : Type) [Field L] [NumberField L] (z : (Σ k, joinIdx ι₁ ι₂ k) → L) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
@@ -107,7 +111,10 @@ end Join
 
 section Embed
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω]
   {L : Type} [Field L]
 
 lemma aeval_emb (σ : L →+* ℂ) (z : (Σ k, ι k) → L) (f : MRing ι) :
@@ -156,10 +163,10 @@ lemma sum_abs_coef (M : RootModel Ψ N) (lam : Wt Ψ N) (s : ℝ) :
     simp [RootModel.coef, l1, Fintype.sum_prod_type]
   linarith
 
-def lineDefect (M R : RootModel Ψ N) (t : ℝ) (j : Option (Ψ × Fin N)) :
-    ((Σ k, joinIdx M.ι R.ι k) → ℂ) → ℝ := fun Z =>
-  Real.log ((M.line t j).h fun p => Z (joinInl M.ι R.ι p)) -
-    Real.log ((R.line 1 j).h fun p => Z (joinInr M.ι R.ι p))
+def lineDefect (M R : RootModel Ψ N) (t : ℝ) (j : Option (Ψ × Fin N))
+    : ((Σ k, joinIdx M.ι R.ι k) → ℂ) → ℝ := fun Z =>
+  Real.log ((M.line t j).h fun p => Z (joinInl M.ι R.ι p))
+    - Real.log ((R.line 1 j).h fun p => Z (joinInr M.ι R.ι p))
 
 lemma lineHt_sub (M R : RootModel Ψ N) (t : ℝ) (j : Option (Ψ × Fin N)) (L : Type) [Field L] [NumberField L]
     (z : (Σ k, joinIdx M.ι R.ι k) → L) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
@@ -177,12 +184,15 @@ lemma lineHt_sub (M R : RootModel Ψ N) (t : ℝ) (j : Option (Ψ × Fin N)) (L 
   rw [e]
   rfl
 
-theorem close_ht (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (M R : RootModel Ψ N) (i : R.Ω →+* M.Ω)
-    (u : Option (Ψ × Fin N) → M.Ω) (c t s lo hi : ℝ) (lam : Wt Ψ N) (hC : Close M R i u c)
-    (hA : ArchBetween M R i u t lam s lo hi) (L : Type) [Field L] [NumberField L]
-    (z) (hz : z ∈ ptsOver L (mCoordIdeal (joinOf M R i))) :
-    rootHt M t lam s L (fun p => z (joinInl M.ι R.ι p)) - rootHt R 1 lam s L (fun p => z (joinInr M.ι R.ι p)) ∈
-      Set.Icc (lo - (l1 lam + |s|) * c) (hi + (l1 lam + |s|) * c) := by
+theorem close_ht
+    (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ]
+    (N : ℕ) (M R : RootModel Ψ N) (i : R.Ω →+* M.Ω) (u : Option (Ψ × Fin N) → M.Ω)
+    (c t s lo hi : ℝ) (lam : Wt Ψ N) (hC : Close M R i u c) (hA : ArchBetween M R i u t lam s lo hi)
+    (L : Type) [Field L] [NumberField L]
+    (z) (hz : z ∈ ptsOver L (mCoordIdeal (joinOf M R i)))
+    : rootHt M t lam s L (fun p => z (joinInl M.ι R.ι p))
+        - rootHt R 1 lam s L (fun p => z (joinInr M.ι R.ι p))
+      ∈ Set.Icc (lo - (l1 lam + |s|) * c) (hi + (l1 lam + |s|) * c) := by
   obtain ⟨harith, hbir, -, -⟩ := GlobalTheory.T.join_model_points_project Ψ N M R i
   choose val hval0 hval using fun j => hC.unit j L z hz
   have hc : 0 ≤ c := by
@@ -191,20 +201,27 @@ theorem close_ht (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (M R : Root
     have hq' : (0 : ℝ) < q := by exact_mod_cast hq
     exact (mul_nonneg_iff_of_pos_left hq').1 (h0.trans hlog)
 
-  let E : Option (Ψ × Fin N) → ℝ := fun j => (Module.finrank ℚ L : ℝ)⁻¹ *
-    ∑ σ : L →+* ℂ, (lineDefect M R t j (fun p => σ (z p)) - Real.log ‖σ (val j)‖)
-  let D : Option (Ψ × Fin N) → ℝ := fun j => lineHt (M.line t j) L (fun p => z (joinInl M.ι R.ι p)) -
-    lineHt (R.line 1 j) L (fun p => z (joinInr M.ι R.ι p))
+  let E : Option (Ψ × Fin N) → ℝ := fun j =>
+    (Module.finrank ℚ L : ℝ)⁻¹
+      * ∑ σ : L →+* ℂ, (lineDefect M R t j (fun p => σ (z p)) - Real.log ‖σ (val j)‖)
+  let D : Option (Ψ × Fin N) → ℝ := fun j =>
+    lineHt (M.line t j) L (fun p => z (joinInl M.ι R.ι p))
+      - lineHt (R.line 1 j) L (fun p => z (joinInr M.ι R.ι p))
   have hD : ∀ j, |D j - E j| ≤ c := by
     intro j
-    have := GlobalTheory.T.vertical_bound_height_compare (M.K ⊕ R.K) (joinIdx M.ι R.ι) M.Ω (joinOf M R i) (dimFl Ψ N + 1) harith hbir
-      (joinDeg M R j) (u j) c (hC.vert j) (lineDefect M R t j) L z hz (val j) (hval0 j) (hval j)
+    have :=
+      GlobalTheory.T.vertical_bound_height_compare (M.K ⊕ R.K) (joinIdx M.ι R.ι) M.Ω (joinOf M R i)
+        (dimFl Ψ N + 1) harith hbir (joinDeg M R j) (u j) c (hC.vert j) (lineDefect M R t j) L z hz
+        (val j) (hval0 j) (hval j)
     simp only [D, E]
     rw [lineHt_sub M R t j L z hz.1]
     exact this
   have hE : ∑ j, M.coef lam s j * E j ∈ Set.Icc lo hi := by
-    have e : ∑ j, M.coef lam s j * E j = (Module.finrank ℚ L : ℝ)⁻¹ * ∑ σ : L →+* ℂ, ∑ j, M.coef lam s j *
-        (lineDefect M R t j (fun p => σ (z p)) - Real.log ‖σ (val j)‖) := by
+    have e
+        : ∑ j, M.coef lam s j * E j
+          = (Module.finrank ℚ L : ℝ)⁻¹
+            * ∑ σ : L →+* ℂ, ∑ j, M.coef lam s j *
+              (lineDefect M R t j (fun p => σ (z p)) - Real.log ‖σ (val j)‖) := by
       simp only [E]
       rw [Finset.sum_comm, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
@@ -214,9 +231,10 @@ theorem close_ht (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (M R : Root
     rw [e]
     refine avg_mem _ fun σ => ?_
     exact hA _ (ptsOver_emb σ hz) (fun j => σ (val j)) fun j => hasVal_emb σ (hval j)
-  have hsplit : rootHt M t lam s L (fun p => z (joinInl M.ι R.ι p)) -
-      rootHt R 1 lam s L (fun p => z (joinInr M.ι R.ι p)) =
-      ∑ j, M.coef lam s j * E j + ∑ j, M.coef lam s j * (D j - E j) := by
+  have hsplit
+      : rootHt M t lam s L (fun p => z (joinInl M.ι R.ι p))
+          - rootHt R 1 lam s L (fun p => z (joinInr M.ι R.ι p))
+        = ∑ j, M.coef lam s j * E j + ∑ j, M.coef lam s j * (D j - E j) := by
     unfold rootHt
     rw [← Finset.sum_add_distrib, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -224,12 +242,13 @@ theorem close_ht (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (M R : Root
     simp only [D]
     ring
   have hb : |∑ j, M.coef lam s j * (D j - E j)| ≤ (l1 lam + |s|) * c := by
-    calc |∑ j, M.coef lam s j * (D j - E j)| ≤ ∑ j, |M.coef lam s j * (D j - E j)| :=
-          Finset.abs_sum_le_sum_abs _ _
+    calc
+      |∑ j, M.coef lam s j * (D j - E j)|
+        ≤ ∑ j, |M.coef lam s j * (D j - E j)| := Finset.abs_sum_le_sum_abs _ _
       _ ≤ ∑ j, |M.coef lam s j| * c := by
-          refine Finset.sum_le_sum fun j _ => ?_
-          rw [abs_mul]
-          exact mul_le_mul_of_nonneg_left (hD j) (abs_nonneg _)
+        refine Finset.sum_le_sum fun j _ => ?_
+        rw [abs_mul]
+        exact mul_le_mul_of_nonneg_left (hD j) (abs_nonneg _)
       _ = (∑ j, |M.coef lam s j|) * c := by rw [Finset.sum_mul]
       _ ≤ (l1 lam + |s|) * c := mul_le_mul_of_nonneg_right (sum_abs_coef M lam s) hc
   rw [hsplit]

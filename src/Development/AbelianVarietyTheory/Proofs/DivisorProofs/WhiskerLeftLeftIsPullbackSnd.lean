@@ -4,13 +4,14 @@ public import Mathlib
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem whiskerLeft_left_isPullback_snd (S : Scheme.{0}) (U T T' : Over S) (f : T' ⟶ T) :
-    IsPullback (U ◁ f).left (snd U T').left (snd U T).left f.left := by
+theorem whiskerLeft_left_isPullback_snd (S : Scheme.{0}) (U T T' : Over S) (f : T' ⟶ T)
+    : IsPullback (U ◁ f).left (snd U T').left (snd U T).left f.left := by
   have hw : (U ◁ f).left ≫ (snd U T).left = (snd U T').left ≫ f.left := by
     rw [← Over.comp_left, ← Over.comp_left, whiskerLeft_snd]
   refine IsPullback.of_right (h₁₂ := (fst U T).left) (h₂₂ := T.hom) (v₁₃ := U.hom) ?_ hw ?_

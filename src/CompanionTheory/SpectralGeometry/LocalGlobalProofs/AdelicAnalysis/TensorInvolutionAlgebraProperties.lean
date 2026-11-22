@@ -5,7 +5,8 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.KAlg
@@ -14,9 +15,11 @@ section Coord
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-theorem exists_basis_one_delta (σ : E →ₐ[F] E) {δ : E} (hδ : σ δ = -δ) (h0 : δ ≠ 0)
-    (hfr : Module.finrank F E = 2) (h2 : (2 : F) ≠ 0) :
-    ∃ b : Module.Basis (Fin 2) F E, b 0 = 1 ∧ b 1 = δ := by
+theorem exists_basis_one_delta
+    (σ : E →ₐ[F] E)
+    {δ : E} (hδ : σ δ = -δ) (h0 : δ ≠ 0)
+    (hfr : Module.finrank F E = 2) (h2 : (2 : F) ≠ 0)
+    : ∃ b : Module.Basis (Fin 2) F E, b 0 = 1 ∧ b 1 = δ := by
   have li : LinearIndependent F ![(1 : E), δ] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -41,8 +44,9 @@ theorem exists_basis_one_delta (σ : E →ₐ[F] E) {δ : E} (hδ : σ δ = -δ)
 
 variable {R : Type} [CommRing R] [Algebra F R]
 
-theorem exists_coord (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb1 : b 1 = δ)
-    (y : R ⊗[F] E) : ∃ a c : R, y = a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ := by
+theorem exists_coord
+    (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb1 : b 1 = δ) (y : R ⊗[F] E)
+    : ∃ a c : R, y = a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ := by
   let B := Algebra.TensorProduct.basis R b
   refine ⟨B.repr y 0, B.repr y 1, ?_⟩
   have h := (B.sum_repr y).symm
@@ -52,9 +56,12 @@ theorem exists_coord (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb
   rw [e0, e1, TensorProduct.smul_tmul', TensorProduct.smul_tmul'] at h
   simpa using h
 
-theorem coord_inj (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb1 : b 1 = δ)
-    {a c a' c' : R} (h : a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ = a' ⊗ₜ[F] (1 : E) + c' ⊗ₜ[F] δ) :
-    a = a' ∧ c = c' := by
+theorem coord_inj
+    (b : Module.Basis (Fin 2) F E)
+    {δ : E}
+    (hb0 : b 0 = 1) (hb1 : b 1 = δ)
+    {a c a' c' : R} (h : a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ = a' ⊗ₜ[F] (1 : E) + c' ⊗ₜ[F] δ)
+    : a = a' ∧ c = c' := by
   let B := Algebra.TensorProduct.basis R b
   have e : ∀ p q : R, p ⊗ₜ[F] (1 : E) + q ⊗ₜ[F] δ = p • B 0 + q • B 1 := by
     intro p q
@@ -68,8 +75,8 @@ theorem coord_inj (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb1 :
   simp at h0 h1
   exact ⟨h0, h1⟩
 
-theorem tmul_one_injective (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb1 : b 1 = δ) :
-    Function.Injective (Algebra.TensorProduct.includeLeft : R →ₐ[F] R ⊗[F] E) := by
+theorem tmul_one_injective (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 1) (hb1 : b 1 = δ)
+    : Function.Injective (Algebra.TensorProduct.includeLeft : R →ₐ[F] R ⊗[F] E) := by
   intro p q h
   have h' : p ⊗ₜ[F] (1 : E) + (0 : R) ⊗ₜ[F] δ = q ⊗ₜ[F] (1 : E) + (0 : R) ⊗ₜ[F] δ := by
     simpa using h
@@ -77,12 +84,15 @@ theorem tmul_one_injective (b : Module.Basis (Fin 2) F E) {δ : E} (hb0 : b 0 = 
 
 end Coord
 
-theorem algebra_tensor_invol : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (R : Type) [CommRing R] [Algebra F R] [IsArtinianRing R] [IsReduced R],
-    IsArtinianRing (R ⊗[F] E) ∧ IsReduced (R ⊗[F] E) ∧ IsUnit (2 : R ⊗[F] E) ∧
-      (∀ y, sigR R σ (sigR R σ y) = y) ∧ (∃ δ : R ⊗[F] E, IsUnit δ ∧ sigR R σ δ = -δ) ∧
-      (∀ y : R ⊗[F] E, sigR R σ y = y → ∃ r : R, y = r ⊗ₜ[F] (1 : E)) ∧
-      ∀ r : R, IsUnit (r ⊗ₜ[F] (1 : E) : R ⊗[F] E) ↔ IsUnit r := by
+theorem algebra_tensor_invol
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (R : Type) [CommRing R] [Algebra F R] [IsArtinianRing R] [IsReduced R],
+          IsArtinianRing (R ⊗[F] E) ∧ IsReduced (R ⊗[F] E) ∧ IsUnit (2 : R ⊗[F] E)
+            ∧ (∀ y, sigR R σ (sigR R σ y) = y) ∧ (∃ δ : R ⊗[F] E, IsUnit δ ∧ sigR R σ δ = -δ)
+            ∧ (∀ y : R ⊗[F] E, sigR R σ y = y → ∃ r : R, y = r ⊗ₜ[F] (1 : E))
+            ∧ ∀ r : R, IsUnit (r ⊗ₜ[F] (1 : E) : R ⊗[F] E) ↔ IsUnit r := by
   intro F E _ _ _ _ _ σ h R _ _ _ _
   have hσσ : ∀ x, σ (σ x) = x := by
     intro x
@@ -117,12 +127,21 @@ theorem algebra_tensor_invol : ∀ (F E : Type) [Field F] [NumberField F] [Field
     ((IsNilpotent.map_iff (tmul_one_injective (R := R) b hb0 hb1)).1 ha).eq_zero
   have hδu : IsUnit ((1 : R) ⊗ₜ[F] δ : R ⊗[F] E) :=
     (IsUnit.mk0 δ hδ0).map (Algebra.TensorProduct.includeRight : E →ₐ[F] R ⊗[F] E)
-  refine ⟨IsArtinianRing.of_finite R _, ⟨fun x hx => ?_⟩, ?_, fun y => ?_, ⟨_, hδu, ?_⟩, fun y hy => ?_, fun r => ⟨?_, ?_⟩⟩
+  refine ⟨
+    IsArtinianRing.of_finite R _,
+    ⟨fun x hx => ?_⟩,
+    ?_,
+    fun y => ?_,
+    ⟨_, hδu, ?_⟩,
+    fun y hy => ?_,
+    fun r => ⟨?_, ?_⟩
+  ⟩
   · obtain ⟨a, c, rfl⟩ := exists_coord b hb0 hb1 x
     have hs := hx.map (sigR R σ)
     have hadd := (Commute.all _ _).isNilpotent_add hx hs
-    have e1 : (a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ) + sigR R σ (a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ) =
-        (a + a) ⊗ₜ[F] (1 : E) := by
+    have e1
+        : (a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ) + sigR R σ (a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] δ)
+          = (a + a) ⊗ₜ[F] (1 : E) := by
       rw [map_add (f := _), hsig, hsig, map_one, hδ, TensorProduct.tmul_neg, TensorProduct.add_tmul]
       abel
     rw [e1] at hadd
@@ -143,17 +162,18 @@ theorem algebra_tensor_invol : ∀ (F E : Type) [Field F] [NumberField F] [Field
     | tmul a e => rw [hsig, hsig, hσσ]
   · rw [hsig, hδ, TensorProduct.tmul_neg]
   · obtain ⟨a, c, rfl⟩ := exists_coord b hb0 hb1 y
-    rw [map_add (f := _), hsig, hsig, map_one, hδ, TensorProduct.tmul_neg, ← TensorProduct.neg_tmul] at hy
+    rw [map_add (f := _), hsig, hsig, map_one, hδ, TensorProduct.tmul_neg, ← TensorProduct.neg_tmul]
+      at hy
     have hc := (coord_inj b hb0 hb1 hy).2
     have : c = 0 := half c (by nth_rewrite 1 [← hc]; simp)
     exact ⟨a, by rw [this, TensorProduct.zero_tmul, add_zero]⟩
   · rintro ⟨u, hu⟩
     obtain ⟨a, c, hac⟩ := exists_coord b hb0 hb1 (u⁻¹ : (R ⊗[F] E)ˣ).val
-    have e : (r * a) ⊗ₜ[F] (1 : E) + (r * c) ⊗ₜ[F] δ =
-        (1 : R) ⊗ₜ[F] (1 : E) + (0 : R) ⊗ₜ[F] δ := by
+    have e : (r * a) ⊗ₜ[F] (1 : E) + (r * c) ⊗ₜ[F] δ = (1 : R) ⊗ₜ[F] (1 : E) + (0 : R) ⊗ₜ[F] δ := by
       have : (u : R ⊗[F] E) * (u⁻¹ : (R ⊗[F] E)ˣ).val = 1 := u.mul_inv
-      rw [hu, hac, mul_add, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul,
-        one_mul, one_mul, Algebra.TensorProduct.one_def] at this
+      rw [hu, hac, mul_add, Algebra.TensorProduct.tmul_mul_tmul,
+          Algebra.TensorProduct.tmul_mul_tmul, one_mul, one_mul, Algebra.TensorProduct.one_def]
+        at this
       rw [this, TensorProduct.zero_tmul, add_zero]
     exact IsUnit.of_mul_eq_one a (coord_inj b hb0 hb1 e).1
   · intro hr

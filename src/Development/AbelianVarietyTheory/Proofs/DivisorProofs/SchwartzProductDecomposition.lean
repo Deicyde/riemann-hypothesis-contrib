@@ -12,17 +12,24 @@ noncomputable section
 
 namespace GlobalTheory.SBProd
 
-theorem exists_compact_clopen_nhd {H : Type} [TopologicalSpace H] [LocallyCompactSpace H] [T2Space H]
-    [TotallyDisconnectedSpace H] {x : H} {U : Set H} (hU : IsOpen U) (hx : x ∈ U) :
-    ∃ V : Set H, IsClopen V ∧ IsCompact V ∧ x ∈ V ∧ V ⊆ U := by
+theorem exists_compact_clopen_nhd
+    {H : Type} [TopologicalSpace H] [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H]
+    {x : H} {U : Set H} (hU : IsOpen U) (hx : x ∈ U)
+    : ∃ V : Set H, IsClopen V ∧ IsCompact V ∧ x ∈ V ∧ V ⊆ U := by
   obtain ⟨s, comp, xs, sU⟩ := exists_compact_subset hU hx
   obtain ⟨V, hV, hxV, hVs⟩ :=
     loc_compact_Haus_tot_disc_of_zero_dim.mem_nhds_iff.1 (isOpen_interior.mem_nhds xs)
-  exact ⟨V, hV, comp.of_isClosed_subset hV.1 (hVs.trans interior_subset), hxV,
-    (hVs.trans interior_subset).trans sU⟩
+  exact ⟨
+    V,
+    hV,
+    comp.of_isClosed_subset hV.1 (hVs.trans interior_subset),
+    hxV,
+    (hVs.trans interior_subset).trans sU
+  ⟩
 
-theorem isLocallyConstant_filter {H ι : Type} [TopologicalSpace H] (F : Finset ι) (U : ι → Set H)
-    (hU : ∀ i, IsClopen (U i)) : IsLocallyConstant fun a => F.filter (fun i => a ∈ U i) := by
+theorem isLocallyConstant_filter
+    {H ι : Type} [TopologicalSpace H] (F : Finset ι) (U : ι → Set H) (hU : ∀ i, IsClopen (U i))
+    : IsLocallyConstant fun a => F.filter (fun i => a ∈ U i) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   have : ∀ i ∈ F, ∀ᶠ y in 𝓝 x, (y ∈ U i ↔ x ∈ U i) := by
@@ -35,12 +42,13 @@ theorem isLocallyConstant_filter {H ι : Type} [TopologicalSpace H] (F : Finset 
   filter_upwards [(Filter.eventually_all_finset F).2 this] with y hy
   exact Finset.filter_congr fun i hi => hy i hi
 
-theorem exists_sum_box (X : Type) [TopologicalSpace X] [LocallyCompactSpace X] [T2Space X]
-    [TotallyDisconnectedSpace X] (κ κ' : Type) [Fintype κ] [Fintype κ'] (g : (κ ⊕ κ' → X) → ℂ)
-    (hg : g ∈ GlobalTheory.WeilM.SB (κ ⊕ κ' → X)) :
-    ∃ (ι : Type) (_ : Fintype ι) (g₁ : ι → (κ → X) → ℂ) (g₂ : ι → (κ' → X) → ℂ),
-      (∀ i, g₁ i ∈ GlobalTheory.WeilM.SB (κ → X)) ∧ (∀ i, g₂ i ∈ GlobalTheory.WeilM.SB (κ' → X)) ∧
-      g = ∑ i, fun z => g₁ i (z ∘ Sum.inl) * g₂ i (z ∘ Sum.inr) := by
+theorem exists_sum_box
+    (X : Type) [TopologicalSpace X] [LocallyCompactSpace X] [T2Space X] [TotallyDisconnectedSpace X]
+    (κ κ' : Type) [Fintype κ] [Fintype κ']
+    (g : (κ ⊕ κ' → X) → ℂ) (hg : g ∈ GlobalTheory.WeilM.SB (κ ⊕ κ' → X))
+    : ∃ (ι : Type) (_ : Fintype ι) (g₁ : ι → (κ → X) → ℂ) (g₂ : ι → (κ' → X) → ℂ),
+      (∀ i, g₁ i ∈ GlobalTheory.WeilM.SB (κ → X)) ∧ (∀ i, g₂ i ∈ GlobalTheory.WeilM.SB (κ' → X))
+        ∧ g = ∑ i, fun z => g₁ i (z ∘ Sum.inl) * g₂ i (z ∘ Sum.inr) := by
   obtain ⟨hlc, hcs⟩ := hg
   let e : (κ ⊕ κ' → X) ≃ₜ (κ → X) × (κ' → X) := Homeomorph.sumArrowHomeomorphProdArrow
   let h : (κ → X) × (κ' → X) → ℂ := g ∘ e.symm
@@ -49,8 +57,10 @@ theorem exists_sum_box (X : Type) [TopologicalSpace X] [LocallyCompactSpace X] [
     simp [h, this]
   have hlc' : IsLocallyConstant h := hlc.comp_continuous e.symm.continuous
   have hcs' : HasCompactSupport h := hcs.comp_homeomorph e.symm
-  have key : ∀ p : (κ → X) × (κ' → X), ∃ U : Set (κ → X), ∃ V : Set (κ' → X), IsClopen U ∧ IsCompact U ∧
-      IsClopen V ∧ IsCompact V ∧ p.1 ∈ U ∧ p.2 ∈ V ∧ ∀ a ∈ U, ∀ b ∈ V, h (a, b) = h p := by
+  have key
+      : ∀ p : (κ → X) × (κ' → X), ∃ U : Set (κ → X), ∃ V : Set (κ' → X),
+        IsClopen U ∧ IsCompact U ∧ IsClopen V ∧ IsCompact V ∧ p.1 ∈ U ∧ p.2 ∈ V
+          ∧ ∀ a ∈ U, ∀ b ∈ V, h (a, b) = h p := by
     rintro ⟨a₀, b₀⟩
     obtain ⟨u, v, hu, hv, hpu, hpv, huv⟩ :=
       isOpen_prod_iff.1 (hlc'.isOpen_fiber (h (a₀, b₀))) a₀ b₀ rfl
@@ -58,17 +68,26 @@ theorem exists_sum_box (X : Type) [TopologicalSpace X] [LocallyCompactSpace X] [
     obtain ⟨V, hV, hVc, hbV, hVv⟩ := exists_compact_clopen_nhd hv hpv
     exact ⟨U, V, hU, hUc, hV, hVc, haU, hbV, fun a ha b hb => huv (mk_mem_prod (hUu ha) (hVv hb))⟩
   choose U V hU hUc hV hVc hpU hpV hconst using key
-  obtain ⟨F, hF⟩ := hcs'.isCompact.elim_finite_subcover (fun p => U p ×ˢ V p)
-    (fun p => (hU p).isOpen.prod (hV p).isOpen) (fun q _ => mem_iUnion.2 ⟨q, hpU q, hpV q⟩)
+  obtain ⟨F, hF⟩ :=
+    hcs'.isCompact.elim_finite_subcover
+      (fun p => U p ×ˢ V p)
+      (fun p => (hU p).isOpen.prod (hV p).isOpen)
+      (fun q _ => mem_iUnion.2 ⟨q, hpU q, hpV q⟩)
   let σ : (κ → X) → Finset F := fun a => Finset.univ.filter (fun i : F => a ∈ U i)
   let τ : (κ' → X) → Finset F := fun b => Finset.univ.filter (fun i : F => b ∈ V i)
   have hσ : IsLocallyConstant σ := isLocallyConstant_filter _ (fun i : F => U i) fun i => hU i
   have hτ : IsLocallyConstant τ := isLocallyConstant_filter _ (fun i : F => V i) fun i => hV i
   let c : Finset F → Finset F → ℂ := fun S T =>
     if hx : (S ∩ T).Nonempty then h (hx.choose : (κ → X) × (κ' → X)) else 0
-  refine ⟨Finset F × Finset F, inferInstance,
+  refine ⟨
+    Finset F × Finset F,
+    inferInstance,
     fun x a => if σ a = x.1 ∧ x.1.Nonempty then c x.1 x.2 else 0,
-    fun x b => if τ b = x.2 ∧ x.2.Nonempty then 1 else 0, ?_, ?_, ?_⟩
+    fun x b => if τ b = x.2 ∧ x.2.Nonempty then 1 else 0,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro x
     refine ⟨hσ.comp fun s => if s = x.1 ∧ x.1.Nonempty then c x.1 x.2 else 0, ?_⟩
     by_cases hx : x.1.Nonempty

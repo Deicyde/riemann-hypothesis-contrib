@@ -109,8 +109,9 @@ lemma qB_affine (h : IsAffineHom q.left) : IsAffineHom (qB f q).left :=
 variable (i : splitTorus S X ⟶ G)
 
 def iB : splitTorus S' X ⟶ (Over.pullback f).obj G :=
-  Over.homMk ((isGrpPullback_pullback G f).1.lift (hT f X ≫ i.left) (splitTorus S' X).hom (by
-    rw [Category.assoc, Over.w i]; exact hT_snd f X))
+  Over.homMk
+    ((isGrpPullback_pullback G f).1.lift (hT f X ≫ i.left) (splitTorus S' X).hom
+      (by rw [Category.assoc, Over.w i]; exact hT_snd f X))
     ((isGrpPullback_pullback G f).1.lift_snd _ _ _)
 
 lemma iB_h : (iB f X i).left ≫ pullback.fst G.hom f = hT f X ≫ i.left := by

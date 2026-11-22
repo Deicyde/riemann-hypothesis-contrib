@@ -8,11 +8,13 @@ open AlgebraicGeometry
 
 namespace GlobalTheory
 
-theorem affineOpen_exists_field_point_basicOpen_commonDenom :
-    ∀ {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (p : X), p ∈ U →
-      ∃ (K : Type) (_ : Field K) (ψ : Γ(X, U) →+* K), (∀ g, ψ g ≠ 0 → p ∈ X.basicOpen g) ∧
-        ∀ (ι : Type) [Fintype ι] (m : ι → K), ∃ (a : ι → Γ(X, U)) (t : Γ(X, U)),
-          ψ t ≠ 0 ∧ ∀ i, m i * ψ t = ψ (a i) := by
+theorem affineOpen_exists_field_point_basicOpen_commonDenom
+    : ∀ {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (p : X),
+      p ∈ U
+        → ∃ (K : Type) (_ : Field K) (ψ : Γ(X, U) →+* K),
+          (∀ g, ψ g ≠ 0 → p ∈ X.basicOpen g)
+            ∧ ∀ (ι : Type) [Fintype ι] (m : ι → K), ∃ (a : ι → Γ(X, U)) (t : Γ(X, U)),
+              ψ t ≠ 0 ∧ ∀ i, m i * ψ t = ψ (a i) := by
   intro X U hU p hp
   classical
   let P := hU.primeIdealOf ⟨p, hp⟩
@@ -33,8 +35,8 @@ theorem affineOpen_exists_field_point_basicOpen_commonDenom :
   · intro ι _ m
     have hrep : ∀ i, ∃ b s : Γ(X, U), ψ s ≠ 0 ∧ m i * ψ s = ψ b := by
       intro i
-      obtain ⟨⟨b', ⟨s', hs'⟩⟩, he⟩ := IsLocalization.mk'_surjective
-        (nonZeroDivisors (Γ(X, U) ⧸ P.asIdeal)) (m i)
+      obtain ⟨⟨b', ⟨s', hs'⟩⟩, he⟩ :=
+        IsLocalization.mk'_surjective (nonZeroDivisors (Γ(X, U) ⧸ P.asIdeal)) (m i)
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective b'
       obtain ⟨s, rfl⟩ := Ideal.Quotient.mk_surjective s'
       refine ⟨b, s, ?_, ?_⟩

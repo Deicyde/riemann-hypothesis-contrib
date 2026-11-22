@@ -19,8 +19,9 @@ variable {K : Type*} [Field K] [NumberField K]
 
 section Real
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E] (h : HermitianMetric K E)
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
+  (h : HermitianMetric K E)
 
 namespace RealSpace
 
@@ -33,25 +34,27 @@ open Classical in
 theorem det_basisMatrix_sq : (basisMatrix K).det ^ 2 = ((discr K : ℤ) : ℂ) := by
   exact (discr_eq_basisMatrix_det_sq K).symm
 
-theorem basisMatrix_apply' (τ σ : K →+* ℂ) :
-    basisMatrix K τ σ = σ ((RingOfIntegers.basis K (equivReindex K τ) : 𝓞 K) : K) := by
+theorem basisMatrix_apply' (τ σ : K →+* ℂ)
+    : basisMatrix K τ σ = σ ((RingOfIntegers.basis K (equivReindex K τ) : 𝓞 K) : K) := by
   simp [basisMatrix, canonicalEmbedding.latticeBasis_apply, integralBasis_apply,
     canonicalEmbedding.apply_at]
 
 section Gram
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E] (h : HermitianMetric K E) {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
+  (h : HermitianMetric K E)
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 end Gram
 
 section RiemannRoch
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E] (h : HermitianMetric K E) {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
+  (h : HermitianMetric K E)
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
   {s : ι → E}
-
-
 
 end RiemannRoch
 

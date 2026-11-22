@@ -7,12 +7,20 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.UnitarySelfGeneration
 
-theorem normal_scheme_height_one_stalk_dvr : ∀ (X : Scheme.{0}) [IsLocallyNoetherian X], IsNormalScheme X → ∀ p : X, ringKrullDim (X.presheaf.stalk p) = 1 → ∃ _ : IsDomain (X.presheaf.stalk p), IsDiscreteValuationRing (X.presheaf.stalk p) := by
+theorem normal_scheme_height_one_stalk_dvr
+    : ∀ (X : Scheme.{0}) [IsLocallyNoetherian X],
+      IsNormalScheme X
+        → ∀ p : X,
+          ringKrullDim (X.presheaf.stalk p) = 1
+            → ∃ _ : IsDomain (X.presheaf.stalk p),
+              IsDiscreteValuationRing (X.presheaf.stalk p) := by
   intro X _ hn p hd
   obtain ⟨h1, h2⟩ := hn p
   refine ⟨h1, ?_⟩

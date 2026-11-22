@@ -14,8 +14,10 @@ section Len
 
 variable {B : Type} [CommRing B] [IsLocalRing B]
 
-theorem length_ne_top_of_max {M : Type} [AddCommGroup M] [Module B M] [Module.Finite B M]
-    (h : ∀ b ∈ maximalIdeal B, ∀ y : M, b • y = 0) : Module.length B M ≠ ⊤ := by
+theorem length_ne_top_of_max
+    {M : Type} [AddCommGroup M] [Module B M] [Module.Finite B M]
+    (h : ∀ b ∈ maximalIdeal B, ∀ y : M, b • y = 0)
+    : Module.length B M ≠ ⊤ := by
   have hM : Module.IsTorsionBySet B M (maximalIdeal B : Set B) := by
     intro y b
     exact h b.1 b.2 y
@@ -26,17 +28,18 @@ theorem length_ne_top_of_max {M : Type} [AddCommGroup M] [Module B M] [Module.Fi
   rw [Module.length_eq_of_surjective (R := B ⧸ maximalIdeal B) Ideal.Quotient.mk_surjective]
   exact Module.length_ne_top
 
-theorem length_ne_top_of_pow [IsNoetherianRing B] (N : ℕ) :
-    ∀ {M : Type} [AddCommGroup M] [Module B M] [Module.Finite B M],
+theorem length_ne_top_of_pow [IsNoetherianRing B] (N : ℕ)
+    : ∀ {M : Type} [AddCommGroup M] [Module B M] [Module.Finite B M],
       (∀ b ∈ maximalIdeal B ^ N, ∀ y : M, b • y = 0) → Module.length B M ≠ ⊤ := by
   induction N with
   | zero =>
     intro M _ _ _ h
-    have : Subsingleton M := ⟨fun x y => by
-      have hx := h 1 (by simp) x
-      have hy := h 1 (by simp) y
-      rw [one_smul] at hx hy
-      rw [hx, hy]⟩
+    have : Subsingleton M :=
+      ⟨fun x y => by
+        have hx := h 1 (by simp) x
+        have hy := h 1 (by simp) y
+        rw [one_smul] at hx hy
+        rw [hx, hy]⟩
     rw [Module.length_eq_zero]
     simp
   | succ N ih =>
@@ -75,11 +78,10 @@ theorem e_nonneg (i : Fin k) : (0 : Deg k) ≤ e i := by
   · subst hj; simp [e]
   · simp [e, Pi.single_eq_of_ne hj]
 
-theorem sum_e : ∑ i, e i = (fun _ => 1 : Deg k) :=
-  Finset.univ_sum_single (fun _ : Fin k => (1 : ℤ))
+theorem sum_e : ∑ i, e i = (fun _ => 1 : Deg k) := Finset.univ_sum_single (fun _ : Fin k => (1 : ℤ))
 
-theorem deg_induction {P : Deg k → Prop} (h0 : P 0)
-    (hs : ∀ m i, 0 ≤ m → P m → P (m + e i)) : ∀ m, 0 ≤ m → P m := by
+theorem deg_induction {P : Deg k → Prop} (h0 : P 0) (hs : ∀ m i, 0 ≤ m → P m → P (m + e i))
+    : ∀ m, 0 ≤ m → P m := by
   have key : ∀ n : ℕ, ∀ m : Deg k, 0 ≤ m → ∑ i, m i = (n : ℤ) → P m := by
     intro n
     induction n with
@@ -110,8 +112,7 @@ theorem deg_induction {P : Deg k → Prop} (h0 : P 0)
         · simp only [e, Pi.zero_apply, Pi.sub_apply, Pi.single_eq_of_ne hj, sub_zero]
           exact hm j
       have h2 : ∑ j, (m - e i) j = (n : ℤ) := by
-        have h3 : ∑ j, (e i : Deg k) j = 1 := by
-          simp [e, Finset.sum_pi_single']
+        have h3 : ∑ j, (e i : Deg k) j = 1 := by simp [e, Finset.sum_pi_single']
         simp only [Pi.sub_apply, Finset.sum_sub_distrib, hsum, h3]
         push_cast
         ring
@@ -139,9 +140,9 @@ theorem Std.fg_all [IsLocalRing B] (h : Std 𝒜) (m : Deg k) : (𝒜 m).FG := b
   · rw [h.nonneg m hm]
     exact Submodule.fg_bot
 
-theorem Std.span_add_e [IsLocalRing B] (h : Std 𝒜) (m : Deg k) (i : Fin k) (hm : 0 ≤ m) :
-    Ideal.span (𝒜 (m + e i) : Set R) ≤
-      Ideal.span (𝒜 m : Set R) * Ideal.span (𝒜 (e i) : Set R) := by
+theorem Std.span_add_e [IsLocalRing B] (h : Std 𝒜) (m : Deg k) (i : Fin k) (hm : 0 ≤ m)
+    : Ideal.span (𝒜 (m + e i) : Set R)
+      ≤ Ideal.span (𝒜 m : Set R) * Ideal.span (𝒜 (e i) : Set R) := by
   rw [Ideal.span_le, h.gen m i hm]
   intro x hx
   refine Submodule.mul_induction_on hx ?_ ?_
@@ -150,9 +151,11 @@ theorem Std.span_add_e [IsLocalRing B] (h : Std 𝒜) (m : Deg k) (i : Fin k) (h
   · intro a b ha hb
     exact Ideal.add_mem _ ha hb
 
-theorem Std.span_add_sum [IsLocalRing B] (h : Std 𝒜) (S : Finset (Fin k)) :
-    ∀ m, 0 ≤ m → Ideal.span (𝒜 (m + ∑ i ∈ S, e i) : Set R) ≤
-      Ideal.span (𝒜 m : Set R) * ∏ i ∈ S, Ideal.span (𝒜 (e i) : Set R) := by
+theorem Std.span_add_sum [IsLocalRing B] (h : Std 𝒜) (S : Finset (Fin k))
+    : ∀ m,
+      0 ≤ m
+        → Ideal.span (𝒜 (m + ∑ i ∈ S, e i) : Set R)
+          ≤ Ideal.span (𝒜 m : Set R) * ∏ i ∈ S, Ideal.span (𝒜 (e i) : Set R) := by
   induction S using Finset.induction_on with
   | empty => intro m _; simp
   | insert i S hi ih =>
@@ -160,17 +163,18 @@ theorem Std.span_add_sum [IsLocalRing B] (h : Std 𝒜) (S : Finset (Fin k)) :
     rw [Finset.sum_insert hi, Finset.prod_insert hi]
     have h1 : m + (e i + ∑ j ∈ S, e j) = (m + ∑ j ∈ S, e j) + e i := by abel
     rw [h1]
-    have hnn : 0 ≤ m + ∑ j ∈ S, e j :=
-      add_nonneg hm (Finset.sum_nonneg fun j _ => e_nonneg j)
-    calc Ideal.span (𝒜 (m + ∑ j ∈ S, e j + e i) : Set R)
-        ≤ Ideal.span (𝒜 (m + ∑ j ∈ S, e j) : Set R) * Ideal.span (𝒜 (e i) : Set R) :=
-          h.span_add_e _ _ hnn
-      _ ≤ (Ideal.span (𝒜 m : Set R) * ∏ j ∈ S, Ideal.span (𝒜 (e j) : Set R)) *
-            Ideal.span (𝒜 (e i) : Set R) := Ideal.mul_mono_left (ih m hm)
+    have hnn : 0 ≤ m + ∑ j ∈ S, e j := add_nonneg hm (Finset.sum_nonneg fun j _ => e_nonneg j)
+    calc
+      Ideal.span (𝒜 (m + ∑ j ∈ S, e j + e i) : Set R)
+          ≤ Ideal.span (𝒜 (m + ∑ j ∈ S, e j) : Set R) * Ideal.span (𝒜 (e i) : Set R) :=
+        h.span_add_e _ _ hnn
+      _ ≤ (Ideal.span (𝒜 m : Set R) * ∏ j ∈ S, Ideal.span (𝒜 (e j) : Set R))
+          * Ideal.span (𝒜 (e i) : Set R) :=
+        Ideal.mul_mono_left (ih m hm)
       _ = _ := by rw [mul_assoc, mul_comm (∏ j ∈ S, Ideal.span (𝒜 (e j) : Set R))]
 
-theorem Std.span_le_irr_pow [IsLocalRing B] (h : Std 𝒜) (N : ℕ) :
-    ∀ m, 0 ≤ m → Ideal.span (𝒜 (m + N • ∑ i, e i) : Set R) ≤ Irr 𝒜 ^ N := by
+theorem Std.span_le_irr_pow [IsLocalRing B] (h : Std 𝒜) (N : ℕ)
+    : ∀ m, 0 ≤ m → Ideal.span (𝒜 (m + N • ∑ i, e i) : Set R) ≤ Irr 𝒜 ^ N := by
   induction N with
   | zero => intro m _; simp
   | succ N ih =>
@@ -182,8 +186,9 @@ theorem Std.span_le_irr_pow [IsLocalRing B] (h : Std 𝒜) (N : ℕ) :
     rw [h1, pow_succ]
     exact (h.span_add_sum Finset.univ _ hnn).trans (Ideal.mul_mono_left (ih m hm))
 
-theorem Std.mem_irr_pow [IsLocalRing B] (h : Std 𝒜) (N : ℕ) (n : Deg k)
-    (hn : ∀ i, (N : ℤ) ≤ n i) {a : R} (ha : a ∈ 𝒜 n) : a ∈ Irr 𝒜 ^ N := by
+theorem Std.mem_irr_pow
+    [IsLocalRing B] (h : Std 𝒜) (N : ℕ) (n : Deg k) (hn : ∀ i, (N : ℤ) ≤ n i) {a : R} (ha : a ∈ 𝒜 n)
+    : a ∈ Irr 𝒜 ^ N := by
   have h0 : 0 ≤ n - N • ∑ i, e i := by
     intro i
     rw [sum_e]
@@ -200,17 +205,20 @@ section Gens
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 variable {𝒜 : Deg k → Submodule B R}
 
-theorem eq_of_le_of_iSup_eq_top {ι M : Type} [AddCommGroup M] [Module B M]
-    {G H : ι → Submodule B M} (hle : ∀ i, G i ≤ H i) (hind : iSupIndep H)
-    (htop : ⨆ i, G i = ⊤) (i : ι) : G i = H i := by
+theorem eq_of_le_of_iSup_eq_top
+    {ι M : Type} [AddCommGroup M] [Module B M]
+    {G H : ι → Submodule B M} (hle : ∀ i, G i ≤ H i) (hind : iSupIndep H) (htop : ⨆ i, G i = ⊤)
+    (i : ι)
+    : G i = H i := by
   classical
   apply le_antisymm (hle i)
   intro x hx
   have h1 : x ∈ G i ⊔ ⨆ (j) (_ : j ≠ i), G j := by
-    have h2 : (⨆ j, G j) ≤ G i ⊔ ⨆ (j) (_ : j ≠ i), G j := iSup_le fun j => by
-      by_cases h : j = i
-      · subst h; exact le_sup_left
-      · exact le_sup_of_le_right (le_iSup₂_of_le j h le_rfl)
+    have h2 : (⨆ j, G j) ≤ G i ⊔ ⨆ (j) (_ : j ≠ i), G j :=
+      iSup_le fun j => by
+        by_cases h : j = i
+        · subst h; exact le_sup_left
+        · exact le_sup_of_le_right (le_iSup₂_of_le j h le_rfl)
     exact h2 (htop ▸ trivial)
   obtain ⟨g, hg, y, hy, rfl⟩ := Submodule.mem_sup.1 h1
   have h2 : y ∈ ⨆ (j) (_ : j ≠ i), H j := (iSup₂_mono fun j _ => hle j) hy
@@ -223,45 +231,51 @@ theorem eq_of_le_of_iSup_eq_top {ι M : Type} [AddCommGroup M] [Module B M]
   rw [h4, add_zero]
   exact hg
 
-theorem GMod.IsGr.exists_gens {F : GMod B R k} (hF : F.IsGr 𝒜) :
-    ∃ T : Finset F.M, (∀ x ∈ T, ∃ m, x ∈ F.gr m) ∧ Submodule.span R (T : Set F.M) = ⊤ := by
+theorem GMod.IsGr.exists_gens {F : GMod B R k} (hF : F.IsGr 𝒜)
+    : ∃ T : Finset F.M, (∀ x ∈ T, ∃ m, x ∈ F.gr m) ∧ Submodule.span R (T : Set F.M) = ⊤ := by
   have htop : Submodule.span R {x : F.M | ∃ m, x ∈ F.gr m} = ⊤ := by
     rw [eq_top_iff]
     intro y _
-    have hy : y ∈ ⨆ m, F.gr m := by
-      rw [hF.internal.submodule_iSup_eq_top]; trivial
+    have hy : y ∈ ⨆ m, F.gr m := by rw [hF.internal.submodule_iSup_eq_top]; trivial
     refine Submodule.iSup_induction _
-      (motive := fun y => y ∈ Submodule.span R {x : F.M | ∃ m, x ∈ F.gr m}) hy ?_ ?_ ?_
+      (motive := fun y => y ∈ Submodule.span R {x : F.M | ∃ m, x ∈ F.gr m})
+      hy ?_ ?_ ?_
     · intro m x hx
       exact Submodule.subset_span ⟨m, hx⟩
     · exact zero_mem _
     · intro a b ha hb
       exact add_mem ha hb
-  have hfg : (Submodule.span R {x : F.M | ∃ m, x ∈ F.gr m}).FG := by
-    rw [htop]; exact hF.fin.fg_top
+  have hfg : (Submodule.span R {x : F.M | ∃ m, x ∈ F.gr m}).FG := by rw [htop]; exact hF.fin.fg_top
   obtain ⟨T, hT, hspan⟩ := (Submodule.fg_span_iff_fg_span_finset_subset _).1 hfg
   exact ⟨T, fun x hx => hT hx, by rw [← hspan, htop]⟩
 
-def genPiece (𝒜 : Deg k → Submodule B R) (F : GMod B R k) (T : Finset F.M) (dg : F.M → Deg k)
-    (m : Deg k) : Submodule B F.M :=
+def genPiece
+    (𝒜 : Deg k → Submodule B R) (F : GMod B R k) (T : Finset F.M) (dg : F.M → Deg k) (m : Deg k)
+    : Submodule B F.M :=
   ⨆ x ∈ T, (𝒜 (m - dg x)).map ((LinearMap.toSpanSingleton R F.M x).restrictScalars B)
 
-theorem genPiece_le {F : GMod B R k} {T : Finset F.M} {dg : F.M → Deg k} {m : Deg k}
-    {W : Submodule B F.M} (h : ∀ x ∈ T, ∀ a ∈ 𝒜 (m - dg x), a • x ∈ W) :
-    genPiece 𝒜 F T dg m ≤ W := by
+theorem genPiece_le
+    {F : GMod B R k} {T : Finset F.M} {dg : F.M → Deg k} {m : Deg k} {W : Submodule B F.M}
+    (h : ∀ x ∈ T, ∀ a ∈ 𝒜 (m - dg x), a • x ∈ W)
+    : genPiece 𝒜 F T dg m ≤ W := by
   refine iSup₂_le fun x hx => ?_
   rw [Submodule.map_le_iff_le_comap]
   intro a ha
   exact h x hx a ha
 
-theorem mem_genPiece {F : GMod B R k} {T : Finset F.M} {dg : F.M → Deg k} {m : Deg k}
-    {x : F.M} (hx : x ∈ T) {a : R} (ha : a ∈ 𝒜 (m - dg x)) : a • x ∈ genPiece 𝒜 F T dg m :=
+theorem mem_genPiece
+    {F : GMod B R k} {T : Finset F.M} {dg : F.M → Deg k} {m : Deg k} {x : F.M} (hx : x ∈ T)
+    {a : R} (ha : a ∈ 𝒜 (m - dg x))
+    : a • x ∈ genPiece 𝒜 F T dg m :=
   Submodule.mem_iSup_of_mem x (Submodule.mem_iSup_of_mem hx ⟨a, ha, rfl⟩)
 
-theorem GMod.IsGr.genPiece_eq {F : GMod B R k} (hF : F.IsGr 𝒜) (h𝒜 : ⨆ d, 𝒜 d = ⊤)
-    {T : Finset F.M} {dg : F.M → Deg k} (hdg : ∀ x ∈ T, x ∈ F.gr (dg x))
-    (hspan : Submodule.span R (T : Set F.M) = ⊤) (m : Deg k) :
-    genPiece 𝒜 F T dg m = F.gr m := by
+theorem GMod.IsGr.genPiece_eq
+    {F : GMod B R k} (hF : F.IsGr 𝒜)
+    (h𝒜 : ⨆ d, 𝒜 d = ⊤)
+    {T : Finset F.M} {dg : F.M → Deg k}
+    (hdg : ∀ x ∈ T, x ∈ F.gr (dg x)) (hspan : Submodule.span R (T : Set F.M) = ⊤)
+    (m : Deg k)
+    : genPiece 𝒜 F T dg m = F.gr m := by
   refine eq_of_le_of_iSup_eq_top (G := genPiece 𝒜 F T dg) (H := F.gr) ?_
     hF.internal.submodule_iSupIndep ?_ m
   · intro m
@@ -273,35 +287,41 @@ theorem GMod.IsGr.genPiece_eq {F : GMod B R k} (hF : F.IsGr 𝒜) (h𝒜 : ⨆ d
     have key : ∀ x ∈ T, ∀ a : R, a • x ∈ ⨆ m, genPiece 𝒜 F T dg m := by
       intro x hx a
       have ha : a ∈ ⨆ d, 𝒜 d := by rw [h𝒜]; trivial
-      refine Submodule.iSup_induction _
-        (motive := fun a => a • x ∈ ⨆ m, genPiece 𝒜 F T dg m) ha ?_ ?_ ?_
+      refine
+        Submodule.iSup_induction _ (motive := fun a => a • x ∈ ⨆ m, genPiece 𝒜 F T dg m) ha ?_ ?_ ?_
       · intro d a ha
         refine Submodule.mem_iSup_of_mem (d + dg x) (mem_genPiece hx ?_)
         rwa [add_sub_cancel_right]
       · rw [zero_smul]; exact zero_mem _
       · intro a b ha hb
-        rw [add_smul]; exact add_mem ha hb
+        rw [add_smul]
+        exact add_mem ha hb
     have hy : y ∈ Submodule.span R (T : Set F.M) := by rw [hspan]; trivial
     have hall : ∀ a : R, a • y ∈ ⨆ m, genPiece 𝒜 F T dg m := by
       refine Submodule.span_induction
-        (p := fun y _ => ∀ a : R, a • y ∈ ⨆ m, genPiece 𝒜 F T dg m) ?_ ?_ ?_ ?_ hy
+        (p := fun y _ => ∀ a : R, a • y ∈ ⨆ m, genPiece 𝒜 F T dg m)
+        ?_ ?_ ?_ ?_ hy
       · intro x hx a
         exact key x hx a
       · intro a
-        rw [smul_zero]; exact zero_mem _
+        rw [smul_zero]
+        exact zero_mem _
       · intro x y _ _ hx hy a
-        rw [smul_add]; exact add_mem (hx a) (hy a)
+        rw [smul_add]
+        exact add_mem (hx a) (hy a)
       · intro r x _ hx a
-        rw [smul_smul]; exact hx _
+        rw [smul_smul]
+        exact hx _
     simpa using hall 1
 
-theorem genPiece_fg [IsLocalRing B] (h : Std 𝒜) (F : GMod B R k) (T : Finset F.M)
-    (dg : F.M → Deg k) (m : Deg k) : (genPiece 𝒜 F T dg m).FG :=
+theorem genPiece_fg
+    [IsLocalRing B] (h : Std 𝒜) (F : GMod B R k) (T : Finset F.M) (dg : F.M → Deg k) (m : Deg k)
+    : (genPiece 𝒜 F T dg m).FG :=
   Submodule.fg_biSup T _ fun _ _ => (h.fg_all _).map _
 
-theorem GMod.IsGr.exists_gens_deg {F : GMod B R k} (hF : F.IsGr 𝒜) :
-    ∃ (T : Finset F.M) (dg : F.M → Deg k), (∀ x ∈ T, x ∈ F.gr (dg x)) ∧
-      Submodule.span R (T : Set F.M) = ⊤ := by
+theorem GMod.IsGr.exists_gens_deg {F : GMod B R k} (hF : F.IsGr 𝒜)
+    : ∃ (T : Finset F.M) (dg : F.M → Deg k),
+      (∀ x ∈ T, x ∈ F.gr (dg x)) ∧ Submodule.span R (T : Set F.M) = ⊤ := by
   classical
   obtain ⟨T, hT, hspan⟩ := hF.exists_gens
   refine ⟨T, fun x => if h : ∃ m, x ∈ F.gr m then h.choose else 0, fun x hx => ?_, hspan⟩
@@ -309,15 +329,16 @@ theorem GMod.IsGr.exists_gens_deg {F : GMod B R k} (hF : F.IsGr 𝒜) :
   rw [dite_eq_left (hT x hx)]
   exact (hT x hx).choose_spec
 
-theorem GMod.IsGr.finite_gr [IsLocalRing B] (h : Std 𝒜) (h𝒜 : ⨆ d, 𝒜 d = ⊤) {F : GMod B R k}
-    (hF : F.IsGr 𝒜) (m : Deg k) : Module.Finite B (F.gr m) := by
+theorem GMod.IsGr.finite_gr
+    [IsLocalRing B] (h : Std 𝒜) (h𝒜 : ⨆ d, 𝒜 d = ⊤) {F : GMod B R k} (hF : F.IsGr 𝒜) (m : Deg k)
+    : Module.Finite B (F.gr m) := by
   obtain ⟨T, dg, hdg, hspan⟩ := hF.exists_gens_deg
   rw [Module.Finite.iff_fg, ← hF.genPiece_eq h𝒜 hdg hspan m]
   exact genPiece_fg h F T dg m
 
-theorem GMod.IsGr.eventually_gr_le [IsLocalRing B] (h : Std 𝒜) (h𝒜 : ⨆ d, 𝒜 d = ⊤)
-    {F : GMod B R k} (hF : F.IsGr 𝒜) (N : ℕ) :
-    ∀ᶠ m in atTop, ∀ y ∈ F.gr m, y ∈ (Irr 𝒜 ^ N • (⊤ : Submodule R F.M)) := by
+theorem GMod.IsGr.eventually_gr_le
+    [IsLocalRing B] (h : Std 𝒜) (h𝒜 : ⨆ d, 𝒜 d = ⊤) {F : GMod B R k} (hF : F.IsGr 𝒜) (N : ℕ)
+    : ∀ᶠ m in atTop, ∀ y ∈ F.gr m, y ∈ (Irr 𝒜 ^ N • (⊤ : Submodule R F.M)) := by
   obtain ⟨T, dg, hdg, hspan⟩ := hF.exists_gens_deg
   have hev : ∀ᶠ m in atTop, ∀ x ∈ T, dg x + (fun _ => (N : ℤ)) ≤ m :=
     (Filter.eventually_all_finset T).2 fun x _ => eventually_ge_atTop _

@@ -11,11 +11,11 @@ namespace PositivityTheory.Rg.BcB.SpectralAccumulation.Cz.SliceUB2
 def expChar (c : ℂ) : Multiplicative ℝ →* ℂ where
   toFun t := Complex.exp (c * ((Multiplicative.toAdd t : ℝ) : ℂ))
   map_one' := by simp
-  map_mul' x y := by
-    simp only [toAdd_mul, Complex.ofReal_add, mul_add, Complex.exp_add]
+  map_mul' x y := by simp only [toAdd_mul, Complex.ofReal_add, mul_add, Complex.exp_add]
 
-theorem lagrange (C : Finset ℂ) (c : ℂ) : ∃ (τs : Finset ℝ) (a : ℝ → ℂ), ∀ c' ∈ C,
-    ∑ t ∈ τs, a t * Complex.exp (c' * t) = if c' = c then 1 else 0 := by
+theorem lagrange (C : Finset ℂ) (c : ℂ)
+    : ∃ (τs : Finset ℝ) (a : ℝ → ℂ), ∀ c' ∈ C,
+      ∑ t ∈ τs, a t * Complex.exp (c' * t) = if c' = c then 1 else 0 := by
   classical
   have expChar_injective : Function.Injective expChar := by
     intro c c' h
@@ -25,7 +25,8 @@ theorem lagrange (C : Finset ℂ) (c : ℂ) : ∃ (τs : Finset ℝ) (a : ℝ �
         ((hasDerivAt_id (0 : ℝ)).ofReal_comp).const_mul d
       have h2 := h1.cexp
       simpa using h2
-    have hf : (fun t : ℝ => Complex.exp (c * (t : ℂ))) = fun t : ℝ => Complex.exp (c' * (t : ℂ)) := by
+    have hf
+        : (fun t : ℝ => Complex.exp (c * (t : ℂ))) = fun t : ℝ => Complex.exp (c' * (t : ℂ)) := by
       funext t
       have := DFunLike.congr_fun h (Multiplicative.ofAdd t)
       simpa [expChar] using this
@@ -34,7 +35,8 @@ theorem lagrange (C : Finset ℂ) (c : ℂ) : ∃ (τs : Finset ℝ) (a : ℝ �
     exact e.unique (hd c')
   let v : ℝ → (C → ℂ) := fun t c' => Complex.exp ((c' : ℂ) * t)
   have hli : LinearIndependent ℂ (fun c' : C => (expChar (c' : ℂ) : Multiplicative ℝ → ℂ)) :=
-    (linearIndependent_monoidHom (Multiplicative ℝ) ℂ).comp (fun c' : C => expChar (c' : ℂ))
+    (linearIndependent_monoidHom (Multiplicative ℝ) ℂ).comp
+      (fun c' : C => expChar (c' : ℂ))
       (expChar_injective.comp Subtype.val_injective)
   have htop : Submodule.span ℂ (Set.range v) = ⊤ := by
     by_contra hne
@@ -44,7 +46,9 @@ theorem lagrange (C : Finset ℂ) (c : ℂ) : ∃ (τs : Finset ℝ) (a : ℝ �
       have hsum : ∑ i : C, f (Pi.single i 1) • (expChar (i : ℂ) : Multiplicative ℝ → ℂ) = 0 := by
         funext x
         have hx : f (v (Multiplicative.toAdd x)) = 0 := hle (Submodule.subset_span ⟨_, rfl⟩)
-        have hv : v (Multiplicative.toAdd x) = ∑ i : C, (v (Multiplicative.toAdd x) i) • Pi.single i 1 := by
+        have hv
+            : v (Multiplicative.toAdd x)
+              = ∑ i : C, (v (Multiplicative.toAdd x) i) • Pi.single i 1 := by
           funext j
           simp [Finset.sum_apply, Pi.single_apply]
         set_option synthInstance.maxHeartbeats 100000 in
@@ -56,7 +60,8 @@ theorem lagrange (C : Finset ℂ) (c : ℂ) : ∃ (τs : Finset ℝ) (a : ℝ �
         simp [expChar, v, mul_comm]
       exact fun i => Fintype.linearIndependent_iff.1 hli _ hsum i
     exact (Pi.basisFun ℂ C).ext fun i => by simpa using hw i
-  have hmem : (fun c' : C => if (c' : ℂ) = c then (1 : ℂ) else 0) ∈ Submodule.span ℂ (Set.range v) := by
+  have hmem
+      : (fun c' : C => if (c' : ℂ) = c then (1 : ℂ) else 0) ∈ Submodule.span ℂ (Set.range v) := by
     rw [htop]; exact Submodule.mem_top
   obtain ⟨a, ha⟩ := Finsupp.mem_span_range_iff_exists_finsupp.1 hmem
   refine ⟨a.support, a, fun c' hc' => ?_⟩

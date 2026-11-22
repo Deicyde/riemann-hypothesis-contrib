@@ -9,25 +9,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-private theorem dim_le_of_forall {R : Type} [CommRing R] (I : Ideal R) (d : WithBot ℕ∞)
-    (h : ∀ P : Ideal R, P.IsPrime → I ≤ P → ∃ J : Ideal R, J ≤ P ∧ ringKrullDim (R ⧸ J) ≤ d) :
-    ringKrullDim (R ⧸ I) ≤ d := by
+private theorem dim_le_of_forall
+    {R : Type} [CommRing R]
+    (I : Ideal R) (d : WithBot ℕ∞)
+    (h : ∀ P : Ideal R, P.IsPrime → I ≤ P → ∃ J : Ideal R, J ≤ P ∧ ringKrullDim (R ⧸ J) ≤ d)
+    : ringKrullDim (R ⧸ I) ≤ d := by
   rw [ringKrullDim_quotient]
   unfold Order.krullDim
   apply iSup_le
   intro l
   obtain ⟨J, hJP, hJd⟩ := h l.head.1.asIdeal l.head.1.isPrime l.head.2
   rw [ringKrullDim_quotient] at hJd
-  let l' : LTSeries (PrimeSpectrum.zeroLocus (J : Set R)) :=
-    { length := l.length
-      toFun := fun i => ⟨(l i).1, fun r hr => (l.monotone (Fin.zero_le i)) (hJP hr)⟩
-      step := fun i => l.step i }
-  exact le_trans (le_iSup (fun p : LTSeries (PrimeSpectrum.zeroLocus (J : Set R)) => (p.length : WithBot ℕ∞)) l') hJd
+  let l' : LTSeries (PrimeSpectrum.zeroLocus (J : Set R)) := {
+    length := l.length
+    toFun := fun i => ⟨(l i).1, fun r hr => (l.monotone (Fin.zero_le i)) (hJP hr)⟩
+    step := fun i => l.step i
+  }
+  exact le_trans
+    (le_iSup (fun p : LTSeries (PrimeSpectrum.zeroLocus (J : Set R)) => (p.length : WithBot ℕ∞)) l')
+    hJd
 
-theorem UpperTheory.V.AlgebraTools.Conn.chain :
-    ∀ {R : Type} [CommRing R] [IsNoetherianRing R] (a : Ideal R) (k : WithBot ℕ∞), ConnOn a k →
-      ∀ p ∈ a.minimalPrimes, ∀ q ∈ a.minimalPrimes,
-        Relation.ReflTransGen (fun x y : Ideal R => x ∈ a.minimalPrimes ∧ y ∈ a.minimalPrimes ∧ ReciprocityTheory.CA.Linked R k x y) p q := by
+theorem UpperTheory.V.AlgebraTools.Conn.chain
+    : ∀ {R : Type} [CommRing R] [IsNoetherianRing R] (a : Ideal R) (k : WithBot ℕ∞),
+      ConnOn a k
+        → ∀ p ∈ a.minimalPrimes, ∀ q ∈ a.minimalPrimes,
+          Relation.ReflTransGen
+            (fun x y : Ideal R =>
+              x ∈ a.minimalPrimes ∧ y ∈ a.minimalPrimes ∧ ReciprocityTheory.CA.Linked R k x y)
+            p q := by
   intro R _ _ a k hconn p hp q hq
   classical
   let rel : Ideal R → Ideal R → Prop := fun x y =>
@@ -35,18 +44,23 @@ theorem UpperTheory.V.AlgebraTools.Conn.chain :
   change Relation.ReflTransGen rel p q
   by_contra hpq
   have hfin := Ideal.finite_minimalPrimes_of_isNoetherianRing R a
-  obtain ⟨K, hK⟩ : ∃ K : Finset (Ideal R),
-      ∀ x, x ∈ K ↔ x ∈ a.minimalPrimes ∧ Relation.ReflTransGen rel p x :=
-    ⟨hfin.toFinset.filter (fun x => Relation.ReflTransGen rel p x), fun x => by
-      rw [Finset.mem_filter, Set.Finite.mem_toFinset]⟩
-  obtain ⟨L, hL⟩ : ∃ L : Finset (Ideal R),
-      ∀ x, x ∈ L ↔ x ∈ a.minimalPrimes ∧ ¬ Relation.ReflTransGen rel p x :=
-    ⟨hfin.toFinset.filter (fun x => ¬ Relation.ReflTransGen rel p x), fun x => by
-      rw [Finset.mem_filter, Set.Finite.mem_toFinset]⟩
+  obtain ⟨K, hK⟩
+      : ∃ K : Finset (Ideal R), ∀ x,
+        x ∈ K ↔ x ∈ a.minimalPrimes ∧ Relation.ReflTransGen rel p x := ⟨
+    hfin.toFinset.filter (fun x => Relation.ReflTransGen rel p x),
+    fun x => by rw [Finset.mem_filter, Set.Finite.mem_toFinset]
+  ⟩
+  obtain ⟨L, hL⟩
+      : ∃ L : Finset (Ideal R), ∀ x,
+        x ∈ L ↔ x ∈ a.minimalPrimes ∧ ¬ Relation.ReflTransGen rel p x := ⟨
+    hfin.toFinset.filter (fun x => ¬ Relation.ReflTransGen rel p x),
+    fun x => by rw [Finset.mem_filter, Set.Finite.mem_toFinset]
+  ⟩
   have hpK : p ∈ K := (hK p).mpr ⟨hp, Relation.ReflTransGen.refl⟩
   have hqL : q ∈ L := (hL q).mpr ⟨hq, hpq⟩
-  obtain ⟨g, hg⟩ : ∃ g : Ideal R × Ideal R → WithBot ℕ∞,
-      ∀ xy, g xy = ringKrullDim (R ⧸ (xy.1 ⊔ xy.2)) := ⟨_, fun _ => rfl⟩
+  obtain ⟨g, hg⟩
+      : ∃ g : Ideal R × Ideal R → WithBot ℕ∞, ∀ xy, g xy = ringKrullDim (R ⧸ (xy.1 ⊔ xy.2)) :=
+    ⟨_, fun _ => rfl⟩
   have hnl : ∀ x ∈ K, ∀ y ∈ L, g (x, y) < k := by
     intro x hx y hy
     obtain ⟨hxM, hpx⟩ := (hK x).mp hx
@@ -75,8 +89,9 @@ theorem UpperTheory.V.AlgebraTools.Conn.chain :
     intro xy hxy
     obtain ⟨h1, h2⟩ := Finset.mem_product.mp hxy
     exact hnl _ h1 _ h2
-  have mz : ∀ (J : Ideal R) (z : PrimeSpectrum R),
-      z ∈ PrimeSpectrum.zeroLocus (J : Set R) ↔ J ≤ z.asIdeal := fun J z => by
+  have mz
+      : ∀ (J : Ideal R) (z : PrimeSpectrum R),
+        z ∈ PrimeSpectrum.zeroLocus (J : Set R) ↔ J ≤ z.asIdeal := fun J z => by
     rw [PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe]
   have hJ2p : ¬ J2 ≤ p := by
     intro h
@@ -92,18 +107,25 @@ theorem UpperTheory.V.AlgebraTools.Conn.chain :
     have hxM := ((hK x).mp hx).1
     have hxeq : x = q := le_antisymm hxq (hq.2 hxM.1 hxq)
     exact hpq (hxeq ▸ ((hK x).mp hx).2)
-  obtain ⟨z, hzS, hzu, hzv⟩ := (hconn (J1 ⊔ J2) haI hdim).isPreconnected
-    (PrimeSpectrum.zeroLocus (J2 : Set R))ᶜ (PrimeSpectrum.zeroLocus (J1 : Set R))ᶜ
-    (PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl (PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl
-    (by
-      rintro z ⟨_, hzI⟩
-      by_contra hz
-      simp only [Set.mem_union, Set.mem_compl_iff, not_or, not_not] at hz
-      exact hzI ((mz _ z).mpr (sup_le ((mz J1 z).mp hz.2) ((mz J2 z).mp hz.1))))
-    ⟨⟨p, hp.1.1⟩, ⟨(mz a _).mpr hp.1.2, fun h => hJ2p (le_sup_right.trans ((mz _ _).mp h))⟩,
-      fun h => hJ2p ((mz J2 _).mp h)⟩
-    ⟨⟨q, hq.1.1⟩, ⟨(mz a _).mpr hq.1.2, fun h => hJ1q (le_sup_left.trans ((mz _ _).mp h))⟩,
-      fun h => hJ1q ((mz J1 _).mp h)⟩
+  obtain ⟨z, hzS, hzu, hzv⟩ :=
+    (hconn (J1 ⊔ J2) haI hdim).isPreconnected (PrimeSpectrum.zeroLocus (J2 : Set R))ᶜ
+      (PrimeSpectrum.zeroLocus (J1 : Set R))ᶜ (PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl
+      (PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl
+      (by
+        rintro z ⟨_, hzI⟩
+        by_contra hz
+        simp only [Set.mem_union, Set.mem_compl_iff, not_or, not_not] at hz
+        exact hzI ((mz _ z).mpr (sup_le ((mz J1 z).mp hz.2) ((mz J2 z).mp hz.1))))
+      ⟨
+        ⟨p, hp.1.1⟩,
+        ⟨(mz a _).mpr hp.1.2, fun h => hJ2p (le_sup_right.trans ((mz _ _).mp h))⟩,
+        fun h => hJ2p ((mz J2 _).mp h)
+      ⟩
+      ⟨
+        ⟨q, hq.1.1⟩,
+        ⟨(mz a _).mpr hq.1.2, fun h => hJ1q (le_sup_left.trans ((mz _ _).mp h))⟩,
+        fun h => hJ1q ((mz J1 _).mp h)
+      ⟩
   obtain ⟨m, hm, hmz⟩ := Ideal.exists_minimalPrimes_le ((mz a z).mp hzS.1)
   by_cases hpm : Relation.ReflTransGen rel p m
   · refine hzv ((mz J1 z).mpr ?_)

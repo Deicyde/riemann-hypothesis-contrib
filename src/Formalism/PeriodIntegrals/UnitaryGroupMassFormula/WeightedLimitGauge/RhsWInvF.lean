@@ -58,8 +58,8 @@ theorem herm_symm (hH : Hᴴ = H) (x w : Fin n → ℂ) : herm H w x = star (her
   conv_lhs => rw [Matrix.star_dotProduct]
   rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hH]
 
-theorem herm_conj (g : Matrix (Fin n) (Fin n) ℂ) (x w : Fin n → ℂ) :
-    herm H (g *ᵥ x) (g *ᵥ w) = herm (gᴴ * H * g) x w := by
+theorem herm_conj (g : Matrix (Fin n) (Fin n) ℂ) (x w : Fin n → ℂ)
+    : herm H (g *ᵥ x) (g *ᵥ w) = herm (gᴴ * H * g) x w := by
   unfold herm
   rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
 
@@ -68,8 +68,9 @@ theorem herm_single (i j : Fin n) : herm H (Pi.single j 1) (Pi.single i 1) = H i
   rw [Matrix.mulVec_single_one]
   simp [dotProduct, Pi.single_apply]
 
-theorem unit_of_form (g : Matrix (Fin n) (Fin n) ℂ) (h : ∀ x w, herm H (g *ᵥ x) (g *ᵥ w) = herm H x w) :
-    gᴴ * H * g = H := by
+theorem unit_of_form
+    (g : Matrix (Fin n) (Fin n) ℂ) (h : ∀ x w, herm H (g *ᵥ x) (g *ᵥ w) = herm H x w)
+    : gᴴ * H * g = H := by
   ext i j
   have e := h (Pi.single j 1) (Pi.single i 1)
   rw [herm_conj, herm_single, herm_single] at e
@@ -89,32 +90,40 @@ theorem tmat_mulVec (κ : ℂ) (d x : Fin n → ℂ) : tmat H κ d *ᵥ x = x + 
 
 end Form
 
-theorem herm_wb {x w : Fin (2 * r + k + 1) → ℂ} (hx : inWb k r x) (hw : inWb k r w) :
-    herm (Hpk k r) x w = herm (Hb k) (wbPart k r x) (wbPart k r w) := by
+theorem herm_wb {x w : Fin (2 * r + k + 1) → ℂ} (hx : inWb k r x) (hw : inWb k r w)
+    : herm (Hpk k r) x w = herm (Hb k) (wbPart k r x) (wbPart k r w) := by
   conv_lhs => rw [← inWb_eq hx, ← inWb_eq hw]
   unfold herm
   rw [Matrix.mulVec_mulVec, MB.Hpk_Em, ← Matrix.mulVec_mulVec, em_dot]
 
-theorem herm_hb (x w : Fin (k + 1) → ℂ) :
-    herm (Hb k) x w = (∑ j : Fin k, star (w (Fin.castSucc j)) * x (Fin.castSucc j)) - star (w (Fin.last k)) * x (Fin.last k) := by
+theorem herm_hb (x w : Fin (k + 1) → ℂ)
+    : herm (Hb k) x w
+      = (∑ j : Fin k, star (w (Fin.castSucc j)) * x (Fin.castSucc j))
+        - star (w (Fin.last k)) * x (Fin.last k) := by
   unfold herm Hb
   simp only [dotProduct, Matrix.mulVec_diagonal, Fin.sum_univ_castSucc, Pi.star_apply]
   simp only [Fin.castSucc_ne_last, if_false, one_mul, if_true, neg_one_mul, mul_neg]
   ring
 
-theorem herm_self_hb (x : Fin (k + 1) → ℂ) :
-    herm (Hb k) x x = ((∑ j : Fin k, Complex.normSq (x (Fin.castSucc j)) - Complex.normSq (x (Fin.last k)) : ℝ) : ℂ) := by
+theorem herm_self_hb (x : Fin (k + 1) → ℂ)
+    : herm (Hb k) x x
+      = ((∑ j : Fin k, Complex.normSq (x (Fin.castSucc j)) - Complex.normSq (x (Fin.last k)) : ℝ)
+        : ℂ) := by
   rw [herm_hb]
   push_cast
   simp only [Complex.normSq_eq_conj_mul_self]
   rfl
 
-theorem wb_posdef {z d : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (hd : inWb k r d)
-    (hdz : herm (Hpk k r) d z = 0) (hdd : herm (Hpk k r) d d = 0) : d = 0 := by
+theorem wb_posdef
+    {z d : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (hd : inWb k r d)
+    (hdz : herm (Hpk k r) d z = 0) (hdd : herm (Hpk k r) d d = 0)
+    : d = 0 := by
   rw [herm_wb hd hz, herm_hb] at hdz
   rw [herm_wb hd hd, herm_self_hb] at hdd
-  have hT' : 0 < Complex.normSq (wbPart k r z (Fin.last k)) -
-      ∑ j : Fin k, Complex.normSq (wbPart k r z (Fin.castSucc j)) := by
+  have hT'
+      : 0
+        < Complex.normSq (wbPart k r z (Fin.last k))
+          - ∑ j : Fin k, Complex.normSq (wbPart k r z (Fin.castSucc j)) := by
     unfold Tz at hT
     rw [herm_wb hz hz, herm_self_hb, Complex.ofReal_re] at hT
     linarith
@@ -131,7 +140,9 @@ theorem wb_posdef {z d : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 
   have hxk : xk = 0 := by
     by_contra hne
     have h1 : ‖zk‖ * ‖xk‖ ≤ ∑ j, ‖Z j‖ * ‖X j‖ := by
-      calc ‖zk‖ * ‖xk‖ = ‖star zk * xk‖ := by rw [norm_mul, norm_star]
+      calc
+        ‖zk‖ * ‖xk‖
+          = ‖star zk * xk‖ := by rw [norm_mul, norm_star]
         _ = ‖∑ j, star (Z j) * X j‖ := by rw [hdz']
         _ ≤ ∑ j, ‖star (Z j) * X j‖ := norm_sum_le _ _
         _ = ∑ j, ‖Z j‖ * ‖X j‖ := by simp only [norm_mul, norm_star]
@@ -145,7 +156,9 @@ theorem wb_posdef {z d : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 
   have hX0 : ∀ j, X j = 0 := by
     intro j
     rw [hxk, map_zero] at hX
-    have := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => Complex.normSq_nonneg (X j))).1 hX j (Finset.mem_univ _)
+    have :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => Complex.normSq_nonneg (X j))).1 hX j
+        (Finset.mem_univ _)
     exact Complex.normSq_eq_zero.1 this
   have hb : wbPart k r d = 0 := by
     ext m
@@ -154,8 +167,10 @@ theorem wb_posdef {z d : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 
     | cast j => exact hX0 j
   rw [← inWb_eq hd, hb, Matrix.mulVec_zero]
 
-theorem herm_e_wb {d : Fin (2 * r + k + 1) → ℂ} (hd : inWb k r d) {j : Fin (2 * r + k + 1)}
-    (hj : j.val < r ∨ r + k < j.val) : herm (Hpk k r) (bvec j) d = 0 := by
+theorem herm_e_wb
+    {d : Fin (2 * r + k + 1) → ℂ} (hd : inWb k r d)
+    {j : Fin (2 * r + k + 1)} (hj : j.val < r ∨ r + k < j.val)
+    : herm (Hpk k r) (bvec j) d = 0 := by
   unfold herm bvec
   rw [Matrix.mulVec_single_one]
   refine Finset.sum_eq_zero fun i _ => ?_
@@ -180,7 +195,8 @@ theorem fibTrans : FibTrans := by
   · exact ⟨1, uwset_one z, by rw [hvv, Matrix.one_mulVec]⟩
   have hsym := herm_symm (Hpk k r) MB.hpk_herm
   set d := v - v' with hddef
-  have hd : inWb k r d := fun i hi => by simp only [hddef, Pi.sub_apply, hv i hi, hv' i hi, sub_zero]
+  have hd : inWb k r d := fun i hi => by
+    simp only [hddef, Pi.sub_apply, hv i hi, hv' i hi, sub_zero]
   have hdz : herm (Hpk k r) d z = 0 := by rw [herm_sub_left, h2, sub_self]
   have hN : herm (Hpk k r) d d = herm (Hpk k r) v d + star (herm (Hpk k r) v d) := by
     simp only [hddef, herm_sub_left, herm_sub_right, star_sub]
@@ -200,14 +216,24 @@ theorem fibTrans : FibTrans := by
     rw [hN, hκ, star_neg, star_inv₀]
     field_simp
     ring
-  have hunit : ∀ x w, herm (Hpk k r) (tmat (Hpk k r) κ d *ᵥ x) (tmat (Hpk k r) κ d *ᵥ w) = herm (Hpk k r) x w := by
+  have hunit
+      : ∀ x w,
+        herm (Hpk k r) (tmat (Hpk k r) κ d *ᵥ x) (tmat (Hpk k r) κ d *ᵥ w)
+          = herm (Hpk k r) x w := by
     intro x w
     rw [hTx, hTx, herm_add_left, herm_add_right, herm_add_right, herm_smul_left, herm_smul_left,
       herm_smul_right, herm_smul_right, hsym w d, star_mul']
     linear_combination (herm (Hpk k r) x d * star (herm (Hpk k r) w d)) * hbr
   have hzd : herm (Hpk k r) z d = 0 := by rw [hsym d z, hdz, star_zero]
-  refine ⟨tmat (Hpk k r) κ d, ⟨unit_of_form _ _ hunit, fun a => ⟨hfix _ (herm_e_wb hd ?_), hfix _ (herm_e_wb hd ?_)⟩,
-    hfix z hzd⟩, ?_⟩
+  refine ⟨
+    tmat (Hpk k r) κ d,
+    ⟨
+      unit_of_form _ _ hunit,
+      fun a => ⟨hfix _ (herm_e_wb hd ?_), hfix _ (herm_e_wb hd ?_)⟩,
+      hfix z hzd
+    ⟩,
+    ?_
+  ⟩
   · left
     exact a.isLt
   · right

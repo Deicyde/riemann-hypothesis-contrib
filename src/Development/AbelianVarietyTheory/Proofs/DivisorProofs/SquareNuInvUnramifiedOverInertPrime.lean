@@ -12,21 +12,28 @@ public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.Star
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
 
 namespace GlobalTheory.FunObj.SqNum
 
-theorem nuH_inv_unrAt_of_inertQ : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T}, L.Is μ₀ → ∀ (G : GridData L sc) (i j : Fin D.R.m) (P : HeightOneSpectrum (𝓞 D.host.E)), (∃ q : ℕ, q.Prime ∧ InertQ D q ∧ ((q : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal) → (nuH G μ₀ i j)⁻¹.UnrAt P := by
+theorem nuH_inv_unrAt_of_inertQ
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T},
+      L.Is μ₀
+        → ∀ (G : GridData L sc) (i j : Fin D.R.m) (P : HeightOneSpectrum (𝓞 D.host.E)),
+          (∃ q : ℕ, q.Prime ∧ InertQ D q ∧ ((q : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal)
+            → (nuH G μ₀ i j)⁻¹.UnrAt P := by
   intro D T L sc μ₀ hL G i j P hq
   obtain ⟨q, hqp, hqi, hqP⟩ := hq
 
-  have hmu : (L.C.mu0 j).UnrAt P := (L.C.isMu0 j).unr P fun k hk => by
-    have hk' : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := hk
-    have e := prime_unique (K := D.host.E) hqp (D.host.g_prime k) hqP hk'
-    exact GlobalTheory.Mem.Col2.SplitChar.not_inertQ_g k (e ▸ hqi)
+  have hmu : (L.C.mu0 j).UnrAt P :=
+    (L.C.isMu0 j).unr P fun k hk => by
+      have hk' : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := hk
+      have e := prime_unique (K := D.host.E) hqp (D.host.g_prime k) hqP hk'
+      exact GlobalTheory.Mem.Col2.SplitChar.not_inertQ_g k (e ▸ hqi)
 
   have hchi : (G.ch.chiH (D.R.m - i)).UnrAt P := by
     refine G.ch.unr (D.R.m - i) (by omega) (by omega) P fun hv => ?_

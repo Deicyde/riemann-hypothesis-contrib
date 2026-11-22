@@ -18,8 +18,10 @@ def smallSectionCount (P : ℕ → Ω → Prop) (La : ℕ → AddSubgroup Ω) (�
   Real.log (Nat.card {s : La τ // P τ (s : Ω)})
 
 def arVolP (P : ℕ → Ω → Prop) (La : ℕ → AddSubgroup Ω) (a D : ℕ) : ℝ :=
-  limsup (fun k : ℕ => smallSectionCount P La (a * k) /
-    (((a * k : ℕ) : ℝ) ^ (D + 1) / ((D + 1).factorial : ℝ))) atTop
+  limsup
+    (fun k : ℕ =>
+      smallSectionCount P La (a * k) / (((a * k : ℕ) : ℝ) ^ (D + 1) / ((D + 1).factorial : ℝ)))
+    atTop
 
 end Vol
 

@@ -9,16 +9,21 @@ open CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal ValuativeRel
 
 namespace CompanionTheory.LocalTateOrthogonality.Gcoh
 
-theorem exists_card_eq_pow (l : ℕ) [hl : Fact l.Prime] (r : ℕ) (M : Type) [AddCommGroup M]
-    [Module (ZMod (l ^ r)) M] [Finite M] : ∃ k, Nat.card M = l ^ k := by
-  have h : IsPGroup l (Multiplicative M) := fun g => ⟨r, by
-    apply Multiplicative.toAdd.injective
-    rw [toAdd_pow, toAdd_one, ← Nat.cast_smul_eq_nsmul (ZMod (l ^ r)), ZMod.natCast_self,
-      zero_smul]⟩
+theorem exists_card_eq_pow
+    (l : ℕ) [hl : Fact l.Prime]
+    (r : ℕ) (M : Type) [AddCommGroup M] [Module (ZMod (l ^ r)) M] [Finite M]
+    : ∃ k, Nat.card M = l ^ k := by
+  have h : IsPGroup l (Multiplicative M) := fun g => ⟨
+    r,
+    by
+      apply Multiplicative.toAdd.injective
+      rw [toAdd_pow, toAdd_one, ← Nat.cast_smul_eq_nsmul (ZMod (l ^ r)), ZMod.natCast_self,
+        zero_smul]
+  ⟩
   exact (IsPGroup.iff_card (p := l) (G := Multiplicative M)).1 h
 
-theorem euler_of (hRep : SgcRep) (h0 : Sgc0) (h1 : Sgc1) (h2 : Sgc2) (hF : SgcField) :
-    Formalism.GaloisCohomology.LocalEulerCharK := by
+theorem euler_of (hRep : SgcRep) (h0 : Sgc0) (h1 : Sgc1) (h2 : Sgc2) (hF : SgcField)
+    : Formalism.GaloisCohomology.LocalEulerCharK := by
   intro l hl K hK r M _ _ _ _ _ rho _ hrho
   obtain ⟨hsep, v, t, hloc, hcard⟩ := hF l K hK
   obtain ⟨A, hA, e, he⟩ := hRep _ _ M rho hrho

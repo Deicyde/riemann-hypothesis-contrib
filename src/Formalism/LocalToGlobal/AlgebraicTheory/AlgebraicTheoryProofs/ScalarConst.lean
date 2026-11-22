@@ -16,13 +16,13 @@ namespace SC
 
 variable {n : Type} [Fintype n]
 
-theorem mem_cLat {c : ℂ} {Λ : AddSubgroup (n → ℂ)} {y : n → ℂ} :
-    y ∈ cLat c Λ ↔ ∃ x ∈ Λ, c • x = y := by
+theorem mem_cLat {c : ℂ} {Λ : AddSubgroup (n → ℂ)} {y : n → ℂ}
+    : y ∈ cLat c Λ ↔ ∃ x ∈ Λ, c • x = y := by
   simp [cLat, imgLat, AddSubgroup.mem_map]
 
-theorem relIdx_cLat (Λ : AddSubgroup (n → ℂ)) (hL : IsLat Λ) (c : ℂ) (hc : c ≠ 0)
-    (hcΛ : ∀ x ∈ Λ, c • x ∈ Λ) :
-    (relIdx (cLat c Λ) Λ : ℝ) = Complex.normSq c ^ Fintype.card n := by
+theorem relIdx_cLat
+    (Λ : AddSubgroup (n → ℂ)) (hL : IsLat Λ) (c : ℂ) (hc : c ≠ 0) (hcΛ : ∀ x ∈ Λ, c • x ∈ Λ)
+    : (relIdx (cLat c Λ) Λ : ℝ) = Complex.normSq c ^ Fintype.card n := by
   obtain ⟨b, hb⟩ := exists_basis_of_lattice Λ hL.1 hL.2
   let f : (n → ℂ) ≃ₗ[ℝ] (n → ℂ) := (LinearEquiv.smulOfNeZero ℂ (n → ℂ) c hc).restrictScalars ℝ
   have hmap : cLat c Λ = Λ.map (f : (n → ℂ) →ₗ[ℝ] (n → ℂ)).toAddMonoidHom := by
@@ -36,8 +36,9 @@ theorem relIdx_cLat (Λ : AddSubgroup (n → ℂ)) (hL : IsLat Λ) (c : ℂ) (hc
     exact hcΛ x hx
   have key := relIndex_map_real Λ Λ le_rfl b b hb hb f hle
   have hdet : LinearMap.det (f : (n → ℂ) →ₗ[ℝ] (n → ℂ)) = Complex.normSq c ^ Fintype.card n := by
-    have e : (f : (n → ℂ) →ₗ[ℝ] (n → ℂ))
-        = ((c • LinearMap.id : (n → ℂ) →ₗ[ℂ] (n → ℂ))).restrictScalars ℝ := by
+    have e
+        : (f : (n → ℂ) →ₗ[ℝ] (n → ℂ))
+          = ((c • LinearMap.id : (n → ℂ) →ₗ[ℂ] (n → ℂ))).restrictScalars ℝ := by
       ext x
       rfl
     rw [e, LinearMap.det_restrictScalars, LinearMap.det_smul, LinearMap.det_id, mul_one,
@@ -46,8 +47,9 @@ theorem relIdx_cLat (Λ : AddSubgroup (n → ℂ)) (hL : IsLat Λ) (c : ℂ) (hc
   rw [hmap, key, AddSubgroup.relIndex_self, Nat.cast_one, one_mul, hdet,
     abs_of_nonneg (pow_nonneg (Complex.normSq_nonneg c) _)]
 
-theorem relIdx_ne_of_le {V : Type*} [AddCommGroup V] {A B L : AddSubgroup V} (h : A ≤ B)
-    (hA : relIdx A L ≠ 0) : relIdx B L ≠ 0 := by
+theorem relIdx_ne_of_le
+    {V : Type*} [AddCommGroup V] {A B L : AddSubgroup V} (h : A ≤ B) (hA : relIdx A L ≠ 0)
+    : relIdx B L ≠ 0 := by
   intro h0
   apply hA
   unfold relIdx at *
@@ -84,8 +86,7 @@ theorem scalar_constant_value : ScalarConst := by
   have hδs : ∀ x, δ.symm x = d⁻¹ • x := fun x => by
     apply δ.injective
     rw [LinearEquiv.apply_symm_apply, hδ, smul_smul, mul_inv_cancel₀ hd0, one_smul]
-  have hδlin : (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) = d • LinearMap.id := LinearMap.ext fun x => by
-    simp [hδ]
+  have hδlin : (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) = d • LinearMap.id := LinearMap.ext fun x => by simp [hδ]
   have hδΛ : imgLat (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) Λ = cLat d Λ := by rw [cLat, hδlin]
   have hisomxy : ∀ x y, matH h (δ x) (δ y) = matH h x y := by
     intro x y
@@ -106,8 +107,7 @@ theorem scalar_constant_value : ScalarConst := by
       obtain ⟨x', hx', rfl⟩ := AddSubgroup.mem_map.1 hy'
       have e1 : (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)).toAddMonoidHom x = δ x := rfl
       have e2 : (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)).toAddMonoidHom x' = δ x' := rfl
-      have e3 : altE (matH h) (δ x) (δ x') = altE (matH h) x x' := by
-        simp only [altE, hisomxy]
+      have e3 : altE (matH h) (δ x) (δ x') = altE (matH h) x x' := by simp only [altE, hisomxy]
       rw [e1, e2, ← map_add (f := _), hαinv, hαinv, hαinv, e3]
       exact hSC.2 x hx x' hx'
 
@@ -122,14 +122,22 @@ theorem scalar_constant_value : ScalarConst := by
     rw [mem_cLat, imgLat, AddSubgroup.mem_map]
     constructor
     · rintro ⟨x, hx, rfl⟩
-      exact ⟨π • x, mem_cLat.2 ⟨x, hx, rfl⟩, by
-        show δ (π • x) = _
-        rw [hδ, smul_smul, hdπ]⟩
+      exact ⟨
+        π • x,
+        mem_cLat.2 ⟨x, hx, rfl⟩,
+        by
+          show δ (π • x) = _
+          rw [hδ, smul_smul, hdπ]
+      ⟩
     · rintro ⟨z, hz, rfl⟩
       obtain ⟨x, hx, rfl⟩ := mem_cLat.1 hz
-      exact ⟨x, hx, by
-        show _ = δ (π • x)
-        rw [hδ, smul_smul, hdπ]⟩
+      exact ⟨
+        x,
+        hx,
+        by
+          show _ = δ (π • x)
+          rw [hδ, smul_smul, hdπ]
+      ⟩
   have hπbleδ : cLat (conj π) Λ ≤ imgLat (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) Λ := by
     rw [hcb]
     exact AddSubgroup.map_mono hπle
@@ -150,8 +158,8 @@ theorem scalar_constant_value : ScalarConst := by
     have h1 := relIdx_cLat Λ hL (conj π) hπb0 hπbΛ
     rw [hnsqb] at h1
     exact_mod_cast h1
-  have hmapidx : relIdx (cLat (conj π) Λ) (imgLat (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) Λ)
-      = p ^ Fintype.card n := by
+  have hmapidx
+      : relIdx (cLat (conj π) Λ) (imgLat (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) Λ) = p ^ Fintype.card n := by
     rw [hcb, ← hidxπ]
     unfold relIdx imgLat
     exact AddSubgroup.relIndex_map_map_of_injective _ _ (fun a b hab => δ.injective hab)
@@ -165,12 +173,24 @@ theorem scalar_constant_value : ScalarConst := by
     rw [hδs, hd, inv_div]
     show (1 - π / conj π) • x = _
     rw [sub_smul, one_smul]
-  have hU : UnitaryData (matH h) Λ α δ Ae :=
-    { herm := hH, pos := hP, selfDual := hSD, semi := hSC, isom := hisom, semi' := hsemi',
-      inv := fun x _ => hαinv x, idx₁ := hidx1, idx₂ := hidx2, cay := hcay }
+  have hU : UnitaryData (matH h) Λ α δ Ae := {
+    herm := hH
+    pos := hP
+    selfDual := hSD
+    semi := hSC
+    isom := hisom
+    semi' := hsemi'
+    inv := fun x _ => hαinv x
+    idx₁ := hidx1
+    idx₂ := hidx2
+    cay := hcay
+  }
   have hReps : IsReps Λ (imgLat (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) Λ) Sa := by
-    refine ⟨fun x hx => by rw [hδΛ]; exact hSa.1 x hx, fun x hx y hy hxy => hSa.2.1 x hx y hy ?_,
-      fun y hy => ?_⟩
+    refine ⟨
+      fun x hx => by rw [hδΛ]; exact hSa.1 x hx,
+      fun x hx y hy hxy => hSa.2.1 x hx y hy ?_,
+      fun y hy => ?_
+    ⟩
     · refine hinter _ ?_ hxy
       rw [hδΛ]
       exact (cLat d Λ).sub_mem (hSa.1 x hx) (hSa.1 y hy)
@@ -178,8 +198,7 @@ theorem scalar_constant_value : ScalarConst := by
       obtain ⟨x, hx, hyx⟩ := hSa.2.2 y hy
       exact ⟨x, hx, hπble hyx⟩
   have hcard : Sa.card = p ^ Fintype.card n := by
-    have h2 : relIdx (cLat (conj π) Λ) (cLat d Λ) = p ^ Fintype.card n := by
-      rw [← hδΛ, hmapidx]
+    have h2 : relIdx (cLat (conj π) Λ) (cLat d Λ) = p ^ Fintype.card n := by rw [← hδΛ, hmapidx]
     rw [(repsExist (n → ℂ) _ _ (by rw [h2]; exact hpn0)).2 Sa hSa, h2]
   have hrel : relIdx Λ (imgLat (δ : (n → ℂ) →ₗ[ℂ] (n → ℂ)) Λ) = p ^ Fintype.card n := by
     rw [← (repsExist (n → ℂ) _ _ hidx2).2 Sa hReps, hcard]
@@ -187,12 +206,14 @@ theorem scalar_constant_value : ScalarConst := by
   have hcθ := hc θ hθ
   have hc8 := unitaryEighth (n → ℂ) (matH h) Λ α δ Ae hL hU hLine θ hθ hθ0 c hcθ
   refine ⟨hcard, c, ?_, fun z => ?_⟩
-  · rw [hc8, hδlin, LinearMap.det_smul, LinearMap.det_id, mul_one, Module.finrank_fintype_fun_eq_card]
+  · rw [hc8, hδlin, LinearMap.det_smul, LinearMap.det_id, mul_one,
+      Module.finrank_fintype_fun_eq_card]
     ring
   · have e1 : θ ((π / conj π) • z) = pullInv δ θ z := by
       show _ = θ (δ.symm z)
       rw [hδs, hd, inv_div]
     rw [e1, hcθ, Pi.smul_apply, smul_eq_mul,
-      interReps (n → ℂ) (matH h) hH Λ _ α hsemi' θ hθ.2 Sa hReps z, hrel, sumU, Nat.cast_pow, mul_assoc]
+      interReps (n → ℂ) (matH h) hH Λ _ α hsemi' θ hθ.2 Sa hReps z, hrel, sumU, Nat.cast_pow,
+      mul_assoc]
 
 end Formalism.L2.AlgTh

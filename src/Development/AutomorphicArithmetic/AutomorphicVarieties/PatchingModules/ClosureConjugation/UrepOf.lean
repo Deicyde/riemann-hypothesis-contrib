@@ -6,11 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.urep_of :
-    ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ} {x : NP G0.frame n} {B : Type} [CommRing B] [IsLocalRing B] {D : GDet n B G.G₀} {I : Set (MonoidAlgebra B G.G₀)} {Bh : Type} [CommRing Bh] [IsLocalRing Bh] [Algebra B Bh] [Algebra Bh (FractionRing x.A)] {e : G.G₀ →* Bˣ} (H : Hat h x D I Bh e) {ep : Fin n → H.E} (g : GrAlg H.T n x.a H.r ep), CompleteOrthogonalIdempotents ep → (∀ i, H.DE.D Bh[X] (1 + X ⊗ₜ ep i) = 1 + X) → Nonempty (URep h x D I Bh (algebraMap Bh (FractionRing x.A)) e) := by
+theorem UpperTheory.V.Pa.urep_of
+    : ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ}
+        {x : NP G0.frame n} {B : Type} [CommRing B] [IsLocalRing B] {D : GDet n B G.G₀}
+        {I : Set (MonoidAlgebra B G.G₀)} {Bh : Type} [CommRing Bh] [IsLocalRing Bh] [Algebra B Bh]
+        [Algebra Bh (FractionRing x.A)] {e : G.G₀ →* Bˣ} (H : Hat h x D I Bh e) {ep : Fin n → H.E}
+        (g : GrAlg H.T n x.a H.r ep),
+      CompleteOrthogonalIdempotents ep → (∀ i, H.DE.D Bh[X] (1 + X ⊗ₜ ep i) = 1 + X)
+        → Nonempty (URep h x D I Bh (algebraMap Bh (FractionRing x.A)) e) := by
   intro l _ L G G0 h n x B _ _ D I Bh _ _ _ _ e H ep g hep hD
   letI : CommRing g.AA := g.ring
   letI : Algebra Bh g.AA := g.alg
@@ -23,15 +30,20 @@ theorem UpperTheory.V.Pa.urep_of :
   let vr : G.G₀ →* Matrix (Fin n) (Fin n) g.AA :=
     ((g.φ.toRingHom.comp H.ι.toRingHom).toMonoidHom).comp (MonoidAlgebra.of Bh G.G₀)
   have hvr : ∀ γ, vr γ = g.φ (H.ι (MonoidAlgebra.single γ 1)) := fun _ => rfl
-  have key : ∀ w, GDet.repAlg vr g.AA (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B g.AA) w) =
-      g.φ (H.ι (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B Bh) w)) := by
+  have key
+      : ∀ w,
+        GDet.repAlg vr g.AA (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B g.AA) w)
+          = g.φ (H.ι (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B Bh) w)) := by
     intro w
-    have hext : ((GDet.repAlg vr g.AA).toRingHom.comp (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B g.AA))) =
-        (g.φ.toRingHom.comp (H.ι.toRingHom.comp (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B Bh)))) := by
+    have hext
+        : ((GDet.repAlg vr g.AA).toRingHom.comp (MonoidAlgebra.mapRingHom G.G₀ (algebraMap B g.AA)))
+          = (g.φ.toRingHom.comp (H.ι.toRingHom.comp (MonoidAlgebra.mapRingHom G.G₀
+            (algebraMap B Bh)))) := by
       apply MonoidAlgebra.ringHom_ext
       · intro b
-        have hs : MonoidAlgebra.single (1 : G.G₀) (algebraMap B Bh b) =
-            (algebraMap B Bh b) • (1 : MonoidAlgebra Bh G.G₀) := by
+        have hs
+            : MonoidAlgebra.single (1 : G.G₀) (algebraMap B Bh b)
+              = (algebraMap B Bh b) • (1 : MonoidAlgebra Bh G.G₀) := by
           rw [MonoidAlgebra.one_def, MonoidAlgebra.smul_single', mul_one]
         simp only [RingHom.comp_apply, MonoidAlgebra.mapRingHom_single, AlgHom.toRingHom_eq_coe,
           RingHom.coe_coe, GDet.repAlg, MonoidAlgebra.lift_single, map_one, hs, map_smul]
@@ -67,7 +79,8 @@ theorem UpperTheory.V.Pa.urep_of :
     P := Submodule.map f H.P
     ker_le_span_sub_sup_map := H.ker_le_span_sub_sup_map.map f
     vr_mem := fun γ => Submodule.mem_map_of_mem (H.mem γ)
-    cont := ?_ }⟩
+    cont := ?_
+  }⟩
   · apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨γ, rfl⟩
@@ -82,7 +95,9 @@ theorem UpperTheory.V.Pa.urep_of :
         rw [map_add (f := _), map_add (f := _)]
         exact Submodule.add_mem _ ha hb
       | single γ c =>
-        have hc : (MonoidAlgebra.single γ c : MonoidAlgebra Bh G.G₀) = c • MonoidAlgebra.single γ 1 := by
+        have hc
+            : (MonoidAlgebra.single γ c : MonoidAlgebra Bh G.G₀)
+              = c • MonoidAlgebra.single γ 1 := by
           rw [MonoidAlgebra.smul_single', mul_one]
         rw [hc, map_smul, map_smul]
         exact Submodule.smul_mem _ c (Submodule.subset_span ⟨γ, rfl⟩)

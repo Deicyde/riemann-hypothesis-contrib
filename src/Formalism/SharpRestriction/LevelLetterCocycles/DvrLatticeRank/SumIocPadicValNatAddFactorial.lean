@@ -14,8 +14,8 @@ variable {p : ℕ} [hp : Fact p.Prime]
 
 private theorem prime_prime_padicInt : Prime (p : ℤ_[p]) := PadicInt.irreducible_p.prime
 
-private theorem not_prime_dvd_padicInt_unit (w : ℤ_[p]ˣ) : ¬ (p : ℤ_[p]) ∣ (w : ℤ_[p]) :=
-  fun h => prime_prime_padicInt.not_unit (isUnit_of_dvd_unit h (Units.isUnit _))
+private theorem not_prime_dvd_padicInt_unit (w : ℤ_[p]ˣ) : ¬ (p : ℤ_[p]) ∣ (w : ℤ_[p]) := fun h =>
+  prime_prime_padicInt.not_unit (isUnit_of_dvd_unit h (Units.isUnit _))
 
 lemma emult_eq_valuation {x : ℤ_[p]} (hx : x ≠ 0) :
     emultiplicity (p : ℤ_[p]) x = x.valuation := by
@@ -110,16 +110,20 @@ lemma emult_zpow_sub_one (hodd : p ≠ 2) (u : ℤ_[p]ˣ) (hdvd : (p : ℤ_[p]) 
 
 end SlopeTestRemainingChoices
 
-theorem val_prod_one_sub_zpow {p : ℕ} [Fact p.Prime] (hodd : p ≠ 2)
+theorem val_prod_one_sub_zpow
+    {p : ℕ} [Fact p.Prime]
+    (hodd : p ≠ 2)
     (u : ℤ_[p]ˣ) (hu1 : ((u : ℤ_[p]) - 1).valuation = 1) (hu0 : (u : ℤ_[p]) - 1 ≠ 0)
-    (Ω : Finset ℤ) (h0 : (0 : ℤ) ∉ Ω) :
-    (∏ i ∈ Ω, (1 - ((u ^ i : ℤ_[p]ˣ) : ℤ_[p]))).valuation
+    (Ω : Finset ℤ) (h0 : (0 : ℤ) ∉ Ω)
+    : (∏ i ∈ Ω, (1 - ((u ^ i : ℤ_[p]ˣ) : ℤ_[p]))).valuation
       = ∑ i ∈ Ω, (1 + padicValNat p i.natAbs) := by
   have hP : Prime (p : ℤ_[p]) := prime_prime_padicInt
   have hdvd := p_dvd_of_valuation_one hu0 hu1
   have he := emult_of_valuation_one hu0 hu1
-  have key : ∀ i ∈ Ω, emultiplicity (p : ℤ_[p]) (1 - ((u ^ i : ℤ_[p]ˣ) : ℤ_[p]))
-      = ((1 + padicValNat p i.natAbs : ℕ) : ℕ∞) := by
+  have key
+      : ∀ i ∈ Ω,
+        emultiplicity (p : ℤ_[p]) (1 - ((u ^ i : ℤ_[p]ˣ) : ℤ_[p]))
+          = ((1 + padicValNat p i.natAbs : ℕ) : ℕ∞) := by
     intro i hi
     rw [← neg_sub, emultiplicity_neg]
     exact emult_zpow_sub_one hodd u hdvd he (fun h => h0 (h ▸ hi))

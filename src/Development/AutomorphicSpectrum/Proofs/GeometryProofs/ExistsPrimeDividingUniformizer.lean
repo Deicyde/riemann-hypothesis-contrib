@@ -6,18 +6,26 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPullWedge
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+  GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.Rescar
 
-theorem exists_prime_natCast_mem {R : Type*} [CommRing R] (P : Ideal R) [hP : P.IsPrime]
-    (n : ℕ) (hn : n ≠ 0) (hmem : (n : R) ∈ P) : ∃ ℓ : ℕ, ℓ.Prime ∧ (ℓ : R) ∈ P := by
+theorem exists_prime_natCast_mem
+    {R : Type*} [CommRing R]
+    (P : Ideal R) [hP : P.IsPrime]
+    (n : ℕ) (hn : n ≠ 0) (hmem : (n : R) ∈ P)
+    : ∃ ℓ : ℕ, ℓ.Prime ∧ (ℓ : R) ∈ P := by
   induction n using Nat.recOnMul with
   | zero => exact absurd rfl hn
   | one =>
-    exact absurd (by simpa using hmem : (1 : R) ∈ P) (fun h => hP.ne_top ((Ideal.eq_top_iff_one P).2 h))
-  | prime p hp => exact ⟨p, hp, hmem⟩
+    exact absurd (by simpa using hmem : (1 : R) ∈ P)
+      (fun h => hP.ne_top ((Ideal.eq_top_iff_one P).2 h))
+  | prime p hp =>
+    exact ⟨p, hp, hmem⟩
   | mul a b iha ihb =>
     have ha : a ≠ 0 := fun h => hn (by simp [h])
     have hb : b ≠ 0 := fun h => hn (by simp [h])
@@ -26,9 +34,10 @@ theorem exists_prime_natCast_mem {R : Type*} [CommRing R] (P : Ideal R) [hP : P.
     · exact iha ha h
     · exact ihb hb h
 
-theorem exists_prime_div_uniformiser (F' : Type) [Field F'] [NumberField F']
-    (v : HeightOneSpectrum (𝓞 F')) (π : F') (hπ : v.valuation F' π = WithZero.exp (-1 : ℤ)) :
-    ∃ ℓ : ℕ, ℓ.Prime ∧ v.valuation F' ((ℓ : F') / π) ≤ 1 := by
+theorem exists_prime_div_uniformiser
+    (F' : Type) [Field F'] [NumberField F']
+    (v : HeightOneSpectrum (𝓞 F')) (π : F') (hπ : v.valuation F' π = WithZero.exp (-1 : ℤ))
+    : ∃ ℓ : ℕ, ℓ.Prime ∧ v.valuation F' ((ℓ : F') / π) ≤ 1 := by
   have hne : Ideal.absNorm v.asIdeal ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]
     exact v.ne_bot

@@ -12,7 +12,9 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.RgEisUnif.EIdemP
 
 open scoped TensorProduct NNReal Matrix NumberField.AdeleRing
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.RgEis
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.RgEis
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -20,8 +22,8 @@ theorem eSF_eq (S : Finset (Pl F)) : eSF S = ((1, ∑ v ∈ S, singleFin v 1) : 
   simp only [eSF, LinearMap.inl_apply, LinearMap.inr_apply, Prod.mk_add_mk, add_zero, zero_add]
 
 open Classical in
-theorem evalV_sum (S : Finset (Pl F)) (u : Pl F) :
-    evalV F u (∑ v ∈ S, singleFin v 1) = if u ∈ S then 1 else 0 := by
+theorem evalV_sum (S : Finset (Pl F)) (u : Pl F)
+    : evalV F u (∑ v ∈ S, singleFin v 1) = if u ∈ S then 1 else 0 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   have hs : ∀ v : Pl F, evalV F u (singleFin v 1) = if u = v then 1 else 0 := by

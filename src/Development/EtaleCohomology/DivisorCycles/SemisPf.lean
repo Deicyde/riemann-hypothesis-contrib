@@ -62,19 +62,23 @@ theorem Semis_of : Semis := by
     induction hv using Submodule.span_induction with
     | mem w hw =>
       obtain ⟨Z, ⟨hZA, hZ⟩, v, rfl⟩ := hw
-      refine Submodule.subset_span ⟨(ρ g : Mat C N) * Z * (ρ g⁻¹ : Mat C N), ⟨hn g Z hZA, ?_⟩,
-        (ρ g : Mat C N) *ᵥ v, ?_⟩
+      refine Submodule.subset_span
+        ⟨(ρ g : Mat C N) * Z * (ρ g⁻¹ : Mat C N), ⟨hn g Z hZA, ?_⟩, (ρ g : Mat C N) *ᵥ v, ?_⟩
       · intro a ha
         have ha' : (ρ g⁻¹ : Mat C N) * a * (ρ g⁻¹⁻¹ : Mat C N) ∈ A := hn g⁻¹ a ha
         rw [inv_inv] at ha'
-        have := nil_conj (ρ g : Mat C N) ((ρ g⁻¹ : Mat C N) * a * (ρ g : Mat C N) * Z)
-          (ρ g⁻¹ : Mat C N) (inv_mul_rho ρ g) (hZ ((ρ g⁻¹ : Mat C N) * a * (ρ g : Mat C N)) ha')
+        have :=
+          nil_conj (ρ g : Mat C N) ((ρ g⁻¹ : Mat C N) * a * (ρ g : Mat C N) * Z) (ρ g⁻¹ : Mat C N)
+            (inv_mul_rho ρ g) (hZ ((ρ g⁻¹ : Mat C N) * a * (ρ g : Mat C N)) ha')
         convert this using 1
-        calc a * ((ρ g : Mat C N) * Z * (ρ g⁻¹ : Mat C N))
-            = ((ρ g : Mat C N) * (ρ g⁻¹ : Mat C N)) * a * ((ρ g : Mat C N) * Z * (ρ g⁻¹ : Mat C N)) := by
-              rw [mul_inv_rho]; simp
+        calc
+          a * ((ρ g : Mat C N) * Z * (ρ g⁻¹ : Mat C N))
+              = ((ρ g : Mat C N) * (ρ g⁻¹ : Mat C N)) * a
+                * ((ρ g : Mat C N) * Z * (ρ g⁻¹ : Mat C N)) := by
+            rw [mul_inv_rho]; simp
           _ = _ := by noncomm_ring
-      · rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, mul_assoc ((ρ g : Mat C N) * Z), inv_mul_rho, mul_one]
+      · rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, mul_assoc ((ρ g : Mat C N) * Z),
+          inv_mul_rho, mul_one]
     | zero => simp
     | add a b _ _ ha hb => rw [Matrix.mulVec_add]; exact add_mem ha hb
     | smul c a _ ha => rw [Matrix.mulVec_smul]; exact Submodule.smul_mem _ c ha
@@ -102,7 +106,8 @@ theorem Semis_of : Semis := by
     refine ⟨↑hu.unit⁻¹, ?_⟩
     rw [Ideal.mem_bot]
     have h1 : (↑hu.unit⁻¹ : A) * (1 + y * (⟨Z, hZ.1⟩ : A)) = 1 := hu.val_inv_mul
-    calc (↑hu.unit⁻¹ : A) * y * (⟨Z, hZ.1⟩ : A) + ↑hu.unit⁻¹ - 1
+    calc
+      (↑hu.unit⁻¹ : A) * y * (⟨Z, hZ.1⟩ : A) + ↑hu.unit⁻¹ - 1
         = (↑hu.unit⁻¹ : A) * (1 + y * (⟨Z, hZ.1⟩ : A)) - 1 := by noncomm_ring
       _ = 0 := by rw [h1, sub_self]
   obtain ⟨m, hm⟩ := IsArtinianRing.isNilpotent_jacobson_bot (R := A)

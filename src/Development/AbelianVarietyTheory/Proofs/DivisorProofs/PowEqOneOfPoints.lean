@@ -9,17 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.GenericPartIm
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
 
 namespace GlobalTheory.AV.TorsKer
 
-theorem pow_eq_one_of_points : ∀ (K : Type) [Field K] (A C : AbVar K) (f : A ⟶ C) (n m : ℕ), (n : K) ≠ 0 →
-    (∀ x : A.Pt, x ^ n = 1 → x ≫ f.hom = 1 → x ^ m = 1) →
-    ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ^ n = 1 → x ≫ f.hom = 1 → x ^ m = 1 := by
+theorem pow_eq_one_of_points
+    : ∀ (K : Type) [Field K] (A C : AbVar K) (f : A ⟶ C) (n m : ℕ),
+      (n : K) ≠ 0 → (∀ x : A.Pt, x ^ n = 1 → x ≫ f.hom = 1 → x ^ m = 1)
+        → ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ^ n = 1 → x ≫ f.hom = 1 → x ^ m = 1 := by
   intro K _ A C f n m hn hpt T x hx hf
   have hu : IsUnit (n : Γ(Sp K, ⊤)) := by
     have : IsUnit (n : K) := isUnit_iff_ne_zero.2 hn
@@ -64,8 +67,7 @@ theorem pow_eq_one_of_points : ∀ (K : Type) [Field K] (A C : AbVar K) (f : A �
     show pullback.fst a _ ≫ a = (toUnit H).left ≫ (η[C.X]).left
     rw [← hs]
     exact pullback.condition
-  have hsep : IsSeparated A.X.hom := by
-    have := A.ab.proper; infer_instance
+  have hsep : IsSeparated A.X.hom := by have := A.ab.proper; infer_instance
   have key : (j ≫ iZ) ^ m = 1 := by
     refine GlobalTheory.GenTorsMap.hom_ext_points hHf hHe hsep _ _ fun y => ?_
     rw [MonObj.comp_one, MonObj.comp_pow]
@@ -82,8 +84,11 @@ theorem pow_eq_one_of_points : ∀ (K : Type) [Field K] (A C : AbVar K) (f : A �
     have hT : (toUnit T).left = T.hom := by simpa using Over.w (toUnit T)
     rw [← hT, ← e, ← hx₁]
     simp [a]
-  let x₂ : T ⟶ H := Over.homMk (pullback.lift x₁.left T.hom hw)
-    (by show _ ≫ pullback.fst a _ ≫ Z.hom = _; rw [← Category.assoc, pullback.lift_fst]; exact Over.w x₁)
+  let x₂ : T ⟶ H :=
+    Over.homMk (pullback.lift x₁.left T.hom hw) (by
+      show _ ≫ pullback.fst a _ ≫ Z.hom = _
+      rw [← Category.assoc, pullback.lift_fst]
+      exact Over.w x₁)
   have hx₂ : x₂ ≫ j ≫ iZ = x := by
     rw [← hx₁, ← Category.assoc]
     congr 1

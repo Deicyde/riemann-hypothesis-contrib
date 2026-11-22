@@ -9,31 +9,36 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCom
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZJ
 
 namespace GlobalTheory
 
-theorem henselianLocalRing_valuationSubring_of_isAlgClosed {K : Type*} [Field K] [IsAlgClosed K]
-    (V : ValuationSubring K) : HenselianLocalRing V where
+theorem henselianLocalRing_valuationSubring_of_isAlgClosed
+    {K : Type*} [Field K] [IsAlgClosed K] (V : ValuationSubring K)
+    : HenselianLocalRing V where
   is_henselian f hf a₀ h₁ _ := by
     classical
     have hg : (f.map (algebraMap V K)).Monic := hf.map _
     have hsplit : (f.map (algebraMap V K)).Splits := IsAlgClosed.splits _
 
-    have hev : ((f.eval a₀ : V) : K) =
-        ((f.map (algebraMap V K)).roots.map fun r => (a₀ : K) - r).prod := by
+    have hev
+        : ((f.eval a₀ : V) : K)
+          = ((f.map (algebraMap V K)).roots.map fun r => (a₀ : K) - r).prod := by
       have h1 : ((f.eval a₀ : V) : K) = (f.map (algebraMap V K)).eval (a₀ : K) := by
         rw [Polynomial.eval_map]
         exact (Polynomial.eval₂_at_apply (algebraMap V K) a₀).symm
       rw [h1]
       exact hsplit.eval_eq_prod_roots_of_monic hg _
-    have hlt : V.valuation (((f.map (algebraMap V K)).roots.map fun r => (a₀ : K) - r).prod) < 1 := by
+    have hlt
+        : V.valuation (((f.map (algebraMap V K)).roots.map fun r => (a₀ : K) - r).prod) < 1 := by
       rw [← hev]
       exact (ValuationSubring.valuation_lt_one_iff V _).mp h₁
     rw [map_multiset_prod, Multiset.map_map] at hlt
 
-    obtain ⟨r, hr, hrlt⟩ : ∃ r ∈ (f.map (algebraMap V K)).roots, V.valuation ((a₀ : K) - r) < 1 := by
+    obtain ⟨r, hr, hrlt⟩
+        : ∃ r ∈ (f.map (algebraMap V K)).roots, V.valuation ((a₀ : K) - r) < 1 := by
       by_contra hcon
       push Not at hcon
       refine absurd hlt (not_lt.mpr (Multiset.one_le_prod_of_one_le ?_))
@@ -57,8 +62,10 @@ theorem henselianLocalRing_valuationSubring_of_isAlgClosed {K : Type*} [Field K]
       rw [h4, Valuation.map_sub_swap]
       exact hrlt
 
-theorem ZJ.exists_classical_lift_of_smooth :
-    ∀ (p : ℕ) [Fact p.Prime] (X S : Scheme.{0}) (f : X ⟶ S) [Smooth f] (y : Sp (OO p) ⟶ S) (x : Sp (kb p) ⟶ X), x ≫ f = rPt p ≫ y → ∃ b : Sp (OO p) ⟶ X, b ≫ f = y ∧ rPt p ≫ b = x := by
+theorem ZJ.exists_classical_lift_of_smooth
+    : ∀ (p : ℕ) [Fact p.Prime] (X S : Scheme.{0}) (f : X ⟶ S) [Smooth f] (y : Sp (OO p) ⟶ S)
+        (x : Sp (kb p) ⟶ X),
+      x ≫ f = rPt p ≫ y → ∃ b : Sp (OO p) ⟶ X, b ≫ f = y ∧ rPt p ≫ b = x := by
   intro p _ X S f _ y x hx
   have : HenselianLocalRing (OO p) := henselianLocalRing_valuationSubring_of_isAlgClosed _
   obtain ⟨⟨b, hb⟩, hb'⟩ := reducePoint_residue_surjective f (OO p) y ⟨x, hx⟩

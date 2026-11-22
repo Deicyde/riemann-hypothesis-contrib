@@ -14,9 +14,10 @@ variable {σ : Type} [Fintype σ]
 noncomputable def extC (𝔭 : Ideal (MvPolynomial σ ℚ)) : Ideal (MvPolynomial σ ℂ) :=
   Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭
 
-theorem comap_of_mem_minimalPrimes_extC (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
-    (Q : Ideal (MvPolynomial σ ℂ)) (hQ : Q ∈ (extC 𝔭).minimalPrimes) :
-    Q.comap (MvPolynomial.map (algebraMap ℚ ℂ)) = 𝔭 := by
+theorem comap_of_mem_minimalPrimes_extC
+    (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
+    (Q : Ideal (MvPolynomial σ ℂ)) (hQ : Q ∈ (extC 𝔭).minimalPrimes)
+    : Q.comap (MvPolynomial.map (algebraMap ℚ ℂ)) = 𝔭 := by
   let _ : Algebra (MvPolynomial σ ℚ) (MvPolynomial σ ℂ) := MvPolynomial.algebraMvPolynomial
   have hflat : Module.Flat (MvPolynomial σ ℚ) (MvPolynomial σ ℂ) :=
     BaseChangeC.flat_mvPolynomial_rat_complex
@@ -33,9 +34,10 @@ theorem comap_of_mem_minimalPrimes_extC (𝔭 : Ideal (MvPolynomial σ ℚ)) [�
   subst hEq
   exact hQ'over
 
-theorem ringKrullDim_of_mem_minimalPrimes_extC (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
-    (Q : Ideal (MvPolynomial σ ℂ)) (hQ : Q ∈ (extC 𝔭).minimalPrimes) :
-    ringKrullDim (MvPolynomial σ ℂ ⧸ Q) = ringKrullDim (MvPolynomial σ ℚ ⧸ 𝔭) := by
+theorem ringKrullDim_of_mem_minimalPrimes_extC
+    (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
+    (Q : Ideal (MvPolynomial σ ℂ)) (hQ : Q ∈ (extC 𝔭).minimalPrimes)
+    : ringKrullDim (MvPolynomial σ ℂ ⧸ Q) = ringKrullDim (MvPolynomial σ ℚ ⧸ 𝔭) := by
   have hQp : Q.IsPrime := hQ.1.1
   have hh := BaseChangeC.height_eq_of_mem_minimalPrimes_map 𝔭 Q hQ
   have h1 := BaseChangeC.height_add_ringKrullDim_quotient_fintype ℂ Q

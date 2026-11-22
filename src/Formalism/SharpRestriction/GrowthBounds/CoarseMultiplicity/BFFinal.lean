@@ -11,10 +11,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.ColumnSystems.Pf
 
-theorem symbol_form_of_block_parts {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D) (hK : RestKapNum) (hO : RestOPlus) : RestForm :=
+theorem symbol_form_of_block_parts
+    {D : Formalism.BasicNotions.D7}
+    (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D)
+    (hK : RestKapNum) (hO : RestOPlus)
+    : RestForm :=
   symbol_form_of_orthogonality (restBlockForm_of h52 hK) orthAt hO
 
-theorem restKapNum_of {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D) (hO : RestOPlus) : RestKapNum := by
+theorem restKapNum_of
+    {D : Formalism.BasicNotions.D7}
+    (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D)
+    (hO : RestOPlus)
+    : RestKapNum := by
   unfold RestKapNum TransportedAlt
   unfold RestOPlus TransportedAlt at hO
   intro Cc hCc
@@ -27,7 +35,11 @@ theorem restKapNum_of {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotio
   have hOP := h2 CYb Cde Ck CD Cb ha hb hc hd he
   exact kapNumAt_of h52 (trueDegAt_of hOP) (coarseMultAt_of hOP)
 
-theorem restForm_of_oplus {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D) (hO : RestOPlus) : RestForm :=
+theorem restForm_of_oplus
+    {D : Formalism.BasicNotions.D7}
+    (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D)
+    (hO : RestOPlus)
+    : RestForm :=
   symbol_form_of_block_parts h52 (restKapNum_of h52 hO) hO
 
 end Formalism.MainNotions.ColumnSystems.Pf

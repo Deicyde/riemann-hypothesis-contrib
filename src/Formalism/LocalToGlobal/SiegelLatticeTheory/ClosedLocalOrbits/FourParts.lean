@@ -12,7 +12,8 @@ open scoped Classical
 
 namespace Formalism.L2.SG.FourParts
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef
 
 section Gen
 
@@ -27,8 +28,7 @@ def IsIdF (Λ : Submodule (𝓞 E) S.V) {T T' : E} (F : LFlag S r T) (F' : LFlag
 theorem e_mem_Xflag {T : E} (F : LFlag S r T) (a : Fin r) : F.fl.e a ∈ Xflag F (a.val + 1) :=
   Submodule.subset_span ⟨a, by simp, rfl⟩
 
-theorem Xflag_zero {T : E} (F : LFlag S r T) : Xflag F 0 = ⊥ := by
-  simp [Xflag, FlagG.Xa]
+theorem Xflag_zero {T : E} (F : LFlag S r T) : Xflag F 0 = ⊥ := by simp [Xflag, FlagG.Xa]
 
 theorem Xflag_r {T : E} (F : LFlag S r T) : F.fl.Xa r = Xsp F := by
   simp only [FlagG.Xa, Xsp, FlagG.X]
@@ -47,8 +47,9 @@ theorem z_mem_orth {T : E} (F : LFlag S r T) : F.fl.z ∈ orth S (Xsp F) := by
   | add y w _ _ hy hw => simp [hy, hw]
   | smul c y _ hy => simp [hy]
 
-theorem inSF_of_isIdF (Λ : Submodule (𝓞 E) S.V) {T T' : E} {F : LFlag S r T} {F' : LFlag S r T'}
-    (h : IsIdF Λ F F') : InSF F F' := by
+theorem inSF_of_isIdF
+    (Λ : Submodule (𝓞 E) S.V) {T T' : E} {F : LFlag S r T} {F' : LFlag S r T'} (h : IsIdF Λ F F')
+    : InSF F F' := by
   obtain ⟨n, hn, he, hz⟩ := h
   refine ⟨fun a => ?_, ?_⟩
   · rw [← he a]
@@ -57,8 +58,9 @@ theorem inSF_of_isIdF (Λ : Submodule (𝓞 E) S.V) {T T' : E} {F : LFlag S r T}
     rw [e]
     exact Submodule.sub_mem _ (hn.2.2 _ (z_mem_orth F)) hz
 
-theorem gval_eq_zero_of_inSF {T T' : E} (hT : star T = T) {F : LFlag S r T} {F' : LFlag S r T'}
-    (h : InSF F F') : Gval F F' = 0 := by
+theorem gval_eq_zero_of_inSF
+    {T T' : E} (hT : star T = T) {F : LFlag S r T} {F' : LFlag S r T'} (h : InSF F F')
+    : Gval F F' = 0 := by
   rcases Nat.eq_zero_or_pos r with hr | hr
   · subst hr
     have hz : F'.fl.z = F.fl.z := by
@@ -80,8 +82,7 @@ theorem gval_eq_zero_of_inSF {T T' : E} (hT : star T = T) {F : LFlag S r T} {F' 
       simp only [Nat.le_refl, dif_pos, Matrix.det_unique]
       show S.hT (F.fl.fvec _) (F'.fl.fvec _) = -T'
       rw [hf F, hf F', hz, F.fl.z_norm]
-    have hD0 : Dl F.fl F'.fl 0 = 1 := by
-      simp [Dl, leadMinorE]
+    have hD0 : Dl F.fl F'.fl 0 = 1 := by simp [Dl, leadMinorE]
     simp only [Gval, Gflag, zero_add, hD1, hD0]
     simp [star_neg, hT]
   · have h0 : F'.fl.e ⟨0, hr⟩ = F.fl.e ⟨0, hr⟩ := by
@@ -137,8 +138,9 @@ theorem isInS_mk (hI : InSFun Λ F P) (x : Carrier P) : IsInS Λ F P (mk Λ F P 
   · intro h
     exact ⟨x.1, rep_mk x, h⟩
 
-theorem gt_eq_zero_of_isInS (hG : GFun Λ F P) (hT : star T = T) {t : TermQ Λ F P} (h : IsInS Λ F P t) :
-    Gt Λ F P t = 0 := by
+theorem gt_eq_zero_of_isInS
+    (hG : GFun Λ F P) (hT : star T = T) {t : TermQ Λ F P} (h : IsInS Λ F P t)
+    : Gt Λ F P t = 0 := by
   obtain ⟨F', ⟨hP, hmk⟩, hin⟩ := h
   subst hmk
   rw [Gt_mk hG]
@@ -150,21 +152,24 @@ section D7
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+variable
+  {D : D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 def termInS (t : Term D u u' F0 what₂) : Prop := IsInS _ _ _ t.cls
 
 def termIsId (t : Term D u u' F0 what₂) : Prop := IsIdT _ _ _ t.cls
 
-theorem termInS_of_termIsId {t : Term D u u' F0 what₂} (h : termIsId t) : termInS t := isInS_of_isIdT h
+theorem termInS_of_termIsId {t : Term D u u' F0 what₂} (h : termIsId t) : termInS t :=
+  isInS_of_isIdT h
 
 variable (D u u' F0 what₂)
 
 variable {D u u' F0 what₂}
 
-theorem G_eq_zero_of_termInS {t : Term D u u' F0 what₂} (hG : GFun t.lam (lf D F0) (PD D t.lam (lf D F0) u'))
-    (h : termInS t) : t.G = 0 := by
+theorem G_eq_zero_of_termInS
+    {t : Term D u u' F0 what₂} (hG : GFun t.lam (lf D F0) (PD D t.lam (lf D F0) u')) (h : termInS t)
+    : t.G = 0 := by
   refine gt_eq_zero_of_isInS (T := ((Tu D u : ℕ) : D.host.E)) hG ?_ h
   exact star_natCast _
 

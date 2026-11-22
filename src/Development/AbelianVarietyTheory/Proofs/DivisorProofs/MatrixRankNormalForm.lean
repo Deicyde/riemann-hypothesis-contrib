@@ -12,9 +12,10 @@ open ValuativeRel Matrix
 
 namespace GlobalTheory
 
-theorem rank_frame_exists :
-    ∀ (K : Type) [Field K] (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
-      (X : Matrix A D K), ∃ (H : Matrix (Fin X.rank) A K) (Q : Matrix D (Fin X.rank) K),
+theorem rank_frame_exists
+    : ∀ (K : Type) [Field K] (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
+        (X : Matrix A D K),
+      ∃ (H : Matrix (Fin X.rank) A K) (Q : Matrix D (Fin X.rank) K),
         H * X * Q = 1 := by
   intro K _ A D _ _ _ _ X
   classical
@@ -28,14 +29,12 @@ theorem rank_frame_exists :
   refine ⟨LinearMap.toMatrix' g, Matrix.of fun d i => q i d, ?_⟩
   apply Matrix.ext_of_mulVec_single
   intro j
-  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.mulVec_single_one,
-    Matrix.one_mulVec]
-  have hcol : (Matrix.of fun d i => q i d).col j = q j := by
-    ext d; simp [Matrix.col]
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.mulVec_single_one, Matrix.one_mulVec]
+  have hcol : (Matrix.of fun d i => q i d).col j = q j := by ext d; simp [Matrix.col]
   rw [hcol, hq j, LinearMap.toMatrix'_mulVec]
   have := congrArg (fun f => f (b j)) hg
-  simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype,
-    LinearEquiv.coe_coe] at this
+  simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype, LinearEquiv.coe_coe]
+    at this
   rw [this]
   ext k
   rw [Module.Basis.equivFun_self]

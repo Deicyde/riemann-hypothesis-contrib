@@ -8,8 +8,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieMod
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Matrix GlobalTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
@@ -19,8 +21,10 @@ namespace PositivityTheory.Xgf.TransportLieModel
 
 variable {S : Scheme.{0}} {G : Over S} [GrpObj G] {R : Type} [CommRing R] {x : Sp R ⟶ S}
 
-def transport {E E' : Type} [AddCommGroup E] [Module R E] [AddCommGroup E'] [Module R E'] (M : LieModel G x E)
-    (e : E ≃ₗ[R] E') : LieModel G x E' where
+def transport
+    {E E' : Type} [AddCommGroup E] [Module R E] [AddCommGroup E'] [Module R E']
+    (M : LieModel G x E) (e : E ≃ₗ[R] E')
+    : LieModel G x E' where
   pt v := M.pt (e.symm v)
   tan v := M.tan _
   inj a b h := e.symm.injective (M.inj h)
@@ -30,11 +34,13 @@ def transport {E E' : Type} [AddCommGroup E] [Module R E] [AddCommGroup E'] [Mod
   add a b := by rw [map_add (f := _), M.add]
   smul c a := by rw [map_smul]; exact M.smul c _
 
-theorem isTanAt_comp {v : epsAt x ⟶ G} (hv : IsTanAt G x v) (f : G ⟶ G) [IsMonHom f] : IsTanAt G x (v ≫ f) := by
+theorem isTanAt_comp {v : epsAt x ⟶ G} (hv : IsTanAt G x v) (f : G ⟶ G) [IsMonHom f]
+    : IsTanAt G x (v ≫ f) := by
   unfold IsTanAt at hv ⊢
   rw [Over.comp_left, ← Category.assoc, hv, ← Over.comp_left, MonObj.one_comp]
 
-theorem mul_comp' {T : Over S} (u v : T ⟶ G) (f : G ⟶ G) [IsMonHom f] : (u * v) ≫ f = (u ≫ f) * (v ≫ f) := by
+theorem mul_comp' {T : Over S} (u v : T ⟶ G) (f : G ⟶ G) [IsMonHom f]
+    : (u * v) ≫ f = (u ≫ f) * (v ≫ f) := by
   simp [Hom.mul_def]
 
 variable {E : Type} [AddCommGroup E] [Module R E]
@@ -42,16 +48,20 @@ variable {E : Type} [AddCommGroup E] [Module R E]
 def endo (M : LieModel G x E) (f : G ⟶ G) [IsMonHom f] (e : E) : E :=
   Classical.choose (M.onto (M.pt e ≫ f) (isTanAt_comp (M.tan e) f))
 
-theorem endo_spec (M : LieModel G x E) (f : G ⟶ G) [IsMonHom f] (e : E) : M.pt (endo M f e) = M.pt e ≫ f :=
+theorem endo_spec (M : LieModel G x E) (f : G ⟶ G) [IsMonHom f] (e : E)
+    : M.pt (endo M f e) = M.pt e ≫ f :=
   Classical.choose_spec (M.onto (M.pt e ≫ f) (isTanAt_comp (M.tan e) f))
 
 def diff (M : LieModel G x E) (f : G ⟶ G) [IsMonHom f] : E →ₗ[R] E where
   toFun := endo M f
   map_add' a b := M.inj (by rw [endo_spec, M.add, M.add, endo_spec, endo_spec, mul_comp'])
-  map_smul' c a := M.inj (by
-    rw [endo_spec, RingHom.id_apply, LieModel.pt_smul, LieModel.pt_smul, endo_spec, Category.assoc])
+  map_smul' c a :=
+    M.inj (by
+      rw [endo_spec, RingHom.id_apply, LieModel.pt_smul, LieModel.pt_smul, endo_spec,
+        Category.assoc])
 
-theorem diff_spec (M : LieModel G x E) (f : G ⟶ G) [IsMonHom f] (e : E) : M.pt (diff M f e) = M.pt e ≫ f :=
+theorem diff_spec (M : LieModel G x E) (f : G ⟶ G) [IsMonHom f] (e : E)
+    : M.pt (diff M f e) = M.pt e ≫ f :=
   endo_spec M f e
 
 def rho {O : Type} [CommRing O] (act : OAct O G) (M : LieModel G x E) : O →+* Module.End R E where
@@ -65,7 +75,9 @@ def rho {O : Type} [CommRing O] (act : OAct O G) (M : LieModel G x E) : O →+* 
   map_mul' a b := by
     ext e
     apply M.inj
-    letI := act.hom a; letI := act.hom b; letI := act.hom (a * b)
+    letI := act.hom a
+    letI := act.hom b
+    letI := act.hom (a * b)
     show M.pt (diff M (act.act (a * b)) e) = M.pt (diff M (act.act a) (diff M (act.act b) e))
     rw [diff_spec, diff_spec, diff_spec, mul_comm, act.mul, Category.assoc]
   map_zero' := by
@@ -77,23 +89,37 @@ def rho {O : Type} [CommRing O] (act : OAct O G) (M : LieModel G x E) : O →+* 
       have := act.add 0 0
       rw [add_zero] at this
       exact mul_eq_left.1 this.symm
-    rw [diff_spec, LieModel.pt_zero, h0, Hom.one_def, Hom.one_def, ← Category.assoc, toUnit_unique (M.pt e ≫ toUnit G)]
+    rw [diff_spec, LieModel.pt_zero, h0, Hom.one_def, Hom.one_def, ← Category.assoc,
+      toUnit_unique (M.pt e ≫ toUnit G)]
   map_add' a b := by
     ext e
     apply M.inj
-    letI := act.hom a; letI := act.hom b; letI := act.hom (a + b)
+    letI := act.hom a
+    letI := act.hom b
+    letI := act.hom (a + b)
     show M.pt (diff M (act.act (a + b)) e) = M.pt (diff M (act.act a) e + diff M (act.act b) e)
     rw [diff_spec, M.add, diff_spec, diff_spec, act.add, comp_mul]
 
-theorem rho_isActOf {O : Type} [CommRing O] (act : OAct O G) (M : LieModel G x E) : M.IsActOf act.act (rho act M) :=
-  fun a e => by letI := act.hom a; exact diff_spec M (act.act a) e
+theorem rho_isActOf {O : Type} [CommRing O] (act : OAct O G) (M : LieModel G x E)
+    : M.IsActOf act.act (rho act M) := fun a e => by
+  letI := act.hom a; exact diff_spec M (act.act a) e
 
 end PositivityTheory.Xgf.TransportLieModel
 
 namespace PositivityTheory.Xgf
 
 open TransportLieModel in
-theorem lie_model_action_base_change : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (S : Scheme.{0}) (t : SAB H S) (R : Type) [CommRing R] [IsLocalRing R] (x : Sp R ⟶ S), ∃ (n : ℕ) (M : LieModel t.G x (Fin n → R)) (ρ : 𝓞 E →+* Module.End R (Fin n → R)), M.IsActOf t.act.act ρ ∧ ∀ (R' : Type) [CommRing R'] (f : R →+* R') (x' : Sp R' ⟶ S), x' = spMap f ≫ x → ∃ (M' : LieModel t.G x' (Fin n → R')) (ρ' : 𝓞 E →+* Module.End R' (Fin n → R')), M'.IsActOf t.act.act ρ' ∧ (∀ u, (M'.pt (f ∘ u)).left = spMap (dualMap f) ≫ (M.pt u).left) ∧ ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u := by
+theorem lie_model_action_base_change
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (S : Scheme.{0})
+        (t : SAB H S) (R : Type) [CommRing R] [IsLocalRing R] (x : Sp R ⟶ S),
+      ∃ (n : ℕ) (M : LieModel t.G x (Fin n → R)) (ρ : 𝓞 E →+* Module.End R (Fin n → R)),
+        M.IsActOf t.act.act ρ
+          ∧ ∀ (R' : Type) [CommRing R'] (f : R →+* R') (x' : Sp R' ⟶ S),
+            x' = spMap f ≫ x
+              → ∃ (M' : LieModel t.G x' (Fin n → R')) (ρ' : 𝓞 E →+* Module.End R' (Fin n → R')),
+                M'.IsActOf t.act.act ρ'
+                  ∧ (∀ u, (M'.pt (f ∘ u)).left = spMap (dualMap f) ≫ (M.pt u).left)
+                  ∧ ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u := by
   intro E _ _ _ H S t R _ _ x
   letI := t.grp
   haveI := t.comm
@@ -112,13 +138,14 @@ theorem lie_model_action_base_change : ∀ (E : Type) [Field E] [NumberField E] 
   obtain ⟨T', _, _, _, _, M1, j, hj, hbc⟩ := FlagFib.lieModel_liftBaseChange S t.G R R' x L M0
   let b' := hbc.basis b
   let M' : LieModel t.G (spMap f ≫ x) (Fin (Module.finrank R L) → R') := transport M1 b'.equivFun
-  have key : ∀ u : Fin (Module.finrank R L) → R, b'.equivFun.symm (f ∘ u) = j (b.equivFun.symm u) := by
+  have key
+      : ∀ u : Fin (Module.finrank R L) → R, b'.equivFun.symm (f ∘ u) = j (b.equivFun.symm u) := by
     intro u
     apply b'.equivFun.injective
     rw [LinearEquiv.apply_symm_apply]
     funext i
-    rw [Module.Basis.equivFun_apply, IsBaseChange.basis_repr_comp_apply, ← Module.Basis.equivFun_apply,
-      LinearEquiv.apply_symm_apply]
+    rw [Module.Basis.equivFun_apply, IsBaseChange.basis_repr_comp_apply,
+      ← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
     rfl
   have hpt : ∀ u, M'.pt (f ∘ u) = M1.pt (j (b.equivFun.symm u)) := by
     intro u

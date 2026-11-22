@@ -14,21 +14,29 @@ namespace PI.OmVe
 
 open PI.VolStabSW Matrix
 
-theorem keySplit (x : ℝ) (hx : x ≠ 0) (n : ℕ) :
-    (x ^ 2) ^ (n + 1) - (2 * x ^ (n + 1) - 1) - (x - 1) * (x ^ (2 * n + 1) * (1 - x ^ (-((n + 1 : ℕ) : ℤ)))) =
-      x ^ (2 * n + 1) * ((1 - x ^ (-(n : ℤ))) * (1 - x ^ (-((n + 1 : ℕ) : ℤ)))) := by
+theorem keySplit (x : ℝ) (hx : x ≠ 0) (n : ℕ)
+    : (x ^ 2) ^ (n + 1) - (2 * x ^ (n + 1) - 1)
+        - (x - 1) * (x ^ (2 * n + 1) * (1 - x ^ (-((n + 1 : ℕ) : ℤ))))
+      = x ^ (2 * n + 1) * ((1 - x ^ (-(n : ℤ))) * (1 - x ^ (-((n + 1 : ℕ) : ℤ)))) := by
   rw [_root_.zpow_neg, _root_.zpow_neg, zpow_natCast, zpow_natCast]
   have hxn : x ^ n ≠ 0 := pow_ne_zero _ hx
   have hxn1 : x ^ (n + 1) ≠ 0 := pow_ne_zero _ hx
   field_simp
   ring
 
-theorem dcount_split {k : Type} [Field k] [Finite k] {M : ℕ} (J : Matrix (Fin M) (Fin M) (k × k)) {a' : ℕ}
-    (haM : a' ≤ M) (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det)
-    (Y : Fin a' → Fin M → k × k) (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0) :
-    Nat.card {x : Fin M → k × k // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0) ∧
-      ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0 ∧ ¬ ∀ c : k × k, c • x = 0 → c = 0} + 1 =
-      2 * Nat.card k ^ (M - a') := by
+theorem dcount_split
+    {k : Type} [Field k] [Finite k]
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) (k × k))
+    {a' : ℕ} (haM : a' ≤ M) (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det)
+    (Y : Fin a' → Fin M → k × k)
+    (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0)
+    : Nat.card
+          {x : Fin M → k × k
+            // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0)
+              ∧ ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0
+              ∧ ¬ ∀ c : k × k, c • x = 0 → c = 0}
+        + 1
+      = 2 * Nat.card k ^ (M - a') := by
   classical
   have := Fintype.ofFinite k
   have hk0 : 0 < Nat.card k := Nat.card_pos
@@ -44,10 +52,12 @@ theorem dcount_split {k : Type} [Field k] [Finite k] {M : ℕ} (J : Matrix (Fin 
     (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0) ∧ ∀ l, (x l).2 = 0)
   set s2 := Finset.univ.filter (fun x : Fin M → k × k =>
     (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0) ∧ ∀ l, (x l).1 = 0)
-  have hs : Finset.univ.filter (fun x : Fin M → k × k =>
-      (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0) ∧
-      ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0 ∧ ¬ ∀ c : k × k, c • x = 0 → c = 0) =
-      s1 ∪ s2 := by
+  have hs
+      : Finset.univ.filter (fun x : Fin M → k × k =>
+          (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0)
+            ∧ ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0
+            ∧ ¬ ∀ c : k × k, c • x = 0 → c = 0)
+        = s1 ∪ s2 := by
     ext x
     simp only [s1, s2, Finset.mem_filter, Finset.mem_union, Finset.mem_univ, true_and]
     rw [notFree_iff]
@@ -64,9 +74,13 @@ theorem dcount_split {k : Type} [Field k] [Finite k] {M : ℕ} (J : Matrix (Fin 
       Finset.mem_singleton]
     constructor
     · rintro ⟨⟨_, h2⟩, ⟨_, h1⟩⟩
-      funext l; exact Prod.ext (h1 l) (h2 l)
+      funext l
+      exact Prod.ext (h1 l) (h2 l)
     · rintro rfl
-      exact ⟨⟨fun j => ffH_zero_right _ _ _, fun l => rfl⟩, ⟨fun j => ffH_zero_right _ _ _, fun l => rfl⟩⟩
+      exact ⟨
+        ⟨fun j => ffH_zero_right _ _ _, fun l => rfl⟩,
+        ⟨fun j => ffH_zero_right _ _ _, fun l => rfl⟩
+      ⟩
   have hu2 := Finset.card_union_add_card_inter s1 s2
   rw [hi, Finset.card_singleton, c1, c2] at hu2
   rw [hs, hu2]

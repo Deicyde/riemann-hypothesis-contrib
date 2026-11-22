@@ -10,34 +10,45 @@ noncomputable section
 
 namespace PI.OmVd
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory PI.OmLocU
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory PI.OmLocU
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
 
-def clsP (a : ℕ) (ϖ : Fv F v) (T : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) :
-    Set (lamA v Λ a ⧸ (lamP v Λ a ϖ).addSubgroupOf (lamA v Λ a)) :=
-  QuotientAddGroup.mk '' {x : lamA v Λ a | (x : TupV (E := E) v n a) ∈ PrimT v Λ a ∧
-    (x : TupV (E := E) v n a) ∈ NearT v σ J ϖ T}
+def clsP (a : ℕ) (ϖ : Fv F v) (T : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E))
+    : Set (lamA v Λ a ⧸ (lamP v Λ a ϖ).addSubgroupOf (lamA v Λ a)) :=
+  QuotientAddGroup.mk
+    '' {x : lamA v Λ a | (x : TupV (E := E) v n a) ∈ PrimT v Λ a ∧
+      (x : TupV (E := E) v n a) ∈ NearT v σ J ϖ T}
 
 def MeasP (a : ℕ) (Y : TupV (E := E) v n a) : Prop :=
-  GoodP σ J ψ v Λ a Y → ∀ ϖ : Fv F v, IsUnif v ϖ →
-    MeasurableAdd (TupV (E := E) v n a) ∧ MeasurableSet (LamT v Λ a) ∧
-      MeasurableSet (lamP v Λ a ϖ : Set (TupV (E := E) v n a))
+  GoodP σ J ψ v Λ a Y
+    → ∀ ϖ : Fv F v,
+      IsUnif v ϖ
+        → MeasurableAdd (TupV (E := E) v n a) ∧ MeasurableSet (LamT v Λ a)
+          ∧ MeasurableSet (lamP v Λ a ϖ : Set (TupV (E := E) v n a))
 
 def IdxP (a : ℕ) (Y : TupV (E := E) v n a) : Prop :=
-  GoodP σ J ψ v Λ a Y → ∀ ϖ : Fv F v, IsUnif v ϖ →
-    (lamP v Λ a ϖ).relIndex (lamA v Λ a) = (Ideal.absNorm v.asIdeal) ^ (2 * n * a)
+  GoodP σ J ψ v Λ a Y
+    → ∀ ϖ : Fv F v,
+      IsUnif v ϖ → (lamP v Λ a ϖ).relIndex (lamA v Λ a) = (Ideal.absNorm v.asIdeal) ^ (2 * n * a)
 
 def ClsP (a : ℕ) (Y : TupV (E := E) v n a) : Prop :=
-  GoodP σ J ψ v Λ a Y → ∀ ϖ : Fv F v, IsUnif v ϖ →
-    (Nat.card (clsP σ J v Λ a ϖ (gramR (Fv F v) σ J Y)) : ℝ) =
-      qv v ^ (2 * n * a - a ^ 2) * prodEtaB (E := E) v n a
+  GoodP σ J ψ v Λ a Y
+    → ∀ ϖ : Fv F v,
+      IsUnif v ϖ
+        → (Nat.card (clsP σ J v Λ a ϖ (gramR (Fv F v) σ J Y)) : ℝ)
+          = qv v ^ (2 * n * a - a ^ 2) * prodEtaB (E := E) v n a
 
-theorem countP_of (a : ℕ) (Y : TupV (E := E) v n a) (hM : MeasP σ J ψ v Λ a Y)
-    (hI : IdxP σ J ψ v Λ a Y) (hC : ClsP σ J ψ v Λ a Y) (hPC : PrimCos σ J ψ v Λ a) : CountP σ J ψ v Λ a Y := by
+theorem countP_of
+    (a : ℕ) (Y : TupV (E := E) v n a) (hM : MeasP σ J ψ v Λ a Y) (hI : IdxP σ J ψ v Λ a Y)
+    (hC : ClsP σ J ψ v Λ a Y) (hPC : PrimCos σ J ψ v Λ a)
+    : CountP σ J ψ v Λ a Y := by
   intro hG hμ ϖ hϖ
   obtain ⟨hMA, hL, hP⟩ := hM hG ϖ hϖ
   have hSD : IsSDLoc σ J v Λ := hG.2.2.1
@@ -73,21 +84,22 @@ theorem countP_of (a : ℕ) (Y : TupV (E := E) v n a) (hM : MeasP σ J ψ v Λ a
     intro h0
     have : qv v = 0 := by simp [qv, h0]
     linarith
-  have hfin : (lamP v Λ a ϖ).relIndex (lamA v Λ a) ≠ 0 := by
-    rw [hIdx]; exact pow_ne_zero _ hN0
+  have hfin : (lamP v Λ a ϖ).relIndex (lamA v Λ a) ≠ 0 := by rw [hIdx]; exact pow_ne_zero _ hN0
   have eL := PI.VolStabSW.measure_eq_relIndex_mul μ (lamP v Λ a ϖ) (lamA v Λ a) hPL hL hP hfin
-  have eS := measure_image_cosets μ (lamP v Λ a ϖ) (lamA v Λ a) hPL hP hfin
-    {x : lamA v Λ a | (x : TupV (E := E) v n a) ∈ PrimT v Λ a ∧
-      (x : TupV (E := E) v n a) ∈ NearT v σ J ϖ (gramR (Fv F v) σ J Y)}
-    (by
-      rintro x hx y ⟨Z, hZ, hZe⟩
-      simp only [Set.mem_setOf_eq]
-      rw [AddSubgroup.coe_add, ← hZe]
-      exact ⟨hcos _ hx.1 Z hZ, nearT_add σ J v Λ hSD hϖ _ _ _ x.2 hZ hx.2⟩)
-  have himg : ((↑) : lamA v Λ a → TupV (E := E) v n a) ''
+  have eS :=
+    measure_image_cosets μ (lamP v Λ a ϖ) (lamA v Λ a) hPL hP hfin
       {x : lamA v Λ a | (x : TupV (E := E) v n a) ∈ PrimT v Λ a ∧
-        (x : TupV (E := E) v n a) ∈ NearT v σ J ϖ (gramR (Fv F v) σ J Y)} =
-      PrimT v Λ a ∩ NearT v σ J ϖ (gramR (Fv F v) σ J Y) := by
+        (x : TupV (E := E) v n a) ∈ NearT v σ J ϖ (gramR (Fv F v) σ J Y)}
+      (by
+        rintro x hx y ⟨Z, hZ, hZe⟩
+        simp only [Set.mem_setOf_eq]
+        rw [AddSubgroup.coe_add, ← hZe]
+        exact ⟨hcos _ hx.1 Z hZ, nearT_add σ J v Λ hSD hϖ _ _ _ x.2 hZ hx.2⟩)
+  have himg
+      : ((↑) : lamA v Λ a → TupV (E := E) v n a)
+          '' {x : lamA v Λ a | (x : TupV (E := E) v n a) ∈ PrimT v Λ a ∧
+               (x : TupV (E := E) v n a) ∈ NearT v σ J ϖ (gramR (Fv F v) σ J Y)}
+        = PrimT v Λ a ∩ NearT v σ J ϖ (gramR (Fv F v) σ J Y) := by
     ext X
     constructor
     · rintro ⟨x, hx, rfl⟩
@@ -95,8 +107,10 @@ theorem countP_of (a : ℕ) (Y : TupV (E := E) v n a) (hM : MeasP σ J ψ v Λ a
     · rintro ⟨h1, h2⟩
       exact ⟨⟨X, h1.1⟩, ⟨h1, h2⟩, rfl⟩
   rw [himg] at eS
-  have eL' : μ (LamT v Λ a) = (((lamP v Λ a ϖ).relIndex (lamA v Λ a) : ℕ) : ENNReal) *
-      μ (lamP v Λ a ϖ) := eL
+  have eL'
+      : μ (LamT v Λ a)
+        = (((lamP v Λ a ϖ).relIndex (lamA v Λ a) : ℕ) : ENNReal) * μ (lamP v Λ a ϖ) :=
+    eL
   rw [eS, eL', ← mul_assoc]
   congr 1
   have hcard := hC hG ϖ hϖ
@@ -119,13 +133,16 @@ theorem countP_of (a : ℕ) (Y : TupV (E := E) v n a) (hM : MeasP σ J ψ v Λ a
       refine Finset.prod_nonneg fun j _ => ?_
       have hq1 : (1 : ℝ) ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
         exact_mod_cast Nat.one_le_iff_ne_zero.2 hN0
-      have habs : |((etaV (E := E) v : ℤ) : ℝ)| = 1 := by
-        unfold etaV; split_ifs <;> norm_num
-      have h1 : ((etaV (E := E) v : ℤ) : ℝ) ^ j * ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-(j : ℤ)) ≤ 1 := by
-        calc _ ≤ |((etaV (E := E) v : ℤ) : ℝ) ^ j * ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-(j : ℤ))| :=
-              le_abs_self _
+      have habs : |((etaV (E := E) v : ℤ) : ℝ)| = 1 := by unfold etaV; split_ifs <;> norm_num
+      have h1
+          : ((etaV (E := E) v : ℤ) : ℝ) ^ j * ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-(j : ℤ))
+            ≤ 1 := by
+        calc
+          _ ≤ |((etaV (E := E) v : ℤ) : ℝ) ^ j * ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-(j : ℤ))| :=
+            le_abs_self _
           _ = ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-(j : ℤ)) := by
-              rw [abs_mul, abs_pow, habs, one_pow, one_mul, abs_of_nonneg (zpow_nonneg (by linarith) _)]
+            rw [abs_mul, abs_pow, habs, one_pow, one_mul,
+              abs_of_nonneg (zpow_nonneg (by linarith) _)]
           _ ≤ 1 := zpow_le_one_of_nonpos₀ hq1 (by omega)
       linarith
     exact mul_nonneg (zpow_nonneg hq.le _) hP0

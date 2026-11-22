@@ -7,6 +7,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbit
 
 namespace Formalism.L2.SG.OwnFacts
 
-instance factGaugeVol : Fact PI.AprimeInfW.GaugeVolUD := ⟨fun k => Formalism.L2.SG.Pf.GV.gaugeVolU k⟩
+instance factGaugeVol : Fact PI.AprimeInfW.GaugeVolUD :=
+  ⟨fun k => Formalism.L2.SG.Pf.GV.gaugeVolU k⟩
 
 end Formalism.L2.SG.OwnFacts

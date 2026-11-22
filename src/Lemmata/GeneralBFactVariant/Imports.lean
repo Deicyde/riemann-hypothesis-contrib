@@ -6,16 +6,15 @@ public import Mathlib
 
 namespace Bl.general_b_fact_variant
 
-theorem goal1 :
-  ∀ {n : Nat} {N N' B B' : Matrix.{0, 0, 0} (Fin n) (Fin n) Complex},
-  Matrix.BlockTriangular.{0, 0, 0} N (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0}) →
-    Matrix.BlockTriangular.{0, 0, 0} N' (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0}) →
-      (∀ (i : Fin n), Eq.{1} (N i i) 1) →
-        (∀ (i : Fin n), Eq.{1} (N' i i) 1) →
-          Matrix.BlockTriangular.{0, 0, 0} B id.{1} →
-            Matrix.BlockTriangular.{0, 0, 0} B' id.{1} →
-              Ne.{1} (Matrix.det.{0, 0} B) 0 →
-                Eq.{1} (HMul.hMul.{0, 0, 0} N B) (HMul.hMul.{0, 0, 0} N' B') → Eq.{1} N N' := by
+theorem goal1
+    : ∀ {n : Nat} {N N' B B' : Matrix.{0, 0, 0} (Fin n) (Fin n) Complex},
+      Matrix.BlockTriangular.{0, 0, 0} N (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0})
+        → Matrix.BlockTriangular.{0, 0, 0} N' (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0})
+        → (∀ (i : Fin n), Eq.{1} (N i i) 1) → (∀ (i : Fin n), Eq.{1} (N' i i) 1)
+        → Matrix.BlockTriangular.{0, 0, 0} B id.{1} → Matrix.BlockTriangular.{0, 0, 0} B' id.{1}
+        → Ne.{1} (Matrix.det.{0, 0} B) 0
+        → Eq.{1} (HMul.hMul.{0, 0, 0} N B) (HMul.hMul.{0, 0, 0} N' B')
+        → Eq.{1} N N' := by
   intro n N N' B B' h1 h2 h3 h4 h5 h6 h7 h8
   classical
   have hN' : N'.det = 1 := by
@@ -30,7 +29,8 @@ theorem goal1 :
     (Matrix.blockTriangular_inv_of_blockTriangular h2).mul h1
   have hMe : M = B' * B⁻¹ := by
     rw [hM, ← Matrix.mul_one (N'⁻¹ * N), ← Matrix.mul_nonsing_inv B hB, ← Matrix.mul_assoc,
-      Matrix.mul_assoc N'⁻¹ N B, h8, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul N' hu, Matrix.one_mul]
+      Matrix.mul_assoc N'⁻¹ N B, h8, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul N' hu,
+      Matrix.one_mul]
   have hMu : M.BlockTriangular id := by
     rw [hMe]
     exact h6.mul (Matrix.blockTriangular_inv_of_blockTriangular h5)

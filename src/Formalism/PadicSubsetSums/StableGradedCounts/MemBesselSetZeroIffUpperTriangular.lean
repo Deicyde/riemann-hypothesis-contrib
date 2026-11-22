@@ -14,9 +14,8 @@ section GelfandTrick
 variable {G : Type} [Group G] [Fintype G]
 
 open Classical in
-theorem twistedIdem_mul_of (J : Subgroup G) (χ : J →* ℂˣ)
-    (v : J) : twistedIdem J χ * MonoidAlgebra.of ℂ G (v : G)
-      = ((χ v : ℂˣ) : ℂ) • twistedIdem J χ := by
+theorem twistedIdem_mul_of (J : Subgroup G) (χ : J →* ℂˣ) (v : J)
+    : twistedIdem J χ * MonoidAlgebra.of ℂ G (v : G) = ((χ v : ℂˣ) : ℂ) • twistedIdem J χ := by
   rw [twistedIdem_def, Finset.sum_mul, Finset.smul_sum]
   refine Fintype.sum_equiv (Equiv.mulRight v) _ _ (fun u => ?_)
   simp only [Equiv.coe_mulRight, smul_mul_assoc, ← map_mul, smul_smul, Subgroup.coe_mul]
@@ -26,22 +25,27 @@ theorem twistedIdem_mul_of (J : Subgroup G) (χ : J →* ℂˣ)
   rw [map_mul, mul_inv, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_inv_eq_inv_val]
   field_simp
 
-theorem idem_sandwich (J : Subgroup G) (χ : J →* ℂˣ) (u u' : J) (g : G) :
-    twistedIdem J χ * MonoidAlgebra.of ℂ G ((u : G) * g * u') * twistedIdem J χ =
-      (((χ u * χ u' : ℂˣ)) : ℂ) •
-        (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) := by
+theorem idem_sandwich (J : Subgroup G) (χ : J →* ℂˣ) (u u' : J) (g : G)
+    : twistedIdem J χ * MonoidAlgebra.of ℂ G ((u : G) * g * u') * twistedIdem J χ
+      = (((χ u * χ u' : ℂˣ)) : ℂ)
+        • (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) := by
   rw [map_mul, map_mul]
-  calc twistedIdem J χ * (MonoidAlgebra.of ℂ G (u : G) * MonoidAlgebra.of ℂ G g *
-        MonoidAlgebra.of ℂ G (u' : G)) * twistedIdem J χ
-      = (twistedIdem J χ * MonoidAlgebra.of ℂ G (u : G)) * MonoidAlgebra.of ℂ G g *
-        (MonoidAlgebra.of ℂ G (u' : G) * twistedIdem J χ) := by simp only [mul_assoc]
+  calc
+    twistedIdem J χ
+          * (MonoidAlgebra.of ℂ G (u : G) * MonoidAlgebra.of ℂ G g * MonoidAlgebra.of ℂ G (u' : G))
+          * twistedIdem J χ
+        = (twistedIdem J χ * MonoidAlgebra.of ℂ G (u : G)) * MonoidAlgebra.of ℂ G g
+          * (MonoidAlgebra.of ℂ G (u' : G) * twistedIdem J χ) := by
+      simp only [mul_assoc]
     _ = _ := by
       rw [twistedIdem_mul_of, of_mul_twistedIdem, smul_mul_assoc, smul_mul_assoc, mul_smul_comm,
         smul_smul, Units.val_mul]
 
-theorem idem_sandwich_zero (J : Subgroup G) (χ : J →* ℂˣ) (u u' : J) (g : G)
-    (h : (u : G) * g * u' = g) (hne : χ u * χ u' ≠ 1) :
-    twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ = 0 := by
+theorem idem_sandwich_zero
+    (J : Subgroup G) (χ : J →* ℂˣ) (u u' : J)
+    (g : G) (h : (u : G) * g * u' = g)
+    (hne : χ u * χ u' ≠ 1)
+    : twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ = 0 := by
   have h1 := idem_sandwich J χ u u' g
   rw [h] at h1
   set X := twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ
@@ -55,33 +59,36 @@ theorem idem_sandwich_zero (J : Subgroup G) (χ : J →* ℂˣ) (u u' : J) (g : 
     exact (sub_eq_zero.mp h3).symm
   · exact h3
 
-noncomputable def antiLift (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) :
-    MonoidAlgebra ℂ G →ₐ[ℂ] (MonoidAlgebra ℂ G)ᵐᵒᵖ :=
-  MonoidAlgebra.lift ℂ _ G
-    { toFun := fun g => MulOpposite.op (MonoidAlgebra.of ℂ G (σ g))
-      map_one' := by
-        have h1 : σ 1 = 1 := by
-          have := hσ 1 1
-          rw [mul_one] at this
-          exact (mul_eq_left.mp this.symm)
-        rw [h1, map_one, MulOpposite.op_one]
-      map_mul' := by
-        intro x y
-        rw [hσ, map_mul, MulOpposite.op_mul] }
+noncomputable def antiLift (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x)
+    : MonoidAlgebra ℂ G →ₐ[ℂ] (MonoidAlgebra ℂ G)ᵐᵒᵖ :=
+  MonoidAlgebra.lift ℂ _ G {
+    toFun := fun g => MulOpposite.op (MonoidAlgebra.of ℂ G (σ g))
+    map_one' := by
+      have h1 : σ 1 = 1 := by
+        have := hσ 1 1
+        rw [mul_one] at this
+        exact (mul_eq_left.mp this.symm)
+      rw [h1, map_one, MulOpposite.op_one]
+    map_mul' := by
+      intro x y
+      rw [hσ, map_mul, MulOpposite.op_mul]
+  }
 
-theorem antiLift_of (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (g : G) :
-    antiLift σ hσ (MonoidAlgebra.of ℂ G g) = MulOpposite.op (MonoidAlgebra.of ℂ G (σ g)) := by
+theorem antiLift_of (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (g : G)
+    : antiLift σ hσ (MonoidAlgebra.of ℂ G g) = MulOpposite.op (MonoidAlgebra.of ℂ G (σ g)) := by
   simp [antiLift]
 
 open Classical in
-theorem antiLift_idem (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (hσσ : ∀ x, σ (σ x) = x)
-    (J : Subgroup G) (χ : J →* ℂˣ) (hJ : ∀ u : J, ∃ h : σ u ∈ J, χ ⟨σ u, h⟩ = χ u) :
-    antiLift σ hσ (twistedIdem J χ) = MulOpposite.op (twistedIdem J χ) := by
-  let s : J ≃ J :=
-    { toFun := fun u => ⟨σ u, (hJ u).1⟩
-      invFun := fun u => ⟨σ u, (hJ u).1⟩
-      left_inv := fun u => Subtype.ext (hσσ u)
-      right_inv := fun u => Subtype.ext (hσσ u) }
+theorem antiLift_idem
+    (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (hσσ : ∀ x, σ (σ x) = x)
+    (J : Subgroup G) (χ : J →* ℂˣ) (hJ : ∀ u : J, ∃ h : σ u ∈ J, χ ⟨σ u, h⟩ = χ u)
+    : antiLift σ hσ (twistedIdem J χ) = MulOpposite.op (twistedIdem J χ) := by
+  let s : J ≃ J := {
+    toFun := fun u => ⟨σ u, (hJ u).1⟩
+    invFun := fun u => ⟨σ u, (hJ u).1⟩
+    left_inv := fun u => Subtype.ext (hσσ u)
+    right_inv := fun u => Subtype.ext (hσσ u)
+  }
   set_option synthInstance.maxHeartbeats 100000 in
     rw [twistedIdem_def, map_sum]
   show _ = MulOpposite.opAddEquiv _
@@ -93,16 +100,21 @@ theorem antiLift_idem (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (
   rw [this]
   rfl
 
-theorem hecke_comm (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (hσσ : ∀ x, σ (σ x) = x)
+theorem hecke_comm
+    (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (hσσ : ∀ x, σ (σ x) = x)
     (J : Subgroup G) (χ : J →* ℂˣ) (hJ : ∀ u : J, ∃ h : σ u ∈ J, χ ⟨σ u, h⟩ = χ u)
-    (H : ∀ g, (∃ u u' : J, σ g = u * g * u' ∧ χ u * χ u' = 1) ∨
-      (∃ u u' : J, (u : G) * g * u' = g ∧ χ u * χ u' ≠ 1)) (g g' : G) :
-    (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) *
-        (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ) =
-      (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ) *
-        (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) := by
-  have key : ∀ g, twistedIdem J χ * MonoidAlgebra.of ℂ G (σ g) * twistedIdem J χ =
-      twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ := by
+    (H : ∀ g,
+      (∃ u u' : J, σ g = u * g * u' ∧ χ u * χ u' = 1)
+        ∨ (∃ u u' : J, (u : G) * g * u' = g ∧ χ u * χ u' ≠ 1))
+    (g g' : G)
+    : (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ)
+        * (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
+      = (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
+        * (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) := by
+  have key
+      : ∀ g,
+        twistedIdem J χ * MonoidAlgebra.of ℂ G (σ g) * twistedIdem J χ
+          = twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ := by
     intro g
     rcases H g with ⟨u, u', h1, h2⟩ | ⟨u, u', h1, h2⟩
     · rw [h1, idem_sandwich, h2, Units.val_one, one_smul]
@@ -113,8 +125,10 @@ theorem hecke_comm (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (hσ
       · show σ u' * σ g * σ u = σ g
         rw [← hσ, ← hσ, ← mul_assoc, h1]
       · rw [hm, hm', mul_comm]; exact h2
-  have fix : ∀ a, antiLift σ hσ (twistedIdem J χ * a * twistedIdem J χ) =
-      MulOpposite.op (twistedIdem J χ * a * twistedIdem J χ) := by
+  have fix
+      : ∀ a,
+        antiLift σ hσ (twistedIdem J χ * a * twistedIdem J χ)
+          = MulOpposite.op (twistedIdem J χ * a * twistedIdem J χ) := by
     intro a
     induction a using MonoidAlgebra.induction_on with
     | of g =>
@@ -122,25 +136,38 @@ theorem hecke_comm (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x) (hσ
         ← MulOpposite.op_mul, ← mul_assoc, key]
     | add x y hx hy => rw [mul_add, add_mul, map_add (f := _), hx, hy, MulOpposite.op_add]
     | smul r x hx => rw [mul_smul_comm, smul_mul_assoc, map_smul, hx, MulOpposite.op_smul]
-  have h := map_mul (antiLift σ hσ) (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ)
-    (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
+  have h :=
+    map_mul (antiLift σ hσ) (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ)
+      (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
   rw [fix, fix, ← MulOpposite.op_mul] at h
-  have h' : (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) *
-      (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ) =
-      twistedIdem J χ * (MonoidAlgebra.of ℂ G g * twistedIdem J χ * twistedIdem J χ *
-        MonoidAlgebra.of ℂ G g') * twistedIdem J χ := by simp only [mul_assoc]
+  have h'
+      : (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ)
+          * (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
+        = twistedIdem J χ
+          * (MonoidAlgebra.of ℂ G g * twistedIdem J χ * twistedIdem J χ * MonoidAlgebra.of ℂ G g')
+          * twistedIdem J χ := by
+    simp only [mul_assoc]
   rw [h', fix, ← h'] at h
   exact MulOpposite.op_injective h
 
-theorem gelfand_trick {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (ρ : Representation ℂ G V) (J : Subgroup G) (χ : J →* ℂˣ)
-    (hcomm : ∀ g g' : G, (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ) *
-        (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ) =
-      (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ) *
-        (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ))
-    (hirr : IsIrr ρ) :
-    Module.finrank ℂ (eqvSpace ρ (fun u : J => (u : G)) (fun u => ((χ u : ℂˣ) : ℂ))) ≤ 1 := by
-  first | exact Bl.CyclicComponents.goal1 .. | (apply Bl.CyclicComponents.goal1 <;> assumption) | (intros; apply Bl.CyclicComponents.goal1 <;> assumption) | (apply @Bl.CyclicComponents.goal1 <;> assumption) | (intros; apply @Bl.CyclicComponents.goal1 <;> assumption) | (apply @Bl.CyclicComponents.goal1 <;> first | assumption | infer_instance)
+theorem gelfand_trick
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V)
+    (J : Subgroup G) (χ : J →* ℂˣ)
+    (hcomm : ∀ g g' : G,
+      (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ)
+          * (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
+        = (twistedIdem J χ * MonoidAlgebra.of ℂ G g' * twistedIdem J χ)
+          * (twistedIdem J χ * MonoidAlgebra.of ℂ G g * twistedIdem J χ))
+    (hirr : IsIrr ρ)
+    : Module.finrank ℂ (eqvSpace ρ (fun u : J => (u : G)) (fun u => ((χ u : ℂˣ) : ℂ))) ≤ 1 := by
+  first
+  | exact Bl.CyclicComponents.goal1 ..
+  | (apply Bl.CyclicComponents.goal1 <;> assumption)
+  | (intros; apply Bl.CyclicComponents.goal1 <;> assumption)
+  | (apply @Bl.CyclicComponents.goal1 <;> assumption)
+  | (intros; apply @Bl.CyclicComponents.goal1 <;> assumption)
+  | (apply @Bl.CyclicComponents.goal1 <;> first | assumption | infer_instance)
 
 end GelfandTrick
 
@@ -155,10 +182,10 @@ namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 section GG
 variable {K : Type} [Field K] {N : ℕ}
 
-def IsUT (A : Matrix (Fin N) (Fin N) K) : Prop :=
-  (∀ i, A i i = 1) ∧ ∀ i j, j < i → A i j = 0
+def IsUT (A : Matrix (Fin N) (Fin N) K) : Prop := (∀ i, A i i = 1) ∧ ∀ i j, j < i → A i j = 0
 
-theorem mem_besselSet_zero_iff_upper_triangular (u : GL (Fin N) K) : u ∈ besselSet K 0 0 N ↔ IsUT (u : Matrix (Fin N) (Fin N) K) := by
+theorem mem_besselSet_zero_iff_upper_triangular (u : GL (Fin N) K)
+    : u ∈ besselSet K 0 0 N ↔ IsUT (u : Matrix (Fin N) (Fin N) K) := by
   constructor
   · rintro ⟨h1, h2, -⟩
     exact ⟨h1, h2⟩
@@ -174,8 +201,10 @@ theorem IsUT.det {A : Matrix (Fin N) (Fin N) K} (h : IsUT A) : A.det = 1 := by
 noncomputable def utMk (A : Matrix (Fin N) (Fin N) K) (h : IsUT A) : GL (Fin N) K :=
   Matrix.GeneralLinearGroup.mkOfDetNeZero A (by rw [h.det]; exact one_ne_zero)
 
-@[simp] theorem utMk_val (A : Matrix (Fin N) (Fin N) K) (h : IsUT A) :
-    ((utMk A h : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) = A := rfl
+@[simp]
+theorem utMk_val (A : Matrix (Fin N) (Fin N) K) (h : IsUT A)
+    : ((utMk A h : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) = A :=
+  rfl
 
 theorem IsUT.one : IsUT (1 : Matrix (Fin N) (Fin N) K) :=
   ⟨fun i => Matrix.one_apply_eq i, fun i j h => Matrix.one_apply_ne (ne_of_gt h)⟩
@@ -199,8 +228,8 @@ theorem IsUT.mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUT A) (hB : IsUT B) : 
 def edgeSum (A : Matrix (Fin N) (Fin N) K) : K :=
   ∑ i : Fin N, ∑ j : Fin N, if (j : ℕ) = i + 1 then A i j else 0
 
-theorem besselChar_zero_eq_edge_sum (ψ₀ : AddChar K ℂ) (u : GL (Fin N) K) :
-    besselChar ψ₀ 0 0 N u = ψ₀ (edgeSum (u : Matrix (Fin N) (Fin N) K)) := by
+theorem besselChar_zero_eq_edge_sum (ψ₀ : AddChar K ℂ) (u : GL (Fin N) K)
+    : besselChar ψ₀ 0 0 N u = ψ₀ (edgeSum (u : Matrix (Fin N) (Fin N) K)) := by
   unfold besselChar edgeSum
   congr 1
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -209,19 +238,18 @@ theorem besselChar_zero_eq_edge_sum (ψ₀ : AddChar K ℂ) (u : GL (Fin N) K) :
     omega
   simp only [this]
 
-theorem edgeSum_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUT A) (hB : IsUT B) :
-    edgeSum (A * B) = edgeSum A + edgeSum B := by
+theorem edgeSum_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUT A) (hB : IsUT B)
+    : edgeSum (A * B) = edgeSum A + edgeSum B := by
   unfold edgeSum
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_
   split_ifs with h
-  · have hij : i ≠ j := by
-      intro h'; rw [h'] at h; omega
+  · have hij : i ≠ j := by intro h'; rw [h'] at h; omega
     rw [Matrix.mul_apply, ← Finset.add_sum_erase _ _ (Finset.mem_univ i),
-      ← Finset.add_sum_erase _ _ (Finset.mem_erase.mpr ⟨hij.symm, Finset.mem_univ j⟩),
-      hA.1, hB.1, one_mul, mul_one, Finset.sum_eq_zero, add_zero, add_comm]
+      ← Finset.add_sum_erase _ _ (Finset.mem_erase.mpr ⟨hij.symm, Finset.mem_univ j⟩), hA.1, hB.1,
+      one_mul, mul_one, Finset.sum_eq_zero, add_zero, add_comm]
     intro m hm
     simp only [Finset.mem_erase, Finset.mem_univ, and_true] at hm
     rcases lt_or_ge m i with h1 | h1
@@ -235,8 +263,8 @@ theorem edgeSum_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUT A) (hB : IsUT B)
       rw [hB.2 m j this, mul_zero]
   · rw [add_zero]
 
-theorem IsUT.inv_val (u : GL (Fin N) K) (h : IsUT (u : Matrix (Fin N) (Fin N) K)) :
-    IsUT ((u⁻¹ : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) := by
+theorem IsUT.inv_val (u : GL (Fin N) K) (h : IsUT (u : Matrix (Fin N) (Fin N) K))
+    : IsUT ((u⁻¹ : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) := by
   have hlow : ∀ i j, j < i → ((u⁻¹ : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) i j = 0 := by
     intro i j hij
     rw [Matrix.coe_units_inv]
@@ -258,36 +286,45 @@ def uniSub (K : Type) [Field K] (N : ℕ) : Subgroup (GL (Fin N) K) where
   carrier := {u | IsUT (u : Matrix (Fin N) (Fin N) K)}
   mul_mem' := fun {a b} ha hb => by
     show IsUT ((a * b : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)
-    rw [Units.val_mul]; exact IsUT.mul ha hb
+    rw [Units.val_mul]
+    exact IsUT.mul ha hb
   one_mem' := by
     show IsUT ((1 : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)
-    rw [Units.val_one]; exact IsUT.one
+    rw [Units.val_one]
+    exact IsUT.one
   inv_mem' := fun {a} ha => IsUT.inv_val a ha
 
 noncomputable def uniChar (ψ₀ : AddChar K ℂ) (N : ℕ) : uniSub K N →* ℂˣ where
-  toFun u := (ψ₀.toMonoidHom.toHomUnits) (Multiplicative.ofAdd (edgeSum ((u : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)))
+  toFun u :=
+    (ψ₀.toMonoidHom.toHomUnits) (Multiplicative.ofAdd (edgeSum
+      ((u : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)))
   map_one' := by
     have : edgeSum (((1 : uniSub K N) : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) = 0 := by
       have h := edgeSum_mul (K := K) (N := N) IsUT.one IsUT.one
       rw [mul_one] at h
       simpa using h
-    rw [this]; simp
+    rw [this]
+    simp
   map_mul' := fun a b => by
-    have : edgeSum (((a * b : uniSub K N) : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) =
-        edgeSum ((a : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) +
-          edgeSum ((b : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) := by
+    have : edgeSum (((a * b : uniSub K N) : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)
+        = edgeSum ((a : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)
+          + edgeSum ((b : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) := by
       rw [Subgroup.coe_mul, Units.val_mul]
       exact edgeSum_mul a.2 b.2
     rw [this, ofAdd_add, map_mul]
 
-theorem uniChar_val (ψ₀ : AddChar K ℂ) (u : uniSub K N) :
-    ((uniChar ψ₀ N u : ℂˣ) : ℂ) = ψ₀ (edgeSum ((u : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)) := by
+theorem uniChar_val (ψ₀ : AddChar K ℂ) (u : uniSub K N)
+    : ((uniChar ψ₀ N u : ℂˣ) : ℂ)
+      = ψ₀ (edgeSum ((u : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)) := by
   simp [uniChar]
 
-theorem besselSpace_zero_eq_equivariant {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (GL (Fin N) K) V) (ψ₀ : AddChar K ℂ) :
-    besselSpace ρ ψ₀ 0 0 = eqvSpace ρ (fun u : uniSub K N => (u : GL (Fin N) K))
-      (fun u => ((uniChar ψ₀ N u : ℂˣ) : ℂ)) := by
+theorem besselSpace_zero_eq_equivariant
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin N) K) V) (ψ₀ : AddChar K ℂ)
+    : besselSpace ρ ψ₀ 0 0
+      = eqvSpace ρ
+        (fun u : uniSub K N => (u : GL (Fin N) K))
+        (fun u => ((uniChar ψ₀ N u : ℂˣ) : ℂ)) := by
   ext x
   constructor
   · intro h u
@@ -296,8 +333,8 @@ theorem besselSpace_zero_eq_equivariant {V : Type} [AddCommGroup V] [Module ℂ 
     rw [uniChar_val, ← besselChar_zero_eq_edge_sum]
     exact this
   · intro h u
-    have : ρ (u : GL (Fin N) K) x =
-        ((uniChar ψ₀ N ⟨u.1, (mem_besselSet_zero_iff_upper_triangular _).mp u.2⟩ : ℂˣ) : ℂ) • x :=
+    have : ρ (u : GL (Fin N) K) x
+        = ((uniChar ψ₀ N ⟨u.1, (mem_besselSet_zero_iff_upper_triangular _).mp u.2⟩ : ℂˣ) : ℂ) • x :=
       h ⟨u.1, (mem_besselSet_zero_iff_upper_triangular _).mp u.2⟩
     rw [uniChar_val, ← besselChar_zero_eq_edge_sum] at this
     exact this
@@ -314,10 +351,10 @@ namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 section Comb
 variable {N : ℕ}
 
-theorem desc_run (τ : Equiv.Perm (Fin N))
-    (h : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → (τ i : ℕ) = τ j + 1) :
-    ∀ d : ℕ, ∀ i j : Fin N, (j : ℕ) = i + d → τ j < τ i → ∀ m : Fin N, i ≤ m → m ≤ j →
-      (τ m : ℕ) + m = τ i + i := by
+theorem desc_run
+    (τ : Equiv.Perm (Fin N)) (h : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → (τ i : ℕ) = τ j + 1)
+    : ∀ d : ℕ, ∀ i j : Fin N,
+      (j : ℕ) = i + d → τ j < τ i → ∀ m : Fin N, i ≤ m → m ≤ j → (τ m : ℕ) + m = τ i + i := by
   intro d
   induction d with
   | zero =>
@@ -345,7 +382,8 @@ theorem desc_run (τ : Equiv.Perm (Fin N))
     · have h2 := h i i' hi'v h1
       by_cases hji : j = i'
       · have : m = i' := Fin.ext (by rw [hji] at hmj'; omega)
-        rw [this]; omega
+        rw [this]
+        omega
       · have h3 : τ j ≠ τ i' := fun h' => hji (τ.injective h')
         have h3' : (τ j : ℕ) ≠ τ i' := fun h' => h3 (Fin.ext h')
         have h4 : τ j < τ i' := by
@@ -366,19 +404,20 @@ theorem desc_run (τ : Equiv.Perm (Fin N))
       have h6 := congrArg Fin.val (τ.injective h5)
       omega
 
-theorem desc_invol (τ : Equiv.Perm (Fin N))
-    (h : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → (τ i : ℕ) = τ j + 1) (i : Fin N) :
-    τ (τ i) = i := by
+theorem desc_invol
+    (τ : Equiv.Perm (Fin N)) (h : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → (τ i : ℕ) = τ j + 1)
+    (i : Fin N)
+    : τ (τ i) = i := by
   have run := desc_run τ h
-  have run' : ∀ i j : Fin N, i < j → τ j < τ i → ∀ m : Fin N, i ≤ m → m ≤ j →
-      (τ m : ℕ) + m = τ i + i := by
+  have run'
+      : ∀ i j : Fin N,
+        i < j → τ j < τ i → ∀ m : Fin N, i ≤ m → m ≤ j → (τ m : ℕ) + m = τ i + i := by
     intro i j hij
     have hij' : (i : ℕ) < j := hij
     exact run (j - i) i j (by omega)
   obtain ⟨j0, hj0⟩ := τ.surjective i
   rcases lt_trichotomy (τ i) i with hc | hc | hc
-  · have hne : j0 ≠ i := by
-      intro h'; rw [h'] at hj0; rw [hj0] at hc; exact lt_irrefl _ hc
+  · have hne : j0 ≠ i := by intro h'; rw [h'] at hj0; rw [hj0] at hc; exact lt_irrefl _ hc
     rcases lt_or_gt_of_ne hne with h1 | h1
     · have := run' j0 i h1 (by rw [hj0]; exact hc) i h1.le le_rfl
       rw [hj0] at this
@@ -411,8 +450,7 @@ theorem desc_invol (τ : Equiv.Perm (Fin N))
       have h1' : (i : ℕ) < j0 := h1
       omega
   · rw [hc, hc]
-  · have hne : j0 ≠ i := by
-      intro h'; rw [h'] at hj0; rw [hj0] at hc; exact lt_irrefl _ hc
+  · have hne : j0 ≠ i := by intro h'; rw [h'] at hj0; rw [hj0] at hc; exact lt_irrefl _ hc
     rcases lt_or_gt_of_ne hne with h1 | h1
     · exfalso
       have hp : ∃ p, i < p ∧ τ p < i := by
@@ -444,10 +482,12 @@ theorem desc_invol (τ : Equiv.Perm (Fin N))
       have h2 : τ i = j0 := Fin.ext (by omega)
       rw [h2, hj0]
 
-theorem desc_const {α : Type} (τ : Equiv.Perm (Fin N))
-    (h : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → (τ i : ℕ) = τ j + 1) (t : Fin N → α)
-    (ht : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → t i = t j) (i : Fin N) :
-    t (τ i) = t i := by
+theorem desc_const
+    {α : Type}
+    (τ : Equiv.Perm (Fin N)) (h : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → (τ i : ℕ) = τ j + 1)
+    (t : Fin N → α) (ht : ∀ i j : Fin N, (j : ℕ) = i + 1 → τ j < τ i → t i = t j)
+    (i : Fin N)
+    : t (τ i) = t i := by
   have inv := desc_invol τ h
   have main : ∀ i : Fin N, i < τ i → t (τ i) = t i := by
     intro i hi
@@ -490,8 +530,7 @@ variable {K : Type} [Field K] {N : ℕ}
 def rowOp (a : Fin N → K) (r : Fin N) : Matrix (Fin N) (Fin N) K :=
   1 + Matrix.of fun i m => if m = r then a i else 0
 
-theorem rowOp_isUT (a : Fin N → K) (r : Fin N) (ha : ∀ i, r ≤ i → a i = 0) :
-    IsUT (rowOp a r) := by
+theorem rowOp_isUT (a : Fin N → K) (r : Fin N) (ha : ∀ i, r ≤ i → a i = 0) : IsUT (rowOp a r) := by
   constructor
   · intro i
     simp only [rowOp, Matrix.add_apply, Matrix.one_apply_eq, Matrix.of_apply]
@@ -505,8 +544,8 @@ theorem rowOp_isUT (a : Fin N → K) (r : Fin N) (ha : ∀ i, r ≤ i → a i = 
     · exact ha i (h ▸ hij.le)
     · rfl
 
-theorem rowOp_mul (a : Fin N → K) (r : Fin N) (h : Matrix (Fin N) (Fin N) K) (i c : Fin N) :
-    (rowOp a r * h) i c = h i c + a i * h r c := by
+theorem rowOp_mul (a : Fin N → K) (r : Fin N) (h : Matrix (Fin N) (Fin N) K) (i c : Fin N)
+    : (rowOp a r * h) i c = h i c + a i * h r c := by
   rw [rowOp, Matrix.add_mul, Matrix.one_mul, Matrix.add_apply, Matrix.mul_apply,
     Finset.sum_eq_single r]
   · simp
@@ -516,8 +555,7 @@ theorem rowOp_mul (a : Fin N → K) (r : Fin N) (h : Matrix (Fin N) (Fin N) K) (
 def colOp (k : Fin N) (b : Fin N → K) : Matrix (Fin N) (Fin N) K :=
   1 + Matrix.of fun m c => if m = k then b c else 0
 
-theorem colOp_isUT (k : Fin N) (b : Fin N → K) (hb : ∀ c, c ≤ k → b c = 0) :
-    IsUT (colOp k b) := by
+theorem colOp_isUT (k : Fin N) (b : Fin N → K) (hb : ∀ c, c ≤ k → b c = 0) : IsUT (colOp k b) := by
   constructor
   · intro i
     simp only [colOp, Matrix.add_apply, Matrix.one_apply_eq, Matrix.of_apply]
@@ -531,8 +569,8 @@ theorem colOp_isUT (k : Fin N) (b : Fin N → K) (hb : ∀ c, c ≤ k → b c = 
     · exact hb j (h ▸ hij.le)
     · rfl
 
-theorem mul_colOp (k : Fin N) (b : Fin N → K) (h : Matrix (Fin N) (Fin N) K) (i c : Fin N) :
-    (h * colOp k b) i c = h i c + h i k * b c := by
+theorem mul_colOp (k : Fin N) (b : Fin N → K) (h : Matrix (Fin N) (Fin N) K) (i c : Fin N)
+    : (h * colOp k b) i c = h i c + h i k * b c := by
   rw [colOp, Matrix.mul_add, Matrix.mul_one, Matrix.add_apply, Matrix.mul_apply,
     Finset.sum_eq_single k]
   · simp
@@ -540,13 +578,16 @@ theorem mul_colOp (k : Fin N) (b : Fin N → K) (h : Matrix (Fin N) (Fin N) K) (
   · intro h'; exact absurd (Finset.mem_univ _) h'
 
 def Cleared (h : Matrix (Fin N) (Fin N) K) (k : ℕ) (p : Fin N → Fin N) : Prop :=
-  ∀ j : Fin N, (j : ℕ) < k →
-    h (p j) j ≠ 0 ∧ (∀ i, i ≠ p j → h i j = 0) ∧ (∀ c, c ≠ j → h (p j) c = 0)
+  ∀ j : Fin N,
+    (j : ℕ) < k → h (p j) j ≠ 0 ∧ (∀ i, i ≠ p j → h i j = 0) ∧ (∀ c, c ≠ j → h (p j) c = 0)
 
 open Classical in
-theorem bruhat_step (g : GL (Fin N) K) : ∀ k : ℕ, k ≤ N → ∃ u u' : GL (Fin N) K,
-    IsUT (u : Matrix (Fin N) (Fin N) K) ∧ IsUT (u' : Matrix (Fin N) (Fin N) K) ∧
-    ∃ p, Cleared ((u * g * u' : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) k p := by
+theorem bruhat_step (g : GL (Fin N) K)
+    : ∀ k : ℕ,
+      k ≤ N
+        → ∃ u u' : GL (Fin N) K,
+          IsUT (u : Matrix (Fin N) (Fin N) K) ∧ IsUT (u' : Matrix (Fin N) (Fin N) K)
+            ∧ ∃ p, Cleared ((u * g * u' : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) k p := by
   intro k
   induction k with
   | zero =>
@@ -581,21 +622,23 @@ theorem bruhat_step (g : GL (Fin N) K) : ∀ k : ℕ, k ≤ N → ∃ u u' : GL 
     set d := h r0 kk with hddef
     set a : Fin N → K := fun i => if i < r0 then - h i kk / d else 0 with hadef
     set b : Fin N → K := fun c => if kk < c then - h r0 c / d else 0 with hbdef
-    have haUT : IsUT (rowOp a r0) := rowOp_isUT a r0 (fun i hi => by
-      simp only [hadef]; rw [if_neg (not_lt.mpr hi)])
-    have hbUT : IsUT (colOp kk b) := colOp_isUT kk b (fun c hc => by
-      simp only [hbdef]; rw [if_neg (not_lt.mpr hc)])
+    have haUT : IsUT (rowOp a r0) :=
+      rowOp_isUT a r0 (fun i hi => by simp only [hadef]; rw [if_neg (not_lt.mpr hi)])
+    have hbUT : IsUT (colOp kk b) :=
+      colOp_isUT kk b (fun c hc => by simp only [hbdef]; rw [if_neg (not_lt.mpr hc)])
     refine ⟨utMk _ haUT * u, u' * utMk _ hbUT, ?_, ?_, Function.update p kk r0, ?_⟩
     · rw [Units.val_mul]; exact IsUT.mul haUT hu
     · rw [Units.val_mul]; exact IsUT.mul hu' hbUT
-    have hprod : ((utMk _ haUT * u * g * (u' * utMk _ hbUT) : GL (Fin N) K) :
-        Matrix (Fin N) (Fin N) K) = rowOp a r0 * h * colOp kk b := by
+    have hprod
+        : ((utMk _ haUT * u * g * (u' * utMk _ hbUT) : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)
+          = rowOp a r0 * h * colOp kk b := by
       have : utMk _ haUT * u * g * (u' * utMk _ hbUT) = utMk _ haUT * hh * utMk _ hbUT := by
         rw [hhdef]; group
       rw [this, Units.val_mul, Units.val_mul, utMk_val, utMk_val]
     rw [hprod]
-    have hform : ∀ i c, (rowOp a r0 * h * colOp kk b) i c =
-        h i c + a i * h r0 c + (h i kk + a i * d) * b c := by
+    have hform
+        : ∀ i c,
+          (rowOp a r0 * h * colOp kk b) i c = h i c + a i * h r0 c + (h i kk + a i * d) * b c := by
       intro i c
       rw [mul_colOp, rowOp_mul, rowOp_mul]
     have F1 : ∀ j : Fin N, (j : ℕ) < k → p j ≠ r0 := by
@@ -604,8 +647,7 @@ theorem bruhat_step (g : GL (Fin N) K) : ∀ k : ℕ, k ≤ N → ∃ u u' : GL 
       have := (hp j hj).2.2 kk hne
       rw [h'] at this
       exact hd this
-    have F2 : ∀ j : Fin N, (j : ℕ) < k → h r0 j = 0 := fun j hj =>
-      (hp j hj).2.1 r0 (F1 j hj).symm
+    have F2 : ∀ j : Fin N, (j : ℕ) < k → h r0 j = 0 := fun j hj => (hp j hj).2.1 r0 (F1 j hj).symm
     have F3 : ∀ i, h i kk + a i * d = if i = r0 then d else 0 := by
       intro i
       rcases lt_trichotomy i r0 with h1 | h1 | h1
@@ -623,8 +665,7 @@ theorem bruhat_step (g : GL (Fin N) K) : ∀ k : ℕ, k ≤ N → ∃ u u' : GL 
       simp only [hadef]
       rw [(hp j hj).2.2 kk hne]
       simp
-    have F5 : ∀ c, c ≤ kk → b c = 0 := fun c hc => by
-      simp only [hbdef]; rw [if_neg (not_lt.mpr hc)]
+    have F5 : ∀ c, c ≤ kk → b c = 0 := fun c hc => by simp only [hbdef]; rw [if_neg (not_lt.mpr hc)]
     have F6 : a r0 = 0 := by simp only [hadef]; rw [if_neg (lt_irrefl _)]
     intro j hj
     by_cases hjk : j = kk
@@ -658,11 +699,14 @@ theorem bruhat_step (g : GL (Fin N) K) : ∀ k : ℕ, k ≤ N → ∃ u u' : GL 
         rw [hform, F3, if_neg (F1 j hjlt), F4 j hjlt, (hp j hjlt).2.2 c hc]
         simp
 
-theorem bruhat_exists (g : GL (Fin N) K) : ∃ u u' : GL (Fin N) K,
-    IsUT (u : Matrix (Fin N) (Fin N) K) ∧ IsUT (u' : Matrix (Fin N) (Fin N) K) ∧
-    ∃ (π : Equiv.Perm (Fin N)) (t : Fin N → K), (∀ j, t j ≠ 0) ∧
-      ∀ i j, ((u * g * u' : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) i j =
-        if i = π j then t j else 0 := by
+theorem bruhat_exists (g : GL (Fin N) K)
+    : ∃ u u' : GL (Fin N) K,
+      IsUT (u : Matrix (Fin N) (Fin N) K) ∧ IsUT (u' : Matrix (Fin N) (Fin N) K)
+        ∧ ∃ (π : Equiv.Perm (Fin N)) (t : Fin N → K),
+          (∀ j, t j ≠ 0)
+            ∧ ∀ i j,
+              ((u * g * u' : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) i j
+                = if i = π j then t j else 0 := by
   obtain ⟨u, u', hu, hu', p, hp⟩ := bruhat_step g N le_rfl
   refine ⟨u, u', hu, hu', ?_⟩
   set h : Matrix (Fin N) (Fin N) K := ((u * g * u' : GL (Fin N) K) : Matrix (Fin N) (Fin N) K)
@@ -672,8 +716,12 @@ theorem bruhat_exists (g : GL (Fin N) K) : ∃ u u' : GL (Fin N) K,
     have h1 := (hp j j.2).2.2 j' (Ne.symm hne)
     rw [hjj] at h1
     exact (hp j' j'.2).1 h1
-  refine ⟨Equiv.ofBijective p (Finite.injective_iff_bijective.mp hinj), fun j => h (p j) j,
-    fun j => (hp j j.2).1, ?_⟩
+  refine ⟨
+    Equiv.ofBijective p (Finite.injective_iff_bijective.mp hinj),
+    fun j => h (p j) j,
+    fun j => (hp j j.2).1,
+    ?_
+  ⟩
   intro i j
   rw [Equiv.ofBijective_apply]
   split_ifs with hij
@@ -693,12 +741,14 @@ section Transfer
 variable {G : Type} [Group G]
 
 def GTAlt (σ : G → G) (J : Subgroup G) (χ : J →* ℂˣ) (g : G) : Prop :=
-  (∃ u u' : J, σ g = u * g * u' ∧ χ u * χ u' = 1) ∨
-    (∃ u u' : J, (u : G) * g * u' = g ∧ χ u * χ u' ≠ 1)
+  (∃ u u' : J, σ g = u * g * u' ∧ χ u * χ u' = 1)
+    ∨ (∃ u u' : J, (u : G) * g * u' = g ∧ χ u * χ u' ≠ 1)
 
-theorem GTAlt.transfer (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x)
-    (J : Subgroup G) (χ : J →* ℂˣ) (hJ : ∀ u : J, ∃ h : σ u ∈ J, χ ⟨σ u, h⟩ = χ u)
-    (u1 u2 : J) (g : G) (h : GTAlt σ J χ ((u1 : G) * g * u2)) : GTAlt σ J χ g := by
+theorem GTAlt.transfer
+    (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x)
+    (J : Subgroup G) (χ : J →* ℂˣ) (hJ : ∀ u : J, ∃ h : σ u ∈ J, χ ⟨σ u, h⟩ = χ u) (u1 u2 : J)
+    (g : G) (h : GTAlt σ J χ ((u1 : G) * g * u2))
+    : GTAlt σ J χ g := by
   rcases h with ⟨a, b, h1, h2⟩ | ⟨a, b, h1, h2⟩
   · left
     obtain ⟨m1, e1⟩ := hJ u1
@@ -710,25 +760,29 @@ theorem GTAlt.transfer (σ : G → G) (hσ : ∀ x y, σ (x * y) = σ y * σ x)
       rw [this, h1]
       group
     · simp only [map_mul, map_inv, e1, e2]
-      calc (χ u2)⁻¹ * χ a * χ u1 * (χ u2 * χ b * (χ u1)⁻¹)
-          = (χ a * χ b) * ((χ u2)⁻¹ * χ u2) * (χ u1 * (χ u1)⁻¹) := by
-            simp only [mul_assoc, mul_comm, mul_left_comm]
+      calc
+        (χ u2)⁻¹ * χ a * χ u1 * (χ u2 * χ b * (χ u1)⁻¹)
+            = (χ a * χ b) * ((χ u2)⁻¹ * χ u2) * (χ u1 * (χ u1)⁻¹) := by
+          simp only [mul_assoc, mul_comm, mul_left_comm]
         _ = 1 := by rw [h2]; simp
   · right
     refine ⟨u1⁻¹ * a * u1, u2 * b * u2⁻¹, ?_, ?_⟩
     · simp only [Subgroup.coe_mul, Subgroup.coe_inv]
-      have : (u1 : G)⁻¹ * a * u1 * g * (u2 * b * (u2 : G)⁻¹) =
-          (u1 : G)⁻¹ * (a * (u1 * g * u2) * b) * (u2 : G)⁻¹ := by group
+      have : (u1 : G)⁻¹ * a * u1 * g * (u2 * b * (u2 : G)⁻¹)
+          = (u1 : G)⁻¹ * (a * (u1 * g * u2) * b) * (u2 : G)⁻¹ := by
+        group
       rw [this, h1]
       group
     · simp only [map_mul, map_inv]
       intro h3
       apply h2
-      calc χ a * χ b = (χ u1)⁻¹ * χ a * χ u1 * (χ u2 * χ b * (χ u2)⁻¹) := by
-            have : (χ u1)⁻¹ * χ a * χ u1 * (χ u2 * χ b * (χ u2)⁻¹) =
-              (χ a * χ b) * ((χ u1)⁻¹ * χ u1) * (χ u2 * (χ u2)⁻¹) := by
-                simp only [mul_assoc, mul_comm, mul_left_comm]
-            rw [this]; simp
+      calc
+        χ a * χ b = (χ u1)⁻¹ * χ a * χ u1 * (χ u2 * χ b * (χ u2)⁻¹) := by
+          have : (χ u1)⁻¹ * χ a * χ u1 * (χ u2 * χ b * (χ u2)⁻¹)
+              = (χ a * χ b) * ((χ u1)⁻¹ * χ u1) * (χ u2 * (χ u2)⁻¹) := by
+            simp only [mul_assoc, mul_comm, mul_left_comm]
+          rw [this]
+          simp
         _ = 1 := h3
 
 end Transfer
@@ -739,8 +793,9 @@ variable {K : Type} [Field K] {N : ℕ}
 def flipM (A : Matrix (Fin N) (Fin N) K) : Matrix (Fin N) (Fin N) K :=
   Matrix.of fun i j => A (Fin.rev j) (Fin.rev i)
 
-theorem flipM_apply (A : Matrix (Fin N) (Fin N) K) (i j : Fin N) :
-    flipM A i j = A (Fin.rev j) (Fin.rev i) := rfl
+theorem flipM_apply (A : Matrix (Fin N) (Fin N) K) (i j : Fin N)
+    : flipM A i j = A (Fin.rev j) (Fin.rev i) :=
+  rfl
 
 theorem flipM_mul (A B : Matrix (Fin N) (Fin N) K) : flipM (A * B) = flipM B * flipM A := by
   ext i j
@@ -760,13 +815,16 @@ theorem flipM_flipM (A : Matrix (Fin N) (Fin N) K) : flipM (flipM A) = A := by
   ext i j
   simp [flipM_apply]
 
-def flipG (g : GL (Fin N) K) : GL (Fin N) K :=
-  ⟨flipM g.1, flipM (g⁻¹).1, by
-    rw [← flipM_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one, flipM_one], by
-    rw [← flipM_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, flipM_one]⟩
+def flipG (g : GL (Fin N) K) : GL (Fin N) K := ⟨
+  flipM g.1,
+  flipM (g⁻¹).1,
+  by rw [← flipM_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one, flipM_one],
+  by rw [← flipM_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, flipM_one]
+⟩
 
-theorem flipG_val (g : GL (Fin N) K) :
-    ((flipG g : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) = flipM g.1 := rfl
+theorem flipG_val (g : GL (Fin N) K)
+    : ((flipG g : GL (Fin N) K) : Matrix (Fin N) (Fin N) K) = flipM g.1 :=
+  rfl
 
 theorem flipG_mul (x y : GL (Fin N) K) : flipG (x * y) = flipG y * flipG x := by
   apply Units.ext
@@ -792,8 +850,8 @@ theorem edgeSum_flip (A : Matrix (Fin N) (Fin N) K) : edgeSum (flipM A) = edgeSu
     omega
   simp only [this]
 
-theorem flip_char (ψ₀ : AddChar K ℂ) (u : uniSub K N) :
-    ∃ h : flipG (u : GL (Fin N) K) ∈ uniSub K N, uniChar ψ₀ N ⟨flipG u, h⟩ = uniChar ψ₀ N u := by
+theorem flip_char (ψ₀ : AddChar K ℂ) (u : uniSub K N)
+    : ∃ h : flipG (u : GL (Fin N) K) ∈ uniSub K N, uniChar ψ₀ N ⟨flipG u, h⟩ = uniChar ψ₀ N u := by
   refine ⟨IsUT.flip u.2, ?_⟩
   apply Units.ext
   rw [uniChar_val, uniChar_val]
@@ -823,24 +881,24 @@ theorem elM_isUT (p q : Fin N) (v : K) (h : p < q) : IsUT (elM p q v) := by
     rw [← h1, ← h2] at h
     exact lt_asymm h hij
 
-theorem elM_mul (p q : Fin N) (v : K) (h : Matrix (Fin N) (Fin N) K) (x c : Fin N) :
-    (elM p q v * h) x c = h x c + if x = p then v * h q c else 0 := by
+theorem elM_mul (p q : Fin N) (v : K) (h : Matrix (Fin N) (Fin N) K) (x c : Fin N)
+    : (elM p q v * h) x c = h x c + if x = p then v * h q c else 0 := by
   rw [elM, Matrix.add_mul, Matrix.one_mul, Matrix.add_apply, Matrix.mul_apply,
     Finset.sum_eq_single q]
   · by_cases hx : x = p <;> simp [hx]
   · intro m _ hm; simp [hm]
   · intro h'; exact absurd (Finset.mem_univ _) h'
 
-theorem mul_elM (p q : Fin N) (v : K) (h : Matrix (Fin N) (Fin N) K) (x c : Fin N) :
-    (h * elM p q v) x c = h x c + if c = q then h x p * v else 0 := by
+theorem mul_elM (p q : Fin N) (v : K) (h : Matrix (Fin N) (Fin N) K) (x c : Fin N)
+    : (h * elM p q v) x c = h x c + if c = q then h x p * v else 0 := by
   rw [elM, Matrix.mul_add, Matrix.mul_one, Matrix.add_apply, Matrix.mul_apply,
     Finset.sum_eq_single p]
   · by_cases hx : c = q <;> simp [hx]
   · intro m _ hm; simp [hm]
   · intro h'; exact absurd (Finset.mem_univ _) h'
 
-theorem edgeSum_elM (p q : Fin N) (v : K) :
-    edgeSum (elM p q v) = if (q : ℕ) = p + 1 then v else 0 := by
+theorem edgeSum_elM (p q : Fin N) (v : K)
+    : edgeSum (elM p q v) = if (q : ℕ) = p + 1 then v else 0 := by
   unfold edgeSum
   rw [Finset.sum_eq_single p]
   · rw [Finset.sum_eq_single q]
@@ -870,9 +928,11 @@ variable {K : Type} [Field K] {N : ℕ}
 def MonoAdm (π : Equiv.Perm (Fin N)) (t : Fin N → K) : Prop :=
   ∀ i j : Fin N, (j : ℕ) = i + 1 → π i < π j → (π j : ℕ) = π i + 1 ∧ t i = t j
 
-theorem flip_mono (n : GL (Fin N) K) (π : Equiv.Perm (Fin N)) (t : Fin N → K)
+theorem flip_mono
+    (n : GL (Fin N) K) (π : Equiv.Perm (Fin N)) (t : Fin N → K)
     (hn : ∀ i j, (n : Matrix (Fin N) (Fin N) K) i j = if i = π j then t j else 0)
-    (hadm : MonoAdm π t) : flipG n = n := by
+    (hadm : MonoAdm π t)
+    : flipG n = n := by
   set τ : Equiv.Perm (Fin N) := π.trans Fin.revPerm with hτ
   have hτv : ∀ i, τ i = Fin.rev (π i) := fun i => rfl
   have hlt : ∀ i j, τ j < τ i ↔ π i < π j := by
@@ -902,12 +962,13 @@ theorem flip_mono (n : GL (Fin N) K) (π : Equiv.Perm (Fin N)) (t : Fin N → K)
     have e3 : τ j = Fin.rev i := by rw [e2, inv]
     rw [hπ j, e3, Fin.rev_rev]
 
-theorem mono_not_adm (ψ₀ : AddChar K ℂ) (hψ : ψ₀ ≠ 1) (n : GL (Fin N) K)
-    (π : Equiv.Perm (Fin N)) (t : Fin N → K) (ht : ∀ j, t j ≠ 0)
+theorem mono_not_adm
+    (ψ₀ : AddChar K ℂ) (hψ : ψ₀ ≠ 1)
+    (n : GL (Fin N) K) (π : Equiv.Perm (Fin N)) (t : Fin N → K) (ht : ∀ j, t j ≠ 0)
     (hn : ∀ i j, (n : Matrix (Fin N) (Fin N) K) i j = if i = π j then t j else 0)
-    (hadm : ¬ MonoAdm π t) :
-    ∃ u u' : uniSub K N, (u : GL (Fin N) K) * n * u' = n ∧
-      uniChar ψ₀ N u * uniChar ψ₀ N u' ≠ 1 := by
+    (hadm : ¬ MonoAdm π t)
+    : ∃ u u' : uniSub K N,
+      (u : GL (Fin N) K) * n * u' = n ∧ uniChar ψ₀ N u * uniChar ψ₀ N u' ≠ 1 := by
   unfold MonoAdm at hadm
   push Not at hadm
   obtain ⟨i, j, hij, hlt, hbad⟩ := hadm
@@ -925,8 +986,12 @@ theorem mono_not_adm (ψ₀ : AddChar K ℂ) (hψ : ψ₀ ≠ 1) (n : GL (Fin N)
     · simp
   set a : K := a0 / (1 - s) with ha
   set c0 : K := a * t i / t j with hc0
-  refine ⟨⟨utMk _ (elM_isUT (π i) (π j) (-c0) hlt), elM_isUT (π i) (π j) (-c0) hlt⟩,
-    ⟨utMk _ (elM_isUT i j a hilt), elM_isUT i j a hilt⟩, ?_, ?_⟩
+  refine ⟨
+    ⟨utMk _ (elM_isUT (π i) (π j) (-c0) hlt), elM_isUT (π i) (π j) (-c0) hlt⟩,
+    ⟨utMk _ (elM_isUT i j a hilt), elM_isUT i j a hilt⟩,
+    ?_,
+    ?_
+  ⟩
   · apply Units.ext
     ext x c
     simp only [Units.val_mul, utMk_val]
@@ -952,7 +1017,7 @@ theorem mono_not_adm (ψ₀ : AddChar K ℂ) (hψ : ψ₀ ≠ 1) (n : GL (Fin N)
     simp only [Units.val_mul, uniChar_val, Units.val_one, utMk_val] at h'
     rw [← AddChar.map_add_eq_mul, edgeSum_elM, edgeSum_elM, if_pos hij] at h'
     have e : (if (π j : ℕ) = π i + 1 then -c0 else 0) + a = a0 := by
-      have e1 : (if (π j : ℕ) = π i + 1 then -c0 else 0) = - (a * s) := by
+      have e1 : (if (π j : ℕ) = π i + 1 then -c0 else 0) = -(a * s) := by
         rw [hs]
         split_ifs with h
         · rw [hc0]; ring

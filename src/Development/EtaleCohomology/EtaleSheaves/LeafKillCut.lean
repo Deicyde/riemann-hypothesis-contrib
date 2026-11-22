@@ -11,15 +11,23 @@ namespace LateralTheory.E.LeafKillCut
 
 open LateralTheory.E.E4
 
-def LeafOne : Prop := Hyps → ∀ (q : ℕ) [NeZero q] (Ω : Type) [Field Ω] [IsAlgClosed Ω], IsUnit (q : Ω) →
-  ∀ {C : Scheme.{0}} (c : C ⟶ Sp Ω), IsCurve c → ∀ m i : ℤ, 0 < m → ∀ x : Ht q (sch.obj C) m i,
-  ∃ (C' : Scheme.{0}) (γ : C' ⟶ C), IsCurve (γ ≫ c) ∧ Surjective γ ∧ pl q i γ m x = 0
+def LeafOne : Prop :=
+  Hyps
+    → ∀ (q : ℕ) [NeZero q] (Ω : Type) [Field Ω] [IsAlgClosed Ω],
+      IsUnit (q : Ω)
+        → ∀ {C : Scheme.{0}} (c : C ⟶ Sp Ω),
+          IsCurve c
+            → ∀ m i : ℤ,
+              0 < m
+                → ∀ x : Ht q (sch.obj C) m i, ∃ (C' : Scheme.{0}) (γ : C' ⟶ C),
+                  IsCurve (γ ≫ c) ∧ Surjective γ ∧ pl q i γ m x = 0
 
 theorem goal_of (hOne : LeafOne) : LateralTheory.E.E4.LeafKill := by
   intro hy q _ Ω _ _ hq C c hc m i hm hfin
   classical
-  have key : ∀ s : Finset (Ht q (sch.obj C) m i), ∃ (C' : Scheme.{0}) (γ : C' ⟶ C),
-      IsCurve (γ ≫ c) ∧ Surjective γ ∧ ∀ x ∈ s, pl q i γ m x = 0 := by
+  have key
+      : ∀ s : Finset (Ht q (sch.obj C) m i), ∃ (C' : Scheme.{0}) (γ : C' ⟶ C),
+        IsCurve (γ ≫ c) ∧ Surjective γ ∧ ∀ x ∈ s, pl q i γ m x = 0 := by
     intro s
     induction s using Finset.induction_on with
     | empty => exact ⟨C, 𝟙 C, by simpa using hc, inferInstance, by simp⟩

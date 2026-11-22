@@ -9,10 +9,10 @@ open scoped NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.SpecBound
 
-theorem norm_pow_le_of_eigenvalues_lt (W : Type) [NormedAddCommGroup W] [NormedSpace ℂ W]
-    [FiniteDimensional ℂ W] (T : W →L[ℂ] W) (ρ : ℝ)
-    (h : ∀ μ : ℂ, Module.End.HasEigenvalue (T : Module.End ℂ W) μ → ‖μ‖ < ρ) :
-    ∃ C : ℝ, ∀ j : ℕ, ‖T ^ j‖ ≤ C * ρ ^ j := by
+theorem norm_pow_le_of_eigenvalues_lt
+    (W : Type) [NormedAddCommGroup W] [NormedSpace ℂ W] [FiniteDimensional ℂ W]
+    (T : W →L[ℂ] W) (ρ : ℝ) (h : ∀ μ : ℂ, Module.End.HasEigenvalue (T : Module.End ℂ W) μ → ‖μ‖ < ρ)
+    : ∃ C : ℝ, ∀ j : ℕ, ‖T ^ j‖ ≤ C * ρ ^ j := by
   rcases subsingleton_or_nontrivial W with hW | hW
   · refine ⟨0, fun j => ?_⟩
     have h0 : T ^ j = 0 := by
@@ -47,8 +47,8 @@ theorem norm_pow_le_of_eigenvalues_lt (W : Type) [NormedAddCommGroup W] [NormedS
     have hn0 : (n : ℝ) ≠ 0 := by exact_mod_cast h0.ne'
     have h2 : (‖T ^ n‖₊ : ℝ≥0∞) ≤ (ρ' : ℝ≥0∞) ^ n := by
       have h3 := ENNReal.rpow_le_rpow h1.le (Nat.cast_nonneg n : (0 : ℝ) ≤ (n : ℝ))
-      rw [← ENNReal.rpow_mul, one_div, inv_mul_cancel₀ hn0, ENNReal.rpow_one,
-        ENNReal.rpow_natCast] at h3
+      rw [← ENNReal.rpow_mul, one_div, inv_mul_cancel₀ hn0, ENNReal.rpow_one, ENNReal.rpow_natCast]
+        at h3
       exact h3
     have h4 : ‖T ^ n‖₊ ≤ ρ' ^ n := by exact_mod_cast h2
     have h5 : ((‖T ^ n‖₊ : ℝ≥0) : ℝ) ≤ ((ρ' ^ n : ℝ≥0) : ℝ) := NNReal.coe_le_coe.2 h4
@@ -60,8 +60,10 @@ theorem norm_pow_le_of_eigenvalues_lt (W : Type) [NormedAddCommGroup W] [NormedS
     Finset.sum_nonneg fun i _ => div_nonneg (norm_nonneg _) (pow_pos hρ i).le
   by_cases hj : j < N
   · have h6 : ‖T ^ j‖ / ρ ^ j ≤ ∑ i ∈ Finset.range N, ‖T ^ i‖ / ρ ^ i :=
-      Finset.single_le_sum (f := fun i => ‖T ^ i‖ / ρ ^ i)
-        (fun i _ => div_nonneg (norm_nonneg _) (pow_pos hρ i).le) (Finset.mem_range.2 hj)
+      Finset.single_le_sum
+        (f := fun i => ‖T ^ i‖ / ρ ^ i)
+        (fun i _ => div_nonneg (norm_nonneg _) (pow_pos hρ i).le)
+        (Finset.mem_range.2 hj)
     have h7 : ‖T ^ j‖ / ρ ^ j ≤ 1 + ∑ i ∈ Finset.range N, ‖T ^ i‖ / ρ ^ i := by linarith
     exact (div_le_iff₀ hpow).1 h7
   · have h8 := key j (not_lt.1 hj)

@@ -12,7 +12,8 @@ namespace PositivityTheory.CW
 
 namespace EigenspaceOrthogonality
 
-variable {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {A : Module.End ℂ V}
 
 lemma nc_sum (f : Fin n × Fin n → ℂ) :
@@ -126,7 +127,8 @@ lemma beta_smul_right (r : ℂ) (v w : V) :
 
 end EigenspaceOrthogonality
 
-theorem eigenspaces_orthogonal_of_calculus : A0 → FunctionalCalculusLaws → EigenspacesOrthogonalAlt := by
+theorem eigenspaces_orthogonal_of_calculus
+    : A0 → FunctionalCalculusLaws → EigenspacesOrthogonalAlt := by
   intro hA0 hA11b n ε V _ _ E h ι b μ hB φ ν ν' v w hne hv hw
   obtain ⟨-, -, hZ, -⟩ := hA0 n ε V E h
   obtain ⟨hfc, -⟩ := hA11b n ε V E h ι b μ hB
@@ -137,7 +139,8 @@ theorem eigenspaces_orthogonal_of_calculus : A0 → FunctionalCalculusLaws → E
       have hz := congrArg (fun T : Module.End ℂ V => T (b i)) (hZ c d hcd)
       simp only [Z, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply] at hz
       show casimirK ε E (E c d (b i)) = ((μ i : ℝ) : ℂ) • E c d (b i)
-      rw [sub_eq_zero.mp hz, show casimirK ε E (b i) = ((μ i : ℝ) : ℂ) • b i from hB.eig i, map_smul]
+      rw [sub_eq_zero.mp hz, show casimirK ε E (b i) = ((μ i : ℝ) : ℂ) • b i from hB.eig i,
+        map_smul]
     have hT : (fc b μ φ).comp (E c d) = (E c d).comp (fc b μ φ) := by
       refine b.ext fun i => ?_
       simp only [LinearMap.comp_apply]
@@ -145,8 +148,9 @@ theorem eigenspaces_orthogonal_of_calculus : A0 → FunctionalCalculusLaws → E
     exact LinearMap.congr_fun hT z
   have hL := EigenspaceOrthogonality.Lsym (A := fc b μ φ) h.gl h.uni hcomm v w
   rw [show casimirK ε E v = ((ν : ℝ) : ℂ) • v from hv,
-    show casimirK ε E w = ((ν' : ℝ) : ℂ) • w from hw,
-    EigenspaceOrthogonality.beta_smul_left, EigenspaceOrthogonality.beta_smul_right] at hL
+      show casimirK ε E w = ((ν' : ℝ) : ℂ) • w from hw, EigenspaceOrthogonality.beta_smul_left,
+      EigenspaceOrthogonality.beta_smul_right]
+    at hL
   have hm : (((ν : ℝ) : ℂ) - ((ν' : ℝ) : ℂ)) * beta ε E (fc b μ φ) v w = 0 := by
     rw [sub_mul, hL, sub_self]
   rcases mul_eq_zero.mp hm with h0 | h0

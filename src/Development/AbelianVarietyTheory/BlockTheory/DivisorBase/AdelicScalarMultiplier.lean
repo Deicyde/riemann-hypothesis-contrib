@@ -33,22 +33,19 @@ def NormUnitCond {K : Type} [Field K] [NumberField K] (s : Idele K) (q : ℚ) : 
 
 section Herm
 
-variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
+variable
+  {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
   {W : Type} [AddCommGroup W] [Module ℚ W] [Module E W]
-
-
 
 end Herm
 
 section Groups
 
-variable {E : Type} [Field E] [NumberField E]
+variable
+  {E : Type} [Field E] [NumberField E]
   {W : Type} [AddCommGroup W] [Module ℚ W] [Module E W] [IsScalarTower ℚ E W]
 
-
 variable [Module (𝓞 E) W]
-
-
 
 end Groups
 

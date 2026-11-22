@@ -10,10 +10,13 @@ namespace GlobalTheory
 
 theorem eq_zero_of_ae_fundamentalDomain_of_leftInvariant
     {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
-    [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G) [Countable Γ] (μ : Measure G)
-    [μ.IsHaarMeasure] (𝓕 : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (F : G → ℂ)
-    (hF : Continuous F) (hinv : ∀ γ ∈ Γ, ∀ x, F (γ * x) = F x)
-    (hae : ∀ᵐ x ∂(μ.restrict 𝓕), F x = 0) : ∀ x, F x = 0 := by
+    [MeasurableSpace G] [BorelSpace G]
+    (Γ : Subgroup G) [Countable Γ]
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (𝓕 : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ)
+    (F : G → ℂ)
+    (hF : Continuous F) (hinv : ∀ γ ∈ Γ, ∀ x, F (γ * x) = F x) (hae : ∀ᵐ x ∂(μ.restrict 𝓕), F x = 0)
+    : ∀ x, F x = 0 := by
   set U : Set G := {x | F x ≠ 0} with hUdef
   have hUo : IsOpen U := isOpen_ne_fun hF continuous_const
   have hUinv : ∀ g : Γ, g • U = U := by

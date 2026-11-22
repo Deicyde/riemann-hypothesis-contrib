@@ -11,8 +11,9 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.PerfClos
 
-theorem exists_PQ : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (I : Ideal S), (p : S) = 0 →
-    ∃ (T : Type) (_ : CommRing T) (i : S →+* T), PQ p i I := by
+theorem exists_PQ
+    : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (I : Ideal S),
+      (p : S) = 0 → ∃ (T : Type) (_ : CommRing T) (i : S →+* T), PQ p i I := by
   intro p hpf S _ I hp
   obtain ⟨T, inst, i, hc, hb, hpow, hker⟩ := exists_perfect_radical p S I hp
   refine ⟨T, inst, i, ⟨⟨hc, hb⟩, hpow, fun x => ?_⟩⟩

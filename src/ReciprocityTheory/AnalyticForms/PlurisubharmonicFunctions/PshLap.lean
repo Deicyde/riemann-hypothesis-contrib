@@ -167,8 +167,7 @@ lemma rot_id (B : ℂ →L[ℝ] ℂ →L[ℝ] ℝ) (θ : ℝ) :
 
 variable {V : Set ℂ} {g : ℂ → ℝ} {G : ℂ → ℂ →L[ℝ] ℝ} {H : ℂ → ℂ →L[ℝ] ℂ →L[ℝ] ℝ}
 
-def Pr (G : ℂ → ℂ →L[ℝ] ℝ) (r : ℝ) : ℝ :=
-  ∫ θ in (0:ℝ)..2*π, G (circleMap 0 r θ) (circleMap 0 1 θ)
+def Pr (G : ℂ → ℂ →L[ℝ] ℝ) (r : ℝ) : ℝ := ∫ θ in (0:ℝ)..2*π, G (circleMap 0 r θ) (circleMap 0 1 θ)
 
 def Lap (H : ℂ → ℂ →L[ℝ] ℂ →L[ℝ] ℝ) (s : ℝ) : ℝ :=
   ∫ θ in (0:ℝ)..2*π, (H (circleMap 0 s θ) (circleMap 0 1 θ) (circleMap 0 1 θ) +
@@ -274,12 +273,14 @@ lemma contOn_H (hHc : ContinuousOn H V) {R a : ℝ} (hR : closedBall (0:ℂ) R �
   exact (hc.clm_apply (he.mul continuous_const).continuousOn).clm_apply
     (he.mul continuous_const).continuousOn
 
-theorem le_circleAverage_of_lap_nonneg (hg : ∀ x ∈ V, HasFDerivAt g (G x) x)
-    (hGd : ∀ x ∈ V, HasFDerivAt G (H x) x) (hHc : ContinuousOn H V) {R : ℝ} (hR0 : 0 ≤ R)
-    (hR : closedBall (0:ℂ) R ⊆ V)
-    (hpos : ∀ x ∈ closedBall (0:ℂ) R, ∀ θ : ℝ, 0 ≤ H x (circleMap 0 1 θ) (circleMap 0 1 θ) +
-      H x (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I)) :
-    g 0 ≤ Real.circleAverage g 0 R := by
+theorem le_circleAverage_of_lap_nonneg
+    (hg : ∀ x ∈ V, HasFDerivAt g (G x) x) (hGd : ∀ x ∈ V, HasFDerivAt G (H x) x)
+    (hHc : ContinuousOn H V)
+    {R : ℝ} (hR0 : 0 ≤ R) (hR : closedBall (0 : ℂ) R ⊆ V)
+    (hpos : ∀ x ∈ closedBall (0 : ℂ) R, ∀ θ : ℝ,
+      0 ≤ H x (circleMap 0 1 θ) (circleMap 0 1 θ)
+        + H x (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I))
+    : g 0 ≤ Real.circleAverage g 0 R := by
   have hGc : ContinuousOn G V := fun x hx => (hGd x hx).continuousAt.continuousWithinAt
   have hm := mean_formula hg hGc hR0 hR
   have hP : 0 ≤ ∫ r in (0:ℝ)..R, Pr G r := by
@@ -292,22 +293,26 @@ theorem le_circleAverage_of_lap_nonneg (hg : ∀ x ∈ V, HasFDerivAt g (G x) x)
         (fun θ _ => hpos _ (circleMap_mem_closedBall hs.1 (hs.2.trans hr.2)) θ)
     rw [← h1] at h2
     exact (mul_nonneg_iff_of_pos_left hr.1).mp h2
-  have : 0 ≤ (2*π)⁻¹ * ∫ r in (0:ℝ)..R, Pr G r := mul_nonneg (by positivity) hP
+  have : 0 ≤ (2 * π)⁻¹ * ∫ r in (0:ℝ)..R, Pr G r := mul_nonneg (by positivity) hP
   linarith
 
-theorem circleAverage_sub_le (hg : ∀ x ∈ V, HasFDerivAt g (G x) x)
-    (hGd : ∀ x ∈ V, HasFDerivAt G (H x) x) (hHc : ContinuousOn H V) {R : ℝ} (hR0 : 0 ≤ R)
-    (hR : closedBall (0:ℂ) R ⊆ V) (K : ℝ)
-    (hK : ∀ x ∈ closedBall (0:ℂ) R, ∀ θ : ℝ, H x (circleMap 0 1 θ) (circleMap 0 1 θ) +
-      H x (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I) ≤ K) :
-    Real.circleAverage g 0 R - g 0 ≤ K * R ^ 2 / 4 := by
+theorem circleAverage_sub_le
+    (hg : ∀ x ∈ V, HasFDerivAt g (G x) x) (hGd : ∀ x ∈ V, HasFDerivAt G (H x) x)
+    (hHc : ContinuousOn H V)
+    {R : ℝ} (hR0 : 0 ≤ R) (hR : closedBall (0 : ℂ) R ⊆ V)
+    (K : ℝ)
+    (hK : ∀ x ∈ closedBall (0 : ℂ) R, ∀ θ : ℝ,
+      H x (circleMap 0 1 θ) (circleMap 0 1 θ)
+          + H x (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I)
+        ≤ K)
+    : Real.circleAverage g 0 R - g 0 ≤ K * R ^ 2 / 4 := by
   have hGc : ContinuousOn G V := fun x hx => (hGd x hx).continuousAt.continuousWithinAt
   rw [mean_formula hg hGc hR0 hR]
   have hPint : IntervalIntegrable (Pr G) volume 0 R :=
     intervalIntegrable_param hR0 two_pi_pos.le (contOn_G hGc hR)
-  have hb : ∀ r ∈ Ioc (0:ℝ) R, Pr G r ≤ π * K * r := by
+  have hb : ∀ r ∈ Ioc (0 : ℝ) R, Pr G r ≤ π * K * r := by
     intro r hr
-    have hrV : closedBall (0:ℂ) r ⊆ V := (closedBall_subset_closedBall hr.2).trans hR
+    have hrV : closedBall (0 : ℂ) r ⊆ V := (closedBall_subset_closedBall hr.2).trans hR
     have h1 := rP_formula hGd hGc hHc hr.1.le hr.2 hR
     have hLapInt : IntervalIntegrable (Lap H) volume 0 r :=
       intervalIntegrable_param hr.1.le two_pi_pos.le (contOn_H hHc hrV)
@@ -340,47 +345,55 @@ theorem circleAverage_sub_le (hg : ∀ x ∈ V, HasFDerivAt g (G x) x)
   have h5 : ∫ r in (0:ℝ)..R, π * K * r = π * K * R ^ 2 / 2 := by
     rw [intervalIntegral.integral_const_mul, integral_id]; ring
   rw [h5] at h4
-  have h6 : (2*π)⁻¹ * ∫ r in (0:ℝ)..R, Pr G r ≤ (2*π)⁻¹ * (π * K * R ^ 2 / 2) :=
+  have h6 : (2 * π)⁻¹ * ∫ r in (0:ℝ)..R, Pr G r ≤ (2 * π)⁻¹ * (π * K * R ^ 2 / 2) :=
     mul_le_mul_of_nonneg_left h4 (by positivity)
-  calc _ ≤ _ := h6
+  calc
+    _ ≤ _ := h6
     _ = K * R ^ 2 / 4 := by field_simp; ring
 
-theorem lap_nonneg_of_sub_mean (hg : ∀ x ∈ V, HasFDerivAt g (G x) x)
-    (hGd : ∀ x ∈ V, HasFDerivAt G (H x) x) (hHc : ContinuousOn H V) {R : ℝ} (hR0 : 0 < R)
-    (hR : closedBall (0:ℂ) R ⊆ V)
-    (hsub : ∀ r ∈ Ioc (0:ℝ) R, g 0 ≤ Real.circleAverage g 0 r) :
-    0 ≤ H 0 1 1 + H 0 Complex.I Complex.I := by
+theorem lap_nonneg_of_sub_mean
+    (hg : ∀ x ∈ V, HasFDerivAt g (G x) x) (hGd : ∀ x ∈ V, HasFDerivAt G (H x) x)
+    (hHc : ContinuousOn H V)
+    {R : ℝ} (hR0 : 0 < R) (hR : closedBall (0 : ℂ) R ⊆ V)
+    (hsub : ∀ r ∈ Ioc (0 : ℝ) R, g 0 ≤ Real.circleAverage g 0 r)
+    : 0 ≤ H 0 1 1 + H 0 Complex.I Complex.I := by
   by_contra hc
   push_neg at hc
   set c := H 0 1 1 + H 0 Complex.I Complex.I with hcdef
-  have h0V : (0:ℂ) ∈ V := hR (mem_closedBall_self hR0.le)
-  obtain ⟨δ, hδ, hball⟩ := Metric.continuousWithinAt_iff.mp (hHc 0 h0V) (-c/4) (by linarith)
+  have h0V : (0 : ℂ) ∈ V := hR (mem_closedBall_self hR0.le)
+  obtain ⟨δ, hδ, hball⟩ := Metric.continuousWithinAt_iff.mp (hHc 0 h0V) (-c / 4) (by linarith)
   set ρ := min (δ/2) R with hρdef
   have hρ : 0 < ρ := lt_min (by linarith) hR0
   have hρR : ρ ≤ R := min_le_right _ _
-  have hK : ∀ x ∈ closedBall (0:ℂ) ρ, ∀ θ : ℝ, H x (circleMap 0 1 θ) (circleMap 0 1 θ) +
-      H x (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I) ≤ c / 2 := by
+  have hK
+      : ∀ x ∈ closedBall (0 : ℂ) ρ, ∀ θ : ℝ,
+        H x (circleMap 0 1 θ) (circleMap 0 1 θ)
+            + H x (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I)
+          ≤ c / 2 := by
     intro x hx θ
     have hxV : x ∈ V := hR (closedBall_subset_closedBall hρR hx)
     have hd : dist x 0 < δ :=
       lt_of_le_of_lt (mem_closedBall.mp hx) (lt_of_le_of_lt (min_le_left _ _) (by linarith))
-    have hn : ‖H x - H 0‖ < -c/4 := by simpa [dist_eq_norm] using hball hxV hd
+    have hn : ‖H x - H 0‖ < -c / 4 := by simpa [dist_eq_norm] using hball hxV hd
     have hrot := rot_id (H 0) θ
     have he : ‖circleMap 0 1 θ‖ = 1 := by simp
     have heI : ‖circleMap 0 1 θ * Complex.I‖ = 1 := by simp
     have b1 : |(H x - H 0) (circleMap 0 1 θ) (circleMap 0 1 θ)| ≤ ‖H x - H 0‖ := by
       have := (H x - H 0).le_opNorm₂ (circleMap 0 1 θ) (circleMap 0 1 θ)
-      rw [he] at this; simpa [Real.norm_eq_abs] using this
-    have b2 : |(H x - H 0) (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I)| ≤
-        ‖H x - H 0‖ := by
+      rw [he] at this
+      simpa [Real.norm_eq_abs] using this
+    have b2
+        : |(H x - H 0) (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I)|
+          ≤ ‖H x - H 0‖ := by
       have := (H x - H 0).le_opNorm₂ (circleMap 0 1 θ * Complex.I) (circleMap 0 1 θ * Complex.I)
-      rw [heI] at this; simpa [Real.norm_eq_abs] using this
+      rw [heI] at this
+      simpa [Real.norm_eq_abs] using this
     simp only [ContinuousLinearMap.sub_apply] at b1 b2
     have := abs_le.mp b1
     have := abs_le.mp b2
     linarith
-  have h1 := circleAverage_sub_le hg hGd hHc hρ.le
-    ((closedBall_subset_closedBall hρR).trans hR) (c/2) hK
+  have h1 :=
+    circleAverage_sub_le hg hGd hHc hρ.le ((closedBall_subset_closedBall hρR).trans hR) (c / 2) hK
   have h2 := hsub ρ ⟨hρ, hρR⟩
   have h3 : c / 2 * ρ ^ 2 / 4 < 0 := by
     have : 0 < ρ ^ 2 := by positivity

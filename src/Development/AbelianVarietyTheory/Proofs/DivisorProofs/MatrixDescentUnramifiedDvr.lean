@@ -14,49 +14,56 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StableLattic
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.MatrixDescent
 
-theorem exists_restrict (R K W K' : Type) [CommRing R] [Field K] [Algebra R K] [CommRing W]
-    [Field K'] [Algebra W K'] [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K']
-    [IsScalarTower R K K'] (hinj : Function.Injective (algebraMap W K')) (σ : K' ≃ₐ[K] K')
-    (h1 : ∀ x : W, ∃ y : W, σ (algebraMap W K' x) = algebraMap W K' y)
-    (h2 : ∀ x : W, ∃ y : W, σ.symm (algebraMap W K' x) = algebraMap W K' y) :
-    ∃ τ : W ≃ₐ[R] W, ∀ x : W, algebraMap W K' (τ x) = σ (algebraMap W K' x) := by
+theorem exists_restrict
+    (R K W K' : Type) [CommRing R] [Field K] [Algebra R K] [CommRing W] [Field K'] [Algebra W K']
+    [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K'] [IsScalarTower R K K']
+    (hinj : Function.Injective (algebraMap W K'))
+    (σ : K' ≃ₐ[K] K') (h1 : ∀ x : W, ∃ y : W, σ (algebraMap W K' x) = algebraMap W K' y)
+    (h2 : ∀ x : W, ∃ y : W, σ.symm (algebraMap W K' x) = algebraMap W K' y)
+    : ∃ τ : W ≃ₐ[R] W, ∀ x : W, algebraMap W K' (τ x) = σ (algebraMap W K' x) := by
   choose f hf using h1
   choose f' hf' using h2
-  have hl : Function.LeftInverse f' f := by
-    intro x; apply hinj; rw [← hf', ← hf]; simp
-  have hr : Function.RightInverse f' f := by
-    intro x; apply hinj; rw [← hf, ← hf']; simp
+  have hl : Function.LeftInverse f' f := by intro x; apply hinj; rw [← hf', ← hf]; simp
+  have hr : Function.RightInverse f' f := by intro x; apply hinj; rw [← hf, ← hf']; simp
   have hm : ∀ x y, f (x * y) = f x * f y := by
     intro x y; apply hinj; rw [map_mul, ← hf, ← hf, ← hf, map_mul, map_mul]
   have ha : ∀ x y, f (x + y) = f x + f y := by
-    intro x y; apply hinj; rw [map_add (f := _), ← hf, ← hf, ← hf, map_add (f := _), map_add (f := _)]
+    intro x y
+    apply hinj
+    rw [map_add (f := _), ← hf, ← hf, ← hf, map_add (f := _), map_add (f := _)]
   have hc : ∀ r : R, f (algebraMap R W r) = algebraMap R W r := by
-    intro r; apply hinj; rw [← hf, ← IsScalarTower.algebraMap_apply,
-      IsScalarTower.algebraMap_apply R K K', AlgEquiv.commutes]
-  let τ : W ≃ₐ[R] W :=
-    { toFun := f
-      invFun := f'
-      left_inv := hl
-      right_inv := hr
-      map_mul' := hm
-      map_add' := ha
-      commutes' := hc }
+    intro r
+    apply hinj
+    rw [← hf, ← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply R K K',
+      AlgEquiv.commutes]
+  let τ : W ≃ₐ[R] W := {
+    toFun := f
+    invFun := f'
+    left_inv := hl
+    right_inv := hr
+    map_mul' := hm
+    map_add' := ha
+    commutes' := hc
+  }
   exact ⟨τ, fun x => (hf x).symm⟩
 
-theorem vecMul_mem_span {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W)
-    (v : Fin n → W) : Matrix.vecMul v g ∈ Submodule.span W (Set.range g) := by
+theorem vecMul_mem_span
+    {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W) (v : Fin n → W)
+    : Matrix.vecMul v g ∈ Submodule.span W (Set.range g) := by
   have : Matrix.vecMul v g ∈ LinearMap.range g.vecMulLinear := ⟨v, rfl⟩
   rw [range_vecMulLinear] at this
   exact this
 
-theorem mem_span_iff_vecMul {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W)
-    (v : Fin n → W) : v ∈ Submodule.span W (Set.range g) ↔ ∃ a, Matrix.vecMul a g = v := by
+theorem mem_span_iff_vecMul
+    {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W) (v : Fin n → W)
+    : v ∈ Submodule.span W (Set.range g) ↔ ∃ a, Matrix.vecMul a g = v := by
   constructor
   · intro hv
     have : v ∈ LinearMap.range g.vecMulLinear := by rw [range_vecMulLinear]; exact hv
@@ -64,20 +71,25 @@ theorem mem_span_iff_vecMul {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n
     exact ⟨a, ha⟩
   · rintro ⟨a, rfl⟩; exact vecMul_mem_span g a
 
-theorem rational_rows (R W : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [CommRing W] [IsDomain W] [Algebra R W] (hinj : Function.Injective (algebraMap R W))
-    (n : ℕ) (g : Matrix (Fin n) (Fin n) W) (hg : g.det ≠ 0) (d : R) (hd : d ≠ 0)
-    (hdN : ∀ w : Fin n → W, algebraMap R W d • w ∈ Submodule.span W (Set.range g))
-    (hspan : Submodule.span W (Set.range g) = Submodule.span W
-      {v | v ∈ Submodule.span W (Set.range g) ∧ ∀ i, v i ∈ Set.range (algebraMap R W)}) :
-    ∃ (A : Matrix (Fin n) (Fin n) R) (h : Matrix (Fin n) (Fin n) W),
+theorem rational_rows
+    (R W : Type)
+    [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing W] [IsDomain W] [Algebra R W]
+    (hinj : Function.Injective (algebraMap R W))
+    (n : ℕ) (g : Matrix (Fin n) (Fin n) W) (hg : g.det ≠ 0)
+    (d : R)
+    (hd : d ≠ 0) (hdN : ∀ w : Fin n → W, algebraMap R W d • w ∈ Submodule.span W (Set.range g))
+    (hspan : Submodule.span W (Set.range g)
+      = Submodule.span W
+        {v | v ∈ Submodule.span W (Set.range g) ∧ ∀ i, v i ∈ Set.range (algebraMap R W)})
+    : ∃ (A : Matrix (Fin n) (Fin n) R) (h : Matrix (Fin n) (Fin n) W),
       IsUnit h.det ∧ A.map (algebraMap R W) = h * g := by
   classical
   set N := Submodule.span W (Set.range g) with hNdef
-  let φ : (Fin n → R) →ₗ[R] (Fin n → W) :=
-    { toFun := fun a i => algebraMap R W (a i)
-      map_add' := by intro a b; funext i; simp
-      map_smul' := by intro c a; funext i; simp [Algebra.smul_def] }
+  let φ : (Fin n → R) →ₗ[R] (Fin n → W) := {
+    toFun := fun a i => algebraMap R W (a i)
+    map_add' := by intro a b; funext i; simp
+    map_smul' := by intro c a; funext i; simp [Algebra.smul_def]
+  }
   have hφ : ∀ a i, φ a i = algebraMap R W (a i) := fun _ _ => rfl
 
   let N₀ : Submodule R (Fin n → R) := (N.restrictScalars R).comap φ
@@ -148,20 +160,22 @@ end GlobalTheory.MatrixDescent
 
 namespace GlobalTheory
 
-
 open GlobalTheory.MatrixDescent in
-theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] [CommRing W]
-    [IsDomain W] [IsDiscreteValuationRing W] [Field K'] [Algebra W K'] [IsFractionRing W K']
-    [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K'] [IsScalarTower R K K']
-    (hm : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) (D : Set (K' ≃ₐ[K] K'))
+theorem matrix_descent_unramified
+    (R K W K' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+    [IsFractionRing R K] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field K']
+    [Algebra W K'] [IsFractionRing W K'] [Algebra R W] [Algebra K K'] [Algebra R K']
+    [IsScalarTower R W K'] [IsScalarTower R K K']
+    (hm : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
+    (D : Set (K' ≃ₐ[K] K'))
     (hD1 : ∀ σ ∈ D, ∀ x : W, ∃ y : W, σ (algebraMap W K' x) = algebraMap W K' y)
     (hD2 : ∀ σ ∈ D, ∀ x : W, ∃ y : W, σ.symm (algebraMap W K' x) = algebraMap W K' y)
-    (hres : ∀ x : W, (∀ σ ∈ D, ∀ y : W, σ (algebraMap W K' x) = algebraMap W K' y →
-      y - x ∈ maximalIdeal W) → ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W)
+    (hres : ∀ x : W,
+      (∀ σ ∈ D, ∀ y : W, σ (algebraMap W K' x) = algebraMap W K' y → y - x ∈ maximalIdeal W)
+        → ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W)
     (n : ℕ) (g : Matrix (Fin n) (Fin n) K') (hg : IsUnit g.det)
-    (hstab : ∀ σ ∈ D, ∃ h : Matrix (Fin n) (Fin n) W, g.map σ = h.map (algebraMap W K') * g) :
-    ∃ (h : Matrix (Fin n) (Fin n) W) (k : Matrix (Fin n) (Fin n) K),
+    (hstab : ∀ σ ∈ D, ∃ h : Matrix (Fin n) (Fin n) W, g.map σ = h.map (algebraMap W K') * g)
+    : ∃ (h : Matrix (Fin n) (Fin n) W) (k : Matrix (Fin n) (Fin n) K),
       IsUnit h.det ∧ k.map (algebraMap K K') = h.map (algebraMap W K') * g := by
   set iW := algebraMap W K' with hiW
   have hinjW : Function.Injective iW := IsFractionRing.injective W K'
@@ -182,8 +196,9 @@ theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
   have hirr : Irreducible (algebraMap R W ϖ) :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer _).mpr hmax
 
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (M := nonZeroDivisors W)
-    (Finset.univ : Finset (Fin n × Fin n)) (fun p => g p.1 p.2)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples (M := nonZeroDivisors W)
+      (Finset.univ : Finset (Fin n × Fin n)) (fun p => g p.1 p.2)
   have hb0 : (b : W) ≠ 0 := nonZeroDivisors.coe_ne_zero b
   obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.associated_pow_irreducible hb0 hirr
   set c : R := ϖ ^ k with hcdef
@@ -202,8 +217,7 @@ theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
     intro h0
     have : iW (Matrix.of g').det = (algebraMap R K' c) ^ n * g.det := by
       rw [RingHom.map_det]
-      have e : iW.mapMatrix (Matrix.of g') = algebraMap R K' c • g := by
-        ext i j; simp [hg']
+      have e : iW.mapMatrix (Matrix.of g') = algebraMap R K' c • g := by ext i j; simp [hg']
       rw [e, Matrix.det_smul, Fintype.card_fin]
     rw [h0, map_zero] at this
     exact (mul_ne_zero (pow_ne_zero n hcK'0) hg.ne_zero) this.symm
@@ -214,10 +228,12 @@ theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
   obtain ⟨r, v, hv⟩ := IsDiscreteValuationRing.associated_pow_irreducible hdet' hirr
   have hdN : ∀ w : Fin n → W, algebraMap R W (ϖ ^ r) • w ∈ N := by
     intro w
-    have e : algebraMap R W (ϖ ^ r) • w = Matrix.vecMul ((v : W) • Matrix.vecMul w G.adjugate) G := by
+    have e
+        : algebraMap R W (ϖ ^ r) • w = Matrix.vecMul ((v : W) • Matrix.vecMul w G.adjugate) G := by
       rw [Matrix.smul_vecMul, Matrix.vecMul_vecMul, Matrix.adjugate_mul, Matrix.vecMul_smul,
         Matrix.vecMul_one, smul_smul, map_pow, ← hv, mul_comm]
-    rw [e]; exact vecMul_mem_span G _
+    rw [e]
+    exact vecMul_mem_span G _
   have hlat : (maximalIdeal W) ^ r • (⊤ : Submodule W (Fin n → W)) ≤ N := by
     rw [Submodule.smul_le]
     intro x hx w _
@@ -229,14 +245,16 @@ theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
   have hτ : ∀ σ ∈ D, ∃ τ : W ≃ₐ[R] W, ∀ x : W, iW (τ x) = σ (iW x) := fun σ hσ =>
     exists_restrict R K W K' hinjW σ (hD1 σ hσ) (hD2 σ hσ)
   set D' : Set (W ≃ₐ[R] W) := {τ | ∃ σ ∈ D, ∀ x : W, iW (τ x) = σ (iW x)} with hD'def
-  have hres' : ∀ x : W, (∀ τ ∈ D', τ x - x ∈ maximalIdeal W) →
-      ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W := by
+  have hres'
+      : ∀ x : W,
+        (∀ τ ∈ D', τ x - x ∈ maximalIdeal W) → ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W := by
     intro x hx
     apply hres x
     intro σ hσ y hy
     obtain ⟨τ, hτσ⟩ := hτ σ hσ
     have : τ x = y := hinjW (by rw [hτσ, hy])
-    rw [← this]; exact hx τ ⟨σ, hσ, hτσ⟩
+    rw [← this]
+    exact hx τ ⟨σ, hσ, hτσ⟩
   have hstab' : ∀ τ ∈ D', ∀ w ∈ N, (fun i => τ (w i)) ∈ N := by
     rintro τ ⟨σ, hσ, hτσ⟩ w hw
     obtain ⟨h, hh⟩ := hstab σ hσ
@@ -249,15 +267,18 @@ theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
       rw [Matrix.map_apply, Matrix.mul_apply] at this
       rw [this, hRK'', AlgEquiv.commutes, ← hRK'', Finset.mul_sum]
       refine Finset.sum_congr rfl fun l _ => ?_
-      rw [map_mul, hGmap, Matrix.map_apply]; ring
+      rw [map_mul, hGmap, Matrix.map_apply]
+      ring
     obtain ⟨a, rfl⟩ := (mem_span_iff_vecMul G w).mp hw
-    have e : (fun i => τ (Matrix.vecMul a G i)) =
-        Matrix.vecMul (Matrix.vecMul (fun i => τ (a i)) h) G := by
+    have e
+        : (fun i => τ (Matrix.vecMul a G i))
+          = Matrix.vecMul (Matrix.vecMul (fun i => τ (a i)) h) G := by
       rw [Matrix.vecMul_vecMul, ← hGτ]
       funext i
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.vecMul, dotProduct, map_sum]
-    rw [e]; exact vecMul_mem_span G _
+      simp [Matrix.vecMul, dotProduct, map_sum]
+    rw [e]
+    exact vecMul_mem_span G _
   have hspan := stable_lattice_descent_unramified R W hm D' hres' n r N hlat hstab'
   obtain ⟨A, h, hhu, hA⟩ :=
     rational_rows R W hinjR n G hdet' (ϖ ^ r) (pow_ne_zero r hϖ.ne_zero) hdN hspan
@@ -269,7 +290,8 @@ theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hRK', e1, map_sum, Matrix.mul_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
-    rw [map_mul, hGmap, Matrix.map_apply]; ring
+    rw [map_mul, hGmap, Matrix.map_apply]
+    ring
   rw [Matrix.map_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, map_mul, map_inv₀,
     ← hRK'', ← hRK'', e2]
   field_simp

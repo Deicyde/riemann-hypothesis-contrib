@@ -28,7 +28,10 @@ noncomputable section
 
 namespace GlobalTheory.RunNum
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.RunJoin
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps
+  Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.RunJoin
 
 open Formalism.MainNotions.Gaps.EtaleWeightGaps.Num.Pm Formalism.BasicNotions.LevelStarExponents
 
@@ -47,39 +50,48 @@ theorem dim_pos (D : D7) (j : ℕ) : (1 : ℝ) ≤ WeightFamilies.dimY D j := by
     omega
   exact_mod_cast this
 
-theorem dim_le (large₂ : SizeData₂ D) {j : ℕ} (hj : InR D j) : (WeightFamilies.dimY D j : ℝ) ≤ zBase large₂ ^ 2 := by
+theorem dim_le (large₂ : SizeData₂ D) {j : ℕ} (hj : InR D j)
+    : (WeightFamilies.dimY D j : ℝ) ≤ zBase large₂ ^ 2 := by
   have hs : (D.R.sigW j).1 + (D.R.sigW j).2 = D.R.r := by
     have h1 := hj.1
     have h2 := hj.2
-    unfold Ranks.sigW Ranks.r; simp only; omega
+    unfold Ranks.sigW Ranks.r
+    simp only
+    omega
   have h : WeightFamilies.dimY D j ≤ D.R.f * D.R.r ^ 2 := by
     unfold WeightFamilies.dimY
     apply Nat.mul_le_mul_left
     rw [← hs]
     generalize (D.R.sigW j).1 = p
     generalize (D.R.sigW j).2 = q
-    have a : p * (p - 1) / 2 ≤ p * p := (Nat.div_le_self _ _).trans (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
-    have b : q * (q - 1) / 2 ≤ q * q := (Nat.div_le_self _ _).trans (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
+    have a : p * (p - 1) / 2 ≤ p * p :=
+      (Nat.div_le_self _ _).trans (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
+    have b : q * (q - 1) / 2 ≤ q * q :=
+      (Nat.div_le_self _ _).trans (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
     nlinarith [Nat.zero_le (p * q)]
   have h' : (WeightFamilies.dimY D j : ℝ) ≤ (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 := by exact_mod_cast h
   have m := mono large₂ 1 2 0 2 (by norm_num) (by norm_num) (by norm_num)
   simp only [pow_one, pow_zero, mul_one] at m
   exact h'.trans m
 
-theorem ppv_nat (large₂ : SizeData₂ D) (C : ℝ) (n : ℕ) : WeightFamilies.PPv D large₂ C (n : ℝ) = C * zBase large₂ ^ n := by
+theorem ppv_nat (large₂ : SizeData₂ D) (C : ℝ) (n : ℕ)
+    : WeightFamilies.PPv D large₂ C (n : ℝ) = C * zBase large₂ ^ n := by
   unfold WeightFamilies.PPv; rw [Real.rpow_natCast]
 
-theorem ppv_two (large₂ : SizeData₂ D) (C : ℝ) : WeightFamilies.PPv D large₂ C 2 = C * zBase large₂ ^ 2 := by
+theorem ppv_two (large₂ : SizeData₂ D) (C : ℝ)
+    : WeightFamilies.PPv D large₂ C 2 = C * zBase large₂ ^ 2 := by
   exact_mod_cast ppv_nat large₂ C 2
 
-theorem ppv_three (large₂ : SizeData₂ D) (C : ℝ) : WeightFamilies.PPv D large₂ C 3 = C * zBase large₂ ^ 3 := by
+theorem ppv_three (large₂ : SizeData₂ D) (C : ℝ)
+    : WeightFamilies.PPv D large₂ C 3 = C * zBase large₂ ^ 3 := by
   exact_mod_cast ppv_nat large₂ C 3
 
-theorem ppv_four (large₂ : SizeData₂ D) (C : ℝ) : WeightFamilies.PPv D large₂ C 4 = C * zBase large₂ ^ 4 := by
+theorem ppv_four (large₂ : SizeData₂ D) (C : ℝ)
+    : WeightFamilies.PPv D large₂ C 4 = C * zBase large₂ ^ 4 := by
   exact_mod_cast ppv_nat large₂ C 4
 
-theorem ppv_ge (large₂ : SizeData₂ D) {C A : ℝ} (hC : 1000 ≤ C) (hA : 12 ≤ A) :
-    1000 * zBase large₂ ^ 12 ≤ WeightFamilies.PPv D large₂ C A := by
+theorem ppv_ge (large₂ : SizeData₂ D) {C A : ℝ} (hC : 1000 ≤ C) (hA : 12 ≤ A)
+    : 1000 * zBase large₂ ^ 12 ≤ WeightFamilies.PPv D large₂ C A := by
   unfold WeightFamilies.PPv
   have h1 := one_le_Z large₂
   have h2 : zBase large₂ ^ (12 : ℕ) ≤ zBase large₂ ^ A := by
@@ -89,9 +101,11 @@ theorem ppv_ge (large₂ : SizeData₂ D) {C A : ℝ} (hC : 1000 ≤ C) (hA : 12
 
 theorem PO_nonneg (large₂ : SizeData₂ D) : 0 ≤ PO D large₂ := by
   have := one_le_L large₂
-  unfold PO; positivity
+  unfold PO
+  positivity
 
-theorem one_add_DF_le {j : ℕ} (w : WeightFamilies.Wt D j) : 1 + (WeightAlgebra.DF w : ℝ) ≤ w.size := by
+theorem one_add_DF_le {j : ℕ} (w : WeightFamilies.Wt D j)
+    : 1 + (WeightAlgebra.DF w : ℝ) ≤ w.size := by
   unfold WeightFamilies.Wt.size WeightAlgebra.DF degP
   push_cast
   have : (0 : ℝ) ≤ (D.R.f : ℝ) * max ((D.R.sigW j).2 : ℝ) 1 * D.R.r * w.n := by positivity
@@ -102,8 +116,11 @@ theorem one_le_size {j : ℕ} (w : WeightFamilies.Wt D j) : 1 ≤ w.size := by
   have h : (0 : ℝ) ≤ WeightAlgebra.DF w := Nat.cast_nonneg _
   linarith
 
-theorem log_size_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt D j) {CK : ℝ} (hC : CK ≤ zBase large₂)
-    (h : w.size ≤ CK * D.R.k * D.R.f * large₂.sc.b) : Real.log w.size ≤ 3 * zBase large₂ := by
+theorem log_size_le
+    (large₂ : SizeData₂ D)
+    {j : ℕ} (w : WeightFamilies.Wt D j)
+    {CK : ℝ} (hC : CK ≤ zBase large₂) (h : w.size ≤ CK * D.R.k * D.R.f * large₂.sc.b)
+    : Real.log w.size ≤ 3 * zBase large₂ := by
   have hZ := one_le_Z large₂
   have hb : 0 < large₂.sc.b := Real.exp_pos _
   have hkf : (D.R.k : ℝ) * D.R.f ≤ zBase large₂ := by
@@ -115,7 +132,8 @@ theorem log_size_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt 
   have h2 : CK * D.R.k * D.R.f ≤ zBase large₂ * zBase large₂ := by
     rw [mul_assoc]
     exact mul_le_mul hC hkf h0 (by linarith)
-  have h3 : w.size ≤ zBase large₂ * zBase large₂ * large₂.sc.b := h.trans (mul_le_mul_of_nonneg_right h2 hb.le)
+  have h3 : w.size ≤ zBase large₂ * zBase large₂ * large₂.sc.b :=
+    h.trans (mul_le_mul_of_nonneg_right h2 hb.le)
   have h4 := Real.log_le_log (by linarith [one_le_size w]) h3
   have hZ0 : 0 < zBase large₂ := by linarith
   rw [Real.log_mul (by positivity) hb.ne', Real.log_mul hZ0.ne' hZ0.ne', log_b] at h4
@@ -123,8 +141,9 @@ theorem log_size_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt 
   have h6 := L_le_Z large₂
   linarith
 
-theorem obound_of_opo (large₂ : SizeData₂ D) (B : WeightFamilies.Prov D) (h : OPO large₂ B) (hZ : 217 ≤ zBase large₂) :
-    WeightFamilies.Obound B large₂ 1 4 := by
+theorem obound_of_opo
+    (large₂ : SizeData₂ D) (B : WeightFamilies.Prov D) (h : OPO large₂ B) (hZ : 217 ≤ zBase large₂)
+    : WeightFamilies.Obound B large₂ 1 4 := by
   have h1 := PO_le large₂
   have h2 : PO D large₂ ≤ WeightFamilies.PPv D large₂ 1 4 := by
     rw [ppv_four]
@@ -136,20 +155,27 @@ theorem obound_of_opo (large₂ : SizeData₂ D) (B : WeightFamilies.Prov D) (h 
   have hd : (0 : ℝ) < |((NumberField.discr B.KO : ℤ) : ℝ)| := by
     rw [abs_pos]; exact_mod_cast NumberField.discr_ne_zero B.KO
   rw [Real.log_rpow hd]
-  apply le_of_eq; ring
+  apply le_of_eq
+  ring
 
-theorem Gc_le {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) (B : WeightFamilies.Prov D) (h : OPO large₂ B)
-    (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1) (po : ℕ) (hp : Real.log po ≤ large₂.sc.L) :
-    Gc large₂ B (1009 * Zb D large₂) po ≤ 2000 * zBase large₂ ^ 2 := by
+theorem Gc_le
+    {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂)
+    (B : WeightFamilies.Prov D) (h : OPO large₂ B)
+    (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1)
+    (po : ℕ) (hp : Real.log po ≤ large₂.sc.L)
+    : Gc large₂ B (1009 * Zb D large₂) po ≤ 2000 * zBase large₂ ^ 2 := by
   have hZ := one_le_Z large₂
   have hL := L_le_Z large₂
   have h1 := PO_le large₂
   have h2 := lamStar_le Q hg
   have hz2 : zBase large₂ ≤ zBase large₂ ^ 2 := by nlinarith
-  have h3 : max
-      (Real.log (Module.finrank ℚ B.KO) + Real.log |((NumberField.discr B.KO : ℤ) : ℝ)| / Module.finrank ℚ B.KO)
-      (Real.log (Module.finrank ℚ D.host.E) +
-        Real.log |((NumberField.discr D.host.E : ℤ) : ℝ)| / Module.finrank ℚ D.host.E) ≤ 434 * zBase large₂ ^ 2 := by
+  have h3
+      : max
+          (Real.log (Module.finrank ℚ B.KO)
+            + Real.log |((NumberField.discr B.KO : ℤ) : ℝ)| / Module.finrank ℚ B.KO)
+          (Real.log (Module.finrank ℚ D.host.E)
+            + Real.log |((NumberField.discr D.host.E : ℤ) : ℝ)| / Module.finrank ℚ D.host.E)
+        ≤ 434 * zBase large₂ ^ 2 := by
     refine max_le (by linarith [h.1, h.2]) ?_
     rw [finrank_E]
     have e := lrd_eq D
@@ -157,29 +183,37 @@ theorem Gc_le {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) (B : 
     rw [e]
     linarith [log_two_f_le large₂, log_rdE_le_scL Q]
   have h4 : 2 * (D.R.f : ℝ) * D.R.r * (lamStar D + 2 * Real.log po) ≤ 46 * zBase large₂ := by
-    calc _ ≤ 2 * (D.R.f : ℝ) * D.R.r * (23 * large₂.sc.L) :=
-          mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+    calc
+      _ ≤ 2 * (D.R.f : ℝ) * D.R.r * (23 * large₂.sc.L) :=
+        mul_le_mul_of_nonneg_left (by linarith) (by positivity)
       _ = _ := by unfold zBase; ring
   have eZ : Zb D large₂ = zBase large₂ := rfl
   unfold Gc
   rw [eZ]
   linarith
 
-theorem runBaseConstant_two_bounds {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) {CL : ℝ} (h0 : 0 ≤ CL) (hC : CL ≤ zBase large₂) :
-    0 ≤ WeightFamilies.PP0v D large₂ CL 2 ∧ WeightFamilies.PP0v D large₂ CL 2 ≤ 900 * zBase large₂ ^ 3 := by
+theorem runBaseConstant_two_bounds
+    {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂)
+    {CL : ℝ} (h0 : 0 ≤ CL) (hC : CL ≤ zBase large₂)
+    : 0 ≤ WeightFamilies.PP0v D large₂ CL 2
+      ∧ WeightFamilies.PP0v D large₂ CL 2 ≤ 900 * zBase large₂ ^ 3 := by
   have h1 := growthZero_le_thirty_zBase Q
   have h2 := growthZero_nonneg large₂
   unfold WeightFamilies.PP0v at h1 h2 ⊢
   rw [Real.rpow_one, one_mul] at h1 h2
   rw [Real.rpow_two]
   refine ⟨by positivity, ?_⟩
-  calc _ ≤ zBase large₂ * (30 * zBase large₂) ^ 2 :=
-        mul_le_mul hC (pow_le_pow_left₀ h2 h1 2) (by positivity) (h0.trans hC)
+  calc
+    _ ≤ zBase large₂ * (30 * zBase large₂) ^ 2 :=
+      mul_le_mul hC (pow_le_pow_left₀ h2 h1 2) (by positivity) (h0.trans hC)
     _ = _ := by ring
 
-theorem nbR_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt D j)
+theorem nbR_le
+    (large₂ : SizeData₂ D)
+    {j : ℕ} (w : WeightFamilies.Wt D j)
     (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1) (hn : (w.n : ℝ) ≤ zBase large₂ ^ 5)
-    (hs : Real.log w.size ≤ 3 * zBase large₂) : nbR large₂ w ≤ 241 * zBase large₂ ^ 7 := by
+    (hs : Real.log w.size ≤ 3 * zBase large₂)
+    : nbR large₂ w ≤ 241 * zBase large₂ ^ 7 := by
   have hZ := one_le_Z large₂
   have hL := L_le_Z large₂
   have h1 := PO_le large₂
@@ -189,11 +223,15 @@ theorem nbR_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt D j)
   have h4 : Real.log 2 < 1 := by have := Real.log_two_lt_d9; linarith
   have h5 : (D.R.f : ℝ) * D.R.r * w.n ≤ zBase large₂ * zBase large₂ ^ 5 :=
     mul_le_mul (fr_le_Z large₂) hn (by positivity) (by linarith)
-  have h6 : (D.R.f : ℝ) * D.R.r * w.n * (Real.log ((D.host.g 0 : ℝ) * D.host.g 1) + Real.log (1 + (WeightAlgebra.DF w : ℝ))) ≤
-      23 * zBase large₂ ^ 7 := by
-    calc _ ≤ (D.R.f : ℝ) * D.R.r * w.n * (23 * zBase large₂) :=
-          mul_le_mul_of_nonneg_left (by linarith) (by positivity)
-      _ ≤ zBase large₂ * zBase large₂ ^ 5 * (23 * zBase large₂) := mul_le_mul_of_nonneg_right h5 (by linarith)
+  have h6
+      : (D.R.f : ℝ) * D.R.r * w.n
+          * (Real.log ((D.host.g 0 : ℝ) * D.host.g 1) + Real.log (1 + (WeightAlgebra.DF w : ℝ)))
+        ≤ 23 * zBase large₂ ^ 7 := by
+    calc
+      _ ≤ (D.R.f : ℝ) * D.R.r * w.n * (23 * zBase large₂) :=
+        mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+      _ ≤ zBase large₂ * zBase large₂ ^ 5 * (23 * zBase large₂) :=
+        mul_le_mul_of_nonneg_right h5 (by linarith)
       _ = _ := by ring
   have a := Zpow_le large₂ (a := 0) (n := 7) (by norm_num)
   have b := Zpow_le large₂ (a := 2) (n := 7) (by norm_num)
@@ -202,12 +240,14 @@ theorem nbR_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt D j)
   push_cast
   linarith
 
-theorem thetaGeneratorArchLowerConst_le (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt D j) (hn : (w.n : ℝ) ≤ zBase large₂ ^ 5) :
-    p14R w ≤ 35 * zBase large₂ ^ 7 := by
+theorem thetaGeneratorArchLowerConst_le
+    (large₂ : SizeData₂ D) {j : ℕ} (w : WeightFamilies.Wt D j) (hn : (w.n : ℝ) ≤ zBase large₂ ^ 5)
+    : p14R w ≤ 35 * zBase large₂ ^ 7 := by
   have hZ := one_le_Z large₂
   have hf : I2.PT.f D.host.E = D.R.f := by
     have h : Module.finrank ℚ D.host.E = 2 * D.R.f := by exact_mod_cast finrank_E D
-    unfold I2.PT.f; omega
+    unfold I2.PT.f
+    omega
   have hd : (I2.dstar (E := D.host.E) D.R.m : ℝ) ≤ 2 * zBase large₂ := by
     unfold I2.dstar
     rw [hf]
@@ -219,17 +259,27 @@ theorem thetaGeneratorArchLowerConst_le (large₂ : SizeData₂ D) {j : ℕ} (w 
   have hd0 : (0 : ℝ) ≤ (I2.dstar (E := D.host.E) D.R.m : ℝ) := Nat.cast_nonneg _
   have h1 : Real.log (2 * (I2.dstar (E := D.host.E) D.R.m : ℝ)) ≤ 4 * zBase large₂ :=
     (Real.log_le_self (by positivity)).trans (by linarith)
-  have h2 : (I2.dstar (E := D.host.E) D.R.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := D.host.E) D.R.m : ℝ)) ≤
-      zBase large₂ * (4 * zBase large₂) :=
-    (mul_le_mul_of_nonneg_left h1 (by positivity)).trans (mul_le_mul_of_nonneg_right (by linarith) (by linarith))
+  have h2
+      : (I2.dstar (E := D.host.E) D.R.m : ℝ) / 2
+          * Real.log (2 * (I2.dstar (E := D.host.E) D.R.m : ℝ))
+        ≤ zBase large₂ * (4 * zBase large₂) :=
+    (mul_le_mul_of_nonneg_left h1 (by positivity)).trans
+      (mul_le_mul_of_nonneg_right (by linarith) (by linarith))
   have h3 : Real.log 24 ≤ 24 := Real.log_le_self (by norm_num)
   have h4 : Real.log Real.pi ≤ 4 := (Real.log_le_self Real.pi_pos.le).trans Real.pi_le_four
   have h5 : Real.log 2 < 1 := by have := Real.log_two_lt_d9; linarith
   have hz2 : 1 ≤ zBase large₂ ^ 2 := one_le_pow₀ hZ
-  have h6 : (w.n : ℝ) * (Real.log 24 + (I2.dstar (E := D.host.E) D.R.m : ℝ) / 2 *
-      Real.log (2 * (I2.dstar (E := D.host.E) D.R.m : ℝ))) ≤ 28 * zBase large₂ ^ 7 := by
-    calc _ ≤ (w.n : ℝ) * (28 * zBase large₂ ^ 2) := mul_le_mul_of_nonneg_left (by nlinarith) (by positivity)
-      _ ≤ zBase large₂ ^ 5 * (28 * zBase large₂ ^ 2) := mul_le_mul_of_nonneg_right hn (by positivity)
+  have h6
+      : (w.n : ℝ)
+          * (Real.log 24
+            + (I2.dstar (E := D.host.E) D.R.m : ℝ) / 2
+              * Real.log (2 * (I2.dstar (E := D.host.E) D.R.m : ℝ)))
+        ≤ 28 * zBase large₂ ^ 7 := by
+    calc
+      _ ≤ (w.n : ℝ) * (28 * zBase large₂ ^ 2) :=
+        mul_le_mul_of_nonneg_left (by nlinarith) (by positivity)
+      _ ≤ zBase large₂ ^ 5 * (28 * zBase large₂ ^ 2) :=
+        mul_le_mul_of_nonneg_right hn (by positivity)
       _ = _ := by ring
   have hr := mono large₂ 0 1 0 7 (by norm_num) (by norm_num) (by norm_num)
   simp only [pow_one, pow_zero, mul_one, one_mul] at hr
@@ -239,10 +289,13 @@ theorem thetaGeneratorArchLowerConst_le (large₂ : SizeData₂ D) {j : ℕ} (w 
   unfold p14R GlobalTheory.BlockTh.p14
   refine max_le (by linarith) (by linarith)
 
-theorem lamR_le {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) {j : ℕ} (hj : InR D j) (w : WeightFamilies.Wt D j) {CL : ℝ}
-    (h0 : 0 ≤ CL) (hC : CL ≤ zBase large₂)
+theorem lamR_le
+    {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂)
+    {j : ℕ} (hj : InR D j) (w : WeightFamilies.Wt D j)
+    {CL : ℝ} (h0 : 0 ≤ CL) (hC : CL ≤ zBase large₂)
     (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1) (hn : (w.n : ℝ) ≤ zBase large₂ ^ 5)
-    (hs : Real.log w.size ≤ 3 * zBase large₂) : lamR large₂ CL w ≤ 2000000 * zBase large₂ ^ 10 := by
+    (hs : Real.log w.size ≤ 3 * zBase large₂)
+    : lamR large₂ CL w ≤ 2000000 * zBase large₂ ^ 10 := by
   have hZ := one_le_Z large₂
   have h1 := PO_le large₂
   have h2 := PO_nonneg large₂
@@ -251,8 +304,11 @@ theorem lamR_le {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) {j 
   obtain ⟨h5, h6⟩ := runBaseConstant_two_bounds Q h0 hC
   have hD : (0 : ℝ) < (WeightFamilies.dimY D j : ℝ) + 2 := by positivity
   have hz2 : 1 ≤ zBase large₂ ^ 2 := one_le_pow₀ hZ
-  have h7 : Real.log (8 * ((WeightFamilies.dimY D j : ℝ) + 2) ^ 3 * (2 + PO D large₂)) ≤ 236 * zBase large₂ ^ 2 := by
-    rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by norm_num) (by positivity), Real.log_pow]
+  have h7
+      : Real.log (8 * ((WeightFamilies.dimY D j : ℝ) + 2) ^ 3 * (2 + PO D large₂))
+        ≤ 236 * zBase large₂ ^ 2 := by
+    rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by norm_num) (by positivity),
+      Real.log_pow]
     have a : Real.log 8 ≤ 8 := Real.log_le_self (by norm_num)
     have b := Real.log_le_self hD.le
     have c : Real.log (2 + PO D large₂) ≤ 2 + PO D large₂ := Real.log_le_self (by linarith)
@@ -268,14 +324,18 @@ theorem lamR_le {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) {j 
   unfold lamR
   rw [eZ]
   refine max_le (by linarith) ?_
-  calc _ ≤ WeightFamilies.PP0v D large₂ CL 2 * (1763 * zBase large₂ ^ 7) := mul_le_mul_of_nonneg_left (by linarith) h5
-    _ ≤ 900 * zBase large₂ ^ 3 * (1763 * zBase large₂ ^ 7) := mul_le_mul_of_nonneg_right h6 (by linarith)
+  calc
+    _ ≤ WeightFamilies.PP0v D large₂ CL 2 * (1763 * zBase large₂ ^ 7) :=
+      mul_le_mul_of_nonneg_left (by linarith) h5
+    _ ≤ 900 * zBase large₂ ^ 3 * (1763 * zBase large₂ ^ 7) :=
+      mul_le_mul_of_nonneg_right h6 (by linarith)
     _ = 1586700 * zBase large₂ ^ 10 := by ring
     _ ≤ _ := by linarith
 
-theorem runIndexConstant_le_zBase_sq {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂) (j : ℕ)
-    (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1) :
-    PI4 D j (1009 * Zb D large₂) (81 * Zb D large₂ ^ 2) ≤ 6000 * zBase large₂ ^ 2 := by
+theorem runIndexConstant_le_zBase_sq
+    {large₂ : SizeData₂ D} (Q : ParameterChoice' D large₂)
+    (j : ℕ) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1)
+    : PI4 D j (1009 * Zb D large₂) (81 * Zb D large₂ ^ 2) ≤ 6000 * zBase large₂ ^ 2 := by
   have hZ := one_le_Z large₂
   have hL := L_le_Z large₂
   have h2 := lamStar_le Q hg
@@ -283,11 +343,22 @@ theorem runIndexConstant_le_zBase_sq {large₂ : SizeData₂ D} (Q : ParameterCh
   have eZ : Zb D large₂ = zBase large₂ := rfl
   unfold PI4
   rw [eZ]
-  have h3 : 2 * (81 * zBase large₂ ^ 2) / (WeightFamilies.dimY D j : ℝ) ≤ 2 * (81 * zBase large₂ ^ 2) :=
+  have h3
+      : 2 * (81 * zBase large₂ ^ 2) / (WeightFamilies.dimY D j : ℝ) ≤ 2 * (81 * zBase large₂ ^ 2) :=
     div_le_self (by positivity) (dim_pos D j)
   linarith
 
-theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL → ∃ Z₀ : ℝ → ℝ → ℝ, ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CT : ℝ) (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ), InR D j → PageOK large₂ X H C2 A2 CT ka wL wF Tn nP nW h0 → Z₀ H.CA H.CK ≤ zBase large₂ → PageGq large₂ (gcR large₂ B) 1 4 ∧ PolyDom (j := j) D B large₂ (kR CL) H C2 A2 7 1 4 (Cq H.CA H.CK) 4 (gcR large₂ B) (phR large₂ B CL wL) (prwR large₂) (WeightFamilies.PPv D large₂ 200000 2) (pdR large₂ ka) ka := by
+theorem polyDom_of_pageOK
+    : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ),
+      0 < CL
+        → ∃ Z₀ : ℝ → ℝ → ℝ,
+          ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ)
+              (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CT : ℝ)
+              (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ),
+            InR D j → PageOK large₂ X H C2 A2 CT ka wL wF Tn nP nW h0 → Z₀ H.CA H.CK ≤ zBase large₂
+              → PageGq large₂ (gcR large₂ B) 1 4 ∧ PolyDom (j := j) D B large₂ (kR CL) H C2 A2 7 1 4
+                (Cq H.CA H.CK) 4 (gcR large₂ B) (phR large₂ B CL wL) (prwR large₂)
+                (WeightFamilies.PPv D large₂ 200000 2) (pdR large₂ ka) ka := by
   intro CL Cq hCL
   refine ⟨fun a b => CL + |b| + |Cq a b|, ?_⟩
   intro D B P j X large₂ H C2 A2 CT ka wL wF Tn nP nW h0 hj hP hZ0
@@ -296,7 +367,9 @@ theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL �
   obtain ⟨Q, -⟩ := hP.page
   obtain ⟨t1, -, t3, t4, t5, t6⟩ := hP.tie
   obtain ⟨-, -, -, -, hg, -, -, hp1, hp2, -⟩ := hA
-  obtain ⟨-, -, -, -, -, -, -, hka, -, -, -, hnW, -, -, hL, -, hwL, hT, -, -, -, -, -, -, hO, hDom⟩ := hS
+  obtain
+      ⟨-, -, -, -, -, -, -, hka, -, -, -, hnW, -, -, hL, -, hwL, hT, -, -, -, -, -, -, hO, hDom⟩ :=
+    hS
   rw [t1] at hDom
   obtain ⟨d1, d2, -, -, -, -, -, -, d9, -⟩ := hDom
   have eZ : Zb D large₂ = zBase large₂ := rfl
@@ -307,7 +380,9 @@ theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL �
   have hC2 : C2 ≤ zBase large₂ := (le_self_pow₀ (by linarith) (by norm_num)).trans d2
   have hbig : 10 ^ 9 ≤ zBase large₂ := by
     refine le_trans ?_ d2
-    calc (10 : ℝ) ^ 9 ≤ 1000 ^ 20 := by norm_num
+    calc
+      (10 : ℝ) ^ 9
+        ≤ 1000 ^ 20 := by norm_num
       _ ≤ _ := pow_le_pow_left₀ (by norm_num) d1 20
   have hb := abs_nonneg H.CK
   have hq := abs_nonneg (Cq H.CA H.CK)
@@ -316,7 +391,8 @@ theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL �
   have hCLZ : CL ≤ zBase large₂ := by linarith
   have hn : (wL.n : ℝ) ≤ zBase large₂ ^ 5 := by
     rw [hL.1]
-    calc _ ≤ C2 * zBase large₂ ^ 4 := hnW.trans d9
+    calc
+      _ ≤ C2 * zBase large₂ ^ 4 := hnW.trans d9
       _ ≤ zBase large₂ * zBase large₂ ^ 4 := mul_le_mul_of_nonneg_right hC2 (by positivity)
       _ = _ := by ring
   have hsk := log_size_le large₂ ka hCK hka
@@ -329,7 +405,8 @@ theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL �
     rw [pow_succ' (zBase large₂) n]
     exact mul_le_mul_of_nonneg_right hbig (by positivity)
   have z0 : 1 ≤ zBase large₂ ^ 2 := one_le_pow₀ hZ
-  have z1 : zBase large₂ ≤ zBase large₂ ^ 2 := by simpa using Zpow_le large₂ (a := 1) (n := 2) (by norm_num)
+  have z1 : zBase large₂ ≤ zBase large₂ ^ 2 := by
+    simpa using Zpow_le large₂ (a := 1) (n := 2) (by norm_num)
   have z2 := Zpow_le large₂ (a := 2) (n := 4) (by norm_num)
   have z3 := Zpow_le large₂ (a := 3) (n := 4) (by norm_num)
   have z4 := Zpow_le large₂ (a := 4) (n := 5) (by norm_num)
@@ -353,7 +430,8 @@ theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL �
   have hp141 : 1 ≤ p14R wL := le_max_left _ _
   have hPN : max 1 (PN D large₂) ≤ 27 * zBase large₂ ^ 2 := by
     refine max_le (by linarith) ?_
-    unfold PN; linarith [lamStar_le Q hg]
+    unfold PN
+    linarith [lamStar_le Q hg]
   have hPN1 : 1 ≤ max 1 (PN D large₂) := le_max_left _ _
   have hI : max 1 (PI4 D j (1009 * Zb D large₂) (81 * Zb D large₂ ^ 2)) ≤ 6000 * zBase large₂ ^ 2 :=
     max_le (by linarith) (runIndexConstant_le_zBase_sq Q j hg)
@@ -363,32 +441,61 @@ theorem polyDom_of_pageOK : ∀ (CL : ℝ) (Cq : ℝ → ℝ → ℝ), 0 < CL �
   have hd : pdR large₂ ka ≤ 4164 * zBase large₂ ^ 4 := by
     unfold pdR
     rw [ppv_three]
-    calc _ ≤ 1041 * zBase large₂ ^ 3 * (4 * zBase large₂) := mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+    calc
+      _ ≤ 1041 * zBase large₂ ^ 3 * (4 * zBase large₂) :=
+        mul_le_mul_of_nonneg_left (by linarith) (by positivity)
       _ = _ := by ring
-  have hm : WeightFamilies.PP0v D large₂ CL 2 * (1 + Real.log ka.size) ≤ 3600 * zBase large₂ ^ 4 := by
-    calc _ ≤ 900 * zBase large₂ ^ 3 * (4 * zBase large₂) := mul_le_mul hp (by linarith) (by linarith) (by positivity)
+  have hm
+      : WeightFamilies.PP0v D large₂ CL 2 * (1 + Real.log ka.size) ≤ 3600 * zBase large₂ ^ 4 := by
+    calc
+      _ ≤ 900 * zBase large₂ ^ 3 * (4 * zBase large₂) :=
+        mul_le_mul hp (by linarith) (by linarith) (by positivity)
       _ = _ := by ring
   have hQ : WeightFamilies.PPv D large₂ (Cq H.CA H.CK) 4 ≤ zBase large₂ ^ 5 := by
     rw [ppv_four]
-    calc _ ≤ zBase large₂ * zBase large₂ ^ 4 := mul_le_mul_of_nonneg_right hCq (by positivity)
+    calc
+      _ ≤ zBase large₂ * zBase large₂ ^ 4 := mul_le_mul_of_nonneg_right hCq (by positivity)
       _ = _ := by ring
   have hPP2 : 2 ≤ WeightFamilies.PPv D large₂ C2 A2 := by linarith
-  have hsq : WeightFamilies.PPv D large₂ C2 A2 ≤ WeightFamilies.PPv D large₂ C2 A2 ^ 2 := le_self_pow₀ (by linarith) (by norm_num)
-  have hsqD : WeightFamilies.PPv D large₂ C2 A2 ^ 2 ≤ WeightFamilies.PPv D large₂ C2 A2 ^ 2 * (WeightFamilies.dimY D j : ℝ) :=
+  have hsq : WeightFamilies.PPv D large₂ C2 A2 ≤ WeightFamilies.PPv D large₂ C2 A2 ^ 2 :=
+    le_self_pow₀ (by linarith) (by norm_num)
+  have hsqD
+      : WeightFamilies.PPv D large₂ C2 A2 ^ 2
+        ≤ WeightFamilies.PPv D large₂ C2 A2 ^ 2 * (WeightFamilies.dimY D j : ℝ) :=
     le_mul_of_one_le_right (by positivity) (dim_pos D j)
   have e1 : (kR CL).CL = CL := rfl
   have e2 : (kR CL).AL = 2 := rfl
   have e3 : (kR CL).CRm = 7 := rfl
   refine ⟨?_, ?_⟩
   · unfold PageGq
-    rw [ppv_four]; linarith
+    rw [ppv_four]
+    linarith
   · unfold PolyDom
     rw [e1, e2, e3, t3, t4, t5, ppv_two]
-    refine ⟨by norm_num, by norm_num, by linarith, by linarith, hp0, obound_of_opo large₂ B hO (by linarith), le_rfl, ?_,
-      by linarith, hP.ck, by linarith, by linarith, by linarith, by linarith, by linarith, hH1, by linarith, by linarith⟩
+    refine ⟨
+      by norm_num,
+      by norm_num,
+      by linarith,
+      by linarith,
+      hp0,
+      obound_of_opo large₂ B hO (by linarith),
+      le_rfl,
+      ?_,
+      by linarith,
+      hP.ck,
+      by linarith,
+      by linarith,
+      by linarith,
+      by linarith,
+      by linarith,
+      hH1,
+      by linarith,
+      by linarith
+    ⟩
     unfold WeightFamilies.RRv
     have hr := one_le_rdE D
-    have e7 : D.host.rdE ^ (7 : ℝ) = D.host.rdE ^ (7 : ℕ) := by exact_mod_cast Real.rpow_natCast D.host.rdE 7
+    have e7 : D.host.rdE ^ (7 : ℝ) = D.host.rdE ^ (7 : ℕ) := by
+      exact_mod_cast Real.rpow_natCast D.host.rdE 7
     rw [e7, ← pow_add, ← pow_mul]
     exact pow_le_pow_right₀ hr (by norm_num)
 

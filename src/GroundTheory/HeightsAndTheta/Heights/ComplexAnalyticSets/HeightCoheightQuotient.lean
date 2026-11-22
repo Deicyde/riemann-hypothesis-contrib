@@ -8,8 +8,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem ringKrullDim_quotient_eq_coheight {B : Type*} [CommRing B] (P : Ideal B) [hP : P.IsPrime] :
-    ringKrullDim (B ⧸ P) = Order.coheight (⟨P, hP⟩ : PrimeSpectrum B) := by
+theorem ringKrullDim_quotient_eq_coheight {B : Type*} [CommRing B] (P : Ideal B) [hP : P.IsPrime]
+    : ringKrullDim (B ⧸ P) = Order.coheight (⟨P, hP⟩ : PrimeSpectrum B) := by
   rw [ringKrullDim_quotient, Order.coheight_eq_krullDim_Ici]
   have h : PrimeSpectrum.zeroLocus (P : Set B) = Set.Ici (⟨P, hP⟩ : PrimeSpectrum B) := by
     ext q
@@ -17,24 +17,28 @@ theorem ringKrullDim_quotient_eq_coheight {B : Type*} [CommRing B] (P : Ideal B)
     exact SetLike.coe_subset_coe
   rw [h]
 
-theorem height_add_ringKrullDim_quotient_le {B : Type*} [CommRing B] (P : Ideal B) [hP : P.IsPrime] :
-    (P.height : WithBot ℕ∞) + ringKrullDim (B ⧸ P) ≤ ringKrullDim B := by
+theorem height_add_ringKrullDim_quotient_le {B : Type*} [CommRing B] (P : Ideal B) [hP : P.IsPrime]
+    : (P.height : WithBot ℕ∞) + ringKrullDim (B ⧸ P) ≤ ringKrullDim B := by
   have : Nonempty (PrimeSpectrum B) := ⟨⟨P, hP⟩⟩
   rw [ringKrullDim_quotient_eq_coheight, PrimeSpectrum.height_eq_orderHeight ⟨P, hP⟩, ringKrullDim,
     Order.krullDim_eq_iSup_height_add_coheight_of_nonempty, ← WithBot.coe_add, WithBot.coe_le_coe]
   exact le_iSup (fun a : PrimeSpectrum B => Order.height a + Order.coheight a) ⟨P, hP⟩
 
-theorem height_map_add_one_le_of_mem_nonZeroDivisors {B : Type*} [CommRing B] [IsNoetherianRing B] {y : B}
-    (hy : y ∈ nonZeroDivisors B) (P : Ideal B) [hP : P.IsPrime] (hyP : y ∈ P) :
-    (P.map (Ideal.Quotient.mk (Ideal.span {y}))).height + 1 ≤ P.height := by
+theorem height_map_add_one_le_of_mem_nonZeroDivisors
+    {B : Type*} [CommRing B] [IsNoetherianRing B]
+    {y : B} (hy : y ∈ nonZeroDivisors B)
+    (P : Ideal B) [hP : P.IsPrime]
+    (hyP : y ∈ P)
+    : (P.map (Ideal.Quotient.mk (Ideal.span {y}))).height + 1 ≤ P.height := by
   set I := Ideal.span {y} with hI
   have hIP : I ≤ P := (Ideal.span_singleton_le_iff_mem P).mpr hyP
   have hP' : (P.map (Ideal.Quotient.mk I)).IsPrime := Ideal.isPrime_map_quotientMk_of_isPrime hIP
   obtain ⟨n, hn⟩ : ∃ n : ℕ, (P.map (Ideal.Quotient.mk I)).height = n :=
     ENat.ne_top_iff_exists.mp (Ideal.height_ne_top hP'.ne_top) |>.imp fun _ h => h.symm
   rw [hn]
-  obtain ⟨l, hlast, hlen⟩ := Order.exists_series_of_height_eq_coe (⟨_, hP'⟩ : PrimeSpectrum (B ⧸ I))
-    (by rw [← PrimeSpectrum.height_eq_orderHeight]; exact hn)
+  obtain ⟨l, hlast, hlen⟩ :=
+    Order.exists_series_of_height_eq_coe (⟨_, hP'⟩ : PrimeSpectrum (B ⧸ I))
+      (by rw [← PrimeSpectrum.height_eq_orderHeight]; exact hn)
   let f : PrimeSpectrum (B ⧸ I) → PrimeSpectrum B := PrimeSpectrum.comap (Ideal.Quotient.mk I)
   have hf : StrictMono f := by
     refine Monotone.strictMono_of_injective (fun a b hab => ?_) (fun a b hab => ?_)
@@ -62,8 +66,7 @@ theorem height_map_add_one_le_of_mem_nonZeroDivisors {B : Type*} [CommRing B] [I
     simp only [L', L, RelSeries.last_cons, LTSeries.last_map, hlast]
     ext1
     exact Ideal.comap_map_mk hIP
-  have hlen' : L'.length = n + 1 := by
-    simp [L', L, hlen]
+  have hlen' : L'.length = n + 1 := by simp [L', L, hlen]
   have := Order.length_le_height_last (p := L')
   rw [hLlast, hlen', ← PrimeSpectrum.height_eq_orderHeight] at this
   exact_mod_cast this

@@ -5,14 +5,22 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr
+  UpperTheory.V
 
-private theorem sd_locConst {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A] (ψ : Γ →* A)
-    (h : IsOpen (ψ.ker : Set Γ)) : IsLocallyConstant ψ :=
+private theorem sd_locConst
+    {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A]
+    (ψ : Γ →* A) (h : IsOpen (ψ.ker : Set Γ))
+    : IsLocallyConstant ψ :=
   _root_.UpperTheory.Reformulated.B.LocallyConstantOfKernel.lc_of_ker ψ h
 
-theorem UpperTheory.V.Fr.st_desc :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (S : Set (HeightOneSpectrum (𝓞 ℚ))) (C : Type) [Group C] (κ : G ℚ Ω →* C), IsOpen (κ.ker : Set (G ℚ Ω)) → (∀ v ∉ S, ∀ A : ValuationSubring Ω, IsPlaceOver A v → Ine (F := ℚ) A ≤ κ.ker) → ∃ κS : GS Ω S →* C, κS.comp (toGS Ω S) = κ ∧ IsLocallyConstant κS := by
+theorem UpperTheory.V.Fr.st_desc
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (S : Set (HeightOneSpectrum (𝓞 ℚ)))
+        (C : Type) [Group C] (κ : G ℚ Ω →* C),
+      IsOpen (κ.ker : Set (G ℚ Ω))
+        → (∀ v ∉ S, ∀ A : ValuationSubring Ω, IsPlaceOver A v → Ine (F := ℚ) A ≤ κ.ker)
+        → ∃ κS : GS Ω S →* C, κS.comp (toGS Ω S) = κ ∧ IsLocallyConstant κS := by
   intro Ω _ _ _ S C _ κ ho hI
   have hN : NS Ω S ≤ κ.ker := by
     refine Subgroup.topologicalClosure_minimal _ (Subgroup.normalClosure_le_normal ?_)

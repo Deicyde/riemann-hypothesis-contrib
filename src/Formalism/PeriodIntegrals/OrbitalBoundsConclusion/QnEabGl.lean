@@ -26,15 +26,26 @@ private lemma posL_eq_posL_iff (k r : ℕ) (i : Fin (r + 1)) (x y : Fin (Formali
 theorem qnEabGl : Formalism.FourierDecayAlt.Q.EabGlLev := by
   intro E _ _ k r i D a b c d f _ hf g hg
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf g hg
-  have hL : Formalism.FourierDecayAlt.Q.EabGlW.LocExt (Formalism.FourierDecayAlt.Q.Glev k r i) f F U := ⟨hU, hF, hfF⟩
-  have good : ∀ x y : Fin (Formalism.FourierDecayAlt.Q.mdim k r i), Formalism.FourierDecayAlt.Q.EabGlW.Good k r i
-      (Matrix.single (Formalism.FourierDecayAlt.Q.posL k r i x) (Formalism.FourierDecayAlt.Q.posL k r i y) (1 : ℂ)) :=
-    fun x y => Formalism.FourierDecayAlt.Q.EabGlW.hpart_mem (Formalism.FourierDecayAlt.Q.EabGlW.inV_single x y)
-  have good0 : Formalism.FourierDecayAlt.Q.EabGlW.Good k r i (0 : Formalism.FourierDecayAlt.Q.Mx k r) :=
+  have hL
+      : Formalism.FourierDecayAlt.Q.EabGlW.LocExt (Formalism.FourierDecayAlt.Q.Glev k r i) f F U :=
+    ⟨hU, hF, hfF⟩
+  have good
+      : ∀ x y : Fin (Formalism.FourierDecayAlt.Q.mdim k r i),
+        Formalism.FourierDecayAlt.Q.EabGlW.Good k r i
+          (Matrix.single (Formalism.FourierDecayAlt.Q.posL k r i x)
+            (Formalism.FourierDecayAlt.Q.posL k r i y) (1 : ℂ)) := fun x y =>
+    Formalism.FourierDecayAlt.Q.EabGlW.hpart_mem (Formalism.FourierDecayAlt.Q.EabGlW.inV_single x y)
+  have good0
+      : Formalism.FourierDecayAlt.Q.EabGlW.Good k r i (0 : Formalism.FourierDecayAlt.Q.Mx k r) :=
     Formalism.FourierDecayAlt.Q.EabGlW.hpart_mem Formalism.FourierDecayAlt.Q.EabGlW.inV_zero
-  have goodIf : ∀ (P : Prop) [Decidable P] (x y : Fin (Formalism.FourierDecayAlt.Q.mdim k r i)),
-      Formalism.FourierDecayAlt.Q.EabGlW.Good k r i (if P then
-        Matrix.single (Formalism.FourierDecayAlt.Q.posL k r i x) (Formalism.FourierDecayAlt.Q.posL k r i y) (1 : ℂ) else 0) := by
+  have goodIf
+      : ∀ (P : Prop) [Decidable P] (x y : Fin (Formalism.FourierDecayAlt.Q.mdim k r i)),
+        Formalism.FourierDecayAlt.Q.EabGlW.Good k r i
+          (if P then
+             Matrix.single (Formalism.FourierDecayAlt.Q.posL k r i x)
+               (Formalism.FourierDecayAlt.Q.posL k r i y) (1 : ℂ)
+           else
+             0) := by
     intro P _ x y
     split_ifs
     · exact good x y

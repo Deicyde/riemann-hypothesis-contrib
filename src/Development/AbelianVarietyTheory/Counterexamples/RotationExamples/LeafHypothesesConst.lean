@@ -18,8 +18,8 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K}
 
 def truncZero (y : ℝ) : ℤ := if 0 ≤ y then ⌊y⌋ else ⌈y⌉
 
-theorem abs_truncZero_le (y : ℝ) (a : ℤ) :
-    |(truncZero y : ℝ)| ≤ |y| ∧ |((a + truncZero y : ℤ) : ℝ)| ≤ |(a : ℝ) + y| + |y| := by
+theorem abs_truncZero_le (y : ℝ) (a : ℤ)
+    : |(truncZero y : ℝ)| ≤ |y| ∧ |((a + truncZero y : ℤ) : ℝ)| ≤ |(a : ℝ) + y| + |y| := by
   have key : |(truncZero y : ℝ)| ≤ |y| ∧ |(truncZero y : ℝ) - y| ≤ |y| := by
     unfold truncZero
     split_ifs with h
@@ -34,7 +34,9 @@ theorem abs_truncZero_le (y : ℝ) (a : ℤ) :
       constructor <;> linarith
   refine ⟨key.1, ?_⟩
   push_cast
-  calc |(a : ℝ) + truncZero y| = |((a : ℝ) + y) + (truncZero y - y)| := by ring_nf
+  calc
+    |(a : ℝ) + truncZero y|
+      = |((a : ℝ) + y) + (truncZero y - y)| := by ring_nf
     _ ≤ |(a : ℝ) + y| + |(truncZero y : ℝ) - y| := abs_add_le _ _
     _ ≤ _ := by linarith [key.2]
 

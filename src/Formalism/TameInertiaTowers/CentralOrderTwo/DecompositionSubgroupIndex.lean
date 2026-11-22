@@ -14,24 +14,40 @@ noncomputable section
 
 namespace Formalism.TwoAdicCyclotomicDecomposition
 
-theorem two_intCast_mem_iff {L : Type} [Field L] [NumberField L]
-    (P : Ideal (𝓞 L)) [P.LiesOver (span {(2 : ℤ)})] (m : ℤ) :
-    (m : 𝓞 L) ∈ P ↔ (2 : ℤ) ∣ m := by
+theorem two_intCast_mem_iff
+    {L : Type} [Field L] [NumberField L] (P : Ideal (𝓞 L)) [P.LiesOver (span {(2 : ℤ)})] (m : ℤ)
+    : (m : 𝓞 L) ∈ P ↔ (2 : ℤ) ∣ m := by
   rw [← Ideal.mem_span_singleton, Ideal.over_def P (span {(2 : ℤ)}), Ideal.under_def,
     Ideal.mem_comap, eq_intCast]
 
-theorem exists_int_quad {L : Type} [Field L] [NumberField L] (x : L) (c : ℤ)
-    (hx : x ^ 2 = x + c) : ∃ X : 𝓞 L, (X : L) = x ∧ X ^ 2 = X + (c : 𝓞 L) := by
-  first | exact Bl.FirstBlockLemmaE.goal1 .. | (apply Bl.FirstBlockLemmaE.goal1 <;> assumption) | (intros; apply Bl.FirstBlockLemmaE.goal1 <;> assumption) | (apply @Bl.FirstBlockLemmaE.goal1 <;> assumption) | (intros; apply @Bl.FirstBlockLemmaE.goal1 <;> assumption) | (apply @Bl.FirstBlockLemmaE.goal1 <;> first | assumption | infer_instance) | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› x c hx | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› x c | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› x | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› | exact @Bl.FirstBlockLemmaE.goal1 L
+theorem exists_int_quad {L : Type} [Field L] [NumberField L] (x : L) (c : ℤ) (hx : x ^ 2 = x + c)
+    : ∃ X : 𝓞 L, (X : L) = x ∧ X ^ 2 = X + (c : 𝓞 L) := by
+  first
+  | exact Bl.FirstBlockLemmaE.goal1 ..
+  | (apply Bl.FirstBlockLemmaE.goal1 <;> assumption)
+  | (intros; apply Bl.FirstBlockLemmaE.goal1 <;> assumption)
+  | (apply @Bl.FirstBlockLemmaE.goal1 <;> assumption)
+  | (intros; apply @Bl.FirstBlockLemmaE.goal1 <;> assumption)
+  | (apply @Bl.FirstBlockLemmaE.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› x c hx
+  | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› x c
+  | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_› x
+  | exact @Bl.FirstBlockLemmaE.goal1 L ‹_› ‹_›
+  | exact @Bl.FirstBlockLemmaE.goal1 L ‹_›
+  | exact @Bl.FirstBlockLemmaE.goal1 L
 
-theorem gal_sq_fix {L : Type} [Field L] [Algebra ℚ L] (σ : Gal(L/ℚ)) (x : L) (m : ℤ)
-    (hx : x ^ 2 = (m : L)) : σ x = x ∨ σ x = -x := by
+theorem gal_sq_fix
+    {L : Type} [Field L] [Algebra ℚ L] (σ : Gal(L/ℚ)) (x : L) (m : ℤ) (hx : x ^ 2 = (m : L))
+    : σ x = x ∨ σ x = -x := by
   have : (σ x) ^ 2 = x ^ 2 := by rw [← map_pow, hx, map_intCast]
   exact sq_eq_sq_iff_eq_or_eq_neg.mp this
 
-theorem half_elt {L : Type} [Field L] [NumberField L] (σ : Gal(L/ℚ)) (x : L) (c : ℤ)
-    (hx : x ^ 2 = ((4 * c + 1 : ℤ) : L)) (hσ : σ x = -x) :
-    ∃ W : 𝓞 L, W ^ 2 = W + (c : 𝓞 L) ∧ σ • W = 1 - W := by
+theorem half_elt
+    {L : Type} [Field L] [NumberField L]
+    (σ : Gal(L/ℚ))
+    (x : L) (c : ℤ) (hx : x ^ 2 = ((4 * c + 1 : ℤ) : L))
+    (hσ : σ x = -x)
+    : ∃ W : 𝓞 L, W ^ 2 = W + (c : 𝓞 L) ∧ σ • W = 1 - W := by
   have hW2 : ((1 + x) / 2) ^ 2 = (1 + x) / 2 + (c : L) := by
     push_cast at hx
     linear_combination (1 / 4 : L) * hx
@@ -43,16 +59,20 @@ theorem half_elt {L : Type} [Field L] [NumberField L] (σ : Gal(L/ℚ)) (x : L) 
   rw [e1, hWc, map_div₀, map_add (f := _), map_one, hσ, map_ofNat]
   ring
 
-theorem stab_fix {L : Type} [Field L] [NumberField L] (x : L) (c : ℤ)
-    (hx : x ^ 2 = ((4 * (2 * c) + 1 : ℤ) : L))
-    (P : Ideal (𝓞 L)) [hP : P.IsPrime] [P.LiesOver (span {(2 : ℤ)})] (σ : Gal(L/ℚ))
-    (hσ : σ ∈ MulAction.stabilizer Gal(L/ℚ) P) : σ x = x := by
+theorem stab_fix
+    {L : Type} [Field L] [NumberField L]
+    (x : L) (c : ℤ) (hx : x ^ 2 = ((4 * (2 * c) + 1 : ℤ) : L))
+    (P : Ideal (𝓞 L)) [hP : P.IsPrime] [P.LiesOver (span {(2 : ℤ)})]
+    (σ : Gal(L/ℚ)) (hσ : σ ∈ MulAction.stabilizer Gal(L/ℚ) P)
+    : σ x = x := by
   exact Bl.general_b_fact_right_ter_form.goal1 x c hx P σ hσ
 
-theorem inertia_fix {L : Type} [Field L] [NumberField L] (x : L) (c : ℤ)
-    (hx : x ^ 2 = ((4 * c + 1 : ℤ) : L))
-    (P : Ideal (𝓞 L)) [P.IsPrime] [P.LiesOver (span {(2 : ℤ)})] (σ : Gal(L/ℚ))
-    (hσ : ∀ y : 𝓞 L, σ • y - y ∈ P) : σ x = x := by
+theorem inertia_fix
+    {L : Type} [Field L] [NumberField L]
+    (x : L) (c : ℤ) (hx : x ^ 2 = ((4 * c + 1 : ℤ) : L))
+    (P : Ideal (𝓞 L)) [P.IsPrime] [P.LiesOver (span {(2 : ℤ)})]
+    (σ : Gal(L/ℚ)) (hσ : ∀ y : 𝓞 L, σ • y - y ∈ P)
+    : σ x = x := by
   rcases gal_sq_fix σ x _ hx with h | h
   · exact h
   exfalso
@@ -69,14 +89,16 @@ theorem inertia_fix {L : Type} [Field L] [NumberField L] (x : L) (c : ℤ)
   rw [h3, two_intCast_mem_iff P] at h2
   omega
 
-theorem two_le_inertiaDeg {L : Type} [Field L] [NumberField L]
+theorem two_le_inertiaDeg
+    {L : Type} [Field L] [NumberField L]
     (P : Ideal (𝓞 L)) [hP : P.IsPrime] [P.LiesOver (span {(2 : ℤ)})]
-    (W : 𝓞 L) (c : ℤ) (hW : W ^ 2 = W + (c : 𝓞 L)) (hc : ¬ (2 : ℤ) ∣ c) :
-    2 ≤ P.inertiaDeg ℤ := by
+    (W : 𝓞 L) (c : ℤ) (hW : W ^ 2 = W + (c : 𝓞 L)) (hc : ¬ (2 : ℤ) ∣ c)
+    : 2 ≤ P.inertiaDeg ℤ := by
   have hpos := P.inertiaDeg_pos ℤ
   by_contra hlt
   have h1 : P.inertiaDeg ℤ = 1 := by omega
-  have : P.LiesOver (span {((2 : ℕ) : ℤ)}) := by simpa using (inferInstance : P.LiesOver (span {(2 : ℤ)}))
+  have : P.LiesOver (span {((2 : ℕ) : ℤ)}) := by
+    simpa using (inferInstance : P.LiesOver (span {(2 : ℤ)}))
   have hcard : Nat.card (𝓞 L ⧸ P) = 2 := by
     have := Ideal.pow_inertiaDeg 2 P
     rw [h1, pow_one, Ideal.absNorm_apply, Submodule.cardQuot_apply] at this
@@ -101,17 +123,18 @@ theorem two_le_inertiaDeg {L : Type} [Field L] [NumberField L]
     rw [this]
     exact P.mul_mem_left _ h
   have h01 : (0 : 𝓞 L ⧸ P) ≠ 1 := zero_ne_one
-  rcases mem 0 with h0 | h0 <;> rcases mem 1 with h1' | h1' <;>
-    rcases mem (Ideal.Quotient.mk P W) with h2 | h2 <;>
-    first
-    | exact h01 (h0.trans h1'.symm)
-    | exact hW0 (h2.trans h0.symm)
-    | exact hW1 (h2.trans h1'.symm)
+  rcases mem 0 with h0 | h0 <;> rcases mem 1 with h1' | h1'
+    <;> rcases mem (Ideal.Quotient.mk P W) with h2 | h2
+    <;> first
+      | exact h01 (h0.trans h1'.symm)
+      | exact hW0 (h2.trans h0.symm)
+      | exact hW1 (h2.trans h1'.symm)
 
-theorem le_ramificationIdx {L : Type} [Field L] [NumberField L] (k : ℕ) (ζ : L)
-    (hζ : IsPrimitiveRoot ζ (2 ^ (k + 1)))
-    (P : Ideal (𝓞 L)) [hP : P.IsPrime] [P.LiesOver (span {(2 : ℤ)})] :
-    2 ^ k ≤ P.ramificationIdx ℤ := by
+theorem le_ramificationIdx
+    {L : Type} [Field L] [NumberField L]
+    (k : ℕ) (ζ : L) (hζ : IsPrimitiveRoot ζ (2 ^ (k + 1)))
+    (P : Ideal (𝓞 L)) [hP : P.IsPrime] [P.LiesOver (span {(2 : ℤ)})]
+    : 2 ^ k ≤ P.ramificationIdx ℤ := by
   set Z : 𝓞 L := ⟨ζ, hζ.isIntegral (by positivity)⟩ with hZdef
   have hZ : IsPrimitiveRoot Z (2 ^ (k + 1)) :=
     IsPrimitiveRoot.of_map_of_injective (f := algebraMap (𝓞 L) L) hζ RingOfIntegers.coe_injective
@@ -133,8 +156,7 @@ theorem le_ramificationIdx {L : Type} [Field L] [NumberField L] (k : ℕ) (ζ : 
     simpa using this
   have hZP : Z - 1 ∈ P := by
     obtain ⟨u, hu⟩ := hassoc
-    have : (Z - 1) ^ (2 ^ k) = 2 * ↑u⁻¹ := by
-      rw [← hu, mul_assoc, Units.mul_inv, mul_one]
+    have : (Z - 1) ^ (2 ^ k) = 2 * ↑u⁻¹ := by rw [← hu, mul_assoc, Units.mul_inv, mul_one]
     exact hP.mem_of_pow_mem _ (this ▸ P.mul_mem_right _ h2P)
   have hmap : map (algebraMap ℤ (𝓞 L)) (span {(2 : ℤ)}) = span {(2 : 𝓞 L)} := by
     rw [Ideal.map_span, Set.image_singleton]
@@ -151,8 +173,8 @@ theorem le_ramificationIdx {L : Type} [Field L] [NumberField L] (k : ℕ) (ζ : 
   · rw [Ideal.dvd_iff_le, hmap]
     exact hle
 
-theorem sgn_eq_one_iff {L : Type} [Field L] [Algebra ℚ L] (σ : Gal(L/ℚ)) (x : L) :
-    sgn σ x = 1 ↔ σ x = x := by
+theorem sgn_eq_one_iff {L : Type} [Field L] [Algebra ℚ L] (σ : Gal(L/ℚ)) (x : L)
+    : sgn σ x = 1 ↔ σ x = x := by
   unfold sgn
   split_ifs with h
   · simp [h]
@@ -175,19 +197,22 @@ theorem two_isPrime : (span {(2 : ℤ)}).IsPrime := by
   rw [Ideal.span_singleton_prime two_ne_zero]
   exact Int.prime_two
 
-theorem efg_L (hG : LayerGalois) {n q d : ℕ} (hn : 1 ≤ n) (hqd : HypQD q d)
-    {L : Type} [Field L] [NumberField L] {ζ a b : L} (h : IsLayer n q d ζ a b)
-    (P : Ideal (𝓞 L)) [P.IsPrime] [P.LiesOver (span {(2 : ℤ)})] :
-    P.ramificationIdx ℤ = 2 ^ (n - 1) ∧ P.inertiaDeg ℤ = 2 ∧
-      (primesOver (span {(2 : ℤ)}) (𝓞 L)).ncard = 2 := by
+theorem efg_L
+    (hG : LayerGalois)
+    {n q d : ℕ} (hn : 1 ≤ n) (hqd : HypQD q d)
+    {L : Type} [Field L] [NumberField L]
+    {ζ a b : L} (h : IsLayer n q d ζ a b)
+    (P : Ideal (𝓞 L)) [P.IsPrime] [P.LiesOver (span {(2 : ℤ)})]
+    : P.ramificationIdx ℤ = 2 ^ (n - 1) ∧ P.inertiaDeg ℤ = 2
+      ∧ (primesOver (span {(2 : ℤ)}) (𝓞 L)).ncard = 2 := by
   obtain ⟨hGal, hdeg, hmul, hbij⟩ := hG n q d hn hqd.toHypOdd L ζ a b h
   have : IsGaloisGroup Gal(L/ℚ) ℤ (𝓞 L) := IsGaloisGroup.of_isFractionRing _ _ _ ℚ L
   have : (span {(2 : ℤ)}).IsPrime := two_isPrime
-  have hfund := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn
-    (span {(2 : ℤ)}) (𝓞 L) Gal(L/ℚ)
+  have hfund :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (span {(2 : ℤ)}) (𝓞 L) Gal(L/ℚ)
   rw [ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) P Gal(L/ℚ),
-    inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) P Gal(L/ℚ), IsGalois.card_aut_eq_finrank,
-    hdeg] at hfund
+      inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) P Gal(L/ℚ), IsGalois.card_aut_eq_finrank, hdeg]
+    at hfund
   obtain ⟨hq, hd, hq8, hd8⟩ := hqd
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
   have he := le_ramificationIdx k ζ h.1 P
@@ -279,8 +304,9 @@ theorem layerDecompTwo_of (hG : LayerGalois) : LayerDecompTwo := by
     omega
   have hcardD : Nat.card ((D2 n).comap φ) = 2 ^ n := by
     have h1 := Subgroup.card_mul_index ((D2 n).comap φ)
-    rw [Subgroup.index_comap_of_surjective _ hbij.2, decomposition_subgroup_index, IsGalois.card_aut_eq_finrank, hdeg,
-      pow_succ] at h1
+    rw [Subgroup.index_comap_of_surjective _ hbij.2, decomposition_subgroup_index,
+        IsGalois.card_aut_eq_finrank, hdeg, pow_succ]
+      at h1
     exact Nat.eq_of_mul_eq_mul_right two_pos h1
   have heq := Subgroup.eq_of_le_of_card_ge hle (by rw [hcardS, hcardD])
   rw [heq]
@@ -317,8 +343,9 @@ theorem layerInertiaTwo_of (hG : LayerGalois) : LayerInertiaTwo := by
       ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) P Gal(L/ℚ), he]
   have hcardD : Nat.card ((I2 n).comap φ) = 2 ^ (n - 1) := by
     have h1 := Subgroup.card_mul_index ((I2 n).comap φ)
-    rw [Subgroup.index_comap_of_surjective _ hbij.2, inertia_subgroup_index, IsGalois.card_aut_eq_finrank,
-      hdeg, show n + 1 = (n - 1) + 2 by omega, pow_add] at h1
+    rw [Subgroup.index_comap_of_surjective _ hbij.2, inertia_subgroup_index,
+        IsGalois.card_aut_eq_finrank, hdeg, show n + 1 = (n - 1) + 2 by omega, pow_add]
+      at h1
     exact Nat.eq_of_mul_eq_mul_right (by norm_num) h1
   have heq := Subgroup.eq_of_le_of_card_ge hle (by rw [hcardI, hcardD])
   change σ ∈ P.inertia Gal(L/ℚ) ↔ _
@@ -339,8 +366,12 @@ theorem layerEFGTwo_of (hG : LayerGalois) (hR : LayerReal) : LayerEFGTwo := by
     rw [← hc', h.2.2.1]
     push_cast
     ring
-  refine ⟨by rw [ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) P Gal(L/ℚ), he],
-    by rw [inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) P Gal(L/ℚ), hf], hg, ?_⟩
+  refine ⟨
+    by rw [ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) P Gal(L/ℚ), he],
+    by rw [inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) P Gal(L/ℚ), hf],
+    hg,
+    ?_
+  ⟩
 
   set K := maximalRealSubfield L with hKdef
   obtain ⟨τ, hτ⟩ := hbij.2 (JJ n)
@@ -368,8 +399,8 @@ theorem layerEFGTwo_of (hG : LayerGalois) (hR : LayerReal) : LayerEFGTwo := by
   set Pp : Ideal S := P.under S with hPp_def
   have hunder : (τ • P).under S = Pp := by
     ext x
-    rw [Ideal.under_def, Ideal.mem_comap, Ideal.mem_pointwise_smul_iff_inv_smul_mem,
-      hPp_def, Ideal.under_def, Ideal.mem_comap]
+    rw [Ideal.under_def, Ideal.mem_comap, Ideal.mem_pointwise_smul_iff_inv_smul_mem, hPp_def,
+      Ideal.under_def, Ideal.mem_comap]
     have hfx : τ⁻¹ • (algebraMap S (𝓞 L) x) = algebraMap S (𝓞 L) x := by
       apply RingOfIntegers.coe_injective
       show τ⁻¹ ((algebraMap S (𝓞 L) x : 𝓞 L) : L) = ((algebraMap S (𝓞 L) x : 𝓞 L) : L)
@@ -377,7 +408,8 @@ theorem layerEFGTwo_of (hG : LayerGalois) (hR : LayerReal) : LayerEFGTwo := by
         show ((x : K) : L) ∈ K
         exact (x : K).2
       have h1 := hτK _ hmem
-      calc τ⁻¹ ((algebraMap S (𝓞 L) x : 𝓞 L) : L)
+      calc
+        τ⁻¹ ((algebraMap S (𝓞 L) x : 𝓞 L) : L)
           = τ⁻¹ (τ ((algebraMap S (𝓞 L) x : 𝓞 L) : L)) := by rw [h1]
         _ = _ := by rw [← AlgEquiv.mul_apply, inv_mul_cancel, AlgEquiv.one_apply]
     rw [hfx]
@@ -400,16 +432,16 @@ theorem layerEFGTwo_of (hG : LayerGalois) (hR : LayerReal) : LayerEFGTwo := by
       exact ⟨inferInstance, inferInstance⟩
 
   have : IsMulCommutative Gal(L/ℚ) := ⟨⟨fun x y => hbij.1 (by rw [hmul, hmul, mul_comm])⟩⟩
-  have : IsAbelianGalois ℚ L := { }
+  have : IsAbelianGalois ℚ L := {}
   have : IsGalois ℚ K := (IsAbelianGalois.tower_bot ℚ K L).toIsGalois
   have : IsGaloisGroup Gal(K/ℚ) ℤ S := IsGaloisGroup.of_isFractionRing _ _ _ ℚ K
-  have hfundK := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn
-    (span {(2 : ℤ)}) S Gal(K/ℚ)
+  have hfundK :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (span {(2 : ℤ)}) S Gal(K/ℚ)
   rw [IsGalois.card_aut_eq_finrank, hdegK, hsetK, Set.ncard_singleton, one_mul,
-    ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) Pp Gal(K/ℚ),
-    inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) Pp Gal(K/ℚ)] at hfundK
-  rw [hsetK, Set.ncard_singleton,
-    ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) Pp Gal(K/ℚ),
+      ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) Pp Gal(K/ℚ),
+      inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) Pp Gal(K/ℚ)]
+    at hfundK
+  rw [hsetK, Set.ncard_singleton, ramificationIdxIn_eq_ramificationIdx (span {(2 : ℤ)}) Pp Gal(K/ℚ),
     inertiaDegIn_eq_inertiaDeg (span {(2 : ℤ)}) Pp Gal(K/ℚ)]
   have hte := Ideal.ramificationIdx_tower (R := ℤ) Pp P
   have htf := Ideal.inertiaDeg_tower (R := ℤ) Pp P
@@ -429,7 +461,9 @@ theorem layerEFGTwo_of (hG : LayerGalois) (hR : LayerReal) : LayerEFGTwo := by
     by_contra hlt
     push Not at hlt
     have : e * f < 2 ^ (n - 1) * 2 := by
-      calc e * f ≤ e * 2 := Nat.mul_le_mul_left _ hf1
+      calc
+        e * f
+          ≤ e * 2 := Nat.mul_le_mul_left _ hf1
         _ < 2 ^ (n - 1) * 2 := by omega
     omega
   refine ⟨rfl, he2, ?_⟩

@@ -28,8 +28,8 @@ theorem fb_smul {q d : ℕ} (B : FB k q d) (l a : k) : B.cF (l ^ q * a) = fun j 
     Finset.sum_congr rfl fun j _ => by rw [mul_pow]; ring
   rw [this, B.uniq]
 
-theorem fb_exists (hF : FinDim k) (p c : ℕ) [Fact p.Prime] [CharP k p] :
-    ∃ d : ℕ, 0 < d ∧ Nonempty (FB k (p ^ c) d) := by
+theorem fb_exists (hF : FinDim k) (p c : ℕ) [Fact p.Prime] [CharP k p]
+    : ∃ d : ℕ, 0 < d ∧ Nonempty (FB k (p ^ c) d) := by
   letI := frMod (k := k) p c
   obtain ⟨hfd, hpos⟩ := hF p c
   set d := Module.finrank k (Fr k p c) with hd

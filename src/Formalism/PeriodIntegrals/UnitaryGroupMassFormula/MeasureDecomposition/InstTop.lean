@@ -12,20 +12,27 @@ open scoped ENNReal Pointwise
 
 namespace PI.ScMuExists.UnitaryGroupMassFormula
 
-theorem inst_mem_frameSet {I : Formalism.MainNotions.S.AutInst} {r : ℕ} (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
-    (j : Fin r ⊕ Fin r ⊕ Unit) : instFvec e f z j ∈ frameSet I e f z := by
+theorem inst_mem_frameSet
+    {I : Formalism.MainNotions.S.AutInst} {r : ℕ}
+    (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) (j : Fin r ⊕ Fin r ⊕ Unit)
+    : instFvec e f z j ∈ frameSet I e f z := by
   rcases j with a | a | u <;> simp [instFvec, frameSet]
 
-theorem inst_col {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F) {r : ℕ} (e f : Fin r → Fin I.n → I.E)
-    (z : Fin I.n → I.E) (j : Fin r ⊕ Fin r ⊕ Unit) :
-    instBmat I v e f z *ᵥ Pi.single j 1 = rv I v (instFvec e f z j) := by
+theorem inst_col
+    {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F)
+    {r : ℕ} (e f : Fin r → Fin I.n → I.E)
+    (z : Fin I.n → I.E) (j : Fin r ⊕ Fin r ⊕ Unit)
+    : instBmat I v e f z *ᵥ Pi.single j 1 = rv I v (instFvec e f z j) := by
   ext i
   rw [Matrix.mulVec_single_one]
   simp [instBmat]
 
-theorem inst_fix_of {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F) {r : ℕ} (e f : Fin r → Fin I.n → I.E)
-    (z : Fin I.n → I.E) (m : Matrix (Fin I.n) (Fin I.n) ℂ) (hm : m * instBmat I v e f z = instBmat I v e f z) :
-    ∀ x ∈ frameSet I e f z, m *ᵥ rv I v x = rv I v x := by
+theorem inst_fix_of
+    {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F)
+    {r : ℕ} (e f : Fin r → Fin I.n → I.E)
+    (z : Fin I.n → I.E) (m : Matrix (Fin I.n) (Fin I.n) ℂ)
+    (hm : m * instBmat I v e f z = instBmat I v e f z)
+    : ∀ x ∈ frameSet I e f z, m *ᵥ rv I v x = rv I v x := by
   intro x hx
   obtain ⟨j, rfl⟩ : ∃ j, instFvec e f z j = x := by
     rcases hx with (⟨a, rfl⟩ | ⟨a, rfl⟩) | hx
@@ -34,10 +41,14 @@ theorem inst_fix_of {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F
     · exact ⟨Sum.inr (Sum.inr ()), (Set.mem_singleton_iff.1 hx).symm⟩
   rw [← inst_col v e f z j, Matrix.mulVec_mulVec, hm]
 
-theorem inst_fixB_of {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F) {r : ℕ} (e f : Fin r → Fin I.n → I.E)
+theorem inst_fixB_of
+    {I : Formalism.MainNotions.S.AutInst} (v : InfinitePlace I.F)
+    {r : ℕ} (e f : Fin r → Fin I.n → I.E)
     (z : Fin I.n → I.E) (m : Matrix (Fin I.n) (Fin I.n) ℂ)
-    (hm : ∀ x ∈ frameSet I e f z, m *ᵥ rv I v x = rv I v x) : m * instBmat I v e f z = instBmat I v e f z := by
-  have hcol : ∀ j, (m * instBmat I v e f z) *ᵥ Pi.single j 1 = instBmat I v e f z *ᵥ Pi.single j 1 := by
+    (hm : ∀ x ∈ frameSet I e f z, m *ᵥ rv I v x = rv I v x)
+    : m * instBmat I v e f z = instBmat I v e f z := by
+  have hcol
+      : ∀ j, (m * instBmat I v e f z) *ᵥ Pi.single j 1 = instBmat I v e f z *ᵥ Pi.single j 1 := by
     intro j
     rw [← Matrix.mulVec_mulVec, inst_col v e f z j, hm _ (inst_mem_frameSet e f z j)]
   ext i j
@@ -57,12 +68,15 @@ theorem instDecomp_of (hP : InstPlaceDecomp) (hG : InstFrameGram) : InstDecomp :
     · subst hab
       by_cases hε : I.ε v a <;> simp [Formalism.REAL.Jm, Matrix.diagonal_mul_diagonal, hε]
     · simp [Formalism.REAL.Jm, Matrix.diagonal_mul_diagonal, Matrix.one_apply, hab]
-  have hU : ∀ v (m : Matrix (Fin I.n) (Fin I.n) ℂ), Formalism.REAL.inUJ (I.ε v) m →
-      ∃ u : Formalism.REAL.UJ (I.ε v), (((u : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ) = m := by
+  have hU
+      : ∀ v (m : Matrix (Fin I.n) (Fin I.n) ℂ),
+        Formalism.REAL.inUJ (I.ε v) m
+          → ∃ u : Formalism.REAL.UJ (I.ε v),
+            (((u : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ) = m := by
     intro v m hm
     have hl : (Formalism.REAL.Jm (I.ε v) * mᴴ * Formalism.REAL.Jm (I.ε v)) * m = 1 := by
-      have : Formalism.REAL.Jm (I.ε v) * mᴴ * Formalism.REAL.Jm (I.ε v) * m =
-          Formalism.REAL.Jm (I.ε v) * (mᴴ * Formalism.REAL.Jm (I.ε v) * m) := by
+      have : Formalism.REAL.Jm (I.ε v) * mᴴ * Formalism.REAL.Jm (I.ε v) * m
+          = Formalism.REAL.Jm (I.ε v) * (mᴴ * Formalism.REAL.Jm (I.ε v) * m) := by
         simp only [Matrix.mul_assoc]
       rw [this, show mᴴ * Formalism.REAL.Jm (I.ε v) * m = Formalism.REAL.Jm (I.ε v) from hm, Jsq v]
     have hr : m * (Formalism.REAL.Jm (I.ε v) * mᴴ * Formalism.REAL.Jm (I.ε v)) = 1 := by
@@ -76,24 +90,34 @@ theorem instDecomp_of (hP : InstPlaceDecomp) (hG : InstFrameGram) : InstDecomp :
   let K : I.Ginf := fun v => ku v
   let P : I.Ginf := fun v => pu v
   let S : I.Ginf := fun v => su v
-  have memH : ∀ (X : I.Ginf) (m : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ),
-      (∀ v, (((X v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ) = m v) →
-      (∀ v, m v * instBmat I v e f z = instBmat I v e f z) → X ∈ Hset I (frameSet I e f z) := by
+  have memH
+      : ∀ (X : I.Ginf) (m : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ),
+        (∀ v, (((X v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ) = m v)
+          → (∀ v, m v * instBmat I v e f z = instBmat I v e f z)
+          → X ∈ Hset I (frameSet I e f z) := by
     intro X m hX hmB v x hx
     show (((X v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ) *ᵥ _ = _
     rw [hX v]
     exact inst_fix_of v e f z (m v) (hmB v) x hx
-  have ext' : ∀ X Y : I.Ginf, (∀ v, (((X v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ) =
-      (((Y v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ)) → X = Y := by
+  have ext'
+      : ∀ X Y : I.Ginf,
+        (∀ v,
+            (((X v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ)
+              = (((Y v : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ))
+          → X = Y := by
     intro X Y hXY
     funext v
     exact Subtype.ext (Units.ext (hXY v))
-  have hSS : S * S = 1 := ext' _ _ fun v => by
-    simp only [Pi.mul_apply, Pi.one_apply, Subgroup.coe_mul, Subgroup.coe_one, Units.val_mul, Units.val_one, S, hsu]
-    exact hσσ v
-  have hSPSP : S * P * S * P = 1 := ext' _ _ fun v => by
-    simp only [Pi.mul_apply, Pi.one_apply, Subgroup.coe_mul, Subgroup.coe_one, Units.val_mul, Units.val_one, S, P, hsu, hpu]
-    exact hσp v
+  have hSS : S * S = 1 :=
+    ext' _ _ fun v => by
+      simp only [Pi.mul_apply, Pi.one_apply, Subgroup.coe_mul, Subgroup.coe_one, Units.val_mul,
+        Units.val_one, S, hsu]
+      exact hσσ v
+  have hSPSP : S * P * S * P = 1 :=
+    ext' _ _ fun v => by
+      simp only [Pi.mul_apply, Pi.one_apply, Subgroup.coe_mul, Subgroup.coe_one, Units.val_mul,
+        Units.val_one, S, P, hsu, hpu]
+      exact hσp v
   refine ⟨K, memH K k hku hkB, P, memH P p hpu hpB, S, memH S σ hsu hσB, ?_, ?_, ?_⟩
   · refine ext' _ _ fun v => ?_
     simp only [Pi.mul_apply, Subgroup.coe_mul, Units.val_mul, K, P, hku, hpu]
@@ -108,10 +132,12 @@ theorem instDecomp_of (hP : InstPlaceDecomp) (hG : InstFrameGram) : InstDecomp :
     · intro x
       simp only [Set.mem_univ_pi]
       refine forall_congr' fun v => hCk v _ _ ?_
-      have hg : (K * x * K⁻¹) v * ku v = ku v * x v := by
-        simp [K]
-      have := congrArg (fun g : Formalism.REAL.UJ (I.ε v) =>
-        (((g : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ)) hg
+      have hg : (K * x * K⁻¹) v * ku v = ku v * x v := by simp [K]
+      have :=
+        congrArg
+          (fun g : Formalism.REAL.UJ (I.ε v) =>
+            (((g : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ)) : Matrix (Fin I.n) (Fin I.n) ℂ))
+          hg
       simp only [Subgroup.coe_mul, Units.val_mul, hku] at this
       exact this
 

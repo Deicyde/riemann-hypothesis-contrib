@@ -12,10 +12,11 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset
 
-theorem SchEvalPowerSumHom.eq_single_of_dvd {N k : ℕ} (hk1 : 1 ≤ k) (hkN : k ≤ N)
-    (e : Fin N →₀ ℕ) (hw : Finsupp.weight (fun i : Fin N => (i : ℕ) + 1) e = k)
-    (hd : ∀ i ∈ e.support, k ∣ (i : ℕ) + 1) :
-    e = Finsupp.single (⟨k - 1, by omega⟩ : Fin N) 1 := by
+theorem SchEvalPowerSumHom.eq_single_of_dvd
+    {N k : ℕ} (hk1 : 1 ≤ k) (hkN : k ≤ N) (e : Fin N →₀ ℕ)
+    (hw : Finsupp.weight (fun i : Fin N => (i : ℕ) + 1) e = k)
+    (hd : ∀ i ∈ e.support, k ∣ (i : ℕ) + 1)
+    : e = Finsupp.single (⟨k - 1, by omega⟩ : Fin N) 1 := by
   have hsum : ∑ i ∈ e.support, e i * ((i : ℕ) + 1) = k := by
     simp only [Finsupp.weight_apply, Finsupp.sum, smul_eq_mul] at hw
     exact hw
@@ -37,8 +38,7 @@ theorem SchEvalPowerSumHom.eq_single_of_dvd {N k : ℕ} (hk1 : 1 ≤ k) (hkN : k
   have hother : ∀ i, i ≠ j → e i = 0 := by
     intro i hij
     by_contra hne
-    have hi : i ∈ e.support.erase j :=
-      Finset.mem_erase.mpr ⟨hij, Finsupp.mem_support_iff.mpr hne⟩
+    have hi : i ∈ e.support.erase j := Finset.mem_erase.mpr ⟨hij, Finsupp.mem_support_iff.mpr hne⟩
     have h0 := (Finset.sum_eq_zero_iff.mp hrest) i hi
     rw [Nat.mul_eq_zero] at h0
     omega
@@ -48,14 +48,19 @@ theorem SchEvalPowerSumHom.eq_single_of_dvd {N k : ℕ} (hk1 : 1 ≤ k) (hkN : k
   · rw [← h, ← hjv, hej1]
   · exact hother i (fun hij => h (hjv.symm.trans hij.symm))
 
-theorem SchEvalPowerSumHom.proof (h1 : SchPowerSumAtRootsOfUnity.Statement) :
-    SchEvalPowerSumHom.Statement := by
+theorem SchEvalPowerSumHom.proof (h1 : SchPowerSumAtRootsOfUnity.Statement)
+    : SchEvalPowerSumHom.Statement := by
   intro N k hk1 hkN S hS
-  have hzv : ∀ i : Fin N, aeval (rootOfUnityPoint N k) (psum (Fin N) ℚ ((i : ℕ) + 1)) =
-      if k ∣ (i : ℕ) + 1 then (k : ℂ) else 0 := fun i =>
+  have hzv
+      : ∀ i : Fin N,
+        aeval (rootOfUnityPoint N k) (psum (Fin N) ℚ ((i : ℕ) + 1))
+          = if k ∣ (i : ℕ) + 1 then (k : ℂ) else 0 := fun i =>
     h1 N k ((i : ℕ) + 1) hk1 hkN (by omega)
-  have hcomp : aeval (rootOfUnityPoint N k) (powerSumHom N S) =
-      aeval (fun i : Fin N => aeval (rootOfUnityPoint N k) (psum (Fin N) ℚ ((i : ℕ) + 1))) S := by
+  have hcomp
+      : aeval (rootOfUnityPoint N k) (powerSumHom N S)
+        = aeval
+          (fun i : Fin N => aeval (rootOfUnityPoint N k) (psum (Fin N) ℚ ((i : ℕ) + 1)))
+          S := by
     rw [powerSumHom, ← AlgHom.comp_apply, comp_aeval]
   rw [hcomp]
   set_option synthInstance.maxHeartbeats 100000 in

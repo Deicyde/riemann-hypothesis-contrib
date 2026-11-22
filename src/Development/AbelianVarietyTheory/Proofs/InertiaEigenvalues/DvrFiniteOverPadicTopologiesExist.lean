@@ -12,9 +12,12 @@ namespace GlobalTheory.PadicTop
 open IsLocalRing Topology
 open ReciprocityTheory.ChartRestriction.T2 (PadicCoeff FracTop TopEx)
 
-theorem padicCoeff_of_finite {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [Algebra ℤ_[p] O] [Module.Finite ℤ_[p] O] [TopologicalSpace O]
-    [IsModuleTopology ℤ_[p] O] (hinj : Function.Injective (algebraMap ℤ_[p] O)) : PadicCoeff p O := by
+theorem padicCoeff_of_finite
+    {p : ℕ} [Fact p.Prime]
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[p] O]
+    [Module.Finite ℤ_[p] O] [TopologicalSpace O] [IsModuleTopology ℤ_[p] O]
+    (hinj : Function.Injective (algebraMap ℤ_[p] O))
+    : PadicCoeff p O := by
   haveI : Module.IsTorsionFree ℤ_[p] O := Module.isTorsionFree_iff_algebraMap_injective.mpr hinj
   haveI : Module.Free ℤ_[p] O := inferInstance
   haveI hR : IsTopologicalRing O := IsModuleTopology.isTopologicalRing ℤ_[p] O
@@ -23,8 +26,11 @@ theorem padicCoeff_of_finite {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [I
   set e : O ≃ₗ[ℤ_[p]] (Module.Free.ChooseBasisIndex ℤ_[p] O → ℤ_[p]) := b.equivFun with he_def
   have he : Continuous e := IsModuleTopology.continuous_of_linearMap e.toLinearMap
   have he' : Continuous e.symm := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
-  let h : O ≃ₜ (Module.Free.ChooseBasisIndex ℤ_[p] O → ℤ_[p]) :=
-    { e.toEquiv with continuous_toFun := he, continuous_invFun := he' }
+  let h : O ≃ₜ (Module.Free.ChooseBasisIndex ℤ_[p] O → ℤ_[p]) := {
+    e.toEquiv with
+    continuous_toFun := he
+    continuous_invFun := he'
+  }
   have hp0 : (p : O) ≠ 0 := by
     rw [← map_natCast (algebraMap ℤ_[p] O), Ne, ← map_zero (algebraMap ℤ_[p] O), hinj.eq_iff]
     exact_mod_cast (Fact.out : p.Prime).ne_zero
@@ -69,14 +75,16 @@ theorem padicCoeff_of_finite {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [I
   refine ⟨hR, h.symm.compactSpace, h.symm.t2Space, ?_, hpm, hp0⟩
   refine isAdic_iff.2 ⟨fun n => ?_, fun s hs => ?_⟩
   · have hn : e ⁻¹' Metric.closedBall 0 ((p : ℝ) ^ (-(n : ℤ))) ∈ 𝓝 (0 : O) :=
-      he.continuousAt.preimage_mem_nhds (by rw [map_zero]; exact Metric.closedBall_mem_nhds 0 (zpow_pos hpR _))
+      he.continuousAt.preimage_mem_nhds (by
+        rw [map_zero]; exact Metric.closedBall_mem_nhds 0 (zpow_pos hpR _))
     refine AddSubgroup.isOpen_of_mem_nhds (maximalIdeal O ^ n).toAddSubgroup (g := 0)
       (Filter.mem_of_superset hn fun x hx => hsub1 n (key1 n x ?_))
     simpa using hx
   · have ht : e.symm ⁻¹' s ∈ 𝓝 (0 : Module.Free.ChooseBasisIndex ℤ_[p] O → ℤ_[p]) :=
       he'.continuousAt.preimage_mem_nhds (by rw [map_zero]; exact hs)
     obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1 ht
-    have hp1 : (p : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt)
+    have hp1 : (p : ℝ)⁻¹ < 1 :=
+      inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt)
     obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one hε hp1
     refine ⟨k * n, fun x hx => ?_⟩
     have h1 := key2 n x (hsub2 n hx)
@@ -94,8 +102,8 @@ variable {O' : Type} [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O']
 def fracB (ϖ : O') (i : ℕ) : Submodule O' (FractionRing O') :=
   Submodule.span O' {algebraMap O' (FractionRing O') (ϖ ^ i)}
 
-theorem mem_fracB {ϖ : O'} {i : ℕ} {x : FractionRing O'} :
-    x ∈ fracB ϖ i ↔ ∃ c : O', x = algebraMap O' (FractionRing O') (c * ϖ ^ i) := by
+theorem mem_fracB {ϖ : O'} {i : ℕ} {x : FractionRing O'}
+    : x ∈ fracB ϖ i ↔ ∃ c : O', x = algebraMap O' (FractionRing O') (c * ϖ ^ i) := by
   rw [fracB, Submodule.mem_span_singleton]
   constructor
   · rintro ⟨c, rfl⟩
@@ -103,8 +111,8 @@ theorem mem_fracB {ϖ : O'} {i : ℕ} {x : FractionRing O'} :
   · rintro ⟨c, rfl⟩
     exact ⟨c, by rw [Algebra.smul_def, map_mul]⟩
 
-theorem algebraMap_mem_fracB {ϖ : O'} {i : ℕ} {x : O'} :
-    algebraMap O' (FractionRing O') x ∈ fracB ϖ i ↔ ϖ ^ i ∣ x := by
+theorem algebraMap_mem_fracB {ϖ : O'} {i : ℕ} {x : O'}
+    : algebraMap O' (FractionRing O') x ∈ fracB ϖ i ↔ ϖ ^ i ∣ x := by
   rw [mem_fracB]
   constructor
   · rintro ⟨c, hc⟩
@@ -116,9 +124,9 @@ theorem fracB_anti (ϖ : O') {i j : ℕ} (h : i ≤ j) : fracB ϖ j ≤ fracB ϖ
   rw [fracB, Submodule.span_singleton_le_iff_mem, algebraMap_mem_fracB]
   exact pow_dvd_pow ϖ h
 
-theorem exists_pow_mul_mem {ϖ : O'} (hϖ : Irreducible ϖ) (a : FractionRing O') :
-    ∃ n : ℕ, ∃ c : O', algebraMap O' (FractionRing O') (ϖ ^ n) * a =
-      algebraMap O' (FractionRing O') c := by
+theorem exists_pow_mul_mem {ϖ : O'} (hϖ : Irreducible ϖ) (a : FractionRing O')
+    : ∃ n : ℕ, ∃ c : O',
+      algebraMap O' (FractionRing O') (ϖ ^ n) * a = algebraMap O' (FractionRing O') c := by
   obtain ⟨⟨r, s⟩, h⟩ := IsLocalization.surj (nonZeroDivisors O') a
   have hs : (s : O') ≠ 0 := nonZeroDivisors.ne_zero s.2
   obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hs hϖ
@@ -137,8 +145,10 @@ theorem fracB_basis {ϖ : O'} (hϖ : Irreducible ϖ) : SubmodulesRingBasis (frac
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨d, rfl⟩ := mem_fracB.1 hx
     refine mem_fracB.2 ⟨c * d, ?_⟩
-    have e : algebraMap O' (FractionRing O') (d * ϖ ^ (i + n)) =
-        algebraMap O' (FractionRing O') (d * ϖ ^ i) * algebraMap O' (FractionRing O') (ϖ ^ n) := by
+    have e
+        : algebraMap O' (FractionRing O') (d * ϖ ^ (i + n))
+          = algebraMap O' (FractionRing O') (d * ϖ ^ i)
+            * algebraMap O' (FractionRing O') (ϖ ^ n) := by
       rw [← map_mul, pow_add, mul_assoc]
     show a * _ = _
     rw [e, mul_comm (algebraMap O' (FractionRing O') (d * ϖ ^ i)), ← mul_assoc, mul_comm a, hc,
@@ -154,10 +164,12 @@ theorem fracB_basis {ϖ : O'} (hϖ : Irreducible ϖ) : SubmodulesRingBasis (frac
 
 end FracTopology
 
-theorem exists_fracTop (O' : Type) [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O']
-    [TopologicalSpace O'] (hA : IsAdic (IsLocalRing.maximalIdeal O')) :
-    ∃ (_ : TopologicalSpace (FractionRing O')) (_ : IsTopologicalAddGroup (FractionRing O'))
-      (_ : ContinuousSMul O' (FractionRing O')), FracTop O' := by
+theorem exists_fracTop
+    (O' : Type) [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O'] [TopologicalSpace O']
+    (hA : IsAdic (IsLocalRing.maximalIdeal O'))
+    : ∃ (_ : TopologicalSpace (FractionRing O')) (_ : IsTopologicalAddGroup (FractionRing O'))
+        (_ : ContinuousSMul O' (FractionRing O')),
+      FracTop O' := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O'
   have hm : ∀ n : ℕ, ((IsLocalRing.maximalIdeal O' ^ n : Ideal O') : Set O') = {x | ϖ ^ n ∣ x} := by
     intro n

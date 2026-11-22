@@ -8,8 +8,8 @@ public import Mathlib.Data.Finsupp.WellFounded
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem UpperTheory.V.Alg.gordan_dickson (σ : Type) [Finite σ] (S : Set (σ →₀ ℕ)) :
-    ∃ μ : Finset (σ →₀ ℕ), (∀ m ∈ μ, m ∈ S) ∧ ∀ n ∈ S, ∃ m ∈ μ, m ≤ n := by
+private theorem UpperTheory.V.Alg.gordan_dickson (σ : Type) [Finite σ] (S : Set (σ →₀ ℕ))
+    : ∃ μ : Finset (σ →₀ ℕ), (∀ m ∈ μ, m ∈ S) ∧ ∀ n ∈ S, ∃ m ∈ μ, m ≤ n := by
   classical
   haveI := Fintype.ofFinite σ
   have hfin : {m : σ →₀ ℕ | Minimal (· ∈ S) m}.Finite :=
@@ -18,10 +18,14 @@ private theorem UpperTheory.V.Alg.gordan_dickson (σ : Type) [Finite σ] (S : Se
   obtain ⟨b, hb, hmin⟩ := (Set.isPWO_of_wellQuasiOrderedLE S).exists_le_minimal hn
   exact ⟨b, (Set.Finite.mem_toFinset hfin).2 hmin, hb⟩
 
-theorem UpperTheory.V.Alg.gordan :
-    ∀ (σ : Type) [Finite σ] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (wt : σ → X), ∃ g : Finset (σ →₀ ℕ), (∀ n ∈ g, n ≠ 0 ∧ Finsupp.weight wt n = 0) ∧
-      (∀ n, Finsupp.weight wt n = 0 → n ∈ AddSubmonoid.closure (g : Set (σ →₀ ℕ))) ∧
-      ∀ j, ∃ μ : Finset (σ →₀ ℕ), (∀ m ∈ μ, Finsupp.weight wt m = j) ∧ ∀ n, Finsupp.weight wt n = j → ∃ m ∈ μ, m ≤ n := by
+theorem UpperTheory.V.Alg.gordan
+    : ∀ (σ : Type) [Finite σ] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+        (wt : σ → X),
+      ∃ g : Finset (σ →₀ ℕ),
+        (∀ n ∈ g, n ≠ 0 ∧ Finsupp.weight wt n = 0)
+          ∧ (∀ n, Finsupp.weight wt n = 0 → n ∈ AddSubmonoid.closure (g : Set (σ →₀ ℕ)))
+          ∧ ∀ j, ∃ μ : Finset (σ →₀ ℕ),
+            (∀ m ∈ μ, Finsupp.weight wt m = j) ∧ ∀ n, Finsupp.weight wt n = j → ∃ m ∈ μ, m ≤ n := by
   intro σ _ X _ _ _ wt
   classical
   obtain ⟨g, hgS, hg⟩ := gordan_dickson σ {n | n ≠ 0 ∧ Finsupp.weight wt n = 0}

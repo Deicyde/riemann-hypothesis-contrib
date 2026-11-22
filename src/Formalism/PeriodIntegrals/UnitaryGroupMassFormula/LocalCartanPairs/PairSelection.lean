@@ -22,16 +22,24 @@ theorem pair_selection : Select := by
   let σ : R ≃+* R := starRingAut
   have hct : ∀ M : Matrix ι ι R, (M.map σ)ᵀ = Mᴴ := by
     intro M; ext i j; simp [σ, Matrix.conjTranspose_apply]
-  have hs : ∀ x : ι → R, star x = fun l => σ (x l) := by
-    intro x; ext l; simp [σ]
+  have hs : ∀ x : ι → R, star x = fun l => σ (x l) := by intro x; ext l; simp [σ]
   have hσϖ : σ ϖ = ϖ := by simpa [σ] using (hI.fix ϖ).mp hI.pi_mem
   have hrel' : (h.map σ)ᵀ * A * h = ϖ ^ (2 * k) • A' := by rw [hct]; exact hrel
   obtain ⟨m, h₁, rfl, hle, _, hcase⟩ :=
     sel_main σ ϖ hI.pi_ne hI.pi_nonunit hσϖ hI.val A A' h hA hA' k hrel'
   rcases hcase with ⟨hmk, hu⟩ | ⟨hlt, g₁, j, y, _, _, _, hxy, hxx, hy⟩
   · exact absurd ⟨h₁, hu, by rw [hmk]⟩ hNB
-  · refine ⟨k - m, h₁ *ᵥ Pi.single j 1, y, by omega, by omega, ?_, ⟨A' j j, ?_⟩,
-      ⟨Pi.single j 1, ?_⟩, ⟨g₁ *ᵥ y, ?_⟩⟩
+  · refine ⟨
+      k - m,
+      h₁ *ᵥ Pi.single j 1,
+      y,
+      by omega,
+      by omega,
+      ?_,
+      ⟨A' j j, ?_⟩,
+      ⟨Pi.single j 1, ?_⟩,
+      ⟨g₁ *ᵥ y, ?_⟩
+    ⟩
     · unfold hf; rw [hs]; exact hxy
     · unfold hf; rw [hs]; exact hxx
     · rw [Matrix.smul_mulVec, show k - (k - m) = m by omega]

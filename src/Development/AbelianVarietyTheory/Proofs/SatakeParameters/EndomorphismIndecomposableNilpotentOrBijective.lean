@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem endo_indecomposable_finite_length_nilpotent_or_bijective :
-    ∀ (R P : Type) [Ring R] [AddCommGroup P] [Module R P] [IsArtinian R P] [IsNoetherian R P],
-      (∀ A B : Submodule R P, IsCompl A B → A = ⊥ ∨ B = ⊥) →
-      ∀ f : Module.End R P, IsNilpotent f ∨ Function.Bijective f := by
+theorem endo_indecomposable_finite_length_nilpotent_or_bijective
+    : ∀ (R P : Type) [Ring R] [AddCommGroup P] [Module R P] [IsArtinian R P] [IsNoetherian R P],
+      (∀ A B : Submodule R P, IsCompl A B → A = ⊥ ∨ B = ⊥)
+        → ∀ f : Module.End R P, IsNilpotent f ∨ Function.Bijective f := by
   intro R P _ _ _ _ _ hind f
   obtain ⟨n, hn⟩ := (LinearMap.eventually_isCompl_ker_pow_range_pow f).exists_forall_of_atTop
   have hc := hn (n + 1) (Nat.le_succ n)

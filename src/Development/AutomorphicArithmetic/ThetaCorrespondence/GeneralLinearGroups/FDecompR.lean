@@ -12,21 +12,28 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JhMultSub
 
 @[expose] public section
 
-open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas UpperTheory.Lit.Red
+open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult UpperTheory.Lit.Cas UpperTheory.Lit.Red
 
-theorem UpperTheory.Lit.Full.decompR :
-    GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (x : IrrGL (k := k)) (P : Set (IrrGL (k := k))), ∃ y z, Emb x y z ∧ LastIn y Pᶜ ∧ SuppIn z P := by
+theorem UpperTheory.Lit.Full.decompR
+    : GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+          (x : IrrGL (k := k)) (P : Set (IrrGL (k := k))),
+        ∃ y z,
+          Emb x y z ∧ LastIn y Pᶜ ∧ SuppIn z P := by
   intro hG hBZ k _ _ _ _ x P
-  have key : ∀ (n : ℕ) (y z : IrrGL (k := k)), y.1 = n → Emb x y z → SuppIn z P →
-      ∃ y z, Emb x y z ∧ LastIn y Pᶜ ∧ SuppIn z P := by
+  have key
+      : ∀ (n : ℕ) (y z : IrrGL (k := k)),
+        y.1 = n → Emb x y z → SuppIn z P → ∃ y z, Emb x y z ∧ LastIn y Pᶜ ∧ SuppIn z P := by
     intro n
     induction n using Nat.strong_induction_on with
     | _ n ih =>
       rintro y z rfl hxyz hz
       by_cases hl : LastIn y Pᶜ
       · exact ⟨y, z, hxyz, hl, hz⟩
-      obtain ⟨q, hq, hc, hj, hP⟩ : ∃ (q : Fin 2 → IrrGL (k := k)) (hq : ∑ a, (q a).1 = y.1),
-          (q 1).IsCusp ∧ jm q hq y.rep ≠ 0 ∧ q 1 ∈ P := by
+      obtain ⟨q, hq, hc, hj, hP⟩
+          : ∃ (q : Fin 2 → IrrGL (k := k)) (hq : ∑ a, (q a).1 = y.1),
+            (q 1).IsCusp ∧ jm q hq y.rep ≠ 0 ∧ q 1 ∈ P := by
         by_contra hn
         exact hl fun q hq hc hj hP => hn ⟨q, hq, hc, hj, hP⟩
       obtain ⟨u, hu⟩ := UpperTheory.Lit.Full.embR hG hBZ k y q hq hc hj
@@ -37,9 +44,10 @@ theorem UpperTheory.Lit.Full.decompR :
         have h1 : u.1 + (q 1).1 = y.1 := by simpa using hd'
         have := hc.1
         omega
-      refine ih u.1 hlt u v rfl hxuv ⟨∑ a, (![{q 1}, A] : Fin 2 → Multiset (IrrGL (k := k))) a, ?_, ?_⟩
-      · refine GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr (y := ![q 1, z]) ?_ v.2.rep.irr
-          (jhMult_ne_zero_iff.1 hv)
+      refine ih u.1 hlt u v rfl hxuv
+        ⟨∑ a, (![{q 1}, A] : Fin 2 → Multiset (IrrGL (k := k))) a, ?_, ?_⟩
+      · refine GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr
+          (y := ![q 1, z]) ?_ v.2.rep.irr (jhMult_ne_zero_iff.1 hv)
         exact Fin.forall_fin_two.2 ⟨hasSupport_self hc, hA⟩
       · intro w hw
         have hw' : w ∈ ({q 1} : Multiset (IrrGL (k := k))) + A := by simpa using hw

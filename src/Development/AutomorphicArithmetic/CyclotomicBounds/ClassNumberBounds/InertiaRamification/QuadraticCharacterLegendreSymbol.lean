@@ -23,8 +23,8 @@ private lemma quadC_ne (d : ℕ) [Fact d.Prime] (h : d ≠ 2) : quadC d ≠ 1 :=
   rw [quadC, Ne, MulChar.ringHomComp_eq_one_iff (by exact Int.cast_injective)]
   exact quadraticChar_ne_one (by rw [ZMod.ringChar_zmod_n]; exact h)
 
-theorem exists_isImagQuad {d : ℕ} (hd : d.Prime) (h4 : d % 4 = 3) (hN : d ∣ N) :
-    ∃ ψ : DirichletCharacter ℂ N, IsImagQuad ψ d := by
+theorem exists_isImagQuad {d : ℕ} (hd : d.Prime) (h4 : d % 4 = 3) (hN : d ∣ N)
+    : ∃ ψ : DirichletCharacter ℂ N, IsImagQuad ψ d := by
   haveI : Fact d.Prime := ⟨hd⟩
   have hd2 : d ≠ 2 := by
     rintro rfl
@@ -32,8 +32,9 @@ theorem exists_isImagQuad {d : ℕ} (hd : d.Prime) (h4 : d % 4 = 3) (hN : d ∣ 
   refine ⟨changeLevel hN (quadC d), ?_, ?_, ?_⟩
   · rw [← map_pow, quadC_sq, map_one]
   · show changeLevel hN (quadC d) (-1) = -1
-    have hc := changeLevel_eq_cast_of_dvd' (quadC d) hN (a := -1)
-      (by simpa using (isCoprime_one_left (x := (N : ℤ))).neg_left)
+    have hc :=
+      changeLevel_eq_cast_of_dvd' (quadC d) hN (a := -1)
+        (by simpa using (isCoprime_one_left (x := (N : ℤ))).neg_left)
     push_cast at hc
     rw [hc, quadC, MulChar.ringHomComp_apply,
       quadraticChar_neg_one (by rw [ZMod.ringChar_zmod_n]; exact hd2), ZMod.card,

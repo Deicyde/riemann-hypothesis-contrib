@@ -47,8 +47,8 @@ lemma ratio_eq {A B B' : AddSubgroup W} {φ : W → ℂ} (h : Fine A φ B) (h' :
     exact_mod_cast m1.trans m2.symm
   rw [← mul_div_mul_left _ _ c3, ← s1, ← mul_div_mul_left (∑ᶠ c : W ⧸ B', φ c.out) _ c4, ← s2, m]
 
-theorem cint_eq {A B : AddSubgroup W} {φ : W → ℂ} (h : Fine A φ B) :
-    cint A φ = (∑ᶠ c : W ⧸ B, φ c.out) / (B.relIndex A : ℂ) := by
+theorem cint_eq {A B : AddSubgroup W} {φ : W → ℂ} (h : Fine A φ B)
+    : cint A φ = (∑ᶠ c : W ⧸ B, φ c.out) / (B.relIndex A : ℂ) := by
   have hn : Nice A φ := ⟨B, h⟩
   rw [cint, dite_eq_left hn]
   exact ratio_eq hn.choose_spec h

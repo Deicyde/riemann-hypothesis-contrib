@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Spl
 @[expose] public section
 
 set_option autoImplicit false
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,8 +19,9 @@ namespace QuotTransition
 
 section
 
-variable {S U V : Scheme.{0}} (fU : U ⟶ S) (fV : V ⟶ S) (A : Over S)
-  (BU : Over U) (BV : Over V) (qU : (Over.pullback fU).obj A ⟶ BU) (qV : (Over.pullback fV).obj A ⟶ BV)
+variable
+  {S U V : Scheme.{0}} (fU : U ⟶ S) (fV : V ⟶ S) (A : Over S) (BU : Over U) (BV : Over V)
+  (qU : (Over.pullback fU).obj A ⟶ BU) (qV : (Over.pullback fV).obj A ⟶ BV)
 
 lemma w_left : qU.left ≫ BU.hom = pullback.snd A.hom fU := Over.w qU
 
@@ -112,30 +115,42 @@ lemma toV_comp_eq [Flat qU.left] [Surjective qU.left] [QuasiCompact qU.left]
   have := congrArg CommaMorphism.left hk
   simpa [zu, zv] using this
 
-theorem exists_trans [Flat qU.left] [Surjective qU.left] [QuasiCompact qU.left]
-    (hU : IsPullback ((fst ((Over.pullback fU).obj H) ((Over.pullback fU).obj A) ≫ (Over.pullback fU).map i) *
-      snd ((Over.pullback fU).obj H) ((Over.pullback fU).obj A))
+theorem exists_trans
+    [Flat qU.left] [Surjective qU.left] [QuasiCompact qU.left]
+    (hU : IsPullback
+      ((fst ((Over.pullback fU).obj H) ((Over.pullback fU).obj A) ≫ (Over.pullback fU).map i)
+        * snd ((Over.pullback fU).obj H) ((Over.pullback fU).obj A))
       (snd ((Over.pullback fU).obj H) ((Over.pullback fU).obj A)) qU qU)
-    (hV : IsPullback ((fst ((Over.pullback fV).obj H) ((Over.pullback fV).obj A) ≫ (Over.pullback fV).map i) *
-      snd ((Over.pullback fV).obj H) ((Over.pullback fV).obj A))
-      (snd ((Over.pullback fV).obj H) ((Over.pullback fV).obj A)) qV qV) :
-    ∃ b : pullback (BU.hom ≫ fU) fV ⟶ BV.left, b ≫ BV.hom = pullback.snd _ _ ∧
-      ∀ (T : Scheme.{0}) (y : T ⟶ pullback A.hom fU) (z : T ⟶ pullback A.hom fV)
-        (w : T ⟶ pullback (BU.hom ≫ fU) fV), y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ →
-        w ≫ pullback.fst _ _ = y ≫ qU.left → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _ →
-        w ≫ b = z ≫ qV.left := by
-  have hc : ∀ {T : Scheme.{0}} (u v : T ⟶ src fU fV A BU qU),
-      u ≫ pullback.snd _ _ = v ≫ pullback.snd _ _ →
-      u ≫ (toV fU fV A BU qU ≫ qV.left) = v ≫ (toV fU fV A BU qU ≫ qV.left) :=
-    fun u v huv => toV_comp_eq fU fV A BU BV qU qV H i hU hV u v huv
-  have fac := EffectiveEpi.fac (pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV))
-    (toV fU fV A BU qU ≫ qV.left) hc
-  refine ⟨EffectiveEpi.desc (pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV))
-    (toV fU fV A BU qU ≫ qV.left) hc, ?_, ?_⟩
+    (hV : IsPullback
+      ((fst ((Over.pullback fV).obj H) ((Over.pullback fV).obj A) ≫ (Over.pullback fV).map i)
+        * snd ((Over.pullback fV).obj H) ((Over.pullback fV).obj A))
+      (snd ((Over.pullback fV).obj H) ((Over.pullback fV).obj A)) qV qV)
+    : ∃ b : pullback (BU.hom ≫ fU) fV ⟶ BV.left,
+      b ≫ BV.hom = pullback.snd _ _
+        ∧ ∀ (T : Scheme.{0}) (y : T ⟶ pullback A.hom fU) (z : T ⟶ pullback A.hom fV)
+            (w : T ⟶ pullback (BU.hom ≫ fU) fV),
+          y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ → w ≫ pullback.fst _ _ = y ≫ qU.left
+            → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _
+            → w ≫ b = z ≫ qV.left := by
+  have hc
+      : ∀ {T : Scheme.{0}} (u v : T ⟶ src fU fV A BU qU),
+        u ≫ pullback.snd _ _ = v ≫ pullback.snd _ _
+          → u ≫ (toV fU fV A BU qU ≫ qV.left) = v ≫ (toV fU fV A BU qU ≫ qV.left) := fun u v huv =>
+    toV_comp_eq fU fV A BU BV qU qV H i hU hV u v huv
+  have fac :=
+    EffectiveEpi.fac (pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV))
+      (toV fU fV A BU qU ≫ qV.left) hc
+  refine ⟨
+    EffectiveEpi.desc (pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV))
+      (toV fU fV A BU qU ≫ qV.left) hc,
+    ?_,
+    ?_
+  ⟩
   · rw [← cancel_epi (pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV)), reassoc_of% fac,
       w_left fV A BV qV, toV_snd]
   · intro T y z w h1 h2 h3
-    have hw : w = pullback.lift y w h2.symm ≫ pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV) :=
+    have hw
+        : w = pullback.lift y w h2.symm ≫ pullback.snd qU.left (pullback.fst (BU.hom ≫ fU) fV) :=
       (pullback.lift_snd _ _ _).symm
     have hz : pullback.lift y w h2.symm ≫ toV fU fV A BU qU = z := by
       apply pullback.hom_ext
@@ -176,56 +191,77 @@ lemma lift_comp_lift {S U V : Scheme.{0}} (fU : U ⟶ S) (fV : V ⟶ S) (A : Ove
   · rw [Category.assoc, Category.assoc, pullback.lift_snd, ← Category.assoc (pullback.lift b _ _),
       pullback.lift_fst, hb]
 
-theorem isPullback_trans {S U V : Scheme.{0}} (fU : U ⟶ S) (fV : V ⟶ S) (A : Over S)
-    (BU : Over U) (BV : Over V) (qU : (Over.pullback fU).obj A ⟶ BU) (qV : (Over.pullback fV).obj A ⟶ BV)
-    [Flat qU.left] [Surjective qU.left] [QuasiCompact qU.left]
-    [Flat qV.left] [Surjective qV.left] [QuasiCompact qV.left]
+theorem isPullback_trans
+    {S U V : Scheme.{0}} (fU : U ⟶ S) (fV : V ⟶ S) (A : Over S) (BU : Over U) (BV : Over V)
+    (qU : (Over.pullback fU).obj A ⟶ BU) (qV : (Over.pullback fV).obj A ⟶ BV)
+    [Flat qU.left] [Surjective qU.left] [QuasiCompact qU.left] [Flat qV.left] [Surjective qV.left]
+    [QuasiCompact qV.left]
     (b : pullback (BU.hom ≫ fU) fV ⟶ BV.left) (b' : pullback (BV.hom ≫ fV) fU ⟶ BU.left)
     (hb : b ≫ BV.hom = pullback.snd _ _) (hb' : b' ≫ BU.hom = pullback.snd _ _)
     (cb : ∀ (T : Scheme.{0}) (y : T ⟶ pullback A.hom fU) (z : T ⟶ pullback A.hom fV)
-        (w : T ⟶ pullback (BU.hom ≫ fU) fV), y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ →
-        w ≫ pullback.fst _ _ = y ≫ qU.left → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _ →
-        w ≫ b = z ≫ qV.left)
+        (w : T ⟶ pullback (BU.hom ≫ fU) fV),
+      y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ → w ≫ pullback.fst _ _ = y ≫ qU.left
+        → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _
+        → w ≫ b = z ≫ qV.left)
     (cb' : ∀ (T : Scheme.{0}) (y : T ⟶ pullback A.hom fV) (z : T ⟶ pullback A.hom fU)
-        (w : T ⟶ pullback (BV.hom ≫ fV) fU), y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ →
-        w ≫ pullback.fst _ _ = y ≫ qV.left → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _ →
-        w ≫ b' = z ≫ qU.left) :
-    IsPullback b (pullback.fst _ _ ≫ BU.hom) (BV.hom ≫ fV) fU := by
+        (w : T ⟶ pullback (BV.hom ≫ fV) fU),
+      y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ → w ≫ pullback.fst _ _ = y ≫ qV.left
+        → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _
+        → w ≫ b' = z ≫ qU.left)
+    : IsPullback b (pullback.fst _ _ ≫ BU.hom) (BV.hom ≫ fV) fU := by
   have h₁ : b ≫ BV.hom ≫ fV = (pullback.fst _ _ ≫ BU.hom) ≫ fU := by
     rw [reassoc_of% hb, Category.assoc]; exact pullback.condition.symm
   have h₂ : b' ≫ BU.hom ≫ fU = (pullback.fst _ _ ≫ BV.hom) ≫ fV := by
     rw [reassoc_of% hb', Category.assoc]; exact pullback.condition.symm
-  let e : pullback (BU.hom ≫ fU) fV ≅ pullback (BV.hom ≫ fV) fU :=
-    { hom := pullback.lift b (pullback.fst _ _ ≫ BU.hom) h₁
-      inv := pullback.lift b' (pullback.fst _ _ ≫ BV.hom) h₂
-      hom_inv_id := lift_comp_lift fU fV A BU BV qU qV b b' hb cb cb' h₁ h₂
-      inv_hom_id := lift_comp_lift fV fU A BV BU qV qU b' b hb' cb' cb h₂ h₁ }
+  let e : pullback (BU.hom ≫ fU) fV ≅ pullback (BV.hom ≫ fV) fU := {
+    hom := pullback.lift b (pullback.fst _ _ ≫ BU.hom) h₁
+    inv := pullback.lift b' (pullback.fst _ _ ≫ BV.hom) h₂
+    hom_inv_id := lift_comp_lift fU fV A BU BV qU qV b b' hb cb cb' h₁ h₂
+    inv_hom_id := lift_comp_lift fV fU A BV BU qV qU b' b hb' cb' cb h₂ h₁
+  }
   exact IsPullback.of_iso_pullback ⟨h₁⟩ e (pullback.lift_fst _ _ _) (pullback.lift_snd _ _ _)
 
-theorem exists_transition : ∀ (S : Scheme.{0}) (𝒰 : S.OpenCover.{0}) (A H : Over S) [GrpObj A] [GrpObj H] (i : H ⟶ A)
-    (B : ∀ j, Over (𝒰.X j)) (q : ∀ j, (Over.pullback (𝒰.f j)).obj A ⟶ B j),
-    (∀ j, Flat (q j).left) → (∀ j, Surjective (q j).left) → (∀ j, QuasiCompact (q j).left) → (∀ j, IsPullback ((fst ((Over.pullback (𝒰.f j)).obj H) ((Over.pullback (𝒰.f j)).obj A) ≫ (Over.pullback (𝒰.f j)).map i) * snd ((Over.pullback (𝒰.f j)).obj H) ((Over.pullback (𝒰.f j)).obj A)) (snd ((Over.pullback (𝒰.f j)).obj H) ((Over.pullback (𝒰.f j)).obj A)) (q j) (q j)) →
-    ∃ b : ∀ j k, pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k) ⟶ (B k).left,
-      (∀ j k, b j k ≫ (B k).hom = pullback.snd _ _) ∧
-      (∀ j k, IsPullback (b j k) (pullback.fst _ _ ≫ (B j).hom) ((B k).hom ≫ 𝒰.f k) (𝒰.f j)) ∧
-      ∀ (j k : 𝒰.I₀) (T : Scheme.{0}) (y : T ⟶ pullback A.hom (𝒰.f j)) (z : T ⟶ pullback A.hom (𝒰.f k))
-        (w : T ⟶ pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k)), y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ →
-        w ≫ pullback.fst _ _ = y ≫ (q j).left → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _ → w ≫ b j k = z ≫ (q k).left := by
+theorem exists_transition
+    : ∀ (S : Scheme.{0}) (𝒰 : S.OpenCover.{0}) (A H : Over S) [GrpObj A] [GrpObj H] (i : H ⟶ A)
+        (B : ∀ j, Over (𝒰.X j)) (q : ∀ j, (Over.pullback (𝒰.f j)).obj A ⟶ B j),
+      (∀ j, Flat (q j).left) → (∀ j, Surjective (q j).left) → (∀ j, QuasiCompact (q j).left)
+        → (∀ j,
+          IsPullback
+            ((fst ((Over.pullback (𝒰.f j)).obj H) ((Over.pullback (𝒰.f j)).obj A)
+                ≫ (Over.pullback (𝒰.f j)).map i)
+              * snd ((Over.pullback (𝒰.f j)).obj H) ((Over.pullback (𝒰.f j)).obj A))
+            (snd ((Over.pullback (𝒰.f j)).obj H) ((Over.pullback (𝒰.f j)).obj A)) (q j) (q j))
+        → ∃ b : ∀ j k, pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k) ⟶ (B k).left,
+          (∀ j k, b j k ≫ (B k).hom = pullback.snd _ _)
+            ∧ (∀ j k, IsPullback (b j k) (pullback.fst _ _ ≫ (B j).hom) ((B k).hom ≫ 𝒰.f k) (𝒰.f j))
+            ∧ ∀ (j k : 𝒰.I₀) (T : Scheme.{0}) (y : T ⟶ pullback A.hom (𝒰.f j))
+                (z : T ⟶ pullback A.hom (𝒰.f k)) (w : T ⟶ pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k)),
+              y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ → w ≫ pullback.fst _ _ = y ≫ (q j).left
+                → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _
+                → w ≫ b j k = z ≫ (q k).left := by
   intro S 𝒰 A H _ _ i B q hf hs hqc hpb
-  have key : ∀ j k, ∃ b : pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k) ⟶ (B k).left,
-      b ≫ (B k).hom = pullback.snd _ _ ∧
-      ∀ (T : Scheme.{0}) (y : T ⟶ pullback A.hom (𝒰.f j)) (z : T ⟶ pullback A.hom (𝒰.f k))
-        (w : T ⟶ pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k)), y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ →
-        w ≫ pullback.fst _ _ = y ≫ (q j).left → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _ →
-        w ≫ b = z ≫ (q k).left := fun j k => by
-    haveI := hf j; haveI := hs j; haveI := hqc j
+  have key
+      : ∀ j k, ∃ b : pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k) ⟶ (B k).left,
+        b ≫ (B k).hom = pullback.snd _ _
+          ∧ ∀ (T : Scheme.{0}) (y : T ⟶ pullback A.hom (𝒰.f j)) (z : T ⟶ pullback A.hom (𝒰.f k))
+              (w : T ⟶ pullback ((B j).hom ≫ 𝒰.f j) (𝒰.f k)),
+            y ≫ pullback.fst _ _ = z ≫ pullback.fst _ _ → w ≫ pullback.fst _ _ = y ≫ (q j).left
+              → w ≫ pullback.snd _ _ = z ≫ pullback.snd _ _
+              → w ≫ b = z ≫ (q k).left := fun j k => by
+    haveI := hf j
+    haveI := hs j
+    haveI := hqc j
     exact exists_trans (𝒰.f j) (𝒰.f k) A (B j) (B k) (q j) (q k) H i (hpb j) (hpb k)
   choose b hb1 hb3 using key
   refine ⟨b, hb1, fun j k => ?_, hb3⟩
-  haveI := hf j; haveI := hs j; haveI := hqc j
-  haveI := hf k; haveI := hs k; haveI := hqc k
-  exact isPullback_trans (𝒰.f j) (𝒰.f k) A (B j) (B k) (q j) (q k) (b j k) (b k j) (hb1 j k) (hb1 k j)
-    (hb3 j k) (hb3 k j)
+  haveI := hf j
+  haveI := hs j
+  haveI := hqc j
+  haveI := hf k
+  haveI := hs k
+  haveI := hqc k
+  exact isPullback_trans (𝒰.f j) (𝒰.f k) A (B j) (B k) (q j) (q k) (b j k) (b k j) (hb1 j k)
+    (hb1 k j) (hb3 j k) (hb3 k j)
 
 end QuotTransition
 end GlobalTheory

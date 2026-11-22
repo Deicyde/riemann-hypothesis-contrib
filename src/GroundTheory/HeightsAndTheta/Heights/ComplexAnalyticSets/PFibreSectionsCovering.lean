@@ -77,9 +77,8 @@ theorem FibreSectionsCovering.proof : FibreSectionsCovering.Statement := by
   have hGV : ∀ i, ∀ w ∈ W, G i w ∈ VV i := fun i w hw => (inX _ _ w (hWO i w hw)).2
   have hAG : ∀ i, ∀ w ∈ W, A *ᵥ G i w = w := fun i w hw => hAg _ _ w (hWO i w hw)
   have hfc : Continuous f := (hAc.comp continuous_subtype_val).subtype_mk fun x => hX x.2
-  have hres : ∀ i (q : Ω) (hq : (q : Fin (e + 1) → ℂ) ∈ W),
-      f ⟨G i q, hGX i q hq⟩ = q := fun i q hq =>
-    Subtype.ext (hAG i q hq)
+  have hres : ∀ i (q : Ω) (hq : (q : Fin (e + 1) → ℂ) ∈ W), f ⟨G i q, hGX i q hq⟩ = q :=
+    fun i q hq => Subtype.ext (hAG i q hq)
   let V : Set Ω := {p | (p : Fin (e + 1) → ℂ) ∈ W}
   let U : Fin N → Set X := fun i => {x | (x : Fin n → ℂ) ∈ VV i ∧ A *ᵥ (x : Fin n → ℂ) ∈ W}
   have hVo : IsOpen V := continuous_subtype_val.isOpen_preimage _ hWo
@@ -107,8 +106,12 @@ theorem FibreSectionsCovering.proof : FibreSectionsCovering.Statement := by
       rw [← hT'eq] at hm
       exact hm
     rw [mem_nhds_subtype]
-    refine ⟨W ∩ G i ⁻¹' T', Filter.inter_mem (hWo.mem_nhds hpW)
-      ((hGc i p (hWO i p hpW)).preimage_mem_nhds (hT'o.mem_nhds hGp)), ?_⟩
+    refine ⟨
+      W ∩ G i ⁻¹' T',
+      Filter.inter_mem (hWo.mem_nhds hpW)
+        ((hGc i p (hWO i p hpW)).preimage_mem_nhds (hT'o.mem_nhds hGp)),
+      ?_
+    ⟩
     rintro q ⟨hqW, hqT⟩
     have hm : (⟨G i q, hGX i q hqW⟩ : X) ∈ Subtype.val ⁻¹' T' := hqT
     rw [hT'eq] at hm

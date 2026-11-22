@@ -13,23 +13,36 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.NormalSetCounting
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.NormalSetCounting
   Formalism.MainNotions.TraceSpectra
 
 theorem restSpec : RestSpec := Formalism.MainNotions.NormalSetCounting.restSpec
 
-theorem prod_range_zmod {M : Type*} [CommMonoid M] (J : ℕ) [NeZero J] (f : ℕ → M) :
-    ∏ i ∈ Finset.range J, f i = ∏ j : ZMod J, f j.val := by
+theorem prod_range_zmod {M : Type*} [CommMonoid M] (J : ℕ) [NeZero J] (f : ℕ → M)
+    : ∏ i ∈ Finset.range J, f i = ∏ j : ZMod J, f j.val := by
   obtain ⟨n, rfl⟩ : ∃ n, J = n + 1 := ⟨J - 1, by have := NeZero.ne J; omega⟩
   exact (Fin.prod_univ_eq_prod_range f (n + 1)).symm
 
-theorem seg_PsiP (p : ℕ) {n' r K m : ℕ} [NeZero n'] [NeZero r] (O : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] (hk : m + 1 = r + K) (Fr : Frames n' r) (L₁ N₁ : ℕ) (hV : Fr.Valid L₁ N₁) {J : ℕ}
-    [NeZero J] (Dt : SignedChainData p O r J) (hJ : J = Fr.J) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
-    (hgP : ∀ j (mm : Fin r), Dt.gP j mm = (Fr.fr (segZ j + 1) (r - 1) - Fr.fr (segZ j) (r - 1)).toNat)
-    (j : ZMod J) (A : MvPolynomial (ℤ × Fin r) O) (hA : A ∈ supported O {v : ℤ × Fin r | v.1 ∈ Fr.letters (segZ j)}) :
-    MvPolynomial.map (algebraMap O (KK O)) (rename (castV hk) (phSeg O K p Fr (segZ j) (plEmb O r K A))) =
-      PsiP (O := O) Fr p hk Dt.nL (Dt.ph (chi Fr Dt.nL (KK O) j (MvPolynomial.map (algebraMap O (KK O)) A))) := by
+theorem seg_PsiP
+    (p : ℕ)
+    {n' r K m : ℕ} [NeZero n'] [NeZero r]
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (hk : m + 1 = r + K)
+    (Fr : Frames n' r) (L₁ N₁ : ℕ) (hV : Fr.Valid L₁ N₁)
+    {J : ℕ} [NeZero J]
+    (Dt : SignedChainData p O r J)
+    (hJ : J = Fr.J) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
+    (hgP
+      : ∀ j (mm : Fin r), Dt.gP j mm = (Fr.fr (segZ j + 1) (r - 1) - Fr.fr (segZ j) (r - 1)).toNat)
+    (j : ZMod J) (A : MvPolynomial (ℤ × Fin r) O)
+    (hA : A ∈ supported O {v : ℤ × Fin r | v.1 ∈ Fr.letters (segZ j)})
+    : MvPolynomial.map (algebraMap O (KK O))
+        (rename (castV hk) (phSeg O K p Fr (segZ j) (plEmb O r K A)))
+      = PsiP (O := O) Fr p hk Dt.nL
+        (Dt.ph (chi Fr Dt.nL (KK O) j (MvPolynomial.map (algebraMap O (KK O)) A))) := by
   have hsp := Formalism.MainNotions.NormalSetCounting.restSpec n' r Fr L₁ N₁ hV J Dt.nL hnL j
   obtain ⟨-, hper, hmono, hgap, -⟩ := hV
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.mpr (NeZero.ne r)
@@ -52,8 +65,9 @@ theorem seg_PsiP (p : ℕ) {n' r K m : ℕ} [NeZero n'] [NeZero r] (O : Type) [C
       simp only [sub_add_cancel] at hsh
       have hA1 : ∀ k, Fr.fr (segZ (j - 1)) k = Fr.fr (segZ j - 1) k + s := fun k => (hsh k).1
       have hA2 : ∀ k, Fr.fr (segZ (j - 1) + 1) k = Fr.fr (segZ j) k + s := fun k => (hsh k).2
-      have e1 : plVar Fr hk Dt.nL (⟨j - 1, Sum.inr mm⟩ : TL J Dt.nL r) a =
-          castV hk (posOf n' (Fr.fr (segZ j - 1) (r - 1 - mm.val)), Fin.castAdd K a) := by
+      have e1
+          : plVar Fr hk Dt.nL (⟨j - 1, Sum.inr mm⟩ : TL J Dt.nL r) a
+            = castV hk (posOf n' (Fr.fr (segZ j - 1) (r - 1 - mm.val)), Fin.castAdd K a) := by
         show (posOf n' (Fr.fr (segZ (j - 1)) (r - 1 - mm.val)), Fin.cast hk.symm (Fin.castAdd K a)) = _
         rw [hA1]
         rcases hs with rfl | rfl
@@ -61,16 +75,21 @@ theorem seg_PsiP (p : ℕ) {n' r K m : ℕ} [NeZero n'] [NeZero r] (O : Type) [C
           rfl
         · rw [Formalism.MainNotions.Proposition5Numerics.DdG.posOf_add_n]
           rfl
-      have e2 : lowP Fr p (⟨j - 1, Sum.inr mm⟩ : TL J Dt.nL r) * p ^ Dt.gP (j - 1) mm =
-          p ^ Fr.dist (segZ j) (Fr.fr (segZ j - 1) (r - 1 - mm.val)) := by
+      have e2
+          : lowP Fr p (⟨j - 1, Sum.inr mm⟩ : TL J Dt.nL r) * p ^ Dt.gP (j - 1) mm
+            = p ^ Fr.dist (segZ j) (Fr.fr (segZ j - 1) (r - 1 - mm.val)) := by
         show p ^ Fr.dist (segZ (j - 1)) (Fr.fr (segZ (j - 1)) (r - 1 - mm.val)) * p ^ Dt.gP (j - 1) mm = _
         rw [← pow_add, hgP]
         congr 1
         simp only [Frames.dist, hA1, hA2]
-        have h1 := Formalism.MainNotions.Proposition5Numerics.DdG.fr_le Fr hmono (segZ j - 1) (Nat.sub_le (r - 1) mm.val) (by omega)
+        have h1 :=
+          Formalism.MainNotions.Proposition5Numerics.DdG.fr_le Fr hmono (segZ j - 1)
+            (Nat.sub_le (r - 1) mm.val) (by omega)
         have h2 := hgap (segZ j - 1)
         simp only [sub_add_cancel] at h2
-        have h3 := Formalism.MainNotions.Proposition5Numerics.DdG.fr_le Fr hmono (segZ j) (Nat.zero_le (r - 1)) (by omega)
+        have h3 :=
+          Formalism.MainNotions.Proposition5Numerics.DdG.fr_le Fr hmono (segZ j)
+            (Nat.zero_le (r - 1)) (by omega)
         omega
       rw [e1, e2]
   | algebraMap c =>
@@ -89,20 +108,25 @@ theorem restTr : RestTr := by
   have hp : 0 < p := (Fact.out : p.Prime).pos
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.mpr (NeZero.ne r)
   refine ⟨?_, ?_⟩
-  · have hseg : ∀ j : ZMod J,
-        MvPolynomial.map (algebraMap O (KK O))
-          (rename (castV hk) (phSeg O K p Fr ((j.val : ℕ) : ℤ) (plEmb O r K (A ((j.val : ℕ) : ℤ))))) =
-        PsiP (O := O) Fr p hk Dt.nL
-          (Dt.ph (chi Fr Dt.nL (KK O) j (MvPolynomial.map (algebraMap O (KK O)) (A (segZ j))))) := by
+  · have hseg
+        : ∀ j : ZMod J,
+          MvPolynomial.map (algebraMap O (KK O))
+              (rename (castV hk)
+                (phSeg O K p Fr ((j.val : ℕ) : ℤ) (plEmb O r K (A ((j.val : ℕ) : ℤ)))))
+            = PsiP (O := O) Fr p hk Dt.nL
+              (Dt.ph (chi Fr Dt.nL (KK O) j
+                (MvPolynomial.map (algebraMap O (KK O)) (A (segZ j))))) := by
       intro j
       have hj : j.val < Fr.J := by
         rw [← hJ]
         exact ZMod.val_lt j
       exact seg_PsiP p O hk Fr L₁ N₁ hV Dt hJ hnL hgP j (A (segZ j)) (hA j.val hj)
-    have hz : zPl p O hk Fr A l ga =
-        PsiP (O := O) Fr p hk Dt.nL (∏ j : ZMod J,
-          Dt.ph (chi Fr Dt.nL (KK O) j (MvPolynomial.map (algebraMap O (KK O)) (A (segZ j))))) *
-        monomial (l.mapDomain (castV hk) + ga) 1 := by
+    have hz
+        : zPl p O hk Fr A l ga
+          = PsiP (O := O) Fr p hk Dt.nL
+              (∏ j : ZMod J,
+                Dt.ph (chi Fr Dt.nL (KK O) j (MvPolynomial.map (algebraMap O (KK O)) (A (segZ j)))))
+            * monomial (l.mapDomain (castV hk) + ga) 1 := by
       unfold zPl
       simp only [map_mul, map_prod, rename_monomial, map_monomial, map_one]
       rw [mul_assoc, monomial_mul, one_mul, ← hJ, prod_range_zmod J]
@@ -117,14 +141,17 @@ theorem restTr : RestTr := by
       rw [← hnL]
       exact ll.isLt
     have hmem := Formalism.MainNotions.Proposition5Numerics.DdG.llPos_mem Fr (segZ j) ll.val hll
-    obtain ⟨hlet, hW⟩ := Formalism.MainNotions.Proposition5Numerics.LL_sub_letters hV hr (segZ j) _ hmem
+    obtain ⟨hlet, hW⟩ :=
+      Formalism.MainNotions.Proposition5Numerics.LL_sub_letters hV hr (segZ j) _ hmem
     have hlab := hl (segZ j) _ hlet hW (Fin.castAdd K a)
     have hinj : Function.Injective (castV (n' := n') hk) := by
       intro v w h
       simp only [castV, Prod.mk.injEq] at h
       exact Prod.ext h.1 (Fin.ext (by simpa using congrArg Fin.val h.2))
-    have hpv : plVar Fr hk Dt.nL (⟨j, Sum.inl ll⟩ : TL J Dt.nL r) a =
-        castV hk (posOf n' (llPos Fr (segZ j) ll.val), Fin.castAdd K a) := rfl
+    have hpv
+        : plVar Fr hk Dt.nL (⟨j, Sum.inl ll⟩ : TL J Dt.nL r) a
+          = castV hk (posOf n' (llPos Fr (segZ j) ll.val), Fin.castAdd K a) :=
+      rfl
     have hgz : ga (plVar Fr hk Dt.nL (⟨j, Sum.inl ll⟩ : TL J Dt.nL r) a) = 0 := by
       by_contra hne
       have hev : Even (posOf n' (llPos Fr (segZ j) ll.val)).val := (hPE _ hne).2
@@ -133,7 +160,9 @@ theorem restTr : RestTr := by
       have hnn : 0 ≤ llPos Fr (segZ j) ll.val % (n' : ℤ) := Int.emod_nonneg _ hn0
       have hlt : llPos Fr (segZ j) ll.val % (n' : ℤ) < n' :=
         Int.emod_lt_of_pos _ (by exact_mod_cast NeZero.pos n')
-      have hv : ((posOf n' (llPos Fr (segZ j) ll.val)).val : ℤ) = llPos Fr (segZ j) ll.val % (n' : ℤ) := by
+      have hv
+          : ((posOf n' (llPos Fr (segZ j) ll.val)).val : ℤ)
+            = llPos Fr (segZ j) ll.val % (n' : ℤ) := by
         show (((llPos Fr (segZ j) ll.val % (n' : ℤ)).toNat % n' : ℕ) : ℤ) = _
         have hlt' : (llPos Fr (segZ j) ll.val % (n' : ℤ)).toNat < n' := by omega
         rw [Nat.mod_eq_of_lt hlt', Int.toNat_of_nonneg hnn]

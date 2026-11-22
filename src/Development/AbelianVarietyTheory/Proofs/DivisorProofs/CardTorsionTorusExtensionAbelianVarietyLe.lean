@@ -10,13 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CardTorsionMu
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorusExtTorsion
 
-theorem card_le : ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G], IsCommMonObj G → ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (B : Over (Sp k)) [GrpObj B] (i : splitTorus (Sp k) X ⟶ G) (q : G ⟶ B), GlobalTheory.SS.IsQuot i q → IsAbelianScheme B → ∀ a : ℕ, SmoothOfRelativeDimension a B.hom → ∀ m : ℕ, (m : k) ≠ 0 → ∀ s : Finset (𝟙_ (Over (Sp k)) ⟶ G), (∀ x ∈ s, x ^ m = 1) → s.card ≤ m ^ (Module.finrank ℤ X + 2 * a) := by
+theorem card_le
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G],
+      IsCommMonObj G
+        → ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (B : Over (Sp k))
+            [GrpObj B] (i : splitTorus (Sp k) X ⟶ G) (q : G ⟶ B),
+          GlobalTheory.SS.IsQuot i q → IsAbelianScheme B
+            → ∀ a : ℕ,
+              SmoothOfRelativeDimension a B.hom
+                → ∀ m : ℕ,
+                  (m : k) ≠ 0
+                    → ∀ s : Finset (𝟙_ (Over (Sp k)) ⟶ G),
+                      (∀ x ∈ s, x ^ m = 1) → s.card ≤ m ^ (Module.finrank ℤ X + 2 * a) := by
   classical
   intro k _ _ G _ hGc X _ _ _ B _ i q hQ hB a ha m hm s hs
   obtain ⟨hi, hq, -, -, -, hk, -⟩ := hQ
@@ -39,15 +51,19 @@ theorem card_le : ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [Gr
 
   have himg : (s.image Q).card ≤ m ^ (2 * a) := by
     rw [← hBcard, ← Nat.card_eq_finsetCard]
-    refine Nat.card_le_card_of_injective (fun y => ⟨y.1, ?_⟩) (fun y z h => Subtype.ext (congrArg Subtype.val h :))
+    refine Nat.card_le_card_of_injective
+      (fun y => ⟨y.1, ?_⟩)
+      (fun y z h => Subtype.ext (congrArg Subtype.val h :))
     obtain ⟨x, hx, hy⟩ := Finset.mem_image.1 y.2
     rw [← hy, ← map_pow, hs x hx, map_one]
 
   have hfib : ∀ b ∈ s.image Q, (s.filter (fun x => Q x = b)).card ≤ m ^ Module.finrank ℤ X := by
     intro b hb
     obtain ⟨x₀, hx₀, rfl⟩ := Finset.mem_image.1 hb
-    have hsub : s.filter (fun x => Q x = Q x₀) ⊆
-        Finset.univ.image (fun t : {t : P ⟶ splitTorus (Sp k) X // t ^ m = 1} => x₀ * I t.1) := by
+    have hsub
+        : s.filter (fun x => Q x = Q x₀)
+          ⊆ Finset.univ.image (fun t : {t : P ⟶ splitTorus (Sp k) X // t ^ m = 1} =>
+            x₀ * I t.1) := by
       intro x hx
       obtain ⟨hxs, hxq⟩ := Finset.mem_filter.1 hx
       have hy : (x₀⁻¹ * x) ≫ q = 1 := by
@@ -61,10 +77,14 @@ theorem card_le : ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [Gr
       refine Finset.mem_image.2 ⟨⟨t, htm⟩, Finset.mem_univ _, ?_⟩
       change x₀ * I t = x
       rw [ht, mul_inv_cancel_left]
-    calc (s.filter (fun x => Q x = Q x₀)).card ≤ _ := Finset.card_le_card hsub
+    calc
+      (s.filter (fun x => Q x = Q x₀)).card
+        ≤ _ := Finset.card_le_card hsub
       _ ≤ Finset.univ.card := Finset.card_image_le
       _ = m ^ Module.finrank ℤ X := by rw [Finset.card_univ, Fintype.card_eq_nat_card, hTcard]
-  calc s.card ≤ m ^ Module.finrank ℤ X * (s.image Q).card := Finset.card_le_mul_card_image s _ hfib
+  calc
+    s.card
+      ≤ m ^ Module.finrank ℤ X * (s.image Q).card := Finset.card_le_mul_card_image s _ hfib
     _ ≤ m ^ Module.finrank ℤ X * m ^ (2 * a) := Nat.mul_le_mul_left _ himg
     _ = m ^ (Module.finrank ℤ X + 2 * a) := (pow_add _ _ _).symm
 

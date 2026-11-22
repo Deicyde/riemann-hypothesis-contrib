@@ -11,10 +11,12 @@ namespace GroundTheory.Heights₂.Heights
 
 open ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem GrassHeightBound.proof (hArith : GrassArithVar.Statement) (hRoot : RootArithVar.Statement)
+theorem GrassHeightBound.proof
+    (hArith : GrassArithVar.Statement) (hRoot : RootArithVar.Statement)
     (hSemi : FsLineSemipositive.Statement) (hNef : NefOfNonneg.Statement)
     (hConj : FsConjInvariant.Statement) (hLe : GrassLeRoot.Statement) (hHt : RootHeight.Statement)
-    (hDense : RootDense.Statement) : GrassHeightBound.Statement := by
+    (hDense : RootDense.Statement)
+    : GrassHeightBound.Statement := by
   intro hZ2 f j m hf II hII
   refine hZ2 (Fin f) (plBlocks f j m) (grassIdeal f j m) ⊥ (f * j * m) (fsMulti (plBlocks f j m))
     (grassConst f j m) (rootFamily f j m) II hII (hArith f j m hf) bot_le (hSemi _ _ _)

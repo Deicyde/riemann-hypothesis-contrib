@@ -25,17 +25,25 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct Pointwise
 
 namespace GlobalTheory.LocFinU
 
-theorem relIndex_ne_zero_of_subset_cpt {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (U P : Subgroup G) (hU : IsOpen (U : Set G)) (Ω : Set G) (hΩ : IsCompact Ω) (hP : (P : Set G) ⊆ Ω) :
-    U.relIndex P ≠ 0 := by
-  obtain ⟨s, hs⟩ := hΩ.elim_finite_subcover (fun g : Ω => (g : G) • (U : Set G)) (fun g => hU.smul _)
-    (fun x hx => Set.mem_iUnion.2 ⟨⟨x, hx⟩, ⟨1, U.one_mem, mul_one x⟩⟩)
-  have hmem : ∀ q : P ⧸ U.subgroupOf P, ∃ i : s, ((Quotient.out q : P) : G) ∈ ((i : Ω) : G) • (U : Set G) := by
+theorem relIndex_ne_zero_of_subset_cpt
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (U P : Subgroup G) (hU : IsOpen (U : Set G))
+    (Ω : Set G) (hΩ : IsCompact Ω) (hP : (P : Set G) ⊆ Ω)
+    : U.relIndex P ≠ 0 := by
+  obtain ⟨s, hs⟩ :=
+    hΩ.elim_finite_subcover
+      (fun g : Ω => (g : G) • (U : Set G))
+      (fun g => hU.smul _)
+      (fun x hx => Set.mem_iUnion.2 ⟨⟨x, hx⟩, ⟨1, U.one_mem, mul_one x⟩⟩)
+  have hmem
+      : ∀ q : P ⧸ U.subgroupOf P, ∃ i : s,
+        ((Quotient.out q : P) : G) ∈ ((i : Ω) : G) • (U : Set G) := by
     intro q
     have := hs (hP (Quotient.out q).2)
     simp only [Set.mem_iUnion] at this
@@ -63,28 +71,32 @@ end GlobalTheory.LocFinU
 
 namespace GlobalTheory.LocFinU
 
-theorem continuous_cj {E : Type} [Field E] [NumberField E] [IsCMField E] (w : Pl E) : Continuous (cj w) := by
+theorem continuous_cj {E : Type} [Field E] [NumberField E] [IsCMField E] (w : Pl E)
+    : Continuous (cj w) := by
   unfold cj
   split_ifs with h
   · exact h.choose_spec.1
   · exact continuous_id
 
-theorem isClosed_UL {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E) :
-    IsClosed (UL n w : Set (GLw n w)) := by
+theorem isClosed_UL {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E)
+    : IsClosed (UL n w : Set (GLw n w)) := by
   unfold UL
   split_ifs
   · exact isClosed_univ
-  · have hc : Continuous fun g : GLw n w => cT (cj w) (g : Matrix (Fin n) (Fin n) _) * 1 * (g : Matrix (Fin n) (Fin n) _) :=
-      ((Units.continuous_val.matrix_map (continuous_cj w)).matrix_transpose.matrix_mul continuous_const).matrix_mul
-        Units.continuous_val
+  · have hc : Continuous fun g : GLw n w =>
+        cT (cj w) (g : Matrix (Fin n) (Fin n) _) * 1 * (g : Matrix (Fin n) (Fin n) _) :=
+      ((Units.continuous_val.matrix_map (continuous_cj w)).matrix_transpose.matrix_mul
+        continuous_const).matrix_mul Units.continuous_val
     exact isClosed_eq hc continuous_const
 
-theorem isCompact_KL {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E) :
-    IsCompact (KL n w : Set (UL n w)) := by
+theorem isCompact_KL {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E)
+    : IsCompact (KL n w : Set (UL n w)) := by
   rw [Subtype.isCompact_iff]
   have hK : IsCompact (GlobalTheory.LFun.KGL w (n := n) : Set (GLw n w)) :=
-    GlobalTheory.LFun.IntPtsUnitary.isCompact_GLint _ (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers E w)
-  have : (Subtype.val '' (KL n w : Set (UL n w))) = (GlobalTheory.LFun.KGL w (n := n) : Set (GLw n w)) ∩ (UL n w : Set (GLw n w)) := by
+    GlobalTheory.LFun.IntPtsUnitary.isCompact_GLint _
+      (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers E w)
+  have : (Subtype.val '' (KL n w : Set (UL n w)))
+      = (GlobalTheory.LFun.KGL w (n := n) : Set (GLw n w)) ∩ (UL n w : Set (GLw n w)) := by
     ext g
     constructor
     · rintro ⟨x, hx, rfl⟩
@@ -98,9 +110,10 @@ end GlobalTheory.LocFinU
 
 namespace GlobalTheory.LocFinU
 
-theorem cptPart_subset_of_comm {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
-    (T : Subgroup G) (hc : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a) :
-    (cptPart T : Set G) ⊆ {t | t ∈ T ∧ IsCompact (closure (Subgroup.zpowers t : Set G))} := by
+theorem cptPart_subset_of_comm
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+    (T : Subgroup G) (hc : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a)
+    : (cptPart T : Set G) ⊆ {t | t ∈ T ∧ IsCompact (closure (Subgroup.zpowers t : Set G))} := by
   intro x hx
   induction hx using Subgroup.closure_induction with
   | mem x hx => exact hx
@@ -111,7 +124,8 @@ theorem cptPart_subset_of_comm {G : Type} [Group G] [TopologicalSpace G] [IsTopo
   | mul x y _ _ hx hy =>
     refine ⟨T.mul_mem hx.1 hy.1, ?_⟩
     have hxy : Commute x y := hc x hx.1 y hy.1
-    have hcp : IsCompact (closure (Subgroup.zpowers x : Set G) * closure (Subgroup.zpowers y : Set G)) :=
+    have hcp
+        : IsCompact (closure (Subgroup.zpowers x : Set G) * closure (Subgroup.zpowers y : Set G)) :=
       hx.2.mul hy.2
     refine hcp.of_isClosed_subset isClosed_closure (closure_minimal ?_ hcp.isClosed)
     rintro _ ⟨k, rfl⟩

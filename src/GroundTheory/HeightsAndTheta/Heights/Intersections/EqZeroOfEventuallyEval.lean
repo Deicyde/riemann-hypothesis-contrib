@@ -14,9 +14,10 @@ namespace GroundTheory.Heights₂.Heights.Inter
 
 open MvPolynomial Filter Topology ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem pointFormRank_holds.exists_surj_coords {σ : Type*} {n : ℕ} (ℓ : σ → (Fin n → ℂ) →ₗ[ℂ] ℂ)
-    (hℓ : ∀ x, (∀ s, ℓ s x = 0) → x = 0) :
-    ∀ m, m ≤ n → ∃ q : Fin m → σ, Function.Surjective (fun x : Fin n → ℂ => fun j => ℓ (q j) x) := by
+theorem pointFormRank_holds.exists_surj_coords
+    {σ : Type*} {n : ℕ} (ℓ : σ → (Fin n → ℂ) →ₗ[ℂ] ℂ) (hℓ : ∀ x, (∀ s, ℓ s x = 0) → x = 0)
+    : ∀ m,
+      m ≤ n → ∃ q : Fin m → σ, Function.Surjective (fun x : Fin n → ℂ => fun j => ℓ (q j) x) := by
   intro m
   induction m with
   | zero => intro _; exact ⟨Fin.elim0, fun t => ⟨0, funext fun j => j.elim0⟩⟩
@@ -43,13 +44,16 @@ theorem pointFormRank_holds.exists_surj_coords {σ : Type*} {n : ℕ} (ℓ : σ 
     · simp only [Fin.snoc_last, map_add (f := _), map_smul, smul_eq_mul]
       rw [div_mul_cancel₀ _ hs]
       ring
-    · simp only [Fin.snoc_castSucc, map_add (f := _), map_smul, hΦx, smul_eq_mul, mul_zero, add_zero]
+    · simp only [Fin.snoc_castSucc, map_add (f := _), map_smul, hΦx, smul_eq_mul, mul_zero,
+        add_zero]
       exact congr_fun hx0' j
 
-theorem pointFormRank_holds.eq_zero_of_eventually_eval {d : ℕ} (f : MvPolynomial (Fin d) ℂ) (a : Fin d → ℂ)
-    (h : ∀ᶠ z in 𝓝 a, eval z f = 0) : f = 0 := by
+theorem pointFormRank_holds.eq_zero_of_eventually_eval
+    {d : ℕ} (f : MvPolynomial (Fin d) ℂ) (a : Fin d → ℂ) (h : ∀ᶠ z in 𝓝 a, eval z f = 0)
+    : f = 0 := by
   have han : AnalyticOnNhd ℂ (fun z => eval z f) Set.univ := AnalyticOnNhd.eval_mvPolynomial f
-  have h0 := han.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ a) h
+  have h0 :=
+    han.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ a) h
   exact MvPolynomial.funext fun z => by simpa using h0 (Set.mem_univ z)
 
 theorem pointFormRank_holds.proof (hA : RatioAlgDep.Statement) : pointFormRank_holds.Statement := by
@@ -67,13 +71,18 @@ theorem pointFormRank_holds.proof (hA : RatioAlgDep.Statement) : pointFormRank_h
   have hF' : HasFDerivAt F F' y := hF.differentiableAt.hasFDerivAt
   set ℓ : (Σ k, ι k) → (Fin n → ℂ) →L[ℂ] ℂ := fun p => fderiv ℂ (r p) y with hℓ_def
   have hℓ : ∀ p, HasFDerivAt (r p) (ℓ p) y := fun p => (hr p).differentiableAt.hasFDerivAt
-  have hprod : ∀ p, HasFDerivAt (fun y' => r p y' * F y' ⟨p.1, c p.1⟩)
-      (r p y • (ContinuousLinearMap.proj ⟨p.1, c p.1⟩).comp F' + F y ⟨p.1, c p.1⟩ • ℓ p) y :=
+  have hprod
+      : ∀ p,
+        HasFDerivAt
+          (fun y' => r p y' * F y' ⟨p.1, c p.1⟩)
+          (r p y • (ContinuousLinearMap.proj ⟨p.1, c p.1⟩).comp F' + F y ⟨p.1, c p.1⟩ • ℓ p) y :=
     fun p => (hℓ p).mul (hasFDerivAt_pi'.mp hF' _)
-  have heq : ∀ p, (fun y' => F y' p) =ᶠ[𝓝 y] fun y' => r p y' * F y' ⟨p.1, c p.1⟩ :=
-    fun p => hnear.mono fun y' hy' => (div_mul_cancel₀ _ (hy' p.1)).symm
-  have hderiv : ∀ p, (ContinuousLinearMap.proj p).comp F' =
-      r p y • (ContinuousLinearMap.proj ⟨p.1, c p.1⟩).comp F' + F y ⟨p.1, c p.1⟩ • ℓ p :=
+  have heq : ∀ p, (fun y' => F y' p) =ᶠ[𝓝 y] fun y' => r p y' * F y' ⟨p.1, c p.1⟩ := fun p =>
+    hnear.mono fun y' hy' => (div_mul_cancel₀ _ (hy' p.1)).symm
+  have hderiv
+      : ∀ p,
+        (ContinuousLinearMap.proj p).comp F'
+          = r p y • (ContinuousLinearMap.proj ⟨p.1, c p.1⟩).comp F' + F y ⟨p.1, c p.1⟩ • ℓ p :=
     fun p => (hasFDerivAt_pi'.mp hF' p).unique ((hprod p).congr_of_eventuallyEq (heq p))
   by_contra hno
   push Not at hno
@@ -83,15 +92,21 @@ theorem pointFormRank_holds.proof (hA : RatioAlgDep.Statement) : pointFormRank_h
     refine hno x hx0 (fun k => F' x ⟨k, c k⟩ / F y ⟨k, c k⟩) ?_
     funext p
     have h1 := congrArg (fun L => L x) (hderiv p)
-    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, FunLike.coe_add, Pi.add_apply,
-      FunLike.coe_smul, Pi.smul_apply, smul_eq_mul, hx p, mul_zero, add_zero] at h1
+    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, FunLike.coe_add,
+        Pi.add_apply, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul, hx p, mul_zero, add_zero]
+      at h1
     rw [h1, bsmul, hr_def]
     ring
-  obtain ⟨q, hq⟩ := pointFormRank_holds.exists_surj_coords (fun p => (ℓ p).toLinearMap)
-    (fun x hx => hinj x (by simpa using hx)) d hdn
-  have hg : HasStrictFDerivAt (fun y' j => r (q j) y') (ContinuousLinearMap.pi fun j => ℓ (q j)) y :=
+  obtain ⟨q, hq⟩ :=
+    pointFormRank_holds.exists_surj_coords
+      (fun p => (ℓ p).toLinearMap)
+      (fun x hx => hinj x (by simpa using hx))
+      d hdn
+  have hg
+      : HasStrictFDerivAt (fun y' j => r (q j) y') (ContinuousLinearMap.pi fun j => ℓ (q j)) y :=
     hasStrictFDerivAt_pi.mpr fun j => (hr (q j)).hasStrictFDerivAt
-  have hrange : (ContinuousLinearMap.pi fun j => ℓ (q j) : (Fin n → ℂ) →L[ℂ] (Fin d → ℂ)).range = ⊤ := by
+  have hrange
+      : (ContinuousLinearMap.pi fun j => ℓ (q j) : (Fin n → ℂ) →L[ℂ] (Fin d → ℂ)).range = ⊤ := by
     refine LinearMap.range_eq_top.mpr fun t => ?_
     obtain ⟨x, hx⟩ := hq t
     exact ⟨x, hx⟩
@@ -104,6 +119,7 @@ theorem pointFormRank_holds.proof (hA : RatioAlgDep.Statement) : pointFormRank_h
     rw [← hmap]
     exact Filter.eventually_map.mpr hev'
   have h0 := pointFormRank_holds.eq_zero_of_eventually_eval _ _ hz
-  exact hf0 (MvPolynomial.map_injective _ (Int.castRingHom ℂ).injective_int (h0.trans (map_zero _).symm))
+  exact hf0 (MvPolynomial.map_injective _ (Int.castRingHom ℂ).injective_int
+    (h0.trans (map_zero _).symm))
 
 end GroundTheory.Heights₂.Heights.Inter

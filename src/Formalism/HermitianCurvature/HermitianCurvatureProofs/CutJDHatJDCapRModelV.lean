@@ -11,8 +11,10 @@ namespace Formalism.FourierDecayAlt.P.CutMP
 
 noncomputable section
 
-theorem site_vector_eq_tensor_product (P : M.Par) (L : R.LevelData (MA.A P (MA.DQ P)) P.r) (hL : MA.IsModelLevel P (MA.DQ P) L)
-    (y : ℂ) (b : Fin 2) : Wd.v0 (MA.sites P (MA.DQ P)) y b = L.Tprod y b 0 := by
+theorem site_vector_eq_tensor_product
+    (P : M.Par) (L : R.LevelData (MA.A P (MA.DQ P)) P.r) (hL : MA.IsModelLevel P (MA.DQ P) L)
+    (y : ℂ) (b : Fin 2)
+    : Wd.v0 (MA.sites P (MA.DQ P)) y b = L.Tprod y b 0 := by
   obtain ⟨hp, -, hc, hci, -⟩ := hL
   have hT : (fun σ => Wd.Ts σ y) ∘ MA.siteA P (MA.DQ P) = L.Tl y := by
     funext l
@@ -23,12 +25,13 @@ theorem site_vector_eq_tensor_product (P : M.Par) (L : R.LevelData (MA.A P (MA.D
   unfold Wd.v0 MA.sites R.LevelData.Tprod
   rw [List.map_reverse, List.map_ofFn, hT]
 
-theorem star_site_vector_eq_tensor (P : M.Par) (L : R.LevelData (MA.A P (MA.DQ P)) P.r) (hL : MA.IsModelLevel P (MA.DQ P) L)
-    (y : ℂ) (a : Fin 2) :
-    star (Wd.v0 (MA.sites P (MA.DQ P)) y a) = L.Tvprod (starRingEnd ℂ y) a 0 := by
+theorem star_site_vector_eq_tensor
+    (P : M.Par) (L : R.LevelData (MA.A P (MA.DQ P)) P.r) (hL : MA.IsModelLevel P (MA.DQ P) L)
+    (y : ℂ) (a : Fin 2)
+    : star (Wd.v0 (MA.sites P (MA.DQ P)) y a) = L.Tvprod (starRingEnd ℂ y) a 0 := by
   have hL' := hL
   obtain ⟨hp, hpb, hc, hci, hcb, hcbi, -⟩ := hL'
-  have sp : ∀ l, star (L.p l) = -L.pb l := fun l => by
+  have sp : ∀ l, star (L.p l) = - L.pb l := fun l => by
     rw [hp, hpb]
     show star (MA.sc P (MA.DQ P) ((MA.DQ P).pP l)) = -MA.sc P (MA.DQ P) ((MA.DQ P).pbP l)
     rw [Formalism.FourierDecayAlt.P.MAx3.F.star_sc, Formalism.FourierDecayAlt.P.MAx3.F.star_pP]

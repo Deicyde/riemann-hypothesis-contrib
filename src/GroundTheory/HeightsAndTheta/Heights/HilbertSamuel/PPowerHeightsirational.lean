@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -27,22 +28,27 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : 
 def InLat (y : (Σ k, ι k) → Ω) (α : K → ℤ) (x : Ω) : Prop :=
   ∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) → x * ∏ k, y ⟨k, c k⟩ ^ (-(α k)) ∈ chartRingZ y c
 
-theorem mem_chartLat_iff {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {x : Ω} :
-    x ∈ chartLat y a τ ↔ InLat y (fun k => (τ : ℤ) * a k) x := Iff.rfl
+theorem mem_chartLat_iff {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {x : Ω}
+    : x ∈ chartLat y a τ ↔ InLat y (fun k => (τ : ℤ) * a k) x :=
+  Iff.rfl
 
-theorem InLat.congr {y : (Σ k, ι k) → Ω} {α β : K → ℤ} {x : Ω} (h : InLat y α x) (hαβ : α = β) :
-    InLat y β x := hαβ ▸ h
+theorem InLat.congr {y : (Σ k, ι k) → Ω} {α β : K → ℤ} {x : Ω} (h : InLat y α x) (hαβ : α = β)
+    : InLat y β x :=
+  hαβ ▸ h
 
-theorem InLat.mul {y : (Σ k, ι k) → Ω} {α β : K → ℤ} {x x' : Ω} (hx : InLat y α x) (hx' : InLat y β x') :
-    InLat y (α + β) (x * x') := by
+theorem InLat.mul
+    {y : (Σ k, ι k) → Ω} {α β : K → ℤ} {x x' : Ω} (hx : InLat y α x) (hx' : InLat y β x')
+    : InLat y (α + β) (x * x') := by
   intro c hc
-  have hp : ∏ k, y ⟨k, c k⟩ ^ (-((α + β) k)) =
-      (∏ k, y ⟨k, c k⟩ ^ (-(α k))) * ∏ k, y ⟨k, c k⟩ ^ (-(β k)) := by
+  have hp
+      : ∏ k, y ⟨k, c k⟩ ^ (-((α + β) k))
+        = (∏ k, y ⟨k, c k⟩ ^ (-(α k))) * ∏ k, y ⟨k, c k⟩ ^ (-(β k)) := by
     rw [← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun k _ => ?_
     rw [Pi.add_apply, neg_add, zpow_add₀ (hc k)]
-  have h : x * x' * ∏ k, y ⟨k, c k⟩ ^ (-((α + β) k)) =
-      (x * ∏ k, y ⟨k, c k⟩ ^ (-(α k))) * (x' * ∏ k, y ⟨k, c k⟩ ^ (-(β k))) := by
+  have h
+      : x * x' * ∏ k, y ⟨k, c k⟩ ^ (-((α + β) k))
+        = (x * ∏ k, y ⟨k, c k⟩ ^ (-(α k))) * (x' * ∏ k, y ⟨k, c k⟩ ^ (-(β k))) := by
     rw [hp]; ring
   rw [h]
   exact Subalgebra.mul_mem _ (hx c hc) (hx' c hc)
@@ -52,23 +58,26 @@ theorem inLat_one (y : (Σ k, ι k) → Ω) : InLat y 0 1 := by
   simp only [Pi.zero_apply, neg_zero, zpow_zero, Finset.prod_const_one, mul_one]
   exact Subalgebra.one_mem _
 
-theorem InLat.pow {y : (Σ k, ι k) → Ω} {α : K → ℤ} {x : Ω} (hx : InLat y α x) (n : ℕ) :
-    InLat y (n • α) (x ^ n) := by
+theorem InLat.pow {y : (Σ k, ι k) → Ω} {α : K → ℤ} {x : Ω} (hx : InLat y α x) (n : ℕ)
+    : InLat y (n • α) (x ^ n) := by
   induction n with
   | zero => simpa using inLat_one y
   | succ n ih => rw [pow_succ, succ_nsmul]; exact ih.mul hx
 
 theorem inLat_prod (y : (Σ k, ι k) → Ω) (f : ∀ k, ι k) : InLat y 1 (∏ k, y ⟨k, f k⟩) := by
   intro c hc
-  have h : (∏ k, y ⟨k, f k⟩) * ∏ k, y ⟨k, c k⟩ ^ (-((1 : K → ℤ) k)) = ∏ k, (y ⟨k, f k⟩ / y ⟨k, c k⟩) := by
+  have h
+      : (∏ k, y ⟨k, f k⟩) * ∏ k, y ⟨k, c k⟩ ^ (-((1 : K → ℤ) k))
+        = ∏ k, (y ⟨k, f k⟩ / y ⟨k, c k⟩) := by
     rw [← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun k _ => ?_
     rw [Pi.one_apply, zpow_neg_one, div_eq_mul_inv]
   rw [h]
   exact Subalgebra.prod_mem _ fun k _ => Algebra.subset_adjoin ⟨⟨k, f k⟩, rfl⟩
 
-theorem aeval_scale {d : K → ℕ} {g : MRing ι} (hg : IsMultiHomog g d) (lam : K → Ω) (z : (Σ k, ι k) → Ω) :
-    aeval (fun p => lam p.1 * z p) g = (∏ k, lam k ^ d k) * aeval z g := by
+theorem aeval_scale
+    {d : K → ℕ} {g : MRing ι} (hg : IsMultiHomog g d) (lam : K → Ω) (z : (Σ k, ι k) → Ω)
+    : aeval (fun p => lam p.1 * z p) g = (∏ k, lam k ^ d k) * aeval z g := by
   classical
   rw [aeval_def, aeval_def, eval₂_eq', eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
@@ -83,8 +92,8 @@ theorem aeval_scale {d : K → ℕ} {g : MRing ι} (hg : IsMultiHomog g d) (lam 
   rw [hsplit, hm']
   ring
 
-theorem exists_chart {y : (Σ k, ι k) → Ω} {d : ℕ} (hV : IsArithVar (mCoordIdeal y) d) :
-    ∃ c : ∀ k, ι k, ∀ k, y ⟨k, c k⟩ ≠ 0 := by
+theorem exists_chart {y : (Σ k, ι k) → Ω} {d : ℕ} (hV : IsArithVar (mCoordIdeal y) d)
+    : ∃ c : ∀ k, ι k, ∀ k, y ⟨k, c k⟩ ≠ 0 := by
   have h : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0 := by
     intro k
     obtain ⟨i, hi⟩ := hV.2.1.2.2 k
@@ -97,7 +106,8 @@ end Lattices
 
 section Forms
 
-variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
 
 theorem homog_zero (a : K → ℕ) : IsMultiHomog (0 : MRing ι) a := by
   intro m hm
@@ -109,8 +119,8 @@ theorem homog_one : IsMultiHomog (1 : MRing ι) 0 := by
   subst hm
   simp
 
-theorem homog_add {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f + g) a := by
+theorem homog_add {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.mp (MvPolynomial.support_add hm) with h | h
@@ -121,8 +131,8 @@ theorem homog_neg {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) : IsMul
   rw [MvPolynomial.support_neg] at hm
   exact hf m hm
 
-theorem homog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem homog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   intro m hm k
   obtain ⟨m1, hm1, m2, hm2, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul f g hm)
@@ -137,14 +147,17 @@ theorem blockDeg_add (k₀ : K) (s t : ℕ) : blockDeg k₀ s + blockDeg k₀ t 
   simp only [blockDeg, Pi.add_apply]
   split_ifs <;> simp
 
-theorem homog_mul_block {k₀ : K} {f g : MRing ι} {s t : ℕ} (hf : IsMultiHomog f (blockDeg k₀ s))
-    (hg : IsMultiHomog g (blockDeg k₀ t)) : IsMultiHomog (f * g) (blockDeg k₀ (s + t)) :=
+theorem homog_mul_block
+    {k₀ : K} {f g : MRing ι} {s t : ℕ}
+    (hf : IsMultiHomog f (blockDeg k₀ s)) (hg : IsMultiHomog g (blockDeg k₀ t))
+    : IsMultiHomog (f * g) (blockDeg k₀ (s + t)) :=
   blockDeg_add k₀ s t ▸ homog_mul hf hg
 
 theorem homog_one_block (k₀ : K) : IsMultiHomog (1 : MRing ι) (blockDeg k₀ 0) :=
   (blockDeg_zero k₀).symm ▸ homog_one
 
-theorem homog_X_block (k₀ : K) (i₀ : ι k₀) : IsMultiHomog (X ⟨k₀, i₀⟩ : MRing ι) (blockDeg k₀ 1) := by
+theorem homog_X_block (k₀ : K) (i₀ : ι k₀)
+    : IsMultiHomog (X ⟨k₀, i₀⟩ : MRing ι) (blockDeg k₀ 1) := by
   classical
   intro m hm k
   rw [support_X, Finset.mem_singleton] at hm
@@ -166,14 +179,22 @@ theorem homog_X_block (k₀ : K) (i₀ : ι k₀) : IsMultiHomog (X ⟨k₀, i�
     exact hk (Sigma.mk.inj_iff.mp h).1.symm
 
 def blockFrac (Y : (Σ k, ι k) → Ω) (k₀ : K) : Subfield Ω where
-  carrier := {s | ∃ (t : ℕ) (g h : MRing ι), IsMultiHomog g (blockDeg k₀ t) ∧ IsMultiHomog h (blockDeg k₀ t) ∧
-    aeval Y h ≠ 0 ∧ aeval Y g = s * aeval Y h}
+  carrier :=
+    {s | ∃ (t : ℕ) (g h : MRing ι), IsMultiHomog g (blockDeg k₀ t) ∧ IsMultiHomog h (blockDeg k₀ t) ∧
+      aeval Y h ≠ 0 ∧ aeval Y g = s * aeval Y h}
   zero_mem' := ⟨0, 0, 1, homog_zero _, homog_one_block k₀, by simp, by simp⟩
   one_mem' := ⟨0, 1, 1, homog_one_block k₀, homog_one_block k₀, by simp, by simp⟩
   add_mem' := by
     rintro s s' ⟨t, g, h, hg, hh, hh0, he⟩ ⟨t', g', h', hg', hh', hh0', he'⟩
-    refine ⟨t + t', g * h' + h * g', h * h', homog_add (homog_mul_block hg hh') (homog_mul_block hh hg'),
-      homog_mul_block hh hh', by rw [map_mul]; exact mul_ne_zero hh0 hh0', ?_⟩
+    refine ⟨
+      t + t',
+      g * h' + h * g',
+      h * h',
+      homog_add (homog_mul_block hg hh') (homog_mul_block hh hg'),
+      homog_mul_block hh hh',
+      by rw [map_mul]; exact mul_ne_zero hh0 hh0',
+      ?_
+    ⟩
     rw [map_add (f := _), map_mul, map_mul, map_mul, he, he']
     ring
   neg_mem' := by
@@ -181,8 +202,15 @@ def blockFrac (Y : (Σ k, ι k) → Ω) (k₀ : K) : Subfield Ω where
     exact ⟨t, -g, h, homog_neg hg, hh, hh0, by rw [map_neg, he, neg_mul]⟩
   mul_mem' := by
     rintro s s' ⟨t, g, h, hg, hh, hh0, he⟩ ⟨t', g', h', hg', hh', hh0', he'⟩
-    refine ⟨t + t', g * g', h * h', homog_mul_block hg hg', homog_mul_block hh hh',
-      by rw [map_mul]; exact mul_ne_zero hh0 hh0', ?_⟩
+    refine ⟨
+      t + t',
+      g * g',
+      h * h',
+      homog_mul_block hg hg',
+      homog_mul_block hh hh',
+      by rw [map_mul]; exact mul_ne_zero hh0 hh0',
+      ?_
+    ⟩
     rw [map_mul, map_mul, he, he']
     ring
   inv_mem' := by
@@ -193,14 +221,19 @@ def blockFrac (Y : (Σ k, ι k) → Ω) (k₀ : K) : Subfield Ω where
     · refine ⟨t, h, g, hh, hg, by rw [he]; exact mul_ne_zero hs hh0, ?_⟩
       rw [he, ← mul_assoc, inv_mul_cancel₀ hs, one_mul]
 
-theorem exists_form_of_mem_closure {N : ℕ} (y : (Σ k, ι k) → Ω) (v : Fin N → Ω) {x : Ω}
-    (hx : x ∈ AddSubgroup.closure (Set.range v)) :
-    ∃ g : MRing (addIdx ι N), IsMultiHomog g (blockDeg (none : Option K) 1) ∧ aeval (addBlock y v) g = x := by
+theorem exists_form_of_mem_closure
+    {N : ℕ}
+    (y : (Σ k, ι k) → Ω)
+    (v : Fin N → Ω)
+    {x : Ω} (hx : x ∈ AddSubgroup.closure (Set.range v))
+    : ∃ g : MRing (addIdx ι N),
+      IsMultiHomog g (blockDeg (none : Option K) 1) ∧ aeval (addBlock y v) g = x := by
   induction hx using AddSubgroup.closure_induction with
   | mem x hx =>
     obtain ⟨j, rfl⟩ := hx
     exact ⟨X ⟨none, j⟩, homog_X_block (ι := addIdx ι N) none j, by simp [addBlock]⟩
-  | zero => exact ⟨0, homog_zero _, by simp⟩
+  | zero =>
+    exact ⟨0, homog_zero _, by simp⟩
   | add x x' _ _ hx hx' =>
     obtain ⟨g, hg, rfl⟩ := hx
     obtain ⟨g', hg', rfl⟩ := hx'
@@ -213,10 +246,11 @@ end Forms
 
 end PowerHeightsirational
 
-
 open PowerHeightsirational in
-theorem PowerHeightsirational.proof (hN : GeneratedNefGeneric.Statement) (hK : KodairaGeneric.Statement)
-    (hC : ChartDenominator.Statement) : PowerHeightsirational.Statement := by
+theorem PowerHeightsirational.proof
+    (hN : GeneratedNefGeneric.Statement) (hK : KodairaGeneric.Statement)
+    (hC : ChartDenominator.Statement)
+    : PowerHeightsirational.Statement := by
   intro K _ _ ι _ Ω _ _ y D a q w hD hV hB hw hgen hdeg
   obtain ⟨c0, hc0⟩ := exists_chart hV
   obtain ⟨k, e, hk, he0, heQ⟩ := hK K ι Ω y D a hD hV hB (hN K ι Ω y D a q w hV hw hgen) hdeg
@@ -234,8 +268,9 @@ theorem PowerHeightsirational.proof (hN : GeneratedNefGeneric.Statement) (hK : K
     have h1 : InLat y (fun κ => (k : ℤ) * a κ - 1) ((n : Ω) * e) :=
       (mem_chartLat_iff.mp hne).congr (by funext κ; simp)
     exact h1.mul ((mem_chartLat_iff.mp (hw j)).pow _)
-  have hsec : ∀ f : ∀ κ, ι κ,
-      (n : Ω) * e * w j ^ (m - k) * ∏ κ, y ⟨κ, f κ⟩ ∈ AddSubgroup.closure (Set.range v) := by
+  have hsec
+      : ∀ f : ∀ κ, ι κ,
+        (n : Ω) * e * w j ^ (m - k) * ∏ κ, y ⟨κ, f κ⟩ ∈ AddSubgroup.closure (Set.range v) := by
     intro f
     rw [hv, mem_chartLat_iff]
     refine (hEl.mul (inLat_prod y f)).congr ?_
@@ -252,9 +287,11 @@ theorem PowerHeightsirational.proof (hN : GeneratedNefGeneric.Statement) (hK : K
     · rw [hv2]
       exact mul_ne_zero hE0 (Finset.prod_ne_zero_iff.mpr fun κ _ => hc0 κ)
     · rw [hv1, hv2]
-      have h1 : ∏ κ, y ⟨κ, Function.update c0 κ0 i κ⟩ =
-          y ⟨κ0, i⟩ * ∏ κ ∈ Finset.univ.erase κ0, y ⟨κ, c0 κ⟩ := by
-        rw [← Finset.mul_prod_erase Finset.univ (fun κ => y ⟨κ, Function.update c0 κ0 i κ⟩)
+      have h1
+          : ∏ κ, y ⟨κ, Function.update c0 κ0 i κ⟩
+            = y ⟨κ0, i⟩ * ∏ κ ∈ Finset.univ.erase κ0, y ⟨κ, c0 κ⟩ := by
+        rw [← Finset.mul_prod_erase Finset.univ
+          (fun κ => y ⟨κ, Function.update c0 κ0 i κ⟩)
           (Finset.mem_univ κ0)]
         simp only [Function.update_self]
         congr 1
@@ -268,7 +305,9 @@ theorem PowerHeightsirational.proof (hN : GeneratedNefGeneric.Statement) (hK : K
   have hall : ∀ s : Ω, s ∈ blockFrac (addBlock y v) none := by
     intro s
     obtain ⟨d, g, h, hg, hh, hh0, hgh⟩ := hB s
-    have hmem : ∀ f : MRing ι, aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) f ∈ blockFrac (addBlock y v) none := by
+    have hmem
+        : ∀ f : MRing ι,
+          aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) f ∈ blockFrac (addBlock y v) none := by
       intro f
       induction f using MvPolynomial.induction_on with
       | C r =>
@@ -283,12 +322,16 @@ theorem PowerHeightsirational.proof (hN : GeneratedNefGeneric.Statement) (hK : K
     have eg := aeval_scale hg (fun κ => y ⟨κ, c0 κ⟩) (fun p => y p / y ⟨p.1, c0 p.1⟩)
     have eh := aeval_scale hh (fun κ => y ⟨κ, c0 κ⟩) (fun p => y p / y ⟨p.1, c0 p.1⟩)
     rw [hy] at eg eh
-    have hΛ : (∏ κ, y ⟨κ, c0 κ⟩ ^ d κ) ≠ 0 := Finset.prod_ne_zero_iff.mpr fun κ _ => pow_ne_zero _ (hc0 κ)
+    have hΛ : (∏ κ, y ⟨κ, c0 κ⟩ ^ d κ) ≠ 0 :=
+      Finset.prod_ne_zero_iff.mpr fun κ _ => pow_ne_zero _ (hc0 κ)
     have hh0' : aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) h ≠ 0 := by
       intro h0
       rw [h0, mul_zero] at eh
       exact hh0 eh
-    have hs : s = aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) g / aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) h := by
+    have hs
+        : s
+          = aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) g
+            / aeval (fun p => y p / y ⟨p.1, c0 p.1⟩) h := by
       rw [eq_div_iff hh0']
       apply mul_left_cancel₀ hΛ
       rw [← eg, hgh, eh]

@@ -5,12 +5,14 @@ public import Development.EtaleCohomology.EtaleSheaves.ChowGraphCut
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut LateralTheory.E.ChowLCut LateralTheory.E.ChowGraphCut
+open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut LateralTheory.E.ChowLCut
+  LateralTheory.E.ChowGraphCut
 
 namespace LateralTheory.E.ProdPf
 
-theorem iterLine_of_isPullback {S P : Scheme.{0}} {q : P ⟶ S} (hq : IterLine q) :
-    ∀ {X P' : Scheme.{0}} (g : X ⟶ S) (a : P' ⟶ P) (q' : P' ⟶ X), IsPullback a q' q g → IterLine q' := by
+theorem iterLine_of_isPullback {S P : Scheme.{0}} {q : P ⟶ S} (hq : IterLine q)
+    : ∀ {X P' : Scheme.{0}} (g : X ⟶ S) (a : P' ⟶ P) (q' : P' ⟶ X),
+      IsPullback a q' q g → IterLine q' := by
   induction hq with
   | iso e he =>
     intro X P' g a q' h
@@ -22,22 +24,24 @@ theorem iterLine_of_isPullback {S P : Scheme.{0}} {q : P ⟶ S} (hq : IterLine q
     intro X P' g a q' h
     have w : q' ≫ g = (a ≫ l) ≫ k := by rw [Category.assoc, ← h.w]
     let m := pullback.lift q' (a ≫ l) w
-    have hb : IsPullback (pullback.snd g k) (pullback.fst g k) k g := (IsPullback.of_hasPullback g k).flip
+    have hb : IsPullback (pullback.snd g k) (pullback.fst g k) k g :=
+      (IsPullback.of_hasPullback g k).flip
     have e1 : m ≫ pullback.fst g k = q' := pullback.lift_fst _ _ _
     have e2 : m ≫ pullback.snd g k = a ≫ l := pullback.lift_snd _ _ _
-    have hs : IsPullback a (m ≫ pullback.fst g k) (l ≫ k) g := by
-      rw [e1]; exact h
+    have hs : IsPullback a (m ≫ pullback.fst g k) (l ≫ k) g := by rw [e1]; exact h
     have ht : IsPullback a m l (pullback.snd g k) := IsPullback.of_bot hs e2.symm hb
     have hm : IsLine m := hl.bc ht
     have e : q' = m ≫ pullback.fst g k := e1.symm
     rw [e]
     exact IterLine.comp _ _ hm (ih g (pullback.snd g k) (pullback.fst g k) hb)
 
-theorem exists_widePullback_of_iteratedLine (hI : IterComp) {S : Scheme.{0}} : ∀ (n : ℕ) (Pj : Fin n → Scheme.{0}) (qj : ∀ j, Pj j ⟶ S),
-    (∀ j, IterLine (qj j)) →
-    ∃ (P : Scheme.{0}) (q : P ⟶ S) (π : ∀ j, P ⟶ Pj j), IterLine q ∧ (∀ j, π j ≫ qj j = q) ∧
-      ∀ {T : Scheme.{0}} (t : T ⟶ S) (f : ∀ j, T ⟶ Pj j), (∀ j, f j ≫ qj j = t) →
-        ∃! g : T ⟶ P, g ≫ q = t ∧ ∀ j, g ≫ π j = f j := by
+theorem exists_widePullback_of_iteratedLine (hI : IterComp) {S : Scheme.{0}}
+    : ∀ (n : ℕ) (Pj : Fin n → Scheme.{0}) (qj : ∀ j, Pj j ⟶ S),
+      (∀ j, IterLine (qj j))
+        → ∃ (P : Scheme.{0}) (q : P ⟶ S) (π : ∀ j, P ⟶ Pj j),
+          IterLine q ∧ (∀ j, π j ≫ qj j = q)
+            ∧ ∀ {T : Scheme.{0}} (t : T ⟶ S) (f : ∀ j, T ⟶ Pj j),
+              (∀ j, f j ≫ qj j = t) → ∃! g : T ⟶ P, g ≫ q = t ∧ ∀ j, g ≫ π j = f j := by
   intro n
   induction n with
   | zero =>
@@ -49,12 +53,15 @@ theorem exists_widePullback_of_iteratedLine (hI : IterComp) {S : Scheme.{0}} : �
     simpa using hg
   | succ n ih =>
     intro Pj qj hqj
-    obtain ⟨P0, q0, π0, hq0, hπ0, hU0⟩ := ih (fun j => Pj j.succ) (fun j => qj j.succ) (fun j => hqj j.succ)
+    obtain ⟨P0, q0, π0, hq0, hπ0, hU0⟩ :=
+      ih (fun j => Pj j.succ) (fun j => qj j.succ) (fun j => hqj j.succ)
     have hfst : IterLine (pullback.fst q0 (qj 0)) :=
       iterLine_of_isPullback (hqj 0) q0 (pullback.snd q0 (qj 0)) (pullback.fst q0 (qj 0))
         (IsPullback.of_hasPullback q0 (qj 0)).flip
     let π : ∀ j, pullback q0 (qj 0) ⟶ Pj j :=
-      Fin.cases (motive := fun j => pullback q0 (qj 0) ⟶ Pj j) (pullback.snd q0 (qj 0))
+      Fin.cases
+        (motive := fun j => pullback q0 (qj 0) ⟶ Pj j)
+        (pullback.snd q0 (qj 0))
         (fun j => pullback.fst q0 (qj 0) ≫ π0 j)
     have hπ0' : π 0 = pullback.snd q0 (qj 0) := rfl
     have hπs : ∀ j : Fin n, π j.succ = pullback.fst q0 (qj 0) ≫ π0 j := fun j => rfl

@@ -7,7 +7,8 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactHaarRightInvari
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -17,8 +18,8 @@ namespace GlobalTheory.KHolExt
 variable {n : ℕ} {ε : Fin n → Bool}
 
 def Hol (ε : Fin n → Bool) (a : KG ε → ℂ) : Prop :=
-  ∃ F : (Fin n → Fin n → ℂ) → ℂ, DifferentiableOn ℂ F {y | Matrix.of y ∈ KC ε} ∧
-    ∀ k : KG ε, F (fun i j => toMK k i j) = a k
+  ∃ F : (Fin n → Fin n → ℂ) → ℂ,
+    DifferentiableOn ℂ F {y | Matrix.of y ∈ KC ε} ∧ ∀ k : KG ε, F (fun i j => toMK k i j) = a k
 
 lemma Hol.const (c : ℂ) : Hol ε (fun _ => c) :=
   ⟨fun _ => c, differentiableOn_const c, fun _ => rfl⟩
@@ -96,8 +97,8 @@ lemma Hol.conjEntry (i j : Fin n) : Hol ε (fun k => star (toMK k i j)) := by
     rw [← key, hinv, Matrix.star_apply]
 
 def Sep (ε : Fin n → Bool) (p : KG ε → ℂ) : Prop :=
-  ∃ (ι : Type) (_ : Fintype ι) (a : ι → KG ε → ℂ) (b : ι → C(KG ε, ℂ)), (∀ i, Hol ε (a i)) ∧
-    ∀ g k, p (g⁻¹ * k) = ∑ i, a i g * b i k
+  ∃ (ι : Type) (_ : Fintype ι) (a : ι → KG ε → ℂ) (b : ι → C(KG ε, ℂ)),
+    (∀ i, Hol ε (a i)) ∧ ∀ g k, p (g⁻¹ * k) = ∑ i, a i g * b i k
 
 lemma Sep.const (c : ℂ) : Sep ε (fun _ => c) :=
   ⟨Unit, inferInstance, fun _ _ => c, fun _ => ContinuousMap.const _ 1, fun _ => Hol.const c,
@@ -151,17 +152,19 @@ lemma Sep.conjEntry (i j : Fin n) : Sep ε (star (ent ε i j) : C(KG ε, ℂ)) :
 
 def sepAlg (ε : Fin n → Bool) : StarSubalgebra ℂ C(KG ε, ℂ) where
   carrier := {p | Sep ε p ∧ Sep ε (star p : C(KG ε, ℂ))}
-  mul_mem' := fun {p q} hp hq => ⟨hp.1.mul hq.1, by
-    rw [star_mul']; exact hp.2.mul hq.2⟩
-  add_mem' := fun {p q} hp hq => ⟨hp.1.add hq.1, by
-    rw [star_add]; exact hp.2.add hq.2⟩
-  algebraMap_mem' := fun c => ⟨by
-    have : ((algebraMap ℂ C(KG ε, ℂ) c : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => c := by
-      funext k; simp
-    rw [this]; exact Sep.const c, by
-    have : ((star (algebraMap ℂ C(KG ε, ℂ) c) : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => star c := by
-      funext k; simp
-    rw [this]; exact Sep.const _⟩
+  mul_mem' := fun {p q} hp hq => ⟨hp.1.mul hq.1, by rw [star_mul']; exact hp.2.mul hq.2⟩
+  add_mem' := fun {p q} hp hq => ⟨hp.1.add hq.1, by rw [star_add]; exact hp.2.add hq.2⟩
+  algebraMap_mem' := fun c => ⟨
+    by
+      have : ((algebraMap ℂ C(KG ε, ℂ) c : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => c := by funext k; simp
+      rw [this]
+      exact Sep.const c,
+    by
+      have : ((star (algebraMap ℂ C(KG ε, ℂ) c) : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => star c := by
+        funext k; simp
+      rw [this]
+      exact Sep.const _
+  ⟩
   star_mem' := fun {p} hp => ⟨hp.2, by rw [star_star]; exact hp.1⟩
 
 lemma sepAlg_dense (ε : Fin n → Bool) : (sepAlg ε).topologicalClosure = ⊤ := by
@@ -175,8 +178,9 @@ lemma sepAlg_dense (ε : Fin n → Bool) : (sepAlg ε).topologicalClosure = ⊤ 
   have hmem : ent ε i j ∈ sepAlg ε := ⟨Sep.entry i j, Sep.conjEntry i j⟩
   exact ⟨_, ⟨ent ε i j, hmem, rfl⟩, hij⟩
 
-private theorem integrable_of_continuous_isFiniteMeasure {E : Type*} [NormedAddCommGroup E] {f : KG ε → E} (hf : Continuous f) :
-    Integrable f (muK ε) :=
+private theorem integrable_of_continuous_isFiniteMeasure
+    {E : Type*} [NormedAddCommGroup E] {f : KG ε → E} (hf : Continuous f)
+    : Integrable f (muK ε) :=
   hf.integrable_of_hasCompactSupport (isClosed_tsupport f).isCompact
 
 lemma eq_zero_of_orth (φ : C(KG ε, ℂ))

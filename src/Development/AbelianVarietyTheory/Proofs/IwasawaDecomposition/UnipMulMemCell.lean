@@ -23,8 +23,8 @@ variable [ValuativeRel k]
 def cell (ϖ : kˣ) (a : Fin m → ℤ) : Set (GL (Fin m) k) :=
   {g | ∃ u ∈ unipB k (Fin m), ∃ κ ∈ KO k (Fin m), g = u * tD ϖ a * κ}
 
-
-theorem val_tD (ϖ : kˣ) (a : Fin m → ℤ) : (tD ϖ a).val = Matrix.diagonal fun i => ((ϖ ^ a i : kˣ) : k) :=
+theorem val_tD (ϖ : kˣ) (a : Fin m → ℤ)
+    : (tD ϖ a).val = Matrix.diagonal fun i => ((ϖ ^ a i : kˣ) : k) :=
   val_diagT k _
 
 theorem tD_add (ϖ : kˣ) (a b : Fin m → ℤ) : tD ϖ (a + b) = tD ϖ a * tD ϖ b := by
@@ -44,26 +44,31 @@ theorem tD_zero (ϖ : kˣ) : tD ϖ (0 : Fin m → ℤ) = 1 := by
 theorem tD_neg (ϖ : kˣ) (a : Fin m → ℤ) : tD ϖ (-a) = (tD ϖ a)⁻¹ :=
   eq_inv_of_mul_eq_one_left (by rw [← tD_add, neg_add_cancel, tD_zero])
 
-theorem diag_entry (ϖ : kˣ) (s t : Fin m → ℤ) {w : GL (Fin m) k} (hw : w ∈ unipB k (Fin m)) (i : Fin m) :
-    (tD ϖ s * w * tD ϖ t).val i i = ((ϖ ^ (s i + t i) : kˣ) : k) := by
-  rw [Units.val_mul, Units.val_mul, val_tD, val_tD, Matrix.mul_diagonal, Matrix.diagonal_mul, ((mem_unipB k).1 hw).2 i,
-    mul_one, _root_.zpow_add, Units.val_mul]
+theorem diag_entry
+    (ϖ : kˣ) (s t : Fin m → ℤ) {w : GL (Fin m) k} (hw : w ∈ unipB k (Fin m)) (i : Fin m)
+    : (tD ϖ s * w * tD ϖ t).val i i = ((ϖ ^ (s i + t i) : kˣ) : k) := by
+  rw [Units.val_mul, Units.val_mul, val_tD, val_tD, Matrix.mul_diagonal, Matrix.diagonal_mul,
+    ((mem_unipB k).1 hw).2 i, mul_one, _root_.zpow_add, Units.val_mul]
 
 theorem ord_zpow (x : kˣ) (n : ℤ) : ord k (x ^ n) = n * ord k x := by
-  let o : kˣ →* Multiplicative ℤ := MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by
-    rw [ord_mul, ofAdd_add]
+  let o : kˣ →* Multiplicative ℤ :=
+    MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by rw [ord_mul, ofAdd_add]
   have h := map_zpow o x n
   have h2 : Multiplicative.toAdd (o (x ^ n)) = Multiplicative.toAdd (o x ^ n) := congrArg _ h
   simpa [o, mul_comm] using h2
 
-theorem eq_of_mem_cell {ϖ : kˣ} (hϖ : ord k ϖ = 1) {a b : Fin m → ℤ} {g : GL (Fin m) k} (ha : g ∈ cell ϖ a)
-    (hb : g ∈ cell ϖ b) : a = b := by
+theorem eq_of_mem_cell
+    {ϖ : kˣ} (hϖ : ord k ϖ = 1)
+    {a b : Fin m → ℤ} {g : GL (Fin m) k} (ha : g ∈ cell ϖ a) (hb : g ∈ cell ϖ b)
+    : a = b := by
   obtain ⟨u, hu, κ, hκ, rfl⟩ := ha
   obtain ⟨u', hu', κ', hκ', e⟩ := hb
   have hw : u'⁻¹ * u ∈ unipB k (Fin m) := mul_mem (inv_mem hu') hu
   have hx : tD ϖ (-b) * (u'⁻¹ * u) * tD ϖ a = κ' * κ⁻¹ := by
     rw [tD_neg]
-    calc (tD ϖ b)⁻¹ * (u'⁻¹ * u) * tD ϖ a = (u' * tD ϖ b)⁻¹ * (u * tD ϖ a * κ) * κ⁻¹ := by group
+    calc
+      (tD ϖ b)⁻¹ * (u'⁻¹ * u) * tD ϖ a
+        = (u' * tD ϖ b)⁻¹ * (u * tD ϖ a * κ) * κ⁻¹ := by group
       _ = (u' * tD ϖ b)⁻¹ * (u' * tD ϖ b * κ') * κ⁻¹ := by rw [e]
       _ = κ' * κ⁻¹ := by group
   have hxi : (tD ϖ (-b) * (u'⁻¹ * u) * tD ϖ a)⁻¹ = tD ϖ (-a) * (u'⁻¹ * u)⁻¹ * tD ϖ b := by
@@ -77,7 +82,7 @@ theorem eq_of_mem_cell {ϖ : kˣ} (hϖ : ord k ϖ = 1) {a b : Fin m → ℤ} {g 
   simp only [Pi.neg_apply] at h1 h2
   set y : kˣ := ϖ ^ (-b i + a i)
   have h2' : ((y⁻¹ : kˣ) : k) ∈ 𝒪[k] := by
-    have : (ϖ ^ (-a i + b i) : kˣ) = y⁻¹ := by rw [← _root_.zpow_neg]; congr 1; ring
+    have : (ϖ ^ (- a i + b i) : kˣ) = y⁻¹ := by rw [← _root_.zpow_neg]; congr 1; ring
     rwa [this] at h2
   have v1 : valuation k (y : k) ≤ 1 := h1
   have v2 : valuation k ((y⁻¹ : kˣ) : k) ≤ 1 := h2'

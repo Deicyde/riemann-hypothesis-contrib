@@ -5,20 +5,22 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Published
+  GroundTheory.Global GroundTheory.Automorphic.GJMatrix
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.datAlg :
-    ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E], Module.finrank F E = 2 →
-      ∃ (δ : F) (θ : E) (σ : E ≃ₐ[F] E) (b : Module.Basis (Fin 2) F E), b 0 = 1 ∧ b 1 = θ ∧ θ ^ 2 = algebraMap F E δ ∧ σ θ = -θ := by
+theorem UpperTheory.ConvolutionTheory.R2.datAlg
+    : ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E],
+      Module.finrank F E = 2
+        → ∃ (δ : F) (θ : E) (σ : E ≃ₐ[F] E) (b : Module.Basis (Fin 2) F E),
+          b 0 = 1 ∧ b 1 = θ ∧ θ ^ 2 = algebraMap F E δ ∧ σ θ = -θ := by
   intro F E _ _ _ _ h2
   haveI : Algebra.IsQuadraticExtension F E := ⟨h2⟩
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (by omega)
   haveI : IsGalois F E := inferInstance
   haveI : CharZero E := charZero_of_injective_algebraMap (algebraMap F E).injective
-  have hcard : Nat.card (E ≃ₐ[F] E) = 2 := by
-    rw [IsGalois.card_aut_eq_finrank, h2]
+  have hcard : Nat.card (E ≃ₐ[F] E) = 2 := by rw [IsGalois.card_aut_eq_finrank, h2]
   obtain ⟨σ, hσ⟩ : ∃ σ : E ≃ₐ[F] E, σ ≠ 1 := by
     haveI : Finite (E ≃ₐ[F] E) := inferInstance
     haveI : Nontrivial (E ≃ₐ[F] E) := by
@@ -39,8 +41,7 @@ theorem UpperTheory.ConvolutionTheory.R2.datAlg :
       exact Finset.card_le_univ _
     omega
   have hσσ : σ * σ = 1 := by
-    have : Monoid.exponent (E ≃ₐ[F] E) ∣ 2 := by
-      rw [← hcard]; exact Group.exponent_dvd_nat_card
+    have : Monoid.exponent (E ≃ₐ[F] E) ∣ 2 := by rw [← hcard]; exact Group.exponent_dvd_nat_card
     have h := Monoid.exponent_dvd_iff_forall_pow_eq_one.mp this σ
     rwa [pow_two] at h
   obtain ⟨α, hα⟩ : ∃ α : E, σ α ≠ α := by
@@ -52,8 +53,7 @@ theorem UpperTheory.ConvolutionTheory.R2.datAlg :
     simpa using this
   set θ : E := α - σ α with hθ
   have hθ0 : θ ≠ 0 := fun h => hα (sub_eq_zero.mp h).symm
-  have hσθ : σ θ = -θ := by
-    simp [hθ, hσσα]
+  have hσθ : σ θ = -θ := by simp [hθ, hσσα]
   have hfix : θ ^ 2 ∈ Set.range (algebraMap F E) := by
     have hb : θ ^ 2 ∈ (⊥ : IntermediateField F E) := by
       rw [IsGalois.mem_bot_iff_fixed]
@@ -66,8 +66,7 @@ theorem UpperTheory.ConvolutionTheory.R2.datAlg :
   have hli : LinearIndependent F ![(1 : E), θ] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
-    have h1 : algebraMap F E s + algebraMap F E t * θ = 0 := by
-      simpa [Algebra.smul_def] using hst
+    have h1 : algebraMap F E s + algebraMap F E t * θ = 0 := by simpa [Algebra.smul_def] using hst
     have h2' : algebraMap F E s - algebraMap F E t * θ = 0 := by
       have := congrArg σ h1
       simpa [hσθ, sub_eq_add_neg] using this

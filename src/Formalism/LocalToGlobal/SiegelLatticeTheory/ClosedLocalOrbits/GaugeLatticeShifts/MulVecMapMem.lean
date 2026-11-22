@@ -19,7 +19,8 @@ abbrev Vk (k r : ℕ) := Fin (2 * r + k + 1) → ℂ
 
 variable {k r : ℕ}
 
-def stdX (k r : ℕ) (b : Fin r) : Vk k r := Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r b)
+def stdX (k r : ℕ) (b : Fin r) : Vk k r :=
+  Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r b)
 
 def supSub (k r a : ℕ) : Submodule ℂ (Vk k r) where
   carrier := {v | ∀ i : Fin (2 * r + k + 1), a ≤ i.val → v i = 0}
@@ -164,8 +165,14 @@ lemma ring_key {R : Type*} [Ring R] (D H g gs S : R) (hDD : D * D = D) (hDH : D 
 def dW (k r : ℕ) : Fin (2 * r + k + 1) → ℂ := fun i => if r ≤ i.val ∧ i.val ≤ r + k then 1 else 0
 def dS (k r : ℕ) : Fin (2 * r + k + 1) → ℂ := fun i => if r + k < i.val then 1 else 0
 
-def hW (g : Mk k r) : Mk k r := Matrix.of fun i j =>
-  if (r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k) then g i j else if i = j then 1 else 0
+def hW (g : Mk k r) : Mk k r :=
+  Matrix.of fun i j =>
+    if (r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k) then
+      g i j
+    else if i = j then
+      1
+    else
+      0
 
 lemma hW_eq (g : Mk k r) :
     hW g = diagonal (dW k r) * g * diagonal (dW k r) + (1 - diagonal (dW k r)) := by
@@ -383,9 +390,16 @@ theorem setCorr_holds : SetCorr := by
   have hE : e = fun a => P *ᵥ SetCorrespondence.stdX k r a := funext fun a => (he a).symm
   subst hE
   subst hzP
-  have hu : (Formalism.MainNotions.S.uMat u)ᴴ * Formalism.REAL.Jm ε * Formalism.MainNotions.S.uMat u = Formalism.REAL.Jm ε := u.2
+  have hu
+      : (Formalism.MainNotions.S.uMat u)ᴴ * Formalism.REAL.Jm ε * Formalism.MainNotions.S.uMat u
+        = Formalism.REAL.Jm ε :=
+    u.2
   show Formalism.L2.SG.HidaSetting.InS _ _ (Formalism.MainNotions.S.uMat u) ↔ _
   rw [SetCorrespondence.inS_transport P hPu zH (Formalism.MainNotions.S.uMat u)]
-  exact ⟨SetCorrespondence.fwd _ zH (SetCorrespondence.gUH P hPu hP (Formalism.MainNotions.S.uMat u) hu) hzW, SetCorrespondence.bwd _ zH hzW⟩
+  exact ⟨
+    SetCorrespondence.fwd _ zH (SetCorrespondence.gUH P hPu hP (Formalism.MainNotions.S.uMat u) hu)
+      hzW,
+    SetCorrespondence.bwd _ zH hzW
+  ⟩
 
 end Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates.JL

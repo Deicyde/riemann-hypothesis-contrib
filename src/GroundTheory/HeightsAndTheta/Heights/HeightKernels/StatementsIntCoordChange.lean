@@ -18,12 +18,13 @@ variable {T T₂ : Type} [Fintype T] [DecidableEq T] [Fintype T₂]
 def intCoordSubst (A : Matrix T T₂ ℤ) : MRing (dualBlocks T₂) →ₐ[ℤ] MRing (dualBlocks T) :=
   aeval fun p => ∑ t, C (A t p.2) * X (⟨(), t⟩ : Σ _ : Unit, T)
 
-def intCoordPt (A : Matrix T T₂ ℤ) (z : (Σ _ : Unit, T) → ℂ) : (Σ _ : Unit, T₂) → ℂ :=
-  fun p => ∑ t, z ⟨(), t⟩ * (A t p.2 : ℂ)
+def intCoordPt (A : Matrix T T₂ ℤ) (z : (Σ _ : Unit, T) → ℂ) : (Σ _ : Unit, T₂) → ℂ := fun p =>
+  ∑ t, z ⟨(), t⟩ * (A t p.2 : ℂ)
 
-theorem intCoordPt_ne_zero {A : Matrix T T₂ ℤ} (hA : ∃ B : Matrix T₂ T ℤ, A * B = 1)
-    {z : (Σ _ : Unit, T) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
-    ∀ k, ∃ i, intCoordPt A z ⟨k, i⟩ ≠ 0 := by
+theorem intCoordPt_ne_zero
+    {A : Matrix T T₂ ℤ} (hA : ∃ B : Matrix T₂ T ℤ, A * B = 1)
+    {z : (Σ _ : Unit, T) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+    : ∀ k, ∃ i, intCoordPt A z ⟨k, i⟩ ≠ 0 := by
   classical
   obtain ⟨B, hB⟩ := hA
   rintro ⟨⟩
@@ -42,8 +43,10 @@ theorem intCoordPt_ne_zero {A : Matrix T T₂ ℤ} (hA : ∃ B : Matrix T₂ T �
   rw [key]
   exact Finset.sum_eq_zero fun s _ => by rw [h s, zero_mul]
 
-def intCoordLine (A : Matrix T T₂ ℤ) (hA : ∃ B : Matrix T₂ T ℤ, A * B = 1)
-    (L : ReciprocityTheory.ChartRestriction.G.Geo.HermLine (dualBlocks T₂)) : ReciprocityTheory.ChartRestriction.G.Geo.HermLine (dualBlocks T) where
+def intCoordLine
+    (A : Matrix T T₂ ℤ) (hA : ∃ B : Matrix T₂ T ℤ, A * B = 1)
+    (L : ReciprocityTheory.ChartRestriction.G.Geo.HermLine (dualBlocks T₂))
+    : ReciprocityTheory.ChartRestriction.G.Geo.HermLine (dualBlocks T) where
   a := L.a
   h z := L.h (intCoordPt A z)
   pos z hz := L.pos _ (intCoordPt_ne_zero hA hz)
@@ -56,11 +59,16 @@ def intCoordLine (A : Matrix T T₂ ℤ) (hA : ∃ B : Matrix T₂ T ℤ, A * B 
 
 def IntCoordChange.Statement : Prop :=
   ∀ (T T₂ : Type) [Fintype T] [DecidableEq T] [Fintype T₂] [DecidableEq T₂] (A : Matrix T T₂ ℤ)
-    (B : Matrix T₂ T ℤ) (hAB : A * B = 1), B * A = 1 → ∀ (II : IntersectionSystem),
-    IsIntersectionSystem II → ∀ (P : Ideal (MRing (dualBlocks T₂))) (n : ℕ)
-    (L : Fin n → ReciprocityTheory.ChartRestriction.G.Geo.HermLine (dualBlocks T₂)), 1 ≤ n → IsArithVar P n → (∀ j, IsSmoothHerm (L j)) →
-    II Unit (dualBlocks T) (P.map (intCoordSubst A)) n (fun j => intCoordLine A ⟨B, hAB⟩ (L j)) =
-      II Unit (dualBlocks T₂) P n L
+      (B : Matrix T₂ T ℤ) (hAB : A * B = 1),
+    B * A = 1
+      → ∀ (II : IntersectionSystem),
+        IsIntersectionSystem II
+          → ∀ (P : Ideal (MRing (dualBlocks T₂))) (n : ℕ)
+              (L : Fin n → ReciprocityTheory.ChartRestriction.G.Geo.HermLine (dualBlocks T₂)),
+            1 ≤ n → IsArithVar P n → (∀ j, IsSmoothHerm (L j))
+              → II Unit (dualBlocks T) (P.map (intCoordSubst A)) n
+                  (fun j => intCoordLine A ⟨B, hAB⟩ (L j))
+                = II Unit (dualBlocks T₂) P n L
 
 end
 

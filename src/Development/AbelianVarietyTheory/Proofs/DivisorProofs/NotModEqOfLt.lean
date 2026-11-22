@@ -10,15 +10,17 @@ open scoped Classical
 
 namespace GlobalTheory.Shin
 
-theorem Reg.not_modEq_of_lt {q N k u v : ℕ} (hq : 2 ≤ q) (h : Reg q N k) (huv : u < v) (hv : v < u + N) :
-    ¬ k * q ^ v ≡ k * q ^ u [MOD q ^ N - 1] := by
+theorem Reg.not_modEq_of_lt
+    {q N k u v : ℕ} (hq : 2 ≤ q) (h : Reg q N k) (huv : u < v) (hv : v < u + N)
+    : ¬ k * q ^ v ≡ k * q ^ u [MOD q ^ N - 1] := by
   intro hmod
   obtain ⟨d, rfl⟩ : ∃ d, v = u + d := ⟨v - u, by omega⟩
   have hd0 : 0 < d := by omega
   have hdN : d < N := by omega
   have hN : 0 < N := by omega
   have hcop : Nat.Coprime (q ^ N - 1) (q ^ u) := by
-    obtain ⟨t, ht⟩ : ∃ t, q ^ N = t + 1 := ⟨q ^ N - 1, by have := Nat.one_le_pow N q (by omega); omega⟩
+    obtain ⟨t, ht⟩ : ∃ t, q ^ N = t + 1 :=
+      ⟨q ^ N - 1, by have := Nat.one_le_pow N q (by omega); omega⟩
     have h2 : Nat.Coprime (q ^ N - 1) (q ^ N) := by
       rw [ht, Nat.add_sub_cancel]
       exact Nat.coprime_self_add_right.mpr (Nat.coprime_one_right t)
@@ -30,10 +32,14 @@ theorem Reg.not_modEq_of_lt {q N k u v : ℕ} (hq : 2 ≤ q) (h : Reg q N k) (hu
     exact hmod
   exact h d hd0 hdN key
 
-theorem reg_step_of_dvd : ∀ q l m k : ℕ, 2 ≤ q → 0 < l → 0 < m → Reg q (l * m) k →
-    (∀ i, Reg (q ^ l) m (k * q ^ i)) ∧ (2 ≤ l * m → ∀ i, ¬ k * q ^ i ≡ 0 [MOD q ^ (l * m) - 1]) ∧
-    ∀ i j a, i < l → j < l → a < m →
-      (k * q ^ i * (q ^ l) ^ a ≡ k * q ^ j [MOD (q ^ l) ^ m - 1] ↔ i = j ∧ a = 0) := by
+theorem reg_step_of_dvd
+    : ∀ q l m k : ℕ,
+      2 ≤ q → 0 < l → 0 < m → Reg q (l * m) k
+        → (∀ i, Reg (q ^ l) m (k * q ^ i))
+          ∧ (2 ≤ l * m → ∀ i, ¬ k * q ^ i ≡ 0 [MOD q ^ (l * m) - 1])
+          ∧ ∀ i j a,
+            i < l → j < l → a < m
+              → (k * q ^ i * (q ^ l) ^ a ≡ k * q ^ j [MOD (q ^ l) ^ m - 1] ↔ i = j ∧ a = 0) := by
   intro q l m k hq hl hm h
   refine ⟨?_, ?_, ?_⟩
   · intro i j hj0 hjm hmod
@@ -41,7 +47,8 @@ theorem reg_step_of_dvd : ∀ q l m k : ℕ, 2 ≤ q → 0 < l → 0 < m → Reg
     rw [mul_assoc, ← pow_add] at hmod
     have hlj : 0 < l * j := Nat.mul_pos hl hj0
     have hljm : l * j < l * m := (Nat.mul_lt_mul_left hl).mpr hjm
-    exact Reg.not_modEq_of_lt hq h (by omega : i < i + l * j) (by omega : i + l * j < i + l * m) hmod
+    exact Reg.not_modEq_of_lt hq h (by omega : i < i + l * j) (by omega : i + l * j < i + l * m)
+      hmod
   · intro hlm i hmod
     have h1 : k * q ^ (i + 1) ≡ k * q ^ i [MOD q ^ (l * m) - 1] := by
       have e : k * q ^ (i + 1) = k * q ^ i * q := by ring
@@ -56,7 +63,9 @@ theorem reg_step_of_dvd : ∀ q l m k : ℕ, 2 ≤ q → 0 < l → 0 < m → Reg
       simp only [← pow_mul] at hmod
       rw [mul_assoc, ← pow_add] at hmod
       have hla : l * a + l ≤ l * m := by
-        calc l * a + l = l * (a + 1) := by ring
+        calc
+          l * a + l
+            = l * (a + 1) := by ring
           _ ≤ l * m := Nat.mul_le_mul_left l ha
       rcases lt_trichotomy (i + l * a) j with hlt | heq | hgt
       · exact absurd hmod.symm (Reg.not_modEq_of_lt hq h hlt (by omega))

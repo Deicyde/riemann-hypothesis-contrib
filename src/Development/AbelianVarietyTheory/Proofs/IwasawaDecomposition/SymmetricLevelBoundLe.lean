@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Level
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
 open scoped TensorProduct
 
 noncomputable section
@@ -31,10 +33,14 @@ theorem symmetric_level_bound_le (k rS s : ℕ) : bd5 k rS s ≤ s := by
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {q : ℕ}
 
-theorem inJSym_of_mat (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal) {k rS r t n : ℕ} (hr : r = rSym k rS) (ht : 0 < t) (hn : r ≤ n)
-    {g : Sp E (n + 0) ≃ₗ[E] Sp E (n + 0)} (hg : g ∈ JGsym P q k rS r t n 0) {κ : Type} [Field κ]
-    (e : (𝓞 E ⧸ P.asIdeal) →+* κ) (M : Matrix (Fin n) (Fin n) κ) (hM : ∀ i j : Fin n, M i j = e (redP P (mat g i j))) :
-    InJSym k rS t false M := by
+theorem inJSym_of_mat
+    (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal)
+    {k rS r t n : ℕ} (hr : r = rSym k rS) (ht : 0 < t) (hn : r ≤ n)
+    {g : Sp E (n + 0) ≃ₗ[E] Sp E (n + 0)} (hg : g ∈ JGsym P q k rS r t n 0)
+    {κ : Type} [Field κ]
+    (e : (𝓞 E ⧸ P.asIdeal) →+* κ) (M : Matrix (Fin n) (Fin n) κ)
+    (hM : ∀ i j : Fin n, M i j = e (redP P (mat g i j)))
+    : InJSym k rS t false M := by
   subst hr
   have hr' : k + rS < rSym k rS := by
     unfold rSym
@@ -65,8 +71,10 @@ theorem inJSym_of_mat (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal) {k rS r t
       have h3 := Nat.div_mul_le_self (x.1 - rSym k rS) t
       have h4 := Nat.mul_le_mul_right t h1
       rw [mul_comm] at h2
-      rw [hM, mat_blk hq hP hr' hg ((y.1 - rSym k rS) / t + 1) x.1 y.1 x.2 (by omega) (by omega), map_zero]
-  · rw [hM, mat_col hq hP hr' hn hg x.1 x.1 x.2 hx (symmetric_level_bound_le _ _ _), if_pos rfl, map_one]
+      rw [hM, mat_blk hq hP hr' hg ((y.1 - rSym k rS) / t + 1) x.1 y.1 x.2 (by omega) (by omega),
+        map_zero]
+  · rw [hM, mat_col hq hP hr' hn hg x.1 x.1 x.2 hx (symmetric_level_bound_le _ _ _), if_pos rfl,
+      map_one]
   · have hyr : y.1 < rSym k rS := by omega
     have key : bd5 k rS (symIdx k rS y.1) ≤ symIdx k rS x.1 := by
       rw [hy]
@@ -74,11 +82,16 @@ theorem inJSym_of_mat (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal) {k rS r t
       split_ifs <;> omega
     rw [hM, mat_col hq hP hr' hn hg x.1 y.1 x.2 hyr key, if_neg (by omega), map_zero]
 
-theorem inJSym_of_prX (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal) {k rS r t n c : ℕ} (hc : c = 0) (hr : r = rSym k rS) (ht : 0 < t)
-    (hn : r ≤ n) {ρ : Sp E (n + c) ≃ₗ[E] Sp E (n + c)} (hρ : ρ ∈ JGsym P q k rS r t n c) {g : Sp E n ≃ₗ[E] Sp E n}
-    (hx : ∀ x, ρ (Loc.inX E n c x) = Loc.inX E n c (g x)) {κ : Type} [Field κ] (e : (𝓞 E ⧸ P.asIdeal) →+* κ)
-    (M : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal)) (hM : ∀ x ∈ stdAt E n P, redV P (g x) = M.mulVec (redV P x)) :
-    InJSym k rS t false (M.map e) := by
+theorem inJSym_of_prX
+    (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal)
+    {k rS r t n c : ℕ} (hc : c = 0) (hr : r = rSym k rS) (ht : 0 < t) (hn : r ≤ n)
+    {ρ : Sp E (n + c) ≃ₗ[E] Sp E (n + c)} (hρ : ρ ∈ JGsym P q k rS r t n c)
+    {g : Sp E n ≃ₗ[E] Sp E n} (hx : ∀ x, ρ (Loc.inX E n c x) = Loc.inX E n c (g x))
+    {κ : Type} [Field κ]
+    (e : (𝓞 E ⧸ P.asIdeal) →+* κ)
+    (M : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal))
+    (hM : ∀ x ∈ stdAt E n P, redV P (g x) = M.mulVec (redV P x))
+    : InJSym k rS t false (M.map e) := by
   subst hc
   refine inJSym_of_mat hq hP hr ht hn hρ e _ fun i j => ?_
   have h6 := congrFun (hM _ (TopStep.single_mem_stdAt j)) i
@@ -96,7 +109,19 @@ theorem inJSym_of_prX (hq : q ≠ 0) (hP : (q : 𝓞 E) ∈ P.asIdeal) {k rS r t
 
 end GlobalTheory.Mem.LastGrp
 
-theorem GlobalTheory.Mem.LastGrp.levG_le_JSymG : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ), X.Ok → Pr.Ok → IsSel X sel → L.Ok Ch sel mu cst G m2 → cst.sharp = true → ∀ (j : ℕ), j + 1 = R.m → ∀ (b : L.β j) (w : {w // w ∈ Pr.vGs}) (κ : Type) [Field κ] (e : (𝓞 X.E ⧸ w.1.asIdeal) ≃+* κ) (M : GL (Fin (R.N j)) (𝓞 X.E ⧸ w.1.asIdeal)), M ∈ (L.levG j b w).H → Matrix.GeneralLinearGroup.map e.toRingHom M ∈ JSymG κ (R.N j) R.k (rSD R) R.t false := by
+theorem GlobalTheory.Mem.LastGrp.levG_le_JSymG
+    : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
+        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ}
+        (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
+        (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ),
+      X.Ok → Pr.Ok → IsSel X sel → L.Ok Ch sel mu cst G m2 → cst.sharp = true
+        → ∀ (j : ℕ),
+          j + 1 = R.m
+            → ∀ (b : L.β j) (w : {w // w ∈ Pr.vGs}) (κ : Type) [Field κ]
+                (e : (𝓞 X.E ⧸ w.1.asIdeal) ≃+* κ) (M : GL (Fin (R.N j)) (𝓞 X.E ⧸ w.1.asIdeal)),
+              M ∈ (L.levG j b w).H
+                → Matrix.GeneralLinearGroup.map e.toRingHom M
+                  ∈ JSymG κ (R.N j) R.k (rSD R) R.t false := by
   intro X Pr R Ch sel S mu cst L G m2 hX hPr hSel hL hs j hj b w κ _ e M hM
   letI : StarRing X.E := X.starE
   have hm := hL.hm
@@ -117,8 +142,9 @@ theorem GlobalTheory.Mem.LastGrp.levG_le_JSymG : ∀ {X : Fields} {Pr : Primes X
     unfold Ranks.r Ranks.N
     rw [mul_add, mul_one]
     omega
-  have key : ∀ A : GL (Fin (R.N (m2 + 1))) (𝓞 X.E ⧸ w.1.asIdeal), A ∈ (L.levG (m2 + 1) b w).H →
-      InJSym R.k (rSD R) R.t false ((A.1).map e.toRingHom) := by
+  have key
+      : ∀ A : GL (Fin (R.N (m2 + 1))) (𝓞 X.E ⧸ w.1.asIdeal),
+        A ∈ (L.levG (m2 + 1) b w).H → InJSym R.k (rSD R) R.t false ((A.1).map e.toRingHom) := by
     intro A hA
     obtain ⟨g, hg, hred⟩ := (hL.grpG _ b w A).1 hA
     unfold prCat at hg

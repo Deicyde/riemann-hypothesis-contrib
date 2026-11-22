@@ -220,8 +220,9 @@ lemma tsum_cos_inf {X : Type} [AddCommMonoid X] [TopologicalSpace X] (Γ S : Sub
     rfl
   exact key _ _ e
 
-variable {L W : Type} [NormedAddCommGroup L] [NormedSpace ℂ L] [NormedAddCommGroup W]
-  [NormedSpace ℂ W] [CompleteSpace W]
+variable
+  {L W : Type} [NormedAddCommGroup L] [NormedSpace ℂ L] [NormedAddCommGroup W] [NormedSpace ℂ W]
+  [CompleteSpace W]
 
 lemma outer_apply {Γ Δ : Subgroup G} (ξ : G → ℝ) (H : ℂ → G → L →L[ℂ] W) (l : ℂ × ℂ) (g : G)
     (hs : Summable fun r : Cos Δ Γ => ‖Complex.exp (l.2 * ξ (rep r * g)) • H l.1 (rep r * g)‖)
@@ -233,8 +234,8 @@ end Series
 
 section Eis
 
-variable {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W]
-  [NormedSpace ℂ W]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
 
 lemma eis_smul (Γ K P : Subgroup G) (c : G → ℂ) (ρ : K →* (W →L[ℂ] W)) (Λ : G → ℂ) (g : G) (s : ℂ)
     (w : W) : eis Γ K P c ρ Λ g (s • w) = s • eis Γ K P c ρ Λ g w := by

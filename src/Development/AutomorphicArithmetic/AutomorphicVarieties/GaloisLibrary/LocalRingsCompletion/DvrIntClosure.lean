@@ -8,9 +8,12 @@ open PowerSeries IsLocalRing UpperTheory.V.abelian₂
 open IsDiscreteValuationRing (addVal)
 open scoped Pointwise TensorProduct Topology
 
-private theorem UpperTheory.V.abelian₂.isIntegral_iff_norm_le_one_bis {l : ℕ} [Fact l.Prime] {K : Type} [Field K]
-    [Algebra ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K] [FiniteDimensional ℚ_[l] K]
-    (φ : K →ₐ[ℚ_[l]] PadicAlgCl l) (x : K) : IsIntegral ℤ_[l] x ↔ ‖φ x‖ ≤ 1 := by
+private theorem UpperTheory.V.abelian₂.isIntegral_iff_norm_le_one_bis
+    {l : ℕ} [Fact l.Prime]
+    {K : Type} [Field K] [Algebra ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
+    [FiniteDimensional ℚ_[l] K]
+    (φ : K →ₐ[ℚ_[l]] PadicAlgCl l) (x : K)
+    : IsIntegral ℤ_[l] x ↔ ‖φ x‖ ≤ 1 := by
   have hi : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   have h0 : ‖φ x‖ = spectralValue (minpoly ℚ_[l] (φ x)) := rfl
   rw [h0, minpoly.algHom_eq φ φ.injective, spectralValue_le_one_iff (minpoly.monic hi)]
@@ -22,19 +25,22 @@ private theorem UpperTheory.V.abelian₂.isIntegral_iff_norm_le_one_bis {l : ℕ
     have hl' : minpoly ℚ_[l] x ∈ Polynomial.lifts (algebraMap ℤ_[l] ℚ_[l]) :=
       (Polynomial.lifts_iff_coeff_lifts _).mpr fun n => ⟨⟨_, h n⟩, rfl⟩
     obtain ⟨q, hq, -, hqm⟩ := Polynomial.lifts_and_degree_eq_and_monic hl' (minpoly.monic hi)
-    exact ⟨q, hqm, by
-      rw [← Polynomial.aeval_def, ← Polynomial.aeval_map_algebraMap ℚ_[l], hq, minpoly.aeval]⟩
+    exact ⟨
+      q,
+      hqm,
+      by rw [← Polynomial.aeval_def, ← Polynomial.aeval_map_algebraMap ℚ_[l], hq, minpoly.aeval]
+    ⟩
 
-theorem UpperTheory.V.abelian₂.dvr_intClosure :
-    ∀ (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Algebra ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
-      [FiniteDimensional ℚ_[l] K],
-      IsDiscreteValuationRing (integralClosure ℤ_[l] K) ∧ Module.Finite ℤ_[l] (integralClosure ℤ_[l] K) ∧
-        IsFractionRing (integralClosure ℤ_[l] K) K := by
+theorem UpperTheory.V.abelian₂.dvr_intClosure
+    : ∀ (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Algebra ℚ_[l] K] [Algebra ℤ_[l] K]
+        [IsScalarTower ℤ_[l] ℚ_[l] K] [FiniteDimensional ℚ_[l] K],
+      IsDiscreteValuationRing (integralClosure ℤ_[l] K)
+        ∧ Module.Finite ℤ_[l] (integralClosure ℤ_[l] K)
+        ∧ IsFractionRing (integralClosure ℤ_[l] K) K := by
   intro l hl K _ _ _ _ _
   let φ : K →ₐ[ℚ_[l]] PadicAlgCl l := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hint := UpperTheory.V.abelian₂.isIntegral_iff_norm_le_one_bis φ
   have hunit : ∀ a : integralClosure ℤ_[l] K, ‖φ a‖ = 1 → IsUnit a := by
@@ -43,9 +49,9 @@ theorem UpperTheory.V.abelian₂.dvr_intClosure :
       intro h
       rw [h] at ha
       simp at ha
-    have hi : IsIntegral ℤ_[l] (a : K)⁻¹ := by
-      rw [hint, map_inv₀, norm_inv, ha, inv_one]
-    exact IsUnit.of_mul_eq_one (⟨_, hi⟩ : integralClosure ℤ_[l] K) (Subtype.ext (mul_inv_cancel₀ h0))
+    have hi : IsIntegral ℤ_[l] (a : K)⁻¹ := by rw [hint, map_inv₀, norm_inv, ha, inv_one]
+    exact IsUnit.of_mul_eq_one (⟨_, hi⟩ : integralClosure ℤ_[l] K)
+      (Subtype.ext (mul_inv_cancel₀ h0))
   have hloc : IsLocalRing (integralClosure ℤ_[l] K) := by
     refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => ?_
     have ha : ‖φ a‖ ≤ 1 := (hint _).1 a.2
@@ -67,6 +73,8 @@ theorem UpperTheory.V.abelian₂.dvr_intClosure :
     exact IsFractionRing.injective ℤ_[l] ℚ_[l] ((algebraMap ℚ_[l] K).injective h)
   have hnf : ¬ IsField (integralClosure ℤ_[l] K) := fun hf =>
     IsDiscreteValuationRing.not_isField ℤ_[l] ((Algebra.IsIntegral.isField_iff_isField hinj).2 hf)
-  exact ⟨((IsDiscreteValuationRing.TFAE _ hnf).out 1 3).mpr hded,
+  exact ⟨
+    ((IsDiscreteValuationRing.TFAE _ hnf).out 1 3).mpr hded,
     IsIntegralClosure.finite ℤ_[l] ℚ_[l] K (integralClosure ℤ_[l] K),
-    integralClosure.isFractionRing_of_finite_extension ℚ_[l] K⟩
+    integralClosure.isFractionRing_of_finite_extension ℚ_[l] K
+  ⟩

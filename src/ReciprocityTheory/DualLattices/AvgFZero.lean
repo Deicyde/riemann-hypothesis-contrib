@@ -14,14 +14,19 @@ open ReciprocityTheory.PGsh.L2
 
 section Lift1
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 variable {G : Type} [CommGroup G] [Fintype G] (β : G → O)
 
-def avgF (H : HodgeTateDatum p g v R O σ cp) (U : UnramData p g v R O σ cp H) (i : Fin U.m) (c₀ : R)
-    (F : Nb p g → C) (y : Nb p g) : C :=
+def avgF
+    (H : HodgeTateDatum p g v R O σ cp) (U : UnramData p g v R O σ cp H) (i : Fin U.m)
+    (c₀ : R) (F : Nb p g → C) (y : Nb p g)
+    : C :=
   ∑ γ, algebraMap R C (c₀ * U.sg i (β γ⁻¹)) * F (nbAct H (β γ) y)
 
 lemma avgF_mem {H : HodgeTateDatum p g v R O σ cp} (U : UnramData p g v R O σ cp H) (i : Fin U.m) (c₀ : R)

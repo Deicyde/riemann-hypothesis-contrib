@@ -7,22 +7,32 @@ public import Formalism.LocalToGlobal.GroupLattices.JointServices.LevelOperatorF
 @[expose] public section
 
 open Module NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions.G Formalism.MainNotions.WeilJacquetShalikaLaw Formalism.L2.DIV Formalism.L2.Indef
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions.G
+  Formalism.MainNotions.WeilJacquetShalikaLaw Formalism.L2.DIV Formalism.L2.Indef
 
 noncomputable section
 
 namespace Formalism.L2.G.ServJoint
 
-theorem perCol_lin (D : D7) (u : D.what₂.Word) (μ : D.what₂.Tup) (φ : D.what₂.Mu u) :
-    ∃ f : D.what₂.Amb μ →ₗ[ℂ] ℂ, ∀ F, D.what₂.perCol u μ φ F = f F := by
+theorem perCol_lin (D : D7) (u : D.what₂.Word) (μ : D.what₂.Tup) (φ : D.what₂.Mu u)
+    : ∃ f : D.what₂.Amb μ →ₗ[ℂ] ℂ, ∀ F, D.what₂.perCol u μ φ F = f F := by
   by_cases h : μ = D.what₂.mu0
   · subst h
-    refine ⟨((D.mem u).P.period ((D.mem u).P.lowerMap ((D.mem u).P.evz ((D.mem u).C.col ↑(D.eMu u φ))))).comp
-      (D.eMt u).symm.toLinearMap, fun F => ?_⟩
+    refine ⟨
+      ((D.mem u).P.period
+          ((D.mem u).P.lowerMap ((D.mem u).P.evz ((D.mem u).C.col ↑(D.eMu u φ))))).comp
+        (D.eMt u).symm.toLinearMap,
+      fun F => ?_
+    ⟩
     rw [D.perCol_base_eq_PtilCol]
     rfl
-  · refine ⟨((D.PTw u μ).period ((D.PTw u μ).lowerMap ((D.PTw u μ).evz
-      ((D.chTw u μ).col (D.e0Tw u μ ↑(D.eMu u φ)))))).comp (D.eMtTw u μ).symm.toLinearMap, fun F => ?_⟩
+  · refine ⟨
+      ((D.PTw u μ).period
+          ((D.PTw u μ).lowerMap
+            ((D.PTw u μ).evz ((D.chTw u μ).col (D.e0Tw u μ ↑(D.eMu u φ)))))).comp
+        (D.eMtTw u μ).symm.toLinearMap,
+      fun F => ?_
+    ⟩
     rw [D.perCol_tie u μ h]
     rfl
 
@@ -40,8 +50,11 @@ theorem perToVal2 : PerToVal2 := by
     intro φ hφ
     induction hφ using Submodule.span_induction with
     | mem x hx =>
-      have hex : ∀ y : D.what₂.Amb (B.I.tup t), ∃ a : D.what₂.LL, y ∈ S →
-          (D.what₂.embLL a = D.what₂.perCol u (B.I.tup t) (D.jN u (B.I.eNu u x)) y ∧ (a = 0 ∨ s ≤ (vAdd z a : ℝ))) := by
+      have hex
+          : ∀ y : D.what₂.Amb (B.I.tup t), ∃ a : D.what₂.LL,
+            y ∈ S
+              → (D.what₂.embLL a = D.what₂.perCol u (B.I.tup t) (D.jN u (B.I.eNu u x)) y
+                ∧ (a = 0 ∨ s ≤ (vAdd z a : ℝ))) := by
         intro y
         by_cases hy : y ∈ S
         · obtain ⟨a, ha⟩ := h x hx y (hS hy).1 (hS hy).2
@@ -74,16 +87,25 @@ theorem val2AllAtR : SecondLevelValuationAtRestricted := by
   intro D L B hB hcut h u Nu hNu z
   have hμ := hB.mu (D.plEq.symm z)
   rw [Equiv.apply_symm_apply] at hμ
-  have h2 : ∀ μ, D.what₂.muAt (D.plEq.symm z) = μ → ∀ φ ∈ L.NuLat u, ∀ F ∈ (D.what₂.Mtilde μ).carrier, F ∈ D.what₂.V0 μ →
-      ∃ y : D.what₂.LL, D.what₂.embLL y = D.what₂.perCol u μ (D.jN u φ) F ∧
-        (y = 0 ∨ ((⌊ur D (D.plEq.symm z) (L.sg u (D.plEq.symm z))⌋ : ℤ) : ℝ) ≤ (vAdd (D.plEq (D.plEq.symm z)) y : ℝ)) := by
+  have h2
+      : ∀ μ,
+        D.what₂.muAt (D.plEq.symm z) = μ
+          → ∀ φ ∈ L.NuLat u, ∀ F ∈ (D.what₂.Mtilde μ).carrier,
+            F ∈ D.what₂.V0 μ
+              → ∃ y : D.what₂.LL,
+                D.what₂.embLL y = D.what₂.perCol u μ (D.jN u φ) F
+                  ∧ (y = 0
+                    ∨ ((⌊ur D (D.plEq.symm z) (L.sg u (D.plEq.symm z))⌋ : ℤ) : ℝ)
+                      ≤ (vAdd (D.plEq (D.plEq.symm z)) y : ℝ)) := by
     rintro μ rfl
     exact h u (D.plEq.symm z)
-  have h3 := perToVal2 D B hB u (B.S1.μ z) (hcut _ (hμ ▸ used_muAt D (D.plEq.symm z))) z ((⌊ur D (D.plEq.symm z) (L.sg u (D.plEq.symm z))⌋ : ℤ) : ℝ) (Nu : Set _)
-    (fun x hx F hF1 hF0 => by
-      have h4 := h2 _ hμ _ (hNu x hx) F hF1 hF0
-      rw [Equiv.apply_symm_apply] at h4
-      exact h4)
+  have h3 :=
+    perToVal2 D B hB u (B.S1.μ z) (hcut _ (hμ ▸ used_muAt D (D.plEq.symm z))) z
+      ((⌊ur D (D.plEq.symm z) (L.sg u (D.plEq.symm z))⌋ : ℤ) : ℝ) (Nu : Set _)
+      (fun x hx F hF1 hF0 => by
+        have h4 := h2 _ hμ _ (hNu x hx) F hF1 hF0
+        rw [Equiv.apply_symm_apply] at h4
+        exact h4)
   rw [Submodule.span_eq] at h3
   exact h3
 

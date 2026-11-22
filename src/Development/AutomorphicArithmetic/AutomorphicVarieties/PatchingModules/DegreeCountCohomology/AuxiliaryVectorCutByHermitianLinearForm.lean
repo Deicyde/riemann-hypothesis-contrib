@@ -6,11 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem linearMap_comp_eq_on_smul_of_eq (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (φ : ℤ_[l] →+* R)
-    (h : ∀ y : R, l • y = 0) (τ : R →+ ZMod l) (a : ℤ_[l]) (y : R) :
-    τ (φ a * y) = PadicInt.toZMod a * τ y := by
+private theorem linearMap_comp_eq_on_smul_of_eq
+    (l : ℕ) [Fact l.Prime]
+    (R : Type) [CommRing R]
+    (φ : ℤ_[l] →+* R) (h : ∀ y : R, l • y = 0) (τ : R →+ ZMod l) (a : ℤ_[l]) (y : R)
+    : τ (φ a * y) = PadicInt.toZMod a * τ y := by
   have hspec := PadicInt.toZMod_spec a
   rw [PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton'] at hspec
   obtain ⟨c, hc⟩ := hspec
@@ -23,9 +26,10 @@ private theorem linearMap_comp_eq_on_smul_of_eq (l : ℕ) [Fact l.Prime] (R : Ty
     rw [e, add_mul, mul_assoc, ← nsmul_eq_mul l y, h y, mul_zero, zero_add]
   rw [key, ← nsmul_eq_mul, map_nsmul, nsmul_eq_mul, ZMod.natCast_zmod_val]
 
-private theorem hermOrthExt_gram_entry_eq_single_and_frame_gram_eq_zero (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l] (m : ℕ) :
-    ∃ τ : (PowerSeries k ⧸ Ideal.span {(PowerSeries.X : PowerSeries k) ^ m}) →+ ZMod l,
-      ∀ y, (∀ z, τ (y * z) = 0) → y = 0 := by
+private theorem hermOrthExt_gram_entry_eq_single_and_frame_gram_eq_zero
+    (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l] (m : ℕ)
+    : ∃ τ : (PowerSeries k ⧸ Ideal.span {(PowerSeries.X : PowerSeries k) ^ m}) →+ ZMod l, ∀ y,
+      (∀ z, τ (y * z) = 0) → y = 0 := by
   cases m with
   | zero =>
     refine ⟨0, fun y _ => ?_⟩
@@ -37,10 +41,18 @@ private theorem hermOrthExt_gram_entry_eq_single_and_frame_gram_eq_zero (l : ℕ
     obtain ⟨lam, -, hlam, -⟩ := UpperTheory.V.AlgebraTools.frob_form_trunc (k := k) l k0
     exact ⟨lam, hlam⟩
 
-theorem UpperTheory.V.Pa.pair1 :
-    ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n) (m : ℕ), ∃ τ : x.Am m →+ ZMod l, (∀ y, (∀ z, τ (y * z) = 0) → y = 0) ∧ ∀ (a : ℤ_[l]) y, τ (algebraMap x.A (x.Am m) (algebraMap ℤ_[l] x.A a) * y) = PadicInt.toZMod a * τ y := by
+theorem UpperTheory.V.Pa.pair1
+    : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n) (m : ℕ), ∃ τ : x.Am m →+ ZMod l,
+      (∀ y, (∀ z, τ (y * z) = 0) → y = 0)
+        ∧ ∀ (a : ℤ_[l]) y,
+          τ (algebraMap x.A (x.Am m) (algebraMap ℤ_[l] x.A a) * y) = PadicInt.toZMod a * τ y := by
   intro l _ F n x m
   obtain ⟨-, -, -, h4, -, -, -, -, hc⟩ := finAm l F n x m 0
   obtain ⟨τ, hτ⟩ := hermOrthExt_gram_entry_eq_single_and_frame_gram_eq_zero l x.K m
-  exact ⟨τ, hτ, fun a y =>
-    linearMap_comp_eq_on_smul_of_eq l (x.Am m) ((algebraMap x.A (x.Am m)).comp (algebraMap ℤ_[l] x.A)) h4 τ a y⟩
+  exact ⟨
+    τ,
+    hτ,
+    fun a y =>
+      linearMap_comp_eq_on_smul_of_eq l (x.Am m)
+        ((algebraMap x.A (x.Am m)).comp (algebraMap ℤ_[l] x.A)) h4 τ a y
+  ⟩

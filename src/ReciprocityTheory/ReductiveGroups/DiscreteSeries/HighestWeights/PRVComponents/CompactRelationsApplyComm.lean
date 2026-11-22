@@ -28,9 +28,12 @@ lemma compactRelations_apply_comm {ε : Fin n → Bool} {M : Type*} [AddCommGrou
   rw [h']
   split_ifs <;> (try simp only [LinearMap.zero_apply]) <;> abel
 
-theorem kIrrHW_int' (ε : Fin n → Bool) {M : Type*} [AddCommGroup M] [Module ℂ M]
-    {F : Fin n → Fin n → Module.End ℂ M} (hF : Formalism.REAL.KRel ε F) {Λ : Fin n → ℝ} {V : Submodule ℂ M}
-    (hV : IsKIrrHW ε F Λ V) : ∀ a b, a < b → ε a = ε b → ∃ m : ℕ, Λ a - Λ b = m := by
+theorem kIrrHW_int'
+    (ε : Fin n → Bool)
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
+    {F : Fin n → Fin n → Module.End ℂ M} (hF : Formalism.REAL.KRel ε F)
+    {Λ : Fin n → ℝ} {V : Submodule ℂ M} (hV : IsKIrrHW ε F Λ V)
+    : ∀ a b, a < b → ε a = ε b → ∃ m : ℕ, Λ a - Λ b = m := by
   intro a b hab hε
   obtain ⟨hfin, hst, -, w, hwV, hw0, hwt, hwh⟩ := hV
   have hne : a ≠ b := ne_of_lt hab
@@ -65,7 +68,8 @@ theorem kIrrHW_int' (ε : Fin n → Bool) {M : Type*} [AddCommGroup M] [Module �
       push_cast
       module
 
-  have hE : ∀ k : ℕ, F a b (v (k + 1)) = ((((k : ℝ) + 1) * (Λ a - Λ b - (k : ℝ)) : ℝ) : ℂ) • v k := by
+  have hE
+      : ∀ k : ℕ, F a b (v (k + 1)) = ((((k : ℝ) + 1) * (Λ a - Λ b - (k : ℝ)) : ℝ) : ℂ) • v k := by
     intro k
     induction k with
     | zero =>
@@ -75,7 +79,8 @@ theorem kIrrHW_int' (ε : Fin n → Bool) {M : Type*} [AddCommGroup M] [Module �
       push_cast
       module
     | succ k ih =>
-      have c := compactRelations_apply_comm hF (a := a) (b := b) (c := b) (d := a) hε hε.symm (v (k + 1))
+      have c :=
+        compactRelations_apply_comm hF (a := a) (b := b) (c := b) (d := a) hε hε.symm (v (k + 1))
       simp only [if_true] at c
       rw [hvs (k + 1), c, ih, map_smul, ← hvs k, hA (k + 1), hB (k + 1)]
       push_cast
@@ -94,8 +99,8 @@ theorem kIrrHW_int' (ε : Fin n → Bool) {M : Type*} [AddCommGroup M] [Module �
       have h2 : (k : ℝ) = (j : ℝ) := by linarith
       exact_mod_cast h2
     have hli : LinearIndependent ℂ v :=
-      Module.End.eigenvectors_linearIndependent' (F a a) _ hinj v
-        (fun k => Module.End.hasEigenvector_iff.mpr ⟨Module.End.mem_eigenspace_iff.mpr (hA k), hall k⟩)
+      Module.End.eigenvectors_linearIndependent' (F a a) _ hinj v (fun k =>
+        Module.End.hasEigenvector_iff.mpr ⟨Module.End.mem_eigenspace_iff.mpr (hA k), hall k⟩)
     have hli' : LinearIndependent ℂ (fun k => (⟨v k, hmem k⟩ : V)) :=
       LinearIndependent.of_comp V.subtype hli
     have : Module.Finite ℂ V := hfin

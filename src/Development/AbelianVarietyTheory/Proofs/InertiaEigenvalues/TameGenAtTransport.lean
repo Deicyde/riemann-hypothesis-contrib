@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CcSymmAlg
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -22,8 +25,8 @@ section Galois
 
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
 
-def conjHom (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y) :
-    G E Ω →* G E Ω where
+def conjHom (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y)
+    : G E Ω →* G E Ω where
   toFun := GlobalTheory.AntiRamConj.conjAut c hc
   map_one' := by
     ext x
@@ -33,17 +36,23 @@ def conjHom (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E �
     change c (g (h (c.symm x))) = c (g (c.symm (c (h (c.symm x)))))
     rw [RingEquiv.symm_apply_apply]
 
-theorem conjHom_apply (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y)
-    (g : G E Ω) (x : Ω) : conjHom c hc g x = c (g (c.symm x)) := rfl
+theorem conjHom_apply
+    (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y)
+    (g : G E Ω) (x : Ω)
+    : conjHom c hc g x = c (g (c.symm x)) :=
+  rfl
 
-theorem continuous_conjHom (c : Ω ≃+* Ω)
-    (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y) : Continuous (conjHom c hc) := by
+theorem continuous_conjHom
+    (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y)
+    : Continuous (conjHom c hc) := by
   refine continuous_of_continuousAt_one _ ?_
   rw [ContinuousAt, map_one]
   intro U hU
   obtain ⟨L, hL, hLU⟩ := (krullTopology_mem_nhds_one_iff E Ω U).1 hU
-  obtain ⟨S, hS⟩ := IntermediateField.fg_of_fg_toSubalgebra L (Subalgebra.fg_of_fg_toSubmodule
-    ((Submodule.fg_iff_finiteDimensional L.toSubalgebra.toSubmodule).2 hL))
+  obtain ⟨S, hS⟩ :=
+    IntermediateField.fg_of_fg_toSubalgebra L
+      (Subalgebra.fg_of_fg_toSubmodule
+        ((Submodule.fg_iff_finiteDimensional L.toSubalgebra.toSubmodule).2 hL))
   classical
   let L' := IntermediateField.adjoin E ((S.image c.symm : Finset Ω) : Set Ω)
   have hL' : FiniteDimensional E L' :=
@@ -57,17 +66,19 @@ theorem continuous_conjHom (c : Ω ≃+* Ω)
     rw [SetLike.mem_coe, IntermediateField.mem_fixedField_iff]
     intro f hf
     have h1 : conjHom c hc g x = x := by
-      rw [conjHom_apply, hg _ (IntermediateField.subset_adjoin _ _ (by simpa using hx)), RingEquiv.apply_symm_apply]
+      rw [conjHom_apply, hg _ (IntermediateField.subset_adjoin _ _ (by simpa using hx)),
+        RingEquiv.apply_symm_apply]
     exact (Subgroup.zpowers_le (H := MulAction.stabilizer (G E Ω) x)).2 h1 hf
   rw [SetLike.mem_coe, IntermediateField.mem_fixingSubgroup_iff]
   intro x hx
   exact (IntermediateField.mem_fixedField_iff _ _).1 (key hx) _ (Subgroup.mem_zpowers _)
 
-theorem tameGenAt_transport (c : Ω ≃+* Ω)
-    (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y)
+theorem tameGenAt_transport
+    (c : Ω ≃+* Ω) (hc : ∀ x : E, ∃ y : E, c.symm (algebraMap E Ω x) = algebraMap E Ω y)
     (hc' : ∀ x : E, ∃ y : E, c (algebraMap E Ω x) = algebraMap E Ω y)
-    {B B' : ValuationSubring Ω} (hB : ∀ y, y ∈ B ↔ c y ∈ B') {γ γ' : G E Ω} (hγ : ∀ y, γ' (c y) = c (γ y))
-    (h : TameGenAt B γ) : TameGenAt B' γ' := by
+    {B B' : ValuationSubring Ω} (hB : ∀ y, y ∈ B ↔ c y ∈ B')
+    {γ γ' : G E Ω} (hγ : ∀ y, γ' (c y) = c (γ y)) (h : TameGenAt B γ)
+    : TameGenAt B' γ' := by
   have hc'' : ∀ x : E, ∃ y : E, c.symm.symm (algebraMap E Ω x) = algebraMap E Ω y := hc'
   have eB : B' = GlobalTheory.AntiRamConj.moveVal c B := by
     ext y
@@ -95,13 +106,15 @@ theorem tameGenAt_transport (c : Ω ≃+* Ω)
   rintro _ ⟨a, ha | ha, rfl⟩
   · exact Or.inl (congrArg f ha)
   · refine Or.inr fun y hy => ?_
-    rw [GlobalTheory.AntiRamConj.moveVal_lt_one, map_sub, map_div₀, map_one, conjHom_apply, RingEquiv.symm_apply_apply]
+    rw [GlobalTheory.AntiRamConj.moveVal_lt_one, map_sub, map_div₀, map_one, conjHom_apply,
+      RingEquiv.symm_apply_apply]
     exact ha _ ((map_ne_zero_iff _ c.symm.injective).2 hy)
 
 end Galois
 
-theorem main : ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut),
-    GlobalTheory.PendOf.LabAll D T → IneRep D ∧ LabDepth D ∧ LabGen D := by
+theorem main
+    : ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut),
+      GlobalTheory.PendOf.LabAll D T → IneRep D ∧ LabDepth D ∧ LabGen D := by
   intro D T ⟨γ, h1, h2, h3⟩
   have hG : GenFam D γ := by
     refine ⟨h1, fun k w hw => ?_⟩
@@ -109,12 +122,17 @@ theorem main : ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut),
     · rw [h1]
       exact D.ntypes.tg_gen k v
     · obtain ⟨c, hc1, hc2, hc3⟩ := h2 k v w hv
-      refine tameGenAt_transport c (fun x => ⟨D.host.conj x, ?_⟩) (fun x => ⟨_, hc1 x⟩) hc2 hc3
-        (D.ntypes.tg_gen k v)
+      refine tameGenAt_transport c
+        (fun x => ⟨D.host.conj x, ?_⟩)
+        (fun x => ⟨_, hc1 x⟩)
+        hc2 hc3 (D.ntypes.tg_gen k v)
       rw [RingEquiv.symm_apply_eq, hc1, GlobalTheory.AntiRamConj.host_conj_conj]
   have h3' : GlobalTheory.PendOf.Model.LabAll T γ := h3
-  exact ⟨GlobalTheory.PendOf.Model.ineRep_of_tie T, GlobalTheory.PendOf.Model.labDepth_of_tie T hG h3',
-    GlobalTheory.PendOf.Model.labGen_of_tie T hG h3'⟩
+  exact ⟨
+    GlobalTheory.PendOf.Model.ineRep_of_tie T,
+    GlobalTheory.PendOf.Model.labDepth_of_tie T hG h3',
+    GlobalTheory.PendOf.Model.labGen_of_tie T hG h3'
+  ⟩
 
 end GlobalTheory.LabTies
 

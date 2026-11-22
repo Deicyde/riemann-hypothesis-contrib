@@ -42,10 +42,10 @@ theorem heightRecR_full : HeightRecR.Statement :=
   HeightRecR.proof OrbitDivVertical.proof
     (OrbitFiniteSum.proof OrbitDegreeRatio.proof
       (OrbitLocalSum.proof OrbitChartRing.proof hM
-        (OrbitChartResidue.proof hM hQ (OrbitChartDehom.proof hM hQ))
-        OrbitChartMult.proof
+        (OrbitChartResidue.proof hM hQ (OrbitChartDehom.proof hM hQ)) OrbitChartMult.proof
         (LocalLengthPlaces.proof LocalQuotCard.proof CentredPlacesFinite.proof
-          (LocalQuotCentred.proof CentredRingNormal.proof LocalNormalIndex.proof) PlacesRingQuot.proof)
+          (LocalQuotCentred.proof CentredRingNormal.proof LocalNormalIndex.proof)
+          PlacesRingQuot.proof)
         OrbitCenterChart.proof PlaceCentredSum.proof OrbitChartTerm.proof)
       (OrbitCenterZero.proof OrbitCenterLe.proof hIff
         (OrbitCenterDivSupp.proof hIff (OrbitCenterPrime.proof hIff) SubringPrimeMaximal.proof)))

@@ -4,21 +4,25 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open MeasureTheory GroundTheory.Automorphic.Spherical UpperTheory.Gal.Gen
 
-theorem UpperTheory.Gal.Gen.ellGrp_pf :
-    UpperTheory.Gal.Gen.EllGrp := by
+theorem UpperTheory.Gal.Gen.ellGrp_pf : UpperTheory.Gal.Gen.EllGrp := by
   classical
   intro G H _ _ Γ C lam hyp
-  have key : ∀ (r γ₁ γ₂ : G), γ₁ ∈ Γ → γ₂ ∈ Γ → ∀ c₁ c₂ : C,
-      γ₁ * r * c₁ = γ₂ * r * c₂ → lam c₁ = lam c₂ := by
+  have key
+      : ∀ (r γ₁ γ₂ : G),
+        γ₁ ∈ Γ → γ₂ ∈ Γ → ∀ c₁ c₂ : C, γ₁ * r * c₁ = γ₂ * r * c₂ → lam c₁ = lam c₂ := by
     intro r γ₁ γ₂ h1 h2 c₁ c₂ h
     have h' : γ₂⁻¹ * γ₁ * r = r * ((c₂ * c₁⁻¹ : C) : G) := by
       rw [Subgroup.coe_mul, Subgroup.coe_inv]
-      calc γ₂⁻¹ * γ₁ * r = γ₂⁻¹ * (γ₁ * r * c₁) * (c₁ : G)⁻¹ := by group
+      calc
+        γ₂⁻¹ * γ₁ * r
+          = γ₂⁻¹ * (γ₁ * r * c₁) * (c₁ : G)⁻¹ := by group
         _ = γ₂⁻¹ * (γ₂ * r * c₂) * (c₁ : G)⁻¹ := by rw [h]
         _ = r * ((c₂ : G) * (c₁ : G)⁻¹) := by group
     have h3 := hyp r _ (Γ.mul_mem (Γ.inv_mem h2) h1) _ h'
@@ -36,8 +40,7 @@ theorem UpperTheory.Gal.Gen.ellGrp_pf :
     intro g g' hg
     obtain ⟨γ, hγ, c, e⟩ := (hR g g').1 hg
     exact (hR g' g).2 ⟨γ⁻¹, Γ.inv_mem hγ, c⁻¹, by rw [e, Subgroup.coe_inv]; group⟩
-  obtain ⟨rep, hrep⟩ : ∃ rep : G → G, ∀ g, rep g = Classical.epsilon (· ∈ R g) :=
-    ⟨_, fun _ => rfl⟩
+  obtain ⟨rep, hrep⟩ : ∃ rep : G → G, ∀ g, rep g = Classical.epsilon (· ∈ R g) := ⟨_, fun _ => rfl⟩
   have hrepR : ∀ g g', g' ∈ R g → rep g' = rep g := by
     intro g g' hg
     have hRR : R g' = R g := Set.Subset.antisymm (hsub g g' hg) (hsub g' g (hsymm g g' hg))

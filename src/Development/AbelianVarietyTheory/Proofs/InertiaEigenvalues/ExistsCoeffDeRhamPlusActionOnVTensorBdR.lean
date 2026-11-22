@@ -5,31 +5,37 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZAEqAlg
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.BKGal.JumpDR
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem exists_odAction : ∀ (l : ℕ) [Fact l.Prime] (Pl : LocPrime l) (AI : LocAinf l Pl) (Td : LocTied l Pl AI)
-    (LL : FinExt l) (T : QLat LL), ∃ A : OD l ↥(OL LL) →+ (T.V ⊗[ℚ_[l]] Pl.R.BdR →+ T.V ⊗[ℚ_[l]] Pl.R.BdR),
-    ∀ (o : ↥(OL LL)) (b : Per.BdRp l) (v : T.V) (c : Pl.R.BdR),
-      A (o ⊗ₜ[ℤ_[l]] b) (v ⊗ₜ[ℚ_[l]] c) = ((o : ↥LL.1) • v) ⊗ₜ[ℚ_[l]] (GlobalTheory.BKGal.JumpDR.cD Td b * c) := by
+theorem exists_odAction
+    : ∀ (l : ℕ) [Fact l.Prime] (Pl : LocPrime l) (AI : LocAinf l Pl) (Td : LocTied l Pl AI)
+        (LL : FinExt l) (T : QLat LL),
+      ∃ A : OD l ↥(OL LL) →+ (T.V ⊗[ℚ_[l]] Pl.R.BdR →+ T.V ⊗[ℚ_[l]] Pl.R.BdR),
+        ∀ (o : ↥(OL LL)) (b : Per.BdRp l) (v : T.V) (c : Pl.R.BdR),
+          A (o ⊗ₜ[ℤ_[l]] b) (v ⊗ₜ[ℚ_[l]] c)
+            = ((o : ↥LL.1) • v) ⊗ₜ[ℚ_[l]] (GlobalTheory.BKGal.JumpDR.cD Td b * c) := by
   intro l _ Pl AI Td LL T
-  let φ : ↥(OL LL) → T.V →ₗ[ℚ_[l]] T.V := fun o =>
-    { toFun := fun v => (o : ↥LL.1) • v
-      map_add' := fun v w => smul_add _ v w
-      map_smul' := fun q v => by
-        simp only [RingHom.id_apply]
-        rw [← algebraMap_smul (↥LL.1) q v, ← algebraMap_smul (↥LL.1) q ((o : ↥LL.1) • v), smul_smul, smul_smul,
-          mul_comm] }
-  let F : ↥(OL LL) → Per.BdRp l → (T.V ⊗[ℚ_[l]] Pl.R.BdR →ₗ[ℚ_[l]] T.V ⊗[ℚ_[l]] Pl.R.BdR) := fun o b =>
-    TensorProduct.map (φ o) (LinearMap.mulLeft ℚ_[l] (cD Td b))
-  have hF : ∀ o b v c, F o b (v ⊗ₜ[ℚ_[l]] c) = ((o : ↥LL.1) • v) ⊗ₜ[ℚ_[l]] (cD Td b * c) := fun o b v c => rfl
+  let φ : ↥(OL LL) → T.V →ₗ[ℚ_[l]] T.V := fun o => {
+    toFun := fun v => (o : ↥LL.1) • v
+    map_add' := fun v w => smul_add _ v w
+    map_smul' := fun q v => by
+      simp only [RingHom.id_apply]
+      rw [← algebraMap_smul (↥LL.1) q v, ← algebraMap_smul (↥LL.1) q ((o : ↥LL.1) • v), smul_smul,
+        smul_smul, mul_comm]
+  }
+  let F : ↥(OL LL) → Per.BdRp l → (T.V ⊗[ℚ_[l]] Pl.R.BdR →ₗ[ℚ_[l]] T.V ⊗[ℚ_[l]] Pl.R.BdR) :=
+    fun o b => TensorProduct.map (φ o) (LinearMap.mulLeft ℚ_[l] (cD Td b))
+  have hF : ∀ o b v c, F o b (v ⊗ₜ[ℚ_[l]] c) = ((o : ↥LL.1) • v) ⊗ₜ[ℚ_[l]] (cD Td b * c) :=
+    fun o b v c => rfl
   have hb : ∀ o b b', F o (b + b') = F o b + F o b' := fun o b b' => by
     apply TensorProduct.ext'
     intro v c
@@ -39,13 +45,21 @@ theorem exists_odAction : ∀ (l : ℕ) [Fact l.Prime] (Pl : LocPrime l) (AI : L
     intro v c
     rw [LinearMap.add_apply, hF, hF, hF, Subalgebra.coe_add, add_smul, add_tmul]
   let f : ↥(OL LL) →+ Per.BdRp l →+ (T.V ⊗[ℚ_[l]] Pl.R.BdR →+ T.V ⊗[ℚ_[l]] Pl.R.BdR) :=
-    AddMonoidHom.mk' (fun o => AddMonoidHom.mk' (fun b => (F o b).toAddMonoidHom)
-      (fun b b' => AddMonoidHom.ext fun x => by
-        show F o (b + b') x = F o b x + F o b' x
-        rw [hb]; rfl))
-      (fun o o' => AddMonoidHom.ext fun b => AddMonoidHom.ext fun x => by
-        show F (o + o') b x = F o b x + F o' b x
-        rw [ho]; rfl)
+    AddMonoidHom.mk'
+      (fun o =>
+        AddMonoidHom.mk'
+          (fun b => (F o b).toAddMonoidHom)
+          (fun b b' =>
+            AddMonoidHom.ext fun x => by
+              show F o (b + b') x = F o b x + F o b' x
+              rw [hb]
+              rfl))
+      (fun o o' =>
+        AddMonoidHom.ext fun b =>
+          AddMonoidHom.ext fun x => by
+            show F (o + o') b x = F o b x + F o' b x
+            rw [ho]
+            rfl)
   have hbal : ∀ (z : ℤ_[l]) (o : ↥(OL LL)) (b : Per.BdRp l), f (z • o) b = f o (z • b) := by
     intro z o b
     apply AddMonoidHom.ext

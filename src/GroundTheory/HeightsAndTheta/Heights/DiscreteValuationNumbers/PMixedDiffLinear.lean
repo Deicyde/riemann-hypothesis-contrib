@@ -13,27 +13,27 @@ section MixedDiffLinearProof
 
 variable {K : Type*}
 
-theorem diffStep_add' (b : K → ℤ) (f g : (K → ℤ) → ℤ) :
-    diffStep b (f + g) = diffStep b f + diffStep b g := by
+theorem diffStep_add' (b : K → ℤ) (f g : (K → ℤ) → ℤ)
+    : diffStep b (f + g) = diffStep b f + diffStep b g := by
   funext m; simp only [diffStep, Pi.add_apply]; ring
 
-theorem diffStep_smul' (b : K → ℤ) (c : ℤ) (f : (K → ℤ) → ℤ) :
-    diffStep b (c • f) = c • diffStep b f := by
+theorem diffStep_smul' (b : K → ℤ) (c : ℤ) (f : (K → ℤ) → ℤ)
+    : diffStep b (c • f) = c • diffStep b f := by
   funext m; simp only [diffStep, Pi.smul_apply, smul_eq_mul]; ring
 
-theorem diffStep_shiftFn' (b s : K → ℤ) (f : (K → ℤ) → ℤ) :
-    diffStep b (shiftFn s f) = shiftFn s (diffStep b f) := by
+theorem diffStep_shiftFn' (b s : K → ℤ) (f : (K → ℤ) → ℤ)
+    : diffStep b (shiftFn s f) = shiftFn s (diffStep b f) := by
   funext m; simp only [diffStep, shiftFn, sub_right_comm]
 
-theorem diffStep_comm' (b b' : K → ℤ) (f : (K → ℤ) → ℤ) :
-    diffStep b (diffStep b' f) = diffStep b' (diffStep b f) := by
+theorem diffStep_comm' (b b' : K → ℤ) (f : (K → ℤ) → ℤ)
+    : diffStep b (diffStep b' f) = diffStep b' (diffStep b f) := by
   funext m; simp only [diffStep, sub_right_comm m b b']; ring
 
-theorem foldr_diffStep_props (l : List (K → ℤ)) (f g : (K → ℤ) → ℤ) (c : ℤ) (s b : K → ℤ) :
-    l.foldr diffStep (f + g) = l.foldr diffStep f + l.foldr diffStep g ∧
-    l.foldr diffStep (c • f) = c • l.foldr diffStep f ∧
-    l.foldr diffStep (shiftFn s f) = shiftFn s (l.foldr diffStep f) ∧
-    l.foldr diffStep (diffStep b f) = diffStep b (l.foldr diffStep f) := by
+theorem foldr_diffStep_props (l : List (K → ℤ)) (f g : (K → ℤ) → ℤ) (c : ℤ) (s b : K → ℤ)
+    : l.foldr diffStep (f + g) = l.foldr diffStep f + l.foldr diffStep g
+      ∧ l.foldr diffStep (c • f) = c • l.foldr diffStep f
+      ∧ l.foldr diffStep (shiftFn s f) = shiftFn s (l.foldr diffStep f)
+      ∧ l.foldr diffStep (diffStep b f) = diffStep b (l.foldr diffStep f) := by
   induction l with
   | nil => exact ⟨rfl, rfl, rfl, rfl⟩
   | cons a l ih =>

@@ -11,7 +11,6 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open MeasureTheory Module ZLattice
 
-
 open scoped Classical in
 theorem CovolumeRelIndex.proof : CovolumeRelIndex.Statement := by
   intro E _ _ _ _ _ μ _ L₁ L₂ _ _ _ _ h
@@ -25,8 +24,9 @@ theorem CovolumeRelIndex.proof : CovolumeRelIndex.Statement := by
     have : (⇑f ∘ ⇑f.symm) = id := by ext x; simp
     rw [this, Measure.map_id]
   obtain ⟨c, hν⟩ : ∃ c : NNReal, ν = c • volume := ⟨_, Measure.isAddLeftInvariant_eq_smul ν volume⟩
-  have scale : ∀ (L : Submodule ℤ (Fin (finrank ℝ E) → ℝ)) [DiscreteTopology L] [IsZLattice ℝ L],
-      covolume L ν = (c : ℝ) * covolume L volume := by
+  have scale
+      : ∀ (L : Submodule ℤ (Fin (finrank ℝ E) → ℝ)) [DiscreteTopology L] [IsZLattice ℝ L],
+        covolume L ν = (c : ℝ) * covolume L volume := by
     intro L _ _
     rw [covolume_eq_measure_fundamentalDomain L ν
         (ZLattice.isAddFundamentalDomain (Free.chooseBasis ℤ L) ν),
@@ -34,15 +34,18 @@ theorem CovolumeRelIndex.proof : CovolumeRelIndex.Statement := by
         (ZLattice.isAddFundamentalDomain (Free.chooseBasis ℤ L) volume)]
     conv_lhs => rw [hν]
     exact measureReal_nnreal_smul_apply c
-  have hidx : ((ZLattice.comap ℝ L₁ f.toLinearMap).toAddSubgroup.relIndex
-      (ZLattice.comap ℝ L₂ f.toLinearMap).toAddSubgroup : ℝ) =
-      (L₁.toAddSubgroup.relIndex L₂.toAddSubgroup : ℝ) := by
+  have hidx
+      : ((ZLattice.comap ℝ L₁ f.toLinearMap).toAddSubgroup.relIndex
+            (ZLattice.comap ℝ L₂ f.toLinearMap).toAddSubgroup
+          : ℝ)
+        = (L₁.toAddSubgroup.relIndex L₂.toAddSubgroup : ℝ) := by
     rw [ZLattice.comap_toAddSubgroup, ZLattice.comap_toAddSubgroup, Nat.cast_inj,
       LinearEquiv.toAddMonoidHom_commutes, AddSubgroup.comap_equiv_eq_map_symm',
       AddSubgroup.comap_equiv_eq_map_symm',
       AddSubgroup.relIndex_map_map_of_injective _ _ f.symm.injective]
-  have key := covolume_div_covolume_eq_relIndex (ZLattice.comap ℝ L₁ f.toLinearMap)
-    (ZLattice.comap ℝ L₂ f.toLinearMap) (fun _ h' ↦ h h')
+  have key :=
+    covolume_div_covolume_eq_relIndex (ZLattice.comap ℝ L₁ f.toLinearMap)
+      (ZLattice.comap ℝ L₂ f.toLinearMap) (fun _ h' ↦ h h')
   have hne := covolume_ne_zero (ZLattice.comap ℝ L₂ f.toLinearMap) volume
   rw [← covolume_comap L₁ μ ν hf, ← covolume_comap L₂ μ ν hf, scale, scale, ← hidx, ← key]
   field_simp

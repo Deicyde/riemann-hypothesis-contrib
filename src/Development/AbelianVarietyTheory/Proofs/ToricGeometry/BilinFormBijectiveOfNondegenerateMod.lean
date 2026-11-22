@@ -9,10 +9,11 @@ open scoped BigOperators Real
 
 namespace GlobalTheory
 
-theorem bilinForm_bijective_of_nondegenerate_mod (X : Type) [AddCommGroup X] [Module.Free ℤ X]
-    [Module.Finite ℤ X] (E : LinearMap.BilinForm ℤ X)
-    (h : ∀ (k : ℕ) (a : X), 0 < k → (∀ b, (k : ℤ) ∣ E a b) → ∃ a', a = (k : ℤ) • a') :
-    Function.Bijective E := by
+theorem bilinForm_bijective_of_nondegenerate_mod
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (E : LinearMap.BilinForm ℤ X)
+    (h : ∀ (k : ℕ) (a : X), 0 < k → (∀ b, (k : ℤ) ∣ E a b) → ∃ a', a = (k : ℤ) • a')
+    : Function.Bijective E := by
   classical
   set b := Module.Free.chooseBasis ℤ X
   have hinj : Function.Injective E := by
@@ -41,9 +42,10 @@ theorem bilinForm_bijective_of_nondegenerate_mod (X : Type) [AddCommGroup X] [Mo
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at hcf
   obtain ⟨x, hx⟩ := hcf
   have hk : 0 < c.natAbs * c.natAbs := Nat.mul_pos (Int.natAbs_pos.2 hc0) (Int.natAbs_pos.2 hc0)
-  obtain ⟨a', ha'⟩ := h (c.natAbs * c.natAbs) (c • x) hk (fun y => by
-    rw [Int.natAbs_mul_self, map_smul, hx, smul_smul]
-    simp)
+  obtain ⟨a', ha'⟩ :=
+    h (c.natAbs * c.natAbs) (c • x) hk (fun y => by
+      rw [Int.natAbs_mul_self, map_smul, hx, smul_smul]
+      simp)
   refine ⟨a', ?_⟩
   have hEq : E (c • x) = ((c.natAbs * c.natAbs : ℕ) : ℤ) • f := by
     rw [Int.natAbs_mul_self, map_smul, hx, smul_smul]

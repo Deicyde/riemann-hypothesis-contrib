@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSchmidtFrame
 
 @[expose] public section
 
-open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 open Matrix
 
 noncomputable section

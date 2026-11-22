@@ -28,9 +28,6 @@ end Blocks
 
 end Formalism.FourierDecayAlt.P.S3x1
 
-
-
-
 namespace Formalism.FourierDecayAlt.P.S3x1
 
 open Matrix Finset
@@ -40,7 +37,8 @@ open Formalism.FourierDecayAlt.S3
 section Count
 
 theorem card_lt_pairs (n : ℕ) : Nat.card {p : Fin n × Fin n // p.1 < p.2} = n * (n - 1) / 2 := by
-  rw [Nat.card_eq_fintype_card, Fintype.card_subtype, Finset.card_filter, Fintype.sum_prod_type_right]
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype, Finset.card_filter,
+    Fintype.sum_prod_type_right]
   have h : ∀ j : Fin n, ∑ i : Fin n, (if i < j then 1 else 0) = (j : ℕ) := by
     intro j
     rw [← Finset.card_filter]
@@ -51,14 +49,24 @@ theorem card_lt_pairs (n : ℕ) : Nat.card {p : Fin n × Fin n // p.1 < p.2} = n
 
 variable {A : Type} [CommRing A]
 
-def uniEquiv (n : ℕ) : {u : Matrix (Fin n) (Fin n) A // IsUpUni u} ≃ ({p : Fin n × Fin n // p.1 < p.2} → A) where
+def uniEquiv (n : ℕ)
+    : {u : Matrix (Fin n) (Fin n) A // IsUpUni u} ≃ ({p : Fin n × Fin n // p.1 < p.2} → A) where
   toFun u := fun p => u.1 p.1.1 p.1.2
-  invFun f := ⟨Matrix.of fun i j => if h : i < j then f ⟨(i, j), h⟩ else if i = j then 1 else 0, by
-    constructor
-    · intro i j hij
-      have hij' : j < i := hij
-      simp [not_lt.2 hij'.le, hij'.ne']
-    · intro a; simp⟩
+  invFun f := ⟨
+    Matrix.of fun i j =>
+      if h : i < j then
+        f ⟨(i, j), h⟩
+      else if i = j then
+        1
+      else
+        0,
+    by
+      constructor
+      · intro i j hij
+        have hij' : j < i := hij
+        simp [not_lt.2 hij'.le, hij'.ne']
+      · intro a; simp
+  ⟩
   left_inv u := by
     apply Subtype.ext
     ext i j
@@ -73,11 +81,13 @@ def uniEquiv (n : ℕ) : {u : Matrix (Fin n) (Fin n) A // IsUpUni u} ≃ ({p : F
     have h' : i < j := h
     simp [h']
 
-theorem card_uni (K : Type) [Field K] [Fintype K] (n : ℕ) :
-    Nat.card {u : Matrix (Fin n) (Fin n) K // IsUpUni u} = Fintype.card K ^ (n * (n - 1) / 2) := by
+theorem card_uni (K : Type) [Field K] [Fintype K] (n : ℕ)
+    : Nat.card {u : Matrix (Fin n) (Fin n) K // IsUpUni u}
+      = Fintype.card K ^ (n * (n - 1) / 2) := by
   rw [Nat.card_congr (uniEquiv n), Nat.card_fun, card_lt_pairs, Nat.card_eq_fintype_card]
 
-noncomputable def upUniGEquiv (n : ℕ) : upUniG A n ≃ {u : Matrix (Fin n) (Fin n) A // IsUpUni u} where
+noncomputable def upUniGEquiv (n : ℕ)
+    : upUniG A n ≃ {u : Matrix (Fin n) (Fin n) A // IsUpUni u} where
   toFun g := ⟨g.1.1, g.2⟩
   invFun u := ⟨Matrix.GeneralLinearGroup.mk'' u.1 (uni_unit u.2), u.2⟩
   left_inv g := Subtype.ext (Units.ext rfl)
@@ -85,14 +95,16 @@ noncomputable def upUniGEquiv (n : ℕ) : upUniG A n ≃ {u : Matrix (Fin n) (Fi
 
 variable {r k : ℕ}
 
-def mk (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
-    (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A) :
-    Matrix (Idx r k) (Idx r k) A :=
+def mk
+    (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
+    (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A)
+    : Matrix (Idx r k) (Idx r k) A :=
   Matrix.fromBlocks a (Matrix.fromCols b c) 0 (Matrix.fromBlocks m e 0 f)
 
 section mk
-variable (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
-    (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A)
+variable
+  (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
+  (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A)
 end mk
 
 end Count
@@ -109,8 +121,8 @@ section Count2
 
 variable {A : Type} [CommRing A] {r k : ℕ}
 
-theorem prod_gl (q k : ℕ) : ∏ i : Fin k, (q ^ k - q ^ (i : ℕ)) =
-    q ^ (k * (k - 1) / 2) * ∏ i ∈ Icc 1 k, (q ^ i - 1) := by
+theorem prod_gl (q k : ℕ)
+    : ∏ i : Fin k, (q ^ k - q ^ (i : ℕ)) = q ^ (k * (k - 1) / 2) * ∏ i ∈ Icc 1 k, (q ^ i - 1) := by
   rw [Fin.prod_univ_eq_prod_range (fun i => q ^ k - q ^ i) k, ← Finset.sum_range_id,
     ← Finset.prod_pow_eq_pow_sum]
   have h1 : ∏ i ∈ Icc 1 k, (q ^ i - 1) = ∏ i ∈ range k, (q ^ (k - i) - 1) := by
@@ -132,12 +144,8 @@ end Count2
 
 end Formalism.FourierDecayAlt.P.S3x1
 
-
-
-
-
 open Formalism.FourierDecayAlt.P.S3x1 in
-theorem Formalism.FourierDecayAlt.P.gamma_factor_product : Formalism.FourierDecayAlt.S3.GammaProduct := by
+theorem Formalism.FourierDecayAlt.P.gamma_factor_product
+    : Formalism.FourierDecayAlt.S3.GammaProduct := by
   intro K _ _ k
   rw [Matrix.card_GL_field, Nat.card_congr (upUniGEquiv k), card_uni, prod_gl]
-

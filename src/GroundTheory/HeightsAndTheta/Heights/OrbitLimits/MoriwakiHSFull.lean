@@ -38,13 +38,15 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry GroundTheory.Heights₂.Heights.HilbertSamuel
+open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  GroundTheory.Heights₂.Heights.HilbertSamuel
 
 theorem SublatticeDegree.full : SublatticeDegree.Statement :=
   SublatticeDegree.proof SublatticeExtension.proof SpanningExtension.proof CovolumeLeGram.proof
     GramContraction.proof
 
-theorem SuccessiveMinimaSpan.of_leaves (hC : KH.CondStatement) (hR : RelSectionsLarge.Statement) : SuccessiveMinimaSpan.Statement :=
+theorem SuccessiveMinimaSpan.of_leaves (hC : KH.CondStatement) (hR : RelSectionsLarge.Statement)
+    : SuccessiveMinimaSpan.Statement :=
   SuccessiveMinimaSpan.proof
     (SectionRingFinite.proof (SectionLatticeFinite.proof hC)
       (SectionSpanStep.proof (SpanStepHomog.proof (SpanStepLocal.proof (RelLatticeFinite.proof hR)))

@@ -36,39 +36,54 @@ theorem fd_Ks (K : FinExt l) (s : ℕ) : FiniteDimensional ℚ_[l] ↥(Ks K s) :
   unfold Ks
   exact IntermediateField.finiteDimensional_sup _ _
 
-def bigLL (K LL : FinExt l) : FinExt l :=
-  ⟨LL.1 ⊔ IntermediateField.normalClosure ℚ_[l] ↥(Ks K 1) (Om l), by
+def bigLL (K LL : FinExt l) : FinExt l := ⟨
+  LL.1 ⊔ IntermediateField.normalClosure ℚ_[l] ↥(Ks K 1) (Om l),
+  by
     have := LL.2
     have := fd_Ks K 1
-    exact IntermediateField.finiteDimensional_sup _ _⟩
+    exact IntermediateField.finiteDimensional_sup _ _
+⟩
 
 theorem le_bigLL (K LL : FinExt l) : LL.1 ≤ (bigLL K LL).1 := le_sup_left
 
-theorem unram_of_caseA {K LL : FinExt l} (hA : CaseA K LL) :
-    Function.Bijective (algebraMap ↥(K0 K) ↥K.1) := by
+theorem unram_of_caseA {K LL : FinExt l} (hA : CaseA K LL)
+    : Function.Bijective (algebraMap ↥(K0 K) ↥K.1) := by
   refine ⟨(algebraMap ↥(K0 K) ↥K.1).injective, fun y => ⟨⟨y, ⟨y.2, hA.1 y.2⟩⟩, ?_⟩⟩
   apply Subtype.ext
   rfl
 
-def BrRest {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+def BrRest
+    {G : Type} [Group G] [TopologicalSpace G]
+    {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+    [IsScalarTower Qp K₀ K]
     {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
     [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
     [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR}
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n] (W : LocWach PD LL O v n)
-    [Fintype (K →ₐ[Qp] LL)] : Prop :=
+    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+    [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
+    (W : LocWach PD LL O v n)
+    [Fintype (K →ₐ[Qp] LL)]
+    : Prop :=
   ∃ e : W.DD W.one, UnitGen W e ∧ BKExt W e ∧ ∀ hR : Ring9 W, Realised2 hR e
 
-theorem brHyp2_of_rec (P : LocPrime l) {K LL : FinExt l} (hA : CaseA K LL) (h5 : 5 ≤ l)
+theorem brHyp2_of_rec
+    (P : LocPrime l)
+    {K LL : FinExt l} (hA : CaseA K LL)
+    (h5 : 5 ≤ l)
     [NeZero (finrank ℚ_[l] ↥(K0 K))] [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)]
-    (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (finrank ℚ_[l] ↥(K0 K))) (hs : W.s = 1) {Cc : ℝ}
-    (h5W : Formalism.MainNotions.DeltaInvariantLattices.P5W W) (h6W : Formalism.MainNotions.DeltaInvariantLattices.WachSaturationExactness W) (h9W : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
-    (h2a : Formalism.MainNotions.DeltaInvariantLattices.HerrComplexFirstProperty W) (hwx : Formalism.MainNotions.LiftingTheory.coreWX W) (hwr : Formalism.MainNotions.LiftingTheory.coreWR W Cc)
-    (htools : ToolsAlg W) (hf1 : F1 W) (hf2 : F2 W) (hH : HodgeExact (P.PD K) ↥LL.1 ↥(OL LL))
-    (hrest : BrRest W) : BrHyp2 W Cc := by
-  refine ⟨hs, unram_of_caseA hA, ?_, h5W, h6W, h9W, h2a, hwx, hwr, htools, hf1, hf2, hH, ?_, ?_, hrest⟩
+    (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (finrank ℚ_[l] ↥(K0 K))) (hs : W.s = 1)
+    {Cc : ℝ}
+    (h5W : Formalism.MainNotions.DeltaInvariantLattices.P5W W)
+    (h6W : Formalism.MainNotions.DeltaInvariantLattices.WachSaturationExactness W)
+    (h9W : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (h2a : Formalism.MainNotions.DeltaInvariantLattices.HerrComplexFirstProperty W)
+    (hwx : Formalism.MainNotions.LiftingTheory.coreWX W)
+    (hwr : Formalism.MainNotions.LiftingTheory.coreWR W Cc) (htools : ToolsAlg W) (hf1 : F1 W)
+    (hf2 : F2 W) (hH : HodgeExact (P.PD K) ↥LL.1 ↥(OL LL)) (hrest : BrRest W)
+    : BrHyp2 W Cc := by
+  refine
+    ⟨hs, unram_of_caseA hA, ?_, h5W, h6W, h9W, h2a, hwx, hwr, htools, hf1, hf2, hH, ?_, ?_, hrest⟩
   · rw [P.PD_p K]
     exact h5
   · unfold ValRing

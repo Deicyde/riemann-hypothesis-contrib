@@ -10,7 +10,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB
 
 namespace GlobalTheory.NablaExpConj
 
@@ -24,11 +25,8 @@ end Lift
 
 variable (k : Type) [CommRing k] [Algebra ℚ k] [Algebra R k]
 
-
-
-
-theorem Dof_expS (F : Fin d → PS k 2 d) (u : Fin d → k) {g : PS k 1 d}
-    (hg : constantCoeff g = 0) : Dof F u (FB.expS k g) = FB.expS k g * Dof F u g := by
+theorem Dof_expS (F : Fin d → PS k 2 d) (u : Fin d → k) {g : PS k 1 d} (hg : constantCoeff g = 0)
+    : Dof F u (FB.expS k g) = FB.expS k g * Dof F u g := by
   have e : ∀ i, pderiv (R := k) i (FB.expS k g) = FB.expS k g * pderiv (R := k) i g :=
     FormalCalc.pderiv_formalExp hg
   unfold Dof

@@ -43,19 +43,19 @@ lemma ATower.sqZero {p : ℕ} (Tw : ATower R₀ p) (n : ℕ) : (Tw.π n).SqZero 
     rw [Tw.ker_eq, sq, Ideal.span_singleton_mul_span_singleton, Tw.ξ_sq, Ideal.span_singleton_eq_bot]⟩
 
 def NsetExpInjectiveSurjective (B : BX R₀) {p : ℕ} (Tw : ATower R₀ p) : Prop :=
-  ∀ (Dp : ∀ n, DualPair (Tw.R n)) (ι : Type) (τ : ι → ℕ → B.G Tw.O)
-    (E : ι → ι → (Tw.O : Type u)) (ht : ι → B.gg →ₗ[R₀] (Tw.O : Type u))
-    (bt : ι → B.gg ⊗[R₀] (Tw.O : Type u)),
-    (∀ i j n, ∃ k : ℕ, (Tw.q n).1 (E i j) = k ∧
-      B.IsPairing (p ^ (n + 1)) (τ i n) (τ j n) (Tw.ζ n ^ k)) →
-    (∀ i n, B.IsHeight (Dp n) (p ^ (n + 1)) (B.map (Tw.q n) (τ i n))
-      ((Tw.q n).1.toLinearMap ∘ₗ ht i)) →
-    (∀ i n, ∃ (th : B.G (Tw.R' n)) (w : B.gg ⊗[R₀] (Tw.R' n : Type u)),
-      B.map (Tw.π n) th = B.map (Tw.q n) (τ i n) ∧
-      (p ^ (n + 1)) • th = B.tg (Tw.π n) (Tw.sqZero n)
-        (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) w) ∧
-      LinearMap.lTensor B.gg (Tw.π n).1.toLinearMap w =
-        LinearMap.lTensor B.gg (Tw.q n).1.toLinearMap (bt i)) →
-    ∀ i j, Tw.c * E i j = B.ev (ht j) (bt i) - B.ev (ht i) (bt j)
+  ∀ (Dp : ∀ n, DualPair (Tw.R n)) (ι : Type) (τ : ι → ℕ → B.G Tw.O) (E : ι → ι → (Tw.O : Type u))
+      (ht : ι → B.gg →ₗ[R₀] (Tw.O : Type u)) (bt : ι → B.gg ⊗[R₀] (Tw.O : Type u)),
+    (∀ i j n, ∃ k : ℕ,
+        (Tw.q n).1 (E i j) = k ∧ B.IsPairing (p ^ (n + 1)) (τ i n) (τ j n) (Tw.ζ n ^ k))
+      → (∀ i n,
+        B.IsHeight (Dp n) (p ^ (n + 1)) (B.map (Tw.q n) (τ i n)) ((Tw.q n).1.toLinearMap ∘ₗ ht i))
+      → (∀ i n, ∃ (th : B.G (Tw.R' n)) (w : B.gg ⊗[R₀] (Tw.R' n : Type u)),
+        B.map (Tw.π n) th = B.map (Tw.q n) (τ i n)
+          ∧ (p ^ (n + 1)) • th
+            = B.tg (Tw.π n) (Tw.sqZero n)
+              (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) w)
+          ∧ LinearMap.lTensor B.gg (Tw.π n).1.toLinearMap w
+            = LinearMap.lTensor B.gg (Tw.q n).1.toLinearMap (bt i))
+      → ∀ i j, Tw.c * E i j = B.ev (ht j) (bt i) - B.ev (ht i) (bt j)
 
 end ReciprocityTheory.PGsh

@@ -12,22 +12,24 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem isSmoothHerm_fsHerm {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (a : K → ℤ) :
-    IsSmoothHerm (fsHerm ι a) := by
+theorem isSmoothHerm_fsHerm {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (a : K → ℤ)
+    : IsSmoothHerm (fsHerm ι a) := by
   unfold IsSmoothHerm
   have hfun : (fsHerm ι a).h = fun z => ∏ k, (∑ i, ‖z ⟨k, i⟩‖ ^ 2) ^ ((a k : ℝ) / 2) := rfl
   rw [hfun]
   refine contDiffOn_prod fun k _ => ContDiffOn.rpow_const_of_ne ?_ fun z hz => ?_
-  · exact (ContDiff.sum fun i _ => (contDiff_norm_sq ℝ).comp
-      (contDiff_apply ℝ (fun _ => ℂ) (⟨k, i⟩ : Σ k, ι k))).contDiffOn
+  · exact (ContDiff.sum fun i _ =>
+      (contDiff_norm_sq ℝ).comp (contDiff_apply ℝ (fun _ => ℂ) (⟨k, i⟩ : Σ k, ι k))).contDiffOn
   · obtain ⟨i, hi⟩ := hz k
-    exact (Finset.sum_pos' (fun j _ => sq_nonneg ‖z ⟨k, j⟩‖)
+    exact (Finset.sum_pos'
+      (fun j _ => sq_nonneg ‖z ⟨k, j⟩‖)
       ⟨i, Finset.mem_univ _, pow_pos (norm_pos_iff.mpr hi) 2⟩).ne'
 
-theorem plToIncr_injective {j m N s : ℕ} (hs : s = j) (hN : j + m = N) :
-    Function.Injective (plToIncr (m := m) hs hN) := by
+theorem plToIncr_injective {j m N s : ℕ} (hs : s = j) (hN : j + m = N)
+    : Function.Injective (plToIncr (m := m) hs hN) := by
   intro I I' h
   have h1 : ∀ a, I.1.orderEmbOfFin I.2 a = I'.1.orderEmbOfFin I'.2 a := by
     intro a
@@ -39,8 +41,8 @@ theorem plToIncr_injective {j m N s : ℕ} (hs : s = j) (hN : j + m = N) :
   rw [← Finset.range_orderEmbOfFin I.1 I.2, ← Finset.range_orderEmbOfFin I'.1 I'.2]
   exact congrArg Set.range (funext h1)
 
-theorem plToIncr_surjective {j m N s : ℕ} (hs : s = j) (hN : j + m = N) :
-    Function.Surjective (plToIncr (m := m) hs hN) := by
+theorem plToIncr_surjective {j m N s : ℕ} (hs : s = j) (hN : j + m = N)
+    : Function.Surjective (plToIncr (m := m) hs hN) := by
   intro A
   let g : Fin j → Fin (j + m) := fun a => Fin.cast hN.symm (A.1 (Fin.cast hs.symm a))
   have hg : StrictMono g := fun a b hab => by
@@ -64,8 +66,8 @@ section Proj
 variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N j : ℕ}
 
 omit [DecidableEq Ψ] in
-theorem isBlockMap_grFl (hj : 1 ≤ j) (hjN : j ≤ N - 1) :
-    IsBlockMap (grFlKappa Ψ N j hj hjN) (grFlV Ψ N j hj hjN) := by
+theorem isBlockMap_grFl (hj : 1 ≤ j) (hjN : j ≤ N - 1)
+    : IsBlockMap (grFlKappa Ψ N j hj hjN) (grFlV Ψ N j hj hjN) := by
   have hκ : Function.Injective (grFlKappa Ψ N j hj hjN) := fun t t' h =>
     (Fintype.equivFin Ψ).symm.injective (congrArg Prod.fst h)
   refine ⟨hκ, ?_, fun _ => rfl, ?_⟩
@@ -76,28 +78,32 @@ theorem isBlockMap_grFl (hj : 1 ≤ j) (hjN : j ≤ N - 1) :
     obtain rfl := plToIncr_injective _ _ (eq_of_heq h2)
     rfl
   · rintro ⟨q, A⟩ ⟨t, rfl⟩
-    obtain ⟨I, hI⟩ := plToIncr_surjective (m := N - j) (N := N)
-      (s := ((grFlKappa Ψ N j hj hjN t).2 : ℕ) + 1) (by show j - 1 + 1 = j; omega) (by omega) A
+    obtain ⟨I, hI⟩ :=
+      plToIncr_surjective (m := N - j) (N := N) (s := ((grFlKappa Ψ N j hj hjN t).2 : ℕ) + 1)
+        (by show j - 1 + 1 = j; omega) (by omega) A
     exact ⟨⟨t, I⟩, congrArg (Sigma.mk _) hI⟩
 
-theorem linDeg_muForm_apply (τ : Ψ) (i : Fin (N - 1)) :
-    linDeg Ψ N (muForm Ψ N j) (τ, i) = if (i : ℕ) + 1 = j then -1 else 0 := by
+theorem linDeg_muForm_apply (τ : Ψ) (i : Fin (N - 1))
+    : linDeg Ψ N (muForm Ψ N j) (τ, i) = if (i : ℕ) + 1 = j then -1 else 0 := by
   have hi := i.isLt
   unfold linDeg
-  rw [Fintype.sum_prod_type, Fintype.sum_eq_single τ (fun τ' hτ' => by
-    refine Finset.sum_eq_zero fun a _ => ?_
-    simp [xDeg, Ne.symm hτ'])]
+  rw [Fintype.sum_prod_type,
+    Fintype.sum_eq_single τ (fun τ' hτ' => by
+      refine Finset.sum_eq_zero fun a _ => ?_
+      simp [xDeg, Ne.symm hτ'])]
   simp only [xDeg, if_true, mul_sub]
   rw [Finset.sum_sub_distrib]
-  have h1 : ∑ a : Fin N, muForm Ψ N j (τ, a) * (if (i : ℕ) = a then 1 else 0) =
-      if (i : ℕ) < j then 0 else 1 := by
+  have h1
+      : ∑ a : Fin N, muForm Ψ N j (τ, a) * (if (i : ℕ) = a then 1 else 0)
+        = if (i : ℕ) < j then 0 else 1 := by
     rw [Fintype.sum_eq_single ⟨i, by omega⟩]
     · simp [muForm]
     · intro a ha
       have : (i : ℕ) ≠ a := fun h => ha (Fin.ext h.symm)
       simp [this]
-  have h2 : ∑ a : Fin N, muForm Ψ N j (τ, a) * (if (i : ℕ) + 1 = a then 1 else 0) =
-      if (i : ℕ) + 1 < j then 0 else 1 := by
+  have h2
+      : ∑ a : Fin N, muForm Ψ N j (τ, a) * (if (i : ℕ) + 1 = a then 1 else 0)
+        = if (i : ℕ) + 1 < j then 0 else 1 := by
     rw [Fintype.sum_eq_single ⟨(i : ℕ) + 1, by omega⟩]
     · simp [muForm]
     · intro a ha
@@ -106,8 +112,8 @@ theorem linDeg_muForm_apply (τ : Ψ) (i : Fin (N - 1)) :
   rw [h1, h2]
   split_ifs <;> omega
 
-theorem linDeg_muForm (hj : 1 ≤ j) (hjN : j ≤ N - 1) :
-    linDeg Ψ N (muForm Ψ N j) = pullDeg (grFlKappa Ψ N j hj hjN) (fun _ => -1) := by
+theorem linDeg_muForm (hj : 1 ≤ j) (hjN : j ≤ N - 1)
+    : linDeg Ψ N (muForm Ψ N j) = pullDeg (grFlKappa Ψ N j hj hjN) (fun _ => -1) := by
   have hκ : Function.Injective (grFlKappa Ψ N j hj hjN) := (isBlockMap_grFl hj hjN).1
   funext ⟨τ, i⟩
   rw [linDeg_muForm_apply]
@@ -125,14 +131,16 @@ theorem linDeg_muForm (hj : 1 ≤ j) (hjN : j ≤ N - 1) :
       simp only [grFlKappa] at this
       omega
 
-theorem isPullHerm_mu (hj : 1 ≤ j) (hjN : j ≤ N - 1) :
-    IsPullHerm (grFlKappa Ψ N j hj hjN) (grFlV Ψ N j hj hjN)
-      (fsHerm (plBlocks (Fintype.card Ψ) j (N - j)) (fun _ => -1)) (linLine Ψ N (muForm Ψ N j)) := by
+theorem isPullHerm_mu (hj : 1 ≤ j) (hjN : j ≤ N - 1)
+    : IsPullHerm (grFlKappa Ψ N j hj hjN) (grFlV Ψ N j hj hjN)
+      (fsHerm (plBlocks (Fintype.card Ψ) j (N - j)) (fun _ => -1))
+      (linLine Ψ N (muForm Ψ N j)) := by
   refine ⟨linDeg_muForm hj hjN, fun z => ?_⟩
   show refNorm (linDeg Ψ N (muForm Ψ N j)) z = refNorm (fun _ => (-1 : ℤ)) (fun p => z (grFlV Ψ N j hj hjN p))
   unfold refNorm
   rw [Fintype.prod_prod_type]
-  refine (Equiv.prod_comp (Fintype.equivFin Ψ).symm _).symm.trans (Finset.prod_congr rfl fun t _ => ?_)
+  refine (Equiv.prod_comp (Fintype.equivFin Ψ).symm _).symm.trans
+    (Finset.prod_congr rfl fun t _ => ?_)
   have hlt : j - 1 < N - 1 := by omega
   rw [Fintype.prod_eq_single ⟨j - 1, hlt⟩ (fun i hi => by
     rw [linDeg_muForm_apply, if_neg (fun h => hi (Fin.ext (by simp; omega)))]
@@ -155,48 +163,58 @@ theorem linForm_muForm : linForm Ψ N (muForm Ψ N j) = muPoly Ψ N j := by
   refine Finset.sum_congr rfl fun p _ => ?_
   split_ifs <;> simp
 
-theorem linForm_vandForm (t : VandPair Ψ N j) :
-    linForm Ψ N (vandForm Ψ N j t) = X (t.1.1, t.1.2.1) - X (t.1.1, t.1.2.2) := by
+theorem linForm_vandForm (t : VandPair Ψ N j)
+    : linForm Ψ N (vandForm Ψ N j t) = X (t.1.1, t.1.2.1) - X (t.1.1, t.1.2.2) := by
   simp only [linForm, vandForm, Int.cast_sub, Int.cast_ite, Int.cast_one, Int.cast_zero, sub_smul,
-    Finset.sum_sub_distrib, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    Finset.sum_sub_distrib, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
 
-def vandPairEquiv :
-    Ψ × {ab : Fin N × Fin N // ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)} ≃ VandPair Ψ N j where
+def vandPairEquiv
+    : Ψ × {ab : Fin N × Fin N // ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)}
+      ≃ VandPair Ψ N j where
   toFun x := ⟨(x.1, x.2.1), x.2.2⟩
   invFun t := (t.1.1, ⟨t.1.2, t.2⟩)
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem prod_vandForm :
-    ∏ i : Fin (vandCount Ψ N j), linForm Ψ N (vandForm Ψ N j ((Fintype.equivFin (VandPair Ψ N j)).symm i)) =
-      vandBlocks Ψ N j := by
+theorem prod_vandForm
+    : ∏ i : Fin (vandCount Ψ N j), linForm Ψ N (vandForm Ψ N j ((Fintype.equivFin (VandPair Ψ N j)).symm i))
+      = vandBlocks Ψ N j := by
   refine (Equiv.prod_comp (Fintype.equivFin (VandPair Ψ N j)).symm
     (fun t => linForm Ψ N (vandForm Ψ N j t))).trans ?_
-  have hB : ∏ x : Ψ × {ab : Fin N × Fin N // ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)},
-      (X (x.1, x.2.1.1) - X (x.1, x.2.1.2) : RootPoly Ψ N) =
-      ∏ t : VandPair Ψ N j, linForm Ψ N (vandForm Ψ N j t) :=
-    Fintype.prod_equiv (vandPairEquiv Ψ N j) _ (fun t => linForm Ψ N (vandForm Ψ N j t))
+  have hB
+      : ∏ x : Ψ × {ab : Fin N × Fin N // ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)},
+          (X (x.1, x.2.1.1) - X (x.1, x.2.1.2) : RootPoly Ψ N)
+        = ∏ t : VandPair Ψ N j, linForm Ψ N (vandForm Ψ N j t) :=
+    Fintype.prod_equiv (vandPairEquiv Ψ N j) _
+      (fun t => linForm Ψ N (vandForm Ψ N j t))
       (fun x => (linForm_vandForm Ψ N j (vandPairEquiv Ψ N j x)).symm)
   rw [← hB]
   rw [Fintype.prod_prod_type]
   refine Finset.prod_congr rfl fun τ _ => ?_
-  rw [Finset.prod_subtype (p := fun ab : Fin N × Fin N => ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j))
+  rw [Finset.prod_subtype
+    (p := fun ab : Fin N × Fin N => ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j))
     (Finset.univ.filter (fun ab : Fin N × Fin N => ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)))
-    (fun ab => by simp) (fun ab => (X (τ, ab.1) - X (τ, ab.2) : RootPoly Ψ N))]
+    (fun ab => by simp)
+    (fun ab => (X (τ, ab.1) - X (τ, ab.2) : RootPoly Ψ N))]
 
 def faForms : Fin (dimN Ψ N j + 1 + vandCount Ψ N j) → Ψ × Fin N → ℤ :=
-  Fin.append (fun _ => muForm Ψ N j) (fun i => vandForm Ψ N j ((Fintype.equivFin (VandPair Ψ N j)).symm i))
+  Fin.append
+    (fun _ => muForm Ψ N j)
+    (fun i => vandForm Ψ N j ((Fintype.equivFin (VandPair Ψ N j)).symm i))
 
 theorem FA_eq_prod (cf : ℚ) : FA Ψ N j cf = C cf * ∏ i, linForm Ψ N (faForms Ψ N j i) := by
   rw [Fin.prod_univ_add]
-  simp only [faForms, Fin.append_left, Fin.append_right, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
-    linForm_muForm, prod_vandForm]
+  simp only [faForms, Fin.append_left, Fin.append_right, Finset.prod_const, Finset.card_univ,
+    Fintype.card_fin, linForm_muForm, prod_vandForm]
   unfold FA fib
   ring
 
-theorem linLine_faForms :
-    (fun i => linLine Ψ N (faForms Ψ N j i)) =
-      Fin.append (fun _ : Fin (dimN Ψ N j + 1) => linLine Ψ N (muForm Ψ N j)) (vandLine Ψ N j) := by
+theorem linLine_faForms
+    : (fun i => linLine Ψ N (faForms Ψ N j i))
+      = Fin.append
+        (fun _ : Fin (dimN Ψ N j + 1) => linLine Ψ N (muForm Ψ N j))
+        (vandLine Ψ N j) := by
   funext i
   refine Fin.addCases (fun i => ?_) (fun i => ?_) i
   · simp [faForms]

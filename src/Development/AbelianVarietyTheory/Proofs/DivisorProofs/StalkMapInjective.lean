@@ -12,9 +12,12 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
 open GlobalTheory.HSApp
@@ -23,8 +26,8 @@ namespace GlobalTheory.HSApp.ValCrit
 
 open IsLocalRing
 
-theorem exists_valuation (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R] :
-    ∃ μ : Valuation R (WithZero (Multiplicative ℤ)),
+theorem exists_valuation (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
+    : ∃ μ : Valuation R (WithZero (Multiplicative ℤ)),
       (∀ a, μ a ≤ 1) ∧ (∀ a ∈ maximalIdeal R, μ a < 1) ∧ ∀ a, μ a = 0 → a = 0 := by
   classical
   by_cases hf : IsField R
@@ -39,14 +42,16 @@ theorem exists_valuation (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing 
     · by_contra h
       rw [Valuation.one_apply_of_ne_zero h] at ha
       exact one_ne_zero ha
-  · obtain ⟨V, hV, hd⟩ := exists_discreteValuationSubring_dominating R (FractionRing R) (FractionRing R) hf
+  · obtain ⟨V, hV, hd⟩ :=
+      exists_discreteValuationSubring_dominating R (FractionRing R) (FractionRing R) hf
     obtain ⟨h1, h2⟩ := (localSubring_range_le_valuationSubring_iff_isLocalHom _ _).1 hd
     let ρ : R →+* V := (algebraMap R (FractionRing R)).codRestrict V h1
     have hρ : Function.Injective ρ := fun a b hab =>
       IsFractionRing.injective R (FractionRing R) (congrArg Subtype.val hab)
     let v : IsDedekindDomain.HeightOneSpectrum V :=
       ⟨maximalIdeal V, inferInstance, IsDiscreteValuationRing.not_a_field V⟩
-    refine ⟨v.intValuation.comap ρ, fun a => v.intValuation_le_one _, fun a ha => ?_, fun a ha => ?_⟩
+    refine
+      ⟨v.intValuation.comap ρ, fun a => v.intValuation_le_one _, fun a ha => ?_, fun a ha => ?_⟩
     · refine (v.intValuation_lt_one_iff_mem _).2 ?_
       exact (mem_maximalIdeal _).2 fun hu => (mem_maximalIdeal _).1 ha (isUnit_of_map_unit ρ a hu)
     · by_contra h
@@ -63,8 +68,9 @@ theorem isIntegral_X [IsIntegral Y] (M : Modif p U D) [Nonempty M.X] : IsIntegra
   haveI := M.iso
   haveI : IsIntegral (M.σ ⁻¹ᵁ U : Scheme) := isIntegral_of_isOpenImmersion (M.σ ∣_ U)
   have h1 : IsIrreducible ((M.σ ⁻¹ᵁ U : M.X.Opens) : Set M.X) := by
-    have := (IrreducibleSpace.isIrreducible_univ (M.σ ⁻¹ᵁ U : Scheme)).image (⇑(M.σ ⁻¹ᵁ U).ι)
-      (M.σ ⁻¹ᵁ U).ι.continuous.continuousOn
+    have :=
+      (IrreducibleSpace.isIrreducible_univ (M.σ ⁻¹ᵁ U : Scheme)).image (⇑(M.σ ⁻¹ᵁ U).ι)
+        (M.σ ⁻¹ᵁ U).ι.continuous.continuousOn
     rwa [Set.image_univ, Scheme.Opens.range_ι] at this
   have h2 := h1.closure
   rw [M.dense.closure_eq] at h2

@@ -12,11 +12,17 @@ namespace GlobalTheory.SgLoc.PtAlg
 
 variable {E : Type} [CommRing E]
 
-theorem ptEntryL_append (bs : List (Eˣ × ℕ+)) (t : Eˣ) (s : ℕ+) :
-    ∀ (m : ℕ), (bs.map (fun b => (b.2 : ℕ))).sum = m → ∀ a b : ℕ,
-      ptEntryL (bs ++ [(t, s)]) a b =
-        if a < m ∧ b < m then ptEntryL bs a b
-        else if m ≤ a ∧ m ≤ b ∧ a + b + 1 = 2 * m + s then (t : E) else 0 := by
+theorem ptEntryL_append (bs : List (Eˣ × ℕ+)) (t : Eˣ) (s : ℕ+)
+    : ∀ (m : ℕ),
+      (bs.map (fun b => (b.2 : ℕ))).sum = m
+        → ∀ a b : ℕ,
+          ptEntryL (bs ++ [(t, s)]) a b
+            = if a < m ∧ b < m then
+                ptEntryL bs a b
+              else if m ≤ a ∧ m ≤ b ∧ a + b + 1 = 2 * m + s then
+                (t : E)
+              else
+                0 := by
   induction bs with
   | nil =>
     intro m hm a b
@@ -32,46 +38,53 @@ theorem ptEntryL_append (bs : List (Eˣ × ℕ+)) (t : Eˣ) (s : ℕ+) :
     rw [ih _ rfl]
     split_ifs <;> first | rfl | omega
 
-theorem mat_snoc {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+) (a b : Fin (m + s)) :
-    (h.snoc t s).mat a b =
-      if hab : (a : ℕ) < m ∧ (b : ℕ) < m then h.mat ⟨a, hab.1⟩ ⟨b, hab.2⟩
-      else if m ≤ (a : ℕ) ∧ m ≤ (b : ℕ) ∧ (a : ℕ) + b + 1 = 2 * m + s then (t : E) else 0 := by
+theorem mat_snoc {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+) (a b : Fin (m + s))
+    : (h.snoc t s).mat a b
+      = if hab : (a : ℕ) < m ∧ (b : ℕ) < m then
+          h.mat ⟨a, hab.1⟩ ⟨b, hab.2⟩
+        else if m ≤ (a : ℕ) ∧ m ≤ (b : ℕ) ∧ (a : ℕ) + b + 1 = 2 * m + s then
+          (t : E)
+        else
+          0 := by
   show ptEntryL (h.blocks ++ [(t, s)]) a b = _
   rw [ptEntryL_append h.blocks t s m h.size]
   split_ifs <;> rfl
 
-theorem det_snoc_eq {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+) :
-    (h.snoc t s).mat.det =
-      h.mat.det * (((Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin s)) : ℤˣ) : ℤ) *
-        (t : E) ^ (s : ℕ)) := by
-  have key : Matrix.reindex finSumFinEquiv.symm finSumFinEquiv.symm (h.snoc t s).mat =
-      Matrix.fromBlocks h.mat 0 0
-        ((t : E) • (Fin.revPerm : Equiv.Perm (Fin s)).permMatrix E) := by
-    ext (i | i) (j | j) <;>
-      simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm, mat_snoc,
+theorem det_snoc_eq {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+)
+    : (h.snoc t s).mat.det
+      = h.mat.det
+        * (((Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin s)) : ℤˣ) : ℤ)
+          * (t : E) ^ (s : ℕ)) := by
+  have key
+      : Matrix.reindex finSumFinEquiv.symm finSumFinEquiv.symm (h.snoc t s).mat
+        = Matrix.fromBlocks h.mat 0 0
+          ((t : E) • (Fin.revPerm : Equiv.Perm (Fin s)).permMatrix E) := by
+    ext (i | i) (j | j)
+      <;> simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm, mat_snoc,
         finSumFinEquiv_apply_left, finSumFinEquiv_apply_right, Fin.val_castAdd, Fin.val_natAdd,
         Matrix.fromBlocks_apply₁₁, Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁,
-        Matrix.fromBlocks_apply₂₂, Matrix.smul_apply, Matrix.zero_apply, smul_eq_mul] <;>
-      have hi := i.isLt <;> have hj := j.isLt
+        Matrix.fromBlocks_apply₂₂, Matrix.smul_apply, Matrix.zero_apply, smul_eq_mul]
+      <;> have hi := i.isLt <;> have hj := j.isLt
     · rw [dite_eq_left ⟨hi, hj⟩]
     · rw [dite_eq_right (by omega), ite_eq_right (by omega)]
     · rw [dite_eq_right (by omega), ite_eq_right (by omega)]
     · rw [dite_eq_right (by omega)]
-      simp only [Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply,
-        Option.mem_def, Option.some.injEq, Fin.revPerm_apply]
+      simp only [Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply, Option.mem_def,
+        Option.some.injEq, Fin.revPerm_apply]
       by_cases hij : Fin.rev i = j
       · rw [ite_eq_left (by rw [← hij, Fin.val_rev]; omega), ite_eq_left hij, mul_one]
-      · rw [ite_eq_right (fun hc => hij (Fin.ext (by rw [Fin.val_rev]; omega))),
-          ite_eq_right hij, mul_zero]
+      · rw [ite_eq_right (fun hc => hij (Fin.ext (by rw [Fin.val_rev]; omega))), ite_eq_right hij,
+          mul_zero]
   have hdet := congrArg Matrix.det key
   rw [Matrix.det_reindex_self, Matrix.det_fromBlocks_zero₂₁, Matrix.det_smul,
-    Matrix.det_permutation, Fintype.card_fin] at hdet
+      Matrix.det_permutation, Fintype.card_fin]
+    at hdet
   rw [hdet]
   ring
 
-theorem det_snoc {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+) :
-    (h.snoc t s).mat.det = h.mat.det * (t : E) ^ (s : ℕ) ∨
-      (h.snoc t s).mat.det = -(h.mat.det * (t : E) ^ (s : ℕ)) := by
+theorem det_snoc {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+)
+    : (h.snoc t s).mat.det = h.mat.det * (t : E) ^ (s : ℕ)
+      ∨ (h.snoc t s).mat.det = -(h.mat.det * (t : E) ^ (s : ℕ)) := by
   rw [det_snoc_eq]
   rcases Int.units_eq_one_or (Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin s))) with h1 | h1
   · left
@@ -81,8 +94,8 @@ theorem det_snoc {m : ℕ} (h : Pt E m) (t : Eˣ) (s : ℕ+) :
     rw [h1]
     simp
 
-private theorem isUnit_det_of_mem_UH_Hpk (bs : List (Eˣ × ℕ+)) :
-    ∀ (n : ℕ) (hn : (bs.map (fun b => (b.2 : ℕ))).sum = n),
+private theorem isUnit_det_of_mem_UH_Hpk (bs : List (Eˣ × ℕ+))
+    : ∀ (n : ℕ) (hn : (bs.map (fun b => (b.2 : ℕ))).sum = n),
       IsUnit (Pt.mat (⟨bs, hn⟩ : Pt E n)).det := by
   induction bs using List.reverseRecOn with
   | nil =>

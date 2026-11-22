@@ -11,28 +11,32 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 noncomputable section
 namespace GlobalTheory.ParabVirt
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.ParabVirt.sum_fibres {G X : Type} [Group G] [Fintype G] [Fintype X]
-    (H : Subgroup G) (π : G → X)
-    (hs : Function.Surjective π) (hπ : ∀ s t, π s = π t ↔ s⁻¹ * t ∈ H) (f : X → ℂ) :
-    ∑ t, f (π t) = (Nat.card H : ℂ) * ∑ x, f x := by
+theorem _root_.GlobalTheory.ParabVirt.sum_fibres
+    {G X : Type} [Group G] [Fintype G] [Fintype X]
+    (H : Subgroup G) (π : G → X) (hs : Function.Surjective π) (hπ : ∀ s t, π s = π t ↔ s⁻¹ * t ∈ H)
+    (f : X → ℂ)
+    : ∑ t, f (π t) = (Nat.card H : ℂ) * ∑ x, f x := by
   classical
   have hcard : ∀ s : G, (Finset.univ.filter (fun t => π t = π s)).card = Nat.card H := by
     intro s
     rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
-    exact Nat.card_congr
-      { toFun := fun t => ⟨s⁻¹ * t.1, (hπ s t.1).1 t.2.symm⟩
-        invFun := fun h => ⟨s * h.1, ((hπ s (s * h.1)).2 (by simpa using h.2)).symm⟩
-        left_inv := fun t => by ext; simp
-        right_inv := fun h => by ext; simp }
-  calc ∑ t, f (π t) = ∑ x, ∑ t ∈ Finset.univ.filter (fun t => π t = x), f (π t) :=
-        (Finset.sum_fiberwise _ _ _).symm
+    exact Nat.card_congr {
+      toFun := fun t => ⟨s⁻¹ * t.1, (hπ s t.1).1 t.2.symm⟩
+      invFun := fun h => ⟨s * h.1, ((hπ s (s * h.1)).2 (by simpa using h.2)).symm⟩
+      left_inv := fun t => by ext; simp
+      right_inv := fun h => by ext; simp
+    }
+  calc
+    ∑ t, f (π t) = ∑ x, ∑ t ∈ Finset.univ.filter (fun t => π t = x), f (π t) :=
+      (Finset.sum_fiberwise _ _ _).symm
     _ = ∑ x, (Nat.card H : ℂ) * f x := by
-        refine Finset.sum_congr rfl fun x _ => ?_
-        obtain ⟨s, rfl⟩ := hs x
-        rw [Finset.sum_congr rfl (g := fun _ => f (π s))
-          (fun t ht => by rw [(Finset.mem_filter.1 ht).2]), Finset.sum_const, hcard, nsmul_eq_mul]
+      refine Finset.sum_congr rfl fun x _ => ?_
+      obtain ⟨s, rfl⟩ := hs x
+      rw [Finset.sum_congr rfl
+          (g := fun _ => f (π s))
+          (fun t ht => by rw [(Finset.mem_filter.1 ht).2]),
+        Finset.sum_const, hcard, nsmul_eq_mul]
     _ = _ := (Finset.mul_sum _ _ _).symm
 
 variable {F : Type} [Field F] {n : ℕ}
@@ -43,29 +47,29 @@ def lin (x : GL (Fin n) F) : (Fin n → F) ≃ₗ[F] (Fin n → F) :=
     (by rw [← Matrix.toLin'_mul, Units.mul_inv, Matrix.toLin'_one])
     (by rw [← Matrix.toLin'_mul, Units.inv_mul, Matrix.toLin'_one])
 
-theorem lin_apply (x : GL (Fin n) F) (v : Fin n → F) :
-    lin x v = Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v := rfl
+theorem lin_apply (x : GL (Fin n) F) (v : Fin n → F)
+    : lin x v = Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v :=
+  rfl
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.lin_mul (x y : GL (Fin n) F) (v : Fin n → F) :
-    _root_.GlobalTheory.ParabVirt.lin (x * y) v =
-      _root_.GlobalTheory.ParabVirt.lin x (_root_.GlobalTheory.ParabVirt.lin y v) := by
-  simp only [_root_.GlobalTheory.ParabVirt.lin_apply, Units.val_mul,
-    Matrix.toLin'_mul_apply]
+theorem _root_.GlobalTheory.ParabVirt.lin_mul (x y : GL (Fin n) F) (v : Fin n → F)
+    : _root_.GlobalTheory.ParabVirt.lin (x * y) v
+      = _root_.GlobalTheory.ParabVirt.lin x (_root_.GlobalTheory.ParabVirt.lin y v) := by
+  simp only [_root_.GlobalTheory.ParabVirt.lin_apply, Units.val_mul, Matrix.toLin'_mul_apply]
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.lin_one (v : Fin n → F) :
-    _root_.GlobalTheory.ParabVirt.lin (1 : GL (Fin n) F) v = v := by
+theorem _root_.GlobalTheory.ParabVirt.lin_one (v : Fin n → F)
+    : _root_.GlobalTheory.ParabVirt.lin (1 : GL (Fin n) F) v = v := by
   simp [_root_.GlobalTheory.ParabVirt.lin_apply]
 
 theorem lin_inv (x : GL (Fin n) F) (v : Fin n → F) : lin x⁻¹ v = (lin x).symm v := rfl
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.lin_surjective (e : (Fin n → F) ≃ₗ[F] (Fin n → F)) :
-    ∃ x : GL (Fin n) F, _root_.GlobalTheory.ParabVirt.lin x = e := by
+theorem _root_.GlobalTheory.ParabVirt.lin_surjective (e : (Fin n → F) ≃ₗ[F] (Fin n → F))
+    : ∃ x : GL (Fin n) F, _root_.GlobalTheory.ParabVirt.lin x = e := by
   refine ⟨⟨LinearMap.toMatrix' e.toLinearMap, LinearMap.toMatrix' e.symm.toLinearMap, ?_, ?_⟩, ?_⟩
   · rw [← LinearMap.toMatrix'_comp]; simp
   · rw [← LinearMap.toMatrix'_comp]; simp
@@ -74,9 +78,10 @@ theorem _root_.GlobalTheory.ParabVirt.lin_surjective (e : (Fin n → F) ≃ₗ[F
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.map_eq_of_stable (x : GL (Fin n) F)
-    (W : Submodule F (Fin n → F)) (h : ∀ v ∈ W, _root_.GlobalTheory.ParabVirt.lin x v ∈ W) :
-    W.map (_root_.GlobalTheory.ParabVirt.lin x).toLinearMap = W := by
+theorem _root_.GlobalTheory.ParabVirt.map_eq_of_stable
+    (x : GL (Fin n) F) (W : Submodule F (Fin n → F))
+    (h : ∀ v ∈ W, _root_.GlobalTheory.ParabVirt.lin x v ∈ W)
+    : W.map (_root_.GlobalTheory.ParabVirt.lin x).toLinearMap = W := by
   refine Submodule.eq_of_le_of_finrank_eq ?_ (LinearEquiv.finrank_map_eq _ _)
   rintro _ ⟨v, hv, rfl⟩
   exact h v hv
@@ -84,8 +89,7 @@ theorem _root_.GlobalTheory.ParabVirt.map_eq_of_stable (x : GL (Fin n) F)
 def stab (W : Submodule F (Fin n → F)) : Subgroup (GL (Fin n) F) where
   carrier := {x | ∀ v ∈ W, Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v ∈ W}
   one_mem' := fun v hv => by rw [← lin_apply, lin_one]; exact hv
-  mul_mem' := fun {x y} hx hy v hv => by
-    rw [← lin_apply, lin_mul]; exact hx _ (hy v hv)
+  mul_mem' := fun {x y} hx hy v hv => by rw [← lin_apply, lin_mul]; exact hx _ (hy v hv)
   inv_mem' := fun {x} hx v hv => by
     rw [← lin_apply, lin_inv]
     rw [← map_eq_of_stable x W hx] at hv
@@ -94,31 +98,34 @@ def stab (W : Submodule F (Fin n → F)) : Subgroup (GL (Fin n) F) where
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.mem_stab (W : Submodule F (Fin n → F)) (x : GL (Fin n) F) :
-    x ∈ _root_.GlobalTheory.ParabVirt.stab W ↔
-      ∀ v ∈ W, Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v ∈ W := Iff.rfl
+theorem _root_.GlobalTheory.ParabVirt.mem_stab (W : Submodule F (Fin n → F)) (x : GL (Fin n) F)
+    : x ∈ _root_.GlobalTheory.ParabVirt.stab W
+      ↔ ∀ v ∈ W, Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v ∈ W :=
+  Iff.rfl
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-private theorem lin_mul_toLinearMap (x y : GL (Fin n) F) :
-    (_root_.GlobalTheory.ParabVirt.lin (x * y)).toLinearMap =
-      (_root_.GlobalTheory.ParabVirt.lin x).toLinearMap ∘ₗ
-        (_root_.GlobalTheory.ParabVirt.lin y).toLinearMap :=
+private theorem lin_mul_toLinearMap (x y : GL (Fin n) F)
+    : (_root_.GlobalTheory.ParabVirt.lin (x * y)).toLinearMap
+      = (_root_.GlobalTheory.ParabVirt.lin x).toLinearMap
+        ∘ₗ (_root_.GlobalTheory.ParabVirt.lin y).toLinearMap :=
   LinearMap.ext fun v => _root_.GlobalTheory.ParabVirt.lin_mul x y v
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.map_eq_map_iff (W : Submodule F (Fin n → F))
-    (s t : GL (Fin n) F) :
-    W.map (_root_.GlobalTheory.ParabVirt.lin s).toLinearMap =
-        W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap ↔
-      s⁻¹ * t ∈ _root_.GlobalTheory.ParabVirt.stab W := by
+theorem _root_.GlobalTheory.ParabVirt.map_eq_map_iff
+    (W : Submodule F (Fin n → F)) (s t : GL (Fin n) F)
+    : W.map (_root_.GlobalTheory.ParabVirt.lin s).toLinearMap
+        = W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap
+      ↔ s⁻¹ * t ∈ _root_.GlobalTheory.ParabVirt.stab W := by
   constructor
   · intro h v hv
     rw [← _root_.GlobalTheory.ParabVirt.lin_apply, _root_.GlobalTheory.ParabVirt.lin_mul,
       _root_.GlobalTheory.ParabVirt.lin_inv]
-    have hmem : _root_.GlobalTheory.ParabVirt.lin t v ∈
-        W.map (_root_.GlobalTheory.ParabVirt.lin s).toLinearMap := h ▸ ⟨v, hv, rfl⟩
+    have hmem
+        : _root_.GlobalTheory.ParabVirt.lin t v
+          ∈ W.map (_root_.GlobalTheory.ParabVirt.lin s).toLinearMap :=
+      h ▸ ⟨v, hv, rfl⟩
     obtain ⟨w, hw, hw'⟩ := hmem
     simpa [← hw'] using hw
   · intro h
@@ -129,13 +136,15 @@ theorem _root_.GlobalTheory.ParabVirt.map_eq_map_iff (W : Submodule F (Fin n →
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-theorem _root_.GlobalTheory.ParabVirt.conj_mem_stab_iff (W : Submodule F (Fin n → F))
-    (x t : GL (Fin n) F) :
-    t⁻¹ * x * t ∈ _root_.GlobalTheory.ParabVirt.stab W ↔
-      x ∈ _root_.GlobalTheory.ParabVirt.stab (W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap) := by
-  change (∀ v ∈ W, _root_.GlobalTheory.ParabVirt.lin (t⁻¹ * x * t) v ∈ W) ↔
-    ∀ v ∈ W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap, _root_.GlobalTheory.ParabVirt.lin x v ∈
-      W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap
+theorem _root_.GlobalTheory.ParabVirt.conj_mem_stab_iff
+    (W : Submodule F (Fin n → F)) (x t : GL (Fin n) F)
+    : t⁻¹ * x * t ∈ _root_.GlobalTheory.ParabVirt.stab W
+      ↔ x ∈ _root_.GlobalTheory.ParabVirt.stab (W.map (_root_.GlobalTheory.ParabVirt.lin
+        t).toLinearMap) := by
+  change (∀ v ∈ W, _root_.GlobalTheory.ParabVirt.lin (t⁻¹ * x * t) v ∈ W)
+    ↔ ∀ v ∈ W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap,
+      _root_.GlobalTheory.ParabVirt.lin x v
+        ∈ W.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap
   constructor
   · rintro h _ ⟨w, hw, rfl⟩
     refine ⟨_root_.GlobalTheory.ParabVirt.lin (t⁻¹ * x * t) w, h w hw, ?_⟩
@@ -151,10 +160,11 @@ theorem _root_.GlobalTheory.ParabVirt.conj_mem_stab_iff (W : Submodule F (Fin n 
     rw [hwu]
     exact hu
 
-def resMat {a : ℕ} (W : Submodule F (Fin n → F)) (e : W ≃ₗ[F] (Fin a → F)) :
-    stab W →* Matrix (Fin a) (Fin a) F where
-  toFun h := LinearMap.toMatrix'
-    (e.conj ((Matrix.toLin' ((h : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)).restrict h.2))
+def resMat {a : ℕ} (W : Submodule F (Fin n → F)) (e : W ≃ₗ[F] (Fin a → F))
+    : stab W →* Matrix (Fin a) (Fin a) F where
+  toFun h :=
+    LinearMap.toMatrix' (e.conj
+      ((Matrix.toLin' ((h : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)).restrict h.2))
   map_one' := by
     rw [← LinearMap.toMatrix'_id]
     congr 1
@@ -173,27 +183,28 @@ def resMat {a : ℕ} (W : Submodule F (Fin n → F)) (e : W ≃ₗ[F] (Fin a →
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in
-private theorem exists_gl_map_lin_eq_of_finrank_eq (W₀ W : Submodule F (Fin n → F))
-    (h : Module.finrank F W₀ = Module.finrank F W) :
-    ∃ t : GL (Fin n) F, W₀.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap = W := by
+private theorem exists_gl_map_lin_eq_of_finrank_eq
+    (W₀ W : Submodule F (Fin n → F)) (h : Module.finrank F W₀ = Module.finrank F W)
+    : ∃ t : GL (Fin n) F, W₀.map (_root_.GlobalTheory.ParabVirt.lin t).toLinearMap = W := by
   obtain ⟨C₀, hC₀⟩ := Submodule.exists_isCompl W₀
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl W
   have h₁ := Submodule.finrank_add_eq_of_isCompl hC₀
   have h₂ := Submodule.finrank_add_eq_of_isCompl hC
   let E : (Fin n → F) ≃ₗ[F] (Fin n → F) :=
-    (W₀.prodEquivOfIsCompl C₀ hC₀).symm ≪≫ₗ
-      (LinearEquiv.prodCongr (LinearEquiv.ofFinrankEq W₀ W h)
-        (LinearEquiv.ofFinrankEq C₀ C (by omega))) ≪≫ₗ W.prodEquivOfIsCompl C hC
+    (W₀.prodEquivOfIsCompl C₀ hC₀).symm
+      ≪≫ₗ (LinearEquiv.prodCongr (LinearEquiv.ofFinrankEq W₀ W h)
+        (LinearEquiv.ofFinrankEq C₀ C (by omega)))
+      ≪≫ₗ W.prodEquivOfIsCompl C hC
   obtain ⟨t, ht⟩ := _root_.GlobalTheory.ParabVirt.lin_surjective E
   refine ⟨t, Submodule.eq_of_le_of_finrank_eq ?_ ?_⟩
   · rintro _ ⟨v, hv, rfl⟩
     have hs : (W₀.prodEquivOfIsCompl C₀ hC₀).symm v = (⟨v, hv⟩, 0) :=
       Submodule.prodEquivOfIsCompl_symm_apply_left W₀ C₀ hC₀ ⟨v, hv⟩
     simpa only [LinearEquiv.coe_coe, ht, E, LinearEquiv.trans_apply, hs,
-      LinearEquiv.prodCongr_apply, LinearEquiv.map_zero, Submodule.coe_prodEquivOfIsCompl',
-      Submodule.coe_zero, add_zero] using (LinearEquiv.ofFinrankEq W₀ W h ⟨v, hv⟩).property
+        LinearEquiv.prodCongr_apply, LinearEquiv.map_zero, Submodule.coe_prodEquivOfIsCompl',
+        Submodule.coe_zero, add_zero]
+      using (LinearEquiv.ofFinrankEq W₀ W h ⟨v, hv⟩).property
   · rw [LinearEquiv.finrank_map_eq, h]
-
 
 open Polynomial in
 variable {F : Type} [Field F] {n : ℕ} in

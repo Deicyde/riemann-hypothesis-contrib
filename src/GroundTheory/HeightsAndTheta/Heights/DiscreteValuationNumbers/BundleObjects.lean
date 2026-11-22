@@ -18,8 +18,8 @@ section Point
 
 variable {K : Type*} {ι : K → Type*} {Ω : Type*} [Field Ω]
 
-def pointConeMap (R : Type*) [CommRing R] [Algebra R Ω] (y : (Σ k, ι k) → Ω) :
-    MRing ι R →ₐ[R] MvPolynomial K Ω :=
+def pointConeMap (R : Type*) [CommRing R] [Algebra R Ω] (y : (Σ k, ι k) → Ω)
+    : MRing ι R →ₐ[R] MvPolynomial K Ω :=
   aeval fun p => C (y p) * X p.1
 
 def pointIdeal (R : Type*) [CommRing R] [Algebra R Ω] (y : (Σ k, ι k) → Ω) : Ideal (MRing ι R) :=
@@ -37,8 +37,7 @@ section Charts
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} {Ω : Type*} [Field Ω]
 
-def segreVec (y : (Σ k, ι k) → Ω) : (∀ k, ι k) → Ω :=
-  fun c => ∏ k, y ⟨k, c k⟩
+def segreVec (y : (Σ k, ι k) → Ω) : (∀ k, ι k) → Ω := fun c => ∏ k, y ⟨k, c k⟩
 
 variable (R : Type*) [CommRing R] [Algebra R Ω]
 
@@ -47,22 +46,36 @@ def degLat (y : (Σ k, ι k) → Ω) (b : K → ℤ) (c : ∀ k, ι k) : Set Ω 
 
 variable {R} {N : ℕ} {E : Type*} [AddCommGroup E] [Module Ω E]
 
-structure IsFlagFrame (y : (Σ k, ι k) → Ω) (B : ChartBundle R (segreVec y) N E)
-    (w : Module.Basis (Fin N) Ω E) (b : Fin N → K → ℤ) : Prop where
-  graded : ∀ c, segreVec y c ≠ 0 → ∀ i : Fin N,
-    {s | ∃ v ∈ B.lat c, (∀ j, i < j → w.repr v j = 0) ∧ w.repr v i = s} = degLat R y (b i) c
+structure IsFlagFrame
+    (y : (Σ k, ι k) → Ω) (B : ChartBundle R (segreVec y) N E)
+    (w : Module.Basis (Fin N) Ω E) (b : Fin N → K → ℤ)
+    : Prop where
+  graded
+    : ∀ c,
+      segreVec y c ≠ 0
+        → ∀ i : Fin N,
+          {s | ∃ v ∈ B.lat c, (∀ j, i < j → w.repr v j = 0) ∧ w.repr v i = s} = degLat R y (b i) c
 
-structure IsTwistedDualGens (y : (Σ k, ι k) → Ω) (B : ChartBundle R (segreVec y) N E) (a : K → ℤ)
-    {M : ℕ} (φ : Fin M → Module.Dual Ω E) : Prop where
+structure IsTwistedDualGens
+    (y : (Σ k, ι k) → Ω) (B : ChartBundle R (segreVec y) N E)
+    (a : K → ℤ)
+    {M : ℕ} (φ : Fin M → Module.Dual Ω E)
+    : Prop where
   sections : ∀ c, segreVec y c ≠ 0 → ∀ l, ∀ v ∈ B.lat c, φ l v ∈ degLat R y a c
-  generate : ∀ c, segreVec y c ≠ 0 → ∀ ψ : Module.Dual Ω E,
-    (∀ v ∈ B.lat c, ψ v ∈ chartRing R (segreVec y) c) →
-    ∃ u : Fin M → Ω, (∀ l, u l ∈ chartRing R (segreVec y) c) ∧
-      ψ = ∑ l, (u l * ∏ k, y ⟨k, c k⟩ ^ (-a k)) • φ l
+  generate
+    : ∀ c,
+      segreVec y c ≠ 0
+        → ∀ ψ : Module.Dual Ω E,
+          (∀ v ∈ B.lat c, ψ v ∈ chartRing R (segreVec y) c)
+            → ∃ u : Fin M → Ω,
+              (∀ l, u l ∈ chartRing R (segreVec y) c)
+                ∧ ψ = ∑ l, (u l * ∏ k, y ⟨k, c k⟩ ^ (-a k)) • φ l
 
 def SameGenericFibre {τ : Type*} {x : τ → Ω} (ϖ : R) (B B' : ChartBundle R x N E) : Prop :=
-  ∀ c, x c ≠ 0 → (∀ v ∈ B.lat c, ∃ n : ℕ, algebraMap R Ω ϖ ^ n • v ∈ B'.lat c) ∧
-    (∀ v ∈ B'.lat c, ∃ n : ℕ, algebraMap R Ω ϖ ^ n • v ∈ B.lat c)
+  ∀ c,
+    x c ≠ 0
+      → (∀ v ∈ B.lat c, ∃ n : ℕ, algebraMap R Ω ϖ ^ n • v ∈ B'.lat c)
+        ∧ (∀ v ∈ B'.lat c, ∃ n : ℕ, algebraMap R Ω ϖ ^ n • v ∈ B.lat c)
 
 end Charts
 
@@ -70,8 +83,7 @@ section ProjBundle
 
 variable {K : Type*} {ι : K → Type} {Ω : Type*} [Field Ω]
 
-def bundleIdx (ι : K → Type) (M : ℕ) : Option K → Type :=
-  fun o => Option.elim o (Fin M) ι
+def bundleIdx (ι : K → Type) (M : ℕ) : Option K → Type := fun o => Option.elim o (Fin M) ι
 
 instance bundleIdx.fintype [∀ k, Fintype (ι k)] (M : ℕ) : ∀ o, Fintype (bundleIdx ι M o)
   | none => inferInstanceAs (Fintype (Fin M))
@@ -79,14 +91,18 @@ instance bundleIdx.fintype [∀ k, Fintype (ι k)] (M : ℕ) : ∀ o, Fintype (b
 
 variable {N M : ℕ} {E : Type*} [AddCommGroup E] [Module Ω E] {Φ : Type*} [Field Φ] [Algebra Ω Φ]
 
-def projCoord (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
-    (t : Fin N → Φ) : (Σ o, bundleIdx ι M o) → Φ
+def projCoord
+    (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
+    (t : Fin N → Φ)
+    : (Σ o, bundleIdx ι M o) → Φ
   | ⟨none, l⟩ => ∑ i, t i * algebraMap Ω Φ (φ l (w i))
   | ⟨some k, i⟩ => algebraMap Ω Φ (y ⟨k, i⟩)
 
-def projIdeal (F : Type*) [Field F] [Algebra F Ω] (y : (Σ k, ι k) → Ω)
-    (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E) (t : Fin N → Φ) :
-    Ideal (MRing (bundleIdx ι M) F) :=
+def projIdeal
+    (F : Type*) [Field F] [Algebra F Ω]
+    (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
+    (t : Fin N → Φ)
+    : Ideal (MRing (bundleIdx ι M) F) :=
   RingHom.ker (eval₂Hom (C.comp ((algebraMap Ω Φ).comp (algebraMap F Ω)))
     (fun p => C (projCoord y w φ t p) * X p.1))
 
@@ -100,8 +116,7 @@ section Numbers
 
 variable {K : Type*} [DecidableEq K] {ι : K → Type*}
 
-def intNumL (F : Type*) [Field F] (P : Ideal (MRing ι F)) (l : List (K → ℤ)) : ℤ :=
-  intNum F P l.get
+def intNumL (F : Type*) [Field F] (P : Ideal (MRing ι F)) (l : List (K → ℤ)) : ℤ := intNum F P l.get
 
 def rootList {N : ℕ} (x : Fin N → K → ℤ) (α : Fin N → ℕ) : List (K → ℤ) :=
   (List.finRange N).flatMap fun i => List.replicate (α i) (x i)
@@ -111,20 +126,24 @@ def classList {σ : Type*} (cls : σ → K → ℤ) (μ : σ →₀ ℕ) : List 
 
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-def vNumL (W : Ideal (MRing ι O)) (l : List (K → ℤ)) : ℤ :=
-  vNum W l.get
+def vNumL (W : Ideal (MRing ι O)) (l : List (K → ℤ)) : ℤ := vNum W l.get
 
-def classNum {σ : Type*} (cls : σ → K → ℤ) (H : MvPolynomial σ ℤ) (Q : List (K → ℤ))
-    (W : Ideal (MRing ι O)) : ℤ :=
+def classNum
+    {σ : Type*} (cls : σ → K → ℤ) (H : MvPolynomial σ ℤ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : ℤ :=
   ∑ μ ∈ H.support, H.coeff μ * vNumL W (classList cls μ ++ Q)
 
-structure IsPairExpansion {N : ℕ} (m : ℕ) (G : MvPolynomial (Fin N) ℤ)
-    (Gs : Fin N → MvPolynomial (Fin N ⊕ Fin N) ℤ) : Prop where
+structure IsPairExpansion
+    {N : ℕ} (m : ℕ) (G : MvPolynomial (Fin N) ℤ) (Gs : Fin N → MvPolynomial (Fin N ⊕ Fin N) ℤ)
+    : Prop where
   expansion : rename Sum.inl G - rename Sum.inr G = ∑ i, (X (Sum.inl i) - X (Sum.inr i)) * Gs i
   homogeneous : ∀ i, (Gs i).IsHomogeneous (m - 1)
 
-def pairNum {N : ℕ} (P : Ideal (MRing ι O)) (x x' : Fin N → K → ℤ) (f g : Fin N → MRing ι O)
-    (Gs : Fin N → MvPolynomial (Fin N ⊕ Fin N) ℤ) (Q : List (K → ℤ)) : ℤ :=
+def pairNum
+    {N : ℕ}
+    (P : Ideal (MRing ι O)) (x x' : Fin N → K → ℤ) (f g : Fin N → MRing ι O)
+    (Gs : Fin N → MvPolynomial (Fin N ⊕ Fin N) ℤ) (Q : List (K → ℤ))
+    : ℤ :=
   ∑ i, cycEval (fun W => classNum (Sum.elim x x') (Gs i) Q W) (ratDiv P (f i) (g i))
 
 end Numbers
@@ -135,8 +154,11 @@ variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} {Ω : Type*}
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O Ω]
 variable {N : ℕ} {E : Type*} [AddCommGroup E] [Module Ω E]
 
-structure IsFlagPair (ϖ : O) (y : (Σ k, ι k) → Ω) (B B' : ChartBundle O (segreVec y) N E)
-    (w w' : Module.Basis (Fin N) Ω E) (x x' : Fin N → K → ℤ) (f g : Fin N → MRing ι O) : Prop where
+structure IsFlagPair
+    (ϖ : O)
+    (y : (Σ k, ι k) → Ω) (B B' : ChartBundle O (segreVec y) N E)
+    (w w' : Module.Basis (Fin N) Ω E) (x x' : Fin N → K → ℤ) (f g : Fin N → MRing ι O)
+    : Prop where
   flag : IsFlagFrame y B w x
   flag' : IsFlagFrame y B' w' x'
   sameFlag : ∀ i j : Fin N, i < j → w.repr (w' i) j = 0
@@ -149,8 +171,7 @@ section Joins
 
 variable {K K' : Type*} {ι : K → Type} {ι' : K' → Type} {Ω : Type*} [Field Ω]
 
-def joinCoords (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) :
-    (Σ s : K ⊕ K', Sum.elim ι ι' s) → Ω
+def joinCoords (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) : (Σ s : K ⊕ K', Sum.elim ι ι' s) → Ω
   | ⟨Sum.inl k, i⟩ => y ⟨k, i⟩
   | ⟨Sum.inr k, i⟩ => y' ⟨k, i⟩
 
@@ -159,11 +180,17 @@ def joinForm {R : Type*} [CommRing R] (f : MRing ι R) : MRing (Sum.elim ι ι')
 
 def joinDeg (b : K → ℤ) : K ⊕ K' → ℤ := Sum.elim b 0
 
-def IsBirationalJoin [Fintype K] [Fintype K'] (R : Type*) [CommRing R] [Algebra R Ω]
-    (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) : Prop :=
-  ∀ c, segreVec y c ≠ 0 → ∀ c₁ c₂, segreVec y' c₂ ≠ 0 →
-    ∃ a ∈ chartRing R (segreVec y) c, ∃ b ∈ chartRing R (segreVec y) c,
-      b ≠ 0 ∧ segreVec y' c₁ * b = a * segreVec y' c₂
+def IsBirationalJoin
+    [Fintype K] [Fintype K']
+    (R : Type*) [CommRing R] [Algebra R Ω]
+    (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω)
+    : Prop :=
+  ∀ c,
+    segreVec y c ≠ 0
+      → ∀ c₁ c₂,
+        segreVec y' c₂ ≠ 0
+          → ∃ a ∈ chartRing R (segreVec y) c, ∃ b ∈ chartRing R (segreVec y) c,
+            b ≠ 0 ∧ segreVec y' c₁ * b = a * segreVec y' c₂
 
 end Joins
 
@@ -192,18 +219,19 @@ def scaledTrivLat (x : τ → Ω) (r : ℕ) (s : Ω) (c : τ) : AddSubgroup (Fin
 
 variable {R}
 
-theorem mem_scaledTrivLat {x : τ → Ω} {r : ℕ} {s : Ω} {c : τ} {v : Fin r → Ω} :
-    v ∈ scaledTrivLat R x r s c ↔ ∀ q, ∃ a ∈ chartRing R x c, v q = s * a := Iff.rfl
+theorem mem_scaledTrivLat {x : τ → Ω} {r : ℕ} {s : Ω} {c : τ} {v : Fin r → Ω}
+    : v ∈ scaledTrivLat R x r s c ↔ ∀ q, ∃ a ∈ chartRing R x c, v q = s * a :=
+  Iff.rfl
 
 def scaledBasis (r : ℕ) {s : Ω} (hs : s ≠ 0) : Module.Basis (Fin r) Ω (Fin r → Ω) :=
   (Pi.basisFun Ω (Fin r)).unitsSMul fun _ => Units.mk0 s hs
 
-theorem scaledBasis_repr (r : ℕ) {s : Ω} (hs : s ≠ 0) (v : Fin r → Ω) (q : Fin r) :
-    (scaledBasis r hs).repr v q = s⁻¹ * v q := by
+theorem scaledBasis_repr (r : ℕ) {s : Ω} (hs : s ≠ 0) (v : Fin r → Ω) (q : Fin r)
+    : (scaledBasis r hs).repr v q = s⁻¹ * v q := by
   simp [scaledBasis, Units.smul_def]
 
-theorem scaledBasis_apply (r : ℕ) {s : Ω} (hs : s ≠ 0) (q : Fin r) :
-    scaledBasis r hs q = s • Pi.single q 1 := by
+theorem scaledBasis_apply (r : ℕ) {s : Ω} (hs : s ≠ 0) (q : Fin r)
+    : scaledBasis r hs q = s • Pi.single q 1 := by
   simp [scaledBasis, Module.Basis.unitsSMul_apply]
 
 variable (R)
@@ -215,8 +243,12 @@ def scaledTrivBundle (x : τ → Ω) (r : ℕ) {s : Ω} (hs : s ≠ 0) : ChartBu
     exact ⟨a * b, mul_mem ha hb, by simp [hvb]; ring⟩
   frame c hc := by
     refine ⟨1, fun _ => 1, fun _ => 1, fun _ => one_mem _, fun _ => one_mem _, by simp, fun _ => ?_⟩
-    refine ⟨scaledBasis r hs, (scaledBasis r hs).linearIndependent, (scaledBasis r hs).span_eq,
-      fun e => ?_⟩
+    refine ⟨
+      scaledBasis r hs,
+      (scaledBasis r hs).linearIndependent,
+      (scaledBasis r hs).span_eq,
+      fun e => ?_
+    ⟩
     simp only [one_pow, one_smul, one_mul, exists_const]
     constructor
     · intro he
@@ -232,8 +264,8 @@ def scaledTrivBundle (x : τ → Ω) (r : ℕ) {s : Ω} (hs : s ≠ 0) : ChartBu
       simp [scaledBasis_apply, Finset.sum_apply, Pi.single_apply, mul_comm]
   overlap c c' hc hc' v hv := by
     choose a ha hva using (mem_scaledTrivLat).1 hv
-    have hex : ∀ q, ∃ m : ℕ, (x c / x c') ^ m * a q ∈ chartRing R x c' :=
-      fun q => exists_pow_mul_mem_chartRing x c c' hc (ha q)
+    have hex : ∀ q, ∃ m : ℕ, (x c / x c') ^ m * a q ∈ chartRing R x c' := fun q =>
+      exists_pow_mul_mem_chartRing x c c' hc (ha q)
     choose m hm using hex
     refine ⟨∑ q, m q, (mem_scaledTrivLat).2 fun q => ⟨(x c / x c') ^ (∑ q, m q) * a q, ?_, ?_⟩⟩
     · have hle : m q ≤ ∑ q, m q :=
@@ -245,8 +277,8 @@ def scaledTrivBundle (x : τ → Ω) (r : ℕ) {s : Ω} (hs : s ≠ 0) : ChartBu
 
 variable {K : Type*} [Fintype K] {ι : K → Type*}
 
-theorem isFlagFrame_scaledTriv (y : (Σ k, ι k) → Ω) (r : ℕ) {s : Ω} (hs : s ≠ 0) :
-    IsFlagFrame y (scaledTrivBundle R (segreVec y) r hs) (scaledBasis r hs) 0 where
+theorem isFlagFrame_scaledTriv (y : (Σ k, ι k) → Ω) (r : ℕ) {s : Ω} (hs : s ≠ 0)
+    : IsFlagFrame y (scaledTrivBundle R (segreVec y) r hs) (scaledBasis r hs) 0 where
   graded c hc i := by
     have hd : degLat R y ((0 : Fin r → K → ℤ) i) c = (chartRing R (segreVec y) c : Set Ω) := by
       ext u
@@ -269,8 +301,8 @@ theorem isFlagFrame_scaledTriv (y : (Σ k, ι k) → Ω) (r : ℕ) {s : Ω} (hs 
       · rw [scaledBasis_repr]
         simp [← mul_assoc, inv_mul_cancel₀ hs]
 
-theorem isTwistedDualGens_triv (y : (Σ k, ι k) → Ω) (r : ℕ) :
-    IsTwistedDualGens y (scaledTrivBundle R (segreVec y) r one_ne_zero) 0
+theorem isTwistedDualGens_triv (y : (Σ k, ι k) → Ω) (r : ℕ)
+    : IsTwistedDualGens y (scaledTrivBundle R (segreVec y) r one_ne_zero) 0
       (fun l : Fin r => (LinearMap.proj l : Module.Dual Ω (Fin r → Ω))) := by
   constructor
   · intro c hc l v hv

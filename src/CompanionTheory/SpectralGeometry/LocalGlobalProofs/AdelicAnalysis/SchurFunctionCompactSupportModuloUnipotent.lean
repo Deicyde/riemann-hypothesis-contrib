@@ -12,7 +12,8 @@ namespace GlobalTheory.CompanionTheory.SW.CharDensity
 open scoped FourierTransform
 open Filter
 
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+variable
+  {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
 noncomputable def phi (μ : Measure V) (x : V) : ℂ :=
@@ -233,12 +234,12 @@ lemma lintegral_dens_le (μ : Measure V) [IsFiniteMeasure μ] (hφ : Integrable 
         simp only [ha, lintegral_smoothed μ (bn_pos _)]
         simp
 
-theorem exists_density (μ : Measure V) [IsFiniteMeasure μ] (hφ : Integrable (phi μ) volume) :
-    ∃ D : V → ℝ, Continuous D ∧ (∀ y, 0 ≤ D y) ∧ (∀ y, (D y : ℂ) = dens μ y) ∧
-      μ = (volume : Measure V).withDensity (fun y => ENNReal.ofReal (D y)) := by
+theorem exists_density (μ : Measure V) [IsFiniteMeasure μ] (hφ : Integrable (phi μ) volume)
+    : ∃ D : V → ℝ,
+      Continuous D ∧ (∀ y, 0 ≤ D y) ∧ (∀ y, (D y : ℂ) = dens μ y)
+        ∧ μ = (volume : Measure V).withDensity (fun y => ENNReal.ofReal (D y)) := by
   have hcF : Continuous (𝓕 (phi μ)) :=
-    VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar
-      (innerSL ℝ).continuous₂ hφ
+    VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar (innerSL ℝ).continuous₂ hφ
   have hdF : dens μ = 𝓕 (phi μ) := funext (dens_eq_fourier μ)
   have hcd : Continuous (dens μ) := hdF ▸ hcF
   have hof : ∀ y, ((dens μ y).re : ℂ) = dens μ y := fun y =>
@@ -246,9 +247,10 @@ theorem exists_density (μ : Measure V) [IsFiniteMeasure μ] (hφ : Integrable (
   have hcD : Continuous (fun y => (dens μ y).re) := Complex.continuous_re.comp hcd
   have hfin : ∫⁻ y, ENNReal.ofReal (dens μ y).re < ∞ :=
     (lintegral_dens_le μ hφ).trans_lt (measure_lt_top μ _)
-  have hDi : Integrable (fun y => (dens μ y).re) volume :=
-    ⟨hcD.aestronglyMeasurable, (hasFiniteIntegral_iff_ofReal
-      (Eventually.of_forall fun y => dens_re_nonneg μ hφ y)).2 hfin⟩
+  have hDi : Integrable (fun y => (dens μ y).re) volume := ⟨
+    hcD.aestronglyMeasurable,
+    (hasFiniteIntegral_iff_ofReal (Eventually.of_forall fun y => dens_re_nonneg μ hφ y)).2 hfin
+  ⟩
   have hFi : Integrable (𝓕 (phi μ)) volume := by
     rw [← hdF]
     exact hDi.ofReal.congr (Eventually.of_forall hof)
@@ -272,8 +274,17 @@ theorem exists_density (μ : Measure V) [IsFiniteMeasure μ] (hφ : Integrable (
   simp only [smul_eq_mul, Complex.ofReal_re]
   rw [mul_comm, mul_inv_cancel_left₀ hpi]
 
-theorem density_of_integrable_charFun :
-    ∀ (κ : Type) [Fintype κ] (m : Measure (κ → ℝ)), IsFiniteMeasure m → Integrable (fun x : κ → ℝ => ∫ z, Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, z w * x w : ℝ) : ℂ)) ∂m) → ∃ D : (κ → ℝ) → ℝ, Continuous D ∧ (∀ y, 0 ≤ D y) ∧ (∀ y, (D y : ℂ) = ∫ x : κ → ℝ, (∫ z, Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, z w * x w : ℝ) : ℂ)) ∂m) * Complex.exp (-(2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, y w * x w : ℝ) : ℂ))) ∧ ∀ U : Set (κ → ℝ), MeasurableSet U → m U = ∫⁻ y in U, ENNReal.ofReal (D y) := by
+theorem density_of_integrable_charFun
+    : ∀ (κ : Type) [Fintype κ] (m : Measure (κ → ℝ)),
+      IsFiniteMeasure m
+        → Integrable (fun x : κ → ℝ =>
+          ∫ z, Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, z w * x w : ℝ) : ℂ)) ∂m)
+        → ∃ D : (κ → ℝ) → ℝ,
+          Continuous D ∧ (∀ y, 0 ≤ D y)
+            ∧ (∀ y,
+              (D y : ℂ)
+                = ∫ x : κ → ℝ, (∫ z, Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, z w * x w : ℝ) : ℂ)) ∂m) * Complex.exp (-(2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, y w * x w : ℝ) : ℂ)))
+            ∧ ∀ U : Set (κ → ℝ), MeasurableSet U → m U = ∫⁻ y in U, ENNReal.ofReal (D y) := by
   intro κ _ m _ hint
   let e : (κ → ℝ) ≃ᵐ EuclideanSpace ℝ κ := MeasurableEquiv.toLp 2 _
   have hmp : MeasurePreserving e volume volume := PiLp.volume_preserving_toLp κ
@@ -283,8 +294,10 @@ theorem density_of_integrable_charFun :
     intro z x
     simp only [e, MeasurableEquiv.toLp_apply, PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
     exact Finset.sum_congr rfl fun w _ => mul_comm _ _
-  have hphi : ∀ x : κ → ℝ, phi μ (e x) =
-      ∫ z, Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, z w * x w : ℝ) : ℂ)) ∂m := by
+  have hphi
+      : ∀ x : κ → ℝ,
+        phi μ (e x)
+          = ∫ z, Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * ((∑ w, z w * x w : ℝ) : ℂ)) ∂m := by
     intro x
     unfold phi
     rw [hμ, integral_map_equiv]

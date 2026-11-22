@@ -12,8 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5.HerC.Fou
 
-theorem integral_fsv_eq_fourier (D : ℂ → ℂ) (s : ℂ) :
-    ∫ t, Formalism.FourierDecayAlt.P5.fsv s t * D t = 𝓕 D (-(I * conj s) / (π : ℂ)) := by
+theorem integral_fsv_eq_fourier (D : ℂ → ℂ) (s : ℂ)
+    : ∫ t, Formalism.FourierDecayAlt.P5.fsv s t * D t = 𝓕 D (-(I * conj s) / (π : ℂ)) := by
   rw [Real.fourier_eq]
   refine integral_congr_ae (Filter.Eventually.of_forall fun t => ?_)
   simp only [Circle.smul_def, Real.fourierChar_apply, smul_eq_mul]
@@ -35,10 +35,13 @@ theorem integral_fsv_eq_fourier (D : ℂ → ℂ) (s : ℂ) :
   push_cast
   field_simp
 
-theorem smooth_bounded_of_fourier_decay (D : ℂ → ℂ) (m : ℕ) (C : ℝ) (hD : Integrable D)
-    (hdec : ∀ s, ‖∫ t, Formalism.FourierDecayAlt.P5.fsv s t * D t‖ ≤ C * (1 + ‖s‖) ^ (-((m : ℝ) + 3))) :
-    ∃ D' : ℂ → ℂ, ContDiff ℝ m D' ∧ (∀ j ≤ m, ∃ B, ∀ t, ‖iteratedFDeriv ℝ j D' t‖ ≤ B) ∧
-      ∀ t, ContinuousAt D t → D' t = D t := by
+theorem smooth_bounded_of_fourier_decay
+    (D : ℂ → ℂ) (m : ℕ) (C : ℝ) (hD : Integrable D)
+    (hdec
+      : ∀ s, ‖∫ t, Formalism.FourierDecayAlt.P5.fsv s t * D t‖ ≤ C * (1 + ‖s‖) ^ (-((m : ℝ) + 3)))
+    : ∃ D' : ℂ → ℂ,
+      ContDiff ℝ m D' ∧ (∀ j ≤ m, ∃ B, ∀ t, ‖iteratedFDeriv ℝ j D' t‖ ≤ B)
+        ∧ ∀ t, ContinuousAt D t → D' t = D t := by
   refine fourier_smooth D m C hD fun w => ?_
   rw [Complex.finrank_real_complex]
   set s : ℂ := -(I * π * conj w) with hs
@@ -61,7 +64,8 @@ theorem smooth_bounded_of_fourier_decay (D : ℂ → ℂ) (m : ℕ) (C : ℝ) (h
   have e : (-((m : ℝ) + ((2 : ℕ) : ℝ) + 1)) = -((m : ℝ) + 3) := by push_cast; ring
   rw [e]
   refine mul_le_mul_of_nonneg_left ?_ hC
-  refine Real.rpow_le_rpow_of_nonpos (by positivity) ?_ (by linarith [(Nat.cast_nonneg m : (0 : ℝ) ≤ m)])
+  refine Real.rpow_le_rpow_of_nonpos (by positivity) ?_
+    (by linarith [(Nat.cast_nonneg m : (0 : ℝ) ≤ m)])
   rw [hns]
   nlinarith [Real.pi_gt_three, norm_nonneg w]
 

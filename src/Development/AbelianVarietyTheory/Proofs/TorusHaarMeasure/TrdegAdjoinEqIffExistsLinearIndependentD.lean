@@ -10,14 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 
 namespace GlobalTheory
 
-open NumberField ReciprocityTheory.ChartRestriction.G.T0 ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Up.AlgT
-
+open NumberField ReciprocityTheory.ChartRestriction.G.T0 ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.ChartRestriction.G.AR.Up.AlgT
 
 open scoped IntermediateField.algebraAdjoinAdjoin in
-theorem trdeg_adjoin_eq_iff_exists_linearIndependent_D {K F κ : Type} [Field K] [CharZero K]
-    [Field F] [Algebra K F] {D : ℕ} (hD : Algebra.trdeg K F = D) (x : κ → F) :
-    Algebra.trdeg K (IntermediateField.adjoin K (Set.range x)) = D ↔
-      ∃ J : Fin D → κ, LinearIndependent F fun k => KaehlerDifferential.D K F (x (J k)) := by
+theorem trdeg_adjoin_eq_iff_exists_linearIndependent_D
+    {K F κ : Type} [Field K] [CharZero K] [Field F] [Algebra K F]
+    {D : ℕ} (hD : Algebra.trdeg K F = D)
+    (x : κ → F)
+    : Algebra.trdeg K (IntermediateField.adjoin K (Set.range x)) = D
+      ↔ ∃ J : Fin D → κ, LinearIndependent F fun k => KaehlerDifferential.D K F (x (J k)) := by
   set L := IntermediateField.adjoin K (Set.range x) with hL
   have htow : Algebra.trdeg K L + Algebra.trdeg L F = D := (trdeg_add_eq K L (A := F)).trans hD
   constructor
@@ -51,25 +53,29 @@ theorem trdeg_adjoin_eq_iff_exists_linearIndependent_D {K F κ : Type} [Field K]
     refine le_antisymm (htow ▸ le_self_add) ?_
     simpa using hy.cardinalMk_le_trdeg
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
 
-theorem trdegD_iff_exists_linearIndependent_D :
-    ∀ (d : Data K ι Ω WT A) (c : ι), Algebra.trdeg K (Ω c) = d.D → d.w (d.jc c) c ≠ 0 →
-    (TrdegD d c ↔ ∃ J : Fin d.D → Fin d.N,
-      LinearIndependent (Ω c) fun k => KaehlerDifferential.D K (Ω c) (d.x c (J k))) := by
+theorem trdegD_iff_exists_linearIndependent_D
+    : ∀ (d : Data K ι Ω WT A) (c : ι),
+      Algebra.trdeg K (Ω c) = d.D → d.w (d.jc c) c ≠ 0
+        → (TrdegD d c
+          ↔ ∃ J : Fin d.D → Fin d.N,
+            LinearIndependent (Ω c) fun k => KaehlerDifferential.D K (Ω c) (d.x c (J k))) := by
   intro d c hD hw
   have hone : ratio (Ω := Ω c) (d.w (d.jc c) c) (d.w (d.jc c) c) = 1 := by
     have hex : ∃ a : Ω c, d.w (d.jc c) c = a • d.w (d.jc c) c := ⟨1, (one_smul _ _).symm⟩
     have h := hex.choose_spec
     rw [ratio, dite_eq_left hex]
     exact smul_left_injective (Ω c) hw (h.symm.trans (one_smul _ _).symm)
-  have heq : IntermediateField.adjoin K (Set.range fun j =>
-      ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c)) =
-      IntermediateField.adjoin K (Set.range (d.x c)) := by
+  have heq
+      : IntermediateField.adjoin K (Set.range fun j => ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c))
+        = IntermediateField.adjoin K (Set.range (d.x c)) := by
     apply le_antisymm
     · rw [IntermediateField.adjoin_le_iff]
       rintro _ ⟨j, rfl⟩

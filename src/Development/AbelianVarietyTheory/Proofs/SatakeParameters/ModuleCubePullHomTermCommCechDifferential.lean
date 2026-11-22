@@ -13,28 +13,30 @@ noncomputable section
 
 namespace GlobalTheory.Cube.PullHom
 
-variable {ι κ : Type} [LinearOrder ι] [LinearOrder κ] {R S : Type} [Ring R] [Ring S]
+variable
+  {ι κ : Type} [LinearOrder ι] [LinearOrder κ]
+  {R S : Type} [Ring R] [Ring S]
   {σ : R →+* S} {τ : κ → ι} {A : Cube.{0} ι R} {B : Cube.{0} κ S} (ψ : Cube.PullHom σ τ A B)
-
 
 open Classical in
 def totalPull (y : ∀ s : Finset ι, A.obj s) (s : Finset κ) : B.obj s :=
   if Set.InjOn τ (s : Set κ) then PD.sortSign τ s • ψ.app s (y (s.image τ)) else 0
 
-theorem term_eq_totalPull {p : ℕ} (x : Cube.Term A p) (s : {s : Finset κ // s.card = p}) :
-    ψ.term p x s = totalPull ψ (Cube.extend A p x) s.1 := by
+theorem term_eq_totalPull {p : ℕ} (x : Cube.Term A p) (s : {s : Finset κ // s.card = p})
+    : ψ.term p x s = totalPull ψ (Cube.extend A p x) s.1 := by
   by_cases h : Set.InjOn τ (s.1 : Set κ)
-  · rw [term_apply_of_injOn ψ x s h, totalPull, if_pos h, Cube.extend_apply_of_eq A x (card_image s h)]
+  · rw [term_apply_of_injOn ψ x s h, totalPull, if_pos h,
+      Cube.extend_apply_of_eq A x (card_image s h)]
   · rw [term_apply_of_not_injOn ψ x s h, totalPull, if_neg h]
 
-theorem totalPull_totalD (y : ∀ s : Finset ι, A.obj s) :
-    totalPull ψ (Cube.totalD A y) = Cube.totalD B (totalPull ψ y) := by
+theorem totalPull_totalD (y : ∀ s : Finset ι, A.obj s)
+    : totalPull ψ (Cube.totalD A y) = Cube.totalD B (totalPull ψ y) := by
   funext t
   rw [Cube.totalD_apply B]
   by_cases h : Set.InjOn τ (t : Set κ)
   set_option synthInstance.maxHeartbeats 100000 in
     · rw [totalPull, if_pos h, Cube.totalD_apply A,
-      Finset.sum_image (fun x hx y hy hxy => h hx hy hxy), map_sum, Finset.smul_sum]
+        Finset.sum_image (fun x hx y hy hxy => h hx hy hxy), map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun i hi => ?_
       have hi' : Set.InjOn τ ((t.erase i : Finset κ) : Set κ) :=
         h.mono (Finset.coe_subset.2 (Finset.erase_subset i t))
@@ -56,9 +58,11 @@ theorem totalPull_totalD (y : ∀ s : Finset ι, A.obj s) :
         map_zero, smul_zero])]
     by_cases hia : Set.InjOn τ ((t.erase a : Finset κ) : Set κ)
     · have hib := PD.PullMap.injOn_erase_swap hb hab he hia
-      have key : ∀ c ∈ t, (t.erase c).image τ = t.image τ →
-          Cube.res B (Finset.erase_subset c t) (ψ.app (t.erase c) (y ((t.erase c).image τ))) =
-            ψ.app t (y (t.image τ)) := by
+      have key
+          : ∀ c ∈ t,
+            (t.erase c).image τ = t.image τ
+              → Cube.res B (Finset.erase_subset c t) (ψ.app (t.erase c) (y ((t.erase c).image τ)))
+                = ψ.app t (y (t.image τ)) := by
         intro c _ e
         rw [← ψ.app_res, Cube.res_congr A y e _ (subset_refl _), Cube.res_self]
       rw [totalPull, totalPull, if_pos hia, if_pos hib, map_zsmul, map_zsmul,
@@ -70,14 +74,16 @@ theorem totalPull_totalD (y : ∀ s : Finset ι, A.obj s) :
       rw [totalPull, totalPull, if_neg hia, if_neg hib, map_zero, map_zero, smul_zero, smul_zero,
         add_zero]
 
-theorem term_d (p : ℕ) (x : Cube.Term A p) :
-    ψ.term (p + 1) (Cube.d A p x) = Cube.d B p (ψ.term p x) := by
+theorem term_d (p : ℕ) (x : Cube.Term A p)
+    : ψ.term (p + 1) (Cube.d A p x) = Cube.d B p (ψ.term p x) := by
   funext t
   rw [Cube.d_apply_eq_totalD B (ψ.term p x) (totalPull ψ (Cube.extend A p x))
-    (fun s => term_eq_totalPull ψ x s), ← totalPull_totalD]
+      (fun s => term_eq_totalPull ψ x s),
+    ← totalPull_totalD]
   by_cases h : Set.InjOn τ (t.1 : Set κ)
-  · rw [term_apply_of_injOn ψ _ t h, totalPull, if_pos h, Cube.d_apply_eq_totalD A x (Cube.extend A p x)
-      (fun s => (Cube.extend_apply_of_eq A x s.2).symm)]
+  · rw [term_apply_of_injOn ψ _ t h, totalPull, if_pos h,
+      Cube.d_apply_eq_totalD A x (Cube.extend A p x)
+        (fun s => (Cube.extend_apply_of_eq A x s.2).symm)]
   · rw [term_apply_of_not_injOn ψ _ t h, totalPull, if_neg h]
 
 end GlobalTheory.Cube.PullHom

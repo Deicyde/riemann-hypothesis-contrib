@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_prime_hom_zmod_of_ne_top (X : Type) [AddCommGroup X] [Module.Finite ℤ X]
-    (Λ : AddSubgroup X) (h : Λ ≠ ⊤) :
-    ∃ l : ℕ, l.Prime ∧ ∃ f : X →+ ZMod l, f ≠ 0 ∧ ∀ x ∈ Λ, f x = 0 := by
+theorem exists_prime_hom_zmod_of_ne_top
+    (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (Λ : AddSubgroup X) (h : Λ ≠ ⊤)
+    : ∃ l : ℕ, l.Prime ∧ ∃ f : X →+ ZMod l, f ≠ 0 ∧ ∀ x ∈ Λ, f x = 0 := by
   have h1 : (AddSubgroup.toIntSubmodule Λ) ≠ ⊤ := by
     intro h'
     apply h
@@ -19,8 +19,7 @@ theorem exists_prime_hom_zmod_of_ne_top (X : Type) [AddCommGroup X] [Module.Fini
   have hs : IsSimpleModule ℤ (X ⧸ M) := isSimpleModule_iff_isCoatom.mpr hM
   obtain ⟨I, hI, ⟨e⟩⟩ := isSimpleModule_iff_quot_maximal.mp hs
   obtain ⟨n, hn⟩ := (IsPrincipalIdealRing.principal I).principal
-  have hn' : I = Ideal.span {((n.natAbs : ℕ) : ℤ)} := by
-    rw [Int.span_natAbs]; exact hn
+  have hn' : I = Ideal.span {((n.natAbs : ℕ) : ℤ)} := by rw [Int.span_natAbs]; exact hn
   have hn0 : n ≠ 0 := by
     rintro rfl
     have hb : I = ⊥ := by simpa using hn
@@ -32,7 +31,13 @@ theorem exists_prime_hom_zmod_of_ne_top (X : Type) [AddCommGroup X] [Module.Fini
     exact Nat.prime_iff_prime_int.mpr h2
   let g : (ℤ ⧸ I) ≃+* ZMod n.natAbs :=
     (Ideal.quotEquivOfEq hn').trans (Int.quotientSpanNatEquivZMod n.natAbs)
-  refine ⟨n.natAbs, hp, g.toAddMonoidHom.comp (e.toLinearMap.toAddMonoidHom.comp M.mkQ.toAddMonoidHom), ?_, ?_⟩
+  refine ⟨
+    n.natAbs,
+    hp,
+    g.toAddMonoidHom.comp (e.toLinearMap.toAddMonoidHom.comp M.mkQ.toAddMonoidHom),
+    ?_,
+    ?_
+  ⟩
   · intro h0
     apply hM.1
     rw [eq_top_iff]
@@ -45,8 +50,15 @@ theorem exists_prime_hom_zmod_of_ne_top (X : Type) [AddCommGroup X] [Module.Fini
     change g (e (M.mkQ x)) = 0
     rw [this, map_zero, map_zero]
 
-theorem support_subgroup_odd_index :
-    ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (S S₂ : Set X), S.Nonempty → (∀ a b, (a ∈ S ∧ b ∈ S) ↔ (a + b ∈ S₂ ∧ a - b ∈ S₂)) → (∀ x : X, ∃ z : X, x + (z + z) ∈ S₂) → S₂ = S ∧ ∃ Λ : AddSubgroup X, (Λ : Set X) = S ∧ (Λ = ⊤ ∨ ∃ l : ℕ, l.Prime ∧ Odd l ∧ ∃ f : X →+ ZMod l, f ≠ 0 ∧ ∀ x ∈ Λ, f x = 0) := by
+theorem support_subgroup_odd_index
+    : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (S S₂ : Set X),
+      S.Nonempty → (∀ a b, (a ∈ S ∧ b ∈ S) ↔ (a + b ∈ S₂ ∧ a - b ∈ S₂))
+        → (∀ x : X, ∃ z : X, x + (z + z) ∈ S₂)
+        → S₂ = S
+          ∧ ∃ Λ : AddSubgroup X,
+            (Λ : Set X) = S
+              ∧ (Λ = ⊤
+                ∨ ∃ l : ℕ, l.Prime ∧ Odd l ∧ ∃ f : X →+ ZMod l, f ≠ 0 ∧ ∀ x ∈ Λ, f x = 0) := by
   intro X _ _ S S₂ ⟨a, ha⟩ h hd
   have h02 : (0 : X) ∈ S₂ := by simpa using ((h a a).mp ⟨ha, ha⟩).2
   have h0 : (0 : X) ∈ S := ((h 0 0).mpr ⟨by simpa using h02, by simpa using h02⟩).1
@@ -57,11 +69,12 @@ theorem support_subgroup_odd_index :
     exact this.symm
   subst heq
   refine ⟨rfl, ?_⟩
-  let Λ : AddSubgroup X :=
-    { carrier := S₂
-      zero_mem' := h0
-      add_mem' := fun {a b} ha hb => ((h a b).mp ⟨ha, hb⟩).1
-      neg_mem' := fun {b} hb => by simpa using ((h 0 b).mp ⟨h0, hb⟩).2 }
+  let Λ : AddSubgroup X := {
+    carrier := S₂
+    zero_mem' := h0
+    add_mem' := fun {a b} ha hb => ((h a b).mp ⟨ha, hb⟩).1
+    neg_mem' := fun {b} hb => by simpa using ((h 0 b).mp ⟨h0, hb⟩).2
+  }
   refine ⟨Λ, rfl, ?_⟩
   by_cases ht : Λ = ⊤
   · exact Or.inl ht

@@ -11,23 +11,25 @@ open scoped TensorProduct
 
 namespace GlobalTheory.FinInterNil
 
-theorem exists_ne_zero_isNilpotent_mul {D E : Type} [CommRing D] [IsDomain D] [CommRing E]
-    [Algebra D E] (y : E)
-    (hy : ∀ Q : Ideal E, Q.IsPrime → Q.comap (algebraMap D E) = ⊥ → y ∈ Q) :
-    ∃ t : D, t ≠ 0 ∧ IsNilpotent (algebraMap D E t * y) := by
+theorem exists_ne_zero_isNilpotent_mul
+    {D E : Type} [CommRing D] [IsDomain D] [CommRing E] [Algebra D E]
+    (y : E) (hy : ∀ Q : Ideal E, Q.IsPrime → Q.comap (algebraMap D E) = ⊥ → y ∈ Q)
+    : ∃ t : D, t ≠ 0 ∧ IsNilpotent (algebraMap D E t * y) := by
   by_contra hcon
   push_neg at hcon
-  let M : Submonoid E :=
-    { carrier := {z | ∃ t : D, t ≠ 0 ∧ ∃ n : ℕ, z = algebraMap D E t * y ^ n}
-      mul_mem' := by
-        rintro a b ⟨t, ht, n, rfl⟩ ⟨t', ht', m, rfl⟩
-        exact ⟨t * t', mul_ne_zero ht ht', n + m, by rw [map_mul, pow_add]; ring⟩
-      one_mem' := ⟨1, one_ne_zero, 0, by simp⟩ }
+  let M : Submonoid E := {
+    carrier := {z | ∃ t : D, t ≠ 0 ∧ ∃ n : ℕ, z = algebraMap D E t * y ^ n}
+    mul_mem' := by
+      rintro a b ⟨t, ht, n, rfl⟩ ⟨t', ht', m, rfl⟩
+      exact ⟨t * t', mul_ne_zero ht ht', n + m, by rw [map_mul, pow_add]; ring⟩
+    one_mem' := ⟨1, one_ne_zero, 0, by simp⟩
+  }
   have h0 : (0 : E) ∉ M := by
     rintro ⟨t, ht, n, hz⟩
     apply hcon t ht
     refine ⟨n + 1, ?_⟩
-    calc (algebraMap D E t * y) ^ (n + 1)
+    calc
+      (algebraMap D E t * y) ^ (n + 1)
         = algebraMap D E t ^ n * y * (algebraMap D E t * y ^ n) := by ring
       _ = 0 := by rw [← hz, mul_zero]
   have hdisj : Disjoint ((⊥ : Ideal E) : Set E) (M : Set E) := by
@@ -47,10 +49,12 @@ theorem exists_ne_zero_isNilpotent_mul {D E : Type} [CommRing D] [IsDomain D] [C
   have hm : y ∈ M := ⟨1, one_ne_zero, 1, by simp⟩
   exact Set.disjoint_left.mp hQM hyQ hm
 
-theorem main : ∀ (D E : Type) [CommRing D] [IsDomain D] [CommRing E] [Algebra D E] (ι : Type)
-    (X : Finset ι) (P : ι → Ideal E), (∀ i ∈ X, (P i).FG) →
-    (∀ Q : Ideal E, Q.IsPrime → Q.comap (algebraMap D E) = ⊥ → (⨅ i ∈ X, P i) ≤ Q) →
-    ∃ s : D, s ≠ 0 ∧ ∀ y ∈ (⨅ i ∈ X, P i), IsNilpotent (algebraMap D E s * y) := by
+theorem main
+    : ∀ (D E : Type) [CommRing D] [IsDomain D] [CommRing E] [Algebra D E] (ι : Type) (X : Finset ι)
+        (P : ι → Ideal E),
+      (∀ i ∈ X, (P i).FG)
+        → (∀ Q : Ideal E, Q.IsPrime → Q.comap (algebraMap D E) = ⊥ → (⨅ i ∈ X, P i) ≤ Q)
+        → ∃ s : D, s ≠ 0 ∧ ∀ y ∈ (⨅ i ∈ X, P i), IsNilpotent (algebraMap D E s * y) := by
   intro D E _ _ _ _ ι X P hFG hQ
   classical
   have hstep : ∀ y ∈ (⨅ i ∈ X, P i), ∃ t : D, t ≠ 0 ∧ IsNilpotent (algebraMap D E t * y) :=
@@ -64,8 +68,7 @@ theorem main : ∀ (D E : Type) [CommRing D] [IsDomain D] [CommRing E] [Algebra 
     intro i hi
     exact (Ideal.prod_le_inf.trans (Finset.inf_le hi)) hg
   obtain ⟨S, hS⟩ := hJfg
-  have hSI : ∀ g : S, (g : E) ∈ (⨅ i ∈ X, P i) := fun g =>
-    hJI g (hS ▸ Submodule.subset_span g.2)
+  have hSI : ∀ g : S, (g : E) ∈ (⨅ i ∈ X, P i) := fun g => hJI g (hS ▸ Submodule.subset_span g.2)
   choose t ht using fun g : S => hstep g.1 (hSI g)
   refine ⟨∏ g : S, t g, Finset.prod_ne_zero_iff.mpr (fun g _ => (ht g).1), ?_⟩
   set s := ∏ g : S, t g with hs
@@ -84,15 +87,20 @@ theorem main : ∀ (D E : Type) [CommRing D] [IsDomain D] [CommRing E] [Algebra 
     exact (Commute.all _ _).isNilpotent_mul_left (ht ⟨g, hg⟩).2
   intro y hy
   have hyN : y ^ X.card ∈ ∏ i ∈ X, P i := by
-    have := Ideal.prod_mem_prod (s := X) (I := P) (x := fun _ => y) (fun i hi => by
-      have := hy
-      simp only [Submodule.mem_iInf] at this
-      exact this i hi)
+    have :=
+      Ideal.prod_mem_prod (s := X) (I := P)
+        (x := fun _ => y)
+        (fun i hi => by
+          have := hy
+          simp only [Submodule.mem_iInf] at this
+          exact this i hi)
     simpa [Finset.prod_const] using this
   have hn := (hK _).mp (hJK hyN)
   have hpow : IsNilpotent ((algebraMap D E s * y) ^ (X.card + 1)) := by
-    have he : (algebraMap D E s * y) ^ (X.card + 1)
-        = (algebraMap D E s ^ X.card * y) * (algebraMap D E s * y ^ X.card) := by ring
+    have he
+        : (algebraMap D E s * y) ^ (X.card + 1)
+          = (algebraMap D E s ^ X.card * y) * (algebraMap D E s * y ^ X.card) := by
+      ring
     rw [he]
     exact (Commute.all _ _).isNilpotent_mul_left hn
   obtain ⟨k, hk⟩ := hpow

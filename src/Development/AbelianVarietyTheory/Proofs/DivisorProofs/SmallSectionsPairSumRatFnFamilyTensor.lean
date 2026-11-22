@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermLineBund
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 set_option autoImplicit false
 
@@ -19,10 +21,14 @@ noncomputable section
 
 namespace GlobalTheory.HSNef
 
-theorem smallFam_pair_tens : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k), ∀ (P : Pair p) (J : Type) (f : J → X.functionField) (w : J → ℝ), (∀ j, f j ∈ P.Bl 1 1 (Real.exp (-w j))) → SmallFam (P.L.tens P.A) f w := by
+theorem smallFam_pair_tens
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k),
+      ∀ (P : Pair p) (J : Type) (f : J → X.functionField) (w : J → ℝ),
+        (∀ j, f j ∈ P.Bl 1 1 (Real.exp (- w j))) → SmallFam (P.L.tens P.A) f w := by
   intro k _ X _ p P J f w hf
-  have e (c : (P.L.tens P.A).B.ι) (j : J) :
-      f j * (((P.r c.1 * P.r' c.2 : X.functionFieldˣ)) : X.functionField) = P.loc 1 1 (f j) c.1 c.2 := by
+  have e (c : (P.L.tens P.A).B.ι) (j : J)
+      : f j * (((P.r c.1 * P.r' c.2 : X.functionFieldˣ)) : X.functionField)
+        = P.loc 1 1 (f j) c.1 c.2 := by
     simp only [Pair.loc, Units.val_mul, zpow_one]; ring
   refine ⟨fun c => P.r c.1 * P.r' c.2, GlobalTheory.PtHtComb.isRatSec_tens P.hr P.hr', ?_, ?_⟩
   · intro x c hc j

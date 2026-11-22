@@ -7,13 +7,16 @@ public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.IsPshLoc
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 
 namespace GlobalTheory.CompanionTheory.Metric.QuotHol
 
-theorem differentiableOn_det {m n : ℕ} {A : (Fin n → ℂ) → Matrix (Fin m) (Fin m) ℂ}
-    {V : Set (Fin n → ℂ)} (hA : ∀ i j, DifferentiableOn ℂ (fun t => A t i j) V) :
-    DifferentiableOn ℂ (fun t => (A t).det) V := by
+theorem differentiableOn_det
+    {m n : ℕ} {A : (Fin n → ℂ) → Matrix (Fin m) (Fin m) ℂ} {V : Set (Fin n → ℂ)}
+    (hA : ∀ i j, DifferentiableOn ℂ (fun t => A t i j) V)
+    : DifferentiableOn ℂ (fun t => (A t).det) V := by
   simp only [Matrix.det_apply]
   refine DifferentiableOn.fun_sum fun σ _ => ?_
   refine DifferentiableOn.const_smul ?_ _
@@ -28,11 +31,11 @@ theorem differentiableOn_det {m n : ℕ} {A : (Fin n → ℂ) → Matrix (Fin m)
       exact (hA _ _).fun_mul ih
   exact hs Finset.univ
 
-theorem exists_complement {k g' : ℕ} (v : Fin k → Fin (k + g') → ℂ)
-    (hv : LinearIndependent ℂ v) :
-    ∃ f : Fin g' → Fin (k + g') → ℂ,
-      (Matrix.of fun i j => Sum.elim v f (finSumFinEquiv.symm j) i :
-        Matrix (Fin (k + g')) (Fin (k + g')) ℂ).det ≠ 0 := by
+theorem exists_complement {k g' : ℕ} (v : Fin k → Fin (k + g') → ℂ) (hv : LinearIndependent ℂ v)
+    : ∃ f : Fin g' → Fin (k + g') → ℂ,
+      (Matrix.of fun i j => Sum.elim v f (finSumFinEquiv.symm j) i
+          : Matrix (Fin (k + g')) (Fin (k + g')) ℂ).det
+        ≠ 0 := by
   classical
   obtain ⟨W', hW'⟩ := Submodule.exists_isCompl (Submodule.span ℂ (Set.range v))
   have hfr : Module.finrank ℂ W' = g' := by
@@ -42,8 +45,7 @@ theorem exists_complement {k g' : ℕ} (v : Fin k → Fin (k + g') → ℂ)
     omega
   let bW := Module.finBasisOfFinrankEq ℂ W' hfr
   let f : Fin g' → Fin (k + g') → ℂ := fun j => (bW j : Fin (k + g') → ℂ)
-  have hf : LinearIndependent ℂ f :=
-    bW.linearIndependent.map' W'.subtype (Submodule.ker_subtype W')
+  have hf : LinearIndependent ℂ f := bW.linearIndependent.map' W'.subtype (Submodule.ker_subtype W')
   have hdisj : Disjoint (Submodule.span ℂ (Set.range v)) (Submodule.span ℂ (Set.range f)) := by
     refine hW'.disjoint.mono_right ?_
     rw [Submodule.span_le]
@@ -52,20 +54,25 @@ theorem exists_complement {k g' : ℕ} (v : Fin k → Fin (k + g') → ℂ)
   have hs : LinearIndependent ℂ (Sum.elim v f) := hv.sum_type hf hdisj
   have hc := hs.comp _ (finSumFinEquiv.symm.injective)
   refine ⟨f, ?_⟩
-  have hu := Matrix.linearIndependent_cols_iff_isUnit
-    (A := (Matrix.of fun i j => Sum.elim v f (finSumFinEquiv.symm j) i :
-      Matrix (Fin (k + g')) (Fin (k + g')) ℂ)) |>.1 hc
+  have hu :=
+    Matrix.linearIndependent_cols_iff_isUnit
+        (A :=
+          (Matrix.of fun i j => Sum.elim v f (finSumFinEquiv.symm j) i
+            : Matrix (Fin (k + g')) (Fin (k + g')) ℂ))
+      |>.1 hc
   exact ((Matrix.isUnit_iff_isUnit_det _).1 hu).ne_zero
 
-theorem exists_holomorphic_quotient (g' k g n : ℕ) (U : Set (Fin n → ℂ))
-    (e : Fin k → (Fin n → ℂ) → Fin g → ℂ) (t₀ : Fin n → ℂ) (hU : IsOpen U) (ht₀ : t₀ ∈ U)
-    (hg : k + g' = g) (he : ∀ i, DifferentiableOn ℂ (e i) U)
-    (hli : LinearIndependent ℂ (fun i => e i t₀)) :
-    ∃ V : Set (Fin n → ℂ), IsOpen V ∧ t₀ ∈ V ∧ V ⊆ U ∧
-      ∃ q : (Fin n → ℂ) → (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ),
-        (∀ x, DifferentiableOn ℂ (fun t => q t x) V) ∧
-        ∀ t ∈ V, Function.Surjective (q t) ∧
-          LinearMap.ker (q t) = Submodule.span ℂ (Set.range fun i => e i t) := by
+theorem exists_holomorphic_quotient
+    (g' k g n : ℕ) (U : Set (Fin n → ℂ)) (e : Fin k → (Fin n → ℂ) → Fin g → ℂ) (t₀ : Fin n → ℂ)
+    (hU : IsOpen U) (ht₀ : t₀ ∈ U) (hg : k + g' = g) (he : ∀ i, DifferentiableOn ℂ (e i) U)
+    (hli : LinearIndependent ℂ (fun i => e i t₀))
+    : ∃ V : Set (Fin n → ℂ),
+      IsOpen V ∧ t₀ ∈ V ∧ V ⊆ U
+        ∧ ∃ q : (Fin n → ℂ) → (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ),
+          (∀ x, DifferentiableOn ℂ (fun t => q t x) V)
+            ∧ ∀ t ∈ V,
+              Function.Surjective (q t)
+                ∧ LinearMap.ker (q t) = Submodule.span ℂ (Set.range fun i => e i t) := by
   classical
   subst hg
   obtain ⟨f, hf⟩ := exists_complement (fun i => e i t₀) hli
@@ -128,8 +135,7 @@ theorem exists_holomorphic_quotient (g' k g n : ℕ) (U : Set (Fin n → ℂ))
           intro j
           rw [← hq, LinearMap.mem_ker.1 hx]
           rfl
-        have hxc : x = M t *ᵥ ((M t)⁻¹ *ᵥ x) := by
-          rw [Matrix.mulVec_mulVec, hMi, Matrix.one_mulVec]
+        have hxc : x = M t *ᵥ ((M t)⁻¹ *ᵥ x) := by rw [Matrix.mulVec_mulVec, hMi, Matrix.one_mulVec]
         obtain ⟨c, hc⟩ : ∃ c, c = (M t)⁻¹ *ᵥ x := ⟨_, rfl⟩
         rw [← hc] at hx0 hxc
         have hsum : x = ∑ a, c (Fin.castAdd g' a) • e a t := by
@@ -139,8 +145,7 @@ theorem exists_holomorphic_quotient (g' k g n : ℕ) (U : Set (Fin n → ℂ))
             Finset.sum_const_zero, add_zero, hMc, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
           exact Finset.sum_congr rfl fun a _ => mul_comm _ _
         rw [hsum]
-        exact Submodule.sum_mem _ fun a _ =>
-          Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
+        exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
       · rw [Submodule.span_le]
         rintro _ ⟨a, rfl⟩
         have hcol : e a t = M t *ᵥ Pi.single (Fin.castAdd g' a) 1 := by

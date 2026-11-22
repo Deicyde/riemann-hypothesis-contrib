@@ -23,16 +23,18 @@ def relSlope (F G : Submodule (𝓞 K) E.carrier) : ℝ :=
   (E.normDegree G - E.normDegree F) / ((E.rank G : ℝ) - E.rank F)
 
 def Semistable : Prop :=
-  0 < Module.finrank (𝓞 K) E.carrier ∧
-    ∀ F : Submodule (𝓞 K) E.carrier, F ≠ ⊥ → E.slope F ≤ E.slope ⊤
+  0 < Module.finrank (𝓞 K) E.carrier
+    ∧ ∀ F : Submodule (𝓞 K) E.carrier, F ≠ ⊥ → E.slope F ≤ E.slope ⊤
 
 structure IsCanonicalFiltration {m : ℕ} (f : Fin (m + 1) → Submodule (𝓞 K) E.carrier) : Prop where
   bot : f 0 = ⊥
   top : f (Fin.last m) = ⊤
   strictMono : StrictMono f
   saturated : ∀ i, E.Saturated (f i)
-  semistable : ∀ (i : Fin m) (G : Submodule (𝓞 K) E.carrier), f i.castSucc < G → G ≤ f i.succ →
-    E.relSlope (f i.castSucc) G ≤ E.relSlope (f i.castSucc) (f i.succ)
+  semistable
+    : ∀ (i : Fin m) (G : Submodule (𝓞 K) E.carrier),
+      f i.castSucc < G → G ≤ f i.succ
+        → E.relSlope (f i.castSucc) G ≤ E.relSlope (f i.castSucc) (f i.succ)
   anti : StrictAnti fun i : Fin m ↦ E.relSlope (f i.castSucc) (f i.succ)
 
 theorem saturated_bot : E.Saturated ⊥ := by
@@ -44,23 +46,25 @@ theorem saturated_top : E.Saturated ⊤ := fun _ _ _ _ ↦ Submodule.mem_top
 
 end HermitianBundle
 
-def trivialFlag {K : Type*} [Field K] [NumberField K] (E : HermitianBundle K) :
-    Fin 2 → Submodule (𝓞 K) E.carrier :=
+def trivialFlag {K : Type*} [Field K] [NumberField K] (E : HermitianBundle K)
+    : Fin 2 → Submodule (𝓞 K) E.carrier :=
   ![⊥, ⊤]
 
 namespace HermitianBundle
 
 variable {K : Type} [Field K] [NumberField K] (E : HermitianBundle.{0} K)
 
-theorem rank_eq_one_of_ne_bot (h1 : Module.finrank (𝓞 K) E.carrier = 1)
-    {G : Submodule (𝓞 K) E.carrier} (hG : G ≠ ⊥) : E.rank G = 1 := by
+theorem rank_eq_one_of_ne_bot
+    (h1 : Module.finrank (𝓞 K) E.carrier = 1) {G : Submodule (𝓞 K) E.carrier} (hG : G ≠ ⊥)
+    : E.rank G = 1 := by
   unfold HermitianBundle.rank
   have hle : Module.finrank (𝓞 K) G ≤ 1 := h1 ▸ Submodule.finrank_le G
   have hpos : Module.finrank (𝓞 K) G ≠ 0 := fun h ↦ hG (Submodule.finrank_eq_zero.mp h)
   omega
 
-theorem degree_le_degree_top (h1 : Module.finrank (𝓞 K) E.carrier = 1)
-    {G : Submodule (𝓞 K) E.carrier} (hG : G ≠ ⊥) : E.degree G ≤ E.degree ⊤ := by
+theorem degree_le_degree_top
+    (h1 : Module.finrank (𝓞 K) E.carrier = 1) {G : Submodule (𝓞 K) E.carrier} (hG : G ≠ ⊥)
+    : E.degree G ≤ E.degree ⊤ := by
   obtain ⟨g, hgG, hg0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hG
   let s : Fin 1 → G := fun _ ↦ ⟨g, hgG⟩
   let t : Fin 1 → (⊤ : Submodule (𝓞 K) E.carrier) := fun _ ↦ ⟨g, Submodule.mem_top⟩
@@ -68,17 +72,20 @@ theorem degree_le_degree_top (h1 : Module.finrank (𝓞 K) E.carrier = 1)
     linearIndependent_unique_iff.mpr (fun h ↦ hg0 (congrArg Subtype.val h))
   have ht : LinearIndependent (𝓞 K) t :=
     linearIndependent_unique_iff.mpr (fun h ↦ hg0 (congrArg Subtype.val h))
-  have hrt : E.rank ⊤ = 1 := E.rank_eq_one_of_ne_bot h1 (by
-    intro h
-    have : Nontrivial E.carrier := Module.nontrivial_of_finrank_eq_succ h1
-    exact top_ne_bot h)
-  rw [E.degree_eq_of_linearIndependent G hs (by rw [Fintype.card_fin, E.rank_eq_one_of_ne_bot h1 hG]),
+  have hrt : E.rank ⊤ = 1 :=
+    E.rank_eq_one_of_ne_bot h1 (by
+      intro h
+      have : Nontrivial E.carrier := Module.nontrivial_of_finrank_eq_succ h1
+      exact top_ne_bot h)
+  rw [E.degree_eq_of_linearIndependent G hs
+      (by rw [Fintype.card_fin, E.rank_eq_one_of_ne_bot h1 hG]),
     E.degree_eq_of_linearIndependent ⊤ ht (by rw [Fintype.card_fin, hrt])]
   refine sub_le_sub_right ?_ _
   have hfin : Finite ((⊤ : Submodule (𝓞 K) E.carrier) ⧸ Submodule.span (𝓞 K) (Set.range t)) :=
     finite_quotient_span ht (by rw [Fintype.card_fin, finrank_top, h1])
-  have hle : Submodule.span (𝓞 K) (Set.range s) ≤
-      (Submodule.span (𝓞 K) (Set.range t)).comap (Submodule.inclusion le_top) := by
+  have hle
+      : Submodule.span (𝓞 K) (Set.range s)
+        ≤ (Submodule.span (𝓞 K) (Set.range t)).comap (Submodule.inclusion le_top) := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     exact Submodule.subset_span ⟨i, rfl⟩
@@ -102,8 +109,8 @@ theorem degree_le_degree_top (h1 : Module.finrank (𝓞 K) E.carrier = 1)
   have hpos : 0 < Nat.card (G ⧸ Submodule.span (𝓞 K) (Set.range s)) := Nat.card_pos
   exact Real.log_le_log (by exact_mod_cast hpos) (by exact_mod_cast hcard)
 
-theorem isCanonicalFiltration_of_finrank_one (h1 : Module.finrank (𝓞 K) E.carrier = 1) :
-    E.IsCanonicalFiltration (trivialFlag E) := by
+theorem isCanonicalFiltration_of_finrank_one (h1 : Module.finrank (𝓞 K) E.carrier = 1)
+    : E.IsCanonicalFiltration (trivialFlag E) := by
   have : Nontrivial E.carrier := Module.nontrivial_of_finrank_eq_succ h1
   refine ⟨rfl, rfl, ?_, ?_, ?_, Subsingleton.strictAnti _⟩
   · refine Fin.strictMono_iff_lt_succ.mpr fun i ↦ ?_
@@ -127,15 +134,16 @@ theorem isCanonicalFiltration_of_finrank_one (h1 : Module.finrank (𝓞 K) E.car
 theorem semistable_of_finrank_one (h1 : Module.finrank (𝓞 K) E.carrier = 1) : E.Semistable := by
   have : Nontrivial E.carrier := Module.nontrivial_of_finrank_eq_succ h1
   refine ⟨by omega, fun G hG ↦ ?_⟩
-  simp only [slope, normDegree, E.rank_eq_one_of_ne_bot h1 hG, E.rank_eq_one_of_ne_bot h1 top_ne_bot,
-    Nat.cast_one, div_one]
+  simp only [slope, normDegree, E.rank_eq_one_of_ne_bot h1 hG,
+    E.rank_eq_one_of_ne_bot h1 top_ne_bot, Nat.cast_one, div_one]
   have hd : (0 : ℝ) < Module.finrank ℚ K := by exact_mod_cast Module.finrank_pos
   exact div_le_div_of_nonneg_right (E.degree_le_degree_top h1 hG) hd.le
 
 end HermitianBundle
 
-theorem isCanonicalFiltration_integers (K : Type) [Field K] [NumberField K] :
-    (HermitianBundle.integers K).IsCanonicalFiltration (trivialFlag (HermitianBundle.integers K)) :=
+theorem isCanonicalFiltration_integers (K : Type) [Field K] [NumberField K]
+    : (HermitianBundle.integers K).IsCanonicalFiltration
+      (trivialFlag (HermitianBundle.integers K)) :=
   HermitianBundle.isCanonicalFiltration_of_finrank_one _ (Module.finrank_self (𝓞 K))
 
 end

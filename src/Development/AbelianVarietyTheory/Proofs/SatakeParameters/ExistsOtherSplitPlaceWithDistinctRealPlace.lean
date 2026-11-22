@@ -12,14 +12,20 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele (ideleMa
 
 namespace GlobalTheory.OtherSplitPlace
 
-theorem exists_isSplitAt_under_ne : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (w₀ : HeightOneSpectrum (𝓞 E)), ∃ w₁ : HeightOneSpectrum (𝓞 E), GlobalTheory.UnitaryBC.IsSplitAt w₁ ∧
-      w₁.under (𝓞 (maximalRealSubfield E)) ≠ w₀.under (𝓞 (maximalRealSubfield E)) := by
+theorem exists_isSplitAt_under_ne
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w₀ : HeightOneSpectrum (𝓞 E)),
+      ∃ w₁ : HeightOneSpectrum (𝓞 E),
+        GlobalTheory.UnitaryBC.IsSplitAt w₁
+          ∧ w₁.under (𝓞 (maximalRealSubfield E)) ≠ w₀.under (𝓞 (maximalRealSubfield E)) := by
   intro E _ _ _ w₀
-  obtain ⟨p, hp, hmp, hs⟩ := GlobalTheory.LargeSplitPrime.exists_splitsCompl E (Ideal.absNorm w₀.asIdeal)
-  have h2 : Module.finrank (maximalRealSubfield E) E = 2 := Algebra.IsQuadraticExtension.finrank_eq_two _ _
+  obtain ⟨p, hp, hmp, hs⟩ :=
+    GlobalTheory.LargeSplitPrime.exists_splitsCompl E (Ideal.absNorm w₀.asIdeal)
+  have h2 : Module.finrank (maximalRealSubfield E) E = 2 :=
+    Algebra.IsQuadraticExtension.finrank_eq_two _ _
 
-  have hsplit : ∀ w : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ w.asIdeal → GlobalTheory.UnitaryBC.IsSplitAt w := by
+  have hsplit
+      : ∀ w : HeightOneSpectrum (𝓞 E),
+        (p : 𝓞 E) ∈ w.asIdeal → GlobalTheory.UnitaryBC.IsSplitAt w := by
     intro w hw
     have hv : (p : 𝓞 (maximalRealSubfield E)) ∈ (w.under (𝓞 (maximalRealSubfield E))).asIdeal := by
       show algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) (p : 𝓞 (maximalRealSubfield E)) ∈ w.asIdeal
@@ -33,8 +39,9 @@ theorem exists_isSplitAt_under_ne : ∀ (E : Type) [Field E] [NumberField E] [Is
   haveI hPmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hp).irreducible
   have hinj : Function.Injective (algebraMap ℤ (𝓞 E)) := (algebraMap ℤ (𝓞 E)).injective_int
-  obtain ⟨Q, hQmax, hQ⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 E)
-    (Ideal.span {(p : ℤ)}) (by rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]; exact bot_le)
+  obtain ⟨Q, hQmax, hQ⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 E) (Ideal.span {(p : ℤ)})
+      (by rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]; exact bot_le)
   have hpQ : (p : 𝓞 E) ∈ Q := by
     have : (p : ℤ) ∈ Q.comap (algebraMap ℤ (𝓞 E)) := by
       change (p : ℤ) ∈ Ideal.under ℤ Q
@@ -42,15 +49,19 @@ theorem exists_isSplitAt_under_ne : ∀ (E : Type) [Field E] [NumberField E] [Is
       exact Ideal.subset_span rfl
     simpa using this
   have hp0 : (p : 𝓞 E) ≠ 0 := by exact_mod_cast hp.ne_zero
-  let w₁ : HeightOneSpectrum (𝓞 E) := ⟨Q, hQmax.isPrime, fun h => hp0 (by rw [h] at hpQ; simpa using hpQ)⟩
+  let w₁ : HeightOneSpectrum (𝓞 E) :=
+    ⟨Q, hQmax.isPrime, fun h => hp0 (by rw [h] at hpQ; simpa using hpQ)⟩
   refine ⟨w₁, hsplit w₁ hpQ, fun heq => ?_⟩
 
   have hp₀ : (p : 𝓞 E) ∈ w₀.asIdeal := by
     have hv : (p : 𝓞 (maximalRealSubfield E)) ∈ (w₁.under (𝓞 (maximalRealSubfield E))).asIdeal := by
       show algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) (p : 𝓞 (maximalRealSubfield E)) ∈ w₁.asIdeal
-      rw [map_natCast]; exact hpQ
+      rw [map_natCast]
+      exact hpQ
     rw [heq] at hv
-    have : algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) (p : 𝓞 (maximalRealSubfield E)) ∈ w₀.asIdeal := hv
+    have : algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) (p : 𝓞 (maximalRealSubfield E))
+        ∈ w₀.asIdeal :=
+      hv
     rwa [map_natCast] at this
   have hN : ((Ideal.absNorm w₀.asIdeal : ℕ) : 𝓞 E) ∈ w₀.asIdeal := Ideal.absNorm_mem _
   have hN0 : 0 < Ideal.absNorm w₀.asIdeal :=

@@ -9,7 +9,8 @@ public import Formalism.HermitianLattices.HermitianLatticesProofs.IsomAct
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.PackageTie2
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.PackageTie2
 
 namespace Formalism.L2.SG.Pf.WittFlags
 
@@ -17,25 +18,30 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Gen
 
-variable {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+  [Module R V] [IsScalarTower R K V]
 
-theorem gmap_mul (a b : V ≃ₗ[K] V) (L : Submodule R V) :
-    Formalism.HermitianLatticesTheory.gmap (a * b) L = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
+theorem gmap_mul (a b : V ≃ₗ[K] V) (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap (a * b) L
+      = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
   unfold Formalism.HermitianLatticesTheory.gmap
   rw [← Submodule.map_comp]
   rfl
 
-theorem gmap_one (L : Submodule R V) : Formalism.HermitianLatticesTheory.gmap (1 : V ≃ₗ[K] V) L = L := by
+theorem gmap_one (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap (1 : V ≃ₗ[K] V) L = L := by
   ext x
   simp [Formalism.HermitianLatticesTheory.gmap]
 
-theorem gmap_inv_gmap (a : V ≃ₗ[K] V) (L : Submodule R V) :
-    Formalism.HermitianLatticesTheory.gmap a⁻¹ (Formalism.HermitianLatticesTheory.gmap a L) = L := by
+theorem gmap_inv_gmap (a : V ≃ₗ[K] V) (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap a⁻¹ (Formalism.HermitianLatticesTheory.gmap a L)
+      = L := by
   rw [← gmap_mul, inv_mul_cancel, gmap_one]
 
-theorem gmap_gmap_inv (a : V ≃ₗ[K] V) (L : Submodule R V) :
-    Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap a⁻¹ L) = L := by
+theorem gmap_gmap_inv (a : V ≃ₗ[K] V) (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap a⁻¹ L)
+      = L := by
   rw [← gmap_mul, mul_inv_cancel, gmap_one]
 
 end Gen
@@ -49,8 +55,9 @@ theorem LatIso_holds (D : D7) : Formalism.L2.SG.TermTieOf.LatIso D := by
   letI := hLat.2 hΛL.toIsLattice
   refine ⟨?_, fun p hp => ?_⟩
   · refine { span_eq_top := ?_ }
-    have he : ((Formalism.HermitianLatticesTheory.gmap β Λ : _) : Set _) =
-        (β.toLinearMap : _ → _) '' (Λ : Set _) := by
+    have he
+        : ((Formalism.HermitianLatticesTheory.gmap β Λ : _) : Set _)
+          = (β.toLinearMap : _ → _) '' (Λ : Set _) := by
       ext x
       simp [Formalism.HermitianLatticesTheory.gmap]
     rw [he, Submodule.span_image β.toLinearMap, hΛL.span_eq_top, Submodule.map_top]

@@ -5,9 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 @[expose] public section
 
 open UpperTheory.V.Pr in
-private theorem UpperTheory.V.Pr.exists_prime_qdim {R : Type} [CommRing R] (J : Ideal R) (n : ℕ)
-    (h : (n : WithBot ℕ∞) ≤ qdim J) :
-    ∃ I : PrimeSpectrum R, J ≤ I.asIdeal ∧ (n : WithBot ℕ∞) ≤ qdim I.asIdeal := by
+private theorem UpperTheory.V.Pr.exists_prime_qdim
+    {R : Type} [CommRing R] (J : Ideal R) (n : ℕ) (h : (n : WithBot ℕ∞) ≤ qdim J)
+    : ∃ I : PrimeSpectrum R, J ≤ I.asIdeal ∧ (n : WithBot ℕ∞) ≤ qdim I.asIdeal := by
   rw [qdim, ringKrullDim_quotient] at h
   obtain ⟨l, hl⟩ := Order.le_krullDim_iff.mp h
   refine ⟨(l 0).1, fun y hy => (l 0).2 hy, ?_⟩
@@ -18,11 +18,9 @@ private theorem UpperTheory.V.Pr.exists_prime_qdim {R : Type} [CommRing R] (J : 
     exact (show (l 0).1.asIdeal ≤ (l i).1.asIdeal from l.monotone (Fin.zero_le i))
   · exact l.step i
 
-theorem UpperTheory.V.Pr.locProp :
-    UpperTheory.V.Pr.LocProp := by
+theorem UpperTheory.V.Pr.locProp : UpperTheory.V.Pr.LocProp := by
   intro R _ _ L hL I hIg hIti hIbig P hPti hPmin
-  have hW : ∀ p ∈ L.Nice, (∃ P ≤ p, P ∈ L.TI ∧ P ∈ L.Good) →
-      ∀ P' ≤ p, P' ∈ L.TI → P' ∈ L.Good := by
+  have hW : ∀ p ∈ L.Nice, (∃ P ≤ p, P ∈ L.TI ∧ P ∈ L.Good) → ∀ P' ≤ p, P' ∈ L.TI → P' ∈ L.Good := by
     intro p hp hS
     rcases hL.nice_type p hp with hpt | hpt
     · obtain ⟨Q, hQp, _, hQg⟩ := hS
@@ -31,20 +29,31 @@ theorem UpperTheory.V.Pr.locProp :
       exact hL.p1 p hp hpt hpg P' hP'
     · exact hL.p23 p hp hpt p Relation.ReflTransGen.refl hS
   let Inv : PrimeSpectrum R → Prop := fun Q =>
-    (Q ∈ L.TI → Q ∈ L.Good) ∧ ((Q ∈ L.TI ∧ Q ∈ L.Good) ∨
-      (Q ∈ L.Thick ∧ ∃ p0 ∈ L.Nice, p0 ∈ L.TE ∧ (∃ P ≤ p0, P ∈ L.TI ∧ P ∈ L.Good) ∧
-        ∃ p ∈ L.Nice, p ∈ L.TE ∧ Q ≤ p ∧ Relation.ReflTransGen L.Link p0 p))
-  have K : ∀ Q, L.Comp Q → Inv Q → ∀ M : PrimeSpectrum R, Q ≤ M →
-      (L.D1 : WithBot ℕ∞) ≤ qdim M.asIdeal →
-      ∃ p ∈ L.Nice, M ≤ p ∧ ∀ P' ≤ p, P' ∈ L.TI → P' ∈ L.Good := by
+    (Q ∈ L.TI → Q ∈ L.Good)
+      ∧ ((Q ∈ L.TI ∧ Q ∈ L.Good)
+        ∨ (Q ∈ L.Thick
+          ∧ ∃ p0 ∈ L.Nice,
+            p0 ∈ L.TE ∧ (∃ P ≤ p0, P ∈ L.TI ∧ P ∈ L.Good)
+              ∧ ∃ p ∈ L.Nice, p ∈ L.TE ∧ Q ≤ p ∧ Relation.ReflTransGen L.Link p0 p))
+  have K
+      : ∀ Q,
+        L.Comp Q → Inv Q
+          → ∀ M : PrimeSpectrum R,
+            Q ≤ M → (L.D1 : WithBot ℕ∞) ≤ qdim M.asIdeal
+              → ∃ p ∈ L.Nice, M ≤ p ∧ ∀ P' ≤ p, P' ∈ L.TI → P' ∈ L.Good := by
     intro Q hQc hQ M hQM hM
     rcases hQ.2 with ⟨hti, hg⟩ | ⟨hth, p0, hp0n, hp0e, hS, p, hpn, hpe, hQp, hrt⟩
     · have hMg := hL.good_up Q M hQM hg
       obtain ⟨p, hpn, hMp⟩ := hL.nice_good M hMg hM
       exact ⟨p, hpn, hMp, hW p hpn ⟨Q, le_trans hQM hMp, hti, hg⟩⟩
     · obtain ⟨p', hp'n, hp'e, hMp'⟩ := hL.nice_thick Q hth hQc M hQM hM
-      exact ⟨p', hp'n, hMp', hL.p23 p0 hp0n hp0e p'
-        (hrt.tail ⟨hpn, hpe, hp'n, hp'e, Q, hth, hQc, hQp, le_trans hQM hMp'⟩) hS⟩
+      exact ⟨
+        p',
+        hp'n,
+        hMp',
+        hL.p23 p0 hp0n hp0e p'
+          (hrt.tail ⟨hpn, hpe, hp'n, hp'e, Q, hth, hQc, hQp, le_trans hQM hMp'⟩) hS
+      ⟩
   have step : ∀ Q Q', L.Adj Q Q' → Inv Q → Inv Q' := by
     intro Q Q' hadj hQ
     obtain ⟨hQc, hQ'c, hbig⟩ := hadj
@@ -59,10 +68,28 @@ theorem UpperTheory.V.Pr.locProp :
       refine ⟨fun h => absurd h hQ'ti, Or.inr ⟨hth, ?_⟩⟩
       obtain ⟨p', hp'n, hp'e, hMp'⟩ := hL.nice_thick Q' hth hQ'c M hQ'M hM
       rcases hQ.2 with ⟨hti, hg⟩ | ⟨hQth, p0, hp0n, hp0e, hS, p1, hp1n, hp1e, hQp1, hrt⟩
-      · exact ⟨p', hp'n, hp'e, ⟨Q, le_trans hQM hMp', hti, hg⟩, p', hp'n, hp'e,
-          le_trans hQ'M hMp', Relation.ReflTransGen.refl⟩
-      · exact ⟨p0, hp0n, hp0e, hS, p', hp'n, hp'e, le_trans hQ'M hMp',
-          hrt.tail ⟨hp1n, hp1e, hp'n, hp'e, Q, hQth, hQc, hQp1, le_trans hQM hMp'⟩⟩
+      · exact ⟨
+          p',
+          hp'n,
+          hp'e,
+          ⟨Q, le_trans hQM hMp', hti, hg⟩,
+          p',
+          hp'n,
+          hp'e,
+          le_trans hQ'M hMp',
+          Relation.ReflTransGen.refl
+        ⟩
+      · exact ⟨
+          p0,
+          hp0n,
+          hp0e,
+          hS,
+          p',
+          hp'n,
+          hp'e,
+          le_trans hQ'M hMp',
+          hrt.tail ⟨hp1n, hp1e, hp'n, hp'e, Q, hQth, hQc, hQp1, le_trans hQM hMp'⟩
+        ⟩
   obtain ⟨q, hq, hqI⟩ := Ideal.exists_minimalPrimes_le (I := ⊥) (J := I.asIdeal) bot_le
   let P0 : PrimeSpectrum R := ⟨q, hq.1.1⟩
   have hP0I : P0 ≤ I := show q ≤ I.asIdeal from hqI

@@ -8,32 +8,47 @@ public import GroundTheory.GlobalFields.TateThesis.AdelePoissonUniform
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 
 section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] [NumberField E]
 
-private theorem pos_snd (s : ℝ) (hs : 0 < s) :
-    (((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E) : A E)).2 = 1 := by
+private theorem pos_snd (s : ℝ) (hs : 0 < s)
+    : (((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E) : A E)).2 = 1 := by
   apply RestrictedProduct.ext
   intro v
   exact GroundTheory.Automorphic.Reduction.posIdele_finite s hs v
 
-private theorem pos_inv_snd (s : ℝ) (hs : 0 < s) :
-    ((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E) : A E)).2 = 1 := by
-  have e : ((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E) : A E)).2 *
-      (((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E) : A E)).2 = 1 :=
-    congrArg Prod.snd (Units.inv_mul (GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E))
+private theorem pos_inv_snd (s : ℝ) (hs : 0 < s)
+    : ((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E)
+        : A E)).2
+      = 1 := by
+  have e
+      : ((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E)
+            : A E)).2
+          * (((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E) : A E)).2
+        = 1 :=
+    congrArg Prod.snd
+      (Units.inv_mul (GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E))
   rwa [pos_snd, mul_one] at e
 
-private theorem norm_pos_inv (s : ℝ) (hs : 0 < s) (w : InfinitePlace E) :
-    ‖((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E) : A E)).1 w‖ = s⁻¹ := by
-  have e : ((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E) : A E)).1 w *
-      (((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E) : A E)).1 w = 1 :=
-    congrArg (fun z : A E => z.1 w) (Units.inv_mul (GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E))
+private theorem norm_pos_inv (s : ℝ) (hs : 0 < s) (w : InfinitePlace E)
+    : ‖((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E) : A E)).1 w‖
+      = s⁻¹ := by
+  have e
+      : ((((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E)⁻¹ : IdeleGroup E)
+            : A E)).1 w
+          * (((GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E) : A E)).1 w
+        = 1 :=
+    congrArg
+      (fun z : A E => z.1 w)
+      (Units.inv_mul (GroundTheory.Automorphic.Reduction.posIdele s hs : IdeleGroup E))
   have h := congrArg norm e
   rw [norm_mul, GroundTheory.Automorphic.Reduction.norm_posIdele_infinite, norm_one] at h
   exact eq_inv_of_mul_eq_one_left h
@@ -44,16 +59,18 @@ private theorem norm_pInf (x : A E) (w : InfinitePlace E) : ‖pInf E x w‖ = �
   have e : pInf E x w = InfinitePlace.Completion.extensionEmbedding w (x.1 w) := by
     have h := UpperTheory.V.Cm.infEq_apply (pInf E x) w
     rw [show infEq E (pInf E x) = x.1 from (infEq E).apply_symm_apply x.1] at h
-    rw [← InfinitePlace.Completion.ringEquivComplexOfIsComplex_apply (IsTotallyComplex.isComplex w), h,
-      RingEquiv.apply_symm_apply]
+    rw [← InfinitePlace.Completion.ringEquivComplexOfIsComplex_apply (IsTotallyComplex.isComplex w),
+      h, RingEquiv.apply_symm_apply]
   rw [e]
   exact (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _) _
 
-private theorem norm_toL_mD_le (q : (A E)ˣ) {r : ℝ} (hr : 0 ≤ r) (h1 : ∀ w, ‖(q : A E).1 w‖ ≤ r)
-    (h2 : ∀ w, ‖((q⁻¹ : (A E)ˣ) : A E).1 w‖ ≤ r) :
-    ‖toL (Matrix.GeneralLinearGroup.map (pInf E) (gl (mD q))).val‖ ≤ r := by
-  refine (pi_norm_le_iff_of_nonneg hr).2 fun i => (pi_norm_le_iff_of_nonneg hr).2 fun j =>
-    (pi_norm_le_iff_of_nonneg hr).2 fun w => ?_
+private theorem norm_toL_mD_le
+    (q : (A E)ˣ)
+    {r : ℝ}
+    (hr : 0 ≤ r) (h1 : ∀ w, ‖(q : A E).1 w‖ ≤ r) (h2 : ∀ w, ‖((q⁻¹ : (A E)ˣ) : A E).1 w‖ ≤ r)
+    : ‖toL (Matrix.GeneralLinearGroup.map (pInf E) (gl (mD q))).val‖ ≤ r := by
+  refine (pi_norm_le_iff_of_nonneg hr).2 fun i =>
+    (pi_norm_le_iff_of_nonneg hr).2 fun j => (pi_norm_le_iff_of_nonneg hr).2 fun w => ?_
   change ‖pInf E ((mD q).1 i j) w‖ ≤ r
   rw [norm_pInf]
   fin_cases i <;> fin_cases j
@@ -69,20 +86,34 @@ private theorem norm_toL_mD_le (q : (A E)ˣ) {r : ℝ} (hr : 0 ≤ r) (h1 : ∀ 
 end SlopeTestRemainingChoices
 
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction in
-theorem UpperTheory.exists_compact_siegel_decomposition_height_le :
-    ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (c : ℝ), 0 < c → ∃ (Y : Set (G1 E)) (C₂ : ℝ), IsCompact Y ∧ ∀ (u : A E) (b : (A E)ˣ), c ≤ ab b → ∃ (γ : Matrix.SpecialLinearGroup (Fin 2) E) (z : GL (Fin 2) (Cinf E)), ∃ w ∈ Y, gl (nU u * mD b) = gl (ratS E γ) * infGL E 2 z * gl w ∧ Ht z ≤ C₂ * ab b := by
+theorem UpperTheory.exists_compact_siegel_decomposition_height_le
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (c : ℝ),
+      0 < c
+        → ∃ (Y : Set (G1 E)) (C₂ : ℝ),
+          IsCompact Y
+            ∧ ∀ (u : A E) (b : (A E)ˣ),
+              c ≤ ab b
+                → ∃ (γ : Matrix.SpecialLinearGroup (Fin 2) E) (z : GL (Fin 2) (Cinf E)), ∃ w ∈ Y,
+                  gl (nU u * mD b) = gl (ratS E γ) * infGL E 2 z * gl w ∧ Ht z ≤ C₂ * ab b := by
   intro E _ _ _ c hc
   obtain ⟨S, hS, hSm⟩ := exists_isCompact_mul_mem_of_ideleModule_mem_Icc (K := E) hc c
   have hcont : Continuous fun x : InfiniteAdeleRing E => ∑ w : InfinitePlace E, ‖x w‖ :=
     continuous_finsetSum _ fun w _ => continuous_norm.comp (continuous_apply w)
-  obtain ⟨M, hM⟩ := (isCompact_closure_fundamentalSetInfinite E).exists_bound_of_continuousOn hcont.continuousOn
-  let L : Set (A E) := ((homeomorphMixedSpace E) ⁻¹' Metric.closedBall 0 M) ×ˢ
-    (integralFiniteAdeles (𝓞 E) E : Set (FiniteAdeleRing (𝓞 E) E))
+  obtain ⟨M, hM⟩ :=
+    (isCompact_closure_fundamentalSetInfinite E).exists_bound_of_continuousOn hcont.continuousOn
+  let L : Set (A E) :=
+    ((homeomorphMixedSpace E) ⁻¹' Metric.closedBall 0 M)
+      ×ˢ (integralFiniteAdeles (𝓞 E) E : Set (FiniteAdeleRing (𝓞 E) E))
   have hL : IsCompact L :=
     ((homeomorphMixedSpace E).isCompact_preimage.2 (isCompact_closedBall _ _)).prod
       (isCompact_integralFiniteAdeles E)
-  refine ⟨(fun x : A E × IdeleGroup E => nU x.1 * mD x.2) '' (L ×ˢ S), 3 / c, (hL.prod hS).image
-    ((continuous_nU.comp continuous_fst).mul (continuous_mD.comp continuous_snd)), fun u b hb => ?_⟩
+  refine ⟨
+    (fun x : A E × IdeleGroup E => nU x.1 * mD x.2) '' (L ×ˢ S),
+    3 / c,
+    (hL.prod hS).image
+      ((continuous_nU.comp continuous_fst).mul (continuous_mD.comp continuous_snd)),
+    fun u b hb => ?_
+  ⟩
   set d := Module.finrank ℚ E
   have hd : d ≠ 0 := Module.finrank_pos.ne'
   have hx : 1 ≤ ab b / c := (one_le_div hc).2 hb
@@ -92,8 +123,9 @@ theorem UpperTheory.exists_compact_siegel_decomposition_height_le :
   have hsd : s ^ d = ab b / c := Real.rpow_inv_natCast_pow (zero_le_one.trans hx) hd
   set p : IdeleGroup E := posIdele s hs0 with hp
   have hm : (IdeleGroup.ideleModule E (p⁻¹ * b) : ℝ) = c := by
-    have h1 : (IdeleGroup.ideleModule E (p⁻¹ * b) : ℝ) =
-        ((IdeleGroup.ideleModule E p : ℝ))⁻¹ * (IdeleGroup.ideleModule E b : ℝ) := by
+    have h1
+        : (IdeleGroup.ideleModule E (p⁻¹ * b) : ℝ)
+          = ((IdeleGroup.ideleModule E p : ℝ))⁻¹ * (IdeleGroup.ideleModule E b : ℝ) := by
       simp [map_mul, map_inv]
     have h2 : (0 : ℝ) < ab b := hc.trans_le hb
     rw [h1, hp, ideleModule_posIdele, hsd]
@@ -112,14 +144,15 @@ theorem UpperTheory.exists_compact_siegel_decomposition_height_le :
     rw [mD_mul_nU a⁻¹ v]
     congr 2
     rw [hv, ← mul_assoc, ← mul_pow, Units.inv_mul, one_pow, one_mul]
-  have h2 : nU v = nU (rt f) * nU u2 := by
-    rw [← nU_add, hu2, add_sub_cancel]
+  have h2 : nU v = nU (rt f) * nU u2 := by rw [← nU_add, hu2, add_sub_cancel]
   have h3 : nU u2 * mD p = mD p * nU u3 := by
     rw [mD_mul_nU p u3]
     congr 2
     rw [hu3, ← mul_assoc, ← mul_pow, Units.mul_inv, one_pow, one_mul]
   have hdec : nU u * mD b = (mD a⁻¹ * nU (rt f)) * mD p * (nU u3 * mD w0) := by
-    calc nU u * mD b = (nU u * mD a⁻¹) * mD p * mD w0 := by rw [hb', mD_mul, mD_mul]; simp only [mul_assoc]
+    calc
+      nU u * mD b
+        = (nU u * mD a⁻¹) * mD p * mD w0 := by rw [hb', mD_mul, mD_mul]; simp only [mul_assoc]
       _ = mD a⁻¹ * nU (rt f) * (nU u2 * mD p) * mD w0 := by rw [h1, h2]; simp only [mul_assoc]
       _ = _ := by rw [h3]; simp only [mul_assoc]
   have hG : mD a⁻¹ * nU (rt f) ∈ Gam E := by
@@ -154,8 +187,10 @@ theorem UpperTheory.exists_compact_siegel_decomposition_height_le :
   · rw [hdec, ← hγ, hz]
     exact Units.ext rfl
   · have hsi : s⁻¹ ≤ s := (inv_le_one_of_one_le₀ hs1).trans hs1
-    have hle1 : ‖toL z.val‖ ≤ s := norm_toL_mD_le p hs0.le
-      (fun w => (norm_posIdele_infinite s hs0 w).le) (fun w => (norm_pos_inv s hs0 w).le.trans hsi)
+    have hle1 : ‖toL z.val‖ ≤ s :=
+      norm_toL_mD_le p hs0.le
+        (fun w => (norm_posIdele_infinite s hs0 w).le)
+        (fun w => (norm_pos_inv s hs0 w).le.trans hsi)
     have hzi : z⁻¹ = Matrix.GeneralLinearGroup.map (pInf E) (gl (mD p⁻¹)) := by
       refine inv_eq_of_mul_eq_one_right ?_
       have e : gl (mD p) * gl (mD p⁻¹) = 1 := by

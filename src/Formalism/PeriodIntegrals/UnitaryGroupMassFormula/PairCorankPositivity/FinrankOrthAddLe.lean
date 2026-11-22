@@ -18,13 +18,17 @@ open scoped Matrix
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem exists_smul_mem {S : HSpace E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
-    (v : S.V) : ∃ c : 𝓞 E, c ≠ 0 ∧ c • v ∈ Λ := by
+theorem exists_smul_mem
+    {S : HSpace E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (v : S.V)
+    : ∃ c : 𝓞 E, c ≠ 0 ∧ c • v ∈ Λ := by
   exact Bl.general_b_fact_left_alt.goal1 Λ hΛ v
 
-theorem finrank_orth_add_le (S : HSpace E) {ι : Type} [Fintype ι] (u : ι → S.V)
-    (hu : LinearIndependent E u) (U : Submodule E S.V) (hU : ∀ i, u i ∈ U) :
-    finrank E (orth S U) + Fintype.card ι ≤ finrank E S.V := by
+theorem finrank_orth_add_le
+    (S : HSpace E)
+    {ι : Type} [Fintype ι]
+    (u : ι → S.V) (hu : LinearIndependent E u)
+    (U : Submodule E S.V) (hU : ∀ i, u i ∈ U)
+    : finrank E (orth S U) + Fintype.card ι ≤ finrank E S.V := by
   let Φ : S.V →ₗ[E] (ι → E) := LinearMap.pi (fun i => S.hT (u i))
   have hle : orth S U ≤ LinearMap.ker Φ := by
     intro v hv
@@ -35,8 +39,7 @@ theorem finrank_orth_add_le (S : HSpace E) {ι : Type} [Fintype ι] (u : ι → 
     exact h2
   have hrange : LinearMap.range Φ = ⊤ := by
     by_contra hne
-    obtain ⟨f, hf0, hfle⟩ :=
-      Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
+    obtain ⟨f, hf0, hfle⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
     set c : ι → E := fun i => f (fun j => if i = j then 1 else 0) with hc
     set w : S.V := ∑ i, star (c i) • u i with hw
     have hwv : ∀ v, S.hT w v = 0 := by
@@ -67,22 +70,21 @@ theorem finrank_orth_add_le (S : HSpace E) {ι : Type} [Fintype ι] (u : ι → 
   have h2 := Submodule.finrank_mono hle
   omega
 
-theorem frame_mem_UUE {S : HSpace E} {r : ℕ} {T T' : E} (Λ : Submodule (𝓞 E) S.V)
-    (hΛ : Submodule.IsFullLattice E Λ) (F : LFlag S r T) (F' : LFlag S r T')
-    (hL : IsLift Λ F) (hL' : IsLift Λ F') :
-    ∀ s, Sum.elim F.fl.fvec F'.fl.fvec s ∈ UUE Λ F F' := by
+theorem frame_mem_UUE
+    {S : HSpace E} {r : ℕ} {T T' : E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
+    (F : LFlag S r T) (F' : LFlag S r T') (hL : IsLift Λ F) (hL' : IsLift Λ F')
+    : ∀ s, Sum.elim F.fl.fvec F'.fl.fvec s ∈ UUE Λ F F' := by
   have hUU : ∀ x, x ∈ UU Λ F F' → x ∈ UUE Λ F F' := fun x hx => Submodule.subset_span hx
   have hA : XLam Λ F ≤ UU Λ F F' := by
     unfold UU; exact le_sup_left.trans (le_sup_left.trans le_sup_left)
   have hB : Submodule.span (𝓞 E) {F.zt} ≤ UU Λ F F' := by
     unfold UU; exact le_sup_right.trans (le_sup_left.trans le_sup_left)
-  have hC : XLam Λ F' ≤ UU Λ F F' := by
-    unfold UU; exact le_sup_right.trans le_sup_left
-  have hD : Submodule.span (𝓞 E) {F'.zt} ≤ UU Λ F F' := by
-    unfold UU; exact le_sup_right
+  have hC : XLam Λ F' ≤ UU Λ F F' := by unfold UU; exact le_sup_right.trans le_sup_left
+  have hD : Submodule.span (𝓞 E) {F'.zt} ≤ UU Λ F F' := by unfold UU; exact le_sup_right
 
-  have hX : ∀ {T₀ : E} (G : LFlag S r T₀), XLam Λ G ≤ UU Λ F F' → ∀ j : Fin r,
-      G.fl.e j ∈ UUE Λ F F' := by
+  have hX
+      : ∀ {T₀ : E} (G : LFlag S r T₀),
+        XLam Λ G ≤ UU Λ F F' → ∀ j : Fin r, G.fl.e j ∈ UUE Λ F F' := by
     intro T₀ G hG j
     obtain ⟨c, hc, hcv⟩ := exists_smul_mem Λ hΛ (G.fl.e j)
     have hcX : c • G.fl.e j ∈ XLam Λ G := by
@@ -91,7 +93,8 @@ theorem frame_mem_UUE {S : HSpace E} {r : ℕ} {T T' : E} (Λ : Submodule (𝓞 
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
     have h1 : c • G.fl.e j ∈ UUE Λ F F' := hUU _ (hG hcX)
     have hc' : algebraMap (𝓞 E) E c ≠ 0 := by
-      intro h; apply hc
+      intro h
+      apply hc
       exact (IsFractionRing.injective (𝓞 E) E) (by rw [h, map_zero])
     rw [← algebraMap_smul E c (G.fl.e j)] at h1
     have := Submodule.smul_mem (UUE Λ F F') (algebraMap (𝓞 E) E c)⁻¹ h1
@@ -116,20 +119,22 @@ theorem frame_mem_UUE {S : HSpace E} {r : ℕ} {T T' : E} (Λ : Submodule (𝓞 
       rw [FlagG.fvec, Fin.snoc_castSucc]
       exact hX F' hC j
 
-theorem Th_le_Hp {S : HSpace E} {r : ℕ} {T T' : E} (Λ : Submodule (𝓞 E) S.V)
-    (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V) :
-    Th Λ F F' F'' β ≤ Hp Λ F F' := by
+theorem Th_le_Hp
+    {S : HSpace E} {r : ℕ} {T T' : E}
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
+    : Th Λ F F' F'' β ≤ Hp Λ F F' := by
   intro x hx
   obtain ⟨p, hp, rfl⟩ := Submodule.mem_map.1 hx
   have h1 := (Submodule.mem_inf.1 (Submodule.mem_inf.1 hp).1).1
   exact (Submodule.mem_prod.1 h1).1
 
-theorem corankPosG :
-    ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r k : ℕ),
-      finrank E S.V = k + 2 * r + 1 →
-      ∀ Λ : Submodule (𝓞 E) S.V, Submodule.IsFullLattice E Λ →
-      ∀ (T T' : E) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V),
-        IsLift Λ F → IsLift Λ F' → Gval F F' ≠ 0 → 1 ≤ s0 Λ F F' F'' β k := by
+theorem corankPosG
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r k : ℕ),
+      finrank E S.V = k + 2 * r + 1
+        → ∀ Λ : Submodule (𝓞 E) S.V,
+          Submodule.IsFullLattice E Λ
+            → ∀ (T T' : E) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V),
+              IsLift Λ F → IsLift Λ F' → Gval F F' ≠ 0 → 1 ≤ s0 Λ F F' F'' β k := by
   intro E _ _ _ S r k hdim Λ hΛ T T' F F' F'' β hL hL' hG
   have hu := linIndep F.fl F'.fl hG
   have h1 := finrank_orth_add_le S _ hu (UUE Λ F F') (frame_mem_UUE Λ hΛ F F' hL hL')

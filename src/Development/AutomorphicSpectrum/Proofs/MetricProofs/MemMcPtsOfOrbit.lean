@@ -7,7 +7,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogResolutionF
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WMan
 
@@ -25,8 +29,10 @@ theorem proj_eq_of_orbit {z w : (Σ k, ι k) → ℂ} (h : SameOrbit z w) : proj
   obtain ⟨c, hc, rfl⟩ := h
   exact Top.proj_smul c hc w
 
-theorem orbit_of_proj {z w : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) (hw : ∀ k, ∃ i, w ⟨k, i⟩ ≠ 0)
-    (h : proj z = proj w) : SameOrbit z w := by
+theorem orbit_of_proj
+    {z w : (Σ k, ι k) → ℂ}
+    (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) (hw : ∀ k, ∃ i, w ⟨k, i⟩ ≠ 0) (h : proj z = proj w)
+    : SameOrbit z w := by
   refine orbit_of_cross hz hw fun k i i' => ?_
   obtain ⟨j, hj⟩ := hz k
   have hN : ((∑ l, ‖z ⟨k, l⟩‖ ^ 2 : ℝ) : ℂ) ≠ 0 :=
@@ -38,8 +44,9 @@ theorem orbit_of_proj {z w : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i
   have h2 := congrFun h ⟨k, (i', j)⟩
   simp only [proj] at h1 h2
   rw [div_eq_div_iff hN hM] at h1 h2
-  have : (z ⟨k, i⟩ * w ⟨k, i'⟩ - z ⟨k, i'⟩ * w ⟨k, i⟩) *
-      (starRingEnd ℂ (z ⟨k, j⟩) * ((∑ l, ‖w ⟨k, l⟩‖ ^ 2 : ℝ) : ℂ)) = 0 := by
+  have : (z ⟨k, i⟩ * w ⟨k, i'⟩ - z ⟨k, i'⟩ * w ⟨k, i⟩)
+        * (starRingEnd ℂ (z ⟨k, j⟩) * ((∑ l, ‖w ⟨k, l⟩‖ ^ 2 : ℝ) : ℂ))
+      = 0 := by
     linear_combination (w ⟨k, i'⟩) * h1 - (w ⟨k, i⟩) * h2
   exact sub_eq_zero.1 ((mul_eq_zero.1 this).resolve_right (mul_ne_zero hj' hM))
 
@@ -59,20 +66,25 @@ def cls (z : (Σ k, ι k) → ℂ) (hz : z ∈ mcPts P) : PtsOf P :=
 theorem rep_cls_orbit (z : (Σ k, ι k) → ℂ) (hz : z ∈ mcPts P) : SameOrbit (rep (cls z hz)) z :=
   orbit_of_proj (rep_mem_mcPts _).1 hz.1 (proj_rep (cls z hz))
 
-theorem mem_mcPts_of_orbit (hP : IsMultiHomogIdeal P) {z z' : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
-    (h : SameOrbit z' z) : z' ∈ mcPts P := by
+theorem mem_mcPts_of_orbit
+    (hP : IsMultiHomogIdeal P) {z z' : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) (h : SameOrbit z' z)
+    : z' ∈ mcPts P := by
   have hz' := (mem_mcPts_iff_conePts_pC P z).1 hz
   refine (mem_mcPts_iff_conePts_pC P z').2 ⟨fun k => ?_, ?_⟩
   · obtain ⟨i, hi⟩ := hz.1 k
-    exact ⟨i, fun h0 => hi (by
-      obtain ⟨c, hc, rfl⟩ := h
-      have : c k * z ⟨k, i⟩ = 0 := h0
-      exact (mul_eq_zero.1 this).resolve_left (hc k))⟩
+    exact ⟨
+      i,
+      fun h0 =>
+        hi (by
+          obtain ⟨c, hc, rfl⟩ := h
+          have : c k * z ⟨k, i⟩ = 0 := h0
+          exact (mul_eq_zero.1 this).resolve_left (hc k))
+    ⟩
   · obtain ⟨c, hc, rfl⟩ := h
     exact ReciprocityTheory.AnForm.R.eval_eq_zero_of_smul (isMultiHomogIdeal_pC hP) c z hz'.2
 
-theorem orbit_aff (p : (k : K) → ι k) {x : PtsOf P} (hx : x ∈ src (P := pC P) p) :
-    SameOrbit (affCoord p (rep x)) (rep x) := by
+theorem orbit_aff (p : (k : K) → ι k) {x : PtsOf P} (hx : x ∈ src (P := pC P) p)
+    : SameOrbit (affCoord p (rep x)) (rep x) := by
   refine ⟨fun k => (rep x ⟨k, p k⟩)⁻¹, fun k => inv_ne_zero (hx k), ?_⟩
   funext q
   simp [affCoord, div_eq_inv_mul]
@@ -81,19 +93,18 @@ theorem exists_alt_variant (x : PtsOf P) : ∃ p : (k : K) → ι k, x ∈ src (
   choose p hp using (rep_mem_mcPts x).1
   exact ⟨p, hp⟩
 
-theorem continuousOn_aff (p : (k : K) → ι k) :
-    ContinuousOn (fun x : PtsOf P => affCoord p (rep x)) (src (P := pC P) p) := by
+theorem continuousOn_aff (p : (k : K) → ι k)
+    : ContinuousOn (fun x : PtsOf P => affCoord p (rep x)) (src (P := pC P) p) := by
   refine continuousOn_pi.2 fun q => ?_
   have hEval (r : Σ k, ι k × ι k) : Continuous (fun x : PtsOf P => x.1 r) :=
     (continuous_apply r).comp continuous_subtype_val
   have hDen (x : PtsOf P) (k : K) : ((∑ i, ‖rep x ⟨k, i⟩‖ ^ 2 : ℝ) : ℂ) ≠ 0 :=
     Complex.ofReal_ne_zero.2 (Top.normSq_pos ((rep_mem x).1 k)).ne'
-  have hDiag (x : PtsOf P) (hx : x ∈ src (P := pC P) p) :
-      x.1 ⟨q.1, (p q.1, p q.1)⟩ ≠ 0 := by
+  have hDiag (x : PtsOf P) (hx : x ∈ src (P := pC P) p) : x.1 ⟨q.1, (p q.1, p q.1)⟩ ≠ 0 := by
     rw [← proj_rep x]
     exact div_ne_zero (mul_ne_zero (hx q.1) (by simpa using hx q.1)) (hDen x q.1)
-  refine ((hEval ⟨q.1, (q.2, p q.1)⟩).continuousOn.div₀
-    (hEval ⟨q.1, (p q.1, p q.1)⟩).continuousOn hDiag).congr ?_
+  refine ((hEval ⟨q.1, (q.2, p q.1)⟩).continuousOn.div₀ (hEval ⟨q.1, (p q.1, p q.1)⟩).continuousOn
+    hDiag).congr ?_
   intro x hx
   have h : starRingEnd ℂ (rep x ⟨q.1, p q.1⟩) ≠ 0 := by simpa using hx q.1
   dsimp only
@@ -103,8 +114,11 @@ theorem continuousOn_aff (p : (k : K) → ι k) :
 
 def srcOf (C : OrbitChart P e) : Set (PtsOf P) := {x | rep x ∈ C.O}
 
-theorem mem_O_of_orbit (C : OrbitChart P e) (hP : IsMultiHomogIdeal P) {z z' : (Σ k, ι k) → ℂ} (hz : z ∈ C.O)
-    (h : SameOrbit z' z) (hzP : z ∈ mcPts P) : z' ∈ C.O :=
+theorem mem_O_of_orbit
+    (C : OrbitChart P e)
+    (hP : IsMultiHomogIdeal P)
+    {z z' : (Σ k, ι k) → ℂ} (hz : z ∈ C.O) (h : SameOrbit z' z) (hzP : z ∈ mcPts P)
+    : z' ∈ C.O :=
   C.O_orbit z hz z' (mem_mcPts_of_orbit hP hzP h) h
 
 theorem isOpen_srcOf (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) : IsOpen (srcOf C) := by
@@ -124,17 +138,17 @@ theorem isOpen_srcOf (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) : IsOpen (s
     exact isOpen_iInter_of_finite fun k =>
       isOpen_ne_fun ((continuous_apply _).comp continuous_subtype_val) continuous_const
   have hS := hOpen.mem_nhds hp
-  have hc : ContinuousAt (fun y : PtsOf P => affCoord p (rep y)) x := (continuousOn_aff p).continuousAt hS
-  have hax : affCoord p (rep x) ∈ C.O :=
-    mem_O_of_orbit C hP hx (orbit_aff p hp) (rep_mem_mcPts x)
+  have hc : ContinuousAt (fun y : PtsOf P => affCoord p (rep y)) x :=
+    (continuousOn_aff p).continuousAt hS
+  have hax : affCoord p (rep x) ∈ C.O := mem_O_of_orbit C hP hx (orbit_aff p hp) (rep_mem_mcPts x)
   have hax' : affCoord p (rep x) ∈ O' := by rw [hO] at hax; exact hax.1
   filter_upwards [hS, hc (hO'.mem_nhds hax')] with y hy hy'
   have h1 : affCoord p (rep y) ∈ mcPts P := mem_mcPts_of_orbit hP (rep_mem_mcPts y) (orbit_aff p hy)
   have h2 : affCoord p (rep y) ∈ C.O := by rw [hO]; exact ⟨hy', h1⟩
   exact mem_O_of_orbit C hP h2 (Proj.orbit_symm (orbit_aff p hy)) h1
 
-theorem continuousOn_rho (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) :
-    ContinuousOn (fun x : PtsOf P => C.ρ (rep x)) (srcOf C) := by
+theorem continuousOn_rho (hP : IsMultiHomogIdeal P) (C : OrbitChart P e)
+    : ContinuousOn (fun x : PtsOf P => C.ρ (rep x)) (srcOf C) := by
   intro x hx
   apply ContinuousAt.continuousWithinAt
   obtain ⟨p, hp⟩ := exists_alt_variant x
@@ -152,10 +166,12 @@ theorem continuousOn_rho (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) :
       isOpen_ne_fun ((continuous_apply _).comp continuous_subtype_val) continuous_const
   have hS := hOpen.mem_nhds hp
   have hO : srcOf C ∈ 𝓝 x := (isOpen_srcOf hP C).mem_nhds hx
-  have hc : ContinuousAt (fun y : PtsOf P => affCoord p (rep y)) x := (continuousOn_aff p).continuousAt hS
+  have hc : ContinuousAt (fun y : PtsOf P => affCoord p (rep y)) x :=
+    (continuousOn_aff p).continuousAt hS
   have hmem : ∀ y ∈ src (P := pC P) p, y ∈ srcOf C → affCoord p (rep y) ∈ C.O := fun y hy hy' =>
     mem_O_of_orbit C hP hy' (orbit_aff p hy) (rep_mem_mcPts y)
-  have ht : Tendsto (fun y : PtsOf P => affCoord p (rep y)) (𝓝 x) (𝓝[C.O] (affCoord p (rep x))) := by
+  have ht
+      : Tendsto (fun y : PtsOf P => affCoord p (rep y)) (𝓝 x) (𝓝[C.O] (affCoord p (rep x))) := by
     refine tendsto_nhdsWithin_iff.2 ⟨hc, ?_⟩
     filter_upwards [hS, hO] with y hy hy' using hmem y hy hy'
   have h1 := (C.ρ_cont _ (hmem x hp hx)).tendsto.comp ht
@@ -168,10 +184,11 @@ theorem continuousOn_rho (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) :
 
 def clsT (x₀ : PtsOf P) (z : (Σ k, ι k) → ℂ) : PtsOf P := if h : z ∈ mcPts P then cls z h else x₀
 
-theorem clsT_of_mem (x₀ : PtsOf P) {z : (Σ k, ι k) → ℂ} (h : z ∈ mcPts P) : clsT x₀ z = cls z h := dite_eq_left h
+theorem clsT_of_mem (x₀ : PtsOf P) {z : (Σ k, ι k) → ℂ} (h : z ∈ mcPts P) : clsT x₀ z = cls z h :=
+  dite_eq_left h
 
-theorem continuousOn_cls (C : OrbitChart P e) (x₀ : PtsOf P) :
-    ContinuousOn (fun w => clsT x₀ (C.φ w)) C.D := by
+theorem continuousOn_cls (C : OrbitChart P e) (x₀ : PtsOf P)
+    : ContinuousOn (fun w => clsT x₀ (C.φ w)) C.D := by
   rw [Topology.IsInducing.subtypeVal.continuousOn_iff]
   have hφ : ContinuousOn C.φ C.D := continuousOn_pi.2 fun q => (C.holo q).continuousOn
   have h1 : ContinuousOn (fun w => proj (C.φ w)) C.D :=
@@ -179,8 +196,8 @@ theorem continuousOn_cls (C : OrbitChart P e) (x₀ : PtsOf P) :
   refine h1.congr fun w hw => ?_
   simp only [Function.comp, clsT_of_mem x₀ (C.mem w hw), cls]
 
-def orbChart (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) (x₀ : PtsOf P) :
-    OpenPartialHomeomorph (PtsOf P) (Fin e → ℂ) where
+def orbChart (hP : IsMultiHomogIdeal P) (C : OrbitChart P e) (x₀ : PtsOf P)
+    : OpenPartialHomeomorph (PtsOf P) (Fin e → ℂ) where
   toFun x := C.ρ (rep x)
   invFun w := clsT x₀ (C.φ w)
   source := srcOf C

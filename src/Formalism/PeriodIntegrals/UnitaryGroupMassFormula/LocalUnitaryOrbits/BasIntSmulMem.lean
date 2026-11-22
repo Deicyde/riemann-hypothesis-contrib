@@ -9,21 +9,24 @@ noncomputable section
 
 namespace PI.OmLocU
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain
 open scoped TensorProduct
 
 section Bas
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (v : HeightOneSpectrum (𝓞 F)) {n : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (v : HeightOneSpectrum (𝓞 F))
+  {n : ℕ}
 
-theorem basRatV_add (x y : Fin n → E) :
-    ratV (F := F) (Fv F v) (x + y) = ratV (F := F) (Fv F v) x + ratV (F := F) (Fv F v) y := by
+theorem basRatV_add (x y : Fin n → E)
+    : ratV (F := F) (Fv F v) (x + y) = ratV (F := F) (Fv F v) x + ratV (F := F) (Fv F v) y := by
   funext i
   simp [ratV, map_add (f := _)]
 
-theorem basRatV_zsmul (c : ℤ) (x : Fin n → E) :
-    ratV (F := F) (Fv F v) (c • x) = c • ratV (F := F) (Fv F v) x := by
+theorem basRatV_zsmul (c : ℤ) (x : Fin n → E)
+    : ratV (F := F) (Fv F v) (c • x) = c • ratV (F := F) (Fv F v) x := by
   funext i
   simp [ratV]
 
@@ -31,18 +34,19 @@ theorem basRatV_zero : ratV (F := F) (Fv F v) (0 : Fin n → E) = 0 := by
   funext i
   simp [ratV]
 
-theorem basRatV_single (i : Fin n) (e : E) :
-    ratV (F := F) (Fv F v) (Pi.single i e : Fin n → E) =
-      (Pi.single i (inclR (F := F) (Fv F v) e) : Fin n → Fv F v ⊗[F] E) := by
+theorem basRatV_single (i : Fin n) (e : E)
+    : ratV (F := F) (Fv F v) (Pi.single i e : Fin n → E)
+      = (Pi.single i (inclR (F := F) (Fv F v) e) : Fin n → Fv F v ⊗[F] E) := by
   funext j
   by_cases h : j = i
   · subst h
     simp [ratV]
   · simp [ratV, Pi.single_eq_of_ne h]
 
-theorem basInt_smul_mem (L : Submodule (𝓞 E) (Fin n → E))
-    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (x : Fin n → E) :
-    ∃ y : ℤ, y ≠ 0 ∧ y • x ∈ L := by
+theorem basInt_smul_mem
+    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤)
+    (x : Fin n → E)
+    : ∃ y : ℤ, y ≠ 0 ∧ y • x ∈ L := by
   classical
   have hx : x ∈ Submodule.span E (L : Set (Fin n → E)) := hL ▸ Submodule.mem_top
   obtain ⟨m, f, g, rfl⟩ := Submodule.mem_span_set'.1 hx
@@ -55,8 +59,8 @@ theorem basInt_smul_mem (L : Submodule (𝓞 E) (Fin n → E))
   rw [← smul_assoc]
   rfl
 
-theorem basLat_fg (L : Submodule (𝓞 E) (Fin n → E)) (hLat : Submodule.IsLattice E L) :
-    (latLoc (E := E) v (L : Set (Fin n → E))).FG := by
+theorem basLat_fg (L : Submodule (𝓞 E) (Fin n → E)) (hLat : Submodule.IsLattice E L)
+    : (latLoc (E := E) v (L : Set (Fin n → E))).FG := by
   classical
   obtain ⟨s, hs⟩ : (L.restrictScalars ℤ).FG := hLat.fg.restrictScalars
   refine ⟨s.image (ratV (F := F) (Fv F v)), ?_⟩
@@ -89,8 +93,10 @@ theorem basLat_fg (L : Submodule (𝓞 E) (Fin n → E)) (hLat : Submodule.IsLat
       rw [basRatV_zsmul]
       exact zsmul_mem hy c
 
-theorem basSpan_top (L : Submodule (𝓞 E) (Fin n → E)) (hLat : Submodule.IsFullLattice E L) :
-    Submodule.span (Fv F v) (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) = ⊤ := by
+theorem basSpan_top (L : Submodule (𝓞 E) (Fin n → E)) (hLat : Submodule.IsFullLattice E L)
+    : Submodule.span (Fv F v)
+        (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E))
+      = ⊤ := by
   classical
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   let bE := Module.finBasis F E
@@ -102,10 +108,15 @@ theorem basSpan_top (L : Submodule (𝓞 E) (Fin n → E)) (hLat : Submodule.IsF
   have hN' : (N : Fv F v) ≠ 0 := by
     rw [← map_intCast (algebraMap F (Fv F v))]
     exact (map_ne_zero _).2 (Int.cast_ne_zero.2 hN)
-  have hmem : ratV (F := F) (Fv F v) (N • (Pi.single i (bE k) : Fin n → E)) ∈
-      latLoc (E := E) v (L : Set (Fin n → E)) := Submodule.subset_span ⟨_, hNL, rfl⟩
-  have e : P ⟨i, k⟩ = (N : Fv F v)⁻¹ • ratV (F := F) (Fv F v) (N • (Pi.single i (bE k) : Fin n → E)) := by
-    rw [basRatV_zsmul, basRatV_single, ← Int.cast_smul_eq_zsmul (Fv F v), smul_smul, inv_mul_cancel₀ hN', one_smul]
+  have hmem
+      : ratV (F := F) (Fv F v) (N • (Pi.single i (bE k) : Fin n → E))
+        ∈ latLoc (E := E) v (L : Set (Fin n → E)) :=
+    Submodule.subset_span ⟨_, hNL, rfl⟩
+  have e
+      : P ⟨i, k⟩
+        = (N : Fv F v)⁻¹ • ratV (F := F) (Fv F v) (N • (Pi.single i (bE k) : Fin n → E)) := by
+    rw [basRatV_zsmul, basRatV_single, ← Int.cast_smul_eq_zsmul (Fv F v), smul_smul,
+      inv_mul_cancel₀ hN', one_smul]
     simp only [P, B, Pi.basis_apply, Algebra.TensorProduct.basis_apply]
     rfl
   rw [SetLike.mem_coe, e]

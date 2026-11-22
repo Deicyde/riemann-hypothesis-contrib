@@ -14,15 +14,24 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.IsInt
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
 
 namespace GlobalTheory
 
-theorem psi_zero_mul_rigV : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F] [Algebra (FractionRing R) F] (s₀ : Raw D F 1), PsiRel D (TF (R := R) F) s₀ → (∃ j, (s₀ 0).f j ≠ 0) → ∀ (z : (TF (R := R) F).left) J, Good D.P.L z J → val (Z := (TF (R := R) F).left) (D.psi (0)) (jFK (R := R) F) z J * rigV D z J = 1 := by
+theorem psi_zero_mul_rigV
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F]
+        [Algebra (FractionRing R) F] (s₀ : Raw D F 1),
+      PsiRel D (TF (R := R) F) s₀ → (∃ j, (s₀ 0).f j ≠ 0)
+        → ∀ (z : (TF (R := R) F).left) J,
+          Good D.P.L z J
+            → val (Z := (TF (R := R) F).left) (D.psi (0)) (jFK (R := R) F) z J * rigV D z J
+              = 1 := by
   intro R _ _ D F _ _ s₀ H hs z J hJ
   have hc : cT D (DegPre.BF D F) 0 = 1 := by
     have h := DVR.cPoint_add D (DegPre.BF D F) 0 0
@@ -49,8 +58,11 @@ theorem psi_zero_mul_rigV : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre
   have e1 : (val (D.psi 0) (p ≫ κ₀).left (ζ z) J' * rigV D (ζ z) J').val = 1 :=
     (mul_eq_right₀ hne).1 e.symm
   have n1 := (values_natural _ _ _ _ D.P.L _ _ _ (p ≫ κ₀).left ζ z J hJ).2.2.1 (D.psi 0)
-  have n2 := (values_natural _ _ _ _ D.P.L PUnit (fun _ => eSec D.P.A) (fun _ => 1)
-    (DegPre.BF D F).hom ζ z J hJ).2.2.1 D.rig
+  have n2 :=
+    (values_natural _ _ _ _ D.P.L PUnit
+      (fun _ => eSec D.P.A)
+      (fun _ => 1)
+      (DegPre.BF D F).hom ζ z J hJ).2.2.1 D.rig
   have a1 : ζ ≫ (p ≫ κ₀).left = jFK (R := R) F := by
     show ζ ≫ p.left ≫ jFK (R := R) F = _
     rw [← Category.assoc, hζ, Category.id_comp]

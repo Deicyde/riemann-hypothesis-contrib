@@ -17,15 +17,17 @@ namespace GlobalTheory.LevelLoss
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem u_bound_off_top (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) (u : D.what₂.Word) (τ : D.what₂.Tau)
-    (l : Fin D.R.k) (hl0 : ¬ (l.1 = 0 ∧ τ ∈ topsOf D.host D.eTau)) :
-    |(((D.hcW u τ).u l : ℚ) : ℝ)| ≤ 3 * L.sc.b := by
+theorem u_bound_off_top
+    (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) (u : D.what₂.Word)
+    (τ : D.what₂.Tau) (l : Fin D.R.k) (hl0 : ¬(l.1 = 0 ∧ τ ∈ topsOf D.host D.eTau))
+    : |(((D.hcW u τ).u l : ℚ) : ℝ)| ≤ 3 * L.sc.b := by
   have hk : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
   have hm := D.R.two_le_m
   have hb := GlobalTheory.HCEntries.one_le_b L
   have hb1 := GlobalTheory.HCEntries.b_bounds h hx τ ⟨0, by omega⟩
   obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, hE, -, hS, -⟩ := h
-  have hS : L.Sc ≤ L.sc.b := by linarith [GlobalTheory.HCEntries.b'_Sc_le hS, GlobalTheory.HCEntries.b'_pos L]
+  have hS : L.Sc ≤ L.sc.b := by
+    linarith [GlobalTheory.HCEntries.b'_Sc_le hS, GlobalTheory.HCEntries.b'_pos L]
   obtain ⟨r, hr⟩ := l
   rw [abs_le]
   by_cases h0 : r = 0
@@ -48,7 +50,9 @@ theorem u_bound_off_top (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L
       have h2 := L.cloud_v τ ⟨D.R.k - 2, by omega⟩
       have h3 : -(((D.hc τ).b ⟨0, by omega⟩ : ℚ) : ℝ) < (((D.hc τ).u ⟨D.R.k - 1, hr⟩ : ℚ) : ℝ) := by
         exact_mod_cast (D.hc τ).u_last_gt (by omega) (by omega)
-      have h4 : (((D.hc τ).u ⟨D.R.k - 1, hr⟩ : ℚ) : ℝ) < (((D.hc τ).v ⟨D.R.k - 2, by omega⟩ : ℚ) : ℝ) := by
+      have h4
+          : (((D.hc τ).u ⟨D.R.k - 1, hr⟩ : ℚ) : ℝ)
+            < (((D.hc τ).v ⟨D.R.k - 2, by omega⟩ : ℚ) : ℝ) := by
         have := (D.hc τ).v_gt_u ⟨D.R.k - 2, by omega⟩
         have e : (⟨D.R.k - 2 + 1, by omega⟩ : Fin D.R.k) = ⟨D.R.k - 1, hr⟩ :=
           Fin.ext (by show D.R.k - 2 + 1 = D.R.k - 1; omega)
@@ -64,9 +68,11 @@ theorem N_le_b (h : SizesAt L) (P : ParameterChoice' D L) : 5 * (D.R.N D.R.m : �
   have h0 : (0 : ℝ) ≤ D.R.N D.R.m := Nat.cast_nonneg _
   nlinarith
 
-theorem true_entry_le (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) (u : D.what₂.Word) (τ : D.what₂.Tau)
-    (i : ℕ) (hi : i ≤ D.R.m) (a : Fin (D.R.N i)) (ha : ¬ (a.1 = 0 ∧ τ ∈ topsOf D.host D.eTau)) :
-    |((((D.fm u).lam i τ).w a - ((i * (D.R.t + 1) / 2 : ℕ) : ℤ) : ℤ) : ℝ)| ≤ 5 * L.sc.b := by
+theorem true_entry_le
+    (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) (u : D.what₂.Word)
+    (τ : D.what₂.Tau) (i : ℕ)
+    (hi : i ≤ D.R.m) (a : Fin (D.R.N i)) (ha : ¬(a.1 = 0 ∧ τ ∈ topsOf D.host D.eTau))
+    : |((((D.fm u).lam i τ).w a - ((i * (D.R.t + 1) / 2 : ℕ) : ℤ) : ℤ) : ℝ)| ≤ 5 * L.sc.b := by
   have hN := N_le_b h P
   have hNe : (D.R.N D.R.m : ℝ) = D.R.k + D.R.m * (D.R.t + 1) := by unfold Ranks.N; push_cast; ring
   have hk0 : (0 : ℝ) ≤ D.R.k := Nat.cast_nonneg _
@@ -90,7 +96,9 @@ theorem true_entry_le (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.s
     constructor <;> linarith [b.1, b.2, GlobalTheory.HCEntries.one_le_b L]
   · have hq := D.R.blk_lt hi a hk
     generalize_proofs
-    obtain ⟨w0, w1⟩ := GlobalTheory.HCEntries.wj_bounds h hx ((a.1 - D.R.k) / (D.R.t + 1) + 1) (Nat.le_add_left _ _) hq τ
+    obtain ⟨w0, w1⟩ :=
+      GlobalTheory.HCEntries.wj_bounds h hx ((a.1 - D.R.k) / (D.R.t + 1) + 1) (Nat.le_add_left _ _)
+        hq τ
     rw [GlobalTheory.FockDegreeGap.wj_succ D _ hq] at w0 w1
     rw [D.hcW_e]
     have q1 : (((a.1 - D.R.k) / (D.R.t + 1) + 1 : ℕ) : ℝ) ≤ D.R.m := by exact_mod_cast hq
@@ -104,8 +112,10 @@ theorem true_entry_le (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.s
     rw [abs_le]
     constructor <;> linarith
 
-theorem Wtau_le (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) (u : D.what₂.Word) (τ : D.what₂.Tau) :
-    (Wtau D u τ : ℝ) ≤ 5 * L.sc.b := by
+theorem Wtau_le
+    (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) (u : D.what₂.Word)
+    (τ : D.what₂.Tau)
+    : (Wtau D u τ : ℝ) ≤ 5 * L.sc.b := by
   have hb := GlobalTheory.HCEntries.one_le_b L
   rw [← Nat.le_floor_iff (by linarith)]
   unfold Wtau

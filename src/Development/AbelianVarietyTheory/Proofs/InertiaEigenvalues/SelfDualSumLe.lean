@@ -10,23 +10,32 @@ open scoped InnerProductSpace BigOperators
 
 namespace GlobalTheory.HermNbr
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-  [Algebra O K] [IsFractionRing O K] {r : ℕ}
+variable
+  {O K : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+  {r : ℕ}
 
-theorem good_map (cK : K ≃+* K) {J : Matrix (Fin r) (Fin r) K} {ϖ : O} {N : ℕ}
-    {L : Submodule O (Fin r → K)} (hL : Good cK J ϖ N L) (hϖ : Irreducible ϖ)
-    (g : GL (Fin r) K) (hU : ((g : Matrix (Fin r) (Fin r) K).map cK).transpose * J *
-      (g : Matrix (Fin r) (Fin r) K) = J) :
-    Good cK J ϖ N (L.map (((g : Matrix (Fin r) (Fin r) K).mulVecLin).restrictScalars O)) := by
+theorem good_map
+    (cK : K ≃+* K)
+    {J : Matrix (Fin r) (Fin r) K} {ϖ : O} {N : ℕ} {L : Submodule O (Fin r → K)}
+    (hL : Good cK J ϖ N L) (hϖ : Irreducible ϖ)
+    (g : GL (Fin r) K)
+    (hU
+      : ((g : Matrix (Fin r) (Fin r) K).map cK).transpose * J * (g : Matrix (Fin r) (Fin r) K) = J)
+    : Good cK J ϖ N (L.map (((g : Matrix (Fin r) (Fin r) K).mulVecLin).restrictScalars O)) := by
   set G := ((g : Matrix (Fin r) (Fin r) K).mulVecLin).restrictScalars O with hG
   set Gi := (((g⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K).mulVecLin).restrictScalars O with hGi
   have h1 : ∀ x, G (Gi x) = x := by
     intro x
-    change (g : Matrix (Fin r) (Fin r) K).mulVec ((((g⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K)).mulVec x) = x
+    change (g : Matrix (Fin r) (Fin r) K).mulVec
+        ((((g⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K)).mulVec x)
+      = x
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
   have h2 : ∀ x, Gi (G x) = x := by
     intro x
-    change (((g⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K)).mulVec ((g : Matrix (Fin r) (Fin r) K).mulVec x) = x
+    change (((g⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K)).mulVec
+        ((g : Matrix (Fin r) (Fin r) K).mulVec x)
+      = x
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
   have memG : ∀ x, x ∈ L.map G ↔ Gi x ∈ L := by
     intro x
@@ -59,8 +68,9 @@ theorem good_map (cK : K ≃+* K) {J : Matrix (Fin r) (Fin r) K} {ϖ : O} {N : �
       congr 1
       ext x
       simp [hf', hG]
-    have e : ∀ P : Submodule O (Fin r → K),
-        (P.map G).toAddSubgroup = P.toAddSubgroup.map G.toAddMonoidHom := fun P => by
+    have e
+        : ∀ P : Submodule O (Fin r → K),
+          (P.map G).toAddSubgroup = P.toAddSubgroup.map G.toAddMonoidHom := fun P => by
       ext x; simp [Submodule.mem_map]
     unfold idx at hidx ⊢
     rw [← hf'] at hidx ⊢

@@ -5,18 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.powChar :
-    PowChar := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.powChar : PowChar := by
   intro p _ n hn hdvd
   have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := (ZMod p)ˣ)
-  have hcard : Nat.card (ZMod p)ˣ = p - 1 := by
-    rw [Nat.card_eq_fintype_card, ZMod.card_units]
-  have hog : orderOf g = p - 1 := by
-    rw [orderOf_eq_card_of_forall_mem_zpowers hg, hcard]
+  have hcard : Nat.card (ZMod p)ˣ = p - 1 := by rw [Nat.card_eq_fintype_card, ZMod.card_units]
+  have hog : orderOf g = p - 1 := by rw [orderOf_eq_card_of_forall_mem_zpowers hg, hcard]
   have hprim := Complex.isPrimitiveRoot_exp n hn.ne'
   obtain ⟨ω, hωc⟩ := hprim.isUnit hn.ne'
   have hωp : IsPrimitiveRoot ω n := by

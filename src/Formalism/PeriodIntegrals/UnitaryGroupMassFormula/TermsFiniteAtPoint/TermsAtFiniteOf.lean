@@ -11,7 +11,8 @@ open scoped Classical
 
 namespace PI.TermsAtPtFiniteW
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

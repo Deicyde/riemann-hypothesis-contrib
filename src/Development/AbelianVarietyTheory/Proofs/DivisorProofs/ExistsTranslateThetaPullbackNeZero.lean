@@ -14,9 +14,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Polarization
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
@@ -27,29 +31,41 @@ namespace GlobalTheory.TransNZ
 
 open GlobalTheory.MBLow.TranslateSection GlobalTheory.MBLow.TrSec
 
-theorem eq_projectionPullbackSection_of_inverseImage {S : Scheme.{0}} (P : PolAV S) (s : P.L.Sec)
-    (th : LB.Sec (LPow P.A P.L ((1 : ℕ) : ℤ) (baseOver S))) (h : IsPolAVSectionInverseImage P (baseOver S) s th) :
-    th = thSec P s := by
+theorem eq_projectionPullbackSection_of_inverseImage
+    {S : Scheme.{0}}
+    (P : PolAV S) (s : P.L.Sec) (th : LB.Sec (LPow P.A P.L ((1 : ℕ) : ℤ) (baseOver S)))
+    (h : IsPolAVSectionInverseImage P (baseOver S) s th)
+    : th = thSec P s := by
   have key : ∀ j : Fin 1 → P.L.ι, th.f j = (thSec P s).f j := by
     intro j
     have hj : j = fun _ => j 0 := funext fun k => by rw [Subsingleton.elim k 0]
-    rw [hj, h (j 0) (chart_le P _), projectionPullbackSectionBaseProduct_isInverseImage P s (j 0) (chart_le P _)]
-  cases th; cases hth : thSec P s
+    rw [hj, h (j 0) (chart_le P _),
+      projectionPullbackSectionBaseProduct_isInverseImage P s (j 0) (chart_le P _)]
+  cases th
+  cases hth : thSec P s
   simp only [hth] at key
   congr
   exact funext key
 
 end GlobalTheory.TransNZ
 
-
 open GlobalTheory.MBLow.TranslateSection GlobalTheory.MBLow.TrSec in
-theorem GlobalTheory.TransNZ.exists_ne : ∀ (K : Type) [Field K] [IsAlgClosed K] [CharZero K] (x : KeyIn K) (m : ℕ), Odd m → 3 ≤ m →
-    ∀ (I : Type) (pt : I → (baseOver (Sp K) ⟶ x.P.A)), (∀ z : baseOver (Sp K) ⟶ x.P.A, z ^ (m ^ 2) = 1 → ∃ i, pt i = z) →
-    ∀ (th : LB.Sec (LPow x.P.A x.P.L ((1 : ℕ) : ℤ) (baseOver (Sp K)))), IsPolAVSectionInverseImage x.P (baseOver (Sp K)) x.th th →
-    ∀ (U : I → ThetaGrp x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (baseOver (Sp K)))
-      (t : I → LB.Sec (LPow x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (baseOver (Sp K)))),
-    (∀ i, SymLift x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (m ^ 2) (pt i) (U i) ∧ Tr x.P x.rig m th (U i) (t i)) →
-    ∃ i, (SecMod.mk (fst (baseOver (Sp K)) x.P.A).left (t i) : EA x.P (𝟙 (Sp K)) (m ^ 2)) ≠ 0 := by
+theorem GlobalTheory.TransNZ.exists_ne
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] [CharZero K] (x : KeyIn K) (m : ℕ),
+      Odd m → 3 ≤ m
+        → ∀ (I : Type) (pt : I → (baseOver (Sp K) ⟶ x.P.A)),
+          (∀ z : baseOver (Sp K) ⟶ x.P.A, z ^ (m ^ 2) = 1 → ∃ i, pt i = z)
+            → ∀ (th : LB.Sec (LPow x.P.A x.P.L ((1 : ℕ) : ℤ) (baseOver (Sp K)))),
+              IsPolAVSectionInverseImage x.P (baseOver (Sp K)) x.th th
+                → ∀ (U : I → ThetaGrp x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (baseOver (Sp K)))
+                    (t : I → LB.Sec (LPow x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (baseOver (Sp K)))),
+                  (∀ i,
+                      SymLift x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (m ^ 2) (pt i) (U i)
+                        ∧ Tr x.P x.rig m th (U i) (t i))
+                    → ∃ i,
+                      (SecMod.mk (fst (baseOver (Sp K)) x.P.A).left (t i)
+                          : EA x.P (𝟙 (Sp K)) (m ^ 2))
+                        ≠ 0 := by
   intro K _ _ _ x m hm hm3 I pt hpt th hth U t hUt
   have hm1 : 1 ≤ m := by omega
   obtain ⟨i₀, -⟩ := hpt 1 (one_pow _)

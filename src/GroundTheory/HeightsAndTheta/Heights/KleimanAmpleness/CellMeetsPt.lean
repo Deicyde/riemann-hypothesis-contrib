@@ -18,7 +18,8 @@ variable {K : Type} [Fintype K] {ι : K → Type}
 def pt (c : ∀ k, ι k) : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 :=
   ⟨fun k => {c k}, fun _ => Finset.singleton_nonempty _, by simp⟩
 
-theorem exists_pt (c : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0) : ∃ d : ∀ k, ι k, c = pt d := by
+theorem exists_pt (c : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0)
+    : ∃ d : ∀ k, ι k, c = pt d := by
   have h1 : ∀ k, (c.1 k).card = 1 := by
     intro k
     have hk : (c.1 k).card - 1 = 0 := (Finset.sum_eq_zero_iff.mp c.2.2) k (Finset.mem_univ _)
@@ -27,17 +28,23 @@ theorem exists_pt (c : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.
   choose d hd using fun k => Finset.card_eq_one.mp (h1 k)
   exact ⟨d, Subtype.ext (funext hd)⟩
 
-theorem cellMeets_pt {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) :
-    CellMeets y (pt c).1 ↔ ∀ k, y ⟨k, c k⟩ ≠ 0 := by
+theorem cellMeets_pt {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
+    : CellMeets y (pt c).1 ↔ ∀ k, y ⟨k, c k⟩ ≠ 0 := by
   simp [CellMeets, pt]
 
 variable [LinearOrder K] [∀ k, LinearOrder (ι k)]
 
-theorem edge (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : (Σ k, ι k) → Ω)
-    (s : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 → Ω) (hs : cellD S y 0 s = 0) (d : ∀ k, ι k) (k : K)
-    {i i' : ι k} (hii : i < i') (hd : ∀ l, l ≠ k → y ⟨l, d l⟩ ≠ 0) (hi : y ⟨k, i⟩ ≠ 0)
-    (hi' : y ⟨k, i'⟩ ≠ 0) :
-    s (pt (Function.update d k i)) = s (pt (Function.update d k i')) := by
+theorem edge
+    (S : Type) [CommRing S]
+    {Ω : Type} [Field Ω] [Algebra S Ω]
+    (y : (Σ k, ι k) → Ω)
+    (s : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 → Ω)
+    (hs : cellD S y 0 s = 0)
+    (d : ∀ k, ι k)
+    (k : K)
+    {i i' : ι k} (hii : i < i')
+    (hd : ∀ l, l ≠ k → y ⟨l, d l⟩ ≠ 0) (hi : y ⟨k, i⟩ ≠ 0) (hi' : y ⟨k, i'⟩ ≠ 0)
+    : s (pt (Function.update d k i)) = s (pt (Function.update d k i')) := by
   classical
   have hne : i ≠ i' := hii.ne
   obtain ⟨J, hJk, hJl⟩ : ∃ J : ∀ l, Finset (ι l), J k = {i, i'} ∧ ∀ l, l ≠ k → J l = {d l} :=
@@ -60,8 +67,10 @@ theorem edge (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : 
       subst hj
       exact hd l hl
 
-  have hface : ∀ a b : ι k, J k = {a, b} → a ≠ b →
-      Function.update J k ((J k).erase a) = (pt (Function.update d k b)).1 := by
+  have hface
+      : ∀ a b : ι k,
+        J k = {a, b} → a ≠ b
+          → Function.update J k ((J k).erase a) = (pt (Function.update d k b)).1 := by
     intro a b hab habn
     funext l
     by_cases hl : l = k
@@ -114,7 +123,9 @@ theorem edge (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : 
     · exact absurd rfl hj2.2
   · intro h; exact absurd (show i ∈ J k by rw [hJk]; simp) h
   · intro h; exact absurd (show i' ∈ J k by rw [hJk]; simp) h
-  rw [dite_eq_left (hfa ▸ (pt (Function.update d k i')).2), dite_eq_left (hfb ▸ (pt (Function.update d k i)).2)] at h0
+  rw [dite_eq_left (hfa ▸ (pt (Function.update d k i')).2),
+      dite_eq_left (hfb ▸ (pt (Function.update d k i)).2)]
+    at h0
   simp only [LinearMap.smul_apply] at h0
   erw [LinearMap.proj_apply, LinearMap.proj_apply] at h0
   have e1 : ∀ h, s ⟨Function.update J k ((J k).erase i), h⟩ = s (pt (Function.update d k i')) :=
@@ -124,10 +135,15 @@ theorem edge (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : 
   rw [hsa, hsb, e1, e2, one_smul, neg_smul, one_smul] at h0
   linear_combination -h0
 
-theorem step (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : (Σ k, ι k) → Ω)
-    (s : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 → Ω) (hs : cellD S y 0 s = 0) (d : ∀ k, ι k)
-    (hd : ∀ l, y ⟨l, d l⟩ ≠ 0) (k : K) (j : ι k) (hj : y ⟨k, j⟩ ≠ 0) :
-    s (pt d) = s (pt (Function.update d k j)) := by
+theorem step
+    (S : Type) [CommRing S]
+    {Ω : Type} [Field Ω] [Algebra S Ω]
+    (y : (Σ k, ι k) → Ω)
+    (s : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 → Ω)
+    (hs : cellD S y 0 s = 0)
+    (d : ∀ k, ι k) (hd : ∀ l, y ⟨l, d l⟩ ≠ 0)
+    (k : K) (j : ι k) (hj : y ⟨k, j⟩ ≠ 0)
+    : s (pt d) = s (pt (Function.update d k j)) := by
   classical
   have hdl : ∀ l, l ≠ k → y ⟨l, d l⟩ ≠ 0 := fun l _ => hd l
   rcases lt_trichotomy (d k) j with h | h | h
@@ -138,10 +154,14 @@ theorem step (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : 
     rw [Function.update_eq_self] at this
     exact this.symm
 
-theorem chain (S : Type) [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] (y : (Σ k, ι k) → Ω)
-    (s : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 → Ω) (hs : cellD S y 0 s = 0) (d d' : ∀ k, ι k)
-    (hd : ∀ l, y ⟨l, d l⟩ ≠ 0) (hd' : ∀ l, y ⟨l, d' l⟩ ≠ 0) :
-    s (pt d) = s (pt d') := by
+theorem chain
+    (S : Type) [CommRing S]
+    {Ω : Type} [Field Ω] [Algebra S Ω]
+    (y : (Σ k, ι k) → Ω)
+    (s : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.Cell K ι 0 → Ω)
+    (hs : cellD S y 0 s = 0)
+    (d d' : ∀ k, ι k) (hd : ∀ l, y ⟨l, d l⟩ ≠ 0) (hd' : ∀ l, y ⟨l, d' l⟩ ≠ 0)
+    : s (pt d) = s (pt d') := by
   classical
   have key : ∀ T : Finset K, s (pt d) = s (pt (fun l => if l ∈ T then d' l else d l)) := by
     intro T

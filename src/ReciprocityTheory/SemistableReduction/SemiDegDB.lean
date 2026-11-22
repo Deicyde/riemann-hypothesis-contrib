@@ -34,8 +34,10 @@ theorem sdd_proj_eq_zero_iff (x : Fin r → K) : projGe K r e x = 0 ↔ x ∈ cu
     · simp [projGe, hi, h i hi]
     · simp [projGe, hi]
 
-theorem sdd_satSub_eq {k₀ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b₀ : Fin k₀ → Fin r → K)
-    (hb₀ : IsKBasisIn (B ⊓ cutSub K r e) b₀) : satSub B b₀ = B ⊓ cutSub K r e := by
+theorem sdd_satSub_eq
+    {k₀ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b₀ : Fin k₀ → Fin r → K)
+    (hb₀ : IsKBasisIn (B ⊓ cutSub K r e) b₀)
+    : satSub B b₀ = B ⊓ cutSub K r e := by
   have hle : Submodule.span K (Set.range b₀) ≤ LinearMap.ker (cutProjK K r e) := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
@@ -48,10 +50,11 @@ theorem sdd_satSub_eq {k₀ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b₀ 
   · rintro ⟨hx, hc⟩
     exact ⟨hx, hb₀.2.2 x ⟨hx, hc⟩⟩
 
-theorem sdd_append_li {k₀ k₁ : ℕ} (b₀ : Fin k₀ → Fin r → K) (c b₁ : Fin k₁ → Fin r → K)
+theorem sdd_append_li
+    {k₀ k₁ : ℕ} (b₀ : Fin k₀ → Fin r → K) (c b₁ : Fin k₁ → Fin r → K)
     (hb₀cut : ∀ i, b₀ i ∈ cutSub K r e) (hb₀li : LinearIndependent K b₀)
-    (hcb : ∀ j, projGe K r e (c j) = b₁ j) (hb₁li : LinearIndependent K b₁) :
-    LinearIndependent K (Fin.append b₀ c) := by
+    (hcb : ∀ j, projGe K r e (c j) = b₁ j) (hb₁li : LinearIndependent K b₁)
+    : LinearIndependent K (Fin.append b₀ c) := by
   rw [Fintype.linearIndependent_iff]
   intro g hg
   rw [Fin.sum_univ_add] at hg
@@ -61,17 +64,19 @@ theorem sdd_append_li {k₀ k₁ : ℕ} (b₀ : Fin k₀ → Fin r → K) (c b�
   have h1 : ∑ j, g (Fin.natAdd k₀ j) • b₁ j = 0 := by
     have := congrArg (cutProjK K r e) hg
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_add (f := _), map_sum, map_smul, hb', hc'] using this
+    simpa [map_add (f := _), map_sum, map_smul, hb', hc'] using this
   have h1' := Fintype.linearIndependent_iff.mp hb₁li _ h1
   have h0 : ∑ i, g (Fin.castAdd k₁ i) • b₀ i = 0 := by simpa [h1'] using hg
   have h0' := Fintype.linearIndependent_iff.mp hb₀li _ h0
   intro i
   exact Fin.addCases (fun i => h0' i) (fun j => h1' j) i
 
-theorem sdd_append_span {k₀ k₁ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b₀ : Fin k₀ → Fin r → K)
-    (c b₁ : Fin k₁ → Fin r → K) (hb₀ : IsKBasisIn (B ⊓ cutSub K r e) b₀) (hcB : ∀ j, c j ∈ B)
-    (hcb : ∀ j, projGe K r e (c j) = b₁ j) (hb₁ : IsKBasisIn (B.map (projGe K r e)) b₁) :
-    ∀ x ∈ B, x ∈ Submodule.span K (Set.range (Fin.append b₀ c)) := by
+theorem sdd_append_span
+    {k₀ k₁ : ℕ}
+    (B : Submodule (𝓞 K) (Fin r → K)) (b₀ : Fin k₀ → Fin r → K) (c b₁ : Fin k₁ → Fin r → K)
+    (hb₀ : IsKBasisIn (B ⊓ cutSub K r e) b₀) (hcB : ∀ j, c j ∈ B)
+    (hcb : ∀ j, projGe K r e (c j) = b₁ j) (hb₁ : IsKBasisIn (B.map (projGe K r e)) b₁)
+    : ∀ x ∈ B, x ∈ Submodule.span K (Set.range (Fin.append b₀ c)) := by
   intro x hx
   have hfx : projGe K r e x ∈ Submodule.span K (Set.range b₁) :=
     hb₁.2.2 _ (Submodule.mem_map_of_mem hx)
@@ -106,13 +111,15 @@ theorem sdd_append_span {k₀ k₁ : ℕ} (B : Submodule (𝓞 K) (Fin r → K))
   have hx' : x = dK⁻¹ • (y + ∑ j, (algebraMap (𝓞 K) K (β' j)) • c j) := by
     rw [hy, sub_add_cancel, smul_smul, inv_mul_cancel₀ hd0, one_smul]
   rw [hx']
-  exact Submodule.smul_mem _ _ (Submodule.add_mem _ hys
-    (Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hcs j)))
+  exact Submodule.smul_mem _ _
+    (Submodule.add_mem _ hys (Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hcs j)))
 
-theorem sdd_card_eq {k k₀ k₁ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b : Fin k → Fin r → K)
-    (a : Fin (k₀ + k₁) → Fin r → K) (hb : IsKBasisIn B b) (haB : ∀ i, a i ∈ B)
-    (hali : LinearIndependent K a) (has : ∀ x ∈ B, x ∈ Submodule.span K (Set.range a)) :
-    k = k₀ + k₁ := by
+theorem sdd_card_eq
+    {k k₀ k₁ : ℕ}
+    (B : Submodule (𝓞 K) (Fin r → K)) (b : Fin k → Fin r → K) (a : Fin (k₀ + k₁) → Fin r → K)
+    (hb : IsKBasisIn B b) (haB : ∀ i, a i ∈ B) (hali : LinearIndependent K a)
+    (has : ∀ x ∈ B, x ∈ Submodule.span K (Set.range a))
+    : k = k₀ + k₁ := by
   have hsp : Submodule.span K (Set.range b) = Submodule.span K (Set.range a) := by
     apply le_antisymm
     · rw [Submodule.span_le]
@@ -126,14 +133,17 @@ theorem sdd_card_eq {k k₀ k₁ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (
   rw [hsp, h2] at h1
   simpa using h1.symm
 
-theorem sdd_index {k₀ k₁ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b₀ : Fin k₀ → Fin r → K)
-    (c b₁ : Fin k₁ → Fin r → K) (hsat : satSub B b₀ = B ⊓ cutSub K r e) (hcB : ∀ j, c j ∈ B)
-    (hcb : ∀ j, projGe K r e (c j) = b₁ j) :
-    (satSub B b₀ ⊔ Submodule.span (𝓞 K) (Set.range c)).toAddSubgroup.relIndex B.toAddSubgroup =
-      (Submodule.span (𝓞 K) (Set.range b₁)).toAddSubgroup.relIndex
+theorem sdd_index
+    {k₀ k₁ : ℕ}
+    (B : Submodule (𝓞 K) (Fin r → K)) (b₀ : Fin k₀ → Fin r → K) (c b₁ : Fin k₁ → Fin r → K)
+    (hsat : satSub B b₀ = B ⊓ cutSub K r e) (hcB : ∀ j, c j ∈ B)
+    (hcb : ∀ j, projGe K r e (c j) = b₁ j)
+    : (satSub B b₀ ⊔ Submodule.span (𝓞 K) (Set.range c)).toAddSubgroup.relIndex B.toAddSubgroup
+      = (Submodule.span (𝓞 K) (Set.range b₁)).toAddSubgroup.relIndex
         (B.map (projGe K r e)).toAddSubgroup := by
-  have hspan : Submodule.span (𝓞 K) (Set.range b₁) =
-      (Submodule.span (𝓞 K) (Set.range c)).map (projGe K r e) := by
+  have hspan
+      : Submodule.span (𝓞 K) (Set.range b₁)
+        = (Submodule.span (𝓞 K) (Set.range c)).map (projGe K r e) := by
     rw [Submodule.map_span, ← Set.range_comp]
     congr 2
     funext j
@@ -142,12 +152,11 @@ theorem sdd_index {k₀ k₁ : ℕ} (B : Submodule (𝓞 K) (Fin r → K)) (b₀
     rw [Submodule.span_le]
     rintro _ ⟨j, rfl⟩
     exact hcB j
-  rw [Submodule.map_toAddSubgroup, ← AddSubgroup.relIndex_comap,
-    ← AddSubgroup.inf_relIndex_right, eq_comm, ← AddSubgroup.inf_relIndex_right]
+  rw [Submodule.map_toAddSubgroup, ← AddSubgroup.relIndex_comap, ← AddSubgroup.inf_relIndex_right,
+    eq_comm, ← AddSubgroup.inf_relIndex_right]
   congr 1
   ext x
-  simp only [AddSubgroup.mem_inf, AddSubgroup.mem_comap, Submodule.mem_toAddSubgroup, hsat,
-    hspan]
+  simp only [AddSubgroup.mem_inf, AddSubgroup.mem_comap, Submodule.mem_toAddSubgroup, hsat, hspan]
   constructor
   · rintro ⟨⟨y, hy, hxy⟩, hx⟩
     have hxy' : projGe K r e y = projGe K r e x := hxy

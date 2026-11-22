@@ -11,7 +11,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.CoefficientPositivity
 
-open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.LatticeMinorExistence
+open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.LatticeMinorExistence
   ReciprocityTheory.ChartRestriction.G.FD.ExponentialGrowthExclusion
 open scoped ComplexConjugate ComplexOrder
 
@@ -254,8 +255,9 @@ private lemma herm_smul_right_eq_cc_mul' (G : Matrix (Fin r) (Fin r) E) (t : E) 
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem nonvanishing_coefficient_positivity_of (h2 : UnipotentLatticeLift (E := E)) (h3 : FourierCoefficientProperties (E := E)) :
-    NonvanishingCoefficientPositivity (E := E) := by
+theorem nonvanishing_coefficient_positivity_of
+    (h2 : UnipotentLatticeLift (E := E)) (h3 : FourierCoefficientProperties (E := E))
+    : NonvanishingCoefficientPositivity (E := E) := by
   intro r X u hu hΛ la P hP hχΓ χ hex τ
   obtain ⟨x1, hx1, hfz⟩ := hex
   obtain ⟨-, hinvP, hβ⟩ := h2 r X u hu hΛ
@@ -267,8 +269,7 @@ theorem nonvanishing_coefficient_positivity_of (h2 : UnipotentLatticeLift (E := 
     exact hfz (by simp only [Data.fz, ite_eq_left hcond, dite_eq_right hc])
   obtain ⟨⟨hPsec, C, hC⟩, hcusp⟩ := hP
   have hPinv := hinvP la P hPsec hχΓ
-  obtain ⟨⟨hFd, -, hFZ⟩, hFn, -⟩ :=
-    h3 r X.toData u X.g hu X.g_pos la P hPsec.1 hPsec.2.1 hPinv χ
+  obtain ⟨⟨hFd, -, hFZ⟩, hFn, -⟩ := h3 r X.toData u X.g hu X.g_pos la P hPsec.1 hPsec.2.1 hPinv χ
   have hFC : ∀ y ∈ X.dom, X.pnorm la (X.fz u X.g χ P) y ≤ C := fun y hy =>
     hFn y hy C fun b hb => hC _ (X.toData.Zb_dom u hu.1 b hb hy)
   have hpsd := psd_of X.toData u hu la χ hcond.1 _ hFd hFZ C hFC hx1 hfz τ
@@ -313,25 +314,30 @@ theorem nonvanishing_coefficient_positivity_of (h2 : UnipotentLatticeLift (E := 
     exact Submodule.smul_mem _ _ (hΛ i)
   have hξ0 : ξ ≠ 0 := fun h => he0 (funext (Fintype.linearIndependent_iff.1 hu.2 e h))
   have hξξ : herm X.Gm ξ ξ = 0 := by
-    simp only [hξ_def, Fin.sum_univ_two, herm_add_left_fundamental_domains, herm_add_right_fundamental_domains, herm_smul_left_fundamental_domains',
+    simp only [hξ_def, Fin.sum_univ_two, herm_add_left_fundamental_domains,
+      herm_add_right_fundamental_domains, herm_smul_left_fundamental_domains',
       herm_smul_right_eq_cc_mul', hu.1, mul_zero, add_zero]
   have hemb : ∀ σ : X.Ψ, Data.emb σ.1 ξ = X.uvec u (fun σ i => σ.1 (e i)) σ := by
     intro σ
     funext j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Data.emb, Data.uvec, hξ_def, Finset.sum_apply, map_mul]
+    simp [Data.emb, Data.uvec, hξ_def, Finset.sum_apply, map_mul]
 
-  have hinv : ∀ s : X.Ψ → ℝ, X.fz u X.g (X.embH β) P (X.flow ξ (fun τ => (s τ : ℂ)) x1) =
-      X.fz u X.g (X.embH β) P x1 := by
+  have hinv
+      : ∀ s : X.Ψ → ℝ,
+        X.fz u X.g (X.embH β) P (X.flow ξ (fun τ => (s τ : ℂ)) x1)
+          = X.fz u X.g (X.embH β) P x1 := by
     intro s
     rw [flow_eq_Zb X.toData u ξ _ hemb s x1, hFZ _ (herm_rank1 X.toData s _) x1 hx1, pairR_rank1]
     have hz : ∀ σ, X.chiAt (X.embH β) (fun σ i => σ.1 (e i)) σ = 0 := by
       intro σ
       rw [chiAt_embH, Finset.sum_comm]
-      have h1 : ∑ k, ∑ i, β i k * e i * cc (e k) = 0 := Finset.sum_eq_zero fun k _ => by
-        rw [← Finset.sum_mul,
-          show (∑ i, β i k * e i) = ∑ i, e i * β i k from Finset.sum_congr rfl fun i _ => mul_comm _ _,
-          hek k, zero_mul]
+      have h1 : ∑ k, ∑ i, β i k * e i * cc (e k) = 0 :=
+        Finset.sum_eq_zero fun k _ => by
+          rw [← Finset.sum_mul,
+            show (∑ i, β i k * e i) = ∑ i, e i * β i k from
+              Finset.sum_congr rfl fun i _ => mul_comm _ _,
+            hek k, zero_mul]
       rw [h1, map_zero]
     simp [hz]
   exact hfz (fz_zero_of_inv X.toData u hu.1 X.g _ hcond hωex la P hPsec.1.continuousOn C hC ξ hξξ _

@@ -16,17 +16,21 @@ noncomputable section
 
 namespace Formalism.MainNotions.S.Pv.LemmaJ
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.Bridge Formalism.MainNotions.S.ThB
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.Bridge Formalism.MainNotions.S.ThB
 
-theorem hsNormSq_nonneg' {Wp Wq : Type*} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (A : Wq →L[ℂ] Wp) : 0 ≤ hsNormSq A := by
+theorem hsNormSq_nonneg'
+    {Wp Wq : Type*} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    (A : Wq →L[ℂ] Wp)
+    : 0 ≤ hsNormSq A := by
   simp only [hsNormSq, hsInner]
   rw [Complex.re_sum]
   exact Finset.sum_nonneg (fun i _ => by
     simpa using (inner_self_nonneg (𝕜 := ℂ) (x := A ((stdOrthonormalBasis ℂ Wq) i))))
 
-theorem ell_one {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) :
-    ell k r z (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) = 0 := by
+theorem ell_one {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    : ell k r z (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) = 0 := by
   simp only [inWb] at hz
   simp only [ell, eI]
   apply Finset.sum_eq_zero
@@ -39,30 +43,35 @@ theorem ell_one {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) 
   · rw [Matrix.one_mulVec]
     exact hz _ (Or.inl (by simp [a.isLt]))
 
-theorem psi_one {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (c : ℂ) :
-    psi k r z c (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) = 1 := by
+theorem psi_one {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (c : ℂ)
+    : psi k r z c (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) = 1 := by
   simp only [psi]
   simp [ell_one hz]
 
-theorem Gf_big {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
+theorem Gf_big
+    {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
     {μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hsec : IsSection k r z z' μsec)
-    (c : Fin r → ℂ) (hc : ∀ a, c a ≠ 0) (ζ : ℂ) (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ) :
-    0 < Gf k r z z' (bigCell k r c (μsec ζ)) := by
+    (c : Fin r → ℂ) (hc : ∀ a, c a ≠ 0)
+    (ζ : ℂ) (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ)
+    : 0 < Gf k r z z' (bigCell k r c (μsec ζ)) := by
   have h1 := (Formalism.MainNotions.InterlacingSignCuts.bigCell_D k r z z' hz hz' c hc (μsec ζ)).2
   rw [(hsec.2 ζ hζ).2] at h1
   have h2 := (Formalism.QuantumDeterminants.bigCellMinors k r z z' c (μsec ζ) hz hz').1 (Fin.last r)
   simp only [Fin.val_last] at h2
   have hne : (∏ a : Fin r with a.val < r, c a) ≠ 0 := Finset.prod_ne_zero_iff.2 fun a _ => hc a
-  have e : Gf k r z z' (bigCell k r c (μsec ζ)) =
-      Complex.normSq (∏ a : Fin r with a.val < r, c a) * (Complex.normSq ζ - Tz k r z * Tz k r z') := by
+  have e
+      : Gf k r z z' (bigCell k r c (μsec ζ))
+        = Complex.normSq (∏ a : Fin r with a.val < r, c a)
+          * (Complex.normSq ζ - Tz k r z * Tz k r z') := by
     unfold Gf
     rw [h1, h2, Complex.normSq_mul]
     ring
   rw [e]
   exact mul_pos (Complex.normSq_pos.2 hne) (by linarith)
 
-theorem bcWeight_ne {k r : ℕ} (hk : 2 ≤ k) {T T' : ℝ} {p : (Fin r → ℂ) × ℂ} (h : bcWeight k r T T' p ≠ 0) :
-    (∀ a, p.1 a ≠ 0) ∧ T * T' < Complex.normSq p.2 := by
+theorem bcWeight_ne
+    {k r : ℕ} (hk : 2 ≤ k) {T T' : ℝ} {p : (Fin r → ℂ) × ℂ} (h : bcWeight k r T T' p ≠ 0)
+    : (∀ a, p.1 a ≠ 0) ∧ T * T' < Complex.normSq p.2 := by
   simp only [bcWeight] at h
   split_ifs at h with hle
   · have h1 := left_ne_zero_of_mul h
@@ -100,7 +109,8 @@ theorem big_cell_eq : BigCellEq := by
   congr 1
 
   set g := bigCell D.R.k D.R.rS q.1 (μsec q.2) with hgdef
-  have hζ' : Tz D.R.k D.R.rS W.z * Tz D.R.k D.R.rS W.z' < Complex.normSq q.2 := by rw [hTz, hTz']; exact hζ
+  have hζ' : Tz D.R.k D.R.rS W.z * Tz D.R.k D.R.rS W.z' < Complex.normSq q.2 := by
+    rw [hTz, hTz']; exact hζ
   have hμ := (hsec.2 q.2 hζ').1
   have hgU : g ∈ UH (Hpk D.R.k D.R.rS) := Formalism.QuantumDeterminants.bigCellMem _ _ _ _ hc hμ
   have hGp := Gf_big hz hz' hsec q.1 hc q.2 hζ'
@@ -130,7 +140,10 @@ theorem big_cell_eq : BigCellEq := by
     · intro s hs
       rw [hRS] at hs
       rw [Set.mem_singleton_iff.1 hs]
-      have hl1 : lmulM (k := D.R.k) (r := D.R.rS) (1 : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ) = id := by
+      have hl1
+          : lmulM (k := D.R.k) (r := D.R.rS)
+              (1 : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ)
+            = id := by
         funext x i j
         simp [lmulM]
       rw [hl1, Measure.map_id]
@@ -149,11 +162,16 @@ theorem big_cell_eq : BigCellEq := by
     apply Continuous.measurable
     refine continuous_pi fun i => continuous_pi fun j => ?_
     exact ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const).matrix_elem i j
-  have hQM : IsQuotMeas W.μG ((Measure.dirac one).map (fun x => fun i j => (g⁻¹ * Matrix.of x * g) i j)) W.μG := by
-    have hmapd : (Measure.dirac one).map (fun x => fun i j => (g⁻¹ * Matrix.of x * g) i j) = Measure.dirac one := by
+  have hQM : IsQuotMeas W.μG
+      ((Measure.dirac one).map (fun x => fun i j => (g⁻¹ * Matrix.of x * g) i j)) W.μG := by
+    have hmapd
+        : (Measure.dirac one).map (fun x => fun i j => (g⁻¹ * Matrix.of x * g) i j)
+          = Measure.dirac one := by
       ext s hs
       rw [Measure.map_apply hmc hs, Measure.dirac_apply' _ (hmc hs), Measure.dirac_apply' _ hs]
-      have hiff : one ∈ (fun x : Mt D.R.k D.R.rS => fun i j => (g⁻¹ * Matrix.of x * g) i j) ⁻¹' s ↔ one ∈ s := by
+      have hiff
+          : one ∈ (fun x : Mt D.R.k D.R.rS => fun i j => (g⁻¹ * Matrix.of x * g) i j) ⁻¹' s
+            ↔ one ∈ s := by
         rw [Set.mem_preimage]
         exact iff_of_eq (congrArg (· ∈ s) hpt)
       simp only [Set.indicator]
@@ -170,31 +188,46 @@ theorem big_cell_eq : BigCellEq := by
     funext i j
     rw [hof, Matrix.one_mul]
     rfl
-  have hMo : Formalism.FourierDecayAlt.C2.IsMonomial (Formalism.QuantumDeterminants.Zhat D.R.k D.R.rS W.z W.z' g) := by
+  have hMo : Formalism.FourierDecayAlt.C2.IsMonomial (Formalism.QuantumDeterminants.Zhat D.R.k
+      D.R.rS W.z W.z' g) := by
     rw [hgdef, Formalism.QuantumDeterminants.bigCellZhat _ _ _ _ _ _ hz hz']
-    refine ⟨Equiv.refl _, fun a => if h : a.val < D.R.rS then q.1 ⟨a.val, h⟩ else
-      herm (Hpk D.R.k D.R.rS) (Matrix.mulVec (bigCell D.R.k D.R.rS q.1 (μsec q.2)) W.z') W.z, fun a => ?_, ?_⟩
+    refine ⟨
+      Equiv.refl _,
+      fun a =>
+        if h : a.val < D.R.rS then
+          q.1 ⟨a.val, h⟩
+        else
+          herm (Hpk D.R.k D.R.rS) (Matrix.mulVec (bigCell D.R.k D.R.rS q.1 (μsec q.2)) W.z') W.z,
+      fun a => ?_,
+      ?_
+    ⟩
     · by_cases h : a.val < D.R.rS
       · simp only [dif_pos h]; exact hc _
       · simp only [dif_neg h]
-        have hz0 := (Formalism.QuantumDeterminants.bigCellMinors _ _ _ _ q.1 (μsec q.2) hz hz').2.2 hc
+        have hz0 :=
+          (Formalism.QuantumDeterminants.bigCellMinors _ _ _ _ q.1 (μsec q.2) hz hz').2.2 hc
         have hζ0 : q.2 ≠ 0 := by
-          intro e; rw [e, Complex.normSq_zero] at hζ'
+          intro e
+          rw [e, Complex.normSq_zero] at hζ'
           have : 0 ≤ Tz D.R.k D.R.rS W.z * Tz D.R.k D.R.rS W.z' := by rw [hTz, hTz']; positivity
           linarith
-        have h1 := Formalism.MainNotions.InterlacingSignCuts.bigCell_D D.R.k D.R.rS W.z W.z' hz hz' q.1 hc (μsec q.2)
+        have h1 :=
+          Formalism.MainNotions.InterlacingSignCuts.bigCell_D D.R.k D.R.rS W.z W.z' hz hz' q.1 hc
+            (μsec q.2)
         rw [(hsec.2 q.2 hζ').2] at h1
         rw [← hz0]
         unfold zeta
         rw [h1.2, mul_div_cancel_left₀ _ h1.1]
         exact hζ0
     · ext i j
-      simp only [Formalism.FourierDecayAlt.C2.monoP, Matrix.diagonal_apply, Matrix.of_apply, Equiv.refl_apply]
+      simp only [Formalism.FourierDecayAlt.C2.monoP, Matrix.diagonal_apply, Matrix.of_apply,
+        Equiv.refl_apply]
       by_cases hij : i = j
       · subst hij; simp
       · simp [hij]
-  have e1 := hfEq g hgU hGp hMo hRel (Measure.dirac one) W.μG (pairMeas (toBessel D τ w w' θ W lam' A hW hA hT hT'))
-    hHaar hOQ hQM
+  have e1 :=
+    hfEq g hgU hGp hMo hRel (Measure.dirac one) W.μG
+      (pairMeas (toBessel D τ w w' θ W lam' A hW hA hT hT')) hHaar hOQ hQM
   rw [e1]
   rfl
 

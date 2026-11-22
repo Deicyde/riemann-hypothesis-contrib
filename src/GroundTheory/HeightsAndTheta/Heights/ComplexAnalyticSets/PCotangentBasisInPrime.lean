@@ -39,23 +39,26 @@ theorem CotangentBasisInPrime.proof : CotangentBasisInPrime.Statement := by
   have hspw : Submodule.span (ResidueField (Localization.AtPrime P)) (Set.range w) = ⊤ := by
     rw [show Set.range w = Set.range (v ∘ a) from e.symm.surjective.range_comp _, hsp, hspan]
   let G : Fin (Nat.card κ) → maximalIdeal (Localization.AtPrime P) := fun i => g (a (e.symm i))
-  have hsum : ∀ c : Fin (Nat.card κ) → Localization.AtPrime P,
-      (maximalIdeal _).toCotangent (∑ i, c i • G i) = ∑ i, residue _ (c i) • w i := by
+  have hsum
+      : ∀ c : Fin (Nat.card κ) → Localization.AtPrime P,
+        (maximalIdeal _).toCotangent (∑ i, c i • G i) = ∑ i, residue _ (c i) • w i := by
     intro c
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, ← ResidueField.algebraMap_eq, algebraMap_smul]
     rfl
-  have hcoe : ∀ c : Fin (Nat.card κ) → Localization.AtPrime P,
-      ((∑ i, c i • G i : maximalIdeal (Localization.AtPrime P)) : Localization.AtPrime P) =
-        ∑ i, c i * algebraMap T _ (a (e.symm i) : T) := by
+  have hcoe
+      : ∀ c : Fin (Nat.card κ) → Localization.AtPrime P,
+        ((∑ i, c i • G i : maximalIdeal (Localization.AtPrime P)) : Localization.AtPrime P)
+          = ∑ i, c i * algebraMap T _ (a (e.symm i) : T) := by
     intro c
     simp [G, g]
   refine ⟨Nat.card κ, fun i => (a (e.symm i) : T), fun i => (a (e.symm i)).2, ?_, ?_⟩
   · intro y hy
-    have hz : (maximalIdeal _).toCotangent ⟨y, hy⟩ ∈
-        Submodule.span (ResidueField (Localization.AtPrime P)) (Set.range w) := by
+    have hz
+        : (maximalIdeal _).toCotangent ⟨y, hy⟩
+          ∈ Submodule.span (ResidueField (Localization.AtPrime P)) (Set.range w) := by
       rw [hspw]; trivial
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hz
     choose c' hc' using fun i => residue_surjective (R := Localization.AtPrime P) (c i)
@@ -63,8 +66,10 @@ theorem CotangentBasisInPrime.proof : CotangentBasisInPrime.Statement := by
       rw [map_sub, hsum, ← hc]
       simp [hc']
     rw [Ideal.toCotangent_eq_zero, Submodule.coe_sub, hcoe] at hdiff
-    rw [show y = (y - ∑ i, c' i * algebraMap T _ (a (e.symm i) : T)) +
-        ∑ i, c' i * algebraMap T _ (a (e.symm i) : T) by ring]
+    rw [show y
+        = (y - ∑ i, c' i * algebraMap T _ (a (e.symm i) : T))
+          + ∑ i, c' i * algebraMap T _ (a (e.symm i) : T) by
+      ring]
     refine add_mem (Ideal.mem_sup_right hdiff) (Ideal.mem_sup_left (Ideal.sum_mem _ fun i _ => ?_))
     exact Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
   · intro c hc i

@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem finite_sq_eq_one_of_finite_algebra (k : Type) [Field k] [CharZero k] (A : Type) [CommRing A]
-    [Algebra k A] [Module.Finite k A] : Set.Finite {x : A | x ^ 2 = 1} := by
+theorem finite_sq_eq_one_of_finite_algebra
+    (k : Type) [Field k] [CharZero k] (A : Type) [CommRing A] [Algebra k A] [Module.Finite k A]
+    : Set.Finite {x : A | x ^ 2 = 1} := by
   haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
   haveI : Finite (TopologicalSpace.Clopens (PrimeSpectrum A)) :=
     Finite.of_injective (fun s : TopologicalSpace.Clopens (PrimeSpectrum A) => (s : Set (PrimeSpectrum A)))
@@ -33,7 +34,6 @@ theorem finite_sq_eq_one_of_finite_algebra (k : Type) [Field k] [CharZero k] (A 
     exact add_left_cancel h
   have hfin : Set.Finite {e : A | IsIdempotentElem e} :=
     Set.finite_coe_iff.mp (‹Finite {e : A // IsIdempotentElem e}› :)
-  exact Set.Finite.of_finite_image (hfin.subset (by
-    rintro _ ⟨x, hx, rfl⟩; exact hmap x hx)) hinj
+  exact Set.Finite.of_finite_image (hfin.subset (by rintro _ ⟨x, hx, rfl⟩; exact hmap x hx)) hinj
 
 end GlobalTheory

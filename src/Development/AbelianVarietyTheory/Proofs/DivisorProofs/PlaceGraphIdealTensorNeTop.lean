@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ToQMemMaxima
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair GlobalTheory.GraphLocal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair GlobalTheory.GraphLocal
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -21,35 +23,44 @@ namespace GlobalTheory.GraphLocal
 
 open GlobalTheory.FieldPair
 
-theorem ne_zero_of_ord_pos {K : Type} [Field K] [Algebra ℂ K] (E : Place (algebraMap ℂ K)) {e : K}
-    (he : 0 < E.ord e) : e ≠ 0 := by
+theorem ne_zero_of_ord_pos
+    {K : Type} [Field K] [Algebra ℂ K] (E : Place (algebraMap ℂ K)) {e : K} (he : 0 < E.ord e)
+    : e ≠ 0 := by
   rintro rfl
   simp [Place.ord] at he
 
-theorem graphIdeal_ne_top_of_hom {K κ κ' F : Type} [Field K] [Field κ] [Field κ'] [Field F]
-    [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
-    (R : Subring K) (π : R →+* κ) (ρ : κ →ₐ[ℂ] κ') (E : Place (algebraMap ℂ K))
+theorem graphIdeal_ne_top_of_hom
+    {K κ κ' F : Type}
+    [Field K] [Field κ] [Field κ'] [Field F] [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
+    (R : Subring K) (π : R →+* κ)
+    (ρ : κ →ₐ[ℂ] κ')
+    (E : Place (algebraMap ℂ K))
     (h1 : ∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a)
-    (h2 : ∀ a, algebraMap ℂ K a ∈ R) (h4 : E.Contains R)
-    (α : E.ring →+* F) (β : κ' →+* F) (hα : ∀ r : R, α ⟨r, h4 _ r.2⟩ = β (ρ (π r)))
-    (hpos : ∀ x : E.ring, 0 < E.ord (x : K) → α x = 0) :
-    graphIdeal (κ' := κ') E R π ρ ≠ ⊤ := by
+    (h2 : ∀ a, algebraMap ℂ K a ∈ R)
+    (h4 : E.Contains R) (α : E.ring →+* F) (β : κ' →+* F)
+    (hα : ∀ r : R, α ⟨r, h4 _ r.2⟩ = β (ρ (π r)))
+    (hpos : ∀ x : E.ring, 0 < E.ord (x : K) → α x = 0)
+    : graphIdeal (κ' := κ') E R π ρ ≠ ⊤ := by
   letI : Algebra ℂ F := (β.comp (algebraMap ℂ κ')).toAlgebra
-  let j : placeAlg E →+* E.ring :=
-    { toFun := fun x => ⟨x.1, x.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl,
-      map_zero' := rfl, map_add' := fun _ _ => rfl }
-  let α' : placeAlg E →ₐ[ℂ] F :=
-    { α.comp j with
-      commutes' := fun a => by
-        have := hα ⟨algebraMap ℂ K a, h2 a⟩
-        rw [h1, ρ.commutes] at this
-        exact this }
+  let j : placeAlg E →+* E.ring := {
+    toFun := fun x => ⟨x.1, x.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
+  let α' : placeAlg E →ₐ[ℂ] F := {
+    α.comp j with
+    commutes' := fun a => by
+      have := hα ⟨algebraMap ℂ K a, h2 a⟩
+      rw [h1, ρ.commutes] at this
+      exact this
+  }
   let β' : κ' →ₐ[ℂ] F := { β with commutes' := fun _ => rfl }
   let Φ := Algebra.TensorProduct.lift α' β' (fun _ _ => Commute.all _ _)
   let Ψ : tens (κ' := κ') (placeAlg E) →+* F :=
     (Φ.comp (tensEquiv (κ' := κ') (placeAlg E)).symm.toAlgHom).toRingHom
-  have hΨ : ∀ w, Ψ (tensEquiv (placeAlg E) w) = Φ w := fun w => by
-    simp [Ψ]
+  have hΨ : ∀ w, Ψ (tensEquiv (placeAlg E) w) = Φ w := fun w => by simp [Ψ]
   intro htop
   have hle : graphIdeal (κ' := κ') E R π ρ ≤ RingHom.ker Ψ := by
     rw [graphIdeal, Ideal.span_le]
@@ -60,8 +71,7 @@ theorem graphIdeal_ne_top_of_hom {K κ κ' F : Type} [Field K] [Field κ] [Field
       rw [SetLike.mem_coe, RingHom.mem_ker, hb', hΨ]
       simp only [Φ, Algebra.TensorProduct.lift_tmul, map_one, mul_one]
       exact hpos ⟨e, hmem⟩ he
-    · have hb' : b = tensEquiv (κ' := κ') (placeAlg E)
-          (⟨a, h4 _ a.2⟩ ⊗ₜ 1 - 1 ⊗ₜ ρ (π a)) :=
+    · have hb' : b = tensEquiv (κ' := κ') (placeAlg E) (⟨a, h4 _ a.2⟩ ⊗ₜ 1 - 1 ⊗ₜ ρ (π a)) :=
         Subtype.ext (by rw [hb, coe_tensEquiv, map_sub]; rfl)
       rw [SetLike.mem_coe, RingHom.mem_ker, hb', hΨ]
       simp only [Φ, map_sub, Algebra.TensorProduct.lift_tmul, map_one, mul_one, one_mul]
@@ -77,18 +87,18 @@ namespace GlobalTheory.GraphLocal
 
 open GlobalTheory.FieldPair
 
-theorem graphIdeal_ne_top : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
-    (R : Subring K) (π : R →+* κ) (ρ : κ →ₐ[ℂ] κ') (E : Place (algebraMap ℂ K)),
-  (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a) →
-  (∀ a, algebraMap ℂ K a ∈ R) → (∀ f : κ, ∃ a b : R, π b ≠ 0 ∧ f * π b = π a) →
-  E.Contains R → (∀ r : R, (r : K) ≠ 0 → (π r = 0 ↔ 0 < E.ord r)) →
-  graphIdeal (κ' := κ') E R π ρ ≠ ⊤ := by
+theorem graphIdeal_ne_top
+    : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
+        (R : Subring K) (π : R →+* κ) (ρ : κ →ₐ[ℂ] κ') (E : Place (algebraMap ℂ K)),
+      (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a)
+        → (∀ a, algebraMap ℂ K a ∈ R) → (∀ f : κ, ∃ a b : R, π b ≠ 0 ∧ f * π b = π a) → E.Contains R
+        → (∀ r : R, (r : K) ≠ 0 → (π r = 0 ↔ 0 < E.ord r))
+        → graphIdeal (κ' := κ') E R π ρ ≠ ⊤ := by
   intro K κ κ' _ _ _ _ _ _ R π ρ E h1 h2 h3 h4 h5
   let kE := IsLocalRing.ResidueField E.ring
   let inc : R →+* E.ring := R.subtype.codRestrict E.ring (fun r => h4 _ r.2)
   let g : R →+* kE := (IsLocalRing.residue E.ring).comp inc
-  have hnu : ∀ x : E.ring, (x : K) ≠ 0 →
-      (0 < E.ord x ↔ x ∈ IsLocalRing.maximalIdeal E.ring) := by
+  have hnu : ∀ x : E.ring, (x : K) ≠ 0 → (0 < E.ord x ↔ x ∈ IsLocalRing.maximalIdeal E.ring) := by
     intro x hx
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     constructor
@@ -114,16 +124,20 @@ theorem graphIdeal_ne_top : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ
         IsLocalRing.residue_eq_zero_iff]
       exact hnu (inc r) hr
   have hsurj : Function.Surjective π.rangeRestrict := π.rangeRestrict_surjective
-  let φ₀ : π.range →+* kE := π.rangeRestrict.liftOfSurjective hsurj
-    ⟨g, fun r hr => by
-      rw [RingHom.mem_ker] at hr ⊢
-      exact (hker r).1 (congrArg Subtype.val hr)⟩
+  let φ₀ : π.range →+* kE :=
+    π.rangeRestrict.liftOfSurjective hsurj ⟨
+      g,
+      fun r hr => by
+        rw [RingHom.mem_ker] at hr ⊢
+        exact (hker r).1 (congrArg Subtype.val hr)
+    ⟩
   have hφ₀ : ∀ r, φ₀ (π.rangeRestrict r) = g r := fun r =>
     RingHom.liftOfSurjective_comp_apply _ hsurj _ r
-  have hinj : Function.Injective φ₀ := (injective_iff_map_eq_zero φ₀).2 fun s hs => by
-    obtain ⟨r, rfl⟩ := hsurj s
-    rw [hφ₀] at hs
-    exact Subtype.ext ((hker r).2 hs)
+  have hinj : Function.Injective φ₀ :=
+    (injective_iff_map_eq_zero φ₀).2 fun s hs => by
+      obtain ⟨r, rfl⟩ := hsurj s
+      rw [hφ₀] at hs
+      exact Subtype.ext ((hker r).2 hs)
   haveI : IsFractionRing π.range κ := IsFractionRing.of_field π.range κ fun z => by
     obtain ⟨a, b, hb, e⟩ := h3 z
     refine ⟨π.rangeRestrict a, π.rangeRestrict b, ?_⟩
@@ -149,8 +163,8 @@ theorem graphIdeal_ne_top : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ
   · show q (IsLocalRing.residue E.ring (inc r) ⊗ₜ 1) = q (1 ⊗ₜ ρ (π r))
     congr 1
     rw [show IsLocalRing.residue E.ring (inc r) = g r from rfl, ← hι,
-      show ι (π r) = π r • (1 : kE) by rw [Algebra.smul_def, mul_one]; rfl,
-      TensorProduct.smul_tmul, Algebra.smul_def, mul_one]
+      show ι (π r) = π r • (1 : kE) by rw [Algebra.smul_def, mul_one]; rfl, TensorProduct.smul_tmul,
+      Algebra.smul_def, mul_one]
     rfl
   · show q (IsLocalRing.residue E.ring x ⊗ₜ 1) = 0
     rw [(IsLocalRing.residue_eq_zero_iff x).2 ((hnu x (ne_zero_of_ord_pos E hx)).1 hx),

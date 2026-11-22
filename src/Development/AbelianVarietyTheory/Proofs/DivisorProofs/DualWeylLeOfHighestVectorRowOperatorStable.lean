@@ -7,14 +7,17 @@ public import Formalism.BranchSandwichDivisors.DivFromPassageAndNorm
 
 @[expose] public section
 
-open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BranchingDeterminantCap Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.Mem.Gelf GlobalTheory.Mem.GelfCheck GlobalTheory.BrCompare
+open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BranchingDeterminantCap
+  Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.Mem.Gelf GlobalTheory.Mem.GelfCheck
+  GlobalTheory.BrCompare
 
 namespace GlobalTheory.BrCompare
 
-theorem rowDiv_succ_rec (R : Type) [CommRing R] {r m : ℕ} (a b : Fin r) (f : MvPolynomial (Fin r × Fin m) R) (k : ℕ) :
-    ((k : MvPolynomial (Fin r × Fin m) R) + 1) * rowDiv R a b (k + 1) f +
-      (if a = b then 1 else 0) * (k : MvPolynomial (Fin r × Fin m) R) * rowDiv R a b k f =
-      rowE R r m a b (rowDiv R a b k f) := by
+theorem rowDiv_succ_rec
+    (R : Type) [CommRing R] {r m : ℕ} (a b : Fin r) (f : MvPolynomial (Fin r × Fin m) R) (k : ℕ)
+    : ((k : MvPolynomial (Fin r × Fin m) R) + 1) * rowDiv R a b (k + 1) f
+        + (if a = b then 1 else 0) * (k : MvPolynomial (Fin r × Fin m) R) * rowDiv R a b k f
+      = rowE R r m a b (rowDiv R a b k f) := by
   unfold rowDiv
   induction f using MvPolynomial.induction_on generalizing k with
   | C c =>
@@ -30,8 +33,9 @@ theorem rowDiv_succ_rec (R : Type) [CommRing R] {r m : ℕ} (a b : Fin r) (f : M
   | mul_X p v hp =>
     obtain ⟨c, s⟩ := v
     set y : MvPolynomial (Fin r × Fin m) R := if b = c then X (a, s) else 0 with hy
-    have hX : rowGen R a b (X (c, s) : MvPolynomial (Fin r × Fin m) R) =
-        Polynomial.C (X (c, s)) + Polynomial.C y * Polynomial.X := by
+    have hX
+        : rowGen R a b (X (c, s) : MvPolynomial (Fin r × Fin m) R)
+          = Polynomial.C (X (c, s)) + Polynomial.C y * Polynomial.X := by
       rw [rowGen, aeval_X, hy]
       by_cases h : b = c
       · rw [if_pos h, if_pos h.symm, mul_comm]
@@ -44,14 +48,16 @@ theorem rowDiv_succ_rec (R : Type) [CommRing R] {r m : ℕ} (a b : Fin r) (f : M
       · rw [rowE_X, if_neg (Ne.symm h2), zero_mul]
       · simp
       · simp
-    have hs : ∀ j, (rowGen R a b (p * X (c, s))).coeff (j + 1) =
-        (rowGen R a b p).coeff (j + 1) * X (c, s) + (rowGen R a b p).coeff j * y := by
+    have hs
+        : ∀ j,
+          (rowGen R a b (p * X (c, s))).coeff (j + 1)
+            = (rowGen R a b p).coeff (j + 1) * X (c, s) + (rowGen R a b p).coeff j * y := by
       intro j
-      rw [map_mul, hX, mul_add, ← mul_assoc, Polynomial.coeff_add, Polynomial.coeff_mul_X, Polynomial.coeff_mul_C,
-        Polynomial.coeff_mul_C]
+      rw [map_mul, hX, mul_add, ← mul_assoc, Polynomial.coeff_add, Polynomial.coeff_mul_X,
+        Polynomial.coeff_mul_C, Polynomial.coeff_mul_C]
     have h0 : (rowGen R a b (p * X (c, s))).coeff 0 = (rowGen R a b p).coeff 0 * X (c, s) := by
-      rw [map_mul, hX, mul_add, ← mul_assoc, Polynomial.coeff_add, Polynomial.coeff_mul_X_zero, Polynomial.coeff_mul_C,
-        add_zero]
+      rw [map_mul, hX, mul_add, ← mul_assoc, Polynomial.coeff_add, Polynomial.coeff_mul_X_zero,
+        Polynomial.coeff_mul_C, add_zero]
     cases k with
     | zero =>
       rw [hs, h0, rowE_mul, hx, ← hp]
@@ -62,14 +68,20 @@ theorem rowDiv_succ_rec (R : Type) [CommRing R] {r m : ℕ} (a b : Fin r) (f : M
       push_cast
       ring
 
-theorem rowDiv_mem_of_rowE {K : Type} [Field K] [CharZero K] {r m : ℕ} (a b : Fin r)
-    (M : Submodule K (MvPolynomial (Fin r × Fin m) K)) (h : ∀ f ∈ M, rowE K r m a b f ∈ M) (k : ℕ)
-    {f : MvPolynomial (Fin r × Fin m) K} (hf : f ∈ M) : rowDiv K a b k f ∈ M := by
+theorem rowDiv_mem_of_rowE
+    {K : Type} [Field K] [CharZero K]
+    {r m : ℕ} (a b : Fin r) (M : Submodule K (MvPolynomial (Fin r × Fin m) K))
+    (h : ∀ f ∈ M, rowE K r m a b f ∈ M)
+    (k : ℕ)
+    {f : MvPolynomial (Fin r × Fin m) K} (hf : f ∈ M)
+    : rowDiv K a b k f ∈ M := by
   induction k with
   | zero => rw [(rowE_eq_rowDiv K r m a b f).2]; exact hf
   | succ k ih =>
     have hrec := rowDiv_succ_rec K a b f k
-    have h1 : (if a = b then 1 else 0) * (k : MvPolynomial (Fin r × Fin m) K) * rowDiv K a b k f ∈ M := by
+    have h1
+        : (if a = b then 1 else 0) * (k : MvPolynomial (Fin r × Fin m) K) * rowDiv K a b k f
+          ∈ M := by
       split_ifs
       · rw [one_mul, ← nsmul_eq_mul]; exact nsmul_mem ih k
       · simp
@@ -78,9 +90,12 @@ theorem rowDiv_mem_of_rowE {K : Type} [Field K] [CharZero K] {r m : ℕ} (a b : 
       exact M.sub_mem (h _ ih) h1
     exact (M.smul_mem_iff (Nat.cast_ne_zero.2 k.succ_ne_zero)).1 h2
 
-theorem dualWeyl_le_of_rowE_stable : ∀ (K : Type) [Field K] [CharZero K] (n : ℕ) (ν : Fin n → ℕ), Antitone ν →
-    ∀ M : Submodule K (MvPolynomial (Fin n × Fin n) K), hw K le_rfl ν ∈ M →
-      (∀ a b : Fin n, ∀ f ∈ M, rowE K n n a b f ∈ M) → dualWeyl K n n ν ≤ M := by
+theorem dualWeyl_le_of_rowE_stable
+    : ∀ (K : Type) [Field K] [CharZero K] (n : ℕ) (ν : Fin n → ℕ),
+      Antitone ν
+        → ∀ M : Submodule K (MvPolynomial (Fin n × Fin n) K),
+          hw K le_rfl ν ∈ M → (∀ a b : Fin n, ∀ f ∈ M, rowE K n n a b f ∈ M)
+            → dualWeyl K n n ν ≤ M := by
   intro K _ _ n ν hν M h0 hE
   rw [Formalism.L2.Col.dualWeyl_eq_weyl K le_rfl ν hν, weyl, Submodule.span_le]
   rintro _ ⟨w, rfl⟩

@@ -16,16 +16,22 @@ open ReciprocityTheory.ChartRestriction.DS
 
 namespace NormTraceLemmas
 
-theorem abs_le_of_nsq {n : ℕ} (u : Fin n → ℝ) (T : ℝ) (h : nsq u ≤ T) (a : Fin n) : |u a| ≤ Real.sqrt T := by
+theorem abs_le_of_nsq {n : ℕ} (u : Fin n → ℝ) (T : ℝ) (h : nsq u ≤ T) (a : Fin n)
+    : |u a| ≤ Real.sqrt T := by
   have hs : u a ^ 2 ≤ nsq u := by
     unfold nsq dot
-    have := Finset.single_le_sum (f := fun i => u i * u i) (fun i _ => mul_self_nonneg (u i)) (Finset.mem_univ a)
+    have :=
+      Finset.single_le_sum
+        (f := fun i => u i * u i)
+        (fun i _ => mul_self_nonneg (u i))
+        (Finset.mem_univ a)
     simpa [sq] using this
   exact Real.abs_le_sqrt (hs.trans h)
 
 end NormTraceLemmas
 
-theorem discrete_series_bound_of_inputs : Comp → Parts → Cut → Ascent → Descent → IntWt → HCOf → Ident → Core := by
+theorem discrete_series_bound_of_inputs
+    : Comp → Parts → Cut → Ascent → Descent → IntWt → HCOf → Ident → Core := by
   intro hComp hParts hCut hAsc hDesc hInt hHCOf hId
   unfold Comp ForAlg at hComp
   unfold Parts ForAlg at hParts
@@ -44,9 +50,9 @@ theorem discrete_series_bound_of_inputs : Comp → Parts → Cut → Ascent → 
   obtain ⟨h1, h2, h3⟩ := hParts n ε _ (smE ε ρ) hGl hIU μ ν κ S y hG hqy
   obtain ⟨N, hN, hNcas, y', hy'N, hG'⟩ := hCut n ε H ρ hU hD ν κ S y hS hG h3
   have hsq : 0 ≤ √(2 * S) := Real.sqrt_nonneg _
-  have hn3 : (0:ℝ) ≤ (n:ℝ) ^ 3 := by positivity
-  have hJ0 : (0:ℝ) ≤ (J:ℝ) := by positivity
-  have hn0 : (0:ℝ) ≤ (n:ℝ) := by positivity
+  have hn3 : (0 : ℝ) ≤ (n : ℝ) ^ 3 := by positivity
+  have hJ0 : (0 : ℝ) ≤ (J : ℝ) := by positivity
+  have hn0 : (0 : ℝ) ≤ (n : ℝ) := by positivity
   have hτ0 : 0 ≤ τ := by linarith
   have hanti : Antitone μ := by
     intro a b hab
@@ -61,11 +67,11 @@ theorem discrete_series_bound_of_inputs : Comp → Parts → Cut → Ascent → 
     simpa using this
   obtain ⟨L', V, hL'bd, hIrr, hNoD⟩ :=
     hDesc n ε _ (smE ε ρ) hGl hIU N hN μ L (2 * S) τ (√(2 * S)) J
-      (fun z hz => by rw [hcasL]; exact hNcas z hz) hgap hbd hJ y'' hy''N hy0 hyK hHW
+      (fun z hz => by rw [hcasL]; exact hNcas z hz)
+      hgap hbd hJ y'' hy''N hy0 hyK hHW
   obtain ⟨w, -, hw0, hwHW⟩ := hIrr.2.2.2
   have hLint := hInt n ε H ρ hU L' w hw0 hwHW.1
-  have hgapL : ∀ a b : Fin n, a < b →
-      (τ - 2 * (√(2 * S) + J) - 2 * n) + 2 * n ≤ L' a - L' b := by
+  have hgapL : ∀ a b : Fin n, a < b → (τ - 2 * (√(2 * S) + J) - 2 * n) + 2 * n ≤ L' a - L' b := by
     intro a b hab
     have ha := abs_le.mp (hL'bd a)
     have hb := abs_le.mp (hL'bd b)
@@ -73,7 +79,7 @@ theorem discrete_series_bound_of_inputs : Comp → Parts → Cut → Ascent → 
     linarith [ha.1, ha.2, hb.1, hb.2]
   have hh : 0 < τ - 2 * (√(2 * S) + J) - 2 * n := by linarith
   obtain ⟨mu, hP, hlow, hGap, hmu⟩ := hHCOf n ε L' _ hLint hh hgapL
-  have hlt : (n:ℝ) ^ 3 + 2 * n + 1 < τ - 2 * (√(2 * S) + J) - 2 * n := by linarith
+  have hlt : (n : ℝ) ^ 3 + 2 * n + 1 < τ - 2 * (√(2 * S) + J) - 2 * n := by linarith
   have hV1 : IsKIrrHW ε (smE ε ρ) (lowK ε mu) V := by rw [hlow]; exact hIrr
   have hV2 : NoDown ε (smE ε ρ) (lowK ε mu) V := by rw [hlow]; exact hNoD
   refine ⟨mu, hP, fun a => ?_, ?_⟩

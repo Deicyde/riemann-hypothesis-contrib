@@ -14,16 +14,23 @@ namespace GlobalTheory.AmbTiePosDef
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem hAt_eq_dotProduct {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (v : InfinitePlace K) (x y : Fin n → K) :
-    hAt H v x y = star (fun i => v.embedding (x i)) ⬝ᵥ (H.map v.embedding) *ᵥ (fun i => v.embedding (y i)) := by
-  simp only [hAt, dotProduct, Matrix.mulVec, Matrix.map_apply, Finset.mul_sum, Pi.star_apply, mul_assoc]
+theorem hAt_eq_dotProduct
+    {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (v : InfinitePlace K) (x y : Fin n → K)
+    : hAt H v x y
+      = star (fun i => v.embedding (x i))
+        ⬝ᵥ (H.map v.embedding) *ᵥ (fun i => v.embedding (y i)) := by
+  simp only [hAt, dotProduct, Matrix.mulVec, Matrix.map_apply, Finset.mul_sum, Pi.star_apply,
+    mul_assoc]
 
-theorem hAt_single_single {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (v : InfinitePlace K) (i j : Fin n) :
-    hAt H v (Pi.single i 1) (Pi.single j 1) = v.embedding (H i j) := by
+theorem hAt_single_single {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (v : InfinitePlace K) (i j : Fin n)
+    : hAt H v (Pi.single i 1) (Pi.single j 1) = v.embedding (H i j) := by
   simp [hAt, Pi.single_apply]
 
-theorem posDef_map_of_posAt [_root_.NumberField.IsTotallyComplex K] {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (v : InfinitePlace K)
-    (h : PosAt H v) : (H.map v.embedding).PosDef := by
+theorem posDef_map_of_posAt
+    [_root_.NumberField.IsTotallyComplex K]
+    {n : ℕ} (H : Matrix (Fin n) (Fin n) K)
+    (v : InfinitePlace K) (h : PosAt H v)
+    : (H.map v.embedding).PosDef := by
   have herm : (H.map v.embedding).IsHermitian := by
     ext i j
     have := h.1 (Pi.single j 1) (Pi.single i 1)
@@ -31,15 +38,18 @@ theorem posDef_map_of_posAt [_root_.NumberField.IsTotallyComplex K] {n : ℕ} (H
     simp only [Matrix.conjTranspose_apply, Matrix.map_apply]
     rw [this]
   have hd : DenseRange (Pi.map (fun _ : Fin n => (v.embedding : K → ℂ))) :=
-    DenseRange.piMap (fun _ => Formalism.BasicNotions.denseRange_embedding_of_isComplex v (IsTotallyComplex.isComplex v))
+    DenseRange.piMap (fun _ =>
+      Formalism.BasicNotions.denseRange_embedding_of_isComplex v (IsTotallyComplex.isComplex v))
   have psd : (H.map v.embedding).PosSemidef := by
     refine Matrix.PosSemidef.of_dotProduct_mulVec_nonneg herm fun z => ?_
     induction z using hd.induction_on with
     | hp =>
       refine isClosed_le continuous_const ?_
-      exact Continuous.dotProduct (continuous_star) (Continuous.matrix_mulVec continuous_const continuous_id)
+      exact Continuous.dotProduct (continuous_star)
+        (Continuous.matrix_mulVec continuous_const continuous_id)
     | ih y =>
-      have hy : Pi.map (fun _ : Fin n => (v.embedding : K → ℂ)) y = fun i => v.embedding (y i) := rfl
+      have hy : Pi.map (fun _ : Fin n => (v.embedding : K → ℂ)) y = fun i => v.embedding (y i) :=
+        rfl
       rw [hy, ← hAt_eq_dotProduct]
       have hs := h.1 y y
       have him : (hAt H v y y).im = 0 := by

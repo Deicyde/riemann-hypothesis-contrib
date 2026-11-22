@@ -16,8 +16,8 @@ def FjDiff (E : Type) [Field E] [NumberField E] [IsCMField E] : Prop :=
 
 def FjBEq (E : Type) [Field E] [NumberField E] [IsCMField E] : Prop :=
   ∀ (r : ℕ) (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (ξ : Fin r → E) (ν : X.Ψ → ℝ),
-    X.IsSec la P → X.IsIso ξ → ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r,
-      X.fj la ξ ν P (rmul x b) = bchar la b * X.fj la ξ ν P x
+    X.IsSec la P → X.IsIso ξ
+      → ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, X.fj la ξ ν P (rmul x b) = bchar la b * X.fj la ξ ν P x
 
 def FjBdd (E : Type) [Field E] [NumberField E] [IsCMField E] : Prop :=
   ∀ (r : ℕ) (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (ξ : Fin r → E) (ν : X.Ψ → ℝ),
@@ -31,8 +31,8 @@ def UnitDom (E : Type) [Field E] [NumberField E] [IsCMField E] : Prop :=
     X.IsUnitaryC n → x ∈ X.dom → X.lmulC n x ∈ X.dom
 
 def BorFlag (E : Type) [Field E] [NumberField E] [IsCMField E] : Prop :=
-  ∀ (r : ℕ) (X : Data E r) (x b : Frame X.Ψ r), b ∈ Bor X.Ψ r → rmul x b ∈ X.dom →
-    X.SameFlag x (rmul x b)
+  ∀ (r : ℕ) (X : Data E r) (x b : Frame X.Ψ r),
+    b ∈ Bor X.Ψ r → rmul x b ∈ X.dom → X.SameFlag x (rmul x b)
 
 def ZnSmul (E : Type) [Field E] [NumberField E] [IsCMField E] : Prop :=
   ∀ (r : ℕ) (X : Data E r) (t : ℂ) (Z : X.Coord), X.zN (t • Z) = ‖t‖ * X.zN Z

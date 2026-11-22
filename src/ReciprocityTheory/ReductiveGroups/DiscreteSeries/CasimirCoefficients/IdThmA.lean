@@ -105,47 +105,71 @@ lemma continuousOn_fderiv_dPhi2 (μ : Fin n → ℤ) :
 
 end IdA
 
-theorem line_int_differentiableAt (T : KType ε Λ) (μ : Fin n → ℤ) {U : Set (Matrix (Fin n) (Fin n) ℂ)}
+theorem line_int_differentiableAt
+    (T : KType ε Λ) (μ : Fin n → ℤ)
+    {U : Set (Matrix (Fin n) (Fin n) ℂ)}
     (hUo : IsOpen U) (hU : ∀ z ∈ U, ∀ k : KG ε, toMK k⁻¹ * z * toMK k ∈ OmegaSet n)
-    (a₀ a₁ b₀ b₁ : Matrix (Fin n) (Fin n) ℂ) {s₀ : ℂ} (hs₀ : a₀ + s₀ • a₁ ∈ U) :
-    DifferentiableAt ℂ (fun s : ℂ => ∫ k, IdA.dPhi2 μ (toMK k⁻¹ * (a₀ + s • a₁) * toMK k,
-      toMK k⁻¹ * (b₀ + s • b₁) * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε)) s₀ := by
+    (a₀ a₁ b₀ b₁ : Matrix (Fin n) (Fin n) ℂ)
+    {s₀ : ℂ} (hs₀ : a₀ + s₀ • a₁ ∈ U)
+    : DifferentiableAt ℂ
+      (fun s : ℂ =>
+        ∫ k, IdA.dPhi2 μ (toMK k⁻¹ * (a₀ + s • a₁) * toMK k,
+          toMK k⁻¹ * (b₀ + s • b₁) * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε))
+      s₀ := by
   have := compactSpace_KG ε
   have hS : IsOpen ((fun s : ℂ => a₀ + s • a₁) ⁻¹' U) :=
     hUo.preimage (continuous_const.add (continuous_id.smul continuous_const))
   have hγ : Continuous fun p : ℂ × KG ε =>
       (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2, toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2) :=
     (IdA.continuous_cline a₀ a₁).prodMk (IdA.continuous_cline b₀ b₁)
-  have hmaps : Set.MapsTo (fun p : ℂ × KG ε =>
-      (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2, toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2))
-      (((fun s : ℂ => a₀ + s • a₁) ⁻¹' U) ×ˢ Set.univ) (OmegaSet n ×ˢ Set.univ) :=
-    fun p hp => ⟨hU _ hp.1 p.2, trivial⟩
-  have hP : ContinuousOn (fun p : ℂ × KG ε => T.op p.2 * projW T * T.op p.2⁻¹)
+  have hmaps : Set.MapsTo
+      (fun p : ℂ × KG ε =>
+        (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2, toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2))
+      (((fun s : ℂ => a₀ + s • a₁) ⁻¹' U) ×ˢ Set.univ) (OmegaSet n ×ˢ Set.univ) := fun p hp =>
+    ⟨hU _ hp.1 p.2, trivial⟩
+  have hP : ContinuousOn
+      (fun p : ℂ × KG ε => T.op p.2 * projW T * T.op p.2⁻¹)
       (((fun s : ℂ => a₀ + s • a₁) ⁻¹' U) ×ˢ Set.univ) :=
     ((IdA.continuous_P T).comp continuous_snd).continuousOn
-  have hd1 : Continuous fun p : ℂ × KG ε => (toMK p.2⁻¹ * a₁ * toMK p.2, toMK p.2⁻¹ * b₁ * toMK p.2) :=
+  have hd1
+      : Continuous fun p : ℂ × KG ε => (toMK p.2⁻¹ * a₁ * toMK p.2, toMK p.2⁻¹ * b₁ * toMK p.2) :=
     (((IdA.continuous_toMK_inv.comp continuous_snd).matrix_mul continuous_const).matrix_mul
-      (IdA.continuous_toMK.comp continuous_snd)).prodMk
-    (((IdA.continuous_toMK_inv.comp continuous_snd).matrix_mul continuous_const).matrix_mul
-      (IdA.continuous_toMK.comp continuous_snd))
-  have hF : ContinuousOn (fun p : ℂ × KG ε => IdA.dPhi2 μ (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2,
-      toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2) • (T.op p.2 * projW T * T.op p.2⁻¹))
+        (IdA.continuous_toMK.comp continuous_snd)).prodMk
+      (((IdA.continuous_toMK_inv.comp continuous_snd).matrix_mul continuous_const).matrix_mul
+        (IdA.continuous_toMK.comp continuous_snd))
+  have hF : ContinuousOn
+      (fun p : ℂ × KG ε =>
+        IdA.dPhi2 μ
+            (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2, toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2)
+          • (T.op p.2 * projW T * T.op p.2⁻¹))
       (((fun s : ℂ => a₀ + s • a₁) ⁻¹' U) ×ˢ Set.univ) :=
     ((IdA.continuousOn_dPhi2 μ).comp hγ.continuousOn hmaps).smul hP
-  have hF' : ContinuousOn (fun p : ℂ × KG ε => fderiv ℂ (IdA.dPhi2 μ)
-      (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2, toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2)
-      (toMK p.2⁻¹ * a₁ * toMK p.2, toMK p.2⁻¹ * b₁ * toMK p.2) • (T.op p.2 * projW T * T.op p.2⁻¹))
+  have hF' : ContinuousOn
+      (fun p : ℂ × KG ε =>
+        fderiv ℂ (IdA.dPhi2 μ)
+            (toMK p.2⁻¹ * (a₀ + p.1 • a₁) * toMK p.2, toMK p.2⁻¹ * (b₀ + p.1 • b₁) * toMK p.2)
+            (toMK p.2⁻¹ * a₁ * toMK p.2, toMK p.2⁻¹ * b₁ * toMK p.2)
+          • (T.op p.2 * projW T * T.op p.2⁻¹))
       (((fun s : ℂ => a₀ + s • a₁) ⁻¹' U) ×ˢ Set.univ) :=
-    (((IdA.continuousOn_fderiv_dPhi2 μ).comp hγ.continuousOn hmaps).clm_apply hd1.continuousOn).smul hP
-  have hd : ∀ s ∈ (fun s : ℂ => a₀ + s • a₁) ⁻¹' U, ∀ k : KG ε, HasDerivAt
-      (fun s => IdA.dPhi2 μ (toMK k⁻¹ * (a₀ + s • a₁) * toMK k, toMK k⁻¹ * (b₀ + s • b₁) * toMK k) •
-        (T.op k * projW T * T.op k⁻¹))
-      (fderiv ℂ (IdA.dPhi2 μ) (toMK k⁻¹ * (a₀ + s • a₁) * toMK k, toMK k⁻¹ * (b₀ + s • b₁) * toMK k)
-        (toMK k⁻¹ * a₁ * toMK k, toMK k⁻¹ * b₁ * toMK k) • (T.op k * projW T * T.op k⁻¹)) s := by
+    (((IdA.continuousOn_fderiv_dPhi2 μ).comp hγ.continuousOn hmaps).clm_apply hd1.continuousOn).smul
+      hP
+  have hd
+      : ∀ s ∈ (fun s : ℂ => a₀ + s • a₁) ⁻¹' U, ∀ k : KG ε,
+        HasDerivAt
+          (fun s =>
+            IdA.dPhi2 μ (toMK k⁻¹ * (a₀ + s • a₁) * toMK k, toMK k⁻¹ * (b₀ + s • b₁) * toMK k)
+              • (T.op k * projW T * T.op k⁻¹))
+          (fderiv ℂ (IdA.dPhi2 μ)
+              (toMK k⁻¹ * (a₀ + s • a₁) * toMK k, toMK k⁻¹ * (b₀ + s • b₁) * toMK k)
+              (toMK k⁻¹ * a₁ * toMK k, toMK k⁻¹ * b₁ * toMK k)
+            • (T.op k * projW T * T.op k⁻¹))
+          s := by
     intro s hs k
     have hq := (IdA.hasDerivAt_cline k a₀ a₁ s).prodMk (IdA.hasDerivAt_cline k b₀ b₁ s)
-    have hD := ((IdA.contDiffAt_dPhi2 μ (p := (toMK k⁻¹ * (a₀ + s • a₁) * toMK k,
-      toMK k⁻¹ * (b₀ + s • b₁) * toMK k)) (hU _ hs k)).differentiableAt one_ne_zero).hasFDerivAt
+    have hD :=
+      ((IdA.contDiffAt_dPhi2 μ
+        (p := (toMK k⁻¹ * (a₀ + s • a₁) * toMK k, toMK k⁻¹ * (b₀ + s • b₁) * toMK k))
+        (hU _ hs k)).differentiableAt one_ne_zero).hasFDerivAt
     exact (hD.comp_hasDerivAt s hq).smul_const (T.op k * projW T * T.op k⁻¹)
   exact (IdA.hasDerivAt_intK T _ _ hS hF hF' hd hs₀).differentiableAt
 

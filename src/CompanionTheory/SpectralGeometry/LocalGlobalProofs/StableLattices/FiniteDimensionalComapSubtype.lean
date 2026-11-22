@@ -20,16 +20,20 @@ theorem locFin_tens (ε : Fin n → Bool) (X : GMod n) (h : LocFin ε X.E) : Loc
   haveI : ∀ i, FiniteDimensional ℂ (S i) := hSfd
   have hTst : ∀ a b, ε a = ε b → ∀ x ∈ ⨆ i, S i, X.E a b x ∈ ⨆ i, S i := by
     intro a b hab x hx
-    refine Submodule.iSup_induction S (motive := fun y => X.E a b y ∈ ⨆ i, S i) hx
-      (fun i y hy => (le_iSup S i) (hSst i a b hab y hy)) (by simp) ?_
+    refine Submodule.iSup_induction S
+      (motive := fun y => X.E a b y ∈ ⨆ i, S i)
+      hx
+      (fun i y hy => (le_iSup S i) (hSst i a b hab y hy))
+      (by simp) ?_
     intro y w hy hw
     rw [(X.E a b).map_add]
     exact Submodule.add_mem _ hy hw
   have hfd : FiniteDimensional ℂ (Submodule.pi Set.univ fun _ : Fin n => ⨆ i, S i) := by
-    let f : (Submodule.pi Set.univ fun _ : Fin n => ⨆ i, S i) →ₗ[ℂ] (Fin n → ↥(⨆ i, S i)) :=
-      { toFun := fun v i => ⟨v.1 i, v.2 i (Set.mem_univ i)⟩
-        map_add' := fun _ _ => rfl
-        map_smul' := fun _ _ => rfl }
+    let f : (Submodule.pi Set.univ fun _ : Fin n => ⨆ i, S i) →ₗ[ℂ] (Fin n → ↥(⨆ i, S i)) := {
+      toFun := fun v i => ⟨v.1 i, v.2 i (Set.mem_univ i)⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+    }
     exact FiniteDimensional.of_injective f
       (fun v w hvw => Subtype.ext (funext fun i => congrArg Subtype.val (congrFun hvw i)))
   refine ⟨Submodule.pi Set.univ (fun _ : Fin n => ⨆ i, S i), hfd, ?_, ?_⟩
@@ -43,16 +47,19 @@ theorem locFin_tens (ε : Fin n → Bool) (X : GMod n) (h : LocFin ε X.E) : Loc
   · intro i _
     exact (le_iSup S i) (hSmem i)
 
-theorem finiteDimensional_comap_subtype {V : Type} [AddCommGroup V] [Module ℂ V]
-    (S T : Submodule ℂ V) [FiniteDimensional ℂ T] : FiniteDimensional ℂ (T.comap S.subtype) := by
+theorem finiteDimensional_comap_subtype
+    {V : Type} [AddCommGroup V] [Module ℂ V] (S T : Submodule ℂ V) [FiniteDimensional ℂ T]
+    : FiniteDimensional ℂ (T.comap S.subtype) := by
   refine FiniteDimensional.of_injective
     (LinearMap.codRestrict T (S.subtype ∘ₗ (T.comap S.subtype).subtype) fun x => x.2) ?_
   intro x y hxy
   have hv : ((x : S) : V) = ((y : S) : V) := congrArg (fun w : T => (w : V)) hxy
   exact Subtype.ext (Subtype.ext hv)
 
-theorem locFin_sub (ε : Fin n → Bool) (X : GMod n) (S : Submodule ℂ X.V)
-    (h : ∀ a b, ∀ x ∈ S, X.E a b x ∈ S) (hX : LocFin ε X.E) : LocFin ε (X.sub S h).E := by
+theorem locFin_sub
+    (ε : Fin n → Bool) (X : GMod n) (S : Submodule ℂ X.V)
+    (h : ∀ a b, ∀ x ∈ S, X.E a b x ∈ S) (hX : LocFin ε X.E)
+    : LocFin ε (X.sub S h).E := by
   intro x
   obtain ⟨F, hF, hst, hx⟩ := hX x.1
   haveI := hF
@@ -83,27 +90,27 @@ theorem intWt_tens (X : GMod n) (h : IntWt X) : IntWt (tens X) := by
   · simp only [if_neg hai] at hm
     exact ⟨m, hm⟩
 
-theorem intWt_sub (X : GMod n) (S : Submodule ℂ X.V) (h : ∀ a b, ∀ x ∈ S, X.E a b x ∈ S)
-    (hX : IntWt X) : IntWt (X.sub S h) := by
+theorem intWt_sub
+    (X : GMod n) (S : Submodule ℂ X.V) (h : ∀ a b, ∀ x ∈ S, X.E a b x ∈ S) (hX : IntWt X)
+    : IntWt (X.sub S h) := by
   intro μ x hx hw a
   exact hX μ x.1 (fun h0 => hx (Subtype.ext h0)) (fun b => congrArg Subtype.val (hw b)) a
 
-theorem locFin_step (ε : Fin n → Bool) (X : GMod n) (z : ℂ) (h : LocFin ε X.E) :
-    LocFin ε (step X z).E := by
+theorem locFin_step (ε : Fin n → Bool) (X : GMod n) (z : ℂ) (h : LocFin ε X.E)
+    : LocFin ε (step X z).E := by
   exact locFin_sub ε (CompanionTheory.RgExh.tens X) _ _ (locFin_tens ε X h)
 
 theorem intWt_step (X : GMod n) (z : ℂ) (h : IntWt X) : IntWt (step X z) := by
   exact intWt_sub (CompanionTheory.RgExh.tens X) _ _ (intWt_tens X h)
 
-theorem pathFin :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (X : GMod n) (χ : Fin n → ℂ) (ss : List (Fin n)),
+theorem pathFin
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (X : GMod n) (χ : Fin n → ℂ) (ss : List (Fin n)),
       (LocFin ε X.E → LocFin ε (path X χ ss).E) ∧ (IntWt X → IntWt (path X χ ss)) := by
   intro n ε X χ ss
   induction ss generalizing X χ with
   | nil => exact ⟨id, id⟩
   | cons s ss ih =>
     have h := ih (step X (χ s)) (χ + Pi.single s 1)
-    exact ⟨fun hX => h.1 (locFin_step ε X (χ s) hX),
-      fun hX => h.2 (intWt_step X (χ s) hX)⟩
+    exact ⟨fun hX => h.1 (locFin_step ε X (χ s) hX), fun hX => h.2 (intWt_step X (χ s) hX)⟩
 
 end GlobalTheory.CompanionTheory.RgSteps

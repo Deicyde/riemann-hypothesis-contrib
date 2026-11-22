@@ -6,13 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Continuou
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix MeasureTheory
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix
+  MeasureTheory
 
 namespace GlobalTheory
 
-theorem hasDerivAt_exp_add_smul_duhamel (A : Type) [NormedRing A] [NormedAlgebra ℝ A]
-    [CompleteSpace A] (X V : A) :
-    HasDerivAt (fun t : ℝ => NormedSpace.exp (X + t • V))
+theorem hasDerivAt_exp_add_smul_duhamel
+    (A : Type) [NormedRing A] [NormedAlgebra ℝ A] [CompleteSpace A] (X V : A)
+    : HasDerivAt
+      (fun t : ℝ => NormedSpace.exp (X + t • V))
       (∫ s in (0 : ℝ)..1, NormedSpace.exp ((1 - s) • X) * V * NormedSpace.exp (s • X)) 0 := by
   letI : NormedAlgebra ℚ A := NormedAlgebra.restrictScalars ℚ ℝ A
   have hc : Continuous (NormedSpace.exp : A → A) := NormedSpace.exp_continuous
@@ -26,9 +28,11 @@ theorem hasDerivAt_exp_add_smul_duhamel (A : Type) [NormedRing A] [NormedAlgebra
     intervalIntegral.continuous_parametric_intervalIntegral_of_continuous' hfc 0 1
   have key : ∀ t : ℝ, NormedSpace.exp (X + t • V) = NormedSpace.exp X + t • F t := by
     intro t
-    have hd : ∀ s : ℝ, HasDerivAt
-        (fun s : ℝ => NormedSpace.exp ((1 - s) • X) * NormedSpace.exp (s • (X + t • V)))
-        (t • f t s) s := by
+    have hd
+        : ∀ s : ℝ,
+          HasDerivAt
+            (fun s : ℝ => NormedSpace.exp ((1 - s) • X) * NormedSpace.exp (s • (X + t • V)))
+            (t • f t s) s := by
       intro s
       have h0 : HasDerivAt (fun s : ℝ => 1 - s) (-1) s := by
         simpa using (hasDerivAt_id s).const_sub 1
@@ -36,20 +40,21 @@ theorem hasDerivAt_exp_add_smul_duhamel (A : Type) [NormedRing A] [NormedAlgebra
       have h2 := hasDerivAt_exp_smul_const' (𝕂 := ℝ) (X + t • V) s
       have h3 := h1.mul h2
       refine h3.congr_deriv ?_
-      simp only [hf, Function.comp_apply, neg_smul, one_smul, add_mul, mul_add, mul_assoc,
-        neg_mul, smul_mul_assoc, mul_smul_comm]
+      simp only [hf, Function.comp_apply, neg_smul, one_smul, add_mul, mul_add, mul_assoc, neg_mul,
+        smul_mul_assoc, mul_smul_comm]
       abel
     have hi : IntervalIntegrable (fun s => t • f t s) volume 0 1 :=
       ((hfc.comp (Continuous.prodMk_right t)).const_smul t).intervalIntegrable 0 1
     have h := intervalIntegral.integral_eq_sub_of_hasDerivAt (fun s _ => hd s) hi
     rw [intervalIntegral.integral_smul] at h
-    simp only [sub_self, zero_smul, NormedSpace.exp_zero, one_mul, one_smul, sub_zero,
-      mul_one] at h
+    simp only [sub_self, zero_smul, NormedSpace.exp_zero, one_mul, one_smul, sub_zero, mul_one] at h
     simp only [hF]
     rw [h]
     abel
-  have hF0 : F 0 = ∫ s in (0 : ℝ)..1,
-      NormedSpace.exp ((1 - s) • X) * V * NormedSpace.exp (s • X) := by
+  have hF0
+      : F 0
+        = ∫ s in (0 : ℝ)..1,
+          NormedSpace.exp ((1 - s) • X) * V * NormedSpace.exp (s • X) := by
     simp [hF, hf]
   rw [← hF0, hasDerivAt_iff_tendsto_slope_zero]
   have ht : Filter.Tendsto F (nhdsWithin 0 {0}ᶜ) (nhds (F 0)) :=

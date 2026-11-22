@@ -8,13 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Tilde
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1
+  ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem GlobalTheory.Mem.Chr
+  GlobalTheory.Mem.Col2
 
 namespace GlobalTheory.Mem.ChiDet
 
 variable {R : Ranks} (H : Formalism.BasicNotions.Host R)
 
-theorem detId_stdL (N : ℕ) (M : Submodule (𝓞 H.E) (Fin N → H.E)) : Th.detId H (Th.stdL H N) M = detSub M := by
+theorem detId_stdL (N : ℕ) (M : Submodule (𝓞 H.E) (Fin N → H.E))
+    : Th.detId H (Th.stdL H N) M = detSub M := by
   classical
   unfold Th.detId detSub
   congr 1
@@ -44,17 +47,27 @@ theorem detId_stdL (N : ℕ) (M : Submodule (𝓞 H.E) (Fin N → H.E)) : Th.det
     rw [e]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hx i)
 
-theorem ordSub_detSub_stdL (N : ℕ) (w : HeightOneSpectrum (𝓞 H.E)) : ordSub w (detSub (Th.stdL H N)) = 0 := by
+theorem ordSub_detSub_stdL (N : ℕ) (w : HeightOneSpectrum (𝓞 H.E))
+    : ordSub w (detSub (Th.stdL H N)) = 0 := by
   rw [← detId_stdL, detId_std, Submodule.one_eq_span]
   have h := ordSub_span_singleton w (1 : H.Eˣ)
   rw [Units.val_one] at h
   rw [h]
   simp [ordF]
 
-theorem tildeD_eq_chiId : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (χ : HChar H.E), IsChiPsi H χ → ∀ (N : ℕ) (M : Submodule (𝓞 H.E) (Fin N → H.E)), Submodule.IsLattice H.E M → ∀ x : DtT H, (QuotientGroup.mk x : DtT H ⧸ UOT H) = relDetT H N (Th.stdL H N) M → ((tildeD H χ x : ℂˣ) : ℂ) = chiId χ (Th.detId H (Th.stdL H N) M) := by
+theorem tildeD_eq_chiId
+    : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (χ : HChar H.E),
+      IsChiPsi H χ
+        → ∀ (N : ℕ) (M : Submodule (𝓞 H.E) (Fin N → H.E)),
+          Submodule.IsLattice H.E M
+            → ∀ x : DtT H,
+              (QuotientGroup.mk x : DtT H ⧸ UOT H) = relDetT H N (Th.stdL H N) M
+                → ((tildeD H χ x : ℂˣ) : ℂ) = chiId χ (Th.detId H (Th.stdL H N) M) := by
   intro R H χ hχ N M hM x hx
   have hK : KD H ≤ (χ.1.comp (finPartI H.E)).ker :=
-    (KerDet.kernel_open_and_factor R H).2.2.2 χ hχ.triv (fun v y hy _ => hχ.unr v y hy) fun v _ => hχ.unr v
+    (KerDet.kernel_open_and_factor R H).2.2.2 χ hχ.triv
+      (fun v y hy _ => hχ.unr v y hy)
+      fun v _ => hχ.unr v
   have hU := (ChiLaws.chi_laws R H χ hχ).1
   have hfin : {w : HeightOneSpectrum (𝓞 H.E) | ordSub w (detSub M) ≠ 0}.Finite := by
     by_cases h : ∃ k : H.Eˣ, (k : H.E) ∈ detSub M

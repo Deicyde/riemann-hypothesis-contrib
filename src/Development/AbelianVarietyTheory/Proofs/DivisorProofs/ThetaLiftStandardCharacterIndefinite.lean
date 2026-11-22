@@ -17,13 +17,16 @@ namespace GlobalTheory.WeilContF
 
 open Formalism.IndefR.DatumF
 
-theorem continuous_mixed (K : Type) [Field K] [NumberField K] :
-    Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace K) := by
-  have : (InfiniteAdeleRing.ringEquiv_mixedSpace K : InfiniteAdeleRing K → mixedEmbedding.mixedSpace K) =
-      fun x => ((fun v : {w : InfinitePlace K // InfinitePlace.IsReal w} =>
+theorem continuous_mixed (K : Type) [Field K] [NumberField K]
+    : Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace K) := by
+  have : (InfiniteAdeleRing.ringEquiv_mixedSpace K
+        : InfiniteAdeleRing K → mixedEmbedding.mixedSpace K)
+      = fun x => (
+        (fun v : {w : InfinitePlace K // InfinitePlace.IsReal w} =>
           InfinitePlace.Completion.extensionEmbeddingOfIsReal v.2 (x v)),
         (fun v : {w : InfinitePlace K // InfinitePlace.IsComplex w} =>
-          InfinitePlace.Completion.extensionEmbedding v.1 (x v))) := by
+          InfinitePlace.Completion.extensionEmbedding v.1 (x v))
+      ) := by
     funext x; exact InfiniteAdeleRing.ringEquiv_mixedSpace_apply K x
   rw [this]
   refine Continuous.prodMk (continuous_pi fun v => ?_) (continuous_pi fun v => ?_)
@@ -32,16 +35,19 @@ theorem continuous_mixed (K : Type) [Field K] [NumberField K] :
   · exact (InfinitePlace.Completion.isometry_extensionEmbedding v.1).continuous.comp
       (continuous_apply _)
 
-theorem continuous_mixed_symm (K : Type) [Field K] [NumberField K] :
-    Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace K).symm := by
+theorem continuous_mixed_symm (K : Type) [Field K] [NumberField K]
+    : Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace K).symm := by
   refine continuous_pi fun v => ?_
   rcases v.isReal_or_isComplex with hv | hv
-  · rw [(InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal hv).isEmbedding.continuous_iff]
+  · rw [(InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal
+      hv).isEmbedding.continuous_iff]
     exact ((continuous_apply _).comp continuous_fst).congr fun y =>
-      (congrFun (congrArg Prod.fst ((InfiniteAdeleRing.ringEquiv_mixedSpace K).apply_symm_apply y)) ⟨v, hv⟩).symm
+      (congrFun (congrArg Prod.fst ((InfiniteAdeleRing.ringEquiv_mixedSpace K).apply_symm_apply y))
+        ⟨v, hv⟩).symm
   · rw [(InfinitePlace.Completion.isometry_extensionEmbedding v).isEmbedding.continuous_iff]
     exact ((continuous_apply _).comp continuous_snd).congr fun y =>
-      (congrFun (congrArg Prod.snd ((InfiniteAdeleRing.ringEquiv_mixedSpace K).apply_symm_apply y)) ⟨v, hv⟩).symm
+      (congrFun (congrArg Prod.snd ((InfiniteAdeleRing.ringEquiv_mixedSpace K).apply_symm_apply y))
+        ⟨v, hv⟩).symm
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -75,9 +81,13 @@ theorem continuous_cAF (σ : E →ₐ[F] E) : Continuous (cAF σ) := by
   rw [e] at h
   exact h
 
-theorem continuous_symplOHF (σ : E →ₐ[F] E) {nS nT : ℕ} (JS : Matrix (Fin nS) (Fin nS) E)
-    (JT : Matrix (Fin nT) (Fin nT) E) (ξ : E) {X : Type} [TopologicalSpace X] {x y : X → WOF F E nS nT}
-    (hx : Continuous x) (hy : Continuous y) : Continuous fun t => symplOHF σ JS JT ξ (x t) (y t) := by
+theorem continuous_symplOHF
+    (σ : E →ₐ[F] E)
+    {nS nT : ℕ} (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E)
+    (ξ : E)
+    {X : Type} [TopologicalSpace X]
+    {x y : X → WOF F E nS nT} (hx : Continuous x) (hy : Continuous y)
+    : Continuous fun t => symplOHF σ JS JT ξ (x t) (y t) := by
   haveI := finiteFE (F := F) (E := E)
   haveI := modTop (F := F) (E := E)
   haveI := topRing (F := F) (E := E)
@@ -86,9 +96,13 @@ theorem continuous_symplOHF (σ : E →ₐ[F] E) {nS nT : ℕ} (JS : Matrix (Fin
   have hx' : ∀ i j, Continuous fun t => x t i j := fun i j =>
     (continuous_apply j).comp ((continuous_apply i).comp hx)
   have hh : Continuous fun t => hOF σ JS JT (x t) (y t) :=
-    continuous_finsetSum _ fun _ _ => continuous_finsetSum _ fun _ _ => continuous_finsetSum _ fun _ _ =>
-      continuous_finsetSum _ fun _ _ => ((continuous_const.mul (hy' _ _)).mul continuous_const).mul (hx' _ _)
-  have ht : Continuous (Algebra.trace (AF F) (AEF F E)) := IsModuleTopology.continuous_of_linearMap _
+    continuous_finsetSum _ fun _ _ =>
+      continuous_finsetSum _ fun _ _ =>
+        continuous_finsetSum _ fun _ _ =>
+          continuous_finsetSum _ fun _ _ =>
+            ((continuous_const.mul (hy' _ _)).mul continuous_const).mul (hx' _ _)
+  have ht : Continuous (Algebra.trace (AF F) (AEF F E)) :=
+    IsModuleTopology.continuous_of_linearMap _
   exact continuous_const.mul (ht.comp (continuous_const.mul hh))
 
 def eInf (F : Type) [Field F] [NumberField F] : AF F := pairA F 1 0
@@ -128,7 +142,6 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 
 attribute [local instance] finiteFE modTop topRing
 
-
 variable (F E) in
 def crd : AEF F E ≃ₗ[AF F] (Fin (Module.finrank F E) → AF F) :=
   (Algebra.TensorProduct.basis (AF F) (Module.finBasis F E)).equivFun
@@ -145,10 +158,13 @@ theorem eInf_mul_pair (x : Ainf F) : eInf F * pairA F x 0 = pairA F x 0 :=
 theorem pair_fst_eInf_mul (a : AF F) : pairA F (eInf F * a).1 0 = eInf F * a :=
   Prod.ext rfl (zero_mul a.2).symm
 
-
 variable (F E) in
-def realCh (nS nT : ℕ) : (Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F) →+ WOF F E nS nT where
-  toFun t := fun i j => (crd F E).symm fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0
+def realCh (nS nT : ℕ)
+    : (Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F)
+      →+ WOF F E nS nT where
+  toFun t := fun i j =>
+    (crd F E).symm fun l =>
+      pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0
   map_zero' := by
     funext i j
     show (crd F E).symm (fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm 0) 0) = 0
@@ -165,33 +181,37 @@ def realCh (nS nT : ℕ) : (Fin nT × Fin nS × Fin (Module.finrank F E) → mix
     rw [map_add (f := _)]
     exact Prod.ext rfl (add_zero (0 : Af F)).symm
 
-
 variable (F E) in
-def realCo (nS nT : ℕ) (y : WOF F E nS nT) : Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F :=
-  fun p => InfiniteAdeleRing.ringEquiv_mixedSpace F ((crd F E (y p.1 p.2.1)) p.2.2).1
+def realCo (nS nT : ℕ) (y : WOF F E nS nT)
+    : Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F := fun p =>
+  InfiniteAdeleRing.ringEquiv_mixedSpace F ((crd F E (y p.1 p.2.1)) p.2.2).1
 
 theorem continuous_realCh (nS nT : ℕ) : Continuous (realCh F E nS nT) := by
-  refine continuous_pi fun i => continuous_pi fun j => continuous_crd_symm.comp (continuous_pi fun l => ?_)
+  refine continuous_pi fun i =>
+    continuous_pi fun j => continuous_crd_symm.comp (continuous_pi fun l => ?_)
   show Continuous fun t : Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F =>
     (((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l)), (0 : Af F)) : Ainf F × Af F)
   exact ((continuous_mixed_symm F).comp (continuous_apply (i, j, l))).prodMk continuous_const
 
 theorem continuous_realCo (nS nT : ℕ) : Continuous (realCo F E nS nT) := by
   refine continuous_pi fun p => ?_
-  exact (continuous_mixed F).comp (continuous_fst.comp ((continuous_apply p.2.2).comp
-    (continuous_crd.comp ((continuous_apply p.2.1).comp (continuous_apply p.1)))))
+  exact (continuous_mixed F).comp
+    (continuous_fst.comp ((continuous_apply p.2.2).comp
+      (continuous_crd.comp ((continuous_apply p.2.1).comp (continuous_apply p.1)))))
 
 theorem realCh_fin (nS nT : ℕ) (t) (i j) : finPartF F E (realCh F E nS nT t i j) = 0 := by
   show finPartF F E ((crd F E).symm fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0) = 0
-  have e : (fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0) =
-      eInf F • fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0 := by
+  have e
+      : (fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0)
+        = eInf F
+          • fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (t (i, j, l))) 0 := by
     funext l
     exact (eInf_mul_pair _).symm
   rw [e, LinearEquiv.map_smul]
   exact finPartF_eInf_smul _
 
-theorem realCh_realCo (nS nT : ℕ) (y : WOF F E nS nT) :
-    realCh F E nS nT (realCo F E nS nT (eInf F • y)) = eInf F • y := by
+theorem realCh_realCo (nS nT : ℕ) (y : WOF F E nS nT)
+    : realCh F E nS nT (realCo F E nS nT (eInf F • y)) = eInf F • y := by
   funext i j
   show (crd F E).symm (fun l => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm
     (InfiniteAdeleRing.ringEquiv_mixedSpace F ((crd F E ((eInf F • y) i j)) l).1)) 0) = (eInf F • y) i j
@@ -203,24 +223,39 @@ theorem realCh_realCo (nS nT : ℕ) (y : WOF F E nS nT) :
   rw [RingEquiv.symm_apply_apply]
   exact pair_fst_eInf_mul _
 
-theorem continuous_of_level_real : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
-    B.IsGood σ → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
-      IsHermND σ JS → IsHermND σ JT → ∀ ξ₀ : E, ξ₀ ≠ 0 → σ ξ₀ = -ξ₀ →
-      Formalism.IndefR.DatumF.IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) →
-      ∀ g : Formalism.IndefR.DatumF.WOF F E nS nT → ℂ,
-      (∃ U : AddSubgroup (Formalism.IndefR.DatumF.WOF F E nS nT), IsOpen (U : Set (Formalism.IndefR.DatumF.WOF F E nS nT)) ∧
-        ∀ u ∈ U, u.map (Formalism.IndefR.DatumF.infPartF F E) = 0 → Formalism.IndefR.DatumF.heisOF σ JS JT ξ₀ B.ψ (u) g = g) →
-      (∀ (k : ℕ) (L : (Fin k → ℝ) →+ Formalism.IndefR.DatumF.WOF F E nS nT), Continuous L → (∀ t, (L t).map (Formalism.IndefR.DatumF.finPartF F E) = 0) →
-        ∀ w : Formalism.IndefR.DatumF.WOF F E nS nT, ContDiff ℝ ∞ fun x => g (w + L x)) →
-      Continuous g := by
+theorem continuous_of_level_real
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      B.IsGood σ
+        → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
+          IsHermND σ JS → IsHermND σ JT
+            → ∀ ξ₀ : E,
+              ξ₀ ≠ 0 → σ ξ₀ = -ξ₀
+                → Formalism.IndefR.DatumF.IsStdCharF
+                  (fun w : InfinitePlace F => (B.emb w).1)
+                  B.ψ (-1)
+                → ∀ g : Formalism.IndefR.DatumF.WOF F E nS nT → ℂ,
+                  (∃ U : AddSubgroup (Formalism.IndefR.DatumF.WOF F E nS nT),
+                      IsOpen (U : Set (Formalism.IndefR.DatumF.WOF F E nS nT))
+                        ∧ ∀ u ∈ U,
+                          u.map (Formalism.IndefR.DatumF.infPartF F E) = 0
+                            → Formalism.IndefR.DatumF.heisOF σ JS JT ξ₀ B.ψ (u) g = g)
+                    → (∀ (k : ℕ) (L : (Fin k → ℝ) →+ Formalism.IndefR.DatumF.WOF F E nS nT),
+                      Continuous L → (∀ t, (L t).map (Formalism.IndefR.DatumF.finPartF F E) = 0)
+                        → ∀ w : Formalism.IndefR.DatumF.WOF F E nS nT,
+                          ContDiff ℝ ∞ fun x => g (w + L x))
+                    → Continuous g := by
   intro F E _ _ _ _ _ σ B _ nS nT JS JT _ _ ξ₀ _ _ hstd g hU hsm
   haveI := finiteFE (F := F) (E := E)
   haveI := modTop (F := F) (E := E)
   haveI := topRing (F := F) (E := E)
   haveI : IsTopologicalAddGroup (AEF F E) := IsTopologicalRing.to_topologicalAddGroup
   obtain ⟨U, hUo, hUf⟩ := hU
-  let φ := (Module.finBasis ℝ (Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F)).equivFunL
-  let L : (Fin _ → ℝ) →+ WOF F E nS nT := (realCh F E nS nT).comp φ.symm.toLinearEquiv.toAddMonoidHom
+  let φ :=
+    (Module.finBasis ℝ
+      (Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F)).equivFunL
+  let L : (Fin _ → ℝ) →+ WOF F E nS nT :=
+    (realCh F E nS nT).comp φ.symm.toLinearEquiv.toAddMonoidHom
   have hLc : Continuous L := (continuous_realCh nS nT).comp φ.symm.continuous
   have hL0 : ∀ t, (L t).map (finPartF F E) = 0 := fun t => by
     funext i j
@@ -245,12 +280,13 @@ theorem continuous_of_level_real : ∀ (F E : Type) [Field F] [NumberField F] [F
     rw [e]
     exact infPartF_sub_eInf_smul _
   have hga : Continuous fun w' => g (a w') := by
-    have h1 := (hsm _ L hLc hL0 w).continuous.comp
-      (φ.continuous.comp ((continuous_realCo nS nT).comp (hsmc.comp (continuous_sub_right w))))
+    have h1 :=
+      (hsm _ L hLc hL0 w).continuous.comp
+        (φ.continuous.comp ((continuous_realCo nS nT).comp (hsmc.comp (continuous_sub_right w))))
     refine h1.congr fun w' => ?_
     show g (w + L (φ (realCo F E nS nT (eInf F • (w' - w))))) = g (w + eInf F • (w' - w))
     rw [hLφ, realCh_realCo]
-  have hg : Continuous fun w' => B.ψ (-symplOHF σ JS JT ξ₀ (a w') (u w')) * g (a w') :=
+  have hg : Continuous fun w' => B.ψ (- symplOHF σ JS JT ξ₀ (a w') (u w')) * g (a w') :=
     (hstd.1.1.comp (continuous_symplOHF σ JS JT ξ₀ ha hu).neg).mul hga
   have hev : ∀ᶠ w' in 𝓝 w, u w' ∈ U :=
     hu.continuousAt.preimage_mem_nhds (hUo.mem_nhds (by rw [huw]; exact U.zero_mem))

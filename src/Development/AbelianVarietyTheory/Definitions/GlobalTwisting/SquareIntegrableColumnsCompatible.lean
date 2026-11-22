@@ -17,17 +17,29 @@ noncomputable section
 
 namespace GlobalTheory.Cp
 
-open Formalism Formalism.L2 Formalism.L2.DIV Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.Indef
+open Formalism Formalism.L2 Formalism.L2.DIV Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling Formalism.L2.Indef
 
-abbrev fieldsLL (D : Formalism.BasicNotions.D7) (X : Formalism.L2.Col.Fields) (e : X.Tau → (X.E →+* D.what₂.LL)) : Formalism.L2.Col.Fields :=
-  { X with K := D.what₂.LL, fieldK := inferInstance, nfK := inferInstance, starK := inferInstance, emb := e }
+abbrev fieldsLL
+    (D : Formalism.BasicNotions.D7) (X : Formalism.L2.Col.Fields) (e : X.Tau → (X.E →+* D.what₂.LL))
+    : Formalism.L2.Col.Fields := {
+  X with
+  K := D.what₂.LL
+  fieldK := inferInstance
+  nfK := inferInstance
+  starK := inferInstance
+  emb := e
+}
 
 section ColRec
 
 open Formalism.BasicNotions Formalism.L2.Col
 
-structure ColRec3 (X : Fields) {G : Type} [Group G] [Fintype G] {Pl0 I0 Ty T : Type} {m : ℕ}
-    (A3 : FamIn3 X.K G Pl0 I0 Ty T m) (P1 : Subgroup G) (ψ1 : P1 →* X.Kˣ) where
+structure ColRec3
+    (X : Fields)
+    {G : Type} [Group G] [Fintype G]
+    {Pl0 I0 Ty T : Type} {m : ℕ} (A3 : FamIn3 X.K G Pl0 I0 Ty T m)
+    (P1 : Subgroup G) (ψ1 : P1 →* X.Kˣ) where
   Pr : Primes X
   Rk : Ranks
   W : Wts X Pr.Word Rk
@@ -49,20 +61,28 @@ structure ColRec3 (X : Fields) {G : Type} [Group G] [Fintype G] {Pl0 I0 Ty T : T
   b : ∀ t, Mem → (Li t).β (m2 + 1)
   hY : ∀ t x, YbHyp (R := Rk) sel (mu t) (cst t) (Li t) (wd x) m2 (b t x)
   Am : Formalism.L2.Ker.Amb X
-  hK : ∀ t x, Formalism.L2.Ker.KerEquivC W Ch sel (mu t) (cst t) (Li t) Am (wd x) m2 (b t x) (hY t x) Lv
+  hK
+    : ∀ t x,
+      Formalism.L2.Ker.KerEquivC W Ch sel (mu t) (cst t) (Li t) Am (wd x) m2 (b t x) (hY t x) Lv
   hF : ∀ t x j, (chF W sel (mu t) (Li t) (wd x) j).Ok
   hE : ∀ x, (evGSD W Ch sel (mu A3.fam3.base3.μ0) Lv (wd x)).Ok
-  ev : ∀ (Zs : DefSub A3.fam3.amb3) t, (Fin ((A3.side3 P1 ψ1 Zs).nV t) → X.K) →ₗ[X.K] V0X W Ch sel (mu t) Xg Lv
+  ev
+    : ∀ (Zs : DefSub A3.fam3.amb3) t,
+      (Fin ((A3.side3 P1 ψ1 Zs).nV t) → X.K) →ₗ[X.K] V0X W Ch sel (mu t) Xg Lv
 
-variable {X : Fields} {G : Type} [Group G] [Fintype G] {Pl0 I0 Ty T : Type} {m : ℕ}
-  {A3 : FamIn3 X.K G Pl0 I0 Ty T m} {P1 : Subgroup G} {ψ1 : P1 →* X.Kˣ}
+variable
+  {X : Fields} {G : Type} [Group G] [Fintype G]
+  {Pl0 I0 Ty T : Type} {m : ℕ} {A3 : FamIn3 X.K G Pl0 I0 Ty T m} {P1 : Subgroup G} {ψ1 : P1 →* X.Kˣ}
 
-abbrev ColRec3.ker (c : ColRec3 X A3 P1 ψ1) :
-    ∀ t x, ChKer c.W c.Ch c.sel (c.mu t) (c.cst t) (c.Li t) c.Lv (c.wd x) c.m2 (c.b t x) (c.hY t x) :=
+abbrev ColRec3.ker (c : ColRec3 X A3 P1 ψ1)
+    : ∀ t x,
+      ChKer c.W c.Ch c.sel (c.mu t) (c.cst t) (c.Li t) c.Lv (c.wd x) c.m2 (c.b t x) (c.hY t x) :=
   kerRec c.mu c.cst c.Li c.wd c.b c.hY c.Am c.hK
 
-abbrev ColRec3.face (c : ColRec3 X A3 P1 ψ1) (Zs : DefSub A3.fam3.amb3) : DefCols (A3.side3 P1 ψ1 Zs) :=
-  colFace c.hX (A3.side3 P1 ψ1 Zs) c.Xg c.mu c.cst c.Li c.hL c.hP c.Mem c.wd c.b c.hY c.ker c.hF (c.ev Zs)
+abbrev ColRec3.face (c : ColRec3 X A3 P1 ψ1) (Zs : DefSub A3.fam3.amb3)
+    : DefCols (A3.side3 P1 ψ1 Zs) :=
+  colFace c.hX (A3.side3 P1 ψ1 Zs) c.Xg c.mu c.cst c.Li c.hL c.hP c.Mem c.wd c.b c.hY c.ker c.hF
+    (c.ev Zs)
 
 end ColRec
 
@@ -70,21 +90,32 @@ section IndefiniteRowSideFullHecke
 
 open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Rows
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {Kc : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {Kc : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
+  {ex : Extra D L hT Gi Gl Kc Y cX}
 
-def ColTie3 (P : RowSideFamily ex) (X : Formalism.L2.Col.Fields) (e : X.Tau → (X.E →+* D.what₂.LL)) (c : ColRec3 (fieldsLL D X e) P.A3 P.Ps P.ψs)
-    (Sp : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (c.face Zs)) : Prop :=
+def ColTie3
+    (P : RowSideFamily ex) (X : Formalism.L2.Col.Fields)
+    (e : X.Tau → (X.E →+* D.what₂.LL)) (c : ColRec3 (fieldsLL D X e) P.A3 P.Ps P.ψs)
+    (Sp : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (c.face Zs))
+    : Prop :=
   c.face P.Zs = P.Dc ∧ HEq (Sp P.Zs) P.Sp
 
-def ColTieT (T : TiedDataSK ex) (P : RowSideFamily ex) (X : Formalism.L2.Col.Fields) (e : X.Tau → (X.E →+* D.what₂.LL))
-    (c : ColRec3 (fieldsLL D X e) P.A3 P.Ps P.ψs) : Prop :=
-  T.ker.X = fieldsLL D X e ∧ c.Rk = D.R ∧ HEq c.Pr T.ker.Pr ∧ HEq c.Ch T.ker.Ch ∧ HEq c.sel T.ker.sel ∧ HEq c.Sg T.ker.S ∧
-    HEq c.mu (fun t => T.ker.tup (P.I.tup t)) ∧ HEq c.cst (fun t => T.ker.cst (P.I.tup t)) ∧
-    HEq c.Li (fun t => T.ker.idx (P.I.tup t)) ∧ c.m2 = T.ker.m2 ∧ HEq c.Gc T.ker.glob ∧
-    HEq c.Am (Formalism.L2.Ker.ambOf T.ker.seam T.ker.B T.ker.χ T.ker.cD) ∧ c.Mem = D.what₂.Word ∧ HEq c.wd T.ker.word
+def ColTieT
+    (T : TiedDataSK ex)
+    (P : RowSideFamily ex) (X : Formalism.L2.Col.Fields)
+    (e : X.Tau → (X.E →+* D.what₂.LL)) (c : ColRec3 (fieldsLL D X e) P.A3 P.Ps P.ψs)
+    : Prop :=
+  T.ker.X = fieldsLL D X e ∧ c.Rk = D.R ∧ HEq c.Pr T.ker.Pr ∧ HEq c.Ch T.ker.Ch
+    ∧ HEq c.sel T.ker.sel ∧ HEq c.Sg T.ker.S ∧ HEq c.mu (fun t => T.ker.tup (P.I.tup t))
+    ∧ HEq c.cst (fun t => T.ker.cst (P.I.tup t)) ∧ HEq c.Li (fun t => T.ker.idx (P.I.tup t))
+    ∧ c.m2 = T.ker.m2 ∧ HEq c.Gc T.ker.glob
+    ∧ HEq c.Am (Formalism.L2.Ker.ambOf T.ker.seam T.ker.B T.ker.χ T.ker.cD) ∧ c.Mem = D.what₂.Word
+    ∧ HEq c.wd T.ker.word
 
-structure SquareIntegrableColumnsCompatible (T : TiedDataSK ex) (P : RowSideFamily ex) : Type 1 where
+structure SquareIntegrableColumnsCompatible (T : TiedDataSK ex) (P : RowSideFamily ex)
+    : Type 1 where
   X : Formalism.L2.Col.Fields
   e : X.Tau → (X.E →+* D.what₂.LL)
   c : ColRec3 (fieldsLL D X e) P.A3 P.Ps P.ψs
@@ -97,8 +128,10 @@ structure SquareIntegrableColumnsCompatible (T : TiedDataSK ex) (P : RowSideFami
   v0 : InfinitePlace D.what₂.LL
   TU : Finset (Tup X.F X.E D.what₂.LL c.Sg)
   xiVal : Tup X.F X.E D.what₂.LL c.Sg → HeightOneSpectrum (𝓞 X.E) → D.what₂.LLˣ
-  trIv : Fin c.Rk.m → (Formalism.L2.Col.LevOffI ∅ c.Pr.vGs ∅ × List ℕ → D.what₂.LL) →
-    Formalism.L2.Col.LevOffI ∅ c.Pr.vGs ∅ × List ℕ → D.what₂.LL
+  trIv
+    : Fin c.Rk.m → (Formalism.L2.Col.LevOffI ∅ c.Pr.vGs ∅ × List ℕ → D.what₂.LL)
+      → Formalism.L2.Col.LevOffI ∅ c.Pr.vGs ∅ × List ℕ
+      → D.what₂.LL
   famEq : HEq P.A3 (colIn3 c.W c.Ch c.sel c.hX v0 TU c.Xg ∅ xiVal trIv)
   gEq : P.Gp = Formalism.L2.Col.G0 X.E c.Pr.vGs c.Rk.r
   plEq : P.Pl0 = Formalism.L2.Col.LevOff ∅ c.Pr.vGs ∅

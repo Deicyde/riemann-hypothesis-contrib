@@ -27,9 +27,10 @@ section SlopeTestRemainingChoices
 open scoped TensorProduct
 open GlobalTheory.IndefiniteRowSideFullHecke.SplitUnramifiedPlaces
 
-private theorem isDomain_of_span {A : Type} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
-    {π : A} (hπ : IsLocalRing.maximalIdeal A = Ideal.span {π}) (hreg : π ∈ nonZeroDivisors A) :
-    IsDomain A := by
+private theorem isDomain_of_span
+    {A : Type} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+    {π : A} (hπ : IsLocalRing.maximalIdeal A = Ideal.span {π}) (hreg : π ∈ nonZeroDivisors A)
+    : IsDomain A := by
   classical
   have hkrull : ⨅ i : ℕ, (IsLocalRing.maximalIdeal A) ^ i = ⊥ :=
     Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal A).ne_top
@@ -67,26 +68,29 @@ private theorem isDomain_of_span {A : Type} [CommRing A] [IsNoetherianRing A] [I
     obtain ⟨k, u, hu, rfl⟩ := hfac a h.1
     obtain ⟨l, v, hv, rfl⟩ := hfac b h.2
     have h1 : (u * v) * π ^ (k + l) = 0 := by rw [← hab]; ring
-    have h2 : u * v = 0 :=
-      (mul_right_mem_nonZeroDivisors_eq_zero_iff (pow_mem hreg (k + l))).1 h1
+    have h2 : u * v = 0 := (mul_right_mem_nonZeroDivisors_eq_zero_iff (pow_mem hreg (k + l))).1 h1
     exact (hu.mul hv).ne_zero h2
   exact NoZeroDivisors.to_isDomain A
 
 variable {p : ℕ} [Fact p.Prime] {R : Type} [CommRing R]
 
-private theorem exists_dvr [IsDedekindDomain R] [CharZero R] [Module.Finite ℤ R]
-    (w : Place p R) : ∃ _ : IsDomain w.Ow, IsDiscreteValuationRing w.Ow := by
+private theorem exists_dvr [IsDedekindDomain R] [CharZero R] [Module.Finite ℤ R] (w : Place p R)
+    : ∃ _ : IsDomain w.Ow, IsDiscreteValuationRing w.Ow := by
   classical
   have := GlobalTheory.OnePrime.nontrivial_Ow w
   obtain ⟨P, hP, hpP, hm, hQ⟩ := GlobalTheory.OnePrime.exists_prime_under p R w
   have : IsLocalRing w.Ow :=
-    IsLocalRing.of_unique_max_ideal ⟨_, hm, fun N hN => GlobalTheory.OnePrime.maximal_unique w _ N hm hN⟩
+    IsLocalRing.of_unique_max_ideal
+      ⟨_, hm, fun N hN => GlobalTheory.OnePrime.maximal_unique w _ N hm hN⟩
   have : IsNoetherianRing w.Ow := IsNoetherianRing.of_finite ℤ_[p] w.Ow
   have hM : IsLocalRing.maximalIdeal w.Ow = P.map w.toOw := (IsLocalRing.eq_maximalIdeal hm).symm
   have hp0 : (p : R) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero
   have hP0 : P ≠ ⊥ := fun h => hp0 (by rwa [h, Ideal.mem_bot] at hpP)
-  have hpow : ∀ a : R, a ≠ 0 → ∃ (k : ℕ) (Q : Ideal R), Ideal.span {a} = P ^ k * Q ∧ P ⊔ Q = ⊤ ∧
-      Ideal.span {w.toOw a} = P.map w.toOw ^ k := by
+  have hpow
+      : ∀ a : R,
+        a ≠ 0
+          → ∃ (k : ℕ) (Q : Ideal R),
+            Ideal.span {a} = P ^ k * Q ∧ P ⊔ Q = ⊤ ∧ Ideal.span {w.toOw a} = P.map w.toOw ^ k := by
     intro a ha
     have ha0 : Ideal.span {a} ≠ ⊥ := by simpa using ha
     obtain ⟨Q, hPQ, hQe⟩ := Ideal.eq_prime_pow_mul_coprime ha0 P
@@ -95,7 +99,9 @@ private theorem exists_dvr [IsDedekindDomain R] [CharZero R] [Module.Finite ℤ 
     refine ⟨e, Q, hQe, hPQ, ?_⟩
     have := congrArg (Ideal.map w.toOw) hQe
     rwa [Ideal.map_span, Set.image_singleton, Ideal.map_mul, Ideal.map_pow,
-      GlobalTheory.Proof.different_power_unramified_iff.map_eq_top_of_coprime _ P hP hQ Q hQ0 hPQ, Ideal.mul_top] at this
+        GlobalTheory.Proof.different_power_unramified_iff.map_eq_top_of_coprime _ P hP hQ Q hQ0 hPQ,
+        Ideal.mul_top]
+      at this
   obtain ⟨a, ha1, ha2⟩ := Ideal.exists_mem_pow_notMem_pow_succ P hP0 hP.ne_top 1
   have ha0 : a ≠ 0 := by rintro rfl; exact ha2 (zero_mem _)
   have hπ : IsLocalRing.maximalIdeal w.Ow = Ideal.span {w.toOw a} := by
@@ -116,7 +122,8 @@ private theorem exists_dvr [IsDedekindDomain R] [CharZero R] [Module.Finite ℤ 
   have hpM : (p : w.Ow) ∈ IsLocalRing.maximalIdeal w.Ow := by
     rw [hM, ← map_natCast w.toOw]; exact Ideal.mem_map_of_mem _ hpP
   have hpreg : (p : w.Ow) ∈ nonZeroDivisors w.Ow :=
-    mem_nonZeroDivisors_iff_left.2 (GlobalTheory.Proof.different_power_unramified_iff.ow_p_torsionFree p R w)
+    mem_nonZeroDivisors_iff_left.2
+      (GlobalTheory.Proof.different_power_unramified_iff.ow_p_torsionFree p R w)
   have hreg : w.toOw a ∈ nonZeroDivisors w.Ow := by
     have h := hpM
     rw [hπ, Ideal.mem_span_singleton] at h
@@ -133,11 +140,12 @@ private theorem exists_dvr [IsDedekindDomain R] [CharZero R] [Module.Finite ℤ 
   have hpr : (IsLocalRing.maximalIdeal w.Ow).IsPrincipal := ⟨_, hπ⟩
   exact ((IsDiscreteValuationRing.TFAE w.Ow hnf).out 1 5).2 hpr
 
-private def cutEquiv (w : Place p R) :
-    LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e) ≃ₗ[ℤ_[p]] w.Ow :=
+private def cutEquiv (w : Place p R)
+    : LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e) ≃ₗ[ℤ_[p]] w.Ow :=
   LinearEquiv.ofBijective
-    ((Ideal.Quotient.mkₐ ℤ_[p] (Ideal.span {1 - w.e})).toLinearMap ∘ₗ
-      (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)).subtype) (by
+    ((Ideal.Quotient.mkₐ ℤ_[p] (Ideal.span {1 - w.e})).toLinearMap
+      ∘ₗ (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)).subtype)
+    (by
       constructor
       · rw [injective_iff_map_eq_zero]
         rintro ⟨_, a, rfl⟩ ha
@@ -149,12 +157,15 @@ private def cutEquiv (w : Place p R) :
       · intro s
         obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective s
         refine ⟨⟨w.e * a, a, rfl⟩, Ideal.Quotient.eq.2 ?_⟩
-        exact Ideal.mem_span_singleton'.2 ⟨-a, by
-          show -a * (1 - w.e) = w.e * a - a
-          ring⟩)
+        exact Ideal.mem_span_singleton'.2 ⟨
+          -a,
+          by
+            show -a * (1 - w.e) = w.e * a - a
+            ring
+        ⟩)
 
-private theorem cutEquiv_symm (w : Place p R) (a : Op p R) :
-    ((cutEquiv w).symm (Ideal.Quotient.mk _ a) : Op p R) = w.e * a := by
+private theorem cutEquiv_symm (w : Place p R) (a : Op p R)
+    : ((cutEquiv w).symm (Ideal.Quotient.mk _ a) : Op p R) = w.e * a := by
   have : (cutEquiv w).symm (Ideal.Quotient.mk _ a) = ⟨w.e * a, a, rfl⟩ := by
     rw [LinearEquiv.symm_apply_eq]
     refine Ideal.Quotient.eq.2 (Ideal.mem_span_singleton'.2 ⟨a, ?_⟩)
@@ -162,11 +173,14 @@ private theorem cutEquiv_symm (w : Place p R) (a : Op p R) :
     ring
   rw [this]
 
-private theorem exists_basis [IsDedekindDomain R] [CharZero R] [Module.Free ℤ R]
-    [Module.Finite ℤ R] (w : Place p R) :
-    ∃ (α : Op p R) (b : Module.Basis
-      (Fin (Module.finrank ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)))) ℤ_[p]
-      (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e))), ∀ k, (b k : Op p R) = w.e * α ^ (k : ℕ) := by
+private theorem exists_basis
+    [IsDedekindDomain R] [CharZero R] [Module.Free ℤ R] [Module.Finite ℤ R] (w : Place p R)
+    : ∃ (α : Op p R)
+        (b : Module.Basis
+          (Fin (Module.finrank ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)))) ℤ_[p]
+          (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e))),
+      ∀ k,
+        (b k : Op p R) = w.e * α ^ (k : ℕ) := by
   obtain ⟨_, _⟩ := exists_dvr w
   have : Module.Free ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)) := inferInstance
   have : Module.Free ℤ_[p] w.Ow := Module.Free.of_equiv (cutEquiv w)
@@ -187,14 +201,26 @@ private theorem exists_basis [IsDedekindDomain R] [CharZero R] [Module.Free ℤ 
 
 end SlopeTestRemainingChoices
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 
-theorem place_monogenic : ∀ (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE] (w : PlaceU p OE), IsDomain ((ℤ_[p] ⊗[ℤ] OE) ⧸ Ideal.span {1 - w.e}) ∧ IsPrincipalIdealRing ((ℤ_[p] ⊗[ℤ] OE) ⧸ Ideal.span {1 - w.e}) ∧ ∃ (α : ℤ_[p] ⊗[ℤ] OE) (b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e))), ∀ k, (b k : ℤ_[p] ⊗[ℤ] OE) = w.e * α ^ (k : ℕ) := by
+theorem place_monogenic
+    : ∀ (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE]
+        [Module.Free ℤ OE] [Module.Finite ℤ OE] (w : PlaceU p OE),
+      IsDomain ((ℤ_[p] ⊗[ℤ] OE) ⧸ Ideal.span {1 - w.e})
+        ∧ IsPrincipalIdealRing ((ℤ_[p] ⊗[ℤ] OE) ⧸ Ideal.span {1 - w.e})
+        ∧ ∃ (α : ℤ_[p] ⊗[ℤ] OE)
+            (b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e))),
+          ∀ k,
+            (b k : ℤ_[p] ⊗[ℤ] OE) = w.e * α ^ (k : ℕ) := by
   intro p _ OE _ _ _ _ _ w
-  let w' : GlobalTheory.IndefiniteRowSideFullHecke.SplitUnramifiedPlaces.Place p OE := ⟨w.e, w.idem, w.ne_zero, w.prim⟩
+  let w' : GlobalTheory.IndefiniteRowSideFullHecke.SplitUnramifiedPlaces.Place p OE :=
+    ⟨w.e, w.idem, w.ne_zero, w.prim⟩
   obtain ⟨h1, h2⟩ := exists_dvr w'
   exact ⟨h1, h2.toIsPrincipalIdealRing, exists_basis w'⟩
 

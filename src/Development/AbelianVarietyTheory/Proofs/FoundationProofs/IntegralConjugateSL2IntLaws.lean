@@ -80,20 +80,27 @@ private lemma mul_eq_cj_mul_and_cj_mem_gamma (m : Matrix (Fin 2) (Fin 2) ℤ) (M
 
 open Matrix in
 open scoped MatrixGroups TensorProduct in
-theorem _root_.GlobalTheory.KZ.cj_laws : (∀ (m : Matrix (Fin 2) (Fin 2) ℤ) (M : ℕ), 0 < m.det →
-    ∀ δ ∈ CongruenceSubgroup.Gamma (M * m.det.natAbs),
-      m * (δ : Matrix (Fin 2) (Fin 2) ℤ) = (_root_.GlobalTheory.KZ.H3.cj m δ : Matrix (Fin 2) (Fin 2) ℤ) * m ∧
-        _root_.GlobalTheory.KZ.H3.cj m δ ∈ CongruenceSubgroup.Gamma M) ∧
-    (∀ γ δ : SL(2, ℤ), _root_.GlobalTheory.KZ.H3.cj (γ : Matrix (Fin 2) (Fin 2) ℤ) δ = γ * δ * γ⁻¹) ∧
-    (∀ (m : Matrix (Fin 2) (Fin 2) ℤ) (δ δ' : SL(2, ℤ)), 0 < m.det →
-      m * (δ : Matrix (Fin 2) (Fin 2) ℤ) = (δ' : Matrix (Fin 2) (Fin 2) ℤ) * m →
-        ∀ z ∈ _root_.GlobalTheory.KZ.Hs,
-          _root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.toGQ m) (_root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.ofSL δ) z) =
-            _root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.ofSL δ')
-              (_root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.toGQ m) z)) := by
+theorem _root_.GlobalTheory.KZ.cj_laws
+    : (∀ (m : Matrix (Fin 2) (Fin 2) ℤ) (M : ℕ),
+        0 < m.det
+          → ∀ δ ∈ CongruenceSubgroup.Gamma (M * m.det.natAbs),
+            m * (δ : Matrix (Fin 2) (Fin 2) ℤ)
+                = (_root_.GlobalTheory.KZ.H3.cj m δ : Matrix (Fin 2) (Fin 2) ℤ) * m
+              ∧ _root_.GlobalTheory.KZ.H3.cj m δ ∈ CongruenceSubgroup.Gamma M)
+      ∧ (∀ γ δ : SL(2, ℤ),
+        _root_.GlobalTheory.KZ.H3.cj (γ : Matrix (Fin 2) (Fin 2) ℤ) δ = γ * δ * γ⁻¹)
+      ∧ (∀ (m : Matrix (Fin 2) (Fin 2) ℤ) (δ δ' : SL(2, ℤ)),
+        0 < m.det → m * (δ : Matrix (Fin 2) (Fin 2) ℤ) = (δ' : Matrix (Fin 2) (Fin 2) ℤ) * m
+          → ∀ z ∈ _root_.GlobalTheory.KZ.Hs,
+            _root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.toGQ m)
+                (_root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.ofSL δ) z)
+              = _root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.ofSL δ')
+                (_root_.GlobalTheory.KZ.mob (_root_.GlobalTheory.KZ.toGQ m) z)) := by
   refine ⟨mul_eq_cj_mul_and_cj_mem_gamma, fun γ δ => ?_, fun m δ δ' hm h => ?_⟩
-  · have hex : ∃ δ' : SL(2, ℤ), (γ : Matrix (Fin 2) (Fin 2) ℤ) * (δ : Matrix (Fin 2) (Fin 2) ℤ) =
-        (δ' : Matrix (Fin 2) (Fin 2) ℤ) * γ :=
+  · have hex
+        : ∃ δ' : SL(2, ℤ),
+          (γ : Matrix (Fin 2) (Fin 2) ℤ) * (δ : Matrix (Fin 2) (Fin 2) ℤ)
+            = (δ' : Matrix (Fin 2) (Fin 2) ℤ) * γ :=
       ⟨γ * δ * γ⁻¹, by simp [Matrix.mul_assoc, Matrix.adjugate_mul]⟩
     have h1 := mul_eq_cj_mul_of_exists hex
     apply Subtype.ext

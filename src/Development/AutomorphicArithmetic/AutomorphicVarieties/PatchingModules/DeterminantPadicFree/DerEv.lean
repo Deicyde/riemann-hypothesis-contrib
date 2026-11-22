@@ -6,20 +6,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem single_mem_ev_of_same_block {F : Type} [CommRing F] {n a : ℕ} (p q : Fin n) (c : F)
-    (h : ((p : ℕ) < a ↔ (q : ℕ) < a)) : Matrix.single p q c ∈ Ev F F n a := by
+private theorem single_mem_ev_of_same_block
+    {F : Type} [CommRing F] {n a : ℕ} (p q : Fin n) (c : F) (h : ((p : ℕ) < a ↔ (q : ℕ) < a))
+    : Matrix.single p q c ∈ Ev F F n a := by
   intro i j
   refine ⟨fun _ => Submodule.mem_top, fun hij => ?_⟩
   rw [Submodule.mem_bot, Matrix.single_apply, if_neg]
   rintro ⟨rfl, rfl⟩
   exact hij h
 
-theorem UpperTheory.V.Pa.Det.derEv :
-    ∀ {F : Type} [CommRing F] {n a : ℕ} (d : Matrix (Fin n) (Fin n) F →ₗ[F] Matrix (Fin n) (Fin n) F), (∀ x ∈ Ev F F n a, ∀ y ∈ Ev F F n a, d (x * y) = d x * y + x * d y) → ∃ Y, ∀ x ∈ Ev F F n a, d x = Y * x - x * Y := by
+theorem UpperTheory.V.Pa.Det.derEv
+    : ∀ {F : Type} [CommRing F] {n a : ℕ}
+        (d : Matrix (Fin n) (Fin n) F →ₗ[F] Matrix (Fin n) (Fin n) F),
+      (∀ x ∈ Ev F F n a, ∀ y ∈ Ev F F n a, d (x * y) = d x * y + x * d y)
+        → ∃ Y, ∀ x ∈ Ev F F n a, d x = Y * x - x * Y := by
   intro F _ n a d hd
   let β : Fin n → Fin n := fun i =>
-    if h : (i : ℕ) < a then ⟨0, lt_of_le_of_lt (Nat.zero_le _) i.isLt⟩
-    else ⟨a, lt_of_le_of_lt (not_lt.mp h) i.isLt⟩
+    if h : (i : ℕ) < a then
+      ⟨0, lt_of_le_of_lt (Nat.zero_le _) i.isLt⟩
+    else
+      ⟨a, lt_of_le_of_lt (not_lt.mp h) i.isLt⟩
   have hβ : ∀ i : Fin n, ((i : ℕ) < a ↔ (β i : ℕ) < a) := by
     intro i
     by_cases h : (i : ℕ) < a
@@ -42,8 +48,7 @@ theorem UpperTheory.V.Pa.Det.derEv :
   have hsum : ∑ k, u k * v k = 1 := by
     simp only [u, v, E, Matrix.single_mul_single_same, mul_one]
     exact Matrix.sum_single_one
-  have key : ∀ i j : Fin n, ((i : ℕ) < a ↔ (j : ℕ) < a) →
-      d (E i j) = Y * E i j - E i j * Y := by
+  have key : ∀ i j : Fin n, ((i : ℕ) < a ↔ (j : ℕ) < a) → d (E i j) = Y * E i j - E i j * Y := by
     intro i j hij
     have hE : E i j ∈ Ev F F n a := single_mem_ev_of_same_block i j 1 hij
     have h1 : Y * E i j = d (u i) * v j := by
@@ -67,18 +72,19 @@ theorem UpperTheory.V.Pa.Det.derEv :
         rw [Matrix.single_mul_single_same, mul_one, hβeq i j hij]
       · exact Matrix.single_mul_single_of_ne _ _ _ _ h _
     have h2 : E i j * Y = d (u i) * v j - d (E i j) := by
-      calc E i j * Y = ∑ k, (d (E i j * u k) * v k - d (E i j) * (u k * v k)) := by
-            simp only [Y, Finset.mul_sum]
-            refine Finset.sum_congr rfl fun k _ => ?_
-            rw [← mul_assoc, hk, sub_mul, mul_assoc]
+      calc
+        E i j * Y = ∑ k, (d (E i j * u k) * v k - d (E i j) * (u k * v k)) := by
+          simp only [Y, Finset.mul_sum]
+          refine Finset.sum_congr rfl fun k _ => ?_
+          rw [← mul_assoc, hk, sub_mul, mul_assoc]
         _ = d (u i) * v j - d (E i j) := by
-            rw [Finset.sum_sub_distrib, ← Finset.mul_sum, hsum, mul_one]
-            congr 1
-            rw [Finset.sum_eq_single j]
-            · rw [hEu, if_pos rfl]
-            · intro k _ hk
-              rw [hEu, if_neg (Ne.symm hk), map_zero, zero_mul]
-            · simp
+          rw [Finset.sum_sub_distrib, ← Finset.mul_sum, hsum, mul_one]
+          congr 1
+          rw [Finset.sum_eq_single j]
+          · rw [hEu, if_pos rfl]
+          · intro k _ hk
+            rw [hEu, if_neg (Ne.symm hk), map_zero, zero_mul]
+          · simp
     rw [h1, h2]
     abel
   refine ⟨Y, fun x hx => ?_⟩
@@ -100,5 +106,6 @@ theorem UpperTheory.V.Pa.Det.derEv :
     · have h0 : x i j = 0 := (Submodule.mem_bot F).mp ((hx i j).2 hij)
       rw [h0, Matrix.single_zero, map_zero]
   simp only [D', LinearMap.sub_apply, LinearMap.mulLeft_apply, LinearMap.mulRight_apply,
-    sub_eq_zero] at hD
+      sub_eq_zero]
+    at hD
   exact hD

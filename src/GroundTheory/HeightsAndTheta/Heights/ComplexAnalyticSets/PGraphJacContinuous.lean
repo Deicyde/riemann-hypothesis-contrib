@@ -13,10 +13,12 @@ noncomputable section
 
 open scoped InnerProductSpace
 
-theorem det_one_add_adjoint_comp_self_pos {k m : ℕ}
-    (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)) :
-    0 < LinearMap.det ((1 : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin k)) +
-      LinearMap.adjoint B ∘ₗ B) := by
+theorem det_one_add_adjoint_comp_self_pos
+    {k m : ℕ} (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))
+    : 0
+      < LinearMap.det
+        ((1 : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin k))
+          + LinearMap.adjoint B ∘ₗ B) := by
   set S : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin k) := 1 + LinearMap.adjoint B ∘ₗ B
     with hSdef
   have hBB : (LinearMap.adjoint B ∘ₗ B).IsPositive := LinearMap.isPositive_adjoint_comp_self B
@@ -30,28 +32,29 @@ theorem det_one_add_adjoint_comp_self_pos {k m : ℕ}
     rw [hS.isSymmetric.apply_eigenvectorBasis hn i]
     simp [real_inner_smul_left, hv, v]
   have h2 : ⟪S v, v⟫_ℝ = ‖v‖ ^ 2 + ⟪(LinearMap.adjoint B ∘ₗ B) v, v⟫_ℝ := by
-    rw [hSdef, LinearMap.add_apply, inner_add_left, Module.End.one_apply, real_inner_self_eq_norm_sq]
-  have h3 : 0 ≤ ⟪(LinearMap.adjoint B ∘ₗ B) v, v⟫_ℝ := by
-    simpa using hBB.re_inner_nonneg_left v
-  have : 0 < (hS.isSymmetric.eigenvalues hn i : ℝ) := by
-    rw [← h1, h2, hv]; linarith
+    rw [hSdef, LinearMap.add_apply, inner_add_left, Module.End.one_apply,
+      real_inner_self_eq_norm_sq]
+  have h3 : 0 ≤ ⟪(LinearMap.adjoint B ∘ₗ B) v, v⟫_ℝ := by simpa using hBB.re_inner_nonneg_left v
+  have : 0 < (hS.isSymmetric.eigenvalues hn i : ℝ) := by rw [← h1, h2, hv]; linarith
   simpa using this
 
-theorem graphJac_pos {k m : ℕ} (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)) :
-    0 < graphJac B :=
+theorem graphJac_pos {k m : ℕ} (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))
+    : 0 < graphJac B :=
   Real.sqrt_pos.mpr (det_one_add_adjoint_comp_self_pos B)
 
-theorem continuous_graphJac (k m : ℕ) :
-    Continuous fun B : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m) =>
+theorem continuous_graphJac (k m : ℕ)
+    : Continuous fun B : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m) =>
       graphJac (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)) := by
   have hc : Continuous fun B : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m) =>
-      (1 + (ContinuousLinearMap.adjoint B).comp B :
-        EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin k)) :=
+      (1 + (ContinuousLinearMap.adjoint B).comp B
+        : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin k)) :=
     continuous_const.add ((ContinuousLinearMap.adjoint.continuous).clm_comp continuous_id)
-  have heq : (fun B : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m) =>
-      graphJac (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) =
-      fun B => √((1 + (ContinuousLinearMap.adjoint B).comp B :
-        EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin k)).det) := by
+  have heq
+      : (fun B : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m) =>
+          graphJac (B : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)))
+        = fun B =>
+          √((1 + (ContinuousLinearMap.adjoint B).comp B
+            : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin k)).det) := by
     funext B
     rfl
   rw [heq]

@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChainParI
 noncomputable section
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.IndefR.Links Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilSignShift (NcGapGt NcGapGe minSig lamS lamT StepGap)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilSignShift
+  (NcGapGt NcGapGe minSig lamS lamT StepGap)
 open GlobalTheory.Chain.ItPairCompare
 
 namespace GlobalTheory.Chain.ParOfSizes
@@ -21,15 +22,16 @@ variable {R : Ranks} (P : HCParam R) {h₀ : ℝ}
 
 theorem b_le_of_le {i j : Fin R.m} (h : i.1 ≤ j.1) : P.b i ≤ P.b j := by
   rcases h.lt_or_eq with hlt | heq
-  ·
-    have h1 := gap_of_lt P hlt
+  · have h1 := gap_of_lt P hlt
     have h2 := gap_of_le P (le_refl i.1)
     have ht : (0 : ℚ) ≤ R.t := Nat.cast_nonneg _
     linarith
   · exact le_of_eq (congrArg P.b (Fin.ext heq))
 
-theorem le_b_sub (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1, h⟩ - P.b ⟨i, by omega⟩ : ℚ) : ℝ))
-    {i j : Fin R.m} (h : i.1 < j.1) : h₀ ≤ ((P.b j - P.b i : ℚ) : ℝ) := by
+theorem le_b_sub
+    (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1, h⟩ - P.b ⟨i, by omega⟩ : ℚ) : ℝ))
+    {i j : Fin R.m} (h : i.1 < j.1)
+    : h₀ ≤ ((P.b j - P.b i : ℚ) : ℝ) := by
   have hi : i.1 + 1 < R.m := by omega
 
   have hstep := hg i.1 hi
@@ -40,9 +42,10 @@ theorem le_b_sub (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1,
     linarith
   exact hstep.trans (by exact_mod_cast hq)
 
-theorem hermitianParam_oppositeSign_entries_dist_ge_gap (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1, h⟩ - P.b ⟨i, by omega⟩ : ℚ) : ℝ))
-    (j : ℕ) (x y : Idx R j) (hx : sgn R j x = false) (hy : sgn R j y = true) :
-    h₀ ≤ |((val P j x - val P j y : ℚ) : ℝ)| := by
+theorem hermitianParam_oppositeSign_entries_dist_ge_gap
+    (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1, h⟩ - P.b ⟨i, by omega⟩ : ℚ) : ℝ))
+    (j : ℕ) (x y : Idx R j) (hx : sgn R j x = false) (hy : sgn R j y = true)
+    : h₀ ≤ |((val P j x - val P j y : ℚ) : ℝ)| := by
   rw [← Rat.cast_abs]
   rcases x with a | i | a
   · simp [sgn] at hx
@@ -50,8 +53,7 @@ theorem hermitianParam_oppositeSign_entries_dist_ge_gap (hg : ∀ (i : ℕ) (h :
     obtain ⟨hij, hodd⟩ := hx
     have hi1 : i.1 - 1 < R.m := by omega
     rcases y with c | i2 | ⟨⟨i2, hi2⟩, a⟩
-    ·
-      have h1 := neg_b_lt_v P c ⟨i.1 - 1, hi1⟩
+    · have h1 := neg_b_lt_v P c ⟨i.1 - 1, hi1⟩
       have h2 := le_b_sub P hg (i := ⟨i.1 - 1, hi1⟩) (j := i) (show i.1 - 1 < i.1 by omega)
       refine h2.trans (Rat.cast_le.mpr ?_)
       simp only [val]
@@ -71,8 +73,7 @@ theorem hermitianParam_oppositeSign_entries_dist_ge_gap (hg : ∀ (i : ℕ) (h :
       · refine (le_b_sub P hg h2).trans (Rat.cast_le.mpr ?_)
         simp only [val]
         exact le_abs.mpr (Or.inl (by linarith))
-    ·
-      have hi3 : i2.1 + 1 < R.m := by omega
+    · have hi3 : i2.1 + 1 < R.m := by omega
       have g1 := gap_of_lt P (i := i2) (j := ⟨i2.1 + 1, hi3⟩) (show i2.1 < i2.1 + 1 by omega)
       have g2 := le_b_sub P hg (i := ⟨i2.1 + 1, hi3⟩) (j := i) (show i2.1 + 1 < i.1 by omega)
       have ha0 : (0 : ℚ) ≤ (a.1 : ℚ) := Nat.cast_nonneg _
@@ -83,9 +84,12 @@ theorem hermitianParam_oppositeSign_entries_dist_ge_gap (hg : ∀ (i : ℕ) (h :
       exact le_abs.mpr (Or.inl (by linarith))
   · simp [sgn] at hx
 
-theorem le_val_sub (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1, h⟩ - P.b ⟨i, by omega⟩ : ℚ) : ℝ))
-    (j : ℕ) (c : ℚ) (x y : Idx R j) (h : sgn R j x ≠ sgn R j y) :
-    h₀ ≤ |(((val P j x + c) - (val P j y + c) : ℚ) : ℝ)| := by
+theorem le_val_sub
+    (hg : ∀ (i : ℕ) (h : i + 1 < R.m), h₀ ≤ ((P.b ⟨i + 1, h⟩ - P.b ⟨i, by omega⟩ : ℚ) : ℝ))
+    (j : ℕ)
+    (c : ℚ)
+    (x y : Idx R j) (h : sgn R j x ≠ sgn R j y)
+    : h₀ ≤ |(((val P j x + c) - (val P j y + c) : ℚ) : ℝ)| := by
   rw [add_sub_add_right_eq_sub]
   by_cases hx : sgn R j x = false
   · have hy : sgn R j y = true := by

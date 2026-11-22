@@ -11,12 +11,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem detects_mono {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x)
-    {S T : Set F.G₀} (hST : S ⊆ T) (h : Detects k S) : Detects k T :=
-  fun z hz hT => h z hz fun σ hσ => hT σ (hST hσ)
+private theorem detects_mono
+    {l : ℕ} [Fact l.Prime]
+    {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x)
+    {S T : Set F.G₀} (hST : S ⊆ T) (h : Detects k S)
+    : Detects k T := fun z hz hT =>
+  h z hz fun σ hσ => hT σ (hST hσ)
 
-theorem UpperTheory.V.Pa.choice :
-    UpperTheory.V.Pa.Choice := by
+theorem UpperTheory.V.Pa.choice : UpperTheory.V.Pa.Choice := by
   intro l _ F n h x hl hphi hε hN3
   classical
   set S : Set F.G₀ := {σ | σ ∈ F.G' ∧ ∀ i : Fin (h + 1),
@@ -40,5 +42,16 @@ theorem UpperTheory.V.Pa.choice :
   have hD0 : (∏ i, d i) ≠ 0 := Finset.prod_ne_zero_iff.2 (fun i _ => hd0 i)
   choose x' j k' al hext hcard hdet' hal using
     fun i => hd i (∏ i, d i) (Finset.dvd_prod_of_mem d (Finset.mem_univ i)) hD0
-  exact ⟨U.card, sg, x', j, k', al, fun a => (hsgS a).1, hext, fun i => by rw [hcard, hcard],
-    hdet', fun i a => hal i a⟩
+  exact ⟨
+    U.card,
+    sg,
+    x',
+    j,
+    k',
+    al,
+    fun a => (hsgS a).1,
+    hext,
+    fun i => by rw [hcard, hcard],
+    hdet',
+    fun i a => hal i a
+  ⟩

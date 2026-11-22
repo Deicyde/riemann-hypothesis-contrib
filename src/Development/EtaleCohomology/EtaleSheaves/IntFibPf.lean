@@ -59,12 +59,12 @@ theorem IntFib_of : LateralTheory.E.IntPBPf.IntFib := by
   · rw [← IsIntegralHom.SpecMap_iff, hψ]; infer_instance
   · intro q i h
     have hP := isPullback_SpecMap_of_isPushout _ _ _ _ (isPushout_quot A ψ)
-    have hP' : IsPullback (Spec.map (CommRingCat.ofHom
-        (Ideal.Quotient.mk ((IsLocalRing.maximalIdeal A).map ψ.hom))) ≫ X.isoSpec.inv) _ p
-        (LateralTheory.E.t_E2Cut.cpt A) :=
+    have hP' : IsPullback
+        (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk ((IsLocalRing.maximalIdeal A).map ψ.hom)))
+          ≫ X.isoSpec.inv)
+        _ p (LateralTheory.E.t_E2Cut.cpt A) :=
       hP.of_iso (Iso.refl _) X.isoSpec.symm (Iso.refl _) (Iso.refl _) (by simp)
-        ((Category.comp_id _).trans (Category.id_comp _).symm)
-        (by simp [hψ]) (by simp)
+        ((Category.comp_id _).trans (Category.id_comp _).symm) (by simp [hψ]) (by simp)
     rw [← hP'.isoPullback_inv_fst, Functor.map_comp, Functor.map_comp]
     exact eqv_comp _ _ _ (eqv_iso (sch.mapIso hP'.isoPullback.symm) _)
       (eqv_comp _ _ _ h (eqv_iso (sch.mapIso X.isoSpec.symm) _))

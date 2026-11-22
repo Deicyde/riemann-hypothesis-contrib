@@ -74,9 +74,13 @@ theorem growth_of_basic : A0 → B1 := by
   intro hA n ε V _ _ E hm
   obtain ⟨_, _, _, h4⟩ := hA n ε V E hm
   refine ⟨fun p hp => inP_Xp ε p.1 p.2 (by simpa [nc] using hp), fun κ hκ v => ?_, fun f w => ?_⟩
-  · have hterm : ∀ a b : Fin n, actM E (Xp a b) (actM E (Xp a b) v) =
-        ((1 + Complex.I) / 2) ^ 2 • E a b (E a b v) + ((1 + Complex.I) / 2 * ((1 - Complex.I) / 2)) • E a b (E b a v) +
-        ((1 - Complex.I) / 2 * ((1 + Complex.I) / 2)) • E b a (E a b v) + ((1 - Complex.I) / 2) ^ 2 • E b a (E b a v) := by
+  · have hterm
+        : ∀ a b : Fin n,
+          actM E (Xp a b) (actM E (Xp a b) v)
+            = ((1 + Complex.I) / 2) ^ 2 • E a b (E a b v)
+              + ((1 + Complex.I) / 2 * ((1 - Complex.I) / 2)) • E a b (E b a v)
+              + ((1 - Complex.I) / 2 * ((1 + Complex.I) / 2)) • E b a (E a b v)
+              + ((1 - Complex.I) / 2) ^ 2 • E b a (E b a v) := by
       intro a b
       rw [actM_Xp]
       simp only [LinearMap.add_apply, LinearMap.smul_apply, map_add (f := _), map_smul]
@@ -87,14 +91,21 @@ theorem growth_of_basic : A0 → B1 := by
     have s2 := sum_nc_swap ε (fun p => E p.1 p.2 (E p.2 p.1 v))
     simp only [Prod.fst_swap, Prod.snd_swap] at s1 s2
     rw [s1, s2, ← (h4 κ hκ v).2.2]
-    calc _ = (((1 + Complex.I) / 2) ^ 2 + ((1 - Complex.I) / 2) ^ 2) • ∑ p ∈ nc ε, E p.1 p.2 (E p.1 p.2 v) +
-          ((1 + Complex.I) / 2 * ((1 - Complex.I) / 2) + (1 - Complex.I) / 2 * ((1 + Complex.I) / 2)) •
-            ∑ p ∈ nc ε, E p.1 p.2 (E p.2 p.1 v) := by module
+    calc
+      _ = (((1 + Complex.I) / 2) ^ 2 + ((1 - Complex.I) / 2) ^ 2)
+            • ∑ p ∈ nc ε, E p.1 p.2 (E p.1 p.2 v)
+          + ((1 + Complex.I) / 2 * ((1 - Complex.I) / 2)
+              + (1 - Complex.I) / 2 * ((1 + Complex.I) / 2))
+            • ∑ p ∈ nc ε, E p.1 p.2 (E p.2 p.1 v) := by
+        module
       _ = _ := by rw [coef1, coef2]; simp
-  · have key : ∀ p ∈ nc ε, ‖f (actM E (Xp p.1 p.2) w)‖ ^ 2 + ‖f (actM E (Xp p.2 p.1) w)‖ ^ 2 =
-        ‖f (E p.1 p.2 w)‖ ^ 2 + ‖f (E p.2 p.1 w)‖ ^ 2 := by
+  · have key
+        : ∀ p ∈ nc ε,
+          ‖f (actM E (Xp p.1 p.2) w)‖ ^ 2 + ‖f (actM E (Xp p.2 p.1) w)‖ ^ 2
+            = ‖f (E p.1 p.2 w)‖ ^ 2 + ‖f (E p.2 p.1 w)‖ ^ 2 := by
       intro p _
-      simp only [actM_Xp, LinearMap.add_apply, LinearMap.smul_apply, map_add (f := _), map_smul, smul_eq_mul]
+      simp only [actM_Xp, LinearMap.add_apply, LinearMap.smul_apply, map_add (f := _), map_smul,
+        smul_eq_mul]
       exact norm_id _ _
     have h1 := sum_nc_swap ε (fun p => ‖f (actM E (Xp p.1 p.2) w)‖ ^ 2)
     have h2 := sum_nc_swap ε (fun p => ‖f (E p.1 p.2 w)‖ ^ 2)

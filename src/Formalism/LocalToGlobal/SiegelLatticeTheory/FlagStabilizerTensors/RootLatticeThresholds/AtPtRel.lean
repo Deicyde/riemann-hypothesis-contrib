@@ -13,7 +13,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.FlagEEqHyperbolic
 noncomputable section
 
 open scoped Classical
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.BridgeLemma
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.BridgeLemma
 
 namespace Formalism.L2.SG.Pf.FinXP
 
@@ -21,13 +22,14 @@ section Mono
 
 variable {K : Type} [Field K] [StarRing K] {n : ℕ}
 
-def smono (π : Fin n → Fin n) (c ε : Fin n → K) : Matrix (Fin n) (Fin n) K :=
-  fun a b => (if b = π a then c a else 0) * ε b
+def smono (π : Fin n → Fin n) (c ε : Fin n → K) : Matrix (Fin n) (Fin n) K := fun a b =>
+  (if b = π a then c a else 0) * ε b
 
-private theorem matRel_smono_lemma (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a) (c ε : Fin n → K)
-    (A A' : Matrix (Fin n) (Fin n) K) (a b : Fin n) :
-    (Aᴴ * smono π c ε + smono π c ε * A') a b =
-      star (A (π b) a) * (c (π b) * ε b) + c a * ε (π a) * A' (π a) b := by
+private theorem matRel_smono_lemma
+    (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a)
+    (c ε : Fin n → K) (A A' : Matrix (Fin n) (Fin n) K) (a b : Fin n)
+    : (Aᴴ * smono π c ε + smono π c ε * A') a b
+      = star (A (π b) a) * (c (π b) * ε b) + c a * ε (π a) * A' (π a) b := by
   simp only [Matrix.add_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, smono]
   congr 1
   · rw [Finset.sum_eq_single (π b)]
@@ -43,19 +45,24 @@ private theorem matRel_smono_lemma (π : Fin n → Fin n) (hπ : ∀ a, π (π a
     · intro h
       exact absurd (Finset.mem_univ _) h
 
-theorem matRel_smono (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a) (c ε : Fin n → K) (hc : ∀ a, c a ≠ 0)
-    (hε : ∀ a, ε a ≠ 0) (hεs : ∀ (y : Fin n) (h : y.val + 1 < n), ε ⟨y.val + 1, h⟩ = -ε y)
+theorem matRel_smono
+    (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a)
+    (c ε : Fin n → K) (hc : ∀ a, c a ≠ 0) (hε : ∀ a, ε a ≠ 0)
+    (hεs : ∀ (y : Fin n) (h : y.val + 1 < n), ε ⟨y.val + 1, h⟩ = - ε y)
     (hP : ∀ (y : Fin n) (h : y.val + 1 < n),
-      ((π ⟨y.val + 1, h⟩).val + 1 = (π y).val ∧ c ⟨y.val + 1, h⟩ = c y) ∨ (π y).val < (π ⟨y.val + 1, h⟩).val) :
-    MatRel (smono π c ε) := by
+      ((π ⟨y.val + 1, h⟩).val + 1 = (π y).val ∧ c ⟨y.val + 1, h⟩ = c y)
+        ∨ (π y).val < (π ⟨y.val + 1, h⟩).val)
+    : MatRel (smono π c ε) := by
   intro A A' hA hA' hR
   have hE : ∀ a b, star (A (π b) a) * (c (π b) * ε b) + c a * ε (π a) * A' (π a) b = 0 := by
     intro a b
     rw [← matRel_smono_lemma π hπ c ε A A' a b, hR]
     rfl
 
-  have hF1 : ∀ (y : Fin n) (h : y.val + 1 < n), ¬ ((π ⟨y.val + 1, h⟩).val + 1 = (π y).val) →
-      A y ⟨y.val + 1, h⟩ = 0 ∧ A' y ⟨y.val + 1, h⟩ = 0 := by
+  have hF1
+      : ∀ (y : Fin n) (h : y.val + 1 < n),
+        ¬((π ⟨y.val + 1, h⟩).val + 1 = (π y).val)
+          → A y ⟨y.val + 1, h⟩ = 0 ∧ A' y ⟨y.val + 1, h⟩ = 0 := by
     intro y h hn
     have hlt : (π y).val < (π ⟨y.val + 1, h⟩).val := by
       rcases hP y h with h1 | h1
@@ -69,9 +76,11 @@ theorem matRel_smono (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a) (c ε :
       rw [hπ, hA _ _ (Fin.le_def.mpr hlt.le), star_zero, zero_mul, zero_add] at e
       exact (mul_eq_zero.mp e).resolve_left (mul_ne_zero (hc _) (hε _))
 
-  have hF2 : ∀ (y : Fin n) (h : y.val + 1 < n) (hs : (π ⟨y.val + 1, h⟩).val + 1 = (π y).val),
-      A y ⟨y.val + 1, h⟩ = star (A' (π ⟨y.val + 1, h⟩)
-        ⟨(π ⟨y.val + 1, h⟩).val + 1, by have := (π y).isLt; omega⟩) := by
+  have hF2
+      : ∀ (y : Fin n) (h : y.val + 1 < n) (hs : (π ⟨y.val + 1, h⟩).val + 1 = (π y).val),
+        A y ⟨y.val + 1, h⟩
+          = star (A' (π ⟨y.val + 1, h⟩)
+            ⟨(π ⟨y.val + 1, h⟩).val + 1, by have := (π y).isLt; omega⟩) := by
     intro y h hs
     have hcc : c ⟨y.val + 1, h⟩ = c y := by
       rcases hP y h with h1 | h1
@@ -83,13 +92,19 @@ theorem matRel_smono (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a) (c ε :
     rw [hzs] at hεz ⊢
     have e := hE ⟨y.val + 1, h⟩ (π y)
     rw [hπ, hcc, hεz] at e
-    have e2 : c y * ε (π ⟨y.val + 1, h⟩) *
-        (A' (π ⟨y.val + 1, h⟩) (π y) - star (A y ⟨y.val + 1, h⟩)) = 0 := by
+    have e2
+        : c y * ε (π ⟨y.val + 1, h⟩) * (A' (π ⟨y.val + 1, h⟩) (π y) - star (A y ⟨y.val + 1, h⟩))
+          = 0 := by
       linear_combination e
     have h3 := (mul_eq_zero.mp e2).resolve_left (mul_ne_zero (hc y) (hε _))
     rw [sub_eq_zero.mp h3, star_star]
-  obtain ⟨ψ, hψdef⟩ : ∃ ψ : Fin n → Fin n, ∀ y, ψ y = if h : y.val + 1 < n then
-      (if (π ⟨y.val + 1, h⟩).val + 1 = (π y).val then π ⟨y.val + 1, h⟩ else y) else y :=
+  obtain ⟨ψ, hψdef⟩
+      : ∃ ψ : Fin n → Fin n, ∀ y,
+        ψ y
+          = if h : y.val + 1 < n then
+              (if (π ⟨y.val + 1, h⟩).val + 1 = (π y).val then π ⟨y.val + 1, h⟩ else y)
+            else
+              y :=
     ⟨_, fun _ => rfl⟩
   have hψ : Function.Involutive ψ := by
     intro y
@@ -105,8 +120,10 @@ theorem matRel_smono (π : Fin n → Fin n) (hπ : ∀ a, π (π a) = a) (c ε :
         rw [hy, hy]
     · have hy : ψ y = y := by rw [hψdef, dif_neg h]
       rw [hy, hy]
-  have hg : ∀ y : Fin n, (if h : y.val + 1 < n then A y ⟨y.val + 1, h⟩ else 0) =
-      star (if h : (ψ y).val + 1 < n then A' (ψ y) ⟨(ψ y).val + 1, h⟩ else 0) := by
+  have hg
+      : ∀ y : Fin n,
+        (if h : y.val + 1 < n then A y ⟨y.val + 1, h⟩ else 0)
+          = star (if h : (ψ y).val + 1 < n then A' (ψ y) ⟨(ψ y).val + 1, h⟩ else 0) := by
     intro y
     by_cases h : y.val + 1 < n
     · by_cases hs : (π ⟨y.val + 1, h⟩).val + 1 = (π y).val
@@ -129,10 +146,11 @@ section PtStruct
 
 variable {K : Type} [Field K]
 
-theorem pperm_step (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : ℕ) (hi : i + 1 < (bs.map Prod.snd).sum) :
-    (Formalism.L2.SG.PtCell.pperm bs (i + 1) + 1 = Formalism.L2.SG.PtCell.pperm bs i ∧
-      Formalism.L2.SG.PtCell.pval bs (i + 1) = Formalism.L2.SG.PtCell.pval bs i) ∨
-      Formalism.L2.SG.PtCell.pperm bs i < Formalism.L2.SG.PtCell.pperm bs (i + 1) := by
+theorem pperm_step
+    (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : ℕ) (hi : i + 1 < (bs.map Prod.snd).sum)
+    : (Formalism.L2.SG.PtCell.pperm bs (i + 1) + 1 = Formalism.L2.SG.PtCell.pperm bs i
+        ∧ Formalism.L2.SG.PtCell.pval bs (i + 1) = Formalism.L2.SG.PtCell.pval bs i)
+      ∨ Formalism.L2.SG.PtCell.pperm bs i < Formalism.L2.SG.PtCell.pperm bs (i + 1) := by
   induction bs generalizing i with
   | nil => simp at hi
   | cons b bs ih =>
@@ -154,10 +172,12 @@ theorem pperm_step (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : 
         · exact Or.inl ⟨by omega, h5⟩
         · exact Or.inr (by omega)
 
-theorem pinv_step {N : ℕ} (p : Point K N) (y : Fin N) (h : y.val + 1 < N) :
-    ((Formalism.L2.SG.PtCell.pinv p ⟨y.val + 1, h⟩).val + 1 = (Formalism.L2.SG.PtCell.pinv p y).val ∧
-      Formalism.L2.SG.PtCell.pval p.1 (y.val + 1) = Formalism.L2.SG.PtCell.pval p.1 y.val) ∨
-      (Formalism.L2.SG.PtCell.pinv p y).val < (Formalism.L2.SG.PtCell.pinv p ⟨y.val + 1, h⟩).val := by
+theorem pinv_step {N : ℕ} (p : Point K N) (y : Fin N) (h : y.val + 1 < N)
+    : ((Formalism.L2.SG.PtCell.pinv p ⟨y.val + 1, h⟩).val + 1
+          = (Formalism.L2.SG.PtCell.pinv p y).val
+        ∧ Formalism.L2.SG.PtCell.pval p.1 (y.val + 1) = Formalism.L2.SG.PtCell.pval p.1 y.val)
+      ∨ (Formalism.L2.SG.PtCell.pinv p y).val
+        < (Formalism.L2.SG.PtCell.pinv p ⟨y.val + 1, h⟩).val := by
   have := pperm_step p.1 (fun b hb => (p.2.1 b hb).2) y.val (by rw [p.2.2]; exact h)
   simpa only [Formalism.L2.SG.PtCell.pinv] using this
 
@@ -167,11 +187,13 @@ section Cell
 
 variable {K : Type} [Field K] [StarRing K] {r : ℕ}
 
-theorem matRel_ptSign (w : Point K (r + 1)) :
-    MatRel (ptMat w * Matrix.diagonal (fun b : Fin (r + 1) => (-1 : K) ^ (r - b.val))) := by
-  have heq : ptMat w * Matrix.diagonal (fun b : Fin (r + 1) => (-1 : K) ^ (r - b.val)) =
-      smono (Formalism.L2.SG.PtCell.pinv w) (fun a => Formalism.L2.SG.PtCell.pval w.1 a.val)
-        (fun b => (-1 : K) ^ (r - b.val)) := by
+theorem matRel_ptSign (w : Point K (r + 1))
+    : MatRel (ptMat w * Matrix.diagonal (fun b : Fin (r + 1) => (-1 : K) ^ (r - b.val))) := by
+  have heq
+      : ptMat w * Matrix.diagonal (fun b : Fin (r + 1) => (-1 : K) ^ (r - b.val))
+        = smono (Formalism.L2.SG.PtCell.pinv w)
+          (fun a => Formalism.L2.SG.PtCell.pval w.1 a.val)
+          (fun b => (-1 : K) ^ (r - b.val)) := by
     ext a b
     rw [Matrix.mul_diagonal, Formalism.L2.SG.PtCell.ptMat_eq_mono]
     rfl
@@ -179,7 +201,8 @@ theorem matRel_ptSign (w : Point K (r + 1)) :
   apply matRel_smono
   · exact Formalism.L2.SG.PtCell.pinv_pinv w
   · intro a
-    exact Formalism.L2.SG.PtCell.pval_ne w.1 (fun b hb => (w.2.1 b hb).1) a.val (by rw [w.2.2]; exact a.isLt)
+    exact Formalism.L2.SG.PtCell.pval_ne w.1 (fun b hb => (w.2.1 b hb).1) a.val (by
+      rw [w.2.2]; exact a.isLt)
   · intro a
     exact pow_ne_zero _ (neg_ne_zero.mpr one_ne_zero)
   · intro y h
@@ -188,8 +211,9 @@ theorem matRel_ptSign (w : Point K (r + 1)) :
   · intro y h
     exact pinv_step w y h
 
-theorem matRel_conj {n : ℕ} {L M U : Matrix (Fin n) (Fin n) K} (hL : IsLoUni L) (hU : IsUpUni U) (hM : MatRel M) :
-    MatRel (L * M * U) := by
+theorem matRel_conj
+    {n : ℕ} {L M U : Matrix (Fin n) (Fin n) K} (hL : IsLoUni L) (hU : IsUpUni U) (hM : MatRel M)
+    : MatRel (L * M * U) := by
   have hLt : IsUpUni Lᵀ := fun i j => ⟨fun h => (hL j i).1 h, fun h => (hL j i).2 h.symm⟩
   have hLinv : IsLoUni L⁻¹ := by
     have h1 := cinv_inv_up hLt
@@ -208,11 +232,14 @@ theorem matRel_conj {n : ℕ} {L M U : Matrix (Fin n) (Fin n) K} (hL : IsLoUni L
       Matrix.mul_nonsing_inv U hUd, mul_one]
   exact cell_inv K n L⁻¹ (L * M * U) U⁻¹ hLinv (cinv_inv_up hU) (by rw [key]; exact hM)
 
-theorem matRel_of_cell (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (w : Point K (r + 1))
-    (h : IsInCell (ZhatOM Z) w) : MatRel Z := by
+theorem matRel_of_cell
+    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (w : Point K (r + 1)) (h : IsInCell (ZhatOM Z) w)
+    : MatRel Z := by
   obtain ⟨L, U, hL, hU, hZ⟩ := h
-  obtain ⟨D, hDdef⟩ : ∃ D : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
-      D = Matrix.diagonal (fun b : Fin (r + 1) => (-1 : K) ^ (r - b.val)) := ⟨_, rfl⟩
+  obtain ⟨D, hDdef⟩
+      : ∃ D : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
+        D = Matrix.diagonal (fun b : Fin (r + 1) => (-1 : K) ^ (r - b.val)) :=
+    ⟨_, rfl⟩
   have hsq : ∀ k : ℕ, (-1 : K) ^ k * (-1 : K) ^ k = 1 := fun k => by
     rw [← mul_pow, neg_one_mul, neg_neg, one_pow]
   have hDD : D * D = 1 := by
@@ -234,7 +261,8 @@ theorem matRel_of_cell (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (w : Point K (
     rw [(hU i i).2 rfl, mul_one]
     exact hsq _
   have key : Z = L * (ptMat w * D) * (D * U * D) := by
-    calc Z = ZhatOM Z * D := hZD
+    calc
+      Z = ZhatOM Z * D := hZD
       _ = L * ptMat w * U * D := by rw [hZ]
       _ = L * ptMat w * (D * D) * U * D := by rw [hDD, mul_one]
       _ = L * (ptMat w * D) * (D * U * D) := by simp only [mul_assoc]
@@ -257,8 +285,8 @@ theorem Xa_r (F : FlagG S r T) : F.Xa r = F.X := by
   ext i
   simp [i.isLt]
 
-theorem Y_fvec_mem (F : FlagG S r T) {Y : S.V →ₗ[E] S.V} (hY : Y ∈ F.LieN) (ρ : Fin (r + 1)) :
-    Y (F.fvec ρ) ∈ F.Xa ρ.val := by
+theorem Y_fvec_mem (F : FlagG S r T) {Y : S.V →ₗ[E] S.V} (hY : Y ∈ F.LieN) (ρ : Fin (r + 1))
+    : Y (F.fvec ρ) ∈ F.Xa ρ.val := by
   have hz : F.z ∈ perpS S F.X := by
     show ∀ x ∈ F.X, S.hT x F.z = 0
     intro x hx
@@ -287,8 +315,8 @@ theorem Y_fvec_mem (F : FlagG S r T) {Y : S.V →ₗ[E] S.V} (hY : Y ∈ F.LieN)
     rw [hf, hρr, Fin.val_last, Xa_r]
     exact hY.2.2 F.z hz
 
-theorem expand_Xa (F : FlagG S r T) (a : ℕ) {y : S.V} (hy : y ∈ F.Xa a) :
-    y = ∑ i : Fin r, (if i.val < a then F.coefX y i else 0) • F.e i := by
+theorem expand_Xa (F : FlagG S r T) (a : ℕ) {y : S.V} (hy : y ∈ F.Xa a)
+    : y = ∑ i : Fin r, (if i.val < a then F.coefX y i else 0) • F.e i := by
   have hyX : y ∈ Submodule.span E (Set.range F.e) :=
     Submodule.span_mono (Set.image_subset_range _ _) hy
   obtain ⟨l, hl, hly⟩ := (Finsupp.mem_span_image_iff_linearCombination E).mp hy
@@ -306,16 +334,16 @@ theorem expand_Xa (F : FlagG S r T) (a : ℕ) {y : S.V} (hy : y ∈ F.Xa a) :
   · rfl
   · rw [hl i h, zero_smul]
 
-def coefM (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
-  fun d ρ => if hd : d.val < ρ.val then F.coefX (Y (F.fvec ρ)) ⟨d.val, by omega⟩ else 0
+def coefM (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) : Matrix (Fin (r + 1)) (Fin (r + 1)) E := fun d ρ =>
+  if hd : d.val < ρ.val then F.coefX (Y (F.fvec ρ)) ⟨d.val, by omega⟩ else 0
 
 theorem coefM_strict (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) : StrictUp (coefM F Y) := by
   intro a b h
   unfold coefM
   exact dif_neg (Fin.not_lt.mpr h)
 
-theorem coefM_expand (F : FlagG S r T) {Y : S.V →ₗ[E] S.V} (hY : Y ∈ F.LieN) (ρ : Fin (r + 1)) :
-    Y (F.fvec ρ) = ∑ d : Fin (r + 1), coefM F Y d ρ • F.fvec d := by
+theorem coefM_expand (F : FlagG S r T) {Y : S.V →ₗ[E] S.V} (hY : Y ∈ F.LieN) (ρ : Fin (r + 1))
+    : Y (F.fvec ρ) = ∑ d : Fin (r + 1), coefM F Y d ρ • F.fvec d := by
   rw [Fin.sum_univ_castSucc]
   have hlast : coefM F Y (Fin.last r) ρ = 0 := by
     unfold coefM
@@ -342,9 +370,11 @@ theorem coefM_supSum (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) : supSum (coefM F
   rw [dite_eq_left (by simp)]
   rfl
 
-theorem rel_of_matRel (K : Type) [Field K] [Algebra K E]
+theorem rel_of_matRel
+    (K : Type) [Field K] [Algebra K E]
     (htr : ∀ x : E, algebraMap K E (Algebra.trace K E x) = x + star x)
-    (F : FlagG S r T) (F' : FlagG S r T') (h : MatRel (Zhat F F')) : Relevant K F F' := by
+    (F : FlagG S r T) (F' : FlagG S r T') (h : MatRel (Zhat F F'))
+    : Relevant K F F' := by
   intro Y hY
   have hYF : Y ∈ F.LieN := hY.1
   have hYF' : Y ∈ F'.LieN := hY.2
@@ -354,8 +384,9 @@ theorem rel_of_matRel (K : Type) [Field K] [Algebra K E]
     have e := hLie (F.fvec a) (F'.fvec b)
     rw [coefM_expand F hYF a, coefM_expand F' hYF' b] at e
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ, map_smul, LinearMap.sum_apply,
-      LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply] at e
+      simp only [map_sum, map_smulₛₗ, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
+          smul_eq_mul, starRingEnd_apply]
+        at e
     simp only [Matrix.add_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.zero_apply,
       Zhat, brS]
     rw [← e]
@@ -368,10 +399,12 @@ theorem rel_of_matRel (K : Type) [Field K] [Algebra K E]
   apply (algebraMap K E).injective
   rw [htr, htr, star_star, add_comm]
 
-theorem relevant_of_cell (K : Type) [Field K] [Algebra K E]
+theorem relevant_of_cell
+    (K : Type) [Field K] [Algebra K E]
     (htr : ∀ x : E, algebraMap K E (Algebra.trace K E x) = x + star x)
-    (F : FlagG S r T) (F' : FlagG S r T') (w : Point E (r + 1)) (h : IsInCell (ZhatOM (Zhat F F')) w) :
-    Relevant K F F' := by
+    (F : FlagG S r T) (F' : FlagG S r T') (w : Point E (r + 1))
+    (h : IsInCell (ZhatOM (Zhat F F')) w)
+    : Relevant K F F' := by
   exact rel_of_matRel K htr F F' (matRel_of_cell _ w h)
 
 end Geo
@@ -380,8 +413,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 def AtPtRelevantAll : Prop :=
   ∀ (D : D7) (u u' : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E))
-    (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)) (t : Formalism.L2.SG.TermDef.Term D u u' F0 what₂)
-    (w : Point D.host.E (D.R.rS + 1)), t.atPt w → t.relevant
+      (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V))
+      (t : Formalism.L2.SG.TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)),
+    t.atPt w → t.relevant
 
 theorem atPtRelevant_holds : AtPtRelevantAll := by
   intro D u u' F0 what₂ t w h

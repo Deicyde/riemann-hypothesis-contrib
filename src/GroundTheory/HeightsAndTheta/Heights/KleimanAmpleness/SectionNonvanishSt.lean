@@ -17,10 +17,12 @@ universe u v w
 
 def SectionNonvanish.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (pp : Ideal (Poly k N)), pp.IsPrime → (∀ f ∈ pp, ∀ d : ℕ, homogeneousComponent d f ∈ pp) →
-    primeOf (S := k) x ≤ pp → (∃ i, (X i : Poly k N) ∉ pp) →
-    ∀ D : LineBundle k x, D.toSubSystem.Generated →
-    ∃ s ∈ D.toSubSystem.secs, ∃ I, s ∉ (D.toSubSystem.twist (idealSys x pp)).sub I
+      (pp : Ideal (Poly k N)),
+    pp.IsPrime → (∀ f ∈ pp, ∀ d : ℕ, homogeneousComponent d f ∈ pp) → primeOf (S := k) x ≤ pp
+      → (∃ i, (X i : Poly k N) ∉ pp)
+      → ∀ D : LineBundle k x,
+        D.toSubSystem.Generated
+          → ∃ s ∈ D.toSubSystem.secs, ∃ I, s ∉ (D.toSubSystem.twist (idealSys x pp)).sub I
 
 end
 

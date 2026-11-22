@@ -6,33 +6,48 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th GlobalTheory.GalOfCusp
+open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV
+  UpperTheory.V.Th GlobalTheory.GalOfCusp
 
-private theorem red_mul' {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O) :
-    red m (A * B) = red m A * red m B := Matrix.map_mul
+private theorem red_mul'
+    {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O)
+    : red m (A * B) = red m A * red m B :=
+  Matrix.map_mul
 
-private theorem red_sub' {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O) :
-    red m (A - B) = red m A - red m B := by
+private theorem red_sub'
+    {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O)
+    : red m (A - B) = red m A - red m B := by
   ext i j
   simp [red]
 
-private theorem red_surj {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (Y : Mm O n m) : ∃ Y', red m Y' = Y := by
+private theorem red_surj {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (Y : Mm O n m)
+    : ∃ Y', red m Y' = Y := by
   choose Y' hY' using fun i j => Ideal.Quotient.mk_surjective (Y i j)
   exact ⟨Matrix.of Y', by ext i j; exact hY' i j⟩
 
-private theorem red_add' {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O) :
-    red m (A + B) = red m A + red m B := by
+private theorem red_add'
+    {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O)
+    : red m (A + B) = red m A + red m B := by
   ext i j
   simp [red]
 
-theorem UpperTheory.V.Th.h0GO :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ) (y : Pt G0.frame O n), l ≠ 2 → ∃ C : ℕ, ∀ m, {Y : Mm O n m | red m y.P * Y = -(Yᵀ * red m y.P) ∧ ∀ g, y.ρ0 m g * Y * y.ρ0 m g⁻¹ = Y}.ncard ≤ Nat.card (ResidueField O) ^ C := by
+theorem UpperTheory.V.Th.h0GO
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (O : Type) [CommRing O] [IsDomain O]
+        [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ) (y : Pt G0.frame O n),
+      l ≠ 2
+        → ∃ C : ℕ, ∀ m,
+          {Y : Mm O n m | red m y.P * Y = -(Yᵀ * red m y.P) ∧ ∀ g, y.ρ0 m g * Y * y.ρ0 m g⁻¹ = Y}.ncard
+            ≤ Nat.card (ResidueField O) ^ C := by
   intro l _ L G0 O _ _ _ hO _ n y hl
   have h2u : IsUnit (2 : O) := (omFacts l O).1 hl
-  let Φ : Option G0.G₀ → Matrix (Fin n) (Fin n) O →ₗ[O] Matrix (Fin n) (Fin n) O := fun s => s.elim
-    (LinearMap.mulLeft O (y.P : Matrix (Fin n) (Fin n) O) + (LinearMap.mulRight O (y.P : Matrix (Fin n) (Fin n) O)).comp
-      (Matrix.transposeLinearEquiv (Fin n) (Fin n) O O).toLinearMap)
-    fun g => (LinearMap.mulRight O (mat y.ρ g⁻¹)).comp (LinearMap.mulLeft O (mat y.ρ g)) - LinearMap.id
+  let Φ : Option G0.G₀ → Matrix (Fin n) (Fin n) O →ₗ[O] Matrix (Fin n) (Fin n) O := fun s =>
+    s.elim
+      (LinearMap.mulLeft O (y.P : Matrix (Fin n) (Fin n) O)
+        + (LinearMap.mulRight O (y.P : Matrix (Fin n) (Fin n) O)).comp
+          (Matrix.transposeLinearEquiv (Fin n) (Fin n) O O).toLinearMap)
+      fun g =>
+        (LinearMap.mulRight O (mat y.ρ g⁻¹)).comp (LinearMap.mulLeft O (mat y.ρ g)) - LinearMap.id
   have hΦ0 : ∀ Y, Φ none Y = (y.P : Matrix (Fin n) (Fin n) O) * Y + Yᵀ * y.P := fun _ => rfl
   have hΦ : ∀ g Y, Φ (some g) Y = mat y.ρ g * Y * mat y.ρ g⁻¹ - Y := fun _ _ => rfl
   obtain ⟨C, hC⟩ := fixCnt l O n _ Φ

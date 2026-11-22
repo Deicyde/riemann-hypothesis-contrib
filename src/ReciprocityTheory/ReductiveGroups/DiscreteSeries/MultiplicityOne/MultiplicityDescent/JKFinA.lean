@@ -21,23 +21,33 @@ open scoped InnerProductSpace
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1.Down.KF
 
-open ReciprocityTheory.ChartRestriction.DS.Mult1 Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ReciprocityTheory.ChartRestriction.DS.Mult1.BeEquiv
+open ReciprocityTheory.ChartRestriction.DS.Mult1 Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ReciprocityTheory.ChartRestriction.DS.Mult1.BeEquiv
 
 section abstract
 
 variable {K : Type} [Group K] [TopologicalSpace K]
 
 def Fin2 (α : C(K, ℂ)) : Prop :=
-  ∃ (ι : Type) (_ : Fintype ι) (a : ι → K → ℂ) (β : ι → C(K, ℂ)), ∀ k₀ κ, α (k₀ * κ) = ∑ i, a i k₀ * β i κ
+  ∃ (ι : Type) (_ : Fintype ι) (a : ι → K → ℂ) (β : ι → C(K, ℂ)), ∀ k₀ κ,
+    α (k₀ * κ) = ∑ i, a i k₀ * β i κ
 
 def finAlg (K : Type) [Group K] [TopologicalSpace K] : StarSubalgebra ℂ C(K, ℂ) where
   carrier := {α | Fin2 α}
   mul_mem' := by
     rintro α α' ⟨ι, _, a, β, h⟩ ⟨ι', _, a', β', h'⟩
-    refine ⟨ι × ι', inferInstance, fun i k => a i.1 k * a' i.2 k, fun i => β i.1 * β' i.2, fun k₀ κ => ?_⟩
+    refine ⟨
+      ι × ι',
+      inferInstance,
+      fun i k => a i.1 k * a' i.2 k,
+      fun i => β i.1 * β' i.2,
+      fun k₀ κ => ?_
+    ⟩
     rw [ContinuousMap.mul_apply, h, h', Finset.sum_mul_sum, Fintype.sum_prod_type]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    rw [ContinuousMap.mul_apply]; ring
+    rw [ContinuousMap.mul_apply]
+    ring
   add_mem' := by
     rintro α α' ⟨ι, _, a, β, h⟩ ⟨ι', _, a', β', h'⟩
     refine ⟨ι ⊕ ι', inferInstance, Sum.elim a a', Sum.elim β β', fun k₀ κ => ?_⟩

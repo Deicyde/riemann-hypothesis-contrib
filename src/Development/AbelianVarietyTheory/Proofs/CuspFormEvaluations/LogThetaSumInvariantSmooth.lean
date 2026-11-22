@@ -18,7 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.Exists
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.I2 ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.I2
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
 open scoped ContDiff
 
 namespace GlobalTheory.ThetaLogSum
@@ -27,9 +28,11 @@ open GlobalTheory.LevelTupleSum
 
 variable {E : Type} [Field E] [NumberField E] {r : ℕ}
 
-theorem gen_map {Λ : Submodule (𝓞 E) (Fin r → E)} (e : (Fin r → E) ≃ₗ[E] (Fin r → E))
-    (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ) {t : Fin r → Fin r → E} (h : Gen Λ t) :
-    Gen Λ fun j => e (t j) := by
+theorem gen_map
+    {Λ : Submodule (𝓞 E) (Fin r → E)}
+    (e : (Fin r → E) ≃ₗ[E] (Fin r → E)) (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ)
+    {t : Fin r → Fin r → E} (h : Gen Λ t)
+    : Gen Λ fun j => e (t j) := by
   refine ⟨fun j => ?_, fun u hu => ?_⟩
   · rw [← map_smul]
     exact (he _).1 (h.1 j)
@@ -37,14 +40,16 @@ theorem gen_map {Λ : Submodule (𝓞 E) (Fin r → E)} (e : (Fin r → E) ≃�
     refine ⟨c, e y, (he _).1 hy, ?_⟩
     have := congrArg e h2
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [LinearEquiv.apply_symm_apply, map_add (f := _), map_sum, map_smul] using this
+    simpa only [LinearEquiv.apply_symm_apply, map_add (f := _), map_sum, map_smul] using this
 
-theorem exists_reps_map {Λ : Submodule (𝓞 E) (Fin r → E)} (e : (Fin r → E) ≃ₗ[E] (Fin r → E))
-    (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ) (𝒯 : Finset (Fin r → Fin r → E)) (h1 : ∀ t ∈ 𝒯, Gen Λ t)
-    (h2 : ∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯 ∧ ∀ j, t j - t' j ∈ Λ) :
-    ∃ 𝒯' : Finset (Fin r → Fin r → E), (∀ t ∈ 𝒯', Gen Λ t) ∧
-      (∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯' ∧ ∀ j, t j - t' j ∈ Λ) ∧
-      ∀ f : (Fin r → Fin r → E) → ℝ, ∑ t ∈ 𝒯', f t = ∑ t ∈ 𝒯, f fun j => e (t j) := by
+theorem exists_reps_map
+    {Λ : Submodule (𝓞 E) (Fin r → E)}
+    (e : (Fin r → E) ≃ₗ[E] (Fin r → E)) (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ)
+    (𝒯 : Finset (Fin r → Fin r → E))
+    (h1 : ∀ t ∈ 𝒯, Gen Λ t) (h2 : ∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯 ∧ ∀ j, t j - t' j ∈ Λ)
+    : ∃ 𝒯' : Finset (Fin r → Fin r → E),
+      (∀ t ∈ 𝒯', Gen Λ t) ∧ (∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯' ∧ ∀ j, t j - t' j ∈ Λ)
+        ∧ ∀ f : (Fin r → Fin r → E) → ℝ, ∑ t ∈ 𝒯', f t = ∑ t ∈ 𝒯, f fun j => e (t j) := by
   let ι : (Fin r → Fin r → E) ↪ (Fin r → Fin r → E) :=
     ⟨fun t j => e (t j), fun t t' h => funext fun j => e.injective (congrFun h j)⟩
   refine ⟨𝒯.map ι, fun t ht => ?_, fun t ht => ?_, fun f => Finset.sum_map _ _ _⟩
@@ -64,16 +69,18 @@ theorem exists_reps_map {Λ : Submodule (𝓞 E) (Fin r → E)} (e : (Fin r → 
 
 variable [IsCMField E]
 
-theorem contDiffOn_cpt (X : Data E r) (x0 : Frame X.Ψ r) {F : Frame X.Ψ r → ℂ}
-    (hF : DifferentiableOn ℂ F X.dom) : ContDiffOn ℝ ∞ (fun z => F (cpt X x0 z)) (OmF X x0) := by
+theorem contDiffOn_cpt
+    (X : Data E r) (x0 : Frame X.Ψ r) {F : Frame X.Ψ r → ℂ} (hF : DifferentiableOn ℂ F X.dom)
+    : ContDiffOn ℝ ∞ (fun z => F (cpt X x0 z)) (OmF X x0) := by
   have hc : Differentiable ℂ (cpt X x0) :=
-    differentiable_pi.2 fun τ => differentiable_pi.2 fun a => differentiable_pi.2 fun b =>
-      (IW.cpt_entry_cd X x0 τ a b).differentiable (by simp)
-  exact (ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn _ _ _ (ExF.isOpen_OmF X x0)
-    (hF.comp hc.differentiableOn fun z hz => hz)).restrict_scalars ℝ
+    differentiable_pi.2 fun τ =>
+      differentiable_pi.2 fun a =>
+        differentiable_pi.2 fun b => (IW.cpt_entry_cd X x0 τ a b).differentiable (by simp)
+  exact (ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn _ _ _
+    (ExF.isOpen_OmF X x0) (hF.comp hc.differentiableOn fun z hz => hz)).restrict_scalars ℝ
 
-theorem contDiffOn_nfac (X : Data E r) (x0 : Frame X.Ψ r) (la : Wt X.Ψ r) :
-    ContDiffOn ℝ ∞ (fun z => X.nfac la (cpt X x0 z)) (OmF X x0) := by
+theorem contDiffOn_nfac (X : Data E r) (x0 : Frame X.Ψ r) (la : Wt X.Ψ r)
+    : ContDiffOn ℝ ∞ (fun z => X.nfac la (cpt X x0 z)) (OmF X x0) := by
   have h : ContDiffOn ℝ ∞ (fun z => Real.exp (phla X la (cpt X x0 z) / (-2))) (OmF X x0) :=
     fun z hz => ((IW.phla_cpt_cdAt X x0 hz la).div_const _).exp.contDiffWithinAt
   refine h.congr fun z hz => ?_

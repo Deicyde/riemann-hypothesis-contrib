@@ -10,7 +10,10 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 noncomputable section
 namespace GlobalTheory.HeightCounting.FitRho
 open Formalism.L2.NR
@@ -90,10 +93,22 @@ end GlobalTheory.HeightCounting.FitRho
 namespace GlobalTheory.HeightCounting
 set_option maxHeartbeats 4000000 in
 set_option synthInstance.maxHeartbeats 400000 in
-theorem nRhoTied_withLoc_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D' : D7) (b : _root_.GlobalTheory.HeightCounting.NormChoiceConstructed hL D'), (∀ x : b.D.LL0, star (x : b.D.what₂.LL) ∈ b.D.LL0) → (∀ j g, ∃ z : ℤ, eExp b.D j g = z) → (∀ v, v ∈ placesOver b.D.host.E b.D.host.pde ∨ v ∈ placesOver b.D.host.E b.D.host.pde' → IsSplitPl b.D.host v) → GlobalTheory.RowTie.ChebSplit b.D.nd → TypesOpen (withLoc b.L) b.jE → NR.NRhoTied (withLoc b.L) := by
+theorem nRhoTied_withLoc_alt
+    : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D' : D7)
+        (b : _root_.GlobalTheory.HeightCounting.NormChoiceConstructed hL D'),
+      (∀ x : b.D.LL0, star (x : b.D.what₂.LL) ∈ b.D.LL0) → (∀ j g, ∃ z : ℤ, eExp b.D j g = z)
+        → (∀ v,
+          v ∈ placesOver b.D.host.E b.D.host.pde ∨ v ∈ placesOver b.D.host.E b.D.host.pde'
+            → IsSplitPl b.D.host v)
+        → GlobalTheory.RowTie.ChebSplit b.D.nd → TypesOpen (withLoc b.L) b.jE
+        → NR.NRhoTied (withLoc b.L) := by
   intro hL D' b _ _ _ hcheb hT
-  exact ⟨hT.rbarSS, hT.rbar, fun hP hG hC hη a s hs hj =>
-    _root_.GlobalTheory.HeightCounting.FitRho.rhoS_withLoc_alt hL D' b hcheb hP hG hC hη a s hs hj⟩
+  exact ⟨
+    hT.rbarSS,
+    hT.rbar,
+    fun hP hG hC hη a s hs hj =>
+      _root_.GlobalTheory.HeightCounting.FitRho.rhoS_withLoc_alt hL D' b hcheb hP hG hC hη a s hs hj
+  ⟩
 end GlobalTheory.HeightCounting
 end
 end

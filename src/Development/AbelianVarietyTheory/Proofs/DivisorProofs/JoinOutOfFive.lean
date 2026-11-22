@@ -16,6 +16,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatticeValue
 
 @[expose] public section
 
-theorem GlobalTheory.JoinFun.joinOut_of_five : GlobalTheory.Published.EllipticMainTheoremCM → GlobalTheory.Published.HilbertClassFieldJ → GlobalTheory.Published.SiegelKlingenDeligneRibet → GlobalTheory.Published.PartialZetaFunctionalEquation → GlobalTheory.Published.HeckeTateFunctionalEquation → GlobalTheory.Mem.LiteralAutomorphy.JoinOut :=
-  fun hEM hHJ hSK hPZ hHT => GlobalTheory.T.toricPeriodZetaStatements_of_jetIntegrality_algebraicity hEM hHJ hSK hPZ hHT (GlobalTheory.T.cmLatticeDividedPowerJetIntegrality_of_ellipticCM hSK hPZ hHJ hEM)
-    (GlobalTheory.T.latticeValueIsAlgebraic_of_ellipticCM_theorems hSK hPZ hHJ hEM) (GlobalTheory.T.latticeValueConjugation_of_ellipticCM_theorems hSK hPZ hHJ hEM)
+theorem GlobalTheory.JoinFun.joinOut_of_five
+    : GlobalTheory.Published.EllipticMainTheoremCM → GlobalTheory.Published.HilbertClassFieldJ
+      → GlobalTheory.Published.SiegelKlingenDeligneRibet
+      → GlobalTheory.Published.PartialZetaFunctionalEquation
+      → GlobalTheory.Published.HeckeTateFunctionalEquation
+      → GlobalTheory.Mem.LiteralAutomorphy.JoinOut := fun hEM hHJ hSK hPZ hHT =>
+  GlobalTheory.T.toricPeriodZetaStatements_of_jetIntegrality_algebraicity hEM hHJ hSK hPZ hHT
+    (GlobalTheory.T.cmLatticeDividedPowerJetIntegrality_of_ellipticCM hSK hPZ hHJ hEM)
+    (GlobalTheory.T.latticeValueIsAlgebraic_of_ellipticCM_theorems hSK hPZ hHJ hEM)
+    (GlobalTheory.T.latticeValueConjugation_of_ellipticCM_theorems hSK hPZ hHJ hEM)

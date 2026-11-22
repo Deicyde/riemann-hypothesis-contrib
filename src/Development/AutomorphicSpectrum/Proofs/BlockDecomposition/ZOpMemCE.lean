@@ -28,10 +28,11 @@ section Good
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
 def Good (T : (Mat n → V) → (Mat n → V)) : Prop :=
-  (∀ f, ContDiffOn ℝ ∞ f (GLs n) → ContDiffOn ℝ ∞ (T f) (GLs n)) ∧
-  (∀ (f h : Mat n → V) (a b : ℂ), ContDiffOn ℝ ∞ f (GLs n) → ContDiffOn ℝ ∞ h (GLs n) →
-    ∀ x ∈ GLs n, T (fun y => a • f y + b • h y) x = a • T f x + b • T h x) ∧
-  (∀ f f', Set.EqOn f f' (GLs n) → Set.EqOn (T f) (T f') (GLs n))
+  (∀ f, ContDiffOn ℝ ∞ f (GLs n) → ContDiffOn ℝ ∞ (T f) (GLs n))
+    ∧ (∀ (f h : Mat n → V) (a b : ℂ),
+      ContDiffOn ℝ ∞ f (GLs n) → ContDiffOn ℝ ∞ h (GLs n)
+        → ∀ x ∈ GLs n, T (fun y => a • f y + b • h y) x = a • T f x + b • T h x)
+    ∧ (∀ f f', Set.EqOn f f' (GLs n) → Set.EqOn (T f) (T f') (GLs n))
 
 theorem good_id : Good (n := n) (V := V) (fun f => f) :=
   ⟨fun _ h => h, fun _ _ _ _ _ _ _ _ => rfl, fun _ _ h => h⟩
@@ -45,8 +46,7 @@ theorem good_Rd (hR : RCalc) (X : Mat n) : Good (n := n) (V := V) (Rd X) := by
     have hn : GLs n ∈ nhds x := (isOpen_GLs n).mem_nhds hx
     have df : DifferentiableAt ℝ f x := (hf.contDiffAt hn).differentiableAt (by simp)
     have dh : DifferentiableAt ℝ h x := (hh.contDiffAt hn).differentiableAt (by simp)
-    have key : HasFDerivAt (fun y => a • f y + b • h y)
-        (a • fderiv ℝ f x + b • fderiv ℝ h x) x :=
+    have key : HasFDerivAt (fun y => a • f y + b • h y) (a • fderiv ℝ f x + b • fderiv ℝ h x) x :=
       (df.hasFDerivAt.const_smul a).add (dh.hasFDerivAt.const_smul b)
     simp only [Rd]
     rw [key.fderiv]
@@ -57,8 +57,8 @@ theorem good_Rd (hR : RCalc) (X : Mat n) : Good (n := n) (V := V) (Rd X) := by
     simp only [Rd]
     rw [this.fderiv_eq]
 
-theorem good_comp {T T' : (Mat n → V) → (Mat n → V)} (hT : Good T) (hT' : Good T') :
-    Good (fun f => T (T' f)) := by
+theorem good_comp {T T' : (Mat n → V) → (Mat n → V)} (hT : Good T) (hT' : Good T')
+    : Good (fun f => T (T' f)) := by
   refine ⟨fun f hf => hT.1 _ (hT'.1 f hf), ?_, fun f f' hE => hT.2.2 _ _ (hT'.2.2 f f' hE)⟩
   intro f h a b hf hh x hx
   have e : Set.EqOn (T' (fun y => a • f y + b • h y)) (fun y => a • T' f y + b • T' h y) (GLs n) :=
@@ -67,8 +67,8 @@ theorem good_comp {T T' : (Mat n → V) → (Mat n → V)} (hT : Good T) (hT' : 
   rw [hT.2.2 _ _ e hx]
   exact hT.2.1 _ _ a b (hT'.1 f hf) (hT'.1 h hh) x hx
 
-theorem good_add {T T' : (Mat n → V) → (Mat n → V)} (hT : Good T) (hT' : Good T') :
-    Good (fun f => T f + T' f) := by
+theorem good_add {T T' : (Mat n → V) → (Mat n → V)} (hT : Good T) (hT' : Good T')
+    : Good (fun f => T f + T' f) := by
   refine ⟨fun f hf => (hT.1 f hf).add (hT'.1 f hf), ?_, ?_⟩
   · intro f h a b hf hh x hx
     simp only [Pi.add_apply]
@@ -78,8 +78,8 @@ theorem good_add {T T' : (Mat n → V) → (Mat n → V)} (hT : Good T) (hT' : G
     simp only [Pi.add_apply]
     rw [hT.2.2 f f' hE hx, hT'.2.2 f f' hE hx]
 
-theorem good_smul (c : ℂ) {T : (Mat n → V) → (Mat n → V)} (hT : Good T) :
-    Good (fun f => c • T f) := by
+theorem good_smul (c : ℂ) {T : (Mat n → V) → (Mat n → V)} (hT : Good T)
+    : Good (fun f => c • T f) := by
   refine ⟨fun f hf => (hT.1 f hf).const_smul c, ?_, ?_⟩
   · intro f h a b hf hh x hx
     simp only [Pi.smul_apply]
@@ -89,8 +89,8 @@ theorem good_smul (c : ℂ) {T : (Mat n → V) → (Mat n → V)} (hT : Good T) 
     simp only [Pi.smul_apply]
     rw [hT.2.2 f f' hE hx]
 
-theorem good_sum {ι : Type} (s : Finset ι) (T : ι → (Mat n → V) → (Mat n → V))
-    (h : ∀ i, Good (T i)) : Good (fun f => ∑ i ∈ s, T i f) := by
+theorem good_sum {ι : Type} (s : Finset ι) (T : ι → (Mat n → V) → (Mat n → V)) (h : ∀ i, Good (T i))
+    : Good (fun f => ∑ i ∈ s, T i f) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using good_zero
@@ -101,21 +101,22 @@ theorem good_sum {ι : Type} (s : Finset ι) (T : ι → (Mat n → V) → (Mat 
 theorem good_Eu (hR : RCalc) (s : Bool) (a b : Fin n) : Good (n := n) (V := V) (Eu s a b) :=
   good_smul (1 / 2 : ℂ) (good_add (good_Rd hR _) (good_smul _ (good_Rd hR _)))
 
-theorem good_Epow (hR : RCalc) (s : Bool) (m : ℕ) :
-    ∀ a b : Fin n, Good (n := n) (V := V) (Epow s m a b) := by
+theorem good_Epow (hR : RCalc) (s : Bool) (m : ℕ)
+    : ∀ a b : Fin n, Good (n := n) (V := V) (Epow s m a b) := by
   induction m with
   | zero =>
     intro a b
     by_cases h : a = b
-    · have e : Epow (n := n) (V := V) s 0 a b = fun f => f := by
-        funext f; simp [Epow, h]
-      rw [e]; exact good_id
-    · have e : Epow (n := n) (V := V) s 0 a b = fun _ => 0 := by
-        funext f; simp [Epow, h]
-      rw [e]; exact good_zero
+    · have e : Epow (n := n) (V := V) s 0 a b = fun f => f := by funext f; simp [Epow, h]
+      rw [e]
+      exact good_id
+    · have e : Epow (n := n) (V := V) s 0 a b = fun _ => 0 := by funext f; simp [Epow, h]
+      rw [e]
+      exact good_zero
   | succ m ih =>
     intro a b
-    exact good_sum Finset.univ (fun c f => Eu s a c (Epow s m c b f))
+    exact good_sum Finset.univ
+      (fun c f => Eu s a c (Epow s m c b f))
       (fun c => good_comp (good_Eu hR s a c) (ih c b))
 
 theorem good_gel (hR : RCalc) (s : Bool) (m : ℕ) : Good (n := n) (V := V) (gel s m) :=

@@ -10,7 +10,8 @@ public import Formalism.LocalToGlobal.KernelLattices.LateralTheory
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.TaylorLogMetric Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G
+  Formalism.MainNotions.TaylorLogMetric Classical
 
 namespace GlobalTheory.InertCompare
 
@@ -33,7 +34,8 @@ theorem rhoH_apply (τ : D.what₂.Tau) (x : D.host.E) : rhoH D lam τ x = lamC 
 theorem coe_rhoH (τ : D.what₂.Tau) : (rhoH D lam τ : D.host.E → ℂ_[l]) = tauEmb D lam τ :=
   funext fun x => rhoH_apply D lam τ x
 
-def rhoC (τ : D.what₂.Tau) : D.host.E →+* ℂ_[l] := (rhoH D lam τ).comp (D.host.conj : D.host.E →+* D.host.E)
+def rhoC (τ : D.what₂.Tau) : D.host.E →+* ℂ_[l] :=
+  (rhoH D lam τ).comp (D.host.conj : D.host.E →+* D.host.E)
 
 end Emb
 

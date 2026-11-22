@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG UpperTheory.Gal.W2.Seed
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
+  UpperTheory.Gal.W2.Seed
 open UpperTheory.Gal.CertificateRingHomMap (GUf Gam0 AfQ Plc sim mat comp rat lev ZU)
 open scoped TensorProduct Classical
 
@@ -74,7 +76,8 @@ private lemma H_cj {E : Type} [Field E] [NumberField E] [IsCMField E] (A : Arith
   funext i
   exact hd_cj A n i
 
-private abbrev Dm {E : Type} [Field E] [NumberField E] [IsCMField E] (A : Arith E) (n : ℕ) : Matrix (Fin n) (Fin n) E :=
+private abbrev Dm {E : Type} [Field E] [NumberField E] [IsCMField E] (A : Arith E) (n : ℕ)
+    : Matrix (Fin n) (Fin n) E :=
   Matrix.diagonal fun i => ((A.dg n i : 𝓞 E) : E)
 
 private lemma H_eq {E : Type} [Field E] [NumberField E] [IsCMField E] (A : Arith E) (n : ℕ) :
@@ -98,15 +101,21 @@ section
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {A : Arith E} {n p : ℕ} [Fact p.Prime]
 
 private def βS (S : Setup A n p) : S.G.Cˣ :=
-  (⟨Dm A n, Matrix.diagonal fun i => ((A.dg n i : 𝓞 E) : E)⁻¹, by
-      rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-      congr 1
-      funext i
-      exact mul_inv_cancel₀ (dg_ne A n i), by
-      rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-      congr 1
-      funext i
-      exact inv_mul_cancel₀ (dg_ne A n i)⟩ : (Matrix (Fin n) (Fin n) E)ˣ)
+  (⟨
+     Dm A n,
+     Matrix.diagonal fun i => ((A.dg n i : 𝓞 E) : E)⁻¹,
+     by
+       rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+       congr 1
+       funext i
+       exact mul_inv_cancel₀ (dg_ne A n i),
+     by
+       rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+       congr 1
+       funext i
+       exact inv_mul_cancel₀ (dg_ne A n i)
+   ⟩
+    : (Matrix (Fin n) (Fin n) E)ˣ)
 
 private lemma hU (A : Arith E) (n : ℕ) : IsUnit (Dm A n) := by
   rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_diagonal]
@@ -169,9 +178,11 @@ private lemma mem_iff (S : Setup A n p) (y : GL (Fin n) E × ℚˣ) : y ∈ Glob
 private noncomputable def xOf {S : Setup A n p} (T : Tr S) : (AfP p ⊗[ℚ] S.G.C)ˣ :=
   Units.map (RingHom.toMonoidHom T.μ.symm.toRingHom) (GeneralLinearGroup.map T.Φ T.a)
 
-private noncomputable def xv {S : Setup A n p} (T : Tr S) : AfP p ⊗[ℚ] Matrix (Fin n) (Fin n) E := (xOf T).val
+private noncomputable def xv {S : Setup A n p} (T : Tr S) : AfP p ⊗[ℚ] Matrix (Fin n) (Fin n) E :=
+  (xOf T).val
 
-private noncomputable def xiv {S : Setup A n p} (T : Tr S) : AfP p ⊗[ℚ] Matrix (Fin n) (Fin n) E := ((xOf T)⁻¹).val
+private noncomputable def xiv {S : Setup A n p} (T : Tr S) : AfP p ⊗[ℚ] Matrix (Fin n) (Fin n) E :=
+  ((xOf T)⁻¹).val
 
 private lemma traceMap_unipotent {S : Setup A n p} (T : Tr S) : T.μ (xv T) = T.a.val.map T.Φ :=
   T.μ.apply_symm_apply _
@@ -234,8 +245,13 @@ private lemma emb_eq {S : Setup A n p} (T : Tr S) (hx : Triv S.G (AfP p) (βS S 
     exact RingHom.congr_fun (Subsingleton.elim (algebraMap ℚ (AfP p)) (T.ρ.comp (algebraMap ℚ AfQ))) _
 
 end
-theorem UpperTheory.Gal.W2.Seed.pStdForm2 :
-    MuStar → StdForm2 := by
+theorem UpperTheory.Gal.W2.Seed.pStdForm2 : MuStar → StdForm2 := by
   intro hM E _ _ _ A n p _ S T
   have hx := triv_xOf_of_muStar hM T
-  refine ⟨⟨βS S, βS_sym S, ⟨xOf T, 1, hx⟩, βS_pos S⟩, xOf T, hx, fun y => mem_iff S y, fun y h h' => emb_eq T hx y h h'⟩
+  refine ⟨
+    ⟨βS S, βS_sym S, ⟨xOf T, 1, hx⟩, βS_pos S⟩,
+    xOf T,
+    hx,
+    fun y => mem_iff S y,
+    fun y h h' => emb_eq T hx y h h'
+  ⟩

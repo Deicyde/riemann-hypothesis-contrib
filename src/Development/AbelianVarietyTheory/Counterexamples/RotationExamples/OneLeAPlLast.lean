@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.ThetaKern
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 
 namespace GlobalTheory.ThetaFiresProbe
 
@@ -22,7 +25,9 @@ theorem labE_fixed (τ : D.what₂.Tau) : labE D.what₂.embLL τ = tauE D τ :=
   exact DFunLike.congr_fun D.embE_φ₀ (D.host.sigmaOf (D.eTau τ).1 x)
 
 theorem lab_fixed (ρ : D.what₂.Tau) : lab D.what₂.embLL ρ = ρ := by
-  have h : ∃ τ, labE D.what₂.embLL τ = tauE D ρ ∨ labE D.what₂.embLL τ = (starRingEnd ℂ).comp (tauE D ρ) :=
+  have h
+      : ∃ τ,
+        labE D.what₂.embLL τ = tauE D ρ ∨ labE D.what₂.embLL τ = (starRingEnd ℂ).comp (tauE D ρ) :=
     ⟨ρ, Or.inl (labE_fixed ρ)⟩
   unfold lab
   rw [dite_eq_left h]
@@ -42,8 +47,9 @@ theorem lab_fixed (ρ : D.what₂.Tau) : lab D.what₂.embLL ρ = ρ := by
     simp at a
     linarith
 
-theorem parAt_fixed (W : HSp D) (ρ : D.what₂.Tau) :
-    parAt W D.what₂.embLL ρ = Formalism.L2.NTheta.holPar _ _ (Formalism.L2.NTheta.wtOf D W ρ) := by
+theorem parAt_fixed (W : HSp D) (ρ : D.what₂.Tau)
+    : parAt W D.what₂.embLL ρ
+      = Formalism.L2.NTheta.holPar _ _ (Formalism.L2.NTheta.wtOf D W ρ) := by
   unfold parAt kapAt
   rw [lab_fixed, if_pos (labE_fixed ρ)]
   rfl

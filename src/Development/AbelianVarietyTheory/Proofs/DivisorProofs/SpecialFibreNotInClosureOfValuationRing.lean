@@ -14,11 +14,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.WeilIntegral
 
-
 set_option autoImplicit false in
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.WeilIntegral.isAlgebraic_of_etale (S B : Type) [CommRing S] [IsDomain S] [CommRing B] [Algebra S B]
-    [Algebra.Etale S B] (f : B) : IsAlgebraic S f := by
+theorem _root_.GlobalTheory.WeilIntegral.isAlgebraic_of_etale
+    (S B : Type) [CommRing S] [IsDomain S] [CommRing B] [Algebra S B] [Algebra.Etale S B] (f : B)
+    : IsAlgebraic S f := by
   classical
   let K := FractionRing S
   haveI : Algebra.Etale K (TensorProduct S K B) := Algebra.Etale.baseChange S B K
@@ -36,7 +36,8 @@ theorem _root_.GlobalTheory.WeilIntegral.isAlgebraic_of_etale (S B : Type) [Comm
     rfl
   haveI : IsLocalizedModule (nonZeroDivisors S) (TensorProduct.mk S K B 1) :=
     (isLocalizedModule_iff_isBaseChange (nonZeroDivisors S) K _).2 (TensorProduct.isBaseChange S B K)
-  obtain ⟨s, hs⟩ := (IsLocalizedModule.eq_zero_iff (nonZeroDivisors S) (TensorProduct.mk S K B 1)).1 hmap
+  obtain ⟨s, hs⟩ :=
+    (IsLocalizedModule.eq_zero_iff (nonZeroDivisors S) (TensorProduct.mk S K B 1)).1 hmap
   refine ⟨Polynomial.C (s : S) * q, ?_, ?_⟩
   · exact mul_ne_zero (Polynomial.C_ne_zero.2 (nonZeroDivisors.coe_ne_zero s)) hq0
   · rw [map_mul, Polynomial.aeval_C, ← Algebra.smul_def]

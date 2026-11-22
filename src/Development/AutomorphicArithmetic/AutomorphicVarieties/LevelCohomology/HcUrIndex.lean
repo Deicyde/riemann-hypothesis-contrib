@@ -4,11 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LevelCohomo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module
+  UpperTheory.V UpperTheory.V.X
 
-private theorem urIndex_mem {k D M : Type} [Field k] [Group D] [TopologicalSpace D] [AddCommGroup M] [Module k M]
-    [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation k D M) (J : Subgroup D) (f : Z1 ρ) :
-    (Submodule.Quotient.mk f : H1 ρ) ∈ H1ur ρ J ↔ ∃ m, ∀ j ∈ J, f.1 j = ρ j m - m := by
+private theorem urIndex_mem
+    {k D M : Type} [Field k] [Group D] [TopologicalSpace D] [AddCommGroup M] [Module k M]
+    [TopologicalSpace M] [DiscreteTopology M]
+    (ρ : Representation k D M)
+    (J : Subgroup D) (f : Z1 ρ)
+    : (Submodule.Quotient.mk f : H1 ρ) ∈ H1ur ρ J ↔ ∃ m, ∀ j ∈ J, f.1 j = ρ j m - m := by
   have hJc : Continuous J.subtype := continuous_subtype_val
   show resH1 ρ J.subtype hJc (Submodule.Quotient.mk f) = 0 ↔ _
   unfold resH1
@@ -26,21 +30,24 @@ private theorem urIndex_mem {k D M : Type} [Field k] [Group D] [TopologicalSpace
     rw [restrictCocycles1_apply ρ J.subtype hJc]
     simpa using hm j j.2
 
-private theorem urIndex_avg {k Γ M : Type} [Field k] [Group Γ] [AddCommGroup M] [Module k M]
-    (ρ : Representation k Γ M) (N : Subgroup Γ) (hN : (N.index : k) ≠ 0) (c : Γ → M)
-    (hc : ∀ g h, c (g * h) = c g + ρ g (c h)) (h0 : ∀ n ∈ N, c n = 0) :
-    ∃ m, ∀ g, c g = ρ g m - m := by
+private theorem urIndex_avg
+    {k Γ M : Type} [Field k] [Group Γ] [AddCommGroup M] [Module k M]
+    (ρ : Representation k Γ M)
+    (N : Subgroup Γ) (hN : (N.index : k) ≠ 0)
+    (c : Γ → M) (hc : ∀ g h, c (g * h) = c g + ρ g (c h)) (h0 : ∀ n ∈ N, c n = 0)
+    : ∃ m, ∀ g, c g = ρ g m - m := by
   classical
   have hNi : N.index ≠ 0 := fun h => hN (by rw [h, Nat.cast_zero])
   haveI : N.FiniteIndex := ⟨hNi⟩
   haveI : Fintype (Γ ⧸ N) := Fintype.ofFinite _
   have hconst : ∀ g n, n ∈ N → c (g * n) = c g := fun g n hn => by
     rw [hc, h0 n hn, map_zero, add_zero]
-  let c' : Γ ⧸ N → M := Quotient.lift (s := QuotientGroup.leftRel N) c (fun a b hab => by
-    have hab' : a⁻¹ * b ∈ N := QuotientGroup.leftRel_apply.1 hab
-    have h := hconst a (a⁻¹ * b) hab'
-    rw [mul_inv_cancel_left] at h
-    exact h.symm)
+  let c' : Γ ⧸ N → M :=
+    Quotient.lift (s := QuotientGroup.leftRel N) c (fun a b hab => by
+      have hab' : a⁻¹ * b ∈ N := QuotientGroup.leftRel_apply.1 hab
+      have h := hconst a (a⁻¹ * b) hab'
+      rw [mul_inv_cancel_left] at h
+      exact h.symm)
   have hc' : ∀ (h : Γ) (x : Γ ⧸ N), c' (h • x) = c h + ρ h (c' x) := by
     intro h x
     obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
@@ -49,7 +56,8 @@ private theorem urIndex_avg {k Γ M : Type} [Field k] [Group Γ] [AddCommGroup M
   let S := ∑ x : Γ ⧸ N, c' x
   have hS : ∀ h, S = Fintype.card (Γ ⧸ N) • c h + ρ h S := by
     intro h
-    calc S = ∑ x, c' (h • x) := (Equiv.sum_comp (MulAction.toPerm h) c').symm
+    calc
+      S = ∑ x, c' (h • x) := (Equiv.sum_comp (MulAction.toPerm h) c').symm
       _ = ∑ x, (c h + ρ h (c' x)) := Finset.sum_congr rfl fun x _ => hc' h x
       _ = _ := by rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, map_sum]
   have hcard : (Fintype.card (Γ ⧸ N) : k) = N.index := by
@@ -63,8 +71,11 @@ private theorem urIndex_avg {k Γ M : Type} [Field k] [Group Γ] [AddCommGroup M
     rw [add_sub_cancel_right]
   rw [map_neg, map_smul, neg_sub_neg, ← smul_sub, h2, smul_smul, inv_mul_cancel₀ hN, one_smul]
 
-theorem UpperTheory.V.X.urIndex :
-    ∀ (l : ℕ) [Fact l.Prime] {k D M : Type} [Field k] [CharP k l] [Group D] [TopologicalSpace D] [AddCommGroup M] [Module k M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation k D M), ContAction ρ → ∀ (I N : Subgroup D), N ≤ I → ¬ l ∣ N.relIndex I → H1ur ρ N = H1ur ρ I := by
+theorem UpperTheory.V.X.urIndex
+    : ∀ (l : ℕ) [Fact l.Prime] {k D M : Type} [Field k] [CharP k l] [Group D] [TopologicalSpace D]
+        [AddCommGroup M] [Module k M] [TopologicalSpace M] [DiscreteTopology M]
+        (ρ : Representation k D M),
+      ContAction ρ → ∀ (I N : Subgroup D), N ≤ I → ¬ l ∣ N.relIndex I → H1ur ρ N = H1ur ρ I := by
   intro l _ k D M _ _ _ _ _ _ _ _ ρ hρ I N hNI hl
   ext c
   obtain ⟨f, rfl⟩ := Submodule.Quotient.mk_surjective (Submodule.comap (Z1 ρ).subtype (B1 ρ)) c

@@ -7,30 +7,35 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HasValu
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.BT
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.TanLift
 
-theorem comp_one_over {S : Scheme.{0}} {X Y M : Over S} [GrpObj M] (u : Y ⟶ X) : u ≫ (1 : X ⟶ M) = 1 := by
+theorem comp_one_over {S : Scheme.{0}} {X Y M : Over S} [GrpObj M] (u : Y ⟶ X)
+    : u ≫ (1 : X ⟶ M) = 1 := by
   exact MonObj.comp_one u
 
-theorem comp_mul_over {S : Scheme.{0}} {X Y M : Over S} [GrpObj M] (u : Y ⟶ X) (a b : X ⟶ M) :
-    u ≫ (a * b) = (u ≫ a) * (u ≫ b) := by
+theorem comp_mul_over {S : Scheme.{0}} {X Y M : Over S} [GrpObj M] (u : Y ⟶ X) (a b : X ⟶ M)
+    : u ≫ (a * b) = (u ≫ a) * (u ≫ b) := by
   exact MonObj.comp_mul u a b
 
-theorem comp_pow_over {S : Scheme.{0}} {X Y M : Over S} [GrpObj M] (u : Y ⟶ X) (a : X ⟶ M) (n : ℕ) :
-    u ≫ a ^ n = (u ≫ a) ^ n := by
+theorem comp_pow_over {S : Scheme.{0}} {X Y M : Over S} [GrpObj M] (u : Y ⟶ X) (a : X ⟶ M) (n : ℕ)
+    : u ≫ a ^ n = (u ≫ a) ^ n := by
   induction n with
   | zero => simp only [pow_zero]; exact GlobalTheory.CompanionTheory.Ar.BT.TanLift.comp_one_over u
-  | succ n ih => rw [pow_succ, pow_succ, GlobalTheory.CompanionTheory.Ar.BT.TanLift.comp_mul_over, ih]
+  | succ n ih =>
+    rw [pow_succ, pow_succ, GlobalTheory.CompanionTheory.Ar.BT.TanLift.comp_mul_over, ih]
 
 section
 
-variable {S : Scheme.{0}} {R : Type} [CommRing R] {G : Over S} [GrpObj G] {x : Spec (CommRingCat.of R) ⟶ S}
-  {L : Type} [AddCommGroup L] [Module R L]
+variable
+  {S : Scheme.{0}} {R : Type} [CommRing R]
+  {G : Over S} [GrpObj G]
+  {x : Spec (CommRingCat.of R) ⟶ S} {L : Type} [AddCommGroup L] [Module R L]
 
 theorem pt_zero (M : LieModel G x L) : M.pt 0 = 1 := by
   have h : M.pt 0 * M.pt 0 = M.pt 0 := by rw [← M.5, add_zero]
@@ -41,17 +46,17 @@ theorem pt_nsmul (M : LieModel G x L) (e : L) (n : ℕ) : M.pt (n • e) = M.pt 
   | zero => rw [zero_smul, pow_zero, GlobalTheory.CompanionTheory.Ar.BT.TanLift.pt_zero]
   | succ n ih => rw [succ_nsmul, M.5, ih, pow_succ]
 
-theorem dualMap_epsMul (I : Ideal R) (c : R) (hc : Ideal.Quotient.mk I c = 0) :
-    (dualMap (Ideal.Quotient.mk I)).comp (epsMul c) =
-      ((algebraMap (R ⧸ I) (DualNumber (R ⧸ I))).comp (Ideal.Quotient.mk I)).comp
+theorem dualMap_epsMul (I : Ideal R) (c : R) (hc : Ideal.Quotient.mk I c = 0)
+    : (dualMap (Ideal.Quotient.mk I)).comp (epsMul c)
+      = ((algebraMap (R ⧸ I) (DualNumber (R ⧸ I))).comp (Ideal.Quotient.mk I)).comp
         (TrivSqZeroExt.fstHom R R R).toRingHom := by
   refine RingHom.ext fun a => TrivSqZeroExt.ext ?_ ?_
   · simp [dualMap, epsMul, TrivSqZeroExt.algebraMap_eq_inl]
   · simp [dualMap, epsMul, TrivSqZeroExt.algebraMap_eq_inl, hc]
 
-theorem dualMap_algebraMap (I : Ideal R) :
-    (dualMap (Ideal.Quotient.mk I)).comp (algebraMap R (DualNumber R)) =
-      (algebraMap (R ⧸ I) (DualNumber (R ⧸ I))).comp (Ideal.Quotient.mk I) := by
+theorem dualMap_algebraMap (I : Ideal R)
+    : (dualMap (Ideal.Quotient.mk I)).comp (algebraMap R (DualNumber R))
+      = (algebraMap (R ⧸ I) (DualNumber (R ⧸ I))).comp (Ideal.Quotient.mk I) := by
   refine RingHom.ext fun a => TrivSqZeroExt.ext ?_ ?_
   · simp [dualMap, TrivSqZeroExt.algebraMap_eq_inl]
   · simp [dualMap, TrivSqZeroExt.algebraMap_eq_inl]

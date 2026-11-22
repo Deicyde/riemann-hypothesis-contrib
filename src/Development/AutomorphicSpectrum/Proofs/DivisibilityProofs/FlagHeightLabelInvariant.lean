@@ -12,8 +12,10 @@ public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PHFlProdLinea
 
 noncomputable section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
-open GroundTheory.Heights₂.Heights.LowerBoundFree (FlBlock FlIdx PFl xLine xDeg yFl fsHerm ΩFl refNorm)
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open GroundTheory.Heights₂.Heights.LowerBoundFree
+  (FlBlock FlIdx PFl xLine xDeg yFl fsHerm ΩFl refNorm)
 open ReciprocityTheory.ChartRestriction.G.AI.I1 (IsBlockMap pullDeg)
 open ReciprocityTheory.ChartRestriction.G.AI.I4 (imageZ IsPullHerm blockFnField)
 
@@ -23,8 +25,9 @@ variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N : ℕ}
 
 def blockMap (σ : Equiv.Perm Ψ) : FlBlock Ψ N → FlBlock Ψ N := fun q => (σ q.1, q.2)
 
-def coordMap (σ : Equiv.Perm Ψ) : (Σ q : FlBlock Ψ N, FlIdx Ψ N q) → (Σ q : FlBlock Ψ N, FlIdx Ψ N q) :=
-  fun p => ⟨(σ p.1.1, p.1.2), p.2⟩
+def coordMap (σ : Equiv.Perm Ψ)
+    : (Σ q : FlBlock Ψ N, FlIdx Ψ N q) → (Σ q : FlBlock Ψ N, FlIdx Ψ N q) := fun p =>
+  ⟨(σ p.1.1, p.1.2), p.2⟩
 
 theorem blockMap_bijective (σ : Equiv.Perm Ψ) : Function.Bijective (blockMap (N := N) σ) := by
   refine ⟨?_, ?_⟩
@@ -55,8 +58,8 @@ def matEquiv (N : ℕ) (σ : Equiv.Perm Ψ) : (Ψ × Fin N × Fin N) ≃ (Ψ × 
 def fieldAut (σ : Equiv.Perm Ψ) : ΩFl Ψ N ≃+* ΩFl Ψ N :=
   IsFractionRing.ringEquivOfRingEquiv (renameEquiv ℚ (matEquiv N σ)).toRingEquiv
 
-theorem yFl_coordMap (σ : Equiv.Perm Ψ) (p : Σ q : FlBlock Ψ N, FlIdx Ψ N q) :
-    yFl Ψ N (coordMap σ p) = fieldAut σ (yFl Ψ N p) := by
+theorem yFl_coordMap (σ : Equiv.Perm Ψ) (p : Σ q : FlBlock Ψ N, FlIdx Ψ N q)
+    : yFl Ψ N (coordMap σ p) = fieldAut σ (yFl Ψ N p) := by
   unfold yFl fieldAut
   rw [IsFractionRing.ringEquivOfRingEquiv_algebraMap]
   congr 1
@@ -64,11 +67,20 @@ theorem yFl_coordMap (σ : Equiv.Perm Ψ) (p : Σ q : FlBlock Ψ N, FlIdx Ψ N q
   rw [RingHom.map_det]
   congr 1
   refine Matrix.ext fun a b => ?_
-  exact (rename_X (R := ℚ) (matEquiv N σ) (p.1.1, Fin.castLE (GroundTheory.Heights₂.Heights.LowerBoundFree.step_le p.1.2) a, p.2.1 b)).symm
+  exact (rename_X (R := ℚ) (matEquiv N σ) (
+    p.1.1,
+    Fin.castLE (GroundTheory.Heights₂.Heights.LowerBoundFree.step_le p.1.2) a,
+    p.2.1 b
+  )).symm
 
-theorem mCoordIdeal_ringHom {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {Ω₀ Ω : Type} [Field Ω₀] [Field Ω]
-    (i : Ω₀ →+* Ω) (y₀ : (Σ k, J k) → Ω₀) : mCoordIdeal (fun p => i (y₀ p)) = mCoordIdeal y₀ := by
-  have key : ∀ f : MRing J, mConeMap (fun p => i (y₀ p)) f = MvPolynomial.map i (mConeMap y₀ f) := by
+theorem mCoordIdeal_ringHom
+    {K : Type} [Fintype K]
+    {J : K → Type} [∀ k, Fintype (J k)]
+    {Ω₀ Ω : Type} [Field Ω₀] [Field Ω]
+    (i : Ω₀ →+* Ω) (y₀ : (Σ k, J k) → Ω₀)
+    : mCoordIdeal (fun p => i (y₀ p)) = mCoordIdeal y₀ := by
+  have key
+      : ∀ f : MRing J, mConeMap (fun p => i (y₀ p)) f = MvPolynomial.map i (mConeMap y₀ f) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C a => simp [mConeMap]
@@ -87,8 +99,8 @@ theorem imageZ_PFl (σ : Equiv.Perm Ψ) : imageZ (coordMap σ) (PFl Ψ N) = PFl 
   funext p
   exact yFl_coordMap σ p
 
-theorem blockFnField_coordMap (σ : Equiv.Perm Ψ) :
-    blockFnField (yFl Ψ N ∘ coordMap σ) = blockFnField (yFl Ψ N) := by
+theorem blockFnField_coordMap (σ : Equiv.Perm Ψ)
+    : blockFnField (yFl Ψ N ∘ coordMap σ) = blockFnField (yFl Ψ N) := by
   unfold blockFnField
   congr 1
   ext t
@@ -100,12 +112,12 @@ theorem blockFnField_coordMap (σ : Equiv.Perm Ψ) :
     obtain ⟨q', rfl⟩ := coordMap_surjective σ q
     exact ⟨p', q', (blockMap_bijective σ).1 hpq, rfl⟩
 
-theorem xDeg_blockMap (σ : Equiv.Perm Ψ) (p : Ψ × Fin N) (q : FlBlock Ψ N) :
-    xDeg Ψ N (σ p.1, p.2) (blockMap σ q) = xDeg Ψ N p q := by
+theorem xDeg_blockMap (σ : Equiv.Perm Ψ) (p : Ψ × Fin N) (q : FlBlock Ψ N)
+    : xDeg Ψ N (σ p.1, p.2) (blockMap σ q) = xDeg Ψ N p q := by
   by_cases h : q.1 = p.1 <;> simp [xDeg, blockMap, h]
 
-theorem isPullHerm_xLine (σ : Equiv.Perm Ψ) (p : Ψ × Fin N) :
-    IsPullHerm (blockMap σ) (coordMap σ) (xLine Ψ N p) (xLine Ψ N (σ p.1, p.2)) := by
+theorem isPullHerm_xLine (σ : Equiv.Perm Ψ) (p : Ψ × Fin N)
+    : IsPullHerm (blockMap σ) (coordMap σ) (xLine Ψ N p) (xLine Ψ N (σ p.1, p.2)) := by
   refine ⟨?_, fun z' => ?_⟩
   · show xDeg Ψ N (σ p.1, p.2) = pullDeg (blockMap σ) (xDeg Ψ N p)
     funext q
@@ -118,7 +130,8 @@ theorem isPullHerm_xLine (σ : Equiv.Perm Ψ) (p : Ψ × Fin N) :
     rw [xDeg_blockMap]
     rfl
 
-theorem degree_mapDomain {J J' : Type} (f : J → J') (m : J →₀ ℕ) : (m.mapDomain f).degree = m.degree := by
+theorem degree_mapDomain {J J' : Type} (f : J → J') (m : J →₀ ℕ)
+    : (m.mapDomain f).degree = m.degree := by
   induction m using Finsupp.induction_linear with
   | zero => simp
   | add a b ha hb => rw [Finsupp.mapDomain_add, map_add (f := _), map_add (f := _), ha, hb]
@@ -128,36 +141,49 @@ end GlobalTheory.CompanionTheory.Ar.Top.HhLabel
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-
 open HhLabel in
-theorem hhFl_labelInv : ∀ II : IntersectionSystem, IsFullIntersectionSystem II → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ]
-    (N : ℕ) [Nonempty Ψ], 2 ≤ N → IsArithVar (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1) →
-    LabelInv (Ψ := Ψ) (N := N) (hhFl Ψ N II) := by
+theorem hhFl_labelInv
+    : ∀ II : IntersectionSystem,
+      IsFullIntersectionSystem II
+        → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) [Nonempty Ψ],
+          2 ≤ N → IsArithVar (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1)
+            → LabelInv (Ψ := Ψ) (N := N) (hhFl Ψ N II) := by
   intro II hII Ψ _ _ N _ _ hP σ F
-  have key : ∀ w : Fin (dimFl Ψ N + 1) → Ψ × Fin N,
-      II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (dimFl Ψ N + 1) (fun k => xLine Ψ N (σ (w k).1, (w k).2)) =
-        II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (dimFl Ψ N + 1) (fun k => xLine Ψ N (w k)) := by
+  have key
+      : ∀ w : Fin (dimFl Ψ N + 1) → Ψ × Fin N,
+        II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (dimFl Ψ N + 1)
+            (fun k => xLine Ψ N (σ (w k).1, (w k).2))
+          = II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (dimFl Ψ N + 1) (fun k => xLine Ψ N (w k)) := by
     intro w
     have himg := imageZ_PFl (N := N) σ
-    have hPF := hII.2.2.1 (FlBlock Ψ N) (FlIdx Ψ N) (FlBlock Ψ N) (FlIdx Ψ N) (blockMap σ) (coordMap σ) (ΩFl Ψ N)
-      (yFl Ψ N) (dimFl Ψ N + 1) (fun k => xLine Ψ N (w k)) (fun k => xLine Ψ N (σ (w k).1, (w k).2))
-      (isBlockMap σ) hP (by show IsArithVar (imageZ (coordMap σ) (PFl Ψ N)) _; rw [himg]; exact hP)
-      (fun _ => GroundTheory.Heights₂.Heights.LowerBoundFree.FlagHeightMultilinear.isSmoothHerm_fsHerm _)
-      (fun j => isPullHerm_xLine σ (w j))
+    have hPF :=
+      hII.2.2.1 (FlBlock Ψ N) (FlIdx Ψ N) (FlBlock Ψ N) (FlIdx Ψ N) (blockMap σ) (coordMap σ)
+        (ΩFl Ψ N) (yFl Ψ N) (dimFl Ψ N + 1)
+        (fun k => xLine Ψ N (w k))
+        (fun k => xLine Ψ N (σ (w k).1, (w k).2))
+        (isBlockMap σ) hP
+        (by show IsArithVar (imageZ (coordMap σ) (PFl Ψ N)) _; rw [himg]; exact hP)
+        (fun _ =>
+          GroundTheory.Heights₂.Heights.LowerBoundFree.FlagHeightMultilinear.isSmoothHerm_fsHerm _)
+        (fun j => isPullHerm_xLine σ (w j))
     rw [blockFnField_coordMap, IntermediateField.relfinrank_self, Nat.cast_one, one_mul] at hPF
-    exact hPF.trans (congrArg (fun P => II (FlBlock Ψ N) (FlIdx Ψ N) P (dimFl Ψ N + 1) fun k => xLine Ψ N (w k)) himg)
+    exact hPF.trans (congrArg
+      (fun P => II (FlBlock Ψ N) (FlIdx Ψ N) P (dimFl Ψ N + 1) fun k => xLine Ψ N (w k))
+      himg)
   induction F using MvPolynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), map_add (f := _), hp, hq]
   | monomial m c =>
     rw [rename_monomial]
     by_cases hm : m.degree = dimFl Ψ N + 1
     · obtain ⟨w, rfl⟩ := RootFieldNumerics.HH.exists_word _ m hm
-      have hmap : (∑ k, Finsupp.single (w k) (1 : ℕ)).mapDomain (fun x : Ψ × Fin N => (σ x.1, x.2)) =
-          ∑ k, Finsupp.single (σ (w k).1, (w k).2) 1 := by
+      have hmap
+          : (∑ k, Finsupp.single (w k) (1 : ℕ)).mapDomain (fun x : Ψ × Fin N => (σ x.1, x.2))
+            = ∑ k, Finsupp.single (σ (w k).1, (w k).2) 1 := by
         rw [Finsupp.mapDomain_finsetSum]
         simp only [Finsupp.mapDomain_single]
       have hwd := RootFieldNumerics.HH.hhFl_word II hII.1 hP (fun k => (σ (w k).1, (w k).2)) c
       rw [hmap, hwd, RootFieldNumerics.HH.hhFl_word II hII.1 hP w c, key w]
-    · rw [HhModel.hhFl_monomial_of_ne II _ _ (by rwa [degree_mapDomain]), HhModel.hhFl_monomial_of_ne II _ _ hm]
+    · rw [HhModel.hhFl_monomial_of_ne II _ _ (by rwa [degree_mapDomain]),
+        HhModel.hhFl_monomial_of_ne II _ _ hm]
 
 end GlobalTheory.CompanionTheory.Ar.Top

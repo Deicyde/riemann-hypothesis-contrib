@@ -10,10 +10,13 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.Places
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.HN Formalism.LFunctionChainParameters
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory
+  Formalism.HN Formalism.LFunctionChainParameters
 
-theorem placesF_min' {eps : ℝ} (Fm : FamP eps) (h26 : LocalQuadraticParts.LevelTFamily Fm) (hNC : Lnk.NuCommensF Fm) (hTu : TuSize Fm)
-    (hRank : J.MuRank Fm) (lG : LinkG Fm) (lMu : LinkMu Fm) : Lnk.PlacesF Fm := by
+theorem placesF_min'
+    {eps : ℝ} (Fm : FamP eps) (h26 : LocalQuadraticParts.LevelTFamily Fm) (hNC : Lnk.NuCommensF Fm)
+    (hTu : TuSize Fm) (hRank : J.MuRank Fm) (lG : LinkG Fm) (lMu : LinkMu Fm)
+    : Lnk.PlacesF Fm := by
   have heps := Lnk.fam_eps_pos Fm
   obtain ⟨xNC, hNC⟩ := hNC
   obtain ⟨CT, xT, δ, hδ, hTa⟩ := G.TopChoiceBounds.tau_sum_family_of_mertens Fm (fun _ _ => mertens)
@@ -26,9 +29,12 @@ theorem placesF_min' {eps : ℝ} (Fm : FamP eps) (h26 : LocalQuadraticParts.Leve
   obtain ⟨xM, hM⟩ := flipTwoThree.le_rpow_for_large_x ((2 : ℝ) / 5) (by norm_num) 6
   obtain ⟨xD, hD⟩ : ∃ xD : ℝ, ∀ x ≥ xD, δ x ≤ 1 :=
     Filter.eventually_atTop.1 (hδ.eventually (Iic_mem_nhds zero_lt_one))
-  refine ⟨max (max C26 CMu) 4,
+  refine ⟨
+    max (max C26 CMu) 4,
     |xNC| + |xT| + |x26| + |xMu| + |xG| + |xR| + |xU| + |xE| + |xM| + |xD| + |Fm.x1| + 4 * |CT| + 5,
-    le_max_right _ _, fun x hx i => ?_⟩
+    le_max_right _ _,
+    fun x hx i => ?_
+  ⟩
   have n1 := abs_nonneg xNC
   have n2 := abs_nonneg xT
   have n3 := abs_nonneg x26
@@ -85,14 +91,18 @@ theorem placesF_min' {eps : ℝ} (Fm : FamP eps) (h26 : LocalQuadraticParts.Leve
       have h2 : (1 : ℝ) ≤ (Fm.L x i).sc.b ^ 2 := one_le_pow₀ hb1
       nlinarith
     linarith [hTb u]
-  have hsz := fun u => size_alt ((Fm.D x i).R.f : ℝ) (Fm.L x i).sc.b (((Fm.D x i).mem u).A.T : ℝ)
-    (Nat.cast_nonneg _) s8 s9 (hTb u)
+  have hsz := fun u =>
+    size_alt ((Fm.D x i).R.f : ℝ) (Fm.L x i).sc.b (((Fm.D x i).mem u).A.T : ℝ) (Nat.cast_nonneg _)
+      s8 s9 (hTb u)
   have hfill := Fm.fills x hx1 i
-  refine ⟨Lnk.IOsum_nonneg (Fm.Gx x i) Fm.GK Fm.GK_nonneg (Fm.ex x hx1 i).kapI_def
-    (fun w => (hfill w).2.2.2.2.2.1), ?_⟩
+  refine ⟨
+    Lnk.IOsum_nonneg (Fm.Gx x i) Fm.GK Fm.GK_nonneg (Fm.ex x hx1 i).kapI_def
+      (fun w => (hfill w).2.2.2.2.2.1),
+    ?_
+  ⟩
   refine places_at_of C26 CMu _ (le_trans (le_max_left _ _) (le_max_left _ _))
-    (le_trans (le_max_right _ _) (le_max_left _ _)) (Fm.nprimeDef x hx1 i) (Fm.nuDef x hx1 i) (hNC x e1 i)
-    (hRank x e6 i) (h26 x e3 i) (hMu x e4 i)
+    (le_trans (le_max_right _ _) (le_max_left _ _)) (Fm.nprimeDef x hx1 i) (Fm.nuDef x hx1 i)
+    (hNC x e1 i) (hRank x e6 i) (h26 x e3 i) (hMu x e4 i)
     (fun u w hw => ⟨((hG x e5 i).1 u w hw).1, ((hG x e5 i).1 u w hw).2.1⟩)
     (fun w => by rw [(hfill w).2.2.2.2.1]; exact exists_tau_eq_natCast _ _ _ _ _)
     (fun w => by
@@ -103,11 +113,13 @@ theorem placesF_min' {eps : ℝ} (Fm : FamP eps) (h26 : LocalQuadraticParts.Leve
       exact tau_eq_zero_of_le _ _ _ _ _ (hXT u))
     (fun u w hs => ?_)
     (ta_le (Fm.L x i) S hx5' hb9 CT (δ x) (by rw [hsx]; exact hxC) (hD x e10) (hTa x e2 i))
-    (fun u => (hsz u).1) (fun u => (hsz u).2.1) (fun u => (hsz u).2.2)
+    (fun u => (hsz u).1)
+    (fun u => (hsz u).2.1)
+    (fun u => (hsz u).2.2)
   by_cases hw : (Fm.D x i).what₂.places.resChar w = ((Fm.D x i).mem u).A.T
   · exact Or.inl (lenLoc_atT_zero (Fm.ex x hx1 i).lat.atT (Fm.ex x hx1 i).err.edef u w hw hs)
   · refine Or.inr (Fm.lats0 x hx1 i w u (VV_empty_of_ge _ _ _ _ _ ?_) hw)
-    have h1 : ¬ ((((Fm.D x i).what₂.places.resChar w : ℕ) : ℝ) ≤ (Fm.L x i).sc.X'' (Fm.D x i).R.n) :=
+    have h1 : ¬((((Fm.D x i).what₂.places.resChar w : ℕ) : ℝ) ≤ (Fm.L x i).sc.X'' (Fm.D x i).R.n) :=
       fun h => hs (Fm.supp_sat x hx1 i w h)
     linarith [not_le.1 h1]
 

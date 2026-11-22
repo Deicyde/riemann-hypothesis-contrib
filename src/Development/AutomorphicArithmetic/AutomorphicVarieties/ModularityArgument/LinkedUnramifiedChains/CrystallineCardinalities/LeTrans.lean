@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr UpperTheory.V.Z.J
 
-theorem UpperTheory.V.Z.J.leTrans :
-    ∀ (l : ℕ) [Fact l.Prime] (D D' : Type) [Group D] [TopologicalSpace D] [Group D'] [TopologicalSpace D'] (e : D ≃ₜ* D') (ε : D' →* ℤ_[l]ˣ) (d : ℕ), LE l D' ε d → LE l D (ε.comp (e : D →* D')) d := by
+theorem UpperTheory.V.Z.J.leTrans
+    : ∀ (l : ℕ) [Fact l.Prime] (D D' : Type) [Group D] [TopologicalSpace D] [Group D']
+        [TopologicalSpace D'] (e : D ≃ₜ* D') (ε : D' →* ℤ_[l]ˣ) (d : ℕ),
+      LE l D' ε d → LE l D (ε.comp (e : D →* D')) d := by
   intro l _ D D' _ _ _ _ e ε d h k hk N _ _ ρ hN hker
   let ρ' : Representation ℤ D' N := ρ.comp (e.symm : D' →* D)
   have hρ' : ∀ s : D', ρ' s = ρ (e.symm s) := fun s => rfl

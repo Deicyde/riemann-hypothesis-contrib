@@ -8,14 +8,16 @@ open FourierTransform MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem exists_equiv_euclidean_pi_mul_norm_sq_eq_re (V : Type) [NormedAddCommGroup V]
-    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : V →L[ℝ] V →L[ℝ] ℂ) (c : ℝ)
-    (hc : 0 < c) (hQ : ∀ x, c * ‖x‖ ^ 2 ≤ (Q x x).re) :
-    ∃ A : V ≃L[ℝ] EuclideanSpace ℝ (Fin (Module.finrank ℝ V)),
-      ∀ x, Real.pi * ‖A x‖ ^ 2 = (Q x x).re := by
+theorem exists_equiv_euclidean_pi_mul_norm_sq_eq_re
+    (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    (Q : V →L[ℝ] V →L[ℝ] ℂ) (c : ℝ) (hc : 0 < c) (hQ : ∀ x, c * ‖x‖ ^ 2 ≤ (Q x x).re)
+    : ∃ A : V ≃L[ℝ] EuclideanSpace ℝ (Fin (Module.finrank ℝ V)), ∀ x,
+      Real.pi * ‖A x‖ ^ 2 = (Q x x).re := by
   classical
-  let B : LinearMap.BilinForm ℝ V := LinearMap.mk₂ ℝ (fun x y => (Q x y).re)
-    (by intros; simp) (by intros; simp) (by intros; simp) (by intros; simp)
+  let B : LinearMap.BilinForm ℝ V :=
+    LinearMap.mk₂ ℝ
+      (fun x y => (Q x y).re)
+      (by intros; simp) (by intros; simp) (by intros; simp) (by intros; simp)
   let q : QuadraticForm ℝ V := B.toQuadraticMap
   have hq : ∀ x, q x = (Q x x).re := fun x => rfl
   obtain ⟨w, ⟨e⟩⟩ := QuadraticForm.equivalent_weightedSumSquares q

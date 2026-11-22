@@ -15,13 +15,14 @@ variable (l : ℕ) [Fact l.Prime]
 
 abbrev B : Type := BdRPlus l (Cmp6.OC l)
 
-theorem mem_ker_pow_iff (x : B l) (n : ℕ) :
-    x ∈ RingHom.ker (BdRPlus.thetaC l (PadicComplexInt l)) ^ n ↔ BdRPlus.eval l (Cmp6.OC l) n x = 0 := by
+theorem mem_ker_pow_iff (x : B l) (n : ℕ)
+    : x ∈ RingHom.ker (BdRPlus.thetaC l (PadicComplexInt l)) ^ n
+      ↔ BdRPlus.eval l (Cmp6.OC l) n x = 0 := by
   rw [BdRPlus.ker_thetaC, ← RingHom.mem_ker, BdRPlus.ker_eval]
   rfl
 
-theorem truncLog_eq (N : ℕ) (x : AinfInv l (Cmp6.OC l) ⧸ AinfInv.kerTheta l (Cmp6.OC l) ^ N) :
-    truncLog N x = ∑ i ∈ Finset.Ico 1 (N + 1), algebraMap ℚ _ ((-1) ^ (i + 1) / i) * x ^ i := by
+theorem truncLog_eq (N : ℕ) (x : AinfInv l (Cmp6.OC l) ⧸ AinfInv.kerTheta l (Cmp6.OC l) ^ N)
+    : truncLog N x = ∑ i ∈ Finset.Ico 1 (N + 1), algebraMap ℚ _ ((-1) ^ (i + 1) / i) * x ^ i := by
   unfold truncLog
   rw [Finset.sum_Ico_eq_sum_range]
   simp only [Nat.add_sub_cancel]
@@ -38,8 +39,10 @@ abbrev u (ε : PreTilt ↥(PadicComplexInt l) l) : B l :=
 abbrev sA (ε : PreTilt ↥(PadicComplexInt l) l) (n : ℕ) : B l :=
   ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ (B l) ((-1) ^ (i + 1) / i) * (u l ε - 1) ^ i
 
-theorem log_sub_mem (ε : PreTilt ↥(PadicComplexInt l) l) (h : BdRPlus.theta l (Cmp6.OC l) (u l ε) = 1) (n : ℕ) :
-    BdRPlus.log (u l ε) h - sA l ε n ∈ RingHom.ker (BdRPlus.thetaC l (PadicComplexInt l)) ^ n := by
+theorem log_sub_mem
+    (ε : PreTilt ↥(PadicComplexInt l) l) (h : BdRPlus.theta l (Cmp6.OC l) (u l ε) = 1) (n : ℕ)
+    : BdRPlus.log (u l ε) h - sA l ε n
+      ∈ RingHom.ker (BdRPlus.thetaC l (PadicComplexInt l)) ^ n := by
   have hk : u l ε - 1 ∈ RingHom.ker (BdRPlus.thetaC l (PadicComplexInt l)) := by
     rw [BdRPlus.ker_thetaC, RingHom.mem_ker, map_sub, h, map_one, sub_self]
   have hX : BdRPlus.eval l (Cmp6.OC l) n ((u l ε - 1) ^ n) = 0 :=
@@ -51,8 +54,9 @@ theorem log_sub_mem (ε : PreTilt ↥(PadicComplexInt l) l) (h : BdRPlus.theta l
   · simp
   · rw [Finset.sum_Ico_succ_top hn, add_sub_cancel_left, ← map_pow, hX, mul_zero]
 
-theorem isLog_iff (ε : PreTilt ↥(PadicComplexInt l) l) (y : B l) :
-    (∃ h : BdRPlus.theta l (Cmp6.OC l) (u l ε) = 1, y = BdRPlus.log (u l ε) h) ↔ Cmp6.IsLogA l ε y := by
+theorem isLog_iff (ε : PreTilt ↥(PadicComplexInt l) l) (y : B l)
+    : (∃ h : BdRPlus.theta l (Cmp6.OC l) (u l ε) = 1, y = BdRPlus.log (u l ε) h)
+      ↔ Cmp6.IsLogA l ε y := by
   constructor
   · rintro ⟨h, rfl⟩ n
     exact log_sub_mem l ε h n

@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.SelfDu
 
 namespace GlobalTheory.LatticeDensityClosed
 
-theorem selfDualLatticeDensity : GlobalTheory.IndefiniteRowSideFullHecke.PlaceSplittingTypes.SelfDualLatticeDensity :=
+theorem selfDualLatticeDensity
+    : GlobalTheory.IndefiniteRowSideFullHecke.PlaceSplittingTypes.SelfDualLatticeDensity :=
   GlobalTheory.LocalDensityCompare.localDensity_iff.1
     (GlobalTheory.LatticeDensity.localDensity_of_selfDualLatticeLemmas
       GlobalTheory.UnramSelfDualClosed.selfDualLatticeLemmas)

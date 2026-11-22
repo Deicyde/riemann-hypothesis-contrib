@@ -11,26 +11,33 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.CountBase
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.AtPt
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.AtPt
 open Classical ValuativeRel
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
+variable
+  {D : D7}
+  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
 
-theorem zhatOM_sg (X : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) :
-    ZhatOM X * Sg D.host.E D.R.rS = X := by
+theorem zhatOM_sg (X : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)
+    : ZhatOM X * Sg D.host.E D.R.rS = X := by
   ext a b
   simp only [ZhatOM, Sg, Matrix.mul_diagonal]
   rw [mul_comm, ← mul_assoc, ← mul_pow]
   simp
 
-theorem modMat_ord (hA : ∀ p, Agree δ M p) (T T' : ℕ) (p : PlF D) (hM : (M p).split = none)
-    (w : Point D.host.E (D.R.rS + 1)) :
-    Matrix.diagonal (fun a => algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a)) *
-        (ptMat w).map (D.s.atP p).ιE *
-        Matrix.diagonal (fun a => algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a)) =
-      modMat δ T T' p w := by
+theorem modMat_ord
+    (hA : ∀ p, Agree δ M p) (T T' : ℕ)
+    (p : PlF D) (hM : (M p).split = none)
+    (w : Point D.host.E (D.R.rS + 1))
+    : Matrix.diagonal (fun a =>
+          algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a))
+        * (ptMat w).map (D.s.atP p).ιE
+        * Matrix.diagonal (fun a =>
+          algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a))
+      = modMat δ T T' p w := by
   set Zd : LocDat D := ⟨δ, M, hA⟩
   have hR : (D.s.atP p).split = none := by
     have h := (hA p).2.2.2.2.2
@@ -47,11 +54,14 @@ theorem modMat_ord (hA : ∀ p, Agree δ M p) (T T' : ℕ) (p : PlF D) (hM : (M 
     ring
   · rw [if_neg hb, if_neg hb, map_zero, mul_zero, zero_mul]
 
-theorem baseConj_L (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (w : Point D.host.E (D.R.rS + 1)) (p : PlF D)
+theorem baseConj_L
+    (hA : ∀ p, Agree δ M p)
+    (u u' : D.what₂.Word) (w : Point D.host.E (D.R.rS + 1)) (p : PlF D)
     (hM : (M p).split = none) (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1))
-    (ha : modPt δ (D.mem u).A.T (D.mem u').A.T p w = some a) :
-    Formalism.L2.SG.Pf.ProdE.Y0 M δ u u' w p * Formalism.L2.SG.LsDatumB.sgnP p +
-      Formalism.L2.SG.Pf.LocOrbSumPf.shM δ (D.mem u).A.T (D.mem u').A.T p w = a.mat := by
+    (ha : modPt δ (D.mem u).A.T (D.mem u').A.T p w = some a)
+    : Formalism.L2.SG.Pf.ProdE.Y0 M δ u u' w p * Formalism.L2.SG.LsDatumB.sgnP p
+        + Formalism.L2.SG.Pf.LocOrbSumPf.shM δ (D.mem u).A.T (D.mem u').A.T p w
+      = a.mat := by
   set Zd : LocDat D := ⟨δ, M, hA⟩
   have hY := Formalism.L2.SG.Pf.PCount.zzp_sgn_ord Zd u u' p hM (ZhatOM (ptMat w))
   rw [zhatOM_sg] at hY
@@ -59,8 +69,12 @@ theorem baseConj_L (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (w : Point
   rw [hmat]
   unfold Formalism.L2.SG.Pf.ProdE.Y0
   congr 1
-  rw [show Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (ZhatOM (ptMat w)) * Formalism.L2.SG.LsDatumB.sgnP p =
-    Formalism.L2.SG.CntLocal.ZZP (M := Zd.M) Zd.δ u u' p (ZhatOM (ptMat w)) * Formalism.L2.SG.LsDatumB.sgnP p from rfl, hY]
+  rw [show Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (ZhatOM (ptMat w))
+          * Formalism.L2.SG.LsDatumB.sgnP p
+        = Formalism.L2.SG.CntLocal.ZZP (M := Zd.M) Zd.δ u u' p (ZhatOM (ptMat w))
+          * Formalism.L2.SG.LsDatumB.sgnP p from
+      rfl,
+    hY]
   exact modMat_ord hA _ _ p hM w
 
 end Formalism.L2.SG.Pf.CountBase

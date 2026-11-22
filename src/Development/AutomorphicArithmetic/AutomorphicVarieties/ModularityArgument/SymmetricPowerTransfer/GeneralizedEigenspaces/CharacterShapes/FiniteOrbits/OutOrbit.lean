@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -19,8 +21,8 @@ section SlopeTestRemainingChoices
 
 variable {G : Type} [Group G]
 
-private theorem dc_left (U : Subgroup G) (a : G) {u : G} (hu : u ∈ U) (y : G) :
-    u * y ∈ DC U a ↔ y ∈ DC U a := by
+private theorem dc_left (U : Subgroup G) (a : G) {u : G} (hu : u ∈ U) (y : G)
+    : u * y ∈ DC U a ↔ y ∈ DC U a := by
   constructor
   · rintro ⟨v, hv, w, hw, h⟩
     refine ⟨u⁻¹ * v, U.mul_mem (U.inv_mem hu) hv, w, hw, ?_⟩
@@ -29,17 +31,16 @@ private theorem dc_left (U : Subgroup G) (a : G) {u : G} (hu : u ∈ U) (y : G) 
   · rintro ⟨v, hv, w, hw, rfl⟩
     exact ⟨u * v, U.mul_mem hu hv, w, hw, by group⟩
 
-private theorem dc_right (U : Subgroup G) (a : G) {u : G} (hu : u ∈ U) (y : G) :
-    y * u ∈ DC U a ↔ y ∈ DC U a := by
+private theorem dc_right (U : Subgroup G) (a : G) {u : G} (hu : u ∈ U) (y : G)
+    : y * u ∈ DC U a ↔ y ∈ DC U a := by
   constructor
   · rintro ⟨b, hb, c, hc, h⟩
-    exact ⟨b, hb, c * u⁻¹, U.mul_mem hc (U.inv_mem hu), by
-      rw [← mul_assoc, ← h]; group⟩
+    exact ⟨b, hb, c * u⁻¹, U.mul_mem hc (U.inv_mem hu), by rw [← mul_assoc, ← h]; group⟩
   · rintro ⟨b, hb, c, hc, rfl⟩
     exact ⟨b, hb, c * u, U.mul_mem hc hu, by group⟩
 
-private theorem out_orbit (U : Subgroup G) (a : G) (x : G ⧸ U) (h : x.out ∈ DC U a) :
-    x ∈ MulAction.orbit U (a : G ⧸ U) := by
+private theorem out_orbit (U : Subgroup G) (a : G) (x : G ⧸ U) (h : x.out ∈ DC U a)
+    : x ∈ MulAction.orbit U (a : G ⧸ U) := by
   obtain ⟨v, hv, w, hw, h⟩ := h
   refine ⟨⟨v, hv⟩, ?_⟩
   rw [← QuotientGroup.out_eq' x, h]
@@ -55,8 +56,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.Sym.So
 
-theorem UpperTheory.V.Z.Sym.So.opDc :
-    UpperTheory.V.Z.Sym.So.OpDc := by
+theorem UpperTheory.V.Z.Sym.So.opDc : UpperTheory.V.Z.Sym.So.OpDc := by
   intro Γ G V _ _ _ _ B hω g hfin
   have hω1 : ∀ u : B.U, (B.ω u : ℂ) = 1 := by
     intro u

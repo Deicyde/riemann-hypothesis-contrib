@@ -15,7 +15,23 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.FrameIndex
 
-theorem relIndex_span_matrix : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ ϖ : 𝒪[F], Irreducible ϖ → ∀ {n m : ℕ} (b : Fin m → Fin n → E), LinearIndependent E b → ∀ (A : Matrix (Fin m) (Fin m) E) (c : F), c ≠ 0 → A.det * L.cj A.det = algebraMap F E c → ∀ Q Q' : Submodule L.O (Fin n → E), Q = Submodule.span L.O (Set.range b) → Q' = Submodule.span L.O (Set.range fun j => ∑ i, A i j • b i) → Q'.toAddSubgroup.relIndex Q.toAddSubgroup ≠ 0 ∧ Q.toAddSubgroup.relIndex Q'.toAddSubgroup ≠ 0 ∧ (Q'.toAddSubgroup.relIndex Q.toAddSubgroup : ℝ) = (resQ ϖ : ℝ) ^ (vE L ϖ (algebraMap F E c)) * (Q.toAddSubgroup.relIndex Q'.toAddSubgroup : ℝ) := by
+theorem relIndex_span_matrix
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ ϖ : 𝒪[F],
+        Irreducible ϖ
+          → ∀ {n m : ℕ} (b : Fin m → Fin n → E),
+            LinearIndependent E b
+              → ∀ (A : Matrix (Fin m) (Fin m) E) (c : F),
+                c ≠ 0 → A.det * L.cj A.det = algebraMap F E c
+                  → ∀ Q Q' : Submodule L.O (Fin n → E),
+                    Q = Submodule.span L.O (Set.range b)
+                      → Q' = Submodule.span L.O (Set.range fun j => ∑ i, A i j • b i)
+                      → Q'.toAddSubgroup.relIndex Q.toAddSubgroup ≠ 0
+                        ∧ Q.toAddSubgroup.relIndex Q'.toAddSubgroup ≠ 0
+                        ∧ (Q'.toAddSubgroup.relIndex Q.toAddSubgroup : ℝ)
+                          = (resQ ϖ : ℝ) ^ (vE L ϖ (algebraMap F E c))
+                            * (Q.toAddSubgroup.relIndex Q'.toAddSubgroup : ℝ) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ n m b hb A c hc0 hA Q Q' hQ hQ'
   obtain ⟨c2, hc, hN⟩ := TupleJac.exists_int_basis L
   have := L.free
@@ -24,27 +40,30 @@ theorem relIndex_span_matrix : ∀ {F : Type} [Field F] [ValuativeRel F] [Topolo
     have h := (IsUnit.mk0 c hc0).map (algebraMap F E)
     rw [← hA] at h
     exact isUnit_of_mul_isUnit_left h
-  have hdet : IsUnit (LinearMap.det (Matrix.toLin' A)) := by
-    rw [LinearMap.det_toLin']; exact hAu
+  have hdet : IsUnit (LinearMap.det (Matrix.toLin' A)) := by rw [LinearMap.det_toLin']; exact hAu
   set φ := LinearMap.equivOfIsUnitDet hdet with hφdef
   have hφ : φ.toLinearMap = Matrix.toLin' A := LinearMap.coe_equivOfIsUnitDet hdet
   have hφx : ∀ x, φ x = A.mulVec x := fun x => LinearMap.congr_fun hφ x
   let W0 : AddSubgroup (Fin m → E) := AddSubgroup.pi Set.univ fun _ => L.O.toAddSubgroup
   have hW0 : ∀ x, x ∈ W0 ↔ ∀ i, x i ∈ L.O := fun x => by
     simp only [W0, AddSubgroup.mem_pi, Set.mem_univ, true_imp_iff, Subring.mem_toAddSubgroup]
-  have h := LatDet.relVol_map ϖ hϖ (c2.smulTower (Pi.basisFun E (Fin m))) (φ.restrictScalars F)
-    (vE L ϖ (algebraMap F E c)) u
-    (by
-      apply GlobalTheory.UnramOrder.algebraMap_inj L
-      rw [← hu, ← hA, ← hN, ← LinearMap.det_toLin', ← hφ, ← LinearMap.det_restrictScalars]
-      rfl) W0 (by
-      intro x
-      simp only [hW0, hc, Module.Basis.smulTower_repr, Pi.basisFun_repr]
-      exact ⟨fun h i => h _ _, fun h j i => h (i, j)⟩)
+  have h :=
+    LatDet.relVol_map ϖ hϖ (c2.smulTower (Pi.basisFun E (Fin m))) (φ.restrictScalars F)
+      (vE L ϖ (algebraMap F E c)) u
+      (by
+        apply GlobalTheory.UnramOrder.algebraMap_inj L
+        rw [← hu, ← hA, ← hN, ← LinearMap.det_toLin', ← hφ, ← LinearMap.det_restrictScalars]
+        rfl)
+      W0
+      (by
+        intro x
+        simp only [hW0, hc, Module.Basis.smulTower_repr, Pi.basisFun_repr]
+        exact ⟨fun h i => h _ _, fun h j i => h (i, j)⟩)
   let e : (Fin m → E) →+ (Fin n → E) := (Fintype.linearCombination E b).toAddMonoidHom
   have he : ∀ x, e x = ∑ i, x i • b i := fun x => Fintype.linearCombination_apply E b x
   have hei : Function.Injective e := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     exact funext (Fintype.linearIndependent_iff.1 hb x ((he x).symm.trans hx))
   have h1 : Q.toAddSubgroup = W0.map e := by
@@ -62,8 +81,7 @@ theorem relIndex_span_matrix : ∀ {F : Type} [Field F] [ValuativeRel F] [Topolo
     simp only [Matrix.mulVec, dotProduct, Finset.sum_smul, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     simp only [mul_comm]
-  have h2 : Q'.toAddSubgroup =
-      (W0.map (φ.restrictScalars F).toAddEquiv.toAddMonoidHom).map e := by
+  have h2 : Q'.toAddSubgroup = (W0.map (φ.restrictScalars F).toAddEquiv.toAddMonoidHom).map e := by
     ext w
     rw [hQ', Submodule.mem_toAddSubgroup, Submodule.mem_span_range_iff_exists_fun,
       AddSubgroup.mem_map]

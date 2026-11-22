@@ -27,8 +27,10 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.TopLePreimag
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 open GroundTheory.Heights₂.Heights TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Sl
 open GlobalTheory
@@ -44,25 +46,44 @@ theorem valF_eq_valAt' (x : Sp ℂ ⟶ X) (U : X.Opens) (f : Γ(X, U)) : valF x 
   · rw [valF, dite_eq_left h, valAt', dite_eq_left h, valAt]
   · rw [valF, dite_eq_right h, valAt', dite_eq_right h]
 
-theorem top_le_wchart {K : Type} [Fintype K] (L : LB X) (φ : Y ⟶ X) (x : Sp ℂ ⟶ Y) (i : L.ι)
-    (h : ⊤ ≤ (x ≫ φ) ⁻¹ᵁ L.U i) : ⊤ ≤ x ⁻¹ᵁ LB.wchart L (fun _ : K => φ) (fun _ => i) :=
-  fun p hp => Set.mem_iInter.2 fun _ => by
+theorem top_le_wchart
+    {K : Type} [Fintype K]
+    (L : LB X) (φ : Y ⟶ X) (x : Sp ℂ ⟶ Y) (i : L.ι) (h : ⊤ ≤ (x ≫ φ) ⁻¹ᵁ L.U i)
+    : ⊤ ≤ x ⁻¹ᵁ LB.wchart L (fun _ : K => φ) (fun _ => i) := fun p hp =>
+  Set.mem_iInter.2 fun _ => by
     have := h hp
     simpa using this
 
-theorem valAt'_g_const {K : Type} [Fintype K] [Unique K] (L : LB X) (φ : Y ⟶ X) (e : ℤ) (x : Sp ℂ ⟶ Y) (i i' : L.ι)
-    (h : ⊤ ≤ x ⁻¹ᵁ (LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i'))) :
-    valAt' x _ ((LB.LinComb L (K := K) (fun _ => φ) (fun _ => e)).g (fun _ => i) (fun _ => i')).val =
-      valAt' (x ≫ φ) (L.U i ⊓ L.U i') (L.g i i').val ^ e := by
-  have hle : LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i') ≤
-      φ ⁻¹ᵁ (L.U i ⊓ L.U i') :=
-    le_inf (inf_le_left.trans (LB.wchart_le L _ _ default)) (inf_le_right.trans (LB.wchart_le L _ _ default))
-  have key : ((LB.LinComb L (K := K) (fun _ => φ) (fun _ => e)).g (fun _ => i) (fun _ => i') :
-      Γ(Y, LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i'))ˣ) =
-      (res hle (pullU φ _ (L.g i i'))) ^ e :=
-    Fintype.prod_unique (M := Γ(Y, LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i'))ˣ) _
-  refine (congrArg (fun u : Γ(Y, LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓
-    LB.wchart L (fun _ : K => φ) (fun _ => i'))ˣ => valAt' x _ u.val) key).trans ?_
+theorem valAt'_g_const
+    {K : Type} [Fintype K] [Unique K]
+    (L : LB X) (φ : Y ⟶ X)
+    (e : ℤ)
+    (x : Sp ℂ ⟶ Y) (i i' : L.ι)
+    (h : ⊤
+      ≤ x
+        ⁻¹ᵁ (LB.wchart L (fun _ : K => φ) (fun _ => i)
+          ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i')))
+    : valAt' x _
+        ((LB.LinComb L (K := K) (fun _ => φ) (fun _ => e)).g (fun _ => i) (fun _ => i')).val
+      = valAt' (x ≫ φ) (L.U i ⊓ L.U i') (L.g i i').val ^ e := by
+  have hle
+      : LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i')
+        ≤ φ ⁻¹ᵁ (L.U i ⊓ L.U i') :=
+    le_inf (inf_le_left.trans (LB.wchart_le L _ _ default))
+      (inf_le_right.trans (LB.wchart_le L _ _ default))
+  have key
+      : ((LB.LinComb L (K := K) (fun _ => φ) (fun _ => e)).g (fun _ => i) (fun _ => i')
+          : Γ(Y, LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i'))ˣ)
+        = (res hle (pullU φ _ (L.g i i'))) ^ e :=
+    Fintype.prod_unique
+      (M :=
+        Γ(Y, LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓ LB.wchart L (fun _ : K => φ) (fun _ => i'))ˣ)
+      _
+  refine (congrArg
+    (fun u : Γ(Y, LB.wchart L (fun _ : K => φ) (fun _ => i) ⊓
+        LB.wchart L (fun _ : K => φ) (fun _ => i'))ˣ =>
+      valAt' x _ u.val)
+    key).trans ?_
   refine (valAt'_units_zpow x h _ e).trans ?_
   congr 1
   exact (valAt'_map x _ _ h).trans (valAt'_comp x φ _ _)
@@ -70,7 +91,8 @@ theorem valAt'_g_const {K : Type} [Fintype K] [Unique K] (L : LB X) (φ : Y ⟶ 
 end GlobalTheory.CompanionTheory.Ar.Sl.FrameFn
 
 namespace GlobalTheory.CompanionTheory.Ar.Sl.FrameFn
-variable {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G] {P : RigLB G} {z : Sp ℂ ⟶ S} {g : ℕ}
+variable
+  {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G] {P : RigLB G} {z : Sp ℂ ⟶ S} {g : ℕ}
 
 theorem exists_chart_pt (a : ArchFrame P z g) (w : Fin g → ℂ) : ∃ i, ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i := by
   have h : a.pt w (default : PrimeSpectrum ℂ) ∈ (⨆ i, P.L.U i : G.left.Opens) := by
@@ -78,30 +100,43 @@ theorem exists_chart_pt (a : ArchFrame P z g) (w : Fin g → ℂ) : ∃ i, ⊤ �
   obtain ⟨i, hi⟩ := (TopologicalSpace.Opens.mem_iSup).1 h
   exact ⟨i, (top_le_preimage_iff_mem _ _).2 hi⟩
 
-theorem top_le_frame (a : ArchFrame P z g) (w : Fin g → ℂ) (i : P.L.ι) (h : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i) :
-    ⊤ ≤ (a.u.ex w).left ⁻¹ᵁ (P.L.pull a.φ).U (fun _ => i) :=
+theorem top_le_frame (a : ArchFrame P z g) (w : Fin g → ℂ) (i : P.L.ι) (h : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i)
+    : ⊤ ≤ (a.u.ex w).left ⁻¹ᵁ (P.L.pull a.φ).U (fun _ => i) :=
   top_le_wchart (K := PUnit) P.L a.φ (a.u.ex w).left i h
 
-theorem top_le_sec (a : ArchFrame P z g) (n : ℕ) (w : Fin g → ℂ) (i : P.L.ι) (h : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i) :
-    ⊤ ≤ a.pt w ⁻¹ᵁ (LB.LinComb P.L (K := Fin 1) (fun _ => 𝟙 G.left) (fun _ => (n : ℤ))).U (fun _ => i) :=
+theorem top_le_sec
+    (a : ArchFrame P z g) (n : ℕ) (w : Fin g → ℂ) (i : P.L.ι) (h : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i)
+    : ⊤
+      ≤ a.pt w
+        ⁻¹ᵁ (LB.LinComb P.L (K := Fin 1) (fun _ => 𝟙 G.left) (fun _ => (n : ℤ))).U (fun _ => i) :=
   top_le_wchart (K := Fin 1) P.L (𝟙 G.left) (a.pt w) i (by simpa using h)
 
-theorem fr_change (a : ArchFrame P z g) (w : Fin g → ℂ) (i j : P.L.ι) (hi : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i)
-    (hj : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U j) :
-    a.u.fr (fun _ => i) w = valAt' (a.pt w) (P.L.U i ⊓ P.L.U j) (P.L.g i j).val * a.u.fr (fun _ => j) w := by
-  have h : ⊤ ≤ (a.u.ex w).left ⁻¹ᵁ ((P.L.pull a.φ).U (fun _ => i) ⊓ (P.L.pull a.φ).U (fun _ => j)) :=
+theorem fr_change
+    (a : ArchFrame P z g) (w : Fin g → ℂ) (i j : P.L.ι)
+    (hi : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i) (hj : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U j)
+    : a.u.fr (fun _ => i) w
+      = valAt' (a.pt w) (P.L.U i ⊓ P.L.U j) (P.L.g i j).val * a.u.fr (fun _ => j) w := by
+  have h
+      : ⊤ ≤ (a.u.ex w).left ⁻¹ᵁ ((P.L.pull a.φ).U (fun _ => i) ⊓ (P.L.pull a.φ).U (fun _ => j)) :=
     (top_le_preimage_inf _ _ _).2 ⟨top_le_frame a w i hi, top_le_frame a w j hj⟩
   refine (a.u.fr_compat _ _ w h).trans ?_
   have := valAt'_g_const (K := PUnit) P.L a.φ 1 (a.u.ex w).left i j h
   rw [zpow_one] at this
   exact congrArg (· * a.u.fr (fun _ => j) w) this
 
-theorem sec_change (a : ArchFrame P z g) {n : ℕ} (s : Out.H0 P.L n) (w : Fin g → ℂ) (i j : P.L.ι)
-    (hi : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i) (hj : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U j) :
-    valF (a.pt w) _ (s.f fun _ => i) =
-      valAt' (a.pt w) (P.L.U i ⊓ P.L.U j) (P.L.g i j).val ^ n * valF (a.pt w) _ (s.f fun _ => j) := by
-  have h : ⊤ ≤ a.pt w ⁻¹ᵁ ((LB.LinComb P.L (K := Fin 1) (fun _ => 𝟙 G.left) (fun _ => (n : ℤ))).U (fun _ => i) ⊓
-      (LB.LinComb P.L (K := Fin 1) (fun _ => 𝟙 G.left) (fun _ => (n : ℤ))).U (fun _ => j)) :=
+theorem sec_change
+    (a : ArchFrame P z g)
+    {n : ℕ} (s : Out.H0 P.L n)
+    (w : Fin g → ℂ) (i j : P.L.ι) (hi : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i) (hj : ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U j)
+    : valF (a.pt w) _ (s.f fun _ => i)
+      = valAt' (a.pt w) (P.L.U i ⊓ P.L.U j) (P.L.g i j).val ^ n
+        * valF (a.pt w) _ (s.f fun _ => j) := by
+  have h
+      : ⊤
+        ≤ a.pt w
+          ⁻¹ᵁ ((LB.LinComb P.L (K := Fin 1) (fun _ => 𝟙 G.left) (fun _ => (n : ℤ))).U (fun _ => i)
+            ⊓ (LB.LinComb P.L (K := Fin 1) (fun _ => 𝟙 G.left) (fun _ => (n : ℤ))).U
+              (fun _ => j)) :=
     (top_le_preimage_inf _ _ _).2 ⟨top_le_sec a n w i hi, top_le_sec a n w j hj⟩
   have e := congrArg (valAt' (a.pt w) _) (s.compat (fun _ => i) (fun _ => j))
   rw [valAt'_mul, valAt'_map _ _ _ h, valAt'_map _ _ _ h] at e
@@ -111,8 +146,8 @@ theorem sec_change (a : ArchFrame P z g) {n : ℕ} (s : Out.H0 P.L n) (w : Fin g
 
 theorem unique_fn (a : ArchFrame P z g) (n : ℕ) (s : Out.H0 P.L n) : ∃! θ, a.IsFn s θ := by
   choose c hc using exists_chart_pt a
-  have hne : ∀ w i, ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i → a.u.fr (fun _ => i) w ≠ 0 :=
-    fun w i h => a.u.fr_ne _ w (top_le_frame a w i h)
+  have hne : ∀ w i, ⊤ ≤ a.pt w ⁻¹ᵁ P.L.U i → a.u.fr (fun _ => i) w ≠ 0 := fun w i h =>
+    a.u.fr_ne _ w (top_le_frame a w i h)
   refine ⟨fun w => valF (a.pt w) _ (s.f fun _ => c w) / a.u.fr (fun _ => c w) w ^ n, ?_, ?_⟩
   · intro i w hi
     have h1 := fr_change a w i (c w) hi (hc w)
@@ -128,7 +163,9 @@ theorem unique_fn (a : ArchFrame P z g) (n : ℕ) (s : Out.H0 P.L n) : ∃! θ, 
 
 end GlobalTheory.CompanionTheory.Ar.Sl.FrameFn
 
-theorem GlobalTheory.CompanionTheory.Ar.Sl.frame_fn_existsUnique : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (P : RigLB G) (z : Sp ℂ ⟶ S) (g : ℕ) (a : ArchFrame P z g) (n : ℕ) (s : Out.H0 P.L n), ∃! θ, a.IsFn s θ :=
-  by
+theorem GlobalTheory.CompanionTheory.Ar.Sl.frame_fn_existsUnique
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (P : RigLB G) (z : Sp ℂ ⟶ S)
+        (g : ℕ) (a : ArchFrame P z g) (n : ℕ) (s : Out.H0 P.L n),
+      ∃! θ, a.IsFn s θ := by
   intro S G _ _ P z g a n s
   exact GlobalTheory.CompanionTheory.Ar.Sl.FrameFn.unique_fn a n s

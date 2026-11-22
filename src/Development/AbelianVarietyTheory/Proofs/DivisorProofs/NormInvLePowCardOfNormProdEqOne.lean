@@ -6,12 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem norm_inv_le_pow_card_of_norm_prod_eq_one :
-    ∀ (B : Multiset ℂˣ) (M : ℝ), 1 ≤ M → (∀ b ∈ B, ‖(b : ℂ)‖ ≤ M) →
-      ‖(B.map fun b : ℂˣ => (b : ℂ)).prod‖ = 1 → ∀ b ∈ B, ‖((b⁻¹ : ℂˣ) : ℂ)‖ ≤ M ^ B.card := by
+theorem norm_inv_le_pow_card_of_norm_prod_eq_one
+    : ∀ (B : Multiset ℂˣ) (M : ℝ),
+      1 ≤ M → (∀ b ∈ B, ‖(b : ℂ)‖ ≤ M) → ‖(B.map fun b : ℂˣ => (b : ℂ)).prod‖ = 1
+        → ∀ b ∈ B, ‖((b⁻¹ : ℂˣ) : ℂ)‖ ≤ M ^ B.card := by
   intro B M hM hB hprod b hb
-  have aux : ∀ C : Multiset ℂˣ, (∀ c ∈ C, ‖(c : ℂ)‖ ≤ M) →
-      ‖(C.map fun c : ℂˣ => (c : ℂ)).prod‖ ≤ M ^ C.card := by
+  have aux
+      : ∀ C : Multiset ℂˣ,
+        (∀ c ∈ C, ‖(c : ℂ)‖ ≤ M) → ‖(C.map fun c : ℂˣ => (c : ℂ)).prod‖ ≤ M ^ C.card := by
     intro C
     induction C using Multiset.induction_on with
     | empty => intro _; simp

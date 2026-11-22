@@ -5,13 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PrimRay
 
-theorem eq_of_toReal_eq_smul : ∀ {X : Type} [AddCommGroup X] (x y : LinearMap.BilinForm ℤ X) (d : ℝ), 0 < d →
-  (∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = x → k = 1) → (∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = y → k = 1) →
-  toReal x = d • toReal y → x = y ∧ d = 1 := by
+theorem eq_of_toReal_eq_smul
+    : ∀ {X : Type} [AddCommGroup X] (x y : LinearMap.BilinForm ℤ X) (d : ℝ),
+      0 < d → (∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = x → k = 1)
+        → (∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = y → k = 1)
+        → toReal x = d • toReal y
+        → x = y ∧ d = 1 := by
   intro X _ x y d hd hx hy h
   have hx0 : x ≠ 0 := fun h0 => by
     have := hx 0 0 (by simp [h0])
@@ -19,7 +23,8 @@ theorem eq_of_toReal_eq_smul : ∀ {X : Type} [AddCommGroup X] (x y : LinearMap.
   have hy0 : y ≠ 0 := fun h0 => by
     have := hy 0 0 (by simp [h0])
     simp at this
-  obtain ⟨a, b, ha, hb, hab⟩ := GlobalTheory.T.exists_pos_rat_multiple_of_pos_real_multiple_intForm x y d hd hy0 h
+  obtain ⟨a, b, ha, hb, hab⟩ :=
+    GlobalTheory.T.exists_pos_rat_multiple_of_pos_real_multiple_intForm x y d hd hy0 h
   have hg : 0 < Nat.gcd a b := Nat.gcd_pos_of_pos_left b ha
   have hcop0 := Nat.coprime_div_gcd_div_gcd (m := a) (n := b) hg
   obtain ⟨a', ha'⟩ := Nat.gcd_dvd_left a b

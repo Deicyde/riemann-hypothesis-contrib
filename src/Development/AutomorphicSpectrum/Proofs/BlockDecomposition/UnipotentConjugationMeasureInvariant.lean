@@ -6,12 +6,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenFns
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZMir.Leib GlobalTheory.CompanionTheory.Rodier
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZMir.Leib
+  GlobalTheory.CompanionTheory.Rodier
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.HaarConj
 
-theorem conj_measurePreserving : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] (U N : Subgroup G), IsClosed (U : Set G) → (∀ n ∈ N, ∀ u ∈ U, n * u * n⁻¹ ∈ U) → (∀ n ∈ N, ∃ L : Subgroup G, n ∈ L ∧ L ≤ N ∧ IsCompact (L : Set G)) → ∀ [MeasurableSpace U] [BorelSpace U] (μ : MeasureTheory.Measure U) [μ.IsHaarMeasure], ∀ n ∈ N, ∀ c : U → U, (∀ u, (c u : G) = n * u * n⁻¹) → MeasureTheory.MeasurePreserving c μ μ := by
+theorem conj_measurePreserving
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] (U N : Subgroup G),
+      IsClosed (U : Set G) → (∀ n ∈ N, ∀ u ∈ U, n * u * n⁻¹ ∈ U)
+        → (∀ n ∈ N, ∃ L : Subgroup G, n ∈ L ∧ L ≤ N ∧ IsCompact (L : Set G))
+        → ∀ [MeasurableSpace U] [BorelSpace U] (μ : MeasureTheory.Measure U) [μ.IsHaarMeasure],
+          ∀ n ∈ N, ∀ c : U → U,
+            (∀ u, (c u : G) = n * u * n⁻¹) → MeasureTheory.MeasurePreserving c μ μ := by
   intro G _ _ _ _ _ _ U N hU hN hL _ _ μ _ n hn c hc
   have hninv : n⁻¹ ∈ N := N.inv_mem hn
   let d : U → U := fun u => ⟨n⁻¹ * u * n⁻¹⁻¹, hN _ hninv _ u.2⟩
@@ -26,8 +34,13 @@ theorem conj_measurePreserving : ∀ {G : Type} [Group G] [TopologicalSpace G] [
   have hdc' : Continuous d := by
     refine Continuous.subtype_mk ?_ _
     fun_prop
-  let e : U ≃* U :=
-    { toFun := c, invFun := d, left_inv := hdc, right_inv := hcd, map_mul' := hcmul }
+  let e : U ≃* U := {
+    toFun := c
+    invFun := d
+    left_inv := hdc
+    right_inv := hcd
+    map_mul' := hcmul
+  }
   haveI hH : (μ.map c).IsHaarMeasure := e.isHaarMeasure_map μ hcc hdc'
   haveI : LocallyCompactSpace U := hU.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : SecondCountableTopology U := Topology.IsEmbedding.subtypeVal.secondCountableTopology
@@ -37,8 +50,7 @@ theorem conj_measurePreserving : ∀ {G : Type} [Group G] [TopologicalSpace G] [
   have hK : IsCompact K := (hLc.prod (hQc.image continuous_subtype_val)).image (by fun_prop)
   let Q' : Set U := Subtype.val ⁻¹' K
   have hQ'c : IsCompact Q' := hU.isClosedEmbedding_subtypeVal.isCompact_preimage hK
-  have hQQ' : Q ⊆ Q' := fun q hq =>
-    ⟨(1, (q : G)), ⟨L.one_mem, ⟨q, hq, rfl⟩⟩, by simp⟩
+  have hQQ' : Q ⊆ Q' := fun q hq => ⟨(1, (q : G)), ⟨L.one_mem, ⟨q, hq, rfl⟩⟩, by simp⟩
   have hpos : 0 < μ Q' :=
     (MeasureTheory.Measure.measure_pos_of_mem_nhds μ hQn).trans_le (MeasureTheory.measure_mono hQQ')
   have hfin : μ Q' ≠ ⊤ := hQ'c.measure_lt_top.ne
@@ -51,7 +63,9 @@ theorem conj_measurePreserving : ∀ {G : Type} [Group G] [TopologicalSpace G] [
         rw [← hc]
         exact h
       change n⁻¹ * l * q * (n⁻¹ * l)⁻¹ = (u : G)
-      calc n⁻¹ * l * q * (n⁻¹ * l)⁻¹ = n⁻¹ * (l * q * l⁻¹) * n := by group
+      calc
+        n⁻¹ * l * q * (n⁻¹ * l)⁻¹
+          = n⁻¹ * (l * q * l⁻¹) * n := by group
         _ = (u : G) := by rw [h']; group
     · rintro ⟨⟨l, q⟩, ⟨hl, hq⟩, h⟩
       refine ⟨(n * l, q), ⟨L.mul_mem hnL hl, hq⟩, ?_⟩
@@ -60,11 +74,11 @@ theorem conj_measurePreserving : ∀ {G : Type} [Group G] [TopologicalSpace G] [
       rw [hc, ← h']
       group
   have hmeas : MeasurableSet Q' := hQ'c.measurableSet
-  have h1 : μ.map c Q' = μ Q' := by
-    rw [MeasureTheory.Measure.map_apply hcc.measurable hmeas, hpre]
+  have h1 : μ.map c Q' = μ Q' := by rw [MeasureTheory.Measure.map_apply hcc.measurable hmeas, hpre]
   have heq := MeasureTheory.Measure.isMulLeftInvariant_eq_smul (μ.map c) μ
-  have h2 : ((MeasureTheory.Measure.haarScalarFactor (μ.map c) μ : NNReal) : ENNReal) * μ Q'
-      = 1 * μ Q' := by
+  have h2
+      : ((MeasureTheory.Measure.haarScalarFactor (μ.map c) μ : NNReal) : ENNReal) * μ Q'
+        = 1 * μ Q' := by
     have h3 := congrArg (fun ν : MeasureTheory.Measure U => ν Q') heq
     simp only [MeasureTheory.Measure.smul_apply, h1] at h3
     rw [one_mul]

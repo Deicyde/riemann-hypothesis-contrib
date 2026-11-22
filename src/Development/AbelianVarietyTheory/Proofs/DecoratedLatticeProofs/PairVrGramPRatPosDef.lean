@@ -22,7 +22,9 @@ open scoped Matrix ComplexOrder
 
 namespace GlobalTheory.Core.CoefGram
 
-theorem posDef_of_hasSignature {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (h : Formalism.UG.HasSignature G n 0) : G.PosDef := by
+theorem posDef_of_hasSignature
+    {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (h : Formalism.UG.HasSignature G n 0)
+    : G.PosDef := by
   obtain ⟨e, P, hP⟩ := h
   have hJ : Formalism.UG.Jpq n 0 = 1 := by
     ext i j

@@ -89,13 +89,13 @@ theorem kType_int {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) :
     apply onep_KG_ext
     rw [hγ, ktint_exp_two_pi]
     rfl
-  have hw : (((2 * Real.pi : ℝ) : ℂ) • T.dτ (Complex.I • Matrix.single a a (1 : ℂ))) T.w =
-      (((2 * Real.pi : ℝ) : ℂ) * (Complex.I * (Λ a : ℂ))) • T.w := by
+  have hw
+      : (((2 * Real.pi : ℝ) : ℂ) • T.dτ (Complex.I • Matrix.single a a (1 : ℂ))) T.w
+        = (((2 * Real.pi : ℝ) : ℂ) * (Complex.I * (Λ a : ℂ))) • T.w := by
     rw [_root_.smul_apply, map_smul, _root_.smul_apply, T.w_wt, smul_smul, smul_smul, mul_assoc]
   have key := ktint_exp_apply_of_eig _ _ _ hw
   rw [← hop, h1] at key
-  have hone : T.op 1 = 1 := by
-    simp [KType.op]
+  have hone : T.op 1 = 1 := by simp [KType.op]
   rw [hone] at key
   change T.w = _ at key
   have hw0 : T.w ≠ 0 := by
@@ -105,7 +105,8 @@ theorem kType_int {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) :
     exact zero_ne_one this
   have he : NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) * (Complex.I * (Λ a : ℂ))) = 1 := by
     by_contra hne
-    have h2 : (1 - NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) * (Complex.I * (Λ a : ℂ)))) • T.w = 0 := by
+    have h2
+        : (1 - NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) * (Complex.I * (Λ a : ℂ)))) • T.w = 0 := by
       rw [sub_smul, one_smul, ← key, sub_self]
     rcases smul_eq_zero.mp h2 with h3 | h3
     · exact hne (sub_eq_zero.mp h3).symm
@@ -113,9 +114,10 @@ theorem kType_int {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) :
   rw [← Complex.exp_eq_exp_ℂ, Complex.exp_eq_one_iff] at he
   obtain ⟨m, hm⟩ := he
   refine ⟨m, ?_⟩
-  have hpi : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
-    simp [Complex.I_ne_zero, Real.pi_ne_zero]
-  have h4 : (Λ a : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) = (m : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) := by
+  have hpi : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by simp [Complex.I_ne_zero, Real.pi_ne_zero]
+  have h4
+      : (Λ a : ℂ) * (2 * (Real.pi : ℂ) * Complex.I)
+        = (m : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) := by
     rw [← hm]
     push_cast
     ring

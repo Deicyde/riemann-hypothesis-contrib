@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.GeoTie
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+  GlobalTheory.GeoTie
 
 set_option autoImplicit false
 
@@ -18,14 +19,16 @@ open GlobalTheory.GoodPts
 
 variable {p : ℕ} [Fact p.Prime] {F : Type} [Field F] [NumberField F] (φ : F →+* ℂ_[p])
 
-theorem norm_le_one_of_valuation_le_one {x : F} (hx : (placeAt φ).valuation F x ≤ 1) : ‖φ x‖ ≤ 1 := by
+theorem norm_le_one_of_valuation_le_one {x : F} (hx : (placeAt φ).valuation F x ≤ 1)
+    : ‖φ x‖ ≤ 1 := by
   obtain ⟨n, d, hnd⟩ := HeightOneSpectrum.exists_primeCompl_mul_eq_of_integer (placeAt φ) x hx
   have hd : ‖φ ((d : 𝓞 F) : F)‖ = 1 := le_antisymm (norm_int_le_one φ _) (not_lt.1 d.2)
   have h2 := congrArg (fun t => ‖φ t‖) hnd
   simp only [map_mul, norm_mul] at h2
   have h3 : ‖φ x‖ * ‖φ ((d : 𝓞 F) : F)‖ = ‖φ (n : F)‖ := h2
   rw [hd, mul_one] at h3
-  rw [h3]; exact norm_int_le_one φ n
+  rw [h3]
+  exact norm_int_le_one φ n
 
 variable (T : CDVR)
 
@@ -35,8 +38,9 @@ theorem valV_le_one_of_inV {x : T.Fr} (hx : InV T x) : valV T.V x ≤ 1 := by
   exact HeightOneSpectrum.intValuation_le_one _ _
 
 theorem inV_of_valV_le_one {x : T.Fr} (hx : valV T.V x ≤ 1) : InV T x := by
-  obtain ⟨n, d, hnd⟩ := HeightOneSpectrum.exists_primeCompl_mul_eq_of_integer
-    (IsDiscreteValuationRing.maximalIdeal T.V) x hx
+  obtain ⟨n, d, hnd⟩ :=
+    HeightOneSpectrum.exists_primeCompl_mul_eq_of_integer (IsDiscreteValuationRing.maximalIdeal T.V)
+      x hx
   have hu : IsUnit (d : T.V) := by
     by_contra h
     exact d.2 ((IsLocalRing.mem_maximalIdeal _).2 h)
@@ -49,14 +53,13 @@ theorem vV_zpow {x : T.Fr} (n : ℤ) : vV T.V (x ^ n) = n * vV T.V x := by
 
 variable {T}
 
-theorem overLa_placeAt_of_isReading {io : F →+* T.Fr} {k : T.Fr →+* ℂ_[p]} (hR : IsReading φ T io k) :
-    ∃ e : ℕ, OverLa (placeAt φ) T.V io e := by
+theorem overLa_placeAt_of_isReading {io : F →+* T.Fr} {k : T.Fr →+* ℂ_[p]} (hR : IsReading φ T io k)
+    : ∃ e : ℕ, OverLa (placeAt φ) T.V io e := by
   set P := placeAt φ with hP
   have key : ∀ y : T.Fr, valV T.V y ≤ 1 ↔ ‖k y‖ ≤ 1 := fun y =>
     ⟨fun h => (hR.int y).2 (inV_of_valV_le_one T h), fun h => valV_le_one_of_inV T ((hR.int y).1 h)⟩
   obtain ⟨π, hπ⟩ := P.intValuation_exists_uniformizer
-  have hπ1 : P.intValuation π < 1 := by
-    rw [hπ, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
+  have hπ1 : P.intValuation π < 1 := by rw [hπ, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
   have hπn : ‖φ (π : F)‖ < 1 := (mem_placeAt φ π).1 ((P.intValuation_lt_one_iff_mem π).1 hπ1)
   have hπ0 : (π : F) ≠ 0 := by
     intro h
@@ -78,7 +81,8 @@ theorem overLa_placeAt_of_isReading {io : F →+* T.Fr} {k : T.Fr →+* ℂ_[p]}
   have hvx : 0 < vV T.V x := by
     have h := (WithZero.log_lt_log (valV_ne_zero hx0) one_ne_zero).2 hvx1
     rw [WithZero.log_one] at h
-    simp only [vV]; omega
+    simp only [vV]
+    omega
   refine ⟨(vV T.V x).toNat, by omega, fun a => ?_⟩
   by_cases ha : a = 0
   · subst ha; simp [vV, vLa]
@@ -104,13 +108,17 @@ theorem overLa_placeAt_of_isReading {io : F →+* T.Fr} {k : T.Fr →+* ℂ_[p]}
     exact le_antisymm h1 h3
   have hvb : vV T.V (io b) = 0 := by simp [vV, hvb1]
   have hab : io a = io b * x ^ n := by
-    rw [hx, ← map_zpow₀, ← map_mul, hb, mul_assoc, ← zpow_add₀ hπ0, neg_add_cancel, zpow_zero, mul_one]
-  rw [hab, vV_mul ((map_ne_zero io).2 hb0) (zpow_ne_zero _ hx0), hvb, vV_zpow, Int.toNat_of_nonneg hvx.le]
+    rw [hx, ← map_zpow₀, ← map_mul, hb, mul_assoc, ← zpow_add₀ hπ0, neg_add_cancel, zpow_zero,
+      mul_one]
+  rw [hab, vV_mul ((map_ne_zero io).2 hb0) (zpow_ne_zero _ hx0), hvb, vV_zpow,
+    Int.toNat_of_nonneg hvx.le]
   ring
 
-theorem overLa_placeAt : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (φ : F →+* ℂ_[p]) (T : CDVR)
-    (io : F →+* T.Fr) (k : T.Fr →+* ℂ_[p]), IsReading φ T io k → ∃ e : ℕ, OverLa (placeAt φ) T.V io e :=
-  fun _ _ _ _ _ φ _ _ _ hR => overLa_placeAt_of_isReading φ hR
+theorem overLa_placeAt
+    : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (φ : F →+* ℂ_[p]) (T : CDVR)
+        (io : F →+* T.Fr) (k : T.Fr →+* ℂ_[p]),
+      IsReading φ T io k → ∃ e : ℕ, OverLa (placeAt φ) T.V io e := fun _ _ _ _ _ φ _ _ _ hR =>
+  overLa_placeAt_of_isReading φ hR
 
 end GlobalTheory.ReadingOver
 

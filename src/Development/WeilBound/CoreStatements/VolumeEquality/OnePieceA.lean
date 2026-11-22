@@ -10,10 +10,14 @@ noncomputable section
 namespace SheetDecomposition.One
 
 open AlgebraicGeometry CategoryTheory Filter Topology Metric
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.TB.ValAt GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.TB.ValAt GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem isHolTo_mono {X : Scheme.{0}} {n : ℕ} {B T : Set (Fin n → ℂ)} {y : (Fin n → ℂ) → (Sp ℂ ⟶ X)}
-    (hy : IsHolTo B y) (hT : IsOpen T) (h : T ⊆ B) : IsHolTo T y := by
+theorem isHolTo_mono
+    {X : Scheme.{0}} {n : ℕ} {B T : Set (Fin n → ℂ)} {y : (Fin n → ℂ) → (Sp ℂ ⟶ X)}
+    (hy : IsHolTo B y) (hT : IsOpen T) (h : T ⊆ B)
+    : IsHolTo T y := by
   intro U f
   have e : {b ∈ T | ⊤ ≤ y b ⁻¹ᵁ U} = T ∩ {b ∈ B | ⊤ ≤ y b ⁻¹ᵁ U} := by
     ext b
@@ -21,13 +25,20 @@ theorem isHolTo_mono {X : Scheme.{0}} {n : ℕ} {B T : Set (Fin n → ℂ)} {y :
   rw [e]
   exact ⟨hT.inter (hy U f).1, (hy U f).2.mono Set.inter_subset_right⟩
 
-theorem exists_point {K : Type} [Field K] (σ : K →+* ℂ) {X : Scheme.{0}} (s : X ⟶ Sp K) [LocallyOfFiniteType s]
-    (U : X.Opens) {q : X} (hq : q ∈ U) : ∃ x : Sp ℂ ⟶ X, x ≫ s = spMap σ ∧ ⊤ ≤ x ⁻¹ᵁ U := by
+theorem exists_point
+    {K : Type} [Field K]
+    (σ : K →+* ℂ)
+    {X : Scheme.{0}} (s : X ⟶ Sp K) [LocallyOfFiniteType s]
+    (U : X.Opens)
+    {q : X} (hq : q ∈ U)
+    : ∃ x : Sp ℂ ⟶ X, x ≫ s = spMap σ ∧ ⊤ ≤ x ⁻¹ᵁ U := by
   obtain ⟨V, hV, hqV, hVU⟩ := exists_isAffineOpen_mem_and_subset (X := X) (x := q) (U := U) hq
-  let ρ' : CommRingCat.of K ⟶ Γ(X, V) := (Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ s.appLE ⊤ V (fun _ _ => trivial)
+  let ρ' : CommRingCat.of K ⟶ Γ(X, V) :=
+    (Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ s.appLE ⊤ V (fun _ _ => trivial)
   let ρ : K →+* Γ(X, V) := ρ'.hom
   have hρ : ρ.FiniteType := by
-    have h1 := LocallyOfFiniteType.finiteType_appLE s (isAffineOpen_top (Sp K)) hV (fun _ _ => trivial)
+    have h1 :=
+      LocallyOfFiniteType.finiteType_appLE s (isAffineOpen_top (Sp K)) hV (fun _ _ => trivial)
     have h2 : (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom.FiniteType :=
       RingHom.FiniteType.of_surjective _
         (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of K)).inv).2
@@ -42,8 +53,7 @@ theorem exists_point {K : Type} [Field K] (σ : K →+* ℂ) {X : Scheme.{0}} (s
   haveI : Module.Finite K (Γ(X, V) ⧸ M) := finite_of_finite_type_of_isJacobsonRing K (Γ(X, V) ⧸ M)
   let e : (Γ(X, V) ⧸ M) →ₐ[K] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let χ : Γ(X, V) →ₐ[K] ℂ := e.comp (Ideal.Quotient.mkₐ K M)
   let x : Sp ℂ ⟶ X := spMap χ.toRingHom ≫ hV.fromSpec

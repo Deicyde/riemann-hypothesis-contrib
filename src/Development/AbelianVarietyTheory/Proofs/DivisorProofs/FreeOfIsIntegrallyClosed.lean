@@ -10,10 +10,11 @@ open IsLocalRing
 
 namespace GlobalTheory.PurFree
 
-theorem span_succAbove_eq_top {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] {k : ℕ}
-    (e : Fin (k + 1) → M) (he : Submodule.span R (Set.range e) = ⊤) (a : Fin (k + 1) → R)
-    (ha : ∑ i, a i • e i = 0) (j : Fin (k + 1)) (hj : IsUnit (a j)) :
-    Submodule.span R (Set.range (e ∘ j.succAbove)) = ⊤ := by
+theorem span_succAbove_eq_top
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    {k : ℕ} (e : Fin (k + 1) → M) (he : Submodule.span R (Set.range e) = ⊤) (a : Fin (k + 1) → R)
+    (ha : ∑ i, a i • e i = 0) (j : Fin (k + 1)) (hj : IsUnit (a j))
+    : Submodule.span R (Set.range (e ∘ j.succAbove)) = ⊤ := by
   set N := Submodule.span R (Set.range (e ∘ j.succAbove))
   have hsa : ∀ i : Fin k, e (j.succAbove i) ∈ N := fun i => Submodule.subset_span ⟨i, rfl⟩
   have hej : e j ∈ N := by
@@ -21,7 +22,9 @@ theorem span_succAbove_eq_top {R M : Type} [CommRing R] [AddCommGroup M] [Module
     obtain ⟨u, hu⟩ := hj
     have h1 := eq_neg_of_add_eq_zero_left ha
     have : e j = -(↑u⁻¹ : R) • ∑ i : Fin k, a (j.succAbove i) • e (j.succAbove i) := by
-      calc e j = ((↑u⁻¹ : R) * a j) • e j := by rw [← hu, Units.inv_mul, one_smul]
+      calc
+        e j
+          = ((↑u⁻¹ : R) * a j) • e j := by rw [← hu, Units.inv_mul, one_smul]
         _ = (↑u⁻¹ : R) • (a j • e j) := mul_smul _ _ _
         _ = _ := by rw [h1, smul_neg, neg_smul]
     rw [this]
@@ -32,20 +35,24 @@ theorem span_succAbove_eq_top {R M : Type} [CommRing R] [AddCommGroup M] [Module
   · rw [h]; exact hej
   · exact hsa i'
 
-theorem exists_span_fin_pred {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] (n : ℕ)
-    (e : Fin n → M) (he : Submodule.span R (Set.range e) = ⊤) (a : Fin n → R)
-    (ha : ∑ i, a i • e i = 0) (j : Fin n) (hj : IsUnit (a j)) :
-    ∃ e' : Fin (n - 1) → M, Submodule.span R (Set.range e') = ⊤ := by
+theorem exists_span_fin_pred
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (n : ℕ) (e : Fin n → M) (he : Submodule.span R (Set.range e) = ⊤) (a : Fin n → R)
+    (ha : ∑ i, a i • e i = 0) (j : Fin n) (hj : IsUnit (a j))
+    : ∃ e' : Fin (n - 1) → M, Submodule.span R (Set.range e') = ⊤ := by
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by have := j.pos; omega⟩
   exact ⟨e ∘ j.succAbove, span_succAbove_eq_top e he a ha j hj⟩
 
-theorem free_of_relations {R M : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [AddCommGroup M] [Module R M] [Module.Finite R M] (x y : R)
-    (hx : x ∈ maximalIdeal R) (hy : y ∈ maximalIdeal R)
-    (hrel : ∀ (n : ℕ) (e : Fin n → M), Submodule.span R (Set.range e) = ⊤ →
-      ∀ a : Fin n → R, ∑ i, a i • e i = 0 → (∀ i, a i ∈ maximalIdeal R) →
-      ∃ b c : Fin n → R, ∑ i, b i • e i = 0 ∧ ∑ i, c i • e i = 0 ∧ a = x • b + y • c) :
-    Module.Free R M := by
+theorem free_of_relations
+    {R M : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [AddCommGroup M] [Module R M]
+    [Module.Finite R M]
+    (x y : R) (hx : x ∈ maximalIdeal R) (hy : y ∈ maximalIdeal R)
+    (hrel : ∀ (n : ℕ) (e : Fin n → M),
+      Submodule.span R (Set.range e) = ⊤
+        → ∀ a : Fin n → R,
+          ∑ i, a i • e i = 0 → (∀ i, a i ∈ maximalIdeal R)
+            → ∃ b c : Fin n → R, ∑ i, b i • e i = 0 ∧ ∑ i, c i • e i = 0 ∧ a = x • b + y • c)
+    : Module.Free R M := by
   classical
   have hex : ∃ n, ∃ e : Fin n → M, Submodule.span R (Set.range e) = ⊤ := Module.Finite.exists_fin
   obtain ⟨e, he⟩ := Nat.find_spec hex
@@ -68,18 +75,18 @@ theorem free_of_relations {R M : Type} [CommRing R] [IsLocalRing R] [IsNoetheria
     · rw [LinearMap.mem_ker, Fintype.linearCombination_apply]; exact hb
     · rw [LinearMap.mem_ker, Fintype.linearCombination_apply]; exact hc
   have hbot : LinearMap.ker f = ⊥ :=
-    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal R) _
-      (IsNoetherian.noetherian _) hK
+    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal R) _ (IsNoetherian.noetherian _) hK
       (by rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top])
   have hsurj : Function.Surjective f := by
     rw [← LinearMap.range_eq_top, Fintype.range_linearCombination, he]
   exact Module.Free.of_equiv (LinearEquiv.ofBijective f ⟨LinearMap.ker_eq_bot.mp hbot, hsurj⟩)
 
-theorem relations_of_koszul {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] (x y : R)
-    (hK : ∀ B C : M, x • B + y • C = 0 → ∃ w : M, B = y • w ∧ C = -(x • w))
+theorem relations_of_koszul
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (x y : R) (hK : ∀ B C : M, x • B + y • C = 0 → ∃ w : M, B = y • w ∧ C = -(x • w))
     (n : ℕ) (e : Fin n → M) (he : Submodule.span R (Set.range e) = ⊤) (a : Fin n → R)
-    (ha : ∑ i, a i • e i = 0) (hai : ∀ i, a i ∈ Ideal.span {x, y}) :
-    ∃ b c : Fin n → R, ∑ i, b i • e i = 0 ∧ ∑ i, c i • e i = 0 ∧ a = x • b + y • c := by
+    (ha : ∑ i, a i • e i = 0) (hai : ∀ i, a i ∈ Ideal.span {x, y})
+    : ∃ b c : Fin n → R, ∑ i, b i • e i = 0 ∧ ∑ i, c i • e i = 0 ∧ a = x • b + y • c := by
   have hbc : ∀ i, ∃ p q : R, p * x + q * y = a i := fun i => Ideal.mem_span_pair.mp (hai i)
   choose b c hbc using hbc
   have hsum : x • (∑ i, b i • e i) + y • (∑ i, c i • e i) = 0 := by
@@ -101,11 +108,13 @@ theorem relations_of_koszul {R M : Type} [CommRing R] [AddCommGroup M] [Module R
     rw [← hbc i]
     ring
 
-theorem two_le_height_of_comap (R A : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
-    [IsLocalRing R] [IsNoetherianRing R] [CommRing A] [IsDomain A] [Algebra R A]
-    [Algebra.IsIntegral R A] [FaithfulSMul R A] (h2 : ringKrullDim R = 2)
-    (P : Ideal A) (hPp : P.IsPrime) (hP : P.comap (algebraMap R A) = maximalIdeal R) :
-    2 ≤ P.height := by
+theorem two_le_height_of_comap
+    (R A : Type)
+    [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsLocalRing R] [IsNoetherianRing R]
+    [CommRing A] [IsDomain A] [Algebra R A] [Algebra.IsIntegral R A] [FaithfulSMul R A]
+    (h2 : ringKrullDim R = 2)
+    (P : Ideal A) (hPp : P.IsPrime) (hP : P.comap (algebraMap R A) = maximalIdeal R)
+    : 2 ≤ P.height := by
   have hm : (maximalIdeal R).height = 2 := by
     have := IsLocalRing.maximalIdeal_height_eq_ringKrullDim (R := R)
     rw [h2] at this
@@ -115,8 +124,7 @@ theorem two_le_height_of_comap (R A : Type) [CommRing R] [IsDomain R] [IsIntegra
     rw [h, Ideal.height_bot] at hm
     exact absurd hm (by decide)
   obtain ⟨x, hxm, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hmbot
-  obtain ⟨q, hq, hqm⟩ := Ideal.exists_minimalPrimes_le
-    ((Ideal.span_singleton_le_iff_mem _).mpr hxm)
+  obtain ⟨q, hq, hqm⟩ := Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem _).mpr hxm)
   have hqp : q.IsPrime := hq.1.1
   have hq1 : q.height ≤ 1 := Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ q hq
   have hqne : q ≠ maximalIdeal R := by
@@ -129,7 +137,8 @@ theorem two_le_height_of_comap (R A : Type) [CommRing R] [IsDomain R] [IsIntegra
     rw [h, Ideal.span_singleton_le_iff_mem, Ideal.mem_bot] at this
     exact hx0 this
   haveI : P.LiesOver (maximalIdeal R) := ⟨hP.symm⟩
-  obtain ⟨Q, hQP, hQ, hQo⟩ := Ideal.exists_ideal_le_liesOver_of_le (p := q) (q := maximalIdeal R) P hqm
+  obtain ⟨Q, hQP, hQ, hQo⟩ :=
+    Ideal.exists_ideal_le_liesOver_of_le (p := q) (q := maximalIdeal R) P hqm
   have hQq : Q.comap (algebraMap R A) = q := hQo.over.symm
   have hQlt : Q < P := by
     refine lt_of_le_of_ne hQP ?_
@@ -146,15 +155,19 @@ theorem two_le_height_of_comap (R A : Type) [CommRing R] [IsDomain R] [IsIntegra
     rw [ENat.one_le_iff_ne_zero, Ne, Ideal.height_eq_zero_iff_eq_bot]
     exact hQbot
   have h3 : Q.height + 1 ≤ P.height := Ideal.height_add_one_le_of_lt_of_isPrime hQlt
-  calc (2 : ℕ∞) = 1 + 1 := by norm_num
+  calc
+    (2 : ℕ∞)
+      = 1 + 1 := by norm_num
     _ ≤ Q.height + 1 := by gcongr
     _ ≤ P.height := h3
 
-theorem koszul_of_height (R A : Type) [CommRing R] [IsLocalRing R] [CommRing A] [IsDomain A]
-    [IsIntegrallyClosed A] [IsNoetherianRing A] [Algebra R A] [FaithfulSMul R A]
+theorem koszul_of_height
+    (R A : Type) [CommRing R] [IsLocalRing R] [CommRing A] [IsDomain A] [IsIntegrallyClosed A]
+    [IsNoetherianRing A] [Algebra R A] [FaithfulSMul R A]
     (x y : R) (hm : maximalIdeal R = Ideal.span {x, y}) (hx : x ≠ 0)
     (hP : ∀ P : Ideal A, P.IsPrime → P.comap (algebraMap R A) = maximalIdeal R → 2 ≤ P.height)
-    (B C : A) (h : x • B + y • C = 0) : ∃ w : A, B = y • w ∧ C = -(x • w) := by
+    (B C : A) (h : x • B + y • C = 0)
+    : ∃ w : A, B = y • w ∧ C = -(x • w) := by
   have hX : algebraMap R A x ≠ 0 :=
     (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective R A)).mpr hx
   rw [Algebra.smul_def, Algebra.smul_def] at h
@@ -164,7 +177,8 @@ theorem koszul_of_height (R A : Type) [CommRing R] [IsLocalRing R] [CommRing A] 
     · exfalso
       have hcomap : p.comap (algebraMap R A) = maximalIdeal R := by
         apply le_antisymm
-        · exact IsLocalRing.le_maximalIdeal (Ideal.comap_ne_top _ (Ideal.IsPrime.ne_top inferInstance))
+        · exact IsLocalRing.le_maximalIdeal (Ideal.comap_ne_top _
+            (Ideal.IsPrime.ne_top inferInstance))
         · rw [hm, Ideal.span_le]
           intro z hz
           simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
@@ -186,7 +200,11 @@ theorem koszul_of_height (R A : Type) [CommRing R] [IsLocalRing R] [CommRing A] 
   · rw [Algebra.smul_def, hw']
     ring
 
-theorem free_of_isIntegrallyClosed : ∀ (R A : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsDomain R] [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [Algebra R A] [Module.Finite R A] [FaithfulSMul R A], (((maximalIdeal R).spanFinrank : WithBot ℕ∞) = ringKrullDim R) → ringKrullDim R ≤ 2 → Module.Free R A := by
+theorem free_of_isIntegrallyClosed
+    : ∀ (R A : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsDomain R] [CommRing A]
+        [IsDomain A] [IsIntegrallyClosed A] [Algebra R A] [Module.Finite R A] [FaithfulSMul R A],
+      (((maximalIdeal R).spanFinrank : WithBot ℕ∞) = ringKrullDim R) → ringKrullDim R ≤ 2
+        → Module.Free R A := by
   intro R A _ _ _ _ _ _ _ _ _ _ hreg hdim
   classical
   haveI : IsRegularLocalRing R := (isRegularLocalRing_iff R).mpr hreg
@@ -198,8 +216,8 @@ theorem free_of_isIntegrallyClosed : ∀ (R A : Type) [CommRing R] [IsLocalRing 
     intro r hr v hv
     rw [Algebra.smul_def] at hv
     exact (mul_eq_zero.mp hv).resolve_left ((map_ne_zero_iff _ hinj).mpr hr)
-  obtain ⟨s, hs, hspan⟩ := Submodule.FG.exists_span_finset_card_eq_spanFinrank
-    (IsNoetherian.noetherian (maximalIdeal R))
+  obtain ⟨s, hs, hspan⟩ :=
+    Submodule.FG.exists_span_finset_card_eq_spanFinrank (IsNoetherian.noetherian (maximalIdeal R))
   have hn : s.card ≤ 2 := by
     have h1 : ((maximalIdeal R).spanFinrank : WithBot ℕ∞) ≤ 2 := hreg ▸ hdim
     rw [← hs] at h1
@@ -247,8 +265,7 @@ theorem free_of_isIntegrallyClosed : ∀ (R A : Type) [CommRing R] [IsLocalRing 
       rintro rfl
       have hle := Submodule.spanFinrank_span_le_ncard_of_finite (R := R) (Set.finite_singleton y)
       rw [Set.ncard_singleton] at hle
-      have : Submodule.span R {y} = maximalIdeal R := by
-        rw [hm]; simp [Ideal.span]
+      have : Submodule.span R {y} = maximalIdeal R := by rw [hm]; simp [Ideal.span]
       rw [this, ← hs, h2] at hle
       omega
     have hxm : x ∈ maximalIdeal R := hm ▸ Ideal.subset_span (by simp)
@@ -256,7 +273,7 @@ theorem free_of_isIntegrallyClosed : ∀ (R A : Type) [CommRing R] [IsLocalRing 
     refine free_of_relations x y hxm hym ?_
     intro n e he a ha hai
     exact relations_of_koszul x y
-      (koszul_of_height R A x y hm hx0 fun P hP hc => two_le_height_of_comap R A h2dim P hP hc)
-      n e he a ha (fun i => hm ▸ hai i)
+      (koszul_of_height R A x y hm hx0 fun P hP hc => two_le_height_of_comap R A h2dim P hP hc) n e
+      he a ha (fun i => hm ▸ hai i)
 
 end GlobalTheory.PurFree

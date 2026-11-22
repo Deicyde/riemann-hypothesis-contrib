@@ -21,9 +21,13 @@ open CategoryTheory AlgebraicGeometry Limits GlobalTheory.LogCris DividedPowers
 
 namespace CrystallineSemistableComparison.Pb.Kap
 
-variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {m : ℕ} {L : Lev (per l K) m} (hL : L.Good)
-  (d : ∀ n, RedIn (B.DD false (PAlg.base l) n) (B.κb (okToOC l K) false n) L.γ l n)
-  (hc : ∀ n (c : Acris l), (d n).ρ ((PAlg.base l).cris n c) = Ideal.Quotient.mk _ (L.lam c)) (M : Model l K) (s : ℕ)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {m : ℕ} {L : Lev (per l K) m}
+  (hL : L.Good) (d : ∀ n, RedIn (B.DD false (PAlg.base l) n) (B.κb (okToOC l K) false n) L.γ l n)
+  (hc : ∀ n (c : Acris l), (d n).ρ ((PAlg.base l).cris n c) = Ideal.Quotient.mk _ (L.lam c))
+  (M : Model l K)
+  (s : ℕ)
 
 omit d hc in
 theorem pdP_B_bot (hL : L.Good) : pdP L.γB m = ⊥ := by
@@ -33,27 +37,37 @@ theorem pdP_B_bot (hL : L.Good) : pdP L.γB m = ⊥ := by
     exact ⟨1, by simp⟩
   · exact absurd (facts l K).t_mem ht
 
-
 omit d hc in
-theorem quoM_bMap (hQ : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T)) (r : ℤ) (j : ℕ) (z : HO (QA L M s) j)
-    (hz : quoM (QA L M s) r j z = 0) : quoM (QB L M s) r j (bMap M s hL hQ j z) = 0 := by
-  have e : quoM (QB L M s) r j (bMap M s hL hQ j z) =
-      ((smB M s hL hQ).sq (a := sFil _ 0) (a' := sFil _ 0) (b := sFil _ r) (b' := sFil _ r) (fun _ _ hx => hx)
-        fun _ _ hx => hx).pull j (quoM (QA L M s) r j z) := by
+theorem quoM_bMap
+    (hQ : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T))
+    (r : ℤ) (j : ℕ) (z : HO (QA L M s) j) (hz : quoM (QA L M s) r j z = 0)
+    : quoM (QB L M s) r j (bMap M s hL hQ j z) = 0 := by
+  have e
+      : quoM (QB L M s) r j (bMap M s hL hQ j z)
+        = ((smB M s hL hQ).sq (a := sFil _ 0) (a' := sFil _ 0) (b := sFil _ r) (b' := sFil _ r)
+          (fun _ _ hx => hx)
+          fun _ _ hx => hx).pull j (quoM (QA L M s) r j z) := by
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ z
     rfl
   rw [e, hz, map_zero]
 
 set_option maxHeartbeats 1600000 in
-theorem fil_lev_pf [FiniteDimensional ℚ_[l] K] (hM : M.Sm) (U : Cov M.q) (hU : ∀ α, U.d α + m ≤ s) (hs : m ≤ s) {j : ℕ}
-    (x : ∀ n, M.Hc false n j) (hx : (chainOf hL M s (qb_le hL M s) (rHof d hc M s)).Comp x)
-    (f : Module.Dual K (HdR M.q j) →+ L.B) (hf : (chainOf hL M s (qb_le hL M s) (rHof d hc M s)).Rho x f) (N r : ℕ) (hN : N ≤ s)
-    (hfil : ∀ n, x n ∈ B.HcFil (B.schFn M.p) (okToOC l K) false n N j) (φ : Module.Dual K (HdR M.q j))
-    (hφ : ∀ h ∈ FilR M.q j (r + 1), φ h = 0) : f φ ∈ pdP L.γB (N - r) := by
+theorem fil_lev_pf
+    [FiniteDimensional ℚ_[l] K]
+    (hM : M.Sm)
+    (U : Cov M.q) (hU : ∀ α, U.d α + m ≤ s)
+    (hs : m ≤ s)
+    {j : ℕ} (x : ∀ n, M.Hc false n j) (hx : (chainOf hL M s (qb_le hL M s) (rHof d hc M s)).Comp x)
+    (f : Module.Dual K (HdR M.q j) →+ L.B)
+    (hf : (chainOf hL M s (qb_le hL M s) (rHof d hc M s)).Rho x f)
+    (N r : ℕ) (hN : N ≤ s) (hfil : ∀ n, x n ∈ B.HcFil (B.schFn M.p) (okToOC l K) false n N j)
+    (φ : Module.Dual K (HdR M.q j)) (hφ : ∀ h ∈ FilR M.q j (r + 1), φ h = 0)
+    : f φ ∈ pdP L.γB (N - r) := by
   obtain ⟨hlin, e, z, hz, hb⟩ := hf
   obtain ⟨e', -, -, hsep⟩ := cg_lift hL M hM s hs j
   have h1 : ∀ n, redM (QA L M s) (some (N : ℤ)) ((l : L.A) ^ n) j z = 0 := fun n => by
-    have h2 : redM (QA L M s) none ((l : L.A) ^ n) j z = (l : L.A) ^ e • rHof d hc M s n j (x n) := hz n
+    have h2 : redM (QA L M s) none ((l : L.A) ^ n) j z = (l : L.A) ^ e • rHof d hc M s n j (x n) :=
+      hz n
     rw [← toSome_redM, h2, map_smul]
     have h3 : toSome (QA L M s) N ((l : L.A) ^ n) j (rHof d hc M s n j (x n)) = 0 :=
       red_fil (d n) M.p s {⊤} ((PAlg.base l).cris n) L.lam (hc n) N j (x n) (hfil n)
@@ -63,7 +77,10 @@ theorem fil_lev_pf [FiniteDimensional ℚ_[l] K] (hM : M.Sm) (U : Cov M.q) (hU :
   have h5 := quoM_bMap hL M s (qb_le hL M s) N j _ h4
   haveI := (m_fin M hM j).1
   let bs := Module.finBasis K (HdR M.q j)
-  have h6 : (l : L.B) ^ e • ∑ t, f (bs.coord t) • muB L.γB M.q 1 s {⊤} j (bs t) = bMap M s hL (qb_le hL M s) j z := hb bs
+  have h6
+      : (l : L.B) ^ e • ∑ t, f (bs.coord t) • muB L.γB M.q 1 s {⊤} j (bs t)
+        = bMap M s hL (qb_le hL M s) j z :=
+    hb bs
   rw [LinearMap.map_smulₛₗ, ← h6, map_pow, map_natCast, map_smul, map_smul] at h5
   have hu := unit_B hL
   rw [(hu.pow e').smul_eq_zero, (hu.pow e).smul_eq_zero] at h5

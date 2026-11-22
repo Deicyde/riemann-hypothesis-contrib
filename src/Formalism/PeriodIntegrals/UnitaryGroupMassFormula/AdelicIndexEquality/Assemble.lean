@@ -38,13 +38,16 @@ variable (I : AutInst) (v : HeightOneSpectrum (𝓞 I.F))
 
 def liftFn (hL : LiftU) (g : Uv I v) : I.Gf := Classical.choose (hL I v g g.2)
 
-theorem liftFn_spec (hL : LiftU) (g : Uv I v) :
-    matV I v ((liftFn I v hL g : I.Gf) : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) = g ∧ SuppAt I v (liftFn I v hL g) :=
+theorem liftFn_spec (hL : LiftU) (g : Uv I v)
+    : matV I v ((liftFn I v hL g : I.Gf) : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) = g
+      ∧ SuppAt I v (liftFn I v hL g) :=
   Classical.choose_spec (hL I v g g.2)
 
-theorem eq_liftFn (hL : LiftU) (hJ : MatVInj) (g : Uv I v) (y : I.Gf)
-    (hy : matV I v (y : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) = g) (hs : SuppAt I v y) :
-    y = liftFn I v hL g := by
+theorem eq_liftFn
+    (hL : LiftU) (hJ : MatVInj)
+    (g : Uv I v) (y : I.Gf)
+    (hy : matV I v (y : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) = g) (hs : SuppAt I v y)
+    : y = liftFn I v hL g := by
   apply hJ I
   intro w
   by_cases hw : w = v
@@ -69,16 +72,18 @@ def liftHom (hL : LiftU) (hJ : MatVInj) : Uv I v →* I.Gf where
       simp only [Subgroup.coe_mul, map_mul]
       rw [(liftFn_spec I v hL g).2 w hw, (liftFn_spec I v hL h).2 w hw, one_mul]
 
-theorem liftHom_apply (hL : LiftU) (hJ : MatVInj) (g : Uv I v) :
-    liftHom I v hL hJ g = liftFn I v hL g := rfl
+theorem liftHom_apply (hL : LiftU) (hJ : MatVInj) (g : Uv I v)
+    : liftHom I v hL hJ g = liftFn I v hL g :=
+  rfl
 
 def chiV (hC : KComm) (hL : LiftU) (hJ : MatVInj) : Uv I v →* ℚ where
   toFun g := modQ (PI.AdIndexEq.Ksub I) (liftHom I v hL hJ g)
   map_one' := by simp [modQ_one]
   map_mul' g h := by simp only [map_mul]; exact modQ_mul _ (hC I) _ _
 
-private theorem modQ_eq_one_of_central {G : Type} [Group G] (K : Subgroup G) (y : G)
-    (hy : ∀ x : G, y * x * y⁻¹ = x) : modQ K y = 1 := by
+private theorem modQ_eq_one_of_central
+    {G : Type} [Group G] (K : Subgroup G) (y : G) (hy : ∀ x : G, y * x * y⁻¹ = x)
+    : modQ K y = 1 := by
   have h1 : ∀ z : G, (∀ x : G, z * x * z⁻¹ = x) → dIdx K z = 1 := by
     intro z hz
     unfold dIdx
@@ -89,18 +94,24 @@ private theorem modQ_eq_one_of_central {G : Type} [Group G] (K : Subgroup G) (y 
     intro x
     have hx := hy x
     rw [inv_inv]
-    calc y⁻¹ * x * y = y⁻¹ * (y * x * y⁻¹) * y := by rw [hx]
+    calc
+      y⁻¹ * x * y
+        = y⁻¹ * (y * x * y⁻¹) * y := by rw [hx]
       _ = x := by group
   unfold modQ
   rw [h1 y hy, h1 y⁻¹ h2]
   norm_num
 
-theorem chiV_props (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob) :
-    (∀ g, 0 < chiV I v hC hL hJ g) ∧
-    (∀ s : Uv I v, (∀ t : Uv I v, s * t = t * s) → chiV I v hC hL hJ s = 1) ∧
-    (∀ s : Uv I v, (∃ m : ℕ, 1 ≤ m ∧
-        (((s ^ m : Uv I v) : GL (Fin I.n) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv I.F v ⊗[I.F] I.E)) ∈ Kv I v)) →
-        chiV I v hC hL hJ s = 1) := by
+theorem chiV_props (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob)
+    : (∀ g, 0 < chiV I v hC hL hJ g)
+      ∧ (∀ s : Uv I v, (∀ t : Uv I v, s * t = t * s) → chiV I v hC hL hJ s = 1)
+      ∧ (∀ s : Uv I v,
+        (∃ m : ℕ,
+            1 ≤ m
+              ∧ (((s ^ m : Uv I v) : GL (Fin I.n)
+                  (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv I.F v ⊗[I.F] I.E))
+                ∈ Kv I v))
+          → chiV I v hC hL hJ s = 1) := by
   have hM := mod_q_hom I.Gf (PI.AdIndexEq.Ksub I) (hC I)
   have hpos : ∀ g, 0 < chiV I v hC hL hJ g := by
     intro g
@@ -142,31 +153,36 @@ theorem chiV_props (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : K
     rw [map_pow] at hpow
     exact (pow_eq_one_iff_of_nonneg (hpos s).le (by omega)).1 hpow
 
-theorem modQ_of_supp (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (y : I.Gf) (hy : SuppAt I v y) :
-    modQ (PI.AdIndexEq.Ksub I) y = chiV I v hC hL hJ ⟨_, hU I v y⟩ := by
+theorem modQ_of_supp
+    (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (y : I.Gf) (hy : SuppAt I v y)
+    : modQ (PI.AdIndexEq.Ksub I) y = chiV I v hC hL hJ ⟨_, hU I v y⟩ := by
   show modQ (PI.AdIndexEq.Ksub I) y = modQ (PI.AdIndexEq.Ksub I) (liftHom I v hL hJ ⟨_, hU I v y⟩)
   rw [liftHom_apply, ← eq_liftFn I v hL hJ ⟨_, hU I v y⟩ y rfl hy]
 
 end Lift
 
-theorem locInert_of (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob)
-    (h : LocInertChi) : LocInert := by
+theorem locInert_of
+    (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob) (h : LocInertChi)
+    : LocInert := by
   unfold LocInert
   intro I v hv y hy
   obtain ⟨h1, h2, h3⟩ := chiV_props I v hC hL hJ hU hK
   rw [modQ_of_supp I v hC hL hJ hU y hy]
   exact h I v hv _ h1 h2 h3 _
 
-theorem locSplit_of (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob)
-    (h : LocSplitChi) : LocSplit := by
+theorem locSplit_of
+    (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob) (h : LocSplitChi)
+    : LocSplit := by
   unfold LocSplit
   intro I v hv y hy
   obtain ⟨h1, h2, h3⟩ := chiV_props I v hC hL hJ hU hK
   rw [modQ_of_supp I v hC hL hJ hU y hy]
   exact h I v hv _ h1 h2 h3 _
 
-theorem indexEq_of_loc (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob)
-    (hR : ReduceLoc) (hS : LocSplitChi) (hI : LocInertChi) : PI.AdIndexEq.IndexEq := by
+theorem indexEq_of_loc
+    (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK : KLocGlob) (hR : ReduceLoc)
+    (hS : LocSplitChi) (hI : LocInertChi)
+    : PI.AdIndexEq.IndexEq := by
   unfold PI.AdIndexEq.IndexEq
   intro I x
   have hM := mod_q_hom I.Gf (PI.AdIndexEq.Ksub I) (hC I)
@@ -182,8 +198,10 @@ theorem indexEq_of_loc (hC : KComm) (hL : LiftU) (hJ : MatVInj) (hU : MatVU) (hK
       rcases hy with ⟨v, hv⟩ | hy
       · exact hloc v y hv
       · exact hM.2.1 y hy
-    | one => exact modQ_one _
-    | mul a b _ _ ha hb => rw [hM.1, ha, hb, one_mul]
+    | one =>
+      exact modQ_one _
+    | mul a b _ _ ha hb =>
+      rw [hM.1, ha, hb, one_mul]
     | inv a _ ha =>
       have h1 := hM.1 a a⁻¹
       rw [mul_inv_cancel, modQ_one, ha, one_mul] at h1

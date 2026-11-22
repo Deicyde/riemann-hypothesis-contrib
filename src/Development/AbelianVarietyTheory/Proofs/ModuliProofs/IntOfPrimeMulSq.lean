@@ -6,19 +6,23 @@ public import Mathlib
 
 namespace GlobalTheory.RationalIntegralCoordinates
 
-theorem exists_coords {d : ℕ} (hd : 0 < d) {r : ℂ} (hr : r ^ 2 = -(d : ℂ)) {z : ℂ}
-    (hzK : z ∈ IntermediateField.adjoin ℚ ({r} : Set ℂ)) :
-    ∃ a b : ℚ, z = (a : ℂ) + (b : ℂ) * r := by
+theorem exists_coords
+    {d : ℕ} (hd : 0 < d)
+    {r : ℂ} (hr : r ^ 2 = -(d : ℂ))
+    {z : ℂ} (hzK : z ∈ IntermediateField.adjoin ℚ ({r} : Set ℂ))
+    : ∃ a b : ℚ, z = (a : ℂ) + (b : ℂ) * r := by
   have hint : IsIntegral ℚ r := by
     refine ⟨Polynomial.X ^ 2 + Polynomial.C (d : ℚ), Polynomial.monic_X_pow_add_C _ two_ne_zero, ?_⟩
     simp [hr]
   rw [← IntermediateField.mem_toSubalgebra,
-    IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic] at hzK
+      IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic]
+    at hzK
   induction hzK using Algebra.adjoin_induction with
   | mem x hx =>
     rw [Set.mem_singleton_iff] at hx
     exact ⟨0, 1, by simp [hx]⟩
-  | algebraMap q => exact ⟨q, 0, by simp [eq_ratCast]⟩
+  | algebraMap q =>
+    exact ⟨q, 0, by simp [eq_ratCast]⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, b, rfl⟩ := hx
     obtain ⟨c, e, rfl⟩ := hy
@@ -30,12 +34,13 @@ theorem exists_coords {d : ℕ} (hd : 0 < d) {r : ℂ} (hr : r ^ 2 = -(d : ℂ))
     push_cast
     linear_combination (b : ℂ) * e * hr
 
-theorem conj_eq_neg {d : ℕ} (hd : 0 < d) {r : ℂ} (hr : r ^ 2 = -(d : ℂ)) :
-    (starRingEnd ℂ) r = -r := by
+theorem conj_eq_neg {d : ℕ} (hd : 0 < d) {r : ℂ} (hr : r ^ 2 = -(d : ℂ))
+    : (starRingEnd ℂ) r = -r := by
   have h1 := congrArg Complex.re hr
   have h2 := congrArg Complex.im hr
   simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im,
-    Complex.natCast_re, Complex.natCast_im, neg_zero] at h1 h2
+      Complex.natCast_re, Complex.natCast_im, neg_zero]
+    at h1 h2
   have hdpos : (0 : ℝ) < d := by exact_mod_cast hd
   have hre : r.re = 0 := by
     by_contra hne
@@ -56,8 +61,8 @@ theorem rat_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) : ∃ m : ℤ, (m : ℚ
   obtain ⟨m, hm⟩ := IsIntegrallyClosed.isIntegral_iff.mp hq
   exact ⟨m, by simpa using hm⟩
 
-theorem int_of_prime_mul_sq {d : ℕ} (hd : d.Prime) {q : ℚ} {n : ℤ}
-    (h : (d : ℚ) * q ^ 2 = n) : ∃ k : ℤ, (k : ℚ) = q := by
+theorem int_of_prime_mul_sq {d : ℕ} (hd : d.Prime) {q : ℚ} {n : ℤ} (h : (d : ℚ) * q ^ 2 = n)
+    : ∃ k : ℤ, (k : ℚ) = q := by
   have hden : (q.den : ℚ) ≠ 0 := by exact_mod_cast q.den_ne_zero
   have hz : (d : ℤ) * q.num ^ 2 = (q.den : ℤ) ^ 2 * n := by
     have hq : q = q.num / q.den := (Rat.num_div_den q).symm
@@ -81,9 +86,12 @@ theorem int_of_prime_mul_sq {d : ℕ} (hd : d.Prime) {q : ℚ} {n : ℤ}
     have h4 := hd.two_le
     nlinarith
 
-theorem main {d : ℕ} (hd : Nat.Prime d) (hd4 : d % 4 = 3) {r : ℂ} (hr : r ^ 2 = -(d : ℂ))
-    (T : Subring ℂ) (hT : (1 + r) / 2 ∈ T) {z : ℂ}
-    (hzK : z ∈ IntermediateField.adjoin ℚ ({r} : Set ℂ)) (hz : IsIntegral ℤ z) : z ∈ T := by
+theorem main
+    {d : ℕ} (hd : Nat.Prime d) (hd4 : d % 4 = 3)
+    {r : ℂ} (hr : r ^ 2 = -(d : ℂ))
+    (T : Subring ℂ) (hT : (1 + r) / 2 ∈ T)
+    {z : ℂ} (hzK : z ∈ IntermediateField.adjoin ℚ ({r} : Set ℂ)) (hz : IsIntegral ℤ z)
+    : z ∈ T := by
   have hd0 : 0 < d := hd.pos
   obtain ⟨a, b, rfl⟩ := exists_coords hd0 hr hzK
   have hc : starRingEnd ℂ ((a : ℂ) + b * r) = a - b * r := by
@@ -98,8 +106,9 @@ theorem main {d : ℕ} (hd : Nat.Prime d) (hd4 : d % 4 = 3) {r : ℂ} (hr : r ^ 
     rw [e]
     exact hz.add hcz
   have hnm : IsIntegral ℤ (((a ^ 2 + d * b ^ 2 : ℚ)) : ℂ) := by
-    have e : (((a ^ 2 + d * b ^ 2 : ℚ)) : ℂ) =
-        ((a : ℂ) + b * r) * starRingEnd ℂ ((a : ℂ) + b * r) := by
+    have e
+        : (((a ^ 2 + d * b ^ 2 : ℚ)) : ℂ)
+          = ((a : ℂ) + b * r) * starRingEnd ℂ ((a : ℂ) + b * r) := by
       rw [hc]
       push_cast
       linear_combination (b : ℂ) ^ 2 * hr
@@ -107,10 +116,11 @@ theorem main {d : ℕ} (hd : Nat.Prime d) (hd4 : d % 4 = 3) {r : ℂ} (hr : r ^ 
     exact hz.mul hcz
   obtain ⟨m, hm⟩ := rat_int htr
   obtain ⟨N, hN⟩ := rat_int hnm
-  obtain ⟨k, hk⟩ := int_of_prime_mul_sq hd (q := 2 * b) (n := 4 * N - m ^ 2) (by
-    push_cast
-    rw [hm, hN]
-    ring)
+  obtain ⟨k, hk⟩ :=
+    int_of_prime_mul_sq hd (q := 2 * b) (n := 4 * N - m ^ 2) (by
+      push_cast
+      rw [hm, hN]
+      ring)
   have heq : m ^ 2 + (d : ℤ) * k ^ 2 = 4 * N := by
     have : ((m ^ 2 + (d : ℤ) * k ^ 2 : ℤ) : ℚ) = ((4 * N : ℤ) : ℚ) := by
       push_cast

@@ -6,11 +6,16 @@ public import Development.EtaleCohomology.EtaleSheaves.H0TwistOverClosedField
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField UpperTheory.Et.Sel LateralTheory.E.E4
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField
+  UpperTheory.Et.Sel LateralTheory.E.E4
 open scoped TensorProduct
 
-theorem UpperTheory.tensor_fractionRing_exists_mul_eq_of_denominator :
-    ∀ (k L K : Type) [Field k] [Field L] [Field K] [Algebra k L] [Algebra k K] (B : Subalgebra k K), IsFractionRing B K → ∀ t : L ⊗[k] K, ∃ (s : L ⊗[k] B) (β : B), β ≠ 0 ∧ t * ((1 : L) ⊗ₜ[k] (β : K)) = inc L B s := by
+theorem UpperTheory.tensor_fractionRing_exists_mul_eq_of_denominator
+    : ∀ (k L K : Type) [Field k] [Field L] [Field K] [Algebra k L] [Algebra k K]
+        (B : Subalgebra k K),
+      IsFractionRing B K
+        → ∀ t : L ⊗[k] K, ∃ (s : L ⊗[k] B) (β : B),
+          β ≠ 0 ∧ t * ((1 : L) ⊗ₜ[k] (β : K)) = inc L B s := by
   intro k L K _ _ _ _ _ B hB t
   induction t using TensorProduct.induction_on with
   | zero => exact ⟨0, 1, one_ne_zero, by simp⟩
@@ -31,8 +36,9 @@ theorem UpperTheory.tensor_fractionRing_exists_mul_eq_of_denominator :
     refine ⟨s1 * ((1 : L) ⊗ₜ[k] β2) + s2 * ((1 : L) ⊗ₜ[k] β1), β1 * β2, mul_ne_zero h1 h2, ?_⟩
     have i1 : inc L B ((1 : L) ⊗ₜ[k] β2) = (1 : L) ⊗ₜ[k] (β2 : K) := by simp [inc]
     have i2 : inc L B ((1 : L) ⊗ₜ[k] β1) = (1 : L) ⊗ₜ[k] (β1 : K) := by simp [inc]
-    have split : (1 : L) ⊗ₜ[k] ((β1 * β2 : B) : K) =
-        ((1 : L) ⊗ₜ[k] (β1 : K)) * ((1 : L) ⊗ₜ[k] (β2 : K)) := by
+    have split
+        : (1 : L) ⊗ₜ[k] ((β1 * β2 : B) : K)
+          = ((1 : L) ⊗ₜ[k] (β1 : K)) * ((1 : L) ⊗ₜ[k] (β2 : K)) := by
       rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, Subalgebra.coe_mul]
     rw [map_add (f := _), map_mul, map_mul, i1, i2, ← e1, ← e2, split]
     ring

@@ -12,9 +12,10 @@ namespace PI.FJMB
 
 variable {σ : Type*}
 
-theorem cd_mono_factor {m : ℕ} (ι : Fin m × Fin m → σ) (hι : Function.Injective ι) (e : σ →₀ ℕ) :
-    aeval (killS (offD ι)) (monomial e (1 : ℂ)) =
-      (∏ i, X (ι (i, i)) ^ (∑ k : Fin m, e (ι (i, k)))) * aeval (diagOne' ι) (monomial e (1 : ℂ)) := by
+theorem cd_mono_factor {m : ℕ} (ι : Fin m × Fin m → σ) (hι : Function.Injective ι) (e : σ →₀ ℕ)
+    : aeval (killS (offD ι)) (monomial e (1 : ℂ))
+      = (∏ i, X (ι (i, i)) ^ (∑ k : Fin m, e (ι (i, k))))
+        * aeval (diagOne' ι) (monomial e (1 : ℂ)) := by
   rw [MvPolynomial.aeval_monomial, MvPolynomial.aeval_monomial, map_one, one_mul, one_mul]
   by_cases hoff : ∃ v ∈ e.support, v ∈ offD ι
   · obtain ⟨v, hv, hvo⟩ := hoff
@@ -33,33 +34,43 @@ theorem cd_mono_factor {m : ℕ} (ι : Fin m × Fin m → σ) (hι : Function.In
       rw [Finset.sum_eq_single i]
       · intro k _ hk
         by_contra hne
-        exact hoff (ι (i, k)) (Finsupp.mem_support_iff.mpr hne) ⟨i, k, rfl, fun h => hk (Fin.ext h).symm⟩
+        exact hoff (ι (i, k)) (Finsupp.mem_support_iff.mpr hne)
+          ⟨i, k, rfl, fun h => hk (Fin.ext h).symm⟩
       · intro h
         exact absurd (Finset.mem_univ i) h
     simp only [hsum]
-    have hL : (e.prod fun v k => killS (offD ι) v ^ k) = ∏ v ∈ e.support, (X v : MvPolynomial σ ℂ) ^ e v := by
+    have hL
+        : (e.prod fun v k => killS (offD ι) v ^ k)
+          = ∏ v ∈ e.support, (X v : MvPolynomial σ ℂ) ^ e v := by
       unfold Finsupp.prod
       refine Finset.prod_congr rfl fun v hv => ?_
       simp only [killS, if_neg (hoff v hv)]
-    have hR : (e.prod fun v k => diagOne' ι v ^ k) =
-        ∏ v ∈ e.support, (if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then 1 else (X v : MvPolynomial σ ℂ) ^ e v) := by
-      unfold Finsupp.prod
-      refine Finset.prod_congr rfl fun v hv => ?_
-      simp only [diagOne', if_neg (hoff v hv)]
-      split_ifs <;> simp
-    have hsplit : ∏ v ∈ e.support, (X v : MvPolynomial σ ℂ) ^ e v =
-        (∏ v ∈ e.support, if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then (X v : MvPolynomial σ ℂ) ^ e v else 1) *
-          ∏ v ∈ e.support, (if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then 1 else (X v : MvPolynomial σ ℂ) ^ e v) := by
-      rw [← Finset.prod_mul_distrib]
-      refine Finset.prod_congr rfl fun v _ => ?_
-      split_ifs <;> simp
-    have hF : ∏ v ∈ e.support.filter (fun v => ∃ i k, ι (i, k) = v ∧ (i : ℕ) = k), (X v : MvPolynomial σ ℂ) ^ e v =
-        ∏ v ∈ e.support, if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then (X v : MvPolynomial σ ℂ) ^ e v else 1 := by
-      rw [Finset.prod_filter]
-    have hinj : Function.Injective (fun i : Fin m => ι (i, i)) := fun a b h => (Prod.mk.inj (hι h)).1
-    have himg : ∏ i, (X (ι (i, i)) : MvPolynomial σ ℂ) ^ e (ι (i, i)) =
-        ∏ v ∈ Finset.univ.image (fun i : Fin m => ι (i, i)), (X v : MvPolynomial σ ℂ) ^ e v := by
-      rw [Finset.prod_image (fun a _ b _ h => hinj h)]
+    have hR
+        : (e.prod fun v k => diagOne' ι v ^ k)
+          = ∏ v ∈ e.support, (if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then 1 else (X v : MvPolynomial σ ℂ) ^ e v) :=
+      by
+        unfold Finsupp.prod
+        refine Finset.prod_congr rfl fun v hv => ?_
+        simp only [diagOne', if_neg (hoff v hv)]
+        split_ifs <;> simp
+    have hsplit
+        : ∏ v ∈ e.support, (X v : MvPolynomial σ ℂ) ^ e v
+          = (∏ v ∈ e.support, if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then (X v : MvPolynomial σ ℂ) ^ e v else 1)
+            * ∏ v ∈ e.support, (if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then 1 else (X v : MvPolynomial σ ℂ) ^ e v) :=
+      by
+        rw [← Finset.prod_mul_distrib]
+        refine Finset.prod_congr rfl fun v _ => ?_
+        split_ifs <;> simp
+    have hF
+        : ∏ v ∈ e.support.filter (fun v => ∃ i k, ι (i, k) = v ∧ (i : ℕ) = k), (X v : MvPolynomial σ ℂ) ^ e v
+          = ∏ v ∈ e.support, if (∃ i k, ι (i, k) = v ∧ (i : ℕ) = k) then (X v : MvPolynomial σ ℂ) ^ e v else 1 :=
+      by rw [Finset.prod_filter]
+    have hinj : Function.Injective (fun i : Fin m => ι (i, i)) := fun a b h =>
+      (Prod.mk.inj (hι h)).1
+    have himg
+        : ∏ i, (X (ι (i, i)) : MvPolynomial σ ℂ) ^ e (ι (i, i))
+          = ∏ v ∈ Finset.univ.image (fun i : Fin m => ι (i, i)), (X v : MvPolynomial σ ℂ) ^ e v :=
+      by rw [Finset.prod_image (fun a _ b _ h => hinj h)]
     rw [hL, hR, hsplit, ← hF, himg]
     congr 1
     apply Finset.prod_subset
@@ -84,7 +95,9 @@ theorem diagonal_hypothesis : HypDiag := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun e he => ?_
-  have hm : MvPolynomial.monomial e (P.coeff e) = MvPolynomial.C (P.coeff e) * MvPolynomial.monomial e 1 := by
+  have hm
+      : MvPolynomial.monomial e (P.coeff e)
+        = MvPolynomial.C (P.coeff e) * MvPolynomial.monomial e 1 := by
     rw [MvPolynomial.C_mul_monomial, mul_one]
   rw [hm, map_mul, map_mul, cd_mono_factor ι hι e]
   have hs : ∀ i, ∑ k : Fin m, e (ι (i, k)) = α i := hP e he
@@ -100,14 +113,18 @@ theorem diagonal_image_block_free : HypFree := by
     rw [Finset.mem_singleton] at h0
     rw [h0]
     rfl
-  have hadd : ∀ Q R : MvPolynomial σ ℂ, (∀ e ∈ Q.support, ∀ x, e (ι x) = 0) →
-      (∀ e ∈ R.support, ∀ x, e (ι x) = 0) → ∀ e ∈ (Q + R).support, ∀ x, e (ι x) = 0 := by
+  have hadd
+      : ∀ Q R : MvPolynomial σ ℂ,
+        (∀ e ∈ Q.support, ∀ x, e (ι x) = 0) → (∀ e ∈ R.support, ∀ x, e (ι x) = 0)
+          → ∀ e ∈ (Q + R).support, ∀ x, e (ι x) = 0 := by
     intro Q R hQ hR e he x
     rcases Finset.mem_union.mp (MvPolynomial.support_add he) with h | h
     · exact hQ e h x
     · exact hR e h x
-  have hmul : ∀ Q R : MvPolynomial σ ℂ, (∀ e ∈ Q.support, ∀ x, e (ι x) = 0) →
-      (∀ e ∈ R.support, ∀ x, e (ι x) = 0) → ∀ e ∈ (Q * R).support, ∀ x, e (ι x) = 0 := by
+  have hmul
+      : ∀ Q R : MvPolynomial σ ℂ,
+        (∀ e ∈ Q.support, ∀ x, e (ι x) = 0) → (∀ e ∈ R.support, ∀ x, e (ι x) = 0)
+          → ∀ e ∈ (Q * R).support, ∀ x, e (ι x) = 0 := by
     intro Q R hQ hR e he x
     obtain ⟨a, ha, b, hb, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul Q R he)
     rw [Finsupp.add_apply, hQ a ha x, hR b hb x]

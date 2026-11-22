@@ -25,7 +25,8 @@ theorem HypPairExists.proof : HypPairExists.Statement := by
       ext j
       simpa [vecMul, dotProduct] using h j
     apply he0
-    calc e = e ᵥ* (J * J⁻¹) := by rw [mul_nonsing_inv J hdet, vecMul_one]
+    calc
+      e = e ᵥ* (J * J⁻¹) := by rw [mul_nonsing_inv J hdet, vecMul_one]
       _ = (e ᵥ* J) ᵥ* J⁻¹ := by rw [vecMul_vecMul]
       _ = 0 := by rw [h0, zero_vecMul]
   obtain ⟨j, hj⟩ := hw
@@ -39,10 +40,8 @@ theorem HypPairExists.proof : HypPairExists.Statement := by
     · simp
 
   obtain ⟨a, hea⟩ : ∃ a : Fin N → E, hf σ J e a = 1 :=
-    ⟨σ (∑ i, e i * J i j)⁻¹ • Pi.single j 1, by
-      rw [hf_smul_right, hsingle, hσ, inv_mul_cancel₀ hj]⟩
-  have hae : hf σ J a e = 1 := by
-    rw [← hf_symm hσ hJ, hea, map_one]
+    ⟨σ (∑ i, e i * J i j)⁻¹ • Pi.single j 1, by rw [hf_smul_right, hsingle, hσ, inv_mul_cancel₀ hj]⟩
+  have hae : hf σ J a e = 1 := by rw [← hf_symm hσ hJ, hea, map_one]
   have haa : σ (hf σ J a a) = hf σ J a a := hf_symm hσ hJ a a
   set t : E := -(hf σ J a a) / 2 with ht_def
   have hσ2 : σ 2 = 2 := map_ofNat σ 2

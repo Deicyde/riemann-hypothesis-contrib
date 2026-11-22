@@ -9,13 +9,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntegralJ
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.FinalJoin GlobalTheory.CompRat Formalism.MainNotions.StandardLatticesGL3
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.FinalJoin GlobalTheory.CompRat Formalism.MainNotions.StandardLatticesGL3
 
 namespace GlobalTheory.WeberField
 
-theorem weber_isAlgebraic (L : PeriodPair) (hj : IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)))
-    {n : ℕ} (hn : 0 < n) {t : ℂ} (ht : t ∉ L.lattice) (hnt : (n : ℂ) * t ∈ L.lattice) :
-    IsAlgebraic ℚ (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t) := by
+theorem weber_isAlgebraic
+    (L : PeriodPair) (hj : IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)))
+    {n : ℕ} (hn : 0 < n)
+    {t : ℂ} (ht : t ∉ L.lattice) (hnt : (n : ℂ) * t ∈ L.lattice)
+    : IsAlgebraic ℚ (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t) := by
   have hD := g₂_cube_sub_g₃_sq_ne_zero L
   obtain ⟨m, hm⟩ := IsAlgClosed.exists_pow_nat_eq (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) (n := 12) (by norm_num)
   have hm0 : m ≠ 0 := by
@@ -23,8 +26,7 @@ theorem weber_isAlgebraic (L : PeriodPair) (hj : IsAlgebraic ℚ (L.g₂ ^ 3 / (
     exact hD (by simpa using hm.symm)
   have H := isHomothetic_scalePeriods L m hm0
   set L' := scalePeriods L m hm0
-  have e2 : L'.g₂ ^ 3 = L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) := by
-    rw [H.g₂_eq, ← hm]; field_simp
+  have e2 : L'.g₂ ^ 3 = L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) := by rw [H.g₂_eq, ← hm]; field_simp
   have e3 : L'.g₃ ^ 2 = (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) - 1) / 27 := by
     rw [H.g₃_eq, mul_pow, inv_pow, ← pow_mul, hm]; field_simp; ring
   have hjm := mem_algebraicClosure_iff.mpr hj
@@ -34,18 +36,22 @@ theorem weber_isAlgebraic (L : PeriodPair) (hj : IsAlgebraic ℚ (L.g₂ ^ 3 / (
     refine mem_algebraicClosure_iff.mpr (IsAlgebraic.of_pow two_pos ?_)
     rw [← mem_algebraicClosure_iff, e3]
     exact div_mem (sub_mem hjm (one_mem _)) (ofNat_mem _ 27)
-  have hp := (GlobalTheory.CurveAlgebraic.weierstrassP_mem L' h2 h3 hn (t := m * t) (fun h => ht ((H t).1 h))
-    (by rw [mul_left_comm]; exact (H _).2 hnt)).1
-  have e : L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t =
-      L'.g₂ * L'.g₃ * L'.weierstrassP (m * t) := by
+  have hp :=
+    (GlobalTheory.CurveAlgebraic.weierstrassP_mem L' h2 h3 hn (t := m * t)
+      (fun h => ht ((H t).1 h))
+      (by rw [mul_left_comm]; exact (H _).2 hnt)).1
+  have e
+      : L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t
+        = L'.g₂ * L'.g₃ * L'.weierstrassP (m * t) := by
     rw [H.g₂_eq, H.g₃_eq, H.weierstrassP_mul, ← hm]; field_simp
   rw [e]
   exact mem_algebraicClosure_iff.mp (mul_mem (mul_mem h2 h3) hp)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem invariant_isAlgebraic (H : Host E) (L : PeriodPair) (hL : ∀ x, x ∈ L.lattice ↔ ∃ s, x = wC H s) :
-    IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) := by
+theorem invariant_isAlgebraic
+    (H : Host E) (L : PeriodPair) (hL : ∀ x, x ∈ L.lattice ↔ ∃ s, x = wC H s)
+    : IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) := by
   obtain ⟨a, τ, ha, h⟩ := exists_lattice_eq_mul_tau L
   have key : ∀ y : ℂ, y ∈ Submodule.span ℤ {(τ : ℂ), 1} ↔ a * y ∈ L.lattice := fun y ↦ by
     rw [h, Submodule.mem_span_pair]
@@ -67,8 +73,9 @@ theorem invariant_isAlgebraic (H : Host E) (L : PeriodPair) (hL : ∀ x, x ∈ L
       rw [mul_left_comm, hs, hb]
       exact (hL _).2 ⟨b, rfl⟩
   rw [← g₂_cube_div_eq_modularJ ha h] at hi
-  have := div_mem (mem_algebraicClosure_iff.mpr (hi.tower_top (A := ℚ)).isAlgebraic)
-    (ofNat_mem (algebraicClosure ℚ ℂ) 1728)
+  have :=
+    div_mem (mem_algebraicClosure_iff.mpr (hi.tower_top (A := ℚ)).isAlgebraic)
+      (ofNat_mem (algebraicClosure ℚ ℂ) 1728)
   rw [mul_div_assoc, mul_div_cancel_left₀ _ (by norm_num)] at this
   exact mem_algebraicClosure_iff.mp this
 

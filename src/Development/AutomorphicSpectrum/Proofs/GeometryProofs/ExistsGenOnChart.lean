@@ -46,7 +46,9 @@ theorem IsU.of_isUnit {a : S} (h : IsUnit a) : IsU S (a : Ω) := by
 
 end Units
 
-def satIdeal {A E : Type} [CommRing A] [AddCommGroup E] [Module A E] (S : Submodule A E) (f : A) (e : E) : Ideal A where
+def satIdeal
+    {A E : Type} [CommRing A] [AddCommGroup E] [Module A E] (S : Submodule A E) (f : A) (e : E)
+    : Ideal A where
   carrier := {a | ∃ k : ℕ, (f ^ k * a) • e ∈ S}
   add_mem' := by
     rintro a b ⟨k, hk⟩ ⟨l, hl⟩
@@ -70,12 +72,18 @@ def satIdeal {A E : Type} [CommRing A] [AddCommGroup E] [Module A E] (S : Submod
 
 section Abstract
 
-variable {A : Type} [CommRing A] {Ω : Type} [Field Ω] (ι : A →+* Ω) {E : Type} [AddCommGroup E] [Module Ω E]
-  [Module A E]
+variable
+  {A : Type} [CommRing A]
+  {Ω : Type} [Field Ω]
+  (ι : A →+* Ω)
+  {E : Type} [AddCommGroup E] [Module Ω E] [Module A E]
 
-theorem clear_denoms (hsm : ∀ (a : A) (e : E), a • e = ι a • e) {S : Subring Ω}
-    (hfrac : ∀ a ∈ S, ∃ u v : A, IsU S (ι v) ∧ a = ι u / ι v) (s : Set E) {e : E}
-    (he : e ∈ Submodule.span S s) : ∃ v : A, IsU S (ι v) ∧ v • e ∈ Submodule.span A s := by
+theorem clear_denoms
+    (hsm : ∀ (a : A) (e : E), a • e = ι a • e)
+    {S : Subring Ω} (hfrac : ∀ a ∈ S, ∃ u v : A, IsU S (ι v) ∧ a = ι u / ι v)
+    (s : Set E)
+    {e : E} (he : e ∈ Submodule.span S s)
+    : ∃ v : A, IsU S (ι v) ∧ v • e ∈ Submodule.span A s := by
   induction he using Submodule.span_induction with
   | mem x hx => exact ⟨1, by simpa using IsU.one, by simpa using Submodule.subset_span hx⟩
   | zero => exact ⟨1, by simpa using IsU.one, by simp⟩
@@ -100,8 +108,11 @@ theorem clear_denoms (hsm : ∀ (a : A) (e : E), a • e = ι a • e) {S : Subr
     rw [this]
     exact Submodule.smul_mem _ _ h
 
-theorem mem_of_mem_spanA (hsm : ∀ (a : A) (e : E), a • e = ι a • e) {S : Subring Ω} (hAS : ∀ a, ι a ∈ S)
-    {s : Set E} {e : E} (he : e ∈ Submodule.span A s) : e ∈ Submodule.span S s := by
+theorem mem_of_mem_spanA
+    (hsm : ∀ (a : A) (e : E), a • e = ι a • e)
+    {S : Subring Ω} (hAS : ∀ a, ι a ∈ S)
+    {s : Set E} {e : E} (he : e ∈ Submodule.span A s)
+    : e ∈ Submodule.span S s := by
   induction he using Submodule.span_induction with
   | mem x hx => exact Submodule.subset_span hx
   | zero => exact zero_mem _
@@ -112,13 +123,15 @@ theorem mem_of_mem_spanA (hsm : ∀ (a : A) (e : E), a • e = ι a • e) {S : 
 
 variable {Pt : Type} (R : Pt → Subring Ω)
 
-theorem pow_smul_mem (hsm : ∀ (a : A) (e : E), a • e = ι a • e) (hAR : ∀ q a, ι a ∈ R q)
+theorem pow_smul_mem
+    (hsm : ∀ (a : A) (e : E), a • e = ι a • e) (hAR : ∀ q a, ι a ∈ R q)
     (hfrac : ∀ q, ∀ a ∈ R q, ∃ u v : A, IsU (R q) (ι v) ∧ a = ι u / ι v)
     (hprime : ∀ P : Ideal A, P.IsPrime → ∃ q : Pt, ∀ u : A, u ∈ P ↔ ¬ IsU (R q) (ι u))
-    (L : ∀ q, Submodule (R q) E) {f g : A} {s t : Set E}
-    (hf : ∀ q, IsU (R q) (ι f) → L q = Submodule.span (R q) s)
-    (hg : ∀ q, IsU (R q) (ι g) → L q = Submodule.span (R q) t) {e : E} (he : e ∈ s) :
-    ∃ m : ℕ, ∀ q, IsU (R q) (ι g) → (ι f) ^ m • e ∈ L q := by
+    (L : ∀ q, Submodule (R q) E)
+    {f g : A} {s t : Set E} (hf : ∀ q, IsU (R q) (ι f) → L q = Submodule.span (R q) s)
+    (hg : ∀ q, IsU (R q) (ι g) → L q = Submodule.span (R q) t)
+    {e : E} (he : e ∈ s)
+    : ∃ m : ℕ, ∀ q, IsU (R q) (ι g) → (ι f) ^ m • e ∈ L q := by
   have hrad : g * f ∈ (satIdeal (Submodule.span A t) g e).radical := by
     rw [Ideal.radical_eq_sInf, Ideal.mem_sInf]
     rintro P ⟨hJP, hP⟩
@@ -147,15 +160,18 @@ theorem pow_smul_mem (hsm : ∀ (a : A) (e : E), a • e = ι a • e) (hAR : �
     simp only [map_mul, map_pow, mul_pow, pow_add]
     field_simp
   rw [h2]
-  exact Submodule.smul_mem _ (⟨(ι g ^ (k + m))⁻¹, by rw [← inv_pow]; exact pow_mem hgq.2.2 _⟩ : R q) h1
+  exact Submodule.smul_mem _ (⟨(ι g ^ (k + m))⁻¹, by rw [← inv_pow]; exact pow_mem hgq.2.2 _⟩ : R q)
+    h1
 
-theorem finite_gen (hsm : ∀ (a : A) (e : E), a • e = ι a • e) (hAR : ∀ q a, ι a ∈ R q)
+theorem finite_gen
+    (hsm : ∀ (a : A) (e : E), a • e = ι a • e) (hAR : ∀ q a, ι a ∈ R q)
     (hfrac : ∀ q, ∀ a ∈ R q, ∃ u v : A, IsU (R q) (ι v) ∧ a = ι u / ι v)
     (hprime : ∀ P : Ideal A, P.IsPrime → ∃ q : Pt, ∀ u : A, u ∈ P ↔ ¬ IsU (R q) (ι u))
-    (hloc : ∀ q, IsLocalRing (R q)) (L : ∀ q, Submodule (R q) E)
-    (hcover : ∀ p : Pt, ∃ (f : A) (n : ℕ) (b : Fin n → E), IsU (R p) (ι f) ∧
-      ∀ q, IsU (R q) (ι f) → L q = Submodule.span (R q) (Set.range b)) :
-    ∃ (n : ℕ) (b : Fin n → E), ∀ q, L q = Submodule.span (R q) (Set.range b) := by
+    (hloc : ∀ q, IsLocalRing (R q))
+    (L : ∀ q, Submodule (R q) E)
+    (hcover : ∀ p : Pt, ∃ (f : A) (n : ℕ) (b : Fin n → E),
+      IsU (R p) (ι f) ∧ ∀ q, IsU (R q) (ι f) → L q = Submodule.span (R q) (Set.range b))
+    : ∃ (n : ℕ) (b : Fin n → E), ∀ q, L q = Submodule.span (R q) (Set.range b) := by
   choose F n b hF hL using hcover
   have htop : Ideal.span (Set.range F) = ⊤ := by
     by_contra h
@@ -180,8 +196,9 @@ theorem finite_gen (hsm : ∀ (a : A) (e : E), a • e = ι a • e) (hAR : ∀ 
     exact (Ideal.ne_top_iff_one _).1 (IsLocalRing.maximalIdeal.isMaximal _).ne_top h1'
   have hm : ∀ (l : Pt) (i : Fin (n l)), ∃ m : ℕ, ∀ q, (ι (F l)) ^ m • b l i ∈ L q := by
     intro l i
-    have h := fun j => pow_smul_mem ι R hsm hAR hfrac hprime L (f := F l) (g := F j) (hL l) (hL j)
-      (e := b l i) ⟨i, rfl⟩
+    have h := fun j =>
+      pow_smul_mem ι R hsm hAR hfrac hprime L (f := F l) (g := F j) (hL l) (hL j) (e := b l i)
+        ⟨i, rfl⟩
     choose m hm using h
     refine ⟨c.support.sup m, fun q => ?_⟩
     obtain ⟨j, hj, hu⟩ := hsome q

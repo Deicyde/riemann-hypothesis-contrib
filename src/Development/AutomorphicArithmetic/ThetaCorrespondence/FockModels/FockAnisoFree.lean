@@ -11,14 +11,18 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.WeilRepresen
 
 namespace UpperTheory.Lit.Sw47
 
-theorem convergent : GlobalTheory.Published.SiegelWeilUnitaryConvergent := GlobalTheory.StdUnn.sw_doubled_of_std PositivityTheory.SiegelWeilCoefficients.field
+theorem convergent : GlobalTheory.Published.SiegelWeilUnitaryConvergent :=
+  GlobalTheory.StdUnn.sw_doubled_of_std PositivityTheory.SiegelWeilCoefficients.field
 
 theorem weilUnitary : GlobalTheory.Published.WeilSiegelFormulaUnitary :=
-  PositivityTheory.SiegelWeilFormulaUnitary.weilSiegelFormulaUnitary_of_two UpperTheory.Lit.weilThetaConvergence PositivityTheory.Rg.Wsf.weilSiegelFormula
+  PositivityTheory.SiegelWeilFormulaUnitary.weilSiegelFormulaUnitary_of_two
+    UpperTheory.Lit.weilThetaConvergence PositivityTheory.Rg.Wsf.weilSiegelFormula
 
 theorem fa : FA := fa_of convergent weilUnitary
 
-theorem fockAniso_free (_ : GlobalTheory.Published.SiegelWeilAnisotropicUnitary) (D : Formalism.BasicNotions.D7) :
-    GlobalTheory.BottomRallis.SiegelWeilFockAniso D := fa D
+theorem fockAniso_free
+    (_ : GlobalTheory.Published.SiegelWeilAnisotropicUnitary) (D : Formalism.BasicNotions.D7)
+    : GlobalTheory.BottomRallis.SiegelWeilFockAniso D :=
+  fa D
 
 end UpperTheory.Lit.Sw47

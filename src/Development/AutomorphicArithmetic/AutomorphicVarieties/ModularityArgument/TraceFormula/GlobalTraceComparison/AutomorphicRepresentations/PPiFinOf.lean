@@ -11,10 +11,11 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.TwtrC
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.piFinOf_pf :
-    PiAdm → TensType → CvType → CvIn → TypeIn → PiFin := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.piFinOf_pf
+    : PiAdm → TensType → CvType → CvIn → TypeIn → PiFin := by
   intro hA hT hC hI hY E _ _ _ n hn D π hπ μa μb ha hb Ma Mb κ ka kb va vb R ψ U h1 h2 h3 h4 h5 i j
-  obtain ⟨ht, K, W, k1, k2, w1, w2, hl⟩ := hT E n μa μb ha hb Ma Mb κ ka kb va vb R ψ U h1 h2 h3 h4 h5 i j
+  obtain ⟨ht, K, W, k1, k2, w1, w2, hl⟩ :=
+    hT E n μa μb ha hb Ma Mb κ ka kb va vb R ψ U h1 h2 h3 h4 h5 i j
   obtain ⟨Y, y1, y2, y3⟩ := hA E n hn π hπ K W k1 w1
   refine ⟨Y, y1, y2, fun u hu φ hφ => ?_⟩
   obtain ⟨s0, s1⟩ := hI E n hn D π hπ φ hφ

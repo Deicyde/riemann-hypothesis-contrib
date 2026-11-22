@@ -16,23 +16,26 @@ namespace GlobalTheory.HermExpo
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r ρ : ℕ}
 
-theorem sum_re_eq_trace (X : Data E r) (x : E) :
-    ∑ τ : X.Ψ, (τ.1 (x + cc x)).re = ((Algebra.trace ℚ E x : ℚ) : ℝ) := by
+theorem sum_re_eq_trace (X : Data E r) (x : E)
+    : ∑ τ : X.Ψ, (τ.1 (x + cc x)).re = ((Algebra.trace ℚ E x : ℚ) : ℝ) := by
   first
   | exact @_root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj
   | exact _root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj
   | (apply _root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj <;> assumption)
   | (intros; apply _root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.TraceRealPartConjugateSum.sum_re_add_conj ..)
 
 theorem kappa_ne (X : Data E r) : X.κ0 ≠ 0 := by
   have := X.ξ0_ne
   rcases X.κ0_xi with h | h <;> rw [h] <;> simpa using this
 
-theorem exists_trace_repr (f : Matrix (Fin ρ) (Fin ρ) E →ₗ[ℚ] ℚ) :
-    ∃ c : Matrix (Fin ρ) (Fin ρ) E, ∀ β,
-      f β = Algebra.trace ℚ E (∑ a, ∑ b, c a b * β a b) := by
+theorem exists_trace_repr (f : Matrix (Fin ρ) (Fin ρ) E →ₗ[ℚ] ℚ)
+    : ∃ c : Matrix (Fin ρ) (Fin ρ) E, ∀ β, f β = Algebra.trace ℚ E (∑ a, ∑ b, c a b * β a b) := by
   have h : ∀ g : E →ₗ[ℚ] ℚ, ∃ c : E, ∀ y, g y = Algebra.trace ℚ E (c * y) := by
     intro g
     refine ⟨((Algebra.traceForm ℚ E).toDual (traceForm_nondegenerate ℚ E)).symm g, fun y => ?_⟩
@@ -44,18 +47,20 @@ theorem exists_trace_repr (f : Matrix (Fin ρ) (Fin ρ) E →ₗ[ℚ] ℚ) :
     simp only [map_sum, Matrix.of_apply, ← hc]
   rfl
 
-theorem exists_herm_phase (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ)
-    (X : Data E r) (cu : CuspFD X ρ) (hb : IsZBasis X cu (zBas X cu))
-    (m : Fin (nZ X ρ) → ℤ) :
-    ∃ χ : Matrix (Fin ρ) (Fin ρ) E, IsHermE χ ∧ ∀ k, phZ X cu χ k = m k := by
+theorem exists_herm_phase
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r ρ : ℕ) (X : Data E r) (cu : CuspFD X ρ)
+    (hb : IsZBasis X cu (zBas X cu)) (m : Fin (nZ X ρ) → ℤ)
+    : ∃ χ : Matrix (Fin ρ) (Fin ρ) E, IsHermE χ ∧ ∀ k, phZ X cu χ k = m k := by
   have hli : LinearIndependent ℚ (zBas X cu) := (LinearIndependent.iff_fractionRing ℤ ℚ).1 hb.1
   obtain ⟨f, hf⟩ : ∃ f : Matrix (Fin ρ) (Fin ρ) E →ₗ[ℚ] ℚ, ∀ k, f (zBas X cu k) = m k := by
-    obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective
-      (Finsupp.linearCombination ℚ (zBas X cu)) (LinearMap.ker_eq_bot.2 hli)
+    obtain ⟨g, hg⟩ :=
+      LinearMap.exists_leftInverse_of_injective (Finsupp.linearCombination ℚ (zBas X cu))
+        (LinearMap.ker_eq_bot.2 hli)
     refine ⟨Finsupp.linearCombination ℚ (fun k => (m k : ℚ)) ∘ₗ g, fun k => ?_⟩
     have h1 := LinearMap.congr_fun hg (Finsupp.single k 1)
-    simp only [LinearMap.comp_apply, Finsupp.linearCombination_single, one_smul,
-      LinearMap.id_apply] at h1
+    simp only [LinearMap.comp_apply, Finsupp.linearCombination_single, one_smul, LinearMap.id_apply]
+      at h1
     simp [h1]
   obtain ⟨c, hc⟩ := exists_trace_repr f
   have hκ : X.κ0 / 2 ≠ 0 := div_ne_zero (kappa_ne X) two_ne_zero
@@ -71,11 +76,13 @@ theorem exists_herm_phase (E : Type) [Field E] [NumberField E] [IsCMField E] (r 
   · simp only [Matrix.of_apply, hmul, hsub, hκc, hcc]
     ring
   · have hs := zBas_skew X cu ⟨_, hb⟩ k
-    have hx : Matrix.trace ((Matrix.of fun a b => (X.κ0 / 2) * (c a b - cc (c b a))).transpose *
-        zBas X cu k) / (X.κ0 / 2) =
-        (∑ a, ∑ b, c a b * zBas X cu k a b) + cc (∑ a, ∑ b, c a b * zBas X cu k a b) := by
-      have h1 : cc (∑ a, ∑ b, c a b * zBas X cu k a b) =
-          ∑ a, ∑ b, -(cc (c b a) * zBas X cu k a b) := by
+    have hx
+        : Matrix.trace
+              ((Matrix.of fun a b => (X.κ0 / 2) * (c a b - cc (c b a))).transpose * zBas X cu k)
+            / (X.κ0 / 2)
+          = (∑ a, ∑ b, c a b * zBas X cu k a b) + cc (∑ a, ∑ b, c a b * zBas X cu k a b) := by
+      have h1
+          : cc (∑ a, ∑ b, c a b * zBas X cu k a b) = ∑ a, ∑ b, -(cc (c b a) * zBas X cu k a b) := by
         rw [Finset.sum_comm]
         unfold cc
         set_option synthInstance.maxHeartbeats 100000 in
@@ -95,5 +102,10 @@ theorem exists_herm_phase (E : Type) [Field E] [NumberField E] [IsCMField E] (r 
 
 end GlobalTheory.HermExpo
 
-theorem GlobalTheory.exists_isHermE_phZ_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r) (cu : CuspFD X ρ), IsZBasis X cu (zBas X cu) → ∀ m : Fin (nZ X ρ) → ℤ, ∃ χ : Matrix (Fin ρ) (Fin ρ) E, IsHermE χ ∧ ∀ k, phZ X cu χ k = m k :=
+theorem GlobalTheory.exists_isHermE_phZ_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r)
+        (cu : CuspFD X ρ),
+      IsZBasis X cu (zBas X cu)
+        → ∀ m : Fin (nZ X ρ) → ℤ, ∃ χ : Matrix (Fin ρ) (Fin ρ) E,
+          IsHermE χ ∧ ∀ k, phZ X cu χ k = m k :=
   GlobalTheory.HermExpo.exists_herm_phase

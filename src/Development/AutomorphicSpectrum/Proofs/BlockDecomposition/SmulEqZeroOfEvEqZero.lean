@@ -11,15 +11,30 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsGraded
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.AbLaw PositivityTheory.FormalThickening
-open GlobalTheory.ProjSpace GlobalTheory.QCoh.Qcqs GlobalTheory.Cartier GlobalTheory.CompanionTheory.FormalAlg GlobalTheory.CompanionTheory.FormalAlg.Lift
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.AbLaw
+  PositivityTheory.FormalThickening
+open GlobalTheory.ProjSpace GlobalTheory.QCoh.Qcqs GlobalTheory.Cartier
+  GlobalTheory.CompanionTheory.FormalAlg GlobalTheory.CompanionTheory.FormalAlg.Lift
 open GlobalTheory.CompanionTheory.FormalAlg.Lift.Glue
 
 set_option autoImplicit false
 
 namespace GlobalTheory.CompanionTheory.FormalAlg.Lift.Glue
 
-theorem smul_eq_zero_of_ev_eq_zero : ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (A : Type) [CommRing A] (P : Finset ι → Type) [∀ S, AddCommGroup (P S)] [∀ S, Module A (P S)] [∀ S, Module (MvPolynomial ι A) (P S)] [∀ S, IsScalarTower A (MvPolynomial ι A) (P S)] (res : ∀ S S' : Finset ι, S ⊆ S' → P S →ₗ[MvPolynomial ι A] P S'), (∀ S S' S'' (h : S ⊆ S') (h' : S' ⊆ S'') a, res S' S'' h' (res S S' h a) = res S S'' (h.trans h') a) → (∀ (T S : Finset ι) (a : P S), S.Nonempty → res S (S ∪ T) Finset.subset_union_left a = 0 → ∃ l : ℕ, xProd A T ^ l • a = 0) → ∀ (I : Finset ι) (hI : I.Nonempty) (m : glue res), ev res I hI m = 0 → ∃ l : ℕ, xProd A I ^ l • m = 0 := by
+theorem smul_eq_zero_of_ev_eq_zero
+    : ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (A : Type) [CommRing A] (P : Finset ι → Type)
+        [∀ S, AddCommGroup (P S)] [∀ S, Module A (P S)] [∀ S, Module (MvPolynomial ι A) (P S)]
+        [∀ S, IsScalarTower A (MvPolynomial ι A) (P S)]
+        (res : ∀ S S' : Finset ι, S ⊆ S' → P S →ₗ[MvPolynomial ι A] P S'),
+      (∀ S S' S'' (h : S ⊆ S') (h' : S' ⊆ S'') a,
+          res S' S'' h' (res S S' h a) = res S S'' (h.trans h') a)
+        → (∀ (T S : Finset ι) (a : P S),
+          S.Nonempty → res S (S ∪ T) Finset.subset_union_left a = 0
+            → ∃ l : ℕ, xProd A T ^ l • a = 0)
+        → ∀ (I : Finset ι) (hI : I.Nonempty) (m : glue res),
+          ev res I hI m = 0 → ∃ l : ℕ, xProd A I ^ l • m = 0 := by
   intro ι _ _ A _ P _ _ _ _ res hcomp H I hI m hm
   have key : ∀ i, res {i} ({i} ∪ I) Finset.subset_union_left (m.1 i) = 0 := by
     intro i

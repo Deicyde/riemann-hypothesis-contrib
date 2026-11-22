@@ -63,7 +63,15 @@ lemma norm_le_one_of_root (Q : C[X]) (hm : Q.Monic) (hc : ∀ i, ‖Q.coeff i‖
   linarith
 end
 
-theorem main_theorem : (let d1 : {C : Type} → [inst : NormedField C] → [IsUltrametricDist C] → Subfield C → Subring C := @(fun {C : Type} [NormedField C] [IsUltrametricDist C] (F : Subfield C) ↦ Subfield.toSubring F ⊓ Valuation.integer NormedField.valuation); ∀ {C : Type} [inst : NormedField C] [inst_1 : IsUltrametricDist C] {F : Subfield C} [IsAlgClosed C] [inst_3 : IsLocalRing ↥(d1 F)], (∀ (x : C), ‖x‖ ≤ (1 : ℝ) → ∃ y ∈ F, ‖x - y‖ < (1 : ℝ)) → IsAlgClosed (IsLocalRing.ResidueField ↥(d1 F))) := by
+theorem main_theorem
+    : (let d1
+           : {C : Type} → [inst : NormedField C] → [IsUltrametricDist C] → Subfield C → Subring C :=
+         @(fun {C : Type} [NormedField C] [IsUltrametricDist C] (F : Subfield C) ↦
+           Subfield.toSubring F ⊓ Valuation.integer NormedField.valuation)
+       ∀ {C : Type} [inst : NormedField C] [inst_1 : IsUltrametricDist C] {F : Subfield C}
+           [IsAlgClosed C] [inst_3 : IsLocalRing ↥(d1 F)],
+         (∀ (x : C), ‖x‖ ≤ (1 : ℝ) → ∃ y ∈ F, ‖x - y‖ < (1 : ℝ))
+           → IsAlgClosed (IsLocalRing.ResidueField ↥(d1 F))) := by
   intro d1 C _ _ F _ _ hdense
   have mem : ∀ x : C, x ∈ d1 F ↔ x ∈ F ∧ ‖x‖ ≤ 1 := by
     intro x
@@ -92,11 +100,12 @@ theorem main_theorem : (let d1 : {C : Type} → [inst : NormedField C] → [IsUl
     rw [this]
     rw [sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha1 ?_)
-    rw [norm_neg]; exact hya.le
+    rw [norm_neg]
+    exact hya.le
   let y' : d1 F := ⟨y, (mem y).mpr ⟨hyF, hy1⟩⟩
   refine ⟨IsLocalRing.residue _ y', ?_⟩
-  rw [← hqmap, eval_map, eval₂_hom, IsLocalRing.residue_eq_zero_iff,
-    IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
+  rw [← hqmap, eval_map, eval₂_hom, IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal,
+    mem_nonunits_iff]
   intro hu
   have hval : ((q.eval y' : d1 F) : C) = Q.eval y := by
     rw [hQ, eval_map]
@@ -114,7 +123,8 @@ theorem main_theorem : (let d1 : {C : Type} → [inst : NormedField C] → [IsUl
   have hv : ‖(v : C)‖ ≤ 1 := ((mem _).mp v.2).2
   have : ‖((q.eval y' : d1 F) : C) * (v : C)‖ < 1 := by
     rw [norm_mul]
-    calc _ ≤ ‖((q.eval y' : d1 F) : C)‖ * 1 := mul_le_mul_of_nonneg_left hv (norm_nonneg _)
+    calc
+      _ ≤ ‖((q.eval y' : d1 F) : C)‖ * 1 := mul_le_mul_of_nonneg_left hv (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact hn
   rw [h1, norm_one] at this
   exact lt_irrefl _ this

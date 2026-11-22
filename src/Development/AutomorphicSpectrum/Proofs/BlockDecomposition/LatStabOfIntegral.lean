@@ -11,62 +11,76 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExistsLocalApp
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
-open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free GlobalTheory.CompanionTheory.WeilSiegel.HypStep
+open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
+  GlobalTheory.CompanionTheory.WeilSiegel.HypStep
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.HypStep.PrimLoc
 
-theorem JR_hypOne {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) : JR (F := F) R (hypOne J) = hypOne (JR (F := F) R J) := by
+theorem JR_hypOne
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    : JR (F := F) R (hypOne J) = hypOne (JR (F := F) R J) := by
   ext i j
   simp only [JR, Matrix.map_apply]
-  refine Fin.cases ?_ (fun i => Fin.cases ?_ (fun i => ?_) i) i <;>
-    refine Fin.cases ?_ (fun j => Fin.cases ?_ (fun j => ?_) j) j <;>
-    simp [hypOne]
+  refine Fin.cases ?_ (fun i => Fin.cases ?_ (fun i => ?_) i) i
+    <;> refine Fin.cases ?_ (fun j => Fin.cases ?_ (fun j => ?_) j) j <;> simp [hypOne]
 
 section Place
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem e0_mem_latV {d : ℕ} (M : ℕ) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-      v.adicCompletionIntegers F) :
-    (e0 (Fv F v ⊗[F] E) M : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) ∈ latV b v := by
+theorem e0_mem_latV
+    {d : ℕ}
+    (M : ℕ)
+    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    : (e0 (Fv F v ⊗[F] E) M : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) ∈ latV b v := by
   rw [GoodTrans.mem_latV_iff b v O hO]
   intro a i
   refine Fin.cases ?_ (fun i => ?_) i
   · simpa [e0] using O.one_mem
   · simpa [e0] using O.zero_mem
 
-theorem primV_subset (σ : E →ₐ[F] E) {M d : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-      v.adicCompletionIntegers F) : primV σ J b v ⊆ latV b v := by
+theorem primV_subset
+    (σ : E →ₐ[F] E)
+    {M d : ℕ} (J : Matrix (Fin M) (Fin M) E) (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    : primV σ J b v ⊆ latV b v := by
   rintro y ⟨g, hg, rfl⟩
   exact (hg _).2 (e0_mem_latV M b v O hO)
 
-theorem latStab_of_integral (σ : E →ₐ[F] E) {M d : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-      v.adicCompletionIntegers F)
-    (g : GL (Fin M) (Fv F v ⊗[F] E)) (hg : g ∈ HR (Fv F v) σ J)
-    (hgO : ∀ i j, (g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) i j ∈ O)
-    (hgiO : ∀ i j, ((g⁻¹ : GL (Fin M) (Fv F v ⊗[F] E)) : Matrix (Fin M) (Fin M) _) i j ∈ O) :
-    latStab σ J b v ((⟨g, hg⟩ : HR (Fv F v) σ J) : HA (Fv F v) σ J) := by
+theorem latStab_of_integral
+    (σ : E →ₐ[F] E)
+    {M d : ℕ} (J : Matrix (Fin M) (Fin M) E) (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    (g : GL (Fin M) (Fv F v ⊗[F] E))
+    (hg : g ∈ HR (Fv F v) σ J) (hgO : ∀ i j, (g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) i j ∈ O)
+    (hgiO : ∀ i j, ((g⁻¹ : GL (Fin M) (Fv F v ⊗[F] E)) : Matrix (Fin M) (Fin M) _) i j ∈ O)
+    : latStab σ J b v ((⟨g, hg⟩ : HR (Fv F v) σ J) : HA (Fv F v) σ J) := by
   let h' : HA (Fv F v) σ J := (⟨g, hg⟩ : HR (Fv F v) σ J)
-  have hact : ∀ (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (a : Fin 1),
-      actW (Fv F v) σ J h' X a = (g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) *ᵥ X a :=
-    fun _ _ => rfl
+  have hact
+      : ∀ (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (a : Fin 1),
+        actW (Fv F v) σ J h' X a = (g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) *ᵥ X a := fun _ _ =>
+    rfl
   intro X
   rw [GoodTrans.mem_latV_iff b v O hO, GoodTrans.mem_latV_iff b v O hO]
   constructor
   · intro hX a i
-    have e : X a = ((g⁻¹ : GL (Fin M) (Fv F v ⊗[F] E)) : Matrix (Fin M) (Fin M) _) *ᵥ
-        ((g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) *ᵥ X a) := by
+    have e
+        : X a
+          = ((g⁻¹ : GL (Fin M) (Fv F v ⊗[F] E)) : Matrix (Fin M) (Fin M) _)
+            *ᵥ ((g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) *ᵥ X a) := by
       rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
     rw [e]
     exact GoodTrans.mulVec_mem O _ hgiO _ (fun j => by rw [← hact]; exact hX a j) i
@@ -75,21 +89,25 @@ theorem latStab_of_integral (σ : E →ₐ[F] E) {M d : ℕ} (J : Matrix (Fin M)
     rw [hact]
     exact GoodTrans.mulVec_mem O _ hgO _ (hX a) i
 
-theorem cover_pt (σ : E →ₐ[F] E) {M d : ℕ} (J Ji : Matrix (Fin M) (Fin M) E) (hmul : J * Ji = 1)
-    (hJs : ∀ i j, σ (J j i) = J i j)
-    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-      v.adicCompletionIntegers F)
-    (hstab : ∀ y ∈ O, sigR (Fv F v) σ y ∈ O)
-    (hss : ∀ y, sigR (Fv F v) σ (sigR (Fv F v) σ y) = y)
-    (h2 : IsUnit (2 : O)) (hδ : ∃ δ : O, IsUnit δ ∧ sigR (Fv F v) σ δ = -δ)
-    (π₁ π₂ : O) (hπ : ∀ P : Ideal O, P.IsMaximal → P = Ideal.span {π₁} ∨ P = Ideal.span {π₂})
+theorem cover_pt
+    (σ : E →ₐ[F] E)
+    {M d : ℕ} (J Ji : Matrix (Fin M) (Fin M) E) (hmul : J * Ji = 1) (hJs : ∀ i j, σ (J j i) = J i j)
+    (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    (hstab : ∀ y ∈ O, sigR (Fv F v) σ y ∈ O) (hss : ∀ y, sigR (Fv F v) σ (sigR (Fv F v) σ y) = y)
+    (h2 : IsUnit (2 : O)) (hδ : ∃ δ : O, IsUnit δ ∧ sigR (Fv F v) σ δ = -δ) (π₁ π₂ : O)
+    (hπ : ∀ P : Ideal O, P.IsMaximal → P = Ideal.span {π₁} ∨ P = Ideal.span {π₂})
     (hJO : ∀ i j, inclR (Fv F v) (J i j) ∈ O) (hJiO : ∀ i j, inclR (Fv F v) (Ji i j) ∈ O)
-    (X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) (hX : X ∈ latV b v)
-    (hg : hform (sigR (Fv F v) σ) (JR (Fv F v) (hypOne J)) (X 0) (X 0) = 0) :
-    X ∈ primV σ J b v ∨ ∃ c : O, (c = π₁ ∨ c = π₂) ∧ ¬ IsUnit c ∧
-      X ∈ (fun (Y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) a i => (c : Fv F v ⊗[F] E) * Y a i) ''
-        latV b v := by
+    (X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E)
+    (hX : X ∈ latV b v) (hg : hform (sigR (Fv F v) σ) (JR (Fv F v) (hypOne J)) (X 0) (X 0) = 0)
+    : X ∈ primV σ J b v
+      ∨ ∃ c : O,
+        (c = π₁ ∨ c = π₂) ∧ ¬ IsUnit c
+          ∧ X
+            ∈ (fun (Y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) a i => (c : Fv F v ⊗[F] E) * Y a i)
+              '' latV b v := by
   classical
   have hXO := (GoodTrans.mem_latV_iff b v O hO X).1 hX
   let x : Fin (M + 2) → O := fun i => ⟨X 0 i, hXO 0 i⟩
@@ -99,27 +117,36 @@ theorem cover_pt (σ : E →ₐ[F] E) {M d : ℕ} (J Ji : Matrix (Fin M) (Fin M)
     have hmulT : JR (F := F) (Fv F v) J * JR (F := F) (Fv F v) Ji = 1 := by
       have := congrArg (RingHom.mapMatrix (inclR (Fv F v) (F := F) (E := E))) hmul
       rwa [map_mul, map_one] at this
-    obtain ⟨g, hgU, hgx, hgO, hgiO⟩ := GlobalTheory.T.primitive_vector_extends_hyperbolic _ O (sigR (Fv F v) σ) hstab hss h2 hδ π₁ π₂ hπ M
-      (JR (Fv F v) J) (JR (Fv F v) Ji) hJO hJiO hmulT
-      (fun i j => by
-        show sigR (Fv F v) σ (inclR (Fv F v) (J j i)) = inclR (Fv F v) (J i j)
-        rw [← hJs i j]
-        rfl)
-      x hp (by rw [← hJR]; exact hg)
+    obtain ⟨g, hgU, hgx, hgO, hgiO⟩ :=
+      GlobalTheory.T.primitive_vector_extends_hyperbolic _ O (sigR (Fv F v) σ) hstab hss h2 hδ π₁ π₂
+        hπ M (JR (Fv F v) J) (JR (Fv F v) Ji) hJO hJiO hmulT
+        (fun i j => by
+          show sigR (Fv F v) σ (inclR (Fv F v) (J j i)) = inclR (Fv F v) (J i j)
+          rw [← hJs i j]
+          rfl)
+        x hp (by rw [← hJR]; exact hg)
     have hgH : g ∈ HR (Fv F v) σ (hypOne J) := by
       show g ∈ UJ (sigR (Fv F v) σ) (JR (Fv F v) (hypOne J))
-      rw [hJR]; exact hgU
-    refine ⟨(⟨g, hgH⟩ : HR (Fv F v) σ (hypOne J)),
-      latStab_of_integral σ (hypOne J) b v O hO g hgH hgO hgiO, ?_⟩
+      rw [hJR]
+      exact hgU
+    refine ⟨
+      (⟨g, hgH⟩ : HR (Fv F v) σ (hypOne J)),
+      latStab_of_integral σ (hypOne J) b v O hO g hgH hgO hgiO,
+      ?_
+    ⟩
     funext a
     rw [Fin.fin_one_eq_zero a]
     exact hgx
   · right
     push_neg at hp
     obtain ⟨P, hPm, hP⟩ := hp
-    have aux : ∀ c : O, P = Ideal.span {c} → ¬ IsUnit c ∧
-        X ∈ (fun (Y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) a i => (c : Fv F v ⊗[F] E) * Y a i) ''
-          latV b v := by
+    have aux
+        : ∀ c : O,
+          P = Ideal.span {c}
+            → ¬ IsUnit c
+              ∧ X
+                ∈ (fun (Y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) a i => (c : Fv F v ⊗[F] E) * Y a i)
+                  '' latV b v := by
       intro c hc
       refine ⟨fun hu => hPm.ne_top (by rw [hc]; exact Ideal.span_singleton_eq_top.2 hu), ?_⟩
       have hdiv : ∀ i, ∃ y : O, y * c = x i := fun i => by

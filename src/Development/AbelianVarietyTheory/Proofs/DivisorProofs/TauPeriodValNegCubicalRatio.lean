@@ -8,15 +8,28 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TauNeg
 
-theorem val_tau_neg : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R), D.TauBimult → ∀ (a b : D.X) (z : (TK R).left) (J : ((TK R).left ⟶ D.P.A.left) → D.P.L.ι), Good D.P.L z J → val (D.tau a b) (𝟙 _) z J = val (D.tau (-a) (-b)) (𝟙 _) z J * cubV D.cub z J (toUnit (TK R) ≫ D.c a) (toUnit (TK R) ≫ D.c (-a)) (toUnit (TK R) ≫ D.c b) * (cubV D.cub z J (toUnit (TK R) ≫ D.c b) (toUnit (TK R) ≫ D.c (-b)) (toUnit (TK R) ≫ D.c (-a)))⁻¹ := by
+theorem val_tau_neg
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R),
+      D.TauBimult
+        → ∀ (a b : D.X) (z : (TK R).left) (J : ((TK R).left ⟶ D.P.A.left) → D.P.L.ι),
+          Good D.P.L z J
+            → val (D.tau a b) (𝟙 _) z J
+              = val (D.tau (-a) (-b)) (𝟙 _) z J
+                * cubV D.cub z J (toUnit (TK R) ≫ D.c a) (toUnit (TK R) ≫ D.c (-a))
+                  (toUnit (TK R) ≫ D.c b)
+                * (cubV D.cub z J (toUnit (TK R) ≫ D.c b) (toUnit (TK R) ≫ D.c (-b))
+                  (toUnit (TK R) ≫ D.c (-a)))⁻¹ := by
   intro R _ _ D hB a b z J hJ
-  have xadd : ∀ u v : D.X, toUnit (TK R) ≫ D.c (u + v) = (toUnit (TK R) ≫ D.c u) * (toUnit (TK R) ≫ D.c v) := by
+  have xadd
+      : ∀ u v : D.X,
+        toUnit (TK R) ≫ D.c (u + v) = (toUnit (TK R) ≫ D.c u) * (toUnit (TK R) ≫ D.c v) := by
     intro u v; rw [D.c_add]; exact MonObj.comp_mul _ _ _
   have x0 : toUnit (TK R) ≫ D.c 0 = 1 := by
     have h := xadd 0 0
@@ -28,13 +41,19 @@ theorem val_tau_neg : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R), D
     refine Eq.trans ?_ h
     refine Eq.trans ?_ (val_cub D.cub (lift x y) hJ (pzero D.P.A _) (x2 D.P.A 0) (x2 D.P.A 1)).symm
     congr 1 <;> simp [x2, pzero, Hom.one_def]
-  have B : ∀ u u' w v : D.X, u + u' = w → val (D.tau w v) (𝟙 _) z J *
-      cubV D.cub z J (toUnit (TK R) ≫ D.c u) (toUnit (TK R) ≫ D.c u') (toUnit (TK R) ≫ D.c v) =
-      val (D.tau u v) (𝟙 _) z J * val (D.tau u' v) (𝟙 _) z J := by
+  have B
+      : ∀ u u' w v : D.X,
+        u + u' = w
+          → val (D.tau w v) (𝟙 _) z J * cubV D.cub z J (toUnit (TK R) ≫ D.c u)
+              (toUnit (TK R) ≫ D.c u') (toUnit (TK R) ≫ D.c v)
+            = val (D.tau u v) (𝟙 _) z J * val (D.tau u' v) (𝟙 _) z J := by
     rintro u u' w v rfl
-    have h := (val_mul hJ _ _ _).symm.trans ((val_corr hJ (hB u u' v) (𝟙 _)).trans (val_mul hJ _ _ _))
-    have hc : val (LB.pullGen D.P.L (thφ D.P.A (x3 D.P.A)) thε D.cub.t (D.pt3 u u' v)) (𝟙 _) z J =
-        cubV D.cub z J (toUnit (TK R) ≫ D.c u) (toUnit (TK R) ≫ D.c u') (toUnit (TK R) ≫ D.c v) := by
+    have h :=
+      (val_mul hJ _ _ _).symm.trans ((val_corr hJ (hB u u' v) (𝟙 _)).trans (val_mul hJ _ _ _))
+    have hc
+        : val (LB.pullGen D.P.L (thφ D.P.A (x3 D.P.A)) thε D.cub.t (D.pt3 u u' v)) (𝟙 _) z J
+          = cubV D.cub z J (toUnit (TK R) ≫ D.c u) (toUnit (TK R) ≫ D.c u')
+            (toUnit (TK R) ≫ D.c v) := by
       refine (val_cub D.cub (𝟙 (TK R)) hJ _ _ _).trans ?_
       rw [Category.id_comp, Category.id_comp, Category.id_comp]
     rw [← hc]

@@ -8,23 +8,31 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Heisenber
 
 @[expose] public section
 
-open Matrix Formalism.UG GlobalTheory.Hk3 GlobalTheory.FinWeil GlobalTheory.SphTheta ValuativeRel Classical
+open Matrix Formalism.UG GlobalTheory.Hk3 GlobalTheory.FinWeil GlobalTheory.SphTheta ValuativeRel
+  Classical
 open GlobalTheory.LFun (HasSatU IsSatVecU heckeVec)
 open GlobalTheory.LGrp (bcParam extProd)
-open GlobalTheory.WeilM (UG IsQuad Darboux symp sbClass SB IsWeilB IsWeilPair TestClass schr dbl diagCols)
+open GlobalTheory.WeilM
+  (UG IsQuad Darboux symp sbClass SB IsWeilB IsWeilPair TestClass schr dbl diagCols)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace (str chi IsUnramAdd)
 open scoped TensorProduct
 
 namespace GlobalTheory.SphTheta
 
-theorem sumOp_vec_zero {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
-    (W : X → M →ₗ[ℂ] M) (A B : Submodule R X) : sumOp W A B 0 = 0 := by
+theorem sumOp_vec_zero
+    {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+    (W : X → M →ₗ[ℂ] M) (A B : Submodule R X)
+    : sumOp W A B 0 = 0 := by
   unfold sumOp; simp
 
-theorem form_translate_vacuum {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
-    {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} (h : IsHeis σ w γ W) {Λ : Submodule R X}
-    (hΛ : SelfDual γ Λ) {s : M} (hs : Fixes W Λ s) (e : M →ₗ[ℂ] ℂ) (he : ∀ a ∈ Λ, ∀ v, e (W a v) = e v) (x : X) :
-    e (W x s) = if x ∈ Λ then e s else 0 := by
+theorem form_translate_vacuum
+    {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+    {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} (h : IsHeis σ w γ W)
+    {Λ : Submodule R X} (hΛ : SelfDual γ Λ)
+    {s : M} (hs : Fixes W Λ s)
+    (e : M →ₗ[ℂ] ℂ) (he : ∀ a ∈ Λ, ∀ v, e (W a v) = e v)
+    (x : X)
+    : e (W x s) = if x ∈ Λ then e s else 0 := by
   split_ifs with hx
   · rw [hs x hx]
   · obtain ⟨a, ha, hne⟩ : ∃ a ∈ Λ, γ x a ≠ 1 := by
@@ -41,7 +49,21 @@ theorem form_translate_vacuum {R X M : Type} [CommRing R] [AddCommGroup X] [Modu
     have h3 : (1 - γ a x) * e (W x s) = 0 := by rw [sub_mul, one_mul, ← h1, sub_self]
     exact (mul_eq_zero.1 h3).resolve_left (sub_ne_zero.2 (Ne.symm h2))
 
-theorem sumOp_vacuum_lift : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}, IsHeis σ w γ W → ∀ Λ : Submodule R X, SelfDual γ Λ → ∀ s : M, s ≠ 0 → Fixes W Λ s → Submodule.span ℂ (Set.range fun x => W x s) = ⊤ → ∀ Λ' : Submodule R X, SelfDual γ Λ' → idx Λ Λ' ≠ 0 → (sumOp W Λ Λ' s ≠ 0 ∧ Fixes W Λ' (sumOp W Λ Λ' s) ∧ Submodule.span ℂ (Set.range fun x => W x (sumOp W Λ Λ' s)) = ⊤) ∧ ∀ e : M →ₗ[ℂ] ℂ, e s = 1 → (∀ a ∈ Λ, ∀ v, e (W a v) = e v) → ∀ v, Fixes W Λ' v → v = e v • sumOp W Λ Λ' s := by
+theorem sumOp_vacuum_lift
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      IsHeis σ w γ W
+        → ∀ Λ : Submodule R X,
+          SelfDual γ Λ
+            → ∀ s : M,
+              s ≠ 0 → Fixes W Λ s → Submodule.span ℂ (Set.range fun x => W x s) = ⊤
+                → ∀ Λ' : Submodule R X,
+                  SelfDual γ Λ' → idx Λ Λ' ≠ 0
+                    → (sumOp W Λ Λ' s ≠ 0 ∧ Fixes W Λ' (sumOp W Λ Λ' s)
+                        ∧ Submodule.span ℂ (Set.range fun x => W x (sumOp W Λ Λ' s)) = ⊤)
+                      ∧ ∀ e : M →ₗ[ℂ] ℂ,
+                        e s = 1 → (∀ a ∈ Λ, ∀ v, e (W a v) = e v)
+                          → ∀ v, Fixes W Λ' v → v = e v • sumOp W Λ Λ' s := by
   intro R X M _ _ _ _ _ σ w γ W h Λ hΛ s hs0 hs hspan Λ' hΛ' hidx
   obtain ⟨hidx', hss⟩ := sumOp_sumOp_eq_idx_smul h Λ Λ' hΛ hΛ' hidx
   obtain ⟨⟨n, f, hf, ht⟩, hfix, -⟩ := (sumOp_transversal h Λ Λ' hΛ').2.1 hidx
@@ -69,7 +91,8 @@ theorem sumOp_vacuum_lift : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Mo
     rintro _ ⟨x, rfl⟩
     exact hmem x
   refine ⟨⟨hne, hs'fix, hspan'⟩, fun e he1 he v hv => ?_⟩
-  obtain ⟨c, rfl⟩ := GlobalTheory.T.heisenbergVacuum_unique_of_selfDual h Λ' hΛ' _ hne hs'fix hspan' v hv
+  obtain ⟨c, rfl⟩ :=
+    GlobalTheory.T.heisenbergVacuum_unique_of_selfDual h Λ' hΛ' _ hne hs'fix hspan' v hv
   have hes' : e (sumOp W Λ Λ' s) = 1 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [((sumOp_transversal h Λ Λ' hΛ').1 s hs (Fin n) f hf ht).1, map_sum]

@@ -11,13 +11,17 @@ namespace PI.HtPlacesSumWork
 
 open NumberField IsLocalRing ReciprocityTheory.ChartRestriction.G.T0
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] {Ω : ι → Type}
-  [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)] {WT : Type} [AddCommGroup WT] {A : ι → Type}
-  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
+  {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
+  {WT : Type} [AddCommGroup WT]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
 
-theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c) (A c))
-    (d : Data K ι Ω WT A) : LeafSt.places_over_la 𝒜 d := by
+theorem places_over_height_one_prime
+    (𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)) (d : Data K ι Ω WT A)
+    : LeafSt.places_over_la 𝒜 d := by
   intro hd h la c
   letI : Algebra (Op d.D d.N la) (KTf K d.D d.N) := (OpToKT d.D d.N la).toAlgebra
   letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
@@ -47,10 +51,14 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
     have hC (k : 𝓞 K) (hk : k ≠ 0) : f (g (MvPolynomial.C k)) ≠ 0 :=
       (map_ne_zero_iff (f.comp g) (hf.comp hg)).2 (MvPolynomial.C_ne_zero.mpr hk)
     have hQ' : f Q ≠ 0 := (map_ne_zero_iff f hf).2 (nonZeroDivisors.ne_zero hQ)
-    refine ⟨algebraMap (OT K d.D d.N) (Op d.D d.N la) (a * MvPolynomial.C m),
-      algebraMap (OT K d.D d.N) (Op d.D d.N la) (b * MvPolynomial.C n), ?_⟩
-    change f P / f Q = OpToKT d.D d.N la (algebraMap _ _ (a * MvPolynomial.C m)) /
-      OpToKT d.D d.N la (algebraMap _ _ (b * MvPolynomial.C n))
+    refine ⟨
+      algebraMap (OT K d.D d.N) (Op d.D d.N la) (a * MvPolynomial.C m),
+      algebraMap (OT K d.D d.N) (Op d.D d.N la) (b * MvPolynomial.C n),
+      ?_
+    ⟩
+    change f P / f Q
+      = OpToKT d.D d.N la (algebraMap _ _ (a * MvPolynomial.C m))
+        / OpToKT d.D d.N la (algebraMap _ _ (b * MvPolynomial.C n))
     rw [gauss_lift, gauss_lift]
     change f P / f Q = f (g (a * MvPolynomial.C m)) / f (g (b * MvPolynomial.C n))
     change g a = g (MvPolynomial.C n) * P at ha
@@ -61,8 +69,10 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
   have : FiniteDimensional (d.KT c) (OmS (Ω c) d.D d.N) := d.KT_finiteDimensional hd c
   let e : KTf K d.D d.N ≃+* d.KT c :=
     (d.KTtoS h c).rangeRestrictFieldEquiv.trans (RingEquiv.subfieldCongr (d.KTtoS_fieldRange h c))
-  have hc : (algebraMap (KTf K d.D d.N) (OmS (Ω c) d.D d.N)).comp e.symm.toRingHom =
-      (RingEquiv.refl (OmS (Ω c) d.D d.N)).toRingHom.comp (algebraMap (d.KT c) (OmS (Ω c) d.D d.N)) := by
+  have hc
+      : (algebraMap (KTf K d.D d.N) (OmS (Ω c) d.D d.N)).comp e.symm.toRingHom
+        = (RingEquiv.refl (OmS (Ω c) d.D d.N)).toRingHom.comp
+          (algebraMap (d.KT c) (OmS (Ω c) d.D d.N)) := by
     refine RingHom.ext fun y => ?_
     have he (z : KTf K d.D d.N) : (e z : OmS (Ω c) d.D d.N) = d.KTtoS h c z := rfl
     change d.KTtoS h c (e.symm y) = (y : OmS (Ω c) d.D d.N)
@@ -72,9 +82,10 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
   have hrk : Module.finrank (KTf K d.D d.N) (OmS (Ω c) d.D d.N) = d.delc c :=
     (Algebra.finrank_eq_of_equiv_equiv e.symm (RingEquiv.refl _) hc).symm
   have : Algebra.IsSeparable (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := inferInstance
-  have hcomp : ∀ x : OT K d.D d.N,
-      algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N) (algebraMap (OT K d.D d.N) (Op d.D d.N la) x) =
-        d.OTtoS c x := by
+  have hcomp
+      : ∀ x : OT K d.D d.N,
+        algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N) (algebraMap (OT K d.D d.N) (Op d.D d.N la) x)
+          = d.OTtoS c x := by
     intro x
     show d.KTtoS h c (OpToKT d.D d.N la (algebraMap _ _ x)) = _
     rw [gauss_lift]
@@ -87,8 +98,9 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
       obtain ⟨⟨x, m⟩, rfl⟩ := IsLocalization.mk'_surjective (laT d.D d.N la).primeCompl a
       have hm0 : w (d.OTtoS c m) = 0 :=
         le_antisymm (not_lt.mp fun hp => m.2 ((hw m).2.mp hp)) (hw m).1
-      have hsp := congrArg (algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N))
-        (IsLocalization.mk'_spec (Op d.D d.N la) x m)
+      have hsp :=
+        congrArg (algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N))
+          (IsLocalization.mk'_spec (Op d.D d.N la) x m)
       rw [map_mul, hcomp, hcomp] at hsp
       have hv := congrArg w hsp
       rw [AddValuation.map_mul, hm0, add_zero] at hv
@@ -96,14 +108,16 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
       exact hw x
     · rintro ⟨hnd, hO⟩
       refine ⟨hnd, fun x => ?_⟩
-      rw [← hcomp x, ← IsLocalization.AtPrime.to_map_mem_maximal_iff (Op d.D d.N la) (laT d.D d.N la)]
+      rw [← hcomp x,
+        ← IsLocalization.AtPrime.to_map_mem_maximal_iff (Op d.D d.N la) (laT d.D d.N la)]
       exact hO _
   obtain ⟨π, hπ, hπ0, s, hs, hps⟩ := gauss_unif la
   have hmax := gauss_maximalIdeal d.D d.N la hπ hs hps
   have hϖ : Irreducible (algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C π)) :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer _).mpr hmax
-  have hWres : ∀ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (a : 𝓞 K),
-      d.Wres c w (algebraMap K (Ω c) (a : K)) = w (d.OTtoS c (MvPolynomial.C a)) := by
+  have hWres
+      : ∀ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (a : 𝓞 K),
+        d.Wres c w (algebraMap K (Ω c) (a : K)) = w (d.OTtoS c (MvPolynomial.C a)) := by
     intro w a
     show w (algebraMap (Ω c) (OmS (Ω c) d.D d.N) (algebraMap K (Ω c) (a : K))) = _
     congr 1
@@ -113,17 +127,21 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
   have hne : d.OTtoS c (MvPolynomial.C π) ≠ 0 := by
     rw [← hcomp]
     intro h0
-    have h1 : algebraMap (Op d.D d.N la) (KTf K d.D d.N)
-        (algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C π)) = 0 :=
+    have h1
+        : algebraMap (Op d.D d.N la) (KTf K d.D d.N)
+            (algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C π))
+          = 0 :=
       (d.KTtoS h c).injective (by rw [map_zero]; exact h0)
     have h2 : algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C π) = 0 :=
       (IsFractionRing.injective (Op d.D d.N la) (KTf K d.D d.N)) (by rw [h1, map_zero])
     have h3 : (MvPolynomial.C π : OT K d.D d.N) = 0 :=
       gauss_inj d.D d.N la (by rw [map_zero]; exact h2)
     exact hπ0 (by simpa using h3)
-  have he : ∀ w ∈ PlacesOver (Op d.D d.N la) (OmS (Ω c) d.D d.N),
-      ((ramIdx (d.Wres c w) la : ℤ) : WithTop ℤ) = w (algebraMap (Op d.D d.N la)
-        (OmS (Ω c) d.D d.N) (algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C π))) := by
+  have he
+      : ∀ w ∈ PlacesOver (Op d.D d.N la) (OmS (Ω c) d.D d.N),
+        ((ramIdx (d.Wres c w) la : ℤ) : WithTop ℤ)
+          = w (algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N)
+            (algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C π))) := by
     intro w hw
     rw [hcomp]
     obtain ⟨n0, hn0⟩ := WithTop.ne_top_iff_exists.mp (hw.1.1 _ hne)
@@ -133,8 +151,9 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
     refine ⟨⟨π, hπ, hπ0, by rw [hWres, hn0]⟩, ?_⟩
     rintro n ⟨a, ha, -, hna⟩
     rw [hWres] at hna
-    have hmem : algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C a) ∈
-        maximalIdeal (Op d.D d.N la) := by
+    have hmem
+        : algebraMap (OT K d.D d.N) (Op d.D d.N la) (MvPolynomial.C a)
+          ∈ maximalIdeal (Op d.D d.N la) := by
       rw [IsLocalization.AtPrime.to_map_mem_maximal_iff (Op d.D d.N la) (laT d.D d.N la)]
       exact Ideal.mem_map_of_mem _ ha
     rw [hmax, Ideal.mem_span_singleton'] at hmem
@@ -142,11 +161,12 @@ theorem places_over_height_one_prime (𝒜 : (c : ι) → WT → Submodule (Ω c
     have hv := congrArg (fun t => w (algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N) t)) hy
     simp only [map_mul, AddValuation.map_mul, hcomp] at hv
     rw [← hn0, hna] at hv
-    have hle : (n0 : WithTop ℤ) ≤ n := by
-      rw [← hv]; exact le_add_of_nonneg_left (hw.2 y).1
+    have hle : (n0 : WithTop ℤ) ≤ n := by rw [← hv]; exact le_add_of_nonneg_left (hw.2 y).1
     exact_mod_cast hle
-  have key := valPl (Op d.D d.N la) (KTf K d.D d.N) (OmS (Ω c) d.D d.N) hϖ
-    (fun w => ramIdx (d.Wres c w) la) he
+  have key :=
+    valPl (Op d.D d.N la) (KTf K d.D d.N) (OmS (Ω c) d.D d.N) hϖ
+      (fun w => ramIdx (d.Wres c w) la)
+      he
   rw [hset]
   refine ⟨key.1, ?_⟩
   rw [← hrk]

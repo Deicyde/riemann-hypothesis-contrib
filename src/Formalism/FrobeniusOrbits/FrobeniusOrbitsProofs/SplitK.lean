@@ -37,34 +37,38 @@ theorem b_not_rat (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : b ∉ (⊥ : Intermedia
   nlinarith [sq_nonneg q]
 
 private theorem isIntegral_b : IsIntegral ℚ b := by
-  first
-  | exact IsIntegral.of_finite ℚ b
-  | exact Algebra.IsIntegral.isIntegral b
+  first | exact IsIntegral.of_finite ℚ b | exact Algebra.IsIntegral.isIntegral b
 
-private theorem aeval_X_sq_add_C_eq_zero_of_sq_eq_neg (hb : b ^ 2 = -(d : L)) :
-    Polynomial.aeval b (Polynomial.X ^ 2 + Polynomial.C (d : ℚ)) = 0 := by
+private theorem aeval_X_sq_add_C_eq_zero_of_sq_eq_neg (hb : b ^ 2 = -(d : L))
+    : Polynomial.aeval b (Polynomial.X ^ 2 + Polynomial.C (d : ℚ)) = 0 := by
   first
   | simp [hb]
   | (rw [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C, hb]; simp)
 
-private theorem minpoly_natDegree_eq_two_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) :
-    (minpoly ℚ b).natDegree = 2 := by
+private theorem minpoly_natDegree_eq_two_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L))
+    : (minpoly ℚ b).natDegree = 2 := by
   have hint : IsIntegral ℚ b := isIntegral_b
   have hmon : (Polynomial.X ^ 2 + Polynomial.C (d : ℚ)).Monic := by
-    first
-    | exact Polynomial.monic_X_pow_add_C _ two_ne_zero
-    | monicity!
+    first | exact Polynomial.monic_X_pow_add_C _ two_ne_zero | monicity!
   have hle : (minpoly ℚ b).natDegree ≤ 2 := by
-    have h1 := Polynomial.natDegree_le_of_dvd (minpoly.dvd ℚ b (aeval_X_sq_add_C_eq_zero_of_sq_eq_neg hb)) hmon.ne_zero
-    first
-    | rwa [Polynomial.natDegree_X_pow_add_C] at h1
-    | exact h1.trans (by compute_degree)
+    have h1 :=
+      Polynomial.natDegree_le_of_dvd (minpoly.dvd ℚ b (aeval_X_sq_add_C_eq_zero_of_sq_eq_neg hb))
+        hmon.ne_zero
+    first | rwa [Polynomial.natDegree_X_pow_add_C] at h1 | exact h1.trans (by compute_degree)
   have hne1 : (minpoly ℚ b).natDegree ≠ 1 := by
     intro h1
     first
-    | (rw [minpoly.natDegree_eq_one_iff] at h1; obtain ⟨q, hq⟩ := h1; exact b_not_rat hd hb (IntermediateField.mem_bot.mpr ⟨q, hq⟩))
-    | (have h2 : Module.finrank ℚ ℚ⟮b⟯ = 1 := by rw [IntermediateField.adjoin.finrank hint, h1]
-       exact b_not_rat hd hb (IntermediateField.adjoin_simple_eq_bot_iff.mp (IntermediateField.finrank_eq_one_iff.mp h2)))
+    | (
+        rw [minpoly.natDegree_eq_one_iff] at h1
+        obtain ⟨q, hq⟩ := h1
+        exact b_not_rat hd hb (IntermediateField.mem_bot.mpr ⟨q, hq⟩)
+      )
+    | (
+        have h2 : Module.finrank ℚ ℚ⟮b⟯ = 1 := by rw [IntermediateField.adjoin.finrank hint, h1]
+        exact b_not_rat hd hb
+          (IntermediateField.adjoin_simple_eq_bot_iff.mp (IntermediateField.finrank_eq_one_iff.mp
+            h2))
+      )
   have hpos := minpoly.natDegree_pos hint
   omega
 
@@ -79,7 +83,8 @@ theorem quad_K (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Algebra.IsQuadraticExtensi
   | exact { toFree := inferInstance, finrank_eq_two' := finrank_K hd hb }
   | (constructor <;> first | exact finrank_K hd hb | exact inferInstance)
 
-private theorem Kd_algEquiv_ext_of_apply_bK_eq (σ τ : Kd b ≃ₐ[ℚ] Kd b) (h : σ (bK b) = τ (bK b)) : σ = τ := by
+private theorem Kd_algEquiv_ext_of_apply_bK_eq (σ τ : Kd b ≃ₐ[ℚ] Kd b) (h : σ (bK b) = τ (bK b))
+    : σ = τ := by
   have hint : IsIntegral ℚ b := isIntegral_b
   have key : (σ : Kd b →ₐ[ℚ] Kd b) = (τ : Kd b →ₐ[ℚ] Kd b) := by
     apply (IntermediateField.adjoin.powerBasis hint).algHom_ext
@@ -91,17 +96,12 @@ private theorem Kd_algEquiv_ext_of_apply_bK_eq (σ τ : Kd b ≃ₐ[ℚ] Kd b) (
 
 theorem gal_eq_one_of_fix (σ : Kd b ≃ₐ[ℚ] Kd b) (h : σ (bK b) = bK b) : σ = 1 := by
   apply Kd_algEquiv_ext_of_apply_bK_eq σ 1
-  first
-  | (rw [h]; rfl)
-  | simpa using h
-  | (rw [AlgEquiv.one_apply]; exact h)
+  first | (rw [h]; rfl) | simpa using h | (rw [AlgEquiv.one_apply]; exact h)
 
-private theorem Kd_algEquiv_bK_eq_or_eq_neg (hb : b ^ 2 = -(d : L)) (σ : Kd b ≃ₐ[ℚ] Kd b) :
-    σ (bK b) = bK b ∨ σ (bK b) = -bK b := by
+private theorem Kd_algEquiv_bK_eq_or_eq_neg (hb : b ^ 2 = -(d : L)) (σ : Kd b ≃ₐ[ℚ] Kd b)
+    : σ (bK b) = bK b ∨ σ (bK b) = - bK b := by
   have h1 : σ (bK b) ^ 2 = bK b ^ 2 := by
-    first
-    | rw [← map_pow, bK_sq hb, map_neg, map_natCast]
-    | (rw [← map_pow, bK_sq hb]; simp)
+    first | rw [← map_pow, bK_sq hb, map_neg, map_natCast] | (rw [← map_pow, bK_sq hb]; simp)
   have h2 : (σ (bK b) - bK b) * (σ (bK b) + bK b) = 0 := by linear_combination h1
   rcases mul_eq_zero.mp h2 with h | h
   · left
@@ -109,13 +109,11 @@ private theorem Kd_algEquiv_bK_eq_or_eq_neg (hb : b ^ 2 = -(d : L)) (σ : Kd b �
   · right
     linear_combination h
 
-private theorem minpoly_eq_X_sq_add_C_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) :
-    minpoly ℚ b = Polynomial.X ^ 2 + Polynomial.C (d : ℚ) := by
+private theorem minpoly_eq_X_sq_add_C_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L))
+    : minpoly ℚ b = Polynomial.X ^ 2 + Polynomial.C (d : ℚ) := by
   have hint : IsIntegral ℚ b := isIntegral_b
   have hmon : (Polynomial.X ^ 2 + Polynomial.C (d : ℚ)).Monic := by
-    first
-    | exact Polynomial.monic_X_pow_add_C _ two_ne_zero
-    | monicity!
+    first | exact Polynomial.monic_X_pow_add_C _ two_ne_zero | monicity!
   obtain ⟨r, hr⟩ := minpoly.dvd ℚ b (aeval_X_sq_add_C_eq_zero_of_sq_eq_neg hb)
   have hr0 : r ≠ 0 := by
     rintro rfl
@@ -123,24 +121,28 @@ private theorem minpoly_eq_X_sq_add_C_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(
     exact hmon.ne_zero hr
   have hdeg := congrArg Polynomial.natDegree hr
   rw [(minpoly.monic hint).natDegree_mul' hr0, Polynomial.natDegree_X_pow_add_C,
-    minpoly_natDegree_eq_two_of_sq_eq_neg hd hb] at hdeg
+      minpoly_natDegree_eq_two_of_sq_eq_neg hd hb]
+    at hdeg
   have hrm : r.Monic := (minpoly.monic hint).of_mul_monic_left (hr ▸ hmon)
   have hr0d : r.natDegree = 0 := by omega
   have hr1 : r = 1 := by
     first
     | exact (Polynomial.Monic.natDegree_eq_zero hrm).mp hr0d
     | exact Polynomial.eq_one_of_monic_natDegree_zero hrm hr0d
-    | (rw [Polynomial.eq_C_of_natDegree_eq_zero hr0d]; have h5 := hrm.leadingCoeff; rw [Polynomial.leadingCoeff, hr0d] at h5; rw [h5, map_one])
+    | (
+        rw [Polynomial.eq_C_of_natDegree_eq_zero hr0d]
+        have h5 := hrm.leadingCoeff
+        rw [Polynomial.leadingCoeff, hr0d] at h5
+        rw [h5, map_one]
+      )
   rw [hr, hr1, mul_one]
 
-private theorem Kd_exists_algEquiv_bK_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) :
-    ∃ σ : Kd b ≃ₐ[ℚ] Kd b, σ (bK b) = -bK b := by
+private theorem Kd_exists_algEquiv_bK_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L))
+    : ∃ σ : Kd b ≃ₐ[ℚ] Kd b, σ (bK b) = - bK b := by
   have hint : IsIntegral ℚ b := isIntegral_b
   set pb : PowerBasis ℚ (Kd b) := IntermediateField.adjoin.powerBasis hint with hpb
   have hgen : pb.gen = bK b := by
-    first
-    | rfl
-    | (rw [hpb, IntermediateField.adjoin.powerBasis_gen]; rfl)
+    first | rfl | (rw [hpb, IntermediateField.adjoin.powerBasis_gen]; rfl)
   have hmin : minpoly ℚ pb.gen = minpoly ℚ b := by
     first
     | exact (minpoly.algebraMap_eq (algebraMap (Kd b) L).injective pb.gen).symm
@@ -150,29 +152,34 @@ private theorem Kd_exists_algEquiv_bK_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)
   have hroot : Polynomial.aeval (-pb.gen) (minpoly ℚ pb.gen) = 0 := by
     rw [hmin, minpoly_eq_X_sq_add_C_of_sq_eq_neg hd hb, hgen]
     first
-    | (simp only [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C, map_natCast]; linear_combination bK_sq hb)
+    | (
+        simp only [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C, map_natCast]
+        linear_combination bK_sq hb
+      )
     | (simp; linear_combination bK_sq hb)
     | (simp; rw [neg_sq, bK_sq hb]; ring)
-    | (simp only [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C]; rw [neg_sq, bK_sq hb]; simp)
+    | (
+        simp only [map_add (f := _), map_pow, Polynomial.aeval_X, Polynomial.aeval_C]
+        rw [neg_sq, bK_sq hb]
+        simp
+      )
   have hbij : Function.Bijective (pb.lift (-pb.gen) hroot) := by
     first
     | exact AlgHom.bijective _
-    | exact ⟨(pb.lift (-pb.gen) hroot).toRingHom.injective,
-        LinearMap.injective_iff_surjective.mp (pb.lift (-pb.gen) hroot).toRingHom.injective⟩
+    | exact ⟨
+        (pb.lift (-pb.gen) hroot).toRingHom.injective,
+        LinearMap.injective_iff_surjective.mp (pb.lift (-pb.gen) hroot).toRingHom.injective
+      ⟩
   refine ⟨AlgEquiv.ofBijective _ hbij, ?_⟩
-  have hl : pb.lift (-pb.gen) hroot (bK b) = -bK b := by
+  have hl : pb.lift (-pb.gen) hroot (bK b) = - bK b := by
     rw [← hgen]
     exact pb.lift_gen _ hroot
-  first
-  | exact hl
-  | (rw [AlgEquiv.ofBijective_apply]; exact hl)
+  first | exact hl | (rw [AlgEquiv.ofBijective_apply]; exact hl)
 
-private theorem bK_ne_neg_bK_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : bK b ≠ -bK b := by
+private theorem bK_ne_neg_bK_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : bK b ≠ - bK b := by
   intro h
   have h2 : b = -b := by
-    first
-    | exact congrArg Subtype.val h
-    | simpa [bK] using congrArg Subtype.val h
+    first | exact congrArg Subtype.val h | simpa [bK] using congrArg Subtype.val h
   have h3 : b = 0 := by
     have h4 : (2 : L) * b = 0 := by linear_combination h2
     rcases mul_eq_zero.mp h4 with h5 | h5
@@ -186,9 +193,10 @@ private theorem bK_ne_neg_bK_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) :
 theorem card_gal (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Nat.card (Kd b ≃ₐ[ℚ] Kd b) = 2 := by
   obtain ⟨τ, hτ⟩ := Kd_exists_algEquiv_bK_eq_neg hd hb
   have hne := bK_ne_neg_bK_of_sq_eq_neg hd hb
-  let f : (Kd b ≃ₐ[ℚ] Kd b) → ({bK b, -bK b} : Set (Kd b)) := fun σ =>
+  let f : (Kd b ≃ₐ[ℚ] Kd b) → ({bK b, - bK b} : Set (Kd b)) := fun σ =>
     ⟨σ (bK b), by rcases Kd_algEquiv_bK_eq_or_eq_neg hb σ with h | h <;> simp [h]⟩
-  have hinj : Function.Injective f := fun σ σ' h => Kd_algEquiv_ext_of_apply_bK_eq σ σ' (congrArg Subtype.val h)
+  have hinj : Function.Injective f := fun σ σ' h =>
+    Kd_algEquiv_ext_of_apply_bK_eq σ σ' (congrArg Subtype.val h)
   haveI : Finite (Kd b ≃ₐ[ℚ] Kd b) := Finite.of_injective f hinj
   have hτ1 : τ ≠ 1 := by
     intro h1
@@ -197,8 +205,9 @@ theorem card_gal (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Nat.card (Kd b ≃ₐ[�
     first | exact hτ | simpa using hτ
   haveI : Nontrivial (Kd b ≃ₐ[ℚ] Kd b) := ⟨⟨τ, 1, hτ1⟩⟩
   apply le_antisymm
-  · calc Nat.card (Kd b ≃ₐ[ℚ] Kd b) ≤ Nat.card ({bK b, -bK b} : Set (Kd b)) :=
-          Nat.card_le_card_of_injective f hinj
+  · calc
+      Nat.card (Kd b ≃ₐ[ℚ] Kd b)
+        ≤ Nat.card ({bK b, - bK b} : Set (Kd b)) := Nat.card_le_card_of_injective f hinj
       _ = 2 := by
         first
         | rw [Nat.card_coe_set_eq, Set.ncard_pair hne]
@@ -209,10 +218,7 @@ theorem card_gal (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : Nat.card (Kd b ≃ₐ[�
 
 theorem bK_sq_int (hb : b ^ 2 = -(d : L)) : bK b ^ 2 = ((-(d : ℤ) : ℤ) : Kd b) := by
   rw [bK_sq hb]
-  first
-  | simp
-  | (push_cast; rfl)
-  | norm_num
+  first | simp | (push_cast; rfl) | norm_num
 
 theorem bK_ne_zero (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) : bK b ≠ 0 := by
   intro h
@@ -225,32 +231,38 @@ theorem exists_ne_one (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) : ∃ ι : Kd b ≃�
   rw [h1] at hτ
   first | exact hτ | simpa using hτ
 
-theorem apply_bK_of_ne (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (ι : Kd b ≃ₐ[ℚ] Kd b) (hι : ι ≠ 1) :
-    ι (bK b) = -bK b := by
+theorem apply_bK_of_ne (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (ι : Kd b ≃ₐ[ℚ] Kd b) (hι : ι ≠ 1)
+    : ι (bK b) = - bK b := by
   rcases Kd_algEquiv_bK_eq_or_eq_neg hb ι with h | h
   · exact absurd (gal_eq_one_of_fix ι h) hι
   · exact h
 
-theorem eq_of_ne_one (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (σ τ : Kd b ≃ₐ[ℚ] Kd b) (hσ : σ ≠ 1)
-    (hτ : τ ≠ 1) : σ = τ := by
+theorem eq_of_ne_one
+    (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (σ τ : Kd b ≃ₐ[ℚ] Kd b) (hσ : σ ≠ 1) (hτ : τ ≠ 1)
+    : σ = τ := by
   apply Kd_algEquiv_ext_of_apply_bK_eq
   rw [apply_bK_of_ne hd0 hb σ hσ, apply_bK_of_ne hd0 hb τ hτ]
 
 theorem span_prime (p : ℕ) [hp : Fact p.Prime] : (span {(p : ℤ)}).IsPrime := by
   first
-  | exact (Ideal.span_singleton_prime (by exact_mod_cast hp.out.ne_zero)).mpr (Nat.prime_iff_prime_int.mp hp.out)
+  | exact (Ideal.span_singleton_prime (by exact_mod_cast hp.out.ne_zero)).mpr
+      (Nat.prime_iff_prime_int.mp hp.out)
   | exact (Int.ideal_span_isMaximal_of_prime p).isPrime
   | exact inferInstance
 
-private theorem Kd_isGalois_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L)) : IsGalois ℚ (Kd b) := by
+private theorem Kd_isGalois_of_sq_eq_neg (hd : 0 < d) (hb : b ^ 2 = -(d : L))
+    : IsGalois ℚ (Kd b) := by
   first
   | exact IsGalois.of_card_aut_eq_finrank (by rw [card_gal hd hb, finrank_K hd hb])
   | exact IsGalois.of_card_aut_eq_finrank ℚ (Kd b) (by rw [card_gal hd hb, finrank_K hd hb])
   | (haveI := quad_K hd hb; exact inferInstance)
 
-theorem fund (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
-    (P : Ideal (𝓞 (Kd b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard * (P.ramificationIdx ℤ * P.inertiaDeg ℤ) = 2 := by
+theorem fund
+    (hd0 : 0 < d) (hb : b ^ 2 = -(d : L))
+    (p : ℕ) [Fact p.Prime]
+    (P : Ideal (𝓞 (Kd b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard * (P.ramificationIdx ℤ * P.inertiaDeg ℤ)
+      = 2 := by
   haveI : NumberField (Kd b) := by
     first
     | exact inferInstance
@@ -259,16 +271,20 @@ theorem fund (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
   haveI : IsGalois ℚ (Kd b) := Kd_isGalois_of_sq_eq_neg hd0 hb
   haveI : Finite (Kd b ≃ₐ[ℚ] Kd b) := Nat.finite_of_card_ne_zero (by rw [card_gal hd0 hb]; norm_num)
   haveI := span_prime p
-  have h := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (span {(p : ℤ)})
-    (𝓞 (Kd b)) (Kd b ≃ₐ[ℚ] Kd b)
+  have h :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (span {(p : ℤ)}) (𝓞 (Kd b))
+      (Kd b ≃ₐ[ℚ] Kd b)
   rw [Ideal.ramificationIdxIn_eq_ramificationIdx (span {(p : ℤ)}) P (Kd b ≃ₐ[ℚ] Kd b),
-    Ideal.inertiaDegIn_eq_inertiaDeg (span {(p : ℤ)}) P (Kd b ≃ₐ[ℚ] Kd b), card_gal hd0 hb] at h
+      Ideal.inertiaDegIn_eq_inertiaDeg (span {(p : ℤ)}) P (Kd b ≃ₐ[ℚ] Kd b), card_gal hd0 hb]
+    at h
   exact h
 
-theorem ncard_one (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
+theorem ncard_one
+    (hd0 : 0 < d) (hb : b ^ 2 = -(d : L))
+    (p : ℕ) [Fact p.Prime]
     (P : Ideal (𝓞 (Kd b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
-    (h : ∀ σ : Kd b ≃ₐ[ℚ] Kd b, σ • P = P) :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 1 := by
+    (h : ∀ σ : Kd b ≃ₐ[ℚ] Kd b, σ • P = P)
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 1 := by
   haveI : NumberField (Kd b) := by
     first
     | exact inferInstance
@@ -286,15 +302,26 @@ theorem ncard_one (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
   refine ⟨P, Set.eq_singleton_iff_unique_mem.mpr ⟨hP, fun Q hQ => ?_⟩⟩
   have hex : ∃ σ : Kd b ≃ₐ[ℚ] Kd b, σ • P = Q := by
     first
-    | (obtain ⟨σ, hσ⟩ := MulAction.exists_smul_eq (Kd b ≃ₐ[ℚ] Kd b) (⟨P, hP⟩ : primesOver (span {(p : ℤ)}) (𝓞 (Kd b))) ⟨Q, hQ⟩; exact ⟨σ, congrArg Subtype.val hσ⟩)
-    | (haveI := hQ.1; haveI := hQ.2; exact Ideal.exists_smul_eq_of_isGaloisGroup (span {(p : ℤ)}) P Q (Kd b ≃ₐ[ℚ] Kd b))
+    | (
+        obtain ⟨σ, hσ⟩ :=
+          MulAction.exists_smul_eq (Kd b ≃ₐ[ℚ] Kd b)
+            (⟨P, hP⟩ : primesOver (span {(p : ℤ)}) (𝓞 (Kd b))) ⟨Q, hQ⟩
+        exact ⟨σ, congrArg Subtype.val hσ⟩
+      )
+    | (
+        haveI := hQ.1
+        haveI := hQ.2
+        exact Ideal.exists_smul_eq_of_isGaloisGroup (span {(p : ℤ)}) P Q (Kd b ≃ₐ[ℚ] Kd b)
+      )
   obtain ⟨σ, h1⟩ := hex
   rw [← h1, h σ]
 
-theorem ncard_two (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
+theorem ncard_two
+    (hd0 : 0 < d) (hb : b ^ 2 = -(d : L))
+    (p : ℕ) [Fact p.Prime]
     (P : Ideal (𝓞 (Kd b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
-    (σ : Kd b ≃ₐ[ℚ] Kd b) (h : σ • P ≠ P) :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 := by
+    (σ : Kd b ≃ₐ[ℚ] Kd b) (h : σ • P ≠ P)
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 := by
   have hf := fund hd0 hb p P
   haveI : NumberField (Kd b) := by
     first
@@ -326,8 +353,9 @@ theorem ncard_two (hd0 : 0 < d) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
     exact absurd hf (by norm_num)
   omega
 
-theorem smul_mem_of_eq (σ : Kd b ≃ₐ[ℚ] Kd b) (P : Ideal (𝓞 (Kd b))) (h : σ • P = P)
-    (y : 𝓞 (Kd b)) (hy : y ∈ P) : σ • y ∈ P := by
+theorem smul_mem_of_eq
+    (σ : Kd b ≃ₐ[ℚ] Kd b) (P : Ideal (𝓞 (Kd b))) (h : σ • P = P) (y : 𝓞 (Kd b)) (hy : y ∈ P)
+    : σ • y ∈ P := by
   first
   | (have h1 := Ideal.smul_mem_pointwise_smul σ y P hy; rwa [h] at h1)
   | (rw [← h]; exact Ideal.smul_mem_pointwise_smul σ y P hy)
@@ -339,9 +367,12 @@ theorem smul_intCast (σ : Kd b ≃ₐ[ℚ] Kd b) (n : ℤ) : σ • (n : 𝓞 (
   | simp
   | (rw [← MulSemiringAction.toRingHom_apply, map_intCast])
 
-theorem two_case (hd0 : 0 < d) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
-    (hp2 : p = 2) (P : Ideal (𝓞 (Kd b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 := by
+theorem two_case
+    (hd0 : 0 < d) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L))
+    (p : ℕ) [Fact p.Prime]
+    (hp2 : p = 2)
+    (P : Ideal (𝓞 (Kd b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 := by
   obtain ⟨ι, hι⟩ := exists_ne_one hd0 hb
   apply ncard_two hd0 hb p P ι
   intro heq
@@ -356,9 +387,12 @@ theorem two_case (hd0 : 0 < d) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : �
   have h2 : (2 : Kd b) * bK b = 0 := by linear_combination -hfix
   simpa using h2
 
-theorem ram_case (hd : d.Prime) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime] (hpd : p = d)
-    (P : Ideal (𝓞 (Kd b))) [hP : P.IsPrime] [P.LiesOver (span {(p : ℤ)})] :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 1 := by
+theorem ram_case
+    (hd : d.Prime) (hb : b ^ 2 = -(d : L))
+    (p : ℕ) [Fact p.Prime]
+    (hpd : p = d)
+    (P : Ideal (𝓞 (Kd b))) [hP : P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 1 := by
   subst hpd
   have hd0 : 0 < p := hd.pos
   obtain ⟨B, hB, hB2⟩ := odd_lift (bK b) (-(p : ℤ)) (bK_sq_int hb)
@@ -398,9 +432,12 @@ theorem ram_case (hd : d.Prime) (hb : b ^ 2 = -(d : L)) (p : ℕ) [Fact p.Prime]
     · rfl
   · nlinarith
 
-theorem odd_case (hd : d.Prime) (hb : b ^ 2 = -(d : L)) (p : ℕ) [hp : Fact p.Prime] (hp2 : p ≠ 2)
-    (hpd : p ≠ d) (P : Ideal (𝓞 (Kd b))) [hP : P.IsPrime] [P.LiesOver (span {(p : ℤ)})] :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 ↔ jacobiSym (-(d : ℤ)) p = 1 := by
+theorem odd_case
+    (hd : d.Prime) (hb : b ^ 2 = -(d : L))
+    (p : ℕ) [hp : Fact p.Prime]
+    (hp2 : p ≠ 2) (hpd : p ≠ d)
+    (P : Ideal (𝓞 (Kd b))) [hP : P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 ↔ jacobiSym (-(d : ℤ)) p = 1 := by
   have hd0 := hd.pos
   have := quad_K hd0 hb
   have hpb : span {(p : ℤ)} ≠ ⊥ := by
@@ -489,21 +526,34 @@ theorem odd_case (hd : d.Prime) (hb : b ^ 2 = -(d : L)) (p : ℕ) [hp : Fact p.P
     rw [ncard_one hd0 hb p P hall]
     norm_num
 
-private theorem Kd_exists_isPrime_liesOver (p : ℕ) [hp : Fact p.Prime] :
-    ∃ P : Ideal (𝓞 (Kd b)), P.IsPrime ∧ P.LiesOver (span {(p : ℤ)}) := by
+private theorem Kd_exists_isPrime_liesOver (p : ℕ) [hp : Fact p.Prime]
+    : ∃ P : Ideal (𝓞 (Kd b)), P.IsPrime ∧ P.LiesOver (span {(p : ℤ)}) := by
   haveI hmax : (span {(p : ℤ)}).IsMaximal := by
     first
     | exact Int.ideal_span_isMaximal_of_prime p
     | exact (span_prime p).isMaximal (by simp [hp.out.ne_zero])
     | exact Ideal.IsPrime.isMaximal (span_prime p) (by simp [hp.out.ne_zero])
   first
-  | (obtain ⟨P, hP⟩ := Ideal.nonempty_primesOver (S := 𝓞 (Kd b)) (span {(p : ℤ)}); exact ⟨P, hP.1, hP.2⟩)
-  | (obtain ⟨P, hP, hPl⟩ := Ideal.exists_ideal_liesOver_maximal_of_isIntegral (span {(p : ℤ)}) (𝓞 (Kd b)); exact ⟨P, hP.isPrime, hPl⟩)
-  | (obtain ⟨Q, hQ, hQc⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 (Kd b)) (span {(p : ℤ)}) (by rw [(RingHom.injective_iff_ker_eq_bot _).mp (algebraMap ℤ (𝓞 (Kd b))).injective_int]; exact bot_le); exact ⟨Q, hQ.isPrime, ⟨hQc.symm⟩⟩)
+  | (
+      obtain ⟨P, hP⟩ := Ideal.nonempty_primesOver (S := 𝓞 (Kd b)) (span {(p : ℤ)})
+      exact ⟨P, hP.1, hP.2⟩
+    )
+  | (
+      obtain ⟨P, hP, hPl⟩ :=
+        Ideal.exists_ideal_liesOver_maximal_of_isIntegral (span {(p : ℤ)}) (𝓞 (Kd b))
+      exact ⟨P, hP.isPrime, hPl⟩
+    )
+  | (
+      obtain ⟨Q, hQ, hQc⟩ :=
+        Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 (Kd b)) (span {(p : ℤ)}) (by
+          rw [(RingHom.injective_iff_ker_eq_bot _).mp (algebraMap ℤ (𝓞 (Kd b))).injective_int]
+          exact bot_le)
+      exact ⟨Q, hQ.isPrime, ⟨hQc.symm⟩⟩
+    )
 
-theorem clause (hd : d.Prime) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : ℕ) (hp : p.Prime) :
-    (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2 ↔
-      (p = 2 ∨ (p ≠ 2 ∧ jacobiSym (-(d : ℤ)) p = 1)) := by
+theorem clause (hd : d.Prime) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : ℕ) (hp : p.Prime)
+    : (primesOver (span {(p : ℤ)}) (𝓞 (Kd b))).ncard = 2
+      ↔ (p = 2 ∨ (p ≠ 2 ∧ jacobiSym (-(d : ℤ)) p = 1)) := by
   haveI : Fact p.Prime := ⟨hp⟩
   obtain ⟨P, hP1, hP2⟩ := Kd_exists_isPrime_liesOver (b := b) p
   haveI := hP1
@@ -516,8 +566,15 @@ theorem clause (hd : d.Prime) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : ℕ
       have hJ : jacobiSym (-(d : ℤ)) p = 0 := by
         subst hpd
         first
-        | (rw [jacobiSym.mod_left, Int.emod_eq_zero_of_dvd (by simp), jacobiSym.zero_left hp.one_lt])
-        | (rw [jacobiSym.eq_zero_iff_not_coprime]; simp [Int.gcd_neg, Int.gcd_self]; exact hp.one_lt.ne')
+        | (
+            rw [jacobiSym.mod_left, Int.emod_eq_zero_of_dvd (by simp),
+              jacobiSym.zero_left hp.one_lt]
+          )
+        | (
+            rw [jacobiSym.eq_zero_iff_not_coprime]
+            simp [Int.gcd_neg, Int.gcd_self]
+            exact hp.one_lt.ne'
+          )
       rw [h3, hJ]
       simp [h2]
     · have h3 := odd_case hd hb p h2 hpd P
@@ -528,8 +585,8 @@ theorem clause (hd : d.Prime) (hd7 : d % 8 = 7) (hb : b ^ 2 = -(d : L)) (p : ℕ
         · exact absurd h h2
         · exact h3.mpr h
 
-theorem ram_ncard (hd : d.Prime) (hb : b ^ 2 = -(d : L)) :
-    (primesOver (span {(d : ℤ)}) (𝓞 (Kd b))).ncard = 1 := by
+theorem ram_ncard (hd : d.Prime) (hb : b ^ 2 = -(d : L))
+    : (primesOver (span {(d : ℤ)}) (𝓞 (Kd b))).ncard = 1 := by
   haveI : Fact d.Prime := ⟨hd⟩
   obtain ⟨P, hP1, hP2⟩ := Kd_exists_isPrime_liesOver (b := b) d
   haveI := hP1
@@ -554,8 +611,12 @@ theorem hostSplitK_of (hFrob : HostFrob) : HostSplitK := by
   have hqd : q ≠ d := by
     rintro rfl
     omega
-  refine ⟨fun p hp => SplitK.clause hd hd7 hb p hp, SplitK.ram_ncard hd hb,
-    (SplitK.clause hd hd7 hb q hq).mpr (Or.inr ⟨hq2, hJq⟩), ?_⟩
+  refine ⟨
+    fun p hp => SplitK.clause hd hd7 hb p hp,
+    SplitK.ram_ncard hd hb,
+    (SplitK.clause hd hd7 hb q hq).mpr (Or.inr ⟨hq2, hJq⟩),
+    ?_
+  ⟩
   intro p hfp hp2 hpq hpd P _ _ σ hσ
   have hF := ((hFrob e q d ⟨hq, hd, hqd, hq2, hd2⟩ L ζ a b hL p hp2 hpq hpd P).2.1 σ).mp hσ
   have h2 := hF.2.1

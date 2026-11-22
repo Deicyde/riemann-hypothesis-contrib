@@ -6,10 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.QzTorsion
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-theorem UpperTheory.V.LDataCardLeFinrank.contScal :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] (ψ : Γ →* ℤ_[l]ˣ), (Continuous fun g => ((ψ g : ℤ_[l]ˣ) : ℤ_[l])) → ContAction (scalRep (QZ l) ψ) := by
+theorem UpperTheory.V.LDataCardLeFinrank.contScal
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] (ψ : Γ →* ℤ_[l]ˣ),
+      (Continuous fun g => ((ψ g : ℤ_[l]ˣ) : ℤ_[l])) → ContAction (scalRep (QZ l) ψ) := by
   intro l _ Γ _ _ ψ hψ
   haveI hd : DiscreteTopology (QZ l) := ⟨rfl⟩
   unfold ReciprocityTheory.Gal.ContAction
@@ -24,8 +26,8 @@ theorem UpperTheory.V.LDataCardLeFinrank.contScal :
     have e : q ⁻¹' {q y} = Metric.closedBall y 1 := by
       ext z
       have h1 : q z = q y ↔ z - y ∈ ZlSub l := Submodule.Quotient.eq (ZlSub l)
-      rw [Set.mem_preimage, Set.mem_singleton_iff, h1, LinearMap.mem_range,
-        Metric.mem_closedBall, dist_eq_norm]
+      rw [Set.mem_preimage, Set.mem_singleton_iff, h1, LinearMap.mem_range, Metric.mem_closedBall,
+        dist_eq_norm]
       constructor
       · rintro ⟨w, hw⟩
         rw [← hw]

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.CyclotomicNorms Polynomial Module
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.CyclotomicNorms Polynomial Module
 
 namespace GlobalTheory.WeilDeligne.LabModel
 
@@ -15,8 +16,11 @@ variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAl
 variable {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)}
 variable {g : ℕ} [Fact g.Prime]
 
-theorem eq_one_of_cong (h : IsPlaceOver A w) (hw : normV w = g) {l : ℕ} (hc : l.Coprime g)
-    {u : Ω} (hu : u ^ l = 1) (h1 : A.valuation (u - 1) < 1) : u = 1 := by
+theorem eq_one_of_cong
+    (h : IsPlaceOver A w) (hw : normV w = g)
+    {l : ℕ} (hc : l.Coprime g)
+    {u : Ω} (hu : u ^ l = 1) (h1 : A.valuation (u - 1) < 1)
+    : u = 1 := by
   have hg : g.Prime := Fact.out
   by_contra hne
   have hl0 : l ≠ 0 := by
@@ -32,7 +36,7 @@ theorem eq_one_of_cong (h : IsPlaceOver A w) (hw : normV w = g) {l : ℕ} (hc : 
     rw [hu, sub_self] at e
     exact (mul_eq_zero.mp e).resolve_right (sub_ne_zero.mpr hne)
   have hlv : A.valuation (l : Ω) < 1 := by
-    have e : (l : Ω) = -∑ i ∈ Finset.range l, (u ^ i - 1) := by
+    have e : (l : Ω) = - ∑ i ∈ Finset.range l, (u ^ i - 1) := by
       rw [Finset.sum_sub_distrib, hs]
       simp
     rw [e, Valuation.map_neg]
@@ -40,9 +44,10 @@ theorem eq_one_of_cong (h : IsPlaceOver A w) (hw : normV w = g) {l : ℕ} (hc : 
       simpa using GlobalTheory.WeilDeligne.cong_pow hv (by simp) h1 i
   have hgw : ((g : ℕ) : 𝓞 E) ∈ w.asIdeal := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast, ← hw]
-    have : Finite (𝓞 E ⧸ w.asIdeal) := Nat.finite_of_card_ne_zero (by
-      rw [show Nat.card (𝓞 E ⧸ w.asIdeal) = normV w from rfl, hw]
-      exact hg.ne_zero)
+    have : Finite (𝓞 E ⧸ w.asIdeal) :=
+      Nat.finite_of_card_ne_zero (by
+        rw [show Nat.card (𝓞 E ⧸ w.asIdeal) = normV w from rfl, hw]
+        exact hg.ne_zero)
     rw [show normV w = Nat.card (𝓞 E ⧸ w.asIdeal) from rfl, ← nsmul_one]
     exact card_nsmul_eq_zero'
   have hlw : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal := by

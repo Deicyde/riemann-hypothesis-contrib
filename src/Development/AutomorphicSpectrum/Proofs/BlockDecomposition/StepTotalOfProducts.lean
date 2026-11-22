@@ -8,20 +8,30 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaInt
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.ThTot
 
-theorem continuous_integral_mul_of_bdd {X Y : Type*} [TopologicalSpace X] [FirstCountableTopology X]
-    [TopologicalSpace Y] [MeasurableSpace Y] [OpensMeasurableSpace Y] {ν : Measure Y}
-    {f : X → Y → ℂ} (hf : Continuous fun w : X × Y => f w.1 w.2) {B : ℝ} (hB : ∀ x y, ‖f x y‖ ≤ B)
-    {g : Y → ℂ} (hg : Integrable g ν) : Continuous fun x => ∫ y, f x y * g y ∂ν := by
-  refine continuous_of_dominated (bound := fun y => B * ‖g y‖) (fun x => ?_)
-    (fun x => ae_of_all _ fun y => ?_) (hg.norm.const_mul B) (ae_of_all _ fun y => ?_)
+theorem continuous_integral_mul_of_bdd
+    {X Y : Type*} [TopologicalSpace X] [FirstCountableTopology X] [TopologicalSpace Y]
+    [MeasurableSpace Y] [OpensMeasurableSpace Y]
+    {ν : Measure Y} {f : X → Y → ℂ} (hf : Continuous fun w : X × Y => f w.1 w.2)
+    {B : ℝ} (hB : ∀ x y, ‖f x y‖ ≤ B)
+    {g : Y → ℂ} (hg : Integrable g ν)
+    : Continuous fun x => ∫ y, f x y * g y ∂ν := by
+  refine continuous_of_dominated
+    (bound := fun y => B * ‖g y‖)
+    (fun x => ?_)
+    (fun x => ae_of_all _ fun y => ?_)
+    (hg.norm.const_mul B) (ae_of_all _ fun y => ?_)
   · have h1 : Continuous (f x) := hf.comp (continuous_const.prodMk continuous_id)
     exact h1.aestronglyMeasurable.mul hg.1
   · rw [norm_mul]
@@ -29,10 +39,13 @@ theorem continuous_integral_mul_of_bdd {X Y : Type*} [TopologicalSpace X] [First
   · have h1 : Continuous fun x => f x y := hf.comp (continuous_id.prodMk continuous_const)
     exact h1.mul continuous_const
 
-theorem integral_integral_mul_of_bdd {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y] {μ : Measure X} {ν : Measure Y}
-    [SFinite μ] [SFinite ν] {F : X × Y → ℂ} (hF : AEStronglyMeasurable F (μ.prod ν)) {B : ℝ} (hB : ∀ w, ‖F w‖ ≤ B)
-    {a : X → ℂ} {c : Y → ℂ} (ha : Integrable a μ) (hc : Integrable c ν) :
-    ∫ x, (∫ z, F (x, z) * c z ∂ν) * a x ∂μ = ∫ w, F w * (a w.1 * c w.2) ∂(μ.prod ν) := by
+theorem integral_integral_mul_of_bdd
+    {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
+    {μ : Measure X} {ν : Measure Y} [SFinite μ] [SFinite ν]
+    {F : X × Y → ℂ} (hF : AEStronglyMeasurable F (μ.prod ν))
+    {B : ℝ} (hB : ∀ w, ‖F w‖ ≤ B)
+    {a : X → ℂ} {c : Y → ℂ} (ha : Integrable a μ) (hc : Integrable c ν)
+    : ∫ x, (∫ z, F (x, z) * c z ∂ν) * a x ∂μ = ∫ w, F w * (a w.1 * c w.2) ∂(μ.prod ν) := by
   have hI : Integrable (fun w : X × Y => F w * (a w.1 * c w.2)) (μ.prod ν) :=
     (ha.mul_prod hc).bdd_mul hF (ae_of_all _ hB)
   rw [integral_prod _ hI]
@@ -73,12 +86,15 @@ theorem continuous_rowJ : Continuous fun w : Mx D r p × Mx D s p => rowJ w.1 w.
     simp only [rowJ, Fin.addCases_right]
     exact continuous_snd.matrix_elem b j
 
-theorem continuous_th_one {ρ : ℕ} {ψ : AddChar (AF D.host.F) ℂ} {χ : (AE D)ˣ →* Circle} {θ : InfFam D} {b₀ : HermE D ρ}
-    {μ : Measure (Mx D ρ p)} {Ω : G D p → Mx D ρ p → ℂ} (hΩ : IsTh ψ χ θ b₀ μ Ω) : Continuous (Ω 1) :=
+theorem continuous_th_one
+    {ρ : ℕ} {ψ : AddChar (AF D.host.F) ℂ} {χ : (AE D)ˣ →* Circle} {θ : InfFam D} {b₀ : HermE D ρ}
+    {μ : Measure (Mx D ρ p)} {Ω : G D p → Mx D ρ p → ℂ} (hΩ : IsTh ψ χ θ b₀ μ Ω)
+    : Continuous (Ω 1) :=
   hΩ.cont.comp (continuous_const.prodMk continuous_id)
 
-theorem integrable_conj {X : Type*} [MeasurableSpace X] {μ : Measure X} {f : X → ℂ} (hf : Integrable f μ) :
-    Integrable (fun x => conj (f x)) μ :=
+theorem integrable_conj
+    {X : Type*} [MeasurableSpace X] {μ : Measure X} {f : X → ℂ} (hf : Integrable f μ)
+    : Integrable (fun x => conj (f x)) μ :=
   (Complex.conjCLE : ℂ →L[ℝ] ℂ).integrable_comp hf
 
 theorem stepTotal : ProdTh → ProdMeas → StepTotal := by
@@ -102,8 +118,10 @@ theorem stepTotal : ProdTh → ProdMeas → StepTotal := by
   haveI := hs.1
   have hcJ := continuous_rowJ (D := D) (r := r) (s := s) (p := p)
   have hcF : Continuous fun w : Mx D r p × Mx D s p => u (rowJ w.1 w.2) := hu.comp hcJ
-  have key : ∀ Ωr Ωs, IsTh ψ χr θ br μr Ωr → IsTh ψ χs θ bs μs Ωs →
-      ∫ x, (∫ z, u (rowJ x z) * conj (Ωs 1 z) ∂μs) * conj (Ωr 1 x) ∂μr = 0 := by
+  have key
+      : ∀ Ωr Ωs,
+        IsTh ψ χr θ br μr Ωr → IsTh ψ χs θ bs μs Ωs
+          → ∫ x, (∫ z, u (rowJ x z) * conj (Ωs 1 z) ∂μs) * conj (Ωr 1 x) ∂μr = 0 := by
     intro Ωr Ωs hΩr hΩs
     have hT := hP D r s p μr Fr μs Fs hr hs ψ hψ χr χs θ hθ br bs b hb Ωr Ωs hΩr hΩs
     have h0 := horth _ hT
@@ -111,10 +129,14 @@ theorem stepTotal : ProdTh → ProdMeas → StepTotal := by
       hu.mul (Complex.continuous_conj.comp (((continuous_th_one hΩr).comp continuous_rowT).mul
         ((continuous_th_one hΩs).comp continuous_rowB)))
     rw [integral_map hcJ.aemeasurable hm.aestronglyMeasurable] at h0
-    rw [integral_integral_mul_of_bdd (F := fun w : Mx D r p × Mx D s p => u (rowJ w.1 w.2))
-      hcF.aestronglyMeasurable (fun w => hB _)
-      (integrable_conj (GlobalTheory.CompanionTheory.BigCellJ.integrable_schwartzA hθ hr (hΩr.mem 1)))
-      (integrable_conj (GlobalTheory.CompanionTheory.BigCellJ.integrable_schwartzA hθ hs (hΩs.mem 1)))]
+    rw [integral_integral_mul_of_bdd
+      (F := fun w : Mx D r p × Mx D s p => u (rowJ w.1 w.2))
+      hcF.aestronglyMeasurable
+      (fun w => hB _)
+      (integrable_conj (GlobalTheory.CompanionTheory.BigCellJ.integrable_schwartzA hθ hr
+        (hΩr.mem 1)))
+      (integrable_conj (GlobalTheory.CompanionTheory.BigCellJ.integrable_schwartzA hθ hs
+        (hΩs.mem 1)))]
     simpa only [rowT_rowJ, rowB_rowJ, map_mul] using h0
   have hv : ∀ Ωs, IsTh ψ χs θ bs μs Ωs → ∀ x, ∫ z, u (rowJ x z) * conj (Ωs 1 z) ∂μs = 0 := by
     intro Ωs hΩs
@@ -125,13 +147,16 @@ theorem stepTotal : ProdTh → ProdMeas → StepTotal := by
     · refine ⟨B * ∫ z, ‖conj (Ωs 1 z)‖ ∂μs, fun x => ?_⟩
       refine (norm_integral_le_integral_norm _).trans ?_
       rw [← integral_const_mul]
-      refine integral_mono_of_nonneg (ae_of_all _ fun _ => norm_nonneg _) (hi.norm.const_mul B) (ae_of_all _ fun z => ?_)
+      refine integral_mono_of_nonneg (ae_of_all _ fun _ => norm_nonneg _) (hi.norm.const_mul B)
+        (ae_of_all _ fun z => ?_)
       show ‖u (rowJ x z) * conj (Ωs 1 z)‖ ≤ B * ‖conj (Ωs 1 z)‖
       rw [norm_mul]
       exact mul_le_mul_of_nonneg_right (hB _) (norm_nonneg _)
     · exact fun Ωr hΩr => key Ωr Ωs hΩr hΩs
   have hz : ∀ x, (fun z => u (rowJ x z)) = 0 := fun x =>
-    Ts (fun z => u (rowJ x z)) (hu.comp (hcJ.comp (continuous_const.prodMk continuous_id))) ⟨B, fun _ => hB _⟩
+    Ts
+      (fun z => u (rowJ x z))
+      (hu.comp (hcJ.comp (continuous_const.prodMk continuous_id))) ⟨B, fun _ => hB _⟩
       fun Ωs hΩs => hv Ωs hΩs x
   funext y
   rw [← rowJ_rowT_rowB y]

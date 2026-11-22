@@ -6,14 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsDec
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-theorem UpperTheory.V.LDataCardLeFinrank.ineOpen :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (l : ℕ) [Fact l.Prime] (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
-    v ∈ Above (F := F) l → IsPlaceOver A v →
-    IsOpen (ineImage F l A : Set ℤ_[l]ˣ) ∧ (ineImage F l A).index ≠ 0 ∧
-    (ineImage F l A).index ≤ Module.finrank ℚ F := by
+theorem UpperTheory.V.LDataCardLeFinrank.ineOpen
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
+      v ∈ Above (F := F) l → IsPlaceOver A v
+        → IsOpen (ineImage F l A : Set ℤ_[l]ˣ) ∧ (ineImage F l A).index ≠ 0
+          ∧ (ineImage F l A).index ≤ Module.finrank ℚ F := by
   intro F Ω _ _ _ _ _ l _ v A hl hA
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
@@ -22,14 +23,12 @@ theorem UpperTheory.V.LDataCardLeFinrank.ineOpen :
   have : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
   have : IsGalois F Ω := IsAlgClosure.isGalois F Ω
   have hl' : ((l : ℕ) : 𝓞 F) ∈ v.asIdeal := hl
-  have hv : A.valuation (l : Ω) < 1 := by
-    simpa using (hA _).2 hl'
+  have hv : A.valuation (l : Ω) < 1 := by simpa using (hA _).2 hl'
   let K : IntermediateField ℚ Ω := (IsScalarTower.toAlgHom ℚ F Ω).fieldRange
   have hK : Module.finrank ℚ F = K.fixingSubgroup.index := by
     rw [← IntermediateField.finrank_eq_fixingSubgroup_index]
     exact (AlgEquiv.ofInjectiveField (IsScalarTower.toAlgHom ℚ F Ω)).toLinearEquiv.finrank_eq
-  have hK0 : K.fixingSubgroup.index ≠ 0 := by
-    rw [← hK]; exact Module.finrank_pos.ne'
+  have hK0 : K.fixingSubgroup.index ≠ 0 := by rw [← hK]; exact Module.finrank_pos.ne'
   let I : Subgroup (G ℚ Ω) := Ine (F := ℚ) A
   let f : I →* ℤ_[l]ˣ := (cycZ (F := ℚ) (Ω := Ω) l).comp I.subtype
   have hf : Function.Surjective f := fun u => by
@@ -38,8 +37,10 @@ theorem UpperTheory.V.LDataCardLeFinrank.ineOpen :
   have hle : (K.fixingSubgroup.subgroupOf I).map f ≤ ineImage F l A := by
     rintro _ ⟨σ, hσ, rfl⟩
     have hmem : σ.1 ∈ K.fixingSubgroup := hσ
-    let g : G F Ω := { σ.1.toRingEquiv with
-      commutes' := fun x => (IntermediateField.mem_fixingSubgroup_iff _ _).1 hmem _ ⟨x, rfl⟩ }
+    let g : G F Ω := {
+      σ.1.toRingEquiv with
+      commutes' := fun x => (IntermediateField.mem_fixingSubgroup_iff _ _).1 hmem _ ⟨x, rfl⟩
+    }
     exact ⟨g, σ.2, rfl⟩
   have hrel0 : K.fixingSubgroup.relIndex ⊤ ≠ 0 := by rwa [Subgroup.relIndex_top_right]
   have hrel : K.fixingSubgroup.relIndex I ≤ K.fixingSubgroup.index := by

@@ -11,18 +11,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TranslateBas
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem exists_affine_open_of_finset_closedFibre :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], AdmBase R (maximalIdeal R) →
-    ∀ (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → ∀ s : Finset G.left,
-    (∀ x ∈ s, G.hom x = closedPoint R) → ∃ O : G.left.Opens, IsAffineOpen O ∧ ∀ x ∈ s, x ∈ O := by
+theorem exists_affine_open_of_finset_closedFibre
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      AdmBase R (maximalIdeal R)
+        → ∀ (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G],
+          IsSemiAbelian G
+            → ∀ s : Finset G.left,
+              (∀ x ∈ s, G.hom x = closedPoint R)
+                → ∃ O : G.left.Opens, IsAffineOpen O ∧ ∀ x ∈ s, x ∈ O := by
   intro R _ _ _ hR G _ _ hG s hs
   haveI : IsNoetherianRing R := hR.1
   haveI : QuasiCompact G.hom := hG.quasiCompact
@@ -33,8 +39,8 @@ theorem exists_affine_open_of_finset_closedFibre :
   rcases s.eq_empty_or_nonempty with hs0 | ⟨x₀, hx₀⟩
   · exact ⟨⊥, isAffineOpen_bot _, by simp [hs0]⟩
 
-  have hcl : ∀ x : G.left, ∃ y ∈ closure ({x} : Set G.left), IsClosed ({y} : Set G.left) :=
-    fun x => isClosed_closure.exists_closed_singleton ⟨x, subset_closure rfl⟩
+  have hcl : ∀ x : G.left, ∃ y ∈ closure ({x} : Set G.left), IsClosed ({y} : Set G.left) := fun x =>
+    isClosed_closure.exists_closed_singleton ⟨x, subset_closure rfl⟩
   choose f hfx hfc using hcl
   have hsp : ∀ x, x ⤳ f x := fun x => specializes_iff_mem_closure.2 (hfx x)
   have hcp : IsClosed ({closedPoint R} : Set (Sp R)) := isClosed_singleton_closedPoint R
@@ -54,11 +60,13 @@ theorem exists_affine_open_of_finset_closedFibre :
     obtain ⟨O, hO, hyO⟩ := H
     exact ⟨O, hO, fun x hx => (hsp x).mem_open O.2 (hyO _ (Finset.mem_image_of_mem f hx))⟩
 
-  obtain ⟨V, hV, hxV, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.mp G.left.isBasis_affineOpens)
-    (show x₀ ∈ (⊤ : G.left.Opens) from trivial)
+  obtain ⟨V, hV, hxV, -⟩ :=
+    (TopologicalSpace.Opens.isBasis_iff_nbhd.mp G.left.isBasis_affineOpens)
+      (show x₀ ∈ (⊤ : G.left.Opens) from trivial)
 
   obtain ⟨O, ⟨u, huO, hu⟩, hmove⟩ :=
-    GlobalTheory.T.exists_open_translations_moving_closedPoints_into_open R G hG V ⟨x₀, hxV, hs x₀ hx₀⟩ s' hs'
+    GlobalTheory.T.exists_open_translations_moving_closedPoints_into_open R G hG V
+      ⟨x₀, hxV, hs x₀ hx₀⟩ s' hs'
 
   obtain ⟨R₁, _, _, _, ρ, a, hfin, het, ha, haO⟩ :=
     GlobalTheory.T.exists_finiteEtale_section_of_smooth_closedFibre R hR G hG.smooth O ⟨u, huO, hu⟩
@@ -72,17 +80,20 @@ theorem exists_affine_open_of_finset_closedFibre :
   obtain ⟨W, hW, hzW⟩ := GlobalTheory.T.exists_affineOpen_translate_baseChange R R₁ ρ G V hV A
 
   have hpb : IsPullback (pullback.fst G.hom (spMap ρ)) (pullback.snd G.hom (spMap ρ)) G.hom
-      (spMap (algebraMap R R₁)) := IsPullback.of_hasPullback G.hom (spMap ρ)
-  refine GlobalTheory.T.exists_affineOpen_descending_finiteFreeBaseChange R R₁ G.left (pullback G.hom (spMap ρ)) G.hom (pullback.snd _ _) (pullback.fst _ _)
-    hpb inferInstance inferInstance W hW s' ?_
+      (spMap (algebraMap R R₁)) :=
+    IsPullback.of_hasPullback G.hom (spMap ρ)
+  refine GlobalTheory.T.exists_affineOpen_descending_finiteFreeBaseChange R R₁ G.left
+    (pullback G.hom (spMap ρ)) G.hom (pullback.snd _ _) (pullback.fst _ _) hpb inferInstance
+    inferInstance W hW s' ?_
   intro z hz
   let Ω := (pullback G.hom (spMap ρ)).residueField z
   let z' : Sp Ω ⟶ pullback G.hom (spMap ρ) := (pullback G.hom (spMap ρ)).fromSpecResidueField z
   have hz' : ∀ w, z' w = z := fun w => Scheme.fromSpecResidueField_apply z w
   let t : Sp Ω ⟶ Sp R := z' ≫ pullback.fst _ _ ≫ G.hom
   let x : Over.mk t ⟶ G := Over.homMk (z' ≫ pullback.fst _ _) (by simp [t])
-  let a' : Over.mk t ⟶ G := Over.homMk (z' ≫ pullback.snd _ _ ≫ a)
-    (by simp only [t, Over.mk_hom, Category.assoc, ha, pullback.condition])
+  let a' : Over.mk t ⟶ G :=
+    Over.homMk (z' ≫ pullback.snd _ _ ≫ a)
+      (by simp only [t, Over.mk_hom, Category.assoc, ha, pullback.condition])
   have hx : ∀ w, x.left w ∈ s' := by
     intro w
     show (z' ≫ pullback.fst _ _) w ∈ s'
@@ -96,8 +107,8 @@ theorem exists_affine_open_of_finset_closedFibre :
   have hV' := hmove Ω t x a' hx ha'
   have := hzW Ω z' t x a' rfl rfl hV' (closedPoint Ω)
   first
-    | exact (Scheme.fromSpecResidueField_apply z _) ▸ this
-    | simpa only [hz'] using this
-    | (convert this using 1; exact (hz' _).symm)
+  | exact (Scheme.fromSpecResidueField_apply z _) ▸ this
+  | simpa only [hz'] using this
+  | (convert this using 1; exact (hz' _).symm)
 
 end GlobalTheory.Mum

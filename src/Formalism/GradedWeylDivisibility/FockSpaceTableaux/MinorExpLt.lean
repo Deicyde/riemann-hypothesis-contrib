@@ -12,18 +12,21 @@ namespace Formalism.GradedWeylDivisibility
 
 open scoped MonomialOrder
 
-private theorem cmIdx_val_eq {r n : ℕ} (v : Fin r × Fin n) :
-    ((cmIdx r n v : Fin (n * r)) : ℕ) = v.1.val + r * v.2.val := by
+private theorem cmIdx_val_eq {r n : ℕ} (v : Fin r × Fin n)
+    : ((cmIdx r n v : Fin (n * r)) : ℕ) = v.1.val + r * v.2.val := by
   first
   | rfl
-  | (simp only [cmIdx, Equiv.trans_apply, Equiv.prodComm_apply, Prod.fst_swap,
-      Prod.snd_swap, finProdFinEquiv_apply_val]; done)
+  | (
+      simp only [cmIdx, Equiv.trans_apply, Equiv.prodComm_apply, Prod.fst_swap, Prod.snd_swap,
+        finProdFinEquiv_apply_val]
+      done
+    )
   | (simp [cmIdx, finProdFinEquiv_apply_val, Nat.mul_comm, Nat.add_comm]; done)
   | (simp [cmIdx]; ring)
 
-private theorem col_lt_or_col_eq_row_lt_of_cmIdx_lt {r n : ℕ} {v w : Fin r × Fin n}
-    (h : cmIdx r n v < cmIdx r n w) :
-    v.2.val < w.2.val ∨ (v.2 = w.2 ∧ v.1 < w.1) := by
+private theorem col_lt_or_col_eq_row_lt_of_cmIdx_lt
+    {r n : ℕ} {v w : Fin r × Fin n} (h : cmIdx r n v < cmIdx r n w)
+    : v.2.val < w.2.val ∨ (v.2 = w.2 ∧ v.1 < w.1) := by
   have h0 : ((cmIdx r n v : Fin (n * r)) : ℕ) < ((cmIdx r n w : Fin (n * r)) : ℕ) := h
   rw [cmIdx_val_eq, cmIdx_val_eq] at h0
   have hv1 := v.1.isLt
@@ -41,20 +44,19 @@ private theorem col_lt_or_col_eq_row_lt_of_cmIdx_lt {r n : ℕ} {v w : Fin r × 
       | exact Nat.mul_le_mul_left h1 r
       | exact Nat.mul_le_mul (le_refl r) h1
     rw [Nat.mul_add, Nat.mul_one] at hm
-    first
-    | omega
-    | linarith
+    first | omega | linarith
 
-private theorem domCongr_cmIdx_apply_cmIdx {r n : ℕ} (x : Fin r × Fin n →₀ ℕ) (v : Fin r × Fin n) :
-    (Finsupp.domCongr (cmIdx r n) x) (cmIdx r n v) = x v := by
+private theorem domCongr_cmIdx_apply_cmIdx {r n : ℕ} (x : Fin r × Fin n →₀ ℕ) (v : Fin r × Fin n)
+    : (Finsupp.domCongr (cmIdx r n) x) (cmIdx r n v) = x v := by
   first
   | (simp [Finsupp.domCongr_apply, Finsupp.equivMapDomain_apply]; done)
   | (rw [Finsupp.domCongr_apply, Finsupp.equivMapDomain_apply, Equiv.symm_apply_apply])
   | (simp; done)
 
-private theorem sum_single_castLE_apply' {r n s : ℕ} (τ : Fin s → Fin r) (hs : s ≤ n) (b : Fin r) (t : Fin n) :
-    (∑ q : Fin s, Finsupp.single (τ q, Fin.castLE hs q) 1 : Fin r × Fin n →₀ ℕ) (b, t) =
-      if h : t.val < s then (if τ ⟨t.val, h⟩ = b then 1 else 0) else 0 := by
+private theorem sum_single_castLE_apply'
+    {r n s : ℕ} (τ : Fin s → Fin r) (hs : s ≤ n) (b : Fin r) (t : Fin n)
+    : (∑ q : Fin s, Finsupp.single (τ q, Fin.castLE hs q) 1 : Fin r × Fin n →₀ ℕ) (b, t)
+      = if h : t.val < s then (if τ ⟨t.val, h⟩ = b then 1 else 0) else 0 := by
   rw [Finsupp.finsetSum_apply]
   by_cases h : t.val < s
   · rw [dite_eq_left h, Finset.sum_eq_single ⟨t.val, h⟩]
@@ -89,8 +91,9 @@ private theorem sum_single_castLE_apply' {r n s : ℕ} (τ : Fin s → Fin r) (h
     have h4 : (Fin.castLE hs q).val = q.val := rfl
     omega
 
-private theorem toLex_lt_of_eq_below_of_apply_lt {N : ℕ} (x y : Fin N →₀ ℕ) (i : Fin N)
-    (h1 : ∀ j, j < i → x j = y j) (h2 : x i < y i) : toLex x < toLex y := by
+private theorem toLex_lt_of_eq_below_of_apply_lt
+    {N : ℕ} (x y : Fin N →₀ ℕ) (i : Fin N) (h1 : ∀ j, j < i → x j = y j) (h2 : x i < y i)
+    : toLex x < toLex y := by
   first
   | exact ⟨i, h1, h2⟩
   | exact Finsupp.Lex.lt_of_forall_lt_of_lt _ _ i h1 h2
@@ -98,10 +101,11 @@ private theorem toLex_lt_of_eq_below_of_apply_lt {N : ℕ} (x y : Fin N →₀ �
   | (show Pi.Lex (· < ·) (· < ·) x y; exact ⟨i, h1, h2⟩)
   | (rw [Finsupp.lex_def]; exact ⟨i, h1, h2⟩)
 
-private theorem colLex_lt_of_toLex_domCongr_cmIdx_lt {r n : ℕ} {c d : Fin r × Fin n →₀ ℕ}
-    (h : toLex (Finsupp.domCongr (cmIdx r n) c) <
-      toLex (Finsupp.domCongr (cmIdx r n) d)) :
-    c ≺[colLex r n] d := h
+private theorem colLex_lt_of_toLex_domCongr_cmIdx_lt
+    {r n : ℕ} {c d : Fin r × Fin n →₀ ℕ}
+    (h : toLex (Finsupp.domCongr (cmIdx r n) c) < toLex (Finsupp.domCongr (cmIdx r n) d))
+    : c ≺[colLex r n] d :=
+  h
 
 theorem minorExponentLt : MinorExpLt := by
   intro r n s I hs hI σ hσ
@@ -110,9 +114,7 @@ theorem minorExponentLt : MinorExpLt := by
     push_neg at h
     apply hσ
     ext x
-    first
-    | (rw [h x]; rfl)
-    | simp [h x]
+    first | (rw [h x]; rfl) | simp [h x]
   obtain ⟨q0, hq0, hmin⟩ := (wellFounded_lt (α := Fin s)).has_min {q | σ q ≠ q} hex
   have hq0' : σ q0 ≠ q0 := hq0
   have hfix : ∀ q, q < q0 → σ q = q := fun q hq => by
@@ -124,14 +126,16 @@ theorem minorExponentLt : MinorExpLt := by
     · exact absurd h hq0'
     · exact h
   have hIlt : I q0 < I (σ q0) := hI hgt
-  have hA : ∀ (b : Fin r) (t : Fin n),
-      (∑ q : Fin s, Finsupp.single (I (σ q), Fin.castLE hs q) 1 : Fin r × Fin n →₀ ℕ) (b, t) =
-        if h : t.val < s then (if I (σ ⟨t.val, h⟩) = b then 1 else 0) else 0 :=
-    fun b t => sum_single_castLE_apply' (fun q => I (σ q)) hs b t
-  have hB : ∀ (b : Fin r) (t : Fin n),
-      (∑ q : Fin s, Finsupp.single (I q, Fin.castLE hs q) 1 : Fin r × Fin n →₀ ℕ) (b, t) =
-        if h : t.val < s then (if I ⟨t.val, h⟩ = b then 1 else 0) else 0 :=
-    fun b t => sum_single_castLE_apply' I hs b t
+  have hA
+      : ∀ (b : Fin r) (t : Fin n),
+        (∑ q : Fin s, Finsupp.single (I (σ q), Fin.castLE hs q) 1 : Fin r × Fin n →₀ ℕ) (b, t)
+          = if h : t.val < s then (if I (σ ⟨t.val, h⟩) = b then 1 else 0) else 0 := fun b t =>
+    sum_single_castLE_apply' (fun q => I (σ q)) hs b t
+  have hB
+      : ∀ (b : Fin r) (t : Fin n),
+        (∑ q : Fin s, Finsupp.single (I q, Fin.castLE hs q) 1 : Fin r × Fin n →₀ ℕ) (b, t)
+          = if h : t.val < s then (if I ⟨t.val, h⟩ = b then 1 else 0) else 0 := fun b t =>
+    sum_single_castLE_apply' I hs b t
   have hcq : (Fin.castLE hs q0).val = q0.val := rfl
   have ht0 : (Fin.castLE hs q0).val < s := q0.isLt
   have e1 : (⟨(Fin.castLE hs q0).val, ht0⟩ : Fin s) = q0 := Fin.ext rfl

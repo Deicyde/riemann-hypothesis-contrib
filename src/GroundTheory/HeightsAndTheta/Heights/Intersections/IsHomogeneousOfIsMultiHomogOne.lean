@@ -15,14 +15,15 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1
 
 section Helpers
 
 variable {F : Type} [Field F]
 
-theorem linearForm_fin_one_eq {g : MvPolynomial (Fin 1) F} (hg : g.IsHomogeneous 1) :
-    g = C (AddMonoidAlgebra.coeff g (Finsupp.single 0 1)) * X 0 := by
+theorem linearForm_fin_one_eq {g : MvPolynomial (Fin 1) F} (hg : g.IsHomogeneous 1)
+    : g = C (AddMonoidAlgebra.coeff g (Finsupp.single 0 1)) * X 0 := by
   ext d
   rw [coeff_C_mul, coeff_X]
   by_cases h : Finsupp.single 0 1 = d
@@ -37,9 +38,12 @@ theorem linearForm_fin_one_eq {g : MvPolynomial (Fin 1) F} (hg : g.IsHomogeneous
     simp [Finsupp.weight_apply, Finsupp.sum_fintype] at hw ⊢
     omega
 
-theorem isHomogeneous_of_isMultiHomog_one {K₀ : Type} [Fintype K₀] {ι₀ : K₀ → Type}
-    [∀ k, Fintype (ι₀ k)] (hK : Fintype.card K₀ = 1) {f : MRingOver F ι₀}
-    (hf : IsMultiHomog f fun _ => 1) : f.IsHomogeneous 1 := by
+theorem isHomogeneous_of_isMultiHomog_one
+    {K₀ : Type} [Fintype K₀]
+    {ι₀ : K₀ → Type} [∀ k, Fintype (ι₀ k)]
+    (hK : Fintype.card K₀ = 1)
+    {f : MRingOver F ι₀} (hf : IsMultiHomog f fun _ => 1)
+    : f.IsHomogeneous 1 := by
   intro d hd
   have h := hf d (mem_support_iff.mpr hd)
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp)]
@@ -56,25 +60,27 @@ theorem LineFibreBlocks.proof (hLin : LinearQuotient.Statement) : LineFibreBlock
   have hQp : Q.IsPrime := hQ.1.1
   obtain ⟨i₀, hi₀⟩ := hQ.1.2.2 k₀
   set ℓ : MRingOver F ι₀ := X ⟨k₀, i₀⟩ with hℓdef
-  obtain ⟨r, φ, hφs, hφk, hφX⟩ := hLin F (Σ k, ι₀ k) (insert ℓ S) (by
-    rintro f (rfl | hf)
-    · exact isHomogeneous_X F _
-    · exact isHomogeneous_of_isMultiHomog_one hK (hS f hf))
+  obtain ⟨r, φ, hφs, hφk, hφX⟩ :=
+    hLin F (Σ k, ι₀ k) (insert ℓ S) (by
+      rintro f (rfl | hf)
+      · exact isHomogeneous_X F _
+      · exact isHomogeneous_of_isMultiHomog_one hK (hS f hf))
   set W : Ideal (MRingOver F ι₀) := RingHom.ker φ with hWdef
-  have hQW : Q ⊔ Ideal.span {ℓ} = W := by
-    rw [hφk, Ideal.span_insert, hQS, sup_comm]
+  have hQW : Q ⊔ Ideal.span {ℓ} = W := by rw [hφk, Ideal.span_insert, hQS, sup_comm]
   have hWp : W.IsPrime := RingHom.ker_isPrime φ
   have hWmin : W ∈ (Q ⊔ Ideal.span {ℓ}).minimalPrimes := by
     rw [hQW, Ideal.minimalPrimes_eq_subsingleton_self]
     rfl
 
-  have hdim := cyc_dim_quot_minimal_add_one hi₀ hWmin (fun h => by
-    rw [hQ.2] at h
-    exact ENat.natCast_ne_top _ (WithBot.coe_injective h))
+  have hdim :=
+    cyc_dim_quot_minimal_add_one hi₀ hWmin (fun h => by
+      rw [hQ.2] at h
+      exact ENat.natCast_ne_top _ (WithBot.coe_injective h))
   have hdimW : ringKrullDim (MRingOver F ι₀ ⧸ W) = ((1 : ℕ) : WithBot ℕ∞) :=
     cyc_withBot_eq_of_add_one (by rw [hdim, hQ.2, hK])
   rw [hWdef, ringKrullDim_eq_of_ringEquiv (Ideal.quotientKerAlgEquivOfSurjective hφs).toRingEquiv,
-    MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field, zero_add] at hdimW
+      MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field, zero_add]
+    at hdimW
   have hr : r = 1 := by
     have h : ENat.card (Fin r) = (1 : ℕ∞) := WithBot.coe_injective hdimW
     rw [ENat.card_eq_coe_natCard] at h
@@ -108,8 +114,7 @@ theorem LineFibreBlocks.proof (hLin : LinearQuotient.Statement) : LineFibreBlock
     intro n
     induction n with
     | zero => simp [divCycle_one]
-    | succ n ih =>
-      rw [pow_succ, divCycle_mul hQp (hℓpow n) hi₀, ih, hdivℓ, ← Finsupp.single_add]
+    | succ n ih => rw [pow_succ, divCycle_mul hQp (hℓpow n) hi₀, ih, hdivℓ, ← Finsupp.single_add]
 
   have hWpv : IsProjVarF W 0 :=
     isProjVarF_of_mem_divSupp (n := 0) hQ (isMultiHomog_X k₀ i₀) hi₀ ⟨hWmin, hWrel⟩
@@ -147,8 +152,9 @@ theorem LineFibreBlocks.proof (hLin : LinearQuotient.Statement) : LineFibreBlock
       have h1 : X s - C (c s) * X p₁ ∈ W := by
         rw [hWdef, RingHom.mem_ker, map_sub, map_mul, algHom_C, hφXs, hφXs, ← mul_assoc,
           algebraMap_eq, ← C_mul, hcdef, div_mul_cancel₀ _ ha1, sub_self]
-      have h2 : C (c s) * (X p₁ - 1) ∈
-          Ideal.span (Set.range fun k => (X ⟨k, j k⟩ : MRingOver F ι₀) - 1) :=
+      have h2
+          : C (c s) * (X p₁ - 1)
+            ∈ Ideal.span (Set.range fun k => (X ⟨k, j k⟩ : MRingOver F ι₀) - 1) :=
         Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨k₀, rfl⟩)
       have e : X s - C (c s) = (X s - C (c s) * X p₁) + C (c s) * (X p₁ - 1) := by ring
       rw [e]
@@ -168,11 +174,13 @@ theorem LineFibreBlocks.proof (hLin : LinearQuotient.Statement) : LineFibreBlock
   have h1Q : (1 : MRingOver F ι₀) ∉ Q := fun h => hQp.ne_top ((Ideal.eq_top_iff_one _).mpr h)
   rw [e1]
   obtain ⟨n, hn | hn⟩ := Int.eq_nat_or_neg (m k₀)
-  · rw [hJ.2 Q 0 Fin.elim0 m (ℓ ^ n) 1 hQ ⟨fun _ => n, 0, hhomℓ n, isMultiHomog_one, hℓpow n, h1Q,
-      fun k => by simp [hmk k, hn]⟩, ratDiv, hdivpow, divCycle_one]
+  · rw [hJ.2 Q 0 Fin.elim0 m (ℓ ^ n) 1 hQ
+        ⟨fun _ => n, 0, hhomℓ n, isMultiHomog_one, hℓpow n, h1Q, fun k => by simp [hmk k, hn]⟩,
+      ratDiv, hdivpow, divCycle_one]
     simp [inh_cycEval_single, hpt, hn]
-  · rw [hJ.2 Q 0 Fin.elim0 m 1 (ℓ ^ n) hQ ⟨0, fun _ => n, isMultiHomog_one, hhomℓ n, h1Q, hℓpow n,
-      fun k => by simp [hmk k, hn]⟩, ratDiv, hdivpow, divCycle_one]
+  · rw [hJ.2 Q 0 Fin.elim0 m 1 (ℓ ^ n) hQ
+        ⟨0, fun _ => n, isMultiHomog_one, hhomℓ n, h1Q, hℓpow n, fun k => by simp [hmk k, hn]⟩,
+      ratDiv, hdivpow, divCycle_one]
     simp only [Finsupp.mapRange_zero, Finsupp.mapRange_single, zero_sub]
     rw [← Finsupp.single_neg, inh_cycEval_single, hpt, hn]
     simp

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Induced
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 noncomputable section
@@ -16,9 +17,11 @@ namespace RatModel
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {M : RatModel o Ω}
 
-theorem isIntegrallyClosed_stalk_of_ringOn {U : M.Z.Opens} (hU : IsAffineOpen U) {z : M.Z} (hz : z ∈ U)
-    (h : ∀ x : Ω, IsIntegral (M.ringOn U) x → x ∈ M.ringOn U) :
-    IsIntegrallyClosed (M.Z.presheaf.stalk z) := by
+theorem isIntegrallyClosed_stalk_of_ringOn
+    {U : M.Z.Opens} (hU : IsAffineOpen U)
+    {z : M.Z} (hz : z ∈ U)
+    (h : ∀ x : Ω, IsIntegral (M.ringOn U) x → x ∈ M.ringOn U)
+    : IsIntegrallyClosed (M.Z.presheaf.stalk z) := by
   have hne : (U : Set M.Z).Nonempty := ⟨z, hz⟩
   have : Nonempty U := ⟨⟨z, hz⟩⟩
   have : IsFractionRing (M.ringOn U) Ω := isFractionRing_ringOn hU hne
@@ -44,14 +47,15 @@ theorem IsNm.isNormalScheme {J : Type} {t : J → Ω} (h : M.IsNm t) : IsNormalS
     have hle : A ≤ M.ringOn U := fun y hy => (hmem y).2 (isIntegral_algebraMap (x := (⟨y, hy⟩ : A)))
     let : Algebra A (M.ringOn U) := (Subalgebra.inclusion hle).toRingHom.toAlgebra
     have : IsScalarTower A (M.ringOn U) Ω := IsScalarTower.of_algebraMap_eq fun _ => rfl
-    have : Algebra.IsIntegral A (M.ringOn U) := ⟨fun y =>
-      (isIntegral_algHom_iff (IsScalarTower.toAlgHom A (M.ringOn U) Ω) Subtype.val_injective).1
-        ((hmem y).1 y.2)⟩
+    have : Algebra.IsIntegral A (M.ringOn U) :=
+      ⟨fun y =>
+        (isIntegral_algHom_iff (IsScalarTower.toAlgHom A (M.ringOn U) Ω) Subtype.val_injective).1
+          ((hmem y).1 y.2)⟩
     exact (hmem x).2 (isIntegral_trans x hx)
   exact fun z => ⟨(M.stalkHom_injective z).isDomain _, key z⟩
 
-theorem div_prod_iff {J J' : Type} {t : J → Ω} {t' : J' → Ω} {i : J} {i' : J'} {z : M.Z} :
-    M.Div (fun q : J × J' => t q.1 * t' q.2) (i, i') z ↔ M.Div t i z ∧ M.Div t' i' z := by
+theorem div_prod_iff {J J' : Type} {t : J → Ω} {t' : J' → Ω} {i : J} {i' : J'} {z : M.Z}
+    : M.Div (fun q : J × J' => t q.1 * t' q.2) (i, i') z ↔ M.Div t i z ∧ M.Div t' i' z := by
   simp only [RatModel.Div]
   constructor
   · rintro ⟨h0, h⟩
@@ -65,8 +69,9 @@ theorem div_prod_iff {J J' : Type} {t : J → Ω} {t' : J' → Ω} {i : J} {i' :
     rw [mul_div_mul_comm]
     exact mul_mem (h q.1) (h' q.2)
 
-theorem div_finprod_iff {A : Type} [Fintype A] {JJ : A → Type} {tt : ∀ a, JJ a → Ω} {q : ∀ a, JJ a} {z : M.Z} :
-    M.Div (fun q : ∀ a, JJ a => ∏ a, tt a (q a)) q z ↔ ∀ a, M.Div (tt a) (q a) z := by
+theorem div_finprod_iff
+    {A : Type} [Fintype A] {JJ : A → Type} {tt : ∀ a, JJ a → Ω} {q : ∀ a, JJ a} {z : M.Z}
+    : M.Div (fun q : ∀ a, JJ a => ∏ a, tt a (q a)) q z ↔ ∀ a, M.Div (tt a) (q a) z := by
   simp only [RatModel.Div]
   constructor
   · rintro ⟨h0, h⟩
@@ -85,8 +90,8 @@ theorem div_finprod_iff {A : Type} [Fintype A] {JJ : A → Type} {tt : ∀ a, JJ
     rw [← Finset.prod_div_distrib]
     exact prod_mem fun a _ => (h a).2 (q' a)
 
-theorem hasDiv_finprod_iff {A : Type} [Fintype A] {JJ : A → Type} {tt : ∀ a, JJ a → Ω} :
-    M.HasDiv (fun q : ∀ a, JJ a => ∏ a, tt a (q a)) ↔ ∀ a, M.HasDiv (tt a) := by
+theorem hasDiv_finprod_iff {A : Type} [Fintype A] {JJ : A → Type} {tt : ∀ a, JJ a → Ω}
+    : M.HasDiv (fun q : ∀ a, JJ a => ∏ a, tt a (q a)) ↔ ∀ a, M.HasDiv (tt a) := by
   simp only [RatModel.HasDiv]
   constructor
   · intro h a z
@@ -98,10 +103,19 @@ theorem hasDiv_finprod_iff {A : Type} [Fintype A] {JJ : A → Type} {tt : ∀ a,
 
 end RatModel
 
-theorem isNm_normal_and_div_prod : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (J : Type) (t : J → Ω), (M.IsNm t → IsNormalScheme M.Z) ∧ (∀ (J' : Type) (t' : J' → Ω) (i : J) (i' : J') (z : M.Z), M.Div (fun q : J × J' => t q.1 * t' q.2) (i, i') z ↔ M.Div t i z ∧ M.Div t' i' z) ∧ (∀ (A : Type) [Fintype A] (JJ : A → Type) (tt : ∀ a, JJ a → Ω), M.HasDiv (fun q : ∀ a, JJ a => ∏ a, tt a (q a)) ↔ ∀ a, M.HasDiv (tt a)) := by
+theorem isNm_normal_and_div_prod
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (J : Type) (t : J → Ω),
+      (M.IsNm t → IsNormalScheme M.Z)
+        ∧ (∀ (J' : Type) (t' : J' → Ω) (i : J) (i' : J') (z : M.Z),
+          M.Div (fun q : J × J' => t q.1 * t' q.2) (i, i') z ↔ M.Div t i z ∧ M.Div t' i' z)
+        ∧ (∀ (A : Type) [Fintype A] (JJ : A → Type) (tt : ∀ a, JJ a → Ω),
+          M.HasDiv (fun q : ∀ a, JJ a => ∏ a, tt a (q a)) ↔ ∀ a, M.HasDiv (tt a)) := by
   intro o Ω _ _ _ M J t
-  exact ⟨fun h => h.isNormalScheme, fun J' t' i i' z => RatModel.div_prod_iff,
-    fun A _ JJ tt => RatModel.hasDiv_finprod_iff⟩
+  exact ⟨
+    fun h => h.isNormalScheme,
+    fun J' t' i i' z => RatModel.div_prod_iff,
+    fun A _ JJ tt => RatModel.hasDiv_finprod_iff
+  ⟩
 
 end GlobalTheory.ZH
 end

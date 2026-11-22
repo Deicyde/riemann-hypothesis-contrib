@@ -11,15 +11,16 @@ open NumberField NumberField.InfinitePlace Matrix MeasureTheory UpperTheory.V.KT
 namespace PositivityTheory.KB.CentralizerFixed
 
 open ComplexOrder in
-theorem real_smul_posDef {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : M.PosDef) {a : ℝ} (ha : 0 < a) :
-    (a • M).PosDef := by
+theorem real_smul_posDef {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : M.PosDef) {a : ℝ} (ha : 0 < a)
+    : (a • M).PosDef := by
   have e : a • M = (a : ℂ) • M := by ext i j; simp [Complex.real_smul]
   rw [e]
   exact h.smul (Complex.zero_lt_real.2 ha)
 
 open ComplexOrder in
-theorem real_smul_posSemidef {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : M.PosSemidef) {a : ℝ}
-    (ha : 0 ≤ a) : (a • M).PosSemidef := by
+theorem real_smul_posSemidef
+    {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : M.PosSemidef) {a : ℝ} (ha : 0 ≤ a)
+    : (a • M).PosSemidef := by
   have e : a • M = (a : ℂ) • M := by ext i j; simp [Complex.real_smul]
   rw [e]
   exact h.smul (Complex.zero_le_real.2 ha)
@@ -36,17 +37,17 @@ theorem pos_convex (L : Type) [Field L] [NumberField L] (N : ℕ) : Convex ℝ (
     rw [← ha', hb1, zero_smul, zero_add, one_smul]
     exact hy w
 
-theorem simplex_meas (q : ℕ) :
-    MeasurableSet {t : Fin q → ℝ | (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1} := by
+theorem simplex_meas (q : ℕ) : MeasurableSet {t : Fin q → ℝ | (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1} := by
   refine IsClosed.measurableSet ?_
   refine (IsClosed.inter ?_ ?_ : IsClosed ({t : Fin q → ℝ | ∀ j, 0 ≤ t j} ∩ {t | ∑ j, t j ≤ 1}))
   · simp only [Set.ofPred_forall]
     exact isClosed_iInter fun j => isClosed_le continuous_const (continuous_apply j)
   · exact isClosed_le (continuous_finsetSum _ fun j _ => continuous_apply j) continuous_const
 
-theorem simplex_mem {L : Type} [Field L] [NumberField L] {N q : ℕ} (y : Fin (q + 1) → Pos L N)
-    (t : Fin q → ℝ) (h0 : ∀ j, 0 ≤ t j) (h1 : ∑ j, t j ≤ 1) :
-    (y 0).1 + ∑ j, t j • ((y j.succ).1 - (y 0).1) ∈ Pos L N := by
+theorem simplex_mem
+    {L : Type} [Field L] [NumberField L]
+    {N q : ℕ} (y : Fin (q + 1) → Pos L N) (t : Fin q → ℝ) (h0 : ∀ j, 0 ≤ t j) (h1 : ∑ j, t j ≤ 1)
+    : (y 0).1 + ∑ j, t j • ((y j.succ).1 - (y 0).1) ∈ Pos L N := by
   let c : Fin (q + 1) → ℝ := Fin.cons (1 - ∑ j, t j) t
   have e : (y 0).1 + ∑ j, t j • ((y j.succ).1 - (y 0).1) = ∑ i, c i • (y i).1 := by
     rw [Fin.sum_univ_succ]

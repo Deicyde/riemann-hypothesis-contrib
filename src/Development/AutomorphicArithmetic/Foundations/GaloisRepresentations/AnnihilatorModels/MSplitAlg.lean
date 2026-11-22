@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.splitAlg_of :
-    SplitAlg := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.splitAlg_of : SplitAlg := by
   classical
   intro κ B Λ _ _ _ _ _ _ _ hcard ε g
   have hli := linearIndependent_toLinearMap κ B κ
@@ -59,7 +58,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.splitAlg_of :
   have hcS : c ∈ S := by
     have h1 := congrArg ε hq
     rw [← Polynomial.aeval_algHom_apply, map_zero, Polynomial.coe_aeval_eq_eval,
-      Polynomial.eval_prod, Finset.prod_eq_zero_iff] at h1
+        Polynomial.eval_prod, Finset.prod_eq_zero_iff]
+      at h1
     obtain ⟨s, hs, hs0⟩ := h1
     simp only [Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C, sub_eq_zero] at hs0
     rw [hc, hs0]

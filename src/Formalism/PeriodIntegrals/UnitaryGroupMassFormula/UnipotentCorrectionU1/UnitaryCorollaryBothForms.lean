@@ -21,12 +21,18 @@ noncomputable section
 
 namespace PI.UnitaryCorollaryDerivatives
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.U
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem unitary_corollary_both_forms : Formalism.FourierDecayAlt.U.StarBoundOfCutoffOperator ∧ Formalism.FourierDecayAlt.U.StarBoundOfTwoCutoffOperator :=
-  unitary_corollary_of_estimates star_estimate_unitary (djWB_of determinant_curve_derivative polynomial_bound determinant_derivative_polynomial compact_curve_estimate)
-    (gfWB_of generating_function_polynomial polynomial_bound compact_region_estimate) weight_bound_multiplicative
+theorem unitary_corollary_both_forms
+    : Formalism.FourierDecayAlt.U.StarBoundOfCutoffOperator
+      ∧ Formalism.FourierDecayAlt.U.StarBoundOfTwoCutoffOperator :=
+  unitary_corollary_of_estimates star_estimate_unitary
+    (djWB_of determinant_curve_derivative polynomial_bound determinant_derivative_polynomial
+      compact_curve_estimate)
+    (gfWB_of generating_function_polynomial polynomial_bound compact_region_estimate)
+    weight_bound_multiplicative
 
 end PI.UnitaryCorollaryDerivatives

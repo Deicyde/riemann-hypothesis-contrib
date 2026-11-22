@@ -12,13 +12,14 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G
 
 def OrbitCenterChart.Statement : Prop :=
-  ∀ (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (n : ι → ℕ)
-    (A : HermLine n) (x : Cone n (AlgebraicClosure ℚ)) (s : MvPolynomial (Coord n) ℤ),
-    BlockNonzero x → Geo.IsSectionOn (orbitIdeal x) A.toGeo s →
-    ∀ V ∈ Geo.divSupp (orbitIdeal x) s, ∀ c : (k : ι) → Fin (n k + 1),
-      (∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ V) →
-        ∀ v : FinitePlace (coordField x),
-          orbitCenter x v = V ↔ AbsCentredAt (chartRing x c) (chartPoint x c V)
-            fun t ↦ v (IntermediateField.inclusion (ratioField_le_coordField x) t)
+  ∀ (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (n : ι → ℕ) (A : HermLine n)
+      (x : Cone n (AlgebraicClosure ℚ)) (s : MvPolynomial (Coord n) ℤ),
+    BlockNonzero x → Geo.IsSectionOn (orbitIdeal x) A.toGeo s
+      → ∀ V ∈ Geo.divSupp (orbitIdeal x) s, ∀ c : (k : ι) → Fin (n k + 1),
+        (∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ V)
+          → ∀ v : FinitePlace (coordField x),
+            orbitCenter x v = V
+              ↔ AbsCentredAt (chartRing x c) (chartPoint x c V) fun t ↦
+                v (IntermediateField.inclusion (ratioField_le_coordField x) t)
 
 end GroundTheory.Heights₂.Heights

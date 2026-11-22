@@ -9,15 +9,20 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsotropicEigen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GlobalTheory.CompanionTheory.Ar.Cusp.FamEx
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GlobalTheory.CompanionTheory.Ar.Cusp.FamEx
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.FamEx.Lin
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
 
 section Ip
 
@@ -50,21 +55,20 @@ section Eig
 
 variable (R : RiemLat E g Λ)
 
-theorem ip_sum_right {A : Type} (t : Finset A) (f : A → Fin g → ℂ) (x : Fin g → ℂ) :
-    R.ip x (∑ i ∈ t, f i) = ∑ i ∈ t, R.ip x (f i) := map_sum (ipL R x) f t
+theorem ip_sum_right {A : Type} (t : Finset A) (f : A → Fin g → ℂ) (x : Fin g → ℂ)
+    : R.ip x (∑ i ∈ t, f i) = ∑ i ∈ t, R.ip x (f i) :=
+  map_sum (ipL R x) f t
 
-theorem ip_sum_left {A : Type} (t : Finset A) (f : A → Fin g → ℂ) (y : Fin g → ℂ) :
-    R.ip (∑ i ∈ t, f i) y = ∑ i ∈ t, R.ip (f i) y := by
+theorem ip_sum_left {A : Type} (t : Finset A) (f : A → Fin g → ℂ) (y : Fin g → ℂ)
+    : R.ip (∑ i ∈ t, f i) y = ∑ i ∈ t, R.ip (f i) y := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← ip_conj R y, ip_sum_right, map_sum]
   exact Finset.sum_congr rfl fun i _ => ip_conj R y (f i)
 
-
 omit [IsCMField E] in
-theorem comp_ne {s s' : E →+* ℂ} (h : s ≠ s') :
-    s.comp (algebraMap (𝓞 E) E) ≠ s'.comp (algebraMap (𝓞 E) E) :=
-  fun e => h (IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) e)
-
+theorem comp_ne {s s' : E →+* ℂ} (h : s ≠ s')
+    : s.comp (algebraMap (𝓞 E) E) ≠ s'.comp (algebraMap (𝓞 E) E) := fun e =>
+  h (IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) e)
 
 omit [IsCMField E] in
 theorem emb_injective (s : 𝓞 E →+* ℂ) : Function.Injective s := by
@@ -83,14 +87,11 @@ omit [IsCMField E] in
 theorem extEmb_comp (s : 𝓞 E →+* ℂ) : (extEmb s).comp (algebraMap (𝓞 E) E) = s :=
   RingHom.ext (extEmb_apply s)
 
-
 end Eig
 
 section Family
 
 variable {K : Type} {J : K → Type} {Ψ : Type}
-
-
 
 variable {T : Set ((Σ k, J k) → ℂ)} {R : ((Σ k, J k) → ℂ) → RiemLat E g Λ} {w : (Σ k, J k) → ℂ}
 

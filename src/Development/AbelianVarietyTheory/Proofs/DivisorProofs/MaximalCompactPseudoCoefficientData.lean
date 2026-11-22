@@ -36,13 +36,24 @@ namespace GlobalTheory.PsCo.Pc1
 
 theorem maximalCompact_pseudoCoefficientData' : StKData :=
   GlobalTheory.PsCo.PcEF.stKData_of
-    GlobalTheory.PsCo.PcEF.maxCompactPolynomial_blockTimesConjDetPower GlobalTheory.PsCo.PcEF.modeMatrixDet_eq_adjointDet GlobalTheory.PsCo.PcEF.coefPoly
-    GlobalTheory.PsCo.PcEF.trPoly GlobalTheory.PsCo.PcEF.adjointDetTrace_classFunction GlobalTheory.PsCo.PcEF.harishChandraWeight_integral_dominant
-    GlobalTheory.PsCo.PcEF.polyCoefIrrep_hasDerivedAction GlobalTheory.PsCo.PcEF.adjointDet_onCompactTorus GlobalTheory.PsCo.PcEF.torusId_full
-    GlobalTheory.PsCo.PcEF.tracePairing_nonzero_intertwiner GlobalTheory.PsCo.PcEF.norm_irreducibleCharacter_unitaryMaxCompact_eq_one GlobalTheory.PsCo.PcEF.rangeFD_closed
-    GlobalTheory.PsCo.PcEF.casimirScalar_stableSumSpace GlobalTheory.PsCo.PcEF.supertrace_carriedBy_diracKernel GlobalTheory.PsCo.PcEF.StrIdx_proof2
-    GlobalTheory.PsCo.PcEF.intertwiner_preserves_highestWeight GlobalTheory.PsCo.PcEF.fockCoordinates_span_finiteDimensional GlobalTheory.PsCo.PcEF.casimirValue_highestWeightCoordinates
-    GlobalTheory.PsCo.PcEF.highestWeightKernel_lowestType GlobalTheory.PsCo.PcEF.eq_discreteSeries_of_lowestKType_casimir GlobalTheory.PsCo.PcEF.compactDiscreteSeries_ownType
-    GlobalTheory.PsCo.PcEF.gapConditions_of_largeGaps GlobalTheory.PsCo.PcEF.unitaryRep_upq_matrixFunction GlobalTheory.HcPort.casimirActsByScalar_indefUnitary
+    GlobalTheory.PsCo.PcEF.maxCompactPolynomial_blockTimesConjDetPower
+    GlobalTheory.PsCo.PcEF.modeMatrixDet_eq_adjointDet GlobalTheory.PsCo.PcEF.coefPoly
+    GlobalTheory.PsCo.PcEF.trPoly GlobalTheory.PsCo.PcEF.adjointDetTrace_classFunction
+    GlobalTheory.PsCo.PcEF.harishChandraWeight_integral_dominant
+    GlobalTheory.PsCo.PcEF.polyCoefIrrep_hasDerivedAction
+    GlobalTheory.PsCo.PcEF.adjointDet_onCompactTorus GlobalTheory.PsCo.PcEF.torusId_full
+    GlobalTheory.PsCo.PcEF.tracePairing_nonzero_intertwiner
+    GlobalTheory.PsCo.PcEF.norm_irreducibleCharacter_unitaryMaxCompact_eq_one
+    GlobalTheory.PsCo.PcEF.rangeFD_closed GlobalTheory.PsCo.PcEF.casimirScalar_stableSumSpace
+    GlobalTheory.PsCo.PcEF.supertrace_carriedBy_diracKernel GlobalTheory.PsCo.PcEF.StrIdx_proof2
+    GlobalTheory.PsCo.PcEF.intertwiner_preserves_highestWeight
+    GlobalTheory.PsCo.PcEF.fockCoordinates_span_finiteDimensional
+    GlobalTheory.PsCo.PcEF.casimirValue_highestWeightCoordinates
+    GlobalTheory.PsCo.PcEF.highestWeightKernel_lowestType
+    GlobalTheory.PsCo.PcEF.eq_discreteSeries_of_lowestKType_casimir
+    GlobalTheory.PsCo.PcEF.compactDiscreteSeries_ownType
+    GlobalTheory.PsCo.PcEF.gapConditions_of_largeGaps
+    GlobalTheory.PsCo.PcEF.unitaryRep_upq_matrixFunction
+    GlobalTheory.HcPort.casimirActsByScalar_indefUnitary
 
 end GlobalTheory.PsCo.Pc1

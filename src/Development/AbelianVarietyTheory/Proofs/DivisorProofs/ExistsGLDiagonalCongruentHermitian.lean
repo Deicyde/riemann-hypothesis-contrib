@@ -12,7 +12,13 @@ open GlobalTheory.SplitWeil (SB nabs)
 
 namespace GlobalTheory.KSp
 
-theorem exists_gl_diagonal_hermitian : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (b : Matrix ν ν E), (b.map c)ᵀ = b → b.det ≠ 0 → ∃ (a : GL ν E) (D : ν → Fˣ), b = (a : Matrix ν ν E) * diagonal (fun j => algebraMap F E (D j)) * ((a : Matrix ν ν E).map c)ᵀ := by
+theorem exists_gl_diagonal_hermitian
+    : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E) (δ : E)
+        (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (b : Matrix ν ν E),
+      (b.map c)ᵀ = b → b.det ≠ 0
+        → ∃ (a : GL ν E) (D : ν → Fˣ),
+          b = (a : Matrix ν ν E) * diagonal (fun j => algebraMap F E (D j))
+            * ((a : Matrix ν ν E).map c)ᵀ := by
   intro F _ _ E _ _ c δ hE ν _ _ b hb hdet
   letI : Invertible (2 : F) := invertibleOfNonzero two_ne_zero
   have h2 : (2 : E) ≠ 0 := by
@@ -23,12 +29,13 @@ theorem exists_gl_diagonal_hermitian : ∀ (F : Type) [Field F] [CharZero F] (E 
     have := congrFun (congrFun hb y) x
     simpa using this
   obtain ⟨P, d, hP, hPd, hfix, hne⟩ :=
-    GlobalTheory.HermDiag.exists_congr_diagonal (c := (c : E →+* E)) h2 (fun t => hE.invol t) (G := b) hG
+    GlobalTheory.HermDiag.exists_congr_diagonal (c := (c : E →+* E)) h2
+      (fun t => hE.invol t)
+      (G := b) hG
   have hd0 := hne hdet
   have hPd' : Pᵀ * b * P.map c = diagonal d := hPd
   choose f hf using fun i => hE.exists_of_fixed (hfix i)
-  have hf0 : ∀ i, f i ≠ 0 := by
-    intro i h; apply hd0 i; rw [hf i, h, map_zero]
+  have hf0 : ∀ i, f i ≠ 0 := by intro i h; apply hd0 i; rw [hf i, h, map_zero]
   have hQ : (Pᵀ).det ≠ 0 := by rwa [det_transpose]
   set A : Matrix ν ν E := (Pᵀ)⁻¹ with hA
   have hAQ : A * Pᵀ = 1 := Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.2 hQ)
@@ -46,11 +53,13 @@ theorem exists_gl_diagonal_hermitian : ∀ (F : Type) [Field F] [CharZero F] (E 
     rw [det_mul, h0, zero_mul, det_one] at this
     exact zero_ne_one this
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero A hAdet, fun j => Units.mk0 (f j) (hf0 j), ?_⟩
-  have hD : diagonal (fun j => algebraMap F E ((Units.mk0 (f j) (hf0 j) : Fˣ) : F)) = diagonal d := by
+  have hD
+      : diagonal (fun j => algebraMap F E ((Units.mk0 (f j) (hf0 j) : Fˣ) : F)) = diagonal d := by
     congr 1; funext j; simp [hf j]
   rw [Matrix.GeneralLinearGroup.val_mkOfDetNeZero]
   rw [hD, ← hPd']
-  calc b = (A * Pᵀ) * b * (P.map c * (A.map c)ᵀ) := by rw [hAQ, hAs', Matrix.one_mul, Matrix.mul_one]
+  calc
+    b = (A * Pᵀ) * b * (P.map c * (A.map c)ᵀ) := by rw [hAQ, hAs', Matrix.one_mul, Matrix.mul_one]
     _ = A * (Pᵀ * b * P.map c) * (A.map c)ᵀ := by simp only [Matrix.mul_assoc]
 
 end GlobalTheory.KSp

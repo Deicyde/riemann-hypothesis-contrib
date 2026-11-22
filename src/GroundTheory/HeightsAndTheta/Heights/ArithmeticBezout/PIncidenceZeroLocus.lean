@@ -15,10 +15,10 @@ noncomputable section
 
 namespace IncidenceZeroLocus
 
-theorem exists_det_submatrix_ne_zero {K ρ κ : Type*} [Field K] [Fintype ρ] [DecidableEq ρ]
-    [Fintype κ] (A : Matrix ρ κ K)
-    (hA : ∀ f, Pi.single f 1 ∈ Submodule.span K (Set.range A.col)) :
-    ∃ e : ρ → κ, (A.submatrix id e).det ≠ 0 := by
+theorem exists_det_submatrix_ne_zero
+    {K ρ κ : Type*} [Field K] [Fintype ρ] [DecidableEq ρ] [Fintype κ]
+    (A : Matrix ρ κ K) (hA : ∀ f, Pi.single f 1 ∈ Submodule.span K (Set.range A.col))
+    : ∃ e : ρ → κ, (A.submatrix id e).det ≠ 0 := by
   have htop : Submodule.span K (Set.range A.col) = ⊤ := by
     rw [eq_top_iff, ← (Pi.basisFun K ρ).span_eq, Submodule.span_le]
     rintro _ ⟨f, rfl⟩
@@ -31,29 +31,33 @@ theorem exists_det_submatrix_ne_zero {K ρ κ : Type*} [Field K] [Fintype ρ] [D
     rw [← Module.finrank_fintype_fun_eq_card K, Module.finrank_eq_card_basis b]
   let eqv := Fintype.equivOfCardEq hcard
   refine ⟨a ∘ eqv, ?_⟩
-  have hli' : LinearIndependent K (A.submatrix id (a ∘ eqv)).col :=
-    hli.comp eqv eqv.injective
-  rw [Matrix.linearIndependent_cols_iff_isUnit, Matrix.isUnit_iff_isUnit_det,
-    isUnit_iff_ne_zero] at hli'
+  have hli' : LinearIndependent K (A.submatrix id (a ∘ eqv)).col := hli.comp eqv eqv.injective
+  rw [Matrix.linearIndependent_cols_iff_isUnit, Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero]
+    at hli'
   exact hli'
 
-theorem homogeneousComponent_map {R S σ : Type*} [CommSemiring R] [CommSemiring S] (g : R →+* S)
-    (N : ℕ) (p : MvPolynomial σ R) :
-    homogeneousComponent N (map g p) = map g (homogeneousComponent N p) := by
+theorem homogeneousComponent_map
+    {R S σ : Type*} [CommSemiring R] [CommSemiring S] (g : R →+* S) (N : ℕ) (p : MvPolynomial σ R)
+    : homogeneousComponent N (map g p) = map g (homogeneousComponent N p) := by
   ext d
   simp only [coeff_homogeneousComponent, coeff_map]
   split_ifs <;> simp
 
-theorem mem_finsuppAntidiag_univ_iff {n N : ℕ} (f : Fin n →₀ ℕ) :
-    f ∈ (Finset.univ : Finset (Fin n)).finsuppAntidiag N ↔ f.degree = N := by
+theorem mem_finsuppAntidiag_univ_iff {n N : ℕ} (f : Fin n →₀ ℕ)
+    : f ∈ (Finset.univ : Finset (Fin n)).finsuppAntidiag N ↔ f.degree = N := by
   simp [Finset.mem_finsuppAntidiag, Finsupp.degree_eq_sum]
 
-theorem eval₂_eq_sum_degree {R S : Type*} [CommSemiring R] [CommSemiring S] {n N : ℕ} (g : R →+* S)
-    (x : Fin n → S) (p : MvPolynomial (Fin n) R) (hp : p.IsHomogeneous N) :
-    eval₂ g x p = ∑ f : ((Finset.univ : Finset (Fin n)).finsuppAntidiag N),
-      g (AddMonoidAlgebra.coeff p (f : Fin n →₀ ℕ)) * ∏ j, x j ^ (f : Fin n →₀ ℕ) j := by
-  rw [eval₂_eq', Finset.sum_coe_sort ((Finset.univ : Finset (Fin n)).finsuppAntidiag N)
-    (fun f => g (AddMonoidAlgebra.coeff p f) * ∏ j, x j ^ f j)]
+theorem eval₂_eq_sum_degree
+    {R S : Type*} [CommSemiring R] [CommSemiring S]
+    {n N : ℕ}
+    (g : R →+* S) (x : Fin n → S)
+    (p : MvPolynomial (Fin n) R) (hp : p.IsHomogeneous N)
+    : eval₂ g x p
+      = ∑ f : ((Finset.univ : Finset (Fin n)).finsuppAntidiag N),
+        g (AddMonoidAlgebra.coeff p (f : Fin n →₀ ℕ)) * ∏ j, x j ^ (f : Fin n →₀ ℕ) j := by
+  rw [eval₂_eq',
+    Finset.sum_coe_sort ((Finset.univ : Finset (Fin n)).finsuppAntidiag N)
+      (fun f => g (AddMonoidAlgebra.coeff p f) * ∏ j, x j ^ f j)]
   refine Finset.sum_subset (fun d hd => ?_) (fun d _ hd => ?_)
   · have h := hp (mem_support_iff.mp hd)
     rw [mem_finsuppAntidiag_univ_iff, Finsupp.degree_eq_weight_one]
@@ -68,9 +72,11 @@ theorem proof : IncidenceZeroLocus.Statement := by
   obtain ⟨S, hS⟩ := (IsNoetherian.noetherian Q : Q.FG)
   have hSQ : ∀ q ∈ S, q ∈ Q := fun q hq => by rw [← hS]; exact Submodule.subset_span hq
   let G : (S ⊕ Fin k) → MvPolynomial (Fin n) (MvPolynomial (Fin k × Fin n) F) :=
-    Sum.elim (fun q => map (algebraMap F (MvPolynomial (Fin k × Fin n) F)) (q : MvPolynomial (Fin n) F))
+    Sum.elim
+      (fun q => map (algebraMap F (MvPolynomial (Fin k × Fin n) F)) (q : MvPolynomial (Fin n) F))
       (fun i => ∑ j, C (X (i, j)) * X j)
-  let φv : MvPolynomial (Fin k × Fin n) F →+* Ω := (aeval v : MvPolynomial (Fin k × Fin n) F →ₐ[F] Ω)
+  let φv : MvPolynomial (Fin k × Fin n) F →+* Ω :=
+    (aeval v : MvPolynomial (Fin k × Fin n) F →ₐ[F] Ω)
   have hφv : φv.comp (algebraMap F (MvPolynomial (Fin k × Fin n) F)) = algebraMap F Ω :=
     AlgHom.comp_algebraMap _
   let Jv : Ideal (MvPolynomial (Fin n) Ω) := Ideal.span (Set.range fun t => map φv (G t))
@@ -121,10 +127,10 @@ theorem proof : IncidenceZeroLocus.Statement := by
     (Finset.range (N + 1)).biUnion fun d => (Finset.univ : Finset (Fin n)).finsuppAntidiag d
   have memMf : ∀ m, m ∈ Mf ↔ m.degree ≤ N := fun m => by
     simp [Mf, Finset.mem_finsuppAntidiag, Finsupp.degree_eq_sum, Nat.lt_succ_iff]
-  let c : (S ⊕ Fin k) × Mf → MvPolynomial (Fin n) (MvPolynomial (Fin k × Fin n) F) :=
-    fun p => homogeneousComponent N (monomial (p.2 : Fin n →₀ ℕ) 1 * G p.1)
-  let Mx : Matrix Rows ((S ⊕ Fin k) × Mf) (MvPolynomial (Fin k × Fin n) F) :=
-    fun f p => AddMonoidAlgebra.coeff (c p) (f : Fin n →₀ ℕ)
+  let c : (S ⊕ Fin k) × Mf → MvPolynomial (Fin n) (MvPolynomial (Fin k × Fin n) F) := fun p =>
+    homogeneousComponent N (monomial (p.2 : Fin n →₀ ℕ) 1 * G p.1)
+  let Mx : Matrix Rows ((S ⊕ Fin k) × Mf) (MvPolynomial (Fin k × Fin n) F) := fun f p =>
+    AddMonoidAlgebra.coeff (c p) (f : Fin n →₀ ℕ)
 
   have hspanv : ∀ f : Rows, Pi.single f 1 ∈ Submodule.span Ω (Set.range (Mx.map φv).col) := by
     let π : MvPolynomial (Fin n) Ω →ₗ[Ω] (Rows → Ω) :=
@@ -137,8 +143,8 @@ theorem proof : IncidenceZeroLocus.Statement := by
       ext f
       simp [π, Mx, coeff_map, Matrix.col]
       rfl
-    have hterm : ∀ t (m : Fin n →₀ ℕ),
-        homogeneousComponent N (monomial m (1 : Ω) * map φv (G t)) ∈ W := by
+    have hterm
+        : ∀ t (m : Fin n →₀ ℕ), homogeneousComponent N (monomial m (1 : Ω) * map φv (G t)) ∈ W := by
       intro t m
       by_cases hm : m ∈ Mf
       · refine Submodule.subset_span ⟨(t, ⟨m, hm⟩), ?_⟩
@@ -164,7 +170,9 @@ theorem proof : IncidenceZeroLocus.Statement := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [(a t).as_sum, Finset.sum_mul, map_sum]
       refine Submodule.sum_mem _ fun m _ => ?_
-      have hmon : monomial m (AddMonoidAlgebra.coeff (a t) m) = AddMonoidAlgebra.coeff (a t) m • monomial m (1 : Ω) := by
+      have hmon
+          : monomial m (AddMonoidAlgebra.coeff (a t) m)
+            = AddMonoidAlgebra.coeff (a t) m • monomial m (1 : Ω) := by
         rw [smul_monomial, smul_eq_mul, mul_one]
       rw [hmon, smul_mul_assoc, map_smul]
       exact W.smul_mem _ (hterm t m)
@@ -196,7 +204,9 @@ theorem proof : IncidenceZeroLocus.Statement := by
     obtain ⟨x, hx0, hxQ, hxu⟩ := hu
     let φu : MvPolynomial (Fin k × Fin n) F →+* AlgebraicClosure F :=
       (aeval u : MvPolynomial (Fin k × Fin n) F →ₐ[F] AlgebraicClosure F)
-    have hφu : φu.comp (algebraMap F (MvPolynomial (Fin k × Fin n) F)) = algebraMap F (AlgebraicClosure F) :=
+    have hφu
+        : φu.comp (algebraMap F (MvPolynomial (Fin k × Fin n) F))
+          = algebraMap F (AlgebraicClosure F) :=
       AlgHom.comp_algebraMap _
 
     have hcol : ∀ p, eval₂ φu x (c p) = 0 := by
@@ -206,14 +216,16 @@ theorem proof : IncidenceZeroLocus.Statement := by
           hQ _ (Q.mul_mem_left _ (hSQ q hq)) N
         have h := hxQ _ hqQ
         simp only [c, G, Sum.elim_inl]
-        rw [show monomial m (1 : MvPolynomial (Fin k × Fin n) F) *
-            map (algebraMap F (MvPolynomial (Fin k × Fin n) F)) q =
-            map (algebraMap F (MvPolynomial (Fin k × Fin n) F)) (monomial m 1 * q) by
-          rw [map_mul, map_monomial, map_one (algebraMap F (MvPolynomial (Fin k × Fin n) F))], homogeneousComponent_map, eval₂_map, hφu, ← aeval_def]
+        rw [show monomial m (1 : MvPolynomial (Fin k × Fin n) F)
+                * map (algebraMap F (MvPolynomial (Fin k × Fin n) F)) q
+              = map (algebraMap F (MvPolynomial (Fin k × Fin n) F)) (monomial m 1 * q) by
+            rw [map_mul, map_monomial, map_one (algebraMap F (MvPolynomial (Fin k × Fin n) F))],
+          homogeneousComponent_map, eval₂_map, hφu, ← aeval_def]
         exact h
       · simp only [c, G, Sum.elim_inr]
-        have hh : (monomial m (1 : MvPolynomial (Fin k × Fin n) F) *
-            ∑ j, C (X (i, j)) * X j).IsHomogeneous (m.degree + 1) :=
+        have hh
+            : (monomial m (1 : MvPolynomial (Fin k × Fin n) F)
+              * ∑ j, C (X (i, j)) * X j).IsHomogeneous (m.degree + 1) :=
           (isHomogeneous_monomial _ rfl).mul
             (IsHomogeneous.sum _ _ _ fun j _ => isHomogeneous_C_mul_X _ _)
         rw [homogeneousComponent_of_mem hh]

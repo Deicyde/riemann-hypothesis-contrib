@@ -11,18 +11,21 @@ open MeasureTheory
 
 namespace Formalism.L2.SG.NGCut.SplitEmbedding
 
-theorem box_fundX {ι P : Type} [Fintype P] [DecidableEq P] (h : P → ℕ) (BX : P → (P → ℂ) → (P → ℂ) → ℂ)
-    (hBd : ∀ p (x x' y y' : P → ℂ), (∀ q, h q < h p → x q = x' q ∧ y q = y' q) → BX p x y = BX p x' y')
+theorem box_fundX
+    {ι P : Type} [Fintype P] [DecidableEq P]
+    (h : P → ℕ) (BX : P → (P → ℂ) → (P → ℂ) → ℂ)
+    (hBd
+      : ∀ p (x x' y y' : P → ℂ), (∀ q, h q < h p → x q = x' q ∧ y q = y' q) → BX p x y = BX p x' y')
     (τ : P → (ι → P → ℂ) → (ι → ℂ))
     (hτ : ∀ p (x x' : ι → P → ℂ), (∀ q, h q < h p → ∀ v, x v q = x' v q) → τ p x = τ p x')
-    (A : P → AddSubgroup (ι → ℂ)) (F : P → Set (ι → ℂ)) (hFd : ∀ p (v : ι → ℂ), ∃! a : A p, (a : ι → ℂ) + v ∈ F p)
-    (x : ι → P → ℂ) :
-    ∃! γ : ι → P → ℂ, (∀ p, (fun v => γ v p) - τ p γ ∈ A p) ∧
-      lawX BX γ x ∈ {y : ι → P → ℂ | ∀ p, (fun v => y v p) ∈ F p} := by
+    (A : P → AddSubgroup (ι → ℂ)) (F : P → Set (ι → ℂ))
+    (hFd : ∀ p (v : ι → ℂ), ∃! a : A p, (a : ι → ℂ) + v ∈ F p)
+    (x : ι → P → ℂ)
+    : ∃! γ : ι → P → ℂ, (∀ p, (fun v => γ v p) - τ p γ ∈ A p) ∧
+        lawX BX γ x ∈ {y : ι → P → ℂ | ∀ p, (fun v => y v p) ∈ F p} := by
   classical
   let w : P → (ι → P → ℂ) → (ι → ℂ) := fun p γ => τ p γ + fun v => x v p + BX p (γ v) (x v)
-  let c : P → (ι → P → ℂ) → (ι → ℂ) := fun p γ =>
-    ((hFd p (w p γ)).exists.choose : ι → ℂ) + τ p γ
+  let c : P → (ι → P → ℂ) → (ι → ℂ) := fun p γ => ((hFd p (w p γ)).exists.choose : ι → ℂ) + τ p γ
   have hloc : ∀ p (γ γ' : ι → P → ℂ), (∀ q, h q < h p → ∀ v, γ v q = γ' v q) → c p γ = c p γ' := by
     intro p γ γ' hg
     have h1 : τ p γ = τ p γ' := hτ p γ γ' hg
@@ -32,14 +35,17 @@ theorem box_fundX {ι P : Type} [Fintype P] [DecidableEq P] (h : P → ℕ) (BX 
       congr 1
       funext v
       rw [hBd p (γ v) (γ' v) (x v) (x v) (fun q hq => ⟨hg q hq v, rfl⟩)]
-    have hch : ∀ u u' : ι → ℂ, u = u' →
-        ((hFd p u).exists.choose : ι → ℂ) = ((hFd p u').exists.choose : ι → ℂ) := by
+    have hch
+        : ∀ u u' : ι → ℂ,
+          u = u' → ((hFd p u).exists.choose : ι → ℂ) = ((hFd p u').exists.choose : ι → ℂ) := by
       rintro u _ rfl
       rfl
     show ((hFd p (w p γ)).exists.choose : ι → ℂ) + τ p γ = ((hFd p (w p γ')).exists.choose : ι → ℂ) + τ p γ'
     rw [h1, hch _ _ h2]
-  have key : ∀ p (γ : ι → P → ℂ), ((fun v => γ v p) - τ p γ ∈ A p ∧ (fun v => lawX BX γ x v p) ∈ F p) ↔
-      (fun v => γ v p) = c p γ := by
+  have key
+      : ∀ p (γ : ι → P → ℂ),
+        ((fun v => γ v p) - τ p γ ∈ A p ∧ (fun v => lawX BX γ x v p) ∈ F p)
+          ↔ (fun v => γ v p) = c p γ := by
     intro p γ
     obtain ⟨a, ha, huniq⟩ := hFd p (w p γ)
     have hc : c p γ = (a : ι → ℂ) + τ p γ := by
@@ -71,8 +77,11 @@ theorem box_fundX {ι P : Type} [Fintype P] [DecidableEq P] (h : P → ℕ) (BX 
       rw [hloc p _ _ (fun q hq v => ih γ γ' q (by omega) v)]
   have hN : ∀ p, h p < Finset.univ.sup h + 1 := fun p =>
     Nat.lt_succ_of_le (Finset.le_sup (Finset.mem_univ p))
-  have hcond : ∀ γ : ι → P → ℂ, ((∀ p, (fun v => γ v p) - τ p γ ∈ A p) ∧
-      lawX BX γ x ∈ {y : ι → P → ℂ | ∀ p, (fun v => y v p) ∈ F p}) ↔ Φ γ = γ := by
+  have hcond
+      : ∀ γ : ι → P → ℂ,
+        ((∀ p, (fun v => γ v p) - τ p γ ∈ A p)
+            ∧ lawX BX γ x ∈ {y : ι → P → ℂ | ∀ p, (fun v => y v p) ∈ F p})
+          ↔ Φ γ = γ := by
     intro γ
     rw [Set.mem_setOf_eq, ← forall_and, forall_congr' (fun p => key p γ)]
     constructor
@@ -88,7 +97,9 @@ theorem box_fundX {ι P : Type} [Fintype P] [DecidableEq P] (h : P → ℕ) (BX 
     exact hit _ (Φ 0) 0 p (hN p) v
   · have e1 : Φ^[Finset.univ.sup h + 1] γ = γ := Function.iterate_fixed ((hcond γ).1 hγ) _
     funext v p
-    calc γ v p = (Φ^[Finset.univ.sup h + 1] γ) v p := by rw [e1]
+    calc
+      γ v p
+        = (Φ^[Finset.univ.sup h + 1] γ) v p := by rw [e1]
       _ = _ := hit _ γ 0 p (hN p) v
 
 end Formalism.L2.SG.NGCut.SplitEmbedding

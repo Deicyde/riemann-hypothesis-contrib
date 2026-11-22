@@ -14,8 +14,9 @@ open CategoryTheory AlgebraicGeometry
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem radical_ker_le_ker_of_isReduced {R S : Type*} [CommRing R] [CommRing S] [IsReduced S]
-    (f : R →+* S) : (RingHom.ker f).radical ≤ RingHom.ker f := by
+private theorem radical_ker_le_ker_of_isReduced
+    {R S : Type*} [CommRing R] [CommRing S] [IsReduced S] (f : R →+* S)
+    : (RingHom.ker f).radical ≤ RingHom.ker f := by
   intro x hx
   obtain ⟨n, hn⟩ := hx
   rw [RingHom.mem_ker, map_pow] at hn
@@ -28,10 +29,9 @@ theorem smoothSubschemeIdealIsRadical : SmoothSubschemeIdealIsRadical.{u} := by
     intro x
     have := isDomain_stalk_of_smooth (Z.subschemeι ≫ p) x
     infer_instance
-  have hred : AlgebraicGeometry.IsReduced Z.subscheme :=
-    isReduced_of_isReduced_stalk Z.subscheme
-  have hcomp : ∀ U : Z.subscheme.Opens,
-      _root_.IsReduced ↑(Z.subscheme.presheaf.obj (Opposite.op U)) :=
+  have hred : AlgebraicGeometry.IsReduced Z.subscheme := isReduced_of_isReduced_stalk Z.subscheme
+  have hcomp
+      : ∀ U : Z.subscheme.Opens, _root_.IsReduced ↑(Z.subscheme.presheaf.obj (Opposite.op U)) :=
     fun U => AlgebraicGeometry.IsReduced.component_reduced U
   have hZrad : ∀ U : X.affineOpens, (Z.ideal U).radical ≤ Z.ideal U := by
     intro U

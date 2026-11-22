@@ -24,17 +24,20 @@ theorem sum_coord_smul_coordVec {n : ℕ} (w : V n) : ∑ b, w b • coordVec b 
   ext i
   simp [coordVec, Pi.single_apply]
 
-theorem dOne_comp_holo {n : ℕ} {φ : V n → V n} {c : V n → ℂ} {v : V n}
-    (hc : DifferentiableAt ℝ c (φ v)) (hφ : DifferentiableAt ℂ φ v) :
-    dOne (fun w => c (φ w)) v = pull (fderiv ℂ φ v) (dOne c (φ v)) := by
-  have key (a : Fin n) : del (fun w => c (φ w)) v (coordVec a) =
-      ∑ b, fderiv ℂ φ v (coordVec a) b * del c (φ v) (coordVec b) := by
+theorem dOne_comp_holo
+    {n : ℕ} {φ : V n → V n} {c : V n → ℂ} {v : V n}
+    (hc : DifferentiableAt ℝ c (φ v)) (hφ : DifferentiableAt ℂ φ v)
+    : dOne (fun w => c (φ w)) v = pull (fderiv ℂ φ v) (dOne c (φ v)) := by
+  have key (a : Fin n)
+      : del (fun w => c (φ w)) v (coordVec a)
+        = ∑ b, fderiv ℂ φ v (coordVec a) b * del c (φ v) (coordVec b) := by
     rw [del_comp_holo hc hφ]
     conv_lhs => rw [← sum_coord_smul_coordVec (fderiv ℂ φ v (coordVec a))]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul, smul_eq_mul]
+    simp [map_sum, map_smul, smul_eq_mul]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dOne, map_sum, map_smul, (pull_dz _ _).1, Finset.smul_sum, smul_smul, key, Finset.sum_smul]
+    simp only [dOne, map_sum, map_smul, (pull_dz _ _).1, Finset.smul_sum, smul_smul, key,
+      Finset.sum_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   rw [mul_comm]

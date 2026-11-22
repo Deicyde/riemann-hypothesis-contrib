@@ -11,7 +11,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
 open scoped LaurentSeries
 
 namespace GlobalTheory.PerFlow
@@ -104,8 +106,8 @@ lemma blockEquiv_inl (a : Fin X.p0) : blockEquiv X (.inl a) = Fin.castLE X.p0_le
 lemma blockEquiv_inr (a : Fin (r - X.p0)) : ((blockEquiv X (.inr a) : Fin r) : ℕ) = X.p0 + a := by
   simp [blockEquiv]
 
-def blk (P : Matrix (Fin X.p0) (Fin X.p0) ℂ) (Q : Matrix (Fin (r - X.p0)) (Fin (r - X.p0)) ℂ) :
-    Matrix (Fin r) (Fin r) ℂ :=
+def blk (P : Matrix (Fin X.p0) (Fin X.p0) ℂ) (Q : Matrix (Fin (r - X.p0)) (Fin (r - X.p0)) ℂ)
+    : Matrix (Fin r) (Fin r) ℂ :=
   Matrix.reindex (blockEquiv X) (blockEquiv X) (fromBlocks P 0 0 Q)
 
 lemma blk_mul (P P' : Matrix (Fin X.p0) (Fin X.p0) ℂ)
@@ -181,9 +183,29 @@ lemma block_change (x : Frame X.Ψ r) (hx : x ∈ X.dom)
 
 end aux
 
-theorem perFr_flow_block : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r), (∀ ξ, herm X.Gm ξ ξ = 0 → ∀ (s : X.Ψ → ℂ), ∀ x ∈ X.dom, ∀ (v : Fin r → E) (τ : X.Ψ) (i : ℕ), perFr X (X.flow ξ s x) v τ.1 i = perFr X x v τ.1 i - s τ * τ.1 (X.κ0 * herm X.Gm v ξ) * perFr X x ξ τ.1 i ∧ (i < X.p0 → perFr X (X.flow ξ s x) v (conjEmb τ.1) i = perFr X x v (conjEmb τ.1) i - s τ * conjEmb τ.1 (X.κ0 * herm X.Gm v ξ) * perFr X x ξ (conjEmb τ.1) i)) ∧ ∀ x ∈ X.dom, ∀ (A : X.Ψ → Matrix (Fin (r - X.p0)) (Fin (r - X.p0)) ℂ) (B : X.Ψ → Matrix (Fin X.p0) (Fin X.p0) ℂ), (∀ τ, (A τ).det ≠ 0) → (∀ τ, (B τ).det ≠ 0) → ∃ x' ∈ X.dom, ∀ (v : Fin r → E) (τ : X.Ψ), (∀ i : Fin (r - X.p0), perFr X x' v τ.1 i = ∑ k, A τ i k * perFr X x v τ.1 k) ∧ ∀ i : Fin X.p0, perFr X x' v (conjEmb τ.1) i = ∑ k, B τ i k * perFr X x v (conjEmb τ.1) k := by
+theorem perFr_flow_block
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      (∀ ξ,
+          herm X.Gm ξ ξ = 0
+            → ∀ (s : X.Ψ → ℂ), ∀ x ∈ X.dom, ∀ (v : Fin r → E) (τ : X.Ψ) (i : ℕ),
+              perFr X (X.flow ξ s x) v τ.1 i
+                  = perFr X x v τ.1 i - s τ * τ.1 (X.κ0 * herm X.Gm v ξ) * perFr X x ξ τ.1 i
+                ∧ (i < X.p0
+                  → perFr X (X.flow ξ s x) v (conjEmb τ.1) i
+                    = perFr X x v (conjEmb τ.1) i
+                      - s τ * conjEmb τ.1 (X.κ0 * herm X.Gm v ξ) * perFr X x ξ (conjEmb τ.1) i))
+        ∧ ∀ x ∈ X.dom,
+          ∀ (A : X.Ψ → Matrix (Fin (r - X.p0)) (Fin (r - X.p0)) ℂ)
+              (B : X.Ψ → Matrix (Fin X.p0) (Fin X.p0) ℂ),
+            (∀ τ, (A τ).det ≠ 0) → (∀ τ, (B τ).det ≠ 0)
+              → ∃ x' ∈ X.dom, ∀ (v : Fin r → E) (τ : X.Ψ),
+                (∀ i : Fin (r - X.p0), perFr X x' v τ.1 i = ∑ k, A τ i k * perFr X x v τ.1 k)
+                  ∧ ∀ i : Fin X.p0,
+                    perFr X x' v (conjEmb τ.1) i = ∑ k, B τ i k * perFr X x v (conjEmb τ.1) k := by
   intro E _ _ _ r X
-  exact ⟨fun ξ hξ s x _ v τ i => ⟨flow_mem X hξ s x v τ i, flow_conj X ξ s x v τ i⟩,
-    fun x hx A B hA hB => block_change X x hx A B hA hB⟩
+  exact ⟨
+    fun ξ hξ s x _ v τ i => ⟨flow_mem X hξ s x v τ i, flow_conj X ξ s x v τ i⟩,
+    fun x hx A B hA hB => block_change X x hx A B hA hB
+  ⟩
 
 end GlobalTheory.PerFlow

@@ -5,14 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.I.cosetSpan :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G], Lgrp G → ∀ a ∈ SB G, ∀ N ∈ 𝓝 (1 : G),
-      ∃ (U : Subgroup G) (s : Finset G) (c : G → ℂ), IsOpen (U : Set G) ∧ IsCompact (U : Set G) ∧ (U : Set G) ⊆ N ∧
-        ∀ x, a x = ∑ g ∈ s, c g * ind U (g⁻¹ * x) := by
+theorem UpperTheory.ConvolutionTheory.R2.I.cosetSpan
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G],
+      Lgrp G
+        → ∀ a ∈ SB G, ∀ N ∈ 𝓝 (1 : G), ∃ (U : Subgroup G) (s : Finset G) (c : G → ℂ),
+          IsOpen (U : Set G) ∧ IsCompact (U : Set G) ∧ (U : Set G) ⊆ N
+            ∧ ∀ x, a x = ∑ g ∈ s, c g * ind U (g⁻¹ * x) := by
   intro G _ _ _ _ hL a ha N hN
   have hlc : IsLocallyConstant a := (GroundTheory.LocalField.mem_schwartzBruhat.1 ha).1
   have hcs : HasCompactSupport a := (GroundTheory.LocalField.mem_schwartzBruhat.1 ha).2
@@ -23,8 +28,7 @@ theorem UpperTheory.ConvolutionTheory.R2.I.cosetSpan :
     have hev := (IsLocallyConstant.iff_eventually_eq a).1 hlc
     have e1 : ∀ᶠ q : G × G in 𝓝 p, a (q.1 * q.2) = a (p.1 * p.2) :=
       ((continuous_fst.mul continuous_snd).tendsto p).eventually (hev (p.1 * p.2))
-    have e2 : ∀ᶠ q : G × G in 𝓝 p, a q.1 = a p.1 :=
-      (continuous_fst.tendsto p).eventually (hev p.1)
+    have e2 : ∀ᶠ q : G × G in 𝓝 p, a q.1 = a p.1 := (continuous_fst.tendsto p).eventually (hev p.1)
     filter_upwards [e1, e2] with q h1 h2
     show a (q.1 * q.2) = a q.1
     rw [h1, h2]
@@ -49,14 +53,14 @@ theorem UpperTheory.ConvolutionTheory.R2.I.cosetSpan :
       rw [mul_inv_cancel_right] at h
       exact h.symm
     · rw [image_eq_zero_of_notMem_tsupport hxu, image_eq_zero_of_notMem_tsupport hx]
-  obtain ⟨t, -, ht⟩ := hK.elim_nhds_subcover (fun x => {y : G | x⁻¹ * y ∈ U}) (by
-    intro x _
-    have ho : IsOpen {y : G | x⁻¹ * y ∈ U} :=
-      hUo.preimage (continuous_const.mul continuous_id)
-    refine ho.mem_nhds ?_
-    show x⁻¹ * x ∈ U
-    rw [inv_mul_cancel]
-    exact U.one_mem)
+  obtain ⟨t, -, ht⟩ :=
+    hK.elim_nhds_subcover (fun x => {y : G | x⁻¹ * y ∈ U}) (by
+      intro x _
+      have ho : IsOpen {y : G | x⁻¹ * y ∈ U} := hUo.preimage (continuous_const.mul continuous_id)
+      refine ho.mem_nhds ?_
+      show x⁻¹ * x ∈ U
+      rw [inv_mul_cancel]
+      exact U.one_mem)
   let r : G → G := fun x => Quotient.out (QuotientGroup.mk x : G ⧸ U)
   have hr : ∀ x, (r x)⁻¹ * x ∈ U := fun x => QuotientGroup.eq.1 (QuotientGroup.out_eq' _)
   have h1 : ∀ y ∈ U, ind U y = 1 := fun y hy => by simp [ind, hy]

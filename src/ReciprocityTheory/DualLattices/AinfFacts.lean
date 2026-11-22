@@ -13,9 +13,11 @@ namespace ReciprocityTheory.PGsh
 
 namespace Ainf
 
-variable (p : ℕ) [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-  {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-  [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable
+  (p : ℕ) [hp : Fact p.Prime]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal}
+  (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 abbrev A := WittVector p (PreTilt O p)
 
@@ -106,8 +108,9 @@ lemma local_of_surj_sq {S T : Type} [CommRing S] [CommRing T] [IsLocalRing T] (f
   · exact Or.inl (key x h)
   · exact Or.inr (key (1 - x) (by rwa [map_sub, map_one]))
 
-variable (hv : v.Integers O) (ε : PreTilt O p)
-  (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+variable
+  (hv : v.Integers O)
+  (ε : PreTilt O p) (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
 include hv hε
 
 lemma ker_theta : RingHom.ker (fontaineTheta O p) = span {xi p O ε} := by

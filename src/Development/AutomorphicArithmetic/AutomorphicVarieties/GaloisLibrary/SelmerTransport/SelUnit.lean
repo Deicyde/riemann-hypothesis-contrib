@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-private theorem relIndex_inf_dvd {G : Type} [Group G] (U' U D : Subgroup G) [U'.Normal] :
-    (U' ⊓ D).relIndex (U ⊓ D) ∣ U'.relIndex U := by
+private theorem relIndex_inf_dvd {G : Type} [Group G] (U' U D : Subgroup G) [U'.Normal]
+    : (U' ⊓ D).relIndex (U ⊓ D) ∣ U'.relIndex U := by
   have e : (U' ⊓ D).relIndex (U ⊓ D) = U'.relIndex (U ⊓ D) := by
     unfold Subgroup.relIndex
     congr 1
@@ -22,16 +22,24 @@ private theorem relIndex_inf_dvd {G : Type} [Group G] (U' U D : Subgroup G) [U'.
   rw [k, k]
   exact Subgroup.card_dvd_of_le (Subgroup.map_mono inf_le_left)
 
-private theorem eq_zero_of_nsmul {R N : Type} [CommRing R] [AddCommGroup N] [Module R N] {n : ℕ}
-    (hn : IsUnit (n : R)) {x : N} (hx : n • x = 0) : x = 0 := by
+private theorem eq_zero_of_nsmul
+    {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
+    {n : ℕ} (hn : IsUnit (n : R))
+    {x : N} (hx : n • x = 0)
+    : x = 0 := by
   rw [← Nat.cast_smul_eq_nsmul R] at hx
   exact (hn.smul_eq_zero).1 hx
 
-theorem UpperTheory.V.Base.selUnit :
-    ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]
-      [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [DiscreteTopology M] (ρ : Representation R G M), ContAction ρ → ∀ (U' U : Subgroup G) [U'.Normal] (h : U' ≤ U), IsOpen (U'.subgroupOf U : Set U) →
-      IsUnit (U'.relIndex U : R) → ∀ (𝒟 : Set (Subgroup G)) (h𝒟 : ConjStable 𝒟),
-      Function.Injective (selRes ρ h 𝒟) ∧ LinearMap.range (selRes ρ h 𝒟) = selEig ρ U' h𝒟 U 1 := by
+theorem UpperTheory.V.Base.selUnit
+    : ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+        [ContinuousConstSMul R M] [DiscreteTopology M] (ρ : Representation R G M),
+      ContAction ρ
+        → ∀ (U' U : Subgroup G) [U'.Normal] (h : U' ≤ U),
+          IsOpen (U'.subgroupOf U : Set U) → IsUnit (U'.relIndex U : R)
+            → ∀ (𝒟 : Set (Subgroup G)) (h𝒟 : ConjStable 𝒟),
+              Function.Injective (selRes ρ h 𝒟)
+                ∧ LinearMap.range (selRes ρ h 𝒟) = selEig ρ U' h𝒟 U 1 := by
   intro R G M _ _ _ _ _ _ _ _ _ _ ρ hρ U' U _ h hop hu 𝒟 h𝒟
   refine ⟨?_, ?_⟩
   · rw [injective_iff_map_eq_zero]

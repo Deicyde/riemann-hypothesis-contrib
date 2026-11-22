@@ -15,9 +15,11 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-private theorem degreeZeroWeightsBounded_ellOf {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-    [CharZero K] [FiniteDimensional K V] {E : GLOps n K V} (hE : IsGLRep E) :
-    DegreeZeroWeightsBounded E (ellOf E (⊤ : Submodule K V)) := by
+private theorem degreeZeroWeightsBounded_ellOf
+    {n : ℕ} {K V : Type*}
+    [Field K] [AddCommGroup V] [Module K V] [CharZero K] [FiniteDimensional K V]
+    {E : GLOps n K V} (hE : IsGLRep E)
+    : DegreeZeroWeightsBounded E (ellOf E (⊤ : Submodule K V)) := by
   intro ν hsum hne a
   have hsplit : ν a + ∑ i ∈ Finset.univ.erase a, ν i = 0 := by
     rw [Finset.add_sum_erase _ _ (Finset.mem_univ a)]; exact hsum
@@ -47,15 +49,20 @@ private theorem degreeZeroWeightsBounded_ellOf {n : ℕ} {K V : Type*} [Field K]
       have := weight_difference_le_ell_of_rep hE ν hne a b hab (by linarith)
       linarith
 
-private theorem degreeZeroWeightsBounded_linf {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-    [CharZero K] [FiniteDimensional K V] {E : GLOps n K V} (hE : IsGLRep E) :
-    DegreeZeroWeightsBounded E (linf E (⊤ : Submodule K V)) := by
+private theorem degreeZeroWeightsBounded_linf
+    {n : ℕ} {K V : Type*}
+    [Field K] [AddCommGroup V] [Module K V] [CharZero K] [FiniteDimensional K V]
+    {E : GLOps n K V} (hE : IsGLRep E)
+    : DegreeZeroWeightsBounded E (linf E (⊤ : Submodule K V)) := by
   intro ν hsum hne a
-  have hmem : (ν a).natAbs ∈ {k | ∃ nu ∈ wtsOf E (⊤ : Submodule K V), (∑ b, nu b = 0) ∧
-      ∃ b, k = (nu b).natAbs} :=
+  have hmem
+      : (ν a).natAbs
+        ∈ {k | ∃ nu ∈ wtsOf E (⊤ : Submodule K V), (∑ b, nu b = 0) ∧
+          ∃ b, k = (nu b).natAbs} :=
     ⟨ν, by simpa [wtsOf] using hne, hsum, a, rfl⟩
-  have hbdd : BddAbove {k | ∃ nu ∈ wtsOf E (⊤ : Submodule K V), (∑ b, nu b = 0) ∧
-      ∃ b, k = (nu b).natAbs} := by
+  have hbdd : BddAbove
+      {k | ∃ nu ∈ wtsOf E (⊤ : Submodule K V), (∑ b, nu b = 0) ∧
+        ∃ b, k = (nu b).natAbs} := by
     refine ⟨ellOf E (⊤ : Submodule K V), ?_⟩
     rintro k ⟨nu, hnu, hs, b, rfl⟩
     have hne' : weightSp E nu ≠ ⊥ := by simpa [wtsOf] using hnu
@@ -68,20 +75,26 @@ private theorem degreeZeroWeightsBounded_linf {n : ℕ} {K V : Type*} [Field K] 
   rw [Int.abs_eq_natAbs]
   exact_mod_cast hle
 
-theorem linf_lemma_without_projector (D : Formalism.BasicNotions.D7) (h2 : adm2 D) : InvariantDenominatorLinftyBound := by
+theorem linf_lemma_without_projector (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    : InvariantDenominatorLinftyBound := by
   intro p n' O _ _ _ S hG n V _ _ _ _ _ E hE M hM hMQ Inv hInv x hx
   haveI : CharZero (KK O) := dvr_fraction_field_charZero_prime S hG.prime
   rw [hMQ]
   exact invariant_projection_denominator_bound D h2 p O n V E hE M hM.1 Inv hInv _ _
-    (fun c u hu0 hu => extremal_projector_properties hE c _ (degreeZeroWeightsBounded_linf hE) u hu0 hu)
-    (fun c y hy => extremalProjector_denominator_bound S hG.prime hE hM.1 c _ y hy) x hx
+    (fun c u hu0 hu =>
+      extremal_projector_properties hE c _ (degreeZeroWeightsBounded_linf hE) u hu0 hu)
+    (fun c y hy => extremalProjector_denominator_bound S hG.prime hE hM.1 c _ y hy)
+    x hx
 
-theorem denominator_lemma_without_projector (D : Formalism.BasicNotions.D7) (h2 : adm2 D) : InvariantProjectionDenominator := by
+theorem denominator_lemma_without_projector (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    : InvariantProjectionDenominator := by
   intro p n' O _ _ _ S hG n V _ _ _ _ _ E hE M hM hMQ Inv hInv x hx
   haveI : CharZero (KK O) := dvr_fraction_field_charZero_prime S hG.prime
   rw [hMQ]
   exact invariant_projection_denominator_bound D h2 p O n V E hE M hM.1 Inv hInv _ _
-    (fun c u hu0 hu => extremal_projector_properties hE c _ (degreeZeroWeightsBounded_ellOf hE) u hu0 hu)
-    (fun c y hy => extremalProjector_denominator_bound S hG.prime hE hM.1 c _ y hy) x hx
+    (fun c u hu0 hu =>
+      extremal_projector_properties hE c _ (degreeZeroWeightsBounded_ellOf hE) u hu0 hu)
+    (fun c y hy => extremalProjector_denominator_bound S hG.prime hE hM.1 c _ y hy)
+    x hx
 
 end Formalism.MainNotions.G.GLWeightTheory

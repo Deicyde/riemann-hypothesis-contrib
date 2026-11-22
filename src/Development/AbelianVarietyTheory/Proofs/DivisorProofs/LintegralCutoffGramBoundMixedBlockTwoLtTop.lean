@@ -14,8 +14,9 @@ theorem lintegral_hB_one_two_lt_top : ∫⁻ w : Low 2 → ℂ, hB 1 w < ⊤ := 
   have hg : ∀ w : Low 2 → ℂ, gB 1 w = 1 := by
     intro w
     simp [gB, colGram, lminor]
-  have hset : {w : Low 2 → ℂ | ∀ p : Low 2, (p.1.2 : ℕ) < 1 → 1 ≤ (p.1.1 : ℕ) → ‖w p‖ ≤ 1}
-      = Metric.closedBall (0 : Low 2 → ℂ) 1 := by
+  have hset
+      : {w : Low 2 → ℂ | ∀ p : Low 2, (p.1.2 : ℕ) < 1 → 1 ≤ (p.1.1 : ℕ) → ‖w p‖ ≤ 1}
+        = Metric.closedBall (0 : Low 2 → ℂ) 1 := by
     ext w
     simp only [Set.mem_setOf_eq, mem_closedBall_zero_iff]
     rw [pi_norm_le_iff_of_nonneg zero_le_one]

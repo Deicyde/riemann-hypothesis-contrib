@@ -20,12 +20,13 @@ section Alg
 
 variable {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
 
-theorem split_prime {e a t t' : A} (ht : t' * t = 1) {y f : M} (hy : e • y = y) :
-    y = e • (y - a • f) + (a * (e * t')) • (t • f) := by
+theorem split_prime {e a t t' : A} (ht : t' * t = 1) {y f : M} (hy : e • y = y)
+    : y = e • (y - a • f) + (a * (e * t')) • (t • f) := by
   have key : a * (e * t') * t = e * a := by linear_combination (a * e) * ht
   rw [smul_sub, hy, smul_smul, smul_smul, key, sub_add_cancel]
 
-theorem mem_of_mul_sub (S : Subring A) {b h t : A} (hb : b ∈ S) (h1 : b * h ∈ S) (h2 : h - t ∈ S) : b * t ∈ S := by
+theorem mem_of_mul_sub (S : Subring A) {b h t : A} (hb : b ∈ S) (h1 : b * h ∈ S) (h2 : h - t ∈ S)
+    : b * t ∈ S := by
   have hd := S.sub_mem h1 (S.mul_mem hb h2)
   rwa [mul_sub, sub_sub_cancel] at hd
 
@@ -33,8 +34,7 @@ theorem mem_of_sub (S : Subring A) {a b : A} (ha : a ∈ S) (h : a - b ∈ S) : 
   have hd := S.sub_mem ha h
   rwa [sub_sub_cancel] at hd
 
-theorem idem_smul_smul {e : A} (he : e * e = e) (x : M) : e • e • x = e • x := by
-  rw [smul_smul, he]
+theorem idem_smul_smul {e : A} (he : e * e = e) (x : M) : e • e • x = e • x := by rw [smul_smul, he]
 
 end Alg
 
@@ -48,20 +48,21 @@ theorem cjA_inc_inv (u : D.what₂.Word) : cjA D (inc D (Tu D u)⁻¹) = inc D (
   congr 1
   simp [Tu, star_inv₀]
 
-theorem hA_idem {X : HSp D} {e : EAf D} {y : Fin X.rank → EAf D} (hy : cjA D e • y = y) (x : Fin X.rank → EAf D) :
-    hA X x y = hA X (e • x) y := by
+theorem hA_idem
+    {X : HSp D} {e : EAf D} {y : Fin X.rank → EAf D} (hy : cjA D e • y = y) (x : Fin X.rank → EAf D)
+    : hA X x y = hA X (e • x) y := by
   conv_lhs => rw [← hy]
   rw [hA_smul_right, hA_smul_left, cjA_cjA]
 
-theorem isBasePair_of_isGlueVec (D : D7) (u : D.what₂.Word) (π : 𝓞 D.host.E) (hπ : IsPi u π) (X : HSp D) (L₀ : Lat X)
-    (f : Fin X.rank → EAf D) (hL : Submodule.IsFullLattice D.host.E L₀) (hf : IsGlueVec X u L₀ f) :
-    IsBasePair X u π L₀ fun w => idem w • f := by
+theorem isBasePair_of_isGlueVec
+    (D : D7) (u : D.what₂.Word) (π : 𝓞 D.host.E) (hπ : IsPi u π) (X : HSp D) (L₀ : Lat X)
+    (f : Fin X.rank → EAf D) (hL : Submodule.IsFullLattice D.host.E L₀) (hf : IsGlueVec X u L₀ f)
+    : IsBasePair X u π L₀ fun w => idem w • f := by
   have ht : inc D (Tu D u)⁻¹ * inc D (Tu D u) = 1 := inc_inv_mul u
   have := hL
   unfold IsBasePair
   refine ⟨by infer_instance, fun w e he hT y => ?_, fun w e he hπw => ?_⟩
-  ·
-    obtain rfl := eq_idem he
+  · obtain rfl := eq_idem he
     have hinv : idem w * inc D (Tu D u)⁻¹ ∈ OA D := (idem_mul_inv_mem_iff u w).2 hT
     simp only [InCmp]
     constructor
@@ -71,9 +72,9 @@ theorem isBasePair_of_isGlueVec (D : D7) (u : D.what₂.Word) (π : 𝓞 D.host.
       obtain ⟨a, ha, hya⟩ := hf.dual y ((mem_hat_dualL_iff hL y).1 hy)
       refine ⟨?_, hey⟩
       rw [split_prime (a := a) (f := f) ht hey]
-      exact add_mem_hat (smul_mem_hat (idem_mem w) hya) (smul_mem_hat ((OA D).mul_mem ha hinv) hf.mul_mem)
-  ·
-    obtain rfl := eq_idem he
+      exact add_mem_hat (smul_mem_hat (idem_mem w) hya)
+        (smul_mem_hat ((OA D).mul_mem ha hinv) hf.mul_mem)
+  · obtain rfl := eq_idem he
     have hTw : (((D.mem u).A.T : ℕ) : 𝓞 D.host.E) ∈ w.asIdeal := by
       rw [← pi_mul_cO hπ]
       exact w.asIdeal.mul_mem_right _ hπw
@@ -83,8 +84,7 @@ theorem isBasePair_of_isGlueVec (D : D7) (u : D.what₂.Word) (π : 𝓞 D.host.
     · show inc D (Tu D u) • (idem w • f) ∈ hat L₀
       rw [smul_smul, mul_comm, ← smul_smul]
       exact smul_mem_hat (idem_mem w) hf.mul_mem
-    ·
-      intro hmem
+    · intro hmem
       apply hnot
       refine mem_of_mul_sub (OA D) (idem_mem w) ?_ hff
       rw [← hA_smul_left, ← cjA_hA]

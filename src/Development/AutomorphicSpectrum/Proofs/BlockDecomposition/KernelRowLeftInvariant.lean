@@ -16,31 +16,42 @@ open PositivityTheory.RgBcC PositivityTheory.RgBcC.Fc
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def unitaryUnit {n : ℕ} (k : Matrix.unitaryGroup (Fin n) ℂ) : G n :=
-  ⟨k.1, (k⁻¹).1,
-    by have h : (k * k⁻¹).1 = 1 := by rw [mul_inv_cancel]; rfl
-       exact h,
-    by have h : (k⁻¹ * k).1 = 1 := by rw [inv_mul_cancel]; rfl
-       exact h⟩
+def unitaryUnit {n : ℕ} (k : Matrix.unitaryGroup (Fin n) ℂ) : G n := ⟨
+  k.1,
+  (k⁻¹).1,
+  by
+    have h : (k * k⁻¹).1 = 1 := by rw [mul_inv_cancel]; rfl
+    exact h,
+  by
+    have h : (k⁻¹ * k).1 = 1 := by rw [inv_mul_cancel]; rfl
+    exact h
+⟩
 
-theorem unitaryUnit_inv_val {n : ℕ} (k : Matrix.unitaryGroup (Fin n) ℂ) :
-    ((unitaryUnit k)⁻¹ : G n).val = (k⁻¹).1 := rfl
+theorem unitaryUnit_inv_val {n : ℕ} (k : Matrix.unitaryGroup (Fin n) ℂ)
+    : ((unitaryUnit k)⁻¹ : G n).val = (k⁻¹).1 :=
+  rfl
 
-theorem inner_cls {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) {V : Type} [NormedAddCommGroup V]
-    [InnerProductSpace ℂ V] (f g : Mat n → V) (hf : MemLp (fun y : G n => f y.val) 2 μ)
-    (hg : MemLp (fun y : G n => g y.val) 2 μ) :
-    ⟪cls μ f, cls μ g⟫_ℂ = ∫ y : G n, ⟪f y.val, g y.val⟫_ℂ ∂μ := by
+theorem inner_cls
+    {n : ℕ} [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (f g : Mat n → V)
+    (hf : MemLp (fun y : G n => f y.val) 2 μ) (hg : MemLp (fun y : G n => g y.val) 2 μ)
+    : ⟪cls μ f, cls μ g⟫_ℂ = ∫ y : G n, ⟪f y.val, g y.val⟫_ℂ ∂μ := by
   unfold cls
   rw [dite_eq_left hf, dite_eq_left hg, L2.inner_def]
   refine integral_congr_ae ?_
   filter_upwards [hf.coeFn_toLp, hg.coeFn_toLp] with y h1 h2
   rw [h1, h2]
 
-theorem inner_cls_lTr {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
-    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] (x : G n) (f g : Mat n → V)
+theorem inner_cls_lTr
+    {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (x : G n) (f g : Mat n → V)
     (hf : MemLp (fun y : G n => f y.val) 2 μ) (hf' : MemLp (fun y : G n => lTr x f y.val) 2 μ)
-    (hg : MemLp (fun y : G n => g y.val) 2 μ) (hg' : MemLp (fun y : G n => lTr x⁻¹ g y.val) 2 μ) :
-    ⟪cls μ (lTr x f), cls μ g⟫_ℂ = ⟪cls μ f, cls μ (lTr x⁻¹ g)⟫_ℂ := by
+    (hg : MemLp (fun y : G n => g y.val) 2 μ) (hg' : MemLp (fun y : G n => lTr x⁻¹ g y.val) 2 μ)
+    : ⟪cls μ (lTr x f), cls μ g⟫_ℂ = ⟪cls μ f, cls μ (lTr x⁻¹ g)⟫_ℂ := by
   rw [inner_cls μ _ _ hf' hg, inner_cls μ _ _ hf hg',
     ← integral_mul_left_eq_self (μ := μ) (fun y : G n => ⟪f y.val, lTr x⁻¹ g y.val⟫_ℂ) x]
   refine integral_congr_ae (Eventually.of_forall fun y => ?_)
@@ -48,7 +59,8 @@ theorem inner_cls_lTr {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)] (μ :
     rw [← Units.val_mul, ← Units.val_mul, inv_mul_cancel_left]
   simp only [lTr, Units.val_mul, h]
 
-theorem isSec_lTr {n : ℕ} {E : KMod n} (x : G n) {f : Mat n → E.V} (hf : IsSec E f) : IsSec E (lTr x f) := by
+theorem isSec_lTr {n : ℕ} {E : KMod n} (x : G n) {f : Mat n → E.V} (hf : IsSec E f)
+    : IsSec E (lTr x f) := by
   intro g hg k
   have hxg : x.val * g ∈ GLs n := by
     simp only [GLs, Set.mem_setOf_eq, Matrix.det_mul] at hg ⊢
@@ -56,8 +68,8 @@ theorem isSec_lTr {n : ℕ} {E : KMod n} (x : G n) {f : Mat n → E.V} (hf : IsS
   have := hf _ hxg k
   simpa only [lTr, mul_assoc] using this
 
-theorem inner_rho {n : ℕ} (E : KMod n) (k : Matrix.unitaryGroup (Fin n) ℂ) (v w : E.V) :
-    ⟪v, E.ρ k w⟫_ℂ = ⟪E.ρ k⁻¹ v, w⟫_ℂ := by
+theorem inner_rho {n : ℕ} (E : KMod n) (k : Matrix.unitaryGroup (Fin n) ℂ) (v w : E.V)
+    : ⟪v, E.ρ k w⟫_ℂ = ⟪E.ρ k⁻¹ v, w⟫_ℂ := by
   have hI : ∀ a b : E.V, ⟪E.ρ k a, E.ρ k b⟫_ℂ = ⟪a, b⟫_ℂ := fun a b =>
     LinearIsometry.inner_map_map (⟨(E.ρ k : E.V →ₗ[ℂ] E.V), E.iso k⟩ : E.V →ₗᵢ[ℂ] E.V) a b
   have h1 : E.ρ k (E.ρ k⁻¹ v) = v := by
@@ -67,8 +79,7 @@ theorem inner_rho {n : ℕ} (E : KMod n) (k : Matrix.unitaryGroup (Fin n) ℂ) (
     simpa using h2.symm
   rw [← hI (E.ρ k⁻¹ v) w, h1]
 
-theorem one_mem_GLs (n : ℕ) : (1 : Mat n) ∈ GLs n := by
-  simp [GLs]
+theorem one_mem_GLs (n : ℕ) : (1 : Mat n) ∈ GLs n := by simp [GLs]
 
 theorem rowLeft (hLS : LtSob) (hLC : LtComm) : RowLeft := by
   intro n _ _ μ _ E _ Ω T F c hStd h A hR hRow k y hy v
@@ -89,7 +100,8 @@ theorem rowLeft (hLS : LtSob) (hLC : LtComm) : RowLeft := by
   have hbS : Sob μ b := hrowb.1
   have haS : Sob μ a := (hLt x r hrS).1
   have haSec : IsSec E a := isSec_lTr x hrow.2.1
-  have hkey : ∀ ψ : Mat n → E.V, Sob μ ψ → IsSec E ψ → ⟪cls μ a, cls μ ψ⟫_ℂ = ⟪cls μ b, cls μ ψ⟫_ℂ := by
+  have hkey
+      : ∀ ψ : Mat n → E.V, Sob μ ψ → IsSec E ψ → ⟪cls μ a, cls μ ψ⟫_ℂ = ⟪cls μ b, cls μ ψ⟫_ℂ := by
     intro ψ hψ hψs
     obtain ⟨ψ', hψ'S, hψ's, hψ'c, -⟩ := hC (cls μ ψ) (subset_closure ⟨ψ, hψ, hψs, rfl⟩)
     have hlψ := (hLt x⁻¹ ψ hψ).1
@@ -117,10 +129,10 @@ theorem rowLeft (hLS : LtSob) (hLC : LtComm) : RowLeft := by
   have hz := hkey ψ hψS hψs
   have hzero : cls μ a - cls μ b = 0 := by
     rw [hcψ] at hz
-    have : ⟪cls μ a - cls μ b, cls μ a - cls μ b⟫_ℂ = 0 := by
-      rw [inner_sub_left, hz, sub_self]
+    have : ⟪cls μ a - cls μ b, cls μ a - cls μ b⟫_ℂ = 0 := by rw [inner_sub_left, hz, sub_self]
     exact inner_self_eq_zero.mp this
-  have hfin := hCF.1 a b haS.1.continuousOn hbS.1.continuousOn (hL2 haS) (hL2 hbS) (sub_eq_zero.mp hzero) y hy
+  have hfin :=
+    hCF.1 a b haS.1.continuousOn hbS.1.continuousOn (hL2 haS) (hL2 hbS) (sub_eq_zero.mp hzero) y hy
   exact hfin
 
 end GlobalTheory.CompanionTheory.KerFc

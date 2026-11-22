@@ -13,8 +13,12 @@ private theorem sg_one (R : Type) [CommRing R] : sg R 1 = -1 := by
   show (-1 : R) ^ (1 : ZMod 2).val = -1
   rw [show (1 : ZMod 2).val = 1 from rfl, pow_one]
 
-theorem UpperTheory.V.Fr.ep_ee :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ}, F.Ok C₀ → ∀ S : Space O F 3, ∀ (x : Ideal S.A) (L : S.Loc x), S.u.ee ≤ x → ∀ σ, L.IsInv σ → L.ρ.ee = Ideal.span (evp σ 1 : Set L.R) := by
+theorem UpperTheory.V.Fr.ep_ee
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ},
+      F.Ok C₀
+        → ∀ S : Space O F 3, ∀ (x : Ideal S.A) (L : S.Loc x),
+          S.u.ee ≤ x → ∀ σ, L.IsInv σ → L.ρ.ee = Ideal.span (evp σ 1 : Set L.R) := by
   intro l _ O _ _ _ _ F C₀ hF S x L hx σ hσ
   have hl : l ≠ 2 := hF.l_odd
   have h2O : IsUnit (2 : L.O') := by
@@ -66,8 +70,9 @@ theorem UpperTheory.V.Fr.ep_ee :
       Ideal.Quotient.nontrivial_iff.mpr (ne_top_of_le_ne_top (maximalIdeal.isMaximal L.R).ne_top hIm)
     haveI : IsCO L.O' (L.R ⧸ L.ρ.ee) :=
       co_quot L.O' L.R _ (Ideal.Quotient.mkₐ L.O' L.ρ.ee) (Ideal.Quotient.mkₐ_surjective _ _)
-    have key' : ∀ z (hz : z ∈ Algebra.adjoin O ((S.B : Set S.R) ∪ {x | ∃ g i j, x = S.ρ.r g i j})),
-        Ideal.Quotient.mk L.ρ.ee (σ (L.ι ⟨z, hz⟩)) = Ideal.Quotient.mk L.ρ.ee (L.ι ⟨z, hz⟩) := by
+    have key'
+        : ∀ z (hz : z ∈ Algebra.adjoin O ((S.B : Set S.R) ∪ {x | ∃ g i j, x = S.ρ.r g i j})),
+          Ideal.Quotient.mk L.ρ.ee (σ (L.ι ⟨z, hz⟩)) = Ideal.Quotient.mk L.ρ.ee (L.ι ⟨z, hz⟩) := by
       intro z hz
       induction hz using Algebra.adjoin_induction with
       | mem z hz =>
@@ -99,15 +104,20 @@ theorem UpperTheory.V.Fr.ep_ee :
       | mul a b ha hb iha ihb =>
         show Ideal.Quotient.mk _ (σ (L.ι (⟨a, ha⟩ * ⟨b, hb⟩))) = Ideal.Quotient.mk _ (L.ι (⟨a, ha⟩ * ⟨b, hb⟩))
         simp only [map_mul, iha, ihb]
-    have huniq := L.univ (L.R ⧸ L.ρ.ee) ((Ideal.Quotient.mkₐ O L.ρ.ee).comp L.ι) (fun a => by
-      show res L.O' _ (Ideal.Quotient.mkₐ L.O' L.ρ.ee (L.ι a)) = _
-      exact res_map _ _)
-    have h1 : ∀ a : S.A, ((Ideal.Quotient.mkₐ L.O' L.ρ.ee).comp σ) (L.ι a) =
-        ((Ideal.Quotient.mkₐ O L.ρ.ee).comp L.ι) a := by
+    have huniq :=
+      L.univ (L.R ⧸ L.ρ.ee) ((Ideal.Quotient.mkₐ O L.ρ.ee).comp L.ι) (fun a => by
+        show res L.O' _ (Ideal.Quotient.mkₐ L.O' L.ρ.ee (L.ι a)) = _
+        exact res_map _ _)
+    have h1
+        : ∀ a : S.A,
+          ((Ideal.Quotient.mkₐ L.O' L.ρ.ee).comp σ) (L.ι a)
+            = ((Ideal.Quotient.mkₐ O L.ρ.ee).comp L.ι) a := by
       rintro ⟨z, hz⟩
       exact key' z hz
-    have h2' : ∀ a : S.A, (Ideal.Quotient.mkₐ L.O' L.ρ.ee) (L.ι a) =
-        ((Ideal.Quotient.mkₐ O L.ρ.ee).comp L.ι) a := fun a => rfl
+    have h2'
+        : ∀ a : S.A,
+          (Ideal.Quotient.mkₐ L.O' L.ρ.ee) (L.ι a) = ((Ideal.Quotient.mkₐ O L.ρ.ee).comp L.ι) a :=
+      fun a => rfl
     have heq := huniq.unique h1 h2'
     have hyq := AlgHom.congr_fun heq y
     simp only [AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, hy'] at hyq

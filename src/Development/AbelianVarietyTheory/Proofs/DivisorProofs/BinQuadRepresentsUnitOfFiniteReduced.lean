@@ -9,20 +9,25 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem binQuad_represents_unit_of_finite_reduced (S : Type) [CommRing S] [Finite S]
-    [IsReduced S] (t m f : S) (hd : IsUnit (t ^ 2 - 4 * m)) (hf : IsUnit f) :
-    ∃ a b : S, a ^ 2 + t * a * b + m * b ^ 2 = f := by
+theorem binQuad_represents_unit_of_finite_reduced
+    (S : Type) [CommRing S] [Finite S] [IsReduced S]
+    (t m f : S) (hd : IsUnit (t ^ 2 - 4 * m)) (hf : IsUnit f)
+    : ∃ a b : S, a ^ 2 + t * a * b + m * b ^ 2 = f := by
   first
   | exact @_root_.GlobalTheory.FieldCaseReduction.main
   | exact _root_.GlobalTheory.FieldCaseReduction.main
   | (apply _root_.GlobalTheory.FieldCaseReduction.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.FieldCaseReduction.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.FieldCaseReduction.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.FieldCaseReduction.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.FieldCaseReduction.main ..)
 
-theorem norm_surj_of_finite_reduced_involution : ∀ (R : Type) [CommRing R] [Finite R]
-    [IsReduced R] (τ : R →+* R), (∀ x, τ (τ x) = x) → ∀ θ : R, IsUnit (θ - τ θ) →
-    ∀ f : R, IsUnit f → τ f = f → ∃ c : R, τ c * c = f := by
+theorem norm_surj_of_finite_reduced_involution
+    : ∀ (R : Type) [CommRing R] [Finite R] [IsReduced R] (τ : R →+* R),
+      (∀ x, τ (τ x) = x)
+        → ∀ θ : R, IsUnit (θ - τ θ) → ∀ f : R, IsUnit f → τ f = f → ∃ c : R, τ c * c = f := by
   intro R _ _ _ τ hτ θ hθ f hf hτf
   classical
   let A : Subring R := τ.eqLocus (RingHom.id R)
@@ -31,18 +36,21 @@ theorem norm_surj_of_finite_reduced_involution : ∀ (R : Type) [CommRing R] [Fi
   obtain ⟨u, hu⟩ := hθ
   have h4 : ((4 : A) : R) = 4 := map_ofNat A.subtype 4
   have hτd : τ (θ - τ θ) = -(θ - τ θ) := by rw [map_sub, hτ]; ring
-  have hτdi : τ (↑u⁻¹ : R) = -↑u⁻¹ := by
+  have hτdi : τ (↑u⁻¹ : R) = - ↑u⁻¹ := by
     have h1 : τ (↑u⁻¹ : R) * (θ - τ θ) = -1 := by
       have := congrArg τ u.inv_mul
       rw [map_mul, map_one, hu, hτd] at this
       linear_combination -this
-    calc τ (↑u⁻¹ : R) = τ ↑u⁻¹ * ((θ - τ θ) * ↑u⁻¹) := by rw [← hu, u.mul_inv, mul_one]
-      _ = -↑u⁻¹ := by rw [← mul_assoc, h1]; ring
+    calc
+      τ (↑u⁻¹ : R)
+        = τ ↑u⁻¹ * ((θ - τ θ) * ↑u⁻¹) := by rw [← hu, u.mul_inv, mul_one]
+      _ = - ↑u⁻¹ := by rw [← mul_assoc, h1]; ring
   obtain ⟨v, hv⟩ := hf
   have hτfi : τ (↑v⁻¹ : R) = ↑v⁻¹ := by
-    have h1 : τ (↑v⁻¹ : R) * f = 1 := by
-      rw [← hτf, ← map_mul, ← hv, v.inv_mul, map_one]
-    calc τ (↑v⁻¹ : R) = τ ↑v⁻¹ * (f * ↑v⁻¹) := by rw [← hv, v.mul_inv, mul_one]
+    have h1 : τ (↑v⁻¹ : R) * f = 1 := by rw [← hτf, ← map_mul, ← hv, v.inv_mul, map_one]
+    calc
+      τ (↑v⁻¹ : R)
+        = τ ↑v⁻¹ * (f * ↑v⁻¹) := by rw [← hv, v.mul_inv, mul_one]
       _ = ↑v⁻¹ := by rw [← mul_assoc, h1, one_mul]
   let tA : A := ⟨θ + τ θ, memA _ (by rw [map_add (f := _), hτ, add_comm])⟩
   let mA : A := ⟨θ * τ θ, memA _ (by rw [map_mul, hτ, mul_comm])⟩

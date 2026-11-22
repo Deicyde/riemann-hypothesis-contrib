@@ -13,16 +13,21 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.IsR
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.EndOnTorsion
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.EndOnTorsion
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.GenericFibreFactorial
 
-theorem isRegularRing_localization_of_comap_eq_bot (R A : Type) [CommRing R] [IsDomain R]
-    [CommRing A] [Algebra R A] [Algebra.Smooth R A] (p : Ideal A) [p.IsPrime]
-    (hp : p.comap (algebraMap R A) = ⊥) : IsRegularRing (Localization.AtPrime p) := by
+theorem isRegularRing_localization_of_comap_eq_bot
+    (R A : Type) [CommRing R] [IsDomain R] [CommRing A] [Algebra R A] [Algebra.Smooth R A]
+    (p : Ideal A) [p.IsPrime]
+    (hp : p.comap (algebraMap R A) = ⊥)
+    : IsRegularRing (Localization.AtPrime p) := by
   let K := FractionRing R
   let M := Algebra.algebraMapSubmonoid A (nonZeroDivisors R)
   let B := Localization M
@@ -47,12 +52,14 @@ theorem isRegularRing_localization_of_comap_eq_bot (R A : Type) [CommRing R] [Is
     exact (IsLocalization.under_map_of_isPrime_disjoint M B inferInstance disj).symm
   haveI : IsRegularRing (Localization.AtPrime q) :=
     GlobalTheory.ExtendRig.isRegularRing_of_isLocalization q.primeCompl _
-  exact IsRegularRing.of_ringEquiv (IsLocalization.algEquiv p.primeCompl
-    (Localization.AtPrime q) (Localization.AtPrime p)).toRingEquiv
+  exact IsRegularRing.of_ringEquiv (IsLocalization.algEquiv p.primeCompl (Localization.AtPrime q)
+    (Localization.AtPrime p)).toRingEquiv
 
-theorem ufd_stalk_of_generic : ∀ (R : Type) [CommRing R] [IsDomain R] (X : Scheme.{0}) [IsIntegral X]
-    (f : X ⟶ Sp R) [Smooth f] (x : X), (show PrimeSpectrum R from f x).asIdeal = ⊥ →
-    UniqueFactorizationMonoid (X.presheaf.stalk x) := by
+theorem ufd_stalk_of_generic
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (X : Scheme.{0}) [IsIntegral X] (f : X ⟶ Sp R)
+        [Smooth f] (x : X),
+      (show PrimeSpectrum R from f x).asIdeal = ⊥
+        → UniqueFactorizationMonoid (X.presheaf.stalk x) := by
   intro R _ _ X _ f _ x hx
   obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
@@ -64,8 +71,9 @@ theorem ufd_stalk_of_generic : ∀ (R : Type) [CommRing R] [IsDomain R] (X : Sch
     rw [genericPoint_eq_bot_of_affine]
     exact PrimeSpectrum.ext hx
   have h1 := IsAffineOpen.comap_primeIdealOf_appLE (f := f) ⊤ (isAffineOpen_top _) U hU le_top hxU
-  have h2 : (isAffineOpen_top (Sp R)).primeIdealOf ⟨f x, (show f x ∈ (⊤ : (Sp R).Opens) from trivial)⟩ =
-      genericPoint (Spec Γ(Sp R, ⊤)) := by
+  have h2
+      : (isAffineOpen_top (Sp R)).primeIdealOf ⟨f x, (show f x ∈ (⊤ : (Sp R).Opens) from trivial)⟩
+        = genericPoint (Spec Γ(Sp R, ⊤)) := by
     rw [← (isAffineOpen_top (Sp R)).primeIdealOf_genericPoint]
     congr 1
     exact Subtype.ext hgen
@@ -73,8 +81,9 @@ theorem ufd_stalk_of_generic : ∀ (R : Type) [CommRing R] [IsDomain R] (X : Sch
   have hcomap : (hU.primeIdealOf ⟨x, hxU⟩).asIdeal.comap (f.appLE ⊤ U le_top).hom = ⊥ :=
     congrArg PrimeSpectrum.asIdeal h1
   algebraize [(f.appLE ⊤ U le_top).hom]
-  have hreg := isRegularRing_localization_of_comap_eq_bot Γ(Sp R, ⊤) Γ(X, U)
-    (hU.primeIdealOf ⟨x, hxU⟩).asIdeal hcomap
+  have hreg :=
+    isRegularRing_localization_of_comap_eq_bot Γ(Sp R, ⊤) Γ(X, U) (hU.primeIdealOf ⟨x, hxU⟩).asIdeal
+      hcomap
   let := X.presheaf.algebra_section_stalk ⟨x, hxU⟩
   have := hU.isLocalization_stalk ⟨x, hxU⟩
   haveI : IsRegularRing (X.presheaf.stalk x) :=

@@ -8,9 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HookREqHo
 
 namespace GlobalTheory.HookDiagram
 
-theorem hookProd_eq_of_mem (μ : YoungDiagram) (n : ℕ) (a : ℕ → ℕ)
-    (h : ∀ i j, (i, j) ∈ μ ↔ i < n ∧ j < a i) :
-    Formalism.LatticeIndexTer.hookProd μ = GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a := by
+theorem hookProd_eq_of_mem
+    (μ : YoungDiagram) (n : ℕ) (a : ℕ → ℕ) (h : ∀ i j, (i, j) ∈ μ ↔ i < n ∧ j < a i)
+    : Formalism.LatticeIndexTer.hookProd μ
+      = GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a := by
   have hrow : ∀ r, r < n → μ.rowLen r = a r := by
     intro r hr
     apply le_antisymm
@@ -22,8 +23,8 @@ theorem hookProd_eq_of_mem (μ : YoungDiagram) (n : ℕ) (a : ℕ → ℕ)
       rw [not_le] at hlt
       have hm : (r, μ.rowLen r) ∈ μ := (h r _).mpr ⟨hr, hlt⟩
       exact lt_irrefl _ (YoungDiagram.mem_iff_lt_rowLen.mp hm)
-  have hcol : ∀ r c, Finset.filter (fun r' => c < a r') (Finset.Ioo r n) =
-      Finset.Ioo r (μ.colLen c) := by
+  have hcol
+      : ∀ r c, Finset.filter (fun r' => c < a r') (Finset.Ioo r n) = Finset.Ioo r (μ.colLen c) := by
     intro r c
     ext r'
     simp only [Finset.mem_filter, Finset.mem_Ioo]
@@ -35,7 +36,8 @@ theorem hookProd_eq_of_mem (μ : YoungDiagram) (n : ℕ) (a : ℕ → ℕ)
       exact ⟨⟨h1, hm.1⟩, hm.2⟩
   have hrc : ∀ r c, r < n → c < a r → r < μ.colLen c := fun r c hr hc =>
     YoungDiagram.mem_iff_lt_colLen.mp ((h r c).mpr ⟨hr, hc⟩)
-  unfold Formalism.LatticeIndexTer.hookProd GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd
+  unfold Formalism.LatticeIndexTer.hookProd
+    GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd
   rw [Finset.prod_finset_product μ.cells (Finset.range n) (fun r => Finset.range (a r))]
   · apply Finset.prod_congr rfl
     intro r hr
@@ -51,12 +53,13 @@ theorem hookProd_eq_of_mem (μ : YoungDiagram) (n : ℕ) (a : ℕ → ℕ)
     simp only [YoungDiagram.mem_cells, Finset.mem_range]
     exact h i j
 
-theorem hookOf_eq (n : ℕ) (a : ℕ → ℕ) (ha : ∀ x y, x ≤ y → y < n → a y ≤ a x) :
-    GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf n a = GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a := by
+theorem hookOf_eq (n : ℕ) (a : ℕ → ℕ) (ha : ∀ x y, x ≤ y → y < n → a y ≤ a x)
+    : GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf n a
+      = GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a := by
   have hsort : ((List.range n).map a).Pairwise (· ≥ ·) := by
     rw [List.pairwise_map]
-    exact List.pairwise_lt_range.imp_of_mem
-      (fun {x y} _ hy hxy => ha x y hxy.le (List.mem_range.mp hy))
+    exact List.pairwise_lt_range.imp_of_mem (fun {x y} _ hy hxy =>
+      ha x y hxy.le (List.mem_range.mp hy))
   have hL : ((List.range n).map a).insertionSort (· ≥ ·) = (List.range n).map a :=
     hsort.insertionSort_eq
   unfold GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf
@@ -66,13 +69,13 @@ theorem hookOf_eq (n : ℕ) (a : ℕ → ℕ) (ha : ∀ x y, x ≤ y → y < n �
   simp only [hL, List.length_map, List.length_range, List.getElem_map, List.getElem_range,
     exists_prop]
 
-theorem hookOf_pos_log (n : ℕ) (a : ℕ → ℕ) (ha : ∀ x y, x ≤ y → y < n → a y ≤ a x) :
-    0 < GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf n a ∧
-      Real.log (GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf n a : ℝ) = Formalism.BasicNotions.DV.logHook n (fun k => (a k : ℝ)) := by
+theorem hookOf_pos_log (n : ℕ) (a : ℕ → ℕ) (ha : ∀ x y, x ≤ y → y < n → a y ≤ a x)
+    : 0 < GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf n a
+      ∧ Real.log (GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.hookOf n a : ℝ)
+        = Formalism.BasicNotions.DV.logHook n (fun k => (a k : ℝ)) := by
   rw [hookOf_eq n a ha]
   have hm := GlobalTheory.LiftSizeCompare.hookProd_mul n a ha
-  have hinner : ∀ r ∈ Finset.range n,
-      0 < ∏ l ∈ Finset.Ioo r n, (a r - a l + (l - r)) := by
+  have hinner : ∀ r ∈ Finset.range n, 0 < ∏ l ∈ Finset.Ioo r n, (a r - a l + (l - r)) := by
     intro r _
     apply Finset.prod_pos
     intro l hl
@@ -81,16 +84,19 @@ theorem hookOf_pos_log (n : ℕ) (a : ℕ → ℕ) (ha : ∀ x y, x ≤ y → y 
   have hPpos : 0 < ∏ r ∈ Finset.range n, ∏ l ∈ Finset.Ioo r n, (a r - a l + (l - r)) :=
     Finset.prod_pos hinner
   have hHpos : 0 < GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a := by
-    rcases Nat.eq_zero_or_pos (GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a) with h0 | h0
+    rcases Nat.eq_zero_or_pos (GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd
+        n a)
+      with h0 | h0
     · have hF : 0 < ∏ r ∈ Finset.range n, (a r + n - 1 - r).factorial :=
         Finset.prod_pos fun r _ => Nat.factorial_pos _
       rw [h0, zero_mul] at hm
       omega
     · exact h0
   refine ⟨hHpos, ?_⟩
-  have hmR : (GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a : ℝ) =
-      ((∏ r ∈ Finset.range n, (a r + n - 1 - r).factorial : ℕ) : ℝ) /
-        ((∏ r ∈ Finset.range n, ∏ l ∈ Finset.Ioo r n, (a r - a l + (l - r)) : ℕ) : ℝ) := by
+  have hmR
+      : (GlobalTheory.IndefiniteRowSideFullHecke.SchurTensorLattices.hookProd n a : ℝ)
+        = ((∏ r ∈ Finset.range n, (a r + n - 1 - r).factorial : ℕ) : ℝ)
+          / ((∏ r ∈ Finset.range n, ∏ l ∈ Finset.Ioo r n, (a r - a l + (l - r)) : ℕ) : ℝ) := by
     rw [eq_div_iff (by exact_mod_cast hPpos.ne'), ← Nat.cast_mul, hm]
   have hFpos : (0 : ℝ) < ((∏ r ∈ Finset.range n, (a r + n - 1 - r).factorial : ℕ) : ℝ) := by
     exact_mod_cast Finset.prod_pos fun r _ => Nat.factorial_pos _

@@ -85,7 +85,8 @@ lemma dB_mem (ε : Fin n → Bool) : dB ε ∈ blockAlg ε := (bM ε).det.2
 lemma ev_dB {ε : Fin n → Bool} {k : Mat n} (hk : k ∈ Formalism.REAL.Kset ε) : ev k (dB ε) = k.det := det_bM hk
 
 def Good (ε : Fin n → Bool) (P : Poly n) : Prop :=
-  ∃ (M : ℕ) (Q : Poly n), Q ∈ blockAlg ε ∧ ∀ k ∈ Formalism.REAL.Kset ε, ev k P = ev k (detbP n ^ M * Q)
+  ∃ (M : ℕ) (Q : Poly n),
+    Q ∈ blockAlg ε ∧ ∀ k ∈ Formalism.REAL.Kset ε, ev k P = ev k (detbP n ^ M * Q)
 
 lemma good (ε : Fin n → Bool) (P : Poly n) : Good ε P := by
   refine MvPolynomial.induction_on P ?_ ?_ ?_

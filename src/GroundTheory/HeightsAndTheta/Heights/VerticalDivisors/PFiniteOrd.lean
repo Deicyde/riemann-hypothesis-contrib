@@ -25,10 +25,12 @@ theorem FiniteOrd.proof : FiniteOrd.Statement := by
   have : Ring.KrullDimLE 1 (Localization.AtPrime 𝔫.asIdeal) :=
     Ring.krullDimLE_iff.mpr (by exact_mod_cast hS)
   have hbB : b ∈ nonZeroDivisors B := by
-    refine mem_nonZeroDivisors_iff.mpr ⟨fun x hx ↦ ?_, fun x hx ↦ hb (by simpa [mul_comm, mul_zero] using hx)⟩
+    refine mem_nonZeroDivisors_iff.mpr
+      ⟨fun x hx ↦ ?_, fun x hx ↦ hb (by simpa [mul_comm, mul_zero] using hx)⟩
     exact hb (by simpa [mul_comm, mul_zero] using hx)
-  have hbS : algebraMap B (Localization.AtPrime 𝔫.asIdeal) b ∈
-      nonZeroDivisors (Localization.AtPrime 𝔫.asIdeal) :=
+  have hbS
+      : algebraMap B (Localization.AtPrime 𝔫.asIdeal) b
+        ∈ nonZeroDivisors (Localization.AtPrime 𝔫.asIdeal) :=
     IsLocalization.map_nonZeroDivisors_le 𝔫.asIdeal.primeCompl _ ⟨b, hbB, rfl⟩
   exact Ring.ord_ne_top hbS
 

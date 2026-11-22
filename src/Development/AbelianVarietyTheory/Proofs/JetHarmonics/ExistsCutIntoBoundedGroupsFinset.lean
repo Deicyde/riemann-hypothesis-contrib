@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_le_sum_eq_of_le_sum (S : Finset ℕ) (e : ℕ → ℕ) :
-    ∀ n, n ≤ ∑ k ∈ S, e k →
-      ∃ f : ℕ → ℕ, (∀ k, f k ≤ e k) ∧ ∑ k ∈ S, f k = n ∧ ∀ k, k ∉ S → f k = 0 := by
+theorem exists_le_sum_eq_of_le_sum (S : Finset ℕ) (e : ℕ → ℕ)
+    : ∀ n,
+      n ≤ ∑ k ∈ S, e k
+        → ∃ f : ℕ → ℕ, (∀ k, f k ≤ e k) ∧ ∑ k ∈ S, f k = n ∧ ∀ k, k ∉ S → f k = 0 := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -41,10 +42,12 @@ theorem exists_le_sum_eq_of_le_sum (S : Finset ℕ) (e : ℕ → ℕ) :
       simp only [hka, if_false]
       exact hgo k hkS
 
-theorem exists_cut_into_bounded_groups_finset (S : Finset ℕ) (B : ℕ) :
-    ∀ (s : ℕ) (e : ℕ → ℕ), ∑ k ∈ S, e k ≤ s * B →
-      ∃ pc : Fin s → ℕ → ℕ, (∀ k ∈ S, ∑ u, pc u k = e k) ∧ (∀ u, ∑ k ∈ S, pc u k ≤ B) ∧
-        ∀ u k, k ∉ S → pc u k = 0 := by
+theorem exists_cut_into_bounded_groups_finset (S : Finset ℕ) (B : ℕ)
+    : ∀ (s : ℕ) (e : ℕ → ℕ),
+      ∑ k ∈ S, e k ≤ s * B
+        → ∃ pc : Fin s → ℕ → ℕ,
+          (∀ k ∈ S, ∑ u, pc u k = e k) ∧ (∀ u, ∑ k ∈ S, pc u k ≤ B)
+            ∧ ∀ u k, k ∉ S → pc u k = 0 := by
   classical
   intro s
   induction s with
@@ -83,7 +86,12 @@ theorem exists_cut_into_bounded_groups_finset (S : Finset ℕ) (B : ℕ) :
       · simp only [Fin.cons_succ]
         exact hpco i k hk
 
-theorem exists_cut_columns_bounded_width : ∀ (K s B : ℕ) (e : ℕ → ℕ), ∑ k ∈ Finset.Icc 1 K, e k ≤ s * B → ∃ pc : Fin s → ℕ → ℕ, (∀ k ∈ Finset.Icc 1 K, ∑ u, pc u k = e k) ∧ (∀ u, ∑ k ∈ Finset.Icc 1 K, pc u k ≤ B) ∧ ∀ u k, k ∉ Finset.Icc 1 K → pc u k = 0 := by
+theorem exists_cut_columns_bounded_width
+    : ∀ (K s B : ℕ) (e : ℕ → ℕ),
+      ∑ k ∈ Finset.Icc 1 K, e k ≤ s * B
+        → ∃ pc : Fin s → ℕ → ℕ,
+          (∀ k ∈ Finset.Icc 1 K, ∑ u, pc u k = e k) ∧ (∀ u, ∑ k ∈ Finset.Icc 1 K, pc u k ≤ B)
+            ∧ ∀ u k, k ∉ Finset.Icc 1 K → pc u k = 0 := by
   intro K s B e h
   exact exists_cut_into_bounded_groups_finset (Finset.Icc 1 K) B s e h
 

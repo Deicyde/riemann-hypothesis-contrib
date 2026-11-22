@@ -18,31 +18,34 @@ namespace GlobalTheory.CompanionTheory.ModelS.ReversedBlocks
 
 variable {n : ℕ}
 
-theorem lower_iff (P : Fin n → Prop) [DecidablePred P] (hP : ∀ a b, a ≤ b → P b → P a) (b : Fin n) :
-    P b ↔ (b : ℕ) < (univ.filter P).card :=
+theorem lower_iff (P : Fin n → Prop) [DecidablePred P] (hP : ∀ a b, a ≤ b → P b → P a) (b : Fin n)
+    : P b ↔ (b : ℕ) < (univ.filter P).card :=
   _root_.UpperTheory.Reformulated.B.Re1.lower_iff P hP b
 
 def lowC (lev : Fin n → ℕ) (a : Fin n) : ℕ := (univ.filter fun b => lev b < lev a).card
 
 def topC (lev : Fin n → ℕ) (a : Fin n) : ℕ := (univ.filter fun b => lev b ≤ lev a).card
 
-theorem lt_iff {lev : Fin n → ℕ} (hm : Monotone lev) (a b : Fin n) : lev b < lev a ↔ (b : ℕ) < lowC lev a :=
+theorem lt_iff {lev : Fin n → ℕ} (hm : Monotone lev) (a b : Fin n)
+    : lev b < lev a ↔ (b : ℕ) < lowC lev a :=
   lower_iff (fun b => lev b < lev a) (fun _ _ h hb => lt_of_le_of_lt (hm h) hb) b
 
-theorem le_iff {lev : Fin n → ℕ} (hm : Monotone lev) (a b : Fin n) : lev b ≤ lev a ↔ (b : ℕ) < topC lev a :=
+theorem le_iff {lev : Fin n → ℕ} (hm : Monotone lev) (a b : Fin n)
+    : lev b ≤ lev a ↔ (b : ℕ) < topC lev a :=
   lower_iff (fun b => lev b ≤ lev a) (fun _ _ h hb => le_trans (hm h) hb) b
 
-theorem high_add_topC (lev : Fin n → ℕ) (a : Fin n) :
-    (univ.filter fun b => lev a < lev b).card + topC lev a = n := by
-  have h := Finset.card_filter_add_card_filter_not (s := (univ : Finset (Fin n))) (fun b => lev a < lev b)
+theorem high_add_topC (lev : Fin n → ℕ) (a : Fin n)
+    : (univ.filter fun b => lev a < lev b).card + topC lev a = n := by
+  have h :=
+    Finset.card_filter_add_card_filter_not (s := (univ : Finset (Fin n))) (fun b => lev a < lev b)
   simp only [not_lt, Finset.card_univ, Fintype.card_fin] at h
   unfold topC
   exact h
 
 def rv (lev : Fin n → ℕ) (a : Fin n) : ℕ := lowC lev a + (topC lev a - 1) - a
 
-theorem rv_bounds {lev : Fin n → ℕ} (hm : Monotone lev) (a : Fin n) :
-    lowC lev a ≤ a ∧ (a : ℕ) < topC lev a ∧ rv lev a + a + 1 = lowC lev a + topC lev a := by
+theorem rv_bounds {lev : Fin n → ℕ} (hm : Monotone lev) (a : Fin n)
+    : lowC lev a ≤ a ∧ (a : ℕ) < topC lev a ∧ rv lev a + a + 1 = lowC lev a + topC lev a := by
   have h1 : ¬ (a : ℕ) < lowC lev a := fun h => lt_irrefl _ ((lt_iff hm a a).2 h)
   have h2 : (a : ℕ) < topC lev a := (le_iff hm a a).1 le_rfl
   unfold rv
@@ -75,9 +78,12 @@ theorem rf_rf {lev : Fin n → ℕ} (hm : Monotone lev) (a : Fin n) : rf hm (rf 
   have e4 : ((rf hm (rf hm a) : Fin n) : ℕ) = rv lev (rf hm a) := rfl
   omega
 
-theorem exists_perm_yZ : ∀ (n : ℕ) (lam : Fin n → ℤ) (lev : Fin n → ℕ), IsLev lam lev →
-    ∃ σ : Equiv.Perm (Fin n), ∀ a : Fin n,
-      (GlobalTheory.CompanionTheory.ModelS.yZ lam lev a : ℂ) + ((n : ℂ) - 1) / 2 - ((a : ℕ) : ℂ) = infOf lam false (σ a) := by
+theorem exists_perm_yZ
+    : ∀ (n : ℕ) (lam : Fin n → ℤ) (lev : Fin n → ℕ),
+      IsLev lam lev
+        → ∃ σ : Equiv.Perm (Fin n), ∀ a : Fin n,
+          (GlobalTheory.CompanionTheory.ModelS.yZ lam lev a : ℂ) + ((n : ℂ) - 1) / 2 - ((a : ℕ) : ℂ)
+            = infOf lam false (σ a) := by
   intro n lam lev h
   obtain ⟨hm, hc⟩ := h
   refine ⟨Function.Involutive.toPerm (rf hm) (rf_rf hm), fun a => ?_⟩
@@ -86,11 +92,14 @@ theorem exists_perm_yZ : ∀ (n : ℕ) (lam : Fin n → ℤ) (lev : Fin n → �
   have hl : lam (rf hm a) = lam a := hc _ _ (lev_rf hm a)
   obtain ⟨h1, h2, h3⟩ := rv_bounds hm a
   have h4 := high_add_topC lev a
-  have c3 : ((rv lev a : ℕ) : ℂ) + ((a : ℕ) : ℂ) + 1 = (lowC lev a : ℂ) + (topC lev a : ℂ) := by exact_mod_cast h3
-  have c4 : (((univ.filter fun b => lev a < lev b).card : ℕ) : ℂ) + (topC lev a : ℂ) = (n : ℂ) := by exact_mod_cast h4
+  have c3 : ((rv lev a : ℕ) : ℂ) + ((a : ℕ) : ℂ) + 1 = (lowC lev a : ℂ) + (topC lev a : ℂ) := by
+    exact_mod_cast h3
+  have c4 : (((univ.filter fun b => lev a < lev b).card : ℕ) : ℂ) + (topC lev a : ℂ) = (n : ℂ) := by
+    exact_mod_cast h4
   have e3 : (((rf hm a : Fin n) : ℕ) : ℂ) = (rv lev a : ℂ) := rfl
   have hlow : (((univ.filter fun b => lev b < lev a).card : ℕ) : ℂ) = (lowC lev a : ℂ) := rfl
-  simp only [GlobalTheory.CompanionTheory.ModelS.yZ, GlobalTheory.CompanionTheory.ModelS.muZ, infOf, hl, e3]
+  simp only [GlobalTheory.CompanionTheory.ModelS.yZ, GlobalTheory.CompanionTheory.ModelS.muZ, infOf,
+    hl, e3]
   push_cast
   rw [hlow]
   linear_combination (-1 : ℂ) * c3 - c4

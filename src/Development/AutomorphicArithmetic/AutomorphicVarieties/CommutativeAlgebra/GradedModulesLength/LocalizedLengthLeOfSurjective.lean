@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-private theorem localized_length_le_of_surjective {O B K : Type} [CommRing O] [CommRing B] [Algebra O B] [Field K] [Algebra O K]
-    (σ : B →ₐ[O] K) {L M N : Type} [AddCommGroup L] [Module B L] [AddCommGroup M] [Module B M]
-    [AddCommGroup N] [Module B N] (φ : L →ₗ[B] M) (ψ : L →ₗ[B] N) (hφ : Function.Surjective φ)
-    (h : ∀ x, ψ x = 0 → ∃ t : B, σ t ≠ 0 ∧ t • φ x = 0) : locLen σ M ≤ locLen σ N := by
+private theorem localized_length_le_of_surjective
+    {O B K : Type} [CommRing O] [CommRing B] [Algebra O B] [Field K] [Algebra O K]
+    (σ : B →ₐ[O] K)
+    {L M N : Type}
+    [AddCommGroup L] [Module B L] [AddCommGroup M] [Module B M] [AddCommGroup N] [Module B N]
+    (φ : L →ₗ[B] M) (ψ : L →ₗ[B] N)
+    (hφ : Function.Surjective φ) (h : ∀ x, ψ x = 0 → ∃ t : B, σ t ≠ 0 ∧ t • φ x = 0)
+    : locLen σ M ≤ locLen σ N := by
   haveI : (RingHom.ker σ).IsPrime := RingHom.ker_isPrime σ
   unfold locLen
   set S := (RingHom.ker σ).primeCompl
@@ -26,24 +30,29 @@ private theorem localized_length_le_of_surjective {O B K : Type} [CommRing O] [C
       obtain ⟨t, ht, h2⟩ := h _ h1
       refine ⟨⟨t, ht⟩ * u, ?_⟩
       simpa [Submonoid.smul_def, mul_smul] using h2
-  have hs2 : Function.Surjective ((LinearMap.ker (LocalizedModule.map S ψ)).liftQ (LocalizedModule.map S φ) hk) := by
+  have hs2 : Function.Surjective ((LinearMap.ker (LocalizedModule.map S ψ)).liftQ
+      (LocalizedModule.map S φ) hk) := by
     intro y
     obtain ⟨x, rfl⟩ := hs y
     exact ⟨Submodule.Quotient.mk x, rfl⟩
   refine (Module.length_le_of_surjective _ hs2).trans ?_
-  exact Module.length_le_of_injective ((LinearMap.ker (LocalizedModule.map S ψ)).liftQ (LocalizedModule.map S ψ) le_rfl)
+  exact Module.length_le_of_injective
+    ((LinearMap.ker (LocalizedModule.map S ψ)).liftQ (LocalizedModule.map S ψ) le_rfl)
     (LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ le_rfl))
 
 section
 
-variable {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
+variable
+  {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
 
 private def u4w (μ : Fin 3 →₀ ℕ) : ℤ := 2 * ((μ 1 : ℤ) - μ 0 - μ 2)
 
 private theorem weight_submodule_mul_le (i j : ℤ) : oz 𝒜 i * oz 𝒜 j ≤ oz 𝒜 (i + j) :=
-  Submodule.mul_le.2 fun _ ha _ hb => (mem_oz 𝒜).2 (SetLike.GradedMul.mul_mem ((mem_oz 𝒜).1 ha) ((mem_oz 𝒜).1 hb))
+  Submodule.mul_le.2 fun _ ha _ hb =>
+    (mem_oz 𝒜).2 (SetLike.GradedMul.mul_mem ((mem_oz 𝒜).1 ha) ((mem_oz 𝒜).1 hb))
 
-private theorem weight_submodule_pow_le {P : Submodule (𝒜 0) A} {i : ℤ} (h : P ≤ oz 𝒜 i) (n : ℕ) : P ^ n ≤ oz 𝒜 (n * i) := by
+private theorem weight_submodule_pow_le {P : Submodule (𝒜 0) A} {i : ℤ} (h : P ≤ oz 𝒜 i) (n : ℕ)
+    : P ^ n ≤ oz 𝒜 (n * i) := by
   induction n with
   | zero =>
     rw [pow_zero, Submodule.one_le]
@@ -51,9 +60,12 @@ private theorem weight_submodule_pow_le {P : Submodule (𝒜 0) A} {i : ℤ} (h 
   | succ n ih =>
     rw [pow_succ]
     refine (mul_le_mul' ih h).trans ((weight_submodule_mul_le 𝒜 _ _).trans (le_of_eq ?_))
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
 
-private theorem lattice_le_weight_submodule {F : A} (hF : F ∈ 𝒜 (-1)) (μ : Fin 3 →₀ ℕ) : lat (mN 𝒜 F) μ ≤ oz 𝒜 (u4w μ) := by
+private theorem lattice_le_weight_submodule {F : A} (hF : F ∈ 𝒜 (-1)) (μ : Fin 3 →₀ ℕ)
+    : lat (mN 𝒜 F) μ ≤ oz 𝒜 (u4w μ) := by
   have h2 : mN 𝒜 F 2 ≤ oz 𝒜 (-2) := by
     show Submodule.span (𝒜 0) {F ^ 2} ⊔ oz 𝒜 (-2) * oz 𝒜 (-2) * oz 𝒜 2 ≤ _
     refine sup_le ((Submodule.span_singleton_le_iff_mem _ _).2 (sq_mem_neg 𝒜 hF)) ?_
@@ -61,13 +73,20 @@ private theorem lattice_le_weight_submodule {F : A} (hF : F ∈ 𝒜 (-1)) (μ :
   have h0 : mN 𝒜 F 0 ≤ oz 𝒜 (-2) := le_rfl
   have h1 : mN 𝒜 F 1 ≤ oz 𝒜 2 := le_rfl
   rw [lat, Fin.prod_univ_three]
-  refine (mul_le_mul' ((mul_le_mul' (weight_submodule_pow_le 𝒜 h0 _) (weight_submodule_pow_le 𝒜 h1 _)).trans (weight_submodule_mul_le 𝒜 _ _))
+  refine (mul_le_mul'
+    ((mul_le_mul' (weight_submodule_pow_le 𝒜 h0 _) (weight_submodule_pow_le 𝒜 h1 _)).trans
+      (weight_submodule_mul_le 𝒜 _ _))
     (weight_submodule_pow_le 𝒜 h2 _)).trans ((weight_submodule_mul_le 𝒜 _ _).trans (le_of_eq ?_))
-  congr 1; unfold u4w; ring
+  congr 1
+  unfold u4w
+  ring
 
-private theorem power_mul_mem_lattice (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz 𝒜 (-2) ^ n ∧ oz 𝒜 (2 * n) = oz 𝒜 2 ^ n)
-    (F : A) {f g : A} (hf : f ∈ 𝒜 (-2)) (hg : g ∈ 𝒜 2) (μ : Fin 3 →₀ ℕ) {a : A} (ha : a ∈ 𝒜 (u4w μ)) :
-    ∃ n : ℕ, (f * g) ^ n * a ∈ lat (mN 𝒜 F) μ := by
+private theorem power_mul_mem_lattice
+    (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz 𝒜 (-2) ^ n ∧ oz 𝒜 (2 * n) = oz 𝒜 2 ^ n) (F : A)
+    {f g : A} (hf : f ∈ 𝒜 (-2)) (hg : g ∈ 𝒜 2)
+    (μ : Fin 3 →₀ ℕ)
+    {a : A} (ha : a ∈ 𝒜 (u4w μ))
+    : ∃ n : ℕ, (f * g) ^ n * a ∈ lat (mN 𝒜 F) μ := by
   have hl : oz 𝒜 (-2) ^ (μ 0 + 2 * μ 2) * oz 𝒜 2 ^ (μ 1 + μ 2) ≤ lat (mN 𝒜 F) μ := by
     have h2 : oz 𝒜 (-2) * oz 𝒜 (-2) * oz 𝒜 2 ≤ mN 𝒜 F 2 := le_sup_right
     rw [lat, Fin.prod_univ_three]
@@ -76,7 +95,8 @@ private theorem power_mul_mem_lattice (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz
     ring
   have hfg : ∀ n : ℕ, (f * g) ^ n ∈ oz 𝒜 (-2) ^ n * oz 𝒜 2 ^ n := fun n => by
     rw [mul_pow]
-    exact Submodule.mul_mem_mul (Submodule.pow_mem_pow (oz 𝒜 (-2)) hf n) (Submodule.pow_mem_pow (oz 𝒜 2) hg n)
+    exact Submodule.mul_mem_mul (Submodule.pow_mem_pow (oz 𝒜 (-2)) hf n)
+      (Submodule.pow_mem_pow (oz 𝒜 2) hg n)
   rcases le_total (μ 0 + 2 * μ 2) (μ 1 + μ 2) with h | h
   · obtain ⟨c, hc⟩ := Nat.exists_eq_add_of_le h
     refine ⟨μ 0 + 2 * μ 2, hl ?_⟩
@@ -95,13 +115,18 @@ private theorem power_mul_mem_lattice (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz
     rw [hc, pow_add (oz 𝒜 (-2)) _ c, mul_right_comm]
     exact Submodule.mul_mem_mul (hfg _) ha'
 
-private def u4K (F : A) (b : 𝒜 0) (J : Ideal (rees (mN 𝒜 F))) (μ : Fin 3 →₀ ℕ) : AddSubmonoid A where
+private def u4K (F : A) (b : 𝒜 0) (J : Ideal (rees (mN 𝒜 F))) (μ : Fin 3 →₀ ℕ)
+    : AddSubmonoid A where
   carrier := {a | ∃ n : ℕ, ∃ p ∈ J, p.1 = MvPolynomial.monomial μ ((b : A) ^ n * a)}
   zero_mem' := ⟨0, 0, J.zero_mem, by simp⟩
   add_mem' := by
     rintro a a' ⟨n, p, hp, e⟩ ⟨n', p', hp', e'⟩
-    refine ⟨n + n', b ^ n' • p + b ^ n • p',
-      J.add_mem (Submodule.smul_of_tower_mem _ _ hp) (Submodule.smul_of_tower_mem _ _ hp'), ?_⟩
+    refine ⟨
+      n + n',
+      b ^ n' • p + b ^ n • p',
+      J.add_mem (Submodule.smul_of_tower_mem _ _ hp) (Submodule.smul_of_tower_mem _ _ hp'),
+      ?_
+    ⟩
     show b ^ n' • p.1 + b ^ n • p'.1 = _
     rw [e, e', MvPolynomial.smul_monomial, MvPolynomial.smul_monomial, ← map_add (f := _)]
     congr 1
@@ -109,14 +134,19 @@ private def u4K (F : A) (b : 𝒜 0) (J : Ideal (rees (mN 𝒜 F))) (μ : Fin 3 
     simp only [SetLike.GradeZero.coe_pow]
     ring
 
-private theorem generated_component_mem (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz 𝒜 (-2) ^ n ∧ oz 𝒜 (2 * n) = oz 𝒜 2 ^ n)
-    (F : A) {f g : A} (hf : f ∈ 𝒜 (-2)) (hg : g ∈ 𝒜 2) (b : 𝒜 0) (hb : (b : A) = f * g)
-    (J : Ideal (rees (mN 𝒜 F))) (μ ν : Fin 3 →₀ ℕ) (hν : ν ≤ μ) {y : A} (hy : y ∈ 𝒜 (u4w ν))
-    (q : rees (mN 𝒜 F)) (hq : q ∈ J) (e : q.1 = MvPolynomial.monomial ν y) (c : A) :
-    (DirectSum.decompose 𝒜 (c * y) (u4w μ) : A) ∈ u4K 𝒜 F b J μ := by
+private theorem generated_component_mem
+    (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz 𝒜 (-2) ^ n ∧ oz 𝒜 (2 * n) = oz 𝒜 2 ^ n)
+    (F : A)
+    {f g : A} (hf : f ∈ 𝒜 (-2)) (hg : g ∈ 𝒜 2)
+    (b : 𝒜 0) (hb : (b : A) = f * g)
+    (J : Ideal (rees (mN 𝒜 F)))
+    (μ ν : Fin 3 →₀ ℕ) (hν : ν ≤ μ)
+    {y : A} (hy : y ∈ 𝒜 (u4w ν))
+    (q : rees (mN 𝒜 F)) (hq : q ∈ J) (e : q.1 = MvPolynomial.monomial ν y)
+    (c : A)
+    : (DirectSum.decompose 𝒜 (c * y) (u4w μ) : A) ∈ u4K 𝒜 F b J μ := by
   obtain ⟨ν', rfl⟩ := exists_add_of_le hν
-  have hw : u4w (ν + ν') = u4w ν' + u4w ν := by
-    simp only [u4w, Finsupp.add_apply]; push_cast; ring
+  have hw : u4w (ν + ν') = u4w ν' + u4w ν := by simp only [u4w, Finsupp.add_apply]; push_cast; ring
   rw [hw, DirectSum.coe_decompose_mul_add_of_right_mem 𝒜 hy]
   obtain ⟨n, hn⟩ := power_mul_mem_lattice 𝒜 hp F hf hg ν' (DirectSum.decompose 𝒜 c (u4w ν')).2
   refine ⟨n, mono _ ν' _ hn * q, J.mul_mem_left _ hq, ?_⟩
@@ -125,33 +155,47 @@ private theorem generated_component_mem (hp : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = 
 
 end
 
-theorem UpperTheory.V.Alg.M.locLen_mQ_gr_le_locLen_aPiece :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ (r s r' s' m : ℕ) (Q : Eqns 𝒜 x r s r' s' m),
-    ∀ J : Ideal (mR Q), secs (ts Q) ≤ J → (∀ i, algebraMap (𝒜 0) (mR Q) ⟨Q.Z i, (Q.hZ i).1⟩ ∈ J) →
-    ∀ σ : 𝒜 0 →ₐ[O] K, ¬ idD 𝒜 ≤ RingHom.ker σ → ∀ d : Deg 3, 1 ≤ d →
-      locLen σ ((mQ Q J).gr d) ≤ locLen σ (aPiece 𝒜 (ideal2 Q) (2 * (d 1 - d 0 - d 2))) := by
+theorem UpperTheory.V.Alg.M.locLen_mQ_gr_le_locLen_aPiece
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (K : Type) [Field K] [Algebra O K]
+        [IsAlgClosed K] [FaithfulSMul O K] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x
+        → ∀ (r s r' s' m : ℕ) (Q : Eqns 𝒜 x r s r' s' m), ∀ J : Ideal (mR Q),
+          secs (ts Q) ≤ J → (∀ i, algebraMap (𝒜 0) (mR Q) ⟨Q.Z i, (Q.hZ i).1⟩ ∈ J)
+            → ∀ σ : 𝒜 0 →ₐ[O] K,
+              ¬ idD 𝒜 ≤ RingHom.ker σ
+                → ∀ d : Deg 3,
+                  1 ≤ d
+                    → locLen σ ((mQ Q J).gr d)
+                      ≤ locLen σ (aPiece 𝒜 (ideal2 Q) (2 * (d 1 - d 0 - d 2))) := by
   intro O _ _ _ _ _ K _ _ _ _ A _ _ 𝒜 _ _ x hW r s r' s' m Q J hJ hZ σ hσ d hd
   have hp := oz_two_mul_eq_pow O A 𝒜 x hW
-  obtain ⟨b, ⟨f, hf, g, hg, hb⟩, hbσ⟩ : ∃ b : 𝒜 0, (∃ f ∈ 𝒜 (-2), ∃ g ∈ 𝒜 2, (b : A) = f * g) ∧ σ b ≠ 0 := by
+  obtain ⟨b, ⟨f, hf, g, hg, hb⟩, hbσ⟩
+      : ∃ b : 𝒜 0, (∃ f ∈ 𝒜 (-2), ∃ g ∈ 𝒜 2, (b : A) = f * g) ∧ σ b ≠ 0 := by
     by_contra hcon
     push Not at hcon
     exact hσ (Ideal.span_le.2 fun b ⟨f, hf, g, hg, hb⟩ => hcon b ⟨f, hf, g, hg, hb⟩)
-  obtain ⟨μ, rfl⟩ : ∃ μ : Fin 3 →₀ ℕ, toDeg μ = d :=
-    ⟨Finsupp.equivFunOnFinite.symm fun i => (d i).toNat, funext fun i => by
+  obtain ⟨μ, rfl⟩ : ∃ μ : Fin 3 →₀ ℕ, toDeg μ = d := ⟨
+    Finsupp.equivFunOnFinite.symm fun i => (d i).toNat,
+    funext fun i => by
       have : (1 : ℤ) ≤ d i := hd i
       simp only [toDeg, Finsupp.equivFunOnFinite_symm_apply_apply]
-      omega⟩
+      omega
+  ⟩
   have hμ : ∀ i, Finsupp.single i 1 ≤ μ := fun i => by
     have : (1 : ℤ) ≤ (μ i : ℤ) := hd i
-    rw [Finsupp.single_le_iff]; omega
-  have hsec : ∀ (i : Fin 3) (y : A) (hy : y ∈ mN 𝒜 (Q.F (Fin.last r)) i), (e i, sec _ i y hy) ∈ ts Q →
-      ∀ c : A, (DirectSum.decompose 𝒜 (c * y) (u4w μ) : A) ∈ u4K 𝒜 _ b J μ := fun i y hy hm =>
+    rw [Finsupp.single_le_iff]
+    omega
+  have hsec
+      : ∀ (i : Fin 3) (y : A) (hy : y ∈ mN 𝒜 (Q.F (Fin.last r)) i),
+        (e i, sec _ i y hy) ∈ ts Q
+          → ∀ c : A, (DirectSum.decompose 𝒜 (c * y) (u4w μ) : A) ∈ u4K 𝒜 _ b J μ := fun i y hy hm =>
     generated_component_mem 𝒜 hp _ hf hg b hb J μ _ (hμ i)
-      (lattice_le_weight_submodule 𝒜 (Q.hF (Fin.last r)) _ (by rw [lat_single]; exact hy)) _ (hJ (Ideal.subset_span ⟨_, hm⟩)) rfl
-  have hI : ∀ y ∈ ideal2 Q, ∀ c : A, (DirectSum.decompose 𝒜 (c * y) (u4w μ) : A) ∈ u4K 𝒜 _ b J μ := by
+      (lattice_le_weight_submodule 𝒜 (Q.hF (Fin.last r)) _ (by rw [lat_single]; exact hy)) _
+      (hJ (Ideal.subset_span ⟨_, hm⟩)) rfl
+  have hI
+      : ∀ y ∈ ideal2 Q, ∀ c : A, (DirectSum.decompose 𝒜 (c * y) (u4w μ) : A) ∈ u4K 𝒜 _ b J μ := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem y hy =>
@@ -162,14 +206,20 @@ theorem UpperTheory.V.Alg.M.locLen_mQ_gr_le_locLen_aPiece :
             (List.mem_append_right _ (List.mem_append_right _ (List.mem_singleton_self _)))
         | cast i =>
           exact hsec 0 _ (sq_mem_neg 𝒜 (Q.hF _)) (List.mem_append_left _ (List.mem_ofFn.2 ⟨i, rfl⟩))
-      · exact hsec 0 _ (Q.hG i) (List.mem_append_right _ (List.mem_append_left _ (List.mem_append_left _
-          (List.mem_append_left _ (List.mem_ofFn.2 ⟨i, rfl⟩)))))
-      · exact hsec 1 _ (sq_mem_pos 𝒜 (Q.hE i)) (List.mem_append_right _ (List.mem_append_left _
-          (List.mem_append_left _ (List.mem_append_right _ (List.mem_ofFn.2 ⟨i, rfl⟩)))))
-      · exact hsec 1 _ (Q.hE' i) (List.mem_append_right _ (List.mem_append_left _
-          (List.mem_append_right _ (List.mem_ofFn.2 ⟨i, rfl⟩))))
+      · exact hsec 0 _ (Q.hG i)
+          (List.mem_append_right _
+            (List.mem_append_left _
+              (List.mem_append_left _ (List.mem_append_left _ (List.mem_ofFn.2 ⟨i, rfl⟩)))))
+      · exact hsec 1 _ (sq_mem_pos 𝒜 (Q.hE i))
+          (List.mem_append_right _
+            (List.mem_append_left _
+              (List.mem_append_left _ (List.mem_append_right _ (List.mem_ofFn.2 ⟨i, rfl⟩)))))
+      · exact hsec 1 _ (Q.hE' i)
+          (List.mem_append_right _
+            (List.mem_append_left _ (List.mem_append_right _ (List.mem_ofFn.2 ⟨i, rfl⟩))))
       · exact generated_component_mem 𝒜 hp _ hf hg b hb J μ 0 bot_le (Q.hZ i).1 _ (hZ i) rfl
-    | zero => intro c; simp
+    | zero =>
+      intro c; simp
     | add y z _ _ h1 h2 =>
       intro c
       rw [mul_add, DirectSum.decompose_add, DirectSum.add_apply, Submodule.coe_add]
@@ -178,15 +228,18 @@ theorem UpperTheory.V.Alg.M.locLen_mQ_gr_le_locLen_aPiece :
       intro c
       rw [smul_eq_mul, ← mul_assoc]
       exact h1 _
-  let φ0 : lat (mN 𝒜 (Q.F (Fin.last r))) μ →ₗ[𝒜 0] mR Q :=
-    { toFun := fun h => mono _ μ h.1 h.2
-      map_add' := fun h h' => Subtype.ext (map_add (MvPolynomial.monomial μ) h.1 h'.1)
-      map_smul' := fun c h => Subtype.ext (MvPolynomial.smul_monomial c).symm }
+  let φ0 : lat (mN 𝒜 (Q.F (Fin.last r))) μ →ₗ[𝒜 0] mR Q := {
+    toFun := fun h => mono _ μ h.1 h.2
+    map_add' := fun h h' => Subtype.ext (map_add (MvPolynomial.monomial μ) h.1 h'.1)
+    map_smul' := fun c h => Subtype.ext (MvPolynomial.smul_monomial c).symm
+  }
   let φ : lat (mN 𝒜 (Q.F (Fin.last r))) μ →ₗ[𝒜 0] (mQ Q J).gr (toDeg μ) :=
-    LinearMap.codRestrict _ ((J.mkQ.restrictScalars (𝒜 0)) ∘ₗ φ0) fun h => ⟨φ0 h, mono_mem _ μ h.1 h.2, rfl⟩
+    LinearMap.codRestrict _ ((J.mkQ.restrictScalars (𝒜 0)) ∘ₗ φ0) fun h =>
+      ⟨φ0 h, mono_mem _ μ h.1 h.2, rfl⟩
   let ψ : lat (mN 𝒜 (Q.F (Fin.last r))) μ →ₗ[𝒜 0] aPiece 𝒜 (ideal2 Q) (u4w μ) :=
-    LinearMap.codRestrict _ ((Ideal.Quotient.mkₐ (𝒜 0) (ideal2 Q)).toLinearMap ∘ₗ Submodule.subtype _) fun h =>
-      ⟨h.1, lattice_le_weight_submodule 𝒜 (Q.hF (Fin.last r)) μ h.2, rfl⟩
+    LinearMap.codRestrict _
+      ((Ideal.Quotient.mkₐ (𝒜 0) (ideal2 Q)).toLinearMap ∘ₗ Submodule.subtype _)
+      fun h => ⟨h.1, lattice_le_weight_submodule 𝒜 (Q.hF (Fin.last r)) μ h.2, rfl⟩
   refine localized_length_le_of_surjective σ φ ψ ?_ ?_
   · rintro ⟨_, p, hp', rfl⟩
     refine ⟨⟨AddMonoidAlgebra.coeff p.1 μ, p.2 μ⟩, Subtype.ext ?_⟩
@@ -202,7 +255,9 @@ theorem UpperTheory.V.Alg.M.locLen_mQ_gr_le_locLen_aPiece :
   · intro h h0
     have h1 : h.1 ∈ ideal2 Q := Ideal.Quotient.eq_zero_iff_mem.1 (congrArg Subtype.val h0)
     have h2 := hI _ h1 1
-    rw [one_mul, DirectSum.decompose_of_mem_same 𝒜 (lattice_le_weight_submodule 𝒜 (Q.hF (Fin.last r)) μ h.2)] at h2
+    rw [one_mul,
+        DirectSum.decompose_of_mem_same 𝒜 (lattice_le_weight_submodule 𝒜 (Q.hF (Fin.last r)) μ h.2)]
+      at h2
     obtain ⟨n, p, hpJ, e⟩ := h2
     refine ⟨b ^ n, by rw [map_pow]; exact pow_ne_zero _ hbσ, ?_⟩
     rw [← map_smul]

@@ -104,22 +104,30 @@ private lemma span_map_toK_delSq_eq_nablaSq (K : Type) [Field K] [NumberField K]
   change MvPolynomial.map (algebraMap (𝓞 K) K) _ = _
   rw [← _root_.Formalism.GradedWeylDivisibility.lclosedeq_applyWord_map, _root_.Formalism.GradedWeylDivisibility.lclosedeq_hw_map]
 
-
 open NumberField MvPolynomial Pointwise in
 variable (K : Type) [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.StdLatSpan.std_fg_span : ∀ (K : Type) [Field K] [NumberField K] (ι : Type)
-    [Fintype ι] (n : ℕ) (lam : ι → _root_.Formalism.BasicNotions.DomWeight n),
-    (_root_.Formalism.L2.DIV.nabStd K lam).FG ∧ (_root_.Formalism.L2.DIV.delStd K lam).FG ∧
-      Submodule.span K (_root_.Formalism.L2.DIV.nabStd K lam : Set (_root_.Formalism.L2.DIV.Pol K ι n)) = _root_.Formalism.L2.DIV.VV K lam ∧
-      Submodule.span K (_root_.Formalism.L2.DIV.delStd K lam : Set (_root_.Formalism.L2.DIV.Pol K ι n)) = _root_.Formalism.L2.DIV.VV K lam := by
+theorem _root_.GlobalTheory.StdLatSpan.std_fg_span
+    : ∀ (K : Type) [Field K] [NumberField K] (ι : Type) [Fintype ι] (n : ℕ)
+        (lam : ι → _root_.Formalism.BasicNotions.DomWeight n),
+      (_root_.Formalism.L2.DIV.nabStd K lam).FG ∧ (_root_.Formalism.L2.DIV.delStd K lam).FG
+        ∧ Submodule.span K
+            (_root_.Formalism.L2.DIV.nabStd K lam : Set (_root_.Formalism.L2.DIV.Pol K ι n))
+          = _root_.Formalism.L2.DIV.VV K lam
+        ∧ Submodule.span K
+            (_root_.Formalism.L2.DIV.delStd K lam : Set (_root_.Formalism.L2.DIV.Pol K ι n))
+          = _root_.Formalism.L2.DIV.VV K lam := by
   intro K _ _ ι _ n lam
   have hnab := nabStd_fg' K ι n lam
   refine ⟨hnab, hnab.of_le (_root_.Formalism.L2.DIV.delStd_le_nabStd K lam), ?_, ?_⟩
   · unfold _root_.Formalism.L2.DIV.nabStd _root_.Formalism.L2.DIV.VV
-    rw [span_tensorLat_eq_prod_map_span, ← Submodule.span_eq (_root_.Formalism.GradedWeylDivisibility.tensorLat K K _), span_tensorLat_eq_prod_map_span]
+    rw [span_tensorLat_eq_prod_map_span,
+      ← Submodule.span_eq (_root_.Formalism.GradedWeylDivisibility.tensorLat K K _),
+      span_tensorLat_eq_prod_map_span]
     simp only [span_map_toK_nablaSq_eq_nablaSq, Submodule.span_eq]
   · unfold _root_.Formalism.L2.DIV.delStd _root_.Formalism.L2.DIV.VV
-    rw [span_tensorLat_eq_prod_map_span, ← Submodule.span_eq (_root_.Formalism.GradedWeylDivisibility.tensorLat K K _), span_tensorLat_eq_prod_map_span]
+    rw [span_tensorLat_eq_prod_map_span,
+      ← Submodule.span_eq (_root_.Formalism.GradedWeylDivisibility.tensorLat K K _),
+      span_tensorLat_eq_prod_map_span]
     simp only [span_map_toK_delSq_eq_nablaSq, Submodule.span_eq]
 
 end GlobalTheory.StdLatSpan

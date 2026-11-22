@@ -10,9 +10,10 @@ noncomputable section
 
 namespace Formalism.HermitianLattices.Ext.L3
 
-variable {K V V' : Type} [Field K] [NumberField K] [StarRing K]
-  [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-  [AddCommGroup V'] [Module K V'] [Module (𝓞 K) V'] [IsScalarTower (𝓞 K) K V']
+variable
+  {K V V' : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup V'] [Module K V'] [Module (𝓞 K) V']
+  [IsScalarTower (𝓞 K) K V']
 
 structure VecSplit (h : V →ₗ⋆[K] V →ₗ[K] K) (h' : V' →ₗ⋆[K] V' →ₗ[K] K) where
   x₀ : V
@@ -38,8 +39,8 @@ variable (S : VecSplit h h')
 theorem h_x₀_comb (c : K) (a : V') : h S.x₀ (c • S.x₀ + S.ι a) = c * h S.x₀ S.x₀ := by
   rw [map_add (f := _), map_smul, S.orth a, smul_eq_mul, add_zero]
 
-theorem comb_eq_iff {c c' : K} {a a' : V'} :
-    c • S.x₀ + S.ι a = c' • S.x₀ + S.ι a' ↔ c = c' ∧ a = a' := by
+theorem comb_eq_iff {c c' : K} {a a' : V'}
+    : c • S.x₀ + S.ι a = c' • S.x₀ + S.ι a' ↔ c = c' ∧ a = a' := by
   constructor
   · intro he
     have hc : c = c' := by
@@ -57,8 +58,9 @@ theorem x₀_not_mem_range (a : V') : S.ι a ≠ S.x₀ := by
   have := S.orth a
   rwa [he] at this
 
-theorem mem_adjoin_iff (L' : Submodule (𝓞 K) V') (v : V) :
-    v ∈ S.adjoin L' ↔ ∃ (r : 𝓞 K) (a : V'), a ∈ L' ∧ v = (algebraMap (𝓞 K) K r) • S.x₀ + S.ι a := by
+theorem mem_adjoin_iff (L' : Submodule (𝓞 K) V') (v : V)
+    : v ∈ S.adjoin L'
+      ↔ ∃ (r : 𝓞 K) (a : V'), a ∈ L' ∧ v = (algebraMap (𝓞 K) K r) • S.x₀ + S.ι a := by
   unfold VecSplit.adjoin
   rw [Submodule.mem_sup]
   constructor
@@ -67,8 +69,13 @@ theorem mem_adjoin_iff (L' : Submodule (𝓞 K) V') (v : V) :
     obtain ⟨a, ha, rfl⟩ := Submodule.mem_map.mp hz
     exact ⟨r, a, ha, by simp only [algebraMap_smul, LinearMap.coe_restrictScalars]⟩
   · rintro ⟨r, a, ha, rfl⟩
-    exact ⟨r • S.x₀, Submodule.mem_span_singleton.mpr ⟨r, rfl⟩, S.ι a,
-      Submodule.mem_map.mpr ⟨a, ha, rfl⟩, by simp only [algebraMap_smul, LinearMap.coe_restrictScalars]⟩
+    exact ⟨
+      r • S.x₀,
+      Submodule.mem_span_singleton.mpr ⟨r, rfl⟩,
+      S.ι a,
+      Submodule.mem_map.mpr ⟨a, ha, rfl⟩,
+      by simp only [algebraMap_smul, LinearMap.coe_restrictScalars]
+    ⟩
 
 theorem x₀_mem_adjoin' (L' : Submodule (𝓞 K) V') : S.x₀ ∈ S.adjoin L' := by
   unfold VecSplit.adjoin
@@ -89,8 +96,11 @@ theorem cut_adjoin' (L' : Submodule (𝓞 K) V') : S.cut (S.adjoin L') = L' := b
   · intro ha
     exact ⟨0, a, ha, by simp⟩
 
-theorem adjoin_cut' (h1 : h S.x₀ S.x₀ = 1) {L : Submodule (𝓞 K) V}
-    (hL : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (hx : S.x₀ ∈ L) : S.adjoin (S.cut L) = L := by
+theorem adjoin_cut'
+    (h1 : h S.x₀ S.x₀ = 1)
+    {L : Submodule (𝓞 K) V}
+    (hL : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (hx : S.x₀ ∈ L)
+    : S.adjoin (S.cut L) = L := by
   apply le_antisymm
   · unfold VecSplit.adjoin VecSplit.cut
     exact sup_le ((Submodule.span_singleton_le_iff_mem _ _).mpr hx) (Submodule.map_comap_le _ _)
@@ -120,16 +130,17 @@ variable (S : VecSplit h h')
 theorem orth' (hs : h.IsSymm) (a : V') : h (S.ι a) S.x₀ = 0 := by
   rw [← hs.eq S.x₀ (S.ι a), S.orth a, map_zero]
 
-theorem h_comb (hs : h.IsSymm) (h1 : h S.x₀ S.x₀ = 1) (d c : K) (b a : V') :
-    h (d • S.x₀ + S.ι b) (c • S.x₀ + S.ι a) = starRingEnd K d * c + h' b a := by
+theorem h_comb (hs : h.IsSymm) (h1 : h S.x₀ S.x₀ = 1) (d c : K) (b a : V')
+    : h (d • S.x₀ + S.ι b) (c • S.x₀ + S.ι a) = starRingEnd K d * c + h' b a := by
   simp [S.orth, S.orth' hs, S.isom, h1]
 
-theorem star_alg_mem_one (r : 𝓞 K) : starRingEnd K (algebraMap (𝓞 K) K r) ∈ (1 : Submodule (𝓞 K) K) := by
+theorem star_alg_mem_one (r : 𝓞 K)
+    : starRingEnd K (algebraMap (𝓞 K) K r) ∈ (1 : Submodule (𝓞 K) K) := by
   refine Submodule.mem_one.mpr ⟨⟨starRingEnd K (algebraMap (𝓞 K) K r), ?_⟩, rfl⟩
   exact (NumberField.RingOfIntegers.isIntegral_coe r).map (starRingEnd K).toIntAlgHom
 
-theorem isLattice_adjoin_iff' (L' : Submodule (𝓞 K) V') :
-    Submodule.IsLattice K (S.adjoin L') ↔ Submodule.IsLattice K L' := by
+theorem isLattice_adjoin_iff' (L' : Submodule (𝓞 K) V')
+    : Submodule.IsLattice K (S.adjoin L') ↔ Submodule.IsLattice K L' := by
   constructor
   · intro hL
     have hFG : (L'.map (S.ι.restrictScalars (𝓞 K))).FG :=
@@ -143,8 +154,9 @@ theorem isLattice_adjoin_iff' (L' : Submodule (𝓞 K) V') :
       exact (Submodule.fg_span_singleton _).sup (hL.fg.map _)
     · intro s hs hli
       exact (LinearIndependent.iff_fractionRing _ _).mp hli
-theorem isIntegralLat_adjoin_iff' (hs : h.IsSymm) (h1 : h S.x₀ S.x₀ = 1) (L' : Submodule (𝓞 K) V') :
-    Formalism.HermitianLatticesTheory.IsIntegralLat h (S.adjoin L') ↔ Formalism.HermitianLatticesTheory.IsIntegralLat h' L' := by
+theorem isIntegralLat_adjoin_iff' (hs : h.IsSymm) (h1 : h S.x₀ S.x₀ = 1) (L' : Submodule (𝓞 K) V')
+    : Formalism.HermitianLatticesTheory.IsIntegralLat h (S.adjoin L')
+      ↔ Formalism.HermitianLatticesTheory.IsIntegralLat h' L' := by
   unfold Formalism.HermitianLatticesTheory.IsIntegralLat
   constructor
   · intro H b hb a ha
@@ -166,12 +178,12 @@ namespace VecSplit
 
 variable (S : VecSplit h h')
 
-theorem smul_comb (s : 𝓞 K) (c : K) (a : V') :
-    s • (c • S.x₀ + S.ι a) = (s • c) • S.x₀ + S.ι (s • a) := by
+theorem smul_comb (s : 𝓞 K) (c : K) (a : V')
+    : s • (c • S.x₀ + S.ι a) = (s • c) • S.x₀ + S.ι (s • a) := by
   rw [smul_add, smul_assoc, ← LinearMap.map_smul_of_tower]
 
-theorem comb_mem_adjoin_iff (L' : Submodule (𝓞 K) V') (c : K) (a : V') :
-    c • S.x₀ + S.ι a ∈ S.adjoin L' ↔ c ∈ (1 : Submodule (𝓞 K) K) ∧ a ∈ L' := by
+theorem comb_mem_adjoin_iff (L' : Submodule (𝓞 K) V') (c : K) (a : V')
+    : c • S.x₀ + S.ι a ∈ S.adjoin L' ↔ c ∈ (1 : Submodule (𝓞 K) K) ∧ a ∈ L' := by
   rw [S.mem_adjoin_iff]
   constructor
   · rintro ⟨r, b, hb, he⟩
@@ -181,10 +193,12 @@ theorem comb_mem_adjoin_iff (L' : Submodule (𝓞 K) V') (c : K) (a : V') :
     obtain ⟨r, rfl⟩ := Submodule.mem_one.mp hc
     exact ⟨r, a, ha, rfl⟩
 
-theorem comb_mem_loc_adjoin_iff (p : Ideal (𝓞 K)) (L' : Submodule (𝓞 K) V') (c : K) (a : V') :
-    c • S.x₀ + S.ι a ∈ Formalism.HermitianLatticesTheory.loc (K := K) p (S.adjoin L') ↔
-      c ∈ Formalism.HermitianLatticesTheory.locR (K := K) p ∧ a ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L' := by
-  simp only [Formalism.HermitianLatticesTheory.locR, Formalism.HermitianLatticesTheory.loc, Formalism.HermitianLatticesTheory.locS, Submodule.mem_mk, AddSubmonoid.mem_mk,
+theorem comb_mem_loc_adjoin_iff (p : Ideal (𝓞 K)) (L' : Submodule (𝓞 K) V') (c : K) (a : V')
+    : c • S.x₀ + S.ι a ∈ Formalism.HermitianLatticesTheory.loc (K := K) p (S.adjoin L')
+      ↔ c ∈ Formalism.HermitianLatticesTheory.locR (K := K) p
+        ∧ a ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L' := by
+  simp only [Formalism.HermitianLatticesTheory.locR, Formalism.HermitianLatticesTheory.loc,
+    Formalism.HermitianLatticesTheory.locS, Submodule.mem_mk, AddSubmonoid.mem_mk,
     AddSubsemigroup.mem_mk, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨s, hs, hmem⟩
@@ -201,20 +215,28 @@ theorem comb_mem_loc_adjoin_iff (p : Ideal (𝓞 K)) (L' : Submodule (𝓞 K) V'
 
 end VecSplit
 
-theorem VecSplit.cut_adjoin (S : VecSplit h h') (L' : Submodule (𝓞 K) V') :
-    S.cut (S.adjoin L') = L' := S.cut_adjoin' L'
+theorem VecSplit.cut_adjoin (S : VecSplit h h') (L' : Submodule (𝓞 K) V')
+    : S.cut (S.adjoin L') = L' :=
+  S.cut_adjoin' L'
 
-theorem VecSplit.adjoin_cut (S : VecSplit h h') (h1 : h S.x₀ S.x₀ = 1) {L : Submodule (𝓞 K) V}
-    (hL : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (hx : S.x₀ ∈ L) : S.adjoin (S.cut L) = L := S.adjoin_cut' h1 hL hx
+theorem VecSplit.adjoin_cut
+    (S : VecSplit h h') (h1 : h S.x₀ S.x₀ = 1)
+    {L : Submodule (𝓞 K) V}
+    (hL : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (hx : S.x₀ ∈ L)
+    : S.adjoin (S.cut L) = L :=
+  S.adjoin_cut' h1 hL hx
 
-theorem VecSplit.x₀_mem_adjoin (S : VecSplit h h') (L' : Submodule (𝓞 K) V') :
-    S.x₀ ∈ S.adjoin L' := S.x₀_mem_adjoin' L'
+theorem VecSplit.x₀_mem_adjoin (S : VecSplit h h') (L' : Submodule (𝓞 K) V') : S.x₀ ∈ S.adjoin L' :=
+  S.x₀_mem_adjoin' L'
 
-theorem VecSplit.isLattice_adjoin_iff (S : VecSplit h h') (L' : Submodule (𝓞 K) V') :
-    Submodule.IsLattice K (S.adjoin L') ↔ Submodule.IsLattice K L' := S.isLattice_adjoin_iff' L'
+theorem VecSplit.isLattice_adjoin_iff (S : VecSplit h h') (L' : Submodule (𝓞 K) V')
+    : Submodule.IsLattice K (S.adjoin L') ↔ Submodule.IsLattice K L' :=
+  S.isLattice_adjoin_iff' L'
 
-theorem VecSplit.isIntegralLat_adjoin_iff (hs : h.IsSymm) (S : VecSplit h h') (h1 : h S.x₀ S.x₀ = 1)
-    (L' : Submodule (𝓞 K) V') :
-    Formalism.HermitianLatticesTheory.IsIntegralLat h (S.adjoin L') ↔ Formalism.HermitianLatticesTheory.IsIntegralLat h' L' := S.isIntegralLat_adjoin_iff' hs h1 L'
+theorem VecSplit.isIntegralLat_adjoin_iff
+    (hs : h.IsSymm) (S : VecSplit h h') (h1 : h S.x₀ S.x₀ = 1) (L' : Submodule (𝓞 K) V')
+    : Formalism.HermitianLatticesTheory.IsIntegralLat h (S.adjoin L')
+      ↔ Formalism.HermitianLatticesTheory.IsIntegralLat h' L' :=
+  S.isIntegralLat_adjoin_iff' hs h1 L'
 
 end Formalism.HermitianLattices.Ext.L3

@@ -4,8 +4,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
@@ -67,14 +69,14 @@ private lemma esymm_descends (F : Type) [Field F] [NumberField F] (n : ℕ)
     refine Finset.sum_congr rfl fun a ha => ?_
     rw [he a.1 (Finset.mem_filter.1 ha).2 τ, hp]
 
-theorem UpperTheory.Gal.W2.newtonPoly_of :
-    UpperTheory.Gal.W2.NewtonPoly := by
+theorem UpperTheory.Gal.W2.newtonPoly_of : UpperTheory.Gal.W2.NewtonPoly := by
   intro F _ _ n m hc hpow
   choose b hb using esymm_descends F n m hc hpow
   refine ⟨∑ j ∈ Finset.range (n + 1), (-1) ^ j * (C (b j) * X ^ (n - j)), ?_⟩
-  have hmap : ∀ τ : F →+* ℂ, Polynomial.map τ
-      (∑ j ∈ Finset.range (n + 1), (-1) ^ j * (C (b j) * X ^ (n - j))) =
-      ((m τ).map fun r => X - C r).prod := by
+  have hmap
+      : ∀ τ : F →+* ℂ,
+        Polynomial.map τ (∑ j ∈ Finset.range (n + 1), (-1) ^ j * (C (b j) * X ^ (n - j)))
+          = ((m τ).map fun r => X - C r).prod := by
     intro τ
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Multiset.prod_X_sub_X_eq_sum_esymm, hc τ, Polynomial.map_sum]
@@ -84,8 +86,9 @@ theorem UpperTheory.Gal.W2.newtonPoly_of :
   have hmon : ((m τ).map fun r => X - C r).prod.Monic :=
     Polynomial.monic_multiset_prod_of_monic _ _ fun r _ => Polynomial.monic_X_sub_C r
   refine ⟨?_, ?_, hmap⟩
-  · have h1 := Polynomial.leadingCoeff_map_of_injective τ.injective
-      (∑ j ∈ Finset.range (n + 1), (-1) ^ j * (C (b j) * X ^ (n - j)))
+  · have h1 :=
+      Polynomial.leadingCoeff_map_of_injective τ.injective
+        (∑ j ∈ Finset.range (n + 1), (-1) ^ j * (C (b j) * X ^ (n - j)))
     rw [hmap τ, hmon.leadingCoeff] at h1
     exact τ.injective (by rw [← h1, map_one])
   · rw [← Polynomial.natDegree_map_eq_of_injective τ.injective, hmap τ,

@@ -13,15 +13,25 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PeriodDat
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
-theorem reads_orbit_invFrob : ∀ (D : D7) {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) (W : Wach P K LL) (c : D.host.E →+* ↥K.1) (κ : D.host.E →+* ↥LL.1), l ∉ D.host.small → l ≠ D.host.q → l ≠ D.host.d → (K.1 : Set (Om l)) ⊆ closure (Set.range fun x => ((c x : ↥K.1) : Om l)) → K.1 ≤ MaximalUnramifiedExtension l → ∃ g : ZMod (Module.finrank ℚ_[l] ↥(K0 K)) → D.R.GG, IsOrbit g (DV.frobG D l)⁻¹ ∧ ∀ τ a, Over W τ a → Reads D.host c κ τ (g a) := by
+theorem reads_orbit_invFrob
+    : ∀ (D : D7) {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) (W : Wach P K LL)
+        (c : D.host.E →+* ↥K.1) (κ : D.host.E →+* ↥LL.1),
+      l ∉ D.host.small → l ≠ D.host.q → l ≠ D.host.d
+        → (K.1 : Set (Om l)) ⊆ closure (Set.range fun x => ((c x : ↥K.1) : Om l))
+        → K.1 ≤ MaximalUnramifiedExtension l
+        → ∃ g : ZMod (Module.finrank ℚ_[l] ↥(K0 K)) → D.R.GG,
+          IsOrbit g (DV.frobG D l)⁻¹ ∧ ∀ τ a, Over W τ a → Reads D.host c κ τ (g a) := by
   intro D l _ P K LL W c κ h2 hq hd hcl hK
   set φ := DV.frobG D l with hφ
   set n := Module.finrank ℚ_[l] ↥(K0 K) with hn
-  have hτ := fun a => GlobalTheory.T.existsUnique_embeddingRestrictsToWachLetter_unramified P K LL W hK a
+  have hτ := fun a =>
+    GlobalTheory.T.existsUnique_embeddingRestrictsToWachLetter_unramified P K LL W hK a
   have hg := fun τ => GlobalTheory.T.existsUnique_embeddingReadsGaloisElement D.host K LL c κ τ
   let τa : ZMod n → (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) := fun a => (hτ a).exists.choose
   have hover : ∀ a, Over W (τa a) a := fun a => (hτ a).exists.choose_spec
@@ -39,7 +49,8 @@ theorem reads_orbit_invFrob : ∀ (D : D7) {l : ℕ} [Fact l.Prime] (P : LocPrim
     have hz : D.host.sigmaOf φ x = z := by
       rw [hx, ← AlgEquiv.mul_apply, ← smul, mul_inv_cancel]
       show (D.host.gal).symm 1 z = z
-      rw [map_one]; rfl
+      rw [map_one]
+      rfl
     let y : ↥(K0 K) := ⟨((c x : ↥K.1) : Om l), ⟨(c x).2, hK (c x).2⟩⟩
     have hy : algebraMap ↥(K0 K) ↥K.1 y = c x := Subtype.ext rfl
     have hσ := GlobalTheory.T.periodDatum_frobenius_restrict_hostField D P K c h2 hq hd x y hy
@@ -50,7 +61,9 @@ theorem reads_orbit_invFrob : ∀ (D : D7) {l : ℕ} [Fact l.Prime] (P : LocPrim
     have hemb : W.emb (a + 1) ((P.PD K).σ y) = W.emb a y := by
       have := congrArg (fun f => f y) (W.emb_σ a)
       simpa using this
-    calc τa (a + 1) (c z) = τa (a + 1) (c (D.host.sigmaOf φ x)) := by rw [hz]
+    calc
+      τa (a + 1) (c z)
+        = τa (a + 1) (c (D.host.sigmaOf φ x)) := by rw [hz]
       _ = τa (a + 1) (algebraMap ↥(K0 K) ↥K.1 ((P.PD K).σ y)) := by rw [hσ]
       _ = W.emb (a + 1) ((P.PD K).σ y) := ov _ _
       _ = W.emb a y := hemb
@@ -63,21 +76,24 @@ theorem reads_orbit_invFrob : ∀ (D : D7) {l : ℕ} [Fact l.Prime] (P : LocPrim
     rw [hn]; exact (IntermediateField.equivOfEq hK0).toLinearEquiv.finrank_eq
   have hlen : n = orderOf φ⁻¹ := by
     rw [orderOf_inv]
-    obtain ⟨Q, -, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral
-      (Ideal.span {(l : ℤ)}) (⊥ : Ideal (𝓞 D.host.E)) (by
-        intro x hx
-        simp only [Ideal.mem_comap, Ideal.mem_bot] at hx
-        have : x = 0 := (algebraMap ℤ (𝓞 D.host.E)).injective_int (by simpa using hx)
-        rw [this]; exact Ideal.zero_mem _)
+    obtain ⟨Q, -, hQ, hQc⟩ :=
+      Ideal.exists_ideal_over_prime_of_isIntegral (Ideal.span {(l : ℤ)}) (⊥ : Ideal (𝓞 D.host.E))
+        (by
+          intro x hx
+          simp only [Ideal.mem_comap, Ideal.mem_bot] at hx
+          have : x = 0 := (algebraMap ℤ (𝓞 D.host.E)).injective_int (by simpa using hx)
+          rw [this]
+          exact Ideal.zero_mem _)
     have := hQ
     have : Q.LiesOver (Ideal.span {(l : ℤ)}) := ⟨hQc.symm⟩
     have hfrob := (GlobalTheory.T.frobG_isArithFrobAt_and_sign_eq_jacobiSym D l h2 hq hd).1 Q
     let c' : D.host.E →+* PadicAlgCl l := (K.1.val : ↥K.1 →ₐ[ℚ_[l]] Om l).toRingHom.comp c
     have hc' : ∀ x, c' x ∈ K.1 := fun x => (c x).2
     have hcl' : (K.1 : Set (PadicAlgCl l)) ⊆ closure (Set.range c') := hcl
-    have := (GlobalTheory.T.completion_embeddings_single_frobenius_orbit D.host l h2 hq hd c' K hc' hcl' Q (D.host.sigmaOf φ) hfrob).1
-    have hφg : D.host.galE (D.host.sigmaOf φ) = φ :=
-      (D.host.gal).apply_symm_apply φ
+    have :=
+      (GlobalTheory.T.completion_embeddings_single_frobenius_orbit D.host l h2 hq hd c' K hc' hcl' Q
+        (D.host.sigmaOf φ) hfrob).1
+    have hφg : D.host.galE (D.host.sigmaOf φ) = φ := (D.host.gal).apply_symm_apply φ
     rw [hfr, this, hφg]
   have hpos : 0 < n := by
     rw [hfr]

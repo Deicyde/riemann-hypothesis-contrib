@@ -17,9 +17,11 @@ theorem mem_rows [Fintype m] (M : Matrix m n R) (v : n → R) : v ∈ what₂ M 
   simp only [what₂, Matrix.vecMul_eq_sum]
   exact Submodule.mem_span_range_iff_exists_fun R
 
-theorem det_relations [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] (P : Matrix n n R) (G : Matrix m n R)
-    (T : Matrix m m R) (hG : ∀ v, ∃ w z, v = w ᵥ* G + z ᵥ* P) (hT : ∀ i, T i ᵥ* G ∈ what₂ P) (h0 : P.det = 0) :
-    T.det = 0 := by
+theorem det_relations
+    [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+    (P : Matrix n n R) (G : Matrix m n R) (T : Matrix m m R)
+    (hG : ∀ v, ∃ w z, v = w ᵥ* G + z ᵥ* P) (hT : ∀ i, T i ᵥ* G ∈ what₂ P) (h0 : P.det = 0)
+    : T.det = 0 := by
   classical
   set Q : Submodule R (n → R) := what₂ P with hQ
   have hrow : ∀ i, (T * G) i = T i ᵥ* G := by
@@ -50,31 +52,39 @@ theorem det_relations [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] (P
   rw [Matrix.det_transpose, Matrix.det_transpose, h0, Ideal.mem_span_singleton, zero_dvd_iff] at h
   exact h
 
-theorem multilinear_add_smul [Fintype m] [DecidableEq m] (f : (m → n → R) →ₘₗ[R] R)
-    (M V : m → n → R) (x : R) (hx : x * x = 0) :
-    f (M + x • V) = f M + x * ∑ i, f (Function.update M i (V i)) := by
+theorem multilinear_add_smul
+    [Fintype m] [DecidableEq m]
+    (f : (m → n → R) →ₘₗ[R] R) (M V : m → n → R)
+    (x : R) (hx : x * x = 0)
+    : f (M + x • V) = f M + x * ∑ i, f (Function.update M i (V i)) := by
   classical
-  have key : ∀ (S : Finset m) (N : m → n → R),
-      f (N + x • S.piecewise V 0) = f N + x * ∑ i ∈ S, f (Function.update N i (V i)) := by
+  have key
+      : ∀ (S : Finset m) (N : m → n → R),
+        f (N + x • S.piecewise V 0) = f N + x * ∑ i ∈ S, f (Function.update N i (V i)) := by
     intro S
     induction S using Finset.induction_on with
     | empty => intro N; simp
     | insert a S ha ih =>
       intro N
-      have e : N + x • (insert a S).piecewise V 0 =
-          Function.update N a (N a + x • V a) + x • S.piecewise V 0 := by
+      have e
+          : N + x • (insert a S).piecewise V 0
+            = Function.update N a (N a + x • V a) + x • S.piecewise V 0 := by
         funext i
         by_cases hi : i = a
         · subst hi; simp [ha]
         · simp [Finset.piecewise_insert, hi]
-      have h1 : f (Function.update N a (N a + x • V a)) = f N + x * f (Function.update N a (V a)) := by
-        rw [f.map_update_add, f.map_update_smul, Function.update_eq_self, RingHom.id_apply, smul_eq_mul]
-      have h2 : ∀ i ∈ S, x * f (Function.update (Function.update N a (N a + x • V a)) i (V i)) =
-          x * f (Function.update N i (V i)) := by
+      have h1
+          : f (Function.update N a (N a + x • V a)) = f N + x * f (Function.update N a (V a)) := by
+        rw [f.map_update_add, f.map_update_smul, Function.update_eq_self, RingHom.id_apply,
+          smul_eq_mul]
+      have h2
+          : ∀ i ∈ S,
+            x * f (Function.update (Function.update N a (N a + x • V a)) i (V i))
+              = x * f (Function.update N i (V i)) := by
         intro i hi
         have hia : a ≠ i := fun h => ha (h ▸ hi)
-        rw [Function.update_comm hia, f.map_update_add, f.map_update_smul, RingHom.id_apply, smul_eq_mul, mul_add,
-          ← mul_assoc, hx, zero_mul, add_zero]
+        rw [Function.update_comm hia, f.map_update_add, f.map_update_smul, RingHom.id_apply,
+          smul_eq_mul, mul_add, ← mul_assoc, hx, zero_mul, add_zero]
         congr 2
         conv_rhs => rw [← Function.update_eq_self a (Function.update N i (V i))]
         rw [Function.update_of_ne hia]
@@ -83,16 +93,21 @@ theorem multilinear_add_smul [Fintype m] [DecidableEq m] (f : (m → n → R) �
       ring
   simpa using key Finset.univ M
 
-theorem det_add_smul [Fintype m] [DecidableEq m] (M V : Matrix m m R) (x : R) (hx : x * x = 0) :
-    (M + x • V).det = M.det + x * ∑ i, (M.updateRow i (V i)).det := by
-  exact multilinear_add_smul (Matrix.detRowAlternating : (m → R) [⋀^m]→ₗ[R] R).toMultilinearMap M V x hx
+theorem det_add_smul [Fintype m] [DecidableEq m] (M V : Matrix m m R) (x : R) (hx : x * x = 0)
+    : (M + x • V).det = M.det + x * ∑ i, (M.updateRow i (V i)).det := by
+  exact multilinear_add_smul (Matrix.detRowAlternating : (m → R) [⋀^m]→ₗ[R] R).toMultilinearMap M V
+    x hx
 
-theorem det_block [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] (Φ : Matrix m m R) (C : Matrix m n R)
-    (l : m) (j : n) (k U' : n → R) (U : m → R) :
-    ((fromBlocks (Φ.updateRow l 0) (C.updateRow l k) 0 1).updateRow (Sum.inr j) (Sum.elim U U')).det
-      = - (k j * ∑ c, U c * Φ.adjugate c l) := by
+theorem det_block
+    [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+    (Φ : Matrix m m R) (C : Matrix m n R) (l : m) (j : n) (k U' : n → R) (U : m → R)
+    : ((fromBlocks (Φ.updateRow l 0) (C.updateRow l k) 0 1).updateRow (Sum.inr j)
+        (Sum.elim U U')).det
+      = -(k j * ∑ c, U c * Φ.adjugate c l) := by
   classical
-  have hrow : ∀ (A : Matrix m m R) (i : m) (b : m → R), (A.updateRow i b).det = ∑ c, b c * A.adjugate c i := by
+  have hrow
+      : ∀ (A : Matrix m m R) (i : m) (b : m → R),
+        (A.updateRow i b).det = ∑ c, b c * A.adjugate c i := by
     intro A i b
     rw [Matrix.det_eq_sum_mul_adjugate_row _ i]
     simp [Matrix.adjugate_apply, Matrix.updateRow_idem]
@@ -102,11 +117,12 @@ theorem det_block [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] (Φ : 
     simp only [← Matrix.adjugate_apply, Matrix.adjugate_one, Matrix.one_apply]
     simp
   set M := (fromBlocks (Φ.updateRow l 0) (C.updateRow l k) 0 1).updateRow (Sum.inr j) (Sum.elim U U') with hM
-  have hsw : M.submatrix (Equiv.swap (Sum.inl l) (Sum.inr j)) id =
-      fromBlocks (Φ.updateRow l U) (C.updateRow l U') 0 ((1 : Matrix n n R).updateRow j k) := by
-    ext (a | a) (b | b) <;>
-      simp [hM, Equiv.swap_apply_def, Matrix.updateRow_apply, Matrix.one_apply] <;>
-      split_ifs <;> simp_all
+  have hsw
+      : M.submatrix (Equiv.swap (Sum.inl l) (Sum.inr j)) id
+        = fromBlocks (Φ.updateRow l U) (C.updateRow l U') 0 ((1 : Matrix n n R).updateRow j k) := by
+    ext (a | a) (b | b)
+      <;> simp [hM, Equiv.swap_apply_def, Matrix.updateRow_apply, Matrix.one_apply] <;> split_ifs
+      <;> simp_all
   have h1 := Matrix.det_permute (Equiv.swap (Sum.inl l) (Sum.inr j)) M
   rw [hsw, Matrix.det_fromBlocks_zero₂₁, Equiv.Perm.sign_swap (by simp), hrow, hrow1] at h1
   simp at h1
@@ -115,12 +131,15 @@ theorem det_block [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] (Φ : 
 end
 
 section
-variable {A B m n : Type} [CommRing A] [CommRing B] [Fintype m] [Fintype n] (π : B →+* A) (x y : B)
-  (hπ : Function.Surjective π) (hker : ∀ b, π b = 0 → b ∈ Ideal.span {x, y}) (G : Matrix m n B) (P : Matrix n n B)
+variable
+  {A B m n : Type} [CommRing A] [CommRing B] [Fintype m] [Fintype n]
+  (π : B →+* A) (x y : B)
+  (hπ : Function.Surjective π) (hker : ∀ b, π b = 0 → b ∈ Ideal.span {x, y}) (G : Matrix m n B)
+  (P : Matrix n n B)
 
 include hπ hker in
-theorem lift_mod (v : n → B) (w₀ : m → A) (h : π ∘ v - w₀ ᵥ* G.map π ∈ what₂ (P.map π)) :
-    ∃ w z p q, π ∘ w = w₀ ∧ v = w ᵥ* G + z ᵥ* P + (x • p + y • q) := by
+theorem lift_mod (v : n → B) (w₀ : m → A) (h : π ∘ v - w₀ ᵥ* G.map π ∈ what₂ (P.map π))
+    : ∃ w z p q, π ∘ w = w₀ ∧ v = w ᵥ* G + z ᵥ* P + (x • p + y • q) := by
   classical
   obtain ⟨z₀, hz₀⟩ := (mem_rows _ _).1 h
   set s := Function.surjInv hπ
@@ -141,9 +160,10 @@ theorem lift_mod (v : n → B) (w₀ : m → A) (h : π ∘ v - w₀ ᵥ* G.map 
   linear_combination -(hpq c)
 
 include hπ hker in
-theorem generate (hx : IsNilpotent x) (hy : IsNilpotent y)
-    (h : ∀ v₀ : n → A, ∃ w₀, v₀ - w₀ ᵥ* G.map π ∈ what₂ (P.map π)) (v : n → B) :
-    ∃ w z, v = w ᵥ* G + z ᵥ* P := by
+theorem generate
+    (hx : IsNilpotent x) (hy : IsNilpotent y)
+    (h : ∀ v₀ : n → A, ∃ w₀, v₀ - w₀ ᵥ* G.map π ∈ what₂ (P.map π)) (v : n → B)
+    : ∃ w z, v = w ᵥ* G + z ᵥ* P := by
   classical
   have hI : Ideal.span {x, y} ≤ Ideal.jacobson ⊥ := by
     rw [Ideal.span_le]
@@ -159,19 +179,20 @@ theorem generate (hx : IsNilpotent x) (hy : IsNilpotent y)
     refine add_mem (add_mem ?_ ?_) (add_mem ?_ ?_)
     · exact Submodule.mem_sup_left (Submodule.mem_sup_left ((mem_rows G _).2 ⟨w, rfl⟩))
     · exact Submodule.mem_sup_left (Submodule.mem_sup_right ((mem_rows P _).2 ⟨z, rfl⟩))
-    · exact Submodule.mem_sup_right
-        (Submodule.smul_mem_smul (Ideal.subset_span (by simp)) Submodule.mem_top)
-    · exact Submodule.mem_sup_right
-        (Submodule.smul_mem_smul (Ideal.subset_span (by simp)) Submodule.mem_top)
+    · exact Submodule.mem_sup_right (Submodule.smul_mem_smul (Ideal.subset_span (by simp))
+        Submodule.mem_top)
+    · exact Submodule.mem_sup_right (Submodule.smul_mem_smul (Ideal.subset_span (by simp))
+        Submodule.mem_top)
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 (htop Submodule.mem_top : v ∈ what₂ G ⊔ what₂ P)
   obtain ⟨w, rfl⟩ := (mem_rows G a).1 ha
   obtain ⟨z, rfl⟩ := (mem_rows P b).1 hb
   exact ⟨w, z, hab.symm⟩
 
 include hπ hker in
-theorem lift_exact (hx : π x = 0) (hy : π y = 0) (hG : ∀ v, ∃ w z, v = w ᵥ* G + z ᵥ* P)
-    (v : n → B) (w₀ : m → A) (h : π ∘ v - w₀ ᵥ* G.map π ∈ what₂ (P.map π)) :
-    ∃ w, π ∘ w = w₀ ∧ v - w ᵥ* G ∈ what₂ P := by
+theorem lift_exact
+    (hx : π x = 0) (hy : π y = 0) (hG : ∀ v, ∃ w z, v = w ᵥ* G + z ᵥ* P)
+    (v : n → B) (w₀ : m → A) (h : π ∘ v - w₀ ᵥ* G.map π ∈ what₂ (P.map π))
+    : ∃ w, π ∘ w = w₀ ∧ v - w ᵥ* G ∈ what₂ P := by
   obtain ⟨w', z', p, q, hw', hv⟩ := lift_mod π x y hπ hker G P v w₀ h
   obtain ⟨a, b, hab⟩ := hG p
   obtain ⟨c, d, hcd⟩ := hG q
@@ -189,33 +210,43 @@ end
 section
 variable {B m μ : Type} [CommRing B] [Fintype m] [DecidableEq m] [Fintype μ] [DecidableEq μ]
 
-theorem det_expand (x y : B) (hx : x * x = 0) (hy : y ^ Fintype.card μ = 0) (D : Matrix m (m ⊕ μ) B)
-    (w : Matrix μ (m ⊕ μ) B) :
-    (fromRows D (y • fromCols 0 1 + x • w)).det = x * y ^ (Fintype.card μ - 1) *
-      ∑ j, ((fromRows D (fromCols 0 1)).updateRow (Sum.inr j) (w j)).det := by
+theorem det_expand
+    (x y : B) (hx : x * x = 0) (hy : y ^ Fintype.card μ = 0)
+    (D : Matrix m (m ⊕ μ) B) (w : Matrix μ (m ⊕ μ) B)
+    : (fromRows D (y • fromCols 0 1 + x • w)).det
+      = x * y ^ (Fintype.card μ - 1)
+        * ∑ j, ((fromRows D (fromCols 0 1)).updateRow (Sum.inr j) (w j)).det := by
   classical
   set E := fromRows D (fromCols (0 : Matrix μ m B) (1 : Matrix μ μ B)) with hE
   set ν : m ⊕ μ → B := Sum.elim (fun _ => 1) (fun _ => y) with hν
-  have hsplit : fromRows D (y • fromCols (0 : Matrix μ m B) 1 + x • w) =
-      fromRows D (y • fromCols (0 : Matrix μ m B) 1) + x • fromRows (0 : Matrix m (m ⊕ μ) B) w := by
+  have hsplit
+      : fromRows D (y • fromCols (0 : Matrix μ m B) 1 + x • w)
+        = fromRows D (y • fromCols (0 : Matrix μ m B) 1)
+          + x • fromRows (0 : Matrix m (m ⊕ μ) B) w := by
     ext (i | i) c <;> simp
   have hM : fromRows D (y • fromCols (0 : Matrix μ m B) 1) = of fun i c => ν i * E i c := by
     ext (i | i) c <;> simp [hν, hE]
-  have hprod : ∏ i, ν i = y ^ Fintype.card μ := by
-    simp [hν, Fintype.prod_sum_type]
-  have h0 : ∀ b : m, ((of fun i c => ν i * E i c).updateRow (Sum.inl b)
-      ((fromRows (0 : Matrix m (m ⊕ μ) B) w) (Sum.inl b))).det = 0 := by
+  have hprod : ∏ i, ν i = y ^ Fintype.card μ := by simp [hν, Fintype.prod_sum_type]
+  have h0
+      : ∀ b : m,
+        ((of fun i c => ν i * E i c).updateRow (Sum.inl b)
+            ((fromRows (0 : Matrix m (m ⊕ μ) B) w) (Sum.inl b))).det
+          = 0 := by
     intro b
     apply Matrix.det_eq_zero_of_row_eq_zero (Sum.inl b)
     intro c
     simp
-  have h1 : ∀ j : μ, ((of fun i c => ν i * E i c).updateRow (Sum.inr j)
-      ((fromRows (0 : Matrix m (m ⊕ μ) B) w) (Sum.inr j))).det =
-      y ^ (Fintype.card μ - 1) * (E.updateRow (Sum.inr j) (w j)).det := by
+  have h1
+      : ∀ j : μ,
+        ((of fun i c => ν i * E i c).updateRow (Sum.inr j)
+            ((fromRows (0 : Matrix m (m ⊕ μ) B) w) (Sum.inr j))).det
+          = y ^ (Fintype.card μ - 1) * (E.updateRow (Sum.inr j) (w j)).det := by
     intro j
-    have e : (of fun i c => ν i * E i c).updateRow (Sum.inr j)
-        ((fromRows (0 : Matrix m (m ⊕ μ) B) w) (Sum.inr j)) =
-        of fun i c => Function.update ν (Sum.inr j) 1 i * (E.updateRow (Sum.inr j) (w j)) i c := by
+    have e
+        : (of fun i c => ν i * E i c).updateRow (Sum.inr j)
+            ((fromRows (0 : Matrix m (m ⊕ μ) B) w) (Sum.inr j))
+          = of fun i c =>
+            Function.update ν (Sum.inr j) 1 i * (E.updateRow (Sum.inr j) (w j)) i c := by
       ext i c
       by_cases hi : i = Sum.inr j
       · subst hi; simp
@@ -235,9 +266,25 @@ theorem det_expand (x y : B) (hx : x * x = 0) (hy : y ^ Fintype.card μ = 0) (D 
 
 end
 
-theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A) (x y : B) (μ : Type) [Fintype μ] (a a' : ℕ) (Φ' : Matrix (Fin a') (Fin a') B) (u t : μ → Fin a' → B) (η : μ → B) (Φ : Matrix (Fin a) (Fin a) A) (E : Matrix (Fin a) (Fin a') A) (U : μ → Fin a → A) (k : μ → A) (l₀ : Fin a), Function.Surjective π → (∀ b, π b = 0 → b ∈ Ideal.span {x, y}) → π x = 0 → π y = 0 → x * x = 0 → y ^ Fintype.card μ = 0 → (∀ f, x * y ^ (Fintype.card μ - 1) * f = 0 → π f = 0) → (∀ j, π (η j) = 1) → (∀ j, x • u j - (y * η j) • t j ∈ what₂ Φ') → what₂ E ⊔ (what₂ (Φ'.map π) ⊔ what₂ (fun j c => π (t j c))) = ⊤ → (∀ b, (Φ * E) b ∈ what₂ (Φ'.map π) ⊔ what₂ (fun j c => π (t j c))) → (∀ j, (fun c => π (u j c)) - Matrix.vecMul (U j) E ∈ what₂ (Φ'.map π) ⊔ what₂ (fun j c => π (t j c))) → ∑ j, k j • (fun c => π (t j c)) ∈ what₂ (Φ'.map π) → ∑ j, k j * ∑ c, U j c * Φ.adjugate c l₀ ≠ 0 → Φ'.det ≠ 0 := by
+theorem det_ne_zero
+    : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A) (x y : B) (μ : Type) [Fintype μ]
+        (a a' : ℕ) (Φ' : Matrix (Fin a') (Fin a') B) (u t : μ → Fin a' → B) (η : μ → B)
+        (Φ : Matrix (Fin a) (Fin a) A) (E : Matrix (Fin a) (Fin a') A) (U : μ → Fin a → A)
+        (k : μ → A) (l₀ : Fin a),
+      Function.Surjective π → (∀ b, π b = 0 → b ∈ Ideal.span {x, y}) → π x = 0 → π y = 0 → x * x = 0
+        → y ^ Fintype.card μ = 0 → (∀ f, x * y ^ (Fintype.card μ - 1) * f = 0 → π f = 0)
+        → (∀ j, π (η j) = 1) → (∀ j, x • u j - (y * η j) • t j ∈ what₂ Φ')
+        → what₂ E ⊔ (what₂ (Φ'.map π) ⊔ what₂ (fun j c => π (t j c))) = ⊤
+        → (∀ b, (Φ * E) b ∈ what₂ (Φ'.map π) ⊔ what₂ (fun j c => π (t j c)))
+        → (∀ j,
+          (fun c => π (u j c)) - Matrix.vecMul (U j) E
+            ∈ what₂ (Φ'.map π) ⊔ what₂ (fun j c => π (t j c)))
+        → ∑ j, k j • (fun c => π (t j c)) ∈ what₂ (Φ'.map π)
+        → ∑ j, k j * ∑ c, U j c * Φ.adjugate c l₀ ≠ 0
+        → Φ'.det ≠ 0 := by
   classical
-  intro A B _ _ π x y μ _ a a' Φ' u t η Φ E U k l₀ hπ hker hx0 hy0 hx hy hann hη hrel hgen hΦE hu hk hne hdet
+  intro A B _ _ π x y μ _ a a' Φ' u t η Φ E U k l₀ hπ hker hx0 hy0 hx hy hann hη hrel hgen hΦE hu hk
+    hne hdet
   set s := Function.surjInv hπ
   have hs : ∀ a, π (s a) = a := Function.surjInv_eq hπ
   set tπ : Matrix μ (Fin a') A := fun j c => π (t j c) with htπ
@@ -265,17 +312,18 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
     obtain ⟨f, hf, g, hg, hfg⟩ := Submodule.mem_sup.1 (hΦE b)
     obtain ⟨r, rfl⟩ := (mem_rows tπ g).1 hg
     refine ⟨r, ?_⟩
-    have e : (Φ * E) b = Φ b ᵥ* E := by
-      funext c; simp [Matrix.mul_apply, Matrix.vecMul, dotProduct]
+    have e : (Φ * E) b = Φ b ᵥ* E := by funext c; simp [Matrix.mul_apply, Matrix.vecMul, dotProduct]
     rw [← e, ← hfg, add_sub_cancel_right]
     exact hf
   choose r hr using hr
   set C : Matrix (Fin a) μ A := fun b => -r b with hC
-  have hD : ∀ b, ∃ d : Fin a ⊕ μ → B,
-      π ∘ d = Sum.elim ((Φ.updateRow l₀ 0) b) ((C.updateRow l₀ k) b) ∧ d ᵥ* G ∈ what₂ Φ' := by
+  have hD
+      : ∀ b, ∃ d : Fin a ⊕ μ → B,
+        π ∘ d = Sum.elim ((Φ.updateRow l₀ 0) b) ((C.updateRow l₀ k) b) ∧ d ᵥ* G ∈ what₂ Φ' := by
     intro b
-    have hmem : π ∘ (0 : Fin a' → B) - Sum.elim ((Φ.updateRow l₀ 0) b) ((C.updateRow l₀ k) b) ᵥ* G.map π
-        ∈ what₂ (Φ'.map π) := by
+    have hmem
+        : π ∘ (0 : Fin a' → B) - Sum.elim ((Φ.updateRow l₀ 0) b) ((C.updateRow l₀ k) b) ᵥ* G.map π
+          ∈ what₂ (Φ'.map π) := by
       rw [hGπ, Matrix.sumElim_vecMul_fromRows]
       by_cases hb : b = l₀
       · subst hb
@@ -300,7 +348,8 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
     obtain ⟨σ, rfl⟩ := (mem_rows tπ g).1 hg
     exact ⟨σ, by rw [← hfg, add_sub_cancel_right]; exact hf⟩
   choose σ hσ using hσ
-  have hW : ∀ j, ∃ wj : Fin a ⊕ μ → B, π ∘ wj = Sum.elim (U j) (σ j) ∧ u j - wj ᵥ* G ∈ what₂ Φ' := by
+  have hW
+      : ∀ j, ∃ wj : Fin a ⊕ μ → B, π ∘ wj = Sum.elim (U j) (σ j) ∧ u j - wj ᵥ* G ∈ what₂ Φ' := by
     intro j
     apply lift_exact π x y hπ hker G Φ' hx0 hy0 hG (u j)
     rw [hGπ, Matrix.sumElim_vecMul_fromRows, ← sub_sub]
@@ -312,14 +361,15 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
   have hT : ∀ i, T i ᵥ* G ∈ what₂ Φ' := by
     rintro (b | j)
     · exact hD b
-    · have e1 : (fromCols (0 : Matrix μ (Fin a) B) (1 : Matrix μ μ B)) j = Pi.single (Sum.inr j) 1 := by
+    · have e1
+          : (fromCols (0 : Matrix μ (Fin a) B) (1 : Matrix μ μ B)) j = Pi.single (Sum.inr j) 1 := by
         funext i
         rcases i with i | i
         · simp
         · by_cases h : i = j
           · rw [h]; simp
           · simp [h, Ne.symm h]
-      have hTj : T (Sum.inr j) = y • Pi.single (Sum.inr j) 1 + x • (-W j) := by
+      have hTj : T (Sum.inr j) = y • Pi.single (Sum.inr j) 1 + x • (- W j) := by
         show y • (fromCols (0 : Matrix μ (Fin a) B) (1 : Matrix μ μ B)) j + x • W' j = _
         rw [e1]
         rfl
@@ -327,8 +377,8 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
         funext c
         rfl
       have e : T (Sum.inr j) ᵥ* G = -(x • u j - (y * η j) • t j) + x • (u j - W j ᵥ* G) := by
-        rw [hTj, Matrix.add_vecMul, Matrix.smul_vecMul, Matrix.smul_vecMul, Matrix.single_one_vecMul,
-          Matrix.neg_vecMul, hGr]
+        rw [hTj, Matrix.add_vecMul, Matrix.smul_vecMul, Matrix.smul_vecMul,
+          Matrix.single_one_vecMul, Matrix.neg_vecMul, hGr]
         funext c
         simp only [Pi.add_apply, Pi.smul_apply, Pi.neg_apply, Pi.sub_apply, smul_eq_mul]
         ring
@@ -341,10 +391,11 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
-  have hN : π.mapMatrix ((fromRows D (fromCols (0 : Matrix μ (Fin a) B) (1 : Matrix μ μ B))).updateRow
-      (Sum.inr j) (W' j)) =
-      (fromBlocks (Φ.updateRow l₀ 0) (C.updateRow l₀ k) 0 1).updateRow (Sum.inr j)
-        (Sum.elim (-U j) (-σ j)) := by
+  have hN
+      : π.mapMatrix ((fromRows D (fromCols (0 : Matrix μ (Fin a) B) (1 : Matrix μ μ B))).updateRow
+          (Sum.inr j) (W' j))
+        = (fromBlocks (Φ.updateRow l₀ 0) (C.updateRow l₀ k) 0 1).updateRow (Sum.inr j)
+          (Sum.elim (- U j) (- σ j)) := by
     ext (i | i) (c | c)
     · rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.updateRow_ne Sum.inl_ne_inr,
         Matrix.updateRow_ne Sum.inl_ne_inr, Matrix.fromBlocks_apply₁₁]
@@ -353,7 +404,8 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
         Matrix.updateRow_ne Sum.inl_ne_inr, Matrix.fromBlocks_apply₁₂]
       exact congrFun (hDπ i) (Sum.inr c)
     · by_cases hi : i = j
-      · rw [hi, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.updateRow_self, Matrix.updateRow_self]
+      · rw [hi, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.updateRow_self,
+          Matrix.updateRow_self]
         show π (-(W j (Sum.inl c))) = -(U j c)
         rw [map_neg]
         exact congrArg Neg.neg (congrFun (hWπ j) (Sum.inl c))
@@ -363,7 +415,8 @@ theorem det_ne_zero : ∀ (A B : Type) [CommRing A] [CommRing B] (π : B →+* A
         show π ((0 : Matrix μ (Fin a) B) i c) = (0 : Matrix μ (Fin a) A) i c
         simp
     · by_cases hi : i = j
-      · rw [hi, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.updateRow_self, Matrix.updateRow_self]
+      · rw [hi, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.updateRow_self,
+          Matrix.updateRow_self]
         show π (-(W j (Sum.inr c))) = -(σ j c)
         rw [map_neg]
         exact congrArg Neg.neg (congrFun (hWπ j) (Sum.inr c))

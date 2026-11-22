@@ -10,22 +10,27 @@ open IsLocalRing NumberField
 
 namespace GlobalTheory.PointAlg
 
-theorem trdeg_le_of_hom_algClosure (X Y Z : Type) [Field X] [Field Y] [Field Z] [Algebra ℚ X] [Algebra ℚ Y]
-    (f : X →+* AlgebraicClosure Z) (e : Y →+* Z) (he : Function.Surjective e) :
-    Algebra.trdeg ℚ X ≤ Algebra.trdeg ℚ Y := by
+theorem trdeg_le_of_hom_algClosure
+    (X Y Z : Type) [Field X] [Field Y] [Field Z] [Algebra ℚ X] [Algebra ℚ Y]
+    (f : X →+* AlgebraicClosure Z)
+    (e : Y →+* Z) (he : Function.Surjective e)
+    : Algebra.trdeg ℚ X ≤ Algebra.trdeg ℚ Y := by
   letI : Algebra ℚ Z := (e.comp (algebraMap ℚ Y)).toAlgebra
   have h1 : Algebra.trdeg ℚ X ≤ Algebra.trdeg ℚ (AlgebraicClosure Z) :=
     trdeg_le_of_injective f.toRatAlgHom f.injective
-  have h2 : Algebra.trdeg ℚ Z ≤ Algebra.trdeg ℚ Y :=
-    trdeg_le_of_surjective e.toRatAlgHom he
+  have h2 : Algebra.trdeg ℚ Z ≤ Algebra.trdeg ℚ Y := trdeg_le_of_surjective e.toRatAlgHom he
   have h3 := trdeg_add_eq ℚ Z (A := AlgebraicClosure Z)
   rw [trdeg_eq_zero (R := Z) (A := AlgebraicClosure Z), add_zero] at h3
   exact h1.trans (h3.ge.trans h2)
 
-theorem closed_point_of_values (F A R K : Type) [Field F] [NumberField F] [CommRing A] [IsDomain A] [CommRing R]
-    [IsLocalRing R] [Field K] (b : F →+* A) (hb : b.EssFiniteType) (ψ : A →+* R) (hψ : GlobalTheory.TChart.IsComplAt ψ)
-    (ev : R →+* K) (k₀ : Subfield K) (hk : Nonempty (k₀ →+* AlgebraicClosure (ResidueField R)))
-    (hev : ∀ a, ev (ψ a) ∈ k₀) : (∀ r ∈ maximalIdeal R, ev r = 0) ∧ ∀ r, ev r ∈ k₀ := by
+theorem closed_point_of_values
+    (F A R K : Type)
+    [Field F] [NumberField F] [CommRing A] [IsDomain A] [CommRing R] [IsLocalRing R] [Field K]
+    (b : F →+* A) (hb : b.EssFiniteType)
+    (ψ : A →+* R) (hψ : GlobalTheory.TChart.IsComplAt ψ)
+    (ev : R →+* K) (k₀ : Subfield K)
+    (hk : Nonempty (k₀ →+* AlgebraicClosure (ResidueField R))) (hev : ∀ a, ev (ψ a) ∈ k₀)
+    : (∀ r ∈ maximalIdeal R, ev r = 0) ∧ ∀ r, ev r ∈ k₀ := by
   obtain ⟨j⟩ := hk
   obtain ⟨-, -, -, hmap, hres⟩ := hψ
   set q : Ideal A := (maximalIdeal R).comap ψ with hq
@@ -67,7 +72,8 @@ theorem closed_point_of_values (F A R K : Type) [Field F] [NumberField F] [CommR
   have hE : ((algebraMap A L).comp (b.comp (algebraMap ℚ F))).EssFiniteType := by
     refine RingHom.EssFiniteType.comp (RingHom.EssFiniteType.comp ?_ hb) ?_
     · exact RingHom.essFiniteType_algebraMap.mpr inferInstance
-    · exact RingHom.essFiniteType_algebraMap.mpr (Algebra.EssFiniteType.of_isLocalization L q.primeCompl)
+    · exact RingHom.essFiniteType_algebraMap.mpr (Algebra.EssFiniteType.of_isLocalization L
+        q.primeCompl)
   letI : Algebra ℚ L := ((algebraMap A L).comp (b.comp (algebraMap ℚ F))).toAlgebra
   have hmax : RingHom.ker g = maximalIdeal L :=
     GlobalTheory.eq_maximalIdeal_of_trdeg_le ℚ L hE _ hP

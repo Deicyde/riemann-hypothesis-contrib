@@ -17,9 +17,10 @@ def OnlyIn (S : σ → Prop) (f : MvPowerSeries σ C) : Prop :=
   ∀ m : σ →₀ ℕ, MvPowerSeries.coeff m f ≠ 0 → ∀ x ∈ m.support, S x
 
 def Lead (π : σ → κ) (d : σ →₀ ℕ) (f : MvPowerSeries σ C) : Prop :=
-  (∀ m : σ →₀ ℕ, MvPowerSeries.coeff m f ≠ 0 →
-    d.mapDomain π ≤ m.mapDomain π ∧ (m.mapDomain π ≤ d.mapDomain π → m = d)) ∧
-  MvPowerSeries.coeff d f = 1
+  (∀ m : σ →₀ ℕ,
+      MvPowerSeries.coeff m f ≠ 0
+        → d.mapDomain π ≤ m.mapDomain π ∧ (m.mapDomain π ≤ d.mapDomain π → m = d))
+    ∧ MvPowerSeries.coeff d f = 1
 
 def sideRow (n : ℕ) : PVar n → Fin n ⊕ Fin n := Sum.map Prod.fst Prod.fst
 
@@ -369,7 +370,6 @@ private lemma mapDomain_sideRow_inr {n : ℕ} (m : _root_.Formalism.IncomingBoun
   rw [Finset.sum_eq_single ρ (fun b _ hb => by simp [hb]) (by simp)]
   simp
 
-
 open scoped BigOperators in
 variable {C : Type} [Field C] {σ κ : Type} in
 theorem _root_.GlobalTheory.blockValue_rows : _root_.Formalism.L2.FormalSeriesBounds.BiValue := by
@@ -379,16 +379,24 @@ theorem _root_.GlobalTheory.blockValue_rows : _root_.Formalism.L2.FormalSeriesBo
   obtain ⟨-, hR, -, hU⟩ := _root_.GlobalTheory.DiagBlock.main
   unfold _root_.Formalism.UnitaryBoundIntegral.BlockJet at hR
   unfold _root_.Formalism.UnitaryBoundIntegral.RestrictExp at hU
-  have hsplit : _root_.Formalism.L2.FormalSeriesBounds.BiF l i n0 n y hr t t' =
-      _root_.Formalism.IncomingBounds.mvExp (∑ ρ : Fin n with ρ.val < n0, hr ρ) *
-        ∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ)) := by
-    unfold _root_.Formalism.L2.FormalSeriesBounds.BiF
-    rw [mvExp_sum' _ _ (fun ρ _ => hB.constantCoeff_biadditive_zero ρ), Finset.prod_filter, ← Finset.prod_mul_distrib]
-    refine Finset.prod_congr rfl fun ρ _ => ?_
-    split_ifs <;> ring
-  have hres : _root_.Formalism.UnitaryBoundIntegral.restr hn (_root_.Formalism.IncomingBounds.mvExp (∑ ρ : Fin n with ρ.val < n0, hr ρ)) = _root_.Formalism.IncomingBounds.mvExp (_root_.Formalism.IncomingBounds.hP C l i n0 h1) := by
+  have hsplit
+      : _root_.Formalism.L2.FormalSeriesBounds.BiF l i n0 n y hr t t'
+        = _root_.Formalism.IncomingBounds.mvExp (∑ ρ : Fin n with ρ.val < n0, hr ρ)
+          * ∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ)) :=
+    by
+      unfold _root_.Formalism.L2.FormalSeriesBounds.BiF
+      rw [mvExp_sum' _ _ (fun ρ _ => hB.constantCoeff_biadditive_zero ρ), Finset.prod_filter,
+        ← Finset.prod_mul_distrib]
+      refine Finset.prod_congr rfl fun ρ _ => ?_
+      split_ifs <;> ring
+  have hres
+      : _root_.Formalism.UnitaryBoundIntegral.restr hn
+          (_root_.Formalism.IncomingBounds.mvExp (∑ ρ : Fin n with ρ.val < n0, hr ρ))
+        = _root_.Formalism.IncomingBounds.mvExp (_root_.Formalism.IncomingBounds.hP C l i n0
+          h1) := by
     rw [hU, hB.R3]
-  have hG : _root_.GlobalTheory.BlockValue.OnlyIn (fun x => (_root_.Formalism.UnitaryBoundIntegral.rowOf x : ℕ) < n0)
+  have hG : _root_.GlobalTheory.BlockValue.OnlyIn
+      (fun x => (_root_.Formalism.UnitaryBoundIntegral.rowOf x : ℕ) < n0)
       (_root_.Formalism.IncomingBounds.mvExp (∑ ρ : Fin n with ρ.val < n0, hr ρ)) := by
     refine onlyIn_mvExp (onlyIn_sum _ _ fun ρ hρ => ?_)
     have hrow := hB.biadditive_in_single_variables ρ
@@ -396,64 +404,91 @@ theorem _root_.GlobalTheory.blockValue_rows : _root_.Formalism.L2.FormalSeriesBo
     intro m hm x hx
     rw [hrow m hm x hx]
     exact (Finset.mem_filter.1 hρ).2
-  have hH : _root_.GlobalTheory.BlockValue.OnlyIn (fun x => n0 ≤ (_root_.Formalism.UnitaryBoundIntegral.rowOf x : ℕ))
-      (∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ))) := by
-    refine onlyIn_prod _ _ fun ρ _ => ?_
-    split_ifs with hρ
-    · exact onlyIn_one _
-    · have hρ' : n0 ≤ (ρ : ℕ) := not_lt.1 hρ
-      have ht := hB.diagonal_coordinate_left ρ hρ'
-      have ht' := hB.diagonal_coordinate_right ρ hρ'
-      have hrow := hB.biadditive_in_single_variables ρ
-      unfold _root_.Formalism.L2.FormalSeriesBounds.DiagCoord at ht ht'
-      unfold _root_.Formalism.L2.FormalSeriesBounds.InRow at hrow
-      refine onlyIn_mul (onlyIn_mul (onlyIn_pow ?_ _) (onlyIn_pow ?_ _)) (onlyIn_mvExp ?_)
-      · intro m hm x hx
-        obtain ⟨c, rfl⟩ := ht.1 m hm x hx
-        exact hρ'
-      · intro m hm x hx
-        obtain ⟨c, rfl⟩ := ht'.1 m hm x hx
-        exact hρ'
-      · intro m hm x hx
-        rw [hrow m hm x hx]
-        exact hρ'
-  have hL : _root_.GlobalTheory.BlockValue.Lead (_root_.GlobalTheory.BlockValue.sideRow n) (_root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y)
-      (∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ))) := by
-    have hX : _root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y = ∑ ρ : Fin n, (if (ρ : ℕ) < n0 then 0 else
-        Finsupp.single (Sum.inl (ρ, ρ) : _root_.Formalism.IncomingBounds.PVar n) (l ^ i * y) +
-          Finsupp.single (Sum.inr (ρ, ρ) : _root_.Formalism.IncomingBounds.PVar n) y) := by
-      unfold _root_.Formalism.UnitaryBoundIntegral.diagMon
-      rw [Finset.sum_filter]
-      refine Finset.sum_congr rfl fun ρ _ => ?_
-      split_ifs <;> first | omega | rfl
-    rw [hX]
-    refine lead_prod' _ _ _ fun ρ _ => ?_
-    split_ifs with hρ
-    · exact lead_zero_one _
-    · have hρ' : n0 ≤ (ρ : ℕ) := not_lt.1 hρ
-      have ht := hB.diagonal_coordinate_left ρ hρ'
-      have ht' := hB.diagonal_coordinate_right ρ hρ'
-      unfold _root_.Formalism.L2.FormalSeriesBounds.DiagCoord at ht ht'
-      have h1 := lead_pow' (lead_single_of_linear_coeff_eq_X (π := _root_.GlobalTheory.BlockValue.sideRow n)
-        (z := Sum.inl ρ) (fun c => rfl) ht.1 ht.2) (l ^ i * y)
-      have h2 := lead_pow' (lead_single_of_linear_coeff_eq_X (π := _root_.GlobalTheory.BlockValue.sideRow n)
-        (z := Sum.inr ρ) (fun c => rfl) ht'.1 ht'.2) y
-      rw [Finsupp.smul_single_one] at h1 h2
-      have h3 := lead_mul' (lead_mul' h1 h2) (lead_zero_mvExp (_root_.GlobalTheory.BlockValue.sideRow n) (hr ρ))
-      rwa [add_zero] at h3
-  have hHc : ∀ m : _root_.Formalism.IncomingBounds.PVar n →₀ ℕ, (∀ x ∈ m.support, n0 ≤ (_root_.Formalism.UnitaryBoundIntegral.rowOf x : ℕ)) →
-      (∀ ρ : Fin n, n0 ≤ (ρ : ℕ) → _root_.Formalism.UnitaryBoundIntegral.rowDegZ m ρ ≤ l ^ i * y ∧ _root_.Formalism.UnitaryBoundIntegral.rowDegZ' m ρ ≤ y) →
-      MvPowerSeries.coeff m
-        (∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ))) =
-        if m = _root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y then 1 else 0 := by
+  have hH : _root_.GlobalTheory.BlockValue.OnlyIn
+      (fun x => n0 ≤ (_root_.Formalism.UnitaryBoundIntegral.rowOf x : ℕ))
+      (∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ))) :=
+    by
+      refine onlyIn_prod _ _ fun ρ _ => ?_
+      split_ifs with hρ
+      · exact onlyIn_one _
+      · have hρ' : n0 ≤ (ρ : ℕ) := not_lt.1 hρ
+        have ht := hB.diagonal_coordinate_left ρ hρ'
+        have ht' := hB.diagonal_coordinate_right ρ hρ'
+        have hrow := hB.biadditive_in_single_variables ρ
+        unfold _root_.Formalism.L2.FormalSeriesBounds.DiagCoord at ht ht'
+        unfold _root_.Formalism.L2.FormalSeriesBounds.InRow at hrow
+        refine onlyIn_mul (onlyIn_mul (onlyIn_pow ?_ _) (onlyIn_pow ?_ _)) (onlyIn_mvExp ?_)
+        · intro m hm x hx
+          obtain ⟨c, rfl⟩ := ht.1 m hm x hx
+          exact hρ'
+        · intro m hm x hx
+          obtain ⟨c, rfl⟩ := ht'.1 m hm x hx
+          exact hρ'
+        · intro m hm x hx
+          rw [hrow m hm x hx]
+          exact hρ'
+  have hL : _root_.GlobalTheory.BlockValue.Lead (_root_.GlobalTheory.BlockValue.sideRow n)
+      (_root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y)
+      (∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ))) :=
+    by
+      have hX
+          : _root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y
+            = ∑ ρ : Fin n, (if (ρ : ℕ) < n0 then 0 else
+              Finsupp.single (Sum.inl (ρ, ρ) : _root_.Formalism.IncomingBounds.PVar n) (l ^ i * y) +
+                Finsupp.single (Sum.inr (ρ, ρ) : _root_.Formalism.IncomingBounds.PVar n) y) := by
+        unfold _root_.Formalism.UnitaryBoundIntegral.diagMon
+        rw [Finset.sum_filter]
+        refine Finset.sum_congr rfl fun ρ _ => ?_
+        split_ifs <;> first | omega | rfl
+      rw [hX]
+      refine lead_prod' _ _ _ fun ρ _ => ?_
+      split_ifs with hρ
+      · exact lead_zero_one _
+      · have hρ' : n0 ≤ (ρ : ℕ) := not_lt.1 hρ
+        have ht := hB.diagonal_coordinate_left ρ hρ'
+        have ht' := hB.diagonal_coordinate_right ρ hρ'
+        unfold _root_.Formalism.L2.FormalSeriesBounds.DiagCoord at ht ht'
+        have h1 :=
+          lead_pow'
+            (lead_single_of_linear_coeff_eq_X (π := _root_.GlobalTheory.BlockValue.sideRow n)
+              (z := Sum.inl ρ)
+              (fun c => rfl)
+              ht.1 ht.2)
+            (l ^ i * y)
+        have h2 :=
+          lead_pow'
+            (lead_single_of_linear_coeff_eq_X (π := _root_.GlobalTheory.BlockValue.sideRow n)
+              (z := Sum.inr ρ)
+              (fun c => rfl)
+              ht'.1 ht'.2)
+            y
+        rw [Finsupp.smul_single_one] at h1 h2
+        have h3 :=
+          lead_mul' (lead_mul' h1 h2)
+            (lead_zero_mvExp (_root_.GlobalTheory.BlockValue.sideRow n) (hr ρ))
+        rwa [add_zero] at h3
+  have hHc
+      : ∀ m : _root_.Formalism.IncomingBounds.PVar n →₀ ℕ,
+        (∀ x ∈ m.support, n0 ≤ (_root_.Formalism.UnitaryBoundIntegral.rowOf x : ℕ))
+          → (∀ ρ : Fin n,
+            n0 ≤ (ρ : ℕ)
+              → _root_.Formalism.UnitaryBoundIntegral.rowDegZ m ρ ≤ l ^ i * y
+                ∧ _root_.Formalism.UnitaryBoundIntegral.rowDegZ' m ρ ≤ y)
+          → MvPowerSeries.coeff m
+              (∏ ρ : Fin n, (if (ρ : ℕ) < n0 then 1 else t ρ ^ (l ^ i * y) * t' ρ ^ y * _root_.Formalism.IncomingBounds.mvExp (hr ρ)))
+            = if m = _root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y then
+                1
+              else
+                0 := by
     intro m hsupp hbd
     split_ifs with hm
     · rw [hm]
       exact hL.2
     · by_contra hne
       refine hm ((hL.1 m hne).2 ?_)
-      have hzero : ∀ ρ : Fin n, ¬ n0 ≤ (ρ : ℕ) → ∀ c : Fin n,
-          m (Sum.inl (ρ, c)) = 0 ∧ m (Sum.inr (ρ, c)) = 0 := by
+      have hzero
+          : ∀ ρ : Fin n,
+            ¬ n0 ≤ (ρ : ℕ) → ∀ c : Fin n, m (Sum.inl (ρ, c)) = 0 ∧ m (Sum.inr (ρ, c)) = 0 := by
         intro ρ hρ c
         constructor
         · by_contra hc
@@ -464,7 +499,9 @@ theorem _root_.GlobalTheory.blockValue_rows : _root_.Formalism.L2.FormalSeriesBo
       rintro (ρ | ρ)
       · rw [mapDomain_sideRow_inl, mapDomain_sideRow_inl]
         by_cases hρ : n0 ≤ (ρ : ℕ)
-        · have hX : ∑ c : Fin n, (_root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y) (Sum.inl (ρ, c)) = l ^ i * y := by
+        · have hX
+              : ∑ c : Fin n, (_root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y) (Sum.inl (ρ, c))
+                = l ^ i * y := by
             unfold _root_.Formalism.UnitaryBoundIntegral.diagMon
             simp only [Finsupp.finsetSum_apply, Finsupp.add_apply, Finsupp.single_apply,
               Sum.inl.injEq, Prod.mk.injEq, reduceCtorEq, if_false, add_zero]
@@ -478,7 +515,9 @@ theorem _root_.GlobalTheory.blockValue_rows : _root_.Formalism.L2.FormalSeriesBo
           exact Nat.zero_le _
       · rw [mapDomain_sideRow_inr, mapDomain_sideRow_inr]
         by_cases hρ : n0 ≤ (ρ : ℕ)
-        · have hX : ∑ c : Fin n, (_root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y) (Sum.inr (ρ, c)) = y := by
+        · have hX
+              : ∑ c : Fin n, (_root_.Formalism.UnitaryBoundIntegral.diagMon n0 n (l ^ i) y) (Sum.inr (ρ, c))
+                = y := by
             unfold _root_.Formalism.UnitaryBoundIntegral.diagMon
             simp only [Finsupp.finsetSum_apply, Finsupp.add_apply, Finsupp.single_apply,
               Sum.inr.injEq, Prod.mk.injEq, reduceCtorEq, if_false, zero_add]

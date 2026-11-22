@@ -9,16 +9,20 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.LocLanglands
 
-theorem normV_zpow_deg_eq {K L Ω : Type} [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
-    [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] {A : ValuationSubring Ω}
-    {v : HeightOneSpectrum (𝓞 K)} {v' : HeightOneSpectrum (𝓞 L)} {h : IsPlaceOver A v} {h' : IsPlaceOver A v'}
-    (σ' : Weil h') (σ : Weil h) (hσ : ∀ z : Ω, (σ : G K Ω) z = (σ' : G L Ω) z) :
-    ((normV v' : ℕ) : ℝ) ^ deg σ' = ((normV v : ℕ) : ℝ) ^ deg σ := by
+theorem normV_zpow_deg_eq
+    {K L Ω : Type} [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω] [Field L]
+    [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} {v' : HeightOneSpectrum (𝓞 L)}
+    {h : IsPlaceOver A v} {h' : IsPlaceOver A v'}
+    (σ' : Weil h') (σ : Weil h) (hσ : ∀ z : Ω, (σ : G K Ω) z = (σ' : G L Ω) z)
+    : ((normV v' : ℕ) : ℝ) ^ deg σ' = ((normV v : ℕ) : ℝ) ^ deg σ := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed K
   obtain ⟨a, b, ha⟩ := σ'.2
   obtain ⟨c, d, hc⟩ := σ.2
@@ -27,8 +31,9 @@ theorem normV_zpow_deg_eq {K L Ω : Type} [Field Ω] [Field K] [NumberField K] [
   set q := normV v with hq
   have hq'0 : 0 < q' := (zero_lt_one.trans (one_lt_normV v'))
   have hq0 : 0 < q := (zero_lt_one.trans (one_lt_normV v))
-  have key : ∀ x : Ω, A.valuation x ≤ 1 →
-      A.valuation (x ^ (q' ^ a * q ^ d) - x ^ (q ^ c * q' ^ b)) < 1 := by
+  have key
+      : ∀ x : Ω,
+        A.valuation x ≤ 1 → A.valuation (x ^ (q' ^ a * q ^ d) - x ^ (q ^ c * q' ^ b)) < 1 := by
     intro x hx
     have hy : A.valuation ((σ' : G L Ω) x) ≤ 1 := val_apply_le_one ha.1 hx
     have h1 := cong_pow (val_pow_le_one hy _) (val_pow_le_one hx _) (ha.2 x hx) (q ^ d)
@@ -40,12 +45,12 @@ theorem normV_zpow_deg_eq {K L Ω : Type} [Field Ω] [Field K] [NumberField K] [
     exact cong_trans (cong_symm h1) h2
   have hN : q' ^ a * q ^ d = q ^ c * q' ^ b := by
     rcases lt_trichotomy (q' ^ a * q ^ d) (q ^ c * q' ^ b) with hlt | heq | hgt
-    · obtain ⟨x, hx, hx'⟩ := exists_not_cong_pow (A := A)
-        (Nat.mul_pos (pow_pos hq'0 a) (pow_pos hq0 d)) hlt
+    · obtain ⟨x, hx, hx'⟩ :=
+        exists_not_cong_pow (A := A) (Nat.mul_pos (pow_pos hq'0 a) (pow_pos hq0 d)) hlt
       exact absurd (cong_symm (key x hx)) hx'
     · exact heq
-    · obtain ⟨x, hx, hx'⟩ := exists_not_cong_pow (A := A)
-        (Nat.mul_pos (pow_pos hq0 c) (pow_pos hq'0 b)) hgt
+    · obtain ⟨x, hx, hx'⟩ :=
+        exists_not_cong_pow (A := A) (Nat.mul_pos (pow_pos hq0 c) (pow_pos hq'0 b)) hgt
       exact absurd (key x hx) hx'
   have hR : ((q' : ℕ) : ℝ) ^ a * ((q : ℕ) : ℝ) ^ d = ((q : ℕ) : ℝ) ^ c * ((q' : ℕ) : ℝ) ^ b := by
     exact_mod_cast hN

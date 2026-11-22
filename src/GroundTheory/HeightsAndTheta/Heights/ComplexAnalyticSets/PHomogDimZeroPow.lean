@@ -15,20 +15,26 @@ noncomputable section
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem le_originIdeal_of_isHomogeneous {n : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)}
-    (hI : I.IsHomogeneous (homogeneousSubmodule (Fin n) ℂ)) (hne : I ≠ ⊤) : I ≤ originIdeal n := by
+theorem le_originIdeal_of_isHomogeneous
+    {n : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)}
+    (hI : I.IsHomogeneous (homogeneousSubmodule (Fin n) ℂ)) (hne : I ≠ ⊤)
+    : I ≤ originIdeal n := by
   intro f hf
   rw [originIdeal_eq_ker, RingHom.mem_ker]
   by_contra h0
   have h1 : homogeneousComponent 0 f ∈ I := by
     have := hI 0 hf
     rwa [show (DirectSum.decompose (homogeneousSubmodule (Fin n) ℂ) f 0 : MvPolynomial (Fin n) ℂ)
-      = homogeneousComponent 0 f from decomposition.decompose'_apply _ _] at this
+          = homogeneousComponent 0 f from
+        decomposition.decompose'_apply _ _]
+      at this
   rw [homogeneousComponent_zero, ← constantCoeff_eq] at h1
   exact hne (I.eq_top_of_isUnit_mem h1 (isUnit_iff_ne_zero.2 h0 |>.map C))
 
-theorem isMaximal_of_isPrime_of_quotient_dim_le_zero {R : Type*} [CommRing R] {K Q : Ideal R}
-    (hK : ringKrullDim (R ⧸ K) ≤ 0) (hQ : Q.IsPrime) (hKQ : K ≤ Q) : Q.IsMaximal := by
+theorem isMaximal_of_isPrime_of_quotient_dim_le_zero
+    {R : Type*} [CommRing R]
+    {K Q : Ideal R} (hK : ringKrullDim (R ⧸ K) ≤ 0) (hQ : Q.IsPrime) (hKQ : K ≤ Q)
+    : Q.IsMaximal := by
   have : Ring.KrullDimLE 0 (R ⧸ K) := Ring.krullDimLE_iff.2 (by exact_mod_cast hK)
   have hsurj := Ideal.Quotient.mk_surjective (I := K)
   have : (Q.map (Ideal.Quotient.mk K)).IsPrime :=
@@ -36,7 +42,8 @@ theorem isMaximal_of_isPrime_of_quotient_dim_le_zero {R : Type*} [CommRing R] {K
   have hmax := Ideal.isMaximal_of_isPrime (Q.map (Ideal.Quotient.mk K))
   have := Ideal.comap_isMaximal_of_surjective _ hsurj (K := Q.map (Ideal.Quotient.mk K))
   rwa [Ideal.comap_map_of_surjective _ hsurj, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker,
-    sup_eq_left.2 hKQ] at this
+      sup_eq_left.2 hKQ]
+    at this
 
 theorem HomogDimZeroPow.proof : HomogDimZeroPow.Statement := by
   intro n K hK hdim

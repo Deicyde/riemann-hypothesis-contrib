@@ -24,14 +24,20 @@ open GlobalTheory.PsCo.PcEG
 theorem highestWeightKernel_lowestType : AlgDatum := by
   intro n ε lam hg M _ _ E hE hU z hz0 hzp hz hcas S hSfd hSk hzS
 
-  have hz' : IsKHWVec ε (fun a b => TensorProduct.map (E a b) LinearMap.id +
-      LinearMap.lTensor M (sgE ε cpFock cmFock a b)) (gaW ε lam) z := by
-    have e : (diagE ε (eT E) cpT cmT : Fin n → Fin n → Module.End ℂ (TensorProduct ℂ M (Fock n))) =
-        fun a b => TensorProduct.map (E a b) LinearMap.id + LinearMap.lTensor M (sgE ε cpFock cmFock a b) := by
+  have hz' : IsKHWVec ε
+      (fun a b =>
+        TensorProduct.map (E a b) LinearMap.id + LinearMap.lTensor M (sgE ε cpFock cmFock a b))
+      (gaW ε lam) z := by
+    have e
+        : (diagE ε (eT E) cpT cmT : Fin n → Fin n → Module.End ℂ (TensorProduct ℂ M (Fock n)))
+          = fun a b =>
+            TensorProduct.map (E a b) LinearMap.id
+              + LinearMap.lTensor M (sgE ε cpFock cmFock a b) := by
       funext a b
       delta diagE eT
       rw [sgE_cpT]
-    rw [← e]; exact hz
+    rw [← e]
+    exact hz
   obtain ⟨s, hy0, hy⟩ := khw_extract ε hg.1 hz' hz0
   set y := tcoef ((fockBasis n).coord s) z with hydef
 

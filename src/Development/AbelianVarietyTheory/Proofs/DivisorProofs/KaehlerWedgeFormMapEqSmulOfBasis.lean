@@ -12,17 +12,23 @@ set_option autoImplicit false
 
 namespace GlobalTheory.TopFormAppend
 
-theorem dForm_append_eq_smul : ∀ {k K L : Type} [CommRing k] [CommRing K] [CommRing L] (cK : k →+* K) (cL : k →+* L)
-    (j : K →+* L), j.comp cK = cL → ∀ {n r : ℕ} (x w : Fin n → K) (bK : Module.Basis (Fin n) K (Omega cK)),
-    (∀ i, bK i = dFun cK (w i)) → ∀ f : K, dForm cK x = f • dForm cK w → ∀ t : Fin r → L,
-    dForm cL (Fin.append t (fun i => j (x i))) = j f • dForm cL (Fin.append t (fun i => j (w i))) := by
+theorem dForm_append_eq_smul
+    : ∀ {k K L : Type} [CommRing k] [CommRing K] [CommRing L] (cK : k →+* K) (cL : k →+* L)
+        (j : K →+* L),
+      j.comp cK = cL
+        → ∀ {n r : ℕ} (x w : Fin n → K) (bK : Module.Basis (Fin n) K (Omega cK)),
+          (∀ i, bK i = dFun cK (w i))
+            → ∀ f : K,
+              dForm cK x = f • dForm cK w
+                → ∀ t : Fin r → L,
+                  dForm cL (Fin.append t (fun i => j (x i)))
+                    = j f • dForm cL (Fin.append t (fun i => j (w i))) := by
   intro k K L _ _ _ cK cL j hc n r x w bK hbK f hf t
   let a : Matrix (Fin n) (Fin n) K := Matrix.of fun i l => bK.repr (dFun cK (x i)) l
   have ha : ∀ i, dFun cK (x i) = ∑ l, a i l • dFun cK (w l) := fun i => by
     conv_lhs => rw [← bK.sum_repr (dFun cK (x i))]
     exact Finset.sum_congr rfl fun l _ => by rw [hbK]; rfl
-  have hdet : a.det = f :=
-    (isFreeGen_dForm w bK hbK).1 ((dForm_eq_det_smul x w a ha).symm.trans hf)
+  have hdet : a.det = f := (isFreeGen_dForm w bK hbK).1 ((dForm_eq_det_smul x w a ha).symm.trans hf)
   have hL : ∀ i, dFun cL (j (x i)) = ∑ l, j (a i l) • dFun cL (j (w l)) := fun i => by
     letI := cK.toAlgebra
     letI := cL.toAlgebra

@@ -8,11 +8,11 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem integrable_exp_neg_mul_of_sublevel_growth :
-    ∀ (X : Type) [MeasurableSpace X] (μ : Measure X) (d : X → ℝ) (a b C : ℝ), Measurable d →
-      (∀ x, 0 ≤ d x) →
-      (∀ r : ℝ, 0 ≤ r → μ {x | d x ≤ r} ≤ ENNReal.ofReal (C * Real.exp (a * r))) → a < b →
-      Integrable (fun x => Real.exp (-(b * d x))) μ := by
+theorem integrable_exp_neg_mul_of_sublevel_growth
+    : ∀ (X : Type) [MeasurableSpace X] (μ : Measure X) (d : X → ℝ) (a b C : ℝ),
+      Measurable d → (∀ x, 0 ≤ d x)
+        → (∀ r : ℝ, 0 ≤ r → μ {x | d x ≤ r} ≤ ENNReal.ofReal (C * Real.exp (a * r))) → a < b
+        → Integrable (fun x => Real.exp (-(b * d x))) μ := by
   intro X _ μ d a b C hd hd0 hgrowth hab
   set C' : ℝ := max C 0 with hC'
   have hC'0 : 0 ≤ C' := le_max_right _ _
@@ -37,18 +37,20 @@ theorem integrable_exp_neg_mul_of_sublevel_growth :
       exact h2.le
     have hexp : Real.exp (-(b * d x)) ≤ Real.exp (|b| - b * n) := by
       apply Real.exp_le_exp.mpr
-      have hdist : |d x - n| ≤ 1 := by
-        rw [abs_le]; constructor <;> linarith
+      have hdist : |d x - n| ≤ 1 := by rw [abs_le]; constructor <;> linarith
       have : |b * (d x - n)| ≤ |b| := by
         rw [abs_mul]
-        calc |b| * |d x - n| ≤ |b| * 1 := mul_le_mul_of_nonneg_left hdist (abs_nonneg b)
+        calc
+          |b| * |d x - n|
+            ≤ |b| * 1 := mul_le_mul_of_nonneg_left hdist (abs_nonneg b)
           _ = |b| := mul_one _
       have hlow := neg_abs_le (b * (d x - n))
       have hy : -(b * d x) = |b| - b * n - (|b| + b * (d x - n)) := by ring
       rw [hy]
       linarith
-    calc ENNReal.ofReal (Real.exp (-(b * d x))) ≤ ENNReal.ofReal (Real.exp (|b| - b * n)) :=
-          ENNReal.ofReal_le_ofReal hexp
+    calc
+      ENNReal.ofReal (Real.exp (-(b * d x)))
+        ≤ ENNReal.ofReal (Real.exp (|b| - b * n)) := ENNReal.ofReal_le_ofReal hexp
       _ = g n x := by simp only [g, Set.indicator_of_mem hxs]
       _ ≤ ∑' m, g m x := ENNReal.le_tsum (f := fun m => g m x) n
 
@@ -62,28 +64,33 @@ theorem integrable_exp_neg_mul_of_sublevel_growth :
     simp only [g]
     rw [lintegral_indicator_const (hs n)]
     have hμ : μ (s n) ≤ ENNReal.ofReal (C' * Real.exp (a * ((n : ℝ) + 1))) := by
-      calc μ (s n) ≤ ENNReal.ofReal (C * Real.exp (a * ((n : ℝ) + 1))) :=
-            hgrowth _ (by positivity)
+      calc
+        μ (s n)
+          ≤ ENNReal.ofReal (C * Real.exp (a * ((n : ℝ) + 1))) := hgrowth _ (by positivity)
         _ ≤ ENNReal.ofReal (C' * Real.exp (a * ((n : ℝ) + 1))) :=
-            ENNReal.ofReal_le_ofReal
-              (mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.exp_pos _).le)
-    calc ENNReal.ofReal (Real.exp (|b| - b * n)) * μ (s n)
-        ≤ ENNReal.ofReal (Real.exp (|b| - b * n)) *
-            ENNReal.ofReal (C' * Real.exp (a * ((n : ℝ) + 1))) := by gcongr
+          ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_right (le_max_left _ _)
+            (Real.exp_pos _).le)
+    calc
+      ENNReal.ofReal (Real.exp (|b| - b * n)) * μ (s n)
+          ≤ ENNReal.ofReal (Real.exp (|b| - b * n))
+            * ENNReal.ofReal (C' * Real.exp (a * ((n : ℝ) + 1))) := by
+        gcongr
       _ = ENNReal.ofReal (Real.exp (|b| - b * n) * (C' * Real.exp (a * ((n : ℝ) + 1)))) :=
-          (ENNReal.ofReal_mul (Real.exp_pos _).le).symm
+        (ENNReal.ofReal_mul (Real.exp_pos _).le).symm
       _ = ENNReal.ofReal (u n) := by
-          congr 1
-          simp only [u]
-          rw [← Real.exp_nat_mul]
-          have hE : Real.exp (|b| - b * n) * Real.exp (a * ((n : ℝ) + 1)) =
-              Real.exp (|b| + a) * Real.exp (n * (a - b)) := by
-            rw [← Real.exp_add, ← Real.exp_add]; ring_nf
-          linear_combination C' * hE
-  calc ∫⁻ x, ENNReal.ofReal (Real.exp (-(b * d x))) ∂μ ≤ ∫⁻ x, ∑' n, g n x ∂μ :=
-        MeasureTheory.lintegral_mono hpt
+        congr 1
+        simp only [u]
+        rw [← Real.exp_nat_mul]
+        have hE
+            : Real.exp (|b| - b * n) * Real.exp (a * ((n : ℝ) + 1))
+              = Real.exp (|b| + a) * Real.exp (n * (a - b)) := by
+          rw [← Real.exp_add, ← Real.exp_add]; ring_nf
+        linear_combination C' * hE
+  calc
+    ∫⁻ x, ENNReal.ofReal (Real.exp (-(b * d x))) ∂μ
+      ≤ ∫⁻ x, ∑' n, g n x ∂μ := MeasureTheory.lintegral_mono hpt
     _ = ∑' n, ∫⁻ x, g n x ∂μ :=
-        MeasureTheory.lintegral_tsum fun n => (measurable_const.indicator (hs n)).aemeasurable
+      MeasureTheory.lintegral_tsum fun n => (measurable_const.indicator (hs n)).aemeasurable
     _ ≤ ∑' n, ENNReal.ofReal (u n) := ENNReal.tsum_le_tsum hterm
     _ = ENNReal.ofReal (∑' n, u n) := (ENNReal.ofReal_tsum_of_nonneg hu0 hsum).symm
     _ < ⊤ := ENNReal.ofReal_lt_top

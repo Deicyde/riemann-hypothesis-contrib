@@ -12,14 +12,17 @@ namespace PI.CompAtExist
 open NumberField IsDedekindDomain ReciprocityTheory.Aut
 
 def StepA (L : Type) [Field L] [NumberField L] [IsCMField L] : Prop :=
-  ∀ (s : SplitPlace L) (k : L),
-    Valued.v (s.i k) = Valued.v (algebraMap L (s.w.adicCompletion L) k)
+  ∀ (s : SplitPlace L) (k : L), Valued.v (s.i k) = Valued.v (algebraMap L (s.w.adicCompletion L) k)
 
-theorem val_eq_of_le_one_iff {K : Type*} [Field K] (μ ν : Valuation K (WithZero (Multiplicative ℤ)))
-    (h : ∀ x, μ x ≤ 1 ↔ ν x ≤ 1) {ϖ π : K} (hϖ : ν ϖ = WithZero.exp (-1))
-    (hπ : μ π = WithZero.exp (-1)) (x : K) : μ x = ν x := by
-  have hunit : ∀ (μ' ν' : Valuation K (WithZero (Multiplicative ℤ))), (∀ x, μ' x ≤ 1 ↔ ν' x ≤ 1) →
-      ∀ y, ν' y = 1 → μ' y = 1 := by
+theorem val_eq_of_le_one_iff
+    {K : Type*} [Field K]
+    (μ ν : Valuation K (WithZero (Multiplicative ℤ))) (h : ∀ x, μ x ≤ 1 ↔ ν x ≤ 1)
+    {ϖ π : K} (hϖ : ν ϖ = WithZero.exp (-1)) (hπ : μ π = WithZero.exp (-1))
+    (x : K)
+    : μ x = ν x := by
+  have hunit
+      : ∀ (μ' ν' : Valuation K (WithZero (Multiplicative ℤ))),
+        (∀ x, μ' x ≤ 1 ↔ ν' x ≤ 1) → ∀ y, ν' y = 1 → μ' y = 1 := by
     intro μ' ν' h' y hy
     have hy0 : y ≠ 0 := by
       rintro rfl
@@ -42,10 +45,11 @@ theorem val_eq_of_le_one_iff {K : Type*} [Field K] (μ ν : Valuation K (WithZer
     intro y hy
     have hνy : ν y ≠ 0 := ν.ne_zero_iff.2 hy
     have hνp : ν (ϖ ^ (WithZero.log (ν y))) ≠ 0 := ν.ne_zero_iff.2 (zpow_ne_zero _ hϖ0)
-    have hne : ν (y * ϖ ^ (WithZero.log (ν y))) ≠ 0 := ν.ne_zero_iff.2 (mul_ne_zero hy (zpow_ne_zero _ hϖ0))
+    have hne : ν (y * ϖ ^ (WithZero.log (ν y))) ≠ 0 :=
+      ν.ne_zero_iff.2 (mul_ne_zero hy (zpow_ne_zero _ hϖ0))
     have h1 : ν (y * ϖ ^ (WithZero.log (ν y))) = 1 := by
-      rw [← WithZero.exp_log hne, map_mul, WithZero.log_mul hνy hνp,
-        map_zpow₀, WithZero.log_zpow, hϖ, WithZero.log_exp, smul_eq_mul]
+      rw [← WithZero.exp_log hne, map_mul, WithZero.log_mul hνy hνp, map_zpow₀, WithZero.log_zpow,
+        hϖ, WithZero.log_exp, smul_eq_mul]
       rw [show WithZero.log (ν y) + WithZero.log (ν y) * (-1) = 0 by ring, WithZero.exp_zero]
     have h2 := hunit μ ν h _ h1
     rwa [map_mul, map_zpow₀] at h2
@@ -53,7 +57,8 @@ theorem val_eq_of_le_one_iff {K : Type*} [Field K] (μ ν : Valuation K (WithZer
   have hμϖ : μ ϖ = WithZero.exp (-1) := by
     have k1 := congrArg WithZero.log (key π hπ0)
     rw [WithZero.log_mul (by rw [hπ]; exact WithZero.exp_ne_zero) (zpow_ne_zero _ hμϖ0), hπ,
-      WithZero.log_exp, WithZero.log_zpow, WithZero.log_one, smul_eq_mul] at k1
+        WithZero.log_exp, WithZero.log_zpow, WithZero.log_one, smul_eq_mul]
+      at k1
     have hij : WithZero.log (ν π) * WithZero.log (μ ϖ) = 1 := by linarith
     have hlt : μ ϖ < 1 := by
       refine lt_of_le_of_ne ((h ϖ).2 (by rw [hϖ]; exact WithZero.exp_le_exp.2 (by norm_num))) ?_
@@ -81,7 +86,8 @@ theorem val_eq_of_le_one_iff {K : Type*} [Field K] (μ ν : Valuation K (WithZer
     have hνx : ν x ≠ 0 := ν.ne_zero_iff.2 hx
     have k2 := congrArg WithZero.log (key x hx)
     rw [WithZero.log_mul hμx (zpow_ne_zero _ hμϖ0), hμϖ, WithZero.log_zpow, WithZero.log_exp,
-      WithZero.log_one, smul_eq_mul] at k2
+        WithZero.log_one, smul_eq_mul]
+      at k2
     rw [← WithZero.exp_log hμx, ← WithZero.exp_log hνx]
     congr 1
     linarith
@@ -91,8 +97,8 @@ section
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
 def muV (s : SplitPlace L) : Valuation L (WithZero (Multiplicative ℤ)) :=
-  (Valued.v : Valuation (s.v.adicCompletion (maximalRealSubfield L)) (WithZero (Multiplicative ℤ))).comap
-    (s.i : L →+* s.v.adicCompletion (maximalRealSubfield L))
+  (Valued.v : Valuation (s.v.adicCompletion (maximalRealSubfield L))
+    (WithZero (Multiplicative ℤ))).comap (s.i : L →+* s.v.adicCompletion (maximalRealSubfield L))
 
 theorem muV_apply (s : SplitPlace L) (k : L) : muV s k = Valued.v (s.i k) := rfl
 
@@ -101,17 +107,19 @@ theorem muV_int_le_one (s : SplitPlace L) (r : 𝓞 L) : muV s (algebraMap (𝓞
   have := s.split_le_one r
   rwa [RingOfIntegers.coe_eq_algebraMap] at this
 
-theorem muV_int_lt_one_iff (s : SplitPlace L) (r : 𝓞 L) :
-    muV s (algebraMap (𝓞 L) L r) < 1 ↔ r ∈ s.w.asIdeal := by
-  rw [muV_apply, show s.w.asIdeal = s.ideal from rfl, s.split_mem_ideal, RingOfIntegers.coe_eq_algebraMap]
+theorem muV_int_lt_one_iff (s : SplitPlace L) (r : 𝓞 L)
+    : muV s (algebraMap (𝓞 L) L r) < 1 ↔ r ∈ s.w.asIdeal := by
+  rw [muV_apply, show s.w.asIdeal = s.ideal from rfl, s.split_mem_ideal,
+    RingOfIntegers.coe_eq_algebraMap]
 
-theorem muV_int_eq_one_iff (s : SplitPlace L) (r : 𝓞 L) :
-    muV s (algebraMap (𝓞 L) L r) = 1 ↔ r ∉ s.w.asIdeal := by
+theorem muV_int_eq_one_iff (s : SplitPlace L) (r : 𝓞 L)
+    : muV s (algebraMap (𝓞 L) L r) = 1 ↔ r ∉ s.w.asIdeal := by
   rw [← muV_int_lt_one_iff, not_lt]
   exact ⟨fun h => h.ge, fun h => le_antisymm (muV_int_le_one s r) h⟩
 
-private theorem exists_ringOfIntegers_not_mem_mul_eq_of_valuation_le (s : SplitPlace L) (x : L) (hx : s.w.valuation L x ≤ 1) :
-    ∃ c t : 𝓞 L, c ∉ s.w.asIdeal ∧ algebraMap (𝓞 L) L c * x = algebraMap (𝓞 L) L t := by
+private theorem exists_ringOfIntegers_not_mem_mul_eq_of_valuation_le
+    (s : SplitPlace L) (x : L) (hx : s.w.valuation L x ≤ 1)
+    : ∃ c t : 𝓞 L, c ∉ s.w.asIdeal ∧ algebraMap (𝓞 L) L c * x = algebraMap (𝓞 L) L t := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 L) x
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have hbL : algebraMap (𝓞 L) L b ≠ 0 :=
@@ -122,7 +130,9 @@ private theorem exists_ringOfIntegers_not_mem_mul_eq_of_valuation_le (s : SplitP
   have hk0 : WithZero.log (s.w.intValuation b) ≤ 0 := by
     have := (WithZero.log_le_log hvb one_ne_zero).2 (s.w.intValuation_le_one b)
     rwa [WithZero.log_one] at this
-  have hbe : s.w.intValuation b = WithZero.exp (-(((-WithZero.log (s.w.intValuation b)).toNat : ℕ) : ℤ)) := by
+  have hbe
+      : s.w.intValuation b
+        = WithZero.exp (-(((- WithZero.log (s.w.intValuation b)).toNat : ℕ) : ℤ)) := by
     rw [Int.toNat_of_nonneg (by omega), neg_neg, WithZero.exp_log hvb]
   set e : ℕ := (-WithZero.log (s.w.intValuation b)).toNat with he
   have ha_mem : a ∈ s.w.asIdeal ^ e := (s.w.intValuation_le_pow_iff_mem a e).1 (hab.trans hbe.le)
@@ -149,8 +159,8 @@ private theorem exists_ringOfIntegers_not_mem_mul_eq_of_valuation_le (s : SplitP
   rw [mul_div_assoc', div_eq_iff hbL, ← map_mul, ← map_mul, ht, mul_comm]
 
 theorem muV_le_one_iff (s : SplitPlace L) (x : L) : muV s x ≤ 1 ↔ s.w.valuation L x ≤ 1 := by
-  have hμint : ∀ r : 𝓞 L, r ∉ s.w.asIdeal → muV s (algebraMap (𝓞 L) L r) = 1 :=
-    fun r hr => (muV_int_eq_one_iff s r).2 hr
+  have hμint : ∀ r : 𝓞 L, r ∉ s.w.asIdeal → muV s (algebraMap (𝓞 L) L r) = 1 := fun r hr =>
+    (muV_int_eq_one_iff s r).2 hr
   have hνint : ∀ r : 𝓞 L, r ∉ s.w.asIdeal → s.w.valuation L (algebraMap (𝓞 L) L r) = 1 := by
     intro r hr
     rw [s.w.valuation_of_algebraMap]

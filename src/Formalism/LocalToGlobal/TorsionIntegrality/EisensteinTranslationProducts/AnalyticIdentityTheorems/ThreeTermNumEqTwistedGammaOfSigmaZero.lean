@@ -341,15 +341,18 @@ lemma threeTermDet_cycle (a : ℂ) : threeTermDet L b c a = threeTermDet L c a b
 end ThreeTermRelation
 
 open ThreeTermRelation in
-theorem sigmaThree_of (h1 : EllipticOnePole) (hord : SigmaOrder) (hq : SigmaQuasi) (hz : SigmaZero)
-    (he : SigmaEntire) (ho : SigmaOdd) (hs : SigmaSimple) (hadd : SigmaAdd) : SigmaThree := by
+theorem sigmaThree_of
+    (h1 : EllipticOnePole) (hord : SigmaOrder) (hq : SigmaQuasi) (hz : SigmaZero) (he : SigmaEntire)
+    (ho : SigmaOdd) (hs : SigmaSimple) (hadd : SigmaAdd)
+    : SigmaThree := by
   intro L a b c ha hb hc
   rw [det_eq]
   by_cases hp1 : b + c ∈ L.lattice
   · by_cases hp2 : c + a ∈ L.lattice
     · have hm : a - b ∈ L.lattice := by
         have := L.lattice.sub_mem hp2 hp1
-        convert this using 1; ring
+        convert this using 1
+        ring
       have := trivial_case L a b hz (a := c) hm
       rw [threeTermDet_cycle, threeTermDet_cycle]
       have e : c + a + b = a + b + c := by ring
@@ -365,17 +368,24 @@ theorem sigmaThree_of (h1 : EllipticOnePole) (hord : SigmaOrder) (hq : SigmaQuas
 theorem sgStarThree_of (h : SigmaThree) : SgStarThree := by
   intro L a b c ha hb hc
   have h0 := h L a b c ha hb hc
-  have hexp : (Complex.exp (-(s2 L) * a ^ 2 / 2) * Complex.exp (-(s2 L) * b ^ 2 / 2)
-        * Complex.exp (-(s2 L) * c ^ 2 / 2)) ^ 3
-      = Complex.exp (-(s2 L) * (a + b + c) ^ 2 / 2) * Complex.exp (-(s2 L) * (a - b) ^ 2 / 2)
-        * Complex.exp (-(s2 L) * (b - c) ^ 2 / 2) * Complex.exp (-(s2 L) * (c - a) ^ 2 / 2) := by
+  have hexp
+      : (Complex.exp (-(s2 L) * a ^ 2 / 2) * Complex.exp (-(s2 L) * b ^ 2 / 2)
+            * Complex.exp (-(s2 L) * c ^ 2 / 2))
+          ^ 3
+        = Complex.exp (-(s2 L) * (a + b + c) ^ 2 / 2) * Complex.exp (-(s2 L) * (a - b) ^ 2 / 2)
+          * Complex.exp (-(s2 L) * (b - c) ^ 2 / 2) * Complex.exp (-(s2 L) * (c - a) ^ 2 / 2) := by
     rw [← Complex.exp_add, ← Complex.exp_add, ← Complex.exp_nat_mul, ← Complex.exp_add,
       ← Complex.exp_add, ← Complex.exp_add]
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
   unfold sgStar
-  generalize Matrix.det !![1, L.weierstrassP a, L.derivWeierstrassP a;
-                   1, L.weierstrassP b, L.derivWeierstrassP b;
-                   1, L.weierstrassP c, L.derivWeierstrassP c] = D at h0 ⊢
+  generalize Matrix.det
+        !![1, L.weierstrassP a, L.derivWeierstrassP a;
+          1, L.weierstrassP b, L.derivWeierstrassP b;
+          1, L.weierstrassP c, L.derivWeierstrassP c]
+      = D
+    at h0 ⊢
   linear_combination (Complex.exp (-(s2 L) * a ^ 2 / 2) * Complex.exp (-(s2 L) * b ^ 2 / 2)
         * Complex.exp (-(s2 L) * c ^ 2 / 2)) ^ 3 * h0
     + (2 * wSigma L (a + b + c) * wSigma L (a - b) * wSigma L (b - c) * wSigma L (c - a)) * hexp
@@ -393,8 +403,9 @@ theorem thetaLine_of (h1 : EllipticOnePole) (hq : SgStarQuasi) (hb : SgStarBasic
     have e3 := semiChar_mul_self L ω
     have hχ : (semiChar L ω)⁻¹ = semiChar L ω := inv_eq_of_mul_eq_one_left e3
     unfold opU at e1
-    have hE : Complex.exp (-(Real.pi : ℂ) * herm L z ω - (Real.pi : ℂ) * herm L ω ω / 2)
-        = (Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2))⁻¹ := by
+    have hE
+        : Complex.exp (-(Real.pi : ℂ) * herm L z ω - (Real.pi : ℂ) * herm L ω ω / 2)
+          = (Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2))⁻¹ := by
       rw [← Complex.exp_neg]; congr 1; ring
     rw [hE] at e1
     show F (z + ω) / sgStar L (z + ω) = F z / sgStar L z
@@ -407,13 +418,19 @@ theorem thetaLine_of (h1 : EllipticOnePole) (hq : SgStarQuasi) (hb : SgStarBasic
       (hd.analyticAt 0).analyticOrderAt_eq_one_of_zero_deriv_ne_zero ((hzero 0).2 (zero_mem _))
         (by rw [hder]; exact one_ne_zero)]
     rfl
-  obtain ⟨c, hc⟩ := h1 L (fun z => F z / sgStar L z) 0 hmer hper
-    (fun z hz => (han z (by simpa using hz)).meromorphicOrderAt_nonneg) (by
-      have hF0 := (hF.analyticAt 0).meromorphicOrderAt_nonneg
-      rw [fun_meromorphicOrderAt_div (hF.analyticAt 0).meromorphicAt (hd.analyticAt 0).meromorphicAt,
-        hord0]
-      have := le_sub_of_add_le (o := meromorphicOrderAt F 0) (m := 1) (k := -1) (by simpa using hF0)
-      simpa using this)
+  obtain ⟨c, hc⟩ :=
+    h1 L
+      (fun z => F z / sgStar L z)
+      0 hmer hper
+      (fun z hz => (han z (by simpa using hz)).meromorphicOrderAt_nonneg)
+      (by
+        have hF0 := (hF.analyticAt 0).meromorphicOrderAt_nonneg
+        rw [fun_meromorphicOrderAt_div (hF.analyticAt 0).meromorphicAt
+            (hd.analyticAt 0).meromorphicAt,
+          hord0]
+        have :=
+          le_sub_of_add_le (o := meromorphicOrderAt F 0) (m := 1) (k := -1) (by simpa using hF0)
+        simpa using this)
   have hoff : ∀ z, z ∉ L.lattice → F z = c * sgStar L z := by
     intro z hz
     have := hc z (han z hz).continuousAt
@@ -421,7 +438,8 @@ theorem thetaLine_of (h1 : EllipticOnePole) (hq : SgStarQuasi) (hb : SgStarBasic
     field_simp at this
     rw [this, mul_comm]
   refine ⟨c, fun z => ?_⟩
-  refine eq_of_eventuallyEq_punctured (f := F) (g := fun z => c * sgStar L z)
+  refine eq_of_eventuallyEq_punctured (f := F)
+    (g := fun z => c * sgStar L z)
     hF.continuous.continuousAt (continuous_const.mul hd.continuous).continuousAt ?_
   filter_upwards [eventually_notMem L z] with x hx using hoff x hx
 

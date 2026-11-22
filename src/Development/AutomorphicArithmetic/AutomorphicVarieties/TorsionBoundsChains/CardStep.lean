@@ -6,9 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.cardStep :
-    ∀ (A B C : Type) [AddCommGroup A] [AddCommGroup B] [AddCommGroup C] (f : A →+ B) (g : B →+ C)
-      (a c : ℕ), Function.Exact f g → CardLe A a → CardLe C c → CardLe B (a * c) := by
+theorem UpperTheory.V.KH.cardStep
+    : ∀ (A B C : Type) [AddCommGroup A] [AddCommGroup B] [AddCommGroup C] (f : A →+ B) (g : B →+ C)
+        (a c : ℕ),
+      Function.Exact f g → CardLe A a → CardLe C c → CardLe B (a * c) := by
   intro A B C _ _ _ f g a c hex hA hC
   obtain ⟨hAf, ha⟩ := hA
   obtain ⟨hCf, hc⟩ := hC

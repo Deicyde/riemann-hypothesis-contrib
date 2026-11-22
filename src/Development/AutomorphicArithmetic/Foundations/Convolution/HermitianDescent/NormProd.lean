@@ -48,7 +48,8 @@ private lemma expand {σ : R ≃ₐ[k] R} {q s : ℕ} (hq : 0 < q) {x y : Fin s 
 
 private def phi (σ : R ≃ₐ[k] R) (q : ℕ) : R ⊗[k] R →ₐ[R] (Fin q → R) :=
   Algebra.TensorProduct.lift (Algebra.ofId R (Fin q → R))
-    (Pi.algHom k _ fun j : Fin q => ((σ ^ (j : ℕ) : R ≃ₐ[k] R) : R →ₐ[k] R)) fun _ _ => Commute.all _ _
+    (Pi.algHom k _ fun j : Fin q => ((σ ^ (j : ℕ) : R ≃ₐ[k] R) : R →ₐ[k] R))
+    fun _ _ => Commute.all _ _
 
 private lemma phi_tmul (σ : R ≃ₐ[k] R) (q : ℕ) (a b : R) (j : Fin q) :
     phi σ q (a ⊗ₜ b) j = a * (σ ^ (j : ℕ)) b := by
@@ -120,8 +121,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.ConvolutionTheory.D
 
-theorem UpperTheory.ConvolutionTheory.D.normProd :
-    UpperTheory.ConvolutionTheory.D.NormProd := by
+theorem UpperTheory.ConvolutionTheory.D.normProd : UpperTheory.ConvolutionTheory.D.NormProd := by
   intro k R _ _ _ _ σ q h r
   haveI := UpperTheory.ConvolutionTheory.D.fin h
   have h1 : algebraMap k R (Algebra.norm k r) = Algebra.norm R ((1 : R) ⊗ₜ[k] r) := by
@@ -129,7 +129,10 @@ theorem UpperTheory.ConvolutionTheory.D.normProd :
     congr 1
     ext b
     simp
-  let e := AlgEquiv.ofBijective (UpperTheory.ConvolutionTheory.D.phi σ q) ⟨UpperTheory.ConvolutionTheory.D.phi_inj h, UpperTheory.ConvolutionTheory.D.phi_surj h⟩
-  rw [h1, ← Algebra.norm_eq_of_algEquiv e, UpperTheory.ConvolutionTheory.D.norm_pi, Finset.prod_range]
+  let e :=
+    AlgEquiv.ofBijective (UpperTheory.ConvolutionTheory.D.phi σ q)
+      ⟨UpperTheory.ConvolutionTheory.D.phi_inj h, UpperTheory.ConvolutionTheory.D.phi_surj h⟩
+  rw [h1, ← Algebra.norm_eq_of_algEquiv e, UpperTheory.ConvolutionTheory.D.norm_pi,
+    Finset.prod_range]
   refine Finset.prod_congr rfl fun j _ => ?_
   exact (UpperTheory.ConvolutionTheory.D.phi_tmul σ q 1 r j).trans (one_mul _)

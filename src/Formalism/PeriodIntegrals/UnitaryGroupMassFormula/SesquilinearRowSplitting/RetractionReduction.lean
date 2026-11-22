@@ -25,7 +25,8 @@ theorem retraction_reduction : RetrStep := by
     rw [Submodule.Quotient.mk_eq_zero]
     exact hsat o x ho x.2 hq
   haveI : Module.Projective (𝓞 E) (Λ ⧸ N') := PI.FGTFG.projective_reduction (𝓞 E) (Λ ⧸ N')
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property N'.mkQ LinearMap.id (Submodule.mkQ_surjective N')
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property N'.mkQ LinearMap.id (Submodule.mkQ_surjective N')
   let ρ' : Λ →ₗ[𝓞 E] Λ := LinearMap.id - s.comp N'.mkQ
   have hρ' : ∀ x : Λ, ρ' x ∈ N' := by
     intro x

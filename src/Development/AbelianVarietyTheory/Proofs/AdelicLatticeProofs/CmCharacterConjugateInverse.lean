@@ -6,13 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemRan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical HeckeCharacterZeroLocus.ThmBIn
+open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical
+  HeckeCharacterZeroLocus.ThmBIn
 open scoped TensorProduct ContDiff nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem ideleChar_conj_eq_inv_of_trivial_on_base :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ χ : (AE F E)ˣ →* Circle, (∀ a : (AF F)ˣ, χ (idF F E a) = 1) → ∀ x y : (AE F E)ˣ, (y : AE F E) = cA σ x → χ y = (χ x)⁻¹ := by
+theorem ideleChar_conj_eq_inv_of_trivial_on_base
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ χ : (AE F E)ˣ →* Circle,
+          (∀ a : (AF F)ˣ, χ (idF F E a) = 1)
+            → ∀ x y : (AE F E)ˣ, (y : AE F E) = cA σ x → χ y = (χ x)⁻¹ := by
   intro F E _ _ _ _ _ σ h χ hχ x y hy
   obtain ⟨h1, h2, h3, h4⟩ := h
   obtain ⟨n, hn⟩ := exists_unit_mul_conj_eq_algebraMap F E σ h1 h2 h3 h4 (AF F) x

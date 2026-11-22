@@ -29,8 +29,9 @@ theorem denseRange_intCast : DenseRange (Int.cast : ℤ → ℤ̂) := by
   intro x
   rw [mem_closure_iff]
   intro U hU hxU
-  obtain ⟨W, hW⟩ := ProfiniteGrp.exist_openNormalAddSubgroup_sub_open_nhds_of_zero
-    (hU.preimage (continuous_const_add x)) (by simpa using hxU)
+  obtain ⟨W, hW⟩ :=
+    ProfiniteGrp.exist_openNormalAddSubgroup_sub_open_nhds_of_zero
+      (hU.preimage (continuous_const_add x)) (by simpa using hxU)
   have : Finite (ℤ̂ ⧸ W.toAddSubgroup) :=
     AddSubgroup.quotient_finite_of_isOpen W.toAddSubgroup W.isOpen'
   have hfi : W.toAddSubgroup.FiniteIndex := AddSubgroup.finiteIndex_of_finite_quotient
@@ -40,8 +41,9 @@ theorem denseRange_intCast : DenseRange (Int.cast : ℤ → ℤ̂) := by
   refine ⟨((((proj m x).val : ℕ) : ℤ) : ℤ̂), ?_, Set.mem_range_self _⟩
   have hk : ((((proj m x).val : ℕ) : ℤ) : ℤ̂) - x ∈ W.toAddSubgroup := by
     rw [hWm]
-    have := (proj_eq_zero_iff (n := m) (x := ((((proj m x).val : ℕ) : ℤ) : ℤ̂) - x)).1 (by
-      rw [map_sub, map_intCast, Int.cast_natCast, ZMod.natCast_zmod_val, sub_self])
+    have :=
+      (proj_eq_zero_iff (n := m) (x := ((((proj m x).val : ℕ) : ℤ) : ℤ̂) - x)).1
+        (by rw [map_sub, map_intCast, Int.cast_natCast, ZMod.natCast_zmod_val, sub_self])
     simpa [hmdef] using this
   have := hW hk
   simpa using this
@@ -52,10 +54,11 @@ section FixedField
 
 variable {G : Type*} [Group G] {d : G →* Multiplicative ℤ̂} {L : Subgroup G} {σ : G}
 
-theorem mem_zpowers_sup_iff (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G))
-    {h : G} : h ∈ Subgroup.zpowers σ ⊔ (L ⊓ d.ker) ↔ ∃ k : ℤ, ∃ j ∈ L ⊓ d.ker, h = σ ^ k * j := by
-  rw [← SetLike.mem_coe, Subgroup.coe_mul_of_left_le_normalizer_right _ _
-    (Subgroup.zpowers_le.2 hσ), Set.mem_mul]
+theorem mem_zpowers_sup_iff
+    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G)) {h : G}
+    : h ∈ Subgroup.zpowers σ ⊔ (L ⊓ d.ker) ↔ ∃ k : ℤ, ∃ j ∈ L ⊓ d.ker, h = σ ^ k * j := by
+  rw [← SetLike.mem_coe,
+    Subgroup.coe_mul_of_left_le_normalizer_right _ _ (Subgroup.zpowers_le.2 hσ), Set.mem_mul]
   constructor
   · rintro ⟨a, ha, j, hj, rfl⟩
     obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.1 ha
@@ -63,16 +66,15 @@ theorem mem_zpowers_sup_iff (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Su
   · rintro ⟨k, j, hj, rfl⟩
     exact ⟨σ ^ k, Subgroup.zpow_mem_zpowers σ k, j, hj, rfl⟩
 
-theorem deg_zpow_mul {N : ℕ} (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂)) (k : ℤ) {j : G}
-    (hj : j ∈ L ⊓ d.ker) :
-    Multiplicative.toAdd (d (σ ^ k * j)) = ((k * N : ℤ) : ℤ̂) := by
+theorem deg_zpow_mul
+    {N : ℕ} (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂)) (k : ℤ) {j : G} (hj : j ∈ L ⊓ d.ker)
+    : Multiplicative.toAdd (d (σ ^ k * j)) = ((k * N : ℤ) : ℤ̂) := by
   rw [map_mul, map_zpow, hdσ, (MonoidHom.mem_ker).1 hj.2, mul_one, ← ofAdd_zsmul, toAdd_ofAdd,
     zsmul_eq_mul]
   push_cast
   ring
 
 variable [TopologicalSpace G] [IsTopologicalGroup G]
-
 
 variable (d L σ) in
 def frobeniusClosure (d : G →* Multiplicative ℤ̂) (L : Subgroup G) (σ : G) : Subgroup G :=
@@ -87,13 +89,14 @@ theorem mem_frobeniusClosure_self : σ ∈ frobeniusClosure d L σ :=
 theorem isClosed_frobeniusClosure : IsClosed (frobeniusClosure d L σ : Set G) :=
   Subgroup.isClosed_topologicalClosure _
 
-theorem frobeniusClosure_le {K : Subgroup G} (hK : IsClosed (K : Set G)) (hσK : σ ∈ K)
-    (hLK : L ⊓ d.ker ≤ K) : frobeniusClosure d L σ ≤ K :=
+theorem frobeniusClosure_le
+    {K : Subgroup G} (hK : IsClosed (K : Set G)) (hσK : σ ∈ K) (hLK : L ⊓ d.ker ≤ K)
+    : frobeniusClosure d L σ ≤ K :=
   Subgroup.topologicalClosure_minimal _ (sup_le (Subgroup.zpowers_le.2 hσK) hLK) hK
 
-theorem mem_fixedModule_frobeniusClosure {A : Type*} [CommGroup A] [MulDistribMulAction G A]
-    [IsDiscreteModule G A] {a : A} :
-    a ∈ fixedModule A (frobeniusClosure d L σ) ↔ a ∈ fixedModule A (L ⊓ d.ker) ∧ σ • a = a := by
+theorem mem_fixedModule_frobeniusClosure
+    {A : Type*} [CommGroup A] [MulDistribMulAction G A] [IsDiscreteModule G A] {a : A}
+    : a ∈ fixedModule A (frobeniusClosure d L σ) ↔ a ∈ fixedModule A (L ⊓ d.ker) ∧ σ • a = a := by
   constructor
   · intro ha
     exact ⟨fixedModule_anti le_frobeniusClosure ha, ha σ mem_frobeniusClosure_self⟩
@@ -106,10 +109,11 @@ theorem mem_fixedModule_frobeniusClosure {A : Type*} [CommGroup A] [MulDistribMu
 
 variable [CompactSpace G] [TotallyDisconnectedSpace G]
 
-theorem frobeniusClosure_inf_ker (hd : Continuous d) (hL : IsOpen (L : Set G))
-    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G)) {N : ℕ} (hN : N ≠ 0)
-    (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂)) :
-    frobeniusClosure d L σ ⊓ d.ker = L ⊓ d.ker := by
+theorem frobeniusClosure_inf_ker
+    (hd : Continuous d) (hL : IsOpen (L : Set G))
+    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G))
+    {N : ℕ} (hN : N ≠ 0) (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂))
+    : frobeniusClosure d L σ ⊓ d.ker = L ⊓ d.ker := by
   refine le_antisymm ?_ (le_inf le_frobeniusClosure inf_le_right)
   intro x hx0
   obtain ⟨hx, hxk⟩ := Subgroup.mem_inf.1 hx0
@@ -120,8 +124,7 @@ theorem frobeniusClosure_inf_ker (hd : Continuous d) (hL : IsOpen (L : Set G))
   have ht : 0 < t := orderOf_pos _
   set M : ℕ+ := ⟨t * N, Nat.mul_pos ht (Nat.pos_of_ne_zero hN)⟩ with hMdef
   set V : Set G := (U0 : Set G) ∩ d ⁻¹' (Multiplicative.toAdd ⁻¹' (multiples M : Set ℤ̂)) with hVdef
-  have hV : IsOpen V :=
-    U0.isOpen'.inter ((isOpen_multiples M).preimage (continuous_toAdd.comp hd))
+  have hV : IsOpen V := U0.isOpen'.inter ((isOpen_multiples M).preimage (continuous_toAdd.comp hd))
   have hO : IsOpen ((fun y => x⁻¹ * y) ⁻¹' V) := hV.preimage (continuous_const.mul continuous_id)
   have hxO : x ∈ (fun y => x⁻¹ * y) ⁻¹' V := by
     simp only [Set.mem_preimage, inv_mul_cancel, hVdef, Set.mem_inter_iff, map_one, toAdd_one]
@@ -151,18 +154,18 @@ theorem frobeniusClosure_inf_ker (hd : Continuous d) (hL : IsOpen (L : Set G))
   rw [hx_eq]
   exact L.mul_mem (L.mul_mem (hU0 hσk) hj.1) (L.inv_mem (hU0 hU))
 
-
 omit [TotallyDisconnectedSpace G] in
-theorem map_frobeniusClosure (hd : Continuous d)
-    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G)) {N : ℕ}
-    (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂)) :
-    (frobeniusClosure d L σ).map d = AddSubgroup.toSubgroup (multiples N) := by
+theorem map_frobeniusClosure
+    (hd : Continuous d) (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G))
+    {N : ℕ} (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂))
+    : (frobeniusClosure d L σ).map d = AddSubgroup.toSubgroup (multiples N) := by
   apply le_antisymm
   · rintro _ ⟨x, hx, rfl⟩
     have hcl : IsClosed (d ⁻¹' (Multiplicative.toAdd ⁻¹' (multiples N : Set ℤ̂))) :=
       (isClosed_multiples N).preimage (continuous_toAdd.comp hd)
-    have hsub : ((Subgroup.zpowers σ ⊔ (L ⊓ d.ker) : Subgroup G) : Set G) ⊆
-        d ⁻¹' (Multiplicative.toAdd ⁻¹' (multiples N : Set ℤ̂)) := by
+    have hsub
+        : ((Subgroup.zpowers σ ⊔ (L ⊓ d.ker) : Subgroup G) : Set G)
+          ⊆ d ⁻¹' (Multiplicative.toAdd ⁻¹' (multiples N : Set ℤ̂)) := by
       intro h hh
       obtain ⟨k, j, hj, rfl⟩ := (mem_zpowers_sup_iff hσ).1 hh
       simp only [Set.mem_preimage, SetLike.mem_coe]
@@ -188,10 +191,11 @@ theorem map_frobeniusClosure (hd : Continuous d)
     rw [hxy, ← nsmul_eq_mul, ← hw]
     rfl
 
-theorem isOpen_frobeniusClosure (hd : Continuous d) (hL : IsOpen (L : Set G))
-    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G)) {N : ℕ} (hN : N ≠ 0)
-    (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂)) :
-    IsOpen (frobeniusClosure d L σ : Set G) := by
+theorem isOpen_frobeniusClosure
+    (hd : Continuous d) (hL : IsOpen (L : Set G))
+    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G))
+    {N : ℕ} (hN : N ≠ 0) (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂))
+    : IsOpen (frobeniusClosure d L σ : Set G) := by
   set S := frobeniusClosure d L σ with hSdef
   have hsup : S ⊔ d.ker = (AddSubgroup.toSubgroup (multiples N)).comap d := by
     rw [← map_frobeniusClosure hd hσ hdσ, Subgroup.comap_map_eq]
@@ -211,12 +215,11 @@ theorem isOpen_frobeniusClosure (hd : Continuous d) (hL : IsOpen (L : Set G))
     ⟨by rw [← Subgroup.relIndex_mul_index le_sup_left]; exact mul_ne_zero h2 h1.index_ne_zero⟩
   exact Subgroup.isOpen_of_isClosed_of_finiteIndex _ isClosed_frobeniusClosure
 
-
 omit [TotallyDisconnectedSpace G] in
-theorem inertiaDegree_frobeniusClosure (hd : Continuous d)
-    (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G)) {N : ℕ} (hN : N ≠ 0)
-    (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂)) :
-    inertiaDegree d (frobeniusClosure d L σ) = N := by
+theorem inertiaDegree_frobeniusClosure
+    (hd : Continuous d) (hσ : σ ∈ Subgroup.normalizer ((L ⊓ d.ker : Subgroup G) : Set G))
+    {N : ℕ} (hN : N ≠ 0) (hdσ : d σ = Multiplicative.ofAdd (N : ℤ̂))
+    : inertiaDegree d (frobeniusClosure d L σ) = N := by
   rw [inertiaDegree, map_frobeniusClosure hd hσ hdσ, AddSubgroup.index_toSubgroup]
   exact index_multiples ⟨N, Nat.pos_of_ne_zero hN⟩
 

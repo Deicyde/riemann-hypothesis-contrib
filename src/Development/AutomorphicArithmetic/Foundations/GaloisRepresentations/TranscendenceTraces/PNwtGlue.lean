@@ -5,22 +5,30 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem lift_ex {Z S : Scheme.{0}} {p : Z ⟶ S} (A : Sq p) [IsOpenImmersion A.u] {Ω : Type} [Field Ω]
-    (z : gp Ω ⟶ Z) (hz : pt (z ≫ p) ∈ Set.range A.u) : ∃ l : gp Ω ⟶ A.V, l ≫ A.v = z := by
+private theorem lift_ex
+    {Z S : Scheme.{0}} {p : Z ⟶ S} (A : Sq p) [IsOpenImmersion A.u]
+    {Ω : Type} [Field Ω]
+    (z : gp Ω ⟶ Z) (hz : pt (z ≫ p) ∈ Set.range A.u)
+    : ∃ l : gp Ω ⟶ A.V, l ≫ A.v = z := by
   have hr : Set.range (z ≫ p) ⊆ Set.range A.u := by
     rintro _ ⟨t, rfl⟩
     rw [pt_eq]
     exact hz
-  exact ⟨A.pb.lift z (IsOpenImmersion.lift A.u (z ≫ p) hr) (IsOpenImmersion.lift_fac _ _ _).symm,
-    A.pb.lift_fst _ _ _⟩
+  exact ⟨
+    A.pb.lift z (IsOpenImmersion.lift A.u (z ≫ p) hr) (IsOpenImmersion.lift_fac _ _ _).symm,
+    A.pb.lift_fst _ _ _
+  ⟩
 
-theorem UpperTheory.Gal.TranscendenceTraces.nwtGlue_of :
-    NwtAgree → WtLocal → MultBC → GenBasic → NwtGlue := by
+theorem UpperTheory.Gal.TranscendenceTraces.nwtGlue_of
+    : NwtAgree → WtLocal → MultBC → GenBasic → NwtGlue := by
   intro hAg hLoc hBC hGen Z S p _ h
   choose A w hopen hmem hw using h
-  have hl : ∀ (Ω : Type) [Field Ω] (z : gp Ω ⟶ Z), ∃ l : gp Ω ⟶ (A (pt (z ≫ p))).V, l ≫ (A (pt (z ≫ p))).v = z := by
+  have hl
+      : ∀ (Ω : Type) [Field Ω] (z : gp Ω ⟶ Z), ∃ l : gp Ω ⟶ (A (pt (z ≫ p))).V,
+        l ≫ (A (pt (z ≫ p))).v = z := by
     intro Ω _ z
     haveI := hopen (pt (z ≫ p))
     exact lift_ex _ z (hmem _)

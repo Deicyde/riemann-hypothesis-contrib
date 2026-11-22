@@ -18,8 +18,11 @@ section LocalGroups
 
 variable (r : ℕ) (k : Type) [Field k]
 
-theorem diag_mul_of_upper {r : ℕ} {k : Type} [Field k] (A B : Matrix (Fin r) (Fin r) k)
-    (hA : A.BlockTriangular id) (hB : B.BlockTriangular id) (i : Fin r) : (A * B) i i = A i i * B i i := by
+theorem diag_mul_of_upper
+    {r : ℕ} {k : Type} [Field k]
+    (A B : Matrix (Fin r) (Fin r) k) (hA : A.BlockTriangular id) (hB : B.BlockTriangular id)
+    (i : Fin r)
+    : (A * B) i i = A i i * B i i := by
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_single i (fun j _ hj => ?_) (fun h => absurd (Finset.mem_univ i) h)
   rcases lt_or_gt_of_ne hj with h | h
@@ -27,7 +30,8 @@ theorem diag_mul_of_upper {r : ℕ} {k : Type} [Field k] (A B : Matrix (Fin r) (
   · rw [hB (show id i < id j from h), mul_zero]
 
 def unitri : Subgroup (GL (Fin r) k) where
-  carrier := {u | (u : Matrix (Fin r) (Fin r) k).BlockTriangular id ∧ ∀ i, (u : Matrix (Fin r) (Fin r) k) i i = 1}
+  carrier :=
+    {u | (u : Matrix (Fin r) (Fin r) k).BlockTriangular id ∧ ∀ i, (u : Matrix (Fin r) (Fin r) k) i i = 1}
   one_mem' := ⟨by simpa using Matrix.blockTriangular_one, fun i => by simp⟩
   mul_mem' := by
     intro a b ha hb
@@ -60,10 +64,11 @@ def centralIdem [Finite G] (τ : G → K) : MonoidAlgebra K G :=
   ∑ a : G, MonoidAlgebra.single a (τ 1 / (Nat.card G : K) * τ a⁻¹)
 
 def twistInv (χ : G →* Kˣ) : MonoidAlgebra K G →ₐ[K] MonoidAlgebra K G :=
-  MonoidAlgebra.lift K (MonoidAlgebra K G) G
-    { toFun := fun a => MonoidAlgebra.single a (((χ a)⁻¹ : Kˣ) : K)
-      map_one' := by simp [MonoidAlgebra.one_def]
-      map_mul' := fun a b => by simp [MonoidAlgebra.single_mul_single, mul_comm] }
+  MonoidAlgebra.lift K (MonoidAlgebra K G) G {
+    toFun := fun a => MonoidAlgebra.single a (((χ a)⁻¹ : Kˣ) : K)
+    map_one' := by simp [MonoidAlgebra.one_def]
+    map_mul' := fun a b => by simp [MonoidAlgebra.single_mul_single, mul_comm]
+  }
 
 end Idem
 
@@ -100,10 +105,14 @@ theorem toTorOne_bijective : Function.Bijective (toTorOne p) := by
       have h3 : ((x : (Fbar p)ˣ) : Fbar p) ^ (p - 1) = 1 := by
         rw [← Units.val_pow_eq_pow_val, hx, Units.val_one]
       have h4 : p = (p - 1) + 1 := (Nat.sub_add_cancel hp.out.one_le).symm
-      calc ((x : (Fbar p)ˣ) : Fbar p) ^ p = ((x : (Fbar p)ˣ) : Fbar p) ^ ((p - 1) + 1) := by rw [← h4]
+      calc
+        ((x : (Fbar p)ˣ) : Fbar p) ^ p
+          = ((x : (Fbar p)ˣ) : Fbar p) ^ ((p - 1) + 1) := by rw [← h4]
         _ = _ := by rw [pow_succ, h3, one_mul]
-    obtain ⟨n, hn⟩ := (mem_bot_iff_intCast p (Fbar p)).1 ((Subfield.mem_bot_iff_pow_eq_self (Fbar p) p).2 h2)
-    have hn' : algebraMap (ZMod p) (Fbar p) (n : ZMod p) = ((x : (Fbar p)ˣ) : Fbar p) := by rw [map_intCast, hn]
+    obtain ⟨n, hn⟩ :=
+      (mem_bot_iff_intCast p (Fbar p)).1 ((Subfield.mem_bot_iff_pow_eq_self (Fbar p) p).2 h2)
+    have hn' : algebraMap (ZMod p) (Fbar p) (n : ZMod p) = ((x : (Fbar p)ˣ) : Fbar p) := by
+      rw [map_intCast, hn]
     have h0 : (n : ZMod p) ≠ 0 := by
       intro h
       rw [h, map_zero] at hn'
@@ -111,22 +120,27 @@ theorem toTorOne_bijective : Function.Bijective (toTorOne p) := by
     exact ⟨Units.mk0 _ h0, Subtype.ext (Units.ext hn')⟩
 
 def baseNorm (D : ℕ) : Tor p D →* (ZMod p)ˣ :=
-  ((MulEquiv.ofBijective (toTorOne p) (toTorOne_bijective p)).symm : Tor p 1 →* (ZMod p)ˣ).comp (torNorm p (one_dvd D))
+  ((MulEquiv.ofBijective (toTorOne p) (toTorOne_bijective p)).symm : Tor p 1 →* (ZMod p)ˣ).comp
+    (torNorm p (one_dvd D))
 
 variable {p} {K : Type} [Field K]
 
 def torVal {d : ℕ} (θ : Tor p d →* Kˣ) : Fbar p → K :=
   Function.extend (fun u : Tor p d => ((u : (Fbar p)ˣ) : Fbar p)) (fun u => ((θ u : Kˣ) : K)) 0
 
-
 open Classical in
-def cuspChar {ι : Type} [Fintype ι] [DecidableEq ι] (θ : Tor p (Fintype.card ι) →* Kˣ) (h : Matrix ι ι (ZMod p)) : K :=
+def cuspChar
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (θ : Tor p (Fintype.card ι) →* Kˣ) (h : Matrix ι ι (ZMod p))
+    : K :=
   if ∃ (φ : (ZMod p)[X]) (n : ℕ), Irreducible φ ∧ h.charpoly = φ ^ n then
-    (-1) ^ (Fintype.card ι - 1) * ∑ z ∈ (h.charpoly.aroots (Fbar p)).toFinset, torVal θ z *
-      ∏ i ∈ Finset.Ico 1 (Module.finrank (Fbar p)
-          (Module.End.eigenspace (Matrix.toLin' (h.map (algebraMap (ZMod p) (Fbar p)))) z)),
-        (1 - (p : K) ^ ((h.charpoly.aroots (Fbar p)).toFinset.card * i))
-  else 0
+    (-1) ^ (Fintype.card ι - 1)
+      * ∑ z ∈ (h.charpoly.aroots (Fbar p)).toFinset, torVal θ z *
+        ∏ i ∈ Finset.Ico 1 (Module.finrank (Fbar p)
+            (Module.End.eigenspace (Matrix.toLin' (h.map (algebraMap (ZMod p) (Fbar p)))) z)),
+          (1 - (p : K) ^ ((h.charpoly.aroots (Fbar p)).toFinset.card * i))
+  else
+    0
 
 abbrev Cyc {r : ℕ} (b : Fin r → Fin r) : Type := {c : Fin r // ∃ i, b i = c}
 
@@ -137,8 +151,8 @@ theorem cycLen_pos {r : ℕ} (b : Fin r → Fin r) (c : Cyc b) : 0 < cycLen b c 
   exact Fintype.card_pos_iff.2 ⟨⟨i, hi⟩⟩
 
 theorem cycLen_dvd {r : ℕ} (b : Fin r → Fin r) (c : Cyc b) : cycLen b c ∣ r.factorial :=
-  Nat.dvd_factorial (cycLen_pos b c) (by simpa using Fintype.card_subtype_le (fun i : Fin r => b i = c.1))
-
+  Nat.dvd_factorial (cycLen_pos b c)
+    (by simpa using Fintype.card_subtype_le (fun i : Fin r => b i = c.1))
 
 variable (p K) in
 abbrev SSParam (r : ℕ) : Type := Σ b : Fin r → Fin r, ∀ c : Cyc b, (Tor p (cycLen b c) →* Kˣ)
@@ -158,19 +172,21 @@ variable {r : ℕ}
 def cycChar (s : SSParam p K r) (c : Cyc s.1) : Tor p r.factorial →* Kˣ :=
   (s.2 c).comp (torNorm p (cycLen_dvd s.1 c))
 
-def rootChar (s : SSParam p K r) (x : Σ c : Cyc s.1, Fin (cycLen s.1 c)) : Tor p r.factorial →* Kˣ :=
+def rootChar (s : SSParam p K r) (x : Σ c : Cyc s.1, Fin (cycLen s.1 c))
+    : Tor p r.factorial →* Kˣ :=
   cycChar s x.1 ^ (p ^ x.2.val)
-
 
 open Classical in
 def typeChar (s : SSParam p K r) (x : GL (Fin r) (ZMod p)) : K :=
   haveI := Fintype.ofFinite (GL (Fin r) (ZMod p))
-  ((Nat.card {y : GL (Fin r) (ZMod p) // (y : Matrix (Fin r) (Fin r) (ZMod p)).BlockTriangular s.1} : ℕ) : K)⁻¹ *
-    ∑ y : GL (Fin r) (ZMod p),
-      if ((y⁻¹ * x * y : GL (Fin r) (ZMod p)) : Matrix (Fin r) (Fin r) (ZMod p)).BlockTriangular s.1 then
-        ∏ c : Cyc s.1, cuspChar (s.2 c)
-          (((y⁻¹ * x * y : GL (Fin r) (ZMod p)) : Matrix (Fin r) (Fin r) (ZMod p)).toSquareBlock s.1 c.1)
-      else 0
+  ((Nat.card {y : GL (Fin r) (ZMod p) // (y : Matrix (Fin r) (Fin r) (ZMod p)).BlockTriangular s.1}
+        : ℕ)
+      : K)⁻¹
+    * ∑ y : GL (Fin r) (ZMod p),
+        if ((y⁻¹ * x * y : GL (Fin r) (ZMod p)) : Matrix (Fin r) (Fin r) (ZMod p)).BlockTriangular s.1 then
+          ∏ c : Cyc s.1, cuspChar (s.2 c)
+            (((y⁻¹ * x * y : GL (Fin r) (ZMod p)) : Matrix (Fin r) (Fin r) (ZMod p)).toSquareBlock s.1 c.1)
+        else 0
 
 def CongrMod {A : Type} [CommGroup A] (l : ℕ) (x y : A) : Prop := ∃ n : ℕ, (x / y) ^ (l ^ n) = 1
 
@@ -180,20 +196,21 @@ def BB (g r : ℕ) : Set ℕ :=
 def IsRegularParam (s : SSParam p K r) : Prop := Function.Injective (rootChar s)
 
 def GoodAt {ι J : Type} (χ : J → ((ZMod p)ˣ →* Kˣ)) (s : ι → SSParam p K r) : Prop :=
-
-  (∀ v, IsRegularParam (s v)) ∧
-
-  (∀ l : ℕ, l.Prime → l ∉ BB p r → ∀ v, ∀ x y, x ≠ y → ¬ CongrMod l (rootChar (s v) x) (rootChar (s v) y)) ∧
-
-  ((∀ l : ℕ, l.Prime → l ≠ p → ∀ v j c,
-      ¬ CongrMod l (cycChar (s v) c) ((χ j).comp (baseNorm p r.factorial)) ∧
-      ¬ CongrMod l (cycChar (s v) c) ((χ j)⁻¹.comp (baseNorm p r.factorial))) ∧
-    ∀ v j x, rootChar (s v) x ≠ (χ j).comp (baseNorm p r.factorial) ∧
-      rootChar (s v) x ≠ (χ j)⁻¹.comp (baseNorm p r.factorial)) ∧
-
-  (¬ ∃ a : ℕ, 1 ≤ a ∧ 2 * a ≤ r ∧ ∀ v, ∃ A : Finset (Cyc (s v).1), ∑ c ∈ A, cycLen (s v).1 c = a) ∧
-
-  ∃ v, ∃ c : Cyc (s v).1, (cycLen (s v).1 c).Prime ∧ r < 2 * cycLen (s v).1 c ∧ cycLen (s v).1 c + 3 ≤ r
+  (∀ v, IsRegularParam (s v))
+    ∧ (∀ l : ℕ,
+      l.Prime → l ∉ BB p r → ∀ v, ∀ x y, x ≠ y → ¬ CongrMod l (rootChar (s v) x) (rootChar (s v) y))
+    ∧ ((∀ l : ℕ,
+        l.Prime → l ≠ p
+          → ∀ v j c,
+            ¬ CongrMod l (cycChar (s v) c) ((χ j).comp (baseNorm p r.factorial))
+              ∧ ¬ CongrMod l (cycChar (s v) c) ((χ j)⁻¹.comp (baseNorm p r.factorial)))
+      ∧ ∀ v j x,
+        rootChar (s v) x ≠ (χ j).comp (baseNorm p r.factorial)
+          ∧ rootChar (s v) x ≠ (χ j)⁻¹.comp (baseNorm p r.factorial))
+    ∧ (¬ ∃ a : ℕ,
+      1 ≤ a ∧ 2 * a ≤ r ∧ ∀ v, ∃ A : Finset (Cyc (s v).1), ∑ c ∈ A, cycLen (s v).1 c = a)
+    ∧ ∃ v, ∃ c : Cyc (s v).1,
+      (cycLen (s v).1 c).Prime ∧ r < 2 * cycLen (s v).1 c ∧ cycLen (s v).1 c + 3 ≤ r
 
 end Types
 
@@ -203,14 +220,16 @@ variable {R : Ranks} (H : Host R)
 
 instance factPrime (i : Fin 2) : Fact (H.g i).Prime := ⟨H.g_prime i⟩
 
-def PlOver (i : Fin 2) : Type := {v : HeightOneSpectrum (𝓞 H.F) // ((H.g i : ℕ) : 𝓞 H.F) ∈ v.asIdeal}
+def PlOver (i : Fin 2) : Type :=
+  {v : HeightOneSpectrum (𝓞 H.F) // ((H.g i : ℕ) : 𝓞 H.F) ∈ v.asIdeal}
 
 instance finitePlOver (i : Fin 2) : Finite (PlOver H i) := by
   have h0 : (Ideal.span {((H.g i : ℕ) : 𝓞 H.F)}) ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast (H.g_prime i).ne_zero
   have h := Ideal.finite_factors h0
-  refine Set.Finite.to_subtype (s := {v : HeightOneSpectrum (𝓞 H.F) | ((H.g i : ℕ) : 𝓞 H.F) ∈ v.asIdeal}) (h.subset ?_)
+  refine Set.Finite.to_subtype
+    (s := {v : HeightOneSpectrum (𝓞 H.F) | ((H.g i : ℕ) : 𝓞 H.F) ∈ v.asIdeal}) (h.subset ?_)
   intro v hv
   exact Ideal.dvd_span_singleton.2 hv
 
@@ -222,13 +241,16 @@ def levelU : Subgroup (LevelGroup H) := Subgroup.pi Set.univ fun v => unitri R.r
 
 variable {H} {K : Type} [Field K]
 
-def psiU {A : Type} [CommMonoid A] (ψ : ∀ v : Sq H, AddChar (ZMod (H.g v.1)) A) (u : LevelGroup H) : A :=
+def psiU {A : Type} [CommMonoid A] (ψ : ∀ v : Sq H, AddChar (ZMod (H.g v.1)) A) (u : LevelGroup H)
+    : A :=
   haveI := Fintype.ofFinite (Sq H)
   ∏ v : Sq H, ψ v (superDiag ((u v : GL (Fin R.r) (ZMod (H.g v.1))) : Matrix (Fin R.r) (Fin R.r) (ZMod (H.g v.1))))
 
-def IsGeneratorFamily (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) : Prop := ∀ i, Function.Injective (om i)
+def IsGeneratorFamily (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) : Prop :=
+  ∀ i, Function.Injective (om i)
 
-def chiTame (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (i : Fin 2) (j : Fin R.m) : (ZMod (H.g i))ˣ →* Kˣ :=
+def chiTame (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (i : Fin 2) (j : Fin R.m)
+    : (ZMod (H.g i))ˣ →* Kˣ :=
   om i ^ (2 * (j.val + 1))
 
 def chiDet (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (j : Fin R.m) : LevelGroup H →* Kˣ :=
@@ -236,7 +258,8 @@ def chiDet (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (j : Fin R.m) : Level
   ∏ v : Sq H, ((chiTame om v.1 j).comp Matrix.GeneralLinearGroup.det).comp
     (Pi.evalMonoidHom (fun v : Sq H => GL (Fin R.r) (ZMod (H.g v.1))) v)
 
-def IsGoodParam (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (s : ∀ v : Sq H, SSParam (H.g v.1) K R.r) : Prop :=
+def IsGoodParam (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (s : ∀ v : Sq H, SSParam (H.g v.1) K R.r)
+    : Prop :=
   ∀ i : Fin 2, GoodAt (chiTame om i) (fun w : PlOver H i => s ⟨i, w⟩)
 
 def tupleChar (s : ∀ v : Sq H, SSParam (H.g v.1) K R.r) (a : LevelGroup H) : K :=
@@ -252,15 +275,17 @@ theorem goodTypes_finite (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) : (good
 def goodIdem (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) : MonoidAlgebra K (LevelGroup H) :=
   ∑ τ ∈ (goodTypes_finite om).toFinset, centralIdem τ
 
-def goodIdemTw (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (j : Fin R.m) : MonoidAlgebra K (LevelGroup H) :=
+def goodIdemTw (om : ∀ i : Fin 2, (ZMod (H.g i))ˣ →* Kˣ) (j : Fin R.m)
+    : MonoidAlgebra K (LevelGroup H) :=
   twistInv (chiDet om j) (goodIdem om)
-
 
 end Level
 
 section Ties
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {c : OnConst}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {c : OnConst}
 
 end Ties
 

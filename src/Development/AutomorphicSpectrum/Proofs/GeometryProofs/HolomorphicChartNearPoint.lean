@@ -14,8 +14,11 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
 
 noncomputable section
 
@@ -24,9 +27,13 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart
 abbrev cst {K : Type} [Field K] {X : Scheme.{0}} (s : X ⟶ Sp K) (V : X.Opens) : K →+* Γ(X, V) :=
   ((Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ s.appLE ⊤ V (fun _ _ => trivial)).hom
 
-theorem cst_basicOpen {K : Type} [Field K] {X : Scheme.{0}} (s : X ⟶ Sp K) {V : X.Opens}
-    (hV : IsAffineOpen V) {d : ℕ} (h : (cst s V).IsStandardSmoothOfRelativeDimension d)
-    (g : Γ(X, V)) : (cst s (X.basicOpen g)).IsStandardSmoothOfRelativeDimension d := by
+theorem cst_basicOpen
+    {K : Type} [Field K]
+    {X : Scheme.{0}} (s : X ⟶ Sp K)
+    {V : X.Opens} (hV : IsAffineOpen V)
+    {d : ℕ} (h : (cst s V).IsStandardSmoothOfRelativeDimension d)
+    (g : Γ(X, V))
+    : (cst s (X.basicOpen g)).IsStandardSmoothOfRelativeDimension d := by
   have := hV.isLocalization_basicOpen g
   have h1 : (algebraMap Γ(X, V) Γ(X, X.basicOpen g)).IsStandardSmoothOfRelativeDimension 0 :=
     RingHom.IsStandardSmoothOfRelativeDimension.algebraMap_isLocalizationAway g
@@ -34,39 +41,53 @@ theorem cst_basicOpen {K : Type} [Field K] {X : Scheme.{0}} (s : X ⟶ Sp K) {V 
   rw [zero_add] at h3
   convert h3 using 1
   ext c
-  exact congr($(Scheme.Hom.appLE_map s (U := ⊤) (V := V) le_top (homOfLE (X.basicOpen_le g)).op)
-    ((Scheme.ΓSpecIso (CommRingCat.of K)).inv c)).symm
+  exact
+    congr($(Scheme.Hom.appLE_map s (U := ⊤) (V := V) le_top (homOfLE (X.basicOpen_le g)).op)
+      ((Scheme.ΓSpecIso (CommRingCat.of K)).inv c)).symm
 
-theorem exists_std {K : Type} [Field K] {X : Scheme.{0}} (s : X ⟶ Sp K) {d : ℕ}
-    (hs : SmoothOfRelativeDimension d s) (U : X.Opens) (x : X) (hx : x ∈ U) :
-    ∃ V : X.Opens, IsAffineOpen V ∧ V ≤ U ∧ x ∈ V ∧
-      (cst s V).IsStandardSmoothOfRelativeDimension d := by
+theorem exists_std
+    {K : Type} [Field K]
+    {X : Scheme.{0}} (s : X ⟶ Sp K)
+    {d : ℕ} (hs : SmoothOfRelativeDimension d s)
+    (U : X.Opens) (x : X) (hx : x ∈ U)
+    : ∃ V : X.Opens,
+      IsAffineOpen V ∧ V ≤ U ∧ x ∈ V ∧ (cst s V).IsStandardSmoothOfRelativeDimension d := by
   obtain ⟨W, -, V, hV, hxV, e, hf⟩ := hs.exists_isStandardSmoothOfRelativeDimension x
   obtain rfl : W = ⊤ := by
     refine top_le_iff.1 fun y _ => ?_
     have : y = s x := Subsingleton.elim (α := PrimeSpectrum K) _ _
-    rw [this]; exact e hxV
+    rw [this]
+    exact e hxV
   obtain ⟨g, hgU, hxg⟩ := hV.exists_basicOpen_le ⟨x, hx⟩ hxV
   refine ⟨X.basicOpen g, hV.basicOpen g, hgU, hxg, cst_basicOpen s hV ?_ g⟩
   exact RingHom.isStandardSmoothOfRelativeDimension_respectsIso.2 _
     (Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv hf
 
-theorem fromSpec_comp {K : Type} [Field K] {X : Scheme.{0}} (s : X ⟶ Sp K) {V : X.Opens}
-    (hV : IsAffineOpen V) : hV.fromSpec ≫ s = spMap (cst s V) := by
+theorem fromSpec_comp
+    {K : Type} [Field K] {X : Scheme.{0}} (s : X ⟶ Sp K) {V : X.Opens} (hV : IsAffineOpen V)
+    : hV.fromSpec ≫ s = spMap (cst s V) := by
   have h := IsAffineOpen.SpecMap_appLE_fromSpec s (isAffineOpen_top (Sp K)) hV (fun _ _ => trivial)
   rw [← h, IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv, ← Spec.map_comp]
   rfl
 
-theorem exists_domain {X : Scheme.{0}} {V : X.Opens} (hV : IsAffineOpen V)
-    [IsNoetherianRing Γ(X, V)] (ξ : X) (hξ : ξ ∈ V) [IsDomain (X.presheaf.stalk ξ)] :
-    ∃ f : Γ(X, V), ξ ∈ X.basicOpen f ∧ IsDomain Γ(X, X.basicOpen f) :=
+theorem exists_domain
+    {X : Scheme.{0}} {V : X.Opens} (hV : IsAffineOpen V) [IsNoetherianRing Γ(X, V)]
+    (ξ : X) (hξ : ξ ∈ V) [IsDomain (X.presheaf.stalk ξ)]
+    : ∃ f : Γ(X, V), ξ ∈ X.basicOpen f ∧ IsDomain Γ(X, X.basicOpen f) :=
   _root_.UpperTheory.Reformulated.B.DYde8.main hV ξ hξ
 
 end GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart
 
-
 open GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart in
-theorem GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart.exists_polydisc_chart : ∀ (K : Type) [Field K] (σ : K →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp K) (d : ℕ), SmoothOfRelativeDimension d s → ∀ (x : Sp ℂ ⟶ X) (W₀ : X.Opens), x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ W₀ → IsDomain (X.presheaf.stalk (centre x)) → ∃ (V : X.Opens) (hV : IsAffineOpen V) (ψ : (Fin d → ℂ) → (Γ(X, V) →+* ℂ)), V ≤ W₀ ∧ IsHolPts (ball 0 1) ψ ∧ spMap (ψ 0) ≫ hV.fromSpec = x ∧ (∀ z ∈ ball (0 : Fin d → ℂ) 1, (spMap (ψ z) ≫ hV.fromSpec) ≫ s = spMap σ) ∧ ∀ g : Γ(X, V), (∀ z ∈ ball (0 : Fin d → ℂ) 1, ψ z g = 0) → g = 0 := by
+theorem GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart.exists_polydisc_chart
+    : ∀ (K : Type) [Field K] (σ : K →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp K) (d : ℕ),
+      SmoothOfRelativeDimension d s
+        → ∀ (x : Sp ℂ ⟶ X) (W₀ : X.Opens),
+          x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ W₀ → IsDomain (X.presheaf.stalk (centre x))
+            → ∃ (V : X.Opens) (hV : IsAffineOpen V) (ψ : (Fin d → ℂ) → (Γ(X, V) →+* ℂ)),
+              V ≤ W₀ ∧ IsHolPts (ball 0 1) ψ ∧ spMap (ψ 0) ≫ hV.fromSpec = x
+                ∧ (∀ z ∈ ball (0 : Fin d → ℂ) 1, (spMap (ψ z) ≫ hV.fromSpec) ≫ s = spMap σ)
+                ∧ ∀ g : Γ(X, V), (∀ z ∈ ball (0 : Fin d → ℂ) 1, ψ z g = 0) → g = 0 := by
   intro K _ σ X s d hsm x W₀ hxs hW hdom
   have hξW : centre x ∈ W₀ := hW (show IsLocalRing.closedPoint ℂ ∈ (⊤ : (Sp ℂ).Opens) from trivial)
   obtain ⟨V₁, hV₁, hV₁W, hξ₁, hstd₁⟩ := exists_std s hsm W₀ (centre x) hξW
@@ -92,8 +113,9 @@ theorem GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart.exists_polydisc_chart :
     rw [← hy]
     congr 1
     exact Spec.map_preimage y
-  have hcomp : ∀ ψ : Γ(X, X.basicOpen f) →+* ℂ,
-      (spMap ψ ≫ hV.fromSpec) ≫ s = spMap (ψ.comp (cst s (X.basicOpen f))) := by
+  have hcomp
+      : ∀ ψ : Γ(X, X.basicOpen f) →+* ℂ,
+        (spMap ψ ≫ hV.fromSpec) ≫ s = spMap (ψ.comp (cst s (X.basicOpen f))) := by
     intro ψ
     rw [Category.assoc, fromSpec_comp s hV, ← Spec.map_comp]
     rfl
@@ -102,7 +124,8 @@ theorem GlobalTheory.CompanionTheory.Ar.Flat.SmoothChart.exists_polydisc_chart :
     rw [hψ₀, hxs] at h
     have h' := Spec.map_injective h
     exact (congrArg CommRingCat.Hom.hom h').symm
-  obtain ⟨Ψ, hol, h0, hbase, hvan⟩ := GlobalTheory.T.holomorphic_family_of_homs K Γ(X, X.basicOpen f) d σ ψ₀ hσ
+  obtain ⟨Ψ, hol, h0, hbase, hvan⟩ :=
+    GlobalTheory.T.holomorphic_family_of_homs K Γ(X, X.basicOpen f) d σ ψ₀ hσ
   refine ⟨X.basicOpen f, hV, Ψ, (X.basicOpen_le f).trans hV₁W, hol, ?_, ?_, hvan⟩
   · rw [h0]; exact hψ₀
   · intro z hz

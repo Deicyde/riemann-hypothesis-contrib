@@ -8,15 +8,20 @@ open GlobalTheory.NeedB Polynomial
 
 namespace GlobalTheory
 
-theorem zeta_pow_val_add {Ω : Type} [Field Ω] {N : ℕ} [NeZero N] {ζ : Ω} (hζN : ζ ^ N = 1) (x y : ZMod N) :
-    ζ ^ (x + y).val = ζ ^ x.val * ζ ^ y.val := by
+theorem zeta_pow_val_add
+    {Ω : Type} [Field Ω] {N : ℕ} [NeZero N] {ζ : Ω} (hζN : ζ ^ N = 1) (x y : ZMod N)
+    : ζ ^ (x + y).val = ζ ^ x.val * ζ ^ y.val := by
   rw [ZMod.val_add, ← pow_add]
   conv_rhs => rw [← Nat.div_add_mod (x.val + y.val) N, pow_add, pow_mul, hζN, one_pow, one_mul]
 
-theorem kummer_generator_of_char : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (N : ℕ) (ζ : Ω), 0 < N →
-  IsPrimitiveRoot ζ N → (∀ g : Ω ≃ₐ[K] Ω, g ζ = ζ) → ∀ (E : IntermediateField K Ω) (χ : (Ω ≃ₐ[K] Ω) → ZMod N),
-  IsLocallyConstant χ → (∀ g ∈ E.fixingSubgroup, ∀ h ∈ E.fixingSubgroup, χ (g * h) = χ g + χ h) →
-  ∃ θ : Ω, θ ≠ 0 ∧ θ ^ N ∈ E ∧ ∀ g ∈ E.fixingSubgroup, g θ = ζ ^ (χ g).val * θ := by
+theorem kummer_generator_of_char
+    : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (N : ℕ)
+        (ζ : Ω),
+      0 < N → IsPrimitiveRoot ζ N → (∀ g : Ω ≃ₐ[K] Ω, g ζ = ζ)
+        → ∀ (E : IntermediateField K Ω) (χ : (Ω ≃ₐ[K] Ω) → ZMod N),
+          IsLocallyConstant χ
+            → (∀ g ∈ E.fixingSubgroup, ∀ h ∈ E.fixingSubgroup, χ (g * h) = χ g + χ h)
+            → ∃ θ : Ω, θ ≠ 0 ∧ θ ^ N ∈ E ∧ ∀ g ∈ E.fixingSubgroup, g θ = ζ ^ (χ g).val * θ := by
   intro K Ω _ _ _ _ _ N ζ hN hζ hfix E χ hχ hadd
   haveI : NeZero N := ⟨hN.ne'⟩
   classical
@@ -59,8 +64,7 @@ theorem kummer_generator_of_char : ∀ (K Ω : Type) [Field K] [CharZero K] [Fie
   have hamul : ∀ g ∈ H, ∀ h ∈ H, a (g * h) = a g * a h := by
     intro g hg h hh
     simp only [a, hadd g hg h hh, zeta_pow_val_add hζN]
-  have hafix : ∀ (g h : Ω ≃ₐ[K] Ω), g (a h) = a h := by
-    intro g h; simp only [a, map_pow, hfix]
+  have hafix : ∀ (g h : Ω ≃ₐ[K] Ω), g (a h) = a h := by intro g h; simp only [a, map_pow, hfix]
   let w : ι → Ω := fun i => (a (s i))⁻¹
 
   let v : ι → (F →* Ω) := fun i => (i.1 : F →+* Ω).toMonoidHom
@@ -82,16 +86,12 @@ theorem kummer_generator_of_char : ∀ (K Ω : Type) [Field K] [CharZero K] [Fie
   have hmain : ∀ g ∈ H, g (∑ i, w i * i.1 c) = a g * ∑ i, w i * i.1 c := by
     intro g hg
     let e : ι → ι := fun i => ⟨r (g * s i), g * s i, H.mul_mem hg (hsH i), rfl⟩
-    have hic : ∀ i : ι, i.1 c = s i (c : Ω) := by
-      intro i; rw [← hsr i]; exact hr _ _
-    have hec : ∀ i, (e i).1 c = g (i.1 c) := by
-      intro i; rw [hic i]; rfl
+    have hic : ∀ i : ι, i.1 c = s i (c : Ω) := by intro i; rw [← hsr i]; exact hr _ _
+    have hec : ∀ i, (e i).1 c = g (i.1 c) := by intro i; rw [hic i]; rfl
     have hwe : ∀ i, w i = a g * w (e i) := by
       intro i
-      have hχe : χ (s (e i)) = χ (g * s i) :=
-        hrχ _ (hsH (e i)) _ (H.mul_mem hg (hsH i)) (hsr (e i))
-      have : a (s (e i)) = a g * a (s i) := by
-        rw [← hamul g hg (s i) (hsH i)]; simp only [a, hχe]
+      have hχe : χ (s (e i)) = χ (g * s i) := hrχ _ (hsH (e i)) _ (H.mul_mem hg (hsH i)) (hsr (e i))
+      have : a (s (e i)) = a g * a (s i) := by rw [← hamul g hg (s i) (hsH i)]; simp only [a, hχe]
       simp only [w, this, mul_inv, ← mul_assoc, mul_inv_cancel₀ (ha0 g), one_mul]
     have he : Function.Injective e := by
       intro i j hij
@@ -111,7 +111,8 @@ theorem kummer_generator_of_char : ∀ (K Ω : Type) [Field K] [CharZero K] [Fie
     intro i
     have h3 := hwe i
     simp only [w] at h3
-    rw [h3, ← hec i]; ring
+    rw [h3, ← hec i]
+    ring
   refine ⟨∑ i, w i * i.1 c, hc, ?_, ?_⟩
   · haveI : IsGalois K Ω := IsAlgClosure.isGalois K Ω
     rw [← InfiniteGalois.fixedField_fixingSubgroup E, IntermediateField.mem_fixedField_iff]

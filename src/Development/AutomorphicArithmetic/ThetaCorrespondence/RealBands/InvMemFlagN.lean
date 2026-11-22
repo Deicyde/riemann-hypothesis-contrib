@@ -6,25 +6,27 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Im
 
 @[expose] public section
 
-open MeasureTheory Filter Matrix Formalism.REAL Formalism.MainNotions.S GlobalTheory.FlagMeas GlobalTheory.RealInd UpperTheory.Lit.Cusp
+open MeasureTheory Filter Matrix Formalism.REAL Formalism.MainNotions.S GlobalTheory.FlagMeas
+  GlobalTheory.RealInd UpperTheory.Lit.Cusp
 open GlobalTheory.Dec (IsHaarSub IsIsoC NW IsSqIntIrr)
 open scoped Topology InnerProductSpace
 
-private theorem act_mul {n : ℕ} {ε : Fin n → Bool} (g h : UJ ε) (y : Fin n → ℂ) :
-    uMat (g * h) *ᵥ y = uMat g *ᵥ (uMat h *ᵥ y) := by
+private theorem act_mul {n : ℕ} {ε : Fin n → Bool} (g h : UJ ε) (y : Fin n → ℂ)
+    : uMat (g * h) *ᵥ y = uMat g *ᵥ (uMat h *ᵥ y) := by
   rw [mulVec_mulVec]; rfl
 
-private theorem act_inv {n : ℕ} {ε : Fin n → Bool} (g : UJ ε) (y : Fin n → ℂ) :
-    uMat g⁻¹ *ᵥ (uMat g *ᵥ y) = y := by
+private theorem act_inv {n : ℕ} {ε : Fin n → Bool} (g : UJ ε) (y : Fin n → ℂ)
+    : uMat g⁻¹ *ᵥ (uMat g *ᵥ y) = y := by
   rw [← act_mul, inv_mul_cancel]; exact one_mulVec y
 
-private theorem act_inv' {n : ℕ} {ε : Fin n → Bool} (g : UJ ε) (y : Fin n → ℂ) :
-    uMat g *ᵥ (uMat g⁻¹ *ᵥ y) = y := by
+private theorem act_inv' {n : ℕ} {ε : Fin n → Bool} (g : UJ ε) (y : Fin n → ℂ)
+    : uMat g *ᵥ (uMat g⁻¹ *ᵥ y) = y := by
   rw [← act_mul, mul_inv_cancel]; exact one_mulVec y
 
-private theorem keeps_perp {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p : UJ ε} (hp : p ∈ parab ε W)
-    {y : Fin n → ℂ} (hy : ∀ z ∈ W (Fin.last a), star z ⬝ᵥ (Jm ε *ᵥ y) = 0) :
-    ∀ z ∈ W (Fin.last a), star z ⬝ᵥ (Jm ε *ᵥ (uMat p *ᵥ y)) = 0 := by
+private theorem keeps_perp
+    {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p : UJ ε} (hp : p ∈ parab ε W)
+    {y : Fin n → ℂ} (hy : ∀ z ∈ W (Fin.last a), star z ⬝ᵥ (Jm ε *ᵥ y) = 0)
+    : ∀ z ∈ W (Fin.last a), star z ⬝ᵥ (Jm ε *ᵥ (uMat p *ᵥ y)) = 0 := by
   intro z hz
   have hpiS : ∀ i, ∀ y ∈ W i, uMat p⁻¹ *ᵥ y ∈ W i := (parab ε W).inv_mem hp
   have h1 : Jm ε *ᵥ (uMat p *ᵥ y) = (uMat p⁻¹)ᴴ *ᵥ (Jm ε *ᵥ y) := by
@@ -32,17 +34,24 @@ private theorem keeps_perp {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p :
   rw [h1, dotProduct_mulVec, ← star_mulVec]
   exact hy _ (hpiS _ _ hz)
 
-private theorem conj_mem {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p m : UJ ε} (hp : p ∈ parab ε W)
-    (hm : m ∈ flagN ε W) : p⁻¹ * m * p ∈ flagN ε W := by
-  have e : ∀ y, uMat (p⁻¹ * m * p) *ᵥ y - y = uMat p⁻¹ *ᵥ (uMat m *ᵥ (uMat p *ᵥ y) - uMat p *ᵥ y) := fun y => by
+private theorem conj_mem
+    {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p m : UJ ε}
+    (hp : p ∈ parab ε W) (hm : m ∈ flagN ε W)
+    : p⁻¹ * m * p ∈ flagN ε W := by
+  have e
+      : ∀ y,
+        uMat (p⁻¹ * m * p) *ᵥ y - y
+          = uMat p⁻¹ *ᵥ (uMat m *ᵥ (uMat p *ᵥ y) - uMat p *ᵥ y) := fun y => by
     rw [mulVec_sub, act_inv, act_mul, act_mul]
   have hi := (parab ε W).inv_mem hp
   refine ⟨fun i y hy => ?_, fun y hy => ?_⟩
   · rw [e]; exact hi _ _ (hm.1 i _ (hp _ y hy))
   · rw [e]; exact hi _ _ (hm.2 _ (keeps_perp hp hy))
 
-private theorem comm_mem {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p t : UJ ε} {x : Fin a → ℝ}
-    (hp : p ∈ parab ε W) (ht : IsSplit ε W x t) : t⁻¹ * (p * t * p⁻¹) ∈ flagN ε W := by
+private theorem comm_mem
+    {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p t : UJ ε} {x : Fin a → ℝ}
+    (hp : p ∈ parab ε W) (ht : IsSplit ε W x t)
+    : t⁻¹ * (p * t * p⁻¹) ∈ flagN ε W := by
   have hpS : ∀ i, ∀ y ∈ W i, uMat p *ᵥ y ∈ W i := hp
   have hpiS : ∀ i, ∀ y ∈ W i, uMat p⁻¹ *ᵥ y ∈ W i := (parab ε W).inv_mem hp
   have htS : ∀ i, ∀ y ∈ W i, uMat t *ᵥ y ∈ W i := fun i y hy => (ht.1 i y hy).1
@@ -50,18 +59,20 @@ private theorem comm_mem {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p t :
     (parab ε W).inv_mem (show t ∈ parab ε W from htS)
   simp only [flagN, Set.mem_setOf_eq]
   refine ⟨fun i y hy => ?_, fun y hy => ?_⟩
-  · have e : uMat (t⁻¹ * (p * t * p⁻¹)) *ᵥ y - y =
-        uMat t⁻¹ *ᵥ (uMat p *ᵥ (uMat t *ᵥ (uMat p⁻¹ *ᵥ y) -
-          (Real.exp (x i) : ℂ) • (uMat p⁻¹ *ᵥ y))) -
-          uMat t⁻¹ *ᵥ (uMat t *ᵥ y - (Real.exp (x i) : ℂ) • y) := by
+  · have e
+        : uMat (t⁻¹ * (p * t * p⁻¹)) *ᵥ y - y
+          = uMat t⁻¹
+              *ᵥ (uMat p *ᵥ (uMat t *ᵥ (uMat p⁻¹ *ᵥ y) - (Real.exp (x i) : ℂ) • (uMat p⁻¹ *ᵥ y)))
+            - uMat t⁻¹ *ᵥ (uMat t *ᵥ y - (Real.exp (x i) : ℂ) • y) := by
       simp only [act_mul, mulVec_sub, mulVec_smul, act_inv, act_inv']
       abel
     rw [e]
     exact Submodule.sub_mem _ (htiS _ _ (hpS _ _ (ht.2.1 i _ (hpiS _ _ hy))))
       (htiS _ _ (ht.2.1 i y hy))
-  · have e : uMat (t⁻¹ * (p * t * p⁻¹)) *ᵥ y - y =
-        uMat t⁻¹ *ᵥ (uMat p *ᵥ (uMat t *ᵥ (uMat p⁻¹ *ᵥ y) - uMat p⁻¹ *ᵥ y)) -
-          uMat t⁻¹ *ᵥ (uMat t *ᵥ y - y) := by
+  · have e
+        : uMat (t⁻¹ * (p * t * p⁻¹)) *ᵥ y - y
+          = uMat t⁻¹ *ᵥ (uMat p *ᵥ (uMat t *ᵥ (uMat p⁻¹ *ᵥ y) - uMat p⁻¹ *ᵥ y))
+            - uMat t⁻¹ *ᵥ (uMat t *ᵥ y - y) := by
       simp only [act_mul, mulVec_sub, act_inv, act_inv']
       abel
     rw [e]
@@ -69,9 +80,10 @@ private theorem comm_mem {n a : ℕ} {ε : Fin n → Bool} {W : Flag n a} {p t :
       (htiS _ _ (hpS _ _ (ht.2.2 _ (keeps_perp ((parab ε W).inv_mem hp) hy))))
       (htiS _ _ (ht.2.2 y hy))
 
-theorem UpperTheory.Lit.Cusp.exists_isRay :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (j : Fin 1 → ℕ) (W : Flag n 1), IsIsoFlag ε j W → (∀ i, 1 ≤ j i) →
-      ∃ (a : ℝ → UJ ε) (H : UJ ε → ℝ), IsRay (flagN ε W) a H := by
+theorem UpperTheory.Lit.Cusp.exists_isRay
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (j : Fin 1 → ℕ) (W : Flag n 1),
+      IsIsoFlag ε j W → (∀ i, 1 ≤ j i)
+        → ∃ (a : ℝ → UJ ε) (H : UJ ε → ℝ), IsRay (flagN ε W) a H := by
   intro n ε j W hW hj
   obtain ⟨a, ha_cont, ha_add, ha_split⟩ := exists_split n ε j W hW
   obtain ⟨h, hh_cont, hh1, hhK, hhP⟩ := exists_height hW hj
@@ -132,8 +144,10 @@ theorem UpperTheory.Lit.Cusp.exists_isRay :
   · intro D hD
     have hS : IsCompact ((fun q : UJ ε × UJ ε => q.1 * q.2) '' ((KG ε : Set (UJ ε)) ×ˢ D)) :=
       (hK.prod hD).image continuous_mul
-    obtain ⟨c, hc⟩ := hS.exists_bound_of_continuousOn (f := fun g => h g 0)
-      ((continuous_apply 0).comp hh_cont).continuousOn
+    obtain ⟨c, hc⟩ :=
+      hS.exists_bound_of_continuousOn
+        (f := fun g => h g 0)
+        ((continuous_apply 0).comp hh_cont).continuousOn
     refine ⟨c, fun g hg x => ?_⟩
     obtain ⟨k, hk, hyg⟩ := hshift x⁻¹ g
     show |-(h (g⁻¹ * x)⁻¹ 0) - -(h x⁻¹ 0)| ≤ c

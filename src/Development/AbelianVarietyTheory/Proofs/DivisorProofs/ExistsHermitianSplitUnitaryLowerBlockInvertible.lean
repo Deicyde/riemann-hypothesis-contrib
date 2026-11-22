@@ -15,10 +15,11 @@ section Transverse
 
 variable {k : Type} [Field k] {ν : Type} [Fintype ν] [DecidableEq ν]
 
-theorem transv_kills (c : k →+* k) (S A C : Matrix ν ν k)
-    (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0)
-    (u : ν → k) (hu : A *ᵥ u = 0) (w : ν → k) :
-    ((C *ᵥ u) ᵥ* S) ⬝ᵥ (c ∘ (A *ᵥ w)) = 0 := by
+theorem transv_kills
+    (c : k →+* k) (S A C : Matrix ν ν k) (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0)
+    (u : ν → k) (hu : A *ᵥ u = 0)
+    (w : ν → k)
+    : ((C *ᵥ u) ᵥ* S) ⬝ᵥ (c ∘ (A *ᵥ w)) = 0 := by
   have h := congrArg (fun M => u ⬝ᵥ (M *ᵥ (c ∘ w))) hiso
   simp only [add_mulVec, dotProduct_add, dotProduct_mulVec, zero_mulVec, dotProduct_zero] at h
   have e1 : u ᵥ* (Aᵀ * S * C.map c) = 0 := by
@@ -34,30 +35,33 @@ theorem transv_kills (c : k →+* k) (S A C : Matrix ν ν k)
 def transvRankOne (S : Matrix ν ν k) (j : ν) : Matrix ν ν k :=
   Matrix.of fun a b => if a = j then S b j else 0
 
-theorem transvRankOne_adm (c : k →+* k) (S : Matrix ν ν k) (hS : Sᵀ = -S.map c) (j : ν) :
-    (transvRankOne S j)ᵀ * S + S * (transvRankOne S j).map c = 0 := by
+theorem transvRankOne_adm (c : k →+* k) (S : Matrix ν ν k) (hS : Sᵀ = - S.map c) (j : ν)
+    : (transvRankOne S j)ᵀ * S + S * (transvRankOne S j).map c = 0 := by
   ext a b
   have h1 : c (S b j) = - S j b := by
-    have h2 : Sᵀ b j = (-S.map c) b j := by rw [hS]
+    have h2 : Sᵀ b j = (- S.map c) b j := by rw [hS]
     rw [transpose_apply, Matrix.neg_apply, Matrix.map_apply] at h2
     rw [h2, neg_neg]
   have h3 : ∀ l, c (if l = j then S b j else 0) = if l = j then c (S b j) else 0 := by
     intro l; split_ifs <;> simp
   simp [Matrix.mul_apply, transvRankOne, h3, h1]
 
-theorem transvRankOne_mulVec (S : Matrix ν ν k) (j : ν) (v : ν → k) :
-    transvRankOne S j *ᵥ v = Pi.single j ((v ᵥ* S) j) := by
+theorem transvRankOne_mulVec (S : Matrix ν ν k) (j : ν) (v : ν → k)
+    : transvRankOne S j *ᵥ v = Pi.single j ((v ᵥ* S) j) := by
   funext a
   by_cases h : a = j
   · subst h; simp [transvRankOne, mulVec, vecMul, dotProduct, mul_comm]
   · simp [transvRankOne, mulVec, dotProduct, h]
 
-theorem transv_step (c : k →+* k) (S : Matrix ν ν k) (hSu : IsUnit S.det) (A C : Matrix ν ν k)
-    (hinj : ∀ u : ν → k, A *ᵥ u = 0 → C *ᵥ u = 0 → u = 0)
+theorem transv_step
+    (c : k →+* k)
+    (S : Matrix ν ν k) (hSu : IsUnit S.det)
+    (A C : Matrix ν ν k) (hinj : ∀ u : ν → k, A *ᵥ u = 0 → C *ᵥ u = 0 → u = 0)
     (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0)
-    (u : ν → k) (hu0 : u ≠ 0) (hu : A *ᵥ u = 0) :
-    ∃ j : ν, (∀ w, (A + transvRankOne S j * C) *ᵥ w = 0 → A *ᵥ w = 0) ∧
-      (A + transvRankOne S j * C) *ᵥ u ≠ 0 := by
+    (u : ν → k) (hu0 : u ≠ 0) (hu : A *ᵥ u = 0)
+    : ∃ j : ν,
+      (∀ w, (A + transvRankOne S j * C) *ᵥ w = 0 → A *ᵥ w = 0)
+        ∧ (A + transvRankOne S j * C) *ᵥ u ≠ 0 := by
   have hx : C *ᵥ u ≠ 0 := fun h => hu0 (hinj u hu h)
   have hxS : (C *ᵥ u) ᵥ* S ≠ 0 := by
     intro h
@@ -93,36 +97,39 @@ theorem transv_step (c : k →+* k) (S : Matrix ν ν k) (hSu : IsUnit S.det) (A
     simp only [Pi.single_eq_same, Pi.zero_apply] at this
     exact hj this
 
-theorem transv_iso_update (c : k →+* k) (S A C X : Matrix ν ν k)
-    (hX : Xᵀ * S + S * X.map c = 0)
-    (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0) :
-    (A + X * C)ᵀ * S * C.map c + Cᵀ * S * (A + X * C).map c = 0 := by
-  have e : (A + X * C)ᵀ * S * C.map c + Cᵀ * S * (A + X * C).map c =
-      (Aᵀ * S * C.map c + Cᵀ * S * A.map c) + Cᵀ * (Xᵀ * S + S * X.map c) * C.map c := by
+theorem transv_iso_update
+    (c : k →+* k) (S A C X : Matrix ν ν k)
+    (hX : Xᵀ * S + S * X.map c = 0) (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0)
+    : (A + X * C)ᵀ * S * C.map c + Cᵀ * S * (A + X * C).map c = 0 := by
+  have e
+      : (A + X * C)ᵀ * S * C.map c + Cᵀ * S * (A + X * C).map c
+        = (Aᵀ * S * C.map c + Cᵀ * S * A.map c) + Cᵀ * (Xᵀ * S + S * X.map c) * C.map c := by
     rw [Matrix.map_add c (map_add c)]
-    simp only [transpose_add, transpose_mul, Matrix.map_mul, Matrix.mul_add,
-      Matrix.add_mul, Matrix.mul_assoc]
+    simp only [transpose_add, transpose_mul, Matrix.map_mul, Matrix.mul_add, Matrix.add_mul,
+      Matrix.mul_assoc]
     abel
   rw [e, hiso, hX, Matrix.mul_zero, Matrix.zero_mul, add_zero]
 
-theorem skewAdmissibleMatrix_add (c : k →+* k) (S X Y : Matrix ν ν k)
-    (hX : Xᵀ * S + S * X.map c = 0) (hY : Yᵀ * S + S * Y.map c = 0) :
-    (X + Y)ᵀ * S + S * (X + Y).map c = 0 := by
+theorem skewAdmissibleMatrix_add
+    (c : k →+* k) (S X Y : Matrix ν ν k)
+    (hX : Xᵀ * S + S * X.map c = 0) (hY : Yᵀ * S + S * Y.map c = 0)
+    : (X + Y)ᵀ * S + S * (X + Y).map c = 0 := by
   have e : (X + Y)ᵀ * S + S * (X + Y).map c = (Xᵀ * S + S * X.map c) + (Yᵀ * S + S * Y.map c) := by
     rw [Matrix.map_add c (map_add c)]
     simp only [transpose_add, Matrix.mul_add, Matrix.add_mul]
     abel
   rw [e, hX, hY, add_zero]
 
-theorem transv_field (c : k →+* k) (S : Matrix ν ν k) (hSu : IsUnit S.det) (hS : Sᵀ = -S.map c)
+theorem transv_field
+    (c : k →+* k) (S : Matrix ν ν k) (hSu : IsUnit S.det) (hS : Sᵀ = - S.map c)
     (A C : Matrix ν ν k) (hinj : ∀ u : ν → k, A *ᵥ u = 0 → C *ᵥ u = 0 → u = 0)
-    (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0) :
-    ∃ X : Matrix ν ν k, Xᵀ * S + S * X.map c = 0 ∧ IsUnit (A + X * C).det := by
-  suffices H : ∀ m : ℕ, ∀ A : Matrix ν ν k,
-      Module.finrank k (LinearMap.ker A.mulVecLin) < m →
-      (∀ u : ν → k, A *ᵥ u = 0 → C *ᵥ u = 0 → u = 0) →
-      Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0 →
-      ∃ X : Matrix ν ν k, Xᵀ * S + S * X.map c = 0 ∧ IsUnit (A + X * C).det from
+    (hiso : Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0)
+    : ∃ X : Matrix ν ν k, Xᵀ * S + S * X.map c = 0 ∧ IsUnit (A + X * C).det := by
+  suffices H
+      : ∀ m : ℕ, ∀ A : Matrix ν ν k,
+        Module.finrank k (LinearMap.ker A.mulVecLin) < m
+          → (∀ u : ν → k, A *ᵥ u = 0 → C *ᵥ u = 0 → u = 0) → Aᵀ * S * C.map c + Cᵀ * S * A.map c = 0
+          → ∃ X : Matrix ν ν k, Xᵀ * S + S * X.map c = 0 ∧ IsUnit (A + X * C).det from
     H _ A (Nat.lt_succ_self _) hinj hiso
   intro m
   induction m with
@@ -135,8 +142,8 @@ theorem transv_field (c : k →+* k) (S : Matrix ν ν k) (hSu : IsUnit S.det) (
       obtain ⟨u, hu0, hu⟩ := exists_mulVec_eq_zero_iff.mpr hd
       obtain ⟨j, hker, hne⟩ := transv_step c S hSu A C hinj hiso u hu0 hu
       have hX1 := transvRankOne_adm c S hS j
-      have hlt : LinearMap.ker (A + transvRankOne S j * C).mulVecLin <
-          LinearMap.ker A.mulVecLin := by
+      have hlt
+          : LinearMap.ker (A + transvRankOne S j * C).mulVecLin < LinearMap.ker A.mulVecLin := by
         refine lt_of_le_of_ne ?_ ?_
         · intro w hw
           simp only [LinearMap.mem_ker, mulVecLin_apply] at hw ⊢
@@ -154,8 +161,8 @@ theorem transv_field (c : k →+* k) (S : Matrix ν ν k) (hSu : IsUnit S.det) (
         apply hinj w _ h2
         rw [add_mulVec, ← mulVec_mulVec, h2, mulVec_zero, add_zero] at h1
         exact h1
-      obtain ⟨X2, hX2, hdet2⟩ := ih (A + transvRankOne S j * C) (by omega) hinj'
-        (transv_iso_update c S A C _ hX1 hiso)
+      obtain ⟨X2, hX2, hdet2⟩ :=
+        ih (A + transvRankOne S j * C) (by omega) hinj' (transv_iso_update c S A C _ hX1 hiso)
       refine ⟨transvRankOne S j + X2, skewAdmissibleMatrix_add c S _ _ hX1 hX2, ?_⟩
       rwa [Matrix.add_mul, ← add_assoc]
 
@@ -165,9 +172,11 @@ end GlobalTheory.KSp
 
 namespace GlobalTheory.KSp
 
-theorem exists_herm_transverse : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E)
-    (δ : E) (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (g : UG c (stdJ ν E)),
-    ∃ t : Matrix ν ν E, (t.map c)ᵀ = t ∧ ((mat c g).toBlocks₂₁ + (mat c g).toBlocks₂₂ * t).det ≠ 0 := by
+theorem exists_herm_transverse
+    : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E) (δ : E)
+        (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (g : UG c (stdJ ν E)),
+      ∃ t : Matrix ν ν E,
+        (t.map c)ᵀ = t ∧ ((mat c g).toBlocks₂₁ + (mat c g).toBlocks₂₂ * t).det ≠ 0 := by
   intro F _ _ E _ _ c δ hE ν _ _ g
   have hδ : δ ≠ 0 := hE.unit.ne_zero
   set M := mat c g with hMdef
@@ -178,25 +187,30 @@ theorem exists_herm_transverse : ∀ (F : Type) [Field F] [CharZero F] (E : Type
   have key : cc * (dd.map c)ᵀ = dd * (cc.map c)ᵀ := by
     have h := congrArg Matrix.toBlocks₂₂ hU
     rw [← fromBlocks_toBlocks M] at h
-    simp only [stdJ, fromBlocks_map, fromBlocks_transpose, fromBlocks_multiply, toBlocks_fromBlocks₂₂] at h
-    simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.neg_mul] at h
+    simp only [stdJ, fromBlocks_map, fromBlocks_transpose, fromBlocks_multiply,
+        toBlocks_fromBlocks₂₂]
+      at h
+    simp only [Matrix.mul_zero, Matrix.mul_one, Matrix.mul_neg, zero_add, add_zero, Matrix.neg_mul]
+      at h
     have h' : cc * (dd.map c)ᵀ + -(dd * (cc.map c)ᵀ) = 0 := by rw [← h]; abel
     exact eq_of_sub_eq_zero (by rw [sub_eq_add_neg]; exact h')
 
   set S : Matrix ν ν E := δ • (1 : Matrix ν ν E)
   have hcδ : c δ = -δ := hE.anti
-  have hSu : IsUnit S.det := by
-    rw [isUnit_iff_ne_zero]; simp [S, Matrix.det_smul, hδ]
-  have hS : Sᵀ = -S.map (c : E →+* E) := by
+  have hSu : IsUnit S.det := by rw [isUnit_iff_ne_zero]; simp [S, Matrix.det_smul, hδ]
+  have hS : Sᵀ = - S.map (c : E →+* E) := by
     ext i j; by_cases h : i = j <;> simp [S, Matrix.one_apply, h, hcδ, eq_comm]
-  have hmapC : (δ • ddᵀ).map (c : E →+* E) = (-δ) • (dd.map c)ᵀ := by
-    ext i j; simp [hcδ]
-  have hiso : (ccᵀ)ᵀ * S * (δ • ddᵀ).map (c : E →+* E) + (δ • ddᵀ)ᵀ * S * (ccᵀ).map (c : E →+* E) = 0 := by
+  have hmapC : (δ • ddᵀ).map (c : E →+* E) = (-δ) • (dd.map c)ᵀ := by ext i j; simp [hcδ]
+  have hiso
+      : (ccᵀ)ᵀ * S * (δ • ddᵀ).map (c : E →+* E) + (δ • ddᵀ)ᵀ * S * (ccᵀ).map (c : E →+* E)
+        = 0 := by
     rw [hmapC]
     have e1 : (ccᵀ).map (c : E →+* E) = (cc.map c)ᵀ := rfl
     rw [e1]
-    simp only [S, transpose_transpose, transpose_smul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, smul_smul, key]
-    rw [← add_smul]; simp
+    simp only [S, transpose_transpose, transpose_smul, Matrix.mul_smul, Matrix.smul_mul,
+      Matrix.mul_one, smul_smul, key]
+    rw [← add_smul]
+    simp
   have hinj : ∀ u : ν → E, ccᵀ *ᵥ u = 0 → (δ • ddᵀ) *ᵥ u = 0 → u = 0 := by
     intro u h1 h2
     rw [mulVec_transpose] at h1
@@ -212,7 +226,8 @@ theorem exists_herm_transverse : ∀ (F : Type) [Field F] [CharZero F] (E : Type
         simpa [vecMul, dotProduct, fromBlocks, Fintype.sum_sum_type, dd] using this
     have hinv : M * ((g⁻¹ : UG c (stdJ ν E)) : GL (ν ⊕ ν) E) = 1 := by
       change (((g * g⁻¹ : UG c (stdJ ν E)) : GL (ν ⊕ ν) E) : Matrix (ν ⊕ ν) (ν ⊕ ν) E) = 1
-      rw [mul_inv_cancel]; rfl
+      rw [mul_inv_cancel]
+      rfl
     have hw0 : (Sum.elim 0 u : ν ⊕ ν → E) = 0 := by
       rw [← vecMul_one (Sum.elim 0 u : ν ⊕ ν → E), ← hinv, ← vecMul_vecMul, hw, zero_vecMul]
     funext i
@@ -222,7 +237,7 @@ theorem exists_herm_transverse : ∀ (F : Type) [Field F] [CharZero F] (E : Type
   · have hX' : δ • Xᵀ + δ • X.map (c : E →+* E) = 0 := by
       simpa [S, Matrix.mul_smul, Matrix.smul_mul] using hX
     rw [← smul_add, smul_eq_zero] at hX'
-    have hX'' : X.map (c : E →+* E) = -Xᵀ := eq_neg_of_add_eq_zero_right (hX'.resolve_left hδ)
+    have hX'' : X.map (c : E →+* E) = - Xᵀ := eq_neg_of_add_eq_zero_right (hX'.resolve_left hδ)
     have e : (δ • Xᵀ).map c = (-δ) • (X.map (c : E →+* E))ᵀ := by ext i j; simp [hcδ]
     rw [e, hX'']
     simp

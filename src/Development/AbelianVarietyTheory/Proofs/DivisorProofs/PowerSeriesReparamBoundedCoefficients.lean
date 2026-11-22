@@ -7,21 +7,36 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoeffTopMonE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.MBLow
 
-theorem regroup_fib_tsum {X M : Type} [AddCommMonoid M] [TopologicalSpace M] (n : X → ℕ) (i : ℕ)
-    (h : {α | n α = i}.Finite) (f : X → M) :
-    ∑' b : n ⁻¹' {i}, f b = ∑ α ∈ h.toFinset, f α := by
+theorem regroup_fib_tsum
+    {X M : Type} [AddCommMonoid M] [TopologicalSpace M]
+    (n : X → ℕ) (i : ℕ) (h : {α | n α = i}.Finite)
+    (f : X → M)
+    : ∑' b : n ⁻¹' {i}, f b = ∑ α ∈ h.toFinset, f α := by
   have hs : n ⁻¹' {i} = (h.toFinset : Set X) := by ext; simp
   rw [← Finset.tsum_subtype', ← hs]
 
-theorem lattice_series_regroup : ∀ (C : Type) [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C] (X : Type) (n : X → ℕ) (π : C) (a : X → C) (b : ℝ), π ≠ 0 → ‖π‖ < 1 → (∀ i, {α | n α = i}.Finite) → (∀ α, ‖a α‖ ≤ b * ‖π‖ ^ n α) → ∃ Θ : PowerSeries C, (∀ i, ‖PowerSeries.coeff i Θ‖ ≤ max b 0) ∧ ∑' i, PowerSeries.coeff i Θ * π ^ i = ∑' α, a α ∧ ∀ (e : C →+* ℂ) (u : ℂ), (Summable fun α => ‖e (a α) * (u / e π) ^ n α‖) → (Summable fun i => ‖e (PowerSeries.coeff i Θ) * u ^ i‖) ∧ ∑' i, e (PowerSeries.coeff i Θ) * u ^ i = ∑' α, e (a α) * (u / e π) ^ n α := by
+theorem lattice_series_regroup
+    : ∀ (C : Type) [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C] (X : Type)
+        (n : X → ℕ) (π : C) (a : X → C) (b : ℝ),
+      π ≠ 0 → ‖π‖ < 1 → (∀ i, {α | n α = i}.Finite) → (∀ α, ‖a α‖ ≤ b * ‖π‖ ^ n α)
+        → ∃ Θ : PowerSeries C,
+          (∀ i, ‖PowerSeries.coeff i Θ‖ ≤ max b 0) ∧ ∑' i, PowerSeries.coeff i Θ * π ^ i = ∑' α, a α
+            ∧ ∀ (e : C →+* ℂ) (u : ℂ),
+              (Summable fun α => ‖e (a α) * (u / e π) ^ n α‖)
+                → (Summable fun i => ‖e (PowerSeries.coeff i Θ) * u ^ i‖)
+                  ∧ ∑' i, e (PowerSeries.coeff i Θ) * u ^ i = ∑' α, e (a α) * (u / e π) ^ n α := by
   intro C _ _ _ X n π a b hπ0 hπ1 hfin hb
   classical
   have hmem : ∀ i α, α ∈ (hfin i).toFinset ↔ n α = i := fun i α => by simp
@@ -50,8 +65,11 @@ theorem lattice_series_regroup : ∀ (C : Type) [NontriviallyNormedField C] [IsU
     exact Finset.sum_congr rfl fun α _ => div_mul_cancel₀ _ (pow_ne_zero _ hπ0)
   · intro e u hsum
     have heπ : e π ≠ 0 := (map_ne_zero e).2 hπ0
-    have hkey : ∀ i, e (PowerSeries.coeff i (PowerSeries.mk fun i => ∑ α ∈ (hfin i).toFinset, a α / π ^ i)) * u ^ i
-        = ∑ α ∈ (hfin i).toFinset, e (a α) * (u / e π) ^ n α := by
+    have hkey
+        : ∀ i,
+          e (PowerSeries.coeff i (PowerSeries.mk fun i => ∑ α ∈ (hfin i).toFinset, a α / π ^ i))
+              * u ^ i
+            = ∑ α ∈ (hfin i).toFinset, e (a α) * (u / e π) ^ n α := by
       intro i
       set_option synthInstance.maxHeartbeats 100000 in
         rw [PowerSeries.coeff_mk, map_sum, Finset.sum_mul]

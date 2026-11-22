@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
@@ -27,9 +29,13 @@ theorem dvd_σF_self {l : ℕ} [Fact l.Prime] (g : GQ l) (x : Per.Fl l) : x ∣ 
       change Per.σC g y = (y : ℂ_[l]) * (Per.σC g y / y)
       field_simp
 
-theorem galois_discMap : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
-    (∀ g : GQ l, bk.ev X ∣ Per.σA g (bk.ev X)) ∧ ∀ (ρ : ℝ≥0), 0 < ρ → ∀ g : GQ l,
-      ∃ G : bk.DA ρ →+* bk.DA ρ, IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA g) G := by
+theorem galois_discMap
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
+      (∀ g : GQ l, bk.ev X ∣ Per.σA g (bk.ev X))
+        ∧ ∀ (ρ : ℝ≥0),
+          0 < ρ
+            → ∀ g : GQ l, ∃ G : bk.DA ρ →+* bk.DA ρ,
+              IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA g) G := by
   intro l _ K bk
   have h : ∀ g : GQ l, bk.ev X ∣ Per.σA g (bk.ev X) := fun g => by
     rw [bk.ev_X, GlobalTheory.RingIface.sigA_teich]
@@ -39,6 +45,7 @@ theorem galois_discMap : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K)
   have h1 := norm_toDisc_pow_le (l := l) (u := bk.ev X) 1 hρ
   rw [pow_one, pow_one] at h1
   rw [hc, map_mul]
-  exact (norm_mul_le _ _).trans ((mul_le_mul h1 (norm_toDisc_le c) (norm_nonneg _) ρ.2).trans (mul_one _).le)
+  exact (norm_mul_le _ _).trans
+    ((mul_le_mul h1 (norm_toDisc_le c) (norm_nonneg _) ρ.2).trans (mul_one _).le)
 
 end GlobalTheory.BSP

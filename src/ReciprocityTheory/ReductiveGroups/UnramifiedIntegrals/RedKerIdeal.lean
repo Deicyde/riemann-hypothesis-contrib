@@ -14,9 +14,10 @@ open Formalism.L2.Th1.CM Formalism.L2.Th1.F
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem xsOf_filter (L : PeriodPair) (α β : ℂ) (hα : MulStable L α) (hβ : MulStable L β) (T T' : Finset ℂ)
-    (hT : IsHalfReps L α T) (hT' : IsHalfReps L β T') :
-    xsOf L (T.filter (fun P => β * P ∈ L.lattice)) = xsOf L T ∩ xsOf L T' := by
+theorem xsOf_filter
+    (L : PeriodPair) (α β : ℂ) (hα : MulStable L α) (hβ : MulStable L β)
+    (T T' : Finset ℂ) (hT : IsHalfReps L α T) (hT' : IsHalfReps L β T')
+    : xsOf L (T.filter (fun P => β * P ∈ L.lattice)) = xsOf L T ∩ xsOf L T' := by
   ext x
   simp only [xsOf, Finset.mem_image, Finset.mem_filter, Finset.mem_inter]
   constructor
@@ -34,8 +35,13 @@ theorem natCast_mulStable (L : PeriodPair) (n : ℕ) : MulStable L (n : ℂ) := 
   have := L.lattice.nsmul_mem hω n
   simpa [nsmul_eq_mul] using this
 
-theorem kerProd_ideal (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3) (hCM : HasCMBy d L)
-    (l : ℕ) (hl : l.Prime) (h3 : 3 ∣ d) (hd3 : d ≠ 3) : KerProdAt d L l 3 := by
+theorem kerProd_ideal
+    (d : ℕ)
+    (L : PeriodPair)
+    (hsq : Squarefree d) (hd4 : d % 4 = 3) (hCM : HasCMBy d L)
+    (l : ℕ) (hl : l.Prime)
+    (h3 : 3 ∣ d) (hd3 : d ≠ 3)
+    : KerProdAt d L l 3 := by
   obtain ⟨p, r, hp, hb, -, hp3, hr, hdiv, hndiv⟩ := prime_choice d (l + 3) hsq hd4 h3 hd3
   obtain ⟨M, hM⟩ := hdiv
   have hpM : ¬ p ∣ M := by
@@ -75,8 +81,7 @@ theorem kerProd_ideal (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d %
     have hpk : (p : ℂ) ∈ k := natCast_mem k p
     have hβk : β ∈ k := by
       rw [hβdef, redSqD]
-      exact k.add_mem (natCast_mem k r)
-        (k.sub_mem (k.mul_mem (by simp) hω) k.one_mem)
+      exact k.add_mem (natCast_mem k r) (k.sub_mem (k.mul_mem (by simp) hω) k.one_mem)
     have h1 := kerPoly_mem L (p : ℂ) T hp0 hps hT k h2 h3' hpk
     have h1' := kerPoly_mem L β T' hβ0 hβs hT' k h2 h3' hβk
     have h4 := prod_mem_of_rootPoly k _ (rootPoly_inter_mem k _ _ h1 h1')

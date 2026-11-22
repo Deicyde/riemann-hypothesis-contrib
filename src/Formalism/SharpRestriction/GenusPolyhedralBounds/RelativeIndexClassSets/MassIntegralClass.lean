@@ -22,10 +22,6 @@ variable (K : Type) [Field K] [NumberField K] [StarRing K]
 
 variable (hc : ∀ (φ : K →+* ℂ) (a : K), φ (star a) = starRingEnd ℂ (φ a))
 
-
-
-
-
 end Std
 
 end Formalism.MainNotions.Gaps.MI

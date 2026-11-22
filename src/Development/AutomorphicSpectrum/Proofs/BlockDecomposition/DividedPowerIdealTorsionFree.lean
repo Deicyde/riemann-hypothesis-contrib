@@ -4,13 +4,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.DivPow
 
-theorem exists_gamma {S : Type} [CommRing S] (I : Ideal S) (z : S)
-    (h : ∀ k : ℕ, k ≠ 0 → ∃ y ∈ I, (k.factorial : S) * y = z ^ k) :
-    ∃ γ : ℕ → S, (∀ i, i ≠ 0 → γ i ∈ I) ∧ ∀ i, (i.factorial : S) * γ i = z ^ i := by
+theorem exists_gamma
+    {S : Type} [CommRing S]
+    (I : Ideal S) (z : S) (h : ∀ k : ℕ, k ≠ 0 → ∃ y ∈ I, (k.factorial : S) * y = z ^ k)
+    : ∃ γ : ℕ → S, (∀ i, i ≠ 0 → γ i ∈ I) ∧ ∀ i, (i.factorial : S) * γ i = z ^ i := by
   classical
   refine ⟨fun i => if hi : i = 0 then 1 else (h i hi).choose, ?_, ?_⟩
   · intro i hi
@@ -21,9 +23,12 @@ theorem exists_gamma {S : Type} [CommRing S] (I : Ideal S) (z : S)
       simp
     · simpa [hi] using (h i hi).choose_spec.2
 
-theorem pdI_span : ∀ {S : Type} [CommRing S], TF (S := S) → ∀ s : Set S,
-    (∀ x ∈ s, ∀ k : ℕ, k ≠ 0 → ∃ y ∈ Ideal.span s, (k.factorial : S) * y = x ^ k) →
-    PdI (Ideal.span s) := by
+theorem pdI_span
+    : ∀ {S : Type} [CommRing S],
+      TF (S := S)
+        → ∀ s : Set S,
+          (∀ x ∈ s, ∀ k : ℕ, k ≠ 0 → ∃ y ∈ Ideal.span s, (k.factorial : S) * y = x ^ k)
+            → PdI (Ideal.span s) := by
   intro S _ _ s h x hx
   induction hx using Submodule.span_induction with
   | mem x hx => exact h x hx
@@ -55,7 +60,8 @@ theorem pdI_span : ∀ {S : Type} [CommRing S], TF (S := S) → ∀ s : Set S,
       rintro ⟨i, j⟩ hij
       rw [Finset.HasAntidiagonal.mem_antidiagonal] at hij
       subst hij
-      rw [← e i, ← e' j, nsmul_eq_mul, Nat.choose_symm_add, ← Nat.add_choose_mul_factorial_mul_factorial i j]
+      rw [← e i, ← e' j, nsmul_eq_mul, Nat.choose_symm_add,
+        ← Nat.add_choose_mul_factorial_mul_factorial i j]
       push_cast
       ring
 

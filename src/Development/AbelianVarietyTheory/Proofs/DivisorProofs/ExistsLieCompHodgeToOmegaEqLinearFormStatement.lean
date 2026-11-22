@@ -11,18 +11,23 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_lie_comp_hodgeToOmega_eq_linearForm :
-    ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ), (p : R) ^ N = 0 →
-    ∀ (A : Over (Sp R)) [GrpObj A], IsAbelianScheme A → LieExact A →
-    (∃ N' : Submodule R (primDR A), IsCompl (PrimitiveSubmodule A) N') →
-    ∀ (G : PDivGroup p R) (t : PDivGroup.TorsionTower G A)
-      (ψ : PrimitiveSubmodule A →ₗ[R] G.omega),
-    (∀ c : PrimitiveSubmodule A, PtExt.IsCan t c.1 (G.rigOfOmega (ψ c))) →
-    ∀ l : Module.Dual R (PrimitiveSubmodule A), ∃ x : G.Lie, ∀ c, x (ψ c) = l c :=
+theorem _root_.GlobalTheory.T.exists_lie_comp_hodgeToOmega_eq_linearForm
+    : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ),
+      (p : R) ^ N = 0
+        → ∀ (A : Over (Sp R)) [GrpObj A],
+          IsAbelianScheme A → LieExact A
+            → (∃ N' : Submodule R (primDR A), IsCompl (PrimitiveSubmodule A) N')
+            → ∀ (G : PDivGroup p R) (t : PDivGroup.TorsionTower G A)
+                (ψ : PrimitiveSubmodule A →ₗ[R] G.omega),
+              (∀ c : PrimitiveSubmodule A, PtExt.IsCan t c.1 (G.rigOfOmega (ψ c)))
+                → ∀ l : Module.Dual R (PrimitiveSubmodule A), ∃ x : G.Lie, ∀ c, x (ψ c) = l c :=
   @GlobalTheory.PtExt.exists_lie_comp_psi_eq

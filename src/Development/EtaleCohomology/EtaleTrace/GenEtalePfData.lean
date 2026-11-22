@@ -11,11 +11,14 @@ namespace LateralTheory.EtaleTrace.Cov
 theorem genAffineData : GenAffineData := by
   intro k _ _ X P _ _ p r π hπ hr hfin hsurj
   obtain ⟨x⟩ : Nonempty P := inferInstance
-  obtain ⟨U, hU, hxU, -⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.mp P.isBasis_affineOpens (show x ∈ (⊤ : P.Opens) from trivial)
+  obtain ⟨U, hU, hxU, -⟩ :=
+    TopologicalSpace.Opens.isBasis_iff_nbhd.mp P.isBasis_affineOpens
+      (show x ∈ (⊤ : P.Opens) from trivial)
   have hU' : IsAffineOpen (π ⁻¹ᵁ U) := hU.preimage π
   refine ⟨U, hU, ⟨x, hxU⟩, hU', ?_, ?_, ?_⟩
   · have hft : (r.appLE ⊤ U le_top).hom.FiniteType :=
-      HasRingHomProperty.appLE (P := @LocallyOfFiniteType) r hr ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩ le_top
+      HasRingHomProperty.appLE (P := @LocallyOfFiniteType) r hr ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩
+        le_top
     letI := (r.appLE ⊤ U le_top).hom.toAlgebra
     haveI : IsNoetherianRing Γ(S k, ⊤) :=
       isNoetherianRing_of_ringEquiv k (Scheme.ΓSpecIso (CommRingCat.of k)).commRingCatIsoToRingEquiv.symm
@@ -24,8 +27,10 @@ theorem genAffineData : GenAffineData := by
   · haveI : IsAffine U := hU
     have h0 : (π ∣_ U).appTop.hom.Finite := (π ∣_ U).finite_appTop
     rw [morphismRestrict_appTop] at h0
-    have gen : ∀ (W : P.Opens) (T : X.Opens) (h : T = π ⁻¹ᵁ W), W = U →
-        RingHom.Finite (π.app W ≫ X.presheaf.map (eqToHom h).op).hom → RingHom.Finite (π.app U).hom := by
+    have gen
+        : ∀ (W : P.Opens) (T : X.Opens) (h : T = π ⁻¹ᵁ W),
+          W = U → RingHom.Finite (π.app W ≫ X.presheaf.map (eqToHom h).op).hom
+            → RingHom.Finite (π.app U).hom := by
       rintro W T h rfl
       subst h
       simp

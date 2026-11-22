@@ -11,10 +11,12 @@ namespace GroundTheory.Heights₂.Heights
 
 open IsLocalRing RingTheory.Sequence Pointwise
 
-theorem length_le_ringKrullDim_quotient_colon {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    (rs : List R) : ∀ {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M] (y : M), y ≠ 0 →
-      (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular M rs →
-        (rs.length : WithBot ℕ∞) ≤ ringKrullDim (R ⧸ Submodule.colon (⊥ : Submodule R M) {y}) := by
+theorem length_le_ringKrullDim_quotient_colon
+    {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (rs : List R)
+    : ∀ {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M] (y : M),
+      y ≠ 0 → (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular M rs
+        → (rs.length : WithBot ℕ∞)
+          ≤ ringKrullDim (R ⧸ Submodule.colon (⊥ : Submodule R M) {y}) := by
   induction rs with
   | nil =>
     intro M _ _ _ y hy _ _
@@ -32,7 +34,8 @@ theorem length_le_ringKrullDim_quotient_colon {R : Type*} [CommRing R] [IsLocalR
     obtain ⟨hxreg, hrs⟩ := (isWeaklyRegular_cons_iff M x rs).mp hreg
 
     have hspan : Ideal.span {x} ≠ ⊤ := fun h =>
-      (maximalIdeal.isMaximal R).ne_top (top_le_iff.mp (h ▸ (Ideal.span_le.mpr (by simpa using hx))))
+      (maximalIdeal.isMaximal R).ne_top
+        (top_le_iff.mp (h ▸ (Ideal.span_le.mpr (by simpa using hx))))
     have hK := Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (M := M) (Ideal.span {x}) hspan
     have hpow : ∀ k : ℕ, (Ideal.span {x} ^ k • ⊤ : Submodule R M) = x ^ k • ⊤ := fun k => by
       rw [Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul]
@@ -59,8 +62,9 @@ theorem length_le_ringKrullDim_quotient_colon {R : Type*} [CommRing R] [IsLocalR
       apply hn
       rw [hk, smul_smul, ← pow_succ]
       exact Submodule.smul_mem_pointwise_smul _ _ _ Submodule.mem_top
-    have hcolon : Submodule.colon (⊥ : Submodule R M) {x ^ k • y₁} =
-        Submodule.colon (⊥ : Submodule R M) {y₁} := by
+    have hcolon
+        : Submodule.colon (⊥ : Submodule R M) {x ^ k • y₁}
+          = Submodule.colon (⊥ : Submodule R M) {y₁} := by
       ext r
       simp only [Submodule.mem_colon_singleton, Submodule.mem_bot]
       rw [smul_comm]
@@ -82,13 +86,14 @@ theorem length_le_ringKrullDim_quotient_colon {R : Type*} [CommRing R] [IsLocalR
       refine sup_le ?_ ?_
       · intro r hr
         rw [hI, Submodule.mem_colon_singleton, Submodule.mem_bot] at hr
-        rw [Submodule.mem_colon_singleton, Submodule.mem_bot, hybar, ← Submodule.Quotient.mk_smul, hr,
-          Submodule.Quotient.mk_zero]
+        rw [Submodule.mem_colon_singleton, Submodule.mem_bot, hybar, ← Submodule.Quotient.mk_smul,
+          hr, Submodule.Quotient.mk_zero]
       · rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe, Submodule.mem_colon_singleton,
           Submodule.mem_bot, hybar, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
         exact Submodule.smul_mem_pointwise_smul _ _ _ Submodule.mem_top
-    have hd1 : ringKrullDim (R ⧸ Submodule.colon (⊥ : Submodule R (QuotSMulTop x M)) {ybar}) ≤
-        ringKrullDim (R ⧸ (I ⊔ Ideal.span {x})) :=
+    have hd1
+        : ringKrullDim (R ⧸ Submodule.colon (⊥ : Submodule R (QuotSMulTop x M)) {ybar})
+          ≤ ringKrullDim (R ⧸ (I ⊔ Ideal.span {x})) :=
       ringKrullDim_le_of_surjective _ (Ideal.Quotient.factor_surjective hle)
 
     have hnzd : Ideal.Quotient.mk I x ∈ nonZeroDivisors (R ⧸ I) := by
@@ -96,7 +101,8 @@ theorem length_le_ringKrullDim_quotient_colon {R : Type*} [CommRing R] [IsLocalR
       intro z hz
       obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective z
       rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem, hI, Submodule.mem_colon_singleton,
-        Submodule.mem_bot, mul_smul, smul_comm] at hz
+          Submodule.mem_bot, mul_smul, smul_comm]
+        at hz
       rw [Ideal.Quotient.eq_zero_iff_mem, hI, Submodule.mem_colon_singleton, Submodule.mem_bot]
       exact hxreg (show x • r • y₁ = x • 0 by rw [hz, smul_zero])
     have hd2 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hnzd
@@ -106,14 +112,17 @@ theorem length_le_ringKrullDim_quotient_colon {R : Type*} [CommRing R] [IsLocalR
       rw [this]
       exact DoubleQuot.quotQuotEquivQuotSup I (Ideal.span {x})
     rw [ringKrullDim_eq_of_ringEquiv heq] at hd2
-    calc ((x :: rs).length : WithBot ℕ∞) = (rs.length : WithBot ℕ∞) + 1 := by simp
+    calc
+      ((x :: rs).length : WithBot ℕ∞)
+        = (rs.length : WithBot ℕ∞) + 1 := by simp
       _ ≤ ringKrullDim (R ⧸ Submodule.colon (⊥ : Submodule R (QuotSMulTop x M)) {ybar}) + 1 := by
-          gcongr
+        gcongr
       _ ≤ ringKrullDim (R ⧸ (I ⊔ Ideal.span {x})) + 1 := by gcongr
       _ ≤ ringKrullDim (R ⧸ I) := hd2
 
-theorem ringKrullDim_quotient_eq_of_mem_minimalPrimes {B : Type*} [CommRing B] [IsCohenMacaulayLocalRing B]
-    {P : Ideal B} (hP : P ∈ minimalPrimes B) : ringKrullDim (B ⧸ P) = ringKrullDim B := by
+theorem ringKrullDim_quotient_eq_of_mem_minimalPrimes
+    {B : Type*} [CommRing B] [IsCohenMacaulayLocalRing B] {P : Ideal B} (hP : P ∈ minimalPrimes B)
+    : ringKrullDim (B ⧸ P) = ringKrullDim B := by
   obtain ⟨rs, hm, hreg, hdim⟩ := IsCohenMacaulayLocalRing.exists_isWeaklyRegular (B := B)
   have hann : Module.annihilator B B = ⊥ := Module.annihilator_eq_bot.mpr inferInstance
   have hP' : P ∈ (Module.annihilator B B).minimalPrimes := by

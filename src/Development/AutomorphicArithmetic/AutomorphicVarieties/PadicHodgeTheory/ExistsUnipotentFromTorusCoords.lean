@@ -4,19 +4,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module Topology UpperTheory.V.Loc UpperTheory.V.U3
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module Topology
+  UpperTheory.V.Loc UpperTheory.V.U3
 
 private def triGL {B : Type} [CommRing B] (t : Fin 3 → Bˣ) (x y z : B) : GL (Fin 3) B where
   val := triM t x y z
-  inv := !![((t 0)⁻¹ : Bˣ), -x * ((t 0)⁻¹ : Bˣ), (x * y - z) * ((t 0)⁻¹ : Bˣ);
-    0, ((t 1)⁻¹ : Bˣ), -y * ((t 1)⁻¹ : Bˣ); 0, 0, ((t 2)⁻¹ : Bˣ)]
+  inv :=
+    !![((t 0)⁻¹ : Bˣ), -x * ((t 0)⁻¹ : Bˣ), (x * y - z) * ((t 0)⁻¹ : Bˣ);
+      0, ((t 1)⁻¹ : Bˣ), -y * ((t 1)⁻¹ : Bˣ); 0, 0, ((t 2)⁻¹ : Bˣ)]
   val_inv := by
     have h0 := (t 0).mul_inv
     have h1 := (t 1).mul_inv
     have h2 := (t 2).mul_inv
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [triM, Matrix.mul_apply, Fin.sum_univ_three, -Units.mul_inv, -Units.inv_mul] <;>
-      first
+    fin_cases i <;> fin_cases j
+      <;> simp [triM, Matrix.mul_apply, Fin.sum_univ_three, -Units.mul_inv, -Units.inv_mul]
+      <;> first
         | assumption
         | linear_combination (-x) * h0
         | linear_combination (x * y - z) * h0 - x * y * h1
@@ -26,58 +29,69 @@ private def triGL {B : Type} [CommRing B] (t : Fin 3 → Bˣ) (x y z : B) : GL (
     have h1 := (t 1).inv_mul
     have h2 := (t 2).inv_mul
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [triM, Matrix.mul_apply, Fin.sum_univ_three, -Units.mul_inv, -Units.inv_mul] <;>
-      first
-        | assumption
-        | ring
+    fin_cases i <;> fin_cases j
+      <;> simp [triM, Matrix.mul_apply, Fin.sum_univ_three, -Units.mul_inv, -Units.inv_mul]
+      <;> first | assumption | ring
 
-private theorem triGL_val {B : Type} [CommRing B] (t : Fin 3 → Bˣ) (x y z : B) :
-    (triGL t x y z : Matrix (Fin 3) (Fin 3) B) = triM t x y z := rfl
+private theorem triGL_val {B : Type} [CommRing B] (t : Fin 3 → Bˣ) (x y z : B)
+    : (triGL t x y z : Matrix (Fin 3) (Fin 3) B) = triM t x y z :=
+  rfl
 
-private theorem triGL_congr {B : Type} [CommRing B] {t s : Fin 3 → Bˣ} {x y z x' y' z' : B}
-    (ht : t = s) (hx : x = x') (hy : y = y') (hz : z = z') : triGL t x y z = triGL s x' y' z' := by
+private theorem triGL_congr
+    {B : Type} [CommRing B]
+    {t s : Fin 3 → Bˣ} {x y z x' y' z' : B} (ht : t = s) (hx : x = x') (hy : y = y') (hz : z = z')
+    : triGL t x y z = triGL s x' y' z' := by
   subst ht hx hy hz
   rfl
 
-private theorem theta_triGL {B : Type} [CommRing B] (t : Fin 3 → Bˣ) (x y z : B) :
-    theta (triGL t x y z) = triGL (fun i => (t i.rev)⁻¹) (-y) (-x) (x * y - z) := by
+private theorem theta_triGL {B : Type} [CommRing B] (t : Fin 3 → Bˣ) (x y z : B)
+    : theta (triGL t x y z) = triGL (fun i => (t i.rev)⁻¹) (-y) (-x) (x * y - z) := by
   apply Units.ext
   rw [theta_val, triGL_val]
-  have hinv : ((triGL t x y z)⁻¹ : GL (Fin 3) B).val =
-      !![(((t 0)⁻¹ : Bˣ) : B), -x * (((t 0)⁻¹ : Bˣ) : B), (x * y - z) * (((t 0)⁻¹ : Bˣ) : B);
-        0, (((t 1)⁻¹ : Bˣ) : B), -y * (((t 1)⁻¹ : Bˣ) : B); 0, 0, (((t 2)⁻¹ : Bˣ) : B)] := rfl
+  have hinv
+      : ((triGL t x y z)⁻¹ : GL (Fin 3) B).val
+        = !![(((t 0)⁻¹ : Bˣ) : B), -x * (((t 0)⁻¹ : Bˣ) : B), (x * y - z) * (((t 0)⁻¹ : Bˣ) : B);
+            0, (((t 1)⁻¹ : Bˣ) : B), -y * (((t 1)⁻¹ : Bˣ) : B); 0, 0, (((t 2)⁻¹ : Bˣ) : B)] :=
+    rfl
   rw [hinv]
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Jmat, triM, Matrix.mul_apply, Fin.sum_univ_three, Matrix.transpose_apply, Fin.rev] <;> ring
+  fin_cases i <;> fin_cases j
+    <;> simp [Jmat, triM, Matrix.mul_apply, Fin.sum_univ_three, Matrix.transpose_apply, Fin.rev]
+    <;> ring
 
-private theorem triGL_mul {B : Type} [CommRing B] (t s : Fin 3 → Bˣ) (x y z x' y' z' : B) :
-    triGL t x y z * triGL s x' y' z' = triGL (fun i => t i * s i)
-      (x + ((t 0 / t 1 : Bˣ) : B) * x') (y + ((t 1 / t 2 : Bˣ) : B) * y')
-      (z + ((t 0 / t 2 : Bˣ) : B) * z' + x * (((t 1 / t 2 : Bˣ) : B) * y')) := by
+private theorem triGL_mul {B : Type} [CommRing B] (t s : Fin 3 → Bˣ) (x y z x' y' z' : B)
+    : triGL t x y z * triGL s x' y' z'
+      = triGL
+        (fun i => t i * s i)
+        (x + ((t 0 / t 1 : Bˣ) : B) * x') (y + ((t 1 / t 2 : Bˣ) : B) * y')
+        (z + ((t 0 / t 2 : Bˣ) : B) * z' + x * (((t 1 / t 2 : Bˣ) : B) * y')) := by
   apply Units.ext
   rw [Units.val_mul, triGL_val, triGL_val, triGL_val]
   have h1 := (t 1).inv_mul
   have h2 := (t 2).inv_mul
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_three, triM, div_eq_mul_inv, -Units.mul_inv, -Units.inv_mul] <;>
-    first
+  fin_cases i <;> fin_cases j
+    <;> simp [Matrix.mul_apply, Fin.sum_univ_three, triM, div_eq_mul_inv, -Units.mul_inv,
+      -Units.inv_mul]
+    <;> first
       | linear_combination (-((t 0 : B) * x' * s 1)) * h1
       | linear_combination (-((t 1 : B) * y' * s 2)) * h2
       | linear_combination (-((t 0 : B) * z' * s 2 + x * t 1 * y' * s 2)) * h2
 
-theorem UpperTheory.exists_unipotent_from_torus_coords :
-    ∀ {G B : Type} [Group G] [CommRing B] {η : G →* ℤˣ} (T : Tor η B) (h : B), 2 * h = 1 →
-      ∀ (β : G → B × B) (γ : G → B), (∀ g g', β (g * g') = β g + T.M1 g (β g')) →
-        T.IsGam h β γ → ∃ u : G →* GG (m := 3) (R := B), T.Coord h β γ u := by
+theorem UpperTheory.exists_unipotent_from_torus_coords
+    : ∀ {G B : Type} [Group G] [CommRing B] {η : G →* ℤˣ} (T : Tor η B) (h : B),
+      2 * h = 1
+        → ∀ (β : G → B × B) (γ : G → B),
+          (∀ g g', β (g * g') = β g + T.M1 g (β g')) → T.IsGam h β γ
+            → ∃ u : G →* GG (m := 3) (R := B), T.Coord h β γ u := by
   intro G B _ _ η T h hh β γ hβ hγ
   let F : G → GG (m := 3) (R := B) := fun g =>
     ⟨triGL (T.t g) (β g).1 (β g).2 (γ g + h * (β g).1 * (β g).2), η g⟩
   have hmul : ∀ g g' : G, F (g * g') = F g * F g' := by
     intro g g'
-    have hab : (((T.t g 0 / T.t g 2 : Bˣ)) : B) =
-        ((T.t g 0 / T.t g 1 : Bˣ) : B) * ((T.t g 1 / T.t g 2 : Bˣ) : B) := by
+    have hab
+        : (((T.t g 0 / T.t g 2 : Bˣ)) : B)
+          = ((T.t g 0 / T.t g 1 : Bˣ) : B) * ((T.t g 1 / T.t g 2 : Bˣ) : B) := by
       rw [← Units.val_mul, div_mul_div_cancel]
     have hb := hβ g g'
     have hc := hγ g g'

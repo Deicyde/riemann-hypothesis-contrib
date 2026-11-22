@@ -17,11 +17,13 @@ universe u
 
 def DegZeroLocalRing.Statement : Prop :=
   ∀ (F : Type u) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)) (hP : IsMultiProjPrime P)
-    (W : Ideal (MRing ι F)), IsMultiProjPrime W → P ≤ W →
-    haveI := hP.isPrime
-    (IsNoetherianRing (degZeroLoc P {W}) ∧ IsLocalRing (degZeroLoc P {W})) ∧
-      ∀ n : ℕ, relDim P = (n + 1 : ℕ) → relDim W = (n : ℕ) → ringKrullDim (degZeroLoc P {W}) = 1
+      [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)) (hP : IsMultiProjPrime P)
+      (W : Ideal (MRing ι F)),
+    IsMultiProjPrime W → P ≤ W
+      → haveI := hP.isPrime
+        (IsNoetherianRing (degZeroLoc P {W}) ∧ IsLocalRing (degZeroLoc P {W}))
+          ∧ ∀ n : ℕ,
+            relDim P = (n + 1 : ℕ) → relDim W = (n : ℕ) → ringKrullDim (degZeroLoc P {W}) = 1
 
 end
 

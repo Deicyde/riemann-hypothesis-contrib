@@ -26,8 +26,10 @@ universe u
 
 section Cocycles
 
-variable {k : Type u} [CommRing k] {H : Type u} [Group H] [TopologicalSpace H]
-  [IsTopologicalGroup H] {B : Rep.{u} k H} [IsDiscreteRep B]
+variable
+  {k : Type u} [CommRing k]
+  {H : Type u} [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
+  {B : Rep.{u} k H} [IsDiscreteRep B]
 
 end Cocycles
 

@@ -10,17 +10,26 @@ public import Development.AbelianVarietyTheory.Proofs.TorusSplitting.ValuationFo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R Formalism.L2.Pj
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.TorRef GlobalTheory.Cartier
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R Formalism.L2.Pj
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.TorRef GlobalTheory.Cartier
 open ReciprocityTheory.ChartRestriction.G.DVR
 
 noncomputable section
 
 namespace GlobalTheory.MonPeriods
 
-theorem exists_isMonomial_levelOne : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {W : Type}
-    [CommRing W] [IsDomain W] [IsLocalRing W], CDvr W → ∀ ϖ : W, Irreducible ϖ → ∀ (t : SAB H (Sp W))
-    (P : PELUnif (maximalIdeal W) t), ∃ be ∈ levelForms H 1 P.D.toPre.X, IsMonomial P.D.toPre ![ϖ] ![be] := by
+theorem exists_isMonomial_levelOne
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {W : Type} [CommRing W]
+        [IsDomain W] [IsLocalRing W],
+      CDvr W
+        → ∀ ϖ : W,
+          Irreducible ϖ
+            → ∀ (t : SAB H (Sp W)) (P : PELUnif (maximalIdeal W) t),
+              ∃ be ∈ levelForms H 1 P.D.toPre.X,
+                IsMonomial P.D.toPre ![ϖ] ![be] := by
   intro E _ _ _ H W _ _ _ hW ϖ hϖ t P
   obtain ⟨hdvr, hcomp, hchar⟩ := hW
   haveI := hdvr
@@ -37,20 +46,29 @@ theorem exists_isMonomial_levelOne : ∀ {E : Type} [Field E] [NumberField E] [I
     by_cases ha : a = 0
     · rw [ha, QForm.Q_zero hϖ P.D hQ']
     · exact zero_le_one.trans (QForm.Q_pos hϖ P.D hQ' ha)
-  have hbal : ∀ (x : 𝓞 E) a b, QForm.bOf P.D.toPre Q (x • a) b = QForm.bOf P.D.toPre Q a (H.bar x • b) := by
+  have hbal
+      : ∀ (x : 𝓞 E) a b,
+        QForm.bOf P.D.toPre Q (x • a) b = QForm.bOf P.D.toPre Q a (H.bar x • b) := by
     intro x a b
-    obtain ⟨u, hu⟩ := GlobalTheory.PeriodBalance.coord_balance P.D.toPre P.oD x a b (hex (x • a + b)).choose_spec
-      (hex (x • a)).choose_spec (hex b).choose_spec (hex (a + H.bar x • b)).choose_spec (hex a).choose_spec
-      (hex (H.bar x • b)).choose_spec
-    have h1 := hasVal_mul_unit (GlobalTheory.ValForm.hasVal_mul hϖ (GlobalTheory.ValForm.hasVal_mul hϖ (hv (x • a + b)) (hv a))
-      (hv (H.bar x • b))) u
-    have h2 := GlobalTheory.ValForm.hasVal_mul hϖ (GlobalTheory.ValForm.hasVal_mul hϖ (hv (a + H.bar x • b)) (hv (x • a))) (hv b)
+    obtain ⟨u, hu⟩ :=
+      GlobalTheory.PeriodBalance.coord_balance P.D.toPre P.oD x a b (hex (x • a + b)).choose_spec
+        (hex (x • a)).choose_spec (hex b).choose_spec (hex (a + H.bar x • b)).choose_spec
+        (hex a).choose_spec (hex (H.bar x • b)).choose_spec
+    have h1 :=
+      hasVal_mul_unit
+        (GlobalTheory.ValForm.hasVal_mul hϖ
+          (GlobalTheory.ValForm.hasVal_mul hϖ (hv (x • a + b)) (hv a)) (hv (H.bar x • b)))
+        u
+    have h2 :=
+      GlobalTheory.ValForm.hasVal_mul hϖ
+        (GlobalTheory.ValForm.hasVal_mul hϖ (hv (a + H.bar x • b)) (hv (x • a))) (hv b)
     rw [← map_mul, _root_.mul_comm, hu] at h1
     have := hasVal_unique hϖ h1 h2
     simp only [QForm.bOf]
     linarith
   let be : LinearMap.BilinForm ℤ P.D.toPre.X :=
-    LinearMap.mk₂ ℤ (fun a b => QForm.bHom hϖ P.D hQ' a b)
+    LinearMap.mk₂ ℤ
+      (fun a b => QForm.bHom hϖ P.D hQ' a b)
       (fun a a' b => by simp only [map_add (f := _), AddMonoidHom.add_apply])
       (fun c a b => by simp only [map_zsmul, AddMonoidHom.smul_apply, smul_eq_mul])
       (fun a b b' => by simp only [map_add (f := _)])

@@ -25,12 +25,16 @@ theorem genFrac_ne_zero (p : Fin n × Fin n) : genFrac F n p ≠ 0 := by
   exact X_ne_zero p
 
 def spec (p : Fin n × Fin n) : FractionRing (MvPolynomial (Fin n × Fin n) F) :=
-  if (p.2 : ℕ) < p.1 then 0
-  else if h : (p.1 : ℕ) = 0 then genFrac F n p
-  else genFrac F n p / genFrac F n (⟨p.1 - 1, by omega⟩, ⟨p.1 - 1, by omega⟩)
+  if (p.2 : ℕ) < p.1 then
+    0
+  else if h : (p.1 : ℕ) = 0 then
+    genFrac F n p
+  else
+    genFrac F n p / genFrac F n (⟨p.1 - 1, by omega⟩, ⟨p.1 - 1, by omega⟩)
 
-theorem prod_spec (m : ℕ) (hm : m < n) (c : Fin n) (hc : m ≤ (c : ℕ)) :
-    (∏ i : Fin m, spec F n (⟨i, by omega⟩, ⟨i, by omega⟩)) * spec F n (⟨m, hm⟩, c) = genFrac F n (⟨m, hm⟩, c) := by
+theorem prod_spec (m : ℕ) (hm : m < n) (c : Fin n) (hc : m ≤ (c : ℕ))
+    : (∏ i : Fin m, spec F n (⟨i, by omega⟩, ⟨i, by omega⟩)) * spec F n (⟨m, hm⟩, c)
+      = genFrac F n (⟨m, hm⟩, c) := by
   induction m generalizing c with
   | zero => simp [spec]
   | succ m ih =>
@@ -38,11 +42,13 @@ theorem prod_spec (m : ℕ) (hm : m < n) (c : Fin n) (hc : m ≤ (c : ℕ)) :
     simp only [Fin.val_castSucc, Fin.val_last]
     rw [ih (by omega) ⟨m, by omega⟩ le_rfl]
     have e : (⟨m + 1 - 1, by omega⟩ : Fin n) = ⟨m, by omega⟩ := Fin.ext (by simp)
-    simp only [spec, show ¬ ((c : ℕ) < m + 1) by omega, if_false, show m + 1 ≠ 0 by omega, dif_neg, not_false_eq_true, e]
+    simp only [spec, show ¬((c : ℕ) < m + 1) by omega, if_false, show m + 1 ≠ 0 by omega, dif_neg,
+      not_false_eq_true, e]
     exact mul_div_cancel₀ _ (genFrac_ne_zero F n _)
 
-theorem spec_pivotMinor (a : Fin (n - 1)) (b : Fin n) (hab : (a : ℕ) ≤ b) :
-    aeval (spec F n) (pivotMinor (genMat F n) a b) = genFrac F n (Fin.castLE (Nat.sub_le n 1) a, b) := by
+theorem spec_pivotMinor (a : Fin (n - 1)) (b : Fin n) (hab : (a : ℕ) ≤ b)
+    : aeval (spec F n) (pivotMinor (genMat F n) a b)
+      = genFrac F n (Fin.castLE (Nat.sub_le n 1) a, b) := by
   have ha : (a : ℕ) < n := by have := a.2; omega
   unfold pivotMinor
   rw [AlgHom.map_det, Matrix.det_of_isUpperTriangular]

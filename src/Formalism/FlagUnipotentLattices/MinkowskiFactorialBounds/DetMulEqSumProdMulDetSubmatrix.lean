@@ -59,28 +59,34 @@ lemma det_submatrix_castLE_of_unitUpper {R : Type*} [CommRing R] {N l : ℕ} (hl
 
 theorem leadingMinorTriangularInvariant : LeadingMinorInvariant := by
   intro R _ N l hl Lo W Up hL1 hL0 hU1 hU0
-  rw [Matrix.mul_assoc, submatrix_mul_castLE_of_lower hl Lo (W * Up) _ (fun i j hi hj => hL0 i j (by
-      rw [Fin.lt_def]; omega)),
+  rw [Matrix.mul_assoc,
+    submatrix_mul_castLE_of_lower hl Lo (W * Up) _
+      (fun i j hi hj => hL0 i j (by rw [Fin.lt_def]; omega)),
     submatrix_mul_castLE_of_upper hl W Up _ (fun i j hi hj => hU0 i j (by rw [Fin.lt_def]; omega)),
-    Matrix.det_mul, Matrix.det_mul, det_submatrix_castLE_of_unitLower hl Lo hL1 hL0, det_submatrix_castLE_of_unitUpper hl Up hU1 hU0]
+    Matrix.det_mul, Matrix.det_mul, det_submatrix_castLE_of_unitLower hl Lo hL1 hL0,
+    det_submatrix_castLE_of_unitUpper hl Up hU1 hU0]
   ring
 
 theorem leadingMinorColumnReplace : CramerUpper := by
   intro R _ N l hl Lo W Up hL1 hL0 hU1 hU0 hW c b hc
   have hLo' : ∀ i j : Fin N, (i : ℕ) < l → l ≤ (j : ℕ) → Lo i j = 0 := fun i j hi hj =>
     hL0 i j (by rw [Fin.lt_def]; omega)
-  have key : ∀ {α : Type} (g : α → Fin N), (Lo * W * Up).submatrix (Fin.castLE hl) g =
-      Lo.submatrix (Fin.castLE hl) (Fin.castLE hl) * (W.submatrix (Fin.castLE hl) (Fin.castLE hl) *
-        Up.submatrix (Fin.castLE hl) g) := by
+  have key
+      : ∀ {α : Type} (g : α → Fin N),
+        (Lo * W * Up).submatrix (Fin.castLE hl) g
+          = Lo.submatrix (Fin.castLE hl) (Fin.castLE hl)
+            * (W.submatrix (Fin.castLE hl) (Fin.castLE hl) * Up.submatrix (Fin.castLE hl) g) := by
     intro α g
-    rw [Matrix.mul_assoc, submatrix_mul_castLE_of_lower hl Lo (W * Up) g hLo', submatrix_mul_castLE_of_lower hl W Up g hW]
+    rw [Matrix.mul_assoc, submatrix_mul_castLE_of_lower hl Lo (W * Up) g hLo',
+      submatrix_mul_castLE_of_lower hl W Up g hW]
   rw [key, key, Matrix.det_mul, Matrix.det_mul, Matrix.det_mul, Matrix.det_mul,
     det_submatrix_castLE_of_unitUpper hl Up hU1 hU0]
   set A := Up.submatrix (Fin.castLE hl) (Fin.castLE hl) with hA
   have hAdet : A.det = 1 := det_submatrix_castLE_of_unitUpper hl Up hU1 hU0
   set u : Fin l → R := fun k => Up (Fin.castLE hl k) b with hu
-  have e1 : Up.submatrix (Fin.castLE hl) (fun j => if j = c then b else Fin.castLE hl j) =
-      A.updateCol c u := by
+  have e1
+      : Up.submatrix (Fin.castLE hl) (fun j => if j = c then b else Fin.castLE hl j)
+        = A.updateCol c u := by
     ext i j
     simp only [Matrix.submatrix_apply, Matrix.updateCol_apply, hA, hu]
     split_ifs <;> rfl
@@ -101,7 +107,8 @@ theorem leadingMinorColumnReplace : CramerUpper := by
   have e2 : (A.updateCol c u).det = u c := by
     rw [← Matrix.cramer_apply, Matrix.cramer_eq_adjugate_mulVec, Matrix.mulVec, dotProduct]
     simp [hadj]
-  rw [e1, e2]; ring
+  rw [e1, e2]
+  ring
 
 theorem complementNormIdentity : OmegaNorm := by
   intro K V _ _ _ _ h hh r f f' T T' x w ζ hG hG' hT hxmem hw hom
@@ -115,8 +122,7 @@ theorem complementNormIdentity : OmegaNorm := by
     · intro u v _ _ hu hv; simp [hu, hv]
     · intro c u _ hu; simp [hu]
   have hne : ∀ a : Fin r, a.castSucc ≠ Fin.last r := fun a => (Fin.castSucc_lt_last a).ne
-  have hez : ∀ a : Fin r, ∀ b, h (f a.castSucc) (f b) = 0 := fun a b => by
-    rw [hG]; simp [hne a]
+  have hez : ∀ a : Fin r, ∀ b, h (f a.castSucc) (f b) = 0 := fun a b => by rw [hG]; simp [hne a]
   have hxf : ∀ b, h x (f b) = 0 := fun b => hx _ fun a => hez a b
   have hxw : h x w = 0 := hx _ fun a => by rw [hh w, hw, star_zero]
   have hwx : h w x = 0 := by rw [hh x, hxw, star_zero]
@@ -129,7 +135,7 @@ theorem complementNormIdentity : OmegaNorm := by
   have hTs : star T = T := by
     have := hh z z
     rw [hzz] at this
-    have h2 : star (-T) = -star T := star_neg T
+    have h2 : star (-T) = - star T := star_neg T
     rw [h2] at this
     exact (neg_injective this).symm
   set om := ∑ b, Z.adjugate b (Fin.last r) • f' b with hom'
@@ -138,24 +144,27 @@ theorem complementNormIdentity : OmegaNorm := by
     rw [hom']
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul]
-    have : (Z * Z.adjugate) (Fin.last r) (Fin.last r) = Z.det := by
-      rw [Matrix.mul_adjugate]; simp
+    have : (Z * Z.adjugate) (Fin.last r) (Fin.last r) = Z.det := by rw [Matrix.mul_adjugate]; simp
     rw [← this, Matrix.mul_apply]
     refine Finset.sum_congr rfl fun b _ => ?_
-    rw [mul_comm]; rfl
+    rw [mul_comm]
+    rfl
   have h2 : h om z = -(ζ * T) := by
     rw [hom]
-    simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hxz, hwz,
-      hzz, ← hz]
+    simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
+      hxz, hwz, hzz, ← hz]
     ring
   have hdet : Z.det = -(ζ * T) := h1.symm.trans h2
 
-  have h3 : h om om = -(T' * (Z.adjugate (Fin.last r) (Fin.last r) *
-      star (Z.adjugate (Fin.last r) (Fin.last r)))) := by
+  have h3
+      : h om om
+        = -(T'
+          * (Z.adjugate (Fin.last r) (Fin.last r)
+            * star (Z.adjugate (Fin.last r) (Fin.last r)))) := by
     rw [hom']
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
-      LinearMap.map_smulₛₗ, starRingEnd_apply, hG']
+        LinearMap.map_smulₛₗ, starRingEnd_apply, hG']
     rw [Finset.sum_eq_single (Fin.last r)]
     · rw [Finset.sum_eq_single (Fin.last r)]
       · simp; ring
@@ -169,18 +178,24 @@ theorem complementNormIdentity : OmegaNorm := by
     simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
       LinearMap.map_smulₛₗ, starRingEnd_apply, hxx, hxw, hwx, hxz, hwz, hzx, hzw, hzz, ← hz]
     ring
-  have hadj : Z.adjugate (Fin.last r) (Fin.last r) = (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+  have hadj
+      : Z.adjugate (Fin.last r) (Fin.last r) = (Z.submatrix Fin.castSucc Fin.castSucc).det := by
     rw [Matrix.adjugate_fin_succ_eq_det_submatrix, Fin.succAbove_last]
     simp [← two_mul]
   rw [← hadj, hdet, star_neg, star_mul, hTs]
-  have h5 : h w w = ζ * star ζ * T - T' * (Z.adjugate (Fin.last r) (Fin.last r) *
-      star (Z.adjugate (Fin.last r) (Fin.last r))) := by
+  have h5
+      : h w w
+        = ζ * star ζ * T
+          - T'
+            * (Z.adjugate (Fin.last r) (Fin.last r)
+              * star (Z.adjugate (Fin.last r) (Fin.last r))) := by
     have := h3.symm.trans h4
     linear_combination -this
-  rw [h5]; ring
+  rw [h5]
+  ring
 
-def consRowMatrix {R : Type*} {r : ℕ} (u : Fin (r + 1) → R) (Y : Matrix (Fin r) (Fin (r + 1)) R) :
-    Matrix (Fin (r + 1)) (Fin (r + 1)) R :=
+def consRowMatrix {R : Type*} {r : ℕ} (u : Fin (r + 1) → R) (Y : Matrix (Fin r) (Fin (r + 1)) R)
+    : Matrix (Fin (r + 1)) (Fin (r + 1)) R :=
   Matrix.of fun i => Fin.cases u (fun a => Y a) i
 
 lemma s5bCons_zero {R : Type*} {r : ℕ} (u : Fin (r + 1) → R) (Y : Matrix (Fin r) (Fin (r + 1)) R)
@@ -248,16 +263,23 @@ theorem cofactorVectorKernel : KernelRowSpace := by
     rcases Fin.eq_self_or_eq_succAbove b₀ b with hb | ⟨c, hb⟩
     · rw [hb]
       rw [Matrix.det_succ_column _ b₀, Fin.sum_univ_succ] at hA
-      have t0 : (consRowMatrix u Y).submatrix (Fin.succAbove 0) b₀.succAbove =
-          Y.submatrix id b₀.succAbove := by
+      have t0
+          : (consRowMatrix u Y).submatrix (Fin.succAbove 0) b₀.succAbove
+            = Y.submatrix id b₀.succAbove := by
         ext i j; simp only [Matrix.submatrix_apply, Fin.succAbove_zero, s5bCons_succ, id]
       rw [t0] at hA
-      simp only [det_submatrix_consRow_succAbove', s5bCons_zero, s5bCons_succ,
-        Fin.val_zero, Fin.val_succ, zero_add] at hA
-      have hterm : ∀ a : Fin r, (-1 : R) ^ ((a : ℕ) + 1 + (b₀ : ℕ)) * Y a b₀ *
-          ((-1) ^ (a : ℕ) * ∑ c, u (b₀.succAbove c) * (Y.submatrix id b₀.succAbove).adjugate c a) =
-          -((-1) ^ (b₀ : ℕ) * ((∑ c, u (b₀.succAbove c) *
-            (Y.submatrix id b₀.succAbove).adjugate c a) * Y a b₀)) := by
+      simp only [det_submatrix_consRow_succAbove', s5bCons_zero, s5bCons_succ, Fin.val_zero,
+          Fin.val_succ, zero_add]
+        at hA
+      have hterm
+          : ∀ a : Fin r,
+            (-1 : R) ^ ((a : ℕ) + 1 + (b₀ : ℕ)) * Y a b₀
+                * ((-1) ^ (a : ℕ)
+                  * ∑ c, u (b₀.succAbove c) * (Y.submatrix id b₀.succAbove).adjugate c a)
+              = -((-1) ^ (b₀ : ℕ)
+                * ((∑ c, u (b₀.succAbove c) *
+                     (Y.submatrix id b₀.succAbove).adjugate c a)
+                  * Y a b₀)) := by
         intro a
         have hs := neg_one_pow_mul_neg_one_pow (R := R) (a : ℕ)
         rw [pow_add, pow_add, pow_one]
@@ -270,8 +292,10 @@ theorem cofactorVectorKernel : KernelRowSpace := by
         ∑ a, (∑ c, u (b₀.succAbove c) * (Y.submatrix id b₀.succAbove).adjugate c a) * Y a b₀) * hs
     · rw [hb]
       have : (((fun c => u (b₀.succAbove c)) ᵥ* (Y.submatrix id b₀.succAbove).adjugate) ᵥ* Y)
-          (b₀.succAbove c) = (((fun c => u (b₀.succAbove c)) ᵥ*
-            (Y.submatrix id b₀.succAbove).adjugate) ᵥ* (Y.submatrix id b₀.succAbove)) c := by
+            (b₀.succAbove c)
+          = (((fun c => u (b₀.succAbove c)) ᵥ* (Y.submatrix id b₀.succAbove).adjugate)
+              ᵥ* (Y.submatrix id b₀.succAbove))
+            c := by
         simp [Matrix.vecMul, dotProduct]
       rw [this, Matrix.vecMul_vecMul, Matrix.adjugate_mul, Matrix.vecMul_smul, Matrix.vecMul_one]
       simp
@@ -279,15 +303,22 @@ theorem cofactorVectorKernel : KernelRowSpace := by
 theorem unitriangularReduction : UnipotentReduce := by
   intro E _ O FF N u hFF hu1 hu0
   classical
-  have key : ∀ t : ℕ, ∃ n : Matrix (Fin N) (Fin N) E, (∀ i, n i i = 1) ∧
-      (∀ i j, j < i → n i j = 0) ∧ (∀ i j, n i j ∈ O) ∧
-      ∀ i j : Fin N, i < j → N ≤ (i:ℕ) + t → (u * n) i j ∈ FF := by
+  have key
+      : ∀ t : ℕ, ∃ n : Matrix (Fin N) (Fin N) E,
+        (∀ i, n i i = 1) ∧ (∀ i j, j < i → n i j = 0) ∧ (∀ i j, n i j ∈ O)
+          ∧ ∀ i j : Fin N, i < j → N ≤ (i : ℕ) + t → (u * n) i j ∈ FF := by
     intro t
     induction t with
     | zero =>
-      refine ⟨1, by simp, fun i j h => Matrix.one_apply_ne h.ne', fun i j => ?_,
-        fun i j _ h => absurd i.2 (by omega)⟩
-      rw [Matrix.one_apply]; split_ifs
+      refine ⟨
+        1,
+        by simp,
+        fun i j h => Matrix.one_apply_ne h.ne',
+        fun i j => ?_,
+        fun i j _ h => absurd i.2 (by omega)
+      ⟩
+      rw [Matrix.one_apply]
+      split_ifs
       · exact O.one_mem
       · exact O.zero_mem
     | succ t ih =>
@@ -306,10 +337,11 @@ theorem unitriangularReduction : UnipotentReduce := by
           simp only [Matrix.mul_apply]
           rw [← Finset.add_sum_erase _ _ (Finset.mem_univ s),
             ← Finset.add_sum_erase Finset.univ (fun k => u i k * n k j) (Finset.mem_univ s)]
-          have : ∑ k ∈ Finset.univ.erase s, u i k * n' k j =
-              ∑ k ∈ Finset.univ.erase s, u i k * n k j :=
+          have : ∑ k ∈ Finset.univ.erase s, u i k * n' k j
+              = ∑ k ∈ Finset.univ.erase s, u i k * n k j :=
             Finset.sum_congr rfl fun k hk => by rw [hn'ne k j (Finset.ne_of_mem_erase hk)]
-          rw [this]; ring
+          rw [this]
+          ring
         refine ⟨n', ?_, ?_, ?_, ?_⟩
         · intro i
           by_cases hi : i = s
@@ -321,7 +353,9 @@ theorem unitriangularReduction : UnipotentReduce := by
           · rw [hn'ne i j hi, h0 _ _ hji]
         · intro i j
           by_cases hi : i = s
-          · subst hi; rw [hn's]; split_ifs
+          · subst hi
+            rw [hn's]
+            split_ifs
             · exact (ha j).1
             · exact hO _ _
           · rw [hn'ne i j hi]; exact hO _ _
@@ -330,10 +364,13 @@ theorem unitriangularReduction : UnipotentReduce := by
           by_cases his : i = s
           · subst his
             rw [hu1, hn's, if_pos hij]
-            have hsplit : (u * n) s j = n s j +
-                ∑ k ∈ Finset.univ.filter (fun k => s < k), u s k * n k j := by
-              rw [Matrix.mul_apply, ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun k => s < k)]
-              rw [add_comm]; congr 1
+            have hsplit
+                : (u * n) s j
+                  = n s j + ∑ k ∈ Finset.univ.filter (fun k => s < k), u s k * n k j := by
+              rw [Matrix.mul_apply,
+                ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun k => s < k)]
+              rw [add_comm]
+              congr 1
               rw [Finset.sum_eq_single s]
               · rw [hu1, one_mul]
               · intro k hk hki
@@ -342,7 +379,8 @@ theorem unitriangularReduction : UnipotentReduce := by
               · intro h; exact (h (by simp)).elim
             rw [hsplit]
             have := (ha j).2
-            convert this using 1; ring
+            convert this using 1
+            ring
           · have hsi : s < i := by
               rw [Fin.lt_def]
               have : (i : ℕ) ≠ (s : ℕ) := fun h => his (Fin.ext h)
@@ -375,16 +413,19 @@ theorem normMinorMonomialLe : MonomialMinor := by
       rw [h2, one_mul]
     have hgle : ∀ π, g π ≤ P := by
       intro π
-      calc g π ≤ ∏ i, max 1 ‖c (I (π i))‖ := by
-            refine Finset.prod_le_prod₀ (fun i _ => norm_nonneg _) fun i _ => ?_
-            simp only [hW, Matrix.submatrix_apply, Matrix.of_apply]
-            split_ifs
-            · exact le_max_right _ _
-            · simp
+      calc
+        g π ≤ ∏ i, max 1 ‖c (I (π i))‖ := by
+          refine Finset.prod_le_prod₀ (fun i _ => norm_nonneg _) fun i _ => ?_
+          simp only [hW, Matrix.submatrix_apply, Matrix.of_apply]
+          split_ifs
+          · exact le_max_right _ _
+          · simp
         _ = ∏ i, max 1 ‖c (I i)‖ := Equiv.prod_comp π (fun i => max 1 ‖c (I i)‖)
         _ = ∏ k ∈ Finset.univ.image I, max 1 ‖c k‖ := by
-            rw [Finset.prod_image (fun a _ b _ h => hI h)]
-        _ ≤ P := finset_prod_le_prod_of_subset_of_one_le _ _ (Finset.subset_univ _) _ fun k _ => le_max_left _ _
+          rw [Finset.prod_image (fun a _ b _ h => hI h)]
+        _ ≤ P :=
+          finset_prod_le_prod_of_subset_of_one_le _ _ (Finset.subset_univ _) _ fun k _ =>
+            le_max_left _ _
     have huniq : ∀ π π', g π ≠ 0 → g π' ≠ 0 → π = π' := by
       intro π π' h h'
       have key : ∀ ρ : Equiv.Perm (Fin t), g ρ ≠ 0 → ∀ i, J i = σ (I (ρ i)) := by
@@ -406,11 +447,12 @@ theorem normMinorMonomialLe : MonomialMinor := by
         exact hne (huniq π π₀ hπ h₀)
       · simp
     · push_neg at hex
-      rw [Finset.sum_eq_zero fun π _ => hex π]; linarith
-  · obtain ⟨a, b, hab, hne⟩ : ∃ a b, I a = I b ∧ a ≠ b := by
-      simpa [Function.Injective] using hI
+      rw [Finset.sum_eq_zero fun π _ => hex π]
+      linarith
+  · obtain ⟨a, b, hab, hne⟩ : ∃ a b, I a = I b ∧ a ≠ b := by simpa [Function.Injective] using hI
     rw [Matrix.det_zero_of_row_eq hne (by ext j; simp [hab])]
-    simp; linarith
+    simp
+    linarith
 
 lemma det_mul_eq_sum_prod_mul_det_submatrix {t N : ℕ} (X : Matrix (Fin t) (Fin N) ℂ) (Y : Matrix (Fin N) (Fin t) ℂ) :
     (X * Y).det = ∑ f : Fin t → Fin N, (∏ i, X i (f i)) * (Y.submatrix f id).det := by
@@ -473,22 +515,28 @@ theorem normMinorMulLe : MinorBound := by
   have e : (A * w * B).submatrix I J = (A.submatrix I id) * ((w * B).submatrix id J) := by
     rw [Matrix.mul_assoc]; ext i j; simp [Matrix.mul_apply]
   rw [e]
-  have h2 : ∀ f : Fin t → Fin N, ‖(((w * B).submatrix id J).submatrix f id).det‖ ≤
-      (N.factorial : ℝ) * ρ ^ N * P := by
+  have h2
+      : ∀ f : Fin t → Fin N,
+        ‖(((w * B).submatrix id J).submatrix f id).det‖ ≤ (N.factorial : ℝ) * ρ ^ N * P := by
     intro f
-    have e2 : ((w * B).submatrix id J).submatrix f id =
-        ((B.submatrix id J)ᵀ * (w.submatrix f id)ᵀ)ᵀ := by
+    have e2
+        : ((w * B).submatrix id J).submatrix f id
+          = ((B.submatrix id J)ᵀ * (w.submatrix f id)ᵀ)ᵀ := by
       rw [← Matrix.transpose_mul]; ext i j; simp [Matrix.mul_apply, mul_comm]
     rw [e2, Matrix.det_transpose]
     apply norm_det_mul_le _ _ ρ P hρ hP (fun i k => hB _ _)
     intro g
     have : ((w.submatrix f id)ᵀ).submatrix g id = (w.submatrix f g)ᵀ := by ext i j; simp
-    rw [this, Matrix.det_transpose]; exact hw t f g
-  have h1 := norm_det_mul_le (A.submatrix I id) ((w * B).submatrix id J) ρ _ hρ (by positivity)
-    (fun i k => hA _ _) h2
+    rw [this, Matrix.det_transpose]
+    exact hw t f g
+  have h1 :=
+    norm_det_mul_le (A.submatrix I id) ((w * B).submatrix id J) ρ _ hρ (by positivity)
+      (fun i k => hA _ _)
+      h2
   refine h1.trans ?_
-  have h4 : (1:ℝ) ≤ 4 ^ N := one_le_pow₀ (by norm_num)
-  calc (N.factorial : ℝ) * ρ ^ N * ((N.factorial : ℝ) * ρ ^ N * P)
+  have h4 : (1 : ℝ) ≤ 4 ^ N := one_le_pow₀ (by norm_num)
+  calc
+    (N.factorial : ℝ) * ρ ^ N * ((N.factorial : ℝ) * ρ ^ N * P)
       = 1 * ((N.factorial : ℝ) ^ 2 * ρ ^ (2 * N) * P) := by ring
     _ ≤ 4 ^ N * ((N.factorial : ℝ) ^ 2 * ρ ^ (2 * N) * P) := by gcongr
     _ = _ := by ring

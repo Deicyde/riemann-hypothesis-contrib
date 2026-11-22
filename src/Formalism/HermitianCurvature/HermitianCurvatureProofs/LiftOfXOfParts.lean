@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.StatementTL
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TL Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Fr
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TL Formalism.REAL
+  Formalism.QuantumDeterminants Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Fr
 
 noncomputable section
 
@@ -17,8 +18,7 @@ theorem lift_of_x_of_parts : TL.LiftXOfParts := by
   obtain ⟨hFB, hEq, hRad⟩ := hB Y
   set E := xFib Bs B0 (Y + ((P.k : ℂ) - 2) / 2) with hE
   set s : ℂ := M.sgn P l0 with hs
-  have hx : st.x Y = L.GGi * st.QQ Y 1 1 := by
-    rw [hLS.tau, ← mul_assoc, L.GGi_GG, one_mul]
+  have hx : st.x Y = L.GGi * st.QQ Y 1 1 := by rw [hLS.tau, ← mul_assoc, L.GGi_GG, one_mul]
   have hx1 : (st.x Y).1 = X.fn 5 * (s • X.t Y 1 1) := by
     rw [hx, hQQ Y, hAct.2.2.2.2.2.2.2.2.2.2.2.1]
     rfl
@@ -29,8 +29,8 @@ theorem lift_of_x_of_parts : TL.LiftXOfParts := by
     rw [hEq p hp g hg J, ContinuousLinearMap.smul_comp, ContinuousLinearMap.comp_smul]
   · intro Φ x hx'
     simp only [pow_zero, mul_one, smul_apply]
-    rw [hx1, Module.End.mul_apply, X.fn_apply 5 _ x hx', LinearMap.smul_apply, Submodule.coe_smul, Pi.smul_apply,
-      Pi.smul_apply, hRad Φ x hx', smul_smul, smul_smul]
+    rw [hx1, Module.End.mul_apply, X.fn_apply 5 _ x hx', LinearMap.smul_apply, Submodule.coe_smul,
+      Pi.smul_apply, Pi.smul_apply, hRad Φ x hx', smul_smul, smul_smul]
     have hG : (0 : ℝ) < Q.GGl P.k P.r Bs.z Bs.z' x.2 := hx'.2.2
     simp only [Q.fnVal]
     congr 1

@@ -5,27 +5,33 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.UnitaryBC UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.UnitaryBC UpperTheory.V
 open UpperTheory.V.W (Plc Lp resP)
 open scoped Pointwise
 
 section SlopeTestRemainingChoices
 
-variable {F E Ω : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Field Ω] [Algebra F E] [Algebra F Ω] [Algebra E Ω]
-  [IsScalarTower F E Ω]
+variable
+  {F E Ω : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Field Ω] [Algebra F E]
+  [Algebra F Ω] [Algebra E Ω] [IsScalarTower F E Ω]
 
-private theorem place_conj {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (h : IsPlaceOver A v) (t : G F Ω) :
-    IsPlaceOver (t⁻¹ • A) v := fun x => by
+private theorem place_conj
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (h : IsPlaceOver A v) (t : G F Ω)
+    : IsPlaceOver (t⁻¹ • A) v := fun x => by
   have hm : ∀ x, x ∈ t⁻¹ • A ↔ t x ∈ A := fun x => ValuationSubring.mem_inv_pointwise_smul_iff
   have hv : ∀ y, (t⁻¹ • A).valuation y < 1 ↔ A.valuation (t y) < 1 := fun y => by
-    rw [valuation_lt_one_iff', valuation_lt_one_iff', hm, hm, map_inv₀, map_eq_zero_iff _ t.injective]
+    rw [valuation_lt_one_iff', valuation_lt_one_iff', hm, hm, map_inv₀,
+      map_eq_zero_iff _ t.injective]
   rw [hv, AlgEquiv.commutes]
   exact h x
 
-private theorem place_between {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v) :
-    ∃ w : HeightOneSpectrum (𝓞 E), IsPlaceOver A w ∧ w.under (𝓞 F) = v := by
+private theorem place_between
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v)
+    : ∃ w : HeightOneSpectrum (𝓞 E), IsPlaceOver A w ∧ w.under (𝓞 F) = v := by
   have hint : ∀ x : 𝓞 E, algebraMap E Ω (x : E) ∈ A := fun x => by
-    have h : IsIntegral A (algebraMap E Ω (x : E)) := (x.isIntegral_coe.map (algebraMap E Ω).toIntAlgHom).tower_top
+    have h : IsIntegral A (algebraMap E Ω (x : E)) :=
+      (x.isIntegral_coe.map (algebraMap E Ω).toIntAlgHom).tower_top
     obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 h
     rw [← hy]
     exact y.2
@@ -46,8 +52,11 @@ private theorem place_between {A : ValuationSubring Ω} {v : HeightOneSpectrum (
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.isSplitAt_of_decomposition_le_restriction_range :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (A : ValuationSubring Ω) (v : Plc (Lp L)), IsPlaceOver A v → Dec (F := Lp L) A ≤ (resP L Ω).range → ∀ w : Plc L, w.under (𝓞 (Lp L)) = v → IsSplitAt w := by
+theorem UpperTheory.isSplitAt_of_decomposition_le_restriction_range
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
+        [IsAlgClosure L Ω] (A : ValuationSubring Ω) (v : Plc (Lp L)),
+      IsPlaceOver A v → Dec (F := Lp L) A ≤ (resP L Ω).range
+        → ∀ w : Plc L, w.under (𝓞 (Lp L)) = v → IsSplitAt w := by
   intro L Ω _ _ _ _ _ _ A v hA hD w hw
   by_contra hs
   have huniq : ∀ u : Plc L, u.under (𝓞 (Lp L)) = v → u = w := fun u hu => by

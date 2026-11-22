@@ -21,14 +21,28 @@ set_option synthInstance.maxHeartbeats 200000
 section
 section
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset
 open Formalism.L2 Formalism.L2.DIV
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SqTop
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
+  GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SqTop
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.BigTop.Fun
 set_option maxHeartbeats 1600000 in
-theorem square_ratio_at_point_of_leading_term_alt : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → (Closed FamHyp fun Fm _ => _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ => |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps) → GlobalTheory.RowClaim.ConstK → LNe → TriEx → Tower → (_root_.GlobalTheory.BigTop.Fun.CharacterAtPoint fun {D} _ _ _ _ _ _ _ _ _ _ _ ch => ∀ i j t, GlobalTheory.RowTest.sqRatio ch i j t ∈ Set.range D.what₂.embLL) := by
+theorem square_ratio_at_point_of_leading_term_alt
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → _root_.GlobalTheory.BigTop.Fun.SettingAtPoint
+      → (Closed FamHyp fun Fm _ =>
+        _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ =>
+          |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps)
+      → GlobalTheory.RowClaim.ConstK → LNe → TriEx → Tower
+      → (_root_.GlobalTheory.BigTop.Fun.CharacterAtPoint fun {D} _ _ _ _ _ _ _ _ _ _ _ ch =>
+        ∀ i j t, GlobalTheory.RowTest.sqRatio ch i j t ∈ Set.range D.what₂.embLL) := by
   intro hP hAg hMa hSet hdl hC hLN hTX hTW
   have hBF := _root_.GlobalTheory.T.bottom_triple_integral_eq_const_mul_local hP hAg hMa hLN
   obtain ⟨c3, h3⟩ := hSet.atPt hC
@@ -49,19 +63,39 @@ theorem square_ratio_at_point_of_leading_term_alt : _root_.GlobalTheory.FunPr.Th
   have l7 : x₀ ≤ x := le_trans (by simp) hle
   have hset := g6 x hx l6 i p hp ha.eser
   have hrec : Rec (Fm.L x i) := ⟨hset.size, hset.host, hset.hF, g5 x hx l5 i p hp⟩
-  obtain ⟨⟨hLN', hTX'⟩, hTW', hBF'⟩ := hg C0 le_rfl _ (Fm.L x i) (Fm.L_eps x i)
-    (by rw [Fm.L_x x i hx]; exact l7) hrec _ _ _ hset.core.lev G
+  obtain ⟨⟨hLN', hTX'⟩, hTW', hBF'⟩ :=
+    hg C0 le_rfl _ (Fm.L x i) (Fm.L_eps x i) (by rw [Fm.L_x x i hx]; exact l7) hrec _ _ _
+      hset.core.lev G
   have hc := g3 x hx l3 i p hp G W n a ha
   have hstd : IsStdChar (Fm.D x i) W.ψ (-1) := (ha.is.weil.ψ : a.ch.W.ψ = _) ▸ hset.std
-  exact fun i' j' t => sqRatio_mem_of G _ W a.S.toGridChoice a.rm a.c hstd ha.field hc ha.is.const
-    (fun i j => (hLN' i j).1) (hTX' W hstd) (hTW' W a.S.toGridChoice a.rm hstd ha.field) (hBF' W hstd) i' j' t
+  exact fun i' j' t =>
+    sqRatio_mem_of G _ W a.S.toGridChoice a.rm a.c hstd ha.field hc ha.is.const
+      (fun i j => (hLN' i j).1)
+      (hTX' W hstd) (hTW' W a.S.toGridChoice a.rm hstd ha.field) (hBF' W hstd) i' j' t
 end GlobalTheory.BigTop.Fun
 end
 end
 section
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SqTop
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+  GlobalTheory.SqTop
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.sq_ratio_mem_range_emb_ll : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → (Closed FamHyp fun Fm _ => _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ => |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps) → GlobalTheory.RowClaim.ConstK → LNe → TriEx → Tower → (_root_.GlobalTheory.BigTop.Fun.CharacterAtPoint fun {D} _ _ _ _ _ _ _ _ _ _ _ ch => ∀ i j t, GlobalTheory.RowTest.sqRatio ch i j t ∈ Set.range D.what₂.embLL) := by
-  first | exact @_root_.GlobalTheory.BigTop.Fun.square_ratio_at_point_of_leading_term_alt | exact _root_.GlobalTheory.BigTop.Fun.square_ratio_at_point_of_leading_term_alt | (intros; apply _root_.GlobalTheory.BigTop.Fun.square_ratio_at_point_of_leading_term_alt <;> assumption)
+theorem _root_.GlobalTheory.T.sq_ratio_mem_range_emb_ll
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → _root_.GlobalTheory.BigTop.Fun.SettingAtPoint
+      → (Closed FamHyp fun Fm _ =>
+        _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ =>
+          |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps)
+      → GlobalTheory.RowClaim.ConstK → LNe → TriEx → Tower
+      → (_root_.GlobalTheory.BigTop.Fun.CharacterAtPoint fun {D} _ _ _ _ _ _ _ _ _ _ _ ch =>
+        ∀ i j t, GlobalTheory.RowTest.sqRatio ch i j t ∈ Set.range D.what₂.embLL) := by
+  first
+  | exact @_root_.GlobalTheory.BigTop.Fun.square_ratio_at_point_of_leading_term_alt
+  | exact _root_.GlobalTheory.BigTop.Fun.square_ratio_at_point_of_leading_term_alt
+  | (
+      intros
+      apply _root_.GlobalTheory.BigTop.Fun.square_ratio_at_point_of_leading_term_alt <;> assumption
+    )
 end
 end

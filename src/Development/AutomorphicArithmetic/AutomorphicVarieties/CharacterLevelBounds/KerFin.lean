@@ -8,14 +8,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 
-private theorem kerFin_triv {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [AddCommGroup M] [Module R M]
-    [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] (ρ : Representation R G M)
-    (U' U : Subgroup G) (h : U' ≤ U) (hρ : ∀ u ∈ U, ∀ m, ρ u m = m) (n : ℕ) (hn : ∀ u ∈ U, u ^ n ∈ U')
-    [Fintype (U ⧸ U'.subgroupOf U)] :
-    Module.length R (LinearMap.ker (resU ρ h)) ≤ (Fintype.card (U ⧸ U'.subgroupOf U) : ℕ∞) *
-      Module.length R (LinearMap.ker ((n : R) • (LinearMap.id : M →ₗ[R] M))) := by
+private theorem kerFin_triv
+    {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [AddCommGroup M] [Module R M]
+    [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M]
+    (ρ : Representation R G M) (U' U : Subgroup G) (h : U' ≤ U) (hρ : ∀ u ∈ U, ∀ m, ρ u m = m)
+    (n : ℕ) (hn : ∀ u ∈ U, u ^ n ∈ U')
+    [Fintype (U ⧸ U'.subgroupOf U)]
+    : Module.length R (LinearMap.ker (resU ρ h))
+      ≤ (Fintype.card (U ⧸ U'.subgroupOf U) : ℕ∞)
+        * Module.length R (LinearMap.ker ((n : R) • (LinearMap.id : M →ₗ[R] M))) := by
   classical
   set K : Subgroup U := U'.subgroupOf U with hK
   set N := LinearMap.ker ((n : R) • (LinearMap.id : M →ₗ[R] M)) with hN
@@ -57,7 +61,9 @@ private theorem kerFin_triv {R G M : Type} [CommRing R] [Group G] [TopologicalSp
       rw [hev, hB z hz]
       rfl)
   have hΦ : ∀ z q, Φ (Submodule.Quotient.mk z) q = (z : U → M) (Quotient.out q) := fun z q => rfl
-  have hvan : ∀ z : Z1U ρ U, resU ρ h (Submodule.Quotient.mk z) = 0 → ∀ u : U, (u : G) ∈ U' → (z : U → M) u = 0 := by
+  have hvan
+      : ∀ z : Z1U ρ U,
+        resU ρ h (Submodule.Quotient.mk z) = 0 → ∀ u : U, (u : G) ∈ U' → (z : U → M) u = 0 := by
     intro z hz u hu
     obtain ⟨m, hm⟩ := (resU_mk_eq_zero ρ h z).mp hz
     have := hm ⟨(u : G), hu⟩
@@ -71,11 +77,13 @@ private theorem kerFin_triv {R G M : Type} [CommRing R] [Group G] [TopologicalSp
       ← hpow z z.2]
     exact hvan z hx _ (hn _ (Quotient.out q).2)
   let Ψ : LinearMap.ker (resU ρ h) →ₗ[R] (U ⧸ K → N) :=
-    LinearMap.pi (fun q => LinearMap.codRestrict N
-      ((LinearMap.proj q : (U ⧸ K → M) →ₗ[R] M) ∘ₗ Φ ∘ₗ (LinearMap.ker (resU ρ h)).subtype)
-      (fun x => key x.1 x.2 q))
+    LinearMap.pi (fun q =>
+      LinearMap.codRestrict N
+        ((LinearMap.proj q : (U ⧸ K → M) →ₗ[R] M) ∘ₗ Φ ∘ₗ (LinearMap.ker (resU ρ h)).subtype)
+        (fun x => key x.1 x.2 q))
   have hΨ : Function.Injective Ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     rintro ⟨x, hxk⟩ hx0
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     have hq : ∀ q : U ⧸ K, (z : U → M) (Quotient.out q) = 0 := by
@@ -86,21 +94,23 @@ private theorem kerFin_triv {R G M : Type} [CommRing R] [Group G] [TopologicalSp
       funext u
       obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K u
       have hkU : ((k : U) : G) ∈ U' := Subgroup.mem_subgroupOf.mp k.2
-      have hu : u = Quotient.out (QuotientGroup.mk u : U ⧸ K) * (k : U)⁻¹ := by
-        rw [hk]; group
+      have hu : u = Quotient.out (QuotientGroup.mk u : U ⧸ K) * (k : U)⁻¹ := by rw [hk]; group
       rw [hu, hadd z z.2, hq, hinv z z.2, hvan z hxk _ hkU, neg_zero, add_zero]
       rfl
     have hz' : z = 0 := Subtype.ext hz
     subst hz'
     rfl
-  calc Module.length R (LinearMap.ker (resU ρ h)) ≤ Module.length R (U ⧸ K → N) :=
-        Module.length_le_of_injective Ψ hΨ
+  calc
+    Module.length R (LinearMap.ker (resU ρ h))
+      ≤ Module.length R (U ⧸ K → N) := Module.length_le_of_injective Ψ hΨ
     _ = _ := by
       rw [Module.length_pi_of_fintype, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
         Fintype.card_eq_nat_card, Fintype.card_eq_nat_card]
 
-private theorem exists_doubleCoset_section {G : Type} [Group G] (U' U : Subgroup G) (h0 : U'.relIndex U ≠ 0) :
-    ∃ T : Finset G, (T : Set G) ⊆ U ∧ T.card ≤ U'.relIndex U ∧ U ≤ Subgroup.closure (T : Set G) ⊔ U' := by
+private theorem exists_doubleCoset_section
+    {G : Type} [Group G] (U' U : Subgroup G) (h0 : U'.relIndex U ≠ 0)
+    : ∃ T : Finset G,
+      (T : Set G) ⊆ U ∧ T.card ≤ U'.relIndex U ∧ U ≤ Subgroup.closure (T : Set G) ⊔ U' := by
   classical
   set K : Subgroup U := U'.subgroupOf U with hK
   have hfi : K.FiniteIndex := ⟨by rw [hK]; exact h0⟩
@@ -116,21 +126,34 @@ private theorem exists_doubleCoset_section {G : Type} [Group G] (U' U : Subgroup
   · intro u hu
     obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K (⟨u, hu⟩ : U)
     have hkU' : ((k : U) : G) ∈ U' := Subgroup.mem_subgroupOf.mp k.2
-    have hout : ((Quotient.out (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ K) : U) : G) ∈ Subgroup.closure
-        ((Finset.univ.image (fun q : U ⧸ K => ((Quotient.out q : U) : G)) : Finset G) : Set G) := by
+    have hout
+        : ((Quotient.out (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ K) : U) : G) ∈ Subgroup.closure
+          ((Finset.univ.image (fun q : U ⧸ K => ((Quotient.out q : U) : G)) : Finset G)
+            : Set G) := by
       apply Subgroup.subset_closure
       simp
-    have heq : u = ((Quotient.out (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ K) : U) : G) * ((k : U) : G)⁻¹ := by
+    have heq
+        : u
+          = ((Quotient.out (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ K) : U) : G)
+            * ((k : U) : G)⁻¹ := by
       have := congrArg (fun x : U => (x : G)) hk
       simp only [Subgroup.coe_mul] at this
-      rw [this]; group
+      rw [this]
+      group
     rw [heq]
     exact Subgroup.mul_mem_sup hout (U'.inv_mem hkU')
 
-theorem UpperTheory.V.Chr.kerFin :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (θ : G →* Oˣ), ContAction (twist₂ l θ) →
-          ∀ (U' U : Subgroup G) (h : U' ≤ U), U' ≤ θ.ker → (∀ a ∈ U, ∀ b ∈ U, a * b * a⁻¹ * b⁻¹ ∈ U') → ∀ n : ℕ, n ≠ 0 → U'.relIndex U ∣ n →
-          Module.length O (LinearMap.ker (resU (twist₂ l θ) h)) ≤ ((n * n.factorization l : ℕ) : ℕ∞) * eO l O := by
+theorem UpperTheory.V.Chr.kerFin
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (G : Type) [Group G] [TopologicalSpace G]
+        [IsTopologicalGroup G] (θ : G →* Oˣ),
+      ContAction (twist₂ l θ)
+        → ∀ (U' U : Subgroup G) (h : U' ≤ U),
+          U' ≤ θ.ker → (∀ a ∈ U, ∀ b ∈ U, a * b * a⁻¹ * b⁻¹ ∈ U')
+            → ∀ n : ℕ,
+              n ≠ 0 → U'.relIndex U ∣ n
+                → Module.length O (LinearMap.ker (resU (twist₂ l θ) h))
+                  ≤ ((n * n.factorization l : ℕ) : ℕ∞) * eO l O := by
   intro l _ O _ _ _ _ _ G _ _ _ θ hc U' U h hker hcomm n hn hdiv
   classical
   have h0 : U'.relIndex U ≠ 0 := fun hz => hn (Nat.eq_zero_of_zero_dvd (hz ▸ hdiv))
@@ -147,8 +170,7 @@ theorem UpperTheory.V.Chr.kerFin :
       push_cast; group
     rw [this]
     exact U'.mul_mem hcm hk
-  have hcardK : Nat.card (U ⧸ K) = U'.relIndex U := by
-    rw [Subgroup.relIndex, ← hK, Subgroup.index]
+  have hcardK : Nat.card (U ⧸ K) = U'.relIndex U := by rw [Subgroup.relIndex, ← hK, Subgroup.index]
   have hpowU : ∀ u ∈ U, u ^ n ∈ U' := by
     intro u hu
     obtain ⟨c, hc'⟩ := hdiv
@@ -178,8 +200,7 @@ theorem UpperTheory.V.Chr.kerFin :
     have hθn : (θ g) ^ n = 1 := by
       rw [← map_pow]
       exact hker (hpowU g hg)
-    have hζn : ζ ^ n = 1 := by
-      rw [hζdef, ← Units.val_pow_eq_pow_val, hθn, Units.val_one]
+    have hζn : ζ ^ n = 1 := by rw [hζdef, ← Units.val_pow_eq_pow_val, hθn, Units.val_one]
     have hζ1 : ζ ≠ 1 := by
       intro h1
       apply hgk
@@ -190,19 +211,23 @@ theorem UpperTheory.V.Chr.kerFin :
       rw [H0U, mem_riemannRochSpace_iff_regularAt_everywhere] at hm
       have h1 := hm ⟨g, hg⟩
       rw [MonoidHom.comp_apply, Subgroup.coe_subtype, hact] at h1
-      rw [LinearMap.mem_ker, LinearMap.smul_apply, LinearMap.id_apply, sub_smul, one_smul, hζdef, h1, sub_self]
+      rw [LinearMap.mem_ker, LinearMap.smul_apply, LinearMap.id_apply, sub_smul, one_smul, hζdef,
+        h1, sub_self]
     have hbound : Module.length O (H0U (twist₂ l θ) U) ≤ (n.factorization l : ℕ∞) * eO l O := by
-      refine (Module.length_le_of_injective (Submodule.inclusion hsub) (Submodule.inclusion_injective hsub)).trans ?_
+      refine (Module.length_le_of_injective (Submodule.inclusion hsub)
+        (Submodule.inclusion_injective hsub)).trans ?_
       rw [(qoFacts l O).2.2.2]
       exact hζ ζ hζn hζ1
     obtain ⟨T, hTU, hTcard, hTcl⟩ := exists_doubleCoset_section U' U h0
-    have key := kerResAb O G (QO l O) (twist₂ l θ) hc (qoFacts l O).1
-      (fun g => ⟨(θ g : O), fun m => hact g m⟩) U' U h hcomm T hTU
-      (hTcl.trans (Subgroup.le_topologicalClosure _))
+    have key :=
+      kerResAb O G (QO l O) (twist₂ l θ) hc (qoFacts l O).1
+        (fun g => ⟨(θ g : O), fun m => hact g m⟩)
+        U' U h hcomm T hTU (hTcl.trans (Subgroup.le_topologicalClosure _))
     refine key.trans ?_
     have hle : T.card ≤ n := hTcard.trans hrel_le
-    calc (T.card : ℕ∞) * Module.length O (H0U (twist₂ l θ) U) ≤ (n : ℕ∞) * ((n.factorization l : ℕ∞) * eO l O) := by
-          gcongr
+    calc
+      (T.card : ℕ∞) * Module.length O (H0U (twist₂ l θ) U)
+        ≤ (n : ℕ∞) * ((n.factorization l : ℕ∞) * eO l O) := by gcongr
       _ = ((n * n.factorization l : ℕ) : ℕ∞) * eO l O := by
-          push_cast
-          rw [mul_assoc]
+        push_cast
+        rw [mul_assoc]

@@ -44,7 +44,8 @@ theorem duality_inequality : DualIneq := by
     rw [hs]
     ring
   have h2 : X ≤ ∑ n ∈ I, ‖b n‖ * ‖w n‖ := by
-    calc X = ‖((X : ℝ) : ℂ)‖ := by rw [Complex.norm_real, Real.norm_of_nonneg hXnn]
+    calc
+      X = ‖((X : ℝ) : ℂ)‖ := by rw [Complex.norm_real, Real.norm_of_nonneg hXnn]
       _ = ‖∑ n ∈ I, b n * w n‖ := by rw [h1]
       _ ≤ ∑ n ∈ I, ‖b n * w n‖ := norm_sum_le _ _
       _ = ∑ n ∈ I, ‖b n‖ * ‖w n‖ := by simp_rw [norm_mul]
@@ -60,8 +61,8 @@ theorem duality_inequality : DualIneq := by
       intro n _
       ring
     rw [e, Complex.norm_conj]
-  have e : ((∑ n ∈ I, ‖w n‖ ^ 2 : ℝ) : ℂ) =
-      ∑ i ∈ S, ∑ j ∈ S, (starRingEnd ℂ) (s i) * s j * G i j := by
+  have e
+      : ((∑ n ∈ I, ‖w n‖ ^ 2 : ℝ) : ℂ) = ∑ i ∈ S, ∑ j ∈ S, (starRingEnd ℂ) (s i) * s j * G i j := by
     conv_rhs => rw [Finset.sum_comm]
     rw [Complex.ofReal_sum]
     simp_rw [hz]
@@ -78,19 +79,21 @@ theorem duality_inequality : DualIneq := by
     ring
   have hle : ∑ n ∈ I, ‖w n‖ ^ 2 ≤ ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ * ‖s j‖ * ‖G i j‖ := by
     have hnn : (0 : ℝ) ≤ ∑ n ∈ I, ‖w n‖ ^ 2 := by positivity
-    calc ∑ n ∈ I, ‖w n‖ ^ 2 = ‖((∑ n ∈ I, ‖w n‖ ^ 2 : ℝ) : ℂ)‖ := by
-          rw [Complex.norm_real, Real.norm_of_nonneg hnn]
+    calc
+      ∑ n ∈ I, ‖w n‖ ^ 2
+        = ‖((∑ n ∈ I, ‖w n‖ ^ 2 : ℝ) : ℂ)‖ := by rw [Complex.norm_real, Real.norm_of_nonneg hnn]
       _ = ‖∑ i ∈ S, ∑ j ∈ S, (starRingEnd ℂ) (s i) * s j * G i j‖ := by rw [e]
       _ ≤ ∑ i ∈ S, ‖∑ j ∈ S, (starRingEnd ℂ) (s i) * s j * G i j‖ := norm_sum_le _ _
       _ ≤ ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ * ‖s j‖ * ‖G i j‖ := by
-          apply Finset.sum_le_sum
-          intro i _
-          refine (norm_sum_le _ _).trans (le_of_eq ?_)
-          apply Finset.sum_congr rfl
-          intro j _
-          rw [norm_mul, norm_mul, Complex.norm_conj]
-  have hsplit : ∑ i ∈ S, ∑ j ∈ S, (‖s i‖ ^ 2 * ‖G i j‖ / 2 + ‖s j‖ ^ 2 * ‖G j i‖ / 2) =
-      ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ ^ 2 * ‖G i j‖ := by
+        apply Finset.sum_le_sum
+        intro i _
+        refine (norm_sum_le _ _).trans (le_of_eq ?_)
+        apply Finset.sum_congr rfl
+        intro j _
+        rw [norm_mul, norm_mul, Complex.norm_conj]
+  have hsplit
+      : ∑ i ∈ S, ∑ j ∈ S, (‖s i‖ ^ 2 * ‖G i j‖ / 2 + ‖s j‖ ^ 2 * ‖G j i‖ / 2)
+        = ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ ^ 2 * ‖G i j‖ := by
     simp only [Finset.sum_add_distrib]
     rw [Finset.sum_comm (f := fun i j => ‖s j‖ ^ 2 * ‖G j i‖ / 2), ← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
@@ -100,30 +103,33 @@ theorem duality_inequality : DualIneq := by
     intro j _
     ring
   have hamgm : ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ * ‖s j‖ * ‖G i j‖ ≤ Δ * X := by
-    calc ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ * ‖s j‖ * ‖G i j‖
-        ≤ ∑ i ∈ S, ∑ j ∈ S, (‖s i‖ ^ 2 * ‖G i j‖ / 2 + ‖s j‖ ^ 2 * ‖G j i‖ / 2) := by
-          apply Finset.sum_le_sum
-          intro i _
-          apply Finset.sum_le_sum
-          intro j _
-          rw [← hGsym i j]
-          have h0 := sq_nonneg (‖s i‖ - ‖s j‖)
-          have hg := norm_nonneg (G i j)
-          nlinarith
+    calc
+      ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ * ‖s j‖ * ‖G i j‖
+          ≤ ∑ i ∈ S, ∑ j ∈ S, (‖s i‖ ^ 2 * ‖G i j‖ / 2 + ‖s j‖ ^ 2 * ‖G j i‖ / 2) := by
+        apply Finset.sum_le_sum
+        intro i _
+        apply Finset.sum_le_sum
+        intro j _
+        rw [← hGsym i j]
+        have h0 := sq_nonneg (‖s i‖ - ‖s j‖)
+        have hg := norm_nonneg (G i j)
+        nlinarith
       _ = ∑ i ∈ S, ∑ j ∈ S, ‖s i‖ ^ 2 * ‖G i j‖ := hsplit
       _ = ∑ i ∈ S, ‖s i‖ ^ 2 * ∑ j ∈ S, ‖G i j‖ := by simp_rw [Finset.mul_sum]
       _ ≤ ∑ i ∈ S, ‖s i‖ ^ 2 * Δ := by
-          apply Finset.sum_le_sum
-          intro i hi
-          exact mul_le_mul_of_nonneg_left (hrow i hi) (sq_nonneg _)
+        apply Finset.sum_le_sum
+        intro i hi
+        exact mul_le_mul_of_nonneg_left (hrow i hi) (sq_nonneg _)
       _ = Δ * X := by rw [hX, Finset.mul_sum]; simp_rw [mul_comm]
   have hXsq : X ^ 2 ≤ B * (Δ * X) := by
     have hY : 0 ≤ ∑ n ∈ I, ‖b n‖ * ‖w n‖ := by positivity
-    calc X ^ 2 ≤ (∑ n ∈ I, ‖b n‖ * ‖w n‖) ^ 2 := by nlinarith
+    calc
+      X ^ 2
+        ≤ (∑ n ∈ I, ‖b n‖ * ‖w n‖) ^ 2 := by nlinarith
       _ ≤ (∑ n ∈ I, ‖b n‖ ^ 2) * ∑ n ∈ I, ‖w n‖ ^ 2 := h3
       _ ≤ B * (Δ * X) := by
-          rw [← hB]
-          exact mul_le_mul_of_nonneg_left (hle.trans hamgm) hBnn
+        rw [← hB]
+        exact mul_le_mul_of_nonneg_left (hle.trans hamgm) hBnn
   rcases hXnn.eq_or_lt with h0 | hpos
   · rw [← h0]
     positivity

@@ -18,19 +18,23 @@ set_option maxHeartbeats 1000000
 
 namespace GlobalTheory
 
-theorem residueField_isSeparable_of_kummer_root (T V : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [CommRing V] [IsDomain V]
+theorem residueField_isSeparable_of_kummer_root
+    (T V : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [CommRing V] [IsDomain V]
     [IsDiscreteValuationRing V] [Algebra T V] [IsLocalHom (algebraMap T V)]
     (hinj : Function.Injective (algebraMap T V))
-    (α : V) (ϖ u : T) (m k : ℕ) (hϖ : Irreducible ϖ) (hu : IsUnit u) (hk : IsUnit (k : T)) (hk0 : 0 < k) (hm0 : 0 < m)
-    (hα : α ^ (m * k) = algebraMap T V (u * ϖ ^ k))
-    (hgen : ∀ v : V, ∃ f g : Polynomial T, Polynomial.aeval α g ≠ 0 ∧ Polynomial.aeval α g * v = Polynomial.aeval α f) :
-    Algebra.IsSeparable (IsLocalRing.ResidueField T) (IsLocalRing.ResidueField V) := by
-  obtain ⟨γ, hγu, hαγ, hγk⟩ := GlobalTheory.T.dvr_exists_unit_pow_eq_mul_uniformizer T V hinj α ϖ u m k hϖ hu hk0 hα
+    (α : V) (ϖ u : T) (m k : ℕ) (hϖ : Irreducible ϖ) (hu : IsUnit u) (hk : IsUnit (k : T))
+    (hk0 : 0 < k) (hm0 : 0 < m) (hα : α ^ (m * k) = algebraMap T V (u * ϖ ^ k))
+    (hgen : ∀ v : V, ∃ f g : Polynomial T,
+      Polynomial.aeval α g ≠ 0 ∧ Polynomial.aeval α g * v = Polynomial.aeval α f)
+    : Algebra.IsSeparable (IsLocalRing.ResidueField T) (IsLocalRing.ResidueField V) := by
+  obtain ⟨γ, hγu, hαγ, hγk⟩ :=
+    GlobalTheory.T.dvr_exists_unit_pow_eq_mul_uniformizer T V hinj α ϖ u m k hϖ hu hk0 hα
   have hK := GlobalTheory.T.kummer_aeval_valuation_dvr T V hinj γ ϖ u k hϖ hu hk hk0 hγk
   have hres := GlobalTheory.T.kummer_residue_mem_adjoin_unit T V hinj α γ ϖ m hϖ hm0 hγu hαγ hK hgen
   set g := IsLocalRing.residue V γ
   have hsepg : IsSeparable (IsLocalRing.ResidueField T) g := by
-    have hroot : Polynomial.aeval g (Polynomial.X ^ k - Polynomial.C (IsLocalRing.residue T u)) = 0 := by
+    have hroot
+        : Polynomial.aeval g (Polynomial.X ^ k - Polynomial.C (IsLocalRing.residue T u)) = 0 := by
       simp only [map_sub, map_pow, Polynomial.aeval_X, Polynomial.aeval_C, g]
       rw [← map_pow, hγk]
       rw [sub_eq_zero]
@@ -49,8 +53,9 @@ theorem residueField_isSeparable_of_kummer_root (T V : Type) [CommRing T] [IsDom
   have hS := (IntermediateField.isSeparable_adjoin_simple_iff_isSeparable _ _).2 hsepg
   refine ⟨fun x => ?_⟩
   have hx : x ∈ IntermediateField.adjoin (IsLocalRing.ResidueField T) {g} := by rw [htop]; trivial
-  have h := Algebra.IsSeparable.isSeparable (IsLocalRing.ResidueField T)
-    (⟨x, hx⟩ : IntermediateField.adjoin (IsLocalRing.ResidueField T) {g})
+  have h :=
+    Algebra.IsSeparable.isSeparable (IsLocalRing.ResidueField T)
+      (⟨x, hx⟩ : IntermediateField.adjoin (IsLocalRing.ResidueField T) {g})
   unfold IsSeparable at h ⊢
   rwa [IntermediateField.minpoly_eq] at h
 end GlobalTheory

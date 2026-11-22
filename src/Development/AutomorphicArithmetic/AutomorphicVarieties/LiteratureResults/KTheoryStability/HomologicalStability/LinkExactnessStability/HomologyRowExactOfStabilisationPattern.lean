@@ -9,24 +9,31 @@ open CategoryTheory CategoryTheory.Limits GlobalTheory.HomStab
 
 namespace GlobalTheory.HomStab.Row
 
-theorem hMap_zero' {k G : Type} [CommRing k] [Group G] (A B : Rep k G) (n : ℕ) :
-    hMap (0 : A ⟶ B) n = 0 := by
+theorem hMap_zero' {k G : Type} [CommRing k] [Group G] (A B : Rep k G) (n : ℕ)
+    : hMap (0 : A ⟶ B) n = 0 := by
   simp [hMap, groupHomology.map]
 
-theorem main : ∀ (k G : Type) [CommRing k] [Group G] (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p),
-    (∀ p, d (p + 1) ≫ d p = 0) → ∀ (M : ℕ → ℕ → ModuleCat.{0} k)
-    (e : ∀ p q, M p q ⟶ groupHomology (C p) q) (s : ∀ p q, M (p + 1) q ⟶ M p q) (T : ℕ),
-    (∀ p q, p ≤ T → IsIso (e p q)) →
-    (∀ p q, p + 1 ≤ T → e (p + 1) q ≫ hMap (d p) q = if Even p then s p q ≫ e p q else 0) →
-    ∀ p q, p + 2 ≤ T → (Even p → Function.Injective (s p q).hom) →
-    (Odd p → Function.Surjective (s (p + 1) q).hom) →
-    Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom := by
+theorem main
+    : ∀ (k G : Type) [CommRing k] [Group G] (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p),
+      (∀ p, d (p + 1) ≫ d p = 0)
+        → ∀ (M : ℕ → ℕ → ModuleCat.{0} k) (e : ∀ p q, M p q ⟶ groupHomology (C p) q)
+            (s : ∀ p q, M (p + 1) q ⟶ M p q) (T : ℕ),
+          (∀ p q, p ≤ T → IsIso (e p q))
+            → (∀ p q, p + 1 ≤ T → e (p + 1) q ≫ hMap (d p) q = if Even p then s p q ≫ e p q else 0)
+            → ∀ p q,
+              p + 2 ≤ T → (Even p → Function.Injective (s p q).hom)
+                → (Odd p → Function.Surjective (s (p + 1) q).hom)
+                → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom := by
   intro k G _ _ C d hd M e s T hiso hrel p q hp hinj hsurj
   have bij : ∀ p q, p ≤ T → Function.Bijective (e p q).hom := fun p q h =>
     (ConcreteCategory.isIso_iff_bijective (e p q)).1 (hiso p q h)
-  have rel : ∀ p q, p + 1 ≤ T → ∀ m, (hMap (d p) q).hom ((e (p + 1) q).hom m) =
-      (if Even p then s p q ≫ e p q else 0).hom m :=
-    fun p q h m => congrArg (fun f => ModuleCat.Hom.hom f m) (hrel p q h)
+  have rel
+      : ∀ p q,
+        p + 1 ≤ T
+          → ∀ m,
+            (hMap (d p) q).hom ((e (p + 1) q).hom m)
+              = (if Even p then s p q ≫ e p q else 0).hom m := fun p q h m =>
+    congrArg (fun f => ModuleCat.Hom.hom f m) (hrel p q h)
   intro y
   obtain ⟨m, rfl⟩ := (bij (p + 1) q (by omega)).2 y
   rcases Nat.even_or_odd p with hev | hod
@@ -69,8 +76,16 @@ end GlobalTheory.HomStab.Row
 
 section
 open CategoryTheory CategoryTheory.Limits GlobalTheory.HomStab
-theorem _root_.GlobalTheory.T.homology_row_exact_of_stabilisation_pattern : ∀ (k G : Type) [CommRing k] [Group G] (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p), (∀ p, d (p + 1) ≫ d p = 0) → ∀ (M : ℕ → ℕ → ModuleCat.{0} k) (e : ∀ p q, M p q ⟶ groupHomology (C p) q) (s : ∀ p q, M (p + 1) q ⟶ M p q) (T : ℕ), (∀ p q, p ≤ T → IsIso (e p q)) → (∀ p q, p + 1 ≤ T → e (p + 1) q ≫ hMap (d p) q = if Even p then s p q ≫ e p q else 0) → ∀ p q, p + 2 ≤ T → (Even p → Function.Injective (s p q).hom) → (Odd p → Function.Surjective (s (p + 1) q).hom) → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom := by
-  first
-  | exact @GlobalTheory.HomStab.Row.main
-  | exact @GlobalTheory.HomStab.Row.hMap_zero'
+theorem _root_.GlobalTheory.T.homology_row_exact_of_stabilisation_pattern
+    : ∀ (k G : Type) [CommRing k] [Group G] (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p),
+      (∀ p, d (p + 1) ≫ d p = 0)
+        → ∀ (M : ℕ → ℕ → ModuleCat.{0} k) (e : ∀ p q, M p q ⟶ groupHomology (C p) q)
+            (s : ∀ p q, M (p + 1) q ⟶ M p q) (T : ℕ),
+          (∀ p q, p ≤ T → IsIso (e p q))
+            → (∀ p q, p + 1 ≤ T → e (p + 1) q ≫ hMap (d p) q = if Even p then s p q ≫ e p q else 0)
+            → ∀ p q,
+              p + 2 ≤ T → (Even p → Function.Injective (s p q).hom)
+                → (Odd p → Function.Surjective (s (p + 1) q).hom)
+                → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom := by
+  first | exact @GlobalTheory.HomStab.Row.main | exact @GlobalTheory.HomStab.Row.hMap_zero'
 end

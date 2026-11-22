@@ -15,26 +15,32 @@ noncomputable section
 
 universe u
 
-theorem homLocRing_form_not_mem {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-    {R : Type u} [CommRing R] {W : Ideal (MRing ι R)} (hW : W.IsPrime) (hrel : IsRelevant W)
-    (c : K → ℕ) : ∃ g : MRing ι R, IsMultiHomog g c ∧ g ∉ W := by
+theorem homLocRing_form_not_mem
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} {R : Type u} [CommRing R]
+    {W : Ideal (MRing ι R)} (hW : W.IsPrime) (hrel : IsRelevant W)
+    (c : K → ℕ)
+    : ∃ g : MRing ι R, IsMultiHomog g c ∧ g ∉ W := by
   choose i hi using hrel
   refine ⟨∏ k, X ⟨k, i k⟩ ^ c k, ?_, ?_⟩
   · have hc : c = ∑ k, c k • blockWeight ι ⟨k, i k⟩ := by
       funext j
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
-    have h := IsWeightedHomogeneous.prod Finset.univ (fun k => (X ⟨k, i k⟩ : MRing ι R) ^ c k)
-      (fun k => c k • blockWeight ι ⟨k, i k⟩)
-      fun k _ => (isWeightedHomogeneous_X R (blockWeight ι) _).pow _
+    have h :=
+      IsWeightedHomogeneous.prod Finset.univ
+        (fun k => (X ⟨k, i k⟩ : MRing ι R) ^ c k)
+        (fun k => c k • blockWeight ι ⟨k, i k⟩)
+        fun k _ => (isWeightedHomogeneous_X R (blockWeight ι) _).pow _
     rw [← hc] at h
     exact h
   · intro h
     obtain ⟨k, -, hk⟩ := (Ideal.IsPrime.prod_mem_iff (hp := hW)).mp h
     exact hi k (hW.mem_of_pow_mem _ hk)
 
-theorem HomLocRingLocal.proof (hloc : HomLocRingIsLocal.Statement.{u})
-    (hnoeth : HomLocRingNoetherian.Statement.{u}) (hdim : HomLocRingDimLe.Statement.{u}) :
-    HomLocRingLocal.Statement.{u} := by
+theorem HomLocRingLocal.proof
+    (hloc : HomLocRingIsLocal.Statement.{u}) (hnoeth : HomLocRingNoetherian.Statement.{u})
+    (hdim : HomLocRingDimLe.Statement.{u})
+    : HomLocRingLocal.Statement.{u} := by
   intro O _ _ _ K _ _ ι _ P hP c x hx hxP W hW hWrel
   have := hP.isPrime
   have hWp : W.IsPrime := hW.1.1
@@ -47,17 +53,18 @@ theorem HomLocRingLocal.proof (hloc : HomLocRingIsLocal.Statement.{u})
     have h1 := Ideal.map_height_le_one_of_mem_minimalPrimes hW
     exact_mod_cast h1
   · obtain ⟨g, hg, hgW⟩ := homLocRing_form_not_mem hWp hWrel c
-    have hz : algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P x) /
-        algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P g) ∈
-          homLocRing P W :=
+    have hz
+        : algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P x)
+            / algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P g)
+          ∈ homLocRing P W :=
       Subring.subset_closure ⟨c, x, g, hx, hg, hgW, rfl⟩
-    have hnu : ¬ IsUnit (⟨_, hz⟩ : homLocRing P W) :=
-      fun h => (hunit c x g hx hg hgW hz).mp h hxW
+    have hnu : ¬ IsUnit (⟨_, hz⟩ : homLocRing P W) := fun h => (hunit c x g hx hg hgW hz).mp h hxW
     have hne : (⟨_, hz⟩ : homLocRing P W) ≠ 0 := by
       intro h0
       have h1 := congrArg Subtype.val h0
-      simp only [ZeroMemClass.coe_zero, div_eq_zero_iff,
-        IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at h1
+      simp only [ZeroMemClass.coe_zero, div_eq_zero_iff, IsFractionRing.to_map_eq_zero_iff,
+          Ideal.Quotient.eq_zero_iff_mem]
+        at h1
       rcases h1 with h1 | h1
       · exact hxP h1
       · exact hgW (hPW h1)

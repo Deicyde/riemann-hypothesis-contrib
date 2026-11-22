@@ -8,8 +8,14 @@ noncomputable section
 
 namespace LateralTheory.CohomologicalPurity.Hz
 
-theorem good_iso (A S : Type) [CommRing A] [CommRing S] (e : A ≃+* S) (I : Ideal A) : Good (e : A →+* S) I := by
-  refine ⟨RingHom.Etale.of_bijective e.bijective, ⟨(Ideal.Quotient.mk I).comp (e.symm : S →+* A), ?_⟩, fun s => ⟨e.symm s, ?_⟩, ?_⟩
+theorem good_iso (A S : Type) [CommRing A] [CommRing S] (e : A ≃+* S) (I : Ideal A)
+    : Good (e : A →+* S) I := by
+  refine ⟨
+    RingHom.Etale.of_bijective e.bijective,
+    ⟨(Ideal.Quotient.mk I).comp (e.symm : S →+* A), ?_⟩,
+    fun s => ⟨e.symm s, ?_⟩,
+    ?_
+  ⟩
   · ext a; simp
   · simp
   · intro B _ J _ ψ _
@@ -19,8 +25,10 @@ theorem good_iso (A S : Type) [CommRing A] [CommRing S] (e : A ≃+* S) (I : Ide
       have := congrArg (fun f : A →+* B => f (e.symm s)) hχ
       simpa using this
 
-theorem good_comp (A S T : Type) [CommRing A] [CommRing S] [CommRing T] (φ : A →+* S) (ψ : S →+* T) (I : Ideal A)
-    (h1 : Good φ I) (h2 : Good ψ (I.map φ)) : Good (ψ.comp φ) I := by
+theorem good_comp
+    (A S T : Type) [CommRing A] [CommRing S] [CommRing T]
+    (φ : A →+* S) (ψ : S →+* T) (I : Ideal A) (h1 : Good φ I) (h2 : Good ψ (I.map φ))
+    : Good (ψ.comp φ) I := by
   obtain ⟨r1, hr1⟩ := h1.retr
   obtain ⟨r2, hr2⟩ := h2.retr
   have hk : I.map φ ≤ RingHom.ker r1 := by
@@ -29,10 +37,15 @@ theorem good_comp (A S T : Type) [CommRing A] [CommRing S] [CommRing T] (φ : A 
     change (r1.comp φ) a = 0
     rw [hr1]
     exact Ideal.Quotient.eq_zero_iff_mem.2 ha
-  refine ⟨RingHom.Etale.stableUnderComposition φ ψ h1.etale h2.etale,
-    ⟨(Ideal.Quotient.lift (I.map φ) r1 (fun a ha => hk ha)).comp r2, ?_⟩, fun t => ?_, ?_⟩
+  refine ⟨
+    RingHom.Etale.stableUnderComposition φ ψ h1.etale h2.etale,
+    ⟨(Ideal.Quotient.lift (I.map φ) r1 (fun a ha => hk ha)).comp r2, ?_⟩,
+    fun t => ?_,
+    ?_
+  ⟩
   · ext a
-    have e2 : r2 (ψ (φ a)) = Ideal.Quotient.mk (I.map φ) (φ a) := congrArg (fun f : S →+* S ⧸ I.map φ => f (φ a)) hr2
+    have e2 : r2 (ψ (φ a)) = Ideal.Quotient.mk (I.map φ) (φ a) :=
+      congrArg (fun f : S →+* S ⧸ I.map φ => f (φ a)) hr2
     simp only [RingHom.comp_apply, e2, Ideal.Quotient.lift_mk]
     exact congrArg (fun f : A →+* A ⧸ I => f a) hr1
   · obtain ⟨s, hs⟩ := h2.surj t

@@ -10,20 +10,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem valuation_lt_one_iff_eq_zero_or_inv_notMem {L : Type} [Field L] (B : ValuationSubring L) (x : L) :
-    B.valuation x < 1 ↔ x = 0 ∨ x⁻¹ ∉ B := by
+private theorem valuation_lt_one_iff_eq_zero_or_inv_notMem
+    {L : Type} [Field L] (B : ValuationSubring L) (x : L)
+    : B.valuation x < 1 ↔ x = 0 ∨ x⁻¹ ∉ B := by
   by_cases hx : x = 0
   · simp [hx]
   · have h0 : B.valuation x ≠ 0 := by simpa using hx
     rw [← B.valuation_le_one_iff, map_inv₀, not_le, one_lt_inv₀ (zero_lt_iff.mpr h0)]
     simp [hx]
 
-private theorem conjGal_mem_decompositionSubgroup_comap {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {τ : K ≃+* K}
-    {σ : Ω ≃+* Ω} (h : IsLift τ σ) (A : ValuationSubring Ω) (g : G K Ω)
-    (hg : g ∈ ValuationSubring.decompositionSubgroup K A) :
-    conjGal h g ∈ ValuationSubring.decompositionSubgroup K (A.comap (σ : Ω →+* Ω)) := by
+private theorem conjGal_mem_decompositionSubgroup_comap
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {τ : K ≃+* K} {σ : Ω ≃+* Ω} (h : IsLift τ σ)
+    (A : ValuationSubring Ω) (g : G K Ω) (hg : g ∈ ValuationSubring.decompositionSubgroup K A)
+    : conjGal h g ∈ ValuationSubring.decompositionSubgroup K (A.comap (σ : Ω →+* Ω)) := by
   open scoped Pointwise in
   rw [ValuationSubring.decompositionSubgroup, MulAction.mem_stabilizer_iff] at hg ⊢
   open scoped Pointwise in
@@ -35,28 +39,35 @@ private theorem conjGal_mem_decompositionSubgroup_comap {K Ω : Type} [Field K] 
   open scoped Pointwise in
   rw [← AlgEquiv.smul_def, ← ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, hg]
 
-private theorem valuation_comap_le_one_iff {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (σ : Ω ≃+* Ω) (x : Ω) :
-    (A.comap (σ : Ω →+* Ω)).valuation x ≤ 1 ↔ A.valuation (σ x) ≤ 1 := by
+private theorem valuation_comap_le_one_iff
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (σ : Ω ≃+* Ω) (x : Ω)
+    : (A.comap (σ : Ω →+* Ω)).valuation x ≤ 1 ↔ A.valuation (σ x) ≤ 1 := by
   rw [ValuationSubring.valuation_le_one_iff, ValuationSubring.valuation_le_one_iff,
     ValuationSubring.mem_comap]
   rfl
 
-private theorem valuation_comap_lt_one_iff {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (σ : Ω ≃+* Ω) (x : Ω) :
-    (A.comap (σ : Ω →+* Ω)).valuation x < 1 ↔ A.valuation (σ x) < 1 := by
-  rw [valuation_lt_one_iff_eq_zero_or_inv_notMem, valuation_lt_one_iff_eq_zero_or_inv_notMem, ValuationSubring.mem_comap]
+private theorem valuation_comap_lt_one_iff
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (σ : Ω ≃+* Ω) (x : Ω)
+    : (A.comap (σ : Ω →+* Ω)).valuation x < 1 ↔ A.valuation (σ x) < 1 := by
+  rw [valuation_lt_one_iff_eq_zero_or_inv_notMem, valuation_lt_one_iff_eq_zero_or_inv_notMem,
+    ValuationSubring.mem_comap]
   simp [map_inv₀]
 
-private theorem isFrob_comap_conjGal {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {τ : K ≃+* K}
-    {σ : Ω ≃+* Ω} (h : IsLift τ σ) (A : ValuationSubring Ω) (q : ℕ) (g : G K Ω)
-    (hg : IsFrob A q g) : IsFrob (A.comap (σ : Ω →+* Ω)) q (conjGal h g) := by
+private theorem isFrob_comap_conjGal
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {τ : K ≃+* K} {σ : Ω ≃+* Ω} (h : IsLift τ σ)
+    (A : ValuationSubring Ω) (q : ℕ) (g : G K Ω) (hg : IsFrob A q g)
+    : IsFrob (A.comap (σ : Ω →+* Ω)) q (conjGal h g) := by
   refine ⟨conjGal_mem_decompositionSubgroup_comap h A g hg.1, fun x hx => ?_⟩
   rw [valuation_comap_le_one_iff] at hx
   rw [valuation_comap_lt_one_iff, map_sub, map_pow, conjGal_apply, RingEquiv.apply_symm_apply]
   exact hg.2 (σ x) hx
 
-private theorem conjGal_mem_ine_comap {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
-    {τ : K ≃+* K} {σ : Ω ≃+* Ω} (h : IsLift τ σ) (A : ValuationSubring Ω) (g : G K Ω)
-    (hg : g ∈ Ine A) : conjGal h g ∈ Ine (A.comap (σ : Ω →+* Ω)) := by
+private theorem conjGal_mem_ine_comap
+    {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
+    {τ : K ≃+* K} {σ : Ω ≃+* Ω} (h : IsLift τ σ)
+    (A : ValuationSubring Ω) (g : G K Ω) (hg : g ∈ Ine A)
+    : conjGal h g ∈ Ine (A.comap (σ : Ω →+* Ω)) := by
   have hg' : g ∈ Inertia A := hg
   show conjGal h g ∈ Inertia (A.comap (σ : Ω →+* Ω))
   refine ⟨conjGal_mem_decompositionSubgroup_comap h A g hg'.1, fun x hx => ?_⟩
@@ -64,8 +75,10 @@ private theorem conjGal_mem_ine_comap {K Ω : Type} [Field K] [NumberField K] [F
   rw [valuation_comap_lt_one_iff, map_sub, conjGal_apply, RingEquiv.apply_symm_apply]
   exact hg'.2 (σ x) hx
 
-theorem UpperTheory.V.Kum.artConj :
-    ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (τ : K ≃+* K) (σ : Ω ≃+* Ω) (h : IsLift τ σ) (g : G K Ω), artCl K Ω g = clMap τ (artCl K Ω (conjGal h g)) := by
+theorem UpperTheory.V.Kum.artConj
+    : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
+        (τ : K ≃+* K) (σ : Ω ≃+* Ω) (h : IsLift τ σ) (g : G K Ω),
+      artCl K Ω g = clMap τ (artCl K Ω (conjGal h g)) := by
   intro K Ω _ _ _ _ _ τ σ h g
   set ψ : G K Ω →* ClassGroup (𝓞 K) := (clMap τ).comp ((artCl K Ω).comp (conjGal h)) with hψ
   have hker : (artCl K Ω).ker ≤ ψ.ker := by
@@ -101,8 +114,8 @@ theorem UpperTheory.V.Kum.artConj :
       rw [clSub] at hu
       rw [hu]
       exact Subgroup.mem_top c
-    refine Subgroup.closure_induction (p := fun c _ => ∃ x, artCl K Ω x = c ∧ ψ x = c)
-      ?_ ?_ ?_ ?_ hc
+    refine
+      Subgroup.closure_induction (p := fun c _ => ∃ x, artCl K Ω x = c ∧ ψ x = c) ?_ ?_ ?_ ?_ hc
     · rintro _ ⟨v, -, rfl⟩
       obtain ⟨A, hA⟩ := exists_isPlaceOver Ω v
       obtain ⟨f, hf⟩ := exists_isFrob hA

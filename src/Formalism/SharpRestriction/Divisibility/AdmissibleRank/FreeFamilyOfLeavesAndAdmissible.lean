@@ -54,8 +54,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH MeasureTheory
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem hkSigPar_lt (D : D7) (τ : D.what₂.Tau) (i : ℕ) (hi : i + 1 < D.R.k - 1 + D.R.m) :
-    DV.sigPar D τ (i + 1) < DV.sigPar D τ i := by
+theorem hkSigPar_lt (D : D7) (τ : D.what₂.Tau) (i : ℕ) (hi : i + 1 < D.R.k - 1 + D.R.m)
+    : DV.sigPar D τ (i + 1) < DV.sigPar D τ i := by
   have hk := D.R.m_add_three_le_k
   have hm := D.R.two_le_m
   unfold DV.sigPar
@@ -94,8 +94,8 @@ theorem hkSigPar_lt (D : D7) (τ : D.what₂.Tau) (i : ℕ) (hi : i + 1 < D.R.k 
       have ht : (0 : ℚ) ≤ D.R.t := Nat.cast_nonneg _
       linarith
 
-theorem aPlusQ_step (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) (hi : i + 1 < D.R.k - 1 + D.R.m) :
-    DV.aPlusQ D j τ (i + 1) ≤ DV.aPlusQ D j τ i := by
+theorem aPlusQ_step (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) (hi : i + 1 < D.R.k - 1 + D.R.m)
+    : DV.aPlusQ D j τ (i + 1) ≤ DV.aPlusQ D j τ i := by
   obtain ⟨a, ha⟩ := DV.sigPar_int D τ i
   obtain ⟨b, hb⟩ := DV.sigPar_int D τ (i + 1)
   have h := hkSigPar_lt D τ i hi
@@ -106,8 +106,8 @@ theorem aPlusQ_step (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) (hi : i + 
   push_cast
   linarith
 
-theorem aMinusQ_step (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c : ℕ) (hc : j + c + 1 < D.R.m) :
-    DV.aMinusQ D j τ c ≤ DV.aMinusQ D j τ (c + 1) := by
+theorem aMinusQ_step (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c : ℕ) (hc : j + c + 1 < D.R.m)
+    : DV.aMinusQ D j τ c ≤ DV.aMinusQ D j τ (c + 1) := by
   have h0 : j + c < D.R.m := by omega
   have h1 : j + (c + 1) < D.R.m := by omega
   unfold DV.aMinusQ
@@ -122,8 +122,9 @@ theorem aMinusQ_step (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c : ℕ) (hc : j +
   push_cast
   linarith
 
-theorem aMinusQ_mono (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c c' : ℕ) (h : c ≤ c') (hc' : j + c' < D.R.m) :
-    DV.aMinusQ D j τ c ≤ DV.aMinusQ D j τ c' := by
+theorem aMinusQ_mono
+    (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c c' : ℕ) (h : c ≤ c') (hc' : j + c' < D.R.m)
+    : DV.aMinusQ D j τ c ≤ DV.aMinusQ D j τ c' := by
   induction c', h using Nat.le_induction with
   | base => exact le_rfl
   | succ n hn ih => exact (ih (by omega)).trans (aMinusQ_step D j τ n (by omega))

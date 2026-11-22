@@ -18,11 +18,12 @@ private theorem red_surj {p : ℕ} [Fact p.Prime] {g : ℕ} (n : Nb p g) : ∃ t
   refine ⟨fun i => ((n i).val : ℤ_[p]), funext fun i => ?_⟩
   simp [red]
 
-private theorem red_mulVec {p : ℕ} [Fact p.Prime] {g : ℕ} (M : Matrix (Ix g) (Ix g) ℤ_[p])
-    (t : TT p g) : red p g (M *ᵥ t) = M.map PadicInt.toZMod *ᵥ red p g t := by
+private theorem red_mulVec
+    {p : ℕ} [Fact p.Prime] {g : ℕ} (M : Matrix (Ix g) (Ix g) ℤ_[p]) (t : TT p g)
+    : red p g (M *ᵥ t) = M.map PadicInt.toZMod *ᵥ red p g t := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [red, Matrix.mulVec, dotProduct, map_sum, map_mul]
+  simp [red, Matrix.mulVec, dotProduct, map_sum, map_mul]
 
 theorem restrict_hopfOrder_length : RestrictedHopfOrderStatement := by
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hS H a ha r Bw hrange hkerB d hd
@@ -88,20 +89,24 @@ theorem restrict_hopfOrder_length : RestrictedHopfOrderStatement := by
     apply Matrix.toLin'.injective
     rw [Matrix.toLin'_mul, Matrix.toLin'_toMatrix', Matrix.toLin'_toMatrix', Matrix.toLin'_one]
     refine LinearMap.ext fun y => ?_
-    have hz : (H.ρL a).mulVecLin.rangeRestrict ((e.symm y : LinearMap.range (H.ρL a).mulVecLin) : Fin g → R) =
-        e.symm y := by
+    have hz
+        : (H.ρL a).mulVecLin.rangeRestrict
+            ((e.symm y : LinearMap.range (H.ρL a).mulVecLin) : Fin g → R)
+          = e.symm y := by
       apply Subtype.ext
       obtain ⟨w, hw⟩ := (e.symm y).2
       show H.ρL a *ᵥ ((e.symm y : LinearMap.range (H.ρL a).mulVecLin) : Fin g → R) = e.symm y
       rw [← hw]
       show H.ρL a *ᵥ (H.ρL a *ᵥ w) = H.ρL a *ᵥ w
       rw [Matrix.mulVec_mulVec, hEE]
-    simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, Submodule.subtype_apply, LinearMap.id_apply]
+    simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, Submodule.subtype_apply,
+      LinearMap.id_apply]
     rw [hz, LinearEquiv.apply_symm_apply]
   have hF : Q2ᵀ * Q1ᵀ = (H.ρL a)ᵀ := by rw [← Matrix.transpose_mul, hQ12]
   have h21 : Q1ᵀ * Q2ᵀ = 1 := by rw [← Matrix.transpose_mul, hQ21, Matrix.transpose_one]
-  obtain ⟨eO⟩ := omega_pull p ψ χ hχψ H.AA.carrier hA H.φ H.cotangent_surjective H.cotangent_ker_eq (H.ρL a)ᵀ Q2ᵀ Q1ᵀ hF h21
-    (fun f f' l hff hl => H.cotangent_linear a f f' l (fun t => by rw [hff, hred]) hl)
+  obtain ⟨eO⟩ :=
+    omega_pull p ψ χ hχψ H.AA.carrier hA H.φ H.cotangent_surjective H.cotangent_ker_eq (H.ρL a)ᵀ Q2ᵀ
+      Q1ᵀ hF h21 (fun f f' l hff hl => H.cotangent_linear a f f' l (fun t => by rw [hff, hred]) hl)
   refine ⟨pullHopf ψ H.AA (isLat_pull v hS.integers ψ hinj H.AA), pullHopf_carrier _ _ _, ?_⟩
   rw [pullHopf_carrier]
   exact ⟨d, fun _ => (p : R), ⟨eO.trans (qPi p d)⟩, by simp [Finset.prod_const]⟩

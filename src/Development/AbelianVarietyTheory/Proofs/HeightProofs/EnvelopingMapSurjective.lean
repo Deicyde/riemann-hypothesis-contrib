@@ -5,18 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.DenomBound
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.SmoothForms Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.SmoothForms Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance 100] LieRing.ofAssociativeRing
 
 namespace GlobalTheory.EnvWords
 
-theorem mem_span_words (L : Type) [LieRing L] [LieAlgebra ℝ L] (u : UniversalEnvelopingAlgebra ℂ (ℂ ⊗[ℝ] L)) :
-    u ∈ Submodule.span ℂ (Set.range fun l : List L =>
-      (l.map fun X => UniversalEnvelopingAlgebra.ι ℂ ((1 : ℂ) ⊗ₜ[ℝ] X)).prod) := by
-  have hs : Function.Surjective (UniversalEnvelopingAlgebra.mkAlgHom ℂ (ℂ ⊗[ℝ] L)) :=
-    fun u => Quotient.exists_rep u
+theorem mem_span_words
+    (L : Type) [LieRing L] [LieAlgebra ℝ L] (u : UniversalEnvelopingAlgebra ℂ (ℂ ⊗[ℝ] L))
+    : u ∈ Submodule.span ℂ
+      (Set.range fun l : List L =>
+        (l.map fun X => UniversalEnvelopingAlgebra.ι ℂ ((1 : ℂ) ⊗ₜ[ℝ] X)).prod) := by
+  have hs : Function.Surjective (UniversalEnvelopingAlgebra.mkAlgHom ℂ (ℂ ⊗[ℝ] L)) := fun u =>
+    Quotient.exists_rep u
   obtain ⟨t, rfl⟩ := hs u
   induction t using TensorAlgebra.induction with
   | algebraMap r =>
@@ -41,9 +45,13 @@ theorem mem_span_words (L : Type) [LieRing L] [LieAlgebra ℝ L] (u : UniversalE
     exact ⟨l ++ m, by simp only [List.map_append, List.prod_append]⟩
   | add a b ha hb => rw [map_add (f := _)]; exact Submodule.add_mem _ ha hb
 
-theorem envOf_surjective : ∀ (D : D7) (V : HSp D) (τ : D.what₂.Tau),
-    Function.Surjective (GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies.envOf V τ) := by
+theorem envOf_surjective
+    : ∀ (D : D7) (V : HSp D) (τ : D.what₂.Tau),
+      Function.Surjective
+        (GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies.envOf V τ) := by
   intro D V τ u
-  exact (Finsupp.mem_span_range_iff_exists_finsupp).1 (mem_span_words (GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies.LieAt V τ) u)
+  exact (Finsupp.mem_span_range_iff_exists_finsupp).1
+    (mem_span_words
+      (GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies.LieAt V τ) u)
 
 end GlobalTheory.EnvWords

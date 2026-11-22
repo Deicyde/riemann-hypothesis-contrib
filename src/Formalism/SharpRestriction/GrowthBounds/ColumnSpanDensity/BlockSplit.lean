@@ -13,18 +13,18 @@ variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 private noncomputable def bspZ (n : ℕ) (z : O) : Submodule O (Fin n → O) :=
   LinearMap.range (z • (LinearMap.id : (Fin n → O) →ₗ[O] (Fin n → O)))
 
-private theorem bsp_one (n : ℕ) (z : O) (A : Matrix (Fin n) (Fin n) O) :
-    ∃ (ν : ℕ) (v : Fin ν → (Fin n → O)),
-      LinearMap.range (Matrix.mulVecLin A) ≤
-        Submodule.span O (Set.range v) ⊔ IsLocalRing.maximalIdeal O • bspZ n z ∧
-      ∃ (P : Matrix (Fin ν) (Fin n) O) (Q : Matrix (Fin n) (Fin ν) O),
-        P * A * Q = z • (1 : Matrix (Fin ν) (Fin ν) O) := by
+private theorem bsp_one (n : ℕ) (z : O) (A : Matrix (Fin n) (Fin n) O)
+    : ∃ (ν : ℕ) (v : Fin ν → (Fin n → O)),
+      LinearMap.range (Matrix.mulVecLin A)
+          ≤ Submodule.span O (Set.range v) ⊔ IsLocalRing.maximalIdeal O • bspZ n z
+        ∧ ∃ (P : Matrix (Fin ν) (Fin n) O) (Q : Matrix (Fin n) (Fin ν) O),
+          P * A * Q = z • (1 : Matrix (Fin ν) (Fin ν) O) := by
   classical
   haveI : ValuationRing O :=
     ((IsDiscreteValuationRing.TFAE O (IsDiscreteValuationRing.not_isField O)).out 1 2).mp
       (inferInstance : IsDiscreteValuationRing O)
-  obtain ⟨m, S⟩ := Submodule.smithNormalForm (Pi.basisFun O (Fin n))
-    (LinearMap.range (Matrix.mulVecLin A))
+  obtain ⟨m, S⟩ :=
+    Submodule.smithNormalForm (Pi.basisFun O (Fin n)) (LinearMap.range (Matrix.mulVecLin A))
   let T : Finset (Fin m) := Finset.univ.filter (fun k => S.a k ∣ z)
   let e : Fin T.card ≃ T := T.equivFin.symm
   choose x hx using fun k : Fin m => (S.bN k).2
@@ -57,8 +57,11 @@ private theorem bsp_one (n : ℕ) (z : O) (A : Matrix (Fin n) (Fin n) O) :
         exact hk ⟨↑hu.unit⁻¹, by rw [hd, mul_assoc, IsUnit.mul_val_inv, mul_one]⟩
       rw [hd, mul_comm, ← smul_smul]
       exact Submodule.smul_mem_smul hdm ⟨S.bM (S.f k), rfl⟩
-  · refine ⟨Matrix.of fun i r => S.bM.coord (S.f (e i).1) (fun j => if r = j then 1 else 0),
-      Matrix.of fun r i => w i r, ?_⟩
+  · refine ⟨
+      Matrix.of fun i r => S.bM.coord (S.f (e i).1) (fun j => if r = j then 1 else 0),
+      Matrix.of fun r i => w i r,
+      ?_
+    ⟩
     ext i i'
     rw [Matrix.mul_assoc, Matrix.mul_apply]
     have hcol : ∀ r, (A * Matrix.of fun r i => w i r) r i' = (z • S.bM (S.f (e i').1)) r := by
@@ -66,8 +69,10 @@ private theorem bsp_one (n : ℕ) (z : O) (A : Matrix (Fin n) (Fin n) O) :
       rw [← hAw i']
       simp [Matrix.mul_apply, Matrix.mulVec, dotProduct]
     simp only [hcol, Matrix.of_apply]
-    have hφ : ∑ r, S.bM.coord (S.f (e i).1) (fun j => if r = j then 1 else 0) *
-        (z • S.bM (S.f (e i').1)) r = S.bM.coord (S.f (e i).1) (z • S.bM (S.f (e i').1)) := by
+    have hφ
+        : ∑ r, S.bM.coord (S.f (e i).1) (fun j => if r = j then 1 else 0) *
+            (z • S.bM (S.f (e i').1)) r
+          = S.bM.coord (S.f (e i).1) (z • S.bM (S.f (e i').1)) := by
       rw [LinearMap.pi_apply_eq_sum_univ (S.bM.coord (S.f (e i).1)) (z • S.bM (S.f (e i').1))]
       refine Finset.sum_congr rfl fun r _ => ?_
       rw [smul_eq_mul, mul_comm]
@@ -80,10 +85,15 @@ private theorem bsp_one (n : ℕ) (z : O) (A : Matrix (Fin n) (Fin n) O) :
         hii (e.injective (Subtype.ext (S.f.injective h)))
       simp [Finsupp.single_apply, hne, hii]
 
-theorem blockSplit {J : Type} [Fintype J] (n : ℕ) (z : O) (hz : z ≠ 0)
-    (A : J → Matrix (Fin n) (Fin n) O) (h : ∑ j, A j = z • (1 : Matrix (Fin n) (Fin n) O)) :
-    ∃ ν : J → ℕ, n ≤ ∑ j, ν j ∧ ∀ j, ∃ (P : Matrix (Fin (ν j)) (Fin n) O)
-      (Q : Matrix (Fin n) (Fin (ν j)) O), P * A j * Q = z • (1 : Matrix _ _ O) := by
+theorem blockSplit
+    {J : Type} [Fintype J]
+    (n : ℕ)
+    (z : O) (hz : z ≠ 0)
+    (A : J → Matrix (Fin n) (Fin n) O) (h : ∑ j, A j = z • (1 : Matrix (Fin n) (Fin n) O))
+    : ∃ ν : J → ℕ,
+      n ≤ ∑ j, ν j
+        ∧ ∀ j, ∃ (P : Matrix (Fin (ν j)) (Fin n) O) (Q : Matrix (Fin n) (Fin (ν j)) O),
+          P * A j * Q = z • (1 : Matrix _ _ O) := by
   classical
   choose ν v hv P Q hPQ using fun j => bsp_one n z (A j)
   refine ⟨ν, ?_, fun j => ⟨P j, Q j, hPQ j⟩⟩
@@ -94,14 +104,17 @@ theorem blockSplit {J : Type} [Fintype J] (n : ℕ) (z : O) (hz : z ≠ 0)
     apply Submodule.span_mono
     rintro _ ⟨k, rfl⟩
     exact ⟨⟨j, k⟩, rfl⟩
-  have hsum : ∀ (s : Finset J) (x : Fin n → O), Matrix.mulVec (∑ j ∈ s, A j) x = ∑ j ∈ s, Matrix.mulVec (A j) x := by
+  have hsum
+      : ∀ (s : Finset J) (x : Fin n → O),
+        Matrix.mulVec (∑ j ∈ s, A j) x = ∑ j ∈ s, Matrix.mulVec (A j) x := by
     intro s x
     induction s using Finset.induction_on with
     | empty => simp
     | insert j s hj ih => rw [Finset.sum_insert hj, Finset.sum_insert hj, Matrix.add_mulVec, ih]
   have hZ : bspZ n z ≤ W ⊔ IsLocalRing.maximalIdeal O • bspZ n z := by
     rintro _ ⟨x, rfl⟩
-    have hx : (z • (LinearMap.id : (Fin n → O) →ₗ[O] (Fin n → O))) x = ∑ j, Matrix.mulVec (A j) x := by
+    have hx
+        : (z • (LinearMap.id : (Fin n → O) →ₗ[O] (Fin n → O))) x = ∑ j, Matrix.mulVec (A j) x := by
       rw [LinearMap.smul_apply, LinearMap.id_apply, ← hsum, h, Matrix.smul_mulVec,
         Matrix.one_mulVec]
     rw [hx]
@@ -121,13 +134,15 @@ theorem blockSplit {J : Type} [Fintype J] (n : ℕ) (z : O) (hz : z ≠ 0)
     exact smul_right_injective _ hz hxy
   have hli : LinearIndependent O (fun i : Fin n => f (Pi.basisFun O (Fin n) i)) :=
     (Pi.basisFun O (Fin n)).linearIndependent.map' f hinj
-  have hle := linearIndependent_le_span' _ hli (Set.range V) (by
-    rintro _ ⟨i, rfl⟩
-    exact hZW ⟨_, rfl⟩)
-  calc n = Fintype.card (Fin n) := (Fintype.card_fin n).symm
+  have hle :=
+    linearIndependent_le_span' _ hli (Set.range V) (by
+      rintro _ ⟨i, rfl⟩
+      exact hZW ⟨_, rfl⟩)
+  calc
+    n = Fintype.card (Fin n) := (Fintype.card_fin n).symm
     _ ≤ Fintype.card (Set.range V) := by
-        rw [Cardinal.mk_fintype] at hle
-        exact_mod_cast hle
+      rw [Cardinal.mk_fintype] at hle
+      exact_mod_cast hle
     _ ≤ Fintype.card (Σ j, Fin (ν j)) := Fintype.card_range_le V
     _ = ∑ j, ν j := by simp [Fintype.card_sigma]
 

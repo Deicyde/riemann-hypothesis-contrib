@@ -10,8 +10,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem charP_of_padic {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] (f : ℤ_[l] →+* K) :
-    CharP K l := by
+private theorem charP_of_padic
+    {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] (f : ℤ_[l] →+* K)
+    : CharP K l := by
   obtain ⟨p, hp⟩ := CharP.exists K
   have hpp : p.Prime := CharP.char_is_prime K p
   have hpK : ((p : ℕ) : K) = 0 := CharP.cast_eq_zero K p
@@ -26,8 +27,9 @@ private theorem charP_of_padic {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Fi
   subst hpl
   exact hp
 
-theorem UpperTheory.V.Pa.Det.kapEx :
-    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} (x : NP F n), PhiCond F.Γ l → Nonempty (Kap x) := by
+theorem UpperTheory.V.Pa.Det.kapEx
+    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} (x : NP F n),
+      PhiCond F.Γ l → Nonempty (Kap x) := by
   intro l _ F n x hΦ
   letI : Field x.K := x.field
   haveI : Finite x.K := x.fin
@@ -39,11 +41,12 @@ theorem UpperTheory.V.Pa.Det.kapEx :
   have hρ : x.ρX x.A = fun g => mat x.ρ g := by
     funext g
     simp [UpperTheory.V.Pa.NP.ρX, Algebra.algebraMap_self]
-  obtain ⟨⟨S, hS⟩, ⟨B, hB⟩⟩ := UpperTheory.V.Pa.Det.selSub F (A := x.A) (R := x.A) x.t (x.ρX x.A)
-    (x.wX x.A) (x.wiX x.A) (Od x.A x.A n x.a)
+  obtain ⟨⟨S, hS⟩, ⟨B, hB⟩⟩ :=
+    UpperTheory.V.Pa.Det.selSub F (A := x.A) (R := x.A) x.t (x.ρX x.A) (x.wX x.A) (x.wiX x.A)
+      (Od x.A x.A n x.a)
   have hSfg : S.FG := by
-    refine UpperTheory.V.Pa.Det.matFg l (K := x.K) (G := F.G₀) (R := x.A) (1 : F.G₀ →* x.A) (mat x.ρ) S hΦ0
-      ?_ ?_ ?_
+    refine UpperTheory.V.Pa.Det.matFg l (K := x.K) (G := F.G₀) (R := x.A) (1 : F.G₀ →* x.A)
+      (mat x.ρ) S hΦ0 ?_ ?_ ?_
     · intro N
       simp only [MonoidHom.one_apply]
       exact IsLocallyConstant.const (X := F.G₀) _
@@ -63,8 +66,7 @@ theorem UpperTheory.V.Pa.Det.kapEx :
     intro j
     rw [← hS]
     exact hmem j
-  have hloc : ∀ j v, ∃ Y ∈ Od x.A x.A n x.a,
-      LocAt F (x.ρX x.A) (x.wX x.A) (x.wiX x.A) (κ j) v Y :=
+  have hloc : ∀ j v, ∃ Y ∈ Od x.A x.A n x.a, LocAt F (x.ρX x.A) (x.wX x.A) (x.wiX x.A) (κ j) v Y :=
     fun j v => (hsel j).2.2.2.2.2 v
   choose Y hYmem hYloc using hloc
   refine ⟨⟨g, κ, hsel, Y, hYmem, hYloc, ?_, ?_⟩⟩

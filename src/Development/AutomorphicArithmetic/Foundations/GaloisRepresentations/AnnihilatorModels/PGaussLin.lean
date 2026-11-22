@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.gaussLin_of :
-    GaussLin := by
+theorem UpperTheory.Gal.crystallineComparison.gaussLin_of : GaussLin := by
   intro A ι _ c s hs hc
   by_contra hc0
   have hmem : ∀ a : A, a ∈ (Submodule.span A {c}).annihilator ↔ a * c = 0 := by
@@ -17,8 +16,7 @@ theorem UpperTheory.Gal.crystallineComparison.gaussLin_of :
     rw [Submodule.mem_annihilator_span_singleton, smul_eq_mul]
   have hIt : (Submodule.span A {c}).annihilator ≠ ⊤ := by
     intro h
-    have h1 : (1:A) ∈ (Submodule.span A {c}).annihilator := by
-      rw [h]; exact Submodule.mem_top
+    have h1 : (1 : A) ∈ (Submodule.span A {c}).annihilator := by rw [h]; exact Submodule.mem_top
     rw [hmem, one_mul] at h1
     exact hc0 h1
   obtain ⟨M, hM, hIM⟩ := Ideal.exists_le_maximal _ hIt

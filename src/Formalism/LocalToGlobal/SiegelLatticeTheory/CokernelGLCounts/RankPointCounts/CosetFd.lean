@@ -12,10 +12,11 @@ open MeasureTheory NumberField NumberField.mixedEmbedding
 
 namespace Formalism.L2.SG.NGCut.SplitEmbedding
 
-theorem coset_fd {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V] (L Λ : AddSubgroup V)
-    (hle : Λ ≤ L) (hfin : (Λ.addSubgroupOf L).FiniteIndex) (FL : Set V) (hFL : MeasurableSet FL)
-    (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL) :
-    ∃ G : Set V, MeasurableSet G ∧ ∀ v, ∃! a : Λ, (a : V) + v ∈ G := by
+theorem coset_fd
+    {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V]
+    (L Λ : AddSubgroup V) (hle : Λ ≤ L) (hfin : (Λ.addSubgroupOf L).FiniteIndex)
+    (FL : Set V) (hFL : MeasurableSet FL) (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL)
+    : ∃ G : Set V, MeasurableSet G ∧ ∀ v, ∃! a : Λ, (a : V) + v ∈ G := by
   set Λ' := Λ.addSubgroupOf L
   have : Finite (L ⧸ Λ') := Λ'.finite_quotient_of_finiteIndex
   have : Fintype (L ⧸ Λ') := Fintype.ofFinite _
@@ -26,18 +27,21 @@ theorem coset_fd {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd 
   set q : L ⧸ Λ' := (l : L ⧸ Λ')
   have hdiff : -(rep q) + l ∈ Λ' := by
     have : ((rep q : L) : L ⧸ Λ') = q := QuotientAddGroup.out_eq' q
-    rw [← QuotientAddGroup.eq]; exact this
+    rw [← QuotientAddGroup.eq]
+    exact this
   have hΛ : ((-(rep q) + l : L) : V) ∈ Λ := by
     rw [AddSubgroup.mem_addSubgroupOf] at hdiff; exact hdiff
   refine ⟨⟨_, hΛ⟩, Set.mem_iUnion.2 ⟨q, ?_⟩, ?_⟩
   · show ((rep q : L) : V) + (((-(rep q) + l : L) : V) + v) ∈ FL
     simp only [AddSubgroup.coe_add, AddSubgroup.coe_neg]
-    rw [← add_assoc, add_neg_cancel_left]; exact hl
+    rw [← add_assoc, add_neg_cancel_left]
+    exact hl
   · rintro ⟨a, ha⟩ haG
     obtain ⟨q', hq'⟩ := Set.mem_iUnion.1 haG
     have hq'' : ((rep q' : L) : V) + (a + v) ∈ FL := hq'
     have hmem : ((rep q' : V) + a) ∈ L := L.add_mem (rep q').2 (hle ha)
-    have h1 : (⟨(rep q' : V) + a, hmem⟩ : L) = l := hlu _ (by show (rep q' : V) + a + v ∈ FL; rw [add_assoc]; exact hq'')
+    have h1 : (⟨(rep q' : V) + a, hmem⟩ : L) = l :=
+      hlu _ (by show (rep q' : V) + a + v ∈ FL; rw [add_assoc]; exact hq'')
 
     have hqq : q' = q := by
       have e : (rep q' : L) + ⟨a, hle ha⟩ = l := by

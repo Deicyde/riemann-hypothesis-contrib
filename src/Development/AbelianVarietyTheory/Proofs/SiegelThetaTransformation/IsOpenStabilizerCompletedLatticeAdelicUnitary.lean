@@ -8,14 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFin
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta MeasureTheory NumberField
 open scoped TensorProduct Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.StabOpen
 
-noncomputable def stab {D : D7} (V : HSp D) (L : AddSubgroup (Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E)) :
-    Subgroup (GA D V) where
+noncomputable def stab
+    {D : D7} (V : HSp D) (L : AddSubgroup (Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E))
+    : Subgroup (GA D V) where
   carrier := {h | ∀ y, y ∈ L ↔ (finHom V h).1.mulVec y ∈ L}
   one_mem' := fun y => by rw [map_one, Units.val_one, Matrix.one_mulVec]
   mul_mem' := by
@@ -24,8 +27,8 @@ noncomputable def stab {D : D7} (V : HSp D) (L : AddSubgroup (Fin V.rank → Af 
     exact (hb y).trans (ha _)
   inv_mem' := by
     intro a ha y
-    rw [ha ((finHom V a⁻¹).1.mulVec y), Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul, mul_inv_cancel,
-      map_one, Units.val_one, Matrix.one_mulVec]
+    rw [ha ((finHom V a⁻¹).1.mulVec y), Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul,
+      mul_inv_cancel, map_one, Units.val_one, Matrix.one_mulVec]
 
 theorem isOpen_stab_latHat : ∀ (D : D7) (V : HSp D), IsOpen {h : GA D V | ∀ y, y ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E (L0c D V) ↔ (finMat D.sp.cm.sig V.gram h).mulVec y ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E (L0c D V)} := by
   intro D V

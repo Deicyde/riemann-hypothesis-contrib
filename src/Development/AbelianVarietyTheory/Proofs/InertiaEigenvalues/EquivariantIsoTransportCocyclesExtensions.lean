@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 
 @[expose] public section
 
-open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
 set_option synthInstance.maxHeartbeats 400000
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
@@ -25,27 +26,35 @@ namespace GlobalTheory.TransportCoef
 open Formalism.MainNotions.N (twistRep coefRep)
 open ReciprocityTheory.Def (d0 d1 C1)
 
-variable {O G : Type} [CommRing O] [Group G] {M M' : Type} [AddCommGroup M] [Module O M] [AddCommGroup M']
-  [Module O M']
+variable
+  {O G : Type} [CommRing O] [Group G]
+  {M M' : Type} [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O M']
 
-theorem rTensor_coefRep (W : Representation O G M) (W' : Representation O G M') (e : M →ₗ[O] M')
-    (he : ∀ g x, e (W g x) = W' g (e x)) (X : Type) [AddCommGroup X] [Module O X] (g : G) (y : M ⊗[O] X) :
-    LinearMap.rTensor X e (coefRep W X g y) = coefRep W' X g (LinearMap.rTensor X e y) := by
+theorem rTensor_coefRep
+    (W : Representation O G M) (W' : Representation O G M') (e : M →ₗ[O] M')
+    (he : ∀ g x, e (W g x) = W' g (e x))
+    (X : Type) [AddCommGroup X] [Module O X]
+    (g : G) (y : M ⊗[O] X)
+    : LinearMap.rTensor X e (coefRep W X g y) = coefRep W' X g (LinearMap.rTensor X e y) := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul m x => rw [coefRep_tmul, LinearMap.rTensor_tmul, LinearMap.rTensor_tmul, coefRep_tmul, he]
-  | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), map_add (f := _)]
+  | add a b ha hb =>
+    rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), map_add (f := _)]
 
-theorem twist_intertwine (W : Representation O G M) (W' : Representation O G M') (e : M →ₗ[O] M')
-    (he : ∀ g x, e (W g x) = W' g (e x)) (χ : G →* Oˣ) (g : G) (x : M) :
-    e (twistRep W χ g x) = twistRep W' χ g (e x) := by
+theorem twist_intertwine
+    (W : Representation O G M) (W' : Representation O G M') (e : M →ₗ[O] M')
+    (he : ∀ g x, e (W g x) = W' g (e x))
+    (χ : G →* Oˣ) (g : G) (x : M)
+    : e (twistRep W χ g x) = twistRep W' χ g (e x) := by
   rw [twistRep_apply, twistRep_apply, map_smul, he]
 
 variable [TopologicalSpace G]
 
 section General
 
-variable {P P' : Type} [AddCommGroup P] [Module O P] [AddCommGroup P'] [Module O P']
+variable
+  {P P' : Type} [AddCommGroup P] [Module O P] [AddCommGroup P'] [Module O P']
   (π : Representation O G P) (π' : Representation O G P') (F : P →ₗ[O] P')
   (hF : ∀ g y, F (π g y) = π' g (F y))
 include hF
@@ -60,8 +69,8 @@ theorem mem_Z1_comp {z : G → P} (hz : z ∈ Z1 π ⊤) : (fun g => F (z g)) �
   simp only [d1, LinearMap.coe_mk, AddHom.coe_mk, Pi.zero_apply] at this ⊢
   rw [← hF, ← map_sub, ← map_add (f := _), this, map_zero]
 
-theorem cob_comp {z : G → P} (S : Set G) (b : P) (hb : ∀ g ∈ S, z g = π g b - b) :
-    ∀ g ∈ S, F (z g) = π' g (F b) - F b := by
+theorem cob_comp {z : G → P} (S : Set G) (b : P) (hb : ∀ g ∈ S, z g = π g b - b)
+    : ∀ g ∈ S, F (z g) = π' g (F b) - F b := by
   intro g hg
   rw [hb g hg, map_sub, hF]
 
@@ -80,18 +89,24 @@ end GlobalTheory.TransportCoef
 namespace GlobalTheory.TransportCoef
 open Formalism.MainNotions.N (twistRep coefRep)
 
-theorem transport {O G : Type} [CommRing O] [Group G] [TopologicalSpace G] {M M' : Type} [AddCommGroup M]
-    [Module O M] [AddCommGroup M'] [Module O M'] (W : Representation O G M) (W' : Representation O G M')
-    (e : M ≃ₗ[O] M') (he : ∀ g x, e (W g x) = W' g (e x)) :
-    ∀ (χ : G →* Oˣ) (X : Type) [AddCommGroup X] [Module O X] (z : G → M ⊗[O] X) (z' : G → M' ⊗[O] X),
-      (∀ g, z' g = LinearEquiv.rTensor X e (z g)) →
-      (z ∈ Z1 (twCoef W χ X) ⊤ ↔ z' ∈ Z1 (twCoef W' χ X) ⊤) ∧
-      (∀ (hz : z ∈ Z1 (twCoef W χ X) ⊤) (hz' : z' ∈ Z1 (twCoef W' χ X) ⊤) {c : O} (hc : ∀ x : X, c • x = 0),
-        ∃ f : ((M ⊗[O] X) × (O ⧸ Ideal.span {c})) ≃ₗ[O] ((M' ⊗[O] X) × (O ⧸ Ideal.span {c})),
-          ∀ g x, f (Ea W χ hc ⟨z, hz⟩ g x) = Ea W' χ hc ⟨z', hz'⟩ g (f x)) ∧
-      (z ∈ B1 (twCoef W χ X) ⊤ ↔ z' ∈ B1 (twCoef W' χ X) ⊤) ∧
-      ∀ I : Subgroup G, (∃ b, ∀ g ∈ I, z g = twCoef W χ X g b - b) ↔
-        (∃ b', ∀ g ∈ I, z' g = twCoef W' χ X g b' - b') := by
+theorem transport
+    {O G : Type} [CommRing O] [Group G] [TopologicalSpace G]
+    {M M' : Type} [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O M']
+    (W : Representation O G M) (W' : Representation O G M') (e : M ≃ₗ[O] M')
+    (he : ∀ g x, e (W g x) = W' g (e x))
+    : ∀ (χ : G →* Oˣ) (X : Type) [AddCommGroup X] [Module O X] (z : G → M ⊗[O] X)
+        (z' : G → M' ⊗[O] X),
+      (∀ g, z' g = LinearEquiv.rTensor X e (z g))
+        → (z ∈ Z1 (twCoef W χ X) ⊤ ↔ z' ∈ Z1 (twCoef W' χ X) ⊤)
+          ∧ (∀ (hz : z ∈ Z1 (twCoef W χ X) ⊤) (hz' : z' ∈ Z1 (twCoef W' χ X) ⊤) {c : O}
+              (hc : ∀ x : X, c • x = 0),
+            ∃ f : ((M ⊗[O] X) × (O ⧸ Ideal.span {c})) ≃ₗ[O] ((M' ⊗[O] X) × (O ⧸ Ideal.span {c})),
+              ∀ g x,
+                f (Ea W χ hc ⟨z, hz⟩ g x) = Ea W' χ hc ⟨z', hz'⟩ g (f x))
+          ∧ (z ∈ B1 (twCoef W χ X) ⊤ ↔ z' ∈ B1 (twCoef W' χ X) ⊤)
+          ∧ ∀ I : Subgroup G,
+            (∃ b, ∀ g ∈ I, z g = twCoef W χ X g b - b)
+              ↔ (∃ b', ∀ g ∈ I, z' g = twCoef W' χ X g b' - b') := by
   intro χ X _ _ z z' hzz
   have he' : ∀ g x, e.symm (W' g x) = W g (e.symm x) := fun g x => by
     apply e.injective
@@ -103,15 +118,18 @@ theorem transport {O G : Type} [CommRing O] [Group G] [TopologicalSpace G] {M M'
     apply E.injective
     rw [LinearEquiv.apply_symm_apply, hE, ← LinearMap.comp_apply, ← LinearMap.rTensor_comp]
     simp
-  have key : ∀ g y, (E : M ⊗[O] X →ₗ[O] M' ⊗[O] X) (twCoef W χ X g y) = twCoef W' χ X g (E y) := fun g y =>
-    rTensor_coefRep (twistRep W χ⁻¹) (twistRep W' χ⁻¹) (e : M →ₗ[O] M')
-      (twist_intertwine W W' (e : M →ₗ[O] M') he χ⁻¹) X g y
-  have keys : ∀ g y, (E.symm : M' ⊗[O] X →ₗ[O] M ⊗[O] X) (twCoef W' χ X g y) = twCoef W χ X g (E.symm y) :=
-    fun g y => by
-      show E.symm _ = _
-      rw [hEs, hEs]
-      exact rTensor_coefRep (twistRep W' χ⁻¹) (twistRep W χ⁻¹) (e.symm : M' →ₗ[O] M)
-        (twist_intertwine W' W (e.symm : M' →ₗ[O] M) he' χ⁻¹) X g y
+  have key : ∀ g y, (E : M ⊗[O] X →ₗ[O] M' ⊗[O] X) (twCoef W χ X g y) = twCoef W' χ X g (E y) :=
+    fun g y =>
+      rTensor_coefRep (twistRep W χ⁻¹) (twistRep W' χ⁻¹) (e : M →ₗ[O] M')
+        (twist_intertwine W W' (e : M →ₗ[O] M') he χ⁻¹) X g y
+  have keys
+      : ∀ g y,
+        (E.symm : M' ⊗[O] X →ₗ[O] M ⊗[O] X) (twCoef W' χ X g y)
+          = twCoef W χ X g (E.symm y) := fun g y => by
+    show E.symm _ = _
+    rw [hEs, hEs]
+    exact rTensor_coefRep (twistRep W' χ⁻¹) (twistRep W χ⁻¹) (e.symm : M' →ₗ[O] M)
+      (twist_intertwine W' W (e.symm : M' →ₗ[O] M) he' χ⁻¹) X g y
   have keyc : ∀ g y, E (coefRep W X g y) = coefRep W' X g (E y) := fun g y =>
     rTensor_coefRep W W' (e : M →ₗ[O] M') he X g y
   have hz'f : z' = fun g => (E : M ⊗[O] X →ₗ[O] M' ⊗[O] X) (z g) := funext hzz

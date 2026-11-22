@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.NonemptyU
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -28,17 +31,37 @@ open Limits
 
 namespace GlobalTheory.ShFam.Hor.LogCh
 
-theorem kernel_lattice_of_isUnf : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Z : Model Xo c β) (σ : c.F →+* ℂ) (U : Formalism.L2.PjFree.Unf Xo c σ (Dw.p + Dw.q)), Formalism.L2.PjFree.GoodEmb c σ → Formalism.L2.PjFree.IsUnf U → ∀ (g : ℕ) (x : GlobalTheory.CxPts (genStr Z) σ) (ex : (Fin g → ℂ) → (Over.mk (x.1 ≫ genι Z) ⟶ Z.t.G)), Inner x → IsExpAt Z.t (x.1 ≫ genι Z) ex → IsHolTo Set.univ (fun w => (ex w).left) → Fintype.card (Σ τ : E →+* ℂ, Fin (Dw.mult τ)) = g ∧ ∃ Hm : Matrix (Fin g) (Fin g) ℂ, Hm.IsHermitian ∧ (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) ∧ Submodule.span ℝ {w | ex w = 1} = ⊤ ∧ (∀ v w, ex v = 1 → ex w = 1 → ∃ m : ℤ, (hermForm Hm v w).im = m) ∧ ∀ (k : ℕ) (v w : Fin g → ℂ) (ζ : ℂˣ), 0 < k → ex v = 1 → ex w = 1 → (ζ : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * ((hermForm Hm v w).im : ℂ) / k) → GlobalTheory.UU.CubWeil Z.t.cub k (ex ((k : ℂ)⁻¹ • v)) (ex ((k : ℂ)⁻¹ • w)) (unitOn ζ) := by
+theorem kernel_lattice_of_isUnf
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Z : Model Xo c β)
+        (σ : c.F →+* ℂ) (U : Formalism.L2.PjFree.Unf Xo c σ (Dw.p + Dw.q)),
+      Formalism.L2.PjFree.GoodEmb c σ → Formalism.L2.PjFree.IsUnf U
+        → ∀ (g : ℕ) (x : GlobalTheory.CxPts (genStr Z) σ)
+            (ex : (Fin g → ℂ) → (Over.mk (x.1 ≫ genι Z) ⟶ Z.t.G)),
+          Inner x → IsExpAt Z.t (x.1 ≫ genι Z) ex → IsHolTo Set.univ (fun w => (ex w).left)
+            → Fintype.card (Σ τ : E →+* ℂ, Fin (Dw.mult τ)) = g
+              ∧ ∃ Hm : Matrix (Fin g) (Fin g) ℂ,
+                Hm.IsHermitian ∧ (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
+                  ∧ Submodule.span ℝ {w | ex w = 1} = ⊤
+                  ∧ (∀ v w, ex v = 1 → ex w = 1 → ∃ m : ℤ, (hermForm Hm v w).im = m)
+                  ∧ ∀ (k : ℕ) (v w : Fin g → ℂ) (ζ : ℂˣ),
+                    0 < k → ex v = 1 → ex w = 1
+                      → (ζ : ℂ)
+                        = Complex.exp (-(2 * Real.pi * Complex.I) * ((hermForm Hm v w).im : ℂ) / k)
+                      → GlobalTheory.UU.CubWeil Z.t.cub k (ex ((k : ℂ)⁻¹ • v)) (ex ((k : ℂ)⁻¹ • w))
+                        (unitOn ζ) := by
   intro E _ _ _ H Dw l Xo c O _ β Z σ U _hσ hU g x ex hx hex hhol
   obtain ⟨y, hy⟩ := hx.exists_lift
   obtain ⟨W₀⟩ := GlobalTheory.ArcQ.nonempty_unfWit_of_isUnf E H Dw l Xo c σ _ U hU
   have hs : y ≫ pullback.snd _ _ = spMap σ := by
     rw [← Z.jQ_over, ← Category.assoc, hy]
     exact x.2
-  obtain ⟨i, P, hP, hu⟩ := W₀.F.onto (y ≫ pullback.fst _ _) (by
-    rw [Category.assoc, pullback.condition, ← Category.assoc, hs, OpenReg.spMap_comp])
-  obtain ⟨e', he', hhol', hker, hweil⟩ := exists_pushed_exp E H Dw l Xo c O β Z _ _ _ W₀.F y i P (x.1 ≫ genι Z) hP hu
-    (by rw [← hy, Category.assoc])
+  obtain ⟨i, P, hP, hu⟩ :=
+    W₀.F.onto (y ≫ pullback.fst _ _)
+      (by rw [Category.assoc, pullback.condition, ← Category.assoc, hs, OpenReg.spMap_comp])
+  obtain ⟨e', he', hhol', hker, hweil⟩ :=
+    exists_pushed_exp E H Dw l Xo c O β Z _ _ _ W₀.F y i P (x.1 ≫ genι Z) hP hu
+      (by rw [← hy, Category.assoc])
   obtain ⟨L, hL⟩ := exp_eq_comp_linearEquiv E H Z.X Z.t (x.1 ≫ genι Z) g _ ex e' hex hhol he' hhol'
   have hg : W₀.g = g := by
     have := L.finrank_eq

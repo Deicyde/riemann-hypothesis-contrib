@@ -6,7 +6,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.CntLocal
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
+  Formalism.L2.SG.CntLocal
 open Classical
 
 noncomputable section
@@ -15,47 +16,53 @@ namespace PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowZUnitPf
 
 open PI.UnitaryGroupMassFormula.CntFormula.RowsMassW
 
-theorem star_int {K : Type} [Field K] [NumberField K] [StarRing K] (o : 𝓞 K) :
-    ∃ o' : 𝓞 K, (o' : K) = star (o : K) := by
+theorem star_int {K : Type} [Field K] [NumberField K] [StarRing K] (o : 𝓞 K)
+    : ∃ o' : 𝓞 K, (o' : K) = star (o : K) := by
   have h1 : IsIntegral ℤ (star (o : K)) :=
     (NumberField.RingOfIntegers.isIntegral_coe o).map (starRingEnd K).toIntAlgHom
   exact ⟨⟨star (o : K), h1⟩, rfl⟩
 
-theorem exists_one {K : Type} [Field K] [NumberField K] [StarRing K]
+theorem exists_one
+    {K : Type} [Field K] [NumberField K] [StarRing K]
     {W : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
     (h : W →ₗ⋆[K] W →ₗ[K] K) (M : Submodule (𝓞 K) W)
-    (hU : Formalism.HermitianLatticesTheory.IsUnimodular h M) {z : W} (hz : z ∈ M)
-    (hprim : ∀ c : K, c • z ∈ M → ∃ o : 𝓞 K, (o : K) = c) : ∃ m ∈ M, h m z = 1 := by
+    (hU : Formalism.HermitianLatticesTheory.IsUnimodular h M)
+    {z : W} (hz : z ∈ M) (hprim : ∀ c : K, c • z ∈ M → ∃ o : 𝓞 K, (o : K) = c)
+    : ∃ m ∈ M, h m z = 1 := by
   classical
-
   have memM : ∀ x : W, x ∈ M ↔ ∀ m ∈ M, ∃ y : 𝓞 K, algebraMap (𝓞 K) K y = h m x := by
     intro x
     conv_lhs => rw [← hU]
-    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-      LinearMap.restrictScalars_apply, Submodule.mem_one]
+    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+      Submodule.mem_comap, LinearMap.restrictScalars_apply, Submodule.mem_one]
 
-  let I : Ideal (𝓞 K) :=
-    { carrier := {o | ∃ m ∈ M, h m z = star (o : K)}
-      add_mem' := by
-        rintro a b ⟨m₁, hm₁, e₁⟩ ⟨m₂, hm₂, e₂⟩
-        refine ⟨m₁ + m₂, M.add_mem hm₁ hm₂, ?_⟩
-        rw [map_add (f := _), LinearMap.add_apply, e₁, e₂]
-        show star (algebraMap (𝓞 K) K a) + star (algebraMap (𝓞 K) K b) =
-          star (algebraMap (𝓞 K) K (a + b))
-        rw [map_add (f := _), star_add]
-      zero_mem' := ⟨0, M.zero_mem, by
+  let I : Ideal (𝓞 K) := {
+    carrier := {o | ∃ m ∈ M, h m z = star (o : K)}
+    add_mem' := by
+      rintro a b ⟨m₁, hm₁, e₁⟩ ⟨m₂, hm₂, e₂⟩
+      refine ⟨m₁ + m₂, M.add_mem hm₁ hm₂, ?_⟩
+      rw [map_add (f := _), LinearMap.add_apply, e₁, e₂]
+      show star (algebraMap (𝓞 K) K a) + star (algebraMap (𝓞 K) K b) =
+        star (algebraMap (𝓞 K) K (a + b))
+      rw [map_add (f := _), star_add]
+    zero_mem' := ⟨
+      0,
+      M.zero_mem,
+      by
         rw [map_zero, LinearMap.zero_apply]
         show (0 : K) = star (algebraMap (𝓞 K) K 0)
-        rw [map_zero, star_zero]⟩
-      smul_mem' := by
-        rintro a b ⟨m, hm, e⟩
-        refine ⟨a • m, M.smul_mem a hm, ?_⟩
-        have ha : (a • m : W) = (algebraMap (𝓞 K) K a) • m := (algebraMap_smul K a m).symm
-        rw [ha, LinearMap.map_smulₛₗ, LinearMap.smul_apply, e]
-        simp only [smul_eq_mul, starRingEnd_apply]
-        show star (algebraMap (𝓞 K) K a) * star (algebraMap (𝓞 K) K b) =
-          star (algebraMap (𝓞 K) K (a * b))
-        rw [map_mul, star_mul'] }
+        rw [map_zero, star_zero]
+    ⟩
+    smul_mem' := by
+      rintro a b ⟨m, hm, e⟩
+      refine ⟨a • m, M.smul_mem a hm, ?_⟩
+      have ha : (a • m : W) = (algebraMap (𝓞 K) K a) • m := (algebraMap_smul K a m).symm
+      rw [ha, LinearMap.map_smulₛₗ, LinearMap.smul_apply, e]
+      simp only [smul_eq_mul, starRingEnd_apply]
+      show star (algebraMap (𝓞 K) K a) * star (algebraMap (𝓞 K) K b) =
+        star (algebraMap (𝓞 K) K (a * b))
+      rw [map_mul, star_mul']
+  }
   have memI : ∀ o : 𝓞 K, o ∈ I ↔ ∃ m ∈ M, h m z = star (o : K) := fun o => Iff.rfl
   by_contra hne
   push_neg at hne
@@ -67,8 +74,7 @@ theorem exists_one {K : Type} [Field K] [NumberField K] [StarRing K]
   obtain ⟨P, hPmax, hIP⟩ := Ideal.exists_le_maximal I hI
   have hP0 : P ≠ ⊥ :=
     Ring.ne_bot_of_isMaximal_of_not_isField hPmax (NumberField.RingOfIntegers.not_isField K)
-  obtain ⟨c, hc, hc1⟩ :=
-    FractionalIdeal.exists_notMem_one_of_ne_bot (K := K) hP0 hPmax.ne_top
+  obtain ⟨c, hc, hc1⟩ := FractionalIdeal.exists_notMem_one_of_ne_bot (K := K) hP0 hPmax.ne_top
   have hPne : (P : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ≠ 0 := by
     rwa [ne_eq, FractionalIdeal.coeIdeal_eq_zero]
   rw [FractionalIdeal.mem_inv_iff hPne] at hc
@@ -108,4 +114,6 @@ theorem row_unit_condition : RowZUnit := by
 
 end PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowZUnitPf
 
-theorem PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.row_unit_condition : PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowZUnit := PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowZUnitPf.row_unit_condition
+theorem PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.row_unit_condition
+    : PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowZUnit :=
+  PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowZUnitPf.row_unit_condition

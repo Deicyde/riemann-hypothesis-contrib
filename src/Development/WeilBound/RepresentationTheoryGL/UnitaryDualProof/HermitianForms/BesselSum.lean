@@ -7,8 +7,10 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Herm
 
 namespace PositivityTheory.RgUd.Form.Final
 
-theorem besselSum (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    PositivityTheory.RgUd.BesselSum k :=
-  PositivityTheory.RgUd.Form.Asm.asmForm k (PositivityTheory.RgUd.Form.LeviSmoothness.Final.stepForm k)
+theorem besselSum
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : PositivityTheory.RgUd.BesselSum k :=
+  PositivityTheory.RgUd.Form.Asm.asmForm k
+    (PositivityTheory.RgUd.Form.LeviSmoothness.Final.stepForm k)
 
 end PositivityTheory.RgUd.Form.Final

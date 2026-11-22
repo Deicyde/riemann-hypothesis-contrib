@@ -26,16 +26,19 @@ theorem nabs_pos' (x : kˣ) : 0 < nabs k x := by
 
 theorem nabs_mul' (x y : kˣ) : nabs k (x * y) = nabs k x * nabs k y := by simp [nabs]
 
-
 open scoped Pointwise in
 theorem nabs_eq_one {x : kˣ} (hx : valuation k (x : k) = 1) : nabs k x = 1 := by
   borelize k
   have hc : IsCompact (𝒪[k] : Set k) := IsNonarchimedeanLocalField.isCompact_closedBall k 1
   have ho : IsOpen (𝒪[k] : Set k) := Valuation.isOpen_integer
-  let K : TopologicalSpace.PositiveCompacts k := ⟨⟨(𝒪[k] : Set k), hc⟩, by
-    rw [show interior ((⟨(𝒪[k] : Set k), hc⟩ : TopologicalSpace.Compacts k).carrier) =
-      (𝒪[k] : Set k) from ho.interior_eq]
-    exact ⟨0, zero_mem _⟩⟩
+  let K : TopologicalSpace.PositiveCompacts k := ⟨
+    ⟨(𝒪[k] : Set k), hc⟩,
+    by
+      rw [show interior ((⟨(𝒪[k] : Set k), hc⟩ : TopologicalSpace.Compacts k).carrier)
+          = (𝒪[k] : Set k) from
+        ho.interior_eq]
+      exact ⟨0, zero_mem _⟩
+  ⟩
   have h1 : MeasureTheory.Measure.addHaarMeasure K (𝒪[k] : Set k) = 1 :=
     MeasureTheory.Measure.addHaarMeasure_self
   have hs : x • (𝒪[k] : Set k) = (𝒪[k] : Set k) := by
@@ -43,18 +46,20 @@ theorem nabs_eq_one {x : kˣ} (hx : valuation k (x : k) = 1) : nabs k x = 1 := b
     rw [Set.mem_smul_set_iff_inv_smul_mem]
     show valuation k (((x⁻¹ : kˣ) : k) * y) ≤ 1 ↔ valuation k y ≤ 1
     simp [hx]
-  have := MeasureTheory.distribHaarChar_eq_of_measure_smul_eq_mul
-    (μ := MeasureTheory.Measure.addHaarMeasure K) (s := (𝒪[k] : Set k)) (g := x) (r := 1)
-    (by simp [h1]) (by simp [h1]) (by simp [hs])
+  have :=
+    MeasureTheory.distribHaarChar_eq_of_measure_smul_eq_mul
+      (μ := MeasureTheory.Measure.addHaarMeasure K) (s := (𝒪[k] : Set k)) (g := x) (r := 1)
+      (by simp [h1]) (by simp [h1]) (by simp [hs])
   simp [nabs, this]
 
 def absPow (s : ℂ) : kˣ →* ℂˣ :=
-  MonoidHom.toHomUnits
-    { toFun := fun x => ((nabs k x : ℝ) : ℂ) ^ s
-      map_one' := by simp [nabs]
-      map_mul' := fun x y => by
-        rw [nabs_mul', Complex.ofReal_mul,
-          Complex.mul_cpow_ofReal_nonneg (nabs_pos' k x).le (nabs_pos' k y).le] }
+  MonoidHom.toHomUnits {
+    toFun := fun x => ((nabs k x : ℝ) : ℂ) ^ s
+    map_one' := by simp [nabs]
+    map_mul' := fun x y => by
+      rw [nabs_mul', Complex.ofReal_mul,
+        Complex.mul_cpow_ofReal_nonneg (nabs_pos' k x).le (nabs_pos' k y).le]
+  }
 
 theorem val_absPow (s : ℂ) (x : kˣ) : (absPow k s x : ℂ) = ((nabs k x : ℝ) : ℂ) ^ s := rfl
 
@@ -66,8 +71,8 @@ theorem absPow_add (s t : ℂ) : absPow k (s + t) = absPow k s * absPow k t := b
   simp only [val_absPow, MonoidHom.mul_apply, Units.val_mul]
   exact Complex.cpow_add _ _ (by exact_mod_cast (nabs_pos' k x).ne')
 
-@[simp] theorem absPow_zero : absPow k 0 = 1 := by
-  ext x; simp [val_absPow]
+@[simp]
+theorem absPow_zero : absPow k 0 = 1 := by ext x; simp [val_absPow]
 
 theorem absPow_neg (s : ℂ) : absPow k (-s) = (absPow k s)⁻¹ := by
   ext x; simp [val_absPow, Complex.cpow_neg]
@@ -75,12 +80,11 @@ theorem absPow_neg (s : ℂ) : absPow k (-s) = (absPow k s)⁻¹ := by
 theorem isUnram_absPow (s : ℂ) : IsUnram (absPow k s) := fun x hx => by
   ext; simp [val_absPow, nabs_eq_one k hx]
 
-
 variable {k} in
 theorem isSmoothChar_of_isUnram {χ : kˣ →* ℂˣ} (h : IsUnram χ) : IsSmoothChar χ := by
   have ho : IsOpen (𝒪[k] : Set k) := Valuation.isOpen_integer
-  have h1 : IsOpen ({x : kˣ | (x : k) ∈ (𝒪[k] : Set k)} ∩
-      {x : kˣ | ((x⁻¹ : kˣ) : k) ∈ (𝒪[k] : Set k)}) :=
+  have h1 : IsOpen
+      ({x : kˣ | (x : k) ∈ (𝒪[k] : Set k)} ∩ {x : kˣ | ((x⁻¹ : kˣ) : k) ∈ (𝒪[k] : Set k)}) :=
     (ho.preimage Units.continuous_val).inter (ho.preimage Units.continuous_coe_inv)
   refine Subgroup.isOpen_of_mem_nhds _ (g := 1) (Filter.mem_of_superset (h1.mem_nhds ?_) ?_)
   · exact ⟨one_mem 𝒪[k], by simpa using one_mem 𝒪[k]⟩
@@ -92,17 +96,15 @@ theorem isSmoothChar_of_isUnram {χ : kˣ →* ℂˣ} (h : IsUnram χ) : IsSmoot
     exact (inv_le_one₀ (zero_lt_iff.2 (by simp))).1 a2
 
 def ord (x : kˣ) : ℤ :=
-  -WithZero.log (IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k (valuation k (x : k)))
+  - WithZero.log (IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k (valuation k (x : k)))
 
 theorem ord_mul (x y : kˣ) : ord k (x * y) = ord k x + ord k y := by
   simp only [ord, Units.val_mul, map_mul]
   rw [WithZero.log_mul (by simp) (by simp)]
   ring
 
-
 variable {k} in
 theorem ord_eq_zero {x : kˣ} (hx : valuation k (x : k) = 1) : ord k x = 0 := by simp [ord, hx]
-
 
 variable {k} in
 theorem ord_eq_one {x : kˣ} (hx : valuation k (x : k) = uniformizer k) : ord k x = 1 := by
@@ -119,7 +121,6 @@ theorem ord_eq_one {x : kˣ} (hx : valuation k (x : k) = uniformizer k) : ord k 
         exact φ.symm.strictMono (by rw [← WithZero.exp_zero, WithZero.exp_lt_exp]; omega)
       simpa using φ.strictMono.monotone this
   simp [ord, hx, φ, key]
-
 
 variable {k} in
 theorem ord_eq_zero_iff {x : kˣ} : ord k x = 0 ↔ valuation k (x : k) = 1 := by
@@ -140,16 +141,16 @@ theorem unrChar_apply (α : ℂˣ) (x : kˣ) : unrChar k α x = α ^ ord k x := 
 theorem isUnram_unrChar (α : ℂˣ) : IsUnram (unrChar k α) := fun x hx => by
   rw [unrChar_apply, ord_eq_zero hx, zpow_zero]
 
-theorem unrChar_uniformizer (α : ℂˣ) {x : kˣ} (hx : valuation k (x : k) = uniformizer k) :
-    unrChar k α x = α := by
+theorem unrChar_uniformizer (α : ℂˣ) {x : kˣ} (hx : valuation k (x : k) = uniformizer k)
+    : unrChar k α x = α := by
   rw [unrChar_apply, ord_eq_one hx, zpow_one]
 
-
 variable {k} in
-theorem eq_unrChar {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ}
-    (hϖ : valuation k (ϖ : k) = uniformizer k) : χ = unrChar k (χ ϖ) := by
-  let o : kˣ →* Multiplicative ℤ := MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by
-    rw [ord_mul, ofAdd_add]
+theorem eq_unrChar
+    {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k)
+    : χ = unrChar k (χ ϖ) := by
+  let o : kˣ →* Multiplicative ℤ :=
+    MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by rw [ord_mul, ofAdd_add]
   refine MonoidHom.ext fun x => ?_
   have h1 : o (x / ϖ ^ ord k x) = 1 := by
     rw [map_div, map_zpow, show o ϖ = .ofAdd 1 from congrArg Multiplicative.ofAdd (ord_eq_one hϖ),
@@ -159,8 +160,9 @@ theorem eq_unrChar {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ}
   rw [map_div, map_zpow, div_eq_one] at h2
   exact h2
 
-variable {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α]
-  [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
+variable
+  {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+  [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
   {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
 
 section Det
@@ -170,20 +172,22 @@ variable {R : Type} [CommRing R]
 def detChar (n : Type) [Fintype n] [DecidableEq n] (χ : Rˣ →* ℂˣ) : GL n R →* ℂˣ :=
   χ.comp GeneralLinearGroup.det
 
-@[simp] theorem detChar_apply (χ : Rˣ →* ℂˣ) (g : GL n R) :
-    detChar n χ g = χ (GeneralLinearGroup.det g) := rfl
+@[simp]
+theorem detChar_apply (χ : Rˣ →* ℂˣ) (g : GL n R) : detChar n χ g = χ (GeneralLinearGroup.det g) :=
+  rfl
 
 def detRep (n : Type) [Fintype n] [DecidableEq n] (χ : Rˣ →* ℂˣ) : Representation ℂ (GL n R) ℂ :=
   ofChar (detChar n χ)
 
-theorem continuous_glDet [TopologicalSpace R] [IsTopologicalRing R] :
-    Continuous (GeneralLinearGroup.det : GL n R → Rˣ) := by
+theorem continuous_glDet [TopologicalSpace R] [IsTopologicalRing R]
+    : Continuous (GeneralLinearGroup.det : GL n R → Rˣ) := by
   refine Units.continuous_iff.2 ⟨Units.continuous_val.matrix_det, ?_⟩
   simp only [← map_inv]
   exact Units.continuous_coe_inv.matrix_det
 
-theorem IsSmoothChar.detChar [TopologicalSpace R] [IsTopologicalRing R] {χ : Rˣ →* ℂˣ}
-    (h : IsSmoothChar χ) : IsSmoothChar (detChar n χ) :=
+theorem IsSmoothChar.detChar
+    [TopologicalSpace R] [IsTopologicalRing R] {χ : Rˣ →* ℂˣ} (h : IsSmoothChar χ)
+    : IsSmoothChar (detChar n χ) :=
   h.comp _ continuous_glDet
 
 def HasCentralChar (π : Representation ℂ (GL n R) V) (ω : Rˣ →* ℂˣ) : Prop :=
@@ -192,8 +196,9 @@ def HasCentralChar (π : Representation ℂ (GL n R) V) (ω : Rˣ →* ℂˣ) : 
 def torusChar {n : Type} [Fintype n] (χ : n → Rˣ →* ℂˣ) : (n → Rˣ) →* ℂˣ :=
   ∏ i, (χ i).comp (Pi.evalMonoidHom (fun _ => Rˣ) i)
 
-@[simp] theorem torusChar_apply {n : Type} [Fintype n] (χ : n → Rˣ →* ℂˣ) (t : n → Rˣ) :
-    torusChar χ t = ∏ i, χ i (t i) := by
+@[simp]
+theorem torusChar_apply {n : Type} [Fintype n] (χ : n → Rˣ →* ℂˣ) (t : n → Rˣ)
+    : torusChar χ t = ∏ i, χ i (t i) := by
   simp [torusChar, MonoidHom.finsetProd_apply]
 
 end Det
@@ -207,8 +212,8 @@ def modulus (m : α → Type) [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] 
 def deltaHalf (m : α → Type) [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] : Levi k m →* ℂˣ :=
   ∏ a, (detChar (m a) (absPow k ((modExp m a : ℂ) / 2))).comp (Pi.evalMonoidHom (fun a => GL (m a) k) a)
 
-theorem deltaHalf_apply (g : Levi k m) :
-    deltaHalf k m g = ∏ a, absPow k ((modExp m a : ℂ) / 2) (GeneralLinearGroup.det (g a)) := by
+theorem deltaHalf_apply (g : Levi k m)
+    : deltaHalf k m g = ∏ a, absPow k ((modExp m a : ℂ) / 2) (GeneralLinearGroup.det (g a)) := by
   simp [deltaHalf, MonoidHom.finsetProd_apply]
 
 theorem modulus_pos (g : Levi k m) : 0 < modulus k m g :=
@@ -219,7 +224,8 @@ theorem val_deltaHalf (g : Levi k m) : (deltaHalf k m g : ℂ) = (√(modulus k 
     Real.sqrt_prod _ fun _ _ => (zpow_pos (nabs_pos' k _) _).le, Complex.ofReal_prod]
   refine Finset.prod_congr rfl fun a _ => ?_
   have : ((modExp m a : ℂ) / 2) = (((modExp m a : ℝ) * (1 / 2) : ℝ) : ℂ) := by push_cast; ring
-  rw [this, val_absPow_ofReal, Real.sqrt_eq_rpow, Real.rpow_mul (nabs_pos' k _).le, Real.rpow_intCast]
+  rw [this, val_absPow_ofReal, Real.sqrt_eq_rpow, Real.rpow_mul (nabs_pos' k _).le,
+    Real.rpow_intCast]
 
 theorem isSmoothChar_deltaHalf : IsSmoothChar (deltaHalf k m) := by
   unfold deltaHalf
@@ -232,71 +238,80 @@ variable {k}
 abbrev IndSp (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) : Type :=
   smoothPart (ind (parab k e) ((twist ρ (deltaHalf k m)).comp (leviProj k e)))
 
-def parInd (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) :
-    Representation ℂ (GL n k) (IndSp e ρ) :=
+def parInd (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W)
+    : Representation ℂ (GL n k) (IndSp e ρ) :=
   smInd (parab k e) ((twist ρ (deltaHalf k m)).comp (leviProj k e))
 
-theorem parInd_law (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W)
-    (f : IndSp e ρ)
-    (p : parab k e) (g : GL n k) :
-    f.1.1 (p * g) = (deltaHalf k m (leviProj k e p) : ℂ) • ρ (leviProj k e p) (f.1.1 g) :=
+theorem parInd_law
+    (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) (f : IndSp e ρ)
+    (p : parab k e) (g : GL n k)
+    : f.1.1 (p * g) = (deltaHalf k m (leviProj k e p) : ℂ) • ρ (leviProj k e p) (f.1.1 g) :=
   f.1.2 p g
 
-@[simp] theorem parInd_apply (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) (g x : GL n k)
-    (f : IndSp e ρ) :
-    (parInd e ρ g f).1.1 x = f.1.1 (x * g) := rfl
+@[simp]
+theorem parInd_apply
+    (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) (g x : GL n k) (f : IndSp e ρ)
+    : (parInd e ρ g f).1.1 x = f.1.1 (x * g) :=
+  rfl
 
-theorem isSmooth_parInd (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) :
-    IsSmooth (parInd e ρ) := isSmooth_smoothRep _
+theorem isSmooth_parInd (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W)
+    : IsSmooth (parInd e ρ) :=
+  isSmooth_smoothRep _
 
-def parIndMap (e : (Σ a, m a) ≃ n) {ρ : Representation ℂ (Levi k m) V}
-    {σ : Representation ℂ (Levi k m) W} (f : ρ.IntertwiningMap σ) :
-    (parInd e ρ).IntertwiningMap (parInd e σ) :=
+def parIndMap
+    (e : (Σ a, m a) ≃ n)
+    {ρ : Representation ℂ (Levi k m) V} {σ : Representation ℂ (Levi k m) W}
+    (f : ρ.IntertwiningMap σ)
+    : (parInd e ρ).IntertwiningMap (parInd e σ) :=
   smIndMap (compMap (twistMap f _) _)
 
-def jacU {R : Type} [CommRing R] (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n R) V) :
-    Representation ℂ (Levi R m) (Jacquet π (unipRad R e)) := by
+def jacU {R : Type} [CommRing R] (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n R) V)
+    : Representation ℂ (Levi R m) (Jacquet π (unipRad R e)) := by
   refine jacquet π (unipRad R e) (leviEmb R e) fun g => ?_
-  have hg : leviEmb R e g ∈ parab R e := (mem_parab_iff (R := R)).2 fun a b i j h => by
-    simp [leviEmb, blockDiagonal'_apply, h.ne']
+  have hg : leviEmb R e g ∈ parab R e :=
+    (mem_parab_iff (R := R)).2 fun a b i j h => by simp [leviEmb, blockDiagonal'_apply, h.ne']
   exact parab_le_normalizer R e hg
 
-def jac (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n k) V) :
-    Representation ℂ (Levi k m) (Jacquet π (unipRad k e)) :=
+def jac (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n k) V)
+    : Representation ℂ (Levi k m) (Jacquet π (unipRad k e)) :=
   twist (jacU e π) (deltaHalf k m)⁻¹
 
-theorem jac_mk (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n k) V) (g : Levi k m) (v : V) :
-    jac e π g (Submodule.Quotient.mk v) =
-      (((deltaHalf k m g)⁻¹ : ℂˣ) : ℂ) • Submodule.Quotient.mk (π (leviEmb k e g) v) := rfl
+theorem jac_mk (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n k) V) (g : Levi k m) (v : V)
+    : jac e π g (Submodule.Quotient.mk v)
+      = (((deltaHalf k m g)⁻¹ : ℂˣ) : ℂ) • Submodule.Quotient.mk (π (leviEmb k e g) v) :=
+  rfl
 
-theorem isSmooth_jacU (e : (Σ a, m a) ≃ n) {π : Representation ℂ (GL n k) V} (hπ : IsSmooth π) :
-    IsSmooth (jacU e π) :=
+theorem isSmooth_jacU (e : (Σ a, m a) ≃ n) {π : Representation ℂ (GL n k) V} (hπ : IsSmooth π)
+    : IsSmooth (jacU e π) :=
   isSmooth_jacquet hπ _ _ _ (continuous_leviEmb k e)
 
-theorem isSmooth_jac (e : (Σ a, m a) ≃ n) {π : Representation ℂ (GL n k) V} (hπ : IsSmooth π) :
-    IsSmooth (jac e π) :=
+theorem isSmooth_jac (e : (Σ a, m a) ≃ n) {π : Representation ℂ (GL n k) V} (hπ : IsSmooth π)
+    : IsSmooth (jac e π) :=
   isSmooth_twist (isSmooth_jacU e hπ) (isSmoothChar_deltaHalf k).inv
 
-def jacMap (e : (Σ a, m a) ≃ n) {π : Representation ℂ (GL n k) V} {τ : Representation ℂ (GL n k) W}
-    (f : π.IntertwiningMap τ) : (jac e π).IntertwiningMap (jac e τ) :=
+def jacMap
+    (e : (Σ a, m a) ≃ n)
+    {π : Representation ℂ (GL n k) V} {τ : Representation ℂ (GL n k) W} (f : π.IntertwiningMap τ)
+    : (jac e π).IntertwiningMap (jac e τ) :=
   twistMap (jacquetMap f _ _ _) _
-
 
 abbrev IndSpLower (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) : Type :=
   smoothPart (ind (parabLower k e) ((twist ρ (deltaHalf k m)⁻¹).comp (leviProjLower k e)))
 
-def parIndLower (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) :
-    Representation ℂ (GL n k) (IndSpLower e ρ) :=
+def parIndLower (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W)
+    : Representation ℂ (GL n k) (IndSpLower e ρ) :=
   smInd (parabLower k e) ((twist ρ (deltaHalf k m)⁻¹).comp (leviProjLower k e))
 
-def jacLower (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n k) V) :
-    Representation ℂ (Levi k m) (Jacquet π (unipRadLower k e)) := by
+def jacLower (e : (Σ a, m a) ≃ n) (π : Representation ℂ (GL n k) V)
+    : Representation ℂ (Levi k m) (Jacquet π (unipRadLower k e)) := by
   refine twist (jacquet π (unipRadLower k e) (leviEmb k e) fun g => ?_) (deltaHalf k m)
-  have hg : leviEmb k e g ∈ parabLower k e := (mem_parabLower_iff (R := k)).2 fun a b i j h => by
-    simp [leviEmb, blockDiagonal'_apply, h.ne]
+  have hg : leviEmb k e g ∈ parabLower k e :=
+    (mem_parabLower_iff (R := k)).2 fun a b i j h => by simp [leviEmb, blockDiagonal'_apply, h.ne]
   exact parab_le_normalizer k (opp e) hg
 
-def multiProd (e : (Σ a, m a) ≃ n) {X : α → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+def multiProd
+    (e : (Σ a, m a) ≃ n)
+    {X : α → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
     (π : ∀ a, Representation ℂ (GL (m a) k) (X a)) :=
   parInd e (piTensor π)
 
@@ -304,14 +319,12 @@ section Two
 
 variable {a b : Type} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
 
-theorem deltaHalf_two (g : GL a k × GL b k) :
-    deltaHalf k (Two a b) (leviTwo k a b g) =
-      absPow k ((Fintype.card b : ℂ) / 2) (GeneralLinearGroup.det g.1) *
-        absPow k (-(Fintype.card a : ℂ) / 2) (GeneralLinearGroup.det g.2) := by
-  have h1 : modExp (Two a b) false = Fintype.card b := by
-    simp [modExp, Finset.sum_filter]
-  have h2 : modExp (Two a b) true = -Fintype.card a := by
-    simp [modExp, Finset.sum_filter]
+theorem deltaHalf_two (g : GL a k × GL b k)
+    : deltaHalf k (Two a b) (leviTwo k a b g)
+      = absPow k ((Fintype.card b : ℂ) / 2) (GeneralLinearGroup.det g.1)
+        * absPow k (-(Fintype.card a : ℂ) / 2) (GeneralLinearGroup.det g.2) := by
+  have h1 : modExp (Two a b) false = Fintype.card b := by simp [modExp, Finset.sum_filter]
+  have h2 : modExp (Two a b) true = - Fintype.card a := by simp [modExp, Finset.sum_filter]
   rw [deltaHalf_apply, Fintype.prod_bool, h1, h2, mul_comm]
   push_cast
   rfl
@@ -322,61 +335,69 @@ def ind₂ (e : a ⊕ b ≃ n) (ρ : Representation ℂ (GL a k × GL b k) W) :=
 def ind₂Lower (e : a ⊕ b ≃ n) (ρ : Representation ℂ (GL a k × GL b k) W) :=
   parIndLower (two e) (ρ.comp (leviTwo k a b).symm.toMonoidHom)
 
-def jacU₂ (e : a ⊕ b ≃ n) (π : Representation ℂ (GL n k) V) :
-    Representation ℂ (GL a k × GL b k) (Jacquet π (unipRad k (two e))) :=
+def jacU₂ (e : a ⊕ b ≃ n) (π : Representation ℂ (GL n k) V)
+    : Representation ℂ (GL a k × GL b k) (Jacquet π (unipRad k (two e))) :=
   (jacU (two e) π).comp (leviTwo k a b).toMonoidHom
 
-def jac₂ (e : a ⊕ b ≃ n) (π : Representation ℂ (GL n k) V) :
-    Representation ℂ (GL a k × GL b k) (Jacquet π (unipRad k (two e))) :=
+def jac₂ (e : a ⊕ b ≃ n) (π : Representation ℂ (GL n k) V)
+    : Representation ℂ (GL a k × GL b k) (Jacquet π (unipRad k (two e))) :=
   (jac (two e) π).comp (leviTwo k a b).toMonoidHom
 
-def jac₂Lower (e : a ⊕ b ≃ n) (π : Representation ℂ (GL n k) V) :
-    Representation ℂ (GL a k × GL b k) (Jacquet π (unipRadLower k (two e))) :=
+def jac₂Lower (e : a ⊕ b ≃ n) (π : Representation ℂ (GL n k) V)
+    : Representation ℂ (GL a k × GL b k) (Jacquet π (unipRadLower k (two e))) :=
   (jacLower (two e) π).comp (leviTwo k a b).toMonoidHom
 
-theorem isSmooth_jac₂ (e : a ⊕ b ≃ n) {π : Representation ℂ (GL n k) V} (hπ : IsSmooth π) :
-    IsSmooth (jac₂ e π) :=
+theorem isSmooth_jac₂ (e : a ⊕ b ≃ n) {π : Representation ℂ (GL n k) V} (hπ : IsSmooth π)
+    : IsSmooth (jac₂ e π) :=
   isSmooth_comp (isSmooth_jac _ hπ) _ (continuous_leviTwo k)
 
-def prod₂ {r t : ℕ} (π₁ : Representation ℂ (GL (Fin r) k) V) (π₂ : Representation ℂ (GL (Fin t) k) W) :=
+def prod₂
+    {r t : ℕ} (π₁ : Representation ℂ (GL (Fin r) k) V) (π₂ : Representation ℂ (GL (Fin t) k) W) :=
   ind₂ (stdSum (rfl : r + t = r + t)) (extTensor π₁ π₂)
 
-theorem isSmooth_prod₂ {r t : ℕ} (π₁ : Representation ℂ (GL (Fin r) k) V)
-    (π₂ : Representation ℂ (GL (Fin t) k) W) : IsSmooth (prod₂ π₁ π₂) := isSmooth_parInd _ _
+theorem isSmooth_prod₂
+    {r t : ℕ} (π₁ : Representation ℂ (GL (Fin r) k) V) (π₂ : Representation ℂ (GL (Fin t) k) W)
+    : IsSmooth (prod₂ π₁ π₂) :=
+  isSmooth_parInd _ _
 
 end Two
 
-theorem twKer_detRep {R : Type} [CommRing R] (e : (Σ a, m a) ≃ n) (χ : Rˣ →* ℂˣ) :
-    twKer (detRep n χ) (unipRad R e) 1 = ⊥ := by
+theorem twKer_detRep {R : Type} [CommRing R] (e : (Σ a, m a) ≃ n) (χ : Rˣ →* ℂˣ)
+    : twKer (detRep n χ) (unipRad R e) 1 = ⊥ := by
   refine Submodule.span_eq_bot.2 ?_
   rintro _ ⟨u, v, rfl⟩
   simp [detRep, det_eq_one_of_mem_unipRad R u.2]
 
 def IsCuspidal (π : Representation ℂ (GL n k) V) : Prop :=
-  IsSmooth π ∧ ∀ (s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ n), unipRad k e ≠ ⊥ →
-    Subsingleton (Jacquet π (unipRad k e))
+  IsSmooth π
+    ∧ ∀ (s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ n),
+      unipRad k e ≠ ⊥ → Subsingleton (Jacquet π (unipRad k e))
 
-def IsCuspSupport (π : Representation ℂ (GL n k) V) {s : ℕ} (d : Fin s → ℕ) {X : Fin s → Type}
-    [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
-    (σ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a)) : Prop :=
-  π.IsIrreducible ∧ (∀ a, 0 < d a ∧ (σ a).IsIrreducible ∧ IsCuspidal (σ a)) ∧
-    ∃ e : (Σ a, Fin (d a)) ≃ n, IsSubquotient π (multiProd e σ)
+def IsCuspSupport
+    (π : Representation ℂ (GL n k) V)
+    {s : ℕ} (d : Fin s → ℕ)
+    {X : Fin s → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+    (σ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a))
+    : Prop :=
+  π.IsIrreducible ∧ (∀ a, 0 < d a ∧ (σ a).IsIrreducible ∧ IsCuspidal (σ a))
+    ∧ ∃ e : (Σ a, Fin (d a)) ≃ n, IsSubquotient π (multiProd e σ)
 
 def InSupport (π : Representation ℂ (GL n k) V) (χ : kˣ →* ℂˣ) : Prop :=
-  ∃ (s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ n) (a : Fin s), d a = 1 ∧
-    ∃ (Y : Type) (_ : AddCommGroup Y) (_ : Module ℂ Y)
-      (σ : Representation ℂ (Levi k fun a => Fin (d a)) Y),
-      σ.IsIrreducible ∧ IsSubquotient σ (jac e π) ∧
-        ∀ (g : GL (Fin (d a)) k) (y : Y),
-          σ (Pi.mulSingle a g) y = (χ (GeneralLinearGroup.det g) : ℂ) • y
+  ∃ (s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ n) (a : Fin s),
+    d a = 1
+      ∧ ∃ (Y : Type) (_ : AddCommGroup Y) (_ : Module ℂ Y)
+          (σ : Representation ℂ (Levi k fun a => Fin (d a)) Y),
+        σ.IsIrreducible ∧ IsSubquotient σ (jac e π)
+          ∧ ∀ (g : GL (Fin (d a)) k) (y : Y),
+            σ (Pi.mulSingle a g) y = (χ (GeneralLinearGroup.det g) : ℂ) • y
 
 section Borel
 
 variable [LinearOrder n]
 
-theorem modulus_torus {n : Type} [Fintype n] [LinearOrder n] (t : n → kˣ) :
-    modulus k (fun _ : n => Unit) (leviTorus k n t) =
-      ∏ i, ∏ j with i < j, nabs k (t i / t j) := by
+theorem modulus_torus {n : Type} [Fintype n] [LinearOrder n] (t : n → kˣ)
+    : modulus k (fun _ : n => Unit) (leviTorus k n t)
+      = ∏ i, ∏ j with i < j, nabs k (t i / t j) := by
   have hd : ∀ i, GeneralLinearGroup.det (leviTorus k n t i) = t i :=
     congrFun ((leviTorus k n).left_inv t)
   have hq : ∀ x y : kˣ, nabs k (x / y) = nabs k x / nabs k y := fun x y => by simp [nabs]
@@ -396,10 +417,9 @@ def jacBU (π : Representation ℂ (GL n k) V) : Representation ℂ (n → kˣ) 
 def jacB (π : Representation ℂ (GL n k) V) : Representation ℂ (n → kˣ) (Jacquet π (unipB k n)) :=
   (jac (points n) π).comp (leviTorus k n).toMonoidHom
 
-
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem jacBU_mk (π : Representation ℂ (GL n k) V) (t : n → kˣ) (v : V) :
-    jacBU π t (Submodule.Quotient.mk v) = Submodule.Quotient.mk (π (diagT k n t) v) := by
+theorem jacBU_mk (π : Representation ℂ (GL n k) V) (t : n → kˣ) (v : V)
+    : jacBU π t (Submodule.Quotient.mk v) = Submodule.Quotient.mk (π (diagT k n t) v) := by
   change jacU (points n) π (leviTorus k n t) (Submodule.Quotient.mk v) = _
   rw [jacU, jacquet_mk]
   apply congrArg (fun g : GL n k => Submodule.Quotient.mk (π g v))
@@ -438,9 +458,10 @@ theorem KOne_le_iwahori : KOne k n ≤ iwahori k n :=
 
 variable {k n}
 
-theorem mem_iwahori {g : GL n k} :
-    g ∈ iwahori k n ↔ g ∈ KO k n ∧ ∀ i j, j < i → valuation k ((g : Matrix n n k) i j) < 1 := by
-  have key : ∀ x : 𝒪[k], IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (algebraMap 𝒪[k] k x) < 1 := by
+theorem mem_iwahori {g : GL n k}
+    : g ∈ iwahori k n ↔ g ∈ KO k n ∧ ∀ i j, j < i → valuation k ((g : Matrix n n k) i j) < 1 := by
+  have key
+      : ∀ x : 𝒪[k], IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (algebraMap 𝒪[k] k x) < 1 := by
     intro x
     rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
       (Valuation.integer.integers (valuation k)).isUnit_iff_valuation_eq_one]
@@ -452,8 +473,12 @@ theorem mem_iwahori {g : GL n k} :
     exact ⟨h, (mem_borel _).2 fun i j hij => (key _).2 (hh i j hij), rfl⟩
 
 theorem diagT_mem_iwahori {t : n → kˣ} (ht : t ∈ torusO k n) : diagT k n t ∈ iwahori k n := by
-  let u : n → 𝒪[k]ˣ := fun i => ⟨⟨t i, (ht i).le⟩, ⟨((t i)⁻¹ : kˣ), (inv_mem ht i).le⟩,
-    Subtype.ext (t i).mul_inv, Subtype.ext (t i).inv_mul⟩
+  let u : n → 𝒪[k]ˣ := fun i => ⟨
+    ⟨t i, (ht i).le⟩,
+    ⟨((t i)⁻¹ : kˣ), (inv_mem ht i).le⟩,
+    Subtype.ext (t i).mul_inv,
+    Subtype.ext (t i).inv_mul
+  ⟩
   refine mem_iwahori.2 ⟨⟨diagT _ n u, ?_⟩, fun i j hij => ?_⟩
   · ext i j
     show algebraMap 𝒪[k] k ((diagT _ n u : Matrix n n 𝒪[k]) i j) = _
@@ -464,22 +489,21 @@ theorem diagT_mem_iwahori {t : n → kˣ} (ht : t ∈ torusO k n) : diagT k n t 
   · rw [val_diagT, diagonal_apply_ne _ hij.ne']
     simp
 
-def iwahoriProj (π : Representation ℂ (GL n k) V) :
-    fixed π (iwahori k n) →ₗ[ℂ] fixed (jacBU π) (torusO k n) :=
+def iwahoriProj (π : Representation ℂ (GL n k) V)
+    : fixed π (iwahori k n) →ₗ[ℂ] fixed (jacBU π) (torusO k n) :=
   (twKer π (unipB k n) 1).mkQ.restrict fun v hv t => by
     have h : π (diagT k n t) v = v := by simpa using hv ⟨_, diagT_mem_iwahori t.2⟩
     show jacBU π t (Submodule.Quotient.mk v) = _
     rw [jacBU_mk, h]
     simp
 
-def jacBUFixed (π : Representation ℂ (GL n k) V) :
-    Representation ℂ (n → kˣ) (fixed (jacBU π) (torusO k n)) :=
+def jacBUFixed (π : Representation ℂ (GL n k) V)
+    : Representation ℂ (n → kˣ) (fixed (jacBU π) (torusO k n)) :=
   onFixed (jacBU π) (torusO k n) (MonoidHom.id _) fun _ => by
     rw [Subgroup.normalizer_eq_top]; trivial
 
 def expMult (π : Representation ℂ (GL n k) V) (χ : (n → kˣ) →* ℂˣ) : ℕ∞ :=
   jhMult (ofChar χ) (jacBUFixed π)
-
 
 omit [LinearOrder n] in
 def IsSpherical (π : Representation ℂ (GL n k) V) : Prop := IsSphericalFor π (KO k n)
@@ -495,18 +519,22 @@ section Examples
 
 open Matrix
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α]
-  [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+  [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
 
 def detLevi (e : (Σ a, m a) ≃ n) (χ : kˣ →* ℂˣ) : Levi k m →* ℂˣ :=
   (detChar n χ).comp (leviEmb k e) * (deltaHalf k m)⁻¹
 
-theorem detLevi_apply (e : (Σ a, m a) ≃ n) (χ : kˣ →* ℂˣ) (g : Levi k m) :
-    detLevi e χ g = ∏ a, (χ * absPow k (-(modExp m a : ℂ) / 2)) (GeneralLinearGroup.det (g a)) := by
+theorem detLevi_apply (e : (Σ a, m a) ≃ n) (χ : kˣ →* ℂˣ) (g : Levi k m)
+    : detLevi e χ g
+      = ∏ a, (χ * absPow k (-(modExp m a : ℂ) / 2)) (GeneralLinearGroup.det (g a)) := by
   have hdet : GeneralLinearGroup.det (leviEmb k e g) = ∏ a, GeneralLinearGroup.det (g a) := by
-    let p : parab k e := ⟨leviEmb k e g, mem_parab_iff.2 fun a b i j h => by
-      simp [leviEmb, blockDiagonal'_apply, h.ne']⟩
+    let p : parab k e := ⟨
+      leviEmb k e g,
+      mem_parab_iff.2 fun a b i j h => by simp [leviEmb, blockDiagonal'_apply, h.ne']
+    ⟩
     have hproj : leviProj k e p = g := by
       funext a
       ext i j
@@ -514,22 +542,31 @@ theorem detLevi_apply (e : (Σ a, m a) ≃ n) (χ : kˣ →* ℂˣ) (g : Levi k 
     simpa only [hproj] using det_parab k e p
   simp [detLevi, hdet, deltaHalf_apply, neg_div, absPow_neg, Finset.prod_mul_distrib]
 
-theorem isSubquotient_jac_detRep (e : (Σ a, m a) ≃ n) (χ : kˣ →* ℂˣ) :
-    IsSubquotient (ofChar (detLevi e χ)) (jac e (detRep n χ)) := by
-  refine .of_surjective ⟨(twKer (detRep n χ) (unipRad k e) 1).liftQ LinearMap.id
-    (by rw [twKer_detRep]; exact bot_le), fun g => ?_⟩ fun x => ⟨Submodule.Quotient.mk x, rfl⟩
+theorem isSubquotient_jac_detRep (e : (Σ a, m a) ≃ n) (χ : kˣ →* ℂˣ)
+    : IsSubquotient (ofChar (detLevi e χ)) (jac e (detRep n χ)) := by
+  refine .of_surjective
+    ⟨
+      (twKer (detRep n χ) (unipRad k e) 1).liftQ LinearMap.id (by rw [twKer_detRep]; exact bot_le),
+      fun g => ?_
+    ⟩
+    fun x => ⟨Submodule.Quotient.mk x, rfl⟩
   refine Submodule.linearMap_qext _ (LinearMap.ext fun v => ?_)
   show (((deltaHalf k m g)⁻¹ : ℂˣ) : ℂ) • detRep n χ (leviEmb k e g) v = ofChar (detLevi e χ) g v
   simp [detRep, detLevi, mul_comm, mul_left_comm]
 
-theorem isSubquotient_detRep_parInd (e : (Σ a, m a) ≃ n) {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ) :
-    IsSubquotient (detRep n χ) (parInd e (ofChar (detLevi e χ))) := by
-  let f : ℂ →ₗ[ℂ] IndSp e (ofChar (detLevi e χ)) :=
-    { toFun := fun c => ⟨⟨fun g => (detChar n χ g : ℂ) * c, fun p g => by
-          have : GeneralLinearGroup.det (leviEmb k e (leviProj k e p)) =
-              GeneralLinearGroup.det (p : GL n k) := by
-            let q : parab k e := ⟨leviEmb k e (leviProj k e p), mem_parab_iff.2 fun a b i j h => by
-              simp [leviEmb, blockDiagonal'_apply, h.ne']⟩
+theorem isSubquotient_detRep_parInd (e : (Σ a, m a) ≃ n) {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ)
+    : IsSubquotient (detRep n χ) (parInd e (ofChar (detLevi e χ))) := by
+  let f : ℂ →ₗ[ℂ] IndSp e (ofChar (detLevi e χ)) := {
+    toFun := fun c => ⟨
+      ⟨
+        fun g => (detChar n χ g : ℂ) * c,
+        fun p g => by
+          have : GeneralLinearGroup.det (leviEmb k e (leviProj k e p))
+              = GeneralLinearGroup.det (p : GL n k) := by
+            let q : parab k e := ⟨
+              leviEmb k e (leviProj k e p),
+              mem_parab_iff.2 fun a b i j h => by simp [leviEmb, blockDiagonal'_apply, h.ne']
+            ⟩
             have hproj : leviProj k e q = leviProj k e p := by
               funext a
               ext i j
@@ -537,24 +574,28 @@ theorem isSubquotient_detRep_parInd (e : (Σ a, m a) ≃ n) {χ : kˣ →* ℂˣ
             change GeneralLinearGroup.det (q : GL n k) = GeneralLinearGroup.det (p : GL n k)
             rw [det_parab k e q, det_parab k e p, hproj]
           show _ = (deltaHalf k m _ : ℂ) • ofChar (detLevi e χ) (leviProj k e p) _
-          simp [detLevi, this, mul_assoc, mul_left_comm (deltaHalf k m (leviProj k e p) : ℂ)]⟩,
-        mem_smoothPart_of_nhds (Filter.mem_of_superset
-          (IsOpen.mem_nhds (hχ.detChar (n := n)) (one_mem _)) fun g hg => by
-            have hg' : detChar n χ g = 1 := hg
-            apply Subtype.ext
-            funext x
-            show (detChar n χ (x * g) : ℂ) * c = (detChar n χ x : ℂ) * c
-            rw [map_mul, hg', mul_one])⟩
-      map_add' := fun c d => by ext g; exact mul_add _ _ _
-      map_smul' := fun c d => by ext g; exact mul_left_comm _ _ _ }
+          simp [detLevi, this, mul_assoc, mul_left_comm (deltaHalf k m (leviProj k e p) : ℂ)]
+      ⟩,
+      mem_smoothPart_of_nhds
+        (Filter.mem_of_superset (IsOpen.mem_nhds (hχ.detChar (n := n)) (one_mem _)) fun g hg => by
+          have hg' : detChar n χ g = 1 := hg
+          apply Subtype.ext
+          funext x
+          show (detChar n χ (x * g) : ℂ) * c = (detChar n χ x : ℂ) * c
+          rw [map_mul, hg', mul_one])
+    ⟩
+    map_add' := fun c d => by ext g; exact mul_add _ _ _
+    map_smul' := fun c d => by ext g; exact mul_left_comm _ _ _
+  }
   refine .of_injective ⟨f, fun g => ?_⟩ fun c d h => ?_
   · refine LinearMap.ext fun c => Subtype.ext (Subtype.ext (funext fun x => ?_))
     show (detChar n χ x : ℂ) * (detRep n χ g c) = (detChar n χ (x * g) : ℂ) * c
     simp [detRep, mul_assoc]
   · simpa [f] using congrFun (congrArg (fun φ => φ.1.1) h) 1
 
-theorem modExp_fin {N : ℕ} (X : Fin N → Type) [∀ i, Fintype (X i)] (hX : ∀ i, Fintype.card (X i) = 1)
-    (i : Fin N) : modExp X i = (N : ℤ) - 1 - 2 * (i : ℕ) := by
+theorem modExp_fin
+    {N : ℕ} (X : Fin N → Type) [∀ i, Fintype (X i)] (hX : ∀ i, Fintype.card (X i) = 1) (i : Fin N)
+    : modExp X i = (N : ℤ) - 1 - 2 * (i : ℕ) := by
   have h1 : Finset.univ.filter (fun b => i < b) = Finset.Ioi i := by ext; simp
   have h2 : Finset.univ.filter (fun b => b < i) = Finset.Iio i := by ext; simp
   have := i.2
@@ -562,11 +603,23 @@ theorem modExp_fin {N : ℕ} (X : Fin N → Type) [∀ i, Fintype (X i)] (hX : �
     nsmul_eq_mul, mul_one]
   omega
 
-theorem inSupport_detRep {N : ℕ} (χ : kˣ →* ℂˣ) (i : Fin N) :
-    InSupport (detRep (Fin N) χ) (χ * absPow k (((i : ℕ) : ℂ) - ((N : ℂ) - 1) / 2)) := by
+theorem inSupport_detRep {N : ℕ} (χ : kˣ →* ℂˣ) (i : Fin N)
+    : InSupport (detRep (Fin N) χ) (χ * absPow k (((i : ℕ) : ℂ) - ((N : ℂ) - 1) / 2)) := by
   let e : (Σ _ : Fin N, Fin 1) ≃ Fin N := Equiv.sigmaUnique _ _
-  refine ⟨N, fun _ => 1, e, i, rfl, ℂ, inferInstance, inferInstance, ofChar (detLevi e χ),
-    isIrreducible_ofChar _, isSubquotient_jac_detRep e χ, fun g y => ?_⟩
+  refine ⟨
+    N,
+    fun _ => 1,
+    e,
+    i,
+    rfl,
+    ℂ,
+    inferInstance,
+    inferInstance,
+    ofChar (detLevi e χ),
+    isIrreducible_ofChar _,
+    isSubquotient_jac_detRep e χ,
+    fun g y => ?_
+  ⟩
   rw [ofChar_apply, detLevi_apply, Finset.prod_eq_single i, Pi.mulSingle_eq_same,
     modExp_fin _ (fun _ => by simp), smul_eq_mul]
   · congr 6
@@ -581,21 +634,24 @@ theorem isSpherical_detRep {χ : kˣ →* ℂˣ} (h : IsUnram χ) : IsSpherical 
   rintro ⟨_, g, rfl⟩
   have : χ (GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g)) = 1 := by
     apply h
-    have h1 : ((GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g) : kˣ) : k) =
-        algebraMap 𝒪[k] k (GeneralLinearGroup.det g : 𝒪[k]ˣ) :=
+    have h1
+        : ((GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g) : kˣ) : k)
+          = algebraMap 𝒪[k] k (GeneralLinearGroup.det g : 𝒪[k]ˣ) :=
       ((algebraMap 𝒪[k] k).map_det _).symm
     rw [h1]
     exact (Valuation.integer.integers (valuation k)).one_of_isUnit (Units.isUnit _)
   simp [detRep, this]
 
-theorem hasSatake_detRep {N : ℕ} {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ}
-    (hϖ : valuation k (ϖ : k) = uniformizer k) :
-    HasSatake (detRep (Fin N) χ)
-      fun i => χ ϖ * absPow k (((i : ℕ) : ℂ) - ((N : ℂ) - 1) / 2) ϖ := by
+theorem hasSatake_detRep
+    {N : ℕ} {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k)
+    : HasSatake (detRep (Fin N) χ) fun i =>
+      χ ϖ * absPow k (((i : ℕ) : ℂ) - ((N : ℂ) - 1) / 2) ϖ := by
   refine ⟨isIrreducible_ofChar _, isSpherical_detRep h, ?_⟩
-  have key : (ofChar (torusChar fun i : Fin N => unrChar k
-      (χ ϖ * absPow k (((i : ℕ) : ℂ) - ((N : ℂ) - 1) / 2) ϖ))).comp
-        (leviTorus k (Fin N)).symm.toMonoidHom = ofChar (detLevi (points (Fin N)) χ) := by
+  have key
+      : (ofChar (torusChar fun i : Fin N =>
+            unrChar k (χ ϖ * absPow k (((i : ℕ) : ℂ) - ((N : ℂ) - 1) / 2) ϖ))).comp
+          (leviTorus k (Fin N)).symm.toMonoidHom
+        = ofChar (detLevi (points (Fin N)) χ) := by
     refine MonoidHom.ext fun g => LinearMap.ext fun y => ?_
     show ofChar _ _ y = _
     rw [ofChar_apply, ofChar_apply, detLevi_apply, torusChar_apply]
@@ -611,8 +667,8 @@ theorem hasSatake_detRep {N : ℕ} {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : 
   rw [← key] at this
   exact this
 
-theorem isCuspidal_detRep_one {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ) :
-    IsCuspidal (detRep (Fin 1) χ) := by
+theorem isCuspidal_detRep_one {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ)
+    : IsCuspidal (detRep (Fin 1) χ) := by
   refine ⟨(isSmooth_ofChar_iff _).2 hχ.detChar, fun s d e he => absurd ?_ he⟩
   refine (Subgroup.eq_bot_iff_forall _).2 fun u hu => ?_
   ext i j

@@ -15,7 +15,8 @@ open Module Formalism.HermitianLatticesTheory
 
 section Maj
 
-variable {K V ι : Type} [Field K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
+variable
+  {K V ι : Type} [Field K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
   (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K)
 
 theorem fcoord_add' (x y : V) : fcoord b X v (x + y) = fcoord b X v x + fcoord b X v y := by
@@ -30,8 +31,9 @@ theorem fcoord_smul' (a : K) (x : V) : fcoord b X v (a • x) = v.embedding a �
     simp [vecAt]
   simp only [fcoord, hv, Matrix.mulVec_smul]
 
-theorem normAt_add_sq (x y : V) :
-    normAt b X v (x + y) ^ 2 = normAt b X v x ^ 2 + normAt b X v y ^ 2 + 2 * (majAt b X v x y).re := by
+theorem normAt_add_sq (x y : V)
+    : normAt b X v (x + y) ^ 2
+      = normAt b X v x ^ 2 + normAt b X v y ^ 2 + 2 * (majAt b X v x y).re := by
   simp only [normAt, cnorm, majAt, fcoord_add']
   rw [Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _),
     Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _),
@@ -42,23 +44,28 @@ theorem normAt_add_sq (x y : V) :
     Complex.mul_re, Complex.star_def, Complex.conj_re, Complex.conj_im]
   ring
 
-theorem majAt_smul_left' (a : K) (x y : V) :
-    majAt b X v (a • x) y = star (v.embedding a) * majAt b X v x y := by
+theorem majAt_smul_left' (a : K) (x y : V)
+    : majAt b X v (a • x) y = star (v.embedding a) * majAt b X v x y := by
   simp only [majAt, fcoord_smul', Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [Pi.smul_apply, smul_eq_mul, star_mul']
   ring
 
-theorem majAt_add_right' (x y z : V) : majAt b X v x (y + z) = majAt b X v x y + majAt b X v x z := by
+theorem majAt_add_right' (x y z : V)
+    : majAt b X v x (y + z) = majAt b X v x y + majAt b X v x z := by
   simp only [majAt, fcoord_add', Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
 theorem star_majAt' (x y : V) : star (majAt b X v x y) = majAt b X v y x := by
   simp only [majAt, star_sum, star_mul', star_star]
   exact Finset.sum_congr rfl fun i _ => mul_comm _ _
 
-theorem selfAdj_of_pyth (hv : v.IsComplex) (e : V →ₗ[K] V)
-    (h : ∀ x y, normAt b X v (e x + (y - e y)) ^ 2 = normAt b X v (e x) ^ 2 + normAt b X v (y - e y) ^ 2) (x y : V) :
-    majAt b X v (e x) y = majAt b X v x (e y) := by
+theorem selfAdj_of_pyth
+    (hv : v.IsComplex)
+    (e : V →ₗ[K] V)
+    (h : ∀ x y,
+      normAt b X v (e x + (y - e y)) ^ 2 = normAt b X v (e x) ^ 2 + normAt b X v (y - e y) ^ 2)
+    (x y : V)
+    : majAt b X v (e x) y = majAt b X v x (e y) := by
   have hre : ∀ x y, (majAt b X v (e x) (y - e y)).re = 0 := by
     intro x y
     have h1 := normAt_add_sq b X v (e x) (y - e y)
@@ -94,9 +101,11 @@ theorem selfAdj_of_pyth (hv : v.IsComplex) (e : V →ₗ[K] V)
 
 end Maj
 
-theorem numeric {dg db μ μg m lg δ Q : ℝ} (hd : 0 < dg + db) (hdg : 0 ≤ dg) (hdb : 0 ≤ db)
-    (hcut : (dg + db) * μ ≤ dg * μg + db * (m + lg)) (hδ : 0 ≤ δ) (hδ' : δ ≤ 1 / 12) (hb : db ≤ 3 * δ * (dg + db))
-    (hm : m ≤ Q) (hμ : -Q ≤ μ) (hlg : lg ≤ Q) (hlg0 : 0 ≤ lg) : μ - 12 * δ * Q ≤ μg := by
+theorem numeric
+    {dg db μ μg m lg δ Q : ℝ} (hd : 0 < dg + db) (hdg : 0 ≤ dg) (hdb : 0 ≤ db)
+    (hcut : (dg + db) * μ ≤ dg * μg + db * (m + lg)) (hδ : 0 ≤ δ) (hδ' : δ ≤ 1 / 12)
+    (hb : db ≤ 3 * δ * (dg + db)) (hm : m ≤ Q) (hμ : -Q ≤ μ) (hlg : lg ≤ Q) (hlg0 : 0 ≤ lg)
+    : μ - 12 * δ * Q ≤ μg := by
   have hQ : 0 ≤ Q := by linarith
   have hδdb : δ * db ≤ 1 / 12 * db := mul_le_mul_of_nonneg_right hδ' hdb
   have hdg0 : 0 < dg := by
@@ -112,7 +121,18 @@ theorem numeric {dg db μ μg m lg δ Q : ℝ} (hd : 0 < dg + db) (hdg : 0 ≤ d
   have key : dg * (μ - 12 * δ * Q) ≤ dg * μg := by nlinarith
   exact le_of_mul_le_mul_left key hdg0
 
-theorem slope_good_ge : ∀ (K V : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (N : (K →+* ℂ) → V → ℝ) (L M : Submodule (𝓞 K) V) (e : V →ₗ[K] V) (g : ℕ) (δ Q : ℝ), HasGram N → M.FG → L ≤ M → L ≠ ⊥ → e ∘ₗ e = e → (∀ σ x y, N σ (e x + (y - e y)) ^ 2 = N σ (e x) ^ 2 + N σ (y - e y) ^ 2) → 1 ≤ g → (∀ x ∈ L, (g : K) • e x ∈ L) → 0 ≤ δ → δ ≤ 1 / 12 → (Formalism.HN.rkK (L ⊓ (LinearMap.ker e).restrictScalars (𝓞 K)) : ℝ) ≤ 3 * δ * Formalism.HN.rkK L → slopeMax_sq N M ≤ Q → -Q ≤ slope_sq N L → 2 * Real.log g ≤ Q → slope_sq N L - 12 * δ * Q ≤ slope_sq N (L ⊓ (LinearMap.range e).restrictScalars (𝓞 K)) := by
+theorem slope_good_ge
+    : ∀ (K V : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+        (N : (K →+* ℂ) → V → ℝ) (L M : Submodule (𝓞 K) V) (e : V →ₗ[K] V) (g : ℕ) (δ Q : ℝ),
+      HasGram N → M.FG → L ≤ M → L ≠ ⊥ → e ∘ₗ e = e
+        → (∀ σ x y, N σ (e x + (y - e y)) ^ 2 = N σ (e x) ^ 2 + N σ (y - e y) ^ 2) → 1 ≤ g
+        → (∀ x ∈ L, (g : K) • e x ∈ L) → 0 ≤ δ → δ ≤ 1 / 12
+        → (Formalism.HN.rkK (L ⊓ (LinearMap.ker e).restrictScalars (𝓞 K)) : ℝ)
+          ≤ 3 * δ * Formalism.HN.rkK L
+        → slopeMax_sq N M ≤ Q → -Q ≤ slope_sq N L → 2 * Real.log g ≤ Q
+        → slope_sq N L - 12 * δ * Q
+          ≤ slope_sq N (L ⊓ (LinearMap.range e).restrictScalars (𝓞 K)) := by
   intro K V _ _ _ _ _ _ _ N L M e g δ Q hGram hM hLM hL0 hee hpyth hg hint hδ hδ' hrk hmax hmin hlog
   letI : StarRing K := starRingOfComm
   obtain ⟨F⟩ := hGram
@@ -127,14 +147,17 @@ theorem slope_good_ge : ∀ (K V : Type) [Field K] [NumberField K] [_root_.Numbe
     intro x y
     simp only [(hG v).2]
     exact hpyth v.embedding x y
-  obtain ⟨hrkadd, hcut, hmaj⟩ := Formalism.ExtensionFiltration.goodBadCut K V (Fin n) b X hX e g L hLfg hg hee hsa hint
+  obtain ⟨hrkadd, hcut, hmaj⟩ :=
+    Formalism.ExtensionFiltration.goodBadCut K V (Fin n) b X hX e g L hLfg hg hee hsa hint
   have hM0 : M ≠ ⊥ := fun h => hL0 (le_bot_iff.mp (h ▸ hLM))
   rw [slope_sq_eq hG hLfg] at hmin ⊢
   rw [slope_sq_eq hG hRfg]
   rw [(slopeMax_slopeMin_eq hG hM hM0).1] at hmax
   have hne := Formalism.ExtensionFiltration.HermitianIdempotentFrameLemmas.rkK_ne_zero b L hL0
-  have hrkR : (Formalism.HN.rkK L : ℝ) = (Formalism.HN.rkK (L ⊓ (LinearMap.range e).restrictScalars (𝓞 K)) : ℝ) +
-      (Formalism.HN.rkK (L ⊓ (LinearMap.ker e).restrictScalars (𝓞 K)) : ℝ) := by
+  have hrkR
+      : (Formalism.HN.rkK L : ℝ)
+        = (Formalism.HN.rkK (L ⊓ (LinearMap.range e).restrictScalars (𝓞 K)) : ℝ)
+          + (Formalism.HN.rkK (L ⊓ (LinearMap.ker e).restrictScalars (𝓞 K)) : ℝ) := by
     exact_mod_cast hrkadd.symm
   have hpos : (0 : ℝ) < Formalism.HN.rkK L := by exact_mod_cast Nat.pos_of_ne_zero hne
   have hmj := hmaj M hM hLM
@@ -143,6 +166,7 @@ theorem slope_good_ge : ∀ (K V : Type) [Field K] [NumberField K] [_root_.Numbe
     have := Real.log_nonneg this
     linarith
   rw [hrkR] at hcut hrk hpos
-  exact numeric hpos (Nat.cast_nonneg _) (Nat.cast_nonneg _) (by linarith) hδ hδ' hrk hmax hmin hlog hlg0
+  exact numeric hpos (Nat.cast_nonneg _) (Nat.cast_nonneg _) (by linarith) hδ hδ' hrk hmax hmin hlog
+    hlg0
 
 end GlobalTheory.CutNum

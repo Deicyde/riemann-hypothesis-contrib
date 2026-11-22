@@ -45,8 +45,9 @@ theorem InjectiveHolomorphicDerivNeZero.proof : InjectiveHolomorphicDerivNeZero.
 
   set c : ℂ := u a ^ ((n : ℂ)⁻¹) with hc
   set v : ℂ → ℂ := fun z ↦ c * (u z / u a) ^ ((n : ℂ)⁻¹) with hv
-  have hva : AnalyticAt ℂ v a := analyticAt_const.mul
-    ((hu.div analyticAt_const hua).cpow analyticAt_const (by simp [hua, Complex.one_mem_slitPlane]))
+  have hva : AnalyticAt ℂ v a :=
+    analyticAt_const.mul ((hu.div analyticAt_const hua).cpow analyticAt_const
+      (by simp [hua, Complex.one_mem_slitPlane]))
   have hvpow : ∀ z, v z ^ n = u z := by
     intro z
     rw [hv, mul_pow, hc, Complex.cpow_nat_inv_pow _ hn0, Complex.cpow_nat_inv_pow _ hn0]
@@ -73,8 +74,7 @@ theorem InjectiveHolomorphicDerivNeZero.proof : InjectiveHolomorphicDerivNeZero.
       rw [EventuallyEq.deriv_eq (hconst : w =ᶠ[𝓝 a] fun _ ↦ w a)]
       simp
     exact hv0 (hwd.deriv.symm.trans h1)
-  obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.mp
-    (hmap (image_mem_map (inter_mem hDa hfac)))
+  obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.mp (hmap (image_mem_map (inter_mem hDa hfac)))
   rw [hwa] at hball
   have hk : 1 < n := by omega
   set ζ : ℂ := Complex.exp (2 * Real.pi * Complex.I / n) with hζ
@@ -85,10 +85,10 @@ theorem InjectiveHolomorphicDerivNeZero.proof : InjectiveHolomorphicDerivNeZero.
     intro h
     rw [h, norm_zero] at htn
     linarith
-  obtain ⟨z₁, ⟨hz₁D, hz₁⟩, hw₁⟩ := hball (by
-    rw [Metric.mem_ball, dist_zero_right, htn]; linarith)
-  obtain ⟨z₂, ⟨hz₂D, hz₂⟩, hw₂⟩ := hball (show ζ * t ∈ Metric.ball 0 ε by
-    rw [Metric.mem_ball, dist_zero_right, norm_mul, hprim.norm'_eq_one hn0, htn]; linarith)
+  obtain ⟨z₁, ⟨hz₁D, hz₁⟩, hw₁⟩ := hball (by rw [Metric.mem_ball, dist_zero_right, htn]; linarith)
+  obtain ⟨z₂, ⟨hz₂D, hz₂⟩, hw₂⟩ :=
+    hball (show ζ * t ∈ Metric.ball 0 ε by
+      rw [Metric.mem_ball, dist_zero_right, norm_mul, hprim.norm'_eq_one hn0, htn]; linarith)
   have hg₁ := hgw z₁ hz₁
   have hg₂ := hgw z₂ hz₂
   rw [hw₁] at hg₁

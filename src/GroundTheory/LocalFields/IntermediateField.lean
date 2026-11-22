@@ -14,45 +14,43 @@ open ValuativeRel Topology Filter
 
 section Algebraic
 
-variable {K L : Type*} [Field K] [Field L] [Algebra K L] [ValuativeRel L]
-  (E : IntermediateField K L)
+variable
+  {K L : Type*} [Field K] [Field L] [Algebra K L] [ValuativeRel L] (E : IntermediateField K L)
 
 instance intermediateField_valuativeRel : ValuativeRel E :=
   ValuativeRel.ofValuation ((valuation L).comap (algebraMap E L))
 
-
 variable {E} in
 @[simp]
-theorem IntermediateField.coe_vle_coe_iff (x y : E) : (x : L) ≤ᵥ (y : L) ↔ x ≤ᵥ y :=
-  by exact (valuation L).vle_iff_le
+theorem IntermediateField.coe_vle_coe_iff (x y : E) : (x : L) ≤ᵥ (y : L) ↔ x ≤ᵥ y := by
+  exact (valuation L).vle_iff_le
 
 instance intermediateField_valuativeExtension_right : ValuativeExtension E L :=
   ⟨by
     intro a b
     exact IntermediateField.coe_vle_coe_iff (E := E) a b⟩
 
-instance intermediateField_valuativeExtension_left [ValuativeRel K] [ValuativeExtension K L] :
-    ValuativeExtension K E :=
+instance intermediateField_valuativeExtension_left [ValuativeRel K] [ValuativeExtension K L]
+    : ValuativeExtension K E :=
   ⟨by
     intro a b
-    rw [← IntermediateField.coe_vle_coe_iff (E := E) (algebraMap K E a)
-      (algebraMap K E b), IntermediateField.coe_algebraMap_apply,
-      IntermediateField.coe_algebraMap_apply, ValuativeExtension.vle_iff_vle]⟩
-
+    rw [← IntermediateField.coe_vle_coe_iff (E := E) (algebraMap K E a) (algebraMap K E b),
+      IntermediateField.coe_algebraMap_apply, IntermediateField.coe_algebraMap_apply,
+      ValuativeExtension.vle_iff_vle]⟩
 
 variable {E} in
-theorem IntermediateField.valuation_coe (x : E) :
-    valuation L (x : L) = ValuativeExtension.mapValueGroupWithZero E L (valuation E x) :=
+theorem IntermediateField.valuation_coe (x : E)
+    : valuation L (x : L) = ValuativeExtension.mapValueGroupWithZero E L (valuation E x) :=
   (ValuativeExtension.mapValueGroupWithZero_valuation (A := E) (B := L) x).symm
 
 end Algebraic
 
 section Topological
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
   (E : IntermediateField K L)
 
 theorem IntermediateField.isClosed_of_isNonarchimedeanLocalField : IsClosed (E : Set L) := by
@@ -64,7 +62,6 @@ theorem IntermediateField.isClosed_of_isNonarchimedeanLocalField : IsClosed (E :
   exact (Subalgebra.toSubmodule E.toSubalgebra).closed_of_finiteDimensional
 
 instance intermediateField_isNonarchimedeanLocalField : IsNonarchimedeanLocalField E := by
-
   have small : ∀ γ : (ValueGroupWithZero L)ˣ, ∃ b : E, b ≠ 0 ∧ valuation L (b : L) < γ := by
     intro γ
     obtain ⟨δ, hδ0, hδ1⟩ := IsNontrivial.exists_lt_one (R := K)

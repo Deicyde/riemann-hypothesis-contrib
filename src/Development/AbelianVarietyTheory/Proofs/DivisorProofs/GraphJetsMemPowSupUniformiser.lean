@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ToQMemMaxima
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair GlobalTheory.GraphLocal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair GlobalTheory.GraphLocal
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -19,27 +21,30 @@ noncomputable section
 
 namespace GlobalTheory.GraphLocal
 
-theorem ker_productMap_le_span {κ κ' : Type} [Field κ] [Field κ'] [Algebra ℂ κ] [Algebra ℂ κ']
-    (ρ : κ →ₐ[ℂ] κ') :
-    RingHom.ker (Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ')) ≤
-      Ideal.span {x | ∃ f : κ, x = f ⊗ₜ[ℂ] (1 : κ') - 1 ⊗ₜ ρ f} := by
-  have key : ∀ x : κ ⊗[ℂ] κ',
-      x - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') x ∈
-        Ideal.span {x | ∃ f : κ, x = f ⊗ₜ[ℂ] (1 : κ') - 1 ⊗ₜ ρ f} := by
+theorem ker_productMap_le_span
+    {κ κ' : Type} [Field κ] [Field κ'] [Algebra ℂ κ] [Algebra ℂ κ'] (ρ : κ →ₐ[ℂ] κ')
+    : RingHom.ker (Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ'))
+      ≤ Ideal.span {x | ∃ f : κ, x = f ⊗ₜ[ℂ] (1 : κ') - 1 ⊗ₜ ρ f} := by
+  have key
+      : ∀ x : κ ⊗[ℂ] κ',
+        x - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') x
+          ∈ Ideal.span {x | ∃ f : κ, x = f ⊗ₜ[ℂ] (1 : κ') - 1 ⊗ₜ ρ f} := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul f g =>
-      have e : f ⊗ₜ[ℂ] g - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') (f ⊗ₜ g) =
-          (f ⊗ₜ[ℂ] (1 : κ') - 1 ⊗ₜ ρ f) * (1 ⊗ₜ g) := by
+      have e
+          : f ⊗ₜ[ℂ] g - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') (f ⊗ₜ g)
+            = (f ⊗ₜ[ℂ] (1 : κ') - 1 ⊗ₜ ρ f) * (1 ⊗ₜ g) := by
         simp [Algebra.TensorProduct.productMap_apply_tmul, sub_mul,
           Algebra.TensorProduct.tmul_mul_tmul]
       rw [e]
       exact Ideal.mul_mem_right _ _ (Ideal.subset_span ⟨f, rfl⟩)
     | add x y hx hy =>
-      have e : x + y - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') (x + y) =
-          (x - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') x) +
-            (y - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') y) := by
+      have e
+          : x + y - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') (x + y)
+            = (x - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') x)
+              + (y - 1 ⊗ₜ Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ') y) := by
         rw [map_add (f := _), TensorProduct.tmul_add]
         abel
       rw [e]
@@ -48,20 +53,20 @@ theorem ker_productMap_le_span {κ κ' : Type} [Field κ] [Field κ'] [Algebra �
   have h := key x
   rwa [RingHom.mem_ker.1 hx, TensorProduct.tmul_zero, sub_zero] at h
 
-
 set_option maxHeartbeats 1000000 in
-theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
-    (R : Subring K) (π : R →+* κ) (ρ : κ →ₐ[ℂ] κ') (E : Place (algebraMap ℂ K))
-    (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime] (t : E.ring),
-  graphIdeal E R π ρ ≤ 𝔭 → Irreducible t →
-  (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a) →
-  (∀ a, algebraMap ℂ K a ∈ R) → (∀ f : κ, ∃ a b : R, π b ≠ 0 ∧ f * π b = π a) →
-  E.Contains R → (∀ r : R, (r : K) ≠ 0 → (π r = 0 ↔ 0 < E.ord r)) →
-  ∀ (M l : ℕ) (a : Fin l → R) (b : Fin l → κ') (w : tens (κ' := κ') (placeAlg E)),
-    (w : K ⊗[ℂ] κ') = ∑ i, (a i : K) ⊗ₜ b i →
-    ∑ i, π (a i) ⊗ₜ[ℂ] b i ∈ (RingHom.ker (Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ'))) ^ M →
-    w ∈ 𝔭 ^ M ⊔ Ideal.span {⟨(t : K) ⊗ₜ 1, tmul_mem t.2 1⟩} := by
-
+theorem jets_mem_pow_sup
+    : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
+        (R : Subring K) (π : R →+* κ) (ρ : κ →ₐ[ℂ] κ') (E : Place (algebraMap ℂ K))
+        (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime] (t : E.ring),
+      graphIdeal E R π ρ ≤ 𝔭 → Irreducible t
+        → (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a)
+        → (∀ a, algebraMap ℂ K a ∈ R) → (∀ f : κ, ∃ a b : R, π b ≠ 0 ∧ f * π b = π a) → E.Contains R
+        → (∀ r : R, (r : K) ≠ 0 → (π r = 0 ↔ 0 < E.ord r))
+        → ∀ (M l : ℕ) (a : Fin l → R) (b : Fin l → κ') (w : tens (κ' := κ') (placeAlg E)),
+          (w : K ⊗[ℂ] κ') = ∑ i, (a i : K) ⊗ₜ b i
+            → ∑ i, π (a i) ⊗ₜ[ℂ] b i
+              ∈ (RingHom.ker (Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ'))) ^ M
+            → w ∈ 𝔭 ^ M ⊔ Ideal.span {⟨(t : K) ⊗ₜ 1, tmul_mem t.2 1⟩} := by
   intro K κ κ' _ _ _ _ _ _ R π ρ E 𝔭 _ t hle ht hπC hC hfrac hR hord M l a b w hw hx
   let T := tens (κ' := κ') (placeAlg E)
   let I : Ideal T := 𝔭 ^ M ⊔ Ideal.span {⟨(t : K) ⊗ₜ 1, tmul_mem t.2 1⟩}
@@ -72,13 +77,15 @@ theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'
     (tensEquiv (κ' := κ') (placeAlg E)).toAlgHom.comp Algebra.TensorProduct.includeLeft
   let jR : κ' →ₐ[ℂ] T :=
     (tensEquiv (κ' := κ') (placeAlg E)).toAlgHom.comp Algebra.TensorProduct.includeRight
-  have hjL : ∀ e, (jL e : K ⊗[ℂ] κ') = (e : K) ⊗ₜ 1 := fun e => by
-    simp [jL, tensMap]
-  have hjR : ∀ c, (jR c : K ⊗[ℂ] κ') = 1 ⊗ₜ c := fun c => by
-    simp [jR, tensMap]
-  let ι : R →+* placeAlg E :=
-    { toFun := fun r => ⟨r, hR _ r.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl,
-      map_zero' := rfl, map_add' := fun _ _ => rfl }
+  have hjL : ∀ e, (jL e : K ⊗[ℂ] κ') = (e : K) ⊗ₜ 1 := fun e => by simp [jL, tensMap]
+  have hjR : ∀ c, (jR c : K ⊗[ℂ] κ') = 1 ⊗ₜ c := fun c => by simp [jR, tensMap]
+  let ι : R →+* placeAlg E := {
+    toFun := fun r => ⟨r, hR _ r.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have hι : ∀ r : R, ((ι r : placeAlg E) : K) = r := fun _ => rfl
 
   have hg : ∀ r : R, jL (ι r) - jR (ρ (π r)) ∈ 𝔭 := fun r => by
@@ -142,13 +149,14 @@ theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'
   have hθ₀ : ∀ r, θ₀ (π r) = q (jL (ι r)) := fun r =>
     (IsLocalization.lift_eq (M := nonZeroDivisors π.range) hunit (π.rangeRestrict r)).trans (hψ r)
 
-  let θ₀A : κ →ₐ[ℂ] T ⧸ I :=
-    { θ₀ with
-      commutes' := fun c => by
-        have e1 : algebraMap ℂ κ c = π ⟨algebraMap ℂ K c, hC c⟩ := (hπC c (hC c)).symm
-        have e2 : ι ⟨algebraMap ℂ K c, hC c⟩ = algebraMap ℂ (placeAlg E) c := Subtype.ext rfl
-        change θ₀ (algebraMap ℂ κ c) = _
-        rw [e1, hθ₀, e2, AlgHom.commutes, AlgHom.commutes] }
+  let θ₀A : κ →ₐ[ℂ] T ⧸ I := {
+    θ₀ with
+    commutes' := fun c => by
+      have e1 : algebraMap ℂ κ c = π ⟨algebraMap ℂ K c, hC c⟩ := (hπC c (hC c)).symm
+      have e2 : ι ⟨algebraMap ℂ K c, hC c⟩ = algebraMap ℂ (placeAlg E) c := Subtype.ext rfl
+      change θ₀ (algebraMap ℂ κ c) = _
+      rw [e1, hθ₀, e2, AlgHom.commutes, AlgHom.commutes]
+  }
   let θ : κ ⊗[ℂ] κ' →ₐ[ℂ] T ⧸ I := Algebra.TensorProduct.productMap θ₀A (q.comp jR)
   have hθt : ∀ f c, θ (f ⊗ₜ c) = θ₀ f * q (jR c) := fun f c =>
     Algebra.TensorProduct.productMap_apply_tmul _ _ _ _
@@ -164,8 +172,9 @@ theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hθt, hθ₀, map_mul]
 
-  have hgen : Ideal.map θ (RingHom.ker (Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ'))) ≤
-      Ideal.map q 𝔭 := by
+  have hgen
+      : Ideal.map θ (RingHom.ker (Algebra.TensorProduct.productMap ρ (AlgHom.id ℂ κ')))
+        ≤ Ideal.map q 𝔭 := by
     refine (Ideal.map_mono (ker_productMap_le_span ρ)).trans ?_
     rw [Ideal.map_span, Ideal.span_le]
     rintro _ ⟨_, ⟨f, rfl⟩, rfl⟩
@@ -175,8 +184,9 @@ theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'
     have hu1 : u = θ₀ f - q (jR (ρ f)) := by
       rw [hu_def, map_sub, hθt, hθt]
       simp only [map_one, mul_one, one_mul]
-    have h2 : u * q (jL (ι d)) =
-        q (jL (ι c) - jR (ρ (π c))) - q (jR (ρ f)) * q (jL (ι d) - jR (ρ (π d))) := by
+    have h2
+        : u * q (jL (ι d))
+          = q (jL (ι c) - jR (ρ (π c))) - q (jR (ρ f)) * q (jL (ι d) - jR (ρ (π d))) := by
       rw [hu1, sub_mul, hfd, ← e, map_mul ρ, map_mul jR, map_sub q (jL (ι c)), map_sub q (jL (ι d)),
         map_mul q]
       rw [mul_sub, sub_sub_sub_cancel_right]

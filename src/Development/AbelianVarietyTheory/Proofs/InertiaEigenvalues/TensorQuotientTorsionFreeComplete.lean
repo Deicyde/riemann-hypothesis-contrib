@@ -5,7 +5,8 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
 
 noncomputable section
 
@@ -15,25 +16,25 @@ section Algebra
 
 variable {R : Type} [CommRing R] (π : R)
 
-theorem smodEq_iff {M : Type} [AddCommGroup M] [Module R M] (n : ℕ) (x y : M) :
-    x ≡ y [SMOD (Ideal.span {π} ^ n • ⊤ : Submodule R M)] ↔ ∃ z : M, π ^ n • z = x - y := by
+theorem smodEq_iff {M : Type} [AddCommGroup M] [Module R M] (n : ℕ) (x y : M)
+    : x ≡ y [SMOD (Ideal.span {π} ^ n • ⊤ : Submodule R M)] ↔ ∃ z : M, π ^ n • z = x - y := by
   rw [SModEq.sub_mem, Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul,
     Submodule.mem_smul_pointwise_iff_exists]
   simp
 
-theorem isAdicComplete_iff {M : Type} [AddCommGroup M] [Module R M] :
-    IsAdicComplete (Ideal.span {π}) M ↔
-      (∀ x : M, (∀ n : ℕ, ∃ z : M, π ^ n • z = x) → x = 0) ∧
-      ∀ u : ℕ → M, (∀ n : ℕ, ∃ z : M, π ^ n • z = u n - u (n + 1)) →
-        ∃ L : M, ∀ n : ℕ, ∃ z : M, π ^ n • z = u n - L := by
+theorem isAdicComplete_iff {M : Type} [AddCommGroup M] [Module R M]
+    : IsAdicComplete (Ideal.span {π}) M
+      ↔ (∀ x : M, (∀ n : ℕ, ∃ z : M, π ^ n • z = x) → x = 0)
+        ∧ ∀ u : ℕ → M,
+          (∀ n : ℕ, ∃ z : M, π ^ n • z = u n - u (n + 1))
+            → ∃ L : M, ∀ n : ℕ, ∃ z : M, π ^ n • z = u n - L := by
   constructor
   · intro h
     refine ⟨fun x hx => ?_, fun u hu => ?_⟩
     · refine h.toIsHausdorff.haus x fun n => ?_
       rw [smodEq_iff, sub_zero]
       exact hx n
-    · have hc : ∀ {m n : ℕ}, m ≤ n →
-          u m ≡ u n [SMOD (Ideal.span {π} ^ m • ⊤ : Submodule R M)] := by
+    · have hc : ∀ {m n : ℕ}, m ≤ n → u m ≡ u n [SMOD (Ideal.span {π} ^ m • ⊤ : Submodule R M)] := by
         intro m n hmn
         rw [smodEq_iff]
         induction n, hmn using Nat.le_induction with
@@ -54,12 +55,12 @@ theorem isAdicComplete_iff {M : Type} [AddCommGroup M] [Module R M] :
       exact ⟨L, fun n => (smodEq_iff π n _ _).2 (hL n)⟩⟩
     exact ⟨⟩
 
-theorem isAdicComplete_coker {A Q : Type} [AddCommGroup A] [Module R A] [AddCommGroup Q]
-    [Module R Q] (hA : IsAdicComplete (Ideal.span {π}) A) (hπ : ∀ x : A, π • x = 0 → x = 0)
-    (f : A →ₗ[R] A) (g : A →ₗ[R] Q) (hg : Function.Surjective g)
-    (hfg : ∀ x, g x = 0 ↔ ∃ y, f y = x)
-    (hreg : ∀ x y : A, π • x = f y → ∃ y', y = π • y') :
-    (∀ q : Q, π • q = 0 → q = 0) ∧ IsAdicComplete (Ideal.span {π}) Q := by
+theorem isAdicComplete_coker
+    {A Q : Type} [AddCommGroup A] [Module R A] [AddCommGroup Q] [Module R Q]
+    (hA : IsAdicComplete (Ideal.span {π}) A) (hπ : ∀ x : A, π • x = 0 → x = 0)
+    (f : A →ₗ[R] A) (g : A →ₗ[R] Q) (hg : Function.Surjective g) (hfg : ∀ x, g x = 0 ↔ ∃ y, f y = x)
+    (hreg : ∀ x y : A, π • x = f y → ∃ y', y = π • y')
+    : (∀ q : Q, π • q = 0 → q = 0) ∧ IsAdicComplete (Ideal.span {π}) Q := by
   obtain ⟨h1, h2⟩ := (isAdicComplete_iff π).1 hA
   have hstep : ∀ x y : A, π • x = f y → ∃ y', y = π • y' ∧ x = f y' := by
     intro x y h
@@ -90,8 +91,10 @@ theorem isAdicComplete_coker {A Q : Type} [AddCommGroup A] [Module R A] [AddComm
       obtain ⟨y, hy⟩ := (hfg (x - π ^ n • z)).1 (by rw [map_sub, map_smul, hw, sub_self])
       exact ⟨y, z, hy⟩
     choose y z hyz using this
-    obtain ⟨L, hL⟩ := h2 y fun n => hpow n (π • z (n + 1) - z n) _ (by
-      rw [map_sub, hyz, hyz, smul_sub, smul_smul, ← pow_succ]; abel)
+    obtain ⟨L, hL⟩ :=
+      h2 y fun n =>
+        hpow n (π • z (n + 1) - z n) _
+          (by rw [map_sub, hyz, hyz, smul_sub, smul_smul, ← pow_succ]; abel)
     refine (hfg x).2 ⟨L, (sub_eq_zero.1 (h1 _ fun n => ?_)).symm⟩
     obtain ⟨w, hw⟩ := hL n
     refine ⟨z n + f w, ?_⟩
@@ -106,8 +109,7 @@ theorem isAdicComplete_coker {A Q : Type} [AddCommGroup A] [Module R A] [AddComm
       induction n with
       | zero => simp [x, hx₀]
       | succ n ih =>
-        have : x (n + 1) = x n - π ^ n • z' n := by
-          simp only [x, Finset.sum_range_succ]; abel
+        have : x (n + 1) = x n - π ^ n • z' n := by simp only [x, Finset.sum_range_succ]; abel
         rw [this, map_sub, ih, map_smul, hz', hz]
         abel
     obtain ⟨L, hL⟩ := h2 x fun n => ⟨z' n, by simp only [x, Finset.sum_range_succ]; abel⟩
@@ -115,9 +117,10 @@ theorem isAdicComplete_coker {A Q : Type} [AddCommGroup A] [Module R A] [AddComm
     obtain ⟨w, hw⟩ := hL n
     exact ⟨g w, by rw [← map_smul, hw, map_sub, hx]⟩
 
-theorem isAdicComplete_of_equiv_pi {ι Q M : Type} [AddCommGroup Q] [Module R Q] [AddCommGroup M]
-    [Module R M] (hQ : IsAdicComplete (Ideal.span {π}) Q) (e : M ≃ₗ[R] (ι → Q)) :
-    IsAdicComplete (Ideal.span {π}) M := by
+theorem isAdicComplete_of_equiv_pi
+    {ι Q M : Type} [AddCommGroup Q] [Module R Q] [AddCommGroup M] [Module R M]
+    (hQ : IsAdicComplete (Ideal.span {π}) Q) (e : M ≃ₗ[R] (ι → Q))
+    : IsAdicComplete (Ideal.span {π}) M := by
   obtain ⟨h1, h2⟩ := (isAdicComplete_iff π).1 hQ
   refine (isAdicComplete_iff π).2 ⟨fun x hx => ?_, fun u hu => ?_⟩
   · apply e.injective
@@ -143,8 +146,11 @@ theorem isAdicComplete_of_equiv_pi {ι Q M : Type} [AddCommGroup Q] [Module R Q]
 
 end Algebra
 
-theorem noZeroSMulDivisors_of_prime {l : ℕ} [Fact l.Prime] {M : Type} [AddCommGroup M]
-    [Module ℤ_[l] M] (h : ∀ x : M, (l : ℤ_[l]) • x = 0 → x = 0) : NoZeroSMulDivisors ℤ_[l] M := by
+theorem noZeroSMulDivisors_of_prime
+    {l : ℕ} [Fact l.Prime]
+    {M : Type} [AddCommGroup M] [Module ℤ_[l] M]
+    (h : ∀ x : M, (l : ℤ_[l]) • x = 0 → x = 0)
+    : NoZeroSMulDivisors ℤ_[l] M := by
   have hpow : ∀ (n : ℕ) (x : M), (l : ℤ_[l]) ^ n • x = 0 → x = 0 := by
     intro n
     induction n with
@@ -188,8 +194,8 @@ theorem xi_coeff_ne_zero : WittVector.constantCoeff AI.ξ ≠ 0 := by
   change algebraMap (OCb l) (Cb l) (WittVector.constantCoeff AI.ξ) = 0
   rw [h, map_zero]
 
-theorem xi_pow_regular (k : ℕ) (x y : Ainf l) (h : (l : ℤ_[l]) • x = AI.ξ ^ k * y) :
-    ∃ y', y = (l : ℤ_[l]) • y' := by
+theorem xi_pow_regular (k : ℕ) (x y : Ainf l) (h : (l : ℤ_[l]) • x = AI.ξ ^ k * y)
+    : ∃ y', y = (l : ℤ_[l]) • y' := by
   rw [smul_l] at h
   have h0 := congrArg (WittVector.constantCoeff : Ainf l →+* OCb l) h
   rw [map_mul, map_mul, map_natCast, CharP.cast_eq_zero, zero_mul, map_pow] at h0
@@ -204,25 +210,29 @@ def toMxi (a : ℤ) : Ainf l →ₗ[ℤ_[l]] Mxi (AinfSub l) (xiU AI) a :=
     ((LinearMap.mulLeft ℤ_[l] ((xiU AI ^ a : (WCb l)ˣ) : WCb l)) ∘ₗ (inclWA l).toLinearMap)
     fun x => ⟨inclWA l x, ⟨x, rfl⟩, rfl⟩
 
-theorem toMxi_val (a : ℤ) (x : Ainf l) :
-    (toMxi AI a x : WCb l) = ((xiU AI ^ a : (WCb l)ˣ) : WCb l) * inclW l x := rfl
+theorem toMxi_val (a : ℤ) (x : Ainf l)
+    : (toMxi AI a x : WCb l) = ((xiU AI ^ a : (WCb l)ˣ) : WCb l) * inclW l x :=
+  rfl
 
 theorem toMxi_surjective (a : ℤ) : Function.Surjective (toMxi AI a) := by
   rintro ⟨_, _, ⟨x, rfl⟩, rfl⟩
   exact ⟨x, rfl⟩
 
-theorem quotient_complete (a b : ℤ) (hab : a ≤ b) :
-    (∀ q : Qab (AinfSub l) (xiU AI) a b, (l : ℤ_[l]) • q = 0 → q = 0) ∧
-      IsAdicComplete (Ideal.span {(l : ℤ_[l])}) (Qab (AinfSub l) (xiU AI) a b) := by
+theorem quotient_complete (a b : ℤ) (hab : a ≤ b)
+    : (∀ q : Qab (AinfSub l) (xiU AI) a b, (l : ℤ_[l]) • q = 0 → q = 0)
+      ∧ IsAdicComplete (Ideal.span {(l : ℤ_[l])}) (Qab (AinfSub l) (xiU AI) a b) := by
   obtain ⟨k, rfl⟩ := Int.exists_add_of_le hab
-  have hk : ∀ y : Ainf l, ((xiU AI ^ (a + k) : (WCb l)ˣ) : WCb l) * inclW l y =
-      ((xiU AI ^ a : (WCb l)ˣ) : WCb l) * inclW l (AI.ξ ^ k * y) := by
+  have hk
+      : ∀ y : Ainf l,
+        ((xiU AI ^ (a + k) : (WCb l)ˣ) : WCb l) * inclW l y
+          = ((xiU AI ^ a : (WCb l)ˣ) : WCb l) * inclW l (AI.ξ ^ k * y) := by
     intro y
-    rw [zpow_add, Units.val_mul, zpow_natCast, Units.val_pow_eq_pow_val, map_mul, map_pow, mul_assoc]
+    rw [zpow_add, Units.val_mul, zpow_natCast, Units.val_pow_eq_pow_val, map_mul, map_pow,
+      mul_assoc]
     rfl
   refine isAdicComplete_coker (l : ℤ_[l]) ainf_complete ?_ (LinearMap.mulLeft ℤ_[l] (AI.ξ ^ k))
-    ((Submodule.mkQ _) ∘ₗ toMxi AI a)
-    ((Submodule.mkQ_surjective _).comp (toMxi_surjective AI a)) ?_ (xi_pow_regular AI k)
+    ((Submodule.mkQ _) ∘ₗ toMxi AI a) ((Submodule.mkQ_surjective _).comp (toMxi_surjective AI a)) ?_
+    (xi_pow_regular AI k)
   · intro x hx
     rw [smul_l, mul_comm] at hx
     exact WittVector.eq_zero_of_p_mul_eq_zero x hx
@@ -232,8 +242,10 @@ theorem quotient_complete (a b : ℤ) (hab : a ≤ b) :
     constructor
     · rintro ⟨_, ⟨y, rfl⟩, hy⟩
       refine ⟨y, inclW_injective ?_⟩
-      have hy' : ((xiU AI ^ (a + k) : (WCb l)ˣ) : WCb l) * inclW l y =
-          ((xiU AI ^ a : (WCb l)ˣ) : WCb l) * inclW l x := hy
+      have hy'
+          : ((xiU AI ^ (a + k) : (WCb l)ˣ) : WCb l) * inclW l y
+            = ((xiU AI ^ a : (WCb l)ˣ) : WCb l) * inclW l x :=
+        hy
       rw [hk] at hy'
       exact (Units.mul_right_inj _).1 hy'
     · rintro ⟨y, rfl⟩
@@ -241,18 +253,21 @@ theorem quotient_complete (a b : ℤ) (hab : a ≤ b) :
 
 end Ainf
 
-theorem tensor_quotient_torsionFree_complete : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l)
-    (AI : LocAinf l P) (a b : ℤ), a ≤ b → ∀ (T : Type) [AddCommGroup T] [Module ℤ_[l] T]
-    [Module.Free ℤ_[l] T] [Module.Finite ℤ_[l] T],
-    NoZeroSMulDivisors ℤ_[l] (TensorProduct ℤ_[l] T (Qab (AinfSub l) (xiU AI) a b)) ∧
-      IsAdicComplete (Ideal.span {(l : ℤ_[l])})
-        (TensorProduct ℤ_[l] T (Qab (AinfSub l) (xiU AI) a b)) := by
+theorem tensor_quotient_torsionFree_complete
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (a b : ℤ),
+      a ≤ b
+        → ∀ (T : Type) [AddCommGroup T] [Module ℤ_[l] T] [Module.Free ℤ_[l] T]
+            [Module.Finite ℤ_[l] T],
+          NoZeroSMulDivisors ℤ_[l] (TensorProduct ℤ_[l] T (Qab (AinfSub l) (xiU AI) a b))
+            ∧ IsAdicComplete (Ideal.span {(l : ℤ_[l])})
+              (TensorProduct ℤ_[l] T (Qab (AinfSub l) (xiU AI) a b)) := by
   intro l _ P AI a b hab T _ _ _ _
   classical
   obtain ⟨h1, h2⟩ := quotient_complete AI a b hab
   let β := Module.Free.chooseBasis ℤ_[l] T
-  let e : TensorProduct ℤ_[l] T (Qab (AinfSub l) (xiU AI) a b) ≃ₗ[ℤ_[l]]
-      (Module.Free.ChooseBasisIndex ℤ_[l] T → Qab (AinfSub l) (xiU AI) a b) :=
+  let e
+      : TensorProduct ℤ_[l] T (Qab (AinfSub l) (xiU AI) a b) ≃ₗ[ℤ_[l]]
+        (Module.Free.ChooseBasisIndex ℤ_[l] T → Qab (AinfSub l) (xiU AI) a b) :=
     (TensorProduct.comm ℤ_[l] _ _).trans
       ((TensorProduct.congr (LinearEquiv.refl ℤ_[l] _) β.equivFun).trans
         (TensorProduct.piScalarRight ℤ_[l] ℤ_[l] _ _))

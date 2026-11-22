@@ -12,8 +12,10 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open Module
 
-theorem SublatticeDegree.proof (hExt : SublatticeExtension.Statement) (hSpan : SpanningExtension.Statement)
-    (hCov : CovolumeLeGram.Statement) (hGram : GramContraction.Statement) : SublatticeDegree.Statement := by
+theorem SublatticeDegree.proof
+    (hExt : SublatticeExtension.Statement) (hSpan : SpanningExtension.Statement)
+    (hCov : CovolumeLeGram.Statement) (hGram : GramContraction.Statement)
+    : SublatticeDegree.Statement := by
   intro E E' _ _ R R' φ φ' _ _ _ _ ψ S C hφ hφ' hψ hnorm hS hSC hC
   obtain ⟨Ψ, hΨφ, hΨn, hΨi⟩ := hExt E E' R R' φ φ' ψ hφ hφ' hψ hnorm
   set Λ := imageLattice φ with hΛdef
@@ -43,11 +45,14 @@ theorem SublatticeDegree.proof (hExt : SublatticeExtension.Statement) (hSpan : S
       | zero => simp
       | add x y _ _ hx hy => simpa using add_mem hx hy
       | neg x _ hx => simpa using neg_mem hx
-    rw [eq_top_iff, ← (IsZLattice.span_top : Submodule.span ℝ (Λ : Set (EuclideanSpace ℝ (Fin R))) = ⊤)]
+    rw [eq_top_iff,
+      ← (IsZLattice.span_top : Submodule.span ℝ (Λ : Set (EuclideanSpace ℝ (Fin R))) = ⊤)]
     exact Submodule.span_le.2 h1
 
   obtain ⟨w, hwS, hind⟩ := hSpan (EuclideanSpace ℝ (Fin R)) (Fin R') (Ψ ∘ u) (φ '' S) hv hspan
-  have hcard : Fintype.card (Fin R' ⊕ Fin (finrank ℝ (EuclideanSpace ℝ (Fin R)) - Fintype.card (Fin R'))) = R := by
+  have hcard
+      : Fintype.card (Fin R' ⊕ Fin (finrank ℝ (EuclideanSpace ℝ (Fin R)) - Fintype.card (Fin R')))
+        = R := by
     simp only [Fintype.card_sum, Fintype.card_fin, finrank_euclideanSpace_fin]
     omega
   have hmem : ∀ i, Sum.elim (Ψ ∘ u) w i ∈ Λ := by
@@ -66,14 +71,19 @@ theorem SublatticeDegree.proof (hExt : SublatticeExtension.Statement) (hSpan : S
     obtain ⟨s, hs, hsw⟩ := hwS j
     rw [← hsw]
     exact hSC s hs
-  have hk : Fintype.card (Fin (finrank ℝ (EuclideanSpace ℝ (Fin R)) - Fintype.card (Fin R'))) ≤ R := by
+  have hk
+      : Fintype.card (Fin (finrank ℝ (EuclideanSpace ℝ (Fin R)) - Fintype.card (Fin R'))) ≤ R := by
     simp only [Fintype.card_fin, finrank_euclideanSpace_fin]
     omega
   have hprod : ∏ j, ‖w j‖ ^ 2 ≤ (C ^ R) ^ 2 := by
-    calc ∏ j, ‖w j‖ ^ 2 ≤ ∏ _j, C ^ 2 :=
-          Finset.prod_le_prod₀ (fun _ _ => by positivity) (fun j _ => pow_le_pow_left₀ (norm_nonneg _) (hw j) 2)
-      _ = (C ^ 2) ^ Fintype.card (Fin (finrank ℝ (EuclideanSpace ℝ (Fin R)) - Fintype.card (Fin R'))) := by
-          rw [Finset.prod_const, Finset.card_univ]
+    calc
+      ∏ j, ‖w j‖ ^ 2 ≤ ∏ _j, C ^ 2 :=
+        Finset.prod_le_prod₀
+          (fun _ _ => by positivity)
+          (fun j _ => pow_le_pow_left₀ (norm_nonneg _) (hw j) 2)
+      _ = (C ^ 2)
+          ^ Fintype.card (Fin (finrank ℝ (EuclideanSpace ℝ (Fin R)) - Fintype.card (Fin R'))) := by
+        rw [Finset.prod_const, Finset.card_univ]
       _ ≤ (C ^ 2) ^ R := pow_le_pow_right₀ (by nlinarith) hk
       _ = (C ^ R) ^ 2 := by ring
   have hpos' : 0 < ZLattice.covolume Λ' := ZLattice.covolume_pos Λ'
@@ -82,11 +92,13 @@ theorem SublatticeDegree.proof (hExt : SublatticeExtension.Statement) (hSpan : S
     rw [hcov'] at hpos'
     exact (Real.sqrt_pos.1 hpos').le
   have hmain : ZLattice.covolume Λ ≤ ZLattice.covolume Λ' * C ^ R := by
-    calc ZLattice.covolume Λ ≤ Real.sqrt (Matrix.gram ℝ (Sum.elim (Ψ ∘ u) w)).det := h1
+    calc
+      ZLattice.covolume Λ
+        ≤ Real.sqrt (Matrix.gram ℝ (Sum.elim (Ψ ∘ u) w)).det := h1
       _ ≤ Real.sqrt ((Matrix.gram ℝ u).det * (C ^ R) ^ 2) :=
-          Real.sqrt_le_sqrt (h2.trans (mul_le_mul_of_nonneg_left hprod hdu))
+        Real.sqrt_le_sqrt (h2.trans (mul_le_mul_of_nonneg_left hprod hdu))
       _ = ZLattice.covolume Λ' * C ^ R := by
-          rw [Real.sqrt_mul hdu, Real.sqrt_sq (pow_pos hC0 R).le, hcov']
+        rw [Real.sqrt_mul hdu, Real.sqrt_sq (pow_pos hC0 R).le, hcov']
   have hlog := Real.log_le_log hpos hmain
   rw [Real.log_mul hpos'.ne' (pow_pos hC0 R).ne', Real.log_pow] at hlog
   linarith

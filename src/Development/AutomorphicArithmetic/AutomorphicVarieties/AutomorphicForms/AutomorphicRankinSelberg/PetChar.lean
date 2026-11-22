@@ -8,8 +8,7 @@ open CongruenceSubgroup UpperTheory.V.Af
 open UpperHalfPlane hiding I
 open scoped MatrixGroups ModularForm ComplexConjugate
 
-theorem UpperTheory.V.Af.Rs.petChar :
-    UpperTheory.V.Af.Rs.PetChar := by
+theorem UpperTheory.V.Af.Rs.petChar : UpperTheory.V.Af.Rs.PetChar := by
   intro k L _ χ ψ f g hf hg γ hγ z
   have h := UpperHalfPlane.petersson_slash_SL (k : ℤ) g f γ z
   rw [hg γ hγ, hf γ hγ] at h

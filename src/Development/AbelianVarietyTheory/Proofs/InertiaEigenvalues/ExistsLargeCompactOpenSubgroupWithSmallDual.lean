@@ -14,12 +14,17 @@ noncomputable section
 
 namespace GlobalTheory.JR.WeilQuad.LargeLattice
 
-theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (x : A.Kˣ) (μ : Measure A.L) (ω : A.K → ℂ),
-    Hyp A ψ x μ ω → ∀ C : Set A.L, IsCompact C → ∀ V ∈ 𝓝 (0 : A.L), ∃ Λ : AddSubgroup A.L,
-      IsOpen (Λ : Set A.L) ∧ IsCompact (Λ : Set A.L) ∧ C ⊆ Λ ∧
-      {y : A.L | ∀ w ∈ (Λ : Set A.L), A.kerL ψ x w y = 1} ⊆ Λ ∧
-      {y : A.L | ∀ w ∈ (Λ : Set A.L), A.kerL ψ x w y = 1} ⊆ V := by
+theorem main
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (x : A.Kˣ) (μ : Measure A.L)
+        (ω : A.K → ℂ),
+      Hyp A ψ x μ ω
+        → ∀ C : Set A.L,
+          IsCompact C
+            → ∀ V ∈ 𝓝 (0 : A.L), ∃ Λ : AddSubgroup A.L,
+              IsOpen (Λ : Set A.L) ∧ IsCompact (Λ : Set A.L) ∧ C ⊆ Λ
+                ∧ {y : A.L | ∀ w ∈ (Λ : Set A.L), A.kerL ψ x w y = 1} ⊆ Λ
+                ∧ {y : A.L | ∀ w ∈ (Λ : Set A.L), A.kerL ψ x w y = 1} ⊆ V := by
   intro F E _ _ _ _ _ A ψ x μ ω h C hC V hV
   obtain ⟨hK, hL, hψ, -, -⟩ := h
   haveI := FourierTest.finite_F_L A
@@ -39,8 +44,7 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
     intro y hy
     apply FourierTest.beta_sepLeft A hK hL x y
     intro w
-    have h0 : β.flip y = 0 := e.ext (fun i => by
-      simpa [hΦ] using congrFun hy i)
+    have h0 : β.flip y = 0 := e.ext (fun i => by simpa [hΦ] using congrFun hy i)
     rw [FourierTest.beta_symm A hK hL]
     simpa using LinearMap.congr_fun h0 w
   have hsurj : Function.Surjective Φ :=
@@ -60,24 +64,28 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
   let Km : ℝ := ∑ i, ‖Φ (e i)‖
   have hKm : ∀ i j, ‖Φ (e i) j‖ ≤ Km := fun i j =>
     (norm_le_pi_norm (Φ (e i)) j).trans
-      (Finset.single_le_sum (f := fun i => ‖Φ (e i)‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ i))
+      (Finset.single_le_sum
+        (f := fun i => ‖Φ (e i)‖)
+        (fun _ _ => norm_nonneg _)
+        (Finset.mem_univ i))
   let R : ℝ := max (max b (‖t‖ * Km)) (max ε 1)
   have hR1 : 1 ≤ R := le_trans (le_max_right _ _) (le_max_right _ _)
   have hR0 : 0 < R := lt_of_lt_of_le one_pos hR1
   have hRε : ε ≤ R := le_trans (le_max_left _ _) (le_max_right _ _)
   have hRb : b ≤ R := le_trans (le_max_left _ _) (le_max_left _ _)
   have hRt : ‖t‖ * Km ≤ R := le_trans (le_max_right _ _) (le_max_left _ _)
-  let Λ : AddSubgroup A.L :=
-    { carrier := {y | ∀ i, ‖Φ y i‖ ≤ R}
-      add_mem' := by
-        intro a c ha hc i
-        simp only [Set.mem_setOf_eq, map_add (f := _), Pi.add_apply] at *
-        exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (ha i) (hc i))
-      zero_mem' := by intro i; simp [hR0.le]
-      neg_mem' := by
-        intro a ha i
-        simp only [Set.mem_setOf_eq, map_neg, Pi.neg_apply, norm_neg] at *
-        exact ha i }
+  let Λ : AddSubgroup A.L := {
+    carrier := {y | ∀ i, ‖Φ y i‖ ≤ R}
+    add_mem' := by
+      intro a c ha hc i
+      simp only [Set.mem_setOf_eq, map_add (f := _), Pi.add_apply] at *
+      exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (ha i) (hc i))
+    zero_mem' := by intro i; simp [hR0.le]
+    neg_mem' := by
+      intro a ha i
+      simp only [Set.mem_setOf_eq, map_neg, Pi.neg_apply, norm_neg] at *
+      exact ha i
+  }
   have hmem : ∀ y, y ∈ Λ ↔ ∀ i, ‖Φ y i‖ ≤ R := fun _ => Iff.rfl
 
   have hperp : ∀ y ∈ {y : A.L | ∀ w ∈ (Λ : Set A.L), A.kerL ψ x w y = 1}, ∀ i, ‖Φ y i‖ < ε := by
@@ -85,9 +93,12 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
     have h1 : ‖t * Φ y i‖ ≤ 1 := by
       refine (hcond (t * Φ y i)).1 fun e' he' => ?_
       have hw : (e' * t) • e i ∈ Λ := by
-        rw [hmem]; intro j
+        rw [hmem]
+        intro j
         rw [map_smul, Pi.smul_apply, smul_eq_mul, norm_mul, norm_mul]
-        calc ‖e'‖ * ‖t‖ * ‖Φ (e i) j‖ ≤ 1 * ‖t‖ * Km := by gcongr; exact hKm i j
+        calc
+          ‖e'‖ * ‖t‖ * ‖Φ (e i) j‖
+            ≤ 1 * ‖t‖ * Km := by gcongr; exact hKm i j
           _ ≤ R := by rw [one_mul]; exact hRt
       have := hy _ hw
       rw [hker, map_smul, LinearMap.smul_apply, smul_eq_mul] at this
@@ -112,12 +123,14 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
       constructor
       · intro hy
         refine ⟨Φe y, ?_, by simp⟩
-        rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hR0.le, hΦe]; exact hy
+        rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hR0.le, hΦe]
+        exact hy
       · rintro ⟨z, hz, rfl⟩
         rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hR0.le] at hz
         intro i
         have : Φ (Φe.symm z) = z := by rw [← hΦe]; simp
-        rw [this]; exact hz i
+        rw [this]
+        exact hz i
     rw [this]
     exact (isCompact_closedBall 0 R).image hΨc
   · intro y hy

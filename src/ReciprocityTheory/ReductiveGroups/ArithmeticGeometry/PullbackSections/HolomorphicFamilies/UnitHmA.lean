@@ -14,28 +14,29 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable {g : ℕ}
 
-theorem hermForm_add_left (Hm : Matrix (Fin g) (Fin g) ℂ) (z z' w : Fin g → ℂ) :
-    hermForm Hm (z + z') w = hermForm Hm z w + hermForm Hm z' w := by
+theorem hermForm_add_left (Hm : Matrix (Fin g) (Fin g) ℂ) (z z' w : Fin g → ℂ)
+    : hermForm Hm (z + z') w = hermForm Hm z w + hermForm Hm z' w := by
   simp [hermForm, add_dotProduct]
 
-theorem hermForm_smul_left (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g → ℂ) :
-    hermForm Hm (c • z) w = c * hermForm Hm z w := by
+theorem hermForm_smul_left (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g → ℂ)
+    : hermForm Hm (c • z) w = c * hermForm Hm z w := by
   simp [hermForm, smul_dotProduct]
 
-theorem hermForm_add_right (Hm : Matrix (Fin g) (Fin g) ℂ) (z w w' : Fin g → ℂ) :
-    hermForm Hm z (w + w') = hermForm Hm z w + hermForm Hm z w' := by
+theorem hermForm_add_right (Hm : Matrix (Fin g) (Fin g) ℂ) (z w w' : Fin g → ℂ)
+    : hermForm Hm z (w + w') = hermForm Hm z w + hermForm Hm z w' := by
   simp [hermForm, star_add, Matrix.mulVec_add, dotProduct_add]
 
-theorem hermForm_rsmul_right (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℝ) (z w : Fin g → ℂ) :
-    hermForm Hm z (c • w) = c * hermForm Hm z w := by
+theorem hermForm_rsmul_right (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℝ) (z w : Fin g → ℂ)
+    : hermForm Hm z (c • w) = c * hermForm Hm z w := by
   simp [hermForm, star_smul, Matrix.mulVec_smul, dotProduct_smul, Complex.real_smul]
 
-theorem hermForm_sub_mat (H₁ H₂ : Matrix (Fin g) (Fin g) ℂ) (z w : Fin g → ℂ) :
-    hermForm (H₁ - H₂) z w = hermForm H₁ z w - hermForm H₂ z w := by
+theorem hermForm_sub_mat (H₁ H₂ : Matrix (Fin g) (Fin g) ℂ) (z w : Fin g → ℂ)
+    : hermForm (H₁ - H₂) z w = hermForm H₁ z w - hermForm H₂ z w := by
   simp [hermForm, Matrix.sub_mulVec, dotProduct_sub]
 
 def imForm (Hm : Matrix (Fin g) (Fin g) ℂ) : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun z w => (hermForm Hm z w).im)
+  LinearMap.mk₂ ℝ
+    (fun z w => (hermForm Hm z w).im)
     (fun z z' w => by rw [hermForm_add_left, Complex.add_im])
     (fun c z w => by
       rw [show (c • z : Fin g → ℂ) = (c : ℂ) • z from by funext i; simp [Complex.real_smul],
@@ -43,9 +44,12 @@ def imForm (Hm : Matrix (Fin g) (Fin g) ℂ) : (Fin g → ℂ) →ₗ[ℝ] (Fin 
     (fun z w w' => by rw [hermForm_add_right, Complex.add_im])
     (fun c z w => by rw [hermForm_rsmul_right, smul_eq_mul]; simp)
 
-theorem herm_eq_of_im {L : Type} [AddCommGroup L] (P : L →+ (Fin g → ℂ))
-    (hP : Submodule.span ℝ (Set.range P) = ⊤) (H₁ H₂ : Matrix (Fin g) (Fin g) ℂ)
-    (h : ∀ x y, (hermForm H₁ (P x) (P y)).im = (hermForm H₂ (P x) (P y)).im) : H₁ = H₂ := by
+theorem herm_eq_of_im
+    {L : Type} [AddCommGroup L]
+    (P : L →+ (Fin g → ℂ)) (hP : Submodule.span ℝ (Set.range P) = ⊤)
+    (H₁ H₂ : Matrix (Fin g) (Fin g) ℂ)
+    (h : ∀ x y, (hermForm H₁ (P x) (P y)).im = (hermForm H₂ (P x) (P y)).im)
+    : H₁ = H₂ := by
   have hD : ∀ x y, (hermForm (H₁ - H₂) (P x) (P y)).im = 0 := fun x y => by
     rw [hermForm_sub_mat, Complex.sub_im, h, sub_self]
   have h0 : imForm (H₁ - H₂) = 0 := by
@@ -63,7 +67,8 @@ theorem herm_eq_of_im {L : Type} [AddCommGroup L] (P : L →+ (Fin g → ℂ))
     apply Complex.ext
     · simpa using hre
     · simpa using him z
-  have hs : ∀ j : Fin g, star (Pi.single j 1 : Fin g → ℂ) = (Pi.single j 1 : Fin g → ℂ) := fun j => by
+  have hs
+      : ∀ j : Fin g, star (Pi.single j 1 : Fin g → ℂ) = (Pi.single j 1 : Fin g → ℂ) := fun j => by
     ext k
     by_cases hk : k = j
     · subst hk; simp

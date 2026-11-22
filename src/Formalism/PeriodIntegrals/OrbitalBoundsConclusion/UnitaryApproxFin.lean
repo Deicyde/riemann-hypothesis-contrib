@@ -16,5 +16,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnitaryApproxima
 theorem unitary_approximation_finite : PI.UnitaryApproxFin.UnitaryApproxFin :=
   PI.UnitaryApproxFinWork.unitaryApproxFin_of PI.UnitaryApproxFinWork.topStep
     PI.UnitaryApproxFinWork.cayleyStep PI.UnitaryApproxFinWork.approxEStep
-    PI.UnitaryApproxFinWork.weak_approximation_finite_unitary PI.UnitaryApproxFinWork.bounded_rational_unitary
-    PI.UnitaryApproxFinWork.unitary_scalars PI.UnitaryApproxFinWork.eigenvalue_avoidance
+    PI.UnitaryApproxFinWork.weak_approximation_finite_unitary
+    PI.UnitaryApproxFinWork.bounded_rational_unitary PI.UnitaryApproxFinWork.unitary_scalars
+    PI.UnitaryApproxFinWork.eigenvalue_avoidance

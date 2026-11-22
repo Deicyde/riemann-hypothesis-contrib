@@ -6,11 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Unipotent
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix Topology GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
+open MeasureTheory ValuativeRel Matrix Topology GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
 
 namespace GlobalTheory.GenericShape
 
-theorem superSum_one {F : Type} [Field F] {κ : ℕ} : superSum Fin.val (1 : Matrix (Fin κ) (Fin κ) F) = 0 := by
+theorem superSum_one {F : Type} [Field F] {κ : ℕ}
+    : superSum Fin.val (1 : Matrix (Fin κ) (Fin κ) F) = 0 := by
   refine Finset.sum_eq_zero fun r _ => Finset.sum_eq_zero fun s _ => ?_
   split_ifs with e
   · rw [Matrix.one_apply_ne]; rintro rfl; omega
@@ -155,9 +157,30 @@ private lemma superSum_framePos_eq_simpleSum_of_mem_N {k : Type} [Field k] {κ l
   simp only [h₄]
   linear_combination h₁ + h₂ + h₃
 
-
 open MeasureTheory ValuativeRel Matrix Topology in
-theorem _root_.GlobalTheory.GenericShape.generic_shape : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle) (ϖ : kˣ) (κ l : ℕ) (P : _root_.GlobalTheory.StepData.TypeDatum k (Fin κ ⊕ Fin l)), _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsGenericLevel ψ ϖ P → ((∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) l 1, ∀ γ : GL (Fin κ) k, u * _root_.GlobalTheory.RootEx.embX l γ ∈ P.J → ∃ gb, _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val gb.val) ∧ (∀ (γ : GL (Fin κ) k) (gb : GL (Fin κ) 𝓀[k]), _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb → _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val gb.val → ∃ hm : _root_.GlobalTheory.RootEx.embX l γ ∈ P.J, (P.lam ⟨_, hm⟩ : ℂ) = ψ ((ϖ⁻¹ : kˣ) * _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.superSum Fin.val γ.val)) ∧ ∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) l 1, ∀ hm : u ∈ P.J, (P.lam ⟨u, hm⟩ : ℂ) = ψ ((ϖ⁻¹ : kˣ) * _root_.GlobalTheory.RootEx.simpleSum u)) := by
+theorem _root_.GlobalTheory.GenericShape.generic_shape
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle) (ϖ : kˣ) (κ l : ℕ)
+        (P : _root_.GlobalTheory.StepData.TypeDatum k (Fin κ ⊕ Fin l)),
+      _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsGenericLevel ψ ϖ P
+        → ((∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) l 1, ∀ γ : GL (Fin κ) k,
+            u * _root_.GlobalTheory.RootEx.embX l γ ∈ P.J
+              → ∃ gb,
+                _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb
+                  ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip
+                    Fin.val gb.val)
+          ∧ (∀ (γ : GL (Fin κ) k) (gb : GL (Fin κ) 𝓀[k]),
+            _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb
+              → _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val
+                gb.val
+              → ∃ hm : _root_.GlobalTheory.RootEx.embX l γ ∈ P.J,
+                (P.lam ⟨_, hm⟩ : ℂ)
+                  = ψ
+                    ((ϖ⁻¹ : kˣ)
+                      * _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.superSum
+                        Fin.val γ.val))
+          ∧ ∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) l 1, ∀ hm : u ∈ P.J,
+            (P.lam ⟨u, hm⟩ : ℂ) = ψ ((ϖ⁻¹ : kˣ) * _root_.GlobalTheory.RootEx.simpleSum u)) := by
   intro k _ _ _ _ ψ ϖ κ l P h
   unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsGenericLevel at h
   obtain ⟨hJ, hlam⟩ := h
@@ -165,16 +188,19 @@ theorem _root_.GlobalTheory.GenericShape.generic_shape : ∀ (k : Type) [Field k
   · obtain ⟨gb', ⟨g₀, hg₀, hres₀⟩, hup'⟩ := (hJ _).1 hm
     refine reduces_of_corner_lemma hg₀ (toBlocks₁₁_mul_embX_of_mem_N hu γ) fun r s hsr => ?_
     rw [← map_residue_apply, hres₀]
-    exact (hup' (Sum.inl r) (Sum.inl s) (by simpa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.framePos] using hsr)).trans
-      (one_apply_inl_inl r s)
+    exact (hup' (Sum.inl r) (Sum.inl s) (by
+      simpa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.framePos] using
+        hsr)).trans (one_apply_inl_inl r s)
   · have hm : _root_.GlobalTheory.RootEx.embX l γ ∈ P.J := by
       refine (hJ _).2 ⟨_root_.GlobalTheory.RootEx.embX l gb, reduces_embX_of_reduces hred, ?_⟩
       intro r s hrs
       rcases r with r | r <;> rcases s with s | s
-      · have h' : (s : ℕ) ≤ r := by simpa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.framePos] using hrs
+      · have h' : (s : ℕ) ≤ r := by
+          simpa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.framePos] using hrs
         rw [_root_.GlobalTheory.RootEx.Radical.embX_val, fromBlocks_apply₁₁]
         exact (hup r s h').trans (one_apply_inl_inl r s).symm
-      · have h' : κ + (s : ℕ) ≤ r := by simpa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.framePos] using hrs
+      · have h' : κ + (s : ℕ) ≤ r := by
+          simpa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.framePos] using hrs
         omega
       · rw [_root_.GlobalTheory.RootEx.Radical.embX_val, fromBlocks_apply₂₁]
         simp [Matrix.one_apply]

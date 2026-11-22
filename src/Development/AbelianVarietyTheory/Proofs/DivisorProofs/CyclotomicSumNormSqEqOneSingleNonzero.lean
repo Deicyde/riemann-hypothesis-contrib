@@ -10,8 +10,8 @@ open scoped Classical
 
 namespace GlobalTheory
 
-theorem cycloSq_mod_eq_zero_iff {l a b : ℕ} (hl : 0 < l) (ha : a < l) (hb : b < l) :
-    (a + (l - 1) * b) % l = 0 ↔ b = a := by
+theorem cycloSq_mod_eq_zero_iff {l a b : ℕ} (hl : 0 < l) (ha : a < l) (hb : b < l)
+    : (a + (l - 1) * b) % l = 0 ↔ b = a := by
   rw [← Nat.dvd_iff_mod_eq_zero]
   constructor
   · intro h
@@ -26,8 +26,11 @@ theorem cycloSq_mod_eq_zero_iff {l a b : ℕ} (hl : 0 < l) (ha : a < l) (hb : b 
     obtain ⟨m, rfl⟩ : ∃ m, l = m + 1 := ⟨l - 1, by omega⟩
     exact ⟨b, by simp; ring⟩
 
-theorem cycloSq_coeff_eq {l : ℕ} (hl : l.Prime) {ζ : ℂ} (hζ : IsPrimitiveRoot ζ l) (a : ℕ → ℤ)
-    (h : ∑ d ∈ Finset.range l, (a d : ℂ) * ζ ^ d = 0) : ∀ d < l, a d = a (l - 1) := by
+theorem cycloSq_coeff_eq
+    {l : ℕ} (hl : l.Prime)
+    {ζ : ℂ} (hζ : IsPrimitiveRoot ζ l)
+    (a : ℕ → ℤ) (h : ∑ d ∈ Finset.range l, (a d : ℂ) * ζ ^ d = 0)
+    : ∀ d < l, a d = a (l - 1) := by
   have hl1 : 1 < l := hl.one_lt
   have hgeom : ∑ d ∈ Finset.range l, ζ ^ d = 0 := hζ.geom_sum_eq_zero hl1
   set Q : ℚ[X] := ∑ d ∈ Finset.range (l - 1), C (((a d - a (l - 1) : ℤ)) : ℚ) * X ^ d with hQdef
@@ -47,8 +50,9 @@ theorem cycloSq_coeff_eq {l : ℕ} (hl : l.Prime) {ζ : ℂ} (hζ : IsPrimitiveR
   have hQ0 : Q = 0 := by
     by_contra hne
     have h1 := natDegree_le_of_dvd hdvd hne
-    have h2 : Q.natDegree ≤ l - 2 := natDegree_sum_le_of_forall_le _ _ (fun d hd =>
-      (natDegree_C_mul_X_pow_le _ _).trans (by rw [Finset.mem_range] at hd; omega))
+    have h2 : Q.natDegree ≤ l - 2 :=
+      natDegree_sum_le_of_forall_le _ _
+        (fun d hd => (natDegree_C_mul_X_pow_le _ _).trans (by rw [Finset.mem_range] at hd; omega))
     omega
   intro d hd
   by_cases hd' : d = l - 1
@@ -68,41 +72,42 @@ def cycloSqCoeff (l : ℕ) (f : ℕ → ℤ) (d : ℕ) : ℤ :=
   ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l,
     if (a + (l - 1) * b) % l = d then f a * f b else 0
 
-theorem cycloSq_mul_star {l : ℕ} (hl : 0 < l) {ζ : ℂ} (hζ : IsPrimitiveRoot ζ l) (f : ℕ → ℤ) :
-    (∑ a ∈ Finset.range l, (f a : ℂ) * ζ ^ a) * star (∑ a ∈ Finset.range l, (f a : ℂ) * ζ ^ a)
+theorem cycloSq_mul_star {l : ℕ} (hl : 0 < l) {ζ : ℂ} (hζ : IsPrimitiveRoot ζ l) (f : ℕ → ℤ)
+    : (∑ a ∈ Finset.range l, (f a : ℂ) * ζ ^ a) * star (∑ a ∈ Finset.range l, (f a : ℂ) * ζ ^ a)
       = ∑ d ∈ Finset.range l, (cycloSqCoeff l f d : ℂ) * ζ ^ d := by
   have hnorm : ‖ζ‖ = 1 := hζ.norm'_eq_one hl.ne'
   have hinv : ζ⁻¹ = ζ ^ (l - 1) := by
     apply inv_eq_of_mul_eq_one_right
     rw [← pow_succ', Nat.sub_add_cancel hl, hζ.pow_eq_one]
-  have hstar : star ζ = ζ ^ (l - 1) := by
-    rw [← hinv, Complex.inv_eq_conj hnorm]; rfl
+  have hstar : star ζ = ζ ^ (l - 1) := by rw [← hinv, Complex.inv_eq_conj hnorm]; rfl
   have hpow : ∀ m, ζ ^ m = ζ ^ (m % l) := by
     intro m
     conv_lhs => rw [← Nat.div_add_mod m l]
     rw [pow_add, pow_mul, hζ.pow_eq_one, one_pow, one_mul]
   rw [star_sum, Finset.sum_mul_sum]
-  calc ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (f a : ℂ) * ζ ^ a * star ((f b : ℂ) * ζ ^ b)
-      = ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l,
-          ((f a * f b : ℤ) : ℂ) * ζ ^ ((a + (l - 1) * b) % l) := by
-        refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
-        rw [← hpow, star_mul', star_pow, hstar, star_intCast, pow_add, pow_mul]
-        push_cast; ring
+  calc
+    ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (f a : ℂ) * ζ ^ a * star ((f b : ℂ) * ζ ^ b)
+        = ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l,
+            ((f a * f b : ℤ) : ℂ) * ζ ^ ((a + (l - 1) * b) % l) := by
+      refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
+      rw [← hpow, star_mul', star_pow, hstar, star_intCast, pow_add, pow_mul]
+      push_cast
+      ring
     _ = ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, ∑ d ∈ Finset.range l,
           (if (a + (l - 1) * b) % l = d then ((f a * f b : ℤ) : ℂ) * ζ ^ d else 0) := by
-        refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
-        rw [Finset.sum_ite_eq, if_pos (Finset.mem_range.mpr (Nat.mod_lt _ hl))]
+      refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
+      rw [Finset.sum_ite_eq, if_pos (Finset.mem_range.mpr (Nat.mod_lt _ hl))]
     _ = ∑ d ∈ Finset.range l, ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l,
           (if (a + (l - 1) * b) % l = d then ((f a * f b : ℤ) : ℂ) * ζ ^ d else 0) := by
-        exact (Finset.sum_congr rfl (fun a _ => Finset.sum_comm)).trans Finset.sum_comm
+      exact (Finset.sum_congr rfl (fun a _ => Finset.sum_comm)).trans Finset.sum_comm
     _ = _ := by
-        refine Finset.sum_congr rfl (fun d _ => ?_)
-        simp only [cycloSqCoeff, Int.cast_sum, Finset.sum_mul]
-        refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
-        split_ifs <;> simp
+      refine Finset.sum_congr rfl (fun d _ => ?_)
+      simp only [cycloSqCoeff, Int.cast_sum, Finset.sum_mul]
+      refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
+      split_ifs <;> simp
 
-theorem cycloSq_sum_coeff {l : ℕ} (hl : 0 < l) (f : ℕ → ℤ) :
-    ∑ d ∈ Finset.range l, cycloSqCoeff l f d
+theorem cycloSq_sum_coeff {l : ℕ} (hl : 0 < l) (f : ℕ → ℤ)
+    : ∑ d ∈ Finset.range l, cycloSqCoeff l f d
       = ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, f a * f b := by
   simp only [cycloSqCoeff]
   rw [Finset.sum_comm]
@@ -111,27 +116,31 @@ theorem cycloSq_sum_coeff {l : ℕ} (hl : 0 < l) (f : ℕ → ℤ) :
   refine Finset.sum_congr rfl (fun b _ => ?_)
   rw [Finset.sum_ite_eq, if_pos (Finset.mem_range.mpr (Nat.mod_lt _ hl))]
 
-theorem cycloSq_coeff_zero {l : ℕ} (hl : 0 < l) (f : ℕ → ℤ) :
-    cycloSqCoeff l f 0 = ∑ a ∈ Finset.range l, f a ^ 2 := by
+theorem cycloSq_coeff_zero {l : ℕ} (hl : 0 < l) (f : ℕ → ℤ)
+    : cycloSqCoeff l f 0 = ∑ a ∈ Finset.range l, f a ^ 2 := by
   simp only [cycloSqCoeff]
   refine Finset.sum_congr rfl (fun a ha => ?_)
   rw [Finset.mem_range] at ha
-  rw [Finset.sum_congr rfl (g := fun b => if b = a then f a * f b else 0) (fun b hb => by
-    simp only [cycloSq_mod_eq_zero_iff hl ha (Finset.mem_range.mp hb)])]
+  rw [Finset.sum_congr rfl
+    (g := fun b => if b = a then f a * f b else 0)
+    (fun b hb => by simp only [cycloSq_mod_eq_zero_iff hl ha (Finset.mem_range.mp hb)])]
   rw [Finset.sum_ite_eq', if_pos (Finset.mem_range.mpr ha), sq]
 
-theorem cycloSq_two_mul {l : ℕ} (f : ℕ → ℤ) :
-    ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (f a - f b) ^ 2
-      = 2 * ((l : ℤ) * ∑ a ∈ Finset.range l, f a ^ 2
+theorem cycloSq_two_mul {l : ℕ} (f : ℕ → ℤ)
+    : ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (f a - f b) ^ 2
+      = 2
+        * ((l : ℤ) * ∑ a ∈ Finset.range l, f a ^ 2
           - ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, f a * f b) := by
   have : ∀ a b : ℕ, (f a - f b) ^ 2 = f a ^ 2 + f b ^ 2 - 2 * (f a * f b) := fun a b => by ring
   simp only [this, Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.sum_const,
     Finset.card_range, nsmul_eq_mul, ← Finset.mul_sum]
   ring
 
-theorem cycloSq_le_of_ne_zero {l : ℕ} (hl : 1 < l) {ζ : ℂ} (hζ : IsPrimitiveRoot ζ l)
-    (f : ℕ → ℤ) (hc : ∑ a ∈ Finset.range l, (f a : ℂ) * ζ ^ a ≠ 0) :
-    (l : ℤ) ≤ ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (f a - f b) ^ 2 := by
+theorem cycloSq_le_of_ne_zero
+    {l : ℕ} (hl : 1 < l)
+    {ζ : ℂ} (hζ : IsPrimitiveRoot ζ l)
+    (f : ℕ → ℤ) (hc : ∑ a ∈ Finset.range l, (f a : ℂ) * ζ ^ a ≠ 0)
+    : (l : ℤ) ≤ ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (f a - f b) ^ 2 := by
   have hne : ∃ x ∈ Finset.range l, f x ≠ f 0 := by
     by_contra hall
     push_neg at hall
@@ -141,32 +150,39 @@ theorem cycloSq_le_of_ne_zero {l : ℕ} (hl : 1 < l) {ζ : ℂ} (hζ : IsPrimiti
   obtain ⟨x, hx, hfx⟩ := hne
   have h0 : 0 ∈ Finset.range l := Finset.mem_range.mpr (by omega)
   have hx0 : x ≠ 0 := by rintro rfl; exact hfx rfl
-  have hR : ∀ a ∈ Finset.range l, 0 ≤ ∑ b ∈ Finset.range l, (f a - f b) ^ 2 :=
-    fun a _ => Finset.sum_nonneg (fun b _ => sq_nonneg _)
+  have hR : ∀ a ∈ Finset.range l, 0 ≤ ∑ b ∈ Finset.range l, (f a - f b) ^ 2 := fun a _ =>
+    Finset.sum_nonneg (fun b _ => sq_nonneg _)
   have hsum := Finset.add_le_sum hR hx h0 hx0
-  have hxy : (l : ℤ) ≤ ∑ b ∈ Finset.range l, (f x - f b) ^ 2
-      + ∑ b ∈ Finset.range l, (f 0 - f b) ^ 2 := by
+  have hxy
+      : (l : ℤ)
+        ≤ ∑ b ∈ Finset.range l, (f x - f b) ^ 2 + ∑ b ∈ Finset.range l, (f 0 - f b) ^ 2 := by
     rw [← Finset.sum_add_distrib]
-    calc (l : ℤ) = ∑ b ∈ Finset.range l, (1 : ℤ) := by simp
-      _ ≤ _ := Finset.sum_le_sum (fun b _ => by
-        have h1 := sq_nonneg (f x - f b)
-        have h2 := sq_nonneg (f 0 - f b)
-        by_cases h : f x = f b
-        · have : f 0 - f b ≠ 0 := by omega
-          rcases lt_or_gt_of_ne this with h3 | h3 <;> nlinarith
-        · have : f x - f b ≠ 0 := by omega
-          rcases lt_or_gt_of_ne this with h3 | h3 <;> nlinarith)
+    calc
+      (l : ℤ)
+        = ∑ b ∈ Finset.range l, (1 : ℤ) := by simp
+      _ ≤ _ :=
+        Finset.sum_le_sum (fun b _ => by
+          have h1 := sq_nonneg (f x - f b)
+          have h2 := sq_nonneg (f 0 - f b)
+          by_cases h : f x = f b
+          · have : f 0 - f b ≠ 0 := by omega
+            rcases lt_or_gt_of_ne this with h3 | h3 <;> nlinarith
+          · have : f x - f b ≠ 0 := by omega
+            rcases lt_or_gt_of_ne this with h3 | h3 <;> nlinarith)
   linarith
 
 end GlobalTheory
 
 namespace GlobalTheory
 
-theorem cyclo_sum_mul_star_eq_one_single : ∀ (l : ℕ) (ζ : ℂ), l.Prime → IsPrimitiveRoot ζ l →
-    ∀ (I : Type) (S : Finset I) (n : I → ℕ → ℤ),
-      ∑ i ∈ S, (∑ a ∈ Finset.range l, (n i a : ℂ) * ζ ^ a) *
-          star (∑ a ∈ Finset.range l, (n i a : ℂ) * ζ ^ a) = 1 →
-      ∃ i₀ ∈ S, ∀ i ∈ S, i ≠ i₀ → ∑ a ∈ Finset.range l, (n i a : ℂ) * ζ ^ a = 0 := by
+theorem cyclo_sum_mul_star_eq_one_single
+    : ∀ (l : ℕ) (ζ : ℂ),
+      l.Prime → IsPrimitiveRoot ζ l
+        → ∀ (I : Type) (S : Finset I) (n : I → ℕ → ℤ),
+          ∑ i ∈ S, (∑ a ∈ Finset.range l, (n i a : ℂ) * ζ ^ a) *
+              star (∑ a ∈ Finset.range l, (n i a : ℂ) * ζ ^ a)
+              = 1
+            → ∃ i₀ ∈ S, ∀ i ∈ S, i ≠ i₀ → ∑ a ∈ Finset.range l, (n i a : ℂ) * ζ ^ a = 0 := by
   intro l ζ hl hζ I S n hsum
   have hl0 : 0 < l := hl.pos
   have hl1 : 1 < l := hl.one_lt
@@ -191,16 +207,19 @@ theorem cyclo_sum_mul_star_eq_one_single : ∀ (l : ℕ) (ζ : ℂ), l.Prime →
     rw [← Finset.add_sum_erase _ _ h0mem, Finset.sum_congr rfl hNd, Finset.sum_const,
       Finset.card_erase_of_mem h0mem, Finset.card_range, nsmul_eq_mul,
       Nat.cast_sub (by omega : 1 ≤ l)]
-    push_cast; ring
-  have hsumN' : ∑ d ∈ Finset.range l, N d
-      = ∑ i ∈ S, ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, n i a * n i b := by
+    push_cast
+    ring
+  have hsumN'
+      : ∑ d ∈ Finset.range l, N d
+        = ∑ i ∈ S, ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, n i a * n i b := by
     simp only [hN]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl (fun i _ => cycloSq_sum_coeff hl0 (n i))
   have hN0 : N 0 = ∑ i ∈ S, ∑ a ∈ Finset.range l, n i a ^ 2 :=
     Finset.sum_congr rfl (fun i _ => cycloSq_coeff_zero hl0 (n i))
-  have hQsum : ∑ i ∈ S, ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (n i a - n i b) ^ 2
-      = 2 * ((l : ℤ) - 1) := by
+  have hQsum
+      : ∑ i ∈ S, ∑ a ∈ Finset.range l, ∑ b ∈ Finset.range l, (n i a - n i b) ^ 2
+        = 2 * ((l : ℤ) - 1) := by
     rw [Finset.sum_congr rfl (fun i _ => cycloSq_two_mul (n i)), ← Finset.mul_sum,
       Finset.sum_sub_distrib, ← Finset.mul_sum, ← hN0, ← hsumN', hsumN]
     ring

@@ -13,18 +13,32 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.WeilDeligne GlobalTheory.GalOfCusp GlobalTheory.HeckeGal GlobalTheory.LocLanglands GlobalTheory.Published UpperTheory.V.W
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.WeilDeligne GlobalTheory.GalOfCusp
+  GlobalTheory.HeckeGal GlobalTheory.LocLanglands GlobalTheory.Published UpperTheory.V.W
 
-private theorem cyc_continuous (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime] :
-    Continuous (cycBar F Ω l) :=
+private theorem cyc_continuous
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime]
+    : Continuous (cycBar F Ω l) :=
   _root_.UpperTheory.Reformulated.B.ContinuousCyclotomicCharacter₂.cyc_continuous F Ω l
 
-theorem UpperTheory.V.Loc.laArith :
-    GlobalArtinReciprocity → ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] {A : ValuationSubring Ω} {w : Plc F} (h : IsPlaceOver A w), ((l : ℕ) : 𝓞 F) ∈ w.asIdeal → ∀ (κ : ↥(Dec (F := F) A) →* (Qbar l)ˣ), Continuous κ → ∀ (m : ℤ) (k : ℕ), 0 < k → (∀ g : ↥(Dec (F := F) A), (g : G F Ω) ∈ Ine (F := F) A → (κ g * cycBar F Ω l g ^ (-m)) ^ k = 1) → IsLocAlg h κ fun _ => -m := by
+theorem UpperTheory.V.Loc.laArith
+    : GlobalArtinReciprocity
+      → ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ}
+          [Fact l.Prime] {A : ValuationSubring Ω} {w : Plc F} (h : IsPlaceOver A w),
+        ((l : ℕ) : 𝓞 F) ∈ w.asIdeal
+          → ∀ (κ : ↥(Dec (F := F) A) →* (Qbar l)ˣ),
+            Continuous κ
+              → ∀ (m : ℤ) (k : ℕ),
+                0 < k
+                  → (∀ g : ↥(Dec (F := F) A),
+                    (g : G F Ω) ∈ Ine (F := F) A → (κ g * cycBar F Ω l g ^ (-m)) ^ k = 1)
+                  → IsLocAlg h κ fun _ => -m := by
   intro H F Ω _ _ _ _ _ l _ A w h hl κ hκ m k hk hpow
   set c : ↥(Dec (F := F) A) →* (Qbar l)ˣ := (cycBar F Ω l).comp (Dec (F := F) A).subtype with hc
   have hcc : Continuous c := (cyc_continuous F Ω l).comp continuous_subtype_val
-  let i : ↥(Ine (F := F) A) →* ↥(Dec (F := F) A) := (Subgroup.inclusion (Weil_le_Dec h)).comp (ineIncl h)
+  let i : ↥(Ine (F := F) A) →* ↥(Dec (F := F) A) :=
+    (Subgroup.inclusion (Weil_le_Dec h)).comp (ineIncl h)
   have hi : Continuous i := continuous_subtype_val.subtype_mk _
   let χ : ↥(Dec (F := F) A) →* (Qbar l)ˣ := κ * c ^ (-m)
   have hχ : Continuous χ := hκ.mul ((continuous_zpow (-m)).comp hcc)

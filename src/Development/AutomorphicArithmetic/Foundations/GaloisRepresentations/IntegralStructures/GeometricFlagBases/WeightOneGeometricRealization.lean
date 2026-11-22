@@ -12,6 +12,7 @@ theorem weight_one_geometric_realization : LocalSmoothExtension.HolomorphicLefsc
   unfold LocalSmoothExtension.HolomorphicLefschetzFormula
   exact GlobalTheory.T.lefschetz_fixedPoint_finite_etale_correspondence
 
-theorem geoOne_holds : GeoOne := geometric_realization_of_weight_one weight_one_geometric_realization
+theorem geoOne_holds : GeoOne :=
+  geometric_realization_of_weight_one weight_one_geometric_realization
 
 end UpperTheory.Gal.Int.Geo

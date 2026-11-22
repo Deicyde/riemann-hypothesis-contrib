@@ -13,14 +13,17 @@ open scoped TensorProduct
 
 namespace Formalism.L2.SG.Pf.AllRowsRedKer
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.RowDict Formalism.L2.SG.Pf.RowDictPf Formalism.L2.SG.Pf.AllRowsRedKerA
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.RowDict Formalism.L2.SG.Pf.RowDictPf Formalism.L2.SG.Pf.AllRowsRedKerA
   Formalism.MainNotions.BridgeLemma
 
 variable {D : D7}
 
 def sigH (D : D7) : 𝓞 D.host.E ≃+* 𝓞 D.host.E := RingOfIntegers.mapRingEquiv D.host.conj.toRingEquiv
 
-theorem sigH_coe (a : 𝓞 D.host.E) : ((sigH D a : 𝓞 D.host.E) : D.host.E) = D.host.conj (a : D.host.E) := rfl
+theorem sigH_coe (a : 𝓞 D.host.E)
+    : ((sigH D a : 𝓞 D.host.E) : D.host.E) = D.host.conj (a : D.host.E) :=
+  rfl
 
 def conjH (w : HeightOneSpectrum (𝓞 D.host.E)) : HeightOneSpectrum (𝓞 D.host.E) where
   asIdeal := w.asIdeal.comap (sigH D)
@@ -40,14 +43,16 @@ theorem sigH_sigH (X : HidaSetting D) (a : 𝓞 D.host.E) : sigH D (sigH D a) = 
   rw [sigH_coe, sigH_coe]
   exact conj_conj X _
 
-theorem conjH_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) : conjH (conjH w) = w := by
+theorem conjH_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
+    : conjH (conjH w) = w := by
   apply HeightOneSpectrum.ext
   show (w.asIdeal.comap (sigH D)).comap (sigH D) = w.asIdeal
   ext a
   simp only [Ideal.mem_comap]
   rw [sigH_sigH X]
 
-theorem isConjPl_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) : IsConjPl D.host w (conjH w) := by
+theorem isConjPl_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
+    : IsConjPl D.host w (conjH w) := by
   intro x y hxy
   have hs : sigH D y = x := by
     apply RingOfIntegers.ext
@@ -55,19 +60,22 @@ theorem isConjPl_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E
   show x ∈ w.asIdeal ↔ sigH D y ∈ w.asIdeal
   rw [hs]
 
-theorem natCast_mem_conjH {w : HeightOneSpectrum (𝓞 D.host.E)} {p : ℕ} (h : (p : 𝓞 D.host.E) ∈ w.asIdeal) :
-    (p : 𝓞 D.host.E) ∈ (conjH w).asIdeal := by
+theorem natCast_mem_conjH
+    {w : HeightOneSpectrum (𝓞 D.host.E)} {p : ℕ} (h : (p : 𝓞 D.host.E) ∈ w.asIdeal)
+    : (p : 𝓞 D.host.E) ∈ (conjH w).asIdeal := by
   show sigH D (p : 𝓞 D.host.E) ∈ w.asIdeal
   rw [map_natCast]
   exact h
 
-theorem wB_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) : wB X (conjH w) = wc X.B.I (wB X w) := by
+theorem wB_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
+    : wB X (conjH w) = wc X.B.I (wB X w) := by
   apply HeightOneSpectrum.ext
   ext a
   rw [mem_wc]
   simp only [wB, conjH, Ideal.mem_comap]
-  have hc : sigH D (RingOfIntegers.mapRingEquiv X.ιE a) =
-      RingOfIntegers.mapRingEquiv X.ιE (sigO X.B.I a) := by
+  have hc
+      : sigH D (RingOfIntegers.mapRingEquiv X.ιE a)
+        = RingOfIntegers.mapRingEquiv X.ιE (sigO X.B.I a) := by
     apply RingOfIntegers.ext
     rw [sigH_coe]
     simp [RingOfIntegers.mapRingEquiv, sigO_coe, X.ιE_conj]
@@ -75,13 +83,16 @@ theorem wB_conjH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) : w
 
 theorem finrank_cmField (D : D7) : Module.finrank ℚ D.host.E = 2 * D.R.f := by
   haveI := D.host.galois
-  rw [← IsGalois.card_aut_eq_finrank, Nat.card_congr D.host.gal.toEquiv, Formalism.HC.Frame.natCard_GG]
+  rw [← IsGalois.card_aut_eq_finrank, Nat.card_congr D.host.gal.toEquiv,
+    Formalism.HC.Frame.natCard_GG]
   simp only [Formalism.BasicNotions.Ranks.f, Formalism.BasicNotions.Ranks.n]
   ring
 
-theorem cover (X : HidaSetting D) (k : Fin 2) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ w.asIdeal) :
-    ∃ v, w = D.naut.plGw k v ∨ w = conjH (D.naut.plGw k v) := by
+theorem cover
+    (X : HidaSetting D)
+    (k : Fin 2) (w : HeightOneSpectrum (𝓞 D.host.E))
+    (hw : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ w.asIdeal)
+    : ∃ v, w = D.naut.plGw k v ∨ w = conjH (D.naut.plGw k v) := by
   have hp := D.host.g_prime k
   set A : Set (HeightOneSpectrum (𝓞 D.host.E)) :=
     Set.range (D.naut.plGw k) ∪ Set.range (fun v => conjH (D.naut.plGw k v)) with hA
@@ -96,7 +107,8 @@ theorem cover (X : HidaSetting D) (k : Fin 2) (w : HeightOneSpectrum (𝓞 D.hos
     apply D.naut.plGw_inj k
     have := congrArg conjH h
     simpa only [conjH_conjH X] using this
-  have hdisj : Disjoint (Set.range (D.naut.plGw k)) (Set.range (fun v => conjH (D.naut.plGw k v))) := by
+  have hdisj
+      : Disjoint (Set.range (D.naut.plGw k)) (Set.range (fun v => conjH (D.naut.plGw k v))) := by
     rw [Set.disjoint_left]
     rintro _ ⟨v, rfl⟩ ⟨v', hv'⟩
     apply D.naut.plGw_nconj k v' v
@@ -116,14 +128,17 @@ theorem cover (X : HidaSetting D) (k : Fin 2) (w : HeightOneSpectrum (𝓞 D.hos
   · exact ⟨v, Or.inl rfl⟩
   · exact ⟨v, Or.inr rfl⟩
 
-theorem unram (X : HidaSetting D) (k : Fin 2) (P : Ideal (𝓞 X.B.I.E)) (hPm : P.IsMaximal)
-    (hgP : ((D.host.g k : ℕ) : 𝓞 X.B.I.E) ∈ P) : ((D.host.g k : ℕ) : 𝓞 X.B.I.E) ∉ P ^ 2 := by
+theorem unram
+    (X : HidaSetting D) (k : Fin 2) (P : Ideal (𝓞 X.B.I.E))
+    (hPm : P.IsMaximal) (hgP : ((D.host.g k : ℕ) : 𝓞 X.B.I.E) ∈ P)
+    : ((D.host.g k : ℕ) : 𝓞 X.B.I.E) ∉ P ^ 2 := by
   have hp := D.host.g_prime k
   have := span_isMaximal hp
-  have hspl := splitsCompl_of_ncard D.host.E (D.host.g k) hp (by
-    rw [← IsDedekindDomain.coe_primesOverFinset (span_ne_bot hp) (𝓞 D.host.E), ← image_plOver _ hp,
-      (injOn_asIdeal _ _).ncard_image]
-    exact D.nd.g_split k)
+  have hspl :=
+    splitsCompl_of_ncard D.host.E (D.host.g k) hp (by
+      rw [← IsDedekindDomain.coe_primesOverFinset (span_ne_bot hp) (𝓞 D.host.E),
+        ← image_plOver _ hp, (injOn_asIdeal _ _).ncard_image]
+      exact D.nd.g_split k)
   set e : 𝓞 X.B.I.E ≃+* 𝓞 D.host.E := RingOfIntegers.mapRingEquiv X.ιE
   have hQm : (P.map e).IsMaximal := Ideal.map_isMaximal_of_equiv e
   have hgQ : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P.map e := by
@@ -135,13 +150,15 @@ theorem unram (X : HidaSetting D) (k : Fin 2) (P : Ideal (𝓞 X.B.I.E)) (hPm : 
   have := Ideal.mem_map_of_mem e h
   rwa [map_natCast, Ideal.map_pow] at this
 
-def toH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 X.B.I.E)) : HeightOneSpectrum (𝓞 D.host.E) where
+def toH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 X.B.I.E))
+    : HeightOneSpectrum (𝓞 D.host.E) where
   asIdeal := w.asIdeal.comap (RingOfIntegers.mapRingEquiv X.ιE).symm
   isPrime := by have := w.isPrime; exact Ideal.comap_isPrime _ _
   ne_bot := by
     intro h
     apply w.ne_bot
-    have := Ideal.map_comap_of_surjective _ (RingOfIntegers.mapRingEquiv X.ιE).symm.surjective w.asIdeal
+    have :=
+      Ideal.map_comap_of_surjective _ (RingOfIntegers.mapRingEquiv X.ιE).symm.surjective w.asIdeal
     rw [← this, h, Ideal.map_bot]
 
 theorem wB_toH (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 X.B.I.E)) : wB X (toH X w) = w := by
@@ -159,7 +176,8 @@ theorem redKerP_holds (X : HidaSetting D) (k : Fin 2) : Formalism.L2.SG.AllRowsO
   refine glue X.B.I hp (unram X k) hx fun w hw => ?_
   have hwH : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ (toH X w).asIdeal := by
     show (RingOfIntegers.mapRingEquiv X.ιE).symm ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ w.asIdeal
-    rw [map_natCast]; exact hw
+    rw [map_natCast]
+    exact hw
   obtain ⟨v, hv | hv⟩ := cover X k (toH X w) hwH
   · rw [← wB_toH X w, hv]
     exact hA v

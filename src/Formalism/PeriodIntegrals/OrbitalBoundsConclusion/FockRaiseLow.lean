@@ -13,6 +13,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FockRaisingLower
 theorem gradedOscillatorProperty : FockH1Action.H1 :=
   FockRL.gradedOscillatorProperty_of FockRL.blockDiagonalPreservesDegree
     (FockRL.pcStep_of FockRaiseLowGrade.raisingLoweringSplit)
-    (FockRL.adjStep_of FockRaiseLowGrade.raisingLoweringSplit FockRaiseLowInner.fischerConjLinearLeft
-      FockRaiseLowInner.fischerLinearRight FockRaiseLowInner.fischerXAdjoint)
+    (FockRL.adjStep_of FockRaiseLowGrade.raisingLoweringSplit
+      FockRaiseLowInner.fischerConjLinearLeft FockRaiseLowInner.fischerLinearRight
+      FockRaiseLowInner.fischerXAdjoint)
     FockRL.kroneckerProperties

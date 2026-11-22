@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SplitPr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.FrobeniusOrbits GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.FrobeniusOrbits
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 open GlobalTheory.SplitRowProbe GlobalTheory.SplitType
 
 namespace UpperTheory.N.Two
@@ -17,23 +19,28 @@ theorem norm_two {l : ℕ} [Fact l.Prime] (h2 : l = 2) : ‖(2 : ℤ_[l])‖ = 1
   have := PadicInt.norm_p (p := 2)
   simpa using this
 
-theorem exists_sqrt {l : ℕ} [Fact l.Prime] (h2 : l = 2) {d k : ℕ} (hk : d + 1 = 8 * k) :
-    ∃ s : ℤ_[l], s ^ 2 = -(d : ℤ_[l]) := by
+theorem exists_sqrt {l : ℕ} [Fact l.Prime] (h2 : l = 2) {d k : ℕ} (hk : d + 1 = 8 * k)
+    : ∃ s : ℤ_[l], s ^ 2 = -(d : ℤ_[l]) := by
   have n2 := norm_two h2
   have hk' : (((1 : ℤ) ^ 2 + d : ℤ) : ℤ_[l]) = 2 * 2 * 2 * k := by
     have : ((d + 1 : ℕ) : ℤ_[l]) = ((8 * k : ℕ) : ℤ_[l]) := by rw [hk]
     push_cast at this ⊢
     linear_combination this
-  obtain ⟨s, hs⟩ := Misc.isSquare_of_hensel l d 1 (by
-    rw [hk', norm_mul, norm_mul, norm_mul, n2]
-    have e : ((2 * 1 : ℤ) : ℤ_[l]) = 2 := by norm_num
-    rw [e, n2]
-    have := PadicInt.norm_le_one (k : ℤ_[l])
-    nlinarith)
+  obtain ⟨s, hs⟩ :=
+    Misc.isSquare_of_hensel l d 1 (by
+      rw [hk', norm_mul, norm_mul, norm_mul, n2]
+      have e : ((2 * 1 : ℤ) : ℤ_[l]) = 2 := by norm_num
+      rw [e, n2]
+      have := PadicInt.norm_le_one (k : ℤ_[l])
+      nlinarith)
   exact ⟨s, by rw [sq, ← hs]; simp⟩
 
-theorem exists_half {l : ℕ} [Fact l.Prime] (h2 : l = 2) {d k : ℕ} (hk : d + 1 = 8 * k) {t : ℤ_[l]}
-    (ht : t ^ 2 = -(d : ℤ_[l])) : ∃ u : ℤ_[l], 2 * u = 1 + t ∧ u * (1 - u) = 2 * k := by
+theorem exists_half
+    {l : ℕ} [Fact l.Prime]
+    (h2 : l = 2)
+    {d k : ℕ} (hk : d + 1 = 8 * k)
+    {t : ℤ_[l]} (ht : t ^ 2 = -(d : ℤ_[l]))
+    : ∃ u : ℤ_[l], 2 * u = 1 + t ∧ u * (1 - u) = 2 * k := by
   have n2 := norm_two h2
   have hk' : (d : ℤ_[l]) + 1 = 8 * k := by exact_mod_cast congrArg (Nat.cast : ℕ → ℤ_[l]) hk
   have hp : (1 + t) * (1 - t) = 2 * (4 * k) := by linear_combination hk' - ht
@@ -61,16 +68,21 @@ theorem exists_half {l : ℕ} [Fact l.Prime] (h2 : l = 2) {d k : ℕ} (hk : d + 
 
 variable (D : D7) (i : D.nd.Loc)
 
-theorem root_ne (h2 : D.nd.l i = 2) (w w' : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
-    (hw' : w' ∈ placesOver D.host.E (D.nd.l i)) (hc : IsConjPl D.host w w') {t : ℤ_[D.nd.l i]}
-    (hs : t ^ 2 = -(D.host.d : ℤ_[D.nd.l i]))
-    (ht : algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i]) =
-      (D.nbr i w hw).j (algebraMap D.host.E D.nd.Om (D.host.sqd)))
-    (ht' : algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i]) =
-      (D.nbr i w' hw').j (algebraMap D.host.E D.nd.Om (D.host.sqd))) : False := by
-  obtain ⟨k, hk⟩ : ∃ k : ℕ, D.host.d + 1 = 8 * k := ⟨(D.host.d + 1) / 8, by have := D.host.hyp.2.2.2.1; omega⟩
+theorem root_ne
+    (h2 : D.nd.l i = 2)
+    (w w' : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
+    (hw' : w' ∈ placesOver D.host.E (D.nd.l i)) (hc : IsConjPl D.host w w')
+    {t : ℤ_[D.nd.l i]} (hs : t ^ 2 = -(D.host.d : ℤ_[D.nd.l i]))
+    (ht : algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i])
+      = (D.nbr i w hw).j (algebraMap D.host.E D.nd.Om (D.host.sqd)))
+    (ht' : algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i])
+      = (D.nbr i w' hw').j (algebraMap D.host.E D.nd.Om (D.host.sqd)))
+    : False := by
+  obtain ⟨k, hk⟩ : ∃ k : ℕ, D.host.d + 1 = 8 * k :=
+    ⟨(D.host.d + 1) / 8, by have := D.host.hyp.2.2.2.1; omega⟩
   obtain ⟨u, hu, huk⟩ := exists_half h2 hk hs
-  have hkE : (D.host.d : D.host.E) + 1 = 8 * k := by exact_mod_cast congrArg (Nat.cast : ℕ → D.host.E) hk
+  have hkE : (D.host.d : D.host.E) + 1 = 8 * k := by
+    exact_mod_cast congrArg (Nat.cast : ℕ → D.host.E) hk
   set ω : D.host.E := (1 + D.host.sqd) / 2 with hω
   have hq : ω ^ 2 - ω + 2 * k = 0 := by
     have := sqrtE_sq D.host
@@ -91,10 +103,15 @@ theorem root_ne (h2 : D.nd.l i = 2) (w w' : HeightOneSpectrum (𝓞 D.host.E)) (
     have e : ((2 : ℤ_[D.nd.l i]) : ℚ_[D.nd.l i]) = 2 := rfl
     rw [← this, e]
     field_simp
-  have a1 : β ∈ w.asIdeal ↔ ‖u‖ < 1 := mem_iff_norm D i w hw β u (by
-    rw [hβ, hω, huQ]; simp only [map_div₀, map_add (f := _), map_one, map_ofNat, ht])
-  have a2 : 1 - β ∈ w'.asIdeal ↔ ‖1 - u‖ < 1 := mem_iff_norm D i w' hw' (1 - β) (1 - u) (by
-    rw [hy, hω]; push_cast; rw [huQ]; simp only [map_sub, map_div₀, map_add (f := _), map_one, map_ofNat, ht'])
+  have a1 : β ∈ w.asIdeal ↔ ‖u‖ < 1 :=
+    mem_iff_norm D i w hw β u
+      (by rw [hβ, hω, huQ]; simp only [map_div₀, map_add (f := _), map_one, map_ofNat, ht])
+  have a2 : 1 - β ∈ w'.asIdeal ↔ ‖1 - u‖ < 1 :=
+    mem_iff_norm D i w' hw' (1 - β) (1 - u) (by
+      rw [hy, hω]
+      push_cast
+      rw [huQ]
+      simp only [map_sub, map_div₀, map_add (f := _), map_one, map_ofNat, ht'])
   have a3 : β ∈ w.asIdeal ↔ 1 - β ∈ w'.asIdeal := hc β (1 - β) (by rw [hy, hβ, hconj])
   have hiff : ‖u‖ < 1 ↔ ‖1 - u‖ < 1 := a1.symm.trans (a3.trans a2)
   have hprod : ‖u‖ * ‖1 - u‖ < 1 := by
@@ -110,16 +127,19 @@ theorem root_ne (h2 : D.nd.l i = 2) (w w' : HeightOneSpectrum (𝓞 D.host.E)) (
   rw [show u + (1 - u) = 1 by ring, norm_one] at h6
   exact absurd h6 (not_le.2 (max_lt b1 (hiff.1 b1)))
 
-theorem place_type_conj (h2 : D.nd.l i = 2)
+theorem place_type_conj
+    (h2 : D.nd.l i = 2)
     (w w' : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
-    (hw' : w' ∈ placesOver D.host.E (D.nd.l i)) (hc : IsConjPl D.host w w') :
-    (PlIn (N := D.nd) D.nbr i true w hw ∧ PlIn (N := D.nd) D.nbr i false w' hw') ∨
-      (PlIn (N := D.nd) D.nbr i false w hw ∧ PlIn (N := D.nd) D.nbr i true w' hw') := by
-  obtain ⟨k, hk⟩ : ∃ k : ℕ, D.host.d + 1 = 8 * k := ⟨(D.host.d + 1) / 8, by have := D.host.hyp.2.2.2.1; omega⟩
+    (hw' : w' ∈ placesOver D.host.E (D.nd.l i)) (hc : IsConjPl D.host w w')
+    : (PlIn (N := D.nd) D.nbr i true w hw ∧ PlIn (N := D.nd) D.nbr i false w' hw')
+      ∨ (PlIn (N := D.nd) D.nbr i false w hw ∧ PlIn (N := D.nd) D.nbr i true w' hw') := by
+  obtain ⟨k, hk⟩ : ∃ k : ℕ, D.host.d + 1 = 8 * k :=
+    ⟨(D.host.d + 1) / 8, by have := D.host.hyp.2.2.2.1; omega⟩
   obtain ⟨s, hs⟩ := exists_sqrt h2 hk
-  obtain ⟨s₀, hs₀, h₀⟩ := exists_root
-    ((algebraMap (D.nd.O i) (FractionRing (D.nd.O i))).comp (algebraMap ℤ_[D.nd.l i] (D.nd.O i))) hs
-    (map_sqrt_sq D.host ((D.nd.embK i).comp D.embE))
+  obtain ⟨s₀, hs₀, h₀⟩ :=
+    exists_root
+      ((algebraMap (D.nd.O i) (FractionRing (D.nd.O i))).comp (algebraMap ℤ_[D.nd.l i] (D.nd.O i)))
+      hs (map_sqrt_sq D.host ((D.nd.embK i).comp D.embE))
   have hs0 : s₀ ^ 2 = -(D.host.d : ℤ_[D.nd.l i]) := by rcases hs₀ with rfl | rfl <;> simp [hs]
   have hne : s₀ ≠ -s₀ := fun e => by
     have h0 : s₀ = 0 := by
@@ -129,14 +149,17 @@ theorem place_type_conj (h2 : D.nd.l i = 2)
     have : (D.host.d : ℤ_[D.nd.l i]) = 0 := by linear_combination hs0
     have : D.host.d = 0 := by exact_mod_cast this
     omega
-  have key : ∀ (v : HeightOneSpectrum (𝓞 D.host.E)) (hv : v ∈ placesOver D.host.E (D.nd.l i)),
-      ∃ t : ℤ_[D.nd.l i], algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i]) =
-        (D.nbr i v hv).j (algebraMap D.host.E D.nd.Om (D.host.sqd)) ∧
-        ((t = s₀ ∧ PlIn (N := D.nd) D.nbr i true v hv) ∨ (t = -s₀ ∧ PlIn (N := D.nd) D.nbr i false v hv)) := by
+  have key
+      : ∀ (v : HeightOneSpectrum (𝓞 D.host.E)) (hv : v ∈ placesOver D.host.E (D.nd.l i)),
+        ∃ t : ℤ_[D.nd.l i],
+          algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i])
+              = (D.nbr i v hv).j (algebraMap D.host.E D.nd.Om (D.host.sqd))
+            ∧ ((t = s₀ ∧ PlIn (N := D.nd) D.nbr i true v hv)
+              ∨ (t = -s₀ ∧ PlIn (N := D.nd) D.nbr i false v hv)) := by
     intro v hv
-    obtain ⟨t, ht, h⟩ := exists_root
-      ((algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i))).comp PadicInt.Coe.ringHom) hs0
-      (map_sqrt_sq D.host ((D.nbr i v hv).j.comp (algebraMap D.host.E D.nd.Om)))
+    obtain ⟨t, ht, h⟩ :=
+      exists_root ((algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i))).comp PadicInt.Coe.ringHom) hs0
+        (map_sqrt_sq D.host ((D.nbr i v hv).j.comp (algebraMap D.host.E D.nd.Om)))
     refine ⟨t, h, ?_⟩
     rcases ht with ht | ht
     · refine Or.inl ⟨ht, nonempty_emb D i v hv, fun τ => ?_⟩

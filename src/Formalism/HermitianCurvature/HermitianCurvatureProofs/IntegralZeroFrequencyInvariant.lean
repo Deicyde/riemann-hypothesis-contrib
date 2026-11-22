@@ -17,8 +17,10 @@ theorem semi : SeminormIneq := by
   have hre : ∀ z, 0 ≤ (β z z).re := by
     intro z
     exact (hnn z).2
-  have hexp : ∀ t : ℝ, (β (x + ((-t : ℝ) : ℂ) • y) (x + ((-t : ℝ) : ℂ) • y)).re =
-      (β y y).re * (t * t) + (-(β x y + β y x).re) * t + (β x x).re := by
+  have hexp
+      : ∀ t : ℝ,
+        (β (x + ((-t : ℝ) : ℂ) • y) (x + ((-t : ℝ) : ℂ) • y)).re
+          = (β y y).re * (t * t) + (-(β x y + β y x).re) * t + (β x x).re := by
     intro t
     simp only [ba1, ba2, bs1, bs2, Complex.conj_ofReal, Complex.add_re, Complex.re_ofReal_mul]
     ring
@@ -30,7 +32,8 @@ theorem semi : SeminormIneq := by
   simp only [discrim] at hd
   have h1 := hexp 1
   rw [show x + ((-(1 : ℝ) : ℝ) : ℂ) • y = x - y by
-    rw [Complex.ofReal_neg, Complex.ofReal_one, neg_smul, one_smul, sub_eq_add_neg]] at h1
+      rw [Complex.ofReal_neg, Complex.ofReal_one, neg_smul, one_smul, sub_eq_add_neg]]
+    at h1
   rw [h1]
   have ha := hre x
   have hb := hre y
@@ -46,23 +49,23 @@ theorem core (hsemi : SeminormIneq) (hpol : Polarisation) : FormCoreC := by
   refine hpol V W β βi hβ hβi ?_
   intro x hx
   obtain ⟨Φ, c, t₀, _h0, hc0, hcc, hlim, U, hU, hae⟩ := hW x hx
-  have hsq : ∀ t, (Real.sqrt (β (Φ t) (Φ t)).re - Real.sqrt (β x x).re) ^ 2 ≤
-      (βi (Φ t - x) (Φ t - x)).re :=
+  have hsq
+      : ∀ t,
+        (Real.sqrt (β (Φ t) (Φ t)).re - Real.sqrt (β x x).re) ^ 2 ≤ (βi (Φ t - x) (Φ t - x)).re :=
     fun t => (hsemi V β hβ hnn (Φ t) x).trans (hle _)
-  have hT1 : Tendsto (fun t => (Real.sqrt (β (Φ t) (Φ t)).re - Real.sqrt (β x x).re) ^ 2)
-      (𝓝 t₀) (𝓝 0) :=
+  have hT1
+      : Tendsto (fun t => (Real.sqrt (β (Φ t) (Φ t)).re - Real.sqrt (β x x).re) ^ 2) (𝓝 t₀) (𝓝 0) :=
     squeeze_zero (fun t => sq_nonneg _) hsq hlim
-  have hT2 : Tendsto (fun t => Real.sqrt (β (Φ t) (Φ t)).re) (𝓝 t₀)
-      (𝓝 (Real.sqrt (β x x).re)) := by
-    have h' : Tendsto (fun t => Real.sqrt (β (Φ t) (Φ t)).re - Real.sqrt (β x x).re) (𝓝 t₀)
-        (𝓝 0) := by
+  have hT2 : Tendsto (fun t => Real.sqrt (β (Φ t) (Φ t)).re) (𝓝 t₀) (𝓝 (Real.sqrt (β x x).re)) := by
+    have h'
+        : Tendsto (fun t => Real.sqrt (β (Φ t) (Φ t)).re - Real.sqrt (β x x).re) (𝓝 t₀) (𝓝 0) := by
       have h2 := hT1.sqrt
       rw [Real.sqrt_zero] at h2
       simp only [Real.sqrt_sq_eq_abs] at h2
       exact (tendsto_zero_iff_abs_tendsto_zero _).mpr h2
     simpa using h'.add_const (Real.sqrt (β x x).re)
-  have e : ∀ t, Real.sqrt (β (Φ t) (Φ t)).re ^ 2 = (β (Φ t) (Φ t)).re :=
-    fun t => Real.sq_sqrt (hnn _).2
+  have e : ∀ t, Real.sqrt (β (Φ t) (Φ t)).re ^ 2 = (β (Φ t) (Φ t)).re := fun t =>
+    Real.sq_sqrt (hnn _).2
   have hT3 : Tendsto (fun t => (β (Φ t) (Φ t)).re) (𝓝 t₀) (𝓝 (β x x).re) := by
     simpa only [e, Real.sq_sqrt (hnn x).2] using hT2.pow 2
   have hNe : (ae (volume.restrict U) ⊓ 𝓝 t₀).NeBot := by
@@ -80,7 +83,8 @@ theorem core (hsemi : SeminormIneq) (hpol : Polarisation) : FormCoreC := by
     have h0' : volume.restrict U s₁ᶜ = 0 := mem_ae_iff.mp hs₁
     have hle2 : volume.restrict U (interior (s₂ ∩ U)) ≤ volume.restrict U s₁ᶜ := measure_mono hsub
     rw [h0', Measure.restrict_apply isOpen_interior.measurableSet,
-      Set.inter_eq_left.mpr (interior_subset.trans Set.inter_subset_right)] at hle2
+        Set.inter_eq_left.mpr (interior_subset.trans Set.inter_subset_right)]
+      at hle2
     exact lt_irrefl _ (hpos.trans_le hle2)
   have hcL : Tendsto c (ae (volume.restrict U) ⊓ 𝓝 t₀) (𝓝 (βi x x)) := by
     rw [← hc0]
@@ -131,10 +135,13 @@ theorem fatou : FatouParam := by
     have h0' : volume.restrict U s₁ᶜ = 0 := mem_ae_iff.mp hs₁
     have hle2 : volume.restrict U (interior (s₂ ∩ U)) ≤ volume.restrict U s₁ᶜ := measure_mono hsub
     rw [h0', Measure.restrict_apply isOpen_interior.measurableSet,
-      Set.inter_eq_left.mpr (interior_subset.trans Set.inter_subset_right)] at hle2
+        Set.inter_eq_left.mpr (interior_subset.trans Set.inter_subset_right)]
+      at hle2
     exact lt_irrefl _ (hpos.trans_le hle2)
-  have hex : ∀ n : ℕ, ∃ σ, σ ∈ Metric.ball τ (1 / ((n : ℝ) + 1)) ∩ U ∧
-      ∫⁻ q, ‖J σ q‖ₑ ^ 2 ∂μ = ENNReal.ofReal (c σ) := by
+  have hex
+      : ∀ n : ℕ, ∃ σ,
+        σ ∈ Metric.ball τ (1 / ((n : ℝ) + 1)) ∩ U
+          ∧ ∫⁻ q, ‖J σ q‖ₑ ^ 2 ∂μ = ENNReal.ofReal (c σ) := by
     intro n
     have h1 : Metric.ball τ (1 / ((n : ℝ) + 1)) ∩ U ∈ 𝓝 τ :=
       Filter.inter_mem (Metric.ball_mem_nhds τ (by positivity)) (hU.mem_nhds hτ)
@@ -153,16 +160,16 @@ theorem fatou : FatouParam := by
     exact ((ENNReal.continuous_pow 2).tendsto _).comp ((continuous_enorm.tendsto _).comp h2)
   have hcT : Tendsto (fun n => ENNReal.ofReal (c (σ n))) atTop (𝓝 (ENNReal.ofReal (c τ))) :=
     (ENNReal.continuous_ofReal.tendsto _).comp ((hc τ hτ).tendsto.comp hσW)
-  calc ∫⁻ q, ‖J τ q‖ₑ ^ 2 ∂μ = ∫⁻ q, liminf (fun n => ‖J (σ n) q‖ₑ ^ 2) atTop ∂μ := by
-        apply lintegral_congr_ae
-        filter_upwards [hpt] with q hq
-        exact hq.liminf_eq.symm
+  calc
+    ∫⁻ q, ‖J τ q‖ₑ ^ 2 ∂μ = ∫⁻ q, liminf (fun n => ‖J (σ n) q‖ₑ ^ 2) atTop ∂μ := by
+      apply lintegral_congr_ae
+      filter_upwards [hpt] with q hq
+      exact hq.liminf_eq.symm
     _ ≤ liminf (fun n => ∫⁻ q, ‖J (σ n) q‖ₑ ^ 2 ∂μ) atTop := by
-        apply lintegral_liminf_le'
-        intro n
-        exact ((hJm (σ n) (hσ n).2).enorm).pow_const 2
-    _ = liminf (fun n => ENNReal.ofReal (c (σ n))) atTop := by
-        simp only [hσeq]
+      apply lintegral_liminf_le'
+      intro n
+      exact ((hJm (σ n) (hσ n).2).enorm).pow_const 2
+    _ = liminf (fun n => ENNReal.ofReal (c (σ n))) atTop := by simp only [hσeq]
     _ = ENNReal.ofReal (c τ) := hcT.liminf_eq
 
 theorem ibp : RegIBP := by
@@ -177,8 +184,7 @@ theorem ibp : RegIBP := by
       exact h2.const_mul _
     have := h1.cexp
     simpa [he, mul_comm, mul_left_comm, mul_assoc] using this
-  have hec : Continuous e := by
-    rw [he]; fun_prop
+  have hec : Continuous e := by rw [he]; fun_prop
   have hd1 : ContDiff ℝ 1 (deriv h) := by
     have : ContDiff ℝ (1 + 1) h := by simpa [one_add_one_eq_two] using hh
     exact ((contDiff_succ_iff_deriv).1 this).2.2
@@ -189,24 +195,34 @@ theorem ibp : RegIBP := by
   have c2 : Continuous (deriv (deriv h)) := hd1.continuous_deriv (le_refl _)
   have k1 : HasCompactSupport (deriv h) := hc.deriv
   have k2 : HasCompactSupport (deriv (deriv h)) := k1.deriv
-  have i2 : iteratedDeriv 2 h = deriv (deriv h) := by
-    rw [iteratedDeriv_succ, iteratedDeriv_one]
-  have I0 : Integrable (fun t => e t * h t) := (hec.mul c0).integrable_of_hasCompactSupport hc.mul_left
-  have I1 : Integrable (fun t => e t * deriv h t) := (hec.mul c1).integrable_of_hasCompactSupport k1.mul_left
-  have I2 : Integrable (fun t => e t * deriv (deriv h) t) := (hec.mul c2).integrable_of_hasCompactSupport k2.mul_left
+  have i2 : iteratedDeriv 2 h = deriv (deriv h) := by rw [iteratedDeriv_succ, iteratedDeriv_one]
+  have I0 : Integrable (fun t => e t * h t) :=
+    (hec.mul c0).integrable_of_hasCompactSupport hc.mul_left
+  have I1 : Integrable (fun t => e t * deriv h t) :=
+    (hec.mul c1).integrable_of_hasCompactSupport k1.mul_left
+  have I2 : Integrable (fun t => e t * deriv (deriv h) t) :=
+    (hec.mul c2).integrable_of_hasCompactSupport k2.mul_left
   have J0 : Integrable (fun t => (Complex.I * x * e t) * h t) := by
     simpa [mul_assoc] using I0.const_mul (Complex.I * x)
   have J1 : Integrable (fun t => (Complex.I * x * e t) * deriv h t) := by
     simpa [mul_assoc] using I1.const_mul (Complex.I * x)
   have s1 : (∫ t, e t * deriv (deriv h) t) = - ∫ t, (Complex.I * x * e t) * deriv h t :=
-    integral_mul_deriv_eq_deriv_mul_of_integrable (fun t _ => hed t) (fun t _ => (hh1 t).hasDerivAt) I2 J1 I1
+    integral_mul_deriv_eq_deriv_mul_of_integrable
+      (fun t _ => hed t)
+      (fun t _ => (hh1 t).hasDerivAt)
+      I2 J1 I1
   have s2 : (∫ t, e t * deriv h t) = - ∫ t, (Complex.I * x * e t) * h t :=
-    integral_mul_deriv_eq_deriv_mul_of_integrable (fun t _ => hed t) (fun t _ => (hh0 t).hasDerivAt) I1 J0 I0
+    integral_mul_deriv_eq_deriv_mul_of_integrable
+      (fun t _ => hed t)
+      (fun t _ => (hh0 t).hasDerivAt)
+      I1 J0 I0
   have m1 : (∫ t, (Complex.I * x * e t) * deriv h t) = Complex.I * x * ∫ t, e t * deriv h t := by
     rw [← integral_const_mul]; congr 1; funext t; ring
   have m0 : (∫ t, (Complex.I * x * e t) * h t) = Complex.I * x * ∫ t, e t * h t := by
     rw [← integral_const_mul]; congr 1; funext t; ring
-  have l : (∫ t : ℝ, (h t - iteratedDeriv 2 h t) * e t) = (∫ t, e t * h t) - ∫ t, e t * deriv (deriv h) t := by
+  have l
+      : (∫ t : ℝ, (h t - iteratedDeriv 2 h t) * e t)
+        = (∫ t, e t * h t) - ∫ t, e t * deriv (deriv h) t := by
     rw [← integral_sub I0 I2, i2]; congr 1; funext t; ring
   have r : (∫ t : ℝ, h t * e t) = ∫ t, e t * h t := by congr 1; funext t; ring
   rw [l, r, s1, m1, s2, m0]
@@ -221,14 +237,12 @@ theorem decay (hibp : RegIBP) : TestDecay := by
   unfold IsTest at hwh
   obtain ⟨hcd, hcs, _⟩ := hwh
   have hcd' : ContDiff ℝ 2 (fun t : ℝ => (wh t : ℂ)) := by
-    first
-    | exact Complex.ofRealCLM.contDiff.comp hcd
-    | fun_prop
+    first | exact Complex.ofRealCLM.contDiff.comp hcd | fun_prop
   have hcs' : HasCompactSupport (fun t : ℝ => (wh t : ℂ)) := hcs.comp_left Complex.ofReal_zero
   have hgc : Continuous (fun t : ℝ => (wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t) :=
     hcd'.continuous.sub (hcd'.continuous_iteratedDeriv 2 (by norm_num))
-  have hgs : HasCompactSupport
-      (fun t : ℝ => (wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t) :=
+  have hgs
+      : HasCompactSupport (fun t : ℝ => (wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t) :=
     hcs'.sub (by
       first
       | (rw [iteratedDeriv_succ, iteratedDeriv_one]; exact hcs'.deriv.deriv)
@@ -241,21 +255,24 @@ theorem decay (hibp : RegIBP) : TestDecay := by
   have key := hibp (fun t : ℝ => (wh t : ℂ)) hcd' hcs' x
   beta_reduce at key
   have hpos : (0 : ℝ) < 1 + x ^ 2 := by positivity
-  have hbound : ‖∫ t, ((wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t) *
-      Complex.exp (Complex.I * ↑(x * t))‖ ≤
-      ∫ t, ‖(wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t‖ := by
+  have hbound
+      : ‖∫ t, ((wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t) *
+          Complex.exp (Complex.I * ↑(x * t))‖
+        ≤ ∫ t, ‖(wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t‖ := by
     refine (norm_integral_le_integral_norm _).trans (le_of_eq ?_)
     congr 1
     funext t
     rw [norm_mul, hn, mul_one]
-  have e2 : ∫ τ, (wh τ : ℂ) * Complex.exp (Complex.I * ↑(τ * x)) =
-      ∫ t, (wh t : ℂ) * Complex.exp (Complex.I * ↑(x * t)) := by
+  have e2
+      : ∫ τ, (wh τ : ℂ) * Complex.exp (Complex.I * ↑(τ * x))
+        = ∫ t, (wh t : ℂ) * Complex.exp (Complex.I * ↑(x * t)) := by
     congr 1
     funext t
     rw [mul_comm t x]
   rw [e2]
-  have hI : ‖∫ t, (wh t : ℂ) * Complex.exp (Complex.I * ↑(x * t))‖ * (1 + x ^ 2) ≤
-      ∫ t, ‖(wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t‖ := by
+  have hI
+      : ‖∫ t, (wh t : ℂ) * Complex.exp (Complex.I * ↑(x * t))‖ * (1 + x ^ 2)
+        ≤ ∫ t, ‖(wh t : ℂ) - iteratedDeriv 2 (fun t : ℝ => (wh t : ℂ)) t‖ := by
     have h3 := congrArg norm key
     rw [norm_mul, Complex.norm_of_nonneg hpos.le] at h3
     rw [mul_comm, ← h3]
@@ -264,8 +281,9 @@ theorem decay (hibp : RegIBP) : TestDecay := by
     nlinarith [sq_abs x, abs_nonneg x, sq_nonneg (|x| - 1)]
   have hq : 0 < (1 + |x|) ^ 2 := by positivity
   rw [← div_eq_mul_inv, le_div_iff₀ hq]
-  have hm := mul_le_mul_of_nonneg_left hsq
-    (norm_nonneg (∫ t, (wh t : ℂ) * Complex.exp (Complex.I * ↑(x * t))))
+  have hm :=
+    mul_le_mul_of_nonneg_left hsq
+      (norm_nonneg (∫ t, (wh t : ℂ) * Complex.exp (Complex.I * ↑(x * t))))
   nlinarith [hI, hm]
 
 theorem intZero : IntRdZeroInv := by
@@ -287,7 +305,8 @@ theorem intZero : IntRdZeroInv := by
   set k : (Fin n → Fin n → ℂ) → ℂ := fun g => RdV X h (Matrix.of g) with hk
   set Ψ : (Fin n → Fin n → ℂ) × ℝ → (Fin n → Fin n → ℂ) := fun p => rmulF (E p.2) p.1 with hΨd
   have hΨc : Continuous Ψ := by
-    have : Continuous fun p : (Fin n → Fin n → ℂ) × ℝ => (Matrix.of p.1 : Matrix (Fin n) (Fin n) ℂ) * E p.2 :=
+    have : Continuous fun p : (Fin n → Fin n → ℂ) × ℝ =>
+        (Matrix.of p.1 : Matrix (Fin n) (Fin n) ℂ) * E p.2 :=
       Continuous.matrix_mul continuous_fst (hEcont.comp continuous_snd)
     exact this
   have hΨ : Measurable Ψ := hΨc.measurable
@@ -311,10 +330,12 @@ theorem intZero : IntRdZeroInv := by
     rw [← integral_map (hR s).aemeasurable hm, hinv s]
   have hkN : ∀ s : ℝ, (∫ g, ‖k (rmulF (E s) g)‖ ∂μ) = ∫ g, ‖k g‖ ∂μ := by
     intro s
-    have hm : AEStronglyMeasurable (fun g => ‖k g‖) (μ.map (rmulF (E s))) := by rw [hinv s]; exact hRI.1.norm
+    have hm : AEStronglyMeasurable (fun g => ‖k g‖) (μ.map (rmulF (E s))) := by
+      rw [hinv s]; exact hRI.1.norm
     rw [← integral_map (hR s).aemeasurable hm, hinv s]
   have hint : Integrable (fun p => k (Ψ p)) (μ.prod ν) := by
-    have hm : AEStronglyMeasurable (fun p => k (Ψ p)) (μ.prod ν) := hRI.1.comp_quasiMeasurePreserving hq
+    have hm : AEStronglyMeasurable (fun p => k (Ψ p)) (μ.prod ν) :=
+      hRI.1.comp_quasiMeasurePreserving hq
     rw [integrable_prod_iff' hm]
     refine ⟨Filter.Eventually.of_forall fun s => hkR s, ?_⟩
     have : (fun y : ℝ => ∫ x, ‖k (Ψ (x, y))‖ ∂μ) = fun _ => ∫ g, ‖k g‖ ∂μ := by
@@ -323,11 +344,11 @@ theorem intZero : IntRdZeroInv := by
     exact integrable_const _
   have hswap := integral_integral_swap (f := fun g s => k (Ψ (g, s))) (μ := μ) (ν := ν) hint
   have hrhs : (∫ s, ∫ g, k (Ψ (g, s)) ∂μ ∂ν) = ∫ g, k g ∂μ := by
-    have : (fun s : ℝ => ∫ g, k (Ψ (g, s)) ∂μ) = fun _ => ∫ g, k g ∂μ := by
-      funext s; exact hkI s
+    have : (fun s : ℝ => ∫ g, k (Ψ (g, s)) ∂μ) = fun _ => ∫ g, k g ∂μ := by funext s; exact hkI s
     rw [this]
     simp [hν]
-  have hftc : ∀ᵐ g ∂μ, (∫ s, k (Ψ (g, s)) ∂ν) = h (Matrix.of (rmulF (E 1) g)) - h (Matrix.of g) := by
+  have hftc
+      : ∀ᵐ g ∂μ, (∫ s, k (Ψ (g, s)) ∂ν) = h (Matrix.of (rmulF (E 1) g)) - h (Matrix.of g) := by
     filter_upwards [hC1] with g hg
     set φ : ℝ → ℂ := fun t => h (Matrix.of g * E t) with hφ
     have hd : ∀ s, deriv φ s = k (Ψ (g, s)) := by
@@ -339,9 +360,10 @@ theorem intZero : IntRdZeroInv := by
         rw [hEadd, ← mul_assoc]
         rfl
       rw [e1, deriv_comp_const_add, add_zero]
-    have hf := intervalIntegral.integral_deriv_eq_sub (f := φ) (a := 0) (b := 1)
-      (fun x _ => (hg.differentiable (by norm_num)) x)
-      ((hg.continuous_deriv (le_refl _)).intervalIntegrable _ _)
+    have hf :=
+      intervalIntegral.integral_deriv_eq_sub (f := φ) (a := 0) (b := 1)
+        (fun x _ => (hg.differentiable (by norm_num)) x)
+        ((hg.continuous_deriv (le_refl _)).intervalIntegrable _ _)
     rw [intervalIntegral.integral_of_le zero_le_one] at hf
     have e2 : (∫ s, k (Ψ (g, s)) ∂ν) = ∫ s in Set.Ioc 0 1, deriv φ s := by
       rw [hν]; congr 1; funext s; exact (hd s).symm
@@ -349,7 +371,8 @@ theorem intZero : IntRdZeroInv := by
     simp only [hφ, hE0, mul_one]
     rfl
   have hhI : (∫ g, h (Matrix.of (rmulF (E 1) g)) ∂μ) = ∫ g, h (Matrix.of g) ∂μ := by
-    have hm : AEStronglyMeasurable (fun g => h (Matrix.of g)) (μ.map (rmulF (E 1))) := by rw [hinv 1]; exact hI.1
+    have hm : AEStronglyMeasurable (fun g => h (Matrix.of g)) (μ.map (rmulF (E 1))) := by
+      rw [hinv 1]; exact hI.1
     rw [← integral_map (hR 1).aemeasurable hm, hinv 1]
   have hhR : Integrable (fun g => h (Matrix.of (rmulF (E 1) g))) μ := by
     have : Integrable (fun g => h (Matrix.of g)) (μ.map (rmulF (E 1))) := by rw [hinv 1]; exact hI

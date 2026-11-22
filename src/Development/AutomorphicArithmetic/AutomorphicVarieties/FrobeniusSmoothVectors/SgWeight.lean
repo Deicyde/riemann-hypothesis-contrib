@@ -6,8 +6,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem zcases (j : ZMod 2) : j = 0 ∨ j = 1 := by
-  revert j; decide
+private theorem zcases (j : ZMod 2) : j = 0 ∨ j = 1 := by revert j; decide
 
 private theorem sg0 (K : Type) [CommRing K] : sg K 0 = 1 := by simp [sg]
 
@@ -24,13 +23,14 @@ private theorem sg_add (K : Type) [CommRing K] (i j : ZMod 2) : sg K (i + j) = s
   · rw [show (1 : ZMod 2) + 1 = 0 from rfl, sg0, sg1]
     ring
 
-private theorem sg_nsmul (K : Type) [CommRing K] (m : ℕ) (i : ZMod 2) : sg K (m • i) = sg K i ^ m := by
+private theorem sg_nsmul (K : Type) [CommRing K] (m : ℕ) (i : ZMod 2)
+    : sg K (m • i) = sg K i ^ m := by
   induction m with
   | zero => simp [sg0]
   | succ k ih => rw [succ_nsmul, sg_add, ih, pow_succ]
 
-private theorem sg_weight (K : Type) [CommRing K] {ι : Type} (wt : ι → ZMod 2) (n : ι →₀ ℕ) :
-    (n.prod fun s m => sg K (wt s) ^ m) = sg K (Finsupp.weight wt n) := by
+private theorem sg_weight (K : Type) [CommRing K] {ι : Type} (wt : ι → ZMod 2) (n : ι →₀ ℕ)
+    : (n.prod fun s m => sg K (wt s) ^ m) = sg K (Finsupp.weight wt n) := by
   classical
   rw [Finsupp.weight_apply]
   simp only [Finsupp.prod, Finsupp.sum, ← sg_nsmul]
@@ -40,12 +40,18 @@ private theorem sg_weight (K : Type) [CommRing K] {ι : Type} (wt : ι → ZMod 
   · intro a s ha ih
     rw [Finset.prod_insert ha, Finset.sum_insert ha, ih, sg_add]
 
-private theorem coeff_sg (O : Type) [CommRing O] {ι : Type} (j : ZMod 2) (y : MvPowerSeries ι O) (n : ι →₀ ℕ) :
-    MvPowerSeries.coeff n (sg _ j * y) = sg O j * MvPowerSeries.coeff n y := by
+private theorem coeff_sg
+    (O : Type) [CommRing O] {ι : Type} (j : ZMod 2) (y : MvPowerSeries ι O) (n : ι →₀ ℕ)
+    : MvPowerSeries.coeff n (sg _ j * y) = sg O j * MvPowerSeries.coeff n y := by
   rcases zcases j with rfl | rfl <;> simp [sg0, sg1]
 
-theorem UpperTheory.V.Fr.ep_ps :
-    ∀ (O : Type) [CommRing O], IsUnit (2 : O) → ∀ (ι : Type) [Finite ι] (wt : ι → ZMod 2), ∃ τ : MvPowerSeries ι O →ₐ[O] MvPowerSeries ι O, (∀ y, τ (τ y) = y) ∧ (∀ j, evp τ j = wtPart O wt j) ∧ ∀ j y, (2 : MvPowerSeries ι O) * wcomp O wt j y = y + sg _ j * τ y := by
+theorem UpperTheory.V.Fr.ep_ps
+    : ∀ (O : Type) [CommRing O],
+      IsUnit (2 : O)
+        → ∀ (ι : Type) [Finite ι] (wt : ι → ZMod 2),
+          ∃ τ : MvPowerSeries ι O →ₐ[O] MvPowerSeries ι O,
+            (∀ y, τ (τ y) = y) ∧ (∀ j, evp τ j = wtPart O wt j)
+              ∧ ∀ j y, (2 : MvPowerSeries ι O) * wcomp O wt j y = y + sg _ j * τ y := by
   classical
   intro O _ h2 ι _ wt
   have hsq : ∀ i : ZMod 2, sg O i * sg O i = 1 := by
@@ -63,8 +69,10 @@ theorem UpperTheory.V.Fr.ep_ps :
     · simp [sg0, sg1]
     · exact absurd rfl hij
   let a : ι → O := fun s => sg O (wt s)
-  have hcoef : ∀ y n, MvPowerSeries.coeff n (MvPowerSeries.rescale a y)
-      = sg O (Finsupp.weight wt n) * MvPowerSeries.coeff n y := by
+  have hcoef
+      : ∀ y n,
+        MvPowerSeries.coeff n (MvPowerSeries.rescale a y)
+          = sg O (Finsupp.weight wt n) * MvPowerSeries.coeff n y := by
     intro y n
     rw [MvPowerSeries.coeff_rescale, sg_weight]
   let τ : MvPowerSeries ι O →ₐ[O] MvPowerSeries ι O :=
@@ -78,8 +86,9 @@ theorem UpperTheory.V.Fr.ep_ps :
       · classical
         rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply,
           MvPowerSeries.coeff_C, if_neg hn, mul_zero])
-  have hτ : ∀ y n, MvPowerSeries.coeff n (τ y)
-      = sg O (Finsupp.weight wt n) * MvPowerSeries.coeff n y := hcoef
+  have hτ
+      : ∀ y n, MvPowerSeries.coeff n (τ y) = sg O (Finsupp.weight wt n) * MvPowerSeries.coeff n y :=
+    hcoef
   refine ⟨τ, ?_, ?_, ?_⟩
   · intro y
     ext n

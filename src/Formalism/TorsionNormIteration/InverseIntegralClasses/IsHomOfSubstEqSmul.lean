@@ -17,12 +17,12 @@ section LtLog
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-
 end LtLog
 
-theorem coeff_one_subst {R : Type} [CommRing R] (f a : PowerSeries R)
-    (hf0 : constantCoeff f = 0) (ha0 : constantCoeff a = 0) :
-    coeff 1 (f.subst a) = coeff 1 f * coeff 1 a := by
+theorem coeff_one_subst
+    {R : Type} [CommRing R]
+    (f a : PowerSeries R) (hf0 : constantCoeff f = 0) (ha0 : constantCoeff a = 0)
+    : coeff 1 (f.subst a) = coeff 1 f * coeff 1 a := by
   have ha : HasSubst a := HasSubst.of_constantCoeff_zero' ha0
   change MvPowerSeries.coeff (Finsupp.single () 1) _ = _
   rw [coeff_subst ha]

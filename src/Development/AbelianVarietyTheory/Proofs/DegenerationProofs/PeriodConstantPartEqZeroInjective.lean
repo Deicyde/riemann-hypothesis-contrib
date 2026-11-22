@@ -5,16 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Reframe
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Ex.Arch
 
 namespace GlobalTheory.Ex.Arch
 
-theorem period_constantPart_eq_zero_injective {O : Type} [CommRing O] [StarRing O] (B : AnArc O) (la : B.La) (hy : la.y = 0)
-    (h : B.P0 la = 0) : la = 0 := by
+theorem period_constantPart_eq_zero_injective
+    {O : Type} [CommRing O] [StarRing O] (B : AnArc O) (la : B.La) (hy : la.y = 0) (h : B.P0 la = 0)
+    : la = 0 := by
   have hl : la.l = 0 := by
     have := congrArg Prod.snd h
     rw [AnArc.degeneratingTori_basePeriodMap_snd, hy, map_zero, zero_add] at this
@@ -29,7 +32,8 @@ theorem qkSt_of_ptSt : PtSt → QkSt := by
   obtain ⟨h1, h2, h3, h4, h5⟩ := hP O N B d
   choose E hE hU using h1
   have hiff : ∀ v g, d.IsPt v g ↔ g = E v := fun v g => ⟨hU v g, fun h => h ▸ hE v⟩
-  have hadd : ∀ v v', E (v + v') = E v * E v' := fun v v' => (hU _ _ (h3 _ _ _ _ (hE v) (hE v'))).symm
+  have hadd : ∀ v v', E (v + v') = E v * E v' := fun v v' =>
+    (hU _ _ (h3 _ _ _ _ (hE v) (hE v'))).symm
   have hzero : E 0 = 1 := by
     have := hadd 0 0
     rw [add_zero] at this
@@ -48,8 +52,10 @@ theorem qkSt_of_ptSt : PtSt → QkSt := by
     rw [← Nat.cast_smul_eq_nsmul ℂ, inv_smul_smul₀ hk0]
   have hc2 : ∀ v : B.V, k • ((k : ℂ)⁻¹ • v) = v := fun v => by
     rw [← Nat.cast_smul_eq_nsmul ℂ, smul_inv_smul₀ hk0]
-  have hrep : ∀ (la : B.La) (p : N.QT k), d.Rep k la p ↔
-      p.1.1.toAdd = d.eX la.y ∧ p.1.2 = E ((k : ℂ)⁻¹ • B.P0 la) := fun la p => and_congr Iff.rfl (hiff _ _)
+  have hrep
+      : ∀ (la : B.La) (p : N.QT k),
+        d.Rep k la p ↔ p.1.1.toAdd = d.eX la.y ∧ p.1.2 = E ((k : ℂ)⁻¹ • B.P0 la) := fun la p =>
+    and_congr Iff.rfl (hiff _ _)
   refine ⟨fun p => ?_, fun la => ?_, fun la la' p p' h h' => ?_, fun la la' p p' h h' => ?_⟩
   · obtain ⟨v, hv⟩ := h2 p.1.2
     have hv' := (hiff _ _).1 hv
@@ -60,7 +66,11 @@ theorem qkSt_of_ptSt : PtSt → QkSt := by
     refine ⟨AnArc.La.mk (d.eX.symm p.1.1.toAdd) 0 0 + la, (hrep _ _).2 ⟨?_, ?_⟩⟩
     · rw [AnArc.La.add_y, hy, add_zero, AnArc.La.mk_y, AddEquiv.apply_symm_apply]
     · rw [map_add (f := _), ← hl, hc1, hv']
-  · refine ⟨⟨(Multiplicative.ofAdd (d.eX la.y), E ((k : ℂ)⁻¹ • B.P0 la)), ?_⟩, (hrep _ _).2 ⟨rfl, rfl⟩, fun p hp => ?_⟩
+  · refine ⟨
+      ⟨(Multiplicative.ofAdd (d.eX la.y), E ((k : ℂ)⁻¹ • B.P0 la)), ?_⟩,
+      (hrep _ _).2 ⟨rfl, rfl⟩,
+      fun p hp => ?_
+    ⟩
     · rw [NumD.mem_QT, ← hpow, hc2, hper]
       rfl
     · obtain ⟨a, b⟩ := (hrep _ _).1 hp
@@ -83,9 +93,10 @@ theorem qkSt_of_ptSt : PtSt → QkSt := by
       obtain ⟨e₀, hy, hl⟩ := hker _ _ e
       refine ⟨z₀ + e₀, sub_eq_zero.1 (period_constantPart_eq_zero_injective B _ ?_ ?_)⟩
       · apply d.eX.injective
-        rw [AnArc.La.sub_y, AnArc.La.add_y, AnArc.La.nsmul_y, AnArc.La.add_y, hy, add_zero, map_sub, map_add (f := _),
-          map_nsmul, hz, ← a, ← a', c, sub_self, map_zero]
-      · rw [map_sub, map_add (f := _), map_nsmul, map_add (f := _), ← hc2 (B.P0 la'), hl, add_assoc, smul_add, hc2, sub_self]
+        rw [AnArc.La.sub_y, AnArc.La.add_y, AnArc.La.nsmul_y, AnArc.La.add_y, hy, add_zero, map_sub,
+          map_add (f := _), map_nsmul, hz, ← a, ← a', c, sub_self, map_zero]
+      · rw [map_sub, map_add (f := _), map_nsmul, map_add (f := _), ← hc2 (B.P0 la'), hl, add_assoc,
+          smul_add, hc2, sub_self]
     · rintro ⟨e, rfl⟩
       refine ⟨d.eX e.y, ?_, ?_⟩
       · rw [a, a', AnArc.La.add_y, AnArc.La.nsmul_y, map_add (f := _), map_nsmul]

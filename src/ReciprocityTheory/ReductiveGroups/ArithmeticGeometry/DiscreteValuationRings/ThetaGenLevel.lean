@@ -12,7 +12,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -24,10 +25,13 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 lemma resTop_scal {R : Type} [CommRing R] {Y : Scheme.{0}} (p : Y ⟶ Spec (CommRingCat.of R)) (W : Y.Opens)
     (r : R) : resTop W (scal p r) = toW p W r := rfl
 
-theorem sec_div {R : Type} [CommRing R] [IsDomain R] {Y : Scheme.{0}} (p : Y ⟶ Spec (CommRingCat.of R)) [Flat p]
-    {M : LB Y} (s : LB.Sec M) {a : R} (ha : a ≠ 0) {J : Ideal R} (hJ : J ≤ Ideal.span {a})
-    (h0 : ∀ j, (pullback.fst p (tq J)).app _ (s.f j) = 0) :
-    ∃ g : LB.Sec M, ∀ j, s.f j = toW p _ a * g.f j := by
+theorem sec_div
+    {R : Type} [CommRing R] [IsDomain R]
+    {Y : Scheme.{0}} (p : Y ⟶ Spec (CommRingCat.of R)) [Flat p]
+    {M : LB Y} (s : LB.Sec M)
+    {a : R} (ha : a ≠ 0)
+    {J : Ideal R} (hJ : J ≤ Ideal.span {a}) (h0 : ∀ j, (pullback.fst p (tq J)).app _ (s.f j) = 0)
+    : ∃ g : LB.Sec M, ∀ j, s.f j = toW p _ a * g.f j := by
   choose g hg using fun j => exists_div p ha hJ (M.U j) (s.f j) (h0 j)
   refine ⟨⟨g, fun i j => ?_⟩, hg⟩
   apply sub_eq_zero.1
@@ -37,8 +41,9 @@ theorem sec_div {R : Type} [CommRing R] [IsDomain R] {Y : Scheme.{0}} (p : Y ⟶
   rw [mul_sub, sub_eq_zero, c]
   ring
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
 lemma thickMap_fst (e : ℕ) : thickMap R I e G ≫ (fstG I (e + 1) G).left = (fstG I e G).left := by
@@ -64,12 +69,14 @@ lemma app_eq_zero_of_comp {X Y Z : Scheme.{0}} {f : X ⟶ Z} {g : X ⟶ Y} {h : 
   | (rw [Scheme.comp_app]; exact hx)
   | (simp only [Scheme.comp_app, CommRingCat.comp_apply]; exact hx)
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
-def thickO (e : ℕ) : (Over.map (thick R I e)).obj (thickObj R I e G) ⟶
-    (Over.map (thick R I (e + 1))).obj (thickObj R I (e + 1) G) :=
+def thickO (e : ℕ)
+    : (Over.map (thick R I e)).obj (thickObj R I e G)
+      ⟶ (Over.map (thick R I (e + 1))).obj (thickObj R I (e + 1) G) :=
   Over.homMk (thickMap R I e G) (by
     show thickMap R I e G ≫ pullback.snd G.hom (thick R I (e + 1)) ≫ thick R I (e + 1) =
       pullback.snd G.hom (thick R I e) ≫ thick R I e

@@ -10,8 +10,8 @@ noncomputable section
 
 namespace PI.LocMassTypW
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.LocVol MeasureTheory NumberField
-  IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.LocVol MeasureTheory NumberField IsDedekindDomain
 open scoped TensorProduct Classical
 
 theorem congruence_subgroup_measurable : CongruenceSubgroupMeasurable := by
@@ -19,8 +19,10 @@ theorem congruence_subgroup_measurable : CongruenceSubgroupMeasurable := by
   obtain ⟨-, -, hSD, -, hg, -⟩ := hyp
   exact (PI.LocMassTypM.isClosed_congruence_subgroup σ J v Λ hSD hg P).measurableSet
 
-theorem isOpen_uog {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (v : HeightOneSpectrum (𝓞 F)) (r g : ℕ) : IsOpen (UOg (E := E) v g r) := by
+theorem isOpen_uog
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (v : HeightOneSpectrum (𝓞 F)) (r g : ℕ)
+    : IsOpen (UOg (E := E) v g r) := by
   rw [PI.LocMassTypU.uog_eq v g r]
   exact PI.LocMassTypU.isOpen_boxS _
 
@@ -36,14 +38,16 @@ theorem unipotent_orbit_count : CountUOg := by
   haveI : SecondCountableTopology (UIdx r → Fv F v ⊗[F] E) := inferInstance
   have hB : IsOpen (UOgS (E := E) v g r : Set (UIdx r → Fv F v ⊗[F] E)) := isOpen_uog v r g
   rw [← Set.countable_univ_iff]
-  have hd : (Set.univ : Set ((UIdx r → Fv F v ⊗[F] E) ⧸ UOgS (E := E) v g r)).PairwiseDisjoint
-      (fun q => (QuotientAddGroup.mk : (UIdx r → Fv F v ⊗[F] E) → _ ⧸ UOgS (E := E) v g r) ⁻¹' {q}) :=
+  have hd
+      : (Set.univ : Set ((UIdx r → Fv F v ⊗[F] E) ⧸ UOgS (E := E) v g r)).PairwiseDisjoint (fun q =>
+        (QuotientAddGroup.mk : (UIdx r → Fv F v ⊗[F] E) → _ ⧸ UOgS (E := E) v g r) ⁻¹' {q}) :=
     Set.pairwiseDisjoint_fiber _ _
   refine hd.countable_of_isOpen (fun q _ => ?_) (fun q _ => ?_)
   · obtain ⟨x, rfl⟩ := QuotientAddGroup.mk_surjective q
-    have e : (QuotientAddGroup.mk : (UIdx r → Fv F v ⊗[F] E) → _ ⧸ UOgS (E := E) v g r) ⁻¹'
-        {(QuotientAddGroup.mk x : _ ⧸ UOgS (E := E) v g r)} =
-        (fun w => -x + w) ⁻¹' (UOgS (E := E) v g r : Set (UIdx r → Fv F v ⊗[F] E)) := by
+    have e
+        : (QuotientAddGroup.mk : (UIdx r → Fv F v ⊗[F] E) → _ ⧸ UOgS (E := E) v g r)
+            ⁻¹' {(QuotientAddGroup.mk x : _ ⧸ UOgS (E := E) v g r)}
+          = (fun w => -x + w) ⁻¹' (UOgS (E := E) v g r : Set (UIdx r → Fv F v ⊗[F] E)) := by
       ext w
       simp only [Set.mem_preimage, Set.mem_singleton_iff, SetLike.mem_coe]
       rw [eq_comm, QuotientAddGroup.eq]

@@ -13,42 +13,75 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUn
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 noncomputable section
 
-theorem GlobalTheory.Mum.values_galois_scalar : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], Base R → ∀ (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R))) (lab : Labels D.toPre A), OneTrait D.toPre A lab → ∀ m : ℕ, Odd m → IsUnit (m : R) → ∀ v : QkPt D.toPre (Kb R) (m ^ 2) → Kb R, (∀ (C : Type) [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C] [IsAlgClosed C] [Algebra (FractionRing R) C], GlobalTheory.Ex.CExt R (maximalIdeal R) C → ∀ (em : Kb R →ₐ[FractionRing R] C) (N : GlobalTheory.Ex.NumD C) (nu : GlobalTheory.Ex.NumOf D.toPre C N) (p₁ : QkPt D.toPre (Kb R) (m ^ 2) → QkPt D.toPre C (m ^ 2)) (q : QkPt D.toPre (Kb R) (m ^ 2) → N.QT (m ^ 2)), (∀ i, QkExt em.toRingHom i (p₁ i)) → (∀ i, nu.QPt (p₁ i) (q i)) → ∃ s : Cˣ, ∀ i, em (v i) = s * N.tx m (q i)) → ∀ σ : Kb R →ₐ[FractionRing R] Kb R, ∃ c : (Kb R)ˣ, ∀ p p' : QkPt D.toPre (Kb R) (m ^ 2), QkExt σ.toRingHom p p' → σ (v p) = c * v p' := by
+theorem GlobalTheory.Mum.values_galois_scalar
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      Base R
+        → ∀ (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R)))
+            (lab : Labels D.toPre A),
+          OneTrait D.toPre A lab
+            → ∀ m : ℕ,
+              Odd m → IsUnit (m : R)
+                → ∀ v : QkPt D.toPre (Kb R) (m ^ 2) → Kb R,
+                  (∀ (C : Type) [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C]
+                        [IsAlgClosed C] [Algebra (FractionRing R) C],
+                      GlobalTheory.Ex.CExt R (maximalIdeal R) C
+                        → ∀ (em : Kb R →ₐ[FractionRing R] C) (N : GlobalTheory.Ex.NumD C)
+                            (nu : GlobalTheory.Ex.NumOf D.toPre C N)
+                            (p₁ : QkPt D.toPre (Kb R) (m ^ 2) → QkPt D.toPre C (m ^ 2))
+                            (q : QkPt D.toPre (Kb R) (m ^ 2) → N.QT (m ^ 2)),
+                          (∀ i, QkExt em.toRingHom i (p₁ i)) → (∀ i, nu.QPt (p₁ i) (q i))
+                            → ∃ s : Cˣ, ∀ i, em (v i) = s * N.tx m (q i))
+                    → ∀ σ : Kb R →ₐ[FractionRing R] Kb R, ∃ c : (Kb R)ˣ,
+                      ∀ p p' : QkPt D.toPre (Kb R) (m ^ 2),
+                        QkExt σ.toRingHom p p' → σ (v p) = c * v p' := by
   intro R _ _ _ hR D A lab hT m hm hmu v H σ
   obtain ⟨W, _, _, _, φ, G', _, _, D', A', U', hD, a, _, em₀, hW, hφ, hloc, -, -, -, -⟩ := hT
   obtain ⟨C, _, _, _, _, _, _, hC⟩ := GlobalTheory.Ex.StepInh.exists_cExt W hW
-  have hg : Function.Injective ((algebraMap (FractionRing W) C).comp ((algebraMap W (FractionRing W)).comp φ)) :=
-    (algebraMap (FractionRing W) C).injective.comp ((IsFractionRing.injective W (FractionRing W)).comp hφ)
+  have hg : Function.Injective ((algebraMap (FractionRing W) C).comp
+      ((algebraMap W (FractionRing W)).comp φ)) :=
+    (algebraMap (FractionRing W) C).injective.comp
+      ((IsFractionRing.injective W (FractionRing W)).comp hφ)
   letI : Algebra (FractionRing R) C := (IsFractionRing.lift hg).toAlgebra
-  have hA : ∀ r : R, algebraMap (FractionRing R) C (algebraMap R _ r) =
-      algebraMap (FractionRing W) C (algebraMap W _ (φ r)) := fun r => IsFractionRing.lift_algebraMap hg r
+  have hA
+      : ∀ r : R,
+        algebraMap (FractionRing R) C (algebraMap R _ r)
+          = algebraMap (FractionRing W) C (algebraMap W _ (φ r)) := fun r =>
+    IsFractionRing.lift_algebraMap hg r
   haveI := hloc
   have hCR : GlobalTheory.Ex.CExt R (maximalIdeal R) C :=
     ⟨fun r => by rw [hA]; exact hC.1 _, fun r hr => by rw [hA]; exact hC.2 _ (map_nonunit φ r hr)⟩
   haveI : IsNoetherianRing R := hR.1.1
-  obtain ⟨N, nu, -⟩ := GlobalTheory.ValuesExist.exists_integral_values GlobalTheory.firstFiveLaws.1 R D.toPre D.psi_even D.tau_bimult C ⊤
-    (fun _ => trivial)
+  obtain ⟨N, nu, -⟩ :=
+    GlobalTheory.ValuesExist.exists_integral_values GlobalTheory.firstFiveLaws.1 R D.toPre
+      D.psi_even D.tau_bimult C ⊤ (fun _ => trivial)
   have hB := D.tau_bimult
   let em : Kb R →ₐ[FractionRing R] C := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  have hq := ((GlobalTheory.Ex.GtValues.points_correspond R D.toPre D.psi_even D.tau_bimult C N nu).2.2.2.2 (m ^ 2)).1
+  have hq :=
+    ((GlobalTheory.Ex.GtValues.points_correspond R D.toPre D.psi_even D.tau_bimult C N nu).2.2.2.2
+      (m ^ 2)).1
   choose e₁ he₁ using fun i => GlobalTheory.LabTrans.exists_ext hB em i
   choose e₂ he₂ using fun i => GlobalTheory.LabTrans.exists_ext hB σ i
   choose qq hqq using fun x : QkPt D.toPre C (m ^ 2) => (hq x).exists
   obtain ⟨s, hs⟩ := H C hCR em N nu e₁ (fun i => qq (e₁ i)) he₁ (fun i => hqq _)
-  obtain ⟨s', hs'⟩ := H C hCR (em.comp σ) N nu (fun i => e₁ (e₂ i)) (fun i => qq (e₁ (e₂ i)))
-    (fun i => GlobalTheory.LabTrans.qkExt_trans (he₂ i) (he₁ (e₂ i))) (fun i => hqq _)
+  obtain ⟨s', hs'⟩ :=
+    H C hCR (em.comp σ) N nu
+      (fun i => e₁ (e₂ i))
+      (fun i => qq (e₁ (e₂ i)))
+      (fun i => GlobalTheory.LabTrans.qkExt_trans (he₂ i) (he₁ (e₂ i)))
+      (fun i => hqq _)
   have key : ∀ p p', QkExt σ.toRingHom p p' → em (σ (v p)) = ((s' * s⁻¹ : Cˣ) : C) * em (v p') := by
     intro p p' h
     obtain rfl : e₂ p = p' := GlobalTheory.LabTrans.ext_unique hB σ (he₂ p) h

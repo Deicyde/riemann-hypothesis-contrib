@@ -17,14 +17,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteFinClA
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx MeasureTheory
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -38,15 +44,17 @@ namespace GlobalTheory.BotClassFin
 
 variable {D : D7}
 
-def finPart (V : HSp D) (g : GA D V) : GA D V := ((GlobalTheory.AdelicSplit.splitEquiv V).symm g).2.1
+def finPart (V : HSp D) (g : GA D V) : GA D V :=
+  ((GlobalTheory.AdelicSplit.splitEquiv V).symm g).2.1
 
 theorem continuous_finPart (V : HSp D) : Continuous (finPart V) :=
-  continuous_subtype_val.comp (continuous_snd.comp (GlobalTheory.AdelicSplit.splitEquiv V).symm.continuous)
+  continuous_subtype_val.comp (continuous_snd.comp (GlobalTheory.AdelicSplit.splitEquiv
+    V).symm.continuous)
 
-theorem finPart_mem (V : HSp D) (g : GA D V) : finPart V g ∈ GfC V := ((GlobalTheory.AdelicSplit.splitEquiv V).symm g).2.2
+theorem finPart_mem (V : HSp D) (g : GA D V) : finPart V g ∈ GfC V :=
+  ((GlobalTheory.AdelicSplit.splitEquiv V).symm g).2.2
 
-theorem finPart_one (V : HSp D) : finPart V 1 = 1 := by
-  simp [finPart, map_one]
+theorem finPart_one (V : HSp D) : finPart V 1 = 1 := by simp [finPart, map_one]
 
 theorem finHom_finPart (V : HSp D) (g : GA D V) : finHom V (finPart V g) = finHom V g := by
   set p := (GlobalTheory.AdelicSplit.splitEquiv V).symm g with hp
@@ -56,10 +64,13 @@ theorem finHom_finPart (V : HSp D) (g : GA D V) : finHom V (finPart V g) = finHo
   rw [map_mul, h1, one_mul]
   rfl
 
-theorem exists_reps_of_open (V : HSp D) (hV : ∀ τ, (gramAt D V τ).PosDef) (J : Subgroup (GA D V))
-    (hJ : IsOpen (J : Set (GA D V))) :
-    ∃ H : Finset (GA D V), (∀ h ∈ H, h ∈ GfC V) ∧
-      ∀ h ∈ GfC V, ∃ γ ∈ GQ V, ∃ r ∈ GinfC V, ∃ h₀ ∈ H, ∃ κ ∈ J, κ ∈ GfC V ∧ h = γ * r * h₀ * κ := by
+theorem exists_reps_of_open
+    (V : HSp D) (hV : ∀ τ, (gramAt D V τ).PosDef) (J : Subgroup (GA D V))
+    (hJ : IsOpen (J : Set (GA D V)))
+    : ∃ H : Finset (GA D V),
+      (∀ h ∈ H, h ∈ GfC V)
+        ∧ ∀ h ∈ GfC V, ∃ γ ∈ GQ V, ∃ r ∈ GinfC V, ∃ h₀ ∈ H, ∃ κ ∈ J,
+          κ ∈ GfC V ∧ h = γ * r * h₀ * κ := by
   haveI := (GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V).2.2.2.2.1
   set L : Subgroup (Bridge.Gf V) := (J ⊓ GfC V).map (finHom V).rangeRestrict with hL
   have hO : GlobalTheory.IndefiniteRowSideFullHecke.SublevelSplitting.IsOpenLev V L := by
@@ -89,8 +100,18 @@ theorem exists_reps_of_open (V : HSp D) (hV : ∀ τ, (gramAt D V τ).PosDef) (J
       have := congrArg Subtype.val e
       rw [ex, ek, ← eγ]
       exact this
-    refine ⟨γ.1, γ.2, γ.1⁻¹ * h * κ⁻¹ * (x a).1⁻¹, ?_, (x a).1, Finset.mem_image.2 ⟨a, Finset.mem_univ _, rfl⟩, κ, hκJ, hκf,
-      by group⟩
+    refine ⟨
+      γ.1,
+      γ.2,
+      γ.1⁻¹ * h * κ⁻¹ * (x a).1⁻¹,
+      ?_,
+      (x a).1,
+      Finset.mem_image.2 ⟨a, Finset.mem_univ _, rfl⟩,
+      κ,
+      hκJ,
+      hκf,
+      by group
+    ⟩
     show finHom V _ = 1
     simp only [map_mul, map_inv, e']
     group

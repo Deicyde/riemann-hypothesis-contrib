@@ -18,12 +18,16 @@ namespace Formalism.IrreducibleCountingLemmas.WindowSums
 
 open Polynomial
 
-theorem colength_bound_two_layers : ColengthTwoStep := Formalism.ZetaNonvanishing.EisensteinCokernelLengthsFacts.FactorialValuationBoundsFacts.lenBound2
+theorem colength_bound_two_layers : ColengthTwoStep :=
+  Formalism.ZetaNonvanishing.EisensteinCokernelLengthsFacts.FactorialValuationBoundsFacts.lenBound2
 
 theorem lagrange_resolvent_T : LagrangeT := by
   intro l _ D₁ D₂ ρ hd hρ
-  have hass : ∀ a ∈ D₁, ∀ b ∈ D₁ ∪ D₂, a ≠ b →
-      Associated (((a : ℤ) : ℤ_[l]) - ((b : ℤ) : ℤ_[l])) ((l : ℤ_[l]) ^ (0 + padicValInt l (a - b))) := by
+  have hass
+      : ∀ a ∈ D₁, ∀ b ∈ D₁ ∪ D₂,
+        a ≠ b
+          → Associated (((a : ℤ) : ℤ_[l]) - ((b : ℤ) : ℤ_[l]))
+            ((l : ℤ_[l]) ^ (0 + padicValInt l (a - b))) := by
     intro a _ b _ hab
     have hne : a - b ≠ 0 := sub_ne_zero.mpr hab
     set v := padicValInt l (a - b) with hv
@@ -41,11 +45,16 @@ theorem lagrange_resolvent_T : LagrangeT := by
     rw [zero_add, ← Int.cast_sub, hc]
     push_cast
     exact (associated_mul_unit_left _ _ hu)
-  have h := Formalism.ZetaNonvanishing.LIFTV.lagrangeIdealSg_proof l ℤ_[l] 0 D₁ D₂ (fun a => ((a : ℤ) : ℤ_[l])) hd hass
+  have h :=
+    Formalism.ZetaNonvanishing.LIFTV.lagrangeIdealSg_proof l ℤ_[l] 0 D₁ D₂
+      (fun a => ((a : ℤ) : ℤ_[l]))
+      hd hass
   set E := D₁.sup fun a => (∑ b ∈ D₂, (0 + padicValInt l (a - b))) +
     ∑ a' ∈ D₁.erase a, (0 + padicValInt l (a - a')) with hE
   have hle : E ≤ ρ := by
-    rw [hE]; apply Finset.sup_le; intro a ha
+    rw [hE]
+    apply Finset.sup_le
+    intro a ha
     simpa using hρ a ha
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hle
   rw [pow_add, mul_comm, C_mul]
@@ -62,11 +71,14 @@ theorem filtered_product : FiltProd := by
     have := h (k + a) (by omega) (by omega) _ hy
     simpa [Module.algebraMap_end_apply] using this
 
-theorem aeval_mapQ {R V : Type} [CommRing R] [AddCommGroup V] [Module R V] (T : Module.End R V)
-    (W : Submodule R V) (hW : W ≤ W.comap T) (P : R[X]) (y : V) :
-    aeval (W.mapQ W T hW : Module.End R (V ⧸ W)) P (W.mkQ y) = W.mkQ (aeval T P y) := by
-  have hpow : ∀ (n : ℕ) (z : V),
-      ((W.mapQ W T hW : Module.End R (V ⧸ W)) ^ n) (W.mkQ z) = W.mkQ ((T ^ n) z) := by
+theorem aeval_mapQ
+    {R V : Type} [CommRing R] [AddCommGroup V] [Module R V]
+    (T : Module.End R V) (W : Submodule R V) (hW : W ≤ W.comap T)
+    (P : R[X]) (y : V)
+    : aeval (W.mapQ W T hW : Module.End R (V ⧸ W)) P (W.mkQ y) = W.mkQ (aeval T P y) := by
+  have hpow
+      : ∀ (n : ℕ) (z : V),
+        ((W.mapQ W T hW : Module.End R (V ⧸ W)) ^ n) (W.mkQ z) = W.mkQ ((T ^ n) z) := by
     intro n
     induction n with
     | zero => intro z; simp

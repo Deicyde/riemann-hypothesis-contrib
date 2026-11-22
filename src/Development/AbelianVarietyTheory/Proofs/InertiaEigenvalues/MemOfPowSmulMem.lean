@@ -15,35 +15,48 @@ noncomputable section
 
 namespace GlobalTheory.WachSat
 
-open GlobalTheory.WachUse Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.WachUse Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
-theorem exists_pow_smul_le {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+theorem exists_pow_smul_le
+    {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
     (c : O) (hc : ∀ a : LL, ∃ (k : ℕ) (b : O), algebraMap O LL b = algebraMap O LL c ^ k * a)
-    (L S : Submodule O V) (hL : Submodule.span LL (L : Set V) = ⊤) (hS : S.FG) :
-    ∃ m : ℕ, ∀ x ∈ S, c ^ m • x ∈ L := by
+    (L S : Submodule O V) (hL : Submodule.span LL (L : Set V) = ⊤) (hS : S.FG)
+    : ∃ m : ℕ, ∀ x ∈ S, c ^ m • x ∈ L := by
   first
-  | (rename_i h_2 h_3 h_4 h_5 h_7 h_8 h_9 h_10; revert LL O h_2 h_3 h_4 h_5 V h_7 h_8 h_9 h_10 c hc L S hL hS; exact @_root_.GlobalTheory.PowerScalarMembership.main)
+  | (
+      rename_i h_2 h_3 h_4 h_5 h_7 h_8 h_9 h_10
+      revert LL O h_2 h_3 h_4 h_5 V h_7 h_8 h_9 h_10 c hc L S hL hS
+      exact @_root_.GlobalTheory.PowerScalarMembership.main
+    )
   | exact @_root_.GlobalTheory.PowerScalarMembership.main
   | exact _root_.GlobalTheory.PowerScalarMembership.main
   | (apply _root_.GlobalTheory.PowerScalarMembership.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.PowerScalarMembership.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PowerScalarMembership.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PowerScalarMembership.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PowerScalarMembership.main ..)
 
 variable (W : LocWach PD LL O v n)
 
-theorem ee_torsionFree (hp : ∀ a : O, (PD.p : O) * a = 0 → a = 0) (x : W.EE)
-    (hx : (PD.p : W.EE) * x = 0) : x = 0 := by
+theorem ee_torsionFree
+    (hp : ∀ a : O, (PD.p : O) * a = 0 → a = 0) (x : W.EE) (hx : (PD.p : W.EE) * x = 0)
+    : x = 0 := by
   have hA : ∀ a : LetA O n, (PD.p : LetA O n) * a = 0 → a = 0 := by
     intro a ha
     funext i
@@ -57,10 +70,11 @@ theorem ee_torsionFree (hp : ∀ a : O, (PD.p : O) * a = 0 → a = 0) (x : W.EE)
   rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow]
   obtain ⟨a, m, ha⟩ := W.EE_dense x k
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 ha
-  obtain ⟨b, hb⟩ := W.EE_sat ((PD.p : LetA O n) * a) (k + 1) (by
-    refine Ideal.mem_span_singleton'.2 ⟨-y, ?_⟩
-    rw [map_mul, map_natCast]
-    linear_combination (-(PD.p : W.EE)) * hy - (algebraMap (LetA O n) W.EE (letπ ^ m)) * hx)
+  obtain ⟨b, hb⟩ :=
+    W.EE_sat ((PD.p : LetA O n) * a) (k + 1) (by
+      refine Ideal.mem_span_singleton'.2 ⟨-y, ?_⟩
+      rw [map_mul, map_natCast]
+      linear_combination (-(PD.p : W.EE)) * hy - (algebraMap (LetA O n) W.EE (letπ ^ m)) * hx)
   have hab : a = (PD.p : LetA O n) ^ k * b := by
     have := hA (a - (PD.p : LetA O n) ^ k * b) (by rw [mul_sub, hb]; ring)
     exact sub_eq_zero.1 this
@@ -71,9 +85,12 @@ theorem ee_torsionFree (hp : ∀ a : O, (PD.p : O) * a = 0 → a = 0) (x : W.EE)
   have huu : (u : W.EE) * ↑u⁻¹ = 1 := u.mul_inv
   linear_combination (↑u⁻¹ : W.EE) * hy + x * huu
 
-theorem mem_of_pow_smul_mem (hp : ∀ a : O, (PD.p : O) * a = 0 → a = 0) (T : LocLat G Qp LL O)
-    (hb : GlobalTheory.IndefiniteRowSideFullHecke.LetterBasisDecomposition.GlobalBasis W T) (m : ℕ) (x : W.DD T)
-    (hx : ((PD.p : O) ^ m) • x ∈ W.N T) : x ∈ W.N T := by
+theorem mem_of_pow_smul_mem
+    (hp : ∀ a : O, (PD.p : O) * a = 0 → a = 0)
+    (T : LocLat G Qp LL O)
+    (hb : GlobalTheory.IndefiniteRowSideFullHecke.LetterBasisDecomposition.GlobalBasis W T)
+    (m : ℕ) (x : W.DD T) (hx : ((PD.p : O) ^ m) • x ∈ W.N T)
+    : x ∈ W.N T := by
   obtain ⟨b, hli, hsp⟩ := hb
   have hxs : x ∈ Submodule.span W.EE (Set.range fun j => (b j : W.DD T)) := hsp ▸ Submodule.mem_top
   obtain ⟨e, he⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hxs

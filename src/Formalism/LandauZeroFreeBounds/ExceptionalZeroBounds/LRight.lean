@@ -41,8 +41,9 @@ theorem inverseBound : LInvBound := by
           intro x hx y _ hxy
           exact Real.rpow_le_rpow_of_nonpos (by linarith [hx.1]) hxy (by linarith)
         have hsum := hanti.sum_le_integral
-        have hint : ∫ x in (1 : ℝ)..(1 + k), x ^ (-s.re) =
-            ((1 + k : ℝ) ^ (-s.re + 1) - 1 ^ (-s.re + 1)) / (-s.re + 1) := by
+        have hint
+            : ∫ x in (1 : ℝ)..(1 + k), x ^ (-s.re)
+              = ((1 + k : ℝ) ^ (-s.re + 1) - 1 ^ (-s.re + 1)) / (-s.re + 1) := by
           apply integral_rpow
           refine Or.inr ⟨by linarith, ?_⟩
           rw [Set.uIcc_of_le (by linarith)]
@@ -54,8 +55,9 @@ theorem inverseBound : LInvBound := by
           have hpos' : 0 ≤ (1 + k : ℝ) ^ (-(s.re - 1)) := by positivity
           gcongr
           linarith
-        have e : ∑ i ∈ Finset.range k, (((i + 1 : ℕ) : ℝ) + 1) ^ (-(s.re - 1) - 1) =
-            ∑ i ∈ Finset.range k, (fun x : ℝ => x ^ (-s.re)) (1 + ((i + 1 : ℕ) : ℝ)) :=
+        have e
+            : ∑ i ∈ Finset.range k, (((i + 1 : ℕ) : ℝ) + 1) ^ (-(s.re - 1) - 1)
+              = ∑ i ∈ Finset.range k, (fun x : ℝ => x ^ (-s.re)) (1 + ((i + 1 : ℕ) : ℝ)) :=
           Finset.sum_congr rfl fun i _ => by
             show (((i + 1 : ℕ) : ℝ) + 1) ^ (-(s.re - 1) - 1) = (1 + ((i + 1 : ℕ) : ℝ)) ^ (-s.re)
             congr 1 <;> ring
@@ -67,7 +69,9 @@ theorem inverseBound : LInvBound := by
         rw [hint] at hsum
         linarith
   have hp : -(s.re - 1) - 1 < -1 := by linarith
-  have hfun : (fun n : ℕ => ‖term (1 : ℕ → ℂ) s (n + 1)‖) = fun n : ℕ => ((n : ℝ) + 1) ^ (-(s.re - 1) - 1) :=
+  have hfun
+      : (fun n : ℕ => ‖term (1 : ℕ → ℂ) s (n + 1)‖)
+        = fun n : ℕ => ((n : ℝ) + 1) ^ (-(s.re - 1) - 1) :=
     funext (norm_term_one_succ s)
   have hS1 : Summable fun n => ‖term (1 : ℕ → ℂ) s n‖ := by
     rw [← summable_nat_add_iff 1, hfun]
@@ -81,9 +85,13 @@ theorem inverseBound : LInvBound := by
     rw [← norm_inv, inv_eq_of_mul_eq_one_right hmul]
   rw [hinv]
   have hS2 : Summable fun n => ‖term (↗χ * ↗μ) s n‖ :=
-    Summable.of_nonneg_of_le (fun _ => norm_nonneg _)
-      (fun n => norm_term_twist_moebius_le χ s n) hS1
-  calc ‖LSeries (↗χ * ↗μ) s‖ = ‖∑' n, term (↗χ * ↗μ) s n‖ := rfl
+    Summable.of_nonneg_of_le
+      (fun _ => norm_nonneg _)
+      (fun n => norm_term_twist_moebius_le χ s n)
+      hS1
+  calc
+    ‖LSeries (↗χ * ↗μ) s‖
+      = ‖∑' n, term (↗χ * ↗μ) s n‖ := rfl
     _ ≤ ∑' n, ‖term (↗χ * ↗μ) s n‖ := norm_tsum_le_tsum_norm hS2
     _ ≤ ∑' n, ‖term (1 : ℕ → ℂ) s n‖ :=
       Summable.tsum_le_tsum (fun n => norm_term_twist_moebius_le χ s n) hS2 hS1
@@ -124,8 +132,8 @@ theorem l_log_deriv_right : LLogDerivRight := by
   rw [negLD_eq_LSeries_mul_vonMangoldt χ hs]
   refine le_trans (norm_LSeries_twist_vonMangoldt_le χ hs) ?_
   have hre : 1 < (s.re : ℂ).re := by simpa using hs
-  rw [Formalism.ZF.lamF_eq_norm hs, ArithmeticFunction.LSeries_vonMangoldt_eq_deriv_riemannZeta_div hre,
-    neg_div, norm_neg]
+  rw [Formalism.ZF.lamF_eq_norm hs,
+    ArithmeticFunction.LSeries_vonMangoldt_eq_deriv_riemannZeta_div hre, neg_div, norm_neg]
   have h := hC (s.re : ℂ) hre
   simpa using h
 

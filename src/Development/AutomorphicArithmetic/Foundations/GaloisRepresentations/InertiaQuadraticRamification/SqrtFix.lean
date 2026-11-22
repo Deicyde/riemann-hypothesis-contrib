@@ -5,11 +5,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published GlobalTheory.RealGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+  GlobalTheory.RealGal GlobalTheory.UnitaryBC
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.sqrtFix :
-    SqrtFix := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.sqrtFix : SqrtFix := by
   intro F Ω _ _ _ _ A x a hx
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   have hsq : ∀ g : G F Ω, g x = x ∨ g x = -x := by
@@ -33,8 +34,7 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.sqrtFix :
         linear_combination hc
       set y : Ω := (x - 1) / 2 with hy
       set y' : Ω := (-x - 1) / 2 with hy'
-      have hgy : g y = y' := by
-        rw [hy, hy', map_div₀, map_sub, map_one, map_ofNat, h]
+      have hgy : g y = y' := by rw [hy, hy', map_div₀, map_sub, map_one, map_ofNat, h]
       have hsum : y + y' = -1 := by
         rw [hy, hy']
         ring
@@ -45,8 +45,7 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.sqrtFix :
       have hvp : A.valuation (y * y') < 1 := by
         rw [hprod, map_mul]
         exact lt_of_le_of_lt (mul_le_of_le_one_left' (hint _)) hvt
-      have hvs : A.valuation (y + y') = 1 := by
-        rw [hsum, Valuation.map_neg, Valuation.map_one]
+      have hvs : A.valuation (y + y') = 1 := by rw [hsum, Valuation.map_neg, Valuation.map_one]
       have hiff := valuation_apply_lt_one_iff hg y
       rw [hgy] at hiff
       by_cases hyl : A.valuation y < 1
@@ -60,8 +59,10 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.sqrtFix :
           exact one_le_mul hyl hyl'
         exact absurd hvp (not_lt.2 hge)
   · intro h2a τ hτ
-    obtain ⟨-, hI⟩ : τ ∈ ValuationSubring.decompositionSubgroup F A ∧
-        ∀ (y : Ω), A.valuation y ≤ 1 → A.valuation (τ y - y) < 1 := hτ
+    obtain ⟨-, hI⟩
+        : τ ∈ ValuationSubring.decompositionSubgroup F A
+          ∧ ∀ (y : Ω), A.valuation y ≤ 1 → A.valuation (τ y - y) < 1 :=
+      hτ
     rcases hsq τ with h | h
     · exact h
     · exfalso
@@ -71,12 +72,9 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.sqrtFix :
         rw [← map_mul]
         push_cast at h2a
         exact h2a
-      have hv2' : A.valuation (2 : Ω) = 1 :=
-        le_antisymm hv2 (e2a ▸ mul_le_of_le_one_right' hva)
-      have hva' : A.valuation (a : Ω) = 1 :=
-        le_antisymm hva (e2a ▸ mul_le_of_le_one_left' hv2)
-      have hvx2 : A.valuation x ^ 2 = 1 := by
-        rw [← Valuation.map_pow, hx, hva']
+      have hv2' : A.valuation (2 : Ω) = 1 := le_antisymm hv2 (e2a ▸ mul_le_of_le_one_right' hva)
+      have hva' : A.valuation (a : Ω) = 1 := le_antisymm hva (e2a ▸ mul_le_of_le_one_left' hv2)
+      have hvx2 : A.valuation x ^ 2 = 1 := by rw [← Valuation.map_pow, hx, hva']
       have hvx : A.valuation x = 1 := by
         rcases lt_trichotomy (A.valuation x) 1 with hl | he | hg
         · exact absurd hvx2 (ne_of_lt (pow_lt_one' hl two_ne_zero))

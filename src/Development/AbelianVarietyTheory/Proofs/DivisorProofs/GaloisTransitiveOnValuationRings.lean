@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ImportsExtra
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -23,23 +24,50 @@ section general
 
 variable {Ω : Type} [Field Ω]
 
-theorem mem_of_isIntegral {R : Type} [CommRing R] [Algebra R Ω] (A : ValuationSubring Ω)
-    (hR : ∀ r : R, algebraMap R Ω r ∈ A) {b : Ω} (hb : IsIntegral R b) : b ∈ A := by
+theorem mem_of_isIntegral
+    {R : Type} [CommRing R] [Algebra R Ω]
+    (A : ValuationSubring Ω) (hR : ∀ r : R, algebraMap R Ω r ∈ A)
+    {b : Ω} (hb : IsIntegral R b)
+    : b ∈ A := by
   first
-  | (rename_i h_1 h_3 h_4; revert Ω h_1 R h_3 h_4 A hR b hb; exact @_root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral)
+  | (
+      rename_i h_1 h_3 h_4
+      revert Ω h_1 R h_3 h_4 A hR b hb
+      exact @_root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral
+    )
   | exact @_root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral
   | exact _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral
-  | (apply _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral <;> assumption)
-  | (intros; apply _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral <;> first | assumption | infer_instance)
-  | (intros; exact _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral ..)
+  | (
+      apply _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral
+        <;> assumption
+    )
+  | (
+      intros
+      apply _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral
+        <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral
+        <;> first | assumption | infer_instance
+    )
+  | (
+      intros
+      exact _root_.GlobalTheory.IntegralInValuationSubring.mem_valuationSubring_of_isIntegral ..
+    )
 
-variable (S : Type) [CommRing S] [IsDomain S] [IsDedekindDomain S] [Algebra S Ω] [IsFractionRing S Ω]
+variable
+  (S : Type) [CommRing S] [IsDomain S] [IsDedekindDomain S] [Algebra S Ω] [IsFractionRing S Ω]
 
-theorem exists_den (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s ∈ A) {x : Ω} (hx : x ∈ A) :
-    ∃ s t : S, A.valuation (algebraMap S Ω s) = 1 ∧ algebraMap S Ω s * x = algebraMap S Ω t := by
+theorem exists_den
+    (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s ∈ A) {x : Ω} (hx : x ∈ A)
+    : ∃ s t : S, A.valuation (algebraMap S Ω s) = 1 ∧ algebraMap S Ω s * x = algebraMap S Ω t := by
   first
-  | (rename_i h_1 h_3 h_4 h_5 h_6 h_7; revert Ω h_1 S h_3 h_4 h_5 h_6 h_7 A hS x hx; exact @_root_.GlobalTheory.ClosingLemma.main)
+  | (
+      rename_i h_1 h_3 h_4 h_5 h_6 h_7
+      revert Ω h_1 S h_3 h_4 h_5 h_6 h_7 A hS x hx
+      exact @_root_.GlobalTheory.ClosingLemma.main
+    )
   | exact @_root_.GlobalTheory.ClosingLemma.main
   | exact _root_.GlobalTheory.ClosingLemma.main
   | (apply _root_.GlobalTheory.ClosingLemma.main <;> assumption)
@@ -47,10 +75,11 @@ theorem exists_den (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s 
   | (intros; apply @_root_.GlobalTheory.ClosingLemma.main <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.ClosingLemma.main ..)
 
-theorem le_of_valuation_lt_one_iff {A A' : ValuationSubring Ω} (hS : ∀ s : S, algebraMap S Ω s ∈ A)
-    (hS' : ∀ s : S, algebraMap S Ω s ∈ A')
-    (h : ∀ s : S, A.valuation (algebraMap S Ω s) < 1 ↔ A'.valuation (algebraMap S Ω s) < 1) :
-    A ≤ A' := by
+theorem le_of_valuation_lt_one_iff
+    {A A' : ValuationSubring Ω}
+    (hS : ∀ s : S, algebraMap S Ω s ∈ A) (hS' : ∀ s : S, algebraMap S Ω s ∈ A')
+    (h : ∀ s : S, A.valuation (algebraMap S Ω s) < 1 ↔ A'.valuation (algebraMap S Ω s) < 1)
+    : A ≤ A' := by
   intro x hx
   obtain ⟨s, t, hs1, e⟩ := exists_den S A hS hx
   have hs0 : algebraMap S Ω s ≠ 0 := by
@@ -69,12 +98,12 @@ theorem le_of_valuation_lt_one_iff {A A' : ValuationSubring Ω} (hS : ∀ s : S,
 def primeBelow (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s ∈ A) : Ideal S :=
   (IsLocalRing.maximalIdeal A).comap ((algebraMap S Ω).codRestrict A hS)
 
-theorem mem_primeBelow {A : ValuationSubring Ω} (hS : ∀ s : S, algebraMap S Ω s ∈ A) (s : S) :
-    s ∈ primeBelow S A hS ↔ A.valuation (algebraMap S Ω s) < 1 :=
+theorem mem_primeBelow {A : ValuationSubring Ω} (hS : ∀ s : S, algebraMap S Ω s ∈ A) (s : S)
+    : s ∈ primeBelow S A hS ↔ A.valuation (algebraMap S Ω s) < 1 :=
   A.valuation_lt_one_iff _
 
-instance isPrime_primeBelow (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s ∈ A) :
-    (primeBelow S A hS).IsPrime := by
+instance isPrime_primeBelow (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s ∈ A)
+    : (primeBelow S A hS).IsPrime := by
   unfold primeBelow
   infer_instance
 
@@ -82,18 +111,19 @@ end general
 
 section galois
 
-theorem smul_valuation_lt_one_iff {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (g : Ω ≃ₐ[K] Ω)
-    (A : ValuationSubring Ω) (y : Ω) :
-    (g • A).valuation y < 1 ↔ A.valuation ((g⁻¹ : Ω ≃ₐ[K] Ω) y) < 1 := by
+theorem smul_valuation_lt_one_iff
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (g : Ω ≃ₐ[K] Ω) (A : ValuationSubring Ω) (y : Ω)
+    : (g • A).valuation y < 1 ↔ A.valuation ((g⁻¹ : Ω ≃ₐ[K] Ω) y) < 1 := by
   rw [← ValuationSubring.mem_nonunits_iff, ← ValuationSubring.mem_nonunits_iff,
     ValuationSubring.mem_nonunits_iff_or, ValuationSubring.mem_nonunits_iff_or,
     ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def, map_inv₀,
     map_eq_zero_iff _ (g⁻¹ : Ω ≃ₐ[K] Ω).injective]
 
-theorem exists_smul_eq_of_isAbove : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [Field K] [Algebra R K] [IsFractionRing R K] (Ω : Type) [Field Ω] [Algebra K Ω] [IsGalois K Ω]
-    [FiniteDimensional K Ω] (V V' : ValuationSubring Ω), IsAbove R K V.toSubring →
-    IsAbove R K V'.toSubring → ∃ g : Ω ≃ₐ[K] Ω, g • V = V' := by
+theorem exists_smul_eq_of_isAbove
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] (Ω : Type) [Field Ω] [Algebra K Ω] [IsGalois K Ω]
+        [FiniteDimensional K Ω] (V V' : ValuationSubring Ω),
+      IsAbove R K V.toSubring → IsAbove R K V'.toSubring → ∃ g : Ω ≃ₐ[K] Ω, g • V = V' := by
   intro R K _ _ _ _ _ _ Ω _ _ _ _ V V' hV hV'
   letI : Algebra R Ω := ((algebraMap K Ω).comp (algebraMap R K)).toAlgebra
   haveI : IsScalarTower R K Ω := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
@@ -115,8 +145,11 @@ theorem exists_smul_eq_of_isAbove : ∀ (R K : Type) [CommRing R] [IsDomain R] [
     refine ⟨v, Subtype.ext ?_⟩
     rw [← hk, ← hv, ← IsScalarTower.algebraMap_apply]
     rfl
-  have key : ∀ W : ValuationSubring Ω, IsAbove R K W.toSubring → ∀ k : K,
-      (W.valuation (algebraMap K Ω k) < 1 ↔ k⁻¹ ∉ (algebraMap R K).range ∨ k = 0) := by
+  have key
+      : ∀ W : ValuationSubring Ω,
+        IsAbove R K W.toSubring
+          → ∀ k : K,
+            (W.valuation (algebraMap K Ω k) < 1 ↔ k⁻¹ ∉ (algebraMap R K).range ∨ k = 0) := by
     intro W hW k
     rw [← ValuationSubring.mem_nonunits_iff, ValuationSubring.mem_nonunits_iff_or, ← map_inv₀,
       map_eq_zero_iff _ (algebraMap K Ω).injective, ← hW]
@@ -125,28 +158,37 @@ theorem exists_smul_eq_of_isAbove : ∀ (R K : Type) [CommRing R] [IsDomain R] [
     intro W hW r
     have : algebraMap R K r ∈ W.toSubring.comap (algebraMap K Ω) := by rw [hW]; exact ⟨r, rfl⟩
     exact this
-  have hS : ∀ W : ValuationSubring Ω, IsAbove R K W.toSubring →
-      ∀ s : integralClosure R Ω, algebraMap (integralClosure R Ω) Ω s ∈ W :=
-    fun W hW s => mem_of_isIntegral W (hR W hW) s.2
-  have hunder : (primeBelow (integralClosure R Ω) V (hS V hV)).under R =
-      (primeBelow (integralClosure R Ω) V' (hS V' hV')).under R := by
+  have hS
+      : ∀ W : ValuationSubring Ω,
+        IsAbove R K W.toSubring
+          → ∀ s : integralClosure R Ω, algebraMap (integralClosure R Ω) Ω s ∈ W := fun W hW s =>
+    mem_of_isIntegral W (hR W hW) s.2
+  have hunder
+      : (primeBelow (integralClosure R Ω) V (hS V hV)).under R
+        = (primeBelow (integralClosure R Ω) V' (hS V' hV')).under R := by
     ext r
     rw [Ideal.under_def, Ideal.mem_comap, Ideal.mem_comap, mem_primeBelow, mem_primeBelow]
     exact (key V hV (algebraMap R K r)).trans (key V' hV' (algebraMap R K r)).symm
-  obtain ⟨g, hg⟩ := Algebra.IsInvariant.exists_smul_of_under_eq (A := R) (B := integralClosure R Ω)
-    (G := Ω ≃ₐ[K] Ω) _ _ hunder
+  obtain ⟨g, hg⟩ :=
+    Algebra.IsInvariant.exists_smul_of_under_eq (A := R) (B := integralClosure R Ω) (G := Ω ≃ₐ[K] Ω)
+      _ _ hunder
   have hgS : ∀ s : integralClosure R Ω, algebraMap (integralClosure R Ω) Ω s ∈ g • V := by
     intro s
     rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem]
     exact hS V hV (g⁻¹ • s)
-  have hmem : ∀ s : integralClosure R Ω, (g • V).valuation (algebraMap (integralClosure R Ω) Ω s) < 1 ↔
-      V'.valuation (algebraMap (integralClosure R Ω) Ω s) < 1 := by
+  have hmem
+      : ∀ s : integralClosure R Ω,
+        (g • V).valuation (algebraMap (integralClosure R Ω) Ω s) < 1
+          ↔ V'.valuation (algebraMap (integralClosure R Ω) Ω s) < 1 := by
     intro s
     rw [smul_valuation_lt_one_iff, ← mem_primeBelow (integralClosure R Ω) (hS V' hV'), hg,
       Ideal.mem_pointwise_smul_iff_inv_smul_mem, mem_primeBelow]
     rfl
-  exact ⟨g, le_antisymm (le_of_valuation_lt_one_iff (integralClosure R Ω) hgS (hS V' hV') hmem)
-    (le_of_valuation_lt_one_iff (integralClosure R Ω) (hS V' hV') hgS fun s => (hmem s).symm)⟩
+  exact ⟨
+    g,
+    le_antisymm (le_of_valuation_lt_one_iff (integralClosure R Ω) hgS (hS V' hV') hmem)
+      (le_of_valuation_lt_one_iff (integralClosure R Ω) (hS V' hV') hgS fun s => (hmem s).symm)
+  ⟩
 
 end galois
 

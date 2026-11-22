@@ -11,10 +11,10 @@ private theorem w_rev (n : ℕ) (i : Fin n) : w n i.rev = - w n i := by
   simp only [w, Fin.val_rev]
   split_ifs <;> omega
 
-private theorem J_apply {K : Type} [CommRing K] {n : ℕ} (X : Matrix (Fin n) (Fin n) K) (i j : Fin n) :
-    (Jmat (R := K) n * Xᵀ * Jmat (R := K) n) i j = X j.rev i.rev := by
-  simp only [Matrix.mul_apply, Jmat, Matrix.transpose_apply, ite_mul, one_mul, zero_mul,
-    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+private theorem J_apply {K : Type} [CommRing K] {n : ℕ} (X : Matrix (Fin n) (Fin n) K) (i j : Fin n)
+    : (Jmat (R := K) n * Xᵀ * Jmat (R := K) n) i j = X j.rev i.rev := by
+  simp only [Matrix.mul_apply, Jmat, Matrix.transpose_apply, ite_mul, one_mul, zero_mul, mul_ite,
+    mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
   have key : ∀ k : Fin n, (j = k.rev) ↔ (k = j.rev) := by
     intro k
     constructor
@@ -24,8 +24,8 @@ private theorem J_apply {K : Type} [CommRing K] {n : ℕ} (X : Matrix (Fin n) (F
       simp
   simp only [key, Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
-private def tw {K : Type} [CommRing K] (n : ℕ) (u : Kˣ) :
-    Matrix (Fin n) (Fin n) K →ₐ[K] Matrix (Fin n) (Fin n) K where
+private def tw {K : Type} [CommRing K] (n : ℕ) (u : Kˣ)
+    : Matrix (Fin n) (Fin n) K →ₐ[K] Matrix (Fin n) (Fin n) K where
   toFun X := Matrix.of fun i j => ((u ^ (w n i - w n j) : Kˣ) : K) * X i j
   map_one' := by
     ext i j
@@ -43,20 +43,27 @@ private def tw {K : Type} [CommRing K] (n : ℕ) (u : Kˣ) :
     ext i j
     by_cases h : i = j <;> simp [h, Matrix.algebraMap_matrix_apply]
 
-private theorem tw_apply {K : Type} [CommRing K] (n : ℕ) (u : Kˣ) (X : Matrix (Fin n) (Fin n) K) (i j : Fin n) :
-    tw n u X i j = ((u ^ (w n i - w n j) : Kˣ) : K) * X i j := rfl
+private theorem tw_apply
+    {K : Type} [CommRing K] (n : ℕ) (u : Kˣ) (X : Matrix (Fin n) (Fin n) K) (i j : Fin n)
+    : tw n u X i j = ((u ^ (w n i - w n j) : Kˣ) : K) * X i j :=
+  rfl
 
-private theorem ordProd_tw {H K : Type} [CommRing K] {n : ℕ} (u : Kˣ)
-    (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H) :
-    ordProd (fun s => tw n u (r s)) ψ g = tw n u (ordProd r ψ g) := by
+private theorem ordProd_tw
+    {H K : Type} [CommRing K]
+    {n : ℕ}
+    (u : Kˣ) (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H)
+    : ordProd (fun s => tw n u (r s)) ψ g = tw n u (ordProd r ψ g) := by
   unfold ordProd
   rw [map_list_prod, List.map_ofFn]
   congr 2
   funext i
   simp
 
-theorem UpperTheory.V.Fr.alg_twist :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {n : ℕ} {K : Type} [CommRing K] (u : Kˣ) (ρ : NRep F n K), ∃ ρ' : NRep F n K, (∀ g i j, ρ'.r g i j = ((u ^ (w n i - w n j) : Kˣ) : K) * ρ.r g i j) ∧ ρ'.ψ = ρ.ψ := by
+theorem UpperTheory.V.Fr.alg_twist
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {n : ℕ} {K : Type} [CommRing K]
+        (u : Kˣ) (ρ : NRep F n K),
+      ∃ ρ' : NRep F n K,
+        (∀ g i j, ρ'.r g i j = ((u ^ (w n i - w n j) : Kˣ) : K) * ρ.r g i j) ∧ ρ'.ψ = ρ.ψ := by
   intro l _ k _ F n K _ u ρ
   refine ⟨⟨(tw n u).toRingHom.toMonoidHom.comp ρ.r, ρ.ψ, ?_, ?_, ?_⟩, fun g i j => rfl, rfl⟩
   · intro g

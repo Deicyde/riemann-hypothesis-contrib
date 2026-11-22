@@ -19,27 +19,28 @@ section General
 
 variable {R W : Type} [CommRing R] [AddCommGroup W] [Module R W]
 
-theorem idx_sup_right (X B : Submodule R W) : idx (X ⊔ B) B = idx X B :=
-  DelScale.idx_sup le_rfl
+theorem idx_sup_right (X B : Submodule R W) : idx (X ⊔ B) B = idx X B := DelScale.idx_sup le_rfl
 
-theorem idx_glue (M U U' : Submodule R W) :
-    idx (U ⊓ (M ⊔ U')) (M ⊓ U) = idx ((M ⊔ U) ⊓ (M ⊔ U')) M := by
+theorem idx_glue (M U U' : Submodule R W)
+    : idx (U ⊓ (M ⊔ U')) (M ⊓ U) = idx ((M ⊔ U) ⊓ (M ⊔ U')) M := by
   rw [sup_inf_assoc_of_le U (le_sup_left : M ≤ M ⊔ U'), sup_comm M (U ⊓ _), idx_sup_right,
     ← DelScale.idx_inf_left, ← DelScale.idx_inf_left _ M]
   congr 1
   exact le_antisymm (le_inf inf_le_left (inf_le_right.trans inf_le_left))
     (le_inf inf_le_left (le_inf inf_le_right (inf_le_left.trans inf_le_left)))
 
-theorem gidx_glue (M U U' : Submodule R W) :
-    gidx (U ⊓ (M ⊔ U')) (M ⊓ U) = idx ((M ⊔ U) ⊓ (M ⊔ U')) M := by
+theorem gidx_glue (M U U' : Submodule R W)
+    : gidx (U ⊓ (M ⊔ U')) (M ⊓ U) = idx ((M ⊔ U) ⊓ (M ⊔ U')) M := by
   have : idx (M ⊓ U) (U ⊓ (M ⊔ U')) = 1 :=
     AddSubgroup.relIndex_eq_one.2 fun x hx => ⟨hx.2, Submodule.mem_sup_left hx.1⟩
   rw [gidx, this, idx_glue]
   simp
 
-theorem gen_glue (M U U' : Submodule R W) (t : Finset W)
-    (h : U ⊓ (M ⊔ U') = (M ⊓ U) ⊔ Submodule.span R (t : Set W)) :
-    ∃ t' : Finset W, t'.card ≤ t.card ∧ U' ⊓ (M ⊔ U) = (M ⊓ U') ⊔ Submodule.span R (t' : Set W) := by
+theorem gen_glue
+    (M U U' : Submodule R W) (t : Finset W)
+    (h : U ⊓ (M ⊔ U') = (M ⊓ U) ⊔ Submodule.span R (t : Set W))
+    : ∃ t' : Finset W,
+      t'.card ≤ t.card ∧ U' ⊓ (M ⊔ U) = (M ⊓ U') ⊔ Submodule.span R (t' : Set W) := by
   have h1 : ∀ x : W, ∃ y : W, x ∈ t → y ∈ U' ∧ x - y ∈ M := by
     intro x
     by_cases hx : x ∈ t
@@ -57,8 +58,13 @@ theorem gen_glue (M U U' : Submodule R W) (t : Finset W)
   have b : M ⊔ Submodule.span R (t : Set W) = M ⊔ Submodule.span R (t.image f : Set W) := by
     apply le_antisymm
     · refine sup_le le_sup_left (Submodule.span_le.2 fun x hx => ?_)
-      exact Submodule.mem_sup.2 ⟨_, (hf x hx).2, f x,
-        Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image_of_mem f hx)), by abel⟩
+      exact Submodule.mem_sup.2 ⟨
+        _,
+        (hf x hx).2,
+        f x,
+        Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image_of_mem f hx)),
+        by abel
+      ⟩
     · refine sup_le le_sup_left (Submodule.span_le.2 fun y hy => ?_)
       obtain ⟨x, hx, rfl⟩ := Finset.mem_image.1 (Finset.mem_coe.1 hy)
       exact Submodule.mem_sup.2 ⟨_, M.neg_mem (hf x hx).2, x, Submodule.subset_span hx, by abel⟩
@@ -70,21 +76,23 @@ theorem gen_glue (M U U' : Submodule R W) (t : Finset W)
 
 end General
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [StarRing K] [FiniteDimensional K V] in
-theorem exists_mult {M : Submodule (𝓞 K) V} {v : V} (hv : v ∈ Submodule.span K (M : Set V)) :
-    ∃ c : K, c ≠ 0 ∧ c • v ∈ M := by
-  obtain ⟨s, hs⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (M : Set V) v hv
+theorem exists_mult {M : Submodule (𝓞 K) V} {v : V} (hv : v ∈ Submodule.span K (M : Set V))
+    : ∃ c : K, c ≠ 0 ∧ c • v ∈ M := by
+  obtain ⟨s, hs⟩ :=
+    multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (M : Set V) v hv
   rw [Submodule.span_eq] at hs
   refine ⟨algebraMap (𝓞 K) K s, IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors s.2, ?_⟩
   rw [algebraMap_smul]
   exact hs
 
 omit [StarRing K] [FiniteDimensional K V] in
-theorem span_inf {M : Submodule (𝓞 K) V} {T : Submodule K V} (hT : T ≤ Submodule.span K (M : Set V)) :
-    Submodule.span K ((M ⊓ rs (𝓞 K) T : Submodule (𝓞 K) V) : Set V) = T := by
+theorem span_inf {M : Submodule (𝓞 K) V} {T : Submodule K V} (hT : T ≤ Submodule.span K (M : Set V))
+    : Submodule.span K ((M ⊓ rs (𝓞 K) T : Submodule (𝓞 K) V) : Set V) = T := by
   apply le_antisymm
   · exact Submodule.span_le.2 fun x hx => hx.2
   · intro v hv
@@ -92,11 +100,13 @@ theorem span_inf {M : Submodule (𝓞 K) V} {T : Submodule K V} (hT : T ≤ Subm
     rw [← Submodule.smul_mem_iff _ hc]
     exact Submodule.subset_span ⟨h, T.smul_mem c hv⟩
 
-theorem key (H : HermSpace K V) {M : Submodule (𝓞 K) V} {S I : Submodule K V} (hIS : I ≤ S)
-    (hrad : ∀ x ∈ S, (∀ y ∈ S, H.B x y = 0) ↔ x ∈ I) (hM : IsUnimodMod H M S I)
-    {T : Submodule K V} (hIT : I ≤ T) (hTS : T ≤ S) :
-    dual H (M ⊓ rs (𝓞 K) T) = rs (𝓞 K) T ⊓ (M ⊔ rs (𝓞 K) (S ⊓ perp H T)) ∧
-      S ⊓ perp H (S ⊓ perp H T) = T := by
+theorem key
+    (H : HermSpace K V)
+    {M : Submodule (𝓞 K) V} {S I : Submodule K V}
+    (hIS : I ≤ S) (hrad : ∀ x ∈ S, (∀ y ∈ S, H.B x y = 0) ↔ x ∈ I) (hM : IsUnimodMod H M S I)
+    {T : Submodule K V} (hIT : I ≤ T) (hTS : T ≤ S)
+    : dual H (M ⊓ rs (𝓞 K) T) = rs (𝓞 K) T ⊓ (M ⊔ rs (𝓞 K) (S ⊓ perp H T))
+      ∧ S ⊓ perp H (S ⊓ perp H T) = T := by
   obtain ⟨r, hr⟩ := LinearMap.exists_leftInverse_of_injective I.subtype (Submodule.ker_subtype I)
   have hr' : ∀ x (hx : x ∈ I), (r x : V) = x := fun x hx =>
     congrArg Subtype.val (LinearMap.congr_fun hr ⟨x, hx⟩)
@@ -104,29 +114,34 @@ theorem key (H : HermSpace K V) {M : Submodule (𝓞 K) V} {S I : Submodule K V}
   have hpx : ∀ x, p x = x - r x := fun x => rfl
   set C : Submodule K V := S ⊓ LinearMap.ker r with hCd
   have hCS : C ≤ S := inf_le_left
-  have hpC : ∀ x ∈ S, p x ∈ C := fun x hx => ⟨S.sub_mem hx (hIS (r x).2), by
-    change r (p x) = 0
-    rw [hpx, map_sub, sub_eq_zero]
-    exact (Subtype.ext (hr' _ (r x).2)).symm⟩
+  have hpC : ∀ x ∈ S, p x ∈ C := fun x hx => ⟨
+    S.sub_mem hx (hIS (r x).2),
+    by
+      change r (p x) = 0
+      rw [hpx, map_sub, sub_eq_zero]
+      exact (Subtype.ext (hr' _ (r x).2)).symm
+  ⟩
   have hpI : ∀ x, x - p x ∈ I := fun x => by rw [hpx]; simp
   have hI : ∀ x ∈ I, p x = 0 := fun x hx => by rw [hpx, hr' x hx, sub_self]
   have hC : ∀ x ∈ C, p x = x := fun x hx => by
     have : r x = 0 := hx.2
-    rw [hpx, this]; simp
+    rw [hpx, this]
+    simp
   have o1 : ∀ i ∈ I, ∀ y ∈ S, H.B i y = 0 := fun i hi => (hrad i (hIS hi)).2 hi
-  have o2 : ∀ i ∈ I, ∀ y ∈ S, H.B y i = 0 := fun i hi y hy => by rw [← H.herm, o1 i hi y hy, star_zero]
+  have o2 : ∀ i ∈ I, ∀ y ∈ S, H.B y i = 0 := fun i hi y hy => by
+    rw [← H.herm, o1 i hi y hy, star_zero]
   have o3 : ∀ y ∈ S, ∀ x, H.B y (p x) = H.B y x := fun y hy x => by
     rw [hpx, map_sub, o2 _ (r x).2 y hy, sub_zero]
-  have o4 : ∀ y ∈ S, ∀ x, H.B (p x) y = H.B x y := fun y hy x => by
-    rw [← H.herm, o3 y hy, H.herm]
+  have o4 : ∀ y ∈ S, ∀ x, H.B (p x) y = H.B x y := fun y hy x => by rw [← H.herm, o3 y hy, H.herm]
   have hpT : ∀ x ∈ T, p x ∈ T := fun x hx => T.sub_mem hx (hIT (r x).2)
-  let HC : HermSpace K C :=
-    { B := H.B.domRestrict₁₂ C C
-      herm := fun x y => H.herm x y
-      nondeg := fun x hx => by
-        have : (x : V) ∈ I := (hrad x (hCS x.2)).1 fun y hy => by
-          rw [← o3 x (hCS x.2)]; exact hx ⟨_, hpC y hy⟩
-        exact Subtype.ext ((hC x x.2).symm.trans (hI x this)) }
+  let HC : HermSpace K C := {
+    B := H.B.domRestrict₁₂ C C
+    herm := fun x y => H.herm x y
+    nondeg := fun x hx => by
+      have : (x : V) ∈ I :=
+        (hrad x (hCS x.2)).1 fun y hy => by rw [← o3 x (hCS x.2)]; exact hx ⟨_, hpC y hy⟩
+      exact Subtype.ext ((hC x x.2).symm.trans (hI x this))
+  }
   have hB : ∀ x y : C, HC.B x y = H.B x y := fun _ _ => rfl
   obtain ⟨a, b⟩ := DelScale.le_of_latMod hM.1
   have hpM : ∀ x ∈ M, p x ∈ M := fun x hx => M.sub_mem hx (a (r x).2)
@@ -148,22 +163,24 @@ theorem key (H : HermSpace K V) {M : Submodule (𝓞 K) V} {S I : Submodule K V}
     constructor
     · rintro ⟨hd, hdM⟩
       refine ⟨hd, ?_⟩
-      have hx : ∀ x : ↥(GlobalTheory.Mass.latIn C M ⊓ rs (𝓞 K) (T.comap C.subtype)),
-          IsIntegral ℤ (H.B ((x : C) : V) d) := by
+      have hx
+          : ∀ x : ↥(GlobalTheory.Mass.latIn C M ⊓ rs (𝓞 K) (T.comap C.subtype)),
+            IsIntegral ℤ (H.B ((x : C) : V) d) := by
         intro x
         rw [← UnimodQuot.mem_one_iff, ← H.herm]
         exact UnimodQuot.star_mem_one (hdM _ ⟨x.2.1, x.2.2⟩)
-      let φ : ↥(GlobalTheory.Mass.latIn C M ⊓ rs (𝓞 K) (T.comap C.subtype)) →ₗ[𝓞 K] 𝓞 K :=
-        { toFun := fun x => ⟨H.B ((x : C) : V) d, hx x⟩
-          map_add' := fun a b => by
-            apply RingOfIntegers.ext
-            show H.B (((a : C) : V) + (b : C)) d = H.B (a : C) d + H.B (b : C) d
-            simp
-          map_smul' := fun a b => by
-            apply RingOfIntegers.ext
-            show H.B (a • ((b : C) : V)) d = algebraMap (𝓞 K) K a * H.B (b : C) d
-            rw [← algebraMap_smul K a, map_smul]
-            rfl }
+      let φ : ↥(GlobalTheory.Mass.latIn C M ⊓ rs (𝓞 K) (T.comap C.subtype)) →ₗ[𝓞 K] 𝓞 K := {
+        toFun := fun x => ⟨H.B ((x : C) : V) d, hx x⟩
+        map_add' := fun a b => by
+          apply RingOfIntegers.ext
+          show H.B (((a : C) : V) + (b : C)) d = H.B (a : C) d + H.B (b : C) d
+          simp
+        map_smul' := fun a b => by
+          apply RingOfIntegers.ext
+          show H.B (a • ((b : C) : V)) d = algebraMap (𝓞 K) K a * H.B (b : C) d
+          rw [← algebraMap_smul K a, map_smul]
+          rfl
+      }
       obtain ⟨y, hy, h'⟩ := UnimodQuot.exists_lattice_rep HC hU (T.comap C.subtype) φ
       refine Submodule.mem_sup.2 ⟨y, hy, d - y, ⟨S.sub_mem (hTS hd) (hCS y.2), ?_⟩, by abel⟩
       refine (mem_perp_iff H T _).2 fun x hx => ?_
@@ -195,7 +212,18 @@ theorem key (H : HermSpace K V) {M : Submodule (𝓞 K) V} {S I : Submodule K V}
       refine ⟨hTS hx, (mem_perp_iff H _ _).2 fun y hy => ?_⟩
       rw [← H.herm, (mem_perp_iff H T y).1 hy.2 x hx, star_zero]
 
-theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V), Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (M : Submodule (𝓞 K) V) (S I U : Submodule K V), I ≤ U → U ≤ S → (∀ x ∈ S, (∀ y ∈ S, H.B x y = 0) ↔ x ∈ I) → (∀ x ∈ U, (∀ y ∈ U, H.B x y = 0) ↔ x ∈ I) → IsUnimodMod H M S I → del H (M ⊓ rs (𝓞 K) U) = del H (M ⊓ rs (𝓞 K) (S ⊓ perp H U)) ∧ ∀ e : ℕ, GenBy (dual H (M ⊓ rs (𝓞 K) U)) (M ⊓ rs (𝓞 K) U) e → GenBy (dual H (M ⊓ rs (𝓞 K) (S ⊓ perp H U))) (M ⊓ rs (𝓞 K) (S ⊓ perp H U)) e := by
+theorem main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V),
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (M : Submodule (𝓞 K) V) (S I U : Submodule K V),
+          I ≤ U → U ≤ S → (∀ x ∈ S, (∀ y ∈ S, H.B x y = 0) ↔ x ∈ I)
+            → (∀ x ∈ U, (∀ y ∈ U, H.B x y = 0) ↔ x ∈ I) → IsUnimodMod H M S I
+            → del H (M ⊓ rs (𝓞 K) U) = del H (M ⊓ rs (𝓞 K) (S ⊓ perp H U))
+              ∧ ∀ e : ℕ,
+                GenBy (dual H (M ⊓ rs (𝓞 K) U)) (M ⊓ rs (𝓞 K) U) e
+                  → GenBy (dual H (M ⊓ rs (𝓞 K) (S ⊓ perp H U))) (M ⊓ rs (𝓞 K) (S ⊓ perp H U))
+                    e := by
   intro K V _ _ _ _ _ _ _ _ H _ M S I U hIU hUS hrad _ hM
   have hIS := hIU.trans hUS
   obtain ⟨h1, h2⟩ := key H hIS hrad hM hIU hUS

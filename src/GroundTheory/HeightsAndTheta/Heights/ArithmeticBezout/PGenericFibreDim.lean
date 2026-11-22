@@ -19,8 +19,9 @@ open ReciprocityTheory.ChartRestriction.G.Geo (MRing PBlk IsArithVar)
 
 namespace GenericFibreDim
 
-theorem eq_natCast_of_add_one_eq (d : ℕ) (x : WithBot ℕ∞)
-    (hform : x + 1 = ((d : ℕ) : WithBot ℕ∞) + 1) : x = d := by
+theorem eq_natCast_of_add_one_eq
+    (d : ℕ) (x : WithBot ℕ∞) (hform : x + 1 = ((d : ℕ) : WithBot ℕ∞) + 1)
+    : x = d := by
   induction x using WithBot.recBotCoe with
   | bot => exact absurd hform (by simp; rw [← Nat.cast_succ]; exact (WithBot.natCast_ne_bot _).symm)
   | coe y =>
@@ -35,10 +36,10 @@ theorem eq_natCast_of_add_one_eq (d : ℕ) (x : WithBot ℕ∞)
     | coe y =>
       have h1 : ((y + 1 : ℕ) : WithBot ℕ∞) = ((d + 1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast hform
       have : y = d := by exact_mod_cast (by exact_mod_cast h1 : y + 1 = d + 1) |> Nat.succ_injective
-      subst this; rfl
+      subst this
+      rfl
 
 end GenericFibreDim
-
 
 end ObjectsChow
 

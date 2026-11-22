@@ -99,7 +99,13 @@ lemma inv_conj_single (x : Fin (2 * r + k + 1)) :
   rw [hpk_inv, conj_single]
 
 def dz (l : Fin r) (κ κ' : ℂ) : Mx k r :=
-  diagonal (fun p => if p = eI k r l then κ else if p = esI k r l then κ' else 0)
+  diagonal (fun p =>
+    if p = eI k r l then
+      κ
+    else if p = esI k r l then
+      κ'
+    else
+      0)
 
 lemma X1_eq (l : Fin r) : hpart1 (Hpk k r) (single (eI k r l) (eI k r l) 1) =
     dz l ((1 / 2 : ℝ) : ℂ) (-((1 / 2 : ℝ) : ℂ)) := by

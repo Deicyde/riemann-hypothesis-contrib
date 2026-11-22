@@ -14,23 +14,24 @@ namespace Formalism.HermitianLattices.Ext.L3.WA
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem algebraMap_conjO (r : 𝓞 K) :
-    algebraMap (𝓞 K) K (conjO K r) = star (algebraMap (𝓞 K) K r) := rfl
+theorem algebraMap_conjO (r : 𝓞 K) : algebraMap (𝓞 K) K (conjO K r) = star (algebraMap (𝓞 K) K r) :=
+  rfl
 
 theorem conjO_conjO (r : 𝓞 K) : conjO K (conjO K r) = r :=
   _root_.Formalism.HermitianLattices.Ext.L3.conjO_conjO r
 
-theorem mem_conjIdeal_iff (p : Ideal (𝓞 K)) (r : 𝓞 K) :
-    r ∈ Formalism.HermitianLatticesTheory.conjIdeal (K := K) p ↔ conjO K r ∈ p := by
+theorem mem_conjIdeal_iff (p : Ideal (𝓞 K)) (r : 𝓞 K)
+    : r ∈ Formalism.HermitianLatticesTheory.conjIdeal (K := K) p ↔ conjO K r ∈ p := by
   rw [conjIdeal_eq_comap, Ideal.mem_comap]
 
-theorem conjIdeal_isPrime {p : Ideal (𝓞 K)} (hp : p.IsPrime) :
-    (Formalism.HermitianLatticesTheory.conjIdeal (K := K) p).IsPrime := by
+theorem conjIdeal_isPrime {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    : (Formalism.HermitianLatticesTheory.conjIdeal (K := K) p).IsPrime := by
   rw [conjIdeal_eq_comap]
   exact Ideal.comap_isPrime (conjO K) p
 
-theorem hcompl_eq_closure (p : Ideal (𝓞 K)) :
-    Formalism.HermitianLatticesTheory.hcompl (K := K) p = Submonoid.closure {s : 𝓞 K | s ∉ p ∧ conjO K s ∉ p} := by
+theorem hcompl_eq_closure (p : Ideal (𝓞 K))
+    : Formalism.HermitianLatticesTheory.hcompl (K := K) p
+      = Submonoid.closure {s : 𝓞 K | s ∉ p ∧ conjO K s ∉ p} := by
   unfold Formalism.HermitianLatticesTheory.hcompl
   congr 1
   ext s
@@ -42,8 +43,9 @@ theorem hcompl_eq_closure (p : Ideal (𝓞 K)) :
     have : t = conjO K s := RingOfIntegers.ext ht
     rwa [this]
 
-theorem mem_hcompl_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (s : 𝓞 K) :
-    s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p ↔ s ∉ p ∧ s ∉ Formalism.HermitianLatticesTheory.conjIdeal (K := K) p := by
+theorem mem_hcompl_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (s : 𝓞 K)
+    : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p
+      ↔ s ∉ p ∧ s ∉ Formalism.HermitianLatticesTheory.conjIdeal (K := K) p := by
   rw [hcompl_eq_closure, mem_conjIdeal_iff]
   constructor
   · intro hs
@@ -60,8 +62,9 @@ theorem mem_hcompl_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (s : 𝓞 K) :
   · intro hs
     exact Submonoid.subset_closure hs
 
-theorem conjO_mem_hcompl {p : Ideal (𝓞 K)} {s : 𝓞 K} (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p) :
-    conjO K s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p := by
+theorem conjO_mem_hcompl
+    {p : Ideal (𝓞 K)} {s : 𝓞 K} (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p)
+    : conjO K s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p := by
   rw [hcompl_eq_closure] at hs ⊢
   induction hs using Submonoid.closure_induction with
   | mem x hx =>
@@ -70,15 +73,17 @@ theorem conjO_mem_hcompl {p : Ideal (𝓞 K)} {s : 𝓞 K} (hs : s ∈ Formalism
   | one => rw [map_one]; exact one_mem _
   | mul x y _ _ ihx ihy => rw [map_mul]; exact mul_mem ihx ihy
 
-theorem algebraMap_ne_zero_of_mem_hcompl {p : Ideal (𝓞 K)} (hp : p.IsPrime) {s : 𝓞 K}
-    (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p) : algebraMap (𝓞 K) K s ≠ 0 := by
+theorem algebraMap_ne_zero_of_mem_hcompl
+    {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    {s : 𝓞 K} (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p)
+    : algebraMap (𝓞 K) K s ≠ 0 := by
   intro h0
   have hs0 : s = 0 := RingOfIntegers.ext (h0.trans (map_zero (algebraMap (𝓞 K) K)).symm)
   exact ((mem_hcompl_iff hp s).mp hs).1 (hs0 ▸ p.zero_mem)
 
-theorem mem_locR_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (a : K) :
-    a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p ↔
-      ∃ r : 𝓞 K, ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p,
+theorem mem_locR_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (a : K)
+    : a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p
+      ↔ ∃ r : 𝓞 K, ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p,
         a = algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s := by
   rw [Formalism.HermitianLatticesTheory.locDual_mem_locR]
   constructor
@@ -102,8 +107,9 @@ def locRing (p : Ideal (𝓞 K)) : Subring K where
     obtain ⟨s, hs, h1⟩ := ha
     obtain ⟨t, ht, h2⟩ := hb
     refine ⟨s * t, mul_mem hs ht, ?_⟩
-    have e : algebraMap (𝓞 K) K (s * t) * (a * b) =
-        (algebraMap (𝓞 K) K s * a) * (algebraMap (𝓞 K) K t * b) := by
+    have e
+        : algebraMap (𝓞 K) K (s * t) * (a * b)
+          = (algebraMap (𝓞 K) K s * a) * (algebraMap (𝓞 K) K t * b) := by
       rw [map_mul]; ring
     rw [e]
     exact Formalism.HermitianLatticesTheory.locDual_one_mul h1 h2
@@ -115,13 +121,17 @@ def locRing (p : Ideal (𝓞 K)) : Subring K where
   zero_mem' := (Formalism.HermitianLatticesTheory.locR (K := K) p).zero_mem
   neg_mem' := fun ha => (Formalism.HermitianLatticesTheory.locR (K := K) p).neg_mem ha
 
-theorem mem_locRing (p : Ideal (𝓞 K)) (a : K) :
-    a ∈ locRing p ↔ a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p := Iff.rfl
+theorem mem_locRing (p : Ideal (𝓞 K)) (a : K)
+    : a ∈ locRing p ↔ a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p :=
+  Iff.rfl
 
-theorem algebraMap_mem_locRing (p : Ideal (𝓞 K)) (r : 𝓞 K) :
-    algebraMap (𝓞 K) K r ∈ locRing p := by
+theorem algebraMap_mem_locRing (p : Ideal (𝓞 K)) (r : 𝓞 K) : algebraMap (𝓞 K) K r ∈ locRing p := by
   rw [mem_locRing, Formalism.HermitianLatticesTheory.locDual_mem_locR]
-  exact ⟨1, one_mem _, by rw [map_one, one_mul]; exact Formalism.HermitianLatticesTheory.locDual_alg_mem r⟩
+  exact ⟨
+    1,
+    one_mem _,
+    by rw [map_one, one_mul]; exact Formalism.HermitianLatticesTheory.locDual_alg_mem r
+  ⟩
 
 theorem frac_locRing (p : Ideal (𝓞 K)) (a : K) : ∃ t ∈ locRing p, t ≠ 0 ∧ t * a ∈ locRing p := by
   obtain ⟨⟨r, s⟩, hrs⟩ := IsLocalization.surj (nonZeroDivisors (𝓞 K)) a
@@ -132,17 +142,19 @@ theorem frac_locRing (p : Ideal (𝓞 K)) (a : K) : ∃ t ∈ locRing p, t ≠ 0
     rw [hrs]
     exact algebraMap_mem_locRing p r
 
-theorem star_mem_locRing {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a : K} (ha : a ∈ locRing p) :
-    star a ∈ locRing p := by
+theorem star_mem_locRing {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a : K} (ha : a ∈ locRing p)
+    : star a ∈ locRing p := by
   rw [mem_locRing, mem_locR_iff hp] at ha ⊢
   obtain ⟨r, s, hs, rfl⟩ := ha
   refine ⟨conjO K r, conjO K s, conjO_mem_hcompl hs, ?_⟩
   rw [algebraMap_conjO, algebraMap_conjO, star_div₀]
 
-theorem isUnitIn_div_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (r : 𝓞 K) {s : 𝓞 K}
-    (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p) :
-    IsUnitIn (locRing p) (algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s) ↔
-      r ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p := by
+theorem isUnitIn_div_iff
+    {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    (r : 𝓞 K)
+    {s : 𝓞 K} (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p)
+    : IsUnitIn (locRing p) (algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s)
+      ↔ r ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p := by
   have hs0 := algebraMap_ne_zero_of_mem_hcompl hp hs
   constructor
   · rintro ⟨h0, -, hinv⟩
@@ -167,8 +179,9 @@ theorem isUnitIn_div_iff {p : Ideal (𝓞 K)} (hp : p.IsPrime) (r : 𝓞 K) {s :
     · rw [mem_locRing, mem_locR_iff hp]
       exact ⟨s, r, hr, inv_div _ _⟩
 
-theorem unram_locRing (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
-    ∃ θ ∈ locRing p, IsUnitIn (locRing p) (θ - star θ) := by
+theorem unram_locRing
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    : ∃ θ ∈ locRing p, IsUnitIn (locRing p) (θ - star θ) := by
   obtain ⟨θ, hθ⟩ := exists_sub_conjO_notMem hK hp
   refine ⟨algebraMap (𝓞 K) K θ, algebraMap_mem_locRing p θ, ?_⟩
   have hmem : θ - conjO K θ ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p := by
@@ -177,8 +190,9 @@ theorem unram_locRing (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : 
     rw [map_sub, conjO_conjO] at h
     have := p.neg_mem h
     rwa [neg_sub] at this
-  have h := (isUnitIn_div_iff hp.isPrime (θ - conjO K θ)
-    (one_mem (Formalism.HermitianLatticesTheory.hcompl (K := K) p))).mpr hmem
+  have h :=
+    (isUnitIn_div_iff hp.isPrime (θ - conjO K θ)
+      (one_mem (Formalism.HermitianLatticesTheory.hcompl (K := K) p))).mpr hmem
   rwa [map_one, div_one, map_sub, algebraMap_conjO] at h
 
 end Formalism.HermitianLattices.Ext.L3.WA

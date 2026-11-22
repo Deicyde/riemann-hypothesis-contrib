@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.Differentia
 
 @[expose] public section
 
-open MvPolynomial Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.Cj GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.Cj
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Topology
 
 noncomputable section
@@ -18,43 +21,48 @@ section Helpers
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem affCoord_eq_of_orbit (p : (k : K) → ι k) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') :
-    affCoord p z = affCoord p z' := by
+theorem affCoord_eq_of_orbit (p : (k : K) → ι k) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
+    : affCoord p z = affCoord p z' := by
   obtain ⟨c, hc, rfl⟩ := h
   funext q
   simp only [affCoord]
   exact mul_div_mul_left _ _ (hc q.1)
 
-theorem affCoord_cj (p : (k : K) → ι k) (z : (Σ k, ι k) → ℂ) :
-    affCoord p (cj z) = cj (affCoord p z) := by
+theorem affCoord_cj (p : (k : K) → ι k) (z : (Σ k, ι k) → ℂ)
+    : affCoord p (cj z) = cj (affCoord p z) := by
   funext q
   simp [affCoord, cj, map_div₀]
 
-theorem ne_zero_of_orbit_cj {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z (cj z')) {q : Σ k, ι k}
-    (hq : z q ≠ 0) : z' q ≠ 0 := by
+theorem ne_zero_of_orbit_cj
+    {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z (cj z')) {q : Σ k, ι k} (hq : z q ≠ 0)
+    : z' q ≠ 0 := by
   obtain ⟨c, -, rfl⟩ := h
   intro h0
   exact hq (by simp [cj, h0])
 
-theorem analyticAt_affCoord {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {f : E → (Σ k, ι k) → ℂ} {a : E} (p : (k : K) → ι k)
-    (hf : ∀ q, AnalyticAt ℂ (fun y => f y q) a) (h0 : ∀ k, f a ⟨k, p k⟩ ≠ 0) :
-    AnalyticAt ℂ (fun y => affCoord p (f y)) a := by
+theorem analyticAt_affCoord
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {f : E → (Σ k, ι k) → ℂ} {a : E}
+    (p : (k : K) → ι k)
+    (hf : ∀ q, AnalyticAt ℂ (fun y => f y q) a) (h0 : ∀ k, f a ⟨k, p k⟩ ≠ 0)
+    : AnalyticAt ℂ (fun y => affCoord p (f y)) a := by
   rw [analyticAt_pi_iff]
   intro q
   exact (hf q).div (hf ⟨q.1, p q.1⟩) (h0 q.1)
 
-theorem analyticAt_star_comp {e : ℕ} {ψ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {w : Fin e → ℂ}
-    (h : AnalyticAt ℂ ψ w) : AnalyticAt ℂ (star ∘ ψ ∘ star) (star w) := by
+theorem analyticAt_star_comp
+    {e : ℕ} {ψ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {w : Fin e → ℂ} (h : AnalyticAt ℂ ψ w)
+    : AnalyticAt ℂ (star ∘ ψ ∘ star) (star w) := by
   refine GlobalTheory.SCV.analyticAt_iff_eventually_differentiableAt.2 ?_
   have hs : Filter.Tendsto (star : (Fin e → ℂ) → Fin e → ℂ) (𝓝 (star w)) (𝓝 w) := by
     simpa using (continuous_star.tendsto (star w))
   filter_upwards [hs.eventually h.eventually_analyticAt] with v hv
   simpa using hv.differentiableAt.star_star
 
-theorem ker_fderiv_star_comp {e : ℕ} {ψ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {w : Fin e → ℂ}
-    (h : DifferentiableAt ℂ ψ w) (hk : (fderiv ℂ ψ w).ker = ⊥) :
-    (fderiv ℂ (star ∘ ψ ∘ star) (star w)).ker = ⊥ := by
+theorem ker_fderiv_star_comp
+    {e : ℕ} {ψ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {w : Fin e → ℂ}
+    (h : DifferentiableAt ℂ ψ w) (hk : (fderiv ℂ ψ w).ker = ⊥)
+    : (fderiv ℂ (star ∘ ψ ∘ star) (star w)).ker = ⊥ := by
   rw [h.hasFDerivAt.star_star.fderiv, eq_bot_iff]
   intro v hv
   have hv' : star (fderiv ℂ ψ w (star v)) = 0 := by simpa using hv
@@ -66,7 +74,17 @@ theorem ker_fderiv_star_comp {e : ℕ} {ψ : (Fin e → ℂ) → (Σ k, ι k) �
 
 end Helpers
 
-theorem conj_analytic : ∀ {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X} {P : Ideal (MRing ι)} {U : X → Set X} {lift : X → X → (Σ k, ι k) → ℂ}, IsLiftSys A P U lift → ∀ (c : X → X), (∀ x, SameOrbit (lift (c x) (c x)) (cj (lift x x))) → Continuous c → ∀ j k, AnalyticOnNhd ℂ (fun z => star (A.chart k (c ((A.chart j).symm z)))) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' (c ⁻¹' (A.chart k).source)) := by
+theorem conj_analytic
+    : ∀ {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {e : ℕ} {X : Type}
+        [TopologicalSpace X] {A : FinHolAtlas e X} {P : Ideal (MRing ι)} {U : X → Set X}
+        {lift : X → X → (Σ k, ι k) → ℂ},
+      IsLiftSys A P U lift
+        → ∀ (c : X → X),
+          (∀ x, SameOrbit (lift (c x) (c x)) (cj (lift x x))) → Continuous c
+            → ∀ j k,
+              AnalyticOnNhd ℂ
+                (fun z => star (A.chart k (c ((A.chart j).symm z))))
+                ((A.chart j).target ∩ (A.chart j).symm ⁻¹' (c ⁻¹' (A.chart k).source)) := by
   intro K _ ι _ e X _ A P U lift hL c hc hcc j k w hw
   obtain ⟨hUo, hUm, hH, hM, hCp, -, -, hIm⟩ := hL
   obtain ⟨hw1, hw2⟩ := hw
@@ -91,18 +109,21 @@ theorem conj_analytic : ∀ {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fin
   have hFc : ContinuousAt (fun z => star (A.chart k (c ((A.chart j).symm z)))) w := by
     have h1 : ContinuousAt (A.chart k) (c ((A.chart j).symm w)) := by
       rw [hx₀, hx₁]; exact (A.chart k).continuousAt hw2'
-    exact continuous_star.continuousAt.comp (ContinuousAt.comp (f := fun y => c ((A.chart j).symm y)) h1 hcs)
-  have hFw : star (A.chart k (c ((A.chart j).symm w))) = star (A.chart k x₁) := by
-    rw [hx₀, hx₁]
+    exact continuous_star.continuousAt.comp
+      (ContinuousAt.comp (f := fun y => c ((A.chart j).symm y)) h1 hcs)
+  have hFw : star (A.chart k (c ((A.chart j).symm w))) = star (A.chart k x₁) := by rw [hx₀, hx₁]
   have e1 : ∀ᶠ y in 𝓝 w, (A.chart j).symm y ∈ U x₀ :=
     hsc ((hUo x₀).mem_nhds (by rw [hx₀]; exact hUm x₀))
   have e2 : ∀ᶠ y in 𝓝 w, c ((A.chart j).symm y) ∈ (A.chart k).source ∩ U x₁ :=
     hcs (((A.chart k).open_source.inter (hUo x₁)).mem_nhds (by
       change c ((A.chart j).symm w) ∈ _
-      rw [hx₀, hx₁]; exact ⟨hw2', hUm x₁⟩))
-  refine GlobalTheory.T.analytic_of_immersion_composition (fun z => star (A.chart k (c ((A.chart j).symm z))))
+      rw [hx₀, hx₁]
+      exact ⟨hw2', hUm x₁⟩))
+  refine GlobalTheory.T.analytic_of_immersion_composition
+    (fun z => star (A.chart k (c ((A.chart j).symm z))))
     (star ∘ (fun w' => affCoord p (lift x₁ ((A.chart k).symm w'))) ∘ star)
-    (fun y => affCoord p (lift x₀ ((A.chart j).symm y))) w ?_ ?_ hHa hFc ?_
+    (fun y => affCoord p (lift x₀ ((A.chart j).symm y)))
+    w ?_ ?_ hHa hFc ?_
   · rw [hFw]; exact analyticAt_star_comp hψ
   · rw [hFw]; exact ker_fderiv_star_comp hψ.differentiableAt hker
   · filter_upwards [e1, e2] with y h1 h2
@@ -112,7 +133,9 @@ theorem conj_analytic : ∀ {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fin
     have ho2 : SameOrbit (lift y' y') (lift x₀ y') := hCp _ _ _ ⟨hUm _, h1⟩
     have ho : SameOrbit (lift x₁ (c y')) (cj (lift x₀ y')) :=
       sameOrbit_trans ho1 (sameOrbit_trans (hc y') (sameOrbit_cj ho2))
-    have hst : (star : ((Σ k, ι k) → ℂ) → _) (cj (affCoord p (lift x₀ y'))) = affCoord p (lift x₀ y') := by
+    have hst
+        : (star : ((Σ k, ι k) → ℂ) → _) (cj (affCoord p (lift x₀ y')))
+          = affCoord p (lift x₀ y') := by
       funext q; simp [cj]
     simp only [Function.comp, star_star, hy', (A.chart k).left_inv h2s]
     rw [affCoord_eq_of_orbit p ho, affCoord_cj, hst]

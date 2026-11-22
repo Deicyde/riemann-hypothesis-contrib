@@ -16,12 +16,13 @@ open NumberField IsDedekindDomain Module
 
 namespace GlobalTheory.OntoChain
 
-open Formalism.BasicNotions Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx
 
 section Roots
 
 variable {K G : Type} [Field K] [NumberField K] [Group G] [Finite G]
-
 
 omit [NumberField K] in
 theorem isIntegral_char (χ : G →* Kˣ) (g : G) : IsIntegral ℤ ((χ g : Kˣ) : K) := by
@@ -33,21 +34,22 @@ end Roots
 
 section Twisted
 
-variable {LL Ks : Type} [Field LL] [NumberField LL] [Field Ks] [NumberField Ks] [Algebra Ks LL] {n : ℕ}
+variable
+  {LL Ks : Type} [Field LL] [NumberField LL] [Field Ks] [NumberField Ks] [Algebra Ks LL] {n : ℕ}
 variable {W : (LL →+* ℂ) → Type} [∀ σ, NormedAddCommGroup (W σ)] [∀ σ, InnerProductSpace ℂ (W σ)]
 variable {G : Type} [Group G] [Fintype G] (A : Arith.FormsL LL Ks (Fin n → LL) W G)
 
 def twRep : Representation LL G (Fin n → LL) where
   toFun g := (((A.chi g)⁻¹ : LLˣ) : LL) • A.ρ g
   map_one' := by rw [map_one, map_one, inv_one, Units.val_one, one_smul]
-  map_mul' g h := by
-    rw [map_mul, map_mul, mul_inv, Units.val_mul, smul_mul_smul_comm]
+  map_mul' g h := by rw [map_mul, map_mul, mul_inv, Units.val_mul, smul_mul_smul_comm]
 
 omit [Fintype G] in
-theorem twRep_apply (g : G) (x : Fin n → LL) : twRep A g x = (((A.chi g)⁻¹ : LLˣ) : LL) • A.ρ g x := rfl
+theorem twRep_apply (g : G) (x : Fin n → LL) : twRep A g x = (((A.chi g)⁻¹ : LLˣ) : LL) • A.ρ g x :=
+  rfl
 
-
-theorem eOp_eq (a : MonoidAlgebra LL G) : A.eOp (fun g => a.coeff g) = (twRep A).asAlgebraHom a := by
+theorem eOp_eq (a : MonoidAlgebra LL G)
+    : A.eOp (fun g => a.coeff g) = (twRep A).asAlgebraHom a := by
   classical
   have ha : a = ∑ g : G, MonoidAlgebra.single g (a.coeff g) := by
     ext g
@@ -60,9 +62,7 @@ theorem eOp_eq (a : MonoidAlgebra LL G) : A.eOp (fun g => a.coeff g) = (twRep A)
   rw [Representation.asAlgebraHom_single, mul_smul]
   rfl
 
-
 def supLat : Submodule (𝓞 LL) (Fin n → LL) := Submodule.span (𝓞 LL) (A.MK : Set (Fin n → LL))
-
 
 omit [Fintype G] in
 theorem supLat_isLatIn (h1 : A.IsKsForm) (h2 : A.MKFull) : IsLatIn ⊤ (supLat A) := by
@@ -80,26 +80,33 @@ theorem supLat_isLatIn (h1 : A.IsKsForm) (h2 : A.MKFull) : IsLatIn ⊤ (supLat A
           funext i
           simp only [Pi.smul_apply, Algebra.smul_def]
           rfl
-        rw [this]; exact Submodule.smul_mem _ _ hx
+        rw [this]
+        exact Submodule.smul_mem _ _ hx
   · obtain ⟨m, b, hb, -, -, -, htop⟩ := h1
     rw [eq_top_iff, ← htop]
     refine Submodule.span_le.2 ?_
     rintro _ ⟨i, rfl⟩
     have hi := hb i
     rw [← h2.2] at hi
-    refine Submodule.span_induction (p := fun x _ => x ∈ Submodule.span LL (supLat A : Set (Fin n → LL)))
-      (fun x hx => Submodule.subset_span (Submodule.subset_span hx)) (Submodule.zero_mem _)
-      (fun x y _ _ hx hy => Submodule.add_mem _ hx hy) (fun a x _ hx => ?_) hi
+    refine Submodule.span_induction
+      (p := fun x _ => x ∈ Submodule.span LL (supLat A : Set (Fin n → LL)))
+      (fun x hx => Submodule.subset_span (Submodule.subset_span hx))
+      (Submodule.zero_mem _)
+      (fun x y _ _ hx hy => Submodule.add_mem _ hx hy)
+      (fun a x _ hx => ?_)
+      hi
     rw [← algebraMap_smul LL a x]
     exact Submodule.smul_mem _ _ hx
 
-theorem supLat_stable (h : A.MKStable) (g : G) :
-    (supLat A).map ((twRep A g).restrictScalars (𝓞 LL)) ≤ supLat A := by
+theorem supLat_stable (h : A.MKStable) (g : G)
+    : (supLat A).map ((twRep A g).restrictScalars (𝓞 LL)) ≤ supLat A := by
   unfold supLat
   rw [Submodule.map_span, Submodule.span_le]
   rintro _ ⟨x, hx, rfl⟩
-  have e : ((twRep A g).restrictScalars (𝓞 LL)) x =
-      (⟨_, isIntegral_char A.chi⁻¹ g⟩ : 𝓞 LL) • A.ρ g x := rfl
+  have e
+      : ((twRep A g).restrictScalars (𝓞 LL)) x
+        = (⟨_, isIntegral_char A.chi⁻¹ g⟩ : 𝓞 LL) • A.ρ g x :=
+    rfl
   rw [e]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ((h g x).2 hx))
 
@@ -107,8 +114,11 @@ end Twisted
 
 section Block
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
-  {B : BlockDat K G Pl0} {ℓ : Lvl K G} {Z : Submodule K B.S.Forms} {v0 : InfinitePlace K} {s : ℕ}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 : Type} {B : BlockDat K G Pl0}
+  {ℓ : Lvl K G} {Z : Submodule K B.S.Forms} {v0 : InfinitePlace K} {s : ℕ}
 
 end Block
 
@@ -119,20 +129,22 @@ variable {k : Type} [Field k] {r n : ℕ}
 def glCast (hr : r = n + 1) : GL (Fin (n + 1)) k ≃* GL (Fin r) k :=
   Units.mapEquiv (Matrix.reindexAlgEquiv k k (finCongr hr.symm)).toMulEquiv
 
-theorem glCast_mem_unip (hr : r = n + 1) (h : GL (Fin (n + 1)) k) :
-    glCast hr h ∈ unip k r ↔ IsUniU (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) := by
+theorem glCast_mem_unip (hr : r = n + 1) (h : GL (Fin (n + 1)) k)
+    : glCast hr h ∈ unip k r ↔ IsUniU (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) := by
   subst hr
   exact ⟨fun hh => ⟨hh.2, fun _ _ hij => hh.1 hij⟩, fun hh => ⟨fun i j hij => hh.2 i j hij, hh.1⟩⟩
 
-theorem edgeSum_glCast (hr : r = n + 1) (h : GL (Fin (n + 1)) k) :
-    edgeSum supEdge (glCast hr h) = supd (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) := by
+theorem edgeSum_glCast (hr : r = n + 1) (h : GL (Fin (n + 1)) k)
+    : edgeSum supEdge (glCast hr h) = supd (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) := by
   subst hr
   show (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), if j.val = i.val + 1 then
     (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) i j else 0) = _
   unfold supd
   rw [Fin.sum_univ_castSucc]
-  have h0 : (∑ j : Fin (n + 1), if j.val = (Fin.last n).val + 1 then
-      (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.last n) j else 0) = 0 :=
+  have h0
+      : (∑ j : Fin (n + 1), if j.val = (Fin.last n).val + 1 then
+          (h : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.last n) j else 0)
+        = 0 :=
     Finset.sum_eq_zero fun j _ => if_neg (by have := j.2; simp; omega)
   rw [h0, add_zero]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -143,28 +155,32 @@ theorem edgeSum_glCast (hr : r = n + 1) (h : GL (Fin (n + 1)) k) :
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem exists_uni_supd (hn : 0 < n) (a : k) :
-    ∃ u : GL (Fin (n + 1)) k, IsUniU (u : Matrix (Fin (n + 1)) (Fin (n + 1)) k) ∧
-      supd (u : Matrix (Fin (n + 1)) (Fin (n + 1)) k) = a := by
+theorem exists_uni_supd (hn : 0 < n) (a : k)
+    : ∃ u : GL (Fin (n + 1)) k,
+      IsUniU (u : Matrix (Fin (n + 1)) (Fin (n + 1)) k)
+        ∧ supd (u : Matrix (Fin (n + 1)) (Fin (n + 1)) k) = a := by
   let i0 : Fin n := ⟨0, hn⟩
   have hne : i0.castSucc ≠ i0.succ := (Fin.castSucc_lt_succ (i := i0)).ne
   have hdet : (Matrix.transvection i0.castSucc i0.succ a).det ≠ 0 := by
     rw [Matrix.det_transvection_of_ne _ _ hne]; exact one_ne_zero
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero _ hdet, ⟨fun i => ?_, fun i j hij => ?_⟩, ?_⟩
   · show Matrix.transvection i0.castSucc i0.succ a i i = 1
-    rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_eq, Matrix.single_apply_of_ne, add_zero]
+    rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_eq, Matrix.single_apply_of_ne,
+      add_zero]
     rintro ⟨h1, h2⟩
     exact hne (h1.trans h2.symm)
   · show Matrix.transvection i0.castSucc i0.succ a i j = 0
-    rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_ne hij.ne', Matrix.single_apply_of_ne, add_zero]
+    rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_ne hij.ne',
+      Matrix.single_apply_of_ne, add_zero]
     rintro ⟨rfl, rfl⟩
     exact absurd hij (Fin.castSucc_lt_succ (i := i0)).not_gt
   · show ∑ i : Fin n, Matrix.transvection i0.castSucc i0.succ a i.castSucc i.succ = a
     rw [Finset.sum_eq_single i0]
-    · rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_ne hne, Matrix.single_apply_same, zero_add]
+    · rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_ne hne, Matrix.single_apply_same,
+        zero_add]
     · intro i _ hi
-      rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply_ne (Fin.castSucc_lt_succ (i := i)).ne,
-        Matrix.single_apply_of_ne, add_zero]
+      rw [Matrix.transvection, Matrix.add_apply,
+        Matrix.one_apply_ne (Fin.castSucc_lt_succ (i := i)).ne, Matrix.single_apply_of_ne, add_zero]
       rintro ⟨h1, -⟩
       exact hi (Fin.castSucc_injective _ h1).symm
     · intro h
@@ -174,16 +190,21 @@ end Local
 
 section Product
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] [DecidableEq ι] {kf : ι → Type}
-  [∀ v, Field (kf v)] [∀ v, Fintype (kf v)] {n : ℕ}
-
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {kf : ι → Type} [∀ v, Field (kf v)] [∀ v, Fintype (kf v)]
+  {n : ℕ}
 
 omit [NumberField K] in
-theorem exists_psiU_eq (hn : 0 < n) (v : ι) (a : kf v) :
-    ∃ u ∈ Subgroup.pi Set.univ (fun v => uniSub (kf v) n),
-      (∀ w, supd (((u w : mirabSub (kf w) n) : GL (Fin (n + 1)) (kf w)) : Matrix (Fin (n + 1)) (Fin (n + 1)) (kf w)) =
-        Pi.single (M := kf) v a w) ∧
-      ∀ χ : ∀ v, AddChar (kf v) (𝓞 K), psiU kf n χ (fun v => mirabSub (kf v) n) u = χ v a := by
+theorem exists_psiU_eq (hn : 0 < n) (v : ι) (a : kf v)
+    : ∃ u ∈ Subgroup.pi Set.univ (fun v => uniSub (kf v) n),
+      (∀ w,
+          supd
+              (((u w : mirabSub (kf w) n) : GL (Fin (n + 1)) (kf w))
+                : Matrix (Fin (n + 1)) (Fin (n + 1)) (kf w))
+            = Pi.single (M := kf) v a w)
+        ∧ ∀ χ : ∀ v, AddChar (kf v) (𝓞 K), psiU kf n χ (fun v => mirabSub (kf v) n) u = χ v a := by
   choose u hu hs using fun w => exists_uni_supd hn (Pi.single (M := kf) v a w)
   refine ⟨fun w => ⟨u w, isMirab_of_isUniU _ (hu w)⟩, fun w _ => hu w, hs, fun χ => ?_⟩
   unfold psiU
@@ -222,8 +243,11 @@ section Level
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A)
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  (R : RealDat D A Ks) (F : Face D A)
 
 abbrev Res (v : R.Pg) : Type := kP v.1
 
@@ -248,31 +272,42 @@ theorem mirIncl_injective : Function.Injective (mirIncl R) := by
   funext v
   exact Subtype.ext ((glCast (rank_eq D.R)).injective (congrFun h' v))
 
-theorem mem_pi_unip_iff (g : G0 R.Pg D.R.r) :
-    g ∈ Subgroup.pi Set.univ (fun v : R.Pg => unip (kP v.1) D.R.r) ↔ ∃ u ∈ uni R, mirToGL R u = g := by
+theorem mem_pi_unip_iff (g : G0 R.Pg D.R.r)
+    : g ∈ Subgroup.pi Set.univ (fun v : R.Pg => unip (kP v.1) D.R.r)
+      ↔ ∃ u ∈ uni R, mirToGL R u = g := by
   constructor
   · intro h
-    have hu : ∀ v : R.Pg, IsUniU (((glCast (rank_eq D.R)).symm (g v) : GL (Fin (rankPred D.R + 1)) (Res R v)) :
-        Matrix (Fin (rankPred D.R + 1)) (Fin (rankPred D.R + 1)) (Res R v)) := fun v =>
-      (glCast_mem_unip (rank_eq D.R) _).1 (by rw [MulEquiv.apply_symm_apply]; exact h v (Set.mem_univ v))
-    exact ⟨fun v => ⟨_, isMirab_of_isUniU _ (hu v)⟩, fun v _ => hu v,
-      funext fun v => (glCast (rank_eq D.R)).apply_symm_apply _⟩
+    have hu
+        : ∀ v : R.Pg,
+          IsUniU
+            (((glCast (rank_eq D.R)).symm (g v) : GL (Fin (rankPred D.R + 1)) (Res R v))
+              : Matrix (Fin (rankPred D.R + 1)) (Fin (rankPred D.R + 1)) (Res R v)) := fun v =>
+      (glCast_mem_unip (rank_eq D.R) _).1
+        (by rw [MulEquiv.apply_symm_apply]; exact h v (Set.mem_univ v))
+    exact ⟨
+      fun v => ⟨_, isMirab_of_isUniU _ (hu v)⟩,
+      fun v _ => hu v,
+      funext fun v => (glCast (rank_eq D.R)).apply_symm_apply _
+    ⟩
   · rintro ⟨u, hu, rfl⟩ v _
     exact (glCast_mem_unip (rank_eq D.R) _).2 (hu v (Set.mem_univ v))
 
 structure IsLevelChar (χ : ∀ v : R.Pg, AddChar (Res R v) (𝓞 D.what₂.LL)) : Prop where
   generic : IsGenericChar (Res R) χ
-  val : ∀ u ∈ uni R, ∀ h : mirIncl R u ∈ F.P0,
-    ((psiU (Res R) (rankPred D.R) χ _ u : 𝓞 D.what₂.LL) : D.what₂.LL) = ((F.ψ0⁻¹ ⟨mirIncl R u, h⟩ : D.what₂.LLˣ) : D.what₂.LL)
+  val
+    : ∀ u ∈ uni R, ∀ h : mirIncl R u ∈ F.P0,
+      ((psiU (Res R) (rankPred D.R) χ _ u : 𝓞 D.what₂.LL) : D.what₂.LL)
+        = ((F.ψ0⁻¹ ⟨mirIncl R u, h⟩ : D.what₂.LLˣ) : D.what₂.LL)
 
 variable {R F}
 
 theorem mem_base_iff (h : R.grp_levels F) (g : G) : g ∈ F.P0 ↔ ∃ u ∈ uni R, mirIncl R u = g := by
   obtain ⟨ψ, -, h0, -⟩ := h
-  have h1 : F.P0.comap R.eG.symm.toMonoidHom = Subgroup.pi Set.univ (fun v : R.Pg => unip (kP v.1) D.R.r) :=
+  have h1
+      : F.P0.comap R.eG.symm.toMonoidHom
+        = Subgroup.pi Set.univ (fun v : R.Pg => unip (kP v.1) D.R.r) :=
     congrArg LevelP.H h0
-  have h2 : g ∈ F.P0 ↔ R.eG g ∈ F.P0.comap R.eG.symm.toMonoidHom := by
-    rw [Subgroup.mem_comap]; simp
+  have h2 : g ∈ F.P0 ↔ R.eG g ∈ F.P0.comap R.eG.symm.toMonoidHom := by rw [Subgroup.mem_comap]; simp
   rw [h2, h1, mem_pi_unip_iff]
   refine exists_congr fun u => and_congr_right fun _ => ?_
   rw [← eG_mirIncl, R.eG.injective.eq_iff]
@@ -281,26 +316,34 @@ theorem exists_isLevelChar (h : R.grp_levels F) : ∃ χ, IsLevelChar R F χ := 
   classical
   have hmem := mem_base_iff h
   obtain ⟨ψ, hgen, h0, -⟩ := h
-  have key : ∀ (L L' : LevelP R.Pg D.R.r ℂ), L = L' → ∀ g (hg : g ∈ L.H) (hg' : g ∈ L'.H),
-      L.chi ⟨g, hg⟩ = L'.chi ⟨g, hg'⟩ := by
+  have key
+      : ∀ (L L' : LevelP R.Pg D.R.r ℂ),
+        L = L' → ∀ g (hg : g ∈ L.H) (hg' : g ∈ L'.H), L.chi ⟨g, hg⟩ = L'.chi ⟨g, hg'⟩ := by
     rintro L _ rfl g hg hg'; rfl
-  have hval : ∀ u ∈ uni R, ∀ hu : mirIncl R u ∈ F.P0,
-      D.what₂.embLL ((F.ψ0 ⟨mirIncl R u, hu⟩ : D.what₂.LLˣ) : D.what₂.LL) =
-        ∏ v : R.Pg, ψ v.1 (supd (((u v : mirabSub (Res R v) (rankPred D.R)) : GL (Fin (rankPred D.R + 1)) (Res R v)) :
-          Matrix (Fin (rankPred D.R + 1)) (Fin (rankPred D.R + 1)) (Res R v))) := by
+  have hval
+      : ∀ u ∈ uni R, ∀ hu : mirIncl R u ∈ F.P0,
+        D.what₂.embLL ((F.ψ0 ⟨mirIncl R u, hu⟩ : D.what₂.LLˣ) : D.what₂.LL)
+          = ∏ v : R.Pg, ψ v.1 (supd (((u v : mirabSub (Res R v) (rankPred D.R)) : GL (Fin (rankPred D.R + 1)) (Res R v)) :
+              Matrix (Fin (rankPred D.R + 1)) (Fin (rankPred D.R + 1)) (Res R v))) := by
     intro u hu hu'
-    have e := congrArg Units.val (key _ _ h0 (mirToGL R u) hu' ((mem_pi_unip_iff R _).2 ⟨u, hu, rfl⟩))
+    have e :=
+      congrArg Units.val (key _ _ h0 (mirToGL R u) hu' ((mem_pi_unip_iff R _).2 ⟨u, hu, rfl⟩))
     refine Eq.trans e ?_
     letI : IsOneApply ((Subgroup.pi Set.univ fun v : R.Pg => unip (kP v.1) D.R.r) →* ℂˣ) := ⟨by intros; rfl⟩
     letI : IsMulApply ((Subgroup.pi Set.univ fun v : R.Pg => unip (kP v.1) D.R.r) →* ℂˣ) := ⟨by intros; rfl⟩
-    refine (congrArg Units.val (prod_apply Finset.univ (fun v : R.Pg =>
-      (addCharHom (ψ v.1) (supHom (kP v.1) D.R.r)).comp (LevelP.prj (fun v : R.Pg => unip (kP v.1) D.R.r) v))
+    refine (congrArg Units.val
+      (prod_apply Finset.univ
+        (fun v : R.Pg =>
+          (addCharHom (ψ v.1) (supHom (kP v.1) D.R.r)).comp
+            (LevelP.prj (fun v : R.Pg => unip (kP v.1) D.R.r) v))
         _)).trans ?_
     rw [Units.coe_prod]
     refine Finset.prod_congr rfl fun v _ => ?_
     rw [← edgeSum_glCast (rank_eq D.R)]
     rfl
-  have hex : ∀ (v : R.Pg) (a : Res R v), ∃ z : 𝓞 D.what₂.LL, D.what₂.embLL (z : D.what₂.LL) = ψ v.1 (-a) := by
+  have hex
+      : ∀ (v : R.Pg) (a : Res R v), ∃ z : 𝓞 D.what₂.LL,
+        D.what₂.embLL (z : D.what₂.LL) = ψ v.1 (-a) := by
     intro v a
     obtain ⟨u, hu, hs, -⟩ := exists_psiU_eq (K := D.what₂.LL) (rankPred_pos D.R) v (-a)
     have hm := (hmem _).2 ⟨u, hu, rfl⟩
@@ -313,29 +356,36 @@ theorem exists_isLevelChar (h : R.grp_levels F) : ∃ χ, IsLevelChar R F χ := 
     · intro h
       exact absurd (Finset.mem_univ _) h
   choose z hz using hex
-  have hinj : ∀ x y : 𝓞 D.what₂.LL, D.what₂.embLL (x : D.what₂.LL) = D.what₂.embLL (y : D.what₂.LL) → x = y :=
-    fun x y hxy => Subtype.ext (D.what₂.embLL.injective hxy)
-  let χ : ∀ v : R.Pg, AddChar (Res R v) (𝓞 D.what₂.LL) := fun v =>
-    { toFun := z v
-      map_zero_eq_one' := hinj _ _ (by rw [hz, neg_zero, AddChar.map_zero_eq_one]; simp)
-      map_add_eq_mul' := fun a b => hinj _ _ (by
-        rw [hz, neg_add, AddChar.map_add_eq_mul, ← hz, ← hz, ← map_mul]; rfl) }
+  have hinj
+      : ∀ x y : 𝓞 D.what₂.LL,
+        D.what₂.embLL (x : D.what₂.LL) = D.what₂.embLL (y : D.what₂.LL) → x = y := fun x y hxy =>
+    Subtype.ext (D.what₂.embLL.injective hxy)
+  let χ : ∀ v : R.Pg, AddChar (Res R v) (𝓞 D.what₂.LL) := fun v => {
+    toFun := z v
+    map_zero_eq_one' := hinj _ _ (by rw [hz, neg_zero, AddChar.map_zero_eq_one]; simp)
+    map_add_eq_mul' := fun a b =>
+      hinj _ _ (by rw [hz, neg_add, AddChar.map_add_eq_mul, ← hz, ← hz, ← map_mul]; rfl)
+  }
   refine ⟨χ, fun v hv => hgen v.1 v.2 ?_, fun u hu hm => D.what₂.embLL.injective ?_⟩
   · ext a
     have h1 : z v (-a) = 1 := congrArg (fun c : AddChar (Res R v) (𝓞 D.what₂.LL) => c (-a)) hv
     have h2 := hz v (-a)
     rw [h1, neg_neg] at h2
-    rw [← h2]; simp
-  · rw [MonoidHom.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, hval u hu hm, ← Finset.prod_inv_distrib]
+    rw [← h2]
+    simp
+  · rw [MonoidHom.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, hval u hu hm,
+      ← Finset.prod_inv_distrib]
     unfold psiU
-    rw [show ∀ y : 𝓞 D.what₂.LL, D.what₂.embLL (y : D.what₂.LL) =
-      (D.what₂.embLL.comp (algebraMap (𝓞 D.what₂.LL) D.what₂.LL)) y from fun _ => rfl, map_prod]
+    rw [show ∀ y : 𝓞 D.what₂.LL,
+          D.what₂.embLL (y : D.what₂.LL)
+            = (D.what₂.embLL.comp (algebraMap (𝓞 D.what₂.LL) D.what₂.LL)) y from fun _ =>
+        rfl,
+      map_prod]
     refine Finset.prod_congr rfl fun v _ => ?_
     rw [← AddChar.map_neg_eq_inv]
     exact hz v _
 
 variable (R F)
-
 
 open Classical in
 def levelChar : ∀ v : R.Pg, AddChar (Res R v) (𝓞 D.what₂.LL) :=
@@ -352,104 +402,92 @@ theorem levelChar_spec (h : R.grp_levels F) : IsLevelChar R F (levelChar R F) :=
 end Level
 
 structure ChainArgs (K : Type) [Field K] [NumberField K] (J : Type) (nZ : J → ℕ) where
-
   Th1 : HeightOneSpectrum (𝓞 K) → ∀ j, Submodule (𝓞 K) (Fin (nZ j) → K)
-
   Th : HeightOneSpectrum (𝓞 K) → ∀ j, Submodule (𝓞 K) (Fin (nZ j) → K)
-
   ThK : HeightOneSpectrum (𝓞 K) → ∀ j, Submodule (𝓞 K) (Fin (nZ j) → K)
-
   Th0 : HeightOneSpectrum (𝓞 K) → ∀ j, Submodule (𝓞 K) (Fin (nZ j) → K)
-
   ThJ : HeightOneSpectrum (𝓞 K) → ∀ j, Submodule (𝓞 K) (Fin (nZ j) → K)
-
   X₃ : HeightOneSpectrum (𝓞 K) → ∀ j, Submodule (𝓞 K) (Fin (nZ j) → K)
-
   σ : HeightOneSpectrum (𝓞 K) → J → K
-
   a : HeightOneSpectrum (𝓞 K) → J → K
-
   E : HeightOneSpectrum (𝓞 K) → J → ℕ
-
   r1 : HeightOneSpectrum (𝓞 K) → J → ℝ
-
   r2 : HeightOneSpectrum (𝓞 K) → J → ℝ
-
   ε0 : HeightOneSpectrum (𝓞 K) → J → ℝ
-
   nnK : J → K
-
   Jp : J → ℕ → ℝ
-
   bp : ℝ
-
   Sc : ℝ
-
   eta : ℝ
-
   T : ℝ
-
   DF : ℝ
-
   X2 : ℝ
-
   x : ℝ
-
   eps : ℝ
-
   vd : ℝ
-
   de2 : ℝ
-
   Nc : ℝ
-
   wt : J → ℝ
-
   th : ℕ → ℝ
-
   ad : ℕ → ℝ
 
-def ChainArgs.ofObj {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df}
-    {P : Type} [Group P] [Finite P] {c : OnConst} (O : OnObj S P c) : ChainArgs K Bs.J O.nZ :=
-  { O with }
+def ChainArgs.ofObj
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P : Type} [Group P] [Finite P]
+    {c : OnConst} (O : OnObj S P c)
+    : ChainArgs K Bs.J O.nZ := {
+  O with
+}
 
 section Objects
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A)
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  (R : RealDat D A Ks) (F : Face D A)
 
 abbrev liftLvl : Lvl D.what₂.LL G := A.fam.lvlA F.P0 F.ψ0
 
-abbrev liftSub (j : Fin D.R.m) (t : T) : Submodule D.what₂.LL (A.fam.L j t).S.Forms := (R.toCx F).zs.Zl j t
+abbrev liftSub (j : Fin D.R.m) (t : T) : Submodule D.what₂.LL (A.fam.L j t).S.Forms :=
+  (R.toCx F).zs.Zl j t
 
-abbrev srcDim (j : Fin D.R.m) (t : T) : ℕ := (A.fam.L j t).S.lvlDim (A.fam.L j t).r (liftLvl F).P (liftLvl F).ψ
+abbrev srcDim (j : Fin D.R.m) (t : T) : ℕ :=
+  (A.fam.L j t).S.lvlDim (A.fam.L j t).r (liftLvl F).P (liftLvl F).ψ
 
-def goodOp (j : Fin D.R.m) : (Fin (R.nW j) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (R.nW j) → D.what₂.LL) :=
+def goodOp (j : Fin D.R.m)
+    : (Fin (R.nW j) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (R.nW j) → D.what₂.LL) :=
   (R.FW j).eOp fun g => (idemOf A.X).coeff g
 
-def coordMap (j : Fin D.R.m) :
-    (Fin (finrank D.what₂.LL (R.WL F false j)) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (R.nW j) → D.what₂.LL) :=
+def coordMap (j : Fin D.R.m)
+    : (Fin (finrank D.what₂.LL (R.WL F false j)) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (R.nW j) → D.what₂.LL) :=
   Fintype.linearCombination D.what₂.LL (R.bL F false j)
 
-def thetaMat (j : Fin D.R.m) (t : T) : Matrix (Fin (finrank D.what₂.LL (R.WL F false j)))
-    (Fin ((A.fam.L j t).dZ (liftLvl F) (liftSub R F j t))) D.what₂.LL :=
+def thetaMat (j : Fin D.R.m) (t : T)
+    : Matrix (Fin (finrank D.what₂.LL (R.WL F false j)))
+      (Fin ((A.fam.L j t).dZ (liftLvl F) (liftSub R F j t))) D.what₂.LL :=
   (R.toCx F).liftMat F.cr false j t
 
-def thetaOp (j : Fin D.R.m) (t : T) : (Fin (srcDim F j t) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (R.nW j) → D.what₂.LL) :=
+def thetaOp (j : Fin D.R.m) (t : T)
+    : (Fin (srcDim F j t) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (R.nW j) → D.what₂.LL) :=
   coordMap R F j ∘ₗ (thetaMat R F j t * (A.fam.L j t).lPr (liftLvl F) (liftSub R F j t)).mulVecLin
 
-def srcGood (j : Fin D.R.m) (t : T) : (Fin (srcDim F j t) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (srcDim F j t) → D.what₂.LL) :=
+def srcGood (j : Fin D.R.m) (t : T)
+    : (Fin (srcDim F j t) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (srcDim F j t) → D.what₂.LL) :=
   ((A.fam.L j t).S.lvlOp (A.fam.L j t).r (liftLvl F).P (liftLvl F).ψ (idemOf A.X)).mulVecLin
 
-def srcProj (j : Fin D.R.m) (t : T) : (Fin (srcDim F j t) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (srcDim F j t) → D.what₂.LL) :=
-  ((A.fam.L j t).lE (liftLvl F) (liftSub R F j t) * (A.fam.L j t).lPr (liftLvl F) (liftSub R F j t)).mulVecLin
+def srcProj (j : Fin D.R.m) (t : T)
+    : (Fin (srcDim F j t) → D.what₂.LL) →ₗ[D.what₂.LL] (Fin (srcDim F j t) → D.what₂.LL) :=
+  ((A.fam.L j t).lE (liftLvl F) (liftSub R F j t)
+    * (A.fam.L j t).lPr (liftLvl F) (liftSub R F j t)).mulVecLin
 
 def srcLat (j : Fin D.R.m) (t : T) : Submodule (𝓞 D.what₂.LL) (Fin (srcDim F j t) → D.what₂.LL) :=
   (A.fam.L j t).S.lvlNab (A.fam.L j t).r (liftLvl F).P (liftLvl F).ψ
 
-def onOf (c : OnConst) (a : ChainArgs D.what₂.LL (Fin D.R.m) R.nW) : OnObj ((R.toCx F).data F.cr false) (Mir R) c where
+def onOf (c : OnConst) (a : ChainArgs D.what₂.LL (Fin D.R.m) R.nW)
+    : OnObj ((R.toCx F).data F.cr false) (Mir R) c where
   nZ := R.nW
   ρ j := (twRep (R.FW j)).comp (mirIncl R)
   U := uni R
@@ -511,38 +549,43 @@ theorem tiePsi : TiePsi (onOf R F c a) (levelChar R F) := rfl
 
 variable {R F}
 
-theorem goodOp_idem (hX : ∀ χ ∈ A.X, IsAbsIrrChar χ) (j : Fin D.R.m) : goodOp R j ∘ₗ goodOp R j = goodOp R j := by
+theorem goodOp_idem (hX : ∀ χ ∈ A.X, IsAbsIrrChar χ) (j : Fin D.R.m)
+    : goodOp R j ∘ₗ goodOp R j = goodOp R j := by
   unfold goodOp
   rw [eOp_eq, ← Module.End.mul_eq_comp, ← map_mul, (idempotent_central _ G A.X hX).1]
 
-theorem goodOp_comm (hX : ∀ χ ∈ A.X, IsAbsIrrChar χ) (j : Fin D.R.m) (g : G) :
-    goodOp R j ∘ₗ twRep (R.FW j) g = twRep (R.FW j) g ∘ₗ goodOp R j := by
+theorem goodOp_comm (hX : ∀ χ ∈ A.X, IsAbsIrrChar χ) (j : Fin D.R.m) (g : G)
+    : goodOp R j ∘ₗ twRep (R.FW j) g = twRep (R.FW j) g ∘ₗ goodOp R j := by
   unfold goodOp
-  rw [eOp_eq, ← Representation.asAlgebraHom_of, ← Module.End.mul_eq_comp, ← Module.End.mul_eq_comp, ← map_mul, ← map_mul,
-    (idempotent_central _ G A.X hX).2]
+  rw [eOp_eq, ← Representation.asAlgebraHom_of, ← Module.End.mul_eq_comp, ← Module.End.mul_eq_comp,
+    ← map_mul, ← map_mul, (idempotent_central _ G A.X hX).2]
 
 theorem coordMap_injective (j : Fin D.R.m) : Function.Injective (coordMap R F j) :=
   linearIndependent_iff_injective_fintypeLinearCombination.1
-    ((finBasis D.what₂.LL (R.WL F false j)).linearIndependent.map' (R.WL F false j).subtype (Submodule.ker_subtype _))
+    ((finBasis D.what₂.LL (R.WL F false j)).linearIndependent.map' (R.WL F false j).subtype
+      (Submodule.ker_subtype _))
 
 theorem range_coordMap (j : Fin D.R.m) : LinearMap.range (coordMap R F j) = R.WL F false j := by
   unfold coordMap
   rw [Fintype.range_linearCombination]
-  have h := congrArg (Submodule.map (R.WL F false j).subtype) (finBasis D.what₂.LL (R.WL F false j)).span_eq
+  have h :=
+    congrArg (Submodule.map (R.WL F false j).subtype) (finBasis D.what₂.LL (R.WL F false j)).span_eq
   rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype, ← Set.range_comp] at h
   exact h
 
 variable {s : ℕ}
 
-theorem blockHyp (hOk : A.fam.Ok s) (j : Fin D.R.m) (t : T) : BlockHyp (A.fam.L j t) (liftLvl F) A.v0 s :=
+theorem blockHyp (hOk : A.fam.Ok s) (j : Fin D.R.m) (t : T)
+    : BlockHyp (A.fam.L j t) (liftLvl F) A.v0 s :=
   ⟨hOk.conj, hOk.irr, hOk.lifts j t⟩
 
-theorem leafSup (h : R.LIntegral) : LeafSup (onOf R F c a) :=
-  fun j => ⟨supLat_isLatIn _ (h j).1 (h j).2.1, fun g => supLat_stable _ (h j).2.2 (mirIncl R g)⟩
+theorem leafSup (h : R.LIntegral) : LeafSup (onOf R F c a) := fun j =>
+  ⟨supLat_isLatIn _ (h j).1 (h j).2.1, fun g => supLat_stable _ (h j).2.2 (mirIncl R g)⟩
 
 theorem leafMackey (h : R.grp_levels F) : LeafMackey (onOf R F c a) := by
   classical
-  exact leafMackey_of _ _ (mirab_levelGroups _ _) (levelChar_spec h).generic (tieU R F c a) (tiePsi R F c a)
+  exact leafMackey_of _ _ (mirab_levelGroups _ _) (levelChar_spec h).generic (tieU R F c a)
+    (tiePsi R F c a)
 
 theorem leafLevelSq (h : R.grp_record) : LeafLevelSq (onOf R F c a) (Res R) D.R.f := by
   classical
@@ -556,11 +599,13 @@ theorem leafLevelSq (h : R.grp_record) : LeafLevelSq (onOf R F c a) (Res R) D.R.
     · exact absurd hij D.host.g_ne
     · exact absurd hij.symm D.host.g_ne
     · rfl
-  have hn : ∀ i, (Finset.univ.filter fun v => Fintype.card (Res R v) = D.host.g i).card = D.R.f := by
+  have hn
+      : ∀ i, (Finset.univ.filter fun v => Fintype.card (Res R v) = D.host.g i).card = D.R.f := by
     intro i
     rw [← D.nd.card_PlG i, ← Fintype.card_subtype]
-    refine (Fintype.card_congr (Equiv.ofBijective (fun w : D.nd.PlG i => (⟨plg ⟨i, w⟩, hc ⟨i, w⟩⟩ :
-      {v // Fintype.card (Res R v) = D.host.g i})) ⟨fun x y hxy => ?_, fun v => ?_⟩)).symm
+    refine (Fintype.card_congr (Equiv.ofBijective
+      (fun w : D.nd.PlG i => (⟨plg ⟨i, w⟩, hc ⟨i, w⟩⟩ : {v // Fintype.card (Res R v) = D.host.g i}))
+      ⟨fun x y hxy => ?_, fun v => ?_⟩)).symm
     · exact eq_of_heq (Sigma.mk.inj (plg.injective (congrArg Subtype.val hxy))).2
     · obtain ⟨v, hv⟩ := v
       obtain ⟨⟨i', w⟩, rfl⟩ := plg.surjective v
@@ -595,7 +640,9 @@ theorem leafYBound {L : SizeData₂ D} (Q : ParameterChoice' D L) : LeafYBound (
     exact le_min (hg 0).1 (hg 1).1
   have h1 : ((D.R.k : ℝ) * 2) ^ 8 ≤ ((D.R.k : ℝ) * L.sc.b) ^ 8 := by gcongr
   have h2 : (D.R.f : ℝ) ^ 4 * (D.R.k : ℝ) ^ 3 ≤ (D.R.k : ℝ) ^ 8 := by
-    calc (D.R.f : ℝ) ^ 4 * (D.R.k : ℝ) ^ 3 ≤ (D.R.k : ℝ) ^ 4 * (D.R.k : ℝ) ^ 4 := by gcongr; norm_num
+    calc
+      (D.R.f : ℝ) ^ 4 * (D.R.k : ℝ) ^ 3
+        ≤ (D.R.k : ℝ) ^ 4 * (D.R.k : ℝ) ^ 4 := by gcongr; norm_num
       _ = _ := by ring
   have h3 : (1 : ℝ) ≤ (D.R.k : ℝ) ^ 8 := one_le_pow₀ hk
   rw [div_le_div_iff₀ (by nlinarith) (by positivity)]
@@ -607,35 +654,52 @@ section Checks
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {F : Face D A}
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  {R : RealDat D A Ks} {F : Face D A}
 
-theorem tC_cpt {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
-    {fc : DefSub A → DefFace Bs} (cr : Crd A fc) (b : Bool) (j : Bs.J) (t : Bs.Tup) (y : Fin ((lv (fc X.zs) b).dZ j t) → K) :
-    X.tC cr b j t (cpt Bs.v0.embedding y) = X.θ' j t (X.jL j t (cr.toL X.zs b j t y)) := by
+theorem tC_cpt
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
+    {fc : DefSub A → DefFace Bs} (cr : Crd A fc)
+    (b : Bool) (j : Bs.J) (t : Bs.Tup) (y : Fin ((lv (fc X.zs) b).dZ j t) → K)
+    : X.tC cr b j t (cpt Bs.v0.embedding y) = X.θ' j t (X.jL j t (cr.toL X.zs b j t y)) := by
   set_option synthInstance.maxHeartbeats 100000 in
     conv_rhs => rw [← Finset.univ_sum_single y, map_sum, map_sum, map_sum]
   show ∑ k, Bs.v0.embedding (y k) • X.θ' j t (X.jL j t (cr.toL X.zs b j t (Pi.single k 1))) = _
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [← map_smul, ← map_smulₛₗ, ← map_smul, ← Pi.single_smul', smul_eq_mul, mul_one]
 
-theorem liftWeight_complexPoint_eq_twist {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
-    (b : Bool) (j : Bs.J) (z : Fin (X.dW b j) → K) :
-    X.w0C b j (cpt Bs.v0.embedding z) = ∑ k, Bs.v0.embedding (z k) • X.eW b j (X.bW b j Bs.v0 k) := by
+theorem liftWeight_complexPoint_eq_twist
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
+    (b : Bool) (j : Bs.J) (z : Fin (X.dW b j) → K)
+    : X.w0C b j (cpt Bs.v0.embedding z)
+      = ∑ k, Bs.v0.embedding (z k) • X.eW b j (X.bW b j Bs.v0 k) := by
   show X.eW b j (∑ k, Bs.v0.embedding (z k) • X.bW b j Bs.v0 k) = _
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   exact Finset.sum_congr rfl fun k _ => map_smul _ _ _
 
-theorem out_sum {s : Bool} {E ι : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [Fintype ι] (f : ι → Tw s E) :
-    Tw.out (∑ k, f k) = ∑ k, Tw.out (f k) := rfl
+theorem out_sum
+    {s : Bool} {E ι : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [Fintype ι]
+    (f : ι → Tw s E)
+    : Tw.out (∑ k, f k) = ∑ k, Tw.out (f k) :=
+  rfl
 
-theorem j_coordMap (j : Fin D.R.m) (z : Fin (finrank D.what₂.LL (R.WL F false j)) → D.what₂.LL) :
-    (R.FW j).j (sg0 D A) (coordMap R F j z) =
-      Tw.out (s := twAt D.what₂.embLL A.v0) ((R.toCx F).w0C false j (cpt A.v0.embedding z)) := by
-  have hsq : ((Real.sqrt (RealDat.nP F false) : ℝ) : ℂ) * (((Real.sqrt (RealDat.nP F false))⁻¹ : ℝ) : ℂ) = 1 := by
-    rw [← Complex.ofReal_mul, mul_inv_cancel₀ (Real.sqrt_pos.2 (RealDat.nP_pos false)).ne', Complex.ofReal_one]
-  refine Eq.trans ?_ (congrArg (Tw.out (s := twAt D.what₂.embLL A.v0)) (liftWeight_complexPoint_eq_twist (R.toCx F) false j z)).symm
+theorem j_coordMap (j : Fin D.R.m) (z : Fin (finrank D.what₂.LL (R.WL F false j)) → D.what₂.LL)
+    : (R.FW j).j (sg0 D A) (coordMap R F j z)
+      = Tw.out (s := twAt D.what₂.embLL A.v0) ((R.toCx F).w0C false j (cpt A.v0.embedding z)) := by
+  have hsq
+      : ((Real.sqrt (RealDat.nP F false) : ℝ) : ℂ) * (((Real.sqrt (RealDat.nP F false))⁻¹ : ℝ) : ℂ)
+        = 1 := by
+    rw [← Complex.ofReal_mul, mul_inv_cancel₀ (Real.sqrt_pos.2 (RealDat.nP_pos false)).ne',
+      Complex.ofReal_one]
+  refine Eq.trans ?_
+    (congrArg (Tw.out (s := twAt D.what₂.embLL A.v0))
+      (liftWeight_complexPoint_eq_twist (R.toCx F) false j z)).symm
   refine Eq.trans ?_ (out_sum _).symm
   unfold coordMap
   set_option synthInstance.maxHeartbeats 100000 in
@@ -646,7 +710,6 @@ theorem j_coordMap (j : Fin D.R.m) (z : Fin (finrank D.what₂.LL (R.WL F false 
   rw [smul_smul _ _ ((R.FW j).j _ _), hsq, one_smul, map_smulₛₗ, emb_eq D.what₂.embLL A.v0, cj_cj]
 
 variable (c : OnConst) (a : ChainArgs D.what₂.LL (Fin D.R.m) R.nW)
-
 
 variable (R) in
 def supArgs : ChainArgs D.what₂.LL (Fin D.R.m) R.nW where

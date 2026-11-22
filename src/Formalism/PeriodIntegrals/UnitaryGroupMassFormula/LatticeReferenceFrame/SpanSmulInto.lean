@@ -24,24 +24,22 @@ theorem GE_star (g : ℕ) {x : I.E} (h : GE I g x) : GE I g (star x) := by
     | exact (t.2).map (starRingEnd I.E).toIntAlgHom
   refine ⟨⟨starRingEnd I.E (t : I.E), hint⟩, ?_⟩
   rw [ht]
-  first
-  | (rw [star_mul', star_natCast]; rfl)
-  | simp [star_mul']
+  first | (rw [star_mul', star_natCast]; rfl) | simp [star_mul']
 
-theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I.E) (M T : ℕ)
-    (w wd : Fin (k + 1) → Fin I.n → I.E)
+theorem span_part
+    (p m r k : ℕ)
+    (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I.E) (M T : ℕ) (w wd : Fin (k + 1) → Fin I.n → I.E)
     (hM : Nat.Coprime M p) (hM0 : (M : I.E) ≠ 0) (hT : Nat.Coprime T p) (hT0 : (T : I.E) ≠ 0)
     (hθ1 : GE I (p ^ m) ((θ : I.E) * θ - θ)) (hθ2 : GE I (p ^ m) ((θ : I.E) * star (θ : I.E)))
-    (hθ3 : GE I (p ^ m) (1 - (θ : I.E) - star (θ : I.E)))
-    (hw : ∀ i, w i ∈ LA I p ∧ wd i ∈ LA I p)
-    (hspan : ∀ y ∈ I.L, y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w) ∧
-        y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range wd))
-    (Sset : Set (Fin I.n → I.E))
-    (hSe : ∀ a, M • e a ∈ Sset) (hSf : ∀ a, M • f a ∈ Sset)
+    (hθ3 : GE I (p ^ m) (1 - (θ : I.E) - star (θ : I.E))) (hw : ∀ i, w i ∈ LA I p ∧ wd i ∈ LA I p)
+    (hspan : ∀ y ∈ I.L,
+      y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w)
+        ∧ y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range wd))
+    (Sset : Set (Fin I.n → I.E)) (hSe : ∀ a, M • e a ∈ Sset) (hSf : ∀ a, M • f a ∈ Sset)
     (hSz : (T : I.E) • ((θ : I.E) • w (Fin.last k) - star (θ : I.E) • wd (Fin.last k)) ∈ Sset)
     (hSb : ∀ i : Fin k, (θ : I.E) • ((T : I.E) • w i.castSucc) ∈ Sset)
-    (hSbd : ∀ i : Fin k, star (θ : I.E) • ((T : I.E) • wd i.castSucc) ∈ Sset) :
-    ∀ y ∈ I.L, y ∈ Submodule.span (𝓞 I.E) Sset ⊔ gL I (p ^ m) := by
+    (hSbd : ∀ i : Fin k, star (θ : I.E) • ((T : I.E) • wd i.castSucc) ∈ Sset)
+    : ∀ y ∈ I.L, y ∈ Submodule.span (𝓞 I.E) Sset ⊔ gL I (p ^ m) := by
   classical
   set N : Submodule (𝓞 I.E) (Fin I.n → I.E) := Submodule.span (𝓞 I.E) Sset ⊔ gL I (p ^ m) with hN
   have hsm : ∀ (c : 𝓞 I.E) (v : Fin I.n → I.E), c • v = (c : I.E) • v := fun c v => rfl
@@ -78,29 +76,33 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
     intro v hv
     obtain ⟨s, hs, h⟩ := span_clear I p (I.L : Set (Fin I.n → I.E)) hv
     exact ⟨s, hs, by rwa [Submodule.span_eq] at h⟩
-  have gen : ∀ (φ φ' : 𝓞 I.E) (u u' : Fin (k + 1) → Fin I.n → I.E),
-      (∀ i, u i ∈ LA I p) → (∀ i, u' i ∈ LA I p) →
-      (∀ i : Fin k, (φ : I.E) • ((T : I.E) • u i.castSucc) ∈ Sset) →
-      (T : I.E) • ((φ : I.E) • u (Fin.last k) - (φ' : I.E) • u' (Fin.last k)) ∈ N →
-      GE I (p ^ m) ((φ : I.E) * φ - φ) → GE I (p ^ m) ((φ : I.E) * φ') →
-      ∀ y ∈ I.L, y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range u) →
-        (φ : I.E) • y ∈ N := by
+  have gen
+      : ∀ (φ φ' : 𝓞 I.E) (u u' : Fin (k + 1) → Fin I.n → I.E),
+        (∀ i, u i ∈ LA I p) → (∀ i, u' i ∈ LA I p)
+          → (∀ i : Fin k, (φ : I.E) • ((T : I.E) • u i.castSucc) ∈ Sset)
+          → (T : I.E) • ((φ : I.E) • u (Fin.last k) - (φ' : I.E) • u' (Fin.last k)) ∈ N
+          → GE I (p ^ m) ((φ : I.E) * φ - φ) → GE I (p ^ m) ((φ : I.E) * φ')
+          → ∀ y ∈ I.L,
+            y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range u)
+              → (φ : I.E) • y ∈ N := by
     intro φ φ' u u' hu hu' hSu hz h1 h2 y hy hyA
     obtain ⟨s2, hs2, hs2L⟩ := hclr _ (hu (Fin.last k))
     obtain ⟨s3, hs3, hs3L⟩ := hclr _ (hu' (Fin.last k))
     obtain ⟨t1, ht1⟩ := h1
     obtain ⟨t2, ht2⟩ := h2
     obtain ⟨s1, hs1, hs1y⟩ := span_clear I p _ hyA
-    have key : ∀ v ∈ Submodule.span (𝓞 I.E) (Set.range e ∪ Set.range f ∪ Set.range u),
-        ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • v) ∈ N := by
+    have key
+        : ∀ v ∈ Submodule.span (𝓞 I.E) (Set.range e ∪ Set.range f ∪ Set.range u),
+          ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • v) ∈ N := by
       intro v hv
       induction hv using Submodule.span_induction with
       | mem v hv =>
         rcases hv with (⟨a, rfl⟩ | ⟨a, rfl⟩) | ⟨i, rfl⟩
         · have h := hS _ (hSe a)
           rw [← Nat.cast_smul_eq_nsmul I.E] at h
-          have e1 : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • e a) =
-              ((T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((M : I.E) • e a)) := by
+          have e1
+              : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • e a)
+                = ((T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((M : I.E) • e a)) := by
             simp only [smul_smul]
             congr 1
             push_cast
@@ -109,8 +111,9 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
           exact hnat _ _ (hE φ _ h)
         · have h := hS _ (hSf a)
           rw [← Nat.cast_smul_eq_nsmul I.E] at h
-          have e1 : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • f a) =
-              ((T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((M : I.E) • f a)) := by
+          have e1
+              : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • f a)
+                = ((T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((M : I.E) • f a)) := by
             simp only [smul_smul]
             congr 1
             push_cast
@@ -119,20 +122,31 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
           exact hnat _ _ (hE φ _ h)
         · cases i using Fin.lastCases with
           | last =>
-            have hA : ((M * s2 * s3 : ℕ) : I.E) •
-                ((φ : I.E) • ((T : I.E) • ((φ : I.E) • u (Fin.last k) - (φ' : I.E) • u' (Fin.last k)))) ∈ N :=
+            have hA
+                : ((M * s2 * s3 : ℕ) : I.E)
+                    • ((φ : I.E)
+                      • ((T : I.E) • ((φ : I.E) • u (Fin.last k) - (φ' : I.E) • u' (Fin.last k))))
+                  ∈ N :=
               hnat _ _ (hE φ _ hz)
-            have hB : ((M * s3 * T : ℕ) : I.E) • ((((p ^ m : ℕ) : I.E) * (t1 : I.E)) •
-                ((s2 : I.E) • u (Fin.last k))) ∈ N := hnat _ _ (hgl _ hs2L t1)
-            have hC : ((M * s2 * T : ℕ) : I.E) • ((((p ^ m : ℕ) : I.E) * (t2 : I.E)) •
-                ((s3 : I.E) • u' (Fin.last k))) ∈ N := hnat _ _ (hgl _ hs3L t2)
-            have e1 : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • u (Fin.last k)) =
-                ((M * s2 * s3 : ℕ) : I.E) •
-                  ((φ : I.E) • ((T : I.E) • ((φ : I.E) • u (Fin.last k) - (φ' : I.E) • u' (Fin.last k)))) -
-                ((M * s3 * T : ℕ) : I.E) • ((((p ^ m : ℕ) : I.E) * (t1 : I.E)) •
-                  ((s2 : I.E) • u (Fin.last k))) +
-                ((M * s2 * T : ℕ) : I.E) • ((((p ^ m : ℕ) : I.E) * (t2 : I.E)) •
-                  ((s3 : I.E) • u' (Fin.last k))) := by
+            have hB
+                : ((M * s3 * T : ℕ) : I.E)
+                    • ((((p ^ m : ℕ) : I.E) * (t1 : I.E)) • ((s2 : I.E) • u (Fin.last k)))
+                  ∈ N :=
+              hnat _ _ (hgl _ hs2L t1)
+            have hC
+                : ((M * s2 * T : ℕ) : I.E)
+                    • ((((p ^ m : ℕ) : I.E) * (t2 : I.E)) • ((s3 : I.E) • u' (Fin.last k)))
+                  ∈ N :=
+              hnat _ _ (hgl _ hs3L t2)
+            have e1
+                : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • u (Fin.last k))
+                  = ((M * s2 * s3 : ℕ) : I.E)
+                      • ((φ : I.E)
+                        • ((T : I.E) • ((φ : I.E) • u (Fin.last k) - (φ' : I.E) • u' (Fin.last k))))
+                    - ((M * s3 * T : ℕ) : I.E)
+                      • ((((p ^ m : ℕ) : I.E) * (t1 : I.E)) • ((s2 : I.E) • u (Fin.last k)))
+                    + ((M * s2 * T : ℕ) : I.E)
+                      • ((((p ^ m : ℕ) : I.E) * (t2 : I.E)) • ((s3 : I.E) • u' (Fin.last k))) := by
               rw [← ht1, ← ht2]
               funext i
               simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
@@ -142,15 +156,17 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
             exact N.add_mem (N.sub_mem hA hB) hC
           | cast j =>
             have h := hS _ (hSu j)
-            have e1 : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • u j.castSucc) =
-                ((M * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((T : I.E) • u j.castSucc)) := by
+            have e1
+                : ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • u j.castSucc)
+                  = ((M * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((T : I.E) • u j.castSucc)) := by
               simp only [smul_smul]
               congr 1
               push_cast
               ring
             rw [e1]
             exact hnat _ _ h
-      | zero => simp
+      | zero =>
+        simp
       | add v w _ _ hv hw =>
         rw [smul_add, smul_add]
         exact N.add_mem hv hw
@@ -162,9 +178,12 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
       rw [← hsm]
       exact I.L.smul_mem φ hy
     refine hbez _ hφy (M * T * s2 * s3 * s1)
-      (Nat.Coprime.mul_left (Nat.Coprime.mul_left (Nat.Coprime.mul_left (Nat.Coprime.mul_left hM hT) hs2) hs3) hs1) ?_
-    have e2 : ((M * T * s2 * s3 * s1 : ℕ) : I.E) • ((φ : I.E) • y) =
-        ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((s1 : I.E) • y)) := by
+      (Nat.Coprime.mul_left
+        (Nat.Coprime.mul_left (Nat.Coprime.mul_left (Nat.Coprime.mul_left hM hT) hs2) hs3) hs1)
+      ?_
+    have e2
+        : ((M * T * s2 * s3 * s1 : ℕ) : I.E) • ((φ : I.E) • y)
+          = ((M * T * s2 * s3 : ℕ) : I.E) • ((φ : I.E) • ((s1 : I.E) • y)) := by
       simp only [smul_smul]
       congr 1
       push_cast
@@ -179,11 +198,14 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
     exact ⟨⟨starRingEnd I.E (θ : I.E), hint⟩, rfl⟩
   intro y hy
   have hyN1 : (θ : I.E) • y ∈ N :=
-    gen θ θb w wd (fun i => (hw i).1) (fun i => (hw i).2) hSb (by rw [hθb]; exact hS _ hSz) hθ1
-      (by rw [hθb]; exact hθ2) y hy (hspan y hy).1
+    gen θ θb w wd
+      (fun i => (hw i).1)
+      (fun i => (hw i).2)
+      hSb (by rw [hθb]; exact hS _ hSz) hθ1 (by rw [hθb]; exact hθ2) y hy (hspan y hy).1
   have hz2 : (T : I.E) • ((θb : I.E) • wd (Fin.last k) - (θ : I.E) • w (Fin.last k)) ∈ N := by
-    have e : (T : I.E) • ((θb : I.E) • wd (Fin.last k) - (θ : I.E) • w (Fin.last k)) =
-        -((T : I.E) • ((θ : I.E) • w (Fin.last k) - star (θ : I.E) • wd (Fin.last k))) := by
+    have e
+        : (T : I.E) • ((θb : I.E) • wd (Fin.last k) - (θ : I.E) • w (Fin.last k))
+          = -((T : I.E) • ((θ : I.E) • w (Fin.last k) - star (θ : I.E) • wd (Fin.last k))) := by
       rw [hθb, ← smul_neg, neg_sub]
     rw [e]
     exact N.neg_mem (hS _ hSz)
@@ -194,8 +216,11 @@ theorem span_part (p m r k : ℕ) (θ : 𝓞 I.E) (e f : Fin r → Fin I.n → I
     rw [hθb, mul_comm]
     exact hθ2
   have hyN2 : (θb : I.E) • y ∈ N :=
-    gen θb θ wd w (fun i => (hw i).2) (fun i => (hw i).1) (fun i => by rw [hθb]; exact hSbd i) hz2 h1' h2'
-      y hy (hspan y hy).2
+    gen θb θ wd w
+      (fun i => (hw i).2)
+      (fun i => (hw i).1)
+      (fun i => by rw [hθb]; exact hSbd i)
+      hz2 h1' h2' y hy (hspan y hy).2
   obtain ⟨t3, ht3⟩ := hθ3
   have h3 : ((1 : I.E) - θ - star (θ : I.E)) • y ∈ N := by
     rw [ht3]

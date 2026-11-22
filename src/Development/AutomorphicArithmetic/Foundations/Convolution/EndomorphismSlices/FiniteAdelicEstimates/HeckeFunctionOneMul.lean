@@ -14,8 +14,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison
@@ -32,27 +35,34 @@ section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ}
 
-private theorem heckeFunction_mul (w : Pl E) (x y : Ex (Fin (a + 1) × Fin (b + 1))) :
-    fn2 a b w (x.mul y) = PositivityTheory.Rg.BcN.F2.mconv (fn2 a b w x) (fn2 a b w y) := by
+private theorem heckeFunction_mul (w : Pl E) (x y : Ex (Fin (a + 1) × Fin (b + 1)))
+    : fn2 a b w (x.mul y) = PositivityTheory.Rg.BcN.F2.mconv (fn2 a b w x) (fn2 a b w y) := by
   funext m
   simp only [fn2, Ex.fn, PositivityTheory.Rg.BcN.F2.mconv]
 
-private theorem heckeFunction_one (w : Pl E) :
-    fn2 a b w (.one : Ex (Fin (a + 1) × Fin (b + 1))) = (K2 a b w : Set _).indicator 1 := rfl
+private theorem heckeFunction_one (w : Pl E)
+    : fn2 a b w (.one : Ex (Fin (a + 1) × Fin (b + 1))) = (K2 a b w : Set _).indicator 1 :=
+  rfl
 
-private theorem heckeFunction_mul_one {Z : Finset (Pl E)} (L : Lv a b Z) (w : Pl E) (x : Ex (Fin (a + 1) × Fin (b + 1))) :
-    fn2 a b w (x.mul .one) = fn2 a b w x := by
+private theorem heckeFunction_mul_one
+    {Z : Finset (Pl E)} (L : Lv a b Z) (w : Pl E) (x : Ex (Fin (a + 1) × Fin (b + 1)))
+    : fn2 a b w (x.mul .one) = fn2 a b w x := by
   rw [heckeFunction_mul, heckeFunction_one]
   exact ((locAlg E a b Z L w).2.2.2.2 _ (Asm.exHecke2 E a b w x)).1
 
-private theorem heckeFunction_one_mul {Z : Finset (Pl E)} (L : Lv a b Z) (w : Pl E) (x : Ex (Fin (a + 1) × Fin (b + 1))) :
-    fn2 a b w (Ex.one.mul x) = fn2 a b w x := by
+private theorem heckeFunction_one_mul
+    {Z : Finset (Pl E)} (L : Lv a b Z) (w : Pl E) (x : Ex (Fin (a + 1) × Fin (b + 1)))
+    : fn2 a b w (Ex.one.mul x) = fn2 a b w x := by
   rw [heckeFunction_mul, heckeFunction_one]
   exact ((locAlg E a b Z L w).2.2.2.2 _ (Asm.exHecke2 E a b w x)).2.1
 
-private theorem position_congr {Z : Finset (Pl E)} (φ : ∀ w : Pl E, LF a b w) {w : Pl E}
-    {e e' : Pl E → Ex (Fin (a + 1) × Fin (b + 1))} (h : fn2 a b w (e w) = fn2 a b w (e' w)) :
-    intersection_update_fsHerm_neg_one Z {w} φ e = intersection_update_fsHerm_neg_one Z {w} φ e' := by
+private theorem position_congr
+    {Z : Finset (Pl E)}
+    (φ : ∀ w : Pl E, LF a b w)
+    {w : Pl E} {e e' : Pl E → Ex (Fin (a + 1) × Fin (b + 1))}
+    (h : fn2 a b w (e w) = fn2 a b w (e' w))
+    : intersection_update_fsHerm_neg_one Z {w} φ e
+      = intersection_update_fsHerm_neg_one Z {w} φ e' := by
   funext x
   unfold intersection_update_fsHerm_neg_one
   by_cases hx : x = w

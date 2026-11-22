@@ -9,13 +9,16 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_mul_isIntegralElem_of_forall_discreteValuationSubring :
-    ∀ (C B : Type) [CommRing C] [IsDomain C] [IsNoetherianRing C] [CommRing B] (e : C →+* B),
-      Function.Injective e → (∀ b : B, ∃ c s : C, IsUnit (e s) ∧ b * e s = e c) →
-      ∀ (p : Ideal C), p.IsPrime → ∀ f : B,
-        (∀ (F : Type) [Field F] (β : B →+* F) (V : ValuationSubring F), IsDiscreteValuationRing V →
-          (∀ c, β (e c) ∈ V) → (∀ c ∈ p, β (e c) ∈ V.nonunits) → β f ∈ V) →
-        ∃ d : C, d ∉ p ∧ e.IsIntegralElem (e d * f) := by
+theorem exists_mul_isIntegralElem_of_forall_discreteValuationSubring
+    : ∀ (C B : Type) [CommRing C] [IsDomain C] [IsNoetherianRing C] [CommRing B] (e : C →+* B),
+      Function.Injective e → (∀ b : B, ∃ c s : C, IsUnit (e s) ∧ b * e s = e c)
+        → ∀ (p : Ideal C),
+          p.IsPrime
+            → ∀ f : B,
+              (∀ (F : Type) [Field F] (β : B →+* F) (V : ValuationSubring F),
+                  IsDiscreteValuationRing V → (∀ c, β (e c) ∈ V) → (∀ c ∈ p, β (e c) ∈ V.nonunits)
+                    → β f ∈ V)
+                → ∃ d : C, d ∉ p ∧ e.IsIntegralElem (e d * f) := by
   intro C B _ _ _ _ e he hloc p hp f hf
   haveI : Nontrivial B := ⟨⟨e 0, e 1, fun h => zero_ne_one (he h)⟩⟩
   haveI : NoZeroDivisors B := ⟨fun {a b} hab => by
@@ -73,10 +76,10 @@ theorem exists_mul_isIntegralElem_of_forall_discreteValuationSubring :
     refine hf L β V hV (fun c => ?_) (fun c hc => ?_)
     · have := h1 (algebraMap C Cp c)
       rwa [← IsScalarTower.algebraMap_apply] at this
-    · have := h2 (algebraMap C Cp c)
-        ((IsLocalization.AtPrime.to_map_mem_maximal_iff Cp p c).2 hc)
+    · have := h2 (algebraMap C Cp c) ((IsLocalization.AtPrime.to_map_mem_maximal_iff Cp p c).2 hc)
       rwa [← IsScalarTower.algebraMap_apply] at this
-  obtain ⟨⟨d, hd⟩, hdi⟩ := IsIntegral.exists_multiple_integral_of_isLocalization p.primeCompl (β f) hint
+  obtain ⟨⟨d, hd⟩, hdi⟩ :=
+    IsIntegral.exists_multiple_integral_of_isLocalization p.primeCompl (β f) hint
   refine ⟨d, hd, ?_⟩
   obtain ⟨q, hq, hq0⟩ := hdi
   refine ⟨q, hq, hβ ?_⟩

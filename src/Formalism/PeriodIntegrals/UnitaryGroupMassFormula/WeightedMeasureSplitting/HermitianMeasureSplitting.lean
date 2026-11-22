@@ -13,7 +13,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.MeasWCore
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures NumberField
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures NumberField
 
 theorem hermitian_measure_splitting : SplitH := by
   intro F E _ _ _ _ _ σ n J r P T _ _ _
@@ -32,6 +33,7 @@ theorem nilpotent_measure_splitting : SplitN := by
     (mem_Nsub_iff σ J splT_bijective P)
 
 theorem measWCore_main : Formalism.L2.SG.Pf.MeasCore.MWCore :=
-  mwCore_of hermitian_measure_splitting nilpotent_measure_splitting continuous_measure_splitting product_decomposition_holds
+  mwCore_of hermitian_measure_splitting nilpotent_measure_splitting continuous_measure_splitting
+    product_decomposition_holds
 
 end PI.UnitaryGroupMassFormula.MeasWCore

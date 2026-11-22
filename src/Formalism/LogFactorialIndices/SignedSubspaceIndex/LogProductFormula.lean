@@ -13,39 +13,47 @@ open IsDedekindDomain NumberField
 
 theorem log_product_formula : LogProductFormula := by
   intro L _ _ x hx
-  obtain ⟨I, hIdef⟩ : ∃ I : FractionalIdeal (nonZeroDivisors (𝓞 L)) L,
-      I = FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 L)) x := ⟨_, rfl⟩
+  obtain ⟨I, hIdef⟩
+      : ∃ I : FractionalIdeal (nonZeroDivisors (𝓞 L)) L,
+        I = FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 L)) x :=
+    ⟨_, rfl⟩
   rw [← hIdef]
   have hI : I ≠ 0 := by
     rw [hIdef, Ne, FractionalIdeal.spanSingleton_eq_zero_iff]
     exact hx
-  have hfin : (Function.support fun v : HeightOneSpectrum (𝓞 L) => FractionalIdeal.count L v I).Finite :=
+  have hfin : (Function.support fun v : HeightOneSpectrum (𝓞 L) =>
+      FractionalIdeal.count L v I).Finite := by
+    have hev := FractionalIdeal.finite_factors I
+    exact Filter.eventually_cofinite.mp hev
+  have hR
+      : (∑ᶠ v : HeightOneSpectrum (𝓞 L), (FractionalIdeal.count L v I : ℝ) *
+          Real.log (Ideal.absNorm v.asIdeal : ℝ))
+        = ∑ v ∈ hfin.toFinset, (FractionalIdeal.count L v I : ℝ) * Real.log (Ideal.absNorm v.asIdeal : ℝ) :=
     by
-      have hev := FractionalIdeal.finite_factors I
-      exact Filter.eventually_cofinite.mp hev
-  have hR : (∑ᶠ v : HeightOneSpectrum (𝓞 L), (FractionalIdeal.count L v I : ℝ) *
-        Real.log (Ideal.absNorm v.asIdeal : ℝ)) =
-      ∑ v ∈ hfin.toFinset, (FractionalIdeal.count L v I : ℝ) * Real.log (Ideal.absNorm v.asIdeal : ℝ) := by
-    apply finsum_eq_sum_of_support_subset
-    intro v hv
-    rw [Set.Finite.coe_toFinset, Function.mem_support]
-    rw [Function.mem_support] at hv
-    intro h0
-    exact hv (by simp [h0])
-  have hsub2 : Function.mulSupport (fun v : HeightOneSpectrum (𝓞 L) =>
-      (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) ^ FractionalIdeal.count L v I) ⊆
-      (hfin.toFinset : Set _) := by
+      apply finsum_eq_sum_of_support_subset
+      intro v hv
+      rw [Set.Finite.coe_toFinset, Function.mem_support]
+      rw [Function.mem_support] at hv
+      intro h0
+      exact hv (by simp [h0])
+  have hsub2
+      : Function.mulSupport (fun v : HeightOneSpectrum (𝓞 L) =>
+          (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) ^ FractionalIdeal.count L v I)
+        ⊆ (hfin.toFinset : Set _) := by
     intro v hv
     rw [Set.Finite.coe_toFinset, Function.mem_support]
     rw [Function.mem_mulSupport] at hv
     intro h0
     exact hv (by simp [h0])
-  have hfac : ∏ v ∈ hfin.toFinset, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) ^
-      FractionalIdeal.count L v I = I := by
+  have hfac
+      : ∏ v ∈ hfin.toFinset, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) ^
+          FractionalIdeal.count L v I
+        = I := by
     rw [← finprod_eq_prod_of_mulSupport_subset _ hsub2]
     exact FractionalIdeal.finprod_heightOneSpectrum_factorization' L hI
-  have hN1 : FractionalIdeal.absNorm I =
-      ∏ v ∈ hfin.toFinset, (Ideal.absNorm v.asIdeal : ℚ) ^ FractionalIdeal.count L v I := by
+  have hN1
+      : FractionalIdeal.absNorm I
+        = ∏ v ∈ hfin.toFinset, (Ideal.absNorm v.asIdeal : ℚ) ^ FractionalIdeal.count L v I := by
     conv_lhs => rw [← hfac]
     rw [map_prod]
     refine Finset.prod_congr rfl (fun v _ => ?_)
@@ -64,7 +72,9 @@ theorem log_product_formula : LogProductFormula := by
     congr 1
     rw [eq_ratCast (algebraMap ℚ ℂ)]
     simp
-  have hne2 : ∀ v ∈ hfin.toFinset, ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ FractionalIdeal.count L v I ≠ 0 := by
+  have hne2
+      : ∀ v ∈ hfin.toFinset,
+        ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ FractionalIdeal.count L v I ≠ 0 := by
     intro v _
     apply zpow_ne_zero
     rw [Nat.cast_ne_zero, Ne, Ideal.absNorm_eq_zero_iff]

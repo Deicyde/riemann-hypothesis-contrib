@@ -8,19 +8,21 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem le_mul_setIntegral_image2_of_forall_le (G : Type) [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
-    [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (N : ℕ)
-    (Θ : (Fin N → ℝ) → G) (Q : Set (Fin N → ℝ)) (B : Set G) (K : ℝ)
-    (hΘ : Continuous Θ) (hQ : IsCompact Q) (hB : IsCompact B) (hB1 : B ∈ nhds (1 : G))
-    (hK : 0 ≤ K) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (F : G → ℝ) (a : ℝ), Continuous F → (∀ g, 0 ≤ F g) →
-      (∀ x ∈ B, a ≤ K * ∫ t in Q, F (Θ t * x)) →
-      a ≤ C * ∫ x in Set.image2 (fun t b => Θ t * b) Q B, F x ∂μ := by
+theorem le_mul_setIntegral_image2_of_forall_le
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (N : ℕ) (Θ : (Fin N → ℝ) → G) (Q : Set (Fin N → ℝ))
+    (B : Set G) (K : ℝ)
+    (hΘ : Continuous Θ) (hQ : IsCompact Q) (hB : IsCompact B) (hB1 : B ∈ nhds (1 : G)) (hK : 0 ≤ K)
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ (F : G → ℝ) (a : ℝ),
+          Continuous F → (∀ g, 0 ≤ F g) → (∀ x ∈ B, a ≤ K * ∫ t in Q, F (Θ t * x))
+            → a ≤ C * ∫ x in Set.image2 (fun t b => Θ t * b) Q B, F x ∂μ := by
   have hBfin : μ B ≠ ⊤ := hB.measure_lt_top.ne
   have hQfin : (volume : Measure (Fin N → ℝ)) Q ≠ ⊤ := hQ.measure_lt_top.ne
-  have hBpos : 0 < μ.real B :=
-    ENNReal.toReal_pos (Measure.measure_pos_of_mem_nhds μ hB1).ne' hBfin
+  have hBpos : 0 < μ.real B := ENNReal.toReal_pos (Measure.measure_pos_of_mem_nhds μ hB1).ne' hBfin
   refine ⟨K * (volume : Measure (Fin N → ℝ)).real Q / μ.real B, by positivity, ?_⟩
   intro F a hF hF0 ha
   set Ω : Set G := Set.image2 (fun t b => Θ t * b) Q B with hΩdef
@@ -46,14 +48,17 @@ theorem le_mul_setIntegral_image2_of_forall_le (G : Type) [Group G] [Topological
     rw [hc]
     refine setIntegral_mono_on (integrableOn_const hBfin) ?_ hB.measurableSet ha
     exact hint.integral_prod_left.const_mul K
-  have h2 : ∫ x in B, ∫ t in Q, F (Θ t * x) ∂volume ∂μ ≤
-      (volume : Measure (Fin N → ℝ)).real Q * ∫ x in Ω, F x ∂μ := by
+  have h2
+      : ∫ x in B, ∫ t in Q, F (Θ t * x) ∂volume ∂μ
+        ≤ (volume : Measure (Fin N → ℝ)).real Q * ∫ x in Ω, F x ∂μ := by
     rw [integral_integral_swap hint]
-    have hc : (volume : Measure (Fin N → ℝ)).real Q * ∫ x in Ω, F x ∂μ =
-        ∫ _t in Q, (∫ x in Ω, F x ∂μ) := by simp
+    have hc
+        : (volume : Measure (Fin N → ℝ)).real Q * ∫ x in Ω, F x ∂μ
+          = ∫ _t in Q, (∫ x in Ω, F x ∂μ) := by
+      simp
     rw [hc]
-    exact setIntegral_mono_on hint.integral_prod_right (integrableOn_const hQfin)
-      hQ.measurableSet hstep
+    exact setIntegral_mono_on hint.integral_prod_right (integrableOn_const hQfin) hQ.measurableSet
+      hstep
   rw [integral_const_mul] at h1
   rw [div_mul_eq_mul_div, le_div_iff₀ hBpos, mul_comm a, mul_assoc]
   exact h1.trans (mul_le_mul_of_nonneg_left h2 hK)

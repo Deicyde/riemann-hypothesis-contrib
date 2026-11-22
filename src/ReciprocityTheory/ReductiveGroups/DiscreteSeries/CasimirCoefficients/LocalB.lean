@@ -83,20 +83,25 @@ lemma lcB_hasDerivAt (T : KType ε Λ) (μ : Fin n → ℤ) {U : Set (Matrix (Fi
     exact add_neg_cancel _
   exact hzero ▸ hprod
 
-theorem lcB_const (T : KType ε Λ) (μ : Fin n → ℤ) {U : Set (Matrix (Fin n) (Fin n) ℂ)} (hUo : IsOpen U)
-    (hdiff : DifferentiableOn ℂ (psM T μ) U) {Y : Matrix (Fin n) (Fin n) ℂ}
-    (hid : ∀ z ∈ U, fderiv ℂ (psM T μ) z (z * Y) = -(T.dτ Y * psM T μ z))
-    (hY : inK ε Y) (γ : ℝ → KG ε)
+theorem lcB_const
+    (T : KType ε Λ) (μ : Fin n → ℤ)
+    {U : Set (Matrix (Fin n) (Fin n) ℂ)} (hUo : IsOpen U) (hdiff : DifferentiableOn ℂ (psM T μ) U)
+    {Y : Matrix (Fin n) (Fin n) ℂ}
+    (hid : ∀ z ∈ U, fderiv ℂ (psM T μ) z (z * Y) = -(T.dτ Y * psM T μ z)) (hY : inK ε Y)
+    (γ : ℝ → KG ε)
     (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y)) (hmul : ∀ s t, γ (s + t) = γ s * γ t)
-    (A : Matrix (Fin n) (Fin n) ℂ) (hpath : ∀ t ∈ Icc (0 : ℝ) 1, A * NormedSpace.exp ((t : ℂ) • Y) ∈ U) :
-    T.op (γ 1) * psM T μ (A * NormedSpace.exp Y) = psM T μ A := by
+    (A : Matrix (Fin n) (Fin n) ℂ)
+    (hpath : ∀ t ∈ Icc (0 : ℝ) 1, A * NormedSpace.exp ((t : ℂ) • Y) ∈ U)
+    : T.op (γ 1) * psM T μ (A * NormedSpace.exp Y) = psM T μ A := by
   have h0 : γ 0 = 1 := by simpa using hmul 0 0
   let g : ℝ → T.V →L[ℂ] T.V := fun t => T.op (γ t) * psM T μ (A * NormedSpace.exp ((t : ℂ) • Y))
   have hd : ∀ t ∈ Icc (0 : ℝ) 1, HasDerivAt g 0 t := fun t ht =>
     lcB_hasDerivAt T μ hUo hdiff hid hY γ hγ hmul A (hpath t ht)
   have hcont : ContinuousOn g (Icc 0 1) := fun t ht => (hd t ht).continuousAt.continuousWithinAt
-  have hc := constant_of_has_deriv_right_zero hcont
-    (fun t ht => (hd t (Ico_subset_Icc_self ht)).hasDerivWithinAt) 1 ⟨zero_le_one, le_rfl⟩
+  have hc :=
+    constant_of_has_deriv_right_zero hcont
+      (fun t ht => (hd t (Ico_subset_Icc_self ht)).hasDerivWithinAt)
+      1 ⟨zero_le_one, le_rfl⟩
   simpa [g, h0, KType.op] using hc
 
 end ReciprocityTheory.ChartRestriction.DS.S7

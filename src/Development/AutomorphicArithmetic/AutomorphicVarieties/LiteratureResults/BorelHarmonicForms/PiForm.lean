@@ -10,11 +10,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-theorem UpperTheory.V.Lit.Bor.piForm :
-    UpperTheory.V.Lit.Bor.PiForm := by
+theorem UpperTheory.V.Lit.Bor.piForm : UpperTheory.V.Lit.Bor.PiForm := by
   intro E _ _ _ a ha π Ξ r hone
   obtain ⟨G, hG⟩ := admEx E a Ξ
   obtain ⟨H, hH⟩ := petEx E a ha r
@@ -24,8 +24,11 @@ theorem UpperTheory.V.Lit.Bor.piForm :
     mem_tens.2 fun i => by
       rw [hcmp]
       exact Submodule.subset_span (cuspSq E a ha π r hone _ (UpperTheory.V.Lit.Bor.cmp i m).2)
-  refine ⟨((tform H G) ∘ₛₗ (incl π Ξ)).compl₂ (incl π Ξ), ⟨fun x y => ?_, fun x _ => ?_, fun x _ hx => ?_⟩,
-    fun X x y => ?_⟩
+  refine ⟨
+    ((tform H G) ∘ₛₗ (incl π Ξ)).compl₂ (incl π Ξ),
+    ⟨fun x y => ?_, fun x _ => ?_, fun x _ hx => ?_⟩,
+    fun X x y => ?_
+  ⟩
   · exact hpos.herm _ _
   · exact hpos.nonneg _ (hmem x)
   · exact hinj ((hpos.definite _ (hmem x) hx).trans (map_zero _).symm)

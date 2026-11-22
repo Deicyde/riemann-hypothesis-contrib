@@ -9,14 +9,16 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 @[expose] public section
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
-open MeasureTheory PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1 GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+open MeasureTheory PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC
 open scoped Classical
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.uncutOf_pf :
-    Basic → GFac → HalfTerm → RangeW → TrFin → DiscreteGroups.T1.G.UncutHalf := by
-  intro hB hF hH hR hT E _ _ _ n hn D π hπ ι _ Φ₁ Φ₂ T₁ T₂ M k₁ k₂ a1 a2 hfin b1 b2 hv U Uπ Φ t c1 c2 hpi ht
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.uncutOf_pf
+    : Basic → GFac → HalfTerm → RangeW → TrFin → DiscreteGroups.T1.G.UncutHalf := by
+  intro hB hF hH hR hT E _ _ _ n hn D π hπ ι _ Φ₁ Φ₂ T₁ T₂ M k₁ k₂ a1 a2 hfin b1 b2 hv U Uπ Φ t c1
+    c2 hpi ht
   let s : Su E n ι := ⟨D, π, Φ₁, Φ₂, T₁, T₂, M, k₁, k₂, hn, hπ, a1, a2, hfin, b1, b2, hv⟩
   let m : Mid s := ⟨U, Uπ, Φ, c1, c2, hpi⟩
   obtain ⟨p, hp⟩ := hF E n ι s
@@ -26,10 +28,16 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.uncutOf_pf :
   have hterm := fun b => hH E n ι s m (p.w b) (p.mem b) (p.x b) (p.zero b)
   obtain ⟨L, hL, -, rfl⟩ := ht
   let w : p.B → π.V := fun b => ⟨p.w b, p.mem b⟩
-  let e : p.B → (π.V →ₗ[ℂ] ℂ) := fun b =>
-    { toFun := fun ψ => ψ.1.1 (p.x b).1, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
-  have hcentre : ∀ (ψ : Sm E n), ψ ∈ π.V → ∀ g : GA E n,
-      ψ.1 (ac E n (-ldet ((g, 1) : H E n 0)) * ((g, 1) : H E n 0)).1 = ψ.1 g := by
+  let e : p.B → (π.V →ₗ[ℂ] ℂ) := fun b => {
+    toFun := fun ψ => ψ.1.1 (p.x b).1
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
+  have hcentre
+      : ∀ (ψ : Sm E n),
+        ψ ∈ π.V
+          → ∀ g : GA E n,
+            ψ.1 (ac E n (- ldet ((g, 1) : H E n 0)) * ((g, 1) : H E n 0)).1 = ψ.1 g := by
     intro ψ hψ g
     exact hπ.1 ψ hψ _ g
   have hspan : ∀ v, L v = ∑ b, e b (L v) • w b := by
@@ -37,7 +45,7 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.uncutOf_pf :
     apply Subtype.ext
     apply Subtype.ext
     funext g
-    have h0 : ldet (ac E n (-ldet ((g, 1) : H E n 0)) * ((g, 1) : H E n 0)) = 0 := by
+    have h0 : ldet (ac E n (- ldet ((g, 1) : H E n 0)) * ((g, 1) : H E n 0)) = 0 := by
       rw [hmul, hac]; ring
     have h1 := hR E n ι s p hp m v.1 v.2 _ h0
     have h2 : (L v).1.1 g = ∑ b, (L v).1.1 (p.x b).1 * (p.w b).1 g := by
@@ -45,8 +53,11 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.uncutOf_pf :
       refine h1.trans (Finset.sum_congr rfl fun b _ => ?_)
       rw [hcentre _ (p.mem b), hL v, mul_comm]
       rfl
-    let ev : π.V →ₗ[ℂ] ℂ :=
-      { toFun := fun ψ => ψ.1.1 g, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+    let ev : π.V →ₗ[ℂ] ℂ := {
+      toFun := fun ψ => ψ.1.1 g
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+    }
     have h3 : (∑ b, e b (L v) • w b).1.1 g = ev (∑ b, e b (L v) • w b) := rfl
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h3, map_sum]

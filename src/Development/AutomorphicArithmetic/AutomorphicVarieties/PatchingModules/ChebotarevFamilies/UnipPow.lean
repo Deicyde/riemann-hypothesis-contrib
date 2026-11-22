@@ -4,9 +4,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem charK (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [Algebra ℤ_[l] K] : CharP K l := by
+private theorem charK (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [Algebra ℤ_[l] K]
+    : CharP K l := by
   obtain ⟨p, hp⟩ := CharP.exists K
   haveI := hp
   have hpp : p.Prime := CharP.char_is_prime K p
@@ -15,16 +17,21 @@ private theorem charK (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [
   have hu : IsUnit (p : ℤ_[l]) := by
     by_contra h
     rw [PadicInt.not_isUnit_iff, ← Int.cast_natCast, PadicInt.norm_int_lt_one_iff_dvd,
-      Int.natCast_dvd_natCast] at h
+        Int.natCast_dvd_natCast]
+      at h
     exact hpl ((Nat.prime_dvd_prime_iff_eq (Fact.out) hpp).mp h).symm
   have := hu.map (algebraMap ℤ_[l] K)
   rw [map_natCast, CharP.cast_eq_zero] at this
   exact not_isUnit_zero this
 
-private theorem unip_pow (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [CharP K l] (n m : ℕ)
-    (M : Matrix (Fin n) (Fin n) (PowerSeries K))
-    (hM : (M.map (PowerSeries.constantCoeff : PowerSeries K →+* K)).charpoly = (Polynomial.X - 1) ^ n) (i j : Fin n) :
-    (M ^ l ^ (n * m) - 1) i j ∈ maximalIdeal (PowerSeries K) ^ m := by
+private theorem unip_pow
+    (l : ℕ) [Fact l.Prime]
+    (K : Type) [Field K] [CharP K l]
+    (n m : ℕ) (M : Matrix (Fin n) (Fin n) (PowerSeries K))
+    (hM
+      : (M.map (PowerSeries.constantCoeff : PowerSeries K →+* K)).charpoly = (Polynomial.X - 1) ^ n)
+    (i j : Fin n)
+    : (M ^ l ^ (n * m) - 1) i j ∈ maximalIdeal (PowerSeries K) ^ m := by
   rcases isEmpty_or_nonempty (Fin n) with hn | hn
   · exact (IsEmpty.false i).elim
   haveI : CharP (PowerSeries K) l :=
@@ -32,7 +39,8 @@ private theorem unip_pow (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [CharP K 
   set N := M - 1 with hN
   have hMN : M = 1 + N := by rw [hN]; abel
   have hfrob : M ^ l ^ (n * m) - 1 = N ^ l ^ (n * m) := by
-    rw [hMN, add_pow_char_pow_of_commute (p := l) (h := Commute.one_left N), one_pow, add_sub_cancel_left]
+    rw [hMN, add_pow_char_pow_of_commute (p := l) (h := Commute.one_left N), one_pow,
+      add_sub_cancel_left]
   let f := (PowerSeries.constantCoeff : PowerSeries K →+* K).mapMatrix (m := Fin n)
   have hNn : f (N ^ n) = 0 := by
     rw [map_pow, hN, map_sub, map_one, RingHom.mapMatrix_apply]
@@ -46,8 +54,9 @@ private theorem unip_pow (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [CharP K 
       simpa [f, RingHom.mapMatrix_apply] using this
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, PowerSeries.isUnit_iff_constantCoeff, h0]
     exact not_isUnit_zero
-  have hpow : ∀ (I : Ideal (PowerSeries K)) (P : Matrix (Fin n) (Fin n) (PowerSeries K)),
-      (∀ a b, P a b ∈ I) → ∀ k : ℕ, ∀ a b, (P ^ k) a b ∈ I ^ k := by
+  have hpow
+      : ∀ (I : Ideal (PowerSeries K)) (P : Matrix (Fin n) (Fin n) (PowerSeries K)),
+        (∀ a b, P a b ∈ I) → ∀ k : ℕ, ∀ a b, (P ^ k) a b ∈ I ^ k := by
     intro I P hP k
     induction k with
     | zero => intro a b; simp [Ideal.one_eq_top]
@@ -60,8 +69,12 @@ private theorem unip_pow (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [CharP K 
     Matrix.mul_apply]
   exact Ideal.sum_mem _ fun c _ => Ideal.mul_mem_right _ _ (hpow _ _ h1 m i c)
 
-theorem UpperTheory.V.Pa.rhoPL :
-    ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n) (H : OpenNormalSubgroup F.Γ), (∀ g ∈ H, ∃ h : F.η g = 1, ((mat x.ρ ⟨g, h⟩).map (PowerSeries.constantCoeff : x.A →+* x.K)).charpoly = (Polynomial.X - 1) ^ n) → ∀ g : F.G₀, (g : F.Γ) ∈ PL l H.toSubgroup → x.ρ g = 1 := by
+theorem UpperTheory.V.Pa.rhoPL
+    : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n) (H : OpenNormalSubgroup F.Γ),
+      (∀ g ∈ H, ∃ h : F.η g = 1,
+          ((mat x.ρ ⟨g, h⟩).map (PowerSeries.constantCoeff : x.A →+* x.K)).charpoly
+            = (Polynomial.X - 1) ^ n)
+        → ∀ g : F.G₀, (g : F.Γ) ∈ PL l H.toSubgroup → x.ρ g = 1 := by
   intro l _ F n x H hH g hg
   haveI : CharP x.K l := charK l x.K
   have key : ∀ m : ℕ, ∀ i j, (mat x.ρ g - 1) i j ∈ maximalIdeal (PowerSeries x.K) ^ m := by
@@ -80,22 +93,28 @@ theorem UpperTheory.V.Pa.rhoPL :
     let T : Subgroup F.Γ := φ.ker.map F.η.ker.subtype
     have hTopen : IsOpen (T : Set F.Γ) := by
       have hK : IsOpen (φ.ker : Set F.G₀) := by
-        have e : (φ.ker : Set F.G₀) = ⋂ i, ⋂ j, {y : F.G₀ | φ y i j =
-            (1 : Matrix (Fin n) (Fin n) (PowerSeries x.K ⧸ maximalIdeal (PowerSeries x.K) ^ m)) i j} := by
-          ext y
-          simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_iInter, Set.mem_setOf_eq]
-          exact Matrix.ext_iff.symm
+        have e
+            : (φ.ker : Set F.G₀)
+              = ⋂ i, ⋂ j, {y : F.G₀ | φ y i j =
+                (1 : Matrix (Fin n) (Fin n) (PowerSeries x.K ⧸ maximalIdeal (PowerSeries x.K) ^ m)) i j} :=
+          by
+            ext y
+            simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_iInter, Set.mem_setOf_eq]
+            exact Matrix.ext_iff.symm
         rw [e]
-        exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-          (x.cont i j m : IsLocallyConstant fun y : F.G₀ => φ y i j).isOpen_fiber _
+        exact isOpen_iInter_of_finite fun i =>
+          isOpen_iInter_of_finite fun j =>
+            (x.cont i j m : IsLocallyConstant fun y : F.G₀ => φ y i j).isOpen_fiber _
       rw [Subgroup.coe_map]
       exact F.η_open.isOpenMap_subtype_val _ hK
     obtain ⟨V, hV⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hTopen T.one_mem
-    let W : OpenNormalSubgroup F.Γ :=
-      { toSubgroup := T.normalCore
-        isOpen' := Subgroup.isOpen_mono (H₁ := V.toSubgroup)
+    let W : OpenNormalSubgroup F.Γ := {
+      toSubgroup := T.normalCore
+      isOpen' :=
+        Subgroup.isOpen_mono (H₁ := V.toSubgroup)
           (Subgroup.normal_le_normalCore.mpr fun a ha => hV ha) V.toOpenSubgroup.isOpen
-        isNormal' := Subgroup.normalCore_normal T }
+      isNormal' := Subgroup.normalCore_normal T
+    }
     have hW : ∀ h ∈ H.toSubgroup, ∃ e, h ^ l ^ e ∈ W := by
       intro h hh
       refine ⟨n * m, ?_⟩
@@ -122,5 +141,6 @@ theorem UpperTheory.V.Pa.rhoPL :
   have h0 : (mat x.ρ g - 1) i j ∈ ⨅ m, maximalIdeal (PowerSeries x.K) ^ m :=
     Submodule.mem_iInf _ |>.mpr fun m => key m i j
   rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal _).ne_top,
-    Ideal.mem_bot, Matrix.sub_apply, sub_eq_zero] at h0
+      Ideal.mem_bot, Matrix.sub_apply, sub_eq_zero]
+    at h0
   exact h0

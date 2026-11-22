@@ -4,29 +4,43 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem conj_eq_transpose_conj_of_transpose_mul_eq_smul_one {n : ℕ} {R : Type} [CommRing R] (P Q P' Q' X : Matrix (Fin n) (Fin n) R) (a b : R)
-    (hPQ : P * Q = 1) (hQP : Q * P = 1) (hPQ' : P' * Q' = 1) (ha : Pᵀ * P' = a • 1) (hb : Qᵀ * Q' = b • 1) :
-    P' * (X * Q') = Qᵀ * (X * Pᵀ) := by
+private theorem conj_eq_transpose_conj_of_transpose_mul_eq_smul_one
+    {n : ℕ} {R : Type} [CommRing R]
+    (P Q P' Q' X : Matrix (Fin n) (Fin n) R)
+    (a b : R)
+    (hPQ : P * Q = 1) (hQP : Q * P = 1) (hPQ' : P' * Q' = 1) (ha : Pᵀ * P' = a • 1)
+    (hb : Qᵀ * Q' = b • 1)
+    : P' * (X * Q') = Qᵀ * (X * Pᵀ) := by
   have h1 : P' = a • Qᵀ := by
-    calc P' = (Qᵀ * Pᵀ) * P' := by rw [← Matrix.transpose_mul, hPQ, Matrix.transpose_one, Matrix.one_mul]
+    calc
+      P' = (Qᵀ * Pᵀ) * P' := by
+        rw [← Matrix.transpose_mul, hPQ, Matrix.transpose_one, Matrix.one_mul]
       _ = Qᵀ * (Pᵀ * P') := Matrix.mul_assoc _ _ _
       _ = a • Qᵀ := by rw [ha, Matrix.mul_smul, Matrix.mul_one]
   have h2 : Q' = b • Pᵀ := by
-    calc Q' = (Pᵀ * Qᵀ) * Q' := by rw [← Matrix.transpose_mul, hQP, Matrix.transpose_one, Matrix.one_mul]
+    calc
+      Q' = (Pᵀ * Qᵀ) * Q' := by
+        rw [← Matrix.transpose_mul, hQP, Matrix.transpose_one, Matrix.one_mul]
       _ = Pᵀ * (Qᵀ * Q') := Matrix.mul_assoc _ _ _
       _ = b • Pᵀ := by rw [hb, Matrix.mul_smul, Matrix.mul_one]
   have h3 : P' * Q' = (a * b) • (1 : Matrix (Fin n) (Fin n) R) := by
-    rw [h1, h2, Matrix.smul_mul, Matrix.mul_smul, smul_smul, ← Matrix.transpose_mul, hPQ, Matrix.transpose_one]
+    rw [h1, h2, Matrix.smul_mul, Matrix.mul_smul, smul_smul, ← Matrix.transpose_mul, hPQ,
+      Matrix.transpose_one]
   rw [hPQ'] at h3
   rw [h1, h2]
-  calc a • Qᵀ * (X * b • Pᵀ) = ((a * b) • (1 : Matrix (Fin n) (Fin n) R)) * (Qᵀ * (X * Pᵀ)) := by
-        simp only [Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul, smul_smul, mul_comm]
+  calc
+    a • Qᵀ * (X * b • Pᵀ) = ((a * b) • (1 : Matrix (Fin n) (Fin n) R)) * (Qᵀ * (X * Pᵀ)) := by
+      simp only [Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul, smul_smul, mul_comm]
     _ = Qᵀ * (X * Pᵀ) := by rw [← h3, Matrix.one_mul]
 
-theorem UpperTheory.V.Pa.adEx :
-    ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (A R : Type) [CommRing A] [CommRing R] [Algebra A R] (n : ℕ) (ρ : F.G₀ → Matrix (Fin n) (Fin n) R) (χ : F.Γ → R) (V : Submodule A (Matrix (Fin n) (Fin n) R)), AdOk F ρ χ V → ∃ rep : Representation A F.Γ V, IsAd F ρ χ V rep := by
+theorem UpperTheory.V.Pa.adEx
+    : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (A R : Type) [CommRing A] [CommRing R] [Algebra A R]
+        (n : ℕ) (ρ : F.G₀ → Matrix (Fin n) (Fin n) R) (χ : F.Γ → R)
+        (V : Submodule A (Matrix (Fin n) (Fin n) R)),
+      AdOk F ρ χ V → ∃ rep : Representation A F.Γ V, IsAd F ρ χ V rep := by
   intro l _ F A R _ _ _ n ρ χ V hV
   obtain ⟨h1, hmul, hform, hχ1, hχmul, had, htr⟩ := hV
   have hcinv : F.c⁻¹ = F.c := inv_eq_of_mul_eq_one_right F.c_sq
@@ -42,24 +56,26 @@ theorem UpperTheory.V.Pa.adEx :
     show χ (F.c * (g : F.Γ) * F.c⁻¹) = χ g
     rw [hcinv, hχmul, hχmul]
     linear_combination (χ (g : F.Γ)) * hχc
-  let adV : F.G₀ → (V →ₗ[A] V) := fun g =>
-    { toFun := fun Z => ⟨χ g • (ρ g * Z * ρ g⁻¹), had g Z Z.2⟩
-      map_add' := fun Z W => by
-        apply Subtype.ext
-        simp [Matrix.mul_add, Matrix.add_mul]
-      map_smul' := fun a Z => by
-        apply Subtype.ext
-        show χ g • (ρ g * (a • (Z : Matrix (Fin n) (Fin n) R)) * ρ g⁻¹) = a • (χ g • (ρ g * (Z : Matrix (Fin n) (Fin n) R) * ρ g⁻¹))
-        rw [Matrix.mul_smul, Matrix.smul_mul, smul_comm] }
-  let τV : V →ₗ[A] V :=
-    { toFun := fun Z => ⟨-(χ F.c • (Z : Matrix (Fin n) (Fin n) R)ᵀ), V.neg_mem (htr Z Z.2)⟩
-      map_add' := fun Z W => by
-        apply Subtype.ext
-        simp [add_comm]
-      map_smul' := fun a Z => by
-        apply Subtype.ext
-        show -(χ F.c • (a • (Z : Matrix (Fin n) (Fin n) R))ᵀ) = a • -(χ F.c • (Z : Matrix (Fin n) (Fin n) R)ᵀ)
-        rw [Matrix.transpose_smul, smul_comm, smul_neg] }
+  let adV : F.G₀ → (V →ₗ[A] V) := fun g => {
+    toFun := fun Z => ⟨χ g • (ρ g * Z * ρ g⁻¹), had g Z Z.2⟩
+    map_add' := fun Z W => by
+      apply Subtype.ext
+      simp [Matrix.mul_add, Matrix.add_mul]
+    map_smul' := fun a Z => by
+      apply Subtype.ext
+      show χ g • (ρ g * (a • (Z : Matrix (Fin n) (Fin n) R)) * ρ g⁻¹) = a • (χ g • (ρ g * (Z : Matrix (Fin n) (Fin n) R) * ρ g⁻¹))
+      rw [Matrix.mul_smul, Matrix.smul_mul, smul_comm]
+  }
+  let τV : V →ₗ[A] V := {
+    toFun := fun Z => ⟨-(χ F.c • (Z : Matrix (Fin n) (Fin n) R)ᵀ), V.neg_mem (htr Z Z.2)⟩
+    map_add' := fun Z W => by
+      apply Subtype.ext
+      simp [add_comm]
+    map_smul' := fun a Z => by
+      apply Subtype.ext
+      show -(χ F.c • (a • (Z : Matrix (Fin n) (Fin n) R))ᵀ) = a • -(χ F.c • (Z : Matrix (Fin n) (Fin n) R)ᵀ)
+      rw [Matrix.transpose_smul, smul_comm, smul_neg]
+  }
   have hadEq : ∀ g g' : F.G₀, (g : F.Γ) = g' → ∀ Z, adV g Z = adV g' Z := by
     intro g g' h Z
     rw [Subtype.ext h]
@@ -70,7 +86,8 @@ theorem UpperTheory.V.Pa.adEx :
   have hadmul : ∀ g h Z, adV (g * h) Z = adV g (adV h Z) := by
     intro g h Z
     apply Subtype.ext
-    simp [adV, hmul, _root_.mul_inv_rev, hχmul, Matrix.mul_assoc, smul_smul, Matrix.mul_smul, Matrix.smul_mul]
+    simp [adV, hmul, _root_.mul_inv_rev, hχmul, Matrix.mul_assoc, smul_smul, Matrix.mul_smul,
+      Matrix.smul_mul]
   have hττ : ∀ Z, τV (τV Z) = Z := by
     intro Z
     apply Subtype.ext
@@ -81,15 +98,17 @@ theorem UpperTheory.V.Pa.adEx :
     obtain ⟨a, ha⟩ := hform g
     obtain ⟨b, hb⟩ := hform g⁻¹
     rw [map_inv] at hb
-    have hm := conj_eq_transpose_conj_of_transpose_mul_eq_smul_one (ρ g) (ρ g⁻¹) (ρ (F.conj g)) (ρ (F.conj g)⁻¹) (Z : Matrix (Fin n) (Fin n) R)ᵀ a b
-      (hρr g) (hρl g) (hρr _) ha hb
+    have hm :=
+      conj_eq_transpose_conj_of_transpose_mul_eq_smul_one (ρ g) (ρ g⁻¹) (ρ (F.conj g))
+        (ρ (F.conj g)⁻¹) (Z : Matrix (Fin n) (Fin n) R)ᵀ a b (hρr g) (hρl g) (hρr _) ha hb
     simp only [adV, τV, LinearMap.coe_mk, AddHom.coe_mk, hχconj]
-    simp only [Matrix.transpose_smul, Matrix.transpose_mul, Matrix.mul_assoc, Matrix.mul_neg, Matrix.neg_mul,
-      Matrix.mul_smul, Matrix.smul_mul, smul_neg, smul_smul, hm, mul_comm]
+    simp only [Matrix.transpose_smul, Matrix.transpose_mul, Matrix.mul_assoc, Matrix.mul_neg,
+      Matrix.neg_mul, Matrix.mul_smul, Matrix.smul_mul, smul_neg, smul_smul, hm, mul_comm]
   have hswap : ∀ g W, adV g (τV W) = τV (adV (F.conj g) W) := by
     intro g W
     rw [hτad, hcc]
-  have hηc : ∀ h : F.Γ, F.η h ≠ 1 → F.η h = -1 := fun h hh => (Int.units_eq_one_or _).resolve_left hh
+  have hηc : ∀ h : F.Γ, F.η h ≠ 1 → F.η h = -1 := fun h hh =>
+    (Int.units_eq_one_or _).resolve_left hh
   have hmemc : ∀ h : F.Γ, F.η h ≠ 1 → F.c * h ∈ F.η.ker := fun h hh => by
     rw [MonoidHom.mem_ker, map_mul, F.η_c, hηc h hh]
     rfl

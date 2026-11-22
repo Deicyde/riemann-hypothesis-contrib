@@ -16,22 +16,28 @@ namespace GlobalTheory.BaseRing
 section
 open Polynomial
 
-theorem aeval_derivative_mul_mem_adjoin (A K : Type*) {L : Type*} [CommRing A] [Field K] [Field L]
-    [Algebra A K] [Algebra K L] [Algebra A L] [IsScalarTower A K L] [IsDomain A] [IsFractionRing A K]
-    [IsIntegrallyClosed A] [FiniteDimensional K L] [Algebra.IsSeparable K L] {x : L}
-    (hx : Algebra.adjoin K {x} = ⊤) (hAx : IsIntegral A x) (f : A[X]) (hf : aeval x f = 0)
-    {z : L} (hz : IsIntegral A z) : aeval x (derivative f) * z ∈ Algebra.adjoin A {x} := by
+theorem aeval_derivative_mul_mem_adjoin
+    (A K : Type*)
+    {L : Type*} [CommRing A] [Field K] [Field L] [Algebra A K] [Algebra K L] [Algebra A L]
+    [IsScalarTower A K L] [IsDomain A] [IsFractionRing A K] [IsIntegrallyClosed A]
+    [FiniteDimensional K L] [Algebra.IsSeparable K L]
+    {x : L} (hx : Algebra.adjoin K {x} = ⊤) (hAx : IsIntegral A x)
+    (f : A[X]) (hf : aeval x f = 0)
+    {z : L} (hz : IsIntegral A z)
+    : aeval x (derivative f) * z ∈ Algebra.adjoin A {x} := by
   have hinj : Function.Injective (algebraMap A L) := by
     rw [IsScalarTower.algebraMap_eq A K L]
     exact (algebraMap K L).injective.comp (IsFractionRing.injective A K)
   have : Module.IsTorsionFree A L := by
     rw [Module.isTorsionFree_iff_algebraMap_injective]; exact hinj
-  have h1 : z ∈ (Algebra.traceForm K L).dualSubmodule
-      (Subalgebra.toSubmodule (Algebra.adjoin A {x})) := by
+  have h1
+      : z ∈ (Algebra.traceForm K L).dualSubmodule
+        (Subalgebra.toSubmodule (Algebra.adjoin A {x})) := by
     intro y hy
     have hy' : IsIntegral A y :=
       (show Algebra.adjoin A {x} ≤ integralClosure A L from
-        Algebra.adjoin_le (Set.singleton_subset_iff.mpr hAx)) hy
+          Algebra.adjoin_le (Set.singleton_subset_iff.mpr hAx))
+        hy
     have := Algebra.isIntegral_trace (L := K) (hz.mul hy')
     obtain ⟨a, ha⟩ := IsIntegrallyClosed.isIntegral_iff.mp this
     rw [Algebra.traceForm_apply, ← ha]
@@ -40,8 +46,8 @@ theorem aeval_derivative_mul_mem_adjoin (A K : Type*) {L : Type*} [CommRing A] [
   have hne : aeval x (derivative (minpoly K x)) ≠ 0 :=
     (Algebra.IsSeparable.isSeparable _ _).aeval_derivative_ne_zero (minpoly.aeval _ _)
   rw [Submodule.mem_smul_iff_inv_mul_mem (inv_ne_zero hne), inv_inv,
-    minpoly.isIntegrallyClosed_eq_field_fractions' K hAx, derivative_map,
-    aeval_map_algebraMap] at h1
+      minpoly.isIntegrallyClosed_eq_field_fractions' K hAx, derivative_map, aeval_map_algebraMap]
+    at h1
   obtain ⟨g, hg⟩ := minpoly.isIntegrallyClosed_dvd hAx hf
   have : aeval x (derivative f) * z = aeval x g * (aeval x (derivative (minpoly A x)) * z) := by
     rw [hg, derivative_mul]
@@ -50,12 +56,13 @@ theorem aeval_derivative_mul_mem_adjoin (A K : Type*) {L : Type*} [CommRing A] [
   rw [this]
   exact Subalgebra.mul_mem _ (aeval_mem_adjoin_singleton _ _) h1
 
-
 open IntermediateField in
-theorem natCast_mul_mem_of_isIntegral (K : IntermediateField ℚ ℂ) [FiniteDimensional ℚ K]
-    (T : Subring ℂ) (hT : ∀ w ∈ K, IsIntegral ℤ w → w ∈ T) {ζ : ℂ} {n : ℕ} (hn : 0 < n)
-    (hζ : ζ ^ n = 1) (hζT : ζ ∈ T) {z : ℂ} (hzK : z ∈ K⟮ζ⟯) (hz : IsIntegral ℤ z) :
-    (n : ℂ) * z ∈ T := by
+theorem natCast_mul_mem_of_isIntegral
+    (K : IntermediateField ℚ ℂ) [FiniteDimensional ℚ K]
+    (T : Subring ℂ) (hT : ∀ w ∈ K, IsIntegral ℤ w → w ∈ T)
+    {ζ : ℂ} {n : ℕ} (hn : 0 < n) (hζ : ζ ^ n = 1) (hζT : ζ ∈ T)
+    {z : ℂ} (hzK : z ∈ K⟮ζ⟯) (hz : IsIntegral ℤ z)
+    : (n : ℂ) * z ∈ T := by
   have : NumberField K := {}
   let A := integralClosure ℤ K
   have : IsFractionRing A K := integralClosure.isFractionRing_of_finite_extension ℚ K
@@ -68,14 +75,16 @@ theorem natCast_mul_mem_of_isIntegral (K : IntermediateField ℚ ℂ) [FiniteDim
   have hint : ∀ y : K⟮ζ⟯, IsIntegral ℤ (y : ℂ) → IsIntegral A y := fun y hy =>
     ((isIntegral_algHom_iff (K⟮ζ⟯.val.restrictScalars ℤ) Subtype.val_injective).mp hy).tower_top
   have hxn : x ^ n = 1 := Subtype.ext hζ
-  have h := aeval_derivative_mul_mem_adjoin A K hx (hint x hζi) (X ^ n - 1) (by simp [hxn])
-    (hint ⟨z, hzK⟩ hz)
+  have h :=
+    aeval_derivative_mul_mem_adjoin A K hx (hint x hζi) (X ^ n - 1) (by simp [hxn])
+      (hint ⟨z, hzK⟩ hz)
   have hsub : ∀ y ∈ Algebra.adjoin A {x}, (y : ℂ) ∈ T := by
     intro y hy
     induction hy using Algebra.adjoin_induction with
     | mem y hy => rw [Set.mem_singleton_iff.mp hy]; exact hζT
     | algebraMap a =>
-      exact hT _ a.1.2 ((isIntegral_algHom_iff (K.val.restrictScalars ℤ) Subtype.val_injective).mpr a.2)
+      exact hT _ a.1.2
+        ((isIntegral_algHom_iff (K.val.restrictScalars ℤ) Subtype.val_injective).mpr a.2)
     | add a b _ _ ha hb => exact T.add_mem ha hb
     | mul a b _ _ ha hb => exact T.mul_mem ha hb
   have h2 := T.mul_mem hζT (hsub _ h)
@@ -86,23 +95,31 @@ theorem natCast_mul_mem_of_isIntegral (K : IntermediateField ℚ ℂ) [FiniteDim
     simp [derivative_X_pow, hxc]
   linear_combination (-(m + 1 : ℂ) * z) * hζ
 
-
 open IntermediateField in
-theorem mem_of_isIntegral_quadratic {d : ℕ} (hd : d.Prime) (hd4 : d % 4 = 3) {r : ℂ}
-    (hr : r ^ 2 = -(d : ℂ)) (T : Subring ℂ) (hT : (1 + r) / 2 ∈ T) {z : ℂ} (hzK : z ∈ ℚ⟮r⟯)
-    (hz : IsIntegral ℤ z) : z ∈ T := by
+theorem mem_of_isIntegral_quadratic
+    {d : ℕ} (hd : d.Prime) (hd4 : d % 4 = 3)
+    {r : ℂ} (hr : r ^ 2 = -(d : ℂ))
+    (T : Subring ℂ) (hT : (1 + r) / 2 ∈ T)
+    {z : ℂ} (hzK : z ∈ ℚ⟮r⟯) (hz : IsIntegral ℤ z)
+    : z ∈ T := by
   first
   | exact @_root_.GlobalTheory.RationalIntegralCoordinates.main
   | exact _root_.GlobalTheory.RationalIntegralCoordinates.main
   | (apply _root_.GlobalTheory.RationalIntegralCoordinates.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.RationalIntegralCoordinates.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.RationalIntegralCoordinates.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.RationalIntegralCoordinates.main
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.RationalIntegralCoordinates.main ..)
 
 end
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
@@ -135,16 +152,21 @@ theorem RZ_le_KA (l : Level H) (S : ℕ) : RZ H S l.A ≤ (KA l).toSubalgebra.to
   · exact show _ ∈ KA l from inv_mem (natCast_mem (KA l) S)
   · exact IntermediateField.subset_adjoin ℚ {H.rt0, zeta l.A} (by simp)
 
-
 open IntermediateField in
-theorem mem_RZ_of_isIntegral (l : Level H) {S e : ℕ} (hS : 0 < S) (hA : l.A ∣ S ^ e) {z : ℂ}
-    (hzK : z ∈ KA l) (hz : IsIntegral ℤ z) : z ∈ RZ H S l.A := by
-  have : FiniteDimensional ℚ ℚ⟮H.rt0⟯ := adjoin.finiteDimensional (isIntegral_sqrt_discriminant H).tower_top
-  have h := natCast_mul_mem_of_isIntegral ℚ⟮H.rt0⟯ (RZ H S l.A)
-    (fun w hw hw' => mem_of_isIntegral_quadratic H.d_prime (by have := H.d_mod; omega) H.sqrt_neg_disc_sq _
-      (Subring.subset_closure (by simp)) hw hw') l.A_pos (zeta_pow_self l.A_pos)
-    (Subring.subset_closure (by simp)) (z := z)
-    ((mem_restrictScalars ℚ).mp ((adjoin_simple_adjoin_simple ℚ H.rt0 (zeta l.A)).ge hzK)) hz
+theorem mem_RZ_of_isIntegral
+    (l : Level H)
+    {S e : ℕ} (hS : 0 < S) (hA : l.A ∣ S ^ e)
+    {z : ℂ} (hzK : z ∈ KA l) (hz : IsIntegral ℤ z)
+    : z ∈ RZ H S l.A := by
+  have : FiniteDimensional ℚ ℚ⟮H.rt0⟯ :=
+    adjoin.finiteDimensional (isIntegral_sqrt_discriminant H).tower_top
+  have h :=
+    natCast_mul_mem_of_isIntegral ℚ⟮H.rt0⟯ (RZ H S l.A)
+      (fun w hw hw' =>
+        mem_of_isIntegral_quadratic H.d_prime (by have := H.d_mod; omega) H.sqrt_neg_disc_sq _
+          (Subring.subset_closure (by simp)) hw hw')
+      l.A_pos (zeta_pow_self l.A_pos) (Subring.subset_closure (by simp)) (z := z)
+      ((mem_restrictScalars ℚ).mp ((adjoin_simple_adjoin_simple ℚ H.rt0 (zeta l.A)).ge hzK)) hz
   obtain ⟨c, hc⟩ := hA
   have hc' : (S : ℂ) ^ e = l.A * c := by exact_mod_cast hc
   have hS' : (S : ℂ) ≠ 0 := by exact_mod_cast hS.ne'
@@ -156,8 +178,9 @@ theorem mem_RZ_of_isIntegral (l : Level H) {S e : ℕ} (hS : 0 < S) (hA : l.A �
   rw [this]
   exact mul_mem (pow_mem hi e) (mul_mem (natCast_mem _ c) h)
 
-theorem exists_pow_mul_isIntegral (H : Host E) {S A : ℕ} (hS : 0 < S) (hA : 0 < A) {z : ℂ}
-    (hz : z ∈ RZ H S A) : ∃ k : ℕ, IsIntegral ℤ ((S : ℂ) ^ k * z) := by
+theorem exists_pow_mul_isIntegral
+    (H : Host E) {S A : ℕ} (hS : 0 < S) (hA : 0 < A) {z : ℂ} (hz : z ∈ RZ H S A)
+    : ∃ k : ℕ, IsIntegral ℤ ((S : ℂ) ^ k * z) := by
   have hS' : (S : ℂ) ≠ 0 := by exact_mod_cast hS.ne'
   have hp : ∀ k : ℕ, IsIntegral ℤ ((S : ℂ) ^ k) := fun k => (isIntegral_natCast S).pow k
   induction hz using Subring.closure_induction with
@@ -166,8 +189,10 @@ theorem exists_pow_mul_isIntegral (H : Host E) {S A : ℕ} (hS : 0 < S) (hA : 0 
     · exact ⟨0, by simpa using isIntegral_half_one_add_sqrt H⟩
     · exact ⟨1, by simpa [hS'] using isIntegral_one⟩
     · exact ⟨0, by simpa using IsIntegral.of_pow hA (zeta_pow_self hA ▸ isIntegral_one)⟩
-  | zero => exact ⟨0, by simpa using isIntegral_zero⟩
-  | one => exact ⟨0, by simpa using isIntegral_one⟩
+  | zero =>
+    exact ⟨0, by simpa using isIntegral_zero⟩
+  | one =>
+    exact ⟨0, by simpa using isIntegral_one⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha⟩ := hx
     obtain ⟨b, hb⟩ := hy
@@ -191,8 +216,8 @@ theorem finiteType_RZ (H : Host E) (S A : ℕ) : Algebra.FiniteType ℤ (RZ H S 
     rw [Algebra.adjoin_int]; rfl
   exact h2.equiv (RingEquiv.subringCongr h3).toIntAlgEquiv
 
-theorem isDedekindDomain_RZ (l : Level H) {S e : ℕ} (hS : 0 < S) (hA : l.A ∣ S ^ e) :
-    IsDedekindDomain (RZ H S l.A) := by
+theorem isDedekindDomain_RZ (l : Level H) {S e : ℕ} (hS : 0 < S) (hA : l.A ∣ S ^ e)
+    : IsDedekindDomain (RZ H S l.A) := by
   have := finiteDimensional_KA l
   have : NumberField (KA l) := {}
   have hint : ∀ y : KA l, IsIntegral ℤ (y : ℂ) ↔ IsIntegral ℤ y := fun y =>
@@ -212,21 +237,27 @@ theorem isDedekindDomain_RZ (l : Level H) {S e : ℕ} (hS : 0 < S) (hA : l.A ∣
       simp [hS']
     · intro z
       obtain ⟨k, hk⟩ := exists_pow_mul_isIntegral H hS l.A_pos z.2
-      have hm : (S : ℂ) ^ k * z ∈ KA l :=
-        mul_mem (pow_mem (natCast_mem _ S) k) (RZ_le_KA l S z.2)
+      have hm : (S : ℂ) ^ k * z ∈ KA l := mul_mem (pow_mem (natCast_mem _ S) k) (RZ_le_KA l S z.2)
       refine ⟨(⟨⟨_, hm⟩, (hint _).mp hk⟩, ⟨_, k, rfl⟩), Subtype.ext ?_⟩
       simp only [map_pow, map_natCast]
       push_cast
       exact mul_comm _ _
     · intro x y h
       refine ⟨1, ?_⟩
-      have : x = y := RingOfIntegers.ext (Subtype.ext (by
-        rw [← hφ, ← hφ]; exact congrArg Subtype.val h))
+      have : x = y :=
+        RingOfIntegers.ext (Subtype.ext (by rw [← hφ, ← hφ]; exact congrArg Subtype.val h))
       rw [this]
   exact IsLocalization.isDedekindDomain (𝓞 (KA l))
-    (powers_le_nonZeroDivisors_of_noZeroDivisors (Nat.cast_ne_zero.mpr hS.ne' : (S : 𝓞 (KA l)) ≠ 0)) _
+    (powers_le_nonZeroDivisors_of_noZeroDivisors (Nat.cast_ne_zero.mpr hS.ne' : (S : 𝓞 (KA l)) ≠ 0))
+    _
 
-theorem isDedFrac_RZ : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (S e : ℕ), 0 < S → l.A ∣ S ^ e → (∃ β : RZ H S l.A →+* KA l, IsInc (RZ H S l.A).subtype (KA l).val.toRingHom β) ∧ Algebra.FiniteType ℤ (RZ H S l.A) ∧ ∀ β : RZ H S l.A →+* KA l, IsInc (RZ H S l.A).subtype (KA l).val.toRingHom β → IsDedFrac β := by
+theorem isDedFrac_RZ
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (S e : ℕ),
+      0 < S → l.A ∣ S ^ e
+        → (∃ β : RZ H S l.A →+* KA l, IsInc (RZ H S l.A).subtype (KA l).val.toRingHom β)
+          ∧ Algebra.FiniteType ℤ (RZ H S l.A)
+          ∧ ∀ β : RZ H S l.A →+* KA l,
+            IsInc (RZ H S l.A).subtype (KA l).val.toRingHom β → IsDedFrac β := by
   intro E _ _ _ H l S e hS hA
   refine ⟨⟨Subring.inclusion (RZ_le_KA l S), fun _ => rfl⟩, finiteType_RZ H S l.A, fun β hβ => ?_⟩
   refine ⟨⟨inferInstance, isDedekindDomain_RZ l hS hA⟩, inferInstance, ?_⟩

@@ -11,8 +11,9 @@ noncomputable section
 
 namespace PI.UG.W
 
-theorem hStd_apply (E : Type) [Field E] [StarRing E] (n : ℕ) (x y : Sp E n) :
-    hStd E n x y = ∑ i, star (x i) * y i := rfl
+theorem hStd_apply (E : Type) [Field E] [StarRing E] (n : ℕ) (x y : Sp E n)
+    : hStd E n x y = ∑ i, star (x i) * y i :=
+  rfl
 
 theorem hStd_isSymm (E : Type) [Field E] [StarRing E] (n : ℕ) : (hStd E n).IsSymm := by
   refine LinearMap.isSymm_def.mpr fun x y => ?_
@@ -21,14 +22,20 @@ theorem hStd_isSymm (E : Type) [Field E] [StarRing E] (n : ℕ) : (hStd E n).IsS
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [starRingEnd_apply, star_mul, star_star, mul_comm]
 
-theorem star_mem_range (E : Type) [Field E] [NumberField E] [StarRing E] (r : 𝓞 E) :
-    star (algebraMap (𝓞 E) E r) ∈ Set.range (algebraMap (𝓞 E) E) := by
-  exact ⟨⟨star (algebraMap (𝓞 E) E r), (RingOfIntegers.isIntegral_coe r).map (starRingEnd E).toIntAlgHom⟩, rfl⟩
+theorem star_mem_range (E : Type) [Field E] [NumberField E] [StarRing E] (r : 𝓞 E)
+    : star (algebraMap (𝓞 E) E r) ∈ Set.range (algebraMap (𝓞 E) E) := by
+  exact ⟨
+    ⟨
+      star (algebraMap (𝓞 E) E r),
+      (RingOfIntegers.isIntegral_coe r).map (starRingEnd E).toIntAlgHom
+    ⟩,
+    rfl
+  ⟩
 
 def eStd (E : Type) [Field E] (n : ℕ) (i : Fin n) : Sp E n := Pi.single i 1
 
-theorem hStd_eStd (E : Type) [Field E] [StarRing E] (n : ℕ) (i j : Fin n) :
-    hStd E n (eStd E n i) (eStd E n j) = if i = j then 1 else 0 := by
+theorem hStd_eStd (E : Type) [Field E] [StarRing E] (n : ℕ) (i j : Fin n)
+    : hStd E n (eStd E n i) (eStd E n j) = if i = j then 1 else 0 := by
   rw [hStd_apply]
   by_cases h : i = j
   · subst h

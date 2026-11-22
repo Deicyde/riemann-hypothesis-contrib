@@ -16,8 +16,10 @@ namespace Formalism.HN
 
 section
 
-variable {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] (ρ : V →+ E)
+variable
+  {R V E : Type*}
+  [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+  (ρ : V →+ E)
 
 theorem satBasic_zl_mono {A B : Submodule R V} (h : A ≤ B) : zl ρ A ≤ zl ρ B := by
   intro x hx
@@ -47,7 +49,8 @@ theorem saturation_basic_properties : SatBasic := by
     intro A B hAL hBL h y hy
     obtain ⟨z, hz, hzy⟩ := (satR_mem_zl ρ A _).mp (h ((satR_mem_zl ρ B _).mpr ⟨y, hy, rfl⟩))
     have := hL.1 (hAL hz) (hBL hy) hzy
-    rw [← this]; exact hz
+    rw [← this]
+    exact hz
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro N h
     exact ⟨hL.1.mono (fun x hx => h hx), hdisc N h⟩
@@ -55,8 +58,8 @@ theorem saturation_basic_properties : SatBasic := by
     haveI := hdisc B hBL
     haveI := hdisc A (hAB.trans hBL)
     refine ⟨Formalism.F.att_rk_le (satBasic_zl_mono ρ hAB), fun hr => ?_⟩
-    have hc := Formalism.F.covolAntiSameRank E (zl ρ A) (zl ρ B) (hdisc B hBL)
-      (satBasic_zl_mono ρ hAB) hr
+    have hc :=
+      Formalism.F.covolAntiSameRank E (zl ρ A) (zl ρ B) (hdisc B hBL) (satBasic_zl_mono ρ hAB) hr
     have hpB := Formalism.F.covol_pos (zl ρ B)
     show -Real.log (Formalism.F.covol (zl ρ A)) ≤ -Real.log (Formalism.F.covol (zl ρ B))
     have := Real.log_le_log hpB hc
@@ -68,8 +71,7 @@ theorem saturation_basic_properties : SatBasic := by
     obtain ⟨a, ha, hax⟩ :=
       exists_smul_mem_of_finrank_eq (zl ρ N) (zl ρ S) (satBasic_zl_mono ρ hSN) hr x hx
     refine hS.2.2 x (satBasic_zl_mono ρ hNL hx) ?_
-    have hx' : x = (a : ℝ)⁻¹ • ((a : ℝ) • x) := by
-      rw [inv_smul_smul₀ (by exact_mod_cast ha)]
+    have hx' : x = (a : ℝ)⁻¹ • ((a : ℝ) • x) := by rw [inv_smul_smul₀ (by exact_mod_cast ha)]
     rw [hx']
     refine Submodule.smul_mem _ _ (Submodule.subset_span ?_)
     rw [Int.cast_smul_eq_zsmul]

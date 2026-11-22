@@ -9,19 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-private theorem isMonHom_mul_of_isCommMonObj {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G]
-    (f g : G ⟶ G) [IsMonHom f] [IsMonHom g] : IsMonHom (f * g) := by
+private theorem isMonHom_mul_of_isCommMonObj
+    {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G]
+    (f g : G ⟶ G) [IsMonHom f] [IsMonHom g]
+    : IsMonHom (f * g) := by
   rw [Hom.mul_def]
   infer_instance
 
-theorem exists_oAct_of_map_lattice :
-    Out.Laws → Out.Laws2 → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen) → ThetaUnifAV → ∀ (O : Type) [CommRing O] (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (r : O →+* Module.End ℂ (Fin P.g → ℂ)), (∀ a, ∀ z ∈ u.Λ, r a z ∈ u.Λ) → ∃ act : OAct O P.A, ∀ a z, u.ex (r a z) = u.ex z ≫ act.act a := by
+theorem exists_oAct_of_map_lattice
+    : Out.Laws → Out.Laws2
+      → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left),
+        M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
+      → ThetaUnifAV
+      → ∀ (O : Type) [CommRing O] (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g)
+          (r : O →+* Module.End ℂ (Fin P.g → ℂ)),
+        (∀ a, ∀ z ∈ u.Λ, r a z ∈ u.Λ)
+          → ∃ act : OAct O P.A, ∀ a z, u.ex (r a z) = u.ex z ≫ act.act a := by
   intro hL hL2 hGen hTh O _ P u r hr
 
   have key : ∀ a, ∃! f : P.A ⟶ P.A, IsMonHom f ∧ ∀ z, u.ex (r a z) = u.ex z ≫ f := fun a =>

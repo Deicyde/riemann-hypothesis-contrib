@@ -6,20 +6,21 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem isAdicComplete_of_le_of_isNoetherianRing (R : Type) [CommRing R] [IsNoetherianRing R]
-    (I J : Ideal R) (hIJ : I ≤ J) (hJ : IsAdicComplete J R) : IsAdicComplete I R := by
+theorem isAdicComplete_of_le_of_isNoetherianRing
+    (R : Type) [CommRing R] [IsNoetherianRing R]
+    (I J : Ideal R) (hIJ : I ≤ J) (hJ : IsAdicComplete J R)
+    : IsAdicComplete I R := by
   have hle : ∀ n : ℕ, (I ^ n • ⊤ : Submodule R R) ≤ J ^ n • ⊤ := fun n =>
     Submodule.smul_mono_left (Ideal.pow_right_mono hIJ n)
-  have hH : IsHausdorff I R :=
-    ⟨fun x hx => hJ.toIsHausdorff.haus x fun n => (hx n).mono (hle n)⟩
+  have hH : IsHausdorff I R := ⟨fun x hx => hJ.toIsHausdorff.haus x fun n => (hx n).mono (hle n)⟩
   have hP : IsPrecomplete I R := by
     refine ⟨fun f hf => ?_⟩
     obtain ⟨L, hL⟩ := hJ.toIsPrecomplete.prec (f := f) fun {m n} h => (hf h).mono (hle m)
     refine ⟨L, fun n => ?_⟩
     set N : Submodule R R := I ^ n • ⊤ with hN
     have hK : (⨅ m : ℕ, J ^ m • ⊤ : Submodule R (R ⧸ N)) = ⊥ :=
-      Ideal.iInf_pow_smul_eq_bot_of_le_jacobson J (by
-        simpa only [Ideal.jacobson_bot] using IsAdicComplete.le_jacobson_bot J)
+      Ideal.iInf_pow_smul_eq_bot_of_le_jacobson J
+        (by simpa only [Ideal.jacobson_bot] using IsAdicComplete.le_jacobson_bot J)
     rw [SModEq.sub_mem, ← Submodule.Quotient.mk_eq_zero, ← Submodule.mem_bot R, ← hK,
       Submodule.mem_iInf]
     intro m

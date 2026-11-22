@@ -10,9 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.adjoin :
-    ∀ {A R : Type} [CommRing A] [IsLocalRing A] [IsDomain A] [CommRing R] [IsLocalRing R] [IsDomain R] [Algebra A R] [Module.Finite A R] [FaithfulSMul A R], IsBase A → ∀ f : R,
-      ∃ _ : IsLocalRing (Algebra.adjoin A {f}), ReciprocityTheory.CA.IsCM (Algebra.adjoin A {f}) := by
+theorem UpperTheory.V.AlgebraTools.Conn.adjoin
+    : ∀ {A R : Type} [CommRing A] [IsLocalRing A] [IsDomain A] [CommRing R] [IsLocalRing R]
+        [IsDomain R] [Algebra A R] [Module.Finite A R] [FaithfulSMul A R],
+      IsBase A
+        → ∀ f : R, ∃ _ : IsLocalRing (Algebra.adjoin A {f}),
+          ReciprocityTheory.CA.IsCM (Algebra.adjoin A {f}) := by
   intro A R _ _ _ _ _ _ _ _ _ hA f
   have hf : IsIntegral A f := Algebra.IsIntegral.isIntegral f
   haveI : IsIntegrallyClosed A := hA.normal

@@ -13,10 +13,12 @@ universe u
 
 section AdmAux
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-private theorem pair_hom_f_coe_of_id {M M' : TRep R G} (P : Pair M M') (h : P.φ = MonoidHom.id G) (n : ℕ)
-    (x : M.coch.X n) : (P.hom.f n x).1 = fun g => P.u (x.1 g) := by
+private theorem pair_hom_f_coe_of_id
+    {M M' : TRep R G} (P : Pair M M') (h : P.φ = MonoidHom.id G) (n : ℕ) (x : M.coch.X n)
+    : (P.hom.f n x).1 = fun g => P.u (x.1 g) := by
   funext g
   show P.u (x.1 fun i => P.φ (g i)) = P.u (x.1 g)
   rw [h]
@@ -53,19 +55,23 @@ theorem admissibility_holds : AdmStatement.{u} := by
       exact (h.exact (i.u (x.1 g))).2 ⟨x.1 g, rfl⟩
   · intro c
     obtain ⟨s, hs, hps⟩ := h.sec
-    exact ⟨⟨s ∘ c.1, hs.comp c.2⟩,
-      Subtype.ext ((pair_hom_f_coe_of_id p h.p_id n _).trans (funext fun g => hps _))⟩
+    exact ⟨
+      ⟨s ∘ c.1, hs.comp c.2⟩,
+      Subtype.ext ((pair_hom_f_coe_of_id p h.p_id n _).trans (funext fun g => hps _))
+    ⟩
 
 theorem limRep_holds : LimRepStatement.{u} := by
   intro R _ G _ _ _ A _ τ L π hτ hemb hlift
   have cτ : ∀ m n (x : (A (m + 1)).coch.X n), ((τ m).hom.f n x).1 = fun g => (τ m).u (x.1 g) :=
     fun m n x => pair_hom_f_coe_of_id (τ m) (hτ m).1 n x
-  have cπ : ∀ m n (x : L.coch.X n), ((π m).hom.f n x).1 = fun g => (π m).u (x.1 g) :=
-    fun m n x => pair_hom_f_coe_of_id (π m) (hτ m).2.1 n x
+  have cπ : ∀ m n (x : L.coch.X n), ((π m).hom.f n x).1 = fun g => (π m).u (x.1 g) := fun m n x =>
+    pair_hom_f_coe_of_id (π m) (hτ m).2.1 n x
   refine ⟨fun m n c => ?_, fun m n x => ?_, fun n x hx => ?_, fun n y hy => ?_⟩
   · choose s hs using (hτ m).2.2.1
-    exact ⟨⟨s ∘ c.1, (continuous_of_discreteTopology (f := s)).comp c.2⟩,
-      Subtype.ext ((cτ m n _).trans (funext fun g => hs _))⟩
+    exact ⟨
+      ⟨s ∘ c.1, (continuous_of_discreteTopology (f := s)).comp c.2⟩,
+      Subtype.ext ((cτ m n _).trans (funext fun g => hs _))
+    ⟩
   · refine Subtype.ext ?_
     rw [cτ, cπ, cπ]
     funext g
@@ -93,7 +99,8 @@ theorem limRep_holds : LimRepStatement.{u} := by
 
 section ColimAux
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
 end ColimAux
 

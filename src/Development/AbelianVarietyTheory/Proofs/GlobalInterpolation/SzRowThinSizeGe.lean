@@ -7,13 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ScaleP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem szRow_thinSize_ge : SzRow (fun C D L => ((D.R.k : ℝ) ^ C.P.Cw ≤ L.sc.w'' D.R.n ∧ L.sc.b ^ C.P.cw ≤ L.sc.w'' D.R.n)) := by
+theorem szRow_thinSize_ge
+    : SzRow (fun C D L =>
+      ((D.R.k : ℝ) ^ C.P.Cw ≤ L.sc.w'' D.R.n ∧ L.sc.b ^ C.P.cw ≤ L.sc.w'' D.R.n)) := by
   intro eps he he' C hC
-  obtain ⟨x1, h1⟩ := GlobalTheory.scale_poly_comparison eps (5 * |(C.P.Cw : ℝ)|) (1 / 10) he (by norm_num)
+  obtain ⟨x1, h1⟩ :=
+    GlobalTheory.scale_poly_comparison eps (5 * |(C.P.Cw : ℝ)|) (1 / 10) he (by norm_num)
   refine ⟨0, fun cD _ => ⟨0, fun ch _ => ⟨max x1 16, fun D L hs hx hV => ?_⟩⟩⟩
   have hx1 : x1 ≤ L.sc.x := le_trans (le_max_left _ _) hx
   have hx16 : (16 : ℝ) ≤ L.sc.x := le_trans (le_max_right _ _) hx
@@ -28,8 +32,9 @@ theorem szRow_thinSize_ge : SzRow (fun C D L => ((D.R.k : ℝ) ^ C.P.Cw ≤ L.sc
       norm_num
     rwa [e] at h
   have hup : ∀ a b : ℝ, 1 / 4 + a ≤ b → 2 * L.sc.x ^ a ≤ L.sc.x ^ b := fun a b hab => by
-    calc 2 * L.sc.x ^ a ≤ L.sc.x ^ ((1 : ℝ) / 4) * L.sc.x ^ a :=
-          mul_le_mul_of_nonneg_right h2 (Real.rpow_nonneg hx0.le _)
+    calc
+      2 * L.sc.x ^ a ≤ L.sc.x ^ ((1 : ℝ) / 4) * L.sc.x ^ a :=
+        mul_le_mul_of_nonneg_right h2 (Real.rpow_nonneg hx0.le _)
       _ = L.sc.x ^ (1 / 4 + a) := (Real.rpow_add hx0 _ _).symm
       _ ≤ L.sc.x ^ b := Real.rpow_le_rpow_of_exponent_le hone hab
   have hn3 : (D.R.n : ℝ) ≤ L.sc.x ^ (3 : ℝ) := hV.ranks.n_le'.trans (hup _ _ (by norm_num))
@@ -43,10 +48,10 @@ theorem szRow_thinSize_ge : SzRow (fun C D L => ((D.R.k : ℝ) ^ C.P.Cw ≤ L.sc
   have hB : (1 : ℝ) ≤ L.sc.x ^ (5 * |(C.P.Cw : ℝ)|) := Real.one_le_rpow hone (by positivity)
   have hcw : C.P.cw = 9 / 10 := hC.2.2.2.2.1
   have hkC : (D.R.k : ℝ) ^ (C.P.Cw : ℝ) ≤ L.sc.x ^ (5 * |(C.P.Cw : ℝ)|) := by
-    calc (D.R.k : ℝ) ^ (C.P.Cw : ℝ) ≤ (D.R.k : ℝ) ^ |(C.P.Cw : ℝ)| :=
-          Real.rpow_le_rpow_of_exponent_le hk0 (le_abs_self _)
-      _ ≤ (L.sc.x ^ (5 : ℝ)) ^ |(C.P.Cw : ℝ)| :=
-          Real.rpow_le_rpow (by linarith) hk5 (abs_nonneg _)
+    calc
+      (D.R.k : ℝ) ^ (C.P.Cw : ℝ)
+        ≤ (D.R.k : ℝ) ^ |(C.P.Cw : ℝ)| := Real.rpow_le_rpow_of_exponent_le hk0 (le_abs_self _)
+      _ ≤ (L.sc.x ^ (5 : ℝ)) ^ |(C.P.Cw : ℝ)| := Real.rpow_le_rpow (by linarith) hk5 (abs_nonneg _)
       _ = L.sc.x ^ (5 * |(C.P.Cw : ℝ)|) := (Real.rpow_mul hx0.le _ _).symm
   refine ⟨?_, ?_⟩
   · refine hkC.trans (le_trans ?_ hw)

@@ -5,27 +5,33 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RankOfMulEqO
 
 @[expose] public section
 
-open NumberField PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.CohomologicalDescent Formalism.CohomologicalDescent.HeightDescentMinors Formalism.CohomologicalDescent.FrobeniusPeriodChange IsLocalRing GlobalTheory.WachPlace
+open NumberField PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.CohomologicalDescent
+  Formalism.CohomologicalDescent.HeightDescentMinors
+  Formalism.CohomologicalDescent.FrobeniusPeriodChange IsLocalRing GlobalTheory.WachPlace
 open Matrix
 
 namespace GlobalTheory
 
 theorem rank_residue_succ_of_adjoin
-    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (n : ℕ) (ϖ : O)
-    (Ac As : Matrix (Fin n) (Fin n) O) (x : Fin n → O) :
-    Irreducible ϖ → (∀ y : Fin n → O, ∃ u, Ac *ᵥ u = fun a => ϖ * y a) →
-    (∀ w, ∃ u c, As *ᵥ w = Ac *ᵥ u + fun a => c * x a) → (∃ w, As *ᵥ w = x) →
-    (∀ u, ∃ w, As *ᵥ w = Ac *ᵥ u) → (¬ ∃ u, Ac *ᵥ u = x) →
-    (As.map (residue O)).rank = (Ac.map (residue O)).rank + 1 := by
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (n : ℕ)
+    (ϖ : O) (Ac As : Matrix (Fin n) (Fin n) O) (x : Fin n → O)
+    : Irreducible ϖ → (∀ y : Fin n → O, ∃ u, Ac *ᵥ u = fun a => ϖ * y a)
+      → (∀ w, ∃ u c, As *ᵥ w = Ac *ᵥ u + fun a => c * x a) → (∃ w, As *ᵥ w = x)
+      → (∀ u, ∃ w, As *ᵥ w = Ac *ᵥ u) → (¬ ∃ u, Ac *ᵥ u = x)
+      → (As.map (residue O)).rank = (Ac.map (residue O)).rank + 1 := by
   intro hϖ h1 h2 h3 h4 h5
   set bar := residue O with hbar
-  have hmap : ∀ (A : Matrix (Fin n) (Fin n) O) (v : Fin n → O),
-      (A.map bar) *ᵥ (bar ∘ v) = bar ∘ (A *ᵥ v) := by
+  have hmap
+      : ∀ (A : Matrix (Fin n) (Fin n) O) (v : Fin n → O),
+        (A.map bar) *ᵥ (bar ∘ v) = bar ∘ (A *ᵥ v) := by
     intro A v; funext i; exact (RingHom.map_mulVec bar A v i).symm
   have hlift : ∀ z : Fin n → ResidueField O, ∃ v : Fin n → O, bar ∘ v = z := by
     intro z
     refine ⟨fun i => (residue_surjective (z i)).choose, ?_⟩
-    funext i; exact (residue_surjective (z i)).choose_spec
+    funext i
+    exact (residue_surjective (z i)).choose_spec
   set V := LinearMap.range (As.map bar).mulVecLin
   set Wc := LinearMap.range (Ac.map bar).mulVecLin
   set xb : Fin n → ResidueField O := bar ∘ x
@@ -68,9 +74,9 @@ theorem rank_residue_succ_of_adjoin
     have := hy a
     simp only [Pi.sub_apply] at this
     simp only [Pi.add_apply]
-    rw [mul_comm, this]; ring
-  have hxb0 : xb ≠ 0 := by
-    intro h; exact hxb (h ▸ Wc.zero_mem)
+    rw [mul_comm, this]
+    ring
+  have hxb0 : xb ≠ 0 := by intro h; exact hxb (h ▸ Wc.zero_mem)
   have hinf : Wc ⊓ Submodule.span (ResidueField O) {xb} = ⊥ := by
     rw [eq_bot_iff]
     rintro v ⟨hvW, hvs⟩

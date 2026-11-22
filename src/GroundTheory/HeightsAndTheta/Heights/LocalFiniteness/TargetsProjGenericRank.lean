@@ -26,5 +26,8 @@ public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosPartProjIn
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.DefectAverage : GroundTheory.Heights₂.Heights.DefectAverage.Statement :=
-  @GroundTheory.Heights₂.Heights.DefectAverage.proof GroundTheory.Heights₂.Heights.AutoClose.MahlerAverageSplit GroundTheory.Heights₂.Heights.AutoClose.CycleAverage
+theorem GroundTheory.Heights₂.Heights.AutoClose.DefectAverage
+    : GroundTheory.Heights₂.Heights.DefectAverage.Statement :=
+  @GroundTheory.Heights₂.Heights.DefectAverage.proof
+    GroundTheory.Heights₂.Heights.AutoClose.MahlerAverageSplit
+    GroundTheory.Heights₂.Heights.AutoClose.CycleAverage

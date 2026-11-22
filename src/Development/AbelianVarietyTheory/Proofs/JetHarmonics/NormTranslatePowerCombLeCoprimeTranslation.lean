@@ -42,8 +42,8 @@ theorem inOK_int_mul {d : ℕ} (k : ℤ) {x : ℂ} (hx : InOK d x) : InOK d ((k 
   obtain ⟨u, v, rfl⟩ := hx
   exact ⟨k * u, k * v, by push_cast; ring⟩
 
-theorem primeTo_add {d q : ℕ} {x y : ℂ} (hx : PrimeTo d q x) (hy : PrimeTo d q y) :
-    PrimeTo d q (x + y) := by
+theorem primeTo_add {d q : ℕ} {x y : ℂ} (hx : PrimeTo d q x) (hy : PrimeTo d q y)
+    : PrimeTo d q (x + y) := by
   obtain ⟨s, hs, hsq, hx⟩ := hx
   obtain ⟨r, hr, hrq, hy⟩ := hy
   refine ⟨s * r, Nat.mul_pos hs hr, Nat.Coprime.mul_left hsq hrq, ?_⟩
@@ -52,17 +52,27 @@ theorem primeTo_add {d q : ℕ} {x y : ℂ} (hx : PrimeTo d q x) (hy : PrimeTo d
   push_cast
   ring
 
-theorem norm_law : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ), d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ → ∀ (a m : ℕ) (c : Fin m → ℂ_[q]) (s : Fin m → ℂ) (t : ℂ) (B : ℝ), (∀ j, PrimeTo d q (s j)) → PrimeTo d q t → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d (s j) θ) ^ a) → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d t (U1 d (s j) θ)) ^ a) := by
+theorem norm_law
+    : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ),
+      d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ
+        → ∀ (a m : ℕ) (c : Fin m → ℂ_[q]) (s : Fin m → ℂ) (t : ℂ) (B : ℝ),
+          (∀ j, PrimeTo d q (s j)) → PrimeTo d q t
+            → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d (s j) θ) ^ a)
+            → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d t (U1 d (s j) θ)) ^ a) := by
   intro d q hq M ω θ hd hd16 hsp hL hM hθ a m c s t B hs ht hB
-  have law0 := GlobalTheory.T.translate_coprime_order_not_increase_theta_comb_norm d q M ω θ hd hd16 hsp hL hM hθ a m
+  have law0 :=
+    GlobalTheory.T.translate_coprime_order_not_increase_theta_comb_norm d q M ω θ hd hd16 hsp hL hM
+      hθ a m
   by_cases hhalf : InOK d (t - 1 / 2)
   swap
   · exact law0 c s t B hs ht hhalf hB
   have hd0 : 0 < d := hd.pos
   obtain ⟨hUU, -, hdiff, -⟩ := GlobalTheory.T.cmLattice_heisenberg_relations_one_variable d hd0
   obtain ⟨hlaws, hconst, -⟩ := GlobalTheory.MomOne.TaylorRead.hat_laws q M.ι (C ω * logS) hM.2.1
-  have hcm : ∀ (r : ℂ) (F : ℂ → ℂ), Differentiable ℂ F →
-      hat M.ι (C ω * logS) (fun z => r * F z) = C (M.ι r) * hat M.ι (C ω * logS) F := by
+  have hcm
+      : ∀ (r : ℂ) (F : ℂ → ℂ),
+        Differentiable ℂ F
+          → hat M.ι (C ω * logS) (fun z => r * F z) = C (M.ι r) * hat M.ι (C ω * logS) F := by
     intro r F hF
     rw [← hconst r]
     exact (hlaws (fun _ => r) F analyticAt_const (hF.analyticAt 0)).2.1
@@ -102,12 +112,13 @@ theorem norm_law : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ
     simp
   set r : Fin m → ℂ := fun j =>
     Complex.exp (-(Real.pi : ℂ) * Complex.I * (((h1 d (t / 2) (s j)).im : ℝ) : ℂ)) with hr
-  have hstep : ∀ j, U1 d (t / 2) (U1 d (s j) θ) = fun z => r j * U1 d (t / 2 + s j) θ z :=
-    fun j => hUU _ _ _
+  have hstep : ∀ j, U1 d (t / 2) (U1 d (s j) θ) = fun z => r j * U1 d (t / 2 + s j) θ z := fun j =>
+    hUU _ _ _
   have hD : ∀ j, Differentiable ℂ (U1 d (t / 2 + s j) θ) := fun j => (hdiff _ _ hθ.1).1
   have h1 := law0 c s (t / 2) B hs hτ hτ' hB
-  have h2 : Bd B (∑ j, C (c j * M.ι (r j) ^ a) *
-      hat M.ι (C ω * logS) (U1 d (t / 2 + s j) θ) ^ a) := by
+  have h2 : Bd B
+      (∑ j, C (c j * M.ι (r j) ^ a) *
+        hat M.ι (C ω * logS) (U1 d (t / 2 + s j) θ) ^ a) := by
     convert h1 using 2 with j
     rw [hstep j, hcm _ _ (hD j), mul_pow, map_mul, map_pow, mul_assoc]
   have h3 := law0 _ _ (t / 2) B (fun j => primeTo_add hτ (hs j)) hτ hτ' h2

@@ -13,13 +13,16 @@ open scoped ComplexConjugate ENNReal NNReal Pointwise
 
 namespace Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames.NH
 
-open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.REAL Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames
+open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.REAL
+  Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates
+  Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames
 
 theorem NHLoc_holds : JacobianCoordinates.NHLoc := by
   intro n r k ε e p z z' T T' F hep hpp hzp μN μH hN hH
   have hpz : ∀ a, hJ ε (p a) z = 0 := fun a => hJ_swap0 (hzp a)
-  obtain ⟨w, hww, hew, hpw, hzw⟩ := UnitaryIsometries.RI.complement ε F.dim F.sig F.T_pos
-    (⟨F.ee, hep, hpp, F.ez, hpz, F.zz⟩ : UnitaryIsometries.RI.Hyp ε e p z (T : ℂ))
+  obtain ⟨w, hww, hew, hpw, hzw⟩ :=
+    UnitaryIsometries.RI.complement ε F.dim F.sig F.T_pos
+      (⟨F.ee, hep, hpp, F.ez, hpz, F.zz⟩ : UnitaryIsometries.RI.Hyp ε e p z (T : ℂ))
   have Fw : Frm ε e p z w T := ⟨F.ee, hep, hpp, F.ez, hpz, F.zz, hew, hpw, hzw, hww, F.T_pos.ne'⟩
   have hdim := F.dim
   have hHc := HG_compact Fw hdim
@@ -45,8 +48,9 @@ theorem NHLoc_holds : JacobianCoordinates.NHLoc := by
   have hfin : IsFiniteMeasureOnCompacts ((μN.prod μH).map (fun q : UJ ε × UJ ε => q.1 * q.2)) := by
     refine ⟨fun K hK => ?_⟩
     rw [Measure.map_apply hmult hK.measurableSet]
-    have hsub : (fun q : UJ ε × UJ ε => q.1 * q.2) ⁻¹' K ⊆
-        ((K * (HG ε e p z : Set (UJ ε))⁻¹) ×ˢ (HG ε e p z : Set (UJ ε))) ∪ NHᶜ := by
+    have hsub
+        : (fun q : UJ ε × UJ ε => q.1 * q.2) ⁻¹' K
+          ⊆ ((K * (HG ε e p z : Set (UJ ε))⁻¹) ×ˢ (HG ε e p z : Set (UJ ε))) ∪ NHᶜ := by
       intro q hq
       by_cases hq' : q ∈ NH
       · left
@@ -61,14 +65,17 @@ theorem NHLoc_holds : JacobianCoordinates.NHLoc := by
   · intro h0
     have := congrArg (fun m : Measure (UJ ε) => m Set.univ) h0
     simp only [Measure.map_apply hmult MeasurableSet.univ, Set.preimage_univ, Measure.coe_zero,
-      Pi.zero_apply, ← Set.univ_prod_univ, Measure.prod_prod] at this
+        Pi.zero_apply, ← Set.univ_prod_univ, Measure.prod_prod]
+      at this
     rcases mul_eq_zero.1 this with h1 | h1
     · exact hneN (Measure.measure_univ_eq_zero.1 h1)
     · exact hneH (Measure.measure_univ_eq_zero.1 h1)
-  · rw [Measure.map_apply hmult (show MeasurableSet (SLoc ε e z)ᶜ from
-      (UnitaryIsometries.RI.SG_closed ε e z).measurableSet.compl)]
+  · rw [Measure.map_apply hmult
+      (show MeasurableSet (SLoc ε e z)ᶜ from
+        (UnitaryIsometries.RI.SG_closed ε e z).measurableSet.compl)]
     refine measure_mono_null (s := (fun q : UJ ε × UJ ε => q.1 * q.2) ⁻¹' (SLoc ε e z)ᶜ) (t := NHᶜ)
-      (fun q hq hqNH => hq ?_) hPout
+      (fun q hq hqNH => hq ?_)
+      hPout
     exact (UnitaryIsometries.RI.SG ε e z).mul_mem (NG_le_SG ε e z hqNH.1) (HG_le_SG ε e p z hqNH.2)
   · obtain ⟨m0, hm0, h0, hh0, rfl⟩ := mem_NH Fw hdim hs
     have hf : μN.map (fun x => m0 * conjH h0 x) = μN := by
@@ -76,12 +83,15 @@ theorem NHLoc_holds : JacobianCoordinates.NHLoc := by
       rw [this, ← Measure.map_map (measurable_const_mul m0) (conjH h0).continuous.measurable,
         conj_haar_eq Fw hdim hNH hh0, hinvN m0 hm0]
     have hg : μH.map (fun x => h0 * x) = μH := hinvH h0 hh0
-    have hfm : Measurable (fun x => m0 * conjH h0 x) := (conjH h0).continuous.measurable.const_mul m0
+    have hfm : Measurable (fun x => m0 * conjH h0 x) :=
+      (conjH h0).continuous.measurable.const_mul m0
     have hgm : Measurable (fun x : UJ ε => h0 * x) := measurable_const_mul h0
     haveI : SFinite (μN.map (fun x => m0 * conjH h0 x)) := by rw [hf]; infer_instance
     haveI : SFinite (μH.map (fun x => h0 * x)) := by rw [hg]; infer_instance
-    have hfun : (fun x => m0 * h0 * x) ∘ (fun q : UJ ε × UJ ε => q.1 * q.2) =
-        (fun q : UJ ε × UJ ε => q.1 * q.2) ∘ Prod.map (fun x => m0 * conjH h0 x) (fun x => h0 * x) := by
+    have hfun
+        : (fun x => m0 * h0 * x) ∘ (fun q : UJ ε × UJ ε => q.1 * q.2)
+          = (fun q : UJ ε × UJ ε => q.1 * q.2)
+            ∘ Prod.map (fun x => m0 * conjH h0 x) (fun x => h0 * x) := by
       funext q
       simp only [Function.comp_apply, Prod.map_fst, Prod.map_snd, conjH_apply]
       group

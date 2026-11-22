@@ -22,8 +22,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsRin
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -34,8 +36,8 @@ open Filter Topology
 
 namespace GlobalTheory.RealMultChart
 
-theorem comp_mulN {S : Scheme.{0}} (B : Over S) [GrpObj B] {T : Over S} (x : T ⟶ B) (n : ℕ) :
-    x ≫ mulN B n = x ^ n := by
+theorem comp_mulN {S : Scheme.{0}} (B : Over S) [GrpObj B] {T : Over S} (x : T ⟶ B) (n : ℕ)
+    : x ≫ mulN B n = x ^ n := by
   induction n with
   | zero =>
     show x ≫ (toUnit B ≫ η[B]) = x ^ 0
@@ -44,13 +46,17 @@ theorem comp_mulN {S : Scheme.{0}} (B : Over S) [GrpObj B] {T : Over S} (x : T �
     show x ≫ (lift (mulN B n) (𝟙 B) ≫ μ[B]) = x ^ (n + 1)
     rw [pow_succ, Hom.mul_def, ← ih, ← Category.assoc, comp_lift, Category.comp_id]
 
-theorem mulN_eq_mulA {S : Scheme.{0}} (B : Over S) [GrpObj B] (n : ℕ) : mulN B n = Out.mulA B n := by
+theorem mulN_eq_mulA {S : Scheme.{0}} (B : Over S) [GrpObj B] (n : ℕ)
+    : mulN B n = Out.mulA B n := by
   have h1 := comp_mulN B (𝟙 B) n
   rw [Category.id_comp] at h1
   rw [h1]
 
-theorem exists_pow_eq (B : Over (Sp ℂ)) [GrpObj B] (hB : IsAbelianScheme B) (a₀ : 𝟙_ (Over (Sp ℂ)) ⟶ B)
-    (n : ℕ) (hn : n ≠ 0) : ∃ b : 𝟙_ (Over (Sp ℂ)) ⟶ B, b ^ n = a₀ := by
+theorem exists_pow_eq
+    (B : Over (Sp ℂ)) [GrpObj B]
+    (hB : IsAbelianScheme B) (a₀ : 𝟙_ (Over (Sp ℂ)) ⟶ B)
+    (n : ℕ) (hn : n ≠ 0)
+    : ∃ b : 𝟙_ (Over (Sp ℂ)) ⟶ B, b ^ n = a₀ := by
   have hn' : ((n : ℂ)) ≠ 0 := Nat.cast_ne_zero.2 hn
   have hsurj : Surjective (mulN B n).left := surjective_mulN_of_isAbelianScheme ℂ B hB n hn'
   have hfin : IsFinite (mulN B n).left := by
@@ -65,8 +71,8 @@ theorem exists_pow_eq (B : Over (Sp ℂ)) [GrpObj B] (hB : IsAbelianScheme B) (a
   rw [← comp_mulN]
   exact Over.OverMorphism.ext hb'
 
-theorem compactSpace_points (A : Over (Sp ℂ)) (L : LB A.left) (hL : Out.RelAmple A L) :
-    @CompactSpace (𝟙_ (Over (Sp ℂ)) ⟶ A) (PointsCompact.pointTopology A) := by
+theorem compactSpace_points (A : Over (Sp ℂ)) (L : LB A.left) (hL : Out.RelAmple A L)
+    : @CompactSpace (𝟙_ (Over (Sp ℂ)) ⟶ A) (PointsCompact.pointTopology A) := by
   have h1 : PointsCompact.ValueRules := valAt'_rules
   have h2 : PointsCompact.AffinePoints := existsUnique_point_of_ringHom
   obtain ⟨N, -, M, s, hcov, H⟩ := hL ⊤ (isAffineOpen_top _)
@@ -79,12 +85,18 @@ theorem compactSpace_points (A : Over (Sp ℂ)) (L : LB A.left) (hL : Out.RelAmp
     exact (ConcreteCategory.bijective_of_isIso ((⊤ : (Sp ℂ).Opens).ι.app ⊤)).2.comp
       (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv).2
   have hY : @CompactSpace _ (PointsCompact.pointTopology Y) := by
-    refine PointsCompact.compact_of_sections h1 h2 Y (Out.powOver A L ⊤ N) s hcov fun i => ⟨(H i).1, ?_⟩
+    refine PointsCompact.compact_of_sections h1 h2 Y (Out.powOver A L ⊤ N) s hcov fun i =>
+      ⟨(H i).1, ?_⟩
     obtain ⟨r, hr, hs⟩ := (H i).2
-    refine ⟨r, hr, ((A.hom ∣_ ⊤).appLE ⊤ (Out.nonzeroLocus (s i)) le_top).hom.comp c₀,
-      fun a => ?_, fun f => ?_⟩
-    · have := Scheme.Hom.comp_appLE (A.hom ∣_ ⊤) (⊤ : (Sp ℂ).Opens).ι ⊤
-        (Out.nonzeroLocus (s i)) le_top
+    refine ⟨
+      r,
+      hr,
+      ((A.hom ∣_ ⊤).appLE ⊤ (Out.nonzeroLocus (s i)) le_top).hom.comp c₀,
+      fun a => ?_,
+      fun f => ?_
+    ⟩
+    · have :=
+        Scheme.Hom.comp_appLE (A.hom ∣_ ⊤) (⊤ : (Sp ℂ).Opens).ι ⊤ (Out.nonzeroLocus (s i)) le_top
       exact (congrArg (fun u => u.hom ((Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv.hom a)) this).symm
     · obtain ⟨p, rfl⟩ := hs f
       obtain ⟨q, rfl⟩ := MvPolynomial.map_surjective c₀ hc₀ p
@@ -108,13 +120,13 @@ theorem compactSpace_points (A : Over (Sp ℂ)) (L : LB A.left) (hL : Out.RelAmp
 
 def trivLB (A : Over (Sp ℂ)) : LB A.left := ⟨PUnit, fun _ => ⊤, fun _ _ => 1⟩
 
-
 open AbelianExp in
-theorem exists_holUnif_of_compact (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A] (g : ℕ)
-    (hs : SmoothOfRelativeDimension g A.hom)
+theorem exists_holUnif_of_compact
+    (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A]
+    (g : ℕ) (hs : SmoothOfRelativeDimension g A.hom)
     (hcpt : @CompactSpace (𝟙_ (Over (Sp ℂ)) ⟶ A) (PointsCompact.pointTopology A))
-    (hdiv : ∀ (a : 𝟙_ (Over (Sp ℂ)) ⟶ A) (n : ℕ), n ≠ 0 → ∃ b, b ^ n = a) :
-    Nonempty (HolUnif A (trivLB A) g) := by
+    (hdiv : ∀ (a : 𝟙_ (Over (Sp ℂ)) ⟶ A) (n : ℕ), n ≠ 0 → ∃ b, b ^ n = a)
+    : Nonempty (HolUnif A (trivLB A) g) := by
   have hval := @valAt'_rules
   have hvalaff := @existsUnique_point_of_ringHom
   have hprod := @holFamily_lift hval
@@ -123,41 +135,66 @@ theorem exists_holUnif_of_compact (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A
   have := isTopologicalGroup_complexPoints hval A
   have : CompactSpace (𝟙_ (Over (Sp ℂ)) ⟶ A) := hcpt
   have hpost := fun X x => (hval X x).2.2.2.1
-  have hmulHol : ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (W : Set E)
-      (a b : E → (𝟙_ (Over (Sp ℂ)) ⟶ A)), HolOn W a → HolOn W b → HolOn W fun w => a w * b w :=
-    fun E _ _ W a b ha hb => HolOn.post hpost (hprod E W _ _ a b ha hb) μ[A]
+  have hmulHol
+      : ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (W : Set E)
+          (a b : E → (𝟙_ (Over (Sp ℂ)) ⟶ A)),
+        HolOn W a → HolOn W b → HolOn W fun w => a w * b w := fun E _ _ W a b ha hb =>
+    HolOn.post hpost (hprod E W _ _ a b ha hb) μ[A]
   obtain ⟨W, σ, U, t, hW, h0, hσ0, hU, hσ, ht, ho, hD⟩ := hchart A g hs 1
-  let φ : OpenPartialHomeomorph (Additive (𝟙_ (Over (Sp ℂ)) ⟶ A)) (Fin g → ℂ) :=
-    chart t hW hσ ht ho
+  let φ : OpenPartialHomeomorph (Additive (𝟙_ (Over (Sp ℂ)) ⟶ A)) (Fin g → ℂ) := chart t hW hσ ht ho
   have hU1 : ⊤ ≤ (1 : 𝟙_ (Over (Sp ℂ)) ⟶ A).left ⁻¹ᵁ U := hσ0 ▸ (ht 0 h0).1
   have hφ : IsAnalyticGroupChart φ := by
     refine ⟨⟨0, h0, hσ0⟩, funext fun i => ?_, ?_⟩
     · have := (ht 0 h0).2 i
       rwa [hσ0] at this
-    · have hH := hmulHol _ (W ×ˢ W) _ _
-        (HolOn.comp hσ (hW.prod hW) differentiableOn_fst fun p hp => hp.1)
-        (HolOn.comp hσ (hW.prod hW) differentiableOn_snd fun p hp => hp.2)
+    · have hH :=
+        hmulHol _ (W ×ˢ W) _ _ (HolOn.comp hσ (hW.prod hW) differentiableOn_fst fun p hp => hp.1)
+          (HolOn.comp hσ (hW.prod hW) differentiableOn_snd fun p hp => hp.2)
       refine hH.analyticAt t (w := 0) ⟨h0, h0⟩ ?_
       simpa only [Prod.fst_zero, Prod.snd_zero, hσ0, _root_.mul_one] using hU1
   have hsurj : Function.Surjective hφ.exp := hφ.exp_surjective fun n hn x => hdiv x.toMul n hn
-  obtain ⟨W', L, hW', h0', hL, hLm, hLe⟩ : ∃ (W' : Set (Fin g → ℂ))
-      (L : (Fin g → ℂ) → (Fin g → ℂ)), IsOpen W' ∧ 0 ∈ W' ∧ DifferentiableOn ℂ L W' ∧
-      Set.MapsTo L W' W ∧ ∀ᶠ v in 𝓝 0, (hφ.exp v).toMul = σ (L v) := by
+  obtain ⟨W', L, hW', h0', hL, hLm, hLe⟩
+      : ∃ (W' : Set (Fin g → ℂ)) (L : (Fin g → ℂ) → (Fin g → ℂ)),
+        IsOpen W' ∧ 0 ∈ W' ∧ DifferentiableOn ℂ L W' ∧ Set.MapsTo L W' W
+          ∧ ∀ᶠ v in 𝓝 0, (hφ.exp v).toMul = σ (L v) := by
     have ha := hφ.isLocalCommGroupLaw.analyticAt_logChart_symm
     have h1 : ∀ᶠ v in 𝓝 0, hφ.isLocalCommGroupLaw.logChart.symm v ∈ W :=
       ha.continuousAt.eventually (hW.mem_nhds (by simpa using h0))
     obtain ⟨W', h2, h3, h4⟩ := eventually_nhds_iff.mp (ha.eventually_analyticAt.and h1)
-    exact ⟨W', _, h3, h4, fun v hv => (h2 v hv).1.differentiableAt.differentiableWithinAt,
-      fun v hv => (h2 v hv).2, hφ.exp_eventuallyEq⟩
-  refine ⟨⟨fun v => (hφ.exp v).toMul, fun z w => congrArg Additive.toMul (hφ.exp.map_add z w), hsurj,
-    hφ.periodLattice, fun z => Iff.rfl, inferInstance, hφ.isZLattice_periodLattice.span_top,
-    HolOn.of_local fun z => ?_, fun _ _ => 1, fun _ => differentiableOn_const _,
-    fun _ _ _ => one_ne_zero, fun i j z hz => ?_⟩⟩
+    exact ⟨
+      W',
+      _,
+      h3,
+      h4,
+      fun v hv => (h2 v hv).1.differentiableAt.differentiableWithinAt,
+      fun v hv => (h2 v hv).2,
+      hφ.exp_eventuallyEq
+    ⟩
+  refine ⟨⟨
+    fun v => (hφ.exp v).toMul,
+    fun z w => congrArg Additive.toMul (hφ.exp.map_add z w),
+    hsurj,
+    hφ.periodLattice,
+    fun z => Iff.rfl,
+    inferInstance,
+    hφ.isZLattice_periodLattice.span_top,
+    HolOn.of_local fun z => ?_,
+    fun _ _ => 1,
+    fun _ => differentiableOn_const _,
+    fun _ _ _ => one_ne_zero,
+    fun i j z hz => ?_
+  ⟩⟩
   · have hs : Continuous fun v : Fin g → ℂ => v - z := continuous_sub_right z
     have hWz : IsOpen ((fun v => v - z) ⁻¹' W') := hW'.preimage hs
-    refine ⟨(fun v => v - z) ⁻¹' W', fun v => (hφ.exp z).toMul * σ (L (v - z)), by simpa using h0',
-      hmulHol _ _ _ _ (HolOn.const hWz _) (HolOn.comp (HolOn.comp hσ hW' hL hLm) hWz
-        (differentiableOn_id.sub_const z) fun v hv => hv), ?_⟩
+    refine ⟨
+      (fun v => v - z) ⁻¹' W',
+      fun v => (hφ.exp z).toMul * σ (L (v - z)),
+      by simpa using h0',
+      hmulHol _ _ _ _ (HolOn.const hWz _)
+        (HolOn.comp (HolOn.comp hσ hW' hL hLm) hWz (differentiableOn_id.sub_const z) fun v hv =>
+          hv),
+      ?_
+    ⟩
     filter_upwards [(hs.tendsto' z 0 (sub_self z)).eventually hLe] with v hv
     rw [← hv, ← toMul_add, ← map_add (f := _), add_sub_cancel]
   · obtain ⟨e, he⟩ := (hval _ _).2.1 _ hz
@@ -169,6 +206,5 @@ theorem exists_holUnif_of_compact (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A
 end GlobalTheory.RealMultChart
 
 namespace GlobalTheory.RealMult
-
 
 end GlobalTheory.RealMult

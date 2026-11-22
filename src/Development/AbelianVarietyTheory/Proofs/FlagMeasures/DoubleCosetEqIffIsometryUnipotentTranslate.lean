@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Place
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData
+  Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -16,8 +19,8 @@ namespace GlobalTheory.HL.NmlCoset
 
 variable {D : D7} {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
 
-theorem mem_orth_iff (U : Submodule D.host.E (VS D).V) (y : (VS D).V) :
-    y ∈ orth (VS D) U ↔ ∀ x ∈ U, (VS D).hT x y = 0 := by
+theorem mem_orth_iff (U : Submodule D.host.E (VS D).V) (y : (VS D).V)
+    : y ∈ orth (VS D) U ↔ ∀ x ∈ U, (VS D).hT x y = 0 := by
   unfold orth
   simp only [Submodule.mem_iInf, LinearMap.mem_ker]
 
@@ -51,32 +54,32 @@ theorem Xa_mono (j : ℕ) : Xflag F j ≤ Xflag F (j + 1) := by
 instance Xa_fd (j : ℕ) : FiniteDimensional D.host.E (Xflag F j) :=
   FiniteDimensional.span_of_finite _ (Set.Finite.image _ (Set.toFinite _))
 
-theorem maps_Xa {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) (j : ℕ) :
-    ∀ x ∈ Xflag F (j + 1), n x ∈ Xflag F (j + 1) := by
+theorem maps_Xa {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) (j : ℕ)
+    : ∀ x ∈ Xflag F (j + 1), n x ∈ Xflag F (j + 1) := by
   intro x hx
   have h := hn.2.1 j x hx
   have : n x = (n x - x) + x := by abel
   rw [this]
   exact (Xflag F (j + 1)).add_mem (Xa_mono F j h) hx
 
-theorem maps_X {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) :
-    ∀ x ∈ Xsp F, n x ∈ Xsp F := by
+theorem maps_X {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F)
+    : ∀ x ∈ Xsp F, n x ∈ Xsp F := by
   intro x hx
   have h := hn.2.2 x (X_le_orth F hx)
   have : n x = (n x - x) + x := by abel
   rw [this]
   exact (Xsp F).add_mem h hx
 
-theorem maps_orth {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) :
-    ∀ x ∈ orth (VS D) (Xsp F), n x ∈ orth (VS D) (Xsp F) := by
+theorem maps_orth {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F)
+    : ∀ x ∈ orth (VS D) (Xsp F), n x ∈ orth (VS D) (Xsp F) := by
   intro x hx
   have h := hn.2.2 x hx
   have : n x = (n x - x) + x := by abel
   rw [this]
   exact (orth (VS D) (Xsp F)).add_mem (X_le_orth F h) hx
 
-theorem symm_mem_Xa {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) (j : ℕ) :
-    ∀ x ∈ Xflag F (j + 1), n.symm x ∈ Xflag F (j + 1) := by
+theorem symm_mem_Xa {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) (j : ℕ)
+    : ∀ x ∈ Xflag F (j + 1), n.symm x ∈ Xflag F (j + 1) := by
   intro x hx
   have hle : (Xflag F (j + 1)).map (n : (VS D).V →ₗ[D.host.E] (VS D).V) ≤ Xflag F (j + 1) := by
     rintro _ ⟨y, hy, rfl⟩
@@ -85,15 +88,16 @@ theorem symm_mem_Xa {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F)
   rw [← heq] at hx
   obtain ⟨y, hy, hyx⟩ := hx
   have : n.symm x = y := by rw [← hyx]; simp
-  rw [this]; exact hy
+  rw [this]
+  exact hy
 
 theorem one_mem : (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ NRat F := by
   refine ⟨(Formalism.HermitianLatticesTheory.isom (VS D).hT).one_mem, ?_, ?_⟩
   · intro j x _; simp
   · intro x _; simp
 
-theorem mul_mem {n m : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) (hm : m ∈ NRat F) :
-    n * m ∈ NRat F := by
+theorem mul_mem {n m : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) (hm : m ∈ NRat F)
+    : n * m ∈ NRat F := by
   refine ⟨(Formalism.HermitianLatticesTheory.isom (VS D).hT).mul_mem hn.1 hm.1, ?_, ?_⟩
   · intro j x hx
     show n (m x) - x ∈ Xflag F j
@@ -114,7 +118,8 @@ theorem inv_mem {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) : n
     have h := hn.2.1 j (n.symm x) hy
     rw [LinearEquiv.apply_symm_apply] at h
     have e : n.symm x - x = -(x - n.symm x) := by abel
-    rw [e]; exact (Xflag F j).neg_mem h
+    rw [e]
+    exact (Xflag F j).neg_mem h
   · intro x hx
     show n.symm x - x ∈ Xsp F
     have hy : n.symm x ∈ orth (VS D) (Xsp F) := by
@@ -127,18 +132,21 @@ theorem inv_mem {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F) : n
     have h := hn.2.2 (n.symm x) hy
     rw [LinearEquiv.apply_symm_apply] at h
     have e : n.symm x - x = -(x - n.symm x) := by abel
-    rw [e]; exact (Xsp F).neg_mem h
+    rw [e]
+    exact (Xsp F).neg_mem h
 
 end GlobalTheory.HL.NmlCoset
 
 namespace GlobalTheory.HL
 
-
 open GlobalTheory.HL.NmlCoset in
-theorem nmlOf_eq_iff_lin : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
-    Formalism.MainNotions.S.Cnt.Stand D u u' → ∀ t₀ t : TauC Y u u', nmlOf Y u u' t = nmlOf Y u u' t₀ ↔
-      ∃ n m : ((VS D).V ≃ₗ[D.host.E] (VS D).V), n ∈ NRat (lf D (X.Fu u)) ∧ m ∈ NRat (lf D (X.Fu u')) ∧
-        t.lin = n⁻¹ * t₀.lin * m := by
+theorem nmlOf_eq_iff_lin
+    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
+      Formalism.MainNotions.S.Cnt.Stand D u u'
+        → ∀ t₀ t : TauC Y u u',
+          nmlOf Y u u' t = nmlOf Y u u' t₀
+            ↔ ∃ n m : ((VS D).V ≃ₗ[D.host.E] (VS D).V),
+              n ∈ NRat (lf D (X.Fu u)) ∧ m ∈ NRat (lf D (X.Fu u')) ∧ t.lin = n⁻¹ * t₀.lin * m := by
   intro D X Y u u' _ t₀ t
   constructor
   · intro h
@@ -151,9 +159,11 @@ theorem nmlOf_eq_iff_lin : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' :
     constructor
     · rintro ⟨a, ha, b, hb, rfl⟩
       refine ⟨a * n⁻¹, mul_mem _ ha (inv_mem _ hn), m * b, mul_mem _ hm hb, ?_⟩
-      rw [e]; simp only [mul_assoc]
+      rw [e]
+      simp only [mul_assoc]
     · rintro ⟨a, ha, b, hb, rfl⟩
       refine ⟨a * n, mul_mem _ ha hn, m⁻¹ * b, mul_mem _ (inv_mem _ hm) hb, ?_⟩
-      rw [e]; group
+      rw [e]
+      group
 
 end GlobalTheory.HL

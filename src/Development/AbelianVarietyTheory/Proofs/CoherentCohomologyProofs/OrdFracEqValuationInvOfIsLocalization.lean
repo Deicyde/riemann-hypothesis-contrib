@@ -19,15 +19,15 @@ namespace ExtField
 
 section Local
 
-variable {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+variable
+  {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
   {K : Type*} [Field K] [Algebra R K] [IsFractionRing R K]
   (A : Type*) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
-  {L : Type*} [Field L] [Algebra A L] [IsFractionRing A L]
-  [Algebra R A] [IsLocalHom (algebraMap R A)] [Algebra K L] [Algebra R L]
-  [IsScalarTower R K L] [IsScalarTower R A L]
+  {L : Type*}
+  [Field L] [Algebra A L] [IsFractionRing A L] [Algebra R A] [IsLocalHom (algebraMap R A)]
+  [Algebra K L] [Algebra R L] [IsScalarTower R K L] [IsScalarTower R A L]
   {V : Type*} [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
-
 
 omit [IsDomain R] [IsDiscreteValuationRing R] [IsDomain A] [IsDiscreteValuationRing A]
   [IsFractionRing A L] [IsLocalHom (algebraMap R A)] in
@@ -45,29 +45,35 @@ end Local
 
 section Kernel
 
-variable {K L : Type*} [Field K] [Field L] [Algebra K L] {V : Type*} [AddCommGroup V] [Module K V]
+variable
+  {K L : Type*} [Field K] [Field L] [Algebra K L]
+  {V : Type*} [AddCommGroup V] [Module K V]
   {ι : Type*}
 
-theorem ker_liftBaseChange_eq_of_finrank_le [Fintype ι] [DecidableEq ι] (c : V →ₗ[K] (ι → L))
+theorem ker_liftBaseChange_eq_of_finrank_le
+    [Fintype ι] [DecidableEq ι]
+    (c : V →ₗ[K] (ι → L))
     {W₀ : Submodule K V} (hW : W₀ ≤ LinearMap.ker c) [FiniteDimensional K (V ⧸ W₀)]
-    (hr : finrank K (V ⧸ W₀) ≤ Fintype.card ι) {θ : ι → V}
-    (hdet : (Matrix.of fun i j => c (θ j) i).det ≠ 0) :
-    LinearMap.ker (c.liftBaseChange L) = W₀.baseChange L := by
+    (hr : finrank K (V ⧸ W₀) ≤ Fintype.card ι)
+    {θ : ι → V} (hdet : (Matrix.of fun i j => c (θ j) i).det ≠ 0)
+    : LinearMap.ker (c.liftBaseChange L) = W₀.baseChange L := by
   let g : L ⊗[K] (V ⧸ W₀) →ₗ[L] (ι → L) := (W₀.liftQ c hW).liftBaseChange L
   have hg : c.liftBaseChange L = g ∘ₗ W₀.mkQ.baseChange L := by
     ext v i
     simp [g]
   have hs : Function.Surjective g := by
     intro y
-    obtain ⟨a, rfl⟩ := Matrix.mulVec_surjective_iff_isUnit.mpr
-      ((Matrix.isUnit_iff_isUnit_det _).mpr (Ne.isUnit hdet)) y
+    obtain ⟨a, rfl⟩ :=
+      Matrix.mulVec_surjective_iff_isUnit.mpr
+        ((Matrix.isUnit_iff_isUnit_det _).mpr (Ne.isUnit hdet)) y
     refine ⟨∑ j, a j ⊗ₜ Submodule.Quotient.mk (θ j), ?_⟩
     funext i
     simp [g, Matrix.mulVec, dotProduct, mul_comm]
   have hi : LinearMap.ker g = ⊥ := by
     have h₁ := g.finrank_range_add_finrank_ker
     rw [LinearMap.range_eq_top.mpr hs, finrank_top, Module.finrank_baseChange,
-      Module.finrank_fintype_fun_eq_card] at h₁
+        Module.finrank_fintype_fun_eq_card]
+      at h₁
     rw [← Submodule.finrank_eq_zero]
     omega
   rw [hg, LinearMap.ker_comp, hi, Submodule.comap_bot, ker_baseChange_mkQ]
@@ -76,23 +82,28 @@ end Kernel
 
 section Scale
 
-variable {R K V ι : Type*} [CommRing R] [Field K] [Algebra R K] [AddCommGroup V] [Module K V]
-  [Module R V] [IsScalarTower R K V]
+variable
+  {R K V ι : Type*} [CommRing R] [Field K] [Algebra R K] [AddCommGroup V] [Module K V] [Module R V]
+  [IsScalarTower R K V]
 
 end Scale
 
 section Free
 
-variable (R S : Type*) [CommRing R] [Nontrivial R] [AddCommGroup S] [Module R S]
-  [Module.Free R S] [Module.Finite R S] (Q : Type*) [AddCommGroup Q] [Module R Q]
+variable
+  (R S : Type*)
+  [CommRing R] [Nontrivial R] [AddCommGroup S] [Module R S] [Module.Free R S] [Module.Finite R S]
+  (Q : Type*) [AddCommGroup Q] [Module R Q]
 
 end Free
 
 section Valuation
 
-variable {S : Type*} [CommRing S] [IsDedekindDomain S] {L : Type*} [Field L] [Algebra S L]
-  [IsFractionRing S L] (P : HeightOneSpectrum S)
-  (A : Type*) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Algebra S A]
+variable
+  {S : Type*} [CommRing S] [IsDedekindDomain S]
+  {L : Type*} [Field L] [Algebra S L] [IsFractionRing S L]
+  (P : HeightOneSpectrum S) (A : Type*)
+  [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Algebra S A]
   [IsLocalization.AtPrime A P.asIdeal] [Algebra A L] [IsScalarTower S A L] [IsFractionRing A L]
 
 omit [IsDomain A] [IsDiscreteValuationRing A] [IsFractionRing A L] in
@@ -111,8 +122,8 @@ private theorem valuation_algebraMap_unit (u : Aˣ) : P.valuation L (algebraMap 
   rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
 
 omit [IsFractionRing A L] in
-private theorem valuation_algebraMap_irreducible {ϖ : A} (hϖ : Irreducible ϖ) :
-    P.valuation L (algebraMap A L ϖ) = WithZero.exp (-1) := by
+private theorem valuation_algebraMap_irreducible {ϖ : A} (hϖ : Irreducible ϖ)
+    : P.valuation L (algebraMap A L ϖ) = WithZero.exp (-1) := by
   obtain ⟨π, hπ⟩ := P.valuation_exists_uniformizer' L
   have hπ' : P.valuation L (algebraMap A L (algebraMap S A π)) = WithZero.exp (-1) := by
     rw [← IsScalarTower.algebraMap_apply]
@@ -137,8 +148,8 @@ private theorem valuation_algebraMap_irreducible {ϖ : A} (hϖ : Irreducible ϖ)
   · exact h.2
   · omega
 
-theorem ordFrac_eq_valuation_inv_of_isLocalization (x : L) :
-    Ring.ordFrac A x = (P.valuation L x)⁻¹ := by
+theorem ordFrac_eq_valuation_inv_of_isLocalization (x : L)
+    : Ring.ordFrac A x = (P.valuation L x)⁻¹ := by
   rcases eq_or_ne x 0 with rfl | hx
   · simp
   obtain ⟨ϖ, hϖ⟩ := exists_irreducible A
@@ -148,15 +159,16 @@ theorem ordFrac_eq_valuation_inv_of_isLocalization (x : L) :
     ← WithZero.exp_zsmul, ← WithZero.exp_neg]
   simp
 
-theorem log_ordFrac_eq_neg_log_valuation (x : L) :
-    WithZero.log (Ring.ordFrac A x) = -WithZero.log (P.valuation L x) := by
+theorem log_ordFrac_eq_neg_log_valuation (x : L)
+    : WithZero.log (Ring.ordFrac A x) = - WithZero.log (P.valuation L x) := by
   rw [ordFrac_eq_valuation_inv_of_isLocalization P A, WithZero.log_inv]
 
 end Valuation
 
 section Semilocal
 
-variable (R : Type*) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+variable
+  (R : Type*) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
   (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
   (S : Type*) [CommRing S] [IsDedekindDomain S] [Algebra R S] [Module.Finite R S]
   (L : Type*) [Field L] [Algebra S L] [IsFractionRing S L] [Algebra K L] [Algebra R L]
@@ -164,26 +176,29 @@ variable (R : Type*) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 
 omit [Module.Finite R S] in
 variable {S} in
-private theorem exists_algebra_localization (P : HeightOneSpectrum S) :
-    ∃ _ : Algebra (Localization.AtPrime P.asIdeal) L,
-      IsScalarTower S (Localization.AtPrime P.asIdeal) L ∧
-      IsScalarTower R (Localization.AtPrime P.asIdeal) L ∧
-      IsFractionRing (Localization.AtPrime P.asIdeal) L := by
+private theorem exists_algebra_localization (P : HeightOneSpectrum S)
+    : ∃ _ : Algebra (Localization.AtPrime P.asIdeal) L,
+      IsScalarTower S (Localization.AtPrime P.asIdeal) L
+        ∧ IsScalarTower R (Localization.AtPrime P.asIdeal) L
+        ∧ IsFractionRing (Localization.AtPrime P.asIdeal) L := by
   have hu : ∀ y : P.asIdeal.primeCompl, IsUnit (algebraMap S L y) := fun y =>
     IsLocalization.map_units L ⟨y.1, P.asIdeal.primeCompl_le_nonZeroDivisors y.2⟩
   letI : Algebra (Localization.AtPrime P.asIdeal) L := (IsLocalization.lift hu).toAlgebra
   have h₁ : IsScalarTower S (Localization.AtPrime P.asIdeal) L :=
     IsScalarTower.of_algebraMap_eq' (IsLocalization.lift_comp hu).symm
-  refine ⟨inferInstance, h₁, IsScalarTower.of_algebraMap_eq fun r => ?_,
-    IsFractionRing.isFractionRing_of_isDomain_of_isLocalization P.asIdeal.primeCompl _ L⟩
+  refine ⟨
+    inferInstance,
+    h₁,
+    IsScalarTower.of_algebraMap_eq fun r => ?_,
+    IsFractionRing.isFractionRing_of_isDomain_of_isLocalization P.asIdeal.primeCompl _ L
+  ⟩
   rw [IsScalarTower.algebraMap_apply R S (Localization.AtPrime P.asIdeal),
     ← IsScalarTower.algebraMap_apply S, ← IsScalarTower.algebraMap_apply]
 
 variable {S} in
-private theorem dvr_localization (P : HeightOneSpectrum S) :
-    IsDiscreteValuationRing (Localization.AtPrime P.asIdeal) :=
+private theorem dvr_localization (P : HeightOneSpectrum S)
+    : IsDiscreteValuationRing (Localization.AtPrime P.asIdeal) :=
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain S P.ne_bot _
-
 
 include R K L in
 theorem not_isField_of_finite : ¬ IsField S := by
@@ -191,13 +206,12 @@ theorem not_isField_of_finite : ¬ IsField S := by
   rw [← Algebra.IsIntegral.isField_iff_isField (FaithfulSMul.algebraMap_injective R S)]
   exact not_isField R
 
-
 include R in
 theorem finite_heightOneSpectrum : Finite (HeightOneSpectrum S) := by
   have := finite_maximalSpectrum_of_finite R S
-  exact Finite.of_injective (fun P : HeightOneSpectrum S => (⟨P.asIdeal, P.isMaximal⟩ :
-    MaximalSpectrum S)) fun P Q h => HeightOneSpectrum.ext (congrArg MaximalSpectrum.asIdeal h)
-
+  exact Finite.of_injective
+    (fun P : HeightOneSpectrum S => (⟨P.asIdeal, P.isMaximal⟩ : MaximalSpectrum S))
+    fun P Q h => HeightOneSpectrum.ext (congrArg MaximalSpectrum.asIdeal h)
 
 include R S in
 theorem finrank_field_pos : 0 < finrank K L := by
@@ -207,25 +221,27 @@ theorem finrank_field_pos : 0 < finrank K L := by
 
 variable [Fintype (HeightOneSpectrum S)]
 
-private theorem log_ordFrac_norm_algebraMap {x : S} (hx : x ≠ 0) :
-    WithZero.log (Ring.ordFrac R (Algebra.norm K (algebraMap S L x))) =
-      ∑ P : HeightOneSpectrum S,
-        (P.asIdeal.inertiaDeg R : ℤ) * -WithZero.log (P.valuation L (algebraMap S L x)) := by
+private theorem log_ordFrac_norm_algebraMap {x : S} (hx : x ≠ 0)
+    : WithZero.log (Ring.ordFrac R (Algebra.norm K (algebraMap S L x)))
+      = ∑ P : HeightOneSpectrum S,
+          (P.asIdeal.inertiaDeg R : ℤ) * -WithZero.log (P.valuation L (algebraMap S L x)) := by
   have := faithfulSMul_of_tower R K S L
   let e := HeightOneSpectrum.equivMaximalSpectrum (not_isField_of_finite R K S L)
   letI : Fintype (MaximalSpectrum S) := Fintype.ofEquiv _ e
   have := isDiscreteValuationRing_localization_of_isDedekindDomain R (S := S)
   have h := addVal_norm_eq_sum R (fun n : MaximalSpectrum S => Localization.AtPrime n.asIdeal) x
   rw [← e.sum_comp] at h
-  have key : ∀ P : HeightOneSpectrum S, ∃ m : ℕ,
-      addVal (Localization.AtPrime (e P).asIdeal) (algebraMap S _ x) = m ∧
-        -WithZero.log (P.valuation L (algebraMap S L x)) = m := by
+  have key
+      : ∀ P : HeightOneSpectrum S, ∃ m : ℕ,
+        addVal (Localization.AtPrime (e P).asIdeal) (algebraMap S _ x) = m
+          ∧ - WithZero.log (P.valuation L (algebraMap S L x)) = m := by
     intro P
     obtain ⟨_, _, _, _⟩ := exists_algebra_localization R L P
     have := dvr_localization P
-    obtain ⟨m, hm⟩ := ENat.ne_top_iff_exists.mp (addVal_localization_ne_top R
-      (fun n : MaximalSpectrum S => Localization.AtPrime n.asIdeal)
-      (mem_nonZeroDivisors_of_ne_zero hx) (e P))
+    obtain ⟨m, hm⟩ :=
+      ENat.ne_top_iff_exists.mp (addVal_localization_ne_top R
+        (fun n : MaximalSpectrum S => Localization.AtPrime n.asIdeal)
+        (mem_nonZeroDivisors_of_ne_zero hx) (e P))
     refine ⟨m, hm.symm, ?_⟩
     have hm₁ : addVal (Localization.AtPrime P.asIdeal) (algebraMap S _ x) = m := hm.symm
     rw [← log_ordFrac_eq_neg_log_valuation P (Localization.AtPrime P.asIdeal),
@@ -239,12 +255,11 @@ private theorem log_ordFrac_norm_algebraMap {x : S} (hx : x ≠ 0) :
   push_cast
   exact Finset.sum_congr rfl fun P _ => by rw [hm', mul_comm]; rfl
 
-
 variable {L} in
-theorem log_ordFrac_norm_eq_sum {x : L} (hx : x ≠ 0) :
-    WithZero.log (Ring.ordFrac R (Algebra.norm K x)) =
-      ∑ P : HeightOneSpectrum S,
-        (P.asIdeal.inertiaDeg R : ℤ) * -WithZero.log (P.valuation L x) := by
+theorem log_ordFrac_norm_eq_sum {x : L} (hx : x ≠ 0)
+    : WithZero.log (Ring.ordFrac R (Algebra.norm K x))
+      = ∑ P : HeightOneSpectrum S,
+          (P.asIdeal.inertiaDeg R : ℤ) * -WithZero.log (P.valuation L x) := by
   have : FiniteDimensional K L := Module.finite_of_finrank_pos (finrank_field_pos R K S L)
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := S) x
   have hb₀ : b ≠ 0 := nonZeroDivisors.ne_zero hb
@@ -263,7 +278,8 @@ theorem log_ordFrac_norm_eq_sum {x : L} (hx : x ≠ 0) :
   ring
 
 variable {R K S L}
-variable {V : Type*} [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {V : Type*} [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 variable {F : Type*} [Field F] [LinearOrder F] [IsStrictOrderedRing F] [FloorRing F]

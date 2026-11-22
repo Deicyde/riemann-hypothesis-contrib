@@ -11,23 +11,29 @@ noncomputable section
 
 namespace GlobalTheory.NL
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {W : LocWach PD LL O v n} {RA RW : Type} [CommRing RA] [CommRing RW] [Algebra O RA]
-    [Algebra O RW] {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {W : LocWach PD LL O v n} {RA RW : Type}
+  [CommRing RA] [CommRing RW] [Algebra O RA] [Algebra O RW]
+  {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
 
-theorem tmul_basis_inj {O R M : Type} [CommRing O] [AddCommGroup R] [Module O R] [AddCommGroup M]
-    [Module O M] (e₀ : M) (hs : Submodule.span O {e₀} = ⊤) (hi : ∀ c : O, c • e₀ = 0 → c = 0)
-    {r r' : R} (h : r ⊗ₜ[O] e₀ = r' ⊗ₜ[O] e₀) : r = r' := by
+theorem tmul_basis_inj
+    {O R M : Type} [CommRing O] [AddCommGroup R] [Module O R] [AddCommGroup M] [Module O M]
+    (e₀ : M) (hs : Submodule.span O {e₀} = ⊤) (hi : ∀ c : O, c • e₀ = 0 → c = 0)
+    {r r' : R} (h : r ⊗ₜ[O] e₀ = r' ⊗ₜ[O] e₀)
+    : r = r' := by
   have hb : Function.Bijective (LinearMap.toSpanSingleton O M e₀) := by
     refine ⟨(injective_iff_map_eq_zero _).2 fun c hc => hi c (by simpa using hc), fun x => ?_⟩
     have hx : x ∈ Submodule.span O {e₀} := hs ▸ Submodule.mem_top
@@ -40,8 +46,9 @@ theorem tmul_basis_inj {O R M : Type} [CommRing O] [AddCommGroup R] [Module O R]
   have := congrArg (fun z => TensorProduct.rid O R (LinearMap.lTensor R f.symm.toLinearMap z)) h
   simpa [h1] using this
 
-theorem ioLaws_of_injective (E : EtTie W RA RW inclR φR gR πA)
-    (hO : Function.Injective (algebraMap O LL)) : IoLaws E := by
+theorem ioLaws_of_injective
+    (E : EtTie W RA RW inclR φR gR πA) (hO : Function.Injective (algebraMap O LL))
+    : IoLaws E := by
   obtain ⟨e, e₀, hs, hj, -⟩ := E.one_e
   have h0 : (e₀ : W.one.V) ≠ 0 := by
     intro h0
@@ -85,7 +92,10 @@ theorem ioLaws_of_injective (E : EtTie W RA RW inclR φR gR πA)
 
 end Generic
 
-theorem ioLaws : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; let E := ((F l).E K s LL h).tie; IoLaws E := by
+theorem ioLaws
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ)
+        [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL),
+      let W := (HW l).W K s LL h; let E := ((F l).E K s LL h).tie; IoLaws E := by
   intro D HW F l _ K s LL h
   exact ioLaws_of_injective _ Subtype.val_injective
 

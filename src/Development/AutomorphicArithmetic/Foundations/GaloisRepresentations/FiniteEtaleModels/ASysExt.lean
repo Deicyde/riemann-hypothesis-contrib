@@ -9,8 +9,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 open GlobalTheory.UPel.HT.HeckeAd (IsTranslA heckeSubA)
@@ -56,14 +59,16 @@ private theorem Dv.zsmul {n : ℕ} {w : L} (k : ℤ) (h : Dv n w) : Dv n (k • 
   obtain ⟨z, rfl⟩ := h
   exact ⟨k • z, by rw [← natCast_zsmul, ← natCast_zsmul, smul_smul, smul_smul, mul_comm]⟩
 
-private theorem Dv.comb {P Q : ℕ} {w : L} (h : Nat.Coprime P Q) (hP : Dv P w) (hQ : Dv Q w) : Dv (P * Q) w := by
+private theorem Dv.comb {P Q : ℕ} {w : L} (h : Nat.Coprime P Q) (hP : Dv P w) (hQ : Dv Q w)
+    : Dv (P * Q) w := by
   obtain ⟨z₁, h₁⟩ := hP
   obtain ⟨z₂, h₂⟩ := hQ
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.2 h
   have e₁ : w = (P : ℤ) • z₁ := by rw [natCast_zsmul]; exact h₁
   have e₂ : w = (Q : ℤ) • z₂ := by rw [natCast_zsmul]; exact h₂
   refine ⟨a • z₂ + b • z₁, ?_⟩
-  calc w = (a * P + b * Q : ℤ) • w := by rw [hab, one_smul]
+  calc
+    w = (a * P + b * Q : ℤ) • w := by rw [hab, one_smul]
     _ = a • ((P : ℤ) • w) + b • ((Q : ℤ) • w) := by rw [add_smul, mul_smul, mul_smul]
     _ = a • ((P : ℤ) • ((Q : ℤ) • z₂)) + b • ((Q : ℤ) • ((P : ℤ) • z₁)) := by rw [← e₂, ← e₁]
     _ = (P * Q) • (a • z₂ + b • z₁) := by
@@ -73,7 +78,8 @@ private theorem Dv.comb {P Q : ℕ} {w : L} (h : Nat.Coprime P Q) (hP : Dv P w) 
 
 end Dv
 
-private theorem isCoprime_of_dvd_sub {a b m : ℤ} (h : IsCoprime a m) (hd : m ∣ b - a) : IsCoprime b m := by
+private theorem isCoprime_of_dvd_sub {a b m : ℤ} (h : IsCoprime a m) (hd : m ∣ b - a)
+    : IsCoprime b m := by
   obtain ⟨t, ht⟩ := hd
   have hb : b = a + m * t := by rw [← ht]; ring
   rw [hb]
@@ -93,8 +99,8 @@ private theorem dvd_EF_right {n : ℕ} {v : G.La} (h : Dv n v) (x : G.La) : (n :
   rw [map_nsmul, nsmul_eq_mul]
   exact dvd_mul_right _ _
 
-private theorem dvd_EF_sub {n : ℕ} {A A₀ B B₀ : G.La} (hA : Dv n (A - A₀)) (hB : Dv n (B - B₀)) :
-    (n : ℤ) ∣ G.EF A B - G.EF A₀ B₀ := by
+private theorem dvd_EF_sub {n : ℕ} {A A₀ B B₀ : G.La} (hA : Dv n (A - A₀)) (hB : Dv n (B - B₀))
+    : (n : ℤ) ∣ G.EF A B - G.EF A₀ B₀ := by
   have e : G.EF A B - G.EF A₀ B₀ = G.EF (A - A₀) B + G.EF A₀ (B - B₀) := by
     simp only [map_sub, LinearMap.sub_apply]
     ring
@@ -103,18 +109,18 @@ private theorem dvd_EF_sub {n : ℕ} {A A₀ B B₀ : G.La} (hA : Dv n (A - A₀
 
 end Form
 
-private theorem sys_ext_of_split {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G.La} {u : ℕ → ℤ} {c c' κ : ℕ}
-    (hcc : c * c' = κ ^ 2) (hs : Sys G p f u c κ) (P Q : ℕ → ℕ) (e₁ e₂ : ℕ → ℤ)
+private theorem sys_ext_of_split
+    {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G.La} {u : ℕ → ℤ} {c c' κ : ℕ}
+    (hcc : c * c' = κ ^ 2) (hs : Sys G p f u c κ)
+    (P Q : ℕ → ℕ) (e₁ e₂ : ℕ → ℤ)
     (hPQ : ∀ n, 0 < n → P n * Q n = n) (hcop : ∀ n, 0 < n → Nat.Coprime (P n) (Q n))
     (he : ∀ n, 0 < n → e₁ n + e₂ n = 1) (hP : ∀ n, 0 < n → (P n : ℤ) ∣ e₁ n)
     (hQ : ∀ n, 0 < n → (Q n : ℤ) ∣ e₂ n) (hQpos : ∀ n, 0 < n → 0 < Q n)
-    (hQp : ∀ n, 0 < n → (Q n).Coprime p)
-    (hPm : ∀ n m, 0 < n → 0 < m → P (n * m) = P n * P m)
+    (hQp : ∀ n, 0 < n → (Q n).Coprime p) (hPm : ∀ n m, 0 < n → 0 < m → P (n * m) = P n * P m)
     (hQm : ∀ n m, 0 < n → 0 < m → Q (n * m) = Q n * Q m)
-    (hc' : ∀ n, 0 < n → IsCoprime (c' : ℤ) (P n : ℤ))
-    (hQn : ∀ n, 0 < n → n.Coprime p → Q n = n) :
-    ∃ (f' : ℕ → G.La →+ G.La) (u' : ℕ → ℤ), Sys G 1 f' u' c κ ∧
-      ∀ n, 0 < n → n.Coprime p → ∀ x, ∃ z, f' n x = f n x + n • z := by
+    (hc' : ∀ n, 0 < n → IsCoprime (c' : ℤ) (P n : ℤ)) (hQn : ∀ n, 0 < n → n.Coprime p → Q n = n)
+    : ∃ (f' : ℕ → G.La →+ G.La) (u' : ℕ → ℤ),
+      Sys G 1 f' u' c κ ∧ ∀ n, 0 < n → n.Coprime p → ∀ x, ∃ z, f' n x = f n x + n • z := by
   set f' : ℕ → G.La →+ G.La := fun n => (e₂ n * κ) • AddMonoidHom.id G.La + e₁ n • f (Q n)
   set u' : ℕ → ℤ := fun n => e₂ n * c' + e₁ n * u (Q n)
   have hf' : ∀ n x, f' n x = (e₂ n * κ) • x + e₁ n • f (Q n) x := fun n x => by simp [f']
@@ -165,7 +171,8 @@ private theorem sys_ext_of_split {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G
       obtain ⟨z, hz⟩ := s1 (Q n) (hQpos n hn) (hQp n hn) a x
       have d : Dv (Q n) (f (Q n) (a • x) - a • f (Q n) x) := dv_of_eq ⟨z, hz⟩
       have e : f' n (a • x) - a • f' n x = e₁ n • (f (Q n) (a • x) - a • f (Q n) x) := by
-        rw [hf', hf', smul_add, smul_sub, smul_comm a (e₂ n * (κ : ℤ)) x, smul_comm a (e₁ n) (f (Q n) x)]
+        rw [hf', hf', smul_add, smul_sub, smul_comm a (e₂ n * (κ : ℤ)) x,
+          smul_comm a (e₁ n) (f (Q n) x)]
         abel
       rw [e]
       exact key n hn _ (Dv.of_int (hP n hn) _) (Dv.zsmul _ d)
@@ -198,8 +205,10 @@ private theorem sys_ext_of_split {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G
       · have h1 := dvd_trans (Int.natCast_dvd_natCast.2 hQd) (UQ _ hnm)
         rw [hQnm] at h1
         have h := dvd_sub (dvd_add h1 s2b) (UQ n hn)
-        have e : u' (n * m) - u' n =
-            (u' (n * m) - u (Q n * Q m)) + (u (Q n * Q m) - u (Q n)) - (u' n - u (Q n)) := by ring
+        have e
+            : u' (n * m) - u' n
+              = (u' (n * m) - u (Q n * Q m)) + (u (Q n * Q m) - u (Q n)) - (u' n - u (Q n)) := by
+          ring
         rw [e]
         exact h
     · intro n hn _
@@ -211,14 +220,16 @@ private theorem sys_ext_of_split {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G
         rwa [← Nat.cast_mul, hPQ n hn] at h
       · have hcc' : (c : ℤ) * c' = (κ : ℤ) ^ 2 := by exact_mod_cast hcc
         have hk : G.EF (κ • x) (κ • y) = (c : ℤ) * c' * G.EF x y := by
-          rw [← natCast_zsmul, ← natCast_zsmul, LinearMap.map_smul₂, LinearMap.map_smul, smul_eq_mul,
-            smul_eq_mul, hcc']
+          rw [← natCast_zsmul, ← natCast_zsmul, LinearMap.map_smul₂, LinearMap.map_smul,
+            smul_eq_mul, smul_eq_mul, hcc']
           ring
         have t1 := dvd_EF_sub (LP n hn x) (LP n hn y)
         have t2 : (P n : ℤ) ∣ (c : ℤ) * (c' - u' n) * G.EF x y :=
           Dvd.dvd.mul_right (Dvd.dvd.mul_left (dvd_sub_comm.1 (UP n hn)) _) _
-        have e : G.EF (f' n x) (f' n y) - c * u' n * G.EF x y =
-            (G.EF (f' n x) (f' n y) - G.EF (κ • x) (κ • y)) + (c : ℤ) * (c' - u' n) * G.EF x y := by
+        have e
+            : G.EF (f' n x) (f' n y) - c * u' n * G.EF x y
+              = (G.EF (f' n x) (f' n y) - G.EF (κ • x) (κ • y))
+                + (c : ℤ) * (c' - u' n) * G.EF x y := by
           rw [hk]
           ring
         rw [e]
@@ -226,10 +237,12 @@ private theorem sys_ext_of_split {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G
       · have t1 := dvd_EF_sub (LQ n hn x) (LQ n hn y)
         have t3 : (Q n : ℤ) ∣ (c : ℤ) * (u (Q n) - u' n) * G.EF x y :=
           Dvd.dvd.mul_right (Dvd.dvd.mul_left (dvd_sub_comm.1 (UQ n hn)) _) _
-        have e : G.EF (f' n x) (f' n y) - c * u' n * G.EF x y =
-            (G.EF (f' n x) (f' n y) - G.EF (f (Q n) x) (f (Q n) y)) +
-              (G.EF (f (Q n) x) (f (Q n) y) - c * u (Q n) * G.EF x y) +
-              (c : ℤ) * (u (Q n) - u' n) * G.EF x y := by ring
+        have e
+            : G.EF (f' n x) (f' n y) - c * u' n * G.EF x y
+              = (G.EF (f' n x) (f' n y) - G.EF (f (Q n) x) (f (Q n) y))
+                + (G.EF (f (Q n) x) (f (Q n) y) - c * u (Q n) * G.EF x y)
+                + (c : ℤ) * (u (Q n) - u' n) * G.EF x y := by
+          ring
         rw [e]
         exact dvd_add (dvd_add t1 (s3b x y)) t3
     · intro n hn _ x
@@ -256,15 +269,20 @@ private theorem sys_ext_of_split {G : GDatum} {p : ℕ} {f : ℕ → G.La →+ G
 
 end UpperTheory.Gal.FiniteEtaleModels
 
-theorem UpperTheory.Gal.FiniteEtaleModels.sysExt_holds :
-    SysExt := by
+theorem UpperTheory.Gal.FiniteEtaleModels.sysExt_holds : SysExt := by
   rw [SysExt.eq_1]
   intro G p hp f u c c' κ hcc hc'p hs
   have cop : ∀ n, 0 < n → Nat.Coprime (p ^ n.factorization p) (n / p ^ n.factorization p) :=
     fun n hn => Nat.Coprime.pow_left _ (Nat.coprime_ordCompl hp hn.ne')
-  refine sys_ext_of_split hcc hs (fun n => p ^ n.factorization p) (fun n => n / p ^ n.factorization p)
-    (fun n => ((p ^ n.factorization p : ℕ) : ℤ) * Nat.gcdA (p ^ n.factorization p) (n / p ^ n.factorization p))
-    (fun n => ((n / p ^ n.factorization p : ℕ) : ℤ) * Nat.gcdB (p ^ n.factorization p) (n / p ^ n.factorization p))
+  refine sys_ext_of_split hcc hs
+    (fun n => p ^ n.factorization p)
+    (fun n => n / p ^ n.factorization p)
+    (fun n =>
+      ((p ^ n.factorization p : ℕ) : ℤ)
+        * Nat.gcdA (p ^ n.factorization p) (n / p ^ n.factorization p))
+    (fun n =>
+      ((n / p ^ n.factorization p : ℕ) : ℤ)
+        * Nat.gcdB (p ^ n.factorization p) (n / p ^ n.factorization p))
     ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_
   · intro n _
     exact Nat.ordProj_mul_ordCompl_eq_self n p

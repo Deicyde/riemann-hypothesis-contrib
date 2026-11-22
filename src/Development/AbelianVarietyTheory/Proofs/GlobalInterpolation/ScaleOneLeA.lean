@@ -6,7 +6,8 @@ public import Formalism.LocalRingCardinality.CoeNeZeroOfNotMem
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory
 
@@ -21,8 +22,8 @@ theorem scale_one_le_a (s : Scale) : 1 ≤ s.a := by
   unfold Scale.a
   exact one_le_mul_of_one_le_of_one_le hx.le hb
 
-theorem famP_La_nonneg : ∀ (eps : ℝ) (Fm : FamP eps), ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x,
-    0 ≤ (Fm.L x i).La := by
+theorem famP_La_nonneg
+    : ∀ (eps : ℝ) (Fm : FamP eps), ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, 0 ≤ (Fm.L x i).La := by
   intro eps Fm x hx i
   obtain ⟨-, -, -, -, -, -, hQD, -⟩ := Fm.sizes x hx i
   obtain ⟨-, -, -, -, -, -, hrd, -⟩ := hQD

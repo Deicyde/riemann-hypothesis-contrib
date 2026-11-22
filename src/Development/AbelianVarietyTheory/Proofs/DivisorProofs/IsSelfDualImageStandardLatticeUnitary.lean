@@ -10,20 +10,22 @@ open Polynomial Matrix GlobalTheory.LatOrb
 
 namespace GlobalTheory.LatOrb
 
-theorem herm_mulVec_right {K : Type} [Field K] (σ : K →+* K)
-    {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (y u : Fin n → K) :
-    herm σ y (g *ᵥ u) = herm σ ((g.map σ)ᵀ *ᵥ y) u := by
+theorem herm_mulVec_right
+    {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (y u : Fin n → K)
+    : herm σ y (g *ᵥ u) = herm σ ((g.map σ)ᵀ *ᵥ y) u := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [herm, mulVec, dotProduct, map_sum, map_mul, Matrix.transpose_apply, Matrix.map_apply,
-    Finset.mul_sum, Finset.sum_mul]
+      Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl (fun j _ => Finset.sum_congr rfl (fun k _ => ?_))
   ring
 
-theorem selfDual_matLat_stdLat {O K : Type} [CommRing O] [Field K] [Algebra O K] (σ : K →+* K)
+theorem selfDual_matLat_stdLat
+    {O K : Type} [CommRing O] [Field K] [Algebra O K]
+    (σ : K →+* K)
     (_hinv : ∀ x, σ (σ x) = x) (hO : ∀ a : O, ∃ b : O, σ (algebraMap O K a) = algebraMap O K b)
-    (n : ℕ) (g : Matrix (Fin n) (Fin n) K) (hg : (g.map σ)ᵀ * g = 1) :
-    SelfDual O σ (matLat O g (stdLat O n)) := by
+    (n : ℕ) (g : Matrix (Fin n) (Fin n) K) (hg : (g.map σ)ᵀ * g = 1)
+    : SelfDual O σ (matLat O g (stdLat O n)) := by
   have hg' : g * (g.map σ)ᵀ = 1 := mul_eq_one_comm.mp hg
   have hσO : ∀ z ∈ (algebraMap O K).range, σ z ∈ (algebraMap O K).range := by
     rintro z ⟨a, rfl⟩
@@ -37,7 +39,8 @@ theorem selfDual_matLat_stdLat {O K : Type} [CommRing O] [Field K] [Algebra O K]
     obtain ⟨v, hv, rfl⟩ := hx
     rw [herm_mulVec_right, Matrix.mulVec_mulVec, hg, Matrix.one_mulVec]
     unfold herm
-    refine Subring.sum_mem _ (fun k _ => Subring.mul_mem _ ((mem_stdLat u).mp hu k) (hσO _ ((mem_stdLat v).mp hv k)))
+    refine Subring.sum_mem _
+      (fun k _ => Subring.mul_mem _ ((mem_stdLat u).mp hu k) (hσO _ ((mem_stdLat v).mp hv k)))
   · intro h
     refine ⟨(g.map σ)ᵀ *ᵥ y, ?_, by rw [Matrix.mulVec_mulVec, hg', Matrix.one_mulVec]⟩
     rw [mem_stdLat]

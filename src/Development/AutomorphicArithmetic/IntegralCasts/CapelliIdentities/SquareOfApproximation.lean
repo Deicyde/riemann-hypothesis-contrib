@@ -107,14 +107,15 @@ private lemma approx {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] (σ :
   rw [h3]
   exact sub_mem (Ideal.mul_mem_left _ _ hp) (Ideal.mul_mem_left _ _ hsq)
 
-private theorem core {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) {θ : E} {d : 𝓞 F} (hd : (d : F) ≠ 0) (hσ : σ θ = -θ)
-    (hθ : θ * θ = algebraMap F E d)
+private theorem core
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {θ : E} {d : 𝓞 F} (hd : (d : F) ≠ 0) (hσ : σ θ = -θ) (hθ : θ * θ = algebraMap F E d)
     (hsp : ∀ x : E, ∃ u w : F, x = u • (1 : E) + w • θ)
     {v : HeightOneSpectrum (𝓞 F)} (P Q : HeightOneSpectrum (𝓞 E)) (hne : P ≠ Q)
     (hP : P.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = v.asIdeal)
-    (hQ : Q.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = v.asIdeal) :
-    IsSquare (algebraMap F (v.adicCompletion F) (d : F)) := by
+    (hQ : Q.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = v.asIdeal)
+    : IsSquare (algebraMap F (v.adicCompletion F) (d : F)) := by
   have hsp' : ∀ x : E, ∃ u w : F, x = algebraMap F E u + algebraMap F E w * θ := by
     intro x
     obtain ⟨u, w, h⟩ := hsp x
@@ -153,7 +154,7 @@ private theorem core {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
     obtain ⟨u, hu⟩ := hfix (y : E) (by rw [← hs, hy])
     have hint : IsIntegral ℤ u := by
       have h1 : IsIntegral ℤ (algebraMap F E u) := hu ▸ RingOfIntegers.isIntegral_coe y
-      exact (isIntegral_algebraMap_iff ).1 h1
+      exact (isIntegral_algebraMap_iff).1 h1
     refine ⟨⟨u, hint⟩, ?_⟩
     apply RingOfIntegers.ext
     exact hu.symm
@@ -179,8 +180,9 @@ private theorem core {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   have he : v.asIdeal.ramificationIdx' P.asIdeal ≠ 0 :=
     Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver P.asIdeal v.ne_bot
   set e := v.asIdeal.ramificationIdx' P.asIdeal with he'
-  have hdown : ∀ (x : 𝓞 F) (m : ℕ), algebraMap (𝓞 F) (𝓞 E) x ∈ P.asIdeal ^ (e * m) →
-      x ∈ v.asIdeal ^ m := by
+  have hdown
+      : ∀ (x : 𝓞 F) (m : ℕ),
+        algebraMap (𝓞 F) (𝓞 E) x ∈ P.asIdeal ^ (e * m) → x ∈ v.asIdeal ^ m := by
     intro x m hx
     rw [← intValuation_le_pow_iff_mem] at hx ⊢
     rw [← intValuation_liesOver v P x] at hx
@@ -197,45 +199,49 @@ private theorem core {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
     have h1 := ha (e * m)
     have h2 := Ideal.pow_le_pow_right (Nat.mul_le_mul_left e hmk) (ha (e * k))
     have h3 := sub_mem h1 h2
-    have h4 : t - algebraMap (𝓞 F) (𝓞 E) (a (e * m)) - (t - algebraMap (𝓞 F) (𝓞 E) (a (e * k))) =
-        algebraMap (𝓞 F) (𝓞 E) (a (e * k) - a (e * m)) := by
+    have h4
+        : t - algebraMap (𝓞 F) (𝓞 E) (a (e * m)) - (t - algebraMap (𝓞 F) (𝓞 E) (a (e * k)))
+          = algebraMap (𝓞 F) (𝓞 E) (a (e * k) - a (e * m)) := by
       rw [map_sub]; ring
     rwa [h4] at h3
   have hdd : ∀ m, a (e * m) * a (e * m) - d ∈ v.asIdeal ^ m := by
     intro m
     apply hdown
     have h1 := Ideal.mul_mem_left _ (-(t + algebraMap (𝓞 F) (𝓞 E) (a (e * m)))) (ha (e * m))
-    have h2 : -(t + algebraMap (𝓞 F) (𝓞 E) (a (e * m))) * (t - algebraMap (𝓞 F) (𝓞 E) (a (e * m))) =
-        algebraMap (𝓞 F) (𝓞 E) (a (e * m) * a (e * m) - d) := by
+    have h2
+        : -(t + algebraMap (𝓞 F) (𝓞 E) (a (e * m))) * (t - algebraMap (𝓞 F) (𝓞 E) (a (e * m)))
+          = algebraMap (𝓞 F) (𝓞 E) (a (e * m) * a (e * m) - d) := by
       rw [map_sub, map_mul, ← ht]; ring
     rwa [h2] at h1
   exact square_of_approx v (fun m => a (e * m)) d hb hdd
 
-noncomputable def IsCMExt (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) : Prop :=
-  IsTotallyReal F ∧ IsTotallyComplex E ∧ Module.finrank F E = 2 ∧
-    ∀ (τ : E →+* ℂ) (x : E), τ (σ x) = star (τ x)
+noncomputable def IsCMExt
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
+    : Prop :=
+  IsTotallyReal F ∧ IsTotallyComplex E ∧ Module.finrank F E = 2
+    ∧ ∀ (τ : E →+* ℂ) (x : E), τ (σ x) = star (τ x)
 
-theorem aux2 {F E : Type} [Field F] [Field E] :
-    RingHomClass (𝓞 F →+* 𝓞 E) (𝓞 F) (𝓞 E) :=
+theorem aux2 {F E : Type} [Field F] [Field E] : RingHomClass (𝓞 F →+* 𝓞 E) (𝓞 F) (𝓞 E) :=
   inferInstance
 
-noncomputable def IsSplit {F E : Type} [Field F] [Field E] [Algebra F E]
-    (w : HeightOneSpectrum (𝓞 F)) : Prop :=
+noncomputable def IsSplit
+    {F E : Type} [Field F] [Field E] [Algebra F E] (w : HeightOneSpectrum (𝓞 F))
+    : Prop :=
   ∃ P Q : HeightOneSpectrum (𝓞 E),
-    P ≠ Q ∧
-      P.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = w.asIdeal ∧
-      Q.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = w.asIdeal
+    P ≠ Q ∧ P.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = w.asIdeal
+      ∧ Q.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E)) = w.asIdeal
 
-@[reducible] noncomputable def Fv (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) : Type :=
+@[reducible]
+noncomputable def Fv (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) : Type :=
   v.adicCompletion F
 
-theorem main {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (_ : IsCMExt F E σ) {θ : E} {d : 𝓞 F} (hd : (d : F) ≠ 0) (hσ : σ θ = -θ)
-    (hθ : θ * θ = algebraMap F E d) (hsp : ∀ x : E, ∃ u w : F, x = u • (1 : E) + w • θ)
-    {v : HeightOneSpectrum (𝓞 F)} (hv : IsSplit (E := E) v) :
-    IsSquare (algebraMap F (Fv F v) d) := by
+theorem main
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (_ : IsCMExt F E σ)
+    {θ : E} {d : 𝓞 F} (hd : (d : F) ≠ 0) (hσ : σ θ = -θ) (hθ : θ * θ = algebraMap F E d)
+    (hsp : ∀ x : E, ∃ u w : F, x = u • (1 : E) + w • θ)
+    {v : HeightOneSpectrum (𝓞 F)} (hv : IsSplit (E := E) v)
+    : IsSquare (algebraMap F (Fv F v) d) := by
   obtain ⟨P, Q, hne, hP, hQ⟩ := hv
   exact core σ hd hσ hθ hsp P Q hne hP hQ
 

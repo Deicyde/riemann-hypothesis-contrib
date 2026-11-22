@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsSt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -26,21 +29,24 @@ variable {K : Type} [Field K] {r : ℕ}
 
 def cay (S : Matrix (Fin r) (Fin r) K) : Matrix (Fin r) (Fin r) K := (1 + S)⁻¹ * (1 - S)
 
-theorem one_add_cay {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0) :
-    1 + cay A = (2 : K) • (1 + A)⁻¹ := by
+theorem one_add_cay {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0)
+    : 1 + cay A = (2 : K) • (1 + A)⁻¹ := by
   have hu : IsUnit (1 + A).det := isUnit_iff_ne_zero.mpr hA
   have h1 : (1 + A)⁻¹ * (1 + A) = 1 := Matrix.nonsing_inv_mul _ hu
-  calc 1 + cay A = (1 + A)⁻¹ * (1 + A) + (1 + A)⁻¹ * (1 - A) := by rw [h1]; rfl
+  calc
+    1 + cay A
+      = (1 + A)⁻¹ * (1 + A) + (1 + A)⁻¹ * (1 - A) := by rw [h1]; rfl
     _ = (1 + A)⁻¹ * ((2 : K) • (1 : Matrix (Fin r) (Fin r) K)) := by
-        rw [← Matrix.mul_add, two_smul]; congr 1; abel
+      rw [← Matrix.mul_add, two_smul]; congr 1; abel
     _ = (2 : K) • (1 + A)⁻¹ := by rw [Matrix.mul_smul, Matrix.mul_one]
 
-theorem det_one_add_cay [CharZero K] {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0) :
-    (1 + cay A).det ≠ 0 := by
+theorem det_one_add_cay [CharZero K] {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0)
+    : (1 + cay A).det ≠ 0 := by
   rw [one_add_cay hA, Matrix.det_smul, Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
   exact mul_ne_zero (pow_ne_zero _ two_ne_zero) (inv_ne_zero hA)
 
-theorem cay_cay [CharZero K] {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0) : cay (cay A) = A := by
+theorem cay_cay [CharZero K] {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0)
+    : cay (cay A) = A := by
   have hu : IsUnit (1 + A).det := isUnit_iff_ne_zero.mpr hA
   have h1 : (1 + A)⁻¹ * (1 + A) = 1 := Matrix.nonsing_inv_mul _ hu
   have h2 : (1 + A) * (1 + A)⁻¹ = 1 := Matrix.mul_nonsing_inv _ hu
@@ -50,7 +56,9 @@ theorem cay_cay [CharZero K] {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det �
     apply Matrix.inv_eq_left_inv
     rw [Matrix.smul_mul, Matrix.mul_smul, h2, smul_smul, inv_mul_cancel₀ h20, one_smul]
   have hsub : 1 - cay A = (2 : K) • ((1 + A)⁻¹ * A) := by
-    calc 1 - cay A = (1 + A)⁻¹ * (1 + A) - (1 + A)⁻¹ * (1 - A) := by rw [h1]; rfl
+    calc
+      1 - cay A
+        = (1 + A)⁻¹ * (1 + A) - (1 + A)⁻¹ * (1 - A) := by rw [h1]; rfl
       _ = (1 + A)⁻¹ * ((2 : K) • A) := by rw [← Matrix.mul_sub, two_smul]; congr 1; abel
       _ = _ := by rw [Matrix.mul_smul]
   show (1 + cay A)⁻¹ * (1 - cay A) = A
@@ -59,8 +67,9 @@ theorem cay_cay [CharZero K] {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det �
 
 variable [StarRing K]
 
-theorem cay_unitary {G S : Matrix (Fin r) (Fin r) K} (hS : S * G + G * Sᴴ = 0) (hd : (1 + S).det ≠ 0) :
-    cay S * G * (cay S)ᴴ = G := by
+theorem cay_unitary
+    {G S : Matrix (Fin r) (Fin r) K} (hS : S * G + G * Sᴴ = 0) (hd : (1 + S).det ≠ 0)
+    : cay S * G * (cay S)ᴴ = G := by
   have hu : IsUnit (1 + S).det := isUnit_iff_ne_zero.mpr hd
   have h1 : (1 + S)⁻¹ * (1 + S) = 1 := Matrix.nonsing_inv_mul _ hu
   have hSG : S * G = -(G * Sᴴ) := eq_neg_of_add_eq_zero_left hS
@@ -87,8 +96,10 @@ theorem cay_unitary {G S : Matrix (Fin r) (Fin r) K} (hS : S * G + G * Sᴴ = 0)
 def skew (G S : Matrix (Fin r) (Fin r) K) (e : K) : Matrix (Fin r) (Fin r) K :=
   e • S - star e • (G * Sᴴ * G⁻¹)
 
-theorem skew_skew {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠ 0)
-    (S : Matrix (Fin r) (Fin r) K) (e : K) : skew G S e * G + G * (skew G S e)ᴴ = 0 := by
+theorem skew_skew
+    {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠ 0)
+    (S : Matrix (Fin r) (Fin r) K) (e : K)
+    : skew G S e * G + G * (skew G S e)ᴴ = 0 := by
   have hu : IsUnit G.det := isUnit_iff_ne_zero.mpr hd
   have h1 : G⁻¹ * G = 1 := Matrix.nonsing_inv_mul _ hu
   have hi : (G⁻¹)ᴴ = G⁻¹ := by rw [Matrix.conjTranspose_nonsing_inv, hG]
@@ -102,17 +113,21 @@ theorem skew_skew {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠
 def near (G A : Matrix (Fin r) (Fin r) K) (e : K) : Matrix (Fin r) (Fin r) K :=
   if (1 + skew G (cay A) e).det = 0 then 1 else cay (skew G (cay A) e)
 
-theorem near_unitary {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠ 0)
-    (A : Matrix (Fin r) (Fin r) K) (e : K) : near G A e * G * (near G A e)ᴴ = G := by
+theorem near_unitary
+    {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠ 0)
+    (A : Matrix (Fin r) (Fin r) K) (e : K)
+    : near G A e * G * (near G A e)ᴴ = G := by
   unfold near
   split_ifs with h
   · simp
   · exact cay_unitary (skew_skew hG hd _ _) h
 
-theorem near_tendsto [CharZero K] [TopologicalSpace K] [IsTopologicalDivisionRing K] [T1Space K]
-    (G : Matrix (Fin r) (Fin r) K) {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0) {e : ℕ → K}
-    (h1 : Tendsto e atTop (𝓝 1)) (h0 : Tendsto (fun k => star (e k)) atTop (𝓝 0)) :
-    Tendsto (fun k => near G A (e k)) atTop (𝓝 A) := by
+theorem near_tendsto
+    [CharZero K] [TopologicalSpace K] [IsTopologicalDivisionRing K] [T1Space K]
+    (G : Matrix (Fin r) (Fin r) K)
+    {A : Matrix (Fin r) (Fin r) K} (hA : (1 + A).det ≠ 0)
+    {e : ℕ → K} (h1 : Tendsto e atTop (𝓝 1)) (h0 : Tendsto (fun k => star (e k)) atTop (𝓝 0))
+    : Tendsto (fun k => near G A (e k)) atTop (𝓝 A) := by
   set C := cay A with hCdef
   have hC1 : (1 + C).det ≠ 0 := det_one_add_cay hA
   have hT : Tendsto (fun k => skew G C (e k)) atTop (𝓝 C) := by
@@ -133,12 +148,13 @@ theorem near_tendsto [CharZero K] [TopologicalSpace K] [IsTopologicalDivisionRin
   simp [near, hk, C]
 
 omit [StarRing K] in
-theorem exists_scalar [CharZero K] (A : Matrix (Fin r) (Fin r) K) :
-    ∃ c : K, c ≠ 0 ∧ 1 + c ≠ 0 ∧ (1 + c⁻¹ • A).det ≠ 0 := by
+theorem exists_scalar [CharZero K] (A : Matrix (Fin r) (Fin r) K)
+    : ∃ c : K, c ≠ 0 ∧ 1 + c ≠ 0 ∧ (1 + c⁻¹ • A).det ≠ 0 := by
   classical
   have hp : (-A).charpoly ≠ 0 := (Matrix.charpoly_monic _).ne_zero
   have : Infinite K := Infinite.of_injective (Nat.cast : ℕ → K) Nat.cast_injective
-  obtain ⟨c, hc⟩ := Infinite.exists_notMem_finset (insert 0 (insert (-1) (-A).charpoly.roots.toFinset))
+  obtain ⟨c, hc⟩ :=
+    Infinite.exists_notMem_finset (insert 0 (insert (-1) (-A).charpoly.roots.toFinset))
   simp only [Finset.mem_insert, Multiset.mem_toFinset, not_or] at hc
   obtain ⟨hc0, hc1, hcr⟩ := hc
   refine ⟨c, hc0, fun h => hc1 (by linear_combination h), ?_⟩
@@ -150,18 +166,23 @@ theorem exists_scalar [CharZero K] (A : Matrix (Fin r) (Fin r) K) :
   rw [hM, Matrix.det_smul]
   exact mul_ne_zero (pow_ne_zero _ (inv_ne_zero hc0)) hev
 
-theorem exists_seq [CharZero K] {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠ 0)
-    (A : Matrix (Fin r) (Fin r) K) (e : ℕ → K) :
-    ∃ g : ℕ → Matrix (Fin r) (Fin r) K, (∀ k, g k * G * (g k)ᴴ = G) ∧
-      ∀ w : AbsoluteValue K ℝ, Tendsto (fun k => w (e k - 1)) atTop (𝓝 0) →
-        Tendsto (fun k => w (star (e k))) atTop (𝓝 0) →
-        ∀ i j, Tendsto (fun k => w (g k i j - A i j)) atTop (𝓝 0) := by
+theorem exists_seq
+    [CharZero K]
+    {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (hd : G.det ≠ 0)
+    (A : Matrix (Fin r) (Fin r) K) (e : ℕ → K)
+    : ∃ g : ℕ → Matrix (Fin r) (Fin r) K,
+      (∀ k, g k * G * (g k)ᴴ = G)
+        ∧ ∀ w : AbsoluteValue K ℝ,
+          Tendsto (fun k => w (e k - 1)) atTop (𝓝 0) → Tendsto (fun k => w (star (e k))) atTop (𝓝 0)
+            → ∀ i j, Tendsto (fun k => w (g k i j - A i j)) atTop (𝓝 0) := by
   obtain ⟨c, hc0, hc1, hdet⟩ := exists_scalar A
-  refine ⟨fun k => near G (c • (1 : Matrix (Fin r) (Fin r) K)) (e k) * near G (c⁻¹ • A) (e k), ?_, ?_⟩
+  refine
+    ⟨fun k => near G (c • (1 : Matrix (Fin r) (Fin r) K)) (e k) * near G (c⁻¹ • A) (e k), ?_, ?_⟩
   · intro k
     simp only [Matrix.conjTranspose_mul]
     rw [show ∀ U V W X : Matrix (Fin r) (Fin r) K, U * V * G * (W * X) = U * (V * G * W) * X by
-        intros; simp only [Matrix.mul_assoc], near_unitary hG hd, near_unitary hG hd]
+        intros; simp only [Matrix.mul_assoc],
+      near_unitary hG hd, near_unitary hG hd]
   · intro w hw1 hw0 i j
     let _ := w.toNormedField
     have h1 : Tendsto e atTop (𝓝 1) := tendsto_iff_norm_sub_tendsto_zero.2 hw1
@@ -173,8 +194,9 @@ theorem exists_seq [CharZero K] {G : Matrix (Fin r) (Fin r) K} (hG : Gᴴ = G) (
       exact pow_ne_zero _ hc1
     have hg := (near_tendsto G hs h1 h0).mul (near_tendsto G hdet h1 h0)
     rw [Matrix.smul_mul, Matrix.one_mul, smul_smul, mul_inv_cancel₀ hc0, one_smul] at hg
-    have hij : Tendsto (fun k => (near G (c • (1 : Matrix (Fin r) (Fin r) K)) (e k) *
-        near G (c⁻¹ • A) (e k)) i j) atTop (𝓝 (A i j)) :=
+    have hij : Tendsto
+        (fun k => (near G (c • (1 : Matrix (Fin r) (Fin r) K)) (e k) * near G (c⁻¹ • A) (e k)) i j)
+        atTop (𝓝 (A i j)) :=
       ((continuous_apply j).tendsto _).comp (((continuous_apply i).tendsto _).comp hg)
     exact tendsto_iff_norm_sub_tendsto_zero.1 hij
 
@@ -184,20 +206,25 @@ section Arith
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem tendsto_abv {v : HeightOneSpectrum (𝓞 E)} {a : 𝓞 E} (ha : a ∈ v.asIdeal) (x : ℕ → 𝓞 E) :
-    Tendsto (fun k => NumberField.HeightOneSpectrum.adicAbv E v ((x k * a ^ k : 𝓞 E) : E)) atTop (𝓝 0) := by
+theorem tendsto_abv {v : HeightOneSpectrum (𝓞 E)} {a : 𝓞 E} (ha : a ∈ v.asIdeal) (x : ℕ → 𝓞 E)
+    : Tendsto
+      (fun k => NumberField.HeightOneSpectrum.adicAbv E v ((x k * a ^ k : 𝓞 E) : E))
+      atTop (𝓝 0) := by
   have hb := NumberField.HeightOneSpectrum.one_lt_absNorm_nnreal v
   have hle : ∀ c : 𝓞 E, NumberField.HeightOneSpectrum.adicAbv E v (c : E) ≤ 1 := fun c =>
     IsDedekindDomain.HeightOneSpectrum.adicAbv_coe_le_one (K := E) v hb c
   have hq1 : NumberField.HeightOneSpectrum.adicAbv E v (a : E) < 1 :=
     (IsDedekindDomain.HeightOneSpectrum.adicAbv_coe_lt_one_iff (K := E) v hb a).2 ha
   have hq0 : 0 ≤ NumberField.HeightOneSpectrum.adicAbv E v (a : E) := AbsoluteValue.nonneg _ _
-  refine squeeze_zero (fun k => AbsoluteValue.nonneg _ _) (fun k => ?_)
+  refine squeeze_zero
+    (fun k => AbsoluteValue.nonneg _ _)
+    (fun k => ?_)
     (tendsto_pow_atTop_nhds_zero_of_lt_one hq0 hq1)
   push_cast
   rw [map_mul, map_pow]
-  calc _ ≤ 1 * NumberField.HeightOneSpectrum.adicAbv E v (a : E) ^ k :=
-        mul_le_mul_of_nonneg_right (hle _) (pow_nonneg hq0 k)
+  calc
+    _ ≤ 1 * NumberField.HeightOneSpectrum.adicAbv E v (a : E) ^ k :=
+      mul_le_mul_of_nonneg_right (hle _) (pow_nonneg hq0 k)
     _ = _ := _root_.one_mul _
 
 private lemma exists_not_mem_mul_isInteger_of_adicAbv_le_one {E : Type} [Field E] [NumberField E] {J : Type} [Fintype J]
@@ -229,24 +256,29 @@ private lemma exists_not_mem_mul_isInteger_of_adicAbv_le_one {E : Type} [Field E
     rw [ha1] at this
     exact this
 
-theorem exists_denom {J : Type} [Fintype J] {𝔪 : Ideal (𝓞 E)} (h𝔪 : 𝔪 ≠ ⊥) (y : J → E)
-    (hy : ∀ v : HeightOneSpectrum (𝓞 E), v.asIdeal ∣ 𝔪 → ∀ i, NumberField.HeightOneSpectrum.adicAbv E v (y i) ≤ 1) :
-    ∃ s : 𝓞 E, IsCoprime (Ideal.span {s}) 𝔪 ∧ ∀ i, ∃ b : 𝓞 E, (s : E) * y i = (b : E) := by
+theorem exists_denom
+    {J : Type} [Fintype J]
+    {𝔪 : Ideal (𝓞 E)} (h𝔪 : 𝔪 ≠ ⊥)
+    (y : J → E)
+    (hy : ∀ v : HeightOneSpectrum (𝓞 E),
+      v.asIdeal ∣ 𝔪 → ∀ i, NumberField.HeightOneSpectrum.adicAbv E v (y i) ≤ 1)
+    : ∃ s : 𝓞 E, IsCoprime (Ideal.span {s}) 𝔪 ∧ ∀ i, ∃ b : 𝓞 E, (s : E) * y i = (b : E) := by
   classical
-  let Q : Ideal (𝓞 E) :=
-    { carrier := {s | ∀ i, IsLocalization.IsInteger (𝓞 E) ((s : E) * y i)}
-      add_mem' := fun {a b} ha hb i => by
-        have := IsLocalization.isInteger_add (ha i) (hb i)
-        push_cast
-        rwa [add_mul]
-      zero_mem' := fun i => by
-        simpa using (IsLocalization.isInteger_zero : IsLocalization.IsInteger (𝓞 E) (0 : E))
-      smul_mem' := fun c {s} hs i => by
-        have := IsLocalization.isInteger_smul (a := c) (hs i)
-        simp only [smul_eq_mul]
-        push_cast
-        rw [Algebra.smul_def, ← _root_.mul_assoc] at this
-        exact this }
+  let Q : Ideal (𝓞 E) := {
+    carrier := {s | ∀ i, IsLocalization.IsInteger (𝓞 E) ((s : E) * y i)}
+    add_mem' := fun {a b} ha hb i => by
+      have := IsLocalization.isInteger_add (ha i) (hb i)
+      push_cast
+      rwa [add_mul]
+    zero_mem' := fun i => by
+      simpa using (IsLocalization.isInteger_zero : IsLocalization.IsInteger (𝓞 E) (0 : E))
+    smul_mem' := fun c {s} hs i => by
+      have := IsLocalization.isInteger_smul (a := c) (hs i)
+      simp only [smul_eq_mul]
+      push_cast
+      rw [Algebra.smul_def, ← _root_.mul_assoc] at this
+      exact this
+  }
   have htop : Q ⊔ 𝔪 = ⊤ := by
     by_contra hne
     obtain ⟨P, hP, hle⟩ := Ideal.exists_le_maximal _ hne
@@ -257,14 +289,15 @@ theorem exists_denom {J : Type} [Fintype J] {𝔪 : Ideal (𝓞 E)} (h𝔪 : �
     exact hbv (hle (Ideal.mem_sup_left (show b ∈ Q from hbi)))
   have h1 : (1 : 𝓞 E) ∈ Q ⊔ 𝔪 := by rw [htop]; exact Submodule.mem_top
   obtain ⟨s, hs, m, hm, hsm⟩ := Submodule.mem_sup.1 h1
-  refine ⟨s, Ideal.isCoprime_iff_exists.2 ⟨s, Ideal.mem_span_singleton_self s, m, hm, hsm⟩, fun i => ?_⟩
+  refine
+    ⟨s, Ideal.isCoprime_iff_exists.2 ⟨s, Ideal.mem_span_singleton_self s, m, hm, hsm⟩, fun i => ?_⟩
   obtain ⟨b, hb⟩ := hs i
   exact ⟨b, hb.symm⟩
 
 variable [IsCMField E]
 
-theorem conj_mem {𝔪 : Ideal (𝓞 E)} {b : 𝓞 E} (hb : b ∈ conjI 𝔪) :
-    IsCMField.ringOfIntegersComplexConj E b ∈ 𝔪 := by
+theorem conj_mem {𝔪 : Ideal (𝓞 E)} {b : 𝓞 E} (hb : b ∈ conjI 𝔪)
+    : IsCMField.ringOfIntegersComplexConj E b ∈ 𝔪 := by
   have hle : conjI 𝔪 ≤ 𝔪.comap (IsCMField.ringOfIntegersComplexConj E) := by
     unfold conjI
     rw [Ideal.span_le]
@@ -276,15 +309,24 @@ theorem conj_mem {𝔪 : Ideal (𝓞 E)} {b : 𝓞 E} (hb : b ∈ conjI 𝔪) :
     exact IsCMField.complexConj_apply_apply _ _
   exact hle hb
 
-theorem herm_eq {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) :
-    herm G x y = x ⬝ᵥ G *ᵥ star y := by
+theorem herm_eq {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E)
+    : herm G x y = x ⬝ᵥ G *ᵥ star y := by
   simp only [herm, cc, dotProduct, mulVec, Finset.mul_sum, _root_.mul_assoc, Pi.star_apply]
   rfl
 
 end Arith
 
-theorem weak_approx :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (𝔪 : Ideal (𝓞 E)), 𝔪 ≠ ⊥ → IsCoprime 𝔪 (conjI 𝔪) → ∀ (A : GL (Fin r) E) (N : ℕ), ∃ ga : GL (Fin r) E, IsUn X ga ∧ ∃ s : 𝓞 E, IsCoprime (Ideal.span {s}) 𝔪 ∧ ∀ i j, ∃ b ∈ 𝔪 ^ N, (s : E) * ((ga : Matrix (Fin r) (Fin r) E) i j - (A : Matrix (Fin r) (Fin r) E) i j) = (b : E) := by
+theorem weak_approx
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (𝔪 : Ideal (𝓞 E)),
+      𝔪 ≠ ⊥ → IsCoprime 𝔪 (conjI 𝔪)
+        → ∀ (A : GL (Fin r) E) (N : ℕ), ∃ ga : GL (Fin r) E,
+          IsUn X ga
+            ∧ ∃ s : 𝓞 E,
+              IsCoprime (Ideal.span {s}) 𝔪
+                ∧ ∀ i j, ∃ b ∈ 𝔪 ^ N,
+                  (s : E)
+                      * ((ga : Matrix (Fin r) (Fin r) E) i j - (A : Matrix (Fin r) (Fin r) E) i j)
+                    = (b : E) := by
   intro E _ _ _ r X 𝔪 h𝔪 hco A N
   classical
   obtain ⟨m, hm, m', hm', hmm⟩ := Ideal.isCoprime_iff_exists.1 hco
@@ -297,13 +339,19 @@ theorem weak_approx :
     rw [Matrix.conjTranspose_apply]
     exact X.Gm_herm b a
   obtain ⟨h, hun, hconv⟩ := exists_seq hG X.Gm_det ((A : Matrix (Fin r) (Fin r) E)ᵀ) e
-  have hv1 : ∀ v : HeightOneSpectrum (𝓞 E), v.asIdeal ∣ 𝔪 → ∀ i j,
-      Tendsto (fun k => NumberField.HeightOneSpectrum.adicAbv E v
-        (h k i j - (A : Matrix (Fin r) (Fin r) E)ᵀ i j)) atTop (𝓝 0) := by
+  have hv1
+      : ∀ v : HeightOneSpectrum (𝓞 E),
+        v.asIdeal ∣ 𝔪
+          → ∀ i j,
+            Tendsto
+              (fun k =>
+                NumberField.HeightOneSpectrum.adicAbv E v
+                  (h k i j - (A : Matrix (Fin r) (Fin r) E)ᵀ i j))
+              atTop (𝓝 0) := by
     intro v hv
     have h𝔪v : 𝔪 ≤ v.asIdeal := Ideal.dvd_iff_le.1 hv
     apply hconv
-    · refine (tendsto_abv (v := v) (h𝔪v hm) (fun k => -u k)).congr (fun k => ?_)
+    · refine (tendsto_abv (v := v) (h𝔪v hm) (fun k => - u k)).congr (fun k => ?_)
       congr 1
       have := congrArg (fun z : 𝓞 E => (z : E)) (hu k)
       simp only [e]
@@ -319,16 +367,20 @@ theorem weak_approx :
     exact pow_ne_zero N (by rwa [Ideal.zero_eq_bot])
   obtain ⟨mu, hmu, hmu0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hN
   have hmuE : (mu : E) ≠ 0 := by exact_mod_cast hmu0
-  have hmupos : ∀ v : HeightOneSpectrum (𝓞 E), 0 < NumberField.HeightOneSpectrum.adicAbv E v (mu : E) :=
+  have hmupos
+      : ∀ v : HeightOneSpectrum (𝓞 E), 0 < NumberField.HeightOneSpectrum.adicAbv E v (mu : E) :=
     fun v => AbsoluteValue.pos _ hmuE
   have hfin := Ideal.finite_factors (R := 𝓞 E) (I := 𝔪) (by rwa [Ideal.zero_eq_bot])
-  have hev : ∀ᶠ k in atTop, ∀ v ∈ {v : HeightOneSpectrum (𝓞 E) | v.asIdeal ∣ 𝔪}, ∀ i j,
-      NumberField.HeightOneSpectrum.adicAbv E v (h k i j - (A : Matrix (Fin r) (Fin r) E)ᵀ i j) <
-        NumberField.HeightOneSpectrum.adicAbv E v (mu : E) := by
+  have hev
+      : ∀ᶠ k in atTop, ∀ v ∈ {v : HeightOneSpectrum (𝓞 E) | v.asIdeal ∣ 𝔪}, ∀ i j,
+        NumberField.HeightOneSpectrum.adicAbv E v (h k i j - (A : Matrix (Fin r) (Fin r) E)ᵀ i j) <
+          NumberField.HeightOneSpectrum.adicAbv E v (mu : E) := by
     rw [Filter.eventually_all_finite hfin]
     intro v hv
-    rw [Filter.eventually_all]; intro i
-    rw [Filter.eventually_all]; intro j
+    rw [Filter.eventually_all]
+    intro i
+    rw [Filter.eventually_all]
+    intro j
     exact (tendsto_order.1 (hv1 v hv i j)).2 _ (hmupos v)
   obtain ⟨k, hk⟩ := hev.exists
   set g : Matrix (Fin r) (Fin r) E := (h k)ᵀ with hgdef
@@ -348,10 +400,13 @@ theorem weak_approx :
   · intro x y
     show herm X.Gm (g *ᵥ x) (g *ᵥ y) = herm X.Gm x y
     rw [herm_eq, herm_eq, hstar, Matrix.mulVec_mulVec, ← Matrix.vecMul_transpose g x,
-      Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul, ← Matrix.dotProduct_mulVec, ← Matrix.mul_assoc, hug]
-  · let y : Fin r × Fin r → E := fun p => (g p.1 p.2 - (A : Matrix (Fin r) (Fin r) E) p.1 p.2) / (mu : E)
-    have hy : ∀ v : HeightOneSpectrum (𝓞 E), v.asIdeal ∣ 𝔪 → ∀ p,
-        NumberField.HeightOneSpectrum.adicAbv E v (y p) ≤ 1 := by
+      Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul, ← Matrix.dotProduct_mulVec,
+      ← Matrix.mul_assoc, hug]
+  · let y : Fin r × Fin r → E := fun p =>
+      (g p.1 p.2 - (A : Matrix (Fin r) (Fin r) E) p.1 p.2) / (mu : E)
+    have hy
+        : ∀ v : HeightOneSpectrum (𝓞 E),
+          v.asIdeal ∣ 𝔪 → ∀ p, NumberField.HeightOneSpectrum.adicAbv E v (y p) ≤ 1 := by
       intro v hv p
       simp only [y, map_div₀]
       rw [div_le_one (hmupos v)]

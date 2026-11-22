@@ -13,9 +13,11 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry GroundTheory.Heights₂.Heights.HilbertSamuel
+open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  GroundTheory.Heights₂.Heights.HilbertSamuel
 
 theorem RelSectionsLarge.full : RelSectionsLarge.Statement :=
-  RelSectionsLarge.proof RelChartPoly.proof (RelOneStep.proof RelChartPoly.proof RelTorsionBound.proof)
+  RelSectionsLarge.proof RelChartPoly.proof
+    (RelOneStep.proof RelChartPoly.proof RelTorsionBound.proof)
 
 end GroundTheory.Heights₂.Heights.Targets

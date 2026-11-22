@@ -11,23 +11,31 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
-private theorem level_decomp (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
+private theorem level_decomp
+    (K : Type) [Field K] [NumberField K]
+    (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
     (r : ℕ) (w : Fin r → Pl K) (hw : Function.Injective w) (J : ∀ i, Subgroup (Gw n (w i)))
     (A : LL μ →L[ℂ] LL μ) (hA : ∀ i, ∀ k ∈ J i, A ∘L rhoL μ (w i) k = A)
-    (g : AdelicGLn.FiniteAdelicGL K n) (hg : ∀ i, finAt (w i) (finEmb K n g) ∈ J i) (S : Finset (Fin r)) :
-    ∃ a : AdelicGLn.FiniteAdelicGL K n, A ∘L rhoF μ a = A ∧
-      (∀ i ∈ S, finAt (w i) (finEmb K n a) = finAt (w i) (finEmb K n g)) ∧
-      ∀ v : HeightOneSpectrum (𝓞 K), (∀ i ∈ S, v ≠ w i) → finAt v (finEmb K n a) = 1 := by
+    (g : AdelicGLn.FiniteAdelicGL K n) (hg : ∀ i, finAt (w i) (finEmb K n g) ∈ J i)
+    (S : Finset (Fin r))
+    : ∃ a : AdelicGLn.FiniteAdelicGL K n,
+      A ∘L rhoF μ a = A ∧ (∀ i ∈ S, finAt (w i) (finEmb K n a) = finAt (w i) (finEmb K n g))
+        ∧ ∀ v : HeightOneSpectrum (𝓞 K), (∀ i ∈ S, v ≠ w i) → finAt v (finEmb K n a) = 1 := by
   classical
   obtain ⟨-, -, -, -, -, hmul, hone, -, -⟩ := UpperTheory.ConvolutionTheory.Tf.commPrj K n μ ⊥
-  have e : ∀ (u : HeightOneSpectrum (𝓞 K)) (y : AdelicGLn.FiniteAdelicGL K n),
-      finAt u (finEmb K n y) = AdelicGLn.finiteRestrictedEquiv K n y u := fun _ _ => rfl
-  have emul : ∀ (u : HeightOneSpectrum (𝓞 K)) (y z : AdelicGLn.FiniteAdelicGL K n),
-      finAt u (finEmb K n (y * z)) = finAt u (finEmb K n y) * finAt u (finEmb K n z) := by
+  have e
+      : ∀ (u : HeightOneSpectrum (𝓞 K)) (y : AdelicGLn.FiniteAdelicGL K n),
+        finAt u (finEmb K n y) = AdelicGLn.finiteRestrictedEquiv K n y u := fun _ _ =>
+    rfl
+  have emul
+      : ∀ (u : HeightOneSpectrum (𝓞 K)) (y z : AdelicGLn.FiniteAdelicGL K n),
+        finAt u (finEmb K n (y * z)) = finAt u (finEmb K n y) * finAt u (finEmb K n z) := by
     intro u y z
     rw [e, e, e, map_mul, RestrictedProduct.mul_apply]
   have eone : ∀ u : HeightOneSpectrum (𝓞 K), finAt u (finEmb K n 1) = 1 := by
@@ -54,20 +62,33 @@ private theorem level_decomp (K : Type) [Field K] [NumberField K] (n : ℕ) (μ 
       rw [emul, h3 v (fun j hj => hv j (Finset.mem_insert_of_mem hj)),
         l3 v (hv i (Finset.mem_insert_self _ _)), one_mul]
 
-theorem UpperTheory.comp_proj_fixed_level_eq_of_local_invariance :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (m : Measure (AdelicGLn.FiniteAdelicGL K n)) [m.IsHaarMeasure]
-          (r : ℕ) (w : Fin r → Pl K), Function.Injective w → ∀ (J : ∀ i, Subgroup (Gw n (w i))) (U US : Subgroup (AdelicGLn.FiniteAdelicGL K n)),
-          IsOpen (U : Set (AdelicGLn.FiniteAdelicGL K n)) → IsCompact (U : Set (AdelicGLn.FiniteAdelicGL K n)) →
-          (∀ h, h ∈ U ↔ h ∈ AdelicGLn.integralFiniteGL K n ∧ ∀ i, finAt (w i) (finEmb K n h) ∈ J i) →
-          (∀ h, h ∈ US ↔ h ∈ AdelicGLn.integralFiniteGL K n ∧ ∀ i, finAt (w i) (finEmb K n h) = 1) →
-          ∀ A : LL μ →L[ℂ] LL μ, (∀ i, ∀ k ∈ J i, A ∘L rhoL μ (w i) k = A) → A ∘L prj (fixF μ U) = A ∘L prj (fixF μ US) := by
+theorem UpperTheory.comp_proj_fixed_level_eq_of_local_invariance
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n)))
+        [μ.IsHaarMeasure] (m : Measure (AdelicGLn.FiniteAdelicGL K n)) [m.IsHaarMeasure] (r : ℕ)
+        (w : Fin r → Pl K),
+      Function.Injective w
+        → ∀ (J : ∀ i, Subgroup (Gw n (w i))) (U US : Subgroup (AdelicGLn.FiniteAdelicGL K n)),
+          IsOpen (U : Set (AdelicGLn.FiniteAdelicGL K n))
+            → IsCompact (U : Set (AdelicGLn.FiniteAdelicGL K n))
+            → (∀ h,
+              h ∈ U ↔ h ∈ AdelicGLn.integralFiniteGL K n ∧ ∀ i, finAt (w i) (finEmb K n h) ∈ J i)
+            → (∀ h,
+              h ∈ US ↔ h ∈ AdelicGLn.integralFiniteGL K n ∧ ∀ i, finAt (w i) (finEmb K n h) = 1)
+            → ∀ A : LL μ →L[ℂ] LL μ,
+              (∀ i, ∀ k ∈ J i, A ∘L rhoL μ (w i) k = A)
+                → A ∘L prj (fixF μ U) = A ∘L prj (fixF μ US) := by
   intro K _ _ n μ _ m _ r w hw J U US hUo hUc hU hUS A hA
   obtain ⟨-, hmemU, -, -, -, hmul, -, -, -⟩ := UpperTheory.ConvolutionTheory.Tf.commPrj K n μ U
   obtain ⟨-, hmemS, b1, -, -, -, -, -, -⟩ := UpperTheory.ConvolutionTheory.Tf.commPrj K n μ US
-  have hle : fixF μ U ≤ fixF μ US := fun v hv => (hmemS v).2 fun u hu =>
-    (hmemU v).1 hv u ((hU u).2 ⟨((hUS u).1 hu).1, fun i => by
-      rw [((hUS u).1 hu).2 i]
-      exact (J i).one_mem⟩)
+  have hle : fixF μ U ≤ fixF μ US := fun v hv =>
+    (hmemS v).2 fun u hu =>
+      (hmemU v).1 hv u
+        ((hU u).2 ⟨
+          ((hUS u).1 hu).1,
+          fun i => by
+            rw [((hUS u).1 hu).2 i]
+            exact (J i).one_mem
+        ⟩)
   have hPQ : prj (fixF μ U) ∘L prj (fixF μ US) = prj (fixF μ U) := by
     unfold prj
     exact Submodule.starProjection_comp_starProjection_of_le (Submodule.topologicalClosure_mono hle)
@@ -75,10 +96,13 @@ theorem UpperTheory.comp_proj_fixed_level_eq_of_local_invariance :
     intro g hg x hx
     obtain ⟨hgi, hgJ⟩ := (hU g).1 hg
     obtain ⟨a, h1, h2, h3⟩ := level_decomp K n μ r w hw J A hA g hgJ Finset.univ
-    have e : ∀ (u : HeightOneSpectrum (𝓞 K)) (y : AdelicGLn.FiniteAdelicGL K n),
-        finAt u (finEmb K n y) = AdelicGLn.finiteRestrictedEquiv K n y u := fun _ _ => rfl
-    have ec : ∀ u : HeightOneSpectrum (𝓞 K), finAt u (finEmb K n (a⁻¹ * g)) =
-        (finAt u (finEmb K n a))⁻¹ * finAt u (finEmb K n g) := by
+    have e
+        : ∀ (u : HeightOneSpectrum (𝓞 K)) (y : AdelicGLn.FiniteAdelicGL K n),
+          finAt u (finEmb K n y) = AdelicGLn.finiteRestrictedEquiv K n y u := fun _ _ =>
+      rfl
+    have ec
+        : ∀ u : HeightOneSpectrum (𝓞 K),
+          finAt u (finEmb K n (a⁻¹ * g)) = (finAt u (finEmb K n a))⁻¹ * finAt u (finEmb K n g) := by
       intro u
       rw [e, e, e, map_mul, map_inv]
       rfl
@@ -109,8 +133,10 @@ theorem UpperTheory.comp_proj_fixed_level_eq_of_local_invariance :
       rw [UnitaryRep.integrated_ccToL1_apply]
       rfl
     have hint : Integrable (fun h => e h • rhoF μ h x) m :=
-      (e.continuous.smul (((rightRegularRep (rationalGLOne (K := K) (n := n)) μ).continuous_orbit x).comp
-        MultiplicityOne.continuous_finProj)).integrable_of_hasCompactSupport e.hasCompactSupport.smul_right
+      (e.continuous.smul
+          (((rightRegularRep (rationalGLOne (K := K) (n := n)) μ).continuous_orbit x).comp
+            MultiplicityOne.continuous_finProj)).integrable_of_hasCompactSupport
+        e.hasCompactSupport.smul_right
     rw [← hOe, hO, ← ContinuousLinearMap.integral_comp_comm _ hint]
     have h2 : (fun h => A (e h • rhoF μ h x)) = fun h => e h • A x := by
       funext h
@@ -120,7 +146,8 @@ theorem UpperTheory.comp_proj_fixed_level_eq_of_local_invariance :
       · rw [Set.indicator_of_notMem (show h ∉ (U : Set _) from hh), zero_smul, zero_smul]
     rw [h2, integral_smul_const]
     simp only [he]
-    rw [integral_indicator_const _ hUo.measurableSet, Complex.real_smul, mul_inv_cancel₀ (by exact_mod_cast hpos), one_smul]
+    rw [integral_indicator_const _ hUo.measurableSet, Complex.real_smul,
+      mul_inv_cancel₀ (by exact_mod_cast hpos), one_smul]
   refine ContinuousLinearMap.ext fun v => ?_
   have hPv : prj (fixF μ U) v = prj (fixF μ U) (prj (fixF μ US) v) := by
     rw [← ContinuousLinearMap.comp_apply, hPQ]

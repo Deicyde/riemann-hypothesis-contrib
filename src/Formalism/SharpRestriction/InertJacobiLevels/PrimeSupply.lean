@@ -11,14 +11,17 @@ noncomputable section
 
 namespace Formalism.MainNotions.Inhab
 
-open Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition NumberField
+open Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition
+  NumberField
 
 def dlogQ (d : ℕ) (hd : d.Prime) : ℝ :=
   haveI : Fact d.Prime := ⟨hd⟩
   haveI : NeZero d := ⟨hd.ne_zero⟩
-  (deriv (DirichletCharacter.LFunction
-      ((quadraticChar (ZMod d)).ringHomComp (Int.castRingHom ℂ) : DirichletCharacter ℂ d)) 1 /
-    DirichletCharacter.LFunction
+  (deriv
+      (DirichletCharacter.LFunction
+        ((quadraticChar (ZMod d)).ringHomComp (Int.castRingHom ℂ) : DirichletCharacter ℂ d))
+      1
+    / DirichletCharacter.LFunction
       ((quadraticChar (ZMod d)).ringHomComp (Int.castRingHom ℂ) : DirichletCharacter ℂ d) 1).re
 
 structure QDGood (x eps : ℝ) (q d : ℕ) : Prop where

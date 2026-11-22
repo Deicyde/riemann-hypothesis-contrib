@@ -44,9 +44,9 @@ theorem BoundingKaehler.full : BoundingKaehler.Statement := BoundingKaehler.proo
 
 theorem GreenMassZero.full : GreenMassZero.Statement := GreenMassZero.proof
 
-theorem UniformIntegrability.of_greenMass (h₁ : GreenMassStep.Statement)
-    (h₂ : GreenMassReplace.Statement) (h₃ : GreenMassError.Statement) :
-    UniformIntegrability.Statement :=
+theorem UniformIntegrability.of_greenMass
+    (h₁ : GreenMassStep.Statement) (h₂ : GreenMassReplace.Statement) (h₃ : GreenMassError.Statement)
+    : UniformIntegrability.Statement :=
   UniformIntegrability.proof GreenMassZero.full h₁ h₂ h₃
 
 end GroundTheory.Heights₂.Heights.AnalyticLimit

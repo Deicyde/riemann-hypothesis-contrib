@@ -12,14 +12,28 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Par
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.SeeSaw GlobalTheory.LocMod
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel
+  GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.SeeSaw GlobalTheory.LocMod
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.KappaTheta
 
-theorem isThetaFunO_comp_kappa : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (L S L'' : HSp D) (τ : Matrix (Fin L.rank) (Fin L''.rank) D.host.E), τᴴ * (L.gram * τ) = (-(D.host.xi0 * star D.host.xi0)) • L''.gram → ∀ f, IsThetaFunO ψ L S f → IsThetaFunO ψ S L'' (fun w => f (GlobalTheory.IndefiniteRowSideFullHecke.SkewGramHalfModule.ofAdj L S ((rat τ : Mx D L.rank L''.rank) * w))) := by
+theorem isThetaFunO_comp_kappa
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (L S L'' : HSp D)
+        (τ : Matrix (Fin L.rank) (Fin L''.rank) D.host.E),
+      τᴴ * (L.gram * τ) = (-(D.host.xi0 * star D.host.xi0)) • L''.gram
+        → ∀ f,
+          IsThetaFunO ψ L S f
+            → IsThetaFunO ψ S L'' (fun w =>
+              f (GlobalTheory.IndefiniteRowSideFullHecke.SkewGramHalfModule.ofAdj L S
+                ((rat τ : Mx D L.rank L''.rank) * w))) := by
   intro D ψ L S L'' τ hτ f hf
-  have hτ' : τᴴ * (L.gram * τ) = (((-1 : ℤ) : D.host.E) * (D.host.xi0 * star D.host.xi0)) • L''.gram := by
+  have hτ'
+      : τᴴ * (L.gram * τ)
+        = (((-1 : ℤ) : D.host.E) * (D.host.xi0 * star D.host.xi0)) • L''.gram := by
     rw [hτ]; congr 1; push_cast; ring
   set κ : WO S L'' → WO L S := fun w => GlobalTheory.IndefiniteRowSideFullHecke.SkewGramHalfModule.ofAdj L S ((rat τ : Mx D L.rank L''.rank) * w) with hκdef
   obtain ⟨hadd, hcont, hrat, -, hsym, hparts⟩ :=

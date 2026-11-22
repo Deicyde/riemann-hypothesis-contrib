@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.Ord.ParL
@@ -64,7 +67,6 @@ private lemma divA {w B : Ideal C} (hw : w.IsMaximal) (hw0 : w ≠ ⊥) {a : C}
     mul_dvd_mul_iff_left hw0] at h1
   have h2 : w ^ m ∣ Ideal.span {x} := (hc.pow_left).dvd_of_dvd_mul_left h1
   rwa [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem] at h2
-
 
 set_option maxHeartbeats 200000 in
 private lemma exPar (p : ℕ) (hp0 : (p : C) ≠ 0) {w : Ideal C} (hw : w.IsMaximal)
@@ -256,7 +258,9 @@ private lemma exPar (p : ℕ) (hp0 : (p : C) ≠ 0) {w : Ideal C} (hw : w.IsMaxi
 
 end UpperTheory.Gal.Ord.ParL
 
-theorem UpperTheory.Gal.Ord.par :
-    ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (w : Ideal (𝓞 F)) (f : ℕ), w.IsMaximal → (p : 𝓞 F) ∈ w → 0 < f → Nonempty (Par p w f) := by
+theorem UpperTheory.Gal.Ord.par
+    : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (w : Ideal (𝓞 F)) (f : ℕ),
+      w.IsMaximal → (p : 𝓞 F) ∈ w → 0 < f → Nonempty (Par p w f) := by
   intro p _ F _ _ w f hw hpw hf
-  exact UpperTheory.Gal.Ord.ParL.exPar p (Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero) hw hpw f hf
+  exact UpperTheory.Gal.Ord.ParL.exPar p (Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero) hw hpw f
+    hf

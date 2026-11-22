@@ -16,45 +16,78 @@ open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.WeilM
 open scoped SchwartzMap GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Classical
 noncomputable section
 namespace GlobalTheory.ArchJointCont
-theorem tendsto_schrodinger_action_along_line : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n d : ℕ}
-    {Y : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n} {Wd : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d} (M : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Model σ Y Wd) (ψ : AddChar (AF F) ℂ)
-    (χX χW : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chr F E) (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ Y Wd),
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → M.IsGood ψ → M.IsWeil ψ χX χW om →
-    ∀ γ ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Lines σ Y, ∀ (r : (Fin n × Fin d → AF F) → ℂ), r 0 ≠ 0 →
-    (∀ f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin n × Fin d), GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f r) →
-    ∀ (h k : ℝ → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin n × Fin d)) (h₀ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin n × Fin d)),
-    (∀ t : ℝ, om (γ (Multiplicative.ofAdd t), 1) (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (h t) r) =
-      GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (k t) r) →
-    Filter.Tendsto h (nhds 0) (nhds h₀) → Filter.Tendsto k (nhds 0) (nhds h₀) := by
+theorem tendsto_schrodinger_action_along_line
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+          {σ : E →ₐ[F] E} {n d : ℕ}
+          {Y : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n}
+          {Wd : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d}
+          (M : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Model σ Y Wd)
+          (ψ : AddChar (AF F) ℂ)
+          (χX χW : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chr F E)
+          (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ Y Wd),
+        GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → M.IsGood ψ
+          → M.IsWeil ψ χX χW om
+          → ∀ γ ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Lines σ Y,
+            ∀ (r : (Fin n × Fin d → AF F) → ℂ),
+              r 0 ≠ 0
+                → (∀ f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                    (Fin n × Fin d),
+                  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest
+                    (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f r)
+                → ∀ (h k : ℝ
+                    → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                      (Fin n × Fin d))
+                    (h₀ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                      (Fin n × Fin d)),
+                  (∀ t : ℝ,
+                      om (γ (Multiplicative.ofAdd t), 1)
+                          (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens
+                            (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (h t)
+                            r)
+                        = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens
+                          (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (k t) r)
+                    → Filter.Tendsto h (nhds 0) (nhds h₀)
+                    → Filter.Tendsto k (nhds 0) (nhds h₀) := by
   intro hP F E _ _ _ _ _ σ n d Y Wd M ψ χX χW om hψ _hM hW γ hγ r hr0 hR h k h₀ hk hh
   have hs := IsUWeilPair.isUSplitting hW
   let δ : ℝ → UA σ Y.J × UA σ Wd.J := fun t => (γ (Multiplicative.ofAdd t), 1)
   have hδc : Continuous δ := (hγ.1.comp continuous_ofAdd).prodMk continuous_const
   have hδ0 : δ 0 = 1 := by
     show (γ (Multiplicative.ofAdd 0), 1) = 1
-    rw [ofAdd_zero, map_one]; rfl
+    rw [ofAdd_zero, map_one]
+    rfl
   have hδm : ∀ s t, δ (s + t) = δ s * δ t := fun s t => by
     show (γ (Multiplicative.ofAdd (s + t)), 1) = (γ (Multiplicative.ofAdd s), 1) * (γ (Multiplicative.ofAdd t), 1)
     rw [ofAdd_add, map_mul, Prod.mk_mul_mk, one_mul]
-  have ex := fun f => _root_.GlobalTheory.ArchLinePair.exists_orbit_pair_archimedean_line hP M ψ χX χW om hψ hW δ hδc hδ0 hδm (fun t => hγ.2 _)
-    (fun t u _ => by simp [δ, mat]) f
+  have ex := fun f =>
+    _root_.GlobalTheory.ArchLinePair.exists_orbit_pair_archimedean_line hP M ψ χX χW om hψ hW δ hδc
+      hδ0 hδm
+      (fun t => hγ.2 _)
+      (fun t u _ => by simp [δ, mat])
+      f
   choose c g hc0 hslope hact using ex
   have hrr : ∀ x z, At (evI F) z → r (x + z) = r x := (hR 0).1
   have hinj := GlobalTheory.ArchCancel.eq_of_tens_eq F r hrr ⟨0, hr0⟩
-  have hA : ∀ t (f : SInf F (Fin n × Fin d)), om (δ t) (tens (evI F) ⇑f r) = tens (evI F) ⇑(c f t) r :=
+  have hA
+      : ∀ t (f : SInf F (Fin n × Fin d)), om (δ t) (tens (evI F) ⇑f r) = tens (evI F) ⇑(c f t) r :=
     fun t f => hact f t r (hR f)
-  have tadd : ∀ f g : SInf F (Fin n × Fin d),
-      tens (evI F) ⇑(f + g) r = tens (evI F) ⇑f r + tens (evI F) ⇑g r := by
+  have tadd
+      : ∀ f g : SInf F (Fin n × Fin d),
+        tens (evI F) ⇑(f + g) r = tens (evI F) ⇑f r + tens (evI F) ⇑g r := by
     intro f g; funext x; simp [tens, add_mul]
-  have tsmul : ∀ (a : ℂ) (f : SInf F (Fin n × Fin d)), tens (evI F) ⇑(a • f) r = a • tens (evI F) ⇑f r := by
+  have tsmul
+      : ∀ (a : ℂ) (f : SInf F (Fin n × Fin d)),
+        tens (evI F) ⇑(a • f) r = a • tens (evI F) ⇑f r := by
     intro a f; funext x; simp [tens, mul_assoc]
-  let A : ℝ → SInf F (Fin n × Fin d) →ₗ[ℂ] SInf F (Fin n × Fin d) := fun t =>
-    { toFun := fun f => c f t
-      map_add' := fun f g => hinj _ _ (by rw [← hA, tadd, map_add (f := _), hA, hA, tadd])
-      map_smul' := fun a f => hinj _ _ (by rw [← hA, tsmul, map_smul, hA, RingHom.id_apply, tsmul]) }
+  let A : ℝ → SInf F (Fin n × Fin d) →ₗ[ℂ] SInf F (Fin n × Fin d) := fun t => {
+    toFun := fun f => c f t
+    map_add' := fun f g => hinj _ _ (by rw [← hA, tadd, map_add (f := _), hA, hA, tadd])
+    map_smul' := fun a f => hinj _ _ (by rw [← hA, tsmul, map_smul, hA, RingHom.id_apply, tsmul])
+  }
   have hAf : ∀ t f, A t f = c f t := fun _ _ => rfl
-  have hmul : ∀ s t f, c f (s + t) = c (c f t) s := fun s t f => hinj _ _ (by
-    rw [← hA (s + t) f, ← hA s (c f t), ← hA t f, hδm, map_mul, Module.End.mul_apply])
+  have hmul : ∀ s t f, c f (s + t) = c (c f t) s := fun s t f =>
+    hinj _ _ (by rw [← hA (s + t) f, ← hA s (c f t), ← hA t f, hδm, map_mul, Module.End.mul_apply])
   have hcont0 : ∀ f, Tendsto (fun s => c f s) (𝓝 0) (𝓝 f) := by
     intro f
     have h1 : Tendsto (fun s : ℝ => s • (s⁻¹ • (c f s - f))) (𝓝[≠] 0) (𝓝 ((0 : ℝ) • g f)) :=
@@ -82,9 +115,11 @@ theorem tendsto_schrodinger_action_along_line : _root_.GlobalTheory.FunPr.ThetaL
   have hg₀ : g₀ ∈ SB _ := GlobalTheory.ArchLocality.intInd_mem _
   have hg₀0 : g₀ 0 = 1 := by
     simp only [g₀, GlobalTheory.ArchLocality.intInd]
-    rw [Set.indicator_of_mem (show (0 : Fin n × Fin d → IsDedekindDomain.FiniteAdeleRing (𝓞 F) F) ∈ Set.pi Set.univ
-      fun _ => (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (IsDedekindDomain.FiniteAdeleRing (𝓞 F) F)) from
-        fun i _ => zero_mem (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F))]
+    rw [Set.indicator_of_mem (show (0 : Fin n × Fin d → IsDedekindDomain.FiniteAdeleRing (𝓞 F) F)
+        ∈ Set.pi Set.univ fun _ =>
+          (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F
+            : Set (IsDedekindDomain.FiniteAdeleRing (𝓞 F) F)) from fun i _ =>
+      zero_mem (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F))]
     rfl
   let r₀ : (Fin n × Fin d → AF F) → ℂ := fun x => g₀ fun i => (x i).2
   have hrr₀ : ∀ x z, At (evI F) z → r₀ (x + z) = r₀ x := by
@@ -104,21 +139,24 @@ theorem tendsto_schrodinger_action_along_line : _root_.GlobalTheory.FunPr.ThetaL
     have e2 := hT' f
     rw [LinearMap.comp_apply, e1, hlf, hg₀0, one_mul] at e2
     exact e2.symm
-  let 𝓕 : Set.Icc (-1 : ℝ) 1 → SInf F (Fin n × Fin d) →L[ℂ] SInf F (Fin n × Fin d) := fun i => ⟨A i, hAcont i⟩
+  let 𝓕 : Set.Icc (-1 : ℝ) 1 → SInf F (Fin n × Fin d) →L[ℂ] SInf F (Fin n × Fin d) := fun i =>
+    ⟨A i, hAcont i⟩
   haveI : BarrelledSpace ℂ (SInf F (Fin n × Fin d)) := GlobalTheory.schwartzMap_barrelledSpace _
   have hq := schwartz_withSeminorms ℂ (Fin n × Fin d → mixedEmbedding.mixedSpace F) ℂ
-  have hUE : UniformEquicontinuous ((↑) ∘ 𝓕) := hq.banach_steinhaus fun q x => by
-    have hc : Continuous fun t : ℝ => schwartzSeminormFamily ℂ _ ℂ q (c x t) :=
-      (hq.continuous_seminorm q).comp (hcont x)
-    have := (isCompact_Icc (a := (-1 : ℝ)) (b := 1)).bddAbove_image hc.continuousOn
-    rw [Set.image_eq_range] at this
-    exact this
+  have hUE : UniformEquicontinuous ((↑) ∘ 𝓕) :=
+    hq.banach_steinhaus fun q x => by
+      have hc : Continuous fun t : ℝ => schwartzSeminormFamily ℂ _ ℂ q (c x t) :=
+        (hq.continuous_seminorm q).comp (hcont x)
+      have := (isCompact_Icc (a := (-1 : ℝ)) (b := 1)).bddAbove_image hc.continuousOn
+      rw [Set.image_eq_range] at this
+      exact this
   have hk' : ∀ t, k t = c (h t) t := fun t => hinj _ _ ((hk t).symm.trans (hA t (h t)))
   have h1 : Tendsto (fun t => A t (h t - h₀)) (𝓝 0) (𝓝 0) := by
     have hE := hUE.equicontinuous 0
     intro U hU
-    have hU' : {p : SInf F (Fin n × Fin d) × SInf F (Fin n × Fin d) | p.2 - p.1 ∈ U} ∈
-        uniformity (SInf F (Fin n × Fin d)) := by
+    have hU'
+        : {p : SInf F (Fin n × Fin d) × SInf F (Fin n × Fin d) | p.2 - p.1 ∈ U}
+          ∈ uniformity (SInf F (Fin n × Fin d)) := by
       rw [uniformity_eq_comap_nhds_zero]; exact ⟨U, hU, fun p hp => hp⟩
     have ev := hE _ hU'
     have hz : Tendsto (fun t => h t - h₀) (𝓝 0) (𝓝 0) := by simpa using hh.sub_const h₀
@@ -140,15 +178,44 @@ end
 section
 open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.jointly_continuous_archimedean_weil_action : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n d : ℕ}
-    {Y : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n} {Wd : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d} (M : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Model σ Y Wd) (ψ : AddChar (AF F) ℂ)
-    (χX χW : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chr F E) (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ Y Wd),
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → M.IsGood ψ → M.IsWeil ψ χX χW om →
-    ∀ γ ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Lines σ Y, ∀ (r : (Fin n × Fin d → AF F) → ℂ), r 0 ≠ 0 →
-    (∀ f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin n × Fin d), GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f r) →
-    ∀ (h k : ℝ → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin n × Fin d)) (h₀ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin n × Fin d)),
-    (∀ t : ℝ, om (γ (Multiplicative.ofAdd t), 1) (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (h t) r) =
-      GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (k t) r) →
-    Filter.Tendsto h (nhds 0) (nhds h₀) → Filter.Tendsto k (nhds 0) (nhds h₀) := by
-  first | exact @_root_.GlobalTheory.ArchJointCont.tendsto_schrodinger_action_along_line | exact _root_.GlobalTheory.ArchJointCont.tendsto_schrodinger_action_along_line | (intros; apply _root_.GlobalTheory.ArchJointCont.tendsto_schrodinger_action_along_line <;> assumption)
+theorem _root_.GlobalTheory.T.jointly_continuous_archimedean_weil_action
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+          {σ : E →ₐ[F] E} {n d : ℕ}
+          {Y : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n}
+          {Wd : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d}
+          (M : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Model σ Y Wd)
+          (ψ : AddChar (AF F) ℂ)
+          (χX χW : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chr F E)
+          (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ Y Wd),
+        GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → M.IsGood ψ
+          → M.IsWeil ψ χX χW om
+          → ∀ γ ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Lines σ Y,
+            ∀ (r : (Fin n × Fin d → AF F) → ℂ),
+              r 0 ≠ 0
+                → (∀ f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                    (Fin n × Fin d),
+                  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest
+                    (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f r)
+                → ∀ (h k : ℝ
+                    → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                      (Fin n × Fin d))
+                    (h₀ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                      (Fin n × Fin d)),
+                  (∀ t : ℝ,
+                      om (γ (Multiplicative.ofAdd t), 1)
+                          (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens
+                            (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (h t)
+                            r)
+                        = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens
+                          (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (k t) r)
+                    → Filter.Tendsto h (nhds 0) (nhds h₀)
+                    → Filter.Tendsto k (nhds 0) (nhds h₀) := by
+  first
+  | exact @_root_.GlobalTheory.ArchJointCont.tendsto_schrodinger_action_along_line
+  | exact _root_.GlobalTheory.ArchJointCont.tendsto_schrodinger_action_along_line
+  | (
+      intros
+      apply _root_.GlobalTheory.ArchJointCont.tendsto_schrodinger_action_along_line <;> assumption
+    )
 end

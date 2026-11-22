@@ -30,5 +30,4 @@ open scoped Matrix.Norms.Frobenius
 
 end FrobG
 
-
 end Formalism.HermitianLatticeCounting.P

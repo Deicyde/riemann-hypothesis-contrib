@@ -11,9 +11,12 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem evalPt (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] (hMV : C.MVStatement) :
-    EvalPtStatement n M := by
+theorem evalPt
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    (hMV : C.MVStatement)
+    : EvalPtStatement n M := by
   intro z hz ψ hψ x0
   obtain ⟨e, hx0, hze⟩ := hz x0
   have he : IsChart n z e := fun x _ => by rw [hze]
@@ -31,8 +34,7 @@ theorem evalPt (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
   set Vb : ℝ≥0∞ := volume (Metric.ball (e x0) (r / 2)) with hVbdef
   have hVpos : 0 < Vb := Metric.measure_ball_pos _ _ (half_pos hr)
   have hVfin : Vb ≠ ⊤ := measure_ball_lt_top.ne
-  refine ⟨max c 0 / Vb.toReal, div_nonneg (le_max_right c 0) ENNReal.toReal_nonneg,
-    fun F hF => ?_⟩
+  refine ⟨max c 0 / Vb.toReal, div_nonneg (le_max_right c 0) ENNReal.toReal_nonneg, fun F hF => ?_⟩
   have hFc : Continuous F := by
     rw [continuous_iff_continuousAt]
     intro x
@@ -45,15 +47,16 @@ theorem evalPt (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
     filter_upwards [e'.open_source.mem_nhds hx'] with y hy
     simp [Function.comp, e'.left_inv hy]
   set f : M → ℝ≥0∞ := K.indicator (fun x => ‖F x‖ₑ ^ 2) with hfdef
-  have hfm : Measurable f :=
-    (hFc.measurable.enorm.pow_const 2).indicator hKc.isClosed.measurableSet
+  have hfm : Measurable f := (hFc.measurable.enorm.pow_const 2).indicator hKc.isClosed.measurableSet
   have hdiff : DifferentiableOn ℂ (F ∘ e.symm) (Metric.ball (e x0) (r / 2)) :=
     (hF e he).mono (Metric.ball_subset_closedBall.trans hcb)
   have h1 := hMV n (e x0) (r / 2) (F ∘ e.symm) (fun _ => 1) hdiff measurable_const
   simp only [mul_one, lintegral_const, Measure.restrict_apply_univ, Function.comp_apply,
-    e.left_inv hx0] at h1
-  have h2 : ∫⁻ y in Metric.ball (e x0) (r / 2), ‖F (e.symm y)‖ₑ ^ 2 ≤
-      ∫⁻ y in e.target, f (e.symm y) := by
+      e.left_inv hx0]
+    at h1
+  have h2
+      : ∫⁻ y in Metric.ball (e x0) (r / 2), ‖F (e.symm y)‖ₑ ^ 2
+        ≤ ∫⁻ y in e.target, f (e.symm y) := by
     rw [← lintegral_indicator (hs := Metric.isOpen_ball.measurableSet),
       ← lintegral_indicator (hs := e.open_target.measurableSet)]
     apply lintegral_mono

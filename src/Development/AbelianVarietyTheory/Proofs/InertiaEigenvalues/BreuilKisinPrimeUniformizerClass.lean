@@ -6,16 +6,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem prime_mk_X_of_constantCoeff {W : Type} [CommRing W] [IsDomain W] {p : W} (hp : Prime p) (E : W⟦X⟧)
-    (w : Wˣ) (hE : constantCoeff E = p * w) :
-    Prime (Ideal.Quotient.mk (Ideal.span {E}) (X : W⟦X⟧)) := by
-  have key : ∀ f : W⟦X⟧, Ideal.Quotient.mk (Ideal.span {E}) (X : W⟦X⟧) ∣ Ideal.Quotient.mk (Ideal.span {E}) f ↔
-      p ∣ constantCoeff f := by
+theorem prime_mk_X_of_constantCoeff
+    {W : Type} [CommRing W] [IsDomain W]
+    {p : W} (hp : Prime p)
+    (E : W⟦X⟧) (w : Wˣ) (hE : constantCoeff E = p * w)
+    : Prime (Ideal.Quotient.mk (Ideal.span {E}) (X : W⟦X⟧)) := by
+  have key
+      : ∀ f : W⟦X⟧,
+        Ideal.Quotient.mk (Ideal.span {E}) (X : W⟦X⟧) ∣ Ideal.Quotient.mk (Ideal.span {E}) f
+          ↔ p ∣ constantCoeff f := by
     intro f
     constructor
     · rintro ⟨c, hc⟩
@@ -57,9 +63,9 @@ theorem prime_mk_X_of_constantCoeff {W : Type} [CommRing W] [IsDomain W] {p : W}
     rw [key, key]
     exact hp.dvd_or_dvd hab
 
-theorem BK.prime_unif (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) :
-    Prime (bk.str.symm (Ideal.Quotient.mk _ (X : bk.S))) ∧
-      intToOC K (bk.str.symm (Ideal.Quotient.mk _ (X : bk.S))) = bk.flat.untilt := by
+theorem BK.prime_unif (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K)
+    : Prime (bk.str.symm (Ideal.Quotient.mk _ (X : bk.S)))
+      ∧ intToOC K (bk.str.symm (Ideal.Quotient.mk _ (X : bk.S))) = bk.flat.untilt := by
   constructor
   · obtain ⟨w, hw⟩ := bk.coeff_zero
     have hp : Prime (l : Wq l bk.a) := (WittVector.irreducible l).prime

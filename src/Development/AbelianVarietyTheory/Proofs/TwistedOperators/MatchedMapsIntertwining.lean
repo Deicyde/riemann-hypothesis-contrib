@@ -24,15 +24,20 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MatchedMa
 
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 noncomputable section
 
 namespace GlobalTheory.HoweGlobal
 
-theorem decomp {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀] {ι : Type} [Fintype ι] {M : ι → Type}
-    [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] (t : M₀ ⊗[ℂ] (⨂[ℂ] i, M i)) :
-    ∃ (m : ℕ) (f : Fin m → M₀) (φ : Fin m → ∀ i, M i), t = ∑ j, f j ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (φ j) := by
+theorem decomp
+    {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀]
+    {ι : Type} [Fintype ι]
+    {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
+    (t : M₀ ⊗[ℂ] (⨂[ℂ] i, M i))
+    : ∃ (m : ℕ) (f : Fin m → M₀) (φ : Fin m → ∀ i, M i),
+      t = ∑ j, f j ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (φ j) := by
   induction t using TensorProduct.induction_on with
   | zero => exact ⟨0, Fin.elim0, Fin.elim0, by simp⟩
   | tmul x y =>

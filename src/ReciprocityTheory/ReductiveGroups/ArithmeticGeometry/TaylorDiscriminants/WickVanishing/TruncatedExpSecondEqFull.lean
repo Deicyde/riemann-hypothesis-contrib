@@ -21,8 +21,8 @@ variable {k : Type} [CommRing k] {σ : Type}
 
 def lam (W : (σ →₀ ℕ) → k) (R : MvPolynomial σ k) : k := ∑ m ∈ R.support, R.coeff m * W m
 
-theorem lam_eq (W : (σ →₀ ℕ) → k) (R : MvPolynomial σ k) (S : Finset (σ →₀ ℕ)) (hS : R.support ⊆ S) :
-    lam W R = ∑ m ∈ S, R.coeff m * W m := by
+theorem lam_eq (W : (σ →₀ ℕ) → k) (R : MvPolynomial σ k) (S : Finset (σ →₀ ℕ)) (hS : R.support ⊆ S)
+    : lam W R = ∑ m ∈ S, R.coeff m * W m := by
   classical
   unfold lam
   refine Finset.sum_subset hS fun e _ he => ?_
@@ -53,10 +53,14 @@ theorem lam_monomial (W : (σ →₀ ℕ) → k) (m : σ →₀ ℕ) (r : k) : l
 
 end abelian₂
 
-theorem nabVal_eq_lam {R : Type} [CommRing R] {d : ℕ} {O : Type} [CommRing O] [StarRing O] (k : Type)
-    [CommRing k] [Algebra ℚ k] [Algebra R k] [Nontrivial k] (B : FB R d O) (h : PS k 2 d) (w0 : O) (m : ℕ)
-    (f : PS k 1 d) {ι : Type} [Fintype ι] (u : ι → Fin d → k) (Q : MvPolynomial ι k) :
-    B.nabVal k h w0 m f u Q = lam (fun e => B.nabVal k h w0 m f u (monomial e 1)) Q := by
+theorem nabVal_eq_lam
+    {R : Type} [CommRing R]
+    {d : ℕ} {O : Type} [CommRing O] [StarRing O]
+    (k : Type) [CommRing k] [Algebra ℚ k] [Algebra R k] [Nontrivial k]
+    (B : FB R d O) (h : PS k 2 d) (w0 : O) (m : ℕ) (f : PS k 1 d)
+    {ι : Type} [Fintype ι]
+    (u : ι → Fin d → k) (Q : MvPolynomial ι k)
+    : B.nabVal k h w0 m f u Q = lam (fun e => B.nabVal k h w0 m f u (monomial e 1)) Q := by
   classical
   unfold FB.nabVal lam
   set_option synthInstance.maxHeartbeats 100000 in
@@ -85,37 +89,39 @@ theorem glue_apply (g : Fin n → (ι →₀ ℕ)) (l : ι) (b : Fin n) : glue g
 
 theorem colM_glue (g : Fin n → (ι →₀ ℕ)) (b : Fin n) : colM (glue g) b = g b := by
   ext l
-  first
-  | simp [colM, glue_apply]
-  | exact glue_apply g l b
+  first | simp [colM, glue_apply] | exact glue_apply g l b
 
 theorem glue_colM (mo : (ι × Fin n) →₀ ℕ) : glue (fun b => colM mo b) = mo := by
   ext ⟨l, b⟩
   rw [glue_apply]
-  first
-  | simp [colM]
-  | rfl
+  first | simp [colM] | rfl
 
-theorem prodQ_monomial (g : Fin n → (ι →₀ ℕ)) :
-    prodQ (fun b => (monomial (g b) (1 : k) : MvPolynomial ι k)) = monomial (glue g) 1 := by
+theorem prodQ_monomial (g : Fin n → (ι →₀ ℕ))
+    : prodQ (fun b => (monomial (g b) (1 : k) : MvPolynomial ι k)) = monomial (glue g) 1 := by
   unfold prodQ glue
   rw [MvPolynomial.monomial_sum_one]
   refine Finset.prod_congr rfl fun b _ => ?_
   exact MvPolynomial.rename_monomial _ _ _
 
-theorem lam_prodQ (V : Fin n → (ι →₀ ℕ) → k) (Q : Fin n → MvPolynomial ι k) :
-    lam (fun mo => ∏ b, V b (colM mo b)) (prodQ Q) = ∏ b, lam (V b) (Q b) := by
+theorem lam_prodQ (V : Fin n → (ι →₀ ℕ) → k) (Q : Fin n → MvPolynomial ι k)
+    : lam (fun mo => ∏ b, V b (colM mo b)) (prodQ Q) = ∏ b, lam (V b) (Q b) := by
   classical
-  have hP : prodQ Q = ∑ g ∈ Fintype.piFinset (fun b => (Q b).support),
-      (monomial (glue g) (∏ b, (Q b).coeff (g b)) : MvPolynomial (ι × Fin n) k) := by
-    have h1 : ∀ b, colE b (Q b) = ∑ e ∈ (Q b).support,
-        (monomial (Finsupp.mapDomain (fun l => (l, b)) e) ((Q b).coeff e) : MvPolynomial (ι × Fin n) k) := by
-      intro b
-      conv_lhs => rw [(Q b).as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
-      refine Finset.sum_congr rfl fun e _ => ?_
-      exact MvPolynomial.rename_monomial _ _ _
+  have hP
+      : prodQ Q
+        = ∑ g ∈ Fintype.piFinset (fun b => (Q b).support),
+          (monomial (glue g) (∏ b, (Q b).coeff (g b)) : MvPolynomial (ι × Fin n) k) := by
+    have h1
+        : ∀ b,
+          colE b (Q b)
+            = ∑ e ∈ (Q b).support,
+              (monomial (Finsupp.mapDomain (fun l => (l, b)) e) ((Q b).coeff e) : MvPolynomial (ι × Fin n) k) :=
+      by
+        intro b
+        conv_lhs => rw [(Q b).as_sum]
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum]
+        refine Finset.sum_congr rfl fun e _ => ?_
+        exact MvPolynomial.rename_monomial _ _ _
     unfold prodQ
     simp_rw [h1]
     rw [Finset.prod_univ_sum]
@@ -198,13 +204,18 @@ private lemma iterate_secondOrder_eq_zero_of_totalDegree_lt {σ : Type} [Fintype
       exact Function.iterate_fixed (secondOrder_eq_zero_of_totalDegree_eq_zero c 0 MvPolynomial.totalDegree_zero) i
     · exact ih _ (by have := totalDegree_secondOrder_le_of_le_add_two c q (q.totalDegree - 2) (by omega); omega)
 
-theorem truncated_exp_second_eq_full {ι : Type} [Fintype ι] (c : ι → ι → k) (t : k) (D N : ℕ) (hDN : D ≤ N)
-    (y : MvPolynomial ι k) (hy : y.totalDegree ≤ D) : expSecond k c t D y = E1 c t N y := by
+theorem truncated_exp_second_eq_full
+    {ι : Type} [Fintype ι]
+    (c : ι → ι → k) (t : k)
+    (D N : ℕ) (hDN : D ≤ N)
+    (y : MvPolynomial ι k) (hy : y.totalDegree ≤ D)
+    : expSecond k c t D y = E1 c t N y := by
   unfold expSecond E1
-  have h1 : ∑ i ∈ Finset.range (D + 1),
-        (t ^ i * algebraMap ℚ k (1 / (i.factorial : ℚ))) • (secondOrder k c)^[i] y =
-      ∑ i ∈ Finset.range (N + 1),
-        (t ^ i * algebraMap ℚ k (1 / (i.factorial : ℚ))) • (secondOrder k c)^[i] y := by
+  have h1
+      : ∑ i ∈ Finset.range (D + 1),
+          (t ^ i * algebraMap ℚ k (1 / (i.factorial : ℚ))) • (secondOrder k c)^[i] y
+        = ∑ i ∈ Finset.range (N + 1),
+            (t ^ i * algebraMap ℚ k (1 / (i.factorial : ℚ))) • (secondOrder k c)^[i] y := by
     apply Finset.sum_subset (fun x hx => by simp only [Finset.mem_range] at hx ⊢; omega)
     intro i _ hi
     simp only [Finset.mem_range] at hi
@@ -215,12 +226,14 @@ theorem truncated_exp_second_eq_full {ι : Type} [Fintype ι] (c : ι → ι →
   rw [one_div]
   ring
 
-def TL {σ : Type} [Fintype σ] (c : σ → σ → k) (t : k) (N : ℕ) : MvPolynomial σ k →ₗ[k] MvPolynomial σ k :=
+def TL {σ : Type} [Fintype σ] (c : σ → σ → k) (t : k) (N : ℕ)
+    : MvPolynomial σ k →ₗ[k] MvPolynomial σ k :=
   ∑ i ∈ range (N + 1), (algebraMap ℚ k ((i.factorial : ℚ)⁻¹) * t ^ i) • (soL c) ^ i
 
-theorem TL_apply {σ : Type} [Fintype σ] (c : σ → σ → k) (t : k) (N : ℕ) (x : MvPolynomial σ k) :
-    TL c t N x = ∑ i ∈ range (N + 1),
-      (algebraMap ℚ k ((i.factorial : ℚ)⁻¹) * t ^ i) • (secondOrder k c)^[i] x := by
+theorem TL_apply {σ : Type} [Fintype σ] (c : σ → σ → k) (t : k) (N : ℕ) (x : MvPolynomial σ k)
+    : TL c t N x
+      = ∑ i ∈ range (N + 1),
+        (algebraMap ℚ k ((i.factorial : ℚ)⁻¹) * t ^ i) • (secondOrder k c)^[i] x := by
   rw [TL, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [LinearMap.smul_apply]
@@ -247,8 +260,11 @@ theorem gauge_second_columns_of_exp (hG : GaugeExpSt) : GaugeIndependenceColumns
   set N := P.totalDegree with hN
   set V : Fin n → (ι →₀ ℕ) → k := fun b e => B.nabVal k h w0 mm (f b) u (monomial e 1) with hV
   set W : (ι × Fin n →₀ ℕ) → k := fun mo => ∏ b, V b (colM mo b) with hW
-  have hLHS : (∑ mo ∈ P.support, P.coeff mo *
-      ∏ b, B.nabVal k h w0 mm (f b) u (monomial (colM mo b) 1)) = lam W P := rfl
+  have hLHS
+      : (∑ mo ∈ P.support, P.coeff mo *
+          ∏ b, B.nabVal k h w0 mm (f b) u (monomial (colM mo b) 1))
+        = lam W P :=
+    rfl
   rw [hLHS]
   have hcol : ∀ (mo : (ι × Fin n) →₀ ℕ) (b : Fin n) (l : ι), colM mo b l = mo (l, b) := by
     intro mo b l
@@ -264,33 +280,46 @@ theorem gauge_second_columns_of_exp (hG : GaugeExpSt) : GaugeIndependenceColumns
     simp only [h2]
     rw [sum_comm]
     exact h1
-  have key : ∀ mo ∈ P.support, ∏ b, B.nabVal k h' w0 mm (f b) u (monomial (colM mo b) 1) =
-      lam W (TL cD t N (monomial mo 1)) := by
+  have key
+      : ∀ mo ∈ P.support,
+        ∏ b, B.nabVal k h' w0 mm (f b) u (monomial (colM mo b) 1)
+          = lam W (TL cD t N (monomial mo 1)) := by
     intro mo hmo
     have hbN : ∀ b, (monomial (colM mo b) (1 : k)).totalDegree ≤ N := fun b =>
-      (single_le_sum (f := fun b => (monomial (colM mo b) (1 : k)).totalDegree) (fun _ _ => Nat.zero_le _)
+      (single_le_sum
+        (f := fun b => (monomial (colM mo b) (1 : k)).totalDegree)
+        (fun _ _ => Nat.zero_le _)
         (mem_univ b)).trans (hsum mo hmo)
-    have h1 : ∀ b, B.nabVal k h' w0 mm (f b) u (monomial (colM mo b) 1) =
-        lam (V b) (E1 c t N (monomial (colM mo b) 1)) := by
+    have h1
+        : ∀ b,
+          B.nabVal k h' w0 mm (f b) u (monomial (colM mo b) 1)
+            = lam (V b) (E1 c t N (monomial (colM mo b) 1)) := by
       intro b
       rw [hG R d O k B h h' hh hh' w0 mm u _ (f b), nabVal_eq_lam,
         truncated_exp_second_eq_full c t _ N (hbN b) _ le_rfl]
     rw [prod_congr rfl fun b _ => h1 b, ← lam_prodQ V (fun b => E1 c t N (monomial (colM mo b) 1))]
-    have hE := exp_cols c t N (fun b => (monomial (colM mo b) (1 : k)).totalDegree) (hsum mo hmo) univ
-      (fun b => monomial (colM mo b) 1) (fun _ => le_rfl)
+    have hE :=
+      exp_cols c t N
+        (fun b => (monomial (colM mo b) (1 : k)).totalDegree)
+        (hsum mo hmo) univ
+        (fun b => monomial (colM mo b) 1)
+        (fun _ => le_rfl)
     simp only [mem_univ, if_true] at hE
     have hmoN : (monomial mo (1 : k)).totalDegree ≤ N :=
       (totalDegree_monomial_le _ _).trans (le_totalDegree hmo)
     rw [← hE, cS_univ, prodQ_monomial, glue_colM, exp_opA_apply _ _ _ _ hmoN, TL_apply]
-  have hRHS : (∑ mo ∈ P.support, P.coeff mo *
-      ∏ b, B.nabVal k h' w0 mm (f b) u (monomial (colM mo b) 1)) = lam W (TL cD t N P) := by
+  have hRHS
+      : (∑ mo ∈ P.support, P.coeff mo *
+          ∏ b, B.nabVal k h' w0 mm (f b) u (monomial (colM mo b) 1))
+        = lam W (TL cD t N P) := by
     rw [sum_congr rfl fun mo hmo => by rw [key mo hmo]]
     conv_rhs => rw [as_sum P]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, ← lamL_apply, map_sum]
     refine sum_congr rfl fun mo _ => ?_
     rw [show (monomial mo (P.coeff mo) : MvPolynomial (ι × Fin n) k) = P.coeff mo • monomial mo 1 by
-      rw [smul_monomial, smul_eq_mul, mul_one], map_smul, map_smul, lamL_apply, smul_eq_mul]
+        rw [smul_monomial, smul_eq_mul, mul_one],
+      map_smul, map_smul, lamL_apply, smul_eq_mul]
   have hTP : TL cD t N P = P := by
     rw [TL_apply, sum_eq_single 0]
     · simp

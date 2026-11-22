@@ -8,8 +8,9 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem eq_of_le_of_multiset_prod_eq_pow_card {g : ℕ} (hg : 0 < g) (s : Multiset ℕ)
-    (hle : ∀ a ∈ s, g ≤ a) (hprod : s.prod = g ^ s.card) : ∀ a ∈ s, a = g := by
+theorem eq_of_le_of_multiset_prod_eq_pow_card
+    {g : ℕ} (hg : 0 < g) (s : Multiset ℕ) (hle : ∀ a ∈ s, g ≤ a) (hprod : s.prod = g ^ s.card)
+    : ∀ a ∈ s, a = g := by
   intro a ha
   obtain ⟨t, rfl⟩ := Multiset.exists_cons_of_mem ha
   have ht : g ^ t.card ≤ t.prod :=
@@ -19,12 +20,14 @@ theorem eq_of_le_of_multiset_prod_eq_pow_card {g : ℕ} (hg : 0 < g) (s : Multis
   have h1 : a * g ^ t.card ≤ g * g ^ t.card := hprod ▸ Nat.mul_le_mul_left a ht
   exact le_antisymm (Nat.le_of_mul_le_mul_right h1 hpos) (hle a (Multiset.mem_cons_self _ _))
 
-theorem pow_sub_self_mem_span_of_splits_completely (E : Type) [Field E] [NumberField E] (g : ℕ)
-    (hg : g.Prime)
-    (hcard : (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {(g : 𝓞 E)})).card =
-      Module.finrank ℚ E)
+theorem pow_sub_self_mem_span_of_splits_completely
+    (E : Type) [Field E] [NumberField E]
+    (g : ℕ) (hg : g.Prime)
+    (hcard : (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {(g : 𝓞 E)})).card
+      = Module.finrank ℚ E)
     (hnd : (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {(g : 𝓞 E)})).Nodup)
-    (x : 𝓞 E) : x ^ g - x ∈ Ideal.span {(g : 𝓞 E)} := by
+    (x : 𝓞 E)
+    : x ^ g - x ∈ Ideal.span {(g : 𝓞 E)} := by
   classical
   set I : Ideal (𝓞 E) := Ideal.span {(g : 𝓞 E)} with hI
   set s := UniqueFactorizationMonoid.normalizedFactors I with hs
@@ -57,16 +60,14 @@ theorem pow_sub_self_mem_span_of_splits_completely (E : Type) [Field E] [NumberF
     have hNP : Ideal.absNorm P = g := hall _ (Multiset.mem_map_of_mem _ hP)
     have hPp : P.IsPrime := Ideal.isPrime_of_prime (hprime P hP)
     have hPm : P.IsMaximal := hPp.isMaximal (hprime P hP).ne_zero
-    have hc : Nat.card (𝓞 E ⧸ P) = g := by
-      rw [← hNP, Ideal.absNorm_apply, Submodule.cardQuot_apply]
+    have hc : Nat.card (𝓞 E ⧸ P) = g := by rw [← hNP, Ideal.absNorm_apply, Submodule.cardQuot_apply]
     have hfin : Finite (𝓞 E ⧸ P) := Nat.finite_of_card_ne_zero (hc ▸ hg.ne_zero)
     let := Fintype.ofFinite (𝓞 E ⧸ P)
     let := Ideal.Quotient.field P
     rw [← Ideal.Quotient.eq, map_pow, ← hc, Nat.card_eq_fintype_card]
     exact FiniteField.pow_card _
   have hdvd : (∏ P ∈ (⟨s, hnd⟩ : Finset (Ideal (𝓞 E))), P) ∣ Ideal.span {x ^ g - x} :=
-    Finset.prod_primes_dvd _ hprime fun P hP =>
-      Ideal.dvd_span_singleton.mpr (hmem P hP)
+    Finset.prod_primes_dvd _ hprime fun P hP => Ideal.dvd_span_singleton.mpr (hmem P hP)
   have he : (∏ P ∈ (⟨s, hnd⟩ : Finset (Ideal (𝓞 E))), P) = I := by
     rw [← hprod, Finset.prod_mk, Multiset.map_id']
   rw [he] at hdvd

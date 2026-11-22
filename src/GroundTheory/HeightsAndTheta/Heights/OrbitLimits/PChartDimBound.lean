@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1
 
 universe u v w
 
@@ -37,11 +38,14 @@ theorem ChartDimBound.proof : ChartDimBound.Statement.{u, v, w} := by
   obtain ⟨M, hM, htM⟩ := Ideal.exists_le_maximal _ hne
   obtain ⟨s, hs⟩ := DimF.exists_height_of_isMaximal_of_field F (MRingOver F ι ⧸ V)
   have : M.IsPrime := hM.isPrime
-  have h1 := Ideal.height_le_ringKrullDim_quotient_add_encard (p := M) t
-    (fun x hx => htM (Ideal.subset_span hx))
+  have h1 :=
+    Ideal.height_le_ringKrullDim_quotient_add_encard (p := M) t
+      (fun x hx => htM (Ideal.subset_span hx))
   rw [ringKrullDim_eq_of_ringEquiv e] at h1
   have h2 : t.encard ≤ Fintype.card K := by
-    calc t.encard = ((Ideal.Quotient.mk V ∘ f) '' Set.univ).encard := by rw [Set.image_univ]
+    calc
+      t.encard
+        = ((Ideal.Quotient.mk V ∘ f) '' Set.univ).encard := by rw [Set.image_univ]
       _ ≤ (Set.univ : Set K).encard := Set.encard_image_le _ _
       _ = Fintype.card K := by simp [Set.encard_univ]
   refine (ringKrullDim_le_iff_isMaximal_height_le _).mpr fun N hN => ?_

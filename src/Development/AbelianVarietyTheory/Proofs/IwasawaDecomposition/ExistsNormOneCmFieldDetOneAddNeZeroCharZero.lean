@@ -9,16 +9,19 @@ open NumberField
 namespace GlobalTheory.CMScalar
 open Matrix Polynomial
 
-theorem eval_charpolyRev_neg {K : Type} [Field K] {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (w : K) :
-    (-A).charpolyRev.eval w = (1 + w • A).det := by
+theorem eval_charpolyRev_neg {K : Type} [Field K] {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (w : K)
+    : (-A).charpolyRev.eval w = (1 + w • A).det := by
   rw [Matrix.charpolyRev, ← coe_evalRingHom, RingHom.map_det]
   congr 1
   ext a b : 2
   by_cases h : a = b <;> simp [h, mul_comm w, sub_eq_add_neg]
 
-theorem exists_unit_norm_one_det_ne_zero (L : Type) [Field L] [NumberField L] [IsCMField L] (K : Type) [Field K]
-    [CharZero K] (n : ℕ) (M : (L →+* K) → Matrix (Fin n) (Fin n) K) :
-    ∃ u : L, u * (IsCMField.complexConj L : L →+* L) u = 1 ∧ ∀ σ : L →+* K, (1 + σ u • M σ).det ≠ 0 := by
+theorem exists_unit_norm_one_det_ne_zero
+    (L : Type) [Field L] [NumberField L] [IsCMField L]
+    (K : Type) [Field K] [CharZero K]
+    (n : ℕ) (M : (L →+* K) → Matrix (Fin n) (Fin n) K)
+    : ∃ u : L,
+      u * (IsCMField.complexConj L : L →+* L) u = 1 ∧ ∀ σ : L →+* K, (1 + σ u • M σ).det ≠ 0 := by
   classical
   set c : L →+* L := (IsCMField.complexConj L : L →+* L) with hc
   have hcc : ∀ x, c (c x) = x := fun x => IsCMField.complexConj_apply_apply L x

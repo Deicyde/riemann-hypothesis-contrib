@@ -6,16 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylor
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
 open scoped TensorProduct InnerProductSpace
 
 namespace GlobalTheory.UPel.HT
 
-theorem trace_comp_pos_of_adjoint {V : Type} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V]
+theorem trace_comp_pos_of_adjoint
+    {V : Type} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V]
     (g : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : ∀ u v, g u v = g v u) (hp : ∀ u, u ≠ 0 → 0 < g u u)
-    (T T' : V →ₗ[ℝ] V) (hadj : ∀ u v, g (T u) v = g u (T' v)) (hT' : T' ≠ 0) :
-    0 < LinearMap.trace ℝ V (T ∘ₗ T') := by
+    (T T' : V →ₗ[ℝ] V) (hadj : ∀ u v, g (T u) v = g u (T' v)) (hT' : T' ≠ 0)
+    : 0 < LinearMap.trace ℝ V (T ∘ₗ T') := by
   letI core : InnerProductSpace.Core ℝ V :=
     { inner := fun x y => g x y
       conj_inner_symm := fun x y => by simpa using hs y x
@@ -48,16 +51,19 @@ theorem trace_comp_pos_of_adjoint {V : Type} [AddCommGroup V] [Module ℝ V] [Fi
     exact b.toBasis.ext (fun i => by simpa using h i)
   exact Finset.sum_pos' (fun i _ => hnn i) ⟨i, Finset.mem_univ _, hp _ hi⟩
 
-theorem trace_mul_star_pos : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (x : D.O), x ≠ 0 →
-    0 < LinearMap.trace ℤ D.La (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)) := by
+theorem trace_mul_star_pos
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (x : D.O),
+      x ≠ 0
+        → 0 < LinearMap.trace ℤ D.La (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)) := by
   intro p _ D x hx
   haveI := D.freeLa
   haveI := D.finLa
   obtain ⟨J, hJJ, hJinv, hpos, hcomm, -⟩ := D.dom
   let A : D.O → (ℝ ⊗[ℤ] D.La →ₗ[ℝ] ℝ ⊗[ℤ] D.La) := fun b =>
     (DistribSMul.toLinearMap ℤ D.La b).baseChange ℝ
-  have hcomp : A x ∘ₗ A (D.star x).unop =
-      (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)).baseChange ℝ := by
+  have hcomp
+      : A x ∘ₗ A (D.star x).unop
+        = (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)).baseChange ℝ := by
     clear hcomm hpos hJinv hJJ
     simp only [A]
     rw [← LinearMap.baseChange_comp]
@@ -91,7 +97,8 @@ theorem trace_mul_star_pos : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel
       simp only [map_add (f := _), LinearMap.add_apply]
       rw [hu, hw]
       ring
-  have hadjB : ∀ b u v, D.EF.baseChange ℝ (A b u) v = D.EF.baseChange ℝ u (A (D.star b).unop v) := by
+  have hadjB
+      : ∀ b u v, D.EF.baseChange ℝ (A b u) v = D.EF.baseChange ℝ u (A (D.star b).unop v) := by
     intro b u v
     induction u using TensorProduct.induction_on with
     | zero => simp
@@ -105,8 +112,9 @@ theorem trace_mul_star_pos : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel
   have hsym : ∀ u v, D.EF.baseChange ℝ (J u) v = D.EF.baseChange ℝ (J v) u := by
     intro u v
     rw [← hJinv (J v) u, hJJ, map_neg, LinearMap.neg_apply, hanti v (J u), neg_neg]
-  have hadjg : ∀ u v, (D.EF.baseChange ℝ ∘ₗ J) (A x u) v =
-      (D.EF.baseChange ℝ ∘ₗ J) u (A (D.star x).unop v) := by
+  have hadjg
+      : ∀ u v,
+        (D.EF.baseChange ℝ ∘ₗ J) (A x u) v = (D.EF.baseChange ℝ ∘ₗ J) u (A (D.star x).unop v) := by
     intro u v
     simp only [LinearMap.comp_apply]
     rw [← LinearMap.comp_apply J (A x), hAJ, LinearMap.comp_apply, hadjB]
@@ -119,16 +127,18 @@ theorem trace_mul_star_pos : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel
   have hT' : A (D.star x).unop ≠ 0 := by
     intro h0
     apply hx
-    have hz : ∀ y : D.La, (D.star x).unop • y = 0 := fun y => hinj _ (by
-      have := LinearMap.congr_fun h0 ((1 : ℝ) ⊗ₜ y)
-      rwa [hA, LinearMap.zero_apply] at this)
+    have hz : ∀ y : D.La, (D.star x).unop • y = 0 := fun y =>
+      hinj _ (by
+        have := LinearMap.congr_fun h0 ((1 : ℝ) ⊗ₜ y)
+        rwa [hA, LinearMap.zero_apply] at this)
     have h1 := GlobalTheory.T.harrisTaylor_order_faithful_lattice p D _ hz
     rw [← D.star_star x, h1]
     simp
-  have htr := trace_comp_pos_of_adjoint (D.EF.baseChange ℝ ∘ₗ J)
-    (fun u v => by simp only [LinearMap.comp_apply]; exact hsym u v)
-    (fun u hu => by simpa only [LinearMap.comp_apply] using hpos u hu)
-    (A x) (A (D.star x).unop) hadjg hT'
+  have htr :=
+    trace_comp_pos_of_adjoint (D.EF.baseChange ℝ ∘ₗ J)
+      (fun u v => by simp only [LinearMap.comp_apply]; exact hsym u v)
+      (fun u hu => by simpa only [LinearMap.comp_apply] using hpos u hu)
+      (A x) (A (D.star x).unop) hadjg hT'
   rw [hcomp, LinearMap.trace_baseChange] at htr
   simpa using htr
 

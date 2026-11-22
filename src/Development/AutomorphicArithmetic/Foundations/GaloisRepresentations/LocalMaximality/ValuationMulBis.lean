@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma UpperTheory.Gal.productCup_of_system.valuation_mul_bis (hV : ValBasic) {L : Type} [Field L] [Algebra ℂ L]
@@ -30,16 +31,19 @@ private lemma UpperTheory.Gal.productCup_of_system.valuation_mem (hV : ValBasic)
     (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ) {b : L} (hb : b ∈ B) : Val B e b (e ⟨b, hb⟩) :=
   (hV L B e).2.2.1 ⟨b, hb⟩
 
-theorem UpperTheory.Gal.productCup_of_system.ptT_of :
-    LocEq → ValBasic → RYBasic → PtT := by
+theorem UpperTheory.Gal.productCup_of_system.ptT_of : LocEq → ValBasic → RYBasic → PtT := by
   intro hLoc hV hRY
   intro F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 hY I J i hi j hj e hv
-  have hr : ∀ l, (sysY x j2 d).r n10 (gT x j2) i j l =
-      algebraMap F K' (x l.succ) / algebraMap F K' (x i) := by
+  have hr
+      : ∀ l,
+        (sysY x j2 d).r n10 (gT x j2) i j l
+          = algebraMap F K' (x l.succ) / algebraMap F K' (x i) := by
     intro l
     simp [Sys.r, Sys.u, gT, sysY, n10, div_eq_mul_inv]
-  have hw : ∀ a b, (((sysY x j2 d).X a * ((sysY x j2 d).X b)⁻¹ : K'ˣ) : K') =
-      algebraMap F K' (x a) / algebraMap F K' (x b) := by
+  have hw
+      : ∀ a b,
+        (((sysY x j2 d).X a * ((sysY x j2 d).X b)⁻¹ : K'ˣ) : K')
+          = algebraMap F K' (x a) / algebraMap F K' (x b) := by
     intro a b
     simp [sysY, div_eq_mul_inv]
   have hxne : ∀ a, algebraMap F K' (x a : F) ≠ 0 := fun a => (map_ne_zero _).2 (x a).ne_zero
@@ -48,8 +52,10 @@ theorem UpperTheory.Gal.productCup_of_system.ptT_of :
     have h1' : (⟨1, one_mem _⟩ : RY (xv x) j2 I J) = 1 := rfl
     rw [h1', map_one] at h1v
     exact h1v
-  have hv' : ∀ l : Fin d, Val (RY (xv x) j2 I J) e
-      (algebraMap F K' (x l.succ) / algebraMap F K' (x i)) 0 := fun l => hr l ▸ hv l
+  have hv'
+      : ∀ l : Fin d,
+        Val (RY (xv x) j2 I J) e (algebraMap F K' (x l.succ) / algebraMap F K' (x i)) 0 := fun l =>
+    hr l ▸ hv l
   have hi0 : i = 0 := by
     by_contra h
     have hvi := hv' (i.pred h)
@@ -65,8 +71,10 @@ theorem UpperTheory.Gal.productCup_of_system.ptT_of :
     have hval := valuation_mem hV (RY (xv x) j2 I J) e hm
     have hprod := valuation_mul_bis hV _ e (hv' (i'.pred h)) hval
     rw [Fin.succ_pred, zero_mul] at hprod
-    have hone : algebraMap F K' (x i') / algebraMap F K' (x 0) *
-        (algebraMap F K' (x 0) / algebraMap F K' (x i')) = 1 := by
+    have hone
+        : algebraMap F K' (x i') / algebraMap F K' (x 0)
+            * (algebraMap F K' (x 0) / algebraMap F K' (x i'))
+          = 1 := by
       rw [div_mul_div_comm, mul_comm (algebraMap F K' (x i')),
         div_self (mul_ne_zero (hxne 0) (hxne i'))]
     rw [hone] at hprod

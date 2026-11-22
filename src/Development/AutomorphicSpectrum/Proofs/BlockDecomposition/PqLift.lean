@@ -12,9 +12,10 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.PerfectRing
 
-theorem pq_lift : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (T : Type) [CommRing T]
-    (T₁ : Type) [CommRing T₁] (i : S →+* T) (I : Ideal S) (φ : S →+* T₁),
-    PQ p i I → Pf p T₁ → (∀ x ∈ I, φ x = 0) → ∃! ψ : T →+* T₁, ψ.comp i = φ := by
+theorem pq_lift
+    : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (T : Type) [CommRing T] (T₁ : Type)
+        [CommRing T₁] (i : S →+* T) (I : Ideal S) (φ : S →+* T₁),
+      PQ p i I → Pf p T₁ → (∀ x ∈ I, φ x = 0) → ∃! ψ : T →+* T₁, ψ.comp i = φ := by
   intro p _ S _ T _ T₁ _ i I φ hPQ hPf hI
   obtain ⟨-, hred, hroot, hinj, -⟩ := pf_facts p T₁ hPf
   have hcharT : (p : T) = 0 := hPQ.pf.char
@@ -27,11 +28,13 @@ theorem pq_lift : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (T : Type
     exact sub_eq_zero.mp (hred _ _ h0)
   have hfrobT : ∀ (k : ℕ) (u v : T), (u + v) ^ p ^ k = u ^ p ^ k + v ^ p ^ k := by
     intro k u v
-    obtain ⟨F, hF⟩ := GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p T hcharT k
+    obtain ⟨F, hF⟩ :=
+      GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p T hcharT k
     rw [← hF, ← hF, ← hF, map_add (f := _)]
   have hfrobT₁ : ∀ (k : ℕ) (u v : T₁), (u + v) ^ p ^ k = u ^ p ^ k + v ^ p ^ k := by
     intro k u v
-    obtain ⟨F, hF⟩ := GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p T₁ hcharT₁ k
+    obtain ⟨F, hF⟩ :=
+      GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p T₁ hcharT₁ k
     rw [← hF, ← hF, ← hF, map_add (f := _)]
   let Rel : T → T₁ → Prop := fun y z => ∃ (k : ℕ) (x : S), y ^ p ^ k = i x ∧ z ^ p ^ k = φ x
   have hex : ∀ y, ∃ z, Rel y z := by
@@ -56,8 +59,8 @@ theorem pq_lift : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (T : Type
     refine ⟨k₁ + k₂, x₁ ^ p ^ k₂ + x₂ ^ p ^ k₁, ?_, ?_⟩
     · rw [hfrobT, map_add (f := _), map_pow, map_pow, ← hy₁, ← hy₂, ← pow_mul, ← pow_mul, ← pow_add,
         ← pow_add, add_comm k₂ k₁]
-    · rw [hfrobT₁, map_add (f := _), map_pow, map_pow, ← hz₁, ← hz₂, ← pow_mul, ← pow_mul, ← pow_add,
-        ← pow_add, add_comm k₂ k₁]
+    · rw [hfrobT₁, map_add (f := _), map_pow, map_pow, ← hz₁, ← hz₂, ← pow_mul, ← pow_mul,
+        ← pow_add, ← pow_add, add_comm k₂ k₁]
   have hmul : ∀ y₁ y₂, ψf (y₁ * y₂) = ψf y₁ * ψf y₂ := by
     intro y₁ y₂
     apply hRelψ
@@ -70,8 +73,13 @@ theorem pq_lift : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] (T : Type
         ← pow_add, add_comm k₂ k₁]
   have h1 : ψf 1 = 1 := hRelψ 1 1 ⟨0, 1, by simp, by simp⟩
   have h0 : ψf 0 = 0 := hRelψ 0 0 ⟨0, 0, by simp, by simp⟩
-  let ψ : T →+* T₁ :=
-    { toFun := ψf, map_one' := h1, map_mul' := hmul, map_zero' := h0, map_add' := hadd }
+  let ψ : T →+* T₁ := {
+    toFun := ψf
+    map_one' := h1
+    map_mul' := hmul
+    map_zero' := h0
+    map_add' := hadd
+  }
   refine ⟨ψ, ?_, ?_⟩
   · ext s
     show ψf (i s) = φ s

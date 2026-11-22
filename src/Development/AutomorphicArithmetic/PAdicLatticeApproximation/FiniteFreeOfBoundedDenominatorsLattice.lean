@@ -5,21 +5,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open NumberField
-open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
+open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes
+  GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
 open scoped TensorProduct
 
-private theorem UpperTheory.tensor_rat_injective_of_free {L : Type} [AddCommGroup L] [Module.Free ℤ L] :
-    Function.Injective (TensorProduct.mk ℤ ℚ L (1 : ℚ)) := by
-  have hf : Function.Injective (Algebra.linearMap ℤ ℚ) :=
-    fun a b h => by simpa using h
+private theorem UpperTheory.tensor_rat_injective_of_free
+    {L : Type} [AddCommGroup L] [Module.Free ℤ L]
+    : Function.Injective (TensorProduct.mk ℤ ℚ L (1 : ℚ)) := by
+  have hf : Function.Injective (Algebra.linearMap ℤ ℚ) := fun a b h => by simpa using h
   have h := Module.Flat.rTensor_preserves_injective_linearMap (M := L) (Algebra.linearMap ℤ ℚ) hf
   intro x y hxy
   apply (TensorProduct.lid ℤ L).symm.injective
   apply h
   simpa [LinearMap.rTensor_tmul] using hxy
 
-theorem UpperTheory.finite_free_of_bounded_denominators_lattice :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (X : UpperTheory.Gal.W2.Wit.Sys D), (∃ d : ℕ, 0 < d ∧ ∀ w ∈ X.lat, ∃ a : D.La, d • w = (1 : ℚ) ⊗ₜ[ℤ] a) → Module.Finite ℤ X.lat ∧ Module.Free ℤ X.lat := by
+theorem UpperTheory.finite_free_of_bounded_denominators_lattice
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (X : UpperTheory.Gal.W2.Wit.Sys D),
+      (∃ d : ℕ, 0 < d ∧ ∀ w ∈ X.lat, ∃ a : D.La, d • w = (1 : ℚ) ⊗ₜ[ℤ] a)
+        → Module.Finite ℤ X.lat ∧ Module.Free ℤ X.lat := by
   intro p _ D X ⟨d, hd, h⟩
   haveI := D.freeLa
   haveI := D.finLa

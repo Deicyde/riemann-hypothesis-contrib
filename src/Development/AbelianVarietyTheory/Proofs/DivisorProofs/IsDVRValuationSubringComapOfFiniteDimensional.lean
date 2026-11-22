@@ -7,16 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NadelVanishi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
 open Polynomial
 
 namespace GlobalTheory.RestrictDVR
 
-theorem isDiscreteValuationRing_comap (K L : Type) [Field K] [Field L] (φ : K →+* L)
-    (hfin : (letI := φ.toAlgebra; FiniteDimensional K L))
-    (V : ValuationSubring L) [IsDiscreteValuationRing V] :
-    IsDiscreteValuationRing (V.comap φ) := by
+theorem isDiscreteValuationRing_comap
+    (K L : Type) [Field K] [Field L]
+    (φ : K →+* L) (hfin : (letI := φ.toAlgebra; FiniteDimensional K L))
+    (V : ValuationSubring L) [IsDiscreteValuationRing V]
+    : IsDiscreteValuationRing (V.comap φ) := by
   letI := φ.toAlgebra
   set E := V.comap φ with hE
   have memE : ∀ x : K, x ∈ E ↔ φ x ∈ V := fun x => ValuationSubring.mem_comap
@@ -45,7 +47,8 @@ theorem isDiscreteValuationRing_comap (K L : Type) [Field K] [Field L] (φ : K �
       have hcL : φ ((y : K) / x0) = (c : L) := by
         have := congrArg Subtype.val hc
         simp only [hg, MulMemClass.coe_mul] at this
-        rw [map_div₀, this]; field_simp
+        rw [map_div₀, this]
+        field_simp
       refine ⟨⟨(y : K) / x0, (memE _).2 (hcL ▸ c.2)⟩, Subtype.ext ?_⟩
       simp only [MulMemClass.coe_mul]
       field_simp
@@ -69,8 +72,10 @@ theorem isDiscreteValuationRing_comap (K L : Type) [Field K] [Field L] (φ : K �
       have : x = (u : K) := by
         have h1 := congrArg Subtype.val hu
         simp only [MulMemClass.coe_mul, OneMemClass.coe_one] at h1
-        field_simp at h1; exact h1.symm
-      rw [this]; exact (memE _).1 u.2
+        field_simp at h1
+        exact h1.symm
+      rw [this]
+      exact (memE _).1 u.2
     obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible V
     have hπ0 : (π : L) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
     let ψ : K →+* V := φ.codRestrict V hall
@@ -89,7 +94,11 @@ theorem isDiscreteValuationRing_comap (K L : Type) [Field K] [Field L] (φ : K �
     rw [this, mul_inv_cancel₀ hπ0]
   exact { hpid with not_a_field' := hnf }
 
-theorem main : ∀ (K L : Type) [Field K] [Field L] (φ : K →+* L), (letI := φ.toAlgebra; FiniteDimensional K L) → ∀ (V : ValuationSubring L) [IsDiscreteValuationRing V], IsDiscreteValuationRing (V.comap φ) := by
+theorem main
+    : ∀ (K L : Type) [Field K] [Field L] (φ : K →+* L),
+      (letI := φ.toAlgebra; FiniteDimensional K L)
+        → ∀ (V : ValuationSubring L) [IsDiscreteValuationRing V],
+          IsDiscreteValuationRing (V.comap φ) := by
   intro K L _ _ φ hfin V _
   exact isDiscreteValuationRing_comap K L φ hfin V
 

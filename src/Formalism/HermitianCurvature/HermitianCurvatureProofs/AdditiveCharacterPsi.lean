@@ -13,32 +13,33 @@ namespace Formalism.FourierDecayAlt.P.G2
 
 open Formalism.FourierDecayAlt.G
 
-theorem symm_castSucc {n : ℕ} (i : Fin n) :
-    finSumFinEquiv.symm (i.castSucc : Fin (n + 1)) = Sum.inl i :=
+theorem symm_castSucc {n : ℕ} (i : Fin n)
+    : finSumFinEquiv.symm (i.castSucc : Fin (n + 1)) = Sum.inl i :=
   finSumFinEquiv_symm_apply_castAdd (n := 1) i
 
 theorem symm_last (n : ℕ) : finSumFinEquiv.symm (Fin.last n : Fin (n + 1)) = Sum.inr (0 : Fin 1) :=
   finSumFinEquiv_symm_apply_natAdd (m := n) (0 : Fin 1)
 
-theorem blk_cc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i j : Fin n) :
-    blk A b a e i.castSucc j.castSucc = A i j := by
+theorem blk_cc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i j : Fin n)
+    : blk A b a e i.castSucc j.castSucc = A i j := by
   simp [blk, symm_castSucc]
 
-theorem blk_cl {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i : Fin n) :
-    blk A b a e i.castSucc (Fin.last n) = b i := by
+theorem blk_cl {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i : Fin n)
+    : blk A b a e i.castSucc (Fin.last n) = b i := by
   simp [blk, symm_castSucc, symm_last]
 
-theorem blk_lc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (j : Fin n) :
-    blk A b a e (Fin.last n) j.castSucc = a j := by
+theorem blk_lc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (j : Fin n)
+    : blk A b a e (Fin.last n) j.castSucc = a j := by
   simp [blk, symm_castSucc, symm_last]
 
-theorem blk_ll {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) :
-    blk A b a e (Fin.last n) (Fin.last n) = e := by
+theorem blk_ll {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ)
+    : blk A b a e (Fin.last n) (Fin.last n) = e := by
   simp [blk, symm_last]
 
-theorem blk_mul {n : ℕ} (A A' : Matrix (Fin n) (Fin n) ℂ) (b a b' a' : Fin n → ℂ) (e e' : ℂ) :
-    blk A b a e * blk A' b' a' e' =
-      blk (A * A' + Matrix.vecMulVec b a') (A *ᵥ b' + e' • b) (a ᵥ* A' + e • a') (a ⬝ᵥ b' + e * e') := by
+theorem blk_mul {n : ℕ} (A A' : Matrix (Fin n) (Fin n) ℂ) (b a b' a' : Fin n → ℂ) (e e' : ℂ)
+    : blk A b a e * blk A' b' a' e'
+      = blk (A * A' + Matrix.vecMulVec b a') (A *ᵥ b' + e' • b) (a ᵥ* A' + e • a')
+        (a ⬝ᵥ b' + e * e') := by
   unfold blk
   rw [Matrix.reindex_apply, Matrix.reindex_apply, Matrix.reindex_apply, Matrix.submatrix_mul_equiv,
     Matrix.fromBlocks_multiply]
@@ -48,8 +49,8 @@ theorem blk_mul {n : ℕ} (A A' : Matrix (Fin n) (Fin n) ℂ) (b a b' a' : Fin n
   · ext i j; simp [Matrix.mul_apply, Matrix.vecMul, dotProduct]
   · ext i j; simp [Matrix.mul_apply, dotProduct]
 
-theorem det_blk_col_zero {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (a : Fin n → ℂ) (e : ℂ) :
-    (blk A 0 a e).det = A.det * e := by
+theorem det_blk_col_zero {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (a : Fin n → ℂ) (e : ℂ)
+    : (blk A 0 a e).det = A.det * e := by
   unfold blk
   rw [Matrix.det_reindex_self]
   have h : (Matrix.of fun i (_ : Fin 1) => (0 : Fin n → ℂ) i) = (0 : Matrix (Fin n) (Fin 1) ℂ) := by
@@ -57,8 +58,8 @@ theorem det_blk_col_zero {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (a : Fin n �
   rw [h, Matrix.det_fromBlocks_zero₁₂]
   simp
 
-theorem det_blk_row_zero {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b : Fin n → ℂ) (e : ℂ) :
-    (blk A b 0 e).det = A.det * e := by
+theorem det_blk_row_zero {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b : Fin n → ℂ) (e : ℂ)
+    : (blk A b 0 e).det = A.det * e := by
   unfold blk
   rw [Matrix.det_reindex_self]
   have h : (Matrix.of fun (_ : Fin 1) j => (0 : Fin n → ℂ) j) = (0 : Matrix (Fin 1) (Fin n) ℂ) := by
@@ -74,8 +75,8 @@ theorem det_upper {d : ℕ} (v : UT d → ℂ) : (upper v).det = 1 := by
   rw [Matrix.det_of_isUpperTriangular h]
   simp [upper, strictUpper]
 
-theorem wMat_mul_apply {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
-    (wMat n * A) i j = A i.rev j := by
+theorem wMat_mul_apply {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
+    : (wMat n * A) i j = A i.rev j := by
   simp [wMat, Matrix.mul_apply]
 
 theorem wMat_mulVec_apply {n : ℕ} (B : Fin n → ℂ) (i : Fin n) : (wMat n *ᵥ B) i = B i.rev := by
@@ -113,16 +114,18 @@ theorem additive_character_psi : Formalism.FourierDecayAlt.G.PsiChar := by
   · simp only [psi]; rw [mul_comm]; exact Complex.norm_exp_ofReal_mul_I _
   · simp [psi]
 
-theorem det_weyl_matrix : Formalism.FourierDecayAlt.G.DetMatch :=
-  fun n => ⟨det_wMat_succ n, det_wMat_ne_zero n⟩
+theorem det_weyl_matrix : Formalism.FourierDecayAlt.G.DetMatch := fun n =>
+  ⟨det_wMat_succ n, det_wMat_ne_zero n⟩
 
 theorem det_orbit : Formalism.FourierDecayAlt.G.DetOrbit := by
   refine ⟨fun n t c p => ?_, fun d z v => ?_⟩
   · rw [Matrix.det_mul, Matrix.det_mul, lowRow, ptBlock, det_blk_col_zero, det_blk_col_zero,
       det_blk_row_zero, det_upper, Matrix.det_smul]
-    simp; ring
+    simp
+    ring
   · rw [Matrix.det_mul, det_upper, ptLong, Matrix.det_smul]
-    simp; ring
+    simp
+    ring
 
 theorem matrix_entries : Formalism.FourierDecayAlt.G.EntriesM := by
   intro n t c p
@@ -138,20 +141,16 @@ theorem matrix_entries : Formalism.FourierDecayAlt.G.EntriesM := by
 theorem shape_of_matrix : Formalism.FourierDecayAlt.G.ShapeM := by
   intro m t σ X B ρ hX
   refine ⟨fun i j hij => ?_, fun i j hij => ?_, fun k => ?_, ?_, ?_⟩
-  · obtain ⟨i', rfl⟩ : ∃ i' : Fin (m + 1), i = i'.castSucc :=
-      ⟨⟨i, by omega⟩, Fin.ext rfl⟩
-    obtain ⟨j', rfl⟩ : ∃ j' : Fin (m + 1), j = j'.castSucc :=
-      ⟨⟨j, by omega⟩, Fin.ext rfl⟩
+  · obtain ⟨i', rfl⟩ : ∃ i' : Fin (m + 1), i = i'.castSucc := ⟨⟨i, by omega⟩, Fin.ext rfl⟩
+    obtain ⟨j', rfl⟩ : ∃ j' : Fin (m + 1), j = j'.castSucc := ⟨⟨j, by omega⟩, Fin.ext rfl⟩
     have hlt : j' < i'.rev := by
       rw [Fin.lt_def, Fin.val_rev]
       simp only [Fin.val_castSucc] at hij
       omega
     rw [Mcoord, blk_cc, wMat_mul_apply]
     simp [Matrix.one_apply, hlt.ne', hX _ _ hlt.le]
-  · obtain ⟨i', rfl⟩ : ∃ i' : Fin (m + 1), i = i'.castSucc :=
-      ⟨⟨i, by omega⟩, Fin.ext rfl⟩
-    obtain ⟨j', rfl⟩ : ∃ j' : Fin (m + 1), j = j'.castSucc :=
-      ⟨⟨j, by omega⟩, Fin.ext rfl⟩
+  · obtain ⟨i', rfl⟩ : ∃ i' : Fin (m + 1), i = i'.castSucc := ⟨⟨i, by omega⟩, Fin.ext rfl⟩
+    obtain ⟨j', rfl⟩ : ∃ j' : Fin (m + 1), j = j'.castSucc := ⟨⟨j, by omega⟩, Fin.ext rfl⟩
     have heq : i'.rev = j' := by
       apply Fin.ext
       rw [Fin.val_rev]
@@ -190,7 +189,8 @@ theorem phase_formula : Formalism.FourierDecayAlt.G.PhaseFormula := by
       have hnl : ¬ i.rev < 0 := by simp
       simp [upper, strictUpper, Matrix.one_apply_ne hne]
     · simp
-  have h3 : ∀ k : Fin (m + 1), xOf (Xof t v) (t • b) k = t * blk (upper v) b 0 1 k.castSucc k.succ := by
+  have h3
+      : ∀ k : Fin (m + 1), xOf (Xof t v) (t • b) k = t * blk (upper v) b 0 1 k.castSucc k.succ := by
     intro k
     rw [xOf]
     refine Fin.lastCases ?_ (fun k' => ?_) k

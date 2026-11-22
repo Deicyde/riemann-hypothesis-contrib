@@ -13,10 +13,12 @@ open TopologicalSpace
 
 namespace GlobalTheory.ZariskiSections
 
-theorem bijective_of_finite_of_fractionRing {A B K : Type} [CommRing A] [IsDomain A]
-    [IsIntegrallyClosed A] [CommRing B] [Field K] [Algebra A K] [IsFractionRing A K]
-    (φ : A →+* B) (hφ : φ.Finite) (θ : B →+* K) (hθ : Function.Injective θ)
-    (h : ∀ a, θ (φ a) = algebraMap A K a) : Function.Bijective φ := by
+theorem bijective_of_finite_of_fractionRing
+    {A B K : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B] [Field K]
+    [Algebra A K] [IsFractionRing A K]
+    (φ : A →+* B) (hφ : φ.Finite)
+    (θ : B →+* K) (hθ : Function.Injective θ) (h : ∀ a, θ (φ a) = algebraMap A K a)
+    : Function.Bijective φ := by
   refine ⟨fun a a' e => IsFractionRing.injective A K (by rw [← h, ← h, e]), fun b => ?_⟩
   letI := φ.toAlgebra
   have : Module.Finite A B := hφ
@@ -25,8 +27,10 @@ theorem bijective_of_finite_of_fractionRing {A B K : Type} [CommRing A] [IsDomai
   obtain ⟨a, ha⟩ := IsIntegrallyClosed.isIntegral_iff.mp (hb.map θ')
   exact ⟨a, hθ (by rw [h]; exact ha)⟩
 
-theorem finite_appTop_restrict {Y Z : Scheme.{0}} (π : Y ⟶ Z) [IsProper π] [IsLocallyNoetherian Z]
-    {V : Z.Opens} (hV : IsAffineOpen V) : (π ∣_ V).appTop.hom.Finite := by
+theorem finite_appTop_restrict
+    {Y Z : Scheme.{0}} (π : Y ⟶ Z) [IsProper π] [IsLocallyNoetherian Z]
+    {V : Z.Opens} (hV : IsAffineOpen V)
+    : (π ∣_ V).appTop.hom.Finite := by
   let f : (π ⁻¹ᵁ V).toScheme ⟶ Spec (.of Γ(Z, V)) := (π ∣_ V) ≫ hV.isoSpec.hom
   have : IsNoetherianRing Γ(Z, V) := IsLocallyNoetherian.component_noetherian ⟨V, hV⟩
   letI := GlobalTheory.algebraΓOfHom f
@@ -50,24 +54,31 @@ theorem finite_appTop_restrict {Y Z : Scheme.{0}} (π : Y ⟶ Z) [IsProper π] [
   exact RingHom.Finite.comp h3
     (RingHom.Finite.of_surjective _ (ConcreteCategory.bijective_of_isIso (inv e)).2)
 
-theorem bijective_appTop_restrict : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) [IsProper π] [IsIntegral Y]
-    [IsIntegral Z] [IsLocallyNoetherian Z], ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z →
-    ∀ U : Z.Opens, (U : Set Z).Nonempty → IsIso (π ∣_ U) → ∀ V : Z.Opens, IsAffineOpen V →
-    Function.Bijective (π ∣_ V).appTop := by
+theorem bijective_appTop_restrict
+    : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) [IsProper π] [IsIntegral Y] [IsIntegral Z]
+        [IsLocallyNoetherian Z],
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z
+        → ∀ U : Z.Opens,
+          (U : Set Z).Nonempty → IsIso (π ∣_ U)
+            → ∀ V : Z.Opens, IsAffineOpen V → Function.Bijective (π ∣_ V).appTop := by
   intro Y Z π _ _ _ _ hN U hU hiso V hV
   have hV0 : V.ι ''ᵁ ⊤ = V := Scheme.Opens.ι_image_top V
   have hO : (π ⁻¹ᵁ V).ι ''ᵁ ⊤ = π ⁻¹ᵁ V := Scheme.Opens.ι_image_top _
   by_cases hne : (V : Set Z).Nonempty
   swap
   · have hVb : V = ⊥ := by
-      ext x; simp only [Opens.coe_bot, Set.mem_empty_iff_false, iff_false]
+      ext x
+      simp only [Opens.coe_bot, Set.mem_empty_iff_false, iff_false]
       exact fun hx => hne ⟨x, hx⟩
     have s1 : Subsingleton Γ(Z, V.ι ''ᵁ ⊤) :=
       CommRingCat.subsingleton_of_isTerminal (Z.sheaf.isTerminalOfEqEmpty (hV0.trans hVb))
     have s2 : Subsingleton Γ(Y, (π ⁻¹ᵁ V).ι ''ᵁ ⊤) :=
       CommRingCat.subsingleton_of_isTerminal (Y.sheaf.isTerminalOfEqEmpty (by
-        rw [hO]; ext x; simp only [Opens.coe_bot, Set.mem_empty_iff_false, iff_false]
-        intro hx; exact hne ⟨_, hx⟩))
+        rw [hO]
+        ext x
+        simp only [Opens.coe_bot, Set.mem_empty_iff_false, iff_false]
+        intro hx
+        exact hne ⟨_, hx⟩))
     exact ⟨fun a b _ => s1.elim a b, fun b => ⟨0, s2.elim _ _⟩⟩
 
   set η := genericPoint Z
@@ -89,19 +100,21 @@ theorem bijective_appTop_restrict : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) [IsPro
   haveI := functionField_isFractionRing_of_isAffineOpen Z _ hA
   haveI := GlobalTheory.IsNormalScheme.isIntegrallyClosed_of_isAffineOpen hA
   let θ : Γ(Y, (π ⁻¹ᵁ V).ι ''ᵁ ⊤) ⟶ Z.functionField :=
-    Y.presheaf.germ _ y hyO ≫ inv (π.stalkMap y) ≫ (Z.presheaf.stalkCongr (Inseparable.of_eq hy)).hom
+    Y.presheaf.germ _ y hyO ≫ inv (π.stalkMap y)
+      ≫ (Z.presheaf.stalkCongr (Inseparable.of_eq hy)).hom
   have hθ : Function.Injective θ.hom := by
     simp only [θ, CommRingCat.hom_comp, RingHom.coe_comp]
-    exact ((ConcreteCategory.bijective_of_isIso _).1.comp (ConcreteCategory.bijective_of_isIso _).1).comp
-      (germ_injective_of_isIntegral Y y hyO)
+    exact ((ConcreteCategory.bijective_of_isIso _).1.comp (ConcreteCategory.bijective_of_isIso
+      _).1).comp (germ_injective_of_isIntegral Y y hyO)
   refine bijective_of_finite_of_fractionRing (A := Γ(Z, V.ι ''ᵁ ⊤)) (K := Z.functionField)
     (π ∣_ V).appTop.hom (finite_appTop_restrict π hV) θ.hom hθ fun a => ?_
   have hle : (π ⁻¹ᵁ V).ι ''ᵁ ⊤ ≤ π ⁻¹ᵁ (V.ι ''ᵁ ⊤) := by rw [hO, hV0]
   have h1 : (π ∣_ V).appTop = π.app (V.ι ''ᵁ ⊤) ≫ Y.presheaf.map (homOfLE hle).op :=
     morphismRestrict_app π V ⊤
   have hyV : π y ∈ V.ι ''ᵁ ⊤ := by rw [hV0, hy]; exact hηV
-  have key : (π.app (V.ι ''ᵁ ⊤) ≫ Y.presheaf.map (homOfLE hle).op) ≫ θ =
-      Z.germToFunctionField (V.ι ''ᵁ ⊤) := by
+  have key
+      : (π.app (V.ι ''ᵁ ⊤) ≫ Y.presheaf.map (homOfLE hle).op) ≫ θ
+        = Z.germToFunctionField (V.ι ''ᵁ ⊤) := by
     simp only [θ, Category.assoc]
     rw [TopCat.Presheaf.germ_res_assoc, ← Scheme.Hom.germ_stalkMap_assoc π (V.ι ''ᵁ ⊤) y hyV,
       IsIso.hom_inv_id_assoc]

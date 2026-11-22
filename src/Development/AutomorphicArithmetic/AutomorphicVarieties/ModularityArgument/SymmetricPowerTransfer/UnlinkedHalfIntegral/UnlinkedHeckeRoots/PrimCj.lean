@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 namespace UpperTheory.V.Z.Sym.Unl
 
-private theorem ker_cj {N : ℕ} (σ : ℂ ≃+* ℂ) (χ : DirichletCharacter ℂ N) :
-    (cj σ χ).toUnitHom.ker = χ.toUnitHom.ker := by
+private theorem ker_cj {N : ℕ} (σ : ℂ ≃+* ℂ) (χ : DirichletCharacter ℂ N)
+    : (cj σ χ).toUnitHom.ker = χ.toUnitHom.ker := by
   ext x
-  simp only [MonoidHom.mem_ker, Units.ext_iff, MulChar.coe_toUnitHom, Units.val_one, cj, MulChar.ringHomComp_apply]
+  simp only [MonoidHom.mem_ker, Units.ext_iff, MulChar.coe_toUnitHom, Units.val_one, cj,
+    MulChar.ringHomComp_apply]
   exact map_eq_one_iff σ σ.injective
 
 theorem primCj : PrimCj := by

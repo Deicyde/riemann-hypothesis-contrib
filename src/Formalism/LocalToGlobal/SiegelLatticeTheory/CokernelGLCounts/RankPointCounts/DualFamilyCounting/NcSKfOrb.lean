@@ -13,46 +13,57 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcS.KfOrbPf
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.LocVol NumberField IsDedekindDomain
-  MeasureTheory Topology Filter
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory
+  Topology Filter
 open scoped TensorProduct
 
 section SlopeTestRemainingChoices
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem ev_int (x : F) : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, (algebraMap F (Fv F v) x) ∈ v.adicCompletionIntegers F :=
+theorem ev_int (x : F)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, (algebraMap F (Fv F v) x) ∈ v.adicCompletionIntegers F :=
   (algebraMap F (Af F) x).2
 
-theorem int_smul_mem {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (M : ℤ) (hM : M ≠ 0)
-    (hMv : algebraMap F (Fv F v) ((M : F)⁻¹) ∈ v.adicCompletionIntegers F)
+theorem int_smul_mem
+    {n : ℕ}
+    (v : HeightOneSpectrum (𝓞 F)) (M : ℤ)
+    (hM : M ≠ 0) (hMv : algebraMap F (Fv F v) ((M : F)⁻¹) ∈ v.adicCompletionIntegers F)
     (S : Submodule (v.adicCompletionIntegers F) (Fin n → Fv F v ⊗[F] E)) (y : Fin n → Fv F v ⊗[F] E)
-    (hy : M • y ∈ S) : y ∈ S := by
+    (hy : M • y ∈ S)
+    : y ∈ S := by
   have h1 : algebraMap F (Fv F v) ((M : F)⁻¹) * algebraMap F (Fv F v) (M : F) = 1 := by
     rw [← map_mul, inv_mul_cancel₀ (Int.cast_ne_zero.2 hM), map_one]
-  have e : y = (⟨algebraMap F (Fv F v) ((M : F)⁻¹), hMv⟩ : v.adicCompletionIntegers F) • (M • y) := by
+  have e
+      : y = (⟨algebraMap F (Fv F v) ((M : F)⁻¹), hMv⟩ : v.adicCompletionIntegers F) • (M • y) := by
     show y = algebraMap F (Fv F v) ((M : F)⁻¹) • (M • y)
-    rw [← Int.cast_smul_eq_zsmul (Fv F v) M y, smul_smul, ← map_intCast (algebraMap F (Fv F v)) M, h1, one_smul]
+    rw [← Int.cast_smul_eq_zsmul (Fv F v) M y, smul_smul, ← map_intCast (algebraMap F (Fv F v)) M,
+      h1, one_smul]
   rw [e]
   exact S.smul_mem _ hy
 
-theorem ev_latLoc_std {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.IsFullLattice E L) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, latLoc (E := E) v (L : Set (Fin n → E)) =
-      latLoc (E := E) v ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) := by
-  let : Submodule.IsFullLattice E L := hL
-  obtain ⟨N, hN0, hN⟩ := MassDataMassesW.KCptW.std_mult L Submodule.IsFullLattice.span_eq_top
-  obtain ⟨N', hN'0, hN'⟩ := MassDataMassesW.KCptW.lat_mult L hL.fg
-  filter_upwards [ev_int ((N : F)⁻¹), ev_int ((N' : F)⁻¹)] with v hv hv'
-  apply le_antisymm
-  · intro y hy
-    exact int_smul_mem v N' hN'0 hv' _ y (MassDataMassesW.KCptW.zsmul_mem_latLoc_of _ _ N' hN' v hy)
-  · intro y hy
-    exact int_smul_mem v N hN0 hv _ y (MassDataMassesW.KCptW.zsmul_mem_latLoc_of _ _ N hN v hy)
+theorem ev_latLoc_std {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, latLoc (E := E) v (L : Set (Fin n → E)) =
+        latLoc (E := E) v ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) :=
+  by
+    let : Submodule.IsFullLattice E L := hL
+    obtain ⟨N, hN0, hN⟩ := MassDataMassesW.KCptW.std_mult L Submodule.IsFullLattice.span_eq_top
+    obtain ⟨N', hN'0, hN'⟩ := MassDataMassesW.KCptW.lat_mult L hL.fg
+    filter_upwards [ev_int ((N : F)⁻¹), ev_int ((N' : F)⁻¹)] with v hv hv'
+    apply le_antisymm
+    · intro y hy
+      exact int_smul_mem v N' hN'0 hv' _ y
+        (MassDataMassesW.KCptW.zsmul_mem_latLoc_of _ _ N' hN' v hy)
+    · intro y hy
+      exact int_smul_mem v N hN0 hv _ y (MassDataMassesW.KCptW.zsmul_mem_latLoc_of _ _ N hN v hy)
 
-theorem mem_oev_of_std {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (y : Fin n → Fv F v ⊗[F] E)
+theorem mem_oev_of_std
+    {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (y : Fin n → Fv F v ⊗[F] E)
     (hy : y ∈ latLoc (E := E) v
-      ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E))) (i : Fin n) :
-    y i ∈ OEv (E := E) v := by
+      ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)))
+    (i : Fin n)
+    : y i ∈ OEv (E := E) v := by
   show y i ∈ Submodule.span (v.adicCompletionIntegers F)
     ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ)
   induction hy using Submodule.span_induction with
@@ -66,12 +77,16 @@ theorem mem_oev_of_std {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (y : Fin n →
   | add a b _ _ ha hb => exact Submodule.add_mem _ ha hb
   | smul c a _ ha => exact Submodule.smul_mem _ c ha
 
-theorem entries_oev {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (g : GL (Fin n) (Fv F v ⊗[F] E))
-    (hg : g ∈ Kloc (E := E) v ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)))
-    (i j : Fin n) : (g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) i j ∈ OEv (E := E) v := by
+theorem entries_oev
+    {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (g : GL (Fin n) (Fv F v ⊗[F] E))
+    (hg : g ∈ Kloc (E := E) v
+      ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)))
+    (i j : Fin n)
+    : (g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) i j ∈ OEv (E := E) v := by
   classical
-  have he : ratV (F := F) (Fv F v) (Pi.single j (1 : E)) ∈ latLoc (E := E) v
-      ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) :=
+  have he
+      : ratV (F := F) (Fv F v) (Pi.single j (1 : E)) ∈ latLoc (E := E) v
+        ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) :=
     Submodule.subset_span ⟨_, MassDataMassesW.KCptW.single_mem_std j, rfl⟩
   have h2 := (hg _).1 he
   have e1 : ratV (F := F) (Fv F v) (Pi.single j (1 : E)) = Pi.single j 1 := by
@@ -85,19 +100,22 @@ theorem entries_oev {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (g : GL (Fin n) (
 
 variable [FiniteDimensional F E]
 
-theorem ev_crd_oev {d : ℕ} (b : Module.Basis (Fin d) F E) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, ∀ z ∈ OEv (E := E) v, ∀ l,
-      PI.VolStabS.PositiveNearLattice.crd b (Fv F v) z l ∈ v.adicCompletionIntegers F := by
+theorem ev_crd_oev {d : ℕ} (b : Module.Basis (Fin d) F E)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, ∀ z ∈ OEv (E := E) v, ∀ l,
+        PI.VolStabS.PositiveNearLattice.crd b (Fv F v) z l ∈ v.adicCompletionIntegers F := by
   classical
   let B := NumberField.RingOfIntegers.basis E
   filter_upwards [eventually_all.2 fun t => eventually_all.2 fun l =>
     ev_int (F := F) (b.repr ((B t : 𝓞 E) : E) l)] with v hv
-  have hgen : ∀ (o : 𝓞 E) (l : Fin d),
-      PI.VolStabS.PositiveNearLattice.crd b (Fv F v) (inclR (F := F) (Fv F v) (o : E)) l ∈
-        v.adicCompletionIntegers F := by
+  have hgen
+      : ∀ (o : 𝓞 E) (l : Fin d),
+        PI.VolStabS.PositiveNearLattice.crd b (Fv F v) (inclR (F := F) (Fv F v) (o : E)) l
+          ∈ v.adicCompletionIntegers F := by
     intro o l
-    have hcrd : ∀ e : E, PI.VolStabS.PositiveNearLattice.crd b (Fv F v) (inclR (F := F) (Fv F v) e) l =
-        algebraMap F (Fv F v) (b.repr e l) := by
+    have hcrd
+        : ∀ e : E,
+          PI.VolStabS.PositiveNearLattice.crd b (Fv F v) (inclR (F := F) (Fv F v) e) l
+            = algebraMap F (Fv F v) (b.repr e l) := by
       intro e
       simp [PI.VolStabS.PositiveNearLattice.crd, inclR, Algebra.TensorProduct.basis_repr_tmul]
     rw [hcrd]
@@ -113,39 +131,47 @@ theorem ev_crd_oev {d : ℕ} (b : Module.Basis (Fin d) F E) :
     exact Subring.zsmul_mem _ (hv t l) _
   intro z hz l
   change z ∈ Submodule.span (v.adicCompletionIntegers F)
-    ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ) at hz
+      ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ)
+    at hz
   induction hz using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨o, -, rfl⟩ := hy
     exact hgen o l
-  | zero => simp [PI.VolStabS.PositiveNearLattice.crd]
+  | zero =>
+    simp [PI.VolStabS.PositiveNearLattice.crd]
   | add a c _ _ ha hc =>
     simp only [PI.VolStabS.PositiveNearLattice.crd, map_add (f := _), Finsupp.add_apply] at *
     exact Subring.add_mem _ ha hc
   | smul c a _ ha =>
-    have e : PI.VolStabS.PositiveNearLattice.crd b (Fv F v) (c • a) l =
-        (c : Fv F v) * PI.VolStabS.PositiveNearLattice.crd b (Fv F v) a l := by
+    have e
+        : PI.VolStabS.PositiveNearLattice.crd b (Fv F v) (c • a) l
+          = (c : Fv F v) * PI.VolStabS.PositiveNearLattice.crd b (Fv F v) a l := by
       show (Algebra.TensorProduct.basis (Fv F v) b).repr ((c : Fv F v) • a) l = _
       rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
       rfl
     rw [e]
     exact Subring.mul_mem _ c.2 ha
 
-theorem projV_eq_map (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (X : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)) :
-    projV v X = X.map (tensMap (E := E) (evalV F v)) := rfl
+theorem projV_eq_map
+    (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (X : Matrix (Fin n) (Fin n) (Af F ⊗[F] E))
+    : projV v X = X.map (tensMap (E := E) (evalV F v)) :=
+  rfl
 
 end SlopeTestRemainingChoices
 
-theorem finite_orbit_holds :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-      (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (a : ℕ) (X0 : Fin a → Fin n → E)
-      (Λ : Set (Fin n → E)),
-      IsCMExt F E σ → IsHermND σ J →
-      (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsFullLattice E L ∧ (L : Set (Fin n → E)) = Λ) →
-      MeasurableSet {x : Fin a → Fin n → Af F ⊗[F] E | ∃ k ∈ Kf σ J Λ, x = k • ratTup (Af F) X0} ∧
-      ∀ x : Fin a → Fin n → Af F ⊗[F] E, (∃ k ∈ Kf σ J Λ, x = k • ratTup (Af F) X0) ↔
-        ∀ v : HeightOneSpectrum (𝓞 F),
-          projV v x ∈ {X | ∃ k ∈ Formalism.L2.SG.TypedSets.Kv σ J Λ v, X = k • ratTup (Fv F v) X0} := by
+theorem finite_orbit_holds
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (a : ℕ) (X0 : Fin a → Fin n → E)
+        (Λ : Set (Fin n → E)),
+      IsCMExt F E σ → IsHermND σ J
+        → (∃ L : Submodule (𝓞 E) (Fin n → E),
+          Submodule.IsFullLattice E L ∧ (L : Set (Fin n → E)) = Λ)
+        → MeasurableSet {x : Fin a → Fin n → Af F ⊗[F] E | ∃ k ∈ Kf σ J Λ, x = k • ratTup (Af F) X0}
+          ∧ ∀ x : Fin a → Fin n → Af F ⊗[F] E,
+            (∃ k ∈ Kf σ J Λ, x = k • ratTup (Af F) X0)
+              ↔ ∀ v : HeightOneSpectrum (𝓞 F),
+                projV v x
+                  ∈ {X | ∃ k ∈ Formalism.L2.SG.TypedSets.Kv σ J Λ v, X = k • ratTup (Fv F v) X0} := by
   intro F E _ _ _ _ _ σ n J a X0 Λ hCM hJ hLat
   classical
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
@@ -163,53 +189,60 @@ theorem finite_orbit_holds :
       ((HA.mat (Af F) σ J g : GL (Fin n) (Af F ⊗[F] E)) : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).mulVec (Y c))
     exact hmat.matrix_mulVec continuous_const
 
-  have hcomp : ∀ (v : HeightOneSpectrum (𝓞 F)) (g : HA (Af F) σ J),
-      projV v (g • Y) = (((HA.mat (Af F) σ J g : GL (Fin n) (Af F ⊗[F] E)) : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).map
-        (tensMap (E := E) (evalV F v))).mulVec ∘ (fun c => ratTup (F := F) (Fv F v) X0 c) := by
+  have hcomp
+      : ∀ (v : HeightOneSpectrum (𝓞 F)) (g : HA (Af F) σ J),
+        projV v (g • Y)
+          = (((HA.mat (Af F) σ J g : GL (Fin n) (Af F ⊗[F] E))
+              : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).map (tensMap (E := E) (evalV F v))).mulVec
+            ∘ (fun c => ratTup (F := F) (Fv F v) X0 c) := by
     intro v g
     funext c i
     change tensMap (E := E) (evalV F v)
-        (((HA.mat (Af F) σ J g : GL (Fin n) (Af F ⊗[F] E)) : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).mulVec (Y c) i) = _
+        (((HA.mat (Af F) σ J g : GL (Fin n) (Af F ⊗[F] E))
+          : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).mulVec (Y c) i)
+      = _
     rw [RingHom.map_mulVec]
     congr 1
   refine ⟨?_, fun x => ⟨?_, ?_⟩⟩
-  ·
-    have : T2Space (Af F ⊗[F] E) := PI.VolStabS.RestrProdG.t2_tensor_product (Af F)
-    have e : {x : Fin a → Fin n → Af F ⊗[F] E | ∃ k ∈ Kf σ J (L : Set (Fin n → E)), x = k • ratTup (Af F) X0} =
-        (fun g : HA (Af F) σ J => g • Y) '' (Kf σ J (L : Set (Fin n → E)) : Set (HA (Af F) σ J)) := by
+  · have : T2Space (Af F ⊗[F] E) := PI.VolStabS.RestrProdG.t2_tensor_product (Af F)
+    have e
+        : {x : Fin a → Fin n → Af F ⊗[F] E | ∃ k ∈ Kf σ J (L : Set (Fin n → E)), x = k • ratTup (Af F) X0}
+          = (fun g : HA (Af F) σ J => g • Y)
+            '' (Kf σ J (L : Set (Fin n → E)) : Set (HA (Af F) σ J)) := by
       ext x
       constructor
       · rintro ⟨k, hk, rfl⟩; exact ⟨k, hk, rfl⟩
       · rintro ⟨k, hk, rfl⟩; exact ⟨k, hk, rfl⟩
     rw [e]
     exact (hKc.image hact).isClosed.measurableSet
-  ·
-    rintro ⟨k, hk, rfl⟩ v
+  · rintro ⟨k, hk, rfl⟩ v
     refine ⟨haMap σ J (evalV F v) k, ?_, ?_⟩
     · have h1 : k ∈ (Kloc (E := E) v (L : Set (Fin n → E))).comap ((compV v).comp (incAf σ J)) :=
         (Subgroup.mem_iInf.1 hk) v
       exact h1
     · rw [hcomp v k]
       rfl
-  ·
-    intro hx
+  · intro hx
     choose kv hkv hxv using hx
-    have hgoodV : ∀ᶠ v in cofinite, ∀ g : GL (Fin n) (Fv F v ⊗[F] E),
-        g ∈ Kloc (E := E) v (L : Set (Fin n → E)) →
-          (g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) ∈ latV (M := n) (n := n) b v := by
+    have hgoodV
+        : ∀ᶠ v in cofinite, ∀ g : GL (Fin n) (Fv F v ⊗[F] E),
+          g ∈ Kloc (E := E) v (L : Set (Fin n → E)) →
+            (g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) ∈ latV (M := n) (n := n) b v := by
       filter_upwards [ev_latLoc_std L hL, ev_crd_oev b] with v hv hc
       intro g hg i j l
-      have hg' : g ∈ Kloc (E := E) v
-          ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) := by
+      have hg'
+          : g ∈ Kloc (E := E) v
+            ((MassDataMassesW.KCptW.stdSub : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) := by
         intro y; rw [← hv]; exact hg y
       exact hc _ (entries_oev v g hg' i j) l
     let mat : ∀ v : HeightOneSpectrum (𝓞 F), Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) := fun v =>
-      ((HA.mat (Fv F v) σ J (kv v) : GL (Fin n) (Fv F v ⊗[F] E)) : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
+      ((HA.mat (Fv F v) σ J (kv v) : GL (Fin n) (Fv F v ⊗[F] E))
+        : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
     let imat : ∀ v : HeightOneSpectrum (𝓞 F), Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) := fun v =>
-      (((HA.mat (Fv F v) σ J (kv v))⁻¹ : GL (Fin n) (Fv F v ⊗[F] E)) : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
+      (((HA.mat (Fv F v) σ J (kv v))⁻¹ : GL (Fin n) (Fv F v ⊗[F] E))
+        : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
     have hK1 : ∀ v, HA.mat (Fv F v) σ J (kv v) ∈ Kloc (E := E) v (L : Set (Fin n → E)) := hkv
-    have hg1 : ∀ᶠ v in cofinite, mat v ∈ latV b v :=
-      hgoodV.mono fun v h => h _ (hK1 v)
+    have hg1 : ∀ᶠ v in cofinite, mat v ∈ latV b v := hgoodV.mono fun v h => h _ (hK1 v)
     have hg2 : ∀ᶠ v in cofinite, imat v ∈ latV b v :=
       hgoodV.mono fun v h => h _ ((Kloc (E := E) v (L : Set (Fin n → E))).inv_mem (hK1 v))
     obtain ⟨Γ, -, hΓ⟩ := PI.VolStabS.rpGlue_holds F E n n _ b
@@ -219,16 +252,19 @@ theorem finite_orbit_holds :
     have hA' : ∀ v, A'.map (tensMap (E := E) (evalV F v)) = imat v := (hΓ (0, imat) hg2).2
     have hAA' : A * A' = 1 := by
       refine Formalism.L2.SG.Pf.NcS.OmDecompPf.projV_ext b fun v => ?_
-      rw [projV_eq_map, projV_eq_map, Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _), hA, hA']
+      rw [projV_eq_map, projV_eq_map, Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _), hA,
+        hA']
       exact Units.mul_inv (HA.mat (Fv F v) σ J (kv v))
     have hA'A : A' * A = 1 := by
       refine Formalism.L2.SG.Pf.NcS.OmDecompPf.projV_ext b fun v => ?_
-      rw [projV_eq_map, projV_eq_map, Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _), hA, hA']
+      rw [projV_eq_map, projV_eq_map, Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _), hA,
+        hA']
       exact Units.inv_mul (HA.mat (Fv F v) σ J (kv v))
     let gGL : GL (Fin n) (Af F ⊗[F] E) := ⟨A, A', hAA', hA'A⟩
-    have hcT : ∀ v (X : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)),
-        (Formalism.UG.cT (sigR (Af F) σ) X).map (tensMap (E := E) (evalV F v)) =
-          Formalism.UG.cT (sigR (Fv F v) σ) (X.map (tensMap (E := E) (evalV F v))) := by
+    have hcT
+        : ∀ v (X : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)),
+          (Formalism.UG.cT (sigR (Af F) σ) X).map (tensMap (E := E) (evalV F v))
+            = Formalism.UG.cT (sigR (Fv F v) σ) (X.map (tensMap (E := E) (evalV F v))) := by
       intro v X
       ext i j
       simp only [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply]
@@ -248,14 +284,20 @@ theorem finite_orbit_holds :
       show ∀ y, y ∈ latLoc (E := E) v (L : Set (Fin n → E)) ↔
         Matrix.mulVec (((compV v (incAf σ J k)) : GL (Fin n) (Fv F v ⊗[F] E)) :
           Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) y ∈ latLoc (E := E) v (L : Set (Fin n → E))
-      have e : (((compV v (incAf σ J k)) : GL (Fin n) (Fv F v ⊗[F] E)) :
-          Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) = mat v := hA v
+      have e
+          : (((compV v (incAf σ J k)) : GL (Fin n) (Fv F v ⊗[F] E))
+              : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
+            = mat v :=
+        hA v
       rw [e]
       exact hK1 v
     · refine Formalism.L2.SG.Pf.NcS.OmDecompPf.projV_ext b fun v => ?_
       rw [hxv v, hcomp v k]
-      have e : (((HA.mat (Af F) σ J k : GL (Fin n) (Af F ⊗[F] E)) : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).map
-          (tensMap (E := E) (evalV F v))) = mat v := hA v
+      have e
+          : (((HA.mat (Af F) σ J k : GL (Fin n) (Af F ⊗[F] E))
+              : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)).map (tensMap (E := E) (evalV F v)))
+            = mat v :=
+        hA v
       rw [e]
       rfl
 

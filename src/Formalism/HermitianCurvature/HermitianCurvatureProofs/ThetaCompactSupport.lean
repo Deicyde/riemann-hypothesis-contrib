@@ -14,7 +14,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SeminormComp
 
 namespace Formalism.FourierDecayAlt.P.PBJ
 
-open MeasureTheory Filter Topology Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+open MeasureTheory Filter Topology Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.B
 
 section rw
 
@@ -22,9 +23,9 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-theorem rw_vanish_GV {O : Set (Mat k r)} (hO : IsOpen O) {f : Mat k r → E}
-    (h : ∀ g ∈ O, g ∈ GV k r → f g = 0) :
-    ∀ (w : List (Mat k r)), (∀ X ∈ w, inLie k r X) → ∀ g ∈ O, g ∈ GV k r → Rw w f g = 0
+theorem rw_vanish_GV
+    {O : Set (Mat k r)} (hO : IsOpen O) {f : Mat k r → E} (h : ∀ g ∈ O, g ∈ GV k r → f g = 0)
+    : ∀ (w : List (Mat k r)), (∀ X ∈ w, inLie k r X) → ∀ g ∈ O, g ∈ GV k r → Rw w f g = 0
   | [], _ => h
   | X :: w, hw => by
     intro g hg hgG
@@ -41,38 +42,48 @@ theorem rw_vanish_GV {O : Set (Mat k r)} (hO : IsOpen O) {f : Mat k r → E}
     have e : (fun t : ℝ => Rw w f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0] fun _ => 0 := by
       filter_upwards [hev] with t ht
       exact ih _ ht (Formalism.FourierDecayAlt.P.B5.curve_mem hgG hX t)
-    rw [e.deriv_eq]; simp
+    rw [e.deriv_eq]
+    simp
 
 end rw
 
 section op
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem opApply_eq_zero (Θ : DiffOp k r Wp Wq) (F : Mat k r → (Wq →L[ℂ] Wp)) (g : Mat k r)
-    (h : ∀ T ∈ Θ, Rw T.word F g = 0) : opApply Θ F g = 0 := by
+theorem opApply_eq_zero
+    (Θ : DiffOp k r Wp Wq) (F : Mat k r → (Wq →L[ℂ] Wp)) (g : Mat k r)
+    (h : ∀ T ∈ Θ, Rw T.word F g = 0)
+    : opApply Θ F g = 0 := by
   unfold opApply
   apply List.sum_eq_zero
   intro x hx
   obtain ⟨T, hT, rfl⟩ := List.mem_map.1 hx
   rw [h T hT, map_zero]
 
-theorem ckOn_opApply_list (UU : Set (Mat k r)) (F : Mat k r → (Wq →L[ℂ] Wp))
-    (hF : CkOn ⊤ (GV k r) F) (hs : closure {g | g ∈ GV k r ∧ F g ≠ 0} ⊆ UU) :
-    ∀ Θ : DiffOp k r Wp Wq, (∀ T ∈ Θ, CkOn ⊤ UU T.coef) →
-      (∀ T ∈ Θ, closure {g | g ∈ GV k r ∧ Rw T.word F g ≠ 0} ⊆ UU) → CkOn ⊤ (GV k r) (opApply Θ F)
+theorem ckOn_opApply_list
+    (UU : Set (Mat k r)) (F : Mat k r → (Wq →L[ℂ] Wp))
+    (hF : CkOn ⊤ (GV k r) F) (hs : closure {g | g ∈ GV k r ∧ F g ≠ 0} ⊆ UU)
+    : ∀ Θ : DiffOp k r Wp Wq,
+      (∀ T ∈ Θ, CkOn ⊤ UU T.coef) → (∀ T ∈ Θ, closure {g | g ∈ GV k r ∧ Rw T.word F g ≠ 0} ⊆ UU)
+        → CkOn ⊤ (GV k r) (opApply Θ F)
   | [], _, _ => by
     have e : opApply ([] : DiffOp k r Wp Wq) F = fun _ => 0 := by funext g; simp [opApply]
-    rw [e]; exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_zero
+    rw [e]
+    exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_zero
   | T :: Θ, hc, hsu => by
     have e : opApply (T :: Θ) F = fun g => T.coef g (Rw T.word F g) + opApply Θ F g := by
       funext g; simp [opApply]
     rw [e]
-    refine Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_add ?_ (ckOn_opApply_list UU F hF hs Θ (fun T' hT' => hc T' (List.mem_cons_of_mem _ hT'))
-      (fun T' hT' => hsu T' (List.mem_cons_of_mem _ hT')))
+    refine Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_add ?_
+      (ckOn_opApply_list UU F hF hs Θ
+        (fun T' hT' => hc T' (List.mem_cons_of_mem _ hT'))
+        (fun T' hT' => hsu T' (List.mem_cons_of_mem _ hT')))
     exact Formalism.FourierDecayAlt.P.B5.ckOn_coef (hc T List.mem_cons_self)
-      (Formalism.FourierDecayAlt.P.MinorPolynomials.ckOn_Rw_top hF T.word_lie) (hsu T List.mem_cons_self)
+      (Formalism.FourierDecayAlt.P.MinorPolynomials.ckOn_Rw_top hF T.word_lie)
+      (hsu T List.mem_cons_self)
 
 end op
 
@@ -80,28 +91,38 @@ end Formalism.FourierDecayAlt.P.PBJ
 
 namespace Formalism.FourierDecayAlt.P
 
-open MeasureTheory Filter Topology Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+open MeasureTheory Filter Topology Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.B
 
 theorem theta_compact_support : Formalism.FourierDecayAlt.KB.ThetaCpt := by
   intro Wp Wq _ _ _ _ _ _ P p F w e Cb hDD hF hw
   obtain ⟨nf, fib, o, κ, Dop, _, hIn, _, _, hΘeq⟩ := hDD w hw e
   obtain ⟨hFs, ⟨R, hR⟩, ε, hε, hεF⟩ := hF
-  have hGc : Continuous (Gf P.k P.r p.T.base.z p.T.base.z') := Formalism.FourierDecayAlt.P.Ux8.cont_Gf _ _ _ _
+  have hGc : Continuous (Gf P.k P.r p.T.base.z p.T.base.z') :=
+    Formalism.FourierDecayAlt.P.Ux8.cont_Gf _ _ _ _
 
-  have hv1 : ∀ T ∈ Dop, ∀ g ∈ {g : Mat P.k P.r | Gf P.k P.r p.T.base.z p.T.base.z' g < ε}, g ∈ GV P.k P.r →
-      Rw T.word F g = 0 := fun T _ =>
+  have hv1
+      : ∀ T ∈ Dop, ∀ g ∈ {g : Mat P.k P.r | Gf P.k P.r p.T.base.z p.T.base.z' g < ε},
+        g ∈ GV P.k P.r → Rw T.word F g = 0 := fun T _ =>
     PBJ.rw_vanish_GV (isOpen_lt hGc continuous_const)
-      (fun g hg hgG => by by_contra hne; exact absurd (hεF g hgG hne) (not_le.2 hg)) T.word T.word_lie
-  have hv2 : ∀ T ∈ Dop, ∀ g ∈ {g : Mat P.k P.r | R < gN g}, g ∈ GV P.k P.r → Rw T.word F g = 0 := fun T _ =>
-    PBJ.rw_vanish_GV (isOpen_lt continuous_const Formalism.FourierDecayAlt.P.B6.gN_continuous)
-      (fun g hg hgG => by by_contra hne; exact absurd (hR g hgG hne) (not_le.2 hg)) T.word T.word_lie
-  have hcl : IsClosed {g : Mat P.k P.r | g ∈ GV P.k P.r ∧ ε ≤ Gf P.k P.r p.T.base.z p.T.base.z' g} :=
+      (fun g hg hgG => by by_contra hne; exact absurd (hεF g hgG hne) (not_le.2 hg))
+      T.word T.word_lie
+  have hv2 : ∀ T ∈ Dop, ∀ g ∈ {g : Mat P.k P.r | R < gN g}, g ∈ GV P.k P.r → Rw T.word F g = 0 :=
+    fun T _ =>
+      PBJ.rw_vanish_GV (isOpen_lt continuous_const Formalism.FourierDecayAlt.P.B6.gN_continuous)
+        (fun g hg hgG => by by_contra hne; exact absurd (hR g hgG hne) (not_le.2 hg))
+        T.word T.word_lie
+  have hcl
+      : IsClosed {g : Mat P.k P.r | g ∈ GV P.k P.r ∧ ε ≤ Gf P.k P.r p.T.base.z p.T.base.z' g} :=
     Formalism.FourierDecayAlt.P.B5.GV_closed.inter (isClosed_le continuous_const hGc)
-  have hsub : {g : Mat P.k P.r | g ∈ GV P.k P.r ∧ ε ≤ Gf P.k P.r p.T.base.z p.T.base.z' g} ⊆
-      C6.domL p.T.base ∅ := fun g hg => ⟨hg.1, lt_of_lt_of_le hε hg.2, by simp⟩
+  have hsub
+      : {g : Mat P.k P.r | g ∈ GV P.k P.r ∧ ε ≤ Gf P.k P.r p.T.base.z p.T.base.z' g}
+        ⊆ C6.domL p.T.base ∅ := fun g hg =>
+    ⟨hg.1, lt_of_lt_of_le hε hg.2, by simp⟩
   have hsF : closure {g | g ∈ GV P.k P.r ∧ F g ≠ 0} ⊆ C6.domL p.T.base ∅ := by
     refine subset_trans (closure_minimal ?_ hcl) hsub
-    intro g hg; exact ⟨hg.1, hεF g hg.1 hg.2⟩
+    intro g hg
+    exact ⟨hg.1, hεF g hg.1 hg.2⟩
   have hsT : ∀ T ∈ Dop, closure {g | g ∈ GV P.k P.r ∧ Rw T.word F g ≠ 0} ⊆ C6.domL p.T.base ∅ := by
     intro T hT
     refine subset_trans (closure_minimal ?_ hcl) hsub
@@ -124,12 +145,17 @@ theorem theta_compact_support : Formalism.FourierDecayAlt.KB.ThetaCpt := by
     · have hγ := h2.choose_spec
       have hG : 0 < Gf P.k P.r p.T.base.z p.T.base.z' h2.choose := by
         rw [← Formalism.FourierDecayAlt.P.ptG_spec _ _ _ _ a _ h1.1 hγ.2.1]; exact h1.2
-      rw [Formalism.FourierDecayAlt.P.JCx1.needs.orbJ_smul_of_ae p.T.base h2.choose _ (p.Θ.Θ w e F) (opApply Dop F) 1 ?_, one_smul]
+      rw [Formalism.FourierDecayAlt.P.JCx1.needs.orbJ_smul_of_ae p.T.base h2.choose _ (p.Θ.Θ w e F)
+          (opApply Dop F) 1 ?_,
+        one_smul]
       filter_upwards [Formalism.FourierDecayAlt.P.B5.ae_inSS p.T.base] with q hq
       rw [one_smul]
       simp only [D.orbIntegrand, rho]
-      rw [hΘeq F _ ⟨Formalism.FourierDecayAlt.P.B7.sgs_mem p.T.base hq hγ.1,
-        by rw [Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs p.T.base hq]; exact hG, by simp⟩]
+      rw [hΘeq F _ ⟨
+        Formalism.FourierDecayAlt.P.B7.sgs_mem p.T.base hq hγ.1,
+        by rw [Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs p.T.base hq]; exact hG,
+        by simp
+      ⟩]
     · rfl
     · rfl
 

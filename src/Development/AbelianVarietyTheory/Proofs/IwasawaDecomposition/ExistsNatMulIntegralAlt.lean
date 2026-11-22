@@ -8,9 +8,8 @@ namespace GlobalTheory.NatSmulMemIntegral
 
 open NumberField
 
-theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E) :
-    ∃ k : ℕ, k ≠ 0 ∧ ∃ b : RingOfIntegers E, (b : E) = (k : E) * a := by
-
+theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ k : ℕ, k ≠ 0 ∧ ∃ b : RingOfIntegers E, (b : E) = (k : E) * a := by
   obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ (L := E) {a}
   have hi : IsIntegral ℤ (y • a) := hy a (Finset.mem_singleton_self a)
   refine ⟨y.natAbs, Int.natAbs_ne_zero.2 hy0, ?_⟩
@@ -26,10 +25,11 @@ theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E) :
     congr 1
     rw [Nat.cast_natAbs, abs_of_nonpos (by omega), Int.cast_neg]
 
-theorem exists_nat_smul_mem {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (Λ : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
-    (h : Submodule.span E (↑Λ : Set (Fin n → E)) = ⊤) (y : Fin n → E) :
-    ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : E) • y ∈ Λ := by
+theorem exists_nat_smul_mem
+    {E : Type} [inst : Field E] [NumberField E]
+    {n : ℕ} (Λ : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
+    (h : Submodule.span E (↑Λ : Set (Fin n → E)) = ⊤) (y : Fin n → E)
+    : ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : E) • y ∈ Λ := by
   have hy : y ∈ Submodule.span E (↑Λ : Set (Fin n → E)) := by rw [h]; exact Submodule.mem_top
   simp only [Nat.cast_smul_eq_nsmul]
   induction hy using Submodule.span_induction with

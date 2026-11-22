@@ -9,34 +9,43 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.Differentia
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Complex Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  Complex Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped BigOperators Real
 
 namespace GlobalTheory.AbelianExp
 
-@[reducible] def pointTopology (X : Over (Sp ℂ)) : TopologicalSpace (𝟙_ (Over (Sp ℂ)) ⟶ X) :=
-  TopologicalSpace.generateFrom {S : Set (𝟙_ (Over (Sp ℂ)) ⟶ X) | ∃ (U : X.left.Opens)
-    (f : Γ(X.left, U)) (O : Set ℂ), IsOpen O ∧ S = {x | ⊤ ≤ (x).left ⁻¹ᵁ U ∧ valAt' x.left U f ∈ O}}
+@[reducible]
+def pointTopology (X : Over (Sp ℂ)) : TopologicalSpace (𝟙_ (Over (Sp ℂ)) ⟶ X) :=
+  TopologicalSpace.generateFrom
+    {S : Set (𝟙_ (Over (Sp ℂ)) ⟶ X) | ∃ (U : X.left.Opens)
+      (f : Γ(X.left, U)) (O : Set ℂ), IsOpen O ∧ S = {x | ⊤ ≤ (x).left ⁻¹ᵁ U ∧ valAt' x.left U f ∈ O}}
 
 attribute [local instance] pointTopology
 
-def HolOn {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (W : Set E) {X : Over (Sp ℂ)}
-    (a : E → (𝟙_ (Over (Sp ℂ)) ⟶ X)) : Prop :=
-  ∀ (U : X.left.Opens) (f : Γ(X.left, U)), IsOpen {w | w ∈ W ∧ ⊤ ≤ (a w).left ⁻¹ᵁ U} ∧
-    DifferentiableOn ℂ (fun w => valAt' (a w).left U f) {w | w ∈ W ∧ ⊤ ≤ (a w).left ⁻¹ᵁ U}
+def HolOn
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (W : Set E)
+    {X : Over (Sp ℂ)} (a : E → (𝟙_ (Over (Sp ℂ)) ⟶ X))
+    : Prop :=
+  ∀ (U : X.left.Opens) (f : Γ(X.left, U)),
+    IsOpen {w | w ∈ W ∧ ⊤ ≤ (a w).left ⁻¹ᵁ U}
+      ∧ DifferentiableOn ℂ (fun w => valAt' (a w).left U f) {w | w ∈ W ∧ ⊤ ≤ (a w).left ⁻¹ᵁ U}
 
 section Hol
 
-variable {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E']
-  [NormedSpace ℂ E'] {W : Set E} {X Y : Over (Sp ℂ)} {a : E → (𝟙_ (Over (Sp ℂ)) ⟶ X)}
+variable
+  {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
+  {W : Set E} {X Y : Over (Sp ℂ)} {a : E → (𝟙_ (Over (Sp ℂ)) ⟶ X)}
 
-theorem isOpen_value (U : X.left.Opens) (f : Γ(X.left, U)) {O : Set ℂ} (hO : IsOpen O) :
-    IsOpen {x : 𝟙_ (Over (Sp ℂ)) ⟶ X | ⊤ ≤ x.left ⁻¹ᵁ U ∧ valAt' x.left U f ∈ O} :=
+theorem isOpen_value (U : X.left.Opens) (f : Γ(X.left, U)) {O : Set ℂ} (hO : IsOpen O)
+    : IsOpen {x : 𝟙_ (Over (Sp ℂ)) ⟶ X | ⊤ ≤ x.left ⁻¹ᵁ U ∧ valAt' x.left U f ∈ O} :=
   TopologicalSpace.isOpen_generateFrom_of_mem ⟨U, f, O, hO, rfl⟩
 
-theorem continuousOn_value (U : X.left.Opens) (f : Γ(X.left, U)) :
-    ContinuousOn (fun x : 𝟙_ (Over (Sp ℂ)) ⟶ X => valAt' x.left U f) {x | ⊤ ≤ x.left ⁻¹ᵁ U} := by
+theorem continuousOn_value (U : X.left.Opens) (f : Γ(X.left, U))
+    : ContinuousOn (fun x : 𝟙_ (Over (Sp ℂ)) ⟶ X => valAt' x.left U f) {x | ⊤ ≤ x.left ⁻¹ᵁ U} := by
   rw [continuousOn_iff]
   intro x hx t ht hxt
   exact ⟨_, isOpen_value U f ht, ⟨hx, hxt⟩, fun y hy => hy.1.2⟩
@@ -49,11 +58,15 @@ theorem HolOn.const (hW : IsOpen W) (x : 𝟙_ (Over (Sp ℂ)) ⟶ X) : HolOn W 
   · simp only [h, and_false, Set.setOf_false]
     exact ⟨isOpen_empty, differentiableOn_empty⟩
 
-theorem HolOn.comp (h : HolOn W a) {W' : Set E'} (hW' : IsOpen W') {φ : E' → E}
-    (hφ : DifferentiableOn ℂ φ W') (hm : Set.MapsTo φ W' W) : HolOn W' fun w => a (φ w) := by
+theorem HolOn.comp
+    (h : HolOn W a)
+    {W' : Set E'} (hW' : IsOpen W')
+    {φ : E' → E} (hφ : DifferentiableOn ℂ φ W') (hm : Set.MapsTo φ W' W)
+    : HolOn W' fun w => a (φ w) := by
   intro U f
-  have hset : {w | w ∈ W' ∧ ⊤ ≤ (a (φ w)).left ⁻¹ᵁ U} =
-      W' ∩ φ ⁻¹' {w | w ∈ W ∧ ⊤ ≤ (a w).left ⁻¹ᵁ U} := by
+  have hset
+      : {w | w ∈ W' ∧ ⊤ ≤ (a (φ w)).left ⁻¹ᵁ U}
+        = W' ∩ φ ⁻¹' {w | w ∈ W ∧ ⊤ ≤ (a w).left ⁻¹ᵁ U} := by
     ext w
     constructor
     · rintro ⟨hw, hU⟩
@@ -61,19 +74,25 @@ theorem HolOn.comp (h : HolOn W a) {W' : Set E'} (hW' : IsOpen W') {φ : E' → 
     · rintro ⟨hw, -, hU⟩
       exact ⟨hw, hU⟩
   rw [hset]
-  exact ⟨hφ.continuousOn.isOpen_inter_preimage hW' (h U f).1,
-    (h U f).2.comp (hφ.mono Set.inter_subset_left) (fun w hw => hw.2)⟩
+  exact ⟨
+    hφ.continuousOn.isOpen_inter_preimage hW' (h U f).1,
+    (h U f).2.comp (hφ.mono Set.inter_subset_left) (fun w hw => hw.2)
+  ⟩
 
 theorem HolOn.post
-    (hval : ∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X) (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens)
-      (f : Γ(Y, U)), valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f)
-    (h : HolOn W a) (q : X ⟶ Y) : HolOn W fun w => a w ≫ q := by
+    (hval
+      : ∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X) (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)),
+        valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f)
+    (h : HolOn W a) (q : X ⟶ Y)
+    : HolOn W fun w => a w ≫ q := by
   intro U f
   have e1 : ∀ w, (a w ≫ q).left ⁻¹ᵁ U = (a w).left ⁻¹ᵁ (q.left ⁻¹ᵁ U) := fun w => by
     rw [Over.comp_left]
     simp
-  have e2 : ∀ w, valAt' (a w ≫ q).left U f =
-      valAt' (a w).left (q.left ⁻¹ᵁ U) ((q.left.app U).hom f) := fun w => by
+  have e2
+      : ∀ w,
+        valAt' (a w ≫ q).left U f
+          = valAt' (a w).left (q.left ⁻¹ᵁ U) ((q.left.app U).hom f) := fun w => by
     rw [Over.comp_left, hval]
   simp only [e1, e2]
   exact h (q.left ⁻¹ᵁ U) ((q.left.app U).hom f)
@@ -90,10 +109,14 @@ theorem HolOn.continuousAt (h : HolOn W a) {w : E} (hw : w ∈ W) : ContinuousAt
 
 theorem HolOn.of_local
     (h : ∀ z, ∃ (W : Set E) (b : E → (𝟙_ (Over (Sp ℂ)) ⟶ X)), z ∈ W ∧ HolOn W b ∧ a =ᶠ[𝓝 z] b)
-    (U : X.left.Opens) (f : Γ(X.left, U)) : IsOpen {z | ⊤ ≤ (a z).left ⁻¹ᵁ U} ∧
-      DifferentiableOn ℂ (fun z => valAt' (a z).left U f) {z | ⊤ ≤ (a z).left ⁻¹ᵁ U} := by
-  have key : ∀ z, ⊤ ≤ (a z).left ⁻¹ᵁ U → {z | ⊤ ≤ (a z).left ⁻¹ᵁ U} ∈ 𝓝 z ∧
-      DifferentiableAt ℂ (fun z => valAt' (a z).left U f) z := by
+    (U : X.left.Opens) (f : Γ(X.left, U))
+    : IsOpen {z | ⊤ ≤ (a z).left ⁻¹ᵁ U}
+      ∧ DifferentiableOn ℂ (fun z => valAt' (a z).left U f) {z | ⊤ ≤ (a z).left ⁻¹ᵁ U} := by
+  have key
+      : ∀ z,
+        ⊤ ≤ (a z).left ⁻¹ᵁ U
+          → {z | ⊤ ≤ (a z).left ⁻¹ᵁ U} ∈ 𝓝 z
+            ∧ DifferentiableAt ℂ (fun z => valAt' (a z).left U f) z := by
     intro z hzU
     obtain ⟨W', b, hzW, hb, hab⟩ := h z
     have hbz : b z = a z := hab.self_of_nhds.symm
@@ -107,20 +130,28 @@ theorem HolOn.of_local
     · refine ((hb U f).2.differentiableAt hN).congr_of_eventuallyEq ?_
       filter_upwards [hab] with y hy
       rw [hy]
-  exact ⟨isOpen_iff_mem_nhds.2 fun z hz => (key z hz).1,
-    fun z hz => (key z hz).2.differentiableWithinAt⟩
+  exact ⟨
+    isOpen_iff_mem_nhds.2 fun z hz => (key z hz).1,
+    fun z hz => (key z hz).2.differentiableWithinAt
+  ⟩
 
-theorem HolOn.analyticAt [FiniteDimensional ℂ E] (h : HolOn W a) {g : ℕ} {U : X.left.Opens}
-    (t : Fin g → Γ(X.left, U)) {w : E} (hw : w ∈ W) (hU : ⊤ ≤ (a w).left ⁻¹ᵁ U) :
-    AnalyticAt ℂ (fun w i => valAt' (a w).left U (t i)) w := by
+theorem HolOn.analyticAt
+    [FiniteDimensional ℂ E]
+    (h : HolOn W a)
+    {g : ℕ} {U : X.left.Opens} (t : Fin g → Γ(X.left, U))
+    {w : E} (hw : w ∈ W) (hU : ⊤ ≤ (a w).left ⁻¹ᵁ U)
+    : AnalyticAt ℂ (fun w i => valAt' (a w).left U (t i)) w := by
   rw [analyticAt_pi_iff]
   intro i
-  exact GlobalTheory.SCV.analyticAt_of_differentiableOn (h U (t i)).2 ((h U (t i)).1.mem_nhds ⟨hw, hU⟩)
+  exact GlobalTheory.SCV.analyticAt_of_differentiableOn (h U (t i)).2
+    ((h U (t i)).1.mem_nhds ⟨hw, hU⟩)
 
-noncomputable def chart {g : ℕ} {W : Set (Fin g → ℂ)} {σ : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X)}
-    {U : X.left.Opens} (t : Fin g → Γ(X.left, U)) (hW : IsOpen W) (hσ : HolOn W σ)
+noncomputable def chart
+    {g : ℕ} {W : Set (Fin g → ℂ)} {σ : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X)} {U : X.left.Opens}
+    (t : Fin g → Γ(X.left, U)) (hW : IsOpen W) (hσ : HolOn W σ)
     (ht : ∀ w ∈ W, ⊤ ≤ (σ w).left ⁻¹ᵁ U ∧ ∀ i, valAt' (σ w).left U (t i) = w i)
-    (ho : IsOpen (σ '' W)) : OpenPartialHomeomorph (𝟙_ (Over (Sp ℂ)) ⟶ X) (Fin g → ℂ) where
+    (ho : IsOpen (σ '' W))
+    : OpenPartialHomeomorph (𝟙_ (Over (Sp ℂ)) ⟶ X) (Fin g → ℂ) where
   toFun x i := valAt' x.left U (t i)
   invFun := σ
   source := σ '' W
@@ -135,9 +166,11 @@ noncomputable def chart {g : ℕ} {W : Set (Fin g → ℂ)} {σ : (Fin g → ℂ
   right_inv' w hw := funext (ht w hw).2
   open_source := ho
   open_target := hW
-  continuousOn_toFun := continuousOn_pi.mpr fun i => (continuousOn_value U (t i)).mono (by
-    rintro _ ⟨w, hw, rfl⟩
-    exact (ht w hw).1)
+  continuousOn_toFun :=
+    continuousOn_pi.mpr fun i =>
+      (continuousOn_value U (t i)).mono (by
+        rintro _ ⟨w, hw, rfl⟩
+        exact (ht w hw).1)
   continuousOn_invFun w hw := (hσ.continuousAt hw).continuousWithinAt
 
 end Hol

@@ -10,11 +10,26 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TensorStdRelA
 
 @[expose] public section
 
-open Formalism.REAL Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr
+  Formalism.FourierDecayAlt.P
 
 namespace GlobalTheory
 
-theorem splitCasimir_eigenspace_irreducible_standard : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ) (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V) (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (β : ℂ) (L : Fin (n + 1) → ℤ) (l : Fin (n + 1)), Hyp E β L → (∀ a b x y, inner ℂ (E a b x) y = inner ℂ x (E b a y)) → (∀ a b y c, Et a b y c = E a b (y c) + if c = a then y b else 0) → (∀ y b, Om y b = ∑ c, E c b (y c)) → Stab Et (Module.End.eigenspace Om (β + L l + 0)) ∧ (∀ S' : Submodule ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)), S' ≤ Module.End.eigenspace Om (β + L l + 0) → Stab Et S' → S' = ⊥ ∨ S' = Module.End.eigenspace Om (β + L l + 0)) ∧ Module.End.eigenspace Om (β + L l + 0) ≤ CapSp Et (shf β (Function.update L l (L l + 1))) := by
+theorem splitCasimir_eigenspace_irreducible_standard
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ)
+        (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V)
+        (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)))
+        (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (β : ℂ) (L : Fin (n + 1) → ℤ)
+        (l : Fin (n + 1)),
+      Hyp E β L → (∀ a b x y, inner ℂ (E a b x) y = inner ℂ x (E b a y))
+        → (∀ a b y c, Et a b y c = E a b (y c) + if c = a then y b else 0)
+        → (∀ y b, Om y b = ∑ c, E c b (y c))
+        → Stab Et (Module.End.eigenspace Om (β + L l + 0))
+          ∧ (∀ S' : Submodule ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)),
+            S' ≤ Module.End.eigenspace Om (β + L l + 0) → Stab Et S'
+              → S' = ⊥ ∨ S' = Module.End.eigenspace Om (β + L l + 0))
+          ∧ Module.End.eigenspace Om (β + L l + 0)
+            ≤ CapSp Et (shf β (Function.update L l (L l + 1))) := by
   classical
   intro V _ _ _ n E Et Om β L l hyp hadj hEt hOm
   obtain ⟨hgl, hadjt, -, hcomm⟩ :=
@@ -40,15 +55,16 @@ theorem splitCasimir_eigenspace_irreducible_standard : ∀ (V : Type) [NormedAdd
     ring
   have hwtV : ∀ ν v, v ≠ 0 → IsHW E ν v → ∀ j, ν j = β + L j + ((j : ℕ) : ℂ) := by
     intro ν v hv hw j
-    have hne : CapSp E (shf β L) ≠ ⊥ := fun h =>
-      hv ((Submodule.mem_bot ℂ).1 (h ▸ hcapV v))
+    have hne : CapSp E (shf β L) ≠ ⊥ := fun h => hv ((Submodule.mem_bot ℂ).1 (h ▸ hcapV v))
     exact (capelli_singular V (n + 1) E _ hyp.gl hne).2 hsdec ν v (hcapV v) hv hw j
-  have hkey : ∀ θ y, y ∈ S → y ≠ 0 → IsHW Et θ y →
-      y l ≠ 0 ∧ IsHW E (fun j => β + L j + ((j : ℕ) : ℂ)) (y l) ∧
-        θ = fun j => β + L j + ((j : ℕ) : ℂ) + if j = l then 1 else 0 := by
+  have hkey
+      : ∀ θ y,
+        y ∈ S → y ≠ 0 → IsHW Et θ y
+          → y l ≠ 0 ∧ IsHW E (fun j => β + L j + ((j : ℕ) : ℂ)) (y l)
+            ∧ θ = fun j => β + L j + ((j : ℕ) : ℂ) + if j = l then 1 else 0 := by
     intro θ y hy hy0 hw
-    obtain ⟨c, hc0, hcw, hlam⟩ := highestWeight_tensor_standard V n E Et Om θ _ y hEt hOm hy0 hw
-      ((hmemS y).1 hy)
+    obtain ⟨c, hc0, hcw, hlam⟩ :=
+      highestWeight_tensor_standard V n E Et Om θ _ y hEt hOm hy0 hw ((hmemS y).1 hy)
     have hν := hwtV _ _ hc0 hcw
     have hcl : c = l := by
       have h1 := hν c
@@ -59,19 +75,21 @@ theorem splitCasimir_eigenspace_irreducible_standard : ∀ (V : Type) [NormedAdd
     refine ⟨hc0, ?_, ?_⟩
     · rw [← funext hν]; exact hcw
     · funext j
-      rw [← hν j]; ring
+      rw [← hν j]
+      ring
   have hsub : ∀ ν v, IsHW E ν v → IsHW (subA E) (fun j => ν j.castSucc) v := by
     intro ν v hw
     exact ⟨fun a => hw.1 _, fun a b hab => hw.2 _ _ (by simpa using hab)⟩
-  have hprop : ∀ θ y θ' y', y ∈ S → y ≠ 0 → IsHW Et θ y → y' ∈ S → y' ≠ 0 → IsHW Et θ' y' →
-      ∃ t : ℂ, y' = t • y := by
+  have hprop
+      : ∀ θ y θ' y',
+        y ∈ S → y ≠ 0 → IsHW Et θ y → y' ∈ S → y' ≠ 0 → IsHW Et θ' y' → ∃ t : ℂ, y' = t • y := by
     intro θ y θ' y' hy hy0 hw hy' hy0' hw'
     obtain ⟨h1, h2, h3⟩ := hkey θ y hy hy0 hw
     obtain ⟨-, h2', h3'⟩ := hkey θ' y' hy' hy0' hw'
     have hθ : θ' = θ := h3'.trans h3.symm
     rw [hθ] at hw'
-    obtain ⟨t, ht⟩ := multiplicity_one V n E _ (y l) (y' l) hyp.gl hyp.irr (hsub _ _ h2)
-      (hsub _ _ h2') h1
+    obtain ⟨t, ht⟩ :=
+      multiplicity_one V n E _ (y l) (y' l) hyp.gl hyp.irr (hsub _ _ h2) (hsub _ _ h2') h1
     refine ⟨t, ?_⟩
     by_contra hne
     have hz0 : y' - t • y ≠ 0 := sub_ne_zero.2 hne
@@ -81,8 +99,9 @@ theorem splitCasimir_eigenspace_irreducible_standard : ∀ (V : Type) [NormedAdd
       · rw [map_sub, map_smul, hw.2 a b hab, hw'.2 a b hab]; simp
     apply (hkey θ _ (S.sub_mem hy' (S.smul_mem t hy)) hz0 hzw).1
     simp [ht]
-  have hirr : ∀ S' : Submodule ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)), S' ≤ S → Stab Et S' →
-      S' = ⊥ ∨ S' = S := by
+  have hirr
+      : ∀ S' : Submodule ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)),
+        S' ≤ S → Stab Et S' → S' = ⊥ ∨ S' = S := by
     intro S' hle hst
     by_contra hcon
     push_neg at hcon

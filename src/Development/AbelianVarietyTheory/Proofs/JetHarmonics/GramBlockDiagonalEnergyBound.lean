@@ -9,8 +9,9 @@ open Formalism.REAL Finset
 
 namespace GlobalTheory
 
-theorem abs_list_prod_map_le_of_abs_le {α : Type} (L : List α) (f n : α → ℝ)
-    (h : ∀ a ∈ L, |f a| ≤ n a) : |(L.map f).prod| ≤ (L.map n).prod := by
+theorem abs_list_prod_map_le_of_abs_le
+    {α : Type} (L : List α) (f n : α → ℝ) (h : ∀ a ∈ L, |f a| ≤ n a)
+    : |(L.map f).prod| ≤ (L.map n).prod := by
   induction L with
   | nil => simp
   | cons a L ih =>
@@ -19,14 +20,17 @@ theorem abs_list_prod_map_le_of_abs_le {α : Type} (L : List α) (f n : α → �
     have h2 := ih (fun b hb => h b (by simp [hb]))
     exact mul_le_mul h1 h2 (abs_nonneg _) ((abs_nonneg _).trans h1)
 
-theorem sum_weight_blockDiagonal_eq {ι κ : Type} [Fintype ι] [DecidableEq κ] (B : ι → ι → ℂ)
-    (k : ι → κ) (hB : ∀ i j, k i ≠ k j → B i j = 0) (f : κ → ℝ) :
-    (∑ i, ∑ j, ((f (k i) : ℝ) : ℂ) * B i j).re =
-      ∑ t ∈ Finset.univ.image k, f t *
-        (∑ i ∈ Finset.univ.filter (fun i => k i = t),
-          ∑ j ∈ Finset.univ.filter (fun j => k j = t), B i j).re := by
+theorem sum_weight_blockDiagonal_eq
+    {ι κ : Type} [Fintype ι] [DecidableEq κ]
+    (B : ι → ι → ℂ) (k : ι → κ) (hB : ∀ i j, k i ≠ k j → B i j = 0)
+    (f : κ → ℝ)
+    : (∑ i, ∑ j, ((f (k i) : ℝ) : ℂ) * B i j).re
+      = ∑ t ∈ Finset.univ.image k, f t *
+          (∑ i ∈ Finset.univ.filter (fun i => k i = t),
+            ∑ j ∈ Finset.univ.filter (fun j => k j = t), B i j).re := by
   rw [← Finset.sum_fiberwise_of_maps_to (s := Finset.univ) (t := Finset.univ.image k) (g := k)
-    (fun i _ => Finset.mem_image_of_mem k (Finset.mem_univ i)), Complex.re_sum]
+      (fun i _ => Finset.mem_image_of_mem k (Finset.mem_univ i)),
+    Complex.re_sum]
   refine Finset.sum_congr rfl (fun t _ => ?_)
   rw [← Complex.re_ofReal_mul, Finset.mul_sum]
   congr 1
@@ -39,8 +43,12 @@ theorem sum_weight_blockDiagonal_eq {ι κ : Type} [Fintype ι] [DecidableEq κ]
   · rfl
   · exact hB i j (fun e => h (e ▸ hi'))
 
-theorem gram_blockDiagonal_energy_bound :
-    ∀ (ι α : Type) [Fintype ι] (B : ι → ι → ℂ) (c : ι → α → ℝ) (L : List α) (n : α → ℝ), (∀ S : Finset ι, 0 ≤ (∑ i ∈ S, ∑ j ∈ S, B i j).re) → (∀ i j, ∀ a ∈ L, c i a ≠ c j a → B i j = 0) → (∀ i, ∀ a ∈ L, |c i a| ≤ n a) → (∑ i, ∑ j, (((L.map (c i)).prod : ℝ) : ℂ) * B i j).re ≤ (L.map n).prod * (∑ i, ∑ j, B i j).re := by
+theorem gram_blockDiagonal_energy_bound
+    : ∀ (ι α : Type) [Fintype ι] (B : ι → ι → ℂ) (c : ι → α → ℝ) (L : List α) (n : α → ℝ),
+      (∀ S : Finset ι, 0 ≤ (∑ i ∈ S, ∑ j ∈ S, B i j).re)
+        → (∀ i j, ∀ a ∈ L, c i a ≠ c j a → B i j = 0) → (∀ i, ∀ a ∈ L, |c i a| ≤ n a)
+        → (∑ i, ∑ j, (((L.map (c i)).prod : ℝ) : ℂ) * B i j).re
+          ≤ (L.map n).prod * (∑ i, ∑ j, B i j).re := by
   intro ι α _ B c L n hpos hzero hbd
   classical
   have hB : ∀ i j, L.map (c i) ≠ L.map (c j) → B i j = 0 := by

@@ -13,12 +13,14 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
 
 noncomputable section
 
-theorem GeneratedNefGeneric.eq_natCast_of_add_one_eq (d : ℕ) (x : WithBot ℕ∞)
-    (hform : x + 1 = ((d : ℕ) : WithBot ℕ∞) + 1) : x = d := by
+theorem GeneratedNefGeneric.eq_natCast_of_add_one_eq
+    (d : ℕ) (x : WithBot ℕ∞) (hform : x + 1 = ((d : ℕ) : WithBot ℕ∞) + 1)
+    : x = d := by
   induction x using WithBot.recBotCoe with
   | bot => exact absurd hform (by simp; rw [← Nat.cast_succ]; exact (WithBot.natCast_ne_bot _).symm)
   | coe y =>
@@ -33,11 +35,14 @@ theorem GeneratedNefGeneric.eq_natCast_of_add_one_eq (d : ℕ) (x : WithBot ℕ�
     | coe y =>
       have h1 : ((y + 1 : ℕ) : WithBot ℕ∞) = ((d + 1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast hform
       have : y = d := by exact_mod_cast (by exact_mod_cast h1 : y + 1 = d + 1) |> Nat.succ_injective
-      subst this; rfl
+      subst this
+      rfl
 
-theorem GeneratedNefGeneric.isProjVarF_map {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {W : Ideal (MRing ι)} {d : ℕ} (hW : IsArithVar W (d + 1)) :
-    IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom ℚ))) d := by
+theorem GeneratedNefGeneric.isProjVarF_map
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {W : Ideal (MRing ι)} {d : ℕ} (hW : IsArithVar W (d + 1))
+    : IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom ℚ))) d := by
   obtain ⟨-, ⟨hWp, ⟨S, hS, hWS⟩, hrel⟩, hhor, hdim⟩ := hW
   have : W.IsPrime := hWp
   have hchar : ∀ m : ℤ, (C m : MvPolynomial (Σ k, ι k) ℤ) ∈ W → m = 0 := by
@@ -65,8 +70,10 @@ theorem GeneratedNefGeneric.isProjVarF_map {K : Type} [Fintype K] {ι : K → Ty
     push_cast
     rfl
 
-theorem GeneratedNefGeneric.proof (hG : GenOnFibres.Statement) (hR : GeneratedRestrict.Statement)
-    (hN : GeneratedProductNonneg.Statement) : GeneratedNefGeneric.Statement := by
+theorem GeneratedNefGeneric.proof
+    (hG : GenOnFibres.Statement) (hR : GeneratedRestrict.Statement)
+    (hN : GeneratedProductNonneg.Statement)
+    : GeneratedNefGeneric.Statement := by
   intro K _ ι _ Ω _ _ y D a q w _ hw hgen W hW hPW
   classical
   let _ : LinearOrder K := LinearOrder.lift' (Fintype.equivFin K) (Fintype.equivFin K).injective
@@ -77,8 +84,13 @@ theorem GeneratedNefGeneric.proof (hG : GenOnFibres.Statement) (hR : GeneratedRe
     hR ℚ K ι _ _ a (Ideal.map_mono hPW) hQ
   have hV : IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom ℚ))) 1 :=
     GeneratedNefGeneric.isProjVarF_map (d := 1) hW
-  have h := hN ℚ K ι (fun V _ L => NumbersDVR.intNum ℚ V L) _ 1 (fun _ => a)
-    (NumbersDVR.IntNumIsFieldIntersection.full ℚ K ι) hV (fun _ => hWQ)
+  have h :=
+    hN ℚ K ι
+      (fun V _ L => NumbersDVR.intNum ℚ V L)
+      _ 1
+      (fun _ => a)
+      (NumbersDVR.IntNumIsFieldIntersection.full ℚ K ι) hV
+      (fun _ => hWQ)
   unfold genDeg
   convert h
 

@@ -12,8 +12,8 @@ open PI PI.UpqRep Matrix
 
 variable {N : ℕ}
 
-abbrev blR (ε : Fin N → Bool) :
-    Matrix (Fin (nPl ε) ⊕ Fin (nMi ε)) (Fin (nPl ε) ⊕ Fin (nMi ε)) ℂ ≃ₐ[ℂ] Matrix (Fin N) (Fin N) ℂ :=
+abbrev blR (ε : Fin N → Bool)
+    : Matrix (Fin (nPl ε) ⊕ Fin (nMi ε)) (Fin (nPl ε) ⊕ Fin (nMi ε)) ℂ ≃ₐ[ℂ] Matrix (Fin N) (Fin N) ℂ :=
   Matrix.reindexAlgEquiv ℂ ℂ (blk ε)
 
 lemma blR_apply (ε : Fin N → Bool) (M : Matrix (Fin (nPl ε) ⊕ Fin (nMi ε)) (Fin (nPl ε) ⊕ Fin (nMi ε)) ℂ) :
@@ -136,9 +136,15 @@ lemma isUnitaryRepOn_comp {n : ℕ} (ε : Fin N → Bool) {H : Type} [NormedAddC
 
 theorem block_reindex_holds : Blocks := by
   intro N ε
-  refine ⟨fun h hh => plusBlock_mem_unitaryCentralizer ε h hh, fun h hh => minusBlock_mem_unitaryCentralizer ε h hh, fun h h' => ?_,
-    fun g hg => ?_, fun H _ _ σ hσ => ?_⟩
-  · rw [plusBlock_eq_blockReindex, minusBlock_eq_blockReindex, ← map_mul, ← map_mul, Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
+  refine ⟨
+    fun h hh => plusBlock_mem_unitaryCentralizer ε h hh,
+    fun h hh => minusBlock_mem_unitaryCentralizer ε h hh,
+    fun h h' => ?_,
+    fun g hg => ?_,
+    fun H _ _ σ hσ => ?_
+  ⟩
+  · rw [plusBlock_eq_blockReindex, minusBlock_eq_blockReindex, ← map_mul, ← map_mul,
+      Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
     simp
   · obtain ⟨M, rfl⟩ := (blR ε).surjective g
     rw [blockReindex_mem_unitaryCentralizer_iff] at hg
@@ -150,7 +156,8 @@ theorem block_reindex_holds : Blocks := by
     set D := M.toBlocks₂₂
     rw [← hM, Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply, Matrix.fromBlocks_inj] at hC
     simp only [Matrix.mul_one, Matrix.one_mul, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
-      Matrix.mul_neg, Matrix.neg_mul] at hC
+        Matrix.mul_neg, Matrix.neg_mul]
+      at hC
     have hB : B = 0 := by
       ext i j
       have h := congr_fun (congr_fun hC.2.1 i) j
@@ -164,25 +171,38 @@ theorem block_reindex_holds : Blocks := by
       simp only [Matrix.zero_apply]
       linear_combination (1 / 2 : ℂ) * h
     rw [← hM, hB, hC0, fromBlocks_diagonal_mem_unitaryGroup_iff] at hU
-    refine ⟨A, (mem_unitaryCentralizer_allPos_iff _ A).2 hU.1, D, (mem_unitaryCentralizer_allPos_iff _ D).2 hU.2, ?_⟩
-    rw [plusBlock_eq_blockReindex, minusBlock_eq_blockReindex, ← map_mul, Matrix.fromBlocks_multiply, ← hM, hB, hC0]
+    refine ⟨
+      A,
+      (mem_unitaryCentralizer_allPos_iff _ A).2 hU.1,
+      D,
+      (mem_unitaryCentralizer_allPos_iff _ D).2 hU.2,
+      ?_
+    ⟩
+    rw [plusBlock_eq_blockReindex, minusBlock_eq_blockReindex, ← map_mul,
+      Matrix.fromBlocks_multiply, ← hM, hB, hC0]
     congr 1
     simp
-  · exact ⟨isUnitaryRepOn_comp ε σ (iPl ε) (plusBlock_one ε) (plusBlock_mul ε) (plusBlock_mem_unitaryCentralizer ε) (continuous_plusBlock ε) hσ,
-      isUnitaryRepOn_comp ε σ (iMi ε) (minusBlock_one ε) (minusBlock_mul ε) (minusBlock_mem_unitaryCentralizer ε) (continuous_minusBlock ε) hσ⟩
+  · exact ⟨
+      isUnitaryRepOn_comp ε σ (iPl ε) (plusBlock_one ε) (plusBlock_mul ε)
+        (plusBlock_mem_unitaryCentralizer ε) (continuous_plusBlock ε) hσ,
+      isUnitaryRepOn_comp ε σ (iMi ε) (minusBlock_one ε) (minusBlock_mul ε)
+        (minusBlock_mem_unitaryCentralizer ε) (continuous_minusBlock ε) hσ
+    ⟩
 
 theorem block_diagonal_torus_holds : BlockDiag := by
   intro N ε
   refine ⟨fun f => ?_, fun θ => ?_, fun θ => ?_⟩
   · rw [← Equiv.sum_comp (blk ε), Fintype.sum_sum_type]
     rfl
-  · refine ⟨fun a => Sum.elim θ 0 ((blk ε).symm a), fun i => by simp [ePl], fun j => by simp [eMi], ?_⟩
+  · refine
+      ⟨fun a => Sum.elim θ 0 ((blk ε).symm a), fun i => by simp [ePl], fun j => by simp [eMi], ?_⟩
     unfold iPl
     rw [← Matrix.diagonal_one, Matrix.fromBlocks_diagonal, Matrix.submatrix_diagonal_equiv]
     congr 1
     funext a
     rcases h : (blk ε).symm a with i | j <;> simp [h]
-  · refine ⟨fun a => Sum.elim 0 θ ((blk ε).symm a), fun i => by simp [ePl], fun j => by simp [eMi], ?_⟩
+  · refine
+      ⟨fun a => Sum.elim 0 θ ((blk ε).symm a), fun i => by simp [ePl], fun j => by simp [eMi], ?_⟩
     unfold iMi
     rw [← Matrix.diagonal_one, Matrix.fromBlocks_diagonal, Matrix.submatrix_diagonal_equiv]
     congr 1

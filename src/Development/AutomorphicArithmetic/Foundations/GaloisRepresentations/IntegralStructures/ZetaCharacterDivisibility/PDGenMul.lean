@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -18,8 +21,7 @@ open GlobalTheory.BlockSum (blockRep)
 open PositivityTheory.AutomorphicGaloisHodgeTate.Div (DivWCoreLac SenWLac HTLac IsSSMat)
 open UpperTheory.Gal.Int.Div
 
-theorem UpperTheory.Gal.Int.Div.dGenMul_of :
-    DGenMul := by
+theorem UpperTheory.Gal.Int.Div.dGenMul_of : DGenMul := by
   classical
   intro a q B ha hc hG
   obtain ⟨α, rfl⟩ : ∃ α : Fin a → ℂˣ, Finset.univ.val.map α = B := by
@@ -35,19 +37,20 @@ theorem UpperTheory.Gal.Int.Div.dGenMul_of :
   rw [map_mul] at hne
   have h3 := right_ne_zero_of_mul hne
   rw [map_prod] at h3
-  have hle : ∀ i, m i < a + 1 := fun i => Nat.lt_succ_of_le
-    (hs ▸ Finset.single_le_sum (f := m) (fun _ _ => Nat.zero_le _) (Finset.mem_univ i))
-  have hone : ((1 : Fin (a + 1)) : ℕ) = 1 := by
-    rw [Fin.val_one', Nat.mod_eq_of_lt (by omega)]
+  have hle : ∀ i, m i < a + 1 := fun i =>
+    Nat.lt_succ_of_le
+      (hs ▸ Finset.single_le_sum (f := m) (fun _ _ => Nat.zero_le _) (Finset.mem_univ i))
+  have hone : ((1 : Fin (a + 1)) : ℕ) = 1 := by rw [Fin.val_one', Nat.mod_eq_of_lt (by omega)]
   by_cases hm : (fun i => (⟨m i, hle i⟩ : Fin (a + 1))) = fun _ => 1
   · intro i
     have h := congrArg Fin.val (congrFun hm i)
     rw [hone] at h
     exact h
   · exfalso
-    have hmem : (fun i => (⟨m i, hle i⟩ : Fin (a + 1))) ∈
-        (Finset.univ : Finset (Fin a → Fin (a + 1))).filter
-          (fun m => (∑ i, (m i : ℕ)) = a ∧ m ≠ fun _ => 1) :=
+    have hmem
+        : (fun i => (⟨m i, hle i⟩ : Fin (a + 1)))
+          ∈ (Finset.univ : Finset (Fin a → Fin (a + 1))).filter
+            (fun m => (∑ i, (m i : ℕ)) = a ∧ m ≠ fun _ => 1) :=
       Finset.mem_filter.mpr ⟨Finset.mem_univ _, hs, hm⟩
     refine Finset.prod_ne_zero_iff.mp h3 _ hmem ?_
     have hp' : ∏ i, (α i : ℂ) ^ m i = ∏ i, (α i : ℂ) := by

@@ -5,12 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sig
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl IsDedekindDomain NumberField GlobalTheory.FixedUnitNorm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl IsDedekindDomain
+  NumberField GlobalTheory.FixedUnitNorm
 open scoped TensorProduct
 
 namespace GlobalTheory.FixedUnitNorm
 
-theorem compAt_mem_intV_of_intAt : ∀ (D : D7) (v : Pl D) (a : AE D), a ∈ intAt D (· = v) → compAt D v a ∈ intV D v := by
+theorem compAt_mem_intV_of_intAt
+    : ∀ (D : D7) (v : Pl D) (a : AE D), a ∈ intAt D (· = v) → compAt D v a ∈ intV D v := by
   intro D v a ha
   have h : finPart D a ∈ intAE D := ha.2
   show GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D v (finPart D a) ∈ intV D v

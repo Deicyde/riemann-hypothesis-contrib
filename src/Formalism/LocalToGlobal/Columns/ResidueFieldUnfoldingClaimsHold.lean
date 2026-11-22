@@ -7,7 +7,8 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.OneCosetSharp
 
 namespace Formalism.L2.Col
 
-theorem residueFieldUnfolding_claims_hold : ResidueFieldUnfoldingSupport ∧ ResidueFieldUnfoldingNonzero := by
+theorem residueFieldUnfolding_claims_hold
+    : ResidueFieldUnfoldingSupport ∧ ResidueFieldUnfoldingNonzero := by
   refine ⟨?_, ?_⟩
   · intro k _ _ ψ₀ χ k₀ m t j n' c n _ hr h hne
     obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ := hr

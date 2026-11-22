@@ -8,8 +8,11 @@ open Module Filter Topology
 
 namespace GlobalTheory
 
-theorem eq_zero_of_forall_pow_nsmul {X : Type} [AddCommGroup X] [Module.Free ℤ X] {n : ℕ}
-    (hn : 2 ≤ n) {x : X} (hx : ∀ j : ℕ, ∃ μ : X, x = n ^ j • μ) : x = 0 := by
+theorem eq_zero_of_forall_pow_nsmul
+    {X : Type} [AddCommGroup X] [Module.Free ℤ X]
+    {n : ℕ} (hn : 2 ≤ n)
+    {x : X} (hx : ∀ j : ℕ, ∃ μ : X, x = n ^ j • μ)
+    : x = 0 := by
   let b := Module.Free.chooseBasis ℤ X
   apply b.repr.injective
   ext i
@@ -23,10 +26,11 @@ theorem eq_zero_of_forall_pow_nsmul {X : Type} [AddCommGroup X] [Module.Free ℤ
   rw [Int.natAbs_pow, Int.natAbs_natCast]
   exact Nat.lt_pow_self (by omega)
 
-theorem tendsto_tsum_zero_of_eventually_notMem_range {K X Y : Type} [NontriviallyNormedField K]
-    [IsUltrametricDist K] (τ : X → K) (hτ : Tendsto τ cofinite (𝓝 0)) (f : ℕ → Y → X)
-    (hf : ∀ z, τ z ≠ 0 → ∀ᶠ j in atTop, ∀ μ, f j μ ≠ z) :
-    Tendsto (fun j => ∑' μ, τ (f j μ)) atTop (𝓝 0) := by
+theorem tendsto_tsum_zero_of_eventually_notMem_range
+    {K X Y : Type} [NontriviallyNormedField K] [IsUltrametricDist K]
+    (τ : X → K) (hτ : Tendsto τ cofinite (𝓝 0))
+    (f : ℕ → Y → X) (hf : ∀ z, τ z ≠ 0 → ∀ᶠ j in atTop, ∀ μ, f j μ ≠ z)
+    : Tendsto (fun j => ∑' μ, τ (f j μ)) atTop (𝓝 0) := by
   rw [Metric.tendsto_nhds]
   intro ε hε
   have hS : {z | ¬ ‖τ z‖ < ε / 2}.Finite := by
@@ -40,13 +44,16 @@ theorem tendsto_tsum_zero_of_eventually_notMem_range {K X Y : Type} [Nontriviall
   filter_upwards [hev] with j hj
   rw [dist_zero_right]
   refine lt_of_le_of_lt
-    (IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg (half_pos hε).le fun μ => ?_) (half_lt_self hε)
+    (IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg (half_pos hε).le fun μ => ?_)
+    (half_lt_self hε)
   by_contra h
   exact hj (f j μ) (show ¬ ‖τ (f j μ)‖ < ε / 2 from fun h' => h h'.le) μ rfl
 
-theorem mem_class_of_le {X : Type} [AddCommGroup X] {n : ℕ} {α : ℕ → X}
-    (hα : ∀ j, ∃ μ, α (j + 1) = α j + n ^ j • μ) {z : X} {j k : ℕ} (hjk : j ≤ k)
-    (hz : ∃ μ, z = α k + n ^ k • μ) : ∃ μ, z = α j + n ^ j • μ := by
+theorem mem_class_of_le
+    {X : Type} [AddCommGroup X]
+    {n : ℕ} {α : ℕ → X} (hα : ∀ j, ∃ μ, α (j + 1) = α j + n ^ j • μ)
+    {z : X} {j k : ℕ} (hjk : j ≤ k) (hz : ∃ μ, z = α k + n ^ k • μ)
+    : ∃ μ, z = α j + n ^ j • μ := by
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hjk
   clear hjk
   induction d generalizing z with
@@ -59,15 +66,23 @@ theorem mem_class_of_le {X : Type} [AddCommGroup X] {n : ℕ} {α : ℕ → X}
     rw [← add_assoc, hν, pow_succ, mul_smul, smul_add]
     abel
 
-theorem tendsto_tsum_pow_classes :
-    ∀ (K X : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-      [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (n : ℕ), 2 ≤ n →
-      ∀ (σ : X → K), Filter.Tendsto σ Filter.cofinite (nhds 0) → ∀ α : ℕ → X,
-      (∀ j, ∃ μ, α (j + 1) = α j + n ^ j • μ) →
-      (∀ χ : X, (∀ j, ∃ μ, χ = α j + n ^ j • μ) →
-        Filter.Tendsto (fun j => ∑' μ, σ (α j + n ^ j • μ)) Filter.atTop (nhds (σ χ))) ∧
-      ((¬ ∃ χ : X, ∀ j, ∃ μ, χ = α j + n ^ j • μ) →
-        Filter.Tendsto (fun j => ∑' μ, σ (α j + n ^ j • μ)) Filter.atTop (nhds 0)) := by
+theorem tendsto_tsum_pow_classes
+    : ∀ (K X : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (n : ℕ),
+      2 ≤ n
+        → ∀ (σ : X → K),
+          Filter.Tendsto σ Filter.cofinite (nhds 0)
+            → ∀ α : ℕ → X,
+              (∀ j, ∃ μ, α (j + 1) = α j + n ^ j • μ)
+                → (∀ χ : X,
+                    (∀ j, ∃ μ, χ = α j + n ^ j • μ)
+                      → Filter.Tendsto
+                        (fun j => ∑' μ, σ (α j + n ^ j • μ))
+                        Filter.atTop (nhds (σ χ)))
+                  ∧ ((¬ ∃ χ : X, ∀ j, ∃ μ, χ = α j + n ^ j • μ)
+                    → Filter.Tendsto
+                      (fun j => ∑' μ, σ (α j + n ^ j • μ))
+                      Filter.atTop (nhds 0)) := by
   classical
   intro K X _ _ _ _ _ _ n hn σ hσ α hα
   have hinj : ∀ j, Function.Injective (fun μ : X => α j + n ^ j • μ) := by
@@ -78,8 +93,10 @@ theorem tendsto_tsum_pow_classes :
       rw [natCast_zsmul, natCast_zsmul]
       exact h
     exact smul_right_injective X hne h'
-  have hsum : ∀ τ : X → K, Tendsto τ cofinite (𝓝 0) → ∀ j, Summable (fun μ => τ (α j + n ^ j • μ)) :=
-    fun τ hτ j => NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero (hτ.comp (hinj j).tendsto_cofinite)
+  have hsum
+      : ∀ τ : X → K,
+        Tendsto τ cofinite (𝓝 0) → ∀ j, Summable (fun μ => τ (α j + n ^ j • μ)) := fun τ hτ j =>
+    NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero (hτ.comp (hinj j).tendsto_cofinite)
   have hfar : ∀ z w : X, z ≠ w → ∀ᶠ j in atTop, ¬ ∃ μ, z = w + n ^ j • μ := by
     intro z w hzw
     by_contra h
@@ -99,18 +116,19 @@ theorem tendsto_tsum_pow_classes :
       apply hσ.congr'
       filter_upwards [(Set.finite_singleton χ).compl_mem_cofinite] with z hz
       simp [τ, Set.mem_compl_singleton_iff.mp hz]
-    have h2 := tendsto_tsum_zero_of_eventually_notMem_range τ hτ (fun j μ => α j + n ^ j • μ) (by
-      intro z hz
-      have hzχ : z ≠ χ := by
-        rintro rfl
-        simp [τ] at hz
-      filter_upwards [hfar z χ hzχ] with j hj μ hμ
-      apply hj
-      obtain ⟨ν, hν⟩ := hχ j
-      have hμ' : z = α j + n ^ j • μ := hμ.symm
-      refine ⟨μ - ν, ?_⟩
-      rw [hμ', hν, smul_sub]
-      abel)
+    have h2 :=
+      tendsto_tsum_zero_of_eventually_notMem_range τ hτ (fun j μ => α j + n ^ j • μ) (by
+        intro z hz
+        have hzχ : z ≠ χ := by
+          rintro rfl
+          simp [τ] at hz
+        filter_upwards [hfar z χ hzχ] with j hj μ hμ
+        apply hj
+        obtain ⟨ν, hν⟩ := hχ j
+        have hμ' : z = α j + n ^ j • μ := hμ.symm
+        refine ⟨μ - ν, ?_⟩
+        rw [hμ', hν, smul_sub]
+        abel)
     have heq : ∀ j, ∑' μ, σ (α j + n ^ j • μ) = σ χ + ∑' μ, τ (α j + n ^ j • μ) := by
       intro j
       obtain ⟨μj, hμj⟩ := hχ j
@@ -131,9 +149,12 @@ theorem tendsto_tsum_pow_classes :
     intro z _
     obtain ⟨j0, hj0⟩ : ∃ j0, ¬ ∃ μ, z = α j0 + n ^ j0 • μ := by
       by_contra h
-      exact hno ⟨z, fun j => by
-        by_contra h'
-        exact h ⟨j, h'⟩⟩
+      exact hno ⟨
+        z,
+        fun j => by
+          by_contra h'
+          exact h ⟨j, h'⟩
+      ⟩
     filter_upwards [eventually_ge_atTop j0] with j hj μ hμ
     exact hj0 (mem_class_of_le hα hj ⟨μ, hμ.symm⟩)
 

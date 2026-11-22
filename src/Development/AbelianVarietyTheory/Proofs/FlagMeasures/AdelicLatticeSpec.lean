@@ -18,19 +18,22 @@ namespace GlobalTheory.AdelicLattice
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem incl_mem_lamAf (L : Submodule (𝓞 E) (Fin n → E)) {x : Fin n → E} (hx : x ∈ L) :
-    (fun i => Formalism.UG.inclE (F := F) (Af F) (x i)) ∈ lamAf (F := F) L :=
+theorem incl_mem_lamAf (L : Submodule (𝓞 E) (Fin n → E)) {x : Fin n → E} (hx : x ∈ L)
+    : (fun i => Formalism.UG.inclE (F := F) (Af F) (x i)) ∈ lamAf (F := F) L :=
   Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩
 
-theorem exists_approx (L : Submodule (𝓞 E) (Fin n → E)) (g : ℕ) (hg : 1 ≤ g)
-    (y : Fin n → E ⊗[F] Af F) (hy : y ∈ lamAf (F := F) L) :
-    ∃ x ∈ L, ∃ z ∈ lamAf (F := F) L,
+theorem exists_approx
+    (L : Submodule (𝓞 E) (Fin n → E))
+    (g : ℕ) (hg : 1 ≤ g)
+    (y : Fin n → E ⊗[F] Af F) (hy : y ∈ lamAf (F := F) L)
+    : ∃ x ∈ L, ∃ z ∈ lamAf (F := F) L,
       y = (fun i => Formalism.UG.inclE (F := F) (Af F) (x i)) + (g : E ⊗[F] Af F) • z := by
   induction hy using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨x, rfl⟩ := hy
     exact ⟨x, x.2, 0, zero_mem _, by simp⟩
-  | zero => exact ⟨0, zero_mem _, 0, zero_mem _, by funext i; simp⟩
+  | zero =>
+    exact ⟨0, zero_mem _, 0, zero_mem _, by funext i; simp⟩
   | add a b _ _ ha hb =>
     obtain ⟨x, hx, z, hz, rfl⟩ := ha
     obtain ⟨x', hx', z', hz', rfl⟩ := hb
@@ -40,12 +43,17 @@ theorem exists_approx (L : Submodule (𝓞 E) (Fin n → E)) (g : ℕ) (hg : 1 �
     ring
   | smul s a _ ha =>
     obtain ⟨x, hx, z, hz, rfl⟩ := ha
-    obtain ⟨r, hr, w, hw, e⟩ := Formalism.UG.P.csSpan_approx (F := F) (E := E) Formalism.UG.P.csGlob_intAdApprox
-      (g : 𝓞 F) (Nat.cast_ne_zero.2 (by omega)) s.2
+    obtain ⟨r, hr, w, hw, e⟩ :=
+      Formalism.UG.P.csSpan_approx (F := F) (E := E) Formalism.UG.P.csGlob_intAdApprox (g : 𝓞 F)
+        (Nat.cast_ne_zero.2 (by omega)) s.2
     rw [GlobalTheory.AutInhab.levelafC_natCast] at e
-    refine ⟨(⟨r, hr⟩ : 𝓞 E) • x, L.smul_mem _ hx,
+    refine ⟨
+      (⟨r, hr⟩ : 𝓞 E) • x,
+      L.smul_mem _ hx,
       (⟨w, hw⟩ : IntAf F E) • (fun i => Formalism.UG.inclE (F := F) (Af F) (x i)) + s • z,
-      add_mem (Submodule.smul_mem _ _ (incl_mem_lamAf L hx)) (Submodule.smul_mem _ _ hz), ?_⟩
+      add_mem (Submodule.smul_mem _ _ (incl_mem_lamAf L hx)) (Submodule.smul_mem _ _ hz),
+      ?_
+    ⟩
     funext i
     show (s : E ⊗[F] Af F) * (Formalism.UG.inclE (F := F) (Af F) (x i) + (g : E ⊗[F] Af F) * z i) =
       Formalism.UG.inclE (F := F) (Af F) (r * x i) + (g : E ⊗[F] Af F) *
@@ -53,9 +61,11 @@ theorem exists_approx (L : Submodule (𝓞 E) (Fin n → E)) (g : ℕ) (hg : 1 �
     rw [map_mul]
     linear_combination Formalism.UG.inclE (F := F) (Af F) (x i) * e
 
-theorem incl_mem_iff (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG)
-    (hspan : Submodule.span E (L : Set (Fin n → E)) = ⊤) (x : Fin n → E) :
-    (fun i => Formalism.UG.inclE (F := F) (Af F) (x i)) ∈ lamAf (F := F) L ↔ x ∈ L := by
+theorem incl_mem_iff
+    (L : Submodule (𝓞 E) (Fin n → E))
+    (hfg : L.FG) (hspan : Submodule.span E (L : Set (Fin n → E)) = ⊤)
+    (x : Fin n → E)
+    : (fun i => Formalism.UG.inclE (F := F) (Af F) (x i)) ∈ lamAf (F := F) L ↔ x ∈ L := by
   refine ⟨fun h => ?_, incl_mem_lamAf L⟩
   rw [← Formalism.UG.P.global_lattice_one_holds F E (Fin n) L (Module.Finite.iff_fg.2 hfg) hspan]
   show ((1⁻¹ : GL (Fin n) (E ⊗[F] Af F)) : Matrix (Fin n) (Fin n) _) *ᵥ
@@ -65,9 +75,9 @@ theorem incl_mem_iff (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG)
   rintro _ ⟨y, rfl⟩
   exact ⟨y, y.2, rfl⟩
 
-theorem span_lamAf (L : Submodule (𝓞 E) (Fin n → E))
-    (hspan : Submodule.span E (L : Set (Fin n → E)) = ⊤) :
-    Submodule.span (E ⊗[F] Af F) (lamAf (F := F) L : Set (Fin n → E ⊗[F] Af F)) = ⊤ := by
+theorem span_lamAf
+    (L : Submodule (𝓞 E) (Fin n → E)) (hspan : Submodule.span E (L : Set (Fin n → E)) = ⊤)
+    : Submodule.span (E ⊗[F] Af F) (lamAf (F := F) L : Set (Fin n → E ⊗[F] Af F)) = ⊤ := by
   rw [eq_top_iff]
   intro y _
   obtain ⟨m, hm, hy⟩ := GlobalTheory.AutInhab.lamAf_absorbs (F := F) L hspan y
@@ -77,8 +87,23 @@ theorem span_lamAf (L : Submodule (𝓞 E) (Fin n → E))
   rw [this]
   exact Submodule.smul_mem _ _ (Submodule.subset_span hy)
 
-theorem adelicLattice_spec : ∀ (I : AutInst) (g : ℕ), 1 ≤ g → (∀ y ∈ I.Lf, ∃ x ∈ I.L, ∃ z ∈ I.Lf, y = (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (x i)) + (g : (I.E ⊗[I.F] Af I.F)) • z) ∧ (∀ x : Fin I.n → I.E, (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (x i)) ∈ I.Lf ↔ x ∈ I.L) ∧ Submodule.span (I.E ⊗[I.F] Af I.F) (I.Lf : Set (Fin I.n → (I.E ⊗[I.F] Af I.F))) = ⊤ ∧ I.Lf.FG ∧ ∀ y : Fin I.n → (I.E ⊗[I.F] Af I.F), ∃ m : ℕ, 1 ≤ m ∧ (m : (I.E ⊗[I.F] Af I.F)) • y ∈ I.Lf :=
-  fun I g hg => ⟨exists_approx I.L g hg, incl_mem_iff I.L I.L_fg I.L_span, span_lamAf I.L I.L_span,
-    GlobalTheory.AutInhab.lamAf_fg I.L I.L_fg, GlobalTheory.AutInhab.lamAf_absorbs I.L I.L_span⟩
+theorem adelicLattice_spec
+    : ∀ (I : AutInst) (g : ℕ),
+      1 ≤ g
+        → (∀ y ∈ I.Lf, ∃ x ∈ I.L, ∃ z ∈ I.Lf,
+            y = (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (x i))
+              + (g : (I.E ⊗[I.F] Af I.F)) • z)
+          ∧ (∀ x : Fin I.n → I.E,
+            (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (x i)) ∈ I.Lf ↔ x ∈ I.L)
+          ∧ Submodule.span (I.E ⊗[I.F] Af I.F) (I.Lf : Set (Fin I.n → (I.E ⊗[I.F] Af I.F))) = ⊤
+          ∧ I.Lf.FG
+          ∧ ∀ y : Fin I.n → (I.E ⊗[I.F] Af I.F), ∃ m : ℕ,
+            1 ≤ m ∧ (m : (I.E ⊗[I.F] Af I.F)) • y ∈ I.Lf := fun I g hg => ⟨
+  exists_approx I.L g hg,
+  incl_mem_iff I.L I.L_fg I.L_span,
+  span_lamAf I.L I.L_span,
+  GlobalTheory.AutInhab.lamAf_fg I.L I.L_fg,
+  GlobalTheory.AutInhab.lamAf_absorbs I.L I.L_span
+⟩
 
 end GlobalTheory.AdelicLattice

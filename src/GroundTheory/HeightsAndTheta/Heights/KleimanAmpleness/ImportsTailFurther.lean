@@ -13,8 +13,11 @@ open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH (secOver mIdealOve
 
 def SegreNef.Statement : Prop :=
   ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω),
-    (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) → ∀ β : K → ℤ,
-      (IndefiniteRowSideFullHecke.Kleiman2.IsNef F (segreJoin y) (IndefiniteRowSideFullHecke.Kleiman2.pullDeg β) ↔ IndefiniteRowSideFullHecke.Kleiman2.IsNef F y β)
+      (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω),
+    (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0)
+      → ∀ β : K → ℤ,
+        (IndefiniteRowSideFullHecke.Kleiman2.IsNef F (segreJoin y)
+            (IndefiniteRowSideFullHecke.Kleiman2.pullDeg β)
+          ↔ IndefiniteRowSideFullHecke.Kleiman2.IsNef F y β)
 
 end GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization

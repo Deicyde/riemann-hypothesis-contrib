@@ -16,9 +16,11 @@ open GlobalTheory.SplitLift
 section General
 variable {n : ℕ} {K : Type*} (A : Type*) [CommRing K] [CommRing A]
 
-def triMat (M : GL (Fin n) K) : Matrix (Fin n) (Fin n) (K × K × A) :=
-  fun i j => ((M : Matrix (Fin n) (Fin n) K) i j, ((M⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) j i,
-    (1 : Matrix (Fin n) (Fin n) A) i j)
+def triMat (M : GL (Fin n) K) : Matrix (Fin n) (Fin n) (K × K × A) := fun i j => (
+  (M : Matrix (Fin n) (Fin n) K) i j,
+  ((M⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) j i,
+  (1 : Matrix (Fin n) (Fin n) A) i j
+)
 
 theorem triMat_one : triMat A (1 : GL (Fin n) K) = 1 := by
   refine Matrix.ext fun i j => ?_
@@ -29,23 +31,26 @@ theorem triMat_mul (M N : GL (Fin n) K) : triMat A (M * N) = triMat A M * triMat
   symm
   apply matrix_prod_ext
   · exact Matrix.map_mul (L := triMat A M) (M := triMat A N) (f := RingHom.fst K (K × A))
-  · have e := Matrix.map_mul (L := triMat A M) (M := triMat A N)
-      (f := (RingHom.fst K A).comp (RingHom.snd K (K × A)))
+  · have e :=
+      Matrix.map_mul (L := triMat A M) (M := triMat A N)
+        (f := (RingHom.fst K A).comp (RingHom.snd K (K × A)))
     refine e.trans ?_
-    change ((M⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).transpose *
-      ((N⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).transpose =
-      (((M * N)⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).transpose
+    change ((M⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).transpose
+        * ((N⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).transpose
+      = (((M * N)⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).transpose
     rw [mul_inv_rev, Units.val_mul, Matrix.transpose_mul]
-  · have e := Matrix.map_mul (L := triMat A M) (M := triMat A N)
-      (f := (RingHom.snd K A).comp (RingHom.snd K (K × A)))
+  · have e :=
+      Matrix.map_mul (L := triMat A M) (M := triMat A N)
+        (f := (RingHom.snd K A).comp (RingHom.snd K (K × A)))
     refine e.trans ?_
     exact Matrix.mul_one (1 : Matrix (Fin n) (Fin n) A)
 
 end General
 
-theorem exists_hom_trivOutside_loc : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L),
-    ∃ e : GL (Fin n) (s.v.adicCompletion (NumberField.maximalRealSubfield L)) →* GAf L n,
-      (∀ g, TrivOutside {s.v} (e g)) ∧ ∀ g, s.loc n (e g) = g := by
+theorem exists_hom_trivOutside_loc
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L),
+      ∃ e : GL (Fin n) (s.v.adicCompletion (NumberField.maximalRealSubfield L)) →* GAf L n,
+        (∀ g, TrivOutside {s.v} (e g)) ∧ ∀ g, s.loc n (e g) = g := by
   intro L _ _ _ n s
   obtain ⟨y, hy⟩ := DFunLike.ne_iff.mp (IsCMField.complexConj_ne_one L)
   set δ : L := y - IsCMField.complexConj L y with hδdef
@@ -74,10 +79,11 @@ theorem exists_hom_trivOutside_loc : ∀ (L : Type) [Field L] [NumberField L] [I
     split_ifs <;> simp
   have hX : ∀ M, X M * conjT (conjAL L) (X M) = 1 := fun M => by
     rw [hconj, ← hXm, mul_inv_cancel, hX1]
-  let e : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)) →* GAf L n :=
-    { toFun := fun M => ⟨⟨X M, conjT (conjAL L) (X M), hX M, mul_eq_one_comm.mp (hX M)⟩, hX M⟩
-      map_one' := Subtype.ext (Units.ext hX1)
-      map_mul' := fun M N => Subtype.ext (Units.ext (hXm M N)) }
+  let e : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)) →* GAf L n := {
+    toFun := fun M => ⟨⟨X M, conjT (conjAL L) (X M), hX M, mul_eq_one_comm.mp (hX M)⟩, hX M⟩
+    map_one' := Subtype.ext (Units.ext hX1)
+    map_mul' := fun M N => Subtype.ext (Units.ext (hXm M N))
+  }
   refine ⟨e, fun M w hw => ?_, fun M => ?_⟩
   · have hw' : w ≠ s.v := hw
     refine Matrix.ext fun i j => ?_

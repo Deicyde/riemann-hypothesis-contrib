@@ -12,12 +12,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeri
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SqTop
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+  GlobalTheory.SqTop
 
 namespace GlobalTheory.BigTop.Fun
 
-theorem halfRank_eq_sqRank_div (D : D7) (ij : Sq D) :
-    GlobalTheory.FunObj.SqNum.halfRank D ij.1 ij.2 = sqRank D ij / 2 := by
+theorem halfRank_eq_sqRank_div (D : D7) (ij : Sq D)
+    : GlobalTheory.FunObj.SqNum.halfRank D ij.1 ij.2 = sqRank D ij / 2 := by
   unfold GlobalTheory.FunObj.SqNum.halfRank sqRank
   congr 1
   simp only [GlobalTheory.ChiGrid.rankV]

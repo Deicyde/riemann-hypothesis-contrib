@@ -99,7 +99,8 @@ def redH : intS P →+* 𝓞 E ⧸ P.asIdeal where
     refine redP_eq P (r := s' * r + s * r') (s := s * s') (nm_mul P hs hs') ?_ ?_
     · rw [map_add (f := _), map_mul, map_mul, map_mul, ← h, ← h']
       ring
-    · rw [map_add (f := _), map_mul, map_mul, map_mul, ← reduction_spec P hs h, ← reduction_spec P hs' h']
+    · rw [map_add (f := _), map_mul, map_mul, map_mul, ← reduction_spec P hs h,
+        ← reduction_spec P hs' h']
       ring
 
 lemma reduction_one₂ : redP P (1 : E) = 1 := (redH P).map_one
@@ -195,11 +196,12 @@ lemma red_DA {r : Sp E (N + c) ≃ₗ[E] Sp E (N + c)}
     redP P (r (Loc.eN E (N + c) j.1) i) = 0 :=
   redP_eq_zero_of_intAt_inv_absNorm_mul P (intAt_inv_absNorm_mul_apply_of_mem_JQ P hr i hi1 hi2 j hj)
 
-def Ment (kj N c : ℕ) (f : Sp E (N + c) ≃ₗ[E] Sp E (N + c)) : Matrix (Fin (N - kj)) (Fin (N - kj)) E :=
+def Ment (kj N c : ℕ) (f : Sp E (N + c) ≃ₗ[E] Sp E (N + c))
+    : Matrix (Fin (N - kj)) (Fin (N - kj)) E :=
   Matrix.of fun s t => Loc.atN (f (Loc.eN E (N + c) (kj + t.1))) (kj + s.1)
 
-def Mb (kj N c : ℕ) (f : Sp E (N + c) ≃ₗ[E] Sp E (N + c)) :
-    Matrix (Fin (N - kj)) (Fin (N - kj)) (𝓞 E ⧸ P.asIdeal) :=
+def Mb (kj N c : ℕ) (f : Sp E (N + c) ≃ₗ[E] Sp E (N + c))
+    : Matrix (Fin (N - kj)) (Fin (N - kj)) (𝓞 E ⧸ P.asIdeal) :=
   (Ment kj N c f).map (redP P)
 
 def dI (kj N c : ℕ) (t : Fin (N - kj)) : Fin (N + c) := ⟨kj + t.1, by have := t.2; omega⟩

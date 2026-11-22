@@ -24,9 +24,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKHwMa
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
@@ -35,32 +38,59 @@ noncomputable section
 
 namespace GlobalTheory.HarmLine
 
-theorem loc_jointTop : ∀ {σ : Type} [DecidableEq σ] {k l N : ℕ} (z : Fin k × Fin N → σ) (y : Fin l × Fin N → σ) (κ : Fin N → ℂ) (α : Fin k → ℂ) (β : Fin l → ℂ) (G P : MvPolynomial σ ℂ), G ≠ 0 → (∀ v ∈ G.vars, (∀ u, z u ≠ v) ∧ ∀ u, y u ≠ v) → GlobalTheory.CompactHarm.JointTop z y κ α β (G * P) → GlobalTheory.CompactHarm.JointTop z y κ α β P := by
+theorem loc_jointTop
+    : ∀ {σ : Type} [DecidableEq σ] {k l N : ℕ} (z : Fin k × Fin N → σ) (y : Fin l × Fin N → σ)
+        (κ : Fin N → ℂ) (α : Fin k → ℂ) (β : Fin l → ℂ) (G P : MvPolynomial σ ℂ),
+      G ≠ 0 → (∀ v ∈ G.vars, (∀ u, z u ≠ v) ∧ ∀ u, y u ≠ v)
+        → GlobalTheory.CompactHarm.JointTop z y κ α β (G * P)
+        → GlobalTheory.CompactHarm.JointTop z y κ α β P := by
   intro σ _ k l N z y κ α β G P hG hGv hJ
-  have hd : ∀ u, u ∉ G.vars → ∀ Q : MvPolynomial σ ℂ,
-      MvPolynomial.pderiv u (G * Q) = G * MvPolynomial.pderiv u Q := by
+  have hd
+      : ∀ u,
+        u ∉ G.vars
+          → ∀ Q : MvPolynomial σ ℂ,
+            MvPolynomial.pderiv u (G * Q) = G * MvPolynomial.pderiv u Q := by
     intro u hu Q
-    rw [Derivation.leibniz, MvPolynomial.pderiv_eq_zero_of_notMem_vars hu, smul_zero, add_zero, smul_eq_mul]
-  have hz : ∀ c Q, MvPolynomial.pderiv (z c) (G * Q) = G * MvPolynomial.pderiv (z c) Q :=
-    fun c Q => hd _ (fun h => (hGv _ h).1 c rfl) Q
-  have hy : ∀ c Q, MvPolynomial.pderiv (y c) (G * Q) = G * MvPolynomial.pderiv (y c) Q :=
-    fun c Q => hd _ (fun h => (hGv _ h).2 c rfl) Q
-  have hmix : ∀ i j, GlobalTheory.Capelli.mixedOp ℂ z y i j (G * P) = G * GlobalTheory.Capelli.mixedOp ℂ z y i j P := by
+    rw [Derivation.leibniz, MvPolynomial.pderiv_eq_zero_of_notMem_vars hu, smul_zero, add_zero,
+      smul_eq_mul]
+  have hz : ∀ c Q, MvPolynomial.pderiv (z c) (G * Q) = G * MvPolynomial.pderiv (z c) Q := fun c Q =>
+    hd _ (fun h => (hGv _ h).1 c rfl) Q
+  have hy : ∀ c Q, MvPolynomial.pderiv (y c) (G * Q) = G * MvPolynomial.pderiv (y c) Q := fun c Q =>
+    hd _ (fun h => (hGv _ h).2 c rfl) Q
+  have hmix
+      : ∀ i j,
+        GlobalTheory.Capelli.mixedOp ℂ z y i j (G * P)
+          = G * GlobalTheory.Capelli.mixedOp ℂ z y i j P := by
     intro i j
-    rw [GlobalTheory.Capelli.mixedOp_apply, GlobalTheory.Capelli.mixedOp_apply, mul_sub, Finset.mul_sum, Finset.mul_sum]
+    rw [GlobalTheory.Capelli.mixedOp_apply, GlobalTheory.Capelli.mixedOp_apply, mul_sub,
+      Finset.mul_sum, Finset.mul_sum]
     simp only [hz, hy]
-    exact congrArg₂ (· - ·) (Finset.sum_congr rfl fun _ _ => by ring) (Finset.sum_congr rfl fun _ _ => by ring)
-  have hrz : ∀ c c', GlobalTheory.Capelli.rowOp ℂ z c c' (G * P) = G * GlobalTheory.Capelli.rowOp ℂ z c c' P := by
+    exact congrArg₂ (· - ·) (Finset.sum_congr rfl fun _ _ => by ring)
+      (Finset.sum_congr rfl fun _ _ => by ring)
+  have hrz
+      : ∀ c c',
+        GlobalTheory.Capelli.rowOp ℂ z c c' (G * P)
+          = G * GlobalTheory.Capelli.rowOp ℂ z c c' P := by
     intro c c'
     simp only [GlobalTheory.Capelli.rowOp_apply, hz, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => by ring
-  have hry : ∀ c c', GlobalTheory.Capelli.rowOp ℂ y c c' (G * P) = G * GlobalTheory.Capelli.rowOp ℂ y c c' P := by
+  have hry
+      : ∀ c c',
+        GlobalTheory.Capelli.rowOp ℂ y c c' (G * P)
+          = G * GlobalTheory.Capelli.rowOp ℂ y c c' P := by
     intro c c'
     simp only [GlobalTheory.Capelli.rowOp_apply, hy, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => by ring
   obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := hJ
-  refine ⟨fun i j hij => ?_, fun i => ?_, fun c c' h => ?_, fun c => ?_, fun d d' h => ?_, fun d => ?_,
-    fun c d => ?_⟩
+  refine ⟨
+    fun i j hij => ?_,
+    fun i => ?_,
+    fun c c' h => ?_,
+    fun c => ?_,
+    fun d d' h => ?_,
+    fun d => ?_,
+    fun c d => ?_
+  ⟩
   · have := h1 i j hij
     rw [hmix] at this
     exact (mul_eq_zero.1 this).resolve_left hG
@@ -83,25 +113,40 @@ theorem loc_jointTop : ∀ {σ : Type} [DecidableEq σ] {k l N : ℕ} (z : Fin k
     simp only [hy, hz, ← Finset.mul_sum] at this
     exact (mul_eq_zero.1 this).resolve_left hG
 
-theorem joint_line : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Weight D n) (lam : D.what₂.Tau → Fin n → ℂ) (P P' : PolF D m n), P ≠ 0 → GlobalTheory.LowestKType.IsHarm w P → GlobalTheory.LowestKType.IsHarm w P' → GlobalTheory.LowestKType.IsNHw w lam P → GlobalTheory.LowestKType.IsNHw w lam P' → GlobalTheory.LowestKType.IsKHw w P → GlobalTheory.LowestKType.IsKHw w P' → ∃ c : ℂ, P' = c • P := by
+theorem joint_line
+    : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Weight D n)
+        (lam : D.what₂.Tau → Fin n → ℂ) (P P' : PolF D m n),
+      P ≠ 0 → GlobalTheory.LowestKType.IsHarm w P → GlobalTheory.LowestKType.IsHarm w P'
+        → GlobalTheory.LowestKType.IsNHw w lam P → GlobalTheory.LowestKType.IsNHw w lam P'
+        → GlobalTheory.LowestKType.IsKHw w P → GlobalTheory.LowestKType.IsKHw w P'
+        → ∃ c : ℂ, P' = c • P := by
   intro D n m w lam P P' hP0 hH hH' hN hN' hK hK'
   classical
   set κ : D.what₂.Tau → Fin n → ℂ := fun τ a => lam τ a - (m : ℂ) / 2 + ((m - w.p τ : ℕ) : ℂ) with hκ
   have hJ := GlobalTheory.T.jointHighestWeightHarmonic_of_fock_lowestKType D n m w lam P hH hN hK
-  have hJ' := GlobalTheory.T.jointHighestWeightHarmonic_of_fock_lowestKType D n m w lam P' hH' hN' hK'
-  have hU : ∀ τ : D.what₂.Tau, ∃ Q₀ : MvPolynomial (Fin m × Fin n) ℂ, ∀ α β f,
-      GlobalTheory.CompactHarm.JointTop (GlobalTheory.HarmLine.zR m n (w.p τ)) (GlobalTheory.HarmLine.yR m n (w.p τ)) (κ τ) α β f →
-        ∃ r : ℂ, f = r • Q₀ := fun τ =>
-    GlobalTheory.T.jointHighestWeightHarmonic_multiplicity_one_covering _ _ (GlobalTheory.HarmLine.zR_inj m n (w.p τ)) (GlobalTheory.HarmLine.yR_inj m n (w.p τ))
-      (GlobalTheory.HarmLine.zR_ne_yR m n (w.p τ)) (GlobalTheory.HarmLine.zR_yR_cover m n (w.p τ)) (κ τ)
+  have hJ' :=
+    GlobalTheory.T.jointHighestWeightHarmonic_of_fock_lowestKType D n m w lam P' hH' hN' hK'
+  have hU
+      : ∀ τ : D.what₂.Tau, ∃ Q₀ : MvPolynomial (Fin m × Fin n) ℂ, ∀ α β f,
+        GlobalTheory.CompactHarm.JointTop (GlobalTheory.HarmLine.zR m n (w.p τ))
+            (GlobalTheory.HarmLine.yR m n (w.p τ)) (κ τ) α β f
+          → ∃ r : ℂ, f = r • Q₀ := fun τ =>
+    GlobalTheory.T.jointHighestWeightHarmonic_multiplicity_one_covering _ _
+      (GlobalTheory.HarmLine.zR_inj m n (w.p τ)) (GlobalTheory.HarmLine.yR_inj m n (w.p τ))
+      (GlobalTheory.HarmLine.zR_ne_yR m n (w.p τ)) (GlobalTheory.HarmLine.zR_yR_cover m n (w.p τ))
+      (κ τ)
   choose Q₀ hQ₀ using hU
   let Q : D.what₂.Tau → PolF D m n := fun τ => MvPolynomial.rename (Prod.mk τ) (Q₀ τ)
-  have hfac : ∀ (τ : D.what₂.Tau) (P : PolF D m n) α β,
-      GlobalTheory.CompactHarm.JointTop (Prod.mk τ ∘ GlobalTheory.HarmLine.zR m n (w.p τ))
-        (Prod.mk τ ∘ GlobalTheory.HarmLine.yR m n (w.p τ)) (κ τ) α β P →
-      ∃ R : PolF D m n, P = Q τ * R ∧ ∀ v ∈ R.vars, v.1 ≠ τ := by
+  have hfac
+      : ∀ (τ : D.what₂.Tau) (P : PolF D m n) α β,
+        GlobalTheory.CompactHarm.JointTop (Prod.mk τ ∘ GlobalTheory.HarmLine.zR m n (w.p τ))
+            (Prod.mk τ ∘ GlobalTheory.HarmLine.yR m n (w.p τ)) (κ τ) α β P
+          → ∃ R : PolF D m n, P = Q τ * R ∧ ∀ v ∈ R.vars, v.1 ≠ τ := by
     intro τ P α β h
-    obtain ⟨s, f, g, hPs, hf, hg⟩ := GlobalTheory.T.isJointHighestWeightHarmonic_slice_outer_variables (Prod.mk τ) (fun a b h => (Prod.mk.inj h).2) _ _ _ _ _ P h
+    obtain ⟨s, f, g, hPs, hf, hg⟩ :=
+      GlobalTheory.T.isJointHighestWeightHarmonic_slice_outer_variables (Prod.mk τ)
+        (fun a b h => (Prod.mk.inj h).2)
+        _ _ _ _ _ P h
     choose! r hr using fun i (hi : i ∈ s) => hQ₀ τ α β (f i) (hf i hi)
     refine ⟨∑ i ∈ s, r i • g i, ?_, ?_⟩
     · rw [hPs, Finset.mul_sum]
@@ -119,10 +164,12 @@ theorem joint_line : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Wei
     obtain ⟨α, β, hτ⟩ := hJ τ
     obtain ⟨R, hR, -⟩ := hfac τ P α β hτ
     exact hP0 (by rw [hR, h0, zero_mul])
-  have hE : ∀ s : Finset D.what₂.Tau, ∀ P : PolF D m n,
-      (∀ τ ∈ s, ∃ α β, GlobalTheory.CompactHarm.JointTop (Prod.mk τ ∘ GlobalTheory.HarmLine.zR m n (w.p τ))
-        (Prod.mk τ ∘ GlobalTheory.HarmLine.yR m n (w.p τ)) (κ τ) α β P) →
-      ∃ R : PolF D m n, P = (∏ τ ∈ s, Q τ) * R ∧ ∀ v ∈ R.vars, v.1 ∉ s := by
+  have hE
+      : ∀ s : Finset D.what₂.Tau, ∀ P : PolF D m n,
+        (∀ τ ∈ s, ∃ α β,
+            GlobalTheory.CompactHarm.JointTop (Prod.mk τ ∘ GlobalTheory.HarmLine.zR m n (w.p τ))
+              (Prod.mk τ ∘ GlobalTheory.HarmLine.yR m n (w.p τ)) (κ τ) α β P)
+          → ∃ R : PolF D m n, P = (∏ τ ∈ s, Q τ) * R ∧ ∀ v ∈ R.vars, v.1 ∉ s := by
     intro s
     induction s using Finset.induction_on with
     | empty => intro P _; exact ⟨P, by simp, by simp⟩
@@ -137,31 +184,37 @@ theorem joint_line : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Wei
         have := MvPolynomial.vars_rename (Prod.mk τ) (Q₀ τ) hv'
         obtain ⟨u, -, rfl⟩ := Finset.mem_image.1 this
         exact hτ
-      have hJR := loc_jointTop _ _ _ α β _ R hG0 (fun v hv =>
-        ⟨fun u h => hτ₀ (by have := hGv v hv; rw [← h] at this; simpa using this),
-         fun u h => hτ₀ (by have := hGv v hv; rw [← h] at this; simpa using this)⟩) (hPR ▸ hJ0)
+      have hJR :=
+        loc_jointTop _ _ _ α β _ R hG0
+          (fun v hv => ⟨
+            fun u h => hτ₀ (by have := hGv v hv; rw [← h] at this; simpa using this),
+            fun u h => hτ₀ (by have := hGv v hv; rw [← h] at this; simpa using this)
+          ⟩)
+          (hPR ▸ hJ0)
       obtain ⟨R', hRR', hR'v⟩ := hfac τ₀ R α β hJR
       refine ⟨R', by rw [hPR, hRR', Finset.prod_insert hτ₀]; ring, ?_⟩
       intro v hv
       rw [Finset.mem_insert, not_or]
       refine ⟨fun h => hR'v v hv h, hRv v ?_⟩
       have hR'0 : R' ≠ 0 := by rintro rfl; simp at hv
-      rw [hRR', MvPolynomial.mem_vars_iff_degreeOf_ne_zero, MvPolynomial.degreeOf_mul_eq (hQne τ₀) hR'0]
+      rw [hRR', MvPolynomial.mem_vars_iff_degreeOf_ne_zero,
+        MvPolynomial.degreeOf_mul_eq (hQne τ₀) hR'0]
       rw [MvPolynomial.mem_vars_iff_degreeOf_ne_zero] at hv
       omega
   obtain ⟨R, hR, hRv⟩ := hE Finset.univ P (fun τ _ => hJ τ)
   obtain ⟨R', hR', hR'v⟩ := hE Finset.univ P' (fun τ _ => hJ' τ)
-  have hc : ∀ R : PolF D m n, (∀ v ∈ R.vars, v.1 ∉ (Finset.univ : Finset D.what₂.Tau)) →
-      R = MvPolynomial.C (R.coeff 0) := fun R h =>
-    MvPolynomial.vars_eq_empty_iff_eq_C.1
-      (Finset.eq_empty_of_forall_notMem fun v hv => h v hv (Finset.mem_univ _))
+  have hc
+      : ∀ R : PolF D m n,
+        (∀ v ∈ R.vars, v.1 ∉ (Finset.univ : Finset D.what₂.Tau))
+          → R = MvPolynomial.C (R.coeff 0) := fun R h =>
+    MvPolynomial.vars_eq_empty_iff_eq_C.1 (Finset.eq_empty_of_forall_notMem fun v hv =>
+      h v hv (Finset.mem_univ _))
   rw [hc R hRv] at hR
   rw [hc R' hR'v] at hR'
-  have hc0 : R.coeff 0 ≠ 0 := by
-    intro h0; apply hP0; rw [hR, h0]; simp
+  have hc0 : R.coeff 0 ≠ 0 := by intro h0; apply hP0; rw [hR, h0]; simp
   refine ⟨R'.coeff 0 / R.coeff 0, ?_⟩
-  rw [hR', hR, MvPolynomial.smul_eq_C_mul, ← mul_assoc, mul_comm (MvPolynomial.C _) (∏ τ, Q τ), mul_assoc,
-    ← MvPolynomial.C_mul, div_mul_cancel₀ _ hc0]
+  rw [hR', hR, MvPolynomial.smul_eq_C_mul, ← mul_assoc, mul_comm (MvPolynomial.C _) (∏ τ, Q τ),
+    mul_assoc, ← MvPolynomial.C_mul, div_mul_cancel₀ _ hc0]
 
 end GlobalTheory.HarmLine
 

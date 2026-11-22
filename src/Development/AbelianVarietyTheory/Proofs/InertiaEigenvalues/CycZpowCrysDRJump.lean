@@ -15,36 +15,46 @@ noncomputable section
 
 namespace GlobalTheory.CycPow
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 section Generic
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B F : Type} [CommRing B] [CommRing F] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp F] [Algebra K₀ F] [Algebra K F] [IsScalarTower Qp K F]
-    [IsScalarTower K₀ K F] [IsScalarTower Qp K₀ F]
-    (PD : PeriodData G Qp K₀ K B F) {LL : Type} [Field LL] [Algebra Qp LL]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B F : Type}
+  [CommRing B] [CommRing F] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp F]
+  [Algebra K₀ F] [Algebra K F] [IsScalarTower Qp K F] [IsScalarTower K₀ K F] [IsScalarTower Qp K₀ F]
+  (PD : PeriodData G Qp K₀ K B F)
+  {LL : Type} [Field LL] [Algebra Qp LL]
 
-theorem step (u : F) (hu : PD.ι PD.t * u = 1) (hu' : u ∈ PD.Fil (-1)) (n : ℤ) :
-    finrank LL ↥(DdR PD (charRep (cycLL PD LL ^ (n + 1)))) =
-        finrank LL ↥(DdR PD (charRep (cycLL PD LL ^ n))) ∧
-      ∀ (τ : K →ₐ[Qp] LL) (a : ℤ), finrank LL ↥(FildR PD (charRep (cycLL PD LL ^ (n + 1))) τ (a - 1)) =
-        finrank LL ↥(FildR PD (charRep (cycLL PD LL ^ n)) τ a) := by
-  have htw : IsTwistRep (cycLL PD LL) (charRep (cycLL PD LL ^ n)) (charRep (cycLL PD LL ^ (n + 1))) := by
+theorem step (u : F) (hu : PD.ι PD.t * u = 1) (hu' : u ∈ PD.Fil (-1)) (n : ℤ)
+    : finrank LL ↥(DdR PD (charRep (cycLL PD LL ^ (n + 1))))
+        = finrank LL ↥(DdR PD (charRep (cycLL PD LL ^ n)))
+      ∧ ∀ (τ : K →ₐ[Qp] LL) (a : ℤ),
+        finrank LL ↥(FildR PD (charRep (cycLL PD LL ^ (n + 1))) τ (a - 1))
+          = finrank LL ↥(FildR PD (charRep (cycLL PD LL ^ n)) τ a) := by
+  have htw
+      : IsTwistRep (cycLL PD LL) (charRep (cycLL PD LL ^ n)) (charRep (cycLL PD LL ^ (n + 1))) := by
     refine ⟨LinearEquiv.refl LL LL, fun g x => ?_⟩
     rw [zpow_add_one]
-    change (((cycLL PD LL ^ n) g * cycLL PD LL g : LLˣ) : LL) * x =
-      ((cycLL PD LL g : LLˣ) : LL) * ((((cycLL PD LL ^ n) g : LLˣ) : LL) * x)
+    change (((cycLL PD LL ^ n) g * cycLL PD LL g : LLˣ) : LL) * x
+      = ((cycLL PD LL g : LLˣ) : LL) * ((((cycLL PD LL ^ n) g : LLˣ) : LL) * x)
     rw [Units.val_mul]
     ring
   obtain ⟨Φ, hD, hF⟩ := GlobalTheory.DRFil.exists_twist_equiv PD _ _ htw u hu hu'
-  exact ⟨by rw [← hD, LinearEquiv.finrank_map_eq], fun τ a => by rw [← hF, LinearEquiv.finrank_map_eq]⟩
+  exact
+    ⟨by rw [← hD, LinearEquiv.finrank_map_eq], fun τ a => by rw [← hF, LinearEquiv.finrank_map_eq]⟩
 
-theorem isDR_and_finrank [CharZero Qp] [FiniteDimensional Qp LL] (u : F) (hu : PD.ι PD.t * u = 1)
-    (hu' : u ∈ PD.Fil (-1)) (k : ℤ) :
-    IsDR PD (charRep (cycLL PD LL ^ k)) ∧ ∀ (τ : K →ₐ[Qp] LL) (a : ℤ),
-      finrank LL ↥(FildR PD (charRep (cycLL PD LL ^ k)) τ a) = if a ≤ -k then 1 else 0 := by
+theorem isDR_and_finrank
+    [CharZero Qp] [FiniteDimensional Qp LL]
+    (u : F) (hu : PD.ι PD.t * u = 1) (hu' : u ∈ PD.Fil (-1))
+    (k : ℤ)
+    : IsDR PD (charRep (cycLL PD LL ^ k))
+      ∧ ∀ (τ : K →ₐ[Qp] LL) (a : ℤ),
+        finrank LL ↥(FildR PD (charRep (cycLL PD LL ^ k)) τ a) = if a ≤ -k then 1 else 0 := by
   induction k using Int.induction_on with
   | zero =>
     have h1 : charRep (1 : G →* LLˣ) = Representation.trivial LL G LL := by
@@ -68,11 +78,20 @@ theorem isDR_and_finrank [CharZero Qp] [FiniteDimensional Qp LL] (u : F) (hu : P
 
 end Generic
 
-theorem cyc_zpow_crys_dR_jump : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → ∀ (K LL : FinExt l) (k : ℤ), IsCrys (P.PD K) (charRep (cycLL (P.PD K) ↥LL.1 ^ k)) ∧ IsDR (P.PD K) (charRep (cycLL (P.PD K) ↥LL.1 ^ k)) ∧ ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) (a : ℤ), multV (P.PD K) (charRep (cycLL (P.PD K) ↥LL.1 ^ k)) τ a = if a = -k then 1 else 0 := by
+theorem cyc_zpow_crys_dR_jump
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (K LL : FinExt l) (k : ℤ),
+          IsCrys (P.PD K) (charRep (cycLL (P.PD K) ↥LL.1 ^ k))
+            ∧ IsDR (P.PD K) (charRep (cycLL (P.PD K) ↥LL.1 ^ k))
+            ∧ ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) (a : ℤ),
+              multV (P.PD K) (charRep (cycLL (P.PD K) ↥LL.1 ^ k)) τ a
+                = if a = -k then 1 else 0 := by
   intro l _ P AI T K LL k
   have := LL.2
-  obtain ⟨u, hu', hu⟩ := ((GlobalTheory.MemLoc.TiedUnif.tied_uniformiser l P AI T).2.2 K (-1) 1).1
-    (by rw [neg_add_cancel]; exact (P.PD K).one_mem)
+  obtain ⟨u, hu', hu⟩ :=
+    ((GlobalTheory.MemLoc.TiedUnif.tied_uniformiser l P AI T).2.2 K (-1) 1).1
+      (by rw [neg_add_cancel]; exact (P.PD K).one_mem)
   have ht : (P.PD K).ι (P.PD K).t * u = 1 := by
     rw [P.PD_ι, P.period_datum_t_eq]
     exact hu.symm

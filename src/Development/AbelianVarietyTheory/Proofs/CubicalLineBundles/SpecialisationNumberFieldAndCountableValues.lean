@@ -7,17 +7,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 namespace GlobalTheory
 
-theorem _root_.GlobalTheory.exists_ringHom_extend_of_finiteType (F A L : Type*) [Field F] [CommRing A]
-    [Nontrivial A] [Algebra F A] [Algebra.FiniteType F A] [Field L] [IsAlgClosed L]
-    (σ : F →+* L) : ∃ φ : A →+* L, ∀ x, φ (algebraMap F A x) = σ x := by
+theorem _root_.GlobalTheory.exists_ringHom_extend_of_finiteType
+    (F A L : Type*) [Field F] [CommRing A] [Nontrivial A] [Algebra F A] [Algebra.FiniteType F A]
+    [Field L] [IsAlgClosed L]
+    (σ : F →+* L)
+    : ∃ φ : A →+* L, ∀ x, φ (algebraMap F A x) = σ x := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal A
   letI : Field (A ⧸ m) := Ideal.Quotient.field m
   haveI : Module.Finite F (A ⧸ m) := finite_of_finite_type_of_isJacobsonRing F (A ⧸ m)
   letI : Algebra F L := σ.toAlgebra
   let ψ : (A ⧸ m) →ₐ[F] L := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨ψ.toRingHom.comp (Ideal.Quotient.mk m), fun x => ?_⟩
   have h1 : Ideal.Quotient.mk m (algebraMap F A x) = algebraMap F (A ⧸ m) x := rfl
@@ -69,10 +70,11 @@ private lemma exists_algHom_extend_of_fg_ne_zero {k L M : Type*} [Field k] [Fiel
     rw [map_mul, map_one] at this
     exact left_ne_zero_of_mul_eq_one this
 
-theorem _root_.GlobalTheory.exists_specialisation_finite {k L : Type*} [Field k] [Field L]
-    [Algebra k L] [IsAlgClosed L] (R : Subalgebra k L) (hR : R.FG) (r : R) (hr : r ≠ 0) :
-    ∃ (K₁ : IntermediateField k L) (ρ : R →ₐ[k] K₁), FiniteDimensional k K₁ ∧ ρ r ≠ 0 ∧
-      ∀ c : R, IsAlgebraic k c → (ρ c : L) = c := by
+theorem _root_.GlobalTheory.exists_specialisation_finite
+    {k L : Type*} [Field k] [Field L] [Algebra k L] [IsAlgClosed L]
+    (R : Subalgebra k L) (hR : R.FG) (r : R) (hr : r ≠ 0)
+    : ∃ (K₁ : IntermediateField k L) (ρ : R →ₐ[k] K₁),
+      FiniteDimensional k K₁ ∧ ρ r ≠ 0 ∧ ∀ c : R, IsAlgebraic k c → (ρ c : L) = c := by
   classical
   haveI : IsAlgClosed (algebraicClosure k L) := IsAlgClosure.isAlgClosed k
   obtain ⟨ρ₁, hfix, hr₁⟩ :=
@@ -92,13 +94,20 @@ theorem _root_.GlobalTheory.exists_specialisation_finite {k L : Type*} [Field k]
     have h1 : ρ₀ x ∈ Algebra.adjoin k (ρ₀ '' (t : Set R)) := by
       rw [← AlgHom.map_adjoin]; exact ⟨x, hx, rfl⟩
     exact IntermediateField.algebra_adjoin_le_adjoin k _ h1
-  refine ⟨IntermediateField.adjoin k (ρ₀ '' (t : Set R)),
-    { toFun := fun x => ⟨ρ₀ x, hmem x⟩
+  refine ⟨
+    IntermediateField.adjoin k (ρ₀ '' (t : Set R)),
+    {
+      toFun := fun x => ⟨ρ₀ x, hmem x⟩
       map_one' := Subtype.ext (map_one ρ₀)
       map_mul' := fun x y => Subtype.ext (map_mul ρ₀ x y)
       map_zero' := Subtype.ext (map_zero ρ₀)
       map_add' := fun x y => Subtype.ext (map_add ρ₀ x y)
-      commutes' := fun a => Subtype.ext (ρ₀.commutes a) }, hfin, fun h => hr₁ ?_, fun c hc => ?_⟩
+      commutes' := fun a => Subtype.ext (ρ₀.commutes a)
+    },
+    hfin,
+    fun h => hr₁ ?_,
+    fun c hc => ?_
+  ⟩
   · have h' : ρ₀ r = 0 := congrArg Subtype.val h
     exact Subtype.ext h'
   · have hcL : (c : L) ∈ algebraicClosure k L := mem_algebraicClosure_iff.2 (hc.algHom R.val)
@@ -106,12 +115,14 @@ theorem _root_.GlobalTheory.exists_specialisation_finite {k L : Type*} [Field k]
     rw [hfix c hcL]
     rfl
 
-theorem _root_.GlobalTheory.specialisation_numberField_and_countable_values :
-    ∀ (k : IntermediateField ℚ ℂ) [FiniteDimensional ℚ k] (R : Subalgebra k ℂ), R.FG →
-    ∀ (c r : R), r ≠ 0 →
-    (∃ (K₁ : IntermediateField k ℂ) (ρ : R →ₐ[k] K₁), FiniteDimensional k K₁ ∧ ρ r ≠ 0 ∧
-      (IsAlgebraic k c → (ρ c : ℂ) = c)) ∧
-    (∀ S : Set ℂ, S.Countable → (∀ ρ : R →ₐ[k] ℂ, ρ c ∈ S) → IsAlgebraic k c) := by
+theorem _root_.GlobalTheory.specialisation_numberField_and_countable_values
+    : ∀ (k : IntermediateField ℚ ℂ) [FiniteDimensional ℚ k] (R : Subalgebra k ℂ),
+      R.FG
+        → ∀ (c r : R),
+          r ≠ 0
+            → (∃ (K₁ : IntermediateField k ℂ) (ρ : R →ₐ[k] K₁),
+                FiniteDimensional k K₁ ∧ ρ r ≠ 0 ∧ (IsAlgebraic k c → (ρ c : ℂ) = c))
+              ∧ (∀ S : Set ℂ, S.Countable → (∀ ρ : R →ₐ[k] ℂ, ρ c ∈ S) → IsAlgebraic k c) := by
   intro k _ R hR c r hr
   refine ⟨?_, fun S hS hρ => ?_⟩
   · obtain ⟨K₁, ρ, hfin, hr₁, hfix⟩ := _root_.GlobalTheory.exists_specialisation_finite R hR r hr

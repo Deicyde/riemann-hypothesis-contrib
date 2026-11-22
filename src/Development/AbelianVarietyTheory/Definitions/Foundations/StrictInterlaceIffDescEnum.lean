@@ -27,7 +27,8 @@ def signature (S : SPar) : ℕ × ℕ := (nPlus S, nMinus S)
 
 def InCoset (h : ℚ) (E : Finset ℚ) : Prop := ∀ x ∈ E, ∃ z : ℤ, x = h + z
 
-def IsHC (n : ℕ) (S : SPar) : Prop := IsRegular S ∧ S.card = n ∧ InCoset (((n : ℚ) - 1) / 2) (entries S)
+def IsHC (n : ℕ) (S : SPar) : Prop :=
+  IsRegular S ∧ S.card = n ∧ InCoset (((n : ℚ) - 1) / 2) (entries S)
 
 def shift (h : ℚ) (S : SPar) : SPar := S.image fun x => (x.1 + h, x.2)
 
@@ -35,19 +36,21 @@ def negate (S : SPar) : SPar := S.image fun x => (-x.1, x.2)
 
 def flip (S : SPar) : SPar := S.image fun x => (x.1, !x.2)
 
-theorem mem_entries {S : SPar} {x : ℚ} : x ∈ entries S ↔ ∃ s, (x, s) ∈ S := by
-  simp [entries]
+theorem mem_entries {S : SPar} {x : ℚ} : x ∈ entries S ↔ ∃ s, (x, s) ∈ S := by simp [entries]
 
-theorem fst_mem_entries {S : SPar} {x : ℚ × Bool} (h : x ∈ S) : x.1 ∈ entries S := mem_image_of_mem _ h
+theorem fst_mem_entries {S : SPar} {x : ℚ × Bool} (h : x ∈ S) : x.1 ∈ entries S :=
+  mem_image_of_mem _ h
 
-theorem mem_ofSign {E : Finset ℚ} {sg : ℚ → Bool} {x : ℚ × Bool} : x ∈ ofSign E sg ↔ x.1 ∈ E ∧ x.2 = sg x.1 := by
+theorem mem_ofSign {E : Finset ℚ} {sg : ℚ → Bool} {x : ℚ × Bool}
+    : x ∈ ofSign E sg ↔ x.1 ∈ E ∧ x.2 = sg x.1 := by
   obtain ⟨a, s⟩ := x
   simp only [ofSign, mem_image, Prod.mk.injEq]
   constructor
   · rintro ⟨y, hy, rfl, rfl⟩; exact ⟨hy, rfl⟩
   · rintro ⟨h, rfl⟩; exact ⟨a, h, rfl, rfl⟩
 
-@[simp] theorem mem_plus {E : Finset ℚ} {x : ℚ × Bool} : x ∈ plus E ↔ x.1 ∈ E ∧ x.2 = true :=
+@[simp]
+theorem mem_plus {E : Finset ℚ} {x : ℚ × Bool} : x ∈ plus E ↔ x.1 ∈ E ∧ x.2 = true :=
   mem_ofSign (sg := fun _ => true)
 
 theorem mem_shift {h : ℚ} {S : SPar} {x : ℚ × Bool} : x ∈ shift h S ↔ (x.1 - h, x.2) ∈ S := by
@@ -68,15 +71,18 @@ theorem mem_flip {S : SPar} {x : ℚ × Bool} : x ∈ flip S ↔ (x.1, !x.2) ∈
   · rintro ⟨y, hy, rfl⟩; simpa using hy
   · intro hx; exact ⟨_, hx, by simp⟩
 
-@[simp] theorem shift_zero (S : SPar) : shift 0 S = S := by
-  ext x; simp [mem_shift]
+@[simp]
+theorem shift_zero (S : SPar) : shift 0 S = S := by ext x; simp [mem_shift]
 
-@[simp] theorem entries_union (S T : SPar) : entries (S ∪ T) = entries S ∪ entries T := image_union _ _
+@[simp]
+theorem entries_union (S T : SPar) : entries (S ∪ T) = entries S ∪ entries T := image_union _ _
 
-@[simp] theorem entries_ofSign (E : Finset ℚ) (sg : ℚ → Bool) : entries (ofSign E sg) = E := by
+@[simp]
+theorem entries_ofSign (E : Finset ℚ) (sg : ℚ → Bool) : entries (ofSign E sg) = E := by
   ext x; simp [mem_entries, mem_ofSign]
 
-@[simp] theorem entries_plus (E : Finset ℚ) : entries (plus E) = E := entries_ofSign E fun _ => true
+@[simp]
+theorem entries_plus (E : Finset ℚ) : entries (plus E) = E := entries_ofSign E fun _ => true
 
 theorem plus_union (E E' : Finset ℚ) : plus (E ∪ E') = plus E ∪ plus E' := image_union _ _
 
@@ -86,7 +92,8 @@ theorem isRegular_ofSign (E : Finset ℚ) (sg : ℚ → Bool) : IsRegular (ofSig
 
 theorem isRegular_plus (E : Finset ℚ) : IsRegular (plus E) := isRegular_ofSign E fun _ => true
 
-theorem IsRegular.sign_eq {S : SPar} (h : IsRegular S) {x : ℚ × Bool} (hx : x ∈ S) : sign S x.1 = x.2 := by
+theorem IsRegular.sign_eq {S : SPar} (h : IsRegular S) {x : ℚ × Bool} (hx : x ∈ S)
+    : sign S x.1 = x.2 := by
   obtain ⟨a, s⟩ := x
   cases s
   · simp only [sign, decide_eq_false_iff_not]
@@ -103,7 +110,8 @@ theorem IsRegular.eq_ofSign {S : SPar} (h : IsRegular S) : S = ofSign (entries S
     obtain ⟨s, hs⟩ := mem_entries.1 h1
     have := h.sign_eq hs
     have e : x = (x.1, s) := Prod.ext rfl (by simp only at this ⊢; rw [h2, this])
-    rw [e]; exact hs
+    rw [e]
+    exact hs
 
 theorem IsRegular.card_entries {S : SPar} (h : IsRegular S) : (entries S).card = S.card :=
   card_image_of_injOn fun x hx y hy e => Prod.ext e (h x hx y hy e)
@@ -111,8 +119,9 @@ theorem IsRegular.card_entries {S : SPar} (h : IsRegular S) : (entries S).card =
 theorem isRegular_iff_card {S : SPar} : IsRegular S ↔ (entries S).card = S.card :=
   ⟨IsRegular.card_entries, fun h _ hx _ hy e => congrArg Prod.snd (card_image_iff.1 h hx hy e)⟩
 
-theorem IsRegular.union {S T : SPar} (hS : IsRegular S) (hT : IsRegular T) (h : Disjoint (entries S) (entries T)) :
-    IsRegular (S ∪ T) := by
+theorem IsRegular.union
+    {S T : SPar} (hS : IsRegular S) (hT : IsRegular T) (h : Disjoint (entries S) (entries T))
+    : IsRegular (S ∪ T) := by
   intro x hx y hy e
   rcases mem_union.1 hx with hx | hx <;> rcases mem_union.1 hy with hy | hy
   · exact hS x hx y hy e
@@ -129,12 +138,14 @@ def descList (E : Finset ℚ) : List ℚ := E.sort (· ≥ ·)
 
 def descEnum {n : ℕ} (E : Finset ℚ) (h : E.card = n) : Fin n → ℚ := fun i => E.orderEmbOfFin h i.rev
 
-def highestWeight {n : ℕ} (E : Finset ℚ) (h : E.card = n) : Fin n → ℚ :=
-  fun i => descEnum E h i - (((n : ℚ) - 1) / 2 - ((i : ℕ) : ℚ))
+def highestWeight {n : ℕ} (E : Finset ℚ) (h : E.card = n) : Fin n → ℚ := fun i =>
+  descEnum E h i - (((n : ℚ) - 1) / 2 - ((i : ℕ) : ℚ))
 
-@[simp] theorem mem_descList {E : Finset ℚ} {x : ℚ} : x ∈ descList E ↔ x ∈ E := mem_sort _
+@[simp]
+theorem mem_descList {E : Finset ℚ} {x : ℚ} : x ∈ descList E ↔ x ∈ E := mem_sort _
 
-theorem pairwise_descList (E : Finset ℚ) : (descList E).Pairwise (· > ·) := (sortedGT_sort E).pairwise
+theorem pairwise_descList (E : Finset ℚ) : (descList E).Pairwise (· > ·) :=
+  (sortedGT_sort E).pairwise
 
 theorem strictAnti_descEnum {n : ℕ} (E : Finset ℚ) (h : E.card = n) : StrictAnti (descEnum E h) :=
   fun _ _ hab => (E.orderEmbOfFin h).strictMono (Fin.rev_lt_rev.2 hab)
@@ -147,19 +158,25 @@ theorem image_descEnum {n : ℕ} (E : Finset ℚ) (h : E.card = n) : univ.image 
   · obtain ⟨i, -, rfl⟩ := mem_image.1 hx; exact descEnum_mem E h i
   · rw [card_image_of_injective _ (strictAnti_descEnum E h).injective]; simp [h]
 
-theorem descEnum_unique {n : ℕ} {E : Finset ℚ} (h : E.card = n) {f : Fin n → ℚ} (hf : StrictAnti f) (hm : ∀ i, f i ∈ E) :
-    descEnum E h = f := by
-  have := orderEmbOfFin_unique h (f := fun i => f i.rev) (fun i => hm _) fun a b hab => hf (Fin.rev_lt_rev.2 hab)
+theorem descEnum_unique
+    {n : ℕ} {E : Finset ℚ} (h : E.card = n) {f : Fin n → ℚ} (hf : StrictAnti f) (hm : ∀ i, f i ∈ E)
+    : descEnum E h = f := by
+  have :=
+    orderEmbOfFin_unique h
+      (f := fun i => f i.rev)
+      (fun i => hm _)
+      fun a b hab => hf (Fin.rev_lt_rev.2 hab)
   funext i
   simp only [descEnum, ← this, Fin.rev_rev]
 
-theorem highestWeight_int {n : ℕ} {E : Finset ℚ} (h : E.card = n) (hE : InCoset (((n : ℚ) - 1) / 2) E) (i : Fin n) :
-    ∃ z : ℤ, highestWeight E h i = z := by
+theorem highestWeight_int
+    {n : ℕ} {E : Finset ℚ} (h : E.card = n) (hE : InCoset (((n : ℚ) - 1) / 2) E) (i : Fin n)
+    : ∃ z : ℤ, highestWeight E h i = z := by
   obtain ⟨z, hz⟩ := hE _ (descEnum_mem E h i)
   exact ⟨z + (i : ℕ), by simp only [highestWeight, hz]; push_cast; ring⟩
 
-theorem highestWeight_antitone {n : ℕ} {E : Finset ℚ} (h : E.card = n) {c : ℚ} (hE : InCoset c E) :
-    Antitone (highestWeight E h) := by
+theorem highestWeight_antitone {n : ℕ} {E : Finset ℚ} (h : E.card = n) {c : ℚ} (hE : InCoset c E)
+    : Antitone (highestWeight E h) := by
   cases n with
   | zero => intro a; exact a.elim0
   | succ n =>
@@ -175,8 +192,12 @@ theorem highestWeight_antitone {n : ℕ} {E : Finset ℚ} (h : E.card = n) {c : 
     linarith
 
 theorem goodPar_iff {n p q : ℕ} {S : SPar} : GoodPar n p q S ↔ IsHC n S ∧ signature S = (p, q) := by
-  have key : ∀ (f : Fin n → ℚ) (ε : Fin n → Bool), Function.Injective f → ∀ s : Bool,
-      ((univ.image fun a => (f a, ε a)).filter fun x => x.2 = s).card = (univ.filter fun a => ε a = s).card := by
+  have key
+      : ∀ (f : Fin n → ℚ) (ε : Fin n → Bool),
+        Function.Injective f
+          → ∀ s : Bool,
+            ((univ.image fun a => (f a, ε a)).filter fun x => x.2 = s).card
+              = (univ.filter fun a => ε a = s).card := by
     intro f ε hf s
     rw [filter_image, card_image_of_injective _ fun a b h => hf (congrArg Prod.fst h)]
   constructor
@@ -203,30 +224,40 @@ theorem goodPar_iff {n p q : ℕ} {S : SPar} : GoodPar n p q S ↔ IsHC n S ∧ 
     have hS : S = univ.image fun a => (descEnum _ hc a, sign S (descEnum _ hc a)) := by
       conv_lhs => rw [hreg.eq_ofSign, ← image_descEnum _ hc, ofSign, image_image]
       rfl
-    have hanti : StrictAnti fun a => ((descEnum _ hc a : ℚ) : ℝ) :=
-      fun a b h => by simpa using strictAnti_descEnum _ hc h
-    refine ⟨fun a => (descEnum _ hc a : ℝ), fun a => sign S (descEnum _ hc a), ⟨hanti, _, fun _ => rfl, hS⟩,
-      ⟨hanti, fun a => ?_⟩, ?_, ?_⟩
+    have hanti : StrictAnti fun a => ((descEnum _ hc a : ℚ) : ℝ) := fun a b h => by
+      simpa using strictAnti_descEnum _ hc h
+    refine ⟨
+      fun a => (descEnum _ hc a : ℝ),
+      fun a => sign S (descEnum _ hc a),
+      ⟨hanti, _, fun _ => rfl, hS⟩,
+      ⟨hanti, fun a => ?_⟩,
+      ?_,
+      ?_
+    ⟩
     · obtain ⟨z, hz⟩ := hco _ (descEnum_mem _ hc a)
       exact ⟨z, by simp only [hz]; push_cast; ring⟩
     · rw [← key _ _ (strictAnti_descEnum _ hc).injective, ← hS]; exact congrArg Prod.fst hsig
     · rw [← key _ _ (strictAnti_descEnum _ hc).injective, ← hS]; exact congrArg Prod.snd hsig
 
-theorem mem_block {c x : ℚ} {t : ℕ} : x ∈ TPar.block c t ↔ ∃ a : ℕ, a < t ∧ x = c + ((t : ℚ) - 1) / 2 - a := by
+theorem mem_block {c x : ℚ} {t : ℕ}
+    : x ∈ TPar.block c t ↔ ∃ a : ℕ, a < t ∧ x = c + ((t : ℚ) - 1) / 2 - a := by
   simp only [TPar.block, mem_image, mem_range]
   exact ⟨fun ⟨a, h, e⟩ => ⟨a, h, e.symm⟩, fun ⟨a, h, e⟩ => ⟨a, h, e.symm⟩⟩
 
-@[simp] theorem card_block (c : ℚ) (t : ℕ) : (TPar.block c t).card = t := by
+@[simp]
+theorem card_block (c : ℚ) (t : ℕ) : (TPar.block c t).card = t := by
   rw [TPar.block, card_image_of_injective, card_range]
   intro a b h
   have : (a : ℚ) = b := by simp only at h; linarith
   exact_mod_cast this
 
-theorem abs_sub_le_of_mem_block {c x : ℚ} {t : ℕ} (h : x ∈ TPar.block c t) : |x - c| ≤ ((t : ℚ) - 1) / 2 := by
+theorem abs_sub_le_of_mem_block {c x : ℚ} {t : ℕ} (h : x ∈ TPar.block c t)
+    : |x - c| ≤ ((t : ℚ) - 1) / 2 := by
   obtain ⟨a, ha, rfl⟩ := mem_block.1 h
   have h1 : (a : ℚ) + 1 ≤ t := by exact_mod_cast ha
   have h0 : (0 : ℚ) ≤ a := by positivity
-  rw [abs_le]; constructor <;> linarith
+  rw [abs_le]
+  constructor <;> linarith
 
 theorem neg_mem_block {c x : ℚ} {t : ℕ} : -x ∈ TPar.block (-c) t ↔ x ∈ TPar.block c t := by
   have key : ∀ c x : ℚ, x ∈ TPar.block c t → -x ∈ TPar.block (-c) t := by
@@ -235,7 +266,8 @@ theorem neg_mem_block {c x : ℚ} {t : ℕ} : -x ∈ TPar.block (-c) t ↔ x ∈
     refine mem_block.2 ⟨t - 1 - a, by omega, ?_⟩
     have : ((t - 1 - a : ℕ) : ℚ) = t - 1 - a := by
       rw [Nat.sub_sub, Nat.cast_sub (by omega)]; push_cast; ring
-    rw [this]; ring
+    rw [this]
+    ring
   exact ⟨fun h => by simpa using key _ _ h, key _ _⟩
 
 theorem sub_mem_block {c x h : ℚ} {t : ℕ} : x - h ∈ TPar.block c t ↔ x ∈ TPar.block (c + h) t := by
@@ -256,17 +288,16 @@ def liftMinus (c : ℚ) (t : ℕ) (S : SPar) : SPar :=
   (S.image fun x => (x.1, if c < x.1 then !x.2 else x.2)) ∪ plus (TPar.block c t)
 
 inductive Orientation
-
   | pos
-
   | neg
 
 def lift : Orientation → ℚ → ℕ → SPar → SPar
   | .pos => liftPlus
   | .neg => liftMinus
 
-theorem mem_image_change {P : ℚ → Prop} [DecidablePred P] {S : SPar} {x : ℚ × Bool} :
-    x ∈ (S.image fun y => (y.1, if P y.1 then !y.2 else y.2)) ↔ (¬ P x.1 ∧ x ∈ S) ∨ (P x.1 ∧ (x.1, !x.2) ∈ S) := by
+theorem mem_image_change {P : ℚ → Prop} [DecidablePred P] {S : SPar} {x : ℚ × Bool}
+    : x ∈ (S.image fun y => (y.1, if P y.1 then !y.2 else y.2))
+      ↔ (¬ P x.1 ∧ x ∈ S) ∨ (P x.1 ∧ (x.1, !x.2) ∈ S) := by
   rw [mem_image]
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -275,25 +306,31 @@ theorem mem_image_change {P : ℚ → Prop} [DecidablePred P] {S : SPar} {x : �
     · exact ⟨x, hx, by simp [h]⟩
     · exact ⟨_, hx, by simp [h]⟩
 
-theorem mem_liftPlus {c : ℚ} {t : ℕ} {S : SPar} {x : ℚ × Bool} : x ∈ liftPlus c t S ↔
-    (c ≤ x.1 ∧ x ∈ S) ∨ (x.1 < c ∧ (x.1, !x.2) ∈ S) ∨ (x.1 ∈ TPar.block c t ∧ x.2 = true) := by
+theorem mem_liftPlus {c : ℚ} {t : ℕ} {S : SPar} {x : ℚ × Bool}
+    : x ∈ liftPlus c t S
+      ↔ (c ≤ x.1 ∧ x ∈ S) ∨ (x.1 < c ∧ (x.1, !x.2) ∈ S) ∨ (x.1 ∈ TPar.block c t ∧ x.2 = true) := by
   rw [liftPlus, mem_union, mem_image_change (P := fun y => y < c), mem_plus, not_lt, or_assoc]
 
-theorem mem_liftMinus {c : ℚ} {t : ℕ} {S : SPar} {x : ℚ × Bool} : x ∈ liftMinus c t S ↔
-    (x.1 ≤ c ∧ x ∈ S) ∨ (c < x.1 ∧ (x.1, !x.2) ∈ S) ∨ (x.1 ∈ TPar.block c t ∧ x.2 = true) := by
+theorem mem_liftMinus {c : ℚ} {t : ℕ} {S : SPar} {x : ℚ × Bool}
+    : x ∈ liftMinus c t S
+      ↔ (x.1 ≤ c ∧ x ∈ S) ∨ (c < x.1 ∧ (x.1, !x.2) ∈ S) ∨ (x.1 ∈ TPar.block c t ∧ x.2 = true) := by
   rw [liftMinus, mem_union, mem_image_change (P := fun y => c < y), mem_plus, not_lt, or_assoc]
 
-theorem lift_shift (o : Orientation) (c h : ℚ) (t : ℕ) (S : SPar) :
-    lift o (c + h) t (shift h S) = shift h (lift o c t S) := by
+theorem lift_shift (o : Orientation) (c h : ℚ) (t : ℕ) (S : SPar)
+    : lift o (c + h) t (shift h S) = shift h (lift o c t S) := by
   ext x
-  cases o <;>
-    simp only [lift, mem_liftMinus, mem_shift, mem_liftPlus, sub_mem_block, le_sub_iff_add_le, sub_lt_iff_lt_add,
-      sub_le_iff_le_add, lt_sub_iff_add_lt]
+  cases o <;> simp only [lift, mem_liftMinus, mem_shift, mem_liftPlus, sub_mem_block,
+    le_sub_iff_add_le, sub_lt_iff_lt_add, sub_le_iff_le_add, lt_sub_iff_add_lt]
 
-theorem IsRegular.lift {S : SPar} (hS : IsRegular S) (o : Orientation) {c : ℚ} {t : ℕ}
-    (h : Disjoint (entries S) (TPar.block c t)) : IsRegular (lift o c t S) := by
-  have key : ∀ (P : ℚ → Prop) [DecidablePred P],
-      IsRegular ((S.image fun y => (y.1, if P y.1 then !y.2 else y.2)) ∪ plus (TPar.block c t)) := by
+theorem IsRegular.lift
+    {S : SPar} (hS : IsRegular S)
+    (o : Orientation)
+    {c : ℚ} {t : ℕ} (h : Disjoint (entries S) (TPar.block c t))
+    : IsRegular (lift o c t S) := by
+  have key
+      : ∀ (P : ℚ → Prop) [DecidablePred P],
+        IsRegular
+          ((S.image fun y => (y.1, if P y.1 then !y.2 else y.2)) ∪ plus (TPar.block c t)) := by
     intro P _
     refine IsRegular.union ?_ (isRegular_plus _) ?_
     · intro x hx y hy e
@@ -308,20 +345,22 @@ theorem IsRegular.lift {S : SPar} (hS : IsRegular S) (o : Orientation) {c : ℚ}
 
 def ofIx {p q : ℕ} (lam : Ix p q → ℚ) : SPar := univ.image fun a => (lam a, a.isLeft)
 
-theorem mem_ofIx_ofBlocks {p q : ℕ} {l₁ l₂ : List ℚ} (hp : l₁.length = p) (hq : l₂.length = q) {x : ℚ × Bool} :
-    x ∈ ofIx (ofBlocks l₁ l₂ : Ix p q → ℚ) ↔ (x.1 ∈ l₁ ∧ x.2 = true) ∨ (x.1 ∈ l₂ ∧ x.2 = false) := by
+theorem mem_ofIx_ofBlocks
+    {p q : ℕ} {l₁ l₂ : List ℚ} (hp : l₁.length = p) (hq : l₂.length = q) {x : ℚ × Bool}
+    : x ∈ ofIx (ofBlocks l₁ l₂ : Ix p q → ℚ)
+      ↔ (x.1 ∈ l₁ ∧ x.2 = true) ∨ (x.1 ∈ l₂ ∧ x.2 = false) := by
   subst hp hq
   obtain ⟨a, s⟩ := x
-  simp only [ofIx, mem_image, mem_univ, true_and, Sum.exists, ofBlocks, Sum.isLeft_inl, Sum.isLeft_inr, Prod.mk.injEq,
-    List.mem_iff_getElem]
+  simp only [ofIx, mem_image, mem_univ, true_and, Sum.exists, ofBlocks, Sum.isLeft_inl,
+    Sum.isLeft_inr, Prod.mk.injEq, List.mem_iff_getElem]
   refine or_congr ?_ ?_ <;> constructor
   · rintro ⟨i, rfl, rfl⟩; exact ⟨⟨i, i.2, by simp⟩, rfl⟩
   · rintro ⟨⟨i, hi, rfl⟩, rfl⟩; exact ⟨⟨i, hi⟩, by simp [hi], rfl⟩
   · rintro ⟨i, rfl, rfl⟩; exact ⟨⟨i, i.2, by simp⟩, rfl⟩
   · rintro ⟨⟨i, hi, rfl⟩, rfl⟩; exact ⟨⟨i, hi⟩, by simp [hi], rfl⟩
 
-theorem isChain_descList_iff {E : Finset ℚ} {R : ℚ → ℚ → Prop} :
-    (descList E).IsChain R ↔ ∀ x ∈ E, ∀ y ∈ E, y < x → (∀ z ∈ E, ¬ (y < z ∧ z < x)) → R x y := by
+theorem isChain_descList_iff {E : Finset ℚ} {R : ℚ → ℚ → Prop}
+    : (descList E).IsChain R ↔ ∀ x ∈ E, ∀ y ∈ E, y < x → (∀ z ∈ E, ¬(y < z ∧ z < x)) → R x y := by
   have hp := List.pairwise_iff_getElem.1 (pairwise_descList E)
   rw [List.isChain_iff_getElem]
   constructor
@@ -348,23 +387,23 @@ theorem isChain_descList_iff {E : Finset ℚ} {R : ℚ → ℚ → Prop} :
       · exact absurd (hp (i + 1) k hi hk h) (not_lt.2 h1.le)
 
 inductive Letter
-
   | plus
-
   | minus
-
   | circPlus
-
   | circMinus
 
-def hePairs : List (Letter × Letter) :=
-  [(.circPlus, .plus), (.plus, .circPlus), (.minus, .circMinus), (.circMinus, .minus),
-    (.plus, .minus), (.minus, .plus), (.circPlus, .circMinus), (.circMinus, .circPlus)]
+def hePairs : List (Letter × Letter) := [
+  (.circPlus, .plus), (.plus, .circPlus), (.minus, .circMinus), (.circMinus, .minus),
+  (.plus, .minus), (.minus, .plus), (.circPlus, .circMinus), (.circMinus, .circPlus)
+]
 
 def HePair (a b : Letter) : Prop := (a, b) ∈ hePairs
 
 def letter (S T : SPar) (x : ℚ) : Letter :=
-  if x ∈ entries S then (if sign S x then .plus else .minus) else (if sign T x then .circPlus else .circMinus)
+  if x ∈ entries S then
+    (if sign S x then .plus else .minus)
+  else
+    (if sign T x then .circPlus else .circMinus)
 
 def word (S T : SPar) : List Letter := (descList (entries S ∪ entries T)).map (letter S T)
 
@@ -372,17 +411,22 @@ def HeInterlace (S T : SPar) : Prop :=
   IsRegular S ∧ IsRegular T ∧ Disjoint (entries S) (entries T) ∧ (word S T).IsChain HePair
 
 def StrictInterlace (A B : Finset ℚ) : Prop :=
-  ∃ (n : ℕ) (a : Fin (n + 1) → ℚ) (b : Fin n → ℚ), A = univ.image a ∧ B = univ.image b ∧
-    ∀ i : Fin n, b i < a i.castSucc ∧ a i.succ < b i
+  ∃ (n : ℕ) (a : Fin (n + 1) → ℚ) (b : Fin n → ℚ),
+    A = univ.image a ∧ B = univ.image b ∧ ∀ i : Fin n, b i < a i.castSucc ∧ a i.succ < b i
 
-theorem strictAnti_of_interlace {n : ℕ} {a : Fin (n + 1) → ℚ} {b : Fin n → ℚ}
-    (h : ∀ i : Fin n, b i < a i.castSucc ∧ a i.succ < b i) : StrictAnti a ∧ StrictAnti b := by
+theorem strictAnti_of_interlace
+    {n : ℕ} {a : Fin (n + 1) → ℚ} {b : Fin n → ℚ}
+    (h : ∀ i : Fin n, b i < a i.castSucc ∧ a i.succ < b i)
+    : StrictAnti a ∧ StrictAnti b := by
   have ha : StrictAnti a := Fin.strictAnti_iff_succ_lt.2 fun i => (h i).2.trans (h i).1
   refine ⟨ha, fun i j hij => ?_⟩
   exact (h j).1.trans_le ((ha.antitone (show i.succ ≤ j.castSucc from hij)).trans (h i).2.le)
 
-theorem strictInterlace_iff_descEnum {n : ℕ} {A B : Finset ℚ} (hA : A.card = n + 1) (hB : B.card = n) :
-    StrictInterlace A B ↔ ∀ i : Fin n, descEnum B hB i < descEnum A hA i.castSucc ∧ descEnum A hA i.succ < descEnum B hB i := by
+theorem strictInterlace_iff_descEnum
+    {n : ℕ} {A B : Finset ℚ} (hA : A.card = n + 1) (hB : B.card = n)
+    : StrictInterlace A B
+      ↔ ∀ i : Fin n,
+        descEnum B hB i < descEnum A hA i.castSucc ∧ descEnum A hA i.succ < descEnum B hB i := by
   constructor
   · rintro ⟨n', a, b, rfl, rfl, h⟩
     obtain ⟨ha, hb⟩ := strictAnti_of_interlace h
@@ -394,9 +438,10 @@ theorem strictInterlace_iff_descEnum {n : ℕ} {A B : Finset ℚ} (hA : A.card =
   · intro h
     exact ⟨n, _, _, (image_descEnum A hA).symm, (image_descEnum B hB).symm, h⟩
 
-theorem strictInterlace_iff {A B : Finset ℚ} : StrictInterlace A B ↔
-    Disjoint A B ∧ A.Nonempty ∧ (∀ y ∈ B, ∃ x ∈ A, y < x) ∧ (∀ y ∈ B, ∃ x ∈ A, x < y) ∧
-      ∀ x ∈ A ∪ B, ∀ y ∈ A ∪ B, y < x → (∀ z ∈ A ∪ B, ¬ (y < z ∧ z < x)) → (x ∈ A ↔ y ∉ A) := by
+theorem strictInterlace_iff {A B : Finset ℚ}
+    : StrictInterlace A B
+      ↔ Disjoint A B ∧ A.Nonempty ∧ (∀ y ∈ B, ∃ x ∈ A, y < x) ∧ (∀ y ∈ B, ∃ x ∈ A, x < y)
+        ∧ ∀ x ∈ A ∪ B, ∀ y ∈ A ∪ B, y < x → (∀ z ∈ A ∪ B, ¬(y < z ∧ z < x)) → (x ∈ A ↔ y ∉ A) := by
   constructor
   · rintro ⟨n, a, b, rfl, rfl, h⟩
     obtain ⟨ha, hb⟩ := strictAnti_of_interlace h
@@ -408,7 +453,8 @@ theorem strictInterlace_iff {A B : Finset ℚ} : StrictInterlace A B ↔
       obtain ⟨j, -, e⟩ := mem_image.1 hy
       rcases le_or_gt i j.castSucc with hij | hij
       · exact absurd ((h j).1.trans_le (ha.antitone hij)) (by rw [e]; exact lt_irrefl _)
-      · exact absurd ((ha.antitone (show j.succ ≤ i from hij)).trans_lt (h j).2) (by rw [e]; exact lt_irrefl _)
+      · exact absurd ((ha.antitone (show j.succ ≤ i from hij)).trans_lt (h j).2)
+          (by rw [e]; exact lt_irrefl _)
     refine ⟨hd, ⟨_, ma 0⟩, ?_, ?_, ?_⟩
     · intro y hy; obtain ⟨j, -, rfl⟩ := mem_image.1 hy; exact ⟨_, ma _, (h j).1⟩
     · intro y hy; obtain ⟨j, -, rfl⟩ := mem_image.1 hy; exact ⟨_, ma _, (h j).2⟩
@@ -419,8 +465,10 @@ theorem strictInterlace_iff {A B : Finset ℚ} : StrictInterlace A B ↔
         obtain ⟨j, -, rfl⟩ := mem_image.1 hya
         have hij : i < j := ha.lt_iff_gt.1 hxy
         have hi : i.1 < n := by have := j.2; have : i.1 < j.1 := hij; omega
-        exact hz (b ⟨i.1, hi⟩) (mem_union_right _ (mb _))
-          ⟨(ha.antitone (show (⟨i.1, hi⟩ : Fin n).succ ≤ j from hij)).trans_lt (h _).2, (h ⟨i.1, hi⟩).1⟩
+        exact hz (b ⟨i.1, hi⟩) (mem_union_right _ (mb _)) ⟨
+          (ha.antitone (show (⟨i.1, hi⟩ : Fin n).succ ≤ j from hij)).trans_lt (h _).2,
+          (h ⟨i.1, hi⟩).1
+        ⟩
       · intro hya
         by_contra hxa
         obtain ⟨i, -, rfl⟩ := mem_image.1 ((mem_union.1 hx).resolve_left hxa)
@@ -429,14 +477,18 @@ theorem strictInterlace_iff {A B : Finset ℚ} : StrictInterlace A B ↔
         exact hz (a i.succ) (mem_union_left _ (ma _))
           ⟨(h j).1.trans_le (ha.antitone (show i.succ ≤ j.castSucc from hij)), (h i).2⟩
   · rintro ⟨hd, ⟨x0, hx0⟩, htop, hbot, hadj⟩
-    have hc := List.isChain_iff_getElem.1 ((isChain_descList_iff (R := fun x y => x ∈ A ↔ y ∉ A)).2 hadj)
+    have hc :=
+      List.isChain_iff_getElem.1 ((isChain_descList_iff (R := fun x y => x ∈ A ↔ y ∉ A)).2 hadj)
     have hp := List.pairwise_iff_getElem.1 (pairwise_descList (A ∪ B))
-    have hm : ∀ x, x ∈ A ∪ B ↔ ∃ i, ∃ h : i < (descList (A ∪ B)).length, (descList (A ∪ B))[i] = x :=
-      fun x => by rw [← mem_descList, List.mem_iff_getElem]
+    have hm
+        : ∀ x,
+          x ∈ A ∪ B
+            ↔ ∃ i, ∃ h : i < (descList (A ∪ B)).length, (descList (A ∪ B))[i] = x := fun x => by
+      rw [← mem_descList, List.mem_iff_getElem]
     generalize descList (A ∪ B) = L at hc hp hm
     obtain ⟨i0, hi0, -⟩ := (hm x0).1 (mem_union_left _ hx0)
-    have hin : ∀ i (h : i < L.length), L[i] ∉ A → L[i] ∈ B :=
-      fun i h hA => (mem_union.1 ((hm _).2 ⟨i, h, rfl⟩)).resolve_left hA
+    have hin : ∀ i (h : i < L.length), L[i] ∉ A → L[i] ∈ B := fun i h hA =>
+      (mem_union.1 ((hm _).2 ⟨i, h, rfl⟩)).resolve_left hA
     have h0 : L[0] ∈ A := by
       by_contra hA
       obtain ⟨x, hx, hlt⟩ := htop _ (hin 0 (by omega) hA)
@@ -463,8 +515,14 @@ theorem strictInterlace_iff {A B : Finset ℚ} : StrictInterlace A B ↔
         · intro h3; by_contra h4; exact (h1.1 (h2.2 (by omega))) h3
         · intro h3; by_contra h4; have := h2.1 (h1.2 h4); omega
     have hodd := (hpar _ (by omega)).1 hl
-    refine ⟨L.length / 2, fun i => L[2 * i.1]'(by have := i.2; omega), fun i => L[2 * i.1 + 1]'(by have := i.2; omega),
-      ?_, ?_, fun i => ⟨hp _ _ _ _ (by simp), hp _ _ _ _ (by simp; omega)⟩⟩
+    refine ⟨
+      L.length / 2,
+      fun i => L[2 * i.1]'(by have := i.2; omega),
+      fun i => L[2 * i.1 + 1]'(by have := i.2; omega),
+      ?_,
+      ?_,
+      fun i => ⟨hp _ _ _ _ (by simp), hp _ _ _ _ (by simp; omega)⟩
+    ⟩
     · ext x
       simp only [mem_image, mem_univ, true_and]
       constructor
@@ -483,29 +541,17 @@ theorem strictInterlace_iff {A B : Finset ℚ} : StrictInterlace A B ↔
       · rintro ⟨i, rfl⟩; exact hin _ _ fun h => by have := (hpar _ _).1 h; omega
 
 structure GridData where
-
   k : ℕ
-
   m : ℕ
-
   t : ℕ
-
   s : ℕ
-
   ga : ℕ
-
   v : ℕ → ℤ
-
   b : ℕ → ℤ
-
   e : ℕ → ℤ
-
   cen : ℕ → ℤ
-
   two_le_k : 2 ≤ k
-
   v_anti : ∀ i j, 2 ≤ i → i < j → j ≤ k → v j < v i
-
   b_mono : ∀ i j, 1 ≤ i → i < j → j ≤ m → b i < b j
 
 namespace GridData
@@ -553,16 +599,15 @@ def blockC' (i : ℕ) : Finset ℚ := TPar.block (G.cen i : ℚ) (G.s - 1)
 def lam : SPar :=
   ((range (G.m + 1)).image fun i => (G.a i, decide (Even (G.m - i)))) ∪ plus G.cloudHalf
 
-def parD0 : SPar :=
-  plus G.cloud ∪ (Icc 1 G.m).image fun l => (-(G.b l : ℚ), decide (Even (l - 1)))
+def parD0 : SPar := plus G.cloud ∪ (Icc 1 G.m).image fun l => (-(G.b l : ℚ), decide (Even (l - 1)))
 
 def parD (i j : ℕ) : SPar :=
-  plus G.cloud ∪ ((Icc 1 G.m).image fun l => (-(G.b l : ℚ), decide (l ≤ j + 1 ∨ Even (l - j - 1)))) ∪
-    plus ((Icc 1 j).biUnion G.blockM) ∪ plus ((Icc (G.m - i + 1) G.m).biUnion G.blockC)
+  plus G.cloud ∪ ((Icc 1 G.m).image fun l => (-(G.b l : ℚ), decide (l ≤ j + 1 ∨ Even (l - j - 1))))
+    ∪ plus ((Icc 1 j).biUnion G.blockM) ∪ plus ((Icc (G.m - i + 1) G.m).biUnion G.blockC)
 
 def parPi (i : ℕ) : SPar :=
-  ((range (G.m + 1)).image fun l => (G.a l, decide (G.m - i ≤ l ∨ Even (G.m - i - l)))) ∪ plus G.cloudHalf ∪
-    plus ((Icc (G.m - i + 1) G.m).biUnion G.blockC')
+  ((range (G.m + 1)).image fun l => (G.a l, decide (G.m - i ≤ l ∨ Even (G.m - i - l))))
+    ∪ plus G.cloudHalf ∪ plus ((Icc (G.m - i + 1) G.m).biUnion G.blockC')
 
 def weightX (j : ℕ) : Finset ℚ :=
   entries G.lam ∪ (Icc 1 G.m).biUnion G.blockC' ∪ (Icc 1 j).biUnion G.blockMPlus
@@ -587,7 +632,8 @@ theorem nearMid_of_floor (h : ∀ i ∈ Icc 1 G.m, G.cen i = ⌊G.mid i⌋) : G.
   intro i hi
   have h1 := Int.floor_le (G.mid i)
   have h2 := Int.lt_floor_add_one (G.mid i)
-  rw [h i hi, abs_le]; constructor <;> linarith
+  rw [h i hi, abs_le]
+  constructor <;> linarith
 
 variable {G}
 
@@ -603,47 +649,60 @@ theorem mem_cloudHalf {x : ℚ} : x ∈ G.cloudHalf ↔ ∃ i, 2 ≤ i ∧ i ≤
 theorem mem_tops {x : ℚ} : x ∈ G.tops ↔ ∃ i, i ≤ G.m ∧ x = G.a i := by
   simp only [tops, mem_image, mem_range, Nat.lt_succ_iff, eq_comm]
 
-theorem mem_lam {x : ℚ × Bool} : x ∈ G.lam ↔
-    (∃ i, i ≤ G.m ∧ x = (G.a i, decide (Even (G.m - i)))) ∨ (x.1 ∈ G.cloudHalf ∧ x.2 = true) := by
+theorem mem_lam {x : ℚ × Bool}
+    : x ∈ G.lam
+      ↔ (∃ i, i ≤ G.m ∧ x = (G.a i, decide (Even (G.m - i))))
+        ∨ (x.1 ∈ G.cloudHalf ∧ x.2 = true) := by
   simp only [lam, mem_union, mem_image, mem_range, Nat.lt_succ_iff, mem_plus, eq_comm]
 
-theorem mem_discrete_parameter_iff {x : ℚ × Bool} : x ∈ G.parD0 ↔
-    (x.1 ∈ G.cloud ∧ x.2 = true) ∨ ∃ l, 1 ≤ l ∧ l ≤ G.m ∧ x = (-(G.b l : ℚ), decide (Even (l - 1))) := by
+theorem mem_discrete_parameter_iff {x : ℚ × Bool}
+    : x ∈ G.parD0
+      ↔ (x.1 ∈ G.cloud ∧ x.2 = true)
+        ∨ ∃ l, 1 ≤ l ∧ l ≤ G.m ∧ x = (-(G.b l : ℚ), decide (Even (l - 1))) := by
   simp only [parD0, mem_union, mem_image, mem_Icc, mem_plus, and_assoc, eq_comm]
 
-theorem mem_parD {i j : ℕ} {x : ℚ × Bool} : x ∈ G.parD i j ↔
-    (x.1 ∈ G.cloud ∧ x.2 = true) ∨
-    (∃ l, 1 ≤ l ∧ l ≤ G.m ∧ x = (-(G.b l : ℚ), decide (l ≤ j + 1 ∨ Even (l - j - 1)))) ∨
-    (∃ l, 1 ≤ l ∧ l ≤ j ∧ x.1 ∈ G.blockM l ∧ x.2 = true) ∨
-    (∃ l, G.m - i + 1 ≤ l ∧ l ≤ G.m ∧ x.1 ∈ G.blockC l ∧ x.2 = true) := by
-  simp only [parD, mem_union, mem_image, mem_Icc, mem_plus, mem_biUnion, and_assoc, or_assoc, eq_comm,
-    ← exists_and_right]
+theorem mem_parD {i j : ℕ} {x : ℚ × Bool}
+    : x ∈ G.parD i j
+      ↔ (x.1 ∈ G.cloud ∧ x.2 = true)
+        ∨ (∃ l, 1 ≤ l ∧ l ≤ G.m ∧ x = (-(G.b l : ℚ), decide (l ≤ j + 1 ∨ Even (l - j - 1))))
+        ∨ (∃ l, 1 ≤ l ∧ l ≤ j ∧ x.1 ∈ G.blockM l ∧ x.2 = true)
+        ∨ (∃ l, G.m - i + 1 ≤ l ∧ l ≤ G.m ∧ x.1 ∈ G.blockC l ∧ x.2 = true) := by
+  simp only [parD, mem_union, mem_image, mem_Icc, mem_plus, mem_biUnion, and_assoc, or_assoc,
+    eq_comm, ← exists_and_right]
 
-theorem mem_parPi {i : ℕ} {x : ℚ × Bool} : x ∈ G.parPi i ↔
-    (∃ l, l ≤ G.m ∧ x = (G.a l, decide (G.m - i ≤ l ∨ Even (G.m - i - l)))) ∨
-    (x.1 ∈ G.cloudHalf ∧ x.2 = true) ∨
-    (∃ l, G.m - i + 1 ≤ l ∧ l ≤ G.m ∧ x.1 ∈ G.blockC' l ∧ x.2 = true) := by
-  simp only [parPi, mem_union, mem_image, mem_range, Nat.lt_succ_iff, mem_Icc, mem_plus, mem_biUnion, and_assoc,
-    or_assoc, eq_comm, ← exists_and_right]
+theorem mem_parPi {i : ℕ} {x : ℚ × Bool}
+    : x ∈ G.parPi i
+      ↔ (∃ l, l ≤ G.m ∧ x = (G.a l, decide (G.m - i ≤ l ∨ Even (G.m - i - l))))
+        ∨ (x.1 ∈ G.cloudHalf ∧ x.2 = true)
+        ∨ (∃ l, G.m - i + 1 ≤ l ∧ l ≤ G.m ∧ x.1 ∈ G.blockC' l ∧ x.2 = true) := by
+  simp only [parPi, mem_union, mem_image, mem_range, Nat.lt_succ_iff, mem_Icc, mem_plus,
+    mem_biUnion, and_assoc, or_assoc, eq_comm, ← exists_and_right]
 
 variable (G)
 
 theorem entries_lam : entries G.lam = G.tops ∪ G.cloudHalf := by
   rw [lam, entries_union, entries_plus, entries, image_image]; rfl
 
-theorem entries_parD (i j : ℕ) : entries (G.parD i j) =
-    G.cloud ∪ G.lows ∪ (Icc 1 j).biUnion G.blockM ∪ (Icc (G.m - i + 1) G.m).biUnion G.blockC := by
+theorem entries_parD (i j : ℕ)
+    : entries (G.parD i j)
+      = G.cloud ∪ G.lows ∪ (Icc 1 j).biUnion G.blockM
+        ∪ (Icc (G.m - i + 1) G.m).biUnion G.blockC := by
   simp only [parD, entries_union, entries_plus]
-  rw [entries, image_image]; rfl
+  rw [entries, image_image]
+  rfl
 
-theorem entries_parPi (i : ℕ) : entries (G.parPi i) = entries G.lam ∪ (Icc (G.m - i + 1) G.m).biUnion G.blockC' := by
+theorem entries_parPi (i : ℕ)
+    : entries (G.parPi i) = entries G.lam ∪ (Icc (G.m - i + 1) G.m).biUnion G.blockC' := by
   simp only [parPi, entries_lam, entries_union, entries_plus]
-  rw [entries, image_image]; rfl
+  rw [entries, image_image]
+  rfl
 
 variable {G}
 
-theorem mem_weightX {j : ℕ} {x : ℚ} : x ∈ G.weightX j ↔ x ∈ G.tops ∨ x ∈ G.cloudHalf ∨
-    (∃ i, 1 ≤ i ∧ i ≤ G.m ∧ x ∈ G.blockC' i) ∨ ∃ l, 1 ≤ l ∧ l ≤ j ∧ x ∈ G.blockMPlus l := by
+theorem mem_weightX {j : ℕ} {x : ℚ}
+    : x ∈ G.weightX j
+      ↔ x ∈ G.tops ∨ x ∈ G.cloudHalf ∨ (∃ i, 1 ≤ i ∧ i ≤ G.m ∧ x ∈ G.blockC' i)
+        ∨ ∃ l, 1 ≤ l ∧ l ≤ j ∧ x ∈ G.blockMPlus l := by
   simp only [weightX, entries_lam, mem_union, mem_biUnion, mem_Icc, and_assoc, or_assoc]
 
 variable (G)
@@ -659,28 +718,35 @@ theorem parD_zero_zero : G.parD 0 0 = G.parD0 := by
   simp [parD, parD0, h, plus]
 
 theorem parPi_m : G.parPi G.m = G.parX 0 := by
-  simp only [parPi, parX, weightX, entries_lam, plus_union, Nat.sub_self, zero_le, true_or, decide_true, zero_add]
+  simp only [parPi, parX, weightX, entries_lam, plus_union, Nat.sub_self, zero_le, true_or,
+    decide_true, zero_add]
   simp [plus, tops, image_image, Function.comp_def]
 
 theorem weightX_succ (j : ℕ) : G.weightX (j + 1) = G.weightX j ∪ G.blockMPlus (j + 1) := by
-  rw [weightX, weightX, ← Finset.insert_Icc_right_eq_Icc_add_one (by omega), biUnion_insert, union_assoc _ _ (G.blockMPlus _),
-    union_comm (G.blockMPlus _)]
+  rw [weightX, weightX, ← Finset.insert_Icc_right_eq_Icc_add_one (by omega), biUnion_insert,
+    union_assoc _ _ (G.blockMPlus _), union_comm (G.blockMPlus _)]
 
-theorem dpar_eq {D : D7} (P : TPar D) (τ : D.what₂.Tau) (hk : G.k = D.R.k) (hm : G.m = D.R.m) (ht : G.t = P.t)
-    (hv : ∀ i, P.v τ i = G.v (i.1 + 2)) (hb : ∀ l, P.b τ l = G.b (l.1 + 1)) (he : ∀ l, P.e τ l = G.e (l.1 + 1))
-    {j : ℕ} (hj : j ≤ G.m) : P.Dpar j τ = shift (if Odd j then P.eta τ else 0) (G.parD 0 j) := by
+theorem dpar_eq
+    {D : D7} (P : TPar D) (τ : D.what₂.Tau) (hk : G.k = D.R.k) (hm : G.m = D.R.m) (ht : G.t = P.t)
+    (hv : ∀ i, P.v τ i = G.v (i.1 + 2)) (hb : ∀ l, P.b τ l = G.b (l.1 + 1))
+    (he : ∀ l, P.e τ l = G.e (l.1 + 1))
+    {j : ℕ} (hj : j ≤ G.m)
+    : P.Dpar j τ = shift (if Odd j then P.eta τ else 0) (G.parD 0 j) := by
   unfold TPar.Dpar shift
   congr 1
   ext x
   rw [mem_parD]
-  simp only [mem_union, mem_image, mem_biUnion, mem_filter, mem_univ, true_and, hv, hb, he, mem_cloud, blockM, ht,
-    or_assoc]
+  simp only [mem_union, mem_image, mem_biUnion, mem_filter, mem_univ, true_and, hv, hb, he,
+    mem_cloud, blockM, ht, or_assoc]
   refine or_congr ?_ (or_congr ?_ ?_)
   · constructor
     · rintro ⟨i, rfl⟩; exact ⟨⟨i.1 + 2, by omega, by have := i.2; omega, rfl⟩, rfl⟩
     · rintro ⟨⟨i, h1, h2, h3⟩, h4⟩
       exact ⟨⟨i - 2, by omega⟩, Prod.ext (by rw [h3]; simp only [Nat.sub_add_cancel h1]) h4.symm⟩
-  · have hs : ∀ l : ℕ, decide (l ≤ j ∨ Even (l - j)) = decide (l + 1 ≤ j + 1 ∨ Even (l + 1 - j - 1)) := fun l => by
+  · have hs
+        : ∀ l : ℕ,
+          decide (l ≤ j ∨ Even (l - j))
+            = decide (l + 1 ≤ j + 1 ∨ Even (l + 1 - j - 1)) := fun l => by
       rw [show l + 1 - j - 1 = l - j by omega]; simp
     constructor
     · rintro ⟨l, rfl⟩; exact ⟨l.1 + 1, by omega, by have := l.2; omega, by rw [hs]⟩
@@ -689,14 +755,20 @@ theorem dpar_eq {D : D7} (P : TPar D) (τ : D.what₂.Tau) (hk : G.k = D.R.k) (h
   · constructor
     · rintro ⟨l, hl, y, hy, rfl⟩; exact Or.inl ⟨l.1 + 1, by omega, by omega, hy, rfl⟩
     · rintro (⟨l, h1, h2, h3, h4⟩ | ⟨l, h1, h2, -⟩)
-      · exact ⟨⟨l - 1, by omega⟩, by simp only; omega, x.1, by simpa only [Nat.sub_add_cancel h1] using h3,
-          Prod.ext rfl h4.symm⟩
+      · exact ⟨
+          ⟨l - 1, by omega⟩,
+          by simp only; omega,
+          x.1,
+          by simpa only [Nat.sub_add_cancel h1] using h3,
+          Prod.ext rfl h4.symm
+        ⟩
       · omega
 
-def extend {n : ℕ} (d : ℕ) (f : Fin n → ℚ) (i : ℕ) : ℤ := if h : i - d < n then ⌊f ⟨i - d, h⟩⌋ else 0
+def extend {n : ℕ} (d : ℕ) (f : Fin n → ℚ) (i : ℕ) : ℤ :=
+  if h : i - d < n then ⌊f ⟨i - d, h⟩⌋ else 0
 
-theorem extend_cast {n : ℕ} (d : ℕ) {f : Fin n → ℚ} (hf : ∀ i, ∃ z : ℤ, f i = z) (i : Fin n) :
-    (extend d f (i.1 + d) : ℚ) = f i := by
+theorem extend_cast {n : ℕ} (d : ℕ) {f : Fin n → ℚ} (hf : ∀ i, ∃ z : ℤ, f i = z) (i : Fin n)
+    : (extend d f (i.1 + d) : ℚ) = f i := by
   obtain ⟨z, hz⟩ := hf i
   simp [extend, hz]
 
@@ -713,8 +785,8 @@ def ofHCParam {R : Ranks} (P : HCParam R) (s ga : ℕ) (cen : ℕ → ℤ) : Gri
   two_le_k := by have := R.m_add_three_le_k; omega
   v_anti := by
     intro i j hi hij hj
-    have hs : ∀ (a : ℕ) (h : a + 1 < R.k - 1), P.v ⟨a + 1, h⟩ < P.v ⟨a, by omega⟩ :=
-      fun a h => (P.u_gt_v ⟨a + 1, h⟩).trans (P.v_gt_u ⟨a, by omega⟩)
+    have hs : ∀ (a : ℕ) (h : a + 1 < R.k - 1), P.v ⟨a + 1, h⟩ < P.v ⟨a, by omega⟩ := fun a h =>
+      (P.u_gt_v ⟨a + 1, h⟩).trans (P.v_gt_u ⟨a, by omega⟩)
     have hA : ∀ (d a : ℕ) (h : a + d + 1 < R.k - 1), P.v ⟨a + d + 1, h⟩ < P.v ⟨a, by omega⟩ := by
       intro d
       induction d with
@@ -745,11 +817,14 @@ def ofHCParam {R : Ranks} (P : HCParam R) (s ga : ℕ) (cen : ℕ → ℤ) : Gri
     rw [show a + 1 + d + 1 = a + d + 1 + 1 by omega]
     exact_mod_cast h
 
-theorem ofHCParam_spec {R : Ranks} (P : HCParam R) (s ga : ℕ) (cen : ℕ → ℤ) :
-    (∀ i, P.v i = (ofHCParam P s ga cen).v (i.1 + 2)) ∧ (∀ l, P.b l = (ofHCParam P s ga cen).b (l.1 + 1)) ∧
-      ∀ l, P.e l = (ofHCParam P s ga cen).e (l.1 + 1) :=
-  ⟨fun i => (extend_cast 2 P.v_int i).symm, fun l => (extend_cast 1 P.b_int l).symm,
-    fun l => (extend_cast 1 P.e_int l).symm⟩
+theorem ofHCParam_spec {R : Ranks} (P : HCParam R) (s ga : ℕ) (cen : ℕ → ℤ)
+    : (∀ i, P.v i = (ofHCParam P s ga cen).v (i.1 + 2))
+      ∧ (∀ l, P.b l = (ofHCParam P s ga cen).b (l.1 + 1))
+      ∧ ∀ l, P.e l = (ofHCParam P s ga cen).e (l.1 + 1) := ⟨
+  fun i => (extend_cast 2 P.v_int i).symm,
+  fun l => (extend_cast 1 P.b_int l).symm,
+  fun l => (extend_cast 1 P.e_int l).symm
+⟩
 
 end GridData
 

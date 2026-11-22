@@ -5,13 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.G5.irr_conj {G R : Type} [Group G] [CommRing R] {m : ℕ}
-    {U : Subgroup G} {a a' : G → Matrix (Fin m) (Fin m) R} (P Q : Matrix (Fin m) (Fin m) R)
-    (hPQ : P * Q = 1) (H : ∀ g ∈ U, a g = Q * a' g * P)
-    (hirr : ∀ S : Submodule R (Fin m → R),
-      (∀ g ∈ U, ∀ v ∈ S, (a g).mulVec v ∈ S) → S = ⊥ ∨ S = ⊤)
-    (S : Submodule R (Fin m → R)) (hS : ∀ g ∈ U, ∀ v ∈ S, (a' g).mulVec v ∈ S) :
-    S = ⊥ ∨ S = ⊤ := by
+private theorem UpperTheory.Reformulated.B.G5.irr_conj
+    {G R : Type} [Group G] [CommRing R]
+    {m : ℕ} {U : Subgroup G} {a a' : G → Matrix (Fin m) (Fin m) R}
+    (P Q : Matrix (Fin m) (Fin m) R) (hPQ : P * Q = 1) (H : ∀ g ∈ U, a g = Q * a' g * P)
+    (hirr : ∀ S : Submodule R (Fin m → R), (∀ g ∈ U, ∀ v ∈ S, (a g).mulVec v ∈ S) → S = ⊥ ∨ S = ⊤)
+    (S : Submodule R (Fin m → R)) (hS : ∀ g ∈ U, ∀ v ∈ S, (a' g).mulVec v ∈ S)
+    : S = ⊥ ∨ S = ⊤ := by
   have key : ∀ v : Fin m → R, P.mulVec (Q.mulVec v) = v := fun v => by
     rw [Matrix.mulVec_mulVec, hPQ, Matrix.one_mulVec]
   have mem : ∀ v : Fin m → R, v ∈ S.comap P.mulVecLin ↔ P.mulVec v ∈ S := fun v => Iff.rfl
@@ -33,10 +33,11 @@ private theorem UpperTheory.Reformulated.B.G5.irr_conj {G R : Type} [Group G] [C
     have h2 : Q.mulVec v ∈ S.comap P.mulVecLin := by rw [h1]; exact Submodule.mem_top
     rwa [mem, key] at h2
 
-theorem UpperTheory.Reformulated.B.G5.matIrr_conj :
-    ∀ {G R : Type} [inst : Group G] [inst_1 : CommRing R] {m : ℕ}
-    {U : Subgroup G} {a a' : G → Matrix (Fin m) (Fin m) R} (h : GL (Fin m) R),
-    (∀ g ∈ U, a g = (↑h⁻¹ : Matrix (Fin m) (Fin m) R) * a' g * (↑h : Matrix (Fin m) (Fin m) R)) →
-      UpperTheory.V.U3.MatIrr U a → UpperTheory.V.U3.MatIrr U a' := by
+theorem UpperTheory.Reformulated.B.G5.matIrr_conj
+    : ∀ {G R : Type} [inst : Group G] [inst_1 : CommRing R] {m : ℕ} {U : Subgroup G}
+        {a a' : G → Matrix (Fin m) (Fin m) R} (h : GL (Fin m) R),
+      (∀ g ∈ U, a g = (↑h⁻¹ : Matrix (Fin m) (Fin m) R) * a' g * (↑h : Matrix (Fin m) (Fin m) R))
+        → UpperTheory.V.U3.MatIrr U a
+        → UpperTheory.V.U3.MatIrr U a' := by
   intro G R _ _ m U a a' h H hirr
   exact UpperTheory.Reformulated.B.G5.irr_conj _ _ (Units.mul_inv h) H hirr

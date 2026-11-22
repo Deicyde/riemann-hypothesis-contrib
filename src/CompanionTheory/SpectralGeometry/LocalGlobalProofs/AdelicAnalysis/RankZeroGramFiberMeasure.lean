@@ -5,16 +5,18 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.GramEmpty
 
-theorem fibre_eq_dirac_of_unique {V X : Type} [MeasurableSpace V] [MeasurableSpace X] [Subsingleton V]
-    [Subsingleton X] (μ : Measure V) (ν : Measure X) (m : X → Measure V) (x₀ : V)
-    (hμ : μ Set.univ = 1) (hν : ν Set.univ = 1)
-    (h : ∀ φ : V → ℝ≥0∞, Measurable φ → ∫⁻ v, φ v ∂μ = ∫⁻ b, ∫⁻ v, φ v ∂(m b) ∂ν) (S : X) :
-    m S = Measure.dirac x₀ := by
+theorem fibre_eq_dirac_of_unique
+    {V X : Type} [MeasurableSpace V] [MeasurableSpace X] [Subsingleton V] [Subsingleton X]
+    (μ : Measure V) (ν : Measure X) (m : X → Measure V)
+    (x₀ : V) (hμ : μ Set.univ = 1) (hν : ν Set.univ = 1)
+    (h : ∀ φ : V → ℝ≥0∞, Measurable φ → ∫⁻ v, φ v ∂μ = ∫⁻ b, ∫⁻ v, φ v ∂(m b) ∂ν) (S : X)
+    : m S = Measure.dirac x₀ := by
   have h1 := h (fun _ => 1) measurable_const
   have hc : (fun b => ∫⁻ _, (1 : ℝ≥0∞) ∂(m b)) = fun _ => m S Set.univ := by
     funext b
@@ -31,7 +33,20 @@ theorem fibre_eq_dirac_of_unique {V X : Type} [MeasurableSpace V] [MeasurableSpa
 end GlobalTheory.CompanionTheory.SW.GramEmpty
 
 open GlobalTheory.CompanionTheory.SW.GramEmpty in
-theorem GlobalTheory.CompanionTheory.SW.GramEmpty.fibre_gram_zero : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R], IsLocR R → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ (lam : Measure R), lam.IsAddHaarMeasure → ∀ m, IsGramFib R σ J 0 (coordW R b lam 0 M) (coordHerm R σ b lam 0) m → ∀ S, m S = Measure.dirac (fun a => a.elim0) := by
+theorem GlobalTheory.CompanionTheory.SW.GramEmpty.fibre_gram_zero
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
+          IsHermND σ J
+            → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R]
+                [BorelSpace R],
+              IsLocR R
+                → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ (lam : Measure R),
+                  lam.IsAddHaarMeasure
+                    → ∀ m,
+                      IsGramFib R σ J 0 (coordW R b lam 0 M) (coordHerm R σ b lam 0) m
+                        → ∀ S, m S = Measure.dirac (fun a => a.elim0) := by
   intro F E _ _ _ _ _ σ _ M J _ R _ _ _ _ _ _ d b lam _ m hm S
   obtain ⟨-, h2, -⟩ := hm
   haveI : Subsingleton (HermR R σ 0) :=
@@ -47,10 +62,13 @@ theorem GlobalTheory.CompanionTheory.SW.GramEmpty.fibre_gram_zero : ∀ (F E : T
   have hν : coordHerm R σ b lam 0 Set.univ = 1 := by
     unfold coordHerm
     rw [Measure.comap_apply _ (Function.injective_of_subsingleton _)
-      (fun s _ => Subsingleton.measurableSet) _ MeasurableSet.univ]
-    have : (Set.univ : Set ((Fin 0 → R) × ({p : Fin 0 × Fin 0 // p.1 < p.2} → R ⊗[F] E))) =
-        Set.univ ×ˢ Set.univ := by simp
-    rw [Set.image_univ_of_surjective, this, Measure.prod_prod, Measure.pi_of_empty, Measure.pi_of_empty]
+      (fun s _ => Subsingleton.measurableSet)
+      _ MeasurableSet.univ]
+    have : (Set.univ : Set ((Fin 0 → R) × ({p : Fin 0 × Fin 0 // p.1 < p.2} → R ⊗[F] E)))
+        = Set.univ ×ˢ Set.univ := by
+      simp
+    rw [Set.image_univ_of_surjective, this, Measure.prod_prod, Measure.pi_of_empty,
+      Measure.pi_of_empty]
     · simp
     · intro y
       exact ⟨0, Subsingleton.elim _ _⟩

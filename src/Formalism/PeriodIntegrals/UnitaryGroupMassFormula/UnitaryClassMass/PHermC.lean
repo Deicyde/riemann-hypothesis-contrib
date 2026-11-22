@@ -18,18 +18,22 @@ theorem wPlace : WPlace := by
 
 theorem bcU : BcU := by
   intro F E _ _ _ σ M J R _ _ g hg
-  have key : ∀ A : Matrix (Fin M) (Fin M) E,
-      PI.UnitaryApproxDefs.cT (PI.UnitaryApproxDefs.sigR σ R)
-          (A.map (PI.UnitaryApproxDefs.inclE (F := F) R)) =
-        (PI.UnitaryApproxDefs.cT (σ : E →+* E) A).map (PI.UnitaryApproxDefs.inclE (F := F) R) := by
+  have key
+      : ∀ A : Matrix (Fin M) (Fin M) E,
+        PI.UnitaryApproxDefs.cT (PI.UnitaryApproxDefs.sigR σ R)
+            (A.map (PI.UnitaryApproxDefs.inclE (F := F) R))
+          = (PI.UnitaryApproxDefs.cT (σ : E →+* E) A).map
+            (PI.UnitaryApproxDefs.inclE (F := F) R) := by
     intro A
     ext i j
     simp [PI.UnitaryApproxDefs.cT, PI.UnitaryApproxDefs.sigR, PI.UnitaryApproxDefs.inclE]
-  have hg' : PI.UnitaryApproxDefs.cT (σ : E →+* E) (g : Matrix (Fin M) (Fin M) E) * J *
-      (g : Matrix (Fin M) (Fin M) E) = J := hg
+  have hg'
+      : PI.UnitaryApproxDefs.cT (σ : E →+* E) (g : Matrix (Fin M) (Fin M) E) * J
+          * (g : Matrix (Fin M) (Fin M) E)
+        = J :=
+    hg
   change PI.UnitaryApproxDefs.cT _ _ * _ * _ = _
-  simp only [Units.coe_map, MonoidHom.coe_coe, RingHom.toMonoidHom_eq_coe,
-    RingHom.mapMatrix_apply]
+  simp only [Units.coe_map, MonoidHom.coe_coe, RingHom.toMonoidHom_eq_coe, RingHom.mapMatrix_apply]
   rw [key, ← Matrix.map_mul, ← Matrix.map_mul, hg']
 
 theorem gramOK : GramOK := by
@@ -57,7 +61,7 @@ theorem gramOK : GramOK := by
       generalize hwd : (∑ j, c j • b j) = w at hbw ⊢
       rw [← b.sum_repr x]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, hbw, smul_zero,
+      simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, hbw, smul_zero,
         Finset.sum_const_zero]
     have hw0 := hnd.2 _ hw
     funext j

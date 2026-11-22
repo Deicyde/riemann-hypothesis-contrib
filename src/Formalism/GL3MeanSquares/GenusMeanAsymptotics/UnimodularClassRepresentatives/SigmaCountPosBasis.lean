@@ -19,17 +19,20 @@ variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberFi
 variable {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 variable {κ : Type} [Fintype κ] [DecidableEq κ]
 
-theorem exists_arch {S : Subring K} {ϖ : K} (hS : IsLocUnif S ϖ) {α : Type*} [Fintype α] (f : α → K) :
-    ∃ l : ℕ, ∀ a, ϖ ^ l * f a ∈ S := by
+theorem exists_arch {S : Subring K} {ϖ : K} (hS : IsLocUnif S ϖ) {α : Type*} [Fintype α] (f : α → K)
+    : ∃ l : ℕ, ∀ a, ϖ ^ l * f a ∈ S := by
   classical
   choose l hl using fun a => hS.arch (f a)
   refine ⟨∑ a, l a, fun a => ?_⟩
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a), add_comm, pow_add, mul_assoc]
   exact S.mul_mem (pow_mem hS _) (hl a)
 
-theorem exists_isE (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K}
-    (hd : ∀ x, h x x = 0 → x = 0) (b : Basis κ K V) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    ∃ e, IsE h (locF 𝔭 (spanO b)) 𝔭 e := by
+theorem exists_isE
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hd : ∀ x, h x x = 0 → x = 0)
+    (b : Basis κ K V)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ e, IsE h (locF 𝔭 (spanO b)) 𝔭 e := by
   classical
   have : 𝔭.IsPrime := h𝔭.isPrime
   let f := algebraMap (𝓞 F) (𝓞 K)
@@ -37,8 +40,8 @@ theorem exists_isE (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : Is
   let a := (gramK h b)⁻¹
   have hdet : IsUnit (gramK h b).det := isUnit_iff_ne_zero.2 (gramK_det_ne_zero hd b)
   -- Clear the denominators of all entries of the inverse Gram matrix at once.
-  obtain ⟨n, hn, ha⟩ := exists_integral_multiples ℤ ℚ
-    (Finset.univ.image (fun p : κ × κ => a p.1 p.2))
+  obtain ⟨n, hn, ha⟩ :=
+    exists_integral_multiples ℤ ℚ (Finset.univ.image (fun p : κ × κ => a p.1 p.2))
   have hentry (i j : κ) : ∃ z : 𝓞 K, g z = (n : K) * a i j := by
     have hi := ha (a i j) (Finset.mem_image.mpr ⟨(i, j), Finset.mem_univ _, rfl⟩)
     exact ⟨⟨n • a i j, hi⟩, by simp [g, zsmul_eq_mul]⟩
@@ -100,9 +103,12 @@ theorem exists_isE (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : Is
   rw [hprod, show g (f w * z * y) • b i = (f w * z * y) • b i from algebraMap_smul K _ _]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem isE_eA (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K}
-    (hd : ∀ x, h x x = 0 → x = 0) (b : Basis κ K V) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    IsE h (locF 𝔭 (spanO b)) 𝔭 (eA h (locF 𝔭 (spanO b)) 𝔭) :=
+theorem isE_eA
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hd : ∀ x, h x x = 0 → x = 0)
+    (b : Basis κ K V)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : IsE h (locF 𝔭 (spanO b)) 𝔭 (eA h (locF 𝔭 (spanO b)) 𝔭) :=
   Nat.sInf_mem (s := {e | IsE h (locF 𝔭 (spanO b)) 𝔭 e}) (exists_isE hK hF hd b h𝔭)
 
 end Formalism.HermitianLattices.Ext.L3.HU

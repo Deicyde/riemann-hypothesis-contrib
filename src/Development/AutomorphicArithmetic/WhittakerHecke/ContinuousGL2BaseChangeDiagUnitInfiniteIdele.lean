@@ -10,13 +10,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 
-theorem UpperTheory.continuous_GL2BaseChange_diagUnit_infiniteIdele :
-    ∀ (E : Type) [Field E] [NumberField E], Continuous (em E) ∧ Continuous (dM : (A ℚ)ˣ → GL (Fin 2) (A ℚ)) ∧ Continuous (fun t : ℝ => iy (Real.exp t)) := by
+theorem UpperTheory.continuous_GL2BaseChange_diagUnit_infiniteIdele
+    : ∀ (E : Type) [Field E] [NumberField E],
+      Continuous (em E) ∧ Continuous (dM : (A ℚ)ˣ → GL (Fin 2) (A ℚ))
+        ∧ Continuous (fun t : ℝ => iy (Real.exp t)) := by
   intro E _ _
   refine ⟨?_, ?_, ?_⟩
   · have hc : Continuous (AdeleBaseChange.adeleMap ℚ E) := AdeleBaseChange.continuous_adeleMap
@@ -36,10 +40,12 @@ theorem UpperTheory.continuous_GL2BaseChange_diagUnit_infiniteIdele :
       · exact continuous_const
       · exact continuous_const
       · exact Units.continuous_coe_inv
-  · let u : ℝ → (TR.Rinf ℚ)ˣ := fun t =>
-      ⟨fun _ => Real.exp t, fun _ => (Real.exp t)⁻¹,
-        funext fun _ => mul_inv_cancel₀ (Real.exp_ne_zero t),
-        funext fun _ => inv_mul_cancel₀ (Real.exp_ne_zero t)⟩
+  · let u : ℝ → (TR.Rinf ℚ)ˣ := fun t => ⟨
+      fun _ => Real.exp t,
+      fun _ => (Real.exp t)⁻¹,
+      funext fun _ => mul_inv_cancel₀ (Real.exp_ne_zero t),
+      funext fun _ => inv_mul_cancel₀ (Real.exp_ne_zero t)
+    ⟩
     have hu : Continuous u := by
       refine Units.continuous_iff.2 ⟨?_, ?_⟩
       · exact continuous_pi fun _ => Real.continuous_exp

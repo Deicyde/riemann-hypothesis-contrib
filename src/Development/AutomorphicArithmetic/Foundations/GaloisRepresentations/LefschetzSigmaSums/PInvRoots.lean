@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open UpperTheory.Gal.LocalSmoothExtension
 
 open Polynomial in
-private theorem rev_lin (r : ℂ) (hr : r ≠ 0) :
-    (X - C r : ℂ[X]).reverse = C (-r) * (X - C r⁻¹) := by
+private theorem rev_lin (r : ℂ) (hr : r ≠ 0) : (X - C r : ℂ[X]).reverse = C (-r) * (X - C r⁻¹) := by
   have h1 : (C (-r) * (X - C r⁻¹) : ℂ[X]) = 1 - C r * X := by
     rw [mul_sub, ← C_mul]
     simp [hr]
@@ -26,8 +25,8 @@ private theorem rev_lin (r : ℂ) (hr : r ≠ 0) :
     simp [coeff_X, coeff_one, coeff_C]
 
 open Polynomial in
-private theorem rev_prod (s : Multiset ℂ) (hs : ∀ z ∈ s, z ≠ 0) :
-    ((s.map (fun a => X - C a)).prod : ℂ[X]).reverse.roots = s.map (fun z => z⁻¹) := by
+private theorem rev_prod (s : Multiset ℂ) (hs : ∀ z ∈ s, z ≠ 0)
+    : ((s.map (fun a => X - C a)).prod : ℂ[X]).reverse.roots = s.map (fun z => z⁻¹) := by
   induction s using Multiset.induction_on with
   | empty =>
     rw [Multiset.map_zero, Multiset.prod_zero, ← C_1, reverse_C, roots_C, Multiset.map_zero]
@@ -45,8 +44,8 @@ private theorem rev_prod (s : Multiset ℂ) (hs : ∀ z ∈ s, z ≠ 0) :
       Multiset.map_cons, Multiset.singleton_add]
 
 open Polynomial in
-private theorem rev_roots (Q : ℂ[X]) (h0 : Q.coeff 0 ≠ 0) :
-    Q.reverse.roots = Q.roots.map (fun z => z⁻¹) := by
+private theorem rev_roots (Q : ℂ[X]) (h0 : Q.coeff 0 ≠ 0)
+    : Q.reverse.roots = Q.roots.map (fun z => z⁻¹) := by
   have hQ : Q ≠ 0 := fun h => h0 (by simp [h])
   have hc : Multiset.card Q.roots = Q.natDegree := IsAlgClosed.card_roots_eq_natDegree
   have hf := C_leadingCoeff_mul_prod_multiset_X_sub_C hc
@@ -58,8 +57,7 @@ private theorem rev_roots (Q : ℂ[X]) (h0 : Q.coeff 0 ≠ 0) :
   rw [reverse_mul_of_domain, reverse_C, roots_C_mul _ hl, rev_prod _ hz]
 
 open Polynomial in
-theorem UpperTheory.Gal.LocalSmoothExtension.invRoots_of :
-    InvRoots := by
+theorem UpperTheory.Gal.LocalSmoothExtension.invRoots_of : InvRoots := by
   intro F _ _ P h0 τ
   have hτ : τ (P.coeff 0) ≠ 0 := by simpa using h0
   have hmap : (P.map τ).coeff 0 ≠ 0 := by simpa [coeff_map] using h0

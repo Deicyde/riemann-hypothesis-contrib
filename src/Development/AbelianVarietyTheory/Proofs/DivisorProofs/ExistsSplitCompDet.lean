@@ -16,35 +16,45 @@ open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField 
 open scoped Pointwise nonZeroDivisors
 open Formalism.L2.Host (HChar embTau)
 open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 
 noncomputable section
 
 namespace GlobalTheory.FunObj.NormUniq.SplitDet
 
-theorem exists_splitComp_det : ∀ {D : D7} {N : ℕ} {𝔪 : Ideal (𝓞 D.host.E)} {k : GA D N}, k ∈ intG D N → CongOne D 𝔪 k →
-    SuppSplit D (k : GL (Fin N) (AE D)) → ∃ x : (AE D)ˣ, IntU D x ∧
-      (∀ q : ℕ, q.Prime → InertQ D q → ZeroAt D q ((x : AE D) - 1)) ∧
-      x = Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) * sgU D x ∧
-      (x : AE D) - 1 ∈ hatId D 𝔪 ∧ (x : AE D) - 1 ∈ hatId D (D.host.conj • 𝔪) := by
+theorem exists_splitComp_det
+    : ∀ {D : D7} {N : ℕ} {𝔪 : Ideal (𝓞 D.host.E)} {k : GA D N},
+      k ∈ intG D N → CongOne D 𝔪 k → SuppSplit D (k : GL (Fin N) (AE D))
+        → ∃ x : (AE D)ˣ,
+          IntU D x ∧ (∀ q : ℕ, q.Prime → InertQ D q → ZeroAt D q ((x : AE D) - 1))
+            ∧ x = Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) * sgU D x
+            ∧ (x : AE D) - 1 ∈ hatId D 𝔪 ∧ (x : AE D) - 1 ∈ hatId D (D.host.conj • 𝔪) := by
   intro D N 𝔪 k hk hc hs
   have hint := (mem_intG k).1 hk
   have huO : ((Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) : (AE D)ˣ) : AE D) ∈ OhE D :=
     VacMove.det_int D _ hint
   have hn := VacMove.det_norm D k
-  have hm1 : ((Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) : (AE D)ˣ) : AE D) - 1 ∈ hatId D 𝔪 := by
+  have hm1
+      : ((Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) : (AE D)ˣ) : AE D) - 1
+        ∈ hatId D 𝔪 := by
     rw [Matrix.GeneralLinearGroup.val_det_apply]
-    exact GlobalTheory.FunObj.StdDatum.DetCong.det_sub_one_mem_hatId_of _ (fun i j => (hint i j).1) hc
-  have hz : ∀ q : ℕ, q.Prime → InertQ D q →
-      ZeroAt D q (((Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) : (AE D)ˣ) : AE D) - 1) :=
+    exact
+      GlobalTheory.FunObj.StdDatum.DetCong.det_sub_one_mem_hatId_of _ (fun i j => (hint i j).1) hc
+  have hz
+      : ∀ q : ℕ,
+        q.Prime → InertQ D q
+          → ZeroAt D q
+            (((Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) : (AE D)ˣ) : AE D) - 1) :=
     fun q hq hi => GlobalTheory.VacuumScalar.zeroAt_det hq (hs q hq hi)
   set U := Matrix.GeneralLinearGroup.det (k : GL (Fin N) (AE D)) with hU
   set u : AE D := (U : AE D) with hu
   have hm2 : u - 1 ∈ hatId D (D.host.conj • 𝔪) := by
-    have e : u - 1 = -(u * sgA D (u - 1)) := by
-      rw [map_sub, map_one, mul_sub, hn]; ring
+    have e : u - 1 = -(u * sgA D (u - 1)) := by rw [map_sub, map_one, mul_sub, hn]; ring
     rw [e]
-    exact neg_mem (GlobalTheory.FunObj.StdDatum.mul_mem_hatId huO (GlobalTheory.FunObj.StdDatum.DetCong.sgA_mem_hatId hm1))
+    exact neg_mem (GlobalTheory.FunObj.StdDatum.mul_mem_hatId huO
+      (GlobalTheory.FunObj.StdDatum.DetCong.sgA_mem_hatId hm1))
   obtain ⟨ε, hε, h1, h2, h3⟩ := VacMove.exists_half_idem D
   have h1' : sgA D ε * sgA D ε = sgA D ε := by rw [← map_mul, h1]
   have hεε : sgA D (sgA D ε) = ε := VacMove.sgA_sgA D ε

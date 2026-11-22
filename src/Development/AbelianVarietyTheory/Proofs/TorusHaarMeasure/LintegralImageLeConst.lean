@@ -10,24 +10,30 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace GlobalTheory.FrameLoc
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
-  MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 noncomputable section
 
-theorem lintegral_image_le_const {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
-    [FiniteDimensional ℝ F] [MeasurableSpace F] [BorelSpace F] (μ : Measure F) [μ.IsAddHaarMeasure]
-    {Θ : F → F} (hΘ : ContDiff ℝ 1 Θ) {A : Set F} (hA : MeasurableSet A) {M : ℝ}
-    (hM : A ⊆ Metric.closedBall 0 M) (hinj : Set.InjOn Θ A) :
-    ∃ K : ℝ≥0∞, K < ⊤ ∧ ∀ G : F → ℝ≥0∞, ∫⁻ x in Θ '' A, G x ∂μ ≤ K * ∫⁻ y in A, G (Θ y) ∂μ := by
+theorem lintegral_image_le_const
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] [FiniteDimensional ℝ F] [MeasurableSpace F]
+    [BorelSpace F]
+    (μ : Measure F) [μ.IsAddHaarMeasure]
+    {Θ : F → F} (hΘ : ContDiff ℝ 1 Θ)
+    {A : Set F} (hA : MeasurableSet A)
+    {M : ℝ} (hM : A ⊆ Metric.closedBall 0 M)
+    (hinj : Set.InjOn Θ A)
+    : ∃ K : ℝ≥0∞, K < ⊤ ∧ ∀ G : F → ℝ≥0∞, ∫⁻ x in Θ '' A, G x ∂μ ≤ K * ∫⁻ y in A, G (Θ y) ∂μ := by
   have hc : Continuous fun y => |(fderiv ℝ Θ y).det| :=
     (ContinuousLinearMap.continuous_det.comp (hΘ.continuous_fderiv (by simp))).abs
   haveI : ProperSpace F := FiniteDimensional.proper ℝ F
   obtain ⟨C, hC⟩ := (isCompact_closedBall (0 : F) M).bddAbove_image hc.continuousOn
   refine ⟨ENNReal.ofReal C, ENNReal.ofReal_lt_top, fun G => ?_⟩
   rw [lintegral_image_eq_lintegral_abs_det_fderiv_mul μ hA (f' := fderiv ℝ Θ)
-    (fun x _ => ((hΘ.differentiable (by simp)) x).hasFDerivAt.hasFDerivWithinAt) hinj,
+      (fun x _ => ((hΘ.differentiable (by simp)) x).hasFDerivAt.hasFDerivWithinAt)
+      hinj,
     ← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
   refine setLIntegral_mono' hA fun y hy => ?_
   gcongr
@@ -36,16 +42,17 @@ theorem lintegral_image_le_const {F : Type*} [NormedAddCommGroup F] [NormedSpace
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
 def lowPart (y : Frame X.Ψ r) : V (nd X) :=
-  WithLp.toLp 2 fun j => y ((Fintype.equivFin (Ent X)).symm j).1
-    ((Fintype.equivFin (Ent X)).symm j).2.1.1 ((Fintype.equivFin (Ent X)).symm j).2.1.2
+  WithLp.toLp 2 fun j =>
+    y ((Fintype.equivFin (Ent X)).symm j).1 ((Fintype.equivFin (Ent X)).symm j).2.1.1
+      ((Fintype.equivFin (Ent X)).symm j).2.1.2
 
 def upPart (y : Frame X.Ψ r) : Frame X.Ψ r := fun τ a c => if c < a then 0 else y τ a c
 
 def glue (z : V (nd X)) (b : Frame X.Ψ r) : Frame X.Ψ r := fun τ a c =>
   if h : c < a then z ((Fintype.equivFin (Ent X)) ⟨τ, ⟨(a, c), h⟩⟩) else b τ a c
 
-theorem lowPart_apply (y : Frame X.Ψ r) (τ : X.Ψ) (a c : Fin r) (h : c < a) :
-    lowPart X y ((Fintype.equivFin (Ent X)) ⟨τ, ⟨(a, c), h⟩⟩) = y τ a c := by
+theorem lowPart_apply (y : Frame X.Ψ r) (τ : X.Ψ) (a c : Fin r) (h : c < a)
+    : lowPart X y ((Fintype.equivFin (Ent X)) ⟨τ, ⟨(a, c), h⟩⟩) = y τ a c := by
   simp [lowPart]
 
 theorem lowPart_glue (z : V (nd X)) (b : Frame X.Ψ r) : lowPart X (glue X z b) = z := by
@@ -55,15 +62,16 @@ theorem lowPart_glue (z : V (nd X)) (b : Frame X.Ψ r) : lowPart X (glue X z b) 
   simp only [glue]
   rw [dite_eq_left h]
 
-theorem upPart_glue (z : V (nd X)) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) :
-    upPart X (glue X z b) = b := by
+theorem upPart_glue (z : V (nd X)) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r)
+    : upPart X (glue X z b) = b := by
   funext τ a c
   by_cases h : c < a
   · simp [upPart, h, (hb τ).2 a c h]
   · simp [upPart, glue, h]
 
-theorem eq_of_parts {y y' : Frame X.Ψ r} (h1 : lowPart X y = lowPart X y')
-    (h2 : upPart X y = upPart X y') : y = y' := by
+theorem eq_of_parts
+    {y y' : Frame X.Ψ r} (h1 : lowPart X y = lowPart X y') (h2 : upPart X y = upPart X y')
+    : y = y' := by
   funext τ a c
   by_cases h : c < a
   · rw [← lowPart_apply X y τ a c h, ← lowPart_apply X y' τ a c h, h1]
@@ -76,16 +84,15 @@ theorem contDiff_lowPart : ContDiff ℝ 1 (lowPart X) := by
   simp only
   fun_prop
 
-theorem contDiff_upPart_entry (τ : X.Ψ) (a c : Fin r) :
-    ContDiff ℝ 1 fun y => upPart X y τ a c := by
+theorem contDiff_upPart_entry (τ : X.Ψ) (a c : Fin r) : ContDiff ℝ 1 fun y => upPart X y τ a c := by
   unfold upPart
   split_ifs
   · exact contDiff_const
   · fun_prop
 
 theorem continuous_upPart : Continuous (upPart X) :=
-  continuous_pi fun τ => continuous_pi fun a => continuous_pi fun c =>
-    (contDiff_upPart_entry X τ a c).continuous
+  continuous_pi fun τ =>
+    continuous_pi fun a => continuous_pi fun c => (contDiff_upPart_entry X τ a c).continuous
 
 def theta (x1 y : Frame X.Ψ r) : Frame X.Ψ r := rmul (cpt X x1 (lowPart X y)) (upPart X y)
 
@@ -98,14 +105,16 @@ theorem contDiff_theta (x1 : Frame X.Ψ r) : ContDiff ℝ 1 (theta X x1) := by
     (contDiff_lowPart X))
 
 theorem measurableSet_Bor : MeasurableSet (Bor X.Ψ r) := by
-  have : Bor X.Ψ r = ⋂ τ, ({b : Frame X.Ψ r | (mat b τ).det ≠ 0} ∩
-      ⋂ a, ⋂ c, ⋂ (_ : c < a), {b : Frame X.Ψ r | b τ a c = 0}) := by
+  have : Bor X.Ψ r
+      = ⋂ τ, ({b : Frame X.Ψ r | (mat b τ).det ≠ 0} ∩
+        ⋂ a, ⋂ c, ⋂ (_ : c < a), {b : Frame X.Ψ r | b τ a c = 0}) := by
     ext b; simp [Bor]
   rw [this]
   refine MeasurableSet.iInter fun τ => MeasurableSet.inter ?_ ?_
   · have hM : Continuous fun b : Frame X.Ψ r => mat b τ := continuous_apply τ
     exact (isOpen_ne_fun hM.matrix_det continuous_const).measurableSet
-  · refine MeasurableSet.iInter fun a => MeasurableSet.iInter fun c => MeasurableSet.iInter fun _ => ?_
+  · refine MeasurableSet.iInter fun a =>
+      MeasurableSet.iInter fun c => MeasurableSet.iInter fun _ => ?_
     exact (isClosed_eq (by fun_prop) continuous_const).measurableSet
 
 end
@@ -114,8 +123,9 @@ end GlobalTheory.FrameLoc
 
 namespace GlobalTheory
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
-  MeasureTheory Topology GlobalTheory.FrameLoc
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology GlobalTheory.FrameLoc
 open scoped ContDiff ENNReal Matrix
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]

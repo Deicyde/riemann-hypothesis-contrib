@@ -6,11 +6,13 @@ public import Mathlib
 
 namespace Bl.general_b_fact_upper_alt_form
 
-theorem goal1 :
-  ∀ {K : Type} [inst : Field.{0} K] {n k : Type} [Fintype.{0} n] [DecidableEq.{1} n] [inst_3 : Fintype.{0} k]
-  [DecidableEq.{1} k] (f : RingHom.{0, 0} K Complex) (A : Matrix.{0, 0, 0} n k K),
-  Function.Injective.{1, 1} (Matrix.mulVec.{0, 0, 0} A) →
-    Function.Injective.{1, 1} (Matrix.mulVec.{0, 0, 0} (Matrix.map.{0, 0, 0, 0} A (DFunLike.coe.{1, 1, 1} f))) := by
+theorem goal1
+    : ∀ {K : Type} [inst : Field.{0} K] {n k : Type} [Fintype.{0} n] [DecidableEq.{1} n]
+        [inst_3 : Fintype.{0} k] [DecidableEq.{1} k] (f : RingHom.{0, 0} K Complex)
+        (A : Matrix.{0, 0, 0} n k K),
+      Function.Injective.{1, 1} (Matrix.mulVec.{0, 0, 0} A)
+        → Function.Injective.{1, 1} (Matrix.mulVec.{0, 0, 0} (Matrix.map.{0, 0, 0, 0} A
+          (DFunLike.coe.{1, 1, 1} f))) := by
   intro K _ n k _ _ _ _ f A hA
   have hker : LinearMap.ker (Matrix.toLin' A) = ⊥ :=
     LinearMap.ker_eq_bot.mpr (fun x y hxy => hA (by simpa only [Matrix.toLin'_apply] using hxy))

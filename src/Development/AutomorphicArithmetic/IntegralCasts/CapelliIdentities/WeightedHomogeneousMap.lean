@@ -4,8 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.aeval_map_eq_rename_map_iff :
-    ∀ (R S : Type) [CommRing R] [CommRing S] (φ : R →+* S), Function.Injective φ → ∀ (σ M : Type) [AddCommMonoid M] (w : σ → M) (ν : M) (f : MvPolynomial σ R), (MvPolynomial.IsWeightedHomogeneous w (MvPolynomial.map φ f) ν ↔ MvPolynomial.IsWeightedHomogeneous w f ν) ∧ ∀ (τ : Type) (gR : σ → MvPolynomial τ R) (gS : σ → MvPolynomial τ S) (ρ : σ → τ), (∀ v, MvPolynomial.map φ (gR v) = gS v) → (MvPolynomial.aeval gS (MvPolynomial.map φ f) = MvPolynomial.rename ρ (MvPolynomial.map φ f) ↔ MvPolynomial.aeval gR f = MvPolynomial.rename ρ f) := by
+theorem UpperTheory.aeval_map_eq_rename_map_iff
+    : ∀ (R S : Type) [CommRing R] [CommRing S] (φ : R →+* S),
+      Function.Injective φ
+        → ∀ (σ M : Type) [AddCommMonoid M] (w : σ → M) (ν : M) (f : MvPolynomial σ R),
+          (MvPolynomial.IsWeightedHomogeneous w (MvPolynomial.map φ f) ν
+              ↔ MvPolynomial.IsWeightedHomogeneous w f ν)
+            ∧ ∀ (τ : Type) (gR : σ → MvPolynomial τ R) (gS : σ → MvPolynomial τ S) (ρ : σ → τ),
+              (∀ v, MvPolynomial.map φ (gR v) = gS v)
+                → (MvPolynomial.aeval gS (MvPolynomial.map φ f)
+                    = MvPolynomial.rename ρ (MvPolynomial.map φ f)
+                  ↔ MvPolynomial.aeval gR f = MvPolynomial.rename ρ f) := by
   intro R S _ _ φ hφ σ M _ w ν f
   refine ⟨?_, ?_⟩
   · unfold MvPolynomial.IsWeightedHomogeneous

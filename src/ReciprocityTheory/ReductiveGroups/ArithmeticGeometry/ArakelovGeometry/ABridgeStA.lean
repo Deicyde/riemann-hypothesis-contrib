@@ -9,17 +9,21 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.GeometryOfNumbersTheory MvPolynomial MeasureTheory Module
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.GeometryOfNumbersTheory MvPolynomial
+  MeasureTheory Module
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {J : Type} [Fintype J]
 
-theorem aeval_map_int (x : J → Ω) (f : MvPolynomial J ℤ) :
-    aeval x (map (Int.castRingHom ℚ) f) = aeval x f := by
+theorem aeval_map_int (x : J → Ω) (f : MvPolynomial J ℤ)
+    : aeval x (map (Int.castRingHom ℚ) f) = aeval x f := by
   rw [aeval_def, eval₂_map, aeval_def]
   congr 1 <;> exact RingHom.ext_int _ _
 
-theorem eval_smul_of_homog {R : Type*} [CommRing R] {φ : MvPolynomial J R} {d : ℕ}
-    (hφ : φ.IsHomogeneous d) (c : R) (z : J → R) : eval (c • z) φ = c ^ d * eval z φ := by
+theorem eval_smul_of_homog
+    {R : Type*} [CommRing R]
+    {φ : MvPolynomial J R} {d : ℕ} (hφ : φ.IsHomogeneous d)
+    (c : R) (z : J → R)
+    : eval (c • z) φ = c ^ d * eval z φ := by
   conv_lhs => rw [φ.as_sum]
   conv_rhs => rw [φ.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -32,9 +36,11 @@ theorem eval_smul_of_homog {R : Type*} [CommRing R] {φ : MvPolynomial J R} {d :
     Finset.prod_pow_eq_pow_sum, hd]
   ring
 
-theorem secFun_smul {b : MvPolynomial J ℚ} {n : ℕ}
+theorem secFun_smul
+    {b : MvPolynomial J ℚ} {n : ℕ}
     (hb : ∃ f : MvPolynomial J ℤ, f.IsHomogeneous n ∧ b = map (Int.castRingHom ℚ) f)
-    (c : ℂ) (z : J → ℂ) : secFun b (c • z) = c ^ n * secFun b z := by
+    (c : ℂ) (z : J → ℂ)
+    : secFun b (c • z) = c ^ n * secFun b z := by
   obtain ⟨f, hf, rfl⟩ := hb
   have hmap : map (algebraMap ℚ ℂ) (map (Int.castRingHom ℚ) f) = map (Int.castRingHom ℂ) f := by
     rw [map_map]
@@ -46,32 +52,35 @@ theorem continuous_secFun (b : MvPolynomial J ℚ) : Continuous (secFun b) := by
   unfold secFun
   exact MvPolynomial.continuous_eval _
 
-theorem secFun_map_int (f : MvPolynomial J ℤ) (z : J → ℂ) :
-    secFun (map (Int.castRingHom ℚ) f) z = eval z (map (Int.castRingHom ℂ) f) := by
+theorem secFun_map_int (f : MvPolynomial J ℤ) (z : J → ℂ)
+    : secFun (map (Int.castRingHom ℚ) f) z = eval z (map (Int.castRingHom ℂ) f) := by
   unfold secFun
   rw [map_map]
   congr 2 <;> exact RingHom.ext_int _ _
 
-theorem secFun_eq_zero_of_pts {x : J → Ω} {n : ℕ} {d : MvPolynomial J ℤ} (hd : d.IsHomogeneous n)
-    (h0 : aeval x d = 0) {z : J → ℂ} (hz : z ∈ pts (coordIdeal ℤ x)) :
-    secFun (map (Int.castRingHom ℚ) d) z = 0 := by
+theorem secFun_eq_zero_of_pts
+    {x : J → Ω} {n : ℕ} {d : MvPolynomial J ℤ} (hd : d.IsHomogeneous n) (h0 : aeval x d = 0)
+    {z : J → ℂ} (hz : z ∈ pts (coordIdeal ℤ x))
+    : secFun (map (Int.castRingHom ℚ) d) z = 0 := by
   have hmem : d ∈ coordIdeal ℤ x := by
     unfold coordIdeal coneMap
     rw [RingHom.mem_ker, aeval_def, ← eval_map]
-    have hpt : (fun i => Polynomial.C (x i) * Polynomial.X) =
-        (Polynomial.X : Polynomial Ω) • fun i => Polynomial.C (x i) := by
+    have hpt
+        : (fun i => Polynomial.C (x i) * Polynomial.X)
+          = (Polynomial.X : Polynomial Ω) • fun i => Polynomial.C (x i) := by
       funext i
       exact mul_comm _ _
-    have hC : eval (fun i => Polynomial.C (x i)) (map (algebraMap ℤ (Polynomial Ω)) d) =
-        Polynomial.C (aeval x d) := by
+    have hC
+        : eval (fun i => Polynomial.C (x i)) (map (algebraMap ℤ (Polynomial Ω)) d)
+          = Polynomial.C (aeval x d) := by
       rw [eval_map, aeval_def, hom_eval₂]
       congr 1 <;> exact RingHom.ext_int _ _
     rw [hpt, eval_smul_of_homog (hd.map _), hC, h0, map_zero, mul_zero]
   rw [secFun_map_int]
   exact hz.2 d hmem
 
-theorem secFun_conjPt (b : MvPolynomial J ℚ) (z : J → ℂ) :
-    secFun b (conjPt z) = starRingEnd ℂ (secFun b z) := by
+theorem secFun_conjPt (b : MvPolynomial J ℚ) (z : J → ℂ)
+    : secFun b (conjPt z) = starRingEnd ℂ (secFun b z) := by
   simp only [secFun, eval_map, hom_eval₂]
   rw [RingHom.ext_rat ((starRingEnd ℂ).comp (algebraMap ℚ ℂ)) (algebraMap ℚ ℂ)]
   rfl
@@ -87,15 +96,18 @@ def conjEquiv (J : Type) [Fintype J] : (J → ℂ) ≃ᵐ (J → ℂ) where
   measurable_toFun := continuous_conjPt.measurable
   measurable_invFun := continuous_conjPt.measurable
 
-theorem wgt_conjPt {m : ConeMetric (C := ℂ) (ι := J)} (hm : IsConjInvariant m) (n : ℕ) (z : J → ℂ) :
-    wgt m n (conjPt z) = wgt m n z := by
+theorem wgt_conjPt {m : ConeMetric (C := ℂ) (ι := J)} (hm : IsConjInvariant m) (n : ℕ) (z : J → ℂ)
+    : wgt m n (conjPt z) = wgt m n z := by
   unfold wgt conjPt
   rw [hm z]
 
-theorem conj_bGram {m : ConeMetric (C := ℂ) (ι := J)} {μ : Measure (J → ℂ)} (hm : IsConjInvariant m)
-    (hμ : μ.map conjPt = μ) (n : ℕ) {r : ℕ} (b : Fin r → MvPolynomial J ℚ) (i j : Fin r) :
-    starRingEnd ℂ (bGram μ (fun k => secFun (b k)) (wgt m n) i j) =
-      bGram μ (fun k => secFun (b k)) (wgt m n) i j := by
+theorem conj_bGram
+    {m : ConeMetric (C := ℂ) (ι := J)} {μ : Measure (J → ℂ)}
+    (hm : IsConjInvariant m) (hμ : μ.map conjPt = μ)
+    (n : ℕ)
+    {r : ℕ} (b : Fin r → MvPolynomial J ℚ) (i j : Fin r)
+    : starRingEnd ℂ (bGram μ (fun k => secFun (b k)) (wgt m n) i j)
+      = bGram μ (fun k => secFun (b k)) (wgt m n) i j := by
   have hμ' : μ.map (conjEquiv J) = μ := hμ
   have he : ∀ x, conjEquiv J x = conjPt x := fun x => rfl
   simp only [bGram, Matrix.of_apply]

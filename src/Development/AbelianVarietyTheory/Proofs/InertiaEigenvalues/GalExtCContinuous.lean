@@ -23,8 +23,8 @@ noncomputable def galExtC (g : GQ l) : PadicComplex l ≃+* PadicComplex l :=
   UniformSpace.Completion.mapRingEquiv g.toRingEquiv (isometry_galAlgCl g).continuous
     (isometry_galAlgCl g.symm).continuous
 
-theorem galExtC_coe (g : GQ l) (x : Om l) :
-    galExtC g (x : PadicComplex l) = ((g x : Om l) : PadicComplex l) :=
+theorem galExtC_coe (g : GQ l) (x : Om l)
+    : galExtC g (x : PadicComplex l) = ((g x : Om l) : PadicComplex l) :=
   UniformSpace.Completion.map_coe (isometry_galAlgCl g).uniformContinuous x
 
 theorem galExtC_continuous (g : GQ l) : Continuous (galExtC g) :=
@@ -46,7 +46,6 @@ theorem galExtC_mul (g h : GQ l) : galExtC (g * h) = galExtC g * galExtC h := by
 noncomputable def galActC (l : ℕ) [Fact l.Prime] : GQ l →* (PadicComplex l ≃+* PadicComplex l) :=
   MonoidHom.mk' galExtC galExtC_mul
 
-theorem isActC_galActC (l : ℕ) [Fact l.Prime] : IsActC (galActC l) :=
-  ⟨galExtC_coe, norm_galExtC⟩
+theorem isActC_galActC (l : ℕ) [Fact l.Prime] : IsActC (galActC l) := ⟨galExtC_coe, norm_galExtC⟩
 
 end GlobalTheory.InertiaEigenvalues

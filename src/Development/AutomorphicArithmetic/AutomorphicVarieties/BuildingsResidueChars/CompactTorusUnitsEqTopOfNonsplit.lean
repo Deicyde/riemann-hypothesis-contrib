@@ -8,9 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Loc.PS
 
-private theorem int_of_norm_one {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-    [Algebra O K] {Δ τ : K} (h : IsLoc O Δ) (hτ : ¬ IsSquare (τ ^ 2 - 4)) (e : Etau K τ)
-    (hn : QuadraticAlgebra.norm e = 1) : IsIntegral O e := by
+private theorem int_of_norm_one
+    {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    {Δ τ : K}
+    (h : IsLoc O Δ) (hτ : ¬ IsSquare (τ ^ 2 - 4)) (e : Etau K τ) (hn : QuadraticAlgebra.norm e = 1)
+    : IsIntegral O e := by
   classical
   haveI := h.frac
   have hN : e.re * e.re + τ * e.re * e.im - (-1) * e.im * e.im = 1 := by
@@ -60,10 +62,11 @@ private theorem int_of_norm_one {O K : Type} [CommRing O] [IsDomain O] [IsDiscre
           obtain ⟨u, rfl⟩ := hu
           apply hne (↑u⁻¹)
           rw [map_units_inv, hs, inv_inv]
-        obtain ⟨r, hr, -⟩ := sqrtO O K Δ h (1 - 4 * s ^ 2) 1 isUnit_one (by
-          have e' : (1 - 4 * s ^ 2) - 1 ^ 2 = s * (-(4 * s)) := by ring
-          rw [e']
-          exact Ideal.mul_mem_right _ _ hsm)
+        obtain ⟨r, hr, -⟩ :=
+          sqrtO O K Δ h (1 - 4 * s ^ 2) 1 isUnit_one (by
+            have e' : (1 - 4 * s ^ 2) - 1 ^ 2 = s * (-(4 * s)) := by ring
+            rw [e']
+            exact Ideal.mul_mem_right _ _ hsm)
         have hTS : T * algebraMap O K s = 1 := by
           rw [hs]
           exact mul_inv_cancel₀ hT0
@@ -74,12 +77,15 @@ private theorem int_of_norm_one {O K : Type} [CommRing O] [IsDomain O] [IsDiscre
           (T + 2 * e.re + τ * e.im) * hTd
     exact isIntegral_of_trace_norm t 1 ht.symm (by rw [hn, map_one])
 
-private theorem norm_quo {K : Type} [Field K] {τ : K} (z : (Etau K τ)ˣ) : QuadraticAlgebra.norm (quo z) = 1 := by
+private theorem norm_quo {K : Type} [Field K] {τ : K} (z : (Etau K τ)ˣ)
+    : QuadraticAlgebra.norm (quo z) = 1 := by
   simp only [quo, map_mul, QuadraticAlgebra.norm_star]
   rw [← map_mul, Units.mul_inv, map_one]
 
-theorem UpperTheory.compactTorusUnits_eq_top_of_nonsplit :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → ¬ IsSquare (τ ^ 2 - 4) → Cint O τ = ⊤ := by
+theorem UpperTheory.compactTorusUnits_eq_top_of_nonsplit
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → ¬ IsSquare (τ ^ 2 - 4) → Cint O τ = ⊤ := by
   intro O K _ _ _ _ _ Δ τ h _ hτ
   rw [eq_top_iff]
   intro z _

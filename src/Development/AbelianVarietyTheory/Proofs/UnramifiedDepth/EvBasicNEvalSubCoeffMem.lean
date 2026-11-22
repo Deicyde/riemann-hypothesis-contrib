@@ -7,13 +7,16 @@ public import ReciprocityTheory.DualLattices.FormalChartAtZero
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
 section
 
-variable {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι]
+variable
+  {R₀ : Type} [CommRing R₀]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
   {S : Type} [CommRing S] [Algebra R₀ S]
 
 lemma evBasic_tEval_eq_sum (N : ℕ) (f : MvPowerSeries ι R₀) (a : ι → S) :
@@ -64,7 +67,6 @@ lemma evBasic_nEval_eq_tEval (f : MvPowerSeries ι R₀) (a : ι → S) (N : ℕ
   · exact evBasic_tEval_indep f a (Nat.find_spec h) ha
   · exact absurd ⟨N, ha⟩ h
 
-
 omit [DecidableEq ι] in
 lemma evBasic_exists_pow (a : ι → S) (ha : ∀ i, IsNilpotent (a i)) :
     ∃ N : ℕ, 0 < N ∧ ∀ i, a i ^ N = 0 := by
@@ -114,13 +116,19 @@ lemma evBasic_nEval_sub_coeff_mem (f : MvPowerSeries ι R₀) (a : ι → S)
 
 end
 
-theorem nEval_basic :
-  (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀) (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
-    (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a) ∧
-    ((∀ i, IsNilpotent (a i)) → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'), φ (nEval f a) = nEval f (fun i => φ (a i))) ∧
-      nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a))) := by
+theorem nEval_basic
+    : (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀)
+        (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
+      (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a)
+        ∧ ((∀ i, IsNilpotent (a i))
+          → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'),
+              φ (nEval f a) = nEval f (fun i => φ (a i)))
+            ∧ nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f)
+              ∈ Ideal.span (Set.range a))) := by
   intro R₀ _ ι _ _ f S _ _ a
-  exact ⟨fun N hN => evBasic_nEval_eq_tEval f a N hN,
-    fun ha => ⟨fun S' _ _ φ => evBasic_map_nEval φ f a ha, evBasic_nEval_sub_coeff_mem f a ha⟩⟩
+  exact ⟨
+    fun N hN => evBasic_nEval_eq_tEval f a N hN,
+    fun ha => ⟨fun S' _ _ φ => evBasic_map_nEval φ f a ha, evBasic_nEval_sub_coeff_mem f a ha⟩
+  ⟩
 
 end GlobalTheory

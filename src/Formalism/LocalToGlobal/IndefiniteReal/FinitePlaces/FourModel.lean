@@ -13,7 +13,8 @@ namespace Formalism.IndefR.Fin.Four
 variable {W V : Type*} [AddCommGroup W] [AddCommGroup V] [Module ℂ V]
 
 def IsSB (L X : AddSubgroup W) (Φ : W → ℂ) : Prop :=
-  (∀ t, Φ t ≠ 0 → t ∈ X) ∧ ∃ k : ℕ, 0 < k ∧ (∀ u ∈ L ⊓ X, ∀ t, Φ (t + k • u) = Φ t) ∧ ∀ t, Φ t ≠ 0 → k • t ∈ L
+  (∀ t, Φ t ≠ 0 → t ∈ X)
+    ∧ ∃ k : ℕ, 0 < k ∧ (∀ u ∈ L ⊓ X, ∀ t, Φ (t + k • u) = Φ t) ∧ ∀ t, Φ t ≠ 0 → k • t ∈ L
 
 section Defs
 
@@ -27,7 +28,6 @@ abbrev QX : Type _ := W ⧸ (L ⊓ X)
 
 abbrev QY : Type _ := W ⧸ (L ⊓ Y)
 
-
 open Classical in
 def tfun (Φ : W → ℂ) : V :=
   ∑ᶠ q : QX L X × QY L Y, if q.2.out ∈ Y then term ρ χ L X f₀ Φ q.1.out q.2.out else 0
@@ -36,7 +36,8 @@ end Defs
 
 section Chi
 
-variable {χ : W → W → ℂ} (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y)
+variable
+  {χ : W → W → ℂ} (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y)
   (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y') (hχ0 : ∀ t y, χ t y ≠ 0)
 
 include hχl hχ0 in
@@ -53,8 +54,7 @@ theorem chi_zero_right (t : W) : χ t 0 = 1 := by
 
 include hχl hχ0 in
 theorem chi_neg_left (t y : W) : χ (-t) y = (χ t y)⁻¹ := by
-  have h : χ t y * χ (-t) y = 1 := by
-    rw [← hχl, add_neg_cancel, chi_zero_left hχl hχ0]
+  have h : χ t y * χ (-t) y = 1 := by rw [← hχl, add_neg_cancel, chi_zero_left hχl hχ0]
   exact eq_inv_of_mul_eq_one_right h
 
 include hχl hχ0 in
@@ -77,13 +77,17 @@ variable {L X Y : AddSubgroup W}
 
 theorem QX_out (a : W) : ∃ l ∈ L ⊓ X, (QuotientAddGroup.mk a : QX L X).out = a + l := by
   refine ⟨-a + (QuotientAddGroup.mk a : QX L X).out, ?_, (add_neg_cancel_left a _).symm⟩
-  have h : (QuotientAddGroup.mk (QuotientAddGroup.mk a : QX L X).out : QX L X) = QuotientAddGroup.mk a :=
+  have h
+      : (QuotientAddGroup.mk (QuotientAddGroup.mk a : QX L X).out : QX L X)
+        = QuotientAddGroup.mk a :=
     QuotientAddGroup.out_eq' _
   exact QuotientAddGroup.eq.mp h.symm
 
 theorem QY_out (y : W) : ∃ μ ∈ L ⊓ Y, (QuotientAddGroup.mk y : QY L Y).out = y + μ := by
   refine ⟨-y + (QuotientAddGroup.mk y : QY L Y).out, ?_, (add_neg_cancel_left y _).symm⟩
-  have h : (QuotientAddGroup.mk (QuotientAddGroup.mk y : QY L Y).out : QY L Y) = QuotientAddGroup.mk y :=
+  have h
+      : (QuotientAddGroup.mk (QuotientAddGroup.mk y : QY L Y).out : QY L Y)
+        = QuotientAddGroup.mk y :=
     QuotientAddGroup.out_eq' _
   exact QuotientAddGroup.eq.mp h.symm
 
@@ -91,13 +95,14 @@ end Rep
 
 section Coef
 
-variable {ρ : W → Module.End ℂ V} {χ : W → W → ℂ} {L X Y : AddSubgroup W} {f₀ : V}
+variable
+  {ρ : W → Module.End ℂ V} {χ : W → W → ℂ} {L X Y : AddSubgroup W} {f₀ : V}
   (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y) (hχ0 : ∀ t y, χ t y ≠ 0)
   (hfinX : ∀ k, 0 < k → Finite (Qt k (L ⊓ X)))
 
 include hχl hχ0 hfinX in
-theorem coef_add_left (Φ : W → ℂ) (a y : W) {l : W} (hl : l ∈ L ⊓ X) :
-    coef χ L X Φ (a + l) y = χ l y * coef χ L X Φ a y := by
+theorem coef_add_left (Φ : W → ℂ) (a y : W) {l : W} (hl : l ∈ L ⊓ X)
+    : coef χ L X Φ (a + l) y = χ l y * coef χ L X Φ a y := by
   have hc := hχ0 l y
   have hH : ∀ t, Φ (a + l + t) * (χ t y)⁻¹ = χ l y * (Φ (a + (t + l)) * (χ (t + l) y)⁻¹) := by
     intro t
@@ -105,8 +110,10 @@ theorem coef_add_left (Φ : W → ℂ) (a y : W) {l : W} (hl : l ∈ L ⊓ X) :
       rw [hχl, mul_inv, mul_left_comm, mul_inv_cancel₀ hc, mul_one]
     rw [e, add_comm t l, ← add_assoc]
     ring
-  have hiff : ∀ k, IsInv k (L ⊓ X) (fun t => Φ (a + l + t) * (χ t y)⁻¹) ↔
-      IsInv k (L ⊓ X) (fun t => Φ (a + t) * (χ t y)⁻¹) := by
+  have hiff
+      : ∀ k,
+        IsInv k (L ⊓ X) (fun t => Φ (a + l + t) * (χ t y)⁻¹)
+          ↔ IsInv k (L ⊓ X) (fun t => Φ (a + t) * (χ t y)⁻¹) := by
     intro k
     unfold IsInv
     simp only [hH]
@@ -138,17 +145,19 @@ theorem coef_add_left (Φ : W → ℂ) (a y : W) {l : W} (hl : l ∈ L ⊓ X) :
     rw [dite_eq_right h1, dite_eq_right h0, mul_zero]
 
 include hfinX in
-theorem coef_add_right (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y')
-    (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1) (Φ : W → ℂ) (a y : W) {μ : W} (hμ : μ ∈ L ⊓ Y) :
-    coef χ L X Φ a (y + μ) = coef χ L X Φ a y := by
+theorem coef_add_right
+    (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y') (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1)
+    (Φ : W → ℂ) (a y : W)
+    {μ : W} (hμ : μ ∈ L ⊓ Y)
+    : coef χ L X Φ a (y + μ) = coef χ L X Φ a y := by
   unfold coef
   apply integ_congr hfinX
   intro t ht
   rw [hχr, hLL t ht μ hμ, mul_one]
 
 include hfinX in
-theorem coef_eq_zero (Φ : W → ℂ) (hΦ : ∀ t, Φ t ≠ 0 → t ∈ X) {a : W} (ha : a ∉ X) (y : W) :
-    coef χ L X Φ a y = 0 := by
+theorem coef_eq_zero (Φ : W → ℂ) (hΦ : ∀ t, Φ t ≠ 0 → t ∈ X) {a : W} (ha : a ∉ X) (y : W)
+    : coef χ L X Φ a y = 0 := by
   have h0 : ∀ t ∈ L ⊓ X, Φ (a + t) * (χ t y)⁻¹ = (fun _ : W => (0 : ℂ)) t := by
     intro t ht
     have hz : Φ (a + t) = 0 := by
@@ -163,10 +172,14 @@ theorem coef_eq_zero (Φ : W → ℂ) (hΦ : ∀ t, Φ t ≠ 0 → t ∈ X) {a :
   · rfl
 
 include hχl hχ0 hfinX in
-theorem term_add_left (hX : ∀ x ∈ X, ∀ x' ∈ X, ρ (x + x') = ρ x * ρ x')
+theorem term_add_left
+    (hX : ∀ x ∈ X, ∀ x' ∈ X, ρ (x + x') = ρ x * ρ x')
     (hXY : ∀ x ∈ X, ∀ y ∈ Y, ρ x * ρ y = χ x y • (ρ y * ρ x)) (hfX : ∀ u ∈ L ⊓ X, ρ u f₀ = f₀)
-    (Φ : W → ℂ) (hΦ : ∀ t, Φ t ≠ 0 → t ∈ X) (a : W) {y : W} (hy : y ∈ Y) {l : W} (hl : l ∈ L ⊓ X) :
-    term ρ χ L X f₀ Φ (a + l) y = term ρ χ L X f₀ Φ a y := by
+    (Φ : W → ℂ) (hΦ : ∀ t, Φ t ≠ 0 → t ∈ X)
+    (a : W)
+    {y : W} (hy : y ∈ Y)
+    {l : W} (hl : l ∈ L ⊓ X)
+    : term ρ χ L X f₀ Φ (a + l) y = term ρ χ L X f₀ Φ a y := by
   by_cases ha : a ∈ X
   · have hl' := AddSubgroup.mem_inf.mp hl
     have hnl : -l ∈ L ⊓ X := neg_mem hl
@@ -176,19 +189,23 @@ theorem term_add_left (hX : ∀ x ∈ X, ∀ x' ∈ X, ρ (x + x') = ρ x * ρ x
       rw [h1, hfX (-l) hnl, chi_neg_left hχl hχ0]
     unfold term
     rw [coef_add_left hχl hχ0 hfinX Φ a y hl, neg_add, hX (-a) (neg_mem ha) (-l) (neg_mem hl'.2),
-      Module.End.mul_apply, key, map_smul, smul_smul, mul_comm (χ l y), mul_assoc, mul_inv_cancel₀ (hχ0 l y), mul_one]
+      Module.End.mul_apply, key, map_smul, smul_smul, mul_comm (χ l y), mul_assoc,
+      mul_inv_cancel₀ (hχ0 l y), mul_one]
   · have hal : a + l ∉ X := fun h => ha (by simpa using X.sub_mem h (AddSubgroup.mem_inf.mp hl).2)
     unfold term
     rw [coef_eq_zero hfinX Φ hΦ ha, coef_eq_zero hfinX Φ hΦ hal, zero_smul, zero_smul]
 
 include hfinX in
-theorem term_add_right (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y')
-    (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1) (hY : ∀ y ∈ Y, ∀ y' ∈ Y, ρ (y + y') = ρ y * ρ y')
-    (hfY : ∀ u ∈ L ⊓ Y, ρ u f₀ = f₀) (Φ : W → ℂ) (a : W) {y : W} (hy : y ∈ Y) {μ : W} (hμ : μ ∈ L ⊓ Y) :
-    term ρ χ L X f₀ Φ a (y + μ) = term ρ χ L X f₀ Φ a y := by
+theorem term_add_right
+    (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y') (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1)
+    (hY : ∀ y ∈ Y, ∀ y' ∈ Y, ρ (y + y') = ρ y * ρ y') (hfY : ∀ u ∈ L ⊓ Y, ρ u f₀ = f₀) (Φ : W → ℂ)
+    (a : W)
+    {y : W} (hy : y ∈ Y)
+    {μ : W} (hμ : μ ∈ L ⊓ Y)
+    : term ρ χ L X f₀ Φ a (y + μ) = term ρ χ L X f₀ Φ a y := by
   unfold term
-  rw [coef_add_right hfinX hχr hLL Φ a y hμ, hY y hy μ (AddSubgroup.mem_inf.mp hμ).2, Module.End.mul_apply,
-    hfY μ hμ]
+  rw [coef_add_right hfinX hχr hLL Φ a y hμ, hY y hy μ (AddSubgroup.mem_inf.mp hμ).2,
+    Module.End.mul_apply, hfY μ hμ]
 
 end Coef
 

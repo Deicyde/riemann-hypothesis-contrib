@@ -27,8 +27,8 @@ def fpow (f : A) (n : ℕ) : Submonoid.powers f := ⟨f ^ n, (Submonoid.mem_powe
 lemma fpow_add (f : A) (n m : ℕ) : fpow f (n + m) = fpow f n * fpow f m :=
   Subtype.ext (pow_add f n m)
 
-def locMap {f : A} (x : ProjectiveSpectrum 𝒜) (hx : f ∉ x.asHomogeneousIdeal) :
-    Localization.Away f →+* Loc 𝒜 x :=
+def locMap {f : A} (x : ProjectiveSpectrum 𝒜) (hx : f ∉ x.asHomogeneousIdeal)
+    : Localization.Away f →+* Loc 𝒜 x :=
   IsLocalization.map (M := Submonoid.powers f) (T := x.asHomogeneousIdeal.toIdeal.primeCompl) _
     (RingHom.id _) (Submonoid.powers_le.mpr hx)
 
@@ -55,16 +55,22 @@ lemma locMap_comp {f f' : A} (φ : Localization.Away f →+* Localization.Away f
     rw [← RingHom.comp_apply φ, hφ, locMap_algebraMap, locMap_algebraMap]
   exact congrArg (fun F => F z) this
 
-
 variable (𝒜) in
-def awayDeg (𝒜 : ℕ → σ) [GradedRing 𝒜] {f : A} {d : ℕ}
-    (hf : f ∈ 𝒜 d) (hd : 0 < d) (k : ℤ) :
-    AddSubgroup (Localization.Away f) where
-  carrier := {z | ∃ (n j : ℕ) (a : A), a ∈ 𝒜 j ∧ (j : ℤ) = n * d + k ∧
-    z = Localization.mk a (fpow f n)}
-  zero_mem' := ⟨(-k).toNat, (-k).toNat * d + k.toNat - (-k).toNat, 0, zero_mem _, by
-    have : (-k).toNat ≤ (-k).toNat * d := Nat.le_mul_of_pos_right _ hd
-    omega, by rw [Localization.mk_zero]⟩
+def awayDeg (𝒜 : ℕ → σ) [GradedRing 𝒜] {f : A} {d : ℕ} (hf : f ∈ 𝒜 d) (hd : 0 < d) (k : ℤ)
+    : AddSubgroup (Localization.Away f) where
+  carrier :=
+    {z | ∃ (n j : ℕ) (a : A), a ∈ 𝒜 j ∧ (j : ℤ) = n * d + k ∧
+      z = Localization.mk a (fpow f n)}
+  zero_mem' := ⟨
+    (-k).toNat,
+    (-k).toNat * d + k.toNat - (-k).toNat,
+    0,
+    zero_mem _,
+    by
+      have : (-k).toNat ≤ (-k).toNat * d := Nat.le_mul_of_pos_right _ hd
+      omega,
+    by rw [Localization.mk_zero]
+  ⟩
   add_mem' := by
     rintro _ _ ⟨n, j, a, ha, hj, rfl⟩ ⟨m, j', b, hb, hj', rfl⟩
     refine ⟨n + m, j + m * d, f ^ n * b + f ^ m * a, add_mem ?_ ?_, ?_, ?_⟩
@@ -110,17 +116,32 @@ lemma exists_val_eq_of_mem_awayDeg_zero {f : A} {d : ℕ} (hf : f ∈ 𝒜 d) (h
 
 lemma nmem_of_mem {f : A} (x : Proj.basicOpen 𝒜 f) : f ∉ x.1.asHomogeneousIdeal := x.2
 
-def toSection {f : A} {d : ℕ} (hf : f ∈ 𝒜 d) (hd : 0 < d) (k : ℤ) :
-    awayDeg 𝒜 hf hd k →+ Γ(twistingSheaf 𝒜 k, Proj.basicOpen 𝒜 f) where
-  toFun z := mkSection (fun x => locMap x.1 (nmem_of_mem x) z.1) (fun x => by
-    obtain ⟨n, j, a, ha, hj, hz⟩ := z.2
-    refine ⟨Proj.basicOpen 𝒜 f, x.2, 𝟙 _, n * d, j, by push_cast; linarith, a, f ^ n, ha,
-      ?_, fun y h => nmem_of_mem y (y.1.isPrime.mem_of_pow_mem n h), fun y => ?_⟩
-    · have := SetLike.pow_mem_graded n hf
-      rwa [smul_eq_mul] at this
-    · change locMap y.1 (nmem_of_mem y) z.1 = _
-      rw [hz]
-      exact locMap_mk y.1 (nmem_of_mem y) a n)
+def toSection {f : A} {d : ℕ} (hf : f ∈ 𝒜 d) (hd : 0 < d) (k : ℤ)
+    : awayDeg 𝒜 hf hd k →+ Γ(twistingSheaf 𝒜 k, Proj.basicOpen 𝒜 f) where
+  toFun z :=
+    mkSection
+      (fun x => locMap x.1 (nmem_of_mem x) z.1)
+      (fun x => by
+        obtain ⟨n, j, a, ha, hj, hz⟩ := z.2
+        refine ⟨
+          Proj.basicOpen 𝒜 f,
+          x.2,
+          𝟙 _,
+          n * d,
+          j,
+          by push_cast; linarith,
+          a,
+          f ^ n,
+          ha,
+          ?_,
+          fun y h => nmem_of_mem y (y.1.isPrime.mem_of_pow_mem n h),
+          fun y => ?_
+        ⟩
+        · have := SetLike.pow_mem_graded n hf
+          rwa [smul_eq_mul] at this
+        · change locMap y.1 (nmem_of_mem y) z.1 = _
+          rw [hz]
+          exact locMap_mk y.1 (nmem_of_mem y) a n)
   map_zero' := by
     apply Subtype.ext
     funext x
@@ -157,7 +178,6 @@ lemma isLocallyFraction_locMap {f : A} {d : ℕ} (hf : f ∈ 𝒜 d) (hd : 0 < d
         locMap x.1 (nmem_of_mem x) z) :=
   (toSection hf hd k ⟨z, hz⟩).2
 
-
 set_option backward.isDefEq.respectTransparency.types false in
 open ProjectiveSpectrum in
 lemma exists_section_of_isLocallyFraction_zero {U : Opens (ProjectiveSpectrum.top 𝒜)}
@@ -187,9 +207,10 @@ lemma exists_section_of_isLocallyFraction_zero {U : Opens (ProjectiveSpectrum.to
   rw [HomogeneousLocalization.val_mk]
   exact (hg _).trans (w y)
 
-theorem toSection_bijective {f u g : A} {e : ℕ} (hu : u ∈ 𝒜 1) (hg : g ∈ 𝒜 e)
-    (hfug : f = u * g) (hf : f ∈ 𝒜 (e + 1)) (k : ℤ) :
-    Function.Bijective (toSection hf (Nat.succ_pos e) k) := by
+theorem toSection_bijective
+    {f u g : A} {e : ℕ} (hu : u ∈ 𝒜 1) (hg : g ∈ 𝒜 e) (hfug : f = u * g) (hf : f ∈ 𝒜 (e + 1))
+    (k : ℤ)
+    : Function.Bijective (toSection hf (Nat.succ_pos e) k) := by
   set hd := Nat.succ_pos e
   have hk : (k.toNat : ℤ) - ((-k).toNat : ℤ) = k := by omega
 
@@ -214,8 +235,9 @@ theorem toSection_bijective {f u g : A} {e : ℕ} (hu : u ∈ 𝒜 1) (hg : g �
     congr 1
     rw [coe_fpow, hfug]
     ring
-  have hloc : ∀ x : Proj.basicOpen 𝒜 f,
-      locMap x.1 (nmem_of_mem x) c * locMap x.1 (nmem_of_mem x) c' = 1 := fun x => by
+  have hloc
+      : ∀ x : Proj.basicOpen 𝒜 f,
+        locMap x.1 (nmem_of_mem x) c * locMap x.1 (nmem_of_mem x) c' = 1 := fun x => by
     rw [← map_mul, hcc', map_one]
   have hiso := (Proj.basicOpenIsoAway 𝒜 f hf hd).commRingCatIsoToRingEquiv.bijective
   constructor
@@ -232,8 +254,7 @@ theorem toSection_bijective {f u g : A} {e : ℕ} (hu : u ∈ 𝒜 1) (hg : g �
       funext x
       apply HomogeneousLocalization.val_injective
       have h := ProjectiveSpectrum.Proj.awayToSection_apply 𝒜 f z₀ x
-      have h' : locMap x.1 (nmem_of_mem x) z₀.val = 0 := by
-        rw [hz₀, map_mul, hz' x, mul_zero]
+      have h' : locMap x.1 (nmem_of_mem x) z₀.val = 0 := by rw [hz₀, map_mul, hz' x, mul_zero]
       exact h.trans (h'.trans HomogeneousLocalization.val_zero.symm)
     have hz0 : z₀ = 0 := by
       apply hiso.1
@@ -241,11 +262,14 @@ theorem toSection_bijective {f u g : A} {e : ℕ} (hu : u ∈ 𝒜 1) (hg : g �
     have hcz : c * z.1 = 0 := by rw [← hz₀, hz0, HomogeneousLocalization.val_zero]
     apply Subtype.ext
     change z.1 = 0
-    calc z.1 = c' * (c * z.1) := by rw [← mul_assoc, mul_comm c', hcc', one_mul]
+    calc
+      z.1
+        = c' * (c * z.1) := by rw [← mul_assoc, mul_comm c', hcc', one_mul]
       _ = 0 := by rw [hcz, mul_zero]
   · intro s
-    have ht := isLocallyFraction_mul (neg_add_cancel k) (isLocallyFraction_locMap hf hd hc)
-      (isLocallyFraction_val s)
+    have ht :=
+      isLocallyFraction_mul (neg_add_cancel k) (isLocallyFraction_locMap hf hd hc)
+        (isLocallyFraction_val s)
     obtain ⟨t', ht'⟩ := exists_section_of_isLocallyFraction_zero _ ht
     obtain ⟨z₀, hz₀⟩ := hiso.2 t'
     have hz₀' : (Proj.awayToSection 𝒜 f).hom z₀ = t' := hz₀
@@ -256,11 +280,11 @@ theorem toSection_bijective {f u g : A} {e : ℕ} (hu : u ∈ 𝒜 1) (hg : g �
     subst hz₀'
     apply Subtype.ext
     funext x
-    have e1 : locMap x.1 (nmem_of_mem x) z₀.val =
-        (((Proj.awayToSection 𝒜 f).hom z₀).1 x).val :=
+    have e1 : locMap x.1 (nmem_of_mem x) z₀.val = (((Proj.awayToSection 𝒜 f).hom z₀).1 x).val :=
       (ProjectiveSpectrum.Proj.awayToSection_apply 𝒜 f z₀ x).symm
-    have e2 : (((Proj.awayToSection 𝒜 f).hom z₀).1 x).val =
-        locMap x.1 (nmem_of_mem x) c * val s x := ht' x
+    have e2
+        : (((Proj.awayToSection 𝒜 f).hom z₀).1 x).val = locMap x.1 (nmem_of_mem x) c * val s x :=
+      ht' x
     show locMap x.1 (nmem_of_mem x) (c' * z₀.val) = val s x
     rw [map_mul, e1, e2]
     linear_combination (val s x) * hloc x

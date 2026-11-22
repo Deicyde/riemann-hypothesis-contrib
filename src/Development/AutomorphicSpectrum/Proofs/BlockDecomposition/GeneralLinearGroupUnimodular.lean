@@ -39,8 +39,7 @@ noncomputable def pm (σ : Equiv.Perm (Fin n)) : GL (Fin n) ℂ where
     ext i j
     simp [Matrix.one_apply]
 
-theorem pm_mul_dg (σ : Equiv.Perm (Fin n)) (d : Fin n → ℂˣ) :
-    pm σ * dg d = dg (d ∘ σ) * pm σ := by
+theorem pm_mul_dg (σ : Equiv.Perm (Fin n)) (d : Fin n → ℂˣ) : pm σ * dg d = dg (d ∘ σ) * pm σ := by
   ext1
   ext i j
   simp only [pm, dg, Units.val_mul, mul_diagonal, diagonal_mul, PEquiv.toMatrix_apply,
@@ -61,8 +60,9 @@ theorem tv_mul {i j : Fin n} (hij : i ≠ j) (c : ℂ) : tv hij c * tv hij c = t
   simp only [tv, Units.val_mul]
   rw [transvection_mul_transvection_same _ _ hij, two_mul]
 
-theorem dg_mul_tv {i j : Fin n} (hij : i ≠ j) (c : ℂ) (d : Fin n → ℂˣ) (hi : (d i : ℂ) = 2)
-    (hj : (d j : ℂ) = 1) : dg d * tv hij c = tv hij (2 * c) * dg d := by
+theorem dg_mul_tv
+    {i j : Fin n} (hij : i ≠ j) (c : ℂ) (d : Fin n → ℂˣ) (hi : (d i : ℂ) = 2) (hj : (d j : ℂ) = 1)
+    : dg d * tv hij c = tv hij (2 * c) * dg d := by
   ext1
   ext k l
   simp only [dg, tv, Units.val_mul, transvection, diagonal_mul, mul_diagonal, Matrix.add_apply,
@@ -85,8 +85,8 @@ theorem char_ne_zero {H : Type*} [Group H] (χ : H →* ℝ≥0) (g : H) : χ g 
   rw [h, zero_mul] at h1
   exact zero_ne_one h1
 
-theorem char_tv (χ : GL (Fin n) ℂ →* ℝ≥0) {i j : Fin n} (hij : i ≠ j) (c : ℂ) :
-    χ (tv hij c) = 1 := by
+theorem char_tv (χ : GL (Fin n) ℂ →* ℝ≥0) {i j : Fin n} (hij : i ≠ j) (c : ℂ)
+    : χ (tv hij c) = 1 := by
   have h1 : χ (tv hij c) * χ (tv hij c) = χ (tv hij (2 * c)) := by rw [← map_mul, tv_mul]
   let d : Fin n → ℂˣ := fun k => if k = i then Units.mk0 2 two_ne_zero else 1
   have hi : (d i : ℂ) = 2 := by simp [d]
@@ -99,10 +99,11 @@ theorem char_tv (χ : GL (Fin n) ℂ →* ℝ≥0) {i j : Fin n} (hij : i ≠ j)
   have h4 : χ (tv hij c) * χ (tv hij c) = χ (tv hij c) * 1 := by rw [mul_one, h1, h3]
   exact mul_left_cancel₀ (char_ne_zero χ _) h4
 
-theorem char_dg (χ : GL (Fin n) ℂ →* ℝ≥0) (hz : ∀ z : GL (Fin n) ℂ, (∀ g, z * g = g * z) → χ z = 1)
-    (d : Fin n → ℂˣ) : χ (dg d) = 1 := by
-  let D : (Fin n → ℂˣ) →* GL (Fin n) ℂ :=
-    { toFun := dg, map_one' := dg_one, map_mul' := dg_mul }
+theorem char_dg
+    (χ : GL (Fin n) ℂ →* ℝ≥0) (hz : ∀ z : GL (Fin n) ℂ, (∀ g, z * g = g * z) → χ z = 1)
+    (d : Fin n → ℂˣ)
+    : χ (dg d) = 1 := by
+  let D : (Fin n → ℂˣ) →* GL (Fin n) ℂ := { toFun := dg, map_one' := dg_one, map_mul' := dg_mul }
   have hperm : ∀ σ : Equiv.Perm (Fin n), χ (dg (d ∘ σ)) = χ (dg d) := by
     intro σ
     have h := congrArg χ (pm_mul_dg σ d)
@@ -130,8 +131,10 @@ theorem char_dg (χ : GL (Fin n) ℂ →* ℝ≥0) (hz : ∀ z : GL (Fin n) ℂ,
   rw [h1] at h2
   exact (pow_eq_one_iff_of_nonneg (by simp) hm).1 h2.symm
 
-theorem char_eq_one (χ : GL (Fin n) ℂ →* ℝ≥0)
-    (hz : ∀ z : GL (Fin n) ℂ, (∀ g, z * g = g * z) → χ z = 1) (g : GL (Fin n) ℂ) : χ g = 1 := by
+theorem char_eq_one
+    (χ : GL (Fin n) ℂ →* ℝ≥0) (hz : ∀ z : GL (Fin n) ℂ, (∀ g, z * g = g * z) → χ z = 1)
+    (g : GL (Fin n) ℂ)
+    : χ g = 1 := by
   refine Matrix.diagonal_transvection_induction_of_det_ne_zero
     (fun M => ∀ u : GL (Fin n) ℂ, (u : Matrix (Fin n) (Fin n) ℂ) = M → χ u = 1)
     (g : Matrix (Fin n) (Fin n) ℂ) ?_ ?_ ?_ ?_ g rfl
@@ -173,8 +176,9 @@ theorem unimod : PositivityTheory.RgBcC.Unimod := by
   haveI : SecondCountableTopology (PositivityTheory.RgTw.G n) :=
     (Units.isEmbedding_embedProduct :
       Topology.IsEmbedding (Units.embedProduct (Matrix (Fin n) (Fin n) ℂ))).secondCountableTopology
-  have hmap : ∀ g : PositivityTheory.RgTw.G n,
-      Measure.map (· * g) μ = Measure.modularCharacter g • μ := by
+  have hmap
+      : ∀ g : PositivityTheory.RgTw.G n,
+        Measure.map (· * g) μ = Measure.modularCharacter g • μ := by
     intro g
     have e1 := Measure.isMulLeftInvariant_eq_smul (Measure.map (· * g) μ) μ
     have e2 := Measure.modularCharacterFun_eq_haarScalarFactor μ g

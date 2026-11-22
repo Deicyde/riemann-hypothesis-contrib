@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsL
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult
 
 namespace PositivityTheory.Exh
 
@@ -39,7 +40,9 @@ theorem linkP : LinkP k := by
     push_cast
     ring
 
-private theorem eq_zero_of_nu_eq_of_isCusp {ρ : IrrGL (k := k)} (hρ : ρ.IsCusp) (n : ℤ) (h : ρ.nu (n : ℂ) = ρ) : n = 0 := by
+private theorem eq_zero_of_nu_eq_of_isCusp
+    {ρ : IrrGL (k := k)} (hρ : ρ.IsCusp) (n : ℤ) (h : ρ.nu (n : ℂ) = ρ)
+    : n = 0 := by
   have hsub : (Segment.icc ρ hρ n n le_rfl).carrier ⊆ (Segment.icc ρ hρ 0 0 le_rfl).carrier := by
     intro x hx
     rw [Segment.mem_icc] at hx ⊢
@@ -82,8 +85,7 @@ theorem minP : MinP k := by
     exact hm
   refine ⟨f M, hM, fun ρ' hρ' j hj heq => ?_⟩
   have hρ'eq : ρ' = f (M + j) := by
-    have h3 : (f M).nu (-(j : ℂ)) = ρ' := by
-      rw [heq, IrrGL.nu_nu, add_neg_cancel, IrrGL.nu_zero]
+    have h3 : (f M).nu (-(j : ℂ)) = ρ' := by rw [heq, IrrGL.nu_nu, add_neg_cancel, IrrGL.nu_zero]
     rw [← h3]
     simp only [hf, IrrGL.nu_nu]
     congr 1

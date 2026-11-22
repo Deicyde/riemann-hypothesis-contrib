@@ -10,14 +10,19 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem card_quot_span_algebraMap : ∀ (R O : Type) [CommRing R] [Nontrivial R] [CommRing O] [Algebra R O] [Module.Free R O] [Module.Finite R O] (t : R), Nat.card (O ⧸ Ideal.span {algebraMap R O t}) = Nat.card (R ⧸ Ideal.span {t}) ^ Module.finrank R O := by
+theorem card_quot_span_algebraMap
+    : ∀ (R O : Type) [CommRing R] [Nontrivial R] [CommRing O] [Algebra R O] [Module.Free R O]
+        [Module.Finite R O] (t : R),
+      Nat.card (O ⧸ Ideal.span {algebraMap R O t})
+        = Nat.card (R ⧸ Ideal.span {t}) ^ Module.finrank R O := by
   intro R O _ _ _ _ _ _ t
   classical
   let b := Module.Free.chooseBasis R O
-  let f : O →+ (Module.Free.ChooseBasisIndex R O → R ⧸ Ideal.span {t}) :=
-    { toFun := fun x i => Ideal.Quotient.mk _ (b.repr x i)
-      map_zero' := by ext i; simp
-      map_add' := by intro x y; ext i; simp }
+  let f : O →+ (Module.Free.ChooseBasisIndex R O → R ⧸ Ideal.span {t}) := {
+    toFun := fun x i => Ideal.Quotient.mk _ (b.repr x i)
+    map_zero' := by ext i; simp
+    map_add' := by intro x y; ext i; simp
+  }
   have hsurj : Function.Surjective f := by
     intro y
     choose z hz using fun i => Ideal.Quotient.mk_surjective (y i)
@@ -47,8 +52,11 @@ theorem card_quot_span_algebraMap : ∀ (R O : Type) [CommRing R] [Nontrivial R]
       exact Ideal.mem_span_singleton'.2 ⟨b.repr a i, by simp [mul_comm]⟩
   have e := Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective f hsurj).toEquiv
   rw [hker] at e
-  have h1 : Nat.card (O ⧸ Ideal.span {algebraMap R O t}) =
-      Nat.card (Module.Free.ChooseBasisIndex R O → R ⧸ Ideal.span {t}) := e
-  rw [h1, Nat.card_fun, Module.finrank_eq_card_chooseBasisIndex, Nat.card_eq_fintype_card (α := Module.Free.ChooseBasisIndex R O)]
+  have h1
+      : Nat.card (O ⧸ Ideal.span {algebraMap R O t})
+        = Nat.card (Module.Free.ChooseBasisIndex R O → R ⧸ Ideal.span {t}) :=
+    e
+  rw [h1, Nat.card_fun, Module.finrank_eq_card_chooseBasisIndex,
+    Nat.card_eq_fintype_card (α := Module.Free.ChooseBasisIndex R O)]
 
 end GlobalTheory.CNorm

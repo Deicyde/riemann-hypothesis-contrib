@@ -8,8 +8,12 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeAt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+  GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.Flat.CPoint
@@ -18,10 +22,11 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.CPoint.FlatEig
 
-theorem exists_retraction {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {M : Type}
-    [AddCommGroup M] [Module O M] [Module.Finite O M] (N : Submodule O M)
-    (hN : ∀ (c : O) (x : M), c ≠ 0 → c • x ∈ N → x ∈ N) :
-    ∃ r : M →ₗ[O] N, r ∘ₗ N.subtype = LinearMap.id := by
+theorem exists_retraction
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {M : Type} [AddCommGroup M] [Module O M] [Module.Finite O M]
+    (N : Submodule O M) (hN : ∀ (c : O) (x : M), c ≠ 0 → c • x ∈ N → x ∈ N)
+    : ∃ r : M →ₗ[O] N, r ∘ₗ N.subtype = LinearMap.id := by
   haveI : NoZeroSMulDivisors O (M ⧸ N) := by
     refine ⟨fun {c y} h => ?_⟩
     by_cases hc : c = 0
@@ -43,12 +48,13 @@ theorem exists_retraction {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuat
     change (y : M) - s (N.mkQ y) = y
     rw [h0, map_zero, sub_zero]
 
-theorem exists_integral_leftInverse {V K : Type} [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K] {g n : ℕ}
-    (W : Submodule K (Fin g → K)) (b : Fin n → Fin g → K) (hb : LinearIndependent K b)
-    (hsp : Submodule.span V (Set.range b) = stdLat V K g ⊓ W.restrictScalars V) :
-    ∃ m : Fin n → Fin g → V, ∀ i i', ∑ k, algebraMap V K (m i k) * b i' k =
-      if i = i' then 1 else 0 := by
+theorem exists_integral_leftInverse
+    {V K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
+    [IsFractionRing V K]
+    {g n : ℕ} (W : Submodule K (Fin g → K)) (b : Fin n → Fin g → K) (hb : LinearIndependent K b)
+    (hsp : Submodule.span V (Set.range b) = stdLat V K g ⊓ W.restrictScalars V)
+    : ∃ m : Fin n → Fin g → V, ∀ i i',
+      ∑ k, algebraMap V K (m i k) * b i' k = if i = i' then 1 else 0 := by
   let φ : (Fin g → V) →ₗ[V] (Fin g → K) :=
     LinearMap.pi fun k => (Algebra.linearMap V K).comp (LinearMap.proj k)
   let N : Submodule V (Fin g → V) := (W.restrictScalars V).comap φ
@@ -87,10 +93,8 @@ theorem exists_integral_leftInverse {V K : Type} [CommRing V] [IsDomain V]
     show ∀ k, φ y k ∈ (algebraMap V K).range
     intro k
     exact RingHom.mem_range.2 ⟨(y : Fin g → V) k, rfl⟩
-  let ψ : N →ₗ[V] Submodule.span V (Set.range b) :=
-    LinearMap.codRestrict _ (φ ∘ₗ N.subtype) hψ
-  let F : Fin n → (Fin g → V) →ₗ[V] V := fun i =>
-    Finsupp.lapply i ∘ₗ hbV.repr ∘ₗ ψ ∘ₗ r
+  let ψ : N →ₗ[V] Submodule.span V (Set.range b) := LinearMap.codRestrict _ (φ ∘ₗ N.subtype) hψ
+  let F : Fin n → (Fin g → V) →ₗ[V] V := fun i => Finsupp.lapply i ∘ₗ hbV.repr ∘ₗ ψ ∘ₗ r
   refine ⟨fun i k => F i (fun j => if k = j then 1 else 0), fun i i' => ?_⟩
   have hF : F i (β i') = if i = i' then 1 else 0 := by
     have hr' : r (β i') = ⟨β i', hβN i'⟩ := LinearMap.congr_fun hr ⟨β i', hβN i'⟩
@@ -104,24 +108,26 @@ theorem exists_integral_leftInverse {V K : Type} [CommRing V] [IsDomain V]
   have hsum : F i (β i') = ∑ k, β i' k * F i (fun j => if k = j then 1 else 0) := by
     rw [LinearMap.pi_apply_eq_sum_univ (F i) (β i')]
     simp only [smul_eq_mul]
-  calc ∑ k, algebraMap V K (F i (fun j => if k = j then 1 else 0)) * b i' k
-      = algebraMap V K (∑ k, β i' k * F i (fun j => if k = j then 1 else 0)) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
-        refine Finset.sum_congr rfl fun k _ => ?_
-        rw [map_mul, hβ, mul_comm]
+  calc
+    ∑ k, algebraMap V K (F i (fun j => if k = j then 1 else 0)) * b i' k
+        = algebraMap V K (∑ k, β i' k * F i (fun j => if k = j then 1 else 0)) := by
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum]
+      refine Finset.sum_congr rfl fun k _ => ?_
+      rw [map_mul, hβ, mul_comm]
     _ = if i = i' then 1 else 0 := by
-        rw [← hsum, hF]
-        split_ifs <;> simp
+      rw [← hsum, hF]
+      split_ifs <;> simp
 
-theorem mem_span_of_mem {V K : Type} [CommRing V] [IsDomain V] [Field K] [Algebra V K]
-    [IsFractionRing V K] {g n : ℕ} (W : Submodule K (Fin g → K)) (b : Fin n → Fin g → K)
-    (hsp : Submodule.span V (Set.range b) = stdLat V K g ⊓ W.restrictScalars V) {u : Fin g → K}
-    (hu : u ∈ W) : u ∈ Submodule.span K (Set.range b) := by
-  obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors V)
-    (Finset.univ : Finset (Fin g)) u
-  have hd0 : algebraMap V K (d : V) ≠ 0 :=
-    IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors d.2
+theorem mem_span_of_mem
+    {V K : Type} [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K]
+    {g n : ℕ} (W : Submodule K (Fin g → K)) (b : Fin n → Fin g → K)
+    (hsp : Submodule.span V (Set.range b) = stdLat V K g ⊓ W.restrictScalars V)
+    {u : Fin g → K} (hu : u ∈ W)
+    : u ∈ Submodule.span K (Set.range b) := by
+  obtain ⟨d, hd⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors V) (Finset.univ : Finset (Fin g)) u
+  have hd0 : algebraMap V K (d : V) ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors d.2
   have hdu : algebraMap V K (d : V) • u ∈ Submodule.span V (Set.range b) := by
     rw [hsp]
     refine Submodule.mem_inf.2 ⟨?_, W.smul_mem _ hu⟩
@@ -135,19 +141,22 @@ theorem mem_span_of_mem {V K : Type} [CommRing V] [IsDomain V] [Field K] [Algebr
   have h2 := Submodule.smul_mem _ (algebraMap V K (d : V))⁻¹ hK
   rwa [smul_smul, inv_mul_cancel₀ hd0, one_smul] at h2
 
-theorem eigSub_baseChange : ∀ (E : Type) [Field E] [NumberField E] (K C V A : Type) [Field K] [CharZero K] [Field C] [CharZero C] [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [Algebra V K] [IsFractionRing V K] [CommRing A] [IsDomain A] [Algebra A C]
-    (j : K →+* C) (g n : ℕ) (ρK : 𝓞 E →+* Module.End K (Fin g → K)) (ρC : 𝓞 E →+* Module.End C (Fin g → C))
-    (σ : E →+* K) (b : Fin n → Fin g → K),
-    (∀ a : K, a ∈ (algebraMap V K).range → j a ∈ (algebraMap A C).range) →
-    (∀ (a : 𝓞 E) (x : Fin g → K), ρC a (fun i => j (x i)) = fun i => j (ρK a x i)) →
-    LinearIndependent K b → Submodule.span V (Set.range b) = HT.eigSub ρK σ (stdLat V K g) →
-    LinearIndependent C (fun i k => j (b i k)) ∧
-      Submodule.span C (Set.range fun i k => j (b i k)) = HT.eigSp ρC (j.comp σ) ∧
-      Submodule.span A (Set.range fun i k => j (b i k)) = HT.eigSub ρC (j.comp σ) (stdLat A C g) := by
+theorem eigSub_baseChange
+    : ∀ (E : Type) [Field E] [NumberField E] (K C V A : Type) [Field K] [CharZero K] [Field C]
+        [CharZero C] [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra V K]
+        [IsFractionRing V K] [CommRing A] [IsDomain A] [Algebra A C] (j : K →+* C) (g n : ℕ)
+        (ρK : 𝓞 E →+* Module.End K (Fin g → K)) (ρC : 𝓞 E →+* Module.End C (Fin g → C))
+        (σ : E →+* K) (b : Fin n → Fin g → K),
+      (∀ a : K, a ∈ (algebraMap V K).range → j a ∈ (algebraMap A C).range)
+        → (∀ (a : 𝓞 E) (x : Fin g → K), ρC a (fun i => j (x i)) = fun i => j (ρK a x i))
+        → LinearIndependent K b → Submodule.span V (Set.range b) = HT.eigSub ρK σ (stdLat V K g)
+        → LinearIndependent C (fun i k => j (b i k))
+          ∧ Submodule.span C (Set.range fun i k => j (b i k)) = HT.eigSp ρC (j.comp σ)
+          ∧ Submodule.span A (Set.range fun i k => j (b i k))
+            = HT.eigSub ρC (j.comp σ) (stdLat A C g) := by
   intro E _ _ K C V A _ _ _ _ _ _ _ _ _ _ _ _ j g n ρK ρC σ b hA hρ hb hsp
-  have hsp' : Submodule.span V (Set.range b) =
-      stdLat V K g ⊓ (HT.eigSp ρK σ).restrictScalars V := hsp
+  have hsp' : Submodule.span V (Set.range b) = stdLat V K g ⊓ (HT.eigSp ρK σ).restrictScalars V :=
+    hsp
   obtain ⟨m, hm⟩ := exists_integral_leftInverse (HT.eigSp ρK σ) b hb hsp'
   have hbmem : ∀ i', b i' ∈ stdLat V K g ⊓ (HT.eigSp ρK σ).restrictScalars V := by
     intro i'
@@ -159,18 +168,22 @@ theorem eigSub_baseChange : ∀ (E : Type) [Field E] [NumberField E] (K C V A : 
       (Submodule.mem_inf.1 (hbmem i')).2
     have h2 := (Submodule.mem_iInf _).1 h a
     rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-      sub_eq_zero] at h2
+        sub_eq_zero]
+      at h2
     exact h2
-  have hcoef : ∀ (c : Fin n → C) i,
-      ∑ k, j (algebraMap V K (m i k)) * (∑ i', c i' • fun k => j (b i' k)) k = c i := by
+  have hcoef
+      : ∀ (c : Fin n → C) i,
+        ∑ k, j (algebraMap V K (m i k)) * (∑ i', c i' • fun k => j (b i' k)) k = c i := by
     intro c i
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
-    have e2 : ∀ i', ∑ k, j (algebraMap V K (m i k)) * (c i' * j (b i' k)) =
-        if i = i' then c i' else 0 := by
+    have e2
+        : ∀ i',
+          ∑ k, j (algebraMap V K (m i k)) * (c i' * j (b i' k)) = if i = i' then c i' else 0 := by
       intro i'
-      have e3 : ∑ k, j (algebraMap V K (m i k)) * (c i' * j (b i' k)) =
-          c i' * j (∑ k, algebraMap V K (m i k) * b i' k) := by
+      have e3
+          : ∑ k, j (algebraMap V K (m i k)) * (c i' * j (b i' k))
+            = c i' * j (∑ k, algebraMap V K (m i k) * b i' k) := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum, Finset.mul_sum]
         refine Finset.sum_congr rfl fun k _ => ?_
@@ -201,7 +214,8 @@ theorem eigSub_baseChange : ∀ (E : Type) [Field E] [NumberField E] (K C V A : 
         have h : x ∈ ⨅ a : 𝓞 E, LinearMap.ker (ρC a - (j.comp σ) (a : E) • 1) := hx
         have h2 := (Submodule.mem_iInf _).1 h a
         rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-          sub_eq_zero, RingHom.comp_apply] at h2
+            sub_eq_zero, RingHom.comp_apply]
+          at h2
         exact h2
       letI : Algebra K C := j.toAlgebra
       let S : Submodule K C := Submodule.span K (Set.range x)
@@ -213,9 +227,11 @@ theorem eigSub_baseChange : ∀ (E : Type) [Field E] [NumberField E] (K C V A : 
         bS.repr ⟨x k, Submodule.subset_span ⟨k, rfl⟩⟩ t
       have hxk : ∀ k, x k = ∑ t, j (y t k) * c t := by
         intro k
-        have h := congrArg (fun s : S => (s : C)) (bS.sum_repr ⟨x k, Submodule.subset_span ⟨k, rfl⟩⟩)
+        have h :=
+          congrArg (fun s : S => (s : C)) (bS.sum_repr ⟨x k, Submodule.subset_span ⟨k, rfl⟩⟩)
         simp only [Submodule.coe_sum, Submodule.coe_smul, Submodule.coe_smul_of_tower,
-          Algebra.smul_def] at h
+            Algebra.smul_def]
+          at h
         exact h.symm
       have hxsum : x = ∑ t, c t • (fun k => j (y t k)) := by
         funext k
@@ -230,12 +246,13 @@ theorem eigSub_baseChange : ∀ (E : Type) [Field E] [NumberField E] (K C V A : 
         set_option synthInstance.maxHeartbeats 100000 in
           rw [hxsum, map_sum] at h
         simp only [map_smul, hρ, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum] at h
-        calc ∑ t, (ρK a (y t) k - σ (a : E) * y t k) • c t
-            = ∑ t, c t * j (ρK a (y t) k) - ∑ t, j (σ (a : E)) * (c t * j (y t k)) := by
-              rw [← Finset.sum_sub_distrib]
-              refine Finset.sum_congr rfl fun t _ => ?_
-              rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra, map_sub, map_mul]
-              ring
+        calc
+          ∑ t, (ρK a (y t) k - σ (a : E) * y t k) • c t
+              = ∑ t, c t * j (ρK a (y t) k) - ∑ t, j (σ (a : E)) * (c t * j (y t k)) := by
+            rw [← Finset.sum_sub_distrib]
+            refine Finset.sum_congr rfl fun t _ => ?_
+            rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra, map_sub, map_mul]
+            ring
           _ = 0 := by rw [h, sub_self]
       have hyE : ∀ t, y t ∈ HT.eigSp ρK σ := by
         intro t
@@ -254,7 +271,7 @@ theorem eigSub_baseChange : ∀ (E : Type) [Field E] [NumberField E] (K C V A : 
         funext k
         rw [← hcoef]
         set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
+        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
       rw [hxsum]
       exact Submodule.sum_mem _ fun t _ => Submodule.smul_mem _ (c t) (hyC t)
   have hbA : ∀ i' k, j (b i' k) ∈ (algebraMap A C).range := by

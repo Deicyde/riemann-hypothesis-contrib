@@ -9,7 +9,9 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.BesselUnipotentSubgro
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff
 
 namespace Formalism.L2.Fam.ThC
@@ -24,7 +26,7 @@ variable {D : D7}
 
 structure ChrIn (D : D7) where
   chr : D.what₂.Tup → ℕ → chrA D
-  chr_exp : ∀ μ (j : Fin D.R.m) τ, HasInfExp D (chr μ (j.1 + 1)).1 τ (-(D.hc τ).e j)
+  chr_exp : ∀ μ (j : Fin D.R.m) τ, HasInfExp D (chr μ (j.1 + 1)).1 τ (- (D.hc τ).e j)
   chr_res : ∀ μ j, 1 ≤ j → j ≤ D.R.m → ResEta D (chr μ j).1 0
   eta : chrA D
   eta_exp : ∀ τ, HasInfExp D eta.1 τ (1 / 2)
@@ -43,7 +45,6 @@ structure Free {ψ : AddChar (AF D.host.F) ℂ} (_Om : WeilC ψ) : Type 1 where
   conjS_conjS : ∀ V W Φ, conjS V W (conjS V W Φ) = Φ
   conjS_fact : ∀ V W, ∀ Φ ∈ fact V W, conjS V W Φ ∈ fact V W
   conjS_kfin : ∀ V W, ∀ Φ ∈ kfinC ψ V W, conjS V W Φ ∈ kfinC ψ V W
-
   PosE : ∀ (A B : HSp D), (A.V →ₗ[D.host.E] B.V) → Type
   FJd : ∀ (A B : HSp D), (A.V →ₗ[D.host.E] B.V) → Type
   [fjAdd : ∀ A B ι, AddCommGroup (FJd A B ι)]
@@ -52,9 +53,10 @@ structure Free {ψ : AddChar (AF D.host.F) ℂ} (_Om : WeilC ψ) : Type 1 where
   BE_right : ∀ A B ι p s φ, IsLinearMap ℂ (BE A B ι p s φ)
   BE_add : ∀ A B ι p s φ φ' F, BE A B ι p s (φ + φ') F = BE A B ι p s φ F + BE A B ι p s φ' F
   BE_smul : ∀ A B ι p s (c : ℂ) φ F, BE A B ι p s (c • φ) F = star c * BE A B ι p s φ F
-  pos1 : D.what₂.Word → {d : BesDat (D.sp.X 0) (D.sp.Y 0) (D.sp.iXY 0) // (d.y : GA D (D.sp.Y 0)) = 1}
-  posSym : D.what₂.Word → {d : BesDat (D.sp.X 0) (D.sp.Y 0) (D.sp.iXY 0) // (d.y : GA D (D.sp.Y 0)) = 1}
-
+  pos1
+    : D.what₂.Word → {d : BesDat (D.sp.X 0) (D.sp.Y 0) (D.sp.iXY 0) // (d.y : GA D (D.sp.Y 0)) = 1}
+  posSym
+    : D.what₂.Word → {d : BesDat (D.sp.X 0) (D.sp.Y 0) (D.sp.iXY 0) // (d.y : GA D (D.sp.Y 0)) = 1}
   f1 : ∀ u, Matrix (Fin (D.sp.Y 0).rank) (Fin (pos1 u).1.ρ) D.host.E
   free_flag_dual : ∀ u, IsDualFlag (pos1 u).1 (f1 u)
   colAF : ∀ (u : D.what₂.Word) (_μ : D.what₂.Tup) (j : ℕ), D.what₂.Mu u →ₗ[ℂ] cuspC D (D.sp.X j)

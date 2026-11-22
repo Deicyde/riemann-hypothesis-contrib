@@ -31,8 +31,7 @@ theorem lemma_c_twist_ramified : LemmaC_twist_ram := by
     exact ⟨hSD ⟨x, hx.1, rfl⟩, hPD ⟨x, hx.2, rfl⟩⟩
   let ι : (S ⊓ P : Submodule R M) →ₗ[R] S := Submodule.inclusion inf_le_left
   have hι : Function.Injective ι := Submodule.inclusion_injective _
-  obtain ⟨n, bN⟩ := Submodule.basisOfPid (Module.Free.chooseBasis R S)
-    ((S ⊓ P).comap S.subtype)
+  obtain ⟨n, bN⟩ := Submodule.basisOfPid (Module.Free.chooseBasis R S) ((S ⊓ P).comap S.subtype)
   let eN : ((S ⊓ P).comap S.subtype) ≃ₗ[R] (S ⊓ P : Submodule R M) :=
     Submodule.comapSubtypeEquivOfLe inf_le_left
   haveI : Module.Free R (S ⊓ P : Submodule R M) := Module.Free.of_basis (bN.map eN)
@@ -42,9 +41,11 @@ theorem lemma_c_twist_ramified : LemmaC_twist_ram := by
   have key' := key R ϖ hϖ M (S ⊓ P) (B ⊓ P) U D e b h1 h2 h3 hUD inferInstance inferInstance
   have hrank : Module.finrank R (S ⊓ P : Submodule R M) ≤ Module.finrank R S :=
     LinearMap.finrank_le_finrank_of_injective hι
-  have hlen : Module.length R ((B ⊓ P : Submodule R M) ⧸
-      ((S ⊓ P).map ((ϖ ^ b) • (LinearMap.id : M →ₗ[R] M))).comap (B ⊓ P).subtype) ≤
-      Module.length R (B ⧸ (S.map ((ϖ ^ b) • (LinearMap.id : M →ₗ[R] M))).comap B.subtype) := by
+  have hlen
+      : Module.length R
+          ((B ⊓ P : Submodule R M) ⧸
+            ((S ⊓ P).map ((ϖ ^ b) • (LinearMap.id : M →ₗ[R] M))).comap (B ⊓ P).subtype)
+        ≤ Module.length R (B ⧸ (S.map ((ϖ ^ b) • (LinearMap.id : M →ₗ[R] M))).comap B.subtype) := by
     refine Module.length_le_of_injective
       (Submodule.mapQ _ _ (Submodule.inclusion (inf_le_left : B ⊓ P ≤ B)) ?_) ?_
     · intro x hx

@@ -19,7 +19,8 @@ private theorem le_mul_totient_sq (n : ℕ) : n ≤ (if Even n then 2 else 1) * 
         exact Nat.pow_le_pow_right (by norm_num) (by omega)
       simpa using this
     · have hodd : ¬ Even (p ^ k) := by
-        rw [Nat.even_pow]; rintro ⟨he, -⟩
+        rw [Nat.even_pow]
+        rintro ⟨he, -⟩
         exact h2 ((Nat.Prime.even_iff hp).1 he)
       rw [if_neg hodd, one_mul]
       have hp3 : 3 ≤ p := by
@@ -31,15 +32,21 @@ private theorem le_mul_totient_sq (n : ℕ) : n ≤ (if Even n then 2 else 1) * 
         obtain ⟨q, rfl⟩ : ∃ q, p = q + 3 := ⟨p - 3, by omega⟩
         rw [show q + 3 - 1 = q + 2 by omega]
         nlinarith
-      calc p ^ k ≤ p ^ (2 * (k - 1) + 1) := Nat.pow_le_pow_right hp.pos (by omega)
+      calc
+        p ^ k
+          ≤ p ^ (2 * (k - 1) + 1) := Nat.pow_le_pow_right hp.pos (by omega)
         _ = (p ^ (k - 1)) ^ 2 * p := by rw [pow_succ, pow_mul, ← pow_mul, mul_comm 2]; ring
         _ ≤ (p ^ (k - 1)) ^ 2 * (p - 1) ^ 2 := Nat.mul_le_mul_left _ hsq
         _ = (p ^ (k - 1) * (p - 1)) ^ 2 := by ring
-  | zero => simp
-  | one => simp
+  | zero =>
+    simp
+  | one =>
+    simp
   | coprime a b _ _ hab iha ihb =>
     rw [Nat.totient_mul hab]
-    have hc : (if Even (a * b) then 2 else 1) = (if Even a then 2 else 1) * (if Even b then 2 else 1) := by
+    have hc
+        : (if Even (a * b) then 2 else 1)
+          = (if Even a then 2 else 1) * (if Even b then 2 else 1) := by
       by_cases ha : Even a <;> by_cases hb : Even b
       · exfalso
         have h2a : 2 ∣ a := even_iff_two_dvd.1 ha
@@ -52,8 +59,11 @@ private theorem le_mul_totient_sq (n : ℕ) : n ≤ (if Even n then 2 else 1) * 
       · have : ¬ Even (a * b) := by rw [Nat.even_mul]; tauto
         simp [ha, hb, this]
     rw [hc]
-    calc a * b ≤ ((if Even a then 2 else 1) * a.totient ^ 2) * ((if Even b then 2 else 1) * b.totient ^ 2) :=
-          Nat.mul_le_mul iha ihb
+    calc
+      a * b
+          ≤ ((if Even a then 2 else 1) * a.totient ^ 2)
+            * ((if Even b then 2 else 1) * b.totient ^ 2) :=
+        Nat.mul_le_mul iha ihb
       _ = _ := by ring
 
 private theorem le_two_totient_sq (n : ℕ) : n ≤ 2 * n.totient ^ 2 := by
@@ -61,8 +71,8 @@ private theorem le_two_totient_sq (n : ℕ) : n ≤ 2 * n.totient ^ 2 := by
   have hc : (if Even n then 2 else 1) ≤ 2 := by split_ifs <;> norm_num
   exact h.trans (Nat.mul_le_mul_right _ hc)
 
-private theorem torsion_order_le_two_mul_finrank_sq (E : Type) [Field E] [NumberField E] :
-    Units.torsionOrder E ≤ 2 * (Module.finrank ℚ E) ^ 2 := by
+private theorem torsion_order_le_two_mul_finrank_sq (E : Type) [Field E] [NumberField E]
+    : Units.torsionOrder E ≤ 2 * (Module.finrank ℚ E) ^ 2 := by
   classical
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := Units.torsion E)
   have hord : orderOf g = Units.torsionOrder E := by
@@ -83,10 +93,13 @@ private theorem torsion_order_le_two_mul_finrank_sq (E : Type) [Field E] [Number
   have hdeg : (Units.torsionOrder E).totient ≤ Module.finrank ℚ E := by
     rw [← Polynomial.natDegree_cyclotomic (Units.torsionOrder E) ℚ, ← hmin]
     exact minpoly.natDegree_le ζ
-  calc Units.torsionOrder E ≤ 2 * (Units.torsionOrder E).totient ^ 2 := le_two_totient_sq _
+  calc
+    Units.torsionOrder E
+      ≤ 2 * (Units.torsionOrder E).totient ^ 2 := le_two_totient_sq _
     _ ≤ 2 * (Module.finrank ℚ E) ^ 2 := Nat.mul_le_mul_left _ (Nat.pow_le_pow_left hdeg 2)
 
-theorem UpperTheory.torsionOrder_le_two_mul_finrank_sq :
-    ∀ (E : Type) [Field E] [NumberField E], NumberField.Units.torsionOrder E ≤ 2 * Module.finrank ℚ E ^ 2 := by
+theorem UpperTheory.torsionOrder_le_two_mul_finrank_sq
+    : ∀ (E : Type) [Field E] [NumberField E],
+      NumberField.Units.torsionOrder E ≤ 2 * Module.finrank ℚ E ^ 2 := by
   intro E _ _
   exact torsion_order_le_two_mul_finrank_sq E

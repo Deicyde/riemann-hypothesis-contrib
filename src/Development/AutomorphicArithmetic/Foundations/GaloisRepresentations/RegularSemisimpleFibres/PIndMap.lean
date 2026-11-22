@@ -5,24 +5,30 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 set_option maxHeartbeats 1600000 in
-theorem UpperTheory.Gal.InertialTypesAlt.indMap :
-    UpperTheory.Gal.TypesAndIwahori.IndSupp → UpperTheory.Gal.TypesAndIwahori.ParaFactor → IndMap := by
+theorem UpperTheory.Gal.InertialTypesAlt.indMap
+    : UpperTheory.Gal.TypesAndIwahori.IndSupp → UpperTheory.Gal.TypesAndIwahori.ParaFactor
+      → IndMap := by
   intro hSupp hPara k _ _ _ _ N s d hd W Z _ _ _ _ ρ κ j hj hjκ
   set e := stdBlocks d hd with he
   let σ := (twist ρ (deltaHalf k fun a : Fin s => Fin (d a))).comp (leviProj k e)
-  have hσ : ∀ (p : parab k e), leviProj k e p ∈ leviK k (fun a : Fin s => Fin (d a)) →
-      ∀ w : W, σ p w = ρ (leviProj k e p) w := by
+  have hσ
+      : ∀ (p : parab k e),
+        leviProj k e p ∈ leviK k (fun a : Fin s => Fin (d a))
+          → ∀ w : W, σ p w = ρ (leviProj k e p) w := by
     intro p hK w
     have h3 := deltaHalf_of_mem_leviK hK
-    simp only [σ, MonoidHom.comp_apply, twist, MonoidHom.coe_mk, OneHom.coe_mk, LinearMap.smul_apply, h3,
-      Units.val_one, one_smul]
+    simp only [σ, MonoidHom.comp_apply, twist, MonoidHom.coe_mk, OneHom.coe_mk,
+      LinearMap.smul_apply, h3, Units.val_one, one_smul]
   have key : ∀ z : Z, ∀ p : parab k e, (p : GL (Fin N) k) ∈ KOne k (Fin N) → σ p (j z) = j z := by
     intro z p hp
     have hl := (hPara k e).2 p hp
@@ -38,12 +44,14 @@ theorem UpperTheory.Gal.InertialTypesAlt.indMap :
     exact h2.symm
   choose F hF1 hF0 using fun z => hSupp (GL (Fin N) k) W (parab k e) (KOne k (Fin N)) σ (j z)
     GlobalTheory.StepData.isOpen_KOne (key z)
-  have uniq : ∀ (u : W) (f f' : GL (Fin N) k → W),
-      (∀ (p : parab k e), ∀ c ∈ KOne k (Fin N), f ((p : GL (Fin N) k) * c) = σ p u) →
-      (∀ g, (¬∃ (p : parab k e), ∃ c ∈ KOne k (Fin N), g = (p : GL (Fin N) k) * c) → f g = 0) →
-      (∀ (p : parab k e), ∀ c ∈ KOne k (Fin N), f' ((p : GL (Fin N) k) * c) = σ p u) →
-      (∀ g, (¬∃ (p : parab k e), ∃ c ∈ KOne k (Fin N), g = (p : GL (Fin N) k) * c) → f' g = 0) →
-      f = f' := by
+  have uniq
+      : ∀ (u : W) (f f' : GL (Fin N) k → W),
+        (∀ (p : parab k e), ∀ c ∈ KOne k (Fin N), f ((p : GL (Fin N) k) * c) = σ p u)
+          → (∀ g, (¬ ∃ (p : parab k e), ∃ c ∈ KOne k (Fin N), g = (p : GL (Fin N) k) * c) → f g = 0)
+          → (∀ (p : parab k e), ∀ c ∈ KOne k (Fin N), f' ((p : GL (Fin N) k) * c) = σ p u)
+          → (∀ g,
+            (¬ ∃ (p : parab k e), ∃ c ∈ KOne k (Fin N), g = (p : GL (Fin N) k) * c) → f' g = 0)
+          → f = f' := by
     intro u f f' h1 h0 h1' h0'
     funext g
     by_cases hg : ∃ (p : parab k e), ∃ c ∈ KOne k (Fin N), g = (p : GL (Fin N) k) * c
@@ -63,35 +71,38 @@ theorem UpperTheory.Gal.InertialTypesAlt.indMap :
       rw [mul_assoc, hF1 z p _ (mul_mem hc' hc), hF1 z p c' hc']
     · rw [hF0 z g hg, hF0 z (g * c)]
       rintro ⟨p, c', hc', h⟩
-      exact hg ⟨p, c' * c⁻¹, mul_mem hc' (inv_mem hc), by rw [← mul_assoc, ← h, mul_inv_cancel_right]⟩
-  let Φ : Z →ₗ[ℂ] fixed (parInd e ρ) (KOne k (Fin N)) :=
-    { toFun := fun z => ⟨F z, hfix z⟩
-      map_add' := by
-        intro z z'
-        apply Subtype.ext
-        apply Subtype.ext
-        apply Subtype.ext
-        change (F (z + z')).1.1 = (F z).1.1 + (F z').1.1
-        refine uniq (j (z + z')) _ _ (hF1 _) (hF0 _) ?_ ?_
-        · intro p c hc
-          simp only [Pi.add_apply, hF1 z p c hc, hF1 z' p c hc, map_add (f := _)]
-        · intro g hg
-          simp only [Pi.add_apply, hF0 z g hg, hF0 z' g hg, add_zero]
-      map_smul' := by
-        intro a z
-        apply Subtype.ext
-        apply Subtype.ext
-        apply Subtype.ext
-        change (F (a • z)).1.1 = a • (F z).1.1
-        refine uniq (j (a • z)) _ _ (hF1 _) (hF0 _) ?_ ?_
-        · intro p c hc
-          simp only [Pi.smul_apply, hF1 z p c hc, map_smul]
-        · intro g hg
-          simp only [Pi.smul_apply, hF0 z g hg, smul_zero] }
-  let ev : fixed (parInd e ρ) (KOne k (Fin N)) →ₗ[ℂ] W :=
-    { toFun := fun v => v.1.1.1 1
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+      exact hg
+        ⟨p, c' * c⁻¹, mul_mem hc' (inv_mem hc), by rw [← mul_assoc, ← h, mul_inv_cancel_right]⟩
+  let Φ : Z →ₗ[ℂ] fixed (parInd e ρ) (KOne k (Fin N)) := {
+    toFun := fun z => ⟨F z, hfix z⟩
+    map_add' := by
+      intro z z'
+      apply Subtype.ext
+      apply Subtype.ext
+      apply Subtype.ext
+      change (F (z + z')).1.1 = (F z).1.1 + (F z').1.1
+      refine uniq (j (z + z')) _ _ (hF1 _) (hF0 _) ?_ ?_
+      · intro p c hc
+        simp only [Pi.add_apply, hF1 z p c hc, hF1 z' p c hc, map_add (f := _)]
+      · intro g hg
+        simp only [Pi.add_apply, hF0 z g hg, hF0 z' g hg, add_zero]
+    map_smul' := by
+      intro a z
+      apply Subtype.ext
+      apply Subtype.ext
+      apply Subtype.ext
+      change (F (a • z)).1.1 = a • (F z).1.1
+      refine uniq (j (a • z)) _ _ (hF1 _) (hF0 _) ?_ ?_
+      · intro p c hc
+        simp only [Pi.smul_apply, hF1 z p c hc, map_smul]
+      · intro g hg
+        simp only [Pi.smul_apply, hF0 z g hg, smul_zero]
+  }
+  let ev : fixed (parInd e ρ) (KOne k (Fin N)) →ₗ[ℂ] W := {
+    toFun := fun v => v.1.1.1 1
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hev : ∀ z, (F z).1.1 1 = j z := by
     intro z
     have := hF1 z 1 1 (one_mem _)
@@ -123,8 +134,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.indMap :
         refine mul_mem ?_ hc
         have := (Subgroup.mem_normalizer_iff.1 (inv_mem hn) c1).1 hc1
         simpa using this
-      have heq : (q : GL (Fin N) k) * c1 * (g : GL (Fin N) k) =
-          ((q * p' : parab k e) : GL (Fin N) k) * ((p' : GL (Fin N) k)⁻¹ * c1 * (p' : GL (Fin N) k) * c) := by
+      have heq
+          : (q : GL (Fin N) k) * c1 * (g : GL (Fin N) k)
+            = ((q * p' : parab k e) : GL (Fin N) k)
+              * ((p' : GL (Fin N) k)⁻¹ * c1 * (p' : GL (Fin N) k) * c) := by
         rw [hgc', Subgroup.coe_mul]
         group
       show (F z).1.1 ((q : GL (Fin N) k) * c1 * (g : GL (Fin N) k)) = _
@@ -136,7 +149,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.indMap :
       apply hh
       refine ⟨q * p'⁻¹, (p' : GL (Fin N) k) * (c2 * c⁻¹) * (p' : GL (Fin N) k)⁻¹, ?_, ?_⟩
       · exact (Subgroup.mem_normalizer_iff.1 hn (c2 * c⁻¹)).1 (mul_mem hc2 (inv_mem hc))
-      · calc h = (h * (g : GL (Fin N) k)) * (g : GL (Fin N) k)⁻¹ := by group
+      · calc
+          h = (h * (g : GL (Fin N) k)) * (g : GL (Fin N) k)⁻¹ := by group
           _ = _ := by
             rw [hq, hgc', Subgroup.coe_mul, Subgroup.coe_inv]
             group

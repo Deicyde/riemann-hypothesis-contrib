@@ -12,8 +12,8 @@ namespace UpperTheory.NonzeroTypeTheory
 
 namespace TranslationCoordinates
 
-variable {K : Type} [Group K] (W : Submodule ℂ (K → ℂ))
-  (hW : ∀ φ ∈ W, ∀ k : K, rightReg ℂ K ℂ k φ ∈ W)
+variable
+  {K : Type} [Group K] (W : Submodule ℂ (K → ℂ)) (hW : ∀ φ ∈ W, ∀ k : K, rightReg ℂ K ℂ k φ ∈ W)
 
 def rW : Representation ℂ K W := sub (rightReg ℂ K ℂ) W (fun k φ hφ => hW φ hφ k)
 

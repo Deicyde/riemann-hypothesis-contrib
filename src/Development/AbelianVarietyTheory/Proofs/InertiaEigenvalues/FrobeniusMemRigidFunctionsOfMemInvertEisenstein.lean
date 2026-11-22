@@ -9,10 +9,11 @@ open PowerSeries GlobalTheory.BK Filter Topology
 
 namespace GlobalTheory.BK
 
-theorem exists_mul_frob_E_eq_one_of_lt (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
-    [IsUnitBall O K] (l e : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] (k : ℝ)
-    (hk : 1 / ((e : ℝ) * l) < k) :
-    ∃ g ∈ R O K l k, g * frob K l (E K l e) = 1 := by
+theorem exists_mul_frob_E_eq_one_of_lt
+    (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+    (l e : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e]
+    (k : ℝ) (hk : 1 / ((e : ℝ) * l) < k)
+    : ∃ g ∈ R O K l k, g * frob K l (E K l e) = 1 := by
   have hl := (Fact.out : l.Prime).pos
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have : NeZero (e * l) := ⟨(Nat.mul_pos (NeZero.pos e) hl).ne'⟩
@@ -37,8 +38,9 @@ theorem exists_mul_frob_E_eq_one_of_lt (O K : Type) [CommRing O] [NormedField K]
       linarith
     rw [Real.rpow_neg_one] at h2
     rw [hr, h1]
-    calc (l : ℝ) * (l : ℝ) ^ (-(k * ((e : ℝ) * l))) < (l : ℝ) * (l : ℝ)⁻¹ :=
-          mul_lt_mul_of_pos_left h2 (by positivity)
+    calc
+      (l : ℝ) * (l : ℝ) ^ (-(k * ((e : ℝ) * l)))
+        < (l : ℝ) * (l : ℝ)⁻¹ := mul_lt_mul_of_pos_left h2 (by positivity)
       _ = 1 := mul_inv_cancel₀ (by positivity)
   have hc (n : ℕ) : ‖coeff n c‖ * rad l k ^ n ≤ r ^ (n / (e * l)) := by
     simp only [c]
@@ -48,13 +50,17 @@ theorem exists_mul_frob_E_eq_one_of_lt (O K : Type) [CommRing O] [NormedField K]
       rw [Nat.mul_div_cancel_left _ (NeZero.pos (e * l)), coeff_rescale, coeff_mk, Pi.one_apply,
         mul_one, norm_pow, norm_neg, norm_inv, norm_l, inv_inv, hr, mul_pow, pow_mul]
     · simpa using pow_nonneg hr0 _
-  have hcR : c ∈ R O K l k := mem_R.2 <| squeeze_zero
-    (fun n => mul_nonneg (norm_nonneg _) (pow_nonneg (rad_nonneg l k) n)) hc
-    ((tendsto_pow_atTop_nhds_zero_of_lt_one hr0 hr1).comp
-      (Nat.tendsto_div_const_atTop (NeZero.ne _)))
+  have hcR : c ∈ R O K l k :=
+    mem_R.2 <| squeeze_zero
+      (fun n => mul_nonneg (norm_nonneg _) (pow_nonneg (rad_nonneg l k) n))
+      hc
+      ((tendsto_pow_atTop_nhds_zero_of_lt_one hr0 hr1).comp
+        (Nat.tendsto_div_const_atTop (NeZero.ne _)))
   refine ⟨C (l : K)⁻¹ * c, mul_mem (HasK.C_mem _) hcR, ?_⟩
-  have h := congrArg (fun f => expand (e * l) (NeZero.ne _) (rescale (-(l : K)⁻¹) f))
-    (mk_one_mul_one_sub_eq_one K)
+  have h :=
+    congrArg
+      (fun f => expand (e * l) (NeZero.ne _) (rescale (-(l : K)⁻¹) f))
+      (mk_one_mul_one_sub_eq_one K)
   simp only [map_mul, map_sub, map_one, rescale_X, expand_X, expand_C, map_neg] at h
   have h2 : (C (l : K)⁻¹ : K⟦X⟧) * l = 1 := by
     rw [← map_natCast (C : K →+* K⟦X⟧), ← map_mul, inv_mul_cancel₀ hl0, map_one]
@@ -65,12 +71,18 @@ end GlobalTheory.BK
 
 namespace GlobalTheory.BK
 
-theorem frob_mem_R_of_mem_invE_A : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] (l e : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] (k : ℝ), 1 / ((e : ℝ) * l) < k → ∀ f ∈ invE l e (A O K), frob K l f ∈ R O K l k := by
+theorem frob_mem_R_of_mem_invE_A
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
+        [IsUnitBall O K] (l e : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] (k : ℝ),
+      1 / ((e : ℝ) * l) < k → ∀ f ∈ invE l e (A O K), frob K l f ∈ R O K l k := by
   intro O K _ _ _ _ _ l e _ _ _ k hk f hf
-  have hk0 : 0 < k := lt_trans (by
-    have := NeZero.pos e
-    have := (Fact.out : l.Prime).pos
-    positivity) hk
+  have hk0 : 0 < k :=
+    lt_trans
+      (by
+        have := NeZero.pos e
+        have := (Fact.out : l.Prime).pos
+        positivity)
+      hk
   obtain ⟨g, hg, hgE⟩ := exists_mul_frob_E_eq_one_of_lt O K l e k hk
   obtain ⟨n, hn⟩ := mem_away.1 hf
   rw [coe_EIn] at hn

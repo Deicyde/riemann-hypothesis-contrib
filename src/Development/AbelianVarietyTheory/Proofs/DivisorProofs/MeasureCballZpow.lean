@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNo
 
 @[expose] public section
 
-open MeasureTheory GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SatakeBound GlobalTheory.WeylCell
+open MeasureTheory GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SatakeBound
+  GlobalTheory.WeylCell
 
 namespace GlobalTheory.OrdShellInt
 
@@ -24,14 +25,15 @@ open ValuativeRel
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem val_le_iff_ord (x s : kˣ) : valuation k (x : k) ≤ valuation k (s : k) ↔ ord k s ≤ ord k x := by
+theorem val_le_iff_ord (x s : kˣ)
+    : valuation k (x : k) ≤ valuation k (s : k) ↔ ord k s ≤ ord k x := by
   unfold ord
   set φ := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k
   rw [neg_le_neg_iff, WithZero.log_le_log (by simp) (by simp), map_le_map_iff]
 
 theorem ord_zpow (x : kˣ) (n : ℤ) : ord k (x ^ n) = n * ord k x := by
-  let o : kˣ →* Multiplicative ℤ := MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by
-    rw [ord_mul, ofAdd_add]
+  let o : kˣ →* Multiplicative ℤ :=
+    MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by rw [ord_mul, ofAdd_add]
   have h := map_zpow o x n
   have h2 : Multiplicative.toAdd (o (x ^ n)) = Multiplicative.toAdd ((o x) ^ n) := by rw [h]
   simpa [o, toAdd_zpow] using h2

@@ -12,8 +12,11 @@ namespace SubrepresentationTransport
 
 variable {K : Type} [Group K] {m : ℕ}
 
-def transport (V : Representation ℂ K (Fin m → ℂ)) (S : Submodule ℂ (Fin m → ℂ))
-    (hS : ∀ k, ∀ s ∈ S, V k s ∈ S) {d : ℕ} (e : (Fin d → ℂ) ≃ₗ[ℂ] S) : Representation ℂ K (Fin d → ℂ) where
+def transport
+    (V : Representation ℂ K (Fin m → ℂ)) (S : Submodule ℂ (Fin m → ℂ))
+    (hS : ∀ k, ∀ s ∈ S, V k s ∈ S)
+    {d : ℕ} (e : (Fin d → ℂ) ≃ₗ[ℂ] S)
+    : Representation ℂ K (Fin d → ℂ) where
   toFun k := e.symm.toLinearMap ∘ₗ (V k).restrict (fun s hs => hS k s hs) ∘ₗ e.toLinearMap
   map_one' := by
     refine LinearMap.ext fun v => ?_

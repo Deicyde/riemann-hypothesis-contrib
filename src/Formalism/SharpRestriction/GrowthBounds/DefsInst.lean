@@ -15,22 +15,29 @@ namespace Formalism.MainNotions.G
 def EpDef {D : D7} {L : SizeData₂ D} (X : Inst D L) (Ce : ℝ) : Prop :=
   ∀ p, X.ep p = ⌈Ce * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a⌉₊
 
-theorem EpDef.lt {D : D7} {L : SizeData₂ D} {X : Inst D L} {Ce : ℝ} (h : EpDef X Ce) (p : ℕ)
-    (h0 : 0 ≤ Ce * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a) :
-    (X.ep p : ℝ) < Ce * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a + 1 := by
+theorem EpDef.lt
+    {D : D7} {L : SizeData₂ D} {X : Inst D L} {Ce : ℝ} (h : EpDef X Ce)
+    (p : ℕ) (h0 : 0 ≤ Ce * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a)
+    : (X.ep p : ℝ) < Ce * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a + 1 := by
   rw [h]; exact Nat.ceil_lt_add_one h0
 
-theorem EpDef.le {D : D7} {L : SizeData₂ D} {X : Inst D L} {Ce : ℝ} (h : EpDef X Ce) (p : ℕ) (hCe : 0 ≤ Ce)
-    (h1 : 1 ≤ (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a) :
-    (X.ep p : ℝ) ≤ (Ce + 1) * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a := by
+theorem EpDef.le
+    {D : D7} {L : SizeData₂ D} {X : Inst D L} {Ce : ℝ} (h : EpDef X Ce)
+    (p : ℕ)
+    (hCe : 0 ≤ Ce) (h1 : 1 ≤ (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a)
+    : (X.ep p : ℝ) ≤ (Ce + 1) * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a := by
   have h0 : 0 ≤ Ce * (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a := by
     have := mul_nonneg hCe (le_trans zero_le_one h1)
-    calc (0 : ℝ) ≤ Ce * ((D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a) := this
+    calc
+      (0 : ℝ)
+        ≤ Ce * ((D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * Real.logb p L.sc.a) := this
       _ = _ := by ring
   have h2 := h.lt p h0
   nlinarith [h2, h1]
 
-def kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ) : Set ℝ :=
+def kapISet
+    {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ)
+    : Set ℝ :=
   {κ | 0 ≤ κ ∧
     ∀ (W Qq O Kf : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
       [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
@@ -39,29 +46,48 @@ def kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset 
       ∀ lam0 : Fin n' → Fin (D.R.k - 1 + 1) → ℤ, IsBaseWeight TT a b ⌊cG L⌋₊ lam0 → IsDominant lam0 →
         LPprime (W := W) p n' ι σ w 1 lam0 ⌈tIf K L p n' TT a b⌉₊ (DIf K L p n') κ (8 * (DIf K L p n' + 1))}
 
-theorem one_mem_kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ) :
-    (1 : ℝ) ∈ kapISet L K p n' TT a b := by
+theorem one_mem_kapISet
+    {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ)
+    : (1 : ℝ) ∈ kapISet L K p n' TT a b := by
   refine ⟨zero_le_one, ?_⟩
   intro W Qq O Kf _ _ _ _ _ _ _ _ _ _ ι σ j w _ lam0 _ _
-  refine ⟨by omega, fun Λ _ => ⟨0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0,
-    fun i => i.elim0, 0, by simp, ⟨0, 0, fun _ i => i.elim0⟩⟩⟩
+  refine ⟨
+    by omega,
+    fun Λ _ => ⟨
+      0,
+      fun i => i.elim0,
+      fun i => i.elim0,
+      fun i => i.elim0,
+      fun i => i.elim0,
+      fun i => i.elim0,
+      0,
+      by simp,
+      ⟨0, 0, fun _ i => i.elim0⟩
+    ⟩
+  ⟩
 
 def KapIDef {D : D7} {L : SizeData₂ D} (X : Inst D L) (K : Consts) : Prop :=
-  ∀ (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ), X.kapI p n' TT a b = sInf (kapISet L K p n' TT a b)
+  ∀ (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ),
+    X.kapI p n' TT a b = sInf (kapISet L K p n' TT a b)
 
-theorem KapIDef.le {D : D7} {L : SizeData₂ D} {X : Inst D L} {K : Consts} (h : KapIDef X K) {p n' : ℕ}
-    {TT : Finset (Fin n')} {a b : Fin n' → ℤ} {κ : ℝ} (hκ : κ ∈ kapISet L K p n' TT a b) :
-    X.kapI p n' TT a b ≤ κ := by
+theorem KapIDef.le
+    {D : D7} {L : SizeData₂ D} {X : Inst D L} {K : Consts} (h : KapIDef X K)
+    {p n' : ℕ} {TT : Finset (Fin n')} {a b : Fin n' → ℤ} {κ : ℝ} (hκ : κ ∈ kapISet L K p n' TT a b)
+    : X.kapI p n' TT a b ≤ κ := by
   rw [h]
   exact csInf_le ⟨0, fun x hx => hx.1⟩ hκ
 
-theorem KapIDef.mem_Icc {D : D7} {L : SizeData₂ D} {X : Inst D L} {K : Consts} (h : KapIDef X K) (p n' : ℕ)
-    (TT : Finset (Fin n')) (a b : Fin n' → ℤ) : 0 ≤ X.kapI p n' TT a b ∧ X.kapI p n' TT a b ≤ 1 :=
-  ⟨by rw [h]; exact le_csInf ⟨1, one_mem_kapISet L K p n' TT a b⟩ (fun x hx => hx.1),
-   h.le (one_mem_kapISet L K p n' TT a b)⟩
+theorem KapIDef.mem_Icc
+    {D : D7} {L : SizeData₂ D} {X : Inst D L} {K : Consts} (h : KapIDef X K)
+    (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ)
+    : 0 ≤ X.kapI p n' TT a b ∧ X.kapI p n' TT a b ≤ 1 := ⟨
+  by rw [h]; exact le_csInf ⟨1, one_mem_kapISet L K p n' TT a b⟩ (fun x hx => hx.1),
+  h.le (one_mem_kapISet L K p n' TT a b)
+⟩
 
-theorem sInf_mem_kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ) :
-    sInf (kapISet L K p n' TT a b) ∈ kapISet L K p n' TT a b := by
+theorem sInf_mem_kapISet
+    {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ)
+    : sInf (kapISet L K p n' TT a b) ∈ kapISet L K p n' TT a b := by
   set S := kapISet L K p n' TT a b with hS
   have hne : S.Nonempty := ⟨1, one_mem_kapISet L K p n' TT a b⟩
   have hbd : BddBelow S := ⟨0, fun x hx => hx.1⟩
@@ -80,8 +106,7 @@ theorem sInf_mem_kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) 
       exact ⟨not_le.1 h0, by linarith⟩
   obtain ⟨κ, hκS, hκ⟩ : ∃ κ ∈ S, c ≤ 0 ∨ (⌈c⌉₊ : ℝ) - 1 < (1 - κ) * d := by
     rcases hgap with ⟨hcpos, hg⟩ | hg
-    ·
-      have hdpos : 0 < d := by
+    · have hdpos : 0 < d := by
         rcases hd0.lt_or_eq with h | h
         · exact h
         · exfalso
@@ -95,7 +120,8 @@ theorem sInf_mem_kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) 
         have : κ - sInf S < (c - ((⌈c⌉₊ : ℝ) - 1)) / d := by linarith
         exact (lt_div_iff₀ hdpos).1 this
       have h2 : (1 - κ) * d = c - (κ - sInf S) * d := by rw [hc]; ring
-      rw [h2]; linarith
+      rw [h2]
+      linarith
     · exact ⟨1, one_mem_kapISet L K p n' TT a b, Or.inl hg⟩
   obtain ⟨M, e, F, h1, h2, h3, n, hn, hG⟩ := (hκS.2 W Qq O Kf ι σ j w hset lam0 hb hd).2 Λ hΛ
   refine ⟨M, e, F, h1, h2, h3, n, ?_, hG⟩
@@ -108,8 +134,10 @@ theorem sInf_mem_kapISet {D : D7} (L : SizeData₂ D) (K : Consts) (p n' : ℕ) 
       omega
     exact le_trans (Nat.le_ceil c) (by exact_mod_cast h5)
 
-theorem KapIDef.mem {D : D7} {L : SizeData₂ D} {X : Inst D L} {K : Consts} (h : KapIDef X K) (p n' : ℕ)
-    (TT : Finset (Fin n')) (a b : Fin n' → ℤ) : X.kapI p n' TT a b ∈ kapISet L K p n' TT a b := by
+theorem KapIDef.mem
+    {D : D7} {L : SizeData₂ D} {X : Inst D L} {K : Consts} (h : KapIDef X K)
+    (p n' : ℕ) (TT : Finset (Fin n')) (a b : Fin n' → ℤ)
+    : X.kapI p n' TT a b ∈ kapISet L K p n' TT a b := by
   rw [h]; exact sInf_mem_kapISet L K p n' TT a b
 
 end Formalism.MainNotions.G

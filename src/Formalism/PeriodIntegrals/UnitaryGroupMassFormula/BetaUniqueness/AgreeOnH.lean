@@ -25,8 +25,8 @@ theorem agreeOnH : AgreeOnH := by
         simpa using (finrank_span_le_card (R := E) ({G.fl.z} : Set S.V))
       change finrank E (Xsp G ⊔ Submodule.span E {G.fl.z} : Submodule E S.V) ≤ r + 1
       exact (Submodule.finrank_add_le_finrank_add_finrank _ _).trans (by rw [hXG]; omega)
-    have hlat {t : E} (G : LFlag S r t) (hG : IsLift Λ G) :
-        XLam Λ G ⊔ Submodule.span (𝓞 E) {G.zt} ≤ (Xplus G).restrictScalars (𝓞 E) := by
+    have hlat {t : E} (G : LFlag S r t) (hG : IsLift Λ G)
+        : XLam Λ G ⊔ Submodule.span (𝓞 E) {G.zt} ≤ (Xplus G).restrictScalars (𝓞 E) := by
       refine sup_le (fun y hy => ?_) ?_
       · exact (show Xsp G ≤ Xplus G from le_sup_left) hy.2
       · rw [Submodule.span_le, Set.singleton_subset_iff, hG.2]
@@ -36,15 +36,15 @@ theorem agreeOnH : AgreeOnH := by
       rw [UUE, spanE, Submodule.span_le]
       change UU Λ F F'' ≤ (Xplus F ⊔ Xplus F'').restrictScalars (𝓞 E)
       rw [UU, sup_assoc]
-      exact sup_le
-        ((hlat F hLF).trans (Submodule.restrictScalars_mono (𝓞 E) le_sup_left))
+      exact sup_le ((hlat F hLF).trans (Submodule.restrictScalars_mono (𝓞 E) le_sup_left))
         ((hlat F'' hLF'').trans (Submodule.restrictScalars_mono (𝓞 E) le_sup_right))
-    have hEq := Submodule.eq_of_le_of_finrank_le hU (by
-      rw [n''.1]
-      have hsum := Submodule.finrank_add_le_finrank_add_finrank (Xplus F) (Xplus F'')
-      have h₁ := hflag F
-      have h₂ := hflag F''
-      omega)
+    have hEq :=
+      Submodule.eq_of_le_of_finrank_le hU (by
+        rw [n''.1]
+        have hsum := Submodule.finrank_add_le_finrank_add_finrank (Xplus F) (Xplus F'')
+        have h₁ := hflag F
+        have h₂ := hflag F''
+        omega)
     rw [hEq]
     exact (show Xsp F ≤ Xplus F from le_sup_left).trans le_sup_left
   have hHp : finrank E (Hp Λ F F') + (2 * r + 2) = finrank E S.V := by
@@ -65,8 +65,10 @@ theorem agreeOnH : AgreeOnH := by
   have hx2 : x ∈ Th Λ F F' F'' β₂ := by rw [hTh β₂ hs2]; exact hx
   obtain ⟨p, hp, hp1⟩ := Submodule.mem_map.mp hx1
   obtain ⟨q, hq, hq1⟩ := Submodule.mem_map.mp hx2
-  simp only [ThPairs, Submodule.mem_inf, Submodule.mem_prod, Submodule.mem_comap, LinearMap.sub_apply,
-    LinearMap.fst_apply, LinearMap.snd_apply, LinearMap.comp_apply, LinearEquiv.coe_coe] at hp hq hp1 hq1
+  simp only [ThPairs, Submodule.mem_inf, Submodule.mem_prod, Submodule.mem_comap,
+      LinearMap.sub_apply, LinearMap.fst_apply, LinearMap.snd_apply, LinearMap.comp_apply,
+      LinearEquiv.coe_coe]
+    at hp hq hp1 hq1
   subst hp1
   have e : p.2 = q.2 := by
     have hin : p.2 - q.2 ∈ UUE Λ F F'' ⊓ orth S (UUE Λ F F'') := by

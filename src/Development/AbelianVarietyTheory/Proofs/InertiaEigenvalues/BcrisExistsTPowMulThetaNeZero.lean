@@ -14,8 +14,9 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc.RegDivide
 
-theorem exists_pow_mul_not_dvd {R : Type*} [CommRing R] (ξ : R) [IsHausdorff (Ideal.span {ξ}) R]
-    {y : R} (hy : y ≠ 0) : ∃ (n : ℕ) (z : R), y = ξ ^ n * z ∧ ¬ ξ ∣ z := by
+theorem exists_pow_mul_not_dvd
+    {R : Type*} [CommRing R] (ξ : R) [IsHausdorff (Ideal.span {ξ}) R] {y : R} (hy : y ≠ 0)
+    : ∃ (n : ℕ) (z : R), y = ξ ^ n * z ∧ ¬ ξ ∣ z := by
   classical
   have hex : ∃ n : ℕ, ¬ ξ ^ (n + 1) ∣ y := by
     by_contra h
@@ -36,11 +37,17 @@ theorem exists_pow_mul_not_dvd {R : Type*} [CommRing R] (ξ : R) [IsHausdorff (I
   apply Nat.find_spec hex
   exact ⟨w, by rw [pow_succ, mul_assoc]; exact hz⟩
 
-theorem abstract {B R D : Type*} [CommRing B] [CommRing R] [CommRing D] (ι : B →+* D) (a : R →+* D)
-    (hι : Function.Injective ι) (ξ v : R) [IsHausdorff (Ideal.span {ξ}) R] (hv : IsUnit v)
+theorem abstract
+    {B R D : Type*} [CommRing B] [CommRing R] [CommRing D]
+    (ι : B →+* D)
+    (a : R →+* D)
+    (hι : Function.Injective ι)
+    (ξ v : R) [IsHausdorff (Ideal.span {ξ}) R]
+    (hv : IsUnit v)
     (t : B) (ht : IsUnit t) (hιt : ι t = a (ξ * v))
-    (hD : ∀ x : D, ∃ (n : ℕ) (y : R), x * a ξ ^ n = a y) (b : B) (hb : b ≠ 0) :
-    ∃ (m n : ℕ) (b' : B) (y : R), b * t ^ m = t ^ n * b' ∧ ι b' = a y ∧ ¬ ξ ∣ y := by
+    (hD : ∀ x : D, ∃ (n : ℕ) (y : R), x * a ξ ^ n = a y)
+    (b : B) (hb : b ≠ 0)
+    : ∃ (m n : ℕ) (b' : B) (y : R), b * t ^ m = t ^ n * b' ∧ ι b' = a y ∧ ¬ ξ ∣ y := by
   obtain ⟨m, y₀, h0⟩ := hD (ι b)
   obtain ⟨s, hs⟩ := ht.exists_right_inv
   obtain ⟨w, hw⟩ := hv.exists_right_inv
@@ -53,25 +60,30 @@ theorem abstract {B R D : Type*} [CommRing B] [CommRing R] [CommRing D] (ι : B 
     exact hb ((ht.pow m).mul_left_eq_zero.1 (hι h1))
   obtain ⟨n, z, hz, hnd⟩ := exists_pow_mul_not_dvd ξ hne
   refine ⟨m, n, b * t ^ m * s ^ n, z * w ^ n, ?_, ?_, ?_⟩
-  · calc b * t ^ m = b * t ^ m * (t * s) ^ n := by rw [hs, one_pow, mul_one]
+  · calc
+      b * t ^ m
+        = b * t ^ m * (t * s) ^ n := by rw [hs, one_pow, mul_one]
       _ = _ := by ring
   · have h2 : a ξ * a v * ι s = 1 := by rw [← map_mul a, ← hιt, ← map_mul, hs, map_one]
     have h3 : a v * a w = 1 := by rw [← map_mul, hw, map_one]
     rw [map_mul, h1, hz, map_mul, map_mul, map_pow, map_pow, map_pow]
-    calc a ξ ^ n * a z * ι s ^ n = a ξ ^ n * a z * ι s ^ n * (a v * a w) ^ n := by
-          rw [h3, one_pow, mul_one]
+    calc
+      a ξ ^ n * a z * ι s ^ n
+        = a ξ ^ n * a z * ι s ^ n * (a v * a w) ^ n := by rw [h3, one_pow, mul_one]
       _ = a z * a w ^ n * (a ξ * a v * ι s) ^ n := by ring
       _ = _ := by rw [h2, one_pow, mul_one]
   · intro h
     apply hnd
-    have : z = z * w ^ n * v ^ n := by
-      rw [mul_assoc, ← mul_pow, mul_comm w v, hw, one_pow, mul_one]
+    have : z = z * w ^ n * v ^ n := by rw [mul_assoc, ← mul_pow, mul_comm w v, hw, one_pow, mul_one]
     rw [this]
     exact h.mul_right _
 
-theorem exists_divide : ∀ (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.Bcris l), b ≠ 0 →
-    ∃ (m n : ℕ) (b' : Per.Bcris l) (y : Per.BdRp l), b * C.tB ^ m = C.tB ^ n * b' ∧
-      C.ι b' = algebraMap (Per.BdRp l) (Per.BdR l) y ∧ Per.θD l y ≠ 0 := by
+theorem exists_divide
+    : ∀ (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.Bcris l),
+      b ≠ 0
+        → ∃ (m n : ℕ) (b' : Per.Bcris l) (y : Per.BdRp l),
+          b * C.tB ^ m = C.tB ^ n * b' ∧ C.ι b' = algebraMap (Per.BdRp l) (Per.BdR l) y
+            ∧ Per.θD l y ≠ 0 := by
   intro l _ C b hb
   have he := core_isEps l C
   obtain ⟨hF, -, hc, -⟩ := filtration_eq_xi_pow l C.ε he
@@ -91,8 +103,9 @@ theorem exists_divide : ∀ (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.Bcris
     refine (hF 2 _).2 ⟨w, ?_⟩
     rw [hv, hw, pow_two, mul_assoc]
   haveI := hc.toIsHausdorff
-  obtain ⟨m, n, b', y, e1, e2, e3⟩ := abstract C.ι (algebraMap (Per.BdRp l) (Per.BdR l)) hinj
-    (aDp l (xi C.ε)) v hvu C.tB ht (by rw [← hv]; exact C.ι_j C.t) hD b hb
+  obtain ⟨m, n, b', y, e1, e2, e3⟩ :=
+    abstract C.ι (algebraMap (Per.BdRp l) (Per.BdR l)) hinj (aDp l (xi C.ε)) v hvu C.tB ht
+      (by rw [← hv]; exact C.ι_j C.t) hD b hb
   exact ⟨m, n, b', y, e1, e2, hθ y e3⟩
 
 end GlobalTheory.MemLoc.RegDivide

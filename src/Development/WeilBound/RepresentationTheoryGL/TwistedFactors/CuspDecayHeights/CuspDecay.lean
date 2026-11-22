@@ -6,7 +6,8 @@ public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.CuspDe
 
 noncomputable section
 
-open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.RightCosetSpace
+open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum
+  GroundTheory.Automorphic.RightCosetSpace
 
 namespace PositivityTheory.Rg.Tf.Core
 

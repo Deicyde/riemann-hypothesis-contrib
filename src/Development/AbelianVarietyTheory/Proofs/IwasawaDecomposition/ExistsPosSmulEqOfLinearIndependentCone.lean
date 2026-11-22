@@ -8,11 +8,13 @@ open Finset
 
 namespace GlobalTheory
 
-theorem exists_pos_smul_eq_of_linearIndependent_cone {L : Type} [AddCommGroup L] {m m' : ℕ}
-    (δ : Fin m → L) (γ : Fin m' → L) (i : Fin m) (k : ℕ)
-    (a : Fin m' → ℕ) (hδ : LinearIndependent ℤ δ) (hk : 0 < k) (hsum : k • δ i = ∑ j, a j • γ j)
-    (hγ : ∀ j, 0 < a j → ∃ (k' : ℕ) (b : Fin m → ℕ), 0 < k' ∧ k' • γ j = ∑ l, b l • δ l) :
-    ∃ (j : Fin m') (p r : ℕ), 0 < p ∧ 0 < r ∧ p • δ i = r • γ j := by
+theorem exists_pos_smul_eq_of_linearIndependent_cone
+    {L : Type} [AddCommGroup L]
+    {m m' : ℕ} (δ : Fin m → L) (γ : Fin m' → L) (i : Fin m)
+    (k : ℕ) (a : Fin m' → ℕ)
+    (hδ : LinearIndependent ℤ δ) (hk : 0 < k) (hsum : k • δ i = ∑ j, a j • γ j)
+    (hγ : ∀ j, 0 < a j → ∃ (k' : ℕ) (b : Fin m → ℕ), 0 < k' ∧ k' • γ j = ∑ l, b l • δ l)
+    : ∃ (j : Fin m') (p r : ℕ), 0 < p ∧ 0 < r ∧ p • δ i = r • γ j := by
   classical
   have hγ' : ∀ j, ∃ (k' : ℕ) (b : Fin m → ℕ), 0 < k' ∧ (0 < a j → k' • γ j = ∑ l, b l • δ l) := by
     intro j
@@ -34,18 +36,21 @@ theorem exists_pos_smul_eq_of_linearIndependent_cone {L : Type} [AddCommGroup L]
     · have : a j = 0 := Nat.eq_zero_of_not_pos hj
       simp [this]
   have key : (K * k) • δ i = ∑ l, (∑ j, a j * c j * b j l) • δ l := by
-    calc (K * k) • δ i = K • (k • δ i) := mul_smul _ _ _
+    calc
+      (K * k) • δ i
+        = K • (k • δ i) := mul_smul _ _ _
       _ = ∑ j, (K * a j) • γ j := by rw [hsum, Finset.smul_sum]; simp_rw [smul_smul]
       _ = ∑ j, (a j * c j) • ∑ l, b j l • δ l := Finset.sum_congr rfl (fun j _ => hterm j)
       _ = ∑ l, (∑ j, a j * c j * b j l) • δ l := by
-          simp_rw [Finset.smul_sum, smul_smul, Finset.sum_smul]
-          rw [Finset.sum_comm]
+        simp_rw [Finset.smul_sum, smul_smul, Finset.sum_smul]
+        rw [Finset.sum_comm]
   let N : Fin m → ℕ := fun l => ∑ j, a j * c j * b j l
   let g : Fin m → ℤ := fun l => (N l : ℤ) - (if l = i then ((K * k : ℕ) : ℤ) else 0)
   have hg : ∑ l, g l • δ l = 0 := by
     simp only [g, sub_smul, Finset.sum_sub_distrib, ite_smul, zero_smul, Finset.sum_ite_eq',
       mem_univ, if_true, natCast_zsmul]
-    rw [key]; exact sub_self _
+    rw [key]
+    exact sub_self _
   have hg0 := Fintype.linearIndependent_iff.mp hδ g hg
   have hN : ∀ l, N l = if l = i then K * k else 0 := by
     intro l

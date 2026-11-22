@@ -8,8 +8,9 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory
 
-theorem isTotallyComplex_of_primitiveRoot (K : Type) [Field K] [NumberField K] (ζ : K) (m : ℕ)
-    (hζ : IsPrimitiveRoot ζ m) (hm : 3 ≤ m) : NumberField.IsTotallyComplex K := by
+theorem isTotallyComplex_of_primitiveRoot
+    (K : Type) [Field K] [NumberField K] (ζ : K) (m : ℕ) (hζ : IsPrimitiveRoot ζ m) (hm : 3 ≤ m)
+    : NumberField.IsTotallyComplex K := by
   rw [NumberField.isTotallyComplex_iff]
   intro v
   by_contra hc
@@ -26,8 +27,9 @@ theorem isTotallyComplex_of_primitiveRoot (K : Type) [Field K] [NumberField K] (
   have := Nat.le_of_dvd (by norm_num) h5
   omega
 
-theorem tcroot : ∀ (K : Type) [Field K] [NumberField K] (ζ : K) (m : ℕ), IsPrimitiveRoot ζ m → 3 ≤ m →
-    NumberField.IsTotallyComplex K :=
-  fun K _ _ ζ m hζ hm => isTotallyComplex_of_primitiveRoot K ζ m hζ hm
+theorem tcroot
+    : ∀ (K : Type) [Field K] [NumberField K] (ζ : K) (m : ℕ),
+      IsPrimitiveRoot ζ m → 3 ≤ m → NumberField.IsTotallyComplex K := fun K _ _ ζ m hζ hm =>
+  isTotallyComplex_of_primitiveRoot K ζ m hζ hm
 
 end GlobalTheory

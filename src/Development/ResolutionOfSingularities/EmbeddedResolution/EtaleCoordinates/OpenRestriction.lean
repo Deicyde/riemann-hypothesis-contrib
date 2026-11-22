@@ -19,9 +19,9 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace OpenImmersionRestriction
 
-private theorem exists_subschemeMap_isOpenImmersion {V W : Scheme.{u}} (f : V ⟶ W)
-    [IsOpenImmersion f] (D : W.IdealSheafData) :
-    ∃ g : (D.comap f).subscheme ⟶ D.subscheme,
+private theorem exists_subschemeMap_isOpenImmersion
+    {V W : Scheme.{u}} (f : V ⟶ W) [IsOpenImmersion f] (D : W.IdealSheafData)
+    : ∃ g : (D.comap f).subscheme ⟶ D.subscheme,
       IsOpenImmersion g ∧ g ≫ D.subschemeι = (D.comap f).subschemeι ≫ f := by
   have h₁ : IsOpenImmersion (Limits.pullback.snd f D.subschemeι) := inferInstance
   have h₂ : IsOpenImmersion (D.comapIso f).hom := inferInstance
@@ -29,10 +29,11 @@ private theorem exists_subschemeMap_isOpenImmersion {V W : Scheme.{u}} (f : V �
   rw [Category.assoc, ← Limits.pullback.condition, ← Category.assoc,
     Scheme.IdealSheafData.comapIso_hom_fst]
 
-theorem isOpenImmersion_subschemeMap {V W : Scheme.{u}} (f : V ⟶ W) [IsOpenImmersion f]
+theorem isOpenImmersion_subschemeMap
+    {V W : Scheme.{u}} (f : V ⟶ W) [IsOpenImmersion f]
     (D : W.IdealSheafData) (g : (D.comap f).subscheme ⟶ D.subscheme)
-    (hg : g ≫ D.subschemeι = (D.comap f).subschemeι ≫ f) :
-    IsOpenImmersion g := by
+    (hg : g ≫ D.subschemeι = (D.comap f).subschemeι ≫ f)
+    : IsOpenImmersion g := by
   obtain ⟨g', hg', hg'fac⟩ := exists_subschemeMap_isOpenImmersion f D
   have : Mono D.subschemeι := inferInstance
   have heq : g = g' := by
@@ -41,10 +42,11 @@ theorem isOpenImmersion_subschemeMap {V W : Scheme.{u}} (f : V ⟶ W) [IsOpenImm
   rw [heq]
   exact hg'
 
-theorem isSmoothDivisor_comap {V W : Scheme.{u}} {k : Type u} [Field k]
-    (f : V ⟶ W) [IsOpenImmersion f] (p : W ⟶ Spec (CommRingCat.of k))
-    (D : W.IdealSheafData) (hD : IsSmoothDivisor p D) :
-    IsSmoothDivisor (f ≫ p) (D.comap f) := by
+theorem isSmoothDivisor_comap
+    {V W : Scheme.{u}} {k : Type u} [Field k]
+    (f : V ⟶ W) [IsOpenImmersion f]
+    (p : W ⟶ Spec (CommRingCat.of k)) (D : W.IdealSheafData) (hD : IsSmoothDivisor p D)
+    : IsSmoothDivisor (f ≫ p) (D.comap f) := by
   obtain ⟨g, hg, hgfac⟩ := exists_subschemeMap_isOpenImmersion f D
   refine ⟨hD.1.comap_of_isOpenImmersion f, ?_⟩
   have : IsOpenImmersion g := hg

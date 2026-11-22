@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Coeff
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.MemLoc
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.MemLoc
 open scoped Formalism.Per
 
 namespace GlobalTheory.Pst.NoLogTheta
@@ -18,30 +19,35 @@ namespace GlobalTheory.Pst.NoLogTheta
 section Abstract
 variable {R F G : Type} [CommRing R] [IsDomain R] [Field F]
 
-theorem eigen_add (θ : R →+* F) (σ : G → R →+* R) (τ : G → F →+* F) (c d : G → R) (t : R) (ht : t ≠ 0)
-    (hθt : θ t = 0) (hker : ∀ y, θ y = 0 → t ∣ y) (hc : ∀ g, θ (c g) ≠ 0)
-    (hθ : ∀ g y, θ (σ g y) = τ g (θ y)) (hσt : ∀ g, σ g t = c g * t)
-    (tate : ∀ (i : ℤ) (x : F), i ≠ 0 → (∀ g, τ g x * θ (c g) ^ i = x) → x = 0)
-    (n : ℕ) : ∀ y : R, (∀ g, σ g y = c g ^ n * (y + d g * t ^ (n + 1))) →
-      ∃ w, y = t ^ n * w ∧ ∀ g, σ g w = w + d g * t := by
+theorem eigen_add
+    (θ : R →+* F)
+    (σ : G → R →+* R) (τ : G → F →+* F)
+    (c d : G → R)
+    (t : R) (ht : t ≠ 0) (hθt : θ t = 0) (hker : ∀ y, θ y = 0 → t ∣ y)
+    (hc : ∀ g, θ (c g) ≠ 0) (hθ : ∀ g y, θ (σ g y) = τ g (θ y)) (hσt : ∀ g, σ g t = c g * t)
+    (tate : ∀ (i : ℤ) (x : F), i ≠ 0 → (∀ g, τ g x * θ (c g) ^ i = x) → x = 0) (n : ℕ)
+    : ∀ y : R,
+      (∀ g, σ g y = c g ^ n * (y + d g * t ^ (n + 1)))
+        → ∃ w, y = t ^ n * w ∧ ∀ g, σ g w = w + d g * t := by
   induction n with
   | zero => intro y hy; exact ⟨y, by simp, fun g => by simpa using hy g⟩
   | succ n ih =>
     intro y hy
     have h2 : θ y = 0 := by
       refine tate (-((n + 1 : ℕ) : ℤ)) _ (by omega) fun g => ?_
-      rw [zpow_neg, zpow_natCast, ← hθ, hy, map_mul, map_pow, map_add (f := _), map_mul, map_pow, hθt,
-        zero_pow (Nat.succ_ne_zero _), mul_zero, add_zero]
+      rw [zpow_neg, zpow_natCast, ← hθ, hy, map_mul, map_pow, map_add (f := _), map_mul, map_pow,
+        hθt, zero_pow (Nat.succ_ne_zero _), mul_zero, add_zero]
       have := pow_ne_zero (n + 1) (hc g)
       field_simp
     obtain ⟨v, hv⟩ := hker y h2
-    obtain ⟨w, hw, hw'⟩ := ih v fun g => by
-      have h := hy g
-      rw [hv, map_mul, hσt] at h
-      have hc0 : c g ≠ 0 := fun h0 => hc g (by rw [h0, map_zero])
-      apply mul_left_cancel₀ (mul_ne_zero hc0 ht)
-      rw [h]
-      ring
+    obtain ⟨w, hw, hw'⟩ :=
+      ih v fun g => by
+        have h := hy g
+        rw [hv, map_mul, hσt] at h
+        have hc0 : c g ≠ 0 := fun h0 => hc g (by rw [h0, map_zero])
+        apply mul_left_cancel₀ (mul_ne_zero hc0 ht)
+        rw [h]
+        ring
     exact ⟨w, by rw [hv, hw]; ring, hw'⟩
 
 end Abstract
@@ -49,16 +55,19 @@ end Abstract
 set_option allowUnsafeReducibility true in
 attribute [local irreducible] Per.Acris Per.Bcris
 
-theorem core_form (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.BdR l) (d : GQ l → Per.BdRp l)
-    (hb : ∀ g : GQ l, Per.σD g b = b + algebraMap (Per.BdRp l) (Per.BdR l) (d g * C.j C.t)) :
-    ∃ (a : ℚ_[l]) (v : Per.BdRp l), b = algebraMap (Per.BdRp l) (Per.BdR l)
-      (C.o (algebraMap ℚ_[l] (Om l) a) + C.j C.t * v) := by
+theorem core_form
+    (l : ℕ) [Fact l.Prime]
+    (C : Core l) (b : Per.BdR l) (d : GQ l → Per.BdRp l)
+    (hb : ∀ g : GQ l, Per.σD g b = b + algebraMap (Per.BdRp l) (Per.BdR l) (d g * C.j C.t))
+    : ∃ (a : ℚ_[l]) (v : Per.BdRp l),
+      b = algebraMap (Per.BdRp l) (Per.BdR l) (C.o (algebraMap ℚ_[l] (Om l) a) + C.j C.t * v) := by
   have he := GlobalTheory.MemLoc.core_isEps l C
   obtain ⟨hdom, hinj, -, hfrac⟩ := GlobalTheory.T.bdRPlus_isDomain_bdR_isField l
   obtain ⟨hfil, hreg, hcompl, -⟩ := GlobalTheory.T.bdRPlus_filtration_eq_fontaineXi_pow l C.ε he
   obtain ⟨-, hker, hunit, -, hθ⟩ := GlobalTheory.T.thetaBdRPlus_surjective_ker_units_equivariant l
   obtain ⟨-, ht1, ht2, -⟩ := GlobalTheory.T.fontaine_t_isUnit_bcris_and_uniformizer_bdRPlus l C
-  obtain ⟨-, hjσ, -⟩ := GlobalTheory.T.canonicalAcrisToBdRPlus_unique_equivariant_approx l C.j C.j_cris
+  obtain ⟨-, hjσ, -⟩ :=
+    GlobalTheory.T.canonicalAcrisToBdRPlus_unique_equivariant_approx l C.j C.j_cris
   have hσD := (GlobalTheory.MemLoc.ActLaws.act_laws l).2.2.2.2.2.2.2.2.2.1
   have hact := GlobalTheory.T.acrisGaloisAction_fontaine_t_eq_cyclotomic l C
   have htate := GlobalTheory.T.eq_zero_of_tateTwist_invariant_finiteExtension l C (botExt l)
@@ -86,11 +95,12 @@ theorem core_form (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.BdR l) (d : GQ 
   have hker' : ∀ y, Per.θD l y = 0 → t ∣ y := fun y hy =>
     htx.trans (by simpa using (hfil 1 y).1 ((hker y).1 hy))
   have hθt : Per.θD l t = 0 := (hker t).2 ht1
-  have tate : ∀ (i : ℤ) (x : ℂ_[l]), i ≠ 0 →
-      (∀ g : GQ l, Per.σC g x * Per.θD l (c g) ^ i = x) → x = 0 := fun i x hi h =>
-    htate i x hi fun g _ => by simpa only [hθc] using h g
-  have hy : b * algebraMap (Per.BdRp l) (Per.BdR l) t ^ n =
-      algebraMap (Per.BdRp l) (Per.BdR l) (y0 * u ^ n) := by
+  have tate
+      : ∀ (i : ℤ) (x : ℂ_[l]), i ≠ 0 → (∀ g : GQ l, Per.σC g x * Per.θD l (c g) ^ i = x) → x = 0 :=
+    fun i x hi h => htate i x hi fun g _ => by simpa only [hθc] using h g
+  have hy
+      : b * algebraMap (Per.BdRp l) (Per.BdR l) t ^ n
+        = algebraMap (Per.BdRp l) (Per.BdR l) (y0 * u ^ n) := by
     rw [hu, map_mul, map_mul, map_pow, ← hy0]
     ring
   generalize y0 * u ^ n = y at hy
@@ -100,13 +110,19 @@ theorem core_form (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.BdR l) (d : GQ 
     simp only [map_mul, map_pow, map_add (f := _)]
     rw [← hy]
     ring
-  obtain ⟨w, hw, hw'⟩ := eigen_add (Per.θD l) (fun g : GQ l => Per.σDp g) (fun g => Per.σC g) c d t ht0
-    hθt hker' hc (fun g y => hθ g y) hσt tate n y hyσ
-  obtain ⟨k, hk, hkθ⟩ := hast (Per.θD l w) fun g _ => by
-    rw [← hθ, hw' g, map_add (f := _), map_mul, hθt, mul_zero, add_zero]
+  obtain ⟨w, hw, hw'⟩ :=
+    eigen_add (Per.θD l)
+      (fun g : GQ l => Per.σDp g)
+      (fun g => Per.σC g)
+      c d t ht0 hθt hker' hc
+      (fun g y => hθ g y)
+      hσt tate n y hyσ
+  obtain ⟨k, hk, hkθ⟩ :=
+    hast (Per.θD l w) fun g _ => by
+      rw [← hθ, hw' g, map_add (f := _), map_mul, hθt, mul_zero, add_zero]
   obtain ⟨a, rfl⟩ := IntermediateField.mem_bot.1 hk
-  obtain ⟨v, hv⟩ := hker' (w - C.o (algebraMap ℚ_[l] (Om l) a))
-    (by rw [map_sub, C.o_sec.th, hkθ, sub_self])
+  obtain ⟨v, hv⟩ :=
+    hker' (w - C.o (algebraMap ℚ_[l] (Om l) a)) (by rw [map_sub, C.o_sec.th, hkθ, sub_self])
   refine ⟨a, v, ?_⟩
   rw [← hv, add_sub_cancel]
   have : IsDomain (Per.BdR l) := (GlobalTheory.T.bdRPlus_isDomain_bdR_isField l).2.2.1.isDomain
@@ -115,9 +131,13 @@ theorem core_form (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.BdR l) (d : GQ 
   apply mul_right_cancel₀ ht'
   rw [hy, hw, map_mul, map_pow, mul_comm]
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI →
-    ∀ (b : P.R.B) (c : GQ l → ℚ_[l]), (∀ g : GQ l, P.actQ g b - b = c g • P.tB) →
-    ∃ a : ℚ_[l], P.ιB ((b - algebraMap ℚ_[l] P.R.B a) * tInv P) ∈ (P.PD (botExt l)).Fil 0 := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (b : P.R.B) (c : GQ l → ℚ_[l]),
+          (∀ g : GQ l, P.actQ g b - b = c g • P.tB)
+            → ∃ a : ℚ_[l],
+              P.ιB ((b - algebraMap ℚ_[l] P.R.B a) * tInv P) ∈ (P.PD (botExt l)).Fil 0 := by
   intro l _ P AI T b c hb
   obtain ⟨C, hC⟩ := FitsEx.exists_fits l P AI T
   have hι : ∀ g : GQ l, P.actQdR g (P.ιB b) = P.ιB (P.actQ g b) := fun g => by
@@ -126,18 +146,24 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
     exact this.symm
   have ht : T.eD (P.ιB P.tB) = algebraMap (Per.BdRp l) (Per.BdR l) (C.j C.t) := by
     rw [hC.ι, hC.t, Core.tB, C.ι_j]
-  have hq : ∀ a : ℚ_[l], T.eD (P.ιB (algebraMap ℚ_[l] P.R.B a)) =
-      algebraMap (Per.BdRp l) (Per.BdR l) (C.o (algebraMap ℚ_[l] (Om l) a)) := fun a => by
+  have hq
+      : ∀ a : ℚ_[l],
+        T.eD (P.ιB (algebraMap ℚ_[l] P.R.B a))
+          = algebraMap (Per.BdRp l) (Per.BdR l) (C.o (algebraMap ℚ_[l] (Om l) a)) := fun a => by
     rw [AlgHom.commutes, IsScalarTower.algebraMap_apply ℚ_[l] (Om l) P.R.BdR, hC.o]
     rfl
-  obtain ⟨a, v, h⟩ := core_form l C (T.eD (P.ιB b)) (fun g => C.o (algebraMap ℚ_[l] (Om l) (c g))) fun g => by
-    rw [← T.actD, hι, map_mul, ← hq, ← ht, ← map_mul, ← map_mul, ← map_add (f := _), ← map_add (f := _), ← Algebra.smul_def,
-      ← hb, add_sub_cancel]
+  obtain ⟨a, v, h⟩ :=
+    core_form l C (T.eD (P.ιB b))
+      (fun g => C.o (algebraMap ℚ_[l] (Om l) (c g)))
+      fun g => by
+        rw [← T.actD, hι, map_mul, ← hq, ← ht, ← map_mul, ← map_mul, ← map_add (f := _),
+          ← map_add (f := _), ← Algebra.smul_def, ← hb, add_sub_cancel]
   refine ⟨a, ?_⟩
   have h1 : T.eD (P.ιB (tInv P)) * algebraMap (Per.BdRp l) (Per.BdR l) (C.j C.t) = 1 := by
     rw [← ht, ← map_mul, ← map_mul, tInv_mul, map_one, map_one]
-  have h2 : T.eD (P.ιB ((b - algebraMap ℚ_[l] P.R.B a) * tInv P)) =
-      algebraMap (Per.BdRp l) (Per.BdR l) v := by
+  have h2
+      : T.eD (P.ιB ((b - algebraMap ℚ_[l] P.R.B a) * tInv P))
+        = algebraMap (Per.BdRp l) (Per.BdR l) v := by
     rw [map_mul, map_mul, map_sub, map_sub, hq, h, map_add (f := _), map_mul]
     linear_combination algebraMap (Per.BdRp l) (Per.BdR l) v * h1
   rw [T.fil, h2]

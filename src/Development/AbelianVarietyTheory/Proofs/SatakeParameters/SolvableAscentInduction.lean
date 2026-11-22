@@ -32,23 +32,29 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.NormChara
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.SolvUp
 
-theorem exists_normal_prime_index (Γ : Type) [Group Γ] [Finite Γ] [Nontrivial Γ] [Group.IsSolvable Γ] :
-    ∃ H : Subgroup Γ, H.Normal ∧ H.index.Prime := by
-  obtain ⟨H, hH, hle⟩ := (eq_top_or_exists_le_coatom (commutator Γ)).resolve_left
-    (Group.IsSolvable.commutator_lt_top_of_nontrivial Γ).ne
-  have hn : H.Normal := ⟨fun n hn g => by
-    have h1 : g * n * g⁻¹ * n⁻¹ ∈ H :=
-      hle (Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top n))
-    simpa using H.mul_mem h1 hn⟩
+theorem exists_normal_prime_index
+    (Γ : Type) [Group Γ] [Finite Γ] [Nontrivial Γ] [Group.IsSolvable Γ]
+    : ∃ H : Subgroup Γ, H.Normal ∧ H.index.Prime := by
+  obtain ⟨H, hH, hle⟩ :=
+    (eq_top_or_exists_le_coatom (commutator Γ)).resolve_left
+      (Group.IsSolvable.commutator_lt_top_of_nontrivial Γ).ne
+  have hn : H.Normal :=
+    ⟨fun n hn g => by
+      have h1 : g * n * g⁻¹ * n⁻¹ ∈ H :=
+        hle (Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top n))
+      simpa using H.mul_mem h1 hn⟩
   refine ⟨H, hn, ?_⟩
-  obtain ⟨p, hp, hd⟩ := Nat.exists_prime_and_dvd (n := Nat.card (Γ ⧸ H)) (mt Subgroup.index_eq_one.1 hH.1)
+  obtain ⟨p, hp, hd⟩ :=
+    Nat.exists_prime_and_dvd (n := Nat.card (Γ ⧸ H)) (mt Subgroup.index_eq_one.1 hH.1)
   haveI := Fact.mk hp
   obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hd
   have h1 : (Subgroup.zpowers g).comap (QuotientGroup.mk' H) = ⊤ := by
@@ -64,8 +70,9 @@ theorem exists_normal_prime_index (Γ : Type) [Group Γ] [Finite Γ] [Nontrivial
   rw [Subgroup.index, ← Subgroup.card_top, ← h2, Nat.card_zpowers, hg]
   exact hp
 
-theorem isCMField_of_ringEquiv {A B : Type} [Field A] [NumberField A] [Field B] [NumberField B] [IsCMField A]
-    (e : A ≃+* B) : IsCMField B := by
+theorem isCMField_of_ringEquiv
+    {A B : Type} [Field A] [NumberField A] [Field B] [NumberField B] [IsCMField A] (e : A ≃+* B)
+    : IsCMField B := by
   letI : Algebra A B := e.toRingHom.toAlgebra
   haveI : IsTotallyComplex B := isTotallyComplex_of_algebra A B
   letI : Algebra (maximalRealSubfield A) B :=
@@ -80,9 +87,13 @@ end GlobalTheory.SolvUp
 
 namespace GlobalTheory.SolvUp
 
-theorem isCMField_intermediate (Ω : Type) [Field Ω] (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra K Ω]
-    [IsAlgClosure K Ω] (M : Type) [Field M] [NumberField M] [IsCMField M] [Algebra M Ω] [Algebra K M]
-    [IsScalarTower K M Ω] (L : IntermediateField K M) : IsCMField L := by
+theorem isCMField_intermediate
+    (Ω : Type) [Field Ω]
+    (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra K Ω] [IsAlgClosure K Ω]
+    (M : Type)
+    [Field M] [NumberField M] [IsCMField M] [Algebra M Ω] [Algebra K M] [IsScalarTower K M Ω]
+    (L : IntermediateField K M)
+    : IsCMField L := by
   let f := IsScalarTower.toAlgHom K M Ω
   haveI : NumberField f.fieldRange := NumberField.of_ringEquiv M _ (AlgEquiv.ofInjectiveField f).toRingEquiv
   haveI : NumberField (L.map f) := NumberField.of_ringEquiv L _ (IntermediateField.equivMap L f).toRingEquiv

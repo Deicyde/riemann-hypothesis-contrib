@@ -17,8 +17,8 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 def rankOne (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) : Matrix (Fin r) (Fin r) E :=
   Matrix.of fun a b => x a * ∑ k, G b k * cc (y k)
 
-theorem rankOne_mulVec (G : Matrix (Fin r) (Fin r) E) (x y v : Fin r → E) :
-    rankOne G x y *ᵥ v = herm G v y • x := by
+theorem rankOne_mulVec (G : Matrix (Fin r) (Fin r) E) (x y v : Fin r → E)
+    : rankOne G x y *ᵥ v = herm G v y • x := by
   ext a
   simp only [rankOne, mulVec, dotProduct, of_apply, herm, Pi.smul_apply, smul_eq_mul]
   rw [Finset.sum_mul]
@@ -26,8 +26,8 @@ theorem rankOne_mulVec (G : Matrix (Fin r) (Fin r) E) (x y v : Fin r → E) :
   simp only [Finset.mul_sum, Finset.sum_mul]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem trace_rankOne (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) :
-    (rankOne G x y).trace = herm G x y := by
+theorem trace_rankOne (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E)
+    : (rankOne G x y).trace = herm G x y := by
   simp only [Matrix.trace, diag, rankOne, of_apply, herm, Finset.mul_sum, mul_assoc]
 
 def traceIdeal (Λ : Submodule (𝓞 E) (Fin r → E)) : Ideal (𝓞 E) where
@@ -41,11 +41,14 @@ def traceIdeal (Λ : Submodule (𝓞 E) (Fin r → E)) : Ideal (𝓞 E) where
     obtain ⟨Z, hZ, e⟩ := hs
     refine ⟨(c : E) • Z, smul_mem_endLat c.isIntegral_coe hZ, ?_⟩
     rw [trace_smul, e, smul_eq_mul, smul_eq_mul]
-    push_cast; rfl
+    push_cast
+    rfl
 
-theorem exists_endLat_trace_eq_one (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E)) (hr : 1 ≤ r)
-    (h : SelfDualLat G Λ) : ∃ Z ∈ endLat Λ, Z.trace = 1 := by
+theorem exists_endLat_trace_eq_one
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r : ℕ) (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E))
+    (hr : 1 ≤ r) (h : SelfDualLat G Λ)
+    : ∃ Z ∈ endLat Λ, Z.trace = 1 := by
   have hint : ∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ (herm G x y) := fun x hx => (h.2.2.2.2 x).2 hx
   have htop : traceIdeal Λ = ⊤ := by
     by_contra hT

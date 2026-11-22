@@ -15,8 +15,8 @@ open PositivityTheory.RgDs.K
 
 variable {n : ℕ}
 
-theorem tor_inv (θ : Fin n → ℝ) :
-    (tor θ)⁻¹ = Matrix.diagonal fun a => Complex.exp (-((θ a : ℂ) * Complex.I)) := by
+theorem tor_inv (θ : Fin n → ℝ)
+    : (tor θ)⁻¹ = Matrix.diagonal fun a => Complex.exp (-((θ a : ℂ) * Complex.I)) := by
   apply Matrix.inv_eq_left_inv
   simp only [tor, Matrix.diagonal_mul_diagonal, ← Complex.exp_add, neg_add_cancel, Complex.exp_zero]
   exact Matrix.diagonal_one
@@ -30,8 +30,8 @@ theorem adC_tor_ne (θ : Fin n → ℝ) {p q : Fin n × Fin n} (h : p ≠ q) : a
   · unfold tor
     rw [Matrix.diagonal_apply_ne _ h1, zero_mul]
 
-theorem adC_tor_self (θ : Fin n → ℝ) (p : Fin n × Fin n) :
-    adC (tor θ) p p = Complex.exp (((θ p.1 - θ p.2 : ℝ) : ℂ) * Complex.I) := by
+theorem adC_tor_self (θ : Fin n → ℝ) (p : Fin n × Fin n)
+    : adC (tor θ) p p = Complex.exp (((θ p.1 - θ p.2 : ℝ) : ℂ) * Complex.I) := by
   unfold adC
   rw [tor_inv]
   unfold tor

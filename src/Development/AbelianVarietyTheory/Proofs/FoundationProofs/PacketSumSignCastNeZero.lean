@@ -57,16 +57,20 @@ theorem packetSum : Formalism.PacketSums.PacketSum := by
   intro r WK _ T hbij μ α _ _
   set f : Equiv.Perm (Fin r) → ℂ := fun σ =>
     ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ j, α j ^ μ (σ⁻¹ j) with hf
-  have hterm : ∀ y : Equiv.Perm (Fin r),
-      Formalism.PacketSums.numK WK μ (fun i => α (y⁻¹ i)) / Formalism.PacketSums.vdm (fun i => α (y⁻¹ i)) =
-        (∑ w : WK, f (y⁻¹ * (w : Equiv.Perm (Fin r)))) / Formalism.PacketSums.vdm α := by
+  have hterm
+      : ∀ y : Equiv.Perm (Fin r),
+        Formalism.PacketSums.numK WK μ (fun i => α (y⁻¹ i))
+            / Formalism.PacketSums.vdm (fun i => α (y⁻¹ i))
+          = (∑ w : WK, f (y⁻¹ * (w : Equiv.Perm (Fin r)))) / Formalism.PacketSums.vdm α := by
     intro y
     rw [packetSum_numK_perm, packetSum_vdm_perm α y⁻¹, Equiv.Perm.sign_inv,
       mul_div_mul_left _ _ (packetSum_sign_cast_ne_zero y)]
   rw [Finset.sum_congr rfl fun y _ => hterm y, ← Finset.sum_div]
   congr 1
   rw [← Finset.sum_coe_sort T]
-  rw [← Fintype.sum_bijective _ hbij (fun p : WK × T => f ((p.2 : Equiv.Perm (Fin r))⁻¹ * p.1)) f
+  rw [← Fintype.sum_bijective _ hbij
+    (fun p : WK × T => f ((p.2 : Equiv.Perm (Fin r))⁻¹ * p.1))
+    f
     (fun _ => rfl)]
   rw [Fintype.sum_prod_type_right]
 

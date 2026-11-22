@@ -10,34 +10,47 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
 namespace GlobalTheory.UMin
 
-theorem isGenSec_of_univBasis {S : Scheme.{0}} {G : Over S} [GrpObj G] {L : LB G.left} {K K' : Type} [CommRing K]
-    [CommRing K'] {x : Sp K ⟶ S} {e : LB.Sec (LPow G L ((1 : ℕ) : ℤ) (Over.mk x))} (he : UnivBasis G L x e)
-    (i : K →+* K') {x' : Sp K' ⟶ S} (h : spMap i ≫ x = x') :
-    IsGenSec G L ((1 : ℕ) : ℤ) (VVRank.pullS G _ (Over.homMk (spMap i) h : Over.mk x' ⟶ Over.mk x) e) :=
+theorem isGenSec_of_univBasis
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {L : LB G.left} {K K' : Type} [CommRing K] [CommRing K']
+    {x : Sp K ⟶ S} {e : LB.Sec (LPow G L ((1 : ℕ) : ℤ) (Over.mk x))} (he : UnivBasis G L x e)
+    (i : K →+* K')
+    {x' : Sp K' ⟶ S} (h : spMap i ≫ x = x')
+    : IsGenSec G L ((1 : ℕ) : ℤ)
+      (VVRank.pullS G _ (Over.homMk (spMap i) h : Over.mk x' ⟶ Over.mk x) e) :=
   (isGenSec_iff _).2 fun s => by
     obtain ⟨c, hc, -⟩ := he K' i x' h s
     exact ⟨c, hc⟩
 
-theorem spMap_id (K : Type) [CommRing K] : spMap (RingHom.id K) = 𝟙 _ := by
-  rw [← Spec.map_id]; rfl
+theorem spMap_id (K : Type) [CommRing K] : spMap (RingHom.id K) = 𝟙 _ := by rw [← Spec.map_id]; rfl
 
-theorem gen_of_polFib : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (L : LB G.left), L.IsLB → ∀ (g : ℕ) (K : Type)
-    [Field K] (x : Sp K ⟶ S), PolFib G L g x → (∃ θ : SecAt G L x, IsGenSec G L _ θ) ∧
-    ∀ θ : SecAt G L x, IsGenSec G L _ θ → ∀ (K' : Type) [Field K'] (i : K →+* K'),
-      IsGenSec G L _ (SecAt.pull G L θ i) := by
+theorem gen_of_polFib
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (L : LB G.left),
+      L.IsLB
+        → ∀ (g : ℕ) (K : Type) [Field K] (x : Sp K ⟶ S),
+          PolFib G L g x
+            → (∃ θ : SecAt G L x, IsGenSec G L _ θ)
+              ∧ ∀ θ : SecAt G L x,
+                IsGenSec G L _ θ
+                  → ∀ (K' : Type) [Field K'] (i : K →+* K'),
+                    IsGenSec G L _ (SecAt.pull G L θ i) := by
   intro S G _ L hL g K _ x hP
   obtain ⟨P, α, -, hp, hw⟩ := hP
-  obtain ⟨e, he⟩ := exists_univBasis_of_fibre abelianSchemeLaws_all.2 S (Sp K) G L hL P x α hp hw K (𝟙 _) x
-    (Category.id_comp x)
+  obtain ⟨e, he⟩ :=
+    exists_univBasis_of_fibre abelianSchemeLaws_all.2 S (Sp K) G L hL P x α hp hw K (𝟙 _) x
+      (Category.id_comp x)
   have h0 : spMap (RingHom.id K) ≫ x = x := by rw [spMap_id, Category.id_comp]
   refine ⟨⟨_, isGenSec_of_univBasis he (RingHom.id K) h0⟩, fun θ hθ K' _ i => ?_⟩
   set e₀ := VVRank.pullS G _ (Over.homMk (spMap (RingHom.id K)) h0 : Over.mk x ⟶ Over.mk x) e with he₀

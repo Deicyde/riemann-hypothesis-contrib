@@ -9,15 +9,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Ws.Lk
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Ws.Lk
 
-theorem UpperTheory.V.Ws.Lk.residEx :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (X : OCh T c' h) (Y : SetD T) (V : Y.s.Lev), D.Good → T.Ok → V.S' = Y.s.S → ∃ r : W.Resid V.frame c'.O 4, (∀ i (g : G T.L Ω), r.chib i (V.pr g) = X.cb i g) ∧ (∀ (v : W.Vl l T.L) i (g : Dec (F := T.L) (Y.s.A v)), r.psib v i g = r.chib i (V.pr g)) ∧ (∀ v i, r.th v i = 1) := by
+theorem UpperTheory.V.Ws.Lk.residEx
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (X : OCh T c' h) (Y : SetD T)
+        (V : Y.s.Lev),
+      D.Good → T.Ok → V.S' = Y.s.S
+        → ∃ r : W.Resid V.frame c'.O 4,
+          (∀ i (g : G T.L Ω), r.chib i (V.pr g) = X.cb i g)
+            ∧ (∀ (v : W.Vl l T.L) i (g : Dec (F := T.L) (Y.s.A v)),
+              r.psib v i g = r.chib i (V.pr g))
+            ∧ (∀ v i, r.th v i = 1) := by
   intro Ω _ _ _ l _ c D T c' h X Y V hG hT hS
   have hcb := cbFacts X hG
   have hpr := prFacts l T.L Ω Y.s V
-  have hd : ∀ i, ∃ χ : V.η.ker →* (ResidueField c'.O)ˣ, IsOpen (χ.ker : Set V.η.ker) ∧
-      ∀ g, χ (V.pr g) = X.cb i g := fun i =>
+  have hd
+      : ∀ i, ∃ χ : V.η.ker →* (ResidueField c'.O)ˣ,
+        IsOpen (χ.ker : Set V.η.ker) ∧ ∀ g, χ (V.pr g) = X.cb i g := fun i =>
     descend l T.L Ω Y.s V _ (X.cb i) (hcb.1 i)
       (fun A v hA hv => hcb.2.1 i A (Y.away A v hA (by rwa [hS] at hv)))
   choose χ hχo hχ using hd
@@ -41,7 +53,15 @@ theorem UpperTheory.V.Ws.Lk.residEx :
     have e3 : ((4 : ℕ) : ℤ) - 1 = ((3 : ℕ) : ℤ) := by norm_num
     rw [e3, zpow_natCast]
     exact key
-  refine ⟨W.Resid.mk χ hχo hinj hpol (fun v i => (χ i).comp (V.frame.φ v)) ?_ (fun _ _ => 1)
-    (fun _ _ _ _ => rfl), fun i g => hχ i g, fun v i g => rfl, fun v i => rfl⟩
+  refine ⟨
+    W.Resid.mk χ hχo hinj hpol
+      (fun v i => (χ i).comp (V.frame.φ v))
+      ?_
+      (fun _ _ => 1)
+      (fun _ _ _ _ => rfl),
+    fun i g => hχ i g,
+    fun v i g => rfl,
+    fun v i => rfl
+  ⟩
   intro v i
   exact (hχo i).preimage (V.frame.φ_cont v)

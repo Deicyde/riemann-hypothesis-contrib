@@ -15,27 +15,33 @@ open NumberField Formalism.HermitianLatticesTheory
 
 section Gen
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
-theorem star_algebraMap_mem_range (r : 𝓞 K) : star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K) :=
+theorem star_algebraMap_mem_range (r : 𝓞 K)
+    : star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K) :=
   ⟨⟨star (algebraMap (𝓞 K) K r), r.isIntegral_coe.map (starRingEnd K).toIntAlgHom⟩, rfl⟩
 
-theorem inner_sum_orthonormal (h : V →ₗ⋆[K] V →ₗ[K] K) {n : ℕ} (e : Fin n → V)
-    (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0) (a b : Fin n → K) :
-    h (∑ i, a i • e i) (∑ j, b j • e j) = ∑ i, star (a i) * b i := by
+theorem inner_sum_orthonormal
+    (h : V →ₗ⋆[K] V →ₗ[K] K)
+    {n : ℕ} (e : Fin n → V) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0) (a b : Fin n → K)
+    : h (∑ i, a i • e i) (∑ j, b j • e j) = ∑ i, star (a i) * b i := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, he,
-    smul_eq_mul, starRingEnd_apply]
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul,
+      he, smul_eq_mul, starRingEnd_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [mul_comm]
 
-theorem fg_of_orthonormal_basis (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n) : L.FG := by
+theorem fg_of_orthonormal_basis
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n)
+    : L.FG := by
   obtain ⟨e, -, -, rfl, -⟩ := hL
   exact Submodule.fg_span (Set.finite_range e)
 
-theorem integral_of_orthonormal_basis (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n) :
-    IsIntegralLat h L := by
+theorem integral_of_orthonormal_basis
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n)
+    : IsIntegralLat h L := by
   obtain ⟨e, -, -, rfl, he⟩ := hL
   intro x hx y hy
   obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).1 hx
@@ -50,8 +56,9 @@ theorem integral_of_orthonormal_basis (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Su
   rw [← ha', ← map_mul]
   exact Submodule.mem_one.2 ⟨_, rfl⟩
 
-theorem unimodular_of_orthonormal_basis (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n) :
-    IsUnimodular h L := by
+theorem unimodular_of_orthonormal_basis
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n)
+    : IsUnimodular h L := by
   have hint := integral_of_orthonormal_basis h L hL
   obtain ⟨e, -, hsp, rfl, he⟩ := hL
   apply le_antisymm
@@ -74,22 +81,33 @@ theorem unimodular_of_orthonormal_basis (h : V →ₗ⋆[K] V →ₗ[K] K) (L : 
     intro y hy
     exact hint y hy z hz
 
-theorem genus_orthonormal_integral_unimodular (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (L : Submodule (𝓞 K) V) {n : ℕ} (hL : IsOrthoLattice h L n)
-    (M : Submodule (𝓞 K) V) (hM : M ∈ genus h L) : IsIntegralLat h M ∧ dual h M = M := by
-  have hG := (final_genusBasic (𝓞 K) K V h hs star_algebraMap_mem_range).2.2 L M (fg_of_orthonormal_basis h L hL) hM.1.fg hM.2
-  exact ⟨hG.2.1 (integral_of_orthonormal_basis h L hL), hG.1.1 (unimodular_of_orthonormal_basis h L hL)⟩
+theorem genus_orthonormal_integral_unimodular
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
+    (L : Submodule (𝓞 K) V)
+    {n : ℕ} (hL : IsOrthoLattice h L n)
+    (M : Submodule (𝓞 K) V) (hM : M ∈ genus h L)
+    : IsIntegralLat h M ∧ dual h M = M := by
+  have hG :=
+    (final_genusBasic (𝓞 K) K V h hs star_algebraMap_mem_range).2.2 L M
+      (fg_of_orthonormal_basis h L hL) hM.1.fg hM.2
+  exact
+    ⟨hG.2.1 (integral_of_orthonormal_basis h L hL), hG.1.1 (unimodular_of_orthonormal_basis h L hL)⟩
 
-theorem mass_le_of_card_class_reps_le (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) (B : ℝ) (hB : 0 ≤ B)
-    (hc : ∀ s, Formalism.ThetaLiftIndependence.IsClassReps h L s → (s.card : ℝ) ≤ B) : mass h L ≤ B := by
+theorem mass_le_of_card_class_reps_le
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) (B : ℝ)
+    (hB : 0 ≤ B) (hc : ∀ s, Formalism.ThetaLiftIndependence.IsClassReps h L s → (s.card : ℝ) ≤ B)
+    : mass h L ≤ B := by
   classical
   unfold mass
   split_ifs with hs
   · refine le_trans ?_ (hc _ hs.choose_spec)
-    calc ∑ M ∈ hs.choose, ((Nat.card (Formalism.ThetaLiftIndependence.autL h M) : ℕ) : ℝ)⁻¹ ≤ ∑ M ∈ hs.choose, (1 : ℝ) := by
-          refine Finset.sum_le_sum fun M _ => ?_
-          rcases Nat.eq_zero_or_pos (Nat.card (Formalism.ThetaLiftIndependence.autL h M)) with h0 | h0
-          · rw [h0]; simp
-          · exact inv_le_one_of_one_le₀ (by exact_mod_cast h0)
+    calc
+      ∑ M ∈ hs.choose, ((Nat.card (Formalism.ThetaLiftIndependence.autL h M) : ℕ) : ℝ)⁻¹
+          ≤ ∑ M ∈ hs.choose, (1 : ℝ) := by
+        refine Finset.sum_le_sum fun M _ => ?_
+        rcases Nat.eq_zero_or_pos (Nat.card (Formalism.ThetaLiftIndependence.autL h M)) with h0 | h0
+        · rw [h0]; simp
+        · exact inv_le_one_of_one_le₀ (by exact_mod_cast h0)
       _ = (hs.choose.card : ℝ) := by simp
   · exact hB
 

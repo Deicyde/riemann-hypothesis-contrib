@@ -14,7 +14,12 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory
 
-theorem fnShape : ∀ (Ω : Type) [Field Ω] (h : HahnSeries ℚ Ω), Den h → h ≠ 0 → ∃ (N : ℕ) (n₀ : ℤ) (a : ℕ → Ω), 0 < N ∧ a 0 ≠ 0 ∧ (∀ k : ℕ, h.coeff (((n₀ + k : ℤ) : ℚ) / N) = a k) ∧ ∀ r : ℚ, (∀ k : ℕ, r ≠ ((n₀ + k : ℤ) : ℚ) / N) → h.coeff r = 0 := by
+theorem fnShape
+    : ∀ (Ω : Type) [Field Ω] (h : HahnSeries ℚ Ω),
+      Den h → h ≠ 0
+        → ∃ (N : ℕ) (n₀ : ℤ) (a : ℕ → Ω),
+          0 < N ∧ a 0 ≠ 0 ∧ (∀ k : ℕ, h.coeff (((n₀ + k : ℤ) : ℚ) / N) = a k)
+            ∧ ∀ r : ℚ, (∀ k : ℕ, r ≠ ((n₀ + k : ℤ) : ℚ) / N) → h.coeff r = 0 := by
   intro Ω _ h hD h0
   obtain ⟨N, hN, hd⟩ := hD
   have hc : h.coeff h.order ≠ 0 := fun e => h0 (HahnSeries.coeff_order_eq_zero.mp e)

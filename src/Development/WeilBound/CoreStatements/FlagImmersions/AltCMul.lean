@@ -21,8 +21,8 @@ def alt (a : Ψ → Fin N → ℕ) (G : RP Ψ N) : ℝ :=
 
 def rho : Ψ → Fin N → ℕ := fun _ c => N - 1 - (c : ℕ)
 
-def bump (τ : Ψ) (c : Fin N) (k : ℕ) : Ψ → Fin N → ℕ :=
-  fun τ' c' => N - 1 - (c' : ℕ) + if τ' = τ ∧ c' = c then k else 0
+def bump (τ : Ψ) (c : Fin N) (k : ℕ) : Ψ → Fin N → ℕ := fun τ' c' =>
+  N - 1 - (c' : ℕ) + if τ' = τ ∧ c' = c then k else 0
 
 def lam (τ : Ψ) (k : ℕ) (G : RP Ψ N) : ℝ := ∑ c, alt (bump τ c k) G
 
@@ -40,16 +40,16 @@ theorem alt_C_mul (a : Ψ → Fin N → ℕ) (r : ℝ) (G : RP Ψ N) : alt a (C 
   simp only [alt, coeff_C_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun _ _ => by ring
 
-theorem alt_sum {ι : Type*} (a : Ψ → Fin N → ℕ) (s : Finset ι) (F : ι → RP Ψ N) :
-    alt a (∑ i ∈ s, F i) = ∑ i ∈ s, alt a (F i) := by
+theorem alt_sum {ι : Type*} (a : Ψ → Fin N → ℕ) (s : Finset ι) (F : ι → RP Ψ N)
+    : alt a (∑ i ∈ s, F i) = ∑ i ∈ s, alt a (F i) := by
   simp only [alt, coeff_sum, Finset.mul_sum]
   exact Finset.sum_comm
 
 theorem lam_add (τ : Ψ) (k : ℕ) (F G : RP Ψ N) : lam τ k (F + G) = lam τ k F + lam τ k G := by
   simp [lam, alt_add, Finset.sum_add_distrib]
 
-theorem lam_sum {ι : Type*} (τ : Ψ) (k : ℕ) (s : Finset ι) (F : ι → RP Ψ N) :
-    lam τ k (∑ i ∈ s, F i) = ∑ i ∈ s, lam τ k (F i) := by
+theorem lam_sum {ι : Type*} (τ : Ψ) (k : ℕ) (s : Finset ι) (F : ι → RP Ψ N)
+    : lam τ k (∑ i ∈ s, F i) = ∑ i ∈ s, lam τ k (F i) := by
   simp only [lam, alt_sum]
   exact Finset.sum_comm
 

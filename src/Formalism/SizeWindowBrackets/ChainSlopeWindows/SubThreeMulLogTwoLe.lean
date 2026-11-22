@@ -12,34 +12,34 @@ open Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters
 
 set_option linter.unusedVariables false
 
-
 set_option maxHeartbeats 1000000 in
-theorem core_ineq {nT a b b' k L La B0 Nc M sA lW lk lH dI et Xpp y yD yL K h g
-    cDiv cE cH cCount cSlope cSl1 cLoss : ℝ}
-    (hy : 1 ≤ y) (hyD : 1 ≤ yD) (hyL : 1 ≤ yL)
-    (hnT : 1 ≤ nT) (ha1 : 1 ≤ a) (hb0 : 0 ≤ b) (hba : b ≤ a) (hM : 0 ≤ M) (hk : 0 < k) (hMk : M ≤ k)
-    (hMb : M * b ≤ a) (hL0 : 0 ≤ L) (hL : L ≤ 2 * y) (hLa0 : 0 ≤ La) (hLa : La ≤ 2 * y)
-    (hb' : 0 ≤ b') (hkb' : k * b' ≤ a) (hX0 : 0 ≤ Xpp) (hX : Xpp ≤ a)
-    (hsA0 : 0 ≤ sA) (hsA : sA ≤ 2 * (nT * a)) (hB0 : 0 ≤ B0) (hNc : 0 ≤ Nc)
-    (hlW : lW ≤ a) (hlk0 : 0 ≤ lk) (hlk : lk ≤ g * y) (hlH0 : 0 ≤ lH) (hlH : lH ≤ h * y)
-    (hdI0 : 0 ≤ dI) (hdI : dI ≤ 2) (het : et ≤ K * y * (nT * a))
-    (c1 : 0 ≤ cDiv) (c1' : cDiv ≤ K) (c2 : 0 ≤ cE) (c2' : cE ≤ K) (c3 : 0 ≤ cH) (c3' : cH ≤ K)
-    (c4 : 0 ≤ cCount) (c4' : cCount ≤ K) (c5 : 0 ≤ cSlope) (c5' : cSlope ≤ K)
-    (c6 : 0 ≤ cSl1) (c6' : cSl1 ≤ K) (c7 : 0 ≤ cLoss) (c7' : cLoss ≤ K)
-    (hh : 1 ≤ h) (hg : 1 ≤ g) (hbig : 200 * (1 + K) ^ 2 * h * g ≤ y) :
-    sA * (cCount * (La + M ^ 2 * La / k))
-      + (cDiv * nT * a * La + cDiv * M * (B0 + Nc) * yD)
-      + M * cE * B0
-      + cSlope * nT * a * La * (1 + M / k)
-      + lW
-      + cLoss * nT * M * b * yL
-      + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
+theorem core_ineq
+    {nT a b b' k L La B0 Nc M sA lW lk lH dI et Xpp y yD yL K h g cDiv cE cH cCount cSlope cSl1
+      cLoss
+      : ℝ}
+    (hy : 1 ≤ y) (hyD : 1 ≤ yD) (hyL : 1 ≤ yL) (hnT : 1 ≤ nT) (ha1 : 1 ≤ a) (hb0 : 0 ≤ b)
+    (hba : b ≤ a) (hM : 0 ≤ M) (hk : 0 < k) (hMk : M ≤ k) (hMb : M * b ≤ a) (hL0 : 0 ≤ L)
+    (hL : L ≤ 2 * y) (hLa0 : 0 ≤ La) (hLa : La ≤ 2 * y) (hb' : 0 ≤ b') (hkb' : k * b' ≤ a)
+    (hX0 : 0 ≤ Xpp) (hX : Xpp ≤ a) (hsA0 : 0 ≤ sA) (hsA : sA ≤ 2 * (nT * a)) (hB0 : 0 ≤ B0)
+    (hNc : 0 ≤ Nc) (hlW : lW ≤ a) (hlk0 : 0 ≤ lk) (hlk : lk ≤ g * y) (hlH0 : 0 ≤ lH)
+    (hlH : lH ≤ h * y) (hdI0 : 0 ≤ dI) (hdI : dI ≤ 2) (het : et ≤ K * y * (nT * a)) (c1 : 0 ≤ cDiv)
+    (c1' : cDiv ≤ K) (c2 : 0 ≤ cE) (c2' : cE ≤ K) (c3 : 0 ≤ cH) (c3' : cH ≤ K) (c4 : 0 ≤ cCount)
+    (c4' : cCount ≤ K) (c5 : 0 ≤ cSlope) (c5' : cSlope ≤ K) (c6 : 0 ≤ cSl1) (c6' : cSl1 ≤ K)
+    (c7 : 0 ≤ cLoss) (c7' : cLoss ≤ K) (hh : 1 ≤ h) (hg : 1 ≤ g)
+    (hbig : 200 * (1 + K) ^ 2 * h * g ≤ y)
+    : sA * (cCount * (La + M ^ 2 * La / k)) + (cDiv * nT * a * La + cDiv * M * (B0 + Nc) * yD)
+        + M * cE * B0 + cSlope * nT * a * La * (1 + M / k) + lW + cLoss * nT * M * b * yL
+        + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
           + cSl1 * Xpp + 1)
-      + dI * (4 * lH * ((cSlope * nT * a * La * (2 + M / k)
-            + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
-            + cSl1 * M * B0
-            + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
-                + cSl1 * Xpp + 1)) + b) + et)
+        + dI
+          * (4 * lH
+              * ((cSlope * nT * a * La * (2 + M / k)
+                  + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
+                  + cSl1 * M * B0
+                  + (cSl1 * (cLoss * nT * M * b * yL)
+                    + cSl1 * nT * M * (a / k + b') * (cCount * M * L) + cSl1 * Xpp + 1))
+                + b)
+            + et)
       ≤ yD * yL * y * y * y * (nT * a * (1 + M ^ 2 / k) + M * (B0 + Nc)) := by
   have hK : 0 ≤ K := c1.trans c1'
   have hy0 : 0 ≤ y := by linarith
@@ -94,91 +94,132 @@ theorem core_ineq {nT a b b' k L La B0 Nc M sA lW lk lH dI et Xpp y yD yL K h g
       have : sA * (1 + r) ≤ 2 * A1 * (1 + r) := by rw [hA1]; gcongr
       linarith only [this, eA1r]
     rw [e]
-    calc (sA * (1 + r)) * (cCount * La) ≤ (2 * E) * (K * (2 * Y)) := by gcongr
+    calc
+      (sA * (1 + r)) * (cCount * La)
+        ≤ (2 * E) * (K * (2 * Y)) := by gcongr
       _ = 4 * K * P := by rw [hP]; ring
   have T2a : cDiv * nT * a * La ≤ 2 * K * P := by
-    calc cDiv * nT * a * La = cDiv * A1 * La := by rw [hA1]; ring
+    calc
+      cDiv * nT * a * La
+        = cDiv * A1 * La := by rw [hA1]; ring
       _ ≤ K * E * (2 * Y) := by gcongr
       _ = 2 * K * P := by rw [hP]; ring
   have T2b : cDiv * M * (B0 + Nc) * yD ≤ K * P := by
-    calc cDiv * M * (B0 + Nc) * yD = cDiv * (A3 + A4) * yD := by rw [hA3, hA4]; ring
+    calc
+      cDiv * M * (B0 + Nc) * yD
+        = cDiv * (A3 + A4) * yD := by rw [hA3, hA4]; ring
       _ ≤ K * E * Y := by gcongr
       _ = K * P := by rw [hP]; ring
   have T3 : M * cE * B0 ≤ K * P := by
-    calc M * cE * B0 = cE * A3 := by rw [hA3]; ring
+    calc
+      M * cE * B0
+        = cE * A3 := by rw [hA3]; ring
       _ ≤ K * P := by gcongr; exact selfLieBasisVector.trans EP
   have T4 : cSlope * nT * a * La * (1 + M / k) ≤ 4 * K * P := by
-    calc cSlope * nT * a * La * (1 + M / k) = cSlope * A1 * La * (1 + q) := by rw [hA1, hq]; ring
+    calc
+      cSlope * nT * a * La * (1 + M / k)
+        = cSlope * A1 * La * (1 + q) := by rw [hA1, hq]; ring
       _ ≤ K * E * (2 * Y) * (1 + 1) := by gcongr
       _ = 4 * K * P := by rw [hP]; ring
   have T5 : lW ≤ P := by linarith only [hlW, hA1a, orbitMap_conj_smul_one, EP]
   have T60 : 0 ≤ cLoss * nT * M * b * yL := by positivity
   have FreeQuotientRank : cLoss * nT * M * b * yL ≤ K * P := by
-    calc cLoss * nT * M * b * yL = cLoss * (nT * (M * b)) * yL := by ring
+    calc
+      cLoss * nT * M * b * yL
+        = cLoss * (nT * (M * b)) * yL := by ring
       _ ≤ K * (nT * a) * Y := by gcongr
       _ ≤ K * E * Y := by rw [← hA1]; gcongr
       _ = K * P := by rw [hP]; ring
   have Tmid : cSl1 * nT * M * (a / k + b') * (cCount * M * L) ≤ 4 * K ^ 2 * P := by
     have hb'k : b' ≤ a / k := by rw [le_div_iff₀ hk]; linarith
     have hQ : nT * M ^ 2 * (a / k + b') ≤ 2 * E := by
-      calc nT * M ^ 2 * (a / k + b') ≤ nT * M ^ 2 * (a / k + a / k) := by gcongr
+      calc
+        nT * M ^ 2 * (a / k + b')
+          ≤ nT * M ^ 2 * (a / k + a / k) := by gcongr
         _ = 2 * (A1 * r) := by rw [hA1, hr]; ring
         _ ≤ 2 * E := by linarith
     have hQ0 : 0 ≤ nT * M ^ 2 * (a / k + b') := by positivity
-    calc cSl1 * nT * M * (a / k + b') * (cCount * M * L)
+    calc
+      cSl1 * nT * M * (a / k + b') * (cCount * M * L)
         = cSl1 * cCount * L * (nT * M ^ 2 * (a / k + b')) := by ring
       _ ≤ K * K * (2 * Y) * (2 * E) := by gcongr
       _ = 4 * K ^ 2 * P := by rw [hP]; ring
-  have T7 : cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
-      + cSl1 * Xpp + 1 ≤ (5 * K ^ 2 + K + 1) * P := by
+  have T7
+      : cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
+          + cSl1 * Xpp + 1
+        ≤ (5 * K ^ 2 + K + 1) * P := by
     have s1 : cSl1 * (cLoss * nT * M * b * yL) ≤ K * (K * P) := by gcongr
     have s2 : cSl1 * Xpp ≤ K * P := by gcongr; linarith only [hX, hA1a, orbitMap_conj_smul_one, EP]
     have s3 : 1 ≤ P := e1.trans EP
     linarith only [s1, s2, s3, Tmid]
-  have TU : cSlope * nT * a * La * (2 + M / k)
-      + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
-      + cSl1 * M * B0
-      + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
-          + cSl1 * Xpp + 1) + b ≤ (5 * K ^ 2 + 13 * K + 2 * K * g + 2) * P := by
+  have TU
+      : cSlope * nT * a * La * (2 + M / k)
+          + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk)) + cSl1 * M * B0
+          + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
+            + cSl1 * Xpp + 1)
+          + b
+        ≤ (5 * K ^ 2 + 13 * K + 2 * K * g + 2) * P := by
     have s1 : cSlope * nT * a * La * (2 + M / k) ≤ 6 * K * P := by
-      calc cSlope * nT * a * La * (2 + M / k) = cSlope * A1 * La * (2 + q) := by rw [hA1, hq]; ring
+      calc
+        cSlope * nT * a * La * (2 + M / k)
+          = cSlope * A1 * La * (2 + q) := by rw [hA1, hq]; ring
         _ ≤ K * E * (2 * Y) * (2 + 1) := by gcongr
         _ = 6 * K * P := by rw [hP]; ring
     have s2 : cH * (nT * a * La + M * B0) ≤ 3 * K * P := by
-      calc cH * (nT * a * La + M * B0) = cH * (A1 * La + A3) := by rw [hA1, hA3]
+      calc
+        cH * (nT * a * La + M * B0)
+          = cH * (A1 * La + A3) := by rw [hA1, hA3]
         _ ≤ K * (E * (2 * Y) + P) := by gcongr; exact selfLieBasisVector.trans EP
         _ = 3 * K * P := by rw [hP]; ring
     have s3 : sA * (cCount * lk) ≤ 2 * K * g * P := by
-      calc sA * (cCount * lk) ≤ (2 * E) * (K * (g * Y)) := by
-            gcongr
-            rw [← hA1] at hsA; linarith
+      calc
+        sA * (cCount * lk) ≤ (2 * E) * (K * (g * Y)) := by
+          gcongr
+          rw [← hA1] at hsA
+          linarith
         _ = 2 * K * g * P := by rw [hP]; ring
     have s4 : cSl1 * M * B0 ≤ K * P := by
-      calc cSl1 * M * B0 = cSl1 * A3 := by rw [hA3]; ring
+      calc
+        cSl1 * M * B0
+          = cSl1 * A3 := by rw [hA3]; ring
         _ ≤ K * P := by gcongr; exact selfLieBasisVector.trans EP
     have s5 : b ≤ P := by linarith only [hba, hA1a, orbitMap_conj_smul_one, EP]
     linarith only [s1, s2, s3, s4, s5, T3, T7]
   have Tet : et ≤ K * P := by
-    calc et ≤ K * y * A1 := by rw [hA1]; exact het
+    calc
+      et
+        ≤ K * y * A1 := by rw [hA1]; exact het
       _ ≤ K * Y * E := by gcongr
       _ = K * P := by rw [hP]; ring
   obtain ⟨u, hu⟩ : ∃ u, u = 5 * K ^ 2 + 13 * K + 2 * K * g + 2 := ⟨_, rfl⟩
   have hu0 : 0 ≤ u := by rw [hu]; positivity
   rw [← hu] at TU
-  have T8 : dI * (4 * lH * ((cSlope * nT * a * La * (2 + M / k)
-            + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
-            + cSl1 * M * B0
-            + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
-                + cSl1 * Xpp + 1)) + b) + et) ≤ 2 * (4 * (h * y) * (u * P) + K * P) := by
-    have s1 : 4 * lH * ((cSlope * nT * a * La * (2 + M / k)
-            + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
-            + cSl1 * M * B0
-            + (cSl1 * (cLoss * nT * M * b * yL) + cSl1 * nT * M * (a / k + b') * (cCount * M * L)
-                + cSl1 * Xpp + 1)) + b) ≤ 4 * (h * y) * (u * P) := by
-      calc _ ≤ 4 * lH * (u * P) := by gcongr
+  have T8
+      : dI
+          * (4 * lH
+              * ((cSlope * nT * a * La * (2 + M / k)
+                  + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
+                  + cSl1 * M * B0
+                  + (cSl1 * (cLoss * nT * M * b * yL)
+                    + cSl1 * nT * M * (a / k + b') * (cCount * M * L) + cSl1 * Xpp + 1))
+                + b)
+            + et)
+        ≤ 2 * (4 * (h * y) * (u * P) + K * P) := by
+    have s1
+        : 4 * lH
+            * ((cSlope * nT * a * La * (2 + M / k)
+                + (2 * M * cE * B0 + cH * (nT * a * La + M * B0) + sA * (cCount * lk))
+                + cSl1 * M * B0
+                + (cSl1 * (cLoss * nT * M * b * yL)
+                  + cSl1 * nT * M * (a / k + b') * (cCount * M * L) + cSl1 * Xpp + 1))
+              + b)
+          ≤ 4 * (h * y) * (u * P) := by
+      calc
+        _ ≤ 4 * lH * (u * P) := by gcongr
         _ ≤ 4 * (h * y) * (u * P) := by gcongr
     have s2 : 0 ≤ 4 * (h * y) * (u * P) + K * P := by positivity
-    calc _ ≤ dI * (4 * (h * y) * (u * P) + K * P) := by gcongr
+    calc
+      _ ≤ dI * (4 * (h * y) * (u * P) + K * P) := by gcongr
       _ ≤ 2 * (4 * (h * y) * (u * P) + K * P) := by gcongr
 
   have hyP : P ≤ y * P := le_mul_of_one_le_left hP0 hy
@@ -188,18 +229,20 @@ theorem core_ineq {nT a b b' k L La B0 Nc M sA lW lk lH dI et Xpp y yD yL K h g
     have hhg : 1 ≤ h * g := one_le_mul_of_one_le_of_one_le hh hg
     have a1 : (5 * K ^ 2 + 16 * K + 2) ≤ (5 * K ^ 2 + 16 * K + 2) * (h * g) :=
       le_mul_of_one_le_right (by positivity) hhg
-    have a2 : 8 * h * (5 * K ^ 2 + 13 * K + 2 * K * g + 2)
-        ≤ 8 * h * ((5 * K ^ 2 + 15 * K + 2) * g) := by
+    have a2
+        : 8 * h * (5 * K ^ 2 + 13 * K + 2 * K * g + 2)
+          ≤ 8 * h * ((5 * K ^ 2 + 15 * K + 2) * g) := by
       gcongr
-      have := mul_nonneg (by positivity : 0 ≤ 5 * K ^ 2 + 13 * K + 2) (by linarith only [hg] : 0 ≤ g - 1)
+      have :=
+        mul_nonneg (by positivity : 0 ≤ 5 * K ^ 2 + 13 * K + 2) (by linarith only [hg] : 0 ≤ g - 1)
       linarith only [this]
-    have a3 : (5 * K ^ 2 + 16 * K + 2) * (h * g) + 8 * h * ((5 * K ^ 2 + 15 * K + 2) * g)
-        ≤ 200 * (1 + K) ^ 2 * h * g := by
+    have a3
+        : (5 * K ^ 2 + 16 * K + 2) * (h * g) + 8 * h * ((5 * K ^ 2 + 15 * K + 2) * g)
+          ≤ 200 * (1 + K) ^ 2 * h * g := by
       have : 0 ≤ (155 * K ^ 2 + 264 * K + 182) * (h * g) := by positivity
       linarith only [this]
     linarith only [a1, a2, a3]
-  have hfin : (5 * K ^ 2 + 14 * K + 2) * P + 2 * (4 * (h * y) * (u * P) + K * P)
-      ≤ y * (y * P) := by
+  have hfin : (5 * K ^ 2 + 14 * K + 2) * P + 2 * (4 * (h * y) * (u * P) + K * P) ≤ y * (y * P) := by
     have b1 : (5 * K ^ 2 + 16 * K + 2) * P ≤ (5 * K ^ 2 + 16 * K + 2) * (y * P) := by gcongr
     have b2 : ((5 * K ^ 2 + 16 * K + 2) + 8 * h * u) * (y * P) ≤ y * (y * P) := by
       gcongr
@@ -248,7 +291,6 @@ lemma inv_one_sub_le_two {d : ℝ} (hd : d ≤ 1 / 2) : 0 ≤ (1 - d)⁻¹ ∧ (
   have := inv_anti₀ (by norm_num : (0 : ℝ) < 1 / 2) hd12
   simpa using this
 
-
 theorem large_x_eventually : LargeXEv := by
   intro ε K cHH eK hε
   have h1 : ∀ᶠ x : ℝ in Filter.atTop, Real.log x ≤ x ^ ε := by
@@ -262,7 +304,8 @@ theorem large_x_eventually : LargeXEv := by
   exact ⟨x0, fun x hx => hx0 x hx⟩
 
 section
-open Formalism Formalism.D5 Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds
+open Formalism Formalism.D5 Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds
 
 end
 

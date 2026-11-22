@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwOrbEqFinsu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -28,8 +29,9 @@ def cptSub (T : Subgroup G) (hT : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a) : Sub
     rintro a b ⟨haT, ha⟩ ⟨hbT, hb⟩
     refine ⟨T.mul_mem haT hbT, ?_⟩
     have hc : Commute a b := hT a haT b hbT
-    have hsub : closure (Subgroup.zpowers (a * b) : Set G) ⊆
-        closure (Subgroup.zpowers a : Set G) * closure (Subgroup.zpowers b : Set G) := by
+    have hsub
+        : closure (Subgroup.zpowers (a * b) : Set G)
+          ⊆ closure (Subgroup.zpowers a : Set G) * closure (Subgroup.zpowers b : Set G) := by
       refine closure_minimal ?_ (ha.mul hb).isClosed
       rintro _ ⟨n, rfl⟩
       simp only [hc.mul_zpow]
@@ -42,37 +44,44 @@ def cptSub (T : Subgroup G) (hT : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a) : Sub
     rw [Subgroup.zpowers_inv]
     exact ha
 
-theorem mem_cptPart_iff (T : Subgroup G) (hT : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a) (x : G) :
-    x ∈ cptPart T ↔ x ∈ T ∧ IsCompact (closure (Subgroup.zpowers x : Set G)) := by
+theorem mem_cptPart_iff (T : Subgroup G) (hT : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a) (x : G)
+    : x ∈ cptPart T ↔ x ∈ T ∧ IsCompact (closure (Subgroup.zpowers x : Set G)) := by
   have : cptPart T = cptSub T hT := Subgroup.closure_eq (cptSub T hT)
   rw [this]
   rfl
 
 section Restr
 
-variable {X V : Type} {Y : V → Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [T2Space X]
-  [∀ v, Group (Y v)] [∀ v, TopologicalSpace (Y v)] [∀ v, IsTopologicalGroup (Y v)] [∀ v, T2Space (Y v)]
+variable
+  {X V : Type} {Y : V → Type}
+  [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [T2Space X] [∀ v, Group (Y v)]
+  [∀ v, TopologicalSpace (Y v)] [∀ v, IsTopologicalGroup (Y v)] [∀ v, T2Space (Y v)]
   {pf : ∀ v, X →* Y v} {K : ∀ v, Subgroup (Y v)}
 
-theorem isClosed_setOf_forall_mem (hX : GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K)
-    (C : ∀ v, Set (Y v)) (hC : ∀ v, IsCompact (C v)) : IsClosed {z : X | ∀ v, pf v z ∈ C v} := by
+theorem isClosed_setOf_forall_mem
+    (hX : GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K)
+    (C : ∀ v, Set (Y v)) (hC : ∀ v, IsCompact (C v))
+    : IsClosed {z : X | ∀ v, pf v z ∈ C v} := by
   simp only [Set.setOf_forall]
   exact isClosed_iInter fun v => (hC v).isClosed.preimage (hX.continuous_pf v)
 
-theorem isCompact_setOf_forall_mem (hX : GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K)
-    (S : Finset V) : ∀ C : ∀ v, Set (Y v), (∀ v, IsCompact (C v)) → (∀ v ∉ S, C v ⊆ K v) →
-      IsCompact {z : X | ∀ v, pf v z ∈ C v} := by
+theorem isCompact_setOf_forall_mem
+    (hX : GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K) (S : Finset V)
+    : ∀ C : ∀ v, Set (Y v),
+      (∀ v, IsCompact (C v)) → (∀ v ∉ S, C v ⊆ K v) → IsCompact {z : X | ∀ v, pf v z ∈ C v} := by
   induction S using Finset.induction_on with
   | empty =>
     intro C hC hCK
     have hKg := hX.isCompact_level (fun e => e.elim) (fun e => e.elim)
-    exact hKg.of_isClosed_subset (isClosed_setOf_forall_mem hX C hC)
-      fun z hz => ⟨fun e => e.elim, fun v => hCK v (Finset.notMem_empty v) (hz v)⟩
+    exact hKg.of_isClosed_subset (isClosed_setOf_forall_mem hX C hC) fun z hz =>
+      ⟨fun e => e.elim, fun v => hCK v (Finset.notMem_empty v) (hz v)⟩
   | @insert v₀ S hv₀ ih =>
     intro C hC hCK
-    obtain ⟨t, hcov⟩ := (hC v₀).elim_finite_subcover (fun c : C v₀ => (c : Y v₀) • (K v₀ : Set (Y v₀)))
-      (fun c => (hX.isOpen_K v₀).smul _)
-      (fun y hy => Set.mem_iUnion.2 ⟨⟨y, hy⟩, ⟨1, (K v₀).one_mem, by simp⟩⟩)
+    obtain ⟨t, hcov⟩ :=
+      (hC v₀).elim_finite_subcover
+        (fun c : C v₀ => (c : Y v₀) • (K v₀ : Set (Y v₀)))
+        (fun c => (hX.isOpen_K v₀).smul _)
+        (fun y hy => Set.mem_iUnion.2 ⟨⟨y, hy⟩, ⟨1, (K v₀).one_mem, by simp⟩⟩)
     set C' : ∀ v, Set (Y v) := Function.update C v₀ (K v₀ : Set (Y v₀)) with hC'def
     have hC' : ∀ v, IsCompact (C' v) := by
       intro v
@@ -111,9 +120,10 @@ theorem isCompact_setOf_forall_mem (hX : GlobalTheory.RestrMeas.IsRestrGroup (Gl
     · simp only [Pi.mulSingle_eq_of_ne h, inv_one, one_mul, hC'def, Function.update_of_ne h]
       exact hz v
 
-theorem isCompact_closure_zpowers_iff (hX : GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K) (x : X) :
-    IsCompact (closure (Subgroup.zpowers x : Set X)) ↔
-      ∀ v, IsCompact (closure (Subgroup.zpowers (pf v x) : Set (Y v))) := by
+theorem isCompact_closure_zpowers_iff
+    (hX : GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K) (x : X)
+    : IsCompact (closure (Subgroup.zpowers x : Set X))
+      ↔ ∀ v, IsCompact (closure (Subgroup.zpowers (pf v x) : Set (Y v))) := by
   constructor
   · intro h v
     have hi := h.image (hX.continuous_pf v)
@@ -135,11 +145,19 @@ theorem isCompact_closure_zpowers_iff (hX : GlobalTheory.RestrMeas.IsRestrGroup 
 
 end Restr
 
-theorem mem_cptPart_iff_forall : ∀ {X V : Type} {Y : V → Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [T2Space X] [∀ v, Group (Y v)] [∀ v, TopologicalSpace (Y v)] [∀ v, IsTopologicalGroup (Y v)] [∀ v, T2Space (Y v)] (pf : ∀ v, X →* Y v) (K : ∀ v, Subgroup (Y v)), GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K → ∀ (T : Subgroup X) (Tv : ∀ v, Subgroup (Y v)), (∀ x, x ∈ T ↔ ∀ v, pf v x ∈ Tv v) → (∀ v, ∀ a ∈ Tv v, ∀ b ∈ Tv v, a * b = b * a) → ∀ x, x ∈ cptPart T ↔ ∀ v, pf v x ∈ cptPart (Tv v) := by
+theorem mem_cptPart_iff_forall
+    : ∀ {X V : Type} {Y : V → Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X]
+        [T2Space X] [∀ v, Group (Y v)] [∀ v, TopologicalSpace (Y v)] [∀ v, IsTopologicalGroup (Y v)]
+        [∀ v, T2Space (Y v)] (pf : ∀ v, X →* Y v) (K : ∀ v, Subgroup (Y v)),
+      GlobalTheory.RestrMeas.IsRestrGroup (GlobalTheory.RestrMeas.noArch X) pf K
+        → ∀ (T : Subgroup X) (Tv : ∀ v, Subgroup (Y v)),
+          (∀ x, x ∈ T ↔ ∀ v, pf v x ∈ Tv v) → (∀ v, ∀ a ∈ Tv v, ∀ b ∈ Tv v, a * b = b * a)
+            → ∀ x, x ∈ cptPart T ↔ ∀ v, pf v x ∈ cptPart (Tv v) := by
   intro X V Y _ _ _ _ _ _ _ _ pf K hX T Tv hT hTv x
   have hTc : ∀ a ∈ T, ∀ b ∈ T, a * b = b * a := fun a ha b hb =>
-    hX.ext _ _ (fun e => e.elim) fun v => by
-      rw [map_mul, map_mul]; exact hTv v _ ((hT a).1 ha v) _ ((hT b).1 hb v)
+    hX.ext _ _
+      (fun e => e.elim)
+      fun v => by rw [map_mul, map_mul]; exact hTv v _ ((hT a).1 ha v) _ ((hT b).1 hb v)
   rw [mem_cptPart_iff T hTc, hT, isCompact_closure_zpowers_iff hX]
   simp only [mem_cptPart_iff _ (hTv _)]
   exact ⟨fun h v => ⟨h.1 v, h.2 v⟩, fun h => ⟨fun v => (h v).1, fun v => (h v).2⟩⟩

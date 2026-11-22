@@ -24,7 +24,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AvgEqOfLeRig
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.AvgProd
@@ -36,8 +37,10 @@ lemma apply_out_rStab {H : Type} [Group H] (u : H → ℂ) (x : H) :
   have hk' : ∀ y, u (y * (k : H)) = u y := k.2
   exact hk' x
 
-theorem avg_prod : ∀ (H H' : Type) [Group H] [Group H'] (u : H → ℂ) (v : H' → ℂ), (rStab u).index ≠ 0 →
-    (rStab v).index ≠ 0 → avg (fun x : H × H' => u x.1 * v x.2) = avg u * avg v := by
+theorem avg_prod
+    : ∀ (H H' : Type) [Group H] [Group H'] (u : H → ℂ) (v : H' → ℂ),
+      (rStab u).index ≠ 0 → (rStab v).index ≠ 0
+        → avg (fun x : H × H' => u x.1 * v x.2) = avg u * avg v := by
   intro H H' _ _ u v hu hv
   set S : Subgroup (H × H') := (rStab u).prod (rStab v) with hS
   have hle : S ≤ rStab (fun x : H × H' => u x.1 * v x.2) := by
@@ -57,8 +60,8 @@ theorem avg_prod : ∀ (H H' : Type) [Group H] [Group H'] (u : H → ℂ) (v : H
   letI : Fintype (H ⧸ rStab u) := Fintype.ofFinite _
   letI : Fintype (H' ⧸ rStab v) := Fintype.ofFinite _
   letI : Fintype ((H × H') ⧸ S) := Fintype.ofFinite _
-  let f : (H × H') ⧸ S → (H ⧸ rStab u) × (H' ⧸ rStab v) :=
-    fun q => ((q.out.1 : H ⧸ rStab u), (q.out.2 : H' ⧸ rStab v))
+  let f : (H × H') ⧸ S → (H ⧸ rStab u) × (H' ⧸ rStab v) := fun q =>
+    ((q.out.1 : H ⧸ rStab u), (q.out.2 : H' ⧸ rStab v))
   have hf : Function.Bijective f := by
     constructor
     · intro q q' h
@@ -66,10 +69,13 @@ theorem avg_prod : ∀ (H H' : Type) [Group H] [Group H'] (u : H → ℂ) (v : H
       obtain ⟨h1, h2⟩ := h
       rw [QuotientGroup.eq] at h1 h2
       rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q', QuotientGroup.eq]
-      exact (Subgroup.mem_prod (H := rStab u) (K := rStab v)).2 ⟨by simpa using h1, by simpa using h2⟩
+      exact (Subgroup.mem_prod (H := rStab u) (K := rStab v)).2
+        ⟨by simpa using h1, by simpa using h2⟩
     · rintro ⟨a, b⟩
-      induction a using QuotientGroup.induction_on with | H x => ?_
-      induction b using QuotientGroup.induction_on with | H y => ?_
+      induction a using QuotientGroup.induction_on with
+      | H x => ?_
+      induction b using QuotientGroup.induction_on with
+      | H y => ?_
       refine ⟨((x, y) : (H × H') ⧸ S), ?_⟩
       have h := QuotientGroup.out_eq' ((x, y) : (H × H') ⧸ S)
       rw [QuotientGroup.eq] at h
@@ -77,10 +83,11 @@ theorem avg_prod : ∀ (H H' : Type) [Group H] [Group H'] (u : H → ℂ) (v : H
       simp only [f, Prod.mk.injEq]
       rw [QuotientGroup.eq, QuotientGroup.eq]
       exact ⟨by simpa using h.1, by simpa using h.2⟩
-  have hsum : ∑ᶠ q : (H × H') ⧸ S, (fun x : H × H' => u x.1 * v x.2) q.out =
-      (∑ᶠ a : H ⧸ rStab u, u a.out) * ∑ᶠ b : H' ⧸ rStab v, v b.out := by
-    rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, Finset.sum_mul_sum,
-      ← Fintype.sum_prod_type']
+  have hsum
+      : ∑ᶠ q : (H × H') ⧸ S, (fun x : H × H' => u x.1 * v x.2) q.out
+        = (∑ᶠ a : H ⧸ rStab u, u a.out) * ∑ᶠ b : H' ⧸ rStab v, v b.out := by
+    rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype,
+      Finset.sum_mul_sum, ← Fintype.sum_prod_type']
     refine Fintype.sum_bijective f hf _ _ ?_
     intro q
     simp only [f, apply_out_rStab]

@@ -62,7 +62,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaIntNeZe
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset
 open Formalism.DivisionValues (vw)
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
@@ -79,19 +82,26 @@ noncomputable section
 
 namespace GlobalTheory.StageSmallBig
 
-theorem tmul_ne_zero {Pr Pf : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pf] [Module ℂ Pf] {x : Pr} {y : Pf}
-    (hx : x ≠ 0) (hy : y ≠ 0) : x ⊗ₜ[ℂ] y ≠ 0 := by
+theorem tmul_ne_zero
+    {Pr Pf : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pf] [Module ℂ Pf]
+    {x : Pr} {y : Pf} (hx : x ≠ 0) (hy : y ≠ 0)
+    : x ⊗ₜ[ℂ] y ≠ 0 := by
   obtain ⟨φ, hφ⟩ : ∃ φ : Module.Dual ℂ Pf, φ y ≠ 0 := by
     by_contra hc
     push Not at hc
     exact hy ((Module.forall_dual_apply_eq_zero_iff ℂ y).1 hc)
   intro h0
   have := congrArg ((TensorProduct.rid ℂ Pr).toLinearMap ∘ₗ LinearMap.lTensor Pr φ) h0
-  simp only [LinearMap.comp_apply, LinearMap.lTensor_tmul, LinearEquiv.coe_coe, TensorProduct.rid_tmul, map_zero] at this
+  simp only [LinearMap.comp_apply, LinearMap.lTensor_tmul, LinearEquiv.coe_coe,
+      TensorProduct.rid_tmul, map_zero]
+    at this
   exact hx ((smul_eq_zero.1 this).resolve_left hφ)
 
-theorem nontrivial_left {Pr Pf Pi : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pf] [Module ℂ Pf]
-    [AddCommGroup Pi] [Module ℂ Pi] [Nontrivial Pi] (e : Pr ⊗[ℂ] Pf ≃ₗ[ℂ] Pi) : Nontrivial Pr := by
+theorem nontrivial_left
+    {Pr Pf Pi : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pf] [Module ℂ Pf]
+    [AddCommGroup Pi] [Module ℂ Pi] [Nontrivial Pi]
+    (e : Pr ⊗[ℂ] Pf ≃ₗ[ℂ] Pi)
+    : Nontrivial Pr := by
   by_contra hP0
   rw [not_nontrivial_iff_subsingleton] at hP0
   have hz : ∀ z : Pr ⊗[ℂ] Pf, z = 0 := fun z => by

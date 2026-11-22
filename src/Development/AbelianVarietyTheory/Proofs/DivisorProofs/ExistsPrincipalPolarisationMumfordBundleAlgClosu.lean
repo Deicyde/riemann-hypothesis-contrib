@@ -17,8 +17,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -27,11 +29,12 @@ namespace GlobalTheory.PrincipalBaseChange
 
 variable {S S' : Scheme.{0}} {A : Over S} [GrpObj A] {f : S' ⟶ S}
 
-theorem lift_comp_sq (w : pullback.fst A.hom f ≫ A.hom = ((Over.pullback f).obj A).hom ≫ f)
-    {X : Over S'} (a b : X ⟶ (Over.pullback f).obj A) :
-    (lift a b).left ≫ (lift (pushPt w (fst ((Over.pullback f).obj A) ((Over.pullback f).obj A)))
-        (pushPt w (snd ((Over.pullback f).obj A) ((Over.pullback f).obj A)))).left =
-      (lift (pushPt w a) (pushPt w b)).left := by
+theorem lift_comp_sq
+    (w : pullback.fst A.hom f ≫ A.hom = ((Over.pullback f).obj A).hom ≫ f)
+    {X : Over S'} (a b : X ⟶ (Over.pullback f).obj A)
+    : (lift a b).left ≫ (lift (pushPt w (fst ((Over.pullback f).obj A) ((Over.pullback f).obj A)))
+        (pushPt w (snd ((Over.pullback f).obj A) ((Over.pullback f).obj A)))).left
+      = (lift (pushPt w a) (pushPt w b)).left := by
   apply pullback.hom_ext
   · change _ ≫ _ ≫ (fst A A).left = _ ≫ (fst A A).left
     rw [← Over.comp_left, lift_fst, ← Over.comp_left, lift_fst]
@@ -42,12 +45,13 @@ theorem lift_comp_sq (w : pullback.fst A.hom f ≫ A.hom = ((Over.pullback f).ob
     show (lift a b).left ≫ ((snd ((Over.pullback f).obj A) ((Over.pullback f).obj A)).left ≫ pullback.fst A.hom f) = b.left ≫ pullback.fst A.hom f
     rw [← Category.assoc, ← Over.comp_left, lift_snd]
 
-theorem lift_comp_sq' (w : pullback.fst A.hom f ≫ A.hom = ((Over.pullback f).obj A).hom ≫ f)
-    {X : Over S'} {Y : Over S} (U : Over.mk (X.hom ≫ f) ⟶ Y) (a b : X ⟶ (Over.pullback f).obj A) (c d : Y ⟶ A)
-    (ha : pushPt w a = U ≫ c) (hb : pushPt w b = U ≫ d) :
-    (lift a b).left ≫ (lift (pushPt w (fst ((Over.pullback f).obj A) ((Over.pullback f).obj A)))
-        (pushPt w (snd ((Over.pullback f).obj A) ((Over.pullback f).obj A)))).left =
-      U.left ≫ (lift c d).left := by
+theorem lift_comp_sq'
+    (w : pullback.fst A.hom f ≫ A.hom = ((Over.pullback f).obj A).hom ≫ f)
+    {X : Over S'} {Y : Over S} (U : Over.mk (X.hom ≫ f) ⟶ Y) (a b : X ⟶ (Over.pullback f).obj A)
+    (c d : Y ⟶ A) (ha : pushPt w a = U ≫ c) (hb : pushPt w b = U ≫ d)
+    : (lift a b).left ≫ (lift (pushPt w (fst ((Over.pullback f).obj A) ((Over.pullback f).obj A)))
+        (pushPt w (snd ((Over.pullback f).obj A) ((Over.pullback f).obj A)))).left
+      = U.left ≫ (lift c d).left := by
   rw [lift_comp_sq, ← Over.comp_left, comp_lift, ha, hb]
 
 end GlobalTheory.PrincipalBaseChange

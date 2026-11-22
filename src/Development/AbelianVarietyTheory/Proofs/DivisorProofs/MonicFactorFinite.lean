@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BlockMatrixM
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix IsMulCommutative
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
 open GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.LeviHC
 
 namespace GlobalTheory.LeviHC
@@ -33,10 +35,12 @@ theorem monicFactorFinite : MonicFactorFinite := by
   let c : ℕ → Module.End ℂ N := fun i => if i < d + 1 then c₀ i else 0
   let b : ℕ → Module.End ℂ N := fun i => if i < e + 1 then b₀ i else 0
   have hpc : ∀ u, p u = ∑ i ∈ Finset.range (d + 1), u ^ i • c i := fun u => by
-    rw [hpc₀ u]; exact Finset.sum_congr rfl fun i hi => by
+    rw [hpc₀ u]
+    exact Finset.sum_congr rfl fun i hi => by
       show _ = u ^ i • (if i < d + 1 then c₀ i else 0); rw [ite_eq_left (Finset.mem_range.1 hi)]
   have hqb : ∀ u, q u = ∑ i ∈ Finset.range (e + 1), u ^ i • b i := fun u => by
-    rw [hqb₀ u]; exact Finset.sum_congr rfl fun i hi => by
+    rw [hqb₀ u]
+    exact Finset.sum_congr rfl fun i hi => by
       show _ = u ^ i • (if i < e + 1 then b₀ i else 0); rw [ite_eq_left (Finset.mem_range.1 hi)]
   have hpS : Submodule.span ℂ (Set.range p) ≤ Subalgebra.toSubmodule S :=
     Submodule.span_le.2 fun x hx => Algebra.subset_adjoin (Or.inl hx)
@@ -45,15 +49,19 @@ theorem monicFactorFinite : MonicFactorFinite := by
   have hcS : ∀ i, c i ∈ S := fun i => by
     by_cases h : i < d + 1
     · show (if i < d + 1 then c₀ i else 0) ∈ S
-      rw [ite_eq_left h]; exact hpS (coeff_mem_span hpc₀ h)
+      rw [ite_eq_left h]
+      exact hpS (coeff_mem_span hpc₀ h)
     · show (if i < d + 1 then c₀ i else 0) ∈ S
-      rw [ite_eq_right h]; exact S.zero_mem
+      rw [ite_eq_right h]
+      exact S.zero_mem
   have hbS : ∀ i, b i ∈ S := fun i => by
     by_cases h : i < e + 1
     · show (if i < e + 1 then b₀ i else 0) ∈ S
-      rw [ite_eq_left h]; exact hqS (coeff_mem_span hqb₀ h)
+      rw [ite_eq_left h]
+      exact hqS (coeff_mem_span hqb₀ h)
     · show (if i < e + 1 then b₀ i else 0) ∈ S
-      rw [ite_eq_right h]; exact S.zero_mem
+      rw [ite_eq_right h]
+      exact S.zero_mem
   let c' : ℕ → S := fun i => ⟨c i, hcS i⟩
   let b' : ℕ → S := fun i => ⟨b i, hbS i⟩
   let P : Polynomial S := ∑ i ∈ Finset.range (d + 1), Polynomial.monomial i (c' i)
@@ -76,13 +84,15 @@ theorem monicFactorFinite : MonicFactorFinite := by
   have hPm : P.Monic := by
     refine Polynomial.monic_of_degree_le d ?_ ?_
     · refine (Polynomial.degree_sum_le _ _).trans (Finset.sup_le fun i hi => ?_)
-      exact (Polynomial.degree_monomial_le _ _).trans (by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi))
+      exact (Polynomial.degree_monomial_le _ _).trans
+        (by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi))
     · rw [hPc d (Nat.lt_succ_self d)]
       exact Subtype.ext (by simp [c', c, hcd])
   have hQm : Q.Monic := by
     refine Polynomial.monic_of_degree_le e ?_ ?_
     · refine (Polynomial.degree_sum_le _ _).trans (Finset.sup_le fun i hi => ?_)
-      exact (Polynomial.degree_monomial_le _ _).trans (by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi))
+      exact (Polynomial.degree_monomial_le _ _).trans
+        (by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi))
     · simp only [Q, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply]
       rw [Finset.sum_ite_eq', ite_eq_left (Finset.mem_range.2 (Nat.lt_succ_self e))]
       exact Subtype.ext (by simp [b', b, hbe])
@@ -91,23 +101,28 @@ theorem monicFactorFinite : MonicFactorFinite := by
     Algebra.adjoin ℂ (Set.range fun u => P.eval (algebraMap ℂ S u) * Q.eval (algebraMap ℂ S u))
   have hRT : ∀ r ∈ R, ((r : S) : Module.End ℂ N) ∈ T := by
     intro r hr
-    have hle : R ≤ Subalgebra.comap S.val T := Algebra.adjoin_le (by
-      rintro _ ⟨u, rfl⟩
-      show ((P.eval (algebraMap ℂ S u) * Q.eval (algebraMap ℂ S u) : S) : Module.End ℂ N) ∈ T
-      rw [Subalgebra.coe_mul, hPe, hQe]
-      exact Algebra.subset_adjoin ⟨u, rfl⟩)
+    have hle : R ≤ Subalgebra.comap S.val T :=
+      Algebra.adjoin_le (by
+        rintro _ ⟨u, rfl⟩
+        show ((P.eval (algebraMap ℂ S u) * Q.eval (algebraMap ℂ S u) : S) : Module.End ℂ N) ∈ T
+        rw [Subalgebra.coe_mul, hPe, hQe]
+        exact Algebra.subset_adjoin ⟨u, rfl⟩)
     exact hle hr
 
   have hPQR : ∀ k, (P * Q).coeff k ∈ R := by
     intro k
     by_cases hk : k < (P * Q).natDegree + 1
-    · have hf : ∀ u, (P * Q).eval (algebraMap ℂ S u) =
-          ∑ i ∈ Finset.range ((P * Q).natDegree + 1), u ^ i • (P * Q).coeff i := fun u => by
+    · have hf
+          : ∀ u,
+            (P * Q).eval (algebraMap ℂ S u)
+              = ∑ i ∈ Finset.range ((P * Q).natDegree + 1), u ^ i • (P * Q).coeff i := fun u => by
         rw [Polynomial.eval_eq_sum_range]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [Algebra.smul_def, map_pow, mul_comm]
       have h1 := coeff_mem_span hf hk
-      have h2 : Submodule.span ℂ (Set.range fun u => (P * Q).eval (algebraMap ℂ S u)) ≤ Subalgebra.toSubmodule R := by
+      have h2
+          : Submodule.span ℂ (Set.range fun u => (P * Q).eval (algebraMap ℂ S u))
+            ≤ Subalgebra.toSubmodule R := by
         refine Submodule.span_le.2 ?_
         rintro _ ⟨u, rfl⟩
         show Polynomial.eval (algebraMap ℂ S u) (P * Q) ∈ R
@@ -135,20 +150,24 @@ theorem monicFactorFinite : MonicFactorFinite := by
     simp only [P, Polynomial.eval_finsetSum, Polynomial.eval_monomial]
     refine B.sum_mem fun i hi => B.mul_mem ?_ (B.pow_mem (B.algebraMap_mem u) _)
     exact (Subalgebra.mem_restrictScalars _).2 (Algebra.subset_adjoin ⟨i, hi, rfl⟩)
-  have hmap : Algebra.adjoin ℂ (Set.range p) =
-      (Algebra.adjoin ℂ (Set.range fun u => P.eval (algebraMap ℂ S u))).map S.val := by
+  have hmap
+      : Algebra.adjoin ℂ (Set.range p)
+        = (Algebra.adjoin ℂ (Set.range fun u => P.eval (algebraMap ℂ S u))).map S.val := by
     rw [AlgHom.map_adjoin, ← Set.range_comp]
     exact congrArg (fun f => Algebra.adjoin ℂ (Set.range f)) (funext fun u => (hPe u).symm)
 
   let Xs : Submodule ℂ N := ⨆ g : (G : Set S), (Wsp.map ((g : S) : Module.End ℂ N) : Submodule ℂ N)
   have : FiniteDimensional ℂ Wsp := hfin
-  have key : ∀ x ∈ Submodule.span R (G : Set S), ∀ t ∈ T, ((x : S) : Module.End ℂ N) (t v) ∈ Xs := by
+  have key
+      : ∀ x ∈ Submodule.span R (G : Set S), ∀ t ∈ T, ((x : S) : Module.End ℂ N) (t v) ∈ Xs := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem g hg =>
       intro t ht
       have h1 : t v ∈ Wsp := Submodule.subset_span ⟨t, ht, rfl⟩
-      exact (le_iSup (fun g : (G : Set S) => (Wsp.map ((g : S) : Module.End ℂ N) : Submodule ℂ N)) ⟨g, hg⟩)
+      exact (le_iSup
+          (fun g : (G : Set S) => (Wsp.map ((g : S) : Module.End ℂ N) : Submodule ℂ N))
+          ⟨g, hg⟩)
         (Submodule.mem_map_of_mem h1)
     | zero =>
       intro t _

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial TensorProduct Module
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  TensorProduct Module
 
 namespace GlobalTheory.WeilDeligne.WD
 
@@ -15,10 +16,8 @@ variable {E Ω : Type*} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
 variable {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} [IsAlgClosure E Ω]
 variable {h : IsPlaceOver A w}
 
-
 variable (h) in
-theorem lpDim_zero (h : IsPlaceOver A w) : lpDim (lpZero (h := h)) = 0 := by
-  simp [lpZero]
+theorem lpDim_zero (h : IsPlaceOver A w) : lpDim (lpZero (h := h)) = 0 := by simp [lpZero]
 
 theorem lpDim_sum (a b : WD h) : lpDim (lpSum a b) = lpDim a + lpDim b := by
   induction a using ind
@@ -77,7 +76,8 @@ theorem lpTw_sum (a b : WD h) (s : ℝ) : lpTw (lpSum a b) s = lpSum (lpTw a s) 
 theorem monomial_sum_iff (a b : WD h) : mono0 (lpSum a b) ↔ mono0 a ∧ mono0 b := by
   induction a using ind
   induction b using ind
-  rw [lpSum_mk, monodromyZero_ofWeilDeligneRepClass_iff, monodromyZero_ofWeilDeligneRepClass_iff, monodromyZero_ofWeilDeligneRepClass_iff, WDRep.sum_N]
+  rw [lpSum_mk, monodromyZero_ofWeilDeligneRepClass_iff, monodromyZero_ofWeilDeligneRepClass_iff,
+    monodromyZero_ofWeilDeligneRepClass_iff, WDRep.sum_N]
   refine ⟨fun h0 => ⟨LinearMap.ext fun v => ?_, LinearMap.ext fun v => ?_⟩, fun h0 => ?_⟩
   · exact congrArg Prod.fst (LinearMap.congr_fun h0 (v, 0))
   · exact congrArg Prod.snd (LinearMap.congr_fun h0 (0, v))
@@ -85,7 +85,8 @@ theorem monomial_sum_iff (a b : WD h) : mono0 (lpSum a b) ↔ mono0 a ∧ mono0 
 
 theorem monomial_twist_iff (a : WD h) (s : ℝ) : mono0 (lpTw a s) ↔ mono0 a := by
   induction a using ind
-  rw [lpTw_mk, monodromyZero_ofWeilDeligneRepClass_iff, monodromyZero_ofWeilDeligneRepClass_iff, WDRep.tw_N]
+  rw [lpTw_mk, monodromyZero_ofWeilDeligneRepClass_iff, monodromyZero_ofWeilDeligneRepClass_iff,
+    WDRep.tw_N]
 
 theorem mono0_of_lpDim_eq_one {χ : WD h} (hχ : lpDim χ = 1) : mono0 χ := by
   induction χ using ind with
@@ -100,31 +101,33 @@ theorem monomial_char_iff (a χ : WD h) (hχ : lpDim χ = 1) : mono0 (lpChar a �
   have h0 := mono0_of_lpDim_eq_one hχ
   induction a using ind with
   | hP m a =>
-  induction χ using ind with
-  | hP n b =>
-    rw [lpDim_mk] at hχ
-    rw [monodromyZero_ofWeilDeligneRepClass_iff] at h0
-    rw [lpChar_mk, monodromyZero_ofWeilDeligneRepClass_iff, monodromyZero_ofWeilDeligneRepClass_iff, WDRep.tensor_N, h0, LinearMap.lTensor_zero, add_zero]
-    refine ⟨fun h1 => LinearMap.ext fun v => ?_, fun h1 => by rw [h1, LinearMap.rTensor_zero]⟩
-    let e : (Fin n → ℂ) ≃ₗ[ℂ] ℂ := LinearEquiv.ofFinrankEq _ _ (by rw [hχ, finrank_self])
-    have h2 := congrArg (fun x => TensorProduct.rid ℂ _ (e.toLinearMap.lTensor _ x))
-      (LinearMap.congr_fun h1 (v ⊗ₜ e.symm 1))
-    simpa using h2
+    induction χ using ind with
+    | hP n b =>
+      rw [lpDim_mk] at hχ
+      rw [monodromyZero_ofWeilDeligneRepClass_iff] at h0
+      rw [lpChar_mk, monodromyZero_ofWeilDeligneRepClass_iff,
+        monodromyZero_ofWeilDeligneRepClass_iff, WDRep.tensor_N, h0, LinearMap.lTensor_zero,
+        add_zero]
+      refine ⟨fun h1 => LinearMap.ext fun v => ?_, fun h1 => by rw [h1, LinearMap.rTensor_zero]⟩
+      let e : (Fin n → ℂ) ≃ₗ[ℂ] ℂ := LinearEquiv.ofFinrankEq _ _ (by rw [hχ, finrank_self])
+      have h2 :=
+        congrArg
+          (fun x => TensorProduct.rid ℂ _ (e.toLinearMap.lTensor _ x))
+          (LinearMap.congr_fun h1 (v ⊗ₜ e.symm 1))
+      simpa using h2
 
-theorem charPol_lpSum (a b : WD h) (σ : Weil h) :
-    charPol (lpSum a b) σ = charPol a σ * charPol b σ := by
+theorem charPol_lpSum (a b : WD h) (σ : Weil h)
+    : charPol (lpSum a b) σ = charPol a σ * charPol b σ := by
   induction a using ind
   induction b using ind
   rw [lpSum_mk, charPol_mk, charPol_mk, charPol_mk, WDRep.sum_ρ, LinearMap.charpoly_prodMap]
 
-theorem inePol_sum (a b : WD h) (σ : G E Ω) :
-    inePol (lpSum a b) σ = inePol a σ * inePol b σ := by
+theorem inePol_sum (a b : WD h) (σ : G E Ω) : inePol (lpSum a b) σ = inePol a σ * inePol b σ := by
   by_cases hσ : σ ∈ Weil h
   · rw [inePol_of_mem _ hσ, inePol_of_mem _ hσ, inePol_of_mem _ hσ, charPol_lpSum]
   · rw [inePol_of_not_mem _ hσ, inePol_of_not_mem _ hσ, inePol_of_not_mem _ hσ, mul_one]
 
-theorem inePol_tw (a : WD h) (s : ℝ) :
-    ∀ σ ∈ Ine (F := E) A, inePol (lpTw a s) σ = inePol a σ := by
+theorem inePol_tw (a : WD h) (s : ℝ) : ∀ σ ∈ Ine (F := E) A, inePol (lpTw a s) σ = inePol a σ := by
   intro σ hσ
   induction a using ind
   rw [inePol_of_mem_Ine _ hσ, inePol_of_mem_Ine _ hσ, lpTw_mk, charPol_mk, charPol_mk]

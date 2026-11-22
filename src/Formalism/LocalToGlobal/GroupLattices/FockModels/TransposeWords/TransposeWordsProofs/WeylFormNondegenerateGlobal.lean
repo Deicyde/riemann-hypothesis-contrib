@@ -103,13 +103,17 @@ lemma tsc_coeff_pair (hA : FockRWordAdj) (hH : FockPairingHighestWeight) (hC : C
     by_contra h0
     exact hcol (columnSums_holds K r n ν Q hQ e (mem_support_iff.2 h0))
 
-theorem weylPair_of (hB : FockRBilin) (hA : FockRWordAdj) (hH : FockPairingHighestWeight) : WeylPair := by
+theorem weylPair_of (hB : FockRBilin) (hA : FockRWordAdj) (hH : FockPairingHighestWeight)
+    : WeylPair := by
   intro O K _ _ _ _ _ _ r n hn ν hν P hP Q hQ
   obtain ⟨P0, hP0, rfl⟩ := hP
   obtain ⟨Q0, hQ0, rfl⟩ := hQ
   rw [tsc_toK_apply, tsc_toK_apply]
   have hQK : map (algebraMap O K) Q0 ∈ dualWeyl K r n ν := dualWeylMap O K _ r n ν Q0 hQ0
-  have hP1 : P0 ∈ Submodule.span O (Set.range fun w : List (Fin r × Fin r × ℕ) => applyWord O w (hw O hn ν)) := hP0
+  have hP1
+      : P0 ∈ Submodule.span O
+        (Set.range fun w : List (Fin r × Fin r × ℕ) => applyWord O w (hw O hn ν)) :=
+    hP0
   clear hP0
   induction hP1 using Submodule.span_induction with
   | mem x hx =>
@@ -117,7 +121,8 @@ theorem weylPair_of (hB : FockRBilin) (hA : FockRWordAdj) (hH : FockPairingHighe
     refine ⟨eval (idFrame O r n) (applyWord O (transposeWord w) Q0), ?_⟩
     rw [← lclosedeq_applyWord_map, lclosedeq_hw_map, tsc_word_pair hA hH hn ν hν w _ hQK,
       lclosedeq_applyWord_map, tsc_eval_map]
-  | zero => exact ⟨0, by rw [map_zero, map_zero, tsc_zero_left hB, zero_mul]⟩
+  | zero =>
+    exact ⟨0, by rw [map_zero, map_zero, tsc_zero_left hB, zero_mul]⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha⟩ := hx
     obtain ⟨b, hb⟩ := hy
@@ -126,20 +131,25 @@ theorem weylPair_of (hB : FockRBilin) (hA : FockRWordAdj) (hH : FockPairingHighe
     obtain ⟨z, hz⟩ := hx
     exact ⟨a * z, by rw [tsc_map_smul, tsc_smul_left hB, hz, map_mul, mul_assoc]⟩
 
-theorem dualWeylIn_of (hA : FockRWordAdj) (hH : FockPairingHighestWeight) (hN : HWNorm) (hC : CoeffWord) (hL : LowerTriK) :
-    DualWeylIn := by
+theorem dualWeylIn_of
+    (hA : FockRWordAdj) (hH : FockPairingHighestWeight) (hN : HWNorm) (hC : CoeffWord)
+    (hL : LowerTriK)
+    : DualWeylIn := by
   intro O K _ _ _ _ _ _ r n hn ν hν Q hQ H
   refine (hL O K r n ν Q hQ).1 fun e he => ?_
   have hc := tsc_norm_ne hN K hn ν
   rcases tsc_coeff_pair hA hH hC hn ν hν Q hQ e he with h0 | h1
   · exact ⟨0, by rw [map_zero, h0]⟩
-  · obtain ⟨z, hz⟩ := H (toK O K (applyWord O (transposeWord (wordOf e)) (hw O hn ν)))
-      (Submodule.mem_map_of_mem (Submodule.subset_span ⟨_, rfl⟩))
+  · obtain ⟨z, hz⟩ :=
+      H (toK O K (applyWord O (transposeWord (wordOf e)) (hw O hn ν)))
+        (Submodule.mem_map_of_mem (Submodule.subset_span ⟨_, rfl⟩))
     rw [tsc_toK_apply, ← lclosedeq_applyWord_map, lclosedeq_hw_map, h1] at hz
     exact ⟨z, (mul_right_cancel₀ hc hz).symm⟩
 
-theorem nondegK_of (hA : FockRWordAdj) (hH : FockPairingHighestWeight) (hN : HWNorm) (hC : CoeffWord) (hL : LowerTriK) :
-    NondegK := by
+theorem nondegK_of
+    (hA : FockRWordAdj) (hH : FockPairingHighestWeight) (hN : HWNorm) (hC : CoeffWord)
+    (hL : LowerTriK)
+    : NondegK := by
   intro K _ _ r n hn ν hν Q hQ H
   refine (hL K K r n ν Q hQ).2 fun e he => ?_
   have hc := tsc_norm_ne hN K hn ν
@@ -148,8 +158,10 @@ theorem nondegK_of (hA : FockRWordAdj) (hH : FockPairingHighestWeight) (hN : HWN
   · rw [H _ (tsc_applyWord_mem ν _ _ (hwMem K r n hn ν hν))] at h1
     exact (mul_eq_zero.1 h1.symm).resolve_right hc
 
-def tscForm (hB : FockRBilin) {K σ : Type} [Field K] (c : K) : MvPolynomial σ K →ₗ[K] MvPolynomial σ K →ₗ[K] K :=
-  LinearMap.mk₂ K (fun P Q => c⁻¹ * fockR P Q)
+def tscForm (hB : FockRBilin) {K σ : Type} [Field K] (c : K)
+    : MvPolynomial σ K →ₗ[K] MvPolynomial σ K →ₗ[K] K :=
+  LinearMap.mk₂ K
+    (fun P Q => c⁻¹ * fockR P Q)
     (fun P P' Q => by rw [tsc_add_left hB, mul_add])
     (fun a P Q => by rw [tsc_smul_left hB, smul_eq_mul, mul_left_comm])
     (fun P Q Q' => by rw [tsc_add_right hB, mul_add])
@@ -191,8 +203,10 @@ lemma tsc_zero_weight {O : Type} [CommRing O] {r n : ℕ} (hn : n ≤ r) (ν : F
   rw [hPc, ← mul_one (C (AddMonoidAlgebra.coeff P 0)), ← smul_eq_C_mul]
   exact Submodule.smul_mem _ _ h1
 
-theorem formCoreG_of (hB : FockRBilin) (hR : FockRRowAct) (hN : HWNorm) (hW : WeylPair) (hD : DualWeylIn)
-    (hG : NondegK) : FormCoreG := by
+theorem formCoreG_of
+    (hB : FockRBilin) (hR : FockRRowAct) (hN : HWNorm) (hW : WeylPair) (hD : DualWeylIn)
+    (hG : NondegK)
+    : FormCoreG := by
   intro p _ O K _ _ _ _ _ _ _ hp r n hn ν hν
   have hc := tsc_norm_ne hN K hn ν
   refine ⟨tscForm hB (fockR (hw K hn ν) (hw K hn ν)), ?_, ?_, ?_, ?_, ?_⟩
@@ -220,15 +234,19 @@ theorem formCoreG_of (hB : FockRBilin) (hR : FockRRowAct) (hN : HWNorm) (hW : We
     exact (tsc_range_iff hc _).2
       (hW O K r n hn ν hν P (Submodule.map_mono (tsc_zero_weight hn ν h0) hP) Q hQ)
 
-theorem weyl_pairing : WeylPair := weylPair_of fock_pairing_bilinear fock_pairing_word_adjoint fock_pairing_highest_weight_proof
+theorem weyl_pairing : WeylPair :=
+  weylPair_of fock_pairing_bilinear fock_pairing_word_adjoint fock_pairing_highest_weight_proof
 
 theorem dual_weyl_inclusion : DualWeylIn :=
-  dualWeylIn_of fock_pairing_word_adjoint fock_pairing_highest_weight_proof highest_weight_norm coeffWord' lower_triangular_over_field
+  dualWeylIn_of fock_pairing_word_adjoint fock_pairing_highest_weight_proof highest_weight_norm
+    coeffWord' lower_triangular_over_field
 
 theorem nondegenerate_over_field : NondegK :=
-  nondegK_of fock_pairing_word_adjoint fock_pairing_highest_weight_proof highest_weight_norm coeffWord' lower_triangular_over_field
+  nondegK_of fock_pairing_word_adjoint fock_pairing_highest_weight_proof highest_weight_norm
+    coeffWord' lower_triangular_over_field
 
 theorem weyl_form_nondegenerate_global : FormCoreG :=
-  formCoreG_of fock_pairing_bilinear fock_pairing_row_action highest_weight_norm weyl_pairing dual_weyl_inclusion nondegenerate_over_field
+  formCoreG_of fock_pairing_bilinear fock_pairing_row_action highest_weight_norm weyl_pairing
+    dual_weyl_inclusion nondegenerate_over_field
 
 end Formalism.L2.G.Model.TS

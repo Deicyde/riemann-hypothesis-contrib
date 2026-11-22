@@ -36,31 +36,33 @@ def invEquiv (σ : K →+* K) (hc : Continuous σ) (hi : ∀ y, σ (σ y) = y) :
 
 variable [LocallyCompactSpace K] [MeasurableSpace K] [BorelSpace K]
 
-theorem char_conj (σ : K →+* K) (hc : Continuous σ) (hi : ∀ y, σ (σ y) = y) (u v : K)
-    (h : u * v = 1) (h' : σ u * σ v = 1) :
-    addEquivAddHaarChar (mulEquiv (σ u) (σ v) h') = addEquivAddHaarChar (mulEquiv u v h) := by
+theorem char_conj
+    (σ : K →+* K) (hc : Continuous σ) (hi : ∀ y, σ (σ y) = y)
+    (u v : K) (h : u * v = 1) (h' : σ u * σ v = 1)
+    : addEquivAddHaarChar (mulEquiv (σ u) (σ v) h') = addEquivAddHaarChar (mulEquiv u v h) := by
   set s := invEquiv σ hc hi
   have e : mulEquiv (σ u) (σ v) h' = (s.trans (mulEquiv u v h)).trans s.symm := by
     ext y
     show σ u * y = σ (u * σ y)
     rw [map_mul, hi]
   rw [e, addEquivAddHaarChar_trans, addEquivAddHaarChar_trans, addEquivAddHaarChar_symm,
-    mul_comm (addEquivAddHaarChar s), mul_assoc,
-    mul_inv_cancel₀ (addEquivAddHaarChar_pos s).ne', mul_one]
+    mul_comm (addEquivAddHaarChar s), mul_assoc, mul_inv_cancel₀ (addEquivAddHaarChar_pos s).ne',
+    mul_one]
 
-theorem char_mul_eq_one (u v : K) (h : u * v = 1) (h' : v * u = 1) :
-    addEquivAddHaarChar (mulEquiv u v h) * addEquivAddHaarChar (mulEquiv v u h') = 1 := by
+theorem char_mul_eq_one (u v : K) (h : u * v = 1) (h' : v * u = 1)
+    : addEquivAddHaarChar (mulEquiv u v h) * addEquivAddHaarChar (mulEquiv v u h') = 1 := by
   have e : (mulEquiv u v h).trans (mulEquiv v u h') = ContinuousAddEquiv.refl K := by
     ext y
     show v * (u * y) = y
     rw [← mul_assoc, h', one_mul]
   rw [← addEquivAddHaarChar_trans, e, addEquivAddHaarChar_refl]
 
-theorem map_mul_eq_of_norm_one :
-    ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
-      [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K] (σ : K →+* K),
-      Continuous σ → (∀ y, σ (σ y) = y) → ∀ (lam : Measure K) [lam.IsAddHaarMeasure] (u : K),
-      u * σ u = 1 → lam.map (fun y => u * y) = lam := by
+theorem map_mul_eq_of_norm_one
+    : ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
+        [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K] (σ : K →+* K),
+      Continuous σ → (∀ y, σ (σ y) = y)
+        → ∀ (lam : Measure K) [lam.IsAddHaarMeasure] (u : K),
+          u * σ u = 1 → lam.map (fun y => u * y) = lam := by
   intro K _ _ _ _ _ _ _ _ σ hc hi lam _ u hu
   have hu' : σ u * σ (σ u) = 1 := by rw [← map_mul, hu, map_one]
   have hu2 : σ u * u = 1 := by rw [mul_comm, hu]

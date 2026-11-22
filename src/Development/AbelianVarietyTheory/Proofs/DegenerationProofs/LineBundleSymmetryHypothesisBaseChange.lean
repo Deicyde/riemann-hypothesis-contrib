@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.LbIsoLinCo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -20,19 +21,24 @@ noncomputable section
 
 namespace GlobalTheory.SymBaseChange
 
-variable {B B' : Scheme.{0}} {G : Over B} {G' : Over B'} [GrpObj G] [GrpObj G'] {f : B' ⟶ B} {φ : G'.left ⟶ G.left}
+variable
+  {B B' : Scheme.{0}} {G : Over B} {G' : Over B'} [GrpObj G] [GrpObj G']
+  {f : B' ⟶ B} {φ : G'.left ⟶ G.left}
 
-theorem pushPt_injective (h : IsGrpPullback G' G f φ) {T : Over B'} {x y : T ⟶ G'}
-    (e : pushPt h.1.w x = pushPt h.1.w y) : x = y := by
+theorem pushPt_injective
+    (h : IsGrpPullback G' G f φ) {T : Over B'} {x y : T ⟶ G'} (e : pushPt h.1.w x = pushPt h.1.w y)
+    : x = y := by
   apply Over.OverMorphism.ext
   apply h.1.hom_ext
   · exact congrArg (fun z => z.left) e
   · rw [Over.w, Over.w]
 
-theorem exists_endo (h : IsGrpPullback G' G f φ) (w : G ⟶ G) [IsMonHom w] :
-    ∃ w' : G' ⟶ G', IsMonHom w' ∧ ∀ {T : Over B'} (x : T ⟶ G'), pushPt h.1.w (x ≫ w') = pushPt h.1.w x ≫ w := by
-  let w' : G' ⟶ G' := Over.homMk (h.1.lift (φ ≫ w.left) G'.hom (by rw [Category.assoc, Over.w, h.1.w]))
-    (h.1.lift_snd _ _ _)
+theorem exists_endo (h : IsGrpPullback G' G f φ) (w : G ⟶ G) [IsMonHom w]
+    : ∃ w' : G' ⟶ G',
+      IsMonHom w' ∧ ∀ {T : Over B'} (x : T ⟶ G'), pushPt h.1.w (x ≫ w') = pushPt h.1.w x ≫ w := by
+  let w' : G' ⟶ G' :=
+    Over.homMk (h.1.lift (φ ≫ w.left) G'.hom (by rw [Category.assoc, Over.w, h.1.w]))
+      (h.1.lift_snd _ _ _)
   have hw : w'.left ≫ φ = φ ≫ w.left := h.1.lift_fst _ _ _
   have pa : ∀ {T : Over B'} (x : T ⟶ G'), pushPt h.1.w (x ≫ w') = pushPt h.1.w x ≫ w := fun x =>
     Over.OverMorphism.ext (by
@@ -52,9 +58,13 @@ theorem exists_endo (h : IsGrpPullback G' G f φ) (w : G ⟶ G) [IsMonHom w] :
     simpa [Hom.one_def] using h'
   · have h := mul (G' ⊗ G') (fst _ _) (snd _ _)
     rw [Hom.mul_def, Hom.mul_def, lift_fst_snd, Category.id_comp] at h
-    rw [h]; congr 1
+    rw [h]
+    congr 1
 
-theorem hypS_baseChange : ∀ (B B' : Scheme.{0}) (G : Over B) (G' : Over B') [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G'] (f : B' ⟶ B) (φ : G'.left ⟶ G.left) (L : LB G.left) (L' : LB G'.left), L.IsLB → L'.IsLB → IsGrpPullback G' G f φ → LBIso L' (L.pull φ) → HypS G L → HypS G' L' := by
+theorem hypS_baseChange
+    : ∀ (B B' : Scheme.{0}) (G : Over B) (G' : Over B') [GrpObj G] [IsCommMonObj G] [GrpObj G']
+        [IsCommMonObj G'] (f : B' ⟶ B) (φ : G'.left ⟶ G.left) (L : LB G.left) (L' : LB G'.left),
+      L.IsLB → L'.IsLB → IsGrpPullback G' G f φ → LBIso L' (L.pull φ) → HypS G L → HypS G' L' := by
   intro B B' G G' _ _ _ _ f φ L L' hL hL' h hb ⟨w, wd, hw, hwd, hs, hp, ha⟩
   obtain ⟨w', hw', pa⟩ := exists_endo h w
   obtain ⟨wd', hwd', pd⟩ := exists_endo h wd
@@ -69,13 +79,14 @@ theorem hypS_baseChange : ∀ (B B' : Scheme.{0}) (G : Over B) (G' : Over B') [G
       exact gm_self hL _ y (mem_pull.1 hy)
     · intro I J K
       refine unit_ext fun y hy => ?_
-      rw [map_mul, gm_res (𝟙 G'.left) y _ hy, gm_res (𝟙 G'.left) y _ hy,
-        gm_res (𝟙 G'.left) y _ hy, gm_pull_g L φ (𝟙 G'.left) y I J hy.1.1 hy.1.2,
-        gm_pull_g L φ (𝟙 G'.left) y J K hy.1.2 hy.2, gm_pull_g L φ (𝟙 G'.left) y I K hy.1.1 hy.2]
+      rw [map_mul, gm_res (𝟙 G'.left) y _ hy, gm_res (𝟙 G'.left) y _ hy, gm_res (𝟙 G'.left) y _ hy,
+        gm_pull_g L φ (𝟙 G'.left) y I J hy.1.1 hy.1.2, gm_pull_g L φ (𝟙 G'.left) y J K hy.1.2 hy.2,
+        gm_pull_g L φ (𝟙 G'.left) y I K hy.1.1 hy.2]
       exact gm_cocycle hL _ y (mem_pull.1 hy.1.1) (mem_pull.1 hy.1.2) (mem_pull.1 hy.2)
   refine ⟨w', wd', hw', hwd', ?_, ?_, ?_⟩
   · apply pushPt_injective h
-    have b : pushPt h.1.w (w' * wd') = pushPt h.1.w w' * pushPt h.1.w wd' := map_mul (pushHom h G') _ _
+    have b : pushPt h.1.w (w' * wd') = pushPt h.1.w w' * pushPt h.1.w wd' :=
+      map_mul (pushHom h G') _ _
     have c := pa (𝟙 G')
     have d := pd (𝟙 G')
     rw [Category.id_comp] at c d
@@ -83,10 +94,14 @@ theorem hypS_baseChange : ∀ (B B' : Scheme.{0}) (G : Over B) (G' : Over B') [G
   · have h₁ : LBIso (L.pull φ) (cubeLB G' ![𝟙 G', w'] (L.pull φ)) := by
       let U := pushPt h.1.w (𝟙 G')
       refine LBIso.chartPull (chartPullPull L _ U.left (Category.id_comp _))
-        (chartPullLinComb L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => by
-          fin_cases i
-          · simp [U]
-          · exact (congrArg (pushPt h.1.w) (Category.id_comp _).symm).trans (pa _)) I.down) hp
+        (chartPullLinComb L _ _ _ _ U.left fun I =>
+          psum_push h _ _ U
+            (fun i => by
+              fin_cases i
+              · simp [U]
+              · exact (congrArg (pushPt h.1.w) (Category.id_comp _).symm).trans (pa _))
+            I.down)
+        hp
     have h₂ : LBIso (cubeLB G' ![𝟙 G', w'] (L.pull φ)) (cubeLB G' ![𝟙 G', w'] L') :=
       GlobalTheory.PowPrimitive.lbIso_linComb hb.symm _ _
     exact LBIso.trans hL' hB (DVR.linComb_isLB L' hL' _ _) hb
@@ -94,17 +109,25 @@ theorem hypS_baseChange : ∀ (B B' : Scheme.{0}) (G : Over B) (G' : Over B') [G
   · have h₁ : LBIso (cubeLB G' ![fst G' G' ≫ w', snd G' G'] (L.pull φ))
         (cubeLB G' ![fst G' G', snd G' G' ≫ wd'] (L.pull φ)) := by
       let U := lift (pushPt h.1.w (fst G' G')) (pushPt h.1.w (snd G' G'))
-      refine LBIso.chartPull (chartPullLinComb L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => by
-        fin_cases i
-        · exact (pa _).trans (by simp [U])
-        · simp [U]) I.down)
-        (chartPullLinComb L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => by
-          fin_cases i
-          · simp [U]
-          · exact (pd _).trans (by simp [U])) I.down) ha
-    exact LBIso.trans (DVR.linComb_isLB L' hL' _ _) (DVR.linComb_isLB _ hB _ _) (DVR.linComb_isLB L' hL' _ _)
-      (GlobalTheory.PowPrimitive.lbIso_linComb hb _ _)
-      (LBIso.trans (DVR.linComb_isLB _ hB _ _) (DVR.linComb_isLB _ hB _ _) (DVR.linComb_isLB L' hL' _ _) h₁
-        (GlobalTheory.PowPrimitive.lbIso_linComb hb.symm _ _))
+      refine LBIso.chartPull
+        (chartPullLinComb L _ _ _ _ U.left fun I =>
+          psum_push h _ _ U
+            (fun i => by
+              fin_cases i
+              · exact (pa _).trans (by simp [U])
+              · simp [U])
+            I.down)
+        (chartPullLinComb L _ _ _ _ U.left fun I =>
+          psum_push h _ _ U
+            (fun i => by
+              fin_cases i
+              · simp [U]
+              · exact (pd _).trans (by simp [U]))
+            I.down)
+        ha
+    exact LBIso.trans (DVR.linComb_isLB L' hL' _ _) (DVR.linComb_isLB _ hB _ _)
+      (DVR.linComb_isLB L' hL' _ _) (GlobalTheory.PowPrimitive.lbIso_linComb hb _ _)
+      (LBIso.trans (DVR.linComb_isLB _ hB _ _) (DVR.linComb_isLB _ hB _ _)
+        (DVR.linComb_isLB L' hL' _ _) h₁ (GlobalTheory.PowPrimitive.lbIso_linComb hb.symm _ _))
 
 end GlobalTheory.SymBaseChange

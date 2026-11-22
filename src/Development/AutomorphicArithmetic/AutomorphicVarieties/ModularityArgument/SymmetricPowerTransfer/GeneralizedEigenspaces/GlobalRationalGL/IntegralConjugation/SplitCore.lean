@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
-open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
+open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+  UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 open UpperTheory.V.W (Plc Lp)
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem exists_adele {L : Type} [Field L] [NumberField L] [IsCMField L] (w : Plc L) (c : Kw w) :
-    ∃ a : Af L, pLoc L w a = c ∧ ∀ u : Plc L, u ≠ w → pLoc L u a = 0 := by
+private theorem exists_adele
+    {L : Type} [Field L] [NumberField L] [IsCMField L] (w : Plc L) (c : Kw w)
+    : ∃ a : Af L, pLoc L w a = c ∧ ∀ u : Plc L, u ≠ w → pLoc L u a = 0 := by
   classical
   refine ⟨⟨Function.update (fun _ => 0) w c, ?_⟩, ?_, ?_⟩
   · filter_upwards [(Set.finite_singleton w).compl_mem_cofinite] with u hu
@@ -23,15 +26,16 @@ private theorem exists_adele {L : Type} [Field L] [NumberField L] [IsCMField L] 
     show Function.update (fun _ => 0) w c u = 0
     simp [Function.update_of_ne hu]
 
-private theorem decomp {K : Type} [Field K] {D : K} (x : Lsq K D) :
-    x = algebraMap K (Lsq K D) x.re + algebraMap K (Lsq K D) x.im * QuadraticAlgebra.omega := by
+private theorem decomp {K : Type} [Field K] {D : K} (x : Lsq K D)
+    : x = algebraMap K (Lsq K D) x.re + algebraMap K (Lsq K D) x.im * QuadraticAlgebra.omega := by
   ext <;> simp
 
-private theorem omega_sq {K : Type} [Field K] {D : K} :
-    (QuadraticAlgebra.omega : Lsq K D) * QuadraticAlgebra.omega = algebraMap K (Lsq K D) D := by
+private theorem omega_sq {K : Type} [Field K] {D : K}
+    : (QuadraticAlgebra.omega : Lsq K D) * QuadraticAlgebra.omega = algebraMap K (Lsq K D) D := by
   ext <;> simp
 
-private theorem ne_zero_of_equiv {K M : Type} [Field K] [Field M] {D : K} (e : Lsq K D ≃+* M) : D ≠ 0 := by
+private theorem ne_zero_of_equiv {K M : Type} [Field K] [Field M] {D : K} (e : Lsq K D ≃+* M)
+    : D ≠ 0 := by
   rintro rfl
   have hz : e QuadraticAlgebra.omega * e QuadraticAlgebra.omega = 0 := by
     rw [← map_mul, omega_sq, map_zero, map_zero]
@@ -40,15 +44,19 @@ private theorem ne_zero_of_equiv {K M : Type} [Field K] [Field M] {D : K} (e : L
   have := congrArg QuadraticAlgebra.im hz''
   simp at this
 
-theorem UpperTheory.V.Z.Sym.Dict.Br.splitCore :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (R : RingBr L) (w : Plc L), IsSplitAt w → ∃ (s : Kv (un w)) (hs : s * s = cv (un w) R.Δ) (i : Kv (un w) ≃+* Kw w), s ≠ 0 ∧ ∀ x, R.ρ _ w rfl x = i (Sig.proj hs x) := by
+theorem UpperTheory.V.Z.Sym.Dict.Br.splitCore
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (R : RingBr L) (w : Plc L),
+      IsSplitAt w
+        → ∃ (s : Kv (un w)) (hs : s * s = cv (un w) R.Δ) (i : Kv (un w) ≃+* Kw w),
+          s ≠ 0 ∧ ∀ x, R.ρ _ w rfl x = i (Sig.proj hs x) := by
   intro L _ _ _ R w hw
   obtain ⟨u, huw, hu⟩ := hw
   have hu' : un u = un w := hu
   let f : Kv (un w) →+* Kw w := (R.ρ _ w rfl).comp (algebraMap _ _)
   have hf : Function.Injective f := f.injective
-  have hdec : ∀ x : Lsq (Kv (un w)) (cv (un w) R.Δ),
-      R.ρ _ w rfl x = f x.re + f x.im * R.ρ _ w rfl QuadraticAlgebra.omega := by
+  have hdec
+      : ∀ x : Lsq (Kv (un w)) (cv (un w) R.Δ),
+        R.ρ _ w rfl x = f x.re + f x.im * R.ρ _ w rfl QuadraticAlgebra.omega := by
     intro x
     conv_lhs => rw [decomp x]
     simp [f]

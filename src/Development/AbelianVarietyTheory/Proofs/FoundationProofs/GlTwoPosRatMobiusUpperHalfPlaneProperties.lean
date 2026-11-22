@@ -19,10 +19,12 @@ theorem det_pos (g : GQ) : 0 < ent g 0 0 * ent g 1 1 - ent g 0 1 * ent g 1 0 := 
   rw [Matrix.GeneralLinearGroup.val_det_apply, Matrix.det_fin_two] at h
   simpa [ent] using h
 
-theorem im_frac (a b c d : ℝ) (z : ℂ) :
-    (((a : ℂ) * z + b) / ((c : ℂ) * z + d)).im = (a * d - b * c) * z.im / Complex.normSq ((c : ℂ) * z + d) := by
+theorem im_frac (a b c d : ℝ) (z : ℂ)
+    : (((a : ℂ) * z + b) / ((c : ℂ) * z + d)).im
+      = (a * d - b * c) * z.im / Complex.normSq ((c : ℂ) * z + d) := by
   rw [Complex.div_im]
-  simp only [Complex.add_re, Complex.add_im, Complex.mul_re, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im]
+  simp only [Complex.add_re, Complex.add_im, Complex.mul_re, Complex.mul_im, Complex.ofReal_re,
+    Complex.ofReal_im]
   ring
 
 theorem denom_ne (g : GQ) {z : ℂ} (hz : z ∈ Hs) : (ent g 1 0 : ℂ) * z + (ent g 1 1 : ℂ) ≠ 0 := by
@@ -43,8 +45,10 @@ theorem denom_ne (g : GQ) {z : ℂ} (hz : z ∈ Hs) : (ent g 1 0 : ℂ) * z + (e
 
 theorem mob_mem (g : GQ) {z : ℂ} (hz : z ∈ Hs) : mob g z ∈ Hs := by
   have hne := denom_ne g hz
-  have e : mob g z = ((((ent g 0 0 : ℝ)) : ℂ) * z + ((ent g 0 1 : ℝ) : ℂ)) /
-      ((((ent g 1 0 : ℝ)) : ℂ) * z + ((ent g 1 1 : ℝ) : ℂ)) := by
+  have e
+      : mob g z
+        = ((((ent g 0 0 : ℝ)) : ℂ) * z + ((ent g 0 1 : ℝ) : ℂ))
+          / ((((ent g 1 0 : ℝ)) : ℂ) * z + ((ent g 1 1 : ℝ) : ℂ)) := by
     simp [mob]
   show 0 < (mob g z).im
   rw [e, im_frac]
@@ -55,11 +59,12 @@ theorem mob_mem (g : GQ) {z : ℂ} (hz : z ∈ Hs) : mob g z ∈ Hs := by
   have hz' : 0 < z.im := hz
   positivity
 
-theorem ent_mul (g h : GQ) (i j : Fin 2) : ent (g * h) i j = ent g i 0 * ent h 0 j + ent g i 1 * ent h 1 j := by
+theorem ent_mul (g h : GQ) (i j : Fin 2)
+    : ent (g * h) i j = ent g i 0 * ent h 0 j + ent g i 1 * ent h 1 j := by
   simp [ent, Matrix.mul_apply, Fin.sum_univ_two]
 
-theorem frac_comp (a b c d N D : ℂ) (hD : D ≠ 0) :
-    (a * (N / D) + b) / (c * (N / D) + d) = (a * N + b * D) / (c * N + d * D) := by
+theorem frac_comp (a b c d N D : ℂ) (hD : D ≠ 0)
+    : (a * (N / D) + b) / (c * (N / D) + d) = (a * N + b * D) / (c * N + d * D) := by
   rw [show a * (N / D) + b = (a * N + b * D) / D by field_simp,
     show c * (N / D) + d = (c * N + d * D) / D by field_simp, div_div_div_cancel_right₀ hD]
 
@@ -85,15 +90,17 @@ theorem mob_diff (g : GQ) : DifferentiableOn ℂ (mob g) Hs := by
   have h2 : DifferentiableAt ℂ (fun z : ℂ => (ent g 1 0 : ℂ) * z + (ent g 1 1 : ℂ)) z := by fun_prop
   exact (h1.div h2 hne).differentiableWithinAt
 
-theorem mob_upper (g : GQ) (hc : ent g 1 0 = 0) : 0 < ent g 0 0 / ent g 1 1 ∧
-    ∀ z : ℂ, mob g z = ((ent g 0 0 / ent g 1 1 : ℚ) : ℂ) * z + ((ent g 0 1 / ent g 1 1 : ℚ) : ℂ) := by
+theorem mob_upper (g : GQ) (hc : ent g 1 0 = 0)
+    : 0 < ent g 0 0 / ent g 1 1
+      ∧ ∀ z : ℂ,
+        mob g z = ((ent g 0 0 / ent g 1 1 : ℚ) : ℂ) * z + ((ent g 0 1 / ent g 1 1 : ℚ) : ℂ) := by
   have hdet := det_pos g
   rw [hc, mul_zero, sub_zero] at hdet
   have hd : ent g 1 1 ≠ 0 := by rintro h; rw [h, mul_zero] at hdet; exact lt_irrefl _ hdet
   refine ⟨?_, fun z => ?_⟩
-  · have : ent g 0 0 / ent g 1 1 = ent g 0 0 * ent g 1 1 / (ent g 1 1 * ent g 1 1) := by
-      field_simp
-    rw [this]; exact div_pos hdet (mul_self_pos.2 hd)
+  · have : ent g 0 0 / ent g 1 1 = ent g 0 0 * ent g 1 1 / (ent g 1 1 * ent g 1 1) := by field_simp
+    rw [this]
+    exact div_pos hdet (mul_self_pos.2 hd)
   · have hd' : (ent g 1 1 : ℂ) ≠ 0 := by exact_mod_cast hd
     simp only [mob, hc]
     push_cast
@@ -102,6 +109,21 @@ theorem mob_upper (g : GQ) (hc : ent g 1 0 = 0) : 0 < ent g 0 0 / ent g 1 1 ∧
 
 end GlobalTheory.FNMob
 
-theorem GlobalTheory.FN.mob_props : (∀ (g : GQ) (z : ℂ), z ∈ Hs → mob g z ∈ Hs) ∧ (∀ (g h : GQ) (z : ℂ), z ∈ Hs → mob (g * h) z = mob g (mob h z)) ∧ (∀ z : ℂ, mob 1 z = z) ∧ (∀ (γ : SL(2, ℤ)) (τ : ℍ), mob (ofSL γ) τ = ((γ • τ : ℍ) : ℂ)) ∧ (∀ g : GQ, DifferentiableOn ℂ (mob g) Hs) ∧ ∀ g : GQ, ent g 1 0 = 0 → 0 < ent g 0 0 / ent g 1 1 ∧ ∀ z : ℂ, mob g z = ((ent g 0 0 / ent g 1 1 : ℚ) : ℂ) * z + ((ent g 0 1 / ent g 1 1 : ℚ) : ℂ) :=
-  ⟨fun g _ hz => GlobalTheory.FNMob.mob_mem g hz, fun g h _ hz => GlobalTheory.FNMob.mob_mul g h hz, GlobalTheory.FNMob.mob_one,
-    GlobalTheory.FNMob.mob_ofSL, GlobalTheory.FNMob.mob_diff, GlobalTheory.FNMob.mob_upper⟩
+theorem GlobalTheory.FN.mob_props
+    : (∀ (g : GQ) (z : ℂ), z ∈ Hs → mob g z ∈ Hs)
+      ∧ (∀ (g h : GQ) (z : ℂ), z ∈ Hs → mob (g * h) z = mob g (mob h z)) ∧ (∀ z : ℂ, mob 1 z = z)
+      ∧ (∀ (γ : SL(2, ℤ)) (τ : ℍ), mob (ofSL γ) τ = ((γ • τ : ℍ) : ℂ))
+      ∧ (∀ g : GQ, DifferentiableOn ℂ (mob g) Hs)
+      ∧ ∀ g : GQ,
+        ent g 1 0 = 0
+          → 0 < ent g 0 0 / ent g 1 1
+            ∧ ∀ z : ℂ,
+              mob g z
+                = ((ent g 0 0 / ent g 1 1 : ℚ) : ℂ) * z + ((ent g 0 1 / ent g 1 1 : ℚ) : ℂ) := ⟨
+  fun g _ hz => GlobalTheory.FNMob.mob_mem g hz,
+  fun g h _ hz => GlobalTheory.FNMob.mob_mul g h hz,
+  GlobalTheory.FNMob.mob_one,
+  GlobalTheory.FNMob.mob_ofSL,
+  GlobalTheory.FNMob.mob_diff,
+  GlobalTheory.FNMob.mob_upper
+⟩

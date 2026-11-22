@@ -90,8 +90,7 @@ theorem c2_tau_mem : C2.TauMem := by
   have hfc : ∀ c : Fin r, fvec k r z c.castSucc = bvec (eI k r c) := by
     intro c
     simp [fvec]
-  have hfl : fvec k r z (Fin.last r) = z := by
-    simp [fvec]
+  have hfl : fvec k r z (Fin.last r) = z := by simp [fvec]
   have hact : ∀ b, C2.tauM k r z v *ᵥ fvec k r z b = ∑ a, v a b • fvec k r z a := by
     intro b
     rw [htau, ← Matrix.mulVec_mulVec, Fin.sum_univ_castSucc]
@@ -119,8 +118,7 @@ theorem c2_tau_mem : C2.TauMem := by
       have h1 : herm (Hpk k r) z (C2.xiV k r ξ) = 0 :=
         HermitianXiVector.herm_X_right (C2.xiV k r ξ) z (HermitianXiVector.xiV_X ξ) hzW
       have h2 : herm (Hpk k r) z z = ((-(Tz k r z) : ℝ) : ℂ) := hzz_real z
-      have hT : ((Tz k r z : ℝ) : ℂ) ≠ 0 := by
-        exact_mod_cast (ne_of_gt hz.2)
+      have hT : ((Tz k r z : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (ne_of_gt hz.2)
       have hll : v (Fin.last r) (Fin.last r) = 1 := hv.2 _
       rw [h1, h2, hll, one_smul, ← hxi]
       have : ((1 : ℂ) / ((Tz k r z : ℝ) : ℂ)) * (-(((-(Tz k r z) : ℝ) : ℂ))) = 1 := by
@@ -128,18 +126,24 @@ theorem c2_tau_mem : C2.TauMem := by
         field_simp
       rw [zero_smul, mul_zero, zero_smul, add_zero, add_zero, smul_smul, this, one_smul]
       exact add_comm _ _
-    · have hmy : C2.mX k r vX *ᵥ bvec (eI k r b') =
-          fun p => if hp : p.val < r then vX ⟨p.val, hp⟩ b' else 0 := by
+    · have hmy
+          : C2.mX k r vX *ᵥ bvec (eI k r b')
+            = fun p => if hp : p.val < r then vX ⟨p.val, hp⟩ b' else 0 := by
         rw [FlagSpanVanishing.mulVec_bvec]
         funext p
         exact mX_col_X vX p b'
-      have hyX : ∀ i : Fin (2 * r + k + 1), r ≤ i.val →
-          (fun p : Fin (2 * r + k + 1) => if hp : p.val < r then vX ⟨p.val, hp⟩ b' else 0) i = 0 := by
+      have hyX
+          : ∀ i : Fin (2 * r + k + 1),
+            r ≤ i.val
+              → (fun p : Fin (2 * r + k + 1) => if hp : p.val < r then vX ⟨p.val, hp⟩ b' else 0) i
+                = 0 := by
         intro i hi
         simp only
         rw [dite_eq_right (by omega)]
       have h1 := HermitianXiVector.herm_X_left _ z hyX hzW
-      have h2 := HermitianXiVector.herm_X_left _ (C2.xiV k r ξ) hyX (HermitianXiVector.xiV_apply_last_block_zero ξ)
+      have h2 :=
+        HermitianXiVector.herm_X_left _ (C2.xiV k r ξ) hyX
+          (HermitianXiVector.xiV_apply_last_block_zero ξ)
       have hlow : v (Fin.last r) b'.castSucc = 0 := hv.1 _ _ (Fin.castSucc_lt_last b')
       rw [hfc, hmy, HermitianXiVector.nEich_apply, h1, h2, hlow, zero_smul, add_zero]
       simp only [neg_zero, zero_smul, mul_zero, add_zero, smul_zero]

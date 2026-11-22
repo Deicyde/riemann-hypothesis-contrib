@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EdgeStair
 
@@ -16,20 +17,24 @@ theorem stCol : CrystallineSemistableComparison.E.StCol := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro k z
     funext s
-    change ∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
-        ((T.K 0).map (GlobalTheory.CatH.toLast i s)).hom (T.ι _ (z (GlobalTheory.CatH.face i s))) =
-      T.ι _ (∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
-        (F.map (GlobalTheory.CatH.toLast i s)).hom (z (GlobalTheory.CatH.face i s)))
+    change
+      ∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
+          ((T.K 0).map (GlobalTheory.CatH.toLast i s)).hom (T.ι _ (z (GlobalTheory.CatH.face i s)))
+        = T.ι _
+          (∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
+            (F.map (GlobalTheory.CatH.toLast i s)).hom (z (GlobalTheory.CatH.face i s)))
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_zsmul, hG.ι_nat]
   · intro s k a
     funext t
-    change ∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
-        ((T.K (s + 1)).map (GlobalTheory.CatH.toLast i t)).hom (T.dv s _ (a (GlobalTheory.CatH.face i t))) =
-      T.dv s _ (∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
-        ((T.K s).map (GlobalTheory.CatH.toLast i t)).hom (a (GlobalTheory.CatH.face i t)))
+    change
+      ∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
+          ((T.K (s + 1)).map (GlobalTheory.CatH.toLast i t)).hom (T.dv s _ (a (GlobalTheory.CatH.face i t)))
+        = T.dv s _
+          (∑ i : Fin (k + 2), (-1 : ℤ) ^ (i : ℕ) •
+            ((T.K s).map (GlobalTheory.CatH.toLast i t)).hom (a (GlobalTheory.CatH.face i t)))
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_

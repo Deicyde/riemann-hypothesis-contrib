@@ -13,63 +13,84 @@ open scoped ENNReal Pointwise
 
 namespace Formalism.L2.SG.Pf.Carrier.CarPinTor
 
-open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.InfCut Formalism.L2.SG.LocWSOf Formalism.MainNotions.S
+open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.InfCut
+  Formalism.L2.SG.LocWSOf Formalism.MainNotions.S
 
 section Gen
 
-variable {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D} {v : InfinitePlace X.B.I.F} {lam : ℂ}
-  {Q : Matrix (Fin X.B.I.n) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ} {Qi : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin X.B.I.n) ℂ}
+variable
+  {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D}
+  {v : InfinitePlace X.B.I.F} {lam : ℂ} {Q : Matrix (Fin X.B.I.n) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ}
+  {Qi : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin X.B.I.n) ℂ}
 
-theorem trHyp_gen (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (u : D.what₂.Word) :
-    Formalism.L2.SG.Pf.Bridge.TrHyp (PtRepPf.frU X u v) Q Qi (fun a : Fin D.R.rS => lam ^ (D.R.rS - (a : ℕ))) := by
+theorem trHyp_gen (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (u : D.what₂.Word)
+    : Formalism.L2.SG.Pf.Bridge.TrHyp (PtRepPf.frU X u v) Q Qi
+      (fun a : Fin D.R.rS => lam ^ (D.R.rS - (a : ℕ))) := by
   obtain ⟨h1, h2, hH, hef⟩ := hT
   exact ⟨h1, h2, hH, fun a => (hef a a rfl).1, fun a => (hef a a rfl).2⟩
 
-theorem trG_mul_g (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (a b : Formalism.REAL.UJ (X.B.I.ε v)) :
-    trG Q Qi (a * b) = trG Q Qi a * trG Q Qi b := by
+theorem trG_mul_g (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (a b : Formalism.REAL.UJ (X.B.I.ε v))
+    : trG Q Qi (a * b) = trG Q Qi a * trG Q Qi b := by
   obtain ⟨-, h2, -, -⟩ := hT
   unfold trG
   rw [Formalism.L2.SG.RealObj.InfCut.RealHermitianForms.uMat_mul]
-  calc Qi * (uMat a * uMat b) * Q = Qi * uMat a * (Q * Qi) * uMat b * Q := by
-        rw [h2, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+  calc
+    Qi * (uMat a * uMat b) * Q = Qi * uMat a * (Q * Qi) * uMat b * Q := by
+      rw [h2, Matrix.mul_one]; simp only [Matrix.mul_assoc]
     _ = _ := by simp only [Matrix.mul_assoc]
 
-theorem trG_inv_g (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (γ : Formalism.REAL.UJ (X.B.I.ε v)) :
-    (trG Q Qi γ)⁻¹ = trG Q Qi γ⁻¹ := by
+theorem trG_inv_g (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (γ : Formalism.REAL.UJ (X.B.I.ε v))
+    : (trG Q Qi γ)⁻¹ = trG Q Qi γ⁻¹ := by
   refine Matrix.inv_eq_right_inv ?_
   rw [← trG_mul_g hT, mul_inv_cancel]
   obtain ⟨h1, -, -, -⟩ := hT
   show Qi * uMat (1 : Formalism.REAL.UJ (X.B.I.ε v)) * Q = 1
   simp [uMat, h1]
 
-theorem transp_mem_g (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) {m : Matrix (Fin (2 * D.R.rS + D.R.k + 1))
-    (Fin (2 * D.R.rS + D.R.k + 1)) ℂ} (hm : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS)) :
-    Q * m * Qi ∈ UJset (X.B.I.ε v) := by
+theorem transp_mem_g
+    (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi)
+    {m : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ}
+    (hm : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS))
+    : Q * m * Qi ∈ UJset (X.B.I.ε v) := by
   obtain ⟨hQiQ, hQQi, hH, _⟩ := hT
-  have hm' : mᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * m = Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS := hm
+  have hm'
+      : mᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * m
+        = Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS :=
+    hm
   show (Q * m * Qi)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * (Q * m * Qi) = Formalism.REAL.Jm (X.B.I.ε v)
-  have e1 : (Q * m * Qi)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * (Q * m * Qi) =
-      Qiᴴ * (mᴴ * (Qᴴ * Formalism.REAL.Jm (X.B.I.ε v) * Q) * m) * Qi := by
+  have e1
+      : (Q * m * Qi)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * (Q * m * Qi)
+        = Qiᴴ * (mᴴ * (Qᴴ * Formalism.REAL.Jm (X.B.I.ε v) * Q) * m) * Qi := by
     simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
   rw [e1, hH, hm', ← hH]
-  have e2 : Qiᴴ * (Qᴴ * Formalism.REAL.Jm (X.B.I.ε v) * Q) * Qi = (Q * Qi)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * (Q * Qi) := by
+  have e2
+      : Qiᴴ * (Qᴴ * Formalism.REAL.Jm (X.B.I.ε v) * Q) * Qi
+        = (Q * Qi)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * (Q * Qi) := by
     simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
   rw [e2, hQQi, Matrix.conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
 
-variable (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (u u' : D.what₂.Word) (γ : Formalism.REAL.UJ (X.B.I.ε v))
-  (μRv : Measure (Formalism.REAL.UJ (X.B.I.ε v)))
+variable
+  (hT : IsTranspC X v lam D.R.k D.R.rS Q Qi) (u u' : D.what₂.Word)
+  (γ : Formalism.REAL.UJ (X.B.I.ε v)) (μRv : Measure (Formalism.REAL.UJ (X.B.I.ε v)))
 include hT
 
-theorem emb_g : Topology.IsClosedEmbedding
-    (fun x : Formalism.REAL.UJ (X.B.I.ε v) => (Matrix.of.symm (trG Q Qi x) : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS)) :=
+theorem emb_g
+    : Topology.IsClosedEmbedding (fun x : Formalism.REAL.UJ (X.B.I.ε v) =>
+      (Matrix.of.symm (trG Q Qi x) : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS)) :=
   Formalism.L2.SG.Pf.WuBL.trG_closedEmb' n_eq _ hT.2.1
 
-theorem haar_measure_transport_invariant (hH : IsHaarLoc (StSet (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u v)
-      (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u' v) γ) μRv) :
-    (μRv.map (fun x => Matrix.of.symm (trG Q Qi x))) (Formalism.FourierDecayAlt.C6.Rset (trG Q Qi γ))ᶜ = 0 ∧
-    (∀ a ∈ Formalism.FourierDecayAlt.C6.Rset (trG Q Qi γ),
-      (μRv.map (fun x => Matrix.of.symm (trG Q Qi x))).map (Formalism.QuantumDeterminants.lmulM a) = μRv.map (fun x => Matrix.of.symm (trG Q Qi x))) ∧
-    μRv.map (fun x => Matrix.of.symm (trG Q Qi x)) ≠ 0 := by
+theorem haar_measure_transport_invariant
+    (hH : IsHaarLoc
+      (StSet (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u v)
+        (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u' v) γ)
+      μRv)
+    : (μRv.map (fun x => Matrix.of.symm (trG Q Qi x))) (Formalism.FourierDecayAlt.C6.Rset (trG Q Qi
+          γ))ᶜ
+        = 0
+      ∧ (∀ a ∈ Formalism.FourierDecayAlt.C6.Rset (trG Q Qi γ),
+        (μRv.map (fun x => Matrix.of.symm (trG Q Qi x))).map (Formalism.QuantumDeterminants.lmulM a)
+          = μRv.map (fun x => Matrix.of.symm (trG Q Qi x)))
+      ∧ μRv.map (fun x => Matrix.of.symm (trG Q Qi x)) ≠ 0 := by
   obtain ⟨hσ, hne, hconc, hinv⟩ := hH
   have h1 := hT.1
   have h2 := hT.2.1
@@ -77,10 +98,15 @@ theorem haar_measure_transport_invariant (hH : IsHaarLoc (StSet (Formalism.L2.SG
   have hTu' := trHyp_gen hT u'
   set F : Formalism.REAL.UJ (X.B.I.ε v) → Formalism.QuantumDeterminants.Mt D.R.k D.R.rS := fun x => Matrix.of.symm (trG Q Qi x) with hF
   have hme : MeasurableEmbedding F := (emb_g hT).measurableEmbedding
-  have hU : ∀ y : Formalism.REAL.UJ (X.B.I.ε v), (uMat y)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * uMat y = Formalism.REAL.Jm (X.B.I.ε v) :=
+  have hU
+      : ∀ y : Formalism.REAL.UJ (X.B.I.ε v),
+        (uMat y)ᴴ * Formalism.REAL.Jm (X.B.I.ε v) * uMat y = Formalism.REAL.Jm (X.B.I.ε v) :=
     fun y => y.2
-  have hfwd : ∀ y ∈ StSet (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u v) (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u' v) γ,
-      trG Q Qi y ∈ Formalism.FourierDecayAlt.C6.Rset (trG Q Qi γ) := by
+  have hfwd
+      : ∀ y
+          ∈ StSet (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u v)
+            (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u' v) γ,
+        trG Q Qi y ∈ Formalism.FourierDecayAlt.C6.Rset (trG Q Qi γ) := by
     rintro y ⟨hy1, hy2⟩
     refine ⟨Formalism.L2.SG.Pf.Bridge.fwd_N hTu (hU y) hy1, ?_⟩
     rw [trG_inv_g hT, ← trG_mul_g hT, ← trG_mul_g hT]
@@ -94,13 +120,16 @@ theorem haar_measure_transport_invariant (hH : IsHaarLoc (StSet (Formalism.L2.SG
     obtain ⟨hsN, hsN'⟩ := hs
     have hmem := transp_mem_g hT hsN.1
     set y0 := Formalism.L2.SG.Pf.LocJEq.ujOf' (Q * s * Qi) hmem with hy0
-    have hy0S : y0 ∈ StSet (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u v) (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u' v) γ := by
+    have hy0S
+        : y0 ∈ StSet (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u v)
+          (Formalism.L2.SG.Pf.Carrier.JointQuot.NV X u' v) γ := by
       refine ⟨Formalism.L2.SG.Pf.Bridge.inN_Q hTu hsN, ?_⟩
       show Formalism.L2.SG.HidaSetting.InN _ _ _ (uMat (γ⁻¹ * y0 * γ))
       have e : uMat (γ⁻¹ * y0 * γ) = Q * ((trG Q Qi γ)⁻¹ * s * trG Q Qi γ) * Qi := by
         rw [trG_inv_g hT]
         show uMat (γ⁻¹ * y0 * γ) = Q * (Qi * uMat γ⁻¹ * Q * s * (Qi * uMat γ * Q)) * Qi
-        rw [Formalism.L2.SG.RealObj.InfCut.RealHermitianForms.uMat_mul, Formalism.L2.SG.RealObj.InfCut.RealHermitianForms.uMat_mul]
+        rw [Formalism.L2.SG.RealObj.InfCut.RealHermitianForms.uMat_mul,
+          Formalism.L2.SG.RealObj.InfCut.RealHermitianForms.uMat_mul]
         show uMat γ⁻¹ * (Q * s * Qi) * uMat γ = _
         simp only [← Matrix.mul_assoc]
         rw [h2, Matrix.one_mul]
@@ -116,7 +145,8 @@ theorem haar_measure_transport_invariant (hH : IsHaarLoc (StSet (Formalism.L2.SG
       show s = Qi * (Q * s * Qi) * Q
       simp only [← Matrix.mul_assoc]
       rw [h1, Matrix.one_mul, Matrix.mul_assoc, h1, Matrix.mul_one]
-    have hcont_l : Measurable (Formalism.QuantumDeterminants.lmulM (k := D.R.k) (r := D.R.rS) s) := by
+    have hcont_l
+        : Measurable (Formalism.QuantumDeterminants.lmulM (k := D.R.k) (r := D.R.rS) s) := by
       have : Continuous (Formalism.QuantumDeterminants.lmulM (k := D.R.k) (r := D.R.rS) s) := by
         unfold Formalism.QuantumDeterminants.lmulM
         exact continuous_const.matrix_mul continuous_id
@@ -125,13 +155,16 @@ theorem haar_measure_transport_invariant (hH : IsHaarLoc (StSet (Formalism.L2.SG
       ← Measure.map_map hme.measurable (continuous_const_mul y0).measurable, hinv y0 hy0S]
   · intro h0
     apply hne
-    have h := congrArg (fun m : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS) => m Set.univ) h0
+    have h :=
+      congrArg (fun m : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS) => m Set.univ) h0
     simp only [Measure.coe_zero, Pi.zero_apply] at h
     rw [hme.map_apply, Set.preimage_univ] at h
     exact Measure.measure_univ_eq_zero.1 h
 
-theorem fin_g (ν : Measure (Formalism.REAL.UJ (X.B.I.ε v))) (hq : IsQuotLoc μRv ν) (K : Set (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
-    (hK : IsCompact K) : (μRv.map (fun x => Matrix.of.symm (trG Q Qi x))) K < ∞ := by
+theorem fin_g
+    (ν : Measure (Formalism.REAL.UJ (X.B.I.ε v))) (hq : IsQuotLoc μRv ν)
+    (K : Set (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS)) (hK : IsCompact K)
+    : (μRv.map (fun x => Matrix.of.symm (trG Q Qi x))) K < ∞ := by
   have hemb := emb_g hT
   rw [hemb.measurableEmbedding.map_apply]
   set Cc := (fun x : Formalism.REAL.UJ (X.B.I.ε v) => (Matrix.of.symm (trG Q Qi x) : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS)) ⁻¹' K
@@ -141,7 +174,8 @@ theorem fin_g (ν : Measure (Formalism.REAL.UJ (X.B.I.ε v))) (hq : IsQuotLoc μ
     intro h0
     have h := hq (fun _ => 1) measurable_const
     rw [h0] at h
-    simp only [lintegral_const, Measure.coe_zero, Pi.zero_apply, mul_zero, lintegral_zero_measure] at h
+    simp only [lintegral_const, Measure.coe_zero, Pi.zero_apply, mul_zero, lintegral_zero_measure]
+      at h
     have : Formalism.REAL.muG (X.B.I.ε v) Set.univ = 0 := by simpa using h
     exact (isOpen_univ.measure_pos (Formalism.REAL.muG (X.B.I.ε v)) Set.univ_nonempty).ne' this
 

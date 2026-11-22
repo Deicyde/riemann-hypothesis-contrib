@@ -41,7 +41,9 @@ theorem large_constant_le_param_cube : 10 ^ 100 * A ^ 2 ≤ PP ^ 3 := by
 theorem ATO : 10 ^ 100 * (A ^ 2 * TO ^ 2) ≤ sb := by
   have h1 : 10 ^ 100 * A ^ 2 * TO ^ 2 ≤ PP ^ 3 * TO ^ 2 :=
     mul_le_mul_of_nonneg_right h.large_constant_le_param_cube (sq_nonneg TO)
-  calc 10 ^ 100 * (A ^ 2 * TO ^ 2) = 10 ^ 100 * A ^ 2 * TO ^ 2 := by ring
+  calc
+    10 ^ 100 * (A ^ 2 * TO ^ 2)
+      = 10 ^ 100 * A ^ 2 * TO ^ 2 := by ring
     _ ≤ PP ^ 3 * TO ^ 2 := h1
     _ ≤ sb := h.h32
 
@@ -78,8 +80,7 @@ theorem param_cube_le_bound : PP ^ 3 ≤ sb := by
   have h1 : PP ^ 3 * 1 ≤ PP ^ 3 * TO ^ 2 := mul_le_mul_of_nonneg_left hT (pow_nonneg hP 3)
   linarith [h.h32]
 
-theorem rd_pow_le {n : ℕ} (hn : n ≤ 8) : rd ^ n ≤ sb :=
-  le_trans (pow_le_pow_right₀ h.rd1 hn) h.rd8
+theorem rd_pow_le {n : ℕ} (hn : n ≤ 8) : rd ^ n ≤ sb := le_trans (pow_le_pow_right₀ h.rd1 hn) h.rd8
 
 end Bs
 
@@ -101,7 +102,8 @@ variable {A k b sb PP TO rd r D2 nW nP q0 : ℝ} (h : Rn A k b sb PP TO rd r D2 
 include h
 
 theorem nW_le : nW ≤ TO := by
-  have h1 : 2 * nW ≤ D2 * nW := mul_le_mul_of_nonneg_right h.two_le_degree_alt (by linarith [h.forty_le_weight_count])
+  have h1 : 2 * nW ≤ D2 * nW :=
+    mul_le_mul_of_nonneg_right h.two_le_degree_alt (by linarith [h.forty_le_weight_count])
   linarith [h.W, h.r6, h.forty_le_weight_count]
 
 theorem modulus_pos_alt : 0 < q0 := by
@@ -111,7 +113,8 @@ theorem modulus_pos_alt : 0 < q0 := by
   nlinarith
 
 theorem TO_le_sq : TO ≤ TO ^ 2 := by
-  have h1 : TO * 1 ≤ TO * TO := mul_le_mul_of_nonneg_left h.one_le_order_alt (by linarith [h.one_le_order_alt])
+  have h1 : TO * 1 ≤ TO * TO :=
+    mul_le_mul_of_nonneg_left h.one_le_order_alt (by linarith [h.one_le_order_alt])
   nlinarith
 
 theorem kl_le : D2 * nW + 2 * r + (TO + D2) * q0 ≤ 3 * TO + 2 * b := by
@@ -124,15 +127,18 @@ theorem TQ_le : (TO + D2) * (TO + D2 + 2 * r) ≤ 6 * TO ^ 2 := by
   have hT1 := h.one_le_order_alt
   have hD2 := h.two_le_degree_alt
   have hr6 := h.r6
-  have hDW : D2 * 1 ≤ D2 * nW := mul_le_mul_of_nonneg_left (by linarith [h.forty_le_weight_count]) (by linarith)
+  have hDW : D2 * 1 ≤ D2 * nW :=
+    mul_le_mul_of_nonneg_left (by linarith [h.forty_le_weight_count]) (by linarith)
   have hQ : TO + D2 + 2 * r ≤ 3 * TO := by linarith [h.W, h.forty_mul_degree_le_order]
   have hD : TO + D2 ≤ 2 * TO := by linarith [h.forty_mul_degree_le_order]
-  calc (TO + D2) * (TO + D2 + 2 * r) ≤ (2 * TO) * (3 * TO) :=
-        mul_le_mul hD hQ (by linarith) (by linarith)
+  calc
+    (TO + D2) * (TO + D2 + 2 * r)
+      ≤ (2 * TO) * (3 * TO) := mul_le_mul hD hQ (by linarith) (by linarith)
     _ = 6 * TO ^ 2 := by ring
 
 theorem Q_le : TO + D2 + 2 * r ≤ 3 * TO := by
-  have h1 : 0 ≤ D2 * nW := mul_nonneg (by linarith [h.two_le_degree_alt]) (by linarith [h.forty_le_weight_count])
+  have h1 : 0 ≤ D2 * nW :=
+    mul_nonneg (by linarith [h.two_le_degree_alt]) (by linarith [h.forty_le_weight_count])
   linarith [h.forty_mul_degree_le_order, h.W, h.one_le_order_alt]
 
 theorem sq_mul_sq_le : A ^ 2 * TO ^ 2 ≤ b := by
@@ -145,8 +151,12 @@ theorem b_le_Ab : b ≤ A * b := by
   have h1 : b * 1 ≤ b * A := mul_le_mul_of_nonneg_left (by linarith [h.forty_eight_le_constant]) hb
   linarith
 
-theorem sK {s : ℝ} (hs : s ≤ A * (D2 * nW + 2 * r + (TO + D2) * q0 + r * ((TO + D2) * (TO + D2 + 2 * r))) +
-    A * (nP + TO * nW) + 1) : s ≤ 4 * A * b := by
+theorem sK
+    {s : ℝ}
+    (hs : s
+      ≤ A * (D2 * nW + 2 * r + (TO + D2) * q0 + r * ((TO + D2) * (TO + D2 + 2 * r)))
+        + A * (nP + TO * nW) + 1)
+    : s ≤ 4 * A * b := by
   have hT1 := h.one_le_order_alt
   have hT0 : (0 : ℝ) ≤ TO := by linarith
   have hA1 : (1 : ℝ) ≤ A := by linarith [h.forty_eight_le_constant]
@@ -157,8 +167,7 @@ theorem sK {s : ℝ} (hs : s ≤ A * (D2 * nW + 2 * r + (TO + D2) * q0 + r * ((T
   have hkl := h.kl_le
   have hTQ := h.TQ_le
   have hY0 : 0 ≤ (TO + D2) * (TO + D2 + 2 * r) := mul_nonneg (by linarith) (by linarith)
-  have e1 : r * ((TO + D2) * (TO + D2 + 2 * r)) ≤ A * (6 * TO ^ 2) :=
-    mul_le_mul hrA hTQ hY0 hA0
+  have e1 : r * ((TO + D2) * (TO + D2 + 2 * r)) ≤ A * (6 * TO ^ 2) := mul_le_mul hrA hTQ hY0 hA0
   have hnW := h.nW_le
   have hnP : nP ≤ TO := le_trans h.nPW hnW
   have e2 : TO * nW ≤ TO * TO := mul_le_mul_of_nonneg_left hnW hT0
@@ -169,17 +178,23 @@ theorem sK {s : ℝ} (hs : s ≤ A * (D2 * nW + 2 * r + (TO + D2) * q0 + r * ((T
   have eP : A * TO * (A * TO) = A ^ 2 * TO ^ 2 := by ring
   have hB := h.toBs.ATOb
   have hBA := h.b_le_Ab
-  have i1 : A * (D2 * nW + 2 * r + (TO + D2) * q0 + r * ((TO + D2) * (TO + D2 + 2 * r))) ≤
-      A * (3 * TO + 2 * b + A * (6 * TO ^ 2)) := mul_le_mul_of_nonneg_left (by linarith) hA0
+  have i1
+      : A * (D2 * nW + 2 * r + (TO + D2) * q0 + r * ((TO + D2) * (TO + D2 + 2 * r)))
+        ≤ A * (3 * TO + 2 * b + A * (6 * TO ^ 2)) :=
+    mul_le_mul_of_nonneg_left (by linarith) hA0
   have i2 : A * (nP + TO * nW) ≤ A * (TO + TO * TO) := mul_le_mul_of_nonneg_left (by linarith) hA0
-  have f1 : A * (3 * TO + 2 * b + A * (6 * TO ^ 2)) = 2 * (A * b) + 3 * (A * TO) + 6 * (A ^ 2 * TO ^ 2) := by ring
+  have f1
+      : A * (3 * TO + 2 * b + A * (6 * TO ^ 2))
+        = 2 * (A * b) + 3 * (A * TO) + 6 * (A ^ 2 * TO ^ 2) := by
+    ring
   have f2 : A * (TO + TO * TO) = A * TO + A * TO * TO := by ring
   have hP0 : (0 : ℝ) ≤ A ^ 2 * TO ^ 2 := by positivity
   have f3 : A * b = A * b := rfl
   have hAb : b ≤ A * b := hBA
   nlinarith
 
-theorem sL {s : ℝ} (hs : s ≤ A * (q0 + r * (TO + D2 + 2 * r)) + A * nW + 1) : s * TO ≤ 2 * A * b := by
+theorem sL {s : ℝ} (hs : s ≤ A * (q0 + r * (TO + D2 + 2 * r)) + A * nW + 1)
+    : s * TO ≤ 2 * A * b := by
   have hT1 := h.one_le_order_alt
   have hT0 : (0 : ℝ) ≤ TO := by linarith
   have hA1 : (1 : ℝ) ≤ A := by linarith [h.forty_eight_le_constant]
@@ -196,10 +211,13 @@ theorem sL {s : ℝ} (hs : s ≤ A * (q0 + r * (TO + D2 + 2 * r)) + A * nW + 1) 
   have e2 : r * (TO + D2 + 2 * r) * TO ≤ A * (3 * TO) * TO := mul_le_mul_of_nonneg_right e1 hT0
   have e3 : nW * TO ≤ TO * TO := mul_le_mul_of_nonneg_right hnW hT0
   have e4 : A * (TO * q0) ≤ A * (b + TO) := mul_le_mul_of_nonneg_left hq hA0
-  have e5 : A * (r * (TO + D2 + 2 * r) * TO) ≤ A * (A * (3 * TO) * TO) := mul_le_mul_of_nonneg_left e2 hA0
+  have e5 : A * (r * (TO + D2 + 2 * r) * TO) ≤ A * (A * (3 * TO) * TO) :=
+    mul_le_mul_of_nonneg_left e2 hA0
   have e6 : A * (nW * TO) ≤ A * (TO * TO) := mul_le_mul_of_nonneg_left e3 hA0
-  have eX : (A * (q0 + r * (TO + D2 + 2 * r)) + A * nW + 1) * TO =
-      A * (TO * q0) + A * (r * (TO + D2 + 2 * r) * TO) + A * (nW * TO) + TO := by ring
+  have eX
+      : (A * (q0 + r * (TO + D2 + 2 * r)) + A * nW + 1) * TO
+        = A * (TO * q0) + A * (r * (TO + D2 + 2 * r) * TO) + A * (nW * TO) + TO := by
+    ring
   have hATO : 1 ≤ A * TO := one_le_mul_of_one_le_of_one_le hA1 hT1
   have hTA : TO ≤ A * TO := le_mul_of_one_le_left hT0 hA1
   have p1 : A * TO * 1 ≤ A * TO * (A * TO) := mul_le_mul_of_nonneg_left hATO (by linarith)
@@ -242,8 +260,10 @@ theorem dL {d : ℝ} (hd : d ≤ A * (q0 + r * (TO + D2 + 2 * r))) : d ≤ 2 * A
 
 end Rn
 
-theorem absorb {k b c : ℝ} (hk : 1 ≤ k) (hb : 10 ^ 100 ≤ b) (hc0 : 0 ≤ c) (hc : c ≤ 10 ^ 100) {i j : ℕ} (hi : i ≤ 8)
-    (hj : j + 1 ≤ 8) : c * k ^ i * b ^ j ≤ (k * b) ^ 8 := by
+theorem absorb
+    {k b c : ℝ} (hk : 1 ≤ k) (hb : 10 ^ 100 ≤ b) (hc0 : 0 ≤ c) (hc : c ≤ 10 ^ 100)
+    {i j : ℕ} (hi : i ≤ 8) (hj : j + 1 ≤ 8)
+    : c * k ^ i * b ^ j ≤ (k * b) ^ 8 := by
   have hb1 : (1 : ℝ) ≤ b := le_trans (by norm_num) hb
   have hk0 : (0 : ℝ) ≤ k := by linarith
   have hb0 : (0 : ℝ) ≤ b := by linarith
@@ -254,7 +274,9 @@ theorem absorb {k b c : ℝ} (hk : 1 ≤ k) (hb : 10 ^ 100 ≤ b) (hc0 : 0 ≤ c
     mul_le_mul s1 hbj (pow_nonneg hb0 j) (mul_nonneg (by norm_num) (pow_nonneg hk0 8))
   have s3 : 10 ^ 100 * k ^ 8 * b ^ 7 ≤ b * k ^ 8 * b ^ 7 :=
     mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hb (pow_nonneg hk0 8)) (pow_nonneg hb0 7)
-  calc c * k ^ i * b ^ j ≤ b * k ^ 8 * b ^ 7 := le_trans s2 s3
+  calc
+    c * k ^ i * b ^ j
+      ≤ b * k ^ 8 * b ^ 7 := le_trans s2 s3
     _ = (k * b) ^ 8 := by ring
 
 namespace Rn
@@ -274,32 +296,34 @@ theorem d_le {d : ℝ} (hd : d ≤ 2 * A * b) : d ≤ 4 * k ^ 2 * b := by
 
 theorem d_sq {d : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) : d ^ 2 ≤ 16 * k ^ 4 * b ^ 2 := by
   have h1 := pow_le_pow_left₀ hd0 (h.d_le hd) 2
-  calc d ^ 2 ≤ (4 * k ^ 2 * b) ^ 2 := h1
+  calc
+    d ^ 2
+      ≤ (4 * k ^ 2 * b) ^ 2 := h1
     _ = 16 * k ^ 4 * b ^ 2 := by ring
 
 theorem k1 : 1 ≤ k := by linarith [h.k8]
 
-theorem h3a {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q) :
-    (rd ^ 2) ^ 4 * PP ^ 3 * d ^ 2 ≤ q := by
+theorem h3a {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q)
+    : (rd ^ 2) ^ 4 * PP ^ 3 * d ^ 2 ≤ q := by
   have hsb0 := h.sb_pos.le
   have e1 : (rd ^ 2) ^ 4 ≤ sb := by
     have : (rd ^ 2) ^ 4 = rd ^ 8 := by ring
-    rw [this]; exact h.rd8
+    rw [this]
+    exact h.rd8
   have e2 : PP ^ 3 ≤ sb := h.toBs.param_cube_le_bound
   have e3 := h.d_sq hd0 hd
   have s1 : (rd ^ 2) ^ 4 * PP ^ 3 ≤ sb * sb := mul_le_mul e1 e2 (pow_nonneg h.PP_pos.le 3) hsb0
   have s2 : (rd ^ 2) ^ 4 * PP ^ 3 * d ^ 2 ≤ sb * sb * (16 * k ^ 4 * b ^ 2) :=
     mul_le_mul s1 e3 (sq_nonneg d) (mul_nonneg hsb0 hsb0)
-  have s3 : sb * sb * (16 * k ^ 4 * b ^ 2) = 16 * k ^ 4 * b ^ 3 := by
-    rw [h.sb_sq]; ring
+  have s3 : sb * sb * (16 * k ^ 4 * b ^ 2) = 16 * k ^ 4 * b ^ 3 := by rw [h.sb_sq]; ring
   have s4 : 16 * k ^ 4 * b ^ 3 ≤ (k * b) ^ 8 :=
     absorb h.k1 h.toBs.b_ge (by norm_num) (by norm_num) (by norm_num) (by norm_num)
   linarith
 
 theorem r_le : r ≤ k ^ 2 := by linarith [sq_nonneg k, h.rA, h.Ak]
 
-theorem h3b {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q) :
-    TO * (1250 * r) * rd ^ 2 * PP * d ^ 2 ≤ q := by
+theorem h3b {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q)
+    : TO * (1250 * r) * rd ^ 2 * PP * d ^ 2 ≤ q := by
   have B := h.toBs
   have hb0 := h.b_pos.le
   have hT : TO ≤ b := le_trans B.TO_le_sb B.sb_le_b
@@ -312,22 +336,27 @@ theorem h3b {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8
   have n1 : 0 ≤ b * (1250 * k ^ 2) := mul_nonneg hb0 hk2
   have s2 : TO * (1250 * r) * rd ^ 2 ≤ b * (1250 * k ^ 2) * b := mul_le_mul s1 hrd (sq_nonneg rd) n1
   have n2 : 0 ≤ b * (1250 * k ^ 2) * b := mul_nonneg n1 hb0
-  have s3 : TO * (1250 * r) * rd ^ 2 * PP ≤ b * (1250 * k ^ 2) * b * b := mul_le_mul s2 hP h.PP_pos.le n2
+  have s3 : TO * (1250 * r) * rd ^ 2 * PP ≤ b * (1250 * k ^ 2) * b * b :=
+    mul_le_mul s2 hP h.PP_pos.le n2
   have n3 : 0 ≤ b * (1250 * k ^ 2) * b * b := mul_nonneg n2 hb0
-  have s4 : TO * (1250 * r) * rd ^ 2 * PP * d ^ 2 ≤ b * (1250 * k ^ 2) * b * b * (16 * k ^ 4 * b ^ 2) :=
+  have s4
+      : TO * (1250 * r) * rd ^ 2 * PP * d ^ 2 ≤ b * (1250 * k ^ 2) * b * b * (16 * k ^ 4 * b ^ 2) :=
     mul_le_mul s3 hd2 (sq_nonneg d) n3
   have s5 : 20000 * k ^ 6 * b ^ 5 ≤ (k * b) ^ 8 :=
     absorb h.k1 B.b_ge (by norm_num) (by norm_num) (by norm_num) (by norm_num)
   have s6 : b * (1250 * k ^ 2) * b * b * (16 * k ^ 4 * b ^ 2) = 20000 * k ^ 6 * b ^ 5 := by ring
   linarith
 
-theorem h3e {d q fm : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q) (hf0 : 0 ≤ fm) (hf : fm ≤ k ^ 4) :
-    2 * (fm * (rd ^ 2) ^ 2 * (rd ^ 2 * PP * d ^ 2)) ≤ q := by
+theorem h3e
+    {d q fm : ℝ}
+    (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q) (hf0 : 0 ≤ fm) (hf : fm ≤ k ^ 4)
+    : 2 * (fm * (rd ^ 2) ^ 2 * (rd ^ 2 * PP * d ^ 2)) ≤ q := by
   have B := h.toBs
   have hb0 := h.b_pos.le
   have hrd4 : (rd ^ 2) ^ 2 ≤ b := by
     have : (rd ^ 2) ^ 2 = rd ^ 4 := by ring
-    rw [this]; exact le_trans (B.rd_pow_le (by norm_num)) B.sb_le_b
+    rw [this]
+    exact le_trans (B.rd_pow_le (by norm_num)) B.sb_le_b
   have hrd : rd ^ 2 ≤ b := le_trans (B.rd_pow_le (by norm_num)) B.sb_le_b
   have hP : PP ≤ b := le_trans B.PP_le_sb B.sb_le_b
   have hd2 := h.d_sq hd0 hd
@@ -336,14 +365,17 @@ theorem h3e {d q fm : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) 
   have t2 : rd ^ 2 * PP ≤ b * b := mul_le_mul hrd hP hPP0 hb0
   have t3 : rd ^ 2 * PP * d ^ 2 ≤ b * b * (16 * k ^ 4 * b ^ 2) :=
     mul_le_mul t2 hd2 (sq_nonneg d) (mul_nonneg hb0 hb0)
-  have t4 : fm * (rd ^ 2) ^ 2 * (rd ^ 2 * PP * d ^ 2) ≤ k ^ 4 * b * (b * b * (16 * k ^ 4 * b ^ 2)) :=
-    mul_le_mul t1 t3 (mul_nonneg (mul_nonneg (sq_nonneg rd) hPP0) (sq_nonneg d)) (mul_nonneg (by positivity) hb0)
+  have t4
+      : fm * (rd ^ 2) ^ 2 * (rd ^ 2 * PP * d ^ 2) ≤ k ^ 4 * b * (b * b * (16 * k ^ 4 * b ^ 2)) :=
+    mul_le_mul t1 t3 (mul_nonneg (mul_nonneg (sq_nonneg rd) hPP0) (sq_nonneg d))
+      (mul_nonneg (by positivity) hb0)
   have t5 : 32 * k ^ 8 * b ^ 5 ≤ (k * b) ^ 8 :=
     absorb h.k1 B.b_ge (by norm_num) (by norm_num) (by norm_num) (by norm_num)
   have t6 : 2 * (k ^ 4 * b * (b * b * (16 * k ^ 4 * b ^ 2))) = 32 * k ^ 8 * b ^ 5 := by ring
   linarith
 
-theorem h3f {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q) : (D2 + 2) * d ≤ q - 2 := by
+theorem h3f {d q : ℝ} (hd0 : 0 ≤ d) (hd : d ≤ 2 * A * b) (hq : (k * b) ^ 8 ≤ q)
+    : (D2 + 2) * d ≤ q - 2 := by
   have B := h.toBs
   have hb1 : (1 : ℝ) ≤ b := le_trans (by norm_num) B.b_ge
   have hT : TO ≤ b := le_trans B.TO_le_sb B.sb_le_b

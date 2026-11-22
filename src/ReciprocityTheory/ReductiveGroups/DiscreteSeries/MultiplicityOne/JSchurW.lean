@@ -18,12 +18,17 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.Fourier
 
 namespace SchurWAux
 
-theorem fdeg_eq_finrank {G : Type*} [MeasurableSpace G] (μ : Measure G) [IsProbabilityMeasure μ]
-    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H] [Nontrivial H]
-    (ρ : G → (H →L[ℂ] H)) (hiso : ∀ g v, ‖ρ g v‖ = ‖v‖) (d : ℝ) (hd : 0 < d)
-    (h : ∀ v w v' w' : H, Integrable (fun g => ⟪w, ρ g v⟫_ℂ * star ⟪w', ρ g v'⟫_ℂ) μ ∧
-      ∫ g, ⟪w, ρ g v⟫_ℂ * star ⟪w', ρ g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ)) :
-    (d : ℂ) = (Module.finrank ℂ H : ℂ) := by
+theorem fdeg_eq_finrank
+    {G : Type*} [MeasurableSpace G]
+    (μ : Measure G) [IsProbabilityMeasure μ]
+    {H : Type*}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H] [Nontrivial H]
+    (ρ : G → (H →L[ℂ] H)) (hiso : ∀ g v, ‖ρ g v‖ = ‖v‖)
+    (d : ℝ) (hd : 0 < d)
+    (h : ∀ v w v' w' : H,
+      Integrable (fun g => ⟪w, ρ g v⟫_ℂ * star ⟪w', ρ g v'⟫_ℂ) μ
+        ∧ ∫ g, ⟪w, ρ g v⟫_ℂ * star ⟪w', ρ g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ))
+    : (d : ℂ) = (Module.finrank ℂ H : ℂ) := by
   obtain ⟨v, hv⟩ := exists_ne (0 : H)
   set b := stdOrthonormalBasis ℂ H
   have hpt : ∀ g, ∑ i, ⟪b i, ρ g v⟫_ℂ * star ⟪b i, ρ g v⟫_ℂ = ((‖v‖ ^ 2 : ℝ) : ℂ) := by
@@ -76,31 +81,41 @@ theorem stSchurW (h : UnitaryGroupStructuralFacts) : StSchurW := by
   have : μ.IsInvInvariant := MatrixSubsetMeasurability.nu_inv hHI hμ
   have hE := MatrixSubsetMeasurability.me_val hU
   have hcpt : IsCompact (Set.univ : Set (MatrixSubsetMeasurability.SG hU)) := by
-    have hind : Topology.IsInducing (fun g : MatrixSubsetMeasurability.SG hU => g.1) := Topology.IsInducing.subtypeVal
-    have hr : Set.range (fun g : MatrixSubsetMeasurability.SG hU => g.1) = {x : Mt k r | (Matrix.of x : Mat k r) ∈ UWset k r D.z} :=
+    have hind : Topology.IsInducing (fun g : MatrixSubsetMeasurability.SG hU => g.1) :=
+      Topology.IsInducing.subtypeVal
+    have hr
+        : Set.range (fun g : MatrixSubsetMeasurability.SG hU => g.1)
+          = {x : Mt k r | (Matrix.of x : Mat k r) ∈ UWset k r D.z} :=
       Subtype.range_coe_subtype
     rw [hind.isCompact_iff, Set.image_univ, hr]
     exact hCpt k r D.z D.z_mem D.T_pos
   have hν1 : μ Set.univ = 1 := by
-    have e : ((MatrixSubsetMeasurability.nu hU D.μW).map (fun g : MatrixSubsetMeasurability.SG hU => g.1)) Set.univ = D.μW Set.univ := by
+    have e
+        : ((MatrixSubsetMeasurability.nu hU D.μW).map
+              (fun g : MatrixSubsetMeasurability.SG hU => g.1))
+            Set.univ
+          = D.μW Set.univ := by
       rw [MatrixSubsetMeasurability.map_nu hμ]
     rw [Measure.map_apply hE.measurable MeasurableSet.univ, Set.preimage_univ] at e
     exact e.trans hD.mass
   have : IsProbabilityMeasure μ := ⟨hν1⟩
   have : μ.IsOpenPosMeasure :=
     isOpenPosMeasure_of_mulLeftInvariant_of_compact _ hcpt (by rw [hν1]; exact one_ne_zero)
-  let ρ : MatrixSubsetMeasurability.SG hU → (Wp →L[ℂ] Wp) := fun g => D.π (MatrixSubsetMeasurability.mat g)
+  let ρ : MatrixSubsetMeasurability.SG hU → (Wp →L[ℂ] Wp) := fun g =>
+    D.π (MatrixSubsetMeasurability.mat g)
   have h1 : ρ 1 = 1 := D.π_rep.1
   have hρm : ∀ a b, ρ (a * b) = (ρ a).comp (ρ b) := fun a b => D.π_rep.2 _ a.2 _ b.2
   have hiso : ∀ g v, ‖ρ g v‖ = ‖v‖ := fun g v => D.π_unitary _ g.2 v
   have hcont : ∀ v, Continuous fun g => ρ g v := fun v =>
-    (D.π_cont.comp_continuous MatrixSubsetMeasurability.continuous_mat MatrixSubsetMeasurability.mat_mem).clm_apply continuous_const
+    (D.π_cont.comp_continuous MatrixSubsetMeasurability.continuous_mat
+      MatrixSubsetMeasurability.mat_mem).clm_apply continuous_const
   have hsq : ∀ v w : Wp, MemLp (fun g => ⟪w, ρ g v⟫_ℂ) 2 μ := by
     intro v w
     refine MemLp.of_bound (continuous_const.inner (hcont v)).aestronglyMeasurable (‖w‖ * ‖v‖)
       (ae_of_all _ fun g => ?_)
     exact (norm_inner_le_norm _ _).trans (le_of_eq (by rw [hiso]))
-  have hirr : ∀ S : Submodule ℂ Wp, IsClosed (S : Set Wp) → (∀ g, ∀ v ∈ S, ρ g v ∈ S) → S = ⊥ ∨ S = ⊤ :=
+  have hirr
+      : ∀ S : Submodule ℂ Wp, IsClosed (S : Set Wp) → (∀ g, ∀ v ∈ S, ρ g v ∈ S) → S = ⊥ ∨ S = ⊤ :=
     fun S hS hst => hD.irr S hS fun g hg v hv => hst (MatrixSubsetMeasurability.mk hU g hg) v hv
   have hSq : Formalism.MainNotions.BridgeCSchur.SqRep μ ρ := ⟨h1, hρm, hiso, hcont, hsq⟩
   obtain ⟨d, hd, hrel⟩ := Formalism.MainNotions.BridgeCSchur.schur_orth hSq hirr

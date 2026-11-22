@@ -9,8 +9,11 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PieceLocaliz
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
@@ -20,8 +23,8 @@ open GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
 
-theorem mem_span_iff {q : Cpt ξ} {a b : Ω} :
-    a ∈ Submodule.span (regAt ξ q) {b} ↔ ∃ r ∈ regAt ξ q, r * b = a := by
+theorem mem_span_iff {q : Cpt ξ} {a b : Ω}
+    : a ∈ Submodule.span (regAt ξ q) {b} ↔ ∃ r ∈ regAt ξ q, r * b = a := by
   rw [Submodule.mem_span_singleton]
   constructor
   · rintro ⟨r, rfl⟩
@@ -32,15 +35,16 @@ theorem mem_span_iff {q : Cpt ξ} {a b : Ω} :
 theorem unitAt_inv {q : Cpt ξ} {a : Ω} (h : unitAt ξ q a) : unitAt ξ q a⁻¹ :=
   ⟨inv_ne_zero h.1, h.2.2, by simpa using h.2.1⟩
 
-theorem unitAt_mul {q : Cpt ξ} {a b : Ω} (ha : unitAt ξ q a) (hb : unitAt ξ q b) : unitAt ξ q (a * b) :=
-  ⟨mul_ne_zero ha.1 hb.1, mul_mem ha.2.1 hb.2.1, by
-    rw [mul_inv]; exact mul_mem ha.2.2 hb.2.2⟩
+theorem unitAt_mul {q : Cpt ξ} {a b : Ω} (ha : unitAt ξ q a) (hb : unitAt ξ q b)
+    : unitAt ξ q (a * b) :=
+  ⟨mul_ne_zero ha.1 hb.1, mul_mem ha.2.1 hb.2.1, by rw [mul_inv]; exact mul_mem ha.2.2 hb.2.2⟩
 
 theorem unitAt_pow {q : Cpt ξ} {a : Ω} (ha : unitAt ξ q a) (k : ℕ) : unitAt ξ q (a ^ k) :=
   ⟨pow_ne_zero _ ha.1, pow_mem ha.2.1 _, by rw [← inv_pow]; exact pow_mem ha.2.2 _⟩
 
-theorem unitAt_left {q : Cpt ξ} {a b : Ω} (h : unitAt ξ q (a * b)) (ha : a ∈ regAt ξ q) (hb : b ∈ regAt ξ q) :
-    unitAt ξ q a := by
+theorem unitAt_left
+    {q : Cpt ξ} {a b : Ω} (h : unitAt ξ q (a * b)) (ha : a ∈ regAt ξ q) (hb : b ∈ regAt ξ q)
+    : unitAt ξ q a := by
   have ha0 : a ≠ 0 := left_ne_zero_of_mul h.1
   have hb0 : b ≠ 0 := right_ne_zero_of_mul h.1
   refine ⟨ha0, ha, ?_⟩
@@ -48,8 +52,8 @@ theorem unitAt_left {q : Cpt ξ} {a b : Ω} (h : unitAt ξ q (a * b)) (ha : a �
   rw [e]
   exact mul_mem hb h.2.2
 
-theorem span_unit_mul {q : Cpt ξ} {a : Ω} (ha : unitAt ξ q a) (b : Ω) :
-    Submodule.span (regAt ξ q) {a * b} = Submodule.span (regAt ξ q) {b} := by
+theorem span_unit_mul {q : Cpt ξ} {a : Ω} (ha : unitAt ξ q a) (b : Ω)
+    : Submodule.span (regAt ξ q) {a * b} = Submodule.span (regAt ξ q) {b} := by
   apply le_antisymm
   · rw [Submodule.span_singleton_le_iff_mem]
     exact mem_span_iff.2 ⟨a, ha.2.1, rfl⟩
@@ -58,17 +62,20 @@ theorem span_unit_mul {q : Cpt ξ} {a : Ω} (ha : unitAt ξ q a) (b : Ω) :
     have := ha.1
     field_simp
 
-theorem piece_chart {κ : Type} {x : κ → Ω} (hT : CoordTie ℤ ξ x) {c : κ} (hc : x c ≠ 0) :
-    ∃ U : X.Opens, IsPiece ξ U (chartSub x c) ∧ ∀ q : Cpt ξ, q.1 ∈ U ↔ InChart ξ x c q := by
+theorem piece_chart {κ : Type} {x : κ → Ω} (hT : CoordTie ℤ ξ x) {c : κ} (hc : x c ≠ 0)
+    : ∃ U : X.Opens, IsPiece ξ U (chartSub x c) ∧ ∀ q : Cpt ξ, q.1 ∈ U ↔ InChart ξ x c q := by
   obtain ⟨U, hU, hm⟩ := hT.affine c hc
   have hq : ∀ q : Cpt ξ, q.1 ∈ U ↔ InChart ξ x c q := fun q =>
     ⟨fun h => ((hm q.1).1 h).2, fun h => (hm q.1).2 ⟨q.2, h⟩⟩
   refine ⟨U, ⟨hU, fun q h => ((hm q).1 h).1, fun a => ?_⟩, hq⟩
   exact (hT.ring c hc a).trans (forall_congr' fun q => imp_congr (hq q).symm Iff.rfl)
 
-theorem exists_basic (hg : IsCptGen ξ) {U : X.Opens} {R : Subring Ω} (hP : IsPiece ξ U R) (p : Cpt ξ)
-    (hp : p.1 ∈ U) (V : X.Opens) (hV : p.1 ∈ V) :
-    ∃ g ∈ R, g ≠ 0 ∧ unitAt ξ p g ∧ ∀ q : Cpt ξ, q.1 ∈ U → unitAt ξ q g → q.1 ∈ V := by
+theorem exists_basic
+    (hg : IsCptGen ξ)
+    {U : X.Opens} {R : Subring Ω} (hP : IsPiece ξ U R)
+    (p : Cpt ξ) (hp : p.1 ∈ U)
+    (V : X.Opens) (hV : p.1 ∈ V)
+    : ∃ g ∈ R, g ≠ 0 ∧ unitAt ξ p g ∧ ∀ q : Cpt ξ, q.1 ∈ U → unitAt ξ q g → q.1 ∈ V := by
   obtain ⟨f, hfV, hpf⟩ := hP.affine.exists_basicOpen_le (V := V) ⟨p.1, hV⟩ hp
   have hη : genPt ξ ∈ U := p.2.mem_open U.isOpen hp
   let g : Ω := (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ U (genPt ξ) hη f)
@@ -79,36 +86,57 @@ theorem exists_basic (hg : IsCptGen ξ) {U : X.Opens} {R : Subring Ω} (hP : IsP
     exact X.presheaf.germ_stalkSpecializes_apply hq q.2 f
   have hgR : g ∈ R := (hP.ring g).2 fun q hq => ⟨_, hgerm q hq⟩
   obtain ⟨v, hv⟩ := ((Scheme.mem_basicOpen X f p.1 hp).1 hpf).exists_right_inv
-  have h1 : g * genMap ξ p v = 1 := by
-    rw [← hgerm p hp, ← map_mul, hv, map_one]
+  have h1 : g * genMap ξ p v = 1 := by rw [← hgerm p hp, ← map_mul, hv, map_one]
   have hg0 : g ≠ 0 := left_ne_zero_of_mul_eq_one h1
-  refine ⟨g, hgR, hg0, ⟨hg0, ⟨_, hgerm p hp⟩, ⟨v, (inv_eq_of_mul_eq_one_right h1).symm⟩⟩, fun q hq hu => ?_⟩
+  refine ⟨
+    g,
+    hgR,
+    hg0,
+    ⟨hg0, ⟨_, hgerm p hp⟩, ⟨v, (inv_eq_of_mul_eq_one_right h1).symm⟩⟩,
+    fun q hq hu => ?_
+  ⟩
   obtain ⟨-, -, ⟨t, ht⟩⟩ := hu
   refine hfV ((Scheme.mem_basicOpen X f q.1 hq).2 (isUnit_iff_exists_inv.2 ⟨t, hg.inj q ?_⟩))
   rw [map_mul, map_one, hgerm q hq, ht, mul_inv_cancel₀ hg0]
 
-theorem exists_cover (hg : IsCptGen ξ) {U : X.Opens} {R : Subring Ω} (hP : IsPiece ξ U R) {Λ : Lat ξ Ω}
-    (hΛ : Λ.IsVB 1 ⊤) :
-    ∃ t : Finset (Ω × Ω), (∀ a ∈ t, a.1 ∈ R ∧ a.1 ≠ 0 ∧ a.2 ≠ 0 ∧ ∀ q : Cpt ξ, q.1 ∈ U → unitAt ξ q a.1 →
-        Λ q = Submodule.span (regAt ξ q) {a.2}) ∧
-      ∀ q : Cpt ξ, q.1 ∈ U → ∃ a ∈ t, unitAt ξ q a.1 := by
+theorem exists_cover
+    (hg : IsCptGen ξ)
+    {U : X.Opens} {R : Subring Ω} (hP : IsPiece ξ U R)
+    {Λ : Lat ξ Ω} (hΛ : Λ.IsVB 1 ⊤)
+    : ∃ t : Finset (Ω × Ω),
+      (∀ a ∈ t,
+          a.1 ∈ R ∧ a.1 ≠ 0 ∧ a.2 ≠ 0
+            ∧ ∀ q : Cpt ξ, q.1 ∈ U → unitAt ξ q a.1 → Λ q = Submodule.span (regAt ξ q) {a.2})
+        ∧ ∀ q : Cpt ξ, q.1 ∈ U → ∃ a ∈ t, unitAt ξ q a.1 := by
   classical
-  have key : ∀ z : X, z ∈ U → ∃ (a : Ω × Ω) (W : X.Opens), z ∈ W ∧
-      (a.1 ∈ R ∧ a.1 ≠ 0 ∧ a.2 ≠ 0 ∧ ∀ q : Cpt ξ, q.1 ∈ U → unitAt ξ q a.1 →
-        Λ q = Submodule.span (regAt ξ q) {a.2}) ∧ ∀ q : Cpt ξ, q.1 ∈ W → unitAt ξ q a.1 := by
+  have key
+      : ∀ z : X,
+        z ∈ U
+          → ∃ (a : Ω × Ω) (W : X.Opens),
+            z ∈ W
+              ∧ (a.1 ∈ R ∧ a.1 ≠ 0 ∧ a.2 ≠ 0
+                ∧ ∀ q : Cpt ξ, q.1 ∈ U → unitAt ξ q a.1 → Λ q = Submodule.span (regAt ξ q) {a.2})
+              ∧ ∀ q : Cpt ξ, q.1 ∈ W → unitAt ξ q a.1 := by
     intro z hz
     let p : Cpt ξ := ⟨z, hP.spec z hz⟩
     obtain ⟨V, hpV, b, -, hfr⟩ := hΛ p trivial
     obtain ⟨g, hgR, hg0, hpu, hgV⟩ := exists_basic hg hP p hz V hpV
     obtain ⟨U', -, hm⟩ := GlobalTheory.T.piece_localization_at_element X Ω ξ U R g hg hP hgR hg0
-    refine ⟨(g, b 0), U', (hm p).2 ⟨hz, hpu⟩, ⟨hgR, hg0, (hfr p trivial hpV).1.ne_zero 0, fun q hq hu => ?_⟩,
-      fun q hq => ((hm q).1 hq).2⟩
+    refine ⟨
+      (g, b 0),
+      U',
+      (hm p).2 ⟨hz, hpu⟩,
+      ⟨hgR, hg0, (hfr p trivial hpV).1.ne_zero 0, fun q hq hu => ?_⟩,
+      fun q hq => ((hm q).1 hq).2
+    ⟩
     have := (hfr q trivial (hgV q hq hu)).2
     rw [this, Set.range_unique]
     rfl
   choose! a W hzW ha hW using key
-  obtain ⟨T, hTU, hcov⟩ := hP.affine.isCompact.elim_nhds_subcover (fun z => (W z : Set X))
-    (fun z hz => (W z).isOpen.mem_nhds (hzW z hz))
+  obtain ⟨T, hTU, hcov⟩ :=
+    hP.affine.isCompact.elim_nhds_subcover
+      (fun z => (W z : Set X))
+      (fun z hz => (W z).isOpen.mem_nhds (hzW z hz))
   refine ⟨T.image a, fun y hy => ?_, fun q hq => ?_⟩
   · obtain ⟨z, hz, rfl⟩ := Finset.mem_image.1 hy
     exact ha z (hTU z hz)
@@ -118,8 +146,11 @@ theorem exists_cover (hg : IsCptGen ξ) {U : X.Opens} {R : Subring Ω} (hP : IsP
 theorem div_mem_chart {κ : Type} (x : κ → Ω) (j c : κ) : x j / x c ∈ chartSub x c :=
   Algebra.subset_adjoin ⟨j, rfl⟩
 
-theorem exists_deg {κ : Type} (x : κ → Ω) {c c' : κ} (hc : x c ≠ 0) (hc' : x c' ≠ 0) {g : Ω}
-    (hgR : g ∈ chartSub x c) : ∃ e : ℕ, ∀ e', e ≤ e' → (x c / x c') ^ e' * g ∈ chartSub x c' := by
+theorem exists_deg
+    {κ : Type} (x : κ → Ω)
+    {c c' : κ} (hc : x c ≠ 0) (hc' : x c' ≠ 0)
+    {g : Ω} (hgR : g ∈ chartSub x c)
+    : ∃ e : ℕ, ∀ e', e ≤ e' → (x c / x c') ^ e' * g ∈ chartSub x c' := by
   have hu : x c / x c' ∈ chartSub x c' := div_mem_chart x c c'
   have hgR' : g ∈ Algebra.adjoin ℤ (Set.range fun j => x j / x c) := hgR
   induction hgR' using Algebra.adjoin_induction with
@@ -127,8 +158,7 @@ theorem exists_deg {κ : Type} (x : κ → Ω) {c c' : κ} (hc : x c ≠ 0) (hc'
     obtain ⟨j, rfl⟩ := hy
     refine ⟨1, fun e' he => ?_⟩
     obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le he
-    have h1 : (x c / x c') * (x j / x c) = x j / x c' := by
-      field_simp
+    have h1 : (x c / x c') * (x j / x c) = x j / x c' := by field_simp
     have e : (x c / x c') ^ (1 + k) * (x j / x c) = (x c / x c') ^ k * (x j / x c') := by
       rw [pow_add, pow_one, mul_comm (x c / x c') (_ ^ k), _root_.mul_assoc, h1]
     rw [e]
@@ -147,19 +177,25 @@ theorem exists_deg {κ : Type} (x : κ → Ω) {c c' : κ} (hc : x c ≠ 0) (hc'
     obtain ⟨e₂, h₂⟩ := h2 (Subalgebra.mem_toSubring.2 ‹_›)
     refine ⟨e₁ + e₂, fun e' he => ?_⟩
     obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le he
-    have e : (x c / x c') ^ (e₁ + e₂ + k) * (a * b) =
-        ((x c / x c') ^ e₁ * a) * ((x c / x c') ^ (e₂ + k) * b) := by ring
+    have e
+        : (x c / x c') ^ (e₁ + e₂ + k) * (a * b)
+          = ((x c / x c') ^ e₁ * a) * ((x c / x c') ^ (e₂ + k) * b) := by
+      ring
     rw [e]
     exact mul_mem (h₁ _ le_rfl) (h₂ _ (Nat.le_add_right _ _))
 
-theorem pair {κ : Type} {x : κ → Ω} {Λ : Lat ξ Ω} (hT : CoordTie ℤ ξ x) {c c' : κ} (hc : x c ≠ 0)
-    (hc' : x c' ≠ 0) {g g' b b' : Ω} {e : ℕ} (hgR : g ∈ chartSub x c) (hg0 : g ≠ 0)
-    (hg'R : g' ∈ chartSub x c') (hg'0 : g' ≠ 0) (hb' : b' ≠ 0)
+theorem pair
+    {κ : Type} {x : κ → Ω} {Λ : Lat ξ Ω} (hT : CoordTie ℤ ξ x)
+    {c c' : κ} (hc : x c ≠ 0) (hc' : x c' ≠ 0)
+    {g g' b b' : Ω} {e : ℕ} (hgR : g ∈ chartSub x c) (hg0 : g ≠ 0) (hg'R : g' ∈ chartSub x c')
+    (hg'0 : g' ≠ 0) (hb' : b' ≠ 0)
     (hΛ : ∀ q : Cpt ξ, InChart ξ x c q → unitAt ξ q g → Λ q = Submodule.span (regAt ξ q) {b})
     (hΛ' : ∀ q : Cpt ξ, InChart ξ x c' q → unitAt ξ q g' → Λ q = Submodule.span (regAt ξ q) {b'})
-    (he : (x c / x c') ^ e * g ∈ chartSub x c') :
-    ∃ M₀ : ℕ, ∀ M, M₀ ≤ M → ∀ q : Cpt ξ, InChart ξ x c' q → unitAt ξ q g' →
-      (x c / x c') ^ ((e + 1) * M) * g ^ M * b ∈ Λ q := by
+    (he : (x c / x c') ^ e * g ∈ chartSub x c')
+    : ∃ M₀ : ℕ, ∀ M,
+      M₀ ≤ M
+        → ∀ q : Cpt ξ,
+          InChart ξ x c' q → unitAt ξ q g' → (x c / x c') ^ ((e + 1) * M) * g ^ M * b ∈ Λ q := by
   set u : Ω := x c / x c' with hu_def
   have hu : u ∈ chartSub x c' := div_mem_chart x c c'
   have hu0 : u ≠ 0 := div_ne_zero hc hc'
@@ -169,9 +205,10 @@ theorem pair {κ : Type} {x : κ → Ω} {Λ : Lat ξ Ω} (hT : CoordTie ℤ ξ 
   have hw0 : w ≠ 0 := mul_ne_zero hg'0 (mul_ne_zero hu0 hG0)
   have hwR : w ∈ chartSub x c' := mul_mem hg'R (mul_mem hu he)
   obtain ⟨U₀, hU₀, hU₀m⟩ := piece_chart hT hc'
-  obtain ⟨U₁, hU₁, hm⟩ := GlobalTheory.T.piece_localization_at_element X Ω ξ U₀ _ w hT.gen hU₀ hwR hw0
-  have hreg : ∀ q : Cpt ξ, InChart ξ x c' q → ∀ a ∈ chartSub x c', a ∈ regAt ξ q :=
-    fun q hq a ha => (hT.ring c' hc' a).1 ha q hq
+  obtain ⟨U₁, hU₁, hm⟩ :=
+    GlobalTheory.T.piece_localization_at_element X Ω ξ U₀ _ w hT.gen hU₀ hwR hw0
+  have hreg : ∀ q : Cpt ξ, InChart ξ x c' q → ∀ a ∈ chartSub x c', a ∈ regAt ξ q := fun q hq a ha =>
+    (hT.ring c' hc' a).1 ha q hq
   have hf : b / b' ∈ locSub (chartSub x c') w := by
     refine (hU₁.ring _).2 fun q hq => ?_
     obtain ⟨hq0, hqw⟩ := (hm q).1 hq
@@ -209,15 +246,16 @@ theorem pair {κ : Type} {x : κ → Ω} {Λ : Lat ξ Ω} (hT : CoordTie ℤ ξ 
     rw [pow_add, mul_comm (w ^ k), _root_.mul_assoc]
     exact mul_mem (pow_mem hwR _) hk
   rw [hΛ' q hq hqu]
-  refine mem_span_iff.2 ⟨(g'⁻¹) ^ M * (w ^ M * (b / b')),
-    mul_mem (pow_mem hqu.2.2 _) (hreg q hq _ hwM), ?_⟩
+  refine mem_span_iff.2
+    ⟨(g'⁻¹) ^ M * (w ^ M * (b / b')), mul_mem (pow_mem hqu.2.2 _) (hreg q hq _ hwM), ?_⟩
   have e1 : w ^ M = g' ^ M * (u ^ ((e + 1) * M) * g ^ M) := by
     rw [hw_def, hG_def]
     ring
-  have e2 : (g'⁻¹) ^ M * g' ^ M = 1 := by
-    rw [← mul_pow, inv_mul_cancel₀ hg'0, one_pow]
-  have e3 : (g'⁻¹) ^ M * (g' ^ M * (u ^ ((e + 1) * M) * g ^ M) * (b / b')) * b' =
-      ((g'⁻¹) ^ M * g' ^ M) * (u ^ ((e + 1) * M) * g ^ M) * (b / b' * b') := by ring
+  have e2 : (g'⁻¹) ^ M * g' ^ M = 1 := by rw [← mul_pow, inv_mul_cancel₀ hg'0, one_pow]
+  have e3
+      : (g'⁻¹) ^ M * (g' ^ M * (u ^ ((e + 1) * M) * g ^ M) * (b / b')) * b'
+        = ((g'⁻¹) ^ M * g' ^ M) * (u ^ ((e + 1) * M) * g ^ M) * (b / b' * b') := by
+    ring
   rw [e1, e3, e2, div_mul_cancel₀ _ hb', _root_.one_mul]
 
 end GlobalTheory.CompanionTheory.Ar.LineGen
@@ -226,7 +264,13 @@ namespace GlobalTheory.CompanionTheory.Ar
 
 open GlobalTheory.CompanionTheory.Ar.FlagBun.Sm GlobalTheory.CompanionTheory.Ar.LineGen
 
-theorem line_twist_generated : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (κ : Type) [Finite κ] (x : κ → Ω) (Λ : Lat ξ Ω), CoordTie ℤ ξ x → Λ.IsVB 1 ⊤ → ∃ (n m : ℕ) (s : Fin (m + 1) → Ω), (∀ (p : Cpt ξ) (c : κ), InChart ξ x c p → ∀ i, s i / x c ^ n ∈ Λ p) ∧ ∀ (p : Cpt ξ) (c : κ), InChart ξ x c p → ∃ i, Λ.IsGenAt p (s i / x c ^ n) := by
+theorem line_twist_generated
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (κ : Type)
+        [Finite κ] (x : κ → Ω) (Λ : Lat ξ Ω),
+      CoordTie ℤ ξ x → Λ.IsVB 1 ⊤
+        → ∃ (n m : ℕ) (s : Fin (m + 1) → Ω),
+          (∀ (p : Cpt ξ) (c : κ), InChart ξ x c p → ∀ i, s i / x c ^ n ∈ Λ p)
+            ∧ ∀ (p : Cpt ξ) (c : κ), InChart ξ x c p → ∃ i, Λ.IsGenAt p (s i / x c ^ n) := by
   intro X Ω _ ξ κ _ x Λ hT hΛ
   classical
   let C := {c : κ // x c ≠ 0}
@@ -240,8 +284,9 @@ theorem line_twist_generated : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ :
   have hgR : ∀ i, gg i ∈ chartSub x (cc i) := fun i => (ht i.1 _ i.2.2).1
   have hg0 : ∀ i, gg i ≠ 0 := fun i => (ht i.1 _ i.2.2).2.1
   have hb0 : ∀ i, bb i ≠ 0 := fun i => (ht i.1 _ i.2.2).2.2.1
-  have hΛi : ∀ (i : I) (q : Cpt ξ), InChart ξ x (cc i) q → unitAt ξ q (gg i) →
-      Λ q = Submodule.span (regAt ξ q) {bb i} :=
+  have hΛi
+      : ∀ (i : I) (q : Cpt ξ),
+        InChart ξ x (cc i) q → unitAt ξ q (gg i) → Λ q = Submodule.span (regAt ξ q) {bb i} :=
     fun i q hq hu => (ht i.1 _ i.2.2).2.2.2 q ((hUm i.1 q).2 hq) hu
 
   choose e₀ he₀ using fun ij : I × I => exists_deg x (hcc ij.1) (hcc ij.2) (hgR ij.1)

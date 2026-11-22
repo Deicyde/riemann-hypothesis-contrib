@@ -8,15 +8,18 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf
 
-open Matrix NumberField IsDedekindDomain Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups ValuativeRel
+open Matrix NumberField IsDedekindDomain Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups ValuativeRel
 open scoped BigOperators
 
 section Fit
 
 variable {R : Type*} [CommRing R]
 
-theorem exists_mul_eq_of_range_le {ι : Type*} [Fintype ι] [DecidableEq ι] (M N : Matrix ι ι R)
-    (h : LinearMap.range N.mulVecLin ≤ LinearMap.range M.mulVecLin) : ∃ G : Matrix ι ι R, M * G = N := by
+theorem exists_mul_eq_of_range_le
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M N : Matrix ι ι R) (h : LinearMap.range N.mulVecLin ≤ LinearMap.range M.mulVecLin)
+    : ∃ G : Matrix ι ι R, M * G = N := by
   classical
   have hv : ∀ j : ι, ∃ v : ι → R, M.mulVecLin v = N.mulVecLin (Pi.single j 1) := fun j =>
     h (LinearMap.mem_range_self _ _)
@@ -30,9 +33,11 @@ theorem exists_mul_eq_of_range_le {ι : Type*} [Fintype ι] [DecidableEq ι] (M 
   · simp [Matrix.mulVec, dotProduct]
   · simp
 
-theorem det_assoc_of_range_eq {ι : Type*} [Fintype ι] [DecidableEq ι] (M N : Matrix ι ι R)
-    (h : LinearMap.range N.mulVecLin = LinearMap.range M.mulVecLin) (hM : ∀ x, M.det * x = 0 → x = 0) :
-    ∃ u : Rˣ, N.det = M.det * u := by
+theorem det_assoc_of_range_eq
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M N : Matrix ι ι R) (h : LinearMap.range N.mulVecLin = LinearMap.range M.mulVecLin)
+    (hM : ∀ x, M.det * x = 0 → x = 0)
+    : ∃ u : Rˣ, N.det = M.det * u := by
   obtain ⟨G, hG⟩ := exists_mul_eq_of_range_le M N h.le
   obtain ⟨H, hH⟩ := exists_mul_eq_of_range_le N M h.ge
   have hGH : G * H = 1 := by
@@ -42,7 +47,8 @@ theorem det_assoc_of_range_eq {ι : Type*} [Fintype ι] [DecidableEq ι] (M N : 
     rw [Matrix.adjugate_mul] at h2
     ext i j
     have h3 := congrFun (congrFun h2 i) j
-    simp only [Matrix.smul_mul, Matrix.one_mul, Matrix.mul_one, Matrix.smul_apply, smul_eq_mul] at h3
+    simp only [Matrix.smul_mul, Matrix.one_mul, Matrix.mul_one, Matrix.smul_apply, smul_eq_mul]
+      at h3
     have h4 : M.det * ((G * H) i j - (1 : Matrix ι ι R) i j) = 0 := by rw [mul_sub, h3, sub_self]
     exact sub_eq_zero.mp (hM _ h4)
   have hu : IsUnit G.det := by
@@ -51,20 +57,30 @@ theorem det_assoc_of_range_eq {ι : Type*} [Fintype ι] [DecidableEq ι] (M N : 
     exact ⟨⟨G.det, H.det, h5, by rw [mul_comm]; exact h5⟩, rfl⟩
   exact ⟨hu.unit, by rw [IsUnit.unit_spec, ← hG, Matrix.det_mul]⟩
 
-theorem det_assoc_of_cok {n : Type*} [Fintype n] [DecidableEq n] (Z Z' : Matrix n n R)
+theorem det_assoc_of_cok
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (Z Z' : Matrix n n R)
     (φ : ((n → R) ⧸ LinearMap.range Z.mulVecLin) ≃ₗ[R] ((n → R) ⧸ LinearMap.range Z'.mulVecLin))
-    (hZ : ∀ x, Z.det * x = 0 → x = 0) : ∃ u : Rˣ, Z'.det = Z.det * u := by
-  obtain ⟨A, hA⟩ := Module.projective_lifting_property (Submodule.mkQ (LinearMap.range Z'.mulVecLin))
-    ((φ : _ →ₗ[R] _) ∘ₗ Submodule.mkQ (LinearMap.range Z.mulVecLin)) (Submodule.mkQ_surjective _)
-  have hA' : ∀ v, Submodule.mkQ (LinearMap.range Z'.mulVecLin) (LinearMap.toMatrix' A *ᵥ v) =
-      φ (Submodule.mkQ (LinearMap.range Z.mulVecLin) v) := by
+    (hZ : ∀ x, Z.det * x = 0 → x = 0)
+    : ∃ u : Rˣ, Z'.det = Z.det * u := by
+  obtain ⟨A, hA⟩ :=
+    Module.projective_lifting_property (Submodule.mkQ (LinearMap.range Z'.mulVecLin))
+      ((φ : _ →ₗ[R] _) ∘ₗ Submodule.mkQ (LinearMap.range Z.mulVecLin)) (Submodule.mkQ_surjective _)
+  have hA'
+      : ∀ v,
+        Submodule.mkQ (LinearMap.range Z'.mulVecLin) (LinearMap.toMatrix' A *ᵥ v)
+          = φ (Submodule.mkQ (LinearMap.range Z.mulVecLin) v) := by
     intro v
     rw [LinearMap.toMatrix'_mulVec]
     exact LinearMap.congr_fun hA v
-  obtain ⟨B, hB⟩ := Module.projective_lifting_property (Submodule.mkQ (LinearMap.range Z.mulVecLin))
-    ((φ.symm : _ →ₗ[R] _) ∘ₗ Submodule.mkQ (LinearMap.range Z'.mulVecLin)) (Submodule.mkQ_surjective _)
-  have hB' : ∀ v, Submodule.mkQ (LinearMap.range Z.mulVecLin) (LinearMap.toMatrix' B *ᵥ v) =
-      φ.symm (Submodule.mkQ (LinearMap.range Z'.mulVecLin) v) := by
+  obtain ⟨B, hB⟩ :=
+    Module.projective_lifting_property (Submodule.mkQ (LinearMap.range Z.mulVecLin))
+      ((φ.symm : _ →ₗ[R] _) ∘ₗ Submodule.mkQ (LinearMap.range Z'.mulVecLin))
+      (Submodule.mkQ_surjective _)
+  have hB'
+      : ∀ v,
+        Submodule.mkQ (LinearMap.range Z.mulVecLin) (LinearMap.toMatrix' B *ᵥ v)
+          = φ.symm (Submodule.mkQ (LinearMap.range Z'.mulVecLin) v) := by
     intro v
     rw [LinearMap.toMatrix'_mulVec]
     exact LinearMap.congr_fun hB v
@@ -72,8 +88,11 @@ theorem det_assoc_of_cok {n : Type*} [Fintype n] [DecidableEq n] (Z Z' : Matrix 
   set b := LinearMap.toMatrix' B
   let M1 : Matrix (n ⊕ n) (n ⊕ n) R := fromBlocks 1 0 (-a) Z'
   let M2 : Matrix (n ⊕ n) (n ⊕ n) R := fromBlocks Z (-b) 0 1
-  have c1 : ∀ u : n ⊕ n → R, u ∈ LinearMap.range M1.mulVecLin ↔
-      Submodule.mkQ (LinearMap.range Z'.mulVecLin) (a *ᵥ (u ∘ Sum.inl) + u ∘ Sum.inr) = 0 := by
+  have c1
+      : ∀ u : n ⊕ n → R,
+        u ∈ LinearMap.range M1.mulVecLin
+          ↔ Submodule.mkQ (LinearMap.range Z'.mulVecLin) (a *ᵥ (u ∘ Sum.inl) + u ∘ Sum.inr)
+            = 0 := by
     intro u
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
     constructor
@@ -89,11 +108,13 @@ theorem det_assoc_of_cok {n : Type*} [Fintype n] [DecidableEq n] (Z Z' : Matrix 
       funext i
       rcases i with i | i
       · simp
-      · simp only [Sum.elim_inr, Sum.elim_comp_inl, Sum.elim_comp_inr, Matrix.one_mulVec, Matrix.zero_mulVec,
-          add_zero, Matrix.neg_mulVec, hy]
+      · simp only [Sum.elim_inr, Sum.elim_comp_inl, Sum.elim_comp_inr, Matrix.one_mulVec,
+          Matrix.zero_mulVec, add_zero, Matrix.neg_mulVec, hy]
         simp
-  have c2 : ∀ u : n ⊕ n → R, u ∈ LinearMap.range M2.mulVecLin ↔
-      Submodule.mkQ (LinearMap.range Z.mulVecLin) (u ∘ Sum.inl + b *ᵥ (u ∘ Sum.inr)) = 0 := by
+  have c2
+      : ∀ u : n ⊕ n → R,
+        u ∈ LinearMap.range M2.mulVecLin
+          ↔ Submodule.mkQ (LinearMap.range Z.mulVecLin) (u ∘ Sum.inl + b *ᵥ (u ∘ Sum.inr)) = 0 := by
     intro u
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
     constructor
@@ -113,8 +134,8 @@ theorem det_assoc_of_cok {n : Type*} [Fintype n] [DecidableEq n] (Z Z' : Matrix 
       · simp
   have key : LinearMap.range M1.mulVecLin = LinearMap.range M2.mulVecLin := by
     ext u
-    rw [c1, c2, map_add (f := _), hA', ← φ.apply_symm_apply (Submodule.mkQ _ (u ∘ Sum.inr)), ← hB', ← map_add (f := _), ← map_add (f := _),
-      LinearEquiv.map_eq_zero_iff]
+    rw [c1, c2, map_add (f := _), hA', ← φ.apply_symm_apply (Submodule.mkQ _ (u ∘ Sum.inr)), ← hB',
+      ← map_add (f := _), ← map_add (f := _), LinearEquiv.map_eq_zero_iff]
   have d1 : M1.det = Z'.det := by simp [M1, Matrix.det_fromBlocks_zero₁₂]
   have d2 : M2.det = Z.det := by simp [M2]
   obtain ⟨u, hu⟩ := det_assoc_of_range_eq M2 M1 key (by rw [d2]; exact hZ)
@@ -126,8 +147,10 @@ section Pts
 
 variable {K S : Type} [Zero K] [CommRing S]
 
-theorem ptEntryL_eq (L : List (Sˣ × ℕ+)) : ∀ i j : ℕ,
-    Formalism.MainNotions.S.Loc.ptEntryL L i j = ptEntry (L.map fun b => ((b.1 : S), (b.2 : ℕ))) i j := by
+theorem ptEntryL_eq (L : List (Sˣ × ℕ+))
+    : ∀ i j : ℕ,
+      Formalism.MainNotions.S.Loc.ptEntryL L i j
+        = ptEntry (L.map fun b => ((b.1 : S), (b.2 : ℕ))) i j := by
   induction L with
   | nil => intro i j; simp [Formalism.MainNotions.S.Loc.ptEntryL, ptEntry]
   | cons b L ih =>
@@ -135,11 +158,13 @@ theorem ptEntryL_eq (L : List (Sˣ × ℕ+)) : ∀ i j : ℕ,
     obtain ⟨t, s⟩ := b
     simp only [Formalism.MainNotions.S.Loc.ptEntryL, List.map_cons, ptEntry, ih]
 
-theorem modBlocks_map {A : Type} (f : ℕ → ℕ → A → S) : ∀ (l : List (A × ℕ)) (a : ℕ) (L : List (Sˣ × ℕ+)),
-    modBlocks f a l = some L → L.map (fun b => ((b.1 : S), (b.2 : ℕ))) = mapBlocks f a l
+theorem modBlocks_map {A : Type} (f : ℕ → ℕ → A → S)
+    : ∀ (l : List (A × ℕ)) (a : ℕ) (L : List (Sˣ × ℕ+)),
+      modBlocks f a l = some L → L.map (fun b => ((b.1 : S), (b.2 : ℕ))) = mapBlocks f a l
   | [], a, L, h => by
     simp only [modBlocks, Option.some.injEq] at h
-    subst h; rfl
+    subst h
+    rfl
   | (t, s) :: l, a, L, h => by
     unfold modBlocks at h
     split at h
@@ -152,20 +177,27 @@ theorem modBlocks_map {A : Type} (f : ℕ → ℕ → A → S) : ∀ (l : List (
           modBlocks_map f l (a + s) L1 hL1]
     · cases h
 
-theorem mapBlocks_snd {A B : Type} (f : ℕ → ℕ → A → B) : ∀ (l : List (A × ℕ)) (a : ℕ),
-    (mapBlocks f a l).map Prod.snd = l.map Prod.snd
+theorem mapBlocks_snd {A B : Type} (f : ℕ → ℕ → A → B)
+    : ∀ (l : List (A × ℕ)) (a : ℕ), (mapBlocks f a l).map Prod.snd = l.map Prod.snd
   | [], _ => rfl
   | (t, s) :: l, a => by simp [mapBlocks, mapBlocks_snd f l (a + s)]
 
-theorem mapBlocks_append {A B : Type} (f : ℕ → ℕ → A → B) : ∀ (l0 l1 : List (A × ℕ)) (a : ℕ),
-    mapBlocks f a (l0 ++ l1) = mapBlocks f a l0 ++ mapBlocks f (a + (l0.map Prod.snd).sum) l1
+theorem mapBlocks_append {A B : Type} (f : ℕ → ℕ → A → B)
+    : ∀ (l0 l1 : List (A × ℕ)) (a : ℕ),
+      mapBlocks f a (l0 ++ l1) = mapBlocks f a l0 ++ mapBlocks f (a + (l0.map Prod.snd).sum) l1
   | [], l1, a => by simp [mapBlocks]
   | (t, s) :: l0, l1, a => by
-    simp only [List.cons_append, mapBlocks, mapBlocks_append f l0 l1 (a + s), List.map_cons, List.sum_cons, add_assoc]
+    simp only [List.cons_append, mapBlocks, mapBlocks_append f l0 l1 (a + s), List.map_cons,
+      List.sum_cons, add_assoc]
 
-theorem ptEntry_append_ge {L : Type} [Zero L] : ∀ (l0 l1 : List (L × ℕ)) (i j : ℕ), (l0.map Prod.snd).sum ≤ i →
-    ptEntry (l0 ++ l1) i j = if (l0.map Prod.snd).sum ≤ j then
-      ptEntry l1 (i - (l0.map Prod.snd).sum) (j - (l0.map Prod.snd).sum) else 0
+theorem ptEntry_append_ge {L : Type} [Zero L]
+    : ∀ (l0 l1 : List (L × ℕ)) (i j : ℕ),
+      (l0.map Prod.snd).sum ≤ i
+        → ptEntry (l0 ++ l1) i j
+          = if (l0.map Prod.snd).sum ≤ j then
+              ptEntry l1 (i - (l0.map Prod.snd).sum) (j - (l0.map Prod.snd).sum)
+            else
+              0
   | [], l1, i, j, _ => by simp
   | (t, s) :: l0, l1, i, j, hi => by
     simp only [List.map_cons, List.sum_cons] at hi ⊢
@@ -184,11 +216,14 @@ section Scale
 
 variable {K S : Type} [Field K] [CommRing S]
 
-theorem ptEntry_scale (ι : K →+* S) (g : ℕ → ℕ → K → S) (ρ : ℕ → S) (κ : S) (r : ℕ)
-    (H : ∀ a s t x y, 1 ≤ a → a - 1 ≤ x → a - 1 ≤ y → x + y + 1 = 2 * (a - 1) + s → x ≤ r → y ≤ r →
-      ¬ (x = r ∧ y = r) → g a s t = ρ x * ρ y * κ * ι t) :
-    ∀ (l : List (K × ℕ)) (a i j : ℕ), 1 ≤ a → a - 1 + i ≤ r → a - 1 + j ≤ r → ¬ (a - 1 + i = r ∧ a - 1 + j = r) →
-      ptEntry (mapBlocks g a l) i j = ρ (a - 1 + i) * ρ (a - 1 + j) * κ * ι (ptEntry l i j)
+theorem ptEntry_scale
+    (ι : K →+* S) (g : ℕ → ℕ → K → S) (ρ : ℕ → S) (κ : S) (r : ℕ)
+    (H : ∀ a s t x y,
+      1 ≤ a → a - 1 ≤ x → a - 1 ≤ y → x + y + 1 = 2 * (a - 1) + s → x ≤ r → y ≤ r → ¬(x = r ∧ y = r)
+        → g a s t = ρ x * ρ y * κ * ι t)
+    : ∀ (l : List (K × ℕ)) (a i j : ℕ),
+      1 ≤ a → a - 1 + i ≤ r → a - 1 + j ≤ r → ¬(a - 1 + i = r ∧ a - 1 + j = r)
+        → ptEntry (mapBlocks g a l) i j = ρ (a - 1 + i) * ρ (a - 1 + j) * κ * ι (ptEntry l i j)
   | [], a, i, j, _, _, _, _ => by simp [mapBlocks, ptEntry]
   | (t, s) :: l, a, i, j, ha, hi, hj, hn => by
     simp only [mapBlocks, ptEntry]
@@ -200,17 +235,19 @@ theorem ptEntry_scale (ι : K →+* S) (g : ℕ → ℕ → K → S) (ρ : ℕ �
       · rw [if_neg h2, if_neg h2]; simp
     · rw [if_neg h1, if_neg h1]
       by_cases h2 : s ≤ i ∧ s ≤ j
-      · rw [if_pos h2, if_pos h2, ptEntry_scale ι g ρ κ r H l (a + s) (i - s) (j - s) (by omega) (by omega) (by omega)
-          (by omega)]
+      · rw [if_pos h2, if_pos h2,
+          ptEntry_scale ι g ρ κ r H l (a + s) (i - s) (j - s) (by omega) (by omega) (by omega)
+            (by omega)]
         have e1 : a + s - 1 + (i - s) = a - 1 + i := by omega
         have e2 : a + s - 1 + (j - s) = a - 1 + j := by omega
         rw [e1, e2]
       · rw [if_neg h2, if_neg h2]; simp
 
-theorem det_scaled {n : ℕ} (ι : K →+* S) (ρ : Fin n → S) (κ : S) (P : Matrix (Fin n) (Fin n) K) :
-    (Matrix.of fun x y => ρ x * ρ y * κ * ι (P x y)).det = (∏ x, ρ x) ^ 2 * κ ^ n * ι P.det := by
-  have h : (Matrix.of fun x y => ρ x * ρ y * κ * ι (P x y)) =
-      Matrix.diagonal ρ * (κ • (P.map ι)) * Matrix.diagonal ρ := by
+theorem det_scaled {n : ℕ} (ι : K →+* S) (ρ : Fin n → S) (κ : S) (P : Matrix (Fin n) (Fin n) K)
+    : (Matrix.of fun x y => ρ x * ρ y * κ * ι (P x y)).det = (∏ x, ρ x) ^ 2 * κ ^ n * ι P.det := by
+  have h
+      : (Matrix.of fun x y => ρ x * ρ y * κ * ι (P x y))
+        = Matrix.diagonal ρ * (κ • (P.map ι)) * Matrix.diagonal ρ := by
     ext x y
     simp only [Matrix.of_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.smul_apply,
       Matrix.map_apply, smul_eq_mul]
@@ -219,14 +256,19 @@ theorem det_scaled {n : ℕ} (ι : K →+* S) (ρ : Fin n → S) (κ : S) (P : M
   rw [h, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal, Matrix.det_smul, hm, Fintype.card_fin]
   ring
 
-theorem det_corner {n : ℕ} (A B : Matrix (Fin (n + 1)) (Fin (n + 1)) S)
-    (h : ∀ x y, ¬ (x = Fin.last n ∧ y = Fin.last n) → A x y = B x y) :
-    A.det = B.det + (A (Fin.last n) (Fin.last n) - B (Fin.last n) (Fin.last n)) *
-      (B.submatrix Fin.castSucc Fin.castSucc).det := by
+theorem det_corner
+    {n : ℕ} (A B : Matrix (Fin (n + 1)) (Fin (n + 1)) S)
+    (h : ∀ x y, ¬(x = Fin.last n ∧ y = Fin.last n) → A x y = B x y)
+    : A.det
+      = B.det
+        + (A (Fin.last n) (Fin.last n) - B (Fin.last n) (Fin.last n))
+          * (B.submatrix Fin.castSucc Fin.castSucc).det := by
   obtain ⟨c, hc⟩ : ∃ c, c = A (Fin.last n) (Fin.last n) - B (Fin.last n) (Fin.last n) := ⟨_, rfl⟩
   rw [← hc]
-  have hA : A = B.updateRow (Fin.last n)
-      (B (Fin.last n) + c • (Pi.single (Fin.last n) (1 : S) : Fin (n + 1) → S)) := by
+  have hA
+      : A
+        = B.updateRow (Fin.last n)
+          (B (Fin.last n) + c • (Pi.single (Fin.last n) (1 : S) : Fin (n + 1) → S)) := by
     ext x y
     by_cases hx : x = Fin.last n
     · subst hx
@@ -272,8 +314,9 @@ theorem det_uUp {n : ℕ} (w : Loc.Pt E n) (y : Loc.IN w → E) : (Loc.uUp w y).
   rw [Matrix.det_of_upperTriangular hut]
   simp [Loc.uUp]
 
-theorem bb_ne (Mo : Loc.Model F E) {m : ℕ} (w : Loc.Pt E (m + 1)) (c : Mo.Cls m) (h : Mo.BB w c ≠ 0) :
-    ∃ ZZ : Mo.Mat (m + 1), (ZZ.Z.map Mo.R.subtype).det = w.mat.det ∧ Nonempty (Mo.Iso ZZ (Quotient.out c)) := by
+theorem bb_ne (Mo : Loc.Model F E) {m : ℕ} (w : Loc.Pt E (m + 1)) (c : Mo.Cls m) (h : Mo.BB w c ≠ 0)
+    : ∃ ZZ : Mo.Mat (m + 1),
+      (ZZ.Z.map Mo.R.subtype).det = w.mat.det ∧ Nonempty (Mo.Iso ZZ (Quotient.out c)) := by
   obtain ⟨xy, hxy⟩ : ∃ xy, Mo.bbIntegrand w c xy ≠ 0 := by
     by_contra hc
     push_neg at hc
@@ -291,7 +334,8 @@ theorem bb_ne (Mo : Loc.Model F E) {m : ℕ} (w : Loc.Pt E (m + 1)) (c : Mo.Cls 
     rw [Matrix.det_mul, Matrix.det_mul, det_uLow, det_uUp, one_mul, mul_one]
   · exact absurd rfl hxy
 
-theorem modK_mul_unit (Mo : Loc.Model F E) (x : E) (u : (Mo.R)ˣ) : Mo.modK (x * ((u : Mo.R) : E)) = Mo.modK x := by
+theorem modK_mul_unit (Mo : Loc.Model F E) (x : E) (u : (Mo.R)ˣ)
+    : Mo.modK (x * ((u : Mo.R) : E)) = Mo.modK x := by
   unfold Loc.Model.modK
   congr 2
   ext z
@@ -303,7 +347,8 @@ theorem modK_mul_unit (Mo : Loc.Model F E) (x : E) (u : (Mo.R)ˣ) : Mo.modK (x *
     refine ⟨(((u⁻¹ : (Mo.R)ˣ) : Mo.R) : E) * y, Mo.R.mul_mem (((u⁻¹ : (Mo.R)ˣ) : Mo.R)).2 hy, ?_⟩
     have e : ((u : Mo.R) : E) * (((u⁻¹ : (Mo.R)ˣ) : Mo.R) : E) = 1 := by
       rw [← MulMemClass.coe_mul, Units.mul_inv]; rfl
-    calc x * ((u : Mo.R) : E) * ((((u⁻¹ : (Mo.R)ˣ) : Mo.R) : E) * y)
+    calc
+      x * ((u : Mo.R) : E) * ((((u⁻¹ : (Mo.R)ˣ) : Mo.R) : E) * y)
         = x * (((u : Mo.R) : E) * (((u⁻¹ : (Mo.R)ˣ) : Mo.R) : E)) * y := by ring
       _ = x * y := by rw [e, mul_one]
 
@@ -348,11 +393,13 @@ def rho (δ : ∀ p, (D.s.atP p).Fp) (p : PlF D) (x : ℕ) : (D.s.atP p).Ep :=
 
 def kap (p : PlF D) : (D.s.atP p).Ep := tw p 1 * Ring.inverse (qE p)
 
-theorem blkTop_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) :
-    ∀ a s t x y, 1 ≤ a → a - 1 ≤ x → a - 1 ≤ y → x + y + 1 = 2 * (a - 1) + s → x ≤ D.R.rS → y ≤ D.R.rS →
-      ¬ (x = D.R.rS ∧ y = D.R.rS) → blkTop δ T T' p a s t = rho δ p x * rho δ p y * kap p * (D.s.atP p).ιE t := by
+theorem blkTop_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D)
+    : ∀ a s t x y,
+      1 ≤ a → a - 1 ≤ x → a - 1 ≤ y → x + y + 1 = 2 * (a - 1) + s → x ≤ D.R.rS → y ≤ D.R.rS
+        → ¬(x = D.R.rS ∧ y = D.R.rS)
+        → blkTop δ T T' p a s t = rho δ p x * rho δ p y * kap p * (D.s.atP p).ιE t := by
   intro a s t x y ha hx hy hxy hxr hyr hn
-  have hc : ¬ (a + s - 1 = D.R.rS + 1 ∧ s = 1) := by
+  have hc : ¬(a + s - 1 = D.R.rS + 1 ∧ s = 1) := by
     rintro ⟨h1, h2⟩
     apply hn
     constructor <;> omega
@@ -373,9 +420,11 @@ theorem blkTop_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) :
   simp only [rho, kap, cB]
   ring
 
-theorem modPt_blocks (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) {n : ℕ} (w : Point D.host.E n)
-    (a : Loc.Pt (D.s.atP p).Ep n) (ha : modPt δ T T' p w = some a) :
-    a.blocks.map (fun b => ((b.1 : (D.s.atP p).Ep), (b.2 : ℕ))) = mapBlocks (blkTop δ T T' p) 1 w.1 := by
+theorem modPt_blocks
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D)
+    {n : ℕ} (w : Point D.host.E n) (a : Loc.Pt (D.s.atP p).Ep n) (ha : modPt δ T T' p w = some a)
+    : a.blocks.map (fun b => ((b.1 : (D.s.atP p).Ep), (b.2 : ℕ)))
+      = mapBlocks (blkTop δ T T' p) 1 w.1 := by
   unfold modPt at ha
   cases hm : modBlocks (blkTop δ T T' p) 1 w.1 with
   | none => rw [hm] at ha; simp at ha
@@ -387,15 +436,21 @@ theorem modPt_blocks (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) {n : 
     subst ha
     exact modBlocks_map (blkTop δ T T' p) w.1 1 l hm
 
-theorem amat_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
-    (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1)) (ha : modPt δ T T' p w = some a) (x y : Fin (D.R.rS + 1))
-    (hn : ¬ (x = Fin.last D.R.rS ∧ y = Fin.last D.R.rS)) :
-    a.mat x y = rho δ p x * rho δ p y * kap p * (D.s.atP p).ιE (ptMat w x y) := by
+theorem amat_eq
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
+    (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1)) (ha : modPt δ T T' p w = some a)
+    (x y : Fin (D.R.rS + 1)) (hn : ¬(x = Fin.last D.R.rS ∧ y = Fin.last D.R.rS))
+    : a.mat x y = rho δ p x * rho δ p y * kap p * (D.s.atP p).ιE (ptMat w x y) := by
   have hx := x.isLt
   have hy := y.isLt
-  have h1 := ptEntry_scale (D.s.atP p).ιE (blkTop δ T T' p) (rho δ p) (kap p) D.R.rS
-    (blkTop_eq δ T T' p) w.1 1 x y le_rfl (by omega) (by omega)
-    (fun h => hn ⟨Fin.ext (by simp only [Fin.val_last]; omega), Fin.ext (by simp only [Fin.val_last]; omega)⟩)
+  have h1 :=
+    ptEntry_scale (D.s.atP p).ιE (blkTop δ T T' p) (rho δ p) (kap p) D.R.rS (blkTop_eq δ T T' p) w.1
+      1 x y le_rfl (by omega) (by omega)
+      (fun h =>
+        hn ⟨
+          Fin.ext (by simp only [Fin.val_last]; omega),
+          Fin.ext (by simp only [Fin.val_last]; omega)
+        ⟩)
   show Formalism.MainNotions.S.Loc.ptEntryL a.blocks x y = _
   rw [ptEntryL_eq, modPt_blocks δ T T' p w a ha, h1]
   simp [ptMat]
@@ -405,46 +460,59 @@ theorem dmin_top (w : Point D.host.E (D.R.rS + 1)) : Dmin w (D.R.rS + 1) = (ptMa
   rw [dite_eq_left le_rfl]
   rfl
 
-theorem dmin_r (w : Point D.host.E (D.R.rS + 1)) :
-    Dmin w D.R.rS = ((ptMat w).submatrix Fin.castSucc Fin.castSucc).det := by
+theorem dmin_r (w : Point D.host.E (D.R.rS + 1))
+    : Dmin w D.R.rS = ((ptMat w).submatrix Fin.castSucc Fin.castSucc).det := by
   unfold Dmin
   rw [dite_eq_left (Nat.le_succ _)]
   rfl
 
-theorem det_amat (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
-    (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1)) (ha : modPt δ T T' p w = some a) :
-    a.mat.det = ((∏ x : Fin (D.R.rS + 1), rho δ p x) ^ 2 * kap p ^ (D.R.rS + 1)) *
-        (D.s.atP p).ιE (Dmin w (D.R.rS + 1)) +
-      (a.mat (Fin.last _) (Fin.last _) - rho δ p D.R.rS * rho δ p D.R.rS * kap p *
-        (D.s.atP p).ιE (ptMat w (Fin.last _) (Fin.last _))) *
-      (((∏ x : Fin D.R.rS, rho δ p x) ^ 2 * kap p ^ D.R.rS) * (D.s.atP p).ιE (Dmin w D.R.rS)) := by
+theorem det_amat
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
+    (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1)) (ha : modPt δ T T' p w = some a)
+    : a.mat.det
+      = ((∏ x : Fin (D.R.rS + 1), rho δ p x) ^ 2 * kap p ^ (D.R.rS + 1))
+          * (D.s.atP p).ιE (Dmin w (D.R.rS + 1))
+        + (a.mat (Fin.last _) (Fin.last _)
+            - rho δ p D.R.rS * rho δ p D.R.rS * kap p
+              * (D.s.atP p).ιE (ptMat w (Fin.last _) (Fin.last _)))
+          * (((∏ x : Fin D.R.rS, rho δ p x) ^ 2 * kap p ^ D.R.rS)
+            * (D.s.atP p).ιE (Dmin w D.R.rS)) := by
   set B : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (D.s.atP p).Ep :=
     Matrix.of fun x y => rho δ p x * rho δ p y * kap p * (D.s.atP p).ιE (ptMat w x y) with hBdef
   have hc := det_corner a.mat B (fun x y hxy => by rw [amat_eq δ T T' p w a ha x y hxy]; rfl)
-  have hBd : B.det = ((∏ x : Fin (D.R.rS + 1), rho δ p x) ^ 2 * kap p ^ (D.R.rS + 1)) *
-      (D.s.atP p).ιE (Dmin w (D.R.rS + 1)) := by
+  have hBd
+      : B.det
+        = ((∏ x : Fin (D.R.rS + 1), rho δ p x) ^ 2 * kap p ^ (D.R.rS + 1))
+          * (D.s.atP p).ιE (Dmin w (D.R.rS + 1)) := by
     rw [hBdef, det_scaled, dmin_top]
-  have hm : B.submatrix Fin.castSucc Fin.castSucc = Matrix.of fun x y : Fin D.R.rS =>
-      rho δ p x * rho δ p y * kap p *
-        (D.s.atP p).ιE (((ptMat w).submatrix Fin.castSucc Fin.castSucc) x y) := by
+  have hm
+      : B.submatrix Fin.castSucc Fin.castSucc
+        = Matrix.of fun x y : Fin D.R.rS =>
+          rho δ p x * rho δ p y * kap p
+            * (D.s.atP p).ιE (((ptMat w).submatrix Fin.castSucc Fin.castSucc) x y) := by
     ext x y
     simp [hBdef]
-  have hBm : (B.submatrix Fin.castSucc Fin.castSucc).det =
-      ((∏ x : Fin D.R.rS, rho δ p x) ^ 2 * kap p ^ D.R.rS) * (D.s.atP p).ιE (Dmin w D.R.rS) := by
+  have hBm
+      : (B.submatrix Fin.castSucc Fin.castSucc).det
+        = ((∏ x : Fin D.R.rS, rho δ p x) ^ 2 * kap p ^ D.R.rS)
+          * (D.s.atP p).ιE (Dmin w D.R.rS) := by
     rw [hm, det_scaled, dmin_r]
-  have hBl : B (Fin.last _) (Fin.last _) = rho δ p D.R.rS * rho δ p D.R.rS * kap p *
-      (D.s.atP p).ιE (ptMat w (Fin.last _) (Fin.last _)) := by
+  have hBl
+      : B (Fin.last _) (Fin.last _)
+        = rho δ p D.R.rS * rho δ p D.R.rS * kap p
+          * (D.s.atP p).ιE (ptMat w (Fin.last _) (Fin.last _)) := by
     simp [hBdef]
   rw [hc, hBd, hBm, hBl]
 
-theorem last_one (w : Point D.host.E (D.R.rS + 1)) (hD : Dmin w D.R.rS ≠ 0) :
-    ∃ l0 t, w.1 = l0 ++ [(t, 1)] ∧ (l0.map Prod.snd).sum = D.R.rS := by
+theorem last_one (w : Point D.host.E (D.R.rS + 1)) (hD : Dmin w D.R.rS ≠ 0)
+    : ∃ l0 t, w.1 = l0 ++ [(t, 1)] ∧ (l0.map Prod.snd).sum = D.R.rS := by
   have hne : w.1 ≠ [] := by
     intro h
     have := w.2.2
     rw [h] at this
     simp at this
-  obtain ⟨l0, b, hb⟩ : ∃ l0 b, w.1 = l0 ++ [b] := ⟨w.1.dropLast, w.1.getLast hne, (List.dropLast_append_getLast hne).symm⟩
+  obtain ⟨l0, b, hb⟩ : ∃ l0 b, w.1 = l0 ++ [b] :=
+    ⟨w.1.dropLast, w.1.getLast hne, (List.dropLast_append_getLast hne).symm⟩
   obtain ⟨t, s⟩ := b
   have hmem := w.2.1 (t, s) (by rw [hb]; simp)
   have hsum : (l0.map Prod.snd).sum + s = D.R.rS + 1 := by
@@ -468,17 +536,21 @@ theorem last_one (w : Point D.host.E (D.R.rS + 1)) (hD : Dmin w D.R.rS ≠ 0) :
       rw [if_pos ⟨by omega, by omega⟩, if_neg (by omega)]
     · rfl
 
-theorem ptMat_last (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)) (t : D.host.E)
-    (hb : w.1 = l0 ++ [(t, 1)]) (hs : (l0.map Prod.snd).sum = D.R.rS) :
-    ptMat w (Fin.last _) (Fin.last _) = t := by
+theorem ptMat_last
+    (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)) (t : D.host.E)
+    (hb : w.1 = l0 ++ [(t, 1)])
+    (hs : (l0.map Prod.snd).sum = D.R.rS)
+    : ptMat w (Fin.last _) (Fin.last _) = t := by
   show ptEntry w.1 (Fin.last D.R.rS).val (Fin.last D.R.rS).val = t
-  rw [hb, Fin.val_last, ptEntry_append_ge l0 [(t, 1)] D.R.rS D.R.rS (by omega), if_pos (by omega), hs,
-    Nat.sub_self]
+  rw [hb, Fin.val_last, ptEntry_append_ge l0 [(t, 1)] D.R.rS D.R.rS (by omega), if_pos (by omega),
+    hs, Nat.sub_self]
   simp [ptEntry]
 
-theorem dmin_snoc (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)) (t : D.host.E)
-    (hb : w.1 = l0 ++ [(t, 1)]) (hs : (l0.map Prod.snd).sum = D.R.rS) :
-    Dmin w (D.R.rS + 1) = Dmin w D.R.rS * t := by
+theorem dmin_snoc
+    (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)) (t : D.host.E)
+    (hb : w.1 = l0 ++ [(t, 1)])
+    (hs : (l0.map Prod.snd).sum = D.R.rS)
+    : Dmin w (D.R.rS + 1) = Dmin w D.R.rS * t := by
   rw [dmin_top, dmin_r]
   have hrow : ∀ j : Fin (D.R.rS + 1), j ≠ Fin.last _ → ptMat w (Fin.last _) j = 0 := by
     intro j hj
@@ -492,32 +564,40 @@ theorem dmin_snoc (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)
     omega
   let B : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E :=
     Matrix.of fun x y => if x = Fin.last _ ∧ y = Fin.last _ then 0 else ptMat w x y
-  have hB0 : B.det = 0 := Matrix.det_eq_zero_of_row_eq_zero (Fin.last _) (fun j => by
-    by_cases hj : j = Fin.last _
-    · simp [B, hj]
-    · simp [B, hj, hrow j hj])
-  have hc := det_corner (ptMat w) B (fun x y hxy => by
-    simp only [B, Matrix.of_apply]
-    rw [if_neg hxy])
-  have hsub : B.submatrix Fin.castSucc Fin.castSucc = (ptMat w).submatrix Fin.castSucc Fin.castSucc := by
+  have hB0 : B.det = 0 :=
+    Matrix.det_eq_zero_of_row_eq_zero (Fin.last _) (fun j => by
+      by_cases hj : j = Fin.last _
+      · simp [B, hj]
+      · simp [B, hj, hrow j hj])
+  have hc :=
+    det_corner (ptMat w) B (fun x y hxy => by
+      simp only [B, Matrix.of_apply]
+      rw [if_neg hxy])
+  have hsub
+      : B.submatrix Fin.castSucc Fin.castSucc = (ptMat w).submatrix Fin.castSucc Fin.castSucc := by
     ext x y
     simp [B, Fin.castSucc_ne_last]
   have hBl : B (Fin.last _) (Fin.last _) = 0 := by simp [B]
   rw [hc, hB0, hsub, ptMat_last w l0 t hb hs, hBl]
   ring
 
-theorem amat_last (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
-    (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1)) (ha : modPt δ T T' p w = some a) (l0 : List (D.host.E × ℕ))
-    (t : D.host.E) (hb : w.1 = l0 ++ [(t, 1)]) (hs : (l0.map Prod.snd).sum = D.R.rS) :
-    a.mat (Fin.last _) (Fin.last _) = blkTop δ T T' p (D.R.rS + 1) 1 t := by
+theorem amat_last
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
+    (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1)) (ha : modPt δ T T' p w = some a)
+    (l0 : List (D.host.E × ℕ)) (t : D.host.E) (hb : w.1 = l0 ++ [(t, 1)])
+    (hs : (l0.map Prod.snd).sum = D.R.rS)
+    : a.mat (Fin.last _) (Fin.last _) = blkTop δ T T' p (D.R.rS + 1) 1 t := by
   show Formalism.MainNotions.S.Loc.ptEntryL a.blocks (Fin.last D.R.rS).val (Fin.last D.R.rS).val = _
   rw [ptEntryL_eq, modPt_blocks δ T T' p w a ha, hb, mapBlocks_append, Fin.val_last,
     ptEntry_append_ge _ _ _ _ (by rw [mapBlocks_snd]; omega), if_pos (by rw [mapBlocks_snd]; omega),
     mapBlocks_snd, hs, Nat.sub_self]
   simp [mapBlocks, ptEntry, Nat.add_comm 1 D.R.rS]
 
-theorem zeta_snoc (w : Point D.host.E (D.R.rS + 1)) (h0 : Dmin w D.R.rS ≠ 0) (l0 : List (D.host.E × ℕ))
-    (t : D.host.E) (hb : w.1 = l0 ++ [(t, 1)]) (hs : (l0.map Prod.snd).sum = D.R.rS) : zetaOf w = t := by
+theorem zeta_snoc
+    (w : Point D.host.E (D.R.rS + 1)) (h0 : Dmin w D.R.rS ≠ 0)
+    (l0 : List (D.host.E × ℕ)) (t : D.host.E) (hb : w.1 = l0 ++ [(t, 1)])
+    (hs : (l0.map Prod.snd).sum = D.R.rS)
+    : zetaOf w = t := by
   unfold zetaOf
   rw [dmin_snoc w l0 t hb hs, mul_div_cancel_left₀ t h0]
 

@@ -170,26 +170,30 @@ lemma lam_per {Γ : Subgroup SL(2, ℤ)} [Γ.FiniteIndex] {k : ℕ} (hk : 2 ≤ 
 
 end GlobalTheory.HeckeFamilyMatrices.Par
 
-
 open GlobalTheory.HeckeFamilyMatrices.Par in
-theorem GlobalTheory.HeckeFamilyMatrices.cuspidal_of_per_sub_cj_mem : ∀ (N : ℕ) (Γ : Subgroup SL(2, ℤ)) (k : ℕ), 5 ≤ N → Γ ≤ CongruenceSubgroup.Gamma1 N → Γ.FiniteIndex → 3 ≤ k → ∀ (f : ModularForm Γ (k : ℤ)) (h : CuspForm Γ (k : ℤ)), per Γ (k - 2) ⇑f - cj (per Γ (k - 2) ⇑h) ∈ B1 Γ (k - 2) → ∃ f' : CuspForm Γ (k : ℤ), ⇑f' = ⇑f := by
+theorem GlobalTheory.HeckeFamilyMatrices.cuspidal_of_per_sub_cj_mem
+    : ∀ (N : ℕ) (Γ : Subgroup SL(2, ℤ)) (k : ℕ),
+      5 ≤ N → Γ ≤ CongruenceSubgroup.Gamma1 N → Γ.FiniteIndex → 3 ≤ k
+        → ∀ (f : ModularForm Γ (k : ℤ)) (h : CuspForm Γ (k : ℤ)),
+          per Γ (k - 2) ⇑f - cj (per Γ (k - 2) ⇑h) ∈ B1 Γ (k - 2)
+            → ∃ f' : CuspForm Γ (k : ℤ), ⇑f' = ⇑f := by
   intro N Γ k _ _ hΓ hk f h hB
   have hk2 : 2 ≤ k := by omega
   obtain ⟨p, hp⟩ := hB
   have hall : ∀ σ : SL(2, ℤ), IsZeroAtImInfty ((f : ℍ → ℂ) ∣[(k : ℤ)] σ) := by
     intro σ
-    obtain ⟨n, hn, -, hmem⟩ := Subgroup.exists_pow_mem_of_index_ne_zero hΓ.index_ne_zero
-      (σ * ModularGroup.T * σ⁻¹)
-    have hγ : ((⟨_, hmem⟩ : Γ) : SL(2, ℤ)) * σ = σ * ModularGroup.T ^ (n : ℤ) := by
-      simp [conj_pow]
+    obtain ⟨n, hn, -, hmem⟩ :=
+      Subgroup.exists_pow_mem_of_index_ne_zero hΓ.index_ne_zero (σ * ModularGroup.T * σ⁻¹)
+    have hγ : ((⟨_, hmem⟩ : Γ) : SL(2, ℤ)) * σ = σ * ModularGroup.T ^ (n : ℤ) := by simp [conj_pow]
     set γ : Γ := ⟨_, hmem⟩
     have hf := lam_per hk2 f σ γ n hn hγ
     have hh := lam_per hk2 (ModularFormClass.modularForm h) σ γ n hn hγ
     have hcoe : ((ModularFormClass.modularForm h : ModularForm Γ (k : ℤ)) : ℍ → ℂ) = h := rfl
     rw [hcoe, (CuspFormClass.zero_at_infty_slash h σ).valueAtInfty_eq_zero, mul_zero] at hh
     have h1 := congrArg (lam (k - 2) (mat σ 0 0 : ℤ) (mat σ 1 0 : ℤ)) (congrFun hp γ)
-    simp only [LinearMap.comp_apply, LinearMap.pi_apply, LinearMap.sub_apply, LinearMap.id_apply, map_sub,
-      Pi.sub_apply, cj] at h1
+    simp only [LinearMap.comp_apply, LinearMap.pi_apply, LinearMap.sub_apply, LinearMap.id_apply,
+        map_sub, Pi.sub_apply, cj]
+      at h1
     rw [lambda_slParabolic _ σ γ n hγ, sub_self, lam_conj, hh, hf, map_zero, sub_zero] at h1
     have hv : valueAtInfty ((f : ℍ → ℂ) ∣[(k : ℤ)] σ) = 0 :=
       (mul_eq_zero.mp h1.symm).resolve_left (by exact_mod_cast hn.ne')
@@ -200,8 +204,10 @@ theorem GlobalTheory.HeckeFamilyMatrices.cuspidal_of_per_sub_cj_mem : ∀ (N : �
       rw [ModularForm.SL_slash]
       exact MDifferentiable.slash f.holo' _ _
     have han := analyticAt_cuspFunction_zero hn' hper hhol (ModularFormClass.bdd_at_infty_slash f σ)
-    have h2 : (cuspFunction n ((f : ℍ → ℂ) ∣[(k : ℤ)] σ) ∘ fun τ : ℍ => Function.Periodic.qParam n τ : ℍ → ℂ) =
-        (f : ℍ → ℂ) ∣[(k : ℤ)] σ := by
+    have h2
+        : (cuspFunction n ((f : ℍ → ℂ) ∣[(k : ℤ)] σ) ∘ fun τ : ℍ => Function.Periodic.qParam n τ
+            : ℍ → ℂ)
+          = (f : ℍ → ℂ) ∣[(k : ℤ)] σ := by
       funext τ
       exact eq_cuspFunction τ hn'.ne' hper
     have h3 := han.continuousAt.tendsto.comp (qParam_tendsto_atImInfty hn')

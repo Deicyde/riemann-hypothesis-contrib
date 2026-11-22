@@ -12,19 +12,23 @@ open GlobalTheory.HeckeFamilyMatrices
 
 namespace GlobalTheory.HkInvFin
 
-theorem sigma_dg_mul_eq : ∀ (N l q : ℕ) (σ γ : SL(2, ℤ)), q.Prime → ¬ q ∣ N * l → GlobalTheory.Hk.IsDia N l q σ →
-    γ ∈ GlobalTheory.Hk.lev N l → ¬ (q : ℤ) ∣ mat γ 1 0 → ∃ j' < q, ∃ γ' ∈ GlobalTheory.Hk.lev N l,
-      mat σ * dg q 1 * mat γ = mat γ' * !![(1 : ℤ), (j' : ℤ); 0, (q : ℤ)] := by
+theorem sigma_dg_mul_eq
+    : ∀ (N l q : ℕ) (σ γ : SL(2, ℤ)),
+      q.Prime → ¬ q ∣ N * l → GlobalTheory.Hk.IsDia N l q σ → γ ∈ GlobalTheory.Hk.lev N l
+        → ¬ (q : ℤ) ∣ mat γ 1 0
+        → ∃ j' < q, ∃ γ' ∈ GlobalTheory.Hk.lev N l,
+          mat σ * dg q 1 * mat γ = mat γ' * !![(1 : ℤ), (j' : ℤ); 0, (q : ℤ)] := by
   intro N l q σ γ hq _ hσ hγ hc
   haveI := Fact.mk hq
   have hdetγ : mat γ 0 0 * mat γ 1 1 - mat γ 0 1 * mat γ 1 0 = 1 := by
     have := γ.2; rwa [Matrix.det_fin_two] at this
   have hdetσ : mat σ 0 0 * mat σ 1 1 - mat σ 0 1 * mat σ 1 0 = 1 := by
     have := σ.2; rwa [Matrix.det_fin_two] at this
-  have hcq : ((mat γ 1 0 : ℤ) : ZMod q) ≠ 0 := by
-    rwa [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
-  have hdiv : (q : ℤ) ∣ mat γ 1 1 - mat γ 1 0 *
-      (((mat γ 1 1 : ℤ) : ZMod q) * ((mat γ 1 0 : ℤ) : ZMod q)⁻¹).val := by
+  have hcq : ((mat γ 1 0 : ℤ) : ZMod q) ≠ 0 := by rwa [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
+  have hdiv
+      : (q : ℤ)
+        ∣ mat γ 1 1
+          - mat γ 1 0 * (((mat γ 1 1 : ℤ) : ZMod q) * ((mat γ 1 0 : ℤ) : ZMod q)⁻¹).val := by
     rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
     push_cast
     rw [ZMod.natCast_zmod_val, mul_comm ((mat γ 1 1 : ℤ) : ZMod q), ← mul_assoc,
@@ -70,18 +74,30 @@ theorem sigma_dg_mul_eq : ∀ (N l q : ℕ) (σ γ : SL(2, ℤ)), q.Prime → ¬
     rw [GlobalTheory.Hk.lev, Subgroup.mem_inf, Gamma1_mem, Gamma0_mem]
     refine ⟨⟨?_, ?_, ?_⟩, ?_⟩
     · show ((γ'.1 0 0 : ℤ) : ZMod N) = 1
-      rw [e00]; push_cast; rw [ha', hcN']; linear_combination hdN
+      rw [e00]
+      push_cast
+      rw [ha', hcN']
+      linear_combination hdN
     · show ((γ'.1 1 1 : ℤ) : ZMod N) = 1
-      rw [e11]; push_cast; rw [hsN, h11]; linear_combination -hxN
+      rw [e11]
+      push_cast
+      rw [hsN, h11]
+      linear_combination -hxN
     · show ((γ'.1 1 0 : ℤ) : ZMod N) = 0
-      rw [e10]; push_cast; rw [hsN, hcN']; ring
+      rw [e10]
+      push_cast
+      rw [hsN, hcN']
+      ring
     · show ((γ'.1 1 0 : ℤ) : ZMod l) = 0
-      rw [e10]; push_cast; rw [hsl, hcl']; ring
+      rw [e10]
+      push_cast
+      rw [hsl, hcl']
+      ring
   · show mat σ * dg q 1 * mat γ = (mat σ * δ) * _
     rw [Matrix.mul_assoc, Matrix.mul_assoc]
     congr 1
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [dg, δ, Matrix.mul_apply, Fin.sum_univ_two] <;>
-      first | linear_combination hx | ring
+    fin_cases i <;> fin_cases j <;> simp [dg, δ, Matrix.mul_apply, Fin.sum_univ_two]
+      <;> first | linear_combination hx | ring
 
 end GlobalTheory.HkInvFin

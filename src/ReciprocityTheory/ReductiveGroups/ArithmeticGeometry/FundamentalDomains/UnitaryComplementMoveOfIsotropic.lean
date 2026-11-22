@@ -69,7 +69,9 @@ lemma Hf_eq (x : Frame X.Ψ r) (hx : x ∈ X.dom) (τ : X.Ψ) (u w : Fin r → �
 
 section unitary
 
-variable (x : Frame X.Ψ r) (τ : X.Ψ) (g : Matrix (Fin r) (Fin r) ℂ)
+variable
+  (x : Frame X.Ψ r)
+  (τ : X.Ψ) (g : Matrix (Fin r) (Fin r) ℂ)
   (hg : ∀ u w, hermC τ.1 X.Gm (Matrix.mulVec g u) (Matrix.mulVec g w) = hermC τ.1 X.Gm u w)
 
 include hg
@@ -113,19 +115,23 @@ theorem unitaryComplementMove_of_isotropic : UnitaryComplementMove (E := E) := b
   have hfe : ∀ τ, Matrix.mulVec (h1 τ) (emb τ.1 ξ) = emb τ.1 ξ := by
     intro τ
     have h := congrFun (hfix (fun _ => 1) (fun _ => 0)) τ
-    simp only [applyV, lineV, Jz, Pi.add_apply, one_smul, zero_smul, ppos_zero, smul_zero,
-      sub_zero, add_zero] at h
+    simp only [applyV, lineV, Jz, Pi.add_apply, one_smul, zero_smul, ppos_zero, smul_zero, sub_zero,
+        add_zero]
+      at h
     exact h
-  have hfJ : ∀ τ, Matrix.mulVec (h1 τ) ((2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ) =
-      (2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ := by
+  have hfJ
+      : ∀ τ,
+        Matrix.mulVec (h1 τ) ((2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ)
+          = (2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ := by
     intro τ
     have h := congrFun (hfix (fun _ => 0) (fun _ => -I)) τ
     simp only [applyV, lineV, Jz, Pi.add_apply, zero_smul, zero_add, ppos_smul, smul_smul] at h
-    have e1 : I • (((2 : ℂ) * -I) • X.ppos x τ (emb τ.1 ξ) - -I • emb τ.1 ξ) =
-        (2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ := by
-      rw [smul_sub, smul_smul, smul_smul, show I * (2 * -I) = (2 : ℂ) by
-        linear_combination (-2 : ℂ) * Complex.I_mul_I, show I * -I = (1 : ℂ) by
-        linear_combination (-1 : ℂ) * Complex.I_mul_I, one_smul]
+    have e1
+        : I • (((2 : ℂ) * -I) • X.ppos x τ (emb τ.1 ξ) - -I • emb τ.1 ξ)
+          = (2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ := by
+      rw [smul_sub, smul_smul, smul_smul,
+        show I * (2 * -I) = (2 : ℂ) by linear_combination (-2 : ℂ) * Complex.I_mul_I,
+        show I * -I = (1 : ℂ) by linear_combination (-1 : ℂ) * Complex.I_mul_I, one_smul]
     rw [e1] at h
     exact h
 
@@ -142,7 +148,8 @@ theorem unitaryComplementMove_of_isotropic : UnitaryComplementMove (E := E) := b
       have hG : (Matrix.map X.Gm τ.1).det ≠ 0 := by
         have h := RingHom.map_det τ.1 X.Gm
         rw [show τ.1.mapMatrix X.Gm = X.Gm.map τ.1 from rfl] at h
-        rw [← h]; exact (map_ne_zero _).mpr X.Gm_det
+        rw [← h]
+        exact (map_ne_zero _).mpr X.Gm_det
       by_contra hne
       apply hG
       apply Matrix.exists_vecMul_eq_zero_iff.mp
@@ -150,18 +157,19 @@ theorem unitaryComplementMove_of_isotropic : UnitaryComplementMove (E := E) := b
       funext b
       have := hrad (Pi.single b 1)
       simpa [hermC, Matrix.vecMul, dotProduct, Pi.single_apply, Matrix.map_apply] using this
-    · have : dmin X.Gm x' τ i = dmin X.Gm x τ i := by
-        simp only [dmin]; rw [hgramτ]
-      rw [this]; exact (hx τ).2 i
+    · have : dmin X.Gm x' τ i = dmin X.Gm x τ i := by simp only [dmin]; rw [hgramτ]
+      rw [this]
+      exact (hx τ).2 i
   refine ⟨hdom, ?_, ?_, ?_⟩
-  ·
-    intro u _
+  · intro u _
     funext τ
-    have hJe : (2 : ℂ) • X.ppos x' τ (emb τ.1 ξ) - emb τ.1 ξ =
-        (2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ := by
+    have hJe
+        : (2 : ℂ) • X.ppos x' τ (emb τ.1 ξ) - emb τ.1 ξ
+          = (2 : ℂ) • X.ppos x τ (emb τ.1 ξ) - emb τ.1 ξ := by
       have hp := ppos_unitary X x τ (h1 τ) (hu τ) hx (emb τ.1 ξ)
       rw [hfe τ] at hp
-      rw [show X.ppos x' τ (emb τ.1 ξ) = X.ppos (X.lmulC (fun _ => h1 τ) x) τ (emb τ.1 ξ) from rfl, hp]
+      rw [show X.ppos x' τ (emb τ.1 ξ) = X.ppos (X.lmulC (fun _ => h1 τ) x) τ (emb τ.1 ξ) from rfl,
+        hp]
       rw [← Matrix.mulVec_smul, ← hfe τ, ← Matrix.mulVec_sub, hfe τ, hfJ τ]
     simp only [aproj, lineV]
     rw [Hf_eq X x' hdom, Hf_eq X x' hdom, Hf_eq X x hx, Hf_eq X x hx, hJe]
@@ -171,8 +179,10 @@ theorem unitaryComplementMove_of_isotropic : UnitaryComplementMove (E := E) := b
       have hgp : X.gramPos x' τ = X.gramPos x τ := by simp only [gramPos]; rw [hgramτ]
       simp only [posPart]
       rw [hgp]
-      have hc : ∀ a : Fin X.p0, hermC τ.1 X.Gm (emb τ.1 ξ) (col (mat x' τ) (Fin.castLE X.p0_le a)) =
-          hermC τ.1 X.Gm (emb τ.1 ξ) (col (mat x τ) (Fin.castLE X.p0_le a)) := by
+      have hc
+          : ∀ a : Fin X.p0,
+            hermC τ.1 X.Gm (emb τ.1 ξ) (col (mat x' τ) (Fin.castLE X.p0_le a))
+              = hermC τ.1 X.Gm (emb τ.1 ξ) (col (mat x τ) (Fin.castLE X.p0_le a)) := by
         intro a
         rw [hmat, col_mul]
         conv_lhs => rw [← hfe τ]
@@ -183,12 +193,15 @@ theorem unitaryComplementMove_of_isotropic : UnitaryComplementMove (E := E) := b
     funext τ
     simp only [Jz, applyV]
     have hp := ppos_unitary X x τ (h1 τ) (hu τ) hx (u τ)
-    rw [show X.ppos x' τ (Matrix.mulVec (h1 τ) (u τ)) =
-      X.ppos (X.lmulC (fun _ => h1 τ) x) τ (Matrix.mulVec (h1 τ) (u τ)) from rfl, hp]
+    rw [show X.ppos x' τ (Matrix.mulVec (h1 τ) (u τ))
+          = X.ppos (X.lmulC (fun _ => h1 τ) x) τ (Matrix.mulVec (h1 τ) (u τ)) from
+        rfl,
+      hp]
     rw [Matrix.mulVec_smul, Matrix.mulVec_sub, Matrix.mulVec_smul]
 
 end Data
 
-theorem unitaryComplementMove : UnitaryComplementMove (E := E) := Data.unitaryComplementMove_of_isotropic
+theorem unitaryComplementMove : UnitaryComplementMove (E := E) :=
+  Data.unitaryComplementMove_of_isotropic
 
 end ReciprocityTheory.ChartRestriction.G.FD

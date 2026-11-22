@@ -15,9 +15,10 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial MeasureTheory Filter Topology Matrix ComplexSets
 open scoped ContDiff
 
-theorem LelongLimitGoodPoints.proof (hBr : DivisorGeneralPointBranches.Statement)
-    (hLim : LelongLimitAtBranches.Statement) (hOrd : LocalOrder.Statement) :
-    LelongLimitGoodPoints.Statement := by
+theorem LelongLimitGoodPoints.proof
+    (hBr : DivisorGeneralPointBranches.Statement) (hLim : LelongLimitAtBranches.Statement)
+    (hOrd : LocalOrder.Statement)
+    : LelongLimitGoodPoints.Statement := by
   classical
   intro n d J u φ hJ hdim hu hφ
   obtain ⟨I, hI, hIdim, hgood⟩ := hBr n d J u hJ hdim hu
@@ -35,19 +36,21 @@ theorem LelongLimitGoodPoints.proof (hBr : DivisorGeneralPointBranches.Statement
 
   set O := ⋂ W' ∈ (J ⊔ Ideal.span {linForm u}).minimalPrimes \ {W}, (zeroSet W')ᶜ
   have hO : O ∈ 𝓝 q :=
-    (Filter.biInter_mem
-      ((Ideal.finite_minimalPrimes_of_isNoetherianRing _ _).sdiff)).2 fun W' hW' =>
-      (hclosed W').isOpen_compl.mem_nhds fun h => hW'.2 (hone W' hW'.1 h)
+    (Filter.biInter_mem ((Ideal.finite_minimalPrimes_of_isNoetherianRing _ _).sdiff)).2
+      fun W' hW' => (hclosed W').isOpen_compl.mem_nhds fun h => hW'.2 (hone W' hW'.1 h)
   refine ⟨N ∩ O, Filter.inter_mem hN hO, fun f hf hfc hfN => ?_⟩
-  have hL : (∑ᶠ (W' : Ideal (MvPolynomial (Fin n) ℂ))
-      (_ : W' ∈ (J ⊔ Ideal.span {linForm u}).minimalPrimes),
-      (localMult (J ⊔ Ideal.span {linForm u}) W' : ℝ) * varInt W' d f φ) =
-      (localMult (J ⊔ Ideal.span {linForm u}) W : ℝ) * varInt W d f φ := by
+  have hL
+      : (∑ᶠ (W' : Ideal (MvPolynomial (Fin n) ℂ))
+          (_ : W' ∈ (J ⊔ Ideal.span {linForm u}).minimalPrimes),
+          (localMult (J ⊔ Ideal.span {linForm u}) W' : ℝ) * varInt W' d f φ)
+        = (localMult (J ⊔ Ideal.span {linForm u}) W : ℝ) * varInt W d f φ := by
     rw [finsum_eq_single _ W fun W' hne => ?_, finsum_eq_dif, dite_eq_left hWm]
     rw [finsum_eq_dif]
     split_ifs with hW'
-    · rw [varInt_eq_zero_of_vanish W' f φ fun x hx => image_eq_zero_of_notMem_tsupport fun hxs =>
-        Set.mem_iInter₂.1 (hfN hxs).2 W' ⟨hW', hne⟩ hx, mul_zero]
+    · rw [varInt_eq_zero_of_vanish W' f φ fun x hx =>
+          image_eq_zero_of_notMem_tsupport fun hxs =>
+            Set.mem_iInter₂.1 (hfN hxs).2 W' ⟨hW', hne⟩ hx,
+        mul_zero]
     · rfl
   rw [hL, hmult]
   exact hlim f hf hfc fun x hx => (hfN hx).1

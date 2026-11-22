@@ -12,9 +12,11 @@ open Loc LocE
 
 variable {k : Type} [Field k] {n' c n : ℕ}
 
-theorem embedMatrix_basisVec_apply_of_not_free (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (tt : FC n' (c + 1) n c → k) (i : ℕ) (hi : i < c)
-    (l : Fin (n + c)) (hf : ¬ IsFree n' n c l.1 (n' + i)) :
-    xx1 xj tt (eN k (n' + (c + 1)) (n' + i)) l = if l.1 = n + i then 1 else 0 := by
+theorem embedMatrix_basisVec_apply_of_not_free
+    (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (tt : FC n' (c + 1) n c → k)
+    (i : ℕ) (hi : i < c)
+    (l : Fin (n + c)) (hf : ¬ IsFree n' n c l.1 (n' + i))
+    : xx1 xj tt (eN k (n' + (c + 1)) (n' + i)) l = if l.1 = n + i then 1 else 0 := by
   have hs : n' + i < n' + (c + 1) := by omega
   have he : eN k (n' + (c + 1)) (n' + i) = Pi.single (⟨n' + i, hs⟩ : Fin (n' + (c + 1))) 1 := by
     funext s
@@ -25,8 +27,9 @@ theorem embedMatrix_basisVec_apply_of_not_free (xj : (Fin n' → k) →ₗ[k] (F
       simp
     · have : s ≠ ⟨n' + i, hs⟩ := fun e => h (by rw [e])
       simp [h, this]
-  have key : ∀ (A : Matrix (Fin (n + c)) (Fin (n' + (c + 1))) k) (j : Fin (n' + (c + 1))),
-      Matrix.toLin' A (Pi.single j 1) l = A l j := by
+  have key
+      : ∀ (A : Matrix (Fin (n + c)) (Fin (n' + (c + 1))) k) (j : Fin (n' + (c + 1))),
+        Matrix.toLin' A (Pi.single j 1) l = A l j := by
     intro A j
     rw [Matrix.toLin'_apply, Matrix.mulVec_single_one]
     rfl
@@ -34,14 +37,14 @@ theorem embedMatrix_basisVec_apply_of_not_free (xj : (Fin n' → k) →ₗ[k] (F
   unfold xx1
   rw [key, Matrix.of_apply,
     dite_eq_right (show ¬ IsFree n' n c l.1 (⟨n' + i, hs⟩ : Fin (n' + (c + 1))).1 from hf),
-    dite_eq_right (show ¬ ((⟨n' + i, hs⟩ : Fin (n' + (c + 1))).1 < n') by show ¬ (n' + i < n'); omega)]
+    dite_eq_right (show ¬((⟨n' + i, hs⟩ : Fin (n' + (c + 1))).1 < n') by
+      show ¬ (n' + i < n'); omega)]
   show (if l.1 = n + (n' + i - n') then (1 : k) else 0) = _
   rw [Nat.add_sub_cancel_left]
 
 theorem nElem : NElem := by
   intro k _ n' c n xj tt
   classical
-
   have heN : ∀ (N j : ℕ) (hj : j < N), eN k N j = Pi.single (⟨j, hj⟩ : Fin N) 1 := by
     intro N j hj
     funext s
@@ -52,20 +55,25 @@ theorem nElem : NElem := by
       simp
     · have : s ≠ ⟨j, hj⟩ := fun e => h (by rw [e])
       simp [h, this]
-  have hnf : ∀ (l : Fin (n + c)) (i : ℕ), i < c → (i = 0 ∨ n + i ≤ l.1) →
-      ¬ IsFree n' n c l.1 (n' + i) := by
+  have hnf
+      : ∀ (l : Fin (n + c)) (i : ℕ),
+        i < c → (i = 0 ∨ n + i ≤ l.1) → ¬ IsFree n' n c l.1 (n' + i) := by
     intro l i hi h
     unfold IsFree
     omega
 
-  let M : Matrix (Fin (n + c)) (Fin (n + c)) k := Matrix.of fun l s =>
-    if s.1 < n then (if l = s then 1 else 0)
-    else xx1 xj tt (eN k (n' + (c + 1)) (n' + (s.1 - n))) l
+  let M : Matrix (Fin (n + c)) (Fin (n + c)) k :=
+    Matrix.of fun l s =>
+      if s.1 < n then
+        (if l = s then 1 else 0)
+      else
+        xx1 xj tt (eN k (n' + (c + 1)) (n' + (s.1 - n))) l
   have hM_lt : ∀ l s : Fin (n + c), s.1 < n → M l s = if l = s then 1 else 0 := by
     intro l s hs
     simp [M, hs]
-  have hM_ge : ∀ (l : Fin (n + c)) (j : ℕ) (hj : j < n + c), ¬ j < n →
-      M l ⟨j, hj⟩ = xx1 xj tt (eN k (n' + (c + 1)) (n' + (j - n))) l := by
+  have hM_ge
+      : ∀ (l : Fin (n + c)) (j : ℕ) (hj : j < n + c),
+        ¬ j < n → M l ⟨j, hj⟩ = xx1 xj tt (eN k (n' + (c + 1)) (n' + (j - n))) l := by
     intro l j hj hn
     simp [M, hn]
   have hT : ∀ l s : Fin (n + c), s < l → M l s = 0 := by
@@ -75,7 +83,8 @@ theorem nElem : NElem := by
     · rw [hM_lt l s hs, if_neg (fun h => by rw [h] at hsl'; exact lt_irrefl _ hsl')]
     · have hsc := s.2
       rw [show s = ⟨s.1, s.2⟩ from rfl, hM_ge l s.1 s.2 hs,
-        embedMatrix_basisVec_apply_of_not_free xj tt (s.1 - n) (by omega) l (hnf l (s.1 - n) (by omega) (Or.inr (by omega))),
+        embedMatrix_basisVec_apply_of_not_free xj tt (s.1 - n) (by omega) l
+          (hnf l (s.1 - n) (by omega) (Or.inr (by omega))),
         if_neg (by omega)]
   have hD : ∀ s : Fin (n + c), M s s = 1 := by
     intro s
@@ -83,7 +92,8 @@ theorem nElem : NElem := by
     · rw [hM_lt s s hs, if_pos rfl]
     · have hsc := s.2
       rw [show s = ⟨s.1, s.2⟩ from rfl, hM_ge _ s.1 s.2 hs,
-        embedMatrix_basisVec_apply_of_not_free xj tt (s.1 - n) (by omega) _ (hnf _ (s.1 - n) (by omega) (Or.inr (by simp; omega))),
+        embedMatrix_basisVec_apply_of_not_free xj tt (s.1 - n) (by omega) _
+          (hnf _ (s.1 - n) (by omega) (Or.inr (by simp; omega))),
         if_pos (by simp; omega)]
   have hUT : M.BlockTriangular id := fun i j hij => hT i j hij
   have hdet : IsUnit M.det := by
@@ -99,7 +109,8 @@ theorem nElem : NElem := by
     intro j hj
     rw [heN _ j hj, Matrix.mulVec_single_one]
     rfl
-  have hνcol : ∀ i, i < c → ν (eN k (n + c) (n + i)) = xx1 xj tt (eN k (n' + (c + 1)) (n' + i)) := by
+  have hνcol
+      : ∀ i, i < c → ν (eN k (n + c) (n + i)) = xx1 xj tt (eN k (n' + (c + 1)) (n' + i)) := by
     intro i hi
     rw [hν, hcol (n + i) (by omega)]
     funext l
@@ -142,7 +153,8 @@ theorem nElem : NElem := by
     intro l hl
     have hl' : n + i ≤ l.1 := by simpa using hl
     by_cases hi : i < c
-    · rw [hνcol i hi, Pi.sub_apply, embedMatrix_basisVec_apply_of_not_free xj tt i hi l (hnf l i hi (Or.inr hl'))]
+    · rw [hνcol i hi, Pi.sub_apply,
+        embedMatrix_basisVec_apply_of_not_free xj tt i hi l (hnf l i hi (Or.inr hl'))]
       show (if l.1 = n + i then (1 : k) else 0) - (if l.1 = n + i then 1 else 0) = 0
       exact sub_self _
     · rw [hzero i hi, map_zero, sub_zero]

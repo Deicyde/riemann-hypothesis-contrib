@@ -5,14 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.Gal.Int.Geo.extCont_of :
-    ExtCont := by
+theorem UpperTheory.Gal.Int.Geo.extCont_of : ExtCont := by
   intro Γ F L _ _ _ _ _ _ _ hF M _ _ _ a ha v μ
   induction v using TensorProduct.inductionOn with
   | add x y hx hy =>
@@ -20,8 +21,10 @@ theorem UpperTheory.Gal.Int.Geo.extCont_of :
     exact hx.add hy
   | tmul l m =>
     let b := Module.finBasis F M
-    have key : ∀ g, μ ((LinearMap.baseChange L (a g)) (l ⊗ₜ m)) =
-        ∑ i, algebraMap F L (b.coord i (a g m)) * μ (l ⊗ₜ b i) := by
+    have key
+        : ∀ g,
+          μ ((LinearMap.baseChange L (a g)) (l ⊗ₜ m))
+            = ∑ i, algebraMap F L (b.coord i (a g m)) * μ (l ⊗ₜ b i) := by
       intro g
       rw [LinearMap.baseChange_tmul]
       conv_lhs => rw [← b.sum_repr (a g m)]

@@ -8,10 +8,12 @@ namespace GlobalTheory.FactorOrderExistence
 
 open Filter Topology
 
-theorem exists_factor_order {U : Set ℂ} {g : ℂ → ℂ} (hg : AnalyticOnNhd ℂ g U) {w : ℂ}
-    (hw : w ∈ U) (hord : analyticOrderAt g w ≠ ⊤) :
-    ∃ h : ℂ → ℂ, AnalyticOnNhd ℂ h U ∧
-      (∀ z : ℂ, g z = (z - w) ^ analyticOrderNatAt g w * h z) ∧ h w ≠ (0 : ℂ) := by
+theorem exists_factor_order
+    {U : Set ℂ} {g : ℂ → ℂ} (hg : AnalyticOnNhd ℂ g U)
+    {w : ℂ} (hw : w ∈ U) (hord : analyticOrderAt g w ≠ ⊤)
+    : ∃ h : ℂ → ℂ,
+      AnalyticOnNhd ℂ h U ∧ (∀ z : ℂ, g z = (z - w) ^ analyticOrderNatAt g w * h z)
+        ∧ h w ≠ (0 : ℂ) := by
   classical
   obtain ⟨h0, h0a, h0ne, hev⟩ := ((hg w hw).analyticOrderAt_ne_top).1 hord
   set n := analyticOrderNatAt g w with hn

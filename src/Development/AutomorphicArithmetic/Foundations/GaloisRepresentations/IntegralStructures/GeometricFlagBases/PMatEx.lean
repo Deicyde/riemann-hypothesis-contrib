@@ -5,14 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.Gal.Int.Geo.matEx_of :
-    MatEx := by
+theorem UpperTheory.Gal.Int.Geo.matEx_of : MatEx := by
   intro Γ L _ _ M _ _ a h1 hmul U hU d b
   let f : Γ → (U →ₗ[L] U) := fun g => (a g).restrict (fun x hx => hU g x hx)
   have hfv : ∀ g (x : U), ((f g x : U) : M) = a g (x : M) := fun g x => rfl
@@ -23,14 +24,14 @@ theorem UpperTheory.Gal.Int.Geo.matEx_of :
     intro g h
     ext x
     simp [hfv, hmul]
-  let φ : Γ →* Matrix (Fin d) (Fin d) L :=
-    { toFun := fun g => LinearMap.toMatrix b b (f g)
-      map_one' := by
-        simp only [hf1, LinearMap.toMatrix_id]
-      map_mul' := by
-        intro g h
-        simp only [hfm]
-        exact LinearMap.toMatrix_comp b b b (f g) (f h) }
+  let φ : Γ →* Matrix (Fin d) (Fin d) L := {
+    toFun := fun g => LinearMap.toMatrix b b (f g)
+    map_one' := by simp only [hf1, LinearMap.toMatrix_id]
+    map_mul' := by
+      intro g h
+      simp only [hfm]
+      exact LinearMap.toMatrix_comp b b b (f g) (f h)
+  }
   let ρ : Γ →* GL (Fin d) L := φ.toHomUnits
   have hρ : ∀ g, ((ρ g : GL (Fin d) L) : Matrix (Fin d) (Fin d) L) = LinearMap.toMatrix b b (f g) :=
     fun g => MonoidHom.coe_toHomUnits φ g

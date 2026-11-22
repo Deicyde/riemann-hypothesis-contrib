@@ -16,6 +16,7 @@ theorem quadratic_local_family_holds : GQLFam := by
   refine ⟨hO, hD, hM, ?_, ?_⟩
   · exact Formalism.FourierDecayAlt.P.transfer_joint_smooth _ _ _ _ _ _ _ Φ (Y : ℂ) a b hO hS
   · intro c hc
-    exact Formalism.FourierDecayAlt.P.operator_preserves_fusion_forms _ _ _ _ _ _ _ _ _ _ (Y : ℂ) a b Bs.z_mem Bs.z'_mem (hD c hc) _ (hFF c hc)
+    exact Formalism.FourierDecayAlt.P.operator_preserves_fusion_forms _ _ _ _ _ _ _ _ _ _ (Y : ℂ) a
+      b Bs.z_mem Bs.z'_mem (hD c hc) _ (hFF c hc)
 
 end Formalism.FourierDecayAlt.P.CutMP.Gauge

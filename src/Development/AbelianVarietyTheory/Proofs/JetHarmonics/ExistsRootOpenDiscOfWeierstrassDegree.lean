@@ -23,8 +23,8 @@ def ball (K : Type) [NormedField K] [IsUltrametricDist K] : Subring K where
   zero_mem' := by simp
   neg_mem' := fun {a} ha => by simpa using ha
 
-theorem mem_span_pow (p x : ball K) (n : ℕ) :
-    x ∈ Ideal.span {p} ^ n ↔ ‖(x : K)‖ ≤ ‖(p : K)‖ ^ n := by
+theorem mem_span_pow (p x : ball K) (n : ℕ)
+    : x ∈ Ideal.span {p} ^ n ↔ ‖(x : K)‖ ≤ ‖(p : K)‖ ^ n := by
   rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton']
   constructor
   · rintro ⟨a, rfl⟩
@@ -42,41 +42,47 @@ theorem mem_span_pow (p x : ball K) (n : ℕ) :
       · simp only [Subring.coe_mul, SubmonoidClass.coe_pow]
         exact div_mul_cancel₀ _ hp
 
-theorem smod_iff (p x y : ball K) (n : ℕ) :
-    x ≡ y [SMOD (Ideal.span {p} ^ n • ⊤ : Submodule (ball K) (ball K))] ↔
-      ‖(x : K) - y‖ ≤ ‖(p : K)‖ ^ n := by
+theorem smod_iff (p x y : ball K) (n : ℕ)
+    : x ≡ y [SMOD (Ideal.span {p} ^ n • ⊤ : Submodule (ball K) (ball K))]
+      ↔ ‖(x : K) - y‖ ≤ ‖(p : K)‖ ^ n := by
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, mem_span_pow]
   rfl
 
-theorem adicComplete [CompleteSpace K] (p : ball K) (hp : ‖(p : K)‖ < 1) :
-    IsAdicComplete (Ideal.span {p}) (ball K) := by
+theorem adicComplete [CompleteSpace K] (p : ball K) (hp : ‖(p : K)‖ < 1)
+    : IsAdicComplete (Ideal.span {p}) (ball K) := by
   have ht : Filter.Tendsto (fun n : ℕ => ‖(p : K)‖ ^ n) Filter.atTop (nhds 0) :=
     tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hp
-  have hH : IsHausdorff (Ideal.span {p}) (ball K) := ⟨fun x hx => by
-    have : ‖(x : K)‖ ≤ 0 := ge_of_tendsto' ht fun n => by
-      simpa using (smod_iff p x 0 n).1 (hx n)
-    exact Subtype.ext (by simpa using this)⟩
-  have hP : IsPrecomplete (Ideal.span {p}) (ball K) := ⟨fun f hf => by
-    have hc : CauchySeq fun n => (f n : K) := by
-      refine cauchySeq_of_le_tendsto_0' (fun n => ‖(p : K)‖ ^ n) (fun n m hnm => ?_) ht
-      rw [dist_eq_norm]
-      exact (smod_iff p _ _ n).1 (hf hnm)
-    obtain ⟨L, hL⟩ := cauchySeq_tendsto_of_complete hc
-    have hL1 : ‖L‖ ≤ 1 := le_of_tendsto' hL.norm fun n => (f n).2
-    refine ⟨⟨L, hL1⟩, fun n => (smod_iff p _ _ n).2 ?_⟩
-    refine le_of_tendsto ((tendsto_const_nhds (x := (f n : K))).sub hL).norm ?_
-    filter_upwards [Filter.eventually_ge_atTop n] with m hm
-    exact (smod_iff p _ _ n).1 (hf hm)⟩
+  have hH : IsHausdorff (Ideal.span {p}) (ball K) :=
+    ⟨fun x hx => by
+      have : ‖(x : K)‖ ≤ 0 := ge_of_tendsto' ht fun n => by simpa using (smod_iff p x 0 n).1 (hx n)
+      exact Subtype.ext (by simpa using this)⟩
+  have hP : IsPrecomplete (Ideal.span {p}) (ball K) :=
+    ⟨fun f hf => by
+      have hc : CauchySeq fun n => (f n : K) := by
+        refine cauchySeq_of_le_tendsto_0' (fun n => ‖(p : K)‖ ^ n) (fun n m hnm => ?_) ht
+        rw [dist_eq_norm]
+        exact (smod_iff p _ _ n).1 (hf hnm)
+      obtain ⟨L, hL⟩ := cauchySeq_tendsto_of_complete hc
+      have hL1 : ‖L‖ ≤ 1 := le_of_tendsto' hL.norm fun n => (f n).2
+      refine ⟨⟨L, hL1⟩, fun n => (smod_iff p _ _ n).2 ?_⟩
+      refine le_of_tendsto ((tendsto_const_nhds (x := (f n : K))).sub hL).norm ?_
+      filter_upwards [Filter.eventually_ge_atTop n] with m hm
+      exact (smod_iff p _ _ n).1 (hf hm)⟩
   exact { toIsHausdorff := hH, toIsPrecomplete := hP }
 
-theorem division [CompleteSpace K] (h : PowerSeries K) (d : ℕ) (hd : 0 < d)
+theorem division
+    [CompleteSpace K]
+    (h : PowerSeries K)
+    (d : ℕ) (hd : 0 < d)
     (hi : ∀ n, ‖PowerSeries.coeff n h‖ ≤ 1) (h1 : ‖PowerSeries.coeff d h‖ = 1)
-    (hl : ∀ k < d, ‖PowerSeries.coeff k h‖ < 1) :
-    ∃ (q : PowerSeries K) (r : Polynomial K), (∀ n, ‖PowerSeries.coeff n q‖ ≤ 1) ∧
-      ‖PowerSeries.coeff 0 q‖ = 1 ∧ r.degree < d ∧ (∀ n, ‖r.coeff n‖ < 1) ∧
-      PowerSeries.X ^ d = h * q + (r : PowerSeries K) := by
-  obtain ⟨k, hk, hmax⟩ := Finset.exists_max_image (Finset.range d)
-    (fun k => ‖PowerSeries.coeff k h‖) ⟨0, Finset.mem_range.2 hd⟩
+    (hl : ∀ k < d, ‖PowerSeries.coeff k h‖ < 1)
+    : ∃ (q : PowerSeries K) (r : Polynomial K),
+      (∀ n, ‖PowerSeries.coeff n q‖ ≤ 1) ∧ ‖PowerSeries.coeff 0 q‖ = 1 ∧ r.degree < d
+        ∧ (∀ n, ‖r.coeff n‖ < 1) ∧ PowerSeries.X ^ d = h * q + (r : PowerSeries K) := by
+  obtain ⟨k, hk, hmax⟩ :=
+    Finset.exists_max_image (Finset.range d)
+      (fun k => ‖PowerSeries.coeff k h‖)
+      ⟨0, Finset.mem_range.2 hd⟩
   let g : PowerSeries (ball K) := PowerSeries.mk fun n => ⟨PowerSeries.coeff n h, hi n⟩
   have hg : ∀ n, ((PowerSeries.coeff n g : ball K) : K) = PowerSeries.coeff n h := fun n => by
     simp [g]
@@ -109,18 +115,27 @@ theorem division [CompleteSpace K] (h : PowerSeries K) (d : ℕ) (hd : 0 < d)
   set q := H.div (PowerSeries.X ^ d)
   set r := H.mod (PowerSeries.X ^ d)
   have hdeg : r.degree < d := hord' ▸ HD.degree_lt
-  have hgh : g.map (ball K).subtype = h := by
-    ext n; simp [hg]
-  refine ⟨q.map (ball K).subtype, r.map (ball K).subtype, fun n => ?_, ?_,
-    lt_of_le_of_lt (Polynomial.degree_map_le) hdeg, fun n => ?_, ?_⟩
+  have hgh : g.map (ball K).subtype = h := by ext n; simp [hg]
+  refine ⟨
+    q.map (ball K).subtype,
+    r.map (ball K).subtype,
+    fun n => ?_,
+    ?_,
+    lt_of_le_of_lt (Polynomial.degree_map_le) hdeg,
+    fun n => ?_,
+    ?_
+  ⟩
   · rw [PowerSeries.coeff_map]; exact (PowerSeries.coeff n q).2
   · have e := congrArg (PowerSeries.coeff d) HD.eq_mul_add
     rw [g.eq_X_pow_mul_shift_add_trunc d, add_mul, mul_assoc, map_add (f := _), map_add (f := _),
-      PowerSeries.coeff_X_pow_self, Polynomial.coeff_coe,
-      Polynomial.coeff_eq_zero_of_degree_lt hdeg, add_zero, PowerSeries.coeff_X_pow_mul',
-      if_pos le_rfl, Nat.sub_self, PowerSeries.coeff_mul] at e
+        PowerSeries.coeff_X_pow_self, Polynomial.coeff_coe,
+        Polynomial.coeff_eq_zero_of_degree_lt hdeg, add_zero, PowerSeries.coeff_X_pow_mul',
+        if_pos le_rfl, Nat.sub_self, PowerSeries.coeff_mul]
+      at e
     rw [Finset.Nat.antidiagonal_zero, Finset.sum_singleton] at e
-    have e2 : PowerSeries.coeff d (((g.trunc d : Polynomial (ball K)) : PowerSeries (ball K)) * q) ∈ I := by
+    have e2
+        : PowerSeries.coeff d (((g.trunc d : Polynomial (ball K)) : PowerSeries (ball K)) * q)
+          ∈ I := by
       refine PowerSeries.coeff_mul_mem_ideal_of_coeff_left_mem_ideal' (fun i => ?_) d
       rw [Polynomial.coeff_coe, PowerSeries.coeff_trunc]
       split_ifs with hh
@@ -128,7 +143,9 @@ theorem division [CompleteSpace K] (h : PowerSeries K) (d : ℕ) (hd : 0 < d)
       · exact zero_mem _
     have e3 := ((hmem _).1 e2).trans_lt hp
     have e4 := congrArg (fun z : ball K => (z : K)) e
-    simp only [PowerSeries.coeff_mk, zero_add, Subring.coe_add, Subring.coe_mul, hg, OneMemClass.coe_one] at e4
+    simp only [PowerSeries.coeff_mk, zero_add, Subring.coe_add, Subring.coe_mul, hg,
+        OneMemClass.coe_one]
+      at e4
     rw [PowerSeries.coeff_map]
     refine le_antisymm (PowerSeries.coeff 0 q).2 (not_lt.1 fun hlt => ?_)
     have e5 := congrArg norm e4
@@ -140,7 +157,8 @@ theorem division [CompleteSpace K] (h : PowerSeries K) (d : ℕ) (hd : 0 < d)
     by_cases hn : n < d
     · have := HD.coeff_f_sub_r_mem (i := n) (hord'.symm ▸ hn)
       rw [map_sub, PowerSeries.coeff_X_pow, if_neg hn.ne, zero_sub, neg_mem_iff,
-        Polynomial.coeff_coe] at this
+          Polynomial.coeff_coe]
+        at this
       exact ((hmem _).1 this).trans_lt hp
     · rw [Polynomial.coeff_eq_zero_of_degree_lt (hdeg.trans_le (by exact_mod_cast not_lt.1 hn))]
       simp
@@ -148,13 +166,16 @@ theorem division [CompleteSpace K] (h : PowerSeries K) (d : ℕ) (hd : 0 < d)
     rw [map_pow, PowerSeries.map_X, map_add (f := _), map_mul, hgh] at this
     rw [this, Polynomial.polynomial_map_coe]
 
-theorem root_small [IsAlgClosed K] (r : Polynomial K) (d : ℕ) (hd : 0 < d) (hr : r.degree < d)
-    (hc : ∀ n, ‖r.coeff n‖ < 1) : ∃ x : K, ‖x‖ < 1 ∧ (Polynomial.X ^ d - r).eval x = 0 := by
+theorem root_small
+    [IsAlgClosed K]
+    (r : Polynomial K) (d : ℕ) (hd : 0 < d) (hr : r.degree < d)
+    (hc : ∀ n, ‖r.coeff n‖ < 1)
+    : ∃ x : K, ‖x‖ < 1 ∧ (Polynomial.X ^ d - r).eval x = 0 := by
   have hdeg : (Polynomial.X ^ d - r).degree = (d : WithBot ℕ) := by
     rw [Polynomial.degree_sub_eq_left_of_degree_lt (by rwa [Polynomial.degree_X_pow]),
       Polynomial.degree_X_pow]
-  obtain ⟨x, hx⟩ := IsAlgClosed.exists_root (Polynomial.X ^ d - r)
-    (by rw [hdeg]; exact_mod_cast hd.ne')
+  obtain ⟨x, hx⟩ :=
+    IsAlgClosed.exists_root (Polynomial.X ^ d - r) (by rw [hdeg]; exact_mod_cast hd.ne')
   refine ⟨x, not_le.1 fun h1 => ?_, hx⟩
   have e : x ^ d = ∑ i ∈ Finset.range d, r.coeff i * x ^ i := by
     have := hx.eq_zero
@@ -163,8 +184,9 @@ theorem root_small [IsAlgClosed K] (r : Polynomial K) (d : ℕ) (hd : 0 < d) (hr
     by_cases h0 : r = 0
     · simp [h0]
     exact Polynomial.eval_eq_sum_range' ((Polynomial.natDegree_lt_iff_degree_lt h0).2 hr) x
-  obtain ⟨i, hi, hle⟩ := IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty
-    (t := Finset.range d) ⟨0, Finset.mem_range.2 hd⟩ (fun i => r.coeff i * x ^ i)
+  obtain ⟨i, hi, hle⟩ :=
+    IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty (t := Finset.range d)
+      ⟨0, Finset.mem_range.2 hd⟩ (fun i => r.coeff i * x ^ i)
   rw [← e, norm_mul, norm_pow, norm_pow] at hle
   have h2 : ‖x‖ ^ i ≤ ‖x‖ ^ d := pow_le_pow_right₀ h1 (Finset.mem_range.1 hi).le
   have h3 : 0 < ‖x‖ ^ i := by positivity
@@ -173,13 +195,19 @@ theorem root_small [IsAlgClosed K] (r : Polynomial K) (d : ℕ) (hd : 0 < d) (hr
 
 end GlobalTheory.ConvSer.DiscRoot
 
-theorem GlobalTheory.ConvSer.exists_root_of_weierstrassDegree : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [IsAlgClosed K] (h : PowerSeries K) (d : ℕ), 0 < d → Intg h → ‖PowerSeries.coeff d h‖ = 1 → (∀ k < d, ‖PowerSeries.coeff k h‖ < 1) → ∃ x : K, ‖x‖ < 1 ∧ ev1 h x = 0 := by
+theorem GlobalTheory.ConvSer.exists_root_of_weierstrassDegree
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [IsAlgClosed K]
+        (h : PowerSeries K) (d : ℕ),
+      0 < d → Intg h → ‖PowerSeries.coeff d h‖ = 1 → (∀ k < d, ‖PowerSeries.coeff k h‖ < 1)
+        → ∃ x : K, ‖x‖ < 1 ∧ ev1 h x = 0 := by
   intro K _ _ _ _ h d hd hi h1 hl
-  obtain ⟨-, -, hA, -, -, -, -, -, -, hB⟩ := GlobalTheory.T.mvPowerSeries_integral_bounded_closure K Unit
+  obtain ⟨-, -, hA, -, -, -, -, -, -, hB⟩ :=
+    GlobalTheory.T.mvPowerSeries_integral_bounded_closure K Unit
   obtain ⟨q, r, hq, hq0, hr, hrc, e⟩ := DiscRoot.division h d hd ((hB h).1.1 hi) h1 hl
   obtain ⟨x, hx, hx0⟩ := DiscRoot.root_small r d hd hr hrc
   refine ⟨x, hx, ?_⟩
-  obtain ⟨-, hmul, -, -, hP, -, hI, -⟩ := GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K x hx
+  obtain ⟨-, hmul, -, -, hP, -, hI, -⟩ :=
+    GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K x hx
   have hq' : Intg q := (hB q).1.2 hq
   have e2 : ((Polynomial.X ^ d - r : Polynomial K) : PowerSeries K) = h * q := by
     rw [Polynomial.coe_sub, Polynomial.coe_pow, Polynomial.coe_X, e]; ring

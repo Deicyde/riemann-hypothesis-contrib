@@ -18,23 +18,29 @@ def phiO (φ : E →ₐ[F] E) : 𝓞 E →+* 𝓞 E := RingOfIntegers.mapRingHom
 
 theorem coe_phiO (φ : E →ₐ[F] E) (y : 𝓞 E) : ((phiO φ y : 𝓞 E) : E) = φ (y : E) := rfl
 
-theorem phiO_comp (φ : E →ₐ[F] E) :
-    (phiO φ).comp (algebraMap (𝓞 F) (𝓞 E)) = algebraMap (𝓞 F) (𝓞 E) := by
+theorem phiO_comp (φ : E →ₐ[F] E)
+    : (phiO φ).comp (algebraMap (𝓞 F) (𝓞 E)) = algebraMap (𝓞 F) (𝓞 E) := by
   refine RingHom.ext fun f => RingOfIntegers.ext ?_
   rw [RingHom.comp_apply, coe_phiO]
   have h : ((algebraMap (𝓞 F) (𝓞 E) f : 𝓞 E) : E) = algebraMap F E (f : F) := rfl
   rw [h]
   exact φ.commutes _
 
-theorem map_phiO_pow (φ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
-    (hin : Formalism.UG.IsInertAt F E v w) (n : ℕ) :
-    Ideal.map (phiO φ) (w.asIdeal ^ n) = w.asIdeal ^ n := by
+theorem map_phiO_pow
+    (φ : E →ₐ[F] E)
+    (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
+    (hin : Formalism.UG.IsInertAt F E v w)
+    (n : ℕ)
+    : Ideal.map (phiO φ) (w.asIdeal ^ n) = w.asIdeal ^ n := by
   unfold Formalism.UG.IsInertAt at hin
   rw [← hin, ← Ideal.map_pow, Ideal.map_map, phiO_comp]
 
-theorem intVal_phi_le (φ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
-    (hin : Formalism.UG.IsInertAt F E v w) (y : 𝓞 E) :
-    w.intValuation (phiO φ y) ≤ w.intValuation y := by
+theorem intVal_phi_le
+    (φ : E →ₐ[F] E)
+    (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
+    (hin : Formalism.UG.IsInertAt F E v w)
+    (y : 𝓞 E)
+    : w.intValuation (phiO φ y) ≤ w.intValuation y := by
   rcases eq_or_ne y 0 with rfl | hy
   · rw [map_zero]
   have h0 : w.intValuation y ≠ 0 := w.intValuation_ne_zero y hy
@@ -56,9 +62,12 @@ theorem bij (σ : E →ₐ[F] E) : Function.Bijective σ := by
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   exact σ.bijective
 
-theorem intVal_phi (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
-    (hin : Formalism.UG.IsInertAt F E v w) (y : 𝓞 E) :
-    w.intValuation (phiO σ y) = w.intValuation y := by
+theorem intVal_phi
+    (σ : E →ₐ[F] E)
+    (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
+    (hin : Formalism.UG.IsInertAt F E v w)
+    (y : 𝓞 E)
+    : w.intValuation (phiO σ y) = w.intValuation y := by
   refine le_antisymm (intVal_phi_le σ v w hin y) ?_
   let τ : E ≃ₐ[F] E := AlgEquiv.ofBijective σ (bij σ)
   have h := intVal_phi_le (τ.symm : E →ₐ[F] E) v w hin (phiO σ y)
@@ -69,9 +78,10 @@ theorem intVal_phi (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (w : He
     exact τ.symm_apply_apply _
   rwa [e] at h
 
-theorem val_conj : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E)),
-    Formalism.UG.IsInertAt F E v w → ∀ x : E, w.valuation E (σ x) = w.valuation E x := by
+theorem val_conj
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E)),
+      Formalism.UG.IsInertAt F E v w → ∀ x : E, w.valuation E (σ x) = w.valuation E x := by
   intro F E _ _ _ _ _ σ v w hin x
   obtain ⟨a, s, -, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 E) x
   rw [map_div₀, map_div₀, map_div₀]

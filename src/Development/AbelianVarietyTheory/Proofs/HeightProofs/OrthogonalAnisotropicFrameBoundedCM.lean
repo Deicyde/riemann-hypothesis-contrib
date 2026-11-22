@@ -12,11 +12,13 @@ namespace GlobalTheory.SmoothForms
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_small_anisotropic_mem {V : Type} [AddCommGroup V] [Module E V] {h : V →ₗ[E] V →ₗ⋆[E] E}
-    {Λ : Submodule ℤ V} {N : ℤ} {ν : V → ℝ} {B₀ : ℝ} (H : Sized h Λ N ν B₀) {B : ℝ} (hB : 2 ≤ B)
+theorem exists_small_anisotropic_mem
+    {V : Type} [AddCommGroup V] [Module E V]
+    {h : V →ₗ[E] V →ₗ⋆[E] E} {Λ : Submodule ℤ V} {N : ℤ} {ν : V → ℝ} {B₀ : ℝ} (H : Sized h Λ N ν B₀)
+    {B : ℝ} (hB : 2 ≤ B)
     {W : Submodule E V} (hW : W ≠ ⊥) (hnd : ∀ y ∈ W, (∀ x ∈ W, h y x = 0) → y = 0)
-    (hsp : W ≤ Submodule.span E {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B}) :
-    ∃ v, v ∈ Λ ∧ v ∈ W ∧ h v v ≠ 0 ∧ ν v ≤ B ^ 4 := by
+    (hsp : W ≤ Submodule.span E {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B})
+    : ∃ v, v ∈ Λ ∧ v ∈ W ∧ h v v ≠ 0 ∧ ν v ≤ B ^ 4 := by
   have hB1 : B ≤ B ^ 4 := le_self_pow₀ (by linarith) (by norm_num)
   obtain ⟨x, ⟨hx1, hx2, hx3⟩, hx0⟩ : ∃ x ∈ {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B}, x ≠ 0 := by
     by_contra hc
@@ -35,11 +37,16 @@ theorem exists_small_anisotropic_mem {V : Type} [AddCommGroup V] [Module E V] {h
   by_cases hyy : h y y = 0
   swap
   · exact ⟨y, hy1, hy2, hyy, hy3.trans hB1⟩
-  refine ⟨x + h x y • y, Λ.add_mem hx1 (H.stable _ (H.int x hx1 y hy1) y hy1),
-    W.add_mem hx2 (W.smul_mem _ hy2), ?_, ?_⟩
+  refine ⟨
+    x + h x y • y,
+    Λ.add_mem hx1 (H.stable _ (H.int x hx1 y hy1) y hy1),
+    W.add_mem hx2 (W.smul_mem _ hy2),
+    ?_,
+    ?_
+  ⟩
   · have : h (x + h x y • y) (x + h x y • y) = 2 * (h x y * star (h x y)) := by
-      simp only [map_add (f := _), LinearMap.add_apply, map_smulₛₗ, LinearMap.smul_apply, hxx, hyy, H.symm x y,
-        smul_eq_mul, RingHom.id_apply, starRingEnd_apply]
+      simp only [map_add (f := _), LinearMap.add_apply, map_smulₛₗ, LinearMap.smul_apply, hxx, hyy,
+        H.symm x y, smul_eq_mul, RingHom.id_apply, starRingEnd_apply]
       ring
     rw [this]
     exact mul_ne_zero two_ne_zero (mul_ne_zero hxy (star_ne_zero.2 hxy))
@@ -52,15 +59,26 @@ theorem exists_small_anisotropic_mem {V : Type} [AddCommGroup V] [Module E V] {h
     have := H.add_le x (h x y • y)
     nlinarith
 
-theorem exists_small_frame_mem (n : ℕ) : ∃ k : ℕ, ∀ (V : Type) [AddCommGroup V] [Module E V] [FiniteDimensional E V]
-    (h : V →ₗ[E] V →ₗ⋆[E] E) (Λ : Submodule ℤ V) (N : ℤ) (ν : V → ℝ) (B₀ : ℝ), Sized h Λ N ν B₀ →
-    ∀ B : ℝ, 2 ≤ B → ∀ W : Submodule E V, Module.finrank E W = n → (∀ y ∈ W, (∀ x ∈ W, h y x = 0) → y = 0) →
-    W ≤ Submodule.span E {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B} →
-    ∃ v : Fin n → V, (∀ i, v i ∈ Λ ∧ v i ∈ W) ∧ (∀ i j, i ≠ j → h (v i) (v j) = 0) ∧
-      ∀ i, h (v i) (v i) ≠ 0 ∧ ν (v i) ≤ B ^ k := by
+theorem exists_small_frame_mem (n : ℕ)
+    : ∃ k : ℕ,
+      ∀ (V : Type) [AddCommGroup V] [Module E V] [FiniteDimensional E V] (h : V →ₗ[E] V →ₗ⋆[E] E)
+          (Λ : Submodule ℤ V) (N : ℤ) (ν : V → ℝ) (B₀ : ℝ),
+        Sized h Λ N ν B₀
+          → ∀ B : ℝ,
+            2 ≤ B
+              → ∀ W : Submodule E V,
+                Module.finrank E W = n → (∀ y ∈ W, (∀ x ∈ W, h y x = 0) → y = 0)
+                  → W ≤ Submodule.span E {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B}
+                  → ∃ v : Fin n → V,
+                    (∀ i, v i ∈ Λ ∧ v i ∈ W) ∧ (∀ i j, i ≠ j → h (v i) (v j) = 0)
+                      ∧ ∀ i, h (v i) (v i) ≠ 0 ∧ ν (v i) ≤ B ^ k := by
   induction n with
-  | zero => exact ⟨0, fun V _ _ _ h Λ N ν B₀ H B hB W hn hnd hsp =>
-      ⟨Fin.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩⟩
+  | zero =>
+    exact ⟨
+      0,
+      fun V _ _ _ h Λ N ν B₀ H B hB W hn hnd hsp =>
+        ⟨Fin.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩
+    ⟩
   | succ n ih =>
     obtain ⟨k, ih⟩ := ih
     refine ⟨10 * k + 4, fun V _ _ _ h Λ N ν B₀ H B hB W hn hnd hsp => ?_⟩
@@ -91,8 +109,7 @@ theorem exists_small_frame_mem (n : ℕ) : ∃ k : ℕ, ∀ (V : Type) [AddCommG
       rw [Submodule.finrank_map_subtype_eq]
       omega
     let P : V →ₗ[E] V := h v v • LinearMap.id - (h.flip v).smulRight v
-    have hP : ∀ x, P x = h v v • x + (-h x v) • v := fun x => by
-      simp [P, sub_eq_add_neg]
+    have hP : ∀ x, P x = h v v • x + (- h x v) • v := fun x => by simp [P, sub_eq_add_neg]
     have hPW : ∀ x ∈ W, P x ∈ W' := fun x hx => by
       rw [hmem, hP]
       refine ⟨W.add_mem (W.smul_mem _ hx) (W.smul_mem _ hv2), ?_⟩
@@ -103,29 +120,34 @@ theorem exists_small_frame_mem (n : ℕ) : ∃ k : ℕ, ∀ (V : Type) [AddCommG
       refine hnd y hy1 fun x hx => ?_
       have h1 := hy0 _ (hPW x hx)
       rw [hP] at h1
-      simp only [map_add (f := _), map_smulₛₗ, hy2, smul_eq_mul, mul_zero, add_zero, starRingEnd_apply] at h1
+      simp only [map_add (f := _), map_smulₛₗ, hy2, smul_eq_mul, mul_zero, add_zero,
+          starRingEnd_apply]
+        at h1
       exact (mul_eq_zero.1 h1).resolve_left (star_ne_zero.2 hv3)
     have hsp' : W' ≤ Submodule.span E {x | x ∈ Λ ∧ x ∈ W' ∧ ν x ≤ B ^ 10} := by
-      have h1 : Submodule.span E {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B} ≤
-          (Submodule.span E {x | x ∈ Λ ∧ x ∈ W' ∧ ν x ≤ B ^ 10}).comap P := by
+      have h1
+          : Submodule.span E {x | x ∈ Λ ∧ x ∈ W ∧ ν x ≤ B}
+            ≤ (Submodule.span E {x | x ∈ Λ ∧ x ∈ W' ∧ ν x ≤ B ^ 10}).comap P := by
         refine Submodule.span_le.2 ?_
         rintro x ⟨hx1, hx2, hx3⟩
         refine Submodule.subset_span ⟨?_, hPW x hx2, ?_⟩
         · rw [hP]
-          exact Λ.add_mem (H.stable _ (H.int v hv1 v hv1) x hx1) (H.stable _ (H.int x hx1 v hv1).neg v hv1)
+          exact Λ.add_mem (H.stable _ (H.int v hv1 v hv1) x hx1)
+            (H.stable _ (H.int x hx1 v hv1).neg v hv1)
         · rw [hP]
           have a1 : house (h v v) ≤ B ^ 4 * B ^ 4 :=
             (H.form_le v v).trans (mul_le_mul hv4 hv4 (H.nonneg _) (by positivity))
-          have a2 : house (-h x v) ≤ B * B ^ 4 := by
-            have : house (-h x v) = house (h x v) := by simp [house]
+          have a2 : house (- h x v) ≤ B * B ^ 4 := by
+            have : house (- h x v) = house (h x v) := by simp [house]
             rw [this]
             exact (H.form_le x v).trans (mul_le_mul hx3 hv4 (H.nonneg _) h0)
           have a3 : ν (h v v • x) ≤ B ^ 4 * B ^ 4 * B :=
             (H.smul_le _ _).trans (mul_le_mul a1 hx3 (H.nonneg _) (by positivity))
-          have a4 : ν ((-h x v) • v) ≤ B * B ^ 4 * B ^ 4 :=
+          have a4 : ν ((- h x v) • v) ≤ B * B ^ 4 * B ^ 4 :=
             (H.smul_le _ _).trans (mul_le_mul a2 hv4 (H.nonneg _) (by positivity))
           have a5 : 2 * B ^ 9 ≤ B * B ^ 9 := mul_le_mul_of_nonneg_right hB (by positivity)
-          calc _ ≤ _ := H.add_le _ _
+          calc
+            _ ≤ _ := H.add_le _ _
             _ ≤ _ := add_le_add a3 a4
             _ = 2 * B ^ 9 := by ring
             _ ≤ B * B ^ 9 := a5
@@ -135,8 +157,8 @@ theorem exists_small_frame_mem (n : ℕ) : ∃ k : ℕ, ∀ (V : Type) [AddCommG
       have h2 : P x ∈ Submodule.span E {x | x ∈ Λ ∧ x ∈ W' ∧ ν x ≤ B ^ 10} := h1 (hsp hx1)
       rw [hP, hx2, neg_zero, zero_smul, add_zero] at h2
       exact (Submodule.smul_mem_iff _ hv3).1 h2
-    obtain ⟨w, hw1, hw2, hw3⟩ := ih V h Λ N ν B₀ H (B ^ 10)
-      (hB.trans (le_self_pow₀ hB1 (by norm_num))) W' hrank hnd' hsp'
+    obtain ⟨w, hw1, hw2, hw3⟩ :=
+      ih V h Λ N ν B₀ H (B ^ 10) (hB.trans (le_self_pow₀ hB1 (by norm_num))) W' hrank hnd' hsp'
     have hwv : ∀ i, h (w i) v = 0 := fun i => ((hmem _).1 (hw1 i).2).2
     refine ⟨Fin.cons v w, ?_, ?_, ?_⟩
     · intro i
@@ -162,8 +184,10 @@ theorem frameSmall : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Fra
   intro E _ _ _ n
   obtain ⟨k, hk⟩ := exists_small_frame_mem (E := E) n
   refine ⟨k, fun V _ _ _ h Λ N ν B hn H => ?_⟩
-  obtain ⟨v, h1, h2, h3⟩ := hk V h Λ N ν B H B H.two_le ⊤ (by rw [finrank_top, hn])
-    (fun y _ hy => H.nondeg y fun x => hy x trivial) (by simp [H.span])
+  obtain ⟨v, h1, h2, h3⟩ :=
+    hk V h Λ N ν B H B H.two_le ⊤ (by rw [finrank_top, hn])
+      (fun y _ hy => H.nondeg y fun x => hy x trivial)
+      (by simp [H.span])
   exact ⟨v, fun i => (h1 i).1, h2, h3⟩
 
 end GlobalTheory.SmoothForms

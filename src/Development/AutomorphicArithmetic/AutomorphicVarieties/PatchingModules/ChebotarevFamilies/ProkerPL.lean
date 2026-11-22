@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.prokerPL :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (I : Type) [Group I] [TopologicalSpace I] [IsTopologicalGroup I] (f : I →* Γ) (H : Subgroup Γ), Continuous f → (∀ g, f g ∈ H) → ∀ g ∈ GlobalTheory.TameQuot.proKer l I, f g ∈ PL l H := by
+theorem UpperTheory.V.Pa.prokerPL
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (I : Type) [Group I] [TopologicalSpace I]
+        [IsTopologicalGroup I] (f : I →* Γ) (H : Subgroup Γ),
+      Continuous f → (∀ g, f g ∈ H) → ∀ g ∈ GlobalTheory.TameQuot.proKer l I, f g ∈ PL l H := by
   intro l _ Γ _ _ _ _ _ I _ _ _ f H hf hfH g hg
   unfold PL
   simp only [Subgroup.mem_iInf]
@@ -30,7 +34,8 @@ theorem UpperTheory.V.Pa.prokerPL :
   have hopen : IsOpen (φ.ker : Set I) := by
     rw [hker]
     exact U.isOpen.preimage hf
-  have h2 := GlobalTheory.TameQuot.mem_proKer.1 hg φ.ker inferInstance hopen
-    ⟨n, by rw [Subgroup.index_ker, hn]⟩
+  have h2 :=
+    GlobalTheory.TameQuot.mem_proKer.1 hg φ.ker inferInstance hopen
+      ⟨n, by rw [Subgroup.index_ker, hn]⟩
   rw [hker] at h2
   exact h2

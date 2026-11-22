@@ -18,32 +18,42 @@ open Formalism.L2.Th1.A (shortW)
 
 variable {l : ℕ} [Fact l.Prime] {g2 g3 : ℂ_[l]}
 
-theorem cubic_close {C : Type} [NormedField C] [IsUltrametricDist C] {x a p q : C} (hx : ‖x‖ ≤ 1)
-    (ha : ‖a‖ ≤ 1) (hp : ‖p‖ ≤ 1) (hxa : ‖x - a‖ < 1) :
-    ‖(a ^ 3 + p * a + q) - (x ^ 3 + p * x + q)‖ < 1 := by
-  have e : (a ^ 3 + p * a + q) - (x ^ 3 + p * x + q) = (a - x) * (a ^ 2 + a * x + x ^ 2 + p) := by ring
+theorem cubic_close
+    {C : Type} [NormedField C] [IsUltrametricDist C]
+    {x a p q : C} (hx : ‖x‖ ≤ 1) (ha : ‖a‖ ≤ 1) (hp : ‖p‖ ≤ 1) (hxa : ‖x - a‖ < 1)
+    : ‖(a ^ 3 + p * a + q) - (x ^ 3 + p * x + q)‖ < 1 := by
+  have e : (a ^ 3 + p * a + q) - (x ^ 3 + p * x + q) = (a - x) * (a ^ 2 + a * x + x ^ 2 + p) := by
+    ring
   rw [e, norm_mul]
   have h1 : ‖a ^ 2‖ ≤ 1 := by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) ha
   have h2 : ‖a * x‖ ≤ 1 := by rw [norm_mul]; exact mul_le_one₀ ha (norm_nonneg _) hx
   have h3 : ‖x ^ 2‖ ≤ 1 := by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hx
   have hb : ‖a ^ 2 + a * x + x ^ 2 + p‖ ≤ 1 :=
-    (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ((IsUltrametricDist.norm_add_le_max _ _).trans
-      (max_le ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 h2)) h3)) hp)
+    (IsUltrametricDist.norm_add_le_max _ _).trans
+      (max_le
+        ((IsUltrametricDist.norm_add_le_max _ _).trans
+          (max_le ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 h2)) h3))
+        hp)
   rw [norm_sub_rev] at hxa
-  calc ‖a - x‖ * ‖a ^ 2 + a * x + x ^ 2 + p‖ ≤ ‖a - x‖ * 1 := mul_le_mul_of_nonneg_left hb (norm_nonneg _)
+  calc
+    ‖a - x‖ * ‖a ^ 2 + a * x + x ^ 2 + p‖
+      ≤ ‖a - x‖ * 1 := mul_le_mul_of_nonneg_left hb (norm_nonneg _)
     _ < 1 := by rw [mul_one]; exact hxa
 
-theorem norm_one_of_close {C : Type} [NormedField C] [IsUltrametricDist C] {c d : C} (hd : ‖d‖ = 1)
-    (h : ‖c - d‖ < 1) : ‖c‖ = 1 := by
+theorem norm_one_of_close
+    {C : Type} [NormedField C] [IsUltrametricDist C] {c d : C} (hd : ‖d‖ = 1) (h : ‖c - d‖ < 1)
+    : ‖c‖ = 1 := by
   have hne : ‖d‖ ≠ ‖c - d‖ := by rw [hd]; exact (ne_of_lt h).symm
   have h2 := IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hne
   rw [add_sub_cancel, hd] at h2
   rw [h2]
   exact max_eq_left h.le
 
-theorem tor_lift (h : GoodPair l g2 g3) (P : (shortW g2 g3).toAffine.Point) (hP0 : P ≠ 0)
-    (hx : ‖px _ P‖ ≤ 1) (hy : ‖py _ P‖ = 1) :
-    ∃ Q : (shortW g2 g3).toAffine.Point, InSub (MaximalUnramifiedExtension l) Q ∧ InFormalGroupPoints (P - Q) := by
+theorem tor_lift
+    (h : GoodPair l g2 g3)
+    (P : (shortW g2 g3).toAffine.Point) (hP0 : P ≠ 0) (hx : ‖px _ P‖ ≤ 1) (hy : ‖py _ P‖ = 1)
+    : ∃ Q : (shortW g2 g3).toAffine.Point,
+      InSub (MaximalUnramifiedExtension l) Q ∧ InFormalGroupPoints (P - Q) := by
   have hI := good_int h
   have hC := good_coeff h
   obtain ⟨-, -, -, h4, h6, -⟩ := hI
@@ -97,8 +107,10 @@ theorem tor_lift (h : GoodPair l g2 g3) (P : (shortW g2 g3).toAffine.Point) (hP0
     exfalso
     obtain ⟨d0, dx, -⟩ := integral_of_not_mem_formalGroup h _ h1
     obtain ⟨s0, sx, -⟩ := integral_of_not_mem_formalGroup h _ h2
-    have hu := Formalism.L2.Th1.E.UnitDiff_of Formalism.L2.Th1.E.nonsingular_norm ℂ_[l] (shortW g2 g3) (good_int h) P Q
-      hP0 (WeierstrassCurve.Affine.Point.some_ne_zero _) s0 d0 hx hy.le ha1 hb1.le sx dx
+    have hu :=
+      Formalism.L2.Th1.E.UnitDiff_of Formalism.L2.Th1.E.nonsingular_norm ℂ_[l] (shortW g2 g3)
+        (good_int h) P Q hP0 (WeierstrassCurve.Affine.Point.some_ne_zero _) s0 d0 hx hy.le ha1
+        hb1.le sx dx
     change ‖x - a‖ = 1 at hu
     exact absurd hu hxa.ne
 

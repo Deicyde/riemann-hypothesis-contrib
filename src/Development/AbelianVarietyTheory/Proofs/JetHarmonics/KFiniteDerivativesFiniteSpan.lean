@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DerivedAction
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -22,19 +23,25 @@ def lieSubspace (k r : ℕ) : Submodule ℝ (Mx k r) where
   carrier := {X | InLieHpk k r X}
   add_mem' := fun {X Y} hX hY => by
     simp only [Set.mem_setOf_eq, InLieHpk] at *
-    rw [Matrix.conjTranspose_add, Matrix.add_mul, Matrix.mul_add, add_add_add_comm, hX, hY, add_zero]
+    rw [Matrix.conjTranspose_add, Matrix.add_mul, Matrix.mul_add, add_add_add_comm, hX, hY,
+      add_zero]
   zero_mem' := by simp [InLieHpk]
   smul_mem' := fun c X hX => by
     simp only [Set.mem_setOf_eq, InLieHpk] at *
-    rw [Matrix.conjTranspose_smul, star_trivial, Matrix.smul_mul, Matrix.mul_smul, ← smul_add, hX, smul_zero]
+    rw [Matrix.conjTranspose_smul, star_trivial, Matrix.smul_mul, Matrix.mul_smul, ← smul_add, hX,
+      smul_zero]
 
-theorem exists_box_generators (k r : ℕ) : ∃ (J : Type) (_ : Fintype J) (Z : J → Mx k r),
-    (∀ j, InLieHpk k r (Z j)) ∧ ∀ Y, B.unitLie k r Y → ∃ c : J → ℝ, (∀ j, |c j| ≤ 1) ∧ Y = ∑ j, c j • Z j := by
-  obtain ⟨P, hP⟩ := (lieSubspace k r).subtype.exists_leftInverse_of_injective (Submodule.ker_subtype _)
+theorem exists_box_generators (k r : ℕ)
+    : ∃ (J : Type) (_ : Fintype J) (Z : J → Mx k r),
+      (∀ j, InLieHpk k r (Z j))
+        ∧ ∀ Y, B.unitLie k r Y → ∃ c : J → ℝ, (∀ j, |c j| ≤ 1) ∧ Y = ∑ j, c j • Z j := by
+  obtain ⟨P, hP⟩ :=
+    (lieSubspace k r).subtype.exists_leftInverse_of_injective (Submodule.ker_subtype _)
   let n := Fin (2 * r + k + 1)
   let E : (n × n) ⊕ (n × n) → Mx k r :=
     Sum.elim (fun p => Matrix.single p.1 p.2 1) (fun p => Matrix.single p.1 p.2 Complex.I)
-  refine ⟨(n × n) ⊕ (n × n), inferInstance, fun j => (P (E j)).1, fun j => (P (E j)).2, fun Y hY => ?_⟩
+  refine
+    ⟨(n × n) ⊕ (n × n), inferInstance, fun j => (P (E j)).1, fun j => (P (E j)).2, fun Y hY => ?_⟩
   let c : (n × n) ⊕ (n × n) → ℝ := Sum.elim (fun p => (Y p.1 p.2).re) (fun p => (Y p.1 p.2).im)
   refine ⟨c, ?_, ?_⟩
   · rintro (p | p)
@@ -51,14 +58,19 @@ theorem exists_box_generators (k r : ℕ) : ∃ (J : Type) (_ : Fintype J) (Z : 
     have h2 : (P Y).1 = Y := by
       have := LinearMap.congr_fun hP ⟨Y, hYL⟩
       exact congrArg Subtype.val this
-    calc Y = (P Y).1 := h2.symm
+    calc
+      Y = (P Y).1 := h2.symm
       _ = (P (∑ j, c j • E j)).1 := by rw [← h1]
       _ = _ := by simp [map_sum]
 
-theorem dsig_sum_letter {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {σ : Mx k r → (H →L[ℂ] H)}
-    {J : Type} [Fintype J] {Z : J → Mx k r} (hZ : ∀ j, InLieHpk k r (Z j)) (c : J → ℝ) {v : H}
-    (hv : v ∈ smoothVecs (k := k) (r := r) σ) :
-    dsig (k := k) (r := r) σ (∑ j, c j • Z j) v = ∑ j, (c j : ℂ) • dsig (k := k) (r := r) σ (Z j) v := by
+theorem dsig_sum_letter
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Mx k r → (H →L[ℂ] H)} {J : Type} [Fintype J]
+    {Z : J → Mx k r} (hZ : ∀ j, InLieHpk k r (Z j))
+    (c : J → ℝ)
+    {v : H} (hv : v ∈ smoothVecs (k := k) (r := r) σ)
+    : dsig (k := k) (r := r) σ (∑ j, c j • Z j) v
+      = ∑ j, (c j : ℂ) • dsig (k := k) (r := r) σ (Z j) v := by
   obtain ⟨L, hL⟩ := exists_lin hv
   have hm : (∑ j, c j • Z j) ∈ lieSubspace k r :=
     Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hZ j)
@@ -67,9 +79,13 @@ theorem dsig_sum_letter {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, (hL _ (hZ j)).1, Complex.coe_smul]
 
-theorem dsig_sum_vec (R : Rep k r) {X : Mx k r} (hX : InLieHpk k r X) {ι : Type} (s : Finset ι) (c : ι → ℂ)
-    {v : ι → R.H} (hv : ∀ i, v i ∈ R.sm) :
-    dsig (k := k) (r := r) R.σ X (∑ i ∈ s, c i • v i) = ∑ i ∈ s, c i • dsig (k := k) (r := r) R.σ X (v i) := by
+theorem dsig_sum_vec
+    (R : Rep k r)
+    {X : Mx k r} (hX : InLieHpk k r X)
+    {ι : Type} (s : Finset ι) (c : ι → ℂ)
+    {v : ι → R.H} (hv : ∀ i, v i ∈ R.sm)
+    : dsig (k := k) (r := r) R.σ X (∑ i ∈ s, c i • v i)
+      = ∑ i ∈ s, c i • dsig (k := k) (r := r) R.σ X (v i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [dsig_zero]
@@ -78,10 +94,14 @@ theorem dsig_sum_vec (R : Rep k r) {X : Mx k r} (hX : InLieHpk k r X) {ι : Type
     have h2 : ∑ i ∈ s, c i • v i ∈ R.smSub := R.smSub.sum_mem fun i _ => R.smSub.smul_mem _ (hv i)
     rw [Finset.sum_insert ha, Finset.sum_insert ha, dsig_add hX h1 h2, dsig_smul hX _ (hv a), ih]
 
-theorem box_words_fintype (hK : PI.KFinSmooth) (R : Rep k r) (hR : R.IsDS ε mu) {x : R.H} (hx : x ∈ R.TK) (m : ℕ) :
-    ∃ (ι : Type) (_ : Fintype ι) (xs : ι → R.H), (∀ i, xs i ∈ R.TK) ∧ ∀ a : List (Mx k r),
-      (∀ Y ∈ a, B.unitLie k r Y) → a.length ≤ m → ∃ co : ι → ℝ, (∀ i, |co i| ≤ 1) ∧
-        dsigW (k := k) (r := r) R.σ a x = ∑ i, (co i : ℂ) • xs i := by
+theorem box_words_fintype
+    (hK : PI.KFinSmooth) (R : Rep k r) (hR : R.IsDS ε mu) {x : R.H} (hx : x ∈ R.TK) (m : ℕ)
+    : ∃ (ι : Type) (_ : Fintype ι) (xs : ι → R.H),
+      (∀ i, xs i ∈ R.TK)
+        ∧ ∀ a : List (Mx k r),
+          (∀ Y ∈ a, B.unitLie k r Y) → a.length ≤ m
+            → ∃ co : ι → ℝ,
+              (∀ i, |co i| ≤ 1) ∧ dsigW (k := k) (r := r) R.σ a x = ∑ i, (co i : ℂ) • xs i := by
   obtain ⟨J, _, Z, hZ, hbox⟩ := exists_box_generators k r
   have h0 : InLieHpk k r (0 : Mx k r) := (lieSubspace k r).zero_mem
   induction m with
@@ -91,8 +111,13 @@ theorem box_words_fintype (hK : PI.KFinSmooth) (R : Rep k r) (hR : R.IsDS ε mu)
     simp [dsigW]
   | succ m ih =>
     obtain ⟨ι, _, xs, hxs, h⟩ := ih
-    refine ⟨Unit ⊕ (J × ι), inferInstance,
-      Sum.elim (fun _ => x) (fun p => dsig (k := k) (r := r) R.σ (Z p.1) (xs p.2)), ?_, ?_⟩
+    refine ⟨
+      Unit ⊕ (J × ι),
+      inferInstance,
+      Sum.elim (fun _ => x) (fun p => dsig (k := k) (r := r) R.σ (Z p.1) (xs p.2)),
+      ?_,
+      ?_
+    ⟩
     · rintro (p | p)
       · exact hx
       · exact (dsig_TK hK R hR (hZ p.1) _ (hxs p.2)).2
@@ -115,13 +140,24 @@ theorem box_words_fintype (hK : PI.KFinSmooth) (R : Rep k r) (hR : R.IsDS ε mu)
         · have hYL : InLieHpk k r Y := hY.1
           show dsig (k := k) (r := r) R.σ Y (dsigW (k := k) (r := r) R.σ a x) = _
           rw [e, dsig_sum_vec R hYL _ _ hsm, Fintype.sum_sum_type, Fintype.sum_prod_type_right]
-          simp only [Sum.elim_inl, Sum.elim_inr, Complex.ofReal_zero, zero_smul, Finset.sum_const_zero, zero_add]
+          simp only [Sum.elim_inl, Sum.elim_inr, Complex.ofReal_zero, zero_smul,
+            Finset.sum_const_zero, zero_add]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [eY, dsig_sum_letter hZ c (hsm i), Finset.smul_sum]
           refine Finset.sum_congr rfl fun j _ => ?_
           rw [smul_smul, Complex.ofReal_mul]
 
-theorem box_words : PI.KFinSmooth → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r), R.IsDS ε mu → ∀ x ∈ R.TK, ∀ m : ℕ, ∃ (M : ℕ) (xs : Fin M → R.H), (∀ i, xs i ∈ R.TK) ∧ ∀ a : List (Mx k r), (∀ Y ∈ a, B.unitLie k r Y) → a.length ≤ m → ∃ co : Fin M → ℝ, (∀ i, |co i| ≤ 1) ∧ PI.UpqRep.dsigW (k := k) (r := r) R.σ a x = ∑ i, (co i : ℂ) • xs i := by
+theorem box_words
+    : PI.KFinSmooth
+      → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r),
+        R.IsDS ε mu
+          → ∀ x ∈ R.TK, ∀ m : ℕ, ∃ (M : ℕ) (xs : Fin M → R.H),
+            (∀ i, xs i ∈ R.TK)
+              ∧ ∀ a : List (Mx k r),
+                (∀ Y ∈ a, B.unitLie k r Y) → a.length ≤ m
+                  → ∃ co : Fin M → ℝ,
+                    (∀ i, |co i| ≤ 1)
+                      ∧ PI.UpqRep.dsigW (k := k) (r := r) R.σ a x = ∑ i, (co i : ℂ) • xs i := by
   intro hK k r ε mu R hR x hx m
   obtain ⟨ι, _, xs, hxs, h⟩ := box_words_fintype hK R hR hx m
   let e := (Fintype.equivFin ι).symm

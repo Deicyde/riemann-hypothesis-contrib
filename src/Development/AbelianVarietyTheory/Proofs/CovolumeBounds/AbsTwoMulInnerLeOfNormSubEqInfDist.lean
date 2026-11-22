@@ -14,9 +14,9 @@ namespace GlobalTheory
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
 
-theorem exists_int_comb_norm_sub_sq_le (k : ℕ) (v : Fin k → E) {x : E}
-    (hx : x ∈ span ℝ (Set.range v)) :
-    ∃ w ∈ span ℤ (Set.range v), ‖x - w‖ ^ 2 ≤ (∑ i, ‖v i‖ ^ 2) / 4 := by
+theorem exists_int_comb_norm_sub_sq_le
+    (k : ℕ) (v : Fin k → E) {x : E} (hx : x ∈ span ℝ (Set.range v))
+    : ∃ w ∈ span ℤ (Set.range v), ‖x - w‖ ^ 2 ≤ (∑ i, ‖v i‖ ^ 2) / 4 := by
   induction k generalizing x with
   | zero =>
     refine ⟨0, zero_mem _, ?_⟩
@@ -41,7 +41,8 @@ theorem exists_int_comb_norm_sub_sq_le (k : ℕ) (v : Fin k → E) {x : E}
     · rintro _ ⟨i, rfl⟩; exact ⟨_, rfl⟩
     have e : ∑ i, c i • v i - (w + round a • u) = (y + t • p - w) + t • (u - p) := by
       rw [Fin.sum_univ_castSucc, ← Int.cast_smul_eq_zsmul ℝ]
-      simp only [t]; module
+      simp only [t]
+      module
     have hz : y + t • p - w ∈ U := sub_mem (add_mem hyU (smul_mem _ _ hpU)) hwU
     have horth : ⟪y + t • p - w, t • (u - p)⟫_ℝ = 0 :=
       U.inner_right_of_mem_orthogonal hz (smul_mem _ _ hq)
@@ -50,12 +51,10 @@ theorem exists_int_comb_norm_sub_sq_le (k : ℕ) (v : Fin k → E) {x : E}
       have h2 := norm_add_sq_real p (u - p)
       rw [add_sub_cancel, h1] at h2
       nlinarith [sq_nonneg ‖p‖]
-    have ht2 : t ^ 2 ≤ 1 / 4 := by
-      rw [← sq_abs]; nlinarith [abs_nonneg t]
+    have ht2 : t ^ 2 ≤ 1 / 4 := by rw [← sq_abs]; nlinarith [abs_nonneg t]
     rw [e, norm_add_sq_real, horth, norm_smul, mul_pow, Real.norm_eq_abs, sq_abs,
       Fin.sum_univ_castSucc]
-    have : t ^ 2 * ‖u - p‖ ^ 2 ≤ 1 / 4 * ‖u‖ ^ 2 :=
-      mul_le_mul ht2 hup (sq_nonneg _) (by norm_num)
+    have : t ^ 2 * ‖u - p‖ ^ 2 ≤ 1 / 4 * ‖u‖ ^ 2 := mul_le_mul ht2 hup (sq_nonneg _) (by norm_num)
     have hle' : ‖y + t • p - w‖ ^ 2 ≤ (∑ i : Fin k, ‖v i.castSucc‖ ^ 2) / 4 := hle
     linarith
 

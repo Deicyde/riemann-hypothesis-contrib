@@ -6,8 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.AbLaw PositivityTheory.FormalThickening
-open GlobalTheory.ProjSpace GlobalTheory.QCoh.Qcqs GlobalTheory.Cartier GlobalTheory.CompanionTheory.FormalAlg GlobalTheory.CompanionTheory.FormalAlg.Lift
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.AbLaw
+  PositivityTheory.FormalThickening
+open GlobalTheory.ProjSpace GlobalTheory.QCoh.Qcqs GlobalTheory.Cartier
+  GlobalTheory.CompanionTheory.FormalAlg GlobalTheory.CompanionTheory.FormalAlg.Lift
 
 set_option autoImplicit false
 noncomputable section
@@ -18,7 +22,8 @@ open DirectSum
 
 section NSum
 
-variable {κ : Type*} {R : Type*} [CommRing R]
+variable
+  {κ : Type*} {R : Type*} [CommRing R]
   {V : ℕ → Type*} [∀ n, AddCommGroup (V n)] [∀ n, Module R (V n)]
   {V' : ℕ → Type*} [∀ n, AddCommGroup (V' n)] [∀ n, Module R (V' n)]
 
@@ -29,7 +34,8 @@ def NSum {y : κ → ∀ n, V n →ₗ[R] V (n + 1)} (_ : NOpsCommute y) : Type 
 
 namespace NSum
 
-variable {y : κ → ∀ n, V n →ₗ[R] V (n + 1)} (hy : NOpsCommute y)
+variable
+  {y : κ → ∀ n, V n →ₗ[R] V (n + 1)} (hy : NOpsCommute y)
   {y' : κ → ∀ n, V' n →ₗ[R] V' (n + 1)} (hy' : NOpsCommute y')
 
 instance : AddCommGroup (NSum hy) := inferInstanceAs (AddCommGroup (⨁ n, V n))
@@ -47,20 +53,25 @@ theorem component_of (n : ℕ) (a : V n) : component hy n (of hy n a) = a :=
 theorem component_of_ne {n k : ℕ} (h : k ≠ n) (a : V k) : component hy n (of hy k a) = 0 :=
   (DirectSum.component.of R n k a).trans (dif_neg h)
 
-theorem lhom_ext {N : Type*} [AddCommGroup N] [Module R N] {f g : NSum hy →ₗ[R] N}
-    (h : ∀ n a, f (of hy n a) = g (of hy n a)) : f = g :=
+theorem lhom_ext
+    {N : Type*} [AddCommGroup N] [Module R N]
+    {f g : NSum hy →ₗ[R] N} (h : ∀ n a, f (of hy n a) = g (of hy n a))
+    : f = g :=
   DirectSum.linearMap_ext R fun n => LinearMap.ext (h n)
 
-theorem induction {C : NSum hy → Prop} (h0 : C 0) (hof : ∀ n a, C (of hy n a))
-    (hadd : ∀ a b, C a → C b → C (a + b)) (m : NSum hy) : C m :=
+theorem induction
+    {C : NSum hy → Prop}
+    (h0 : C 0) (hof : ∀ n a, C (of hy n a)) (hadd : ∀ a b, C a → C b → C (a + b))
+    (m : NSum hy)
+    : C m :=
   DirectSum.induction_on (β := V) (motive := C) m h0 hof hadd
 
 def desc {N : Type*} [AddCommGroup N] [Module R N] (φ : ∀ n, V n →ₗ[R] N) : NSum hy →ₗ[R] N :=
   DirectSum.toModule R ℕ N φ
 
 @[simp]
-theorem desc_of {N : Type*} [AddCommGroup N] [Module R N] (φ : ∀ n, V n →ₗ[R] N) (n : ℕ)
-    (a : V n) : desc hy φ (of hy n a) = φ n a :=
+theorem desc_of {N : Type*} [AddCommGroup N] [Module R N] (φ : ∀ n, V n →ₗ[R] N) (n : ℕ) (a : V n)
+    : desc hy φ (of hy n a) = φ n a :=
   DirectSum.toModule_lof R n a
 
 def op (i : κ) : Module.End R (NSum hy) := desc hy fun n => of hy (n + 1) ∘ₗ y i n
@@ -75,8 +86,9 @@ theorem commute_op (i j : κ) : Commute (op hy i) (op hy j) :=
 instance : Module (MvPolynomial κ R) (NSum hy) :=
   Module.compHom (NSum hy) (Wick.commEval R (op hy) (commute_op hy)).toRingHom
 
-theorem smul_def (p : MvPolynomial κ R) (m : NSum hy) :
-    p • m = Wick.commEval R (op hy) (commute_op hy) p m := rfl
+theorem smul_def (p : MvPolynomial κ R) (m : NSum hy)
+    : p • m = Wick.commEval R (op hy) (commute_op hy) p m :=
+  rfl
 
 instance : IsScalarTower R (MvPolynomial κ R) (NSum hy) where
   smul_assoc r p m := by rw [smul_def, smul_def, map_smul]; rfl
@@ -85,19 +97,22 @@ theorem X_smul (i : κ) (m : NSum hy) : (MvPolynomial.X i : MvPolynomial κ R) �
   rw [smul_def, Wick.commEval_X]
 
 @[simp]
-theorem X_smul_of (i : κ) (n : ℕ) (a : V n) :
-    (MvPolynomial.X i : MvPolynomial κ R) • of hy n a = of hy (n + 1) (y i n a) := by
+theorem X_smul_of (i : κ) (n : ℕ) (a : V n)
+    : (MvPolynomial.X i : MvPolynomial κ R) • of hy n a = of hy (n + 1) (y i n a) := by
   rw [X_smul, op_of]
 
-def lift {N : Type*} [AddCommGroup N] [Module R N] [Module (MvPolynomial κ R) N]
-    [IsScalarTower R (MvPolynomial κ R) N] (φ : ∀ n, V n →ₗ[R] N)
-    (hφ : ∀ i n a, φ (n + 1) (y i n a) = (MvPolynomial.X i : MvPolynomial κ R) • φ n a) :
-    NSum hy →ₗ[MvPolynomial κ R] N where
+def lift
+    {N : Type*} [AddCommGroup N] [Module R N] [Module (MvPolynomial κ R) N]
+    [IsScalarTower R (MvPolynomial κ R) N]
+    (φ : ∀ n, V n →ₗ[R] N)
+    (hφ : ∀ i n a, φ (n + 1) (y i n a) = (MvPolynomial.X i : MvPolynomial κ R) • φ n a)
+    : NSum hy →ₗ[MvPolynomial κ R] N where
   toFun := desc hy φ
   map_add' := map_add _
   map_smul' p m := by
-    have hX (i : κ) (m : NSum hy) : desc hy φ ((MvPolynomial.X i : MvPolynomial κ R) • m) =
-        (MvPolynomial.X i : MvPolynomial κ R) • desc hy φ m := by
+    have hX (i : κ) (m : NSum hy)
+        : desc hy φ ((MvPolynomial.X i : MvPolynomial κ R) • m)
+          = (MvPolynomial.X i : MvPolynomial κ R) • desc hy φ m := by
       induction m using NSum.induction with
       | h0 => simp
       | hof n a => simp [hφ]
@@ -109,20 +124,25 @@ def lift {N : Type*} [AddCommGroup N] [Module R N] [Module (MvPolynomial κ R) N
     | mul_X p i hp => rw [mul_smul, mul_smul, hp, hX]
 
 @[simp]
-theorem lift_of {N : Type*} [AddCommGroup N] [Module R N] [Module (MvPolynomial κ R) N]
-    [IsScalarTower R (MvPolynomial κ R) N] (φ : ∀ n, V n →ₗ[R] N) (hφ) (n : ℕ) (a : V n) :
-    lift hy φ hφ (of hy n a) = φ n a := desc_of hy φ n a
+theorem lift_of
+    {N : Type*} [AddCommGroup N] [Module R N] [Module (MvPolynomial κ R) N]
+    [IsScalarTower R (MvPolynomial κ R) N]
+    (φ : ∀ n, V n →ₗ[R] N) (hφ)
+    (n : ℕ) (a : V n)
+    : lift hy φ hφ (of hy n a) = φ n a :=
+  desc_of hy φ n a
 
-def map (φ : ∀ n, V n →ₗ[R] V' n) (hφ : ∀ i n a, φ (n + 1) (y i n a) = y' i n (φ n a)) :
-    NSum hy →ₗ[MvPolynomial κ R] NSum hy' :=
+def map (φ : ∀ n, V n →ₗ[R] V' n) (hφ : ∀ i n a, φ (n + 1) (y i n a) = y' i n (φ n a))
+    : NSum hy →ₗ[MvPolynomial κ R] NSum hy' :=
   lift hy (fun n => of hy' n ∘ₗ φ n) fun i n a => by simp [hφ]
 
 @[simp]
-theorem map_of (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (n : ℕ) (a : V n) :
-    map hy hy' φ hφ (of hy n a) = of hy' n (φ n a) := lift_of hy _ _ n a
+theorem map_of (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (n : ℕ) (a : V n)
+    : map hy hy' φ hφ (of hy n a) = of hy' n (φ n a) :=
+  lift_of hy _ _ n a
 
-theorem component_map (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (n : ℕ) (m : NSum hy) :
-    component hy' n (map hy hy' φ hφ m) = φ n (component hy n m) := by
+theorem component_map (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (n : ℕ) (m : NSum hy)
+    : component hy' n (map hy hy' φ hφ m) = φ n (component hy n m) := by
   induction m using NSum.induction with
   | h0 => simp
   | hof k a =>
@@ -135,8 +155,8 @@ theorem component_map (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (n : ℕ) (m : NSum
 theorem ext_component {m m' : NSum hy} (h : ∀ n, component hy n m = component hy n m') : m = m' :=
   DFinsupp.ext h
 
-theorem map_bijective (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (h : ∀ n, Function.Bijective (φ n)) :
-    Function.Bijective (map hy hy' φ hφ) := by
+theorem map_bijective (φ : ∀ n, V n →ₗ[R] V' n) (hφ) (h : ∀ n, Function.Bijective (φ n))
+    : Function.Bijective (map hy hy' φ hφ) := by
   refine ⟨fun m m' e => ext_component hy fun n => (h n).1 ?_, fun m => ?_⟩
   · rw [← component_map hy hy' φ hφ, ← component_map hy hy' φ hφ, e]
   · induction m using NSum.induction with
@@ -155,21 +175,17 @@ end NSum
 
 section Bi
 
-variable {ι κ : Type} {R : Type} [CommRing R]
+variable
+  {ι κ : Type} {R : Type} [CommRing R]
   {W : ℕ → ℤ → Type} [∀ e t, AddCommGroup (W e t)] [∀ e t, Module R (W e t)]
   {W' : ℕ → ℤ → Type} [∀ e t, AddCommGroup (W' e t)] [∀ e t, Module R (W' e t)]
 
-structure BiOps (W : ℕ → ℤ → Type) [∀ e t, AddCommGroup (W e t)] [∀ e t, Module R (W e t)]
-    (ι κ : Type) where
-
+structure BiOps
+    (W : ℕ → ℤ → Type) [∀ e t, AddCommGroup (W e t)] [∀ e t, Module R (W e t)] (ι κ : Type) where
   x : ι → ∀ e t, W e t →ₗ[R] W e (t + 1)
-
   y : κ → ∀ e t, W e t →ₗ[R] W (e + 1) t
-
   hx : ∀ i j e t a, x i e (t + 1) (x j e t a) = x j e (t + 1) (x i e t a)
-
   hy : ∀ k l e t a, y k (e + 1) t (y l e t a) = y l (e + 1) t (y k e t a)
-
   hxy : ∀ j l e t a, x j (e + 1) t (y l e t a) = y l e (t + 1) (x j e t a)
 
 namespace BiOps
@@ -184,8 +200,8 @@ def xN (j : ι) (t : ℤ) : D.NM t →ₗ[MvPolynomial κ R] D.NM (t + 1) :=
   NSum.map (D.hyN t) (D.hyN (t + 1)) (fun e => D.x j e t) fun l e a => D.hxy j l e t a
 
 @[simp]
-theorem xN_of (j : ι) (t : ℤ) (e : ℕ) (a : W e t) :
-    D.xN j t (NSum.of (D.hyN t) e a) = NSum.of (D.hyN (t + 1)) e (D.x j e t a) :=
+theorem xN_of (j : ι) (t : ℤ) (e : ℕ) (a : W e t)
+    : D.xN j t (NSum.of (D.hyN t) e a) = NSum.of (D.hyN (t + 1)) e (D.x j e t a) :=
   NSum.map_of (D.hyN t) (D.hyN (t + 1)) (fun e => D.x j e t) (fun l e a => D.hxy j l e t a) e a
 
 theorem hxN : OperatorsCommute (R := MvPolynomial κ R) (A := D.NM) D.xN := fun i j t m => by
@@ -202,41 +218,42 @@ def of (e : ℕ) (t : ℤ) : W e t →+ D.Tot :=
   (GrSum.of D.hxN t).toAddMonoidHom.comp (NSum.of (D.hyN t) e).toAddMonoidHom
 
 def comp (e : ℕ) (t : ℤ) : D.Tot →+ W e t :=
-  (NSum.component (D.hyN t) e).toAddMonoidHom.comp
-    ((GrSum.component D.hxN t).toAddMonoidHom)
+  (NSum.component (D.hyN t) e).toAddMonoidHom.comp ((GrSum.component D.hxN t).toAddMonoidHom)
 
 theorem of_mem_grading (e : ℕ) (t : ℤ) (a : W e t) : D.of e t a ∈ D.grading t :=
   GrSum.of_mem_grading _ _ _
 
 @[simp]
-theorem comp_of (e : ℕ) (t : ℤ) (a : W e t) : D.comp e t (D.of e t a) = a := by
-  simp [comp, of]
+theorem comp_of (e : ℕ) (t : ℤ) (a : W e t) : D.comp e t (D.of e t a) = a := by simp [comp, of]
 
-theorem X_smul_of (j : ι) (e : ℕ) (t : ℤ) (a : W e t) :
-    (MvPolynomial.X j : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a =
-      D.of e (t + 1) (D.x j e t a) := by
+theorem X_smul_of (j : ι) (e : ℕ) (t : ℤ) (a : W e t)
+    : (MvPolynomial.X j : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a
+      = D.of e (t + 1) (D.x j e t a) := by
   simp [of, xN]
 
-theorem C_smul_of (c : MvPolynomial κ R) (e : ℕ) (t : ℤ) (a : W e t) :
-    (MvPolynomial.C c : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a =
-      GrSum.of D.hxN t (c • NSum.of (D.hyN t) e a) := by
+theorem C_smul_of (c : MvPolynomial κ R) (e : ℕ) (t : ℤ) (a : W e t)
+    : (MvPolynomial.C c : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a
+      = GrSum.of D.hxN t (c • NSum.of (D.hyN t) e a) := by
   rw [← MvPolynomial.algebraMap_eq, algebraMap_smul]
   exact (map_smul (GrSum.of D.hxN t) c _).symm
 
-theorem C_X_smul_of (l : κ) (e : ℕ) (t : ℤ) (a : W e t) :
-    (MvPolynomial.C (MvPolynomial.X l) : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a =
-      D.of (e + 1) t (D.y l e t a) := by
+theorem C_X_smul_of (l : κ) (e : ℕ) (t : ℤ) (a : W e t)
+    : (MvPolynomial.C (MvPolynomial.X l) : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a
+      = D.of (e + 1) t (D.y l e t a) := by
   rw [C_smul_of, NSum.X_smul_of]
   rfl
 
-theorem C_C_smul_of (r : R) (e : ℕ) (t : ℤ) (a : W e t) :
-    (MvPolynomial.C (MvPolynomial.C r) : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a =
-      D.of e t (r • a) := by
+theorem C_C_smul_of (r : R) (e : ℕ) (t : ℤ) (a : W e t)
+    : (MvPolynomial.C (MvPolynomial.C r) : MvPolynomial ι (MvPolynomial κ R)) • D.of e t a
+      = D.of e t (r • a) := by
   rw [C_smul_of, ← MvPolynomial.algebraMap_eq, algebraMap_smul, ← map_smul]
   rfl
 
-theorem induction {C : D.Tot → Prop} (h0 : C 0) (hof : ∀ e t a, C (D.of e t a))
-    (hadd : ∀ a b, C a → C b → C (a + b)) (m : D.Tot) : C m := by
+theorem induction
+    {C : D.Tot → Prop}
+    (h0 : C 0) (hof : ∀ e t a, C (D.of e t a)) (hadd : ∀ a b, C a → C b → C (a + b))
+    (m : D.Tot)
+    : C m := by
   have key (t : ℤ) (n : D.NM t) : C (GrSum.of D.hxN t n) := by
     induction n using NSum.induction with
     | h0 => rw [map_zero]; exact h0
@@ -244,8 +261,8 @@ theorem induction {C : D.Tot → Prop} (h0 : C 0) (hof : ∀ e t a, C (D.of e t 
     | hadd a b ha hb => rw [map_add (f := _)]; exact hadd _ _ ha hb
   exact DirectSum.induction_on (β := D.NM) (motive := C) m h0 (fun t n => key t n) hadd
 
-theorem comp_of_ne {e e' : ℕ} {t t' : ℤ} (h : ¬(e = e' ∧ t = t')) (a : W e t) :
-    D.comp e' t' (D.of e t a) = 0 := by
+theorem comp_of_ne {e e' : ℕ} {t t' : ℤ} (h : ¬(e = e' ∧ t = t')) (a : W e t)
+    : D.comp e' t' (D.of e t a) = 0 := by
   by_cases ht : t = t'
   · subst ht
     have he : e ≠ e' := fun he => h ⟨he, rfl⟩
@@ -254,8 +271,8 @@ theorem comp_of_ne {e e' : ℕ} {t t' : ℤ} (h : ¬(e = e' ∧ t = t')) (a : W 
     simp only [comp, of, AddMonoidHom.comp_apply, LinearMap.toAddMonoidHom_coe] at this ⊢
     rw [this, map_zero]
 
-theorem exists_finset_sum (m : D.Tot) :
-    ∃ s : Finset (ℕ × ℤ), m = ∑ q ∈ s, D.of q.1 q.2 (D.comp q.1 q.2 m) := by
+theorem exists_finset_sum (m : D.Tot)
+    : ∃ s : Finset (ℕ × ℤ), m = ∑ q ∈ s, D.of q.1 q.2 (D.comp q.1 q.2 m) := by
   classical
   suffices h : ∃ s₀ : Finset (ℕ × ℤ), ∀ s, s₀ ⊆ s → m = ∑ q ∈ s, D.of q.1 q.2 (D.comp q.1 q.2 m) by
     obtain ⟨s₀, h⟩ := h
@@ -277,11 +294,13 @@ theorem exists_finset_sum (m : D.Tot) :
     simp only [map_add (f := _), Finset.sum_add_distrib]
     rw [← h₁ s (Finset.union_subset_left hs), ← h₂ s (Finset.union_subset_right hs)]
 
-def map (φ : ∀ e t, W e t →ₗ[R] W' e t)
+def map
+    (φ : ∀ e t, W e t →ₗ[R] W' e t)
     (hx : ∀ j e t a, φ e (t + 1) (D.x j e t a) = D'.x j e t (φ e t a))
-    (hy : ∀ l e t a, φ (e + 1) t (D.y l e t a) = D'.y l e t (φ e t a)) :
-    D.Tot →ₗ[MvPolynomial ι (MvPolynomial κ R)] D'.Tot :=
-  GrSum.map D.hxN D'.hxN (fun t => NSum.map _ _ (fun e => φ e t) fun l e a => hy l e t a)
+    (hy : ∀ l e t a, φ (e + 1) t (D.y l e t a) = D'.y l e t (φ e t a))
+    : D.Tot →ₗ[MvPolynomial ι (MvPolynomial κ R)] D'.Tot :=
+  GrSum.map D.hxN D'.hxN
+    (fun t => NSum.map _ _ (fun e => φ e t) fun l e a => hy l e t a)
     fun j t m => by
       induction m using NSum.induction with
       | h0 => simp
@@ -289,16 +308,16 @@ def map (φ : ∀ e t, W e t →ₗ[R] W' e t)
       | hadd a b ha hb => simp only [map_add (f := _), ha, hb]
 
 @[simp]
-theorem map_of (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy) (e : ℕ) (t : ℤ) (a : W e t) :
-    D.map D' φ hx hy (D.of e t a) = D'.of e t (φ e t a) := by
+theorem map_of (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy) (e : ℕ) (t : ℤ) (a : W e t)
+    : D.map D' φ hx hy (D.of e t a) = D'.of e t (φ e t a) := by
   simp [map, of]
 
-theorem isGradedMap_map (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy) :
-    IsGradedMap D.grading D'.grading (D.map D' φ hx hy) :=
+theorem isGradedMap_map (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy)
+    : IsGradedMap D.grading D'.grading (D.map D' φ hx hy) :=
   GrSum.isGradedMap_map _ _ _ _
 
-theorem comp_map (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy) (e : ℕ) (t : ℤ) (m : D.Tot) :
-    D'.comp e t (D.map D' φ hx hy m) = φ e t (D.comp e t m) := by
+theorem comp_map (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy) (e : ℕ) (t : ℤ) (m : D.Tot)
+    : D'.comp e t (D.map D' φ hx hy m) = φ e t (D.comp e t m) := by
   induction m using D.induction with
   | h0 => simp
   | hof e' t' a =>
@@ -308,10 +327,11 @@ theorem comp_map (φ : ∀ e t, W e t →ₗ[R] W' e t) (hx) (hy) (e : ℕ) (t :
     · rw [map_of, comp_of_ne _ h, comp_of_ne _ h, map_zero]
   | hadd a b ha hb => simp only [map_add (f := _), ha, hb]
 
-theorem X_smul_bijective (j : ι) (h : ∀ e t, Function.Bijective (D.x j e t)) :
-    Function.Bijective fun m : D.Tot =>
+theorem X_smul_bijective (j : ι) (h : ∀ e t, Function.Bijective (D.x j e t))
+    : Function.Bijective fun m : D.Tot =>
       (MvPolynomial.X j : MvPolynomial ι (MvPolynomial κ R)) • m :=
-  GrSum.X_smul_bijective D.hxN fun t => NSum.map_bijective (D.hyN t) (D.hyN (t + 1)) _ _ fun e => h e t
+  GrSum.X_smul_bijective D.hxN fun t =>
+    NSum.map_bijective (D.hyN t) (D.hyN (t + 1)) _ _ fun e => h e t
 
 end BiOps
 

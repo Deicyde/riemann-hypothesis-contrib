@@ -6,8 +6,16 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finMax :
-    ∀ (Λ T : Type) [CommRing Λ] [IsLocalRing Λ] [CommRing T] [Algebra Λ T] [Module.Finite Λ T], Finite (MaximalSpectrum T) ∧ (∀ m : Ideal T, m.IsMaximal → m.comap (algebraMap Λ T) = maximalIdeal Λ ∧ (Finite (ResidueField Λ) → Finite (T ⧸ m))) ∧ ∃ n : ℕ, (⊥ : Ideal T).jacobson ^ n ≤ (maximalIdeal Λ).map (algebraMap Λ T) ∧ (maximalIdeal Λ).map (algebraMap Λ T) ≤ (⊥ : Ideal T).jacobson := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finMax
+    : ∀ (Λ T : Type) [CommRing Λ] [IsLocalRing Λ] [CommRing T] [Algebra Λ T] [Module.Finite Λ T],
+      Finite (MaximalSpectrum T)
+        ∧ (∀ m : Ideal T,
+          m.IsMaximal
+            → m.comap (algebraMap Λ T) = maximalIdeal Λ
+              ∧ (Finite (ResidueField Λ) → Finite (T ⧸ m)))
+        ∧ ∃ n : ℕ,
+          (⊥ : Ideal T).jacobson ^ n ≤ (maximalIdeal Λ).map (algebraMap Λ T)
+            ∧ (maximalIdeal Λ).map (algebraMap Λ T) ≤ (⊥ : Ideal T).jacobson := by
   intro Λ T _ _ _ _ _
   let I : Ideal T := (maximalIdeal Λ).map (algebraMap Λ T)
   have h1 : Module.Finite Λ (T ⧸ I) :=
@@ -26,9 +34,10 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finMax :
     Ideal.map_le_iff_le_comap.2 (hcomap m hm).ge
   have hker : RingHom.ker (Ideal.Quotient.mk I) = I := Ideal.mk_ker
   refine ⟨?_, ?_, ?_⟩
-  · let f : MaximalSpectrum (T ⧸ I) → MaximalSpectrum T := fun p =>
-      ⟨p.asIdeal.comap (Ideal.Quotient.mk I),
-        Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective⟩
+  · let f : MaximalSpectrum (T ⧸ I) → MaximalSpectrum T := fun p => ⟨
+      p.asIdeal.comap (Ideal.Quotient.mk I),
+      Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective
+    ⟩
     apply Finite.of_surjective f
     intro m
     have hcm : (m.asIdeal.map (Ideal.Quotient.mk I)).comap (Ideal.Quotient.mk I) = m.asIdeal := by
@@ -36,7 +45,8 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finMax :
         hker]
       exact sup_eq_left.2 (hIm _ m.isMaximal)
     rcases Ideal.map_eq_top_or_isMaximal_of_surjective (Ideal.Quotient.mk I)
-      Ideal.Quotient.mk_surjective m.isMaximal with h | h
+        Ideal.Quotient.mk_surjective m.isMaximal
+      with h | h
     · exfalso
       apply m.isMaximal.ne_top
       rw [← hcm, h, Ideal.comap_top]
@@ -48,7 +58,8 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finMax :
     exact Finite.of_surjective _ (Ideal.Quotient.factor_surjective (hIm m hm))
   · obtain ⟨n, hn⟩ := IsArtinianRing.isNilpotent_jacobson_bot (R := T ⧸ I)
     refine ⟨n, ?_, ?_⟩
-    · have hJ : (⊥ : Ideal T).jacobson.map (Ideal.Quotient.mk I) ≤ (⊥ : Ideal (T ⧸ I)).jacobson := by
+    · have hJ
+          : (⊥ : Ideal T).jacobson.map (Ideal.Quotient.mk I) ≤ (⊥ : Ideal (T ⧸ I)).jacobson := by
         rw [Ideal.map_le_iff_le_comap]
         intro x hx
         rw [Ideal.mem_comap, Ideal.mem_jacobson_bot]

@@ -100,35 +100,61 @@ public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.InhabitedCha
 
 open GroundTheory.Heights₂.Heights
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ObjectsChow_ChowDegreeClosedPoint : GroundTheory.Heights₂.Heights.ObjectsChow.ChowDegreeClosedPoint.Statement :=
-  @GroundTheory.Heights₂.Heights.ObjectsChow.ChowDegreeClosedPoint.proof GroundTheory.Heights₂.Heights.ObjectsChow.ClosedPointChartField.proof GroundTheory.Heights₂.Heights.ObjectsChow.ClosedPointConeCoord.proof
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ObjectsChow_ChowDegreeClosedPoint
+    : GroundTheory.Heights₂.Heights.ObjectsChow.ChowDegreeClosedPoint.Statement :=
+  @GroundTheory.Heights₂.Heights.ObjectsChow.ChowDegreeClosedPoint.proof
+    GroundTheory.Heights₂.Heights.ObjectsChow.ClosedPointChartField.proof
+    GroundTheory.Heights₂.Heights.ObjectsChow.ClosedPointConeCoord.proof
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.NormOfDividedFormSep : GroundTheory.Heights₂.Heights.NormOfDividedFormSep.Statement :=
-  @GroundTheory.Heights₂.Heights.NormOfDividedFormSep.proof GroundTheory.Heights₂.Heights.NormFormEval.full GroundTheory.Heights₂.Heights.NormFormDvd.full GroundTheory.Heights₂.Heights.PrimeMapFractionRing.full
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.NormOfDividedFormSep
+    : GroundTheory.Heights₂.Heights.NormOfDividedFormSep.Statement :=
+  @GroundTheory.Heights₂.Heights.NormOfDividedFormSep.proof
+    GroundTheory.Heights₂.Heights.NormFormEval.full GroundTheory.Heights₂.Heights.NormFormDvd.full
+    GroundTheory.Heights₂.Heights.PrimeMapFractionRing.full
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFreeParAlgIndep : GroundTheory.Heights₂.Heights.ChartFreeParAlgIndep.Statement :=
-  @GroundTheory.Heights₂.Heights.ChartFreeParAlgIndep.proof GroundTheory.Heights₂.Heights.ChartParAlgebraic.proof
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFreeParAlgIndep
+    : GroundTheory.Heights₂.Heights.ChartFreeParAlgIndep.Statement :=
+  @GroundTheory.Heights₂.Heights.ChartFreeParAlgIndep.proof
+    GroundTheory.Heights₂.Heights.ChartParAlgebraic.proof
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartPointSeparable : GroundTheory.Heights₂.Heights.ChartPointSeparable.Statement :=
-  @GroundTheory.Heights₂.Heights.ChartPointSeparable.proof GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFreeParAlgIndep
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartPointSeparable
+    : GroundTheory.Heights₂.Heights.ChartPointSeparable.Statement :=
+  @GroundTheory.Heights₂.Heights.ChartPointSeparable.proof
+    GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFreeParAlgIndep
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFracSeparable : GroundTheory.Heights₂.Heights.ChartFracSeparable.Statement :=
-  @GroundTheory.Heights₂.Heights.ChartFracSeparable.proof GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartPointSeparable
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFracSeparable
+    : GroundTheory.Heights₂.Heights.ChartFracSeparable.Statement :=
+  @GroundTheory.Heights₂.Heights.ChartFracSeparable.proof
+    GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartPointSeparable
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartNormAlgClosed : GroundTheory.Heights₂.Heights.ChartNormAlgClosed.Statement :=
-  @GroundTheory.Heights₂.Heights.ChartNormAlgClosed.proof GroundTheory.Heights₂.Heights.IncIdealBelow.full GroundTheory.Heights₂.Heights.SpecFirstMemIncIdeal.full GroundTheory.Heights₂.Heights.LocalizationPrimeDVR.full GroundTheory.Heights₂.Heights.ChartFinite.full GroundTheory.Heights₂.Heights.ChartFracSeparableInhabited.chartLocDomain GroundTheory.Heights₂.Heights.ChartFirstGroupPrime.full GroundTheory.Heights₂.Heights.ChartFirstGroupDvd.full GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.NormOfDividedFormSep GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFracSeparable
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartNormAlgClosed
+    : GroundTheory.Heights₂.Heights.ChartNormAlgClosed.Statement :=
+  @GroundTheory.Heights₂.Heights.ChartNormAlgClosed.proof
+    GroundTheory.Heights₂.Heights.IncIdealBelow.full
+    GroundTheory.Heights₂.Heights.SpecFirstMemIncIdeal.full
+    GroundTheory.Heights₂.Heights.LocalizationPrimeDVR.full
+    GroundTheory.Heights₂.Heights.ChartFinite.full
+    GroundTheory.Heights₂.Heights.ChartFracSeparableInhabited.chartLocDomain
+    GroundTheory.Heights₂.Heights.ChartFirstGroupPrime.full
+    GroundTheory.Heights₂.Heights.ChartFirstGroupDvd.full
+    GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.NormOfDividedFormSep
+    GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.ChartFracSeparable
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.LocalSectionLengthSum : GroundTheory.Heights₂.Heights.LocalSectionLengthSum.Statement :=
-  @GroundTheory.Heights₂.Heights.LocalSectionLengthSum.proof GroundTheory.Heights₂.Heights.PiQuotCokerFiniteLength.proof
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.LocalSectionLengthSum
+    : GroundTheory.Heights₂.Heights.LocalSectionLengthSum.Statement :=
+  @GroundTheory.Heights₂.Heights.LocalSectionLengthSum.proof
+    GroundTheory.Heights₂.Heights.PiQuotCokerFiniteLength.proof
 
-theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.SectionLengthSum : GroundTheory.Heights₂.Heights.SectionLengthSum.Statement :=
-  @GroundTheory.Heights₂.Heights.SectionLengthSum.proof GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.LocalSectionLengthSum
+theorem GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.SectionLengthSum
+    : GroundTheory.Heights₂.Heights.SectionLengthSum.Statement :=
+  @GroundTheory.Heights₂.Heights.SectionLengthSum.proof
+    GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.LocalSectionLengthSum
 
 namespace GlobalTheory.CompanionTheory.Ar.Short.ChowClosing
 
 theorem chartResidueDegreeAlgClosed_closed : ChartResidueDegreeAlgClosed.Statement :=
-  ChartResidueDegreeAlgClosed.proof ChowFormBirationalAlgClosed.proof ChartFinite.full ChartKernel.full
-    SectionPerfect.coneDimOfChowForm_full ConeDimComponent.proof_closed
+  ChartResidueDegreeAlgClosed.proof ChowFormBirationalAlgClosed.proof ChartFinite.full
+    ChartKernel.full SectionPerfect.coneDimOfChowForm_full ConeDimComponent.proof_closed
     SectionPerfect.chowFormExists_full IncidenceGeneric.full ChartLocalOrder.full
 
 theorem chartLengthAlgClosed_closed : ChartLengthAlgClosed.Statement :=
@@ -139,7 +165,8 @@ theorem chartChoiceAlgClosed_closed : ChartChoiceAlgClosed.Statement :=
   ChartChoiceAlgClosed.proof SectionPerfect.incIdealPrime_full chowFormMultiHomog
 
 theorem sectionCycleReduced_closed : SectionCycleReduced.Statement :=
-  sectionCycleReduced_of SectionComponents.proof_closed GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.SectionLengthSum
+  sectionCycleReduced_of SectionComponents.proof_closed
+    GlobalTheory.CompanionTheory.Ar.Short.ChowClosing.Auto.SectionLengthSum
 
 end GlobalTheory.CompanionTheory.Ar.Short.ChowClosing
 

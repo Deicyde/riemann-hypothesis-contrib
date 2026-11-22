@@ -10,18 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ComapMapEqSe
 
 set_option autoImplicit false
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDivGroup
 
-theorem mulP_mem_kerIdeal_comp_of_app_eq_zero (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R]
-    (G H : PDivGroup p R) (f : G ⟶ H) (g : H ⟶ G) (hfg : f ≫ g = (p : ℤ_[p]) • 𝟙 G)
-    (a : G.A 1) (ha : g.app 1 a = 0) :
-    G.mulP 1 a ∈ kerIdeal ((G.mulP 1).comp (f.app 1)) := by
+theorem mulP_mem_kerIdeal_comp_of_app_eq_zero
+    (p : ℕ) [Fact p.Prime]
+    (R : Type) [CommRing R]
+    (G H : PDivGroup p R) (f : G ⟶ H) (g : H ⟶ G) (hfg : f ≫ g = (p : ℤ_[p]) • 𝟙 G) (a : G.A 1)
+    (ha : g.app 1 a = 0)
+    : G.mulP 1 a ∈ kerIdeal ((G.mulP 1).comp (f.app 1)) := by
   set K := kerIdeal ((G.mulP 1).comp (f.app 1)) with hK
   let x := Ideal.Quotient.mkₐ R K
-  have hx := (kerIdeal_le_ker_iff ((G.mulP 1).comp (f.app 1)) x).1
-    fun c hc => Ideal.Quotient.eq_zero_iff_mem.2 hc
+  have hx :=
+    (kerIdeal_le_ker_iff ((G.mulP 1).comp (f.app 1)) x).1 fun c hc =>
+      Ideal.Quotient.eq_zero_iff_mem.2 hc
   let y := x.comp (f.app 2 : H.A 2 →ₐ[R] G.A 2)
   have hy : torsionIdeal (R := R) (A := H.A 2) p ≤ RingHom.ker y :=
     (kerIdeal_le_ker_iff _ y).2 fun z => by
@@ -48,11 +52,11 @@ theorem mulP_mem_kerIdeal_comp_of_app_eq_zero (p : ℕ) [Fact p.Prime] (R : Type
 
 end GlobalTheory.PDivGroup
 
-
 open GlobalTheory.PDivGroup in
-theorem GlobalTheory.PDivGroup.mem_kerIdeal_of_app_eq_zero : ∀ (p : ℕ) [Fact p.Prime] (K : Type) [Field K]
-    (G H : PDivGroup p K) (f : G ⟶ H) (g : H ⟶ G), f ≫ g = (p : ℤ_[p]) • 𝟙 G →
-    g ≫ f = (p : ℤ_[p]) • 𝟙 H → ∀ a : G.A 1, g.app 1 a = 0 → a ∈ kerIdeal (f.app 1) := by
+theorem GlobalTheory.PDivGroup.mem_kerIdeal_of_app_eq_zero
+    : ∀ (p : ℕ) [Fact p.Prime] (K : Type) [Field K] (G H : PDivGroup p K) (f : G ⟶ H) (g : H ⟶ G),
+      f ≫ g = (p : ℤ_[p]) • 𝟙 G → g ≫ f = (p : ℤ_[p]) • 𝟙 H
+        → ∀ a : G.A 1, g.app 1 a = 0 → a ∈ kerIdeal (f.app 1) := by
   intro p _ K _ G H f g hfg _ a ha
   have hmulP : Function.Injective (G.mulP 1) := fun a b e => by
     refine CartierDual.eq_of_forall_apply (R := K) fun φ => ?_
@@ -61,5 +65,6 @@ theorem GlobalTheory.PDivGroup.mem_kerIdeal_of_app_eq_zero : ∀ (p : ℕ) [Fact
     rw [e]
   have h1 := mulP_mem_kerIdeal_comp_of_app_eq_zero p K G H f g hfg a ha
   rw [kerIdeal_comp] at h1
-  rw [← GlobalTheory.PDiv.comap_map_eq_self_of_hopf_injective K _ _ (G.mulP 1) hmulP (kerIdeal (f.app 1))]
+  rw [← GlobalTheory.PDiv.comap_map_eq_self_of_hopf_injective K _ _ (G.mulP 1) hmulP
+    (kerIdeal (f.app 1))]
   exact h1

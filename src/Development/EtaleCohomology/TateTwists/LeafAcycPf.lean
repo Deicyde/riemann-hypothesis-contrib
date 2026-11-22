@@ -10,16 +10,19 @@ noncomputable section
 
 namespace LateralTheory.EtaleFoundations.AcycPf
 
-def cone {p N : ℕ} (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N) :
-    SimplexCategory.mk (p + 1) ⟶ SimplexCategory.mk N :=
-  SimplexCategory.mkHom ⟨fun i => Fin.cases 0 (fun j => a.toOrderHom j) i, by
-    intro i j h
-    induction i using Fin.cases with
-    | zero => simp
-    | succ i =>
-      induction j using Fin.cases with
-      | zero => exact absurd h (by simp)
-      | succ j => simpa using a.toOrderHom.monotone (Fin.succ_le_succ_iff.1 h)⟩
+def cone {p N : ℕ} (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N)
+    : SimplexCategory.mk (p + 1) ⟶ SimplexCategory.mk N :=
+  SimplexCategory.mkHom ⟨
+    fun i => Fin.cases 0 (fun j => a.toOrderHom j) i,
+    by
+      intro i j h
+      induction i using Fin.cases with
+      | zero => simp
+      | succ i =>
+        induction j using Fin.cases with
+        | zero => exact absurd h (by simp)
+        | succ j => simpa using a.toOrderHom.monotone (Fin.succ_le_succ_iff.1 h)
+  ⟩
 
 def v0 {N : ℕ} : SimplexCategory.mk 0 ⟶ SimplexCategory.mk N :=
   SimplexCategory.mkHom ⟨fun _ => 0, fun _ _ _ => le_rfl⟩
@@ -43,12 +46,15 @@ lemma δ1_cone {N : ℕ} (a : SimplexCategory.mk 0 ⟶ SimplexCategory.mk N) :
   simp [SimplexCategory.δ, cone, v0]
   rfl
 
-abbrev X {N : ℕ} (p r : ℕ) (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N)
-    (b : SimplexCategory.mk r ⟶ SimplexCategory.mk N) : Pr N →₀ ℤ :=
+abbrev X
+    {N : ℕ} (p r : ℕ) (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N)
+    (b : SimplexCategory.mk r ⟶ SimplexCategory.mk N)
+    : Pr N →₀ ℤ :=
   Finsupp.single (⟨p, r, a, b⟩ : Pr N) 1
 
 def Hg {N : ℕ} (z : Pr N) : Pr N →₀ ℤ :=
-  X (z.1 + 1) z.2.1 (cone z.2.2.1) z.2.2.2 + if z.1 = 0 then X 0 (z.2.1 + 1) v0 (cone z.2.2.2) else 0
+  X (z.1 + 1) z.2.1 (cone z.2.2.1) z.2.2.2
+    + if z.1 = 0 then X 0 (z.2.1 + 1) v0 (cone z.2.2.2) else 0
 
 def H (N : ℕ) : (Pr N →₀ ℤ) →ₗ[ℤ] (Pr N →₀ ℤ) := Finsupp.linearCombination ℤ Hg
 
@@ -165,17 +171,28 @@ lemma deg_H {N k : ℕ} {c : Pr N →₀ ℤ} (hdeg : Pr.Deg (k + 1) c) : Pr.Deg
 
 end LateralTheory.EtaleFoundations.AcycPf
 
-
 open LateralTheory.EtaleFoundations.AcycPf in
-theorem LateralTheory.EtaleFoundations.SteenPf.leaf_acyc_of : LateralTheory.EtaleFoundations.SteenPf.leaf_acyc := by
+theorem LateralTheory.EtaleFoundations.SteenPf.leaf_acyc_of
+    : LateralTheory.EtaleFoundations.SteenPf.leaf_acyc := by
   intro N k c hdeg hcyc
-  refine ⟨LateralTheory.EtaleFoundations.AcycPf.H N c, LateralTheory.EtaleFoundations.AcycPf.deg_H hdeg, ?_⟩
-  have h : ∀ y ∈ c.support, Pr.d N (LateralTheory.EtaleFoundations.AcycPf.H N (Finsupp.single y (c y))) + LateralTheory.EtaleFoundations.AcycPf.H N (Pr.d N (Finsupp.single y (c y))) =
-      Finsupp.single y (c y) := by
+  refine ⟨
+    LateralTheory.EtaleFoundations.AcycPf.H N c,
+    LateralTheory.EtaleFoundations.AcycPf.deg_H hdeg,
+    ?_
+  ⟩
+  have h
+      : ∀ y ∈ c.support,
+        Pr.d N (LateralTheory.EtaleFoundations.AcycPf.H N (Finsupp.single y (c y)))
+            + LateralTheory.EtaleFoundations.AcycPf.H N (Pr.d N (Finsupp.single y (c y)))
+          = Finsupp.single y (c y) := by
     intro y hy
     have hy' := hdeg y hy
-    rw [← Finsupp.smul_single_one, map_zsmul, map_zsmul, map_zsmul, map_zsmul, ← smul_add, LateralTheory.EtaleFoundations.AcycPf.key y (by omega)]
-  have e : Pr.d N (LateralTheory.EtaleFoundations.AcycPf.H N c) + LateralTheory.EtaleFoundations.AcycPf.H N (Pr.d N c) = c := by
+    rw [← Finsupp.smul_single_one, map_zsmul, map_zsmul, map_zsmul, map_zsmul, ← smul_add,
+      LateralTheory.EtaleFoundations.AcycPf.key y (by omega)]
+  have e
+      : Pr.d N (LateralTheory.EtaleFoundations.AcycPf.H N c)
+          + LateralTheory.EtaleFoundations.AcycPf.H N (Pr.d N c)
+        = c := by
     conv_rhs => rw [← Finsupp.sum_single c]
     conv_lhs => rw [← Finsupp.sum_single c]
     set_option synthInstance.maxHeartbeats 100000 in

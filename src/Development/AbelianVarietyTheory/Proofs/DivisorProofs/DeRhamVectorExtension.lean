@@ -10,6 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchem
 namespace GlobalTheory
 
 theorem deRhamVectorExtension : GlobalTheory.Published.DeRhamVectorExtension :=
-  GlobalTheory.T.deRhamVectorExtensionIso_of_hodgeDeRham GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates
+  GlobalTheory.T.deRhamVectorExtensionIso_of_hodgeDeRham
+    GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates
 
 end GlobalTheory

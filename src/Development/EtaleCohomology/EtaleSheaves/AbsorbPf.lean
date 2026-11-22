@@ -9,17 +9,24 @@ open CategoryTheory Limits LateralTheory.E.t_E3Cut
 
 namespace LateralTheory.E.AbsorbPf
 
-def Sys : Prop := ∀ (A : CommRingCat.{0}) (Ω : Type) [Field Ω] (ι : A →+* Ω),
-  ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J) (D : J ⥤ CommRingCat.{0})
-    (t : (Functor.const J).obj A ⟶ D) (φ : ∀ j, D.obj j →+* Ω),
-    (∀ j, Et (t.app j)) ∧ (∀ j, (φ j).comp (t.app j).hom = ι) ∧
-    (∀ (j k : J) (a : j ⟶ k), (φ k).comp (D.map a).hom = φ j) ∧
-    (∀ (B : CommRingCat.{0}) (g : A ⟶ B), Et g → ∀ φB : B →+* Ω, φB.comp g.hom = ι →
-      ∃ (j : J) (h : B ⟶ D.obj j), g ≫ h = t.app j ∧ (φ j).comp h.hom = φB) ∧
-    (∀ (j : J) (x : D.obj j), φ j x ≠ 0 → ∃ (k : J) (a : j ⟶ k), IsUnit ((D.map a).hom x))
+def Sys : Prop :=
+  ∀ (A : CommRingCat.{0}) (Ω : Type) [Field Ω] (ι : A →+* Ω),
+    ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J) (D : J ⥤ CommRingCat.{0})
+        (t : (Functor.const J).obj A ⟶ D) (φ : ∀ j, D.obj j →+* Ω),
+      (∀ j, Et (t.app j)) ∧ (∀ j, (φ j).comp (t.app j).hom = ι)
+        ∧ (∀ (j k : J) (a : j ⟶ k), (φ k).comp (D.map a).hom = φ j)
+        ∧ (∀ (B : CommRingCat.{0}) (g : A ⟶ B),
+          Et g
+            → ∀ φB : B →+* Ω,
+              φB.comp g.hom = ι
+                → ∃ (j : J) (h : B ⟶ D.obj j), g ≫ h = t.app j ∧ (φ j).comp h.hom = φB)
+        ∧ (∀ (j : J) (x : D.obj j), φ j x ≠ 0 → ∃ (k : J) (a : j ⟶ k), IsUnit ((D.map a).hom x))
 
-theorem t_nat {J : Type} [SmallCategory J] {A : CommRingCat.{0}} {D : J ⥤ CommRingCat.{0}}
-    (t : (Functor.const J).obj A ⟶ D) {j k : J} (a : j ⟶ k) : t.app j ≫ D.map a = t.app k := by
+theorem t_nat
+    {J : Type} [SmallCategory J]
+    {A : CommRingCat.{0}} {D : J ⥤ CommRingCat.{0}} (t : (Functor.const J).obj A ⟶ D)
+    {j k : J} (a : j ⟶ k)
+    : t.app j ≫ D.map a = t.app k := by
   have := t.naturality a
   simp only [Functor.const_obj_obj, Functor.const_obj_map, Category.id_comp] at this
   exact this.symm
@@ -37,14 +44,17 @@ theorem Absorb_of (hS : Sys) : LateralTheory.E.ColimPf.Absorb := by
     show t.app j ≫ colimit.ι D j = t.app j0 ≫ colimit.ι D j0
     rw [← colimit.w D (IsFiltered.leftToMax j j0), ← colimit.w D (IsFiltered.rightToMax j j0),
       ← Category.assoc, ← Category.assoc, t_nat, t_nat]
-  let cΩ : Cocone D :=
-    { pt := CommRingCat.of Ω
-      ι := { app := fun j => CommRingCat.ofHom (φ j)
-             naturality := by
-               intro j k a
-               ext x
-               have := DFunLike.congr_fun (hcomp j k a) x
-               simpa using this } }
+  let cΩ : Cocone D := {
+    pt := CommRingCat.of Ω
+    ι := {
+      app := fun j => CommRingCat.ofHom (φ j)
+      naturality := by
+        intro j k a
+        ext x
+        have := DFunLike.congr_fun (hcomp j k a) x
+        simpa using this
+    }
+  }
   let ψ : O →+* Ω := (colimit.desc D cΩ).hom
   have hψ : ∀ j (y : D.obj j), ψ (colimit.ι D j y) = φ j y := by
     intro j y
@@ -55,13 +65,13 @@ theorem Absorb_of (hS : Sys) : LateralTheory.E.ColimPf.Absorb := by
   · ext a
     have := DFunLike.congr_fun (hpt j0) a
     simp only [RingHom.comp_apply] at this ⊢
-    rw [← this, ← hψ]; rfl
+    rw [← this, ← hψ]
+    rfl
   · intro x hx
     obtain ⟨j, y, rfl⟩ := Concrete.colimit_exists_rep D x
     rw [hψ] at hx
     obtain ⟨k, a, hu⟩ := hloc j y hx
-    have : colimit.ι D j y = colimit.ι D k ((D.map a).hom y) := by
-      rw [← colimit.w D a]; rfl
+    have : colimit.ι D j y = colimit.ι D k ((D.map a).hom y) := by rw [← colimit.w D a]; rfl
     rw [this]
     exact hu.map (colimit.ι D k).hom
   · intro B g hg φB hφB
@@ -73,15 +83,21 @@ theorem Absorb_of (hS : Sys) : LateralTheory.E.ColimPf.Absorb := by
       rw [hψ]
       exact DFunLike.congr_fun hh2 b
 
-def Sys2 : Prop := ∀ (A : CommRingCat.{0}) (Ω : Type) [Field Ω] (ι : A →+* Ω),
-  ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J) (D : J ⥤ CommRingCat.{0})
-    (t : (Functor.const J).obj A ⟶ D) (φ : ∀ j, D.obj j →+* Ω),
-    (∀ j, Et (t.app j)) ∧ (∀ j, (φ j).comp (t.app j).hom = ι) ∧
-    (∀ (j k : J) (a : j ⟶ k), (φ k).comp (D.map a).hom = φ j) ∧
-    (∀ (B : CommRingCat.{0}) (g : A ⟶ B), Et g → ∀ φB : B →+* Ω, φB.comp g.hom = ι →
-      ∃ (j : J) (h : B ⟶ D.obj j), g ≫ h = t.app j ∧ (φ j).comp h.hom = φB) ∧
-    (∀ (j : J) (B : CommRingCat.{0}) (g : D.obj j ⟶ B), Et g → ∀ φB : B →+* Ω, φB.comp g.hom = φ j →
-      ∃ (k : J) (a : j ⟶ k) (h : B ⟶ D.obj k), g ≫ h = D.map a)
+def Sys2 : Prop :=
+  ∀ (A : CommRingCat.{0}) (Ω : Type) [Field Ω] (ι : A →+* Ω),
+    ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J) (D : J ⥤ CommRingCat.{0})
+        (t : (Functor.const J).obj A ⟶ D) (φ : ∀ j, D.obj j →+* Ω),
+      (∀ j, Et (t.app j)) ∧ (∀ j, (φ j).comp (t.app j).hom = ι)
+        ∧ (∀ (j k : J) (a : j ⟶ k), (φ k).comp (D.map a).hom = φ j)
+        ∧ (∀ (B : CommRingCat.{0}) (g : A ⟶ B),
+          Et g
+            → ∀ φB : B →+* Ω,
+              φB.comp g.hom = ι
+                → ∃ (j : J) (h : B ⟶ D.obj j), g ≫ h = t.app j ∧ (φ j).comp h.hom = φB)
+        ∧ (∀ (j : J) (B : CommRingCat.{0}) (g : D.obj j ⟶ B),
+          Et g
+            → ∀ φB : B →+* Ω,
+              φB.comp g.hom = φ j → ∃ (k : J) (a : j ⟶ k) (h : B ⟶ D.obj k), g ≫ h = D.map a)
 
 theorem Sys_of (h2 : Sys2) : Sys := by
   intro A Ω _ ι
@@ -103,6 +119,8 @@ theorem Sys_of (h2 : Sys2) : Sys := by
   rw [e]
   exact (IsLocalization.Away.algebraMap_isUnit x).map h.hom
 
-theorem etaleAbsorbing_of_strongFilteredEtaleSystemExists (h2 : Sys2) : LateralTheory.E.ColimPf.Absorb := Absorb_of (Sys_of h2)
+theorem etaleAbsorbing_of_strongFilteredEtaleSystemExists (h2 : Sys2)
+    : LateralTheory.E.ColimPf.Absorb :=
+  Absorb_of (Sys_of h2)
 
 end LateralTheory.E.AbsorbPf

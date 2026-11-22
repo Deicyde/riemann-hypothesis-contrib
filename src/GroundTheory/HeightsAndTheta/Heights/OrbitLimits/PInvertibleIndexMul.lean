@@ -19,8 +19,8 @@ namespace InvertibleIndexMultiplicative
 
 variable {Ω : Type} [Field Ω]
 
-theorem index_ne_zero [CharZero Ω] {B : Subring Ω} [Module.Finite ℤ B] {I : Ideal B} (hI : I ≠ ⊥) :
-    I.toAddSubgroup.index ≠ 0 := by
+theorem index_ne_zero [CharZero Ω] {B : Subring Ω} [Module.Finite ℤ B] {I : Ideal B} (hI : I ≠ ⊥)
+    : I.toAddSubgroup.index ≠ 0 := by
   obtain ⟨a, haI, ha⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
   obtain ⟨c, hc, q, hq⟩ := OrderIdealIndexExtensionAlt.exists_int_eq_mul ha
   refine OrderIdealIndexExtensionAlt.index_ne_zero_of_zsmul_mem _ hc fun x => ?_
@@ -28,15 +28,15 @@ theorem index_ne_zero [CharZero Ω] {B : Subring Ω} [Module.Finite ℤ B] {I : 
   rw [Submodule.mem_toAddSubgroup, e]
   exact I.mul_mem_right _ haI
 
-theorem relIndex_mulBy_ne_zero [CharZero Ω] {B : Subring Ω} [Module.Finite ℤ B] {β : B} (hβ : β ≠ 0) :
-    (B.toAddSubgroup.map (mulBy (β : Ω))).relIndex B.toAddSubgroup ≠ 0 := by
+theorem relIndex_mulBy_ne_zero [CharZero Ω] {B : Subring Ω} [Module.Finite ℤ B] {β : B} (hβ : β ≠ 0)
+    : (B.toAddSubgroup.map (mulBy (β : Ω))).relIndex B.toAddSubgroup ≠ 0 := by
   rw [map_mul_eq, relIndex_map_subtype]
   exact index_ne_zero (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hβ)
 
-theorem relIndex_mulBy_mul {B : Subring Ω} {x y : Ω} (hx : x ≠ 0) (hxB : x ∈ B) (hyB : y ∈ B) :
-    (B.toAddSubgroup.map (mulBy (x * y))).relIndex B.toAddSubgroup =
-      (B.toAddSubgroup.map (mulBy x)).relIndex B.toAddSubgroup *
-        (B.toAddSubgroup.map (mulBy y)).relIndex B.toAddSubgroup := by
+theorem relIndex_mulBy_mul {B : Subring Ω} {x y : Ω} (hx : x ≠ 0) (hxB : x ∈ B) (hyB : y ∈ B)
+    : (B.toAddSubgroup.map (mulBy (x * y))).relIndex B.toAddSubgroup
+      = (B.toAddSubgroup.map (mulBy x)).relIndex B.toAddSubgroup
+        * (B.toAddSubgroup.map (mulBy y)).relIndex B.toAddSubgroup := by
   have e : B.toAddSubgroup.map (mulBy (x * y)) = (B.toAddSubgroup.map (mulBy y)).map (mulBy x) := by
     rw [AddSubgroup.map_map]
     congr 1
@@ -49,8 +49,10 @@ theorem relIndex_mulBy_mul {B : Subring Ω} {x y : Ω} (hx : x ≠ 0) (hxB : x �
   rw [e, ← AddSubgroup.relIndex_mul_relIndex _ _ _ (AddSubgroup.map_mono h1) h2,
     AddSubgroup.relIndex_map_map_of_injective (f := mulBy x) _ _ (mulBy_injective hx), mul_comm]
 
-theorem ne_bot_of_rep {B : Subring Ω} {X : AddSubgroup Ω} {β δ : B} {I : Ideal B} (hβ : β ≠ 0)
-    (hX0 : X ≠ ⊥) (hX : ∀ x, x ∈ X ↔ ∃ y ∈ I, (β : Ω) * x = δ * y) : I ≠ ⊥ := by
+theorem ne_bot_of_rep
+    {B : Subring Ω} {X : AddSubgroup Ω} {β δ : B} {I : Ideal B}
+    (hβ : β ≠ 0) (hX0 : X ≠ ⊥) (hX : ∀ x, x ∈ X ↔ ∃ y ∈ I, (β : Ω) * x = δ * y)
+    : I ≠ ⊥ := by
   intro hI
   obtain ⟨⟨x, hxX⟩, hx0⟩ := AddSubgroup.ne_bot_iff_exists_ne_zero.mp hX0
   obtain ⟨y, hy, hxy⟩ := (hX x).1 hxX
@@ -60,46 +62,52 @@ theorem ne_bot_of_rep {B : Subring Ω} {X : AddSubgroup Ω} {β δ : B} {I : Ide
   have hβL : (β : Ω) ≠ 0 := fun h => hβ (Subtype.ext h)
   simp [hβL, hx] at hxy
 
-theorem genIndex_rep [CharZero Ω] {B : Subring Ω} [Module.Finite ℤ B] {X : AddSubgroup Ω} {β δ : B}
-    {I : Ideal B} (hβ : β ≠ 0) (hδ : δ ≠ 0) (hI : I ≠ ⊥)
-    (hX : ∀ x, x ∈ X ↔ ∃ y ∈ I, (β : Ω) * x = δ * y) :
-    genIndex X B.toAddSubgroup = ((B.toAddSubgroup.map (mulBy (β : Ω))).relIndex B.toAddSubgroup : ℝ) /
-      (((B.toAddSubgroup.map (mulBy (δ : Ω))).relIndex B.toAddSubgroup : ℝ) * (I.toAddSubgroup.index : ℝ)) := by
+theorem genIndex_rep
+    [CharZero Ω]
+    {B : Subring Ω} [Module.Finite ℤ B]
+    {X : AddSubgroup Ω} {β δ : B} {I : Ideal B}
+    (hβ : β ≠ 0) (hδ : δ ≠ 0) (hI : I ≠ ⊥) (hX : ∀ x, x ∈ X ↔ ∃ y ∈ I, (β : Ω) * x = δ * y)
+    : genIndex X B.toAddSubgroup
+      = ((B.toAddSubgroup.map (mulBy (β : Ω))).relIndex B.toAddSubgroup : ℝ)
+        / (((B.toAddSubgroup.map (mulBy (δ : Ω))).relIndex B.toAddSubgroup : ℝ)
+          * (I.toAddSubgroup.index : ℝ)) := by
   have hβL : (β : Ω) ≠ 0 := fun h => hβ (Subtype.ext h)
   have hδL : (δ : Ω) ≠ 0 := fun h => hδ (Subtype.ext h)
-  have g := genIndex_eq (X := B.toAddSubgroup) (J := I.toAddSubgroup.map B.subtype.toAddMonoidHom)
-    (M := X) hβL hδL
-    (by rintro _ ⟨y, _, rfl⟩; exact y.2)
-    (by rintro _ ⟨y, hy, rfl⟩; exact B.mul_mem β.2 hy)
-    (by rintro _ ⟨y, hy, rfl⟩; exact B.mul_mem δ.2 hy)
-    (by rintro _ ⟨_, ⟨y, hy, rfl⟩, rfl⟩; exact ⟨β * y, I.mul_mem_left β hy, rfl⟩)
-    (by
-      intro x
-      rw [hX x]
-      constructor
-      · rintro ⟨y, hy, h⟩
-        exact ⟨y, ⟨y, hy, rfl⟩, h⟩
-      · rintro ⟨_, ⟨y, hy, rfl⟩, h⟩
-        exact ⟨y, hy, h⟩)
-    (by rw [relIndex_map_subtype]; exact index_ne_zero hI)
-    (relIndex_mulBy_ne_zero hδ)
+  have g :=
+    genIndex_eq (X := B.toAddSubgroup) (J := I.toAddSubgroup.map B.subtype.toAddMonoidHom) (M := X)
+      hβL hδL (by rintro _ ⟨y, _, rfl⟩; exact y.2)
+      (by rintro _ ⟨y, hy, rfl⟩; exact B.mul_mem β.2 hy)
+      (by rintro _ ⟨y, hy, rfl⟩; exact B.mul_mem δ.2 hy)
+      (by rintro _ ⟨_, ⟨y, hy, rfl⟩, rfl⟩; exact ⟨β * y, I.mul_mem_left β hy, rfl⟩)
+      (by
+        intro x
+        rw [hX x]
+        constructor
+        · rintro ⟨y, hy, h⟩
+          exact ⟨y, ⟨y, hy, rfl⟩, h⟩
+        · rintro ⟨_, ⟨y, hy, rfl⟩, h⟩
+          exact ⟨y, hy, h⟩)
+      (by rw [relIndex_map_subtype]; exact index_ne_zero hI) (relIndex_mulBy_ne_zero hδ)
   rwa [relIndex_map_subtype] at g
 
 end InvertibleIndexMultiplicative
 
-
 open InvertibleIndexMultiplicative in
-theorem InvertibleIndexMul.proof (h1 : LocalGenFamily.Statement) (h2 : LocallyPrincipalCoprimeField.Statement)
-    (h3 : InvertibleProductRep.Statement) (h4 : InvertibleIndexCharP.Statement) :
-    InvertibleIndexMul.Statement := by
+theorem InvertibleIndexMul.proof
+    (h1 : LocalGenFamily.Statement) (h2 : LocallyPrincipalCoprimeField.Statement)
+    (h3 : InvertibleProductRep.Statement) (h4 : InvertibleIndexCharP.Statement)
+    : InvertibleIndexMul.Statement := by
   intro Ω _ B M N P η _ g h hB hM hN hP hg0 hh0 hgc hhc hloc
-  have hlocM : ∀ m : Ideal B, m.IsMaximal → ∃ i, LocalGen B M m (g i) :=
-    fun m hm => (hloc m hm).imp fun _ hi => hi.1
-  have hlocN : ∀ m : Ideal B, m.IsMaximal → ∃ i, LocalGen B N m (h i) :=
-    fun m hm => (hloc m hm).imp fun _ hi => hi.2.1
+  have hlocM : ∀ m : Ideal B, m.IsMaximal → ∃ i, LocalGen B M m (g i) := fun m hm =>
+    (hloc m hm).imp fun _ hi => hi.1
+  have hlocN : ∀ m : Ideal B, m.IsMaximal → ∃ i, LocalGen B N m (h i) := fun m hm =>
+    (hloc m hm).imp fun _ hi => hi.2.1
   by_cases hc : ringChar Ω ≠ 0
   · rw [h4 Ω B M η g hc hB hM hg0 hlocM, h4 Ω B N η h hc hB hN hh0 hlocN,
-      h4 Ω B P η (fun i => g i * h i) hc hB hP (fun i => mul_ne_zero (hg0 i) (hh0 i))
+      h4 Ω B P η
+        (fun i => g i * h i)
+        hc hB hP
+        (fun i => mul_ne_zero (hg0 i) (hh0 i))
         (fun m hm => (hloc m hm).imp fun _ hi => hi.2.2)]
     norm_num
   push Not at hc
@@ -125,8 +133,8 @@ theorem InvertibleIndexMul.proof (h1 : LocalGenFamily.Statement) (h2 : LocallyPr
   have hβL : (β : Ω) ≠ 0 := fun e => hβ (Subtype.ext e)
   have hδL : (δ : Ω) ≠ 0 := fun e => hδ (Subtype.ext e)
   rw [genIndex_rep hβ hδ hI0 hMI, genIndex_rep hβ' hδ' hJ0 hNJ,
-    genIndex_rep (mul_ne_zero hβ hβ') (mul_ne_zero hδ hδ') hIJ0 hPr, hidx, Subring.coe_mul, Subring.coe_mul,
-    relIndex_mulBy_mul hβL β.2 β'.2, relIndex_mulBy_mul hδL δ.2 δ'.2]
+    genIndex_rep (mul_ne_zero hβ hβ') (mul_ne_zero hδ hδ') hIJ0 hPr, hidx, Subring.coe_mul,
+    Subring.coe_mul, relIndex_mulBy_mul hβL β.2 β'.2, relIndex_mulBy_mul hδL δ.2 δ'.2]
   have p1 := Nat.pos_of_ne_zero (relIndex_mulBy_ne_zero hβ)
   have p2 := Nat.pos_of_ne_zero (relIndex_mulBy_ne_zero hδ)
   have p3 := Nat.pos_of_ne_zero (relIndex_mulBy_ne_zero hβ')

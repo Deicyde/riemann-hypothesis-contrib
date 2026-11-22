@@ -10,38 +10,54 @@ noncomputable section
 
 namespace Formalism.L2.G.IntCl
 
-private theorem ideal_smul_top_le_comap_smul_top {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    [AddCommGroup N] [Module R N] (J : Ideal R) (g : M →ₗ[R] N) :
-    (J • ⊤ : Submodule R M) ≤ (J • ⊤ : Submodule R N).comap g :=
+private theorem ideal_smul_top_le_comap_smul_top
+    {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (J : Ideal R) (g : M →ₗ[R] N)
+    : (J • ⊤ : Submodule R M) ≤ (J • ⊤ : Submodule R N).comap g :=
   Submodule.smul_le.mpr fun r hr m _ => by
     rw [Submodule.mem_comap, map_smul]
     exact Submodule.smul_mem_smul hr Submodule.mem_top
 
-private theorem sModEq_ideal_smul_top_map {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    [AddCommGroup N] [Module R N] (J : Ideal R) (g : M →ₗ[R] N) {x y : M}
-    (h : x ≡ y [SMOD (J • ⊤ : Submodule R M)]) : g x ≡ g y [SMOD (J • ⊤ : Submodule R N)] := by
+private theorem sModEq_ideal_smul_top_map
+    {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (J : Ideal R)
+    (g : M →ₗ[R] N)
+    {x y : M} (h : x ≡ y [SMOD (J • ⊤ : Submodule R M)])
+    : g x ≡ g y [SMOD (J • ⊤ : Submodule R N)] := by
   rw [SModEq.sub_mem] at h ⊢
   rw [← map_sub]
   exact ideal_smul_top_le_comap_smul_top J g h
 
-theorem precomplete_equiv {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (I : Ideal R) (e : M ≃ₗ[R] N) [IsPrecomplete I M] : IsPrecomplete I N := by
+theorem precomplete_equiv
+    {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (I : Ideal R)
+    (e : M ≃ₗ[R] N)
+    [IsPrecomplete I M]
+    : IsPrecomplete I N := by
   refine ⟨fun f hf => ?_⟩
-  obtain ⟨L, hL⟩ := (inferInstance : IsPrecomplete I M).prec (f := fun n => e.symm (f n))
-    (fun hmn => sModEq_ideal_smul_top_map _ e.symm.toLinearMap (hf hmn))
+  obtain ⟨L, hL⟩ :=
+    (inferInstance : IsPrecomplete I M).prec
+      (f := fun n => e.symm (f n))
+      (fun hmn => sModEq_ideal_smul_top_map _ e.symm.toLinearMap (hf hmn))
   refine ⟨e L, fun n => ?_⟩
   have := sModEq_ideal_smul_top_map _ e.toLinearMap (hL n)
   simpa using this
 
-theorem complete_of_pow {R : Type*} [CommRing R] (J : Ideal R) {n : ℕ} (hn : 0 < n)
-    (h : IsAdicComplete (J ^ n) R) : IsAdicComplete J R := by
-  refine { toIsHausdorff := ⟨fun x hx => h.toIsHausdorff.haus x fun k => ?_⟩,
-           toIsPrecomplete := ⟨fun f hf => ?_⟩ }
+theorem complete_of_pow
+    {R : Type*} [CommRing R] (J : Ideal R) {n : ℕ} (hn : 0 < n) (h : IsAdicComplete (J ^ n) R)
+    : IsAdicComplete J R := by
+  refine {
+    toIsHausdorff := ⟨fun x hx => h.toIsHausdorff.haus x fun k => ?_⟩
+    toIsPrecomplete := ⟨fun f hf => ?_⟩
+  }
   · rw [← pow_mul]
     exact hx (n * k)
-  · obtain ⟨L, hL⟩ := h.toIsPrecomplete.prec (f := fun k => f (n * k)) (fun {a b} hab => by
-      rw [← pow_mul]
-      exact hf (Nat.mul_le_mul_left n hab))
+  · obtain ⟨L, hL⟩ :=
+      h.toIsPrecomplete.prec
+        (f := fun k => f (n * k))
+        (fun {a b} hab => by
+          rw [← pow_mul]
+          exact hf (Nat.mul_le_mul_left n hab))
     refine ⟨L, fun k => ?_⟩
     have hk : k ≤ n * k := Nat.le_mul_of_pos_left k hn
     have h1 : f k ≡ f (n * k) [SMOD (J ^ k • ⊤ : Submodule R R)] := hf hk
@@ -51,8 +67,9 @@ theorem complete_of_pow {R : Type*} [CommRing R] (J : Ideal R) {n : ℕ} (hn : 0
       exact SModEq.mono (Submodule.smul_mono_left (Ideal.pow_le_pow_right hk)) this
     exact h1.trans h2
 
-private theorem mem_ideal_smul_top_pi_iff' {R : Type*} [CommRing R] {n : ℕ} (J : Ideal R) (x : Fin n → R) :
-    x ∈ (J • ⊤ : Submodule R (Fin n → R)) ↔ ∀ i, x i ∈ J := by
+private theorem mem_ideal_smul_top_pi_iff'
+    {R : Type*} [CommRing R] {n : ℕ} (J : Ideal R) (x : Fin n → R)
+    : x ∈ (J • ⊤ : Submodule R (Fin n → R)) ↔ ∀ i, x i ∈ J := by
   constructor
   · intro hx i
     refine Submodule.smul_induction_on (p := fun y : Fin n → R => y i ∈ J) hx ?_ ?_
@@ -65,15 +82,18 @@ private theorem mem_ideal_smul_top_pi_iff' {R : Type*} [CommRing R] {n : ℕ} (J
     refine Submodule.sum_mem _ fun i _ => ?_
     exact Submodule.smul_mem_smul (h i) Submodule.mem_top
 
-private theorem isPrecomplete_fin_pi {R : Type*} [CommRing R] (J : Ideal R) [IsPrecomplete J R] (n : ℕ) :
-    IsPrecomplete J (Fin n → R) := by
+private theorem isPrecomplete_fin_pi
+    {R : Type*} [CommRing R] (J : Ideal R) [IsPrecomplete J R] (n : ℕ)
+    : IsPrecomplete J (Fin n → R) := by
   refine ⟨fun f hf => ?_⟩
   have hc : ∀ i, ∃ L : R, ∀ k, f k i ≡ L [SMOD (J ^ k • ⊤ : Submodule R R)] := fun i =>
-    (inferInstance : IsPrecomplete J R).prec (f := fun k => f k i) fun {a b} hab => by
-      have h := hf hab
-      rw [SModEq.sub_mem, mem_ideal_smul_top_pi_iff'] at h
-      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
-      simpa using h i
+    (inferInstance : IsPrecomplete J R).prec
+      (f := fun k => f k i)
+      fun {a b} hab => by
+        have h := hf hab
+        rw [SModEq.sub_mem, mem_ideal_smul_top_pi_iff'] at h
+        rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
+        simpa using h i
   choose L hL using hc
   refine ⟨L, fun k => ?_⟩
   rw [SModEq.sub_mem, mem_ideal_smul_top_pi_iff']
@@ -82,8 +102,9 @@ private theorem isPrecomplete_fin_pi {R : Type*} [CommRing R] (J : Ideal R) [IsP
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] at h
   simpa using h
 
-theorem isLocalRing_of_complete {B : Type*} [CommRing B] [IsDedekindDomain B] (I : Ideal B)
-    (hI : I ≠ ⊥) [IsAdicComplete I B] : IsLocalRing B := by
+theorem isLocalRing_of_complete
+    {B : Type*} [CommRing B] [IsDedekindDomain B] (I : Ideal B) (hI : I ≠ ⊥) [IsAdicComplete I B]
+    : IsLocalRing B := by
   have hjac : ∀ P : Ideal B, P.IsMaximal → I ≤ P := fun P hP =>
     (IsAdicComplete.le_jacobson_bot I).trans (sInf_le ⟨bot_le, hP⟩)
   obtain ⟨P, hP⟩ := Ideal.exists_maximal B
@@ -124,8 +145,7 @@ theorem isLocalRing_of_complete {B : Type*} [CommRing B] [IsDedekindDomain B] (I
   have hK_ne : K ≠ ⊤ := fun h => hQ.ne_top (top_le_iff.mp (h ▸ hKQ))
   let f : B[X] := X ^ 2 - X
   have hfe : ∀ y : B, f.eval y = y ^ 2 - y := fun y => by simp [f]
-  have hmon : f.Monic :=
-    (monic_X_pow 2).sub_of_left (by rw [degree_X, degree_X_pow]; norm_num)
+  have hmon : f.Monic := (monic_X_pow 2).sub_of_left (by rw [degree_X, degree_X_pow]; norm_num)
   have hev : f.eval k ∈ I := by
     have h' : f.eval k = -(j * k) := by
       rw [hfe]
@@ -161,8 +181,7 @@ theorem isLocalRing_of_complete {B : Type*} [CommRing B] [IsDedekindDomain B] (I
   · apply hK_ne
     rw [Ideal.eq_top_iff_one, ← hjk]
     refine K.add_mem (hIle2 ?_) hk
-    have hxj : x - k = j := by
-      linear_combination h1 - hjk
+    have hxj : x - k = j := by linear_combination h1 - hjk
     rw [← hxj]
     exact hxk
 
@@ -170,9 +189,10 @@ section Main
 
 open IsLocalRing
 
-variable (A K L : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Field K] [Algebra A K]
-  [IsFractionRing A K] [CharZero K] [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra A L]
-  [IsScalarTower A K L]
+variable
+  (A K L : Type)
+  [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Field K] [Algebra A K] [IsFractionRing A K]
+  [CharZero K] [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra A L] [IsScalarTower A K L]
 
 include K
 
@@ -185,8 +205,7 @@ theorem alg_injective : Function.Injective (algebraMap A (integralClosure A L)) 
   rw [IsScalarTower.algebraMap_eq A (integralClosure A L) L, RingHom.coe_comp] at h
   exact h.of_comp
 
-theorem dedekind : IsDedekindDomain (integralClosure A L) :=
-  integralClosure.isDedekindDomain A K L
+theorem dedekind : IsDedekindDomain (integralClosure A L) := integralClosure.isDedekindDomain A K L
 
 theorem finite : Module.Finite A (integralClosure A L) :=
   IsIntegralClosure.finite (A := A) (K := K) (L := L) (C := integralClosure A L)
@@ -195,50 +214,53 @@ theorem frac : IsFractionRing (integralClosure A L) L :=
   integralClosure.isFractionRing_of_finite_extension (A := A) (K := K) (L := L)
 
 theorem free : Module.Free A (integralClosure A L) := by
-  have : FaithfulSMul A L :=
-    (faithfulSMul_iff_algebraMap_injective A L).mpr (algL_injective A K L)
+  have : FaithfulSMul A L := (faithfulSMul_iff_algebraMap_injective A L).mpr (algL_injective A K L)
   exact IsIntegralClosure.module_free (A := A) (K := K) (L := L) (C := integralClosure A L)
 
 theorem map_ne_bot : (maximalIdeal A).map (algebraMap A (integralClosure A L)) ≠ ⊥ := by
   rw [Ne, Ideal.map_eq_bot_iff_of_injective (alg_injective A K L)]
   exact IsDiscreteValuationRing.not_a_field A
 
-theorem complete_map (hC : IsAdicComplete (maximalIdeal A) A) :
-    IsAdicComplete ((maximalIdeal A).map (algebraMap A (integralClosure A L))) (integralClosure A L) := by
+theorem complete_map (hC : IsAdicComplete (maximalIdeal A) A)
+    : IsAdicComplete ((maximalIdeal A).map (algebraMap A (integralClosure A L)))
+      (integralClosure A L) := by
   have := finite A K L
   have := free A K L
   rw [IsAdicComplete.map_algebraMap_iff]
   have : IsPrecomplete (maximalIdeal A) (Fin (Module.finrank A (integralClosure A L)) → A) :=
     isPrecomplete_fin_pi _ _
-  exact { toIsHausdorff := inferInstance,
-          toIsPrecomplete := precomplete_equiv _
-            (Module.finBasis A (integralClosure A L)).equivFun.symm }
+  exact {
+    toIsHausdorff := inferInstance
+    toIsPrecomplete := precomplete_equiv _ (Module.finBasis A (integralClosure A L)).equivFun.symm
+  }
 
-theorem isLocalRing (hC : IsAdicComplete (maximalIdeal A) A) : IsLocalRing (integralClosure A L) := by
+theorem isLocalRing (hC : IsAdicComplete (maximalIdeal A) A)
+    : IsLocalRing (integralClosure A L) := by
   have := dedekind A K L
   have := complete_map A K L hC
   exact isLocalRing_of_complete _ (map_ne_bot A K L)
 
 theorem not_isField : ¬ IsField (integralClosure A L) := by
   intro h
-  have hA : IsField A :=
-    (Algebra.IsIntegral.isField_iff_isField (alg_injective A K L)).mpr h
+  have hA : IsField A := (Algebra.IsIntegral.isField_iff_isField (alg_injective A K L)).mpr h
   exact IsDiscreteValuationRing.not_a_field A (IsLocalRing.isField_iff_maximalIdeal_eq.mp hA)
 
-theorem isDVR (hC : IsAdicComplete (maximalIdeal A) A) : IsDiscreteValuationRing (integralClosure A L) := by
+theorem isDVR (hC : IsAdicComplete (maximalIdeal A) A)
+    : IsDiscreteValuationRing (integralClosure A L) := by
   have := dedekind A K L
   have := isLocalRing A K L hC
   exact ((IsDiscreteValuationRing.TFAE (integralClosure A L) (not_isField A K L)).out 3 1).mp
     (dedekind A K L)
 
-theorem complete (hC : IsAdicComplete (maximalIdeal A) A) :
-    haveI := isDVR A K L hC
-    IsAdicComplete (maximalIdeal (integralClosure A L)) (integralClosure A L) := by
+theorem complete (hC : IsAdicComplete (maximalIdeal A) A)
+    : haveI := isDVR A K L hC
+      IsAdicComplete (maximalIdeal (integralClosure A L)) (integralClosure A L) := by
   have := isDVR A K L hC
   have := dedekind A K L
   have hcm := complete_map A K L hC
-  have h6 : ∀ J : Ideal (integralClosure A L), J ≠ ⊥ →
-      ∃ n : ℕ, J = maximalIdeal (integralClosure A L) ^ n :=
+  have h6
+      : ∀ J : Ideal (integralClosure A L),
+        J ≠ ⊥ → ∃ n : ℕ, J = maximalIdeal (integralClosure A L) ^ n :=
     ((IsDiscreteValuationRing.TFAE (integralClosure A L) (not_isField A K L)).out 1 7).mp
       (isDVR A K L hC)
   obtain ⟨n, hn⟩ := h6 _ (map_ne_bot A K L)

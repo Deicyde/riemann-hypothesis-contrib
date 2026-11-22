@@ -16,23 +16,24 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem linProj_smul_left {m n : ℕ} (π : Fin m → Fin n → ℂ) (c : ℂ) (y : EuclideanSpace ℂ (Fin n)) :
-    linProj π (c • y) = c • linProj π y :=
+theorem linProj_smul_left {m n : ℕ} (π : Fin m → Fin n → ℂ) (c : ℂ) (y : EuclideanSpace ℂ (Fin n))
+    : linProj π (c • y) = c • linProj π y :=
   (linProjₗ π).map_smul c y
 
-theorem tangentGauss_indicator_eq {m n : ℕ} (π : Fin m → Fin n → ℂ) (r : ℝ) :
-    (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1).indicator 1 (linProj π ((r : ℂ) • firstCoordVec n)) =
-      if |r| * ‖linProj π (firstCoordVec n)‖ < 1 then (1 : ℝ≥0∞) else 0 := by
+theorem tangentGauss_indicator_eq {m n : ℕ} (π : Fin m → Fin n → ℂ) (r : ℝ)
+    : (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1).indicator 1
+        (linProj π ((r : ℂ) • firstCoordVec n))
+      = if |r| * ‖linProj π (firstCoordVec n)‖ < 1 then (1 : ℝ≥0∞) else 0 := by
   simp only [Set.indicator, Metric.mem_ball, dist_zero_right, linProj_smul_left, norm_smul,
     Complex.norm_real, Real.norm_eq_abs, Pi.one_apply]
 
-theorem tangentGaussProfile_abs (n m : ℕ) (r : ℝ) :
-    tangentGaussProfile n m |r| = tangentGaussProfile n m r := by
+theorem tangentGaussProfile_abs (n m : ℕ) (r : ℝ)
+    : tangentGaussProfile n m |r| = tangentGaussProfile n m r := by
   unfold tangentGaussProfile
   simp only [tangentGauss_indicator_eq, abs_abs]
 
-theorem tangentGaussProfile_antitoneOn (n m : ℕ) :
-    AntitoneOn (tangentGaussProfile n m) (Set.Ici 0) := by
+theorem tangentGaussProfile_antitoneOn (n m : ℕ)
+    : AntitoneOn (tangentGaussProfile n m) (Set.Ici 0) := by
   intro r hr s hs hrs
   unfold tangentGaussProfile
   refine lintegral_mono fun π => ?_
@@ -57,21 +58,27 @@ theorem measurable_tangentGaussProfile (n m : ℕ) : Measurable (tangentGaussPro
   rw [h]
   exact hψ.measurable.comp measurable_abs
 
-theorem pow_two_mul_sub_one_le {r : ℝ} (hr : 0 ≤ r) (m : ℕ) : r ^ (2 * m - 1) ≤ (1 + r ^ 2) ^ m := by
+theorem pow_two_mul_sub_one_le {r : ℝ} (hr : 0 ≤ r) (m : ℕ)
+    : r ^ (2 * m - 1) ≤ (1 + r ^ 2) ^ m := by
   rcases le_total r 1 with h | h
   · exact (pow_le_one₀ hr h).trans (one_le_pow₀ (by nlinarith))
-  · calc r ^ (2 * m - 1) ≤ r ^ (2 * m) := pow_le_pow_right₀ h (Nat.sub_le _ _)
+  · calc
+      r ^ (2 * m - 1)
+        ≤ r ^ (2 * m) := pow_le_pow_right₀ h (Nat.sub_le _ _)
       _ = (r ^ 2) ^ m := by rw [pow_mul]
       _ ≤ (1 + r ^ 2) ^ m := pow_le_pow_left₀ (sq_nonneg r) (by linarith) m
 
-theorem TangentGaussMoment.proof (hA : LeadPlaneJac.Statement) (hB : LeadBlockGaussTail.Statement) :
-    TangentGaussMoment.Statement := by
+theorem TangentGaussMoment.proof (hA : LeadPlaneJac.Statement) (hB : LeadBlockGaussTail.Statement)
+    : TangentGaussMoment.Statement := by
   intro n m hm hmn
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
-  have hk : ∀ r : ℝ, tangentGaussProfile (m + k) m r = ∫⁻ π : Fin m → Fin (m + k) → ℂ, matGauss π *
-      (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1).indicator 1
-        (linProj π ((r : ℂ) • firstCoordVec (m + k))) *
-      ENNReal.ofReal (‖(coordPlaneBlock π).det‖ ^ 2) := by
+  have hk
+      : ∀ r : ℝ,
+        tangentGaussProfile (m + k) m r
+          = ∫⁻ π : Fin m → Fin (m + k) → ℂ, matGauss π *
+            (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1).indicator 1
+              (linProj π ((r : ℂ) • firstCoordVec (m + k))) *
+            ENNReal.ofReal (‖(coordPlaneBlock π).det‖ ^ 2) := by
     intro r
     unfold tangentGaussProfile
     simp only [hA m k]
@@ -84,10 +91,11 @@ theorem TangentGaussMoment.proof (hA : LeadPlaneJac.Statement) (hB : LeadBlockGa
       exact (PiLp.continuous_toLp 2 _).comp (by fun_prop)
     have hdet : Continuous fun π : Fin m → Fin (m + k) → ℂ => (coordPlaneBlock π).det :=
       Continuous.matrix_det (by unfold coordPlaneBlock; fun_prop)
-    have hmeas : Measurable fun π : Fin m → Fin (m + k) → ℂ => matGauss π *
-        (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1).indicator 1
-          (linProj π ((r : ℂ) • firstCoordVec (m + k))) *
-        ENNReal.ofReal (‖(coordPlaneBlock π).det‖ ^ 2) := by
+    have hmeas : Measurable fun π : Fin m → Fin (m + k) → ℂ =>
+        matGauss π
+          * (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1).indicator 1
+            (linProj π ((r : ℂ) • firstCoordVec (m + k)))
+          * ENNReal.ofReal (‖(coordPlaneBlock π).det‖ ^ 2) := by
       refine Measurable.mul (Measurable.mul ?_ ?_) ?_
       · unfold matGauss
         exact ENNReal.measurable_ofReal.comp (by fun_prop)
@@ -119,44 +127,51 @@ theorem TangentGaussMoment.proof (hA : LeadPlaneJac.Statement) (hB : LeadBlockGa
     (measurable_tangentGaussProfile _ _).mul (ENNReal.measurable_ofReal.comp (by fun_prop))
   refine ⟨measurable_tangentGaussProfile _ _, tangentGaussProfile_antitoneOn _ _, hpos, ?_, ?_⟩
   · rw [setLIntegral_pos_iff hmeasM]
-    have hsub : Set.Ioi (0 : ℝ) ⊆
-        Function.support (fun r : ℝ =>
-          tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1))) ∩
-          Set.Ioi 0 := by
+    have hsub
+        : Set.Ioi (0 : ℝ)
+          ⊆ Function.support (fun r : ℝ =>
+              tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1)))
+            ∩ Set.Ioi 0 := by
       intro r hr
       refine ⟨?_, hr⟩
       have hm' : (0 : ℝ) < m := by exact_mod_cast hm
-      exact mul_ne_zero (hpos r).ne' (ENNReal.ofReal_pos.2 (by
-        have := Set.mem_Ioi.1 hr
-        positivity)).ne'
+      exact mul_ne_zero (hpos r).ne'
+        (ENNReal.ofReal_pos.2 (by
+          have := Set.mem_Ioi.1 hr
+          positivity)).ne'
     exact lt_of_lt_of_le (by simp) (measure_mono hsub)
-  · have hle : ∀ r ∈ Set.Ioi (0 : ℝ),
-        tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1)) ≤
-          ENNReal.ofReal (2 * m * max C 0 * (1 + r ^ 2)⁻¹) := by
+  · have hle
+        : ∀ r ∈ Set.Ioi (0 : ℝ),
+          tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1))
+            ≤ ENNReal.ofReal (2 * m * max C 0 * (1 + r ^ 2)⁻¹) := by
       intro r hr
       have hr0 : 0 ≤ r := le_of_lt hr
       have h1 := pow_two_mul_sub_one_le hr0 m
       have hx : 0 < 1 + r ^ 2 := by positivity
       have hC0 : 0 ≤ max C 0 := le_max_right _ _
-      calc tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1))
-          ≤ ENNReal.ofReal (C / (1 + r ^ 2) ^ (m + 1)) * ENNReal.ofReal (2 * m * r ^ (2 * m - 1)) := by
-            rw [hk r]
-            gcongr
-            exact hC r
+      calc
+        tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1))
+            ≤ ENNReal.ofReal (C / (1 + r ^ 2) ^ (m + 1))
+              * ENNReal.ofReal (2 * m * r ^ (2 * m - 1)) := by
+          rw [hk r]
+          gcongr
+          exact hC r
         _ = ENNReal.ofReal (C / (1 + r ^ 2) ^ (m + 1) * (2 * m * r ^ (2 * m - 1))) :=
-            (ENNReal.ofReal_mul' (by positivity)).symm
+          (ENNReal.ofReal_mul' (by positivity)).symm
         _ ≤ ENNReal.ofReal (2 * m * max C 0 * (1 + r ^ 2)⁻¹) := by
-            refine ENNReal.ofReal_le_ofReal ?_
-            calc C / (1 + r ^ 2) ^ (m + 1) * (2 * m * r ^ (2 * m - 1))
+          refine ENNReal.ofReal_le_ofReal ?_
+          calc
+            C / (1 + r ^ 2) ^ (m + 1) * (2 * m * r ^ (2 * m - 1))
                 ≤ max C 0 / (1 + r ^ 2) ^ (m + 1) * (2 * m * (1 + r ^ 2) ^ m) := by
-                  gcongr
-                  exact le_max_left _ _
-              _ = 2 * m * max C 0 * (1 + r ^ 2)⁻¹ := by
-                  field_simp
-                  ring
-    calc ∫⁻ r in Set.Ioi (0 : ℝ), tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1))
-        ≤ ∫⁻ r in Set.Ioi (0 : ℝ), ENNReal.ofReal (2 * m * max C 0 * (1 + r ^ 2)⁻¹) :=
-          setLIntegral_mono' measurableSet_Ioi hle
+              gcongr
+              exact le_max_left _ _
+            _ = 2 * m * max C 0 * (1 + r ^ 2)⁻¹ := by
+              field_simp
+              ring
+    calc
+      ∫⁻ r in Set.Ioi (0 : ℝ), tangentGaussProfile (m + k) m r * ENNReal.ofReal (2 * m * r ^ (2 * m - 1))
+          ≤ ∫⁻ r in Set.Ioi (0 : ℝ), ENNReal.ofReal (2 * m * max C 0 * (1 + r ^ 2)⁻¹) :=
+        setLIntegral_mono' measurableSet_Ioi hle
       _ ≤ ∫⁻ r, ENNReal.ofReal (2 * m * max C 0 * (1 + r ^ 2)⁻¹) := setLIntegral_le_lintegral _ _
       _ < ⊤ := (integrable_inv_one_add_sq.const_mul _).lintegral_lt_top
 

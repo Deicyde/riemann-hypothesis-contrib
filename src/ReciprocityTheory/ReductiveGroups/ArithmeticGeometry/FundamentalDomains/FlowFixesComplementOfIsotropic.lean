@@ -19,9 +19,9 @@ section onetau
 
 variable (ξ : Fin r → E) (τ : X.Ψ)
 
-private theorem flowMat_mulVec' (s : ℂ) (v : Fin r → ℂ) :
-    Matrix.mulVec (X.flowMat ξ τ s) v =
-      v - (I * X.c τ * s * hermC τ.1 X.Gm v (emb τ.1 ξ)) • emb τ.1 ξ := by
+private theorem flowMat_mulVec' (s : ℂ) (v : Fin r → ℂ)
+    : Matrix.mulVec (X.flowMat ξ τ s) v
+      = v - (I * X.c τ * s * hermC τ.1 X.Gm v (emb τ.1 ξ)) • emb τ.1 ξ := by
   ext a
   simp only [Matrix.mulVec, dotProduct, flowMat, Matrix.of_apply, sub_mul, Finset.sum_sub_distrib,
     ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true,
@@ -31,9 +31,9 @@ private theorem flowMat_mulVec' (s : ℂ) (v : Fin r → ℂ) :
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun k _ => ?_
   ring
 
-private theorem hermC_sub_const_smul_right (σ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
-    (w v e : Fin r → ℂ) (k : ℂ) :
-    hermC σ G w (v - k • e) = hermC σ G w v - conj k * hermC σ G w e := by
+private theorem hermC_sub_const_smul_right
+    (σ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (w v e : Fin r → ℂ) (k : ℂ)
+    : hermC σ G w (v - k • e) = hermC σ G w v - conj k * hermC σ G w e := by
   simp only [hermC, Finset.mul_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_sub, map_mul]

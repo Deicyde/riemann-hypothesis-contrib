@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CubWeilOfI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS ev pt addOf)
 open ReciprocityTheory.PGsh.Be2 (nEval)
 open GlobalTheory.UU (CubWeil)
@@ -16,8 +18,12 @@ open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem embOK_exists_ringHom :
-    ∀ (T : CDVR) (C : Type) [Field C] [CharZero C] (V : VF C) (ι' : T.Fr →+* C), EmbOK T V ι' → ∃ j : T.V →+* V.RR, (∀ x, (j x : C) = ι' (algebraMap T.V T.Fr x)) ∧ ∀ x ∈ maximalIdeal T.V, V.MM (j x : C) := by
+theorem embOK_exists_ringHom
+    : ∀ (T : CDVR) (C : Type) [Field C] [CharZero C] (V : VF C) (ι' : T.Fr →+* C),
+      EmbOK T V ι'
+        → ∃ j : T.V →+* V.RR,
+          (∀ x, (j x : C) = ι' (algebraMap T.V T.Fr x))
+            ∧ ∀ x ∈ maximalIdeal T.V, V.MM (j x : C) := by
   intro T C _ _ V ι' h
   have hnn : ∀ a : T.V, 0 ≤ vV T.V (algebraMap T.V T.Fr a) := by
     intro a

@@ -43,8 +43,7 @@ theorem ConeDimComponent.proof_closed : ConeDimComponent.Statement := by
   have huW : linForm u ∈ W := (le_sup_right.trans hmin.1.2) (Ideal.mem_span_singleton_self _)
   set B := MvPolynomial (Fin n) F ⧸ I
   have _ : Algebra.FiniteType F B :=
-    Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ F I)
-      (Ideal.Quotient.mkₐ_surjective F I)
+    Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ F I) (Ideal.Quotient.mkₐ_surjective F I)
   set W' : Ideal B := W.map (Ideal.Quotient.mk I)
   have hW'prime : W'.IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
@@ -76,8 +75,8 @@ theorem ConeDimComponent.proof_closed : ConeDimComponent.Statement := by
   have hyle : y ≤ e := by
     have : y + 1 ≤ (e : ℕ∞) + 1 := by exact_mod_cast h1
     exact (ENat.add_le_add_iff_right ENat.one_ne_top).mp this
-  obtain ⟨m, rfl⟩ : ∃ m : ℕ, (m : ℕ∞) = y := ENat.ne_top_iff_exists.mp (ne_top_of_le_ne_top
-    (ENat.natCast_ne_top e) hyle)
+  obtain ⟨m, rfl⟩ : ∃ m : ℕ, (m : ℕ∞) = y :=
+    ENat.ne_top_iff_exists.mp (ne_top_of_le_ne_top (ENat.natCast_ne_top e) hyle)
   have h3 : ((e + 1 : ℕ) : ℕ∞) ≤ 1 + m := by rw [← h2]; gcongr
   have h4 : e + 1 ≤ 1 + m := by exact_mod_cast h3
   have h5 : m ≤ e := by exact_mod_cast hyle

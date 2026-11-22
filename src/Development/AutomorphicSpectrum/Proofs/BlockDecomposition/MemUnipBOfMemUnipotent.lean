@@ -20,8 +20,8 @@ section Local
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-theorem psiOK_of_hasConductor {ψ₁ : AddChar F Circle} (h : GlobalTheory.SplitWeil.HasConductor ψ₁ 1) :
-    PsiOK (Circle.coeHom.compAddChar ψ₁) := by
+theorem psiOK_of_hasConductor {ψ₁ : AddChar F Circle} (h : GlobalTheory.SplitWeil.HasConductor ψ₁ 1)
+    : PsiOK (Circle.coeHom.compAddChar ψ₁) := by
   have h1 : ∀ y : F, ValuativeRel.valuation F y ≤ 1 → ψ₁ y = 1 := fun y hy =>
     (h 1).mpr (by simp) y (by simpa using hy)
   refine ⟨fun x hx => ?_, ?_, fun x => Circle.norm_coe (ψ₁ x)⟩
@@ -35,8 +35,10 @@ theorem psiOK_of_hasConductor {ψ₁ : AddChar F Circle} (h : GlobalTheory.Split
     have hnot : ¬ ValuativeRel.valuation F ϖ⁻¹ ≤ ValuativeRel.valuation F ((1 : Fˣ) : F) := by
       rw [Units.val_one, map_one]
       intro hle
-      have h3 : ValuativeRel.valuation F ϖ * ValuativeRel.valuation F ϖ⁻¹ ≤
-          ValuativeRel.valuation F ϖ * 1 := by gcongr
+      have h3
+          : ValuativeRel.valuation F ϖ * ValuativeRel.valuation F ϖ⁻¹
+            ≤ ValuativeRel.valuation F ϖ * 1 := by
+        gcongr
       rw [hinv, mul_one] at h3
       exact absurd hlt (not_lt.mpr h3)
     have hex : ¬ ∀ y : F, ValuativeRel.valuation F y ≤ ValuativeRel.valuation F ϖ⁻¹ → ψ₁ y = 1 :=
@@ -45,7 +47,8 @@ theorem psiOK_of_hasConductor {ψ₁ : AddChar F Circle} (h : GlobalTheory.Split
     obtain ⟨y, hy, hy1⟩ := hex
     refine ⟨y, ?_, ?_⟩
     · rw [Valuation.mem_integer_iff, map_mul]
-      calc ValuativeRel.valuation F ϖ * ValuativeRel.valuation F y
+      calc
+        ValuativeRel.valuation F ϖ * ValuativeRel.valuation F y
           ≤ ValuativeRel.valuation F ϖ * ValuativeRel.valuation F ϖ⁻¹ := by gcongr
         _ = 1 := hinv
     · intro hc
@@ -54,8 +57,8 @@ theorem psiOK_of_hasConductor {ψ₁ : AddChar F Circle} (h : GlobalTheory.Split
       rw [Circle.coe_one]
       exact hc
 
-theorem mem_unipB_of_mem_unipotent {n : ℕ} {g : GL (Fin n) F} (hg : g ∈ Iwasawa.unipotent F n) :
-    g ∈ GlobalTheory.SmGL.unipB F (Fin n) := by
+theorem mem_unipB_of_mem_unipotent {n : ℕ} {g : GL (Fin n) F} (hg : g ∈ Iwasawa.unipotent F n)
+    : g ∈ GlobalTheory.SmGL.unipB F (Fin n) := by
   obtain ⟨hut, hdiag⟩ := hg
   have hp : g ∈ GlobalTheory.SmGL.parab F (GlobalTheory.SmGL.points (Fin n)) := by
     intro i j hij
@@ -71,13 +74,17 @@ theorem mem_unipB_of_mem_unipotent {n : ℕ} {g : GL (Fin n) F} (hg : g ∈ Iwas
   rw [Matrix.one_apply_eq]
   exact hdiag a
 
-theorem superDiag_eq_superdiagSum {n : ℕ} (g : GL (Fin n) F) :
-    GlobalTheory.Whittaker.superDiag g = Whittaker.superdiagSum (g : Matrix (Fin n) (Fin n) F) := by
-  simp only [GlobalTheory.Whittaker.superDiag, GroundTheory.Automorphic.Whittaker.superdiagSum, Finset.sum_filter]
+theorem superDiag_eq_superdiagSum {n : ℕ} (g : GL (Fin n) F)
+    : GlobalTheory.Whittaker.superDiag g
+      = Whittaker.superdiagSum (g : Matrix (Fin n) (Fin n) F) := by
+  simp only [GlobalTheory.Whittaker.superDiag, GroundTheory.Automorphic.Whittaker.superdiagSum,
+    Finset.sum_filter]
 
-theorem whit_of_isFunctional {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+theorem whit_of_isFunctional
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
     {ρ : Representation ℂ (GL (Fin n) F) V} {ψ₁ : AddChar F Circle} {l : Module.Dual ℂ V}
-    (h : GlobalTheory.Whittaker.IsFunctional ψ₁ ρ l) : Whit ρ (Circle.coeHom.compAddChar ψ₁) l := by
+    (h : GlobalTheory.Whittaker.IsFunctional ψ₁ ρ l)
+    : Whit ρ (Circle.coeHom.compAddChar ψ₁) l := by
   intro g hg u
   rw [h g (mem_unipB_of_mem_unipotent hg) u, GroundTheory.Automorphic.Whittaker.psiN,
     ← superDiag_eq_superdiagSum]
@@ -85,23 +92,30 @@ theorem whit_of_isFunctional {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V
 
 end Local
 
-private theorem continuous_of_hasConductor_one {k : Type} [Field k] [ValuativeRel k]
-    [TopologicalSpace k] [IsNonarchimedeanLocalField k] {ψ₁ : AddChar k Circle}
-    (h : GlobalTheory.SplitWeil.HasConductor ψ₁ 1) : Continuous ψ₁ := by
+private theorem continuous_of_hasConductor_one
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {ψ₁ : AddChar k Circle} (h : GlobalTheory.SplitWeil.HasConductor ψ₁ 1)
+    : Continuous ψ₁ := by
   have h1 : ∀ y : k, ValuativeRel.valuation k y ≤ 1 → ψ₁ y = 1 := fun y hy =>
     (h 1).mpr (by simp) y (by simpa using hy)
   have hopen : IsOpen ((ValuativeRel.valuation k).integer : Set k) := Valuation.isOpen_integer
   refine IsLocallyConstant.continuous ?_
   rw [IsLocallyConstant.iff_exists_open]
   intro x
-  refine ⟨(fun y => y - x) ⁻¹' ((ValuativeRel.valuation k).integer : Set k),
-    hopen.preimage (continuous_sub_right x), ?_, ?_⟩
+  refine ⟨
+    (fun y => y - x) ⁻¹' ((ValuativeRel.valuation k).integer : Set k),
+    hopen.preimage (continuous_sub_right x),
+    ?_,
+    ?_
+  ⟩
   · show x - x ∈ (ValuativeRel.valuation k).integer
     rw [sub_self]
     exact zero_mem _
   · intro y hy
     have hy' : ψ₁ (y - x) = 1 := h1 _ ((Valuation.mem_integer_iff _ _).mp hy)
-    calc ψ₁ y = ψ₁ ((y - x) + x) := by rw [sub_add_cancel]
+    calc
+      ψ₁ y
+        = ψ₁ ((y - x) + x) := by rw [sub_add_cancel]
       _ = ψ₁ (y - x) * ψ₁ x := AddChar.map_add_eq_mul _ _ _
       _ = ψ₁ x := by rw [hy', one_mul]
 
@@ -111,8 +125,9 @@ theorem global_character_holds : G4 := by
   have hne : ψ₁ ≠ 1 := by
     rintro rfl
     exact GlobalTheory.SplitWeil.Model.not_hasConductor_one 1 hψ
-  obtain ⟨l, hl0, hl⟩ := GlobalTheory.Published.cuspidalGeneric_holds E a ha π w ψ₁
-    (continuous_of_hasConductor_one hψ) hne
+  obtain ⟨l, hl0, hl⟩ :=
+    GlobalTheory.Published.cuspidalGeneric_holds E a ha π w ψ₁ (continuous_of_hasConductor_one hψ)
+      hne
   exact ⟨_, psiOK_of_hasConductor hψ, l, hl0, whit_of_isFunctional hl⟩
 
 end GlobalTheory.CompanionTheory.JSBound

@@ -9,37 +9,46 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC CochainCo
 
 namespace LateralTheory.CohomologicalPurity.Cl
 
-def LeafResK : Prop := ∀ (q : ℕ) (i : ℤ),
-  (∀ s, Injective ((res _ (tw q i)).X s)) ∧ ∀ s < 0, IsZero ((res _ (tw q i)).X s)
+def LeafResK : Prop :=
+  ∀ (q : ℕ) (i : ℤ),
+    (∀ s, Injective ((res _ (tw q i)).X s)) ∧ ∀ s < 0, IsZero ((res _ (tw q i)).X s)
 
-def LeafZcPull : Prop := ∀ {R : Type} [CommRing R] (K : Cx R) {X' X : Scheme.{0}} (f : X' ⟶ X) (U' : X'.Opens)
-  (U : X.Opens), U' ≤ f ⁻¹ᵁ U → ∀ (n : ℤ) (a : Sec (K.X n) X), a ∈ Zc K U n → Sec.res f a ∈ Zc K U' n
+def LeafZcPull : Prop :=
+  ∀ {R : Type} [CommRing R] (K : Cx R) {X' X : Scheme.{0}} (f : X' ⟶ X) (U' : X'.Opens)
+      (U : X.Opens),
+    U' ≤ f ⁻¹ᵁ U → ∀ (n : ℤ) (a : Sec (K.X n) X), a ∈ Zc K U n → Sec.res f a ∈ Zc K U' n
 
-def LeafZcIn : Prop := ∀ {R : Type} [CommRing R] (K : Cx R) {X : Scheme.{0}} (U W V : X.Opens) (h : V ≤ W), V ≤ U →
-  ∀ (n : ℤ) (a : Sec (K.X n) W.toScheme), a ∈ Zc K (W.ι ⁻¹ᵁ U) n → rs h a = 0
+def LeafZcIn : Prop :=
+  ∀ {R : Type} [CommRing R] (K : Cx R) {X : Scheme.{0}} (U W V : X.Opens) (h : V ≤ W),
+    V ≤ U → ∀ (n : ℤ) (a : Sec (K.X n) W.toScheme), a ∈ Zc K (W.ι ⁻¹ᵁ U) n → rs h a = 0
 
-private theorem sres_zero {R : Type} [CommRing R] {G : Shv R} {X Y : Scheme.{0}} (f : Y ⟶ X) :
-    Sec.res f (0 : Sec G X) = 0 := by
+private theorem sres_zero {R : Type} [CommRing R] {G : Shv R} {X Y : Scheme.{0}} (f : Y ⟶ X)
+    : Sec.res f (0 : Sec G X) = 0 := by
   show (G.obj.map f.op).hom 0 = 0
   exact map_zero _
 
-private theorem smap_zero {R : Type} [CommRing R] {G H : Shv R} (φ : G ⟶ H) {X : Scheme.{0}} :
-    Sec.map φ (0 : Sec G X) = 0 := by
+private theorem smap_zero {R : Type} [CommRing R] {G H : Shv R} (φ : G ⟶ H) {X : Scheme.{0}}
+    : Sec.map φ (0 : Sec G X) = 0 := by
   show (φ.hom.app (op X)).hom 0 = 0
   exact map_zero _
 
-private theorem Bd_zero {R : Type} [CommRing R] (K : Cx R) {X : Scheme.{0}} (U : X.Opens) (n : ℤ) : Bd K U n 0 :=
+private theorem Bd_zero {R : Type} [CommRing R] (K : Cx R) {X : Scheme.{0}} (U : X.Opens) (n : ℤ)
+    : Bd K U n 0 :=
   ⟨0, sres_zero _, smap_zero _⟩
 
-private theorem leι {X : Scheme.{0}} {V W : X.Opens} (h : V ≤ W) (U : X.Opens) :
-    V.ι ⁻¹ᵁ U ≤ X.homOfLE h ⁻¹ᵁ (W.ι ⁻¹ᵁ U) :=
+private theorem leι {X : Scheme.{0}} {V W : X.Opens} (h : V ≤ W) (U : X.Opens)
+    : V.ι ⁻¹ᵁ U ≤ X.homOfLE h ⁻¹ᵁ (W.ι ⁻¹ᵁ U) :=
   le_of_comp _ _ U rfl _ (Scheme.homOfLE_ι _ _) le_rfl
 
-private theorem descent_glue_of_residue_pullback_inclusion (hK : LeafResK) (hP : LeafZcPull) (hI : LeafZcIn) : LeafDescOGlue := by
+private theorem descent_glue_of_residue_pullback_inclusion
+    (hK : LeafResK) (hP : LeafZcPull) (hI : LeafZcIn)
+    : LeafDescOGlue := by
   intro hD hF q X U m i hL A V s hcov H
   obtain ⟨cls, hon, hker, hnat⟩ := hD q m i
-  have H1 : ∀ n < m, ∀ (W : X.Opens), ∀ a ∈ Zc (res _ (tw q i)) (W.ι ⁻¹ᵁ U) n, ∀ x ∈ W,
-      ∃ (V : X.Opens) (h : V ≤ W), x ∈ V ∧ Bd (res _ (tw q i)) (V.ι ⁻¹ᵁ U) n (rs h a) := by
+  have H1
+      : ∀ n < m, ∀ (W : X.Opens), ∀ a ∈ Zc (res _ (tw q i)) (W.ι ⁻¹ᵁ U) n, ∀ x ∈ W,
+        ∃ (V : X.Opens) (h : V ≤ W),
+          x ∈ V ∧ Bd (res _ (tw q i)) (V.ι ⁻¹ᵁ U) n (rs h a) := by
     intro n hn W a ha x hx
     by_cases hxU : x ∈ U
     · refine ⟨W ⊓ U, inf_le_left, ⟨hx, hxU⟩, ?_⟩
@@ -67,13 +76,22 @@ private theorem descent_glue_of_residue_pullback_inclusion (hK : LeafResK) (hP :
     · exact ⟨none, hx⟩
     · obtain ⟨a, ha⟩ := hcov x hx
       exact ⟨some a, ha⟩
-  have hcmp : ∀ k l', ∀ x ∈ V' k, x ∈ V' l' → ∃ (T : X.Opens) (hk : T ≤ V' k) (hl : T ≤ V' l'), x ∈ T ∧
-      Bd (res _ (tw q i)) (T.ι ⁻¹ᵁ U) m (rs hk (a' k) - rs hl (a' l')) := by
+  have hcmp
+      : ∀ k l', ∀ x ∈ V' k,
+        x ∈ V' l'
+          → ∃ (T : X.Opens) (hk : T ≤ V' k) (hl : T ≤ V' l'),
+            x ∈ T ∧ Bd (res _ (tw q i)) (T.ι ⁻¹ᵁ U) m (rs hk (a' k) - rs hl (a' l')) := by
     intro k l' x hk hl'
     by_cases hxU : x ∈ U
-    · refine ⟨V' k ⊓ V' l' ⊓ U, inf_le_left.trans inf_le_left, inf_le_left.trans inf_le_right, ⟨⟨hk, hl'⟩, hxU⟩, ?_⟩
-      rw [hI _ U (V' k) _ _ inf_le_right m (a' k) (hmem k), hI _ U (V' l') _ _ inf_le_right m (a' l') (hmem l'),
-        sub_zero]
+    · refine ⟨
+        V' k ⊓ V' l' ⊓ U,
+        inf_le_left.trans inf_le_left,
+        inf_le_left.trans inf_le_right,
+        ⟨⟨hk, hl'⟩, hxU⟩,
+        ?_
+      ⟩
+      rw [hI _ U (V' k) _ _ inf_le_right m (a' k) (hmem k),
+        hI _ U (V' l') _ _ inf_le_right m (a' l') (hmem l'), sub_zero]
       exact Bd_zero _ _ _
     · rcases k with _ | a
       · exact absurd hk hxU
@@ -97,17 +115,22 @@ private theorem descent_glue_of_residue_pullback_inclusion (hK : LeafResK) (hP :
   rw [hnat (V a).ι ((V a).ι ⁻¹ᵁ U) U le_rfl ⟨c, hc⟩ ⟨_, zc⟩ rfl, ← hl a, ← sub_eq_zero, ← map_sub]
   exact (hker _ _).2 (hcb (some a))
 
-private theorem sres_comp {R : Type} [CommRing R] {G : Shv R} {X Y Z : Scheme.{0}} (g : Z ⟶ Y) (f : Y ⟶ X) (a : Sec G X) :
-    Sec.res g (Sec.res f a) = Sec.res (g ≫ f) a := by
+private theorem sres_comp
+    {R : Type} [CommRing R] {G : Shv R} {X Y Z : Scheme.{0}} (g : Z ⟶ Y) (f : Y ⟶ X) (a : Sec G X)
+    : Sec.res g (Sec.res f a) = Sec.res (g ≫ f) a := by
   show (G.obj.map g.op).hom ((G.obj.map f.op).hom a) = (G.obj.map (g ≫ f).op).hom a
-  rw [op_comp, Functor.map_comp]; rfl
+  rw [op_comp, Functor.map_comp]
+  rfl
 
-private theorem sres_id {R : Type} [CommRing R] {G : Shv R} {X : Scheme.{0}} (a : Sec G X) : Sec.res (𝟙 X) a = a := by
+private theorem sres_id {R : Type} [CommRing R] {G : Shv R} {X : Scheme.{0}} (a : Sec G X)
+    : Sec.res (𝟙 X) a = a := by
   show (G.obj.map (𝟙 X).op).hom a = a
-  rw [op_id, CategoryTheory.Functor.map_id]; rfl
+  rw [op_id, CategoryTheory.Functor.map_id]
+  rfl
 
-private theorem smap_res {R : Type} [CommRing R] {G H : Shv R} (φ : G ⟶ H) {X Y : Scheme.{0}} (f : Y ⟶ X) (a : Sec G X) :
-    Sec.map φ (Sec.res f a) = Sec.res f (Sec.map φ a) := by
+private theorem smap_res
+    {R : Type} [CommRing R] {G H : Shv R} (φ : G ⟶ H) {X Y : Scheme.{0}} (f : Y ⟶ X) (a : Sec G X)
+    : Sec.map φ (Sec.res f a) = Sec.res f (Sec.map φ a) := by
   show (φ.hom.app (op Y)).hom ((G.obj.map f.op).hom a) = (H.obj.map f.op).hom ((φ.hom.app (op X)).hom a)
   have h := φ.hom.naturality f.op
   exact congrArg (fun t => t.hom a) h
@@ -123,16 +146,22 @@ private theorem LeafZcIn_pf : LeafZcIn := by
   intro R _ K X U W V h hU n a ha
   obtain ⟨h1, -⟩ := (mem_Zc a).1 ha
   have e : (⊤ : V.toScheme.Opens) ≤ X.homOfLE h ⁻¹ᵁ (W.ι ⁻¹ᵁ U) :=
-    le_of_comp _ _ U rfl _ (Scheme.homOfLE_ι _ _) ((Scheme.Opens.ι_preimage_self V).symm.le.trans (fun y hy => hU hy))
+    le_of_comp _ _ U rfl _ (Scheme.homOfLE_ι _ _)
+      ((Scheme.Opens.ι_preimage_self V).symm.le.trans (fun y hy => hU hy))
   have h0 : Sec.res (⊤ : V.toScheme.Opens).ι (rs h a) = 0 := by
     rw [sres_comp, ← Scheme.Hom.resLE_comp_ι (X.homOfLE h) e, ← sres_comp, h1, sres_zero]
   rw [← sres_id (rs h a), ← Scheme.toIso_inv_ι, ← sres_comp, h0, sres_zero]
 
-private theorem resK_inj (q : ℕ) (i : ℤ) (s : ℤ) : Injective ((res _ (tw q i)).X s) := by unfold GlobalTheory.EtC.res; infer_instance
-private theorem LeafResK_pf : LeafResK := fun q i => ⟨resK_inj q i, fun s hs => by
-  have : (res _ (tw q i)).IsStrictlyGE 0 := by unfold GlobalTheory.EtC.res; infer_instance
-  exact CochainComplex.isZero_of_isStrictlyGE (res _ (tw q i)) 0 s hs⟩
+private theorem resK_inj (q : ℕ) (i : ℤ) (s : ℤ) : Injective ((res _ (tw q i)).X s) := by
+  unfold GlobalTheory.EtC.res; infer_instance
+private theorem LeafResK_pf : LeafResK := fun q i => ⟨
+  resK_inj q i,
+  fun s hs => by
+    have : (res _ (tw q i)).IsStrictlyGE 0 := by unfold GlobalTheory.EtC.res; infer_instance
+    exact CochainComplex.isZero_of_isStrictlyGE (res _ (tw q i)) 0 s hs
+⟩
 
-theorem LeafDescOGlue_of : LeafDescOGlue := descent_glue_of_residue_pullback_inclusion LeafResK_pf LeafZcPull_pf LeafZcIn_pf
+theorem LeafDescOGlue_of : LeafDescOGlue :=
+  descent_glue_of_residue_pullback_inclusion LeafResK_pf LeafZcPull_pf LeafZcIn_pf
 
 end LateralTheory.CohomologicalPurity.Cl

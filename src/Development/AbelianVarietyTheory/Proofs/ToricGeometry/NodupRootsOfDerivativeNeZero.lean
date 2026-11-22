@@ -10,32 +10,32 @@ namespace GlobalTheory.SimpleRoots
 
 variable {d : ℕ}
 
-theorem eval_map_eq_sum (p : Polynomial (MvPolynomial (Fin d) ℂ)) (x : Fin d → ℂ) (y : ℂ) :
-    (p.map (MvPolynomial.eval x)).eval y
+theorem eval_map_eq_sum (p : Polynomial (MvPolynomial (Fin d) ℂ)) (x : Fin d → ℂ) (y : ℂ)
+    : (p.map (MvPolynomial.eval x)).eval y
       = ∑ i ∈ Finset.range (p.natDegree + 1), MvPolynomial.eval x (p.coeff i) * y ^ i := by
   rw [eval_map, eval₂_eq_sum_range]
 
-theorem analyticAt_mvPolynomial_eval (a : MvPolynomial (Fin d) ℂ) (x : Fin d → ℂ) :
-    AnalyticAt ℂ (fun x : Fin d → ℂ => MvPolynomial.eval x a) x :=
+theorem analyticAt_mvPolynomial_eval (a : MvPolynomial (Fin d) ℂ) (x : Fin d → ℂ)
+    : AnalyticAt ℂ (fun x : Fin d → ℂ => MvPolynomial.eval x a) x :=
   AnalyticOnNhd.eval_mvPolynomial a x (Set.mem_univ x)
 
-theorem analyticAt_eval_map (p : Polynomial (MvPolynomial (Fin d) ℂ)) (z : (Fin d → ℂ) × ℂ) :
-    AnalyticAt ℂ (fun w : (Fin d → ℂ) × ℂ => (p.map (MvPolynomial.eval w.1)).eval w.2) z := by
+theorem analyticAt_eval_map (p : Polynomial (MvPolynomial (Fin d) ℂ)) (z : (Fin d → ℂ) × ℂ)
+    : AnalyticAt ℂ (fun w : (Fin d → ℂ) × ℂ => (p.map (MvPolynomial.eval w.1)).eval w.2) z := by
   simp only [eval_map_eq_sum]
   refine Finset.analyticAt_fun_sum _ fun i _ => ?_
   exact ((analyticAt_mvPolynomial_eval _ _).comp analyticAt_fst).mul (analyticAt_snd.pow i)
 
-theorem exists_analytic_root (p : Polynomial (MvPolynomial (Fin d) ℂ)) {x₀ : Fin d → ℂ} {y₀ : ℂ}
-    (h0 : (p.map (MvPolynomial.eval x₀)).eval y₀ = 0)
-    (h1 : (p.map (MvPolynomial.eval x₀)).derivative.eval y₀ ≠ 0) :
-    ∃ ψ : (Fin d → ℂ) → ℂ, AnalyticAt ℂ ψ x₀ ∧ ψ x₀ = y₀ ∧
-      (∀ᶠ x in 𝓝 x₀, (p.map (MvPolynomial.eval x)).eval (ψ x) = 0) ∧
-      ∀ᶠ w in 𝓝 (x₀, y₀), (p.map (MvPolynomial.eval w.1)).eval w.2 = 0 ↔ ψ w.1 = w.2 := by
+theorem exists_analytic_root
+    (p : Polynomial (MvPolynomial (Fin d) ℂ))
+    {x₀ : Fin d → ℂ} {y₀ : ℂ} (h0 : (p.map (MvPolynomial.eval x₀)).eval y₀ = 0)
+    (h1 : (p.map (MvPolynomial.eval x₀)).derivative.eval y₀ ≠ 0)
+    : ∃ ψ : (Fin d → ℂ) → ℂ,
+      AnalyticAt ℂ ψ x₀ ∧ ψ x₀ = y₀ ∧ (∀ᶠ x in 𝓝 x₀, (p.map (MvPolynomial.eval x)).eval (ψ x) = 0)
+        ∧ ∀ᶠ w in 𝓝 (x₀, y₀), (p.map (MvPolynomial.eval w.1)).eval w.2 = 0 ↔ ψ w.1 = w.2 := by
   set f : (Fin d → ℂ) × ℂ → ℂ := fun w => (p.map (MvPolynomial.eval w.1)).eval w.2 with hf
   have ha : AnalyticAt ℂ f (x₀, y₀) := analyticAt_eval_map p _
   have hc : ContDiffAt ℂ ⊤ f (x₀, y₀) := ha.contDiffAt
-  have hd : HasFDerivAt (fun y : ℂ => f (x₀, y))
-      (fderiv ℂ f (x₀, y₀) ∘L .inr ℂ (Fin d → ℂ) ℂ) y₀ :=
+  have hd : HasFDerivAt (fun y : ℂ => f (x₀, y)) (fderiv ℂ f (x₀, y₀) ∘L .inr ℂ (Fin d → ℂ) ℂ) y₀ :=
     ha.differentiableAt.hasFDerivAt.comp y₀ (hasFDerivAt_prodMk_right x₀ y₀)
   have hd' := ((p.map (MvPolynomial.eval x₀)).hasDerivAt y₀).hasFDerivAt
   have he := hd.unique hd'
@@ -52,8 +52,9 @@ theorem exists_analytic_root (p : Polynomial (MvPolynomial (Fin d) ℂ)) {x₀ :
     rw [← hw]
     exact Iff.of_eq (congrArg _ h0.symm)
 
-theorem nodup_roots_of_derivative_ne_zero {P : ℂ[X]} (hP : P ≠ 0)
-    (h : ∀ y, P.eval y = 0 → P.derivative.eval y ≠ 0) : P.roots.Nodup := by
+theorem nodup_roots_of_derivative_ne_zero
+    {P : ℂ[X]} (hP : P ≠ 0) (h : ∀ y, P.eval y = 0 → P.derivative.eval y ≠ 0)
+    : P.roots.Nodup := by
   classical
   rw [Multiset.nodup_iff_count_le_one]
   intro y
@@ -62,19 +63,23 @@ theorem nodup_roots_of_derivative_ne_zero {P : ℂ[X]} (hP : P ≠ 0)
   obtain ⟨h1, h2⟩ := (one_lt_rootMultiplicity_iff_isRoot hP).mp (not_le.mp hy)
   exact h y h1 h2
 
-theorem exists_analytic_roots {p : Polynomial (MvPolynomial (Fin d) ℂ)} (hp : p.Monic)
+theorem exists_analytic_roots
+    {p : Polynomial (MvPolynomial (Fin d) ℂ)} (hp : p.Monic)
     {x₀ : Fin d → ℂ}
-    (h : ∀ y, (p.map (MvPolynomial.eval x₀)).eval y = 0 →
-      (p.map (MvPolynomial.eval x₀)).derivative.eval y ≠ 0) :
-    ∃ ψ : ℂ → (Fin d → ℂ) → ℂ,
-      (∀ y ∈ (p.map (MvPolynomial.eval x₀)).roots, AnalyticAt ℂ (ψ y) x₀ ∧ ψ y x₀ = y) ∧
-      ∀ᶠ x in 𝓝 x₀, (p.map (MvPolynomial.eval x)).roots
-        = (p.map (MvPolynomial.eval x₀)).roots.map fun y => ψ y x := by
+    (h : ∀ y,
+      (p.map (MvPolynomial.eval x₀)).eval y = 0
+        → (p.map (MvPolynomial.eval x₀)).derivative.eval y ≠ 0)
+    : ∃ ψ : ℂ → (Fin d → ℂ) → ℂ,
+      (∀ y ∈ (p.map (MvPolynomial.eval x₀)).roots, AnalyticAt ℂ (ψ y) x₀ ∧ ψ y x₀ = y)
+        ∧ ∀ᶠ x in 𝓝 x₀, (p.map (MvPolynomial.eval x)).roots
+            = (p.map (MvPolynomial.eval x₀)).roots.map fun y => ψ y x := by
   classical
   have hne : ∀ x, p.map (MvPolynomial.eval x) ≠ 0 := fun x => (hp.map _).ne_zero
-  have hex : ∀ y, ∃ ψ : (Fin d → ℂ) → ℂ, y ∈ (p.map (MvPolynomial.eval x₀)).roots →
-      AnalyticAt ℂ ψ x₀ ∧ ψ x₀ = y ∧
-        ∀ᶠ x in 𝓝 x₀, (p.map (MvPolynomial.eval x)).eval (ψ x) = 0 := by
+  have hex
+      : ∀ y, ∃ ψ : (Fin d → ℂ) → ℂ,
+        y ∈ (p.map (MvPolynomial.eval x₀)).roots
+          → AnalyticAt ℂ ψ x₀ ∧ ψ x₀ = y
+            ∧ ∀ᶠ x in 𝓝 x₀, (p.map (MvPolynomial.eval x)).eval (ψ x) = 0 := by
     intro y
     by_cases hy : y ∈ (p.map (MvPolynomial.eval x₀)).roots
     · have hy' := (mem_roots (hne x₀)).mp hy
@@ -108,9 +113,12 @@ theorem exists_analytic_roots {p : Polynomial (MvPolynomial (Fin d) ℂ)} (hp : 
       exact (mem_roots (hne x)).mpr (h1 y (Multiset.mem_toFinset.mpr hy))
   · rw [Multiset.card_map, hcard, hS, hcard]
 
-theorem differentiableAt_coeff_prod {E ι : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (T : Multiset ι) (ψ : ι → E → ℂ) {x₀ : E} (h : ∀ y ∈ T, DifferentiableAt ℂ (ψ y) x₀) (k : ℕ) :
-    DifferentiableAt ℂ (fun x => (T.map fun y => X - C (ψ y x)).prod.coeff k) x₀ := by
+theorem differentiableAt_coeff_prod
+    {E ι : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T : Multiset ι) (ψ : ι → E → ℂ)
+    {x₀ : E} (h : ∀ y ∈ T, DifferentiableAt ℂ (ψ y) x₀)
+    (k : ℕ)
+    : DifferentiableAt ℂ (fun x => (T.map fun y => X - C (ψ y x)).prod.coeff k) x₀ := by
   induction T using Multiset.induction_on generalizing k with
   | empty => simp
   | cons a T ih =>
@@ -122,8 +130,8 @@ theorem differentiableAt_coeff_prod {E ι : Type*} [NormedAddCommGroup E] [Norme
     | zero => simp
     | succ k => simpa only [coeff_X_mul] using ih' k
 
-theorem norm_coeff_prod_le (T : Multiset ℂ) {R : ℝ} (hR : 0 ≤ R) (h : ∀ y ∈ T, ‖y‖ ≤ R) (k : ℕ) :
-    ‖(T.map fun y => X - C y).prod.coeff k‖ ≤ (1 + R) ^ T.card := by
+theorem norm_coeff_prod_le (T : Multiset ℂ) {R : ℝ} (hR : 0 ≤ R) (h : ∀ y ∈ T, ‖y‖ ≤ R) (k : ℕ)
+    : ‖(T.map fun y => X - C y).prod.coeff k‖ ≤ (1 + R) ^ T.card := by
   induction T using Multiset.induction_on generalizing k with
   | empty =>
     simp only [Multiset.map_zero, Multiset.prod_zero, coeff_one, Multiset.card_zero, pow_zero]
@@ -143,8 +151,8 @@ theorem norm_coeff_prod_le (T : Multiset ℂ) {R : ℝ} (hR : 0 ≤ R) (h : ∀ 
     refine (norm_sub_le _ _).trans ((add_le_add h1 h2).trans_eq ?_)
     ring
 
-theorem exists_norm_eval_le (a : MvPolynomial (Fin d) ℂ) :
-    ∃ (C : ℝ) (m : ℕ), 0 ≤ C ∧ ∀ x : Fin d → ℂ, ‖MvPolynomial.eval x a‖ ≤ C * (1 + ‖x‖) ^ m := by
+theorem exists_norm_eval_le (a : MvPolynomial (Fin d) ℂ)
+    : ∃ (C : ℝ) (m : ℕ), 0 ≤ C ∧ ∀ x : Fin d → ℂ, ‖MvPolynomial.eval x a‖ ≤ C * (1 + ‖x‖) ^ m := by
   induction a using MvPolynomial.induction_on with
   | C c => exact ⟨‖c‖, 0, norm_nonneg _, fun x => by simp⟩
   | add a b ha hb =>
@@ -163,8 +171,11 @@ theorem exists_norm_eval_le (a : MvPolynomial (Fin d) ℂ) :
     refine mul_le_mul (ha x) ?_ (norm_nonneg _) (by positivity)
     linarith [norm_le_pi_norm x i]
 
-theorem norm_root_le {P : ℂ[X]} (hP : P.Monic) {M : ℝ} (hM0 : 0 ≤ M)
-    (hM : ∀ i < P.natDegree, ‖P.coeff i‖ ≤ M) {y : ℂ} (hy : P.eval y = 0) : ‖y‖ ≤ M + 1 := by
+theorem norm_root_le
+    {P : ℂ[X]} (hP : P.Monic)
+    {M : ℝ} (hM0 : 0 ≤ M) (hM : ∀ i < P.natDegree, ‖P.coeff i‖ ≤ M)
+    {y : ℂ} (hy : P.eval y = 0)
+    : ‖y‖ ≤ M + 1 := by
   have h1 := IsRoot.norm_lt_cauchyBound hP.ne_zero hy
   lift M to NNReal using hM0
   have h2 : P.cauchyBound ≤ M + 1 := by
@@ -174,23 +185,28 @@ theorem norm_root_le {P : ℂ[X]} (hP : P.Monic) {M : ℝ} (hM0 : 0 ≤ M)
     exact Finset.sup_le fun i hi => by exact_mod_cast hM i (Finset.mem_range.mp hi)
   exact_mod_cast (h1.trans_le h2).le
 
-theorem exists_norm_root_le {p : Polynomial (MvPolynomial (Fin d) ℂ)} (hp : p.Monic) :
-    ∃ (C : ℝ) (m : ℕ), 0 ≤ C ∧ ∀ (x : Fin d → ℂ) (y : ℂ),
-      (p.map (MvPolynomial.eval x)).eval y = 0 → ‖y‖ ≤ C * (1 + ‖x‖) ^ m := by
+theorem exists_norm_root_le {p : Polynomial (MvPolynomial (Fin d) ℂ)} (hp : p.Monic)
+    : ∃ (C : ℝ) (m : ℕ),
+      0 ≤ C
+        ∧ ∀ (x : Fin d → ℂ) (y : ℂ),
+          (p.map (MvPolynomial.eval x)).eval y = 0 → ‖y‖ ≤ C * (1 + ‖x‖) ^ m := by
   choose C m hC h using fun i => exists_norm_eval_le (p.coeff i)
   set s := Finset.range p.natDegree
   have hs : 0 ≤ ∑ i ∈ s, C i := Finset.sum_nonneg fun i _ => hC i
   refine ⟨∑ i ∈ s, C i + 1, ∑ i ∈ s, m i, by positivity, fun x y hy => ?_⟩
   have h1 : 1 ≤ 1 + ‖x‖ := by linarith [norm_nonneg x]
-  have h2 := norm_root_le (hp.map _) (M := (∑ i ∈ s, C i) * (1 + ‖x‖) ^ (∑ i ∈ s, m i))
-    (by positivity) (fun i hi => ?_) hy
+  have h2 :=
+    norm_root_le (hp.map _) (M := (∑ i ∈ s, C i) * (1 + ‖x‖) ^ (∑ i ∈ s, m i)) (by positivity)
+      (fun i hi => ?_)
+      hy
   · rw [add_mul, one_mul]
     linarith [one_le_pow₀ h1 (n := ∑ i ∈ s, m i)]
   · rw [hp.natDegree_map] at hi
     have hi' : i ∈ s := Finset.mem_range.mpr hi
     rw [coeff_map]
-    refine (h i x).trans (mul_le_mul (Finset.single_le_sum (fun j _ => hC j) hi')
-      (pow_le_pow_right₀ h1 (Finset.single_le_sum (fun j _ => Nat.zero_le _) hi'))
-      (by positivity) hs)
+    refine (h i x).trans
+      (mul_le_mul (Finset.single_le_sum (fun j _ => hC j) hi')
+        (pow_le_pow_right₀ h1 (Finset.single_le_sum (fun j _ => Nat.zero_le _) hi')) (by positivity)
+        hs)
 
 end GlobalTheory.SimpleRoots

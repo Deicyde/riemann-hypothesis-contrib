@@ -19,16 +19,17 @@ theorem coord_ne (y : (Af E)ˣ) (v : HeightOneSpectrum (𝓞 E)) : Valued.v ((y 
   have := (FiniteAdeleRing.isUnit_iff.1 y.isUnit).1 v
   simpa using this
 
-theorem modF_finite (y : (Af E)ˣ) : (Function.mulSupport fun v : HeightOneSpectrum (𝓞 E) =>
-    ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (WithZero.log (Valued.v ((y : Af E) v)))).Finite := by
+theorem modF_finite (y : (Af E)ˣ)
+    : (Function.mulSupport fun v : HeightOneSpectrum (𝓞 E) =>
+      ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (WithZero.log (Valued.v ((y : Af E) v)))).Finite := by
   have := (FiniteAdeleRing.isUnit_iff.1 y.isUnit).2
   rw [Filter.eventually_cofinite] at this
   refine this.subset fun v hv h1 => hv ?_
   simp [h1]
 
-theorem absNorm_pos (v : HeightOneSpectrum (𝓞 E)) : (0 : ℝ) < ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
-  have : Ideal.absNorm v.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
+theorem absNorm_pos (v : HeightOneSpectrum (𝓞 E))
+    : (0 : ℝ) < ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
+  have : Ideal.absNorm v.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
   positivity
 
 theorem modF_mul (y y' : (Af E)ˣ) : modF (y * y') = modF y * modF y' := by
@@ -39,10 +40,15 @@ theorem modF_mul (y y' : (Af E)ˣ) : modF (y * y') = modF y * modF y' := by
   rw [this, map_mul, WithZero.log_mul (coord_ne y v) (coord_ne y' v), zpow_add₀ (absNorm_pos v).ne']
 
 theorem modF_pos (y : (Af E)ˣ) : 0 < modF y :=
-  finprod_induction (fun x : ℝ => 0 < x) one_pos (fun _ _ => mul_pos) fun v => zpow_pos (absNorm_pos v) _
+  finprod_induction
+    (fun x : ℝ => 0 < x)
+    one_pos
+    (fun _ _ => mul_pos)
+    fun v => zpow_pos (absNorm_pos v) _
 
-theorem modF_princ (k : Eˣ) :
-    modF (Units.map (algebraMap E (Af E)).toMonoidHom k) = (|((Algebra.norm ℚ (k : E) : ℚ) : ℝ)|)⁻¹ := by
+theorem modF_princ (k : Eˣ)
+    : modF (Units.map (algebraMap E (Af E)).toMonoidHom k)
+      = (|((Algebra.norm ℚ (k : E) : ℚ) : ℝ)|)⁻¹ := by
   have h := FinitePlace.prod_eq_inv_abs_norm (K := E) k.ne_zero
   push_cast at h
   rw [← h, ← finprod_comp_equiv (FinitePlace.equivHeightOneSpectrum (K := E)).symm]
@@ -50,21 +56,25 @@ theorem modF_princ (k : Eˣ) :
   refine finprod_congr fun v => ?_
   rw [FinitePlace.equivHeightOneSpectrum_symm_apply, FinitePlace.norm_embedding']
   have h0 : v.valuation E (k : E) ≠ 0 := by simp
-  have h1 : Valued.v (((Units.map (algebraMap E (Af E)).toMonoidHom k : (Af E)ˣ) : Af E) v) = v.valuation E (k : E) :=
+  have h1
+      : Valued.v (((Units.map (algebraMap E (Af E)).toMonoidHom k : (Af E)ˣ) : Af E) v)
+        = v.valuation E (k : E) :=
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (k : E)
   rw [h1, WithZeroMulInt.toNNReal_neg_apply _ h0]
   push_cast
   congr 1
 
-theorem hatO_integral {c : Ideal (OF E)} {y : Af E} (hy : y ∈ hatO c) (v : HeightOneSpectrum (𝓞 E)) :
-    Valued.v (y v) ≤ 1 := by
+theorem hatO_integral {c : Ideal (OF E)} {y : Af E} (hy : y ∈ hatO c) (v : HeightOneSpectrum (𝓞 E))
+    : Valued.v (y v) ≤ 1 := by
   have hc : IsClosed {y : Af E | y v ∈ v.adicCompletionIntegers E} :=
-    (Valued.isClosed_valuationSubring (v.adicCompletion E)).preimage (RestrictedProduct.continuous_eval v)
+    (Valued.isClosed_valuationSubring (v.adicCompletion E)).preimage
+      (RestrictedProduct.continuous_eval v)
   have : y ∈ {y : Af E | y v ∈ v.adicCompletionIntegers E} := by
     refine closure_minimal ?_ hc hy
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨a, b, -, rfl⟩ := mem_orderC.1 hx
-    have : algebraMap (OF E) E a + algebraMap (𝓞 E) E b = algebraMap (𝓞 E) E (algebraMap (OF E) (𝓞 E) a + b) := by
+    have : algebraMap (OF E) E a + algebraMap (𝓞 E) E b
+        = algebraMap (𝓞 E) E (algebraMap (OF E) (𝓞 E) a + b) := by
       rw [map_add (f := _)]; rfl
     rw [this]
     refine (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).2 ?_
@@ -82,20 +92,25 @@ theorem modF_unit {c : Ideal (OF E)} {u : (Af E)ˣ} (hu : u ∈ hatOUnits c) : m
     rw [this, map_one]
   have h4 : Valued.v ((u : Af E) v) = 1 := by
     refine le_antisymm h1 ?_
-    calc (1 : WithZero (Multiplicative ℤ)) = _ := h3.symm
+    calc
+      (1 : WithZero (Multiplicative ℤ))
+        = _ := h3.symm
       _ ≤ Valued.v ((u : Af E) v) * 1 := by gcongr
       _ = _ := mul_one _
   simp [h4]
 
 variable {I : Type}
 
-theorem prod_normSq [Fintype I] [_root_.NumberField.IsTotallyComplex E] {φ : I → E →+* ℂ}
-    (h : IsCMType φ) (x : E) :
-    ∏ i, ‖φ i x‖ ^ 2 = |((Algebra.norm ℚ x : ℚ) : ℝ)| := by
+theorem prod_normSq
+    [Fintype I] [_root_.NumberField.IsTotallyComplex E] {φ : I → E →+* ℂ} (h : IsCMType φ) (x : E)
+    : ∏ i, ‖φ i x‖ ^ 2 = |((Algebra.norm ℚ x : ℚ) : ℝ)| := by
   have h1 := InfinitePlace.prod_eq_abs_norm x
   push_cast at h1
   rw [← h1]
-  refine Fintype.prod_bijective (fun i => InfinitePlace.mk (φ i)) ⟨fun i j hij => ?_, fun w => ?_⟩ _ _ fun i => ?_
+  refine Fintype.prod_bijective
+    (fun i => InfinitePlace.mk (φ i))
+    ⟨fun i j hij => ?_, fun w => ?_⟩ _ _
+    fun i => ?_
   · obtain ⟨l, -, hl⟩ := h (φ i)
     have h2 := InfinitePlace.mk_eq_iff.1 hij.symm
     rw [hl i (Or.inl rfl), hl j (h2.imp Eq.symm Eq.symm)]
@@ -105,8 +120,8 @@ theorem prod_normSq [Fintype I] [_root_.NumberField.IsTotallyComplex E] {φ : I 
     exact InfinitePlace.mk_eq_iff.2 (hl.imp Eq.symm Eq.symm)
   · rw [IsTotallyComplex.mult_eq, InfinitePlace.apply]
 
-theorem prod_cpow (t : Finset I) (r : I → ℝ) (hr : ∀ i, 0 ≤ r i) (z : ℂ) :
-    ∏ i ∈ t, ((r i : ℝ) : ℂ) ^ z = ((∏ i ∈ t, r i : ℝ) : ℂ) ^ z := by
+theorem prod_cpow (t : Finset I) (r : I → ℝ) (hr : ∀ i, 0 ≤ r i) (z : ℂ)
+    : ∏ i ∈ t, ((r i : ℝ) : ℂ) ^ z = ((∏ i ∈ t, r i : ℝ) : ℂ) ^ z := by
   classical
   induction t using Finset.induction_on with
   | empty => simp

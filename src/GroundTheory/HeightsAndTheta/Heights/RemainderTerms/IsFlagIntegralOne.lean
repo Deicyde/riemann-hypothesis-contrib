@@ -34,14 +34,18 @@ def nDim : ℕ := f * j * k
 def psumAt (m : ℕ) (τ : Fin f) : Roots f j k := ∑ i, X (τ, i) ^ m
 
 def lieClass (m : ℕ) (σ : Fin f × Bool) : Roots f j k :=
-  if σ.2 then (-1) ^ m * ∑ b : Fin k, X (σ.1, Fin.natAdd j b) ^ m
-  else ∑ a : Fin j, X (σ.1, Fin.castAdd k a) ^ m
+  if σ.2 then
+    (-1) ^ m * ∑ b : Fin k, X (σ.1, Fin.natAdd j b) ^ m
+  else
+    ∑ a : Fin j, X (σ.1, Fin.castAdd k a) ^ m
 
 def IsSmallBlock (bot : Bool) : Prop := (bot = true → k ≤ j) ∧ (bot = false → j ≤ k)
 
 def smallPsum (bot : Bool) (m : ℕ) (τ : Fin f) : Roots f j k :=
-  if bot then ∑ b : Fin k, X (τ, Fin.natAdd j b) ^ m
-  else ∑ a : Fin j, (-X (τ, Fin.castAdd k a)) ^ m
+  if bot then
+    ∑ b : Fin k, X (τ, Fin.natAdd j b) ^ m
+  else
+    ∑ a : Fin j, (-X (τ, Fin.castAdd k a)) ^ m
 
 def muClass (bot : Bool) : Roots f j k := ∑ τ, smallPsum f j k bot 1 τ
 
@@ -58,13 +62,14 @@ def restPoly (bot : Bool) : Roots f j k := muClass f j k bot ^ (nDim f j k + 1) 
 def degPoly (bot : Bool) : Roots f j k := muClass f j k bot ^ nDim f j k * fibClass f j k bot
 
 structure IsFlagIntegral (I : Roots f j k →ₗ[ℝ] ℝ) : Prop where
-  kills : ∀ (m : ℕ) (τ : Fin f) (G : Roots f j k), 1 ≤ m → m ≤ dimFl f j k →
-    G.IsHomogeneous (dimFl f j k - m) → I (psumAt f j k m τ * G) = 0
+  kills
+    : ∀ (m : ℕ) (τ : Fin f) (G : Roots f j k),
+      1 ≤ m → m ≤ dimFl f j k → G.IsHomogeneous (dimFl f j k - m) → I (psumAt f j k m τ * G) = 0
   ne_zero : ∃ G : Roots f j k, G.IsHomogeneous (dimFl f j k) ∧ I G ≠ 0
 
 def IsPsumDecomp (F : Roots f j k) (Q : Fin f → ℕ → Roots f j k) : Prop :=
-  (∀ τ m, 1 ≤ m → m ≤ j + k → (Q τ m).IsHomogeneous (dimFl f j k + 1 - m)) ∧
-    F = ∑ τ : Fin f, ∑ m ∈ Finset.Icc 1 (j + k), psumAt f j k m τ * Q τ m
+  (∀ τ m, 1 ≤ m → m ≤ j + k → (Q τ m).IsHomogeneous (dimFl f j k + 1 - m))
+    ∧ F = ∑ τ : Fin f, ∑ m ∈ Finset.Icc 1 (j + k), psumAt f j k m τ * Q τ m
 
 def blockAntisym : Roots f j k →ₗ[ℝ] Roots f j k :=
   ∑ w : Fin f → Equiv.Perm (Fin (j + k)),
@@ -78,33 +83,50 @@ def ddConst : Roots f j k →ₗ[ℝ] ℝ := (lcoeff ℝ (rhoMon f j k)).comp (b
 
 def primesOver (P : Set ℕ) (B₀ : ℝ) : Type := {p : ℕ // p ∈ P ∧ p.Prime ∧ B₀ < p}
 
-def restTerm (I : Roots f j k →ₗ[ℝ] ℝ) (σ : ℕ → ℕ → Fin f → Fin f × Bool)
-    (Q : Fin f → ℕ → Roots f j k) (p : ℕ) (τ : Fin f) (m n : ℕ) : ℝ :=
+def restTerm
+    (I : Roots f j k →ₗ[ℝ] ℝ) (σ : ℕ → ℕ → Fin f → Fin f × Bool) (Q : Fin f → ℕ → Roots f j k)
+    (p : ℕ) (τ : Fin f) (m n : ℕ)
+    : ℝ :=
   ((p : ℝ) ^ ((n + 1) * m))⁻¹ * m * I (lieClass f j k (m - 1) (σ p (n + 1) τ) * Q τ m)
 
-def restAt (I : Roots f j k →ₗ[ℝ] ℝ) (vol : ℝ) (σ : ℕ → ℕ → Fin f → Fin f × Bool)
-    (Q : Fin f → ℕ → Roots f j k) (p : ℕ) : ℝ :=
+def restAt
+    (I : Roots f j k →ₗ[ℝ] ℝ) (vol : ℝ) (σ : ℕ → ℕ → Fin f → Fin f × Bool)
+    (Q : Fin f → ℕ → Roots f j k) (p : ℕ)
+    : ℝ :=
   Real.log p * vol * ∑ τ : Fin f, ∑ m ∈ Finset.Icc 2 (j + k), ∑' n : ℕ, restTerm f j k I σ Q p τ m n
 
 def FlagIntegralProportional.Statement : Prop :=
-  ∀ f j k : ℕ, 1 ≤ f → 1 ≤ j → 1 ≤ k → ∀ I : Roots f j k →ₗ[ℝ] ℝ, IsFlagIntegral f j k I →
-    ∃ c : ℝ, c ≠ 0 ∧ ∀ G : Roots f j k, G.IsHomogeneous (dimFl f j k) → I G = c * ddConst f j k G
+  ∀ f j k : ℕ,
+    1 ≤ f → 1 ≤ j → 1 ≤ k
+      → ∀ I : Roots f j k →ₗ[ℝ] ℝ,
+        IsFlagIntegral f j k I
+          → ∃ c : ℝ,
+            c ≠ 0 ∧ ∀ G : Roots f j k, G.IsHomogeneous (dimFl f j k) → I G = c * ddConst f j k G
 
 def PrimeTail.Statement : Prop :=
-  ∀ B : ℝ, 0 < B →
-    Summable (fun p : {p : ℕ // p.Prime ∧ B < p} => Real.log p.1 / (p.1 : ℝ) ^ 2) ∧
-      ∑' p : {p : ℕ // p.Prime ∧ B < p}, Real.log p.1 / (p.1 : ℝ) ^ 2 ≤ 2 * Real.log 4 / B
+  ∀ B : ℝ,
+    0 < B
+      → Summable (fun p : {p : ℕ // p.Prime ∧ B < p} => Real.log p.1 / (p.1 : ℝ) ^ 2)
+        ∧ ∑' p : {p : ℕ // p.Prime ∧ B < p}, Real.log p.1 / (p.1 : ℝ) ^ 2 ≤ 2 * Real.log 4 / B
 
 def RestBound.Statement : Prop :=
-  ∀ f j k : ℕ, 1 ≤ f → 1 ≤ j → 1 ≤ k → ∀ bot : Bool, IsSmallBlock j k bot →
-    ∀ I : Roots f j k →ₗ[ℝ] ℝ, IsFlagIntegral f j k I →
-    ∀ vol : ℝ, 0 < vol → ∀ P : Set ℕ, (∀ p ∈ P, p.Prime) →
-    ∀ B₀ : ℝ, 4 * f * ((j + k : ℕ) : ℝ) ^ 2 ≤ B₀ →
-    ∀ σ : ℕ → ℕ → Fin f → Fin f × Bool,
-    ∀ Q : Fin f → ℕ → Roots f j k, IsPsumDecomp f j k (restPoly f j k bot) Q →
-      Summable (fun p : primesOver P B₀ => restAt f j k I vol σ Q p.1) ∧
-        |∑' p : primesOver P B₀, restAt f j k I vol σ Q p.1| ≤
-          1.6 * ((nDim f j k : ℝ) + 1) * vol * |I (degPoly f j k bot)|
+  ∀ f j k : ℕ,
+    1 ≤ f → 1 ≤ j → 1 ≤ k
+      → ∀ bot : Bool,
+        IsSmallBlock j k bot
+          → ∀ I : Roots f j k →ₗ[ℝ] ℝ,
+            IsFlagIntegral f j k I
+              → ∀ vol : ℝ,
+                0 < vol
+                  → ∀ P : Set ℕ,
+                    (∀ p ∈ P, p.Prime)
+                      → ∀ B₀ : ℝ,
+                        4 * f * ((j + k : ℕ) : ℝ) ^ 2 ≤ B₀
+                          → ∀ σ : ℕ → ℕ → Fin f → Fin f × Bool, ∀ Q : Fin f → ℕ → Roots f j k,
+                            IsPsumDecomp f j k (restPoly f j k bot) Q
+                              → Summable (fun p : primesOver P B₀ => restAt f j k I vol σ Q p.1)
+                                ∧ |∑' p : primesOver P B₀, restAt f j k I vol σ Q p.1|
+                                  ≤ 1.6 * ((nDim f j k : ℝ) + 1) * vol * |I (degPoly f j k bot)|
 
 end
 

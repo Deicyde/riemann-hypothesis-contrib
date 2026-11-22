@@ -8,8 +8,11 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscrim
 
 open Formalism.BasicNotions
 
-theorem UpperTheory.Ram.cond_le_four_n_sq :
-    ∀ (R : Ranks) (H : Host R), (H.QS : ℝ) * H.q * H.d ≤ 4 * ((R.f : ℝ) / 2) ^ 2 * H.q * H.d ∧ 4 * ((R.f : ℝ) / 2) ^ 2 * H.q * H.d ≤ ((H.QS : ℝ) * H.q * H.d) ^ 2 ∧ (R.f : ℝ) ≤ H.QS := by
+theorem UpperTheory.Ram.cond_le_four_n_sq
+    : ∀ (R : Ranks) (H : Host R),
+      (H.QS : ℝ) * H.q * H.d ≤ 4 * ((R.f : ℝ) / 2) ^ 2 * H.q * H.d
+        ∧ 4 * ((R.f : ℝ) / 2) ^ 2 * H.q * H.d ≤ ((H.QS : ℝ) * H.q * H.d) ^ 2
+        ∧ (R.f : ℝ) ≤ H.QS := by
   intro R H
   have hQS : H.QS ≤ R.n ^ 2 := H.QS_le
   have h2 : 2 * R.ord ≤ H.QS := (UpperTheory.Ram.ord_le_totient_QS H.toHostAx).2
@@ -25,8 +28,7 @@ theorem UpperTheory.Ram.cond_le_four_n_sq :
     have := H.qd_big.2
     exact_mod_cast (by omega : 1 ≤ H.d)
   have hQSr : (H.QS : ℝ) ≤ (R.n : ℝ) ^ 2 := by exact_mod_cast hQS
-  have h2r : 2 * (R.n : ℝ) ≤ H.QS := by
-    rw [hn]; exact_mod_cast h2
+  have h2r : 2 * (R.n : ℝ) ≤ H.QS := by rw [hn]; exact_mod_cast h2
   have hn0 : (0 : ℝ) ≤ R.n := Nat.cast_nonneg _
   have hqd : (0 : ℝ) ≤ (H.q : ℝ) * H.d := by positivity
   have hqd1 : (1 : ℝ) ≤ (H.q : ℝ) * H.d := by nlinarith
@@ -38,6 +40,8 @@ theorem UpperTheory.Ram.cond_le_four_n_sq :
   · have hsq : 4 * (2 * (R.n : ℝ) / 2) ^ 2 ≤ (H.QS : ℝ) ^ 2 := by nlinarith
     have hqq : (H.q : ℝ) * H.d ≤ ((H.q : ℝ) * H.d) ^ 2 := by nlinarith
     have hA : (0 : ℝ) ≤ 4 * (2 * (R.n : ℝ) / 2) ^ 2 := by positivity
-    calc 4 * (2 * (R.n : ℝ) / 2) ^ 2 * H.q * H.d = 4 * (2 * (R.n : ℝ) / 2) ^ 2 * ((H.q : ℝ) * H.d) := by ring
+    calc
+      4 * (2 * (R.n : ℝ) / 2) ^ 2 * H.q * H.d
+        = 4 * (2 * (R.n : ℝ) / 2) ^ 2 * ((H.q : ℝ) * H.d) := by ring
       _ ≤ (H.QS : ℝ) ^ 2 * ((H.q : ℝ) * H.d) ^ 2 := mul_le_mul hsq hqq hqd (by positivity)
       _ = ((H.QS : ℝ) * H.q * H.d) ^ 2 := by ring

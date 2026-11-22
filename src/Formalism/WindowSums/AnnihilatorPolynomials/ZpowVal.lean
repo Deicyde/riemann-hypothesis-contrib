@@ -101,9 +101,13 @@ end ZpowValAux
 theorem valuation_zpow_sub_one : ZpowVal := by
   intro ℓ _ u s hs1 hs2 hval j hj
 
-  have key : ∀ y : ℤ_[ℓ]ˣ, emultiplicity (ℓ : ℤ_[ℓ]) ((y : ℤ_[ℓ]) - 1) = s → ∀ n : ℕ, n ≠ 0 →
-      ((y ^ n : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) - 1 ≠ 0 ∧
-        PadicInt.valuation (((y ^ n : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) - 1) = s + padicValNat ℓ n := by
+  have key
+      : ∀ y : ℤ_[ℓ]ˣ,
+        emultiplicity (ℓ : ℤ_[ℓ]) ((y : ℤ_[ℓ]) - 1) = s
+          → ∀ n : ℕ,
+            n ≠ 0
+              → ((y ^ n : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) - 1 ≠ 0
+                ∧ PadicInt.valuation (((y ^ n : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) - 1) = s + padicValNat ℓ n := by
     intro y hy n hn
     have hy1 : (ℓ : ℤ_[ℓ]) ∣ (y : ℤ_[ℓ]) - 1 := by
       have h1 := pow_dvd_of_le_emultiplicity (k := 1) (by rw [hy]; exact_mod_cast hs1)
@@ -123,8 +127,7 @@ theorem valuation_zpow_sub_one : ZpowVal := by
     intro h
     rw [h, PadicInt.valuation_zero] at hval
     omega
-  have hem : emultiplicity (ℓ : ℤ_[ℓ]) ((u : ℤ_[ℓ]) - 1) = s := by
-    rw [zv_emult_eq_val hx0, hval]
+  have hem : emultiplicity (ℓ : ℤ_[ℓ]) ((u : ℤ_[ℓ]) - 1) = s := by rw [zv_emult_eq_val hx0, hval]
   obtain ⟨n, rfl | rfl⟩ := Int.eq_nat_or_neg j
   · have hn : n ≠ 0 := by
       rintro rfl

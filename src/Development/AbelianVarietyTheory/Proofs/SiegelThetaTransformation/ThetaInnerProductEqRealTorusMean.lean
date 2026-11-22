@@ -12,8 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.ExistsIsFun
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -26,37 +30,46 @@ section Abstract
 
 open Pointwise
 
-variable {G V : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
-  [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+variable
+  {G V : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [AddCommGroup V]
+  [TopologicalSpace V] [IsTopologicalAddGroup V]
   (p : G →+ V) (R : V →+ G) (U : AddSubgroup G)
 
 def tube : AddSubgroup G := U.comap (AddMonoidHom.id G - R.comp p)
 
-omit [TopologicalSpace G] [IsTopologicalAddGroup G] [TopologicalSpace V] [IsTopologicalAddGroup V] in
+omit [TopologicalSpace G] [IsTopologicalAddGroup G] [TopologicalSpace V]
+  [IsTopologicalAddGroup V] in
 theorem mem_tube (w : G) : w ∈ tube p R U ↔ w - R (p w) ∈ U := Iff.rfl
 
 variable {p R U}
 
-
 omit [IsTopologicalAddGroup V] in
-theorem exists_compact (hR : Continuous R) (hU : IsCompact (U : Set G)) {K : Set V} (hK : IsCompact K) :
-    ∃ K' : Set G, IsCompact K' ∧ p ⁻¹' K ∩ tube p R U ⊆ K' := by
-  refine ⟨(fun x : G × V => x.1 + R x.2) '' ((U : Set G) ×ˢ K),
-    (hU.prod hK).image (continuous_fst.add (hR.comp continuous_snd)), ?_⟩
+theorem exists_compact
+    (hR : Continuous R) (hU : IsCompact (U : Set G)) {K : Set V} (hK : IsCompact K)
+    : ∃ K' : Set G, IsCompact K' ∧ p ⁻¹' K ∩ tube p R U ⊆ K' := by
+  refine ⟨
+    (fun x : G × V => x.1 + R x.2) '' ((U : Set G) ×ˢ K),
+    (hU.prod hK).image (continuous_fst.add (hR.comp continuous_snd)),
+    ?_
+  ⟩
   rintro w ⟨hwK, hwU⟩
   refine ⟨(w - R (p w), p w), ⟨(mem_tube p R U w).mp hwU, hwK⟩, ?_⟩
   simp
 
-theorem discrete_image [T2Space G] [T2Space V] [LocallyCompactSpace V] (hR : Continuous R)
-    (hU : IsCompact (U : Set G)) (Γ : AddSubgroup G) [DiscreteTopology Γ] (L : AddSubgroup V)
-    (hL : ∀ v ∈ L, ∃ γ ∈ Γ, γ ∈ tube p R U ∧ p γ = v) : DiscreteTopology L := by
+theorem discrete_image
+    [T2Space G] [T2Space V] [LocallyCompactSpace V]
+    (hR : Continuous R) (hU : IsCompact (U : Set G))
+    (Γ : AddSubgroup G) [DiscreteTopology Γ]
+    (L : AddSubgroup V) (hL : ∀ v ∈ L, ∃ γ ∈ Γ, γ ∈ tube p R U ∧ p γ = v)
+    : DiscreteTopology L := by
   obtain ⟨K, hKc, hK0⟩ := exists_compact_mem_nhds (0 : V)
   obtain ⟨K', hK', hsub⟩ := exists_compact (p := p) (U := U) hR hU hKc
   have hΓc : IsClosed (Γ : Set G) := AddSubgroup.isClosed_of_discrete
   have hfin : ((Γ : Set G) ∩ K').Finite := by
     apply (hK'.inter_left hΓc).finite
     have hd : DiscreteTopology (Γ : Set G) := inferInstanceAs (DiscreteTopology Γ)
-    have hd' : DiscreteTopology ↥((Γ : Set G) ∩ K') := DiscreteTopology.of_subset hd Set.inter_subset_left
+    have hd' : DiscreteTopology ↥((Γ : Set G) ∩ K') :=
+      DiscreteTopology.of_subset hd Set.inter_subset_left
     exact ⟨hd'⟩
   have hLK : ((L : Set V) ∩ K).Finite := by
     apply (hfin.image p).subset
@@ -65,8 +78,8 @@ theorem discrete_image [T2Space G] [T2Space V] [LocallyCompactSpace V] (hR : Con
     exact ⟨γ, ⟨hγ, hsub ⟨hvK, hγt⟩⟩, rfl⟩
   apply discreteTopology_of_isOpen_singleton_zero
   have hB : IsClosed (((L : Set V) ∩ K) \ {0}) := (hLK.subset Set.sdiff_subset).isClosed
-  refine isOpen_induced_iff.mpr ⟨interior K ∩ (((L : Set V) ∩ K) \ {0})ᶜ,
-    isOpen_interior.inter hB.isOpen_compl, ?_⟩
+  refine isOpen_induced_iff.mpr
+    ⟨interior K ∩ (((L : Set V) ∩ K) \ {0})ᶜ, isOpen_interior.inter hB.isOpen_compl, ?_⟩
   ext ⟨v, hv⟩
   simp only [Set.mem_preimage, Set.mem_inter_iff, Set.mem_compl_iff, Set.mem_singleton_iff]
   constructor
@@ -83,42 +96,54 @@ theorem discrete_image [T2Space G] [T2Space V] [LocallyCompactSpace V] (hR : Con
 
 variable [MeasurableSpace G] [BorelSpace G] [MeasurableSpace V] [BorelSpace V]
 
-theorem exists_map_eq_smul [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] (hp : Continuous p)
-    (hR : Continuous R) (hpR : ∀ v, p (R v) = v) (hU : IsCompact (U : Set G))
-    (μ : Measure G) [μ.IsAddHaarMeasure] (ν : Measure V) [ν.IsAddHaarMeasure] :
-    ∃ c : NNReal, (μ.restrict (tube p R U)).map p = c • ν := by
+theorem exists_map_eq_smul
+    [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V]
+    (hp : Continuous p) (hR : Continuous R) (hpR : ∀ v, p (R v) = v) (hU : IsCompact (U : Set G))
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (ν : Measure V) [ν.IsAddHaarMeasure]
+    : ∃ c : NNReal, (μ.restrict (tube p R U)).map p = c • ν := by
   set ν' := (μ.restrict (tube p R U)).map p with hν'
   have hpm : Measurable p := hp.measurable
-  have : IsFiniteMeasureOnCompacts ν' := ⟨fun K hK => by
-    obtain ⟨K', hK', hsub⟩ := exists_compact hR hU hK
-    rw [hν', Measure.map_apply hpm hK.measurableSet, Measure.restrict_apply (hpm hK.measurableSet)]
-    exact lt_of_le_of_lt (measure_mono hsub) hK'.measure_lt_top⟩
-  have : ν'.IsAddLeftInvariant := ⟨fun v => by
-    have hpre : (fun w => R v + w) ⁻¹' (tube p R U : Set G) = tube p R U := by
-      ext w
-      simp only [Set.mem_preimage, SetLike.mem_coe, mem_tube, map_add (f := _), hpR]
-      rw [show R v + w - (R v + R (p w)) = w - R (p w) by abel]
-    have hpres : MeasurePreserving (fun w => R v + w) (μ.restrict (tube p R U))
-        (μ.restrict (tube p R U)) := by
-      have := (measurePreserving_add_left μ (R v)).restrict_preimage_emb
-        (measurableEmbedding_addLeft (R v)) (tube p R U : Set G)
-      rwa [hpre] at this
-    have hcomm : (fun x => v + x) ∘ p = p ∘ (fun w => R v + w) := by
-      funext w
-      simp [hpR]
-    rw [hν', Measure.map_map (continuous_const_add v).measurable hpm, hcomm,
-      ← Measure.map_map hpm (continuous_const_add (R v)).measurable, hpres.map_eq]⟩
+  have : IsFiniteMeasureOnCompacts ν' :=
+    ⟨fun K hK => by
+      obtain ⟨K', hK', hsub⟩ := exists_compact hR hU hK
+      rw [hν', Measure.map_apply hpm hK.measurableSet,
+        Measure.restrict_apply (hpm hK.measurableSet)]
+      exact lt_of_le_of_lt (measure_mono hsub) hK'.measure_lt_top⟩
+  have : ν'.IsAddLeftInvariant :=
+    ⟨fun v => by
+      have hpre : (fun w => R v + w) ⁻¹' (tube p R U : Set G) = tube p R U := by
+        ext w
+        simp only [Set.mem_preimage, SetLike.mem_coe, mem_tube, map_add (f := _), hpR]
+        rw [show R v + w - (R v + R (p w)) = w - R (p w) by abel]
+      have hpres : MeasurePreserving
+          (fun w => R v + w)
+          (μ.restrict (tube p R U)) (μ.restrict (tube p R U)) := by
+        have :=
+          (measurePreserving_add_left μ (R v)).restrict_preimage_emb
+            (measurableEmbedding_addLeft (R v)) (tube p R U : Set G)
+        rwa [hpre] at this
+      have hcomm : (fun x => v + x) ∘ p = p ∘ (fun w => R v + w) := by
+        funext w
+        simp [hpR]
+      rw [hν', Measure.map_map (continuous_const_add v).measurable hpm, hcomm,
+        ← Measure.map_map hpm (continuous_const_add (R v)).measurable, hpres.map_eq]⟩
   exact ⟨_, Measure.isAddLeftInvariant_eq_smul ν' ν⟩
 
-theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] (hp : Continuous p)
-    (hR : Continuous R) (hpR : ∀ v, p (R v) = v) (hU : IsCompact (U : Set G))
-    (hO : IsOpen (tube p R U : Set G)) (μ : Measure G) [μ.IsAddHaarMeasure] (ν : Measure V) [ν.IsAddHaarMeasure]
-    (Γ : AddSubgroup G) [Countable Γ] (L : AddSubgroup V)
-    (hL : ∀ v, v ∈ L ↔ ∃ γ ∈ Γ, γ ∈ tube p R U ∧ p γ = v) (hcov : ∀ w, ∃ γ ∈ Γ, γ + w ∈ tube p R U)
-    (hinj : ∀ γ ∈ Γ, γ ∈ U → γ = 0) {𝓕 : Set G} (h𝓕 : IsAddFundamentalDomain Γ 𝓕 μ) (h1 : μ 𝓕 = 1)
-    {Fd : Set V} (hFd : IsAddFundamentalDomain L Fd ν) {h : G → ℂ} (hc : Continuous h)
-    (hΓ : ∀ γ ∈ Γ, ∀ w, h (γ + w) = h w) (hhU : ∀ u ∈ U, ∀ w, h (w + u) = h w) :
-    ∫ w in 𝓕, h w ∂μ = ((ν Fd).toReal : ℂ)⁻¹ * ∫ v in Fd, h (R v) ∂ν := by
+theorem integral_eq_mean
+    [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V]
+    (hp : Continuous p) (hR : Continuous R) (hpR : ∀ v, p (R v) = v) (hU : IsCompact (U : Set G))
+    (hO : IsOpen (tube p R U : Set G))
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (ν : Measure V) [ν.IsAddHaarMeasure]
+    (Γ : AddSubgroup G) [Countable Γ]
+    (L : AddSubgroup V) (hL : ∀ v, v ∈ L ↔ ∃ γ ∈ Γ, γ ∈ tube p R U ∧ p γ = v)
+    (hcov : ∀ w, ∃ γ ∈ Γ, γ + w ∈ tube p R U) (hinj : ∀ γ ∈ Γ, γ ∈ U → γ = 0)
+    {𝓕 : Set G} (h𝓕 : IsAddFundamentalDomain Γ 𝓕 μ) (h1 : μ 𝓕 = 1)
+    {Fd : Set V} (hFd : IsAddFundamentalDomain L Fd ν)
+    {h : G → ℂ}
+    (hc : Continuous h) (hΓ : ∀ γ ∈ Γ, ∀ w, h (γ + w) = h w) (hhU : ∀ u ∈ U, ∀ w, h (w + u) = h w)
+    : ∫ w in 𝓕, h w ∂μ = ((ν Fd).toReal : ℂ)⁻¹ * ∫ v in Fd, h (R v) ∂ν := by
   classical
   have hpm : Measurable p := hp.measurable
   have hTm : MeasurableSet (tube p R U : Set G) := hO.measurableSet
@@ -126,8 +151,8 @@ theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2
   have hnull : ∀ N : Set V, ν N = 0 → μ ((tube p R U : Set G) ∩ p ⁻¹' N) = 0 := by
     intro N hN
     have hN0 : ν (toMeasurable ν N) = 0 := by rwa [measure_toMeasurable]
-    apply measure_mono_null
-      (Set.inter_subset_inter_right _ (Set.preimage_mono (subset_toMeasurable ν N)))
+    apply measure_mono_null (Set.inter_subset_inter_right _
+      (Set.preimage_mono (subset_toMeasurable ν N)))
     rw [Set.inter_comm, ← Measure.restrict_apply (hpm (measurableSet_toMeasurable ν N)),
       ← Measure.map_apply hpm (measurableSet_toMeasurable ν N), hcν]
     simp [hN0]
@@ -147,9 +172,11 @@ theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2
   have hFd₀ae : toMeasurable ν Fd =ᵐ[ν] Fd := hFdm.toMeasurable_ae_eq
   have hFdsub : Fd ⊆ toMeasurable ν Fd := subset_toMeasurable ν Fd
   have hdiff : ν (toMeasurable ν Fd \ Fd) = 0 := (ae_eq_set.mp hFd₀ae).1
-  have hΦ₀m : MeasurableSet ((tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd) := hTm.inter (hpm hFd₀m)
-  have hΦae : (((tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd : Set G)) =ᵐ[μ]
-      (((tube p R U : Set G) ∩ p ⁻¹' Fd : Set G)) := by
+  have hΦ₀m : MeasurableSet ((tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd) :=
+    hTm.inter (hpm hFd₀m)
+  have hΦae
+      : (((tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd : Set G)) =ᵐ[μ]
+        (((tube p R U : Set G) ∩ p ⁻¹' Fd : Set G)) := by
     rw [ae_eq_set]
     constructor
     · apply measure_mono_null _ (hnull _ hdiff)
@@ -160,11 +187,14 @@ theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2
     refine ⟨hΦ₀m.nullMeasurableSet.congr hΦae, ?_, ?_⟩
     · have hbad : ν {v | ¬ ∃ l : L, l +ᵥ v ∈ Fd} = 0 := ae_iff.mp hFd.ae_covers
       rw [ae_iff]
-      refine measure_mono_null ?_ (measure_iUnion_null fun γ : Γ =>
-        (show μ ((fun w => (γ : G) + w) ⁻¹'
-            ((tube p R U : Set G) ∩ p ⁻¹' {v | ¬ ∃ l : L, l +ᵥ v ∈ Fd})) = 0 by
-          rw [measure_preimage_add]
-          exact hnull _ hbad))
+      refine measure_mono_null ?_
+        (measure_iUnion_null fun γ : Γ =>
+          (show μ
+                ((fun w => (γ : G) + w)
+                  ⁻¹' ((tube p R U : Set G) ∩ p ⁻¹' {v | ¬ ∃ l : L, l +ᵥ v ∈ Fd}))
+              = 0 by
+            rw [measure_preimage_add]
+            exact hnull _ hbad))
       intro w hw
       simp only [Set.mem_ofPred_eq, not_exists] at hw
       obtain ⟨γ, hγ, hγw⟩ := hcov w
@@ -187,14 +217,18 @@ theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2
           hne (Subtype.ext (sub_eq_zero.mp (hΓT _ hδΓ hδt h0)))
         have hlL : p ((γ₁ : G) - γ₂) ∈ L := (hL _).mpr ⟨_, hδΓ, hδt, rfl⟩
         have hN : ν (Fd ∩ ((⟨p ((γ₁ : G) - γ₂), hlL⟩ : L) +ᵥ Fd)) = 0 := by
-          have := hFd.aedisjoint
-            (show (0 : L) ≠ ⟨p ((γ₁ : G) - γ₂), hlL⟩ from fun h => hl0 (congrArg Subtype.val h).symm)
+          have :=
+            hFd.aedisjoint (show (0 : L) ≠ ⟨p ((γ₁ : G) - γ₂), hlL⟩ from fun h =>
+              hl0 (congrArg Subtype.val h).symm)
           rw [Function.onFun, zero_vadd] at this
           exact this
-        refine measure_mono_null ?_ (show μ ((fun w => -(γ₂ : G) + w) ⁻¹' ((tube p R U : Set G) ∩
-            p ⁻¹' (Fd ∩ ((⟨p ((γ₁ : G) - γ₂), hlL⟩ : L) +ᵥ Fd)))) = 0 by
-          rw [measure_preimage_add]
-          exact hnull _ hN)
+        refine measure_mono_null ?_
+          (show μ
+                ((fun w => -(γ₂ : G) + w)
+                  ⁻¹' ((tube p R U : Set G) ∩ p ⁻¹' (Fd ∩ ((⟨p ((γ₁ : G) - γ₂), hlL⟩ : L) +ᵥ Fd))))
+              = 0 by
+            rw [measure_preimage_add]
+            exact hnull _ hN)
         rintro x ⟨hx1, hx2⟩
         obtain ⟨y₁, ⟨hy₁T, hy₁F⟩, rfl⟩ := hx1
         obtain ⟨y₂, ⟨hy₂T, hy₂F⟩, hxy⟩ := hx2
@@ -202,8 +236,7 @@ theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2
         have e : (γ₁ : G) - γ₂ = y₂ - y₁ := by
           rw [sub_eq_sub_iff_add_eq_add, ← hxy']
           exact add_comm _ _
-        have hy : -(γ₂ : G) + ((γ₁ : G) + y₁) = y₂ := by
-          rw [← hxy', neg_add_cancel_left]
+        have hy : -(γ₂ : G) + ((γ₁ : G) + y₁) = y₂ := by rw [← hxy', neg_add_cancel_left]
         show -(γ₂ : G) + ((γ₁ : G) + y₁) ∈ (tube p R U : Set G) ∩
           p ⁻¹' (Fd ∩ ((⟨p ((γ₁ : G) - γ₂), hlL⟩ : L) +ᵥ Fd))
         rw [hy]
@@ -219,12 +252,16 @@ theorem integral_eq_mean [LocallyCompactSpace V] [SecondCountableTopology V] [T2
           rw [sub_eq_sub_iff_add_eq_add, ← hxy']
           exact add_comm _ _
         exact hδt (e ▸ (tube p R U).sub_mem hy₂T hy₁T)
-  have hint1 : ∫ w in 𝓕, h w ∂μ = ∫ w in (tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd, h w ∂μ := by
+  have hint1
+      : ∫ w in 𝓕, h w ∂μ = ∫ w in (tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd, h w ∂μ := by
     rw [h𝓕.setIntegral_eq hΦ (fun γ w => hΓ γ γ.2 w), setIntegral_congr_set hΦae.symm]
-  have hint2 : ∫ w in (tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd, h w ∂μ =
-      ∫ v in toMeasurable ν Fd, h (R v) ∂((μ.restrict (tube p R U)).map p) := by
-    rw [setIntegral_map (f := fun v => h (R v)) hFd₀m
-      (show Continuous (fun v => h (R v)) from hc.comp hR).aestronglyMeasurable hpm.aemeasurable,
+  have hint2
+      : ∫ w in (tube p R U : Set G) ∩ p ⁻¹' toMeasurable ν Fd, h w ∂μ
+        = ∫ v in toMeasurable ν Fd, h (R v) ∂((μ.restrict (tube p R U)).map p) := by
+    rw [setIntegral_map
+        (f := fun v => h (R v))
+        hFd₀m (show Continuous (fun v => h (R v)) from hc.comp hR).aestronglyMeasurable
+        hpm.aemeasurable,
       Measure.restrict_restrict (hpm hFd₀m), Set.inter_comm]
     apply setIntegral_congr_fun ((hpm hFd₀m).inter hTm)
     intro w hw
@@ -246,13 +283,13 @@ end Abstract
 
 variable {D : D7} {S T : HSp D}
 
-theorem finW_add (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    finW S T (y + y') = finW S T y + finW S T y' := by
+theorem finW_add (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : finW S T (y + y') = finW S T y + finW S T y' := by
   ext a k
   simp [finW, TensorProduct.tmul_add]
 
-theorem finW_nsmul (N : ℕ) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    finW S T (N • y) = N • finW S T y := by
+theorem finW_nsmul (N : ℕ) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : finW S T (N • y) = N • finW S T y := by
   induction N with
   | zero =>
     ext a k
@@ -269,8 +306,8 @@ theorem fin_finW (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) : IsFinPt (finW
   have h0 : fstA (F := D.host.F) (pairA D.host.F 0 1) = 0 := rfl
   rw [h0, TensorProduct.zero_tmul]
 
-theorem real_rat_sub (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    IsRealPt (S := S) (T := T) (ratW T S yᵀ - finW S T y) := by
+theorem real_rat_sub (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : IsRealPt (S := S) (T := T) (ratW T S yᵀ - finW S T y) := by
   unfold IsRealPt
   ext a k
   simp only [finW, ratW, Matrix.map_apply, Matrix.of_apply, Matrix.zero_apply, Matrix.sub_apply,
@@ -283,30 +320,36 @@ theorem real_rat_sub (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
   have h1 : sndA (F := D.host.F) (pairA D.host.F 0 1) = 1 := rfl
   rw [h1, map_one, sub_self]
 
-theorem realPt_ratW (C : Ctx S T) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    C.realPt (ratW T S yᵀ) = embR C.X y := by
+theorem realPt_ratW (C : Ctx S T) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : C.realPt (ratW T S yᵀ) = embR C.X y := by
   funext σ k a
   have h1 : infPart D (incA D (y k a)) = (1 : Ainf D.host.F) ⊗ₜ[D.host.F] y k a := by
     show (Algebra.TensorProduct.map (fstA (F := D.host.F)) (AlgHom.id D.host.F D.host.E))
       ((1 : AF D.host.F) ⊗ₜ[D.host.F] y k a) = _
     rw [Algebra.TensorProduct.map_tmul, map_one]
     rfl
-  have h2 : (C.θ (C.m.e.symm σ)) ((1 : Ainf D.host.F) ⊗ₜ[D.host.F] y k a) =
-      tauE D (C.m.e.symm σ) (y k a) := (C.inf (C.m.e.symm σ)).1 (y k a)
+  have h2
+      : (C.θ (C.m.e.symm σ)) ((1 : Ainf D.host.F) ⊗ₜ[D.host.F] y k a)
+        = tauE D (C.m.e.symm σ) (y k a) :=
+    (C.inf (C.m.e.symm σ)).1 (y k a)
   have h3 := C.m.e_emb (C.m.e.symm σ)
   rw [Equiv.apply_symm_apply] at h3
   simp only [Ctx.realPt, embR, ratW, compAt, Matrix.map_apply, Matrix.transpose_apply]
   rw [h1, h2, h3, ComplexEmbedding.conjugate_coe_eq]
 
-theorem nsmul_cancel_tensor {F A B : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A] [CommRing B] [Algebra F B]
-    {m n N : ℕ} (hN : 0 < N) {w w' : Matrix (Fin m) (Fin n) (A ⊗[F] B)} (h : N • w = N • w') : w = w' := by
+theorem nsmul_cancel_tensor
+    {F A B : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A] [CommRing B] [Algebra F B]
+    {m n N : ℕ} (hN : 0 < N)
+    {w w' : Matrix (Fin m) (Fin n) (A ⊗[F] B)} (h : N • w = N • w')
+    : w = w' := by
   have hN' : (N : F) ≠ 0 := by exact_mod_cast hN.ne'
   have h' : (N : F) • w = (N : F) • w' := by
     rw [Nat.cast_smul_eq_nsmul, Nat.cast_smul_eq_nsmul]
     exact h
   exact smul_right_injective _ hN' h'
 
-theorem nsmul_cancel {N : ℕ} (hN : 0 < N) {w w' : WO S T} (h : N • w = N • w') : w = w' := nsmul_cancel_tensor (F := D.host.F) hN h
+theorem nsmul_cancel {N : ℕ} (hN : 0 < N) {w w' : WO S T} (h : N • w = N • w') : w = w' :=
+  nsmul_cancel_tensor (F := D.host.F) hN h
 
 section Classical
 
@@ -328,8 +371,8 @@ theorem embR_smul (N : ℕ) (y : Matrix (Fin n) (Fin r) E) : embR X (N • y) = 
   funext τ k a
   simp [embR]
 
-theorem mem_latR_iff (N : ℕ) (v : WR X n) :
-    v ∈ latR X n N ↔ ∃ y : Matrix (Fin n) (Fin r) E, (∀ k, y k ∈ X.Λ) ∧ v = N • embR X y := by
+theorem mem_latR_iff (N : ℕ) (v : WR X n)
+    : v ∈ latR X n N ↔ ∃ y : Matrix (Fin n) (Fin r) E, (∀ k, y k ∈ X.Λ) ∧ v = N • embR X y := by
   unfold latR
   constructor
   · intro hv
@@ -347,7 +390,7 @@ theorem mem_latR_iff (N : ℕ) (v : WR X n) :
       simp [embR, smul_add]
     | neg x _ hx =>
       obtain ⟨u, hu, rfl⟩ := hx
-      refine ⟨-u, fun k => show -u k ∈ X.Λ from X.Λ.neg_mem (hu k), ?_⟩
+      refine ⟨-u, fun k => show - u k ∈ X.Λ from X.Λ.neg_mem (hu k), ?_⟩
       funext τ k a
       simp [embR]
   · rintro ⟨y, hy, rfl⟩
@@ -381,16 +424,33 @@ theorem mul_conj_phase {a : ℂ} (ha : ‖a‖ = 1) (x y : ℂ) : a * x * conj (
   rw [map_mul]
   linear_combination (x * conj y) * h1
 
-theorem ipO_eq_mean : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsCovolOne (ratL T S) μ 𝓕 → ∀ f f', C.IsTh f → C.IsTh f' → ∃ N₀ : ℕ, 0 < N₀ ∧ ∀ N : ℕ, 0 < N → N₀ ∣ N → (∃ Fd : Set (WR C.X S.rank), IsAddFundamentalDomain (latR C.X S.rank N) Fd volume) ∧ ∀ Fd : Set (WR C.X S.rank), IsAddFundamentalDomain (latR C.X S.rank N) Fd volume → ∀ F : WR C.X S.rank → ℂ, (∀ w, IsRealPt w → f w * conj (f' w) = F (C.realPt w)) → ipO μ 𝓕 f f' = ((volume Fd).toReal : ℂ)⁻¹ * ∫ v in Fd, F v := by
+theorem ipO_eq_mean
+    : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+      IsCovolOne (ratL T S) μ 𝓕
+        → ∀ f f',
+          C.IsTh f → C.IsTh f'
+            → ∃ N₀ : ℕ,
+              0 < N₀
+                ∧ ∀ N : ℕ,
+                  0 < N → N₀ ∣ N
+                    → (∃ Fd : Set (WR C.X S.rank),
+                        IsAddFundamentalDomain (latR C.X S.rank N) Fd volume)
+                      ∧ ∀ Fd : Set (WR C.X S.rank),
+                        IsAddFundamentalDomain (latR C.X S.rank N) Fd volume
+                          → ∀ F : WR C.X S.rank → ℂ,
+                            (∀ w, IsRealPt w → f w * conj (f' w) = F (C.realPt w))
+                              → ipO μ 𝓕 f f' = ((volume Fd).toReal : ℂ)⁻¹ * ∫ v in Fd, F v := by
   intro D S T C μ 𝓕 hcov f f' hf hf'
   unfold IsCovolOne at hcov
   obtain ⟨hμ, h𝓕, h1⟩ := hcov
-  obtain ⟨R, hRc, hpc, hpadd, hRv, hRreal, hfp, hfin0, -, -⟩ := GlobalTheory.T.realPoints_classicalModel_realVectorSpace D S T C
+  obtain ⟨R, hRc, hpc, hpadd, hRv, hRreal, hfp, hfin0, -, -⟩ :=
+    GlobalTheory.T.realPoints_classicalModel_realVectorSpace D S T C
   have hstdfg : (stdL D.host.E S.rank).FG := by
     unfold stdL
     exact Submodule.fg_span (Set.finite_range _)
-  obtain ⟨hA1, hA2, hA3, -, hA5, hA6⟩ := GlobalTheory.T.completedTensorLattice_strongApprox_open_compact D S T C (stdL D.host.E S.rank) C.X.Λ
-    ⟨hstdfg, span_stdL⟩ ⟨C.X.Λ_fg, C.X.Λ_span⟩
+  obtain ⟨hA1, hA2, hA3, -, hA5, hA6⟩ :=
+    GlobalTheory.T.completedTensorLattice_strongApprox_open_compact D S T C (stdL D.host.E S.rank)
+      C.X.Λ ⟨hstdfg, span_stdL⟩ ⟨C.X.Λ_fg, C.X.Λ_span⟩
   obtain ⟨-, -, hTh⟩ := GlobalTheory.T.thetaFunction_space_heisenberg_laws D S T C
   obtain ⟨-, -, -, -, -, Nf, hNf, hfN⟩ := hTh f hf
   obtain ⟨-, -, -, -, -, Nf', hNf', hfN'⟩ := hTh f' hf'
@@ -438,15 +498,16 @@ theorem ipO_eq_mean : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measur
   have hfinsmul : ∀ u ∈ A, C.realPt (N • u) = 0 := by
     intro u hu
     rw [← hpapp, map_nsmul, hpapp, hfin0 u (hA3 u hu).1, smul_zero]
-  have hRemb : ∀ y : Matrix (Fin S.rank) (Fin T.rank) D.host.E,
-      R (embR C.X y) = ratW T S yᵀ - finW S T y := by
+  have hRemb
+      : ∀ y : Matrix (Fin S.rank) (Fin T.rank) D.host.E,
+        R (embR C.X y) = ratW T S yᵀ - finW S T y := by
     intro y
     have e1 := hRreal _ (real_rat_sub y)
     have e2 : C.realPt (ratW T S yᵀ - finW S T y) = embR C.X y := by
       rw [← hpapp, map_sub, hpapp, hpapp, realPt_ratW, hfin0 _ (fin_finW y), sub_zero]
     rwa [e2] at e1
-  have hmemT : ∀ w, w ∈ tube p R U ↔ ∃ u ∈ A, N • u = w - R (C.realPt w) :=
-    fun w => (mem_tube p R U w).trans (hmemU _)
+  have hmemT : ∀ w, w ∈ tube p R U ↔ ∃ u ∈ A, N • u = w - R (C.realPt w) := fun w =>
+    (mem_tube p R U w).trans (hmemU _)
   have hO : IsOpen (tube p R U : Set (WO S T)) := by
     convert hA5 N hN using 1
     ext w
@@ -473,7 +534,7 @@ theorem ipO_eq_mean : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measur
     refine ⟨-(ratW T S (y + y')ᵀ), (ratL T S).neg_mem ⟨(y + y')ᵀ, rfl⟩, ?_⟩
     rw [hmemT]
     refine ⟨u', hu', ?_⟩
-    have e3 : C.realPt (-(ratW T S (y + y')ᵀ) + w) = -embR C.X (y + y') + C.realPt w := by
+    have e3 : C.realPt (-(ratW T S (y + y')ᵀ) + w) = - embR C.X (y + y') + C.realPt w := by
       rw [← hpapp, map_add (f := _), map_neg, hpapp, hpapp, realPt_ratW]
     rw [e3, map_add (f := _), map_neg, hRemb, finW_add]
     rw [show N • u' = w - R (C.realPt w) - finW S T y - finW S T y' by rw [e]; abel]
@@ -496,7 +557,8 @@ theorem ipO_eq_mean : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measur
     · rintro ⟨y, hy, rfl⟩
       refine ⟨ratW T S (N • y)ᵀ, ⟨_, rfl⟩, ?_, ?_⟩
       · rw [hmemT]
-        refine ⟨finW S T y, (hA2 y).mpr ((GlobalTheory.SW.TensLat.mem_tens_stdL C.X.Λ y).mpr hy), ?_⟩
+        refine
+          ⟨finW S T y, (hA2 y).mpr ((GlobalTheory.SW.TensLat.mem_tens_stdL C.X.Λ y).mpr hy), ?_⟩
         rw [realPt_ratW, hRemb, finW_nsmul]
         abel
       · show C.realPt _ = _
@@ -515,13 +577,15 @@ theorem ipO_eq_mean : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measur
       have e3 : finW S T ((N : D.host.E)⁻¹ • y) = u := by
         apply nsmul_cancel hN
         rw [← finW_nsmul, hy3, e2]
-      have hmem := (GlobalTheory.SW.TensLat.mem_tens_stdL C.X.Λ _).mp ((hA2 _).mp (by rw [e3]; exact hu))
+      have hmem :=
+        (GlobalTheory.SW.TensLat.mem_tens_stdL C.X.Λ _).mp ((hA2 _).mp (by rw [e3]; exact hu))
       refine ⟨(N : D.host.E)⁻¹ • y, hmem, ?_⟩
       show C.realPt (ratW T S yᵀ) = N • embR C.X ((N : D.host.E)⁻¹ • y)
       rw [realPt_ratW, ← embR_smul, hy3]
   have hUc : IsCompact (U : Set (WO S T)) := by
     rw [hUdef, AddSubgroup.coe_map]
-    exact hA6.image (show Continuous (DistribSMul.toAddMonoidHom (WO S T) N) from continuous_nsmul N)
+    exact hA6.image (show Continuous (DistribSMul.toAddMonoidHom (WO S T) N) from
+      continuous_nsmul N)
   obtain ⟨hTG, hLC, hSC, hT2, hdisc, -⟩ := GlobalTheory.AdelicMatrixLattice.lattice D T S
   have := hT2
   have := hdisc
@@ -532,11 +596,14 @@ theorem ipO_eq_mean : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ (μ : Measur
   have := hμ
   have hLdisc : DiscreteTopology (latR C.X S.rank N) :=
     discrete_image (p := p) hRc hUc (ratL T S) (latR C.X S.rank N) (fun v hv => (hL v).mp hv)
-  obtain ⟨Fd0, -, -, hFd0⟩ := GlobalTheory.exists_isAddFundamentalDomain_addSubgroup (latR C.X S.rank N)
+  obtain ⟨Fd0, -, -, hFd0⟩ :=
+    GlobalTheory.exists_isAddFundamentalDomain_addSubgroup (latR C.X S.rank N)
   refine ⟨⟨Fd0, hFd0 volume⟩, fun Fd hFd F hF => ?_⟩
   have hcont : Continuous h := hf.cont.mul (Complex.continuous_conj.comp hf'.cont)
-  have key := integral_eq_mean (p := p) (R := R) (U := U) hpc hRc (fun v => (hRv v).2) hUc hO μ volume
-    (ratL T S) (latR C.X S.rank N) hL hcov' hinj h𝓕 h1 hFd hcont hΓ hhU
+  have key :=
+    integral_eq_mean (p := p) (R := R) (U := U) hpc hRc
+      (fun v => (hRv v).2)
+      hUc hO μ volume (ratL T S) (latR C.X S.rank N) hL hcov' hinj h𝓕 h1 hFd hcont hΓ hhU
   have hFR : (fun v => h (R v)) = F := by
     funext v
     have := hF (R v) (hRv v).1

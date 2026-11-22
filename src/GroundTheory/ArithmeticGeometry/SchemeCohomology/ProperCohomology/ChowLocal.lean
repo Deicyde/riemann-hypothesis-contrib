@@ -31,9 +31,9 @@ lemma chartToPoly_chartStructureMap (n : ℕ) (a : A) :
     simp [polyToChart]
   rw [h, ← RingHom.comp_apply, chartToPoly_polyToChart, RingHom.id_apply]
 
-theorem exists_surjective_chart {B : Type u} [CommRing B] (ρ : A →+* B) (hρ : ρ.FiniteType) :
-    ∃ (n : ℕ) (g : Chart A (0 : Fin (n + 1)) →+* B), Function.Surjective g ∧
-      g.comp (chartStructureMap n) = ρ := by
+theorem exists_surjective_chart {B : Type u} [CommRing B] (ρ : A →+* B) (hρ : ρ.FiniteType)
+    : ∃ (n : ℕ) (g : Chart A (0 : Fin (n + 1)) →+* B),
+      Function.Surjective g ∧ g.comp (chartStructureMap n) = ρ := by
   let _ := ρ.toAlgebra
   obtain ⟨n, s, hs⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.1 hρ
   let ψ : MvPolynomial {j : Fin (n + 1) // j ≠ 0} A →+* B :=
@@ -53,10 +53,11 @@ theorem exists_surjective_chart {B : Type u} [CommRing B] (ρ : A →+* B) (hρ 
     rw [RingHom.comp_apply, RingHom.comp_apply, chartToPoly_chartStructureMap]
     simp [ψ]
 
-theorem exists_closedImmersion_stdOpen {X : Scheme.{u}} (f : X ⟶ Spec (.of A))
-    [LocallyOfFiniteType f] {U : X.Opens} (hU : IsAffineOpen U) :
-    ∃ (n : ℕ) (c : U.toScheme ⟶ (stdOpen A n 0).toScheme), IsClosedImmersion c ∧
-      c ≫ (stdOpen A n 0).ι ≫ toSpecBase A n = U.ι ≫ f := by
+theorem exists_closedImmersion_stdOpen
+    {X : Scheme.{u}} (f : X ⟶ Spec (.of A)) [LocallyOfFiniteType f]
+    {U : X.Opens} (hU : IsAffineOpen U)
+    : ∃ (n : ℕ) (c : U.toScheme ⟶ (stdOpen A n 0).toScheme),
+      IsClosedImmersion c ∧ c ≫ (stdOpen A n 0).ι ≫ toSpecBase A n = U.ι ≫ f := by
   let ρ' : CommRingCat.of A ⟶ Γ(X, U) := (Scheme.ΓSpecIso (.of A)).inv ≫ f.appLE ⊤ U le_top
   have hρ : ρ'.hom.FiniteType := by
     refine RingHom.FiniteType.comp (f.finiteType_appLE (isAffineOpen_top _) hU le_top) ?_
@@ -65,8 +66,8 @@ theorem exists_closedImmersion_stdOpen {X : Scheme.{u}} (f : X ⟶ Spec (.of A))
   obtain ⟨n, g, hg, hgc⟩ := exists_surjective_chart ρ'.hom hρ
   have hX0 : (MvPolynomial.X 0 : MvPolynomial (Fin (n + 1)) A) ∈ grading A n 1 := X_mem 0
   let c : U.toScheme ⟶ (Proj.basicOpen (grading A n) (MvPolynomial.X 0)).toScheme :=
-    hU.isoSpec.hom ≫ Spec.map (CommRingCat.ofHom g) ≫
-      (Proj.basicOpenIsoSpec (grading A n) (MvPolynomial.X 0) hX0 one_pos).inv
+    hU.isoSpec.hom ≫ Spec.map (CommRingCat.ofHom g)
+      ≫ (Proj.basicOpenIsoSpec (grading A n) (MvPolynomial.X 0) hX0 one_pos).inv
   have hc : IsClosedImmersion c := by
     have := IsClosedImmersion.spec_of_surjective (CommRingCat.ofHom g) hg
     dsimp only [c]
@@ -81,11 +82,13 @@ theorem exists_closedImmersion_stdOpen {X : Scheme.{u}} (f : X ⟶ Spec (.of A))
     congr 1
     simp [ρ']
   rw [h1]
-  change hU.isoSpec.hom ≫ Spec.map (CommRingCat.ofHom g) ≫
-      ((Proj.basicOpenIsoSpec (grading A n) (MvPolynomial.X 0) hX0 one_pos).inv ≫
-        (Proj.basicOpen (grading A n) (MvPolynomial.X 0)).ι) ≫ toSpecBase A n = _
-  rw [Proj.basicOpenIsoSpec_inv_ι, toSpecBase, Proj.awayι_toSpecZero_assoc,
-    ← Spec.map_comp, ← Spec.map_comp]
+  change hU.isoSpec.hom ≫ Spec.map (CommRingCat.ofHom g)
+      ≫ ((Proj.basicOpenIsoSpec (grading A n) (MvPolynomial.X 0) hX0 one_pos).inv
+        ≫ (Proj.basicOpen (grading A n) (MvPolynomial.X 0)).ι)
+      ≫ toSpecBase A n
+    = _
+  rw [Proj.basicOpenIsoSpec_inv_ι, toSpecBase, Proj.awayι_toSpecZero_assoc, ← Spec.map_comp,
+    ← Spec.map_comp]
   congr 2
   ext a
   change g (chartStructureMap n a) = ρ'.hom a

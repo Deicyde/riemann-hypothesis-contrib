@@ -4,11 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.V.LinAlg.simEig :
-    ∀ {K M : Type} [Field K] [IsAlgClosed K] [AddCommGroup M] [Module K M] [FiniteDimensional K M]
-        {J : Type} (T : J → Module.End K M), (∀ i j : J, T i * T j = T j * T i) →
-        ∀ (d : ℕ) (U : Submodule K M), Module.finrank K U = d → U ≠ ⊥ → (∀ j : J, ∀ x ∈ U, T j x ∈ U) →
-        ∃ v ∈ U, v ≠ 0 ∧ ∀ j : J, ∃ c : K, T j v = c • v := by
+theorem UpperTheory.V.LinAlg.simEig
+    : ∀ {K M : Type} [Field K] [IsAlgClosed K] [AddCommGroup M] [Module K M] [FiniteDimensional K M]
+        {J : Type} (T : J → Module.End K M),
+      (∀ i j : J, T i * T j = T j * T i)
+        → ∀ (d : ℕ) (U : Submodule K M),
+          Module.finrank K U = d → U ≠ ⊥ → (∀ j : J, ∀ x ∈ U, T j x ∈ U)
+            → ∃ v ∈ U, v ≠ 0 ∧ ∀ j : J, ∃ c : K, T j v = c • v := by
   intro K M _ _ _ _ _ J T hT _ U _ hU hst
   let A : Subalgebra K (Module.End K M) := Algebra.adjoin K (Set.range T)
   have hA : ∀ a ∈ A, (∀ x ∈ U, a x ∈ U) ∧ ∀ j, a * T j = T j * a := by
@@ -17,16 +19,21 @@ theorem UpperTheory.V.LinAlg.simEig :
     | mem a h => obtain ⟨i, rfl⟩ := h; exact ⟨hst i, hT i⟩
     | algebraMap r => exact ⟨fun x hx => U.smul_mem r hx, fun j => Algebra.commutes r _⟩
     | add a b _ _ ha hb =>
-      exact ⟨fun x hx => U.add_mem (ha.1 x hx) (hb.1 x hx),
-        fun j => by rw [add_mul, mul_add, ha.2, hb.2]⟩
+      exact ⟨
+        fun x hx => U.add_mem (ha.1 x hx) (hb.1 x hx),
+        fun j => by rw [add_mul, mul_add, ha.2, hb.2]
+      ⟩
     | mul a b _ _ ha hb =>
-      exact ⟨fun x hx => ha.1 _ (hb.1 x hx),
-        fun j => by rw [mul_assoc, hb.2, ← mul_assoc, ha.2, mul_assoc]⟩
-  let U' : Submodule A M :=
-    { carrier := U
-      add_mem' := fun hx hy => U.add_mem hx hy
-      zero_mem' := U.zero_mem
-      smul_mem' := fun a x hx => (hA a.1 a.2).1 x hx }
+      exact ⟨
+        fun x hx => ha.1 _ (hb.1 x hx),
+        fun j => by rw [mul_assoc, hb.2, ← mul_assoc, ha.2, mul_assoc]
+      ⟩
+  let U' : Submodule A M := {
+    carrier := U
+    add_mem' := fun hx hy => U.add_mem hx hy
+    zero_mem' := U.zero_mem
+    smul_mem' := fun a x hx => (hA a.1 a.2).1 x hx
+  }
   have hU' : U' ≠ ⊥ := by
     intro h
     apply hU
@@ -40,12 +47,13 @@ theorem UpperTheory.V.LinAlg.simEig :
   obtain ⟨v, hv, hv0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hS.1
   refine ⟨v, hSU hv, hv0, fun j => ?_⟩
   let t : A := ⟨T j, Algebra.subset_adjoin ⟨j, rfl⟩⟩
-  let f : Module.End A S :=
-    { toFun := fun x => ⟨t • (x : M), S.smul_mem t x.property⟩
-      map_add' := fun x y => smul_add t x y
-      map_smul' := fun a x => by
-        apply Subtype.ext
-        exact (LinearMap.congr_fun ((hA a.1 a.2).2 j) (x : M)).symm }
+  let f : Module.End A S := {
+    toFun := fun x => ⟨t • (x : M), S.smul_mem t x.property⟩
+    map_add' := fun x y => smul_add t x y
+    map_smul' := fun a x => by
+      apply Subtype.ext
+      exact (LinearMap.congr_fun ((hA a.1 a.2).2 j) (x : M)).symm
+  }
   obtain ⟨c, hc⟩ := (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed K (A := A) (V := S)).2 f
   refine ⟨c, ?_⟩
   have h := congrArg Subtype.val (LinearMap.congr_fun hc ⟨v, hv⟩)

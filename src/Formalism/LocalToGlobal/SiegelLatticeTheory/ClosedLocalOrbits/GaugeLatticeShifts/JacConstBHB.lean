@@ -30,16 +30,21 @@ def gVol (k r : ℕ) (ρ : ℝ) : ℝ :=
   (volume (Metric.ball (0 : Formalism.MainNotions.S.lieE (UH (Hpk k r))) ρ)).toReal
 
 def IterGauge : Prop :=
-  ∀ (k r : ℕ) (μ μb : Measure (Mt k r)), IsGaugeOn (UH (Hpk k r)) μ → IsGaugeOn (Formalism.FourierDecayAlt.B2.UWb k r) μb →
-    ∃ C : NNReal, 0 < C ∧ ∀ φ : Mt k r → ℝ≥0∞, Measurable φ → ∫⁻ x, φ x ∂μ = (C : ℝ≥0∞) * rhs k r μb φ
+  ∀ (k r : ℕ) (μ μb : Measure (Mt k r)),
+    IsGaugeOn (UH (Hpk k r)) μ → IsGaugeOn (Formalism.FourierDecayAlt.B2.UWb k r) μb
+      → ∃ C : NNReal,
+        0 < C ∧ ∀ φ : Mt k r → ℝ≥0∞, Measurable φ → ∫⁻ x, φ x ∂μ = (C : ℝ≥0∞) * rhs k r μb φ
 
 def GaugeShift : Prop :=
-  ∀ (k r : ℕ) (μ : Measure (Mt k r)), Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μ → ∀ ρ : ℝ, 0 < ρ →
-    MeasurableSet (wBall k r ρ) ∧ μ (wBall k r ρ) = μ (gBall k r ρ)
+  ∀ (k r : ℕ) (μ : Measure (Mt k r)),
+    Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μ
+      → ∀ ρ : ℝ, 0 < ρ → MeasurableSet (wBall k r ρ) ∧ μ (wBall k r ρ) = μ (gBall k r ρ)
 
 def RhsLim : Prop :=
-  ∀ (k r : ℕ) (μb : Measure (Mt k r)), IsGaugeOn (Formalism.FourierDecayAlt.B2.UWb k r) μb →
-    Tendsto (fun ρ : ℝ => (rhs k r μb ((wBall k r ρ).indicator 1)).toReal / gVol k r ρ) (𝓝[>] 0)
-      (𝓝 ((2 : ℝ) ^ r)⁻¹)
+  ∀ (k r : ℕ) (μb : Measure (Mt k r)),
+    IsGaugeOn (Formalism.FourierDecayAlt.B2.UWb k r) μb
+      → Tendsto
+        (fun ρ : ℝ => (rhs k r μb ((wBall k r ρ).indicator 1)).toReal / gVol k r ρ)
+        (𝓝[>] 0) (𝓝 ((2 : ℝ) ^ r)⁻¹)
 
 end Formalism.L2.SG.Pf.BH

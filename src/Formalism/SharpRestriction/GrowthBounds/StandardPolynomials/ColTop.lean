@@ -12,10 +12,15 @@ noncomputable section
 
 namespace Formalism.MainNotions.ColumnSystems.Pf
 
-open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.LemmaBAlt Formalism.MainNotions.ColumnSystems.Pf.Col Formalism.MainNotions.ColumnSystems.Pf.ColF Formalism.MainNotions.ColumnSystems.Pf.GenusGluing
+open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.LemmaBAlt
+  Formalism.MainNotions.ColumnSystems.Pf.Col Formalism.MainNotions.ColumnSystems.Pf.ColF
+  Formalism.MainNotions.ColumnSystems.Pf.GenusGluing
 
-theorem col_lamS_vec {C0 CE1 CE2 mu : ℝ} {X : Loc} [NeZero X.m] {β : GlobalTheory X} (L : LvDat C0 CE1 CE2 mu X β)
-    (j : Fin (numSeg X.TT)) (a : Fin (2 * segS X.TT j + 1)) : (lamS X j a.succ).2 = (L.LL j).vec a := by
+theorem col_lamS_vec
+    {C0 CE1 CE2 mu : ℝ} {X : Loc} [NeZero X.m]
+    {β : GlobalTheory X} (L : LvDat C0 CE1 CE2 mu X β)
+    (j : Fin (numSeg X.TT)) (a : Fin (2 * segS X.TT j + 1))
+    : (lamS X j a.succ).2 = (L.LL j).vec a := by
   show _ = decide ((a : ℕ) % 2 = 0)
   by_cases h : (a : ℕ) < 2 * segS X.TT j
   · rw [lamS_succ_lt X j a h]
@@ -27,8 +32,9 @@ theorem column_kappa_nonneg (X : Loc) : 0 ≤ ka1 X := by
   unfold ka1 Loc.k Loc.Q
   positivity
 
-theorem colsAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ} (hNum : ColumnNumericsAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc) :
-    ColsAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
+theorem colsAt_of
+    {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ} (hNum : ColumnNumericsAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc)
+    : ColsAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
   intro X _ _ O _ _ _ _ S hS hD hH hC mm hmm n hn1 hnc β hβ L j y hy
   obtain ⟨hnum1, hnum2⟩ := hNum X hD hH hC mm hmm n hn1 hnc j (β j) (hβ j)
   have h2 : 2 ≤ numSeg X.TT := hH.1.2.2.2.1
@@ -61,7 +67,8 @@ theorem colsAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ} (hNum : ColumnNumericsA
     KPol := fun c => colKPol j y.1.1.mu c.1 _
     digit_le_one := fun c i => by unfold dKS; split_ifs <;> omega
     dKsum := fun i => by
-      rw [Finset.sum_coe_sort (colsS C0 CE1 CE2 (mm + (n : ℝ) * ka1 X) X β j y.1.1.mu) (fun c => dKS X j y.1.1.mu c i)]
+      rw [Finset.sum_coe_sort (colsS C0 CE1 CE2 (mm + (n : ℝ) * ka1 X) X β j y.1.1.mu)
+        (fun c => dKS X j y.1.1.mu c i)]
       exact dKsum_seg L j y h i
     Kprod := by
       rw [Finset.prod_coe_sort (colsS C0 CE1 CE2 (mm + (n : ℝ) * ka1 X) X β j y.1.1.mu)
@@ -79,8 +86,10 @@ theorem colsAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ} (hNum : ColumnNumericsA
       rw [Int.toNat_of_nonneg h0]
       unfold a0Z
       rw [sub_add_cancel]
-      have h1 : ⌊(((X.seg C0 CE1 CE2 j).A0 X.p : ℤ) : ℝ) - (mm + (n : ℝ) * ka1 X)⌋ ≤
-          ⌊(((X.seg C0 CE1 CE2 j).A0 X.p : ℤ) : ℝ)⌋ := Int.floor_le_floor (by linarith)
+      have h1
+          : ⌊(((X.seg C0 CE1 CE2 j).A0 X.p : ℤ) : ℝ) - (mm + (n : ℝ) * ka1 X)⌋
+            ≤ ⌊(((X.seg C0 CE1 CE2 j).A0 X.p : ℤ) : ℝ)⌋ :=
+        Int.floor_le_floor (by linarith)
       rwa [Int.floor_intCast] at h1
     plSum := by
       rw [Finset.sum_coe_sort (colsS C0 CE1 CE2 (mm + (n : ℝ) * ka1 X) X β j y.1.1.mu)
@@ -89,7 +98,8 @@ theorem colsAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ} (hNum : ColumnNumericsA
     oSum := by
       rw [Finset.sum_coe_sort (colsS C0 CE1 CE2 (mm + (n : ℝ) * ka1 X) X β j y.1.1.mu)
         (fun c => oCS C0 CE1 CE2 (mm + (n : ℝ) * ka1 X) X β j y.1.1.mu c)]
-      exact oSum_seg L j y h }⟩
+      exact oSum_seg L j y h
+  }⟩
 
 theorem restCols : RestCols :=
   TransportedAlt.mono (fun _ _ _ _ _ _ _ _ _ _ h => colsAt_of h) column_numerics_holds

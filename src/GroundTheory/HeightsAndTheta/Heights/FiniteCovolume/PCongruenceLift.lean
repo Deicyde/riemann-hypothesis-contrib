@@ -17,39 +17,48 @@ noncomputable section
 
 namespace CongruenceLift
 
-theorem exists_nsmul_mem {E W : Type*} [Field E] [NumberField E] [AddCommGroup W] [Module E W]
-    {La : AddSubgroup W} (hLa : IsLattice E La) (w : W) : ∃ d : ℕ, 0 < d ∧ d • w ∈ La :=
+theorem exists_nsmul_mem
+    {E W : Type*} [Field E] [NumberField E] [AddCommGroup W] [Module E W]
+    {La : AddSubgroup W} (hLa : IsLattice E La)
+    (w : W)
+    : ∃ d : ℕ, 0 < d ∧ d • w ∈ La :=
   _root_.UpperTheory.Reformulated.B.ExistsNsmulMem.exists_nsmul_mem hLa w
 
-theorem exists_congruence {V G : Type*} [AddCommGroup V] [Group G] [DistribMulAction G V]
-    (L : AddSubgroup V) (hL : L.FG) (d : ℕ) (hd : 0 < d) :
-    ∃ K : Subgroup (MulAction.stabilizer G L), K.index ≠ 0 ∧
-      ∀ k ∈ K, ∀ y ∈ L, ∃ u ∈ L, d • u = (k : G) • y - y := by
+theorem exists_congruence
+    {V G : Type*} [AddCommGroup V] [Group G] [DistribMulAction G V]
+    (L : AddSubgroup V) (hL : L.FG)
+    (d : ℕ) (hd : 0 < d)
+    : ∃ K : Subgroup (MulAction.stabilizer G L),
+      K.index ≠ 0 ∧ ∀ k ∈ K, ∀ y ∈ L, ∃ u ∈ L, d • u = (k : G) • y - y := by
   set S := MulAction.stabilizer G L
   have hS : ∀ (s : S) (y : V), y ∈ L → (s : G) • y ∈ L := fun s y hy => by
     have := AddSubgroup.smul_mem_pointwise_smul y (s : G) L hy
     rwa [MulAction.mem_stabilizer_iff.1 s.2] at this
-  let f : S → L →+ L := fun s =>
-    { toFun := fun y => ⟨(s : G) • (y : V), hS s y y.2⟩
-      map_zero' := Subtype.ext (smul_zero _)
-      map_add' := fun y z => Subtype.ext (smul_add _ _ _) }
+  let f : S → L →+ L := fun s => {
+    toFun := fun y => ⟨(s : G) • (y : V), hS s y y.2⟩
+    map_zero' := Subtype.ext (smul_zero _)
+    map_add' := fun y z => Subtype.ext (smul_add _ _ _)
+  }
   set N : AddSubgroup L := (nsmulAddMonoidHom (α := L) d).range
   have hN : ∀ s, N ≤ N.comap (f s) := by
     rintro s _ ⟨u, rfl⟩
     exact ⟨f s u, by simp [map_nsmul]⟩
-  let _ : MulAction S (L ⧸ N) :=
-    { smul := fun s q => QuotientAddGroup.map N N (f s) (hN s) q
-      one_smul := fun q => QuotientAddGroup.induction_on q fun y => by
+  let _ : MulAction S (L ⧸ N) := {
+    smul := fun s q => QuotientAddGroup.map N N (f s) (hN s) q
+    one_smul := fun q =>
+      QuotientAddGroup.induction_on q fun y => by
         change QuotientAddGroup.map N N (f 1) (hN 1) (y : L ⧸ N) = y
         rw [QuotientAddGroup.map_mk]
         congr 1
         exact Subtype.ext (one_smul G (y : V))
-      mul_smul := fun s t q => QuotientAddGroup.induction_on q fun y => by
-        change QuotientAddGroup.map N N (f (s * t)) (hN _) (y : L ⧸ N) =
-          QuotientAddGroup.map N N (f s) (hN s) (QuotientAddGroup.map N N (f t) (hN t) y)
+    mul_smul := fun s t q =>
+      QuotientAddGroup.induction_on q fun y => by
+        change QuotientAddGroup.map N N (f (s * t)) (hN _) (y : L ⧸ N)
+          = QuotientAddGroup.map N N (f s) (hN s) (QuotientAddGroup.map N N (f t) (hN t) y)
         rw [QuotientAddGroup.map_mk, QuotientAddGroup.map_mk, QuotientAddGroup.map_mk]
         congr 1
-        exact Subtype.ext (mul_smul (s : G) (t : G) (y : V)) }
+        exact Subtype.ext (mul_smul (s : G) (t : G) (y : V))
+  }
   have hfg : AddGroup.FG L := (AddGroup.fg_iff_addSubgroup_fg L).2 hL
   have hfin : Finite (L ⧸ N) := by
     refine AddCommGroup.finite_of_fg_isAddTorsion _ fun q => ?_
@@ -68,25 +77,28 @@ theorem exists_congruence {V G : Type*} [AddCommGroup V] [Group G] [DistribMulAc
   refine ⟨-(u : V), L.neg_mem u.2, ?_⟩
   have := congrArg Subtype.val hu
   simp only [nsmulAddMonoidHom_apply, AddSubgroup.coe_nsmul, AddSubgroup.coe_add,
-    AddSubgroup.coe_neg] at this
+      AddSubgroup.coe_neg]
+    at this
   rw [smul_neg, this]
   change -(-((k : G) • y) + y) = (k : G) • y - y
   abel
 
 end CongruenceLift
 
-variable {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E]
-  [Algebra.IsQuadraticExtension F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W]
 
-theorem CongruenceLift.proof [FiniteDimensional E W] (h : HermitianForm F E W) :
-    CongruenceLift.Statement h := by
+theorem CongruenceLift.proof [FiniteDimensional E W] (h : HermitianForm F E W)
+    : CongruenceLift.Statement h := by
   intro D La x₀ w₀ hLa hx₀ hp h' hh'
   obtain ⟨d, hd, hdw⟩ := CongruenceLift.exists_nsmul_mem hLa.isLattice w₀
   set La' : AddSubgroup (hypComplement h x₀ w₀) := La.comap (hypComplement h x₀ w₀).subtype.toAddMonoidHom
-  have dec : ∀ x ∈ La, h.toSesq (d • w₀) x • x₀ ∈ La ∧ (h.toSesq x₀ x * d) • w₀ ∈ La ∧
-      d • x - h.toSesq (d • w₀) x • x₀ - (h.toSesq x₀ x * d) • w₀ =
-        ((d • ComplementExtension.proj hp x : hypComplement h x₀ w₀) : W) := by
+  have dec
+      : ∀ x ∈ La,
+        h.toSesq (d • w₀) x • x₀ ∈ La ∧ (h.toSesq x₀ x * d) • w₀ ∈ La
+          ∧ d • x - h.toSesq (d • w₀) x • x₀ - (h.toSesq x₀ x * d) • w₀
+            = ((d • ComplementExtension.proj hp x : hypComplement h x₀ w₀) : W) := by
     intro x hx
     refine ⟨hLa.isLattice.smul_mem ⟨_, hLa.integral _ hdw x hx⟩ x₀ hx₀, ?_, ?_⟩
     · have := hLa.isLattice.smul_mem ⟨_, hLa.integral _ hx₀ x hx⟩ _ hdw
@@ -96,14 +108,20 @@ theorem CongruenceLift.proof [FiniteDimensional E W] (h : HermitianForm F E W) :
       simp only [← Nat.cast_smul_eq_nsmul E, smul_eq_mul]
       module
   obtain ⟨D', hD'⟩ := ComplementLattice.proof h x₀ w₀ hp h' hh' D d hd
-  have hLa' : IsDIntegral h' D' La' := hD' La hLa fun x hx =>
-    ⟨_, (dec x hx).1, _, (dec x hx).2.1, by rw [(dec x hx).2.2]; exact Submodule.coe_mem _⟩
-  obtain ⟨K, hK, hcong⟩ : ∃ K : Subgroup (latticeStab h' La'), K.index ≠ 0 ∧
-      ∀ k ∈ K, ∀ y ∈ La', ∃ u ∈ La', d • u = (k : h'.unitaryGroup) • y - y :=
+  have hLa' : IsDIntegral h' D' La' :=
+    hD' La hLa fun x hx =>
+      ⟨_, (dec x hx).1, _, (dec x hx).2.1, by rw [(dec x hx).2.2]; exact Submodule.coe_mem _⟩
+  obtain ⟨K, hK, hcong⟩
+      : ∃ K : Subgroup (latticeStab h' La'),
+        K.index ≠ 0 ∧ ∀ k ∈ K, ∀ y ∈ La', ∃ u ∈ La', d • u = (k : h'.unitaryGroup) • y - y :=
     CongruenceLift.exists_congruence (G := h'.unitaryGroup) La' hLa'.isLattice.fg d hd
-  have key : ∀ k ∈ K, ∀ γ : h.unitaryGroup, γ • x₀ = x₀ → γ • w₀ = w₀ →
-      (∀ x : hypComplement h x₀ w₀, γ • (x : W) = ((((k : latticeStab h' La') : h'.unitaryGroup) • x : hypComplement h x₀ w₀) : W)) →
-      ∀ x ∈ La, γ • x ∈ La := by
+  have key
+      : ∀ k ∈ K, ∀ γ : h.unitaryGroup,
+        γ • x₀ = x₀ → γ • w₀ = w₀
+          → (∀ x : hypComplement h x₀ w₀,
+            γ • (x : W)
+              = ((((k : latticeStab h' La') : h'.unitaryGroup) • x : hypComplement h x₀ w₀) : W))
+          → ∀ x ∈ La, γ • x ∈ La := by
     intro k hk γ h1 h2 h3 x hx
     obtain ⟨hA, hB, hC⟩ := dec x hx
     set y : hypComplement h x₀ w₀ := d • ComplementExtension.proj hp x
@@ -116,7 +134,9 @@ theorem CongruenceLift.proof [FiniteDimensional E W] (h : HermitianForm F E W) :
       rw [← hC]
       abel
     have hγ : d • (γ • x) = d • (x + (u : W)) := by
-      have hdu' : (((k : latticeStab h' La') : h'.unitaryGroup) • y : hypComplement h x₀ w₀) = (y : W) + d • (u : W) := by
+      have hdu'
+          : (((k : latticeStab h' La') : h'.unitaryGroup) • y : hypComplement h x₀ w₀)
+            = (y : W) + d • (u : W) := by
         rw [← Submodule.coe_smul_of_tower, hdu]
         simp
       rw [← smul_comm, hx', smul_add, smul_add, smul_comm γ (h.toSesq (d • w₀) x),
@@ -138,7 +158,8 @@ theorem CongruenceLift.proof [FiniteDimensional E W] (h : HermitianForm F E W) :
     · intro z hz
       refine AddSubgroup.mem_pointwise_smul_iff_inv_smul_mem.2 ?_
       refine key k⁻¹ (K.inv_mem hk) γ⁻¹ (inv_smul_eq_iff.2 h1.symm) (inv_smul_eq_iff.2 h2.symm)
-        (fun x => inv_smul_eq_iff.2 ?_) z hz
+        (fun x => inv_smul_eq_iff.2 ?_)
+        z hz
       rw [h3]
       simp
 

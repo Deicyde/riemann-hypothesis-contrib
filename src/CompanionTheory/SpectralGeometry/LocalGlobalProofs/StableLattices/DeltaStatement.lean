@@ -9,8 +9,10 @@ open CompanionTheory.Rg.FlB
 
 namespace GlobalTheory.CompanionTheory.RgFl
 
-theorem exists_isDelta (L : Type) [NontriviallyNormedField L] [IsUltrametricDist L] [ProperSpace L]
-    [CharZero L] (s : L →+* L) (hs : IsInv s) : ∃ δ, IsDelta s δ := by
+theorem exists_isDelta
+    (L : Type) [NontriviallyNormedField L] [IsUltrametricDist L] [ProperSpace L] [CharZero L]
+    (s : L →+* L) (hs : IsInv s)
+    : ∃ δ, IsDelta s δ := by
   obtain ⟨hss, hn, -⟩ := hs
   have hcont : Continuous s := (AddMonoidHomClass.isometry_of_norm s hn).continuous
   have h2 : (2 : L) ≠ 0 := two_ne_zero
@@ -25,8 +27,7 @@ theorem exists_isDelta (L : Type) [NontriviallyNormedField L] [IsUltrametricDist
   let I : Set L := {a | ∀ x : L, ‖x‖ ≤ 1 → ‖a * x + s (a * x)‖ ≤ 1}
   have h1I : (1 : L) ∈ I := fun x hx => by simpa using htr x hx
   have hclosed : IsClosed I := by
-    have : I = ⋂ (x : L) (_ : ‖x‖ ≤ 1), {a : L | ‖a * x + s (a * x)‖ ≤ 1} := by
-      ext a; simp [I]
+    have : I = ⋂ (x : L) (_ : ‖x‖ ≤ 1), {a : L | ‖a * x + s (a * x)‖ ≤ 1} := by ext a; simp [I]
     rw [this]
     refine isClosed_iInter fun x => isClosed_iInter fun _ => isClosed_le ?_ continuous_const
     have hm : Continuous fun a : L => a * x := continuous_id.mul continuous_const
@@ -79,8 +80,8 @@ theorem exists_isDelta (L : Type) [NontriviallyNormedField L] [IsUltrametricDist
   have hf : Continuous fun x : L => ‖x * δ + s (x * δ)‖ := by
     have hm : Continuous fun a : L => a * δ := continuous_id.mul continuous_const
     exact (hm.add (hcont.comp hm)).norm
-  obtain ⟨x₀, hx₀, hx₀max⟩ := (isCompact_closedBall (0 : L) 1).exists_isMaxOn
-    ⟨0, by simp⟩ hf.continuousOn
+  obtain ⟨x₀, hx₀, hx₀max⟩ :=
+    (isCompact_closedBall (0 : L) 1).exists_isMaxOn ⟨0, by simp⟩ hf.continuousOn
   have hx₀' : ‖x₀‖ ≤ 1 := by simpa using hx₀
   have hfmax : ∀ x : L, ‖x‖ ≤ 1 → ‖x * δ + s (x * δ)‖ ≤ ‖x₀ * δ + s (x₀ * δ)‖ := fun x hx =>
     hx₀max (by simpa using hx)

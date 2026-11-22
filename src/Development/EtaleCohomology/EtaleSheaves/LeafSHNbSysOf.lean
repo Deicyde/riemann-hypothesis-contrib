@@ -6,7 +6,9 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafSHNbSys
 
 noncomputable section
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
-open LateralTheory.E.E4 LateralTheory.E.LeafGhostCut LateralTheory.E.EtaleTopologySheaves LateralTheory.E.LeafDegCut LateralTheory.E.LeafInj0Pf LateralTheory.E.LeafInj0VPf LateralTheory.E.LeafSHPtPf LateralTheory.E.StrictHenselianNeighbourhood
+open LateralTheory.E.E4 LateralTheory.E.LeafGhostCut LateralTheory.E.EtaleTopologySheaves
+  LateralTheory.E.LeafDegCut LateralTheory.E.LeafInj0Pf LateralTheory.E.LeafInj0VPf
+  LateralTheory.E.LeafSHPtPf LateralTheory.E.StrictHenselianNeighbourhood
 
 namespace LateralTheory.E.EtaleNeighbourhoodSystem
 
@@ -82,7 +84,8 @@ def D : (Jc s Q)ᵒᵖ ⥤ CommRingCat.{0} := (G s Q).op ⋙ Scheme.Γ
 end
 
 section Sys
-variable {B : Scheme.{0}} {U : B.Etale} {Ω : Type} [Field Ω] [IsSepClosed Ω]
+variable
+  {B : Scheme.{0}} {U : B.Etale} {Ω : Type} [Field Ω] [IsSepClosed Ω]
   (s : Spec (CommRingCat.of Ω) ⟶ U.left) (Q : Set (Fb s).Elements) [Small.{0} Q]
 
 def pt (j : Jc s Q) : Spec (CommRingCat.of Ω) ⟶ (G s Q).obj j := (ι s Q j).2.left
@@ -99,8 +102,7 @@ def V (j : (Jc s Q)ᵒᵖ) : B.Etale :=
   MorphismProperty.Over.mk ⊤ ((ι s Q j.unop).1.hom ≫ U.hom)
     (by have := (ι s Q j.unop).1.prop; have := U.prop; exact Etale.etale_comp _ _)
 
-def a (j : (Jc s Q)ᵒᵖ) : V s Q j ⟶ U :=
-  MorphismProperty.Over.homMk (ι s Q j.unop).1.hom rfl trivial
+def a (j : (Jc s Q)ᵒᵖ) : V s Q j ⟶ U := MorphismProperty.Over.homMk (ι s Q j.unop).1.hom rfl trivial
 
 variable (haff : ∀ j ∈ Q, IsAffine j.1.left)
 include haff
@@ -195,9 +197,12 @@ theorem LeafSHNbSys_of : LeafSHNbSys := by
   intro B U x
   let Ω := SeparableClosure (U.left.residueField x)
   let s : Spec (CommRingCat.of Ω) ⟶ U.left :=
-    Spec.map (CommRingCat.ofHom (algebraMap (U.left.residueField x) Ω)) ≫ U.left.fromSpecResidueField x
+    Spec.map (CommRingCat.ofHom (algebraMap (U.left.residueField x) Ω))
+      ≫ U.left.fromSpecResidueField x
   have hx : s default = x := by
-    first | exact Scheme.fromSpecResidueField_apply x _ | (simp [s]; exact Scheme.fromSpecResidueField_apply x _)
+    first
+    | exact Scheme.fromSpecResidueField_apply x _
+    | (simp [s]; exact Scheme.fromSpecResidueField_apply x _)
   obtain ⟨Q, hQs, haff, hwi⟩ := exists_small s
   haveI := hQs
   exact ⟨Ω, inferInstance, inferInstance, s, main s Q haff x hx hwi⟩

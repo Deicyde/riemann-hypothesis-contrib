@@ -12,14 +12,16 @@ open Formalism.WeaklyAdmissibleFiltrations Module Polynomial TensorProduct
 
 section Inv
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
 theorem inv_one_mem_all (h1 : (1 : BdR) ∈ PD.Fil 1) : ∀ a : ℤ, (1 : BdR) ∈ PD.Fil a := by
   have hpos : ∀ n : ℕ, (1 : BdR) ∈ PD.Fil ((n : ℤ) + 1) := by
@@ -30,7 +32,8 @@ theorem inv_one_mem_all (h1 : (1 : BdR) ∈ PD.Fil 1) : ∀ a : ℤ, (1 : BdR) �
       have := PD.Fil_mul 1 ((n : ℤ) + 1) 1 1 h1 ih
       rw [one_mul] at this
       convert this using 2
-      push_cast; ring
+      push_cast
+      ring
   have hle : ∀ (a : ℤ) (n : ℕ), PD.Fil (a + n) ≤ PD.Fil a := by
     intro a n
     induction n with
@@ -49,9 +52,11 @@ theorem inv_one_mem_all (h1 : (1 : BdR) ∈ PD.Fil 1) : ∀ a : ℤ, (1 : BdR) �
     rw [← e] at this
     exact this h1
   · obtain ⟨n, hn⟩ : ∃ n : ℕ, a = (n : ℤ) + 1 := ⟨(a - 1).toNat, by omega⟩
-    rw [hn]; exact hpos n
+    rw [hn]
+    exact hpos n
 
-theorem field_inter_filtration_one_eq_zero (c : K) (hc : algebraMap K BdR c ∈ PD.Fil 1) : c = 0 := by
+theorem field_inter_filtration_one_eq_zero (c : K) (hc : algebraMap K BdR c ∈ PD.Fil 1)
+    : c = 0 := by
   by_contra hne
   have h1 : (1 : BdR) ∈ PD.Fil 1 := by
     have := (PD.Fil 1).smul_mem c⁻¹ hc
@@ -59,8 +64,7 @@ theorem field_inter_filtration_one_eq_zero (c : K) (hc : algebraMap K BdR c ∈ 
   have hall := inv_one_mem_all PD h1
   have h0 : (1 : BdR) = 0 := PD.Fil_sep 1 hall
   apply PD.not_mem_filtration_two
-  have : PD.ι PD.t = 0 := by
-    rw [← one_mul (PD.ι PD.t), h0, zero_mul]
+  have : PD.ι PD.t = 0 := by rw [← one_mul (PD.ι PD.t), h0, zero_mul]
   rw [this]
   exact (PD.Fil 2).zero_mem
 

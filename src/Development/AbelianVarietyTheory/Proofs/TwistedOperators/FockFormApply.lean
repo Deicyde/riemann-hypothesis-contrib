@@ -23,16 +23,20 @@ theorem blockD_apply (J : (V × V) →ₗ[ℝ] (V × V)) (q : V) : blockD J q = 
 
 def fockForm (β : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (J : (V × V) →ₗ[ℝ] (V × V)) : V →ₗ[ℝ] V →ₗ[ℝ] ℂ :=
   LinearMap.mk₂ ℝ
-    (fun x y => ((Real.pi * β x (Ring.inverse (blockB J) y) : ℝ) : ℂ) +
-      (Real.pi : ℂ) * Complex.I * ((β x (blockD J (Ring.inverse (blockB J) y)) : ℝ) : ℂ))
+    (fun x y =>
+      ((Real.pi * β x (Ring.inverse (blockB J) y) : ℝ) : ℂ)
+        + (Real.pi : ℂ) * Complex.I * ((β x (blockD J (Ring.inverse (blockB J) y)) : ℝ) : ℂ))
     (fun x x' y => by simp only [map_add (f := _), LinearMap.add_apply]; push_cast; ring)
-    (fun c x y => by simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, Complex.real_smul]; push_cast; ring)
+    (fun c x y => by
+      simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, Complex.real_smul]; push_cast; ring)
     (fun x y y' => by simp only [map_add (f := _)]; push_cast; ring)
     (fun c x y => by simp only [map_smul, smul_eq_mul, Complex.real_smul]; push_cast; ring)
 
-theorem fockForm_apply (β : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (J : (V × V) →ₗ[ℝ] (V × V)) (x y : V) :
-    fockForm β J x y = ((Real.pi * β x (Ring.inverse (blockB J) y) : ℝ) : ℂ) +
-      (Real.pi : ℂ) * Complex.I * ((β x (blockD J (Ring.inverse (blockB J) y)) : ℝ) : ℂ) := rfl
+theorem fockForm_apply (β : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (J : (V × V) →ₗ[ℝ] (V × V)) (x y : V)
+    : fockForm β J x y
+      = ((Real.pi * β x (Ring.inverse (blockB J) y) : ℝ) : ℂ)
+        + (Real.pi : ℂ) * Complex.I * ((β x (blockD J (Ring.inverse (blockB J) y)) : ℝ) : ℂ) :=
+  rfl
 
 end GlobalTheory.FockFamily
 

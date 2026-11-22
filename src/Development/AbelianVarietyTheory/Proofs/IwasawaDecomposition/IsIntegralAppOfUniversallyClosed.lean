@@ -11,23 +11,29 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R Formalism.L2.Pj
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.TorRef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R Formalism.L2.Pj
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.TorRef
 
 noncomputable section
 
 namespace GlobalTheory.GenPush
 
-theorem isIntegral_of_isIso_comp {A B C D : CommRingCat.{0}} (k : A ⟶ B) (f : B ⟶ C) (m : C ⟶ D) [IsIso k]
-    [IsIso m] (h : (k ≫ f ≫ m).hom.IsIntegral) : f.hom.IsIntegral := by
+theorem isIntegral_of_isIso_comp
+    {A B C D : CommRingCat.{0}} (k : A ⟶ B) (f : B ⟶ C) (m : C ⟶ D) [IsIso k] [IsIso m]
+    (h : (k ≫ f ≫ m).hom.IsIntegral)
+    : f.hom.IsIntegral := by
   have e : f = inv k ≫ (k ≫ f ≫ m) ≫ inv m := by simp
   rw [e, CommRingCat.hom_comp, CommRingCat.hom_comp]
   refine RingHom.IsIntegral.trans _ _ ?_ (RingHom.IsIntegral.trans _ _ h ?_)
   · exact RingHom.isIntegral_of_surjective _ (ConcreteCategory.bijective_of_isIso (inv k)).2
   · exact RingHom.isIntegral_of_surjective _ (ConcreteCategory.bijective_of_isIso (inv m)).2
 
-theorem isIntegral_app_of_universallyClosed {Z₁ Z₂ : Scheme.{0}} (ρ : Z₁ ⟶ Z₂) [UniversallyClosed ρ]
-    (U : Z₂.Opens) (hU : IsAffineOpen U) : (ρ.app U).hom.IsIntegral := by
+theorem isIntegral_app_of_universallyClosed
+    {Z₁ Z₂ : Scheme.{0}} (ρ : Z₁ ⟶ Z₂) [UniversallyClosed ρ] (U : Z₂.Opens) (hU : IsAffineOpen U)
+    : (ρ.app U).hom.IsIntegral := by
   have : IsAffine U.toScheme := hU
   have h := isIntegral_appTop_of_universallyClosed (ρ ∣_ U)
   rw [morphismRestrict_appTop] at h
@@ -40,15 +46,20 @@ theorem isIntegral_app_of_universallyClosed {Z₁ Z₂ : Scheme.{0}} (ρ : Z₁ 
   · exact hi _
   · exact hi _
 
-theorem exists_app_eq_of_isIntegralElem {T Z : Scheme.{0}} [GlobalTheory.IsNormalScheme Z] [IsLocallyNoetherian Z]
-    (j : T ⟶ Z) [IsOpenImmersion j] (hj : Dense (Set.range j)) (U : Z.Opens)
-    (s : Γ(T, j ⁻¹ᵁ U)) (hs : (j.app U).hom.IsIntegralElem s) : ∃ h : Γ(Z, U), j.app U h = s :=
-  GlobalTheory.T.exists_section_extending_of_dense_openImmersion j hj U s fun u hu => GlobalTheory.T.exists_local_section_of_isIntegralElem_normal_scheme j hj U s hs u hu
+theorem exists_app_eq_of_isIntegralElem
+    {T Z : Scheme.{0}} [GlobalTheory.IsNormalScheme Z] [IsLocallyNoetherian Z]
+    (j : T ⟶ Z) [IsOpenImmersion j]
+    (hj : Dense (Set.range j))
+    (U : Z.Opens) (s : Γ(T, j ⁻¹ᵁ U)) (hs : (j.app U).hom.IsIntegralElem s)
+    : ∃ h : Γ(Z, U), j.app U h = s :=
+  GlobalTheory.T.exists_section_extending_of_dense_openImmersion j hj U s fun u hu =>
+    GlobalTheory.T.exists_local_section_of_isIntegralElem_normal_scheme j hj U s hs u hu
 
 section Models
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l}
 
 end Models
 

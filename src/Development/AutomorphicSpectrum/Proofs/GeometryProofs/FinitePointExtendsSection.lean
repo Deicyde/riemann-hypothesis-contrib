@@ -7,21 +7,23 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.Dua
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 namespace GlobalTheory.CompanionTheory.Ar.BT
 
-theorem spec_gamma_isoSpec_inv (S : CommRingCat.{0}) :
-    Spec.map (Scheme.ΓSpecIso S).hom ≫ (Spec S).isoSpec.inv = 𝟙 _ := by
+theorem spec_gamma_isoSpec_inv (S : CommRingCat.{0})
+    : Spec.map (Scheme.ΓSpecIso S).hom ≫ (Spec S).isoSpec.inv = 𝟙 _ := by
   simp [Scheme.isoSpec_Spec_inv, ← Spec.map_comp]
 
-theorem exists_section_of_isFinite (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
+theorem exists_section_of_isFinite
+    (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
     {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of R)) [IsFinite f]
     (p : Spec (CommRingCat.of (FractionRing R)) ⟶ X)
-    (hp : p ≫ f = Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R)))) :
-    ∃ s : Spec (CommRingCat.of R) ⟶ X, s ≫ f = 𝟙 _ ∧
-      Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R))) ≫ s = p := by
+    (hp : p ≫ f = Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R))))
+    : ∃ s : Spec (CommRingCat.of R) ⟶ X,
+      s ≫ f = 𝟙 _ ∧ Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R))) ≫ s = p := by
   haveI : IsAffine X := isAffine_of_isAffineHom f
   let ψ : CommRingCat.of R ⟶ Γ(X, ⊤) := (Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appTop
   let φ : Γ(X, ⊤) ⟶ CommRingCat.of (FractionRing R) :=
@@ -53,15 +55,17 @@ theorem exists_section_of_isFinite (R : Type) [CommRing R] [IsDomain R] [IsInteg
     RingEquiv.ofBijective (algebraMap R (FractionRing R)).rangeRestrict
       ⟨fun x y h => hinj (congrArg Subtype.val h), RingHom.rangeRestrict_surjective _⟩
   let θ₀ : Γ(X, ⊤) →+* R :=
-    e.symm.toRingHom.comp (φ.hom.codRestrict (algebraMap R (FractionRing R)).range (fun a => hint a))
+    e.symm.toRingHom.comp (φ.hom.codRestrict (algebraMap R (FractionRing R)).range
+      (fun a => hint a))
   have hθ₀ : ∀ a, algebraMap R (FractionRing R) (θ₀ a) = φ.hom a := by
     intro a
-    have h5 : e (θ₀ a) = φ.hom.codRestrict (algebraMap R (FractionRing R)).range (fun a => hint a) a := by
+    have h5
+        : e (θ₀ a)
+          = φ.hom.codRestrict (algebraMap R (FractionRing R)).range (fun a => hint a) a := by
       simp [θ₀]
     exact congrArg Subtype.val h5
   let θ : Γ(X, ⊤) ⟶ CommRingCat.of R := CommRingCat.ofHom θ₀
-  have hθφ : θ ≫ CommRingCat.ofHom (algebraMap R (FractionRing R)) = φ := by
-    ext a; exact hθ₀ a
+  have hθφ : θ ≫ CommRingCat.ofHom (algebraMap R (FractionRing R)) = φ := by ext a; exact hθ₀ a
   have hψθ : ψ ≫ θ = 𝟙 _ := by
     ext r
     apply hinj
@@ -78,11 +82,13 @@ theorem exists_section_of_isFinite (R : Type) [CommRing R] [IsDomain R] [IsInteg
     simp only [φ, Spec.map_comp, Category.assoc]
     rw [Scheme.isoSpec_inv_naturality, reassoc_of% spec_gamma_isoSpec_inv]
 
-theorem exists_section_of_generic_point (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
-    (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens)
-    (hU : IsFinite (U.ι ≫ Γ.G.hom)) (t : T) (ht : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U) :
-    ∃ σ : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ Γ.G, (∀ z, σ.left z ∈ U) ∧
-      toUnit (genPt R) ≫ σ = Γ.pt t := by
+theorem exists_section_of_generic_point
+    (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
+    (T : Type) [CommGroup T] [Finite T]
+    (Γ : QFGroup R T) (U : Γ.G.left.Opens) (hU : IsFinite (U.ι ≫ Γ.G.hom))
+    (t : T) (ht : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U)
+    : ∃ σ : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ Γ.G,
+      (∀ z, σ.left z ∈ U) ∧ toUnit (genPt R) ≫ σ = Γ.pt t := by
   have hr : Set.range (Γ.pt t).left ⊆ Set.range U.ι := by
     rintro _ ⟨x, rfl⟩
     rw [Scheme.Opens.range_ι]

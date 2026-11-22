@@ -14,11 +14,13 @@ open GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential IsLocalRing TensorP
 
 namespace GlobalTheory
 
-theorem span_D_uniformizer_transcendenceBasis : ∀ (k R : Type) [Field k] [CharZero k] [CommRing R]
-    [IsDomain R] [IsDiscreteValuationRing R] [Algebra k R] [Algebra.EssFiniteType k R] (s : R),
-    Irreducible s → ∀ (m : ℕ) (y : Fin m → R),
-    IsTranscendenceBasis k (fun j => IsLocalRing.residue R (y j)) →
-    Submodule.span R (insert (D k R s) (Set.range fun j => D k R (y j))) = ⊤ := by
+theorem span_D_uniformizer_transcendenceBasis
+    : ∀ (k R : Type) [Field k] [CharZero k] [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [Algebra k R] [Algebra.EssFiniteType k R] (s : R),
+      Irreducible s
+        → ∀ (m : ℕ) (y : Fin m → R),
+          IsTranscendenceBasis k (fun j => IsLocalRing.residue R (y j))
+            → Submodule.span R (insert (D k R s) (Set.range fun j => D k R (y j))) = ⊤ := by
   intro k R _ _ _ _ _ _ _ s hs m y hy
   have hsurj : Function.Surjective (algebraMap R (ResidueField R)) := residue_surjective
   haveI := hy.isAlgebraic_field
@@ -32,16 +34,22 @@ theorem span_D_uniformizer_transcendenceBasis : ∀ (k R : Type) [Field k] [Char
     rw [← RingHom.mem_ker, hker, hmax]; exact Ideal.mem_span_singleton_self s
   haveI : Module.Finite R Ω[R⁄k] := inferInstance
   set N := Submodule.span R (insert (D k R s) (Set.range fun j => D k R (y j))) with hN
-  have hmb : ∀ x : R, mapBaseChange k R (ResidueField R) ((1 : ResidueField R) ⊗ₜ[R] D k R x) =
-      D k (ResidueField R) (algebraMap R (ResidueField R) x) :=
-    fun x => by rw [mapBaseChange_tmul, one_smul, map_D]
-  have key : ∀ ω : Ω[R⁄k], ∃ n ∈ N, (1 : ResidueField R) ⊗ₜ[R] ω = (1 : ResidueField R) ⊗ₜ[R] n := by
+  have hmb
+      : ∀ x : R,
+        mapBaseChange k R (ResidueField R) ((1 : ResidueField R) ⊗ₜ[R] D k R x)
+          = D k (ResidueField R) (algebraMap R (ResidueField R) x) := fun x => by
+    rw [mapBaseChange_tmul, one_smul, map_D]
+  have key
+      : ∀ ω : Ω[R⁄k], ∃ n ∈ N, (1 : ResidueField R) ⊗ₜ[R] ω = (1 : ResidueField R) ⊗ₜ[R] n := by
     intro ω
     let c := b.repr (mapBaseChange k R (ResidueField R) ((1 : ResidueField R) ⊗ₜ[R] ω))
     let c' : Fin m → R := fun i => Function.surjInv hsurj (c i)
-    have hc' : ∀ i, algebraMap R (ResidueField R) (c' i) = c i := fun i => Function.surjInv_eq hsurj _
-    have h0 : mapBaseChange k R (ResidueField R)
-        ((1 : ResidueField R) ⊗ₜ[R] (ω - ∑ i, c' i • D k R (y i))) = 0 := by
+    have hc' : ∀ i, algebraMap R (ResidueField R) (c' i) = c i := fun i =>
+      Function.surjInv_eq hsurj _
+    have h0
+        : mapBaseChange k R (ResidueField R)
+            ((1 : ResidueField R) ⊗ₜ[R] (ω - ∑ i, c' i • D k R (y i)))
+          = 0 := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [tmul_sub, map_sub, tmul_sum, map_sum, sub_eq_zero]
       conv_lhs => rw [← b.sum_repr (mapBaseChange k R (ResidueField R) ((1 : ResidueField R) ⊗ₜ[R] ω))]
@@ -54,16 +62,19 @@ theorem span_D_uniformizer_transcendenceBasis : ∀ (k R : Type) [Field k] [Char
     rw [hker, hmax, Ideal.mem_span_singleton'] at ha'
     obtain ⟨r, rfl⟩ := ha'
     rw [kerCotangentToTensor_toCotangent] at ht
-    have e1 : (1 : ResidueField R) ⊗ₜ[R] D k R (r * s) = (1 : ResidueField R) ⊗ₜ[R] (r • D k R s) := by
+    have e1
+        : (1 : ResidueField R) ⊗ₜ[R] D k R (r * s) = (1 : ResidueField R) ⊗ₜ[R] (r • D k R s) := by
       rw [Derivation.leibniz, tmul_add, add_eq_left]
-      have : (1 : ResidueField R) ⊗ₜ[R] (s • D k R r) = (algebraMap R (ResidueField R) s) • ((1 : ResidueField R) ⊗ₜ[R] D k R r) := by
+      have : (1 : ResidueField R) ⊗ₜ[R] (s • D k R r)
+          = (algebraMap R (ResidueField R) s) • ((1 : ResidueField R) ⊗ₜ[R] D k R r) := by
         rw [algebraMap_smul, tmul_smul]
       rw [this, hs0, zero_smul]
     refine ⟨r • D k R s + ∑ i, c' i • D k R (y i), ?_, ?_⟩
     · exact add_mem (Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_insert _ _)))
         (Submodule.sum_mem _ fun i _ =>
           Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_insert_of_mem _ ⟨i, rfl⟩)))
-    · have e2 : ω = (ω - ∑ i, c' i • D k R (y i)) + ∑ i, c' i • D k R (y i) := (sub_add_cancel _ _).symm
+    · have e2 : ω = (ω - ∑ i, c' i • D k R (y i)) + ∑ i, c' i • D k R (y i) :=
+        (sub_add_cancel _ _).symm
       rw [e2, tmul_add, ← ht, e1, ← tmul_add]
   rw [← IsLocalRing.map_tensorProduct_mk_eq_top, eq_top_iff]
   intro z _

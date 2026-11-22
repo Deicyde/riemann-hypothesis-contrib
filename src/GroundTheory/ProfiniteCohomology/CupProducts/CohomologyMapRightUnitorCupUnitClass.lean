@@ -26,34 +26,33 @@ end Associativity
 
 section Unit
 
-
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
-theorem d_oneCochain :
-    (inhomogeneousCochains.d (𝟙_ (Rep.{u} k G)) 0).hom (oneCochain (k := k) (G := G)) = 0 := by
+theorem d_oneCochain
+    : (inhomogeneousCochains.d (𝟙_ (Rep.{u} k G)) 0).hom (oneCochain (k := k) (G := G)) = 0 := by
   funext g
   simp [inhomogeneousCochains.d_hom_apply, oneCochain]
   rfl
 
 def unitCocycle : cocycles (𝟙_ (Rep.{u} k G)) 0 :=
   (cochainsComplex (𝟙_ (Rep.{u} k G))).cyclesMk
-    (mkCochain (A := 𝟙_ (Rep.{u} k G)) oneCochain (IsLocallyConstant.const _)) 1 (by simp) (by
+    (mkCochain (A := 𝟙_ (Rep.{u} k G)) oneCochain (IsLocallyConstant.const _)) 1 (by simp)
+    (by
       apply cochainOf_injective (A := 𝟙_ (Rep.{u} k G))
       exact (cochainOf_d (A := 𝟙_ (Rep.{u} k G)) _).trans d_oneCochain)
 
 @[simp]
-theorem cochainOf_cocycleι_unitCocycle :
-    cochainOf (A := 𝟙_ (Rep.{u} k G))
-      (cocycleι (A := 𝟙_ (Rep.{u} k G)) (p := 0) unitCocycle) = oneCochain :=
+theorem cochainOf_cocycleι_unitCocycle
+    : cochainOf (A := 𝟙_ (Rep.{u} k G)) (cocycleι (A := 𝟙_ (Rep.{u} k G)) (p := 0) unitCocycle)
+      = oneCochain :=
   congrArg (cochainOf (A := 𝟙_ (Rep.{u} k G)))
     ((cochainsComplex (𝟙_ (Rep.{u} k G))).i_cyclesMk _ _ _ _)
 
-def unitClass : cohomology (𝟙_ (Rep.{u} k G)) 0 :=
-  cohomologyπ _ 0 unitCocycle
+def unitClass : cohomology (𝟙_ (Rep.{u} k G)) 0 := cohomologyπ _ 0 unitCocycle
 
 variable {A : Rep.{u} k G} [IsDiscreteRep A]
 
-theorem cohomologyMap_leftUnitor_unitClass_cup {q : ℕ} (x : cohomology A q) :
-    cohomologyMap (λ_ A).hom q (cup (zero_add q) unitClass x) = x := by
+theorem cohomologyMap_leftUnitor_unitClass_cup {q : ℕ} (x : cohomology A q)
+    : cohomologyMap (λ_ A).hom q (cup (zero_add q) unitClass x) = x := by
   refine cohomology_induction_on x fun x => ?_
   rw [unitClass, cup_cohomologyπ, cohomologyMap_cohomologyπ]
   congr 1
@@ -63,8 +62,8 @@ theorem cohomologyMap_leftUnitor_unitClass_cup {q : ℕ} (x : cohomology A q) :
   funext g
   exact leftUnitor_oneCochain_cupCochain _ g
 
-theorem cohomologyMap_rightUnitor_cup_unitClass {p : ℕ} (x : cohomology A p) :
-    cohomologyMap (ρ_ A).hom p (cup (add_zero p) x unitClass) = x := by
+theorem cohomologyMap_rightUnitor_cup_unitClass {p : ℕ} (x : cohomology A p)
+    : cohomologyMap (ρ_ A).hom p (cup (add_zero p) x unitClass) = x := by
   refine cohomology_induction_on x fun x => ?_
   rw [unitClass, cup_cohomologyπ, cohomologyMap_cohomologyπ]
   congr 1

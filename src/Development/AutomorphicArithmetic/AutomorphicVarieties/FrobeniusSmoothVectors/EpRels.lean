@@ -9,8 +9,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.ep_rels :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O], IsUnit (2 : O) → ∀ (ι : Type) [Finite ι] (wt : ι → ZMod 2) (J : Ideal (MvPowerSeries ι O)), IsHomog O wt J → ∃ (κ : Type) (_ : Fintype κ) (f : κ → MvPowerSeries ι O) (wf : κ → ZMod 2), (∀ u, f u ∈ wtPart O wt (wf u)) ∧ J = Ideal.span (Set.range f) ∧ ∀ c : κ → O, ∑ u, c u • f u ∈ maximalIdeal (MvPowerSeries ι O) * J → ∀ u, c u ∈ maximalIdeal O := by
+theorem UpperTheory.V.Fr.ep_rels
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O],
+      IsUnit (2 : O)
+        → ∀ (ι : Type) [Finite ι] (wt : ι → ZMod 2) (J : Ideal (MvPowerSeries ι O)),
+          IsHomog O wt J
+            → ∃ (κ : Type) (_ : Fintype κ) (f : κ → MvPowerSeries ι O) (wf : κ → ZMod 2),
+              (∀ u, f u ∈ wtPart O wt (wf u)) ∧ J = Ideal.span (Set.range f)
+                ∧ ∀ c : κ → O,
+                  ∑ u, c u • f u ∈ maximalIdeal (MvPowerSeries ι O) * J
+                    → ∀ u, c u ∈ maximalIdeal O := by
   intro O _ _ _ _ h2 ι _ wt J hJ
   haveI : IsCO O (MvPowerSeries ι O) := co_mvps O O ι
   obtain ⟨τ, hττ, hev, hw⟩ := ep_ps O h2 ι wt
@@ -31,8 +40,8 @@ theorem UpperTheory.V.Fr.ep_rels :
     apply hy
     rw [← hττ y]
     exact hu.map τ
-  have hτN : ∀ y ∈ maximalIdeal (MvPowerSeries ι O) * J,
-      τ y ∈ maximalIdeal (MvPowerSeries ι O) * J := by
+  have hτN
+      : ∀ y ∈ maximalIdeal (MvPowerSeries ι O) * J, τ y ∈ maximalIdeal (MvPowerSeries ι O) * J := by
     intro y hy
     refine Submodule.mul_induction_on hy ?_ ?_
     · intro m hm j hj

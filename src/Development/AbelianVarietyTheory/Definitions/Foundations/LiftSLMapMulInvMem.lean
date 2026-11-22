@@ -18,13 +18,15 @@ open GlobalTheory.KZ
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-theorem eval_liftK (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ)
-    (a : X.Kl l ⧸ ((idl l) ^ n • (⊤ : Submodule ℤ_[l] (X.Kl l)))) :
-    AdicCompletion.eval (idl l) (X.Kl l) n (liftK X l n a) = a :=
+theorem eval_liftK
+    (X : Tower Ω ε)
+    (l : ℕ) [Fact l.Prime]
+    (n : ℕ) (a : X.Kl l ⧸ ((idl l) ^ n • (⊤ : Submodule ℤ_[l] (X.Kl l))))
+    : AdicCompletion.eval (idl l) (X.Kl l) n (liftK X l n a) = a :=
   Classical.epsilon_spec (AdicCompletion.eval_surjective (idl l) (X.Kl l) n a)
 
-theorem eval_clsK (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) {w : X.K} (h : w ≠ 0) :
-    AdicCompletion.eval (idl l) (X.Kl l) n (clsK X l n w) = X.cls l n (Units.mk0 w h) := by
+theorem eval_clsK (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) {w : X.K} (h : w ≠ 0)
+    : AdicCompletion.eval (idl l) (X.Kl l) n (clsK X l n w) = X.cls l n (Units.mk0 w h) := by
   unfold clsK
   rw [dite_eq_left h]
   exact eval_liftK X l n _
@@ -33,22 +35,22 @@ theorem clsK_zero (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) : clsK X 
   unfold clsK
   exact dif_neg fun h => h rfl
 
-theorem cls_mul (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) (f g : X.Kˣ) :
-    X.cls l n (f * g) = X.cls l n f + X.cls l n g := by
+theorem cls_mul (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) (f g : X.Kˣ)
+    : X.cls l n (f * g) = X.cls l n f + X.cls l n g := by
   unfold Tower.cls
   rw [ofMul_mul, TensorProduct.tmul_add, Submodule.Quotient.mk_add]
 
-theorem map_liftSL (M : ℕ) (g : SL(2, ZMod M)) :
-    Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M g) = g :=
+theorem map_liftSL (M : ℕ) (g : SL(2, ZMod M))
+    : Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M g) = g :=
   Classical.epsilon_spec (GlobalTheory.specialLinearGroup_map_intCast_zmod_surjective M g)
 
-theorem liftSL_map_mul_inv_mem (M : ℕ) (γ : SL(2, ℤ)) :
-    liftSL M (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ) * γ⁻¹ ∈ CongruenceSubgroup.Gamma M := by
+theorem liftSL_map_mul_inv_mem (M : ℕ) (γ : SL(2, ℤ))
+    : liftSL M (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ) * γ⁻¹
+      ∈ CongruenceSubgroup.Gamma M := by
   rw [CongruenceSubgroup.Gamma_mem', map_mul, map_inv, map_liftSL, mul_inv_cancel]
 
-theorem exists_place_over (Ω : Type) [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fact l.Prime] :
-    ∃ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 := by
-
+theorem exists_place_over (Ω : Type) [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fact l.Prime]
+    : ∃ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 := by
   let R : Subring Ω := (Int.castRingHom Ω).range
   let x : R := ⟨(l : Ω), RingHom.mem_range.2 ⟨(l : ℤ), by simp⟩⟩
   have hI : Ideal.span {x} ≠ ⊤ := by
@@ -72,19 +74,21 @@ theorem exists_place_over (Ω : Type) [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fac
   obtain ⟨B, -, hB⟩ := Ideal.image_subset_nonunits_valuationSubring (Ideal.span {x}) hI
   exact ⟨B, (ValuationSubring.mem_nonunits_iff B).1 (hB ⟨x, Ideal.subset_span rfl, rfl⟩)⟩
 
-theorem cycMod_surjective (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (r : ℕ) :
-    Function.Surjective (cycMod ℚ Ω l r) := by
+theorem cycMod_surjective
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (r : ℕ)
+    : Function.Surjective (cycMod ℚ Ω l r) := by
   intro x
   obtain ⟨A, hA⟩ := exists_place_over Ω l
   obtain ⟨s, hs⟩ := GlobalTheory.InertiaPowers.cycMod_Ine_surjective l Ω A hA r x
   exact ⟨_, hs⟩
 
-theorem cycMod_repC [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (r : ℕ) (x : (ZMod (l ^ r))ˣ) :
-    cycMod ℚ Ω l r (repC (Ω := Ω) l r x) = x :=
+theorem cycMod_repC [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (r : ℕ) (x : (ZMod (l ^ r))ˣ)
+    : cycMod ℚ Ω l r (repC (Ω := Ω) l r x) = x :=
   Classical.epsilon_spec (cycMod_surjective Ω l r x)
 
-theorem galB_section_zero (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (s : Ω ≃ₐ[ℚ] Ω) (w : ℕ) (a : X.Khat l) :
-    X.galB l s (fun u => (u 0) ^ w • a) = fun u => (u 0) ^ w • X.kmap l (X.gal s) a := by
+theorem galB_section_zero
+    (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (s : Ω ≃ₐ[ℚ] Ω) (w : ℕ) (a : X.Khat l)
+    : X.galB l s (fun u => (u 0) ^ w • a) = fun u => (u 0) ^ w • X.kmap l (X.gal s) a := by
   funext u
   show X.kmap l (X.gal s)
       (((![u 0, (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) * u 1] : Fin 2 → ℤ_[l]) 0) ^ w • a) = _

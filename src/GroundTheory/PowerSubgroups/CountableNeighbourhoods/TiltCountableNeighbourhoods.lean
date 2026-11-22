@@ -36,7 +36,9 @@ private lemma norm_le_of_mem_span {x : (normInteger K)} {p : ℕ}
   simp only [Subring.coe_mul, Subring.coe_natCast, norm_mul]
   exact mul_le_of_le_one_left (norm_nonneg _) hc
 
-variable {p : ℕ} [Fact (Nat.Prime p)] [Fact ¬IsUnit (p : (normInteger K))] [IsAdicComplete (Ideal.span {(p : (normInteger K))}) (normInteger K)]
+variable
+  {p : ℕ} [Fact (Nat.Prime p)] [Fact ¬ IsUnit (p : (normInteger K))]
+  [IsAdicComplete (Ideal.span {(p : (normInteger K))}) (normInteger K)]
 
 private lemma exists_untilt_norm_of_lt
     (hsurj : Function.Surjective fun x : ModP (normInteger K) p => x ^ p)
@@ -82,12 +84,13 @@ private lemma exists_untilt_norm
 
 end
 
-theorem exists_norm_untilt_eq_norm_of_norm_le_one {K : Type*} [NontriviallyNormedField K]
-    [IsUltrametricDist K] {p : ℕ} [Fact (Nat.Prime p)] [IsPerfectoidField K p] {y : K}
-    (hy : y ≠ 0) (hy1 : ‖y‖ ≤ 1) :
-    ∃ a : PreTilt (normInteger K) p, ‖((PreTilt.untilt a : normInteger K) : K)‖ = ‖y‖ := by
-  obtain ⟨t, hpt, ht1⟩ := IsPerfectoidField.exists_norm_mem_Ioo (K := K) p ‖(p : K)‖
-    IsPerfectoidField.norm_natCast_lt_one
+theorem exists_norm_untilt_eq_norm_of_norm_le_one
+    {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K]
+    {p : ℕ} [Fact (Nat.Prime p)] [IsPerfectoidField K p]
+    {y : K} (hy : y ≠ 0) (hy1 : ‖y‖ ≤ 1)
+    : ∃ a : PreTilt (normInteger K) p, ‖((PreTilt.untilt a : normInteger K) : K)‖ = ‖y‖ := by
+  obtain ⟨t, hpt, ht1⟩ :=
+    IsPerfectoidField.exists_norm_mem_Ioo (K := K) p ‖(p : K)‖ IsPerfectoidField.norm_natCast_lt_one
   exact exists_untilt_norm IsPerfectoidField.surjective_pow hpt ht1 hy hy1
 
 end GroundTheory.Variant₂.N1

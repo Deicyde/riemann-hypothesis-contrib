@@ -7,14 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA
 
-private theorem nilLen_range_succ {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (f : Module.End A M) (k : ℕ) :
-    LinearMap.range (f ^ (k + 1)) = (LinearMap.range (f ^ k)).map f := by
+private theorem nilLen_range_succ
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (f : Module.End A M) (k : ℕ)
+    : LinearMap.range (f ^ (k + 1)) = (LinearMap.range (f ^ k)).map f := by
   rw [pow_succ', Module.End.mul_eq_comp, LinearMap.range_comp]
 
-private theorem nilLen_lt {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (f : Module.End A M) (hf : IsNilpotent f) (k : ℕ) (hk : f ^ k ≠ 0) :
-    LinearMap.range (f ^ (k + 1)) < LinearMap.range (f ^ k) := by
+private theorem nilLen_lt
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (f : Module.End A M) (hf : IsNilpotent f)
+    (k : ℕ) (hk : f ^ k ≠ 0)
+    : LinearMap.range (f ^ (k + 1)) < LinearMap.range (f ^ k) := by
   refine lt_of_le_of_ne ?_ ?_
   · rw [pow_succ, Module.End.mul_eq_comp]
     exact LinearMap.range_comp_le_range _ _
@@ -30,9 +32,9 @@ private theorem nilLen_lt {A M : Type} [CommRing A] [AddCommGroup M] [Module A M
     rw [pow_add, hn, mul_zero, LinearMap.range_zero] at hkn
     exact LinearMap.range_eq_bot.mp hkn.symm
 
-theorem UpperTheory.V.PropA.nilLen :
-    ∀ (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (f : Module.End A M) (n : ℕ), IsNilpotent f →
-      Module.length A M ≤ n → f ^ n = 0 := by
+theorem UpperTheory.V.PropA.nilLen
+    : ∀ (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (f : Module.End A M) (n : ℕ),
+      IsNilpotent f → Module.length A M ≤ n → f ^ n = 0 := by
   intro A M _ _ _ f n hf hlen
   by_contra hne
   have hm : ∀ m, m ≤ n → f ^ m ≠ 0 := fun m hm h0 => hne (pow_eq_zero_of_le hm h0)
@@ -51,7 +53,9 @@ theorem UpperTheory.V.PropA.nilLen :
       intro m hmj
       have h1 := ih (m + 1) (by omega)
       have h2 := Order.height_add_one_le (nilLen_lt f hf m (hm m (by omega)))
-      calc ((j + 1 : ℕ) : ℕ∞) + 1 = ((j : ℕ∞) + 1) + 1 := by push_cast; rfl
+      calc
+        ((j + 1 : ℕ) : ℕ∞) + 1
+          = ((j : ℕ∞) + 1) + 1 := by push_cast; rfl
         _ ≤ Order.height (LinearMap.range (f ^ (m + 1))) + 1 := by gcongr
         _ ≤ _ := h2
   have h3 := key n 0 (by omega)

@@ -5,42 +5,54 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory
 
-theorem det_of_blockTriangular_injective {m α R : Type} [Fintype m] [DecidableEq m]
-    [LinearOrder α] [CommRing R] (M : Matrix m m R) (f : m → α) (hf : Function.Injective f)
-    (h : M.BlockTriangular f) : M.det = ∏ i, M i i := by
+theorem det_of_blockTriangular_injective
+    {m α R : Type} [Fintype m] [DecidableEq m] [LinearOrder α] [CommRing R]
+    (M : Matrix m m R) (f : m → α) (hf : Function.Injective f) (h : M.BlockTriangular f)
+    : M.det = ∏ i, M i i := by
   letI : LinearOrder m := LinearOrder.lift' f hf
   exact Matrix.det_of_upperTriangular (M := M) (fun i j hij => h hij)
 
-theorem prod_lowerPairs_fst {r : ℕ} (d : Fin r → ℂ) :
-    ∏ p : {p : Fin r × Fin r // p.2 < p.1}, d p.1.1 = ∏ a, d a ^ (a : ℕ) := by
-  rw [← Finset.prod_subtype (Finset.univ.filter fun p : Fin r × Fin r => p.2 < p.1)
-    (by simp) (fun p => d p.1), Finset.prod_filter, Fintype.prod_prod_type]
+theorem prod_lowerPairs_fst {r : ℕ} (d : Fin r → ℂ)
+    : ∏ p : {p : Fin r × Fin r // p.2 < p.1}, d p.1.1 = ∏ a, d a ^ (a : ℕ) := by
+  rw [← Finset.prod_subtype (Finset.univ.filter fun p : Fin r × Fin r => p.2 < p.1) (by simp)
+      (fun p => d p.1),
+    Finset.prod_filter, Fintype.prod_prod_type]
   refine Finset.prod_congr rfl fun a _ => ?_
   rw [← Finset.prod_filter]
   simp only [Finset.prod_const]
   congr 1
   rw [← Fin.card_Iio a]
   congr 1
-  ext c; simp
+  ext c
+  simp
 
-theorem prod_lowerPairs_snd {r : ℕ} (d : Fin r → ℂ) :
-    ∏ p : {p : Fin r × Fin r // p.2 < p.1}, d p.1.2 = ∏ a, d a ^ (r - 1 - (a : ℕ)) := by
-  rw [← Finset.prod_subtype (Finset.univ.filter fun p : Fin r × Fin r => p.2 < p.1)
-    (by simp) (fun p => d p.2), Finset.prod_filter, Fintype.prod_prod_type_right]
+theorem prod_lowerPairs_snd {r : ℕ} (d : Fin r → ℂ)
+    : ∏ p : {p : Fin r × Fin r // p.2 < p.1}, d p.1.2 = ∏ a, d a ^ (r - 1 - (a : ℕ)) := by
+  rw [← Finset.prod_subtype (Finset.univ.filter fun p : Fin r × Fin r => p.2 < p.1) (by simp)
+      (fun p => d p.2),
+    Finset.prod_filter, Fintype.prod_prod_type_right]
   refine Finset.prod_congr rfl fun a _ => ?_
   rw [← Finset.prod_filter]
   simp only [Finset.prod_const]
   congr 1
   rw [← Fin.card_Ioi a]
   congr 1
-  ext c; simp
+  ext c
+  simp
 
-theorem det_conj_strictLower : (∀ (r : ℕ) (B : Matrix (Fin r) (Fin r) ℂ), B.det ≠ 0 → (∀ a c : Fin r, c < a → B a c = 0) → (Matrix.of fun p q : {p : Fin r × Fin r // p.2 < p.1} => B p.1.1 q.1.1 * B⁻¹ q.1.2 p.1.2).det = ∏ a : Fin r, B a a ^ (2 * (a : ℤ) - ((r : ℤ) - 1))) := by
+theorem det_conj_strictLower
+    : (∀ (r : ℕ) (B : Matrix (Fin r) (Fin r) ℂ),
+      B.det ≠ 0 → (∀ a c : Fin r, c < a → B a c = 0)
+        → (Matrix.of fun p q : {p : Fin r × Fin r // p.2 < p.1} =>
+            B p.1.1 q.1.1 * B⁻¹ q.1.2 p.1.2).det
+          = ∏ a : Fin r, B a a ^ (2 * (a : ℤ) - ((r : ℤ) - 1))) := by
   intro r B hdet htri
   have hu : IsUnit B.det := isUnit_iff_ne_zero.mpr hdet
   letI : Invertible B := Matrix.invertibleOfIsUnitDet B hu

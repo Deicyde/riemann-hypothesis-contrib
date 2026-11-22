@@ -17,23 +17,33 @@ namespace GlobalTheory.BetaSum
 open Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.JCx2 MeasureTheory Filter
 open scoped ComplexConjugate
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 variable [FiniteDimensional ℂ Wp]
 
-
 open Finset MeasureTheory Filter in
 open scoped ComplexConjugate in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] in
 variable [FiniteDimensional ℂ Wp] in
-theorem _root_.GlobalTheory.BetaSum.beta_sesq (hXi : _root_.Formalism.FourierDecayAlt.B.XiExists) (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) {A : ℝ}
-    (hA : _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A)
-    {F F' G : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)} (hF : _root_.Formalism.FourierDecayAlt.B.InCC A 5 F) (hF' : _root_.Formalism.FourierDecayAlt.B.InCC A 5 F')
-    (hG : _root_.Formalism.FourierDecayAlt.B.InCC A 5 G) (c : ℂ) :
-    _root_.Formalism.FourierDecayAlt.B.beta D (F + c • F') G = _root_.Formalism.FourierDecayAlt.B.beta D F G + c * _root_.Formalism.FourierDecayAlt.B.beta D F' G ∧
-      _root_.Formalism.FourierDecayAlt.B.beta D G (F + c • F') = _root_.Formalism.FourierDecayAlt.B.beta D G F + conj c * _root_.Formalism.FourierDecayAlt.B.beta D G F' :=
+theorem _root_.GlobalTheory.BetaSum.beta_sesq
+    (hXi : _root_.Formalism.FourierDecayAlt.B.XiExists)
+    (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq)
+    {A : ℝ} (hA : _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A)
+    {F F' G : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)}
+    (hF : _root_.Formalism.FourierDecayAlt.B.InCC A 5 F)
+    (hF' : _root_.Formalism.FourierDecayAlt.B.InCC A 5 F')
+    (hG : _root_.Formalism.FourierDecayAlt.B.InCC A 5 G)
+    (c : ℂ)
+    : _root_.Formalism.FourierDecayAlt.B.beta D (F + c • F') G
+        = _root_.Formalism.FourierDecayAlt.B.beta D F G
+          + c * _root_.Formalism.FourierDecayAlt.B.beta D F' G
+      ∧ _root_.Formalism.FourierDecayAlt.B.beta D G (F + c • F')
+        = _root_.Formalism.FourierDecayAlt.B.beta D G F
+          + conj c * _root_.Formalism.FourierDecayAlt.B.beta D G F' :=
   _root_.Formalism.FourierDecayAlt.P.JCx2.sq_beta_sesq D hA hF hF' hG c
 
 end GlobalTheory.BetaSum
@@ -41,7 +51,8 @@ end GlobalTheory.BetaSum
 namespace GlobalTheory
 
 open Finset MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] in
 private lemma beta_eq_star_beta_swap (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) (F G : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp) :
     _root_.Formalism.FourierDecayAlt.B.beta D F G = star (_root_.Formalism.FourierDecayAlt.B.beta D G F) := by
@@ -52,14 +63,16 @@ private lemma beta_eq_star_beta_swap (D : _root_.Formalism.FourierDecayAlt.B.Rea
   simp [inner_conj_symm]
 
 open Finset MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] in
 private lemma beta_congr_right_on_GV (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) {F G G₂ : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp}
     (h : ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, G g = G₂ g) : _root_.Formalism.FourierDecayAlt.B.beta D F G = _root_.Formalism.FourierDecayAlt.B.beta D F G₂ := by
   rw [beta_eq_star_beta_swap D F G, beta_eq_star_beta_swap D F G₂, _root_.Formalism.FourierDecayAlt.P.Dx1.LZ.beta_congr_left D h]
 
 open Finset MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] in
 variable [FiniteDimensional ℂ Wp] in
 private lemma beta_sum_smul_left (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) {A : ℝ} (hA : _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A)
@@ -89,7 +102,8 @@ private lemma beta_sum_smul_left (D : _root_.Formalism.FourierDecayAlt.B.RealPla
     rw [e, (_root_.Formalism.FourierDecayAlt.P.JCx2.sq_beta_sesq D hA hs (hFi x) hG (c x)).1, ih, Finset.sum_insert hx, add_comm]
 
 open Finset MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] in
 variable [FiniteDimensional ℂ Wp] in
 private lemma beta_sum_smul_right (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) {A : ℝ} (hA : _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A)
@@ -100,19 +114,36 @@ private lemma beta_sum_smul_right (D : _root_.Formalism.FourierDecayAlt.B.RealPl
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   rw [star_mul', beta_eq_star_beta_swap D G (Fi i)]
 
-
 open Finset MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] in
 variable [FiniteDimensional ℂ Wp] in
-theorem _root_.GlobalTheory.beta_finset_sum_smul_of_bessel : _root_.GlobalTheory.HCXi.BesselXiIntegrable → ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) (A : ℝ) (ι : Type) (S T : Finset ι) (a b : ι → ℂ) (Fi : ι → _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)) (F F' : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)), _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A → (∀ i, _root_.Formalism.FourierDecayAlt.B.InCC A 5 (Fi i)) → (∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, F g = ∑ i ∈ S, a i • Fi i g) → (∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, F' g = ∑ i ∈ T, b i • Fi i g) → _root_.Formalism.FourierDecayAlt.B.beta D F F' = ∑ i ∈ S, ∑ j ∈ T, a i * star (b j) * _root_.Formalism.FourierDecayAlt.B.beta D (Fi i) (Fi j) := by
-  intro _ k r Wp Wq _ _ _ _ _ _ D A ι S T a b Fi F F' hA hFi hF hF'
-  rw [_root_.Formalism.FourierDecayAlt.P.Dx1.LZ.beta_congr_left D hF, beta_congr_right_on_GV D hF',
-    beta_sum_smul_left D hA S a Fi hFi
-      (_root_.Formalism.FourierDecayAlt.P.JCx2.sq_inCC_sum T (fun i g ↦ b i • Fi i g) (fun i _ ↦ _root_.Formalism.FourierDecayAlt.P.JCx2.sq_inCC_smul (b i) (hFi i)))]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  rw [beta_sum_smul_right D hA T b Fi hFi (hFi i), Finset.mul_sum]
-  refine Finset.sum_congr rfl fun j _ ↦ ?_
-  ring
+theorem _root_.GlobalTheory.beta_finset_sum_smul_of_bessel
+    : _root_.GlobalTheory.HCXi.BesselXiIntegrable
+      → ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+          [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp]
+          [FiniteDimensional ℂ Wq] (D : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq)
+          (A : ℝ) (ι : Type) (S T : Finset ι) (a b : ι → ℂ)
+          (Fi : ι → _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp))
+          (F F' : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)),
+        _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A
+          → (∀ i, _root_.Formalism.FourierDecayAlt.B.InCC A 5 (Fi i))
+          → (∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, F g = ∑ i ∈ S, a i • Fi i g)
+          → (∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, F' g = ∑ i ∈ T, b i • Fi i g)
+          → _root_.Formalism.FourierDecayAlt.B.beta D F F'
+            = ∑ i ∈ S, ∑ j ∈ T, a i * star (b j) * _root_.Formalism.FourierDecayAlt.B.beta D (Fi i) (Fi j) :=
+  by
+    intro _ k r Wp Wq _ _ _ _ _ _ D A ι S T a b Fi F F' hA hFi hF hF'
+    rw [_root_.Formalism.FourierDecayAlt.P.Dx1.LZ.beta_congr_left D hF,
+      beta_congr_right_on_GV D hF',
+      beta_sum_smul_left D hA S a Fi hFi
+        (_root_.Formalism.FourierDecayAlt.P.JCx2.sq_inCC_sum T
+          (fun i g ↦ b i • Fi i g)
+          (fun i _ ↦ _root_.Formalism.FourierDecayAlt.P.JCx2.sq_inCC_smul (b i) (hFi i)))]
+    refine Finset.sum_congr rfl fun i _ ↦ ?_
+    rw [beta_sum_smul_right D hA T b Fi hFi (hFi i), Finset.mul_sum]
+    refine Finset.sum_congr rfl fun j _ ↦ ?_
+    ring
 
 end GlobalTheory

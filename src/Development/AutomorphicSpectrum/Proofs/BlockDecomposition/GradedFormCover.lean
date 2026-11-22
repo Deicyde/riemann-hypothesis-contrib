@@ -9,12 +9,13 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Coordina
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.GrForm.AffCover
 
-theorem iInf_basicOpen {X : Scheme.{0}} {V : X.Opens} : ∀ (n : ℕ) (g : Fin (n + 1) → Γ(X, V)),
-    (⨅ a, X.basicOpen (g a)) = X.basicOpen (∏ k, g k) := by
+theorem iInf_basicOpen {X : Scheme.{0}} {V : X.Opens}
+    : ∀ (n : ℕ) (g : Fin (n + 1) → Γ(X, V)), (⨅ a, X.basicOpen (g a)) = X.basicOpen (∏ k, g k) := by
   intro n
   induction n with
   | zero =>
@@ -29,18 +30,25 @@ theorem iInf_basicOpen {X : Scheme.{0}} {V : X.Opens} : ∀ (n : ℕ) (g : Fin (
 theorem stCover : GlobalTheory.CompanionTheory.GrForm.StCover := by
   intro O _ X q _ V hV
   classical
-  have loc : ∀ x : V, ∃ (f : Γ(X, V)) (d : ℕ), x.1 ∈ X.basicOpen f ∧ Nonempty (Coord q (X.basicOpen f) d) := by
+  have loc
+      : ∀ x : V, ∃ (f : Γ(X, V)) (d : ℕ),
+        x.1 ∈ X.basicOpen f ∧ Nonempty (Coord q (X.basicOpen f) d) := by
     intro x
     have h : RingHom.Locally RingHom.IsStandardSmooth (q.appLE ⊤ V le_top).hom :=
       RingHom.smooth_iff_locally_isStandardSmooth.1 (q.smooth_appLE (isAffineOpen_top _) hV le_top)
-    obtain ⟨f, hf, hst⟩ := GlobalTheory.CompanionTheory.CovEx.exists_basicOpen RingHom.IsStandardSmooth
-      RingHom.isStandardSmooth_respectsIso q hV h x.2
+    obtain ⟨f, hf, hst⟩ :=
+      GlobalTheory.CompanionTheory.CovEx.exists_basicOpen RingHom.IsStandardSmooth
+        RingHom.isStandardSmooth_respectsIso q hV h x.2
     obtain ⟨n, g, hg, he⟩ := hst.exists_etale_mvPolynomial
     exact ⟨f, n, hf, GlobalTheory.CompanionTheory.CovEx.coord_basicOpen q hV f g hg he⟩
   choose f d hx hc using loc
-  obtain ⟨t, ht⟩ := hV.isCompact.elim_finite_subcover (fun x : V => (X.basicOpen (f x) : Set X))
-    (fun x => (X.basicOpen (f x)).2) (fun x hxV => Set.mem_iUnion.2 ⟨⟨x, hxV⟩, hx _⟩)
-  refine ⟨t, inferInstance, fun a => X.basicOpen (f a.1), fun a => d a.1, fun a => (hc a.1).some, ?_, ?_⟩
+  obtain ⟨t, ht⟩ :=
+    hV.isCompact.elim_finite_subcover
+      (fun x : V => (X.basicOpen (f x) : Set X))
+      (fun x => (X.basicOpen (f x)).2)
+      (fun x hxV => Set.mem_iUnion.2 ⟨⟨x, hxV⟩, hx _⟩)
+  refine
+    ⟨t, inferInstance, fun a => X.basicOpen (f a.1), fun a => d a.1, fun a => (hc a.1).some, ?_, ?_⟩
   · refine le_antisymm (iSup_le fun a => X.basicOpen_le _) fun x hxV => ?_
     obtain ⟨y, hy⟩ := Set.mem_iUnion.1 (ht hxV)
     obtain ⟨hy, hxy⟩ := Set.mem_iUnion.1 hy

@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsVolData
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors
 
 noncomputable section
@@ -14,31 +17,34 @@ namespace GlobalTheory.SnMass.VolN.GNGroup
 
 variable {E : Type} [Field E]
 
-theorem cT_mul (σ : E →+* E) {n : ℕ} (A B : Matrix (Fin n) (Fin n) E) :
-    cT σ (A * B) = cT σ B * cT σ A := by
+theorem cT_mul (σ : E →+* E) {n : ℕ} (A B : Matrix (Fin n) (Fin n) E)
+    : cT σ (A * B) = cT σ B * cT σ A := by
   simp only [cT, Matrix.map_mul, Matrix.transpose_mul]
 
-theorem cT_mul' (σ : E →+* E) {n a : ℕ} (A : Matrix (Fin n) (Fin n) E) (B : Matrix (Fin n) (Fin a) E) :
-    cT σ (A * B) = cT σ B * cT σ A := by
+theorem cT_mul'
+    (σ : E →+* E) {n a : ℕ} (A : Matrix (Fin n) (Fin n) E) (B : Matrix (Fin n) (Fin a) E)
+    : cT σ (A * B) = cT σ B * cT σ A := by
   simp only [cT, Matrix.map_mul, Matrix.transpose_mul]
 
-theorem cT_mul'' (σ : E →+* E) {n a : ℕ} (A : Matrix (Fin n) (Fin a) E) (B : Matrix (Fin a) (Fin a) E) :
-    cT σ (A * B) = cT σ B * cT σ A := by
+theorem cT_mul''
+    (σ : E →+* E) {n a : ℕ} (A : Matrix (Fin n) (Fin a) E) (B : Matrix (Fin a) (Fin a) E)
+    : cT σ (A * B) = cT σ B * cT σ A := by
   simp only [cT, Matrix.map_mul, Matrix.transpose_mul]
 
-theorem cT_one (σ : E →+* E) {n : ℕ} : cT σ (1 : Matrix (Fin n) (Fin n) E) = 1 := by
-  simp [cT]
+theorem cT_one (σ : E →+* E) {n : ℕ} : cT σ (1 : Matrix (Fin n) (Fin n) E) = 1 := by simp [cT]
 
-theorem isUp_iff_bt {m : ℕ} (u : Matrix (Fin m) (Fin m) E) :
-    IsUp u ↔ u.BlockTriangular id ∧ ∀ i, u i i = 1 := by
+theorem isUp_iff_bt {m : ℕ} (u : Matrix (Fin m) (Fin m) E)
+    : IsUp u ↔ u.BlockTriangular id ∧ ∀ i, u i i = 1 := by
   constructor
   · intro h
     exact ⟨fun i j hij => (h i j).1 hij, fun i => (h i i).2 rfl⟩
   · rintro ⟨h1, h2⟩ i j
     exact ⟨fun hij => h1 hij, fun hij => hij ▸ h2 i⟩
 
-theorem diag_mul_of_bt {m : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : A.BlockTriangular id)
-    (hB : B.BlockTriangular id) (i : Fin m) : (A * B) i i = A i i * B i i := by
+theorem diag_mul_of_bt
+    {m : ℕ} {A B : Matrix (Fin m) (Fin m) E}
+    (hA : A.BlockTriangular id) (hB : B.BlockTriangular id) (i : Fin m)
+    : (A * B) i i = A i i * B i i := by
   rw [Matrix.mul_apply, Finset.sum_eq_single i]
   · intro l _ hl
     rcases lt_or_gt_of_ne hl with hl | hl
@@ -46,7 +52,8 @@ theorem diag_mul_of_bt {m : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : A.BlockT
     · rw [hB hl, mul_zero]
   · intro h; exact absurd (Finset.mem_univ i) h
 
-theorem isUp_mul {m : ℕ} {u u' : Matrix (Fin m) (Fin m) E} (h : IsUp u) (h' : IsUp u') : IsUp (u * u') := by
+theorem isUp_mul {m : ℕ} {u u' : Matrix (Fin m) (Fin m) E} (h : IsUp u) (h' : IsUp u')
+    : IsUp (u * u') := by
   rw [isUp_iff_bt] at h h' ⊢
   refine ⟨h.1.mul h'.1, fun i => ?_⟩
   rw [diag_mul_of_bt h.1 h'.1, h.2, h'.2, one_mul]
@@ -60,15 +67,18 @@ theorem isUp_inv {m : ℕ} {u : Matrix (Fin m) (Fin m) E} (h : IsUp u) : IsUp u�
   letI : Invertible u := Matrix.invertibleOfDetInvertible u
   have hbt : u⁻¹.BlockTriangular id := Matrix.blockTriangular_inv_of_blockTriangular h.1
   have hui : u⁻¹ * u = 1 := Matrix.nonsing_inv_mul u (by rw [hdet]; exact isUnit_one)
-  refine ⟨(isUp_iff_bt _).2 ⟨hbt, fun i => ?_⟩, Matrix.mul_nonsing_inv u (by rw [hdet]; exact isUnit_one)⟩
+  refine ⟨
+    (isUp_iff_bt _).2 ⟨hbt, fun i => ?_⟩,
+    Matrix.mul_nonsing_inv u (by rw [hdet]; exact isUnit_one)
+  ⟩
   have := congrFun (congrFun hui i) i
   rw [diag_mul_of_bt hbt h.1, h.2, mul_one] at this
   simpa using this
 
 variable [NumberField E]
 
-theorem latMap_mul {n : ℕ} (g g' : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E)) :
-    latMap (g * g') Λ = latMap g (latMap g' Λ) := by
+theorem latMap_mul {n : ℕ} (g g' : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E))
+    : latMap (g * g') Λ = latMap g (latMap g' Λ) := by
   ext x
   simp only [latMap, Submodule.mem_map, LinearMap.coe_restrictScalars, Matrix.mulVecLin_apply]
   constructor
@@ -82,8 +92,9 @@ theorem latMap_one {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E)) : latMap 1 
   simp [latMap, Submodule.mem_map]
 
 omit [NumberField E] in
-theorem isUnit_of_isUn (σ : E →+* E) {n : ℕ} {J g : Matrix (Fin n) (Fin n) E} (hJ : J.det ≠ 0)
-    (h : IsUn σ J g) : IsUnit g := by
+theorem isUnit_of_isUn
+    (σ : E →+* E) {n : ℕ} {J g : Matrix (Fin n) (Fin n) E} (hJ : J.det ≠ 0) (h : IsUn σ J g)
+    : IsUnit g := by
   rw [Matrix.isUnit_iff_isUnit_det]
   have := congrArg Matrix.det h
   rw [cT, Matrix.det_mul, Matrix.det_mul] at this
@@ -92,34 +103,46 @@ theorem isUnit_of_isUn (σ : E →+* E) {n : ℕ} {J g : Matrix (Fin n) (Fin n) 
   exact this.symm
 
 omit [NumberField E] in
-theorem isUn_mul (σ : E →+* E) {n : ℕ} {J g g' : Matrix (Fin n) (Fin n) E} (h : IsUn σ J g)
-    (h' : IsUn σ J g') : IsUn σ J (g * g') := by
+theorem isUn_mul
+    (σ : E →+* E) {n : ℕ} {J g g' : Matrix (Fin n) (Fin n) E} (h : IsUn σ J g) (h' : IsUn σ J g')
+    : IsUn σ J (g * g') := by
   unfold IsUn at *
-  calc cT σ (g * g') * J * (g * g') = cT σ g' * (cT σ g * J * g) * g' := by
-        rw [cT_mul]; simp only [Matrix.mul_assoc]
+  calc
+    cT σ (g * g') * J * (g * g')
+      = cT σ g' * (cT σ g * J * g) * g' := by rw [cT_mul]; simp only [Matrix.mul_assoc]
     _ = J := by rw [h, h']
 
 omit [NumberField E] in
-theorem isUn_inv (σ : E →+* E) {n : ℕ} {J a b : Matrix (Fin n) (Fin n) E} (h : IsUn σ J a)
-    (hab : a * b = 1) : IsUn σ J b := by
+theorem isUn_inv
+    (σ : E →+* E) {n : ℕ} {J a b : Matrix (Fin n) (Fin n) E} (h : IsUn σ J a) (hab : a * b = 1)
+    : IsUn σ J b := by
   unfold IsUn at *
-  calc cT σ b * J * b = cT σ b * (cT σ a * J * a) * b := by rw [h]
+  calc
+    cT σ b * J * b
+      = cT σ b * (cT σ a * J * a) * b := by rw [h]
     _ = cT σ (a * b) * J * (a * b) := by rw [cT_mul]; simp only [Matrix.mul_assoc]
     _ = J := by rw [hab, cT_one, Matrix.one_mul, Matrix.mul_one]
 
 omit [NumberField E] in
-theorem inN_one (σ : E →+* E) {n r : ℕ} (J : Matrix (Fin n) (Fin n) E) (P : Matrix (Fin n) (Fin (r + 1)) E) :
-    InN σ J P 1 := by
+theorem inN_one
+    (σ : E →+* E) {n r : ℕ} (J : Matrix (Fin n) (Fin n) E) (P : Matrix (Fin n) (Fin (r + 1)) E)
+    : InN σ J P 1 := by
   refine ⟨by simp [IsUn, cT_one], ⟨1, ?_, ?_⟩, fun v _ => ⟨0, by simp⟩⟩
   · intro i j
-    exact ⟨fun h => Matrix.one_apply_ne (ne_of_lt h).symm, fun h => by subst h; exact Matrix.one_apply_eq i⟩
+    exact ⟨
+      fun h => Matrix.one_apply_ne (ne_of_lt h).symm,
+      fun h => by subst h; exact Matrix.one_apply_eq i
+    ⟩
   · have key : (1 : Matrix (Fin n) (Fin n) E) * eOf P = eOf P * (1 : Matrix (Fin r) (Fin r) E) := by
       rw [Matrix.one_mul, Matrix.mul_one]
     exact key
 
 omit [NumberField E] in
-theorem inN_mul (σ : E →+* E) {n r : ℕ} {J : Matrix (Fin n) (Fin n) E} {P : Matrix (Fin n) (Fin (r + 1)) E}
-    {g g' : Matrix (Fin n) (Fin n) E} (h : InN σ J P g) (h' : InN σ J P g') : InN σ J P (g * g') := by
+theorem inN_mul
+    (σ : E →+* E)
+    {n r : ℕ} {J : Matrix (Fin n) (Fin n) E} {P : Matrix (Fin n) (Fin (r + 1)) E}
+    {g g' : Matrix (Fin n) (Fin n) E} (h : InN σ J P g) (h' : InN σ J P g')
+    : InN σ J P (g * g') := by
   obtain ⟨hu, ⟨ν, hν, he⟩, hp⟩ := h
   obtain ⟨hu', ⟨ν', hν', he'⟩, hp'⟩ := h'
   replace he : g * eOf P = eOf P * ν := he
@@ -136,19 +159,24 @@ theorem inN_mul (σ : E →+* E) {n r : ℕ} {J : Matrix (Fin n) (Fin n) E} {P :
     rw [e1, hc', hc, Matrix.mulVec_mulVec, he, ← Matrix.mulVec_mulVec, Matrix.mulVec_add]
 
 omit [NumberField E] in
-theorem inN_inv (σ : E →+* E) {n r : ℕ} {J : Matrix (Fin n) (Fin n) E} {P : Matrix (Fin n) (Fin (r + 1)) E}
-    {a b : Matrix (Fin n) (Fin n) E} (h : InN σ J P a) (hab : a * b = 1) (hba : b * a = 1) :
-    InN σ J P b := by
+theorem inN_inv
+    (σ : E →+* E)
+    {n r : ℕ} {J : Matrix (Fin n) (Fin n) E} {P : Matrix (Fin n) (Fin (r + 1)) E}
+    {a b : Matrix (Fin n) (Fin n) E} (h : InN σ J P a) (hab : a * b = 1) (hba : b * a = 1)
+    : InN σ J P b := by
   obtain ⟨hu, ⟨ν, hν, he⟩, hp⟩ := h
   replace he : a * eOf P = eOf P * ν := he
   obtain ⟨hνi, hνν⟩ := isUp_inv hν
   have hJ : cT σ a * J = J * b := by
-    calc cT σ a * J = cT σ a * J * (a * b) := by rw [hab, Matrix.mul_one]
+    calc
+      cT σ a * J
+        = cT σ a * J * (a * b) := by rw [hab, Matrix.mul_one]
       _ = J * b := by rw [← Matrix.mul_assoc, hu]
   refine ⟨isUn_inv σ hu hab, ⟨ν⁻¹, hνi, ?_⟩, fun v hv => ?_⟩
   · have key : b * eOf P = eOf P * ν⁻¹ := by
-      calc b * eOf P = (b * (eOf P * ν)) * ν⁻¹ := by
-            rw [Matrix.mul_assoc b, Matrix.mul_assoc, hνν, Matrix.mul_one]
+      calc
+        b * eOf P = (b * (eOf P * ν)) * ν⁻¹ := by
+          rw [Matrix.mul_assoc b, Matrix.mul_assoc, hνν, Matrix.mul_one]
         _ = (b * (a * eOf P)) * ν⁻¹ := by rw [he]
         _ = eOf P * ν⁻¹ := by rw [← Matrix.mul_assoc b, hba, Matrix.one_mul]
     exact key
@@ -170,8 +198,11 @@ namespace GlobalTheory.SnMass.VolN
 
 variable {E : Type} [Field E] [NumberField E]
 
-def gNUnits (σ : E →+* E) {n r : ℕ} (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E))
-    (P : Matrix (Fin n) (Fin (r + 1)) E) : Subgroup (Matrix (Fin n) (Fin n) E)ˣ where
+def gNUnits
+    (σ : E →+* E)
+    {n r : ℕ} (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E))
+    (P : Matrix (Fin n) (Fin (r + 1)) E)
+    : Subgroup (Matrix (Fin n) (Fin n) E)ˣ where
   carrier := {u | (u : Matrix (Fin n) (Fin n) E) ∈ GN σ J Λ P}
   one_mem' := by
     show ((1 : (Matrix (Fin n) (Fin n) E)ˣ) : Matrix (Fin n) (Fin n) E) ∈ GN σ J Λ P
@@ -186,15 +217,33 @@ def gNUnits (σ : E →+* E) {n r : ℕ} (J : Matrix (Fin n) (Fin n) E) (Λ : Su
     intro a ha
     show ((a⁻¹ : (Matrix (Fin n) (Fin n) E)ˣ) : Matrix (Fin n) (Fin n) E) ∈ GN σ J Λ P
     refine ⟨GNGroup.inN_inv _ ha.1 a.mul_inv a.inv_mul, ?_⟩
-    calc latMap ((a⁻¹ : (Matrix (Fin n) (Fin n) E)ˣ) : Matrix (Fin n) (Fin n) E) Λ
-        = latMap ((a⁻¹ : (Matrix (Fin n) (Fin n) E)ˣ) : Matrix (Fin n) (Fin n) E)
-            (latMap (a : Matrix (Fin n) (Fin n) E) Λ) := by rw [ha.2]
+    calc
+      latMap ((a⁻¹ : (Matrix (Fin n) (Fin n) E)ˣ) : Matrix (Fin n) (Fin n) E) Λ
+          = latMap ((a⁻¹ : (Matrix (Fin n) (Fin n) E)ˣ) : Matrix (Fin n) (Fin n) E)
+            (latMap (a : Matrix (Fin n) (Fin n) E) Λ) := by
+        rw [ha.2]
       _ = Λ := by rw [← GNGroup.latMap_mul, a.inv_mul, GNGroup.latMap_one]
 
-theorem gN_subgroup : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E) (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E)) (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E) (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F) (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (s : Fin r → ℝ), IsVolData σ J Λ P f T A s → (∃ G : Subgroup (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)ˣ, ∀ u : (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)ˣ, u ∈ G ↔ (u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E) ∈ GN (σ : E →+* E) J Λ P) ∧ ∀ γ ∈ GN (σ : E →+* E) J Λ P, IsUnit γ := by
+theorem gN_subgroup
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
+        (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E))
+        (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E)
+        (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F)
+        (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+        (s : Fin r → ℝ),
+      IsVolData σ J Λ P f T A s
+        → (∃ G : Subgroup (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)ˣ,
+            ∀ u : (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)ˣ,
+              u ∈ G
+                ↔ (u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
+                  ∈ GN (σ : E →+* E) J Λ P)
+          ∧ ∀ γ ∈ GN (σ : E →+* E) J Λ P, IsUnit γ := by
   intro F E _ _ _ _ _ σ k r J Λ P f T A s hV
   have hJ : J.det ≠ 0 := hV.2.2.1.2
-  exact ⟨⟨gNUnits (σ : E →+* E) J Λ P, fun u => Iff.rfl⟩,
-    fun γ hγ => GNGroup.isUnit_of_isUn (σ : E →+* E) hJ hγ.1.1⟩
+  exact ⟨
+    ⟨gNUnits (σ : E →+* E) J Λ P, fun u => Iff.rfl⟩,
+    fun γ hγ => GNGroup.isUnit_of_isUn (σ : E →+* E) hJ hγ.1.1
+  ⟩
 
 end GlobalTheory.SnMass.VolN

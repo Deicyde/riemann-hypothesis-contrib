@@ -9,12 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.SecOnPu
 @[expose] public section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.FormalAlg GlobalTheory.Degen.FormalEmb
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw GlobalTheory.FormalAlg GlobalTheory.Degen.FormalEmb
 
 namespace GlobalTheory.FormalAlg
 
-theorem lift_localUnits_of_thickening :
-    ∀ (R : Type) [CommRing R] (J : Ideal R) (X X₀ : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)) (γ : X₀ ⟶ X) (q : X₀ ⟶ Spec (CommRingCat.of (R ⧸ J))), IsPullback γ q f (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) → Surjective γ → ∀ (L : LB X), L.IsLB → ∀ D : X.Opens, IsAffineOpen D → ∀ u : ∀ m : L.ι, Γ(X₀, γ ⁻¹ᵁ (D ⊓ L.U m))ˣ, (∀ z m m', γ z ∈ D ⊓ L.U m → γ z ∈ D ⊓ L.U m' → gm (𝟙 X₀) z _ (u m) = gm γ z _ (L.g m m') * gm (𝟙 X₀) z _ (u m')) → ∃ τ : ∀ m : L.ι, Γ(X, D ⊓ L.U m)ˣ, (∀ m, (γ.app (D ⊓ L.U m)).hom (τ m).val = (u m).val) ∧ ∀ x m m', x ∈ D ⊓ L.U m → x ∈ D ⊓ L.U m' → gm (𝟙 X) x _ (τ m) = gm (𝟙 X) x _ (L.g m m') * gm (𝟙 X) x _ (τ m') := by
+theorem lift_localUnits_of_thickening
+    : ∀ (R : Type) [CommRing R] (J : Ideal R) (X X₀ : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R))
+        (γ : X₀ ⟶ X) (q : X₀ ⟶ Spec (CommRingCat.of (R ⧸ J))),
+      IsPullback γ q f (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) → Surjective γ
+        → ∀ (L : LB X),
+          L.IsLB
+            → ∀ D : X.Opens,
+              IsAffineOpen D
+                → ∀ u : ∀ m : L.ι, Γ(X₀, γ ⁻¹ᵁ (D ⊓ L.U m))ˣ,
+                  (∀ z m m',
+                      γ z ∈ D ⊓ L.U m → γ z ∈ D ⊓ L.U m'
+                        → gm (𝟙 X₀) z _ (u m) = gm γ z _ (L.g m m') * gm (𝟙 X₀) z _ (u m'))
+                    → ∃ τ : ∀ m : L.ι, Γ(X, D ⊓ L.U m)ˣ,
+                      (∀ m, (γ.app (D ⊓ L.U m)).hom (τ m).val = (u m).val)
+                        ∧ ∀ x m m',
+                          x ∈ D ⊓ L.U m → x ∈ D ⊓ L.U m'
+                            → gm (𝟙 X) x _ (τ m)
+                              = gm (𝟙 X) x _ (L.g m m') * gm (𝟙 X) x _ (τ m') := by
   intro R _ J X X₀ f γ q hpb hsurj L hL D hD u hu
   have hLp := LB.isLB_pull hL γ
   let O : L.ι → X₀.Opens := fun m => γ ⁻¹ᵁ (D ⊓ L.U m)
@@ -25,9 +43,12 @@ theorem lift_localUnits_of_thickening :
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨m, show γ z ∈ D ⊓ L.U m from ⟨hz, hm⟩⟩
   have hU : ∀ m, O m ≤ (L.pull γ).U (fun _ => m) := fun m z hz => mem_pull.2 hz.2
 
-  have hg : ∀ z a b, γ z ∈ L.U a → γ z ∈ L.U b →
-      gm (𝟙 X₀) z ((L.pull γ).U (fun _ => a) ⊓ (L.pull γ).U (fun _ => b))
-        ((L.pull γ).g (fun _ => a) (fun _ => b)) = gm γ z _ (L.g a b) := by
+  have hg
+      : ∀ z a b,
+        γ z ∈ L.U a → γ z ∈ L.U b
+          → gm (𝟙 X₀) z ((L.pull γ).U (fun _ => a) ⊓ (L.pull γ).U (fun _ => b))
+              ((L.pull γ).g (fun _ => a) (fun _ => b))
+            = gm γ z _ (L.g a b) := by
     intro z a b ha hb
     have hp : (𝟙 X₀) z ∈ (L.pull γ).U (fun _ => a) ⊓ (L.pull γ).U (fun _ => b) :=
       ⟨mem_pull.2 ha, mem_pull.2 hb⟩
@@ -35,26 +56,29 @@ theorem lift_localUnits_of_thickening :
     rw [Fintype.prod_unique, zpow_one]
     refine (gm_res (𝟙 X₀) z _ hp _).trans ((gm_pull (𝟙 X₀) γ z (L.U a ⊓ L.U b) ⟨ha, hb⟩ _).trans ?_)
     rw [Category.id_comp]
-  have hcomp : ∀ a b, rs X₀ (inf_le_left : O a ⊓ O b ≤ O a) (u a).val =
-      rs X₀ (inf_le_inf (hU a) (hU b)) ((L.pull γ).g (fun _ => a) (fun _ => b)).val *
-        rs X₀ (inf_le_right : O a ⊓ O b ≤ O b) (u b).val := by
+  have hcomp
+      : ∀ a b,
+        rs X₀ (inf_le_left : O a ⊓ O b ≤ O a) (u a).val
+          = rs X₀ (inf_le_inf (hU a) (hU b)) ((L.pull γ).g (fun _ => a) (fun _ => b)).val
+            * rs X₀ (inf_le_right : O a ⊓ O b ≤ O b) (u b).val := by
     intro a b
-    have e : res (inf_le_left : O a ⊓ O b ≤ O a) (u a) =
-        res (inf_le_inf (hU a) (hU b)) ((L.pull γ).g (fun _ => a) (fun _ => b)) *
-          res (inf_le_right : O a ⊓ O b ≤ O b) (u b) := by
+    have e
+        : res (inf_le_left : O a ⊓ O b ≤ O a) (u a)
+          = res (inf_le_inf (hU a) (hU b)) ((L.pull γ).g (fun _ => a) (fun _ => b))
+            * res (inf_le_right : O a ⊓ O b ≤ O b) (u b) := by
       apply unit_ext
       intro z hz
       have hz' : (𝟙 X₀) z ∈ O a ⊓ O b := hz
-      rw [map_mul, gm_res _ z _ hz', gm_res _ z _ hz', gm_res _ z _ hz',
-        hg z a b hz.1.2 hz.2.2]
+      rw [map_mul, gm_res _ z _ hz', gm_res _ z _ hz', gm_res _ z _ hz', hg z a b hz.1.2 hz.2.2]
       exact hu z a b hz.1 hz.2
     have e' := congrArg Units.val e
     simp only [Units.val_mul, GlobalTheory.LB.val_res] at e'
     exact e'
-  obtain ⟨t, ht, -⟩ := SecOn.existsUnique_of_local hLp O hO hc (fun m _ => m) hU
-    (fun m => (u m).val) hcomp
-  obtain ⟨s, hs⟩ := secOn_pull_surjective_of_surjective R (R ⧸ J) (Ideal.Quotient.mk J)
-    Ideal.Quotient.mk_surjective X X₀ f q γ hpb L hL D hD t
+  obtain ⟨t, ht, -⟩ :=
+    SecOn.existsUnique_of_local hLp O hO hc (fun m _ => m) hU (fun m => (u m).val) hcomp
+  obtain ⟨s, hs⟩ :=
+    secOn_pull_surjective_of_surjective R (R ⧸ J) (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
+      X X₀ f q γ hpb L hL D hD t
   have hcoord : ∀ m, (γ.app (D ⊓ L.U m)).hom (GlobalTheory.LB.coord s m) = (u m).val := by
     intro m
     have e := ht m

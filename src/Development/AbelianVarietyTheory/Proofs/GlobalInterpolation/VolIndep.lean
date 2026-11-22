@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsFund
 
 namespace GlobalTheory.VolIndepClosed
 
-theorem volIndep (D : Formalism.BasicNotions.D7) : GlobalTheory.IndefiniteRowSideFullHecke.IsometryTransportFrames.VolIndep D :=
-  (GlobalTheory.VolIndepCompare.volumeIndependence_iff D).1 (GlobalTheory.VolumeIndep.volumeIndependence D)
+theorem volIndep (D : Formalism.BasicNotions.D7)
+    : GlobalTheory.IndefiniteRowSideFullHecke.IsometryTransportFrames.VolIndep D :=
+  (GlobalTheory.VolIndepCompare.volumeIndependence_iff D).1
+    (GlobalTheory.VolumeIndep.volumeIndependence D)
 
 end GlobalTheory.VolIndepClosed

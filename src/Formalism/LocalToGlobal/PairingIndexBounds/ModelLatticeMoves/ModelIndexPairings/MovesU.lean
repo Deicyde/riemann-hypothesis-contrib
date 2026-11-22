@@ -14,8 +14,8 @@ open Formalism.L2.Th1.H
 section Reps
 variable {G : Type*} [AddCommGroup G]
 
-theorem repsG_exist (M N : AddSubgroup G) (h : M.relIndex N ≠ 0) :
-    ∃ S : Finset G, IsRepsG M N S ∧ S.card = M.relIndex N := by
+theorem repsG_exist (M N : AddSubgroup G) (h : M.relIndex N ≠ 0)
+    : ∃ S : Finset G, IsRepsG M N S ∧ S.card = M.relIndex N := by
   classical
   have : (M.addSubgroupOf N).FiniteIndex := ⟨h⟩
   have : Finite (N ⧸ M.addSubgroupOf N) := AddSubgroup.finite_quotient_of_finiteIndex
@@ -42,7 +42,8 @@ theorem repsG_exist (M N : AddSubgroup G) (h : M.relIndex N ≠ 0) :
       simpa [f] using this
     rw [this]
   · intro y hy
-    refine ⟨f (QuotientAddGroup.mk (⟨y, hy⟩ : N)), Finset.mem_image_of_mem _ (Finset.mem_univ _), ?_⟩
+    refine
+      ⟨f (QuotientAddGroup.mk (⟨y, hy⟩ : N)), Finset.mem_image_of_mem _ (Finset.mem_univ _), ?_⟩
     have h1 := QuotientAddGroup.out_eq' (QuotientAddGroup.mk (⟨y, hy⟩ : N) : N ⧸ M.addSubgroupOf N)
     rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf] at h1
     convert h1 using 1
@@ -56,8 +57,8 @@ end Reps
 section
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem cU_eq_one_iff (H : Sesq V) (A B : AddSubgroup V) (b : B) (a : A) :
-    cU H A B b a = 1 ↔ ∃ m : ℤ, altE H (a : V) (b : V) = m := by
+theorem cU_eq_one_iff (H : Sesq V) (A B : AddSubgroup V) (b : B) (a : A)
+    : cU H A B b a = 1 ↔ ∃ m : ℤ, altE H (a : V) (b : V) = m := by
   unfold cU
   rw [Complex.exp_eq_one_iff]
   constructor
@@ -72,15 +73,17 @@ theorem cU_eq_one_iff (H : Sesq V) (A B : AddSubgroup V) (b : B) (a : A) :
     exact_mod_cast this
   · rintro ⟨m, hm⟩
     refine ⟨-m, ?_⟩
-    rw [hm]; push_cast; ring
+    rw [hm]
+    push_cast
+    ring
 
 end
 
 section Moves
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem relIndex_addSubgroupOf_inf (X Y Z : AddSubgroup V) :
-    (X.addSubgroupOf Z).relIndex (Y.addSubgroupOf Z) = (X ⊓ Z).relIndex (Y ⊓ Z) := by
+theorem relIndex_addSubgroupOf_inf (X Y Z : AddSubgroup V)
+    : (X.addSubgroupOf Z).relIndex (Y.addSubgroupOf Z) = (X ⊓ Z).relIndex (Y ⊓ Z) := by
   rw [← AddSubgroup.inf_addSubgroupOf_right Y Z, AddSubgroup.relIndex_addSubgroupOf inf_le_right,
     ← AddSubgroup.inf_relIndex_right, ← AddSubgroup.inf_relIndex_right (X ⊓ Z)]
   congr 1
@@ -88,12 +91,15 @@ theorem relIndex_addSubgroupOf_inf (X Y Z : AddSubgroup V) :
   simp only [AddSubgroup.mem_inf]
   tauto
 
-theorem bichar_swap {k : Type*} [Field k] {A B : Type*} [AddCommGroup A] [AddCommGroup B] {c : B → A → k}
-    (h : IsBichar c) : IsBichar (fun a b => c b a) :=
+theorem bichar_swap
+    {k : Type*} [Field k]
+    {A B : Type*} [AddCommGroup A] [AddCommGroup B]
+    {c : B → A → k} (h : IsBichar c)
+    : IsBichar (fun a b => c b a) :=
   ⟨fun a b => h.1 b a, fun a a' b => h.2.2 b a a', fun a b b' => h.2.1 b b' a⟩
 
-theorem sqrt_div_mul_eq_sqrt_mul (a b : ℝ) (ha : 0 < a) (hb : 0 < b) :
-    (Real.sqrt (a * b))⁻¹ * b = (Real.sqrt (a / b))⁻¹ := by
+theorem sqrt_div_mul_eq_sqrt_mul (a b : ℝ) (ha : 0 < a) (hb : 0 < b)
+    : (Real.sqrt (a * b))⁻¹ * b = (Real.sqrt (a / b))⁻¹ := by
   have hsa : 0 < Real.sqrt a := Real.sqrt_pos.2 ha
   have hsb : 0 < Real.sqrt b := Real.sqrt_pos.2 hb
   have hbb : Real.sqrt b * Real.sqrt b = b := Real.mul_self_sqrt hb.le
@@ -105,10 +111,10 @@ theorem MovesU_of (hMv : Moves) (hID : IndexDual) : MovesU := by
   intro V _ _ H α A B Λ₀ Λ₁ hH hA hB g0 g1 hfin θ hθ Xi hXi
   classical
   obtain ⟨hbc, hheis⟩ := heisenberg_unitary_holds V H α A B hH hA hB
-  have int0 : ∀ x ∈ Λ₀, ∀ y ∈ Λ₀, ∃ m : ℤ, altE H x y = m :=
-    fun x hx y hy => (semiCharBasic V H hH Λ₀ α g0.1).2.2 hx y hy
-  have int1 : ∀ x ∈ Λ₁, ∀ y ∈ Λ₁, ∃ m : ℤ, altE H x y = m :=
-    fun x hx y hy => (semiCharBasic V H hH Λ₁ α g1.1).2.2 hx y hy
+  have int0 : ∀ x ∈ Λ₀, ∀ y ∈ Λ₀, ∃ m : ℤ, altE H x y = m := fun x hx y hy =>
+    (semiCharBasic V H hH Λ₀ α g0.1).2.2 hx y hy
+  have int1 : ∀ x ∈ Λ₁, ∀ y ∈ Λ₁, ∃ m : ℤ, altE H x y = m := fun x hx y hy =>
+    (semiCharBasic V H hH Λ₁ α g1.1).2.2 hx y hy
   have o1 : ∀ b : B, b ∈ Λ₀.addSubgroupOf B ↔ ∀ a ∈ Λ₀.addSubgroupOf A, cU H A B b a = 1 := by
     intro b
     simp only [AddSubgroup.mem_addSubgroupOf]
@@ -117,7 +123,8 @@ theorem MovesU_of (hMv : Moves) (hID : IndexDual) : MovesU := by
       exact (cU_eq_one_iff H A B b a).2 (int0 _ ha _ hb)
     · intro h
       exact g0.2.2.2.2 b b.2 fun a ha haΛ =>
-        (cU_eq_one_iff H A B b ⟨a, ha⟩).1 (h ⟨a, ha⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using haΛ))
+        (cU_eq_one_iff H A B b ⟨a, ha⟩).1
+          (h ⟨a, ha⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using haΛ))
   have o2 : ∀ b ∈ Λ₁.addSubgroupOf B, ∀ a ∈ Λ₁.addSubgroupOf A, cU H A B b a = 1 := by
     intro b hb a ha
     rw [AddSubgroup.mem_addSubgroupOf] at hb ha
@@ -126,26 +133,28 @@ theorem MovesU_of (hMv : Moves) (hID : IndexDual) : MovesU := by
     intro a h
     rw [AddSubgroup.mem_addSubgroupOf]
     exact g1.2.2.2.1 a a.2 fun b hb hbΛ =>
-      (cU_eq_one_iff H A B ⟨b, hb⟩ a).1 (h ⟨b, hb⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using hbΛ))
+      (cU_eq_one_iff H A B ⟨b, hb⟩ a).1
+        (h ⟨b, hb⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using hbΛ))
   have hfinB : (Λ₀.addSubgroupOf B).relIndex (Λ₁.addSubgroupOf B) ≠ 0 := by
     rw [relIndex_addSubgroupOf_inf, ← AddSubgroup.inf_relIndex_right (Λ₀ ⊓ B)]
-    have e : Λ₀ ⊓ B ⊓ (Λ₁ ⊓ B) = Λ₀ ⊓ (Λ₁ ⊓ B) := by
-      ext x; simp only [AddSubgroup.mem_inf]; tauto
+    have e : Λ₀ ⊓ B ⊓ (Λ₁ ⊓ B) = Λ₀ ⊓ (Λ₁ ⊓ B) := by ext x; simp only [AddSubgroup.mem_inf]; tauto
     rw [e, AddSubgroup.inf_relIndex_right]
     intro h0
     exact hfin (AddSubgroup.relIndex_eq_zero_of_le_right inf_le_left h0)
   have hfinA : (Λ₀.addSubgroupOf A).relIndex (Λ₁.addSubgroupOf A) ≠ 0 := by
     rw [relIndex_addSubgroupOf_inf, ← AddSubgroup.inf_relIndex_right (Λ₀ ⊓ A)]
-    have e : Λ₀ ⊓ A ⊓ (Λ₁ ⊓ A) = Λ₀ ⊓ (Λ₁ ⊓ A) := by
-      ext x; simp only [AddSubgroup.mem_inf]; tauto
+    have e : Λ₀ ⊓ A ⊓ (Λ₁ ⊓ A) = Λ₀ ⊓ (Λ₁ ⊓ A) := by ext x; simp only [AddSubgroup.mem_inf]; tauto
     rw [e, AddSubgroup.inf_relIndex_right]
     intro h0
     exact hfin (AddSubgroup.relIndex_eq_zero_of_le_right inf_le_left h0)
 
-  have hdual : (Λ₁.addSubgroupOf A).relIndex (Λ₀.addSubgroupOf A) =
-      (Λ₀.addSubgroupOf B).relIndex (Λ₁.addSubgroupOf B) := by
-    refine hID ℂ B A (fun a b => cU H A B b a) (bichar_swap hbc) (Λ₁.addSubgroupOf B) (Λ₀.addSubgroupOf B)
-      (Λ₁.addSubgroupOf A) (Λ₀.addSubgroupOf A) ?_ ?_ ?_ hfinB
+  have hdual
+      : (Λ₁.addSubgroupOf A).relIndex (Λ₀.addSubgroupOf A)
+        = (Λ₀.addSubgroupOf B).relIndex (Λ₁.addSubgroupOf B) := by
+    refine hID ℂ B A
+      (fun a b => cU H A B b a)
+      (bichar_swap hbc) (Λ₁.addSubgroupOf B) (Λ₀.addSubgroupOf B) (Λ₁.addSubgroupOf A)
+      (Λ₀.addSubgroupOf A) ?_ ?_ ?_ hfinB
     · intro a
       exact ⟨fun ha b hb => o2 b hb a ha, fun h => o3 a h⟩
     · intro a ha b hb
@@ -155,9 +164,11 @@ theorem MovesU_of (hMv : Moves) (hID : IndexDual) : MovesU := by
   obtain ⟨SA, hSA, hSAc⟩ := repsG_exist _ _ hfinA
   obtain ⟨SB, hSB, hSBc⟩ := repsG_exist _ _ hfinB
   have hSBne : (SB.card : ℂ) ≠ 0 := by rw [hSBc]; exact_mod_cast hfinB
-  obtain ⟨h, hsum⟩ := hMv ℂ A B (V → ℂ) (cU H A B) (wA H α A) (wB H α B) hbc hheis
-    (Λ₀.addSubgroupOf A) (Λ₁.addSubgroupOf A) (Λ₀.addSubgroupOf B) (Λ₁.addSubgroupOf B) θ Xi hXi
-    o1 o2 (fun a _ h => o3 a h) SA SB hSA hSB hSBne
+  obtain ⟨h, hsum⟩ :=
+    hMv ℂ A B (V → ℂ) (cU H A B) (wA H α A) (wB H α B) hbc hheis (Λ₀.addSubgroupOf A)
+      (Λ₁.addSubgroupOf A) (Λ₀.addSubgroupOf B) (Λ₁.addSubgroupOf B) θ Xi hXi o1 o2
+      (fun a _ h => o3 a h)
+      SA SB hSA hSB hSBne
   refine ⟨h, ?_, ?_⟩
   · unfold volA
     have h1 : 0 < (Λ₀ ⊓ A).relIndex (Λ₁ ⊓ A) := by
@@ -199,8 +210,10 @@ theorem MovesU_of (hMv : Moves) (hID : IndexDual) : MovesU := by
       rw [key p hp q hq hxy]
     · intro y hy
       obtain ⟨y1, hy1, y2, hy2, rfl⟩ := AddSubgroup.mem_sup.1 (g1.2.1 hy)
-      obtain ⟨a, ha, ha'⟩ := hSA.2.2 ⟨y1, hy1.2⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using hy1.1)
-      obtain ⟨b, hb, hb'⟩ := hSB.2.2 ⟨y2, hy2.2⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using hy2.1)
+      obtain ⟨a, ha, ha'⟩ :=
+        hSA.2.2 ⟨y1, hy1.2⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using hy1.1)
+      obtain ⟨b, hb, hb'⟩ :=
+        hSB.2.2 ⟨y2, hy2.2⟩ (by simpa [AddSubgroup.mem_addSubgroupOf] using hy2.1)
       refine ⟨f (a, b), Finset.mem_image_of_mem _ (Finset.mem_product.2 ⟨ha, hb⟩), ?_⟩
       rw [AddSubgroup.mem_addSubgroupOf] at ha' hb'
       have e : y1 + y2 - f (a, b) = (y1 - a) + (y2 - b) := by simp only [f]; abel
@@ -225,8 +238,7 @@ theorem MovesU_of (hMv : Moves) (hID : IndexDual) : MovesU := by
     simp only [wA, wB, wU, LinearMap.coe_mk, AddHom.coe_mk, f]
     exact (semiHom V H hH Λ₁ α g1.1 _ h1 _ h2 θ z).symm
   rw [hsumU, hn]
-  have hA' : ((Λ₀ ⊓ A).relIndex (Λ₁ ⊓ A) : ℝ) = SA.card := by
-    rw [hSAc, relIndex_addSubgroupOf_inf]
+  have hA' : ((Λ₀ ⊓ A).relIndex (Λ₁ ⊓ A) : ℝ) = SA.card := by rw [hSAc, relIndex_addSubgroupOf_inf]
   have hB' : ((Λ₁ ⊓ A).relIndex (Λ₀ ⊓ A) : ℝ) = SB.card := by
     rw [hSBc, ← hdual, relIndex_addSubgroupOf_inf]
   have hpa : (0 : ℝ) < SA.card := by rw [hSAc]; exact_mod_cast Nat.pos_of_ne_zero hfinA

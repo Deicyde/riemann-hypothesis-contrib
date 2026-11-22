@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsUnitarisab
 
 noncomputable section
 
-open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
-open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam
+  UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL ValuativeRel
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -38,18 +40,17 @@ private theorem resCard_pos : (0 : ℝ) < (resCard k : ℝ) := by
   have := Nat.card_pos (α := IsLocalRing.ResidueField 𝒪[k])
   exact_mod_cast this
 
-private theorem norm_absPow_unif (r : ℝ) :
-    ‖((absPow k (r : ℂ) (unif k) : ℂˣ) : ℂ)‖ = (resCard k : ℝ) ^ (-r) := by
+private theorem norm_absPow_unif (r : ℝ)
+    : ‖((absPow k (r : ℂ) (unif k) : ℂˣ) : ℂ)‖ = (resCard k : ℝ) ^ (-r) := by
   have hq := resCard_pos (k := k)
   rw [val_absPow, GlobalTheory.GLDoubling.nabs_unif valuation_unif,
     Complex.norm_cpow_eq_rpow_re_of_pos (inv_pos.2 hq), Complex.ofReal_re, Real.inv_rpow hq.le,
     Real.rpow_neg hq.le]
 
-private theorem linked (θ : kˣ →* ℂˣ) :
-    IsUnram (θ * (θ * absPow k 1)⁻¹) ∧
-      (((θ * (θ * absPow k 1)⁻¹) (unif k) : ℂˣ) : ℂ) = (resCard k : ℂ) := by
-  have e : θ * (θ * absPow k 1)⁻¹ = (absPow k 1)⁻¹ := by
-    rw [mul_inv, mul_inv_cancel_left]
+private theorem linked (θ : kˣ →* ℂˣ)
+    : IsUnram (θ * (θ * absPow k 1)⁻¹)
+      ∧ (((θ * (θ * absPow k 1)⁻¹) (unif k) : ℂˣ) : ℂ) = (resCard k : ℂ) := by
+  have e : θ * (θ * absPow k 1)⁻¹ = (absPow k 1)⁻¹ := by rw [mul_inv, mul_inv_cancel_left]
   rw [e]
   refine ⟨isUnram_inv (isUnram_absPow k 1), ?_⟩
   have hq : (resCard k : ℂ) ≠ 0 := by
@@ -60,25 +61,36 @@ private theorem linked (θ : kˣ →* ℂˣ) :
   push_cast
   exact inv_inv _
 
-private theorem exponent_of_unl [CharZero k] {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (GL (Fin N) k) V) (hs : IsSmooth ρ) (hi : ρ.IsIrreducible)
-    (hu : IsUnitarisable ρ) (hg : IsGeneric ρ) (S : Multiset (IrrGL (k := k))) (hS : HasSupport ρ S)
-    (h1 : ∀ y ∈ S, y.1 = 1) (hun : Unl (resCard k) S) {ξ : kˣ →* ℂˣ} (hξ : ξ ∈ chars S) :
-    ∃ e : ℝ, |e| < 1 / 2 ∧ ‖((ξ (unif k) : ℂˣ) : ℂ)‖ = (resCard k : ℝ) ^ (-e) := by
-  obtain ⟨h, δ, Δ, s, hL, hc, hb, hd, ⟨φ⟩⟩ := PositivityTheory.JsR.localExpBound_holds k N V ρ hs hi hu hg
+private theorem exponent_of_unl
+    [CharZero k]
+    {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin N) k) V)
+    (hs : IsSmooth ρ) (hi : ρ.IsIrreducible) (hu : IsUnitarisable ρ) (hg : IsGeneric ρ)
+    (S : Multiset (IrrGL (k := k)))
+    (hS : HasSupport ρ S) (h1 : ∀ y ∈ S, y.1 = 1) (hun : Unl (resCard k) S)
+    {ξ : kˣ →* ℂˣ} (hξ : ξ ∈ chars S)
+    : ∃ e : ℝ, |e| < 1 / 2 ∧ ‖((ξ (unif k) : ℂˣ) : ℂ)‖ = (resCard k : ℝ) ^ (-e) := by
+  obtain ⟨h, δ, Δ, s, hL, hc, hb, hd, ⟨φ⟩⟩ :=
+    PositivityTheory.JsR.localExpBound_holds k N V ρ hs hi hu hg
   let D : Fin h → Segment k := fun i => (Δ i).nu ((s i : ℝ) : ℂ)
-  have hL' : ∀ i, IsLSeg (D i) ((δ i).nu ((s i : ℝ) : ℂ)).rep := fun i => GlobalTheory.isLSeg_nu (hL i) _
+  have hL' : ∀ i, IsLSeg (D i) ((δ i).nu ((s i : ℝ) : ℂ)).rep := fun i =>
+    GlobalTheory.isLSeg_nu (hL i) _
   have hG : GlobalTheory.Published.GeometricLemma :=
-    GlobalTheory.geometricLemma_of_filtration GlobalTheory.Laid.bzfin_holds GlobalTheory.geometricLemmaFiltration_holds
+    GlobalTheory.geometricLemma_of_filtration GlobalTheory.Laid.bzfin_holds
+      GlobalTheory.geometricLemmaFiltration_holds
   have hs2 : HasSupport ρ (∑ i, (D i).ms) :=
-    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr (fun i => (hL' i).hasSupport) hi
-      (IsSubquotient.of_injective φ.toIntertwiningMap φ.toLinearEquiv.injective)
-  have he := GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_unique hG GlobalTheory.Laid.bzfin_holds hs2 hS
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr
+      (fun i => (hL' i).hasSupport)
+      hi (IsSubquotient.of_injective φ.toIntertwiningMap φ.toLinearEquiv.injective)
+  have he :=
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_unique hG GlobalTheory.Laid.bzfin_holds
+      hs2 hS
   obtain ⟨hξ0, hm⟩ := hξ
   obtain ⟨i, -, hi'⟩ := Multiset.mem_sum.1 (he ▸ hm)
   have hmem : ∀ a : ℕ, a < (D i).len → (D i).first.nu (a : ℂ) ∈ S := fun a ha => by
     rw [← he]
-    exact Multiset.mem_sum.2 ⟨i, Finset.mem_univ _, Segment.mem_ms.2 (Segment.mem_carrier.2 ⟨a, ha, rfl⟩)⟩
+    exact Multiset.mem_sum.2
+      ⟨i, Finset.mem_univ _, Segment.mem_ms.2 (Segment.mem_carrier.2 ⟨a, ha, rfl⟩)⟩
   have hlen : (D i).len = 1 := by
     by_contra hne
     have h2 : 1 < (D i).len := by have := (D i).len_pos; omega
@@ -88,7 +100,9 @@ private theorem exponent_of_unl [CharZero k] {N : ℕ} {V : Type} [AddCommGroup 
     rw [Nat.cast_one] at h3
     obtain ⟨θ, hθ, e⟩ := GlobalTheory.RoadU.PlainChars.exists_eq_ofChar (D i).first (h1 _ h0)
     rw [e] at h0 h3
-    have e2 : (IrrGL.ofChar θ hθ).nu 1 = IrrGL.ofChar (θ * absPow k 1) (hθ.mul (isSmoothChar_absPow _)) :=
+    have e2
+        : (IrrGL.ofChar θ hθ).nu 1
+          = IrrGL.ofChar (θ * absPow k 1) (hθ.mul (isSmoothChar_absPow _)) :=
       IrrGL.tw_ofChar _ _ _ _
     rw [e2] at h3
     exact hun θ ⟨hθ, h0⟩ _ ⟨_, h3⟩ (linked θ).1 (linked θ).2
@@ -109,7 +123,8 @@ private theorem exponent_of_unl [CharZero k] {N : ℕ} {V : Type} [AddCommGroup 
   have hlen' : (Δ i).len = 1 := hlen
   rw [hlen'] at hcen
   simp only [Nat.cast_one, sub_self, mul_zero, zero_div, neg_zero, zero_mul] at hcen
-  have hn0 : 0 < ‖(((ξ * absPow k ((-(s i) : ℝ) : ℂ)) (unif k) : ℂˣ) : ℂ)‖ := norm_pos_iff.2 (Units.ne_zero _)
+  have hn0 : 0 < ‖(((ξ * absPow k ((-(s i) : ℝ) : ℂ)) (unif k) : ℂˣ) : ℂ)‖ :=
+    norm_pos_iff.2 (Units.ne_zero _)
   have h4 : ‖(((ξ * absPow k ((-(s i) : ℝ) : ℂ)) (unif k) : ℂˣ) : ℂ)‖ = 1 := by
     rcases Real.log_eq_zero.1 hcen with h | h | h
     · exact absurd h hn0.ne'
@@ -125,8 +140,8 @@ end Loc
 
 end UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
 
-theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOf :
-    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.WinOf := by
+theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOf
+    : UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.WinOf := by
   intro K _ _ _ n hn π
   obtain ⟨π₀, t, hu, he⟩ := CG.exists_isUnitary_twist_absPow (CG.mk π) hn
   obtain ⟨π₀, rfl⟩ : ∃ p : CuspSub K n, CG.mk p = π₀ := ⟨π₀.out, Quotient.out_eq π₀⟩
@@ -157,16 +172,22 @@ theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOf :
       rw [mul_inv, mul_mul_mul_comm, mul_inv_cancel, mul_one]
     rw [e]
     exact hL s hs ξ₁ h₁ ξ₂ h₂
-  obtain ⟨e, he1, he2⟩ := exponent_of_unl σ.ρ σ.smooth σ.irred
-    (GlobalTheory.ResW.isUnitarisable_of_isLocComp_cusp K n _ hn hU v σ hσ)
-    (GlobalTheory.CuspRep.Generic.isGeneric_of_isLocComp K n _ v σ hσ) s' hsup h1 hun
-    ((hch _).2 ⟨ξ, hξ, rfl⟩)
+  obtain ⟨e, he1, he2⟩ :=
+    exponent_of_unl σ.ρ σ.smooth σ.irred
+      (GlobalTheory.ResW.isUnitarisable_of_isLocComp_cusp K n _ hn hU v σ hσ)
+      (GlobalTheory.CuspRep.Generic.isGeneric_of_isLocComp K n _ v σ hσ) s' hsup h1 hun
+      ((hch _).2 ⟨ξ, hξ, rfl⟩)
   obtain ⟨-, hav⟩ := ha v
   rw [hres, MonoidHom.mul_apply, Units.val_mul, norm_mul, hav] at he2
   have hq0 : (0 : ℝ) < (Ideal.absNorm v.asIdeal : ℝ) := by linarith
-  have hval : ‖((ξ (unif (v.adicCompletion K)) : ℂˣ) : ℂ)‖ = (Ideal.absNorm v.asIdeal : ℝ) ^ (-a - e) := by
+  have hval
+      : ‖((ξ (unif (v.adicCompletion K)) : ℂˣ) : ℂ)‖
+        = (Ideal.absNorm v.asIdeal : ℝ) ^ (-a - e) := by
     rw [sub_eq_add_neg, Real.rpow_add hq0, ← he2, Real.rpow_neg hq0.le a]
     field_simp
   obtain ⟨hl, hr⟩ := abs_lt.1 he1
   rw [hval]
-  exact ⟨Real.rpow_lt_rpow_of_exponent_lt hq1 (by linarith), Real.rpow_lt_rpow_of_exponent_lt hq1 (by linarith)⟩
+  exact ⟨
+    Real.rpow_lt_rpow_of_exponent_lt hq1 (by linarith),
+    Real.rpow_lt_rpow_of_exponent_lt hq1 (by linarith)
+  ⟩

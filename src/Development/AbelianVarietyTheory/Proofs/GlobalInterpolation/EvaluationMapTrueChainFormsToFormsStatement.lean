@@ -6,17 +6,20 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LowerT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms :
-    ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), ColIn.Ok I →
-      ∀ (l : TC.Laws I) (Z : TC.Later B (TC.cols I l)) (l0 : TC.Law0 I l)
-        (u : B.Word) (a : I.ι),
-        (∀ φ ∈ ((TC.tw I l l0 Z).fm u a).Fi B.R.m,
-          GlobalTheory.PerQ.PtT (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G) u a φ ∈
-            ((TC.tw I l l0 Z).fm u a).ptC) ∧
-        ((_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G).fm u).SgInterlace := by
+theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      ColIn.Ok I
+        → ∀ (l : TC.Laws I) (Z : TC.Later B (TC.cols I l)) (l0 : TC.Law0 I l) (u : B.Word)
+            (a : I.ι),
+          (∀ φ ∈ ((TC.tw I l l0 Z).fm u a).Fi B.R.m,
+              GlobalTheory.PerQ.PtT (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G) u a φ
+                ∈ ((TC.tw I l l0 Z).fm u a).ptC)
+            ∧ ((_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G).fm u).SgInterlace := by
   intro B X I _ l Z l0 u a
   have hs : ∀ τ, (TC.perIn I u a).sg τ = (RowPar.of (B.hcW u τ)).sg := fun τ =>
     congrArg RowPar.sg (B.wts_isOk.hc_row u τ).symm
@@ -24,16 +27,20 @@ theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms :
   refine ⟨?_, ?_⟩
   · intro φ hφ
     let M := TC.fm I l u a
-    have latticeImage : ∀ x ∈ (M.lat B.R.m).L, ∃ y, M.ptEmb y =
-        (TC.per I l u a).lowerMap ((TC.per I l u a).evz (M.emb B.R.m x)) := by
+    have latticeImage
+        : ∀ x ∈ (M.lat B.R.m).L, ∃ y,
+          M.ptEmb y = (TC.per I l u a).lowerMap ((TC.per I l u a).evz (M.emb B.R.m x)) := by
       intro x hx
-      obtain ⟨y, -, hy⟩ := GlobalTheory.LvT.BuiltChain.exists_image (Q := TC.perIn I u a)
-        B.fields.emb B.embLL (B.hcW u) GlobalTheory.LvT.BuiltChain.branching_ok
-        (l.ch u a) (l.per u a) (fun τ => (hW τ).1) (fun τ => (hW τ).2)
-        ((l.fmL u a).fam B.R.m) (l.fmL u a).famP x hx
+      obtain ⟨y, -, hy⟩ :=
+        GlobalTheory.LvT.BuiltChain.exists_image (Q := TC.perIn I u a) B.fields.emb B.embLL
+          (B.hcW u) GlobalTheory.LvT.BuiltChain.branching_ok (l.ch u a) (l.per u a)
+          (fun τ => (hW τ).1)
+          (fun τ => (hW τ).2)
+          ((l.fmL u a).fam B.R.m) (l.fmL u a).famP x hx
       exact ⟨y, hy⟩
-    have rationalImage : ∀ x, ∃ y, M.ptEmb y =
-        (TC.per I l u a).lowerMap ((TC.per I l u a).evz (M.emb B.R.m x)) := by
+    have rationalImage
+        : ∀ x, ∃ y,
+          M.ptEmb y = (TC.per I l u a).lowerMap ((TC.per I l u a).evz (M.emb B.R.m x)) := by
       intro x
       have hx : x ∈ Submodule.span B.LL ((M.lat B.R.m).L : Set (M.lat B.R.m).V) := by
         rw [(M.lat_good B.R.m).2.2]
@@ -58,8 +65,9 @@ theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms :
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨c, rfl⟩)
     have hφ' : φ ∈ M.Fi B.R.m := hφ
     rw [← (M.emb_basis B.R.m).2] at hφ'
-    have hle : Submodule.span ℂ (Set.range fun c => M.emb B.R.m ((M.lat B.R.m).b c)) ≤
-        M.ptC.comap ((TC.per I l u a).lowerMap ∘ₗ (TC.per I l u a).evz) := by
+    have hle
+        : Submodule.span ℂ (Set.range fun c => M.emb B.R.m ((M.lat B.R.m).b c))
+          ≤ M.ptC.comap ((TC.per I l u a).lowerMap ∘ₗ (TC.per I l u a).evz) := by
       rw [Submodule.span_le]
       rintro _ ⟨c, rfl⟩
       obtain ⟨y, hy⟩ := rationalImage ((M.lat B.R.m).b c)
@@ -70,11 +78,13 @@ theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms :
   · intro τ i
     obtain ⟨ha, hb⟩ := (hW τ).1 i
     simp only [Br.aBr, Br.bBr, Br.iS, Br.iC, PerIn.sgT, GlobalTheory.Mem.Col2.lamT,
-      GlobalTheory.Mem.Col2.shW] at ha hb
+        GlobalTheory.Mem.Col2.shW]
+      at ha hb
     constructor
     · show (B.wts.sgW τ).w i ≤ (Examples₂.lamOf (B.hcW u τ) B.R.m).w ⟨i.1, _⟩
       change 0 ≤ (Examples₂.lamOf (B.hcW u τ) B.R.m).w ⟨i.1, _⟩ + _ - ((B.wts.sgW τ).w i + _) at hb
       linarith
     · show (Examples₂.lamOf (B.hcW u τ) B.R.m).w ⟨i.1 + 1, _⟩ ≤ (B.wts.sgW τ).w i
-      change 0 ≤ (B.wts.sgW τ).w i + _ - ((Examples₂.lamOf (B.hcW u τ) B.R.m).w ⟨i.1 + 1, _⟩ + _) at ha
+      change 0 ≤ (B.wts.sgW τ).w i + _ - ((Examples₂.lamOf (B.hcW u τ) B.R.m).w ⟨i.1 + 1, _⟩ + _)
+        at ha
       linarith

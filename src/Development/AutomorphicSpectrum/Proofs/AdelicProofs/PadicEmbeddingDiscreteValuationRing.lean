@@ -14,8 +14,7 @@ open NumberField IsDedekindDomain
 
 variable {K : Type} [Field K] [NumberField K] {p : Nat.Primes} (j : K →+* ℂ_[p])
 
-theorem norm_natCast_padicComplex (p : Nat.Primes) (n : ℕ) :
-    ‖(n : ℂ_[p])‖ = ‖(n : ℚ_[p])‖ := by
+theorem norm_natCast_padicComplex (p : Nat.Primes) (n : ℕ) : ‖(n : ℂ_[p])‖ = ‖(n : ℚ_[p])‖ := by
   have h := PadicComplex.norm_extends' (p : ℕ) (n : ℚ_[p])
   simpa using h
 
@@ -29,8 +28,7 @@ def unitBall : ValuationSubring K where
     simp only [Set.mem_setOf_eq, map_add (f := _)] at *
     exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha hb)
   zero_mem' := by simp
-  neg_mem' := fun {a} ha => by
-    simpa using ha
+  neg_mem' := fun {a} ha => by simpa using ha
   mem_or_inv_mem' := fun a => by
     simp only [Subring.mem_mk, Subsemiring.mem_mk, Submonoid.mem_mk, Subsemigroup.mem_mk,
       Set.mem_setOf_eq, map_inv₀, norm_inv]
@@ -87,22 +85,18 @@ theorem primeBelow_ne_bot : primeBelow j ≠ ⊥ := by
 
 def place : HeightOneSpectrum (𝓞 K) := ⟨primeBelow j, primeBelow_isPrime j, primeBelow_ne_bot j⟩
 
-theorem norm_le_one_of_valuation_le_one {y : K} (hy : (place j).valuation K y ≤ 1) :
-    ‖j y‖ ≤ 1 := by
+theorem norm_le_one_of_valuation_le_one {y : K} (hy : (place j).valuation K y ≤ 1) : ‖j y‖ ≤ 1 := by
   obtain ⟨n, d, h⟩ := (place j).exists_primeCompl_mul_eq_of_integer y hy
-  have hd : ‖j ((d : 𝓞 K) : K)‖ = 1 :=
-    le_antisymm (norm_integer_le_one j _) (not_lt.1 d.2)
+  have hd : ‖j ((d : 𝓞 K) : K)‖ = 1 := le_antisymm (norm_integer_le_one j _) (not_lt.1 d.2)
   have h2 := congrArg (fun t => ‖j t‖) h
   simp only [map_mul, norm_mul] at h2
   change ‖j y‖ * ‖j ((d : 𝓞 K) : K)‖ = ‖j (n : K)‖ at h2
   rw [hd, mul_one] at h2
   exact h2.le.trans (norm_integer_le_one j n)
 
-theorem norm_lt_one_of_valuation_lt_one {y : K} (hy : (place j).valuation K y < 1) :
-    ‖j y‖ < 1 := by
+theorem norm_lt_one_of_valuation_lt_one {y : K} (hy : (place j).valuation K y < 1) : ‖j y‖ < 1 := by
   obtain ⟨n, d, h⟩ := (place j).exists_primeCompl_mul_eq_of_integer y hy.le
-  have hd : ‖j ((d : 𝓞 K) : K)‖ = 1 :=
-    le_antisymm (norm_integer_le_one j _) (not_lt.1 d.2)
+  have hd : ‖j ((d : 𝓞 K) : K)‖ = 1 := le_antisymm (norm_integer_le_one j _) (not_lt.1 d.2)
   have hdv : (place j).valuation K ((d : 𝓞 K) : K) = 1 := by
     have := ((place j).intValuation_eq_one_iff_mem_primeCompl (d : 𝓞 K)).2 d.2
     rw [← (place j).valuation_of_algebraMap (K := K)] at this
@@ -110,8 +104,9 @@ theorem norm_lt_one_of_valuation_lt_one {y : K} (hy : (place j).valuation K y < 
   have hn : (place j).valuation K (n : K) < 1 := by
     have h3 := congrArg ((place j).valuation K) h
     rw [map_mul] at h3
-    change (place j).valuation K y * (place j).valuation K ((d : 𝓞 K) : K) =
-      (place j).valuation K (n : K) at h3
+    change (place j).valuation K y * (place j).valuation K ((d : 𝓞 K) : K)
+        = (place j).valuation K (n : K)
+      at h3
     rw [hdv, mul_one] at h3
     exact h3 ▸ hy
   have hn' : n ∈ primeBelow j := ((place j).valuation_lt_one_iff_mem (K := K) n).1 hn
@@ -138,10 +133,11 @@ theorem unitBall_eq : unitBall j = ((place j).valuation K).valuationSubring := b
   have h3 : 0 < ‖j y‖ := norm_pos_iff.2 ((map_ne_zero j).2 hy)
   exact absurd ((one_le_inv₀ h3).2 h) (not_le.2 h2)
 
-theorem exists_dvr_of_padic_embedding : ∀ (K : Type) [Field K] [NumberField K] (p : Nat.Primes)
-    (j : K →+* ℂ_[p]), ∃ (V : ValuationSubring K), IsDiscreteValuationRing V ∧
-      (∀ a : K, ‖j a‖ ≤ 1 ↔ a ∈ V) ∧ (∀ a : 𝓞 K, (a : K) ∈ V) ∧
-      ∀ n : ℕ, ¬ (p : ℕ) ∣ n → ‖j (n : K)‖ = 1 := by
+theorem exists_dvr_of_padic_embedding
+    : ∀ (K : Type) [Field K] [NumberField K] (p : Nat.Primes) (j : K →+* ℂ_[p]),
+      ∃ (V : ValuationSubring K),
+        IsDiscreteValuationRing V ∧ (∀ a : K, ‖j a‖ ≤ 1 ↔ a ∈ V) ∧ (∀ a : 𝓞 K, (a : K) ∈ V)
+          ∧ ∀ n : ℕ, ¬ (p : ℕ) ∣ n → ‖j (n : K)‖ = 1 := by
   intro K _ _ p j
   refine ⟨unitBall j, ?_, fun a => Iff.rfl, integer_mem_unitBall j, fun n hn => ?_⟩
   · rw [unitBall_eq]

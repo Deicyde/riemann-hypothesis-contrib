@@ -37,16 +37,18 @@ theorem dI_ne_bot (b : F) : dI b ≠ ⊥ := by
   rw [h, Ideal.mem_bot] at hmem
   exact nonZeroDivisors.coe_ne_zero s hmem
 
-theorem fibre_bound (N : ℕ) (hN : 0 < N) (s : Set F)
-    (hs : ∀ b ∈ s, ∀ b' ∈ s, (∃ r : 𝓞 F, b - b' = (N : F) * (r : F)) → b = b')
-    (I : Ideal (𝓞 F)) (hI : I ≠ ⊥) :
-    Finite {b : s // dI (b : F) = I} ∧
-      Nat.card {b : s // dI (b : F) = I} ≤ N ^ Module.finrank ℤ (𝓞 F) * Ideal.absNorm I := by
+theorem fibre_bound
+    (N : ℕ) (hN : 0 < N)
+    (s : Set F) (hs : ∀ b ∈ s, ∀ b' ∈ s, (∃ r : 𝓞 F, b - b' = (N : F) * (r : F)) → b = b')
+    (I : Ideal (𝓞 F)) (hI : I ≠ ⊥)
+    : Finite {b : s // dI (b : F) = I}
+      ∧ Nat.card {b : s // dI (b : F) = I} ≤ N ^ Module.finrank ℤ (𝓞 F) * Ideal.absNorm I := by
   classical
   obtain ⟨a, ha_def⟩ : ∃ a : ℕ, a = Ideal.absNorm I := ⟨_, rfl⟩
   have ha0 : a ≠ 0 := by rw [ha_def, Ne, Ideal.absNorm_eq_zero_iff]; exact hI
   have haI : (a : 𝓞 F) ∈ I := by rw [ha_def]; exact Ideal.absNorm_mem I
-  obtain ⟨C, hC⟩ : I ∣ Ideal.span {(a : 𝓞 F)} := Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem I).mpr haI)
+  obtain ⟨C, hC⟩ : I ∣ Ideal.span {(a : 𝓞 F)} :=
+    Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem I).mpr haI)
   have hspan_ne : Ideal.span {(a : 𝓞 F)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast ha0
   have hC0 : C ≠ ⊥ := by
@@ -90,13 +92,14 @@ theorem fibre_bound (N : ℕ) (hN : 0 < N) (s : Set F)
       push_cast
       exact C.mul_mem_right _ haC
     exact hle hx
-  let Φ : {b : s // dI (b : F) = I} → K ⧸ H.addSubgroupOf K := fun b => QuotientAddGroup.mk ⟨t b, htC b⟩
+  let Φ : {b : s // dI (b : F) = I} → K ⧸ H.addSubgroupOf K := fun b =>
+    QuotientAddGroup.mk ⟨t b, htC b⟩
   have hΦ : Function.Injective Φ := by
     intro b b' hbb
     have hmem := QuotientAddGroup.eq.mp hbb
     rw [AddSubgroup.mem_addSubgroupOf] at hmem
     obtain ⟨r, hr⟩ := Ideal.mem_span_singleton'.mp hmem
-    have hr' : r * ((a * N : ℕ) : 𝓞 F) = -t b + t b' := by simpa using hr
+    have hr' : r * ((a * N : ℕ) : 𝓞 F) = - t b + t b' := by simpa using hr
     have h1 := congrArg (algebraMap (𝓞 F) F) hr'
     have htb : algebraMap (𝓞 F) F (t b) = (a : F) * ((b.1 : s) : F) := ht b
     have htb' : algebraMap (𝓞 F) F (t b') = (a : F) * ((b'.1 : s) : F) := ht b'
@@ -119,9 +122,11 @@ theorem fibre_bound (N : ℕ) (hN : 0 < N) (s : Set F)
     have h1 := AddSubgroup.relIndex_mul_index hHK
     have hKi : K.index = Ideal.absNorm C := by rw [Ideal.absNorm_apply]; rfl
     have hHi : H.index = (a * N) ^ Module.finrank ℤ (𝓞 F) := by
-      have h3 : H.index = Ideal.absNorm (Ideal.span {((a * N : ℕ) : 𝓞 F)}) := by rw [Ideal.absNorm_apply]; rfl
+      have h3 : H.index = Ideal.absNorm (Ideal.span {((a * N : ℕ) : 𝓞 F)}) := by
+        rw [Ideal.absNorm_apply]; rfl
       rw [h3, hnormNat]
-    have hmul : Ideal.absNorm (Ideal.span {(a : 𝓞 F)}) = a * Ideal.absNorm C := by rw [hC, map_mul, ha_def]
+    have hmul : Ideal.absNorm (Ideal.span {(a : 𝓞 F)}) = a * Ideal.absNorm C := by
+      rw [hC, map_mul, ha_def]
     have hC0' : Ideal.absNorm C ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
     rw [hKi, hHi] at h1
     apply Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hC0')
@@ -132,13 +137,22 @@ theorem fibre_bound (N : ℕ) (hN : 0 < N) (s : Set F)
     rw [hrel]
     exact Nat.mul_ne_zero (pow_ne_zero _ hN.ne') ha0)
   refine ⟨Finite.of_injective Φ hΦ, ?_⟩
-  calc Nat.card {b : s // dI (b : F) = I} ≤ Nat.card (K ⧸ H.addSubgroupOf K) := Nat.card_le_card_of_injective Φ hΦ
+  calc
+    Nat.card {b : s // dI (b : F) = I}
+      ≤ Nat.card (K ⧸ H.addSubgroupOf K) := Nat.card_le_card_of_injective Φ hΦ
     _ = N ^ Module.finrank ℤ (𝓞 F) * Ideal.absNorm I := by
       show H.relIndex K = _
       rw [hrel, ha_def]
 
-theorem summable_den :
-    ∀ (F : Type) [Field F] [NumberField F], ∀ M : ℕ, 3 ≤ M → ∀ N : ℕ, 0 < N → (∀ (b : F) (r : 𝓞 F), den (b + (r : F)) = den b) ∧ (∀ b : F, 0 < den b) ∧ ∀ s : Set F, (∀ b ∈ s, ∀ b' ∈ s, (∃ r : 𝓞 F, b - b' = (N : F) * (r : F)) → b = b') → Summable fun b : s => ((den (b : F) : ℝ) ^ M)⁻¹ := by
+theorem summable_den
+    : ∀ (F : Type) [Field F] [NumberField F], ∀ M : ℕ,
+      3 ≤ M
+        → ∀ N : ℕ,
+          0 < N
+            → (∀ (b : F) (r : 𝓞 F), den (b + (r : F)) = den b) ∧ (∀ b : F, 0 < den b)
+              ∧ ∀ s : Set F,
+                (∀ b ∈ s, ∀ b' ∈ s, (∃ r : 𝓞 F, b - b' = (N : F) * (r : F)) → b = b')
+                  → Summable fun b : s => ((den (b : F) : ℝ) ^ M)⁻¹ := by
   intro F _ _ M hM N hN
   refine ⟨fun b r => by rw [den_eq, den_eq, dI_add], fun b => ?_, fun s hs => ?_⟩
   · rw [den_eq]
@@ -154,38 +168,47 @@ theorem summable_den :
     let f : s → ℝ := fun b => ((den (b : F) : ℝ) ^ M)⁻¹
     show Summable f
     rw [← (Equiv.sigmaFiberEquiv (fun b : s => dI (b : F))).summable_iff]
-    refine (summable_sigma_of_nonneg (fun _ => by simp only [Function.comp, f]; positivity)).mpr ⟨fun I => ?_, ?_⟩
+    refine (summable_sigma_of_nonneg (fun _ => by simp only [Function.comp, f]; positivity)).mpr
+      ⟨fun I => ?_, ?_⟩
     · haveI := hfin I
       exact Summable.of_finite
-    · refine Summable.of_nonneg_of_le (fun I => tsum_nonneg (fun _ => by simp only [Function.comp, f]; positivity)) (fun I => ?_)
+    · refine Summable.of_nonneg_of_le
+        (fun I => tsum_nonneg (fun _ => by simp only [Function.comp, f]; positivity))
+        (fun I => ?_)
         (hsum2.mul_left ((N : ℝ) ^ Module.finrank ℤ (𝓞 F)))
       by_cases hI : I = ⊥
       · subst hI
         haveI : IsEmpty {b : s // dI (b : F) = ⊥} := ⟨fun b => dI_ne_bot _ b.2⟩
         rw [tsum_empty]
         positivity
-      · have hterm : ∀ y : {b : s // dI (b : F) = I},
-            (f ∘ ⇑(Equiv.sigmaFiberEquiv fun b : s => dI (b : F))) ⟨I, y⟩ = ((Ideal.absNorm I : ℝ) ^ M)⁻¹ := by
+      · have hterm
+            : ∀ y : {b : s // dI (b : F) = I},
+              (f ∘ ⇑(Equiv.sigmaFiberEquiv fun b : s => dI (b : F))) ⟨I, y⟩
+                = ((Ideal.absNorm I : ℝ) ^ M)⁻¹ := by
           rintro ⟨b, hb⟩
           simp [f, den_eq, hb]
         rw [tsum_congr hterm, tsum_const, nsmul_eq_mul]
         have hc := (fibre_bound N hN s hs I hI).2
         have hn1 : (1 : ℝ) ≤ Ideal.absNorm I := by
           exact_mod_cast Nat.one_le_iff_ne_zero.mpr (by rwa [Ne, Ideal.absNorm_eq_zero_iff])
-        calc (Nat.card {b : s // dI (b : F) = I} : ℝ) * ((Ideal.absNorm I : ℝ) ^ M)⁻¹
-            ≤ ((N : ℝ) ^ Module.finrank ℤ (𝓞 F) * Ideal.absNorm I) * ((Ideal.absNorm I : ℝ) ^ M)⁻¹ := by
-              gcongr
-              exact_mod_cast hc
-          _ ≤ (N : ℝ) ^ Module.finrank ℤ (𝓞 F) * (Ideal.absNorm I : ℝ) ^ (-(2:ℝ)) := by
-              rw [Real.rpow_neg (by positivity), mul_assoc]
-              gcongr
-              rw [show (2:ℝ) = ((2:ℕ):ℝ) by norm_num, Real.rpow_natCast]
-              have ha : (0:ℝ) < Ideal.absNorm I := by linarith
-              have hM1 : (Ideal.absNorm I : ℝ) ^ M = (Ideal.absNorm I : ℝ) * (Ideal.absNorm I : ℝ) ^ (M - 1) := by
-                rw [← pow_succ']
-                congr 1
-                omega
-              rw [hM1, mul_inv, ← mul_assoc, mul_inv_cancel₀ ha.ne', one_mul]
-              exact inv_anti₀ (by positivity) (pow_le_pow_right₀ hn1 (by omega))
+        calc
+          (Nat.card {b : s // dI (b : F) = I} : ℝ) * ((Ideal.absNorm I : ℝ) ^ M)⁻¹
+              ≤ ((N : ℝ) ^ Module.finrank ℤ (𝓞 F) * Ideal.absNorm I)
+                * ((Ideal.absNorm I : ℝ) ^ M)⁻¹ := by
+            gcongr
+            exact_mod_cast hc
+          _ ≤ (N : ℝ) ^ Module.finrank ℤ (𝓞 F) * (Ideal.absNorm I : ℝ) ^ (-(2 : ℝ)) := by
+            rw [Real.rpow_neg (by positivity), mul_assoc]
+            gcongr
+            rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
+            have ha : (0 : ℝ) < Ideal.absNorm I := by linarith
+            have hM1
+                : (Ideal.absNorm I : ℝ) ^ M
+                  = (Ideal.absNorm I : ℝ) * (Ideal.absNorm I : ℝ) ^ (M - 1) := by
+              rw [← pow_succ']
+              congr 1
+              omega
+            rw [hM1, mul_inv, ← mul_assoc, mul_inv_cancel₀ ha.ne', one_mul]
+            exact inv_anti₀ (by positivity) (pow_le_pow_right₀ hn1 (by omega))
 
 end GlobalTheory.CompanionTheory.SW.DenSum

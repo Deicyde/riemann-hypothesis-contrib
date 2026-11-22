@@ -10,10 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem finTw_lc {Γ R : Type} [TopologicalSpace Γ] {n : ℕ} (f : Γ → Matrix (Fin n) (Fin n) R)
-    (h : ∀ i j, IsLocallyConstant fun g => f g i j) : IsLocallyConstant f := by
+private theorem finTw_lc
+    {Γ R : Type} [TopologicalSpace Γ]
+    {n : ℕ} (f : Γ → Matrix (Fin n) (Fin n) R) (h : ∀ i j, IsLocallyConstant fun g => f g i j)
+    : IsLocallyConstant f := by
   have hs : ∀ i j, ∀ x, ∀ᶠ y in nhds x, f y i j = f x i j := fun i j =>
     (IsLocallyConstant.iff_eventually_eq _).1 (h i j)
   refine (IsLocallyConstant.iff_eventually_eq _).2 fun x => ?_
@@ -24,8 +27,10 @@ private theorem finTw_lc {Γ R : Type} [TopologicalSpace Γ] {n : ℕ} (f : Γ �
   ext i j
   exact hy i j
 
-theorem UpperTheory.V.Pa.finTw :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (n : ℕ) (x : NP G0.frame n) (k : Kap x) (m : ℕ), PhiCond G0.Γ l → (TwZ k (x.Am m)).Finite := by
+theorem UpperTheory.V.Pa.finTw
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (n : ℕ) (x : NP G0.frame n) (k : Kap x)
+        (m : ℕ),
+      PhiCond G0.Γ l → (TwZ k (x.Am m)).Finite := by
   intro l _ L G0 n x k m hΦ
   obtain ⟨_, _, hfinR, _, hlR, _, htR, _, _⟩ := finAm l G0.frame n x m k.g
   let χ : G0.Γ →* x.A := (algebraMap ℤ_[l] x.A).toMonoidHom.comp ((Units.coeHom ℤ_[l]).comp G0.ε)
@@ -39,13 +44,18 @@ theorem UpperTheory.V.Pa.finTw :
     apply Subtype.ext
     funext i j
     simp [hlR]
-  have finite_addMonoidHom_zmod_of_finite (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Finite M] :
-      Finite (M →+ ZMod l) := by
+  have finite_addMonoidHom_zmod_of_finite
+      (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Finite M]
+      : Finite (M →+ ZMod l) := by
     haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
     exact Finite.of_injective (fun f : M →+ ZMod l => (f : M → ZMod l)) DFunLike.coe_injective
-  
-  have eq_zero_of_forall_hom_zmod_eq_zero_of_l_smul (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] (hl : ∀ m : M, l • m = 0)
-      (m : M) (h : ∀ f : M →+ ZMod l, f m = 0) : m = 0 := by
+
+  have eq_zero_of_forall_hom_zmod_eq_zero_of_l_smul
+      (l : ℕ) [Fact l.Prime]
+      (M : Type) [AddCommGroup M]
+      (hl : ∀ m : M, l • m = 0)
+      (m : M) (h : ∀ f : M →+ ZMod l, f m = 0)
+      : m = 0 := by
     letI : Module (ZMod l) M := AddCommGroup.zmodModule hl
     let b := Module.Basis.ofVectorSpace (ZMod l) M
     apply b.repr.injective
@@ -53,23 +63,28 @@ theorem UpperTheory.V.Pa.finTw :
     have := h (b.coord i).toAddMonoidHom
     rw [LinearEquiv.map_zero, Finsupp.coe_zero, Pi.zero_apply]
     simpa using this
-  have finZ_local : ∀ (l : ℕ) [Fact l.Prime] (R Γ M : Type) [CommRing R] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [AddCommGroup M] [Module R M] [Finite M] (ρ : Representation R Γ M), PhiCond Γ l → LC ρ → (∀ m : M, l • m = 0) → Finite (Zl ρ) := by
+  have finZ_local
+      : ∀ (l : ℕ) [Fact l.Prime] (R Γ M : Type) [CommRing R] [Group Γ] [TopologicalSpace Γ]
+          [IsTopologicalGroup Γ] [CompactSpace Γ] [AddCommGroup M] [Module R M] [Finite M]
+          (ρ : Representation R Γ M),
+        PhiCond Γ l → LC ρ → (∀ m : M, l • m = 0) → Finite (Zl ρ) := by
     intro l _ R Γ M _ _ _ _ _ _ _ _ ρ hΦ hρ hl
-    let N : Subgroup Γ :=
-      { carrier := {g | ∀ m, ρ g m = m}
-        mul_mem' := by
-          intro a b ha hb m
-          simp only [Set.mem_setOf_eq] at ha hb
-          rw [map_mul, Module.End.mul_apply, hb, ha]
-        one_mem' := by
-          intro m
-          simp
-        inv_mem' := by
-          intro a ha m
-          simp only [Set.mem_setOf_eq] at ha
-          have h1 := ha (ρ a⁻¹ m)
-          rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply] at h1
-          exact h1.symm }
+    let N : Subgroup Γ := {
+      carrier := {g | ∀ m, ρ g m = m}
+      mul_mem' := by
+        intro a b ha hb m
+        simp only [Set.mem_setOf_eq] at ha hb
+        rw [map_mul, Module.End.mul_apply, hb, ha]
+      one_mem' := by
+        intro m
+        simp
+      inv_mem' := by
+        intro a ha m
+        simp only [Set.mem_setOf_eq] at ha
+        have h1 := ha (ρ a⁻¹ m)
+        rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply] at h1
+        exact h1.symm
+    }
     have hN : IsOpen (N : Set Γ) := by
       have hset : (N : Set Γ) = ⋂ m : M, (fun g => ρ g m) ⁻¹' {m} := by
         ext g
@@ -87,10 +102,12 @@ theorem UpperTheory.V.Pa.finTw :
       intro z hz a b ha
       rw [((mem_Zl ρ).1 hz).2, ha]
     refine Finite.of_injective
-      (β := (Γ ⧸ N → M) × ((M →+ ZMod l) →
-        {φ : N →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set N)}))
-      (fun z => (fun q => z.1 q.out, fun f =>
-        ⟨⟨⟨fun k => Multiplicative.ofAdd (f (z.1 k)), ?_⟩, ?_⟩, ?_⟩)) ?_
+      (β :=
+        (Γ ⧸ N → M)
+          × ((M →+ ZMod l) → {φ : N →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set N)}))
+      (fun z =>
+        (fun q => z.1 q.out, fun f => ⟨⟨⟨fun k => Multiplicative.ofAdd (f (z.1 k)), ?_⟩, ?_⟩, ?_⟩))
+      ?_
     · show Multiplicative.ofAdd (f (z.1 ((1 : N) : Γ))) = 1
       rw [Subgroup.coe_one, z1 _ z.2, map_zero, ofAdd_zero]
     · intro k k'
@@ -110,8 +127,11 @@ theorem UpperTheory.V.Pa.finTw :
         intro k
         have hf : ∀ f : M →+ ZMod l, f (z.1 k - z'.1 k) = 0 := by
           intro f
-          have h3 := congrArg (fun ψ : {φ : N →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set N)} =>
-            Multiplicative.toAdd (ψ.1 k)) (congrFun h2 f)
+          have h3 :=
+            congrArg
+              (fun ψ : {φ : N →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set N)} =>
+                Multiplicative.toAdd (ψ.1 k))
+              (congrFun h2 f)
           simp only [MonoidHom.coe_mk, OneHom.coe_mk, toAdd_ofAdd] at h3
           rw [map_sub, h3, sub_self]
         exact sub_eq_zero.1 (eq_zero_of_forall_hom_zmod_eq_zero_of_l_smul l M hl _ hf)
@@ -122,9 +142,12 @@ theorem UpperTheory.V.Pa.finTw :
       have h1' : z.1 (QuotientGroup.mk g : Γ ⧸ N).out = z'.1 (QuotientGroup.mk g : Γ ⧸ N).out :=
         congrFun h1 (QuotientGroup.mk g)
       rw [hg, ((mem_Zl ρ).1 z.2).2, ((mem_Zl ρ).1 z'.2).2, key, h1']
-  have hfin := finZ_local l x.A G0.Γ (pairedDualFirstOrderDualMatrixSpace n x.A (x.Am m) k.g x.a) rep hΦ hLCrep hl
-  have key : ∀ z ∈ TwZ k (x.Am m), ∃ y ∈ Zl rep, y G0.c = 0 ∧
-      ∀ g : G0.frame.G₀, (y (g : G0.Γ) : Matrix _ _ _) = z g := by
+  have hfin :=
+    finZ_local l x.A G0.Γ (pairedDualFirstOrderDualMatrixSpace n x.A (x.Am m) k.g x.a) rep hΦ hLCrep
+      hl
+  have key
+      : ∀ z ∈ TwZ k (x.Am m), ∃ y ∈ Zl rep,
+        y G0.c = 0 ∧ ∀ g : G0.frame.G₀, (y (g : G0.Γ) : Matrix _ _ _) = z g := by
     intro z hz
     obtain ⟨h1, h2, h3, h4⟩ := hz
     refine (polZ l G0.frame x.A (DD (x.Am m) k.g) n _ _ _ rep hrep).1 z h1 ?_ h3 h4

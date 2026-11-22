@@ -11,18 +11,17 @@ namespace HDiscVal
 
 open IsDedekindDomain WithZero ValPl
 
-variable {O F L : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F]
-  [Algebra O F] [IsFractionRing O F] [Field L] [Algebra F L] [FiniteDimensional F L]
-  [Algebra.IsSeparable F L] [Algebra O L] [IsScalarTower O F L]
-  [IsDedekindDomain (integralClosure O L)] [IsFractionRing (integralClosure O L) L]
-
+variable
+  {O F L : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F] [Algebra O F]
+  [IsFractionRing O F] [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L]
+  [Algebra O L] [IsScalarTower O F L] [IsDedekindDomain (integralClosure O L)]
+  [IsFractionRing (integralClosure O L) L]
 
 variable (O F) in
 include F in
-theorem addv_eq_of_mem {w : AddValuation L (WithTop ℤ)} (hw : w ∈ PlacesOver O L) :
-    ∃ v : HeightOneSpectrum (integralClosure O L), w = addv L v := by
-  have hnonneg (s : integralClosure O L) :
-      0 ≤ w (algebraMap (integralClosure O L) L s) := by
+theorem addv_eq_of_mem {w : AddValuation L (WithTop ℤ)} (hw : w ∈ PlacesOver O L)
+    : ∃ v : HeightOneSpectrum (integralClosure O L), w = addv L v := by
+  have hnonneg (s : integralClosure O L) : 0 ≤ w (algebraMap (integralClosure O L) L s) := by
     letI : Algebra O (vRing w) :=
       ((algebraMap O L).codRestrict (vRing w) (fun x => (hw.2 x).1)).toAlgebra
     haveI : IsScalarTower O (vRing w) L := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
@@ -35,14 +34,13 @@ theorem addv_eq_of_mem {w : AddValuation L (WithTop ℤ)} (hw : w ∈ PlacesOver
     (algebraMap (integralClosure O L) L).codRestrict _ hnonneg
   let Q := (IsLocalRing.maximalIdeal (vRing w)).comap f
   have hprime : Q.IsPrime := Ideal.IsPrime.comap f
-  have hmem (s : integralClosure O L) :
-      0 < w (algebraMap (integralClosure O L) L s) ↔ s ∈ Q := by
+  have hmem (s : integralClosure O L) : 0 < w (algebraMap (integralClosure O L) L s) ↔ s ∈ Q := by
     change _ ↔ f s ∈ IsLocalRing.maximalIdeal (vRing w)
     exact (Valuation.mem_maximalIdeal_iff L w (a := f s)).symm
   have hne : Q ≠ ⊥ := by
     intro hQ
-    have hzero (s : integralClosure O L) (hs : s ≠ 0) :
-        w (algebraMap (integralClosure O L) L s) = 0 := by
+    have hzero (s : integralClosure O L) (hs : s ≠ 0)
+        : w (algebraMap (integralClosure O L) L s) = 0 := by
       refine le_antisymm (le_of_not_gt fun h => hs ?_) (hnonneg s)
       have hsQ := (hmem s).1 h
       rwa [hQ, Ideal.mem_bot] at hsQ
@@ -60,8 +58,8 @@ theorem addv_eq_of_mem {w : AddValuation L (WithTop ℤ)} (hw : w ∈ PlacesOver
 variable (O F) in
 include F in
 theorem addv_mem (v : HeightOneSpectrum (integralClosure O L)) : addv L v ∈ PlacesOver O L := by
-  have hval : ∀ y : L, y ≠ 0 →
-      addv L v y = ((-WithZero.log (v.valuation L y) : ℤ) : WithTop ℤ) := by
+  have hval
+      : ∀ y : L, y ≠ 0 → addv L v y = ((- WithZero.log (v.valuation L y) : ℤ) : WithTop ℤ) := by
     intro y hy
     unfold addv
     rw [AddValuation.of_apply, if_neg hy]
@@ -69,9 +67,9 @@ theorem addv_mem (v : HeightOneSpectrum (integralClosure O L)) : addv L v ∈ Pl
     haveI := v.isMaximal
     apply IsLocalRing.eq_maximalIdeal
     first
-      | exact Ideal.isMaximal_comap_of_isIntegral_of_isMaximal v.asIdeal
-      | exact Ideal.IsMaximal.under O v.asIdeal
-      | infer_instance
+    | exact Ideal.isMaximal_comap_of_isIntegral_of_isMaximal v.asIdeal
+    | exact Ideal.IsMaximal.under O v.asIdeal
+    | infer_instance
   simp only [PlacesOver, IsNormDiscrete, Set.mem_setOf_eq]
   refine ⟨⟨fun a ha => ?_, ?_⟩, fun x => ?_⟩
   · rw [hval a ha]
@@ -83,11 +81,10 @@ theorem addv_mem (v : HeightOneSpectrum (integralClosure O L)) : addv L v ∈ Pl
       exact absurd hπ.symm (by simp)
     refine ⟨π, ?_⟩
     rw [hval π hπ0, hπ]
-    first
-      | simp
-      | rfl
-  · have hx : algebraMap O L x =
-        algebraMap (integralClosure O L) L (algebraMap O (integralClosure O L) x) :=
+    first | simp | rfl
+  · have hx
+        : algebraMap O L x
+          = algebraMap (integralClosure O L) L (algebraMap O (integralClosure O L) x) :=
       IsScalarTower.algebraMap_apply O (integralClosure O L) L x
     by_cases hx0 : algebraMap O L x = 0
     · have hx00 : x = 0 := by
@@ -103,40 +100,36 @@ theorem addv_mem (v : HeightOneSpectrum (integralClosure O L)) : addv L v ∈ Pl
       have hle := WithZero.log_le_log hv one_ne_zero
       have hge := WithZero.log_le_log one_ne_zero hv
       rw [WithZero.log_one] at hle hge
-      have hmem : v.valuation L (algebraMap O L x) < 1 ↔
-          algebraMap O (integralClosure O L) x ∈ v.asIdeal := by
+      have hmem
+          : v.valuation L (algebraMap O L x) < 1
+            ↔ algebraMap O (integralClosure O L) x ∈ v.asIdeal := by
         rw [hx]
-        first
-          | exact v.valuation_lt_one_iff_mem _
-          | exact v.valuation_lt_one_iff_mem L _
+        first | exact v.valuation_lt_one_iff_mem _ | exact v.valuation_lt_one_iff_mem L _
       have hint : v.valuation L (algebraMap O L x) ≤ 1 := by
         rw [hx]
-        first
-          | exact v.valuation_le_one _
-          | exact v.valuation_le_one L _
+        first | exact v.valuation_le_one _ | exact v.valuation_le_one L _
       rw [← hP, Ideal.mem_comap, ← hmem]
       constructor
       · have h3 := hle.2 hint
-        exact_mod_cast (show (0 : ℤ) ≤ -WithZero.log (v.valuation L (algebraMap O L x)) by omega)
+        exact_mod_cast (show (0 : ℤ) ≤ - WithZero.log (v.valuation L (algebraMap O L x)) by omega)
       · constructor
         · intro h
-          have h' : (0 : ℤ) < -WithZero.log (v.valuation L (algebraMap O L x)) := by
+          have h' : (0 : ℤ) < - WithZero.log (v.valuation L (algebraMap O L x)) := by
             exact_mod_cast h
           refine lt_of_le_of_ne hint (fun he => ?_)
           rw [he, WithZero.log_one] at h'
           omega
         · intro h
-          have h1 : ¬ (0 ≤ WithZero.log (v.valuation L (algebraMap O L x))) :=
-            fun h0 => (not_le.2 h) (hge.1 h0)
-          have h2 : (0 : ℤ) < -WithZero.log (v.valuation L (algebraMap O L x)) := by omega
+          have h1 : ¬(0 ≤ WithZero.log (v.valuation L (algebraMap O L x))) := fun h0 =>
+            (not_le.2 h) (hge.1 h0)
+          have h2 : (0 : ℤ) < - WithZero.log (v.valuation L (algebraMap O L x)) := by omega
           exact_mod_cast h2
 
-
 omit [IsFractionRing O F] [FiniteDimensional F L] [Algebra.IsSeparable F L] [IsScalarTower O F L] in
-theorem addv_nonneg_iff (v : HeightOneSpectrum (integralClosure O L)) {y : L} (hy : y ≠ 0) :
-    0 ≤ addv L v y ↔ v.valuation L y ≤ 1 := by
+theorem addv_nonneg_iff (v : HeightOneSpectrum (integralClosure O L)) {y : L} (hy : y ≠ 0)
+    : 0 ≤ addv L v y ↔ v.valuation L y ≤ 1 := by
   have hv : v.valuation L y ≠ 0 := by simpa using hy
-  have hval : addv L v y = ((-WithZero.log (v.valuation L y) : ℤ) : WithTop ℤ) := by
+  have hval : addv L v y = ((- WithZero.log (v.valuation L y) : ℤ) : WithTop ℤ) := by
     unfold addv
     rw [AddValuation.of_apply, if_neg hy]
   rw [hval]
@@ -144,17 +137,17 @@ theorem addv_nonneg_iff (v : HeightOneSpectrum (integralClosure O L)) {y : L} (h
   rw [WithZero.log_one] at h2
   constructor
   · intro h
-    have h' : (0 : ℤ) ≤ -WithZero.log (v.valuation L y) := by exact_mod_cast h
+    have h' : (0 : ℤ) ≤ - WithZero.log (v.valuation L y) := by exact_mod_cast h
     exact h2.1 (by omega)
   · intro h
     have h' := h2.2 h
-    have h'' : (0 : ℤ) ≤ -WithZero.log (v.valuation L y) := by omega
+    have h'' : (0 : ℤ) ≤ - WithZero.log (v.valuation L y) := by omega
     exact_mod_cast h''
 
 variable (O F) in
 include F in
-theorem mem_integralClosure_iff (y : L) :
-    y ∈ integralClosure O L ↔ ∀ w ∈ PlacesOver O L, 0 ≤ w y := by
+theorem mem_integralClosure_iff (y : L)
+    : y ∈ integralClosure O L ↔ ∀ w ∈ PlacesOver O L, 0 ≤ w y := by
   constructor
   · intro hy w hw
     obtain ⟨v, rfl⟩ := addv_eq_of_mem O F hw
@@ -164,27 +157,26 @@ theorem mem_integralClosure_iff (y : L) :
       exact le_top
     · rw [addv_nonneg_iff v hy0]
       first
-        | exact v.valuation_le_one (⟨y, hy⟩ : integralClosure O L)
-        | exact v.valuation_le_one L (⟨y, hy⟩ : integralClosure O L)
+      | exact v.valuation_le_one (⟨y, hy⟩ : integralClosure O L)
+      | exact v.valuation_le_one L (⟨y, hy⟩ : integralClosure O L)
   · intro h
     by_cases hy0 : y = 0
     · subst hy0
       exact Subalgebra.zero_mem _
-    · have hle : ∀ v : HeightOneSpectrum (integralClosure O L), v.valuation L y ≤ 1 :=
-        fun v => (addv_nonneg_iff v hy0).1 (h _ (addv_mem O F v))
+    · have hle : ∀ v : HeightOneSpectrum (integralClosure O L), v.valuation L y ≤ 1 := fun v =>
+        (addv_nonneg_iff v hy0).1 (h _ (addv_mem O F v))
       have hr : y ∈ (algebraMap (integralClosure O L) L).range := by
         first
-          | exact HeightOneSpectrum.mem_integers_of_valuation_le_one L y hle
-          | exact HeightOneSpectrum.mem_integers_of_valuation_le_one y hle
+        | exact HeightOneSpectrum.mem_integers_of_valuation_le_one L y hle
+        | exact HeightOneSpectrum.mem_integers_of_valuation_le_one y hle
       obtain ⟨b, hb⟩ := hr
       rw [← hb]
       exact b.2
 
-
 variable (O F) in
 include F in
-theorem exists_val_eq (n : AddValuation L (WithTop ℤ) → ℤ) :
-    ∃ g : L, g ≠ 0 ∧ ∀ w ∈ PlacesOver O L, w g = n w := by
+theorem exists_val_eq (n : AddValuation L (WithTop ℤ) → ℤ)
+    : ∃ g : L, g ≠ 0 ∧ ∀ w ∈ PlacesOver O L, w g = n w := by
   classical
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   let b := algebraMap O (integralClosure O L) ϖ
@@ -211,8 +203,8 @@ theorem exists_val_eq (n : AddValuation L (WithTop ℤ) → ℤ) :
         rw [IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_under_of_isIntegral_of_isMaximal Q)]
         exact (IsLocalRing.mem_maximalIdeal ϖ).2 hϖ.not_isUnit
       have hQ0 : Q ≠ ⊥ := fun h => hb (Ideal.mem_bot.1 (h ▸ hmem))
-      exact ⟨⟨Q, hQ.isPrime, hQ0⟩,
-        Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem Q).2 hmem), rfl⟩
+      exact
+        ⟨⟨Q, hQ.isPrime, hQ0⟩, Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem Q).2 hmem), rfl⟩
   haveI : IsPrincipalIdealRing (integralClosure O L) := IsPrincipalIdealRing.of_finite_maximals hmax
   haveI := hmax.to_subtype
   haveI : Finite (HeightOneSpectrum (integralClosure O L)) := by
@@ -228,8 +220,9 @@ theorem exists_val_eq (n : AddValuation L (WithTop ℤ) → ℤ) :
   have hπ0 : ∀ v, π v ≠ 0 := fun v h => v.ne_bot (by rw [hπ v, Ideal.span_singleton_eq_bot.mpr h])
   have hπL : ∀ v, algebraMap (integralClosure O L) L (π v) ≠ 0 := fun v =>
     (map_ne_zero_iff _ (IsFractionRing.injective (integralClosure O L) L)).mpr (hπ0 v)
-  have hval : ∀ v v' : HeightOneSpectrum (integralClosure O L),
-      v'.valuation L (algebraMap _ L (π v)) = if v' = v then exp (-1 : ℤ) else 1 := by
+  have hval
+      : ∀ v v' : HeightOneSpectrum (integralClosure O L),
+        v'.valuation L (algebraMap _ L (π v)) = if v' = v then exp (-1 : ℤ) else 1 := by
     intro v v'
     rw [HeightOneSpectrum.valuation_of_algebraMap]
     split_ifs with h
@@ -245,7 +238,9 @@ theorem exists_val_eq (n : AddValuation L (WithTop ℤ) → ℤ) :
       exact HeightOneSpectrum.ext (v.isMaximal.eq_of_le v'.isPrime.ne_top hle).symm
   let g : L := ∏ v, (algebraMap _ L (π v)) ^ (n (addv L v))
   have hg0 : g ≠ 0 := Finset.prod_ne_zero_iff.mpr fun v _ => zpow_ne_zero _ (hπL v)
-  have hgv : ∀ v' : HeightOneSpectrum (integralClosure O L), v'.valuation L g = exp (-(n (addv L v'))) := by
+  have hgv
+      : ∀ v' : HeightOneSpectrum (integralClosure O L),
+        v'.valuation L g = exp (-(n (addv L v'))) := by
     intro v'
     simp only [g, map_prod, map_zpow₀, hval]
     rw [Finset.prod_eq_single v']

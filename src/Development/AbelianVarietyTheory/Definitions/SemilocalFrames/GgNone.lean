@@ -43,13 +43,16 @@ def lat (Λ : Submodule M.L.O V) : Submodule M.L.O S.V :=
   Λ.map ((c.e : V →ₗ[E] S.V).restrictScalars M.L.O)
 
 def inn (f : Fin (r + 1) → V) (L : Submodule M.L.O (H.Wb f)) : Submodule M.L.O S.V :=
-  c.lat ((L.comap ((H.mkW f).restrictScalars M.L.O)).map ((H.perp (H.X f)).subtype.restrictScalars M.L.O))
+  c.lat ((L.comap ((H.mkW f).restrictScalars M.L.O)).map
+    ((H.perp (H.X f)).subtype.restrictScalars M.L.O))
 
-def dat (d : LocNG.Datum P) : S.Datum :=
-  (c.inn P.A.f d.L, c.inn P.B.f d.L',
-    {p | ∃ (x' : ↥(H.perp (H.X P.B.f))) (x : ↥(H.perp (H.X P.A.f))), p = (c.e x', c.e x) ∧
-      ((M.split = none ∧ H.mkW P.B.f x' ∈ d.L' ∧ H.mkW P.A.f x ∈ d.L) ∨
-        (H.mkW P.B.f x', H.mkW P.A.f x) ∈ d.io)})
+def dat (d : LocNG.Datum P) : S.Datum := (
+  c.inn P.A.f d.L,
+  c.inn P.B.f d.L',
+  {p | ∃ (x' : ↥(H.perp (H.X P.B.f))) (x : ↥(H.perp (H.X P.A.f))), p = (c.e x', c.e x) ∧
+    ((M.split = none ∧ H.mkW P.B.f x' ∈ d.L' ∧ H.mkW P.A.f x ∈ d.L) ∨
+      (H.mkW P.B.f x', H.mkW P.A.f x) ∈ d.io)}
+)
 
 end Coord
 

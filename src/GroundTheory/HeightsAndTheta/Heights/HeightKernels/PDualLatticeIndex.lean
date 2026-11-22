@@ -38,21 +38,25 @@ def dual (L : Submodule (𝓞 K) (Fin i → K)) : Submodule (𝓞 K) (Fin i → 
     show _ = (c • φ) ⬝ᵥ x
     rw [smul_dotProduct, Algebra.smul_def, map_mul, ha]
 
-theorem mem_dual {L : Submodule (𝓞 K) (Fin i → K)} {φ : Fin i → K} :
-    φ ∈ dual L ↔ ∀ x ∈ L, φ ⬝ᵥ x ∈ (algebraMap (𝓞 K) K).range := Iff.rfl
+theorem mem_dual {L : Submodule (𝓞 K) (Fin i → K)} {φ : Fin i → K}
+    : φ ∈ dual L ↔ ∀ x ∈ L, φ ⬝ᵥ x ∈ (algebraMap (𝓞 K) K).range :=
+  Iff.rfl
 
 theorem dual_anti {L L' : Submodule (𝓞 K) (Fin i → K)} (h : L ≤ L') : dual L' ≤ dual L :=
   fun _ hφ x hx => hφ x (h hx)
 
-theorem dual_toAddSubgroup (F : HermLattice K i) :
-    (dual F.lattice).toAddSubgroup = (dualLattice F).toAddSubgroup := rfl
+theorem dual_toAddSubgroup (F : HermLattice K i)
+    : (dual F.lattice).toAddSubgroup = (dualLattice F).toAddSubgroup :=
+  rfl
 
-theorem mem_dual_sup {L : Submodule (𝓞 K) (Fin i → K)} {x₀ φ : Fin i → K} :
-    φ ∈ dual (L ⊔ (𝓞 K) ∙ x₀) ↔ φ ∈ dual L ∧ φ ⬝ᵥ x₀ ∈ (algebraMap (𝓞 K) K).range := by
+theorem mem_dual_sup {L : Submodule (𝓞 K) (Fin i → K)} {x₀ φ : Fin i → K}
+    : φ ∈ dual (L ⊔ (𝓞 K) ∙ x₀) ↔ φ ∈ dual L ∧ φ ⬝ᵥ x₀ ∈ (algebraMap (𝓞 K) K).range := by
   constructor
   · intro h
-    exact ⟨fun x hx => h x (le_sup_left (a := L) hx),
-      h x₀ (le_sup_right (b := (𝓞 K) ∙ x₀) (Submodule.mem_span_singleton_self x₀))⟩
+    exact ⟨
+      fun x hx => h x (le_sup_left (a := L) hx),
+      h x₀ (le_sup_right (b := (𝓞 K) ∙ x₀) (Submodule.mem_span_singleton_self x₀))
+    ⟩
   · rintro ⟨h1, c, hc⟩ x hx
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
     obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hz
@@ -64,43 +68,53 @@ theorem absNorm_eq_index (I : Ideal (𝓞 K)) : Ideal.absNorm I = I.toAddSubgrou
   rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   rfl
 
-theorem mem_integralClosure_of_mem_range {y : K} (h : y ∈ (algebraMap (𝓞 K) K).range) :
-    y ∈ integralClosure ℤ K := by
+theorem mem_integralClosure_of_mem_range {y : K} (h : y ∈ (algebraMap (𝓞 K) K).range)
+    : y ∈ integralClosure ℤ K := by
   obtain ⟨a, rfl⟩ := h
   exact RingOfIntegers.isIntegral_coe a
 
-def pairInt (L : Submodule (𝓞 K) (Fin i → K)) (w : Fin i → K) (hw : w ∈ L) : dual L →ₗ[𝓞 K] 𝓞 K where
+def pairInt (L : Submodule (𝓞 K) (Fin i → K)) (w : Fin i → K) (hw : w ∈ L)
+    : dual L →ₗ[𝓞 K] 𝓞 K where
   toFun φ := (⟨(φ : Fin i → K) ⬝ᵥ w, mem_integralClosure_of_mem_range (mem_dual.mp φ.2 w hw)⟩ : 𝓞 K)
   map_add' φ ψ := RingOfIntegers.coe_injective (add_dotProduct (φ : Fin i → K) ψ w)
-  map_smul' c φ := RingOfIntegers.coe_injective (by
-    show ((c • φ : dual L) : Fin i → K) ⬝ᵥ w = algebraMap (𝓞 K) K c * ((φ : Fin i → K) ⬝ᵥ w)
-    rw [Submodule.coe_smul, smul_dotProduct, Algebra.smul_def])
+  map_smul' c φ :=
+    RingOfIntegers.coe_injective (by
+      show ((c • φ : dual L) : Fin i → K) ⬝ᵥ w = algebraMap (𝓞 K) K c * ((φ : Fin i → K) ⬝ᵥ w)
+      rw [Submodule.coe_smul, smul_dotProduct, Algebra.smul_def])
 
-theorem coe_pairInt (L : Submodule (𝓞 K) (Fin i → K)) (w : Fin i → K) (hw : w ∈ L) (φ : dual L) :
-    algebraMap (𝓞 K) K (pairInt L w hw φ) = (φ : Fin i → K) ⬝ᵥ w := rfl
+theorem coe_pairInt (L : Submodule (𝓞 K) (Fin i → K)) (w : Fin i → K) (hw : w ∈ L) (φ : dual L)
+    : algebraMap (𝓞 K) K (pairInt L w hw φ) = (φ : Fin i → K) ⬝ᵥ w :=
+  rfl
 
-theorem relIndex_eq_of_pair {M : Type*} [AddCommGroup M] [Module (𝓞 K) M] (P Q : Submodule (𝓞 K) M)
-    (ψ : Q →ₗ[𝓞 K] 𝓞 K) (I : Ideal (𝓞 K)) (h : ∀ φ : Q, (φ : M) ∈ P ↔ ψ φ ∈ I) :
-    P.toAddSubgroup.relIndex Q.toAddSubgroup =
-      I.toAddSubgroup.relIndex (LinearMap.range ψ).toAddSubgroup := by
-  have e : P.toAddSubgroup.addSubgroupOf Q.toAddSubgroup = I.toAddSubgroup.comap ψ.toAddMonoidHom := by
+theorem relIndex_eq_of_pair
+    {M : Type*} [AddCommGroup M] [Module (𝓞 K) M]
+    (P Q : Submodule (𝓞 K) M) (ψ : Q →ₗ[𝓞 K] 𝓞 K)
+    (I : Ideal (𝓞 K)) (h : ∀ φ : Q, (φ : M) ∈ P ↔ ψ φ ∈ I)
+    : P.toAddSubgroup.relIndex Q.toAddSubgroup
+      = I.toAddSubgroup.relIndex (LinearMap.range ψ).toAddSubgroup := by
+  have e
+      : P.toAddSubgroup.addSubgroupOf Q.toAddSubgroup = I.toAddSubgroup.comap ψ.toAddMonoidHom := by
     ext φ
     exact h φ
   show (P.toAddSubgroup.addSubgroupOf Q.toAddSubgroup).index = _
   rw [e, AddSubgroup.index_comap, LinearMap.range_toAddSubgroup]
 
-theorem dual_step (L : Submodule (𝓞 K) (Fin i → K)) (x₀ : Fin i → K)
-    (hk : L.toAddSubgroup.relIndex (L ⊔ (𝓞 K) ∙ x₀).toAddSubgroup ≠ 0) :
-    (dual (L ⊔ (𝓞 K) ∙ x₀)).toAddSubgroup.relIndex (dual L).toAddSubgroup ≤
-      L.toAddSubgroup.relIndex (L ⊔ (𝓞 K) ∙ x₀).toAddSubgroup := by
+theorem dual_step
+    (L : Submodule (𝓞 K) (Fin i → K)) (x₀ : Fin i → K)
+    (hk : L.toAddSubgroup.relIndex (L ⊔ (𝓞 K) ∙ x₀).toAddSubgroup ≠ 0)
+    : (dual (L ⊔ (𝓞 K) ∙ x₀)).toAddSubgroup.relIndex (dual L).toAddSubgroup
+      ≤ L.toAddSubgroup.relIndex (L ⊔ (𝓞 K) ∙ x₀).toAddSubgroup := by
   set k := L.toAddSubgroup.relIndex (L ⊔ (𝓞 K) ∙ x₀).toAddSubgroup with hk_def
   let a : Ideal (𝓞 K) := L.comap (LinearMap.toSpanSingleton (𝓞 K) (Fin i → K) x₀)
   have ha : Ideal.absNorm a = k := by
     rw [absNorm_eq_index]
-    have e1 : a.toAddSubgroup =
-        L.toAddSubgroup.comap (LinearMap.toSpanSingleton (𝓞 K) (Fin i → K) x₀).toAddMonoidHom := rfl
-    rw [e1, AddSubgroup.index_comap, hk_def, Submodule.sup_toAddSubgroup, AddSubgroup.relIndex_sup_left,
-      ← LinearMap.range_toAddSubgroup, ← LinearMap.span_singleton_eq_range]
+    have e1
+        : a.toAddSubgroup
+          = L.toAddSubgroup.comap (LinearMap.toSpanSingleton (𝓞 K) (Fin i → K) x₀).toAddMonoidHom :=
+      rfl
+    rw [e1, AddSubgroup.index_comap, hk_def, Submodule.sup_toAddSubgroup,
+      AddSubgroup.relIndex_sup_left, ← LinearMap.range_toAddSubgroup,
+      ← LinearMap.span_singleton_eq_range]
   have ha0 : a ≠ ⊥ := fun h => hk (by rw [← ha, Ideal.absNorm_eq_zero_iff]; exact h)
   obtain ⟨d, hd, hd0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot ha0
   have hw : d • x₀ ∈ L := hd
@@ -120,12 +134,14 @@ theorem dual_step (L : Submodule (𝓞 K) (Fin i → K)) (x₀ : Fin i → K)
       exact mul_right_cancel₀ hdK (h1.trans (mul_comm _ _))
   have hidx := relIndex_eq_of_pair _ _ ψ _ key
   let b : Ideal (𝓞 K) := LinearMap.range ψ ⊔ Ideal.span {d}
-  have hsup : (Ideal.span {d}).toAddSubgroup.relIndex (LinearMap.range ψ).toAddSubgroup =
-      (Ideal.span {d}).toAddSubgroup.relIndex b.toAddSubgroup := by
+  have hsup
+      : (Ideal.span {d}).toAddSubgroup.relIndex (LinearMap.range ψ).toAddSubgroup
+        = (Ideal.span {d}).toAddSubgroup.relIndex b.toAddSubgroup := by
     rw [Submodule.sup_toAddSubgroup, AddSubgroup.relIndex_sup_right]
   have hdb : Ideal.span {d} ≤ b := le_sup_right
-  have htower : (Ideal.span {d}).toAddSubgroup.relIndex b.toAddSubgroup * Ideal.absNorm b =
-      Ideal.absNorm (Ideal.span {d}) := by
+  have htower
+      : (Ideal.span {d}).toAddSubgroup.relIndex b.toAddSubgroup * Ideal.absNorm b
+        = Ideal.absNorm (Ideal.span {d}) := by
     rw [absNorm_eq_index, absNorm_eq_index, ← AddSubgroup.relIndex_top_right,
       ← AddSubgroup.relIndex_top_right]
     exact AddSubgroup.relIndex_mul_relIndex _ _ _
@@ -159,46 +175,50 @@ theorem dual_step (L : Submodule (𝓞 K) (Fin i → K)) (x₀ : Fin i → K)
   rw [← htower, mul_comm (Ideal.absNorm b)] at hle
   exact Nat.le_of_mul_le_mul_right hle (Nat.pos_of_ne_zero hb0)
 
-theorem dual_index_le (n : ℕ) : ∀ (L' L : Submodule (𝓞 K) (Fin i → K)), L' ≤ L →
-    L'.toAddSubgroup.relIndex L.toAddSubgroup = n → n ≠ 0 →
-      (dual L).toAddSubgroup.relIndex (dual L').toAddSubgroup ≤ n := by
+theorem dual_index_le (n : ℕ)
+    : ∀ (L' L : Submodule (𝓞 K) (Fin i → K)),
+      L' ≤ L → L'.toAddSubgroup.relIndex L.toAddSubgroup = n → n ≠ 0
+        → (dual L).toAddSubgroup.relIndex (dual L').toAddSubgroup ≤ n := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  intro L' L hle hn hn0
-  by_cases hLL : L ≤ L'
-  · have h := le_antisymm hle hLL
-    subst h
-    rw [AddSubgroup.relIndex_self] at hn
-    rw [AddSubgroup.relIndex_self]
-    omega
-  · obtain ⟨x₀, hx₀L, hx₀⟩ := SetLike.not_le_iff_exists.mp hLL
-    have h1 : L' ≤ L' ⊔ (𝓞 K) ∙ x₀ := le_sup_left
-    have h2 : L' ⊔ (𝓞 K) ∙ x₀ ≤ L := sup_le hle ((Submodule.span_singleton_le_iff_mem _ _).mpr hx₀L)
-    have htow := AddSubgroup.relIndex_mul_relIndex _ _ _
-      (show L'.toAddSubgroup ≤ (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup from h1)
-      (show (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup ≤ L.toAddSubgroup from h2)
-    rw [hn] at htow
-    have hk1 : L'.toAddSubgroup.relIndex (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup ≠ 1 := by
-      rw [Ne, AddSubgroup.relIndex_eq_one]
-      intro h
-      exact hx₀ (h (show x₀ ∈ L' ⊔ (𝓞 K) ∙ x₀ from
-        le_sup_right (a := L') (Submodule.mem_span_singleton_self x₀)))
-    set k := L'.toAddSubgroup.relIndex (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup with hk
-    set m := (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup.relIndex L.toAddSubgroup with hm
-    have hk0 : k ≠ 0 := fun h => hn0 (by rw [← htow, h, zero_mul])
-    have hm0 : m ≠ 0 := fun h => hn0 (by rw [← htow, h, mul_zero])
-    have hmn : m < n := by
-      rw [← htow]
-      have : 2 ≤ k := by omega
-      have : 0 < m := Nat.pos_of_ne_zero hm0
-      nlinarith
-    have hA := ih m hmn _ L h2 hm.symm hm0
-    have hB := dual_step L' x₀ hk0
-    have hD := AddSubgroup.relIndex_mul_relIndex _ _ _
-      (show (dual L).toAddSubgroup ≤ (dual (L' ⊔ (𝓞 K) ∙ x₀)).toAddSubgroup from dual_anti h2)
-      (show (dual (L' ⊔ (𝓞 K) ∙ x₀)).toAddSubgroup ≤ (dual L').toAddSubgroup from dual_anti h1)
-    rw [← hD, ← htow, mul_comm k m]
-    exact Nat.mul_le_mul hA hB
+    intro L' L hle hn hn0
+    by_cases hLL : L ≤ L'
+    · have h := le_antisymm hle hLL
+      subst h
+      rw [AddSubgroup.relIndex_self] at hn
+      rw [AddSubgroup.relIndex_self]
+      omega
+    · obtain ⟨x₀, hx₀L, hx₀⟩ := SetLike.not_le_iff_exists.mp hLL
+      have h1 : L' ≤ L' ⊔ (𝓞 K) ∙ x₀ := le_sup_left
+      have h2 : L' ⊔ (𝓞 K) ∙ x₀ ≤ L :=
+        sup_le hle ((Submodule.span_singleton_le_iff_mem _ _).mpr hx₀L)
+      have htow :=
+        AddSubgroup.relIndex_mul_relIndex _ _ _
+          (show L'.toAddSubgroup ≤ (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup from h1)
+          (show (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup ≤ L.toAddSubgroup from h2)
+      rw [hn] at htow
+      have hk1 : L'.toAddSubgroup.relIndex (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup ≠ 1 := by
+        rw [Ne, AddSubgroup.relIndex_eq_one]
+        intro h
+        exact hx₀ (h (show x₀ ∈ L' ⊔ (𝓞 K) ∙ x₀ from
+          le_sup_right (a := L') (Submodule.mem_span_singleton_self x₀)))
+      set k := L'.toAddSubgroup.relIndex (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup with hk
+      set m := (L' ⊔ (𝓞 K) ∙ x₀).toAddSubgroup.relIndex L.toAddSubgroup with hm
+      have hk0 : k ≠ 0 := fun h => hn0 (by rw [← htow, h, zero_mul])
+      have hm0 : m ≠ 0 := fun h => hn0 (by rw [← htow, h, mul_zero])
+      have hmn : m < n := by
+        rw [← htow]
+        have : 2 ≤ k := by omega
+        have : 0 < m := Nat.pos_of_ne_zero hm0
+        nlinarith
+      have hA := ih m hmn _ L h2 hm.symm hm0
+      have hB := dual_step L' x₀ hk0
+      have hD :=
+        AddSubgroup.relIndex_mul_relIndex _ _ _
+          (show (dual L).toAddSubgroup ≤ (dual (L' ⊔ (𝓞 K) ∙ x₀)).toAddSubgroup from dual_anti h2)
+          (show (dual (L' ⊔ (𝓞 K) ∙ x₀)).toAddSubgroup ≤ (dual L').toAddSubgroup from dual_anti h1)
+      rw [← hD, ← htow, mul_comm k m]
+      exact Nat.mul_le_mul hA hB
 
 def box (c : K) : Submodule (𝓞 K) (Fin i → K) := Submodule.pi Set.univ fun _ => (𝓞 K) ∙ c
 
@@ -232,31 +252,33 @@ theorem dual_box {c : K} (hc : c ≠ 0) : dual (box (i := i) c) = box c⁻¹ := 
     rw [← ha j, ← hb j, Algebra.smul_def, Algebra.smul_def, map_mul]
     field_simp
 
-theorem box_le_box {c c' : K} (a : 𝓞 K) (h : c = algebraMap (𝓞 K) K a * c') : box (i := i) c ≤ box c' := by
+theorem box_le_box {c c' : K} (a : 𝓞 K) (h : c = algebraMap (𝓞 K) K a * c')
+    : box (i := i) c ≤ box c' := by
   intro x hx
   rw [mem_box] at hx ⊢
   intro j
   obtain ⟨b, hb⟩ := hx j
   exact ⟨b * a, by rw [← hb, h, Algebra.smul_def, Algebra.smul_def, map_mul, mul_assoc]⟩
 
-theorem exists_box_le (L : Submodule (𝓞 K) (Fin i → K))
-    (hL : Submodule.span K (L : Set (Fin i → K)) = ⊤) :
-    ∃ e : 𝓞 K, e ≠ 0 ∧ box (algebraMap (𝓞 K) K e) ≤ L :=
+theorem exists_box_le
+    (L : Submodule (𝓞 K) (Fin i → K)) (hL : Submodule.span K (L : Set (Fin i → K)) = ⊤)
+    : ∃ e : 𝓞 K, e ≠ 0 ∧ box (algebraMap (𝓞 K) K e) ≤ L :=
   _root_.UpperTheory.Reformulated.B.BoxBounds.exists_box_le L hL
 
-theorem exists_common_denom {T : Type*} [Fintype T] (y : T → K) :
-    ∃ e : 𝓞 K, e ≠ 0 ∧ ∀ t, algebraMap (𝓞 K) K e * y t ∈ (algebraMap (𝓞 K) K).range := by
+theorem exists_common_denom {T : Type*} [Fintype T] (y : T → K)
+    : ∃ e : 𝓞 K, e ≠ 0 ∧ ∀ t, algebraMap (𝓞 K) K e * y t ∈ (algebraMap (𝓞 K) K).range := by
   classical
   choose p q hq hpq using fun t => IsFractionRing.div_surjective (A := 𝓞 K) (y t)
-  refine ⟨∏ t, q t, Finset.prod_ne_zero_iff.mpr fun t _ => nonZeroDivisors.ne_zero (hq t), fun t => ?_⟩
+  refine
+    ⟨∏ t, q t, Finset.prod_ne_zero_iff.mpr fun t _ => nonZeroDivisors.ne_zero (hq t), fun t => ?_⟩
   refine ⟨(∏ l ∈ Finset.univ.erase t, q l) * p t, ?_⟩
   have hqK : algebraMap (𝓞 K) K (q t) ≠ 0 :=
     RingOfIntegers.coe_ne_zero_iff.mpr (nonZeroDivisors.ne_zero (hq t))
   rw [← Finset.prod_erase_mul _ _ (Finset.mem_univ t), map_mul, map_mul, ← hpq t]
   field_simp
 
-theorem exists_le_box (L : Submodule (𝓞 K) (Fin i → K)) (hL : L.FG) :
-    ∃ e : 𝓞 K, e ≠ 0 ∧ L ≤ box (algebraMap (𝓞 K) K e)⁻¹ := by
+theorem exists_le_box (L : Submodule (𝓞 K) (Fin i → K)) (hL : L.FG)
+    : ∃ e : 𝓞 K, e ≠ 0 ∧ L ≤ box (algebraMap (𝓞 K) K e)⁻¹ := by
   obtain ⟨s, rfl⟩ := hL
   obtain ⟨e, he0, he⟩ := exists_common_denom (fun t : s × Fin i => (t.1 : Fin i → K) t.2)
   have heK : algebraMap (𝓞 K) K e ≠ 0 := RingOfIntegers.coe_ne_zero_iff.mpr he0
@@ -268,29 +290,39 @@ theorem exists_le_box (L : Submodule (𝓞 K) (Fin i → K)) (hL : L.FG) :
   rw [Algebra.smul_def, ha]
   field_simp
 
-theorem box_relIndex_ne_zero {c : K} (hc : c ≠ 0) :
-    (box (i := i) c).toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup ≠ 0 := by
-  have hid : ∀ c : K, box (i := i) c =
-      idealLattice (fun _ : Fin i => FractionalIdeal.spanSingleton (𝓞 K)⁰ c) := fun c => by
+theorem box_relIndex_ne_zero {c : K} (hc : c ≠ 0)
+    : (box (i := i) c).toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup ≠ 0 := by
+  have hid
+      : ∀ c : K,
+        box (i := i) c
+          = idealLattice (fun _ : Fin i => FractionalIdeal.spanSingleton (𝓞 K)⁰ c) := fun c => by
     simp only [box, idealLattice, FractionalIdeal.coe_spanSingleton]
   have lat : ∀ c : K, c ≠ 0 → Submodule.IsFullLattice ℚ ((box (i := i) c).restrictScalars ℤ) := by
     intro c hc
-    obtain ⟨hfg, hspan⟩ := LinesIdealLatticeFG.proof K i (fun _ => FractionalIdeal.spanSingleton (𝓞 K)⁰ c)
-      (fun _ => by rw [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]; exact hc)
+    obtain ⟨hfg, hspan⟩ :=
+      LinesIdealLatticeFG.proof K i
+        (fun _ => FractionalIdeal.spanSingleton (𝓞 K)⁰ c)
+        (fun _ => by rw [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]; exact hc)
     rw [← hid] at hfg hspan
     exact LinesIsLattice.proof K (Fin i) (box c) (hfg.restrictScalars) hspan
-  have hpos := (LinesGenIndexTrans.proof LinesLatticeBasis.proof
-    (LinesGenIndexDet.proof LinesLatticeBasis.proof) (Fin i → K)
-    ((box (i := i) c⁻¹).restrictScalars ℤ) ((box c).restrictScalars ℤ) ((box c).restrictScalars ℤ)
-    (lat _ (inv_ne_zero hc)) (lat c hc) (lat c hc)).1
+  have hpos :=
+    (LinesGenIndexTrans.proof LinesLatticeBasis.proof
+      (LinesGenIndexDet.proof LinesLatticeBasis.proof) (Fin i → K)
+      ((box (i := i) c⁻¹).restrictScalars ℤ) ((box c).restrictScalars ℤ) ((box c).restrictScalars ℤ)
+      (lat _ (inv_ne_zero hc)) (lat c hc) (lat c hc)).1
   intro h0
-  have e1 : ((box (i := i) c).restrictScalars ℤ).toAddSubgroup = (box (i := i) c).toAddSubgroup := rfl
-  have e2 : ((box (i := i) c⁻¹).restrictScalars ℤ).toAddSubgroup = (box (i := i) c⁻¹).toAddSubgroup := rfl
+  have e1 : ((box (i := i) c).restrictScalars ℤ).toAddSubgroup = (box (i := i) c).toAddSubgroup :=
+    rfl
+  have e2
+      : ((box (i := i) c⁻¹).restrictScalars ℤ).toAddSubgroup = (box (i := i) c⁻¹).toAddSubgroup :=
+    rfl
   rw [genIndex, e1, e2, h0, Nat.cast_zero, zero_div] at hpos
   exact lt_irrefl _ hpos
 
-theorem eq_of_le_of_prod {a₁ a₂ a₃ b₁ b₂ b₃ : ℕ} (h₁ : a₁ ≤ b₁) (h₂ : a₂ ≤ b₂) (h₃ : a₃ ≤ b₃)
-    (h : a₁ * a₂ * a₃ = b₁ * b₂ * b₃) (h₀ : b₁ * b₂ * b₃ ≠ 0) : a₂ = b₂ := by
+theorem eq_of_le_of_prod
+    {a₁ a₂ a₃ b₁ b₂ b₃ : ℕ} (h₁ : a₁ ≤ b₁) (h₂ : a₂ ≤ b₂) (h₃ : a₃ ≤ b₃)
+    (h : a₁ * a₂ * a₃ = b₁ * b₂ * b₃) (h₀ : b₁ * b₂ * b₃ ≠ 0)
+    : a₂ = b₂ := by
   rcases lt_or_eq_of_le h₂ with hlt | heq
   · exfalso
     have hb₁ : 0 < b₁ := Nat.pos_of_ne_zero fun h' => h₀ (by rw [h', zero_mul, zero_mul])
@@ -303,7 +335,6 @@ theorem eq_of_le_of_prod {a₁ a₂ a₃ b₁ b₂ b₃ : ℕ} (h₁ : a₁ ≤ 
 
 end DualLatticeIndexAlt
 
-
 open DualLatticeIndexAlt in
 theorem DualLatticeIndex.proof : DualLatticeIndex.Statement := by
   intro K _ _ i F F' hle
@@ -314,30 +345,34 @@ theorem DualLatticeIndex.proof : DualLatticeIndex.Statement := by
   set c : K := algebraMap (𝓞 K) K (e₁ * e₂) with hc_def
   have hc : c ≠ 0 := RingOfIntegers.coe_ne_zero_iff.mpr (mul_ne_zero he₁ he₂)
   have hLo : box c ≤ F'.lattice := (box_le_box e₂ (by rw [hc_def, map_mul, mul_comm])).trans hlo
-  have hHi : F.lattice ≤ box c⁻¹ :=
-    hhi.trans (box_le_box e₁ (by rw [hc_def, map_mul]; field_simp))
+  have hHi : F.lattice ≤ box c⁻¹ := hhi.trans (box_le_box e₁ (by rw [hc_def, map_mul]; field_simp))
   have hdLo : dual (box (i := i) c) = box c⁻¹ := dual_box hc
   have hdHi : dual (box (i := i) c⁻¹) = box c := by rw [dual_box (inv_ne_zero hc), inv_inv]
   have hN := box_relIndex_ne_zero (i := i) hc
-  have t1 := AddSubgroup.relIndex_mul_relIndex _ _ _
-    (show (box c).toAddSubgroup ≤ F'.lattice.toAddSubgroup from hLo)
-    (show F'.lattice.toAddSubgroup ≤ F.lattice.toAddSubgroup from hle)
-  have t2 := AddSubgroup.relIndex_mul_relIndex _ _ _
-    (show (box c).toAddSubgroup ≤ F.lattice.toAddSubgroup from hLo.trans hle)
-    (show F.lattice.toAddSubgroup ≤ (box c⁻¹).toAddSubgroup from hHi)
-  have s1 := AddSubgroup.relIndex_mul_relIndex _ _ _
-    (show (dual (box c⁻¹)).toAddSubgroup ≤ (dual F.lattice).toAddSubgroup from dual_anti hHi)
-    (show (dual F.lattice).toAddSubgroup ≤ (dual F'.lattice).toAddSubgroup from dual_anti hle)
-  have s2 := AddSubgroup.relIndex_mul_relIndex _ _ _
-    (show (dual (box c⁻¹)).toAddSubgroup ≤ (dual F'.lattice).toAddSubgroup from
-      dual_anti (hle.trans hHi))
-    (show (dual F'.lattice).toAddSubgroup ≤ (dual (box c)).toAddSubgroup from dual_anti hLo)
+  have t1 :=
+    AddSubgroup.relIndex_mul_relIndex _ _ _
+      (show (box c).toAddSubgroup ≤ F'.lattice.toAddSubgroup from hLo)
+      (show F'.lattice.toAddSubgroup ≤ F.lattice.toAddSubgroup from hle)
+  have t2 :=
+    AddSubgroup.relIndex_mul_relIndex _ _ _
+      (show (box c).toAddSubgroup ≤ F.lattice.toAddSubgroup from hLo.trans hle)
+      (show F.lattice.toAddSubgroup ≤ (box c⁻¹).toAddSubgroup from hHi)
+  have s1 :=
+    AddSubgroup.relIndex_mul_relIndex _ _ _
+      (show (dual (box c⁻¹)).toAddSubgroup ≤ (dual F.lattice).toAddSubgroup from dual_anti hHi)
+      (show (dual F.lattice).toAddSubgroup ≤ (dual F'.lattice).toAddSubgroup from dual_anti hle)
+  have s2 :=
+    AddSubgroup.relIndex_mul_relIndex _ _ _
+      (show (dual (box c⁻¹)).toAddSubgroup ≤ (dual F'.lattice).toAddSubgroup from
+        dual_anti (hle.trans hHi))
+      (show (dual F'.lattice).toAddSubgroup ≤ (dual (box c)).toAddSubgroup from dual_anti hLo)
   rw [hdLo, hdHi] at s2
   rw [hdHi] at s1
   set b₁ := (box c).toAddSubgroup.relIndex F'.lattice.toAddSubgroup
   set b₂ := F'.lattice.toAddSubgroup.relIndex F.lattice.toAddSubgroup
   set b₃ := F.lattice.toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup
-  have hb : b₁ * b₂ * b₃ = (box (i := i) c).toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup := by rw [t1, t2]
+  have hb : b₁ * b₂ * b₃ = (box (i := i) c).toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup := by
+    rw [t1, t2]
   have hb0 : b₁ * b₂ * b₃ ≠ 0 := by rw [hb]; exact hN
   have hb₁ : b₁ ≠ 0 := fun h => hb0 (by rw [h, zero_mul, zero_mul])
   have hb₂ : b₂ ≠ 0 := fun h => hb0 (by rw [h, mul_zero, zero_mul])
@@ -347,9 +382,11 @@ theorem DualLatticeIndex.proof : DualLatticeIndex.Statement := by
   have a₃ := dual_index_le b₃ _ _ hHi rfl hb₃
   rw [hdLo] at a₁
   rw [hdHi] at a₃
-  have hprod : (dual F'.lattice).toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup *
-      (dual F.lattice).toAddSubgroup.relIndex (dual F'.lattice).toAddSubgroup *
-      (box (i := i) c).toAddSubgroup.relIndex (dual F.lattice).toAddSubgroup = b₁ * b₂ * b₃ := by
+  have hprod
+      : (dual F'.lattice).toAddSubgroup.relIndex (box c⁻¹).toAddSubgroup
+          * (dual F.lattice).toAddSubgroup.relIndex (dual F'.lattice).toAddSubgroup
+          * (box (i := i) c).toAddSubgroup.relIndex (dual F.lattice).toAddSubgroup
+        = b₁ * b₂ * b₃ := by
     rw [hb, ← s2, ← s1]
     ring
   rw [← dual_toAddSubgroup, ← dual_toAddSubgroup]

@@ -20,24 +20,35 @@ def locAt (R : Subring K) (𝔪 : Ideal R) [𝔪.IsPrime] : Subring K where
   add_mem' := by
     rintro x y ⟨a, s, hs, hx⟩ ⟨b, t, ht, hy⟩
     refine ⟨a * t + b * s, s * t, fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim hs ht, ?_⟩
-    push_cast; rw [← hx, ← hy]; ring
+    push_cast
+    rw [← hx, ← hy]
+    ring
   mul_mem' := by
     rintro x y ⟨a, s, hs, hx⟩ ⟨b, t, ht, hy⟩
     refine ⟨a * b, s * t, fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim hs ht, ?_⟩
-    push_cast; rw [← hx, ← hy]; ring
+    push_cast
+    rw [← hx, ← hy]
+    ring
   neg_mem' := by
     rintro x ⟨a, s, hs, hx⟩
     refine ⟨-a, s, hs, ?_⟩
-    push_cast; rw [← hx]; ring
+    push_cast
+    rw [← hx]
+    ring
 
 theorem le_locAt (R : Subring K) (𝔪 : Ideal R) [𝔪.IsPrime] : R ≤ locAt R 𝔪 := fun x hx =>
   ⟨⟨x, hx⟩, 1, fun h => Ideal.IsPrime.ne_top ‹_› ((Ideal.eq_top_iff_one _).2 h), by simp⟩
 
-theorem exists_local_subring : ∀ (k K : Type) [Field k] [Field K] [IsAlgClosed K] (φ : k →+* K) (R : Subring K) (𝔪 : Ideal R),
-    φ.range ≤ R → 𝔪.IsMaximal → (∀ r : R, ∃ c : k, ∃ h : φ c ∈ R, r - ⟨φ c, h⟩ ∈ 𝔪) →
-    (∀ x : K, ∃ d : R, d ≠ 0 ∧ (d : K) * x ∈ R) → (∀ x : K, IsIntegral R x → x ∈ R) →
-    ∃ T : Subring K, φ.range ≤ T ∧ (∃ _ : IsLocalRing T, AIC T ∧
-      ∀ t : T, ∃ c : k, ∃ h : φ c ∈ T, t - ⟨φ c, h⟩ ∈ IsLocalRing.maximalIdeal T) ∧ IsFractionRing T K := by
+theorem exists_local_subring
+    : ∀ (k K : Type) [Field k] [Field K] [IsAlgClosed K] (φ : k →+* K) (R : Subring K)
+        (𝔪 : Ideal R),
+      φ.range ≤ R → 𝔪.IsMaximal → (∀ r : R, ∃ c : k, ∃ h : φ c ∈ R, r - ⟨φ c, h⟩ ∈ 𝔪)
+        → (∀ x : K, ∃ d : R, d ≠ 0 ∧ (d : K) * x ∈ R) → (∀ x : K, IsIntegral R x → x ∈ R)
+        → ∃ T : Subring K,
+          φ.range ≤ T
+            ∧ (∃ _ : IsLocalRing T,
+              AIC T ∧ ∀ t : T, ∃ c : k, ∃ h : φ c ∈ T, t - ⟨φ c, h⟩ ∈ IsLocalRing.maximalIdeal T)
+            ∧ IsFractionRing T K := by
   intro k K _ _ _ φ R 𝔪 hφ hmax hres hden hic
   haveI : 𝔪.IsPrime := hmax.isPrime
   have hRT := le_locAt R 𝔪
@@ -82,23 +93,23 @@ theorem exists_local_subring : ∀ (k K : Type) [Field k] [Field K] [IsAlgClosed
     have he0 : e ≠ 0 := by
       rintro rfl
       apply hs
-      have h0 : s - ⟨φ 0, he⟩ = s := by
-        rw [sub_eq_self]; exact Subtype.ext (by simp)
+      have h0 : s - ⟨φ 0, he⟩ = s := by rw [sub_eq_self]; exact Subtype.ext (by simp)
       rwa [h0] at hse
     have hg : φ (c / e) ∈ R := hφ ⟨c / e, rfl⟩
     have hge : φ (c / e) * φ e = φ c := by rw [← map_mul, div_mul_cancel₀ c he0]
     refine ⟨c / e, hRT hg, ?_⟩
     have hb : (a - ⟨φ c, hc⟩) - ⟨φ (c / e), hg⟩ * (s - ⟨φ e, he⟩) ∈ 𝔪 :=
       sub_mem hac (Ideal.mul_mem_left _ _ hse)
-    have key : (t - ⟨φ (c / e), hRT hg⟩) * algebraMap R (locAt R 𝔪) s =
-        algebraMap R (locAt R 𝔪) ((a - ⟨φ c, hc⟩) - ⟨φ (c / e), hg⟩ * (s - ⟨φ e, he⟩)) := by
+    have key
+        : (t - ⟨φ (c / e), hRT hg⟩) * algebraMap R (locAt R 𝔪) s
+          = algebraMap R (locAt R 𝔪) ((a - ⟨φ c, hc⟩) - ⟨φ (c / e), hg⟩ * (s - ⟨φ e, he⟩)) := by
       apply Subtype.ext
       change ((t : K) - φ (c / e)) * (s : K) = ((a : K) - φ c) - φ (c / e) * ((s : K) - φ e)
       linear_combination hts - hge
     have hb' := (IsLocalization.AtPrime.to_map_mem_maximal_iff (locAt R 𝔪) 𝔪 _).2 hb
     rw [← key] at hb'
-    exact (Ideal.IsPrime.mem_or_mem inferInstance hb').resolve_right
-      fun h => (IsLocalRing.mem_maximalIdeal _).1 h (hunit s hs)
+    exact (Ideal.IsPrime.mem_or_mem inferInstance hb').resolve_right fun h =>
+      (IsLocalRing.mem_maximalIdeal _).1 h (hunit s hs)
   · haveI : FaithfulSMul (locAt R 𝔪) K := inferInstance
     refine IsFractionRing.of_field _ K fun z => ?_
     obtain ⟨d, hd, hdz⟩ := hden z

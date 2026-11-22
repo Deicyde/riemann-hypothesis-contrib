@@ -27,8 +27,8 @@ theorem bd_le (g n : ℕ) (hg : 2 ≤ g) (hn : 0 < n) : bd g n ≤ 2 * g ^ (n / 
     have hq' := Nat.dvd_of_mem_primeFactors hq
     simp only at hpq
     rw [← Nat.div_div_self hp' hn.ne', hpq, Nat.div_div_self hq' hn.ne']
-  have himg : ∑ p ∈ n.primeFactors, g ^ (n / p)
-      = ∑ d ∈ n.primeFactors.image (fun p => n / p), g ^ d :=
+  have himg
+      : ∑ p ∈ n.primeFactors, g ^ (n / p) = ∑ d ∈ n.primeFactors.image (fun p => n / p), g ^ d :=
     (Finset.sum_image hinj).symm
   have hsubset : n.primeFactors.image (fun p => n / p) ⊆ range (n / 2 + 1) := by
     intro d hd
@@ -36,7 +36,8 @@ theorem bd_le (g n : ℕ) (hg : 2 ≤ g) (hn : 0 < n) : bd g n ≤ 2 * g ^ (n / 
     obtain ⟨p, hp, rfl⟩ := hd
     rw [Finset.mem_range, Nat.lt_succ_iff]
     exact Nat.div_le_div_left (Nat.prime_of_mem_primeFactors hp).two_le (by norm_num)
-  calc _ ≤ _ := hsub
+  calc
+    _ ≤ _ := hsub
     _ = _ := himg
     _ ≤ ∑ d ∈ range (n / 2 + 1), g ^ d := Finset.sum_le_sum_of_subset hsubset
     _ ≤ 2 * g ^ (n / 2) := geom g hg (n / 2)
@@ -71,16 +72,26 @@ theorem big (g n : ℕ) (hg : 2 ≤ g) (hn : 12 ≤ n) : 2 * n * bd g n + 1 < g 
     nlinarith [Nat.mul_le_mul_left m hb, Nat.mul_le_mul_left A hA, Nat.mul_le_mul_left (A * A) hg,
       Nat.mul_le_mul_right A hm]
 
-private theorem pf2 : Nat.primeFactors 2 = {2} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf3 : Nat.primeFactors 3 = {3} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf4 : Nat.primeFactors 4 = {2} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf5 : Nat.primeFactors 5 = {5} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf6 : Nat.primeFactors 6 = {2, 3} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf7 : Nat.primeFactors 7 = {7} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf8 : Nat.primeFactors 8 = {2} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf9 : Nat.primeFactors 9 = {3} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf10 : Nat.primeFactors 10 = {2, 5} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
-private theorem pf11 : Nat.primeFactors 11 = {11} := by norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf2 : Nat.primeFactors 2 = {2} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf3 : Nat.primeFactors 3 = {3} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf4 : Nat.primeFactors 4 = {2} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf5 : Nat.primeFactors 5 = {5} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf6 : Nat.primeFactors 6 = {2, 3} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf7 : Nat.primeFactors 7 = {7} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf8 : Nat.primeFactors 8 = {2} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf9 : Nat.primeFactors 9 = {3} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf10 : Nat.primeFactors 10 = {2, 5} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
+private theorem pf11 : Nat.primeFactors 11 = {11} := by
+  norm_num [Nat.primeFactors, Nat.primeFactorsList]
 
 theorem bd_two (g : ℕ) : bd g 2 = g - 1 := by simp [bd, pf2]
 theorem bd_three (g : ℕ) : bd g 3 = g - 1 := by simp [bd, pf3]
@@ -93,11 +104,13 @@ theorem bd_nine (g : ℕ) : bd g 9 = g ^ 3 - 1 := by simp [bd, pf9]
 theorem bd_ten (g : ℕ) : bd g 10 = (g ^ 5 - 1) + (g ^ 2 - 1) := by simp [bd, pf10]
 theorem bd_eleven (g : ℕ) : bd g 11 = g - 1 := by simp [bd, pf11]
 
-private theorem cast_pred (h c k : ℕ) (hc : 1 ≤ c) : (((h + c) ^ k - 1 : ℕ) : ℤ) = ((h : ℤ) + c) ^ k - 1 := by
+private theorem cast_pred (h c k : ℕ) (hc : 1 ≤ c)
+    : (((h + c) ^ k - 1 : ℕ) : ℤ) = ((h : ℤ) + c) ^ k - 1 := by
   have h1 : 1 ≤ (h + c) ^ k := Nat.one_le_pow _ _ (by omega)
   rw [Nat.cast_sub h1, Nat.cast_pow, Nat.cast_add, Nat.cast_one]
 
-private theorem cast_pred1 (h c : ℕ) (hc : 1 ≤ c) : (((h + c) - 1 : ℕ) : ℤ) = ((h : ℤ) + c) - 1 := by
+private theorem cast_pred1 (h c : ℕ) (hc : 1 ≤ c)
+    : (((h + c) - 1 : ℕ) : ℤ) = ((h : ℤ) + c) - 1 := by
   rw [Nat.cast_sub (by omega : 1 ≤ h + c), Nat.cast_add, Nat.cast_one]
 
 private theorem t2 (h : ℕ) : 2 * 2 * bd (h + 4) 2 + 1 < (h + 4) ^ 2 := by
@@ -148,7 +161,9 @@ private theorem t6 (h : ℕ) : 2 * 6 * bd (h + 3) 6 + 1 < (h + 3) ^ 6 := by
   rw [bd_six]
   have e0 := cast_pred h 3 3 (by norm_num)
   have e1 := cast_pred h 3 2 (by norm_num)
-  have key : ((2 * 6 * (((h + 3) ^ 3 - 1) + ((h + 3) ^ 2 - 1)) + 1 : ℕ) : ℤ) < (((h + 3) ^ 6 : ℕ) : ℤ) := by
+  have key
+      : ((2 * 6 * (((h + 3) ^ 3 - 1) + ((h + 3) ^ 2 - 1)) + 1 : ℕ) : ℤ)
+        < (((h + 3) ^ 6 : ℕ) : ℤ) := by
     rw [Nat.cast_add, Nat.cast_mul, Nat.cast_add, e0, e1]
     push_cast
     rw [← sub_pos]
@@ -193,7 +208,9 @@ private theorem t10 (h : ℕ) : 2 * 10 * bd (h + 2) 10 + 1 < (h + 2) ^ 10 := by
   rw [bd_ten]
   have e0 := cast_pred h 2 5 (by norm_num)
   have e1 := cast_pred h 2 2 (by norm_num)
-  have key : ((2 * 10 * (((h + 2) ^ 5 - 1) + ((h + 2) ^ 2 - 1)) + 1 : ℕ) : ℤ) < (((h + 2) ^ 10 : ℕ) : ℤ) := by
+  have key
+      : ((2 * 10 * (((h + 2) ^ 5 - 1) + ((h + 2) ^ 2 - 1)) + 1 : ℕ) : ℤ)
+        < (((h + 2) ^ 10 : ℕ) : ℤ) := by
     rw [Nat.cast_add, Nat.cast_mul, Nat.cast_add, e0, e1]
     push_cast
     rw [← sub_pos]
@@ -212,9 +229,10 @@ private theorem t11 (h : ℕ) : 2 * 11 * bd (h + 2) 11 + 1 < (h + 2) ^ 11 := by
     positivity
   exact Nat.cast_lt.mp key
 
-theorem two_bd (g n : ℕ) (hg : 2 ≤ g) (hn : 0 < n)
-    (hex : ¬ ((g = 2 ∧ n = 2) ∨ (g = 3 ∧ n = 2) ∨ (g = 2 ∧ n = 4) ∨ (g = 2 ∧ n = 6))) :
-    2 * n * bd g n + 1 < g ^ n := by
+theorem two_bd
+    (g n : ℕ) (hg : 2 ≤ g) (hn : 0 < n)
+    (hex : ¬((g = 2 ∧ n = 2) ∨ (g = 3 ∧ n = 2) ∨ (g = 2 ∧ n = 4) ∨ (g = 2 ∧ n = 6)))
+    : 2 * n * bd g n + 1 < g ^ n := by
   rcases le_or_gt 12 n with h12 | h12
   · exact big g n hg h12
   · interval_cases n

@@ -20,8 +20,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-theorem UpperTheory.V.ZK.sClassOf :
-    UpperTheory.V.ZK.SClassOf :=
-  cJoin cChain cFree cTriv cAct cSplit cSupp cLatLoc cMu cInt cVal cGtNe cGtEq cBetaDiv cBetaVal cRep cUnit
+theorem UpperTheory.V.ZK.sClassOf : UpperTheory.V.ZK.SClassOf :=
+  cJoin cChain cFree cTriv cAct cSplit cSupp cLatLoc cMu cInt cVal cGtNe cGtEq cBetaDiv cBetaVal
+    cRep cUnit

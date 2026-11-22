@@ -12,21 +12,25 @@ noncomputable section
 
 namespace Formalism.IndefR.LatticeTransfer
 
-open Formalism.IndefR.TransferLatticeStatement Formalism.HN Formalism.L2.GlobalTheoryTheory.DivPassage
+open Formalism.IndefR.TransferLatticeStatement Formalism.HN
+  Formalism.L2.GlobalTheoryTheory.DivPassage
 
 theorem levelAmb_transfer
-    {K : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] {D0 D1 : ℕ}
-    (A : LevelAmb K D0 D1) {G : Type} [Group G] [Fintype G] {T : A.S → Type}
+    {K : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+    {D0 D1 : ℕ} (A : LevelAmb K D0 D1)
+    {G : Type} [Group G] [Fintype G]
+    {T : A.S → Type}
     [∀ s, AddCommGroup (T s)] [∀ s, Module K (T s)] [∀ s, FiniteDimensional K (T s)]
-    (τ : ∀ s, Representation K G (T s)) (H₀ : Subgroup G) (χ₀ : H₀ →* (𝓞 K)ˣ) (H : Subgroup G)
-    (χ : H →* (𝓞 K)ˣ) (ρ : Representation K G (Fin A.Dg → K))
-    (hτ : IsGood τ) (hM : M1 τ H₀ χ₀)
-    (h0 : A.ep0.mulVecLin = epP H₀ χ₀ ρ) (h1 : A.ep1.mulVecLin = epP H χ ρ)
-    (hs : ∀ s, (A.es s).mulVecLin = eS (τ s) ρ) (hn : ∀ s, A.nS s = nS (τ s) H χ)
-    (hG : A.G = Fintype.card G) (hgood : eGood τ ρ = LinearMap.id)
+    (τ : ∀ s, Representation K G (T s))
+    (H₀ : Subgroup G) (χ₀ : H₀ →* (𝓞 K)ˣ)
+    (H : Subgroup G) (χ : H →* (𝓞 K)ˣ)
+    (ρ : Representation K G (Fin A.Dg → K))
+    (hτ : IsGood τ) (hM : M1 τ H₀ χ₀) (h0 : A.ep0.mulVecLin = epP H₀ χ₀ ρ)
+    (h1 : A.ep1.mulVecLin = epP H χ ρ) (hs : ∀ s, (A.es s).mulVecLin = eS (τ s) ρ)
+    (hn : ∀ s, A.nS s = nS (τ s) H χ) (hG : A.G = Fintype.card G) (hgood : eGood τ ρ = LinearMap.id)
     (hX : A.FramesG) (hL : Submodule.IsFullLattice K A.Rg) (hst : ∀ g : G, ∀ a ∈ A.Rg, ρ g a ∈ A.Rg)
-    (hU : IsUnitaryRep (Pi.basisFun K (Fin A.Dg)) A.Xg ρ) :
-    A.Ranks ∧ A.Deg0 ∧ A.Deg1 ∧ (A.latticeAtSharpLevel ≠ ⊥ → A.MaxT) := by
+    (hU : IsUnitaryRep (Pi.basisFun K (Fin A.Dg)) A.Xg ρ)
+    : A.Ranks ∧ A.Deg0 ∧ A.Deg1 ∧ (A.latticeAtSharpLevel ≠ ⊥ → A.MaxT) := by
   have h15 := all_parts_transfer_holds
   have hlat : IsGLat ρ A.Rg := by
     have : Submodule.IsFullLattice K A.Rg := hL

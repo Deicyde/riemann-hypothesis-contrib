@@ -11,8 +11,9 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem exists_pow_smul_eq_add_sub_one_smul {S M : Type} [CommRing S] [AddCommGroup M]
-    [Module S M] (x : S) (k : ℕ) (y : M) : ∃ w : M, x ^ k • y = y + (x - 1) • w := by
+theorem exists_pow_smul_eq_add_sub_one_smul
+    {S M : Type} [CommRing S] [AddCommGroup M] [Module S M] (x : S) (k : ℕ) (y : M)
+    : ∃ w : M, x ^ k • y = y + (x - 1) • w := by
   refine ⟨(∑ j ∈ Finset.range k, x ^ j) • y, ?_⟩
   rw [smul_smul, mul_geom_sum, sub_smul, one_smul]
   abel
@@ -64,13 +65,15 @@ private lemma ker_sup_smul_whole_eq_ker_mkQ_comp {S F G : Type} [CommRing S] [Ad
     exact Submodule.add_mem_sup (LinearMap.mem_ker.mpr hk)
       (Submodule.smul_mem_pointwise_smul v u ⊤ Submodule.mem_top)
 
-theorem finite_quotSMulTop_ker_of_regular {S F G : Type} [CommRing S] [AddCommGroup F]
-    [Module S F] [AddCommGroup G] [Module S G] (u : S) (φ : F →ₗ[S] G)
-    (hreg : ∀ z : G, u • z = 0 → z = 0) [Module.Finite S F]
-    [Module.FinitePresentation S (QuotSMulTop u G)]
+theorem finite_quotSMulTop_ker_of_regular
+    {S F G : Type} [CommRing S] [AddCommGroup F] [Module S F] [AddCommGroup G] [Module S G]
+    (u : S)
+    (φ : F →ₗ[S] G)
+    (hreg : ∀ z : G, u • z = 0 → z = 0)
+    [Module.Finite S F] [Module.FinitePresentation S (QuotSMulTop u G)]
     (hsurj : ∀ z : G, ∃ (y : F) (w : G), φ y = z + u • w)
-    (hker : ∀ (y : F) (w : G), φ y = u • w → ∃ (k v : F), φ k = 0 ∧ y = k + u • v) :
-    Module.Finite S (QuotSMulTop u (LinearMap.ker φ)) := by
+    (hker : ∀ (y : F) (w : G), φ y = u • w → ∃ (k v : F), φ k = 0 ∧ y = k + u • v)
+    : Module.Finite S (QuotSMulTop u (LinearMap.ker φ)) := by
   let ψ : F →ₗ[S] QuotSMulTop u G := (u • (⊤ : Submodule S G)).mkQ ∘ₗ φ
   have hψ : Function.Surjective ψ := by
     intro z
@@ -83,15 +86,26 @@ theorem finite_quotSMulTop_ker_of_regular {S F G : Type} [CommRing S] [AddCommGr
   have hfin : Module.Finite S ↥(LinearMap.ker φ ⊔ u • (⊤ : Submodule S F)) := by
     rw [ker_sup_smul_whole_eq_ker_mkQ_comp u φ hker]
     exact Module.Finite.iff_fg.mpr hfg
-  have h2 : Module.Finite S (LinearMap.ker φ ⧸ Submodule.comap (LinearMap.ker φ).subtype
-      (LinearMap.ker φ ⊓ u • (⊤ : Submodule S F))) :=
+  have h2 : Module.Finite S
+      (LinearMap.ker φ ⧸ Submodule.comap (LinearMap.ker φ).subtype
+        (LinearMap.ker φ ⊓ u • (⊤ : Submodule S F))) :=
     Module.Finite.equiv (LinearMap.quotientInfEquivSupQuotient (LinearMap.ker φ)
       (u • (⊤ : Submodule S F))).symm
   exact Module.Finite.equiv (Submodule.quotEquivOfEq _ (u • (⊤ : Submodule S (LinearMap.ker φ)))
     (comap_ker_inf_smul_whole_eq_smul_whole_of_regular u φ hreg))
 
-theorem finite_quotSMulTop_ker_of_graded :
-    ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (R : Type) [CommRing R] (F : Type) [AddCommGroup F] [Module R F] [Module (MvPolynomial ι R) F] [IsScalarTower R (MvPolynomial ι R) F] (ℱ : ℤ → Submodule R F) [PolyGradedSMul ι ℱ] [Decomposition ℱ] (G : Type) [AddCommGroup G] [Module R G] [Module (MvPolynomial ι R) G] [IsScalarTower R (MvPolynomial ι R) G] (𝒢 : ℤ → Submodule R G) [PolyGradedSMul ι 𝒢] [Decomposition 𝒢] (φ : F →ₗ[MvPolynomial ι R] G) (i : ι), IsGradedMap ℱ 𝒢 φ → Module.Finite (MvPolynomial ι R) F → (∀ z : G, ∃ k : ℕ, (X i : MvPolynomial ι R) ^ k • z ∈ LinearMap.range φ) → Module.FinitePresentation (MvPolynomial ι R) (QuotSMulTop (X i - 1 : MvPolynomial ι R) G) → Module.Finite (MvPolynomial ι R) (QuotSMulTop (X i - 1 : MvPolynomial ι R) (LinearMap.ker φ)) := by
+theorem finite_quotSMulTop_ker_of_graded
+    : ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (R : Type) [CommRing R] (F : Type) [AddCommGroup F]
+        [Module R F] [Module (MvPolynomial ι R) F] [IsScalarTower R (MvPolynomial ι R) F]
+        (ℱ : ℤ → Submodule R F) [PolyGradedSMul ι ℱ] [Decomposition ℱ] (G : Type) [AddCommGroup G]
+        [Module R G] [Module (MvPolynomial ι R) G] [IsScalarTower R (MvPolynomial ι R) G]
+        (𝒢 : ℤ → Submodule R G) [PolyGradedSMul ι 𝒢] [Decomposition 𝒢]
+        (φ : F →ₗ[MvPolynomial ι R] G) (i : ι),
+      IsGradedMap ℱ 𝒢 φ → Module.Finite (MvPolynomial ι R) F
+        → (∀ z : G, ∃ k : ℕ, (X i : MvPolynomial ι R) ^ k • z ∈ LinearMap.range φ)
+        → Module.FinitePresentation (MvPolynomial ι R) (QuotSMulTop (X i - 1 : MvPolynomial ι R) G)
+        → Module.Finite (MvPolynomial ι R)
+          (QuotSMulTop (X i - 1 : MvPolynomial ι R) (LinearMap.ker φ)) := by
   intro ι _ _ R _ F _ _ _ _ ℱ _ _ G _ _ _ _ 𝒢 _ _ φ i hφ hF hpow hfp
   obtain ⟨hregG, hkillG, -⟩ := X_sub_one_smul_graded ι R G 𝒢 i
   obtain ⟨-, -, hhomF⟩ := X_sub_one_smul_graded ι R F ℱ i

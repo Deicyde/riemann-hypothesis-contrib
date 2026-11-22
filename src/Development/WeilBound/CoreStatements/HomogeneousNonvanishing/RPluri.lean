@@ -8,14 +8,19 @@ public import Development.WeilBound.CoreStatements.HomogeneousNonvanishing.CPlur
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.Cmp GlobalTheory.CompanionTheory.Ar.PB Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.Cmp
+  GlobalTheory.CompanionTheory.Ar.PB Filter Topology
 open ReciprocityTheory.ChartRestriction.G.AI.I1 (IsBlockMap pullDeg)
 
 namespace PositivityTheory.UnitarySelfGeneration
 
-private theorem continuousOn_levi_of_contDiffOn' {e : ℕ} (d : (Fin e → ℂ) → ℝ) (c : Fin e → ℂ) (r : ℝ) (w : Fin e → ℂ)
-    (hd2 : ContDiffOn ℝ 2 d (Metric.ball c r)) :
-    ContinuousOn (fun v => ReciprocityTheory.AnForm.levi d v w) (Metric.ball c r) := by
+private theorem continuousOn_levi_of_contDiffOn'
+    {e : ℕ} (d : (Fin e → ℂ) → ℝ) (c : Fin e → ℂ)
+    (r : ℝ)
+    (w : Fin e → ℂ) (hd2 : ContDiffOn ℝ 2 d (Metric.ball c r))
+    : ContinuousOn (fun v => ReciprocityTheory.AnForm.levi d v w) (Metric.ball c r) := by
   have hc0 := ReciprocityTheory.AnForm.continuousOn_levi Metric.isOpen_ball hd2
   refine hc0.comp (f := fun v : Fin e → ℂ => (v, w)) ?_ ?_
   · exact (continuous_id.prodMk continuous_const).continuousOn
@@ -23,7 +28,11 @@ private theorem continuousOn_levi_of_contDiffOn' {e : ℕ} (d : (Fin e → ℂ) 
     exact Set.mk_mem_prod hv (Set.mem_univ w)
 
 open HolomorphicMinorCharts ReciprocityTheory.AnForm in
-theorem r_pluri : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X) (U : Set X) (P Q : LocPot X), IsPotential A P → IsPotential A Q → IsOpen U → Dense U → SamePot A U P Q → SamePot A Set.univ P Q := by
+theorem r_pluri
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
+        (U : Set X) (P Q : LocPot X),
+      IsPotential A P → IsPotential A Q → IsOpen U → Dense U → SamePot A U P Q
+        → SamePot A Set.univ P Q := by
   intro e X _ _ _ A U P Q hP hQ hUo hUd hS x _
   obtain ⟨j, hxj⟩ := A.cover x
   set ψ := A.chart j with hψ
@@ -36,8 +45,12 @@ theorem r_pluri : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X]
     exact ⟨P.mem_U x, Q.mem_U x⟩
   obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp hO (ψ x) hxO
   set d : (Fin e → ℂ) → ℝ := fun z => P.φ x (ψ.symm z) - Q.φ x (ψ.symm z) with hdd
-  have h1 := (hP.1 x j).mono (fun v (hv : v ∈ ψ.target ∩ ψ.symm ⁻¹' (P.U x ∩ Q.U x)) => (⟨hv.1, hv.2.1⟩ : v ∈ ψ.target ∩ ψ.symm ⁻¹' P.U x))
-  have h2 := (hQ.1 x j).mono (fun v (hv : v ∈ ψ.target ∩ ψ.symm ⁻¹' (P.U x ∩ Q.U x)) => (⟨hv.1, hv.2.2⟩ : v ∈ ψ.target ∩ ψ.symm ⁻¹' Q.U x))
+  have h1 :=
+    (hP.1 x j).mono (fun v (hv : v ∈ ψ.target ∩ ψ.symm ⁻¹' (P.U x ∩ Q.U x)) =>
+      (⟨hv.1, hv.2.1⟩ : v ∈ ψ.target ∩ ψ.symm ⁻¹' P.U x))
+  have h2 :=
+    (hQ.1 x j).mono (fun v (hv : v ∈ ψ.target ∩ ψ.symm ⁻¹' (P.U x ∩ Q.U x)) =>
+      (⟨hv.1, hv.2.2⟩ : v ∈ ψ.target ∩ ψ.symm ⁻¹' Q.U x))
   have hd2 : ContDiffOn ℝ 2 d (Metric.ball (ψ x) r) :=
     ((h1.sub h2).mono hball).of_le (WithTop.coe_le_coe.mpr le_top)
   clear_value d
@@ -71,9 +84,11 @@ theorem r_pluri : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X]
     intro z hz w
     by_contra hne
     have hcw := continuousOn_levi_of_contDiffOn' d (ψ x) r w hd2
-    have hca : ContinuousAt (fun v => levi d v w) z := hcw.continuousAt (Metric.isOpen_ball.mem_nhds hz)
+    have hca : ContinuousAt (fun v => levi d v w) z :=
+      hcw.continuousAt (Metric.isOpen_ball.mem_nhds hz)
     have hM : (fun v => levi d v w) ⁻¹' {b | b ≠ 0} ∩ Metric.ball (ψ x) r ∈ 𝓝 z :=
-      Filter.inter_mem (hca.preimage_mem_nhds (isOpen_ne.mem_nhds hne)) (Metric.isOpen_ball.mem_nhds hz)
+      Filter.inter_mem (hca.preimage_mem_nhds (isOpen_ne.mem_nhds hne))
+        (Metric.isOpen_ball.mem_nhds hz)
     obtain ⟨M, hMsub, hMo, hzM⟩ := mem_nhds_iff.mp hM
     have hzt : z ∈ ψ.target := (hball (hMsub hzM).2).1
     have hne2 : (ψ.source ∩ ψ ⁻¹' M).Nonempty := by
@@ -88,9 +103,16 @@ theorem r_pluri : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X]
     rw [ψ.left_inv hus]
     exact huU
   obtain ⟨G0, hG0an, hG0eq⟩ := exists_re_of_levi_zero hr hd2 hlevi
-  refine ⟨ψ.source ∩ ψ ⁻¹' Metric.ball (ψ x) r, ψ.isOpen_inter_preimage Metric.isOpen_ball,
-    ⟨hxj, Metric.mem_ball_self hr⟩, fun y => G0 (ψ y), ?_, ?_⟩
-  · exact holoOn_of_compat (isCompatChart_chart A j) Set.inter_subset_left (fun y hy => hG0an _ hy.2)
+  refine ⟨
+    ψ.source ∩ ψ ⁻¹' Metric.ball (ψ x) r,
+    ψ.isOpen_inter_preimage Metric.isOpen_ball,
+    ⟨hxj, Metric.mem_ball_self hr⟩,
+    fun y => G0 (ψ y),
+    ?_,
+    ?_
+  ⟩
+  · exact holoOn_of_compat (isCompatChart_chart A j) Set.inter_subset_left
+      (fun y hy => hG0an _ hy.2)
   · intro y hy
     have h := hG0eq (ψ y) hy.2
     simp only [hdd, ψ.left_inv hy.1] at h

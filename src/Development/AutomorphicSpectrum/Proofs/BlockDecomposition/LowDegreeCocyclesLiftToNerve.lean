@@ -8,17 +8,22 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.HopfC
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+  GlobalTheory.CompanionTheory.HopfC
 
 namespace GlobalTheory.CompanionTheory.HopfC.LowDict
 
-theorem exists_quot_equiv {R M N : Type} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+theorem exists_quot_equiv
+    {R M N : Type} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
     (e : M ≃ₗ[R] N) (K : Submodule R M) (Z : Submodule R N) (hK : ∀ x, x ∈ K ↔ e x ∈ Z)
     (BK : Submodule R K) (BZ' : Submodule R Z)
-    (hB : ∀ (x : K) (f : Z), e x.1 = f.1 → (x ∈ BK ↔ f ∈ BZ')) :
-    ∃ u : (Z ⧸ BZ') ≃ₗ[R] (K ⧸ BK),
-      (∀ (f : Z) (x : K), e x.1 = f.1 → u (BZ'.mkQ f) = BK.mkQ x) ∧ ∀ f : Z, ∃ x : K, e x.1 = f.1 := by
+    (hB : ∀ (x : K) (f : Z), e x.1 = f.1 → (x ∈ BK ↔ f ∈ BZ'))
+    : ∃ u : (Z ⧸ BZ') ≃ₗ[R] (K ⧸ BK),
+      (∀ (f : Z) (x : K), e x.1 = f.1 → u (BZ'.mkQ f) = BK.mkQ x)
+        ∧ ∀ f : Z, ∃ x : K, e x.1 = f.1 := by
   have hmap : K.map (e : M →ₗ[R] N) = Z := by
     ext y
     constructor
@@ -48,9 +53,11 @@ theorem exists_quot_equiv {R M N : Type} [CommRing R] [AddCommGroup M] [Module R
 
 variable {R : Type} [CommRing R] {C : Type} [Category.{0} C] (F : C ⥤ CommAlgCat.{0} R)
 
-theorem d2_apply (z : C2 F) {T T' T'' T''' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T''') :
-    d2 F z T T' T'' T''' φ ψ χ = z T' T'' T''' ψ χ - z T T'' T''' (φ ≫ ψ) χ + z T T' T''' φ (ψ ≫ χ) -
-      mp F χ (z T T' T'' φ ψ) := rfl
+theorem d2_apply (z : C2 F) {T T' T'' T''' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T''')
+    : d2 F z T T' T'' T''' φ ψ χ
+      = z T' T'' T''' ψ χ - z T T'' T''' (φ ≫ ψ) χ + z T T' T''' φ (ψ ≫ χ)
+        - mp F χ (z T T' T'' φ ψ) :=
+  rfl
 
 theorem Z2_eq_ker : Z2 F = LinearMap.ker (d2 F) := by
   ext z
@@ -61,24 +68,39 @@ theorem Z2_eq_ker : Z2 F = LinearMap.ker (d2 F) := by
     have := h φ ψ χ
     simp only [Pi.zero_apply]
     linear_combination -this
-  · have := congrFun (congrFun (congrFun (congrFun (congrFun (congrFun (congrFun (LinearMap.mem_ker.1 h) T) T') T'') T''') φ) ψ) χ
+  · have :=
+      congrFun
+        (congrFun
+          (congrFun
+            (congrFun (congrFun (congrFun (congrFun (LinearMap.mem_ker.1 h) T) T') T'') T''') φ)
+          ψ)
+        χ
     rw [d2_apply] at this
     simp only [Pi.zero_apply] at this
     linear_combination -this
 
-theorem dict_low : DictSt → ∀ {R : Type} [CommRing R] {C : Type} [Category.{0} C] (F : C ⥤ CommAlgCat.{0} R),
-    ∃ (u₁ : H1 F ≃ₗ[R] HH F 1) (u₂ : H2 F ≃ₗ[R] HH F 2), IsIdealValuedLiftSystemCocycle F u₁.toLinearMap ∧ IsDegreeTwoComparison F u₂.toLinearMap ∧
-      (∀ f : Z1 F, ∃ x : Zc F 1, ∀ (T T' : C) (φ : T ⟶ T'), x.1 (ComposableArrows.mk₁ φ) = f.1 T T' φ) ∧
-      (∀ f : Z2 F, ∃ x : Zc F 2, ∀ (T T' T'' : C) (φ : T ⟶ T') (ψ : T' ⟶ T''),
-        x.1 (ComposableArrows.mk₂ φ ψ) = f.1 T T' T'' φ ψ) := by
+theorem dict_low
+    : DictSt
+      → ∀ {R : Type} [CommRing R] {C : Type} [Category.{0} C] (F : C ⥤ CommAlgCat.{0} R),
+        ∃ (u₁ : H1 F ≃ₗ[R] HH F 1) (u₂ : H2 F ≃ₗ[R] HH F 2),
+          IsIdealValuedLiftSystemCocycle F u₁.toLinearMap ∧ IsDegreeTwoComparison F u₂.toLinearMap
+            ∧ (∀ f : Z1 F, ∃ x : Zc F 1, ∀ (T T' : C) (φ : T ⟶ T'),
+              x.1 (ComposableArrows.mk₁ φ) = f.1 T T' φ)
+            ∧ (∀ f : Z2 F, ∃ x : Zc F 2, ∀ (T T' T'' : C) (φ : T ⟶ T') (ψ : T' ⟶ T''),
+              x.1 (ComposableArrows.mk₂ φ ψ) = f.1 T T' T'' φ ψ) := by
   intro hD R _ C _ F
   obtain ⟨e₀, e₁, e₂, e₃, v₀, v₁, v₂, -, h₀, h₁, h₂⟩ := hD R C F
   have k₁ : ∀ x, x ∈ Zc F 1 ↔ e₁ x ∈ Z1 F := fun x ↦ by
-    rw [commAlgFunctorCocyclesOne_eq_ker, LinearMap.mem_ker, LinearMap.mem_ker, ← h₁, LinearEquiv.map_eq_zero_iff]
+    rw [commAlgFunctorCocyclesOne_eq_ker, LinearMap.mem_ker, LinearMap.mem_ker, ← h₁,
+      LinearEquiv.map_eq_zero_iff]
   have k₂ : ∀ x, x ∈ Zc F 2 ↔ e₂ x ∈ Z2 F := fun x ↦ by
     rw [Z2_eq_ker, LinearMap.mem_ker, LinearMap.mem_ker, ← h₂, LinearEquiv.map_eq_zero_iff]
-  have b₁ : ∀ (x : Zc F 1) (f : Z1 F), e₁ x.1 = f.1 →
-      (x ∈ BZ F 1 ↔ f ∈ LinearMap.range ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F))) := fun x f hxf ↦ by
+  have b₁
+      : ∀ (x : Zc F 1) (f : Z1 F),
+        e₁ x.1 = f.1
+          → (x ∈ BZ F 1
+            ↔ f ∈ LinearMap.range ((d0 F).codRestrict (Z1 F)
+              (commAlgFunctorCoboundaryZero_mem_cocyclesOne F))) := fun x f hxf ↦ by
     constructor
     · rintro ⟨g, hg⟩
       refine ⟨e₀ g, Subtype.ext ?_⟩
@@ -88,8 +110,12 @@ theorem dict_low : DictSt → ∀ {R : Type} [CommRing R] {C : Type} [Category.{
       refine ⟨e₀.symm g, e₁.injective ?_⟩
       rw [h₀, LinearEquiv.apply_symm_apply]
       exact (congrArg Subtype.val hg).trans hxf.symm
-  have b₂ : ∀ (x : Zc F 2) (f : Z2 F), e₂ x.1 = f.1 →
-      (x ∈ BZ F 2 ↔ f ∈ LinearMap.range ((d1 F).codRestrict (Z2 F) (differential_one_mem_scaled_lattice F))) := fun x f hxf ↦ by
+  have b₂
+      : ∀ (x : Zc F 2) (f : Z2 F),
+        e₂ x.1 = f.1
+          → (x ∈ BZ F 2
+            ↔ f ∈ LinearMap.range ((d1 F).codRestrict (Z2 F)
+              (differential_one_mem_scaled_lattice F))) := fun x f hxf ↦ by
     constructor
     · rintro ⟨g, hg⟩
       refine ⟨e₁ g, Subtype.ext ?_⟩
@@ -109,7 +135,11 @@ theorem dict_low : DictSt → ∀ {R : Type} [CommRing R] {C : Type} [Category.{
   · obtain ⟨x, hx⟩ := s₁ f
     exact ⟨x, fun T T' φ ↦ (v₁ x.1 T T' φ).symm.trans (congrFun (congrFun (congrFun hx T) T') φ)⟩
   · obtain ⟨x, hx⟩ := s₂ f
-    exact ⟨x, fun T T' T'' φ ψ ↦ (v₂ x.1 T T' T'' φ ψ).symm.trans
-      (congrFun (congrFun (congrFun (congrFun (congrFun hx T) T') T'') φ) ψ)⟩
+    exact ⟨
+      x,
+      fun T T' T'' φ ψ ↦
+        (v₂ x.1 T T' T'' φ ψ).symm.trans
+          (congrFun (congrFun (congrFun (congrFun (congrFun hx T) T') T'') φ) ψ)
+    ⟩
 
 end GlobalTheory.CompanionTheory.HopfC.LowDict

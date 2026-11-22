@@ -19,19 +19,20 @@ open FiniteSubfield
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-theorem natCard_tate_of_isCyclic (K L : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) [(L.subgroupOf K).Normal]
-    [(L.subgroupOf K).FiniteIndex] {F E : FiniteSubfield} (hFE : F ≤ E)
-    (hK : K = F.1.fixingSubgroup) (hL : L = E.1.fixingSubgroup)
-    (hcyc : IsCyclic (K ⧸ L.subgroupOf K)) :
-    Nat.card (tateZero IdeleClassLimit K L) = L.relIndex K ∧
-      Nat.card (tateNegOne IdeleClassLimit K L) = 1 := by
+theorem natCard_tate_of_isCyclic
+    (K L : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) [(L.subgroupOf K).Normal] [(L.subgroupOf K).FiniteIndex]
+    {F E : FiniteSubfield} (hFE : F ≤ E) (hK : K = F.1.fixingSubgroup) (hL : L = E.1.fixingSubgroup)
+    (hcyc : IsCyclic (K ⧸ L.subgroupOf K))
+    : Nat.card (tateZero IdeleClassLimit K L) = L.relIndex K
+      ∧ Nat.card (tateNegOne IdeleClassLimit K L) = 1 := by
   subst hK hL
   have : Fact (F ≤ E) := ⟨hFE⟩
   have : IsGalois F.1 E.1 := isGalois_of_normal (F := F) (E := E)
 
   have hcycE : IsCyclic (E.1 ≃ₐ[F.1] E.1) := by
-    let φ := QuotientGroup.lift (E.1.fixingSubgroup.subgroupOf F.1.fixingSubgroup)
-      (restrictHom (F := F) (E := E)) (ker_restrictHom (F := F) (E := E)).ge
+    let φ :=
+      QuotientGroup.lift (E.1.fixingSubgroup.subgroupOf F.1.fixingSubgroup)
+        (restrictHom (F := F) (E := E)) (ker_restrictHom (F := F) (E := E)).ge
     refine isCyclic_of_surjective φ fun x ↦ ?_
     obtain ⟨g, rfl⟩ := restrictHom_surjective (F := F) (E := E) x
     exact ⟨g, rfl⟩

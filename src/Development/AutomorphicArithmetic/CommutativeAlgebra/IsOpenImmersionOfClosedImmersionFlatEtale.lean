@@ -6,8 +6,10 @@ public import Mathlib
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory
 
-theorem UpperTheory.isOpenImmersion_of_closedImmersion_flat_etale :
-    ∀ {V X T : Scheme.{0}} (v : V ⟶ X) (p : X ⟶ T), Etale p → IsClosedImmersion v → Flat (v ≫ p) → LocallyOfFinitePresentation (v ≫ p) → IsOpenImmersion v := by
+theorem UpperTheory.isOpenImmersion_of_closedImmersion_flat_etale
+    : ∀ {V X T : Scheme.{0}} (v : V ⟶ X) (p : X ⟶ T),
+      Etale p → IsClosedImmersion v → Flat (v ≫ p) → LocallyOfFinitePresentation (v ≫ p)
+        → IsOpenImmersion v := by
   intro V X T v p hp hv hf hl
   have hv' : FormallyUnramified v := inferInstance
   have hu : FormallyUnramified (v ≫ p) :=

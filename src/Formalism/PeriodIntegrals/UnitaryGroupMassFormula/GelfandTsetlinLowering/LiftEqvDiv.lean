@@ -17,9 +17,11 @@ def tvU {r : ℕ} (a b : Fin r) (hab : a ≠ b) (t : ℂ) : GL (Fin r) ℂ where
   val := Formalism.UG.P.wlocal_E a b t
   inv := Formalism.UG.P.wlocal_E a b (-t)
   val_inv := by
-    rw [Formalism.UG.P.wlocal_E_mul_E, if_neg hab, add_neg_cancel, add_zero, Formalism.UG.P.wlocal_E_zero]
+    rw [Formalism.UG.P.wlocal_E_mul_E, if_neg hab, add_neg_cancel, add_zero,
+      Formalism.UG.P.wlocal_E_zero]
   inv_val := by
-    rw [Formalism.UG.P.wlocal_E_mul_E, if_neg hab, neg_add_cancel, add_zero, Formalism.UG.P.wlocal_E_zero]
+    rw [Formalism.UG.P.wlocal_E_mul_E, if_neg hab, neg_add_cancel, add_zero,
+      Formalism.UG.P.wlocal_E_zero]
 
 lemma wlocal_E_eq_tv {r : ℕ} (a b : Fin r) (t : ℂ) :
     Formalism.UG.P.wlocal_E a b t = Matrix.transvection a b t := by
@@ -74,11 +76,11 @@ lemma embGL_tv {n N : ℕ} (h : n + 1 = N) (a b : Fin n) (hab : a ≠ b) (t : �
 
 end SlopeTestRemainingChoices
 
-private theorem coeff_eq_of_eval_lemma {σ τ : Type*}
-    (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ)
-    (P : Polynomial (MvPolynomial σ ℂ)) (Q : Polynomial (MvPolynomial τ ℂ))
-    (hPQ : ∀ t : ℂ, φ (P.eval (C t)) = Q.eval (C t)) (k : ℕ) :
-    φ (P.coeff k) = Q.coeff k := by
+private theorem coeff_eq_of_eval_lemma
+    {σ τ : Type*} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ) (P : Polynomial (MvPolynomial σ ℂ))
+    (Q : Polynomial (MvPolynomial τ ℂ)) (hPQ : ∀ t : ℂ, φ (P.eval (C t)) = Q.eval (C t))
+    (k : ℕ)
+    : φ (P.coeff k) = Q.coeff k := by
   obtain ⟨d, hdP, hdQ⟩ : ∃ d, P.natDegree < d ∧ Q.natDegree < d :=
     ⟨P.natDegree + Q.natDegree + 1, by omega, by omega⟩
   have hP : ∀ t : ℂ, P.eval (C t) = ∑ i ∈ Finset.range d, t ^ i • P.coeff i := by
@@ -108,7 +110,8 @@ private theorem coeff_eq_of_eval_lemma {σ τ : Type*}
       simpa [mul_comm] using e
     have e2 := congrArg (fun r : Polynomial ℂ => r.coeff k) hpq
     simpa only [p, q, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply,
-      Finset.sum_ite_eq', Finset.mem_range, hk, if_true] using e2
+        Finset.sum_ite_eq', Finset.mem_range, hk, if_true]
+      using e2
   · have h1 : P.coeff k = 0 := Polynomial.coeff_eq_zero_of_natDegree_lt (by omega)
     have h2 : Q.coeff k = 0 := Polynomial.coeff_eq_zero_of_natDegree_lt (by omega)
     rw [h1, h2, map_zero]
@@ -122,6 +125,8 @@ theorem equivariant_divisibility : EqvDiv := by
     (fun t => by
       have e1 := hφ.2 (tvU a b hab t) s hs
       rwa [sqAct_tv mu a b hab t _ rfl s,
-        sqAct_tv lam (eRow h a) (eRow h b) hab' t _ (embGL_tv h a b hab t) (φ s)] at e1) k
+          sqAct_tv lam (eRow h a) (eRow h b) hab' t _ (embGL_tv h a b hab t) (φ s)]
+        at e1)
+    k
 
 end PI.WGL

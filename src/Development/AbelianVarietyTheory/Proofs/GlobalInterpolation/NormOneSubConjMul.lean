@@ -9,33 +9,43 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory
 
 namespace GlobalTheory.LogDerivZeros
 
-theorem exists_factor_one {U : Set ℂ} {g : ℂ → ℂ} (hg : AnalyticOnNhd ℂ g U) {w : ℂ} (hw : w ∈ U)
-    (ho : analyticOrderAt g w ≠ ⊤) :
-    ∃ h : ℂ → ℂ, AnalyticOnNhd ℂ h U ∧ (∀ z, g z = (z - w) ^ (analyticOrderNatAt g w) * h z) ∧
-      h w ≠ 0 := by
+theorem exists_factor_one
+    {U : Set ℂ} {g : ℂ → ℂ} (hg : AnalyticOnNhd ℂ g U)
+    {w : ℂ} (hw : w ∈ U) (ho : analyticOrderAt g w ≠ ⊤)
+    : ∃ h : ℂ → ℂ,
+      AnalyticOnNhd ℂ h U ∧ (∀ z, g z = (z - w) ^ (analyticOrderNatAt g w) * h z) ∧ h w ≠ 0 := by
   first
   | exact @_root_.GlobalTheory.FactorOrderExistence.exists_factor_order
   | exact _root_.GlobalTheory.FactorOrderExistence.exists_factor_order
   | (apply _root_.GlobalTheory.FactorOrderExistence.exists_factor_order <;> assumption)
   | (intros; apply _root_.GlobalTheory.FactorOrderExistence.exists_factor_order <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.FactorOrderExistence.exists_factor_order <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.FactorOrderExistence.exists_factor_order
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.FactorOrderExistence.exists_factor_order ..)
 
-theorem exists_factor {U : Set ℂ} {f : ℂ → ℂ} (hf : AnalyticOnNhd ℂ f U) (S : Finset ℂ)
-    (hS : ∀ w ∈ S, w ∈ U) (ho : ∀ w ∈ S, analyticOrderAt f w ≠ ⊤) :
-    ∃ g : ℂ → ℂ, AnalyticOnNhd ℂ g U ∧
-      (∀ z, f z = (∏ w ∈ S, (z - w) ^ (analyticOrderNatAt f w)) * g z) ∧ ∀ w ∈ S, g w ≠ 0 := by
+theorem exists_factor
+    {U : Set ℂ} {f : ℂ → ℂ} (hf : AnalyticOnNhd ℂ f U)
+    (S : Finset ℂ) (hS : ∀ w ∈ S, w ∈ U) (ho : ∀ w ∈ S, analyticOrderAt f w ≠ ⊤)
+    : ∃ g : ℂ → ℂ,
+      AnalyticOnNhd ℂ g U ∧ (∀ z, f z = (∏ w ∈ S, (z - w) ^ (analyticOrderNatAt f w)) * g z)
+        ∧ ∀ w ∈ S, g w ≠ 0 := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨f, hf, by simp, by simp⟩
   | insert a S ha ih =>
-    obtain ⟨g, hg, hfg, hg0⟩ := ih (fun w hw => hS w (Finset.mem_insert_of_mem hw))
-      (fun w hw => ho w (Finset.mem_insert_of_mem hw))
+    obtain ⟨g, hg, hfg, hg0⟩ :=
+      ih
+        (fun w hw => hS w (Finset.mem_insert_of_mem hw))
+        (fun w hw => ho w (Finset.mem_insert_of_mem hw))
     have haU : a ∈ U := hS a (Finset.mem_insert_self _ _)
     have hP : AnalyticAt ℂ (fun z : ℂ => ∏ w ∈ S, (z - w) ^ (analyticOrderNatAt f w)) a := by
       fun_prop
     have hP0 : (∏ w ∈ S, (a - w) ^ (analyticOrderNatAt f w)) ≠ 0 :=
-      Finset.prod_ne_zero_iff.2 fun w hw => pow_ne_zero _ (sub_ne_zero.2 (by rintro rfl; exact ha hw))
+      Finset.prod_ne_zero_iff.2 fun w hw =>
+        pow_ne_zero _ (sub_ne_zero.2 (by rintro rfl; exact ha hw))
     have hord : analyticOrderAt f a = analyticOrderAt g a := by
       have e : f = (fun z : ℂ => ∏ w ∈ S, (z - w) ^ (analyticOrderNatAt f w)) * g := funext hfg
       have := analyticOrderAt_mul hP (hg a haU)
@@ -51,19 +61,22 @@ theorem exists_factor {U : Set ℂ} {f : ℂ → ℂ} (hf : AnalyticOnNhd ℂ f 
       · intro h0
         exact hg0 w hw (by rw [hgh w, h0, mul_zero])
 
-theorem norm_logDeriv_le {r R K : ℝ} (hr : 0 < r) (hrR : r < R) (hK : 0 < K) {g : ℂ → ℂ}
+theorem norm_logDeriv_le
+    {r R K : ℝ} (hr : 0 < r) (hrR : r < R) (hK : 0 < K)
+    {g : ℂ → ℂ}
     (hg : DifferentiableOn ℂ g (Metric.ball 0 R)) (h0 : ∀ z ∈ Metric.ball (0 : ℂ) R, g z ≠ 0)
-    (hb : ∀ z ∈ Metric.ball (0 : ℂ) R, ‖g z‖ ≤ ‖g 0‖ * Real.exp K) {z : ℂ} (hz : ‖z‖ ≤ r) :
-    ‖deriv g z / g z‖ ≤ (8 * R / (R - r) ^ 2) * K := by
+    (hb : ∀ z ∈ Metric.ball (0 : ℂ) R, ‖g z‖ ≤ ‖g 0‖ * Real.exp K)
+    {z : ℂ} (hz : ‖z‖ ≤ r)
+    : ‖deriv g z / g z‖ ≤ (8 * R / (R - r) ^ 2) * K := by
   have hR : 0 < R := hr.trans hrR
   have hd : DifferentiableOn ℂ (fun u => deriv g u / g u) (Metric.ball 0 R) :=
     (hg.deriv Metric.isOpen_ball).div hg h0
   obtain ⟨h, hh0, hh⟩ := hd.isExactOn_ball.with_val_at 0 0
-  have hhd : DifferentiableOn ℂ h (Metric.ball 0 R) :=
-    fun u hu => (hh u hu).differentiableAt.differentiableWithinAt
-  have hc : ∀ u ∈ Metric.ball (0 : ℂ) R, g u * cexp (-h u) = g 0 := by
+  have hhd : DifferentiableOn ℂ h (Metric.ball 0 R) := fun u hu =>
+    (hh u hu).differentiableAt.differentiableWithinAt
+  have hc : ∀ u ∈ Metric.ball (0 : ℂ) R, g u * cexp (- h u) = g 0 := by
     intro u hu
-    have hD : ∀ v ∈ Metric.ball (0 : ℂ) R, HasDerivAt (fun v => g v * cexp (-h v)) 0 v := by
+    have hD : ∀ v ∈ Metric.ball (0 : ℂ) R, HasDerivAt (fun v => g v * cexp (- h v)) 0 v := by
       intro v hv
       have h1 := (hg.differentiableAt (Metric.isOpen_ball.mem_nhds hv)).hasDerivAt
       have h2 := h1.mul (hh v hv).neg.cexp
@@ -72,15 +85,17 @@ theorem norm_logDeriv_le {r R K : ℝ} (hr : 0 < r) (hrR : r < R) (hK : 0 < K) {
       simp only [Pi.neg_apply]
       field_simp
       ring
-    have := Metric.isOpen_ball.is_const_of_deriv_eq_zero (𝕜 := ℂ) (f := fun v => g v * cexp (-h v))
-      (convex_ball (0 : ℂ) R).isPreconnected
-      (fun v hv => (hD v hv).differentiableAt.differentiableWithinAt)
-      (fun v hv => (hD v hv).deriv) hu (Metric.mem_ball_self hR)
+    have :=
+      Metric.isOpen_ball.is_const_of_deriv_eq_zero (𝕜 := ℂ)
+        (f := fun v => g v * cexp (- h v))
+        (convex_ball (0 : ℂ) R).isPreconnected
+        (fun v hv => (hD v hv).differentiableAt.differentiableWithinAt)
+        (fun v hv => (hD v hv).deriv)
+        hu (Metric.mem_ball_self hR)
     simpa [hh0] using this
   have hre : Set.MapsTo h (Metric.ball 0 R) {z | z.re ≤ K} := by
     intro u hu
-    have e : g u = g 0 * cexp (h u) := by
-      rw [← hc u hu, mul_assoc, ← Complex.exp_add]; simp
+    have e : g u = g 0 * cexp (h u) := by rw [← hc u hu, mul_assoc, ← Complex.exp_add]; simp
     have h1 := hb u hu
     rw [e, norm_mul, Complex.norm_exp] at h1
     have hp : 0 < ‖g 0‖ := norm_pos_iff.2 (h0 0 (Metric.mem_ball_self hR))
@@ -93,45 +108,62 @@ theorem norm_logDeriv_le {r R K : ℝ} (hr : 0 < r) (hrR : r < R) (hK : 0 < K) {
     have := norm_le_norm_sub_add u z
     linarith
   have hzb : z ∈ Metric.ball (0 : ℂ) R := hsub (Metric.mem_closedBall_self hδ.le)
-  have hcau := Complex.norm_deriv_le_of_forall_mem_sphere_norm_le (c := z) (f := h)
-    (C := 2 * K * R / ((R - r) / 2)) hδ (hhd.diffContOnCl_ball hsub) (by
-      intro u hu
-      have hu' := hsub (Metric.sphere_subset_closedBall hu)
-      have h1 := Complex.borelCaratheodory_zero hK hhd hre hR hu' hh0
-      rw [mem_sphere_iff_norm] at hu
-      have h2 := norm_le_norm_sub_add u z
-      refine h1.trans ?_
-      gcongr
-      · exact (mem_ball_zero_iff.1 hu').le
-      · linarith)
+  have hcau :=
+    Complex.norm_deriv_le_of_forall_mem_sphere_norm_le (c := z) (f := h)
+      (C := 2 * K * R / ((R - r) / 2)) hδ (hhd.diffContOnCl_ball hsub)
+      (by
+        intro u hu
+        have hu' := hsub (Metric.sphere_subset_closedBall hu)
+        have h1 := Complex.borelCaratheodory_zero hK hhd hre hR hu' hh0
+        rw [mem_sphere_iff_norm] at hu
+        have h2 := norm_le_norm_sub_add u z
+        refine h1.trans ?_
+        gcongr
+        · exact (mem_ball_zero_iff.1 hu').le
+        · linarith)
   rw [(hh z hzb).deriv] at hcau
   refine hcau.trans (le_of_eq ?_)
   have : R - r ≠ 0 := by linarith
   field_simp
   ring
 
-theorem norm_le_of_sphere {g : ℂ → ℂ} (hg : AnalyticOnNhd ℂ g (Metric.closedBall 0 1)) {B : ℝ}
-    (hb : ∀ z : ℂ, ‖z‖ = 1 → ‖g z‖ ≤ B) {z : ℂ} (hz : ‖z‖ ≤ 1) : ‖g z‖ ≤ B := by
-  refine Complex.norm_le_of_forall_mem_frontier_norm_le (U := Metric.ball 0 1)
-    Metric.isBounded_ball (hg.differentiableOn.diffContOnCl_ball subset_rfl) ?_ ?_
+theorem norm_le_of_sphere
+    {g : ℂ → ℂ} (hg : AnalyticOnNhd ℂ g (Metric.closedBall 0 1))
+    {B : ℝ} (hb : ∀ z : ℂ, ‖z‖ = 1 → ‖g z‖ ≤ B)
+    {z : ℂ} (hz : ‖z‖ ≤ 1)
+    : ‖g z‖ ≤ B := by
+  refine Complex.norm_le_of_forall_mem_frontier_norm_le (U := Metric.ball 0 1) Metric.isBounded_ball
+    (hg.differentiableOn.diffContOnCl_ball subset_rfl) ?_ ?_
   · intro u hu
     rw [frontier_ball _ one_ne_zero] at hu
     exact hb u (by simpa using hu)
   · rw [closure_ball _ one_ne_zero]; simpa using hz
 
-theorem norm_one_sub_conj_mul {w z : ℂ} (hz : ‖z‖ = 1) :
-    ‖1 - (starRingEnd ℂ) w * z‖ = ‖z - w‖ := by
+theorem norm_one_sub_conj_mul {w z : ℂ} (hz : ‖z‖ = 1) : ‖1 - (starRingEnd ℂ) w * z‖ = ‖z - w‖ := by
   have h1 : (starRingEnd ℂ) z * z = 1 := by
     rw [mul_comm, Complex.mul_conj, Complex.normSq_eq_norm_sq, hz]; simp
-  have : 1 - (starRingEnd ℂ) w * z = (starRingEnd ℂ) (z - w) * z := by
-    rw [map_sub, sub_mul, h1]
+  have : 1 - (starRingEnd ℂ) w * z = (starRingEnd ℂ) (z - w) * z := by rw [map_sub, sub_mul, h1]
   rw [this, norm_mul, hz, mul_one, Complex.norm_conj]
 
-theorem main : ∀ r R : ℝ, 0 < r → r < R → R < 1 → ∃ C : ℝ, 0 < C ∧ ∀ (f : ℂ → ℂ) (M : ℝ), AnalyticOnNhd ℂ f (Metric.closedBall 0 1) → f 0 ≠ 0 → (∀ z ∈ Metric.closedBall (0 : ℂ) 1, ‖f z‖ ≤ M) → ({w : ℂ | ‖w‖ ≤ R ∧ f w = 0}.Finite ∧ (∑ᶠ w ∈ {w : ℂ | ‖w‖ ≤ R ∧ f w = 0}, (analyticOrderNatAt f w : ℝ)) ≤ C * (1 + Real.log (M / ‖f 0‖))) ∧ ∀ z : ℂ, ‖z‖ ≤ r → f z ≠ 0 → ‖deriv f z / f z - ∑ᶠ w ∈ {w : ℂ | ‖w‖ ≤ R ∧ f w = 0}, (analyticOrderNatAt f w : ℂ) / (z - w)‖ ≤ C * (1 + Real.log (M / ‖f 0‖)) := by
+theorem main
+    : ∀ r R : ℝ,
+      0 < r → r < R → R < 1
+        → ∃ C : ℝ,
+          0 < C
+            ∧ ∀ (f : ℂ → ℂ) (M : ℝ),
+              AnalyticOnNhd ℂ f (Metric.closedBall 0 1) → f 0 ≠ 0
+                → (∀ z ∈ Metric.closedBall (0 : ℂ) 1, ‖f z‖ ≤ M)
+                → ({w : ℂ | ‖w‖ ≤ R ∧ f w = 0}.Finite
+                    ∧ (∑ᶠ w ∈ {w : ℂ | ‖w‖ ≤ R ∧ f w = 0}, (analyticOrderNatAt f w : ℝ))
+                      ≤ C * (1 + Real.log (M / ‖f 0‖)))
+                  ∧ ∀ z : ℂ,
+                    ‖z‖ ≤ r → f z ≠ 0
+                      → ‖deriv f z / f z - ∑ᶠ w ∈ {w : ℂ | ‖w‖ ≤ R ∧ f w = 0}, (analyticOrderNatAt f w : ℂ) / (z - w)‖
+                        ≤ C * (1 + Real.log (M / ‖f 0‖)) := by
   intro r R hr hrR hR1
   have hR : 0 < R := hr.trans hrR
-  have hc1 : 0 < -Real.log R := neg_pos.2 (Real.log_neg hR hR1)
-  have hc2 : 0 < -Real.log (1 - R) := neg_pos.2 (Real.log_neg (by linarith) (by linarith))
+  have hc1 : 0 < - Real.log R := neg_pos.2 (Real.log_neg hR hR1)
+  have hc2 : 0 < - Real.log (1 - R) := neg_pos.2 (Real.log_neg (by linarith) (by linarith))
   set c1 := -Real.log R with hc1d
   set c2 := -Real.log (1 - R) with hc2d
   have hRr : 0 < R - r := by linarith
@@ -168,13 +200,18 @@ theorem main : ∀ r R : ℝ, 0 < r → r < R → R < 1 → ∃ C : ℝ, 0 < C �
     gcongr with w hw
     simpa using ((hS w).1 hw).1
   have hgM : ‖g 0‖ ≤ M := by
-    have hh : AnalyticOnNhd ℂ (fun z => (∏ w ∈ S, (1 - (starRingEnd ℂ) w * z) ^ m w) * g z)
-        (Metric.closedBall 0 1) := fun z hz => AnalyticAt.mul (by fun_prop) (hg z hz)
-    have := norm_le_of_sphere hh (B := M) (z := 0) (fun z hz => by
-      have h1 := hM z (by simpa using hz.le)
-      rw [hnorm z] at h1
-      rw [norm_mul, norm_prod]
-      simpa only [norm_pow, norm_one_sub_conj_mul hz] using h1) (by simp)
+    have hh : AnalyticOnNhd ℂ
+        (fun z => (∏ w ∈ S, (1 - (starRingEnd ℂ) w * z) ^ m w) * g z)
+        (Metric.closedBall 0 1) := fun z hz =>
+      AnalyticAt.mul (by fun_prop) (hg z hz)
+    have :=
+      norm_le_of_sphere hh (B := M) (z := 0)
+        (fun z hz => by
+          have h1 := hM z (by simpa using hz.le)
+          rw [hnorm z] at h1
+          rw [norm_mul, norm_prod]
+          simpa only [norm_pow, norm_one_sub_conj_mul hz] using h1)
+        (by simp)
     simpa using this
   have hNL : (N : ℝ) ≤ c1⁻¹ * L := by
     have h1 : ‖f 0‖ ≤ R ^ N * M := hg00.trans (by gcongr)
@@ -220,21 +257,24 @@ theorem main : ∀ r R : ℝ, 0 < r → r < R → R < 1 → ∃ C : ℝ, 0 < C �
     gcongr <;> linarith
   · rw [hset, finsum_mem_coe_finset]
     have hzb : z ∈ Metric.ball (0 : ℂ) R := mem_ball_zero_iff.2 (hz.trans_lt hrR)
-    have hzw : ∀ w ∈ S, z - w ≠ 0 := fun w hw h => hfz (by rw [sub_eq_zero.1 h]; exact ((hS w).1 hw).2)
+    have hzw : ∀ w ∈ S, z - w ≠ 0 := fun w hw h =>
+      hfz (by rw [sub_eq_zero.1 h]; exact ((hS w).1 hw).2)
     have hld : deriv f z / f z = ∑ w ∈ S, (m w : ℂ) / (z - w) + deriv g z / g z := by
       have e : f = fun z => (∏ w ∈ S, (z - w) ^ m w) * g z := funext hfg
       rw [← logDeriv_apply, ← logDeriv_apply]
       conv_lhs => rw [e]
-      rw [logDeriv_fun_mul (f := fun z => ∏ w ∈ S, (z - w) ^ m w) z
-        (Finset.prod_ne_zero_iff.2 fun w hw => pow_ne_zero _ (hzw w hw)) (hgne z hzb)
+      rw [logDeriv_fun_mul
+        (f := fun z => ∏ w ∈ S, (z - w) ^ m w)
+        z (Finset.prod_ne_zero_iff.2 fun w hw => pow_ne_zero _ (hzw w hw)) (hgne z hzb)
         (by fun_prop) (hg z (hsub hzb)).differentiableAt]
       congr 1
-      have ep : (∏ w ∈ S, fun z : ℂ => (z - w) ^ m w) =
-          fun z => ∏ w ∈ S, (z - w) ^ m w := by
+      have ep : (∏ w ∈ S, fun z : ℂ => (z - w) ^ m w) = fun z => ∏ w ∈ S, (z - w) ^ m w := by
         ext z
         simp
       rw [← ep]
-      rw [logDeriv_prod (f := fun w z => (z - w) ^ m w) (fun w hw => pow_ne_zero _ (hzw w hw))
+      rw [logDeriv_prod
+        (f := fun w z => (z - w) ^ m w)
+        (fun w hw => pow_ne_zero _ (hzw w hw))
         (fun w hw => by fun_prop)]
       refine Finset.sum_congr rfl fun w hw => ?_
       rw [logDeriv_fun_pow (by fun_prop), logDeriv_apply]

@@ -30,17 +30,21 @@ theorem inr_mem_kerD (t : R) : (TrivSqZeroExt.inr t : DualNumber R) ∈ RingHom.
   TrivSqZeroExt.fst_inr R t
 
 def dualLift {n : ℕ} (c : Fin n → R) : JetR R (Fin n) 1 →ₐ[R] DualNumber R :=
-  jetLift (R := R) (RingHom.ker (fstD R)) kerD_sq (fun j => TrivSqZeroExt.inr (c j))
+  jetLift (R := R) (RingHom.ker (fstD R)) kerD_sq
+    (fun j => TrivSqZeroExt.inr (c j))
     (fun j => inr_mem_kerD (c j))
 
-theorem dualLift_zR {n : ℕ} (c : Fin n → R) (j : Fin n) : dualLift c (zR 1 j) = TrivSqZeroExt.inr (c j) :=
+theorem dualLift_zR {n : ℕ} (c : Fin n → R) (j : Fin n)
+    : dualLift c (zR 1 j) = TrivSqZeroExt.inr (c j) :=
   jetLift_zR _ _ _ _ j
 
-theorem fstD_comp_dualLift {n : ℕ} (c : Fin n → R) : (fstD R).comp (dualLift c) = jetAug R (Fin n) 1 :=
+theorem fstD_comp_dualLift {n : ℕ} (c : Fin n → R)
+    : (fstD R).comp (dualLift c) = jetAug R (Fin n) 1 :=
   jet_ext fun j => by rw [AlgHom.comp_apply, dualLift_zR, jetAug_zR]; exact inr_mem_kerD (c j)
 
-theorem eq_dualLift {n : ℕ} (ψ : JetR R (Fin n) 1 →ₐ[R] DualNumber R) (h : (fstD R).comp ψ = jetAug R (Fin n) 1) :
-    ψ = dualLift (fun j => (ψ (zR 1 j)).snd) :=
+theorem eq_dualLift
+    {n : ℕ} (ψ : JetR R (Fin n) 1 →ₐ[R] DualNumber R) (h : (fstD R).comp ψ = jetAug R (Fin n) 1)
+    : ψ = dualLift (fun j => (ψ (zR 1 j)).snd) :=
   jet_ext fun j => by
     rw [dualLift_zR]
     apply TrivSqZeroExt.ext
@@ -55,8 +59,9 @@ variable {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
 theorem comp_one' {T T' : Over (Spec (CommRingCat.of R))} (f : T' ⟶ T) : f ≫ (1 : T ⟶ G) = 1 := by
   rw [Hom.one_def, Hom.one_def, ← Category.assoc, toUnit_unique (f ≫ toUnit T) (toUnit T')]
 
-theorem spMap_jetAug_alt {n : ℕ} {x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin n) m) ⟶ G} (hx : IsUnivChart G n x)
-    (m : ℕ) : spMap (jetAug R (Fin n) m) ≫ x m = 1 := by
+theorem spMap_jetAug_alt
+    {n : ℕ} {x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin n) m) ⟶ G} (hx : IsUnivChart G n x) (m : ℕ)
+    : spMap (jetAug R (Fin n) m) ≫ x m = 1 := by
   have e : jetAug R (Fin n) m = (jetAug R (Fin n) 0).comp (jetZeroR R (Fin n) m) :=
     (jet_ext fun j => by rw [AlgHom.comp_apply, jetAug_zR]; exact (jetAug_zR (R := R) 0 j).symm)
   rw [e, ← spMap_comp, Category.assoc, hx.2.1 m, comp_one']
@@ -71,8 +76,8 @@ theorem isTan_dualLift (c : Fin n → R) : IsTan (spMap (dualLift c) ≫ x 1) :=
   exact spMap_jetAug_alt hx 1
 
 include hx in
-theorem exists_coord (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w) :
-    ∃! c : Fin n → R, w = spMap (dualLift c) ≫ x 1 := by
+theorem exists_coord (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w)
+    : ∃! c : Fin n → R, w = spMap (dualLift c) ≫ x 1 := by
   obtain ⟨ψ, ⟨h1, h2⟩, hu⟩ := hx.2.2 (DualNumber R) (fstD R) 1 kerD_sq w hw
   refine ⟨fun j => (ψ (zR 1 j)).snd, ?_, ?_⟩
   · show w = spMap (dualLift (fun j => (ψ (zR 1 j)).snd)) ≫ x 1
@@ -87,12 +92,14 @@ theorem exists_coord (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w) :
 def tcoord (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w) : Fin n → R :=
   (exists_coord hx w hw).exists.choose
 
-theorem tcoord_spec (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w) :
-    w = spMap (dualLift (tcoord hx w hw)) ≫ x 1 :=
+theorem tcoord_spec (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w)
+    : w = spMap (dualLift (tcoord hx w hw)) ≫ x 1 :=
   (exists_coord hx w hw).exists.choose_spec
 
-theorem tcoord_eq (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w) (c : Fin n → R)
-    (hc : w = spMap (dualLift c) ≫ x 1) : tcoord hx w hw = c :=
+theorem tcoord_eq
+    (w : sp (R₀ := R) (DualNumber R) ⟶ G) (hw : IsTan w)
+    (c : Fin n → R) (hc : w = spMap (dualLift c) ≫ x 1)
+    : tcoord hx w hw = c :=
   (exists_coord hx w hw).unique (tcoord_spec hx w hw) hc
 
 end ReciprocityTheory.ChartRestriction.G.Chart

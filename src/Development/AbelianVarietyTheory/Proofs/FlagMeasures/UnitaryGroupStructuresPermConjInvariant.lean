@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ScalarOfMultO
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -40,8 +41,10 @@ lemma memLp_equiv {ε ε' : Fin n → Bool} (e : UJ ε' ≃ₜ* UJ ε) (F : UJ �
     have h' := h.smul_measure (ENNReal.inv_ne_top.2 h0)
     rwa [smul_smul, ENNReal.inv_mul_cancel h0 hT, one_smul] at h'
 
-def homUJ {ε ε' : Fin n → Bool} (φ : Matrix (Fin n) (Fin n) ℂ →* Matrix (Fin n) (Fin n) ℂ)
-    (h : ∀ g ∈ UJset ε', φ g ∈ UJset ε) : UJ ε' →* UJ ε :=
+def homUJ
+    {ε ε' : Fin n → Bool}
+    (φ : Matrix (Fin n) (Fin n) ℂ →* Matrix (Fin n) (Fin n) ℂ) (h : ∀ g ∈ UJset ε', φ g ∈ UJset ε)
+    : UJ ε' →* UJ ε :=
   ((Units.map φ).comp (UJ ε').subtype).codRestrict (UJ ε) fun g => h _ g.2
 
 lemma homUJ_cont {ε ε' : Fin n → Bool} (φ : Matrix (Fin n) (Fin n) ℂ →* Matrix (Fin n) (Fin n) ℂ)
@@ -139,7 +142,19 @@ lemma conj_cont : Continuous (conj (n := n)) := by
   show Continuous fun g : Matrix (Fin n) (Fin n) ℂ => g.map star
   exact continuous_id.matrix_map continuous_star
 
-theorem permGroup : ∀ (n : ℕ) (ε : Fin n → Bool) (s : Equiv.Perm (Fin n)), (∀ g : Matrix (Fin n) (Fin n) ℂ, (g ∈ UJset (ε ∘ s) ↔ g.submatrix s.symm s.symm ∈ UJset ε) ∧ (g ∈ Kset (ε ∘ s) ↔ g.submatrix s.symm s.symm ∈ Kset ε) ∧ (inP (ε ∘ s) g ↔ inP ε (g.submatrix s.symm s.symm)) ∧ NormedSpace.exp (g.submatrix s.symm s.symm) = (NormedSpace.exp g).submatrix s.symm s.symm) ∧ ∀ (f : Matrix (Fin n) (Fin n) ℂ → ℂ) (p : ENNReal), (MemLp (fun g : UJ ε => f (umat g)) p (muG ε) ↔ MemLp (fun g : UJ (ε ∘ s) => f ((umat g).submatrix s.symm s.symm)) p (muG (ε ∘ s))) ∧ (MemLp (fun g : UJ ε => f (umat g)) p (muG ε) ↔ MemLp (fun g : UJ ε => f ((umat g).map star)) p (muG ε)) := by
+theorem permGroup
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (s : Equiv.Perm (Fin n)),
+      (∀ g : Matrix (Fin n) (Fin n) ℂ,
+          (g ∈ UJset (ε ∘ s) ↔ g.submatrix s.symm s.symm ∈ UJset ε)
+            ∧ (g ∈ Kset (ε ∘ s) ↔ g.submatrix s.symm s.symm ∈ Kset ε)
+            ∧ (inP (ε ∘ s) g ↔ inP ε (g.submatrix s.symm s.symm))
+            ∧ NormedSpace.exp (g.submatrix s.symm s.symm)
+              = (NormedSpace.exp g).submatrix s.symm s.symm)
+        ∧ ∀ (f : Matrix (Fin n) (Fin n) ℂ → ℂ) (p : ENNReal),
+          (MemLp (fun g : UJ ε => f (umat g)) p (muG ε)
+              ↔ MemLp (fun g : UJ (ε ∘ s) => f ((umat g).submatrix s.symm s.symm)) p (muG (ε ∘ s)))
+            ∧ (MemLp (fun g : UJ ε => f (umat g)) p (muG ε)
+              ↔ MemLp (fun g : UJ ε => f ((umat g).map star)) p (muG ε)) := by
   intro n ε s
   have hpm : ∀ (t : Equiv.Perm (Fin n)) (x : Matrix (Fin n) (Fin n) ℂ), permM t x = perm t x :=
     fun t x => (perm_apply t x).symm
@@ -152,14 +167,20 @@ theorem permGroup : ∀ (n : ℕ) (ε : Fin n → Bool) (s : Equiv.Perm (Fin n))
   · rw [← perm_apply]; exact perm_K ε s g
   · rw [← perm_apply]; exact perm_P ε s g
   · rw [← perm_apply, ← perm_apply]; exact perm_exp s g
-  · refine memLp_hom (permM s) (permM s.symm) (fun g hg => ?_) (fun g hg => ?_) (hcont s)
-      (hcont s.symm) (permM_symm s) (permM_symm' s) f p
+  · refine memLp_hom (permM s) (permM s.symm)
+      (fun g hg => ?_)
+      (fun g hg => ?_)
+      (hcont s) (hcont s.symm) (permM_symm s) (permM_symm' s) f p
     · rw [hpm]; exact (perm_UJ ε s g).1 hg
     · apply (perm_UJ ε s _).2
       rw [← hpm, permM_symm']
       exact hg
-  · exact memLp_hom GlobalTheory.Dec.PermGroup.conj GlobalTheory.Dec.PermGroup.conj (fun g hg => FormF.UJ_star hg)
-      (fun g hg => FormF.UJ_star hg) conj_cont conj_cont (fun g => FormF.map_star_star g)
-      (fun g => FormF.map_star_star g) f p
+  · exact memLp_hom GlobalTheory.Dec.PermGroup.conj GlobalTheory.Dec.PermGroup.conj
+      (fun g hg => FormF.UJ_star hg)
+      (fun g hg => FormF.UJ_star hg)
+      conj_cont conj_cont
+      (fun g => FormF.map_star_star g)
+      (fun g => FormF.map_star_star g)
+      f p
 
 end GlobalTheory.Dec.PermGroup

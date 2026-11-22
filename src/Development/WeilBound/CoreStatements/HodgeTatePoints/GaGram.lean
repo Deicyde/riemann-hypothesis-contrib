@@ -17,22 +17,29 @@ section
 
 variable {E : Type} [Field E] [NumberField E] {N : ℕ}
 
-theorem exists_left_inv {B : Type} [CommRing B] {n : ℕ} (φ : ZMod n →+* B) (c : 𝓞 E ≃+* 𝓞 E)
-    (hc : ∀ a, c (c a) = a) (e : (Fin N → 𝓞 E) →+ (Fin N → 𝓞 E) →+ ZMod n)
+theorem exists_left_inv
+    {B : Type} [CommRing B]
+    {n : ℕ} (φ : ZMod n →+* B)
+    (c : 𝓞 E ≃+* 𝓞 E) (hc : ∀ a, c (c a) = a)
+    (e : (Fin N → 𝓞 E) →+ (Fin N → 𝓞 E) →+ ZMod n)
     (adj : ∀ (a : 𝓞 E) (x y : Fin N → 𝓞 E), e (a • x) y = e x (c a • y))
     (surj : ∀ f : (Fin N → 𝓞 E) →+ ZMod n, ∃ x, e x = f)
     (s : 𝓞 E →+* B) (cc u : Module.Free.ChooseBasisIndex ℤ (𝓞 E) → B) (hu : ∑ k, u k * cc k = 1)
-    (hcc : ∀ (a : 𝓞 E) l, ∑ k, cc k *
-      (((RingOfIntegers.basis E).repr (a * RingOfIntegers.basis E k) l : ℤ) : B) = s a * cc l) :
-    ∃ β : Matrix (Fin N) (Fin N) B, ∀ j₀ j, ∑ i, β j₀ i *
-      (∑ k, cc k * φ (e (Pi.single i (RingOfIntegers.basis E k)) (Pi.single j 1))) =
-        if j₀ = j then 1 else 0 := by
+    (hcc : ∀ (a : 𝓞 E) l,
+      ∑ k, cc k *
+          (((RingOfIntegers.basis E).repr (a * RingOfIntegers.basis E k) l : ℤ) : B)
+        = s a * cc l)
+    : ∃ β : Matrix (Fin N) (Fin N) B, ∀ j₀ j,
+      ∑ i, β j₀ i *
+          (∑ k, cc k * φ (e (Pi.single i (RingOfIntegers.basis E k)) (Pi.single j 1)))
+        = if j₀ = j then 1 else 0 := by
   classical
   set b := RingOfIntegers.basis E with hb
   let Λ : (Fin N → 𝓞 E) → (Fin N → 𝓞 E) → B := fun x y => ∑ k, cc k * φ (e (b k • x) y)
   have Λadd : ∀ x x' y, Λ (x + x') y = Λ x y + Λ x' y := by
     intro x x' y
-    simp only [Λ, smul_add, map_add (f := _), AddMonoidHom.add_apply, mul_add, Finset.sum_add_distrib]
+    simp only [Λ, smul_add, map_add (f := _), AddMonoidHom.add_apply, mul_add,
+      Finset.sum_add_distrib]
   have Λsmul : ∀ (a : 𝓞 E) x y, Λ (a • x) y = s a * Λ x y := by
     intro a x y
     have h1 : ∀ k, b k • a • x = ∑ l, (b.repr (a * b k) l) • (b l • x) := by
@@ -42,7 +49,8 @@ theorem exists_left_inv {B : Type} [CommRing B] {n : ℕ} (φ : ZMod n →+* B) 
       rw [Finset.sum_smul]
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [smul_assoc]
-    have h2 : ∀ k, φ (e (b k • a • x) y) = ∑ l, ((b.repr (a * b k) l : ℤ) : B) * φ (e (b l • x) y) := by
+    have h2
+        : ∀ k, φ (e (b k • a • x) y) = ∑ l, ((b.repr (a * b k) l : ℤ) : B) * φ (e (b l • x) y) := by
       intro k
       set_option synthInstance.maxHeartbeats 100000 in
         rw [h1, map_sum]
@@ -77,8 +85,10 @@ theorem exists_left_inv {B : Type} [CommRing B] {n : ℕ} (φ : ZMod n →+* B) 
   choose x hx using fun q => surj (f q)
   have hΛx : ∀ j₀ l j, Λ (x (j₀, l)) (Pi.single j 1) = if j₀ = j then cc l else 0 := by
     intro j₀ l j
-    have hk : ∀ k, e (b k • x (j₀, l)) (Pi.single j 1) =
-        ((b.repr (c ((Pi.single j (c (b k)) : Fin N → 𝓞 E) j₀)) l : ℤ) : ZMod n) := by
+    have hk
+        : ∀ k,
+          e (b k • x (j₀, l)) (Pi.single j 1)
+            = ((b.repr (c ((Pi.single j (c (b k)) : Fin N → 𝓞 E) j₀)) l : ℤ) : ZMod n) := by
       intro k
       rw [adj, hx]
       have : (c (b k) • (Pi.single j 1 : Fin N → 𝓞 E)) = Pi.single j (c (b k)) := by
@@ -94,7 +104,10 @@ theorem exists_left_inv {B : Type} [CommRing B] {n : ℕ} (φ : ZMod n →+* B) 
     · simp [Pi.single_apply, hj]
   refine ⟨Matrix.of fun j₀ i => ∑ l, u l * s (x (j₀, l) i), ?_⟩
   intro j₀ j
-  have hΓ : ∀ i, (∑ k, cc k * φ (e (Pi.single i (b k)) (Pi.single j 1))) = Λ (Pi.single i 1) (Pi.single j 1) := by
+  have hΓ
+      : ∀ i,
+        (∑ k, cc k * φ (e (Pi.single i (b k)) (Pi.single j 1)))
+          = Λ (Pi.single i 1) (Pi.single j 1) := by
     intro i
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [show (Pi.single i (b k) : Fin N → 𝓞 E) = b k • Pi.single i 1 from by
@@ -102,7 +115,9 @@ theorem exists_left_inv {B : Type} [CommRing B] {n : ℕ} (φ : ZMod n →+* B) 
       simp [Pi.single_apply]]
   simp only [hΓ, Matrix.of_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
-  have : ∀ l, ∑ i, u l * s (x (j₀, l) i) * Λ (Pi.single i 1) (Pi.single j 1) = u l * (if j₀ = j then cc l else 0) := by
+  have : ∀ l,
+      ∑ i, u l * s (x (j₀, l) i) * Λ (Pi.single i 1) (Pi.single j 1)
+        = u l * (if j₀ = j then cc l else 0) := by
     intro l
     rw [← hΛx, hdec (x (j₀, l)), Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -114,15 +129,18 @@ theorem exists_left_inv {B : Type} [CommRing B] {n : ℕ} (φ : ZMod n →+* B) 
 
 end
 
-theorem exists_of_map_eq_one {A : Type} [CommRing A] {N : ℕ} (t : A) (M : Matrix (Fin N) (Fin N) A)
-    (h : (Ideal.Quotient.mk (Ideal.span {t})).mapMatrix M = 1) :
-    ∃ Z : Matrix (Fin N) (Fin N) A, M = 1 + t • Z := by
+theorem exists_of_map_eq_one
+    {A : Type} [CommRing A]
+    {N : ℕ} (t : A) (M : Matrix (Fin N) (Fin N) A)
+    (h : (Ideal.Quotient.mk (Ideal.span {t})).mapMatrix M = 1)
+    : ∃ Z : Matrix (Fin N) (Fin N) A, M = 1 + t • Z := by
   have hmem : ∀ i j, ∃ z : A, z * t = M i j - (1 : Matrix (Fin N) (Fin N) A) i j := by
     intro i j
     have h1 := congrFun (congrFun h i) j
     rw [RingHom.mapMatrix_apply, Matrix.map_apply] at h1
-    have h2 : Ideal.Quotient.mk (Ideal.span {t}) (M i j) =
-        Ideal.Quotient.mk (Ideal.span {t}) ((1 : Matrix (Fin N) (Fin N) A) i j) := by
+    have h2
+        : Ideal.Quotient.mk (Ideal.span {t}) (M i j)
+          = Ideal.Quotient.mk (Ideal.span {t}) ((1 : Matrix (Fin N) (Fin N) A) i j) := by
       rw [h1, Matrix.one_apply, Matrix.one_apply]
       split_ifs <;> simp
     exact Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq.1 h2)
@@ -133,15 +151,25 @@ theorem exists_of_map_eq_one {A : Type} [CommRing A] {N : ℕ} (t : A) (M : Matr
   rw [mul_comm, hZ]
   ring
 
-theorem gram_unit : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZero K] (hAK : Function.Injective (algebraMap A K)) (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Ω : Type) [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω] (D : HTChart A K c p R N Ω) (σ : E →+* K) (d : A), (∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range) → GeneratesDiff σ d → ∃ G H Z Z' : Matrix (Fin N) (Fin N) A, (∀ i j, algebraMap A K (G i j) = D.gram σ d i j) ∧ G * H = 1 + ((p : A) ^ R) • Z ∧ H * G = 1 + ((p : A) ^ R) • Z' := by
+theorem gram_unit
+    : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZero K]
+        (hAK : Function.Injective (algebraMap A K)) (E : Type) [Field E] [NumberField E]
+        (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Ω : Type) [AddCommGroup Ω]
+        [Module K Ω] [Module A Ω] [IsScalarTower A K Ω] (D : HTChart A K c p R N Ω) (σ : E →+* K)
+        (d : A),
+      (∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range) → GeneratesDiff σ d
+        → ∃ G H Z Z' : Matrix (Fin N) (Fin N) A,
+          (∀ i j, algebraMap A K (G i j) = D.gram σ d i j) ∧ G * H = 1 + ((p : A) ^ R) • Z
+            ∧ H * G = 1 + ((p : A) ^ R) • Z' := by
   intro A K _ _ _ _ hAK E _ _ c hc p R N _ Ω _ _ _ _ D σ d hσ hd
   classical
-  obtain ⟨-, hrange, u, hu⟩ := GlobalTheory.CompanionTheory.Ar.HT.different_generator_dualInt A K E σ d hAK hσ hd
+  obtain ⟨-, hrange, u, hu⟩ :=
+    GlobalTheory.CompanionTheory.Ar.HT.different_generator_dualInt A K E σ d hAK hσ hd
   choose g hg using hrange
   set T := algebraMap A K with hT
   set b := RingOfIntegers.basis E with hb
-  let Gm : Matrix (Fin N) (Fin N) A := Matrix.of fun i j =>
-    ∑ k, g k * (((D.e (Pi.single i (b k)) (Pi.single j 1)).val : ℕ) : A)
+  let Gm : Matrix (Fin N) (Fin N) A :=
+    Matrix.of fun i j => ∑ k, g k * (((D.e (Pi.single i (b k)) (Pi.single j 1)).val : ℕ) : A)
   let I : Ideal A := Ideal.span {(p : A) ^ R}
   let mkB := Ideal.Quotient.mk I
   haveI : NeZero (p ^ R) := ⟨by have := (Fact.out : p.Prime).pos; positivity⟩
@@ -158,9 +186,10 @@ theorem gram_unit : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZ
     intro z
     conv_lhs => rw [← ZMod.natCast_zmod_val z]
     rw [map_natCast, map_natCast]
-  have hinj : Function.Injective T.rangeRestrict := fun x y h => hAK (by
-    have := congrArg Subtype.val h
-    simpa using this)
+  have hinj : Function.Injective T.rangeRestrict := fun x y h =>
+    hAK (by
+      have := congrArg Subtype.val h
+      simpa using this)
   let eA : A ≃+* T.range := RingEquiv.ofBijective T.rangeRestrict ⟨hinj, T.rangeRestrict_surjective⟩
   let σ' : 𝓞 E →+* T.range := (σ.comp (algebraMap (𝓞 E) E)).codRestrict T.range (fun a => hσ a)
   let ψ : 𝓞 E →+* A := eA.symm.toRingHom.comp σ'
@@ -179,29 +208,32 @@ theorem gram_unit : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZ
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_mul, hg]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [uB, cc, ← map_mul, ← map_sum, this, map_one]
+    simp only [uB, cc, ← map_mul, ← map_sum, this, map_one]
   have hcc : ∀ (a : 𝓞 E) l, ∑ k, cc k * (((b.repr (a * b k) l : ℤ)) : A ⧸ I) = s a * cc l := by
     intro a l
     have : ∑ k, g k * (((b.repr (a * b k) l : ℤ)) : A) = ψ a * g l := by
       apply hAK
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_mul, hψ, hg, mul_left_comm, ← map_mul, GlobalTheory.CompanionTheory.Ar.HT.ProjEig.mul_dualInt_eq,
-        map_sum, Finset.mul_sum]
+        rw [map_sum, map_mul, hψ, hg, mul_left_comm, ← map_mul,
+          GlobalTheory.CompanionTheory.Ar.HT.ProjEig.mul_dualInt_eq, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_mul T, hg, map_mul σ, map_intCast σ, map_intCast T]
       ring
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [cc, s, RingHom.comp_apply, ← map_intCast mkB, ← map_mul, ← map_sum, this]
+    simp only [cc, s, RingHom.comp_apply, ← map_intCast mkB, ← map_mul, ← map_sum, this]
   have hc' : ∀ a, RingOfIntegers.mapRingEquiv c (RingOfIntegers.mapRingEquiv c a) = a := by
     intro a
     apply RingOfIntegers.ext
     simp [hc]
-  obtain ⟨β, hβ⟩ := exists_left_inv φ (RingOfIntegers.mapRingEquiv c) hc' D.e D.adj D.e_surj s cc uB hu' hcc
-  have hΓ : mkB.mapMatrix Gm = Matrix.of fun i j =>
-      ∑ k, cc k * φ (D.e (Pi.single i (b k)) (Pi.single j 1)) := by
+  obtain ⟨β, hβ⟩ :=
+    exists_left_inv φ (RingOfIntegers.mapRingEquiv c) hc' D.e D.adj D.e_surj s cc uB hu' hcc
+  have hΓ
+      : mkB.mapMatrix Gm
+        = Matrix.of fun i j => ∑ k, cc k * φ (D.e (Pi.single i (b k)) (Pi.single j 1)) := by
     ext i j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Gm, map_sum, map_mul, hφ, cc]
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Gm, map_sum, map_mul, hφ,
+      cc]
   have hβΓ : β * mkB.mapMatrix Gm = 1 := by
     rw [hΓ]
     ext j₀ j
@@ -212,12 +244,14 @@ theorem gram_unit : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZ
   have hH : mkB.mapMatrix H = β := by
     ext i j
     simp [H, hHf, mkB]
-  obtain ⟨Z, hZ⟩ := exists_of_map_eq_one ((p : A) ^ R) (Gm * H) (by
-    rw [map_mul, hH]
-    exact mul_eq_one_comm.1 hβΓ)
-  obtain ⟨Z', hZ'⟩ := exists_of_map_eq_one ((p : A) ^ R) (H * Gm) (by
-    rw [map_mul, hH]
-    exact hβΓ)
+  obtain ⟨Z, hZ⟩ :=
+    exists_of_map_eq_one ((p : A) ^ R) (Gm * H) (by
+      rw [map_mul, hH]
+      exact mul_eq_one_comm.1 hβΓ)
+  obtain ⟨Z', hZ'⟩ :=
+    exists_of_map_eq_one ((p : A) ^ R) (H * Gm) (by
+      rw [map_mul, hH]
+      exact hβΓ)
   refine ⟨Gm, H, Z, Z', ?_, hZ, hZ'⟩
   intro i j
   set_option synthInstance.maxHeartbeats 100000 in

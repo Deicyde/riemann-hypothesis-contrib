@@ -26,8 +26,8 @@ def blkSig (ε : Fin n → Bool) : (Σ s : Bool, Fin (blkP ε s)) ≃ Fin n :=
 lemma ε_blkSig (ε : Fin n → Bool) (s : Bool) (i : Fin (blkP ε s)) : ε (blkSig ε ⟨s, i⟩) = s :=
   (blkE ε s i).2
 
-def blkRes (ε : Fin n → Bool) (s : Bool) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ where
+def blkRes (ε : Fin n → Bool) (s : Bool)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ where
   toFun X := Matrix.of fun i j => X (blkSig ε ⟨s, i⟩) (blkSig ε ⟨s, j⟩)
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
@@ -35,8 +35,8 @@ def blkRes (ε : Fin n → Bool) (s : Bool) :
 lemma blkRes_apply (ε : Fin n → Bool) (s : Bool) (X : Matrix (Fin n) (Fin n) ℂ)
     (i j : Fin (blkP ε s)) : blkRes ε s X i j = X (blkSig ε ⟨s, i⟩) (blkSig ε ⟨s, j⟩) := rfl
 
-def blkDiag (ε : Fin n → Bool) :
-    (∀ s : Bool, Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ) →+* Matrix (Fin n) (Fin n) ℂ :=
+def blkDiag (ε : Fin n → Bool)
+    : (∀ s : Bool, Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ) →+* Matrix (Fin n) (Fin n) ℂ :=
   (Matrix.reindexAlgEquiv ℂ ℂ (blkSig ε)).toRingEquiv.toRingHom.comp
     (Matrix.blockDiagonal'RingHom (fun s => Fin (blkP ε s)) ℂ)
 
@@ -115,8 +115,8 @@ lemma blkDiag_Kset (ε : Fin n → Bool) (v : ∀ s : Bool, Matrix (Fin (blkP ε
     exact hv s
   rw [this, map_one]
 
-def embM (ε : Fin n → Bool) (s : Bool) (A : Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ) :
-    Matrix (Fin n) (Fin n) ℂ :=
+def embM (ε : Fin n → Bool) (s : Bool) (A : Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ)
+    : Matrix (Fin n) (Fin n) ℂ :=
   blkDiag ε (Pi.mulSingle (M := fun s => Matrix (Fin (blkP ε s)) (Fin (blkP ε s)) ℂ) s A)
 
 lemma Jm_allPos (k : ℕ) : Jm (fun _ : Fin k => true) = 1 := by
@@ -133,12 +133,17 @@ lemma embM_Kset (ε : Fin n → Bool) (s : Bool) {A : Matrix (Fin (blkP ε s)) (
   · rw [Pi.mulSingle_eq_of_ne hts]
     simp
 
-def blkK (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) : KG ε :=
-  ⟨⟨⟨g, star g, Unitary.mul_star_self_of_mem hg.1, Unitary.star_mul_self_of_mem hg.1⟩, by
+def blkK (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) : KG ε := ⟨
+  ⟨
+    ⟨g, star g, Unitary.mul_star_self_of_mem hg.1, Unitary.star_mul_self_of_mem hg.1⟩,
+    by
       show gᴴ * Jm ε * g = Jm ε
       have h1 : gᴴ * g = 1 := by
         rw [← Matrix.star_eq_conjTranspose]; exact Unitary.star_mul_self_of_mem hg.1
-      rw [Matrix.mul_assoc, ← hg.2, ← Matrix.mul_assoc, h1, Matrix.one_mul]⟩, hg⟩
+      rw [Matrix.mul_assoc, ← hg.2, ← Matrix.mul_assoc, h1, Matrix.one_mul]
+  ⟩,
+  hg
+⟩
 
 def blkEmbed (ε : Fin n → Bool) (s : Bool) : KG (fun _ : Fin (blkP ε s) => true) →* KG ε where
   toFun h := blkK ε (embM_Kset ε s h.2)
@@ -190,22 +195,25 @@ lemma exp_blkDiag (ε : Fin n → Bool) (v : ∀ s : Bool, Matrix (Fin (blkP ε 
   have h := NormedSpace.map_exp (blkDiag ε) (continuous_blkDiag ε) v
   exact h.symm.trans (congrArg _ (Pi.exp_def v))
 
-theorem exp_blk {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : X * Jm ε = Jm ε * X) :
-    NormedSpace.exp X = embM ε true (NormedSpace.exp (blkRes ε true X)) *
-      embM ε false (NormedSpace.exp (blkRes ε false X)) := by
+theorem exp_blk {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : X * Jm ε = Jm ε * X)
+    : NormedSpace.exp X
+      = embM ε true (NormedSpace.exp (blkRes ε true X))
+        * embM ε false (NormedSpace.exp (blkRes ε false X)) := by
   conv_lhs => rw [eq_blkDiag hX, exp_blkDiag]
   rw [embM, embM, ← map_mul]
   congr 1
   funext t
   cases t <;> simp [Pi.mulSingle_apply]
 
-theorem blk_curve {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
-    (γ : ℝ → KG ε) (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+theorem blk_curve
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ}
+    (hX : inK ε X) (γ : ℝ → KG ε) (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
     (γp : ℝ → KG (fun _ : Fin (blkP ε true) => true))
     (hp : ∀ t : ℝ, toMK (γp t) = NormedSpace.exp ((t : ℂ) • blkRes ε true X))
     (γm : ℝ → KG (fun _ : Fin (blkP ε false) => true))
-    (hm : ∀ t : ℝ, toMK (γm t) = NormedSpace.exp ((t : ℂ) • blkRes ε false X)) (t : ℝ) :
-    γ t = blkEmbed ε true (γp t) * blkEmbed ε false (γm t) := by
+    (hm : ∀ t : ℝ, toMK (γm t) = NormedSpace.exp ((t : ℂ) • blkRes ε false X))
+    (t : ℝ)
+    : γ t = blkEmbed ε true (γp t) * blkEmbed ε false (γm t) := by
   apply onep_KG_ext
   have hX' : ((t : ℂ) • X) * Jm ε = Jm ε * ((t : ℂ) • X) := by
     rw [Matrix.smul_mul, hX.2, Matrix.mul_smul]

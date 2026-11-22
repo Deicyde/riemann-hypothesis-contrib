@@ -23,16 +23,19 @@ open scoped Classical
 
 namespace UpperTheory.Gal.InertialTypesAlt.L
 
-private theorem twOrb_twConj' {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (θ : G →* G)
-    (K : Subgroup G) (δ g : G) (f : G → ℂ) :
-    GlobalTheory.BCT.twOrb θ K (g⁻¹ * δ * θ g) f = GlobalTheory.BCT.twOrb θ K δ f := by
-  let e : DoubleCoset.Quotient (GlobalTheory.BCT.twCent θ (g⁻¹ * δ * θ g) : Set G) (K : Set G) ≃
-      DoubleCoset.Quotient (GlobalTheory.BCT.twCent θ δ : Set G) (K : Set G) := {
+private theorem twOrb_twConj'
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (θ : G →* G) (K : Subgroup G) (δ g : G) (f : G → ℂ)
+    : GlobalTheory.BCT.twOrb θ K (g⁻¹ * δ * θ g) f = GlobalTheory.BCT.twOrb θ K δ f := by
+  let e
+      : DoubleCoset.Quotient (GlobalTheory.BCT.twCent θ (g⁻¹ * δ * θ g) : Set G) (K : Set G)
+        ≃ DoubleCoset.Quotient (GlobalTheory.BCT.twCent θ δ : Set G) (K : Set G) := {
     toFun q := DoubleCoset.mk (GlobalTheory.BCT.twCent θ δ) K (g * Quotient.out q)
     invFun q := DoubleCoset.mk (GlobalTheory.BCT.twCent θ (g⁻¹ * δ * θ g)) K (g⁻¹ * Quotient.out q)
     left_inv q := by
-      obtain ⟨t, ht, k, hk, he⟩ := (@DoubleCoset.eq _ _ _ _ _ _).1
-        (DoubleCoset.out_eq' (DoubleCoset.mk _ K (g * Quotient.out q))).symm
+      obtain ⟨t, ht, k, hk, he⟩ :=
+        (@DoubleCoset.eq _ _ _ _ _ _).1
+          (DoubleCoset.out_eq' (DoubleCoset.mk _ K (g * Quotient.out q))).symm
       show DoubleCoset.mk _ K (g⁻¹ * Quotient.out (DoubleCoset.mk (GlobalTheory.BCT.twCent θ δ) K (g * Quotient.out q))) = q
       rw [he]
       conv_rhs => rw [← DoubleCoset.out_eq' q]
@@ -41,8 +44,9 @@ private theorem twOrb_twConj' {G : Type} [Group G] [TopologicalSpace G] [IsTopol
       rw [GlobalTheory.TwOrbConj.twCent_conj]
       exact ⟨t⁻¹, (GlobalTheory.BCT.twCent θ δ).inv_mem ht, by simp [MulAut.conj_apply]⟩
     right_inv q := by
-      obtain ⟨t, ht, k, hk, he⟩ := (@DoubleCoset.eq _ _ _ _ _ _).1
-        (DoubleCoset.out_eq' (DoubleCoset.mk _ K (g⁻¹ * Quotient.out q))).symm
+      obtain ⟨t, ht, k, hk, he⟩ :=
+        (@DoubleCoset.eq _ _ _ _ _ _).1
+          (DoubleCoset.out_eq' (DoubleCoset.mk _ K (g⁻¹ * Quotient.out q))).symm
       show DoubleCoset.mk _ K (g * Quotient.out (DoubleCoset.mk (GlobalTheory.BCT.twCent θ (g⁻¹ * δ * θ g)) K
         (g⁻¹ * Quotient.out q))) = q
       rw [he]
@@ -52,14 +56,15 @@ private theorem twOrb_twConj' {G : Type} [Group G] [TopologicalSpace G] [IsTopol
       obtain ⟨s, hs, rfl⟩ := ht
       refine ⟨s⁻¹, (GlobalTheory.BCT.twCent θ δ).inv_mem hs, k⁻¹, K.inv_mem hk, ?_⟩
       simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
-      group }
+      group
+  }
   rw [GlobalTheory.TwOrbConj.twOrb_eq, GlobalTheory.TwOrbConj.twOrb_eq,
-    ← finsum_comp_equiv e
-      (f := fun x => GlobalTheory.TwOrbConj.summand θ K δ f (Quotient.out x))]
+    ← finsum_comp_equiv e (f := fun x => GlobalTheory.TwOrbConj.summand θ K δ f (Quotient.out x))]
   refine finsum_congr fun q => ?_
   rw [GlobalTheory.TwOrbConj.summand_twist]
-  have h : DoubleCoset.mk (GlobalTheory.BCT.twCent θ δ) K (g * Quotient.out q) =
-      DoubleCoset.mk (GlobalTheory.BCT.twCent θ δ) K (Quotient.out (e q)) := by
+  have h
+      : DoubleCoset.mk (GlobalTheory.BCT.twCent θ δ) K (g * Quotient.out q)
+        = DoubleCoset.mk (GlobalTheory.BCT.twCent θ δ) K (Quotient.out (e q)) := by
     rw [DoubleCoset.out_eq']
     rfl
   obtain ⟨t, ht, k, hk, he⟩ := (@DoubleCoset.eq _ _ _ _ _ _).1 h
@@ -68,7 +73,8 @@ private theorem twOrb_twConj' {G : Type} [Group G] [TopologicalSpace G] [IsTopol
 
 theorem inflMatch : GlobalTheory.DZA.InflMatching := by
   unfold GlobalTheory.DZA.InflMatching
-  intro k K _ _ _ _ _ _ _ _ _ hcont hchar F F' _ _ _ _ _ hdeg rk rK hk hK hinc s sb hgal hfrob n fb hfb
+  intro k K _ _ _ _ _ _ _ _ _ hcont hchar F F' _ _ _ _ _ hdeg rk rK hk hK hinc s sb hgal hfrob n fb
+    hfb
   have hres : IsRes rk rK s sb := ⟨hdeg, hk, hK, hinc, hgal, hfrob⟩
   obtain ⟨hVE, hFD, hGal⟩ := derive k K hcont F F' rk rK s sb hres
   have hgen := (frobFacts k K F F' rk rK s sb hres).1
@@ -76,10 +82,9 @@ theorem inflMatch : GlobalTheory.DZA.InflMatching := by
   obtain ⟨hval, hinvφ⟩ := hR5 fb hfb
   obtain ⟨-, -, -, -, -, hIK⟩ := inflFacts K F' rK hK n
   obtain ⟨-, -, -, -, -, hIk⟩ := inflFacts k F rk hk n
-  have suppK : ∀ x : GL (Fin n) K, infl rK (normLift sb fb) x ≠ 0 → x ∈ KO K n :=
-    fun x hx => (hIK (normLift sb fb)).2.2 x hx
-  have suppk : ∀ x : GL (Fin n) k, infl rk fb x ≠ 0 → x ∈ KO k n :=
-    fun x hx => (hIk fb).2.2 x hx
+  have suppK : ∀ x : GL (Fin n) K, infl rK (normLift sb fb) x ≠ 0 → x ∈ KO K n := fun x hx =>
+    (hIK (normLift sb fb)).2.2 x hx
+  have suppk : ∀ x : GL (Fin n) k, infl rk fb x ≠ 0 → x ∈ KO k n := fun x hx => (hIk fb).2.2 x hx
   obtain ⟨hgalAct, hnorm, hcent, hcentr, -, hD6⟩ := dict k K s hgen n
   have hIntF : ∀ (γ x : GL (Fin n) k), infl rk fb (x⁻¹ * γ * x) ≠ 0 → IntEl γ := by
     intro γ x hx
@@ -88,7 +93,8 @@ theorem inflMatch : GlobalTheory.DZA.InflMatching := by
     exact hR4 γ (incl K n x) h1
   refine ⟨fun δ hsep γ hcp => ?_, fun γ _ hne => ?_⟩
   · have hreg : PositivityTheory.Rg.Tf.Loc.IsRegSemisimple γ := by
-      have hs : (Polynomial.map (algebraMap k K) (γ : Matrix (Fin n) (Fin n) k).charpoly).Separable :=
+      have hs
+          : (Polynomial.map (algebraMap k K) (γ : Matrix (Fin n) (Fin n) k).charpoly).Separable :=
         hcp ▸ hsep
       exact (Polynomial.separable_map _).1 hs
     have hnormOf : PositivityTheory.Rg.Tf.Loc.IsNormOf s δ γ :=
@@ -98,17 +104,22 @@ theorem inflMatch : GlobalTheory.DZA.InflMatching := by
     · obtain ⟨δ₀, hδ₀N, -, hδ₀K⟩ := goodDelta k K F F' rk rK s sb hres n γ hint
       have hN0 : PositivityTheory.Rg.Tf.Loc.IsNormOf s δ₀ γ :=
         ⟨1, by rw [← hnorm δ₀, hδ₀N, one_mul, inv_one, mul_one]; rfl⟩
-      obtain ⟨y, hy⟩ := UpperTheory.ConvolutionTheory.Loc.normInj k K s hgen n γ hreg δ₀ δ hN0 ⟨h, hh⟩
+      obtain ⟨y, hy⟩ :=
+        UpperTheory.ConvolutionTheory.Loc.normInj k K s hgen n γ hreg δ₀ δ hN0 ⟨h, hh⟩
       have e1 : δ = y⁻¹ * δ₀ * (galAct s n) y := by
         rw [hy, hgalAct]
         rfl
       rw [e1, twOrb_twConj']
-      have hTC := (UpperTheory.V.Z.Tf.Orb.twCentImg_holds k K s hgen n δ₀ γ hreg
-        (by rw [← hnorm δ₀, hδ₀N]; rfl)).2
+      have hTC :=
+        (UpperTheory.V.Z.Tf.Orb.twCentImg_holds k K s hgen n δ₀ γ hreg
+          (by rw [← hnorm δ₀, hδ₀N]; rfl)).2
       rw [hcent δ₀, hcentr γ] at hTC
       refine orbTransfer (GL (Fin n) K) (GL (Fin n) k) (incl K n)
-        (by exact UpperTheory.V.Z.Tf.Orb.inclClosed_holds k K n) (galAct s n) (KO K n) (KO k n) hR1 δ₀ γ
-        (by rw [hgalAct]; exact hTC) _ _ (fun κ hκ y => hinvφ κ hκ y) ?_ ?_ (fun h => galAct_incl s h)
+        (by exact UpperTheory.V.Z.Tf.Orb.inclClosed_holds k K n) (galAct s n) (KO K n) (KO k n) hR1
+        δ₀ γ (by rw [hgalAct]; exact hTC) _ _
+        (fun κ hκ y => hinvφ κ hκ y)
+        ?_ ?_
+        (fun h => galAct_incl s h)
       · intro x hx
         have hβ := suppK _ hx
         have hNβ := hR2 _ hβ
@@ -120,7 +131,9 @@ theorem inflMatch : GlobalTheory.DZA.InflMatching := by
         exact mul_mem (inv_mem h2) hβ
       · intro h
         rw [galAct_incl]
-        have eN : GlobalTheory.LBC.norm k s ((incl K n h)⁻¹ * δ₀ * incl K n h) = incl K n (h⁻¹ * γ * h) := by
+        have eN
+            : GlobalTheory.LBC.norm k s ((incl K n h)⁻¹ * δ₀ * incl K n h)
+              = incl K n (h⁻¹ * γ * h) := by
           have e3 := hR3 δ₀ (incl K n h)
           rw [galAct_incl] at e3
           rw [e3, hδ₀N, map_mul, map_mul, map_inv]
@@ -143,7 +156,8 @@ theorem inflMatch : GlobalTheory.DZA.InflMatching := by
         rw [hR3, hnorm δ, hh] at hNβ
         change x⁻¹ * (h * incl K n γ * h⁻¹) * x ∈ KO K n at hNβ
         apply hR4 γ (h⁻¹ * x)
-        have e4 : (h⁻¹ * x)⁻¹ * incl K n γ * (h⁻¹ * x) = x⁻¹ * (h * incl K n γ * h⁻¹) * x := by group
+        have e4 : (h⁻¹ * x)⁻¹ * incl K n γ * (h⁻¹ * x) = x⁻¹ * (h * incl K n γ * h⁻¹) * x := by
+          group
         rw [e4]
         exact hNβ
       have hR : GlobalTheory.BCT.twOrb (MonoidHom.id (GL (Fin n) k)) (KO k n) γ (infl rk fb) = 0 :=

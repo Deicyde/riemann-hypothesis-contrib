@@ -7,20 +7,26 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 
-private theorem orbField {K : Type} [Field K] [CharZero K] (s : K →+* K) (θ : K) (hθ : θ ≠ 0)
-    (hsθ : s θ = -θ) (hss : ∀ w, s (s w) = w) (x y z : K) (hx : s x = x) (hy : s y = y)
-    (hdet : x * y - z * s z = θ ^ 2) :
-    ∃ a b c d : K, a * d - b * c = 1 ∧ θ * (a * s b - b * s a) = x ∧ θ * (a * s d - b * s c) = z ∧
-      θ * (c * s b - d * s a) = s z ∧ θ * (c * s d - d * s c) = y := by
+private theorem orbField
+    {K : Type} [Field K] [CharZero K]
+    (s : K →+* K) (θ : K) (hθ : θ ≠ 0) (hsθ : s θ = -θ)
+    (hss : ∀ w, s (s w) = w)
+    (x y z : K) (hx : s x = x) (hy : s y = y) (hdet : x * y - z * s z = θ ^ 2)
+    : ∃ a b c d : K,
+      a * d - b * c = 1 ∧ θ * (a * s b - b * s a) = x ∧ θ * (a * s d - b * s c) = z
+        ∧ θ * (c * s b - d * s a) = s z ∧ θ * (c * s d - d * s c) = y := by
   have h2 : (2 : K) ≠ 0 := two_ne_zero
   have s2 : s 2 = 2 := map_ofNat s 2
   by_cases hy0 : y = 0
   · by_cases hx0 : x = 0
-    · have hN : z * s z = -θ ^ 2 := by
+    · have hN : z * s z = - θ ^ 2 := by
         rw [hx0, hy0] at hdet
         linear_combination -hdet
       by_cases hz : θ + z = 0
@@ -115,10 +121,12 @@ private theorem orbField {K : Type} [Field K] [CharZero K] (s : K →+* K) (θ :
       field_simp
       ring
 
-private theorem fix_of {R : Type} [CommRing R] (t t' a b c d a' b' c' d' : R) (ht : t * t' = 1)
-    (hdet : a * d - b * c = 1) (e00 : t * (a * b' - b * a') = 0) (e01 : t * (a * d' - b * c') = t)
-    (e10 : t * (c * b' - d * a') = -t) (e11 : t * (c * d' - d * c') = 0) :
-    a' = a ∧ b' = b ∧ c' = c ∧ d' = d := by
+private theorem fix_of
+    {R : Type} [CommRing R]
+    (t t' a b c d a' b' c' d' : R) (ht : t * t' = 1) (hdet : a * d - b * c = 1)
+    (e00 : t * (a * b' - b * a') = 0) (e01 : t * (a * d' - b * c') = t)
+    (e10 : t * (c * b' - d * a') = -t) (e11 : t * (c * d' - d * c') = 0)
+    : a' = a ∧ b' = b ∧ c' = c ∧ d' = d := by
   have p : a * b' - b * a' = 0 := by linear_combination t' * e00 - (a * b' - b * a') * ht
   have q : a * d' - b * c' = 1 := by linear_combination t' * e01 - (a * d' - b * c' - 1) * ht
   have r : c * b' - d * a' = -1 := by linear_combination t' * e10 - (c * b' - d * a' + 1) * ht
@@ -135,13 +143,13 @@ private theorem hermitian_standardVector : D.herm (rp X0) = !![0, rt D.θ; -rt D
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Dat.herm, X0, rp, Dat.mkE_def]
 
-private theorem act_fix_iff (h : G1 E) :
-    D.act (gl h) (rp X0) = rp X0 ↔ ∀ i j, D.bar (h i j) = h i j := by
+private theorem act_fix_iff (h : G1 E)
+    : D.act (gl h) (rp X0) = rp X0 ↔ ∀ i j, D.bar (h i j) = h i j := by
   have hdet : h 0 0 * h 1 1 - h 0 1 * h 1 0 = 1 := by
     have := h.det_coe
     rwa [Matrix.det_fin_two] at this
-  have key : D.act (gl h) (rp X0) = rp X0 ↔
-      h.1 * D.herm (rp X0) * D.star2 h.1 = D.herm (rp X0) := by
+  have key
+      : D.act (gl h) (rp X0) = rp X0 ↔ h.1 * D.herm (rp X0) * D.star2 h.1 = D.herm (rp X0) := by
     have := D.herm_act (gl h) (rp X0)
     constructor
     · intro e
@@ -150,19 +158,20 @@ private theorem act_fix_iff (h : G1 E) :
     · intro e
       exact D.herm_injective (this.trans e)
   rw [key, hermitian_standardVector]
-  have ht : rt D.θ * rt D.θ⁻¹ = 1 := by
-    rw [← map_mul, mul_inv_cancel₀ D.θ_ne_zero, map_one]
+  have ht : rt D.θ * rt D.θ⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel₀ D.θ_ne_zero, map_one]
   constructor
   · intro e
     have e00 := congrFun (congrFun e 0) 0
     have e01 := congrFun (congrFun e 0) 1
     have e10 := congrFun (congrFun e 1) 0
     have e11 := congrFun (congrFun e 1) 1
-    simp only [Matrix.mul_apply, Fin.sum_univ_two, Dat.conjTransposeGal_apply, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-      Matrix.cons_val_one, Matrix.cons_val_fin_one] at e00 e01 e10 e11
-    obtain ⟨f1, f2, f3, f4⟩ := fix_of (rt D.θ) (rt D.θ⁻¹) (h 0 0) (h 0 1) (h 1 0) (h 1 1)
-      (D.bar (h 0 0)) (D.bar (h 0 1)) (D.bar (h 1 0)) (D.bar (h 1 1)) ht hdet
-      (by linear_combination e00) (by linear_combination e01) (by linear_combination e10) (by linear_combination e11)
+    simp only [Matrix.mul_apply, Fin.sum_univ_two, Dat.conjTransposeGal_apply, Matrix.of_apply,
+        Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one]
+      at e00 e01 e10 e11
+    obtain ⟨f1, f2, f3, f4⟩ :=
+      fix_of (rt D.θ) (rt D.θ⁻¹) (h 0 0) (h 0 1) (h 1 0) (h 1 1) (D.bar (h 0 0)) (D.bar (h 0 1))
+        (D.bar (h 1 0)) (D.bar (h 1 1)) ht hdet (by linear_combination e00)
+        (by linear_combination e01) (by linear_combination e10) (by linear_combination e11)
     intro i j
     fin_cases i <;> fin_cases j
     · exact f1
@@ -171,16 +180,17 @@ private theorem act_fix_iff (h : G1 E) :
     · exact f4
   · intro hb
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp only [Matrix.mul_apply, Fin.sum_univ_two, Dat.conjTransposeGal_apply, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-        Matrix.cons_val_one, Matrix.cons_val_fin_one, hb, Fin.zero_eta, Fin.mk_one, Fin.isValue]
+    fin_cases i <;> fin_cases j
+      <;> simp only [Matrix.mul_apply, Fin.sum_univ_two, Dat.conjTransposeGal_apply,
+        Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one,
+        Matrix.cons_val_fin_one, hb, Fin.zero_eta, Fin.mk_one, Fin.isValue]
     · ring
     · linear_combination rt D.θ * hdet
     · linear_combination (-rt D.θ) * hdet
     · ring
 
-private theorem part2 (h : G1 E) :
-    D.act (gl h) (rp X0) = rp X0 ↔ ∃ g : G1 ℚ, gl h = em E (gl g) := by
+private theorem part2 (h : G1 E)
+    : D.act (gl h) (rp X0) = rp X0 ↔ ∃ g : G1 ℚ, gl h = em E (gl g) := by
   rw [act_fix_iff]
   constructor
   · intro hb
@@ -201,8 +211,8 @@ private theorem part2 (h : G1 E) :
     rw [this]
     exact D.bar_am _
 
-private theorem part3 (γ : SpecialLinearGroup (Fin 2) E) :
-    D.act (gl (ratS E γ)) (rp X0) = rp X0 ↔ ∃ g, gl (ratS E γ) = em E (gl (ratS ℚ g)) := by
+private theorem part3 (γ : SpecialLinearGroup (Fin 2) E)
+    : D.act (gl (ratS E γ)) (rp X0) = rp X0 ↔ ∃ g, gl (ratS E γ) = em E (gl (ratS ℚ g)) := by
   constructor
   · intro e
     have hb := (act_fix_iff D _).1 e
@@ -228,8 +238,8 @@ private theorem part3 (γ : SpecialLinearGroup (Fin 2) E) :
   · rintro ⟨g, hg⟩
     exact (part2 D _).2 ⟨ratS ℚ g, hg⟩
 
-private theorem part1 (ξ : Fin 4 → ℚ) (hq : qr D.δ ξ = qr D.δ X0) :
-    ∃ γ : SpecialLinearGroup (Fin 2) E, rp ξ = D.act (gl (ratS E γ)) (rp X0) := by
+private theorem part1 (ξ : Fin 4 → ℚ) (hq : qr D.δ ξ = qr D.δ X0)
+    : ∃ γ : SpecialLinearGroup (Fin 2) E, rp ξ = D.act (gl (ratS E γ)) (rp X0) := by
   have inj : Function.Injective (algebraMap E (A E)) := AdeleRing.algebraMap_injective (𝓞 E) E
   have hsq : D.θ ^ 2 = algebraMap ℚ E D.δ := D.sq
   have hss : ∀ w, D.σ (D.σ w) = w := by
@@ -249,13 +259,16 @@ private theorem part1 (ξ : Fin 4 → ℚ) (hq : qr D.δ ξ = qr D.δ X0) :
     simp only [map_sub, map_mul, map_pow] at h1
     rw [hsz, hzdef]
     linear_combination h1 + (algebraMap ℚ E (ξ 3) ^ 2 - 1) * hsq
-  obtain ⟨a, b, c, d, h1, h2, h3, h4, h5⟩ := orbField (D.σ : E →+* E) D.θ D.θ_ne_zero D.conj hss
-    (algebraMap ℚ E (ξ 1)) (algebraMap ℚ E (ξ 0)) z (D.σ.commutes _) (D.σ.commutes _) hdet
+  obtain ⟨a, b, c, d, h1, h2, h3, h4, h5⟩ :=
+    orbField (D.σ : E →+* E) D.θ D.θ_ne_zero D.conj hss (algebraMap ℚ E (ξ 1))
+      (algebraMap ℚ E (ξ 0)) z (D.σ.commutes _) (D.σ.commutes _) hdet
   simp only [RingHom.coe_coe] at h2 h3 h4 h5
   refine ⟨⟨!![a, b; c, d], by rw [Matrix.det_fin_two_of]; exact h1⟩, D.herm_injective ?_⟩
   rw [D.herm_act, hermitian_standardVector]
-  have hval : ((gl (ratS E ⟨!![a, b; c, d], by rw [Matrix.det_fin_two_of]; exact h1⟩) : GL (Fin 2) (A E)) :
-      Matrix (Fin 2) (Fin 2) (A E)) = !![rt a, rt b; rt c, rt d] := by
+  have hval
+      : ((gl (ratS E ⟨!![a, b; c, d], by rw [Matrix.det_fin_two_of]; exact h1⟩) : GL (Fin 2) (A E))
+          : Matrix (Fin 2) (Fin 2) (A E))
+        = !![rt a, rt b; rt c, rt d] := by
     ext i j
     fin_cases i <;> fin_cases j <;> rfl
   rw [hval, D.herm_eq]
@@ -267,15 +280,15 @@ private theorem part1 (ξ : Fin 4 → ℚ) (hq : qr D.δ ξ = qr D.δ X0) :
   have m : D.mkE (rp ξ 2) (rp ξ 3) = rt z := by rw [hzdef]; exact D.mkE_rt _ _
   rw [m, D.bar_rt, am_rt, am_rt]
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp only [Matrix.mul_apply, Fin.sum_univ_two, Dat.conjTransposeGal_apply, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-      Matrix.cons_val_one, Matrix.cons_val_fin_one, D.bar_rt, Fin.zero_eta, Fin.mk_one, Fin.isValue]
+  fin_cases i <;> fin_cases j
+    <;> simp only [Matrix.mul_apply, Fin.sum_univ_two, Dat.conjTransposeGal_apply, Matrix.of_apply,
+      Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one,
+      D.bar_rt, Fin.zero_eta, Fin.mk_one, Fin.isValue]
   · linear_combination -g2
   · linear_combination -g3
   · linear_combination -g4
   · linear_combination -g5
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.orbS :
-    OrbS := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.orbS : OrbS := by
   intro E _ _ _ D
   exact ⟨part1 D, part2 D, part3 D⟩

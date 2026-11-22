@@ -7,18 +7,24 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open GlobalTheory.Doubling (absE)
 
 namespace GlobalTheory.QDom
 
 open scoped Pointwise
 
-theorem isFundamentalDomain_inf {G : Type} [Group G] [MeasurableSpace G] {μ : Measure G}
+theorem isFundamentalDomain_inf
+    {G : Type} [Group G] [MeasurableSpace G]
+    {μ : Measure G}
     (hm : ∀ g : G, Measurable (g * ·)) (hinv : ∀ g : G, μ.map (g * ·) = μ)
-    {Γ : Subgroup G} [Countable Γ] {D : Set G} (hD : IsFundamentalDomain Γ D μ) (S : Subgroup G) :
-    ∃ 𝓓 : Set G, IsFundamentalDomain ↥(Γ ⊓ S) 𝓓 μ := by
+    {Γ : Subgroup G} [Countable Γ]
+    {D : Set G} (hD : IsFundamentalDomain Γ D μ)
+    (S : Subgroup G)
+    : ∃ 𝓓 : Set G, IsFundamentalDomain ↥(Γ ⊓ S) 𝓓 μ := by
   classical
   let Q' : Subgroup Γ := (Γ ⊓ S).subgroupOf Γ
   haveI : Countable (Γ ⧸ Q') := Function.Surjective.countable QuotientGroup.mk_surjective
@@ -45,12 +51,14 @@ theorem isFundamentalDomain_inf {G : Type} [Group G] [MeasurableSpace G] {μ : M
     have : (γ : G) * ((h : Γ) : G) * ((⟨((h : Γ) : G)⁻¹, inv_mem hQ⟩ : ↥(Γ ⊓ S)) • x) = γ • x := by
       rw [Subgroup.smul_def, Subgroup.smul_def]
       simp [smul_eq_mul, mul_assoc]
-    rw [this]; exact hγ
+    rw [this]
+    exact hγ
   · intro g hg
     have hsm : g • ⋃ c, ((rep c : Γ) : G) • D = ⋃ c, ((g : G) * ((rep c : Γ) : G)) • D := by
       rw [Set.smul_set_iUnion]
       refine Set.iUnion_congr fun c => ?_
-      rw [← smul_smul]; rfl
+      rw [← smul_smul]
+      rfl
     rw [hsm, AEDisjoint.iUnion_left_iff]
     intro c
     rw [AEDisjoint.iUnion_right_iff]
@@ -73,7 +81,8 @@ theorem isFundamentalDomain_inf {G : Type} [Group G] [MeasurableSpace G] {μ : M
       subst hcc
       apply hg
       have : (⟨g, hgΓ⟩ : Γ) = 1 := by simpa [γ₁] using heq
-      ext; simpa using congrArg Subtype.val this
+      ext
+      simpa using congrArg Subtype.val this
     exact hD.aedisjoint hne
   · intro g
     exact (hmp (g : G)).quasiMeasurePreserving
@@ -87,12 +96,18 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 theorem countable_numberField : Countable E :=
   Countable.of_equiv _ (Module.finBasis ℚ E).equivFun.toEquiv.symm
 
-theorem countable_ratU (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) : Countable (ratU σ J) := by
+theorem countable_ratU (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    : Countable (ratU σ J) := by
   classical
   haveI := countable_numberField (E := E)
   haveI : Countable (Matrix (Fin n) (Fin n) E) := inferInstanceAs (Countable (Fin n → Fin n → E))
-  have hmat : Countable (GL (Fin n) E) := Function.Injective.countable (f := fun A : GL (Fin n) E => (A : Matrix (Fin n) (Fin n) E)) Units.val_injective
-  have hpre : ∀ x : ratU σ J, ∃ A : GL (Fin n) E, Matrix.GeneralLinearGroup.map (inclR (AF F)) A = ((x : UA σ J) : GL (Fin n) (AE F E)) := by
+  have hmat : Countable (GL (Fin n) E) :=
+    Function.Injective.countable
+      (f := fun A : GL (Fin n) E => (A : Matrix (Fin n) (Fin n) E))
+      Units.val_injective
+  have hpre
+      : ∀ x : ratU σ J, ∃ A : GL (Fin n) E,
+        Matrix.GeneralLinearGroup.map (inclR (AF F)) A = ((x : UA σ J) : GL (Fin n) (AE F E)) := by
     intro x
     have := x.2
     unfold ratU at this
@@ -101,12 +116,13 @@ theorem countable_ratU (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n
   choose f hf using hpre
   refine Function.Injective.countable (f := f) ?_
   intro x y hxy
-  apply Subtype.ext; apply Subtype.ext
+  apply Subtype.ext
+  apply Subtype.ext
   rw [← hf x, ← hf y, hxy]
 
 set_option synthInstance.maxHeartbeats 400000 in
-theorem measurable_mul_left (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : UA σ J) :
-    Measurable (g * ·) := by
+theorem measurable_mul_left (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : UA σ J)
+    : Measurable (g * ·) := by
   haveI : BorelSpace (UA σ J) := ⟨rfl⟩
   haveI : IsModuleTopology (AF F) (AE F E) := ⟨rfl⟩
   haveI : IsTopologicalRing (AE F E) := IsModuleTopology.isTopologicalRing (AF F) (AE F E)
@@ -123,13 +139,24 @@ end GlobalTheory.QDom
 
 namespace GlobalTheory.QDom
 
-theorem exists_fundamentalDomain_ratStab : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E) (b a' : ℕ) (G : Geo σ (b + 2) a') (G₁ : Geo σ b a')
-    (H : Plane E (b + 2) b) (H' : Plane E (b + 2 + a') (b + a')), CfgA B G G₁ H H' → ∀ (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W), IsTriple B G X om om' →
-    ∃ 𝓓 : Set (UA σ G.V.J), IsFundamentalDomain ↥(ratU σ G.V.J ⊓ Subgroup.closure {g : UA σ G.V.J | mat g *ᵥ incV F H.x = incV F H.x}) 𝓓 G.M.μ := by
+theorem exists_fundamentalDomain_ratStab
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (b a' : ℕ) (G : Geo σ (b + 2) a') (G₁ : Geo σ b a')
+        (H : Plane E (b + 2) b) (H' : Plane E (b + 2 + a') (b + a')),
+      CfgA B G G₁ H H'
+        → ∀ (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W),
+          IsTriple B G X om om'
+            → ∃ 𝓓 : Set (UA σ G.V.J),
+              IsFundamentalDomain
+                ↥(ratU σ G.V.J
+                  ⊓ Subgroup.closure {g : UA σ G.V.J | mat g *ᵥ incV F H.x = incV F H.x})
+                𝓓 G.M.μ := by
   intro F E _ _ _ _ _ σ B b a' G G₁ H H' _ X om om' hT
   haveI := countable_ratU σ G.V.J
   have hgood := hT.geo.hM
   haveI := hgood.haar
-  exact isFundamentalDomain_inf (measurable_mul_left σ G.V.J) (fun g => map_mul_left_eq_self G.M.μ g) hgood.dom _
+  exact isFundamentalDomain_inf (measurable_mul_left σ G.V.J)
+    (fun g => map_mul_left_eq_self G.M.μ g)
+    hgood.dom _
 
 end GlobalTheory.QDom

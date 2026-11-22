@@ -9,24 +9,34 @@ open Matrix GlobalTheory.RealBessel GlobalTheory.BesselMapOne Formalism.L2.Theta
 
 namespace UpperTheory.Lit.Bur.CWCombo
 
-theorem isCWCont_of_sobCont {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+theorem isCWCont_of_sobCont
+    {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)}
-    (hs : ∀ v, v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ → SmoothVec (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ v)
-    {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] {ι : Type} [Fintype ι] (l : ι → H →ₗ[ℂ] ℂ) (b : ι → Wp)
-    (hl : ∀ i, Sobolev₂ (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ (l i)) {B : H → Wp}
-    (hB : ∀ v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ, B v = ∑ i, l i v • b i) :
-    PI.BesselMapUniq.IsCWCont (k := k) (r := r) σ B := by
+    (hs : ∀ v,
+      v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ
+        → SmoothVec (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ v)
+    {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp]
+    {ι : Type} [Fintype ι]
+    (l : ι → H →ₗ[ℂ] ℂ)
+    (b : ι → Wp)
+    (hl : ∀ i, Sobolev₂ (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ (l i))
+    {B : H → Wp} (hB : ∀ v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ, B v = ∑ i, l i v • b i)
+    : PI.BesselMapUniq.IsCWCont (k := k) (r := r) σ B := by
   classical
-  have hnn : ∀ (L : List (List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))) (v : H),
-      0 ≤ (L.map fun w => ‖PI.UpqRep.dsigW (k := k) (r := r) σ w v‖).sum := fun L v =>
+  have hnn
+      : ∀ (L : List (List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))) (v : H),
+        0 ≤ (L.map fun w => ‖PI.UpqRep.dsigW (k := k) (r := r) σ w v‖).sum := fun L v =>
     List.sum_nonneg (by
       intro x hx
       obtain ⟨w, -, rfl⟩ := List.mem_map.1 hx
       exact norm_nonneg _)
-  have key : ∀ s : Finset ι, ∃ (C : ℝ) (Ws : List (List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))),
-      (∀ w ∈ Ws, ∀ X ∈ w, PI.UpqRep.InLieHpk k r X) ∧
-      ∀ v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ, ‖∑ i ∈ s, l i v • b i‖ ≤
-        C * (Ws.map fun w => ‖PI.UpqRep.dsigW (k := k) (r := r) σ w v‖).sum := by
+  have key
+      : ∀ s : Finset ι,
+        ∃ (C : ℝ) (Ws : List (List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))),
+          (∀ w ∈ Ws, ∀ X ∈ w, PI.UpqRep.InLieHpk k r X)
+            ∧ ∀ v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ,
+              ‖∑ i ∈ s, l i v • b i‖
+                ≤ C * (Ws.map fun w => ‖PI.UpqRep.dsigW (k := k) (r := r) σ w v‖).sum := by
     intro s
     induction s using Finset.induction_on with
     | empty => exact ⟨0, [], by simp, by simp⟩
@@ -51,14 +61,18 @@ theorem isCWCont_of_sobCont {k r : ℕ} {H : Type} [NormedAddCommGroup H] [Inner
         have hbn : 0 ≤ ‖b i‖ := norm_nonneg _
         have e1 : ‖l i v • b i‖ ≤ |D| * ‖b i‖ * P := by
           rw [norm_smul]
-          calc ‖l i v‖ * ‖b i‖ ≤ (|D| * P) * ‖b i‖ :=
-                mul_le_mul_of_nonneg_right (e.trans (mul_le_mul_of_nonneg_right (le_abs_self D) h1)) hbn
+          calc
+            ‖l i v‖ * ‖b i‖ ≤ (|D| * P) * ‖b i‖ :=
+              mul_le_mul_of_nonneg_right (e.trans (mul_le_mul_of_nonneg_right (le_abs_self D) h1))
+                hbn
             _ = |D| * ‖b i‖ * P := by ring
         have e2 : ‖∑ j ∈ s, l j v • b j‖ ≤ |C| * Q :=
           h3.trans (mul_le_mul_of_nonneg_right (le_abs_self C) h2)
         have a1 : 0 ≤ |D| * ‖b i‖ * Q := mul_nonneg (mul_nonneg (abs_nonneg _) hbn) h2
         have a2 : 0 ≤ |C| * P := mul_nonneg (abs_nonneg _) h1
-        calc ‖l i v • b i + ∑ j ∈ s, l j v • b j‖ ≤ ‖l i v • b i‖ + ‖∑ j ∈ s, l j v • b j‖ := norm_add_le _ _
+        calc
+          ‖l i v • b i + ∑ j ∈ s, l j v • b j‖
+            ≤ ‖l i v • b i‖ + ‖∑ j ∈ s, l j v • b j‖ := norm_add_le _ _
           _ ≤ |D| * ‖b i‖ * P + |C| * Q := add_le_add e1 e2
           _ ≤ (|D| * ‖b i‖ + |C|) * (P + Q) := by nlinarith
   obtain ⟨C, Ws, hW, hb⟩ := key Finset.univ
@@ -68,5 +82,18 @@ end UpperTheory.Lit.Bur.CWCombo
 
 open Matrix GlobalTheory.RealBessel GlobalTheory.BesselMapOne Formalism.L2.Theta GlobalTheory.SmVec
 set_option maxHeartbeats 1000000 in
-theorem _root_.UpperTheory.Lit.Bur.casselmanWallachCont_finite_sum_sobolev_forms : ∀ {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)} (hs : ∀ v, v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ → SmoothVec (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ v) {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] {ι : Type} [Fintype ι] (l : ι → H →ₗ[ℂ] ℂ) (b : ι → Wp) (hl : ∀ i, Sobolev₂ (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ (l i)) {B : H → Wp} (hB : ∀ v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ, B v = ∑ i, l i v • b i), PI.BesselMapUniq.IsCWCont (k := k) (r := r) σ B := by
-  first | exact @UpperTheory.Lit.Bur.CWCombo.isCWCont_of_sobCont | exact UpperTheory.Lit.Bur.CWCombo.isCWCont_of_sobCont | (intros; apply UpperTheory.Lit.Bur.CWCombo.isCWCont_of_sobCont <;> assumption)
+theorem _root_.UpperTheory.Lit.Bur.casselmanWallachCont_finite_sum_sobolev_forms
+    : ∀ {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)}
+        (hs : ∀ v,
+          v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ
+            → SmoothVec (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ v)
+        {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] {ι : Type} [Fintype ι]
+        (l : ι → H →ₗ[ℂ] ℂ) (b : ι → Wp)
+        (hl : ∀ i, Sobolev₂ (lieG (Formalism.QuantumDeterminants.Hpk k r)) σ (l i)) {B : H → Wp}
+        (hB : ∀ v ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ, B v = ∑ i, l i v • b i),
+      PI.BesselMapUniq.IsCWCont (k := k) (r := r) σ B := by
+  first
+  | exact @UpperTheory.Lit.Bur.CWCombo.isCWCont_of_sobCont
+  | exact UpperTheory.Lit.Bur.CWCombo.isCWCont_of_sobCont
+  | (intros; apply UpperTheory.Lit.Bur.CWCombo.isCWCont_of_sobCont <;> assumption)

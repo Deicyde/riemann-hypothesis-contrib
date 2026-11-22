@@ -21,23 +21,26 @@ section PartS
 
 variable {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
 
-theorem genusCovol_mem_locS (S : Submonoid R) (L : Submodule R W) (x : W) :
-    x ∈ locS S L ↔ ∃ s ∈ S, s • x ∈ L := Iff.rfl
+theorem genusCovol_mem_locS (S : Submonoid R) (L : Submodule R W) (x : W)
+    : x ∈ locS S L ↔ ∃ s ∈ S, s • x ∈ L :=
+  Iff.rfl
 
-theorem genusCovol_le_locS (S : Submonoid R) (L : Submodule R W) : L ≤ locS S L :=
-  fun x hx => ⟨1, S.one_mem, by simpa using hx⟩
+theorem genusCovol_le_locS (S : Submonoid R) (L : Submodule R W) : L ≤ locS S L := fun x hx =>
+  ⟨1, S.one_mem, by simpa using hx⟩
 
-theorem genusCovol_locS_mono (S : Submonoid R) {L M : Submodule R W} (h : L ≤ M) :
-    locS S L ≤ locS S M := fun _ ⟨s, hs, hx⟩ => ⟨s, hs, h hx⟩
+theorem genusCovol_locS_mono (S : Submonoid R) {L M : Submodule R W} (h : L ≤ M)
+    : locS S L ≤ locS S M := fun _ ⟨s, hs, hx⟩ =>
+  ⟨s, hs, h hx⟩
 
-theorem genusCovol_locS_idem (S : Submonoid R) (L : Submodule R W) :
-    locS S (locS S L) ≤ locS S L := by
+theorem genusCovol_locS_idem (S : Submonoid R) (L : Submodule R W)
+    : locS S (locS S L) ≤ locS S L := by
   rintro x ⟨s, hs, t, ht, hx⟩
   refine ⟨t * s, S.mul_mem ht hs, ?_⟩
   rwa [mul_smul]
 
-theorem genusCovol_le_of_loc {Y X : Submodule R W}
-    (h : ∀ (P : Ideal R) [P.IsMaximal], Y ≤ locS P.primeCompl X) : Y ≤ X := by
+theorem genusCovol_le_of_loc
+    {Y X : Submodule R W} (h : ∀ (P : Ideal R) [P.IsMaximal], Y ≤ locS P.primeCompl X)
+    : Y ≤ X := by
   intro y hy
   let I : Ideal R := X.comap (LinearMap.toSpanSingleton R W y)
   by_cases hI : I = ⊤
@@ -47,15 +50,17 @@ theorem genusCovol_le_of_loc {Y X : Submodule R W}
     obtain ⟨s, hs, hsy⟩ := h P hy
     exact absurd (hIP (show s ∈ I by simpa [I] using hsy)) hs
 
-theorem genusCovol_pigeon {X Y : Submodule R W}
-    (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0) (r : R) {z : W} (hz : z ∈ Y) :
-    ∃ m k : ℕ, 0 < k ∧ r ^ m • z - r ^ (m + k) • z ∈ X := by
+theorem genusCovol_pigeon
+    {X Y : Submodule R W} (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0)
+    (r : R)
+    {z : W} (hz : z ∈ Y)
+    : ∃ m k : ℕ, 0 < k ∧ r ^ m • z - r ^ (m + k) • z ∈ X := by
   classical
   have : (X.toAddSubgroup.addSubgroupOf Y.toAddSubgroup).FiniteIndex := ⟨hfin⟩
   have : Finite (Y.toAddSubgroup ⧸ X.toAddSubgroup.addSubgroupOf Y.toAddSubgroup) :=
     AddSubgroup.finite_quotient_of_finiteIndex
-  let f : ℕ → Y.toAddSubgroup ⧸ X.toAddSubgroup.addSubgroupOf Y.toAddSubgroup :=
-    fun n => QuotientAddGroup.mk (⟨r ^ n • z, Y.smul_mem _ hz⟩ : Y.toAddSubgroup)
+  let f : ℕ → Y.toAddSubgroup ⧸ X.toAddSubgroup.addSubgroupOf Y.toAddSubgroup := fun n =>
+    QuotientAddGroup.mk (⟨r ^ n • z, Y.smul_mem _ hz⟩ : Y.toAddSubgroup)
   obtain ⟨a, b, hab, hf⟩ := Finite.exists_ne_map_eq_of_infinite f
   have key : ∀ a b : ℕ, f a = f b → r ^ a • z - r ^ b • z ∈ X := by
     intro a b e
@@ -72,9 +77,9 @@ theorem genusCovol_pigeon {X Y : Submodule R W}
     rw [Nat.add_sub_cancel' h.le]
     exact key b a hf.symm
 
-theorem genusCovol_claimA (S : Submonoid R) {X Y : Submodule R W}
-    (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0) :
-    locS S Y ≤ Y ⊔ locS S X := by
+theorem genusCovol_claimA
+    (S : Submonoid R) {X Y : Submodule R W} (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0)
+    : locS S Y ≤ Y ⊔ locS S X := by
   rintro y ⟨s, hs, hsy⟩
   obtain ⟨m, k, hk, hmk⟩ := genusCovol_pigeon hfin s hsy
   have hb : s ^ k • y ∈ Y := by
@@ -93,10 +98,11 @@ theorem genusCovol_claimA (S : Submonoid R) {X Y : Submodule R W}
   rw [this]
   exact Submodule.add_mem_sup hb hr
 
-theorem genusCovol_claimB (P Q : Ideal R) [P.IsPrime] [Q.IsPrime] {a : R} (haP : a ∈ P)
-    (haQ : a ∉ Q) {X Y : Submodule R W}
-    (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0) :
-    locS Q.primeCompl Y ≤ locS Q.primeCompl (Y ⊓ locS P.primeCompl X) := by
+theorem genusCovol_claimB
+    (P Q : Ideal R) [P.IsPrime] [Q.IsPrime]
+    {a : R} (haP : a ∈ P) (haQ : a ∉ Q)
+    {X Y : Submodule R W} (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0)
+    : locS Q.primeCompl Y ≤ locS Q.primeCompl (Y ⊓ locS P.primeCompl X) := by
   rintro y' ⟨t, ht, hty⟩
   obtain ⟨m, k, hk, hmk⟩ := genusCovol_pigeon hfin a hty
   refine ⟨a ^ m * t, ?_, ?_, ?_⟩
@@ -118,10 +124,11 @@ theorem genusCovol_claimB (P Q : Ideal R) [P.IsPrime] [Q.IsPrime] {a : R} (haP :
       rw [e]
       exact hmk
 
-theorem genusCovol_ri_peel (S : Submonoid R) {X Y : Submodule R W} (hXY : X ≤ Y)
-    (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0) :
-    (Y ⊓ locS S X).toAddSubgroup.relIndex Y.toAddSubgroup =
-      (locS S X).toAddSubgroup.relIndex (locS S Y).toAddSubgroup := by
+theorem genusCovol_ri_peel
+    (S : Submonoid R)
+    {X Y : Submodule R W} (hXY : X ≤ Y) (hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0)
+    : (Y ⊓ locS S X).toAddSubgroup.relIndex Y.toAddSubgroup
+      = (locS S X).toAddSubgroup.relIndex (locS S Y).toAddSubgroup := by
   have e : locS S Y = locS S X ⊔ Y :=
     le_antisymm (by rw [sup_comm]; exact genusCovol_claimA S hfin)
       (sup_le (genusCovol_locS_mono S hXY) (genusCovol_le_locS S Y))
@@ -129,93 +136,105 @@ theorem genusCovol_ri_peel (S : Submonoid R) {X Y : Submodule R W} (hXY : X ≤ 
     ← AddSubgroup.inf_relIndex_right (locS S X).toAddSubgroup, inf_comm]
   rfl
 
-theorem genusCovol_loc_eq_of_le_of_le (S : Submonoid R) {X Z : Submodule R W} (h1 : X ≤ Z)
-    (h2 : Z ≤ locS S X) : locS S Z = locS S X :=
+theorem genusCovol_loc_eq_of_le_of_le
+    (S : Submonoid R) {X Z : Submodule R W} (h1 : X ≤ Z) (h2 : Z ≤ locS S X)
+    : locS S Z = locS S X :=
   le_antisymm ((genusCovol_locS_mono S h2).trans (genusCovol_locS_idem S X))
     (genusCovol_locS_mono S h1)
 
-theorem genusCovol_lemmaS : ∀ (n : ℕ) (X Y X' Y' : Submodule R W), X ≤ Y → X' ≤ Y' →
-    X.toAddSubgroup.relIndex Y.toAddSubgroup = n → n ≠ 0 →
-    X'.toAddSubgroup.relIndex Y'.toAddSubgroup ≠ 0 →
-    (∀ (P : Ideal R) [P.IsMaximal], ∃ f : W →+ W, Function.Injective f ∧
-      (locS P.primeCompl X).toAddSubgroup.map f = (locS P.primeCompl X').toAddSubgroup ∧
-      (locS P.primeCompl Y).toAddSubgroup.map f = (locS P.primeCompl Y').toAddSubgroup) →
-    X'.toAddSubgroup.relIndex Y'.toAddSubgroup = n := by
+theorem genusCovol_lemmaS
+    : ∀ (n : ℕ) (X Y X' Y' : Submodule R W),
+      X ≤ Y → X' ≤ Y' → X.toAddSubgroup.relIndex Y.toAddSubgroup = n → n ≠ 0
+        → X'.toAddSubgroup.relIndex Y'.toAddSubgroup ≠ 0
+        → (∀ (P : Ideal R) [P.IsMaximal], ∃ f : W →+ W,
+          Function.Injective f
+            ∧ (locS P.primeCompl X).toAddSubgroup.map f = (locS P.primeCompl X').toAddSubgroup
+            ∧ (locS P.primeCompl Y).toAddSubgroup.map f = (locS P.primeCompl Y').toAddSubgroup)
+        → X'.toAddSubgroup.relIndex Y'.toAddSubgroup = n := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  intro X Y X' Y' hXY hXY' hn hn0 hfin' hloc
-  have hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0 := hn ▸ hn0
-  by_cases hall : ∀ (P : Ideal R) [P.IsMaximal], Y ≤ locS P.primeCompl X
-  · have h1 : Y ≤ X := genusCovol_le_of_loc hall
-    have h1' : Y' ≤ X' := by
-      apply genusCovol_le_of_loc
-      intro P _
-      obtain ⟨f, _, hfX, hfY⟩ := hloc P
-      have hYX : locS P.primeCompl Y ≤ locS P.primeCompl X :=
-        (genusCovol_locS_mono _ (hall P)).trans (genusCovol_locS_idem _ X)
-      have : (locS P.primeCompl Y').toAddSubgroup ≤ (locS P.primeCompl X').toAddSubgroup := by
-        rw [← hfX, ← hfY]
-        exact AddSubgroup.map_mono ((Submodule.toAddSubgroup_le _ _).mpr hYX)
-      exact (genusCovol_le_locS _ Y').trans ((Submodule.toAddSubgroup_le _ _).mp this)
-    rw [← hn, AddSubgroup.relIndex_eq_one.mpr ((Submodule.toAddSubgroup_le _ _).mpr h1),
-      AddSubgroup.relIndex_eq_one.mpr ((Submodule.toAddSubgroup_le _ _).mpr h1')]
-  · push Not at hall
-    obtain ⟨P, hP, hY⟩ := hall
-    obtain ⟨f, hfi, hfX, hfY⟩ := hloc P
-    set Z := Y ⊓ locS P.primeCompl X with hZ
-    set Z' := Y' ⊓ locS P.primeCompl X' with hZ'
-    have hXZ : X ≤ Z := le_inf hXY (genusCovol_le_locS _ X)
-    have hXZ' : X' ≤ Z' := le_inf hXY' (genusCovol_le_locS _ X')
-    have hm := AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).mpr hXZ)
-      ((Submodule.toAddSubgroup_le _ _).mpr (inf_le_left : Z ≤ Y))
-    have hm' := AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).mpr hXZ')
-      ((Submodule.toAddSubgroup_le _ _).mpr (inf_le_left : Z' ≤ Y'))
-    have hp := genusCovol_ri_peel P.primeCompl hXY hfin
-    have hp' := genusCovol_ri_peel P.primeCompl hXY' hfin'
-    rw [← hfX, ← hfY, AddSubgroup.relIndex_map_map_of_injective _ _ hfi] at hp'
-    have hne1 : Z.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 1 := by
-      intro h
-      exact hY (((Submodule.toAddSubgroup_le _ _).mp (AddSubgroup.relIndex_eq_one.mp h)).trans
-        inf_le_right)
-    have hlt : X.toAddSubgroup.relIndex Z.toAddSubgroup < n := by
-      rw [← hn, ← hm]
-      have h0 : X.toAddSubgroup.relIndex Z.toAddSubgroup ≠ 0 := by
-        intro h; rw [← hm, h, zero_mul] at hfin; exact hfin rfl
-      have h2 : Z.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0 := by
-        intro h; rw [← hm, h, mul_zero] at hfin; exact hfin rfl
-      have : 2 ≤ Z.toAddSubgroup.relIndex Y.toAddSubgroup := by omega
-      have h4 := Nat.pos_of_ne_zero h0
-      nlinarith
-    have hfinZ' : X'.toAddSubgroup.relIndex Z'.toAddSubgroup ≠ 0 := by
-      intro h; rw [← hm', h, zero_mul] at hfin'; exact hfin' rfl
-    have hIH := ih _ hlt X Z X' Z' hXZ hXZ' rfl
-      (by intro h; rw [← hm, h, zero_mul] at hfin; exact hfin rfl) hfinZ' (by
-        intro Q _
-        by_cases hQ : Q = P
-        · subst hQ
-          refine ⟨f, hfi, hfX, ?_⟩
-          rw [genusCovol_loc_eq_of_le_of_le _ hXZ inf_le_right,
-            genusCovol_loc_eq_of_le_of_le _ hXZ' inf_le_right, hfX]
-        · obtain ⟨g, hgi, hgX, hgY⟩ := hloc Q
-          have hPQ : ¬ P ≤ Q := fun h =>
-            hQ ((Ideal.IsMaximal.eq_of_le inferInstance (Ideal.IsMaximal.ne_top inferInstance) h).symm)
-          obtain ⟨a, haP, haQ⟩ := Set.not_subset.mp hPQ
-          have e1 : locS Q.primeCompl Z = locS Q.primeCompl Y :=
-            le_antisymm (genusCovol_locS_mono _ inf_le_left) (genusCovol_claimB P Q haP haQ hfin)
-          have e2 : locS Q.primeCompl Z' = locS Q.primeCompl Y' :=
-            le_antisymm (genusCovol_locS_mono _ inf_le_left) (genusCovol_claimB P Q haP haQ hfin')
-          exact ⟨g, hgi, hgX, by rw [e1, e2, hgY]⟩)
-    rw [← hm', hIH, hp', ← hp, hm, hn]
+    intro X Y X' Y' hXY hXY' hn hn0 hfin' hloc
+    have hfin : X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0 := hn ▸ hn0
+    by_cases hall : ∀ (P : Ideal R) [P.IsMaximal], Y ≤ locS P.primeCompl X
+    · have h1 : Y ≤ X := genusCovol_le_of_loc hall
+      have h1' : Y' ≤ X' := by
+        apply genusCovol_le_of_loc
+        intro P _
+        obtain ⟨f, _, hfX, hfY⟩ := hloc P
+        have hYX : locS P.primeCompl Y ≤ locS P.primeCompl X :=
+          (genusCovol_locS_mono _ (hall P)).trans (genusCovol_locS_idem _ X)
+        have : (locS P.primeCompl Y').toAddSubgroup ≤ (locS P.primeCompl X').toAddSubgroup := by
+          rw [← hfX, ← hfY]
+          exact AddSubgroup.map_mono ((Submodule.toAddSubgroup_le _ _).mpr hYX)
+        exact (genusCovol_le_locS _ Y').trans ((Submodule.toAddSubgroup_le _ _).mp this)
+      rw [← hn, AddSubgroup.relIndex_eq_one.mpr ((Submodule.toAddSubgroup_le _ _).mpr h1),
+        AddSubgroup.relIndex_eq_one.mpr ((Submodule.toAddSubgroup_le _ _).mpr h1')]
+    · push Not at hall
+      obtain ⟨P, hP, hY⟩ := hall
+      obtain ⟨f, hfi, hfX, hfY⟩ := hloc P
+      set Z := Y ⊓ locS P.primeCompl X with hZ
+      set Z' := Y' ⊓ locS P.primeCompl X' with hZ'
+      have hXZ : X ≤ Z := le_inf hXY (genusCovol_le_locS _ X)
+      have hXZ' : X' ≤ Z' := le_inf hXY' (genusCovol_le_locS _ X')
+      have hm :=
+        AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).mpr hXZ)
+          ((Submodule.toAddSubgroup_le _ _).mpr (inf_le_left : Z ≤ Y))
+      have hm' :=
+        AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).mpr hXZ')
+          ((Submodule.toAddSubgroup_le _ _).mpr (inf_le_left : Z' ≤ Y'))
+      have hp := genusCovol_ri_peel P.primeCompl hXY hfin
+      have hp' := genusCovol_ri_peel P.primeCompl hXY' hfin'
+      rw [← hfX, ← hfY, AddSubgroup.relIndex_map_map_of_injective _ _ hfi] at hp'
+      have hne1 : Z.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 1 := by
+        intro h
+        exact hY (((Submodule.toAddSubgroup_le _ _).mp (AddSubgroup.relIndex_eq_one.mp h)).trans
+          inf_le_right)
+      have hlt : X.toAddSubgroup.relIndex Z.toAddSubgroup < n := by
+        rw [← hn, ← hm]
+        have h0 : X.toAddSubgroup.relIndex Z.toAddSubgroup ≠ 0 := by
+          intro h; rw [← hm, h, zero_mul] at hfin; exact hfin rfl
+        have h2 : Z.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0 := by
+          intro h; rw [← hm, h, mul_zero] at hfin; exact hfin rfl
+        have : 2 ≤ Z.toAddSubgroup.relIndex Y.toAddSubgroup := by omega
+        have h4 := Nat.pos_of_ne_zero h0
+        nlinarith
+      have hfinZ' : X'.toAddSubgroup.relIndex Z'.toAddSubgroup ≠ 0 := by
+        intro h; rw [← hm', h, zero_mul] at hfin'; exact hfin' rfl
+      have hIH :=
+        ih _ hlt X Z X' Z' hXZ hXZ' rfl (by intro h; rw [← hm, h, zero_mul] at hfin; exact hfin rfl)
+          hfinZ'
+          (by
+            intro Q _
+            by_cases hQ : Q = P
+            · subst hQ
+              refine ⟨f, hfi, hfX, ?_⟩
+              rw [genusCovol_loc_eq_of_le_of_le _ hXZ inf_le_right,
+                genusCovol_loc_eq_of_le_of_le _ hXZ' inf_le_right, hfX]
+            · obtain ⟨g, hgi, hgX, hgY⟩ := hloc Q
+              have hPQ : ¬ P ≤ Q := fun h =>
+                hQ ((Ideal.IsMaximal.eq_of_le inferInstance (Ideal.IsMaximal.ne_top inferInstance)
+                  h).symm)
+              obtain ⟨a, haP, haQ⟩ := Set.not_subset.mp hPQ
+              have e1 : locS Q.primeCompl Z = locS Q.primeCompl Y :=
+                le_antisymm (genusCovol_locS_mono _ inf_le_left)
+                  (genusCovol_claimB P Q haP haQ hfin)
+              have e2 : locS Q.primeCompl Z' = locS Q.primeCompl Y' :=
+                le_antisymm (genusCovol_locS_mono _ inf_le_left)
+                  (genusCovol_claimB P Q haP haQ hfin')
+              exact ⟨g, hgi, hgX, by rw [e1, e2, hgY]⟩)
+      rw [← hm', hIH, hp', ← hp, hm, hn]
 
 end PartS
 
 section PartT
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
-theorem star_algebraMap_ringOfIntegers_mem_range (r : 𝓞 K) : star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K) :=
+theorem star_algebraMap_ringOfIntegers_mem_range (r : 𝓞 K)
+    : star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K) :=
   ⟨⟨star (algebraMap (𝓞 K) K r), r.isIntegral_coe.map (starRingEnd K).toIntAlgHom⟩, rfl⟩
 
 theorem genusCovol_hinj : Function.Injective (algebraMap (𝓞 K) K) :=
@@ -231,21 +250,26 @@ def genusCovol_tdual (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) 
   zero_mem' := fun x _ => ⟨0, by simp⟩
   smul_mem' := by
     intro r y hy x hx
-    obtain ⟨z, hz⟩ := hy (locBasic_sigma genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range r • x)
-      (L.smul_mem _ hx)
+    obtain ⟨z, hz⟩ :=
+      hy (locBasic_sigma genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range r • x)
+        (L.smul_mem _ hx)
     refine ⟨z, ?_⟩
     rw [← hz]
     congr 1
-    rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, genusBasic_hsmul_right,
-      locBasic_sigma_spec, locBasic_sigma_spec, star_star]
+    rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range,
+      genusBasic_hsmul_right, locBasic_sigma_spec, locBasic_sigma_spec, star_star]
 
-theorem genusCovol_locS_locS {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
-    {S T : Submonoid R} (hST : S ≤ T) (Z : Submodule R W) : locS T (locS S Z) = locS T Z :=
-  le_antisymm ((genusCovol_locS_mono T (locBasic_locS_le_of_le hST Z)).trans
-    (genusCovol_locS_idem T Z)) (genusCovol_locS_mono T (genusCovol_le_locS S Z))
+theorem genusCovol_locS_locS
+    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
+    {S T : Submonoid R} (hST : S ≤ T)
+    (Z : Submodule R W)
+    : locS T (locS S Z) = locS T Z :=
+  le_antisymm
+    ((genusCovol_locS_mono T (locBasic_locS_le_of_le hST Z)).trans (genusCovol_locS_idem T Z))
+    (genusCovol_locS_mono T (genusCovol_le_locS S Z))
 
-theorem gmap_locS_comm (g : V ≃ₗ[K] V) (S : Submonoid (𝓞 K)) (Z : Submodule (𝓞 K) V) :
-    gmap g (locS S Z) = locS S (gmap g Z) := by
+theorem gmap_locS_comm (g : V ≃ₗ[K] V) (S : Submonoid (𝓞 K)) (Z : Submodule (𝓞 K) V)
+    : gmap g (locS S Z) = locS S (gmap g Z) := by
   ext x
   rw [isomAct_mem_gmap, isomAct_mem_locS, isomAct_mem_locS]
   simp only [isomAct_mem_gmap]
@@ -255,21 +279,22 @@ theorem gmap_locS_comm (g : V ≃ₗ[K] V) (S : Submonoid (𝓞 K)) (Z : Submodu
   · rintro ⟨s, hs, hx⟩
     exact ⟨s, hs, by rw [← isomAct_smul]; exact hx⟩
 
-theorem genusCovol_gmap_inf (g : V ≃ₗ[K] V) (A B : Submodule (𝓞 K) V) :
-    gmap g (A ⊓ B) = gmap g A ⊓ gmap g B := by
+theorem genusCovol_gmap_inf (g : V ≃ₗ[K] V) (A B : Submodule (𝓞 K) V)
+    : gmap g (A ⊓ B) = gmap g A ⊓ gmap g B := by
   ext x
   simp only [isomAct_mem_gmap, Submodule.mem_inf]
 
-theorem genusCovol_gmap_gmap_inv (g : V ≃ₗ[K] V) (Z : Submodule (𝓞 K) V) :
-    gmap g (gmap g⁻¹ Z) = Z := by
+theorem genusCovol_gmap_gmap_inv (g : V ≃ₗ[K] V) (Z : Submodule (𝓞 K) V)
+    : gmap g (gmap g⁻¹ Z) = Z := by
   have := genusBasic_gmap_inv g⁻¹ Z
   rwa [inv_inv] at this
 
-theorem genus_covolume_local_dual_le (h : V →ₗ⋆[K] V →ₗ[K] K) (g : V ≃ₗ[K] V) (hg : g ∈ isom h)
-    (P : Ideal (𝓞 K)) [P.IsPrime] (L M : Submodule (𝓞 K) V) (hM : M.FG)
-    (hML : M ≤ gmap g (loc (K := K) P L)) :
-    gmap g (locS P.primeCompl (genusCovol_tdual h L)) ≤
-      locS P.primeCompl (genusCovol_tdual h M) := by
+theorem genus_covolume_local_dual_le
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (g : V ≃ₗ[K] V) (hg : g ∈ isom h)
+    (P : Ideal (𝓞 K)) [P.IsPrime]
+    (L M : Submodule (𝓞 K) V) (hM : M.FG) (hML : M ≤ gmap g (loc (K := K) P L))
+    : gmap g (locS P.primeCompl (genusCovol_tdual h L))
+      ≤ locS P.primeCompl (genusCovol_tdual h M) := by
   classical
   have hg' : ∀ x y, h (g x) (g y) = h x y := hg
   obtain ⟨F, hF⟩ := hM
@@ -292,31 +317,34 @@ theorem genus_covolume_local_dual_le (h : V →ₗ⋆[K] V →ₗ[K] K) (g : V �
   rw [isomAct_mem_gmap] at hx
   obtain ⟨s, hs, hsx⟩ := hx
   set σT := locBasic_sigma genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range T with hσT
-  have hσmem : σT ∈ hcompl (K := K) P := genusBasic_sigma_mem genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range P T hTmem
+  have hσmem : σT ∈ hcompl (K := K) P :=
+    genusBasic_sigma_mem genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range P T hTmem
   refine ⟨σT * s, P.primeCompl.mul_mem (locBasic_hcompl_le (K := K) P hσmem) hs, ?_⟩
   intro m hm
   obtain ⟨z, hz⟩ := hsx (T • g.symm m) (hMf hm)
   refine ⟨z, ?_⟩
   rw [← hz]
   congr 1
-  rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, genusBasic_hsmul_right,
-    genusBasic_hsmul_right, ← hg' (g.symm m) (g.symm x), LinearEquiv.apply_symm_apply,
-    LinearEquiv.apply_symm_apply, map_mul, mul_assoc]
+  rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range,
+    genusBasic_hsmul_right, genusBasic_hsmul_right, ← hg' (g.symm m) (g.symm x),
+    LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply, map_mul, mul_assoc]
 
 end PartT
 
 section PartE
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
-theorem genusCovol_dualBasis (h : V →ₗ⋆[K] V →ₗ[K] K) (N : ℕ)
-    (ι : V →+ EuclideanSpace ℝ (Fin N))
+theorem genusCovol_dualBasis
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N))
     (hι : ∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
-    (M : Submodule (𝓞 K) V) [DiscreteTopology (zmap ι M)] [IsZLattice ℝ (zmap ι M)] :
-    ∃ bv : Basis (Module.Free.ChooseBasisIndex ℤ (zmap ι M)) ℝ (EuclideanSpace ℝ (Fin N)),
-      zmap ι (genusCovol_tdual h M) = Submodule.span ℤ (Set.range bv) ∧
-      ZLattice.covolume (zmap ι M) * ZLattice.covolume (Submodule.span ℤ (Set.range bv)) = 1 := by
+    (M : Submodule (𝓞 K) V) [DiscreteTopology (zmap ι M)] [IsZLattice ℝ (zmap ι M)]
+    : ∃ bv : Basis (Module.Free.ChooseBasisIndex ℤ (zmap ι M)) ℝ (EuclideanSpace ℝ (Fin N)),
+      zmap ι (genusCovol_tdual h M) = Submodule.span ℤ (Set.range bv)
+        ∧ ZLattice.covolume (zmap ι M) * ZLattice.covolume (Submodule.span ℤ (Set.range bv))
+          = 1 := by
   classical
   set Λ := zmap ι M with hΛ
   let bz := Module.Free.chooseBasis ℤ Λ
@@ -410,8 +438,8 @@ theorem genusCovol_dualBasis (h : V →ₗ⋆[K] V →ₗ[K] K) (N : ℕ)
     have := congrArg (fun u => inner ℝ (bR k) u) hc
     simp only [inner_sum, real_inner_smul_right, hRdelta, inner_zero_right] at this
     simpa using this
-  have hcard : Fintype.card (Module.Free.ChooseBasisIndex ℤ Λ) =
-      finrank ℝ (EuclideanSpace ℝ (Fin N)) := by
+  have hcard
+      : Fintype.card (Module.Free.ChooseBasisIndex ℤ Λ) = finrank ℝ (EuclideanSpace ℝ (Fin N)) := by
     rw [← Module.finrank_eq_card_chooseBasisIndex, ZLattice.rank ℝ Λ]
   let bv := basisOfLinearIndependentOfCardEqFinrank' v hli hcard
   have hbv : ∀ i, bv i = v i := fun i => by simp [bv, basisOfLinearIndependentOfCardEqFinrank']
@@ -447,35 +475,39 @@ theorem genusCovol_dualBasis (h : V →ₗ⋆[K] V →ₗ[K] K) (N : ℕ)
     rw [← Real.sqrt_mul h0, Rat.cast_inv, mul_inv_cancel₀ (by exact_mod_cast hdetpos.ne'),
       Real.sqrt_one]
 
-theorem genusCovol_zmap_mono (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N)) {A B : Submodule (𝓞 K) V}
-    (hAB : A ≤ B) : zmap ι A ≤ zmap ι B := by
+theorem genusCovol_zmap_mono
+    (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N)) {A B : Submodule (𝓞 K) V} (hAB : A ≤ B)
+    : zmap ι A ≤ zmap ι B := by
   intro v hv
   obtain ⟨x, hx, rfl⟩ := (genusCovolBound_mem_zmap N ι A v).mp hv
   exact (genusCovolBound_mem_zmap N ι B _).mpr ⟨x, hAB hx, rfl⟩
 
-theorem genusCovol_ri_zmap (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N)) (hinj : Function.Injective ι)
-    (A B : Submodule (𝓞 K) V) :
-    (zmap ι A).toAddSubgroup.relIndex (zmap ι B).toAddSubgroup =
-      A.toAddSubgroup.relIndex B.toAddSubgroup := by
+theorem genusCovol_ri_zmap
+    (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N)) (hinj : Function.Injective ι)
+    (A B : Submodule (𝓞 K) V)
+    : (zmap ι A).toAddSubgroup.relIndex (zmap ι B).toAddSubgroup
+      = A.toAddSubgroup.relIndex B.toAddSubgroup := by
   unfold zmap
   rw [AddSubgroup.toIntSubmodule_toAddSubgroup, AddSubgroup.toIntSubmodule_toAddSubgroup]
   exact AddSubgroup.relIndex_map_map_of_injective _ _ hinj
 
-theorem genusCovol_sq (h : V →ₗ⋆[K] V →ₗ[K] K)
-    (hpos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x)) (N : ℕ)
-    (ι : V →+ EuclideanSpace ℝ (Fin N))
+theorem genusCovol_sq
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hpos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x))
+    (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N))
     (hι : ∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
     (A : Submodule (𝓞 K) V) [DiscreteTopology (zmap ι A)] [IsZLattice ℝ (zmap ι A)]
-    (D : ℕ) (hD0 : 0 < D) (hD : ∀ x ∈ A, D • x ∈ genusCovol_tdual h A) :
-    (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex A.toAddSubgroup ≠ 0 ∧
-    (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex (genusCovol_tdual h A).toAddSubgroup ≠ 0 ∧
-    ZLattice.covolume (zmap ι A) ^ 2 *
-        ((A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex A.toAddSubgroup : ℝ) =
-      ((A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex (genusCovol_tdual h A).toAddSubgroup : ℝ) := by
+    (D : ℕ) (hD0 : 0 < D) (hD : ∀ x ∈ A, D • x ∈ genusCovol_tdual h A)
+    : (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex A.toAddSubgroup ≠ 0
+      ∧ (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex (genusCovol_tdual h A).toAddSubgroup ≠ 0
+      ∧ ZLattice.covolume (zmap ι A) ^ 2
+          * ((A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex A.toAddSubgroup : ℝ)
+        = ((A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex (genusCovol_tdual h A).toAddSubgroup
+          : ℝ) := by
   classical
   obtain ⟨bv, hE2, hprod⟩ := genusCovol_dualBasis h N ι hι A
   have hinj : Function.Injective ι := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra hne
     have h1 := hpos x hne
@@ -504,12 +536,15 @@ theorem genusCovol_sq (h : V →ₗ⋆[K] V →ₗ[K] K)
     exact Submodule.smul_mem _ _ (Submodule.subset_span hDx)
   have e1 := ZLattice.covolume_div_covolume_eq_relIndex' NE Λ hNΛ
   have e2 := ZLattice.covolume_div_covolume_eq_relIndex' NE _ hNT
-  have hri1 : NE.toAddSubgroup.relIndex Λ.toAddSubgroup =
-      (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex A.toAddSubgroup := by
+  have hri1
+      : NE.toAddSubgroup.relIndex Λ.toAddSubgroup
+        = (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex A.toAddSubgroup := by
     rw [hNE, hΛ, genusCovol_ri_zmap N ι hinj]
   rw [hri1] at e1
-  have hri2 : NE.toAddSubgroup.relIndex (Submodule.span ℤ (Set.range bv)).toAddSubgroup =
-      (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex (genusCovol_tdual h A).toAddSubgroup := by
+  have hri2
+      : NE.toAddSubgroup.relIndex (Submodule.span ℤ (Set.range bv)).toAddSubgroup
+        = (A ⊓ genusCovol_tdual h A).toAddSubgroup.relIndex
+          (genusCovol_tdual h A).toAddSubgroup := by
     rw [← hE2, hNE, genusCovol_ri_zmap N ι hinj]
   rw [hri2] at e2
   have hc := ZLattice.covolume_pos Λ
@@ -531,15 +566,18 @@ end PartE
 
 section PartF
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
-theorem genusCovol_local (h : V →ₗ⋆[K] V →ₗ[K] K) (L M : Submodule (𝓞 K) V) (hLfg : L.FG)
-    (hMfg : M.FG) (P : Ideal (𝓞 K)) [P.IsPrime] (g : V ≃ₗ[K] V) (hg : g ∈ isom h)
-    (hgL : gmap g (loc (K := K) P L) = loc (K := K) P M) :
-    gmap g (locS P.primeCompl L) = locS P.primeCompl M ∧
-    gmap g (locS P.primeCompl (genusCovol_tdual h L)) =
-      locS P.primeCompl (genusCovol_tdual h M) := by
+theorem genusCovol_local
+    (h : V →ₗ⋆[K] V →ₗ[K] K)
+    (L M : Submodule (𝓞 K) V) (hLfg : L.FG) (hMfg : M.FG)
+    (P : Ideal (𝓞 K)) [P.IsPrime]
+    (g : V ≃ₗ[K] V) (hg : g ∈ isom h) (hgL : gmap g (loc (K := K) P L) = loc (K := K) P M)
+    : gmap g (locS P.primeCompl L) = locS P.primeCompl M
+      ∧ gmap g (locS P.primeCompl (genusCovol_tdual h L))
+        = locS P.primeCompl (genusCovol_tdual h M) := by
   have hle := locBasic_hcompl_le (K := K) P
   refine ⟨?_, ?_⟩
   · rw [← genusCovol_locS_locS hle L, gmap_locS_comm]
@@ -556,9 +594,9 @@ theorem genusCovol_local (h : V →ₗ⋆[K] V →ₗ[K] K) (L M : Submodule (�
       change gmap g (gmap g⁻¹ _) ≤ gmap g _ at h2
       rwa [genusCovol_gmap_gmap_inv] at h2
 
-theorem genusCovol_addData (g : V ≃ₗ[K] V) (X Y : Submodule (𝓞 K) V) (hXY : gmap g X = Y) :
-    X.toAddSubgroup.map (((g : V →ₗ[K] V).restrictScalars (𝓞 K) : V →ₗ[𝓞 K] V) : V →+ V) =
-      Y.toAddSubgroup := by
+theorem genusCovol_addData (g : V ≃ₗ[K] V) (X Y : Submodule (𝓞 K) V) (hXY : gmap g X = Y)
+    : X.toAddSubgroup.map (((g : V →ₗ[K] V).restrictScalars (𝓞 K) : V →ₗ[𝓞 K] V) : V →+ V)
+      = Y.toAddSubgroup := by
   rw [← hXY]
   rfl
 
@@ -569,11 +607,12 @@ theorem genusCovol : GenusCovol := by
   classical
   obtain ⟨d, hd0, hd⟩ := genusScale K V h hs L hL
   have hdM := hd M hM
-  have hdL := genusScale_transfer genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range
-    h (d : K) M L (genusBasic_symm h L M hM.2) hdM
-  have hDmem (A : Submodule (𝓞 K) V)
-      (hA : ∀ x ∈ A, ∀ y ∈ A, (d : K) * h x y ∈ (1 : Submodule (𝓞 K) K)) :
-      ∀ x ∈ A, d • x ∈ genusCovol_tdual h A := by
+  have hdL :=
+    genusScale_transfer genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range h (d : K) M L
+      (genusBasic_symm h L M hM.2) hdM
+  have hDmem
+      (A : Submodule (𝓞 K) V) (hA : ∀ x ∈ A, ∀ y ∈ A, (d : K) * h x y ∈ (1 : Submodule (𝓞 K) K))
+      : ∀ x ∈ A, d • x ∈ genusCovol_tdual h A := by
     intro x hx y hy
     obtain ⟨r, hr⟩ := Submodule.mem_one.mp (hA y hy x hx)
     obtain ⟨z, hz⟩ := genusCovolBound_trace_int r
@@ -581,34 +620,39 @@ theorem genusCovol : GenusCovol := by
     rw [map_nsmul, nsmul_eq_mul, ← hz, hr]
   obtain ⟨hL1, hL2, hLsq⟩ := genusCovol_sq h hpos N ι hι L d hd0 (hDmem L hdL)
   obtain ⟨hM1, hM2, hMsq⟩ := genusCovol_sq h hpos N ι hι M d hd0 (hDmem M hdM)
-  have hloc : ∀ (P : Ideal (𝓞 K)) [P.IsMaximal], ∃ g : V ≃ₗ[K] V,
-      gmap g (locS P.primeCompl L) = locS P.primeCompl M ∧
-      gmap g (locS P.primeCompl (genusCovol_tdual h L)) =
-        locS P.primeCompl (genusCovol_tdual h M) := by
+  have hloc
+      : ∀ (P : Ideal (𝓞 K)) [P.IsMaximal], ∃ g : V ≃ₗ[K] V,
+        gmap g (locS P.primeCompl L) = locS P.primeCompl M
+          ∧ gmap g (locS P.primeCompl (genusCovol_tdual h L))
+            = locS P.primeCompl (genusCovol_tdual h M) := by
     intro P hP
     obtain ⟨g, hg, hgL⟩ := hM.2 P hP
     exact ⟨g, genusCovol_local h L M hL.fg hM.1.toIsLattice.fg P g hg hgL⟩
-  have hinf : ∀ (P : Ideal (𝓞 K)) [P.IsMaximal] (g : V ≃ₗ[K] V),
-      gmap g (locS P.primeCompl L) = locS P.primeCompl M →
-      gmap g (locS P.primeCompl (genusCovol_tdual h L)) =
-        locS P.primeCompl (genusCovol_tdual h M) →
-      gmap g (locS P.primeCompl (L ⊓ genusCovol_tdual h L)) =
-        locS P.primeCompl (M ⊓ genusCovol_tdual h M) := by
+  have hinf
+      : ∀ (P : Ideal (𝓞 K)) [P.IsMaximal] (g : V ≃ₗ[K] V),
+        gmap g (locS P.primeCompl L) = locS P.primeCompl M
+          → gmap g (locS P.primeCompl (genusCovol_tdual h L))
+            = locS P.primeCompl (genusCovol_tdual h M)
+          → gmap g (locS P.primeCompl (L ⊓ genusCovol_tdual h L))
+            = locS P.primeCompl (M ⊓ genusCovol_tdual h M) := by
     intro P _ g e1 e2
     rw [locBasic_locS_inf, locBasic_locS_inf, genusCovol_gmap_inf, e1, e2]
-  have eA := genusCovol_lemmaS _ (L ⊓ genusCovol_tdual h L) L (M ⊓ genusCovol_tdual h M) M
-    inf_le_left inf_le_left rfl hL1 hM1 (by
-      intro P _
-      obtain ⟨g, e1, e2⟩ := hloc P
-      exact ⟨_, g.injective, genusCovol_addData g _ _ (hinf P g e1 e2),
-        genusCovol_addData g _ _ e1⟩)
-  have eB := genusCovol_lemmaS _ (L ⊓ genusCovol_tdual h L) (genusCovol_tdual h L)
-    (M ⊓ genusCovol_tdual h M) (genusCovol_tdual h M)
-    inf_le_right inf_le_right rfl hL2 hM2 (by
-      intro P _
-      obtain ⟨g, e1, e2⟩ := hloc P
-      exact ⟨_, g.injective, genusCovol_addData g _ _ (hinf P g e1 e2),
-        genusCovol_addData g _ _ e2⟩)
+  have eA :=
+    genusCovol_lemmaS _ (L ⊓ genusCovol_tdual h L) L (M ⊓ genusCovol_tdual h M) M inf_le_left
+      inf_le_left rfl hL1 hM1
+      (by
+        intro P _
+        obtain ⟨g, e1, e2⟩ := hloc P
+        exact
+          ⟨_, g.injective, genusCovol_addData g _ _ (hinf P g e1 e2), genusCovol_addData g _ _ e1⟩)
+  have eB :=
+    genusCovol_lemmaS _ (L ⊓ genusCovol_tdual h L) (genusCovol_tdual h L) (M ⊓ genusCovol_tdual h M)
+      (genusCovol_tdual h M) inf_le_right inf_le_right rfl hL2 hM2
+      (by
+        intro P _
+        obtain ⟨g, e1, e2⟩ := hloc P
+        exact
+          ⟨_, g.injective, genusCovol_addData g _ _ (hinf P g e1 e2), genusCovol_addData g _ _ e2⟩)
   rw [eA, eB, ← hLsq] at hMsq
   have hr0 : (0 : ℝ) < ((L ⊓ genusCovol_tdual h L).toAddSubgroup.relIndex L.toAddSubgroup : ℝ) := by
     exact_mod_cast Nat.pos_of_ne_zero hL1

@@ -20,13 +20,18 @@ theorem qPh_of_rest (hTau : TauP) (hSm : SmithP) : QPh :=
   qPh_of hTau hSm bilinP detFactsP numP detDivP
 
 theorem contraction_of_pairing_GL (hPh : QPh) (hCO : CartanOnto) : ContractionStandardLattice :=
-  contraction_of_pairing_lemmas hPh subCoeffP subMapP subRowP lamCoeffP lamEquivP lamMulP lamEvalP lamMemP
-    (subMuP_of explicit_map_onto_two_letter_space two_letter_lattice_gauss_inverse hCO) (topLineP_of explicit_map_onto_two_letter_space two_letter_lattice_gauss_inverse hCO) liftP detDivP intCapP hwMulP
+  contraction_of_pairing_lemmas hPh subCoeffP subMapP subRowP lamCoeffP lamEquivP lamMulP lamEvalP
+    lamMemP (subMuP_of explicit_map_onto_two_letter_space two_letter_lattice_gauss_inverse hCO)
+    (topLineP_of explicit_map_onto_two_letter_space two_letter_lattice_gauss_inverse hCO) liftP
+    detDivP intCapP hwMulP
 
-theorem theorem_I_of_contraction (D : Formalism.BasicNotions.D7) (hQ : ContractionStandardLattice) : SecondPartClosed D :=
-  theorem_I_of_two_letter_clauses_contraction D explicit_map_injective explicit_map_onto_two_letter_space two_letter_lattice_gauss_inverse hQ
+theorem theorem_I_of_contraction (D : Formalism.BasicNotions.D7) (hQ : ContractionStandardLattice)
+    : SecondPartClosed D :=
+  theorem_I_of_two_letter_clauses_contraction D explicit_map_injective
+    explicit_map_onto_two_letter_space two_letter_lattice_gauss_inverse hQ
 
-theorem theorem_I_of_pairing_GL (D : Formalism.BasicNotions.D7) (hPh : QPh) : SecondPartClosed D := by
+theorem theorem_I_of_pairing_GL (D : Formalism.BasicNotions.D7) (hPh : QPh)
+    : SecondPartClosed D := by
   intro hA
   obtain ⟨T0, -, h0⟩ := hA 0 le_rfl
   obtain ⟨T1, -, h1⟩ := h0 T0 le_rfl

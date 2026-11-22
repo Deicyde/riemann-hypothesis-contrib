@@ -9,15 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Formall
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 open GlobalTheory.HkFam
 
 namespace GlobalTheory.HkFam
 
-theorem isFinite_and_etale_of_comp_of_finite_etale_cover :
-    ∀ (X Y Z : Scheme.{0}) (q : X ⟶ Y) (π : Y ⟶ Z), IsFinite q → Etale q → Surjective q → IsFinite (q ≫ π) → Etale (q ≫ π) → IsSeparated π → LocallyOfFinitePresentation π → IsFinite π ∧ Etale π := by
+theorem isFinite_and_etale_of_comp_of_finite_etale_cover
+    : ∀ (X Y Z : Scheme.{0}) (q : X ⟶ Y) (π : Y ⟶ Z),
+      IsFinite q → Etale q → Surjective q → IsFinite (q ≫ π) → Etale (q ≫ π) → IsSeparated π
+        → LocallyOfFinitePresentation π
+        → IsFinite π ∧ Etale π := by
   intro X Y Z q π _ _ _ _ _ _ _
   have he : Etale π := GlobalTheory.etale_of_comp_of_etale_of_surjective q π
   have : UniversallyClosed π := UniversallyClosed.of_comp_surjective q π

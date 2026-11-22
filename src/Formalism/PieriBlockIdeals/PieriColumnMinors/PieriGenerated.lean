@@ -12,14 +12,17 @@ namespace Formalism.CohomologicalDescent.LP
 
 open Formalism.CohomologicalDescent.Symmetrization Formalism.CohomologicalDescent.BinaryFormsExample
 
-theorem tower_pieri : TowerPieri := TowerPieri_of completeReducibility_holds highestWeightDominant_holds
+theorem tower_pieri : TowerPieri :=
+  TowerPieri_of completeReducibility_holds highestWeightDominant_holds
 
 theorem pieri_rule : Pieri := by
   intro K P M q _ _ _ _ _ _ _ _ EM B lam2 hF h0 n
   have hT := tensor_tower K P M q EM B n hF
   have hb := tensor_base_case K P M q EM n (fun b => (lam2 b : K)) h0
-  have hTP := tower_pieri K (Tens (Fin q) P M n) q n (fun j => Dpart K EM j) (epsY K n)
-    (tensForm n B) lam2 hT hb
+  have hTP :=
+    tower_pieri K (Tens (Fin q) P M n) q n
+      (fun j => Dpart K EM j)
+      (epsY K n) (tensForm n B) lam2 hT hb
   apply eq_top_iff.mpr
   rw [← hTP, Submodule.span_le]
   rintro z ⟨tau, κ, ρ, hp, hcas⟩

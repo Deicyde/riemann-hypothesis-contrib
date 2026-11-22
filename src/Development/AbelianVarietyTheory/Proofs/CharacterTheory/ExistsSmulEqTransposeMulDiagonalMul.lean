@@ -9,13 +9,15 @@ open scoped BigOperators
 
 namespace GlobalTheory
 
-theorem exists_rat_eq_transpose_mul_diagonal_mul {n : ℕ} (A : Matrix (Fin n) (Fin n) ℚ)
-    (hs : A.IsSymm) (hp : ∀ x : Fin n → ℚ, x ≠ 0 → 0 < x ⬝ᵥ A *ᵥ x) :
-    ∃ (d : Fin n → ℚ) (Q : Matrix (Fin n) (Fin n) ℚ), (∀ i, 0 < d i) ∧ Q.det ≠ 0 ∧
-      A = Qᵀ * Matrix.diagonal d * Q := by
+theorem exists_rat_eq_transpose_mul_diagonal_mul
+    {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) ℚ) (hs : A.IsSymm) (hp : ∀ x : Fin n → ℚ, x ≠ 0 → 0 < x ⬝ᵥ A *ᵥ x)
+    : ∃ (d : Fin n → ℚ) (Q : Matrix (Fin n) (Fin n) ℚ),
+      (∀ i, 0 < d i) ∧ Q.det ≠ 0 ∧ A = Qᵀ * Matrix.diagonal d * Q := by
   have hsym : (Matrix.toBilin' A).IsSymm := Matrix.isSymm_toBilin'_iff_isSymm.mpr hs
-  obtain ⟨v₀, hv₀⟩ := LinearMap.BilinForm.exists_orthogonal_basis (K := ℚ) (V := Fin n → ℚ)
-    (B := Matrix.toBilin' A) (LinearMap.BilinForm.isSymm_iff.mp hsym)
+  obtain ⟨v₀, hv₀⟩ :=
+    LinearMap.BilinForm.exists_orthogonal_basis (K := ℚ) (V := Fin n → ℚ) (B := Matrix.toBilin' A)
+      (LinearMap.BilinForm.isSymm_iff.mp hsym)
   have hr : Module.finrank ℚ (Fin n → ℚ) = n := by simp
   let e : Fin (Module.finrank ℚ (Fin n → ℚ)) ≃ Fin n := finCongr hr
   let v := v₀.reindex e
@@ -43,11 +45,12 @@ theorem exists_rat_eq_transpose_mul_diagonal_mul {n : ℕ} (A : Matrix (Fin n) (
   · rw [← hdiag, Matrix.transpose_transpose]
     have h1 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hPd
     have h2 : Pᵀ * (P⁻¹)ᵀ = 1 := by rw [← Matrix.transpose_mul, h1, Matrix.transpose_one]
-    calc A = (P⁻¹ * P) * A * (Pᵀ * (P⁻¹)ᵀ) := by rw [h1, h2]; simp
+    calc
+      A = (P⁻¹ * P) * A * (Pᵀ * (P⁻¹)ᵀ) := by rw [h1, h2]; simp
       _ = P⁻¹ * (P * A * Pᵀ) * (P⁻¹)ᵀ := by simp only [Matrix.mul_assoc]
 
-theorem exists_pos_nat_mul_eq_intCast {ι : Type} [Finite ι] (f : ι → ℚ) :
-    ∃ (b : ℕ) (g : ι → ℤ), 0 < b ∧ ∀ i, (g i : ℚ) = b * f i := by
+theorem exists_pos_nat_mul_eq_intCast {ι : Type} [Finite ι] (f : ι → ℚ)
+    : ∃ (b : ℕ) (g : ι → ℤ), 0 < b ∧ ∀ i, (g i : ℚ) = b * f i := by
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors ℤ) f
   choose g hg using hb
   have hb0 : (b : ℤ) ≠ 0 := nonZeroDivisors.coe_ne_zero b
@@ -64,8 +67,12 @@ theorem exists_pos_nat_mul_eq_intCast {ι : Type} [Finite ι] (f : ι → ℚ) :
     rw [h3]
     ring
 
-theorem exists_smul_eq_transpose_mul_diagonal_mul :
-    (∀ (n : ℕ) (A : Matrix (Fin n) (Fin n) ℤ), (A.map (fun x : ℤ => (x : ℝ))).PosDef → ∃ (N : ℕ) (c : Fin n → ℕ) (l : Matrix (Fin n) (Fin n) ℤ), 0 < N ∧ (∀ i, 0 < c i) ∧ l.det ≠ 0 ∧ (N : ℤ) • A = lᵀ * Matrix.diagonal (fun i => (c i : ℤ)) * l) := by
+theorem exists_smul_eq_transpose_mul_diagonal_mul
+    : (∀ (n : ℕ) (A : Matrix (Fin n) (Fin n) ℤ),
+      (A.map (fun x : ℤ => (x : ℝ))).PosDef
+        → ∃ (N : ℕ) (c : Fin n → ℕ) (l : Matrix (Fin n) (Fin n) ℤ),
+          0 < N ∧ (∀ i, 0 < c i) ∧ l.det ≠ 0
+            ∧ (N : ℤ) • A = lᵀ * Matrix.diagonal (fun i => (c i : ℤ)) * l) := by
   intro n A hA
   have hs : (A.map (fun x : ℤ => (x : ℚ))).IsSymm := by
     ext i j
@@ -81,8 +88,9 @@ theorem exists_smul_eq_transpose_mul_diagonal_mul :
       have := congrFun h i
       simpa using this
     have h := hA.dotProduct_mulVec_pos hx'
-    have h2 : star (fun i => (x i : ℝ)) ⬝ᵥ (A.map (fun x : ℤ => (x : ℝ))) *ᵥ (fun i => (x i : ℝ))
-        = ((x ⬝ᵥ (A.map (fun x : ℤ => (x : ℚ))) *ᵥ x : ℚ) : ℝ) := by
+    have h2
+        : star (fun i => (x i : ℝ)) ⬝ᵥ (A.map (fun x : ℤ => (x : ℝ))) *ᵥ (fun i => (x i : ℝ))
+          = ((x ⬝ᵥ (A.map (fun x : ℤ => (x : ℚ))) *ᵥ x : ℚ) : ℝ) := by
       simp [dotProduct, Matrix.mulVec]
     rw [h2] at h
     exact_mod_cast h
@@ -99,8 +107,9 @@ theorem exists_smul_eq_transpose_mul_diagonal_mul :
   have hl : l.map (Int.castRingHom ℚ) = (a : ℚ) • Q := by
     ext i j
     simp [l, hg]
-  have hc : (Matrix.diagonal fun i => (((k i).toNat : ℕ) : ℤ)).map (Int.castRingHom ℚ)
-      = (b : ℚ) • Matrix.diagonal d := by
+  have hc
+      : (Matrix.diagonal fun i => (((k i).toNat : ℕ) : ℤ)).map (Int.castRingHom ℚ)
+        = (b : ℚ) • Matrix.diagonal d := by
     ext i j
     by_cases hij : i = j
     · subst hij

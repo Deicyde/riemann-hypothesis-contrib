@@ -5,21 +5,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.QuasiCompact
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.stabTriv_of :
-    UpperTheory.Gal.W2.CoordOcc → UpperTheory.Gal.W2.LatIso → UpperTheory.Gal.W2.FixLine → UpperTheory.Gal.W2.Rigid → UpperTheory.Gal.W2.StabTriv := by
+theorem UpperTheory.Gal.W2.stabTriv_of
+    : UpperTheory.Gal.W2.CoordOcc → UpperTheory.Gal.W2.LatIso → UpperTheory.Gal.W2.FixLine
+      → UpperTheory.Gal.W2.Rigid
+      → UpperTheory.Gal.W2.StabTriv := by
   intro hOcc hLat hFix hRig p _ D G L hDa hDm v hsig t₀ htau ρ hSig PD RD N hN3 hNp B a y hSees
   obtain ⟨D', t, P, j, hCls, hPer, hPl, hCA, hLoc, Q, hQ, hQj, hrel⟩ :=
     hOcc p D G L hDa hDm v hsig t₀ htau ρ hSig PD RD N (by omega) hNp B a
   obtain ⟨hFixL, hS1, hS2⟩ := hSees
   obtain ⟨w, hwm, hwj⟩ :=
-    (hLat p D G L B (PD B) N (by omega) hNp D' t D' t j j a.1 a.1 N N t t
-      hCls hCls hPl hPl hCA hCA hLoc hLoc y).mp ⟨hS1, hS2⟩
+    (hLat p D G L B (PD B) N (by omega) hNp D' t D' t j j a.1 a.1 N N t t hCls hCls hPl hPl hCA hCA
+      hLoc hLoc y).mp ⟨hS1, hS2⟩
   obtain ⟨hiff, hinv⟩ := hFix p D G L v t₀ ρ B.β (RD B) Q a.2 hQ hrel y
   obtain ⟨H, hH⟩ := hiff.mp hFixL
   obtain ⟨H', hH'⟩ := ((hFix p D G L v t₀ ρ B.β (RD B) Q a.2 hQ hrel y⁻¹).1).mp (hinv hFixL)
@@ -60,8 +65,7 @@ theorem UpperTheory.Gal.W2.stabTriv_of :
     apply LinearMap.ext
     intro x
     obtain ⟨m, u, hm, hmu⟩ := hPl.2.2.1 x
-    have h1 : m • (actY L y) x = m • x := by
-      rw [← map_nsmul, hmu, ← hwj, hfix]
+    have h1 : m • (actY L y) x = m • x := by rw [← map_nsmul, hmu, ← hwj, hfix]
     rw [← Nat.cast_smul_eq_nsmul ℚ, ← Nat.cast_smul_eq_nsmul ℚ] at h1
     exact smul_right_injective _ (Nat.cast_ne_zero.mpr hm) h1
   have hy1 : (↑y : G.Cˣ × ℚˣ).1 = 1 := by
@@ -74,7 +78,8 @@ theorem UpperTheory.Gal.W2.stabTriv_of :
   have hsh : sh G (1 : G.C) = 1 := by simp [sh]
   rw [Units.val_one, _root_.one_mul, hsh, _root_.mul_one] at hy
   have hq : (algebraMap ℚ G.C) ((↑y : G.Cˣ × ℚˣ).2 : ℚ) = 1 := by
-    have : (algebraMap ℚ G.C) ((↑y : G.Cˣ × ℚˣ).2 : ℚ) * ↑B.β = 1 * ↑B.β := by rw [_root_.one_mul, ← hy]
+    have : (algebraMap ℚ G.C) ((↑y : G.Cˣ × ℚˣ).2 : ℚ) * ↑B.β = 1 * ↑B.β := by
+      rw [_root_.one_mul, ← hy]
     exact (Units.mul_left_inj B.β).mp this
   have hq' : ((↑y : G.Cˣ × ℚˣ).2 : ℚ) = 1 := by
     rw [← map_one (algebraMap ℚ G.C)] at hq

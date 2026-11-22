@@ -6,17 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsIsoIff
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem isIso_of_finite_etale_of_existsUnique_lift (W S : Scheme.{0}) (w : W ⟶ S) (hf : IsFinite w)
-    (he : Etale w) (hc : PreconnectedSpace S) (Ω : Type) [Field Ω] [IsAlgClosed Ω] (s : Sp Ω ⟶ S)
-    (hs : ∃! x : Sp Ω ⟶ W, x ≫ w = s) : IsIso w := by
+theorem isIso_of_finite_etale_of_existsUnique_lift
+    (W S : Scheme.{0}) (w : W ⟶ S) (hf : IsFinite w) (he : Etale w) (hc : PreconnectedSpace S)
+    (Ω : Type) [Field Ω] [IsAlgClosed Ω]
+    (s : Sp Ω ⟶ S) (hs : ∃! x : Sp Ω ⟶ W, x ≫ w = s)
+    : IsIso w := by
   obtain ⟨z⟩ : Nonempty (Sp Ω) := inferInstance
   obtain ⟨x₀, hx₀, hu⟩ := hs
   have hsub : Subsingleton {x : Sp Ω ⟶ W // x ≫ w = s} :=

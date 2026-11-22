@@ -20,15 +20,15 @@ noncomputable section
 
 section
 
-variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {F : Type} [Field F]
+variable
+  {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] {F : Type} [Field F]
 
-theorem exists_forms_mem_of_not_le_relevant {J : Ideal (MRing ι F)} (hJ : IsMultiHomogIdeal J)
-    (hrel : ∀ W : Ideal (MRing ι F), W.IsPrime → IsMultiHomogIdeal W → IsRelevant W → ¬ J ≤ W) :
-    ∃ n : ℕ, ∀ m : K → ℕ, (∀ k, n * Fintype.card (ι k) < m k) →
-      ∀ x : MRing ι F, IsMultiHomog x m → x ∈ J := by
+theorem exists_forms_mem_of_not_le_relevant
+    {J : Ideal (MRing ι F)} (hJ : IsMultiHomogIdeal J)
+    (hrel : ∀ W : Ideal (MRing ι F), W.IsPrime → IsMultiHomogIdeal W → IsRelevant W → ¬ J ≤ W)
+    : ∃ n : ℕ, ∀ m : K → ℕ,
+      (∀ k, n * Fintype.card (ι k) < m k) → ∀ x : MRing ι F, IsMultiHomog x m → x ∈ J := by
   classical
-
   let e : (∀ k, ι k) → (Σ k, ι k) →₀ ℕ := fun σ =>
     Finsupp.equivFunOnFinite.symm (fun v => if v.2 = σ v.1 then 1 else 0)
   have he : ∀ σ v, e σ v = if v.2 = σ v.1 then 1 else 0 := fun σ v => rfl
@@ -58,8 +58,7 @@ theorem exists_forms_mem_of_not_le_relevant {J : Ideal (MRing ι F)} (hJ : IsMul
     intro k
     by_contra h
     push Not at h
-    have h1 : ∑ i, d ⟨k, i⟩ ≤ ∑ _i : ι k, Finset.univ.sup N :=
-      Finset.sum_le_sum fun i _ => (h i).le
+    have h1 : ∑ i, d ⟨k, i⟩ ≤ ∑ _i : ι k, Finset.univ.sup N := Finset.sum_le_sum fun i _ => (h i).le
     have h2 := congrFun hw k
     simp only [Finset.sum_const, Finset.card_univ, smul_eq_mul] at h1 h2
     have h3 := hm k
@@ -81,21 +80,21 @@ theorem exists_forms_mem_of_not_le_relevant {J : Ideal (MRing ι F)} (hJ : IsMul
     simpa using hσ k
   · simp
 
-theorem hilbFn_sub_le_of_regular {P : Ideal (MRing ι F)} (hP : IsMultiProjPrime P) {b : K → ℤ}
-    {f g : MRing ι F} (hs : IsRegularSection P b f g) :
-    ∀ᶠ m in Filter.atTop, hilbFn P (m - b) ≤ hilbFn P m := by
+theorem hilbFn_sub_le_of_regular
+    {P : Ideal (MRing ι F)} (hP : IsMultiProjPrime P)
+    {b : K → ℤ} {f g : MRing ι F} (hs : IsRegularSection P b f g)
+    : ∀ᶠ m in Filter.atTop, hilbFn P (m - b) ≤ hilbFn P m := by
   classical
   have := hP.isPrime
   obtain ⟨bf, bg, hf, hg, hb⟩ := hs.degrees
   set J : Ideal (MRing ι F) := (P ⊔ Ideal.span {g}).colon {f} with hJdef
   have hJh : IsMultiHomogIdeal J :=
-    ColonMultiHomog.proof F K ι _ f bf
-      (SupSpanMultiHomog.proof F K ι P g bg hP.multiHomog hg) hf
+    ColonMultiHomog.proof F K ι _ f bf (SupSpanMultiHomog.proof F K ι P g bg hP.multiHomog hg) hf
   have hPJ : P ≤ J := fun p hp => by
     rw [hJdef, Submodule.mem_colon_singleton, smul_eq_mul]
     exact Ideal.mem_sup_left (P.mul_mem_right f hp)
-  have hrel : ∀ W : Ideal (MRing ι F), W.IsPrime → IsMultiHomogIdeal W → IsRelevant W →
-      ¬ J ≤ W := by
+  have hrel
+      : ∀ W : Ideal (MRing ι F), W.IsPrime → IsMultiHomogIdeal W → IsRelevant W → ¬ J ≤ W := by
     intro W hWp hWh hWr hJW
     obtain ⟨u, v, hu, huv⟩ := hs.regular W ⟨hWp, hWh, hWr⟩ (hPJ.trans hJW)
     apply hu
@@ -117,18 +116,20 @@ theorem hilbFn_sub_le_of_regular {P : Ideal (MRing ι F)} (hP : IsMultiProjPrime
   set M' : K → ℕ := fun k => ((m - b) k).toNat with hM'
   have hdeg : M' + bf = M + bg := by
     funext k
-    have := hm0 k; have := hmb0 k; have := hb' k
+    have := hm0 k
+    have := hmb0 k
+    have := hb' k
     simp only [Pi.add_apply, hM, hM', Pi.sub_apply] at *
     omega
   have hbig : ∀ k, n * Fintype.card (ι k) < M' k := by
     intro k
-    have := hm' k; have := le_abs_self (b k)
+    have := hm' k
+    have := le_abs_self (b k)
     simp only [hM', Pi.sub_apply]
     omega
   have hfin := (FieldNumbers.GradedFinite.proof F K ι P M).1
   have hfin' := (FieldNumbers.GradedFinite.proof F K ι P M').1
-  have e1 : hilbFn P m = Module.finrank F (gradedPiece P M) := by
-    unfold hilbFn; rw [if_pos hm0]
+  have e1 : hilbFn P m = Module.finrank F (gradedPiece P M) := by unfold hilbFn; rw [if_pos hm0]
   have e2 : hilbFn P (m - b) = Module.finrank F (gradedPiece P M') := by
     unfold hilbFn; rw [if_pos hmb0]
   rw [e1, e2, Nat.cast_le]
@@ -146,32 +147,31 @@ theorem hilbFn_sub_le_of_regular {P : Ideal (MRing ι F)} (hP : IsMultiProjPrime
     obtain ⟨p, hp, q, hq, hpq⟩ := hxJ
     obtain ⟨a, rfl⟩ := Ideal.mem_span_singleton'.mp hq
     set y := weightedHomogeneousComponent (blockWeight ι) M a
-    have hxf : IsMultiHomog (x * f) (M + bg) := by
-      rw [← hdeg]; exact hxh.mul hf
+    have hxf : IsMultiHomog (x * f) (M + bg) := by rw [← hdeg]; exact hxh.mul hf
     have hcomp := congrArg (weightedHomogeneousComponent (blockWeight ι) (M + bg)) hpq
     rw [map_add (f := _), ← component_mul_multiHomog a g M bg hg,
-      hxf.weightedHomogeneousComponent_same] at hcomp
-    have hpc : weightedHomogeneousComponent (blockWeight ι) (M + bg) p ∈ P :=
-      hP.multiHomog p hp _
-    refine ⟨Ideal.Quotient.mk P y, ⟨y, weightedHomogeneousComponent_isWeightedHomogeneous _ _,
-      rfl⟩, ?_⟩
+        hxf.weightedHomogeneousComponent_same]
+      at hcomp
+    have hpc : weightedHomogeneousComponent (blockWeight ι) (M + bg) p ∈ P := hP.multiHomog p hp _
+    refine
+      ⟨Ideal.Quotient.mk P y, ⟨y, weightedHomogeneousComponent_isWeightedHomogeneous _ _, rfl⟩, ?_⟩
     simp only [φ, LinearMap.mulLeft_apply, Ideal.Quotient.mkₐ_eq_mk, AlgHom.toLinearMap_apply,
       ← map_mul]
     rw [Ideal.Quotient.eq, mul_comm f x, ← hcomp]
-    have : g * y - (weightedHomogeneousComponent (blockWeight ι) (M + bg) p + y * g) =
-      -weightedHomogeneousComponent (blockWeight ι) (M + bg) p := by ring
+    have : g * y - (weightedHomogeneousComponent (blockWeight ι) (M + bg) p + y * g)
+        = - weightedHomogeneousComponent (blockWeight ι) (M + bg) p := by
+      ring
     rw [this]
     exact P.neg_mem hpc
-  calc Module.finrank F (gradedPiece P M')
-      = Module.finrank F ((gradedPiece P M').map (φ f)) :=
-        (Submodule.equivMapOfInjective _ (hinj f hs.num_not_mem) _).finrank_eq
+  calc
+    Module.finrank F (gradedPiece P M') = Module.finrank F ((gradedPiece P M').map (φ f)) :=
+      (Submodule.equivMapOfInjective _ (hinj f hs.num_not_mem) _).finrank_eq
     _ ≤ Module.finrank F ((gradedPiece P M).map (φ g)) := by
-        have : FiniteDimensional F ((gradedPiece P M).map (φ g)) :=
-          Module.Finite.map _ _
-        exact LinearMap.finrank_le_finrank_of_injective (f := Submodule.inclusion hle)
-          (Submodule.inclusion_injective hle)
+      have : FiniteDimensional F ((gradedPiece P M).map (φ g)) := Module.Finite.map _ _
+      exact LinearMap.finrank_le_finrank_of_injective (f := Submodule.inclusion hle)
+        (Submodule.inclusion_injective hle)
     _ = Module.finrank F (gradedPiece P M) :=
-        ((Submodule.equivMapOfInjective _ (hinj g hs.den_not_mem) _).finrank_eq).symm
+      ((Submodule.equivMapOfInjective _ (hinj g hs.den_not_mem) _).finrank_eq).symm
 
 end
 

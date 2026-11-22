@@ -29,38 +29,50 @@ structure KeyData (C : Type) [Field C] (V : VF C) (O : Type) [CommRing O] (n d :
   P_lim : ∀ (N : ℕ) i j, ∃ n0 : ℕ, ∀ n ≥ n0, V.Ge N (P i j - ρ (ε ^ V.l ^ n) i j)
 
 def KeyEigSt : Prop :=
-  ∀ (C : Type) [Field C] [CharZero C] (V : VF C), IsAlgClosed C →
-    (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) →
-    ∀ (O : Type) [CommRing O] (n d : ℕ) [NeZero d] (K : KeyData C V O n d) (v : Fin n → C),
-      ∃ (m : ℕ) (w : Fin m → Fin n → C) (χ : Fin m → (O →+* C)),
-        Matrix.mulVec K.P v = ∑ j, w j ∧ ∀ j, Matrix.mulVec K.P (w j) = w j ∧
-          ∀ x, Matrix.mulVec (K.ρ x) (w j) = χ j x • w j
+  ∀ (C : Type) [Field C] [CharZero C] (V : VF C),
+    IsAlgClosed C
+      → (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+      → ∀ (O : Type) [CommRing O] (n d : ℕ) [NeZero d] (K : KeyData C V O n d) (v : Fin n → C),
+        ∃ (m : ℕ) (w : Fin m → Fin n → C) (χ : Fin m → (O →+* C)),
+          Matrix.mulVec K.P v = ∑ j, w j
+            ∧ ∀ j, Matrix.mulVec K.P (w j) = w j ∧ ∀ x, Matrix.mulVec (K.ρ x) (w j) = χ j x • w j
 
 def KeyResSt : Prop :=
   ∀ (C : Type) [Field C] [CharZero C] (V : VF C) (O : Type) [CommRing O] (n d : ℕ) [NeZero d]
-    (K : KeyData C V O n d) (χ : O →+* C), (∀ y, V.Ge 0 (χ y)) →
-    (∀ z, (∀ a, V.MM (K.em a z)) → V.MM (χ z)) → ∃ c, ∀ y, V.MM (χ y - K.em c y)
+      (K : KeyData C V O n d) (χ : O →+* C),
+    (∀ y, V.Ge 0 (χ y)) → (∀ z, (∀ a, V.MM (K.em a z)) → V.MM (χ z))
+      → ∃ c, ∀ y, V.MM (χ y - K.em c y)
 
 def KeyDeltaSt : Prop :=
   ∀ (C : Type) [Field C] [CharZero C] (V : VF C) (O : Type) [CommRing O] (n d : ℕ) [NeZero d]
-    (K : KeyData C V O n d) (χ : O →+* C) (c : ZMod d), (∀ y, V.Ge 0 (χ y)) →
-    (∀ y, V.MM (χ y - K.em c y)) → ∀ y, χ y = K.em c y
+      (K : KeyData C V O n d) (χ : O →+* C) (c : ZMod d),
+    (∀ y, V.Ge 0 (χ y)) → (∀ y, V.MM (χ y - K.em c y)) → ∀ y, χ y = K.em c y
 
 section Lemmas
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem aeval_mulVec {n : ℕ} (A : Matrix (Fin n) (Fin n) C) (w : Fin n → C) (lam : C)
-    (h : Matrix.mulVec A w = lam • w) (f : Polynomial C) :
-    Matrix.mulVec (Polynomial.aeval A f) w = f.eval lam • w := by
-  first | exact Bl.PowMulVecEigen.goal1 .. | (apply Bl.PowMulVecEigen.goal1 <;> assumption) | (intros; apply Bl.PowMulVecEigen.goal1 <;> assumption) | (apply @Bl.PowMulVecEigen.goal1 <;> assumption) | (intros; apply @Bl.PowMulVecEigen.goal1 <;> assumption) | (apply @Bl.PowMulVecEigen.goal1 <;> first | assumption | infer_instance)
+theorem aeval_mulVec
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) C) (w : Fin n → C)
+    (lam : C) (h : Matrix.mulVec A w = lam • w)
+    (f : Polynomial C)
+    : Matrix.mulVec (Polynomial.aeval A f) w = f.eval lam • w := by
+  first
+  | exact Bl.PowMulVecEigen.goal1 ..
+  | (apply Bl.PowMulVecEigen.goal1 <;> assumption)
+  | (intros; apply Bl.PowMulVecEigen.goal1 <;> assumption)
+  | (apply @Bl.PowMulVecEigen.goal1 <;> assumption)
+  | (intros; apply @Bl.PowMulVecEigen.goal1 <;> assumption)
+  | (apply @Bl.PowMulVecEigen.goal1 <;> first | assumption | infer_instance)
 
-theorem eig_int {n : ℕ} (A : Matrix (Fin n) (Fin n) C) (hA : ∀ i j, V.Ge 0 (A i j)) (w : Fin n → C) (hw : w ≠ 0)
-    (lam : C) (h : Matrix.mulVec A w = lam • w) : V.Ge 0 lam := by
-  obtain ⟨i0, hi0⟩ : ∃ i, w i ≠ 0 := by
-    by_contra hc; push_neg at hc; exact hw (funext hc)
+theorem eig_int
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) C) (hA : ∀ i j, V.Ge 0 (A i j)) (w : Fin n → C) (hw : w ≠ 0)
+    (lam : C) (h : Matrix.mulVec A w = lam • w)
+    : V.Ge 0 lam := by
+  obtain ⟨i0, hi0⟩ : ∃ i, w i ≠ 0 := by by_contra hc; push_neg at hc; exact hw (funext hc)
 
-  obtain ⟨i, -, hi⟩ := Finset.exists_min_image Finset.univ (fun i => V.v (w i)) ⟨i0, Finset.mem_univ _⟩
+  obtain ⟨i, -, hi⟩ :=
+    Finset.exists_min_image Finset.univ (fun i => V.v (w i)) ⟨i0, Finset.mem_univ _⟩
   have hwi : w i ≠ 0 := by
     intro h0
     have := hi i0 (Finset.mem_univ _)
@@ -76,7 +88,9 @@ theorem eig_int {n : ℕ} (A : Matrix (Fin n) (Fin n) C) (hA : ∀ i j, V.Ge 0 (
     rw [AddValuation.map_mul]
     have h1 := hA i j
     unfold VF.Ge at h1
-    calc V.v (w i) ≤ V.v (w j) := hi j (Finset.mem_univ _)
+    calc
+      V.v (w i)
+        ≤ V.v (w j) := hi j (Finset.mem_univ _)
       _ = 0 + V.v (w j) := (zero_add _).symm
       _ ≤ V.v (A i j) + V.v (w j) := add_le_add (by exact_mod_cast h1) le_rfl
   rw [AddValuation.map_mul] at hge

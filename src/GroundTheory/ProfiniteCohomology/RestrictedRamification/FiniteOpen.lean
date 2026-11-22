@@ -22,12 +22,13 @@ section Places
 
 variable {F L : Type u} [Field F] [NumberField F] [Field L] [NumberField L] [Algebra F L]
 
-theorem placesOver_finite {S : Set (HeightOneSpectrum (𝓞 F))} (hS : S.Finite) :
-    (placesOver S : Set (HeightOneSpectrum (𝓞 L))).Finite := by
+theorem placesOver_finite {S : Set (HeightOneSpectrum (𝓞 F))} (hS : S.Finite)
+    : (placesOver S : Set (HeightOneSpectrum (𝓞 L))).Finite := by
   have hfin : ∀ v ∈ S, {w : HeightOneSpectrum (𝓞 L) | w.asIdeal.LiesOver v.asIdeal}.Finite := by
     intro v _
     have h := IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 L)
-    refine (h.preimage (f := fun w : HeightOneSpectrum (𝓞 L) => w.asIdeal)
+    refine (h.preimage
+      (f := fun w : HeightOneSpectrum (𝓞 L) => w.asIdeal)
       fun a _ b _ hab => HeightOneSpectrum.ext hab).subset ?_
     intro w hw
     exact ⟨w.isPrime, hw⟩
@@ -35,21 +36,22 @@ theorem placesOver_finite {S : Set (HeightOneSpectrum (𝓞 F))} (hS : S.Finite)
   rintro w ⟨v, hv, hwv⟩
   exact Set.mem_biUnion hv hwv
 
-
 omit [NumberField F] [NumberField L] in
-theorem mem_placesOver_of_natCast_mem {S : Set (HeightOneSpectrum (𝓞 F))} {n : ℕ}
+theorem mem_placesOver_of_natCast_mem
+    {S : Set (HeightOneSpectrum (𝓞 F))} {n : ℕ}
     (hn : ∀ v : HeightOneSpectrum (𝓞 F), ((n : ℕ) : 𝓞 F) ∈ v.asIdeal → v ∈ S)
-    {w : HeightOneSpectrum (𝓞 L)} (hw : ((n : ℕ) : 𝓞 L) ∈ w.asIdeal) : w ∈ placesOver S := by
+    {w : HeightOneSpectrum (𝓞 L)} (hw : ((n : ℕ) : 𝓞 L) ∈ w.asIdeal)
+    : w ∈ placesOver S := by
   refine (mem_placesOver_iff (F := F) (L := L)).2 (hn _ ?_)
   change ((n : ℕ) : 𝓞 F) ∈ Ideal.comap (algebraMap (𝓞 F) (𝓞 L)) w.asIdeal
   rw [Ideal.mem_comap, map_natCast (algebraMap (𝓞 F) (𝓞 L))]
   exact hw
 
-
 omit [NumberField F] [NumberField L] in
-theorem natCast_not_mem_of_not_mem_placesOver {S : Set (HeightOneSpectrum (𝓞 F))} {n : ℕ}
-    (hn : ∀ v : HeightOneSpectrum (𝓞 F), ((n : ℕ) : 𝓞 F) ∈ v.asIdeal → v ∈ S) :
-    ∀ w ∉ (placesOver S : Set (HeightOneSpectrum (𝓞 L))), ((n : ℕ) : 𝓞 L) ∉ w.asIdeal :=
+theorem natCast_not_mem_of_not_mem_placesOver
+    {S : Set (HeightOneSpectrum (𝓞 F))} {n : ℕ}
+    (hn : ∀ v : HeightOneSpectrum (𝓞 F), ((n : ℕ) : 𝓞 F) ∈ v.asIdeal → v ∈ S)
+    : ∀ w ∉ (placesOver S : Set (HeightOneSpectrum (𝓞 L))), ((n : ℕ) : 𝓞 L) ∉ w.asIdeal :=
   fun _ hw hmem => hw (mem_placesOver_of_natCast_mem hn hmem)
 
 end Places
@@ -60,11 +62,13 @@ local notation "ℚ̄" => AlgebraicClosure ℚ
 
 variable (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
 
-theorem mem_gsOpenSubgroup_iff_of_image {L : FiniteSubfield} [Fact (K ≤ L)]
+theorem mem_gsOpenSubgroup_iff_of_image
+    {L : FiniteSubfield} [Fact (K ≤ L)]
     (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
-    (T : Set (maxUnramifiedOutside K.1 ℚ̄ S)) (hT : ∀ x : L.1, gsEmbedding hL x ∈ T)
-    (hT' : ∀ y ∈ T, ∃ x : L.1, gsEmbedding hL x = y) (σ : galUnramifiedOutside K.1 ℚ̄ S) :
-    σ ∈ gsOpenSubgroup S hL ↔ ∀ y ∈ T, σ y = y := by
+    (T : Set (maxUnramifiedOutside K.1 ℚ̄ S))
+    (hT : ∀ x : L.1, gsEmbedding hL x ∈ T) (hT' : ∀ y ∈ T, ∃ x : L.1, gsEmbedding hL x = y)
+    (σ : galUnramifiedOutside K.1 ℚ̄ S)
+    : σ ∈ gsOpenSubgroup S hL ↔ ∀ y ∈ T, σ y = y := by
   rw [mem_gsOpenSubgroup_iff]
   constructor
   · intro h y hy
@@ -73,9 +77,9 @@ theorem mem_gsOpenSubgroup_iff_of_image {L : FiniteSubfield} [Fact (K ≤ L)]
   · intro h x
     exact h _ (hT x)
 
-theorem exists_gsOpenSubgroup_eq (V : OpenSubgroup (galUnramifiedOutside K.1 ℚ̄ S)) :
-    ∃ (L : FiniteSubfield) (_ : Fact (K ≤ L))
-      (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S),
+theorem exists_gsOpenSubgroup_eq (V : OpenSubgroup (galUnramifiedOutside K.1 ℚ̄ S))
+    : ∃ (L : FiniteSubfield) (_ : Fact (K ≤ L))
+        (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S),
       gsOpenSubgroup S hL = V := by
   let KS := maxUnramifiedOutside K.1 ℚ̄ S
   let H : ClosedSubgroup Gal(KS/K.1) := ⟨(V : Subgroup Gal(KS/K.1)), V.isClosed⟩
@@ -95,8 +99,9 @@ theorem exists_gsOpenSubgroup_eq (V : OpenSubgroup (galUnramifiedOutside K.1 ℚ
     change x ∈ E'
     have : algebraMap K.1 ℚ̄ ⟨x, hx⟩ ∈ E' := E'.algebraMap_mem _
     exact this
-  have hKS : ∀ x : (⟨E'.restrictScalars ℚ, hE'Q⟩ : FiniteSubfield).1,
-      algebraMap (⟨E'.restrictScalars ℚ, hE'Q⟩ : FiniteSubfield).1 ℚ̄ x ∈ KS := by
+  have hKS
+      : ∀ x : (⟨E'.restrictScalars ℚ, hE'Q⟩ : FiniteSubfield).1,
+        algebraMap (⟨E'.restrictScalars ℚ, hE'Q⟩ : FiniteSubfield).1 ℚ̄ x ∈ KS := by
     intro x
     obtain ⟨y, -, hy⟩ := (x.2 : (x : ℚ̄) ∈ E')
     change (x : ℚ̄) ∈ KS

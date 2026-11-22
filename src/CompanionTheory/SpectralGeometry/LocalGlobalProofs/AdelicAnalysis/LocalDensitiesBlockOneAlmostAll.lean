@@ -14,36 +14,47 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.GoodStep
 
-theorem blockOne_zero_zero {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) :
-    blockOne t A 0 0 = t := rfl
+theorem blockOne_zero_zero {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K)
+    : blockOne t A 0 0 = t :=
+  rfl
 
-theorem blockOne_zero_succ {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) (j : Fin M) :
-    blockOne t A 0 j.succ = 0 := rfl
+theorem blockOne_zero_succ
+    {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) (j : Fin M)
+    : blockOne t A 0 j.succ = 0 :=
+  rfl
 
-theorem blockOne_succ_zero {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) (i : Fin M) :
-    blockOne t A i.succ 0 = 0 := rfl
+theorem blockOne_succ_zero
+    {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) (i : Fin M)
+    : blockOne t A i.succ 0 = 0 :=
+  rfl
 
-theorem blockOne_succ_succ {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) (i j : Fin M) :
-    blockOne t A i.succ j.succ = A i j := rfl
+theorem blockOne_succ_succ
+    {K : Type} [Zero K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) (i j : Fin M)
+    : blockOne t A i.succ j.succ = A i j :=
+  rfl
 
-theorem det_blockOne {K : Type} [CommRing K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) :
-    (blockOne t A).det = t * A.det := by
+theorem det_blockOne {K : Type} [CommRing K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K)
+    : (blockOne t A).det = t * A.det := by
   have hs : (blockOne t A).submatrix Fin.succ (Fin.succAbove 0) = A := by
     ext i j
     simp [blockOne_succ_succ]
   rw [Matrix.det_succ_row_zero, Fin.sum_univ_succ, hs]
   simp [blockOne_zero_zero, blockOne_zero_succ]
 
-theorem isHermND_blockOne {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) {M : ℕ}
-    (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) (t : F) (ht : t ≠ 0) :
-    IsHermND σ (blockOne (algebraMap F E t) J) := by
+theorem isHermND_blockOne
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
+    (t : F) (ht : t ≠ 0)
+    : IsHermND σ (blockOne (algebraMap F E t) J) := by
   refine ⟨fun i j => ?_, ?_⟩
   · refine Fin.cases ?_ (fun i => ?_) i <;> refine Fin.cases ?_ (fun j => ?_) j
     · simp [blockOne_zero_zero]
@@ -53,11 +64,15 @@ theorem isHermND_blockOne {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E
   · rw [det_blockOne]
     exact mul_ne_zero (by simpa using ht) hJ.2
 
-theorem gram_mulVec_e0 {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (t : F) :
-    gramR R σ (blockOne (algebraMap F E t) J)
-        (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → R ⊗[F] E)) =
-      (hermScal R σ (algebraMap F R t) : HermR R σ 1) := by
+theorem gram_mulVec_e0
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    (t : F)
+    : gramR R σ (blockOne (algebraMap F E t) J)
+        (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → R ⊗[F] E))
+      = (hermScal R σ (algebraMap F R t) : HermR R σ 1) := by
   ext a c
   show hR R σ _ _ _ = algebraMap F R t ⊗ₜ[F] (1 : E)
   simp only [hR, hform, Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, map_one, map_zero, one_mul,
@@ -71,10 +86,14 @@ section Place
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem consTup_mem_latV {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (h1 : ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr (1 : Fv F v ⊗[F] E) k ∈
-      v.adicCompletionIntegers F) {n M : ℕ} (X : Fin n → Fin M → Fv F v ⊗[F] E) :
-    consTup X ∈ latV b v ↔ X ∈ latV b v := by
+theorem consTup_mem_latV
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F))
+    (h1 : ∀ k,
+      (Algebra.TensorProduct.basis (Fv F v) b).repr (1 : Fv F v ⊗[F] E) k
+        ∈ v.adicCompletionIntegers F)
+    {n M : ℕ} (X : Fin n → Fin M → Fv F v ⊗[F] E)
+    : consTup X ∈ latV b v ↔ X ∈ latV b v := by
   constructor
   · intro h a i k
     exact h a.succ i.succ k
@@ -87,18 +106,22 @@ theorem consTup_mem_latV {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOne
       simp [zero_mem]
     · exact h a i k
 
-theorem e0_mem_latV {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (h1 : ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr (1 : Fv F v ⊗[F] E) k ∈
-      v.adicCompletionIntegers F) {M : ℕ} :
-    (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → Fv F v ⊗[F] E)) ∈ latV b v := by
+theorem e0_mem_latV
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F))
+    (h1 : ∀ k,
+      (Algebra.TensorProduct.basis (Fv F v) b).repr (1 : Fv F v ⊗[F] E) k
+        ∈ v.adicCompletionIntegers F)
+    {M : ℕ}
+    : (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → Fv F v ⊗[F] E)) ∈ latV b v := by
   intro a i k
   refine Fin.cases ?_ (fun i => ?_) i
   · exact h1 k
   · show (Algebra.TensorProduct.basis (Fv F v) b).repr (0 : Fv F v ⊗[F] E) k ∈ _
     simp [zero_mem]
 
-theorem incl_mul_eq_smul (R : Type) [CommRing R] [Algebra F R] (t : F) (y : R ⊗[F] E) :
-    inclR R (algebraMap F E t) * y = algebraMap F R t • y := by
+theorem incl_mul_eq_smul (R : Type) [CommRing R] [Algebra F R] (t : F) (y : R ⊗[F] E)
+    : inclR R (algebraMap F E t) * y = algebraMap F R t • y := by
   have : inclR R (algebraMap F E t) = algebraMap F R t • (1 : R ⊗[F] E) := by
     show (1 : R) ⊗ₜ[F] (algebraMap F E t) = _
     rw [Algebra.TensorProduct.one_def, TensorProduct.smul_tmul', Algebra.algebraMap_eq_smul_one,
@@ -106,11 +129,14 @@ theorem incl_mul_eq_smul (R : Type) [CommRing R] [Algebra F R] (t : F) (y : R �
     simp
   rw [this, smul_mul_assoc, one_mul]
 
-theorem coordK_map_unit [NumberField E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
-    (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (t : F) (ht : t ≠ 0)
-    (htv : Valued.v (algebraMap F (Fv F v) t) = 1) (d : ℕ) (b : Module.Basis (Fin d) F E) :
-    (coordK (Fv F v) b lam).map (fun y => inclR (Fv F v) (algebraMap F E t) * y) =
-      (1 : ℝ≥0) • coordK (Fv F v) b lam := by
+theorem coordK_map_unit
+    [NumberField E]
+    (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
+    (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)) (hlam : IsStdV v lam)
+    (t : F) (ht : t ≠ 0) (htv : Valued.v (algebraMap F (Fv F v) t) = 1)
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    : (coordK (Fv F v) b lam).map (fun y => inclR (Fv F v) (algebraMap F E t) * y)
+      = (1 : ℝ≥0) • coordK (Fv F v) b lam := by
   obtain ⟨r1, r2, r3, r4, -⟩ := GlobalTheory.T.completion_is_local_ring F v
   haveI := r1
   haveI := r2
@@ -125,23 +151,28 @@ theorem coordK_map_unit [NumberField E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E 
   haveI : BorelSpace (Fv F v ⊗[F] E) := ⟨rfl⟩
   haveI := hlam.1
   haveI := (GlobalTheory.T.coordinate_haar_measure F E σ hCM (Fv F v) d b lam hlam.1).1
-  have hinv : inclR (F := F) (Fv F v) (algebraMap F E t) * inclR (F := F) (Fv F v) (algebraMap F E t⁻¹) = 1 := by
+  have hinv
+      : inclR (F := F) (Fv F v) (algebraMap F E t) * inclR (F := F) (Fv F v) (algebraMap F E t⁻¹)
+        = 1 := by
     rw [← map_mul, ← map_mul, mul_inv_cancel₀ ht, map_one, map_one]
-  let e : (Fv F v ⊗[F] E) ≃+ (Fv F v ⊗[F] E) :=
-    { toFun := fun y => inclR (F := F) (Fv F v) (algebraMap F E t) * y
-      invFun := fun y => inclR (F := F) (Fv F v) (algebraMap F E t⁻¹) * y
-      left_inv := fun y => by
-        show _ * (_ * y) = y
-        rw [← mul_assoc, mul_comm (inclR (F := F) (Fv F v) (algebraMap F E t⁻¹)), hinv, one_mul]
-      right_inv := fun y => by
-        show _ * (_ * y) = y
-        rw [← mul_assoc, hinv, one_mul]
-      map_add' := fun x y => mul_add _ x y }
+  let e : (Fv F v ⊗[F] E) ≃+ (Fv F v ⊗[F] E) := {
+    toFun := fun y => inclR (F := F) (Fv F v) (algebraMap F E t) * y
+    invFun := fun y => inclR (F := F) (Fv F v) (algebraMap F E t⁻¹) * y
+    left_inv := fun y => by
+      show _ * (_ * y) = y
+      rw [← mul_assoc, mul_comm (inclR (F := F) (Fv F v) (algebraMap F E t⁻¹)), hinv, one_mul]
+    right_inv := fun y => by
+      show _ * (_ * y) = y
+      rw [← mul_assoc, hinv, one_mul]
+    map_add' := fun x y => mul_add _ x y
+  }
   have he : Continuous e := continuous_const.mul continuous_id
   have he' : Continuous e.symm := continuous_const.mul continuous_id
-  let L : Set (Fv F v ⊗[F] E) := {y | ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-    v.adicCompletionIntegers F}
-  obtain ⟨c1, c2, c3, -⟩ := GlobalTheory.T.local_lattice_compact_open_unit_volume F E σ hCM d b 1 1 v
+  let L : Set (Fv F v ⊗[F] E) :=
+    {y | ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
+      v.adicCompletionIntegers F}
+  obtain ⟨c1, c2, c3, -⟩ :=
+    GlobalTheory.T.local_lattice_compact_open_unit_volume F E σ hCM d b 1 1 v
   have hLc : IsCompact L := by
     have : L = (fun X : Fin 1 → Fin 1 → Fv F v ⊗[F] E => X 0 0) '' latV b v := by
       ext y
@@ -159,15 +190,19 @@ theorem coordK_map_unit [NumberField E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E 
     rw [this]
     exact c2.preimage (by fun_prop)
   have hL0 : L.Nonempty := ⟨0, fun k => c3 0 0 k⟩
-  have hmem : ∀ x : Fv F v, algebraMap F (Fv F v) t * x ∈ v.adicCompletionIntegers F ↔
-      x ∈ v.adicCompletionIntegers F := by
+  have hmem
+      : ∀ x : Fv F v,
+        algebraMap F (Fv F v) t * x ∈ v.adicCompletionIntegers F
+          ↔ x ∈ v.adicCompletionIntegers F := by
     intro x
     rw [HeightOneSpectrum.mem_adicCompletionIntegers, HeightOneSpectrum.mem_adicCompletionIntegers,
       map_mul, htv, one_mul]
   have hL : ∀ y, e y ∈ L ↔ y ∈ L := by
     intro y
-    have hk : ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr (e y) k =
-        algebraMap F (Fv F v) t * (Algebra.TensorProduct.basis (Fv F v) b).repr y k := by
+    have hk
+        : ∀ k,
+          (Algebra.TensorProduct.basis (Fv F v) b).repr (e y) k
+            = algebraMap F (Fv F v) t * (Algebra.TensorProduct.basis (Fv F v) b).repr y k := by
       intro k
       show (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (F := F) (Fv F v) (algebraMap F E t) * y) k = _
       rw [incl_mul_eq_smul, map_smul, Finsupp.smul_apply, smul_eq_mul]
@@ -176,7 +211,9 @@ theorem coordK_map_unit [NumberField E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E 
       exact (hmem _).1 (hk k ▸ h k)
     · intro h k
       exact hk k ▸ (hmem _).2 (h k)
-  have := (GlobalTheory.T.map_addHaar_addEquiv_eq_smul_and_eq_of_compact_open _ _ (coordK (Fv F v) b lam) (coordK (Fv F v) b lam) e he he').2 L L hLc hLo hL0 hL rfl
+  have :=
+    (GlobalTheory.T.map_addHaar_addEquiv_eq_smul_and_eq_of_compact_open _ _ (coordK (Fv F v) b lam)
+      (coordK (Fv F v) b lam) e he he').2 L L hLc hLo hL0 hL rfl
   rw [one_smul]
   exact this
 

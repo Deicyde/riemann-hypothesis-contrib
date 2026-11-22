@@ -108,7 +108,6 @@ lemma vmin_le (h : ℕ) (x : K) :
       · rw [if_neg h1]
         split_ifs <;> norm_num
 
-
 omit [NormedAlgebra ℚ_[p] K] in
 lemma dvd_cancel {d : ℤ} (hd : IsCoprime d (p : ℤ)) (i : ℕ) {m : ℤ} (hm : (p : ℤ) ^ i ∣ d * m) :
     (p : ℤ) ^ i ∣ m := (IsCoprime.pow_left hd.symm).dvd_of_dvd_mul_left hm
@@ -168,31 +167,35 @@ open ArithmeticProgressionDivisibility
 
 theorem window_count_progression : WindowCountAP := by
   intro p _ K _ _ _ ζ t₀ d Y₀ h hd
-  calc ∑ j ∈ range Y₀, vmin p h ((progr t₀ d j : K) - ζ)
-      ≤ ∑ j ∈ range Y₀, ∑ i ∈ Icc 1 h,
-          (if ‖((progr t₀ d j : ℤ) : K) - ζ‖ < (p : ℝ) ^ (1 - (i : ℤ)) then (1 : ℝ) else 0) :=
-        Finset.sum_le_sum fun j _ => vmin_le h _
+  calc
+    ∑ j ∈ range Y₀, vmin p h ((progr t₀ d j : K) - ζ)
+        ≤ ∑ j ∈ range Y₀, ∑ i ∈ Icc 1 h,
+            (if ‖((progr t₀ d j : ℤ) : K) - ζ‖ < (p : ℝ) ^ (1 - (i : ℤ)) then (1 : ℝ) else 0) :=
+      Finset.sum_le_sum fun j _ => vmin_le h _
     _ = ∑ i ∈ Icc 1 h, ∑ j ∈ range Y₀,
           (if ‖((progr t₀ d j : ℤ) : K) - ζ‖ < (p : ℝ) ^ (1 - (i : ℤ)) then (1 : ℝ) else 0) :=
-        Finset.sum_comm
+      Finset.sum_comm
     _ ≤ ∑ i ∈ Icc 1 h, ((Y₀ : ℝ) / (p : ℝ) ^ i + 1) := by
-        apply Finset.sum_le_sum
-        intro i _
-        rw [Finset.sum_boole]
-        exact card_le ζ t₀ d hd Y₀ i
+      apply Finset.sum_le_sum
+      intro i _
+      rw [Finset.sum_boole]
+      exact card_le ζ t₀ d hd Y₀ i
 
 open Classical in
 theorem root_discs_disjoint_progression : DiscsDisjointAP := by
   intro p _ K _ _ _ roots t₀ d Y₀ h hd hY
-  have key : ∀ (s : Multiset K) (P : ℕ → K → Prop) [∀ j, DecidablePred (P j)] (Y : Finset ℕ),
-      (∀ a, ∀ j ∈ Y, ∀ j' ∈ Y, P j a → P j' a → j = j') →
-      ∑ j ∈ Y, Multiset.card (s.filter (P j)) ≤ Multiset.card s := by
+  have key
+      : ∀ (s : Multiset K) (P : ℕ → K → Prop) [∀ j, DecidablePred (P j)] (Y : Finset ℕ),
+        (∀ a, ∀ j ∈ Y, ∀ j' ∈ Y, P j a → P j' a → j = j')
+          → ∑ j ∈ Y, Multiset.card (s.filter (P j)) ≤ Multiset.card s := by
     intro s P _ Y huq
     induction s using Multiset.induction_on with
     | empty => simp
     | cons a s ih =>
-      have hstep : ∀ j ∈ Y, Multiset.card ((a ::ₘ s).filter (P j))
-          = Multiset.card (s.filter (P j)) + (if P j a then 1 else 0) := by
+      have hstep
+          : ∀ j ∈ Y,
+            Multiset.card ((a ::ₘ s).filter (P j))
+              = Multiset.card (s.filter (P j)) + (if P j a then 1 else 0) := by
         intro j _
         rw [Multiset.filter_cons]
         split_ifs <;> simp
@@ -205,9 +208,11 @@ theorem root_discs_disjoint_progression : DiscsDisjointAP := by
         exact huq a j hj.1 j' hj'.1 hj.2 hj'.2
       omega
   have hpP : p.Prime := Fact.out
-  have huniq : ∀ ζ : K, ∀ j ∈ range Y₀, ∀ j' ∈ range Y₀,
-      ‖((progr t₀ d j : ℤ) : K) - ζ‖ ≤ (p : ℝ) ^ (-(h : ℤ)) →
-      ‖((progr t₀ d j' : ℤ) : K) - ζ‖ ≤ (p : ℝ) ^ (-(h : ℤ)) → j = j' := by
+  have huniq
+      : ∀ ζ : K, ∀ j ∈ range Y₀, ∀ j' ∈ range Y₀,
+        ‖((progr t₀ d j : ℤ) : K) - ζ‖ ≤ (p : ℝ) ^ (-(h : ℤ))
+          → ‖((progr t₀ d j' : ℤ) : K) - ζ‖ ≤ (p : ℝ) ^ (-(h : ℤ))
+          → j = j' := by
     intro ζ j hj j' hj' h1 h2
     have hp1 : (1 : ℝ) < p := by exact_mod_cast hpP.one_lt
     have h3 : ‖((progr t₀ d j : ℤ) : K) - ((progr t₀ d j' : ℤ) : K)‖ < (p : ℝ) ^ (1 - (h : ℤ)) := by

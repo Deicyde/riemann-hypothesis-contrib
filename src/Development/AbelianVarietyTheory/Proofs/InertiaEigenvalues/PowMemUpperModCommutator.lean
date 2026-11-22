@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowMemU
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
@@ -16,7 +17,15 @@ private lemma commutator_le_of_forall_commutator_mem {G : Type*} [Group G] (C : 
     rw [commutatorElement_def]
     exact hC a b
 
-theorem pow_mem_upper_mod_commutator : ∀ (F L : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra F L] [ValuativeExtension F L] [FiniteDimensional F L] [IsGalois F L] (p e : ℕ) (v : ℝ) (C : Subgroup (L ≃ₐ[F] L)), (∀ σ τ : L ≃ₐ[F] L, σ * τ * σ⁻¹ * τ⁻¹ ∈ C) → 0 ≤ v → OrdIs F p e → ∀ σ ∈ upperRamificationGroup F L v, ∃ τ ∈ upperRamificationGroup F L (min (2 * v) (v + e)), τ⁻¹ * σ ^ p ∈ C := by
+theorem pow_mem_upper_mod_commutator
+    : ∀ (F L : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra F L]
+        [ValuativeExtension F L] [FiniteDimensional F L] [IsGalois F L] (p e : ℕ) (v : ℝ)
+        (C : Subgroup (L ≃ₐ[F] L)),
+      (∀ σ τ : L ≃ₐ[F] L, σ * τ * σ⁻¹ * τ⁻¹ ∈ C) → 0 ≤ v → OrdIs F p e
+        → ∀ σ ∈ upperRamificationGroup F L v,
+          ∃ τ ∈ upperRamificationGroup F L (min (2 * v) (v + e)),
+            τ⁻¹ * σ ^ p ∈ C := by
   intro F L _ _ _ _ _ _ _ _ _ _ _ _ p e v C hC hv hpe σ hσ
 
   let H : Subgroup (L ≃ₐ[F] L) := ⁅(⊤ : Subgroup (L ≃ₐ[F] L)), ⊤⁆

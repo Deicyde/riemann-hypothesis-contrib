@@ -10,30 +10,36 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Local
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.HCharUnit
 
-theorem locK_eq_one {E : Type} [Field E] [NumberField E] (χ : HChar E) (k : Eˣ) (v : HeightOneSpectrum (𝓞 E))
-    (hu : χ.UnrAt v) (ho : ordF v k = 0) : χ.locK v k = 1 := by
+theorem locK_eq_one
+    {E : Type} [Field E] [NumberField E]
+    (χ : HChar E) (k : Eˣ) (v : HeightOneSpectrum (𝓞 E)) (hu : χ.UnrAt v) (ho : ordF v k = 0)
+    : χ.locK v k = 1 := by
   apply hu
   show Valued.v (((k : E) : v.adicCompletion E)) = 1
   rw [HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
   have h0 : v.valuation E (k : E) ≠ 0 := by simp
-  have hl : WithZero.log (v.valuation E (k : E)) = 0 := by
-    unfold ordF at ho; omega
+  have hl : WithZero.log (v.valuation E (k : E)) = 0 := by unfold ordF at ho; omega
   rw [← WithZero.exp_log h0, hl, WithZero.exp_zero]
 
-theorem finprod_locK_mul_inf : ∀ (E : Type) [Field E] [NumberField E] (χ : HChar E) (k : Eˣ),
-    (Function.mulSupport fun w : Pl E => χ.locK w k).Finite ∧ (∏ᶠ w : Pl E, χ.locK w k) * χ.inf k = 1 := by
+theorem finprod_locK_mul_inf
+    : ∀ (E : Type) [Field E] [NumberField E] (χ : HChar E) (k : Eˣ),
+      (Function.mulSupport fun w : Pl E => χ.locK w k).Finite
+        ∧ (∏ᶠ w : Pl E, χ.locK w k) * χ.inf k = 1 := by
   intro E _ _ χ k
   have hT : ({v | ¬ χ.UnrAt v} ∪ {v : HeightOneSpectrum (𝓞 E) | ordF v k ≠ 0}).Finite :=
-    Set.Finite.union (Filter.eventually_cofinite.mp (Formalism.L2.Fam.IdTrans.unrAe χ)) (GlobalTheory.HeckeProduct.finite_ordF k)
+    Set.Finite.union (Filter.eventually_cofinite.mp (Formalism.L2.Fam.IdTrans.unrAe χ))
+      (GlobalTheory.HeckeProduct.finite_ordF k)
   set S := hT.toFinset with hSdef
-  have hsub : (Function.mulSupport fun w : Pl E => χ.locK w k) ⊆ (S : Set (HeightOneSpectrum (𝓞 E))) := by
+  have hsub
+      : (Function.mulSupport fun w : Pl E => χ.locK w k) ⊆ (S : Set (HeightOneSpectrum (𝓞 E))) := by
     intro v hv
     rw [hSdef, Set.Finite.coe_toFinset]
     by_contra h

@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.RootPowerS
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -83,22 +86,26 @@ private lemma J_one_ne (h1 : HcOne) {F : Type} [Field F] [Finite F] (θ : Algebr
     rw [J_cons]
     exact h1 F p.1 (deg M) _ (by simp [GlobalTheory.Shin.deg]) _ _ (cusp_one_ne θ p.1 p.2 hp) (ih hM')
 
-theorem UpperTheory.Gal.InertialTypesAlt.jdPair :
-    JAppend → HcOne → HcPair → DetPair → JDChar → JDPair := by
+theorem UpperTheory.Gal.InertialTypesAlt.jdPair
+    : JAppend → HcOne → HcPair → DetPair → JDChar → JDPair := by
   intro hA h1 hP hD hC F _ _ θ hθ a ha hq
   obtain ⟨q, D, L⟩ := a
   obtain ⟨hq2, hDp, hLp⟩ := ha
   have hL0 : ∀ x ∈ L, 0 < x.1 := fun x hx => (hLp x hx).1
-  have charJ : ∀ M : List (ℕ × ℕ), (∀ x ∈ M, 0 < x.1 ∧ Reg q x.1 x.2) → ∀ n, n = deg M →
-      GlobalTheory.BI.IsChar ℂ ℂ (J θ M n) := by
+  have charJ
+      : ∀ M : List (ℕ × ℕ),
+        (∀ x ∈ M, 0 < x.1 ∧ Reg q x.1 x.2)
+          → ∀ n, n = deg M → GlobalTheory.BI.IsChar ℂ ℂ (J θ M n) := by
     intro M hM n hn
     have hc := (hC F θ hθ).2 ⟨q, [], M⟩ ⟨hq2, by simp, hM⟩ hq
     simp only [Lbl.D, Lbl.L, Lbl.rk] at hc
     rw [JD_nil] at hc
     exact char_cast θ M (by simp [GlobalTheory.Shin.deg] at hn ⊢; omega) hc
-  have key : ∀ E : List (ℕ × ℕ), (∀ x ∈ E, 0 < x.1) →
-      deg (expand E ++ L) = deg E + deg L ∧
-        Pairs (J θ (expand E ++ L) (deg E + deg L)) (JD θ E L (deg E + deg L)) := by
+  have key
+      : ∀ E : List (ℕ × ℕ),
+        (∀ x ∈ E, 0 < x.1)
+          → deg (expand E ++ L) = deg E + deg L
+            ∧ Pairs (J θ (expand E ++ L) (deg E + deg L)) (JD θ E L (deg E + deg L)) := by
     intro E
     induction E with
     | nil =>
@@ -116,7 +123,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.jdPair :
       have hexp : ∀ x ∈ expand E ++ L, 0 < x.1 ∧ Reg q x.1 x.2 := by
         intro x hx
         rcases List.mem_append.mp hx with h | h
-        · simp only [UpperTheory.Gal.InertialTypesAlt.expand, List.mem_flatMap, List.mem_replicate] at h
+        · simp only [UpperTheory.Gal.InertialTypesAlt.expand, List.mem_flatMap, List.mem_replicate]
+            at h
           obtain ⟨y, -, -, rfl⟩ := h
           exact ⟨Nat.one_pos, fun i hi hi1 => absurd hi1 (by omega)⟩
         · exact hLp x h
@@ -128,7 +136,7 @@ theorem UpperTheory.Gal.InertialTypesAlt.jdPair :
       rw [expand_cons', List.append_assoc, deg_app, deg_rep, hdeg, hdc]
       refine ⟨by omega, ?_⟩
       rw [happ hA θ _ _ p.1 (deg E + deg L) _ (deg_rep _ _) hdeg (by omega), JD_cons]
-      refine hP F p.1 _ _ (by omega) _ _ _ _ ((hC F θ hθ).1 _ _)
-        (charJ _ hrep _ (deg_rep _ _).symm) ((hC F θ hθ).2 ⟨q, E, L⟩ ⟨hq2, hE, hLp⟩ hq)
-        (charJ _ hexp _ hdeg.symm) (hD F θ p.1 p.2) hpair
+      refine hP F p.1 _ _ (by omega) _ _ _ _ ((hC F θ hθ).1 _ _) (charJ _ hrep _ (deg_rep _ _).symm)
+        ((hC F θ hθ).2 ⟨q, E, L⟩ ⟨hq2, hE, hLp⟩ hq) (charJ _ hexp _ hdeg.symm) (hD F θ p.1 p.2)
+        hpair
   exact key D hDp

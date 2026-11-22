@@ -6,16 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.IsThetaP
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.ZH GlobalTheory.UT
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.ZH GlobalTheory.UT
 open Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
 namespace GlobalTheory.NormValuation
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing in
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing in
 open scoped CategoryTheory.Obj in
 open Classical in
 attribute [local instance] Over.cartesianMonoidalCategory in
@@ -31,12 +35,23 @@ private lemma exists_rat_norm_eq_rpow {p : ℕ} [Fact p.Prime] {x : PadicAlgCl p
   push_cast
   ring
 
-
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing in
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing in
 open scoped CategoryTheory.Obj in
 open Classical in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.NormValuation.main : ∀ (p : ℕ) [Fact p.Prime] (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra (FractionRing V) (PadicAlgCl p)], (∀ x : FractionRing V, ‖algebraMap _ (PadicAlgCl p) x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap V (FractionRing V))) → ∀ ϖ : V, Irreducible ϖ → ∃ v : AddValuation (PadicAlgCl p) (WithTop ℚ), _root_.ReciprocityTheory.ChartRestriction.G.DVR.ValOver ϖ (PadicAlgCl p) v ∧ _root_.GlobalTheory.ZH.NormVal (algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) ϖ)) v ∧ ∀ x : PadicAlgCl p, (0 ≤ v x ↔ ‖x‖ ≤ 1) ∧ (v x = 0 ↔ ‖x‖ = 1) := by
+theorem _root_.GlobalTheory.NormValuation.main
+    : ∀ (p : ℕ) [Fact p.Prime] (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [Algebra (FractionRing V) (PadicAlgCl p)],
+      (∀ x : FractionRing V,
+          ‖algebraMap _ (PadicAlgCl p) x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap V (FractionRing V)))
+        → ∀ ϖ : V,
+          Irreducible ϖ
+            → ∃ v : AddValuation (PadicAlgCl p) (WithTop ℚ),
+              _root_.ReciprocityTheory.ChartRestriction.G.DVR.ValOver ϖ (PadicAlgCl p) v
+                ∧ _root_.GlobalTheory.ZH.NormVal
+                  (algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) ϖ)) v
+                ∧ ∀ x : PadicAlgCl p, (0 ≤ v x ↔ ‖x‖ ≤ 1) ∧ (v x = 0 ↔ ‖x‖ = 1) := by
   intro p _ V _ _ _ _ hV ϖ hϖ
   set π : PadicAlgCl p :=
     algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) ϖ) with hπ
@@ -47,7 +62,8 @@ theorem _root_.GlobalTheory.NormValuation.main : ∀ (p : ℕ) [Fact p.Prime] (V
   have hπle : ‖π‖ ≤ 1 := (hV _).2 ⟨ϖ, rfl⟩
   have hπlt : ‖π‖ < 1 := by
     refine lt_of_le_of_ne hπle fun h1 => hϖ.not_isUnit ?_
-    have hle : ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) ϖ)⁻¹‖ ≤ 1 := by
+    have hle
+        : ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) ϖ)⁻¹‖ ≤ 1 := by
       rw [map_inv₀, norm_inv, ← hπ, h1, inv_one]
     obtain ⟨a, ha⟩ := (hV _).1 hle
     refine isUnit_iff_exists_inv.2 ⟨a, hinjV ?_⟩
@@ -80,8 +96,7 @@ theorem _root_.GlobalTheory.NormValuation.main : ∀ (p : ℕ) [Fact p.Prime] (V
     have h := hexp (x * y) (mul_ne_zero hx hy)
     rw [norm_mul, hexp x hx, hexp y hy, ← Real.rpow_add hb0] at h
     exact_mod_cast (hinj _ _ h).symm
-  have hr_add : ∀ x y : PadicAlgCl p, x ≠ 0 → y ≠ 0 → x + y ≠ 0 →
-      min (r x) (r y) ≤ r (x + y) := by
+  have hr_add : ∀ x y : PadicAlgCl p, x ≠ 0 → y ≠ 0 → x + y ≠ 0 → min (r x) (r y) ≤ r (x + y) := by
     intro x y hx hy hxy
     have h := (PadicAlgCl.isNonarchimedean p) x y
     rw [hexp x hx, hexp y hy, hexp _ hxy] at h
@@ -120,13 +135,15 @@ theorem _root_.GlobalTheory.NormValuation.main : ∀ (p : ℕ) [Fact p.Prime] (V
     rw [hr_mul x y hx hy, WithTop.coe_add]
   let v : AddValuation (PadicAlgCl p) (WithTop ℚ) := AddValuation.of w hw0 hw1 hwadd hwmul
   have hv : ∀ x, v x = w x := fun x => rfl
-  have hunit : ∀ u : Vˣ,
-      ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) u)‖ = 1 := by
+  have hunit
+      : ∀ u : Vˣ,
+        ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) u)‖ = 1 := by
     intro u
     have h1 := (hV (algebraMap V (FractionRing V) u)).2 ⟨u, rfl⟩
     have h2 := (hV (algebraMap V (FractionRing V) (u⁻¹ : Vˣ))).2 ⟨_, rfl⟩
-    have h3 : ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) u)‖ *
-        ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) (u⁻¹ : Vˣ))‖
+    have h3
+        : ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) u)‖
+            * ‖algebraMap (FractionRing V) (PadicAlgCl p) (algebraMap V (FractionRing V) (u⁻¹ : Vˣ))‖
           = 1 := by
       rw [← norm_mul, ← map_mul, ← map_mul, Units.mul_inv, map_one, map_one, norm_one]
     nlinarith [norm_nonneg (algebraMap (FractionRing V) (PadicAlgCl p)
@@ -137,8 +154,10 @@ theorem _root_.GlobalTheory.NormValuation.main : ∀ (p : ℕ) [Fact p.Prime] (V
     intro c n hc
     unfold _root_.ReciprocityTheory.ChartRestriction.G.DVR.HasVal at hc
     obtain ⟨u, rfl⟩ := hc
-    have hne : algebraMap (FractionRing V) (PadicAlgCl p)
-        ((algebraMap V (FractionRing V)) ϖ ^ n * (algebraMap V (FractionRing V)) u) ≠ 0 := by
+    have hne
+        : algebraMap (FractionRing V) (PadicAlgCl p)
+            ((algebraMap V (FractionRing V)) ϖ ^ n * (algebraMap V (FractionRing V)) u)
+          ≠ 0 := by
       rw [map_mul, map_zpow₀]
       refine mul_ne_zero (zpow_ne_zero _ hπne) ?_
       intro h
@@ -147,11 +166,11 @@ theorem _root_.GlobalTheory.NormValuation.main : ∀ (p : ℕ) [Fact p.Prime] (V
       exact zero_ne_one this
     rw [hv]
     simp only [hw, if_neg hne]
-    have h2 : ‖algebraMap (FractionRing V) (PadicAlgCl p)
-        ((algebraMap V (FractionRing V)) ϖ ^ n * (algebraMap V (FractionRing V)) u)‖ =
-          ‖π‖ ^ (n : ℝ) := by
-      rw [map_mul, map_zpow₀, norm_mul, norm_zpow, hunit u, _root_.mul_one, ← hπ,
-        Real.rpow_intCast]
+    have h2
+        : ‖algebraMap (FractionRing V) (PadicAlgCl p)
+            ((algebraMap V (FractionRing V)) ϖ ^ n * (algebraMap V (FractionRing V)) u)‖
+          = ‖π‖ ^ (n : ℝ) := by
+      rw [map_mul, map_zpow₀, norm_mul, norm_zpow, hunit u, _root_.mul_one, ← hπ, Real.rpow_intCast]
     have := hinj _ _ ((hexp _ hne).symm.trans h2)
     rw [WithTop.coe_eq_coe]
     exact_mod_cast this

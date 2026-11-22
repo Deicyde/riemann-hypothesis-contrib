@@ -14,7 +14,8 @@ namespace GlobalTheory.SeqCx.LinkCol
 
 variable {R : Type} [CommRing R]
 
-def padZero {m N : ℕ} (v : Fin m → R) : Fin N → R := fun i => if h : (i : ℕ) < m then v ⟨i, h⟩ else 0
+def padZero {m N : ℕ} (v : Fin m → R) : Fin N → R := fun i =>
+  if h : (i : ℕ) < m then v ⟨i, h⟩ else 0
 
 def restrFirst {m N : ℕ} (h : m ≤ N) (x : Fin N → R) : Fin m → R := fun i => x (Fin.castLE h i)
 
@@ -77,14 +78,18 @@ end GlobalTheory.SeqCx.LinkCol
 
 open GlobalTheory.SeqCx.LinkCol
 
-theorem GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s →
-    ∀ (N m q : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))), ρ ∈ splitSeq R N → ρ.length + m = N →
-    s ≤ m → ExactAt (uniSeq R m) q →
-    ExactAt {w | w ∈ uniSeq R N ∧ ∀ y ∈ ρ, ∀ u ∈ w, y.2 ⬝ᵥ u = 0} q := by
+theorem GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (N m q : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))),
+          ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (uniSeq R m) q
+            → ExactAt {w | w ∈ uniSeq R N ∧ ∀ y ∈ ρ, ∀ u ∈ w, y.2 ⬝ᵥ u = 0} q := by
   intro R _ s hs N m q ρ hρ hN hsm hex
   have hmN : m ≤ N := by omega
-  obtain ⟨g, hg⟩ := GlobalTheory.T.exists_GL_splitSeq_standard_of_stableRangeLe R s hs N ρ hρ (by omega) (fun j => ⟨m + j, by omega⟩)
-    (by intro a b h; simp [Fin.ext_iff] at h; exact Fin.ext h)
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.T.exists_GL_splitSeq_standard_of_stableRangeLe R s hs N ρ hρ (by omega)
+      (fun j => ⟨m + j, by omega⟩)
+      (by intro a b h; simp [Fin.ext_iff] at h; exact Fin.ext h)
   set G : Matrix (Fin N) (Fin N) R := (g : Matrix (Fin N) (Fin N) R) with hGdef
   set Gi : Matrix (Fin N) (Fin N) R := ((g⁻¹ : GL (Fin N) R) : Matrix (Fin N) (Fin N) R) with hGidef
   have hGGi : G * Gi = 1 := Units.mul_inv g
@@ -92,12 +97,12 @@ theorem GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split : ∀ (R : Type) [Comm
   let e : (Fin m → R) → (Fin N → R) := fun v => Gi *ᵥ padZero v
   have he : Function.Injective e := by
     intro a b hab
-    have h1 : G *ᵥ (Gi *ᵥ padZero a) = G *ᵥ (Gi *ᵥ padZero b) := by
-      simp only [e] at hab; rw [hab]
+    have h1 : G *ᵥ (Gi *ᵥ padZero a) = G *ᵥ (Gi *ᵥ padZero b) := by simp only [e] at hab; rw [hab]
     rw [mulVec_mulVec, mulVec_mulVec, hGGi, one_mulVec, one_mulVec] at h1
     have h2 := congrArg (restrFirst hmN) h1
     rwa [restrFirst_padZero, restrFirst_padZero] at h2
-  have hdot : ∀ (u : Fin N → R) (j : Fin ρ.length), (ρ.get j).2 ⬝ᵥ u = (G *ᵥ u) ⟨m + j, by omega⟩ := by
+  have hdot
+      : ∀ (u : Fin N → R) (j : Fin ρ.length), (ρ.get j).2 ⬝ᵥ u = (G *ᵥ u) ⟨m + j, by omega⟩ := by
     intro u j
     have h1 : u = Gi *ᵥ (G *ᵥ u) := by rw [mulVec_mulVec, hGiG, one_mulVec]
     conv_lhs => rw [h1]
@@ -133,7 +138,8 @@ theorem GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split : ∀ (R : Type) [Comm
   have hB : ∀ f v, (padZero f ᵥ* G) ⬝ᵥ e v = f ⬝ᵥ v := by
     intro f v
     simp only [e]
-    rw [dotProduct_mulVec, vecMul_vecMul, hGGi, vecMul_one, dotProduct_padZero hmN, restrFirst_padZero]
+    rw [dotProduct_mulVec, vecMul_vecMul, hGGi, vecMul_one, dotProduct_padZero hmN,
+      restrFirst_padZero]
   have hset : {w | w ∈ uniSeq R N ∧ ∀ y ∈ ρ, ∀ u ∈ w, y.2 ⬝ᵥ u = 0} = List.map e '' uniSeq R m := by
     ext w
     simp only [Set.mem_setOf_eq, Set.mem_image]
@@ -163,7 +169,11 @@ theorem GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split : ∀ (R : Type) [Comm
 
 section
 open GlobalTheory.SeqCx Matrix UpperTheory.V.KL
-theorem _root_.GlobalTheory.T.exactAt_uniSeq_orthogonal_splitSeq_of_exactAt_uniSeq : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ (N m q : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))), ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (uniSeq R m) q → ExactAt {w | w ∈ uniSeq R N ∧ ∀ y ∈ ρ, ∀ u ∈ w, y.2 ⬝ᵥ u = 0} q := by
-  first
-  | exact @GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split
+theorem _root_.GlobalTheory.T.exactAt_uniSeq_orthogonal_splitSeq_of_exactAt_uniSeq
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (N m q : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))),
+          ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (uniSeq R m) q
+            → ExactAt {w | w ∈ uniSeq R N ∧ ∀ y ∈ ρ, ∀ u ∈ w, y.2 ⬝ᵥ u = 0} q := by
+  first | exact @GlobalTheory.SeqCx.exactAt_uniSeq_killed_by_split
 end

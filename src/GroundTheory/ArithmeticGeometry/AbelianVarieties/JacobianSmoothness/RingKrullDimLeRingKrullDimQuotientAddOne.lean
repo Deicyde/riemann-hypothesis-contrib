@@ -15,16 +15,19 @@ section Normalization
 
 variable (k : Type u) [Field k] {A : Type u} [CommRing A] [Algebra k A]
 
-theorem ringKrullDim_eq_of_normalization {s : ℕ} (g : MvPolynomial (Fin s) k →ₐ[k] A)
-    (hinj : Function.Injective g) (hint : g.IsIntegral) : ringKrullDim A = s := by
+theorem ringKrullDim_eq_of_normalization
+    {s : ℕ} (g : MvPolynomial (Fin s) k →ₐ[k] A) (hinj : Function.Injective g) (hint : g.IsIntegral)
+    : ringKrullDim A = s := by
   let _ : Algebra (MvPolynomial (Fin s) k) A := g.toRingHom.toAlgebra
   have _ : Algebra.IsIntegral (MvPolynomial (Fin s) k) A := ⟨fun x => hint x⟩
   rw [GroundTheory.Arith.Toric.ringKrullDim_eq_of_isIntegral hinj,
     MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field]
   simp
 
-theorem trdeg_eq_of_normalization [IsDomain A] {s : ℕ} (g : MvPolynomial (Fin s) k →ₐ[k] A)
-    (hinj : Function.Injective g) (hint : g.IsIntegral) : trdeg k A = s := by
+theorem trdeg_eq_of_normalization
+    [IsDomain A]
+    {s : ℕ} (g : MvPolynomial (Fin s) k →ₐ[k] A) (hinj : Function.Injective g) (hint : g.IsIntegral)
+    : trdeg k A = s := by
   let _ : Algebra (MvPolynomial (Fin s) k) A := g.toRingHom.toAlgebra
   have _ : IsScalarTower k (MvPolynomial (Fin s) k) A :=
     IsScalarTower.of_algebraMap_eq fun c => (g.commutes c).symm
@@ -37,17 +40,15 @@ theorem trdeg_eq_of_normalization [IsDomain A] {s : ℕ} (g : MvPolynomial (Fin 
 
 variable [Algebra.FiniteType k A]
 
-theorem exists_ringKrullDim_eq_trdeg [IsDomain A] :
-    ∃ n : ℕ, ringKrullDim A = n ∧ trdeg k A = n := by
+theorem exists_ringKrullDim_eq_trdeg [IsDomain A]
+    : ∃ n : ℕ, ringKrullDim A = n ∧ trdeg k A = n := by
   obtain ⟨s, g, hinj, hint⟩ := exists_integral_inj_algHom_of_fg k A
-  exact ⟨s, ringKrullDim_eq_of_normalization k g hinj hint,
-    trdeg_eq_of_normalization k g hinj hint⟩
+  exact ⟨s, ringKrullDim_eq_of_normalization k g hinj hint, trdeg_eq_of_normalization k g hinj hint⟩
 
 theorem ringKrullDim_eq_trdeg [IsDomain A] : ringKrullDim A = (trdeg k A).toENat := by
   obtain ⟨n, h1, h2⟩ := exists_ringKrullDim_eq_trdeg (k := k) (A := A)
   rw [h1, h2]
   simp
-
 
 include k in
 theorem ringKrullDim_lt_top : ringKrullDim A < ⊤ := by
@@ -56,18 +57,20 @@ theorem ringKrullDim_lt_top : ringKrullDim A < ⊤ := by
   rw [ringKrullDim_eq_of_normalization k g hinj hint]
   exact WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top s)
 
-
 omit [Algebra.FiniteType k A] in
-theorem trdeg_eq_of_isFractionRing [IsDomain A] (K : Type u) [Field K] [Algebra A K]
-    [IsFractionRing A K] [Algebra k K] [IsScalarTower k A K] : trdeg k K = trdeg k A := by
+theorem trdeg_eq_of_isFractionRing
+    [IsDomain A]
+    (K : Type u) [Field K] [Algebra A K] [IsFractionRing A K] [Algebra k K] [IsScalarTower k A K]
+    : trdeg k K = trdeg k A := by
   have _ : FaithfulSMul A K :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 (IsFractionRing.injective A K)
   have _ : Algebra.IsAlgebraic A K := IsLocalization.isAlgebraic K (nonZeroDivisors A)
   rw [← trdeg_add_eq k A (A := K), trdeg_eq_zero (R := A) (A := K), add_zero]
 
-theorem ringKrullDim_eq_trdeg_fractionRing [IsDomain A] (K : Type u) [Field K] [Algebra A K]
-    [IsFractionRing A K] [Algebra k K] [IsScalarTower k A K] :
-    ringKrullDim A = (trdeg k K).toENat := by
+theorem ringKrullDim_eq_trdeg_fractionRing
+    [IsDomain A]
+    (K : Type u) [Field K] [Algebra A K] [IsFractionRing A K] [Algebra k K] [IsScalarTower k A K]
+    : ringKrullDim A = (trdeg k K).toENat := by
   rw [trdeg_eq_of_isFractionRing (k := k) (A := A) K, ringKrullDim_eq_trdeg k]
 
 end Normalization
@@ -76,8 +79,8 @@ section Drop
 
 variable {A : Type u} [CommRing A] [IsDomain A]
 
-theorem ringKrullDim_quotient_add_one_le (p : Ideal A) (hp : p ≠ ⊥) :
-    ringKrullDim (A ⧸ p) + 1 ≤ ringKrullDim A := by
+theorem ringKrullDim_quotient_add_one_le (p : Ideal A) (hp : p ≠ ⊥)
+    : ringKrullDim (A ⧸ p) + 1 ≤ ringKrullDim A := by
   obtain ⟨r, hr, hr0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp
   exact ringKrullDim_succ_le_of_surjective (Ideal.Quotient.mk p) Ideal.Quotient.mk_surjective
     (mem_nonZeroDivisors_of_ne_zero hr0) (Ideal.Quotient.eq_zero_iff_mem.mpr hr)
@@ -88,8 +91,8 @@ section Hypersurface
 
 variable (k : Type u) [Field k]
 
-theorem sub_one_le_trdeg_quotient_span_prime {s : ℕ} {g : MvPolynomial (Fin s) k} (hg : Prime g) :
-    ((s - 1 : ℕ) : Cardinal) ≤ trdeg k (MvPolynomial (Fin s) k ⧸ Ideal.span {g}) := by
+theorem sub_one_le_trdeg_quotient_span_prime {s : ℕ} {g : MvPolynomial (Fin s) k} (hg : Prime g)
+    : ((s - 1 : ℕ) : Cardinal) ≤ trdeg k (MvPolynomial (Fin s) k ⧸ Ideal.span {g}) := by
   classical
   have hg0 : g ≠ 0 := hg.ne_zero
 
@@ -101,16 +104,16 @@ theorem sub_one_le_trdeg_quotient_span_prime {s : ℕ} {g : MvPolynomial (Fin s)
     rw [MvPolynomial.vars_eq_empty_iff_eq_C] at hv
     have hc : g.coeff 0 ≠ 0 := fun h0 => hg0 (by rw [hv, h0, map_zero])
     exact hg.not_isUnit (hv ▸ ((isUnit_iff_ne_zero.mpr hc).map MvPolynomial.C))
-  let x : {j : Fin s // j ≠ i} → MvPolynomial (Fin s) k ⧸ Ideal.span {g} :=
-    fun j => Ideal.Quotient.mk _ (MvPolynomial.X j.1)
+  let x : {j : Fin s // j ≠ i} → MvPolynomial (Fin s) k ⧸ Ideal.span {g} := fun j =>
+    Ideal.Quotient.mk _ (MvPolynomial.X j.1)
   have hx : AlgebraicIndependent k x := by
     rw [algebraicIndependent_iff_injective_aeval, injective_iff_map_eq_zero]
     intro h hh
-    have e' : (MvPolynomial.aeval x : MvPolynomial _ k →ₐ[k] _) =
-        (Ideal.Quotient.mkₐ k (Ideal.span {g})).comp (MvPolynomial.rename Subtype.val) :=
+    have e'
+        : (MvPolynomial.aeval x : MvPolynomial _ k →ₐ[k] _)
+          = (Ideal.Quotient.mkₐ k (Ideal.span {g})).comp (MvPolynomial.rename Subtype.val) :=
       MvPolynomial.algHom_ext fun j => by simp [x]
-    have e : MvPolynomial.aeval x h =
-        Ideal.Quotient.mk _ (MvPolynomial.rename Subtype.val h) := by
+    have e : MvPolynomial.aeval x h = Ideal.Quotient.mk _ (MvPolynomial.rename Subtype.val h) := by
       rw [e']
       rfl
     rw [e, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton] at hh
@@ -135,13 +138,13 @@ end Hypersurface
 
 section Formula
 
-variable (k : Type u) [Field k] {A : Type u} [CommRing A] [IsDomain A] [Algebra k A]
-  [Algebra.FiniteType k A]
-
+variable
+  (k : Type u) [Field k]
+  {A : Type u} [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A]
 
 include k in
-theorem ringKrullDim_le_ringKrullDim_quotient_add_one (p : Ideal A) [p.IsPrime]
-    (hp : p.height = 1) : ringKrullDim A ≤ ringKrullDim (A ⧸ p) + 1 := by
+theorem ringKrullDim_le_ringKrullDim_quotient_add_one (p : Ideal A) [p.IsPrime] (hp : p.height = 1)
+    : ringKrullDim A ≤ ringKrullDim (A ⧸ p) + 1 := by
   obtain ⟨s, g, hinj, hint⟩ := exists_integral_inj_algHom_of_fg k A
   let _ : Algebra (MvPolynomial (Fin s) k) A := g.toRingHom.toAlgebra
   have _ : IsScalarTower k (MvPolynomial (Fin s) k) A :=
@@ -163,8 +166,7 @@ theorem ringKrullDim_le_ringKrullDim_quotient_add_one (p : Ideal A) [p.IsPrime]
   obtain ⟨f, hfq, hf⟩ := Ideal.IsPrime.exists_mem_prime_of_ne_bot (inferInstance : q.IsPrime) hqne
   have hspan : Ideal.span {f} = q := by
     by_contra hne
-    have hlt : Ideal.span {f} < q :=
-      lt_of_le_of_ne ((Ideal.span_singleton_le_iff_mem _).2 hfq) hne
+    have hlt : Ideal.span {f} < q := lt_of_le_of_ne ((Ideal.span_singleton_le_iff_mem _).2 hfq) hne
     have _ : (Ideal.span {f}).IsPrime := (Ideal.span_singleton_prime hf.ne_zero).2 hf
     have h0 : (⊥ : Ideal (MvPolynomial (Fin s) k)) < Ideal.span {f} := by
       rw [bot_lt_iff_ne_bot, ne_eq, Ideal.span_singleton_eq_bot]
@@ -172,17 +174,22 @@ theorem ringKrullDim_le_ringKrullDim_quotient_add_one (p : Ideal A) [p.IsPrime]
     have h1 := Ideal.height_add_one_le_of_lt_of_isPrime h0
     have h2 := Ideal.height_add_one_le_of_lt_of_isPrime hlt
     rw [Ideal.height_bot, zero_add] at h1
-    have : (2 : ℕ∞) ≤ q.height := le_trans (by
-      calc (2 : ℕ∞) = 1 + 1 := by norm_num
-        _ ≤ (Ideal.span {f}).height + 1 := by gcongr) h2
+    have : (2 : ℕ∞) ≤ q.height :=
+      le_trans
+        (by
+          calc
+            (2 : ℕ∞)
+              = 1 + 1 := by norm_num
+            _ ≤ (Ideal.span {f}).height + 1 := by gcongr)
+        h2
     exact absurd (this.trans hqle) (by decide)
 
   have hdimq : ringKrullDim (A ⧸ p) = ringKrullDim (MvPolynomial (Fin s) k ⧸ q) :=
     GroundTheory.Arith.Toric.ringKrullDim_eq_of_isIntegral (Ideal.algebraMap_quotient_injective)
 
   have _ : (Ideal.span {f}).IsPrime := (Ideal.span_singleton_prime hf.ne_zero).2 hf
-  obtain ⟨m, hm, htr⟩ := exists_ringKrullDim_eq_trdeg (k := k)
-    (A := MvPolynomial (Fin s) k ⧸ Ideal.span {f})
+  obtain ⟨m, hm, htr⟩ :=
+    exists_ringKrullDim_eq_trdeg (k := k) (A := MvPolynomial (Fin s) k ⧸ Ideal.span {f})
   have hsm : s - 1 ≤ m := by
     have := sub_one_le_trdeg_quotient_span_prime k hf
     rw [htr] at this
@@ -191,7 +198,6 @@ theorem ringKrullDim_le_ringKrullDim_quotient_add_one (p : Ideal A) [p.IsPrime]
   have : s ≤ m + 1 := by omega
   exact_mod_cast this
 
-
 omit [IsDomain A] [Algebra k A] [Algebra.FiniteType k A] in
 lemma coheight_eq_ringKrullDim_quotient (p : PrimeSpectrum A) :
     (Order.coheight p : WithBot ℕ∞) = ringKrullDim (A ⧸ p.asIdeal) := by
@@ -199,7 +205,6 @@ lemma coheight_eq_ringKrullDim_quotient (p : PrimeSpectrum A) :
   refine Order.krullDim_eq_of_orderIso (OrderIso.setCongr _ _ ?_)
   ext q
   simp [PrimeSpectrum.mem_zeroLocus, ← PrimeSpectrum.asIdeal_le_asIdeal]
-
 
 omit [Algebra k A] [Algebra.FiniteType k A] in
 lemma height_map_quotient_add_one_le [IsNoetherianRing A] {p₁ p : Ideal A} [p₁.IsPrime]
@@ -229,56 +234,60 @@ lemma height_map_quotient_add_one_le [IsNoetherianRing A] {p₁ p : Ideal A} [p�
   rw [← PrimeSpectrum.height_eq_orderHeight] at hle
   simpa [l'', l', ← hlen] using hle
 
-theorem ringKrullDim_le_height_add_ringKrullDim_quotient : ∀ (n : ℕ) (A : Type u) [CommRing A]
-    [IsDomain A] [Algebra k A] [Algebra.FiniteType k A], ringKrullDim A = n →
-    ∀ (p : Ideal A) [p.IsPrime], ringKrullDim A ≤ p.height + ringKrullDim (A ⧸ p) := by
+theorem ringKrullDim_le_height_add_ringKrullDim_quotient
+    : ∀ (n : ℕ) (A : Type u) [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A],
+      ringKrullDim A = n
+        → ∀ (p : Ideal A) [p.IsPrime], ringKrullDim A ≤ p.height + ringKrullDim (A ⧸ p) := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  intro A _ _ _ _ hA p _
-  have _ : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing k A
-  by_cases hp : p = ⊥
-  · subst hp
-    rw [Ideal.height_bot, ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot A)]
-    simp
-  obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp
-  obtain ⟨p₁, hp₁min, hp₁le⟩ :=
-    Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem _).2 ha)
-  have _ : p₁.IsPrime := hp₁min.1.1
-  have hp₁ne : p₁ ≠ ⊥ := fun h => ha0 (by
-    have := hp₁min.1.2 (Ideal.mem_span_singleton_self a)
-    rw [h] at this
-    simpa using this)
-  have hht : p₁.height = 1 := by
-    refine le_antisymm (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ _ hp₁min) ?_
-    have := Ideal.height_add_one_le_of_lt_of_isPrime (bot_lt_iff_ne_bot.2 hp₁ne)
-    simpa using this
-  have hC1 := ringKrullDim_le_ringKrullDim_quotient_add_one k p₁ hht
-  have hdrop := ringKrullDim_quotient_add_one_le p₁ hp₁ne
-  obtain ⟨m, hm, -⟩ := exists_ringKrullDim_eq_trdeg (k := k) (A := A ⧸ p₁)
-  have hmn : m < n := by
-    rw [hm, hA] at hdrop
-    have : ((m + 1 : ℕ) : WithBot ℕ∞) ≤ n := by exact_mod_cast hdrop
-    have : m + 1 ≤ n := by exact_mod_cast this
-    omega
-  have _ : (p.map (Ideal.Quotient.mk p₁)).IsPrime :=
-    Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
-  have ih' := ih m hmn (A ⧸ p₁) hm (p.map (Ideal.Quotient.mk p₁))
-  have e : ringKrullDim ((A ⧸ p₁) ⧸ p.map (Ideal.Quotient.mk p₁)) = ringKrullDim (A ⧸ p) :=
-    ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hp₁le)
-  have hh := height_map_quotient_add_one_le hp₁le hp₁ne
-  rw [e] at ih'
-  calc ringKrullDim A ≤ ringKrullDim (A ⧸ p₁) + 1 := hC1
-    _ ≤ ((p.map (Ideal.Quotient.mk p₁)).height + ringKrullDim (A ⧸ p)) + 1 := by gcongr
-    _ = (((p.map (Ideal.Quotient.mk p₁)).height + 1 : ℕ∞) : WithBot ℕ∞) + ringKrullDim (A ⧸ p) := by
-      push_cast
-      ring
-    _ ≤ p.height + ringKrullDim (A ⧸ p) := by gcongr
-
+    intro A _ _ _ _ hA p _
+    have _ : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing k A
+    by_cases hp : p = ⊥
+    · subst hp
+      rw [Ideal.height_bot, ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot A)]
+      simp
+    obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp
+    obtain ⟨p₁, hp₁min, hp₁le⟩ :=
+      Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem _).2 ha)
+    have _ : p₁.IsPrime := hp₁min.1.1
+    have hp₁ne : p₁ ≠ ⊥ := fun h =>
+      ha0 (by
+        have := hp₁min.1.2 (Ideal.mem_span_singleton_self a)
+        rw [h] at this
+        simpa using this)
+    have hht : p₁.height = 1 := by
+      refine le_antisymm (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ _ hp₁min) ?_
+      have := Ideal.height_add_one_le_of_lt_of_isPrime (bot_lt_iff_ne_bot.2 hp₁ne)
+      simpa using this
+    have hC1 := ringKrullDim_le_ringKrullDim_quotient_add_one k p₁ hht
+    have hdrop := ringKrullDim_quotient_add_one_le p₁ hp₁ne
+    obtain ⟨m, hm, -⟩ := exists_ringKrullDim_eq_trdeg (k := k) (A := A ⧸ p₁)
+    have hmn : m < n := by
+      rw [hm, hA] at hdrop
+      have : ((m + 1 : ℕ) : WithBot ℕ∞) ≤ n := by exact_mod_cast hdrop
+      have : m + 1 ≤ n := by exact_mod_cast this
+      omega
+    have _ : (p.map (Ideal.Quotient.mk p₁)).IsPrime :=
+      Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
+    have ih' := ih m hmn (A ⧸ p₁) hm (p.map (Ideal.Quotient.mk p₁))
+    have e : ringKrullDim ((A ⧸ p₁) ⧸ p.map (Ideal.Quotient.mk p₁)) = ringKrullDim (A ⧸ p) :=
+      ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hp₁le)
+    have hh := height_map_quotient_add_one_le hp₁le hp₁ne
+    rw [e] at ih'
+    calc
+      ringKrullDim A
+        ≤ ringKrullDim (A ⧸ p₁) + 1 := hC1
+      _ ≤ ((p.map (Ideal.Quotient.mk p₁)).height + ringKrullDim (A ⧸ p)) + 1 := by gcongr
+      _ = (((p.map (Ideal.Quotient.mk p₁)).height + 1 : ℕ∞) : WithBot ℕ∞)
+          + ringKrullDim (A ⧸ p) := by
+        push_cast
+        ring
+      _ ≤ p.height + ringKrullDim (A ⧸ p) := by gcongr
 
 include k in
-theorem height_add_ringKrullDim_quotient (p : Ideal A) [p.IsPrime] :
-    (p.height : WithBot ℕ∞) + ringKrullDim (A ⧸ p) = ringKrullDim A := by
+theorem height_add_ringKrullDim_quotient (p : Ideal A) [p.IsPrime]
+    : (p.height : WithBot ℕ∞) + ringKrullDim (A ⧸ p) = ringKrullDim A := by
   refine le_antisymm ?_ ?_
   · rw [← coheight_eq_ringKrullDim_quotient (⟨p, inferInstance⟩ : PrimeSpectrum A),
       show p.height = (⟨p, inferInstance⟩ : PrimeSpectrum A).asIdeal.height from rfl,

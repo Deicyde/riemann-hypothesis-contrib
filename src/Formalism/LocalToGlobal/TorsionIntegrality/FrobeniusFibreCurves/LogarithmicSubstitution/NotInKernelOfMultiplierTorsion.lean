@@ -65,8 +65,8 @@ theorem norm_odd {m : ℕ} (hm : Odd m) : ‖(m : ℂ_[2])‖ = 1 := by
   rw [Padic.norm_natCast_eq_one_iff.2 (Nat.coprime_two_left.2 hm)] at h1
   simpa using h1
 
-theorem norm_coe_unit_pow_four (b : ℤ_[2]) (hb : ‖b‖ = 1) :
-    ‖((b : ℚ_[2]) : ℂ_[2]) ^ 4 - 1‖ ≤ 16⁻¹ := by
+theorem norm_coe_unit_pow_four (b : ℤ_[2]) (hb : ‖b‖ = 1)
+    : ‖((b : ℚ_[2]) : ℂ_[2]) ^ 4 - 1‖ ≤ 16⁻¹ := by
   have e : ((b : ℚ_[2]) : ℂ_[2]) ^ 4 - 1 = (((b ^ 4 - 1 : ℤ_[2]) : ℚ_[2]) : ℂ_[2]) := by
     rw [coe_eq_algebraMap, coe_eq_algebraMap]
     push_cast
@@ -78,8 +78,9 @@ section Ultra
 
 variable {K : Type*} [NormedField K] [IsUltrametricDist K]
 
-theorem norm_sum_lt {J : Type*} (s : Finset J) (f : J → K) {C : ℝ} (hC : 0 < C)
-    (h : ∀ i ∈ s, ‖f i‖ < C) : ‖∑ i ∈ s, f i‖ < C := by
+theorem norm_sum_lt
+    {J : Type*} (s : Finset J) (f : J → K) {C : ℝ} (hC : 0 < C) (h : ∀ i ∈ s, ‖f i‖ < C)
+    : ‖∑ i ∈ s, f i‖ < C := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using hC
@@ -88,8 +89,9 @@ theorem norm_sum_lt {J : Type*} (s : Finset J) (f : J → K) {C : ℝ} (hC : 0 <
     exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _)
       (max_lt (h a (Finset.mem_insert_self _ _)) (ih fun i hi => h i (Finset.mem_insert_of_mem hi)))
 
-theorem norm_c₄_le (W : WeierstrassCurve K) (h1 : ‖W.a₁‖ ≤ 1) (h2 : ‖W.a₂‖ ≤ 1) (h3 : ‖W.a₃‖ ≤ 1)
-    (h4 : ‖W.a₄‖ ≤ 1) : ‖W.c₄‖ ≤ 1 := by
+theorem norm_c₄_le
+    (W : WeierstrassCurve K) (h1 : ‖W.a₁‖ ≤ 1) (h2 : ‖W.a₂‖ ≤ 1) (h3 : ‖W.a₃‖ ≤ 1) (h4 : ‖W.a₄‖ ≤ 1)
+    : ‖W.c₄‖ ≤ 1 := by
   have hA : ∀ x y : K, ‖x‖ ≤ 1 → ‖y‖ ≤ 1 → ‖x + y‖ ≤ 1 := fun x y hx hy =>
     (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
   have hS : ∀ x y : K, ‖x‖ ≤ 1 → ‖y‖ ≤ 1 → ‖x - y‖ ≤ 1 := fun x y hx hy => by
@@ -99,8 +101,10 @@ theorem norm_c₄_le (W : WeierstrassCurve K) (h1 : ‖W.a₁‖ ≤ 1) (h2 : �
     rw [norm_mul]
     exact mul_le_one₀ hx (norm_nonneg _) hy
   have hN : ∀ n : ℕ, ‖(n : K)‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one K
-  have e : W.c₄ = (W.a₁ * W.a₁ + ((4 : ℕ) : K) * W.a₂) * (W.a₁ * W.a₁ + ((4 : ℕ) : K) * W.a₂) -
-      ((24 : ℕ) : K) * (((2 : ℕ) : K) * W.a₄ + W.a₁ * W.a₃) := by
+  have e
+      : W.c₄
+        = (W.a₁ * W.a₁ + ((4 : ℕ) : K) * W.a₂) * (W.a₁ * W.a₁ + ((4 : ℕ) : K) * W.a₂)
+          - ((24 : ℕ) : K) * (((2 : ℕ) : K) * W.a₄ + W.a₁ * W.a₃) := by
     simp only [WeierstrassCurve.c₄, WeierstrassCurve.b₂, WeierstrassCurve.b₄]
     push_cast
     ring
@@ -110,8 +114,9 @@ theorem norm_c₄_le (W : WeierstrassCurve K) (h1 : ‖W.a₁‖ ≤ 1) (h2 : �
 
 end Ultra
 
-theorem exists_order_two {G : Type*} [AddCommGroup G] (Q : G) (hQ : Q ≠ 0) (a : ℕ)
-    (h : 2 ^ a • Q = 0) : ∃ j : ℕ, 2 ^ j • Q ≠ 0 ∧ 2 ^ j • Q + 2 ^ j • Q = 0 := by
+theorem exists_order_two
+    {G : Type*} [AddCommGroup G] (Q : G) (hQ : Q ≠ 0) (a : ℕ) (h : 2 ^ a • Q = 0)
+    : ∃ j : ℕ, 2 ^ j • Q ≠ 0 ∧ 2 ^ j • Q + 2 ^ j • Q = 0 := by
   classical
   have hex : ∃ k, 2 ^ k • Q = 0 := ⟨a, h⟩
   have h0 : Nat.find hex ≠ 0 := by
@@ -132,10 +137,14 @@ variable {L : PeriodPair} {ι : ℂ ≃+* ℂ_[2]} {W : WeierstrassCurve ℂ_[2]
 local notation "π" => ptW 2 L ι W
 
 open Classical in
-theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : TorsBound) (h3 : KapNorm) (h4 : KappaSum)
-    (hU : Unif 2 L ι W) (hW : IntCurve W) (ha1 : ‖W.a₁‖ = 1) (α : ℂ) (b : ℤ_[2]) (hα : α ≠ 0)
-    (hst : MulStable L α) (hb : ι α = ((b : ℚ_[2]) : ℂ_[2])) (hb1 : ‖b‖ = 1) (t1 : ℂ)
-    (hαt1 : α * t1 ∈ L.lattice) (ht1 : t1 ∉ L.lattice) : ¬ InFormalGroupPoints (π t1) := by
+theorem not_in_kernel_of_multiplier_torsion
+    (h1 : TwoTorsionKernelUnique) (h2 : TorsBound) (h3 : KapNorm) (h4 : KappaSum)
+    (hU : Unif 2 L ι W) (hW : IntCurve W) (ha1 : ‖W.a₁‖ = 1)
+    (α : ℂ)
+    (b : ℤ_[2])
+    (hα : α ≠ 0) (hst : MulStable L α) (hb : ι α = ((b : ℚ_[2]) : ℂ_[2])) (hb1 : ‖b‖ = 1)
+    (t1 : ℂ) (hαt1 : α * t1 ∈ L.lattice) (ht1 : t1 ∉ L.lattice)
+    : ¬ InFormalGroupPoints (π t1) := by
   intro hE
   have hW' := hW
   obtain ⟨a1, a2, a3, a4, a6, hΔ⟩ := hW'
@@ -156,7 +165,8 @@ theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : 
       congr 1
       push_cast
       ring
-  have hE1n : ∀ (n : ℕ) (P : W.toAffine.Point), InFormalGroupPoints P → InFormalGroupPoints (n • P) := by
+  have hE1n
+      : ∀ (n : ℕ) (P : W.toAffine.Point), InFormalGroupPoints P → InFormalGroupPoints (n • P) := by
     intro n P hP
     induction n with
     | zero =>
@@ -196,13 +206,11 @@ theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : 
       have := L.lattice.smul_mem T ht
       simpa [zsmul_eq_mul] using this
     rcases Int.natAbs_eq n with h | h
-    · have e2 : ((n.natAbs : ℕ) : ℂ) = (n : ℂ) := by
-        rw [← Int.cast_natCast, ← h]
+    · have e2 : ((n.natAbs : ℕ) : ℂ) = (n : ℂ) := by rw [← Int.cast_natCast, ← h]
       rw [e2]
       exact hz
     · have e3 : ((n.natAbs : ℕ) : ℤ) = -n := by omega
-      have e2 : ((n.natAbs : ℕ) : ℂ) = -(n : ℂ) := by
-        rw [← Int.cast_natCast, e3, Int.cast_neg]
+      have e2 : ((n.natAbs : ℕ) : ℂ) = -(n : ℂ) := by rw [← Int.cast_natCast, e3, Int.cast_neg]
       rw [e2, neg_mul]
       exact L.lattice.neg_mem hz
   obtain ⟨a, m, hm, hN⟩ := Nat.exists_eq_two_pow_mul_odd (n := n.natAbs) (by simpa using hn0)
@@ -220,9 +228,10 @@ theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : 
     rw [e]
     have := L.lattice.smul_mem ((2 ^ j : ℕ) : ℤ) hαt1
     simpa [zsmul_eq_mul] using this
-  have htSn : ((2 ^ j : ℕ) : ℂ) * t1 ∉ L.lattice := fun h => hj0 (by
-    rw [← hπS]
-    exact (hzero _).2 h)
+  have htSn : ((2 ^ j : ℕ) : ℂ) * t1 ∉ L.lattice := fun h =>
+    hj0 (by
+      rw [← hπS]
+      exact (hzero _).2 h)
   obtain ⟨S, hS⟩ := Formalism.L2.Th1.F.kerRepsExist L α hα hst
   obtain ⟨PS, hPS, hPSl⟩ := hS.2.2 _ hαS htSn
   have hπPS : π PS = 2 ^ j • π t1 := by
@@ -249,8 +258,10 @@ theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : 
         exact hne (hS.2.1 P hP PS hPS (hcong' _ _ this.symm))
       · exact h2 ℂ_[2] W hW h2n (π P) a (hA P (hS.1 P hP).1 hPE) hP2
     · exact lt_of_le_of_lt (Half.norm_x_le_one_of_not_in_kernel _ hPE) (by norm_num)
-  have hκ : ∀ P ∈ S, ι (3 * L.weierstrassP P ^ 2 - L.g₂ / 4) =
-      3 * (px W (π P) + W.b₂ / 12) ^ 2 - Formalism.L2.Th1.A.g₂ W / 4 := by
+  have hκ
+      : ∀ P ∈ S,
+        ι (3 * L.weierstrassP P ^ 2 - L.g₂ / 4)
+          = 3 * (px W (π P) + W.b₂ / 12) ^ 2 - Formalism.L2.Th1.A.g₂ W / 4 := by
     intro P hP
     rw [Formalism.L2.Th1.E.AnaSysW.px_ptW hU P (hS.1 P hP).2, hU.1]
     simp only [Formalism.L2.Th1.E.AnaSysW.xc, map_sub, map_mul, map_pow, map_div₀, map_ofNat,
@@ -266,8 +277,10 @@ theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : 
   have hsum : ‖ι (∑ P ∈ S, (3 * L.weierstrassP P ^ 2 - L.g₂ / 4))‖ = 16 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, ← Finset.add_sum_erase S _ hPS]
-    have hr := norm_sum_lt (S.erase PS) (fun P => ι (3 * L.weierstrassP P ^ 2 - L.g₂ / 4))
-      (by norm_num : (0 : ℝ) < 16) hklt
+    have hr :=
+      norm_sum_lt (S.erase PS)
+        (fun P => ι (3 * L.weierstrassP P ^ 2 - L.g₂ / 4))
+        (by norm_num : (0 : ℝ) < 16) hklt
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hk16]; exact hr.ne'), hk16]
     exact max_eq_left hr.le
   rw [h4 L α S hα hst hS] at hsum
@@ -305,8 +318,9 @@ theorem not_in_kernel_of_multiplier_torsion (h1 : TwoTorsionKernelUnique) (h2 : 
 
 end Main
 
-theorem KernelIntegral_of (h1 : TwoTorsionKernelUnique) (h2 : TorsBound) (h3 : KapNorm) (h4 : KappaSum) :
-    KernelIntegral := by
+theorem KernelIntegral_of
+    (h1 : TwoTorsionKernelUnique) (h2 : TorsBound) (h3 : KapNorm) (h4 : KappaSum)
+    : KernelIntegral := by
   intro L ι W hU hW ha1 α b hα hst hb hb1 t hαt ht
   exact not_in_kernel_of_multiplier_torsion h1 h2 h3 h4 hU hW ha1 α b hα hst hb hb1 t hαt ht
 

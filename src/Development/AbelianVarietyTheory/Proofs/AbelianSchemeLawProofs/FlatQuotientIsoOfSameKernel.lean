@@ -5,7 +5,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -15,8 +16,8 @@ namespace FlatQuotient
 
 variable {S : Scheme.{0}}
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 variable {S : Scheme.{0}} in
@@ -25,7 +26,8 @@ lemma _root_.GlobalTheory.FlatQuotient.epi_of_flat_surjective {X Y : Over S} (f 
   have hepi : Epi f.left := Flat.epi_of_flat_of_surjective f.left
   exact (Over.forget S).epi_of_epi_map hepi
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 variable {S : Scheme.{0}} in
@@ -45,7 +47,8 @@ private lemma whiskerRight_left_of_isStableUnderBaseChange (P : MorphismProperty
   exact MorphismProperty.of_isPullback
     (IsPullback.of_right houter e2 (IsPullback.of_hasPullback Y.hom Z.hom).flip).flip hf
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 variable {S : Scheme.{0}} in
@@ -65,8 +68,8 @@ private lemma whiskerLeft_left_of_isStableUnderBaseChange (P : MorphismProperty 
   exact MorphismProperty.of_isPullback
     (IsPullback.of_right houter e2 (IsPullback.of_hasPullback Z.hom Y.hom)).flip hf
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 variable {S : Scheme.{0}} in
@@ -82,8 +85,8 @@ lemma _root_.GlobalTheory.FlatQuotient.epi_tensorHom {X Y X' Y' : Over S} (f : X
   rw [MonoidalCategory.tensorHom_def]
   exact epi_comp _ _
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 variable {S : Scheme.{0}} in
@@ -100,28 +103,30 @@ lemma _root_.GlobalTheory.FlatQuotient.comp_eq_of_kills_kernel {G B B' T : Over 
   rw [mul_comp, GrpObj.inv_comp, mul_inv_eq_one] at hone
   exact hone
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
 variable {S : Scheme.{0}} in
-theorem _root_.GlobalTheory.FlatQuotient.exists_desc {G B B' T : Over S} [GrpObj G]
-    [GrpObj B] [GrpObj B'] (q : G ⟶ B) (i : T ⟶ G) (f : G ⟶ B') [IsMonHom q] [IsMonHom f]
-    [Flat q.left] [Surjective q.left] [QuasiCompact q.left]
-    (hker : IsPullback i (toUnit _) q (η[B])) (hf : i ≫ f = toUnit _ ≫ η[B']) :
-    ∃ β : B ⟶ B', IsMonHom β ∧ q ≫ β = f := by
-  have hcomp : ∀ {Z : Scheme} (g₁ g₂ : Z ⟶ G.left), g₁ ≫ q.left = g₂ ≫ q.left →
-      g₁ ≫ f.left = g₂ ≫ f.left := by
+theorem _root_.GlobalTheory.FlatQuotient.exists_desc
+    {G B B' T : Over S} [GrpObj G] [GrpObj B] [GrpObj B']
+    (q : G ⟶ B)
+    (i : T ⟶ G)
+    (f : G ⟶ B') [IsMonHom q] [IsMonHom f] [Flat q.left] [Surjective q.left] [QuasiCompact q.left]
+    (hker : IsPullback i (toUnit _) q (η[B])) (hf : i ≫ f = toUnit _ ≫ η[B'])
+    : ∃ β : B ⟶ B', IsMonHom β ∧ q ≫ β = f := by
+  have hcomp
+      : ∀ {Z : Scheme} (g₁ g₂ : Z ⟶ G.left),
+        g₁ ≫ q.left = g₂ ≫ q.left → g₁ ≫ f.left = g₂ ≫ f.left := by
     intro Z g₁ g₂ h
-    have hw : g₂ ≫ G.hom = g₁ ≫ G.hom := by
-      rw [← Over.w q, ← Category.assoc, ← h, Category.assoc]
-    have key := _root_.GlobalTheory.FlatQuotient.comp_eq_of_kills_kernel q i f hker hf (Z := Over.mk (g₁ ≫ G.hom))
-      (Over.homMk g₁) (Over.homMk g₂ hw) (by ext; simpa using h)
+    have hw : g₂ ≫ G.hom = g₁ ≫ G.hom := by rw [← Over.w q, ← Category.assoc, ← h, Category.assoc]
+    have key :=
+      _root_.GlobalTheory.FlatQuotient.comp_eq_of_kills_kernel q i f hker hf
+        (Z := Over.mk (g₁ ≫ G.hom)) (Over.homMk g₁) (Over.homMk g₂ hw) (by ext; simpa using h)
     simpa using congrArg (fun φ => φ.left) key
   let β₀ : B.left ⟶ B'.left := EffectiveEpi.desc q.left f.left hcomp
   have hβ₀ : q.left ≫ β₀ = f.left := EffectiveEpi.fac _ _ _
-  have hw : β₀ ≫ B'.hom = B.hom := by
-    rw [← cancel_epi q.left, reassoc_of% hβ₀, Over.w f, Over.w q]
+  have hw : β₀ ≫ B'.hom = B.hom := by rw [← cancel_epi q.left, reassoc_of% hβ₀, Over.w f, Over.w q]
   let β : B ⟶ B' := Over.homMk β₀ hw
   have hqβ : q ≫ β = f := by
     ext
@@ -130,37 +135,36 @@ theorem _root_.GlobalTheory.FlatQuotient.exists_desc {G B B' T : Over S} [GrpObj
   refine ⟨β, ⟨?_, ?_⟩, hqβ⟩
   · rw [← IsMonHom.one_hom (f := q), Category.assoc, hqβ, IsMonHom.one_hom]
   · rw [← cancel_epi (q ⊗ₘ q)]
-    calc (q ⊗ₘ q) ≫ μ ≫ β = μ ≫ q ≫ β := by
-          rw [← Category.assoc, ← IsMonHom.mul_hom, Category.assoc]
+    calc
+      (q ⊗ₘ q) ≫ μ ≫ β
+        = μ ≫ q ≫ β := by rw [← Category.assoc, ← IsMonHom.mul_hom, Category.assoc]
       _ = μ ≫ f := by rw [hqβ]
       _ = (f ⊗ₘ f) ≫ μ := IsMonHom.mul_hom f
       _ = (q ⊗ₘ q) ≫ (β ⊗ₘ β) ≫ μ := by
-          rw [← hqβ]
-          simp
+        rw [← hqβ]
+        simp
 
 end FlatQuotient
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.flatQuotient_iso_of_same_kernel :
-    ∀ (S : Scheme.{0}) (G B B' T T' : Over S) [GrpObj G] [GrpObj B] [GrpObj B'] [GrpObj T]
-      [GrpObj T'] (q : G ⟶ B) (i : T ⟶ G) (q' : G ⟶ B') (i' : T' ⟶ G),
-      IsMonHom q → IsMonHom i → Flat q.left → Surjective q.left → QuasiCompact q.left →
-      IsPullback i (toUnit _) q (η[B]) → IsMonHom q' → IsMonHom i' → Flat q'.left →
-      Surjective q'.left → QuasiCompact q'.left → IsPullback i' (toUnit _) q' (η[B']) →
-      i' ≫ q = toUnit _ ≫ η[B] → i ≫ q' = toUnit _ ≫ η[B'] →
-      ∃ β : B' ≅ B, IsMonHom β.hom ∧ q' ≫ β.hom = q := by
+theorem _root_.GlobalTheory.flatQuotient_iso_of_same_kernel
+    : ∀ (S : Scheme.{0}) (G B B' T T' : Over S) [GrpObj G] [GrpObj B] [GrpObj B'] [GrpObj T]
+        [GrpObj T'] (q : G ⟶ B) (i : T ⟶ G) (q' : G ⟶ B') (i' : T' ⟶ G),
+      IsMonHom q → IsMonHom i → Flat q.left → Surjective q.left → QuasiCompact q.left
+        → IsPullback i (toUnit _) q (η[B]) → IsMonHom q' → IsMonHom i' → Flat q'.left
+        → Surjective q'.left → QuasiCompact q'.left → IsPullback i' (toUnit _) q' (η[B'])
+        → i' ≫ q = toUnit _ ≫ η[B] → i ≫ q' = toUnit _ ≫ η[B']
+        → ∃ β : B' ≅ B, IsMonHom β.hom ∧ q' ≫ β.hom = q := by
   intro S G B B' T T' _ _ _ _ _ q i q' i' hq _ hqf hqs hqc hk hq' _ hq'f hq's hq'c hk' h₁ h₂
   obtain ⟨β, -, hqβ⟩ := _root_.GlobalTheory.FlatQuotient.exists_desc q i q' hk h₂
   obtain ⟨β', hβ', hq'β'⟩ := _root_.GlobalTheory.FlatQuotient.exists_desc q' i' q hk' h₁
   have eq : Epi q := _root_.GlobalTheory.FlatQuotient.epi_of_flat_surjective q
   have eq' : Epi q' := _root_.GlobalTheory.FlatQuotient.epi_of_flat_surjective q'
-  have e₁ : β ≫ β' = 𝟙 B := by
-    rw [← cancel_epi q, reassoc_of% hqβ, hq'β', Category.comp_id]
-  have e₂ : β' ≫ β = 𝟙 B' := by
-    rw [← cancel_epi q', reassoc_of% hq'β', hqβ, Category.comp_id]
+  have e₁ : β ≫ β' = 𝟙 B := by rw [← cancel_epi q, reassoc_of% hqβ, hq'β', Category.comp_id]
+  have e₂ : β' ≫ β = 𝟙 B' := by rw [← cancel_epi q', reassoc_of% hq'β', hqβ, Category.comp_id]
   exact ⟨⟨β', β, e₂, e₁⟩, hβ', hq'β'⟩
 
 end GlobalTheory

@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PreimageTrans
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -22,15 +25,24 @@ noncomputable section
 
 namespace GlobalTheory.InvDerBridge
 
-theorem valR_add_of {B : Type} [CommRing B] {Z : Scheme.{0}} (a : Sp B ⟶ Z) {O : Z.Opens} (ha : ⊤ ≤ a ⁻¹ᵁ O)
-    (f g : Γ(Z, O)) : valR a O (f + g) = valR a O f + valR a O g := by
+theorem valR_add_of
+    {B : Type} [CommRing B]
+    {Z : Scheme.{0}} (a : Sp B ⟶ Z)
+    {O : Z.Opens} (ha : ⊤ ≤ a ⁻¹ᵁ O) (f g : Γ(Z, O))
+    : valR a O (f + g) = valR a O f + valR a O g := by
   simp only [valR, dif_pos ha, map_add (f := _)]
 
-theorem valR_mul_of {B : Type} [CommRing B] {Z : Scheme.{0}} (a : Sp B ⟶ Z) {O : Z.Opens} (ha : ⊤ ≤ a ⁻¹ᵁ O)
-    (f g : Γ(Z, O)) : valR a O (f * g) = valR a O f * valR a O g := by
+theorem valR_mul_of
+    {B : Type} [CommRing B]
+    {Z : Scheme.{0}} (a : Sp B ⟶ Z)
+    {O : Z.Opens} (ha : ⊤ ≤ a ⁻¹ᵁ O) (f g : Γ(Z, O))
+    : valR a O (f * g) = valR a O f * valR a O g := by
   simp only [valR, dif_pos ha, map_mul]
 
-theorem isInvDer_of_isInv : ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A] [IsCommMonObj A] (v : TanM (𝟙 (Sp K)) A) (u : epsR K ⟶ A) (dd : Fld A.left), u.left = (tv v).left → IsTangent u → IsInv A v dd → GlobalTheory.KS.IsInvDer u dd := by
+theorem isInvDer_of_isInv
+    : ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A] [IsCommMonObj A] (v : TanM (𝟙 (Sp K)) A)
+        (u : epsR K ⟶ A) (dd : Fld A.left),
+      u.left = (tv v).left → IsTangent u → IsInv A v dd → GlobalTheory.KS.IsInvDer u dd := by
   intro K _ A _ _ v u dd hu ht hd W f
   have hpre : ((fst (epsR K) A ≫ u) * snd (epsR K) A).left ⁻¹ᵁ W = (snd (epsR K) A).left ⁻¹ᵁ W :=
     GlobalTheory.InvFieldBasis.preimage_translate ht W
@@ -53,8 +65,10 @@ theorem isInvDer_of_isInv : ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A
     apply Over.OverMorphism.ext
     rw [Over.comp_left, Chart.spMap_left, ← hβe]
     exact hβ
-  have hmu : x ≫ ((fst (epsR K) A ≫ u) * snd (epsR K) A).left =
-      ((Chart.spMap (GlobalTheory.SqZero.epsTo K e he) ≫ u : Chart.sp (R₀ := K) B ⟶ A) * z).left := by
+  have hmu
+      : x ≫ ((fst (epsR K) A ≫ u) * snd (epsR K) A).left
+        = ((Chart.spMap (GlobalTheory.SqZero.epsTo K e he) ≫ u : Chart.sp (R₀ := K) B ⟶ A)
+          * z).left := by
     rw [← hfst, Category.assoc, ← MonObj.comp_mul]
     rfl
   have hz : ⊤ ≤ z.left ⁻¹ᵁ W := fun p hp => hx hp

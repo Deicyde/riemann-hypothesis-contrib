@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvdSubO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
@@ -16,11 +18,15 @@ namespace GlobalTheory.ExpandCoeff
 
 open Polynomial
 
-theorem coeff_eq_zero_of_roots : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (E : Polynomial (Wq l a)), E.Monic →
-    Irreducible (E.map (GlobalTheory.TameFrob.iota l a)) → ∀ z : Om l, z ≠ 0 →
-    (∀ z' : Om l, Polynomial.aeval z' (minpoly (↥(Kunr l a)) z) = 0 → ∀ y : Om l, y ^ l = z' →
-      (E.map (GlobalTheory.TameFrob.iotaO l a)).IsRoot y) →
-    ∀ i, ¬ l ∣ i → E.coeff i = 0 := by
+theorem coeff_eq_zero_of_roots
+    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (E : Polynomial (Wq l a)),
+      E.Monic → Irreducible (E.map (GlobalTheory.TameFrob.iota l a))
+        → ∀ z : Om l,
+          z ≠ 0
+            → (∀ z' : Om l,
+              Polynomial.aeval z' (minpoly (↥(Kunr l a)) z) = 0
+                → ∀ y : Om l, y ^ l = z' → (E.map (GlobalTheory.TameFrob.iotaO l a)).IsRoot y)
+            → ∀ i, ¬ l ∣ i → E.coeff i = 0 := by
   intro l hl a _ E hE hirr z hz hroot i hi
   have hl0 : 0 < l := hl.out.pos
   set K := ↥(Kunr l a)
@@ -29,14 +35,16 @@ theorem coeff_eq_zero_of_roots : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero 
   set φ := algebraMap K (Om l)
   set EK := E.map (GlobalTheory.TameFrob.iota l a) with hEKdef
   set Q := E.map (GlobalTheory.TameFrob.iotaO l a) with hQdef
-  have hcomp : φ.comp (GlobalTheory.TameFrob.iota l a) = GlobalTheory.TameFrob.iotaO l a := RingHom.ext fun w => rfl
+  have hcomp : φ.comp (GlobalTheory.TameFrob.iota l a) = GlobalTheory.TameFrob.iotaO l a :=
+    RingHom.ext fun w => rfl
   have hmapQ : EK.map φ = Q := by rw [hEKdef, Polynomial.map_map, hcomp]
   have hev : ∀ y : Om l, Polynomial.aeval y EK = Q.eval y := fun y => by
     rw [Polynomial.aeval_def, ← Polynomial.eval_map, hmapQ]
   obtain ⟨y0, hy0⟩ := IsAlgClosed.exists_pow_nat_eq z hl0
   have hQ0 : Q.IsRoot y0 := hroot z (minpoly.aeval K z) y0 hy0
   have hEK : EK.Monic := hE.map _
-  have hEKmin : EK = minpoly K y0 := minpoly.eq_of_irreducible_of_monic hirr (by rw [hev]; exact hQ0) hEK
+  have hEKmin : EK = minpoly K y0 :=
+    minpoly.eq_of_irreducible_of_monic hirr (by rw [hev]; exact hQ0) hEK
   set P := Polynomial.expand K l m with hPdef
   have hPmon : P.Monic := (minpoly.monic hzi).expand hl0
   have hPy0 : Polynomial.aeval y0 P = 0 := by
@@ -53,7 +61,8 @@ theorem coeff_eq_zero_of_roots : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero 
     have h2 : IsCoprime P (Polynomial.X ^ (l - 1)) := by
       refine IsCoprime.pow_right ?_
       refine IsCoprime.symm ((Polynomial.irreducible_X.coprime_iff_not_dvd).2 ?_)
-      rw [Polynomial.X_dvd_iff, hPdef, Polynomial.coeff_expand hl0, if_pos (dvd_zero l), Nat.zero_div]
+      rw [Polynomial.X_dvd_iff, hPdef, Polynomial.coeff_expand hl0, if_pos (dvd_zero l),
+        Nat.zero_div]
       exact hc0
     have h3 : IsCoprime P ((l : K[X])) := by
       have hu : IsUnit ((l : K[X])) := by
@@ -70,13 +79,15 @@ theorem coeff_eq_zero_of_roots : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero 
     (Polynomial.splits_iff_card_roots).1 (IsAlgClosed.splits P')
   have hle : P'.roots ≤ Q.roots := by
     refine (Multiset.le_iff_subset hnod).2 fun y hy => ?_
-    rw [Polynomial.mem_roots hP'0, Polynomial.IsRoot, hP'def, Polynomial.eval_map, ← Polynomial.aeval_def,
-      hPdef, Polynomial.expand_aeval] at hy
+    rw [Polynomial.mem_roots hP'0, Polynomial.IsRoot, hP'def, Polynomial.eval_map,
+        ← Polynomial.aeval_def, hPdef, Polynomial.expand_aeval]
+      at hy
     exact (Polynomial.mem_roots hQne).2 (hroot _ hy y rfl)
   have hdeg : P.natDegree ≤ EK.natDegree := by
     have e1 : P'.natDegree = P.natDegree := Polynomial.natDegree_map φ
     have e2 : EK.natDegree = Q.natDegree := by
-      rw [hEKdef, hQdef, Polynomial.natDegree_map_eq_of_injective (GlobalTheory.TameFrob.iota_injective l a),
+      rw [hEKdef, hQdef,
+        Polynomial.natDegree_map_eq_of_injective (GlobalTheory.TameFrob.iota_injective l a),
         Polynomial.natDegree_map_eq_of_injective (GlobalTheory.TameFrob.iotaO_injective l a)]
     rw [← e1, e2, ← hcard]
     exact (Multiset.card_le_card hle).trans (Polynomial.card_roots' Q)

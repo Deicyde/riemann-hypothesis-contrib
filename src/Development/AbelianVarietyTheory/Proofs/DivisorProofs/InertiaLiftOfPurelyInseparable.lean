@@ -6,19 +6,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tat
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.InertiaLift
 
-theorem mem_iff_pow_mem {F : Type} [Field F] (A : ValuationSubring F) {m : ℕ} (hm : 0 < m) (y : F) :
-    y ∈ A ↔ y ^ m ∈ A := by
+theorem mem_iff_pow_mem {F : Type} [Field F] (A : ValuationSubring F) {m : ℕ} (hm : 0 < m) (y : F)
+    : y ∈ A ↔ y ^ m ∈ A := by
   rw [← A.valuation_le_one_iff, ← A.valuation_le_one_iff, map_pow]
   exact (pow_le_one_iff_of_nonneg zero_le' hm.ne').symm
 
-theorem nonunit_of_pow {F : Type} [Field F] (A : ValuationSubring F) {m : ℕ} (hm : 0 < m) (z : F)
-    (h : A.valuation (z ^ m) < 1) : A.valuation z < 1 := by
+theorem nonunit_of_pow
+    {F : Type} [Field F]
+    (A : ValuationSubring F)
+    {m : ℕ} (hm : 0 < m)
+    (z : F) (h : A.valuation (z ^ m) < 1)
+    : A.valuation z < 1 := by
   rw [map_pow] at h
   by_contra h'
   push_neg at h'
@@ -27,7 +32,13 @@ theorem nonunit_of_pow {F : Type} [Field F] (A : ValuationSubring F) {m : ℕ} (
 end GlobalTheory.InertiaLift
 
 open GlobalTheory.InertiaLift in
-theorem GlobalTheory.inertia_lift_of_purelyInseparable : ∀ (K L Ω Ω' : Type) [Field K] [Field L] [Field Ω] [Field Ω'] [Algebra K Ω] [Algebra L Ω'] [Algebra K Ω'] (j : Ω →ₐ[K] Ω'), (∀ y : Ω', ∃ (m : ℕ) (x : Ω), 0 < m ∧ y ^ m = j x ∧ ∀ a b : Ω', (a - b) ^ m = a ^ m - b ^ m) → ∀ (V' : ValuationSubring Ω') (σ : Ω ≃ₐ[K] Ω) (σ' : Ω' ≃ₐ[L] Ω'), (∀ x, σ' (j x) = j (σ x)) → σ ∈ inertia K (V'.comap (j : Ω →+* Ω')) → σ' ∈ inertia L V' := by
+theorem GlobalTheory.inertia_lift_of_purelyInseparable
+    : ∀ (K L Ω Ω' : Type) [Field K] [Field L] [Field Ω] [Field Ω'] [Algebra K Ω] [Algebra L Ω']
+        [Algebra K Ω'] (j : Ω →ₐ[K] Ω'),
+      (∀ y : Ω', ∃ (m : ℕ) (x : Ω), 0 < m ∧ y ^ m = j x ∧ ∀ a b : Ω', (a - b) ^ m = a ^ m - b ^ m)
+        → ∀ (V' : ValuationSubring Ω') (σ : Ω ≃ₐ[K] Ω) (σ' : Ω' ≃ₐ[L] Ω'),
+          (∀ x, σ' (j x) = j (σ x)) → σ ∈ inertia K (V'.comap (j : Ω →+* Ω'))
+            → σ' ∈ inertia L V' := by
   intro K L Ω Ω' _ _ _ _ _ _ _ j hpi V' σ σ' hcomm hσ
   rw [mem_inertia_iff] at hσ ⊢
   obtain ⟨hσV, hσv⟩ := hσ

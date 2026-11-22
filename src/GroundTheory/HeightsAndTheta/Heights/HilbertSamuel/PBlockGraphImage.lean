@@ -11,7 +11,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
 
 theorem BlockGraphImage.proof : BlockGraphImage.Statement := by
   intro K _ ι _ Ω _ _ κ _ y k₀ M N x hB
@@ -42,20 +43,24 @@ theorem BlockGraphImage.proof : BlockGraphImage.Statement := by
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [mul_assoc]
   let G : MRing (GlobalTheory κ) →+* MvPolynomial Unit (MvPolynomial K Ω) :=
-    (MvPolynomial.map φ).comp ((graphMap (mCoordIdeal y) (blockForms k₀ M)).comp
-      (rename (inrV (ι := ι) (ι₂ := GlobalTheory κ)) : MRing (GlobalTheory κ) →ₐ[ℤ] _).toRingHom)
+    (MvPolynomial.map φ).comp
+      ((graphMap (mCoordIdeal y) (blockForms k₀ M)).comp
+        (rename (inrV (ι := ι) (ι₂ := GlobalTheory κ)) : MRing (GlobalTheory κ) →ₐ[ℤ] _).toRingHom)
   have hG : ∀ f, G f = ψ (coneMap ℤ x f) := by
     have h : G = ψ.comp (coneMap ℤ x).toRingHom := by
       apply MvPolynomial.ringHom_ext
       · intro n
-        exact RingHom.congr_fun (RingHom.ext_int (G.comp C) ((ψ.comp (coneMap ℤ x).toRingHom).comp C)) n
+        exact RingHom.congr_fun
+          (RingHom.ext_int (G.comp C) ((ψ.comp (coneMap ℤ x).toRingHom).comp C)) n
       · rintro ⟨u, j⟩
         cases u
-        simp only [G, RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, rename_X]
+        simp only [G, RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe,
+          RingHom.coe_coe, rename_X]
         rw [show (inrV (ι := ι) (ι₂ := GlobalTheory κ) ⟨(), j⟩) = ⟨Sum.inr (), j⟩ from rfl]
         rw [graphMap, eval₂Hom_X']
         simp only [map_mul, map_C, map_X, coneMap, aeval_X]
-        rw [show φ (Ideal.Quotient.mk (mCoordIdeal y) (blockForms k₀ M ⟨(), j⟩)) = C (x ⟨(), j⟩) * X k₀ from
+        rw [show φ (Ideal.Quotient.mk (mCoordIdeal y) (blockForms k₀ M ⟨(), j⟩))
+            = C (x ⟨(), j⟩) * X k₀ from
           (Ideal.Quotient.lift_mk _ _ _).trans (hcone _)]
         simp [ψ, mul_assoc]
     exact fun f => RingHom.congr_fun h f

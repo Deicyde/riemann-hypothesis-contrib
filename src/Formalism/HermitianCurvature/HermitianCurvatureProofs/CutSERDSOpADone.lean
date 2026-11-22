@@ -11,9 +11,11 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutSERDSALoc
 namespace Formalism.FourierDecayAlt.P.CutSE
 
 theorem spectral_operator_A : RDSOpA :=
-  rDSOpA_of_parts spectral_polynomial_property spectral_group_action spectral_radial_action spectral_action_locality
+  rDSOpA_of_parts spectral_polynomial_property spectral_group_action spectral_radial_action
+    spectral_action_locality
 
 theorem spectral_operator_A_adjoint : RDSOpAv :=
-  rDSOpAv_of_parts spectral_polynomial_property spectral_group_action spectral_radial_action spectral_action_locality
+  rDSOpAv_of_parts spectral_polynomial_property spectral_group_action spectral_radial_action
+    spectral_action_locality
 
 end Formalism.FourierDecayAlt.P.CutSE

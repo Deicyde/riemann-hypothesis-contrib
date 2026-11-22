@@ -13,7 +13,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Top
 
 namespace GlobalTheory.IrrQuot
 
-theorem main : ∀ (G V : Type) [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (s : Finset V), Nontrivial V → Submodule.span ℂ {w | ∃ g : G, ∃ v ∈ s, w = ρ g v} = ⊤ → ∃ (W : Type) (_ : AddCommGroup W) (_ : Module ℂ W) (τ : Representation ℂ G W), τ.IsIrreducible ∧ ∃ f : ρ.IntertwiningMap τ, Function.Surjective f := by
+theorem main
+    : ∀ (G V : Type) [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
+        (s : Finset V),
+      Nontrivial V → Submodule.span ℂ {w | ∃ g : G, ∃ v ∈ s, w = ρ g v} = ⊤
+        → ∃ (W : Type) (_ : AddCommGroup W) (_ : Module ℂ W) (τ : Representation ℂ G W),
+          τ.IsIrreducible ∧ ∃ f : ρ.IntertwiningMap τ, Function.Surjective f := by
   intro G V _ _ _ ρ s hV hspan
   have key : ∀ T : Subrepresentation ρ, (∀ v ∈ s, v ∈ T.toSubmodule) → T = ⊤ := by
     intro T hT
@@ -41,8 +46,23 @@ theorem main : ∀ (G V : Type) [Group G] [AddCommGroup V] [Module ℂ V] (ρ : 
     rw [← h] at this
     exact hv this
   obtain ⟨M, hM, -⟩ := (eq_top_or_exists_le_coatom (⊥ : Subrepresentation ρ)).resolve_left hbt
-  refine ⟨_, inferInstance, inferInstance, GlobalTheory.SmGL.subQuot ⊤ M, GlobalTheory.SmGL.isIrreducible_subQuot hM.covBy_top, ?_⟩
-  refine ⟨⟨(Submodule.mkQ _).comp (LinearMap.codRestrict (⊤ : Subrepresentation ρ).toSubmodule LinearMap.id (fun _ => trivial)), fun g => rfl⟩, ?_⟩
+  refine ⟨
+    _,
+    inferInstance,
+    inferInstance,
+    GlobalTheory.SmGL.subQuot ⊤ M,
+    GlobalTheory.SmGL.isIrreducible_subQuot hM.covBy_top,
+    ?_
+  ⟩
+  refine ⟨
+    ⟨
+      (Submodule.mkQ _).comp
+        (LinearMap.codRestrict (⊤ : Subrepresentation ρ).toSubmodule LinearMap.id
+          (fun _ => trivial)),
+      fun g => rfl
+    ⟩,
+    ?_
+  ⟩
   intro y
   obtain ⟨⟨v, _⟩, rfl⟩ := Submodule.Quotient.mk_surjective _ y
   exact ⟨v, rfl⟩

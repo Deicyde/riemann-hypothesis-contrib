@@ -14,31 +14,48 @@ namespace GlobalTheory.PD
 
 open Polynomial
 
-theorem isIntegral_of_le {k F K : Type} [Field k] [Field F] [Field K] [Algebra k F] [Algebra F K]
-    {A A' : Subalgebra k F} (h : A ≤ A') {y : K} (hy : IsIntegral A y) : IsIntegral A' y := by
+theorem isIntegral_of_le
+    {k F K : Type} [Field k] [Field F] [Field K] [Algebra k F] [Algebra F K]
+    {A A' : Subalgebra k F} (h : A ≤ A')
+    {y : K} (hy : IsIntegral A y)
+    : IsIntegral A' y := by
   obtain ⟨p, hm, he⟩ := hy
   refine ⟨p.map (Subalgebra.inclusion h), hm.map _, ?_⟩
   rw [eval₂_map]
   exact he
 
-theorem rA_mono (k : Type) [Field k] {F : Type} [Field F] [Algebra k F] {d : ℕ} (x : Fin (d + 1) → F)
-    {I J : Finset (Fin (d + 1))} (h : I ⊆ J) : rA k x I ≤ rA k x J := by
+theorem rA_mono
+    (k : Type) [Field k]
+    {F : Type} [Field F] [Algebra k F]
+    {d : ℕ} (x : Fin (d + 1) → F)
+    {I J : Finset (Fin (d + 1))} (h : I ⊆ J)
+    : rA k x I ≤ rA k x J := by
   apply Algebra.adjoin_mono
   rintro y ⟨i, hi, j, rfl⟩
   exact ⟨i, h hi, j, rfl⟩
 
-theorem rB_mono_loc : ∀ (k : Type) [Field k] [CharZero k] (F K : Type) [Field F] [Field K] [Algebra k F] [Algebra k K]
-    [Algebra F K] [IsScalarTower k F K] (d : ℕ) (x : Fin (d + 1) → F), IsFinCover k K x →
-    ∀ (I : Finset (Fin (d + 1))) (i : Fin (d + 1)), i ∈ I →
-    (∀ J, I ⊆ J → rB k K x I ≤ rB k K x J) ∧
-    ∀ y : K, y ∈ rB k K x I ↔ ∃ N : ℕ, y * algebraMap F K (∏ j ∈ I, x j / x i) ^ N ∈ rB k K x {i} := by
+theorem rB_mono_loc
+    : ∀ (k : Type) [Field k] [CharZero k] (F K : Type) [Field F] [Field K] [Algebra k F]
+        [Algebra k K] [Algebra F K] [IsScalarTower k F K] (d : ℕ) (x : Fin (d + 1) → F),
+      IsFinCover k K x
+        → ∀ (I : Finset (Fin (d + 1))) (i : Fin (d + 1)),
+          i ∈ I
+            → (∀ J, I ⊆ J → rB k K x I ≤ rB k K x J)
+              ∧ ∀ y : K,
+                y ∈ rB k K x I
+                  ↔ ∃ N : ℕ, y * algebraMap F K (∏ j ∈ I, x j / x i) ^ N ∈ rB k K x {i} := by
   intro k _ _ F K _ _ _ _ _ _ d x hK I i hi
-  have memB : ∀ (J : Finset (Fin (d + 1))) (y : K), y ∈ rB k K x J ↔ IsIntegral (rA k x J) y := fun J y => by
+  have memB
+      : ∀ (J : Finset (Fin (d + 1))) (y : K),
+        y ∈ rB k K x J ↔ IsIntegral (rA k x J) y := fun J y => by
     rw [rB, Subalgebra.mem_restrictScalars, mem_integralClosure_iff]
-  refine ⟨fun J hJ y hy => (memB J y).2 (isIntegral_of_le (rA_mono k x hJ) ((memB I y).1 hy)), fun y => ?_⟩
+  refine ⟨
+    fun J hJ y hy => (memB J y).2 (isIntegral_of_le (rA_mono k x hJ) ((memB I y).1 hy)),
+    fun y => ?_
+  ⟩
   set s : F := ∏ j ∈ I, x j / x i with hs
-  have hsi : s ∈ rA k x {i} := Subalgebra.prod_mem _ fun j _ =>
-    Algebra.subset_adjoin ⟨i, Finset.mem_singleton_self i, j, rfl⟩
+  have hsi : s ∈ rA k x {i} :=
+    Subalgebra.prod_mem _ fun j _ => Algebra.subset_adjoin ⟨i, Finset.mem_singleton_self i, j, rfl⟩
   have hsinv : s⁻¹ ∈ rA k x I := by
     rw [hs, ← Finset.prod_inv_distrib]
     refine Subalgebra.prod_mem _ fun j hj => ?_
@@ -50,7 +67,8 @@ theorem rB_mono_loc : ∀ (k : Type) [Field k] [CharZero k] (F K : Type) [Field 
   constructor
   · rintro ⟨p, hm, he⟩
     have hc : ∀ m, ∃ N : ℕ, (p.coeff m : F) * s ^ N ∈ rA k x {i} := fun m =>
-      (GlobalTheory.T.mem_standardOpenCoordinateRing_iff_localization_chart k F d x hK.pd I i hi (p.coeff m : F)).1 (p.coeff m).2
+      (GlobalTheory.T.mem_standardOpenCoordinateRing_iff_localization_chart k F d x hK.pd I i hi
+        (p.coeff m : F)).1 (p.coeff m).2
     choose Nf hNf using hc
     set N := (Finset.range (p.natDegree + 1)).sup Nf
     have hcN : ∀ m, (p.coeff m : F) * s ^ N ∈ rA k x {i} := by
@@ -69,7 +87,8 @@ theorem rB_mono_loc : ∀ (k : Type) [Field k] [CharZero k] (F K : Type) [Field 
       rw [lifts_iff_coeff_lifts]
       intro m
       rw [coeff_scaleRoots, coeff_map, hdeg]
-      have hmem : (algebraMap (rA k x I) F (p.coeff m)) * (s ^ N) ^ (p.natDegree - m) ∈ rA k x {i} := by
+      have hmem
+          : (algebraMap (rA k x I) F (p.coeff m)) * (s ^ N) ^ (p.natDegree - m) ∈ rA k x {i} := by
         by_cases hmd : m < p.natDegree
         · obtain ⟨e, he'⟩ : ∃ e, p.natDegree - m = e + 1 := ⟨p.natDegree - m - 1, by omega⟩
           rw [he', pow_succ', ← mul_assoc]

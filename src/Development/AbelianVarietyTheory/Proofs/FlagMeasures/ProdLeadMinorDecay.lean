@@ -152,7 +152,21 @@ lemma min_mul_eq (H c : ℝ) (hH : 0 ≤ H) :
     · rw [div_mul_eq_mul_div, one_mul, div_eq_div_iff (by positivity) hc]
       linear_combination c * this
 
-theorem prod_leadMinor_decay : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (h : ℝ) (X km : Matrix (Fin n) (Fin n) ℂ), IsHCParam lam → GapAtLeast ε lam h → inP ε X → km ∈ Kset ε → (∀ (l : ℕ) (hl : l ≤ n), 0 < (leadMinor (km⁻¹ * NormedSpace.exp X * km) l hl).re ∧ (leadMinor (km⁻¹ * NormedSpace.exp X * km) l hl).im = 0) ∧ ∏ i : Fin (n - 1), (leadMinor (km⁻¹ * NormedSpace.exp X * km) (i.val + 1) (by omega)).re ^ (-(lam ⟨i.val, by omega⟩ - lam ⟨i.val + 1, by omega⟩ + 1)) ≤ Real.exp (-(h / 8) * min (hs X) (Real.sqrt (hs X) / Real.sqrt (2 * ((min (univ.filter fun a => ε a = true).card (univ.filter fun a => ε a = false).card : ℕ) : ℝ)))) := by
+theorem prod_leadMinor_decay
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (h : ℝ) (X km : Matrix (Fin n) (Fin n) ℂ),
+      IsHCParam lam → GapAtLeast ε lam h → inP ε X → km ∈ Kset ε
+        → (∀ (l : ℕ) (hl : l ≤ n),
+            0 < (leadMinor (km⁻¹ * NormedSpace.exp X * km) l hl).re
+              ∧ (leadMinor (km⁻¹ * NormedSpace.exp X * km) l hl).im = 0)
+          ∧ ∏ i : Fin (n - 1), (leadMinor (km⁻¹ * NormedSpace.exp X * km) (i.val + 1) (by omega)).re ^ (-(lam ⟨i.val, by omega⟩ - lam ⟨i.val + 1, by omega⟩ + 1))
+            ≤ Real.exp
+              (-(h / 8) * min (hs X)
+                (Real.sqrt (hs X) / Real.sqrt
+                  (2
+                    * ((min (univ.filter fun a => ε a = true).card
+                          (univ.filter fun a => ε a = false).card
+                        : ℕ)
+                      : ℝ)))) := by
   intro n ε lam h X km hlam hgap hX hk
   obtain ⟨hY, hhs, hexp⟩ := conj_facts hX hk
   rw [hexp, ← hhs]
@@ -174,8 +188,7 @@ theorem prod_leadMinor_decay : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n 
   refine h2.trans ?_
   rw [← Finset.sum_neg_distrib]
   refine Finset.sum_le_sum fun i _ => ?_
-  have hlt : lam ⟨i.val + 1, by omega⟩ < lam ⟨i.val, by omega⟩ :=
-    hlam.1 (by simp [Fin.lt_def])
+  have hlt : lam ⟨i.val + 1, by omega⟩ < lam ⟨i.val, by omega⟩ := hlam.1 (by simp [Fin.lt_def])
   have hk := (key (i.val + 1) (by omega)).2.2
   have hs0 : 0 ≤ lam ⟨i.val, by omega⟩ - lam ⟨i.val + 1, by omega⟩ + 1 := by linarith
   have := mul_le_mul_of_nonneg_left hk hs0

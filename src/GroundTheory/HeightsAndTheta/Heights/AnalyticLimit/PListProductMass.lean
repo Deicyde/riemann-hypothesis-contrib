@@ -34,15 +34,18 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 
 open MeasureTheory Filter Topology
 open ReciprocityTheory.AnForm (levi levi_add_smul)
-open ReciprocityTheory.AnForm.M (FinHolAtlas LocPot IsPotential IsPsh mInt maMeasure isPotentialAdd
-  isPotentialRsmul isPotential_ofFun isPshAdd maMeasureMono maMeasure_thm massIndep mIntegrableCont
-  pot_contDiffAt_two)
+open ReciprocityTheory.AnForm.M
+  (FinHolAtlas LocPot IsPotential IsPsh mInt maMeasure isPotentialAdd isPotentialRsmul
+    isPotential_ofFun isPshAdd maMeasureMono maMeasure_thm massIndep mIntegrableCont
+    pot_contDiffAt_two)
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (RegChartData)
 
 variable {D : ℕ} {X : Type} [TopologicalSpace X]
 
-theorem isPsh_of_formNonneg {A : FinHolAtlas D X} {V : Set X} (hV : interior Vᶜ = ∅)
-    {P : LocPot X} (hP : IsPotential A P) (hnn : FormNonneg A V P) : IsPsh A P := by
+theorem isPsh_of_formNonneg
+    {A : FinHolAtlas D X} {V : Set X} (hV : interior Vᶜ = ∅)
+    {P : LocPot X} (hP : IsPotential A P) (hnn : FormNonneg A V P)
+    : IsPsh A P := by
   intro x j y hy w
   by_contra hneg
   push Not at hneg
@@ -50,13 +53,14 @@ theorem isPsh_of_formNonneg {A : FinHolAtlas D X} {V : Set X} (hV : interior V�
     (A.chart j).isOpen_inter_preimage_symm (P.isOpen_U x)
   have h2 := pot_contDiffAt_two hP x j hy.1 hy.2
   have hc : ContinuousAt (fun z => levi (P.φ x ∘ (A.chart j).symm) z w) y := by
-    have h0 := ((h2.fderiv_right (m := 1) (by norm_num)).fderiv_right (m := 0)
-      (by norm_num)).continuousAt
+    have h0 :=
+      ((h2.fderiv_right (m := 1) (by norm_num)).fderiv_right (m := 0) (by norm_num)).continuousAt
     unfold levi
     exact (((h0.clm_apply continuousAt_const).clm_apply continuousAt_const).add
       ((h0.clm_apply continuousAt_const).clm_apply continuousAt_const)).div_const 4
-  have hev : ∀ᶠ z in 𝓝 y, levi (P.φ x ∘ (A.chart j).symm) z w < 0 ∧
-      z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' P.U x :=
+  have hev
+      : ∀ᶠ z in 𝓝 y, levi (P.φ x ∘ (A.chart j).symm) z w < 0 ∧
+        z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' P.U x :=
     (hc.eventually (eventually_lt_nhds hneg)).and (hO.mem_nhds hy)
   obtain ⟨N, hNsub, hNo, hyN⟩ := mem_nhds_iff.1 hev
   have himg : IsOpen ((A.chart j).symm '' N) :=

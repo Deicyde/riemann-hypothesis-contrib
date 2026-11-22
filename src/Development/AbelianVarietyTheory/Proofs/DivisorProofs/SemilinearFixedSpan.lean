@@ -6,11 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem semilinear_fixed_span (L : Type) [Field L] (s : L ≃+* L) (r : ℕ) (hr : 0 < r)
-    (hsr : ∀ x, (⇑s)^[r] x = x) (hsi : ∀ i, 0 < i → i < r → ∃ x, (⇑s)^[i] x ≠ x)
-    (V : Type) [AddCommGroup V] [Module L V] [FiniteDimensional L V] (F : V →+ V)
-    (hF : ∀ (a : L) (v : V), F (a • v) = s a • F v) (hFr : ∀ v, (⇑F)^[r] v = v) :
-    Submodule.span L {v | F v = v} = ⊤ := by
+theorem semilinear_fixed_span
+    (L : Type) [Field L]
+    (s : L ≃+* L) (r : ℕ)
+    (hr : 0 < r) (hsr : ∀ x, (⇑s)^[r] x = x) (hsi : ∀ i, 0 < i → i < r → ∃ x, (⇑s)^[i] x ≠ x)
+    (V : Type) [AddCommGroup V] [Module L V] [FiniteDimensional L V]
+    (F : V →+ V) (hF : ∀ (a : L) (v : V), F (a • v) = s a • F v) (hFr : ∀ v, (⇑F)^[r] v = v)
+    : Submodule.span L {v | F v = v} = ⊤ := by
   by_contra hne
   obtain ⟨f, hf0, hfk⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
   obtain ⟨v, hv⟩ : ∃ v, f v ≠ 0 := by
@@ -65,8 +67,7 @@ theorem semilinear_fixed_span (L : Type) [Field L] (s : L ≃+* L) (r : ℕ) (hr
     have h0 := hfk hfix
     set_option synthInstance.maxHeartbeats 100000 in
       rw [LinearMap.mem_ker, map_sum] at h0
-    simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, hχ,
-      Pi.zero_apply]
+    simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, hχ, Pi.zero_apply]
     rw [Fin.sum_univ_eq_sum_range (fun i => f ((⇑F)^[i] v) * (⇑s)^[i] a)]
     rw [← h0]
     refine Finset.sum_congr rfl fun i _ => ?_

@@ -12,18 +12,27 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Admissib
 
 open scoped Classical InnerProductSpace ComplexConjugate
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.AutomorphicL2Unitary GlobalTheory.SqIntGL
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.SqIntGL
 open scoped GlobalTheory.CuspRep.CuspidalL2GL
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.FinDiscOrth
 
-theorem rt_mem_l2Sub_and_inner_eq (E : Type) [Field E] [NumberField E] [IsCMField E] (N : ℕ) (μ : Measure (GA E N))
-    [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (g : GA E N) (x y : Sm E N) (hx : x ∈ squareIntegrableSmoothSubmoduleGL μ) (hy : y ∈ squareIntegrableSmoothSubmoduleGL μ) :
-    rt E N g x ∈ squareIntegrableSmoothSubmoduleGL μ ∧ ⟪l2Map μ (rt E N g x), l2Map μ (rt E N g y)⟫_ℂ = ⟪l2Map μ x, l2Map μ y⟫_ℂ := by
-  have key : ∀ z : Sm E N, ∀ hz : z ∈ squareIntegrableSmoothSubmoduleGL μ, ∃ h' : rt E N g z ∈ squareIntegrableSmoothSubmoduleGL μ,
-      l2Map μ (rt E N g z) = R (latticeGL E N) μ g (l2Map μ z) := by
+theorem rt_mem_l2Sub_and_inner_eq
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (N : ℕ) (μ : Measure (GA E N)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
+    (g : GA E N)
+    (x y : Sm E N)
+    (hx : x ∈ squareIntegrableSmoothSubmoduleGL μ) (hy : y ∈ squareIntegrableSmoothSubmoduleGL μ)
+    : rt E N g x ∈ squareIntegrableSmoothSubmoduleGL μ
+      ∧ ⟪l2Map μ (rt E N g x), l2Map μ (rt E N g y)⟫_ℂ = ⟪l2Map μ x, l2Map μ y⟫_ℂ := by
+  have key
+      : ∀ z : Sm E N, ∀ hz : z ∈ squareIntegrableSmoothSubmoduleGL μ,
+        ∃ h' : rt E N g z ∈ squareIntegrableSmoothSubmoduleGL μ,
+          l2Map μ (rt E N g z) = R (latticeGL E N) μ g (l2Map μ z) := by
     intro z hz
     have h' : rt E N g z ∈ squareIntegrableSmoothSubmoduleGL μ := ((mem_l2Sub μ).1 hz).mul_right g
     refine ⟨h', ?_⟩

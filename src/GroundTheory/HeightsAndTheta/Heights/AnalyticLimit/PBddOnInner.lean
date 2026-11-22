@@ -11,11 +11,11 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (RegChartData RegCharts)
 
-theorem bdDom_compact_inner {D : ℕ} {X : Type} [TopologicalSpace X] {A : ReciprocityTheory.AnForm.M.FinHolAtlas D X}
-    (R : RegChartData A) (j : Fin R.n) :
-    IsCompact ((R.ψ j).symm '' closure (R.W'' j)) ∧
-      (R.ψ j).symm '' closure (R.W'' j) ⊆ bdDom R j ∧
-      R.V'' j ⊆ (R.ψ j).symm '' closure (R.W'' j) := by
+theorem bdDom_compact_inner
+    {D : ℕ} {X : Type} [TopologicalSpace X]
+    {A : ReciprocityTheory.AnForm.M.FinHolAtlas D X} (R : RegChartData A) (j : Fin R.n)
+    : IsCompact ((R.ψ j).symm '' closure (R.W'' j)) ∧ (R.ψ j).symm '' closure (R.W'' j) ⊆ bdDom R j
+      ∧ R.V'' j ⊆ (R.ψ j).symm '' closure (R.W'' j) := by
   have hW : closure (R.W'' j) ⊆ R.W j :=
     (R.closure_W''_subset j).trans (subset_closure.trans (R.closure_W'_subset j))
   have hT : closure (R.W'' j) ⊆ (R.ψ j).target := hW.trans (R.W_subset j)

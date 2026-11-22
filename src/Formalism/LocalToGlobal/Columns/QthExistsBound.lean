@@ -38,15 +38,19 @@ theorem qth_exists_bound (x : E) : ∃ k : ℕ, P.valuation E x ≤ WithZero.exp
     conv_lhs => rw [← WithZero.exp_log hx]
     exact WithZero.exp_le_exp.2 (Int.self_le_toNat _)
 
-theorem qth_bound {m : ℕ} (M : Matrix (Fin m) (Fin m) E) : ∃ a : ℕ, ∀ i j, P.valuation E (M i j) ≤ WithZero.exp (a : ℤ) := by
+theorem qth_bound {m : ℕ} (M : Matrix (Fin m) (Fin m) E)
+    : ∃ a : ℕ, ∀ i j, P.valuation E (M i j) ≤ WithZero.exp (a : ℤ) := by
   choose k hk using fun ij : Fin m × Fin m => qth_exists_bound P (M ij.1 ij.2)
   refine ⟨Finset.univ.sup k, fun i j => (hk (i, j)).trans ?_⟩
   exact WithZero.exp_le_exp.2 (Nat.cast_le.2 (Finset.le_sup (f := k) (Finset.mem_univ (i, j))))
 
-theorem qth_conj_le {m : ℕ} (A Z B : Matrix (Fin m) (Fin m) E) (a b N : ℤ)
-    (hA : ∀ i j, P.valuation E (A i j) ≤ WithZero.exp a) (hZ : ∀ i j, P.valuation E (Z i j) ≤ WithZero.exp (-N))
-    (hB : ∀ i j, P.valuation E (B i j) ≤ WithZero.exp b) (i j : Fin m) :
-    P.valuation E ((A * Z * B) i j) ≤ WithZero.exp (a + -N + b) := by
+theorem qth_conj_le
+    {m : ℕ} (A Z B : Matrix (Fin m) (Fin m) E)
+    (a b N : ℤ) (hA : ∀ i j, P.valuation E (A i j) ≤ WithZero.exp a)
+    (hZ : ∀ i j, P.valuation E (Z i j) ≤ WithZero.exp (-N))
+    (hB : ∀ i j, P.valuation E (B i j) ≤ WithZero.exp b)
+    (i j : Fin m)
+    : P.valuation E ((A * Z * B) i j) ≤ WithZero.exp (a + -N + b) := by
   rw [Matrix.mul_apply]
   refine Valuation.map_sum_le _ fun k _ => ?_
   rw [map_mul, WithZero.exp_add]

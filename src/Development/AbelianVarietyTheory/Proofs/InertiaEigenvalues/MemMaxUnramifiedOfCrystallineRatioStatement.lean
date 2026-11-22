@@ -8,7 +8,16 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.mem_maxUnramified_of_crystallineRatio : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → ∀ (a b : P.R.B) (x : Om l), b ≠ 0 → P.ιB a = algebraMap (Om l) P.R.BdR x * P.ιB b → x ∈ MaximalUnramifiedExtension l := by
-  first | exact @GlobalTheory.FracAlg.mem_Kur_of_ratio | exact GlobalTheory.FracAlg.mem_Kur_of_ratio | (intros; apply GlobalTheory.FracAlg.mem_Kur_of_ratio <;> assumption)
+theorem _root_.GlobalTheory.T.mem_maxUnramified_of_crystallineRatio
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (a b : P.R.B) (x : Om l),
+          b ≠ 0 → P.ιB a = algebraMap (Om l) P.R.BdR x * P.ιB b
+            → x ∈ MaximalUnramifiedExtension l := by
+  first
+  | exact @GlobalTheory.FracAlg.mem_Kur_of_ratio
+  | exact GlobalTheory.FracAlg.mem_Kur_of_ratio
+  | (intros; apply GlobalTheory.FracAlg.mem_Kur_of_ratio <;> assumption)

@@ -19,14 +19,18 @@ universe u v
 
 namespace FiltrationHilbSum
 
-variable {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-  {M : Type v} [AddCommGroup M] [Module (MRing ι F) M] [Module F M]
-  [IsScalarTower F (MRing ι F) M] {piece : (K → ℤ) → Submodule F M}
+variable
+  {F : Type u} [Field F]
+  {K : Type} [Fintype K] [DecidableEq K]
+  {ι : K → Type} {M : Type v}
+  [AddCommGroup M] [Module (MRing ι F) M] [Module F M] [IsScalarTower F (MRing ι F) M]
+  {piece : (K → ℤ) → Submodule F M}
 
-theorem monomial_smul_mem (hM : IsMultigrading ι M piece) (d : (Σ k, ι k) →₀ ℕ) (a : F)
-    {m : K → ℤ} {y : M} (hy : y ∈ piece m) :
-    (monomial d a : MRing ι F) • y ∈
-      piece (m + fun k => (Finsupp.weight (blockWeight ι) d k : ℤ)) := by
+theorem monomial_smul_mem
+    (hM : IsMultigrading ι M piece) (d : (Σ k, ι k) →₀ ℕ) (a : F)
+    {m : K → ℤ} {y : M} (hy : y ∈ piece m)
+    : (monomial d a : MRing ι F) • y
+      ∈ piece (m + fun k => (Finsupp.weight (blockWeight ι) d k : ℤ)) := by
   induction d using Finsupp.induction generalizing m y with
   | zero =>
     have h0 : (fun k => ((Finsupp.weight (blockWeight ι) (0 : (Σ k, ι k) →₀ ℕ)) k : ℤ)) = 0 := by
@@ -35,8 +39,9 @@ theorem monomial_smul_mem (hM : IsMultigrading ι M piece) (d : (Σ k, ι k) →
     rw [h0, add_zero, ← C_apply, ← algebraMap_eq, algebraMap_smul]
     exact (piece m).smul_mem a hy
   | single_add v k d' _ _ ih =>
-    have hpow : ∀ (e : ℕ) (m' : K → ℤ) (z : M), z ∈ piece m' →
-        (X v ^ e : MRing ι F) • z ∈ piece (m' + e • unitDeg v.1) := by
+    have hpow
+        : ∀ (e : ℕ) (m' : K → ℤ) (z : M),
+          z ∈ piece m' → (X v ^ e : MRing ι F) • z ∈ piece (m' + e • unitDeg v.1) := by
       intro e
       induction e with
       | zero => intro m' z hz; simpa using hz
@@ -52,9 +57,11 @@ theorem monomial_smul_mem (hM : IsMultigrading ι M piece) (d : (Σ k, ι k) →
       Nat.cast_add, Nat.cast_mul, blockWeight, unitDeg, Pi.single_apply]
     split_ifs <;> push_cast <;> ring
 
-theorem form_smul_mem (hM : IsMultigrading ι M piece) {b : K → ℕ} {f : MRing ι F}
-    (hf : f ∈ weightedHomogeneousSubmodule F (blockWeight ι) b) {m : K → ℤ} {y : M}
-    (hy : y ∈ piece m) : f • y ∈ piece (m + fun k => (b k : ℤ)) := by
+theorem form_smul_mem
+    (hM : IsMultigrading ι M piece)
+    {b : K → ℕ} {f : MRing ι F} (hf : f ∈ weightedHomogeneousSubmodule F (blockWeight ι) b)
+    {m : K → ℤ} {y : M} (hy : y ∈ piece m)
+    : f • y ∈ piece (m + fun k => (b k : ℤ)) := by
   rw [f.as_sum, Finset.sum_smul]
   refine Submodule.sum_mem _ fun d hd => ?_
   have hw : Finsupp.weight (blockWeight ι) d = b :=
@@ -63,20 +70,24 @@ theorem form_smul_mem (hM : IsMultigrading ι M piece) {b : K → ℕ} {f : MRin
   rwa [hw] at h
 
 def comp [DirectSum.Decomposition piece] (m : K → ℤ) : M →ₗ[F] M :=
-  (piece m).subtype ∘ₗ DirectSum.component F (K → ℤ) (fun i => piece i) m ∘ₗ
-    (DirectSum.decomposeLinearEquiv piece).toLinearMap
+  (piece m).subtype ∘ₗ DirectSum.component F (K → ℤ) (fun i => piece i) m
+    ∘ₗ (DirectSum.decomposeLinearEquiv piece).toLinearMap
 
 omit [DecidableEq K] in
-theorem comp_apply [DirectSum.Decomposition piece] (m : K → ℤ) (y : M) :
-    comp (piece := piece) m y = (DirectSum.decompose piece y m : M) := rfl
-
+theorem comp_apply [DirectSum.Decomposition piece] (m : K → ℤ) (y : M)
+    : comp (piece := piece) m y = (DirectSum.decompose piece y m : M) :=
+  rfl
 
 open Classical in
-theorem comp_smul (hM : IsMultigrading ι M piece) [DirectSum.Decomposition piece] {c : K → ℤ}
-    {x : M} (hx : x ∈ piece c) (s : MRing ι F) (m : K → ℤ) :
-    comp (piece := piece) m (s • x) =
-      (∑ d ∈ s.support with (fun k => (Finsupp.weight (blockWeight ι) d k : ℤ)) = m - c,
-        monomial d (AddMonoidAlgebra.coeff s d)) • x := by
+theorem comp_smul
+    (hM : IsMultigrading ι M piece)
+    [DirectSum.Decomposition piece]
+    {c : K → ℤ} {x : M} (hx : x ∈ piece c)
+    (s : MRing ι F) (m : K → ℤ)
+    : comp (piece := piece) m (s • x)
+      = (∑ d ∈ s.support with (fun k => (Finsupp.weight (blockWeight ι) d k : ℤ)) = m - c,
+          monomial d (AddMonoidAlgebra.coeff s d))
+        • x := by
   conv_lhs => rw [s.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Finset.sum_smul, map_sum, Finset.sum_filter, Finset.sum_smul]
@@ -90,41 +101,46 @@ theorem comp_smul (hM : IsMultigrading ι M piece) [DirectSum.Decomposition piec
     refine DirectSum.decompose_of_mem_ne piece h fun h' => hd ?_
     rw [← h', add_sub_cancel_left]
 
-theorem comp_mem_span (hM : IsMultigrading ι M piece) [DirectSum.Decomposition piece]
-    {c : K → ℤ} {x : M} (hx : x ∈ piece c) {y : M}
-    (hy : y ∈ Submodule.span (MRing ι F) {x}) (m : K → ℤ) :
-    comp (piece := piece) m y ∈ Submodule.span (MRing ι F) {x} := by
+theorem comp_mem_span
+    (hM : IsMultigrading ι M piece)
+    [DirectSum.Decomposition piece]
+    {c : K → ℤ} {x : M} (hx : x ∈ piece c)
+    {y : M} (hy : y ∈ Submodule.span (MRing ι F) {x})
+    (m : K → ℤ)
+    : comp (piece := piece) m y ∈ Submodule.span (MRing ι F) {x} := by
   obtain ⟨s, rfl⟩ := Submodule.mem_span_singleton.mp hy
   rw [comp_smul hM hx]
   exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x)
 
-
 omit [DecidableEq K] [IsScalarTower F (MRing ι F) M] in
-theorem comp_mem_sup [DirectSum.Decomposition piece] {N₁ N₂ : Submodule (MRing ι F) M}
-    (h₁ : ∀ y ∈ N₁, ∀ m, comp (piece := piece) m y ∈ N₁)
-    (h₂ : ∀ y ∈ N₂, ∀ m, comp (piece := piece) m y ∈ N₂) :
-    ∀ y ∈ N₁ ⊔ N₂, ∀ m, comp (piece := piece) m y ∈ N₁ ⊔ N₂ := by
+theorem comp_mem_sup
+    [DirectSum.Decomposition piece]
+    {N₁ N₂ : Submodule (MRing ι F) M} (h₁ : ∀ y ∈ N₁, ∀ m, comp (piece := piece) m y ∈ N₁)
+    (h₂ : ∀ y ∈ N₂, ∀ m, comp (piece := piece) m y ∈ N₂)
+    : ∀ y ∈ N₁ ⊔ N₂, ∀ m, comp (piece := piece) m y ∈ N₁ ⊔ N₂ := by
   intro y hy m
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hy
   rw [map_add (f := _)]
   exact Submodule.add_mem_sup (h₁ a ha m) (h₂ b hb m)
 
-
 open Classical in
-theorem step [∀ k, Fintype (ι k)] (hM : IsMultigrading ι M piece) [DirectSum.Decomposition piece]
+theorem step
+    [∀ k, Fintype (ι k)]
+    (hM : IsMultigrading ι M piece)
+    [DirectSum.Decomposition piece]
     {N N' : Submodule (MRing ι F) M} {x : M} {c : K → ℤ} {q : Ideal (MRing ι F)}
     (hx : x ∈ piece c) (hN' : N' = N ⊔ Submodule.span (MRing ι F) {x})
-    (hq : ∀ s : MRing ι F, s • x ∈ N ↔ s ∈ q)
-    (hgr : ∀ y ∈ N, ∀ m, comp (piece := piece) m y ∈ N) (m : K → ℤ)
-    [FiniteDimensional F ↥(N.restrictScalars F ⊓ piece m)] :
-    FiniteDimensional F ↥(N'.restrictScalars F ⊓ piece m) ∧
-      (Module.finrank F ↥(N'.restrictScalars F ⊓ piece m) : ℤ) =
-        Module.finrank F ↥(N.restrictScalars F ⊓ piece m) + hilbFn q (m - c) := by
+    (hq : ∀ s : MRing ι F, s • x ∈ N ↔ s ∈ q) (hgr : ∀ y ∈ N, ∀ m, comp (piece := piece) m y ∈ N)
+    (m : K → ℤ) [FiniteDimensional F ↥(N.restrictScalars F ⊓ piece m)]
+    : FiniteDimensional F ↥(N'.restrictScalars F ⊓ piece m)
+      ∧ (Module.finrank F ↥(N'.restrictScalars F ⊓ piece m) : ℤ)
+        = Module.finrank F ↥(N.restrictScalars F ⊓ piece m) + hilbFn q (m - c) := by
   set A := N.restrictScalars F ⊓ piece m with hA
   have hNN' : N ≤ N' := hN' ▸ le_sup_left
   have hAB : A ≤ N'.restrictScalars F ⊓ piece m := inf_le_inf_right _ hNN'
-  have hdec : ∀ y ∈ N'.restrictScalars F ⊓ piece m, ∃ n ∈ A, ∃ s : MRing ι F,
-      y = n + comp (piece := piece) m (s • x) := by
+  have hdec
+      : ∀ y ∈ N'.restrictScalars F ⊓ piece m, ∃ n ∈ A, ∃ s : MRing ι F,
+        y = n + comp (piece := piece) m (s • x) := by
     intro y hy
     obtain ⟨hy1, hy2⟩ := Submodule.mem_inf.mp hy
     rw [Submodule.restrictScalars_mem, hN'] at hy1
@@ -156,8 +172,11 @@ theorem step [∀ k, Fintype (ι k)] (hM : IsMultigrading ι M piece) [DirectSum
       apply le_antisymm
       · intro y hy
         obtain ⟨n, hn, s, rfl⟩ := hdec y hy
-        refine Submodule.add_mem_sup hn ⟨weightedHomogeneousComponent (blockWeight ι) b s,
-          weightedHomogeneousComponent_mem _ s b, ?_⟩
+        refine Submodule.add_mem_sup hn ⟨
+          weightedHomogeneousComponent (blockWeight ι) b s,
+          weightedHomogeneousComponent_mem _ s b,
+          ?_
+        ⟩
         rw [hψ, comp_smul hM hx, weightedHomogeneousComponent_apply]
         congr 1
         refine Finset.sum_congr (Finset.filter_congr fun d _ => ?_) fun _ _ => rfl
@@ -182,7 +201,8 @@ theorem step [∀ k, Fintype (ι k)] (hM : IsMultigrading ι M piece) [DirectSum
         rintro _ ⟨s, hs, rfl⟩
         refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
         · rw [Submodule.restrictScalars_mem, hψ, hN']
-          exact Submodule.mem_sup_right (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x))
+          exact Submodule.mem_sup_right (Submodule.smul_mem _ _
+            (Submodule.mem_span_singleton_self x))
         · exact hPm s hs
     have hinf : A ⊓ P.map ψ = Q.map ψ := by
       apply le_antisymm
@@ -202,10 +222,13 @@ theorem step [∀ k, Fintype (ι k)] (hM : IsMultigrading ι M piece) [DirectSum
     have k1 := LinearMap.finrank_range_add_finrank_ker (ψ.domRestrict P)
     have k2 := LinearMap.finrank_range_add_finrank_ker (ψ.domRestrict Q)
     rw [LinearMap.range_domRestrict] at k1 k2
-    have hker : ∀ R : Submodule F (MRing ι F), Module.finrank F ↥(LinearMap.ker (ψ.domRestrict R)) =
-        Module.finrank F ↥(R ⊓ LinearMap.ker ψ) := by
+    have hker
+        : ∀ R : Submodule F (MRing ι F),
+          Module.finrank F ↥(LinearMap.ker (ψ.domRestrict R))
+            = Module.finrank F ↥(R ⊓ LinearMap.ker ψ) := by
       intro R
-      rw [LinearMap.ker_domRestrict, ← Submodule.finrank_map_subtype_eq, Submodule.map_comap_subtype]
+      rw [LinearMap.ker_domRestrict, ← Submodule.finrank_map_subtype_eq,
+        Submodule.map_comap_subtype]
     have hPQ : P ⊓ LinearMap.ker ψ = Q ⊓ LinearMap.ker ψ := by
       apply le_antisymm
       · intro s hs
@@ -222,14 +245,21 @@ theorem step [∀ k, Fintype (ι k)] (hM : IsMultigrading ι M piece) [DirectSum
       rw [if_pos hb]
     rw [hsup, hinf] at *
     refine ⟨inferInstance, ?_⟩
-    have key : (Module.finrank F ↥(A ⊔ P.map ψ) : ℤ) =
-        Module.finrank F A + (Module.finrank F P - Module.finrank F Q) := by
-      have k1' : Module.finrank F ↥(P.map ψ) + Module.finrank F ↥(Q ⊓ LinearMap.ker ψ) =
-          Module.finrank F P := k1
-      have k2' : Module.finrank F ↥(Q.map ψ) + Module.finrank F ↥(Q ⊓ LinearMap.ker ψ) =
-          Module.finrank F Q := k2
-      have e1' : Module.finrank F ↥(A ⊔ P.map ψ) + Module.finrank F ↥(Q.map ψ) =
-          Module.finrank F A + Module.finrank F ↥(P.map ψ) := e1
+    have key
+        : (Module.finrank F ↥(A ⊔ P.map ψ) : ℤ)
+          = Module.finrank F A + (Module.finrank F P - Module.finrank F Q) := by
+      have k1'
+          : Module.finrank F ↥(P.map ψ) + Module.finrank F ↥(Q ⊓ LinearMap.ker ψ)
+            = Module.finrank F P :=
+        k1
+      have k2'
+          : Module.finrank F ↥(Q.map ψ) + Module.finrank F ↥(Q ⊓ LinearMap.ker ψ)
+            = Module.finrank F Q :=
+        k2
+      have e1'
+          : Module.finrank F ↥(A ⊔ P.map ψ) + Module.finrank F ↥(Q.map ψ)
+            = Module.finrank F A + Module.finrank F ↥(P.map ψ) :=
+        e1
       clear k1 k2 e1 hq' hhilb
       omega
     rw [hhilb, hq', key]
@@ -254,8 +284,9 @@ theorem FiltrationHilbSum.proof : FiltrationHilbSum.Statement.{u, v} := by
   intro F _ K _ _ ι _ M _ _ _ _ piece hM n N x c q h0 hlast hstep m
   classical
   letI : DirectSum.Decomposition piece := hM.internal.chooseDecomposition
-  have hgr : ∀ (i : ℕ) (hi : i < n + 1), ∀ y ∈ N ⟨i, hi⟩, ∀ m',
-      FiltrationHilbSum.comp (piece := piece) m' y ∈ N ⟨i, hi⟩ := by
+  have hgr
+      : ∀ (i : ℕ) (hi : i < n + 1), ∀ y ∈ N ⟨i, hi⟩, ∀ m',
+        FiltrationHilbSum.comp (piece := piece) m' y ∈ N ⟨i, hi⟩ := by
     intro i
     induction i with
     | zero =>
@@ -271,12 +302,13 @@ theorem FiltrationHilbSum.proof : FiltrationHilbSum.Statement.{u, v} := by
       have e2 : (⟨i, hi'⟩ : Fin n).castSucc = ⟨i, by omega⟩ := rfl
       rw [e1, e2] at hN'
       rw [hN']
-      exact FiltrationHilbSum.comp_mem_sup (ih _) (fun y hy m' =>
-        FiltrationHilbSum.comp_mem_span hM hx hy m')
-  have hcount : ∀ (i : ℕ) (hi : i < n + 1),
-      FiniteDimensional F ↥((N ⟨i, hi⟩).restrictScalars F ⊓ piece m) ∧
-        (Module.finrank F ↥((N ⟨i, hi⟩).restrictScalars F ⊓ piece m) : ℤ) =
-          ∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val < i), hilbFn (q j) (m - c j) := by
+      exact FiltrationHilbSum.comp_mem_sup (ih _)
+        (fun y hy m' => FiltrationHilbSum.comp_mem_span hM hx hy m')
+  have hcount
+      : ∀ (i : ℕ) (hi : i < n + 1),
+        FiniteDimensional F ↥((N ⟨i, hi⟩).restrictScalars F ⊓ piece m)
+          ∧ (Module.finrank F ↥((N ⟨i, hi⟩).restrictScalars F ⊓ piece m) : ℤ)
+            = ∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val < i), hilbFn (q j) (m - c j) := by
     intro i
     induction i with
     | zero =>
@@ -298,8 +330,9 @@ theorem FiltrationHilbSum.proof : FiltrationHilbSum.Statement.{u, v} := by
       obtain ⟨h1, h2⟩ := FiltrationHilbSum.step hM hx hN' hq (hgr i (by omega)) m
       refine ⟨h1, ?_⟩
       rw [h2, hr]
-      have hset : Finset.univ.filter (fun j : Fin n => j.val < i + 1) =
-          insert ⟨i, hi'⟩ (Finset.univ.filter (fun j : Fin n => j.val < i)) := by
+      have hset
+          : Finset.univ.filter (fun j : Fin n => j.val < i + 1)
+            = insert ⟨i, hi'⟩ (Finset.univ.filter (fun j : Fin n => j.val < i)) := by
         ext j
         simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.ext_iff]
         omega

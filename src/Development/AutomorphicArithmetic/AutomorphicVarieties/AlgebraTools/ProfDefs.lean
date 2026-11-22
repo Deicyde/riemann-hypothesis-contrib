@@ -14,7 +14,8 @@ variable (l : ℕ) (G : Type) [Group G] [TopologicalSpace G]
 
 def IsProL : Prop := ∀ N : OpenNormalSubgroup G, IsPGroup l (G ⧸ N.toSubgroup)
 
-theorem isProL_iff : IsProL l G ↔ ∀ (N : OpenNormalSubgroup G) (g : G), ∃ k : ℕ, g ^ l ^ k ∈ N.toSubgroup := by
+theorem isProL_iff
+    : IsProL l G ↔ ∀ (N : OpenNormalSubgroup G) (g : G), ∃ k : ℕ, g ^ l ^ k ∈ N.toSubgroup := by
   unfold IsProL
   refine forall_congr' fun N => ?_
   constructor
@@ -30,18 +31,17 @@ def proLRes : Subgroup G :=
   ⨅ N : {N : OpenNormalSubgroup G // IsPGroup l (G ⧸ N.toSubgroup)}, N.1.toSubgroup
 
 variable {l G} in
-theorem mem_proLRes {g : G} :
-    g ∈ proLRes l G ↔ ∀ N : OpenNormalSubgroup G, IsPGroup l (G ⧸ N.toSubgroup) → g ∈ N.toSubgroup := by
+theorem mem_proLRes {g : G}
+    : g ∈ proLRes l G
+      ↔ ∀ N : OpenNormalSubgroup G, IsPGroup l (G ⧸ N.toSubgroup) → g ∈ N.toSubgroup := by
   simp only [proLRes, Subgroup.mem_iInf, Subtype.forall]
 
 theorem isClosed_proLRes [ContinuousMul G] : IsClosed (proLRes l G : Set G) := by
   rw [proLRes, Subgroup.coe_iInf]
   exact isClosed_iInter fun N => N.1.toOpenSubgroup.isClosed
 
-
 variable {G} in
 def proLResOf (H : Subgroup G) : Subgroup G := (proLRes l H).map H.subtype
-
 
 variable {G} in
 def TopGen (s : Set G) : Prop := Dense (Subgroup.closure s : Set G)
@@ -49,11 +49,10 @@ def TopGen (s : Set G) : Prop := Dense (Subgroup.closure s : Set G)
 def TopFG : Prop := ∃ s : Set G, s.Finite ∧ TopGen s
 
 variable {G} in
-theorem topGen_iff [IsTopologicalGroup G] (s : Set G) :
-    TopGen s ↔ (Subgroup.closure s).topologicalClosure = ⊤ := by
+theorem topGen_iff [IsTopologicalGroup G] (s : Set G)
+    : TopGen s ↔ (Subgroup.closure s).topologicalClosure = ⊤ := by
   rw [TopGen, dense_iff_closure_eq, ← Subgroup.topologicalClosure_coe, ← Subgroup.coe_top,
     SetLike.coe_set_eq]
-
 
 variable {G} in
 def limKer {ι : Type} (F : Filter ι) (K : ι → Subgroup G) : Subgroup G where
@@ -63,14 +62,16 @@ def limKer {ι : Type} (F : Filter ι) (K : ι → Subgroup G) : Subgroup G wher
   inv_mem' h O := (h O).mono fun _ h => inv_mem h
 
 variable {G} in
-theorem mem_limKer {ι : Type} {F : Filter ι} {K : ι → Subgroup G} {g : G} :
-    g ∈ limKer F K ↔ ∀ O : OpenNormalSubgroup G, ∀ᶠ i in F, g ∈ K i ⊔ O.toSubgroup := Iff.rfl
+theorem mem_limKer {ι : Type} {F : Filter ι} {K : ι → Subgroup G} {g : G}
+    : g ∈ limKer F K ↔ ∀ O : OpenNormalSubgroup G, ∀ᶠ i in F, g ∈ K i ⊔ O.toSubgroup :=
+  Iff.rfl
 
 variable {G} in
-instance limKer_normal {ι : Type} (F : Filter ι) (K : ι → Subgroup G) [∀ i, (K i).Normal] :
-    (limKer F K).Normal :=
-  ⟨fun _ h g O => (h O).mono fun i hi => by
-    haveI := O.isNormal'
-    exact (Subgroup.sup_normal (K i) O.toSubgroup).conj_mem _ hi g⟩
+instance limKer_normal {ι : Type} (F : Filter ι) (K : ι → Subgroup G) [∀ i, (K i).Normal]
+    : (limKer F K).Normal :=
+  ⟨fun _ h g O =>
+    (h O).mono fun i hi => by
+      haveI := O.isNormal'
+      exact (Subgroup.sup_normal (K i) O.toSubgroup).conj_mem _ hi g⟩
 
 end UpperTheory.V.AlgebraTools

@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.JointEigenvectorsIndependent
 
-theorem linearIndependent_of_joint_eigenvectors {ι α M : Type} [AddCommGroup M] [Module ℂ M]
+theorem linearIndependent_of_joint_eigenvectors
+    {ι α M : Type} [AddCommGroup M] [Module ℂ M]
     (f : ι → M) (χ : ι → α → ℂ) (op : α → M →ₗ[ℂ] M) (hχ : Function.Injective χ)
-    (hop : ∀ (a : α) (i : ι), (op a : M → M) (f i) = χ i a • f i)
-    (hf : ∀ i : ι, f i ≠ (0 : M)) : LinearIndependent ℂ f := by
+    (hop : ∀ (a : α) (i : ι), (op a : M → M) (f i) = χ i a • f i) (hf : ∀ i : ι, f i ≠ (0 : M))
+    : LinearIndependent ℂ f := by
   classical
   rw [linearIndependent_iff']
   intro s
@@ -36,8 +37,7 @@ theorem linearIndependent_of_joint_eigenvectors {ι α M : Type} [AddCommGroup M
         simp only [mul_sub, sub_smul, Finset.sum_sub_distrib, h4, sub_self]
       have h5 := ih (fun k => g k * (χ k a - χ j a)) h3 i hi
       exact (mul_eq_zero.mp h5).resolve_right (sub_ne_zero.mpr ha)
-    have hsum : ∑ k ∈ s, g k • f k = 0 :=
-      Finset.sum_eq_zero fun k hk => by rw [hs k hk, zero_smul]
+    have hsum : ∑ k ∈ s, g k • f k = 0 := Finset.sum_eq_zero fun k hk => by rw [hs k hk, zero_smul]
     rw [hsum, add_zero] at hg
     intro i hi
     rcases Finset.mem_insert.mp hi with rfl | hi

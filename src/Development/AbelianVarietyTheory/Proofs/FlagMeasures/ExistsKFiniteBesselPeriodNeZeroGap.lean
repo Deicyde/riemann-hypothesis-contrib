@@ -14,7 +14,8 @@ public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries
 
 @[expose] public section
 
-open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp Formalism.BasicNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
+open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -23,46 +24,62 @@ namespace GlobalTheory.BesselPeriodNonzeroGap
 
 open Formalism.FourierDecayAlt.P.MatrixMultiplicationContinuity GlobalTheory.BesselPeriodNonzero
 
-
 set_option maxHeartbeats 1600000 in
-theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {mu : Fin (2 * r + k + 1) → ℝ} {h : ℝ}
-    {R : Rep k r}
-    {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp]
-    {z : Fin (2 * r + k + 1) → ℂ} {π : Formalism.FourierDecayAlt.ThreeDimData.Mx k r → (Wp →L[ℂ] Wp)} {u : ℕ → ℝ}
-    {μW μN μG νq : Measure (Mt k r)} {B l : R.H → Wp} {w : R.H} (hR : R.IsDS ε mu)
-    (hgap : GapAtLeast ε mu h) (hok : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h)
-    (hS : SideG k r z π u μW μN μG νq) (hB : IsBes R z π B) (hwK : R.KFin w) {c : ℝ} (hc : 0 ≤ c)
+theorem nzOn_of_mass
+    (hy : GlobalTheory.GapIn.Hyp)
+    {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {mu : Fin (2 * r + k + 1) → ℝ} {h : ℝ} {R : Rep k r}
+    {Wp : Type}
+    [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp]
+    {z : Fin (2 * r + k + 1) → ℂ}
+    {π : Formalism.FourierDecayAlt.ThreeDimData.Mx k r → (Wp →L[ℂ] Wp)} {u : ℕ → ℝ}
+    {μW μN μG νq : Measure (Mt k r)} {B l : R.H → Wp} {w : R.H}
+    (hR : R.IsDS ε mu) (hgap : GapAtLeast ε mu h)
+    (hok : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h) (hS : SideG k r z π u μW μN μG νq)
+    (hB : IsBes R z π B) (hwK : R.KFin w)
+    {c : ℝ} (hc : 0 ≤ c)
     (hiso : ∀ v ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
       PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g v)) = ENNReal.ofReal (c * ‖v‖ ^ 2))
-    (h0 : PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g w)) ≠ 0) (hl : IsBeL R z π μW μN l) :
-    ∃ v ∈ R.sm, l v ≠ 0 := by
+    (h0 : PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g w)) ≠ 0) (hl : IsBeL R z π μW μN l)
+    : ∃ v ∈ R.sm, l v ≠ 0 := by
   classical
   by_contra hcon
   push_neg at hcon
   have hK : PI.KFinSmooth := hy.1.1.2.2.1
   have hRG : R.IsDG ε mu := ⟨hR.1, hR.2, ⟨h, hgap, hok⟩⟩
-  obtain ⟨hmul, hone, hun, hsm, hTK, hTKs, hKT, -, hcont⟩ := GlobalTheory.rep_basic_of_isDS hK k r ε mu R hR
+  obtain ⟨hmul, hone, hun, hsm, hTK, hTKs, hKT, -, hcont⟩ :=
+    GlobalTheory.rep_basic_of_isDS hK k r ε mu R hR
   have hwT := hKT w hwK
   have hw := hTK w hwT
-  have hΦ := fun v hv => (GlobalTheory.cwCont_continuousOn_hasDerivAt hK k r ε mu R hR Wp B hB.1 hB.2.1 hB.2.2.2 v hv).1
+  have hΦ := fun v hv =>
+    (GlobalTheory.cwCont_continuousOn_hasDerivAt hK k r ε mu R hR Wp B hB.1 hB.2.1 hB.2.2.2 v hv).1
   have hS' := hS
   obtain ⟨hz, hT, ⟨u₀, hπ⟩, -, hWh, hNh, hGh, hq⟩ := hS'
-  have := hWh.1; have := hNh.1; have := hGh.1
+  have := hWh.1
+  have := hNh.1
+  have := hGh.1
   have hGae : ∀ᵐ y ∂μG, Matrix.of y ∈ GG k r := ae_iff.mpr hGh.2.2.1
   have hWae : ∀ᵐ p1 ∂μW, Matrix.of p1 ∈ UWset k r z := ae_iff.mpr hWh.2.2.1
   have hNae : ∀ᵐ p2 ∂μN, Matrix.of p2 ∈ Nset k r := ae_iff.mpr hNh.2.2.1
   have hPae : ∀ᵐ p ∂(μW.prod μN), Matrix.of p.1 ∈ UWset k r z ∧ Matrix.of p.2 ∈ Nset k r :=
     (Measure.quasiMeasurePreserving_fst.ae hWae).and (Measure.quasiMeasurePreserving_snd.ae hNae)
-  have hof : Continuous (fun y : Mt k r => (Matrix.of y : Formalism.FourierDecayAlt.ThreeDimData.Mx k r)) := continuous_id
-  have hSeq : Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN = (μW.prod μN).map (fun p => mulMt p.1 p.2) := rfl
-  have hsf : SFinite (Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN) := by rw [hSeq]; infer_instance
-  have hGm : MeasurableSet {y : Mt k r | Matrix.of y ∈ GG k r} := (isClosed_UH.preimage hof).measurableSet
+  have hof : Continuous (fun y : Mt k r =>
+      (Matrix.of y : Formalism.FourierDecayAlt.ThreeDimData.Mx k r)) :=
+    continuous_id
+  have hSeq
+      : Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN
+        = (μW.prod μN).map (fun p => mulMt p.1 p.2) :=
+    rfl
+  have hsf : SFinite (Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN) := by
+    rw [hSeq]; infer_instance
+  have hGm : MeasurableSet {y : Mt k r | Matrix.of y ∈ GG k r} :=
+    (isClosed_UH.preimage hof).measurableSet
   have hSae : ∀ᵐ s ∂(Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN), Matrix.of s ∈ GG k r := by
     rw [hSeq]
     refine (ae_map_iff measurable_mulMt.aemeasurable hGm).2 ?_
     filter_upwards [hPae] with p hp
     exact Formalism.FourierDecayAlt.P.DDSmoothness.uh_mul hp.1.1 hp.2.1
-  have hS0 : Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN ≠ 0 := GlobalTheory.SideCompare.muS_ne_zero hWh.2.1 hNh.2.1
+  have hS0 : Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN ≠ 0 :=
+    GlobalTheory.SideCompare.muS_ne_zero hWh.2.1 hNh.2.1
   have hνae := GlobalTheory.BesselNorm.quot_ae hq hGae hSae hS0
   have hνs : SigmaFinite νq := GlobalTheory.SideCompare.sigmaFinite_of_isQuotMeas hS0 hq
   have hSC : SecondCountableTopology Wp := by
@@ -80,23 +97,30 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
     rintro _ ⟨g, hg, rfl⟩
     exact hTKs g hg w hwT
   have hnorm : ∀ g ∈ GG k r, ‖R.σ g w‖ = ‖w‖ := fun g hg => (sigma_facts hR.2).2 g hg w
-  have hcw : c * ‖w‖ ^ 2 ≠ 0 := by
-    intro h1; apply h0; rw [hiso w wDD, h1, ENNReal.ofReal_zero]
-  have hmeas : ∀ v ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
-      AEStronglyMeasurable (fun y : Mt k r => B (R.σ (Matrix.of y) v)) νq := fun v hv =>
+  have hcw : c * ‖w‖ ^ 2 ≠ 0 := by intro h1; apply h0; rw [hiso w wDD, h1, ENNReal.ofReal_zero]
+  have hmeas
+      : ∀ v ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
+        AEStronglyMeasurable (fun y : Mt k r => B (R.σ (Matrix.of y) v)) νq := fun v hv =>
     aesm_of_contOn ((hΦ v (DDsm v hv)).comp hof.continuousOn fun y hy => hy) hGm hνae
-  have hsq : ∀ v ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
-      Integrable (fun y : Mt k r => ‖B (R.σ (Matrix.of y) v)‖ ^ 2) νq ∧
-        ∫ y : Mt k r, ‖B (R.σ (Matrix.of y) v)‖ ^ 2 ∂νq = c * ‖v‖ ^ 2 := fun v hv =>
+  have hsq
+      : ∀ v ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
+        Integrable (fun y : Mt k r => ‖B (R.σ (Matrix.of y) v)‖ ^ 2) νq
+          ∧ ∫ y : Mt k r, ‖B (R.σ (Matrix.of y) v)‖ ^ 2 ∂νq = c * ‖v‖ ^ 2 := fun v hv =>
     sq_int (hmeas v hv) (by positivity) (hiso v hv)
 
-  have hpair : ∀ a ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w, ∀ b ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
-      Integrable (fun y : Mt k r => ⟪B (R.σ (Matrix.of y) a), B (R.σ (Matrix.of y) b)⟫_ℂ) νq ∧
-      ∫ y : Mt k r, ‖⟪B (R.σ (Matrix.of y) a), B (R.σ (Matrix.of y) b)⟫_ℂ‖ ∂νq ≤ c * ‖a‖ ^ 2 + c * ‖b‖ ^ 2 ∧
-      (∫ y : Mt k r, ⟪B (R.σ (Matrix.of y) a), B (R.σ (Matrix.of y) b)⟫_ℂ ∂νq).re = c * (⟪a, b⟫_ℂ).re := by
+  have hpair
+      : ∀ a ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
+        ∀ b ∈ Formalism.FourierDecayAlt.ThreeDimData.DDsp R.σ w,
+          Integrable (fun y : Mt k r => ⟪B (R.σ (Matrix.of y) a), B (R.σ (Matrix.of y) b)⟫_ℂ) νq
+            ∧ ∫ y : Mt k r, ‖⟪B (R.σ (Matrix.of y) a), B (R.σ (Matrix.of y) b)⟫_ℂ‖ ∂νq
+              ≤ c * ‖a‖ ^ 2 + c * ‖b‖ ^ 2
+            ∧ (∫ y : Mt k r, ⟪B (R.σ (Matrix.of y) a), B (R.σ (Matrix.of y) b)⟫_ℂ ∂νq).re
+              = c * (⟪a, b⟫_ℂ).re := by
     intro a ha b hb
     obtain ⟨i1, i2, i3⟩ := inner_int (hmeas a ha) (hmeas b hb) (hsq a ha).1 (hsq b hb).1
-    have e : ∫ y : Mt k r, ‖B (R.σ (Matrix.of y) a) + B (R.σ (Matrix.of y) b)‖ ^ 2 ∂νq = c * ‖a + b‖ ^ 2 := by
+    have e
+        : ∫ y : Mt k r, ‖B (R.σ (Matrix.of y) a) + B (R.σ (Matrix.of y) b)‖ ^ 2 ∂νq
+          = c * ‖a + b‖ ^ 2 := by
       rw [← (hsq (a + b) (Submodule.add_mem _ ha hb)).2]
       apply integral_congr_ae
       filter_upwards [hνae] with y hy
@@ -111,11 +135,15 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
   have hmc : ContinuousOn m {y : Mt k r | Matrix.of y ∈ GG k r} :=
     continuousOn_const.inner ((hcont w).comp hof.continuousOn fun y hy => hy)
   have hmi : Integrable m μG := by
-    obtain ⟨C, Ws, -, hd⟩ := Gp91.GlobalTheory.BesselDecay.decay_TK hy.1 k r ε mu h R hRG hgap hok w hwT
+    obtain ⟨C, Ws, -, hd⟩ :=
+      Gp91.GlobalTheory.BesselDecay.decay_TK hy.1 k r ε mu h R hRG hgap hok w hwT
     obtain ⟨-, -, t1, t2⟩ := GlobalTheory.thresholds_of_gapOK k r h hok
-    have hg := GlobalTheory.gN_rpow_neg_integrable_haar k r μG (Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1) hGh (by linarith)
-    refine (hg.const_mul (C * (Ws.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) R.σ W w‖).sum)).mono'
-      (aesm_of_contOn hmc hGm hGae) ?_
+    have hg :=
+      GlobalTheory.gN_rpow_neg_integrable_haar k r μG
+        (Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1) hGh (by linarith)
+    refine
+      (hg.const_mul (C * (Ws.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) R.σ W w‖).sum)).mono'
+        (aesm_of_contOn hmc hGm hGae) ?_
     filter_upwards [hGae] with y hy
     rw [neg_sub]
     exact hd w hw _ hy
@@ -123,23 +151,38 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
   set F : Mt k r × Mt k r → ℂ := fun q =>
     star (m q.1) * ⟪B (R.σ (Matrix.of q.2) w), B (R.σ (Matrix.of q.2 * Matrix.of q.1) w)⟫_ℂ with hF
   have hFm : AEStronglyMeasurable F (μG.prod νq) := by
-    have c1 : Continuous (fun q : Mt k r × Mt k r => (Matrix.of q.1 : Formalism.FourierDecayAlt.ThreeDimData.Mx k r)) := continuous_fst
-    have c2 : Continuous (fun q : Mt k r × Mt k r => (Matrix.of q.2 : Formalism.FourierDecayAlt.ThreeDimData.Mx k r)) := continuous_snd
-    refine aesm_of_contOn (s := {q : Mt k r × Mt k r | Matrix.of q.1 ∈ GG k r ∧ Matrix.of q.2 ∈ GG k r}) ?_
+    have c1 : Continuous (fun q : Mt k r × Mt k r =>
+        (Matrix.of q.1 : Formalism.FourierDecayAlt.ThreeDimData.Mx k r)) :=
+      continuous_fst
+    have c2 : Continuous (fun q : Mt k r × Mt k r =>
+        (Matrix.of q.2 : Formalism.FourierDecayAlt.ThreeDimData.Mx k r)) :=
+      continuous_snd
+    refine aesm_of_contOn
+      (s := {q : Mt k r × Mt k r | Matrix.of q.1 ∈ GG k r ∧ Matrix.of q.2 ∈ GG k r}) ?_
       ((isClosed_UH.preimage c1).inter (isClosed_UH.preimage c2)).measurableSet
-      ((Measure.quasiMeasurePreserving_fst.ae hGae).and (Measure.quasiMeasurePreserving_snd.ae hνae))
+      ((Measure.quasiMeasurePreserving_fst.ae hGae).and
+        (Measure.quasiMeasurePreserving_snd.ae hνae))
     let hs : Set (Mt k r × Mt k r) := {q | Matrix.of q.1 ∈ GG k r ∧ Matrix.of q.2 ∈ GG k r}
-    exact (continuous_star.comp_continuousOn (hmc.comp (s := hs) continuous_fst.continuousOn fun q hq => hq.1)).mul
+    exact (continuous_star.comp_continuousOn (hmc.comp (s := hs) continuous_fst.continuousOn
+        fun q hq => hq.1)).mul
       (((hΦ w hw).comp (s := hs) c2.continuousOn fun q hq => hq.2).inner
-        ((hΦ w hw).comp (s := hs) (c2.matrix_mul c1).continuousOn fun q hq => Formalism.FourierDecayAlt.P.DDSmoothness.uh_mul hq.2 hq.1))
-  have hF1 : ∀ g : Mt k r, Matrix.of g ∈ GG k r → (fun y => F (g, y)) =ᵐ[νq] fun y =>
-      star (m g) * ⟪B (R.σ (Matrix.of y) w), B (R.σ (Matrix.of y) (R.σ (Matrix.of g) w))⟫_ℂ := by
-    intro g hg
-    filter_upwards [hνae] with y hy
-    simp only [hF]
-    rw [hmul _ hy _ hg]
-  have hF2 : ∀ g : Mt k r, Matrix.of g ∈ GG k r → (fun y => F (g, y)) =ᵐ[νq] fun y =>
-      ⟪B (R.σ (Matrix.of y) (m g • w)), B (R.σ (Matrix.of y) (R.σ (Matrix.of g) w))⟫_ℂ := by
+        ((hΦ w hw).comp (s := hs) (c2.matrix_mul c1).continuousOn fun q hq =>
+          Formalism.FourierDecayAlt.P.DDSmoothness.uh_mul hq.2 hq.1))
+  have hF1
+      : ∀ g : Mt k r,
+        Matrix.of g ∈ GG k r
+          → (fun y => F (g, y)) =ᵐ[νq] fun y =>
+            star (m g) * ⟪B (R.σ (Matrix.of y) w), B (R.σ (Matrix.of y) (R.σ (Matrix.of g) w))⟫_ℂ :=
+    by
+      intro g hg
+      filter_upwards [hνae] with y hy
+      simp only [hF]
+      rw [hmul _ hy _ hg]
+  have hF2
+      : ∀ g : Mt k r,
+        Matrix.of g ∈ GG k r
+          → (fun y => F (g, y)) =ᵐ[νq] fun y =>
+            ⟪B (R.σ (Matrix.of y) (m g • w)), B (R.σ (Matrix.of y) (R.σ (Matrix.of g) w))⟫_ℂ := by
     intro g hg
     filter_upwards [hνae, hF1 g hg] with y hy h1
     rw [h1, map_smul, hB.2.1 _ _ (hsm _ hy w hw), inner_smul_left]
@@ -152,12 +195,15 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
     · refine (hmi.norm.mul_const (c * ‖w‖ ^ 2 + c * ‖w‖ ^ 2)).mono' hFm.norm.integral_prod_right' ?_
       filter_upwards [hGae] with g hg
       rw [Real.norm_of_nonneg (integral_nonneg fun y => norm_nonneg _)]
-      have e : ∫ y, ‖F (g, y)‖ ∂νq = ‖m g‖ *
-          ∫ y : Mt k r, ‖⟪B (R.σ (Matrix.of y) w), B (R.σ (Matrix.of y) (R.σ (Matrix.of g) w))⟫_ℂ‖ ∂νq := by
-        rw [← integral_const_mul]
-        apply integral_congr_ae
-        filter_upwards [hF1 g hg] with y hy
-        rw [hy, norm_mul, norm_star]
+      have e
+          : ∫ y, ‖F (g, y)‖ ∂νq
+            = ‖m g‖
+              * ∫ y : Mt k r, ‖⟪B (R.σ (Matrix.of y) w), B (R.σ (Matrix.of y) (R.σ (Matrix.of g) w))⟫_ℂ‖ ∂νq :=
+        by
+          rw [← integral_const_mul]
+          apply integral_congr_ae
+          filter_upwards [hF1 g hg] with y hy
+          rw [hy, norm_mul, norm_star]
       rw [e]
       have := (hpair w wDD _ (memDD _ hg)).2.1
       rw [hnorm _ hg] at this
@@ -170,13 +216,14 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
     set f : Mt k r → ℂ := fun g => star ⟪R.σ (Matrix.of y) w, R.σ (Matrix.of g) w⟫_ℂ *
       ⟪B (R.σ (Matrix.of y) w), B (R.σ (Matrix.of g) w)⟫_ℂ with hf
     have hfc : ContinuousOn f {y : Mt k r | Matrix.of y ∈ GG k r} :=
-      (continuous_star.comp_continuousOn (continuousOn_const.inner
-        ((hcont w).comp hof.continuousOn fun y hy => hy))).mul
+      (continuous_star.comp_continuousOn (continuousOn_const.inner ((hcont w).comp hof.continuousOn
+          fun y hy => hy))).mul
         (continuousOn_const.inner ((hΦ w hw).comp hof.continuousOn fun y hy => hy))
     have hfm : AEStronglyMeasurable f (μG.map (lmulM (Matrix.of y))) := by
       rw [hGh.2.2.2 _ hy]; exact aesm_of_contOn hfc hGm hGae
     have hlm : Measurable (lmulM (k := k) (r := r) (Matrix.of y)) :=
-      measurable_mulMt.comp (measurable_const.prodMk measurable_id : Measurable fun x : Mt k r => (y, x))
+      measurable_mulMt.comp
+        (measurable_const.prodMk measurable_id : Measurable fun x : Mt k r => (y, x))
     have e : (fun g => F (g, y)) =ᵐ[μG] f ∘ lmulM (Matrix.of y) := by
       filter_upwards [hGae] with g hg
       show star ⟪w, R.σ (Matrix.of g) w⟫_ℂ * _ = star ⟪R.σ (Matrix.of y) w, R.σ (Matrix.of y * Matrix.of g) w⟫_ℂ * _
@@ -194,11 +241,13 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
     obtain ⟨j1, j2⟩ := hl.2 x hx _ (hTKs _ hy w hwT)
     refine ⟨j1, ?_⟩
     rw [j2, hcon x hx]
-    ext ξ; simp
+    ext ξ
+    simp
 
   obtain ⟨d, hd, hSch⟩ := Gp91.GlobalTheory.BesselDegree.schur_fdeg hy.1 k r ε μG hGh
   obtain ⟨s1, s2⟩ := (hSch mu R hRG).2 w w w w
-  have hdpos : 0 < d * fdegHC mu := mul_pos hd (GlobalTheory.BesselNorm.fdegHC_pos mu hR.1.1.injective)
+  have hdpos : 0 < d * fdegHC mu :=
+    mul_pos hd (GlobalTheory.BesselNorm.fdegHC_pos mu hR.1.1.injective)
   have hre : (∫ q, F q ∂(μG.prod νq)).re = c * (∫ g, m g * star (m g) ∂μG).re := by
     rw [integral_prod F hFi]
     have a1 := integral_re hFi.integral_prod_left
@@ -207,23 +256,37 @@ theorem nzOn_of_mass (hy : GlobalTheory.GapIn.Hyp) {k r : ℕ} {ε : Fin (2 * r 
     rw [← a1, ← a2, ← integral_const_mul]
     apply integral_congr_ae
     filter_upwards [hGae] with g hg
-    rw [integral_congr_ae (hF2 g hg), (hpair _ (Submodule.smul_mem _ _ wDD) _ (memDD _ hg)).2.2, inner_smul_left,
-      mul_comm ((starRingEnd ℂ) (m g))]
+    rw [integral_congr_ae (hF2 g hg), (hpair _ (Submodule.smul_mem _ _ wDD) _ (memDD _ hg)).2.2,
+      inner_smul_left, mul_comm ((starRingEnd ℂ) (m g))]
     rfl
   rw [hzero, s2, inner_self_eq_norm_sq_to_K] at hre
-  have e3 : (((‖w‖ : ℂ) ^ 2 * (‖w‖ : ℂ) ^ 2 / ((d * fdegHC mu : ℝ) : ℂ))).re =
-      ‖w‖ ^ 2 * ‖w‖ ^ 2 / (d * fdegHC mu) := by
+  have e3
+      : (((‖w‖ : ℂ) ^ 2 * (‖w‖ : ℂ) ^ 2 / ((d * fdegHC mu : ℝ) : ℂ))).re
+        = ‖w‖ ^ 2 * ‖w‖ ^ 2 / (d * fdegHC mu) := by
     rw [← Complex.ofReal_pow, ← Complex.ofReal_mul, ← Complex.ofReal_div, Complex.ofReal_re]
   have hre' : 0 = c * (‖w‖ ^ 2 * ‖w‖ ^ 2 / (d * fdegHC mu)) := by rw [← e3]; exact hre
   have hw2 : ‖w‖ ^ 2 ≠ 0 := right_ne_zero_of_mul hcw
   have hc0 : c ≠ 0 := left_ne_zero_of_mul hcw
   exact mul_ne_zero hc0 (div_ne_zero (mul_ne_zero hw2 hw2) hdpos.ne') hre'.symm
 
-theorem exists_kFin_period_ne_zero : GlobalTheory.GapIn.Hyp → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (h : ℝ) (R : Rep k r) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ) (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)) (u : ℕ → ℝ) (μW μN μG νq : Measure (Mt k r)) (B l : R.H → Wp) (w : R.H), R.IsDS ε mu → GapAtLeast ε mu h → Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h → SideG k r z π u μW μN μG νq → IsBes R z π B → R.KFin w → PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g w)) ≠ 0 → PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g w)) ≠ ⊤ → IsBeL R z π μW μN l → ∃ v, R.KFin v ∧ l v ≠ 0 := by
+theorem exists_kFin_period_ne_zero
+    : GlobalTheory.GapIn.Hyp
+      → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (h : ℝ)
+          (R : Rep k r) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+          [CompleteSpace Wp] [FiniteDimensional ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ)
+          (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)) (u : ℕ → ℝ)
+          (μW μN μG νq : Measure (Mt k r)) (B l : R.H → Wp) (w : R.H),
+        R.IsDS ε mu → GapAtLeast ε mu h → Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h
+          → SideG k r z π u μW μN μG νq → IsBes R z π B → R.KFin w
+          → PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g w)) ≠ 0
+          → PI.BesselPeriodGGP.l2SG νq (fun g => B (R.σ g w)) ≠ ⊤ → IsBeL R z π μW μN l
+          → ∃ v, R.KFin v ∧ l v ≠ 0 := by
   intro hy k r ε mu h R Wp _ _ _ _ z π u μW μN μG νq B l w hR hgap hok hS hB hwK h0 hfin hl
   have hK : PI.KFinSmooth := hy.1.1.2.2.1
   have hw : w ∈ R.sm := hK k r ε mu R.H R.σ hR.1 hR.2 w hwK
-  obtain ⟨c, hc, hiso⟩ := GlobalTheory.T.exists_l2SG_translates_eq_const_mul_norm_sq k r ε mu R Wp z π u μW μN μG νq B w hR hS hB hw hfin
+  obtain ⟨c, hc, hiso⟩ :=
+    GlobalTheory.T.exists_l2SG_translates_eq_const_mul_norm_sq k r ε mu R Wp z π u μW μN μG νq B w
+      hR hS hB hw hfin
   exact GlobalTheory.exists_kFin_ne_zero_of_cwCont hK k r ε mu R hR Wp l hl.1.1 hl.1.2.1 hl.1.2.2.2
     (nzOn_of_mass hy hR hgap hok hS hB hwK hc hiso h0 hl)
 

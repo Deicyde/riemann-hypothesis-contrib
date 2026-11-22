@@ -9,9 +9,12 @@ public import Formalism.LocalToGlobal.Divisibility.ProjLemmas
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Polynomial
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,9 +23,11 @@ noncomputable section
 
 namespace GlobalTheory.Hk3.Meet
 
-theorem sum_char_conj_mul {K G : Type} [Field K] [CharZero K] [Group G] [Fintype G] {χ : G → K}
-    (h : IsAbsIrrChar χ) (y s : G) :
-    (∑ g : G, χ (g * y * g⁻¹ * s)) * χ 1 = (Fintype.card G : K) * χ y * χ s := by
+theorem sum_char_conj_mul
+    {K G : Type} [Field K] [CharZero K] [Group G] [Fintype G]
+    {χ : G → K} (h : IsAbsIrrChar χ)
+    (y s : G)
+    : (∑ g : G, χ (g * y * g⁻¹ * s)) * χ 1 = (Fintype.card G : K) * χ y * χ s := by
   classical
   have hconj := h.conj
   obtain ⟨n, ρ, hi, hρ⟩ := h
@@ -55,23 +60,26 @@ theorem sum_char_conj_mul {K G : Type} [Field K] [CharZero K] [Group G] [Fintype
     have := h1 s
     simp only [hρ] at this
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, this]
+    rw [map_sum, this]
   apply hj
   rw [map_mul, h3, map_mul _ _ (χ s), h2]
   ring
 
 section Op
 
-variable {K G W : Type} [Field K] [CharZero K] [Group G] [Fintype G] [AddCommGroup W] [Module ℂ W]
+variable
+  {K G W : Type} [Field K] [CharZero K] [Group G] [Fintype G] [AddCommGroup W] [Module ℂ W]
   (σ : K →+* ℂ) (ρ : Representation ℂ G W)
 
-theorem class_sum_apply {χ : G → K} (h : IsAbsIrrChar χ) (h1 : χ 1 ≠ 0) (y : G) (u : W) :
-    ∑ g : G, ρ (g * y * g⁻¹) (∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u) =
-      σ ((Fintype.card G : K) * χ y / χ 1) • ∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u := by
+theorem class_sum_apply {χ : G → K} (h : IsAbsIrrChar χ) (h1 : χ 1 ≠ 0) (y : G) (u : W)
+    : ∑ g : G, ρ (g * y * g⁻¹) (∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u)
+      = σ ((Fintype.card G : K) * χ y / χ 1) • ∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u := by
   classical
   have hN : ((Fintype.card G : ℕ) : K) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have e1 : ∀ g : G, ρ (g * y * g⁻¹) (∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u) =
-      ∑ s : G, σ ((chiIdem χ).coeff ((g * y * g⁻¹)⁻¹ * s)) • ρ s u := by
+  have e1
+      : ∀ g : G,
+        ρ (g * y * g⁻¹) (∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u)
+          = ∑ s : G, σ ((chiIdem χ).coeff ((g * y * g⁻¹)⁻¹ * s)) • ρ s u := by
     intro g
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, ← Equiv.sum_comp (Equiv.mulLeft (g * y * g⁻¹)⁻¹)]
@@ -84,8 +92,10 @@ theorem class_sum_apply {χ : G → K} (h : IsAbsIrrChar χ) (h1 : χ 1 ≠ 0) (
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← Finset.sum_smul, ← map_sum, smul_smul, ← map_mul]
   congr 2
-  have e2 : ∀ g : G, (chiIdem χ).coeff ((g * y * g⁻¹)⁻¹ * s) =
-      χ 1 / (Fintype.card G : K) * χ (g * y * g⁻¹ * s⁻¹) := by
+  have e2
+      : ∀ g : G,
+        (chiIdem χ).coeff ((g * y * g⁻¹)⁻¹ * s)
+          = χ 1 / (Fintype.card G : K) * χ (g * y * g⁻¹ * s⁻¹) := by
     intro g
     rw [coeff_chiIdem]
     congr 1
@@ -104,12 +114,11 @@ end Op
 def lvlCoef {K G : Type} [Field K] [Group G] (P : Subgroup G) (ψ : P →* Kˣ) (h : P) : K :=
   (Nat.card P : K)⁻¹ * ((ψ h⁻¹ : Kˣ) : K)
 
-
 open Classical in
-theorem coeff_chiIdem_mul_lvlIdem {K G : Type} [Field K] [Group G] [Fintype G] (χ : G → K) (P : Subgroup G)
-    (ψ : P →* Kˣ) (t : G) :
-    (chiIdem χ * lvlIdem P ψ).coeff t =
-      χ 1 / (Fintype.card G : K) * ∑ h : P, lvlCoef P ψ h * χ ((h : G) * t⁻¹) := by
+theorem coeff_chiIdem_mul_lvlIdem
+    {K G : Type} [Field K] [Group G] [Fintype G] (χ : G → K) (P : Subgroup G) (ψ : P →* Kˣ) (t : G)
+    : (chiIdem χ * lvlIdem P ψ).coeff t
+      = χ 1 / (Fintype.card G : K) * ∑ h : P, lvlCoef P ψ h * χ ((h : G) * t⁻¹) := by
   classical
   unfold lvlIdem
   rw [Finset.mul_sum, MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply, Finset.mul_sum]
@@ -122,13 +131,14 @@ end GlobalTheory.Hk3.Meet
 
 namespace GlobalTheory.Hk3
 
-
 open GlobalTheory.Hk3.Meet in
-theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G] [Fintype G] [AddCommGroup W] [Module ℂ W]
-    [FiniteDimensional ℂ W] (σ : K →+* ℂ) (X : Finset (G → K)) (P : Subgroup G) (ψ : P →* Kˣ) (ρ : Representation ℂ G W)
-    (U : Submodule ℂ W), (∀ χ ∈ X, IsAbsIrrChar χ) → (∀ χ ∈ X, chiIdem χ * lvlIdem P ψ ≠ 0) → (∀ g, U.map (ρ g) ≤ U) →
-    U ≠ ⊥ → (∀ u ∈ U, ∑ g, σ ((idemOf X).coeff g) • ρ g u = u) →
-    ∃ u ∈ U, u ≠ 0 ∧ ∀ p : P, ρ p u = σ (ψ p : K) • u := by
+theorem exists_level_vector
+    : ∀ {K G W : Type} [Field K] [CharZero K] [Group G] [Fintype G] [AddCommGroup W] [Module ℂ W]
+        [FiniteDimensional ℂ W] (σ : K →+* ℂ) (X : Finset (G → K)) (P : Subgroup G) (ψ : P →* Kˣ)
+        (ρ : Representation ℂ G W) (U : Submodule ℂ W),
+      (∀ χ ∈ X, IsAbsIrrChar χ) → (∀ χ ∈ X, chiIdem χ * lvlIdem P ψ ≠ 0) → (∀ g, U.map (ρ g) ≤ U)
+        → U ≠ ⊥ → (∀ u ∈ U, ∑ g, σ ((idemOf X).coeff g) • ρ g u = u)
+        → ∃ u ∈ U, u ≠ 0 ∧ ∀ p : P, ρ p u = σ (ψ p : K) • u := by
   intro K G W _ _ _ _ _ _ _ σ X P ψ ρ U hX hne hst hbot hid
   classical
   have hmem : ∀ g, ∀ u ∈ U, ρ g u ∈ U := fun g u hu => hst g (Submodule.mem_map_of_mem hu)
@@ -142,7 +152,7 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
       unfold idemOf
       simp
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_smul, ← map_sum, e]
+    rw [← Finset.sum_smul, ← map_sum, e]
   obtain ⟨χ, hχ, hw⟩ : ∃ χ ∈ X, ∑ g, σ ((chiIdem χ).coeff g) • ρ g u₀ ≠ 0 := by
     by_contra hcon
     push_neg at hcon
@@ -163,7 +173,8 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
   have hN : ((Fintype.card G : ℕ) : K) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
 
   set L : W → W := fun w => ∑ h : P, σ (lvlCoef P ψ h) • ρ (h : G) w with hL
-  have hLU : ∀ w ∈ U, L w ∈ U := fun w hw => Submodule.sum_mem _ fun h _ => Submodule.smul_mem _ _ (hmem _ _ hw)
+  have hLU : ∀ w ∈ U, L w ∈ U := fun w hw =>
+    Submodule.sum_mem _ fun h _ => Submodule.smul_mem _ _ (hmem _ _ hw)
   have hLe : ∀ (p : P) w, ρ p (L w) = σ (ψ p : K) • L w := by
     intro p w
     set_option synthInstance.maxHeartbeats 100000 in
@@ -186,10 +197,13 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
     exact hp (hLe p w)
   have hz : ∑ g : G, ρ g (L (ρ (t⁻¹ * g⁻¹) w₀)) = 0 :=
     Finset.sum_eq_zero fun g _ => by rw [hL0 _ (hmem _ _ hw₀U), map_zero]
-  have hz2 : ∑ g : G, ρ g (L (ρ (t⁻¹ * g⁻¹) w₀)) =
-      σ ((Fintype.card G : K) / χ 1 * ∑ h : P, lvlCoef P ψ h * χ ((h : G) * t⁻¹)) • w₀ := by
-    have e : ∀ g : G, ρ g (L (ρ (t⁻¹ * g⁻¹) w₀)) =
-        ∑ h : P, σ (lvlCoef P ψ h) • ρ (g * ((h : G) * t⁻¹) * g⁻¹) w₀ := by
+  have hz2
+      : ∑ g : G, ρ g (L (ρ (t⁻¹ * g⁻¹) w₀))
+        = σ ((Fintype.card G : K) / χ 1 * ∑ h : P, lvlCoef P ψ h * χ ((h : G) * t⁻¹)) • w₀ := by
+    have e
+        : ∀ g : G,
+          ρ g (L (ρ (t⁻¹ * g⁻¹) w₀))
+            = ∑ h : P, σ (lvlCoef P ψ h) • ρ (g * ((h : G) * t⁻¹) * g⁻¹) w₀ := by
       intro g
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [hL, map_sum, map_smul]
@@ -198,8 +212,10 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
       simp [mul_assoc]
     simp only [e]
     rw [Finset.sum_comm]
-    have e2 : ∀ h : P, ∑ g : G, σ (lvlCoef P ψ h) • ρ (g * ((h : G) * t⁻¹) * g⁻¹) w₀ =
-        σ (lvlCoef P ψ h * ((Fintype.card G : K) * χ ((h : G) * t⁻¹) / χ 1)) • w₀ := by
+    have e2
+        : ∀ h : P,
+          ∑ g : G, σ (lvlCoef P ψ h) • ρ (g * ((h : G) * t⁻¹) * g⁻¹) w₀
+            = σ (lvlCoef P ψ h * ((Fintype.card G : K) * χ ((h : G) * t⁻¹) / χ 1)) • w₀ := by
       intro h
       rw [← Finset.smul_sum, map_mul, mul_smul]
       congr 1

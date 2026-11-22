@@ -5,14 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NormD
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
+open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
 open scoped InnerProductSpace Topology
 
 namespace GlobalTheory.TypeSum
 
-theorem isKFin_dRep : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)), Std ε σ → ∀ v, IsKFin ε σ v → ∀ X ∈ lieSet ε,
-      IsKFin ε σ (dRep σ X v) := by
+theorem isKFin_dRep
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)),
+      Std ε σ → ∀ v, IsKFin ε σ v → ∀ X ∈ lieSet ε, IsKFin ε σ (dRep σ X v) := by
   intro n ε H _ _ _ σ h v hv X hX
   obtain ⟨S, h1, h2, h3⟩ := hv
   have hS : S ≤ smooth (Jm ε) σ := fun s hs => h.2.2.1 s ⟨S, h1, hs, h3⟩

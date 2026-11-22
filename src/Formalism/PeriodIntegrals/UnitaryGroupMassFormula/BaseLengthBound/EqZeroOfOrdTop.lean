@@ -6,21 +6,29 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BaseLengthBound.
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField
+  IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 namespace PoleLengthBounds
 
 section Ord
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  {A : Type*} [CommRing A] [Algebra O A] {ϖ : O}
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {A : Type*} [CommRing A] [Algebra O A]
+  {ϖ : O}
 
-theorem ord_prod_eq_zero (ζ : Pts O A) [IsDVRAt ζ] (h : IsUnif A ϖ) {ι : Type*} (s : Finset ι) (f : ι → A)
-    (hf : ∀ i ∈ s, ord ϖ ζ (f i) = 0) : ord ϖ ζ (∏ i ∈ s, f i) = 0 := by
+theorem ord_prod_eq_zero
+    (ζ : Pts O A) [IsDVRAt ζ]
+    (h : IsUnif A ϖ)
+    {ι : Type*} (s : Finset ι) (f : ι → A) (hf : ∀ i ∈ s, ord ϖ ζ (f i) = 0)
+    : ord ϖ ζ (∏ i ∈ s, f i) = 0 := by
   refine Finset.prod_induction f (fun x => ord ϖ ζ x = 0) (fun a b ha hb => ?_) (ord_one ζ h) hf
   rw [ord_mul ζ h, ha, hb, add_zero]
 
-theorem eq_zero_of_ord_top [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif A ϖ) {x : A} (hx : ∀ ζ : Pts O A, ord ϖ ζ x = ⊤) : x = 0 := by
+theorem eq_zero_of_ord_top
+    [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif A ϖ) {x : A} (hx : ∀ ζ : Pts O A, ord ϖ ζ x = ⊤)
+    : x = 0 := by
   obtain ⟨n, hn⟩ := h.denom x
   have h0 : (⟨ϖ ^ n • x, hn⟩ : ↥(As O A)) = 0 := by
     refine eq_zero_of_localization _ fun J hJ => ?_
@@ -36,12 +44,16 @@ theorem eq_zero_of_ord_top [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif A ϖ) {x :
 
 end Ord
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+  {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
 
-theorem ord_uC_eq_zero {G : GlobalFamilyData X ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)} (Q : LocalPointData G la) (hC : Q.InCurve)
-    (ζ : PtsG G la) (jj : Fin G.N) (α : Fin (WeightFamilies.dimY D j) → ℕ)
-    (h0 : ord (unifO X la G.N) ζ (toOsK X la G.w (wfr G la jj)) = 0) :
-    ord (unifO X la G.N) ζ (uC G la jj α) = 0 := by
+theorem ord_uC_eq_zero
+    {G : GlobalFamilyData X ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
+    (Q : LocalPointData G la) (hC : Q.InCurve) (ζ : PtsG G la) (jj : Fin G.N)
+    (α : Fin (WeightFamilies.dimY D j) → ℕ)
+    (h0 : ord (unifO X la G.N) ζ (toOsK X la G.w (wfr G la jj)) = 0)
+    : ord (unifO X la G.N) ζ (uC G la jj α) = 0 := by
   have := isDVRAt_of_curve Q hC ζ
   have hU := isUnif_of_curve Q hC
   unfold uC

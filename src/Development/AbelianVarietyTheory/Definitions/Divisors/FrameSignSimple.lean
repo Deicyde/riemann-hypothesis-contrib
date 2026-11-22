@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnique
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct nonZeroDivisors
 
@@ -24,12 +26,17 @@ theorem readOK {ι : Type} [Fintype ι] {n : ℕ} (σ : ι → DomWeight n) : Re
   obtain ⟨Φ, h, -⟩ := funForm (K := ℂ) σ
   exact readOK_of_equiv σ Φ fun F => (h F _).2 rfl
 
-theorem finEmb_eq {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε) (y : GfC A) (x : GfC B)
-    (h : EmbRel B A d.ι x.1 y.1) : finEmb d y = x :=
-  Subtype.ext ((GlobalTheory.AutFunCounterexample.embRel_existsUnique B A d.ι d.isom y.1).unique (finEmb_rel d y) h)
+theorem finEmb_eq
+    {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε) (y : GfC A)
+    (x : GfC B) (h : EmbRel B A d.ι x.1 y.1)
+    : finEmb d y = x :=
+  Subtype.ext ((GlobalTheory.AutFunCounterexample.embRel_existsUnique B A d.ι d.isom y.1).unique
+    (finEmb_rel d y) h)
 
-theorem finEmb_mul {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε) (y y' : GfC A) :
-    finEmb d (y * y') = finEmb d y * finEmb d y' := by
+theorem finEmb_mul
+    {A B : HSp D} {c : ℕ} {ε : D.host.E}
+    (d : HermitianOrthogonalExtensionData A B c ε) (y y' : GfC A)
+    : finEmb d (y * y') = finEmb d y * finEmb d y' := by
   refine finEmb_eq d _ _ ⟨?_, fun v hv => ?_⟩
   · have h1 := (finEmb_rel d y).1
     have h2 := (finEmb_rel d y').1

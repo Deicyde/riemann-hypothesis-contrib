@@ -18,7 +18,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.TP.Skew
 
-theorem lineEx_holds : LineEx := lineEx ordAut (ordLine conjAut (ideleStep conjAut) ordEmb invFun ordAut) memOrd memDual
+theorem lineEx_holds : LineEx :=
+  lineEx ordAut (ordLine conjAut (ideleStep conjAut) ordEmb invFun ordAut) memOrd memDual
 
 theorem spacesEx_holds : SpacesEx := spacesEx_of lineEx_holds posEx stdHerm lineSkew
 

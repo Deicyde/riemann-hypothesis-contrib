@@ -10,9 +10,11 @@ open MvPolynomial
 
 universe u_1 u_2 u_3 u_4
 
-theorem hasDerivAt_line {S : Type*} {J : Type*} [CommRing S] [Fintype J] (φ : S →+* ℂ)
-    (u v : J → ℂ) (p : MvPolynomial J S) :
-    HasDerivAt (fun t : ℂ => eval₂Hom φ (u + t • v) p)
+theorem hasDerivAt_line
+    {S : Type*} {J : Type*} [CommRing S] [Fintype J]
+    (φ : S →+* ℂ) (u v : J → ℂ) (p : MvPolynomial J S)
+    : HasDerivAt
+      (fun t : ℂ => eval₂Hom φ (u + t • v) p)
       (∑ j, v j * eval₂Hom φ u (pderiv j p)) 0 := by
   classical
   induction p using MvPolynomial.induction_on with
@@ -31,24 +33,29 @@ theorem hasDerivAt_line {S : Type*} {J : Type*} [CommRing S] [Fintype J] (φ : S
       · subst h; simp [pderiv_X]
       · simp [pderiv_X, h, Ne.symm h]
 
-    have key : ∀ j, v j * eval₂Hom φ u (pderiv j (p * X i)) =
-        (if j = i then v i * eval₂Hom φ u p else 0) + v j * eval₂Hom φ u (pderiv j p) * u i := by
+    have key
+        : ∀ j,
+          v j * eval₂Hom φ u (pderiv j (p * X i))
+            = (if j = i then v i * eval₂Hom φ u p else 0)
+              + v j * eval₂Hom φ u (pderiv j p) * u i := by
       intro j
-      rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add (f := _), map_mul, map_mul, eval₂Hom_X', hX]
+      rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add (f := _), map_mul, map_mul,
+        eval₂Hom_X', hX]
       split_ifs with h
       · subst h; ring
       · ring
     simp only [map_mul, eval₂Hom_X', Pi.add_apply, Pi.smul_apply, smul_eq_mul]
     refine (hp.mul hlin).congr_deriv ?_
     rw [Finset.sum_congr rfl fun j _ => key j, Finset.sum_add_distrib, ← Finset.sum_mul]
-    simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true, zero_smul,
-      add_zero, zero_mul]
+    simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true, zero_smul, add_zero, zero_mul]
     ring
 
-theorem analyticAt_eval {E : Type*} {S : Type*} {J : Type*} [NormedAddCommGroup E]
-    [NormedSpace ℂ E] [CommRing S] [Fintype J] (χ : E → S →+* ℂ) (z₀ : E) (u₀ : J → ℂ)
-    (h : ∀ a : S, AnalyticAt ℂ (fun z : E => χ z a) z₀) (p : MvPolynomial J S) :
-    AnalyticAt ℂ (fun w : E × (J → ℂ) => eval₂Hom (χ w.1) w.2 p) (z₀, u₀) := by
+theorem analyticAt_eval
+    {E : Type*} {S : Type*} {J : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℂ E] [CommRing S] [Fintype J]
+    (χ : E → S →+* ℂ) (z₀ : E)
+    (u₀ : J → ℂ) (h : ∀ a : S, AnalyticAt ℂ (fun z : E => χ z a) z₀) (p : MvPolynomial J S)
+    : AnalyticAt ℂ (fun w : E × (J → ℂ) => eval₂Hom (χ w.1) w.2 p) (z₀, u₀) := by
   induction p using MvPolynomial.induction_on with
   | C a =>
     simp only [eval₂Hom_C]
@@ -58,19 +65,19 @@ theorem analyticAt_eval {E : Type*} {S : Type*} {J : Type*} [NormedAddCommGroup 
     exact hp.add hq
   | mul_X p i hp =>
     simp only [map_mul, eval₂Hom_X']
-    exact hp.mul (((ContinuousLinearMap.proj i).comp
-      (ContinuousLinearMap.snd ℂ E (J → ℂ))).analyticAt _)
+    exact hp.mul
+      (((ContinuousLinearMap.proj i).comp (ContinuousLinearMap.snd ℂ E (J → ℂ))).analyticAt _)
 
-theorem main {E : Type u_1} {S : Type u_2} {J : Type u_3} {σ : Type u_4}
-    [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E] [CommRing S] [Fintype J]
-    [Fintype σ] [DecidableEq σ] (χ : E → S →+* ℂ) (rel : σ → MvPolynomial J S) (c : σ → J)
-    (hc : Function.Bijective c) (z₀ : E) (u₀ : J → ℂ)
-    (han : ∀ a : S, AnalyticAt ℂ (fun z : E => χ z a) z₀)
-    (hdet : Matrix.det (Matrix.of fun s r : σ =>
-      eval₂Hom (χ z₀) u₀ (pderiv (c s) (rel r))) ≠ 0) :
-    ∃ Φ : OpenPartialHomeomorph (E × (J → ℂ)) (E × (σ → ℂ)),
-      (∀ w : E × (J → ℂ), Φ w = (w.1, fun r : σ => eval₂Hom (χ w.1) w.2 (rel r))) ∧
-        (z₀, u₀) ∈ Φ.source ∧ AnalyticOnNhd ℂ Φ.symm Φ.target := by
+theorem main
+    {E : Type u_1} {S : Type u_2} {J : Type u_3} {σ : Type u_4} [NormedAddCommGroup E]
+    [NormedSpace ℂ E] [FiniteDimensional ℂ E] [CommRing S] [Fintype J] [Fintype σ] [DecidableEq σ]
+    (χ : E → S →+* ℂ) (rel : σ → MvPolynomial J S)
+    (c : σ → J) (hc : Function.Bijective c)
+    (z₀ : E) (u₀ : J → ℂ) (han : ∀ a : S, AnalyticAt ℂ (fun z : E => χ z a) z₀)
+    (hdet : Matrix.det (Matrix.of fun s r : σ => eval₂Hom (χ z₀) u₀ (pderiv (c s) (rel r))) ≠ 0)
+    : ∃ Φ : OpenPartialHomeomorph (E × (J → ℂ)) (E × (σ → ℂ)),
+      (∀ w : E × (J → ℂ), Φ w = (w.1, fun r : σ => eval₂Hom (χ w.1) w.2 (rel r)))
+        ∧ (z₀, u₀) ∈ Φ.source ∧ AnalyticOnNhd ℂ Φ.symm Φ.target := by
   classical
   have : CompleteSpace E := FiniteDimensional.complete ℂ E
   set G : E × (J → ℂ) → (σ → ℂ) := fun w r => eval₂Hom (χ w.1) w.2 (rel r)
@@ -80,8 +87,9 @@ theorem main {E : Type u_1} {S : Type u_2} {J : Type u_3} {σ : Type u_4}
   have hFan : AnalyticAt ℂ F a₀ := analyticAt_fst.prod hGan
   have hGd : HasFDerivAt G (fderiv ℂ G a₀) a₀ := hGan.differentiableAt.hasFDerivAt
 
-  have hdirG : ∀ v : J → ℂ, fderiv ℂ G a₀ (0, v) =
-      fun r => ∑ j, v j * eval₂Hom (χ z₀) u₀ (pderiv j (rel r)) := by
+  have hdirG
+      : ∀ v : J → ℂ,
+        fderiv ℂ G a₀ (0, v) = fun r => ∑ j, v j * eval₂Hom (χ z₀) u₀ (pderiv j (rel r)) := by
     intro v
     have hℓ : HasDerivAt (fun t : ℂ => ((z₀, u₀ + t • v) : E × (J → ℂ))) ((0 : E), (1 : ℂ) • v) 0 :=
       (hasDerivAt_const (0 : ℂ) z₀).prodMk (((hasDerivAt_id (0 : ℂ)).smul_const v).const_add u₀)
@@ -100,15 +108,17 @@ theorem main {E : Type u_1} {S : Type u_2} {J : Type u_3} {σ : Type u_4}
     subst hh
     have hv : fderiv ℂ G a₀ (0, v) = 0 := by simpa [L] using congrArg Prod.snd hw
     rw [hdirG] at hv
-    have hzero : Matrix.vecMul (fun s => v (c s))
-        (Matrix.of fun s r : σ => eval₂Hom (χ z₀) u₀ (pderiv (c s) (rel r))) = 0 := by
+    have hzero
+        : Matrix.vecMul
+            (fun s => v (c s))
+            (Matrix.of fun s r : σ => eval₂Hom (χ z₀) u₀ (pderiv (c s) (rel r)))
+          = 0 := by
       funext r
       have hr := congrFun hv r
       simp only [Pi.zero_apply] at hr ⊢
       rw [← hr]
       simp only [Matrix.vecMul, dotProduct, Matrix.of_apply]
-      exact (Equiv.ofBijective c hc).sum_comp
-        (fun j => v j * eval₂Hom (χ z₀) u₀ (pderiv j (rel r)))
+      exact (Equiv.ofBijective c hc).sum_comp (fun j => v j * eval₂Hom (χ z₀) u₀ (pderiv j (rel r)))
     have hvc : (fun s => v (c s)) = 0 := by
       by_contra hne
       exact hdet (Matrix.exists_vecMul_eq_zero_iff.mp ⟨_, hne, hzero⟩)
@@ -131,14 +141,17 @@ theorem main {E : Type u_1} {S : Type u_2} {J : Type u_3} {σ : Type u_4}
     rw [hi, ← hFd.fderiv]
     exact hFan.hasStrictFDerivAt
 
-  have hev : ∀ᶠ w in nhds a₀, AnalyticAt ℂ F w ∧
-      ∃ j : (E × (J → ℂ)) ≃L[ℂ] (E × (σ → ℂ)), fderiv ℂ F w = j := by
+  have hev
+      : ∀ᶠ w in nhds a₀, AnalyticAt ℂ F w ∧
+        ∃ j : (E × (J → ℂ)) ≃L[ℂ] (E × (σ → ℂ)), fderiv ℂ F w = j := by
     refine hFan.eventually_analyticAt.and ?_
-    have hmem : fderiv ℂ F a₀ ∈
-        Set.range ((↑) : ((E × (J → ℂ)) ≃L[ℂ] (E × (σ → ℂ))) → E × (J → ℂ) →L[ℂ] E × (σ → ℂ)) :=
+    have hmem
+        : fderiv ℂ F a₀
+          ∈ Set.range ((↑) : ((E × (J → ℂ)) ≃L[ℂ] (E × (σ → ℂ))) → E × (J → ℂ) →L[ℂ] E × (σ → ℂ)) :=
       ⟨i, by rw [hi, hFd.fderiv]⟩
-    refine (hFan.fderiv.continuousAt.eventually_mem
-      (ContinuousLinearEquiv.isOpen.mem_nhds hmem)).mono fun w hw => ?_
+    refine
+      (hFan.fderiv.continuousAt.eventually_mem (ContinuousLinearEquiv.isOpen.mem_nhds hmem)).mono
+        fun w hw => ?_
     obtain ⟨j, hj⟩ := hw
     exact ⟨j, hj.symm⟩
   obtain ⟨U, hUsub, hUopen, ha₀U⟩ := mem_nhds_iff.mp hev

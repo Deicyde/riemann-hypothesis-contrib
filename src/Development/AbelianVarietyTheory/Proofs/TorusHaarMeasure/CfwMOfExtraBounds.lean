@@ -16,15 +16,18 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.MajLactRm
 
 namespace GlobalTheory.FlatCompare
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates
 open GlobalTheory.IndefiniteRowSideFullHecke.LowSpanCombinations
 
 noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem hf_pos (X : Data E r) {ξ : Fin r → E} (hξ : ξ ≠ 0) {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) :
-    0 < hf X ξ x τ := by
+theorem hf_pos
+    (X : Data E r) {ξ : Fin r → E} (hξ : ξ ≠ 0) {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ)
+    : 0 < hf X ξ x τ := by
   unfold hf
   refine mul_pos (IsotropicThreshold.c_pos X τ) (X.maj_pos hx τ ?_)
   intro h0
@@ -33,8 +36,9 @@ theorem hf_pos (X : Data E r) {ξ : Fin r → E} (hξ : ξ ≠ 0) {x : Frame X.�
   have h1 := congrFun h0 a
   simpa [Data.emb] using h1
 
-theorem guard_iff (X : Data E r) {ξ : Fin r → E} (hξ : ξ ≠ 0) {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) :
-    hf X ξ x τ ≤ 1 ↔ 1 ≤ X.tt ξ x τ := by
+theorem guard_iff
+    (X : Data E r) {ξ : Fin r → E} (hξ : ξ ≠ 0) {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ)
+    : hf X ξ x τ ≤ 1 ↔ 1 ≤ X.tt ξ x τ := by
   rw [tt_eq X ξ x τ, one_le_div (hf_pos X hξ hx τ)]
 
 theorem logTerm_nonneg (X : Data E r) (x : Frame X.Ψ r) : 0 ≤ Real.log (1 + 1 / X.la1 x) := by
@@ -42,8 +46,14 @@ theorem logTerm_nonneg (X : Data E r) (x : Frame X.Ψ r) : 0 ≤ Real.log (1 + 1
   have h1 : 0 ≤ 1 / X.la1 x := div_nonneg zero_le_one (Real.sqrt_nonneg _)
   linarith
 
-theorem exists_short (X : Data E r) : ∃ ε : ℝ, 0 < ε ∧ ∀ x ∈ X.dom, 0 < X.firstMinimumSq x → X.firstMinimumSq x < ε →
-    ∃ v, X.IsIso v ∧ (∀ τ, 1 ≤ X.tt v x τ) ∧ ∀ τ, 1 / (2 * X.firstMinimumSq x) ≤ X.tt v x τ := by
+theorem exists_short (X : Data E r)
+    : ∃ ε : ℝ,
+      0 < ε
+        ∧ ∀ x ∈ X.dom,
+          0 < X.firstMinimumSq x → X.firstMinimumSq x < ε
+            → ∃ v,
+              X.IsIso v ∧ (∀ τ, 1 ≤ X.tt v x τ)
+                ∧ ∀ τ, 1 / (2 * X.firstMinimumSq x) ≤ X.tt v x τ := by
   obtain ⟨δ0, hδ0, hiso⟩ := IsotropicThreshold.iso_threshold X
   refine ⟨min (δ0 / 2) (1 / 2), lt_min (by linarith) (by norm_num), fun x hx hpos hsmall => ?_⟩
   have hmin1 := min_le_left (δ0 / 2) (1 / 2)
@@ -58,23 +68,28 @@ theorem exists_short (X : Data E r) : ∃ ε : ℝ, 0 < ε ∧ ∀ x ∈ X.dom, 
   have hsum_lt : ∑ τ, X.c τ * X.maj x τ (Data.emb τ.1 v) < δ0 := by linarith
   have hherm := hiso x hx v hvΛ hsum_lt
   have hterm : ∀ τ, hf X v x τ ≤ ∑ τ', X.c τ' * X.maj x τ' (Data.emb τ'.1 v) := fun τ =>
-    Finset.single_le_sum (f := fun τ' => X.c τ' * X.maj x τ' (Data.emb τ'.1 v))
-      (fun τ' _ => (hf_pos X hv0 hx τ').le) (Finset.mem_univ τ)
+    Finset.single_le_sum
+      (f := fun τ' => X.c τ' * X.maj x τ' (Data.emb τ'.1 v))
+      (fun τ' _ => (hf_pos X hv0 hx τ').le)
+      (Finset.mem_univ τ)
   refine ⟨v, ⟨hvΛ, hherm, hv0⟩, fun τ => ?_, fun τ => ?_⟩
   · rw [← guard_iff X hv0 hx τ]
     linarith [hterm τ]
   · rw [tt_eq X v x τ]
     exact one_div_le_one_div_of_le (hf_pos X hv0 hx τ) (by linarith [hterm τ])
 
-theorem bdd_add_log (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (h : cfwM X ps a) (ha : 0 < a)
-    (K : ℝ) : ∃ B : ℝ, ∀ x ∈ X.dom, ps x + K * Real.log (1 + 1 / X.la1 x) ≤ B := by
+theorem bdd_add_log
+    (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (h : cfwM X ps a) (ha : 0 < a) (K : ℝ)
+    : ∃ B : ℝ, ∀ x ∈ X.dom, ps x + K * Real.log (1 + 1 / X.la1 x) ≤ B := by
   obtain ⟨⟨C1, A1, h1⟩, h2⟩ := h
   obtain ⟨C2, A2, h2'⟩ := h2 (1 / 4) (by norm_num) (by norm_num)
   obtain ⟨ε, hε, hshort⟩ := exists_short X
   have hM : 0 ≤ |A1| + |K| + |A2| := by positivity
   have hpa : 0 < 8 * Real.pi * a := by positivity
-  refine ⟨max (C1 + (|A1| + |K| + |A2|) / Real.sqrt ε)
-    (C2 + (|A1| + |K| + |A2|) ^ 2 / (8 * Real.pi * a)), fun x hx => ?_⟩
+  refine ⟨
+    max (C1 + (|A1| + |K| + |A2|) / Real.sqrt ε) (C2 + (|A1| + |K| + |A2|) ^ 2 / (8 * Real.pi * a)),
+    fun x hx => ?_
+  ⟩
   have hL0 := logTerm_nonneg X x
   have hy0 : 0 ≤ 1 / X.la1 x := div_nonneg zero_le_one (Real.sqrt_nonneg _)
   have hLy : Real.log (1 + 1 / X.la1 x) ≤ 1 / X.la1 x := by
@@ -97,8 +112,9 @@ theorem bdd_add_log (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (h : cf
     have hcoef : (0 : ℝ) ≤ 8 * Real.pi * (1 - 2 * (1 / 4)) * a := by nlinarith [Real.pi_pos]
     have hI := mul_le_mul_of_nonneg_left hinf hcoef
     have hMy := mul_le_mul_of_nonneg_left hLy hM
-    have hq : (|A1| + |K| + |A2|) * (1 / X.la1 x) - 2 * Real.pi * a * (1 / X.la1 x) ^ 2 ≤
-        (|A1| + |K| + |A2|) ^ 2 / (8 * Real.pi * a) := by
+    have hq
+        : (|A1| + |K| + |A2|) * (1 / X.la1 x) - 2 * Real.pi * a * (1 / X.la1 x) ^ 2
+          ≤ (|A1| + |K| + |A2|) ^ 2 / (8 * Real.pi * a) := by
       rw [le_div_iff₀ hpa]
       nlinarith [sq_nonneg (4 * Real.pi * a * (1 / X.la1 x) - (|A1| + |K| + |A2|))]
     refine le_trans ?_ (le_max_right _ _)
@@ -118,15 +134,16 @@ theorem bdd_add_log (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (h : cf
     refine le_trans ?_ (le_max_left _ _)
     linarith
 
-theorem cfwM_of_extraBounds (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (h : ExtraBounds X ps a) :
-    cfwM X ps a := by
+theorem cfwM_of_extraBounds (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (h : ExtraBounds X ps a)
+    : cfwM X ps a := by
   obtain ⟨A, h1, C, h2⟩ := h
   refine ⟨⟨C, A, h2⟩, fun η hη _ => ?_⟩
   obtain ⟨C', hC'⟩ := h1 η hη
   exact ⟨C', A, fun x hx ξ hξ htt => hC' x hx ξ hξ fun τ => (guard_iff X hξ.2.2 hx τ).2 (htt τ)⟩
 
-theorem extraBounds_of_cfwM (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (ha : 0 ≤ a)
-    (h : cfwM X ps a) : ExtraBounds X ps a := by
+theorem extraBounds_of_cfwM
+    (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ} (ha : 0 ≤ a) (h : cfwM X ps a)
+    : ExtraBounds X ps a := by
   rcases ha.eq_or_lt with ha0 | hapos
   · subst ha0
     obtain ⟨⟨C, A, hC⟩, -⟩ := h
@@ -152,24 +169,26 @@ theorem extraBounds_of_cfwM (X : Data E r) {ps : Frame X.Ψ r → ℝ} {a : ℝ}
       have hL0 := logTerm_nonneg X x
       have e1 := mul_le_mul_of_nonneg_left (hC' x hx ξ hξ htt) hθ0.le
       have e2 := mul_le_mul_of_nonneg_left (hBK x hx) (sub_pos.2 hθ1).le
-      have hKL : (1 - θ) * K * Real.log (1 + 1 / X.la1 x) =
-          θ * |A'| * Real.log (1 + 1 / X.la1 x) := by rw [hK]
+      have hKL
+          : (1 - θ) * K * Real.log (1 + 1 / X.la1 x) = θ * |A'| * Real.log (1 + 1 / X.la1 x) := by
+        rw [hK]
       have hA : θ * A' * Real.log (1 + 1 / X.la1 x) ≤ θ * |A'| * Real.log (1 + 1 / X.la1 x) :=
         mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left (le_abs_self A') hθ0.le) hL0
-      have h3 : θ * (8 * Real.pi * (1 - 2 * (η / 2)) * a * ⨅ τ, X.tt ξ x τ) =
-          8 * Real.pi * (1 - 2 * η) * a * ⨅ τ, X.tt ξ x τ := by
+      have h3
+          : θ * (8 * Real.pi * (1 - 2 * (η / 2)) * a * ⨅ τ, X.tt ξ x τ)
+            = 8 * Real.pi * (1 - 2 * η) * a * ⨅ τ, X.tt ξ x τ := by
         rw [← hθη]; ring
       linarith
     · refine ⟨B0, fun x hx ξ hξ hg => ?_⟩
       have htt : ∀ τ, 1 ≤ X.tt ξ x τ := fun τ => (guard_iff X hξ.2.2 hx τ).1 (hg τ)
       have hI : 1 ≤ ⨅ τ, X.tt ξ x τ := le_ciInf htt
       have h2 := hB0 x hx
-      have hpI : 0 ≤ 8 * Real.pi * a * ⨅ τ, X.tt ξ x τ :=
-        mul_nonneg (by positivity) (by linarith)
+      have hpI : 0 ≤ 8 * Real.pi * a * ⨅ τ, X.tt ξ x τ := mul_nonneg (by positivity) (by linarith)
       nlinarith
 
-theorem extraBounds_iff (X : Data E r) (ps : Frame X.Ψ r → ℝ) {a : ℝ} (ha : 0 ≤ a) :
-    ExtraBounds X ps a ↔ cfwM X ps a := ⟨fun h => cfwM_of_extraBounds X h, extraBounds_of_cfwM X ha⟩
+theorem extraBounds_iff (X : Data E r) (ps : Frame X.Ψ r → ℝ) {a : ℝ} (ha : 0 ≤ a)
+    : ExtraBounds X ps a ↔ cfwM X ps a :=
+  ⟨fun h => cfwM_of_extraBounds X h, extraBounds_of_cfwM X ha⟩
 
 end
 

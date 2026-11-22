@@ -11,7 +11,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormFibr
 
 @[expose] public section
 
-open PositivityTheory.PfSWUS.Loc GlobalTheory.CompanionTheory.UnrDens GlobalTheory.CompanionTheory.SiegLoc Filter Topology
+open PositivityTheory.PfSWUS.Loc GlobalTheory.CompanionTheory.UnrDens
+  GlobalTheory.CompanionTheory.SiegLoc Filter Topology
 
 namespace GlobalTheory.CompanionTheory.SiegLoc.GaussOne
 
@@ -19,8 +20,8 @@ variable {E : Type} [CommRing E] [Fintype E] {τ : E →+* E} {q : ℕ} {ε : �
 
 open scoped Classical in
 open Classical in
-theorem sum_fixed_eq_zero (χ : AddChar E ℂ) (A b : E) (hb : τ b = b) (hχ : χ (A * b) ≠ 1) :
-    ∑ t ∈ Finset.univ.filter (fun t : E => τ t = t), χ (A * t) = 0 := by
+theorem sum_fixed_eq_zero (χ : AddChar E ℂ) (A b : E) (hb : τ b = b) (hχ : χ (A * b) ≠ 1)
+    : ∑ t ∈ Finset.univ.filter (fun t : E => τ t = t), χ (A * t) = 0 := by
   set S := ∑ t ∈ Finset.univ.filter (fun t : E => τ t = t), χ (A * t) with hS
   have key : χ (A * b) * S = S := by
     rw [hS, Finset.mul_sum]
@@ -44,11 +45,12 @@ theorem sum_fixed_eq_zero (χ : AddChar E ℂ) (A b : E) (hb : τ b = b) (hχ : 
 
 open scoped Classical in
 open Classical in
-theorem card_filter_norm (t : E) :
-    (((Finset.univ.filter (fun w : E => τ w * w = t)).card : ℕ) : ℤ) =
-      (Nat.card {a : E // a * τ a = t} : ℤ) := by
-  have hf : Finset.univ.filter (fun w : E => τ w * w = t) =
-      Finset.univ.filter (fun a : E => a * τ a = t) := by
+theorem card_filter_norm (t : E)
+    : (((Finset.univ.filter (fun w : E => τ w * w = t)).card : ℕ) : ℤ)
+      = (Nat.card {a : E // a * τ a = t} : ℤ) := by
+  have hf
+      : Finset.univ.filter (fun w : E => τ w * w = t)
+        = Finset.univ.filter (fun a : E => a * τ a = t) := by
     ext w
     simp only [Finset.mem_filter, Finset.mem_univ, true_and]
     rw [mul_comm]
@@ -56,26 +58,28 @@ theorem card_filter_norm (t : E) :
 
 open scoped Classical in
 open Classical in
-theorem gauss_core (h : ResAlg E τ q ε) (χ : AddChar E ℂ) (A b : E) (hb : τ b = b)
-    (hχ : χ (A * b) ≠ 1) :
-    ∑ w : E, χ (A * (τ w * w)) = (ε : ℂ) * q := by
-  have hmap : ∀ w ∈ (Finset.univ : Finset E),
-      τ w * w ∈ Finset.univ.filter (fun t : E => τ t = t) := by
+theorem gauss_core
+    (h : ResAlg E τ q ε) (χ : AddChar E ℂ) (A b : E) (hb : τ b = b) (hχ : χ (A * b) ≠ 1)
+    : ∑ w : E, χ (A * (τ w * w)) = (ε : ℂ) * q := by
+  have hmap
+      : ∀ w ∈ (Finset.univ : Finset E), τ w * w ∈ Finset.univ.filter (fun t : E => τ t = t) := by
     intro w _
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, map_mul, h.inv]
     exact mul_comm _ _
   rw [← Finset.sum_fiberwise_of_maps_to hmap]
-  have hfib : ∀ t ∈ Finset.univ.filter (fun t : E => τ t = t),
-      (∑ w ∈ Finset.univ.filter (fun w : E => τ w * w = t), χ (A * (τ w * w))) =
-        (((q : ℂ) - ε) + if t = 0 then (q : ℂ) * ε else 0) * χ (A * t) := by
+  have hfib
+      : ∀ t ∈ Finset.univ.filter (fun t : E => τ t = t),
+        (∑ w ∈ Finset.univ.filter (fun w : E => τ w * w = t), χ (A * (τ w * w)))
+          = (((q : ℂ) - ε) + if t = 0 then (q : ℂ) * ε else 0) * χ (A * t) := by
     intro t ht
     have ht' : τ t = t := (Finset.mem_filter.mp ht).2
     rw [Finset.sum_congr rfl (fun w hw => by rw [(Finset.mem_filter.mp hw).2]), Finset.sum_const,
       nsmul_eq_mul]
     congr 1
     have hc := card_filter_norm (τ := τ) t
-    have hc' : (((Finset.univ.filter (fun w : E => τ w * w = t)).card : ℕ) : ℂ) =
-        ((Nat.card {a : E // a * τ a = t} : ℤ) : ℂ) := by
+    have hc'
+        : (((Finset.univ.filter (fun w : E => τ w * w = t)).card : ℕ) : ℂ)
+          = ((Nat.card {a : E // a * τ a = t} : ℤ) : ℂ) := by
       rw [← hc]
       push_cast
       rfl
@@ -99,18 +103,22 @@ end GlobalTheory.CompanionTheory.SiegLoc.GaussOne
 
 namespace GlobalTheory.CompanionTheory.SiegLoc
 
-theorem gauss_level_one : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R) (q : ℕ) (ε : ℤ)
-    (hR : IsUnrQuad R σ ϖ q ε) [∀ k, Fintype (R ⧸ lev ϖ k)] (ψ : ∀ k, AddChar (R ⧸ lev ϖ k) ℂ),
-    IsLevelChars σ ϖ ψ → ∀ (a : R), σ a = a → a ∉ lev ϖ 1 →
-    (∑ w : R ⧸ lev ϖ 1, ψ 1 (Ideal.Quotient.mk (lev ϖ 1) a * (barσ σ ϖ hR.fix_ϖ 1 w * w))) =
-      (ε : ℂ) * q := by
+theorem gauss_level_one
+    : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R) (q : ℕ) (ε : ℤ) (hR : IsUnrQuad R σ ϖ q ε)
+        [∀ k, Fintype (R ⧸ lev ϖ k)] (ψ : ∀ k, AddChar (R ⧸ lev ϖ k) ℂ),
+      IsLevelChars σ ϖ ψ
+        → ∀ (a : R),
+          σ a = a → a ∉ lev ϖ 1
+            → (∑ w : R ⧸ lev ϖ 1, ψ 1 (Ideal.Quotient.mk (lev ϖ 1) a * (barσ σ ϖ hR.fix_ϖ 1 w * w)))
+              = (ε : ℂ) * q := by
   intro R _ σ ϖ q ε hR _ ψ hψ a ha hna
   have hex : ∃ b, σ b = b ∧ ψ 1 (Ideal.Quotient.mk _ (a * b)) ≠ 1 := by
     by_contra hcon
     push_neg at hcon
     exact hna (hψ.prim a ha hcon)
   obtain ⟨b, hb, hχ⟩ := hex
-  refine GaussOne.gauss_core (GlobalTheory.T.residue_algebra_unramified R σ ϖ q ε hR) (ψ 1) _ (Ideal.Quotient.mk _ b) ?_ ?_
+  refine GaussOne.gauss_core (GlobalTheory.T.residue_algebra_unramified R σ ϖ q ε hR) (ψ 1) _
+    (Ideal.Quotient.mk _ b) ?_ ?_
   · rw [barσ_mk, hb]
   · rwa [← map_mul]
 

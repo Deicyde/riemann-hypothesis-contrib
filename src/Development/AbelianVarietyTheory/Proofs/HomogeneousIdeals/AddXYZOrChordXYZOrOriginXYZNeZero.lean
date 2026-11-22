@@ -13,8 +13,7 @@ section Ring
 
 variable {R S : Type*} [CommRing R] [CommRing S]
 
-def Proportional (T U : Fin 3 → R) : Prop :=
-  ∀ i j, T i * U j = T j * U i
+def Proportional (T U : Fin 3 → R) : Prop := ∀ i j, T i * U j = T j * U i
 
 lemma Proportional.symm {T U : Fin 3 → R} (h : Proportional T U) : Proportional U T :=
   fun i j => by linear_combination h j i
@@ -63,12 +62,6 @@ lemma proportional_diagXYZ_addXYZ {P Q : Fin 3 → R} (hP : W.Equation P) (hQ : 
     Proportional (diagXYZ W P Q) (W.addXYZ P Q) :=
   proportional_negY W (diagX_mul_addZ hP hQ) (negDiagY_mul_addZ hP hQ) (diagX_mul_negAddY hP hQ)
 
-
-
-
-
-
-
 end Ring
 
 section Field
@@ -102,7 +95,6 @@ lemma equiv_of_proportional {T U : Fin 3 → F} (h : Proportional T U) (hT : T �
   have hu : T j / U j ≠ 0 := fun h0 => hT <| by rw [← e, h0, zero_smul]
   exact ⟨Units.mk0 _ hu, e⟩
 
-
 lemma addXYZ_ne_zero_iff {P Q : Fin 3 → F} (hP : W.Nonsingular P) (hQ : W.Nonsingular Q) :
     W.addXYZ P Q ≠ 0 ↔ ¬P ≈ Q := by
   refine ⟨fun h ⟨u, e⟩ => h ?_, fun h => ?_⟩
@@ -128,8 +120,9 @@ lemma diagXYZ_ne_zero_of_equiv {P Q : Fin 3 → F} (hP : W.Nonsingular P) (hQ : 
   ne_zero_of_nonsingular <| (nonsingular_of_equiv <| diagXYZ_equiv_add_of_equiv hP.left h).mpr <|
     nonsingular_add hP hQ
 
-theorem addXYZ_ne_zero_or_diagXYZ_ne_zero {P Q : Fin 3 → F} (hP : W.Nonsingular P)
-    (hQ : W.Nonsingular Q) : W.addXYZ P Q ≠ 0 ∨ diagXYZ W P Q ≠ 0 := by
+theorem addXYZ_ne_zero_or_diagXYZ_ne_zero
+    {P Q : Fin 3 → F} (hP : W.Nonsingular P) (hQ : W.Nonsingular Q)
+    : W.addXYZ P Q ≠ 0 ∨ diagXYZ W P Q ≠ 0 := by
   by_cases h : P ≈ Q
   · exact Or.inr <| diagXYZ_ne_zero_of_equiv hP hQ h
   · exact Or.inl <| (addXYZ_ne_zero_iff hP hQ).mpr h

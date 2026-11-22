@@ -4,19 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
 namespace UpperTheory.V.Pa.FrattiniSubgroup
 
-private theorem exists_hom (l : ℕ) [hl : Fact l.Prime] (Q : Type) [Group Q] [Finite Q] [Nontrivial Q]
-    (hQ : IsPGroup l Q) : ∃ φ : Q →* Multiplicative (ZMod l), φ.ker ≠ ⊤ := by
+private theorem exists_hom
+    (l : ℕ) [hl : Fact l.Prime] (Q : Type) [Group Q] [Finite Q] [Nontrivial Q] (hQ : IsPGroup l Q)
+    : ∃ φ : Q →* Multiplicative (ZMod l), φ.ker ≠ ⊤ := by
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hQ
   have hk0 : k ≠ 0 := by
     rintro rfl
     rw [pow_zero, Nat.card_eq_one_iff_unique] at hk
     exact not_nontrivial_iff_subsingleton.mpr hk.1 ‹_›
-  obtain ⟨K, hK⟩ := Sylow.exists_subgroup_card_pow_prime l (n := k - 1)
-    (hk ▸ pow_dvd_pow l (Nat.sub_le k 1))
+  obtain ⟨K, hK⟩ :=
+    Sylow.exists_subgroup_card_pow_prime l (n := k - 1) (hk ▸ pow_dvd_pow l (Nat.sub_le k 1))
   have hidx : K.index = l := by
     have h := K.card_mul_index
     rw [hK, hk] at h
@@ -34,7 +36,8 @@ private theorem exists_hom (l : ℕ) [hl : Fact l.Prime] (Q : Type) [Group Q] [F
     intro q _
     have hq : q ∈ (e.toMonoidHom.comp (QuotientGroup.mk' K)).ker := htop ▸ Subgroup.mem_top q
     rw [MonoidHom.mem_ker, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulEquiv.map_eq_one_iff,
-      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hq
+        QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      at hq
     exact hq
   rw [hKtop, Subgroup.index_top] at hidx
   exact hl.out.one_lt.ne hidx
@@ -65,8 +68,8 @@ private theorem frS_normal (l : ℕ) (K : Subgroup Γ) [hK : K.Normal] : (frS l 
     exact ψ.2.preimage hcc
   exact hk ⟨ψ.1.comp c, hφ⟩
 
-private theorem frS_open (l : ℕ) (h : PhiCond Γ l) (K : Subgroup Γ) (hK : IsOpen (K : Set Γ)) :
-    IsOpen (frS l K : Set Γ) := by
+private theorem frS_open (l : ℕ) (h : PhiCond Γ l) (K : Subgroup Γ) (hK : IsOpen (K : Set Γ))
+    : IsOpen (frS l K : Set Γ) := by
   haveI := h K hK
   unfold frS
   rw [Subgroup.coe_map, Subgroup.coe_iInf]
@@ -77,18 +80,24 @@ private def fr (l : ℕ) (h : PhiCond Γ l) (K : OpenNormalSubgroup Γ) : OpenNo
   isOpen' := frS_open l h _ K.isOpen
   isNormal' := frS_normal l _
 
-private theorem fr_le (l : ℕ) (h : PhiCond Γ l) (K : OpenNormalSubgroup Γ) :
-    (fr l h K).toSubgroup ≤ K.toSubgroup := Subgroup.map_subtype_le _
+private theorem fr_le (l : ℕ) (h : PhiCond Γ l) (K : OpenNormalSubgroup Γ)
+    : (fr l h K).toSubgroup ≤ K.toSubgroup :=
+  Subgroup.map_subtype_le _
 
-private theorem fr_lt (l : ℕ) [Fact l.Prime] [CompactSpace Γ] (h : PhiCond Γ l) (K V : OpenNormalSubgroup Γ)
-    (hp : ∀ k ∈ K.toSubgroup, ∃ e : ℕ, k ^ l ^ e ∈ V.toSubgroup) (hn : ¬ K.toSubgroup ≤ V.toSubgroup) :
-    (fr l h K).toSubgroup.map (QuotientGroup.mk' V.toSubgroup) <
-      K.toSubgroup.map (QuotientGroup.mk' V.toSubgroup) := by
+private theorem fr_lt
+    (l : ℕ) [Fact l.Prime] [CompactSpace Γ]
+    (h : PhiCond Γ l)
+    (K V : OpenNormalSubgroup Γ) (hp : ∀ k ∈ K.toSubgroup, ∃ e : ℕ, k ^ l ^ e ∈ V.toSubgroup)
+    (hn : ¬ K.toSubgroup ≤ V.toSubgroup)
+    : (fr l h K).toSubgroup.map (QuotientGroup.mk' V.toSubgroup)
+      < K.toSubgroup.map (QuotientGroup.mk' V.toSubgroup) := by
   let π := (QuotientGroup.mk' V.toSubgroup).subgroupMap K.toSubgroup
   haveI : Finite (Γ ⧸ V.toSubgroup) := (inferInstance : Finite (Γ ⧸ (V.toOpenSubgroup : Subgroup Γ)))
-  have hπk : ∀ k : K.toSubgroup, ((π k : K.toSubgroup.map (QuotientGroup.mk' V.toSubgroup)) :
-      Γ ⧸ V.toSubgroup) = QuotientGroup.mk' V.toSubgroup k :=
-    fun k => MonoidHom.subgroupMap_apply_coe _ _ k
+  have hπk
+      : ∀ k : K.toSubgroup,
+        ((π k : K.toSubgroup.map (QuotientGroup.mk' V.toSubgroup)) : Γ ⧸ V.toSubgroup)
+          = QuotientGroup.mk' V.toSubgroup k := fun k =>
+    MonoidHom.subgroupMap_apply_coe _ _ k
   haveI : Nontrivial (K.toSubgroup.map (QuotientGroup.mk' V.toSubgroup)) := by
     obtain ⟨k, hkK, hkV⟩ := Set.not_subset.mp hn
     refine ⟨⟨π ⟨k, hkK⟩, 1, fun h => hkV ?_⟩⟩
@@ -122,8 +131,9 @@ private theorem fr_lt (l : ℕ) [Fact l.Prime] [CompactSpace Γ] (h : PhiCond Γ
   rw [eq_top_iff]
   intro q _
   obtain ⟨k, rfl⟩ := MonoidHom.subgroupMap_surjective _ _ q
-  have hk : QuotientGroup.mk' V.toSubgroup (k : Γ) ∈
-      (fr l h K).toSubgroup.map (QuotientGroup.mk' V.toSubgroup) := by
+  have hk
+      : QuotientGroup.mk' V.toSubgroup (k : Γ)
+        ∈ (fr l h K).toSubgroup.map (QuotientGroup.mk' V.toSubgroup) := by
     rw [heq]
     exact Subgroup.mem_map_of_mem _ k.2
   obtain ⟨f, hf, hfk⟩ := Subgroup.mem_map.mp hk
@@ -138,8 +148,11 @@ private theorem fr_lt (l : ℕ) [Fact l.Prime] [CompactSpace Γ] (h : PhiCond Γ
   rw [hπeq]
   exact hf'ψ
 
-private theorem pow_mem (l : ℕ) [CompactSpace Γ] (H : Subgroup Γ) (V : OpenNormalSubgroup Γ)
-    (hV : PL l H ≤ V.toSubgroup) : ∀ k ∈ H, ∃ e : ℕ, k ^ l ^ e ∈ V.toSubgroup := by
+private theorem pow_mem
+    (l : ℕ)
+    [CompactSpace Γ]
+    (H : Subgroup Γ) (V : OpenNormalSubgroup Γ) (hV : PL l H ≤ V.toSubgroup)
+    : ∀ k ∈ H, ∃ e : ℕ, k ^ l ^ e ∈ V.toSubgroup := by
   intro k hk
   let ι := {U : OpenNormalSubgroup Γ // ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U.toSubgroup}
   haveI : Nonempty ι := ⟨⟨{ toSubgroup := ⊤, isOpen' := isOpen_univ, isNormal' := inferInstance },
@@ -150,8 +163,11 @@ private theorem pow_mem (l : ℕ) [CompactSpace Γ] (H : Subgroup Γ) (V : OpenN
     have hopen : IsOpen ((i.1.toSubgroup ⊓ j.1.toSubgroup : Subgroup Γ) : Set Γ) := by
       rw [Subgroup.coe_inf]
       exact i.1.toOpenSubgroup.isOpen.inter j.1.toOpenSubgroup.isOpen
-    let U : OpenNormalSubgroup Γ :=
-      { toSubgroup := i.1.toSubgroup ⊓ j.1.toSubgroup, isOpen' := hopen, isNormal' := inferInstance }
+    let U : OpenNormalSubgroup Γ := {
+      toSubgroup := i.1.toSubgroup ⊓ j.1.toSubgroup
+      isOpen' := hopen
+      isNormal' := inferInstance
+    }
     have hU : ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U.toSubgroup := by
       intro h hh
       obtain ⟨e1, h1⟩ := i.2 h hh
@@ -163,8 +179,7 @@ private theorem pow_mem (l : ℕ) [CompactSpace Γ] (H : Subgroup Γ) (V : OpenN
         exact Subgroup.pow_mem _ h2 _
     exact ⟨⟨U, hU⟩, fun x hx => (Subgroup.mem_inf.mp hx).1, fun x hx => (Subgroup.mem_inf.mp hx).2⟩
   have hclosed : ∀ i : ι, IsClosed (t i) := fun i => i.1.toOpenSubgroup.isClosed
-  have hVc : IsCompact ((V.toSubgroup : Set Γ)ᶜ) :=
-    V.toOpenSubgroup.isOpen.isClosed_compl.isCompact
+  have hVc : IsCompact ((V.toSubgroup : Set Γ)ᶜ) := V.toOpenSubgroup.isOpen.isClosed_compl.isCompact
   have hempty : (V.toSubgroup : Set Γ)ᶜ ∩ ⋂ i : ι, t i = ∅ := by
     rw [Set.eq_empty_iff_forall_notMem]
     rintro x ⟨hxV, hx⟩
@@ -173,7 +188,9 @@ private theorem pow_mem (l : ℕ) [CompactSpace Γ] (H : Subgroup Γ) (V : OpenN
     simp only [UpperTheory.V.Pa.PL, Subgroup.mem_iInf]
     intro U hU
     exact Set.mem_iInter.mp hx ⟨U, hU⟩
-  obtain ⟨i, hi⟩ := (hVc.elim_directed_family_closed t hclosed (Set.disjoint_iff_inter_eq_empty.2 hempty) hdir).imp (fun _ => Disjoint.inter_eq)
+  obtain ⟨i, hi⟩ :=
+    (hVc.elim_directed_family_closed t hclosed (Set.disjoint_iff_inter_eq_empty.2 hempty) hdir).imp
+      (fun _ => Disjoint.inter_eq)
   obtain ⟨e, he⟩ := i.2 k hk
   refine ⟨e, ?_⟩
   by_contra hne
@@ -184,8 +201,15 @@ private theorem pow_mem (l : ℕ) [CompactSpace Γ] (H : Subgroup Γ) (V : OpenN
 end UpperTheory.V.Pa.FrattiniSubgroup
 
 open UpperTheory.V.Pa.FrattiniSubgroup in
-theorem UpperTheory.V.Pa.frat :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (H : OpenNormalSubgroup Γ), PhiCond Γ l → ∃ W : ℕ → OpenNormalSubgroup Γ, (∀ N, (W N).toSubgroup ≤ H.toSubgroup) ∧ ∀ V : OpenNormalSubgroup Γ, PL l H.toSubgroup ≤ V.toSubgroup → ∀ᶠ N in atTop, (W N).toSubgroup ≤ V.toSubgroup := by
+theorem UpperTheory.V.Pa.frat
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (H : OpenNormalSubgroup Γ),
+      PhiCond Γ l
+        → ∃ W : ℕ → OpenNormalSubgroup Γ,
+          (∀ N, (W N).toSubgroup ≤ H.toSubgroup)
+            ∧ ∀ V : OpenNormalSubgroup Γ,
+              PL l H.toSubgroup ≤ V.toSubgroup
+                → ∀ᶠ N in atTop, (W N).toSubgroup ≤ V.toSubgroup := by
   intro l _ Γ _ _ _ _ _ H hΦ
   let W : ℕ → OpenNormalSubgroup Γ := fun N =>
     Nat.rec (motive := fun _ => OpenNormalSubgroup Γ) H (fun _ K => fr l hΦ K) N

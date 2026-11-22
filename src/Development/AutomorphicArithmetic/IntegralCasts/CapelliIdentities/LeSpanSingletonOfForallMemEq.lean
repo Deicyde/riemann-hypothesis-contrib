@@ -4,13 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yhc2.le_span_singleton_of_forall_mem_eq.{u_1} :
-    ∀ {R : Type u_1} [inst : CommRing R] {π ξ : R} [IsAdicComplete (Ideal.span {π}) R] {J : Ideal R},
+theorem UpperTheory.Reformulated.B.Yhc2.le_span_singleton_of_forall_mem_eq.{u_1}
+    : ∀ {R : Type u_1} [inst : CommRing R] {π ξ : R} [IsAdicComplete (Ideal.span {π}) R]
+        {J : Ideal R},
       (∀ x ∈ J, ∃ (a : R), ∃ z ∈ J, x = a * ξ + z * π) → J ≤ Ideal.span {ξ} := by
   intro R _ π ξ hc J h x hx
   choose! a z hz he using h
-  have hsm : ∀ (n : ℕ) (u v : R),
-      u ≡ v [SMOD ((Ideal.span {π}) ^ n • ⊤ : Submodule R R)] ↔ π ^ n ∣ u - v := by
+  have hsm
+      : ∀ (n : ℕ) (u v : R),
+        u ≡ v [SMOD ((Ideal.span {π}) ^ n • ⊤ : Submodule R R)] ↔ π ^ n ∣ u - v := by
     intro n u v
     rw [SModEq.sub_mem, Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top,
       Ideal.mem_span_singleton]
@@ -29,8 +31,7 @@ theorem UpperTheory.Reformulated.B.Yhc2.le_span_singleton_of_forall_mem_eq.{u_1}
       rw [Function.iterate_succ_apply', hf]
       have h1 := he _ (hzs n)
       linear_combination ih + π ^ n * h1
-  have hcau : ∀ {m n : ℕ}, m ≤ n →
-      f m ≡ f n [SMOD ((Ideal.span {π}) ^ m • ⊤ : Submodule R R)] := by
+  have hcau : ∀ {m n : ℕ}, m ≤ n → f m ≡ f n [SMOD ((Ideal.span {π}) ^ m • ⊤ : Submodule R R)] := by
     intro m n hmn
     rw [hsm]
     induction n, hmn using Nat.le_induction with

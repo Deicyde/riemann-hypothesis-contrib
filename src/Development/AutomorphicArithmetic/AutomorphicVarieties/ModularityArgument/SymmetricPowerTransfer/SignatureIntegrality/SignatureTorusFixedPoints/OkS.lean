@@ -9,7 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
 theorem UpperTheory.V.Z.Sym.Sig.okS : UpperTheory.V.Z.Sym.Sig.OkS := by
   intro k _ _ _ _ O _ _ hO h2 Δ s hs hs0 V Ry hR χ hχ t ht
@@ -27,7 +29,8 @@ theorem UpperTheory.V.Z.Sym.Sig.okS : UpperTheory.V.Z.Sym.Sig.OkS := by
     constructor
     · rintro ⟨a', ha', b, hb, e⟩
       refine ⟨a⁻¹ * a', mul_mem (inv_mem ha) ha', b, hb, ?_⟩
-      calc g = a⁻¹ * (a * g) := by group
+      calc
+        g = a⁻¹ * (a * g) := by group
         _ = a⁻¹ * a' * dg ![t, t⁻¹] * b := by rw [e]; group
     · rintro ⟨a', ha', b, hb, e⟩
       exact ⟨a * a', mul_mem ha ha', b, hb, by rw [e]; group⟩
@@ -36,7 +39,8 @@ theorem UpperTheory.V.Z.Sym.Sig.okS : UpperTheory.V.Z.Sym.Sig.OkS := by
     constructor
     · rintro ⟨a', ha', b, hb, e⟩
       refine ⟨a', ha', b * a⁻¹, mul_mem hb (inv_mem ha), ?_⟩
-      calc g = (g * a) * a⁻¹ := by group
+      calc
+        g = (g * a) * a⁻¹ := by group
         _ = a' * dg ![t, t⁻¹] * (b * a⁻¹) := by rw [e]; group
     · rintro ⟨a', ha', b, hb, e⟩
       exact ⟨a', ha', b * a, mul_mem hb ha, by rw [e]; group⟩
@@ -60,7 +64,10 @@ theorem UpperTheory.V.Z.Sym.Sig.okS : UpperTheory.V.Z.Sym.Sig.OkS := by
       rw [MulAction.Quotient.smul_mk, QuotientGroup.eq]
       simpa [mul_assoc] using hb
     · intro x _ y _ hxy
-      have h1 : (eD hs ((Quotient.out x : ↥(SU Δ)) : ↥(DX Δ)))⁻¹ * eD hs ((Quotient.out y : ↥(SU Δ)) : ↥(DX Δ)) ∈ V.J 2 :=
+      have h1
+          : (eD hs ((Quotient.out x : ↥(SU Δ)) : ↥(DX Δ)))⁻¹
+              * eD hs ((Quotient.out y : ↥(SU Δ)) : ↥(DX Δ))
+            ∈ V.J 2 :=
         QuotientGroup.eq.1 hxy
       rw [← map_inv, ← map_mul] at h1
       have h3 : (Quotient.out x)⁻¹ * Quotient.out y ∈ S.J2.subgroupOf (SU Δ) := h1
@@ -89,9 +96,10 @@ theorem UpperTheory.V.Z.Sym.Sig.okS : UpperTheory.V.Z.Sym.Sig.OkS := by
     obtain ⟨d, hdmem, rfl⟩ := hw
     have hd0 : d 0 ∈ V.H := hdmem 0 (Set.mem_univ _)
     rw [MonoidHom.id_apply] at e
-    have hc : ((j⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) *
-        ((eD hs γ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) * (j : Matrix (Fin 2) (Fin 2) k) =
-        diagonal fun i => (((d * ![t, t⁻¹]) i : kˣ) : k) := by
+    have hc
+        : ((j⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+            * ((eD hs γ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) * (j : Matrix (Fin 2) (Fin 2) k)
+          = diagonal fun i => (((d * ![t, t⁻¹]) i : kˣ) : k) := by
       rw [← Units.val_mul, ← Units.val_mul, e]
       unfold dg
       rw [← map_mul, val_diagT]
@@ -105,7 +113,9 @@ theorem UpperTheory.V.Z.Sym.Sig.okS : UpperTheory.V.Z.Sym.Sig.OkS := by
       inj (by rw [← (hdt γ).2, htr])
     rw [hdet1, Matrix.det_diagonal, Fin.prod_univ_two] at hD
     rw [htr1, Matrix.trace_diagonal, Fin.sum_univ_two] at hT
-    simp only [Pi.mul_apply, Units.val_mul, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons] at hD hT
+    simp only [Pi.mul_apply, Units.val_mul, Matrix.cons_val_zero, Matrix.cons_val_one,
+        Matrix.head_cons]
+      at hD hT
     have hinv : (t * d 0)⁻¹ = d 1 * t⁻¹ := by
       refine inv_eq_of_mul_eq_one_right (Units.ext ?_)
       simp only [Units.val_mul, Units.val_one]

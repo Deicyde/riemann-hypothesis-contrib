@@ -26,8 +26,8 @@ open NumberField.InfinitePlace.Completion
 
 variable {K : Type*} [Field K] {v : InfinitePlace K}
 
-theorem continuous_ringEquivRealOfIsReal (hv : v.IsReal) :
-    Continuous (ringEquivRealOfIsReal hv) := by
+theorem continuous_ringEquivRealOfIsReal (hv : v.IsReal)
+    : Continuous (ringEquivRealOfIsReal hv) := by
   have : (ringEquivRealOfIsReal hv : v.Completion → ℝ) = extensionEmbeddingOfIsReal hv := by
     ext x
     simp

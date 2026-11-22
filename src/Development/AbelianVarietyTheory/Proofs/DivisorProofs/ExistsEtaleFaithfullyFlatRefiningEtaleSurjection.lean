@@ -7,32 +7,43 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleFaithfu
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem etale_sigmaDesc_of_isOpenImmersion {ι : Type} (V : Scheme.{0}) (Y : ι → Scheme.{0})
-    (u : ∀ i, Y i ⟶ V) [∀ i, IsOpenImmersion (u i)] : Etale (Sigma.desc u) := by
+theorem etale_sigmaDesc_of_isOpenImmersion
+    {ι : Type} (V : Scheme.{0}) (Y : ι → Scheme.{0}) (u : ∀ i, Y i ⟶ V) [∀ i, IsOpenImmersion (u i)]
+    : Etale (Sigma.desc u) := by
   have := HasRingHomProperty.instIsZariskiLocalAtSource (P := @Etale)
   exact IsZariskiLocalAtSource.sigmaDesc fun _ => inferInstance
 
-theorem etFF_preimage_of_etale_surjective (A B : CommRingCat.{0}) (k : Spec B ⟶ Spec A)
-    [Etale k] [Surjective k] : EtFF (Spec.preimage k) := by
+theorem etFF_preimage_of_etale_surjective
+    (A B : CommRingCat.{0}) (k : Spec B ⟶ Spec A) [Etale k] [Surjective k]
+    : EtFF (Spec.preimage k) := by
   rw [(GlobalTheory.T.etaleFaithfullyFlatRingHom_basic_properties.2.1 A B _), Spec.map_preimage]
   exact ⟨inferInstance, inferInstance⟩
 
-theorem exists_etFF_of_isAffine (A : CommRingCat.{0}) (X V : Scheme.{0}) [IsAffine X]
-    (h' : X ⟶ V) (f : V ⟶ Spec A) [Etale (h' ≫ f)] [Surjective (h' ≫ f)] :
-    ∃ (B : CommRingCat.{0}) (g : A ⟶ B) (h : Spec B ⟶ V), EtFF g ∧ h ≫ f = Spec.map g := by
+theorem exists_etFF_of_isAffine
+    (A : CommRingCat.{0})
+    (X V : Scheme.{0}) [IsAffine X]
+    (h' : X ⟶ V) (f : V ⟶ Spec A) [Etale (h' ≫ f)] [Surjective (h' ≫ f)]
+    : ∃ (B : CommRingCat.{0}) (g : A ⟶ B) (h : Spec B ⟶ V), EtFF g ∧ h ≫ f = Spec.map g := by
   have he : Etale (X.isoSpec.inv ≫ h' ≫ f) := inferInstance
   have hs : Surjective (X.isoSpec.inv ≫ h' ≫ f) := inferInstance
-  refine ⟨Γ(X, ⊤), Spec.preimage (X.isoSpec.inv ≫ h' ≫ f), X.isoSpec.inv ≫ h',
-    etFF_preimage_of_etale_surjective _ _ _, ?_⟩
+  refine ⟨
+    Γ(X, ⊤),
+    Spec.preimage (X.isoSpec.inv ≫ h' ≫ f),
+    X.isoSpec.inv ≫ h',
+    etFF_preimage_of_etale_surjective _ _ _,
+    ?_
+  ⟩
   rw [Spec.map_preimage, Category.assoc]
 
-theorem exists_etFF_refine_of_etale_surjective :
-    ∀ (A : CommRingCat.{0}) (V : Scheme.{0}) (f : V ⟶ Spec A), Etale f → Surjective f →
-      ∃ (B : CommRingCat.{0}) (g : A ⟶ B) (h : Spec B ⟶ V), EtFF g ∧ h ≫ f = Spec.map g := by
+theorem exists_etFF_refine_of_etale_surjective
+    : ∀ (A : CommRingCat.{0}) (V : Scheme.{0}) (f : V ⟶ Spec A),
+      Etale f → Surjective f
+        → ∃ (B : CommRingCat.{0}) (g : A ⟶ B) (h : Spec B ⟶ V), EtFF g ∧ h ≫ f = Spec.map g := by
   intro A V f hf hs
   have hopen : ∀ x : V.affineCover.I₀, IsOpen (Set.range (V.affineCover.f x ≫ f)) := fun x =>
     (V.affineCover.f x ≫ f).isOpenMap.isOpen_range
@@ -47,8 +58,7 @@ theorem exists_etFF_refine_of_etale_surjective :
   haveI : ∀ i, IsAffine (Y i) := fun i => inferInstanceAs (IsAffine (Spec _))
   haveI : ∀ i, IsOpenImmersion (u i) := fun i => inferInstanceAs (IsOpenImmersion (V.affineCover.f i.1))
   haveI : Etale (Sigma.desc u) := etale_sigmaDesc_of_isOpenImmersion V Y u
-  have hcomp : Sigma.desc u ≫ f = Sigma.desc fun i => u i ≫ f := by
-    ext i; simp
+  have hcomp : Sigma.desc u ≫ f = Sigma.desc fun i => u i ≫ f := by ext i; simp
   haveI hsurj : Surjective (Sigma.desc u ≫ f) := by
     rw [hcomp]
     apply Surjective.sigmaDesc_of_union_range_eq_univ

@@ -62,8 +62,11 @@ lemma factorial_dvd_term (n K s a : ℕ) (hK1 : 1 ≤ K) (hKn : K ≤ n) (hs : s
     (dvd_mul_of_dvd_left (Nat.factorial_dvd_factorial (by omega)) _)
 
 def Good (n : ℕ) (f : MvPolynomial (Fin 2) ℤ) : Prop :=
-  ∀ i j : ℕ, n ≤ i + j → ((n.factorial * ((n - 1) / 2).factorial : ℕ) : ℤ) ∣
-    ((i.factorial * j.factorial : ℕ) : ℤ) * AddMonoidAlgebra.coeff f (Finsupp.single 0 i + Finsupp.single 1 j)
+  ∀ i j : ℕ,
+    n ≤ i + j
+      → ((n.factorial * ((n - 1) / 2).factorial : ℕ) : ℤ)
+        ∣ ((i.factorial * j.factorial : ℕ) : ℤ)
+          * AddMonoidAlgebra.coeff f (Finsupp.single 0 i + Finsupp.single 1 j)
 
 lemma good_sub {n : ℕ} {f g : MvPolynomial (Fin 2) ℤ} (hf : Good n f) (hg : Good n g) :
     Good n (f - g) := by
@@ -147,10 +150,13 @@ theorem good_logDefect (n : ℕ) : Good n (logDefect n) := by
   · exact good_truncLogF n _ fun K h1 h2 => logPolynomialDefectDivisible_C_mul_X_zero_pow n K h1 h2
   · exact good_truncLogF n _ fun K h1 h2 => logPolynomialDefectDivisible_C_mul_X_one_pow n K h1 h2
 
-theorem logDefect_coeff_dvd : ∀ (n i j : ℕ), n ≤ i + j → ∃ d : ℤ,
-    ((i.factorial * j.factorial : ℕ) : ℤ) *
-        AddMonoidAlgebra.coeff (GlobalTheory.LogU.logDefect n) (Finsupp.single 0 i + Finsupp.single 1 j) =
-      ((n.factorial * ((n - 1) / 2).factorial : ℕ) : ℤ) * d := by
+theorem logDefect_coeff_dvd
+    : ∀ (n i j : ℕ),
+      n ≤ i + j
+        → ∃ d : ℤ,
+          ((i.factorial * j.factorial : ℕ) : ℤ) * AddMonoidAlgebra.coeff
+              (GlobalTheory.LogU.logDefect n) (Finsupp.single 0 i + Finsupp.single 1 j)
+            = ((n.factorial * ((n - 1) / 2).factorial : ℕ) : ℤ) * d := by
   intro n i j h
   exact good_logDefect n i j h
 

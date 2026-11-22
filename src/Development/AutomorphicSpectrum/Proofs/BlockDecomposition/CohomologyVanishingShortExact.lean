@@ -10,16 +10,19 @@ open CategoryTheory CrystallineSemistableComparison CrystallineSemistableCompari
 
 namespace GlobalTheory.CompanionTheory.Cohomology
 
-theorem subsingleton_H_of_ses {R : Type} [CommRing R] {C : Type 1} [Category.{0} C]
-    {F₁ F₂ F₃ : C ⥤ ModuleCat.{0} R} (α : F₁ ⟶ F₂) (β : F₂ ⟶ F₃)
-    (hi : ∀ T, Function.Injective (α.app T).hom)
+theorem subsingleton_H_of_ses
+    {R : Type} [CommRing R]
+    {C : Type 1} [Category.{0} C]
+    {F₁ F₂ F₃ : C ⥤ ModuleCat.{0} R}
+    (α : F₁ ⟶ F₂) (β : F₂ ⟶ F₃) (hi : ∀ T, Function.Injective (α.app T).hom)
     (he : ∀ T, Function.Exact (α.app T).hom (β.app T).hom)
-    (hs : ∀ T, Function.Surjective (β.app T).hom)
-    (h₂ : ∀ n, Subsingleton (CH.H F₂ n)) (h₃ : ∀ n, Subsingleton (CH.H F₃ n)) :
-    ∀ n, Subsingleton (CH.H F₁ n) := by
+    (hs : ∀ T, Function.Surjective (β.app T).hom) (h₂ : ∀ n, Subsingleton (CH.H F₂ n))
+    (h₃ : ∀ n, Subsingleton (CH.H F₃ n))
+    : ∀ n, Subsingleton (CH.H F₁ n) := by
   obtain ⟨c₁, c₂, c₃⟩ := CrystallineSemistableComparison.P.ses_cochains α β hi he hs
   obtain ⟨δ, -, hinj, -, -, hex⟩ :=
-    CrystallineSemistableComparison.P.les (CH.Mor.ofNatTrans α).hom (CH.Mor.ofNatTrans β).hom c₁ c₂ c₃
+    CrystallineSemistableComparison.P.les (CH.Mor.ofNatTrans α).hom (CH.Mor.ofNatTrans β).hom c₁ c₂
+      c₃
   intro n
   cases n with
   | zero =>

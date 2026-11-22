@@ -16,10 +16,12 @@ open scoped NNReal ENNReal
 
 namespace GlobalTheory.KSp
 
-theorem map_linearEquiv_haar : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
-    [TopologicalSpace V] [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V)
-    [μ.IsAddHaarMeasure] (T : V ≃ₗ[F] V), μ.map T = (distribHaarChar F (LinearEquiv.det T))⁻¹ • μ := by
+theorem map_linearEquiv_haar
+    : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] (V : Type) [AddCommGroup V] [Module F V]
+        [FiniteDimensional F V] [TopologicalSpace V] [IsModuleTopology F V] [MeasurableSpace V]
+        [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (T : V ≃ₗ[F] V),
+      μ.map T = (distribHaarChar F (LinearEquiv.det T))⁻¹ • μ := by
   intro F _ _ _ _ _ V _ _ _ _ _ _ _ μ _ T
   letI : MeasurableSpace F := borel F
   haveI : BorelSpace F := ⟨rfl⟩
@@ -41,19 +43,19 @@ theorem map_linearEquiv_haar : ∀ (F : Type) [Field F] [CharZero F] [ValuativeR
   set X := μ.map Em with hX
   haveI : X.IsAddHaarMeasure := E.isAddHaarMeasure_map μ
   set M := LinearMap.toMatrix b b T.toLinearMap
-  have hM : ∀ y, M.mulVec (e y) = e (T y) := fun y => by
-    simp [M, e, LinearMap.toMatrix_mulVec_repr]
-  have hdet : ((LinearEquiv.det T : Fˣ) : F) = M.det := by
-    simp [M, LinearMap.det_toMatrix]
+  have hM : ∀ y, M.mulVec (e y) = e (T y) := fun y => by simp [M, e, LinearMap.toMatrix_mulVec_repr]
+  have hdet : ((LinearEquiv.det T : Fˣ) : F) = M.det := by simp [M, LinearMap.det_toMatrix]
   set d := distribHaarChar F (LinearEquiv.det T)
   have key : (d : ℝ≥0∞) • P.map M.mulVec = P :=
     GlobalTheory.WeilM.smul_map_mulVec_pi (Measure.addHaar : Measure F) M (LinearEquiv.det T) hdet
-  have hd0 : (d : ℝ≥0∞) ≠ 0 := by simpa using (distribHaarChar_pos (A := F) (g := LinearEquiv.det T)).ne'
+  have hd0 : (d : ℝ≥0∞) ≠ 0 := by
+    simpa using (distribHaarChar_pos (A := F) (g := LinearEquiv.det T)).ne'
   have hPM : P.map M.mulVec = ((d⁻¹ : ℝ≥0) : ℝ≥0∞) • P := by
     conv_rhs => rw [← key]
-    rw [smul_smul, ENNReal.coe_inv (by simpa using hd0), ENNReal.inv_mul_cancel hd0 ENNReal.coe_ne_top,
-      one_smul]
-  have hXP : X = (Measure.addHaarScalarFactor X P : ℝ≥0∞) • P := Measure.isAddLeftInvariant_eq_smul X P
+    rw [smul_smul, ENNReal.coe_inv (by simpa using hd0),
+      ENNReal.inv_mul_cancel hd0 ENNReal.coe_ne_top, one_smul]
+  have hXP : X = (Measure.addHaarScalarFactor X P : ℝ≥0∞) • P :=
+    Measure.isAddLeftInvariant_eq_smul X P
   have hmv : Measurable M.mulVec := (continuous_const.matrix_mulVec continuous_id).measurable
   have hXM : X.map M.mulVec = ((d⁻¹ : ℝ≥0) : ℝ≥0∞) • X := by
     rw [hXP, Measure.map_smul _ hmv.aemeasurable, hPM, smul_comm]
@@ -66,10 +68,13 @@ theorem map_linearEquiv_haar : ∀ (F : Type) [Field F] [CharZero F] [ValuativeR
   have hTm : Measurable (T : V → V) := by
     have : Continuous (T : V → V) := IsModuleTopology.continuous_of_linearMap T.toLinearMap
     exact this.measurable
-  calc μ.map T = (X.map Em.symm).map T := by rw [← hμ]
+  calc
+    μ.map T
+      = (X.map Em.symm).map T := by rw [← hμ]
     _ = X.map ((T : V → V) ∘ Em.symm) := Measure.map_map hTm Em.symm.measurable
     _ = X.map (Em.symm ∘ M.mulVec) := by rw [hcomp]
     _ = (X.map M.mulVec).map Em.symm := (Measure.map_map Em.symm.measurable hmv).symm
-    _ = (d⁻¹ : ℝ≥0) • μ := by rw [hXM, Measure.map_smul _ Em.symm.measurable.aemeasurable, ← hμ]; rfl
+    _ = (d⁻¹ : ℝ≥0) • μ := by
+      rw [hXM, Measure.map_smul _ Em.symm.measurable.aemeasurable, ← hμ]; rfl
 
 end GlobalTheory.KSp

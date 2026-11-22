@@ -10,12 +10,17 @@ public import Mathlib.NumberTheory.Padics.Hensel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem exists_valuationSubring_valuation_prime_lt_one (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) (hp : p.Prime) :
-    ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1 := by
+private theorem exists_valuationSubring_valuation_prime_lt_one
+    (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) (hp : p.Prime)
+    : ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1 := by
   let R : Subring Ω := (Int.castRingHom Ω).range
   have hpR : (p : Ω) ∈ R := ⟨p, by simp⟩
   let x : R := ⟨p, hpR⟩
@@ -38,9 +43,10 @@ private theorem ringOfIntegers_rat_exists_int_eq (x : 𝓞 ℚ) : ∃ n : ℤ, x
   have := eq_intCast (Rat.ringOfIntegersEquiv.symm : ℤ →+* 𝓞 ℚ) (Rat.ringOfIntegersEquiv x)
   exact (Rat.ringOfIntegersEquiv.symm_apply_apply x).symm.trans this
 
-private theorem exists_isPlaceOver_natCast_mem_of_valuation_lt_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) (p : ℕ)
-    (hp0 : p ≠ 0) (h : A.valuation (p : Ω) < 1) :
-    ∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v ∧ (p : 𝓞 ℚ) ∈ v.asIdeal := by
+private theorem exists_isPlaceOver_natCast_mem_of_valuation_lt_one
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (p : ℕ) (hp0 : p ≠ 0) (h : A.valuation (p : Ω) < 1)
+    : ∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v ∧ (p : 𝓞 ℚ) ∈ v.asIdeal := by
   have hmem : ∀ x : 𝓞 ℚ, ((algebraMap ℚ Ω).comp (algebraMap (𝓞 ℚ) ℚ)) x ∈ A := by
     intro x
     obtain ⟨n, rfl⟩ := ringOfIntegers_rat_exists_int_eq x
@@ -57,8 +63,10 @@ private theorem exists_isPlaceOver_natCast_mem_of_valuation_lt_one {Ω : Type} [
   rw [hbot, Ideal.mem_bot] at hpI
   exact hp0 (by exact_mod_cast hpI)
 
-private theorem false_of_distinct_primes_mem_asIdeal (v : HeightOneSpectrum (𝓞 ℚ)) (p q : ℕ) (hp : p.Prime) (hq : q.Prime)
-    (hpq : p ≠ q) (hpv : (p : 𝓞 ℚ) ∈ v.asIdeal) (hqv : (q : 𝓞 ℚ) ∈ v.asIdeal) : False := by
+private theorem false_of_distinct_primes_mem_asIdeal
+    (v : HeightOneSpectrum (𝓞 ℚ)) (p q : ℕ) (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
+    (hpv : (p : 𝓞 ℚ) ∈ v.asIdeal) (hqv : (q : 𝓞 ℚ) ∈ v.asIdeal)
+    : False := by
   have hcop : Nat.Coprime p q := (Nat.coprime_primes hp hq).mpr hpq
   have h1 : (p : ℤ) * p.gcdA q + (q : ℤ) * p.gcdB q = 1 := by
     rw [← Nat.gcd_eq_gcd_ab, hcop.gcd_eq_one]
@@ -72,8 +80,9 @@ private theorem false_of_distinct_primes_mem_asIdeal (v : HeightOneSpectrum (�
     exact add_mem (Ideal.mul_mem_right _ _ hpv) (Ideal.mul_mem_right _ _ hqv)
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h3)
 
-private theorem exists_padicInt_sq_eq_neg_of_dvd_one_add (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (p : ℕ) (hdiv : (l : ℤ) ∣ 1 + p) :
-    ∃ s : ℤ_[l], s ^ 2 = -(p : ℤ_[l]) := by
+private theorem exists_padicInt_sq_eq_neg_of_dvd_one_add
+    (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (p : ℕ) (hdiv : (l : ℤ) ∣ 1 + p)
+    : ∃ s : ℤ_[l], s ^ 2 = -(p : ℤ_[l]) := by
   let F : Polynomial ℤ := X ^ 2 + C (p : ℤ)
   have h2 : ‖((2 : ℤ) : ℤ_[l])‖ = 1 := by
     refine le_antisymm (PadicInt.norm_le_one _) (not_lt.mp ?_)
@@ -93,23 +102,32 @@ private theorem exists_padicInt_sq_eq_neg_of_dvd_one_add (l : ℕ) [Fact l.Prime
   have hz' : z ^ 2 + (p : ℤ_[l]) = 0 := by simpa [F] using hz
   linear_combination hz'
 
-private theorem nonempty_ringHom_Kstar_of_sq_eq_neg (l : ℕ) [Fact l.Prime] (p : ℕ) (s : ℚ_[l]) (hs : s ^ 2 = -(p : ℚ_[l])) :
-    Nonempty (Kstar p →+* ℚ_[l]) := by
+private theorem nonempty_ringHom_Kstar_of_sq_eq_neg
+    (l : ℕ) [Fact l.Prime] (p : ℕ) (s : ℚ_[l]) (hs : s ^ 2 = -(p : ℚ_[l]))
+    : Nonempty (Kstar p →+* ℚ_[l]) := by
   have hf : (map (algebraMap ℚ ℚ_[l]) (X ^ 2 + C (p : ℚ))) = (X - C s) * (X - C (-s)) := by
-    have h' : C s ^ 2 = -C (p : ℚ_[l]) := by rw [← C_pow, hs, C_neg]
+    have h' : C s ^ 2 = - C (p : ℚ_[l]) := by rw [← C_pow, hs, C_neg]
     rw [map_natCast] at h'
-    simp only [Polynomial.map_add (f := _), Polynomial.map_pow, map_X, map_C, map_natCast, Polynomial.map_natCast, C_neg]
+    simp only [Polynomial.map_add (f := _), Polynomial.map_pow, map_X, map_C, map_natCast,
+      Polynomial.map_natCast, C_neg]
     linear_combination h'
   have hsp : (map (algebraMap ℚ ℚ_[l]) (X ^ 2 + C (p : ℚ))).Splits := by
     rw [hf]
     exact (Splits.X_sub_C s).mul (Splits.X_sub_C _)
   exact ⟨(SplittingField.lift _ hsp).toRingHom⟩
 
-theorem UpperTheory.V.Af.Cq.exQuad :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (S : HeightOneSpectrum (𝓞 ℚ) → Prop), (∀ᶠ v in Filter.cofinite, S v) →
-        ∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K) (_ : Algebra K Ω) (_ : IsScalarTower ℚ K Ω) (_ : IsAlgClosure K Ω),
-          Module.finrank ℚ K = 2 ∧ Nonempty (K →+* ℚ_[l]) ∧ ∃ (v : HeightOneSpectrum (𝓞 ℚ)) (A : ValuationSubring Ω), S v ∧ IsPlaceOver A v ∧
-            ∃ s ∈ Ine (F := ℚ) A, s ∉ (AlgEquiv.restrictScalarsHom ℚ : G K Ω →* G ℚ Ω).range := by
+theorem UpperTheory.V.Af.Cq.exQuad
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∀ (S : HeightOneSpectrum (𝓞 ℚ) → Prop),
+          (∀ᶠ v in Filter.cofinite, S v)
+            → ∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K) (_ : Algebra K Ω)
+                (_ : IsScalarTower ℚ K Ω) (_ : IsAlgClosure K Ω),
+              Module.finrank ℚ K = 2 ∧ Nonempty (K →+* ℚ_[l])
+                ∧ ∃ (v : HeightOneSpectrum (𝓞 ℚ)) (A : ValuationSubring Ω),
+                  S v ∧ IsPlaceOver A v
+                    ∧ ∃ s ∈ Ine (F := ℚ) A,
+                      s ∉ (AlgEquiv.restrictScalarsHom ℚ : G K Ω →* G ℚ Ω).range := by
   intro Ω _ instA _ l hl hl2 S hS
   haveI hc : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have e : instA = DivisionRing.toRatAlgebra := Subsingleton.elim _ _
@@ -127,19 +145,21 @@ theorem UpperTheory.V.Af.Cq.exQuad :
     rw [hpm]
     ring
   haveI : Infinite P := hPinf.to_subtype
-  have hA : ∀ p : P, ∃ A : ValuationSubring Ω, A.valuation ((p : ℕ) : Ω) < 1 :=
-    fun p => exists_valuationSubring_valuation_prime_lt_one Ω p p.2.1
+  have hA : ∀ p : P, ∃ A : ValuationSubring Ω, A.valuation ((p : ℕ) : Ω) < 1 := fun p =>
+    exists_valuationSubring_valuation_prime_lt_one Ω p p.2.1
   choose Af hAf using hA
-  have hv : ∀ p : P, ∃ v : HeightOneSpectrum (𝓞 ℚ),
-      IsPlaceOver (Af p) v ∧ ((p : ℕ) : 𝓞 ℚ) ∈ v.asIdeal :=
-    fun p => exists_isPlaceOver_natCast_mem_of_valuation_lt_one (Af p) p p.2.1.ne_zero (hAf p)
+  have hv
+      : ∀ p : P, ∃ v : HeightOneSpectrum (𝓞 ℚ),
+        IsPlaceOver (Af p) v ∧ ((p : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := fun p =>
+    exists_isPlaceOver_natCast_mem_of_valuation_lt_one (Af p) p p.2.1.ne_zero (hAf p)
   choose vf hvf1 hvf2 using hv
   have hinj : Function.Injective vf := by
     intro p q hpq
     by_contra hne
-    exact false_of_distinct_primes_mem_asIdeal (vf p) p q p.2.1 q.2.1 (fun h => hne (Subtype.ext h)) (hvf2 p) (hpq ▸ hvf2 q)
-  have hfin : (vf ⁻¹' {v | ¬ S v}).Finite :=
-    (Filter.eventually_cofinite.mp hS).preimage hinj.injOn
+    exact false_of_distinct_primes_mem_asIdeal (vf p) p q p.2.1 q.2.1
+      (fun h => hne (Subtype.ext h))
+      (hvf2 p) (hpq ▸ hvf2 q)
+  have hfin : (vf ⁻¹' {v | ¬ S v}).Finite := (Filter.eventually_cofinite.mp hS).preimage hinj.injOn
   obtain ⟨p, hpS⟩ := hfin.infinite_compl.nonempty
   have hSv : S (vf p) := by simpa using hpS
   obtain ⟨hp, hdvd⟩ := p.2
@@ -159,8 +179,7 @@ theorem UpperTheory.V.Af.Cq.exQuad :
   obtain ⟨-, htc, hfr, -⟩ := HV.kstar p hp hp4
   let φ : Kstar p →ₐ[ℚ] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI alg : Algebra (Kstar p) Ω := φ.toRingHom.toAlgebra
   haveI tower : IsScalarTower ℚ (Kstar p) Ω :=
@@ -171,8 +190,24 @@ theorem UpperTheory.V.Af.Cq.exQuad :
   haveI : Algebra.IsQuadraticExtension ℚ (Kstar p) := ⟨hfr⟩
   have hram := HV.kstarRam p hp hp4 Ω (Af p) (hAf p)
   obtain ⟨σ, hσI, hσG⟩ := SetLike.not_le_iff_exists.mp hram
-  refine ⟨Kstar p, inferInstance, inferInstance, IsCMField.ofCMExtension ℚ (Kstar p), alg, tower, hac,
-    hfr, ⟨ι⟩, vf p, Af p, hSv, hvf1 p, σ, hσI, ?_⟩
+  refine ⟨
+    Kstar p,
+    inferInstance,
+    inferInstance,
+    IsCMField.ofCMExtension ℚ (Kstar p),
+    alg,
+    tower,
+    hac,
+    hfr,
+    ⟨ι⟩,
+    vf p,
+    Af p,
+    hSv,
+    hvf1 p,
+    σ,
+    hσI,
+    ?_
+  ⟩
   rintro ⟨τ, rfl⟩
   apply hσG
   intro x

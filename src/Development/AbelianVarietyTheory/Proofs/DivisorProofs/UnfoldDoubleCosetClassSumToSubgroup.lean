@@ -13,9 +13,11 @@ namespace GlobalTheory.ClassSumUnfold
 
 open Function
 
-theorem finsum_eq_of_fiber {α β : Type} (Φ : α → β) (hΦ : Surjective Φ) (w : α → ℂ) (g : β → ℂ)
-    (hfib : ∀ b, (Φ ⁻¹' {b}).Finite) (hw : (support w).Finite)
-    (hwg : ∀ a, w a * ((Φ ⁻¹' {Φ a}).ncard : ℂ) = g (Φ a)) : ∑ᶠ a, w a = ∑ᶠ b, g b := by
+theorem finsum_eq_of_fiber
+    {α β : Type}
+    (Φ : α → β) (hΦ : Surjective Φ) (w : α → ℂ) (g : β → ℂ) (hfib : ∀ b, (Φ ⁻¹' {b}).Finite)
+    (hw : (support w).Finite) (hwg : ∀ a, w a * ((Φ ⁻¹' {Φ a}).ncard : ℂ) = g (Φ a))
+    : ∑ᶠ a, w a = ∑ᶠ b, g b := by
   classical
   have hn : ∀ a, ((Φ ⁻¹' {Φ a}).ncard : ℂ) ≠ 0 := fun a => by
     have : 0 < (Φ ⁻¹' {Φ a}).ncard := (Set.ncard_pos (hfib _)).2 ⟨a, rfl⟩
@@ -26,21 +28,23 @@ theorem finsum_eq_of_fiber {α β : Type} (Φ : α → β) (hΦ : Surjective Φ)
   have hgs : support g ⊆ ↑(s.image Φ) := by
     intro b hb
     obtain ⟨a, rfl⟩ := hΦ b
-    have : w a ≠ 0 := by
-      intro h0; apply hb; rw [← hwg a, h0, zero_mul]
+    have : w a ≠ 0 := by intro h0; apply hb; rw [← hwg a, h0, zero_mul]
     rw [Finset.coe_image]
     exact ⟨a, by simpa [s] using this, rfl⟩
-  rw [finsum_eq_sum_of_support_subset w (s := s) (by simp [s]), finsum_eq_sum_of_support_subset g hgs,
-    ← Finset.sum_fiberwise_of_maps_to (g := Φ) (t := s.image Φ) (fun i hi => Finset.mem_image_of_mem Φ hi)]
+  rw [finsum_eq_sum_of_support_subset w (s := s) (by simp [s]),
+    finsum_eq_sum_of_support_subset g hgs,
+    ← Finset.sum_fiberwise_of_maps_to (g := Φ) (t := s.image Φ)
+      (fun i hi => Finset.mem_image_of_mem Φ hi)]
   refine Finset.sum_congr rfl fun b hb => ?_
   obtain ⟨a0, -, rfl⟩ := Finset.mem_image.1 hb
-  rw [Finset.sum_congr rfl (fun a ha => by rw [hw' a, (Finset.mem_filter.1 ha).2]), Finset.sum_const, nsmul_eq_mul]
+  rw [Finset.sum_congr rfl (fun a ha => by rw [hw' a, (Finset.mem_filter.1 ha).2]),
+    Finset.sum_const, nsmul_eq_mul]
   by_cases hg : g (Φ a0) = 0
   · simp [hg]
   · have hfe : s.filter (fun a => Φ a = Φ a0) = (hfib (Φ a0)).toFinset := by
       ext a
-      simp only [Finset.mem_filter, Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, s,
-        Function.mem_support]
+      simp only [Finset.mem_filter, Set.Finite.mem_toFinset, Set.mem_preimage,
+        Set.mem_singleton_iff, s, Function.mem_support]
       constructor
       · exact fun h => h.2
       · intro h
@@ -58,24 +62,27 @@ open Function
 
 variable {G H : Type} [Group G] [Group H]
 
-theorem mem_conj_iff (K : Subgroup G) (x g : G) :
-    g ∈ K.map (MulAut.conj x).toMonoidHom ↔ x⁻¹ * g * x ∈ K := by
+theorem mem_conj_iff (K : Subgroup G) (x g : G)
+    : g ∈ K.map (MulAut.conj x).toMonoidHom ↔ x⁻¹ * g * x ∈ K := by
   constructor
   · rintro ⟨k, hk, rfl⟩
     simpa [mul_assoc] using hk
   · intro h
     exact ⟨_, h, by simp [mul_assoc]⟩
 
-theorem fiber_count (ι : H →* G) (hι : Injective ι) (Γ : Subgroup G) (hΓ : ∀ g, g ∈ Γ ↔ ∃ h, ι h = g)
-    (T : Subgroup H) (Γ' : Subgroup G) (hΓ' : ∀ g, g ∈ Γ' ↔ ∃ t ∈ T, ι t = g) (K : Subgroup G) (x : G)
-    (hfin : Finite ↥(Γ ⊓ K.map (MulAut.conj x).toMonoidHom)) (δ₀ : H ⧸ T) :
-    ((fun δ : H ⧸ T => DoubleCoset.mk Γ' K ((ι (Quotient.out δ))⁻¹ * x)) ⁻¹'
-        {DoubleCoset.mk Γ' K ((ι (Quotient.out δ₀))⁻¹ * x)}).Finite ∧
-    ((fun δ : H ⧸ T => DoubleCoset.mk Γ' K ((ι (Quotient.out δ))⁻¹ * x)) ⁻¹'
-        {DoubleCoset.mk Γ' K ((ι (Quotient.out δ₀))⁻¹ * x)}).ncard *
-      Nat.card ↥(Γ' ⊓ K.map (MulAut.conj (Quotient.out
-        (DoubleCoset.mk Γ' K ((ι (Quotient.out δ₀))⁻¹ * x)))).toMonoidHom) =
-      Nat.card ↥(Γ ⊓ K.map (MulAut.conj x).toMonoidHom) := by
+theorem fiber_count
+    (ι : H →* G) (hι : Injective ι)
+    (Γ : Subgroup G) (hΓ : ∀ g, g ∈ Γ ↔ ∃ h, ι h = g)
+    (T : Subgroup H) (Γ' : Subgroup G) (hΓ' : ∀ g, g ∈ Γ' ↔ ∃ t ∈ T, ι t = g)
+    (K : Subgroup G) (x : G) (hfin : Finite ↥(Γ ⊓ K.map (MulAut.conj x).toMonoidHom))
+    (δ₀ : H ⧸ T)
+    : ((fun δ : H ⧸ T => DoubleCoset.mk Γ' K ((ι (Quotient.out δ))⁻¹ * x))
+        ⁻¹' {DoubleCoset.mk Γ' K ((ι (Quotient.out δ₀))⁻¹ * x)}).Finite
+      ∧ ((fun δ : H ⧸ T => DoubleCoset.mk Γ' K ((ι (Quotient.out δ))⁻¹ * x))
+            ⁻¹' {DoubleCoset.mk Γ' K ((ι (Quotient.out δ₀))⁻¹ * x)}).ncard
+          * Nat.card ↥(Γ' ⊓ K.map (MulAut.conj (Quotient.out (DoubleCoset.mk Γ' K
+            ((ι (Quotient.out δ₀))⁻¹ * x)))).toMonoidHom)
+        = Nat.card ↥(Γ ⊓ K.map (MulAut.conj x).toMonoidHom) := by
   classical
   have hT : ∀ h, h ∈ T ↔ ι h ∈ Γ' := fun h => by
     rw [hΓ']
@@ -99,22 +106,22 @@ theorem fiber_count (ι : H →* G) (hι : Injective ι) (Γ : Subgroup G) (hΓ 
   have hδ₀ : ((h₀ : H) : H ⧸ T) = δ₀ := QuotientGroup.out_eq' δ₀
   have hsm : ∀ s : S, s • δ₀ = (((s : H) * h₀ : H) : H ⧸ T) := fun s => by
     rw [← hδ₀]
-    first
-    | rfl
-    | simp [Subgroup.smul_def, MulAction.Quotient.smul_mk]
-  have hfo : (fun δ : H ⧸ T => DoubleCoset.mk Γ' K ((ι (Quotient.out δ))⁻¹ * x)) ⁻¹'
-      {DoubleCoset.mk Γ' K ((ι h₀)⁻¹ * x)} = MulAction.orbit S δ₀ := by
+    first | rfl | simp [Subgroup.smul_def, MulAction.Quotient.smul_mk]
+  have hfo
+      : (fun δ : H ⧸ T => DoubleCoset.mk Γ' K ((ι (Quotient.out δ))⁻¹ * x))
+          ⁻¹' {DoubleCoset.mk Γ' K ((ι h₀)⁻¹ * x)}
+        = MulAction.orbit S δ₀ := by
     ext δ
     simp only [Set.mem_preimage, Set.mem_singleton_iff, MulAction.mem_orbit_iff]
     constructor
     · intro he
       obtain ⟨g', hg', k, hk, e⟩ := (@DoubleCoset.eq _ _ Γ' K _ _).1 he
       obtain ⟨t, ht, rfl⟩ := (hΓ' g').1 hg'
-      have e' : (ι h₀)⁻¹ = ι t * ((ι (Quotient.out δ))⁻¹ * x) * k * x⁻¹ := by
-        rw [← e]; group
+      have e' : (ι h₀)⁻¹ = ι t * ((ι (Quotient.out δ))⁻¹ * x) * k * x⁻¹ := by rw [← e]; group
       have hsK : x⁻¹ * ι (Quotient.out δ * t⁻¹ * h₀⁻¹) * x = k := by
         simp only [map_mul, map_inv]
-        rw [e']; group
+        rw [e']
+        group
       refine ⟨⟨Quotient.out δ * t⁻¹ * h₀⁻¹, (hS _).2 (hsK ▸ hk)⟩, ?_⟩
       rw [hsm]
       conv_rhs => rw [← QuotientGroup.out_eq' δ]
@@ -137,7 +144,8 @@ theorem fiber_count (ι : H →* G) (hι : Injective ι) (Γ : Subgroup G) (hΓ 
     intro s s' e
     rw [hφ, hφ] at e
     exact Subtype.ext (hι (by simpa using e))
-  have hstab : ∀ s : S, s ∈ MulAction.stabilizer S δ₀ ↔ ι ((s : H) * h₀)⁻¹ * ι h₀ ∈ Γ' := fun s => by
+  have hstab
+      : ∀ s : S, s ∈ MulAction.stabilizer S δ₀ ↔ ι ((s : H) * h₀)⁻¹ * ι h₀ ∈ Γ' := fun s => by
     rw [MulAction.mem_stabilizer_iff, hsm]
     conv_lhs => rw [← hδ₀]
     rw [QuotientGroup.eq, hT, map_mul]
@@ -153,14 +161,14 @@ theorem fiber_count (ι : H →* G) (hι : Injective ι) (Γ : Subgroup G) (hΓ 
           rw [hφ]; simp only [hadef, map_mul, map_inv]; group
         rw [this]
         exact Γ'.mul_mem (Γ'.mul_mem hg' (Γ'.inv_mem hs')) (Γ'.inv_mem hg')
-      · have : y⁻¹ * φ s * y = k⁻¹ * (x⁻¹ * ι s * x) * k := by
-          rw [hφ, hy]; simp only [hadef]; group
+      · have : y⁻¹ * φ s * y = k⁻¹ * (x⁻¹ * ι s * x) * k := by rw [hφ, hy]; simp only [hadef]; group
         rw [this]
         exact K.mul_mem (K.mul_mem (K.inv_mem hk) hsK) hk
     · rintro ⟨hz1, hz2⟩
       have hΓz : a⁻¹ * z * a ∈ Γ := by
         simp only [hadef]
-        exact Γ.mul_mem (Γ.mul_mem (Γ.inv_mem (Γ.mul_mem (hΓ'Γ _ hg') (Γ.inv_mem (hιΓ h₀)))) (hΓ'Γ _ hz1))
+        exact Γ.mul_mem
+          (Γ.mul_mem (Γ.inv_mem (Γ.mul_mem (hΓ'Γ _ hg') (Γ.inv_mem (hιΓ h₀)))) (hΓ'Γ _ hz1))
           (Γ.mul_mem (hΓ'Γ _ hg') (Γ.inv_mem (hιΓ h₀)))
       obtain ⟨s, hs⟩ := (hΓ _).1 hΓz
       have hsS : s ∈ S := by
@@ -172,13 +180,18 @@ theorem fiber_count (ι : H →* G) (hι : Injective ι) (Γ : Subgroup G) (hΓ 
       refine ⟨⟨s, hsS⟩, (hstab _).2 ?_, ?_⟩
       · have : ι (s * h₀)⁻¹ * ι h₀ = g'⁻¹ * z⁻¹ * g' := by
           simp only [map_mul, map_inv]
-          rw [hs]; simp only [hadef]; group
+          rw [hs]
+          simp only [hadef]
+          group
         rw [this]
         exact Γ'.mul_mem (Γ'.mul_mem (Γ'.inv_mem hg') (Γ'.inv_mem hz1)) hg'
       · rw [hφ]
         show a * ι s * a⁻¹ = z
-        rw [hs]; group
-  have hcst : Nat.card (MulAction.stabilizer S δ₀) = Nat.card ↥(Γ' ⊓ K.map (MulAut.conj y).toMonoidHom) := by
+        rw [hs]
+        group
+  have hcst
+      : Nat.card (MulAction.stabilizer S δ₀)
+        = Nat.card ↥(Γ' ⊓ K.map (MulAut.conj y).toMonoidHom) := by
     rw [← hmap, Subgroup.card_map_of_injective hφi]
   refine ⟨?_, ?_⟩
   · rw [hfo]

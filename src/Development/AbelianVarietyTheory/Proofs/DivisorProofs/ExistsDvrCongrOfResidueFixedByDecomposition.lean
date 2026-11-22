@@ -10,13 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResidueNorma
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ResidueFixed
 
-theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring → ∀ x ∈ V, (∀ σ : Ω ≃ₐ[K] Ω, σ • V = V → V.valuation (σ x - x) < 1) → ∃ r : R, V.valuation (x - algebraMap K Ω (algebraMap R K r)) < 1 := by
+theorem residue_fixed_mem
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω]
+        [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → ∀ x ∈ V,
+          (∀ σ : Ω ≃ₐ[K] Ω, σ • V = V → V.valuation (σ x - x) < 1)
+            → ∃ r : R, V.valuation (x - algebraMap K Ω (algebraMap R K r)) < 1 := by
   intro R K Ω _ _ _ _ _ _ _ _ _ _ V hV x hx hfix
   classical
   letI : Algebra R Ω := ((algebraMap K Ω).comp (algebraMap R K)).toAlgebra
@@ -35,7 +43,9 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
     have hu : IsUnit (φ r) := (V.valuation_eq_one_iff (φ r)).2 h1
     have hne : algebraMap R K r ≠ 0 := by
       intro h0
-      rw [show algebraMap R Ω r = algebraMap K Ω (algebraMap R K r) from rfl, h0, map_zero, map_zero] at h1
+      rw [show algebraMap R Ω r = algebraMap K Ω (algebraMap R K r) from rfl, h0, map_zero,
+          map_zero]
+        at h1
       exact zero_ne_one h1
     have hinv : (algebraMap R K r)⁻¹ ∈ V.toSubring.comap (algebraMap K Ω) := by
       change algebraMap K Ω (algebraMap R K r)⁻¹ ∈ V
@@ -45,7 +55,8 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
         rw [map_inv₀]
         refine (eq_inv_of_mul_eq_one_left ?_)
         exact congrArg Subtype.val this
-      rw [← h2]; exact SetLike.coe_mem _
+      rw [← h2]
+      exact SetLike.coe_mem _
     rw [hV] at hinv
     obtain ⟨r', hr'⟩ := hinv
     apply (mem_maximalIdeal r).1 hr
@@ -61,14 +72,16 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
       rw [Polynomial.eval₂_map]
       exact hp
     obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 hint
-    rw [← hy]; exact y.2
+    rw [← hy]
+    exact y.2
   let ψ : B →+* V := (B.val : B →+* Ω).codRestrict V.toSubring hBV
   let Q : Ideal B := (maximalIdeal V).comap ψ
   have hQ : ∀ b : B, b ∈ Q ↔ V.valuation (b : Ω) < 1 := fun b => V.valuation_lt_one_iff (ψ b)
   let G := Ω ≃ₐ[K] Ω
-  have hc : SMulCommClass G R Ω := ⟨fun g v x => by
-    rw [← IsScalarTower.algebraMap_smul K v x, ← IsScalarTower.algebraMap_smul K v (g • x)]
-    exact map_smul g _ _⟩
+  have hc : SMulCommClass G R Ω :=
+    ⟨fun g v x => by
+      rw [← IsScalarTower.algebraMap_smul K v x, ← IsScalarTower.algebraMap_smul K v (g • x)]
+      exact map_smul g _ _⟩
   let : TopologicalSpace B := ⊥
   have : DiscreteTopology B := ⟨rfl⟩
   have : ContinuousSMul G B := by
@@ -82,11 +95,12 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
   have : Algebra.IsInvariant R B G := by
     constructor
     intro b hb
-    obtain ⟨k, hk⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := K) (b : Ω)).2
-      fun g => congrArg Subtype.val (hb g)
+    obtain ⟨k, hk⟩ :=
+      (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := K) (b : Ω)).2 fun g =>
+        congrArg Subtype.val (hb g)
     have hint : IsIntegral R k := by
       have h2 : IsIntegral R (algebraMap K Ω k) := hk ▸ b.2
-      exact (isIntegral_algebraMap_iff ).1 h2
+      exact (isIntegral_algebraMap_iff).1 h2
     obtain ⟨v, hv⟩ := IsIntegrallyClosed.isIntegral_iff.1 hint
     refine ⟨v, Subtype.ext ?_⟩
     rw [← hk, ← hv, ← IsScalarTower.algebraMap_apply]
@@ -95,11 +109,13 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
     constructor
     refine le_antisymm (fun r hr => ?_) (IsLocalRing.le_maximalIdeal ?_)
     · change algebraMap R B r ∈ Q
-      rw [hQ]; exact hmR r hr
+      rw [hQ]
+      exact hmR r hr
     · intro h1
       have h : (1 : R) ∈ Q.comap (algebraMap R B) := by
         change (1 : R) ∈ Q.under R
-        rw [h1]; exact Submodule.mem_top
+        rw [h1]
+        exact Submodule.mem_top
       rw [Ideal.mem_comap, map_one, hQ] at h
       simp at h
   have hQmax : Q.IsMaximal := Ideal.IsMaximal.of_liesOver_isMaximal Q (maximalIdeal R)
@@ -113,7 +129,8 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
 
   have hsub : ∀ g ∈ MulAction.stabilizer G Q, ∀ y ∈ V, g y ∈ V := by
     intro g hg y hy
-    obtain ⟨a, s, ha, hs, hsv, hys⟩ := GlobalTheory.T.exists_integral_quotient_of_valuationSubring_above_dvr R K Ω V hV y hy
+    obtain ⟨a, s, ha, hs, hsv, hys⟩ :=
+      GlobalTheory.T.exists_integral_quotient_of_valuationSubring_above_dvr R K Ω V hV y hy
     let a' : B := ⟨a, ha⟩
     let s' : B := ⟨s, hs⟩
     have hs'Q : s' ∉ Q := by rw [hQ]; exact fun h => (ne_of_lt h) hsv
@@ -143,7 +160,8 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
     · intro hz
       exact hsub g⁻¹ (inv_mem hg) z hz
 
-  obtain ⟨a, s, ha, hs, hsv, hxs⟩ := GlobalTheory.T.exists_integral_quotient_of_valuationSubring_above_dvr R K Ω V hV x hx
+  obtain ⟨a, s, ha, hs, hsv, hxs⟩ :=
+    GlobalTheory.T.exists_integral_quotient_of_valuationSubring_above_dvr R K Ω V hV x hx
   let a' : B := ⟨a, ha⟩
   let s' : B := ⟨s, hs⟩
   have hs'Q : s' ∉ Q := by rw [hQ]; exact fun h => (ne_of_lt h) hsv
@@ -171,7 +189,8 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
     rw [div_eq_div_iff hσs0 hsne, ← map_mul, ← map_mul, Ideal.Quotient.eq, hQ]
     have e : ((σ • a' * s' - a' * σ • s' : B) : Ω) = (σ x - x) * s * σ s := by
       change σ a * s - a * σ s = _
-      rw [← hxs, map_mul]; ring
+      rw [← hxs, map_mul]
+      ring
     rw [e, map_mul, map_mul, hsv, hσsv, _root_.mul_one, _root_.mul_one]
     exact hlt
   obtain ⟨c, hc⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := R ⧸ maximalIdeal R) ξ).2 hξ
@@ -181,9 +200,11 @@ theorem residue_fixed_mem : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDis
   have h2 : Ideal.Quotient.mk Q (algebraMap R B r * s') = Ideal.Quotient.mk Q a' := by
     rw [map_mul, h1, div_mul_cancel₀ _ hsne]
   rw [Ideal.Quotient.eq, hQ] at h2
-  have e : ((algebraMap R B r * s' - a' : B) : Ω) = (algebraMap K Ω (algebraMap R K r) - x) * s := by
+  have e
+      : ((algebraMap R B r * s' - a' : B) : Ω) = (algebraMap K Ω (algebraMap R K r) - x) * s := by
     change algebraMap K Ω (algebraMap R K r) * s - a = _
-    rw [← hxs]; ring
+    rw [← hxs]
+    ring
   rw [e, map_mul, hsv, _root_.mul_one, Valuation.map_sub_swap] at h2
   exact h2
 

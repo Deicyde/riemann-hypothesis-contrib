@@ -5,18 +5,21 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TensFun
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
-theorem UpperTheory.ConvolutionTheory.Tf.evOf :
-    ∀ (A : Type) [Ring A] [Algebra ℂ A] (ι κ : Type) (a : ι → A) (b : κ → A) (S : Subalgebra ℂ A),
-      (∀ i j, Commute (a i) (a j)) → (∀ i k, Commute (a i) (b k)) → (∀ k l, Commute (b k) (b l)) → (∀ i, a i ∈ S) → (∀ k, b k ∈ S) →
-      ∃ ev : MvPolynomial κ (MvPolynomial ι ℂ) →+* A, (∀ c : ℂ, ev (C (C c)) = c • 1) ∧ (∀ i, ev (C (X i)) = a i) ∧
-        (∀ k, ev (X k) = b k) ∧ ∀ P, ev P ∈ S := by
+theorem UpperTheory.ConvolutionTheory.Tf.evOf
+    : ∀ (A : Type) [Ring A] [Algebra ℂ A] (ι κ : Type) (a : ι → A) (b : κ → A) (S : Subalgebra ℂ A),
+      (∀ i j, Commute (a i) (a j)) → (∀ i k, Commute (a i) (b k)) → (∀ k l, Commute (b k) (b l))
+        → (∀ i, a i ∈ S) → (∀ k, b k ∈ S)
+        → ∃ ev : MvPolynomial κ (MvPolynomial ι ℂ) →+* A,
+          (∀ c : ℂ, ev (C (C c)) = c • 1) ∧ (∀ i, ev (C (X i)) = a i) ∧ (∀ k, ev (X k) = b k)
+            ∧ ∀ P, ev P ∈ S := by
   intro A _ _ ι κ a b S haa hab hbb haS hbS
-  have hcomm : ∀ x ∈ Set.range a ∪ Set.range b, ∀ y ∈ Set.range a ∪ Set.range b,
-      x * y = y * x := by
+  have hcomm : ∀ x ∈ Set.range a ∪ Set.range b, ∀ y ∈ Set.range a ∪ Set.range b, x * y = y * x := by
     rintro x (⟨i, rfl⟩ | ⟨k, rfl⟩) y (⟨j, rfl⟩ | ⟨l, rfl⟩)
     · exact (haa i j).eq
     · exact (hab i l).eq
@@ -37,10 +40,10 @@ theorem UpperTheory.ConvolutionTheory.Tf.evOf :
   letI : CommRing (Algebra.adjoin ℂ (Set.range a ∪ Set.range b)) :=
     { (inferInstance : Ring (Algebra.adjoin ℂ (Set.range a ∪ Set.range b))) with
       mul_comm := hmc }
-  let a' : ι → Algebra.adjoin ℂ (Set.range a ∪ Set.range b) :=
-    fun i => ⟨a i, Algebra.subset_adjoin (Or.inl ⟨i, rfl⟩)⟩
-  let b' : κ → Algebra.adjoin ℂ (Set.range a ∪ Set.range b) :=
-    fun k => ⟨b k, Algebra.subset_adjoin (Or.inr ⟨k, rfl⟩)⟩
+  let a' : ι → Algebra.adjoin ℂ (Set.range a ∪ Set.range b) := fun i =>
+    ⟨a i, Algebra.subset_adjoin (Or.inl ⟨i, rfl⟩)⟩
+  let b' : κ → Algebra.adjoin ℂ (Set.range a ∪ Set.range b) := fun k =>
+    ⟨b k, Algebra.subset_adjoin (Or.inr ⟨k, rfl⟩)⟩
   let e : MvPolynomial κ (MvPolynomial ι ℂ) →+* Algebra.adjoin ℂ (Set.range a ∪ Set.range b) :=
     eval₂Hom (eval₂Hom (algebraMap ℂ _) a') b'
   refine ⟨(Algebra.adjoin ℂ (Set.range a ∪ Set.range b)).val.toRingHom.comp e, ?_, ?_, ?_, ?_⟩

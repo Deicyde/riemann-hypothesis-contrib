@@ -6,10 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Module UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Module UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.X
 
-private theorem not_dvd_index_ker {H k ι : Type} [Group H] [Field k] [Finite k] [Fintype ι] {l : ℕ} [hl : Fact l.Prime]
-    (h0 : (l : k) = 0) (φ : H →* (ι → kˣ)) : ¬ l ∣ φ.ker.index := by
+private theorem not_dvd_index_ker
+    {H k ι : Type} [Group H] [Field k] [Finite k] [Fintype ι]
+    {l : ℕ} [hl : Fact l.Prime]
+    (h0 : (l : k) = 0) (φ : H →* (ι → kˣ))
+    : ¬ l ∣ φ.ker.index := by
   classical
   haveI := Fintype.ofFinite k
   intro hd
@@ -35,8 +40,11 @@ private theorem not_dvd_index_ker {H k ι : Type} [Group H] [Field k] [Finite k]
   have h4 : l ∣ 1 := (Nat.dvd_add_right h3).1 hq
   exact hl.out.one_lt.ne' (Nat.dvd_one.1 h4)
 
-theorem UpperTheory.V.X.spKer :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.rbar.ker.Normal ∧ ¬ l ∣ D.rbar.ker.index ∧ ∀ (j : ℤ × ℤ), ∀ g ∈ D.rbar.ker, Raw.bar (D.al ^ j.1 * D.Psi ^ j.2) g = 1 := by
+theorem UpperTheory.V.X.spKer
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.rbar.ker.Normal ∧ ¬ l ∣ D.rbar.ker.index
+        ∧ ∀ (j : ℤ × ℤ), ∀ g ∈ D.rbar.ker, Raw.bar (D.al ^ j.1 * D.Psi ^ j.2) g = 1 := by
   intro Ω _ _ _ l _ c D
   classical
   haveI := c.dvr
@@ -74,6 +82,8 @@ theorem UpperTheory.V.X.spKer :
   have a2 : Units.map (residue c.O : c.O →* ResidueField c.O) (D.al g) = 1 := by
     ext
     simpa [Raw.ps] using hk 2
-  have hu : Units.map (residue c.O : c.O →* ResidueField c.O) ((D.al ^ j.1 * D.Psi ^ j.2) g) = 1 := by
-    simp only [MonoidHom.mul_apply, MonoidHom.zpow_apply, map_mul, map_zpow, a1, a2, one_zpow, mul_one]
+  have hu
+      : Units.map (residue c.O : c.O →* ResidueField c.O) ((D.al ^ j.1 * D.Psi ^ j.2) g) = 1 := by
+    simp only [MonoidHom.mul_apply, MonoidHom.zpow_apply, map_mul, map_zpow, a1, a2, one_zpow,
+      mul_one]
   exact congrArg Units.val hu

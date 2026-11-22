@@ -13,8 +13,8 @@ open Real
 
 namespace PGaussTermBound
 
-theorem pow_le_sqrt_pow_mul_exp (n m : ℕ) (hn : 1 ≤ n) :
-    ((m : ℝ) + 1) ^ n ≤ √(n : ℝ) ^ n * Real.exp (√(n : ℝ) * ((m : ℝ) + 1)) := by
+theorem pow_le_sqrt_pow_mul_exp (n m : ℕ) (hn : 1 ≤ n)
+    : ((m : ℝ) + 1) ^ n ≤ √(n : ℝ) ^ n * Real.exp (√(n : ℝ) * ((m : ℝ) + 1)) := by
   set s := √(n : ℝ) with hs_def
   have hn' : (0 : ℝ) < n := by exact_mod_cast hn
   have hs : 0 < s := Real.sqrt_pos.2 hn'
@@ -29,13 +29,15 @@ theorem pow_le_sqrt_pow_mul_exp (n m : ℕ) (hn : 1 ≤ n) :
   have hE : 0 ≤ Real.exp (s * ((m : ℝ) + 1)) := (Real.exp_pos _).le
   have h2 : s ^ n * ((m : ℝ) + 1) ^ n ≤ s ^ n * (s ^ n * Real.exp (s * ((m : ℝ) + 1))) := by
     rw [← mul_pow]
-    calc (s * ((m : ℝ) + 1)) ^ n ≤ Real.exp (s * ((m : ℝ) + 1)) * (n.factorial : ℝ) := h1
+    calc
+      (s * ((m : ℝ) + 1)) ^ n
+        ≤ Real.exp (s * ((m : ℝ) + 1)) * (n.factorial : ℝ) := h1
       _ ≤ Real.exp (s * ((m : ℝ) + 1)) * (s ^ n * s ^ n) := mul_le_mul_of_nonneg_left hfac2 hE
       _ = s ^ n * (s ^ n * Real.exp (s * ((m : ℝ) + 1))) := by ring
   exact le_of_mul_le_mul_left h2 (pow_pos hs n)
 
-theorem exponent_le (n m : ℕ) :
-    √(n : ℝ) * ((m : ℝ) + 1) + -π * (m : ℝ) ^ 2 ≤ √(n : ℝ) + n / (2 * π) + -(m : ℝ) := by
+theorem exponent_le (n m : ℕ)
+    : √(n : ℝ) * ((m : ℝ) + 1) + -π * (m : ℝ) ^ 2 ≤ √(n : ℝ) + n / (2 * π) + -(m : ℝ) := by
   set s := √(n : ℝ) with hs_def
   have hss : s * s = n := Real.mul_self_sqrt (Nat.cast_nonneg n)
   have hpi : 0 < π := Real.pi_pos
@@ -59,14 +61,15 @@ theorem GaussTermBound.proof : GaussTermBound.Statement := by
   have h1 := PGaussTermBound.pow_le_sqrt_pow_mul_exp n m hn
   have h2 := PGaussTermBound.exponent_le n m
   have hE : 0 ≤ Real.exp (-π * (m : ℝ) ^ 2) := (Real.exp_pos _).le
-  calc ((m : ℝ) + 1) ^ n * Real.exp (-π * (m : ℝ) ^ 2)
-      ≤ √(n : ℝ) ^ n * Real.exp (√(n : ℝ) * ((m : ℝ) + 1)) * Real.exp (-π * (m : ℝ) ^ 2) :=
-        mul_le_mul_of_nonneg_right h1 hE
+  calc
+    ((m : ℝ) + 1) ^ n * Real.exp (-π * (m : ℝ) ^ 2)
+        ≤ √(n : ℝ) ^ n * Real.exp (√(n : ℝ) * ((m : ℝ) + 1)) * Real.exp (-π * (m : ℝ) ^ 2) :=
+      mul_le_mul_of_nonneg_right h1 hE
     _ = √(n : ℝ) ^ n * Real.exp (√(n : ℝ) * ((m : ℝ) + 1) + -π * (m : ℝ) ^ 2) := by
-        rw [Real.exp_add]; ring
+      rw [Real.exp_add]; ring
     _ ≤ √(n : ℝ) ^ n * Real.exp (√(n : ℝ) + n / (2 * π) + -(m : ℝ)) :=
-        mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 h2) (by positivity)
+      mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 h2) (by positivity)
     _ = √(n : ℝ) ^ n * Real.exp √(n : ℝ) * Real.exp (n / (2 * π)) * Real.exp (-(m : ℝ)) := by
-        rw [Real.exp_add, Real.exp_add]; ring
+      rw [Real.exp_add, Real.exp_add]; ring
 
 end GroundTheory.Heights₂.Heights

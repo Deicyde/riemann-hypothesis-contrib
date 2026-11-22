@@ -14,53 +14,65 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.ForSecondHalf
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace FibreTranscendenceDegree
 
-theorem isAlgebraic_of_forall_div {M : Type} [Field M] (B : Subalgebra ℤ M)
-    (h : ∀ m : M, ∃ a b : M, a ∈ B ∧ b ∈ B ∧ b ≠ 0 ∧ m = a / b) : Algebra.IsAlgebraic B M := by
+theorem isAlgebraic_of_forall_div
+    {M : Type} [Field M]
+    (B : Subalgebra ℤ M) (h : ∀ m : M, ∃ a b : M, a ∈ B ∧ b ∈ B ∧ b ≠ 0 ∧ m = a / b)
+    : Algebra.IsAlgebraic B M := by
   refine ⟨fun m => ?_⟩
   obtain ⟨a, b, ha, hb, hb0, rfl⟩ := h m
-  refine ⟨Polynomial.C (⟨b, hb⟩ : B) * Polynomial.X - Polynomial.C (⟨a, ha⟩ : B), fun h0 => hb0 ?_, ?_⟩
+  refine
+    ⟨Polynomial.C (⟨b, hb⟩ : B) * Polynomial.X - Polynomial.C (⟨a, ha⟩ : B), fun h0 => hb0 ?_, ?_⟩
   · have h1 := congrArg (fun p : Polynomial B => p.coeff 1) h0
-    simp only [Polynomial.coeff_sub, Polynomial.coeff_C_mul_X, Polynomial.coeff_C, if_neg one_ne_zero,
-      sub_zero, Polynomial.coeff_zero] at h1
+    simp only [Polynomial.coeff_sub, Polynomial.coeff_C_mul_X, Polynomial.coeff_C,
+        if_neg one_ne_zero, sub_zero, Polynomial.coeff_zero]
+      at h1
     exact congrArg Subtype.val h1
   · simp only [map_sub, map_mul, Polynomial.aeval_C, Polynomial.aeval_X]
     show b * (a / b) - a = 0
     rw [mul_div_cancel₀ _ hb0, sub_self]
 
-theorem trdeg_eq_of_forall_div {M : Type} [Field M] (B : Subalgebra ℤ M)
+theorem trdeg_eq_of_forall_div
+    {M : Type} [Field M]
+    (B : Subalgebra ℤ M)
     (hZ : Function.Injective (algebraMap ℤ M))
-    (h : ∀ m : M, ∃ a b : M, a ∈ B ∧ b ∈ B ∧ b ≠ 0 ∧ m = a / b) :
-    Algebra.trdeg ℤ M = Algebra.trdeg ℤ B := by
+    (h : ∀ m : M, ∃ a b : M, a ∈ B ∧ b ∈ B ∧ b ≠ 0 ∧ m = a / b)
+    : Algebra.trdeg ℤ M = Algebra.trdeg ℤ B := by
   have := isAlgebraic_of_forall_div B h
-  have : FaithfulSMul ℤ B := (faithfulSMul_iff_algebraMap_injective ℤ B).mpr fun a b hab =>
-    hZ (by simpa using congrArg Subtype.val hab)
+  have : FaithfulSMul ℤ B :=
+    (faithfulSMul_iff_algebraMap_injective ℤ B).mpr fun a b hab =>
+      hZ (by simpa using congrArg Subtype.val hab)
   have : FaithfulSMul B M := (faithfulSMul_iff_algebraMap_injective B M).mpr Subtype.val_injective
   have h0 := trdeg_add_eq ℤ B (A := M)
   rw [trdeg_eq_zero (R := B) (A := M), add_zero] at h0
   exact h0.symm
 
-theorem trdeg_quot_ker {σ : Type} {M : Type} [CommRing M] [IsDomain M] (y : σ → M) :
-    Algebra.trdeg ℤ (MvPolynomial σ ℤ ⧸ RingHom.ker (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M)) =
-      Algebra.trdeg ℤ (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M).range := by
-  have hker : RingHom.ker (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M) =
-      RingHom.ker (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M).rangeRestrict := by
+theorem trdeg_quot_ker {σ : Type} {M : Type} [CommRing M] [IsDomain M] (y : σ → M)
+    : Algebra.trdeg ℤ (MvPolynomial σ ℤ ⧸ RingHom.ker (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M))
+      = Algebra.trdeg ℤ (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M).range := by
+  have hker
+      : RingHom.ker (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M)
+        = RingHom.ker (aeval y : MvPolynomial σ ℤ →ₐ[ℤ] M).rangeRestrict := by
     ext p
     simp [RingHom.mem_ker, Subtype.ext_iff]
   exact ((Ideal.quotientEquivAlgOfEq ℤ hker).trans
     (Ideal.quotientKerAlgEquivOfSurjective (AlgHom.rangeRestrict_surjective _))).trdeg_eq
 
-theorem trdeg_of_isArithVar {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {J : Ideal (MRing ι)}
-    {n : ℕ} (h : IsArithVar J n) :
-    ∃ t : ℕ, Algebra.trdeg ℤ (MRing ι ⧸ J) = t ∧ t + 1 = n + Fintype.card K := by
+theorem trdeg_of_isArithVar
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {J : Ideal (MRing ι)} {n : ℕ} (h : IsArithVar J n)
+    : ∃ t : ℕ, Algebra.trdeg ℤ (MRing ι ⧸ J) = t ∧ t + 1 = n + Fintype.card K := by
   obtain ⟨-, ⟨hprime, -, -⟩, hhor, hdim⟩ := h
   have := hprime
   have hA := IntDomainDim.proof (MRing ι ⧸ J) (CoordinateConeArithVar.algebraMap_injective J hhor)
   rw [hdim] at hA
-  have hA' : ((n + Fintype.card K : ℕ) : ℕ∞) = Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ J)) + 1 := by
+  have hA'
+      : ((n + Fintype.card K : ℕ) : ℕ∞) = Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ J)) + 1 := by
     exact_mod_cast hA
   obtain ⟨t, ht⟩ : ∃ t : ℕ, Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ J)) = t := by
     refine ENat.ne_top_iff_exists.mp (fun htop => ?_) |>.imp fun _ h => h.symm
@@ -70,8 +82,8 @@ theorem trdeg_of_isArithVar {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fin
   refine ⟨t, Cardinal.toENat_eq_natCast.mp ht, ?_⟩
   exact_mod_cast hA'.symm
 
-theorem aeval_mem_closure {σ : Type} {L : Type} [Field L] (y : σ → L) (f : MvPolynomial σ ℤ) :
-    aeval y f ∈ Subfield.closure (Set.range y) := by
+theorem aeval_mem_closure {σ : Type} {L : Type} [Field L] (y : σ → L) (f : MvPolynomial σ ℤ)
+    : aeval y f ∈ Subfield.closure (Set.range y) := by
   induction f using MvPolynomial.induction_on with
   | C a => simp [intCast_mem]
   | add f g hf hg => simpa using add_mem hf hg
@@ -79,13 +91,18 @@ theorem aeval_mem_closure {σ : Type} {L : Type} [Field L] (y : σ → L) (f : M
 
 end FibreTranscendenceDegree
 
-
 open FibreTranscendenceDegree in
 theorem FibreDim.proof : FibreDimStatement := by
   intro K _ ι _ K' _ ι' _ κ v P' d r G hv hP' hP
   classical
-  refine ⟨⟨RingHom.ker_isPrime _, Targets.FibreMultiHomog.proof K ι K' ι' κ v P' G hv hP'.2.1.2.1,
-    fun k => ?_⟩, ?_⟩
+  refine ⟨
+    ⟨
+      RingHom.ker_isPrime _,
+      Targets.FibreMultiHomog.proof K ι K' ι' κ v P' G hv hP'.2.1.2.1,
+      fun k => ?_
+    ⟩,
+    ?_
+  ⟩
   · obtain ⟨i, hi⟩ := hP'.2.1.2.2 k.1
     refine ⟨i, fun h => hi ?_⟩
     rw [fibreIdeal, RingHom.mem_ker, aeval_X] at h
@@ -96,7 +113,8 @@ theorem FibreDim.proof : FibreDimStatement := by
     (Set.range fun q : (Σ k : FibreBlock κ, ι' k.1) => G.x' ⟨q.1.1, q.2⟩) with hEdef
 
   have hZ : Function.Injective (algebraMap ℤ G.Φ) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     have hmem : (C a : MRing ι) ∈ imageZ v P' := by
       rw [← G.ker_x, RingHom.mem_ker, aeval_C]
@@ -107,7 +125,8 @@ theorem FibreDim.proof : FibreDimStatement := by
 
   obtain ⟨t, ht, htd⟩ := trdeg_of_isArithVar hP
   have hΦ : Algebra.trdeg ℤ G.Φ = t := by
-    rw [trdeg_eq_of_forall_div (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).range hZ, ← trdeg_quot_ker, G.ker_x, ht]
+    rw [trdeg_eq_of_forall_div (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).range hZ, ← trdeg_quot_ker, G.ker_x,
+      ht]
     intro c
     obtain ⟨f, g, hg, rfl⟩ := G.gen c
     exact ⟨_, _, ⟨f, rfl⟩, ⟨g, rfl⟩, hg, rfl⟩
@@ -149,7 +168,8 @@ theorem FibreDim.proof : FibreDimStatement := by
     apply (algebraMap G.Φ E).injective
     simpa using hab
   have hE : Algebra.trdeg ℤ E = t' := by
-    rw [trdeg_eq_of_forall_div (aeval xE : MRing ι' →ₐ[ℤ] E).range hZE, ← trdeg_quot_ker, hkerE, ht']
+    rw [trdeg_eq_of_forall_div (aeval xE : MRing ι' →ₐ[ℤ] E).range hZE, ← trdeg_quot_ker, hkerE,
+      ht']
     intro e
 
     have hle : E.toSubfield ≤ Subfield.closure (Set.range G.x') := by
@@ -168,7 +188,9 @@ theorem FibreDim.proof : FibreDimStatement := by
       · rintro _ ⟨q, rfl⟩
         exact Subfield.subset_closure ⟨_, rfl⟩
     obtain ⟨a, ha, b, hb, hab⟩ := Subfield.mem_closure_iff.mp (hle e.2)
-    have hsub : Subring.closure (Set.range G.x') ≤ (aeval G.x' : MRing ι' →ₐ[ℤ] G.Φ').range.toSubring := by
+    have hsub
+        : Subring.closure (Set.range G.x')
+          ≤ (aeval G.x' : MRing ι' →ₐ[ℤ] G.Φ').range.toSubring := by
       rw [Subring.closure_le]
       rintro _ ⟨q, rfl⟩
       exact ⟨X q, aeval_X _ _⟩
@@ -187,7 +209,8 @@ theorem FibreDim.proof : FibreDimStatement := by
       exact hab.symm
 
   have : FaithfulSMul ℤ G.Φ := (faithfulSMul_iff_algebraMap_injective ℤ G.Φ).mpr hZ
-  have : FaithfulSMul G.Φ E := (faithfulSMul_iff_algebraMap_injective G.Φ E).mpr (algebraMap G.Φ E).injective
+  have : FaithfulSMul G.Φ E :=
+    (faithfulSMul_iff_algebraMap_injective G.Φ E).mpr (algebraMap G.Φ E).injective
   have hadd := trdeg_add_eq ℤ G.Φ (A := E)
   rw [hΦ, hE] at hadd
   have hc : Fintype.card (FibreBlock κ) + Fintype.card K = Fintype.card K' := by

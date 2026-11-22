@@ -14,24 +14,32 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 noncomputable section
 namespace GlobalTheory.ZM
 
-theorem reduced_flat_of_charts {Z S : Scheme.{0}} (s : Z ⟶ S) (U : Z.Opens) {κ : Type} (Y : κ → Scheme.{0})
-    (x : ∀ i, Y i ⟶ Z) (hx : ∀ i, IsOpenImmersion (x i)) (hr : ∀ i, IsReduced (Y i)) (hf : ∀ i, Flat (x i ≫ s))
-    (hc : ∀ z ∈ U, ∃ i, z ∈ Set.range (x i)) : IsReduced U.toScheme ∧ Flat (U.ι ≫ s) := by
-  let 𝒰 : U.toScheme.OpenCover := Scheme.Cover.mkOfCovers κ (fun i => pullback U.ι (x i)) (fun i => pullback.fst U.ι (x i))
-    (fun z => by
-      obtain ⟨i, y, hy⟩ := hc z.1 z.2
-      have : z ∈ Set.range (pullback.fst U.ι (x i)) := by
-        rw [Scheme.Pullback.range_fst]
-        exact ⟨y, hy⟩
-      exact ⟨i, this⟩) (fun i => inferInstance)
+theorem reduced_flat_of_charts
+    {Z S : Scheme.{0}} (s : Z ⟶ S) (U : Z.Opens)
+    {κ : Type} (Y : κ → Scheme.{0}) (x : ∀ i, Y i ⟶ Z) (hx : ∀ i, IsOpenImmersion (x i))
+    (hr : ∀ i, IsReduced (Y i)) (hf : ∀ i, Flat (x i ≫ s)) (hc : ∀ z ∈ U, ∃ i, z ∈ Set.range (x i))
+    : IsReduced U.toScheme ∧ Flat (U.ι ≫ s) := by
+  let 𝒰 : U.toScheme.OpenCover :=
+    Scheme.Cover.mkOfCovers κ
+      (fun i => pullback U.ι (x i))
+      (fun i => pullback.fst U.ι (x i))
+      (fun z => by
+        obtain ⟨i, y, hy⟩ := hc z.1 z.2
+        have : z ∈ Set.range (pullback.fst U.ι (x i)) := by
+          rw [Scheme.Pullback.range_fst]
+          exact ⟨y, hy⟩
+        exact ⟨i, this⟩)
+      (fun i => inferInstance)
   constructor
   · haveI : ∀ i, IsReduced (𝒰.X i) := fun i =>
       by
@@ -47,9 +55,10 @@ theorem reduced_flat_of_charts {Z S : Scheme.{0}} (s : Z ⟶ S) (U : Z.Opens) {�
     haveI := hx i
     exact MorphismProperty.comp_mem @Flat _ _ inferInstance (hf i)
 
-theorem flat_spMap_of_torsionFree {o σ : Type} [CommRing o] [IsDedekindDomain o] (J : Ideal (MvPolynomial σ o))
-    (h : ∀ (c : o) F, c ≠ 0 → MvPolynomial.C c * F ∈ J → F ∈ J) :
-    Flat (spMap ((Ideal.Quotient.mk J).comp MvPolynomial.C)) := by
+theorem flat_spMap_of_torsionFree
+    {o σ : Type} [CommRing o] [IsDedekindDomain o]
+    (J : Ideal (MvPolynomial σ o)) (h : ∀ (c : o) F, c ≠ 0 → MvPolynomial.C c * F ∈ J → F ∈ J)
+    : Flat (spMap ((Ideal.Quotient.mk J).comp MvPolynomial.C)) := by
   rw [HasRingHomProperty.Spec_iff (P := @Flat)]
   have : Module.IsTorsionFree o (MvPolynomial σ o ⧸ J) := by
     refine Module.IsTorsionFree.of_smul_eq_zero ?_
@@ -65,34 +74,54 @@ theorem flat_spMap_of_torsionFree {o σ : Type} [CommRing o] [IsDedekindDomain o
   have hfl : Module.Flat o (MvPolynomial σ o ⧸ J) := inferInstance
   exact (RingHom.flat_algebraMap_iff.2 hfl :)
 
-theorem nonempty_MMPre : ∀ (o : Type) [CommRing o] [IsDedekindDomain o] (g n N' : ℕ) (I : Ideal (MvPolynomial (Ix g (N' ^ 2)) o)), 0 < N' → I.IsRadical → (∀ F ∈ I, ∀ e, MvPolynomial.homogeneousComponent e F ∈ I) → (∀ (c : o) F, c ≠ 0 → MvPolynomial.C c * F ∈ I → F ∈ I) → Nonempty (MMPre n N' I) := by
+theorem nonempty_MMPre
+    : ∀ (o : Type) [CommRing o] [IsDedekindDomain o] (g n N' : ℕ)
+        (I : Ideal (MvPolynomial (Ix g (N' ^ 2)) o)),
+      0 < N' → I.IsRadical → (∀ F ∈ I, ∀ e, MvPolynomial.homogeneousComponent e F ∈ I)
+        → (∀ (c : o) F, c ≠ 0 → MvPolynomial.C c * F ∈ I → F ∈ I)
+        → Nonempty (MMPre n N' I) := by
   intro o _ _ g n N' I hN hrad hhom htf
   haveI : NeZero (N' ^ 2) := ⟨by positivity⟩
-  obtain ⟨Z, s, M, th, hproj, hrep, hfp, -⟩ := GlobalTheory.T.exists_projCoordRepresentation_homogeneousIdeal_flat o (Ix g (N' ^ 2)) I 0 hhom
+  obtain ⟨Z, s, M, th, hproj, hrep, hfp, -⟩ :=
+    GlobalTheory.T.exists_projCoordRepresentation_homogeneousIdeal_flat o (Ix g (N' ^ 2)) I 0 hhom
   obtain ⟨N, j, hj, hjs⟩ := hproj ⟨0⟩
   haveI := hfp (IsNoetherian.noetherian I)
   haveI : IsLocallyNoetherian Z := LocallyOfFiniteType.isLocallyNoetherian s
-  let U : Z.Opens := ⟨⋂ a, ⋃ c, (Out.nonzeroLocus (th (a + (N' / n) • c)) : Set Z),
-    isOpen_iInter_of_finite fun a => isOpen_iUnion fun c => (Out.nonzeroLocus _).2⟩
+  let U : Z.Opens := ⟨
+    ⋂ a, ⋃ c, (Out.nonzeroLocus (th (a + (N' / n) • c)) : Set Z),
+    isOpen_iInter_of_finite fun a => isOpen_iUnion fun c => (Out.nonzeroLocus _).2
+  ⟩
   have hU : ∀ z : Z, z ∈ U ↔ ∀ a, ∃ c, z ∈ Out.nonzeroLocus (th (a + (N' / n) • c)) := fun z => by
     change z ∈ ⋂ a, ⋃ c, (Out.nonzeroLocus (th (a + (N' / n) • c)) : Set Z) ↔ _
     simp only [Set.mem_iInter, Set.mem_iUnion, SetLike.mem_coe]
   choose x hxo hxr hxs _ using fun i => GlobalTheory.T.exists_nonzeroCoordinate_affineChart o _ I Z s M th i hrep
-  obtain ⟨hred, hflat⟩ := reduced_flat_of_charts s U _ x hxo
-    (fun i => by
-      haveI : _root_.IsReduced (MvPolynomial (Ix g (N' ^ 2)) o ⧸ (I ⊔ Ideal.span {MvPolynomial.X i - 1})) :=
-        (Ideal.isRadical_iff_quotient_reduced _).1 ((GlobalTheory.T.sup_span_X_sub_one_isRadical_and_torsionFree o _ I i hhom).1 hrad)
-      infer_instance)
-    (fun i => by
-      rw [hxs i]
-      exact flat_spMap_of_torsionFree _ ((GlobalTheory.T.sup_span_X_sub_one_isRadical_and_torsionFree o _ I i hhom).2 htf))
-    (fun z hz => by
-      obtain ⟨c, hc⟩ := (hU z).1 hz 0
-      exact ⟨_, by rw [hxr]; exact hc⟩)
+  obtain ⟨hred, hflat⟩ :=
+    reduced_flat_of_charts s U _ x hxo
+      (fun i => by
+        haveI : _root_.IsReduced (MvPolynomial (Ix g (N' ^ 2)) o ⧸ (I ⊔ Ideal.span {MvPolynomial.X i - 1})) :=
+          (Ideal.isRadical_iff_quotient_reduced _).1 ((GlobalTheory.T.sup_span_X_sub_one_isRadical_and_torsionFree o _ I i hhom).1 hrad)
+        infer_instance)
+      (fun i => by
+        rw [hxs i]
+        exact flat_spMap_of_torsionFree _
+          ((GlobalTheory.T.sup_span_X_sub_one_isRadical_and_torsionFree o _ I i hhom).2 htf))
+      (fun z hz => by
+        obtain ⟨c, hc⟩ := (hU z).1 hz 0
+        exact ⟨_, by rw [hxr]; exact hc⟩)
   obtain ⟨hpull, -, hnz⟩ := GlobalTheory.T.sectionCoordinates_pull_iso_nonzeroLocus Z M _ th hrep.1
   obtain ⟨th', hth'⟩ := hpull U.toScheme U.ι
-  refine ⟨{ MM := U.toScheme, s := U.ι ≫ s, qproj := ⟨N, U.ι ≫ j, inferInstance, inferInstance, by rw [Category.assoc, hjs]⟩
-            flat := hflat, reduced := hred, de := M.pull U.ι, isLB := pull_isLB hrep.1 _, th := th', loc := ?_, pts := ?_ }⟩
+  refine ⟨{
+    MM := U.toScheme
+    s := U.ι ≫ s
+    qproj := ⟨N, U.ι ≫ j, inferInstance, inferInstance, by rw [Category.assoc, hjs]⟩
+    flat := hflat
+    reduced := hred
+    de := M.pull U.ι
+    isLB := pull_isLB hrep.1 _
+    th := th'
+    loc := ?_
+    pts := ?_
+  }⟩
   · intro R _ β y v hy hv
     rw [hth'] at hv
     refine ⟨(hrep.2.1 R β (y ≫ U.ι) v (by rw [Category.assoc, hy]) hv).2, fun q hq a => ?_⟩
@@ -113,7 +142,11 @@ theorem nonempty_MMPre : ∀ (o : Type) [CommRing o] [IsDedekindDomain o] (g n N
       obtain ⟨c, hc⟩ := hv.2 p.asIdeal p.isPrime a
       exact ⟨c, (hnz R y v _ p hyv).2 hc⟩
     have hl := IsOpenImmersion.lift_fac U.ι y hrange
-    refine ⟨IsOpenImmersion.lift U.ι y hrange, ⟨by rw [← Category.assoc, hl, hys], by rw [hth', hl]; exact hyv⟩, ?_⟩
+    refine ⟨
+      IsOpenImmersion.lift U.ι y hrange,
+      ⟨by rw [← Category.assoc, hl, hys], by rw [hth', hl]; exact hyv⟩,
+      ?_
+    ⟩
     rintro y' ⟨h1, h2⟩
     rw [hth'] at h2
     rw [← cancel_mono U.ι, hl]

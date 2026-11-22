@@ -21,10 +21,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-private theorem exists_cycZ_eq_add_pow_mul_of_pows (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (m k : ℕ) (g : G ℚ Ω) (hg : Pows (l ^ m) k g) : ∃ e : ℤ_[l], (cycZ ℚ Ω l g : ℤ_[l]) = k + (l : ℤ_[l]) ^ m * e := by
+private theorem exists_cycZ_eq_add_pow_mul_of_pows
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (m k : ℕ) (g : G ℚ Ω) (hg : Pows (l ^ m) k g)
+    : ∃ e : ℤ_[l], (cycZ ℚ Ω l g : ℤ_[l]) = k + (l : ℤ_[l]) ^ m * e := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   haveI : NeZero (l : Ω) := ⟨by exact_mod_cast (Fact.out : l.Prime).ne_zero⟩
@@ -36,7 +42,8 @@ private theorem exists_cycZ_eq_add_pow_mul_of_pows (Ω : Type) [Field Ω] [Algeb
     isOfFinOrder_iff_pow_eq_one.mpr ⟨l ^ m, pow_pos (Fact.out : l.Prime).pos m, hζ.pow_eq_one⟩
   rw [hfin.pow_eq_pow_iff_modEq, ← hζ.eq_orderOf] at h3
   have h4 : (k : ZMod (l ^ m)) = PadicInt.toZModPow m (cycZ ℚ Ω l g : ℤ_[l]) := by
-    rw [← ZMod.natCast_zmod_val (PadicInt.toZModPow m (cycZ ℚ Ω l g : ℤ_[l])), ZMod.natCast_eq_natCast_iff]
+    rw [← ZMod.natCast_zmod_val (PadicInt.toZModPow m (cycZ ℚ Ω l g : ℤ_[l])),
+      ZMod.natCast_eq_natCast_iff]
     exact h3
   have h5 : (cycZ ℚ Ω l g : ℤ_[l]) - k ∈ RingHom.ker (PadicInt.toZModPow (p := l) m) := by
     rw [RingHom.mem_ker, map_sub, ← h4, map_natCast, sub_self]
@@ -44,7 +51,13 @@ private theorem exists_cycZ_eq_add_pow_mul_of_pows (Ω : Type) [Field Ω] [Algeb
   obtain ⟨e, he⟩ := h5
   exact ⟨e, by rw [← he]; ring⟩
 
-private theorem isUnit_add_pow_mul_of_isUnit_of_one_le (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (m : ℕ) (hm : 1 ≤ m) (u y : O) (hu : IsUnit u) : IsUnit (u + (l : O) ^ m * y) := by
+private theorem isUnit_add_pow_mul_of_isUnit_of_one_le
+    (l : ℕ) [Fact l.Prime]
+    (O : Type)
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    (m : ℕ) (hm : 1 ≤ m)
+    (u y : O) (hu : IsUnit u)
+    : IsUnit (u + (l : O) ^ m * y) := by
   by_contra h
   have hl : (l : O) ∈ IsLocalRing.maximalIdeal O := by
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
@@ -69,21 +82,38 @@ private theorem isUnit_add_pow_mul_of_isUnit_of_one_le (l : ℕ) [Fact l.Prime] 
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] at h6
   exact h6 hu
 
-private theorem intCast_smul_eq_of_zmod_eq_of_nsmul_eq_zero (O W : Type) [CommRing O] [AddCommGroup W] [Module O W] (N : ℕ) (v : W) (hv : N • v = 0) (z₁ z₂ : ℤ) (h : (z₁ : ZMod N) = z₂) : (z₁ : O) • v = (z₂ : O) • v := by
+private theorem intCast_smul_eq_of_zmod_eq_of_nsmul_eq_zero
+    (O W : Type) [CommRing O] [AddCommGroup W] [Module O W]
+    (N : ℕ) (v : W) (hv : N • v = 0)
+    (z₁ z₂ : ℤ) (h : (z₁ : ZMod N) = z₂)
+    : (z₁ : O) • v = (z₂ : O) • v := by
   rw [ZMod.intCast_eq_intCast_iff_dvd_sub] at h
   obtain ⟨j, hj⟩ := h
   rw [← sub_eq_zero, ← sub_smul, ← Int.cast_sub, ← neg_sub, hj]
-  rw [Int.cast_neg, neg_smul, neg_eq_zero, Int.cast_mul, mul_comm, mul_smul, Int.cast_natCast, Nat.cast_smul_eq_nsmul, hv, smul_zero]
+  rw [Int.cast_neg, neg_smul, neg_eq_zero, Int.cast_mul, mul_comm, mul_smul, Int.cast_natCast,
+    Nat.cast_smul_eq_nsmul, hv, smul_zero]
 
-private theorem isUnit_natCast_of_not_dvd' (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Algebra ℤ_[l] O] (n : ℕ) (h : ¬ l ∣ n) : IsUnit (n : O) := by
+private theorem isUnit_natCast_of_not_dvd'
+    (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Algebra ℤ_[l] O] (n : ℕ) (h : ¬ l ∣ n)
+    : IsUnit (n : O) := by
   have h1 : IsUnit (n : ℤ_[l]) :=
-    PadicInt.isUnit_iff.mpr (PadicInt.norm_natCast_eq_one_iff.mpr (((Fact.out : l.Prime).coprime_iff_not_dvd).mpr h))
+    PadicInt.isUnit_iff.mpr (PadicInt.norm_natCast_eq_one_iff.mpr
+      (((Fact.out : l.Prime).coprime_iff_not_dvd).mpr h))
   simpa using h1.map (algebraMap ℤ_[l] O)
 
-theorem UpperTheory.V.ML.nuSysEx :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (N₀ m F r b : ℕ) [NeZero F] (α : G ℚ Ω →* Oˣ), Dat l N₀ m F α → r.Prime → r ≡ 1 [MOD F] → b < F →
-    ∀ A₀ : ValuationSubring Ω, Over A₀ r → ∀ σ : (ZMod F)ˣ → G ℚ Ω, (∀ t, Lifts F t (σ t)) → ∀ w : QO l O, (l ^ m) • w = 0 →
-    ∃ ν : List ℕ → G ℚ Ω → QO l O, NuSys l (l ^ m) F r (dualChar l α) A₀ (zVal α σ b • w) ν := by
+theorem UpperTheory.V.ML.nuSysEx
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type)
+        [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
+        [Module.Finite ℤ_[l] O] (N₀ m F r b : ℕ) [NeZero F] (α : G ℚ Ω →* Oˣ),
+      Dat l N₀ m F α → r.Prime → r ≡ 1 [MOD F] → b < F
+        → ∀ A₀ : ValuationSubring Ω,
+          Over A₀ r
+            → ∀ σ : (ZMod F)ˣ → G ℚ Ω,
+              (∀ t, Lifts F t (σ t))
+                → ∀ w : QO l O,
+                  (l ^ m) • w = 0
+                    → ∃ ν : List ℕ → G ℚ Ω → QO l O,
+                      NuSys l (l ^ m) F r (dualChar l α) A₀ (zVal α σ b • w) ν := by
   intro Ω _ _ _ l _ O _ _ _ _ _ N₀ m F r b _ α hD hr hrF hb A₀ hA₀ σ hσ w hw
   classical
   obtain ⟨hl2, hcop, hm, hF, htriv, hodd, ⟨g0, hg0⟩⟩ := hD
@@ -105,18 +135,32 @@ theorem UpperTheory.V.ML.nuSysEx :
     intro q hq
     simp only [τ, dif_pos hq]
     exact Classical.choose_spec (ineTau Ω q hq).2
-  have hkol : ∀ L, AdmL l F r L → ∃ κ : G ℚ Ω → ZMod (l ^ m), IsKol (l ^ m) F L.prod ζ g0 (a0 : ZMod (l ^ m)).val (der τ L ((fun d => opP g0 (a0 : ZMod (l ^ m)).val (X d) ^ (2 * N₀ * d)) L.prod)) κ := by
+  have hkol
+      : ∀ L,
+        AdmL l F r L
+          → ∃ κ : G ℚ Ω → ZMod (l ^ m),
+            IsKol (l ^ m) F L.prod ζ g0 (a0 : ZMod (l ^ m)).val
+              (der τ L ((fun d => opP g0 (a0 : ZMod (l ^ m)).val (X d) ^ (2 * N₀ * d)) L.prod))
+              κ := by
     intro L hL
     obtain ⟨hAdm, hprod0, -, -⟩ := isCrys_isDR_prod l F r L hL
-    have hD := derBasic Ω (F * L.prod) r (mul_ne_zero hF0 hprod0) τ L _ (hSys.ne _ hAdm) (hSys.fix _ hAdm)
+    have hD :=
+      derBasic Ω (F * L.prod) r (mul_ne_zero hF0 hprod0) τ L _ (hSys.ne _ hAdm) (hSys.fix _ hAdm)
     exact kolEx Ω (l ^ m) F L.prod _ (mul_ne_zero hF0 hprod0) ζ hζ g0 hPows _ hD.1 hD.2.1
       (derInv Ω l (l ^ m) F r hF0 hMF _ _ hSys τ L hL (fun q hq => hτ q (hL.2 q hq).1))
-  let κ : List ℕ → G ℚ Ω → ZMod (l ^ m) := fun L => if h : AdmL l F r L then Classical.choose (hkol L h) else 0
-  have hκ : ∀ L (h : AdmL l F r L), IsKol (l ^ m) F L.prod ζ g0 (a0 : ZMod (l ^ m)).val (der τ L ((fun d => opP g0 (a0 : ZMod (l ^ m)).val (X d) ^ (2 * N₀ * d)) L.prod)) (κ L) := by
+  let κ : List ℕ → G ℚ Ω → ZMod (l ^ m) := fun L =>
+    if h : AdmL l F r L then Classical.choose (hkol L h) else 0
+  have hκ
+      : ∀ L (h : AdmL l F r L),
+        IsKol (l ^ m) F L.prod ζ g0 (a0 : ZMod (l ^ m)).val
+          (der τ L ((fun d => opP g0 (a0 : ZMod (l ^ m)).val (X d) ^ (2 * N₀ * d)) L.prod))
+          (κ L) := by
     intro L h
     simp only [κ, dif_pos h]
     exact Classical.choose_spec (hkol L h)
-  have hchiO : ∀ (g : G ℚ Ω) (k : ℕ), Pows (l ^ m) k g → ∃ e : O, ((chiO ℚ Ω l O g : Oˣ) : O) = k + (l : O) ^ m * e := by
+  have hchiO
+      : ∀ (g : G ℚ Ω) (k : ℕ),
+        Pows (l ^ m) k g → ∃ e : O, ((chiO ℚ Ω l O g : Oˣ) : O) = k + (l : O) ^ m * e := by
     intro g k hg
     obtain ⟨e, he⟩ := exists_cycZ_eq_add_pow_mul_of_pows Ω l m k g hg
     refine ⟨algebraMap ℤ_[l] O e, ?_⟩
@@ -138,13 +182,16 @@ theorem UpperTheory.V.ML.nuSysEx :
   refine ⟨fun L => nu (dualChar l α) σ w (κ L), ⟨?_, ?_, ?_⟩⟩
   · intro L hL
     obtain ⟨hAdm, hprod0, -, -⟩ := isCrys_isDR_prod l F r L hL
-    have hD := derBasic Ω (F * L.prod) r (mul_ne_zero hF0 hprod0) τ L _ (hSys.ne _ hAdm) (hSys.fix _ hAdm)
+    have hD :=
+      derBasic Ω (F * L.prod) r (mul_ne_zero hF0 hprod0) τ L _ (hSys.ne _ hAdm) (hSys.fix _ hAdm)
     have hK := hκ L hL
-    have hH := kolHom Ω (l ^ m) F L.prod _ (mul_ne_zero hF0 hprod0) hMF ζ hζ g0 hPows _ hD.1 hD.2.1 (κ L) hK
-    have hU := kolUnr Ω (l ^ m) F L.prod r _ (mul_ne_zero hF0 hprod0) hMF ζ hζ g0 hPows _ hD.1 hD.2.1
-      (hD.2.2.2.1 (hSys.unit _ hAdm)) (κ L) hK
-    exact nuIs Ω O (QO l O) (l ^ m) F (F * r * L.prod) ⟨r * L.prod, by ring⟩ (dualChar l α) hβ σ hσ w hw
-      (κ L) hH.1 hH.2.1 hU
+    have hH :=
+      kolHom Ω (l ^ m) F L.prod _ (mul_ne_zero hF0 hprod0) hMF ζ hζ g0 hPows _ hD.1 hD.2.1 (κ L) hK
+    have hU :=
+      kolUnr Ω (l ^ m) F L.prod r _ (mul_ne_zero hF0 hprod0) hMF ζ hζ g0 hPows _ hD.1 hD.2.1
+        (hD.2.2.2.1 (hSys.unit _ hAdm)) (κ L) hK
+    exact nuIs Ω O (QO l O) (l ^ m) F (F * r * L.prod) ⟨r * L.prod, by ring⟩ (dualChar l α) hβ σ hσ
+      w hw (κ L) hH.1 hH.2.1 hU
   · intro q L hqL A hA φ hφ
     have hq : q.Prime := (hqL.2 q List.mem_cons_self).1
     have hL : AdmL l F r L :=
@@ -178,18 +225,20 @@ theorem UpperTheory.V.ML.nuSysEx :
         rw [← AlgEquiv.mul_apply, inv_mul_cancel, AlgEquiv.one_apply]
       rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, hcomm, hback]
       exact (ht y hy).trans (hb0 y hy).symm
-    have key := kolStep Ω l (l ^ m) F r _ hF0 hMF hr ζ hζ g0 hPows _ _ hSys τ q L hqL
-      (fun p hp => hτ p (hqL.2 p hp).1) (κ L) (κ (q :: L)) (hκ L hL) (hκ (q :: L) hqL)
-      ((σ c)⁻¹ • A) hA' _ hI' ht' _ hφ'
+    have key :=
+      kolStep Ω l (l ^ m) F r _ hF0 hMF hr ζ hζ g0 hPows _ _ hSys τ q L hqL
+        (fun p hp => hτ p (hqL.2 p hp).1)
+        (κ L) (κ (q :: L)) (hκ L hL) (hκ (q :: L) hqL) ((σ c)⁻¹ • A) hA' _ hI' ht' _ hφ'
     rw [key]
     have hv : (l ^ m) • ((((dualChar l α) (σ c) : Oˣ) : O) • w) = 0 := by
       rw [smul_comm, hw, smul_zero]
     generalize ((((dualChar l α) (σ c) : Oˣ) : O) • w) = v at hv ⊢
     generalize κ L ((σ c)⁻¹ * φ * σ c) = k
     rw [IsUnit.unit_spec, ← Nat.cast_smul_eq_nsmul O, ← Nat.cast_smul_eq_nsmul O, smul_smul]
-    have h3 := intCast_smul_eq_of_zmod_eq_of_nsmul_eq_zero O _ (l ^ m) v hv
-      (((-(((q * s L.prod q : ℕ) : ZMod (l ^ m)) * k)).val : ℕ) : ℤ)
-      (-((q * s L.prod q : ℕ) : ℤ) * (k.val : ℤ)) (by push_cast; simp)
+    have h3 :=
+      intCast_smul_eq_of_zmod_eq_of_nsmul_eq_zero O _ (l ^ m) v hv
+        (((-(((q * s L.prod q : ℕ) : ZMod (l ^ m)) * k)).val : ℕ) : ℤ)
+        (-((q * s L.prod q : ℕ) : ℤ) * (k.val : ℤ)) (by push_cast; simp)
     push_cast at h3 ⊢
     exact h3
   · have hL0 : AdmL l F r [] := ⟨List.nodup_nil, fun p hp => absurd hp List.not_mem_nil⟩
@@ -210,12 +259,14 @@ theorem UpperTheory.V.ML.nuSysEx :
     have hO1 := hO.1 d g0 hd
     have hO2 := ((hasOrdP Ω F r (a0 : ZMod (l ^ m)).val hr.ne_zero A₀ _ _ hO1).2 (2 * N₀ * 1))
     have hO3 := ((hasOrdP Ω F r (a0 : ZMod (l ^ m)).val hr.ne_zero A₀ _ _ hO2).1 d g0 hd)
-    have hinit := kolInit Ω (l ^ m) F r (a0 : ZMod (l ^ m)).val hMF hr hrcop ζ hζ g0 hPows _ hx0
-      (by simpa using hxfix) (κ []) hK0 A₀ hA₀ _ hO3 ρ hρ t htI htρ
+    have hinit :=
+      kolInit Ω (l ^ m) F r (a0 : ZMod (l ^ m)).val hMF hr hrcop ζ hζ g0 hPows _ hx0
+        (by simpa using hxfix) (κ []) hK0 A₀ hA₀ _ hO3 ρ hρ t htI htρ
     obtain ⟨e1, he1⟩ := hchiO g0 _ hPows
     have hU1 : IsUnit (((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O)) := by
-      have heq : ((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O) =
-          (((α g0 : Oˣ) : O) - ((chiO ℚ Ω l O g0 : Oˣ) : O)) + (l : O) ^ m * e1 := by
+      have heq
+          : ((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O)
+            = (((α g0 : Oˣ) : O) - ((chiO ℚ Ω l O g0 : Oˣ) : O)) + (l : O) ^ m * e1 := by
         linear_combination he1
       rw [heq]
       exact isUnit_add_pow_mul_of_isUnit_of_one_le l O m hm _ _ hg0
@@ -230,11 +281,13 @@ theorem UpperTheory.V.ML.nuSysEx :
     have hU := (hU1.pow 2).mul hU2
     refine ⟨t, htI, hU.unit, ?_⟩
     rw [IsUnit.unit_spec]
-    have hwO : ((l : O) ^ m) • w = 0 := by
-      rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul, hw]
-    have hsum : ∀ K : (ZMod F)ˣ → ℤ, (∀ (c : (ZMod F)ˣ) (σ' : G ℚ Ω), Lifts F c σ' →
-        κ [] (σ'⁻¹ * t * σ') * (ZMod.castHom hMF (ZMod (l ^ m))) (c : ZMod F) = K c) →
-        nu (dualChar l α) σ w (κ []) t = zSum α σ K • w := by
+    have hwO : ((l : O) ^ m) • w = 0 := by rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul, hw]
+    have hsum
+        : ∀ K : (ZMod F)ˣ → ℤ,
+          (∀ (c : (ZMod F)ˣ) (σ' : G ℚ Ω),
+              Lifts F c σ'
+                → κ [] (σ'⁻¹ * t * σ') * (ZMod.castHom hMF (ZMod (l ^ m))) (c : ZMod F) = K c)
+            → nu (dualChar l α) σ w (κ []) t = zSum α σ K • w := by
       intro K hK
       simp only [nu, zSum, Finset.sum_smul]
       apply Finset.sum_congr rfl
@@ -246,34 +299,48 @@ theorem UpperTheory.V.ML.nuSysEx :
         obtain ⟨j, hj⟩ := hMF
         rw [hj, pow_mul, hy, one_pow]
       obtain ⟨e, he⟩ := hchiO (σ c) _ hP
-      have hv : (l ^ m) • ((((α (σ c))⁻¹ : Oˣ) : O) • w) = 0 := by
-        rw [smul_comm, hw, smul_zero]
+      have hv : (l ^ m) • ((((α (σ c))⁻¹ : Oˣ) : O) • w) = 0 := by rw [smul_comm, hw, smul_zero]
       show (κ [] ((σ c)⁻¹ * t * σ c)).val • ((((chiO ℚ Ω l O (σ c)) * (α (σ c))⁻¹ : Oˣ) : O) • w) = _
       have hz : ((l : O) ^ m * e) • ((((α (σ c))⁻¹ : Oˣ) : O) • w) = 0 := by
         rw [mul_comm, mul_smul, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul O (l ^ m), hv, smul_zero]
       rw [Units.val_mul, mul_smul, he, add_smul, hz, add_zero]
       rw [← Nat.cast_smul_eq_nsmul O, smul_smul]
-      have h3 := intCast_smul_eq_of_zmod_eq_of_nsmul_eq_zero O _ (l ^ m) _ hv (((κ [] ((σ c)⁻¹ * t * σ c)).val : ℤ) * ((c : ZMod F).val : ℤ)) (K c)
-        (by rw [← hc, Int.cast_mul, Int.cast_natCast, Int.cast_natCast, ZMod.natCast_zmod_val, ZMod.castHom_apply, ZMod.cast_eq_val])
+      have h3 :=
+        intCast_smul_eq_of_zmod_eq_of_nsmul_eq_zero O _ (l ^ m) _ hv
+          (((κ [] ((σ c)⁻¹ * t * σ c)).val : ℤ) * ((c : ZMod F).val : ℤ)) (K c)
+          (by
+            rw [← hc, Int.cast_mul, Int.cast_natCast, Int.cast_natCast, ZMod.natCast_zmod_val,
+              ZMod.castHom_apply, ZMod.cast_eq_val])
       push_cast at h3
       exact h3.trans (mul_smul _ _ _).symm
     rw [hsum _ hinit]
     have zp := fun k => zSumP Ω O F (a0 : ZMod (l ^ m)).val ((l : O) ^ m) α htriv σ hσ k
     obtain ⟨j1, hj1⟩ := (zp (fun t : (ZMod F)ˣ => th F b ↑t)).1 d g0 hd
-    have h2 := (zp (fun t : (ZMod F)ˣ => th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t)).2
-      ((2 * N₀ * 1 : ℕ) : ℤ)
-    obtain ⟨j3, hj3⟩ := (zp (fun t : (ZMod F)ˣ => ((2 * N₀ * 1 : ℕ) : ℤ) *
-      (th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t))).1 d g0 hd
+    have h2 :=
+      (zp (fun t : (ZMod F)ˣ => th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t)).2
+        ((2 * N₀ * 1 : ℕ) : ℤ)
+    obtain ⟨j3, hj3⟩ :=
+      (zp (fun t : (ZMod F)ˣ =>
+          ((2 * N₀ * 1 : ℕ) : ℤ) * (th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t))).1 d g0
+        hd
     have E := hj3
     rw [h2] at E
-    have E2 : zSum α σ (fun t : (ZMod F)ˣ => ((2 * N₀ * 1 : ℕ) : ℤ) * (th F b ↑(t * d * d) -
-        ↑(a0 : ZMod (l ^ m)).val * th F b ↑(t * d)) - ↑(a0 : ZMod (l ^ m)).val *
-        (((2 * N₀ * 1 : ℕ) : ℤ) * (th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t))) =
-        (((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O)) ^ 2 * (((2 * N₀ * 1 : ℕ) : ℤ) : O) *
-          zVal α σ b + (l : O) ^ m * ((((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O)) *
-          (((2 * N₀ * 1 : ℕ) : ℤ) : O) * j1 + j3) := by
+    have E2
+        : zSum α σ (fun t : (ZMod F)ˣ =>
+            ((2 * N₀ * 1 : ℕ) : ℤ)
+                * (th F b ↑(t * d * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑(t * d))
+              - ↑(a0 : ZMod (l ^ m)).val
+                * (((2 * N₀ * 1 : ℕ) : ℤ)
+                  * (th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t)))
+          = (((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O)) ^ 2
+              * (((2 * N₀ * 1 : ℕ) : ℤ) : O) * zVal α σ b
+            + (l : O) ^ m
+              * ((((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O))
+                  * (((2 * N₀ * 1 : ℕ) : ℤ) : O) * j1
+                + j3) := by
       linear_combination E + (((α g0 : Oˣ) : O) - (((a0 : ZMod (l ^ m)).val : ℕ) : O)) * (((2 * N₀ * 1 : ℕ) : ℤ) : O) * hj1
     show zSum α σ (fun t : (ZMod F)ˣ => ((2 * N₀ * 1 : ℕ) : ℤ) * (th F b ↑(t * d * d) -
         ↑(a0 : ZMod (l ^ m)).val * th F b ↑(t * d)) - ↑(a0 : ZMod (l ^ m)).val *
         (((2 * N₀ * 1 : ℕ) : ℤ) * (th F b ↑(t * d) - ↑(a0 : ZMod (l ^ m)).val * th F b ↑t))) • w = _
-    rw [E2, add_smul, mul_comm ((l : O) ^ m) _, mul_smul _ ((l : O) ^ m), hwO, smul_zero, add_zero, mul_smul]
+    rw [E2, add_smul, mul_comm ((l : O) ^ m) _, mul_smul _ ((l : O) ^ m), hwO, smul_zero, add_zero,
+      mul_smul]

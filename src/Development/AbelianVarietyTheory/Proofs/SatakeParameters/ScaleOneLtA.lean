@@ -22,8 +22,9 @@ theorem scale_one_lt_a (s : Scale) : 1 < s.a := by
   unfold Scale.a
   nlinarith
 
-theorem family_one_lt_scale_a : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x →
-    ∀ i : Fm.Ix x, 1 < (Fm.L x i).sc.a :=
-  fun Fm => ⟨0, fun x _ _ i => scale_one_lt_a (Fm.L x i).sc⟩
+theorem family_one_lt_scale_a
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x → ∀ i : Fm.Ix x, 1 < (Fm.L x i).sc.a := fun Fm =>
+  ⟨0, fun x _ _ i => scale_one_lt_a (Fm.L x i).sc⟩
 
 end GlobalTheory

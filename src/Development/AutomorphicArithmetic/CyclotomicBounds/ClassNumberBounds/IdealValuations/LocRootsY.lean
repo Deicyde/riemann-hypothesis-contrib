@@ -18,15 +18,15 @@ private theorem lr_mem (x : PadicAlgCl l) : x ∈ lrO l ↔ ‖x‖ ≤ 1 := by
   rw [lrO, Valuation.mem_valuationSubring_iff, ← NNReal.coe_le_coe, PadicAlgCl.valuation_coe]
   rfl
 
-private theorem lr_max (x : lrO l) :
-    x ∈ IsLocalRing.maximalIdeal (lrO l) ↔ ‖(x : PadicAlgCl l)‖ < 1 := by
+private theorem lr_max (x : lrO l)
+    : x ∈ IsLocalRing.maximalIdeal (lrO l) ↔ ‖(x : PadicAlgCl l)‖ < 1 := by
   unfold lrO at x ⊢
   rw [Valuation.mem_maximalIdeal_iff, ← NNReal.coe_lt_coe, PadicAlgCl.valuation_coe]
   rfl
 
-private theorem lr_res (x y : lrO l) :
-    IsLocalRing.residue (lrO l) x = IsLocalRing.residue (lrO l) y ↔
-      ‖(x : PadicAlgCl l) - y‖ < 1 := by
+private theorem lr_res (x y : lrO l)
+    : IsLocalRing.residue (lrO l) x = IsLocalRing.residue (lrO l) y
+      ↔ ‖(x : PadicAlgCl l) - y‖ < 1 := by
   rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, lr_max]
   rfl
 
@@ -34,22 +34,21 @@ private theorem lr_char : CharP (IsLocalRing.ResidueField (lrO l)) l := by
   refine (CharP.charP_iff_prime_eq_zero Fact.out).mpr ?_
   rw [← map_natCast (IsLocalRing.residue (lrO l)), IsLocalRing.residue_eq_zero_iff, lr_max]
   have h := PadicAlgCl.norm_extends l (l : ℚ_[l])
-  have h2 : ((l : lrO l) : PadicAlgCl l) = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by
-    simp
+  have h2 : ((l : lrO l) : PadicAlgCl l) = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by simp
   rw [h2]
   exact h.trans_lt Padic.norm_p_lt_one
 
 private theorem lr_aut (g : Gal(PadicAlgCl l/ℚ_[l])) (x : PadicAlgCl l) : ‖g x‖ = ‖x‖ :=
   (spectralNorm_eq_of_equiv g x).symm
 
-private theorem lr_norm_root {m : ℕ} {ζ : PadicAlgCl l} (hm : ¬ l ∣ m) (h : ζ ^ m = 1) :
-    ‖ζ‖ = 1 := by
+private theorem lr_norm_root {m : ℕ} {ζ : PadicAlgCl l} (hm : ¬ l ∣ m) (h : ζ ^ m = 1)
+    : ‖ζ‖ = 1 := by
   have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero _)
   have h1 : ‖ζ‖ ^ m = 1 := by rw [← norm_pow, h, norm_one]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hm0).mp h1
 
-private theorem lr_field_pow {k : Type*} [Field k] [CharP k l] (φ : k →+* k) {m : ℕ}
-    (hm : ¬ l ∣ m) : ∃ j : ℕ, ∀ a : k, a ^ m = 1 → φ a = a ^ l ^ j := by
+private theorem lr_field_pow {k : Type*} [Field k] [CharP k l] (φ : k →+* k) {m : ℕ} (hm : ¬ l ∣ m)
+    : ∃ j : ℕ, ∀ a : k, a ^ m = 1 → φ a = a ^ l ^ j := by
   have hl : l.Prime := Fact.out
   have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero _)
   have hf : m.totient ≠ 0 := (Nat.totient_pos.mpr (Nat.pos_of_ne_zero hm0)).ne'
@@ -58,22 +57,27 @@ private theorem lr_field_pow {k : Type*} [Field k] [CharP k l] (φ : k →+* k) 
   have : Finite F := by
     classical
     have hne := FiniteField.X_pow_card_pow_sub_X_ne_zero k hf hl.one_lt
-    refine Set.Finite.subset (s := (((Polynomial.X ^ l ^ m.totient - Polynomial.X :
-      Polynomial k).roots.toFinset : Finset k) : Set k)) (Finset.finite_toSet _) ?_
+    refine Set.Finite.subset
+      (s :=
+        (((Polynomial.X ^ l ^ m.totient - Polynomial.X : Polynomial k).roots.toFinset : Finset k)
+          : Set k))
+      (Finset.finite_toSet _) ?_
     intro a ha
     have ha' := (hF a).mp ha
     simp only [Finset.mem_coe, Multiset.mem_toFinset]
     rw [Polynomial.mem_roots hne]
     simp [ha']
-  let ψ : F →+* F := φ.restrict F F fun a ha => by
-    rw [hF] at ha ⊢
-    rw [← map_pow, ha]
+  let ψ : F →+* F :=
+    φ.restrict F F fun a ha => by
+      rw [hF] at ha ⊢
+      rw [← map_pow, ha]
   let : Algebra (ZMod l) F := ZMod.algebra _ _
-  let ψ' : F →ₐ[ZMod l] F :=
-    { ψ with commutes' := fun r => RingHom.congr_fun (RingHom.ext_zmod (ψ.comp (algebraMap _ _))
-        (algebraMap (ZMod l) F)) r }
-  let e : F ≃ₐ[ZMod l] F :=
-    AlgEquiv.ofBijective ψ' (Finite.injective_iff_bijective.mp ψ.injective)
+  let ψ' : F →ₐ[ZMod l] F := {
+    ψ with
+    commutes' := fun r =>
+      RingHom.congr_fun (RingHom.ext_zmod (ψ.comp (algebraMap _ _)) (algebraMap (ZMod l) F)) r
+  }
+  let e : F ≃ₐ[ZMod l] F := AlgEquiv.ofBijective ψ' (Finite.injective_iff_bijective.mp ψ.injective)
   obtain ⟨j, hj⟩ := FiniteField.exists_forall_apply_eq_pow (ZMod l) l F e
   refine ⟨j, fun a ha => ?_⟩
   have haF : a ∈ F := by
@@ -89,10 +93,10 @@ private theorem lr_field_pow {k : Type*} [Field k] [CharP k l] (φ : k →+* k) 
   rw [Nat.card_zmod] at h
   exact h
 
-theorem norm_aut_and_roots :
-    (∀ (g : Gal(PadicAlgCl l/ℚ_[l])) (x : PadicAlgCl l), ‖g x‖ = ‖x‖) ∧
-      ∀ (m : ℕ) (ζ ζ' : PadicAlgCl l), ¬ l ∣ m → ζ ^ m = 1 → ζ' ^ m = 1 → ‖ζ - ζ'‖ < 1 →
-        ζ = ζ' := by
+theorem norm_aut_and_roots
+    : (∀ (g : Gal(PadicAlgCl l/ℚ_[l])) (x : PadicAlgCl l), ‖g x‖ = ‖x‖)
+      ∧ ∀ (m : ℕ) (ζ ζ' : PadicAlgCl l),
+        ¬ l ∣ m → ζ ^ m = 1 → ζ' ^ m = 1 → ‖ζ - ζ'‖ < 1 → ζ = ζ' := by
   refine ⟨lr_aut, fun m ζ ζ' hm h h' hlt => ?_⟩
   by_contra hne
   have := lr_char (l := l)
@@ -113,15 +117,17 @@ theorem norm_aut_and_roots :
   · have h4 := (lr_res b 0).mp (by rw [map_zero]; exact eq_zero_of_pow_eq_zero h2)
     simp only [b, ZeroMemClass.coe_zero, sub_zero, lr_norm_root hm h', lt_irrefl] at h4
 
-theorem exists_pow_of_aut (g : Gal(PadicAlgCl l/ℚ_[l])) {m : ℕ} (hm : ¬ l ∣ m) :
-    ∃ j : ℕ, ∀ ζ : PadicAlgCl l, ζ ^ m = 1 → g ζ = ζ ^ l ^ j := by
+theorem exists_pow_of_aut (g : Gal(PadicAlgCl l/ℚ_[l])) {m : ℕ} (hm : ¬ l ∣ m)
+    : ∃ j : ℕ, ∀ ζ : PadicAlgCl l, ζ ^ m = 1 → g ζ = ζ ^ l ^ j := by
   have := lr_char (l := l)
-  let gO : lrO l →+* lrO l := (g : PadicAlgCl l →+* PadicAlgCl l).restrict (lrO l) (lrO l)
-    fun x hx => (lr_mem _).mpr ((lr_aut g x).trans_le ((lr_mem _).mp hx))
-  have : IsLocalHom gO := ⟨fun x hx => by
-    rw [← IsLocalRing.notMem_maximalIdeal, lr_max] at hx ⊢
-    rw [← lr_aut g]
-    exact hx⟩
+  let gO : lrO l →+* lrO l :=
+    (g : PadicAlgCl l →+* PadicAlgCl l).restrict (lrO l) (lrO l) fun x hx =>
+      (lr_mem _).mpr ((lr_aut g x).trans_le ((lr_mem _).mp hx))
+  have : IsLocalHom gO :=
+    ⟨fun x hx => by
+      rw [← IsLocalRing.notMem_maximalIdeal, lr_max] at hx ⊢
+      rw [← lr_aut g]
+      exact hx⟩
   obtain ⟨j, hj⟩ := lr_field_pow (IsLocalRing.ResidueField.map gO) hm
   refine ⟨j, fun ζ h => ?_⟩
   let a : lrO l := ⟨ζ, (lr_mem _).mpr (lr_norm_root hm h).le⟩
@@ -131,8 +137,8 @@ theorem exists_pow_of_aut (g : Gal(PadicAlgCl l/ℚ_[l])) {m : ℕ} (hm : ¬ l �
   refine norm_aut_and_roots.2 m _ _ hm (by rw [← map_pow, h, map_one]) ?_ h1
   rw [← pow_mul, mul_comm, pow_mul, h, one_pow]
 
-theorem exists_root_congr {x : PadicAlgCl l} (hx : ‖x‖ = 1) :
-    ∃ (m : ℕ) (ζ : PadicAlgCl l), ¬ l ∣ m ∧ ζ ^ m = 1 ∧ ‖x - ζ‖ < 1 :=
+theorem exists_root_congr {x : PadicAlgCl l} (hx : ‖x‖ = 1)
+    : ∃ (m : ℕ) (ζ : PadicAlgCl l), ¬ l ∣ m ∧ ζ ^ m = 1 ∧ ‖x - ζ‖ < 1 :=
   _root_.UpperTheory.Reformulated.B.ExistsRootCongruence.exists_root_congr hx
 
 end KStar.IdealValuations

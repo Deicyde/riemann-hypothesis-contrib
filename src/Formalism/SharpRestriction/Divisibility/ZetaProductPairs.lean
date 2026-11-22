@@ -23,24 +23,15 @@ open Formalism.BasicNotions
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 structure Loc (D : D7) (T : ThetaX D) where
-
   gl1 : D.what₂.Word → T.Gf (D.sp.Y 0)
-
   glSym : D.what₂.Word → T.Gf (D.sp.Y 0)
-
   ArchDat : D.what₂.Word → Type
   ArchDat_ne : ∀ u, Nonempty (ArchDat u)
-
   ellT : ∀ u, ArchDat u → ℂ
-
   Au : ∀ u, ArchDat u → ℂ
-
   B0 : ∀ u, D.what₂.Mu u →ₗ[ℂ] D.what₂.EE →ₗ[ℂ] ℂ
-
   zeX : D.what₂.Word → D.what₂.Tup → ℂ
-
   zeta_at_base_tuple : ∀ u, zeX u D.what₂.mu0 = 1
-
   zeX_fin : ∀ u μ, ∃ n : ℕ, 0 < n ∧ zeX u μ ^ n = 1
 
 variable {D : D7}
@@ -60,12 +51,13 @@ def idxPar (q : ℝ) (r s : ℕ) : ℝ := TH.parIdx q r s
 def Lpair (q : ℝ) (t : ℕ) (x : ℂ) : ℂ :=
   (∏ s ∈ Icc 1 t, ((1 - x * ((q : ℂ) ^ (-(s : ℤ)))) * (1 - x⁻¹ * ((q : ℂ) ^ (-(s : ℤ))))))⁻¹
 
-
 end Local
 
 section Family
 
-variable {eps : ℝ} (Fm : Formalism.MainNotions.FamP eps) (A : TH.ProvA)
+variable
+  {eps : ℝ} (Fm : Formalism.MainNotions.FamP eps)
+  (A : TH.ProvA)
   (GF : ∀ x (i : Fm.Ix x), Formalism.MainNotions.product_first_zeroth_parts.Th22 (Fm.D x i))
   (XF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), Loc (Fm.D x i) (Fm.ex x hx i).th)
 

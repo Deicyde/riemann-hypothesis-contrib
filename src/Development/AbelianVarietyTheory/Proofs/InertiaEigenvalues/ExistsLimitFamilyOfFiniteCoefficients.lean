@@ -8,10 +8,9 @@ open scoped BigOperators
 
 namespace GlobalTheory
 
-theorem exists_limit_family_of_finite_coefficients (σ I R : Type) [Finite σ] [Finite I] [Finite R]
-    (F : ℕ → I → (σ →₀ ℕ) → R) :
-    ∃ G : I → (σ →₀ ℕ) → R, ∀ N M₀ : ℕ, ∃ M, M₀ ≤ M ∧
-      ∀ x m, m.degree ≤ N → F M x m = G x m := by
+theorem exists_limit_family_of_finite_coefficients
+    (σ I R : Type) [Finite σ] [Finite I] [Finite R] (F : ℕ → I → (σ →₀ ℕ) → R)
+    : ∃ G : I → (σ →₀ ℕ) → R, ∀ N M₀ : ℕ, ∃ M, M₀ ≤ M ∧ ∀ x m, m.degree ≤ N → F M x m = G x m := by
   let _ : TopologicalSpace R := ⊥
   have : DiscreteTopology R := ⟨rfl⟩
 

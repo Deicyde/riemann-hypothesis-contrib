@@ -9,14 +9,16 @@ noncomputable section
 
 open NumberField IsDedekindDomain Polynomial Matrix
 open GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG
-open PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.Bc.ArchbcB.B.M4 PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw
+open PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.Bc.ArchbcB.B.M4
+  PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CompanionTheory.SymmetricIndexRegularity
 
-theorem orderEmb_rev {n m : ℕ} (S : Finset (Fin n)) (h : S.card = m) (hS : ∀ i ∈ S, i.rev ∈ S) (j : Fin m) :
-    S.orderEmbOfFin h j.rev = (S.orderEmbOfFin h j).rev := by
+theorem orderEmb_rev
+    {n m : ℕ} (S : Finset (Fin n)) (h : S.card = m) (hS : ∀ i ∈ S, i.rev ∈ S) (j : Fin m)
+    : S.orderEmbOfFin h j.rev = (S.orderEmbOfFin h j).rev := by
   have key : (fun j : Fin m => (S.orderEmbOfFin h j.rev).rev) = S.orderEmbOfFin h := by
     apply Finset.orderEmbOfFin_unique h
     · intro j
@@ -26,8 +28,8 @@ theorem orderEmb_rev {n m : ℕ} (S : Finset (Fin n)) (h : S.card = m) (hS : ∀
   have := congrFun key j
   rw [← this, Fin.rev_rev]
 
-theorem diff_injective {n : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x) :
-    Function.Injective fun i : Fin n => x i - x i.rev := by
+theorem diff_injective {n : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x)
+    : Function.Injective fun i : Fin n => x i - x i.rev := by
   have : StrictAnti fun i : Fin n => x i - x i.rev := by
     intro i j hij
     have h1 := hx hij
@@ -36,44 +38,58 @@ theorem diff_injective {n : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x) :
     omega
   exact this.injective
 
-theorem nv_restr {n m : ℕ} (x : Fin n → ℤ) (S : Finset (Fin n)) (h : S.card = m) (hS : ∀ i ∈ S, i.rev ∈ S)
-    (j : Fin m) : nv (restr x S h) j = x (S.orderEmbOfFin h j) - x (S.orderEmbOfFin h j).rev := by
+theorem nv_restr
+    {n m : ℕ}
+    (x : Fin n → ℤ) (S : Finset (Fin n)) (h : S.card = m) (hS : ∀ i ∈ S, i.rev ∈ S) (j : Fin m)
+    : nv (restr x S h) j = x (S.orderEmbOfFin h j) - x (S.orderEmbOfFin h j).rev := by
   simp only [nv, restr, orderEmb_rev S h hS]
 
-theorem restr_strictAnti {n m : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x) (S : Finset (Fin n)) (h : S.card = m) :
-    StrictAnti (restr x S h) :=
-  fun _ _ hij => hx ((S.orderEmbOfFin h).strictMono hij)
+theorem restr_strictAnti
+    {n m : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x) (S : Finset (Fin n)) (h : S.card = m)
+    : StrictAnti (restr x S h) := fun _ _ hij =>
+  hx ((S.orderEmbOfFin h).strictMono hij)
 
-theorem mem_symIdx {n : ℕ} {mid : Prop} [Decidable mid] {s : Finset (Fin (n / 2))} {i : Fin n} :
-    i ∈ symIdx n mid s ↔ (∃ h : i.val < n / 2, (⟨i.val, h⟩ : Fin (n / 2)) ∈ s) ∨
-      (∃ h : n - 1 - i.val < n / 2, (⟨n - 1 - i.val, h⟩ : Fin (n / 2)) ∈ s) ∨ (mid ∧ n % 2 = 1 ∧ i.val = n / 2) := by
+theorem mem_symIdx {n : ℕ} {mid : Prop} [Decidable mid] {s : Finset (Fin (n / 2))} {i : Fin n}
+    : i ∈ symIdx n mid s
+      ↔ (∃ h : i.val < n / 2, (⟨i.val, h⟩ : Fin (n / 2)) ∈ s)
+        ∨ (∃ h : n - 1 - i.val < n / 2, (⟨n - 1 - i.val, h⟩ : Fin (n / 2)) ∈ s)
+        ∨ (mid ∧ n % 2 = 1 ∧ i.val = n / 2) := by
   simp [symIdx]
 
-theorem symIdx_rev (n : ℕ) (mid : Prop) [Decidable mid] (s : Finset (Fin (n / 2))) :
-    ∀ i ∈ symIdx n mid s, i.rev ∈ symIdx n mid s := by
+theorem symIdx_rev (n : ℕ) (mid : Prop) [Decidable mid] (s : Finset (Fin (n / 2)))
+    : ∀ i ∈ symIdx n mid s, i.rev ∈ symIdx n mid s := by
   intro i hi
   have hv : i.rev.val = n - 1 - i.val := by
     have := i.isLt
-    rw [Fin.val_rev]; omega
+    rw [Fin.val_rev]
+    omega
   have hv' : n - 1 - i.rev.val = i.val := by
     have := i.isLt
     omega
   rw [mem_symIdx] at hi ⊢
   rcases hi with ⟨h, hs⟩ | ⟨h, hs⟩ | ⟨hm, ho, he⟩
-  · right; left
+  · right
+    left
     refine ⟨by omega, ?_⟩
     simpa only [hv'] using hs
   · left
     refine ⟨by omega, ?_⟩
     simpa only [hv] using hs
-  · right; right
+  · right
+    right
     exact ⟨hm, ho, by omega⟩
 
-theorem symIdx_disj (n : ℕ) (m₁ m₂ : Prop) [Decidable m₁] [Decidable m₂] (s : Finset (Fin (n / 2)))
-    (hm : n % 2 = 1 → ¬ (m₁ ∧ m₂)) (i : Fin n) (h₁ : i ∈ symIdx n m₁ s) (h₂ : i ∈ symIdx n m₂ sᶜ) : False := by
+theorem symIdx_disj
+    (n : ℕ)
+    (m₁ m₂ : Prop) [Decidable m₁] [Decidable m₂]
+    (s : Finset (Fin (n / 2)))
+    (hm : n % 2 = 1 → ¬(m₁ ∧ m₂))
+    (i : Fin n) (h₁ : i ∈ symIdx n m₁ s) (h₂ : i ∈ symIdx n m₂ sᶜ)
+    : False := by
   have hi := i.isLt
   rw [mem_symIdx] at h₁ h₂
-  rcases h₁ with ⟨h, hs⟩ | ⟨h, hs⟩ | ⟨hm₁, ho, he⟩ <;> rcases h₂ with ⟨h', hs'⟩ | ⟨h', hs'⟩ | ⟨hm₂, ho', he'⟩
+  rcases h₁ with ⟨h, hs⟩ | ⟨h, hs⟩ | ⟨hm₁, ho, he⟩
+    <;> rcases h₂ with ⟨h', hs'⟩ | ⟨h', hs'⟩ | ⟨hm₂, ho', he'⟩
   · exact (Finset.mem_compl.mp hs') hs
   · omega
   · omega
@@ -84,11 +100,14 @@ theorem symIdx_disj (n : ℕ) (m₁ m₂ : Prop) [Decidable m₁] [Decidable m�
   · omega
   · exact hm ho ⟨hm₁, hm₂⟩
 
-theorem localization_quotient_separated_dvd {F : Type} [Field F] (ord : F → ℤ) {n a b : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x)
-    (S₁ S₂ : Finset (Fin n)) (h₁ : S₁.card = a) (h₂ : S₂.card = b) (y₁ : ∀ i ∈ S₁, i.rev ∈ S₁)
-    (y₂ : ∀ i ∈ S₂, i.rev ∈ S₂) (hd : ∀ i, i ∈ S₁ → i ∈ S₂ → False) (u₁ : Fin a → F) (u₂ : Fin b → F)
-    (hu₁ : ∀ j, ord (u₁ j) = nv (restr x S₁ h₁) j) (hu₂ : ∀ j, ord (u₂ j) = nv (restr x S₂ h₂) j) :
-    ((∏ i, (X - C (u₁ i))) * ∏ i, (X - C (u₂ i))).Separable := by
+theorem localization_quotient_separated_dvd
+    {F : Type} [Field F]
+    (ord : F → ℤ)
+    {n a b : ℕ} {x : Fin n → ℤ} (hx : StrictAnti x) (S₁ S₂ : Finset (Fin n)) (h₁ : S₁.card = a)
+    (h₂ : S₂.card = b) (y₁ : ∀ i ∈ S₁, i.rev ∈ S₁) (y₂ : ∀ i ∈ S₂, i.rev ∈ S₂)
+    (hd : ∀ i, i ∈ S₁ → i ∈ S₂ → False) (u₁ : Fin a → F) (u₂ : Fin b → F)
+    (hu₁ : ∀ j, ord (u₁ j) = nv (restr x S₁ h₁) j) (hu₂ : ∀ j, ord (u₂ j) = nv (restr x S₂ h₂) j)
+    : ((∏ i, (X - C (u₁ i))) * ∏ i, (X - C (u₂ i))).Separable := by
   have hprod : (∏ i, (X - C (u₁ i))) * (∏ i, (X - C (u₂ i))) = ∏ i, (X - C (Sum.elim u₁ u₂ i)) := by
     rw [Fintype.prod_sum_type]; simp
   rw [hprod, separable_prod_X_sub_C_iff]

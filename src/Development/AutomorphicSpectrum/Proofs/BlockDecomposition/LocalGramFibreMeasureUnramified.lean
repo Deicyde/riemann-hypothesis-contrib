@@ -12,27 +12,34 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.SiegelND GlobalTheory.CompanionTheory.SiegelND.Coef
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.SiegelND GlobalTheory.CompanionTheory.SiegelND.Coef
 open scoped TensorProduct ENNReal
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Coef.AvgV
 
-theorem ae_lift_eq {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
-    {μ : Measure V} {ν : Measure X} {q : V → Y} {ι : X → Y} {W : Set V} {B : Set X} {fib : X → Measure V}
-    (h : IsFibreFamily μ q ι W ν B fib) {g : V → X} (hg : ∀ x, q x = ι (g x)) (hι : Function.Injective ι)
-    (b : X) : ∀ᵐ x ∂(fib b), g x = b := by
+theorem ae_lift_eq
+    {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    {μ : Measure V} {ν : Measure X} {q : V → Y} {ι : X → Y} {W : Set V} {B : Set X}
+    {fib : X → Measure V} (h : IsFibreFamily μ q ι W ν B fib)
+    {g : V → X} (hg : ∀ x, q x = ι (g x))
+    (hι : Function.Injective ι) (b : X)
+    : ∀ᵐ x ∂(fib b), g x = b := by
   refine measure_mono_null ?_ (h.1 b)
   intro x hx hx'
   exact hx (hι ((hg x).symm.trans hx'.1))
 
-theorem fibre_mass_on {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X]
-    [MeasurableSpace X] {μ : Measure V} {ν : Measure X} {q : V → Y} {ι : X → Y} {W : Set V} {B : Set X}
-    {fib : X → Measure V} (h : IsFibreFamily μ q ι W ν B fib) {g : V → X} (hg : ∀ x, q x = ι (g x))
-    (hι : Function.Injective ι) (hgm : Measurable g) {A : Set V} {S : Set X} (hA : MeasurableSet A)
-    (hS : MeasurableSet S) (hW : A ∩ g ⁻¹' S ⊆ W) :
-    μ (A ∩ g ⁻¹' S) = ∫⁻ s in S, fib s A ∂ν := by
+theorem fibre_mass_on
+    {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    {μ : Measure V} {ν : Measure X} {q : V → Y} {ι : X → Y} {W : Set V} {B : Set X}
+    {fib : X → Measure V} (h : IsFibreFamily μ q ι W ν B fib)
+    {g : V → X} (hg : ∀ x, q x = ι (g x))
+    (hι : Function.Injective ι) (hgm : Measurable g)
+    {A : Set V} {S : Set X} (hA : MeasurableSet A) (hS : MeasurableSet S) (hW : A ∩ g ⁻¹' S ⊆ W)
+    : μ (A ∩ g ⁻¹' S) = ∫⁻ s in S, fib s A ∂ν := by
   have hT : MeasurableSet (A ∩ g ⁻¹' S) := hA.inter (hgm hS)
   have e := h.2.1 ((A ∩ g ⁻¹' S).indicator 1) (measurable_one.indicator hT)
   simp only [lintegral_indicator_one hT] at e
@@ -54,18 +61,25 @@ theorem fibre_mass_on {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [T
     rw [← hxb]
     exact hx.2
 
-theorem avg_gen {V X Y : Type} {_ : TopologicalSpace V} {_ : MeasurableSpace V} {_ : TopologicalSpace X}
-    {_ : MeasurableSpace X} {_ : AddCommGroup X} {μ : Measure V} {ν : Measure X} {q : V → Y} {ι : X → Y}
-    {W : Set V} {B : Set X} {fib : X → Measure V} (h : IsFibreFamily μ q ι W ν B fib) {g : V → X}
-    (hg : ∀ x, q x = ι (g x)) (hι : Function.Injective ι) (hgc : Continuous g) (hV2 : T2Space V)
-    (hVb : BorelSpace V) (hX2 : T2Space X) (hXb : BorelSpace X) (hXg : IsTopologicalAddGroup X)
-    (hXl : LocallyCompactSpace X) (hXs : SecondCountableTopology X) (hμ : IsFiniteMeasureOnCompacts μ)
-    (hν : ν.IsAddHaarMeasure) (hB : IsOpen B) (hWB : ∀ x, g x ∈ B → x ∈ W) {c : X} (hc : c ∈ B) {A : Set V}
-    (hAc : IsCompact A) (hAo : IsOpen A) {U : ℕ → Set X} (hU : ∀ k, IsCompact (U k) ∧ IsOpen (U k) ∧ (0 : X) ∈ U k)
-    (hUt : Filter.Tendsto U Filter.atTop (nhds (0 : X)).smallSets) :
-    (∀ k, MeasurableSet (A ∩ {x | c - g x ∈ U k}) ∧ μ (A ∩ {x | c - g x ∈ U k}) ≠ ⊤) ∧
-      Filter.Tendsto (fun k => (μ (A ∩ {x | c - g x ∈ U k})).toReal / (ν (U k)).toReal) Filter.atTop
-        (nhds (fib c A).toReal) := by
+theorem avg_gen
+    {V X Y : Type} {_ : TopologicalSpace V} {_ : MeasurableSpace V} {_ : TopologicalSpace X}
+    {_ : MeasurableSpace X} {_ : AddCommGroup X}
+    {μ : Measure V} {ν : Measure X} {q : V → Y} {ι : X → Y} {W : Set V} {B : Set X}
+    {fib : X → Measure V} (h : IsFibreFamily μ q ι W ν B fib)
+    {g : V → X} (hg : ∀ x, q x = ι (g x))
+    (hι : Function.Injective ι) (hgc : Continuous g) (hV2 : T2Space V) (hVb : BorelSpace V)
+    (hX2 : T2Space X) (hXb : BorelSpace X) (hXg : IsTopologicalAddGroup X)
+    (hXl : LocallyCompactSpace X) (hXs : SecondCountableTopology X)
+    (hμ : IsFiniteMeasureOnCompacts μ) (hν : ν.IsAddHaarMeasure) (hB : IsOpen B)
+    (hWB : ∀ x, g x ∈ B → x ∈ W)
+    {c : X} (hc : c ∈ B)
+    {A : Set V} (hAc : IsCompact A) (hAo : IsOpen A)
+    {U : ℕ → Set X} (hU : ∀ k, IsCompact (U k) ∧ IsOpen (U k) ∧ (0 : X) ∈ U k)
+    (hUt : Filter.Tendsto U Filter.atTop (nhds (0 : X)).smallSets)
+    : (∀ k, MeasurableSet (A ∩ {x | c - g x ∈ U k}) ∧ μ (A ∩ {x | c - g x ∈ U k}) ≠ ⊤)
+      ∧ Filter.Tendsto
+        (fun k => (μ (A ∩ {x | c - g x ∈ U k})).toReal / (ν (U k)).toReal)
+        Filter.atTop (nhds (fib c A).toReal) := by
   haveI : ν.IsNegInvariant := Measure.IsAddHaarMeasure.isNegInvariant_of_regular _
   have hBc := hB.mem_nhds hc
 
@@ -77,7 +91,8 @@ theorem avg_gen {V X Y : Type} {_ : TopologicalSpace V} {_ : MeasurableSpace V} 
     rw [sub_self]
     exact (hU k).2.2
   have hSU : ∀ k, ν (S k) = ν (U k) := fun k =>
-    (Measure.measurePreserving_sub_left _ c).measure_preimage (hU k).2.1.measurableSet.nullMeasurableSet
+    (Measure.measurePreserving_sub_left _ c).measure_preimage
+      (hU k).2.1.measurableSet.nullMeasurableSet
   have hpos : ∀ k, ν (S k) ≠ 0 := fun k => (hSo k).measure_ne_zero _ ⟨c, hSc k⟩
   have htop : ∀ k, ν (S k) ≠ ⊤ := fun k => by
     rw [hSU]
@@ -134,8 +149,14 @@ theorem avg_gen {V X Y : Type} {_ : TopologicalSpace V} {_ : MeasurableSpace V} 
     exact hSc k0
   refine ⟨fun k => ?_, ?_⟩
   · have hO : IsOpen (A ∩ {x | c - g x ∈ U k}) := hAo.inter ((hSo k).preimage hgc)
-    exact ⟨hO.measurableSet, ne_top_of_le_ne_top hAc.measure_lt_top.ne (measure_mono Set.inter_subset_left)⟩
-  · have key := GlobalTheory.CompanionTheory.Hypotheses₂.OneV.AvgV.tendsto_mean ν (fun s => fib s A') c hG hfin S hSm hl hpos htop
+    exact ⟨
+      hO.measurableSet,
+      ne_top_of_le_ne_top hAc.measure_lt_top.ne (measure_mono Set.inter_subset_left)
+    ⟩
+  · have key :=
+      GlobalTheory.CompanionTheory.Hypotheses₂.OneV.AvgV.tendsto_mean ν
+        (fun s => fib s A')
+        c hG hfin S hSm hl hpos htop
     simp only [hcv] at key
     refine key.congr' ?_
     filter_upwards [hl.eventually (Filter.eventually_smallSets_subset.2 ((hSo k0).mem_nhds (hSc k0)))] with k hk
@@ -146,7 +167,38 @@ theorem avg_gen {V X Y : Type} {_ : TopologicalSpace V} {_ : MeasurableSpace V} 
 
 end GlobalTheory.CompanionTheory.SiegelND.Coef.AvgV
 
-theorem GlobalTheory.CompanionTheory.SiegelND.Coef.avgV_tendsto : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) (n : ℕ), 2 * n < M → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (lv : Measure (Fv F v)), GlobalTheory.CompanionTheory.SW.IsStdV v lv → ∀ mv : HermR (Fv F v) σ n → Measure (Fin n → Fin M → Fv F v ⊗[F] E), GlobalTheory.CompanionTheory.SW.IsGramFib (Fv F v) σ J n (GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b lv n M) (GlobalTheory.CompanionTheory.SW.coordHerm (Fv F v) σ b lv n) mv → ∀ c : HermR (Fv F v) σ n, IsUnit (c : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)).det → ∀ A : Set (Fin n → Fin M → Fv F v ⊗[F] E), IsCompact A → IsOpen A → ∀ U : ℕ → Set (HermR (Fv F v) σ n), (∀ k, IsCompact (U k) ∧ IsOpen (U k) ∧ (0 : HermR (Fv F v) σ n) ∈ U k) → Filter.Tendsto U Filter.atTop (nhds (0 : HermR (Fv F v) σ n)).smallSets → (∀ k, MeasurableSet (A ∩ {X | c - gramH hCM hJ (Fv F v) X ∈ U k}) ∧ GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b lv n M (A ∩ {X | c - gramH hCM hJ (Fv F v) X ∈ U k}) ≠ ⊤) ∧ Filter.Tendsto (fun k => (GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b lv n M (A ∩ {X | c - gramH hCM hJ (Fv F v) X ∈ U k})).toReal / (GlobalTheory.CompanionTheory.SW.coordHerm (Fv F v) σ b lv n (U k)).toReal) Filter.atTop (nhds (mv c A).toReal) := by
+theorem GlobalTheory.CompanionTheory.SiegelND.Coef.avgV_tendsto
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+        (hJ : IsHermND σ J) (n : ℕ),
+      2 * n < M
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+            (lv : Measure (Fv F v)),
+          GlobalTheory.CompanionTheory.SW.IsStdV v lv
+            → ∀ mv : HermR (Fv F v) σ n → Measure (Fin n → Fin M → Fv F v ⊗[F] E),
+              GlobalTheory.CompanionTheory.SW.IsGramFib (Fv F v) σ J n
+                  (GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b lv n M)
+                  (GlobalTheory.CompanionTheory.SW.coordHerm (Fv F v) σ b lv n) mv
+                → ∀ c : HermR (Fv F v) σ n,
+                  IsUnit (c : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)).det
+                    → ∀ A : Set (Fin n → Fin M → Fv F v ⊗[F] E),
+                      IsCompact A → IsOpen A
+                        → ∀ U : ℕ → Set (HermR (Fv F v) σ n),
+                          (∀ k, IsCompact (U k) ∧ IsOpen (U k) ∧ (0 : HermR (Fv F v) σ n) ∈ U k)
+                            → Filter.Tendsto U Filter.atTop
+                              (nhds (0 : HermR (Fv F v) σ n)).smallSets
+                            → (∀ k,
+                                MeasurableSet (A ∩ {X | c - gramH hCM hJ (Fv F v) X ∈ U k})
+                                  ∧ GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b lv n M
+                                      (A ∩ {X | c - gramH hCM hJ (Fv F v) X ∈ U k})
+                                    ≠ ⊤)
+                              ∧ Filter.Tendsto
+                                (fun k =>
+                                  (GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b lv n M
+                                      (A ∩ {X | c - gramH hCM hJ (Fv F v) X ∈ U k})).toReal
+                                    / (GlobalTheory.CompanionTheory.SW.coordHerm (Fv F v) σ b lv n
+                                      (U k)).toReal)
+                                Filter.atTop (nhds (mv c A).toReal) := by
   intro F E _ _ _ _ _ σ hCM M J hJ n _ d b v lv hlv mv hmv c hc A hAc hAo U hU hUt
   obtain ⟨r1, r2, r3, r4, -⟩ := GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
   haveI := r1
@@ -155,14 +207,18 @@ theorem GlobalTheory.CompanionTheory.SiegelND.Coef.avgV_tendsto : ∀ (F E : Typ
   haveI := r4
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
-  obtain ⟨a1, a2, a3, a4, -, -, -, a8, -, a10⟩ := GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Fv F v)
+  obtain ⟨a1, a2, a3, a4, -, -, -, a8, -, a10⟩ :=
+    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Fv F v)
   haveI := a1
   haveI := a2
   haveI := a3
   haveI := a4
-  obtain ⟨-, hW, hH⟩ := GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hCM (Fv F v) d b lv hlv.1
-  obtain ⟨e1, e2, e3, e4, -⟩ := GlobalTheory.CompanionTheory.SW.HermTop.herm_top F E σ hCM (Fv F v) n
-  have hgc : Continuous (gramH hCM hJ (Fv F v) : (Fin n → Fin M → Fv F v ⊗[F] E) → HermR (Fv F v) σ n) :=
+  obtain ⟨-, hW, hH⟩ :=
+    GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hCM (Fv F v) d b lv hlv.1
+  obtain ⟨e1, e2, e3, e4, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.HermTop.herm_top F E σ hCM (Fv F v) n
+  have hgc
+      : Continuous (gramH hCM hJ (Fv F v) : (Fin n → Fin M → Fv F v ⊗[F] E) → HermR (Fv F v) σ n) :=
     Continuous.subtype_mk (a10 n M J) _
   have hUo : IsOpen {r : Fv F v | IsUnit r} := by
     have : {r : Fv F v | IsUnit r} = {r | r ≠ 0} := by
@@ -170,8 +226,12 @@ theorem GlobalTheory.CompanionTheory.SiegelND.Coef.avgV_tendsto : ∀ (F E : Typ
       simp [isUnit_iff_ne_zero]
     rw [this]
     exact isOpen_ne
-  have hB : IsOpen {S : HermR (Fv F v) σ n | IsUnit (S : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)).det} :=
+  have hB
+      : IsOpen {S : HermR (Fv F v) σ n | IsUnit (S : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)).det} :=
     PI.VolStabS.isOpen_unitHerm (Fv F v) hUo σ n
   exact AvgV.avg_gen (q := gramR (Fv F v) σ J) (ι := Subtype.val) (g := gramH hCM hJ (Fv F v)) hmv
-    (fun _ => rfl) Subtype.val_injective hgc inferInstance (a8 n M) e3 e4 inferInstance e1 e2
-    (hW n M).toIsFiniteMeasureOnCompacts (hH n) hB (fun _ h => h) hc hAc hAo hU hUt
+    (fun _ => rfl)
+    Subtype.val_injective hgc inferInstance (a8 n M) e3 e4 inferInstance e1 e2
+    (hW n M).toIsFiniteMeasureOnCompacts (hH n) hB
+    (fun _ h => h)
+    hc hAc hAo hU hUt

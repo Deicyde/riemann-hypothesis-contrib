@@ -21,7 +21,8 @@ theorem FlagProdPrimesDvd.proof : FlagProdPrimesDvd.Statement := by
   | @insert t s ht ih =>
     intro hp hne hdvd
     have hs : (∏ i ∈ s, p i) ∣ x :=
-      ih (fun i hi => hp i (mem_insert_of_mem hi))
+      ih
+        (fun i hi => hp i (mem_insert_of_mem hi))
         (fun i hi j hj hij => hne i (mem_insert_of_mem hi) j (mem_insert_of_mem hj) hij)
         (fun i hi => hdvd i (mem_insert_of_mem hi))
     obtain ⟨y, hy⟩ := hs

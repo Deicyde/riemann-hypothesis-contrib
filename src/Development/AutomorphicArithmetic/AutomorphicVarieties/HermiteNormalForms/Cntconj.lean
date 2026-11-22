@@ -8,14 +8,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.cntconj :
-    ∀ (L : Type) [Field L] [NumberField L] (R : ℕ),
-    {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}.Finite ∧
-      {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}.ncard ≤ (2 * R + 1) ^ Module.finrank ℚ L := by
+theorem UpperTheory.V.KT.cntconj
+    : ∀ (L : Type) [Field L] [NumberField L] (R : ℕ),
+      {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}.Finite
+        ∧ {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}.ncard ≤ (2 * R + 1) ^ Module.finrank ℚ L := by
   intro L _ _ R
   have hq : 2 * R + 1 ≠ 0 := by omega
-  have hsep : ∀ a ∈ {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}, ∀ b ∈ {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R},
-      ∀ x : 𝓞 L, a - b = (2 * R + 1) • x → a = b := by
+  have hsep
+      : ∀ a ∈ {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}, ∀ b ∈ {a : 𝓞 L | ∀ w, ‖embO w a‖ ≤ R}, ∀ x : 𝓞 L,
+        a - b = (2 * R + 1) • x → a = b := by
     intro a ha b hb x hab
     by_cases hx : x = 0
     · rw [hx, smul_zero, sub_eq_zero] at hab
@@ -25,7 +26,9 @@ theorem UpperTheory.V.KT.cntconj :
       intro w
       have h1 : ‖embO w (a - b)‖ ≤ 2 * R := by
         rw [map_sub]
-        calc ‖embO w a - embO w b‖ ≤ ‖embO w a‖ + ‖embO w b‖ := norm_sub_le _ _
+        calc
+          ‖embO w a - embO w b‖
+            ≤ ‖embO w a‖ + ‖embO w b‖ := norm_sub_le _ _
           _ ≤ R + R := add_le_add (ha w) (hb w)
           _ = 2 * R := by ring
       rw [hab, map_nsmul, nsmul_eq_mul, norm_mul, Complex.norm_natCast] at h1

@@ -9,7 +9,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelLatA
 
-open NumberField Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD FractionalIdeal
+open NumberField Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD
+  FractionalIdeal
 
 variable {r : ℕ}
 
@@ -26,25 +27,26 @@ theorem cc_cc (D : D7) (x : D.host.E) : cc (cc x) = x := by
   rw [cc_eq_conj, cc_eq_conj]
   exact Formalism.L2.Pj.conj_conj D x
 
-theorem cc_mul (D : D7) (x y : D.host.E) : cc (x * y) = cc x * cc y := by
-  simp only [cc, map_mul]
+theorem cc_mul (D : D7) (x y : D.host.E) : cc (x * y) = cc x * cc y := by simp only [cc, map_mul]
 
 theorem int_cc (D : D7) {b : D.host.E} (hb : IsIntegral ℤ b) : IsIntegral ℤ (cc b) := by
   have h := hb.map ((D.host.conj : D.host.E →ₐ[ℚ] D.host.E).restrictScalars ℤ)
   rw [cc_eq_conj]
   exact h
 
-theorem mem_one_of_int (D : D7) {z : D.host.E} (hz : IsIntegral ℤ z) :
-    z ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :=
+theorem mem_one_of_int (D : D7) {z : D.host.E} (hz : IsIntegral ℤ z)
+    : z ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :=
   (mem_one_iff _).2 ⟨⟨z, hz⟩, rfl⟩
 
-theorem int_of_mem_one (D : D7) {z : D.host.E}
-    (hz : z ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)) : IsIntegral ℤ z := by
+theorem int_of_mem_one
+    (D : D7) {z : D.host.E} (hz : z ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))
+    : IsIntegral ℤ z := by
   obtain ⟨c, rfl⟩ := (mem_one_iff _).1 hz
   exact NumberField.RingOfIntegers.isIntegral_coe c
 
-theorem herm_smul_left {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (c : D.host.E) (x y : Fin r → D.host.E) :
-    herm G (c • x) y = c * herm G x y := by
+theorem herm_smul_left
+    {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (c : D.host.E) (x y : Fin r → D.host.E)
+    : herm G (c • x) y = c * herm G x y := by
   unfold herm
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -53,8 +55,9 @@ theorem herm_smul_left {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (c : D.hos
   simp only [Pi.smul_apply, smul_eq_mul]
   ring
 
-theorem herm_smul_right {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (c : D.host.E) (x y : Fin r → D.host.E) :
-    herm G x (c • y) = cc c * herm G x y := by
+theorem herm_smul_right
+    {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (c : D.host.E) (x y : Fin r → D.host.E)
+    : herm G x (c • y) = cc c * herm G x y := by
   unfold herm
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -63,8 +66,8 @@ theorem herm_smul_right {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (c : D.ho
   simp only [Pi.smul_apply, smul_eq_mul, cc, map_mul]
   ring
 
-theorem herm_add_left {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (x x' y : Fin r → D.host.E) :
-    herm G (x + x') y = herm G x y + herm G x' y := by
+theorem herm_add_left {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (x x' y : Fin r → D.host.E)
+    : herm G (x + x') y = herm G x y + herm G x' y := by
   unfold herm
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -73,8 +76,8 @@ theorem herm_add_left {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (x x' y : F
   simp only [Pi.add_apply]
   ring
 
-theorem herm_add_right {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (x y y' : Fin r → D.host.E) :
-    herm G x (y + y') = herm G x y + herm G x y' := by
+theorem herm_add_right {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (x y y' : Fin r → D.host.E)
+    : herm G x (y + y') = herm G x y + herm G x y' := by
   unfold herm
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -86,13 +89,15 @@ theorem herm_add_right {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (x y y' : 
 theorem AA_mul_inv (hP : FactPrincipalDatum) (D : D7) : D.host.AA * D.host.AA⁻¹ = 1 :=
   mul_inv_cancel₀ (AA_ne_zero hP D)
 
-theorem int_of_AA_mul (hP : FactPrincipalDatum) (D : D7) {a b : D.host.E} (ha : a ∈ D.host.AA)
-    (hb : b ∈ D.host.AA⁻¹) : ∃ c : 𝓞 D.host.E, algebraMap _ _ c = a * b := by
+theorem int_of_AA_mul
+    (hP : FactPrincipalDatum) (D : D7) {a b : D.host.E} (ha : a ∈ D.host.AA) (hb : b ∈ D.host.AA⁻¹)
+    : ∃ c : 𝓞 D.host.E, algebraMap _ _ c = a * b := by
   have h := mul_mem_mul ha hb
   rw [AA_mul_inv hP D] at h
   exact (mem_one_iff _).1 h
 
-theorem int_of_mul_Dinv (D : D7) {w : D.host.E} (hw : ∀ u ∈ Dinv D, w * u ∈ Dinv D) : IsIntegral ℤ w := by
+theorem int_of_mul_Dinv (D : D7) {w : D.host.E} (hw : ∀ u ∈ Dinv D, w * u ∈ Dinv D)
+    : IsIntegral ℤ w := by
   have h0 : Dinv D ≠ 0 := dual_ne_zero ℤ ℚ one_ne_zero
   have hle : spanSingleton (nonZeroDivisors (𝓞 D.host.E)) w * Dinv D ≤ Dinv D := by
     rw [mul_le]
@@ -104,8 +109,9 @@ theorem int_of_mul_Dinv (D : D7) {w : D.host.E} (hw : ∀ u ∈ Dinv D, w * u �
   rw [mul_assoc, mul_inv_cancel₀ h0, mul_one] at h2
   exact int_of_mem_one D (h2 (mem_spanSingleton_self _ w))
 
-theorem mem_AA_of (hP : FactPrincipalDatum) (D : D7) {w : D.host.E}
-    (hw : ∀ b ∈ D.host.AA⁻¹, IsIntegral ℤ (b * w)) : w ∈ D.host.AA := by
+theorem mem_AA_of
+    (hP : FactPrincipalDatum) (D : D7) {w : D.host.E} (hw : ∀ b ∈ D.host.AA⁻¹, IsIntegral ℤ (b * w))
+    : w ∈ D.host.AA := by
   have hle : spanSingleton (nonZeroDivisors (𝓞 D.host.E)) w * D.host.AA⁻¹ ≤ 1 := by
     rw [mul_le]
     intro i hi j hj
@@ -116,13 +122,17 @@ theorem mem_AA_of (hP : FactPrincipalDatum) (D : D7) {w : D.host.E}
   rw [mul_assoc, inv_mul_cancel₀ (AA_ne_zero hP D), mul_one, one_mul] at h2
   exact h2 (mem_spanSingleton_self _ w)
 
-theorem xi_mem_Dinv (hP : FactPrincipalDatum) (D : D7) {a w : D.host.E} (ha : a ∈ D.host.AA)
-    (hw : w ∈ D.host.AAbar) : D.host.xi0 * (a * w) ∈ Dinv D := by
+theorem xi_mem_Dinv
+    (hP : FactPrincipalDatum) (D : D7) {a w : D.host.E} (ha : a ∈ D.host.AA) (hw : w ∈ D.host.AAbar)
+    : D.host.xi0 * (a * w) ∈ Dinv D := by
   rw [show Dinv D = _ from (dual_eq hP D).symm, ← mul_assoc]
   exact mul_mem_mul (mul_mem_mul (mem_spanSingleton_self _ _) ha) hw
 
-theorem int_of_xi (hP : FactPrincipalDatum) (D : D7) {w : D.host.E}
-    (hw : ∀ a ∈ D.host.AA, ∀ j ∈ D.host.AAbar, D.host.xi0 * (a * (j * w)) ∈ Dinv D) : IsIntegral ℤ w := by
+theorem int_of_xi
+    (hP : FactPrincipalDatum)
+    (D : D7)
+    {w : D.host.E} (hw : ∀ a ∈ D.host.AA, ∀ j ∈ D.host.AAbar, D.host.xi0 * (a * (j * w)) ∈ Dinv D)
+    : IsIntegral ℤ w := by
   apply int_of_mul_Dinv D
   intro u hu
   rw [show Dinv D = _ from (dual_eq hP D).symm] at hu
@@ -149,7 +159,8 @@ theorem int_of_xi (hP : FactPrincipalDatum) (D : D7) {w : D.host.E}
     rw [mul_add]
     exact (Dinv D).coeToSubmodule.add_mem hx hy
 
-def lattice₂ (D : D7) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)) : Submodule (𝓞 D.host.E) (Fin r → D.host.E) where
+def lattice₂ (D : D7) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E))
+    : Submodule (𝓞 D.host.E) (Fin r → D.host.E) where
   carrier := {v | ∀ a ∈ D.host.AA, a • v ∈ Λ}
   add_mem' := by
     intro v w hv hw a ha
@@ -165,11 +176,15 @@ def lattice₂ (D : D7) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)) : 
     rw [← algebraMap_smul D.host.E c v, smul_smul, mul_comm a, ← smul_smul, algebraMap_smul]
     exact Λ.smul_mem c (hv a ha)
 
-theorem mem_latP {D : D7} {Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)} {v : Fin r → D.host.E} :
-    v ∈ lattice₂ D Λ ↔ ∀ a ∈ D.host.AA, a • v ∈ Λ := Iff.rfl
+theorem mem_latP {D : D7} {Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)} {v : Fin r → D.host.E}
+    : v ∈ lattice₂ D Λ ↔ ∀ a ∈ D.host.AA, a • v ∈ Λ :=
+  Iff.rfl
 
-theorem smul_mem_latP (hP : FactPrincipalDatum) {D : D7} {Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)}
-    {b : D.host.E} (hb : b ∈ D.host.AA⁻¹) {z : Fin r → D.host.E} (hz : z ∈ Λ) : b • z ∈ lattice₂ D Λ := by
+theorem smul_mem_latP
+    (hP : FactPrincipalDatum)
+    {D : D7} {Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)} {b : D.host.E} (hb : b ∈ D.host.AA⁻¹)
+    {z : Fin r → D.host.E} (hz : z ∈ Λ)
+    : b • z ∈ lattice₂ D Λ := by
   refine mem_latP.2 fun a ha => ?_
   obtain ⟨c, hc⟩ := int_of_AA_mul hP D ha hb
   rw [smul_smul, ← hc, algebraMap_smul]
@@ -177,13 +192,15 @@ theorem smul_mem_latP (hP : FactPrincipalDatum) {D : D7} {Λ : Submodule (𝓞 D
 
 section Dual
 
-variable (hP : FactPrincipalDatum) {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E)
-  (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E))
+variable
+  (hP : FactPrincipalDatum)
+  {D : D7} (G : Matrix (Fin r) (Fin r) D.host.E) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E))
   (hF : ∀ y, y ∈ Λ ↔ ∀ z ∈ Λ, D.host.xi0 * herm G y z ∈ Dinv D)
 include hP hF
 
-theorem localLattice_form_integral {x y : Fin r → D.host.E} (hx : x ∈ lattice₂ D Λ) (hy : y ∈ lattice₂ D Λ) :
-    IsIntegral ℤ (herm G x y) := by
+theorem localLattice_form_integral
+    {x y : Fin r → D.host.E} (hx : x ∈ lattice₂ D Λ) (hy : y ∈ lattice₂ D Λ)
+    : IsIntegral ℤ (herm G x y) := by
   apply int_of_xi hP D
   intro a ha j hj
   have hj' : cc j ∈ D.host.AA := by rw [cc_eq_conj]; exact conj_mem_AA D hj
@@ -191,7 +208,9 @@ theorem localLattice_form_integral {x y : Fin r → D.host.E} (hx : x ∈ lattic
   rw [herm_smul_left, herm_smul_right, cc_cc] at h1
   exact h1
 
-theorem mem_dual_localLattice_of_forall {x : Fin r → D.host.E} (hx : ∀ y ∈ lattice₂ D Λ, IsIntegral ℤ (herm G x y)) : x ∈ lattice₂ D Λ := by
+theorem mem_dual_localLattice_of_forall
+    {x : Fin r → D.host.E} (hx : ∀ y ∈ lattice₂ D Λ, IsIntegral ℤ (herm G x y))
+    : x ∈ lattice₂ D Λ := by
   refine mem_latP.2 fun a ha => ?_
   refine (hF (a • x)).2 fun z hz => ?_
   have hcc : cc (herm G x z) ∈ D.host.AA := by
@@ -207,22 +226,26 @@ theorem mem_dual_localLattice_of_forall {x : Fin r → D.host.E} (hx : ∀ y ∈
 
 end Dual
 
-theorem lat_eq_span (hP : FactPrincipalDatum) {D : D7} (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)) :
-    Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ lattice₂ D Λ, v = a • u} := by
+theorem lat_eq_span
+    (hP : FactPrincipalDatum) {D : D7} (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E))
+    : Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ lattice₂ D Λ, v = a • u} := by
   apply le_antisymm
   · intro z hz
     have h1 : (1 : D.host.E) ∈ D.host.AA * D.host.AA⁻¹ := by
       rw [AA_mul_inv hP D]; exact one_mem_one _
-    have key := FractionalIdeal.mul_induction_on
-      (C := fun w : D.host.E => w • z ∈ Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ lattice₂ D Λ, v = a • u})
-      h1 (fun a ha b hb => by
-        show (a * b) • z ∈ _
-        rw [mul_smul]
-        exact Submodule.subset_span ⟨a, ha, b • z, smul_mem_latP hP hb hz, rfl⟩)
-      (fun x y hx hy => by
-        show (x + y) • z ∈ _
-        rw [add_smul]
-        exact Submodule.add_mem _ hx hy)
+    have key :=
+      FractionalIdeal.mul_induction_on
+        (C := fun w : D.host.E =>
+          w • z ∈ Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ lattice₂ D Λ, v = a • u})
+        h1
+        (fun a ha b hb => by
+          show (a * b) • z ∈ _
+          rw [mul_smul]
+          exact Submodule.subset_span ⟨a, ha, b • z, smul_mem_latP hP hb hz, rfl⟩)
+        (fun x y hx hy => by
+          show (x + y) • z ∈ _
+          rw [add_smul]
+          exact Submodule.add_mem _ hx hy)
     simpa using key
   · rw [Submodule.span_le]
     rintro v ⟨a, ha, u, hu, rfl⟩
@@ -237,26 +260,32 @@ theorem normCc_mem_AA (D : D7) : ((Ideal.absNorm D.host.ccK : ℕ) : D.host.E) �
     rw [one_mul]
     exact coeIdeal_le_one hy
   have h2 : ((Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∈ D.host.ccE := by
-    have := Ideal.mem_map_of_mem (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) (Ideal.absNorm_mem D.host.ccK)
+    have :=
+      Ideal.mem_map_of_mem (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) (Ideal.absNorm_mem D.host.ccK)
     rwa [map_natCast] at this
-  have h3 := mul_mem_mul (mem_coeIdeal_of_mem (S := nonZeroDivisors (𝓞 D.host.E)) (P := D.host.E) h2) h1
+  have h3 :=
+    mul_mem_mul (mem_coeIdeal_of_mem (S := nonZeroDivisors (𝓞 D.host.E)) (P := D.host.E) h2) h1
   rw [map_natCast, mul_one] at h3
   exact h3
 
-theorem int_of_mem_b (D : D7) {n : ℕ} (hn : (n : 𝓞 D.host.E) ∈ D.host.𝔟) {a : D.host.E} (ha : a ∈ D.host.AA) :
-    ∃ c : 𝓞 D.host.E, algebraMap _ _ c = a * n := by
+theorem int_of_mem_b
+    (D : D7) {n : ℕ} (hn : (n : 𝓞 D.host.E) ∈ D.host.𝔟) {a : D.host.E} (ha : a ∈ D.host.AA)
+    : ∃ c : 𝓞 D.host.E, algebraMap _ _ c = a * n := by
   obtain ⟨hB, -⟩ := bB_ne D
-  have h1 := mul_mem_mul ha (mem_coeIdeal_of_mem (S := nonZeroDivisors (𝓞 D.host.E)) (P := D.host.E) hn)
+  have h1 :=
+    mul_mem_mul ha (mem_coeIdeal_of_mem (S := nonZeroDivisors (𝓞 D.host.E)) (P := D.host.E) hn)
   rw [map_natCast] at h1
-  have e : D.host.AA * (D.host.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) =
-      (D.host.ccE : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
+  have e
+      : D.host.AA * (D.host.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+        = (D.host.ccE : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
     show (D.host.ccE : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) *
       ((D.host.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))⁻¹ * _ = _
     rw [mul_assoc, inv_mul_cancel₀ hB, mul_one]
   rw [e] at h1
   exact (mem_one_iff _).1 (coeIdeal_le_one h1)
 
-theorem localLattice_fg (D : D7) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)) (hΛ : Λ.FG) : (lattice₂ D Λ).FG := by
+theorem localLattice_fg (D : D7) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.host.E)) (hΛ : Λ.FG)
+    : (lattice₂ D Λ).FG := by
   set N : ℕ := Ideal.absNorm D.host.ccK
   have hN : (N : D.host.E) ≠ 0 := by
     have : N ≠ 0 := fun h => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 h)
@@ -268,7 +297,8 @@ theorem localLattice_fg (D : D7) (Λ : Submodule (𝓞 D.host.E) (Fin r → D.ho
       have e : ∀ z : Fin r → D.host.E, f z = (N : D.host.E) • z := fun z => by
         show (N : 𝓞 D.host.E) • z = _
         rw [← algebraMap_smul D.host.E (N : 𝓞 D.host.E) z, map_natCast]
-      rw [← e, ← e]; exact hxy
+      rw [← e, ← e]
+      exact hxy
     exact smul_right_injective _ hN h1
   apply Submodule.fg_of_fg_map_injective f hf
   have hI := isNoetherian_of_fg_of_noetherian Λ hΛ

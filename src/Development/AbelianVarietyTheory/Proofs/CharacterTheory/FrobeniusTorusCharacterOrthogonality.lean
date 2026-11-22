@@ -10,10 +10,14 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem finsum_rootsOfUnity_pow_mul_star {K : Type} [Field K] (θ : K →* ℂ) {N : ℕ} (hN : 0 < N)
-    {ζ : K} (hζ : IsPrimitiveRoot ζ N) (hω : IsPrimitiveRoot (θ ζ) N) (k l : ℕ) :
-    ∑ᶠ α ∈ {α : K | α ^ N = 1}, θ α ^ k * star (θ α ^ l) =
-      if k ≡ l [MOD N] then ((N : ℕ) : ℂ) else 0 := by
+theorem finsum_rootsOfUnity_pow_mul_star
+    {K : Type} [Field K]
+    (θ : K →* ℂ)
+    {N : ℕ} (hN : 0 < N)
+    {ζ : K} (hζ : IsPrimitiveRoot ζ N) (hω : IsPrimitiveRoot (θ ζ) N)
+    (k l : ℕ)
+    : ∑ᶠ α ∈ {α : K | α ^ N = 1}, θ α ^ k * star (θ α ^ l)
+      = if k ≡ l [MOD N] then ((N : ℕ) : ℂ) else 0 := by
   classical
   set ω := θ ζ with hωdef
   have hNe : N ≠ 0 := hN.ne'
@@ -67,7 +71,19 @@ theorem finsum_rootsOfUnity_pow_mul_star {K : Type} [Field K] (θ : K →* ℂ) 
       exact hω.pow_inj (Nat.mod_lt _ hN) (Nat.mod_lt _ hN) (by rw [← hm, ← hm]; exact hkl')
     rw [geom_sum_eq hu1, huN, sub_self, zero_div]
 
-theorem torus_orthogonality : ∀ (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ), (∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) → ∀ n : ℕ, 0 < n → (∃ ζ : AlgebraicClosure F, IsPrimitiveRoot ζ (Nat.card F ^ n - 1) ∧ IsPrimitiveRoot (θ ζ) (Nat.card F ^ n - 1)) ∧ ∀ k l : ℕ, ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}, θ α ^ k * star (θ α ^ l) = if k ≡ l [MOD Nat.card F ^ n - 1] then ((Nat.card F ^ n - 1 : ℕ) : ℂ) else 0 := by
+theorem torus_orthogonality
+    : ∀ (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ),
+      (∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+        → ∀ n : ℕ,
+          0 < n
+            → (∃ ζ : AlgebraicClosure F,
+                IsPrimitiveRoot ζ (Nat.card F ^ n - 1) ∧ IsPrimitiveRoot (θ ζ) (Nat.card F ^ n - 1))
+              ∧ ∀ k l : ℕ,
+                ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}, θ α ^ k * star (θ α ^ l)
+                  = if k ≡ l [MOD Nat.card F ^ n - 1] then
+                      ((Nat.card F ^ n - 1 : ℕ) : ℂ)
+                    else
+                      0 := by
   intro F _ _ θ hθ n hn
   classical
   have hq : 1 < Nat.card F := Finite.one_lt_card
@@ -90,9 +106,11 @@ theorem torus_orthogonality : ∀ (F : Type) [Field F] [Finite F] (θ : Algebrai
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (AlgebraicClosure F) N
   have hζ0 : ζ ≠ 0 := hζ.ne_zero hN.ne'
 
-  have hω : IsPrimitiveRoot (θ ζ) N :=
-    ⟨by rw [← map_pow, hζ.pow_eq_one, map_one], fun l hl =>
-      hζ.dvd_of_pow_eq_one l (hθ _ _ (pow_ne_zero _ hζ0) one_ne_zero (by rw [map_pow, hl, map_one]))⟩
+  have hω : IsPrimitiveRoot (θ ζ) N := ⟨
+    by rw [← map_pow, hζ.pow_eq_one, map_one],
+    fun l hl =>
+      hζ.dvd_of_pow_eq_one l (hθ _ _ (pow_ne_zero _ hζ0) one_ne_zero (by rw [map_pow, hl, map_one]))
+  ⟩
   exact ⟨⟨ζ, hζ, hω⟩, fun k l => finsum_rootsOfUnity_pow_mul_star θ hN hζ hω k l⟩
 
 end GlobalTheory.CuspGL

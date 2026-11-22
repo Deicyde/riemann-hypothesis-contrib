@@ -5,34 +5,45 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafGlueProperPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4 LateralTheory.E.LeafGlueProperPf
+open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
+  LateralTheory.E.LeafGlueProperPf
 
 namespace LateralTheory.E.GluingExistence
 
-theorem mul_pow_mem {Ω L : Type} [Field Ω] [Field L] [Algebra Ω L] (C : Subalgebra Ω L) (v : L)
-    (hv : v ∈ C) (hv0 : v ≠ 0) (x : L) (hx : x ∈ Algebra.adjoin Ω ((C : Set L) ∪ {v⁻¹})) :
-    ∃ n : ℕ, x * v ^ n ∈ C := by
+theorem mul_pow_mem
+    {Ω L : Type} [Field Ω] [Field L] [Algebra Ω L]
+    (C : Subalgebra Ω L) (v : L) (hv : v ∈ C) (hv0 : v ≠ 0)
+    (x : L) (hx : x ∈ Algebra.adjoin Ω ((C : Set L) ∪ {v⁻¹}))
+    : ∃ n : ℕ, x * v ^ n ∈ C := by
   induction hx using Algebra.adjoin_induction with
   | mem x hx =>
     rcases hx with hx | hx
     · exact ⟨0, by simpa using hx⟩
-    · rw [Set.mem_singleton_iff.mp hx]; exact ⟨1, by rw [pow_one, inv_mul_cancel₀ hv0]; exact C.one_mem⟩
-  | algebraMap r => exact ⟨0, by simpa using C.algebraMap_mem r⟩
+    · rw [Set.mem_singleton_iff.mp hx]
+      exact ⟨1, by rw [pow_one, inv_mul_cancel₀ hv0]; exact C.one_mem⟩
+  | algebraMap r =>
+    exact ⟨0, by simpa using C.algebraMap_mem r⟩
   | add x y _ _ hx hy =>
-    obtain ⟨n, hn⟩ := hx; obtain ⟨m, hm⟩ := hy
+    obtain ⟨n, hn⟩ := hx
+    obtain ⟨m, hm⟩ := hy
     refine ⟨n + m, ?_⟩
     have : (x + y) * v ^ (n + m) = (x * v ^ n) * v ^ m + (y * v ^ m) * v ^ n := by ring
-    rw [this]; exact C.add_mem (C.mul_mem hn (C.pow_mem hv _)) (C.mul_mem hm (C.pow_mem hv _))
+    rw [this]
+    exact C.add_mem (C.mul_mem hn (C.pow_mem hv _)) (C.mul_mem hm (C.pow_mem hv _))
   | mul x y _ _ hx hy =>
-    obtain ⟨n, hn⟩ := hx; obtain ⟨m, hm⟩ := hy
+    obtain ⟨n, hn⟩ := hx
+    obtain ⟨m, hm⟩ := hy
     refine ⟨n + m, ?_⟩
     have : (x * y) * v ^ (n + m) = (x * v ^ n) * (y * v ^ m) := by ring
-    rw [this]; exact C.mul_mem hn hm
+    rw [this]
+    exact C.mul_mem hn hm
 
-theorem away {Ω L : Type} [Field Ω] [Field L] [Algebra Ω L] (C E : Subalgebra Ω L) (v : L)
-    (hv : v ∈ C) (hv0 : v ≠ 0) (hCE : C ≤ E) (hE : E = Algebra.adjoin Ω ((C : Set L) ∪ {v⁻¹})) :
-    letI := (Subalgebra.inclusion hCE).toRingHom.toAlgebra
-    IsLocalization.Away (⟨v, hv⟩ : C) E := by
+theorem away
+    {Ω L : Type} [Field Ω] [Field L] [Algebra Ω L]
+    (C E : Subalgebra Ω L) (v : L) (hv : v ∈ C) (hv0 : v ≠ 0)
+    (hCE : C ≤ E) (hE : E = Algebra.adjoin Ω ((C : Set L) ∪ {v⁻¹}))
+    : letI := (Subalgebra.inclusion hCE).toRingHom.toAlgebra
+      IsLocalization.Away (⟨v, hv⟩ : C) E := by
   letI := (Subalgebra.inclusion hCE).toRingHom.toAlgebra
   have hvi : v⁻¹ ∈ E := hE ▸ Algebra.subset_adjoin (Set.mem_union_right _ rfl)
   refine ⟨?_, ?_, ?_⟩
@@ -70,8 +81,9 @@ theorem LeafGlueExists_of : LeafGlueExists := by
     · rcases j with _ | _
       · exact hfA
       · exact hfB
-  have hc : fA ≫ Spec.map (CommRingCat.ofHom (algebraMap Ω A)) =
-      fB ≫ Spec.map (CommRingCat.ofHom (algebraMap Ω B)) := by
+  have hc
+      : fA ≫ Spec.map (CommRingCat.ofHom (algebraMap Ω A))
+        = fB ≫ Spec.map (CommRingCat.ofHom (algebraMap Ω B)) := by
     simp only [fA, fB, ← Spec.map_comp]; rfl
   refine ⟨{
     C0 := pushout fA fB
@@ -84,28 +96,38 @@ theorem LeafGlueExists_of : LeafGlueExists := by
     hcB := pushout.inr_desc _ _ _
     agree := pushout.condition
     cover := ?_
-    inter := ?_ }⟩
+    inter := ?_
+  }⟩
   · ext x
     simp only [Set.mem_union, Set.mem_range, Set.mem_univ, iff_true]
     obtain ⟨i, xi, rfl⟩ := Scheme.IsLocallyDirected.ι_jointly_surjective (span fA fB) x
     rcases i with _ | j
-    · left; refine ⟨fA xi, ?_⟩
-      rw [← colimit.w (span fA fB) (WidePushoutShape.Hom.init WalkingPair.left)]; rfl
+    · left
+      refine ⟨fA xi, ?_⟩
+      rw [← colimit.w (span fA fB) (WidePushoutShape.Hom.init WalkingPair.left)]
+      rfl
     · rcases j with _ | _
       · left; exact ⟨xi, rfl⟩
       · right; exact ⟨xi, rfl⟩
   · ext x
     constructor
     · rintro ⟨⟨a, rfl⟩, ⟨b, hb⟩⟩
-      have hab : colimit.ι (span fA fB) (some WalkingPair.left) a =
-          colimit.ι (span fA fB) (some WalkingPair.right) b := hb.symm
+      have hab
+          : colimit.ι (span fA fB) (some WalkingPair.left) a
+            = colimit.ι (span fA fB) (some WalkingPair.right) b :=
+        hb.symm
       obtain ⟨k, fi, fj, y, hy1, hy2⟩ := (Scheme.IsLocallyDirected.ι_eq_ι_iff (span fA fB)).mp hab
       rcases k with _ | k
       · refine ⟨y, ?_⟩
-        rw [← hy1, Subsingleton.elim fi (WidePushoutShape.Hom.init WalkingPair.left)]; rfl
+        rw [← hy1, Subsingleton.elim fi (WidePushoutShape.Hom.init WalkingPair.left)]
+        rfl
       · rcases k with _ | _
-        · cases (show WidePushoutShape.Hom (J := WalkingPair) (some WalkingPair.left) (some WalkingPair.right) from fj)
-        · cases (show WidePushoutShape.Hom (J := WalkingPair) (some WalkingPair.right) (some WalkingPair.left) from fi)
+        · cases (show WidePushoutShape.Hom (J := WalkingPair) (some WalkingPair.left)
+              (some WalkingPair.right) from
+            fj)
+        · cases (show WidePushoutShape.Hom (J := WalkingPair) (some WalkingPair.right)
+              (some WalkingPair.left) from
+            fi)
     · rintro ⟨y, rfl⟩
       refine ⟨⟨fA y, rfl⟩, ⟨fB y, ?_⟩⟩
       show (fB ≫ pushout.inr fA fB).base y = (fA ≫ pushout.inl fA fB).base y

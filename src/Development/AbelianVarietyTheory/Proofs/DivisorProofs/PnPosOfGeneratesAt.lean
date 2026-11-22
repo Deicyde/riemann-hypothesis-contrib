@@ -32,8 +32,11 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.PshShiftA
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
-open Formalism.BasicNotions GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.ArInt GlobalTheory.Mean4 GlobalTheory.Mean4O GlobalTheory.CxPts
+open CategoryTheory AlgebraicGeometry NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+open Formalism.BasicNotions GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.TrueGeo GlobalTheory.ArInt GlobalTheory.Mean4 GlobalTheory.Mean4O GlobalTheory.CxPts
 
 set_option autoImplicit false
 
@@ -50,17 +53,23 @@ def tAtlas (A : FinHolAtlas e X) (h : X ≃ₜ X') : FinHolAtlas e X' where
   chart j := h.symm.transOpenPartialHomeomorph (A.chart j)
   cover x := (A.cover (h.symm x)).imp fun _ hj => hj
   holo j k := by
-    have e₁ : (h.symm.transOpenPartialHomeomorph (A.chart k)) ∘ (h.symm.transOpenPartialHomeomorph (A.chart j)).symm =
-        A.chart k ∘ (A.chart j).symm := funext fun y => by simp
-    have e₂ : (h.symm.transOpenPartialHomeomorph (A.chart j)).target ∩
-        (h.symm.transOpenPartialHomeomorph (A.chart j)).symm ⁻¹' (h.symm.transOpenPartialHomeomorph (A.chart k)).source =
-        (A.chart j).target ∩ (A.chart j).symm ⁻¹' (A.chart k).source := by
+    have e₁
+        : (h.symm.transOpenPartialHomeomorph (A.chart k))
+            ∘ (h.symm.transOpenPartialHomeomorph (A.chart j)).symm
+          = A.chart k ∘ (A.chart j).symm :=
+      funext fun y => by simp
+    have e₂
+        : (h.symm.transOpenPartialHomeomorph (A.chart j)).target
+            ∩ (h.symm.transOpenPartialHomeomorph (A.chart j)).symm
+              ⁻¹' (h.symm.transOpenPartialHomeomorph (A.chart k)).source
+          = (A.chart j).target ∩ (A.chart j).symm ⁻¹' (A.chart k).source := by
       ext y; simp
     rw [e₁, e₂]
     exact A.holo j k
 
-theorem tAtlas_symm (A : FinHolAtlas e X) (h : X ≃ₜ X') (j : Fin (tAtlas A h).n) (y : Fin e → ℂ) :
-    ((tAtlas A h).chart j).symm y = h ((A.chart j).symm y) := rfl
+theorem tAtlas_symm (A : FinHolAtlas e X) (h : X ≃ₜ X') (j : Fin (tAtlas A h).n) (y : Fin e → ℂ)
+    : ((tAtlas A h).chart j).symm y = h ((A.chart j).symm y) :=
+  rfl
 
 end Atlas
 

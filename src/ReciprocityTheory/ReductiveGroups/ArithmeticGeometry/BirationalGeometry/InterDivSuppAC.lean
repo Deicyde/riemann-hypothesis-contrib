@@ -10,9 +10,11 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo.DimF
 
 open Ideal
 
-theorem height_polynomial_of_isMaximal {R : Type*} [CommRing R] [IsNoetherianRing R]
-    [IsJacobsonRing R] {c : ℕ∞} (hR : ∀ m : Ideal R, m.IsMaximal → m.height = c)
-    (M : Ideal (Polynomial R)) (hM : M.IsMaximal) : M.height = c + 1 := by
+theorem height_polynomial_of_isMaximal
+    {R : Type*} [CommRing R] [IsNoetherianRing R] [IsJacobsonRing R]
+    {c : ℕ∞} (hR : ∀ m : Ideal R, m.IsMaximal → m.height = c)
+    (M : Ideal (Polynomial R)) (hM : M.IsMaximal)
+    : M.height = c + 1 := by
   haveI := hM
   have hp : (M.under R).IsMaximal := by
     rw [Ideal.under, Polynomial.algebraMap_eq]
@@ -20,27 +22,27 @@ theorem height_polynomial_of_isMaximal {R : Type*} [CommRing R] [IsNoetherianRin
   haveI : M.LiesOver (M.under R) := ⟨rfl⟩
   rw [Polynomial.height_eq_height_add_one (M.under R) M, hR _ hp]
 
-theorem height_mvPolynomial_fin_of_isMaximal {k : Type*} [Field k] :
-    ∀ (n : ℕ) (M : Ideal (MvPolynomial (Fin n) k)), M.IsMaximal → M.height = n
-  := by
-    intro n
-    induction n with
-    | zero =>
-      intro M hM
-      have h := Ideal.height_le_ringKrullDim_of_ne_top hM.ne_top
-      rw [ringKrullDim_mvPolynomial_of_isEmpty, ringKrullDim_eq_zero_of_field] at h
-      rw [Nat.cast_zero]
-      exact le_antisymm (WithBot.coe_le_coe.mp h) zero_le
-    | succ n ih =>
-      intro M hM
-      let e := (MvPolynomial.finSuccEquiv k n).toRingEquiv
-      have hM' : (M.map e).IsMaximal := Ideal.map_isMaximal_of_equiv e
-      rw [← e.height_map M, height_polynomial_of_isMaximal ih _ hM']
-      simp
+theorem height_mvPolynomial_fin_of_isMaximal {k : Type*} [Field k]
+    : ∀ (n : ℕ) (M : Ideal (MvPolynomial (Fin n) k)), M.IsMaximal → M.height = n := by
+  intro n
+  induction n with
+  | zero =>
+    intro M hM
+    have h := Ideal.height_le_ringKrullDim_of_ne_top hM.ne_top
+    rw [ringKrullDim_mvPolynomial_of_isEmpty, ringKrullDim_eq_zero_of_field] at h
+    rw [Nat.cast_zero]
+    exact le_antisymm (WithBot.coe_le_coe.mp h) zero_le
+  | succ n ih =>
+    intro M hM
+    let e := (MvPolynomial.finSuccEquiv k n).toRingEquiv
+    have hM' : (M.map e).IsMaximal := Ideal.map_isMaximal_of_equiv e
+    rw [← e.height_map M, height_polynomial_of_isMaximal ih _ hM']
+    simp
 
-theorem height_map_under_eq_zero {R B : Type*} [CommRing R] [CommRing B] [Algebra R B]
-    [Algebra.IsIntegral R B] (M : Ideal B) [M.IsPrime] :
-    (M.map (Ideal.Quotient.mk ((M.under R).map (algebraMap R B)))).height = 0 := by
+theorem height_map_under_eq_zero
+    {R B : Type*} [CommRing R] [CommRing B] [Algebra R B] [Algebra.IsIntegral R B]
+    (M : Ideal B) [M.IsPrime]
+    : (M.map (Ideal.Quotient.mk ((M.under R).map (algebraMap R B)))).height = 0 := by
   classical
   have hIM : (M.under R).map (algebraMap R B) ≤ M := Ideal.map_comap_le
   set I := (M.under R).map (algebraMap R B) with hIdef
@@ -65,8 +67,9 @@ theorem height_map_under_eq_zero {R B : Type*} [CommRing R] [CommRing B] [Algebr
       by_contra hne
       have hlt : Q' < M := lt_of_le_of_ne hQ'M hne
       obtain ⟨x, hxM, hxQ⟩ := SetLike.exists_of_lt hlt
-      have hcl := Ideal.comap_lt_comap_of_integral_mem_sdiff (R := R) hQ'M ⟨hxM, hxQ⟩
-        (Algebra.IsIntegral.isIntegral x)
+      have hcl :=
+        Ideal.comap_lt_comap_of_integral_mem_sdiff (R := R) hQ'M ⟨hxM, hxQ⟩
+          (Algebra.IsIntegral.isIntegral x)
       have hge : M.under R ≤ Q'.comap (algebraMap R B) :=
         (Ideal.le_comap_map).trans (Ideal.comap_mono hIQ')
       exact absurd (lt_of_le_of_lt hge hcl) (lt_irrefl _)
@@ -75,9 +78,9 @@ theorem height_map_under_eq_zero {R B : Type*} [CommRing R] [CommRing B] [Algebr
     exact hmq.le
   exact Ideal.height_eq_zero_iff.mpr h0
 
-theorem exists_height_of_isMaximal_of_field (k B : Type*) [Field k] [CommRing B] [IsDomain B]
-    [Algebra k B] [Algebra.FiniteType k B] :
-    ∃ s : ℕ, ∀ M : Ideal B, M.IsMaximal → M.height = s := by
+theorem exists_height_of_isMaximal_of_field
+    (k B : Type*) [Field k] [CommRing B] [IsDomain B] [Algebra k B] [Algebra.FiniteType k B]
+    : ∃ s : ℕ, ∀ M : Ideal B, M.IsMaximal → M.height = s := by
   classical
   obtain ⟨s, g, hg, hfin⟩ := exists_finite_inj_algHom_of_fg k B
   letI : Algebra (MvPolynomial (Fin s) k) B := g.toRingHom.toAlgebra

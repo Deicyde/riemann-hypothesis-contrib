@@ -40,15 +40,15 @@ section Rep
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-structure IsUnitaryRepOn (Γ : Set (Matrix (Fin n) (Fin n) ℂ))
-    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) : Prop where
+structure IsUnitaryRepOn
+    (Γ : Set (Matrix (Fin n) (Fin n) ℂ)) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H)
+    : Prop where
   map_one : σ 1 = 1
   map_mul : ∀ g ∈ Γ, ∀ g' ∈ Γ, σ (g * g') = σ g * σ g'
   norm_map : ∀ g ∈ Γ, ∀ v, ‖σ g v‖ = ‖v‖
   cont : ∀ v, ContinuousOn (fun g => σ g v) Γ
 
-def weightSpace (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) :
-    Submodule ℂ H where
+def weightSpace (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) : Submodule ℂ H where
   carrier := {v | ∀ θ : Fin n → ℝ, σ (torus θ) v = wtChar ω θ • v}
   add_mem' := by
     intro a b ha hb θ
@@ -61,12 +61,14 @@ def weightSpace (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n 
 def IsWeightVector (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) (v : H) : Prop :=
   v ≠ 0 ∧ v ∈ weightSpace σ ω
 
-def KStable (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H)
-    (S : Submodule ℂ H) : Prop :=
+def KStable (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (S : Submodule ℂ H)
+    : Prop :=
   ∀ k ∈ grpK ε, ∀ v ∈ S, σ k v ∈ S
 
-structure IsKType (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H)
-    (S : Submodule ℂ H) (Λ : Fin n → ℝ) : Prop where
+structure IsKType
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (S : Submodule ℂ H)
+    (Λ : Fin n → ℝ)
+    : Prop where
   finDim : FiniteDimensional ℂ S
   stable : KStable ε σ S
   irred : ∀ S' : Submodule ℂ H, S' ≤ S → KStable ε σ S' → S' = ⊥ ∨ S' = S
@@ -77,14 +79,17 @@ end Rep
 
 def rhoU (k : ℕ) : Fin k → ℝ := fun i => ((k : ℝ) - 1) / 2 - (i : ℕ)
 
-structure IsCompactIrrep {k : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (π : Matrix (Fin k) (Fin k) ℂ → H →L[ℂ] H) (u : Fin k → ℝ) : Prop where
+structure IsCompactIrrep
+    {k : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (π : Matrix (Fin k) (Fin k) ℂ → H →L[ℂ] H) (u : Fin k → ℝ)
+    : Prop where
   param : IsHCParam u
   rep : IsUnitaryRepOn (Matrix.unitaryGroup (Fin k) ℂ : Set (Matrix (Fin k) (Fin k) ℂ)) π
   type : IsKType (fun _ => true) π ⊤ (u - rhoU k)
 
-theorem grpK_const (k : ℕ) : grpK (fun _ : Fin k => true) =
-    (Matrix.unitaryGroup (Fin k) ℂ : Set (Matrix (Fin k) (Fin k) ℂ)) := by
+theorem grpK_const (k : ℕ)
+    : grpK (fun _ : Fin k => true)
+      = (Matrix.unitaryGroup (Fin k) ℂ : Set (Matrix (Fin k) (Fin k) ℂ)) := by
   ext g
   simp [grpK]
 

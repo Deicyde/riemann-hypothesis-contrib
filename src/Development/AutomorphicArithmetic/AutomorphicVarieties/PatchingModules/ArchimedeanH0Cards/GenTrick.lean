@@ -6,9 +6,9 @@ public import Mathlib
 
 open IsLocalRing
 
-private theorem card_coker_eq_card_ker {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    [Finite M] (f : M →ₗ[A] M) :
-    Nat.card (M ⧸ LinearMap.range f) = Nat.card (LinearMap.ker f) := by
+private theorem card_coker_eq_card_ker
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] [Finite M] (f : M →ₗ[A] M)
+    : Nat.card (M ⧸ LinearMap.range f) = Nat.card (LinearMap.ker f) := by
   have h1 := Submodule.card_eq_card_quotient_mul_card (LinearMap.range f)
   have h2 := Submodule.card_eq_card_quotient_mul_card (LinearMap.ker f)
   have h3 : Nat.card (M ⧸ LinearMap.ker f) = Nat.card (LinearMap.range f) :=
@@ -18,9 +18,11 @@ private theorem card_coker_eq_card_ker {A M : Type} [CommRing A] [AddCommGroup M
   rw [h2, mul_comm] at h1
   exact (Nat.eq_of_mul_eq_mul_left hpos h1).symm
 
-private theorem UpperTheory.V.Pa.B2.card_quot_span_pow_irreducible_eq_pow {A : Type} [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A] (t : A) (ht : Irreducible t) (e : ℕ) :
-    Nat.card (A ⧸ Ideal.span {t ^ e}) = Nat.card (ResidueField A) ^ e := by
+private theorem UpperTheory.V.Pa.B2.card_quot_span_pow_irreducible_eq_pow
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    (t : A) (ht : Irreducible t)
+    (e : ℕ)
+    : Nat.card (A ⧸ Ideal.span {t ^ e}) = Nat.card (ResidueField A) ^ e := by
   have hmax := ht.maximalIdeal_eq
   have ht0 : t ≠ 0 := ht.ne_zero
   let J : ℕ → AddSubgroup A := fun k => (Ideal.span {t ^ k}).toAddSubgroup
@@ -30,8 +32,7 @@ private theorem UpperTheory.V.Pa.B2.card_quot_span_pow_irreducible_eq_pow {A : T
     rfl
   rw [hJ]
   induction e with
-  | zero =>
-    simp [J, Ideal.span_singleton_one, AddSubgroup.index_top]
+  | zero => simp [J, Ideal.span_singleton_one, AddSubgroup.index_top]
   | succ e ih =>
     have hle : J (e + 1) ≤ J e := by
       intro x hx
@@ -56,8 +57,15 @@ private theorem UpperTheory.V.Pa.B2.card_quot_span_pow_irreducible_eq_pow {A : T
       rw [← h1, ← hcomap, AddSubgroup.index_comap, hrange]
     rw [← AddSubgroup.relIndex_mul_index hle, ih, hrel, pow_succ, mul_comm]
 
-theorem UpperTheory.V.Pa.B2.genTrick :
-    ∀ (A H : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Finite (ResidueField A)] [AddCommGroup H] [Module A H] [Finite H] (t : A) (g C m : ℕ), Irreducible t → (∀ y : H, t ^ m • y = 0) → (∀ e ≤ m, Nat.card (H ⧸ LinearMap.range (LinearMap.lsmul A H (t ^ e))) ≤ Nat.card (ResidueField A) ^ (g * e + C)) → ∀ ξ : Fin (g + 1) → H, ∃ c : Fin (g + 1) → A, (∃ i, IsUnit (c i)) ∧ t ^ C • ∑ i, c i • ξ i = 0 := by
+theorem UpperTheory.V.Pa.B2.genTrick
+    : ∀ (A H : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Finite (ResidueField A)]
+        [AddCommGroup H] [Module A H] [Finite H] (t : A) (g C m : ℕ),
+      Irreducible t → (∀ y : H, t ^ m • y = 0)
+        → (∀ e ≤ m,
+          Nat.card (H ⧸ LinearMap.range (LinearMap.lsmul A H (t ^ e)))
+            ≤ Nat.card (ResidueField A) ^ (g * e + C))
+        → ∀ ξ : Fin (g + 1) → H, ∃ c : Fin (g + 1) → A,
+          (∃ i, IsUnit (c i)) ∧ t ^ C • ∑ i, c i • ξ i = 0 := by
   intro A H _ _ _ _ _ _ _ t g C m ht hm hcard ξ
   classical
   by_cases hCm : m ≤ C
@@ -132,27 +140,35 @@ theorem UpperTheory.V.Pa.B2.genTrick :
     exact Ideal.Quotient.eq.mpr (Ideal.mem_span_singleton.mpr (by simpa using hdv))
   have hQ : Nat.card (Fin (g + 1) → A ⧸ Ideal.span {t ^ e}) ≤ Nat.card Q :=
     Nat.card_le_card_of_injective γ hinj
-  rw [Nat.card_fun, Nat.card_fin, UpperTheory.V.Pa.B2.card_quot_span_pow_irreducible_eq_pow t ht e] at hQ
+  rw [Nat.card_fun, Nat.card_fin, UpperTheory.V.Pa.B2.card_quot_span_pow_irreducible_eq_pow t ht e]
+    at hQ
   have hQN : Nat.card Q = Nat.card (LinearMap.ker (LinearMap.lsmul A N (t ^ e))) :=
     card_coker_eq_card_ker _
-  have hker : Nat.card (LinearMap.ker (LinearMap.lsmul A N (t ^ e))) ≤
-      Nat.card (LinearMap.ker (LinearMap.lsmul A H (t ^ e))) := by
+  have hker
+      : Nat.card (LinearMap.ker (LinearMap.lsmul A N (t ^ e)))
+        ≤ Nat.card (LinearMap.ker (LinearMap.lsmul A H (t ^ e))) := by
     refine Nat.card_le_card_of_injective
-      (fun x => ⟨x.1.1, by
-        have := x.2
-        simp only [LinearMap.mem_ker, LinearMap.lsmul_apply] at this ⊢
-        exact congrArg Subtype.val this⟩) ?_
+      (fun x => ⟨
+        x.1.1,
+        by
+          have := x.2
+          simp only [LinearMap.mem_ker, LinearMap.lsmul_apply] at this ⊢
+          exact congrArg Subtype.val this
+      ⟩)
+      ?_
     intro x y hxy
     have hv := congrArg Subtype.val hxy
     apply Subtype.ext
     apply Subtype.ext
     simpa using hv
-  have hH : Nat.card (LinearMap.ker (LinearMap.lsmul A H (t ^ e))) =
-      Nat.card (H ⧸ LinearMap.range (LinearMap.lsmul A H (t ^ e))) :=
+  have hH
+      : Nat.card (LinearMap.ker (LinearMap.lsmul A H (t ^ e)))
+        = Nat.card (H ⧸ LinearMap.range (LinearMap.lsmul A H (t ^ e))) :=
     (card_coker_eq_card_ker _).symm
   have hb := hcard e hem
   have hq : 1 < Nat.card (ResidueField A) := Finite.one_lt_card
-  have hlt : Nat.card (ResidueField A) ^ (g * e + C) < (Nat.card (ResidueField A) ^ e) ^ (g + 1) := by
+  have hlt
+      : Nat.card (ResidueField A) ^ (g * e + C) < (Nat.card (ResidueField A) ^ e) ^ (g + 1) := by
     rw [← pow_mul]
     exact Nat.pow_lt_pow_right hq (by rw [he]; ring_nf; omega)
   omega

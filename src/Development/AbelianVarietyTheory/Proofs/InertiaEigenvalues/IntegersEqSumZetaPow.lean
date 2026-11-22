@@ -14,36 +14,43 @@ namespace GlobalTheory.Cyc.IntBasis
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem norm_le_norm_sum {ι : Type} (s : Finset ι) (f : ι → Om l)
-    (h : ∀ a ∈ s, ∀ b ∈ s, a ≠ b → f a ≠ 0 → f b ≠ 0 → ‖f a‖ ≠ ‖f b‖) :
-    ∀ a ∈ s, ‖f a‖ ≤ ‖∑ b ∈ s, f b‖ := by
+theorem norm_le_norm_sum
+    {ι : Type}
+    (s : Finset ι) (f : ι → Om l) (h : ∀ a ∈ s, ∀ b ∈ s, a ≠ b → f a ≠ 0 → f b ≠ 0 → ‖f a‖ ≠ ‖f b‖)
+    : ∀ a ∈ s, ‖f a‖ ≤ ‖∑ b ∈ s, f b‖ := by
   classical
   intro a ha
   by_cases hfa : f a = 0
   · rw [hfa, norm_zero]
     exact norm_nonneg _
   have hat : a ∈ s.filter (fun b => f b ≠ 0) := Finset.mem_filter.2 ⟨ha, hfa⟩
-  rw [← Finset.sum_filter_ne_zero s,
-    IsUltrametricDist.norm_sum_eq_sup'_of_pairwise_ne ⟨a, hat⟩]
+  rw [← Finset.sum_filter_ne_zero s, IsUltrametricDist.norm_sum_eq_sup'_of_pairwise_ne ⟨a, hat⟩]
   · exact Finset.le_sup' (fun b => ‖f b‖) hat
   · intro b hb c hc hbc
     have hb' := Finset.mem_filter.1 (Finset.mem_coe.1 hb)
     have hc' := Finset.mem_filter.1 (Finset.mem_coe.1 hc)
     exact h b hb'.1 c hc'.1 hbc hb'.2 hc'.2
 
-theorem norm_term (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
-    (z : Om l) (hz : z ∈ Ks K (i - 1)) (h0 : z ≠ 0) :
-    ∃ n : ℤ, ‖z‖ = (l : ℝ) ^ (((n * l : ℤ) : ℝ) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1))) ∧
-      ∀ a : ℕ, ‖z * (ζ - 1) ^ a‖ =
-        (l : ℝ) ^ (((n * l - a : ℤ) : ℝ) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1))) := by
-  obtain ⟨n, hn⟩ := GlobalTheory.T.norm_mem_cyclotomic_layer_prime_rpow l K (i - 1) (by omega) z hz h0
+theorem norm_term
+    (K : FinExt l)
+    (i : ℕ) (hi : 2 ≤ i)
+    (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
+    (z : Om l) (hz : z ∈ Ks K (i - 1)) (h0 : z ≠ 0)
+    : ∃ n : ℤ,
+      ‖z‖ = (l : ℝ) ^ (((n * l : ℤ) : ℝ) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1)))
+        ∧ ∀ a : ℕ,
+          ‖z * (ζ - 1) ^ a‖
+            = (l : ℝ) ^ (((n * l - a : ℤ) : ℝ) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1))) := by
+  obtain ⟨n, hn⟩ :=
+    GlobalTheory.T.norm_mem_cyclotomic_layer_prime_rpow l K (i - 1) (by omega) z hz h0
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hl0 : (0 : ℝ) < l := by linarith
   have hζC : IsPrimitiveRoot (ζ : PadicComplex l) (l ^ i) := by
     have := hζ.map_of_injective (algebraMap (PadicAlgCl l) (PadicComplex l)).injective
     simpa [← PadicComplex.coe_eq] using this
   have hnorm1 : ‖ζ - 1‖ = (l : ℝ) ^ (-(1 : ℝ) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1))) := by
-    rw [← GlobalTheory.T.norm_primitiveRoot_primePow_sub_one_padicComplex l i (by omega) _ hζC, ← PadicComplex.norm_extends]
+    rw [← GlobalTheory.T.norm_primitiveRoot_primePow_sub_one_padicComplex l i (by omega) _ hζC,
+      ← PadicComplex.norm_extends]
     congr 1
     rw [PadicComplex.coe_eq, PadicComplex.coe_eq, map_sub, map_one]
   set D : ℝ := (l : ℝ) ^ (i - 1) * ((l : ℝ) - 1) with hD
@@ -68,9 +75,13 @@ theorem norm_term (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsP
     field_simp
     ring
 
-theorem term_le (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
-    (z : ℕ → Om l) (hz : ∀ a, z a ∈ Ks K (i - 1)) (a : ℕ) (ha : a < l) :
-    ‖z a * (ζ - 1) ^ a‖ ≤ ‖∑ b ∈ Finset.range l, z b * (ζ - 1) ^ b‖ := by
+theorem term_le
+    (K : FinExt l)
+    (i : ℕ) (hi : 2 ≤ i)
+    (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
+    (z : ℕ → Om l) (hz : ∀ a, z a ∈ Ks K (i - 1))
+    (a : ℕ) (ha : a < l)
+    : ‖z a * (ζ - 1) ^ a‖ ≤ ‖∑ b ∈ Finset.range l, z b * (ζ - 1) ^ b‖ := by
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   apply norm_le_norm_sum _ _ _ a (Finset.mem_range.2 ha)
   intro b hb c hc hbc hb0 hc0 heq
@@ -82,11 +93,12 @@ theorem term_le (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPri
   have hD : (0 : ℝ) < (l : ℝ) ^ (i - 1) * ((l : ℝ) - 1) := by
     apply mul_pos (pow_pos (by linarith) _)
     linarith
-  have h1 : (((nb * l - b : ℤ) : ℝ)) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1)) =
-      (((nc * l - c : ℤ) : ℝ)) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1)) :=
-    le_antisymm ((Real.rpow_le_rpow_left_iff hl).1 heq.le) ((Real.rpow_le_rpow_left_iff hl).1 heq.ge)
-  have h2 : nb * (l : ℤ) - b = nc * l - c := by
-    exact_mod_cast (div_left_inj' hD.ne').1 h1
+  have h1
+      : (((nb * l - b : ℤ) : ℝ)) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1))
+        = (((nc * l - c : ℤ) : ℝ)) / ((l : ℝ) ^ (i - 1) * ((l : ℝ) - 1)) :=
+    le_antisymm ((Real.rpow_le_rpow_left_iff hl).1 heq.le)
+      ((Real.rpow_le_rpow_left_iff hl).1 heq.ge)
+  have h2 : nb * (l : ℤ) - b = nc * l - c := by exact_mod_cast (div_left_inj' hD.ne').1 h1
   have hb' : b < l := Finset.mem_range.1 hb
   have hc' : c < l := Finset.mem_range.1 hc
   have key : (nb - nc) * (l : ℤ) = b - c := by rw [sub_mul]; linarith
@@ -98,9 +110,13 @@ theorem term_le (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPri
   · have : (l : ℤ) ≤ (nb - nc) * l := by nlinarith
     omega
 
-theorem coeff_le (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
-    (z : Om l) (hz : z ∈ Ks K (i - 1)) (a : ℕ) (ha : a < l) (h : ‖z * (ζ - 1) ^ a‖ ≤ 1) :
-    ‖z‖ ≤ 1 := by
+theorem coeff_le
+    (K : FinExt l)
+    (i : ℕ) (hi : 2 ≤ i)
+    (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
+    (z : Om l) (hz : z ∈ Ks K (i - 1))
+    (a : ℕ) (ha : a < l) (h : ‖z * (ζ - 1) ^ a‖ ≤ 1)
+    : ‖z‖ ≤ 1 := by
   by_cases hz0 : z = 0
   · rw [hz0, norm_zero]
     exact zero_le_one
@@ -127,9 +143,12 @@ theorem coeff_le (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPr
   have : n * (l : ℤ) ≤ 0 := by nlinarith
   exact_mod_cast this
 
-theorem exists_poly (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
-    (x : Om l) (hx : x ∈ Ks K i) :
-    ∃ p : (↥(Ks K (i - 1)))[X], p.natDegree < l ∧ aeval ζ p = x := by
+theorem exists_poly
+    (K : FinExt l)
+    (i : ℕ) (hi : 2 ≤ i)
+    (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ i))
+    (x : Om l) (hx : x ∈ Ks K i)
+    : ∃ p : (↥(Ks K (i - 1)))[X], p.natDegree < l ∧ aeval ζ p = x := by
   have hlp : l.Prime := Fact.out
   have hl0 : l ≠ 0 := hlp.ne_zero
   have hζl : ζ ^ l ∈ Ks K (i - 1) := by
@@ -142,8 +161,7 @@ theorem exists_poly (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : I
   set F := Ks K (i - 1) with hF
   set p0 : (↥F)[X] := X ^ l - C ⟨ζ ^ l, hζl⟩ with hp0
   have hmon : p0.Monic := monic_X_pow_sub_C _ hl0
-  have hroot : aeval ζ p0 = 0 := by
-    simp [hp0]
+  have hroot : aeval ζ p0 = 0 := by simp [hp0]
   have hint : IsIntegral F ζ := ⟨p0, hmon, by rw [← aeval_def]; exact hroot⟩
   have hdeg : (minpoly F ζ).natDegree ≤ l := by
     have h1 := natDegree_le_natDegree (minpoly.min F ζ hmon hroot)
@@ -158,8 +176,10 @@ theorem exists_poly (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : I
       intro y hy
       have : NeZero (l ^ i) := ⟨pow_ne_zero _ hl0⟩
       obtain ⟨k, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hy
-      exact pow_mem ((le_sup_right : IntermediateField.adjoin ℚ_[l] {ζ} ≤ F ⊔ _)
-        (IntermediateField.subset_adjoin _ _ (Set.mem_singleton ζ))) k
+      exact pow_mem
+        ((le_sup_right : IntermediateField.adjoin ℚ_[l] {ζ} ≤ F ⊔ _)
+          (IntermediateField.subset_adjoin _ _ (Set.mem_singleton ζ)))
+        k
   have hxF : x ∈ IntermediateField.adjoin F {ζ} :=
     (IntermediateField.mem_restrictScalars ℚ_[l]).1 (hle hx)
   obtain ⟨f, hfdeg, hf⟩ := (IntermediateField.adjoin.powerBasis hint).exists_eq_aeval ⟨x, hxF⟩
@@ -171,16 +191,16 @@ theorem exists_poly (K : FinExt l) (i : ℕ) (hi : 2 ≤ i) (ζ : Om l) (hζ : I
 
 def intRing (F : IntermediateField ℚ_[l] (Om l)) : Subring (Om l) where
   carrier := {y | y ∈ F ∧ ‖y‖ ≤ 1}
-  mul_mem' := fun {a b} ha hb => ⟨mul_mem ha.1 hb.1, by
-    rw [norm_mul]; exact mul_le_one₀ ha.2 (norm_nonneg _) hb.2⟩
+  mul_mem' := fun {a b} ha hb =>
+    ⟨mul_mem ha.1 hb.1, by rw [norm_mul]; exact mul_le_one₀ ha.2 (norm_nonneg _) hb.2⟩
   one_mem' := ⟨one_mem _, by simp⟩
-  add_mem' := fun {a b} ha hb => ⟨add_mem ha.1 hb.1,
-    (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha.2 hb.2)⟩
+  add_mem' := fun {a b} ha hb =>
+    ⟨add_mem ha.1 hb.1, (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha.2 hb.2)⟩
   zero_mem' := ⟨zero_mem _, by simp⟩
   neg_mem' := fun {a} ha => ⟨neg_mem ha.1, by simpa using ha.2⟩
 
-theorem aeval_taylor' {R : Type} [CommRing R] [Algebra R (Om l)] (p : R[X]) (r : R) (w : Om l) :
-    aeval w (taylor r p) = aeval (w + algebraMap R _ r) p := by
+theorem aeval_taylor' {R : Type} [CommRing R] [Algebra R (Om l)] (p : R[X]) (r : R) (w : Om l)
+    : aeval w (taylor r p) = aeval (w + algebraMap R _ r) p := by
   rw [Polynomial.taylor_apply, Polynomial.aeval_comp]
   simp
 
@@ -206,9 +226,18 @@ private lemma aeval_eq_sum_range_of_natDegree_lt {l : ℕ} [Fact l.Prime] {F : I
   rw [aeval_eq_sum_range' hq]
   simp [Algebra.smul_def]
 
-
 open GlobalTheory.Cyc.IntBasis in
-theorem GlobalTheory.Cyc.integers_eq_sum_zeta_pow : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (i : ℕ), 2 ≤ i → ∀ ζ : Om l, IsPrimitiveRoot ζ (l ^ i) → (∀ x : Om l, x ∈ Ks K i → ‖x‖ ≤ 1 → ∃ y : Fin l → Om l, (∀ a, y a ∈ Ks K (i - 1) ∧ ‖y a‖ ≤ 1) ∧ x = ∑ a : Fin l, ζ ^ (a : ℕ) * y a) ∧ ∀ y : Fin l → Om l, (∀ a, y a ∈ Ks K (i - 1)) → ∑ a : Fin l, ζ ^ (a : ℕ) * y a = 0 → ∀ a, y a = 0 := by
+theorem GlobalTheory.Cyc.integers_eq_sum_zeta_pow
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (i : ℕ),
+      2 ≤ i
+        → ∀ ζ : Om l,
+          IsPrimitiveRoot ζ (l ^ i)
+            → (∀ x : Om l,
+                x ∈ Ks K i → ‖x‖ ≤ 1
+                  → ∃ y : Fin l → Om l,
+                    (∀ a, y a ∈ Ks K (i - 1) ∧ ‖y a‖ ≤ 1) ∧ x = ∑ a : Fin l, ζ ^ (a : ℕ) * y a)
+              ∧ ∀ y : Fin l → Om l,
+                (∀ a, y a ∈ Ks K (i - 1)) → ∑ a : Fin l, ζ ^ (a : ℕ) * y a = 0 → ∀ a, y a = 0 := by
   intro l _ K i hi ζ hζ
   have hlp : l.Prime := Fact.out
   have hζ1 : ζ ≠ 1 := hζ.ne_one (Nat.one_lt_pow (by omega) hlp.one_lt)
@@ -224,8 +253,9 @@ theorem GlobalTheory.Cyc.integers_eq_sum_zeta_pow : ∀ (l : ℕ) [Fact l.Prime]
       intro b
       by_cases hb : b < l
       · apply coeff_le K i hi ζ hζ _ (Q.coeff b).2 b hb
-        calc _ ≤ ‖∑ c ∈ Finset.range l, (Q.coeff c : Om l) * (ζ - 1) ^ c‖ :=
-              term_le K i hi ζ hζ (fun c => (Q.coeff c : Om l)) (fun c => (Q.coeff c).2) b hb
+        calc
+          _ ≤ ‖∑ c ∈ Finset.range l, (Q.coeff c : Om l) * (ζ - 1) ^ c‖ :=
+            term_le K i hi ζ hζ (fun c => (Q.coeff c : Om l)) (fun c => (Q.coeff c).2) b hb
           _ = ‖x‖ := by rw [← hQx]
           _ ≤ 1 := hx1
       · rw [coeff_eq_zero_of_natDegree_lt (by omega)]

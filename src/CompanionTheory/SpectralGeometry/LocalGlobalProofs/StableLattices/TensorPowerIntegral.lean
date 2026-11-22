@@ -23,8 +23,14 @@ theorem okTens : OKTens := by
   · rintro ⟨c, c'⟩ ⟨d, d'⟩ g₀ hg₀
     obtain ⟨U, f, hU, hgU, hf, hfe⟩ := hF.smooth c d g₀ hg₀
     obtain ⟨U', f', hU', hgU', hf', hfe'⟩ := hF'.smooth c' d' g₀ hg₀
-    refine ⟨U ∩ U', fun x => f x * f' x, hU.inter hU', ⟨hgU, hgU'⟩,
-      (hf.mono Set.inter_subset_left).mul (hf'.mono Set.inter_subset_right), ?_⟩
+    refine ⟨
+      U ∩ U',
+      fun x => f x * f' x,
+      hU.inter hU',
+      ⟨hgU, hgU'⟩,
+      (hf.mono Set.inter_subset_left).mul (hf'.mono Set.inter_subset_right),
+      ?_
+    ⟩
     intro g hg hin
     have h1 := hfe g hg.1 hin
     have h2 := hfe' g hg.2 hin
@@ -39,8 +45,10 @@ theorem okTens : OKTens := by
     have h1 := hC g hg c d
     have h2 := hC' g hg c' d'
     rw [norm_mul, pow_add]
-    calc _ ≤ (C * Formalism.FourierDecayAlt.B.gN g ^ F.deg) * (C' * Formalism.FourierDecayAlt.B.gN g ^ F'.deg) :=
-          mul_le_mul h1 h2 (norm_nonneg _) ((norm_nonneg _).trans h1)
+    calc
+      _ ≤ (C * Formalism.FourierDecayAlt.B.gN g ^ F.deg)
+          * (C' * Formalism.FourierDecayAlt.B.gN g ^ F'.deg) :=
+        mul_le_mul h1 h2 (norm_nonneg _) ((norm_nonneg _).trans h1)
       _ = _ := by ring
 
 end GlobalTheory.CompanionTheory.ZuckTens

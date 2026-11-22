@@ -42,9 +42,10 @@ lemma exists_perm {n : ℕ} (ε δ : Fin n → Bool)
     simp only [Bool.not_eq_true] at ha this
     rw [ha, this]
 
-theorem exists_unitary {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian) (h2 : A * A = 1)
-    (ε : Fin n → Bool) (ht : (Jm ε).trace = A.trace) :
-    ∃ P ∈ Matrix.unitaryGroup (Fin n) ℂ, Pᴴ * Jm ε * P = A := by
+theorem exists_unitary
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian) (h2 : A * A = 1) (ε : Fin n → Bool)
+    (ht : (Jm ε).trace = A.trace)
+    : ∃ P ∈ Matrix.unitaryGroup (Fin n) ℂ, Pᴴ * Jm ε * P = A := by
   set U : Matrix (Fin n) (Fin n) ℂ := (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   have hUu : U ∈ Matrix.unitaryGroup (Fin n) ℂ := hA.eigenvectorUnitary.2
   have hl : star U * U = 1 := Unitary.star_mul_self_of_mem hUu
@@ -55,12 +56,14 @@ theorem exists_unitary {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHerm
     simpa [Unitary.conjStarAlgAut_apply, hU, hD, Function.comp_def] using this
   have hD' : D = star U * A * U := by
     rw [hs]
-    calc D = (star U * U) * D * (star U * U) := by rw [hl]; simp
+    calc
+      D = (star U * U) * D * (star U * U) := by rw [hl]; simp
       _ = _ := by simp only [Matrix.mul_assoc]
   have hDD : D * D = 1 := by
     rw [hD']
-    calc star U * A * U * (star U * A * U) = star U * (A * (U * star U) * A) * U := by
-          simp only [Matrix.mul_assoc]
+    calc
+      star U * A * U * (star U * A * U)
+        = star U * (A * (U * star U) * A) * U := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hr, Matrix.mul_one, h2, Matrix.mul_one, hl]
   have hev : ∀ i, (hA.eigenvalues i : ℂ) = 1 ∨ (hA.eigenvalues i : ℂ) = -1 := by
     intro i
@@ -72,7 +75,9 @@ theorem exists_unitary {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHerm
   let δ : Fin n → Bool := fun i => decide ((hA.eigenvalues i : ℂ) = 1)
   have hJ : Jm δ = D := by
     unfold Jm
-    rw [hD]; congr 1; funext i
+    rw [hD]
+    congr 1
+    funext i
     by_cases h : (hA.eigenvalues i : ℂ) = 1
     · simp only [δ, h]; simp
     · simp only [δ, h]; simp [(hev i).resolve_left h]
@@ -80,13 +85,17 @@ theorem exists_unitary {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHerm
     rw [ht, hJ, hD', Matrix.trace_mul_comm, ← Matrix.mul_assoc, hr, Matrix.one_mul]
   rw [trace_Jm, trace_Jm] at htr
   have hc : (univ.filter fun i => ε i = true).card = (univ.filter fun i => δ i = true).card := by
-    have : ((univ.filter fun i => ε i = true).card : ℂ) = (univ.filter fun i => δ i = true).card := by
+    have : ((univ.filter fun i => ε i = true).card : ℂ)
+        = (univ.filter fun i => δ i = true).card := by
       linear_combination htr / 2
     exact_mod_cast this
   obtain ⟨e, he⟩ := exists_perm ε δ hc
   have hJe : Jm ε = (Jm δ).submatrix e e := by
     unfold Jm
-    rw [Matrix.submatrix_diagonal_equiv]; congr 1; funext a; simp [he]
+    rw [Matrix.submatrix_diagonal_equiv]
+    congr 1
+    funext a
+    simp [he]
   refine ⟨(star U).submatrix e id, ?_, ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, Matrix.conjTranspose_submatrix,
       Matrix.submatrix_mul_equiv, ← Matrix.star_eq_conjTranspose, star_star, hr]
@@ -111,8 +120,8 @@ lemma trace_Hpk (k r : ℕ) : (Hpk k r).trace = (k : ℂ) - 1 := by
   rw [this, if_pos (by simp only [mem_range]; omega)]
   simp
 
-theorem exists_isCayleyU_iff (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) :
-    (∃ P, IsCayleyU k r ε P) ↔ (univ.filter fun i => ε i = true).card = k + r := by
+theorem exists_isCayleyU_iff (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool)
+    : (∃ P, IsCayleyU k r ε P) ↔ (univ.filter fun i => ε i = true).card = k + r := by
   constructor
   · rintro ⟨P, ⟨-, hP⟩, hu⟩
     have h1 : (Hpk k r).trace = (Jm ε).trace := by
@@ -124,34 +133,46 @@ theorem exists_isCayleyU_iff (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) :
     exact_mod_cast this
   · intro h
     obtain ⟨h1, h2, -⟩ := Formalism.QuantumDeterminants.hermitian_pos_facts_hold k r
-    obtain ⟨P, hu, hP⟩ := exists_unitary (Hpk k r) h1 h2 ε (by
-      rw [trace_Hpk, trace_Jm, h]; push_cast; ring)
-    exact ⟨P, ⟨⟨⟨P, star P, Unitary.mul_star_self_of_mem hu, Unitary.star_mul_self_of_mem hu⟩, rfl⟩, hP⟩, hu⟩
+    obtain ⟨P, hu, hP⟩ :=
+      exists_unitary (Hpk k r) h1 h2 ε (by rw [trace_Hpk, trace_Jm, h]; push_cast; ring)
+    exact ⟨
+      P,
+      ⟨⟨⟨P, star P, Unitary.mul_star_self_of_mem hu, Unitary.star_mul_self_of_mem hu⟩, rfl⟩, hP⟩,
+      hu
+    ⟩
 
-theorem transport {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool}
-    {P : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hP : IsCayleyU k r ε P)
-    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    (P⁻¹ * g * P ∈ UH (Hpk k r) ↔ g ∈ UJset ε) ∧
-    (P⁻¹ * g * P ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ ↔
-      g ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ) := by
+theorem transport
+    {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool}
+    {P : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (hP : IsCayleyU k r ε P) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : (P⁻¹ * g * P ∈ UH (Hpk k r) ↔ g ∈ UJset ε)
+      ∧ (P⁻¹ * g * P ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ
+        ↔ g ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ) := by
   obtain ⟨⟨-, hH⟩, hu⟩ := hP
   have hl : Pᴴ * P = 1 := Unitary.star_mul_self_of_mem hu
   have hr : P * Pᴴ = 1 := Unitary.mul_star_self_of_mem hu
   have hi : P⁻¹ = Pᴴ := Matrix.inv_eq_left_inv hl
-  have key : ∀ A B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
-      Pᴴ * A * P = Pᴴ * B * P ↔ A = B := by
+  have key
+      : ∀ A B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+        Pᴴ * A * P = Pᴴ * B * P ↔ A = B := by
     intro A B
     refine ⟨fun h => ?_, fun h => by rw [h]⟩
-    have e : ∀ C : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ, P * (Pᴴ * C * P) * Pᴴ = C := by
+    have e
+        : ∀ C : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+          P * (Pᴴ * C * P) * Pᴴ = C := by
       intro C
-      calc P * (Pᴴ * C * P) * Pᴴ = (P * Pᴴ) * C * (P * Pᴴ) := by simp only [Matrix.mul_assoc]
+      calc
+        P * (Pᴴ * C * P) * Pᴴ
+          = (P * Pᴴ) * C * (P * Pᴴ) := by simp only [Matrix.mul_assoc]
         _ = C := by rw [hr]; simp
     rw [← e A, h, e]
-  have gen : ∀ J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
-      (Pᴴ * g * P)ᴴ * (Pᴴ * J * P) * (Pᴴ * g * P) = Pᴴ * (gᴴ * J * g) * P := by
+  have gen
+      : ∀ J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+        (Pᴴ * g * P)ᴴ * (Pᴴ * J * P) * (Pᴴ * g * P) = Pᴴ * (gᴴ * J * g) * P := by
     intro J
     simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-    calc Pᴴ * (gᴴ * P) * (Pᴴ * J * P) * (Pᴴ * g * P)
+    calc
+      Pᴴ * (gᴴ * P) * (Pᴴ * J * P) * (Pᴴ * g * P)
         = Pᴴ * (gᴴ * (P * Pᴴ) * J * (P * Pᴴ) * g) * P := by simp only [Matrix.mul_assoc]
       _ = _ := by rw [hr]; simp
   rw [hi]

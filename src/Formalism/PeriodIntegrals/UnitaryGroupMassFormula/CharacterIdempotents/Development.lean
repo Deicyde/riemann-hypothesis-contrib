@@ -16,14 +16,15 @@ def Central : Prop :=
     charIdem V * x = x * charIdem V
 
 def Scalar : Prop :=
-  ∀ (G : Type) [Group G] [Fintype G] (V W : FDRep ℂ G), Simple V → Simple W →
-    (Nonempty (V ≅ W) → act W (charIdem V) = 1) ∧
-    (IsEmpty (V ≅ W) → act W (charIdem V) = 0)
+  ∀ (G : Type) [Group G] [Fintype G] (V W : FDRep ℂ G),
+    Simple V → Simple W
+      → (Nonempty (V ≅ W) → act W (charIdem V) = 1) ∧ (IsEmpty (V ≅ W) → act W (charIdem V) = 0)
 
 def MulEq : Prop :=
-  ∀ (G : Type) [Group G] [Fintype G] (V W : FDRep ℂ G), Simple V → Simple W →
-    (Nonempty (V ≅ W) → charIdem V * charIdem W = charIdem W) ∧
-    (IsEmpty (V ≅ W) → charIdem V * charIdem W = 0)
+  ∀ (G : Type) [Group G] [Fintype G] (V W : FDRep ℂ G),
+    Simple V → Simple W
+      → (Nonempty (V ≅ W) → charIdem V * charIdem W = charIdem W)
+        ∧ (IsEmpty (V ≅ W) → charIdem V * charIdem W = 0)
 
 theorem charIdem_of (hC : Central) (hS : Scalar) (hM : MulEq) : PI.CharIdem.CharIdem := by
   intro G _ _ V W hV hW

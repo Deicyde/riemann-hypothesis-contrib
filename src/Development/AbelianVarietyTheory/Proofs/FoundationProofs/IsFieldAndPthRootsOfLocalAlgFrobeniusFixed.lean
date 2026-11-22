@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem localAlg_frob_fixed_isField_and_pth_roots :
-    ∀ (p : ℕ) [Fact p.Prime] (k A : Type) [Field k] [CharP k p] [CommRing A] [Algebra k A] [IsLocalRing A]
-  (T : Finset A) (f : ℕ), 0 < f → Algebra.adjoin k (T : Set A) = ⊤ → (∀ t ∈ T, t ^ p ^ f = t) →
-  IsField A ∧ ∀ (y : A) (a : k), y ^ p = algebraMap k A a → ∃ b : k, y = algebraMap k A b := by
+theorem localAlg_frob_fixed_isField_and_pth_roots
+    : ∀ (p : ℕ) [Fact p.Prime] (k A : Type) [Field k] [CharP k p] [CommRing A] [Algebra k A]
+        [IsLocalRing A] (T : Finset A) (f : ℕ),
+      0 < f → Algebra.adjoin k (T : Set A) = ⊤ → (∀ t ∈ T, t ^ p ^ f = t)
+        → IsField A
+          ∧ ∀ (y : A) (a : k), y ^ p = algebraMap k A a → ∃ b : k, y = algebraMap k A b := by
   intro p hp k A _ _ _ _ _ T f hf hT hfix
   have hp1 : 1 < p ^ f := Nat.one_lt_pow hf.ne' hp.out.one_lt
 

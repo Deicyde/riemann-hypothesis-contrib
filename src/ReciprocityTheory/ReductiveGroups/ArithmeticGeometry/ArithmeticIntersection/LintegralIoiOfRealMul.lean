@@ -274,13 +274,15 @@ namespace ReciprocityTheory.ChartRestriction.G.AI
 
 open ReciprocityTheory.ChartRestriction.G.AI.ArchimedeanConeVolume
 
-theorem arch0 (u : E3) (f : ℝ → ℝ) (hu : ‖u‖ = 1) (hf : IntervalIntegrable f MeasureTheory.volume (-1) 1) :
-    MeasureTheory.Integrable (fun n : S2 => f (inner ℝ (n : E3) u)) sphereMeasure ∧
-    ∫ n : S2, f (inner ℝ (n : E3) u) ∂sphereMeasure = (1 / 2) * ∫ t in (-1 : ℝ)..1, f t := by
+theorem arch0
+    (u : E3) (f : ℝ → ℝ) (hu : ‖u‖ = 1) (hf : IntervalIntegrable f MeasureTheory.volume (-1) 1)
+    : MeasureTheory.Integrable (fun n : S2 => f (inner ℝ (n : E3) u)) sphereMeasure
+      ∧ ∫ n : S2, f (inner ℝ (n : E3) u) ∂sphereMeasure = (1 / 2) * ∫ t in (-1 : ℝ)..1, f t := by
   have hφ : Measurable (fun n : S2 => inner ℝ (n : E3) u) := by fun_prop
   have hmap := map_inner_sphereMeasure hu
   have hIoo : IntegrableOn f (Ioo (-1 : ℝ) 1) :=
-    ((intervalIntegrable_iff_integrableOn_Ioc_of_le (by norm_num)).1 hf).mono_set Ioo_subset_Ioc_self
+    ((intervalIntegrable_iff_integrableOn_Ioc_of_le (by norm_num)).1 hf).mono_set
+      Ioo_subset_Ioc_self
   have hint : Integrable f ((2⁻¹ : ℝ≥0∞) • volume.restrict (Ioo (-1 : ℝ) 1)) :=
     hIoo.smul_measure (by simp)
   rw [← hmap] at hint

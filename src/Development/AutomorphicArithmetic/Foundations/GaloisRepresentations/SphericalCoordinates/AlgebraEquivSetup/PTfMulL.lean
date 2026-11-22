@@ -8,8 +8,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open Formalism.UG GlobalTheory.LKDef.HeckeTraceForms UpperTheory.Gal.W2.Seed
 open scoped Classical
 
-theorem UpperTheory.Gal.W2.Seed.pTfMulL :
-    TfAdm → TfAct → (∀ (X M' : Type) [Group X] [Group M'] (L' : Loc X M') (K : Subgroup X) (Kw : Subgroup M'), L'.Fact K Kw → ∀ (t : M') (r : X), L'.pr r = 1 → ∀ g, g ∈ DoubleCoset.doubleCoset (L'.loc t * r) (K : Set X) K ↔ L'.pr g ∈ DoubleCoset.doubleCoset t (Kw : Set M') Kw ∧ (L'.loc (L'.pr g))⁻¹ * g ∈ DoubleCoset.doubleCoset r (K : Set X) K) → TfMulL := by
+theorem UpperTheory.Gal.W2.Seed.pTfMulL
+    : TfAdm → TfAct
+      → (∀ (X M' : Type) [Group X] [Group M'] (L' : Loc X M') (K : Subgroup X) (Kw : Subgroup M'),
+        L'.Fact K Kw
+          → ∀ (t : M') (r : X),
+            L'.pr r = 1
+              → ∀ g,
+                g ∈ DoubleCoset.doubleCoset (L'.loc t * r) (K : Set X) K
+                  ↔ L'.pr g ∈ DoubleCoset.doubleCoset t (Kw : Set M') Kw
+                    ∧ (L'.loc (L'.pr g))⁻¹ * g ∈ DoubleCoset.doubleCoset r (K : Set X) K)
+      → TfMulL := by
   intro hAdm hAc hIff X M M' _ _ _ T L' Kw hF hAp t r hr hr'
   funext g₀
   set Φ : X → ℂ := fun y => T.tf r (y⁻¹ * g₀) with hΦ
@@ -23,7 +32,9 @@ theorem UpperTheory.Gal.W2.Seed.pTfMulL :
       Subtype.ext (map_inv _ _)
     rw [e, map_inv, inv_inv]
   have key := hAc X M M' T L' Kw hF hAp t 1 ⟨fun g => by group, map_one _⟩ ℂ Φ hTy 1
-  have lhs : conv T.K₀ (T.tf (L'.loc t)) (T.tf r) g₀ = Formalism.UG.hAct T.K₀ (T.tf (L'.loc t * 1)) Φ 1 := by
+  have lhs
+      : conv T.K₀ (T.tf (L'.loc t)) (T.tf r) g₀
+        = Formalism.UG.hAct T.K₀ (T.tf (L'.loc t * 1)) Φ 1 := by
     simp [conv, Formalism.UG.hAct, hΦ, smul_eq_mul]
   rw [lhs, key]
   have memKrK : ∀ y, y ∈ DoubleCoset.doubleCoset r (T.K : Set X) T.K → L'.pr y ∈ Kw := by
@@ -36,19 +47,23 @@ theorem UpperTheory.Gal.W2.Seed.pTfMulL :
   rw [finsum_eq_single _ ((L'.pr g₀ : M' ⧸ Kw)) ?_]
   · obtain ⟨w, hw⟩ := QuotientGroup.mk_out_eq_mul Kw (L'.pr g₀)
     rw [hw]
-    have h1 : (L'.pr g₀ * w ∈ DoubleCoset.doubleCoset t (Kw : Set M') Kw) ↔
-        L'.pr g₀ ∈ DoubleCoset.doubleCoset t (Kw : Set M') Kw := by
+    have h1
+        : (L'.pr g₀ * w ∈ DoubleCoset.doubleCoset t (Kw : Set M') Kw)
+          ↔ L'.pr g₀ ∈ DoubleCoset.doubleCoset t (Kw : Set M') Kw := by
       simp only [DoubleCoset.mem_doubleCoset, SetLike.mem_coe]
       constructor
       · rintro ⟨a, ha, b, hb, e⟩
         refine ⟨a, ha, b * (w : M')⁻¹, Kw.mul_mem hb (Kw.inv_mem w.2), ?_⟩
-        calc L'.pr g₀ = L'.pr g₀ * w * (w : M')⁻¹ := by group
+        calc
+          L'.pr g₀
+            = L'.pr g₀ * w * (w : M')⁻¹ := by group
           _ = a * t * b * (w : M')⁻¹ := by rw [e]
           _ = a * t * (b * (w : M')⁻¹) := by group
       · rintro ⟨a, ha, b, hb, e⟩
         exact ⟨a, ha, b * w, Kw.mul_mem hb w.2, by rw [e]; group⟩
-    have h2 : ((L'.loc (L'.pr g₀ * w))⁻¹ * g₀ ∈ DoubleCoset.doubleCoset r (T.K : Set X) T.K) ↔
-        (L'.loc (L'.pr g₀))⁻¹ * g₀ ∈ DoubleCoset.doubleCoset r (T.K : Set X) T.K := by
+    have h2
+        : ((L'.loc (L'.pr g₀ * w))⁻¹ * g₀ ∈ DoubleCoset.doubleCoset r (T.K : Set X) T.K)
+          ↔ (L'.loc (L'.pr g₀))⁻¹ * g₀ ∈ DoubleCoset.doubleCoset r (T.K : Set X) T.K := by
       have hwK : L'.loc w ∈ T.K := hF.1 w w.2
       have e : (L'.loc (L'.pr g₀ * w))⁻¹ * g₀ = (L'.loc w)⁻¹ * ((L'.loc (L'.pr g₀))⁻¹ * g₀) := by
         rw [map_mul, mul_inv_rev, mul_assoc]
@@ -57,7 +72,8 @@ theorem UpperTheory.Gal.W2.Seed.pTfMulL :
       constructor
       · rintro ⟨a, ha, b, hb, e2⟩
         refine ⟨L'.loc w * a, T.K.mul_mem hwK ha, b, hb, ?_⟩
-        calc (L'.loc (L'.pr g₀))⁻¹ * g₀
+        calc
+          (L'.loc (L'.pr g₀))⁻¹ * g₀
             = L'.loc w * ((L'.loc w)⁻¹ * ((L'.loc (L'.pr g₀))⁻¹ * g₀)) := by group
           _ = L'.loc w * (a * r * b) := by rw [e2]
           _ = L'.loc w * a * r * b := by group

@@ -31,13 +31,17 @@ theorem indep_of_im_ne {a b : ℂ} (h : (conj a * b).im ≠ 0) : LinearIndepende
   rw [ht, Complex.ofReal_zero, zero_mul, add_zero] at hst
   exact (mul_eq_zero.1 hst).resolve_right ha |> Complex.ofReal_eq_zero.1
 
-theorem im_ne {K : Type} [Field K] [CharZero K] (φ : K →+* ℂ) (hφ : ∃ k : K, (φ k).im ≠ 0)
-    (B : Module.Basis (Fin 2) ℚ K) : (conj (φ (B 0)) * φ (B 1)).im ≠ 0 := by
+theorem im_ne
+    {K : Type} [Field K] [CharZero K]
+    (φ : K →+* ℂ) (hφ : ∃ k : K, (φ k).im ≠ 0)
+    (B : Module.Basis (Fin 2) ℚ K)
+    : (conj (φ (B 0)) * φ (B 1)).im ≠ 0 := by
   intro h0
   obtain ⟨k, hk⟩ := hφ
   have hB0 : φ (B 0) ≠ 0 := (map_ne_zero φ).2 (B.ne_zero 0)
-  have hs : ∀ (q : ℚ) (v : K),
-      (conj (φ (B 0)) * φ (q • v)).im = (q : ℝ) * (conj (φ (B 0)) * φ v).im := by
+  have hs
+      : ∀ (q : ℚ) (v : K),
+        (conj (φ (B 0)) * φ (q • v)).im = (q : ℝ) * (conj (φ (B 0)) * φ v).im := by
     intro q v
     rw [Rat.smul_def, map_mul, map_ratCast, mul_left_comm, ← Complex.ofReal_ratCast,
       Complex.im_ofReal_mul]
@@ -63,10 +67,11 @@ theorem perPair : PI.KerLat.PerPair := by
     rw [← Module.finrank_eq_card_chooseBasisIndex, NumberField.RingOfIntegers.rank, hK]
   let e : Module.Free.ChooseBasisIndex ℤ (𝓞 K) ≃ Fin 2 := Fintype.equivFinOfCardEq hcard
   let bI : Module.Basis (Fin 2) ℤ cc := (Ideal.selfBasis b0 cc hcc).reindex e
-  let f : cc →+ ℂ :=
-    { toFun := fun c => δ * φ ((c : 𝓞 K) : K)
-      map_zero' := by simp
-      map_add' := fun x y => by simp [mul_add] }
+  let f : cc →+ ℂ := {
+    toFun := fun c => δ * φ ((c : 𝓞 K) : K)
+    map_zero' := by simp
+    map_add' := fun x y => by simp [mul_add]
+  }
   let ω : Fin 2 → ℂ := fun i => f (bI i)
   let g : cc →ₗ[ℤ] K :=
     ((algebraMap (𝓞 K) K).toAddMonoidHom.comp cc.subtype.toAddMonoidHom).toIntLinearMap
@@ -74,19 +79,18 @@ theorem perPair : PI.KerLat.PerPair := by
     rw [LinearMap.ker_eq_bot]
     intro x y hxy
     exact Subtype.ext (IsFractionRing.injective (𝓞 K) K hxy)
-  have hliZ : LinearIndependent ℤ (fun i => ((bI i : 𝓞 K) : K)) :=
-    bI.linearIndependent.map' g hg
+  have hliZ : LinearIndependent ℤ (fun i => ((bI i : 𝓞 K) : K)) := bI.linearIndependent.map' g hg
   have hli : LinearIndependent ℚ (fun i => ((bI i : 𝓞 K) : K)) :=
     (LinearIndependent.iff_fractionRing ℤ ℚ).1 hliZ
-  let B : Module.Basis (Fin 2) ℚ K :=
-    basisOfLinearIndependentOfCardEqFinrank hli (by simp [hK])
+  let B : Module.Basis (Fin 2) ℚ K := basisOfLinearIndependentOfCardEqFinrank hli (by simp [hK])
   have hBi : ∀ i, B i = ((bI i : 𝓞 K) : K) := fun i => by
     simp [B, coe_basisOfLinearIndependentOfCardEqFinrank]
   have hω : (conj (ω 0) * ω 1).im ≠ 0 := by
     have hB := im_ne φ hφ B
     rw [hBi, hBi] at hB
-    have eq : conj (ω 0) * ω 1 =
-        (Complex.normSq δ : ℂ) * (conj (φ ((bI 0 : 𝓞 K) : K)) * φ ((bI 1 : 𝓞 K) : K)) := by
+    have eq
+        : conj (ω 0) * ω 1
+          = (Complex.normSq δ : ℂ) * (conj (φ ((bI 0 : 𝓞 K) : K)) * φ ((bI 1 : 𝓞 K) : K)) := by
       simp only [ω, f, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
       rw [Complex.normSq_eq_conj_mul_self, map_mul]
       ring
@@ -95,9 +99,7 @@ theorem perPair : PI.KerLat.PerPair := by
   refine ⟨⟨ω 0, ω 1, indep_of_im_ne hω⟩, ?_⟩
   show (Submodule.span ℤ {ω 0, ω 1}).toAddSubgroup = _
   rw [← AddSubgroup.toIntSubmodule_closure]
-  first
-  | rw [AddSubgroup.toIntSubmodule_toAddSubgroup]
-  | change AddSubgroup.closure {ω 0, ω 1} = _
+  first | rw [AddSubgroup.toIntSubmodule_toAddSubgroup] | change AddSubgroup.closure {ω 0, ω 1} = _
   apply le_antisymm
   · refine AddSubgroup.closure_mono ?_
     rintro w (rfl | rfl)

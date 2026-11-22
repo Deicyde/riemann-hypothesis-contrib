@@ -10,18 +10,19 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem fractionalIdeal_eq_of_count_eq {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K]
-    [Algebra R K] [IsFractionRing R K] {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
-    (h : ∀ v : HeightOneSpectrum R, FractionalIdeal.count K v I = FractionalIdeal.count K v J) :
-    I = J := by
+theorem fractionalIdeal_eq_of_count_eq
+    {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
+    (h : ∀ v : HeightOneSpectrum R, FractionalIdeal.count K v I = FractionalIdeal.count K v J)
+    : I = J := by
   rw [← FractionalIdeal.finprod_heightOneSpectrum_factorization' K hI,
     ← FractionalIdeal.finprod_heightOneSpectrum_factorization' K hJ]
   exact finprod_congr fun v => by rw [h v]
 
-theorem submodule_eq_span_of_pow_eq_span_pow :
-    ∀ (K : Type) [Field K] [NumberField K] (I : Submodule (𝓞 K) K) (β : K) (h : ℕ),
-      0 < h → β ≠ 0 → I.FG → I ^ h = Submodule.span (𝓞 K) {β ^ h} →
-      I = Submodule.span (𝓞 K) {β} := by
+theorem submodule_eq_span_of_pow_eq_span_pow
+    : ∀ (K : Type) [Field K] [NumberField K] (I : Submodule (𝓞 K) K) (β : K) (h : ℕ),
+      0 < h → β ≠ 0 → I.FG → I ^ h = Submodule.span (𝓞 K) {β ^ h}
+        → I = Submodule.span (𝓞 K) {β} := by
   intro K _ _ I β h hh hβ hfg hpow
   let J : FractionalIdeal (𝓞 K)⁰ K := ⟨I, FractionalIdeal.isFractional_of_fg hfg⟩
   have hJI : (J : Submodule (𝓞 K) K) = I := rfl

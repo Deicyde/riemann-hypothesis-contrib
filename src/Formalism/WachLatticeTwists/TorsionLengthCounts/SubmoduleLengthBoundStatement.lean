@@ -11,15 +11,16 @@ noncomputable section
 
 namespace Formalism.RepresentationBoundsCohomology
 
-theorem submoduleLengthBound_statement : Formalism.RepresentationBoundsCohomology.SubmoduleLengthBound := by
+theorem submoduleLengthBound_statement
+    : Formalism.RepresentationBoundsCohomology.SubmoduleLengthBound := by
   intro O _ _ _ d _ N ℓ c hN
   classical
-
   let e : d ≃ Fin (Fintype.card d) := Fintype.equivFin d
   let A : Matrix (Fin (Fintype.card d)) (Fin (Fintype.card d)) O :=
     Matrix.diagonal (fun _ => (ℓ : O) ^ c)
-  have hA : ∀ v : Fin (Fintype.card d) → Formalism.NG.KO O,
-      Formalism.NG.matQ O A v = ((ℓ : O) ^ c) • v := by
+  have hA
+      : ∀ v : Fin (Fintype.card d) → Formalism.NG.KO O,
+        Formalism.NG.matQ O A v = ((ℓ : O) ^ c) • v := by
     intro v
     funext i
     simp [Formalism.NG.matQ, Formalism.NG.relMap, A, Matrix.diagonal_apply, ite_smul]

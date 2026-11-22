@@ -8,7 +8,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 namespace ReciprocityTheory.ChartRestriction.G.FD.BoundedSectionAlgebra
 
 open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
-open ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity
+open ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+  ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns
+  ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity
 open scoped ComplexConjugate
 
 noncomputable section
@@ -305,7 +307,9 @@ lemma fj_mul_zero (h3d : ModerateCoefficientPositivity (E := E)) (h3e : Coeffici
   rw [hz] at hs
   exact hs.unique hasSum_zero
 
-theorem siegelSpaceAlgebra_of (h3d : ModerateCoefficientPositivity (E := E)) (h3e : CoefficientConvolution (E := E)) : SiegelSpaceAlgebra (E := E) := by
+theorem siegelSpaceAlgebra_of
+    (h3d : ModerateCoefficientPositivity (E := E)) (h3e : CoefficientConvolution (E := E))
+    : SiegelSpaceAlgebra (E := E) := by
   intro r X la la' c
   have hSSmul : ∀ P ∈ X.SS la, ∀ Q, X.IsBddSec la' Q → P * Q ∈ X.SS (la + la') := by
     intro P hP Q hQ
@@ -325,7 +329,8 @@ theorem siegelSpaceAlgebra_of (h3d : ModerateCoefficientPositivity (E := E)) (h3
   · intro a P hP
     refine ⟨bdd_smul X a hP.1, fun ξ hξ x hx => ?_⟩
     rw [fj_smul, hP.2 ξ hξ x hx, mul_zero]
-  · exact ⟨⟨bdd_zero X la, fun ξ _ x _ => fj_zero X la ξ x 0⟩, fun ξ _ ν _ x _ => fj_zero X la ξ x ν⟩
+  · exact
+      ⟨⟨bdd_zero X la, fun ξ _ x _ => fj_zero X la ξ x 0⟩, fun ξ _ ν _ x _ => fj_zero X la ξ x ν⟩
   · intro P hP Q hQ
     refine ⟨⟨bdd_add X hP.1.1 hQ.1.1, fun ξ hξ x hx => ?_⟩, fun ξ hξ ν hν x hx => ?_⟩
     · rw [fj_add X hP.1.1 hQ.1.1 hξ hx, hP.1.2 ξ hξ x hx, hQ.1.2 ξ hξ x hx, add_zero]
@@ -338,7 +343,9 @@ theorem siegelSpaceAlgebra_of (h3d : ModerateCoefficientPositivity (E := E)) (h3
     refine ⟨hSSmul P hP.1 Q hQ, fun ξ hξ ν hν x hx => ?_⟩
     refine fj_mul_zero X h3d h3e hP.1.1 hQ hξ hx ν fun ν' h0 h1 => ?_
     refine hP.2 ξ hξ ν' ?_ x hx
-    calc ∑ τ, ν' τ ≤ ∑ τ, ν τ := Finset.sum_le_sum fun τ _ => by linarith [h1 τ]
+    calc
+      ∑ τ, ν' τ
+        ≤ ∑ τ, ν τ := Finset.sum_le_sum fun τ _ => by linarith [h1 τ]
       _ ≤ c := hν
 
 end

@@ -8,9 +8,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.TorMatch
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc GlobalTheory.Poinc.Eq8 Formalism.L2.Pj
 open GlobalTheory
@@ -21,8 +25,8 @@ noncomputable section
 
 namespace GlobalTheory.UPoinc.ClosedPt
 
-theorem exists_prime_eq_zero_of_finiteType (κ : Type) [Field κ] [Algebra.FiniteType ℤ κ] :
-    ∃ p : ℕ, p.Prime ∧ (p : κ) = 0 := by
+theorem exists_prime_eq_zero_of_finiteType (κ : Type) [Field κ] [Algebra.FiniteType ℤ κ]
+    : ∃ p : ℕ, p.Prime ∧ (p : κ) = 0 := by
   haveI := ReciprocityTheory.AnForm.R.IntegerToRational.isJacobsonRing_int
   haveI : Module.Finite ℤ κ := finite_of_finite_type_of_isJacobsonRing ℤ κ
   obtain ⟨q, hq⟩ := CharP.exists κ
@@ -30,11 +34,14 @@ theorem exists_prime_eq_zero_of_finiteType (κ : Type) [Field κ] [Algebra.Finit
   · exact ⟨q, hqp, CharP.cast_eq_zero κ q⟩
   · subst hq0
     haveI : CharZero κ := CharP.charP_to_charZero κ
-    exact absurd (isField_of_isIntegral_of_isField (R := ℤ) (S := κ) (algebraMap ℤ κ).injective_int (Field.toIsField κ))
+    exact absurd
+      (isField_of_isIntegral_of_isField (R := ℤ) (S := κ) (algebraMap ℤ κ).injective_int
+        (Field.toIsField κ))
       Int.not_isField
 
-theorem isLocalHom_of_isCpl {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] {j : O →+* R} (h : IsCpl j) :
-    IsLocalHom j := by
+theorem isLocalHom_of_isCpl
+    {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] {j : O →+* R} (h : IsCpl j)
+    : IsLocalHom j := by
   obtain ⟨e, he⟩ := h
   refine ⟨fun a ha => ?_⟩
   rw [← he] at ha
@@ -50,9 +57,10 @@ theorem isLocalHom_of_isCpl {O R : Type} [CommRing O] [IsLocalRing O] [CommRing 
   rw [h0] at h2
   exact not_isUnit_zero h2
 
-theorem finiteType_residueField {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra o' Ω] [hA : ArithBase o' Ω]
-    (M : RatModel o' Ω) (x : M.Z) (hx : IsClosed ({x} : Set M.Z)) :
-    Algebra.FiniteType ℤ (M.Z.residueField x) := by
+theorem finiteType_residueField
+    {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra o' Ω] [hA : ArithBase o' Ω]
+    (M : RatModel o' Ω) (x : M.Z) (hx : IsClosed ({x} : Set M.Z))
+    : Algebra.FiniteType ℤ (M.Z.residueField x) := by
   haveI : LocallyOfFiniteType M.s := M.lft
   haveI : IsClosedImmersion (M.Z.fromSpecResidueField x) := isClosed_singleton_iff_isClosedImmersion.1 hx
   have h : LocallyOfFiniteType (M.Z.fromSpecResidueField x ≫ M.s) := inferInstance
@@ -65,7 +73,13 @@ theorem finiteType_residueField {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra
   convert h₁.comp h₀
   exact RingHom.ext_int _ _
 
-theorem closedPoint_cpl_residueChar : ∀ (o' Ω : Type) [CommRing o'] [Field Ω] [Algebra o' Ω] [ArithBase o' Ω] (M : RatModel o' Ω) (x : M.Z), IsClosed ({x} : Set M.Z) → Algebra.EssFiniteType ℤ (M.Z.presheaf.stalk x) ∧ ∀ (R : Type) [CommRing R] [IsLocalRing R] (j : M.Z.presheaf.stalk x →+* R), IsCpl j → IsLocalHom j ∧ ∃ p : ℕ, p.Prime ∧ (p : R) ∈ maximalIdeal R := by
+theorem closedPoint_cpl_residueChar
+    : ∀ (o' Ω : Type) [CommRing o'] [Field Ω] [Algebra o' Ω] [ArithBase o' Ω] (M : RatModel o' Ω)
+        (x : M.Z),
+      IsClosed ({x} : Set M.Z)
+        → Algebra.EssFiniteType ℤ (M.Z.presheaf.stalk x)
+          ∧ ∀ (R : Type) [CommRing R] [IsLocalRing R] (j : M.Z.presheaf.stalk x →+* R),
+            IsCpl j → IsLocalHom j ∧ ∃ p : ℕ, p.Prime ∧ (p : R) ∈ maximalIdeal R := by
   intro o' Ω _ _ _ _ M x hx
   refine ⟨RatModel.essFiniteType_int_stalk_of_arithBase M x, fun R _ _ j hj => ?_⟩
   haveI hl := isLocalHom_of_isCpl hj

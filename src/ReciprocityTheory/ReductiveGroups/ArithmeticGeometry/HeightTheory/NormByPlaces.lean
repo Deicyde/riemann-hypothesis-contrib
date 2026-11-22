@@ -10,11 +10,13 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
@@ -221,35 +223,44 @@ private lemma overP_finite (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (p : Ideal (KTp
   exact (HNm.local_norm (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) p hh
     (d.gen p) (d.gen_span ⟨hprime, hh⟩) 1 one_ne_zero).1
 
-theorem norm_by_places (hd : d.AxH 𝒜) (h : d.S1) (c : ι) :
-    (∀ p ∈ d.HtOne, (d.OverP c p).Finite) ∧
-    ∀ y : OmS (Ω c) d.D d.N, y ≠ 0 →
-      {p | p ∈ d.HtOne ∧ ∃ w ∈ d.OverP c p, w y ≠ 0}.Finite ∧
-      ∃ κ : K, κ ≠ 0 ∧
-        letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
-        Algebra.norm (KTf K d.D d.N) y =
-          algebraMap K (KTf K d.D d.N) κ *
-            ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-              algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^
-                (∑ᶠ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (_ : w ∈ d.OverP c p),
-                  (d.fze h c w : ℤ) * WithTop.untopD 0 (w y)) := by
+theorem norm_by_places (hd : d.AxH 𝒜) (h : d.S1) (c : ι)
+    : (∀ p ∈ d.HtOne, (d.OverP c p).Finite)
+      ∧ ∀ y : OmS (Ω c) d.D d.N,
+        y ≠ 0
+          → {p | p ∈ d.HtOne ∧ ∃ w ∈ d.OverP c p, w y ≠ 0}.Finite
+            ∧ ∃ κ : K,
+              κ ≠ 0
+                ∧ letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
+                  Algebra.norm (KTf K d.D d.N) y
+                    = algebraMap K (KTf K d.D d.N) κ
+                      * ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+                          algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^
+                            (∑ᶠ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (_ : w ∈ d.OverP c p),
+                              (d.fze h c w : ℤ) * WithTop.untopD 0 (w y)) := by
   letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
   haveI : FiniteDimensional (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.omS_finite hd h c).1
-  have hmap : ∀ x : KTp K d.D d.N, algebraMap (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
-      (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) x) = d.sH c x := by
+  have hmap
+      : ∀ x : KTp K d.D d.N,
+        algebraMap (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
+            (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) x)
+          = d.sH c x := by
     intro x
     exact IsFractionRing.lift_algebraMap (h c) x
-  have hOver : ∀ p, d.OverP c p =
-      HNm.OverR (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) p := by
+  have hOver
+      : ∀ p,
+        d.OverP c p
+          = HNm.OverR (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) p := by
     intro p
     ext w
     simp only [Data.OverP, HNm.OverR, Set.mem_setOf_eq, hmap]
   refine ⟨fun p hp => overP_finite d hd h c p hp, fun y hy => ?_⟩
-  have hset : {p | p ∈ d.HtOne ∧ ∃ w ∈ d.OverP c p, w y ≠ 0} =
-      {p : Ideal (KTp K d.D d.N) | p.IsPrime ∧ p.height = 1 ∧
-        ∃ w ∈ HNm.OverR (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) p, w y ≠ 0} := by
-    ext p
-    simp only [Set.mem_setOf_eq, Data.HtOne, hOver, and_assoc]
+  have hset
+      : {p | p ∈ d.HtOne ∧ ∃ w ∈ d.OverP c p, w y ≠ 0}
+        = {p : Ideal (KTp K d.D d.N) | p.IsPrime ∧ p.height = 1 ∧
+            ∃ w ∈ HNm.OverR (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) p, w y ≠ 0} :=
+    by
+      ext p
+      simp only [Set.mem_setOf_eq, Data.HtOne, hOver, and_assoc]
   have hfin : {p | p ∈ d.HtOne ∧ ∃ w ∈ d.OverP c p, w y ≠ 0}.Finite := by
     rw [hset]
     exact HNm.fin_support (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) y hy
@@ -287,13 +298,16 @@ theorem norm_by_places (hd : d.AxH 𝒜) (h : d.S1) (c : ι) :
     have h2 := hqH.2
     rw [hq', Ideal.height_bot] at h2
     exact zero_ne_one h2
-  have hloc : ∀ p ∈ d.HtOne, ∃ a s : KTp K d.D d.N, a ∉ p ∧ s ∉ p ∧
-      z / P * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s =
-        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a := by
+  have hloc
+      : ∀ p ∈ d.HtOne, ∃ a s : KTp K d.D d.N,
+        a ∉ p ∧ s ∉ p
+          ∧ z / P * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s
+            = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a := by
     intro p hp
     haveI := hp.1
-    obtain ⟨-, a, s, ha, hs, hzs⟩ := HNm.local_norm (R := KTp K d.D d.N) (F := KTf K d.D d.N)
-      (L := OmS (Ω c) d.D d.N) p hp.2 (d.gen p) (d.gen_span hp) y hy
+    obtain ⟨-, a, s, ha, hs, hzs⟩ :=
+      HNm.local_norm (R := KTp K d.D d.N) (F := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N) p hp.2
+        (d.gen p) (d.gen_span hp) y hy
     rw [← hOver p] at hzs
     change z * _ = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p * _ at hzs
     obtain ⟨A, B, hA, hB, hAB⟩ := prod_gen_zpow_split_at d hp E T hTsub
@@ -302,35 +316,53 @@ theorem norm_by_places (hd : d.AxH 𝒜) (h : d.S1) (c : ι) :
       · rfl
       · exact (hE0 p hp hpT).symm
     rw [hexp] at hAB
-    refine ⟨a * B, s * A, fun h' => (hp.1.mem_or_mem h').elim ha hB,
-      fun h' => (hp.1.mem_or_mem h').elim hs hA, ?_⟩
-    have key : z * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s *
-        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A =
-        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) B * P := by
+    refine ⟨
+      a * B,
+      s * A,
+      fun h' => (hp.1.mem_or_mem h').elim ha hB,
+      fun h' => (hp.1.mem_or_mem h').elim hs hA,
+      ?_
+    ⟩
+    have key
+        : z * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s
+            * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A
+          = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a
+            * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) B * P := by
       rw [hzs]
-      calc algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p *
-            algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A
-          = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a *
-            (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p *
-              algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A) := by ring
+      calc
+        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p
+              * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a
+              * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A
+            = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) a
+              * (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p
+                * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A) := by
+          ring
         _ = _ := by rw [← hAB]; ring
     rw [map_mul, map_mul]
-    calc z / P * (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A)
-        = z * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A / P := by
-          ring
+    calc
+      z / P
+            * (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s
+              * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A)
+          = z * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) s
+            * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) A / P := by
+        ring
       _ = _ := by rw [key, mul_div_cancel_right₀ _ hP0]
   obtain ⟨κ, hκ, hu⟩ := exists_const_of_locally_unit_at_htOne d (z / P) (div_ne_zero hz0 hP0) hloc
   refine ⟨κ, hκ, ?_⟩
-  have hfp : ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-      algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p = P := by
+  have hfp
+      : ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+          algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p
+        = P := by
     rw [hP_def]
     apply finprod_mem_eq_prod_of_subset
     · rintro p ⟨hpH, hp1⟩
       by_contra hpT
       exact hp1 (by simp only []; rw [hE0 p hpH hpT, zpow_zero])
     · exact fun q hq => hTsub q hq
-  change z = algebraMap K (KTf K d.D d.N) κ * ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-      algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p
+  change z
+    = algebraMap K (KTf K d.D d.N) κ
+      * ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ E p
   rw [hfp, ← hu, div_mul_cancel₀ _ hP0]
 
 end Data

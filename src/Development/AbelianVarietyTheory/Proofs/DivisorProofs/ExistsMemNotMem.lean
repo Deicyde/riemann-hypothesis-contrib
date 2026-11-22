@@ -5,7 +5,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LinksChar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Mult
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.NTheta
+  Formalism.IndefR.Mult
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -13,21 +16,23 @@ namespace GlobalTheory
 namespace SplitOffPlaces
 open Formalism.L2.Col Formalism.HermitianLatticesTheory
 
-noncomputable def conjSpec {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) :
-    HeightOneSpectrum (𝓞 E) where
+noncomputable def conjSpec
+    {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E))
+    : HeightOneSpectrum (𝓞 E) where
   asIdeal := P.asIdeal.comap (cO E)
   isPrime := Ideal.comap_isPrime _ _
   ne_bot := by
     obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot P.ne_bot
     intro h
-    have h1 : cO E x ∈ P.asIdeal.comap (cO E) := by
-      rw [Ideal.mem_comap, cO_cO]; exact hx
+    have h1 : cO E x ∈ P.asIdeal.comap (cO E) := by rw [Ideal.mem_comap, cO_cO]; exact hx
     rw [h, Ideal.mem_bot] at h1
     apply hx0
     rw [← cO_cO x, h1, map_zero]
 
-theorem exists_mem_not_mem {A : Type} [CommRing A] [IsDedekindDomain A] {Q P P' : HeightOneSpectrum A}
-    (h : Q ≠ P) (h' : Q ≠ P') : ∃ x ∈ Q.asIdeal, x ∉ P.asIdeal ∧ x ∉ P'.asIdeal := by
+theorem exists_mem_not_mem
+    {A : Type} [CommRing A] [IsDedekindDomain A]
+    {Q P P' : HeightOneSpectrum A} (h : Q ≠ P) (h' : Q ≠ P')
+    : ∃ x ∈ Q.asIdeal, x ∉ P.asIdeal ∧ x ∉ P'.asIdeal := by
   by_contra hc
   have hs : (Q.asIdeal : Set A) ⊆ (P.asIdeal : Set A) ∪ (P'.asIdeal : Set A) := by
     intro x hx
@@ -46,11 +51,10 @@ theorem star_sqrt (D : D7) : star D.host.sqrtMinusD = -D.host.sqrtMinusD := by
   rw [h2, map_neg, h1]
   simp
 
-theorem sqrt_sq (D : D7) : D.host.sqrtMinusD ^ 2 = -(D.host.d : D.host.E) :=
-  D.host.sqd_sq
+theorem sqrt_sq (D : D7) : D.host.sqrtMinusD ^ 2 = -(D.host.d : D.host.E) := D.host.sqd_sq
 
-theorem exists_coord (D : D7) (x : D.host.E) (hx : x ∈ D.host.K) :
-    ∃ u v : ℚ, x = (u : D.host.E) + (v : D.host.E) * D.host.sqrtMinusD := by
+theorem exists_coord (D : D7) (x : D.host.E) (hx : x ∈ D.host.K)
+    : ∃ u v : ℚ, x = (u : D.host.E) + (v : D.host.E) * D.host.sqrtMinusD := by
   have halg : IsAlgebraic ℚ D.host.sqrtMinusD := Algebra.IsAlgebraic.isAlgebraic _
   have hx' : x ∈ Algebra.adjoin ℚ {D.host.sqrtMinusD} := by
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic halg]
@@ -70,25 +74,31 @@ theorem exists_coord (D : D7) (x : D.host.E) (hx : x ∈ D.host.K) :
     push_cast
     linear_combination (v * v' : D.host.E) * sqrt_sq D
 
-theorem exists_norm (D : D7) (x : 𝓞 D.host.K) :
-    ∃ (x' : 𝓞 D.host.K) (n : ℤ), algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x' = cO D.host.E (algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x) ∧
-      x * x' = (n : 𝓞 D.host.K) := by
+theorem exists_norm (D : D7) (x : 𝓞 D.host.K)
+    : ∃ (x' : 𝓞 D.host.K) (n : ℤ),
+      algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x' = cO D.host.E (algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x)
+        ∧ x * x' = (n : 𝓞 D.host.K) := by
   obtain ⟨u, v, huv⟩ := exists_coord D ((x : D.host.K) : D.host.E) (x : D.host.K).2
   have hb : D.host.sqrtMinusD ∈ D.host.K := IntermediateField.mem_adjoin_simple_self ℚ _
-  have hst : star ((x : D.host.K) : D.host.E) = (u : D.host.E) - (v : D.host.E) * D.host.sqrtMinusD := by
+  have hst
+      : star ((x : D.host.K) : D.host.E) = (u : D.host.E) - (v : D.host.E) * D.host.sqrtMinusD := by
     rw [huv, star_add, star_mul, star_sqrt, star_ratCast, star_ratCast]; ring
   have hmem : star ((x : D.host.K) : D.host.E) ∈ D.host.K := by
     rw [hst]
     exact sub_mem (SubfieldClass.ratCast_mem _ u) (mul_mem (SubfieldClass.ratCast_mem _ v) hb)
-  have hinj : Function.Injective (algebraMap D.host.K D.host.E) := (algebraMap D.host.K D.host.E).injective
+  have hinj : Function.Injective (algebraMap D.host.K D.host.E) :=
+    (algebraMap D.host.K D.host.E).injective
   have hint : IsIntegral ℤ (⟨_, hmem⟩ : D.host.K) := by
     rw [← isIntegral_algebraMap_iff (B := D.host.E)]
     exact (cO D.host.E (algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x)).isIntegral_coe
   let x' : 𝓞 D.host.K := ⟨⟨_, hmem⟩, hint⟩
-  have hq : ((x * x' : 𝓞 D.host.K) : D.host.K) = algebraMap ℚ D.host.K (u ^ 2 + D.host.d * v ^ 2) := by
+  have hq
+      : ((x * x' : 𝓞 D.host.K) : D.host.K) = algebraMap ℚ D.host.K (u ^ 2 + D.host.d * v ^ 2) := by
     apply hinj
-    have e1 : algebraMap D.host.K D.host.E ((x * x' : 𝓞 D.host.K) : D.host.K) =
-      ((x : D.host.K) : D.host.E) * star ((x : D.host.K) : D.host.E) := rfl
+    have e1
+        : algebraMap D.host.K D.host.E ((x * x' : 𝓞 D.host.K) : D.host.K)
+          = ((x : D.host.K) : D.host.E) * star ((x : D.host.K) : D.host.E) :=
+      rfl
     rw [e1, hst, ← IsScalarTower.algebraMap_apply, huv, eq_ratCast]
     push_cast
     linear_combination (-(v : D.host.E) ^ 2) * sqrt_sq D
@@ -102,9 +112,17 @@ theorem exists_norm (D : D7) (x : 𝓞 D.host.K) :
 
 end SplitOffPlaces
 
-
 open SplitOffPlaces Formalism.L2.Col Formalism.HermitianLatticesTheory in
-theorem splitOff_places : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg : Finset (HeightOneSpectrum (𝓞 D.host.E))) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (P : HeightOneSpectrum (𝓞 D.host.E)), (∀ PP, PP ∈ Pg ↔ ∃ k, Pb.Div k PP) → (∀ v ∈ S, ∃ PP ∈ Pg, (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) = v) → Formalism.IndefR.Bridge.SplitOff P (Pg : Set (HeightOneSpectrum (𝓞 D.host.E))) → ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal ∧ (∀ PP ∈ Pg, PP ≠ P ∧ ¬ Formalism.IndefR.Lev.IsConjPl PP P) ∧ OffS D S P := by
+theorem splitOff_places
+    : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host)
+        (Pg : Finset (HeightOneSpectrum (𝓞 D.host.E))) (S : Finset (HeightOneSpectrum (𝓞 D.host.F)))
+        (P : HeightOneSpectrum (𝓞 D.host.E)),
+      (∀ PP, PP ∈ Pg ↔ ∃ k, Pb.Div k PP)
+        → (∀ v ∈ S, ∃ PP ∈ Pg,
+          (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) = v)
+        → Formalism.IndefR.Bridge.SplitOff P (Pg : Set (HeightOneSpectrum (𝓞 D.host.E)))
+        → ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal
+          ∧ (∀ PP ∈ Pg, PP ≠ P ∧ ¬ Formalism.IndefR.Lev.IsConjPl PP P) ∧ OffS D S P := by
   intro D Pb Pg S P hPg hS hP
   obtain ⟨-, hP1, hP2⟩ := hP
   have hne : ∀ PP ∈ Pg, PP ≠ P := fun PP h e => hP1 (e ▸ h)
@@ -118,7 +136,10 @@ theorem splitOff_places : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg
     obtain ⟨x', n, hx', hn⟩ := exists_norm D x
     have hnP : (n : 𝓞 D.host.E) ∉ P.asIdeal := by
       intro h
-      have e : (n : 𝓞 D.host.E) = algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x * cO D.host.E (algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x) := by
+      have e
+          : (n : 𝓞 D.host.E)
+            = algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x
+              * cO D.host.E (algebraMap (𝓞 D.host.K) (𝓞 D.host.E) x) := by
         rw [← hx', ← map_mul, hn, map_intCast]
       rw [e] at h
       rcases P.isPrime.mem_or_mem h with h | h
@@ -152,14 +173,17 @@ theorem splitOff_places : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg
   · intro v hv
     obtain ⟨PP, hPP, rfl⟩ := hS v hv
     obtain ⟨x, hx, hx1, hx2⟩ := exists_mem_not_mem (hne PP hPP) (hne' PP hPP)
-    have hfix : star ((x * cO D.host.E x : 𝓞 D.host.E) : D.host.E) = ((x * cO D.host.E x : 𝓞 D.host.E) : D.host.E) := by
+    have hfix
+        : star ((x * cO D.host.E x : 𝓞 D.host.E) : D.host.E)
+          = ((x * cO D.host.E x : 𝓞 D.host.E) : D.host.E) := by
       change star ((x : D.host.E) * star (x : D.host.E)) = (x : D.host.E) * star (x : D.host.E)
       rw [star_mul, star_star]
     obtain ⟨a, ha⟩ := (D.sp.cm.fixed _).1 hfix
     have hint : IsIntegral ℤ a := by
       rw [← isIntegral_algebraMap_iff (B := D.host.E), ha]
       exact (x * cO D.host.E x).isIntegral_coe
-    have e : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ⟨a, hint⟩ = x * cO D.host.E x := RingOfIntegers.ext ha
+    have e : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ⟨a, hint⟩ = x * cO D.host.E x :=
+      RingOfIntegers.ext ha
     refine ⟨⟨a, hint⟩, ?_, fun y hy hyP => ?_⟩
     · change algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ⟨a, hint⟩ ∈ PP.asIdeal
       rw [e]

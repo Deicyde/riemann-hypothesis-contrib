@@ -12,11 +12,17 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem invariant_projection_kills_operator (D : Formalism.BasicNotions.D7) (h2 : adm2 D) {K V : Type} [Field K] [CharZero K]
-    [AddCommGroup V] [Module K V] [FiniteDimensional K V] {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E)
-    (Inv : Module.End K V) (hInv : IsInvProj E Inv) (a b : Fin n) (x : V) : Inv (E a b x) = 0 := by
+theorem invariant_projection_kills_operator
+    (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E)
+    (Inv : Module.End K V) (hInv : IsInvProj E Inv)
+    (a b : Fin n) (x : V)
+    : Inv (E a b x) = 0 := by
   have hs := gl_rep_shifts_weights hE
-  have htop := sum_isotypic_top_of_weight_data D h2 E hE hs (findim_weights_bounded E) (weight_projections_integral_findim E)
+  have htop :=
+    sum_isotypic_top_of_weight_data D h2 E hE hs (findim_weights_bounded E)
+      (weight_projections_integral_findim E)
   have hinv := trivial_isotypic_invariant_holds hE
   have hle : ∀ mu, isoSub E mu ≤ LinearMap.ker (Inv * E a b) := by
     intro mu y hy
@@ -39,10 +45,14 @@ theorem invariant_projection_kills_operator (D : Formalism.BasicNotions.D7) (h2 
   have h3 := this (Submodule.mem_top (x := x))
   rwa [LinearMap.mem_ker, Module.End.mul_apply] at h3
 
-theorem invariant_projection_kills_nonzero_weight (D : Formalism.BasicNotions.D7) (h2 : adm2 D) {K V : Type} [Field K] [CharZero K]
-    [AddCommGroup V] [Module K V] [FiniteDimensional K V] {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E)
-    (Inv : Module.End K V) (hInv : IsInvProj E Inv) (μ : Fin n → ℤ) (hμ : μ ≠ 0) (x : V)
-    (hx : x ∈ weightSp E μ) : Inv x = 0 := by
+theorem invariant_projection_kills_nonzero_weight
+    (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E)
+    (Inv : Module.End K V) (hInv : IsInvProj E Inv)
+    (μ : Fin n → ℤ) (hμ : μ ≠ 0)
+    (x : V) (hx : x ∈ weightSp E μ)
+    : Inv x = 0 := by
   obtain ⟨a, ha⟩ : ∃ a, μ a ≠ 0 := by
     by_contra h
     push Not at h
@@ -54,10 +64,15 @@ theorem invariant_projection_kills_nonzero_weight (D : Formalism.BasicNotions.D7
   rw [h3]
   exact invariant_projection_kills_operator D h2 E hE Inv hInv a a _
 
-theorem invariant_projection_through_zero_weight (D : Formalism.BasicNotions.D7) (h2 : adm2 D) {K V : Type} [Field K] [CharZero K]
-    [AddCommGroup V] [Module K V] [FiniteDimensional K V] {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E)
-    (Inv : Module.End K V) (hInv : IsInvProj E Inv) (Θ : (Fin n → ℤ) → Module.End K V)
-    (hΘ : ∀ μ ν, ∀ x ∈ weightSp E ν, Θ μ x = if ν = μ then x else 0) (x : V) : Inv x = Inv (Θ 0 x) := by
+theorem invariant_projection_through_zero_weight
+    (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E)
+    (Inv : Module.End K V) (hInv : IsInvProj E Inv)
+    (Θ : (Fin n → ℤ) → Module.End K V)
+    (hΘ : ∀ μ ν, ∀ x ∈ weightSp E ν, Θ μ x = if ν = μ then x else 0)
+    (x : V)
+    : Inv x = Inv (Θ 0 x) := by
   classical
   obtain ⟨m, hm⟩ := findim_weights_bounded E
   set box : Finset (Fin n → ℤ) := Fintype.piFinset fun _ => Finset.Icc (-(m : ℤ)) m with hbox
@@ -77,6 +92,7 @@ theorem invariant_projection_through_zero_weight (D : Formalism.BasicNotions.D7)
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finset.sum_eq_single_of_mem 0 h0]
   intro μ _ hμ
-  exact invariant_projection_kills_nonzero_weight D h2 E hE Inv hInv μ hμ _ (weight_projection_mem_weightSpace E hE Θ hΘ μ x)
+  exact invariant_projection_kills_nonzero_weight D h2 E hE Inv hInv μ hμ _
+    (weight_projection_mem_weightSpace E hE Θ hΘ μ x)
 
 end Formalism.MainNotions.G.GLWeightTheory

@@ -7,51 +7,82 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoeFn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
+  Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation
+  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory
+  NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.Mem.SRe
 
-theorem coeFn_sum_smul {α : Type} [MeasurableSpace α] {μ : Measure α} {ι : Type} [Fintype ι] (c : ι → ℂ)
-    (u : ι → Lp ℂ 2 μ) :
-    ((∑ i, c i • u i : Lp ℂ 2 μ) : α → ℂ) =ᵐ[μ] fun x => ∑ i, c i * (u i : α → ℂ) x := by
+theorem coeFn_sum_smul
+    {α : Type} [MeasurableSpace α]
+    {μ : Measure α} {ι : Type} [Fintype ι]
+    (c : ι → ℂ) (u : ι → Lp ℂ 2 μ)
+    : ((∑ i, c i • u i : Lp ℂ 2 μ) : α → ℂ) =ᵐ[μ] fun x => ∑ i, c i * (u i : α → ℂ) x := by
   first
   | exact @_root_.GlobalTheory.FinsetSumSmulCoe.main
   | exact _root_.GlobalTheory.FinsetSumSmulCoe.main
   | (apply _root_.GlobalTheory.FinsetSumSmulCoe.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.FinsetSumSmulCoe.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.FinsetSumSmulCoe.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.FinsetSumSmulCoe.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.FinsetSumSmulCoe.main ..)
 
-theorem sum_smul_apply {ι α : Type} [Fintype ι] (L : ι → (α → ℂ) →ₗ[ℂ] (α → ℂ)) (c : ι → ℂ) (φ : α → ℂ) (y : α) :
-    (∑ i, c i • L i) φ y = ∑ i, c i * L i φ y := by
+theorem sum_smul_apply
+    {ι α : Type} [Fintype ι] (L : ι → (α → ℂ) →ₗ[ℂ] (α → ℂ)) (c : ι → ℂ) (φ : α → ℂ) (y : α)
+    : (∑ i, c i • L i) φ y = ∑ i, c i * L i φ y := by
   rw [LinearMap.sum_apply, Finset.sum_apply]
   simp
 
-theorem iotaX_symm_rat {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (z : X.B.I.GA)
-    (hz : z ∈ X.B.I.GFset) : (iotaX X h).symm z ∈ GQ (D.sp.Y 0) := by
-  have aux : ∀ (I : Formalism.MainNotions.S.AutInst) (hI : I = Formalism.L2.SG.InstExistsPf.instOf D) (z : I.GA), z ∈ I.GFset →
-      ((Formalism.IndefR.RationalEmbedding.iota D).trans (castGA hI.symm)).symm z ∈ GQ (D.sp.Y 0) := by
+theorem iotaX_symm_rat
+    {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (z : X.B.I.GA)
+    (hz : z ∈ X.B.I.GFset)
+    : (iotaX X h).symm z ∈ GQ (D.sp.Y 0) := by
+  have aux
+      : ∀ (I : Formalism.MainNotions.S.AutInst) (hI : I = Formalism.L2.SG.InstExistsPf.instOf D)
+          (z : I.GA),
+        z ∈ I.GFset
+          → ((Formalism.IndefR.RationalEmbedding.iota D).trans (castGA hI.symm)).symm z
+            ∈ GQ (D.sp.Y 0) := by
     intro I hI z hz
     subst hI
-    have e : ((Formalism.IndefR.RationalEmbedding.iota D).trans (castGA (rfl : Formalism.L2.SG.InstExistsPf.instOf D = _).symm)).symm z =
-        (Formalism.IndefR.RationalEmbedding.iota D).symm z := rfl
+    have e
+        : ((Formalism.IndefR.RationalEmbedding.iota D).trans
+            (castGA (rfl : Formalism.L2.SG.InstExistsPf.instOf D = _).symm)).symm z
+          = (Formalism.IndefR.RationalEmbedding.iota D).symm z :=
+      rfl
     rw [e, Formalism.IndefR.RationalEmbedding.iota_rat, ContinuousMulEquiv.apply_symm_apply]
     exact hz
   exact aux X.B.I h z hz
 
-theorem ev_translate {D : D7} {G' : Type} [Group G'] [Fintype G'] {Pl0 T : Type} {A : FamIn D.what₂.LL G' Pl0 T D.R.m}
-    {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A) (X : HidaSetting D)
-    (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (t : GA D (D.sp.Y 0)) (v₀ : (MP R).Vec) (σ : G0g D.nd ≃* G')
-    (red : X.B.I.Gf → G0g D.nd) (hB : LevelMatchB R F X h t σ red) (S : MMap (MP R)) (hS : S ∈ MultR R F)
-    (k : X.B.I.Gf) (hk : k ∈ X.B.I.Kset) (x : X.B.I.GA) :
-    ev (MP R) v₀ S ((iotaX X h).symm (x * (1, k)) * t) =
-      actL (Yc D 0) (R.βY 0) (R.dat0 R.triv) (R.eG (σ (red k))) (S v₀) ((iotaX X h).symm x * t) := by
+theorem ev_translate
+    {D : D7} {G' : Type} [Group G'] [Fintype G']
+    {Pl0 T : Type} {A : FamIn D.what₂.LL G' Pl0 T D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    (R : RealDat D A Ks)
+    (F : Face D A)
+    (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D)
+    (t : GA D (D.sp.Y 0))
+    (v₀ : (MP R).Vec)
+    (σ : G0g D.nd ≃* G') (red : X.B.I.Gf → G0g D.nd) (hB : LevelMatchB R F X h t σ red)
+    (S : MMap (MP R)) (hS : S ∈ MultR R F)
+    (k : X.B.I.Gf) (hk : k ∈ X.B.I.Kset)
+    (x : X.B.I.GA)
+    : ev (MP R) v₀ S ((iotaX X h).symm (x * (1, k)) * t)
+      = actL (Yc D 0) (R.βY 0) (R.dat0 R.triv) (R.eG (σ (red k))) (S v₀)
+        ((iotaX X h).symm x * t) := by
   have hk' := hB.2 k hk S hS v₀ ((iotaX X h).symm x * t)
   refine Eq.trans ?_ hk'
-  have e : (iotaX X h).symm (x * (1, k)) * t = (iotaX X h).symm x * t * (show GA D (D.sp.Y 0) from kap X h t k) := by
+  have e
+      : (iotaX X h).symm (x * (1, k)) * t
+        = (iotaX X h).symm x * t * (show GA D (D.sp.Y 0) from kap X h t k) := by
     unfold kap
     rw [map_mul]
     group

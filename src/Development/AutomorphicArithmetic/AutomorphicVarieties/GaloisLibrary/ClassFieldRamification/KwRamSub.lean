@@ -10,8 +10,11 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.kwRamSub :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (L : IntermediateField ℚ Ω) [NumberField L] [IsAbelianGalois ℚ L] (M : ℕ), 0 < M → (∀ p : ℕ, p.Prime → ¬ p ∣ M → UnramAt L p) → ∃ (n : ℕ) (ζ : Ω), IsPrimitiveRoot ζ (M ^ n) ∧ L ≤ ℚ⟮ζ⟯ := by
+theorem UpperTheory.V.CF.kwRamSub
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (L : IntermediateField ℚ Ω)
+        [NumberField L] [IsAbelianGalois ℚ L] (M : ℕ),
+      0 < M → (∀ p : ℕ, p.Prime → ¬ p ∣ M → UnramAt L p)
+        → ∃ (n : ℕ) (ζ : Ω), IsPrimitiveRoot ζ (M ^ n) ∧ L ≤ ℚ⟮ζ⟯ := by
   intro Ω _ _ _ L _ _ M hM hram
   obtain ⟨n, ⟨g⟩⟩ := kwRam L M hM hram
   haveI : NeZero (M ^ n) := ⟨by positivity⟩
@@ -26,8 +29,7 @@ theorem UpperTheory.V.CF.kwRamSub :
     ⟨_, IsCyclotomicExtension.zeta_spec _ ℚ _⟩
   let ψ : CyclotomicField (M ^ n) ℚ →ₐ[ℚ] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨n, ψ ξ, hξ.map_of_injective ψ.injective, ?_⟩
   have hnorm : (ψ.comp g).fieldRange = L :=

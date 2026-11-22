@@ -10,9 +10,12 @@ open Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
 
 noncomputable section
 
-theorem volume_null_of_slice {I : Type*} [Fintype I] [DecidableEq I] (i0 : I) {S : Set (I → ℂ)}
-    (hS : MeasurableSet S) (huniq : ∀ v ∈ S, ∀ v' ∈ S, (∀ j, j ≠ i0 → v j = v' j) → v = v') :
-    volume S = 0 := by
+theorem volume_null_of_slice
+    {I : Type*} [Fintype I] [DecidableEq I]
+    (i0 : I)
+    {S : Set (I → ℂ)}
+    (hS : MeasurableSet S) (huniq : ∀ v ∈ S, ∀ v' ∈ S, (∀ j, j ≠ i0 → v j = v' j) → v = v')
+    : volume S = 0 := by
   classical
   let e := MeasurableEquiv.piEquivPiSubtypeProd (fun _ : I => ℂ) (fun j => j ≠ i0)
   have hmp : MeasurePreserving e (volume : Measure (I → ℂ))
@@ -68,8 +71,8 @@ lemma continuous_lminor (τ : ι) (i : Fin (r + 1)) : Continuous fun v : Ix ι r
   refine continuous_pi fun a => continuous_pi fun b => ?_
   exact continuous_apply _
 
-theorem volume_lminor_zero (τ : ι) :
-    ∀ k (h : k < r + 1), volume {v : Ix ι r → ℂ | lminor (Mt v τ) ⟨k, h⟩ = 0} = 0 := by
+theorem volume_lminor_zero (τ : ι)
+    : ∀ k (h : k < r + 1), volume {v : Ix ι r → ℂ | lminor (Mt v τ) ⟨k, h⟩ = 0} = 0 := by
   intro k
   induction k with
   | zero =>
@@ -84,15 +87,22 @@ theorem volume_lminor_zero (τ : ι) :
     have hkr : k < r := by omega
     have hl : (Fin.castLE (Nat.le_of_lt_succ h) (Fin.last k) : Fin r) = ⟨k, hkr⟩ :=
       Fin.ext (by simp)
-    have key : ∀ w : Ix ι r → ℂ, lminor (Mt w τ) ⟨k, hk⟩ =
-        (((Mt w τ).submatrix (Fin.castLE (Nat.le_of_lt_succ h)) (Fin.castLE (Nat.le_of_lt_succ h))).submatrix
-          Fin.castSucc Fin.castSucc).det := fun w => rfl
-    have hmeas : MeasurableSet {v : Ix ι r → ℂ |
-        lminor (Mt v τ) ⟨k + 1, h⟩ = 0 ∧ lminor (Mt v τ) ⟨k, hk⟩ ≠ 0} :=
+    have key
+        : ∀ w : Ix ι r → ℂ,
+          lminor (Mt w τ) ⟨k, hk⟩
+            = (((Mt w τ).submatrix (Fin.castLE (Nat.le_of_lt_succ h))
+              (Fin.castLE (Nat.le_of_lt_succ h))).submatrix Fin.castSucc Fin.castSucc).det :=
+      fun w => rfl
+    have hmeas : MeasurableSet
+        {v : Ix ι r → ℂ |
+          lminor (Mt v τ) ⟨k + 1, h⟩ = 0 ∧ lminor (Mt v τ) ⟨k, hk⟩ ≠ 0} :=
       (isClosed_eq (continuous_lminor τ _) continuous_const).measurableSet.inter
         (isClosed_eq (continuous_lminor τ _) continuous_const).isOpen_compl.measurableSet
-    refine measure_mono_null (t := {v : Ix ι r → ℂ | lminor (Mt v τ) ⟨k, hk⟩ = 0} ∪
-      {v : Ix ι r → ℂ | lminor (Mt v τ) ⟨k + 1, h⟩ = 0 ∧ lminor (Mt v τ) ⟨k, hk⟩ ≠ 0}) ?_ ?_
+    refine measure_mono_null
+      (t :=
+        {v : Ix ι r → ℂ | lminor (Mt v τ) ⟨k, hk⟩ = 0}
+          ∪ {v : Ix ι r → ℂ | lminor (Mt v τ) ⟨k + 1, h⟩ = 0 ∧ lminor (Mt v τ) ⟨k, hk⟩ ≠ 0})
+      ?_ ?_
     · intro v hv
       by_cases h0 : lminor (Mt v τ) ⟨k, hk⟩ = 0
       · exact Or.inl h0
@@ -100,14 +110,15 @@ theorem volume_lminor_zero (τ : ι) :
     refine measure_union_null (ih hk) ?_
     refine volume_null_of_slice (τ, ⟨k, hkr⟩, ⟨k, hkr⟩) hmeas ?_
     intro v hv v' hv' hagree
-    have dd := det_diff_last
-      ((Mt v τ).submatrix (Fin.castLE (Nat.le_of_lt_succ h)) (Fin.castLE (Nat.le_of_lt_succ h)))
-      ((Mt v' τ).submatrix (Fin.castLE (Nat.le_of_lt_succ h)) (Fin.castLE (Nat.le_of_lt_succ h)))
-      (by
-        intro a b hab
-        refine hagree _ fun heq => hab ?_
-        simp only [Prod.mk.injEq, Fin.ext_iff, Fin.coe_castLE] at heq
-        exact ⟨Fin.ext (by simp [heq.2.1]), Fin.ext (by simp [heq.2.2])⟩)
+    have dd :=
+      det_diff_last
+        ((Mt v τ).submatrix (Fin.castLE (Nat.le_of_lt_succ h)) (Fin.castLE (Nat.le_of_lt_succ h)))
+        ((Mt v' τ).submatrix (Fin.castLE (Nat.le_of_lt_succ h)) (Fin.castLE (Nat.le_of_lt_succ h)))
+        (by
+          intro a b hab
+          refine hagree _ fun heq => hab ?_
+          simp only [Prod.mk.injEq, Fin.ext_iff, Fin.coe_castLE] at heq
+          exact ⟨Fin.ext (by simp [heq.2.1]), Fin.ext (by simp [heq.2.2])⟩)
     have h1 : lminor (Mt v τ) ⟨k + 1, h⟩ = 0 := hv.1
     have h2 : lminor (Mt v' τ) ⟨k + 1, h⟩ = 0 := hv'.1
     have hm : lminor (Mt v τ) ⟨k, hk⟩ ≠ 0 := hv.2

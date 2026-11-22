@@ -9,7 +9,8 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -65,15 +66,19 @@ theorem st1a : St1a := by
     | succ i ih =>
       have h := hstep _ ih
       rwa [← pow_mul, ← pow_succ] at h
-  obtain ⟨a, b, hab, heq⟩ := Set.Finite.exists_lt_map_eq_of_forall_mem
-    (f := fun i : ℕ => z0 ^ q ^ i) (t := {μ | M.HasEigenvalue μ}) (fun i => hall i) hfin
+  obtain ⟨a, b, hab, heq⟩ :=
+    Set.Finite.exists_lt_map_eq_of_forall_mem
+      (f := fun i : ℕ => z0 ^ q ^ i)
+      (t := {μ | M.HasEigenvalue μ})
+      (fun i => hall i)
+      hfin
   have hzE : M.HasEigenvalue (z0 ^ q ^ a) := hall a
   have hper : (z0 ^ q ^ a) ^ q ^ (b - a) = z0 ^ q ^ a := by
     rw [pow_pow_pow_add, show a + (b - a) = b by omega, ← heq]
   generalize z0 ^ q ^ a = z at hzE hper
   have hP : ∃ e : ℕ, 0 < e ∧ z ^ q ^ e = z := ⟨b - a, by omega, hper⟩
-  obtain ⟨d, ⟨hd0, hzd⟩, hdmin⟩ : ∃ d : ℕ, (0 < d ∧ z ^ q ^ d = z) ∧
-      ∀ e < d, ¬ (0 < e ∧ z ^ q ^ e = z) :=
+  obtain ⟨d, ⟨hd0, hzd⟩, hdmin⟩
+      : ∃ d : ℕ, (0 < d ∧ z ^ q ^ d = z) ∧ ∀ e < d, ¬(0 < e ∧ z ^ q ^ e = z) :=
     ⟨Nat.find hP, Nat.find_spec hP, fun e he => Nat.find_min hP he⟩
 
   have hmaps : ∀ x ∈ M.eigenspace z, (G ^ d) x ∈ M.eigenspace z := by
@@ -105,7 +110,9 @@ theorem st1a : St1a := by
   have key : ∀ i j : ℕ, i < j → j < d → z ^ q ^ i = z ^ q ^ j → False := by
     intro i j hij hjd hij'
     have h1 : z ^ q ^ (j - i) = z := by
-      calc z ^ q ^ (j - i) = (z ^ q ^ d) ^ q ^ (j - i) := by rw [hzd]
+      calc
+        z ^ q ^ (j - i)
+          = (z ^ q ^ d) ^ q ^ (j - i) := by rw [hzd]
         _ = (z ^ q ^ j) ^ q ^ (d - i) := by
           rw [pow_pow_pow_add, pow_pow_pow_add, show j + (d - i) = d + (j - i) by omega]
         _ = (z ^ q ^ i) ^ q ^ (d - i) := by rw [hij']
@@ -120,7 +127,9 @@ theorem st1a : St1a := by
     · exact Fin.ext h
     · exact (key j i h i.2 hij.symm).elim
   have hli : LinearIndependent ℂ bb :=
-    Module.End.eigenvectors_linearIndependent' M (fun i : Fin d => z ^ q ^ (i : ℕ)) hinj bb
+    Module.End.eigenvectors_linearIndependent' M
+      (fun i : Fin d => z ^ q ^ (i : ℕ))
+      hinj bb
       (fun i => ⟨Module.End.mem_eigenspace_iff.mpr (hb_eig i), hb_ne i⟩)
   set W : Submodule ℂ V := Submodule.span ℂ (Set.range bb) with hW_def
   have hvW : v ∈ W := Submodule.subset_span ⟨⟨0, hd0⟩, by simp [bb]⟩

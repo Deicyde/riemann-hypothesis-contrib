@@ -16,12 +16,15 @@ def p1 (π : R ≃+* k × k) : R →+* k := (RingHom.fst k k).comp π.toRingHom
 
 def p2 (π : R ≃+* k × k) : R →+* k := (RingHom.snd k k).comp π.toRingHom
 
-theorem ext_p (π : R ≃+* k × k) {r s : R} (h1 : p1 π r = p1 π s) (h2 : p2 π r = p2 π s) : r = s := by
+theorem ext_p (π : R ≃+* k × k) {r s : R} (h1 : p1 π r = p1 π s) (h2 : p2 π r = p2 π s)
+    : r = s := by
   apply π.injective
   exact Prod.ext h1 h2
 
-theorem mat_ext_p (π : R ≃+* k × k) {M N : Matrix n n R} (h1 : M.map (p1 π) = N.map (p1 π))
-    (h2 : M.map (p2 π) = N.map (p2 π)) : M = N := by
+theorem mat_ext_p
+    (π : R ≃+* k × k)
+    {M N : Matrix n n R} (h1 : M.map (p1 π) = N.map (p1 π)) (h2 : M.map (p2 π) = N.map (p2 π))
+    : M = N := by
   ext i j
   exact ext_p π (congrFun (congrFun h1 i) j) (congrFun (congrFun h2 i) j)
 
@@ -38,21 +41,27 @@ theorem snd_conj (r : R) : p2 π (σ r) = p1 π r := by
   rw [hπ]
   rfl
 
-theorem map_conjTranspose_fst (M : Matrix n n R) : (Formalism.UG.cT σ M).map (p1 π) = (M.map (p2 π))ᵀ := by
+theorem map_conjTranspose_fst (M : Matrix n n R)
+    : (Formalism.UG.cT σ M).map (p1 π) = (M.map (p2 π))ᵀ := by
   ext i j
   exact p1_sigma_eq_p2 σ π hπ (M j i)
 
-theorem map_conjTranspose_snd (M : Matrix n n R) : (Formalism.UG.cT σ M).map (p2 π) = (M.map (p1 π))ᵀ := by
+theorem map_conjTranspose_snd (M : Matrix n n R)
+    : (Formalism.UG.cT σ M).map (p2 π) = (M.map (p1 π))ᵀ := by
   ext i j
   exact snd_conj σ π hπ (M j i)
 
-theorem unitary_iff (J M : Matrix n n R) :
-    Formalism.UG.cT σ M * J * M = J ↔
-      (M.map (p2 π))ᵀ * J.map (p1 π) * M.map (p1 π) = J.map (p1 π) ∧
-      (M.map (p1 π))ᵀ * J.map (p2 π) * M.map (p2 π) = J.map (p2 π) := by
-  have e1 : (Formalism.UG.cT σ M * J * M).map (p1 π) = (M.map (p2 π))ᵀ * J.map (p1 π) * M.map (p1 π) := by
+theorem unitary_iff (J M : Matrix n n R)
+    : Formalism.UG.cT σ M * J * M = J
+      ↔ (M.map (p2 π))ᵀ * J.map (p1 π) * M.map (p1 π) = J.map (p1 π)
+        ∧ (M.map (p1 π))ᵀ * J.map (p2 π) * M.map (p2 π) = J.map (p2 π) := by
+  have e1
+      : (Formalism.UG.cT σ M * J * M).map (p1 π)
+        = (M.map (p2 π))ᵀ * J.map (p1 π) * M.map (p1 π) := by
     rw [Matrix.map_mul, Matrix.map_mul, map_conjTranspose_fst σ π hπ]
-  have e2 : (Formalism.UG.cT σ M * J * M).map (p2 π) = (M.map (p1 π))ᵀ * J.map (p2 π) * M.map (p2 π) := by
+  have e2
+      : (Formalism.UG.cT σ M * J * M).map (p2 π)
+        = (M.map (p1 π))ᵀ * J.map (p2 π) * M.map (p2 π) := by
     rw [Matrix.map_mul, Matrix.map_mul, map_conjTranspose_snd σ π hπ]
   constructor
   · intro h
@@ -61,40 +70,49 @@ theorem unitary_iff (J M : Matrix n n R) :
   · rintro ⟨h1, h2⟩
     exact mat_ext_p π (by rw [e1, h1]) (by rw [e2, h2])
 
-theorem hermitian_map_snd (J : Matrix n n R) (hJ : Formalism.UG.cT σ J = J) : J.map (p2 π) = (J.map (p1 π))ᵀ := by
+theorem hermitian_map_snd (J : Matrix n n R) (hJ : Formalism.UG.cT σ J = J)
+    : J.map (p2 π) = (J.map (p1 π))ᵀ := by
   have h := map_conjTranspose_fst σ π hπ J
   rw [hJ] at h
   rw [h, Matrix.transpose_transpose]
 
-
 omit hπ in
 def proj (J : Matrix n n R) : Formalism.UG.UJ σ J →* GL n k :=
-  (Units.map ((p1 π).mapMatrix : Matrix n n R →+* Matrix n n k).toMonoidHom).comp (Formalism.UG.UJ σ J).subtype
+  (Units.map ((p1 π).mapMatrix : Matrix n n R →+* Matrix n n k).toMonoidHom).comp
+    (Formalism.UG.UJ σ J).subtype
 
-theorem proj_bijective (J : Matrix n n R) (hJ : Formalism.UG.cT σ J = J) (hdet : IsUnit J.det) :
-    Function.Bijective (proj σ π J) := by
+theorem proj_bijective (J : Matrix n n R) (hJ : Formalism.UG.cT σ J = J) (hdet : IsUnit J.det)
+    : Function.Bijective (proj σ π J) := by
   have hJ1 : IsUnit (J.map (p1 π)).det := by
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact hdet.map _
-  have hunit : ∀ x : Formalism.UG.UJ σ J,
-      (((x : GL n R) : Matrix n n R).map (p2 π))ᵀ * J.map (p1 π) * ((x : GL n R) : Matrix n n R).map (p1 π) =
-        J.map (p1 π) :=
-    fun x => ((unitary_iff σ π hπ J ((x : GL n R) : Matrix n n R)).1 x.2).1
-  have hinv1 : ∀ x : GL n R,
-      (x : Matrix n n R).map (p1 π) * ((x⁻¹ : GL n R) : Matrix n n R).map (p1 π) = 1 := by
+  have hunit
+      : ∀ x : Formalism.UG.UJ σ J,
+        (((x : GL n R) : Matrix n n R).map (p2 π))ᵀ * J.map (p1 π)
+            * ((x : GL n R) : Matrix n n R).map (p1 π)
+          = J.map (p1 π) := fun x =>
+    ((unitary_iff σ π hπ J ((x : GL n R) : Matrix n n R)).1 x.2).1
+  have hinv1
+      : ∀ x : GL n R,
+        (x : Matrix n n R).map (p1 π) * ((x⁻¹ : GL n R) : Matrix n n R).map (p1 π) = 1 := by
     intro x
     rw [← Matrix.map_mul, Units.mul_inv, Matrix.map_one _ (map_zero _) (map_one _)]
   constructor
   · intro g h hgh
     have h1 : ((g : GL n R) : Matrix n n R).map (p1 π) = ((h : GL n R) : Matrix n n R).map (p1 π) :=
       congrArg (fun u : GL n k => (u : Matrix n n k)) hgh
-    have h2 : ((g : GL n R) : Matrix n n R).map (p2 π) = ((h : GL n R) : Matrix n n R).map (p2 π) := by
+    have h2
+        : ((g : GL n R) : Matrix n n R).map (p2 π) = ((h : GL n R) : Matrix n n R).map (p2 π) := by
       have hg := hunit g
       have hh := hunit h
       rw [h1] at hg
-      have e : (((g : GL n R) : Matrix n n R).map (p2 π))ᵀ * J.map (p1 π) =
-          (((h : GL n R) : Matrix n n R).map (p2 π))ᵀ * J.map (p1 π) := by
-        have := congrArg (fun X => X * (((h : GL n R)⁻¹ : GL n R) : Matrix n n R).map (p1 π)) (hg.trans hh.symm)
+      have e
+          : (((g : GL n R) : Matrix n n R).map (p2 π))ᵀ * J.map (p1 π)
+            = (((h : GL n R) : Matrix n n R).map (p2 π))ᵀ * J.map (p1 π) := by
+        have :=
+          congrArg
+            (fun X => X * (((h : GL n R)⁻¹ : GL n R) : Matrix n n R).map (p1 π))
+            (hg.trans hh.symm)
         simp only [Matrix.mul_assoc, hinv1, Matrix.mul_one] at this
         simpa only [Matrix.mul_assoc] using this
       have e' := congrArg (fun X => X * (J.map (p1 π))⁻¹) e
@@ -121,7 +139,9 @@ theorem proj_bijective (J : Matrix n n R) (hJ : Formalism.UG.cT σ J = J) (hdet 
       rw [unitary_iff σ π hπ J M, hM1, hM2, hermitian_map_snd σ π hπ J hJ]
       refine ⟨key, ?_⟩
       have := congrArg Matrix.transpose key
-      rw [Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose, ← Matrix.mul_assoc] at this
+      rw [Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose,
+          ← Matrix.mul_assoc]
+        at this
       exact this
     have hdetM : IsUnit M.det := by
       have h := congrArg Matrix.det hU

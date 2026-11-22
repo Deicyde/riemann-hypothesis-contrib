@@ -11,8 +11,10 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af
+  UpperTheory.V.Base
 open scoped Matrix
 namespace UpperTheory.V.Sd
 section Sym
@@ -26,8 +28,11 @@ section Gal
 variable {Ω : Type} [Field Ω] {l : ℕ} [Fact l.Prime] {n : ℕ}
 variable {F : Type} [Field F] [NumberField F] [Algebra F Ω]
 variable [CharZero Ω] [IsAlgClosure ℚ Ω]
-structure IsSeedAlt {L : Type} [Field L] [NumberField L] [IsCMField L] [Algebra L Ω] (ι : Qbar l ≃+* ℂ) (c : G ℚ Ω)
-    (ψ τ : Fin n → G L Ω →* (Qbar l)ˣ) (m : Fin n → ℤ) (ka : G L Ω →* (Qbar l)ˣ) (r : G L Ω →* GL (Fin n) (Qbar l)) : Prop where
+structure IsSeedAlt
+    {L : Type} [Field L] [NumberField L] [IsCMField L] [Algebra L Ω]
+    (ι : Qbar l ≃+* ℂ) (c : G ℚ Ω) (ψ τ : Fin n → G L Ω →* (Qbar l)ˣ) (m : Fin n → ℤ)
+    (ka : G L Ω →* (Qbar l)ˣ) (r : G L Ω →* GL (Fin n) (Qbar l))
+    : Prop where
   cont : Continuous r
   irr : IsIrr r
   pair : ∃ P : GL (Fin n) (Qbar l), (P : Matrix (Fin n) (Fin n) (Qbar l))ᵀ = P ∧ IsPair c r 1 P

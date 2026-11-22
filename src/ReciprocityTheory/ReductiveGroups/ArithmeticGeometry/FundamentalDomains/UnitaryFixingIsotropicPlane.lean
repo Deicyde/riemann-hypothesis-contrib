@@ -14,38 +14,48 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
 
-theorem unitary_fixing_isotropic_plane (r : ℕ) (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
-    (f : X.Ψ → Fin (r - 2) → Fin r → ℂ) (h1 : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (δ : ℝ)
+theorem unitary_fixing_isotropic_plane
+    (r : ℕ) (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
+    (f : X.Ψ → Fin (r - 2) → Fin r → ℂ) (h1 : X.Ψ → Matrix (Fin r) (Fin r) ℂ)
+    (δ : ℝ)
     (hξ : X.IsIso ξ) (hz : z0 ∈ X.dom) (hx0 : x0 ∈ X.dom) (hortho : X.IsOrtho x0)
     (hflag : X.SameFlag z0 x0) (hf : X.UBasis z0 ξ f) (hδ : 0 ≤ δ) (hU : X.IsUnitaryC h1)
-    (hI : ∀ s t : X.Ψ → ℂ, X.applyV h1 (X.lineV ξ s + X.Jz z0 (X.lineV ξ t)) =
-      X.lineV ξ s + X.Jz z0 (X.lineV ξ t))
+    (hI : ∀ s t : X.Ψ → ℂ,
+      X.applyV h1 (X.lineV ξ s + X.Jz z0 (X.lineV ξ t)) = X.lineV ξ s + X.Jz z0 (X.lineV ξ t))
     (hUz : ∀ u ∈ X.Uz z0 ξ, X.applyV h1 u ∈ X.Uz z0 ξ)
-    (hgraph : ∀ τ (v : Fin r → ℂ), v ∈ Submodule.span ℂ (f τ '' {k | (k : ℕ) < X.p0 - 1}) →
-      ∀ c : Fin (r - 2) → ℂ, (h1 τ) *ᵥ v = ∑ k, c k • f τ k →
-        (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖c k‖ ^ 2) ≤
-          δ ^ 2 * ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖c k‖ ^ 2 else 0) :
-    ∃ Z1 : X.Coord, X.SameFlag (X.lmulC h1 z0) (X.xZ x0 Z1) ∧ X.zN Z1 ≤ δ := by
+    (hgraph : ∀ τ (v : Fin r → ℂ),
+      v ∈ Submodule.span ℂ (f τ '' {k | (k : ℕ) < X.p0 - 1})
+        → ∀ c : Fin (r - 2) → ℂ,
+          (h1 τ) *ᵥ v = ∑ k, c k • f τ k
+            → (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖c k‖ ^ 2)
+              ≤ δ ^ 2 * ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖c k‖ ^ 2 else 0)
+    : ∃ Z1 : X.Coord, X.SameFlag (X.lmulC h1 z0) (X.xZ x0 Z1) ∧ X.zN Z1 ≤ δ := by
   classical
   have hdetOf : ∀ x ∈ X.dom, ∀ τ, (mat x τ).det ≠ 0 := by
     intro x hx τ
     simp only [Data.dom, GG, Set.mem_setOf_eq] at hx
     exact (hx τ).1
-  have hcolLI : ∀ x ∈ X.dom, ∀ τ,
-      LinearIndependent ℂ (fun b : Fin X.p0 => col (mat x τ) (Fin.castLE X.p0_le b)) := by
+  have hcolLI
+      : ∀ x ∈ X.dom, ∀ τ,
+        LinearIndependent ℂ (fun b : Fin X.p0 => col (mat x τ) (Fin.castLE X.p0_le b)) := by
     intro x hx τ
     have hu : IsUnit (mat x τ) := (Matrix.isUnit_iff_isUnit_det _).mpr (Ne.isUnit (hdetOf x hx τ))
     exact (Matrix.linearIndependent_cols_iff_isUnit.mpr hu).comp (Fin.castLE X.p0_le)
       (Fin.castLE_injective _)
-  have hineq : ∀ τ (u : Fin X.p0 → ℂ),
-      ∑ a, ‖(LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ *ᵥ u) a‖ ^ 2 ≤
-        δ ^ 2 * ∑ b', ‖(LowerBlockMatrices.Amat X.toData h1 z0 x0 τ *ᵥ u) b'‖ ^ 2 := by
+  have hineq
+      : ∀ τ (u : Fin X.p0 → ℂ),
+        ∑ a, ‖(LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ *ᵥ u) a‖ ^ 2
+          ≤ δ ^ 2 * ∑ b', ‖(LowerBlockMatrices.Amat X.toData h1 z0 x0 τ *ᵥ u) b'‖ ^ 2 := by
     intro τ u
-    have hv : (∑ b, u b • col (mat z0 τ) (Fin.castLE X.p0_le b)) ∈ PositiveSpanMatrices.Spos X.toData z0 τ :=
+    have hv
+        : (∑ b, u b • col (mat z0 τ) (Fin.castLE X.p0_le b))
+          ∈ PositiveSpanMatrices.Spos X.toData z0 τ :=
       Submodule.sum_mem _ (fun b _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩))
-    have k := BlockIdentityExpansion.key X ξ z0 x0 f h1 δ hz hx0 hortho hflag hf hI hUz hgraph τ _ hv
+    have k :=
+      BlockIdentityExpansion.key X ξ z0 x0 f h1 δ hz hx0 hortho hflag hf hI hUz hgraph τ _ hv
     rw [← LowerBlockMatrices.yvec_eq (X := X.toData), LowerBlockMatrices.Neg_eq (X := X.toData),
-      LowerBlockMatrices.Pos_eq (X := X.toData)] at k
+        LowerBlockMatrices.Pos_eq (X := X.toData)]
+      at k
     exact k
   have hAdet : ∀ τ, (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ).det ≠ 0 := by
     intro τ
@@ -65,10 +75,8 @@ theorem unitary_fixing_isotropic_plane (r : ℕ) (X : DataX E r) (ξ : Fin r →
       le_antisymm hNle (PositiveSpanMatrices.Neg_nonneg (X := X.toData) x0 τ y)
     have hy0 : y = 0 :=
       PositiveSpanMatrices.eq_zero_of_Pos_Neg (X := X.toData) hortho τ (hdetOf x0 hx0 τ) y hP hN
-    have hyv : y = h1 τ *ᵥ v := by
-      rw [hydef, hvdef, LowerBlockMatrices.yvec_eq (X := X.toData)]
-    have hvv : hermC τ.1 X.Gm v v = 0 := by
-      rw [← hU τ v v, ← hyv, hy0, hermC_zero_left]
+    have hyv : y = h1 τ *ᵥ v := by rw [hydef, hvdef, LowerBlockMatrices.yvec_eq (X := X.toData)]
+    have hvv : hermC τ.1 X.Gm v v = 0 := by rw [← hU τ v v, ← hyv, hy0, hermC_zero_left]
     have hvx0 : v ∈ PositiveSpanMatrices.Spos X.toData x0 τ := by
       have hv : v ∈ PositiveSpanMatrices.Spos X.toData z0 τ :=
         Submodule.sum_mem _ (fun b _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩))
@@ -81,24 +89,33 @@ theorem unitary_fixing_isotropic_plane (r : ℕ) (X : DataX E r) (ξ : Fin r →
     funext b
     exact Fintype.linearIndependent_iff.mp (hcolLI z0 hz τ) u hv0 b
   let Z1 : X.Coord := fun τ =>
-    (LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ * (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ)⁻¹ :
-      Matrix (Fin (r - X.p0)) (Fin X.p0) ℂ)
+    (LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ * (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ)⁻¹
+      : Matrix (Fin (r - X.p0)) (Fin X.p0) ℂ)
   refine ⟨Z1, ?_, ?_⟩
   · intro τ
     have hA := hAdet τ
-    refine PositiveSpanMatrices.span_eq_of_mat _ _ (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ) hA (fun b => ?_)
-    have hZA : ∀ a, ∑ b', Z1 τ a b' * LowerBlockMatrices.Amat X.toData h1 z0 x0 τ b' b =
-        LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ a b := by
+    refine PositiveSpanMatrices.span_eq_of_mat _ _ (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ) hA
+      (fun b => ?_)
+    have hZA
+        : ∀ a,
+          ∑ b', Z1 τ a b' * LowerBlockMatrices.Amat X.toData h1 z0 x0 τ b' b
+            = LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ a b := by
       intro a
-      have h := congrFun (congrFun (Matrix.nonsing_inv_mul_cancel_right
-        (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ) (LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ)
-        ((Matrix.isUnit_iff_isUnit_det _).mp ((Matrix.isUnit_iff_isUnit_det _).mpr (Ne.isUnit hA)))) a) b
+      have h :=
+        congrFun
+          (congrFun
+            (Matrix.nonsing_inv_mul_cancel_right (LowerBlockMatrices.Amat X.toData h1 z0 x0 τ)
+              (LowerBlockMatrices.Bmat X.toData h1 z0 x0 τ)
+              ((Matrix.isUnit_iff_isUnit_det _).mp
+                ((Matrix.isUnit_iff_isUnit_det _).mpr (Ne.isUnit hA))))
+            a)
+          b
       rw [Matrix.mul_apply] at h
       exact h
     show col (h1 τ * mat z0 τ) (Fin.castLE X.p0_le b) = _
     rw [LowerBlockMatrices.colW_expand (X := X.toData) h1 z0 hortho τ (hdetOf x0 hx0 τ) b]
-    simp only [LowerBlockMatrices.colZ (X := X.toData), smul_add, Finset.sum_add_distrib, Finset.smul_sum,
-      smul_smul]
+    simp only [LowerBlockMatrices.colZ (X := X.toData), smul_add, Finset.sum_add_distrib,
+      Finset.smul_sum, smul_smul]
     congr 1
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun a _ => ?_)
@@ -124,11 +141,14 @@ theorem unitary_fixing_isotropic_plane (r : ℕ) (X : DataX E r) (ξ : Fin r →
     rw [hAu] at k
     have hpos : 0 < ∑ j, ‖v j‖ ^ 2 := by
       obtain ⟨j, hj⟩ := Function.ne_iff.mp hv
-      exact Finset.sum_pos' (fun _ _ => by positivity) ⟨j, Finset.mem_univ _, pow_pos (norm_pos_iff.mpr hj) 2⟩
+      exact Finset.sum_pos'
+        (fun _ _ => by positivity)
+        ⟨j, Finset.mem_univ _, pow_pos (norm_pos_iff.mpr hj) 2⟩
     rw [div_le_iff₀ (Real.sqrt_pos.mpr hpos)]
-    calc Real.sqrt (∑ i, ‖(B *ᵥ u) i‖ ^ 2) ≤ Real.sqrt (δ ^ 2 * ∑ j, ‖v j‖ ^ 2) := Real.sqrt_le_sqrt k
-      _ = δ * Real.sqrt (∑ j, ‖v j‖ ^ 2) := by
-        rw [Real.sqrt_mul (sq_nonneg δ), Real.sqrt_sq hδ]
+    calc
+      Real.sqrt (∑ i, ‖(B *ᵥ u) i‖ ^ 2)
+        ≤ Real.sqrt (δ ^ 2 * ∑ j, ‖v j‖ ^ 2) := Real.sqrt_le_sqrt k
+      _ = δ * Real.sqrt (∑ j, ‖v j‖ ^ 2) := by rw [Real.sqrt_mul (sq_nonneg δ), Real.sqrt_sq hδ]
 
 end
 

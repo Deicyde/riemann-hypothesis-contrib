@@ -8,7 +8,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,20 +20,23 @@ namespace GlobalTheory.GroupPointsBX
 
 variable {R₀ : Type} [CommRing R₀]
 
-theorem spMap_algHom_id (P : Type) [CommRing P] [Algebra R₀ P] :
-    spMap (AlgHom.id R₀ P) = 𝟙 (sp (R₀ := R₀) P) := by
+theorem spMap_algHom_id (P : Type) [CommRing P] [Algebra R₀ P]
+    : spMap (AlgHom.id R₀ P) = 𝟙 (sp (R₀ := R₀) P) := by
   apply Over.OverMorphism.ext
   simp only [spMap_left, Over.id_left]
   exact Spec.map_id _
 
-theorem exists_lift (X : Over (Spec (CommRingCat.of R₀))) [Smooth X.hom]
+theorem exists_lift
+    (X : Over (Spec (CommRingCat.of R₀))) [Smooth X.hom]
     {B C : Type} [CommRing B] [Algebra R₀ B] [CommRing C] [Algebra R₀ C] [IsLocalRing C]
     (π : B →ₐ[R₀] C) (hπ : Function.Surjective π) (hk : IsNilpotent (RingHom.ker π))
-    (z : sp (R₀ := R₀) C ⟶ X) : ∃ y : sp (R₀ := R₀) B ⟶ X, spMap π ≫ y = z := by
+    (z : sp (R₀ := R₀) C ⟶ X)
+    : ∃ y : sp (R₀ := R₀) B ⟶ X, spMap π ≫ y = z := by
   let x₀ : Spec (CommRingCat.of C) ⟶ X.left := z.left
   have hw : x₀ ≫ X.hom = Spec.map (CommRingCat.ofHom (algebraMap R₀ C)) := Over.w z
-  obtain ⟨_, ⟨V, hV : IsAffineOpen V, rfl⟩, hxV, -⟩ := X.left.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (x₀ (closedPoint C))) isOpen_univ
+  obtain ⟨_, ⟨V, hV : IsAffineOpen V, rfl⟩, hxV, -⟩ :=
+    X.left.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (x₀ (closedPoint C)))
+      isOpen_univ
   have hx : Set.range x₀ ⊆ Set.range hV.fromSpec := by
     rw [hV.range_fromSpec]
     rintro _ ⟨y, rfl⟩
@@ -58,8 +63,9 @@ theorem exists_lift (X : Over (Spec (CommRingCat.of R₀))) [Smooth X.hom]
     ext r
     exact ψ.commutes r
   · apply Over.OverMorphism.ext
-    change Spec.map (CommRingCat.ofHom π.toRingHom) ≫
-      Spec.map (CommRingCat.ofHom ψ.toRingHom) ≫ hV.fromSpec = x₀
+    change Spec.map (CommRingCat.ofHom π.toRingHom) ≫ Spec.map (CommRingCat.ofHom ψ.toRingHom)
+        ≫ hV.fromSpec
+      = x₀
     rw [← hφ', ← Category.assoc, ← Spec.map_comp]
     congr 2
     ext a
@@ -69,44 +75,54 @@ section
 
 variable (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G]
 
-structure Coord (g : ℕ)
-    (x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G)) :
-    Prop where
+structure Coord
+    (g : ℕ) (x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G))
+    : Prop where
   zero : ∀ (S : Type) [CommRing S] [Algebra R₀ S], x S 0 = 1
-  nat : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
-    (φ : S →ₐ[R₀] S') (a : Fin g → S),
-    (∀ i, IsNilpotent (a i)) → spMap φ ≫ x S a = x S' (fun i => φ (a i))
-  inj : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a b : Fin g → S), (∀ i, IsNilpotent (a i)) →
-    (∀ i, IsNilpotent (b i)) → x S a = x S b → a = b
-  ker : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
-    (ρ : S →ₐ[R₀] S'), Function.Surjective ρ → (∀ a ∈ RingHom.ker ρ, IsNilpotent a) →
-    ∀ z : sp (R₀ := R₀) S ⟶ G, spMap ρ ≫ z = 1 →
-    ∃ a : Fin g → S, (∀ i, a i ∈ RingHom.ker ρ) ∧ z = x S a
+  nat
+    : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
+        (φ : S →ₐ[R₀] S') (a : Fin g → S),
+      (∀ i, IsNilpotent (a i)) → spMap φ ≫ x S a = x S' (fun i => φ (a i))
+  inj
+    : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a b : Fin g → S),
+      (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i)) → x S a = x S b → a = b
+  ker
+    : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
+        (ρ : S →ₐ[R₀] S'),
+      Function.Surjective ρ → (∀ a ∈ RingHom.ker ρ, IsNilpotent a)
+        → ∀ z : sp (R₀ := R₀) S ⟶ G,
+          spMap ρ ≫ z = 1 → ∃ a : Fin g → S, (∀ i, a i ∈ RingHom.ker ρ) ∧ z = x S a
 
-variable {G} {g : ℕ}
-  {x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G)}
-
+variable
+  {G} {g : ℕ} {x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G)}
 
 open TrivSqZeroExt in
-theorem Coord.mul_inr (h : Coord G g x) {K : Type} [AddCommGroup K] [Module R₀ K]
-    [Module R₀ᵐᵒᵖ K] [IsCentralScalar R₀ K] (a b : Fin g → K) :
-    x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (a i, 0)) *
-      x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (0, b i)) =
-      x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (a i, b i)) := by
-  have nil : ∀ {M : Type} [AddCommGroup M] [Module R₀ M] [Module R₀ᵐᵒᵖ M] [IsCentralScalar R₀ M]
-      (m : M), IsNilpotent (inr m : TrivSqZeroExt R₀ M) := fun m =>
+theorem Coord.mul_inr
+    (h : Coord G g x)
+    {K : Type} [AddCommGroup K] [Module R₀ K] [Module R₀ᵐᵒᵖ K] [IsCentralScalar R₀ K]
+    (a b : Fin g → K)
+    : x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (a i, 0))
+        * x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (0, b i))
+      = x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (a i, b i)) := by
+  have nil
+      : ∀ {M : Type} [AddCommGroup M] [Module R₀ M] [Module R₀ᵐᵒᵖ M] [IsCentralScalar R₀ M] (m : M),
+        IsNilpotent (inr m : TrivSqZeroExt R₀ M) := fun m =>
     ⟨2, by rw [pow_two, inr_mul_inr]⟩
-  have hfst : ∀ c : TrivSqZeroExt R₀ (K × K), c ∈ RingHom.ker (fstHom R₀ R₀ (K × K)) →
-      c = inr c.snd := fun c hc => by
+  have hfst
+      : ∀ c : TrivSqZeroExt R₀ (K × K),
+        c ∈ RingHom.ker (fstHom R₀ R₀ (K × K)) → c = inr c.snd := fun c hc => by
     have : c.fst = 0 := hc
     ext <;> simp [this]
-  obtain ⟨c, hc, hxc⟩ := h.ker _ R₀ (fstHom R₀ R₀ (K × K)) (fun r => ⟨inl r, rfl⟩)
-    (fun c hc => by rw [hfst c hc]; exact nil _)
-    (x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (a i, 0)) *
-      x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (0, b i))) (by
-      rw [MonObj.comp_mul, h.nat _ _ _ _ (fun i => nil _), h.nat _ _ _ _ (fun i => nil _)]
-      have e : x R₀ (fun _ => 0) = 1 := h.zero R₀
-      simp [e])
+  obtain ⟨c, hc, hxc⟩ :=
+    h.ker _ R₀ (fstHom R₀ R₀ (K × K))
+      (fun r => ⟨inl r, rfl⟩)
+      (fun c hc => by rw [hfst c hc]; exact nil _)
+      (x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (a i, 0))
+        * x (TrivSqZeroExt R₀ (K × K)) (fun i => inr (0, b i)))
+      (by
+        rw [MonObj.comp_mul, h.nat _ _ _ _ (fun i => nil _), h.nat _ _ _ _ (fun i => nil _)]
+        have e : x R₀ (fun _ => 0) = 1 := h.zero R₀
+        simp [e])
   have cnil : ∀ i, IsNilpotent (c i) := fun i => by rw [hfst _ (hc i)]; exact nil _
   have e0 : x (TrivSqZeroExt R₀ K) (fun _ => 0) = 1 := h.zero _
   have h1 := congrArg (spMap (map (LinearMap.fst R₀ K K)) ≫ ·) hxc
@@ -128,11 +144,12 @@ theorem Coord.mul_inr (h : Coord G g x) {K : Type} [AddCommGroup K] [Module R₀
   simp only [snd_inr, snd_map, LinearMap.fst_apply, LinearMap.snd_apply] at e1 e2
   exact Prod.ext e1.symm e2.symm
 
-
 open TrivSqZeroExt in
-theorem Coord.mul_eq (h : Coord G g x) {S : Type} [CommRing S] [Algebra R₀ S]
-    (K : Submodule R₀ S) (hK : ∀ a ∈ K, ∀ b ∈ K, a * b = 0) (a b : Fin g → K) :
-    x S (fun i => a i) * x S (fun i => b i) = x S (fun i => (a i : S) + b i) := by
+theorem Coord.mul_eq
+    (h : Coord G g x)
+    {S : Type} [CommRing S] [Algebra R₀ S]
+    (K : Submodule R₀ S) (hK : ∀ a ∈ K, ∀ b ∈ K, a * b = 0) (a b : Fin g → K)
+    : x S (fun i => a i) * x S (fun i => b i) = x S (fun i => (a i : S) + b i) := by
   letI : Module R₀ᵐᵒᵖ K := Module.compHom K ((RingHom.id R₀).fromOpposite mul_comm)
   haveI : IsCentralScalar R₀ K := ⟨fun _ _ => rfl⟩
   let l : K × K →ₗ[R₀] S := K.subtype ∘ₗ (LinearMap.fst R₀ K K + LinearMap.snd R₀ K K)
@@ -147,50 +164,54 @@ theorem Coord.mul_eq (h : Coord G g x) {S : Type} [CommRing S] [Algebra R₀ S]
   have e := congrArg (spMap φ ≫ ·) (h.mul_inr a b)
   simp only [MonObj.comp_mul] at e
   rw [h.nat _ _ _ _ (fun i => nil _), h.nat _ _ _ _ (fun i => nil _),
-    h.nat _ _ _ _ (fun i => nil _)] at e
+      h.nat _ _ _ _ (fun i => nil _)]
+    at e
   simpa only [hφ, Submodule.coe_zero, add_zero, zero_add] using e
 
 end
 
-def coords (g : ℕ) (K : Type) [AddCommGroup K] [Module R₀ K] :
-    (Fin g → R₀) ⊗[R₀] K ≃ₗ[R₀] (Fin g → K) :=
+def coords (g : ℕ) (K : Type) [AddCommGroup K] [Module R₀ K]
+    : (Fin g → R₀) ⊗[R₀] K ≃ₗ[R₀] (Fin g → K) :=
   TensorProduct.comm R₀ _ _ ≪≫ₗ TensorProduct.piScalarRight R₀ R₀ K (Fin g)
 
-theorem coords_lTensor (g : ℕ) {K K' : Type} [AddCommGroup K] [Module R₀ K] [AddCommGroup K']
-    [Module R₀ K'] (f : K →ₗ[R₀] K') (v : (Fin g → R₀) ⊗[R₀] K) (i : Fin g) :
-    coords g K' (LinearMap.lTensor _ f v) i = f (coords g K v i) := by
+theorem coords_lTensor
+    (g : ℕ)
+    {K K' : Type} [AddCommGroup K] [Module R₀ K] [AddCommGroup K'] [Module R₀ K']
+    (f : K →ₗ[R₀] K') (v : (Fin g → R₀) ⊗[R₀] K) (i : Fin g)
+    : coords g K' (LinearMap.lTensor _ f v) i = f (coords g K v i) := by
   induction v using TensorProduct.induction_on with
   | zero => simp
   | tmul r k => simp [coords]
   | add a b ha hb => simp [ha, hb]
 
-theorem mul_eq_zero_of_sqZero {R S : LAlg R₀} {π : LHom R S} (hπ : π.SqZero) :
-    ∀ a ∈ π.ker, ∀ b ∈ π.ker, a * b = 0 := fun a ha b hb => by
+theorem mul_eq_zero_of_sqZero {R S : LAlg R₀} {π : LHom R S} (hπ : π.SqZero)
+    : ∀ a ∈ π.ker, ∀ b ∈ π.ker, a * b = 0 := fun a ha b hb => by
   have h : a * b ∈ RingHom.ker π.1 ^ 2 := by
     rw [pow_two]
     exact Ideal.mul_mem_mul ha hb
   rw [hπ.2] at h
   exact (Ideal.mem_bot).1 h
 
-theorem isNilpotent_of_sqZero {R S : LAlg R₀} {π : LHom R S} (hπ : π.SqZero) {a : (R : Type)}
-    (ha : a ∈ π.ker) : IsNilpotent a :=
+theorem isNilpotent_of_sqZero
+    {R S : LAlg R₀} {π : LHom R S} (hπ : π.SqZero) {a : (R : Type)} (ha : a ∈ π.ker)
+    : IsNilpotent a :=
   ⟨2, by rw [pow_two, mul_eq_zero_of_sqZero hπ a ha a ha]⟩
 
 section
 
 variable (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G]
 
-def ptMap {R S : LAlg R₀} (f : LHom R S) :
-    Additive (sp (R₀ := R₀) (R : Type) ⟶ G) →+ Additive (sp (R₀ := R₀) (S : Type) ⟶ G) where
+def ptMap {R S : LAlg R₀} (f : LHom R S)
+    : Additive (sp (R₀ := R₀) (R : Type) ⟶ G) →+ Additive (sp (R₀ := R₀) (S : Type) ⟶ G) where
   toFun z := Additive.ofMul (spMap f.1 ≫ z.toMul)
   map_zero' := congrArg Additive.ofMul (MonObj.comp_one _)
   map_add' a b := congrArg Additive.ofMul (MonObj.comp_mul _ _ _)
 
-variable {G} {g : ℕ}
-  {x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G)}
+variable
+  {G} {g : ℕ} {x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G)}
 
-def ptTg (h : Coord G g x) {R S : LAlg R₀} (π : LHom R S) (hπ : π.SqZero) :
-    (Fin g → R₀) ⊗[R₀] π.ker →+ Additive (sp (R₀ := R₀) (R : Type) ⟶ G) where
+def ptTg (h : Coord G g x) {R S : LAlg R₀} (π : LHom R S) (hπ : π.SqZero)
+    : (Fin g → R₀) ⊗[R₀] π.ker →+ Additive (sp (R₀ := R₀) (R : Type) ⟶ G) where
   toFun v := Additive.ofMul (x R fun i => coords g π.ker v i)
   map_zero' := by
     rw [map_zero]
@@ -199,10 +220,13 @@ def ptTg (h : Coord G g x) {R S : LAlg R₀} (π : LHom R S) (hπ : π.SqZero) :
     rw [map_add (f := _)]
     exact congrArg Additive.ofMul (h.mul_eq π.ker (mul_eq_zero_of_sqZero hπ) _ _).symm
 
-def ptBX [Smooth G.hom] (h : Coord G g x)
-    (fib : ∀ {F R₁ R₂ R : LAlg R₀} (p₁ : LHom F R₁) (p₂ : LHom F R₂) (f₁ : LHom R₁ R)
-      (f₂ : LHom R₂ R), IsFibreSq p₁ p₂ f₁ f₂ →
-      CarriesFibre (ptMap G p₁) (ptMap G p₂) (ptMap G f₁) (ptMap G f₂)) : BX R₀ where
+def ptBX
+    [Smooth G.hom]
+    (h : Coord G g x)
+    (fib
+      : ∀ {F R₁ R₂ R : LAlg R₀} (p₁ : LHom F R₁) (p₂ : LHom F R₂) (f₁ : LHom R₁ R) (f₂ : LHom R₂ R),
+        IsFibreSq p₁ p₂ f₁ f₂ → CarriesFibre (ptMap G p₁) (ptMap G p₂) (ptMap G f₁) (ptMap G f₂))
+    : BX R₀ where
   G R := Additive (sp (R₀ := R₀) (R : Type) ⟶ G)
   map f := ptMap G f
   map_id R z := by
@@ -222,8 +246,11 @@ def ptBX [Smooth G.hom] (h : Coord G g x)
     rfl
   surj π hπ z := exists_lift G π.1 hπ.1 ⟨2, hπ.2⟩ z.toMul
   tg_inj π hπ v w e := by
-    have e' := h.inj _ _ _ (fun i => isNilpotent_of_sqZero hπ (Submodule.coe_mem _))
-      (fun i => isNilpotent_of_sqZero hπ (Submodule.coe_mem _)) e
+    have e' :=
+      h.inj _ _ _
+        (fun i => isNilpotent_of_sqZero hπ (Submodule.coe_mem _))
+        (fun i => isNilpotent_of_sqZero hπ (Submodule.coe_mem _))
+        e
     exact (coords g π.ker).injective (funext fun i => Subtype.ext (congrFun e' i))
   tg_ker := fun {R S} π hπ z => by
     constructor
@@ -291,33 +318,53 @@ def ptBX [Smooth G.hom] (h : Coord G g x)
     · rintro ⟨dx, dy, du⟩ ⟨hd₁, hd₂⟩
       simp only [Sigma.mk.inj_iff, heq_iff_eq] at hd₁ hd₂
       simp only [Sigma.mk.inj_iff, heq_iff_eq]
-      exact ⟨hcxu dx ⟨hd₁.1, hd₂.1⟩, hcyu dy ⟨hd₁.2.1, hd₂.2.1⟩,
-        Units.ext (hcuu du.1 ⟨congrArg Units.val hd₁.2.2, congrArg Units.val hd₂.2.2⟩)⟩
+      exact ⟨
+        hcxu dx ⟨hd₁.1, hd₂.1⟩,
+        hcyu dy ⟨hd₁.2.1, hd₂.2.1⟩,
+        Units.ext (hcuu du.1 ⟨congrArg Units.val hd₁.2.2, congrArg Units.val hd₂.2.2⟩)
+      ⟩
 
 end
 
-theorem main :
-  (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G] [IsLocalRing R₀] (g : ℕ), SmoothOfRelativeDimension g G.hom →
-    ∃ x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G),
-      (∀ (S : Type) [CommRing S] [Algebra R₀ S], x S 0 = 1) ∧
-      (∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S') (a : Fin g → S),
-        (∀ i, IsNilpotent (a i)) → spMap φ ≫ x S a = x S' (fun i => φ (a i))) ∧
-      (∀ (S : Type) [CommRing S] [Algebra R₀ S] (a b : Fin g → S), (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i)) → x S a = x S b → a = b) ∧
-      (∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S'] (ρ : S →ₐ[R₀] S'), Function.Surjective ρ →
-        (∀ a ∈ RingHom.ker ρ, IsNilpotent a) → ∀ z : sp (R₀ := R₀) S ⟶ G, spMap ρ ≫ z = 1 →
-        ∃ a : Fin g → S, (∀ i, a i ∈ RingHom.ker ρ) ∧ z = x S a)) →
-  (∀ {R₀ : Type} [CommRing R₀] (X : Over (Spec (CommRingCat.of R₀))) {F R₁ R₂ R : LAlg R₀} (p₁ : LHom F R₁) (p₂ : LHom F R₂) (f₁ : LHom R₁ R) (f₂ : LHom R₂ R),
-    IsFibreSq p₁ p₂ f₁ f₂ → ∀ (a : sp (R₀ := R₀) (R₁ : Type) ⟶ X) (b : sp (R₀ := R₀) (R₂ : Type) ⟶ X), spMap f₁.1 ≫ a = spMap f₂.1 ≫ b →
-    ∃! c : sp (R₀ := R₀) (F : Type) ⟶ X, spMap p₁.1 ≫ c = a ∧ spMap p₂.1 ≫ c = b) →
-  (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G] [IsLocalRing R₀] (g : ℕ), SmoothOfRelativeDimension g G.hom →
-    ∃ (B : BX R₀) (e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)), (∀ R, Function.Bijective (e R)) ∧ (∀ R x y, e R (x + y) = e R x * e R y) ∧
-      (∀ {R S : LAlg R₀} (f : LHom R S) (x : B.G R), e S (B.map f x) = spMap f.1 ≫ e R x)) := by
+theorem main
+    : (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G]
+          [IsLocalRing R₀] (g : ℕ),
+        SmoothOfRelativeDimension g G.hom
+          → ∃ x : ∀ (S : Type) [CommRing S] [Algebra R₀ S], (Fin g → S) → (sp (R₀ := R₀) S ⟶ G),
+            (∀ (S : Type) [CommRing S] [Algebra R₀ S], x S 0 = 1)
+              ∧ (∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
+                  (φ : S →ₐ[R₀] S') (a : Fin g → S),
+                (∀ i, IsNilpotent (a i)) → spMap φ ≫ x S a = x S' (fun i => φ (a i)))
+              ∧ (∀ (S : Type) [CommRing S] [Algebra R₀ S] (a b : Fin g → S),
+                (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i)) → x S a = x S b → a = b)
+              ∧ (∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
+                  (ρ : S →ₐ[R₀] S'),
+                Function.Surjective ρ → (∀ a ∈ RingHom.ker ρ, IsNilpotent a)
+                  → ∀ z : sp (R₀ := R₀) S ⟶ G,
+                    spMap ρ ≫ z = 1 → ∃ a : Fin g → S, (∀ i, a i ∈ RingHom.ker ρ) ∧ z = x S a))
+      → (∀ {R₀ : Type} [CommRing R₀] (X : Over (Spec (CommRingCat.of R₀))) {F R₁ R₂ R : LAlg R₀}
+          (p₁ : LHom F R₁) (p₂ : LHom F R₂) (f₁ : LHom R₁ R) (f₂ : LHom R₂ R),
+        IsFibreSq p₁ p₂ f₁ f₂
+          → ∀ (a : sp (R₀ := R₀) (R₁ : Type) ⟶ X) (b : sp (R₀ := R₀) (R₂ : Type) ⟶ X),
+            spMap f₁.1 ≫ a = spMap f₂.1 ≫ b
+              → ∃! c : sp (R₀ := R₀) (F : Type) ⟶ X, spMap p₁.1 ≫ c = a ∧ spMap p₂.1 ≫ c = b)
+      → (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G]
+          [IsCommMonObj G] [IsLocalRing R₀] (g : ℕ),
+        SmoothOfRelativeDimension g G.hom
+          → ∃ (B : BX R₀) (e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)),
+            (∀ R, Function.Bijective (e R)) ∧ (∀ R x y, e R (x + y) = e R x * e R y)
+              ∧ (∀ {R S : LAlg R₀} (f : LHom R S) (x : B.G R),
+                e S (B.map f x) = spMap f.1 ≫ e R x)) := by
   intro hnil hfib R₀ _ G _ _ _ g hg
   obtain ⟨x, h0, h1, h2, h3⟩ := hnil G g hg
   haveI : Smooth G.hom := SmoothOfRelativeDimension.smooth g G.hom
-  refine ⟨ptBX (G := G) ⟨h0, h1, h2, h3⟩
-    (fun p₁ p₂ f₁ f₂ hf a b e => hfib G p₁ p₂ f₁ f₂ hf a.toMul b.toMul e),
-    fun R z => Additive.toMul z, fun R => Additive.toMul.bijective, fun R x y => rfl,
-    fun f x => rfl⟩
+  refine ⟨
+    ptBX (G := G) ⟨h0, h1, h2, h3⟩
+      (fun p₁ p₂ f₁ f₂ hf a b e => hfib G p₁ p₂ f₁ f₂ hf a.toMul b.toMul e),
+    fun R z => Additive.toMul z,
+    fun R => Additive.toMul.bijective,
+    fun R x y => rfl,
+    fun f x => rfl
+  ⟩
 
 end GlobalTheory.GroupPointsBX

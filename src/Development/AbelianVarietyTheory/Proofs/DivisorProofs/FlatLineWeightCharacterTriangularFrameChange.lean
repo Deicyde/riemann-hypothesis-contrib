@@ -5,18 +5,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrameCoord
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi NumberField
+  IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore
 
 noncomputable section
 
 namespace GlobalTheory.FlatChar
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
 
 open Classical in
-theorem exOf_flatWt_some (τ : Psi H) (σ : E →+* ℂ) (i : Fin (Dw.mult σ)) :
-    exOf Dw (flatWt Dw τ) 0 (some ⟨σ, i⟩) = if σ = τ.1 then -1 else if σ = conjEmb τ.1 then 1 else 0 := by
+theorem exOf_flatWt_some (τ : Psi H) (σ : E →+* ℂ) (i : Fin (Dw.mult σ))
+    : exOf Dw (flatWt Dw τ) 0 (some ⟨σ, i⟩)
+      = if σ = τ.1 then
+          -1
+        else if σ = conjEmb τ.1 then
+          1
+        else
+          0 := by
   classical
   show (wtOf Dw (flatWt Dw τ) 0).1 (σ, (i : ℕ)) = _
   have hi := i.2
@@ -48,14 +58,20 @@ theorem exOf_flatWt_some (τ : Psi H) (σ : E →+* ℂ) (i : Fin (Dw.mult σ)) 
     · have : (⟨conjEmb σ, h'⟩ : Psi H) ≠ τ := fun e' => e (hiff.1 e')
       simp [flatWt, parWt, this, e, hne]
 
-theorem flatWt_char (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
-    (Dw : Datum H) (τ : Psi H) (S : Type) [Field S] (t : Ix Dw → Sˣ) :
-    (((∏ i, t i ^ exOf Dw (flatWt Dw τ) 0 i : Sˣ)) : S) * ∏ i : Fin (Dw.mult τ.1), (t (some ⟨τ.1, i⟩) : S) =
-      ∏ j : Fin (Dw.mult (conjEmb τ.1)), (t (some ⟨conjEmb τ.1, j⟩) : S) := by
+theorem flatWt_char
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (τ : Psi H)
+    (S : Type) [Field S]
+    (t : Ix Dw → Sˣ)
+    : (((∏ i, t i ^ exOf Dw (flatWt Dw τ) 0 i : Sˣ)) : S)
+        * ∏ i : Fin (Dw.mult τ.1), (t (some ⟨τ.1, i⟩) : S)
+      = ∏ j : Fin (Dw.mult (conjEmb τ.1)), (t (some ⟨conjEmb τ.1, j⟩) : S) := by
   classical
   have hne : τ.1 ≠ conjEmb τ.1 := fun e => conj_not_mem τ (e ▸ τ.2)
-  have key : (∏ i, t i ^ exOf Dw (flatWt Dw τ) 0 i) =
-      (∏ i : Fin (Dw.mult τ.1), t (some ⟨τ.1, i⟩))⁻¹ * ∏ j : Fin (Dw.mult (conjEmb τ.1)), t (some ⟨conjEmb τ.1, j⟩) := by
+  have key
+      : (∏ i, t i ^ exOf Dw (flatWt Dw τ) 0 i)
+        = (∏ i : Fin (Dw.mult τ.1), t (some ⟨τ.1, i⟩))⁻¹
+          * ∏ j : Fin (Dw.mult (conjEmb τ.1)), t (some ⟨conjEmb τ.1, j⟩) := by
     rw [Fintype.prod_option, Fintype.prod_sigma]
     have h0 : exOf Dw (flatWt Dw τ) 0 none = 0 := rfl
     rw [h0, zpow_zero, one_mul]

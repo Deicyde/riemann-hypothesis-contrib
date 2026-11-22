@@ -15,7 +15,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZer
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -36,7 +39,8 @@ theorem exists_basis : ∃ b : Module.Basis (Fin 2) L⁺ L, b 0 = 1 := by
     rw [LinearIndependent.pair_iff]
     intro a t h
     have h' := congrArg (IsCMField.complexConj L) h
-    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgEquiv.commutes, map_one, map_zero] at h h'
+    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgEquiv.commutes, map_one, map_zero]
+      at h h'
     have hd : algebraMap L⁺ L t * (e - IsCMField.complexConj L e) = 0 := by
       linear_combination h - h'
     have ht : t = 0 := by
@@ -49,8 +53,9 @@ theorem exists_basis : ∃ b : Module.Basis (Fin 2) L⁺ L, b 0 = 1 := by
     rw [Algebra.IsQuadraticExtension.finrank_eq_two L⁺ L]; simp
   exact ⟨basisOfLinearIndependentOfCardEqFinrank hli hcard, by simp⟩
 
-theorem kappa_eq_zero (F : FinIso L n) (u : HeightOneSpectrum (𝓞 L)) (z : AL L)
-    (hz : compAt L (u.under (𝓞 L⁺)) z = 0) : F.κ z u = 0 := by
+theorem kappa_eq_zero
+    (F : FinIso L n) (u : HeightOneSpectrum (𝓞 L)) (z : AL L) (hz : compAt L (u.under (𝓞 L⁺)) z = 0)
+    : F.κ z u = 0 := by
   obtain ⟨i', -, hi'⟩ := F.right u (u.under (𝓞 L⁺)) rfl
   obtain ⟨b, hb0⟩ := exists_basis (L := L)
   obtain ⟨A, B, hAB⟩ := GlobalTheory.tensor_exists_decomp b z
@@ -67,8 +72,8 @@ theorem kappa_eq_zero (F : FinIso L n) (u : HeightOneSpectrum (𝓞 L)) (z : AL 
   change F.κ (1 ⊗ₜ A) u + F.κ (b 1 ⊗ₜ 1) u * F.κ (1 ⊗ₜ B) u = 0
   rw [hi', hi', hAB0.1, hAB0.2, map_zero, mul_zero, add_zero]
 
-theorem j_mem_locU (F : FinIso L n) (s : SplitPlace L) (y : GAf L n) (hy : TrivOutside {s.v} y) :
-    F.j y ∈ locU n s.w := by
+theorem j_mem_locU (F : FinIso L n) (s : SplitPlace L) (y : GAf L n) (hy : TrivOutside {s.v} y)
+    : F.j y ∈ locU n s.w := by
   refine Subgroup.mem_inf.2 ⟨F.fin y, ?_⟩
   rw [Subgroup.mem_iInf]
   intro u
@@ -80,8 +85,11 @@ theorem j_mem_locU (F : FinIso L n) (s : SplitPlace L) (y : GAf L n) (hy : TrivO
   rw [F.loc]
   have h1 := congrFun (congrFun (hy (u.under (𝓞 L⁺)) hu) a) c
   simp only [Matrix.map_apply] at h1
-  have h2 : compAt L (u.under (𝓞 L⁺)) (((y : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) a c -
-      (1 : Matrix (Fin n) (Fin n) (AL L)) a c) = 0 := by
+  have h2
+      : compAt L (u.under (𝓞 L⁺))
+          (((y : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) a c
+            - (1 : Matrix (Fin n) (Fin n) (AL L)) a c)
+        = 0 := by
     rw [map_sub, h1]
     simp only [Matrix.one_apply]
     split_ifs <;> simp
@@ -98,23 +106,33 @@ namespace GlobalTheory.SplitDict
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 local notation3 "L⁺" => NumberField.maximalRealSubfield L
 
-theorem kappa_split (F : FinIso L n) (s : SplitPlace L) (i : s.v.adicCompletion L⁺ ≃+* s.w.adicCompletion L)
-    (hic : Continuous i) (hi : ∀ x : L, i (s.i x) = algebraMap L (s.w.adicCompletion L) x) (z : AL L) :
-    F.κ z s.w = i (s.proj z) := by
+theorem kappa_split
+    (F : FinIso L n)
+    (s : SplitPlace L) (i : s.v.adicCompletion L⁺ ≃+* s.w.adicCompletion L)
+    (hic : Continuous i) (hi : ∀ x : L, i (s.i x) = algebraMap L (s.w.adicCompletion L) x)
+    (z : AL L)
+    : F.κ z s.w = i (s.proj z) := by
   obtain ⟨i', hic', hi'⟩ := F.right s.w s.v s.w_under
-  have hL : ∀ k : L⁺, i' (algebraMap L⁺ (s.v.adicCompletion L⁺) k) =
-      algebraMap L (s.w.adicCompletion L) (algebraMap L⁺ L k) := fun k => by
+  have hL
+      : ∀ k : L⁺,
+        i' (algebraMap L⁺ (s.v.adicCompletion L⁺) k)
+          = algebraMap L (s.w.adicCompletion L) (algebraMap L⁺ L k) := fun k => by
     have h1 := hi' (algebraMap L⁺ (AFplus L) k)
-    have h2 : (1 : L) ⊗ₜ[L⁺] algebraMap L⁺ (AFplus L) k = algebraMap L⁺ L k ⊗ₜ[L⁺] (1 : AFplus L) := by
+    have h2
+        : (1 : L) ⊗ₜ[L⁺] algebraMap L⁺ (AFplus L) k = algebraMap L⁺ L k ⊗ₜ[L⁺] (1 : AFplus L) := by
       rw [← Algebra.TensorProduct.algebraMap_apply', Algebra.TensorProduct.algebraMap_apply]
     rw [h2, F.left] at h1
     exact h1.symm
-  have hR : ∀ k : L⁺, i (algebraMap L⁺ (s.v.adicCompletion L⁺) k) =
-      algebraMap L (s.w.adicCompletion L) (algebraMap L⁺ L k) := fun k => by
+  have hR
+      : ∀ k : L⁺,
+        i (algebraMap L⁺ (s.v.adicCompletion L⁺) k)
+          = algebraMap L (s.w.adicCompletion L) (algebraMap L⁺ L k) := fun k => by
     rw [← hi, AlgHom.commutes]
   have heq : ∀ a : s.v.adicCompletion L⁺, i' a = i a := fun a =>
-    (HeightOneSpectrum.denseRange_algebraMap L⁺ s.v).induction_on (p := fun a => i' a = i a) a
-      (isClosed_eq hic' hic) fun k => by rw [hL, hR]
+    (HeightOneSpectrum.denseRange_algebraMap L⁺ s.v).induction_on
+      (p := fun a => i' a = i a)
+      a (isClosed_eq hic' hic)
+      fun k => by rw [hL, hR]
   induction z using TensorProduct.induction_on with
   | zero => simp <;> rfl
   | add x y hx hy =>
@@ -129,15 +147,21 @@ theorem kappa_split (F : FinIso L n) (s : SplitPlace L) (i : s.v.adicCompletion 
     rw [hi', heq, F.left]
     rfl
 
-theorem cLoc_j (F : FinIso L n) (s : SplitPlace L) (i : s.v.adicCompletion L⁺ ≃+* s.w.adicCompletion L)
-    (hic : Continuous i) (hi : ∀ x : L, i (s.i x) = algebraMap L (s.w.adicCompletion L) x) (y : GAf L n) :
-    cLoc s.w (F.j y) = Matrix.GeneralLinearGroup.map i.toRingHom (s.loc n y) := by
+theorem cLoc_j
+    (F : FinIso L n)
+    (s : SplitPlace L) (i : s.v.adicCompletion L⁺ ≃+* s.w.adicCompletion L)
+    (hic : Continuous i) (hi : ∀ x : L, i (s.i x) = algebraMap L (s.w.adicCompletion L) x)
+    (y : GAf L n)
+    : cLoc s.w (F.j y) = Matrix.GeneralLinearGroup.map i.toRingHom (s.loc n y) := by
   refine Units.ext (Matrix.ext fun a c => ?_)
   rw [F.loc, kappa_split F s i hic hi]
   rfl
 
-theorem isSplitAt_w (F : FinIso L n) (s : SplitPlace L) (i : s.v.adicCompletion L⁺ ≃+* s.w.adicCompletion L)
-    (hic : Continuous i) (hi : ∀ x : L, i (s.i x) = algebraMap L (s.w.adicCompletion L) x) : IsSplitAt s.w := by
+theorem isSplitAt_w
+    (F : FinIso L n)
+    (s : SplitPlace L) (i : s.v.adicCompletion L⁺ ≃+* s.w.adicCompletion L)
+    (hic : Continuous i) (hi : ∀ x : L, i (s.i x) = algebraMap L (s.w.adicCompletion L) x)
+    : IsSplitAt s.w := by
   by_contra hns
   obtain ⟨y, hy⟩ := DFunLike.ne_iff.mp (IsCMField.complexConj_ne_one L)
   set δ : L := y - IsCMField.complexConj L y with hδdef
@@ -166,10 +190,14 @@ end GlobalTheory.SplitDict
 
 namespace GlobalTheory.SplitDict
 
-theorem locComp_agree : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (F : FinIso L n) (π : NG.AutRep L n)
-    (U : Submodule ℂ (UA L n → ℂ)), Dict F π U → ∀ (s : SplitPlace L) (σ : SmIrr (GL (Fin n) (s.w.adicCompletion L))),
-    IsCompAlong U (locU n s.w) ((cLoc s.w).comp (locU n s.w).subtype) σ.ρ →
-    ∃ τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L)), IsLocS π.S s τ ∧ Nonempty (τ.ρ.Equiv σ.ρ) := by
+theorem locComp_agree
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (F : FinIso L n)
+        (π : NG.AutRep L n) (U : Submodule ℂ (UA L n → ℂ)),
+      Dict F π U
+        → ∀ (s : SplitPlace L) (σ : SmIrr (GL (Fin n) (s.w.adicCompletion L))),
+          IsCompAlong U (locU n s.w) ((cLoc s.w).comp (locU n s.w).subtype) σ.ρ
+            → ∃ τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L)),
+              IsLocS π.S s τ ∧ Nonempty (τ.ρ.Equiv σ.ρ) := by
   intro L _ _ _ n F π U hD s σ hσ
   obtain ⟨τ, hτ, -⟩ := GlobalTheory.T.splitPlaceLocalComponent_exists_unique_class L n π s
   refine ⟨τ, hτ, ?_⟩
@@ -179,8 +207,11 @@ theorem locComp_agree : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (
   obtain ⟨sec, hsecT, hsecL⟩ := GlobalTheory.SplitEmb.exists_hom_trivOutside_loc L n s
   have hlift : ∀ x : locU n s.w, ∃ y, TrivOutside {s.v} y ∧ F.j y = x := by
     intro x
-    refine ⟨sec (Matrix.GeneralLinearGroup.map i.symm.toRingHom (cLoc s.w (x : UA L n))), hsecT _, ?_⟩
-    have hm := j_mem_locU F s _ (hsecT (Matrix.GeneralLinearGroup.map i.symm.toRingHom (cLoc s.w (x : UA L n))))
+    refine
+      ⟨sec (Matrix.GeneralLinearGroup.map i.symm.toRingHom (cLoc s.w (x : UA L n))), hsecT _, ?_⟩
+    have hm :=
+      j_mem_locU F s _
+        (hsecT (Matrix.GeneralLinearGroup.map i.symm.toRingHom (cLoc s.w (x : UA L n))))
     have h1 : e ⟨_, hm⟩ = e x := by
       rw [he, he, cLoc_j F s i hic hi, hsecL]
       refine Units.ext (Matrix.ext fun a c => ?_)
@@ -192,7 +223,8 @@ theorem locComp_agree : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (
     have h0 : ∀ y ∈ finU (E := L) (n := n), (φ : UA L n → ℂ) y = 0 := fun y hy => by
       obtain ⟨x, rfl⟩ := F.onto y hy
       exact congrFun hφ x
-    exact Subtype.ext (GlobalTheory.T.definiteUnitaryAutForm_eq_zero_of_finitePoints L n φ (hD.1.aut φ φ.2) h0)
+    exact Subtype.ext (GlobalTheory.T.definiteUnitaryAutForm_eq_zero_of_finitePoints L n φ
+      (hD.1.aut φ φ.2) h0)
   have hRrange : LinearMap.range R = U.map (LinearMap.funLeft ℂ ℂ F.j) := by
     rw [LinearMap.range_comp, Submodule.range_subtype]
   obtain ⟨hnt, -⟩ := (GlobalTheory.CuspRep.isIrreducible_iff _).1 τ.irr

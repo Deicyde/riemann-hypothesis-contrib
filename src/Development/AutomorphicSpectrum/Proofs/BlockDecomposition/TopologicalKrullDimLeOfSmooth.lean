@@ -9,7 +9,10 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.RegularCurve
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge
 
 set_option autoImplicit false
 
@@ -17,27 +20,39 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.Hodge
 
-theorem topologicalKrullDim_le_of_smooth {k : Type} [Field k] {X : Scheme.{0}} (f : X ⟶ Sp k) (g : ℕ)
-    (hf : SmoothOfRelativeDimension g f) : topologicalKrullDim X ≤ g := by
+theorem topologicalKrullDim_le_of_smooth
+    {k : Type} [Field k]
+    {X : Scheme.{0}} (f : X ⟶ Sp k)
+    (g : ℕ) (hf : SmoothOfRelativeDimension g f)
+    : topologicalKrullDim X ≤ g := by
   rw [GlobalTheory.SmoothDimTotal.topologicalKrullDim_eq_iSup_stalk]
-  exact iSup_le fun x ↦ GroundTheory.Arith.SchemeCoh.ringKrullDim_stalk_le_of_smoothOfRelativeDimension g f x
+  exact iSup_le fun x ↦
+    GroundTheory.Arith.SchemeCoh.ringKrullDim_stalk_le_of_smoothOfRelativeDimension g f x
 
-theorem subsingleton_coh_abelian (k : Type) [Field k] (A : Over (Sp k)) [GrpObj A] (g n : ℕ)
-    (hA : IsAbelianScheme A) (hg : SmoothOfRelativeDimension g A.hom) (hn : g < n) :
-    Subsingleton (GlobalTheory.coh (GlobalTheory.structureModule A.left) n) := by
-  refine GlobalTheory.subsingleton_coh_of_isProjOver (PositivityTheory.Xgn.AbelianSchemeSpreading.isProjOver_abelian k A hA) _ ?_
-  refine lt_of_le_of_lt ((topologicalKrullDim_subspace_le _ _).trans
-    (topologicalKrullDim_le_of_smooth A.hom g hg)) ?_
+theorem subsingleton_coh_abelian
+    (k : Type) [Field k]
+    (A : Over (Sp k)) [GrpObj A]
+    (g n : ℕ)
+    (hA : IsAbelianScheme A) (hg : SmoothOfRelativeDimension g A.hom) (hn : g < n)
+    : Subsingleton (GlobalTheory.coh (GlobalTheory.structureModule A.left) n) := by
+  refine GlobalTheory.subsingleton_coh_of_isProjOver
+    (PositivityTheory.Xgn.AbelianSchemeSpreading.isProjOver_abelian k A hA) _ ?_
+  refine lt_of_le_of_lt
+    ((topologicalKrullDim_subspace_le _ _).trans (topologicalKrullDim_le_of_smooth A.hom g hg)) ?_
   exact_mod_cast hn
 
-theorem exact_of_subsingleton_Hs {R : Type} [CommRing R] {C : Type} [Category.{0} C] (F : C ⥤ CommAlgCat.{0} R)
-    (n : ℕ) (hdd : dn F (n + 1) ∘ₗ dn F n = 0) (h : Subsingleton (Hs F n)) :
-    Function.Exact (dn F n) (dn F (n + 1)) := by
+theorem exact_of_subsingleton_Hs
+    {R : Type} [CommRing R]
+    {C : Type} [Category.{0} C]
+    (F : C ⥤ CommAlgCat.{0} R) (n : ℕ)
+    (hdd : dn F (n + 1) ∘ₗ dn F n = 0) (h : Subsingleton (Hs F n))
+    : Function.Exact (dn F n) (dn F (n + 1)) := by
   intro x
   constructor
   · intro hx
-    have hm : (⟨x, hx⟩ : LinearMap.ker (dn F (n + 1))) ∈
-        (LinearMap.range (dn F n)).comap (LinearMap.ker (dn F (n + 1))).subtype :=
+    have hm
+        : (⟨x, hx⟩ : LinearMap.ker (dn F (n + 1)))
+          ∈ (LinearMap.range (dn F n)).comap (LinearMap.ker (dn F (n + 1))).subtype :=
       (Submodule.Quotient.mk_eq_zero _).1 (Subsingleton.elim _ _)
     exact hm
   · rintro ⟨y, rfl⟩

@@ -11,62 +11,74 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
 namespace BlockImageArithmetic
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
+variable
+  {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
 
-theorem ringKrullDim_eq (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) :
-    ringKrullDim (MRing ι ⧸ mCoordIdeal y) =
-      (((Algebra.trdeg ℤ (CoordinateConeArithVar.ratioField y c)).toENat + Fintype.card K + 1 : ℕ∞) :
-        WithBot ℕ∞) := by
+theorem ringKrullDim_eq (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    : ringKrullDim (MRing ι ⧸ mCoordIdeal y)
+      = (((Algebra.trdeg ℤ (CoordinateConeArithVar.ratioField y c)).toENat + Fintype.card K + 1
+          : ℕ∞)
+        : WithBot ℕ∞) := by
   have hhor := CoordinateConeArithVar.horizontal y
   have : (mCoordIdeal y).IsPrime := RingHom.ker_isPrime _
-  have htr := ConeTrdeg.proof K ι (CoordinateConeArithVar.ratioField y c)
-    (CoordinateConeArithVar.ratioPtL y c) (CoordinateConeArithVar.birational y c hc)
-    (fun k ↦ ⟨c k, fun h0 ↦ by
-      have h1 := congrArg Subtype.val h0
-      simp [CoordinateConeArithVar.ratioPtL, CoordinateConeArithVar.ratioPt, hc] at h1⟩)
-    (by rw [CoordinateConeArithVar.mCoordIdeal_ratioPtL y c hc]; exact hhor)
+  have htr :=
+    ConeTrdeg.proof K ι (CoordinateConeArithVar.ratioField y c)
+      (CoordinateConeArithVar.ratioPtL y c) (CoordinateConeArithVar.birational y c hc)
+      (fun k ↦ ⟨
+        c k,
+        fun h0 ↦ by
+          have h1 := congrArg Subtype.val h0
+          simp [CoordinateConeArithVar.ratioPtL, CoordinateConeArithVar.ratioPt, hc] at h1
+      ⟩)
+      (by rw [CoordinateConeArithVar.mCoordIdeal_ratioPtL y c hc]; exact hhor)
   rw [CoordinateConeArithVar.mCoordIdeal_ratioPtL y c hc] at htr
   rw [IntDomainDim.proof (MRing ι ⧸ mCoordIdeal y)
-    (CoordinateConeArithVar.algebraMap_injective _ hhor), htr]
+      (CoordinateConeArithVar.algebraMap_injective _ hhor),
+    htr]
   simp only [map_add (f := _), map_natCast]
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem div_mem_of_sum (F : IntermediateField ℚ Ω) {A B : Type} [Fintype B] (u : A → Ω) (v : B → Ω)
-    (L : Matrix A B ℤ) (hu : ∀ a, u a = ∑ b, (L a b : Ω) * v b) (b₀ : B)
-    (hF : ∀ b, v b / v b₀ ∈ F) (a : A) : u a / v b₀ ∈ F := by
+theorem div_mem_of_sum
+    (F : IntermediateField ℚ Ω)
+    {A B : Type} [Fintype B]
+    (u : A → Ω) (v : B → Ω) (L : Matrix A B ℤ) (hu : ∀ a, u a = ∑ b, (L a b : Ω) * v b)
+    (b₀ : B) (hF : ∀ b, v b / v b₀ ∈ F)
+    (a : A)
+    : u a / v b₀ ∈ F := by
   rw [hu, Finset.sum_div]
   refine sum_mem fun b _ ↦ ?_
   rw [mul_div_assoc]
   exact mul_mem (intCast_mem F _) (hF b)
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem ratio_mem_of_sum (F : IntermediateField ℚ Ω) {A B : Type} [Fintype B] (u : A → Ω) (v : B → Ω)
-    (L : Matrix A B ℤ) (hu : ∀ a, u a = ∑ b, (L a b : Ω) * v b) (b₀ : B) (hv : v b₀ ≠ 0)
-    (hF : ∀ b, v b / v b₀ ∈ F) (a a' : A) : u a / u a' ∈ F := by
+theorem ratio_mem_of_sum
+    (F : IntermediateField ℚ Ω)
+    {A B : Type} [Fintype B]
+    (u : A → Ω) (v : B → Ω) (L : Matrix A B ℤ) (hu : ∀ a, u a = ∑ b, (L a b : Ω) * v b)
+    (b₀ : B) (hv : v b₀ ≠ 0) (hF : ∀ b, v b / v b₀ ∈ F)
+    (a a' : A)
+    : u a / u a' ∈ F := by
   rw [← div_div_div_cancel_right₀ hv (u a) (u a')]
   exact div_mem (div_mem_of_sum F u v L hu b₀ hF a) (div_mem_of_sum F u v L hu b₀ hF a')
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem aeval_mem (F : IntermediateField ℚ Ω) (w : (Σ k, ι k) → Ω) (hw : ∀ p, w p ∈ F) (f : MRing ι) :
-    aeval w f ∈ F := by
+theorem aeval_mem (F : IntermediateField ℚ Ω) (w : (Σ k, ι k) → Ω) (hw : ∀ p, w p ∈ F) (f : MRing ι)
+    : aeval w f ∈ F := by
   induction f using MvPolynomial.induction_on with
   | C a => rw [aeval_C, algebraMap_int_eq, eq_intCast]; exact intCast_mem F a
   | add p q hp hq => rw [map_add]; exact add_mem hp hq
   | mul_X p q hp => rw [map_mul, aeval_X]; exact mul_mem hp (hw q)
 
-
 omit [Fintype K] [CharZero Ω] in
-theorem isMultiHomog_X_single [DecidableEq K] (p : Σ k, ι k) :
-    IsMultiHomog (X p : MRing ι) (fun k ↦ if k = p.1 then 1 else 0) := by
+theorem isMultiHomog_X_single [DecidableEq K] (p : Σ k, ι k)
+    : IsMultiHomog (X p : MRing ι) (fun k ↦ if k = p.1 then 1 else 0) := by
   intro m hm k
   rw [support_X, Finset.mem_singleton] at hm
   subst hm
@@ -81,11 +93,11 @@ theorem isMultiHomog_X_single [DecidableEq K] (p : Σ k, ι k) :
       exact absurd (Finset.mem_univ _) h
   · simp [h]
 
-
 omit [CharZero Ω] in
-theorem aeval_mul_pow_of_block (y w : (Σ k, ι k) → Ω) (k₀ : K) (z : Ω)
-    (hw : ∀ i, w ⟨k₀, i⟩ * z = y ⟨k₀, i⟩) {f : MRing ι} {d : K → ℕ} (hf : IsMultiHomog f d)
-    (hd : ∀ k, k ≠ k₀ → d k = 0) : aeval w f * z ^ d k₀ = aeval y f := by
+theorem aeval_mul_pow_of_block
+    (y w : (Σ k, ι k) → Ω) (k₀ : K) (z : Ω) (hw : ∀ i, w ⟨k₀, i⟩ * z = y ⟨k₀, i⟩)
+    {f : MRing ι} {d : K → ℕ} (hf : IsMultiHomog f d) (hd : ∀ k, k ≠ k₀ → d k = 0)
+    : aeval w f * z ^ d k₀ = aeval y f := by
   classical
   conv_rhs => rw [f.as_sum]
   conv_lhs => rw [f.as_sum]
@@ -119,7 +131,6 @@ theorem aeval_mul_pow_of_block (y w : (Σ k, ι k) → Ω) (k₀ : K) (z : Ω)
 
 end BlockImageArithmetic
 
-
 open BlockImageArithmetic in
 theorem BlockImageArith.proof : BlockImageArith.Statement := by
   intro D K _ _ ι _ Ω _ _ y k₀ r M N x hY hbir hB _
@@ -146,8 +157,11 @@ theorem BlockImageArith.proof : BlockImageArith.Statement := by
   have hLx : Fx ≤ Fy := by
     rw [hFx, IntermediateField.adjoin_le_iff]
     rintro _ ⟨p, rfl⟩
-    exact ratio_mem_of_sum Fy x (fun i ↦ y ⟨k₀, i⟩) M hB.1 (c k₀) (hc k₀)
-      (fun i ↦ IntermediateField.subset_adjoin _ _ ⟨⟨k₀, i⟩, rfl⟩) p ⟨p.1, c' p.1⟩
+    exact ratio_mem_of_sum Fy x
+      (fun i ↦ y ⟨k₀, i⟩)
+      M hB.1 (c k₀) (hc k₀)
+      (fun i ↦ IntermediateField.subset_adjoin _ _ ⟨⟨k₀, i⟩, rfl⟩)
+      p ⟨p.1, c' p.1⟩
   have hLy : Fy ≤ Fx := by
     rw [hFy, IntermediateField.adjoin_le_iff]
     rintro _ ⟨⟨k, i⟩, rfl⟩
@@ -166,9 +180,9 @@ theorem BlockImageArith.proof : BlockImageArith.Statement := by
     have hw : ∀ i, w ⟨k₀, i⟩ * x j₀ = y ⟨k₀, i⟩ := fun i ↦ by
       simp only [w, ite_true]
       exact div_mul_cancel₀ _ hj₀
-    obtain ⟨n, g', h', hg', hh', hh0, heq⟩ := hbir _ (X ⟨k, i⟩) (X ⟨k, c k⟩)
-      (isMultiHomog_X_single ⟨k, i⟩) (isMultiHomog_X_single ⟨k, c k⟩)
-      (by rw [aeval_X]; exact hc k)
+    obtain ⟨n, g', h', hg', hh', hh0, heq⟩ :=
+      hbir _ (X ⟨k, i⟩) (X ⟨k, c k⟩) (isMultiHomog_X_single ⟨k, i⟩) (isMultiHomog_X_single ⟨k, c k⟩)
+        (by rw [aeval_X]; exact hc k)
     rw [aeval_X, aeval_X] at heq
     have hd : ∀ k', k' ≠ k₀ → blockDeg k₀ n k' = 0 := fun k' hk' ↦ by simp [blockDeg, hk']
     have e1 := aeval_mul_pow_of_block y w k₀ (x j₀) hw hg' hd
@@ -184,8 +198,16 @@ theorem BlockImageArith.proof : BlockImageArith.Statement := by
   have hdy := ringKrullDim_eq y c hc
   rw [hdim] at hdy
   rw [coordIdeal_eq_mCoordIdeal]
-  refine ⟨⟨()⟩, ⟨RingHom.ker_isPrime _, CoordinateConeArithVar.isMultiHomogIdeal x,
-    CoordinateConeArithVar.relevant x c' hc'⟩, CoordinateConeArithVar.horizontal x, ?_⟩
+  refine ⟨
+    ⟨()⟩,
+    ⟨
+      RingHom.ker_isPrime _,
+      CoordinateConeArithVar.isMultiHomogIdeal x,
+      CoordinateConeArithVar.relevant x c' hc'
+    ⟩,
+    CoordinateConeArithVar.horizontal x,
+    ?_
+  ⟩
   rw [ringKrullDim_eq x c' hc']
   rw [← hFy, hLeq] at hdy
   generalize (Algebra.trdeg ℤ Fx).toENat = t at hdy ⊢

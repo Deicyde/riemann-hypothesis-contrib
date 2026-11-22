@@ -20,46 +20,44 @@ namespace Modulus
 
 variable (𝔪 : Modulus K)
 
-def rayGroup : Subgroup (IdeleGroup K) :=
-  (diagonal K).range ⊔ 𝔪.congruenceSubgroup
+def rayGroup : Subgroup (IdeleGroup K) := (diagonal K).range ⊔ 𝔪.congruenceSubgroup
 
-abbrev RayClassGroup : Type _ :=
-  IdeleGroup K ⧸ 𝔪.rayGroup
+abbrev RayClassGroup : Type _ := IdeleGroup K ⧸ 𝔪.rayGroup
 
-theorem diagonal_range_le_rayGroup : (diagonal K).range ≤ 𝔪.rayGroup :=
-  le_sup_left
+theorem diagonal_range_le_rayGroup : (diagonal K).range ≤ 𝔪.rayGroup := le_sup_left
 
-theorem map_rayGroup :
-    𝔪.rayGroup.map (QuotientGroup.mk' (diagonal K).range) =
-      𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) := by
+theorem map_rayGroup
+    : 𝔪.rayGroup.map (QuotientGroup.mk' (diagonal K).range)
+      = 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) := by
   rw [rayGroup, Subgroup.map_sup, QuotientGroup.map_mk'_self, bot_sup_eq]
   rfl
 
 instance : (𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K)).Normal :=
   ⟨fun n hn g ↦ by rwa [mul_comm g n, mul_inv_cancel_right]⟩
 
-def quotientMapCongruenceEquiv :
-    IdeleClassGroup K ⧸ 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) ≃* 𝔪.RayClassGroup :=
+def quotientMapCongruenceEquiv
+    : IdeleClassGroup K ⧸ 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) ≃* 𝔪.RayClassGroup :=
   (QuotientGroup.quotientMulEquivOfEq 𝔪.map_rayGroup.symm).trans
     (QuotientGroup.quotientQuotientEquivQuotient _ _ 𝔪.diagonal_range_le_rayGroup)
 
 @[simp]
-theorem quotientMapCongruenceEquiv_mk (x : IdeleGroup K) :
-    𝔪.quotientMapCongruenceEquiv (QuotientGroup.mk (IdeleClassGroup.mk K x)) =
-      (QuotientGroup.mk x : 𝔪.RayClassGroup) :=
+theorem quotientMapCongruenceEquiv_mk (x : IdeleGroup K)
+    : 𝔪.quotientMapCongruenceEquiv (QuotientGroup.mk (IdeleClassGroup.mk K x))
+      = (QuotientGroup.mk x : 𝔪.RayClassGroup) :=
   rfl
 
-theorem map_idealLevel_sup_le :
-    (idealLevel 𝔪.ideal).map ofFinite ⊔ (infinitePositive K).map ofInfinite ≤
-      𝔪.congruenceSubgroup := by
+theorem map_idealLevel_sup_le
+    : (idealLevel 𝔪.ideal).map ofFinite ⊔ (infinitePositive K).map ofInfinite
+      ≤ 𝔪.congruenceSubgroup := by
   refine sup_le ?_ ?_
   · rintro _ ⟨y, hy, rfl⟩
     refine 𝔪.mem_congruenceSubgroup.2 ⟨fun v ↦ ?_, fun w _ ↦ ?_⟩
     · rw [← finiteComponent_toFinite, toFinite_ofFinite]
       have hfinite := FiniteMultiplicity.of_prime_left v.prime 𝔪.ideal_ne_bot
       simpa only [exponent, ite_eq_left hfinite] using mem_finiteLevel.1 hy v
-    · change 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
-        ((toInfinite K (ofFinite y) : InfiniteAdeleRing K) w.1)
+    · change 0
+        < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+          ((toInfinite K (ofFinite y) : InfiniteAdeleRing K) w.1)
       rw [toInfinite_ofFinite]
       change 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2 (1 : w.1.Completion)
       rw [map_one]
@@ -68,8 +66,10 @@ theorem map_idealLevel_sup_le :
     refine 𝔪.mem_congruenceSubgroup.2 ⟨fun v ↦ ?_, fun w _ ↦ ?_⟩
     · rw [← finiteComponent_toFinite, toFinite_ofInfinite, map_one]
       exact one_mem _
-    · have h : ((infiniteProj w.1 (ofInfinite z) : (w.1.Completion)ˣ) : w.1.Completion) =
-          (toInfinite K (ofInfinite z) : InfiniteAdeleRing K) w.1 := rfl
+    · have h
+          : ((infiniteProj w.1 (ofInfinite z) : (w.1.Completion)ˣ) : w.1.Completion)
+            = (toInfinite K (ofInfinite z) : InfiniteAdeleRing K) w.1 :=
+        rfl
       rw [h, toInfinite_ofInfinite]
       exact hz w.1 w.2
 
@@ -84,11 +84,10 @@ theorem RayClassGroup.finite : Finite 𝔪.RayClassGroup := by
   have : 𝔪.rayGroup.FiniteIndex := Subgroup.finiteIndex_of_le 𝔪.rayGroup_ideal_le
   exact Subgroup.finite_quotient_of_finiteIndex
 
-instance : Finite 𝔪.RayClassGroup :=
-  RayClassGroup.finite 𝔪
+instance : Finite 𝔪.RayClassGroup := RayClassGroup.finite 𝔪
 
-theorem finiteIndex_map_congruenceSubgroup :
-    (𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K)).FiniteIndex := by
+theorem finiteIndex_map_congruenceSubgroup
+    : (𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K)).FiniteIndex := by
   have : Finite (IdeleClassGroup K ⧸ 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K)) :=
     Finite.of_equiv _ 𝔪.quotientMapCongruenceEquiv.symm.toEquiv
   exact Subgroup.finiteIndex_of_finite_quotient

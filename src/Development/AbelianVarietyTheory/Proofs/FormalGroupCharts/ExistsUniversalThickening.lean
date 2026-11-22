@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.HasChart
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,8 +19,10 @@ noncomputable section
 
 namespace GlobalTheory.IsolPt
 
-theorem isArtinianRing_of_finite_points (k B : Type) [Field k] [CommRing B] [Algebra k B]
-    [Algebra.FiniteType k B] [Finite (B →ₐ[k] AlgebraicClosure k)] : IsArtinianRing B := by
+theorem isArtinianRing_of_finite_points
+    (k B : Type) [Field k] [CommRing B] [Algebra k B] [Algebra.FiniteType k B]
+    [Finite (B →ₐ[k] AlgebraicClosure k)]
+    : IsArtinianRing B := by
   have hN : IsNoetherianRing B := Algebra.FiniteType.isNoetherianRing k B
   have hJ : IsJacobsonRing B := isJacobsonRing_of_finiteType (A := k)
   have hsur : ∀ m : Ideal B, m.IsMaximal → ∃ f : B →ₐ[k] AlgebraicClosure k, RingHom.ker f = m := by
@@ -27,8 +31,7 @@ theorem isArtinianRing_of_finite_points (k B : Type) [Field k] [CommRing B] [Alg
     have : Module.Finite k (B ⧸ m) := finite_of_finite_type_of_isJacobsonRing k (B ⧸ m)
     let g : (B ⧸ m) →ₐ[k] AlgebraicClosure k := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     refine ⟨g.comp (Ideal.Quotient.mkₐ k m), ?_⟩
     ext b
@@ -48,28 +51,44 @@ theorem isArtinianRing_of_finite_points (k B : Type) [Field k] [CommRing B] [Alg
   have : m = p := le_antisymm hle hm.1
   exact this ▸ hm.2
 
-theorem exists_pow_stable {B : Type} [CommRing B] [IsArtinianRing B] (I : Ideal B) :
-    ∃ M : ℕ, ∀ j : ℕ, I ^ (M + 1) ≤ I ^ (j + 1) := by
-  obtain ⟨n, hn⟩ := IsArtinian.monotone_stabilizes (R := B) (M := B)
-    ⟨fun n => OrderDual.toDual (I ^ n), fun _ _ h => Ideal.pow_le_pow_right h⟩
+theorem exists_pow_stable {B : Type} [CommRing B] [IsArtinianRing B] (I : Ideal B)
+    : ∃ M : ℕ, ∀ j : ℕ, I ^ (M + 1) ≤ I ^ (j + 1) := by
+  obtain ⟨n, hn⟩ :=
+    IsArtinian.monotone_stabilizes (R := B) (M := B)
+      ⟨fun n => OrderDual.toDual (I ^ n), fun _ _ h => Ideal.pow_le_pow_right h⟩
   refine ⟨n, fun j => ?_⟩
   have h1 : I ^ n = I ^ (n + (j + 1)) := hn (n + (j + 1)) (by omega)
-  calc I ^ (n + 1) ≤ I ^ n := Ideal.pow_le_pow_right (by omega)
+  calc
+    I ^ (n + 1)
+      ≤ I ^ n := Ideal.pow_le_pow_right (by omega)
     _ = I ^ (n + (j + 1)) := h1
     _ ≤ I ^ (j + 1) := Ideal.pow_le_pow_right (by omega)
 
-theorem exists_thickening {k B : Type} [Field k] [CommRing B] [Algebra k B] [IsArtinianRing B]
-    (e : B →ₐ[k] k) : ∃ (A : Type) (_ : CommRing A) (_ : Algebra k A) (aug : A →ₐ[k] k) (M : ℕ)
-      (π : B →ₐ[k] A), RingHom.ker aug ^ (M + 1) = ⊥ ∧ aug.comp π = e ∧
-      ∀ (Q : Type) [CommRing Q] [Algebra k Q] (augQ : Q →ₐ[k] k) (j : ℕ),
-        RingHom.ker augQ ^ (j + 1) = ⊥ → ∀ z : B →ₐ[k] Q, augQ.comp z = e →
-        ∃ a : A →ₐ[k] Q, augQ.comp a = aug ∧ z = a.comp π := by
+theorem exists_thickening
+    {k B : Type} [Field k] [CommRing B] [Algebra k B] [IsArtinianRing B] (e : B →ₐ[k] k)
+    : ∃ (A : Type) (_ : CommRing A) (_ : Algebra k A) (aug : A →ₐ[k] k) (M : ℕ) (π : B →ₐ[k] A),
+      RingHom.ker aug ^ (M + 1) = ⊥ ∧ aug.comp π = e
+        ∧ ∀ (Q : Type) [CommRing Q] [Algebra k Q] (augQ : Q →ₐ[k] k) (j : ℕ),
+          RingHom.ker augQ ^ (j + 1) = ⊥
+            → ∀ z : B →ₐ[k] Q,
+              augQ.comp z = e → ∃ a : A →ₐ[k] Q, augQ.comp a = aug ∧ z = a.comp π := by
   obtain ⟨M, hM⟩ := exists_pow_stable (RingHom.ker e)
   set I : Ideal B := RingHom.ker e ^ (M + 1) with hI
   have hIe : ∀ b ∈ I, e b = 0 := fun b hb => Ideal.pow_le_self (Nat.succ_ne_zero M) hb
-  refine ⟨B ⧸ I, inferInstance, inferInstance, Ideal.Quotient.liftₐ I e hIe, M, Ideal.Quotient.mkₐ k I,
-    ?_, ?_, ?_⟩
-  · have h : RingHom.ker (Ideal.Quotient.liftₐ I e hIe) ≤ (RingHom.ker e).map (Ideal.Quotient.mk I) := by
+  refine ⟨
+    B ⧸ I,
+    inferInstance,
+    inferInstance,
+    Ideal.Quotient.liftₐ I e hIe,
+    M,
+    Ideal.Quotient.mkₐ k I,
+    ?_,
+    ?_,
+    ?_
+  ⟩
+  · have h
+        : RingHom.ker (Ideal.Quotient.liftₐ I e hIe)
+          ≤ (RingHom.ker e).map (Ideal.Quotient.mk I) := by
       intro x hx
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x
       exact Ideal.mem_map_of_mem _ hx
@@ -97,20 +116,25 @@ theorem exists_thickening {k B : Type} [Field k] [CommRing B] [Algebra k B] [IsA
     · ext b
       rfl
 
-theorem exists_factor {k A B : Type} [CommRing k] [CommRing A] [Algebra k A] [CommRing B] [Algebra k B]
-    {X : Over (Spec (CommRingCat.of k))} (x : Chart.sp (R₀ := k) A ⟶ X) (v : Chart.sp (R₀ := k) B ⟶ X)
-    [IsOpenImmersion v.left] (hsub : Set.range x.left ⊆ Set.range v.left) :
-    ∃ ψ : B →ₐ[k] A, x = Chart.spMap ψ ≫ v := by
+theorem exists_factor
+    {k A B : Type} [CommRing k] [CommRing A] [Algebra k A] [CommRing B] [Algebra k B]
+    {X : Over (Spec (CommRingCat.of k))}
+    (x : Chart.sp (R₀ := k) A ⟶ X) (v : Chart.sp (R₀ := k) B ⟶ X) [IsOpenImmersion v.left]
+    (hsub : Set.range x.left ⊆ Set.range v.left)
+    : ∃ ψ : B →ₐ[k] A, x = Chart.spMap ψ ≫ v := by
   have hl := IsOpenImmersion.lift_fac v.left _ hsub
-  obtain ⟨ψ, hψ⟩ := NatFun.spMap_surjective (k := k) (A := B) (B := A)
-    (Over.homMk (IsOpenImmersion.lift v.left _ hsub) (by
-      rw [← Over.w v, ← Category.assoc, hl, Over.w]))
+  obtain ⟨ψ, hψ⟩ :=
+    NatFun.spMap_surjective (k := k) (A := B) (B := A)
+      (Over.homMk (IsOpenImmersion.lift v.left _ hsub)
+        (by rw [← Over.w v, ← Category.assoc, hl, Over.w]))
   refine ⟨ψ, Over.OverMorphism.ext ?_⟩
   rw [hψ]
   exact hl.symm
 
-theorem surjective_spMap_aug {k Q : Type} [Field k] [CommRing Q] [Algebra k Q] (q : Q →ₐ[k] k) (j : ℕ)
-    (hj : RingHom.ker q ^ (j + 1) = ⊥) : Function.Surjective (Chart.spMap q).left := by
+theorem surjective_spMap_aug
+    {k Q : Type} [Field k] [CommRing Q] [Algebra k Q]
+    (q : Q →ₐ[k] k) (j : ℕ) (hj : RingHom.ker q ^ (j + 1) = ⊥)
+    : Function.Surjective (Chart.spMap q).left := by
   intro p
   have hq : Function.Surjective q.toRingHom := fun c => ⟨algebraMap k Q c, q.commutes c⟩
   let p' : PrimeSpectrum Q := p
@@ -123,19 +147,31 @@ theorem surjective_spMap_aug {k Q : Type} [Field k] [CommRing Q] [Algebra k Q] (
   change Ideal.comap q.toRingHom (Ideal.map q.toRingHom p'.asIdeal) = p'.asIdeal
   rw [Ideal.comap_map_of_surjective' q.toRingHom hq, sup_eq_left.mpr hker]
 
-
 open NatFun in
-theorem exists_universal_thickening : ∀ (k : Type) [Field k] (K : Over (Spec (CommRingCat.of k))) [LocallyOfFiniteType K.hom], (∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (t : Sp Ω ⟶ Spec (CommRingCat.of k)), Finite (Over.mk t ⟶ K)) → ∀ e : Chart.sp (R₀ := k) k ⟶ K, ∃ (A : Type) (_ : CommRing A) (_ : Algebra k A) (aug : A →ₐ[k] k) (M : ℕ) (io : Chart.sp (R₀ := k) A ⟶ K), RingHom.ker aug ^ (M + 1) = ⊥ ∧ Chart.spMap aug ≫ io = e ∧ ∀ (Q : Type) [CommRing Q] [Algebra k Q] (augQ : Q →ₐ[k] k) (j : ℕ), RingHom.ker augQ ^ (j + 1) = ⊥ → ∀ z : Chart.sp (R₀ := k) Q ⟶ K, Chart.spMap augQ ≫ z = e → ∃ a : A →ₐ[k] Q, augQ.comp a = aug ∧ z = Chart.spMap a ≫ io := by
+theorem exists_universal_thickening
+    : ∀ (k : Type) [Field k] (K : Over (Spec (CommRingCat.of k))) [LocallyOfFiniteType K.hom],
+      (∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (t : Sp Ω ⟶ Spec (CommRingCat.of k)),
+          Finite (Over.mk t ⟶ K))
+        → ∀ e : Chart.sp (R₀ := k) k ⟶ K,
+          ∃ (A : Type) (_ : CommRing A) (_ : Algebra k A) (aug : A →ₐ[k] k) (M : ℕ)
+              (io : Chart.sp (R₀ := k) A ⟶ K),
+            RingHom.ker aug ^ (M + 1) = ⊥ ∧ Chart.spMap aug ≫ io = e
+              ∧ ∀ (Q : Type) [CommRing Q] [Algebra k Q] (augQ : Q →ₐ[k] k) (j : ℕ),
+                RingHom.ker augQ ^ (j + 1) = ⊥
+                  → ∀ z : Chart.sp (R₀ := k) Q ⟶ K,
+                    Chart.spMap augQ ≫ z = e
+                      → ∃ a : A →ₐ[k] Q, augQ.comp a = aug ∧ z = Chart.spMap a ≫ io := by
   intro k _ K _ hfin e
   let o : (Chart.sp (R₀ := k) k).left := (⊥ : PrimeSpectrum k)
-  obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ := K.left.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (e.left o)) isOpen_univ
+  obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ :=
+    K.left.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (e.left o)) isOpen_univ
   change IsAffineOpen U at hU
   let v : Chart.sp (R₀ := k) Γ(K.left, U) ⟶ K := affinePoint hU
   haveI : IsOpenImmersion v.left := hU.isOpenImmersion_fromSpec
   haveI : Mono v := Over.mono_of_mono_left v
-  have hinj : ∀ (Q : Type) [CommRing Q] [Algebra k Q],
-      Function.Injective fun f : Γ(K.left, U) →ₐ[k] Q => Chart.spMap f ≫ v := by
+  have hinj
+      : ∀ (Q : Type) [CommRing Q] [Algebra k Q],
+        Function.Injective fun f : Γ(K.left, U) →ₐ[k] Q => Chart.spMap f ≫ v := by
     intro Q _ _ f g h
     exact spMap_injective ((cancel_mono v).1 h)
   have hft : Algebra.FiniteType k Γ(K.left, U) := by

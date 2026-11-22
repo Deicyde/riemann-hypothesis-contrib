@@ -7,10 +7,14 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FockTran
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 open GlobalTheory.CompanionTheory.ThTot
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,12 +23,12 @@ namespace GlobalTheory.CompanionTheory.ThTot.ProductTheta
 variable {D : D7} {r s p : ℕ}
 
 theorem continuous_rowT : Continuous (rowT : Mx D (r + s) p → Mx D r p) :=
-  continuous_pi fun i => continuous_pi fun j =>
-    (continuous_apply j).comp (continuous_apply (Fin.castAdd s i))
+  continuous_pi fun i =>
+    continuous_pi fun j => (continuous_apply j).comp (continuous_apply (Fin.castAdd s i))
 
 theorem continuous_rowB : Continuous (rowB : Mx D (r + s) p → Mx D s p) :=
-  continuous_pi fun i => continuous_pi fun j =>
-    (continuous_apply j).comp (continuous_apply (Fin.natAdd r i))
+  continuous_pi fun i =>
+    continuous_pi fun j => (continuous_apply j).comp (continuous_apply (Fin.natAdd r i))
 
 theorem rowT_rowJ (x : Mx D r p) (z : Mx D s p) : rowT (rowJ x z) = x := by
   funext i j
@@ -38,12 +42,13 @@ theorem rowJ_rowT_rowB (y : Mx D (r + s) p) : rowJ (rowT y) (rowB y) = y := by
   funext i j
   refine Fin.addCases (fun a => ?_) (fun b => ?_) i <;> simp [rowT, rowB, rowJ]
 
-theorem continuous_rowJ :
-    Continuous fun z : Mx D r p × Mx D s p => rowJ z.1 z.2 := by
+theorem continuous_rowJ : Continuous fun z : Mx D r p × Mx D s p => rowJ z.1 z.2 := by
   refine continuous_pi fun i => continuous_pi fun j => ?_
   refine Fin.addCases (fun a => ?_) (fun b => ?_) i
-  · simpa [rowJ, Function.comp_def] using (continuous_apply j).comp ((continuous_apply a).comp continuous_fst)
-  · simpa [rowJ, Function.comp_def] using (continuous_apply j).comp ((continuous_apply b).comp continuous_snd)
+  · simpa [rowJ, Function.comp_def] using
+      (continuous_apply j).comp ((continuous_apply a).comp continuous_fst)
+  · simpa [rowJ, Function.comp_def] using
+      (continuous_apply j).comp ((continuous_apply b).comp continuous_snd)
 
 def rowHomeo : Mx D r p × Mx D s p ≃ₜ Mx D (r + s) p where
   toFun z := rowJ z.1 z.2
@@ -53,26 +58,29 @@ def rowHomeo : Mx D r p × Mx D s p ≃ₜ Mx D (r + s) p where
   continuous_toFun := continuous_rowJ
   continuous_invFun := continuous_rowT.prodMk continuous_rowB
 
-theorem rowT_mul (y : Mx D (r + s) p) (a : Mx D p p) :
-    rowT (HMul.hMul y a : Mx D (r + s) p) = (HMul.hMul (rowT y) a : Mx D r p) := rfl
+theorem rowT_mul (y : Mx D (r + s) p) (a : Mx D p p)
+    : rowT (HMul.hMul y a : Mx D (r + s) p) = (HMul.hMul (rowT y) a : Mx D r p) :=
+  rfl
 
-theorem rowB_mul (y : Mx D (r + s) p) (a : Mx D p p) :
-    rowB (HMul.hMul y a : Mx D (r + s) p) = (HMul.hMul (rowB y) a : Mx D s p) := rfl
+theorem rowB_mul (y : Mx D (r + s) p) (a : Mx D p p)
+    : rowB (HMul.hMul y a : Mx D (r + s) p) = (HMul.hMul (rowB y) a : Mx D s p) :=
+  rfl
 
-theorem pr_split {b : HermE D (r + s)} {br : HermE D r} {bs : HermE D s} (h : IsBlockSL2Embedding b br bs)
-    (x y : Mx D (r + s) p) :
-    pr b x y = pr br (rowT x) (rowT y) + pr bs (rowB x) (rowB y) := by
+theorem pr_split
+    {b : HermE D (r + s)} {br : HermE D r} {bs : HermE D s} (h : IsBlockSL2Embedding b br bs)
+    (x y : Mx D (r + s) p)
+    : pr b x y = pr br (rowT x) (rowT y) + pr bs (rowB x) (rowB y) := by
   obtain ⟨h1, h2, h3, h4⟩ := h
   funext i j
-  simp only [pr, Matrix.mul_apply, Matrix.add_apply, Matrix.map_apply, Fin.sum_univ_add, h1, h2, h3, h4,
-    map_zero, zero_mul, Finset.sum_const_zero, add_zero, zero_add]
+  simp only [pr, Matrix.mul_apply, Matrix.add_apply, Matrix.map_apply, Fin.sum_univ_add, h1, h2, h3,
+    h4, map_zero, zero_mul, Finset.sum_const_zero, add_zero, zero_add]
   rfl
 
 theorem halfTr_add (u v : AE D) : halfTr (u + v) = halfTr u + halfTr v := by
   simp only [halfTr, trA, map_add (f := _), mul_add]
 
-theorem npow_half_mul (x : ℝ≥0) (hx : x ≠ 0) :
-    npow x ((r : ℂ) / 2) * npow x ((s : ℂ) / 2) = npow x (((r + s : ℕ) : ℂ) / 2) := by
+theorem npow_half_mul (x : ℝ≥0) (hx : x ≠ 0)
+    : npow x ((r : ℂ) / 2) * npow x ((s : ℂ) / 2) = npow x (((r + s : ℕ) : ℂ) / 2) := by
   have hx' : ((x : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hx
   simp only [npow]
   rw [← Complex.cpow_add _ _ hx']
@@ -106,7 +114,8 @@ theorem prodTh_of_schwTensor : SchwTensor → ProdTh := by
     rw [norm_mul, norm_mul]
     exact mul_le_mul (h1 h hh _) (h2 h hh _) (norm_nonneg _) (norm_nonneg _)
   · intro g a hg h y
-    have e := npow_half_mul (r := r) (s := s) (absA D (Matrix.GeneralLinearGroup.det a)) (absA_ne_zero _)
+    have e :=
+      npow_half_mul (r := r) (s := s) (absA D (Matrix.GeneralLinearGroup.det a)) (absA_ne_zero _)
     rw [hr.levi g a hg h, hs.levi g a hg h, rowT_mul, rowB_mul, ← e]
     simp only [MonoidHom.mul_apply, Circle.coe_mul]
     ring
@@ -123,7 +132,8 @@ theorem prodTh_of_schwTensor : SchwTensor → ProdTh := by
       (rowHomeo (D := D) (r := r) (s := s) (p := p)).measurableEmbedding
     rw [hemb.integral_map, hr.weyl g hg h, hs.weyl g hg h, ← integral_prod_mul]
     refine integral_congr_ae (Eventually.of_forall fun z => ?_)
-    simp only [rowT_rowJ, rowB_rowJ, pr_split hb, Matrix.trace_add, map_add (f := _), AddChar.map_add_eq_mul]
+    simp only [rowT_rowJ, rowB_rowJ, pr_split hb, Matrix.trace_add, map_add (f := _),
+      AddChar.map_add_eq_mul]
     ring
 
 end GlobalTheory.CompanionTheory.ThTot.ProductTheta

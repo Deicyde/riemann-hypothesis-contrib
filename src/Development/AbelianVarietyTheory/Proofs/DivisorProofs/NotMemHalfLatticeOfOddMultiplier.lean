@@ -8,14 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.AddMonoi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology ComplexConjugate
 
 namespace GlobalTheory.CMModel
 
-theorem mem_lattice_of_even_kerReps :
-    ∀ (L : PeriodPair) (α a : ℂ) (S : Finset ℂ), α ≠ 0 → MulStable L α → IsKerReps L α S →
-      Even S.card → α * a ∈ L.lattice → 2 * a ∈ L.lattice → a ∈ L.lattice := by
+theorem mem_lattice_of_even_kerReps
+    : ∀ (L : PeriodPair) (α a : ℂ) (S : Finset ℂ),
+      α ≠ 0 → MulStable L α → IsKerReps L α S → Even S.card → α * a ∈ L.lattice → 2 * a ∈ L.lattice
+        → a ∈ L.lattice := by
   intro L α a S hα hst hS hev h1 h2
   obtain ⟨m, hm⟩ := hev
   have hc := kerRepsCard L α S hα hst hS

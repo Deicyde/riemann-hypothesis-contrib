@@ -11,27 +11,30 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField IsDedekindDomain
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K)) :
-    letI := (OpToKT D N la).toAlgebra
-    IsFractionRing (Op D N la) (KTf K D N) := by
+private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
+    : letI := (OpToKT D N la).toAlgebra
+      IsFractionRing (Op D N la) (KTf K D N) := by
   letI := (OpToKT D N la).toAlgebra
   have hinjT : Function.Injective (OTtoKT K D N) := by
     unfold OTtoKT
     exact MvPolynomial.map_injective _ (IsFractionRing.injective (𝓞 K) K)
   have hinj : Function.Injective (algebraMap (Op D N la) (KTf K D N)) := by
     show Function.Injective (OpToKT D N la)
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective (laT D N la).primeCompl x
     unfold OpToKT at hx
@@ -43,23 +46,23 @@ private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
     exact IsLocalization.mk'_zero _
   have hC : ∀ s : 𝓞 K, OTtoKT K D N (MvPolynomial.C s) = MvPolynomial.C (algebraMap (𝓞 K) K s) :=
     fun s => MvPolynomial.map_C _ _
-  have hX : ∀ i, OTtoKT K D N (MvPolynomial.X i) = MvPolynomial.X i :=
-    fun i => MvPolynomial.map_X _ _
-  have hcl : ∀ p : KTp K D N, ∃ s : 𝓞 K, s ≠ 0 ∧ ∃ p' : OT K D N,
-      OTtoKT K D N p' = MvPolynomial.C (algebraMap (𝓞 K) K s) * p := by
+  have hX : ∀ i, OTtoKT K D N (MvPolynomial.X i) = MvPolynomial.X i := fun i =>
+    MvPolynomial.map_X _ _
+  have hcl
+      : ∀ p : KTp K D N, ∃ s : 𝓞 K,
+        s ≠ 0 ∧ ∃ p' : OT K D N, OTtoKT K D N p' = MvPolynomial.C (algebraMap (𝓞 K) K s) * p := by
     intro p
     induction p using MvPolynomial.induction_on
     next a =>
       obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 K) a
-      have hy' : algebraMap (𝓞 K) K y ≠ 0 :=
-        IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hy
+      have hy' : algebraMap (𝓞 K) K y ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hy
       refine ⟨y, nonZeroDivisors.ne_zero hy, MvPolynomial.C x, ?_⟩
       rw [hC, ← MvPolynomial.C_mul]
       congr 1
       first
-        | (field_simp; done)
-        | (rw [mul_div_assoc', mul_div_cancel_left₀ _ hy'])
-        | (field_simp; ring)
+      | (field_simp; done)
+      | (rw [mul_div_assoc', mul_div_cancel_left₀ _ hy'])
+      | (field_simp; ring)
     next p q hp hq =>
       obtain ⟨s1, hs1, p1, hp1⟩ := hp
       obtain ⟨s2, hs2, q1, hq1⟩ := hq
@@ -70,13 +73,16 @@ private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
     next p i hp =>
       obtain ⟨s, hs, p1, hp1⟩ := hp
       exact ⟨s, hs, p1 * MvPolynomial.X i, by rw [map_mul, hp1, hX, mul_assoc]⟩
-  have hCne : ∀ s : 𝓞 K, s ≠ 0 → algebraMap (KTp K D N) (KTf K D N)
-      (MvPolynomial.C (algebraMap (𝓞 K) K s)) ≠ 0 := by
+  have hCne
+      : ∀ s : 𝓞 K,
+        s ≠ 0 → algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K s)) ≠ 0 := by
     intro s hs
     rw [ne_eq, IsFractionRing.to_map_eq_zero_iff, MvPolynomial.C_eq_zero]
     exact (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 K) K)).mpr hs
-  have hOp : ∀ a : OT K D N, algebraMap (Op D N la) (KTf K D N) (algebraMap (OT K D N) (Op D N la) a) =
-      algebraMap (KTp K D N) (KTf K D N) (OTtoKT K D N a) := by
+  have hOp
+      : ∀ a : OT K D N,
+        algebraMap (Op D N la) (KTf K D N) (algebraMap (OT K D N) (Op D N la) a)
+          = algebraMap (KTp K D N) (KTf K D N) (OTtoKT K D N a) := by
     intro a
     show OpToKT D N la _ = _
     unfold OpToKT
@@ -90,38 +96,45 @@ private theorem op_isFractionRing' (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
     obtain ⟨sq, hsq, q', hq'⟩ := hcl q
     have hq0 : algebraMap (KTp K D N) (KTf K D N) q ≠ 0 :=
       IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hq
-    have e1 : algebraMap (Op D N la) (KTf K D N)
-        (algebraMap (OT K D N) (Op D N la) (p' * MvPolynomial.C sq)) =
-        algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sp)) *
-          algebraMap (KTp K D N) (KTf K D N) p *
-          algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sq)) := by
+    have e1
+        : algebraMap (Op D N la) (KTf K D N)
+            (algebraMap (OT K D N) (Op D N la) (p' * MvPolynomial.C sq))
+          = algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sp))
+            * algebraMap (KTp K D N) (KTf K D N) p
+            * algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sq)) := by
       rw [hOp, map_mul, hp', hC, map_mul, map_mul]
-    have e2 : algebraMap (Op D N la) (KTf K D N)
-        (algebraMap (OT K D N) (Op D N la) (q' * MvPolynomial.C sp)) =
-        algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sq)) *
-          algebraMap (KTp K D N) (KTf K D N) q *
-          algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sp)) := by
+    have e2
+        : algebraMap (Op D N la) (KTf K D N)
+            (algebraMap (OT K D N) (Op D N la) (q' * MvPolynomial.C sp))
+          = algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sq))
+            * algebraMap (KTp K D N) (KTf K D N) q
+            * algebraMap (KTp K D N) (KTf K D N) (MvPolynomial.C (algebraMap (𝓞 K) K sp)) := by
       rw [hOp, map_mul, hq', hC, map_mul, map_mul]
     have hx2 : algebraMap (OT K D N) (Op D N la) (q' * MvPolynomial.C sp) ≠ 0 :=
       (map_ne_zero_iff _ hinj).mp (by
         rw [e2]
         exact mul_ne_zero (mul_ne_zero (hCne sq hsq) hq0) (hCne sp hsp))
-    refine ⟨⟨algebraMap (OT K D N) (Op D N la) (p' * MvPolynomial.C sq),
-      ⟨_, mem_nonZeroDivisors_of_ne_zero hx2⟩⟩, ?_⟩
+    refine ⟨
+      ⟨
+        algebraMap (OT K D N) (Op D N la) (p' * MvPolynomial.C sq),
+        ⟨_, mem_nonZeroDivisors_of_ne_zero hx2⟩
+      ⟩,
+      ?_
+    ⟩
     show _ * algebraMap (Op D N la) (KTf K D N)
         (algebraMap (OT K D N) (Op D N la) (q' * MvPolynomial.C sp)) = _
     rw [e1, e2]
     have h1 := hCne sq hsq
     have h2 := hCne sp hsp
     first
-      | (field_simp; done)
-      | (field_simp; ring)
-      | (rw [div_mul_eq_mul_div, div_eq_iff hq0]; ring)
+    | (field_simp; done)
+    | (field_simp; ring)
+    | (rw [div_mul_eq_mul_div, div_eq_iff hq0]; ring)
   · intro x y hxy
     exact ⟨1, by rw [hinj hxy]⟩
 
-private theorem isDedekindDomain_Op (D N : ℕ) (la : HeightOneSpectrum (𝓞 K)) :
-    IsDedekindDomain (Op D N la) := by
+private theorem isDedekindDomain_Op (D N : ℕ) (la : HeightOneSpectrum (𝓞 K))
+    : IsDedekindDomain (Op D N la) := by
   classical
   obtain ⟨ϖ, hϖ, hϖ2⟩ : ∃ ϖ : 𝓞 K, ϖ ∈ la.asIdeal ∧ ϖ ∉ la.asIdeal ^ 2 := by
     have hlt : la.asIdeal ^ 2 < la.asIdeal ^ 1 :=
@@ -153,30 +166,40 @@ private theorem isDedekindDomain_Op (D N : ℕ) (la : HeightOneSpectrum (𝓞 K)
     simpa using h 0
   have hsu : IsUnit (algebraMap (OT K D N) (Op D N la) (MvPolynomial.C s)) :=
     IsLocalization.map_units (Op D N la) (⟨MvPolynomial.C s, hsnot⟩ : (laT D N la).primeCompl)
-  have hsub : ∀ a ∈ la.asIdeal, algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a) ∈
-      Ideal.span {algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)} := by
+  have hsub
+      : ∀ a ∈ la.asIdeal,
+        algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a)
+          ∈ Ideal.span {algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)} := by
     intro a ha
     obtain ⟨b, hb⟩ := key a ha
     obtain ⟨u, hu⟩ := hsu
-    have e : algebraMap (OT K D N) (Op D N la) (MvPolynomial.C s) *
-        algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a) =
-        algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ) *
-          algebraMap (OT K D N) (Op D N la) (MvPolynomial.C b) := by
+    have e
+        : algebraMap (OT K D N) (Op D N la) (MvPolynomial.C s)
+            * algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a)
+          = algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)
+            * algebraMap (OT K D N) (Op D N la) (MvPolynomial.C b) := by
       simp only [← map_mul, hb]
     rw [← hu] at e
-    refine Ideal.mem_span_singleton.mpr ⟨algebraMap (OT K D N) (Op D N la) (MvPolynomial.C b) * ↑u⁻¹, ?_⟩
-    calc algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a)
+    refine Ideal.mem_span_singleton.mpr
+      ⟨algebraMap (OT K D N) (Op D N la) (MvPolynomial.C b) * ↑u⁻¹, ?_⟩
+    calc
+      algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a)
         = ↑u⁻¹ * (↑u * algebraMap (OT K D N) (Op D N la) (MvPolynomial.C a)) := by simp
-      _ = ↑u⁻¹ * (algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ) *
-          algebraMap (OT K D N) (Op D N la) (MvPolynomial.C b)) := by rw [e]
+      _ = ↑u⁻¹
+          * (algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)
+            * algebraMap (OT K D N) (Op D N la) (MvPolynomial.C b)) := by
+        rw [e]
       _ = _ := by ring
-  have hm : IsLocalRing.maximalIdeal (Op D N la) =
-      Ideal.span {algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)} := by
+  have hm
+      : IsLocalRing.maximalIdeal (Op D N la)
+        = Ideal.span {algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)} := by
     rw [← Localization.AtPrime.map_eq_maximalIdeal]
     apply le_antisymm
     · rw [Ideal.map_le_iff_le_comap]
-      have hle : laT D N la ≤ Ideal.comap (algebraMap (OT K D N) (Op D N la))
-          (Ideal.span {algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)}) := by
+      have hle
+          : laT D N la
+            ≤ Ideal.comap (algebraMap (OT K D N) (Op D N la))
+              (Ideal.span {algebraMap (OT K D N) (Op D N la) (MvPolynomial.C ϖ)}) := by
         show Ideal.map (MvPolynomial.C : 𝓞 K →+* OT K D N) la.asIdeal ≤ _
         refine Ideal.map_le_iff_le_comap.mpr ?_
         intro a ha
@@ -188,8 +211,9 @@ private theorem isDedekindDomain_Op (D N : ℕ) (la : HeightOneSpectrum (𝓞 K)
   have hx0 : x ≠ 0 := by
     have hϖ0 : ϖ ≠ 0 := fun h => hϖ2 (h ▸ Ideal.zero_mem _)
     rw [hxdef]
-    refine (map_ne_zero_iff _ (IsLocalization.injective (Op D N la)
-      (Ideal.primeCompl_le_nonZeroDivisors (laT D N la)))).mpr ?_
+    refine (map_ne_zero_iff _
+      (IsLocalization.injective (Op D N la)
+        (Ideal.primeCompl_le_nonZeroDivisors (laT D N la)))).mpr ?_
     simpa using hϖ0
   have hxm : x ∈ IsLocalRing.maximalIdeal (Op D N la) := by
     rw [hm]
@@ -207,16 +231,17 @@ private theorem isDedekindDomain_Op (D N : ℕ) (la : HeightOneSpectrum (𝓞 K)
   have hprinc : (IsLocalRing.maximalIdeal (Op D N la)).IsPrincipal := ⟨⟨x, hm⟩⟩
   exact ((IsDiscreteValuationRing.TFAE (Op D N la) hnf).out 5 3).mp hprinc
 
-theorem comp_facts (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι) :
-    letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
-    letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
-    letI := algOpKT (K := K) d.D d.N la
-    IsFractionRing (Op d.D d.N la) (KTf K d.D d.N) ∧
-      IsScalarTower (Op d.D d.N la) (KTf K d.D d.N) (OmS (Ω c) d.D d.N) ∧
-      FiniteDimensional (KTf K d.D d.N) (OmS (Ω c) d.D d.N) ∧
-      Algebra.IsSeparable (KTf K d.D d.N) (OmS (Ω c) d.D d.N) ∧
-      IsDedekindDomain (integralClosure (Op d.D d.N la) (OmS (Ω c) d.D d.N)) ∧
-      IsFractionRing (integralClosure (Op d.D d.N la) (OmS (Ω c) d.D d.N)) (OmS (Ω c) d.D d.N) := by
+theorem comp_facts (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι)
+    : letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
+      letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
+      letI := algOpKT (K := K) d.D d.N la
+      IsFractionRing (Op d.D d.N la) (KTf K d.D d.N)
+        ∧ IsScalarTower (Op d.D d.N la) (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
+        ∧ FiniteDimensional (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
+        ∧ Algebra.IsSeparable (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
+        ∧ IsDedekindDomain (integralClosure (Op d.D d.N la) (OmS (Ω c) d.D d.N))
+        ∧ IsFractionRing (integralClosure (Op d.D d.N la) (OmS (Ω c) d.D d.N))
+          (OmS (Ω c) d.D d.N) := by
   classical
   letI iKS : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
   letI iOS : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
@@ -258,20 +283,22 @@ theorem comp_facts (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K)
   haveI : IsDedekindDomain (Op d.D d.N la) := isDedekindDomain_Op d.D d.N la
   refine ⟨hF, hT, hFD, hsep, ?_, ?_⟩
   · first
-      | exact integralClosure.isDedekindDomain (A := Op d.D d.N la) (K := KTf K d.D d.N)
-          (L := OmS (Ω c) d.D d.N)
-      | exact integralClosure.isDedekindDomain (Op d.D d.N la) (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
+    | exact integralClosure.isDedekindDomain (A := Op d.D d.N la) (K := KTf K d.D d.N)
+        (L := OmS (Ω c) d.D d.N)
+    | exact integralClosure.isDedekindDomain (Op d.D d.N la) (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
   · first
-      | exact integralClosure.isFractionRing_of_finite_extension (A := Op d.D d.N la)
-          (K := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N)
-      | exact integralClosure.isFractionRing_of_finite_extension (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
+    | exact integralClosure.isFractionRing_of_finite_extension (A := Op d.D d.N la)
+        (K := KTf K d.D d.N) (L := OmS (Ω c) d.D d.N)
+    | exact integralClosure.isFractionRing_of_finite_extension (KTf K d.D d.N) (OmS (Ω c) d.D d.N)
 
-theorem plOver_eq (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι) :
-    letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
-    d.PlOver la c = ValPl.PlacesOver (Op d.D d.N la) (OmS (Ω c) d.D d.N) := by
+theorem plOver_eq (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι)
+    : letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
+      d.PlOver la c = ValPl.PlacesOver (Op d.D d.N la) (OmS (Ω c) d.D d.N) := by
   letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
-  have hOS : ∀ x : OT K d.D d.N, algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N)
-      (algebraMap (OT K d.D d.N) (Op d.D d.N la) x) = d.OTtoS c x := by
+  have hOS
+      : ∀ x : OT K d.D d.N,
+        algebraMap (Op d.D d.N la) (OmS (Ω c) d.D d.N) (algebraMap (OT K d.D d.N) (Op d.D d.N la) x)
+          = d.OTtoS c x := by
     intro x
     show d.KTtoS h c (OpToKT d.D d.N la (algebraMap _ _ x)) = _
     unfold OpToKT Data.KTtoS Data.OTtoS
@@ -288,10 +315,12 @@ theorem plOver_eq (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι) :
       have h2 : ¬ 0 < w (d.OTtoS c s) := fun hlt =>
         (show (s : OT K d.D d.N) ∉ laT d.D d.N la from s.2) ((hw s).2.mp hlt)
       exact le_antisymm (not_lt.mp h2) h1
-    have hmul : w (algebraMap _ (OmS (Ω c) d.D d.N) (IsLocalization.mk' (Op d.D d.N la) a s)) =
-        w (d.OTtoS c a) := by
-      have e : algebraMap _ (OmS (Ω c) d.D d.N) (IsLocalization.mk' (Op d.D d.N la) a s) *
-          d.OTtoS c s = d.OTtoS c a := by
+    have hmul
+        : w (algebraMap _ (OmS (Ω c) d.D d.N) (IsLocalization.mk' (Op d.D d.N la) a s))
+          = w (d.OTtoS c a) := by
+      have e
+          : algebraMap _ (OmS (Ω c) d.D d.N) (IsLocalization.mk' (Op d.D d.N la) a s) * d.OTtoS c s
+            = d.OTtoS c a := by
         rw [← hOS, ← hOS, ← map_mul, IsLocalization.mk'_spec]
       have := congrArg w e
       rw [AddValuation.map_mul, hs0, add_zero] at this
@@ -301,23 +330,29 @@ theorem plOver_eq (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι) :
   · rintro ⟨hnd, hw⟩
     refine ⟨hnd, fun x => ?_⟩
     have := hw (algebraMap _ (Op d.D d.N la) x)
-    have key : algebraMap (OT K d.D d.N) (Op d.D d.N la) x ∈ IsLocalRing.maximalIdeal (Op d.D d.N la) ↔
-        x ∈ laT d.D d.N la := by
+    have key
+        : algebraMap (OT K d.D d.N) (Op d.D d.N la) x ∈ IsLocalRing.maximalIdeal (Op d.D d.N la)
+          ↔ x ∈ laT d.D d.N la := by
       first
-        | exact IsLocalization.AtPrime.to_map_mem_maximal_iff (S := Op d.D d.N la)
-            (I := laT d.D d.N la) x
-        | (rw [← IsLocalization.mk'_one (M := (laT d.D d.N la).primeCompl) (Op d.D d.N la) x]
-           exact IsLocalization.AtPrime.mk'_mem_maximal_iff (S := Op d.D d.N la)
-            (I := laT d.D d.N la) x 1)
+      | exact IsLocalization.AtPrime.to_map_mem_maximal_iff (S := Op d.D d.N la)
+          (I := laT d.D d.N la) x
+      | (
+          rw [← IsLocalization.mk'_one (M := (laT d.D d.N la).primeCompl) (Op d.D d.N la) x]
+          exact IsLocalization.AtPrime.mk'_mem_maximal_iff (S := Op d.D d.N la)
+            (I := laT d.D d.N la) x 1
+        )
     rw [hOS, key] at this
     exact this
 
-theorem comp_g (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι)
-    (n : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ) → ℤ) :
-    letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
-    ∃ g : OmS (Ω c) d.D d.N, g ≠ 0 ∧ (∀ w ∈ d.PlOver la c, w g = n w) ∧
-      ∀ y, (∀ w ∈ d.PlOver la c, 0 ≤ w y + (n w : WithTop ℤ)) ↔
-        g * y ∈ integralClosure (Op d.D d.N la) (OmS (Ω c) d.D d.N) := by
+theorem comp_g
+    (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K))
+    (c : ι) (n : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ) → ℤ)
+    : letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
+      ∃ g : OmS (Ω c) d.D d.N,
+        g ≠ 0 ∧ (∀ w ∈ d.PlOver la c, w g = n w)
+          ∧ ∀ y,
+            (∀ w ∈ d.PlOver la c, 0 ≤ w y + (n w : WithTop ℤ))
+              ↔ g * y ∈ integralClosure (Op d.D d.N la) (OmS (Ω c) d.D d.N) := by
   letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
   letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
   letI := algOpKT (K := K) d.D d.N la
@@ -330,21 +365,28 @@ theorem comp_g (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c
   refine forall₂_congr fun w hw => ?_
   rw [AddValuation.map_mul, hg w hw, add_comm]
 
-theorem comp_norm (hd : d.AxH 𝒜) (h : d.S1) (la : HeightOneSpectrum (𝓞 K)) (c : ι)
-    {g : OmS (Ω c) d.D d.N} (hg0 : g ≠ 0) (n : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ) → ℤ)
-    (hg : ∀ w ∈ d.PlOver la c, w g = n w) :
-    letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
-    ∃ u : Op d.D d.N la, IsUnit u ∧ Algebra.norm (KTf K d.D d.N) g =
-      OpToKT d.D d.N la (unifOp d.D d.N la) ^
-        (∑ᶠ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (_ : w ∈ d.PlOver la c),
-          (d.fze h c w : ℤ) * n w) * OpToKT d.D d.N la u := by
+theorem comp_norm
+    (hd : d.AxH 𝒜) (h : d.S1)
+    (la : HeightOneSpectrum (𝓞 K))
+    (c : ι)
+    {g : OmS (Ω c) d.D d.N} (hg0 : g ≠ 0)
+    (n : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ) → ℤ) (hg : ∀ w ∈ d.PlOver la c, w g = n w)
+    : letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
+      ∃ u : Op d.D d.N la,
+        IsUnit u
+          ∧ Algebra.norm (KTf K d.D d.N) g
+            = OpToKT d.D d.N la (unifOp d.D d.N la)
+                ^ (∑ᶠ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (_ : w ∈ d.PlOver la c),
+                    (d.fze h c w : ℤ) * n w)
+              * OpToKT d.D d.N la u := by
   letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
   letI : Algebra (Op d.D d.N la) (OmS (Ω c) d.D d.N) := d.algOp h la c
   letI := algOpKT (K := K) d.D d.N la
   obtain ⟨i1, i2, i3, i4, i5, i6⟩ := d.comp_facts hd h la c
   haveI := Op_isDVR (K := K) d.D d.N la
-  obtain ⟨u, hu, hN⟩ := ValPl.norm_eq_places (O := Op d.D d.N la) (F := KTf K d.D d.N) g hg0
-    (unifOp_irreducible d.D d.N la)
+  obtain ⟨u, hu, hN⟩ :=
+    ValPl.norm_eq_places (O := Op d.D d.N la) (F := KTf K d.D d.N) g hg0
+      (unifOp_irreducible d.D d.N la)
   refine ⟨u, hu, ?_⟩
   rw [hN]
   have hg' : ∀ w ∈ ValPl.PlacesOver (Op d.D d.N la) (OmS (Ω c) d.D d.N), w g = n w := by

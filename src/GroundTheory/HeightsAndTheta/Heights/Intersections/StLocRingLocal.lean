@@ -15,11 +15,14 @@ noncomputable section
 
 def LocRingLocal.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P W : Ideal (MRing ι)),
-    P.IsPrime → W.IsPrime → P ≤ W →
-    IsLocalRing (locRing P W) ∧
-      ∀ (y : locRing P W) (u v : MRing ι) (a : K → ℕ), IsMultiHomog u a → IsMultiHomog v a → v ∉ W →
-        (y : FractionRing (MRing ι ⧸ P)) * algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P v) = algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P u) →
-        (IsUnit y ↔ u ∉ W)
+    P.IsPrime → W.IsPrime → P ≤ W
+      → IsLocalRing (locRing P W)
+        ∧ ∀ (y : locRing P W) (u v : MRing ι) (a : K → ℕ),
+          IsMultiHomog u a → IsMultiHomog v a → v ∉ W
+            → (y : FractionRing (MRing ι ⧸ P))
+                * algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P v)
+              = algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P u)
+            → (IsUnit y ↔ u ∉ W)
 
 end
 

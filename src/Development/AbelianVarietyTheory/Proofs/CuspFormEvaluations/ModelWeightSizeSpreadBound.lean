@@ -10,7 +10,10 @@ public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniq
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections GlobalTheory.RunIn
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections
+  GlobalTheory.RunIn
 
 noncomputable section
 
@@ -18,15 +21,21 @@ namespace GlobalTheory.RunIn.WtSize
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem sum_cm {M : Type} [AddCommMonoid M] {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r) (g : (E →+* ℂ) → M) :
-    ∑ τ : X.Ψ, (g τ.1 + g (ComplexEmbedding.conjugate τ.1)) = ∑ τ, g τ := by
+theorem sum_cm
+    {M : Type} [AddCommMonoid M]
+    {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+    (g : (E →+* ℂ) → M)
+    : ∑ τ : X.Ψ, (g τ.1 + g (ComplexEmbedding.conjugate τ.1)) = ∑ τ, g τ := by
   classical
-  have hs : ∑ τ : X.Ψ, (g τ.1 + g (ComplexEmbedding.conjugate τ.1)) =
-      ∑ τ ∈ X.Ψ, (g τ + g (ComplexEmbedding.conjugate τ)) :=
+  have hs
+      : ∑ τ : X.Ψ, (g τ.1 + g (ComplexEmbedding.conjugate τ.1))
+        = ∑ τ ∈ X.Ψ, (g τ + g (ComplexEmbedding.conjugate τ)) :=
     Finset.sum_coe_sort X.Ψ (fun τ => g τ + g (ComplexEmbedding.conjugate τ))
   rw [hs, Finset.sum_add_distrib, ← Finset.sum_add_sum_compl X.Ψ g]
   congr 1
-  refine Finset.sum_nbij' (fun τ => ComplexEmbedding.conjugate τ) (fun τ => ComplexEmbedding.conjugate τ)
+  refine Finset.sum_nbij'
+    (fun τ => ComplexEmbedding.conjugate τ)
+    (fun τ => ComplexEmbedding.conjugate τ)
     ?_ ?_ ?_ ?_ ?_
   · intro τ hτ
     simpa [Finset.mem_compl] using (X.cmType τ).1 hτ
@@ -41,52 +50,57 @@ theorem sum_cm {M : Type} [AddCommMonoid M] {r : ℕ} (X : ReciprocityTheory.Cha
   · intro τ _
     rfl
 
-theorem two_mul_card_cm {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r) :
-    2 * Fintype.card X.Ψ = Module.finrank ℚ E := by
+theorem two_mul_card_cm {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+    : 2 * Fintype.card X.Ψ = Module.finrank ℚ E := by
   have h := sum_cm X (fun _ => (1 : ℕ))
   simp only [Finset.sum_const, Finset.card_univ, smul_eq_mul, mul_one] at h
   rw [← NumberField.Embeddings.card E ℂ, ← h]
   ring
 
-theorem sum_row_le (r p0 : ℕ) (hp : p0 ≤ r) (u v : ℕ → ℕ) :
-    ∑ j : Fin r, (if p0 ≤ (j : ℕ) then u ((j : ℕ) - p0) else v (p0 - 1 - (j : ℕ))) ≤
-      ∑ i ∈ Finset.range r, u i + ∑ i ∈ Finset.range r, v i := by
+theorem sum_row_le (r p0 : ℕ) (hp : p0 ≤ r) (u v : ℕ → ℕ)
+    : ∑ j : Fin r, (if p0 ≤ (j : ℕ) then u ((j : ℕ) - p0) else v (p0 - 1 - (j : ℕ)))
+      ≤ ∑ i ∈ Finset.range r, u i + ∑ i ∈ Finset.range r, v i := by
   classical
   rw [Finset.sum_ite]
   gcongr
-  · calc ∑ j ∈ Finset.univ.filter (fun j : Fin r => p0 ≤ (j : ℕ)), u ((j : ℕ) - p0)
-          = ∑ i ∈ Finset.image (fun j : Fin r => (j : ℕ) - p0) (Finset.univ.filter (fun j : Fin r => p0 ≤ (j : ℕ))), u i := by
-            refine (Finset.sum_image ?_).symm
-            intro a ha b hb hab
-            simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at ha hb
-            dsimp only at hab
-            exact Fin.ext (by omega)
+  · calc
+      ∑ j ∈ Finset.univ.filter (fun j : Fin r => p0 ≤ (j : ℕ)), u ((j : ℕ) - p0)
+          = ∑ i ∈ Finset.image (fun j : Fin r => (j : ℕ) - p0) (Finset.univ.filter (fun j : Fin r => p0 ≤ (j : ℕ))), u i :=
+        by
+          refine (Finset.sum_image ?_).symm
+          intro a ha b hb hab
+          simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at ha hb
+          dsimp only at hab
+          exact Fin.ext (by omega)
       _ ≤ ∑ i ∈ Finset.range r, u i := by
-            apply Finset.sum_le_sum_of_subset
-            intro i hi
-            simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and] at hi
-            obtain ⟨j, _, rfl⟩ := hi
-            simp only [Finset.mem_range]
-            have := j.isLt
-            omega
-  · calc ∑ j ∈ Finset.univ.filter (fun j : Fin r => ¬ p0 ≤ (j : ℕ)), v (p0 - 1 - (j : ℕ))
-          = ∑ i ∈ Finset.image (fun j : Fin r => p0 - 1 - (j : ℕ)) (Finset.univ.filter (fun j : Fin r => ¬ p0 ≤ (j : ℕ))), v i := by
-            refine (Finset.sum_image ?_).symm
-            intro a ha b hb hab
-            simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at ha hb
-            dsimp only at hab
-            exact Fin.ext (by omega)
+        apply Finset.sum_le_sum_of_subset
+        intro i hi
+        simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and] at hi
+        obtain ⟨j, _, rfl⟩ := hi
+        simp only [Finset.mem_range]
+        have := j.isLt
+        omega
+  · calc
+      ∑ j ∈ Finset.univ.filter (fun j : Fin r => ¬ p0 ≤ (j : ℕ)), v (p0 - 1 - (j : ℕ))
+          = ∑ i ∈ Finset.image (fun j : Fin r => p0 - 1 - (j : ℕ)) (Finset.univ.filter (fun j : Fin r => ¬ p0 ≤ (j : ℕ))), v i :=
+        by
+          refine (Finset.sum_image ?_).symm
+          intro a ha b hb hab
+          simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at ha hb
+          dsimp only at hab
+          exact Fin.ext (by omega)
       _ ≤ ∑ i ∈ Finset.range r, v i := by
-            apply Finset.sum_le_sum_of_subset
-            intro i hi
-            simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and] at hi
-            obtain ⟨j, hj, rfl⟩ := hi
-            simp only [Finset.mem_range]
-            have := j.isLt
-            omega
+        apply Finset.sum_le_sum_of_subset
+        intro i hi
+        simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and] at hi
+        obtain ⟨j, hj, rfl⟩ := hi
+        simp only [Finset.mem_range]
+        have := j.isLt
+        omega
 
-theorem spread_le {r : ℕ} (x b : Fin r → ℝ) (m : ℝ) (hm : 0 ≤ m) (hb : ∀ i, 0 ≤ b i)
-    (hx : ∀ i, |x i| = b i + m) : (⨆ i, x i) - ⨅ i, x i ≤ ∑ i, b i + 2 * m := by
+theorem spread_le
+    {r : ℕ} (x b : Fin r → ℝ) (m : ℝ) (hm : 0 ≤ m) (hb : ∀ i, 0 ≤ b i) (hx : ∀ i, |x i| = b i + m)
+    : (⨆ i, x i) - ⨅ i, x i ≤ ∑ i, b i + 2 * m := by
   classical
   rcases isEmpty_or_nonempty (Fin r) with hr | hr
   · rw [Real.iSup_of_isEmpty, Real.iInf_of_isEmpty]
@@ -109,10 +123,12 @@ theorem spread_le {r : ℕ} (x b : Fin r → ℝ) (m : ℝ) (hm : 0 ≤ m) (hb :
         exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun k _ _ => hb k)
       linarith
 
-variable {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  {σ : c.F →+* ℂ} {r : ℕ}
+variable
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ}
 
-theorem relab_bijective (c : Coeff l) (σ : c.F →+* ℂ) : Function.Bijective (relab (E := E) c σ) := by
+theorem relab_bijective (c : Coeff l) (σ : c.F →+* ℂ)
+    : Function.Bijective (relab (E := E) c σ) := by
   have hinj : Function.Injective (relab (E := E) c σ) := by
     intro τ τ' hττ'
     unfold relab embF at hττ'
@@ -186,29 +202,39 @@ theorem laU_bounds (U : Unf Xo c σ r) (a : (E →+* ℂ) × ℕ → ℕ) (n : �
             nsmul_eq_mul]
           nlinarith [hsum, mul_le_mul_of_nonneg_left hm2 (mul_nonneg h0 hr0)]
 
-theorem sum_wtA_le {D : D7} {j : ℕ} (w : WeightFamilies.Wt D j) (m : ℕ) :
-    ∑ τ, ∑ i ∈ Finset.range m, wtA w (τ, i) ≤ WeightAlgebra.DF w := by
+theorem sum_wtA_le {D : D7} {j : ℕ} (w : WeightFamilies.Wt D j) (m : ℕ)
+    : ∑ τ, ∑ i ∈ Finset.range m, wtA w (τ, i) ≤ WeightAlgebra.DF w := by
   classical
   unfold wtA WeightAlgebra.DF WeightAlgebra.degP ext0
-  have key : ∀ (q : ℕ) (g : Fin q → ℕ),
-      ∑ i ∈ Finset.range m, (if h : i < q then g ⟨i, h⟩ else 0) ≤ ∑ i, g i := by
+  have key
+      : ∀ (q : ℕ) (g : Fin q → ℕ),
+        ∑ i ∈ Finset.range m, (if h : i < q then g ⟨i, h⟩ else 0) ≤ ∑ i, g i := by
     intro q g
-    calc _ ≤ ∑ i ∈ Finset.range q, (if h : i < q then g ⟨i, h⟩ else 0) := by
-          apply Finset.sum_le_sum_of_ne_zero
-          intro i _ hi
-          rw [Finset.mem_range]
-          by_contra hc
-          exact hi (dif_neg hc)
+    calc
+      _ ≤ ∑ i ∈ Finset.range q, (if h : i < q then g ⟨i, h⟩ else 0) := by
+        apply Finset.sum_le_sum_of_ne_zero
+        intro i _ hi
+        rw [Finset.mem_range]
+        by_contra hc
+        exact hi (dif_neg hc)
       _ = ∑ i, g i := by
-          rw [Finset.sum_range]
-          simp
+        rw [Finset.sum_range]
+        simp
   rw [Finset.sum_congr rfl (fun τ _ => Finset.sum_comm), Finset.sum_comm]
   refine Finset.sum_le_sum (fun t _ => ?_)
   rw [Finset.sum_comm]
   simp only [Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
   exact add_le_add (key _ _) (key _ _)
 
-theorem laU_wtA_size : ∀ (D : D7) (T : Top D) (_h : LawsP T) (j : ℕ) (_hj : InR D j) (w : WeightFamilies.Wt D j) (σ : T.Q.c.F →+* ℂ), GoodEmb T.Q.c σ → ∀ k : (T.U j σ).Comp, (∑ τ, ((T.U j σ).X k).spread (laU (T.U j σ) (wtA w) w.n k) τ) ≤ (WeightAlgebra.DF w : ℝ) + D.R.f * w.n ∧ (∑ τ, ∑ i, |((laU (T.U j σ) (wtA w) w.n k τ i : ℤ) : ℝ)|) ≤ (WeightAlgebra.DF w : ℝ) + D.R.f * D.R.r * w.n / 2 := by
+theorem laU_wtA_size
+    : ∀ (D : D7) (T : Top D) (_h : LawsP T) (j : ℕ) (_hj : InR D j) (w : WeightFamilies.Wt D j)
+        (σ : T.Q.c.F →+* ℂ),
+      GoodEmb T.Q.c σ
+        → ∀ k : (T.U j σ).Comp,
+          (∑ τ, ((T.U j σ).X k).spread (laU (T.U j σ) (wtA w) w.n k) τ)
+              ≤ (WeightAlgebra.DF w : ℝ) + D.R.f * w.n
+            ∧ (∑ τ, ∑ i, |((laU (T.U j σ) (wtA w) w.n k τ i : ℤ) : ℝ)|)
+              ≤ (WeightAlgebra.DF w : ℝ) + D.R.f * D.R.r * w.n / 2 := by
   intro D T h j hj w σ hσ k
   have h2 := two_mul_card_cm ((T.U j σ).X k)
   have h3 : Module.finrank ℚ D.host.E = 2 * D.R.f := by

@@ -44,18 +44,27 @@ def lmulME (a b : Mat k r) (hab : a * b = 1) (hba : b * a = 1) : Mt k r ≃ᵐ M
   measurable_toFun := (cont_lmulM a).measurable
   measurable_invFun := (cont_lmulM b).measurable
 
-theorem isTestG_translate {g : Mat k r} (hg : g ∈ GV k r) {φ : Mat k r → ℂ} (hφ : IsTestG φ) :
-    IsTestG (fun y => φ (g⁻¹ * y)) := by
+theorem isTestG_translate {g : Mat k r} (hg : g ∈ GV k r) {φ : Mat k r → ℂ} (hφ : IsTestG φ)
+    : IsTestG (fun y => φ (g⁻¹ * y)) := by
   obtain ⟨hsm, K, hK, hKv⟩ := hφ
   have hgi : g⁻¹ ∈ GV k r := WeylGroupFacts.uh_inv hg
   have hdet := WeylGroupFacts.isUnit_of_uh hg
   have hgg : g * g⁻¹ = 1 := Matrix.mul_nonsing_inv g hdet
-  refine ⟨fun g₀ hg₀ => ?_, (fun y => g * y) '' K,
-    hK.image (continuous_const.matrix_mul continuous_id), fun y hy hyK => ?_⟩
+  refine ⟨
+    fun g₀ hg₀ => ?_,
+    (fun y => g * y) '' K,
+    hK.image (continuous_const.matrix_mul continuous_id),
+    fun y hy hyK => ?_
+  ⟩
   · obtain ⟨U, f', hU, hgU, hf', hfe⟩ := hsm (g⁻¹ * g₀) (WeylGroupFacts.uh_mul hgi hg₀)
-    refine ⟨(fun y => g⁻¹ * y) ⁻¹' U, fun y => f' (g⁻¹ * y),
-      hU.preimage (continuous_const.matrix_mul continuous_id), hgU, ?_,
-      fun y hyU hyG => hfe _ hyU (WeylGroupFacts.uh_mul hgi hyG)⟩
+    refine ⟨
+      (fun y => g⁻¹ * y) ⁻¹' U,
+      fun y => f' (g⁻¹ * y),
+      hU.preimage (continuous_const.matrix_mul continuous_id),
+      hgU,
+      ?_,
+      fun y hyU hyG => hfe _ hyU (WeylGroupFacts.uh_mul hgi hyG)
+    ⟩
     exact hf'.comp (lmulCLM g⁻¹).contDiff.contDiffOn (fun y hy => hy)
   · apply hKv _ (WeylGroupFacts.uh_mul hgi hy)
     intro hK'
@@ -64,18 +73,23 @@ theorem isTestG_translate {g : Mat k r} (hg : g ∈ GV k r) {φ : Mat k r → �
     show g * (g⁻¹ * y) = y
     rw [← Matrix.mul_assoc, hgg, Matrix.one_mul]
 
-theorem sigInt_translate {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (D : RealPlaceData k r Wp Wq) (X : SigData k r)
-    {g : Mat k r} (hg : g ∈ GV k r) (φ : Mat k r → ℂ) :
-    sigInt D X (fun y => φ (g⁻¹ * y)) X.w = X.σ g (sigInt D X φ X.w) := by
+theorem sigInt_translate
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq]
+    (D : RealPlaceData k r Wp Wq) (X : SigData k r)
+    {g : Mat k r} (hg : g ∈ GV k r)
+    (φ : Mat k r → ℂ)
+    : sigInt D X (fun y => φ (g⁻¹ * y)) X.w = X.σ g (sigInt D X φ X.w) := by
   have hdet := WeylGroupFacts.isUnit_of_uh hg
   have hgg : g * g⁻¹ = 1 := Matrix.mul_nonsing_inv g hdet
   have hgg' : g⁻¹ * g = 1 := Matrix.nonsing_inv_mul g hdet
   let e := lmulME (k := k) (r := r) g g⁻¹ hgg hgg'
   have hmap : D.μG.map e = D.μG := D.haarG.left g hg
   have hconc : ∀ᵐ x ∂D.μG, Matrix.of x ∈ GV k r := ae_iff.mpr D.haarG.conc
-  let L : X.Hs →ₗᵢ[ℂ] X.Hs :=
-    { toLinearMap := (X.σ g).toLinearMap, norm_map' := fun v => X.rep.2.1 g hg v }
+  let L : X.Hs →ₗᵢ[ℂ] X.Hs := {
+    toLinearMap := (X.σ g).toLinearMap
+    norm_map' := fun v => X.rep.2.1 g hg v
+  }
   have hL : ∀ v, L v = X.σ g v := fun v => rfl
   unfold sigInt
   conv_lhs => rw [← hmap]
@@ -91,6 +105,10 @@ end Cut0Aux
 theorem stCut0 (h : UnitaryGroupStructuralFacts) : StCut0 := by
   intro k r Wp _ _ _ D X g hg v hv
   obtain ⟨φ, hφ, rfl⟩ := hv
-  exact ⟨fun y => φ (g⁻¹ * y), Cut0Aux.isTestG_translate hg hφ, (Cut0Aux.sigInt_translate D X hg φ).symm⟩
+  exact ⟨
+    fun y => φ (g⁻¹ * y),
+    Cut0Aux.isTestG_translate hg hφ,
+    (Cut0Aux.sigInt_translate D X hg φ).symm
+  ⟩
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1

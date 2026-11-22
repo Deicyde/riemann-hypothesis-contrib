@@ -8,10 +8,11 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 
-private theorem hlay_place (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) (hp : p.Prime) :
-    ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1 := by
+private theorem hlay_place (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) (hp : p.Prime)
+    : ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1 := by
   have hmem : (p : Ω) ∈ (⊥ : Subring Ω) := Subring.mem_bot.mpr ⟨p, by simp⟩
   set x : (⊥ : Subring Ω) := ⟨p, hmem⟩
   have hI : Ideal.span {x} ≠ ⊤ := by
@@ -33,27 +34,33 @@ private theorem hlay_place (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) (hp : 
   obtain ⟨B, -, hB⟩ := Ideal.image_subset_nonunits_valuationSubring _ hI
   exact ⟨B, (ValuationSubring.mem_nonunits_iff B).mp (hB ⟨x, Ideal.subset_span rfl, rfl⟩)⟩
 
-private theorem hlay_cop (l : ℕ) [hl : Fact l.Prime] (m : ℕ) : (l ^ m).Coprime (l - 1) := Nat.Coprime.pow_left m ((Nat.coprime_self_sub_right hl.out.one_le).mpr (Nat.coprime_one_right _))
+private theorem hlay_cop (l : ℕ) [hl : Fact l.Prime] (m : ℕ) : (l ^ m).Coprime (l - 1) :=
+  Nat.Coprime.pow_left m ((Nat.coprime_self_sub_right hl.out.one_le).mpr (Nat.coprime_one_right _))
 
-private theorem hlay_card (l : ℕ) [hl : Fact l.Prime] (m : ℕ) (h2 : l ≠ 2) :
-    Nat.card ((⊤ : Subgroup (ZMod (l ^ (m + 1)))ˣ).map (powMonoidHom (l - 1))) = l ^ m := by
+private theorem hlay_card (l : ℕ) [hl : Fact l.Prime] (m : ℕ) (h2 : l ≠ 2)
+    : Nat.card ((⊤ : Subgroup (ZMod (l ^ (m + 1)))ˣ).map (powMonoidHom (l - 1))) = l ^ m := by
   haveI := ZMod.isCyclic_units_of_prime_pow l hl.out h2 (m + 1)
-  rw [← MonoidHom.range_eq_map, IsCyclic.card_powMonoidHom_range, Nat.card_eq_fintype_card, ZMod.card_units_eq_totient,
-    Nat.totient_prime_pow_succ hl.out]
+  rw [← MonoidHom.range_eq_map, IsCyclic.card_powMonoidHom_range, Nat.card_eq_fintype_card,
+    ZMod.card_units_eq_totient, Nat.totient_prime_pow_succ hl.out]
   have hpos : 0 < l - 1 := Nat.sub_pos_of_lt hl.out.one_lt
   rw [Nat.gcd_comm, Nat.gcd_mul_left_right]
   exact Nat.mul_div_cancel _ hpos
 
-private theorem hlay_inf {l : ℕ} [hl : Fact l.Prime] (m : ℕ) (u : ℤ_[l]ˣ) (h1 : u ∈ KStar.TotallyRealRoots.princ l 1)
-    (h : KStar.TotallyRealRoots.redPow l (m + 1) u ^ (l - 1) = 1) : KStar.TotallyRealRoots.redPow l (m + 1) u = 1 := by
+private theorem hlay_inf
+    {l : ℕ} [hl : Fact l.Prime]
+    (m : ℕ) (u : ℤ_[l]ˣ) (h1 : u ∈ KStar.TotallyRealRoots.princ l 1)
+    (h : KStar.TotallyRealRoots.redPow l (m + 1) u ^ (l - 1) = 1)
+    : KStar.TotallyRealRoots.redPow l (m + 1) u = 1 := by
   set x := KStar.TotallyRealRoots.redPow l (m + 1) u with hx
   have hd : l ^ 1 ∣ l ^ (m + 1) := pow_dvd_pow l (by omega)
   set f := ZMod.unitsMap hd
   have hfx : f x = 1 := by
     have : f x = KStar.TotallyRealRoots.redPow l 1 u := by
       ext
-      simp only [f, hx, ZMod.unitsMap, KStar.TotallyRealRoots.redPow, Units.coe_map, MonoidHom.coe_coe]
-      exact congrArg (fun g => g (u : ℤ_[l])) (PadicInt.zmod_cast_comp_toZModPow 1 (m + 1) (by omega))
+      simp only [f, hx, ZMod.unitsMap, KStar.TotallyRealRoots.redPow, Units.coe_map,
+        MonoidHom.coe_coe]
+      exact
+        congrArg (fun g => g (u : ℤ_[l])) (PadicInt.zmod_cast_comp_toZModPow 1 (m + 1) (by omega))
     rw [this]
     exact h1
   have hsurj : Function.Surjective f := ZMod.unitsMap_surjective hd
@@ -63,7 +70,8 @@ private theorem hlay_inf {l : ℕ} [hl : Fact l.Prime] (m : ℕ) (u : ℤ_[l]ˣ)
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, pow_one, Nat.totient_prime hl.out]
   have hker : Nat.card f.ker = l ^ m := by
     have e := Subgroup.card_mul_index f.ker
-    rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr hsurj, Subgroup.card_top, hcardH, hcardG] at e
+    rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr hsurj, Subgroup.card_top, hcardH, hcardG]
+      at e
     exact Nat.eq_of_mul_eq_mul_right (Nat.sub_pos_of_lt hl.out.one_lt) e
   have hpow : x ^ (l ^ m) = 1 := by
     have := pow_card_eq_one' (G := f.ker) (x := ⟨x, hfx⟩)
@@ -74,30 +82,43 @@ private theorem hlay_inf {l : ℕ} [hl : Fact l.Prime] (m : ℕ) (u : ℤ_[l]ˣ)
   rw [hlay_cop l m, Nat.dvd_one, orderOf_eq_one_iff] at hdvd
   exact hdvd
 
-theorem UpperTheory.V.Fr.hlay :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (m : ℕ), l ≠ 2 → IsOpen (Hlay Ω l m : Set (G ℚ Ω)) ∧ commutator (G ℚ Ω) ≤ Hlay Ω l m ∧ (Hlay Ω l m).index = l ^ m ∧ Hlay Ω l m ⊓ (cycMod ℚ Ω l 1).ker = (cycMod ℚ Ω l (m + 1)).ker ∧ (∀ B' : ValuationSubring Ω, ¬ B'.valuation (l : Ω) < 1 → Ine (F := ℚ) B' ≤ Hlay Ω l m) ∧ ∀ B' : ValuationSubring Ω, B'.valuation (l : Ω) < 1 → (Hlay Ω l m).relIndex (Ine (F := ℚ) B') = l ^ m ∧ ∀ r, (Ine (F := ℚ) B').map (cycMod ℚ Ω l r) = ⊤ := by
+theorem UpperTheory.V.Fr.hlay
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (m : ℕ),
+      l ≠ 2
+        → IsOpen (Hlay Ω l m : Set (G ℚ Ω)) ∧ commutator (G ℚ Ω) ≤ Hlay Ω l m
+          ∧ (Hlay Ω l m).index = l ^ m
+          ∧ Hlay Ω l m ⊓ (cycMod ℚ Ω l 1).ker = (cycMod ℚ Ω l (m + 1)).ker
+          ∧ (∀ B' : ValuationSubring Ω, ¬ B'.valuation (l : Ω) < 1 → Ine (F := ℚ) B' ≤ Hlay Ω l m)
+          ∧ ∀ B' : ValuationSubring Ω,
+            B'.valuation (l : Ω) < 1
+              → (Hlay Ω l m).relIndex (Ine (F := ℚ) B') = l ^ m
+                ∧ ∀ r, (Ine (F := ℚ) B').map (cycMod ℚ Ω l r) = ⊤ := by
   intro Ω _ _ _ l _ m h2
   obtain ⟨A, hA⟩ := hlay_place Ω l Fact.out
-  have hsurjIne : ∀ B' : ValuationSubring Ω, B'.valuation (l : Ω) < 1 →
-      ∀ r, (Ine (F := ℚ) B').map (cycMod ℚ Ω l r) = ⊤ := by
+  have hsurjIne
+      : ∀ B' : ValuationSubring Ω,
+        B'.valuation (l : Ω) < 1 → ∀ r, (Ine (F := ℚ) B').map (cycMod ℚ Ω l r) = ⊤ := by
     intro B' hB' r
     rw [eq_top_iff]
     rintro y -
     obtain ⟨v, rfl⟩ := KStar.TotallyRealRoots.redPow_surjective (l := l) r y
     obtain ⟨σ, hσ, hσv⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l B' hB' v
     exact ⟨σ, hσ, by rw [← hσv]; rfl⟩
-  have hidx : ∀ K : Subgroup (G ℚ Ω), K.map (cycMod ℚ Ω l (m + 1)) = ⊤ →
-      (Hlay Ω l m).relIndex K = l ^ m := by
+  have hidx
+      : ∀ K : Subgroup (G ℚ Ω),
+        K.map (cycMod ℚ Ω l (m + 1)) = ⊤ → (Hlay Ω l m).relIndex K = l ^ m := by
     intro K hK
-    have hsub : (Hlay Ω l m).subgroupOf K = ((cycMod ℚ Ω l (m + 1) ^ (l - 1)).comp K.subtype).ker := by
+    have hsub
+        : (Hlay Ω l m).subgroupOf K = ((cycMod ℚ Ω l (m + 1) ^ (l - 1)).comp K.subtype).ker := by
       ext x
       rfl
     rw [Subgroup.relIndex, hsub, Subgroup.index_ker]
-    have hr : ((cycMod ℚ Ω l (m + 1) ^ (l - 1)).comp K.subtype).range =
-        (⊤ : Subgroup (ZMod (l ^ (m + 1)))ˣ).map (powMonoidHom (l - 1)) := by
+    have hr
+        : ((cycMod ℚ Ω l (m + 1) ^ (l - 1)).comp K.subtype).range
+          = (⊤ : Subgroup (ZMod (l ^ (m + 1)))ˣ).map (powMonoidHom (l - 1)) := by
       ext y
-      simp only [MonoidHom.mem_range, Subgroup.mem_map, Subgroup.mem_top, true_and, MonoidHom.comp_apply,
-        Subgroup.coe_subtype, MonoidHom.pow_apply, powMonoidHom_apply]
+      simp only [MonoidHom.mem_range, Subgroup.mem_map, Subgroup.mem_top, true_and,
+        MonoidHom.comp_apply, Subgroup.coe_subtype, MonoidHom.pow_apply, powMonoidHom_apply]
       constructor
       · rintro ⟨k, rfl⟩
         exact ⟨_, rfl⟩
@@ -114,8 +135,9 @@ theorem UpperTheory.V.Fr.hlay :
     rw [MonoidHom.mem_ker.mp hσ, one_pow]
   refine ⟨?_, ?_, ?_, ?_, ?_, fun B' hB' => ⟨hidx _ (hsurjIne B' hB' _), hsurjIne B' hB'⟩⟩
   · apply Subgroup.isOpen_mono hkerle
-    have hset : ((cycMod ℚ Ω l (m + 1)).ker : Set (G ℚ Ω)) =
-        cycZ ℚ Ω l ⁻¹' (KStar.TotallyRealRoots.princ l (m + 1) : Set ℤ_[l]ˣ) := by
+    have hset
+        : ((cycMod ℚ Ω l (m + 1)).ker : Set (G ℚ Ω))
+          = cycZ ℚ Ω l ⁻¹' (KStar.TotallyRealRoots.princ l (m + 1) : Set ℤ_[l]ˣ) := by
       ext σ
       rfl
     rw [hset]

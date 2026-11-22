@@ -6,8 +6,10 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.S7
 
-theorem eq_one_of_near {l : ℕ} [Fact l.Prime] {u : PadicAlgCl l} {m : ℕ} (hm : ¬ l ∣ m) (hu : u ^ m = 1)
-    (h : ‖u - 1‖ < 1) : u = 1 := by
+theorem eq_one_of_near
+    {l : ℕ} [Fact l.Prime]
+    {u : PadicAlgCl l} {m : ℕ} (hm : ¬ l ∣ m) (hu : u ^ m = 1) (h : ‖u - 1‖ < 1)
+    : u = 1 := by
   by_contra hne
   have hu1 : ‖u‖ ≤ 1 := by
     have := IsUltrametricDist.norm_add_le_max (u - 1) 1
@@ -28,8 +30,9 @@ theorem eq_one_of_near {l : ℕ} [Fact l.Prime] {u : PadicAlgCl l} {m : ℕ} (hm
     induction n with
     | zero => simp
     | succ n ih =>
-      have e : (∑ i ∈ Finset.range (n + 1), u ^ i) - ((n + 1 : ℕ) : PadicAlgCl l)
-          = ((∑ i ∈ Finset.range n, u ^ i) - (n : PadicAlgCl l)) + (u ^ n - 1) := by
+      have e
+          : (∑ i ∈ Finset.range (n + 1), u ^ i) - ((n + 1 : ℕ) : PadicAlgCl l)
+            = ((∑ i ∈ Finset.range n, u ^ i) - (n : PadicAlgCl l)) + (u ^ n - 1) := by
         rw [Finset.sum_range_succ]; push_cast; ring
       rw [e]
       exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ih (hpow n))

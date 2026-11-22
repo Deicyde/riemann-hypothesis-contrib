@@ -9,11 +9,13 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.UnramifiedTrace
 
-open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 NumberField IsDedekindDomain Matrix Formalism.UG
+open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 NumberField IsDedekindDomain Matrix
+  Formalism.UG
 open scoped TensorProduct Classical
 
 variable {D : D7} {u : D.what₂.Word}
-
 
 set_option maxHeartbeats 4000000 in
 theorem du_formula_of_fibre_count (T : Forms0 D u) (hF : DUFib0F T) : DUFormulaLevelZero D u := by
@@ -33,19 +35,22 @@ theorem du_formula_of_fibre_count (T : Forms0 D u) (hF : DUFib0F T) : DUFormulaL
   obtain ⟨hself, hDE, hEE, hline⟩ := hval G hGA
   funext s
   rw [norm_eq_sum_diamond]
-  simp only [Formalism.MainNotions.product_first_zeroth_parts.trp, LinearMap.smul_apply, LinearMap.comp_apply, Pi.add_apply, Pi.sub_apply, Pi.smul_apply,
-    smul_eq_mul, Finset.sum_apply]
+  simp only [Formalism.MainNotions.product_first_zeroth_parts.trp, LinearMap.smul_apply,
+    LinearMap.comp_apply, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_apply]
   rw [dopU_eq T v φ hGA hGφ c γ η κ Mu hmv hMu, eopU_eq T v φ hGA hGφ c γ η κ Mu hmv hMu]
   simp only [hdia]
   exact comb_du ((D.fm u).te 0 v c) ((D.fm u).te_ne 0 v c) (D.mem u).A.T (D.R.N 0 - 1) (D.R.N 0 - 2)
-    (D.mem u).A.T_prime.ne_zero πD πE _ _ (φ c s) (fun a => G (T.cls0.y c * δ a) (T.val0.eY s)) τ
-    hcE hcD
-    (fun p hp => by rw [hGφ c]; exact congrFun (hself p hp) _) (fun p q h => congrFun (hDE p q h) _)
+    (D.mem u).A.T_prime.ne_zero πD πE _ _ (φ c s)
+    (fun a => G (T.cls0.y c * δ a) (T.val0.eY s))
+    τ hcE hcD
+    (fun p hp => by rw [hGφ c]; exact congrFun (hself p hp) _)
+    (fun p q h => congrFun (hDE p q h) _)
     (fun p q h => congrFun (hEE p q h) _)
     (fun a q hq => congrFun (hline a q hq (k (τ a)) (hk (τ a)) (δ (τ a)) (hδ (τ a))) _)
 
-theorem dUAll_of (h : ∀ (D : D7) (u : D.what₂.Word) (T : Forms0 D u), DUFib0F T) : Formalism.L2.GlobalTheoryTheory.UnramifiedDiagonal.DUAll :=
-  fun D u T => du_formula_of_fibre_count T (h D u T)
+theorem dUAll_of (h : ∀ (D : D7) (u : D.what₂.Word) (T : Forms0 D u), DUFib0F T)
+    : Formalism.L2.GlobalTheoryTheory.UnramifiedDiagonal.DUAll := fun D u T =>
+  du_formula_of_fibre_count T (h D u T)
 
 end Formalism.L2.GlobalTheoryTheory.UnramifiedTrace
 

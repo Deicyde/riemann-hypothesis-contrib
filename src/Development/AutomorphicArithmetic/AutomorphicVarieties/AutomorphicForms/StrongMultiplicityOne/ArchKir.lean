@@ -5,29 +5,37 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
-open UpperTheory.V.Af.Smo hiding psiR conv Cen SameSat ArchStep LinChange ArchKir PsiInf EmbY FinKir ChartCont ConvCont ConvFub ConvNice SeedConv EigMap KillP SphAll Vanish OrthStep OrthConv EigOfSat Seed SetUp Pair CenSame
+open UpperTheory.V.Af.Smo hiding
+  psiR conv Cen SameSat ArchStep LinChange ArchKir PsiInf EmbY FinKir ChartCont ConvCont ConvFub
+  ConvNice SeedConv EigMap KillP SphAll Vanish OrthStep OrthConv EigOfSat Seed SetUp Pair CenSame
 open GlobalTheory.CuspRep (Cinf Lie chart infGL pInf sInf toL lmul invSet)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 open UpperTheory.V UpperTheory.V.Af.StrongMultiplicityOne
 
-private theorem lmul_lmul {E : Type} [Field E] [NumberField E] {n : ℕ} (a b : Matrix (Fin n) (Fin n) (Cinf E))
-    (x : Lie E n) : lmul (toL a) (lmul (toL b) x) = lmul (toL (a * b)) x := by
+private theorem lmul_lmul
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (a b : Matrix (Fin n) (Fin n) (Cinf E)) (x : Lie E n)
+    : lmul (toL a) (lmul (toL b) x) = lmul (toL (a * b)) x := by
   change toL (a * (b * Matrix.of x)) = toL (a * b * Matrix.of x)
   rw [Matrix.mul_assoc]
 
-private theorem rowM_one {R : Type} [CommRing R] {n : ℕ} (m : Fin n) :
-    rowM m ((1 : Matrix (Fin n) (Fin n) R) m) = 1 := by
+private theorem rowM_one {R : Type} [CommRing R] {n : ℕ} (m : Fin n)
+    : rowM m ((1 : Matrix (Fin n) (Fin n) R) m) = 1 := by
   ext i j
   simp only [rowM, Matrix.of_apply]
   split_ifs with h
   · rw [h.1]
   · rfl
 
-theorem UpperTheory.V.Af.StrongMultiplicityOne.archKir :
-    UpperTheory.V.Af.Smo.ColConj → UpperTheory.V.Af.Smo.RowStep → UpperTheory.V.Af.StrongMultiplicityOne.ArchStep → UpperTheory.V.Af.StrongMultiplicityOne.LinChange → UpperTheory.V.Af.StrongMultiplicityOne.ArchKir := by
+theorem UpperTheory.V.Af.StrongMultiplicityOne.archKir
+    : UpperTheory.V.Af.Smo.ColConj → UpperTheory.V.Af.Smo.RowStep
+      → UpperTheory.V.Af.StrongMultiplicityOne.ArchStep
+      → UpperTheory.V.Af.StrongMultiplicityOne.LinChange
+      → UpperTheory.V.Af.StrongMultiplicityOne.ArchKir := by
   classical
   intro hC hR hA hL E _ _ n m
   induction m with
@@ -49,8 +57,15 @@ theorem UpperTheory.V.Af.StrongMultiplicityOne.archKir :
     let m' : Fin n := ⟨m, by omega⟩
     obtain ⟨h, h1, hu, hh⟩ := hA E n m' hm
     obtain ⟨c, c1, hc⟩ := hL E n
-    refine ⟨fun p => if hs : IsUnit (rowM m' (p.val m')) then h (p.val m') * (c hs.unit * H (p * hs.unit⁻¹)) else 0, ?_,
-      fun α => ?_⟩
+    refine ⟨
+      fun p =>
+        if hs : IsUnit (rowM m' (p.val m')) then
+          h (p.val m') * (c hs.unit * H (p * hs.unit⁻¹))
+        else
+          0,
+      ?_,
+      fun α => ?_
+    ⟩
     · have hs : IsUnit (rowM m' ((1 : GL (Fin n) (Cinf E)).val m')) := by
         rw [Units.val_one, rowM_one]; exact isUnit_one
       have e : hs.unit = 1 := Units.ext (by rw [hs.unit_spec, Units.val_one, rowM_one])
@@ -60,11 +75,14 @@ theorem UpperTheory.V.Af.StrongMultiplicityOne.archKir :
       obtain ⟨β, hβ⟩ := hh β₀
       refine ⟨β, fun w wm wb hw p hp => ?_⟩
       obtain ⟨C, hCb⟩ := wb
-      have key := hβ (fun x => w (lmul (toL p.val) x)) (p.val m')
-        (wm.comp (lmul (toL p.val)).continuous.measurable) ⟨C, fun x => hCb _⟩ (fun u x => by
-          obtain ⟨ν, hν, hs, e⟩ := hC (Cinf E) n m' hm p hp u
-          simp only [lmul_lmul]
-          rw [e, ← lmul_lmul, hw ν hν, hs])
+      have key :=
+        hβ
+          (fun x => w (lmul (toL p.val) x))
+          (p.val m') (wm.comp (lmul (toL p.val)).continuous.measurable) ⟨C, fun x => hCb _⟩
+          (fun u x => by
+            obtain ⟨ν, hν, hs, e⟩ := hC (Cinf E) n m' hm p hp u
+            simp only [lmul_lmul]
+            rw [e, ← lmul_lmul, hw ν hν, hs])
       rw [key]
       by_cases h0 : h (p.val m') = 0
       · simp [h0]

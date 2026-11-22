@@ -59,17 +59,18 @@ open ModelEmbedding
 
 theorem decompModel : DecompModel := by
   intro n
-  have hJ : JJ n ∉ D2 n := by
-    rw [mem_decomposition_subgroup_iff, JJ]; exact neg_one_ne_one_int
+  have hJ : JJ n ∉ D2 n := by rw [mem_decomposition_subgroup_iff, JJ]; exact neg_one_ne_one_int
   refine ⟨hJ, ?_, ?_⟩
-  · have hs : Function.Surjective
-        ((MonoidHom.snd ℤˣ ℤˣ).comp (MonoidHom.snd (ZMod (2 ^ n))ˣ (ℤˣ × ℤˣ))) :=
-      fun e => ⟨(1, 1, e), rfl⟩
+  · have hs : Function.Surjective ((MonoidHom.snd ℤˣ ℤˣ).comp
+        (MonoidHom.snd (ZMod (2 ^ n))ˣ (ℤˣ × ℤˣ))) := fun e =>
+      ⟨(1, 1, e), rfl⟩
     rw [D2, Subgroup.index_ker, MonoidHom.range_eq_top.2 hs, Subgroup.card_top, card_units_int]
   · constructor
     · intro x y hxy
-      have hxy' : (QuotientGroup.mk (x : GalL n) : GalL n ⧸ zpowers (JJ n)) =
-          QuotientGroup.mk (y : GalL n) := hxy
+      have hxy'
+          : (QuotientGroup.mk (x : GalL n) : GalL n ⧸ zpowers (JJ n))
+            = QuotientGroup.mk (y : GalL n) :=
+        hxy
       have h := QuotientGroup.eq.1 hxy'
       rcases mem_zpowers_JJ h with h1 | h1
       · exact Subtype.ext (inv_mul_eq_one.1 h1)
@@ -194,9 +195,13 @@ open ModelEmbedding
 theorem gensModel : GensModel := by
   intro n hn
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 2 := ⟨n - 2, by omega⟩
-  have hI2 : I2 (k + 2) = Subgroup.closure {((-1, 1, 1) : GalL (k + 2)), ((u5 (k + 2), 1, 1) : GalL (k + 2))} := by
-    have h1 : I2 (k + 2) =
-        (⊤ : Subgroup (ZMod (2 ^ (k + 2)))ˣ).map (MonoidHom.inl (ZMod (2 ^ (k + 2)))ˣ (ℤˣ × ℤˣ)) := by
+  have hI2
+      : I2 (k + 2)
+        = Subgroup.closure {((-1, 1, 1) : GalL (k + 2)), ((u5 (k + 2), 1, 1) : GalL (k + 2))} := by
+    have h1
+        : I2 (k + 2)
+          = (⊤ : Subgroup (ZMod (2 ^ (k + 2)))ˣ).map
+            (MonoidHom.inl (ZMod (2 ^ (k + 2)))ˣ (ℤˣ × ℤˣ)) := by
       ext g
       rw [I2, MonoidHom.mem_ker, Subgroup.mem_map]
       constructor
@@ -242,8 +247,7 @@ lemma card_Q (n : ℕ) (hn : 1 ≤ n) : Nat.card (GalL n ⧸ zpowers (JJ n)) = 2
   exact (Nat.eq_of_mul_eq_mul_right (by norm_num) h).symm
 
 def KK (n : ℕ) : Subgroup (GalL n) :=
-  (powMonoidHom 2 : (GalL n ⧸ zpowers (JJ n)) →* _).range.comap
-    (QuotientGroup.mk' (zpowers (JJ n)))
+  (powMonoidHom 2 : (GalL n ⧸ zpowers (JJ n)) →* _).range.comap (QuotientGroup.mk' (zpowers (JJ n)))
 
 lemma card_QQ (n : ℕ) :
     Nat.card ((GalL n ⧸ zpowers (JJ n)) ⧸
@@ -362,11 +366,9 @@ lemma h4dvd (k : ℕ) : 4 ∣ 2 ^ (k + 3) := ⟨2 ^ (k + 1), by ring⟩
 
 lemma h8dvd (k : ℕ) : 8 ∣ 2 ^ (k + 3) := ⟨2 ^ k, by ring⟩
 
-def chi4 (k : ℕ) : (ZMod (2 ^ (k + 3)))ˣ →* ℤˣ :=
-  ZMod.χ₄.toUnitHom.comp (ZMod.unitsMap (h4dvd k))
+def chi4 (k : ℕ) : (ZMod (2 ^ (k + 3)))ˣ →* ℤˣ := ZMod.χ₄.toUnitHom.comp (ZMod.unitsMap (h4dvd k))
 
-def chi8 (k : ℕ) : (ZMod (2 ^ (k + 3)))ˣ →* ℤˣ :=
-  ZMod.χ₈.toUnitHom.comp (ZMod.unitsMap (h8dvd k))
+def chi8 (k : ℕ) : (ZMod (2 ^ (k + 3)))ˣ →* ℤˣ := ZMod.χ₈.toUnitHom.comp (ZMod.unitsMap (h8dvd k))
 
 lemma mod_four_character_neg_one (k : ℕ) : chi4 k (-1) = -1 := by
   rw [chi4, MonoidHom.comp_apply]
@@ -431,12 +433,18 @@ open ModelEmbedding
 theorem gmRank : GmRank := by
   intro n hn
   have hQ := card_Q n hn
-  have hle : Nat.card ((GalL n ⧸ Subgroup.zpowers (JJ n)) ⧸
-      (powMonoidHom 2 : (GalL n ⧸ Subgroup.zpowers (JJ n)) →* _).range) ≤
-      Nat.card (GalL n ⧸ Subgroup.zpowers (JJ n)) :=
+  have hle
+      : Nat.card
+          ((GalL n ⧸ Subgroup.zpowers (JJ n)) ⧸
+            (powMonoidHom 2 : (GalL n ⧸ Subgroup.zpowers (JJ n)) →* _).range)
+        ≤ Nat.card (GalL n ⧸ Subgroup.zpowers (JJ n)) :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_card _)
-  have h8 : 3 ≤ n → Nat.card ((GalL n ⧸ Subgroup.zpowers (JJ n)) ⧸
-      (powMonoidHom 2 : (GalL n ⧸ Subgroup.zpowers (JJ n)) →* _).range) = 8 := by
+  have h8
+      : 3 ≤ n
+        → Nat.card
+            ((GalL n ⧸ Subgroup.zpowers (JJ n)) ⧸
+              (powMonoidHom 2 : (GalL n ⧸ Subgroup.zpowers (JJ n)) →* _).range)
+          = 8 := by
     intro h3
     obtain ⟨m, rfl⟩ : ∃ m, n = m + 3 := ⟨n - 3, by omega⟩
     rw [card_QQ]
@@ -448,7 +456,9 @@ theorem gmRank : GmRank := by
   rcases (by omega : n ≤ 2 ∨ 3 ≤ n) with h | h
   · refine hle.trans ?_
     rw [hQ]
-    calc 2 ^ n ≤ 2 ^ 3 := Nat.pow_le_pow_right (by norm_num) (by omega)
+    calc
+      2 ^ n
+        ≤ 2 ^ 3 := Nat.pow_le_pow_right (by norm_num) (by omega)
       _ = 8 := by norm_num
   · exact (h8 h).le
 

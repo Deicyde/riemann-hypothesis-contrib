@@ -15,8 +15,9 @@ open MvPolynomial
 noncomputable section
 
 def IncIdealNeBotDim.Statement : Prop :=
-  ∀ (F : Type) [Field F] (n k : ℕ) (Q : Ideal (MvPolynomial (Fin n) F)), IsProjPrime Q →
-    incIdeal Q k ≠ ⊥ → ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) ≤ ((k : ℕ) : WithBot ℕ∞)
+  ∀ (F : Type) [Field F] (n k : ℕ) (Q : Ideal (MvPolynomial (Fin n) F)),
+    IsProjPrime Q → incIdeal Q k ≠ ⊥
+      → ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) ≤ ((k : ℕ) : WithBot ℕ∞)
 
 section Inhabitants
 

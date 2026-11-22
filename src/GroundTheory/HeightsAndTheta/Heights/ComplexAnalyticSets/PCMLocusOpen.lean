@@ -12,8 +12,10 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem CMLocusOpen.proof (hcrit : CMProjDimCriterion.Statement) (hpd : ProjDimSpread.Statement)
-    (hht : IdealHeightSpread.Statement) : CMLocusOpen.Statement := by
+theorem CMLocusOpen.proof
+    (hcrit : CMProjDimCriterion.Statement) (hpd : ProjDimSpread.Statement)
+    (hht : IdealHeightSpread.Statement)
+    : CMLocusOpen.Statement := by
   intro n I P _ hIP hCM
   obtain ⟨ℓ, hℓ, hℓht⟩ := (hcrit n I P hIP).mp hCM
   obtain ⟨g₁, hg₁P, hg₁⟩ := hpd (MvPolynomial (Fin n) ℂ) I P ℓ hℓ

@@ -19,21 +19,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Intersection
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 set_option autoImplicit false
 
 noncomputable section
 
 namespace GlobalTheory.Discrepancy
 
-private theorem isFormOrd_iff_isFormOrd_ratPull {k : Type} [Field k] {X Y : Scheme.{0}} [IsIntegral X]
-    [IsIntegral Y] {p : X ⟶ Sp k} (s : Y ⟶ X) [IsDominant s]
+private theorem isFormOrd_iff_isFormOrd_ratPull
+    {k : Type} [Field k]
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
+    {p : X ⟶ Sp k}
+    (s : Y ⟶ X) [IsDominant s]
     (hb : Function.Bijective (functionFieldMap s))
-    {E' : DivOver (s ≫ p)} {E : DivOver p} (hE : DivOver.Over s E' E) {n : ℕ}
-    (η : RatForms p n) (a : ℤ) :
-    E.IsFormOrd η a ↔ E'.IsFormOrd (EtaleKlt.ratPull p s n η) a := by
+    {E' : DivOver (s ≫ p)} {E : DivOver p} (hE : DivOver.Over s E' E)
+    {n : ℕ} (η : RatForms p n)
+    (a : ℤ)
+    : E.IsFormOrd η a ↔ E'.IsFormOrd (EtaleKlt.ratPull p s n η) a := by
   let ψ : E.ring →+* E'.ring :=
     ((functionFieldMap s).comp E.ring.subtype).codRestrict E'.ring (fun x => (hE x).1 x.2)
   have hψv : ∀ x : E.ring, (ψ x : Y.functionField) = functionFieldMap s x := fun x => rfl
@@ -57,16 +63,15 @@ private theorem isFormOrd_iff_isFormOrd_ratPull {k : Type} [Field k] {X Y : Sche
   have hτ : ((functionFieldMap s).comp E.ring.subtype).comp E.const = Cartier.constFn (s ≫ p) := by
     rw [← EtaleKlt.functionFieldMap_comp_constFn p s]
     rfl
-  have hrat : ∀ ω : Forms E.const n,
-      E'.toRat n (F ω) = EtaleKlt.ratPull p s n (E.toRat n ω) := by
+  have hrat : ∀ ω : Forms E.const n, E'.toRat n (F ω) = EtaleKlt.ratPull p s n (E.toRat n ω) := by
     intro ω
-    exact (TopForm.formMap_formMap ψ E'.ring.subtype ((functionFieldMap s).comp E.ring.subtype)
-      rfl hψc rfl hτ ω).trans
+    exact (TopForm.formMap_formMap ψ E'.ring.subtype ((functionFieldMap s).comp E.ring.subtype) rfl
+        hψc rfl hτ ω).trans
       (TopForm.formMap_formMap E.ring.subtype (functionFieldMap s)
         ((functionFieldMap s).comp E.ring.subtype) rfl rfl
         (EtaleKlt.functionFieldMap_comp_constFn p s) hτ ω).symm
-  have hfree : ∀ ω : Forms E.const n,
-      TopForm.IsFreeGen E.ring ω ↔ TopForm.IsFreeGen E'.ring (F ω) := by
+  have hfree
+      : ∀ ω : Forms E.const n, TopForm.IsFreeGen E.ring ω ↔ TopForm.IsFreeGen E'.ring (F ω) := by
     intro ω
     have hcomp : (fun b : E'.ring => b • F ω) ∘ ψ = F ∘ (fun a : E.ring => a • ω) := by
       funext x
@@ -93,11 +98,16 @@ private theorem isFormOrd_iff_isFormOrd_ratPull {k : Type} [Field k] {X Y : Sche
       rfl
     · rw [← hord, hff, hf']
 
-theorem discrep_ratPull_fnPull {k : Type} [Field k] {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
-    {p : X ⟶ Sp k} (s : Y ⟶ X) [IsDominant s] (hb : Function.Bijective (functionFieldMap s))
-    {E' : DivOver (s ≫ p)} {E : DivOver p} (hE : DivOver.Over s E' E) {n : ℕ} {η : RatForms p n}
-    (hη : η ≠ 0) (m : ℕ) (g : X.functionFieldˣ) :
-    discrep E' (EtaleKlt.ratPull p s n η) m (fnPull s g) = discrep E η m g := by
+theorem discrep_ratPull_fnPull
+    {k : Type} [Field k]
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
+    {p : X ⟶ Sp k}
+    (s : Y ⟶ X) [IsDominant s]
+    (hb : Function.Bijective (functionFieldMap s))
+    {E' : DivOver (s ≫ p)} {E : DivOver p} (hE : DivOver.Over s E' E)
+    {n : ℕ} {η : RatForms p n} (hη : η ≠ 0)
+    (m : ℕ) (g : X.functionFieldˣ)
+    : discrep E' (EtaleKlt.ratPull p s n η) m (fnPull s g) = discrep E η m g := by
   have hη' : EtaleKlt.ratPull p s n η ≠ 0 := by
     intro h0
     apply hη
@@ -111,17 +121,19 @@ theorem discrep_ratPull_fnPull {k : Type} [Field k] {X Y : Scheme.{0}} [IsIntegr
       rw [dite_eq_left h', dite_eq_left h]
       exact DivOver.IsFormOrd.unique hη' h'.choose_spec
         ((isFormOrd_iff_isFormOrd_ratPull s hb hE η _).1 h.choose_spec)
-    · have h' : ¬ ∃ a, E'.IsFormOrd (EtaleKlt.ratPull p s n η) a :=
-        fun ⟨a, ha⟩ => h ⟨a, (isFormOrd_iff_isFormOrd_ratPull s hb hE η a).2 ha⟩
+    · have h' : ¬ ∃ a, E'.IsFormOrd (EtaleKlt.ratPull p s n η) a := fun ⟨a, ha⟩ =>
+        h ⟨a, (isFormOrd_iff_isFormOrd_ratPull s hb hE η a).2 ha⟩
       rw [dite_eq_right h', dite_eq_right h]
   unfold discrep
   rw [key, DivOver.Over.ord_fnPull_of_bijective k X Y p s hb E' E hE g]
 
-theorem IsLogEqn.lcAt_iff {k : Type} [Field k] [PerfectField k] {X : Scheme.{0}} [IsIntegral X]
-    [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X] {p : X ⟶ Sp k} [LocallyOfFiniteType p] {n : ℕ}
-    {Δ : X → ℚ} {η : RatForms p n} {x : X} {m : ℕ} {g : X.functionFieldˣ}
-    (hn : topologicalKrullDim X = n) (hη : η ≠ 0) (hm : 0 < m) (h : IsLogEqn p Δ η x m g) :
-    LcAt p n Δ x ↔ ∀ E : DivOver p, E.Through x → -1 ≤ discrep E η m g := by
+theorem IsLogEqn.lcAt_iff
+    {k : Type} [Field k] [PerfectField k]
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X]
+    {p : X ⟶ Sp k} [LocallyOfFiniteType p]
+    {n : ℕ} {Δ : X → ℚ} {η : RatForms p n} {x : X} {m : ℕ} {g : X.functionFieldˣ}
+    (hn : topologicalKrullDim X = n) (hη : η ≠ 0) (hm : 0 < m) (h : IsLogEqn p Δ η x m g)
+    : LcAt p n Δ x ↔ ∀ E : DivOver p, E.Through x → -1 ≤ discrep E η m g := by
   constructor
   · rintro ⟨η', m', g', hη', hm', h', hE⟩ E hx
     rw [discrep_eq hn hη hη' hm hm' h h' hx]
@@ -129,30 +141,41 @@ theorem IsLogEqn.lcAt_iff {k : Type} [Field k] [PerfectField k] {X : Scheme.{0}}
   · intro hE
     exact ⟨η, m, g, hη, hm, h, hE⟩
 
-private theorem toFunctionField_mem_divOver_ring {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X]
-    (p : X ⟶ Sp k) (E : DivOver p) (a : k) : toFunctionField p a ∈ E.ring := by
+private theorem toFunctionField_mem_divOver_ring
+    {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ Sp k) (E : DivOver p) (a : k)
+    : toFunctionField p a ∈ E.ring := by
   have : toFunctionField p a = Cartier.constFn p a := by
     simp [toFunctionField, Cartier.constFn, Cartier.fnOf, DVR.FlatBC.algX, Scheme.Hom.appLE,
       Scheme.Hom.appTop]
-    change _ = (X.presheaf.germ ⊤ (genericPoint X) trivial).hom
-      ((p.app ⊤ ≫ X.presheaf.map (𝟙 (Opposite.op ⊤))).hom ((Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom a))
+    change _
+      = (X.presheaf.germ ⊤ (genericPoint X) trivial).hom
+        ((p.app ⊤ ≫ X.presheaf.map (𝟙 (Opposite.op ⊤))).hom
+          ((Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom a))
     let f : Γ(Sp k, ⊤) ⟶ Γ(X, ⊤) := p.app ⊤
-    change (f ≫ X.presheaf.germ ⊤ (genericPoint X) trivial).hom _ =
-      (X.presheaf.germ ⊤ (genericPoint X) trivial).hom
+    change (f ≫ X.presheaf.germ ⊤ (genericPoint X) trivial).hom _
+      = (X.presheaf.germ ⊤ (genericPoint X) trivial).hom
         ((f ≫ X.presheaf.map (𝟙 (Opposite.op ⊤))).hom _)
     simp
   rw [this]
   exact E.const_mem a
 
-private theorem divOver_through_of_dominatesStalk {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X]
-    {p : X ⟶ Sp k} (E : DivOver p) {w : X} (h : DominatesStalk E.ring w) : E.Through w := by
+private theorem divOver_through_of_dominatesStalk
+    {k : Type} [Field k]
+    {X : Scheme.{0}} [IsIntegral X]
+    {p : X ⟶ Sp k} (E : DivOver p)
+    {w : X} (h : DominatesStalk E.ring w)
+    : E.Through w := by
   rintro f ⟨a, rfl⟩
   exact h.1 a
 
-private theorem dominatesStalk_image_of_divOver_over {k : Type} [Field k] {X Y : Scheme.{0}} [IsIntegral X]
-    [IsIntegral Y] {p : X ⟶ Sp k} (s : Y ⟶ X) [IsDominant s] {E' : DivOver (s ≫ p)} {E : DivOver p}
-    (hE : DivOver.Over s E' E) {w : Y} (h : DominatesStalk E'.ring w) :
-    DominatesStalk E.ring (s w) := by
+private theorem dominatesStalk_image_of_divOver_over
+    {k : Type} [Field k]
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
+    {p : X ⟶ Sp k}
+    (s : Y ⟶ X) [IsDominant s]
+    {E' : DivOver (s ≫ p)} {E : DivOver p} (hE : DivOver.Over s E' E)
+    {w : Y} (h : DominatesStalk E'.ring w)
+    : DominatesStalk E.ring (s w) := by
   have hmem : ∀ a, algebraMap (X.presheaf.stalk (s w)) X.functionField a ∈ E.ring := by
     intro a
     rw [hE, functionFieldMap_algebraMap]
@@ -173,9 +196,13 @@ private theorem dominatesStalk_image_of_divOver_over {k : Type} [Field k] {X Y :
     rw [← map_inv₀]
     exact (hE _).1 hf
 
-private theorem specializes_of_through_dominatesStalk {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X]
-    (p : X ⟶ Sp k) [IsSeparated p] (E : DivOver p) {x c : X} (hx : E.Through x)
-    (hc : DominatesStalk E.ring c) : c ⤳ x := by
+private theorem specializes_of_through_dominatesStalk
+    {k : Type} [Field k]
+    {X : Scheme.{0}} [IsIntegral X]
+    (p : X ⟶ Sp k) [IsSeparated p]
+    (E : DivOver p)
+    {x c : X} (hx : E.Through x) (hc : DominatesStalk E.ring c)
+    : c ⤳ x := by
   obtain ⟨l, hl1, hl2⟩ := dominatesStalk_iff_exists_hom.1 hc
   let φ : X.presheaf.stalk x →+* E.ring :=
     (algebraMap (X.presheaf.stalk x) X.functionField).codRestrict E.ring (fun a => hx _ ⟨a, rfl⟩)
@@ -188,8 +215,9 @@ private theorem specializes_of_through_dominatesStalk {k : Type} [Field k] {X : 
   have hp : l ≫ p = l' ≫ p := by
     obtain ⟨fa, hfa⟩ := Spec.map_surjective (l ≫ p)
     obtain ⟨fb, hfb⟩ := Spec.map_surjective (l' ≫ p)
-    have h : specAlgebraMap E.ring X.functionField ≫ Spec.map fa =
-        specAlgebraMap E.ring X.functionField ≫ Spec.map fb := by
+    have h
+        : specAlgebraMap E.ring X.functionField ≫ Spec.map fa
+          = specAlgebraMap E.ring X.functionField ≫ Spec.map fb := by
       rw [hfa, hfb, ← Category.assoc, ← Category.assoc, hl1, hl']
     rw [specAlgebraMap, ← Spec.map_comp, ← Spec.map_comp, Spec.map_inj] at h
     rw [← hfa, ← hfb]
@@ -211,16 +239,22 @@ private theorem specializes_of_through_dominatesStalk {k : Type} [Field k] {X : 
   rw [Scheme.range_fromSpecStalk] at hr
   exact hr
 
-private theorem exists_dominatesStalk_of_isProjOver {k : Type} [Field k] {Y : Scheme.{0}} [IsIntegral Y]
-    (q : Y ⟶ Sp k) (hq : IsProjOver q) (E : DivOver q) : ∃ w, DominatesStalk E.ring w := by
+private theorem exists_dominatesStalk_of_isProjOver
+    {k : Type} [Field k]
+    {Y : Scheme.{0}} [IsIntegral Y]
+    (q : Y ⟶ Sp k) (hq : IsProjOver q) (E : DivOver q)
+    : ∃ w, DominatesStalk E.ring w := by
   obtain ⟨N, i, hi, rfl⟩ := hq
-  exact ⟨_, dominatesStalk_centre (i ≫ PSpace.str k N) E.ring
-    (toFunctionField_mem_divOver_ring _ E)⟩
+  exact
+    ⟨_, dominatesStalk_centre (i ≫ PSpace.str k N) E.ring (toFunctionField_mem_divOver_ring _ E)⟩
 
-private theorem exists_unit_eq_smul_formOf_of_isFrame {k : Type} [Field k] {Y : Scheme.{0}} [IsIntegral Y]
-    {q : Y ⟶ Sp k} {n : ℕ} {U : Y.Opens} (hg : genericPoint Y ∈ U) {ω : FormsOn q n U}
-    (hω : IsFrame ω) (η : RatForms q n) (hη : η ≠ 0) :
-    ∃ h : Y.functionFieldˣ, η = (h : Y.functionField) • formOf U hg ω := by
+private theorem exists_unit_eq_smul_formOf_of_isFrame
+    {k : Type} [Field k]
+    {Y : Scheme.{0}} [IsIntegral Y]
+    {q : Y ⟶ Sp k} {n : ℕ} {U : Y.Opens} (hg : genericPoint Y ∈ U)
+    {ω : FormsOn q n U} (hω : IsFrame ω)
+    (η : RatForms q n) (hη : η ≠ 0)
+    : ∃ h : Y.functionFieldˣ, η = (h : Y.functionField) • formOf U hg ω := by
   obtain ⟨a, ha⟩ := (isFreeGen_formOf hg hω).2 η
   have ha' : a • formOf U hg ω = η := ha
   have ha0 : a ≠ 0 := by
@@ -229,14 +263,20 @@ private theorem exists_unit_eq_smul_formOf_of_isFrame {k : Type} [Field k] {Y : 
     rw [← ha', zero_smul]
   exact ⟨Units.mk0 a ha0, ha'.symm⟩
 
-private theorem discrep_eq_neg_mult_div {k : Type} [Field k] [PerfectField k]
-    {Y : Scheme.{0}} [IsIntegral Y] [IsLocallyNoetherian Y] {q : Y ⟶ Sp k} [LocallyOfFiniteType q]
-    {n : ℕ} (hdim : topologicalKrullDim Y = n) {E : DivOver q} {w : Y} (hE : E.IsAt w)
-    {U : Y.Opens} (hw : w ∈ U) {ω : FormsOn q n U} (hω : IsFrame ω) {K P : CartierDiv Y}
-    {η : RatForms q n} (hη : η ≠ 0) (hK : IsDivOfForm K η) {m : ℕ} (hm : 0 < m)
-    {g : Y.functionFieldˣ} (hg : P.IsEqn w g) :
-    discrep E η m g = -((P - m • K).mult w : ℚ) / m := by
-  have hgen : genericPoint Y ∈ U := ((genericPoint_spec Y).mem_open_set_iff U.isOpen).2 ⟨w, trivial, hw⟩
+private theorem discrep_eq_neg_mult_div
+    {k : Type} [Field k] [PerfectField k]
+    {Y : Scheme.{0}} [IsIntegral Y] [IsLocallyNoetherian Y]
+    {q : Y ⟶ Sp k} [LocallyOfFiniteType q]
+    {n : ℕ} (hdim : topologicalKrullDim Y = n)
+    {E : DivOver q} {w : Y} (hE : E.IsAt w)
+    {U : Y.Opens} (hw : w ∈ U)
+    {ω : FormsOn q n U} (hω : IsFrame ω)
+    {K P : CartierDiv Y} {η : RatForms q n} (hη : η ≠ 0) (hK : IsDivOfForm K η)
+    {m : ℕ} (hm : 0 < m)
+    {g : Y.functionFieldˣ} (hg : P.IsEqn w g)
+    : discrep E η m g = -((P - m • K).mult w : ℚ) / m := by
+  have hgen : genericPoint Y ∈ U :=
+    ((genericPoint_spec Y).mem_open_set_iff U.isOpen).2 ⟨w, trivial, hw⟩
   obtain ⟨h, hh⟩ := exists_unit_eq_smul_formOf_of_isFrame hgen hω η hη
   have hKe : K.IsEqn w h := hK U ω hω w hw h hh
   have hD : (P - m • K).IsEqn w (g / h ^ m) := hg.sub (hKe.nsmul m)
@@ -259,15 +299,18 @@ private theorem discrep_eq_neg_mult_div {k : Type} [Field k] [PerfectField k]
   field_simp
   ring
 
-private theorem neg_one_lt_discrep_of_mult_lt_and_le {k : Type} [Field k] [CharZero k] {Y : Scheme.{0}}
-    [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp k) (n : ℕ) [SmoothOfRelativeDimension n q]
-    [LocallyOfFiniteType q] (hdim : topologicalKrullDim Y = n) (B : Closeds Y)
-    (hB : FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal B)) {E : DivOver q} {w0 : Y}
-    (hE : E.Through w0) {K P : CartierDiv Y} {η : RatForms q n} (hη : η ≠ 0)
-    (hK : IsDivOfForm K η) {m : ℕ} (hm : 0 < m) (hsupp : (P - m • K).supp ≤ B)
-    {g : Y.functionFieldˣ} (hg : P.IsEqn w0 g) :
-    ((∀ w, w ⤳ w0 → (P - m • K).mult w < m) → -1 < discrep E η m g) ∧
-      ((∀ w, w ⤳ w0 → (P - m • K).mult w ≤ m) → -1 ≤ discrep E η m g) := by
+private theorem neg_one_lt_discrep_of_mult_lt_and_le
+    {k : Type} [Field k] [CharZero k]
+    {Y : Scheme.{0}} [IsIntegral Y] [IsLocallyNoetherian Y]
+    (q : Y ⟶ Sp k) (n : ℕ) [SmoothOfRelativeDimension n q] [LocallyOfFiniteType q]
+    (hdim : topologicalKrullDim Y = n)
+    (B : Closeds Y) (hB : FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal B))
+    {E : DivOver q} {w0 : Y} (hE : E.Through w0)
+    {K P : CartierDiv Y} {η : RatForms q n} (hη : η ≠ 0) (hK : IsDivOfForm K η)
+    {m : ℕ} (hm : 0 < m) (hsupp : (P - m • K).supp ≤ B)
+    {g : Y.functionFieldˣ} (hg : P.IsEqn w0 g)
+    : ((∀ w, w ⤳ w0 → (P - m • K).mult w < m) → -1 < discrep E η m g)
+      ∧ ((∀ w, w ⤳ w0 → (P - m • K).mult w ≤ m) → -1 ≤ discrep E η m g) := by
   obtain ⟨U, hy, z, J, w, u, hc⟩ := exists_isSncChart k Y q n B hB w0
   have hgen : genericPoint Y ∈ U :=
     ((genericPoint_spec Y).mem_open_set_iff U.isOpen).2 ⟨w0, trivial, hy⟩
@@ -280,7 +323,8 @@ private theorem neg_one_lt_discrep_of_mult_lt_and_le {k : Type} [Field k] [CharZ
     DivOver.ord_eq_zero_of_unitAt hE _ (by rwa [Units.val_div_eq_div_val])
   have hordg : E.ord g = m * E.ord h + ∑ j ∈ J, (P - m • K).mult (w j) * E.ord (u j) := by
     rw [div_eq_mul_inv, E.ord_mul, E.ord_inv, div_eq_mul_inv, E.ord_mul, E.ord_inv, E.ord_pow,
-      E.ord_prod_zpow] at hord0
+        E.ord_prod_zpow]
+      at hord0
     linarith
   have hf0 : formOf U hgen (dOn q z) ≠ 0 := by
     intro h0
@@ -292,8 +336,12 @@ private theorem neg_one_lt_discrep_of_mult_lt_and_le {k : Type} [Field k] [CharZ
   have hFn : 0 ≤ E.formOrd (formOf U hgen (dOn q z)) :=
     DivOver.formOrd_formOf_nonneg hdim hy hE _ hf0
   have hFs : ∑ j ∈ J, E.ord (u j) - 1 ≤ E.formOrd (formOf U hgen (dOn q z)) := by
-    have := DivOver.sum_ord_sub_one_le_formOrd_dOn hdim E hy hE z hf0 (J := J) (fun j => j.1)
-      Subtype.val_injective (fun j => u j.1) (fun j => hc.val j.1 j.2)
+    have :=
+      DivOver.sum_ord_sub_one_le_formOrd_dOn hdim E hy hE z hf0 (J := J)
+        (fun j => j.1)
+        Subtype.val_injective
+        (fun j => u j.1)
+        (fun j => hc.val j.1 j.2)
     rwa [Finset.sum_coe_sort J (fun j => E.ord (u j))] at this
   have ho : ∀ j ∈ J, 0 ≤ E.ord (u j) := by
     intro j hj
@@ -308,8 +356,9 @@ private theorem neg_one_lt_discrep_of_mult_lt_and_le {k : Type} [Field k] [CharZ
     push_cast
     field_simp
     ring
-  have hC : ∑ j ∈ J, ((m : ℤ) - d j) * E.ord (u j) =
-      (m : ℤ) * ∑ j ∈ J, E.ord (u j) - ∑ j ∈ J, d j * E.ord (u j) := by
+  have hC
+      : ∑ j ∈ J, ((m : ℤ) - d j) * E.ord (u j)
+        = (m : ℤ) * ∑ j ∈ J, E.ord (u j) - ∑ j ∈ J, d j * E.ord (u j) := by
     rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -359,7 +408,17 @@ private theorem neg_one_lt_discrep_of_mult_lt_and_le {k : Type} [Field k] [CharZ
     push_cast at this ⊢
     linarith
 
-theorem kltAt_lcAt_iff_of_isLogRes : ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp k) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (Δ : X → ℚ) (η : RatForms p n) (m : ℕ) (G : CartierDiv X) (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y) (B : Closeds Y), IsLogMult p n Δ η m G → IsLogRes p n η m G s K B → ∀ x : X, (KltAt p n Δ x ↔ ∀ w : Y, s w ⤳ x → (pullCart s G - m • K).mult w < m) ∧ (LcAt p n Δ x ↔ ∀ w : Y, s w ⤳ x → (pullCart s G - m • K).mult w ≤ m) := by
+theorem kltAt_lcAt_iff_of_isLogRes
+    : ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
+        [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp k) (n : ℕ),
+      IsProjOver p → topologicalKrullDim X = n
+        → ∀ (Δ : X → ℚ) (η : RatForms p n) (m : ℕ) (G : CartierDiv X) (Y : Scheme.{0})
+            [IsIntegral Y] [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y)
+            (B : Closeds Y),
+          IsLogMult p n Δ η m G → IsLogRes p n η m G s K B
+            → ∀ x : X,
+              (KltAt p n Δ x ↔ ∀ w : Y, s w ⤳ x → (pullCart s G - m • K).mult w < m)
+                ∧ (LcAt p n Δ x ↔ ∀ w : Y, s w ⤳ x → (pullCart s G - m • K).mult w ≤ m) := by
   intro k _ _ X _ _ _ p n hproj hn Δ η m G Y _ _ s _ K B hlm hres x
   obtain ⟨N, i, hi, hpi⟩ := hproj
   haveI : IsSeparated p := hpi ▸ inferInstance
@@ -378,26 +437,40 @@ theorem kltAt_lcAt_iff_of_isLogRes : ∀ (k : Type) [Field k] [CharZero k] (X : 
   obtain ⟨g, hg⟩ := G.exists_isEqn x
   have hL := hlm.eqn x g hg
   have hm' : (0 : ℚ) < m := by exact_mod_cast hlm.pos
-  have hlow : ∀ E : DivOver p, E.Through x → ∃ w0 : Y, s w0 ⤳ x ∧
-      ∃ (E' : DivOver (s ≫ p)) (g0 : Y.functionFieldˣ), E'.Through w0 ∧
-        (pullCart s G).IsEqn w0 g0 ∧
-        discrep E η m g = discrep E' (EtaleKlt.ratPull p s n η) m g0 := by
+  have hlow
+      : ∀ E : DivOver p,
+        E.Through x
+          → ∃ w0 : Y,
+            s w0 ⤳ x
+              ∧ ∃ (E' : DivOver (s ≫ p)) (g0 : Y.functionFieldˣ),
+                E'.Through w0 ∧ (pullCart s G).IsEqn w0 g0
+                  ∧ discrep E η m g = discrep E' (EtaleKlt.ratPull p s n η) m g0 := by
     intro E hEx
     obtain ⟨E', hE'⟩ := DivOver.exists_over k X Y p s hres.bir E
     obtain ⟨w0, hw0⟩ := exists_dominatesStalk_of_isProjOver (s ≫ p) hres.proj E'
-    have hsw := specializes_of_through_dominatesStalk p E hEx (dominatesStalk_image_of_divOver_over s hE' hw0)
+    have hsw :=
+      specializes_of_through_dominatesStalk p E hEx (dominatesStalk_image_of_divOver_over s hE' hw0)
     obtain ⟨g0, hg0⟩ := G.exists_isEqn (s w0)
     have hL0 := hlm.eqn _ g0 hg0
     have hLx : IsLogEqn p Δ η (s w0) m g := fun z hz => hL z (hz.trans hsw)
     have hEs : E.Through (s w0) :=
       DivOver.Over.through_image k X Y p s E' E hE' w0 (divOver_through_of_dominatesStalk E' hw0)
-    refine ⟨w0, hsw, E', fnPull s g0, divOver_through_of_dominatesStalk E' hw0,
-      (GlobalTheory.Cartier.exists_pullback_cartierDiv X Y s G).choose_spec.2 w0 g0 hg0, ?_⟩
+    refine ⟨
+      w0,
+      hsw,
+      E',
+      fnPull s g0,
+      divOver_through_of_dominatesStalk E' hw0,
+      (GlobalTheory.Cartier.exists_pullback_cartierDiv X Y s G).choose_spec.2 w0 g0 hg0,
+      ?_
+    ⟩
     rw [discrep_eq hn hlm.ne_zero hlm.ne_zero hlm.pos hlm.pos hLx hL0 hEs,
       discrep_ratPull_fnPull s hres.bir hE' hlm.ne_zero m g0]
-  have hup : ∀ w : Y, s w ⤳ x → (pullCart s G - m • K).mult w ≠ 0 →
-      ∃ E : DivOver p, E.Through x ∧
-        discrep E η m g = -((pullCart s G - m • K).mult w : ℚ) / m := by
+  have hup
+      : ∀ w : Y,
+        s w ⤳ x → (pullCart s G - m • K).mult w ≠ 0
+          → ∃ E : DivOver p,
+            E.Through x ∧ discrep E η m g = -((pullCart s G - m • K).mult w : ℚ) / m := by
     intro w hw hne
     have hcoh := CartierDiv.coheight_eq_one_of_mult_ne_zero hne
     obtain ⟨E', hE'⟩ := DivOver.exists_isAt_of_coheight_eq_one (p := s ≫ p) hcoh
@@ -431,8 +504,8 @@ theorem kltAt_lcAt_iff_of_isLogRes : ∀ (k : Type) [Field k] [CharZero k] (X : 
     · intro H E hEx
       obtain ⟨w0, hsw, E', g0, hE't, hg0, hd⟩ := hlow E hEx
       rw [hd]
-      exact (neg_one_lt_discrep_of_mult_lt_and_le (s ≫ p) n hdimY B hres.snc hE't hη' hres.div hlm.pos
-        hres.supp hg0).1 (fun w hw => H w ((hw.map s.continuous).trans hsw))
+      exact (neg_one_lt_discrep_of_mult_lt_and_le (s ≫ p) n hdimY B hres.snc hE't hη' hres.div
+        hlm.pos hres.supp hg0).1 (fun w hw => H w ((hw.map s.continuous).trans hsw))
   · rw [IsLogEqn.lcAt_iff hn hlm.ne_zero hlm.pos hL]
     constructor
     · intro H w hw
@@ -450,7 +523,7 @@ theorem kltAt_lcAt_iff_of_isLogRes : ∀ (k : Type) [Field k] [CharZero k] (X : 
     · intro H E hEx
       obtain ⟨w0, hsw, E', g0, hE't, hg0, hd⟩ := hlow E hEx
       rw [hd]
-      exact (neg_one_lt_discrep_of_mult_lt_and_le (s ≫ p) n hdimY B hres.snc hE't hη' hres.div hlm.pos
-        hres.supp hg0).2 (fun w hw => H w ((hw.map s.continuous).trans hsw))
+      exact (neg_one_lt_discrep_of_mult_lt_and_le (s ≫ p) n hdimY B hres.snc hE't hη' hres.div
+        hlm.pos hres.supp hg0).2 (fun w hw => H w ((hw.map s.continuous).trans hsw))
 
 end GlobalTheory.Discrepancy

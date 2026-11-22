@@ -17,12 +17,20 @@ theorem isUnit_of_isUniUp {n : ℕ} {M : Mt g n} (h : IsUniUp M) : IsUnit M := b
     Finset.prod_eq_one fun a _ => (h a a).2 rfl]
   exact isUnit_one
 
-theorem card_uniUp_mat (n : ℕ) :
-    (Finset.univ.filter fun M : Mt g n => IsUniUp M).card = ∏ i : Fin n, g ^ (i : ℕ) := by
-  have h : (Finset.univ.filter fun M : Mt g n => IsUniUp M) =
-      (Fintype.piFinset fun a : Fin n => Fintype.piFinset fun b : Fin n =>
-        (if a < b then Finset.univ else if a = b then {1} else {0} : Finset (ZMod g)) :
-          Finset (Fin n → Fin n → ZMod g)) := by
+theorem card_uniUp_mat (n : ℕ)
+    : (Finset.univ.filter fun M : Mt g n => IsUniUp M).card = ∏ i : Fin n, g ^ (i : ℕ) := by
+  have h
+      : (Finset.univ.filter fun M : Mt g n => IsUniUp M)
+        = (Fintype.piFinset fun a : Fin n =>
+            Fintype.piFinset fun b : Fin n =>
+              (if a < b then
+                 Finset.univ
+               else if a = b then
+                 {1}
+               else
+                 {0}
+                : Finset (ZMod g))
+          : Finset (Fin n → Fin n → ZMod g)) := by
     ext M
     rw [Finset.mem_filter, and_iff_right (Finset.mem_univ _)]
     refine Iff.trans ?_ Fintype.mem_piFinset.symm
@@ -36,8 +44,16 @@ theorem card_uniUp_mat (n : ℕ) :
   simp only [Fintype.card_piFinset]
   rw [Finset.prod_comm]
   refine Finset.prod_congr rfl fun b _ => ?_
-  have h2 : ∀ a : Fin n, (if a < b then Finset.univ else if a = b then {1} else {0} : Finset (ZMod g)).card =
-      if a < b then g else 1 := by
+  have h2
+      : ∀ a : Fin n,
+        (if a < b then
+           Finset.univ
+         else if a = b then
+           {1}
+         else
+           {0}
+            : Finset (ZMod g)).card
+          = if a < b then g else 1 := by
     intro a
     split_ifs <;> simp [ZMod.card]
   simp only [h2]
@@ -46,8 +62,9 @@ theorem card_uniUp_mat (n : ℕ) :
   rw [show (Finset.univ.filter fun a : Fin n => a < b) = Finset.Iio b by ext; simp]
   simp
 
-theorem card_uniUp (n : ℕ) :
-    (Finset.univ.filter fun u : Gn g n => IsUniUp (u : Mt g n)).card = ∏ i : Fin n, g ^ (i : ℕ) := by
+theorem card_uniUp (n : ℕ)
+    : (Finset.univ.filter fun u : Gn g n => IsUniUp (u : Mt g n)).card
+      = ∏ i : Fin n, g ^ (i : ℕ) := by
   rw [← card_uniUp_mat]
   refine Finset.card_bij (fun u _ => (u : Mt g n)) ?_ ?_ ?_
   · intro u hu
@@ -58,14 +75,15 @@ theorem card_uniUp (n : ℕ) :
     have hM' : IsUniUp M := by simpa using hM
     exact ⟨(isUnit_of_isUniUp hM').unit, by simpa using hM', rfl⟩
 
-theorem card_Gn (n : ℕ) : (Fintype.card (Gn g n) : ℂ) =
-    (∏ i : Fin n, (g : ℂ) ^ (i : ℕ)) * ∏ i ∈ Finset.Icc 1 n, ((g : ℂ) ^ i - 1) := by
+theorem card_Gn (n : ℕ)
+    : (Fintype.card (Gn g n) : ℂ)
+      = (∏ i : Fin n, (g : ℂ) ^ (i : ℕ)) * ∏ i ∈ Finset.Icc 1 n, ((g : ℂ) ^ i - 1) := by
   have hg : 0 < g := (Fact.out : g.Prime).pos
   rw [← Nat.card_eq_fintype_card, Matrix.card_GL_field, ZMod.card, Nat.cast_prod]
   have h1 : ∏ i ∈ Finset.Icc 1 n, ((g : ℂ) ^ i - 1) = ∏ i : Fin n, ((g : ℂ) ^ (n - i) - 1) := by
     rw [Fin.prod_univ_eq_prod_range (fun i => ((g : ℂ) ^ (n - i) - 1)) n]
-    refine Finset.prod_bij' (fun i _ => n - i) (fun i _ => n - i) ?_ ?_ ?_ ?_ ?_ <;>
-      simp only [Finset.mem_Icc, Finset.mem_range] <;> intro i hi
+    refine Finset.prod_bij' (fun i _ => n - i) (fun i _ => n - i) ?_ ?_ ?_ ?_ ?_
+      <;> simp only [Finset.mem_Icc, Finset.mem_range] <;> intro i hi
     · omega
     · omega
     · omega
@@ -78,8 +96,9 @@ theorem card_Gn (n : ℕ) : (Fintype.card (Gn g n) : ℂ) =
   push_cast
   ring
 
-theorem gg_one_and_isClass : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (n : ℕ),
-    gg ψ n 1 = ∏ i ∈ Finset.Icc 1 n, ((g : ℂ) ^ i - 1) ∧ IsClass (gg ψ n) := by
+theorem gg_one_and_isClass
+    : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (n : ℕ),
+      gg ψ n 1 = ∏ i ∈ Finset.Icc 1 n, ((g : ℂ) ^ i - 1) ∧ IsClass (gg ψ n) := by
   intro g _ ψ n
   have hg : (g : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : g.Prime).ne_zero
   constructor

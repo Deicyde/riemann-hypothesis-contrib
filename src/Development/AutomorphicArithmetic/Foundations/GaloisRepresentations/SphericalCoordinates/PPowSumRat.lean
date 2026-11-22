@@ -4,8 +4,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
@@ -80,8 +82,9 @@ private lemma sum_evFull {F : Type} [Field F] [NumberField F] {g : ℕ} (ty : Fi
   simp_rw [evFull, Multiset.map_add (f := _), Multiset.sum_add, mul_add]
   rw [Finset.sum_add_distrib, h1, h2]
 
-theorem UpperTheory.Gal.W2.powSumRat_of :
-    UpperTheory.Gal.W2.TraceLat → UpperTheory.Gal.W2.TraceDual → UpperTheory.Gal.W2.PowSumRat := by
+theorem UpperTheory.Gal.W2.powSumRat_of
+    : UpperTheory.Gal.W2.TraceLat → UpperTheory.Gal.W2.TraceDual
+      → UpperTheory.Gal.W2.PowSumRat := by
   intro hL hD F _ _ O _ bar g ρ a D P₀ hP ga H hga Sb ty ev hd j
   obtain ⟨hS, hρ, hH⟩ := hd
   refine hD F (fun τ => ((evFull ty ev τ).map fun r => r ^ j).sum) ?_

@@ -14,11 +14,12 @@ namespace GlobalTheory.SplitPlaceExt
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-
 open NumberField IsDedekindDomain in
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] in
-theorem _root_.GlobalTheory.SplitPlaceExt.eq_of_w_eq : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L]
-    (s s' : _root_.ReciprocityTheory.Aut.SplitPlace L), s'.w = s.w → s' = s := by
+theorem _root_.GlobalTheory.SplitPlaceExt.eq_of_w_eq
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L]
+        (s s' : _root_.ReciprocityTheory.Aut.SplitPlace L),
+      s'.w = s.w → s' = s := by
   intro L _ _ _ s s' h
   have hv : s'.v = s.v := HeightOneSpectrum.ext (by rw [← s'.w_under, ← s.w_under, h])
   obtain ⟨v, i⟩ := s
@@ -44,8 +45,9 @@ theorem _root_.GlobalTheory.SplitPlaceExt.eq_of_w_eq : ∀ (L : Type) [Field L] 
     fin_cases a <;> fin_cases b <;> simp_all [eq_comm]
   have h3 : Nat.card (Fin 3) ≤ _ := Nat.card_le_card_of_injective _ hinj
   rw [Nat.card_eq_fintype_card (α := Fin 3), Fintype.card_fin] at h3
-  have h2 := card_algHom_le_finrank (maximalRealSubfield L) L
-    (HeightOneSpectrum.adicCompletion (maximalRealSubfield L) v)
+  have h2 :=
+    card_algHom_le_finrank (maximalRealSubfield L) L
+      (HeightOneSpectrum.adicCompletion (maximalRealSubfield L) v)
   rw [Algebra.IsQuadraticExtension.finrank_eq_two] at h2
   omega
 

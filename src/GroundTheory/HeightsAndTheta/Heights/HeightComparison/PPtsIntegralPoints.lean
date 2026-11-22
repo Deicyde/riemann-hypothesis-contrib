@@ -19,9 +19,10 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem rel_equivalence (P : Ideal (Geo.MRing ι)) :
-    Equivalence (fun z z' : Geo.mcPts P ↦
-      ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ (z' : (Σ k, ι k) → ℂ) = fun p ↦ c p.1 * (z : (Σ k, ι k) → ℂ) p) := by
+theorem rel_equivalence (P : Ideal (Geo.MRing ι))
+    : Equivalence (fun z z' : Geo.mcPts P ↦
+      ∃ c : K → ℂ,
+        (∀ k, c k ≠ 0) ∧ (z' : (Σ k, ι k) → ℂ) = fun p ↦ c p.1 * (z : (Σ k, ι k) → ℂ) p) := by
   constructor
   · intro z
     exact ⟨fun _ ↦ 1, fun _ ↦ one_ne_zero, by funext p; simp⟩
@@ -42,13 +43,15 @@ theorem segre_ne_zero {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i�
   simp only [Geo.segre, Pi.zero_apply] at this
   exact Finset.prod_ne_zero_iff.mpr (fun k _ ↦ hi k) this
 
-theorem sheetDensity_eq (P : Ideal (Geo.MRing ι))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ)) (g : ((Σ k, ι k) → ℂ) → ℝ)
-    (hg : ∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → z ∈ Geo.mcPts P →
-      g (fun p ↦ c p.1 * z p) = g z)
-    (y : Fin 0 → ℂ) {z : (Σ k, ι k) → ℂ} (hz : z ∈ Geo.mcPts P)
-    (hΨ : Ψ (Geo.segre z) = Fin.cons 1 y) :
-    Geo.sheetDensity P Ψ Fin.elim0 g y (Geo.segre z) = g z := by
+theorem sheetDensity_eq
+    (P : Ideal (Geo.MRing ι))
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ))
+    (g : ((Σ k, ι k) → ℂ) → ℝ)
+    (hg : ∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ),
+      (∀ k, c k ≠ 0) → z ∈ Geo.mcPts P → g (fun p ↦ c p.1 * z p) = g z)
+    (y : Fin 0 → ℂ)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ Geo.mcPts P) (hΨ : Ψ (Geo.segre z) = Fin.cons 1 y)
+    : Geo.sheetDensity P Ψ Fin.elim0 g y (Geo.segre z) = g z := by
   have hex : ∃ γ, Geo.IsSheet P Ψ y (Geo.segre z) γ := by
     refine ⟨fun _ ↦ z, rfl, Filter.Eventually.of_forall fun y' ↦ ⟨differentiableAt_const _, hz, ?_⟩⟩
     rw [Subsingleton.elim y' y]
@@ -56,17 +59,20 @@ theorem sheetDensity_eq (P : Ideal (Geo.MRing ι))
   rw [Geo.sheetDensity, dite_eq_left hex]
   obtain ⟨hseg, hev⟩ := hex.choose_spec
   have hmem : hex.choose y ∈ Geo.mcPts P := hev.self_of_nhds.2.1
-  obtain ⟨c, hc, hcz⟩ := Geo.sameOrbit_of_segre (z := z) hmem.1 1 one_ne_zero (by rw [one_smul, hseg])
+  obtain ⟨c, hc, hcz⟩ :=
+    Geo.sameOrbit_of_segre (z := z) hmem.1 1 one_ne_zero (by rw [one_smul, hseg])
   have hgz : g z = g (hex.choose y) := (congrArg g hcz).trans (hg c _ hc hmem)
   rw [hgz]
   simp [Geo.maDensity, Geo.mixedDisc]
 
-theorem ptsIntegralAt_eq [Nonempty K] (P : Ideal (Geo.MRing ι)) (hP : Geo.IsMultiHomogIdeal P)
+theorem ptsIntegralAt_eq
+    [Nonempty K]
+    (P : Ideal (Geo.MRing ι)) (hP : Geo.IsMultiHomogIdeal P)
     (g : ((Σ k, ι k) → ℂ) → ℝ)
-    (hg : ∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → z ∈ Geo.mcPts P →
-      g (fun p ↦ c p.1 * z p) = g z)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ)) (hΨ : Geo.IsGoodProj P Ψ) :
-    Geo.ptsIntegralAt P Ψ Fin.elim0 g = ∑ᶠ q : projPts P, g (Quot.out q : Geo.mcPts P) := by
+    (hg : ∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ),
+      (∀ k, c k ≠ 0) → z ∈ Geo.mcPts P → g (fun p ↦ c p.1 * z p) = g z)
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ)) (hΨ : Geo.IsGoodProj P Ψ)
+    : Geo.ptsIntegralAt P Ψ Fin.elim0 g = ∑ᶠ q : projPts P, g (Quot.out q : Geo.mcPts P) := by
   classical
   have hE := rel_equivalence P
   have hcons : ∀ (y : Fin 0 → ℂ) (v : Fin (0 + 1) → ℂ), v = Fin.cons 1 y ↔ v 0 = 1 := by
@@ -94,11 +100,15 @@ theorem ptsIntegralAt_eq [Nonempty K] (P : Ideal (Geo.MRing ι)) (hP : Geo.IsMul
   have hone : ∀ q, Ψ (Geo.segre (zq q)) 0 = 1 := fun q ↦ by
     rw [hseg, map_smul, Pi.smul_apply, smul_eq_mul]
     exact inv_mul_cancel₀ (hne _ (Quot.out q).2)
-  have hrep : ∀ z : Geo.mcPts P, ∃ d : K → ℂ, (∀ k, d k ≠ 0) ∧
-      (z : (Σ k, ι k) → ℂ) = fun p ↦ d p.1 * (Quot.out (Quot.mk _ z : projPts P)).1 p :=
+  have hrep
+      : ∀ z : Geo.mcPts P, ∃ d : K → ℂ,
+        (∀ k, d k ≠ 0)
+          ∧ (z : (Σ k, ι k) → ℂ) = fun p ↦ d p.1 * (Quot.out (Quot.mk _ z : projPts P)).1 p :=
     fun z ↦ hE.eqvGen_iff.mp (Quot.eqvGen_exact (Quot.out_eq (Quot.mk _ z : projPts P)))
-  have hsum : ∀ y : Fin 0 → ℂ, ∑ᶠ w ∈ Geo.fibre P Ψ y, Geo.sheetDensity P Ψ Fin.elim0 g y w =
-      ∑ᶠ q : projPts P, g (Quot.out q : Geo.mcPts P) := by
+  have hsum
+      : ∀ y : Fin 0 → ℂ,
+        ∑ᶠ w ∈ Geo.fibre P Ψ y, Geo.sheetDensity P Ψ Fin.elim0 g y w
+          = ∑ᶠ q : projPts P, g (Quot.out q : Geo.mcPts P) := by
     intro y
     let σ : projPts P → Geo.fibre P Ψ y := fun q ↦
       ⟨Geo.segre (zq q), zq q, hzq q, rfl, (hcons y _).mpr (hone q)⟩
@@ -119,8 +129,9 @@ theorem ptsIntegralAt_eq [Nonempty K] (P : Ideal (Geo.MRing ι)) (hP : Geo.IsMul
       rintro ⟨w, z, hz, rfl, hw⟩
       obtain ⟨d, hd, hdz⟩ := hrep ⟨z, hz⟩
       refine ⟨Quot.mk _ ⟨z, hz⟩, Subtype.ext ?_⟩
-      have hsz : Geo.segre z = (∏ k, d k) •
-          Geo.segre (Quot.out (Quot.mk _ ⟨z, hz⟩ : projPts P) : Geo.mcPts P) := by
+      have hsz
+          : Geo.segre z
+            = (∏ k, d k) • Geo.segre (Quot.out (Quot.mk _ ⟨z, hz⟩ : projPts P) : Geo.mcPts P) := by
         rw [← Geo.segre_smul]
         exact congrArg Geo.segre hdz
       have h1 := (hcons y _).mp hw
@@ -138,17 +149,20 @@ theorem ptsIntegralAt_eq [Nonempty K] (P : Ideal (Geo.MRing ι)) (hP : Geo.IsMul
   rw [integral_const, MeasureTheory.volume_pi, Measure.pi_of_empty]
   simp
 
-theorem exists_isGoodProj (P : Ideal (Geo.MRing ι)) (hfin : Finite (projPts P)) :
-    ∃ Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ), Geo.IsGoodProj P Ψ := by
+theorem exists_isGoodProj (P : Ideal (Geo.MRing ι)) (hfin : Finite (projPts P))
+    : ∃ Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ), Geo.IsGoodProj P Ψ := by
   have hE := rel_equivalence P
-  obtain ⟨f, hf⟩ := Module.exists_dual_forall_apply_ne_zero (K := ℂ) (M := ((k : K) → ι k) → ℂ)
-    (fun q : projPts P ↦ Geo.segre (Quot.out q).1)
-    (fun q ↦ segre_ne_zero (z := (Quot.out q).1) (Quot.out q).2.1)
+  obtain ⟨f, hf⟩ :=
+    Module.exists_dual_forall_apply_ne_zero (K := ℂ) (M := ((k : K) → ι k) → ℂ)
+      (fun q : projPts P ↦ Geo.segre (Quot.out q).1)
+      (fun q ↦ segre_ne_zero (z := (Quot.out q).1) (Quot.out q).2.1)
   refine ⟨LinearMap.pi fun _ ↦ f, fun z hz h ↦ ?_⟩
-  obtain ⟨d, hd, hdz⟩ := hE.eqvGen_iff.mp (Quot.eqvGen_exact (Quot.out_eq (Quot.mk _ ⟨z, hz⟩ : projPts P)))
+  obtain ⟨d, hd, hdz⟩ :=
+    hE.eqvGen_iff.mp (Quot.eqvGen_exact (Quot.out_eq (Quot.mk _ ⟨z, hz⟩ : projPts P)))
   have h0 : f (Geo.segre z) = 0 := congrFun h 0
-  have hsz : Geo.segre z = (∏ k, d k) •
-      Geo.segre (Quot.out (Quot.mk _ ⟨z, hz⟩ : projPts P) : Geo.mcPts P) := by
+  have hsz
+      : Geo.segre z
+        = (∏ k, d k) • Geo.segre (Quot.out (Quot.mk _ ⟨z, hz⟩ : projPts P) : Geo.mcPts P) := by
     rw [← Geo.segre_smul]
     exact congrArg Geo.segre hdz
   rw [hsz, map_smul, smul_eq_mul] at h0
@@ -156,12 +170,12 @@ theorem exists_isGoodProj (P : Ideal (Geo.MRing ι)) (hfin : Finite (projPts P))
 
 def HomogStatement : Prop :=
   ∀ (K : Type) [Fintype K] [Nonempty K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (P : Ideal (Geo.MRing ι)) (g : ((Σ k, ι k) → ℂ) → ℝ),
-    Geo.IsMultiHomogIdeal P → Finite (projPts P) →
-    (∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → z ∈ Geo.mcPts P →
-      g (fun p ↦ c p.1 * z p) = g z) →
-    Geo.ptsIntegral P (Fin.elim0 : Fin 0 → ((Σ k, ι k) → ℂ) → ℝ) g =
-      ∑ᶠ q : projPts P, g (Quot.out q : Geo.mcPts P)
+      (P : Ideal (Geo.MRing ι)) (g : ((Σ k, ι k) → ℂ) → ℝ),
+    Geo.IsMultiHomogIdeal P → Finite (projPts P)
+      → (∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ),
+        (∀ k, c k ≠ 0) → z ∈ Geo.mcPts P → g (fun p ↦ c p.1 * z p) = g z)
+      → Geo.ptsIntegral P (Fin.elim0 : Fin 0 → ((Σ k, ι k) → ℂ) → ℝ) g
+        = ∑ᶠ q : projPts P, g (Quot.out q : Geo.mcPts P)
 
 theorem homogProof : HomogStatement := by
   intro K _ _ ι _ P g hP hfin hg

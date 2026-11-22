@@ -35,7 +35,8 @@ theorem factorOverLocalSubalgebra : FactorOverLocalSubalgebra := by
   · obtain ⟨x⟩ : Nonempty X' := by
       by_contra h
       rw [not_nonempty_iff] at h
-      have hsub : Subsingleton T := ⟨fun a b => Subtype.ext (funext fun x => (IsEmpty.false x).elim)⟩
+      have hsub : Subsingleton T :=
+        ⟨fun a b => Subtype.ext (funext fun x => (IsEmpty.false x).elim)⟩
       exact not_subsingleton T hsub
     have := IsLocalHom.of_surjective (ev T x) (fun o => ⟨algebraMap O T o, by simp [ev]⟩)
     apply isUnit_of_map_unit (ev T x)

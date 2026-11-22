@@ -12,16 +12,18 @@ namespace Formalism.MainNotions.TestSideWords.TwistedFiltration.G1
 
 open Formalism.MainNotions.G
 
-def flt_tay (R : Type*) [CommRing R] (σ : Type*) : MvPolynomial σ R →+* MvPolynomial σ (MvPolynomial σ R) :=
+def flt_tay (R : Type*) [CommRing R] (σ : Type*)
+    : MvPolynomial σ R →+* MvPolynomial σ (MvPolynomial σ R) :=
   eval₂Hom (C.comp C) (fun v => C (X v) + X v)
 
 def flt_g (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ) : MvPolynomial σ R :=
   monomial (m - be) (((be.prod fun k j => (m k).choose j : ℕ)) : R)
 
 open Classical in
-theorem flt_g_pascal (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ) (a : σ) :
-    flt_g R (m + Finsupp.single a 1) be =
-      flt_g R m be * X a + (if a ∈ be.support then flt_g R m (be - Finsupp.single a 1) else 0) := by
+theorem flt_g_pascal (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ) (a : σ)
+    : flt_g R (m + Finsupp.single a 1) be
+      = flt_g R m be * X a
+        + (if a ∈ be.support then flt_g R m (be - Finsupp.single a 1) else 0) := by
   unfold flt_g
   rw [X, monomial_mul, mul_one]
   by_cases ha : a ∈ be.support
@@ -34,15 +36,20 @@ theorem flt_g_pascal (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ
       omega
     rw [Finsupp.prod_of_support_subset _ hsub _ (fun k _ => Nat.choose_zero_right _)]
     simp only [Finsupp.prod]
-    rw [← Finset.mul_prod_erase _ _ ha, ← Finset.mul_prod_erase _ _ ha, ← Finset.mul_prod_erase _ _ ha]
-    have hrest1 : ∏ k ∈ be.support.erase a, ((m + Finsupp.single a 1 : σ →₀ ℕ) k).choose (be k) =
-        ∏ k ∈ be.support.erase a, (m k).choose (be k) :=
+    rw [← Finset.mul_prod_erase _ _ ha, ← Finset.mul_prod_erase _ _ ha,
+      ← Finset.mul_prod_erase _ _ ha]
+    have hrest1
+        : ∏ k ∈ be.support.erase a, ((m + Finsupp.single a 1 : σ →₀ ℕ) k).choose (be k)
+          = ∏ k ∈ be.support.erase a, (m k).choose (be k) :=
       Finset.prod_congr rfl fun k hk => by
-        rw [Finsupp.add_apply, Finsupp.single_apply, if_neg (Finset.ne_of_mem_erase hk).symm, add_zero]
-    have hrest2 : ∏ k ∈ be.support.erase a, (m k).choose ((be - Finsupp.single a 1 : σ →₀ ℕ) k) =
-        ∏ k ∈ be.support.erase a, (m k).choose (be k) :=
+        rw [Finsupp.add_apply, Finsupp.single_apply, if_neg (Finset.ne_of_mem_erase hk).symm,
+          add_zero]
+    have hrest2
+        : ∏ k ∈ be.support.erase a, (m k).choose ((be - Finsupp.single a 1 : σ →₀ ℕ) k)
+          = ∏ k ∈ be.support.erase a, (m k).choose (be k) :=
       Finset.prod_congr rfl fun k hk => by
-        rw [Finsupp.tsub_apply, Finsupp.single_apply, if_neg (Finset.ne_of_mem_erase hk).symm, tsub_zero]
+        rw [Finsupp.tsub_apply, Finsupp.single_apply, if_neg (Finset.ne_of_mem_erase hk).symm,
+          tsub_zero]
     rw [hrest1, hrest2]
     obtain ⟨b, hb⟩ : ∃ b, be a = b + 1 := ⟨be a - 1, by omega⟩
     have hA : (m + Finsupp.single a 1 : σ →₀ ℕ) a = m a + 1 := by simp
@@ -57,7 +64,8 @@ theorem flt_g_pascal (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ
         · subst hk
           simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_eq_same, hb]
           omega
-        · simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_apply, if_neg (Ne.symm hk)]
+        · simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_apply,
+            if_neg (Ne.symm hk)]
           omega
       rcases Nat.lt_or_ge (m a) (b + 1) with hlt2 | hge2
       · rw [Nat.choose_eq_zero_of_lt hlt2, e3]
@@ -68,7 +76,8 @@ theorem flt_g_pascal (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ
           · subst hk
             simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_eq_same, hb]
             omega
-          · simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_apply, if_neg (Ne.symm hk)]
+          · simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_apply,
+              if_neg (Ne.symm hk)]
             omega
         rw [e2, e3, ← map_add (f := _)]
         congr 1
@@ -84,20 +93,25 @@ theorem flt_g_pascal (R : Type*) [CommRing R] {σ : Type*} (m be : σ →₀ ℕ
         omega
       · simp only [Finsupp.tsub_apply, Finsupp.add_apply, Finsupp.single_apply, if_neg (Ne.symm hk)]
         omega
-    have hc : (be.prod fun k j => ((m + Finsupp.single a 1 : σ →₀ ℕ) k).choose j) = be.prod fun k j => (m k).choose j := by
+    have hc
+        : (be.prod fun k j => ((m + Finsupp.single a 1 : σ →₀ ℕ) k).choose j)
+          = be.prod fun k j => (m k).choose j := by
       simp only [Finsupp.prod]
       refine Finset.prod_congr rfl fun k hk => ?_
       have hka : a ≠ k := fun h => ha (h ▸ hk)
       rw [Finsupp.add_apply, Finsupp.single_apply, if_neg hka, add_zero]
     rw [e2, hc]
 
-theorem flt_tay_monomial (R : Type*) [CommRing R] {σ : Type*} (m : σ →₀ ℕ) :
-    ∀ be, AddMonoidAlgebra.coeff (flt_tay R σ (monomial m 1)) be = flt_g R m be := by
+theorem flt_tay_monomial (R : Type*) [CommRing R] {σ : Type*} (m : σ →₀ ℕ)
+    : ∀ be, AddMonoidAlgebra.coeff (flt_tay R σ (monomial m 1)) be = flt_g R m be := by
   classical
   have htx : ∀ a, flt_tay R σ (X a) = C (X a) + X a := fun a => by simp [flt_tay]
-  have step : ∀ m : σ →₀ ℕ, (∀ be, AddMonoidAlgebra.coeff (flt_tay R σ (monomial m 1)) be = flt_g R m be) →
-      ∀ a be, AddMonoidAlgebra.coeff (flt_tay R σ (monomial (m + Finsupp.single a 1) 1)) be =
-        flt_g R (m + Finsupp.single a 1) be := by
+  have step
+      : ∀ m : σ →₀ ℕ,
+        (∀ be, AddMonoidAlgebra.coeff (flt_tay R σ (monomial m 1)) be = flt_g R m be)
+          → ∀ a be,
+            AddMonoidAlgebra.coeff (flt_tay R σ (monomial (m + Finsupp.single a 1) 1)) be
+              = flt_g R (m + Finsupp.single a 1) be := by
     intro m hm a be
     rw [flt_g_pascal, monomial_add_single, pow_one, map_mul, htx, mul_add, MvPolynomial.coeff_add,
       mul_comm _ (C (X a)), coeff_C_mul, coeff_mul_X', hm, mul_comm (X a)]
@@ -129,14 +143,18 @@ theorem flt_tay_monomial (R : Type*) [CommRing R] {σ : Type*} (m : σ →₀ �
       rw [e]
       exact step _ ihb a
 
-theorem flt_tay_coeff (R : Type*) [CommRing R] {σ : Type*} (F : MvPolynomial σ R) (be : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (flt_tay R σ F) be = divDer be F := by
+theorem flt_tay_coeff (R : Type*) [CommRing R] {σ : Type*} (F : MvPolynomial σ R) (be : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (flt_tay R σ F) be = divDer be F := by
   conv_lhs => rw [F.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, coeff_sum, divDer]
   refine Finset.sum_congr rfl fun m _ => ?_
-  rw [show monomial m (AddMonoidAlgebra.coeff F m) = C (AddMonoidAlgebra.coeff F m) * monomial m 1 by rw [C_mul_monomial, mul_one], map_mul]
-  have hC : flt_tay R σ (C (AddMonoidAlgebra.coeff F m)) = C (C (AddMonoidAlgebra.coeff F m)) := by simp [flt_tay]
+  rw [show monomial m (AddMonoidAlgebra.coeff F m)
+        = C (AddMonoidAlgebra.coeff F m) * monomial m 1 by
+      rw [C_mul_monomial, mul_one],
+    map_mul]
+  have hC : flt_tay R σ (C (AddMonoidAlgebra.coeff F m)) = C (C (AddMonoidAlgebra.coeff F m)) := by
+    simp [flt_tay]
   rw [hC, coeff_C_mul, flt_tay_monomial, flt_g, C_mul_monomial]
   split_ifs with hle
   · rfl
@@ -149,20 +167,25 @@ theorem flt_tay_coeff (R : Type*) [CommRing R] {σ : Type*} (F : MvPolynomial σ
       exact Finset.prod_eq_zero (Finsupp.mem_support_iff.2 (by omega)) (Nat.choose_eq_zero_of_lt hk)
     rw [hz, Nat.cast_zero, mul_zero, monomial_zero]
 
-
 open Classical in
-def flt_Th {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n) :
-    MvPolynomial (ι × Fin n) (GLLaurent R n) →+*
-      MvPolynomial (ι × Fin n) (MvPolynomial (ι × Fin n) (GLLaurent R n)) :=
-  eval₂Hom (C.comp C) fun w => C (X w) +
-    (if w.1 ∈ S then
-      (if LL.vec w.1 then ∑ c : Fin n, C (C (twistMat R n j (-1) c w.2)) * X (w.1, c)
-       else ∑ c : Fin n, C (C (twistMat R n j 1 w.2 c)) * X (w.1, c))
-     else X w)
+def flt_Th {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    : MvPolynomial (ι × Fin n) (GLLaurent R n)
+      →+* MvPolynomial (ι × Fin n) (MvPolynomial (ι × Fin n) (GLLaurent R n)) :=
+  eval₂Hom (C.comp C) fun w =>
+    C (X w)
+      + (if w.1 ∈ S then
+           (if LL.vec w.1 then
+              ∑ c : Fin n, C (C (twistMat R n j (-1) c w.2)) * X (w.1, c)
+            else
+              ∑ c : Fin n, C (C (twistMat R n j 1 w.2 c)) * X (w.1, c))
+         else
+           X w)
 
-theorem sum_C_C_mul_sum_of_mul_eq_one {B : Type*} [CommRing B] {σ' σ'' : Type*} {n : ℕ} (P Q : Matrix (Fin n) (Fin n) B)
-    (h : Q * P = 1) (Y : Fin n → MvPolynomial σ' (MvPolynomial σ'' B)) (d : Fin n) :
-    ∑ b, C (C (P b d)) * ∑ c, C (C (Q c b)) * Y c = Y d := by
+theorem sum_C_C_mul_sum_of_mul_eq_one
+    {B : Type*} [CommRing B]
+    {σ' σ'' : Type*} {n : ℕ} (P Q : Matrix (Fin n) (Fin n) B) (h : Q * P = 1)
+    (Y : Fin n → MvPolynomial σ' (MvPolynomial σ'' B)) (d : Fin n)
+    : ∑ b, C (C (P b d)) * ∑ c, C (C (Q c b)) * Y c = Y d := by
   simp_rw [Finset.mul_sum, ← mul_assoc, ← map_mul]
   rw [Finset.sum_comm]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -173,19 +196,27 @@ theorem sum_C_C_mul_sum_of_mul_eq_one {B : Type*} [CommRing B] {σ' σ'' : Type*
   simp_rw [hcd, Matrix.one_apply]
   simp
 
-theorem flt_Th_twist {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n) :
-    (MvPolynomial.map (twistSub (R := R) LL S j)).comp (flt_tay R (ι × Fin n)) =
-      (flt_Th LL S j).comp (twistSub (R := R) LL S j) := by
+theorem flt_Th_twist
+    {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    : (MvPolynomial.map (twistSub (R := R) LL S j)).comp (flt_tay R (ι × Fin n))
+      = (flt_Th LL S j).comp (twistSub (R := R) LL S j) := by
   apply MvPolynomial.ringHom_ext
   · intro r
     simp [flt_tay, flt_Th, twistSub]
   · intro v
-    have hY1 := sum_C_C_mul_sum_of_mul_eq_one (σ' := ι × Fin n) (σ'' := ι × Fin n) (twistMat R n j 1) (twistMat R n j (-1))
-      (by simpa using flt_twistMat_mul R n j (-1)) (fun c => X (v.1, c)) v.2
-    have hM : twistMat R n j (-1) * twistMat R n j 1 = 1 := by simpa using flt_twistMat_mul R n j (-1)
-    have hY2 := sum_C_C_mul_sum_of_mul_eq_one (σ' := ι × Fin n) (σ'' := ι × Fin n) (Matrix.transpose (twistMat R n j (-1)))
-      (Matrix.transpose (twistMat R n j 1))
-      (by rw [← Matrix.transpose_mul, hM, Matrix.transpose_one]) (fun c => X (v.1, c)) v.2
+    have hY1 :=
+      sum_C_C_mul_sum_of_mul_eq_one (σ' := ι × Fin n) (σ'' := ι × Fin n) (twistMat R n j 1)
+        (twistMat R n j (-1)) (by simpa using flt_twistMat_mul R n j (-1))
+        (fun c => X (v.1, c))
+        v.2
+    have hM : twistMat R n j (-1) * twistMat R n j 1 = 1 := by
+      simpa using flt_twistMat_mul R n j (-1)
+    have hY2 :=
+      sum_C_C_mul_sum_of_mul_eq_one (σ' := ι × Fin n) (σ'' := ι × Fin n)
+        (Matrix.transpose (twistMat R n j (-1))) (Matrix.transpose (twistMat R n j 1))
+        (by rw [← Matrix.transpose_mul, hM, Matrix.transpose_one])
+        (fun c => X (v.1, c))
+        v.2
     simp only [Matrix.transpose_apply] at hY2
     by_cases hS : v.1 ∈ S
     · by_cases hv : LL.vec v.1 = true
@@ -193,38 +224,49 @@ theorem flt_Th_twist {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Lette
       · simp [flt_tay, flt_Th, twistSub, hS, hv, mul_add, Finset.sum_add_distrib, hY2]
     · simp [flt_tay, flt_Th, twistSub, hS]
 
-theorem flt_Th_mem {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
-    {e : ℤ} {bm : Bool} (h : flt_compat e bm) {t : ℤ} {P : MvPolynomial (ι × Fin n) (GLLaurent R n)}
-    (hP : P ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t) :
-    flt_Th LL S j P ∈ (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).F t := by
+theorem flt_Th_mem
+    {R : Type*} [CommRing R]
+    {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    {e : ℤ} {bm : Bool} (h : flt_compat e bm)
+    {t : ℤ} {P : MvPolynomial (ι × Fin n) (GLLaurent R n)}
+    (hP : P ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t)
+    : flt_Th LL S j P
+      ∈ (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).F t := by
   have hone : ∀ s : ℤ, s = 0 → (1 : GLLaurent R n) ∈ (flt_L (GLCoord R n) e).F s := by
     rintro s rfl
     exact (flt_L (GLCoord R n) e).one_mem
-  have hX : ∀ w, flt_Th LL S j (X w) ∈ (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).F
-      ((0 : (ι × Fin n →₀ ℕ) →+ ℤ) (Finsupp.single w 1)) := by
+  have hX
+      : ∀ w,
+        flt_Th LL S j (X w)
+          ∈ (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).F
+            ((0 : (ι × Fin n →₀ ℕ) →+ ℤ) (Finsupp.single w 1)) := by
     intro w
     rw [AddMonoidHom.zero_apply]
-    have hXw : (X w : MvPolynomial (ι × Fin n) (GLLaurent R n)) ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F 0 :=
+    have hXw
+        : (X w : MvPolynomial (ι × Fin n) (GLLaurent R n))
+          ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F 0 :=
       flt_monomial_mem (hone _ (by simp))
     simp only [flt_Th, eval₂Hom_X']
     refine AddSubgroup.add_mem _ (flt_C_mem hXw) ?_
     split_ifs with hS hv
     · refine AddSubgroup.sum_mem _ fun c _ => ?_
-      rw [show (C (C (twistMat R n j (-1) c w.2)) * X (w.1, c) :
-          MvPolynomial (ι × Fin n) (MvPolynomial (ι × Fin n) (GLLaurent R n))) =
-          monomial (Finsupp.single (w.1, c) 1) (C (twistMat R n j (-1) c w.2)) by
+      rw [show (C (C (twistMat R n j (-1) c w.2)) * X (w.1, c)
+            : MvPolynomial (ι × Fin n) (MvPolynomial (ι × Fin n) (GLLaurent R n)))
+          = monomial (Finsupp.single (w.1, c) 1) (C (twistMat R n j (-1) c w.2)) by
         rw [X, C_mul_monomial, mul_one]]
-      refine flt_monomial_mem (flt_C_mem (flt_twistMat_mem R n j _ _ _ ?_ ?_ _ _)) <;>
-        rcases h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> simp [flt_cost, hS, hv]
+      refine flt_monomial_mem (flt_C_mem (flt_twistMat_mem R n j _ _ _ ?_ ?_ _ _))
+        <;> rcases h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> simp [flt_cost, hS, hv]
     · refine AddSubgroup.sum_mem _ fun c _ => ?_
-      rw [show (C (C (twistMat R n j 1 w.2 c)) * X (w.1, c) :
-          MvPolynomial (ι × Fin n) (MvPolynomial (ι × Fin n) (GLLaurent R n))) =
-          monomial (Finsupp.single (w.1, c) 1) (C (twistMat R n j 1 w.2 c)) by
+      rw [show (C (C (twistMat R n j 1 w.2 c)) * X (w.1, c)
+            : MvPolynomial (ι × Fin n) (MvPolynomial (ι × Fin n) (GLLaurent R n)))
+          = monomial (Finsupp.single (w.1, c) 1) (C (twistMat R n j 1 w.2 c)) by
         rw [X, C_mul_monomial, mul_one]]
-      refine flt_monomial_mem (flt_C_mem (flt_twistMat_mem R n j _ _ _ ?_ ?_ _ _)) <;>
-        rcases h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> simp [flt_cost, hS, hv]
-    · have h1 : (1 : MvPolynomial (ι × Fin n) (GLLaurent R n)) ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F
-          (0 - flt_cost LL S (!bm) (Finsupp.single w 1)) := by
+      refine flt_monomial_mem (flt_C_mem (flt_twistMat_mem R n j _ _ _ ?_ ?_ _ _))
+        <;> rcases h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> simp [flt_cost, hS, hv]
+    · have h1
+          : (1 : MvPolynomial (ι × Fin n) (GLLaurent R n))
+            ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F
+              (0 - flt_cost LL S (!bm) (Finsupp.single w 1)) := by
         have h0 : flt_cost LL S (!bm) (Finsupp.single w 1) = 0 := by simp [flt_cost, hS]
         rw [h0, sub_zero]
         exact (laurentCoeffFiltration R n (ι × Fin n) e).one_mem
@@ -232,61 +274,85 @@ theorem flt_Th_mem {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters
   set_option synthInstance.maxHeartbeats 100000 in
     rw [P.as_sum, map_sum]
   refine AddSubgroup.sum_mem _ fun m _ => ?_
-  rw [show monomial m (AddMonoidAlgebra.coeff P m) = C (AddMonoidAlgebra.coeff P m) * monomial m 1 by rw [C_mul_monomial, mul_one], map_mul]
+  rw [show monomial m (AddMonoidAlgebra.coeff P m)
+        = C (AddMonoidAlgebra.coeff P m) * monomial m 1 by
+      rw [C_mul_monomial, mul_one],
+    map_mul]
   have hc : AddMonoidAlgebra.coeff P m ∈ (flt_L (GLCoord R n) e).F t := by
     have h3 := (flt_lift_mem.1 hP) m
     simpa using h3
-  have h1 : flt_Th LL S j (C (AddMonoidAlgebra.coeff P m)) ∈
-      (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).F t := by
+  have h1
+      : flt_Th LL S j (C (AddMonoidAlgebra.coeff P m))
+        ∈ (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).F t := by
     simp only [flt_Th, eval₂Hom_C, RingHom.comp_apply]
     exact flt_C_mem (flt_C_mem hc)
   have h2 := flt_hom_monomial _ (flt_Th LL S j) 0 hX m
   rw [AddMonoidHom.zero_apply] at h2
-  have h4 := (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).mul_mem h1 h2
+  have h4 :=
+    (flt_lift (laurentCoeffFiltration R n (ι × Fin n) e) (flt_cost LL S (!bm))).mul_mem h1 h2
   rwa [add_zero] at h4
 
-theorem flt_divDer_mem {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
-    {e : ℤ} {bm : Bool} (h : flt_compat e bm) {t : ℤ} {F : MvPolynomial (ι × Fin n) R}
-    (hF : twistSub LL S j F ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t) (be : ι × Fin n →₀ ℕ) :
-    twistSub LL S j (divDer be F) ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F (t - flt_cost LL S (!bm) be) := by
+theorem flt_divDer_mem
+    {R : Type*} [CommRing R]
+    {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    {e : ℤ} {bm : Bool} (h : flt_compat e bm)
+    {t : ℤ} {F : MvPolynomial (ι × Fin n) R}
+    (hF : twistSub LL S j F ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t)
+    (be : ι × Fin n →₀ ℕ)
+    : twistSub LL S j (divDer be F)
+      ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F (t - flt_cost LL S (!bm) be) := by
   have h1 := flt_lift_mem.1 (flt_Th_mem LL S j h hF) be
-  have e1 : twistSub LL S j (divDer be F) = AddMonoidAlgebra.coeff (flt_Th LL S j (twistSub LL S j F)) be := by
+  have e1
+      : twistSub LL S j (divDer be F)
+        = AddMonoidAlgebra.coeff (flt_Th LL S j (twistSub LL S j F)) be := by
     have h2 := congrArg (fun φ => AddMonoidAlgebra.coeff (φ F) be) (flt_Th_twist (R := R) LL S j)
     simp only [RingHom.comp_apply, coeff_map] at h2
     rw [← h2, flt_tay_coeff]
   rw [e1]
   exact h1
 
-theorem flt_op_mem {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
-    {e : ℤ} {bm : Bool} (h : flt_compat e bm) {t : ℤ} {F : MvPolynomial (ι × Fin n) R}
-    (hF : twistSub LL S j F ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t) (al be : ι × Fin n →₀ ℕ) :
-    twistSub LL S j (monomial al 1 * divDer be F) ∈
-      (laurentCoeffFiltration R n (ι × Fin n) e).F (t - (flt_cost LL S bm al + flt_cost LL S (!bm) be)) := by
+theorem flt_op_mem
+    {R : Type*} [CommRing R]
+    {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    {e : ℤ} {bm : Bool} (h : flt_compat e bm)
+    {t : ℤ} {F : MvPolynomial (ι × Fin n) R}
+    (hF : twistSub LL S j F ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t)
+    (al be : ι × Fin n →₀ ℕ)
+    : twistSub LL S j (monomial al 1 * divDer be F) ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F
+      (t - (flt_cost LL S bm al + flt_cost LL S (!bm) be)) := by
   rw [map_mul]
   have h1 := flt_twist_monomial_mem (R := R) LL S j h al
   have h2 := flt_divDer_mem LL S j h hF be
   have h3 := (laurentCoeffFiltration R n (ι × Fin n) e).mul_mem h1 h2
-  rwa [show -flt_cost LL S bm al + (t - flt_cost LL S (!bm) be) =
-    t - (flt_cost LL S bm al + flt_cost LL S (!bm) be) by ring] at h3
+  rwa [show - flt_cost LL S bm al + (t - flt_cost LL S (!bm) be)
+        = t - (flt_cost LL S bm al + flt_cost LL S (!bm) be) by
+      ring]
+    at h3
 
-private theorem flt_cost_false_eq_covDeg {ι : Type} {n : ℕ} (LL : Letters ι) (S : Set ι) (al : ι × Fin n →₀ ℕ) :
-    flt_cost LL S false al = (covDeg LL S al : ℤ) := by
+private theorem flt_cost_false_eq_covDeg
+    {ι : Type} {n : ℕ} (LL : Letters ι) (S : Set ι) (al : ι × Fin n →₀ ℕ)
+    : flt_cost LL S false al = (covDeg LL S al : ℤ) := by
   simp only [flt_cost, Finsupp.liftAddHom_apply, covDeg, Finsupp.sum]
   push_cast
   refine Finset.sum_congr rfl fun v _ => ?_
   split_ifs <;> simp
 
-private theorem flt_cost_true_eq_vecDeg {ι : Type} {n : ℕ} (LL : Letters ι) (S : Set ι) (al : ι × Fin n →₀ ℕ) :
-    flt_cost LL S true al = (vecDeg LL S al : ℤ) := by
+private theorem flt_cost_true_eq_vecDeg
+    {ι : Type} {n : ℕ} (LL : Letters ι) (S : Set ι) (al : ι × Fin n →₀ ℕ)
+    : flt_cost LL S true al = (vecDeg LL S al : ℤ) := by
   simp only [flt_cost, Finsupp.liftAddHom_apply, vecDeg, Finsupp.sum]
   push_cast
   refine Finset.sum_congr rfl fun v _ => ?_
   split_ifs <;> simp
 
-theorem flt_op_mem_val {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι) (S : Set ι)
-    {F : MvPolynomial (ι × Fin n) R} {t : ℤ} (ht : (t : WithTop ℤ) ≤ valS LL S F) (al be : ι × Fin n →₀ ℕ)
-    (N : ℕ) (hN : covDeg LL S al + vecDeg LL S be ≤ N) :
-    twistSub LL S (lastIdx n) (monomial al 1 * divDer be F) ∈ (laurentCoeffFiltration R n (ι × Fin n) 1).F (t - N) := by
+theorem flt_op_mem_val
+    {R : Type*} [CommRing R]
+    {ι : Type} {n : ℕ} [NeZero n]
+    (LL : Letters ι) (S : Set ι)
+    {F : MvPolynomial (ι × Fin n) R} {t : ℤ} (ht : (t : WithTop ℤ) ≤ valS LL S F)
+    (al be : ι × Fin n →₀ ℕ) (N : ℕ) (hN : covDeg LL S al + vecDeg LL S be ≤ N)
+    : twistSub LL S (lastIdx n) (monomial al 1 * divDer be F)
+      ∈ (laurentCoeffFiltration R n (ι × Fin n) 1).F (t - N) := by
   have hF := (flt_le_valS LL S F t).1 ht
   have hm := flt_op_mem LL S (lastIdx n) (Or.inl ⟨rfl, rfl⟩ : flt_compat 1 false) hF al be
   refine (laurentCoeffFiltration R n (ι × Fin n) 1).anti ?_ hm
@@ -295,10 +361,14 @@ theorem flt_op_mem_val {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n]
   push_cast at hN'
   linarith
 
-theorem flt_op_mem_lam {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι) (S : Set ι)
-    {F : MvPolynomial (ι × Fin n) R} {M : ℤ} (hM : lam1S LL S F ≤ (M : WithBot ℤ)) (al be : ι × Fin n →₀ ℕ)
-    (N : ℕ) (hN : vecDeg LL S al + covDeg LL S be ≤ N) :
-    twistSub LL S (0 : Fin n) (monomial al 1 * divDer be F) ∈ (laurentCoeffFiltration R n (ι × Fin n) (-1)).F (-(M + N)) := by
+theorem flt_op_mem_lam
+    {R : Type*} [CommRing R]
+    {ι : Type} {n : ℕ} [NeZero n]
+    (LL : Letters ι) (S : Set ι)
+    {F : MvPolynomial (ι × Fin n) R} {M : ℤ} (hM : lam1S LL S F ≤ (M : WithBot ℤ))
+    (al be : ι × Fin n →₀ ℕ) (N : ℕ) (hN : vecDeg LL S al + covDeg LL S be ≤ N)
+    : twistSub LL S (0 : Fin n) (monomial al 1 * divDer be F)
+      ∈ (laurentCoeffFiltration R n (ι × Fin n) (-1)).F (-(M + N)) := by
   have hF := (flt_lam1S_le LL S F M).1 hM
   have hm := flt_op_mem LL S (0 : Fin n) (Or.inr ⟨rfl, rfl⟩ : flt_compat (-1) true) hF al be
   refine (laurentCoeffFiltration R n (ι × Fin n) (-1)).anti ?_ hm
@@ -307,10 +377,13 @@ theorem flt_op_mem_lam {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n]
   push_cast at hN'
   linarith
 
-theorem flt_op_valS {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι) (S : Set ι)
-    (F : MvPolynomial (ι × Fin n) R) (al be : ι × Fin n →₀ ℕ) (N : ℕ)
-    (hN : covDeg LL S al + vecDeg LL S be ≤ N) :
-    valS LL S F ≤ valS LL S (monomial al 1 * divDer be F) + ((N : ℤ) : WithTop ℤ) := by
+theorem flt_op_valS
+    {R : Type*} [CommRing R]
+    {ι : Type} {n : ℕ} [NeZero n]
+    (LL : Letters ι) (S : Set ι)
+    (F : MvPolynomial (ι × Fin n) R)
+    (al be : ι × Fin n →₀ ℕ) (N : ℕ) (hN : covDeg LL S al + vecDeg LL S be ≤ N)
+    : valS LL S F ≤ valS LL S (monomial al 1 * divDer be F) + ((N : ℤ) : WithTop ℤ) := by
   by_contra hcon
   push_neg at hcon
   cases hv : valS LL S (monomial al 1 * divDer be F) with
@@ -329,10 +402,13 @@ theorem flt_op_valS {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (L
     rw [← flt_le_valS, hv] at hm
     norm_cast at hm <;> omega
 
-theorem flt_op_lam1S {R : Type*} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι) (S : Set ι)
-    (F : MvPolynomial (ι × Fin n) R) (al be : ι × Fin n →₀ ℕ) (N : ℕ)
-    (hN : vecDeg LL S al + covDeg LL S be ≤ N) :
-    lam1S LL S (monomial al 1 * divDer be F) ≤ lam1S LL S F + ((N : ℤ) : WithBot ℤ) := by
+theorem flt_op_lam1S
+    {R : Type*} [CommRing R]
+    {ι : Type} {n : ℕ} [NeZero n]
+    (LL : Letters ι) (S : Set ι)
+    (F : MvPolynomial (ι × Fin n) R)
+    (al be : ι × Fin n →₀ ℕ) (N : ℕ) (hN : vecDeg LL S al + covDeg LL S be ≤ N)
+    : lam1S LL S (monomial al 1 * divDer be F) ≤ lam1S LL S F + ((N : ℤ) : WithBot ℤ) := by
   by_contra hcon
   push_neg at hcon
   cases hv : lam1S LL S (monomial al 1 * divDer be F) with

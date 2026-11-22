@@ -6,9 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem adicCont_ringHom_comp_of_map_mem {Γ R S : Type} [TopologicalSpace Γ] [CommRing R] [CommRing S]
-    {I : Ideal R} {J : Ideal S} (f : R →+* S) (hIJ : ∀ x ∈ I, f x ∈ J) {u : Γ → R}
-    (hu : AdicCont I u) : AdicCont J fun g => f (u g) := by
+private theorem adicCont_ringHom_comp_of_map_mem
+    {Γ R S : Type} [TopologicalSpace Γ] [CommRing R] [CommRing S]
+    {I : Ideal R} {J : Ideal S}
+    (f : R →+* S) (hIJ : ∀ x ∈ I, f x ∈ J)
+    {u : Γ → R} (hu : AdicCont I u)
+    : AdicCont J fun g => f (u g) := by
   intro N
   have hle : I ^ N ≤ (J ^ N).comap f := by
     rw [← Ideal.map_le_iff_le_comap, Ideal.map_pow]
@@ -18,8 +21,14 @@ private theorem adicCont_ringHom_comp_of_map_mem {Γ R S : Type} [TopologicalSpa
   funext g
   simp [Ideal.quotientMap_mk]
 
-theorem UpperTheory.V.Fr.alg_lift :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ} (C : Type) [CommRing C] [Algebra O C] [IsCO O C] {D : Type} [CommRing D] [Algebra O D] [Algebra C D] [IsScalarTower O C D] (𝔪 : Ideal D) (ρ : NRep F n D), IsModel O C 𝔪 ρ → ∀ (Q : Type) [CommRing Q] [Algebra O Q] [IsCO O Q] (p : D →ₐ[O] Q), (∀ x ∈ 𝔪, p x ∈ maximalIdeal Q) → IsLift O (ρ.map (p : D →+* Q)) := by
+theorem UpperTheory.V.Fr.alg_lift
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O]
+        {F : Frame l (ResidueField O)} {n : ℕ} (C : Type) [CommRing C] [Algebra O C] [IsCO O C]
+        {D : Type} [CommRing D] [Algebra O D] [Algebra C D] [IsScalarTower O C D] (𝔪 : Ideal D)
+        (ρ : NRep F n D),
+      IsModel O C 𝔪 ρ
+        → ∀ (Q : Type) [CommRing Q] [Algebra O Q] [IsCO O Q] (p : D →ₐ[O] Q),
+          (∀ x ∈ 𝔪, p x ∈ maximalIdeal Q) → IsLift O (ρ.map (p : D →+* Q)) := by
   intro l _ O _ _ F n C _ _ _ D _ _ _ _ 𝔪 ρ hm Q _ _ _ p hp
   have hres : ∀ c : C, res O Q (p (algebraMap C D c)) = res O C c := fun c =>
     res_map (p.comp (IsScalarTower.toAlgHom O C D)) c

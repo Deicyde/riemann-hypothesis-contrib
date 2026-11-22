@@ -36,8 +36,7 @@ theorem SlopeParameterChoice.proof : SlopeParameterChoice.Statement := by
   rw [hthird, hlev] at hs
 
   have hL1 : (1 : ℝ) ≤ L := by
-    have he : Real.exp 1 ≤ X := by
-      have := Real.exp_one_lt_d9; linarith
+    have he : Real.exp 1 ≤ X := by have := Real.exp_one_lt_d9; linarith
     have := Real.log_le_log (Real.exp_pos 1) he
     rwa [Real.log_exp] at this
 
@@ -50,10 +49,14 @@ theorem SlopeParameterChoice.proof : SlopeParameterChoice.Statement := by
     have hKpos : (0 : ℝ) < K := by linarith
     have hpos : (0 : ℝ) < 3 * Real.exp 1 * (3 * K ^ 2) ^ 2 := by positivity
     have hK4 : K ^ 4 ≤ X ^ 8 := by
-      calc K ^ 4 ≤ (X ^ 2) ^ 4 := pow_le_pow_left₀ hKpos.le hKX 4
+      calc
+        K ^ 4
+          ≤ (X ^ 2) ^ 4 := pow_le_pow_left₀ hKpos.le hKX 4
         _ = X ^ 8 := by ring
     have hX4 : (81 : ℝ) ≤ X ^ 4 := by
-      calc (81 : ℝ) = 3 ^ 4 := by norm_num
+      calc
+        (81 : ℝ)
+          = 3 ^ 4 := by norm_num
         _ ≤ X ^ 4 := pow_le_pow_left₀ (by norm_num) hX3 4
     have hle : 3 * Real.exp 1 * (3 * K ^ 2) ^ 2 ≤ X ^ 12 := by
       have h1 : 3 * Real.exp 1 * (3 * K ^ 2) ^ 2 ≤ 81 * K ^ 4 := by
@@ -61,9 +64,9 @@ theorem SlopeParameterChoice.proof : SlopeParameterChoice.Statement := by
         rw [this]
         have : (0 : ℝ) ≤ K ^ 4 := by positivity
         nlinarith
-      have h2 : 81 * K ^ 4 ≤ X ^ 4 * X ^ 8 :=
-        mul_le_mul hX4 hK4 (by positivity) (by positivity)
-      calc _ ≤ 81 * K ^ 4 := h1
+      have h2 : 81 * K ^ 4 ≤ X ^ 4 * X ^ 8 := mul_le_mul hX4 hK4 (by positivity) (by positivity)
+      calc
+        _ ≤ 81 * K ^ 4 := h1
         _ ≤ X ^ 4 * X ^ 8 := h2
         _ = X ^ 12 := by ring
     have := Real.log_le_log hpos hle
@@ -85,17 +88,19 @@ theorem SlopeParameterChoice.proof : SlopeParameterChoice.Statement := by
       have a5 : C₂ * G * L = C₂ * (G * L) := by ring
       have a6 : K * (3 * K) = 3 * K ^ 2 := by ring
       have a7 : C₂ * (K * K) = C₂ * K ^ 2 := by ring
-      have a8 : (7 / 2 + C₀ + C₂) * K ^ 2 = 3 * K ^ 2 + K ^ 2 / 2 + C₀ * K ^ 2 + C₂ * K ^ 2 := by ring
+      have a8 : (7 / 2 + C₀ + C₂) * K ^ 2 = 3 * K ^ 2 + K ^ 2 / 2 + C₀ * K ^ 2 + C₂ * K ^ 2 := by
+        ring
       rw [a8]
       linarith
     have hpos : (0 : ℝ) < 2 / (3 * K ^ 2) := by positivity
-    calc 2 / (3 * K ^ 2) * (G * Real.log (3 * K) - μ)
-        ≤ 2 / (3 * K ^ 2) * ((7 / 2 + C₀ + C₂) * K ^ 2) :=
-          mul_le_mul_of_nonneg_left hY hpos.le
+    calc
+      2 / (3 * K ^ 2) * (G * Real.log (3 * K) - μ)
+        ≤ 2 / (3 * K ^ 2) * ((7 / 2 + C₀ + C₂) * K ^ 2) := mul_le_mul_of_nonneg_left hY hpos.le
       _ = 2 / 3 * (7 / 2 + C₀ + C₂) := by field_simp
       _ ≤ 3 + C₀ + C₂ := by linarith
       _ ≤ (3 + C₀ + C₂) * L := le_mul_of_one_le_right (by linarith) hL1
-  calc s ≤ _ := hs
+  calc
+    s ≤ _ := hs
     _ ≤ 6 * L + (3 + C₀ + C₂) * L := add_le_add hfirst hsecond
     _ = (9 + C₀ + C₂) * L := by ring
 

@@ -7,16 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
 open scoped Classical
 
-private theorem psi_sg {K : Type} [Field K] [NumberField K] (v : P K) (x : Kv v) :
-    ψ (sg v x) = UpperTheory.V.Af.Smo.psiL v x := rfl
+private theorem psi_sg {K : Type} [Field K] [NumberField K] (v : P K) (x : Kv v)
+    : ψ (sg v x) = UpperTheory.V.Af.Smo.psiL v x :=
+  rfl
 
-private theorem val_ae {K : Type} [Field K] [NumberField K] (a : K) (ha : a ≠ 0) :
-    ∀ᶠ v : P K in cofinite, Valued.v (algebraMap K (Kv v) a) = 1 := by
+private theorem val_ae {K : Type} [Field K] [NumberField K] (a : K) (ha : a ≠ 0)
+    : ∀ᶠ v : P K in cofinite, Valued.v (algebraMap K (Kv v) a) = 1 := by
   have h1 := HeightOneSpectrum.Support.finite (𝓞 K) a
   have h2 := HeightOneSpectrum.Support.finite (𝓞 K) a⁻¹
   filter_upwards [h1.compl_mem_cofinite, h2.compl_mem_cofinite] with v hv1 hv2
@@ -30,9 +33,10 @@ private theorem val_ae {K : Type} [Field K] [NumberField K] (a : K) (ha : a ≠ 
   have h0 : v.valuation K a ≠ 0 := (Valuation.ne_zero_iff _).2 ha
   exact le_antisymm n1 ((inv_le_one₀ (zero_lt_iff.2 h0)).1 n2)
 
-private theorem good_of_goodAt {K : Type} [Field K] [NumberField K] (v : P K)
-    (h : UpperTheory.V.Af.Smo.GoodAt v (UpperTheory.V.Af.Smo.psiL v)) :
-    Good fun x : Kv v => ψ (sg v x) := by
+private theorem good_of_goodAt
+    {K : Type} [Field K] [NumberField K]
+    (v : P K) (h : UpperTheory.V.Af.Smo.GoodAt v (UpperTheory.V.Af.Smo.psiL v))
+    : Good fun x : Kv v => ψ (sg v x) := by
   obtain ⟨h1, h2⟩ := h
   refine ⟨fun x y => ?_, fun x hx => ?_, fun x hx => ?_⟩
   · simp only [psi_sg]
@@ -57,7 +61,8 @@ private theorem good_of_goodAt {K : Type} [Field K] [NumberField K] (v : P K)
     have hye : Valued.v y ≤ WithZero.exp (1 : ℤ) := by
       have := mul_le_mul_right hyv (WithZero.exp (1 : ℤ))
       rwa [← mul_assoc, ← WithZero.exp_add, show (1 : ℤ) + -1 = 0 by norm_num, WithZero.exp_zero,
-        one_mul, mul_one] at this
+          one_mul, mul_one]
+        at this
     have hc : IsInt (y * x⁻¹) := by
       change Valued.v (y * x⁻¹) ≤ 1
       rw [map_mul, map_inv₀]
@@ -66,8 +71,8 @@ private theorem good_of_goodAt {K : Type} [Field K] [NumberField K] (v : P K)
     rw [mul_assoc, inv_mul_cancel₀ hx0, mul_one] at this
     exact hy1 ((psi_sg v y).symm.trans this)
 
-theorem UpperTheory.ConvolutionTheory.R2.H.gdAe :
-    ∀ (K : Type) [Field K] [NumberField K] (δ : K), δ ≠ 0 → ∀ᶠ v in cofinite, Gd δ v := by
+theorem UpperTheory.ConvolutionTheory.R2.H.gdAe
+    : ∀ (K : Type) [Field K] [NumberField K] (δ : K), δ ≠ 0 → ∀ᶠ v in cofinite, Gd δ v := by
   intro K _ _ δ hδ
   have h2 : (2 : K) ≠ 0 := two_ne_zero
   filter_upwards [(UpperTheory.V.Af.Smo.psiLoc K).2, val_ae (2 : K) h2, val_ae δ hδ] with v hg ht hd

@@ -18,8 +18,8 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-theorem fbr_det_exp_pmat {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
-    (NormedSpace.exp (pmat z)).det = 1 := by
+theorem fbr_det_exp_pmat {ε : Fin n → Bool} (z : PCoord ε → ℂ)
+    : (NormedSpace.exp (pmat z)).det = 1 := by
   set U : Matrix (Fin n) (Fin n) ℂ := ((pmat_isHermitian z).eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   have hsp : pmat z = U * diagonal (fun i => (pev z i : ℂ)) * Uᴴ := by
     have := (pmat_isHermitian z).spectral_theorem
@@ -36,15 +36,16 @@ theorem fbr_det_exp_pmat {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
   simp only [he]
   rw [← Complex.exp_sum, ← Complex.ofReal_sum, sum_pev, Complex.ofReal_zero, Complex.exp_zero]
 
-theorem fbr_det_conj {ε : Fin n → Bool} (k : KG ε) (A : Matrix (Fin n) (Fin n) ℂ) :
-    (toMK k⁻¹ * A * toMK k).det = A.det := by
-  rw [toMK_inv, Matrix.det_mul, Matrix.det_mul, mul_comm ((toMK k)ᴴ.det) A.det, mul_assoc, ← Matrix.det_mul,
-    (toMK_facts k).1, Matrix.det_one, mul_one]
+theorem fbr_det_conj {ε : Fin n → Bool} (k : KG ε) (A : Matrix (Fin n) (Fin n) ℂ)
+    : (toMK k⁻¹ * A * toMK k).det = A.det := by
+  rw [toMK_inv, Matrix.det_mul, Matrix.det_mul, mul_comm ((toMK k)ᴴ.det) A.det, mul_assoc,
+    ← Matrix.det_mul, (toMK_facts k).1, Matrix.det_one, mul_one]
 
-theorem fbr_phi {ε : Fin n → Bool} {lam : Fin n → ℝ} {μ : Fin n → ℤ} (hμ : IsMu lam μ) (k : KG ε)
-    (z : PCoord ε → ℂ) :
-    PhiM μ (toMK k⁻¹ * NormedSpace.exp (pmat z) * toMK k) =
-      ((Real.exp (-Ph lam (toMK k⁻¹ * pmat z * toMK k)) : ℝ) : ℂ) := by
+theorem fbr_phi
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} {μ : Fin n → ℤ}
+    (hμ : IsMu lam μ) (k : KG ε) (z : PCoord ε → ℂ)
+    : PhiM μ (toMK k⁻¹ * NormedSpace.exp (pmat z) * toMK k)
+      = ((Real.exp (- Ph lam (toMK k⁻¹ * pmat z * toMK k)) : ℝ) : ℂ) := by
   obtain ⟨hP, hE⟩ := inP_conj k⁻¹ (pmat_inP z)
   rw [inv_inv] at hP hE
   rw [← hE]
@@ -61,21 +62,26 @@ theorem fbr_phi {ε : Fin n → Bool} {lam : Fin n → ℝ} {μ : Fin n → ℤ}
   have hpos : ∀ i : Fin n, 0 < (lead ((i : ℕ) + 1) E).re := fun i => (lead_posDef hpd _ i.isLt).1
   have h : ∀ i : Fin n, lead ((i : ℕ) + 1) E = ((lead ((i : ℕ) + 1) E).re : ℂ) := fun i =>
     Complex.ext (by simp) (by simp [(lead_posDef hpd _ i.isLt).2])
-  have hphi : PhiM μ E = ((∏ i : Fin n, (lead ((i : ℕ) + 1) E).re ^ (-(μ i - muNext μ i)) : ℝ) : ℂ) := by
+  have hphi
+      : PhiM μ E = ((∏ i : Fin n, (lead ((i : ℕ) + 1) E).re ^ (-(μ i - muNext μ i)) : ℝ) : ℂ) := by
     unfold PhiM
     rw [Complex.ofReal_prod]
     refine prod_congr rfl fun i _ => ?_
     rw [Complex.ofReal_zpow, ← h i]
   rw [hphi]
   congr 1
-  have hz : ∀ i : Fin n, (lead ((i : ℕ) + 1) E).re ^ (-(μ i - muNext μ i)) =
-      Real.exp (Real.log (lead ((i : ℕ) + 1) E).re * ((-(μ i - muNext μ i) : ℤ) : ℝ)) := by
+  have hz
+      : ∀ i : Fin n,
+        (lead ((i : ℕ) + 1) E).re ^ (-(μ i - muNext μ i))
+          = Real.exp (Real.log (lead ((i : ℕ) + 1) E).re * ((-(μ i - muNext μ i) : ℤ) : ℝ)) := by
     intro i
     rw [← Real.rpow_intCast, Real.rpow_def_of_pos (hpos i)]
   rw [prod_congr rfl fun i _ => hz i, ← Real.exp_sum]
   congr 1
   set g : ℕ → ℝ := fun i => -(sCoef lam i * Real.log (lead (i + 1) E).re) with hg
-  have hterm : ∀ i : Fin n, Real.log (lead ((i : ℕ) + 1) E).re * ((-(μ i - muNext μ i) : ℤ) : ℝ) = g i := by
+  have hterm
+      : ∀ i : Fin n,
+        Real.log (lead ((i : ℕ) + 1) E).re * ((-(μ i - muNext μ i) : ℤ) : ℝ) = g i := by
     intro i
     by_cases hi : (i : ℕ) + 1 < n
     · have hm : muNext μ i = μ ⟨(i : ℕ) + 1, hi⟩ := by simp [muNext, hi]
@@ -105,8 +111,11 @@ theorem fbr_phi {ε : Fin n → Bool} {lam : Fin n → ℝ} {μ : Fin n → ℤ}
   rw [hsub, Ph, ← sum_neg_distrib]
   rfl
 
-theorem psM_exp_pmat {ε : Fin n → Bool} {lam : Fin n → ℝ} {μ : Fin n → ℤ} (hμ : IsMu lam μ) {Λ : Fin n → ℝ}
-    (T : KType ε Λ) (z : PCoord ε → ℂ) : psM T μ (NormedSpace.exp (pmat z)) = fF ε lam T (pmat z) := by
+theorem psM_exp_pmat
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} {μ : Fin n → ℤ} (hμ : IsMu lam μ)
+    {Λ : Fin n → ℝ} (T : KType ε Λ)
+    (z : PCoord ε → ℂ)
+    : psM T μ (NormedSpace.exp (pmat z)) = fF ε lam T (pmat z) := by
   simp only [psM, fF]
   congr 1
   refine congrArg (fun f : KG ε → T.V →L[ℂ] T.V => ∫ k, f k ∂(muK ε)) (funext fun k => ?_)

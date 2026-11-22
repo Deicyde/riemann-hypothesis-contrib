@@ -8,10 +8,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem mem_map_ker_of_one_tmul_eq_zero_of_flat (B C k : Type) [CommRing B] [CommRing C]
-    [Algebra B C] [Module.Flat B C] [Field k] [Algebra B k] (c : C)
-    (h : (1 : k) ⊗ₜ[B] c = 0) :
-    c ∈ (RingHom.ker (algebraMap B k)).map (algebraMap B C) := by
+theorem mem_map_ker_of_one_tmul_eq_zero_of_flat
+    (B C k : Type) [CommRing B] [CommRing C] [Algebra B C] [Module.Flat B C] [Field k] [Algebra B k]
+    (c : C) (h : (1 : k) ⊗ₜ[B] c = 0)
+    : c ∈ (RingHom.ker (algebraMap B k)).map (algebraMap B C) := by
   classical
   set I : Ideal B := RingHom.ker (algebraMap B k) with hI
   let f : (B ⧸ I) →ₗ[B] k :=
@@ -30,7 +30,8 @@ theorem mem_map_ker_of_one_tmul_eq_zero_of_flat (B C k : Type) [CommRing B] [Com
     exact h
   have hq := congrArg (TensorProduct.quotTensorEquivQuotSMul C I) hx
   rw [TensorProduct.quotTensorEquivQuotSMul_mk_tmul, map_zero, one_smul,
-    Submodule.Quotient.mk_eq_zero] at hq
+      Submodule.Quotient.mk_eq_zero]
+    at hq
   rw [Ideal.smul_top_eq_map] at hq
   exact hq
 

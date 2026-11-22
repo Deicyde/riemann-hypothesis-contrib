@@ -11,13 +11,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmulMemRange
 
 noncomputable section
 
-open GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta CategoryTheory
+open GlobalTheory.PDivGroup GlobalTheory.Sandwich
+  GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta CategoryTheory
 
 namespace GlobalTheory.DlogSpan
 
-theorem ker_finite_free {O : Type} [CommRing O] [IsDomain O] [ValuationRing O] {h : ℕ}
-    (b : (Fin h → O) →ₗ[O] (Fin h → O)) :
-    Module.Finite O (LinearMap.ker b) ∧ Module.Free O (LinearMap.ker b) := by
+theorem ker_finite_free
+    {O : Type} [CommRing O] [IsDomain O] [ValuationRing O]
+    {h : ℕ} (b : (Fin h → O) →ₗ[O] (Fin h → O))
+    : Module.Finite O (LinearMap.ker b) ∧ Module.Free O (LinearMap.ker b) := by
   have flat : ∀ S : Submodule O (Fin h → O), Module.Flat O S := fun S => by
     rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout, eq_bot_iff]
     rintro x ⟨a, ha⟩
@@ -27,24 +29,27 @@ theorem ker_finite_free {O : Type} [CommRing O] [IsDomain O] [ValuationRing O] {
     exact (smul_eq_zero.1 h1).resolve_left (nonZeroDivisors.ne_zero a.2)
   haveI := flat (LinearMap.range b)
   haveI : Module.Free O (LinearMap.range b) := Module.free_of_flat_of_isLocalRing
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property b.rangeRestrict LinearMap.id
-    b.surjective_rangeRestrict
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property b.rangeRestrict LinearMap.id b.surjective_rangeRestrict
   have hs' : ∀ y, b (s y) = y := fun y => congrArg Subtype.val (LinearMap.congr_fun hs y)
   let π : (Fin h → O) →ₗ[O] LinearMap.ker b :=
-    (LinearMap.id - s ∘ₗ b.rangeRestrict).codRestrict _ fun x => by
-      simp [LinearMap.mem_ker, hs']
-  have hπ : Function.Surjective π := fun x => ⟨x, by
-    apply Subtype.ext
-    have h0 : b.rangeRestrict x = 0 := Subtype.ext x.2
-    simp [π, h0]⟩
+    (LinearMap.id - s ∘ₗ b.rangeRestrict).codRestrict _ fun x => by simp [LinearMap.mem_ker, hs']
+  have hπ : Function.Surjective π := fun x => ⟨
+    x,
+    by
+      apply Subtype.ext
+      have h0 : b.rangeRestrict x = 0 := Subtype.ext x.2
+      simp [π, h0]
+  ⟩
   haveI hfin : Module.Finite O (LinearMap.ker b) := Module.Finite.of_surjective π hπ
   haveI := flat (LinearMap.ker b)
   exact ⟨hfin, Module.free_of_flat_of_isLocalRing⟩
 
-theorem sub_one_dvd {O : Type} [CommRing O] [IsDomain O] {ζ : O} {k : ℕ}
-    (hζ : IsPrimitiveRoot ζ k) (hk : 1 < k) : ζ - 1 ∣ (k : O) := by
+theorem sub_one_dvd
+    {O : Type} [CommRing O] [IsDomain O] {ζ : O} {k : ℕ} (hζ : IsPrimitiveRoot ζ k) (hk : 1 < k)
+    : ζ - 1 ∣ (k : O) := by
   have h0 := hζ.geom_sum_eq_zero hk
-  have h1 : (k : O) = -∑ i ∈ Finset.range k, (ζ ^ i - 1) := by
+  have h1 : (k : O) = - ∑ i ∈ Finset.range k, (ζ ^ i - 1) := by
     rw [Finset.sum_sub_distrib, h0]; simp
   rw [h1, dvd_neg]
   exact Finset.dvd_sum fun i _ => sub_one_dvd_pow_sub_one ζ i
@@ -56,12 +61,21 @@ def pDivGroupOmegaBidualEquiv (G : PDivGroup p O) : G.omega ≃ₗ[O] G.dual.dua
     (by rw [← omegaMap_comp, Iso.inv_hom_id, omegaMap_id])
     (by rw [← omegaMap_comp, Iso.hom_inv_id, omegaMap_id])
 
-theorem pDivGroupOmegaBidual_dlog_eq_dual_hodgeTate (G : PDivGroup p O) (χ : G.dual.Tate) :
-    pDivGroupOmegaBidualEquiv G (dlog G χ) = hodgeTate G.dual χ := by
+theorem pDivGroupOmegaBidual_dlog_eq_dual_hodgeTate (G : PDivGroup p O) (χ : G.dual.Tate)
+    : pDivGroupOmegaBidualEquiv G (dlog G χ) = hodgeTate G.dual χ := by
   rw [hodgeTate_apply, ← dualHom_bidual_inv, dlog_tateMap]
   rfl
 
-theorem finite_free_and_sq_smul_mem_span : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O] (ε : PreTilt O p) (hε : GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.IsPrimitiveSystem ε), v.Integers O → GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.HodgeTateSandwichAt hε → ∀ G : PDivGroup p O, Module.Finite O G.omega ∧ Module.Free O G.omega ∧ ∀ w : G.omega, (p : O) ^ 2 • w ∈ Submodule.span O (Set.range (dlog (G := G))) := by
+theorem finite_free_and_sq_smul_mem_span
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O] (ε : PreTilt O p)
+        (hε : GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.IsPrimitiveSystem ε),
+      v.Integers O
+        → GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.HodgeTateSandwichAt hε
+        → ∀ G : PDivGroup p O,
+          Module.Finite O G.omega ∧ Module.Free O G.omega
+            ∧ ∀ w : G.omega, (p : O) ^ 2 • w ∈ Submodule.span O (Set.range (dlog (G := G))) := by
   intro p hp C _ _ _ v O _ _ _ _ _ ε hε hv hS G
   haveI : ValuationRing O := ValuationRing.of_integers v hv
   obtain ⟨u₁, u₂, hS⟩ := hS
@@ -82,12 +96,11 @@ theorem finite_free_and_sq_smul_mem_span : ∀ (p : ℕ) [Fact p.Prime] (C : Typ
     intro χ
     rw [hR.al_eq, ← hodgeTate_eq_omegaMap, ← pDivGroupOmegaBidual_dlog_eq_dual_hodgeTate, map_smul]
     rfl
-  have key : ∀ y, ∃ s ∈ Submodule.span O (Set.range (dlog G)),
-      D.al y = (Ψ s : Fin _ → O) := by
+  have key : ∀ y, ∃ s ∈ Submodule.span O (Set.range (dlog G)), D.al y = (Ψ s : Fin _ → O) := by
     intro y
     refine ⟨∑ i, y i • (u₁ : O) • dlog G (e.symm (Pi.single i 1)), ?_, ?_⟩
-    · exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _
-        (Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩))
+    · exact Submodule.sum_mem _ fun i _ =>
+        Submodule.smul_mem _ _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩))
     · have hy : y = ∑ i, y i • toO e (e.symm (Pi.single i 1)) := by
         ext j
         simp [toO, Finset.sum_apply, Pi.single_apply, apply_ite]

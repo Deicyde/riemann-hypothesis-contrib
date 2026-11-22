@@ -9,16 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.LeOfFiniteSpl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.L2.NT Formalism.L2.TwC GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.L2.NT
+  Formalism.L2.TwC GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.Mem.RaySplit
 
 open GlobalTheory.NT GlobalTheory.Published GlobalTheory.Mem.Fld
 
-theorem exists_span_eq_of_splits (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-    (𝔮 : Ideal (𝓞 K)) (hR : GlobalTheory.Mem.Fld.IsRayField K L 𝔮) (𝔭 : HeightOneSpectrum (𝓞 K)) (hnd : ¬ 𝔭.asIdeal ∣ 𝔮)
-    (hs : (𝔭.asIdeal.primesOver (𝓞 L)).ncard = Module.finrank K L) :
-    ∃ π : 𝓞 K, 𝔭.asIdeal = Ideal.span {π} ∧ π - 1 ∈ 𝔮 := by
+theorem exists_span_eq_of_splits
+    (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    (𝔮 : Ideal (𝓞 K)) (hR : GlobalTheory.Mem.Fld.IsRayField K L 𝔮)
+    (𝔭 : HeightOneSpectrum (𝓞 K))
+    (hnd : ¬ 𝔭.asIdeal ∣ 𝔮) (hs : (𝔭.asIdeal.primesOver (𝓞 L)).ncard = Module.finrank K L)
+    : ∃ π : 𝓞 K, 𝔭.asIdeal = Ideal.span {π} ∧ π - 1 ∈ 𝔮 := by
   have := hR.1
   have := 𝔭.isPrime
   have := 𝔭.isMaximal
@@ -39,14 +43,21 @@ theorem exists_span_eq_of_splits (K L : Type) [Field K] [NumberField K] [Field L
   letI := Ideal.Quotient.field P
   letI := Fintype.ofFinite (𝓞 L ⧸ P)
   have hpow : ∀ x : 𝓞 L, x ^ Ideal.absNorm 𝔭.asIdeal - x ∈ P := fun x => by
-    rw [← Ideal.Quotient.eq, map_pow, ← hN, Ideal.absNorm_apply, Submodule.cardQuot_apply, Nat.card_eq_fintype_card]
+    rw [← Ideal.Quotient.eq, map_pow, ← hN, Ideal.absNorm_apply, Submodule.cardQuot_apply,
+      Nat.card_eq_fintype_card]
     exact FiniteField.pow_card _
-  have hin : InInertia L 𝔭 σ := ⟨P, hP, hPo, fun x => by
-    have := add_mem (hσ x) (hpow x)
-    rwa [sub_add_sub_cancel] at this⟩
+  have hin : InInertia L 𝔭 σ := ⟨
+    P,
+    hP,
+    hPo,
+    fun x => by
+      have := add_mem (hσ x) (hpow x)
+      rwa [sub_add_sub_cancel] at this
+  ⟩
   have hσ1 : σ = 1 := hR.2.1 𝔭 hnd σ hin
   have hχ : ∀ χ : (L ≃ₐ[K] L) →* ℂˣ, heckeIdeal L χ 𝔭.asIdeal = 1 := fun χ => by
-    rw [heckeIdeal_asIdeal, heckeVal_of_unramIn L χ (hR.2.1 𝔭 hnd) ⟨P, hP, hPo, hσ⟩, hσ1, map_one, Units.val_one]
+    rw [heckeIdeal_asIdeal, heckeVal_of_unramIn L χ (hR.2.1 𝔭 hnd) ⟨P, hP, hPo, hσ⟩, hσ1, map_one,
+      Units.val_one]
   obtain ⟨α, β, hab, he⟩ := (hR.2.2.2 𝔭.asIdeal 𝔭.ne_bot hcop).1 hχ
   have hα : α ∈ 𝔭.asIdeal * Ideal.span {β} := he ▸ Ideal.mem_span_singleton_self α
   obtain ⟨π, hπ, rfl⟩ := Ideal.mem_mul_span_singleton.1 hα
@@ -61,8 +72,7 @@ theorem exists_span_eq_of_splits (K L : Type) [Field K] [NumberField K] [Field L
   have h1 : (π - 1) * β ∈ 𝔮 := by
     have := hab.2.2.2.2.1
     rwa [show π * β - β = (π - 1) * β by ring] at this
-  have h2 : π - 1 = c * ((π - 1) * β) + (π - 1) * j := by
-    linear_combination (π - 1) * hij.symm
+  have h2 : π - 1 = c * ((π - 1) * β) + (π - 1) * j := by linear_combination (π - 1) * hij.symm
   rw [h2]
   exact add_mem (Ideal.mul_mem_left _ _ h1) (Ideal.mul_mem_left _ _ hj)
 

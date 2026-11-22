@@ -10,8 +10,10 @@ open NumberField IsDedekindDomain
 
 namespace PI.LocalEndW
 
-theorem localEndHomeo_of (hA : HenselRoot) (hB1 : IntOfHensel) (hB2 : ValOfInt)
-    (hC1 : ValContinuous) (hC2 : ValSurjective) : PI.LocalEndHomeo := by
+theorem localEndHomeo_of
+    (hA : HenselRoot) (hB1 : IntOfHensel) (hB2 : ValOfInt) (hC1 : ValContinuous)
+    (hC2 : ValSurjective)
+    : PI.LocalEndHomeo := by
   have hV : ValPreserved := hB2 (hB1 hA)
   intro F _ _ v τ
   have hτv : ∀ x, Valued.v (τ x) = Valued.v x := hV F v τ

@@ -8,26 +8,33 @@ open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc Matrix
 
 namespace UpperTheory.V.Z.Sym.Loc
 
-private theorem cyc {O : Type} [CommRing O] [IsLocalRing O] (B : Matrix (Fin 2) (Fin 2) O) (τ : O)
-    (htr : B.trace = τ) (hdet : B.det = 1) (hu : IsUnit (τ ^ 2 - 4)) :
-    ∃ g : GL (Fin 2) O, B * (g : Matrix (Fin 2) (Fin 2) O) = (g : Matrix (Fin 2) (Fin 2) O) * !![0, -1; 1, τ] := by
-  obtain ⟨a, b, c, d, rfl⟩ : ∃ a b c d, B = !![a, b; c, d] :=
-    ⟨_, _, _, _, Matrix.eta_fin_two B⟩
+private theorem cyc
+    {O : Type} [CommRing O] [IsLocalRing O]
+    (B : Matrix (Fin 2) (Fin 2) O) (τ : O) (htr : B.trace = τ)
+    (hdet : B.det = 1) (hu : IsUnit (τ ^ 2 - 4))
+    : ∃ g : GL (Fin 2) O,
+      B * (g : Matrix (Fin 2) (Fin 2) O) = (g : Matrix (Fin 2) (Fin 2) O) * !![0, -1; 1, τ] := by
+  obtain ⟨a, b, c, d, rfl⟩ : ∃ a b c d, B = !![a, b; c, d] := ⟨_, _, _, _, Matrix.eta_fin_two B⟩
   rw [Matrix.trace_fin_two_of] at htr
   rw [Matrix.det_fin_two_of] at hdet
   subst htr
-  have mk : ∀ (g : Matrix (Fin 2) (Fin 2) O), IsUnit g.det →
-      !![a, b; c, d] * g = g * !![0, -1; 1, a + d] →
-      ∃ g : GL (Fin 2) O, !![a, b; c, d] * (g : Matrix (Fin 2) (Fin 2) O) = (g : Matrix (Fin 2) (Fin 2) O) * !![0, -1; 1, a + d] :=
-    fun g hg h => ⟨GeneralLinearGroup.mk'' g hg, h⟩
+  have mk
+      : ∀ (g : Matrix (Fin 2) (Fin 2) O),
+        IsUnit g.det → !![a, b; c, d] * g = g * !![0, -1; 1, a + d]
+          → ∃ g : GL (Fin 2) O,
+            !![a, b; c, d] * (g : Matrix (Fin 2) (Fin 2) O)
+              = (g : Matrix (Fin 2) (Fin 2) O) * !![0, -1; 1, a + d] := fun g hg h =>
+    ⟨GeneralLinearGroup.mk'' g hg, h⟩
   by_cases hc : IsUnit c
   · refine mk !![1, a; 0, c] (by simpa [Matrix.det_fin_two_of] using hc) ?_
-    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two] <;>
-      first | ring1 | linear_combination -hdet | linear_combination hdet
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
+      <;> first | ring1 | linear_combination -hdet | linear_combination hdet
   by_cases hb : IsUnit b
   · refine mk !![0, b; 1, d] (by simpa [Matrix.det_fin_two_of] using hb) ?_
-    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two] <;>
-      first | ring1 | linear_combination -hdet | linear_combination hdet
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
+      <;> first | ring1 | linear_combination -hdet | linear_combination hdet
   have hm : ∀ x : O, ¬ IsUnit x → x ∈ IsLocalRing.maximalIdeal O := fun x hx => hx
   have hdet' : IsUnit (c + d - a - b) := by
     by_contra hn
@@ -42,20 +49,23 @@ private theorem cyc {O : Type} [CommRing O] [IsLocalRing O] (B : Matrix (Fin 2) 
       exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ h2) (Ideal.mul_mem_left _ _ (hm _ hc))
     exact h3 hu
   refine mk !![1, a + b; 1, c + d] (by rw [Matrix.det_fin_two_of]; convert hdet' using 1; ring) ?_
-  ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two] <;>
-    first | ring1 | linear_combination -hdet | linear_combination hdet
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
+    <;> first | ring1 | linear_combination -hdet | linear_combination hdet
 
 section
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ τ : K}
+variable
+  {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+  {Δ τ : K}
 
-private theorem j_eq (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (x : Etau K τ) :
-    j x = x.re • (1 : Matrix (Fin 2) (Fin 2) K) + x.im • j ω := by
+private theorem j_eq (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (x : Etau K τ)
+    : j x = x.re • (1 : Matrix (Fin 2) (Fin 2) K) + x.im • j ω := by
   conv_lhs => rw [show x = algebraMap K (Etau K τ) x.re + x.im • ω by ext <;> simp]
   rw [map_add (f := _), map_smul, AlgHom.commutes, Algebra.algebraMap_eq_smul_one]
 
-private theorem j_det_one (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ) :
-    (j ω).det = 1 := by
+private theorem j_det_one (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ)
+    : (j ω).det = 1 := by
   have h : j ω * j ω = (-1 : K) • 1 + τ • j ω := by
     rw [← map_mul, omega_mul_omega_eq_add, map_add (f := _), map_smul, map_smul, map_one]
   have h00 := congrFun (congrFun h 0) 0
@@ -64,15 +74,17 @@ private theorem j_det_one (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht
   simp [Matrix.mul_apply, Fin.sum_univ_two] at h00
   linear_combination -h00 + (j ω 0 0) * ht
 
-private theorem j_tr (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ) (x : Etau K τ) :
-    (j x).trace = QuadraticAlgebra.trace x := by
+private theorem j_tr
+    (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ) (x : Etau K τ)
+    : (j x).trace = QuadraticAlgebra.trace x := by
   rw [j_eq, QuadraticAlgebra.trace_def]
   rw [Matrix.trace_fin_two] at ht ⊢
   simp
   linear_combination x.im * ht
 
-private theorem j_det (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ) (x : Etau K τ) :
-    (j x).det = QuadraticAlgebra.norm x := by
+private theorem j_det
+    (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ) (x : Etau K τ)
+    : (j x).det = QuadraticAlgebra.norm x := by
   have hd := j_det_one j ht
   rw [j_eq, QuadraticAlgebra.norm_def]
   rw [Matrix.trace_fin_two] at ht
@@ -80,35 +92,38 @@ private theorem j_det (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (
   simp
   linear_combination (x.im ^ 2) * hd + (x.re * x.im) * ht
 
-private theorem coe_jU (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (z : (Etau K τ)ˣ) :
-    ((jU j z : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = j z := rfl
+private theorem coe_jU (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (z : (Etau K τ)ˣ)
+    : ((jU j z : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = j z :=
+  rfl
 
-private theorem coe_map' (g : GL (Fin 2) O) :
-    ((Matrix.GeneralLinearGroup.map (algebraMap O K) g : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) =
-      (g : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K) := rfl
+private theorem coe_map' (g : GL (Fin 2) O)
+    : ((Matrix.GeneralLinearGroup.map (algebraMap O K) g : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+      = (g : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K) :=
+  rfl
 
-private theorem coe_scal (s : Kˣ) :
-    ((Matrix.GeneralLinearGroup.scalar (Fin 2) s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) =
-      (s : K) • (1 : Matrix (Fin 2) (Fin 2) K) := by
+private theorem coe_scal (s : Kˣ)
+    : ((Matrix.GeneralLinearGroup.scalar (Fin 2) s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+      = (s : K) • (1 : Matrix (Fin 2) (Fin 2) K) := by
   ext a b
   by_cases h : a = b <;> simp [Matrix.GeneralLinearGroup.scalar, Matrix.one_apply, h]
 
-private theorem lift_mat (A : Matrix (Fin 2) (Fin 2) K) (h : ∀ s t, A s t ∈ (algebraMap O K).range) :
-    ∃ A₀ : Matrix (Fin 2) (Fin 2) O, A₀.map (algebraMap O K) = A := by
+private theorem lift_mat (A : Matrix (Fin 2) (Fin 2) K) (h : ∀ s t, A s t ∈ (algebraMap O K).range)
+    : ∃ A₀ : Matrix (Fin 2) (Fin 2) O, A₀.map (algebraMap O K) = A := by
   choose f hf using h
   exact ⟨Matrix.of f, by ext s t; exact hf s t⟩
 
-private theorem mem_KG (hinj : Function.Injective (algebraMap O K)) (x : GL (Fin 2) K)
-    (h : ∀ s t, (x : Matrix (Fin 2) (Fin 2) K) s t ∈ (algebraMap O K).range)
-    (hd : ∃ u : Oˣ, algebraMap O K u = (x : Matrix (Fin 2) (Fin 2) K).det) : x ∈ KG O K := by
+private theorem mem_KG
+    (hinj : Function.Injective (algebraMap O K))
+    (x : GL (Fin 2) K) (h : ∀ s t, (x : Matrix (Fin 2) (Fin 2) K) s t ∈ (algebraMap O K).range)
+    (hd : ∃ u : Oˣ, algebraMap O K u = (x : Matrix (Fin 2) (Fin 2) K).det)
+    : x ∈ KG O K := by
   obtain ⟨A₀, hA⟩ := lift_mat (O := O) _ h
   obtain ⟨u, hu⟩ := hd
-  have hdet : A₀.det = u := hinj (by
-    rw [hu, ← hA, RingHom.map_det]; rfl)
+  have hdet : A₀.det = u := hinj (by rw [hu, ← hA, RingHom.map_det]; rfl)
   exact ⟨Matrix.GeneralLinearGroup.mk'' A₀ (hdet ▸ u.isUnit), Units.ext hA⟩
 
-private theorem mem_ZK {g : GL (Fin 2) K} :
-    g ∈ ZK O K ↔ ∃ s : Kˣ, ∃ k ∈ KG O K, g = Matrix.GeneralLinearGroup.scalar (Fin 2) s * k := by
+private theorem mem_ZK {g : GL (Fin 2) K}
+    : g ∈ ZK O K ↔ ∃ s : Kˣ, ∃ k ∈ KG O K, g = Matrix.GeneralLinearGroup.scalar (Fin 2) s * k := by
   constructor
   · intro hg
     haveI : (Matrix.GeneralLinearGroup.scalar (Fin 2) : Kˣ →* GL (Fin 2) K).range.Normal := ⟨by
@@ -117,7 +132,9 @@ private theorem mem_ZK {g : GL (Fin 2) K} :
       have comm : x * Matrix.GeneralLinearGroup.scalar (Fin 2) s = Matrix.GeneralLinearGroup.scalar (Fin 2) s * x :=
         Units.ext (by rw [Units.val_mul, Units.val_mul, coe_scal]; simp)
       rw [comm]; simp⟩
-    have := (Subgroup.normal_mul (Matrix.GeneralLinearGroup.scalar (Fin 2) : Kˣ →* GL (Fin 2) K).range (KG O K))
+    have :=
+      (Subgroup.normal_mul (Matrix.GeneralLinearGroup.scalar (Fin 2) : Kˣ →* GL (Fin 2) K).range
+        (KG O K))
     have hg' : g ∈ ((ZK O K : Subgroup _) : Set (GL (Fin 2) K)) := hg
     rw [ZK, this] at hg'
     obtain ⟨_, ⟨s, rfl⟩, k, hk, rfl⟩ := Set.mem_mul.1 hg'
@@ -125,8 +142,9 @@ private theorem mem_ZK {g : GL (Fin 2) K} :
   · rintro ⟨s, k, hk, rfl⟩
     exact mul_mem (Subgroup.mem_sup_left ⟨s, rfl⟩) (Subgroup.mem_sup_right hk)
 
-private theorem quo_norm (z : (Etau K τ)ˣ) (s : K) (hs : s ≠ 0) (w : Etau K τ) (hzw : (z : Etau K τ) = s • w) :
-    quo z * algebraMap K (Etau K τ) (QuadraticAlgebra.norm w) = w ^ 2 := by
+private theorem quo_norm
+    (z : (Etau K τ)ˣ) (s : K) (hs : s ≠ 0) (w : Etau K τ) (hzw : (z : Etau K τ) = s • w)
+    : quo z * algebraMap K (Etau K τ) (QuadraticAlgebra.norm w) = w ^ 2 := by
   have h1 : star (z : Etau K τ) * star ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ) = 1 := by
     rw [← star_mul]; simp
   have h2 : star (z : Etau K τ) = algebraMap K (Etau K τ) s * star w := by
@@ -134,30 +152,39 @@ private theorem quo_norm (z : (Etau K τ)ˣ) (s : K) (hs : s ≠ 0) (w : Etau K 
   have hz' : (z : Etau K τ) = algebraMap K (Etau K τ) s * w := by rw [hzw, Algebra.smul_def]
   have h3 : s • (quo z * algebraMap K (Etau K τ) (QuadraticAlgebra.norm w)) = s • w ^ 2 := by
     rw [algebraMap_norm_eq_mul_star, quo, Algebra.smul_def, Algebra.smul_def]
-    calc _ = (z : Etau K τ) * w * ((algebraMap K (Etau K τ) s * star w) * star ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ)) := by ring
+    calc
+      _ = (z : Etau K τ) * w
+          * ((algebraMap K (Etau K τ) s * star w) * star ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ)) := by
+        ring
       _ = (z : Etau K τ) * w := by rw [← h2, h1, mul_one]
       _ = _ := by rw [hz']; ring
   have := congrArg (fun x => s⁻¹ • x) h3
   simpa [smul_smul, inv_mul_cancel₀ hs] using this
 
-private theorem isInt_w (w : Etau K τ) (a n : O) (ha : QuadraticAlgebra.trace w = algebraMap O K a)
-    (hn : QuadraticAlgebra.norm w = algebraMap O K n) : IsIntegral O w := by
+private theorem isInt_w
+    (w : Etau K τ) (a n : O) (ha : QuadraticAlgebra.trace w = algebraMap O K a)
+    (hn : QuadraticAlgebra.norm w = algebraMap O K n)
+    : IsIntegral O w := by
   refine ⟨Polynomial.X ^ 2 - Polynomial.C a * Polynomial.X + Polynomial.C n, by monicity!, ?_⟩
   have := sq_sub_trace_smul_add_norm_eq_zero w
   rw [ha, hn, Algebra.smul_def] at this
   simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul, Polynomial.eval₂_pow,
     Polynomial.eval₂_X, Polynomial.eval₂_C]
-  rw [IsScalarTower.algebraMap_apply O K (Etau K τ) a, IsScalarTower.algebraMap_apply O K (Etau K τ) n]
+  rw [IsScalarTower.algebraMap_apply O K (Etau K τ) a,
+    IsScalarTower.algebraMap_apply O K (Etau K τ) n]
   exact this
 
-private theorem quo_int (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ)
-    (z : (Etau K τ)ˣ) (hz : jU j z ∈ ZK O K) : IsIntegral O (quo z) := by
+private theorem quo_int
+    (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ)
+    (z : (Etau K τ)ˣ) (hz : jU j z ∈ ZK O K)
+    : IsIntegral O (quo z) := by
   obtain ⟨s, k, ⟨k₀, rfl⟩, e⟩ := mem_ZK.1 hz
   set w : Etau K τ := ((s⁻¹ : Kˣ) : K) • (z : Etau K τ) with hw
   have hjz : j z = (s : K) • (k₀ : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K) := by
     have := congrArg Units.val e
     rw [Units.val_mul, coe_scal, coe_jU, coe_map'] at this
-    rw [this]; simp
+    rw [this]
+    simp
   have hjw : j w = (k₀ : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K) := by
     rw [hw, map_smul, hjz, smul_smul]; simp
   have h1 : QuadraticAlgebra.trace w = algebraMap O K (k₀ : Matrix (Fin 2) (Fin 2) O).trace := by
@@ -175,33 +202,39 @@ private theorem quo_int (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht :
   rw [h4]
   exact isIntegral_algebraMap.mul (hwi.pow 2)
 
-private theorem tr_int (h : IsLoc O Δ) {x : Etau K τ} (hx : IsIntegral O x) :
-    ∃ c : O, algebraMap O K c = QuadraticAlgebra.trace x := by
+private theorem tr_int (h : IsLoc O Δ) {x : Etau K τ} (hx : IsIntegral O x)
+    : ∃ c : O, algebraMap O K c = QuadraticAlgebra.trace x := by
   haveI := h.frac
   have hinj : Function.Injective (IsScalarTower.toAlgHom O K (Etau K τ)) := algebraMap_injective
   exact IsIntegrallyClosed.isIntegral_iff.1 ((isIntegral_algHom_iff _ hinj).1 (by
     change IsIntegral O (algebraMap K (Etau K τ) _)
-    rw [algebraMap_trace_eq_add_star]; exact hx.add (isIntegral_star_quad hx)))
+    rw [algebraMap_trace_eq_add_star]
+    exact hx.add (isIntegral_star_quad hx)))
 
-private theorem prim (h : IsLoc O Δ) (x y : K) (hxy : ¬ (x = 0 ∧ y = 0)) :
-    ∃ (s : K) (a b : O), s ≠ 0 ∧ x = s * algebraMap O K a ∧ y = s * algebraMap O K b ∧ (a = 1 ∨ b = 1) := by
+private theorem prim (h : IsLoc O Δ) (x y : K) (hxy : ¬(x = 0 ∧ y = 0))
+    : ∃ (s : K) (a b : O),
+      s ≠ 0 ∧ x = s * algebraMap O K a ∧ y = s * algebraMap O K b ∧ (a = 1 ∨ b = 1) := by
   haveI := h.frac
   by_cases hx : x = 0
   · have hy : y ≠ 0 := fun hy => hxy ⟨hx, hy⟩
     exact ⟨y, 0, 1, hy, by simp [hx], by simp, Or.inr rfl⟩
   rcases ValuationRing.isInteger_or_isInteger O (y / x) with ⟨b, hb⟩ | ⟨a, ha⟩
   · refine ⟨x, 1, b, hx, by simp, ?_, Or.inl rfl⟩
-    rw [show algebraMap O K b = y / x from hb]; field_simp
-  · have ha' : algebraMap O K a = x / y := by rw [show algebraMap O K a = (y / x)⁻¹ from ha, inv_div]
+    rw [show algebraMap O K b = y / x from hb]
+    field_simp
+  · have ha' : algebraMap O K a = x / y := by
+      rw [show algebraMap O K a = (y / x)⁻¹ from ha, inv_div]
     by_cases hy : y = 0
     · refine ⟨x, 1, 0, hx, by simp, by simp [hy], Or.inl rfl⟩
     · refine ⟨y, a, 1, hy, ?_, by simp, Or.inr rfl⟩
-      rw [ha']; field_simp
+      rw [ha']
+      field_simp
 
-private theorem ent_j (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K)
-    (hent : ∀ s t, j ω s t ∈ (algebraMap O K).range) (x : Etau K τ)
-    (h1 : x.re ∈ (algebraMap O K).range) (h2 : x.im ∈ (algebraMap O K).range) (s t : Fin 2) :
-    j x s t ∈ (algebraMap O K).range := by
+private theorem ent_j
+    (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (hent : ∀ s t, j ω s t ∈ (algebraMap O K).range)
+    (x : Etau K τ) (h1 : x.re ∈ (algebraMap O K).range) (h2 : x.im ∈ (algebraMap O K).range)
+    (s t : Fin 2)
+    : j x s t ∈ (algebraMap O K).range := by
   rw [j_eq, Matrix.add_apply, Matrix.smul_apply, Matrix.smul_apply, smul_eq_mul, smul_eq_mul]
   refine add_mem (mul_mem h1 ?_) (mul_mem h2 (hent s t))
   rw [Matrix.one_apply]
@@ -209,12 +242,16 @@ private theorem ent_j (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K)
   · exact one_mem _
   · exact zero_mem _
 
-private theorem cint_zk (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ)
-    (hent : ∀ s t, j ω s t ∈ (algebraMap O K).range) (τ₀ : O) (hτ₀ : algebraMap O K τ₀ = τ)
-    (hu : IsUnit (τ₀ ^ 2 - 4)) (z : (Etau K τ)ˣ) (hz : z ∈ Cint O τ) : jU j z ∈ ZK O K := by
+private theorem cint_zk
+    (h : IsLoc O Δ)
+    (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K)
+    (ht : (j ω).trace = τ) (hent : ∀ s t, j ω s t ∈ (algebraMap O K).range)
+    (τ₀ : O) (hτ₀ : algebraMap O K τ₀ = τ) (hu : IsUnit (τ₀ ^ 2 - 4))
+    (z : (Etau K τ)ˣ) (hz : z ∈ Cint O τ)
+    : jU j z ∈ ZK O K := by
   haveI := h.frac
   have hinj : Function.Injective (algebraMap O K) := IsFractionRing.injective O K
-  have hz0 : ¬ ((z : Etau K τ).re = 0 ∧ (z : Etau K τ).im = 0) := fun h0 =>
+  have hz0 : ¬((z : Etau K τ).re = 0 ∧ (z : Etau K τ).im = 0) := fun h0 =>
     z.ne_zero (QuadraticAlgebra.ext h0.1 h0.2)
   obtain ⟨s, a, b, hs, ha, hb, hab⟩ := prim h _ _ hz0
   set w : Etau K τ := ⟨algebraMap O K a, algebraMap O K b⟩ with hw
@@ -226,13 +263,15 @@ private theorem cint_zk (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 2)
   have htw : QuadraticAlgebra.trace w = algebraMap O K t := by
     simp [hw, htdef, QuadraticAlgebra.trace_def, hτ₀, map_ofNat]
   obtain ⟨c, hc⟩ := tr_int h hz.1
-  have key : (c + 2) * n = t * t := hinj (by
-    have h1 := quo_norm z s hs w hzw
-    have h2 := congrArg QuadraticAlgebra.trace h1
-    rw [mul_comm, ← Algebra.smul_def, map_smul, sq_eq_trace_smul_sub_norm, map_sub, map_smul,
-      QuadraticAlgebra.trace_algebraMap, smul_eq_mul, smul_eq_mul, ← hc, htw, hnw] at h2
-    simp only [map_mul, map_add (f := _), map_ofNat]
-    linear_combination h2)
+  have key : (c + 2) * n = t * t :=
+    hinj (by
+      have h1 := quo_norm z s hs w hzw
+      have h2 := congrArg QuadraticAlgebra.trace h1
+      rw [mul_comm, ← Algebra.smul_def, map_smul, sq_eq_trace_smul_sub_norm, map_sub, map_smul,
+          QuadraticAlgebra.trace_algebraMap, smul_eq_mul, smul_eq_mul, ← hc, htw, hnw]
+        at h2
+      simp only [map_mul, map_add (f := _), map_ofNat]
+      linear_combination h2)
   have hm : ∀ x : O, ¬ IsUnit x → x ∈ IsLocalRing.maximalIdeal O := fun x hx => hx
   have hnu : IsUnit n := by
     by_contra hn'
@@ -262,10 +301,18 @@ private theorem cint_zk (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 2)
     · exact ham isUnit_one
     · exact hbm isUnit_one
   let s' : Kˣ := Units.mk0 s hs
-  have hW : (((Matrix.GeneralLinearGroup.scalar (Fin 2) s')⁻¹ * jU j z : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = j w := by
+  have hW
+      : (((Matrix.GeneralLinearGroup.scalar (Fin 2) s')⁻¹ * jU j z : GL (Fin 2) K)
+          : Matrix (Fin 2) (Fin 2) K)
+        = j w := by
     rw [← map_inv, Units.val_mul, coe_scal, coe_jU, hzw, map_smul]
     simp [s', smul_smul, hs]
-  refine mem_ZK.2 ⟨s', (Matrix.GeneralLinearGroup.scalar (Fin 2) s')⁻¹ * jU j z, ?_, (mul_inv_cancel_left _ _).symm⟩
+  refine mem_ZK.2 ⟨
+    s',
+    (Matrix.GeneralLinearGroup.scalar (Fin 2) s')⁻¹ * jU j z,
+    ?_,
+    (mul_inv_cancel_left _ _).symm
+  ⟩
   refine mem_KG hinj _ ?_ ?_
   · rw [hW]
     exact ent_j j hent w ⟨a, rfl⟩ ⟨b, rfl⟩
@@ -273,9 +320,12 @@ private theorem cint_zk (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 2)
     obtain ⟨u, hu'⟩ := hnu
     exact ⟨u, by rw [hu']⟩
 
-private theorem comm_C {τ : K} (M : Matrix (Fin 2) (Fin 2) K)
-    (h : (!![0, -1; 1, τ] : Matrix (Fin 2) (Fin 2) K) * M = M * !![0, -1; 1, τ]) :
-    M = M 0 0 • (1 : Matrix (Fin 2) (Fin 2) K) + M 1 0 • (!![0, -1; 1, τ] : Matrix (Fin 2) (Fin 2) K) := by
+private theorem comm_C
+    {τ : K} (M : Matrix (Fin 2) (Fin 2) K)
+    (h : (!![0, -1; 1, τ] : Matrix (Fin 2) (Fin 2) K) * M = M * !![0, -1; 1, τ])
+    : M
+      = M 0 0 • (1 : Matrix (Fin 2) (Fin 2) K)
+        + M 1 0 • (!![0, -1; 1, τ] : Matrix (Fin 2) (Fin 2) K) := by
   have h00 := congrFun (congrFun h 0) 0
   have h10 := congrFun (congrFun h 1) 0
   simp [Matrix.mul_apply, Fin.sum_univ_two] at h00 h10
@@ -284,12 +334,16 @@ private theorem comm_C {τ : K} (M : Matrix (Fin 2) (Fin 2) K)
   · linear_combination -h00
   · linear_combination -h10
 
-private theorem orbit_imp (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K) (ht : (j ω).trace = τ)
-    (hent : ∀ s t, j ω s t ∈ (algebraMap O K).range) (τ₀ : O) (hτ₀ : algebraMap O K τ₀ = τ)
-    (hu : IsUnit (τ₀ ^ 2 - 4)) (e : O) (z : (Etau K τ)ˣ)
+private theorem orbit_imp
+    (h : IsLoc O Δ)
+    (j : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K)
+    (ht : (j ω).trace = τ) (hent : ∀ s t, j ω s t ∈ (algebraMap O K).range)
+    (τ₀ : O) (hτ₀ : algebraMap O K τ₀ = τ) (hu : IsUnit (τ₀ ^ 2 - 4))
+    (e : O) (z : (Etau K τ)ˣ)
     (hze : (z : Etau K τ) = algebraMap K (Etau K τ) (algebraMap O K e) + ω)
-    (hν : ∃ v : Oˣ, algebraMap O K v = QuadraticAlgebra.norm (z : Etau K τ)) (y : GL (Fin 2) K)
-    (hy : y⁻¹ * jU j z * y ∈ ZK O K) : ∃ t, ∃ k ∈ ZK O K, y = jU j t * k := by
+    (hν : ∃ v : Oˣ, algebraMap O K v = QuadraticAlgebra.norm (z : Etau K τ))
+    (y : GL (Fin 2) K) (hy : y⁻¹ * jU j z * y ∈ ZK O K)
+    : ∃ t, ∃ k ∈ ZK O K, y = jU j t * k := by
   haveI := h.frac
   have hinj : Function.Injective (algebraMap O K) := IsFractionRing.injective O K
   obtain ⟨s, k, ⟨k₀, rfl⟩, E⟩ := mem_ZK.1 hy
@@ -309,7 +363,8 @@ private theorem orbit_imp (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 
   have hE : Yi * j z * Y = (s : K) • (k₀ : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K) := by
     have := congrArg Units.val E
     rw [Units.val_mul, Units.val_mul, Units.val_mul, coe_scal, coe_jU, coe_map'] at this
-    rw [this]; simp
+    rw [this]
+    simp
 
   obtain ⟨n, hn⟩ := Matrix.isUnits_det_units k₀
   have hs2 : (s : K) ^ 2 = algebraMap O K (v * ((n⁻¹ : Oˣ) : O)) := by
@@ -325,7 +380,8 @@ private theorem orbit_imp (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 
     simp only [Fintype.card_fin] at h1
     linear_combination (algebraMap O K ((n⁻¹ : Oˣ) : O)) * h1 - (s : K) ^ 2 * h3
   obtain ⟨s₀, hs₀⟩ : ∃ s₀ : O, algebraMap O K s₀ = s :=
-    IsIntegrallyClosed.isIntegral_iff.1 (IsIntegral.of_pow two_pos (by rw [hs2]; exact isIntegral_algebraMap))
+    IsIntegrallyClosed.isIntegral_iff.1 (IsIntegral.of_pow two_pos
+      (by rw [hs2]; exact isIntegral_algebraMap))
 
   obtain ⟨A₀, hA₀⟩ := lift_mat (O := O) A hent
   let B₀ : Matrix (Fin 2) (Fin 2) O := s₀ • (k₀ : Matrix (Fin 2) (Fin 2) O) - e • 1
@@ -334,15 +390,23 @@ private theorem orbit_imp (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 
       rw [hze, map_add (f := _), AlgHom.commutes, Algebra.algebraMap_eq_smul_one]
     have h2 : Yi * j z * Y = algebraMap O K e • (1 : Matrix (Fin 2) (Fin 2) K) + Yi * A * Y := by
       rw [h1, mul_add, add_mul, mul_smul_comm, smul_mul_assoc, mul_one, hYiY]
-    have h3 : Yi * A * Y = (s : K) • (k₀ : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K) - algebraMap O K e • (1 : Matrix (Fin 2) (Fin 2) K) := by
+    have h3
+        : Yi * A * Y
+          = (s : K) • (k₀ : Matrix (Fin 2) (Fin 2) O).map (algebraMap O K)
+            - algebraMap O K e • (1 : Matrix (Fin 2) (Fin 2) K) := by
       rw [← hE, h2]; abel
     rw [h3, ← hs₀]
     ext a b
-    simp only [B₀, Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, map_sub, smul_eq_mul, map_mul, Matrix.one_apply]
+    simp only [B₀, Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, map_sub, smul_eq_mul,
+      map_mul, Matrix.one_apply]
     split_ifs <;> simp
-  have tr_map : ∀ M : Matrix (Fin 2) (Fin 2) O, (M.map (algebraMap O K)).trace = algebraMap O K M.trace := fun M => by
+  have tr_map
+      : ∀ M : Matrix (Fin 2) (Fin 2) O,
+        (M.map (algebraMap O K)).trace = algebraMap O K M.trace := fun M => by
     simp [Matrix.trace_fin_two]
-  have det_map : ∀ M : Matrix (Fin 2) (Fin 2) O, (M.map (algebraMap O K)).det = algebraMap O K M.det := fun M => by
+  have det_map
+      : ∀ M : Matrix (Fin 2) (Fin 2) O,
+        (M.map (algebraMap O K)).det = algebraMap O K M.det := fun M => by
     rw [RingHom.map_det]; rfl
   have hAt : A₀.trace = τ₀ := hinj (by rw [← tr_map, hA₀, hτ₀, ht])
   have hAd : A₀.det = 1 := hinj (by rw [← det_map, hA₀, map_one, hA, j_det_one j ht])
@@ -376,10 +440,11 @@ private theorem orbit_imp (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 
     simp only [mul_assoc]
     rw [← mul_assoc Y Yi, hYYi, one_mul]
   have hcomm : C * (Gi * (Y * Gp)) = (Gi * (Y * Gp)) * C := by
-    calc C * (Gi * (Y * Gp)) = Gi * (A * (Y * Gp)) := by
-          conv_lhs => rw [hCG]
-          simp only [mul_assoc]
-          rw [← mul_assoc Gm Gi, hGGi, one_mul]
+    calc
+      C * (Gi * (Y * Gp)) = Gi * (A * (Y * Gp)) := by
+        conv_lhs => rw [hCG]
+        simp only [mul_assoc]
+        rw [← mul_assoc Gm Gi, hGGi, one_mul]
       _ = (Gi * (Y * Gp)) * C := by rw [← hYA]; simp only [mul_assoc]
   have hM := comm_C _ hcomm
   set a := (Gi * (Y * Gp)) 0 0
@@ -390,7 +455,8 @@ private theorem orbit_imp (h : IsLoc O Δ) (j : Etau K τ →ₐ[K] Matrix (Fin 
       rw [← mul_assoc Gm, hGGi, one_mul]; rfl
     rw [h1, hM, j_eq]
     have h2 : Gm * C * Gi = A := by rw [← hAG, mul_assoc, hGGi, mul_one]
-    rw [mul_add, add_mul, mul_smul_comm, mul_smul_comm, smul_mul_assoc, smul_mul_assoc, mul_one, hGGi, h2]
+    rw [mul_add, add_mul, mul_smul_comm, mul_smul_comm, smul_mul_assoc, smul_mul_assoc, mul_one,
+      hGGi, h2]
   have hTu : IsUnit (⟨a, c⟩ : Etau K τ) := by
     rw [isUnit_iff_norm_isUnit, ← j_det j ht, ← hT]
     exact Matrix.isUnits_det_units T
@@ -412,7 +478,8 @@ theorem oneG : OneG := by
   have hu₀ : IsUnit (τ₀ ^ 2 - 4) := by
     have : (u : O) = τ₀ ^ 2 - 4 := hinj (by rw [hu, ← hτ₀]; simp [map_ofNat])
     exact this ▸ u.isUnit
-  have h2u : IsUnit (2 + τ₀) := isUnit_of_mul_isUnit_left (y := τ₀ - 2) (by convert hu₀ using 1; ring)
+  have h2u : IsUnit (2 + τ₀) :=
+    isUnit_of_mul_isUnit_left (y := τ₀ - 2) (by convert hu₀ using 1; ring)
   refine ⟨?_, ?_⟩
   · ext z
     constructor
@@ -423,11 +490,14 @@ theorem oneG : OneG := by
       exact inv_mem hz
     · exact cint_zk h j ht hent τ₀ hτ₀ hu₀ z
   · intro z hz
-    have hdata : ∃ e : O, (z : Etau K τ) = algebraMap K (Etau K τ) (algebraMap O K e) + ω ∧
-        ∃ v : Oˣ, algebraMap O K v = QuadraticAlgebra.norm (z : Etau K τ) := by
+    have hdata
+        : ∃ e : O,
+          (z : Etau K τ) = algebraMap K (Etau K τ) (algebraMap O K e) + ω
+            ∧ ∃ v : Oˣ, algebraMap O K v = QuadraticAlgebra.norm (z : Etau K τ) := by
       rcases hz with hz | hz
       · refine ⟨0, by simp [hz], 1, ?_⟩
-        rw [hz]; simp [QuadraticAlgebra.norm_def]
+        rw [hz]
+        simp [QuadraticAlgebra.norm_def]
       · obtain ⟨v, hv⟩ := h2u
         refine ⟨1, by simp [hz], v, ?_⟩
         rw [hz, hv]

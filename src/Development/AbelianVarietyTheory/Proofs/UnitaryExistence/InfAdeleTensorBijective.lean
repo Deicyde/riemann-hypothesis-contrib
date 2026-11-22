@@ -18,63 +18,75 @@ def ext (σ : F →+* ℂ) : InfiniteAdeleRing F →+* ℂ :=
   (InfinitePlace.Completion.extensionEmbedding (InfinitePlace.mk σ)).comp
     (Pi.evalRingHom (fun v : InfinitePlace F => v.Completion) (InfinitePlace.mk σ))
 
-theorem ext_apply (σ : F →+* ℂ) (a : InfiniteAdeleRing F) :
-    ext σ a = InfinitePlace.Completion.extensionEmbedding (InfinitePlace.mk σ) (a (InfinitePlace.mk σ)) := rfl
+theorem ext_apply (σ : F →+* ℂ) (a : InfiniteAdeleRing F)
+    : ext σ a
+      = InfinitePlace.Completion.extensionEmbedding (InfinitePlace.mk σ) (a (InfinitePlace.mk σ)) :=
+  rfl
 
 theorem continuous_ext (σ : F →+* ℂ) : Continuous (ext σ) :=
   (InfinitePlace.Completion.isometry_extensionEmbedding (InfinitePlace.mk σ)).continuous.comp
     (continuous_apply (InfinitePlace.mk σ))
 
-theorem ext_algebraMap [IsTotallyReal F] (σ : F →+* ℂ) (x : F) :
-    ext σ (algebraMap F (InfiniteAdeleRing F) x) = σ x := by
+theorem ext_algebraMap [IsTotallyReal F] (σ : F →+* ℂ) (x : F)
+    : ext σ (algebraMap F (InfiniteAdeleRing F) x) = σ x := by
   have h : (InfinitePlace.mk σ).embedding = σ :=
     InfinitePlace.embedding_mk_eq_of_isReal (IsTotallyReal.complexEmbedding_isReal σ)
   rw [ext_apply, InfiniteAdeleRing.algebraMap_apply]
   simp [h]
 
-theorem ext_eq_ofReal [IsTotallyReal F] (σ : F →+* ℂ) (a : InfiniteAdeleRing F) :
-    ext σ a = (InfinitePlace.Completion.extensionEmbeddingOfIsReal
-      (IsTotallyReal.isReal (InfinitePlace.mk σ)) (a (InfinitePlace.mk σ)) : ℝ) := by
+theorem ext_eq_ofReal [IsTotallyReal F] (σ : F →+* ℂ) (a : InfiniteAdeleRing F)
+    : ext σ a
+      = (InfinitePlace.Completion.extensionEmbeddingOfIsReal
+          (IsTotallyReal.isReal (InfinitePlace.mk σ)) (a (InfinitePlace.mk σ))
+        : ℝ) := by
   rw [ext_apply, InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply]
 
-theorem conj_ext [IsTotallyReal F] (σ : F →+* ℂ) (a : InfiniteAdeleRing F) :
-    starRingEnd ℂ (ext σ a) = ext σ a := by
+theorem conj_ext [IsTotallyReal F] (σ : F →+* ℂ) (a : InfiniteAdeleRing F)
+    : starRingEnd ℂ (ext σ a) = ext σ a := by
   rw [ext_eq_ofReal, Complex.conj_ofReal]
 
 variable {E : Type} [Field E] [NumberField E] [Algebra F E]
 
-theorem exists_hom [IsTotallyReal F] (τ : E →+* ℂ) :
-    ∃ θ : InfiniteAdeleRing F ⊗[F] E →+* ℂ, (∀ x, θ (1 ⊗ₜ x) = τ x) ∧
-      Continuous fun a : InfiniteAdeleRing F => θ (a ⊗ₜ (1 : E)) := by
+theorem exists_hom [IsTotallyReal F] (τ : E →+* ℂ)
+    : ∃ θ : InfiniteAdeleRing F ⊗[F] E →+* ℂ,
+      (∀ x, θ (1 ⊗ₜ x) = τ x) ∧ Continuous fun a : InfiniteAdeleRing F => θ (a ⊗ₜ (1 : E)) := by
   letI : Algebra F ℂ := (τ.comp (algebraMap F E)).toAlgebra
-  let f : InfiniteAdeleRing F →ₐ[F] ℂ :=
-    { ext (τ.comp (algebraMap F E)) with commutes' := fun x => ext_algebraMap _ x }
+  let f : InfiniteAdeleRing F →ₐ[F] ℂ := {
+    ext (τ.comp (algebraMap F E)) with
+    commutes' := fun x => ext_algebraMap _ x
+  }
   let g : E →ₐ[F] ℂ := { τ with commutes' := fun x => rfl }
   refine ⟨(Algebra.TensorProduct.lift f g (fun _ _ => Commute.all _ _)).toRingHom, ?_, ?_⟩
   · intro x
     simp [g]
   · have : (fun a : InfiniteAdeleRing F =>
-        (Algebra.TensorProduct.lift f g (fun _ _ => Commute.all _ _)).toRingHom (a ⊗ₜ (1 : E))) =
-        ext (τ.comp (algebraMap F E)) := by
+          (Algebra.TensorProduct.lift f g (fun _ _ => Commute.all _ _)).toRingHom (a ⊗ₜ (1 : E)))
+        = ext (τ.comp (algebraMap F E)) := by
       funext a
       simp [f]
     rw [this]
     exact continuous_ext _
 
-theorem hom_tmul [IsTotallyReal F] (τ : E →+* ℂ) (θ : InfiniteAdeleRing F ⊗[F] E →+* ℂ)
+theorem hom_tmul
+    [IsTotallyReal F]
+    (τ : E →+* ℂ) (θ : InfiniteAdeleRing F ⊗[F] E →+* ℂ)
     (h1 : ∀ x, θ (1 ⊗ₜ x) = τ x) (h2 : Continuous fun a : InfiniteAdeleRing F => θ (a ⊗ₜ (1 : E)))
-    (a : InfiniteAdeleRing F) (x : E) :
-    θ (a ⊗ₜ x) = ext (τ.comp (algebraMap F E)) a * τ x := by
+    (a : InfiniteAdeleRing F) (x : E)
+    : θ (a ⊗ₜ x) = ext (τ.comp (algebraMap F E)) a * τ x := by
   have : (fun a : InfiniteAdeleRing F => θ (a ⊗ₜ (1 : E))) = ext (τ.comp (algebraMap F E)) := by
     refine (InfiniteAdeleRing.denseRange_algebraMap F).equalizer h2 (continuous_ext _) ?_
     funext y
     simp only [Function.comp_apply, ext_algebraMap, RingHom.comp_apply]
-    rw [← h1, Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
+    rw [← h1, Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one,
+      TensorProduct.smul_tmul]
   rw [← this, ← h1, ← map_mul, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
 
-theorem exists_delta (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c ≠ 1)
-    (hτ : ∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x)) :
-    ∃ δ : E, δ ≠ 0 ∧ c δ = -δ ∧ ∀ x : E, ∃ p q : F, x = algebraMap F E p + algebraMap F E q * δ := by
+theorem exists_delta
+    (c : E ≃ₐ[F] E)
+    (h2 : Module.finrank F E = 2) (hc : c ≠ 1)
+    (hτ : ∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x))
+    : ∃ δ : E,
+      δ ≠ 0 ∧ c δ = -δ ∧ ∀ x : E, ∃ p q : F, x = algebraMap F E p + algebraMap F E q * δ := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   obtain ⟨y, hy⟩ : ∃ y, c y ≠ y := by
     by_contra h
@@ -105,11 +117,12 @@ theorem exists_delta (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c �
   obtain ⟨p, q, rfl⟩ := hx
   exact ⟨p, q, by simp [Algebra.smul_def]⟩
 
-theorem eq_or_conj (c : E ≃ₐ[F] E) (hτ : ∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x))
+theorem eq_or_conj
+    (c : E ≃ₐ[F] E) (hτ : ∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x))
     {δ : E} (h0 : δ ≠ 0) (hc : c δ = -δ)
-    (hs : ∀ x : E, ∃ p q : F, x = algebraMap F E p + algebraMap F E q * δ) (τ τ' : E →+* ℂ)
-    (h : τ.comp (algebraMap F E) = τ'.comp (algebraMap F E)) :
-    τ = τ' ∨ τ = ComplexEmbedding.conjugate τ' := by
+    (hs : ∀ x : E, ∃ p q : F, x = algebraMap F E p + algebraMap F E q * δ)
+    (τ τ' : E →+* ℂ) (h : τ.comp (algebraMap F E) = τ'.comp (algebraMap F E))
+    : τ = τ' ∨ τ = ComplexEmbedding.conjugate τ' := by
   have hp : ∀ p, τ (algebraMap F E p) = τ' (algebraMap F E p) := fun p => RingHom.congr_fun h p
   obtain ⟨p, q, hpq⟩ := hs (δ * δ)
   have h' := congrArg c hpq
@@ -127,8 +140,10 @@ theorem eq_or_conj (c : E ≃ₐ[F] E) (hτ : ∀ (τ : E →+* ℂ) x, τ (c x)
     rw [ComplexEmbedding.conjugate_coe_eq, ← hτ]
     simp [hp, e, hc]
 
-theorem exists_decomp {δ : E} (hs : ∀ x : E, ∃ p q : F, x = algebraMap F E p + algebraMap F E q * δ)
-    (z : InfiniteAdeleRing F ⊗[F] E) : ∃ a b : InfiniteAdeleRing F, z = a ⊗ₜ 1 + b ⊗ₜ δ := by
+theorem exists_decomp
+    {δ : E} (hs : ∀ x : E, ∃ p q : F, x = algebraMap F E p + algebraMap F E q * δ)
+    (z : InfiniteAdeleRing F ⊗[F] E)
+    : ∃ a b : InfiniteAdeleRing F, z = a ⊗ₜ 1 + b ⊗ₜ δ := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul a x =>
@@ -141,13 +156,16 @@ theorem exists_decomp {δ : E} (hs : ∀ x : E, ∃ p q : F, x = algebraMap F E 
     obtain ⟨a', b', rfl⟩ := hy
     exact ⟨a + a', b + b', by rw [TensorProduct.add_tmul, TensorProduct.add_tmul]; abel⟩
 
-theorem mk_eq_iff [IsTotallyReal F] {σ σ' : F →+* ℂ} (h : InfinitePlace.mk σ = InfinitePlace.mk σ') : σ = σ' := by
+theorem mk_eq_iff [IsTotallyReal F] {σ σ' : F →+* ℂ} (h : InfinitePlace.mk σ = InfinitePlace.mk σ')
+    : σ = σ' := by
   rw [← InfinitePlace.embedding_mk_eq_of_isReal (IsTotallyReal.complexEmbedding_isReal σ), h,
     InfinitePlace.embedding_mk_eq_of_isReal (IsTotallyReal.complexEmbedding_isReal σ')]
 
-theorem exists_over [IsTotallyReal F] (Ψ : Set (E →+* ℂ))
-    (hΨ : ∀ τ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) (w : InfinitePlace F) :
-    ∃ τ ∈ Ψ, InfinitePlace.mk (τ.comp (algebraMap F E)) = w := by
+theorem exists_over
+    [IsTotallyReal F]
+    (Ψ : Set (E →+* ℂ)) (hΨ : ∀ τ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ)
+    (w : InfinitePlace F)
+    : ∃ τ ∈ Ψ, InfinitePlace.mk (τ.comp (algebraMap F E)) = w := by
   have h : InfinitePlace.mk ((ComplexEmbedding.lift E w.embedding).comp (algebraMap F E)) = w := by
     rw [ComplexEmbedding.lift_comp_algebraMap, InfinitePlace.mk_embedding]
   by_cases hm : ComplexEmbedding.lift E w.embedding ∈ Ψ
@@ -160,12 +178,15 @@ theorem exists_over [IsTotallyReal F] (Ψ : Set (E →+* ℂ))
       ext x
       simp
 
-theorem bijective [IsTotallyReal F] (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c ≠ 1)
+theorem bijective
+    [IsTotallyReal F]
+    (c : E ≃ₐ[F] E)
+    (h2 : Module.finrank F E = 2) (hc : c ≠ 1)
     (hτ : ∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x))
     (θ : (E →+* ℂ) → (InfiniteAdeleRing F ⊗[F] E →+* ℂ))
     (hθ : ∀ τ a x, θ τ (a ⊗ₜ x) = ext (τ.comp (algebraMap F E)) a * τ x)
-    (Ψ : Set (E →+* ℂ)) (hΨ : ∀ τ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) :
-    Function.Bijective (fun (z : InfiniteAdeleRing F ⊗[F] E) (τ : Ψ) => θ τ.1 z) := by
+    (Ψ : Set (E →+* ℂ)) (hΨ : ∀ τ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ)
+    : Function.Bijective (fun (z : InfiniteAdeleRing F ⊗[F] E) (τ : Ψ) => θ τ.1 z) := by
   obtain ⟨δ, h0, hcδ, hs⟩ := exists_delta c h2 hc hτ
   have hre : ∀ τ : E →+* ℂ, (τ δ).re = 0 := by
     intro τ
@@ -179,13 +200,18 @@ theorem bijective [IsTotallyReal F] (c : E ≃ₐ[F] E) (h2 : Module.finrank F E
     InfinitePlace.Completion.extensionEmbeddingOfIsReal (IsTotallyReal.isReal w)
   have hr : ∀ w, Function.Bijective (r w) := fun w =>
     InfinitePlace.Completion.bijective_extensionEmbeddingOfIsReal _
-  have hval : ∀ (τ : E →+* ℂ) (a b : InfiniteAdeleRing F), θ τ (a ⊗ₜ 1 + b ⊗ₜ δ) =
-      ⟨r _ (a (InfinitePlace.mk (τ.comp (algebraMap F E)))),
-        r _ (b (InfinitePlace.mk (τ.comp (algebraMap F E)))) * (τ δ).im⟩ := by
+  have hval
+      : ∀ (τ : E →+* ℂ) (a b : InfiniteAdeleRing F),
+        θ τ (a ⊗ₜ 1 + b ⊗ₜ δ)
+          = ⟨
+            r _ (a (InfinitePlace.mk (τ.comp (algebraMap F E)))),
+            r _ (b (InfinitePlace.mk (τ.comp (algebraMap F E)))) * (τ δ).im
+          ⟩ := by
     intro τ a b
     rw [map_add (f := _), hθ, hθ, ext_eq_ofReal, ext_eq_ofReal, map_one, mul_one]
     apply Complex.ext
-    · simp only [Complex.add_re, Complex.ofReal_re, Complex.re_ofReal_mul, hre, mul_zero, add_zero, r]
+    · simp only [Complex.add_re, Complex.ofReal_re, Complex.re_ofReal_mul, hre, mul_zero, add_zero,
+        r]
     · simp only [Complex.add_im, Complex.ofReal_im, Complex.im_ofReal_mul, zero_add, r]
   choose t ht htw using exists_over (F := F) Ψ hΨ
   constructor
@@ -204,11 +230,16 @@ theorem bijective [IsTotallyReal F] (c : E ≃ₐ[F] E) (h2 : Module.finrank F E
   · intro y
     choose a ha using fun w => (hr w).2 (y ⟨t w, ht w⟩).re
     choose b hb using fun w => (hr w).2 ((y ⟨t w, ht w⟩).im / (t w δ).im)
-    refine ⟨(show InfiniteAdeleRing F from a) ⊗ₜ[F] (1 : E) + (show InfiniteAdeleRing F from b) ⊗ₜ[F] δ, ?_⟩
+    refine ⟨
+      (show InfiniteAdeleRing F from a) ⊗ₜ[F] (1 : E) + (show InfiniteAdeleRing F from b) ⊗ₜ[F] δ,
+      ?_
+    ⟩
     funext τ
     obtain ⟨τ, hτΨ⟩ := τ
     have e : t (InfinitePlace.mk (τ.comp (algebraMap F E))) = τ := by
-      rcases eq_or_conj c hτ h0 hcδ hs _ _ (mk_eq_iff (htw (InfinitePlace.mk (τ.comp (algebraMap F E))))) with e | e
+      rcases eq_or_conj c hτ h0 hcδ hs _ _
+          (mk_eq_iff (htw (InfinitePlace.mk (τ.comp (algebraMap F E)))))
+        with e | e
       · exact e
       · exact absurd (e ▸ ht _) ((hΨ τ).1 hτΨ)
     have := hval τ a b
@@ -218,7 +249,25 @@ theorem bijective [IsTotallyReal F] (c : E ≃ₐ[F] E) (h2 : Module.finrank F E
     · rfl
     · exact div_mul_cancel₀ _ (him τ)
 
-theorem infAdele_tensor_bijective : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (c : E ≃ₐ[F] E), Module.finrank F E = 2 → c ≠ 1 → IsTotallyReal F → (∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x)) → letI : TopologicalSpace (InfiniteAdeleRing F ⊗[F] E) := moduleTopology (InfiniteAdeleRing F) (InfiniteAdeleRing F ⊗[F] E); (∀ τ : E →+* ℂ, ∃ θ : InfiniteAdeleRing F ⊗[F] E →+* ℂ, (∀ x, θ (1 ⊗ₜ x) = τ x) ∧ Continuous fun a : InfiniteAdeleRing F => θ (a ⊗ₜ (1 : E))) ∧ ∀ θ : (E →+* ℂ) → (InfiniteAdeleRing F ⊗[F] E →+* ℂ), (∀ τ, (∀ x, θ τ (1 ⊗ₜ x) = τ x) ∧ Continuous fun a : InfiniteAdeleRing F => θ τ (a ⊗ₜ (1 : E))) → (∀ τ, Continuous (θ τ)) ∧ (∀ τ z, θ τ (sg (InfiniteAdeleRing F) c z) = starRingEnd ℂ (θ τ z)) ∧ ∀ Ψ : Set (E →+* ℂ), (∀ τ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) → Function.Bijective (fun (z : InfiniteAdeleRing F ⊗[F] E) (τ : Ψ) => θ τ.1 z) := by
+theorem infAdele_tensor_bijective
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (c : E ≃ₐ[F] E),
+      Module.finrank F E = 2 → c ≠ 1 → IsTotallyReal F
+        → (∀ (τ : E →+* ℂ) x, τ (c x) = starRingEnd ℂ (τ x))
+        → letI : TopologicalSpace (InfiniteAdeleRing F ⊗[F] E) :=
+            moduleTopology (InfiniteAdeleRing F) (InfiniteAdeleRing F ⊗[F] E)
+          (∀ τ : E →+* ℂ, ∃ θ : InfiniteAdeleRing F ⊗[F] E →+* ℂ,
+              (∀ x, θ (1 ⊗ₜ x) = τ x) ∧ Continuous fun a : InfiniteAdeleRing F => θ (a ⊗ₜ (1 : E)))
+            ∧ ∀ θ : (E →+* ℂ) → (InfiniteAdeleRing F ⊗[F] E →+* ℂ),
+              (∀ τ,
+                  (∀ x, θ τ (1 ⊗ₜ x) = τ x)
+                    ∧ Continuous fun a : InfiniteAdeleRing F => θ τ (a ⊗ₜ (1 : E)))
+                → (∀ τ, Continuous (θ τ))
+                  ∧ (∀ τ z, θ τ (sg (InfiniteAdeleRing F) c z) = starRingEnd ℂ (θ τ z))
+                  ∧ ∀ Ψ : Set (E →+* ℂ),
+                    (∀ τ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ)
+                      → Function.Bijective (fun (z : InfiniteAdeleRing F ⊗[F] E) (τ : Ψ) =>
+                        θ τ.1 z) := by
   intro F E _ _ _ _ _ c h2 hc hF hτ
   letI : TopologicalSpace (InfiniteAdeleRing F ⊗[F] E) :=
     moduleTopology (InfiniteAdeleRing F) (InfiniteAdeleRing F ⊗[F] E)

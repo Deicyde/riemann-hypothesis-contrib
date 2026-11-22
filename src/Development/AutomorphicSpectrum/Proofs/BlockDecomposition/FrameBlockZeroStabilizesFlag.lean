@@ -8,38 +8,57 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SumFrame
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR GlobalTheory.CompanionTheory.RapidDecay
+open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+  GlobalTheory.CompanionTheory.RapidDecay
 open Formalism.UG (cT)
 open GlobalTheory.Orb (archMat)
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.RapidDecay
 
-theorem frameIdem_inl_mulVec {E : Type} [Field E] {n r : ℕ} (S : E →+* E)
-    (J : Matrix (Fin n) (Fin n) E) (X Y : Matrix (Fin n) (Fin r) E) (i : Fin r) (v : Fin n → E) :
-    frameIdem S J X Y (some (Sum.inl i)) *ᵥ v = fun a => X a i * ((cT S Y * J) *ᵥ v) i := by
+theorem frameIdem_inl_mulVec
+    {E : Type} [Field E]
+    {n r : ℕ}
+    (S : E →+* E) (J : Matrix (Fin n) (Fin n) E) (X Y : Matrix (Fin n) (Fin r) E) (i : Fin r)
+    (v : Fin n → E)
+    : frameIdem S J X Y (some (Sum.inl i)) *ᵥ v = fun a => X a i * ((cT S Y * J) *ᵥ v) i := by
   funext a
   simp only [frameIdem]
   rw [← Matrix.mulVec_mulVec]
-  simp [Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.single_apply, Finset.sum_ite_eq, ite_and]
+  simp [Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.single_apply, Finset.sum_ite_eq,
+    ite_and]
 
-theorem stabilises_flag_span : ∀ (E : Type) [Field E] (S : E →+* E) (n r : ℕ) (J : Matrix (Fin n) (Fin n) E) (X Y : Matrix (Fin n) (Fin r) E), cT S Y * J * X = 1 → ∀ (g : Matrix (Fin n) (Fin n) E) (j : Fin r), (∀ α β : FrameIx r, frameLev j α < 2 → frameLev j β = 2 → frameIdem S J X Y α * g * frameIdem S J X Y β = 0) → ∀ l : Fin r, l ≤ j → ∃ b : Fin r → E, g *ᵥ (fun a => X a l) = X *ᵥ b ∧ ∀ m : Fin r, j < m → b m = 0 := by
+theorem stabilises_flag_span
+    : ∀ (E : Type) [Field E] (S : E →+* E) (n r : ℕ) (J : Matrix (Fin n) (Fin n) E)
+        (X Y : Matrix (Fin n) (Fin r) E),
+      cT S Y * J * X = 1
+        → ∀ (g : Matrix (Fin n) (Fin n) E) (j : Fin r),
+          (∀ α β : FrameIx r,
+              frameLev j α < 2 → frameLev j β = 2
+                → frameIdem S J X Y α * g * frameIdem S J X Y β = 0)
+            → ∀ l : Fin r,
+              l ≤ j
+                → ∃ b : Fin r → E,
+                  g *ᵥ (fun a => X a l) = X *ᵥ b ∧ ∀ m : Fin r, j < m → b m = 0 := by
   intro E _ S n r J X Y hXY g j hg l hl
-  have hcol : (fun a => X a l) = X *ᵥ Pi.single l 1 := by
-    funext a; simp
+  have hcol : (fun a => X a l) = X *ᵥ Pi.single l 1 := by funext a; simp
   have hx : frameIdem S J X Y (some (Sum.inl l)) *ᵥ (fun a => X a l) = fun a => X a l := by
     rw [frameIdem_inl_mulVec, hcol, Matrix.mulVec_mulVec, hXY]
-    funext a; simp
+    funext a
+    simp
   have hβ : frameLev j (some (Sum.inl l) : FrameIx r) = 2 := by simp [frameLev, hl]
   set v : Fin n → E := g *ᵥ (fun a => X a l) with hv
   have hz : ∀ α : FrameIx r, frameLev j α < 2 → frameIdem S J X Y α *ᵥ v = 0 := by
     intro α hα
     have := hg α _ hα hβ
-    calc frameIdem S J X Y α *ᵥ v
-        = frameIdem S J X Y α *ᵥ (g *ᵥ (frameIdem S J X Y (some (Sum.inl l)) *ᵥ (fun a => X a l))) := by
-          rw [hx]
+    calc
+      frameIdem S J X Y α *ᵥ v
+          = frameIdem S J X Y α
+            *ᵥ (g *ᵥ (frameIdem S J X Y (some (Sum.inl l)) *ᵥ (fun a => X a l))) := by
+        rw [hx]
       _ = (frameIdem S J X Y α * g * frameIdem S J X Y (some (Sum.inl l))) *ᵥ (fun a => X a l) := by
-          simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc]
+        simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc]
       _ = 0 := by rw [this, Matrix.zero_mulVec]
   have hsum : v = ∑ α, frameIdem S J X Y α *ᵥ v := by
     have h1 : (∑ α, frameIdem S J X Y α) *ᵥ v = ∑ α, frameIdem S J X Y α *ᵥ v :=

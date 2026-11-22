@@ -12,11 +12,14 @@ namespace Formalism.NG
 
 section HomAux
 
-variable {R O M : Type*} [Ring R] [CommRing O] [AddCommGroup M] [Module R M] [Module O M]
-  [SMulCommClass R O M] {m g : Type} [Fintype m] [Fintype g] [DecidableEq g]
+variable
+  {R O M : Type*}
+  [Ring R] [CommRing O] [AddCommGroup M] [Module R M] [Module O M] [SMulCommClass R O M]
+  {m g : Type} [Fintype m] [Fintype g] [DecidableEq g]
 
-theorem relMap_apply' (Θ : Matrix m g R) (v : g → M) (i : m) :
-    relMap O M Θ v i = ∑ j, Θ i j • v j := rfl
+theorem relMap_apply' (Θ : Matrix m g R) (v : g → M) (i : m)
+    : relMap O M Θ v i = ∑ j, Θ i j • v j :=
+  rfl
 
 def combo (v : g → M) : (g → R) →ₗ[R] M where
   toFun w := ∑ j, w j • v j
@@ -35,24 +38,24 @@ theorem single_eq_smul (j : g) (x : R) : (Pi.single j x : g → R) = x • Pi.si
   · subst h; simp
   · simp [h]
 
-theorem sum_row (Θ : Matrix m g R) (i : m) :
-    ∑ j, Θ i j • (Pi.single j (1 : R) : g → R) = Θ i := by
+theorem sum_row (Θ : Matrix m g R) (i : m) : ∑ j, Θ i j • (Pi.single j (1 : R) : g → R) = Θ i := by
   ext k
   simp [Finset.sum_apply, Pi.single_apply]
 
-def toVec (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M) : g → M :=
-  fun j => φ ((relSpan Θ).mkQ (Pi.single j (1 : R)))
+def toVec (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M) : g → M := fun j =>
+  φ ((relSpan Θ).mkQ (Pi.single j (1 : R)))
 
-theorem toVec_mem (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M) :
-    toVec Θ φ ∈ LinearMap.ker (relMap O M Θ) := by
+theorem toVec_mem (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M)
+    : toVec Θ φ ∈ LinearMap.ker (relMap O M Θ) := by
   rw [LinearMap.mem_ker]
   funext i
   rw [relMap_apply', Pi.zero_apply]
   simp only [toVec]
-  have h : ∑ j, Θ i j • φ ((relSpan Θ).mkQ (Pi.single j (1 : R))) =
-      φ ((relSpan Θ).mkQ (∑ j, Θ i j • (Pi.single j (1 : R) : g → R))) := by
+  have h
+      : ∑ j, Θ i j • φ ((relSpan Θ).mkQ (Pi.single j (1 : R)))
+        = φ ((relSpan Θ).mkQ (∑ j, Θ i j • (Pi.single j (1 : R) : g → R))) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul]
+    simp [map_sum, map_smul]
   rw [h, sum_row]
   have hmem : Θ i ∈ relSpan Θ := Submodule.subset_span ⟨i, rfl⟩
   rw [Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero _).mpr hmem, map_zero]
@@ -66,16 +69,15 @@ def ofVec (Θ : Matrix m g R) (v : LinearMap.ker (relMap O M Θ)) : Coker Θ →
     rw [relMap_apply'] at h
     exact h)
 
-theorem ofVec_mk (Θ : Matrix m g R) (v : LinearMap.ker (relMap O M Θ)) (w : g → R) :
-    ofVec Θ v (Submodule.Quotient.mk w) = combo (v : g → M) w := rfl
+theorem ofVec_mk (Θ : Matrix m g R) (v : LinearMap.ker (relMap O M Θ)) (w : g → R)
+    : ofVec Θ v (Submodule.Quotient.mk w) = combo (v : g → M) w :=
+  rfl
 
 def homEquiv (Θ : Matrix m g R) : (Coker Θ →ₗ[R] M) ≃ₗ[O] LinearMap.ker (relMap O M Θ) where
   toFun φ := ⟨toVec Θ φ, toVec_mem Θ φ⟩
   invFun v := ofVec Θ v
-  map_add' φ ψ := by
-    apply Subtype.ext; funext j; simp [toVec]
-  map_smul' c φ := by
-    apply Subtype.ext; funext j; simp [toVec]
+  map_add' φ ψ := by apply Subtype.ext; funext j; simp [toVec]
+  map_smul' c φ := by apply Subtype.ext; funext j; simp [toVec]
   left_inv φ := by
     apply Submodule.linearMap_qext
     apply LinearMap.pi_ext
@@ -84,7 +86,8 @@ def homEquiv (Θ : Matrix m g R) : (Coker Θ →ₗ[R] M) ≃ₗ[O] LinearMap.ke
       single_eq_smul j x, Submodule.Quotient.mk_smul, map_smul]
     rfl
   right_inv v := by
-    apply Subtype.ext; funext j
+    apply Subtype.ext
+    funext j
     show ofVec Θ v (Submodule.Quotient.mk (Pi.single j (1 : R))) = (v : g → M) j
     rw [ofVec_mk, combo_single, one_smul]
 

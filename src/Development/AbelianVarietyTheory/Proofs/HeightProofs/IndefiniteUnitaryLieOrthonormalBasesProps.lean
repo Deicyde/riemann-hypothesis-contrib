@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.InvSqrtTwo
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum GlobalTheory.TypeSum.CasBasis GlobalTheory.LowTypeDetermined
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum GlobalTheory.TypeSum.CasBasis GlobalTheory.LowTypeDetermined
 open scoped InnerProductSpace
 
 namespace GlobalTheory.TypeSum.CasBasisFacts
@@ -134,30 +135,49 @@ lemma mem_pairs {ε : Fin n → Bool} {same : Bool} {a b : Fin n} (h : (a, b) �
 
 end GlobalTheory.TypeSum.CasBasisFacts
 
-
 open GlobalTheory.TypeSum.CasBasisFacts in
-theorem GlobalTheory.TypeSum.CasBasis.bases_mem_lie : ∀ (n : ℕ) (ε : Fin n → Bool),
-    (∀ i, kB ε i ∈ lieSet ε ∧ (kB ε i)ᴴ = -kB ε i ∧ hs (kB ε i) ≤ 1) ∧
-      ∀ b, pB ε b ∈ lieSet ε ∧ (pB ε b)ᴴ = pB ε b := by
+theorem GlobalTheory.TypeSum.CasBasis.bases_mem_lie
+    : ∀ (n : ℕ) (ε : Fin n → Bool),
+      (∀ i, kB ε i ∈ lieSet ε ∧ (kB ε i)ᴴ = - kB ε i ∧ hs (kB ε i) ≤ 1)
+        ∧ ∀ b, pB ε b ∈ lieSet ε ∧ (pB ε b)ᴴ = pB ε b := by
   intro n ε
   constructor
   · intro i
     have hm : kB ε i ∈ kList ε := List.get_mem _ _
     generalize kB ε i = X at hm ⊢
     simp only [kList, List.mem_append, List.mem_map, List.mem_flatMap, List.mem_cons,
-      List.not_mem_nil, or_false] at hm
+        List.not_mem_nil, or_false]
+      at hm
     rcases hm with ⟨a, -, rfl⟩ | ⟨⟨a, b⟩, hp, rfl | rfl⟩
-    · exact ⟨i_smul_diag_casimir_unit_mem_indefinite_lie ε a, i_smul_diag_casimir_unit_skewHermitian a, i_smul_diag_casimir_unit_hs_le_one a⟩
+    · exact ⟨
+        i_smul_diag_casimir_unit_mem_indefinite_lie ε a,
+        i_smul_diag_casimir_unit_skewHermitian a,
+        i_smul_diag_casimir_unit_hs_le_one a
+      ⟩
     · obtain ⟨hab, he⟩ := mem_pairs hp
-      exact ⟨same_sign_casimir_skew_sum_mem_indefinite_lie ε a b hab (he.2 rfl), casimir_unit_skew_diff_skewHermitian a b, casimir_unit_skew_diff_hs_le_one a b hab⟩
+      exact ⟨
+        same_sign_casimir_skew_sum_mem_indefinite_lie ε a b hab (he.2 rfl),
+        casimir_unit_skew_diff_skewHermitian a b,
+        casimir_unit_skew_diff_hs_le_one a b hab
+      ⟩
     · obtain ⟨hab, he⟩ := mem_pairs hp
-      exact ⟨same_sign_casimir_i_sym_sum_mem_indefinite_lie ε a b hab (he.2 rfl), casimir_unit_i_sym_sum_skewHermitian a b, casimir_unit_i_sym_sum_hs_le_one a b hab⟩
+      exact ⟨
+        same_sign_casimir_i_sym_sum_mem_indefinite_lie ε a b hab (he.2 rfl),
+        casimir_unit_i_sym_sum_skewHermitian a b,
+        casimir_unit_i_sym_sum_hs_le_one a b hab
+      ⟩
   · intro i
     have hm : pB ε i ∈ pList ε := List.get_mem _ _
     generalize pB ε i = X at hm ⊢
     simp only [pList, List.mem_flatMap, List.mem_cons, List.not_mem_nil, or_false] at hm
     rcases hm with ⟨⟨a, b⟩, hp, rfl | rfl⟩
     · obtain ⟨hab, he⟩ := mem_pairs hp
-      exact ⟨opp_sign_casimir_sym_sum_mem_indefinite_lie ε a b hab (fun h => by simpa using he.1 h), casimir_unit_sym_sum_hermitian a b⟩
+      exact ⟨
+        opp_sign_casimir_sym_sum_mem_indefinite_lie ε a b hab (fun h => by simpa using he.1 h),
+        casimir_unit_sym_sum_hermitian a b
+      ⟩
     · obtain ⟨hab, he⟩ := mem_pairs hp
-      exact ⟨opp_sign_casimir_i_skew_sum_mem_indefinite_lie ε a b hab (fun h => by simpa using he.1 h), casimir_unit_i_skew_diff_hermitian a b⟩
+      exact ⟨
+        opp_sign_casimir_i_skew_sum_mem_indefinite_lie ε a b hab (fun h => by simpa using he.1 h),
+        casimir_unit_i_skew_diff_hermitian a b
+      ⟩

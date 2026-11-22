@@ -8,10 +8,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -20,9 +23,14 @@ namespace GlobalTheory.PDivGroup
 
 open GlobalTheory.PDiv
 
-theorem eq_zero_of_cob_eq_zero_of_pow (p : ℕ) (R : Type) [CommRing R] (N : ℕ)
-    (hN : (p : R) ^ N = 0) (G : PDivGroup p R) (B : G.funs) (hB : G.cob B = 0) : B = 0 := by
-  have key : ∀ k : ℕ, (∀ n, GlobalTheory.PDiv.mulBy R (G.A n) (p ^ k) (B.1 n) = 0) → ∀ n, B.1 n = 0 := by
+theorem eq_zero_of_cob_eq_zero_of_pow
+    (p : ℕ)
+    (R : Type) [CommRing R]
+    (N : ℕ) (hN : (p : R) ^ N = 0)
+    (G : PDivGroup p R) (B : G.funs) (hB : G.cob B = 0)
+    : B = 0 := by
+  have key
+      : ∀ k : ℕ, (∀ n, GlobalTheory.PDiv.mulBy R (G.A n) (p ^ k) (B.1 n) = 0) → ∀ n, B.1 n = 0 := by
     intro k
     induction k with
     | zero =>

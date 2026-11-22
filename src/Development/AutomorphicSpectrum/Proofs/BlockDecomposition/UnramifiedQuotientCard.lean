@@ -12,16 +12,18 @@ namespace GlobalTheory.CompanionTheory.UnrDens
 private def mulPow {R : Type} [CommRing R] (ϖ : R) (k : ℕ) : R →+ R ⧸ lev ϖ (k + 1) :=
   ((Ideal.Quotient.mk (lev ϖ (k + 1))).toAddMonoidHom).comp (AddMonoidHom.mulLeft (ϖ ^ k))
 
-private theorem mulPow_apply {R : Type} [CommRing R] (ϖ : R) (k : ℕ) (a : R) :
-    mulPow ϖ k a = Ideal.Quotient.mk (lev ϖ (k + 1)) (ϖ ^ k * a) := rfl
+private theorem mulPow_apply {R : Type} [CommRing R] (ϖ : R) (k : ℕ) (a : R)
+    : mulPow ϖ k a = Ideal.Quotient.mk (lev ϖ (k + 1)) (ϖ ^ k * a) :=
+  rfl
 
 private theorem lev_succ_le {R : Type} [CommRing R] (ϖ : R) (k : ℕ) : lev ϖ (k + 1) ≤ lev ϖ k := by
   exact Ideal.span_singleton_le_span_singleton.mpr (pow_dvd_pow ϖ (Nat.le_succ k))
 
-private theorem mulPow_ker {R : Type} [CommRing R] {ϖ : R} (hr : IsSMulRegular R ϖ) (k : ℕ) :
-    (mulPow ϖ k).ker = (lev ϖ 1).toAddSubgroup := by
+private theorem mulPow_ker {R : Type} [CommRing R] {ϖ : R} (hr : IsSMulRegular R ϖ) (k : ℕ)
+    : (mulPow ϖ k).ker = (lev ϖ 1).toAddSubgroup := by
   ext a
-  rw [AddMonoidHom.mem_ker, mulPow_apply, Ideal.Quotient.eq_zero_iff_mem, Submodule.mem_toAddSubgroup]
+  rw [AddMonoidHom.mem_ker, mulPow_apply, Ideal.Quotient.eq_zero_iff_mem,
+    Submodule.mem_toAddSubgroup]
   simp only [lev, Ideal.mem_span_singleton]
   constructor
   · rintro ⟨c, hc⟩
@@ -34,13 +36,15 @@ private theorem mulPow_ker {R : Type} [CommRing R] {ϖ : R} (hr : IsSMulRegular 
   · rintro ⟨c, hc⟩
     exact ⟨c, by rw [hc]; ring⟩
 
-theorem card_quot_lev_succ {R : Type} [CommRing R] {ϖ : R} (hr : IsSMulRegular R ϖ) (k : ℕ) :
-    Nat.card (R ⧸ lev ϖ (k + 1)) = Nat.card (R ⧸ lev ϖ 1) * Nat.card (R ⧸ lev ϖ k) := by
-  obtain ⟨φ, hφ⟩ : ∃ φ : R ⧸ lev ϖ (k + 1) →+ R ⧸ lev ϖ k,
-      ∀ a, φ (Ideal.Quotient.mk _ a) = Ideal.Quotient.mk _ a :=
-    ⟨(Ideal.Quotient.lift (lev ϖ (k + 1)) (Ideal.Quotient.mk (lev ϖ k))
+theorem card_quot_lev_succ {R : Type} [CommRing R] {ϖ : R} (hr : IsSMulRegular R ϖ) (k : ℕ)
+    : Nat.card (R ⧸ lev ϖ (k + 1)) = Nat.card (R ⧸ lev ϖ 1) * Nat.card (R ⧸ lev ϖ k) := by
+  obtain ⟨φ, hφ⟩
+      : ∃ φ : R ⧸ lev ϖ (k + 1) →+ R ⧸ lev ϖ k, ∀ a,
+        φ (Ideal.Quotient.mk _ a) = Ideal.Quotient.mk _ a := ⟨
+    (Ideal.Quotient.lift (lev ϖ (k + 1)) (Ideal.Quotient.mk (lev ϖ k))
       (fun a ha => Ideal.Quotient.eq_zero_iff_mem.mpr (lev_succ_le ϖ k ha))).toAddMonoidHom,
-      fun a => by simp⟩
+    fun a => by simp
+  ⟩
   have hsurj : Function.Surjective φ := by
     intro y
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective y
@@ -70,8 +74,9 @@ theorem card_quot_lev_succ {R : Type} [CommRing R] {ϖ : R} (hr : IsSMulRegular 
   rw [e1, e2, e3]
   ring
 
-theorem card_quot_lev : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R) (q : ℕ) (ε : ℤ),
-    IsUnrQuad R σ ϖ q ε → ∀ k : ℕ, Nat.card (R ⧸ lev ϖ k) = q ^ (2 * k) := by
+theorem card_quot_lev
+    : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R) (q : ℕ) (ε : ℤ),
+      IsUnrQuad R σ ϖ q ε → ∀ k : ℕ, Nat.card (R ⧸ lev ϖ k) = q ^ (2 * k) := by
   intro R _ σ ϖ q ε hR k
   induction k with
   | zero =>

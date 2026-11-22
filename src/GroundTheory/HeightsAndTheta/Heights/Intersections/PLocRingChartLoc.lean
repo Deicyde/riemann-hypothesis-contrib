@@ -20,8 +20,10 @@ theorem LocRingChartLoc.proof : LocRingChartLoc.Statement := by
   intro K _ ι _ P W hP hW hPW hrel
   let L := FractionRing (MRing ι ⧸ P)
   let q : MRing ι →+* L := (algebraMap (MRing ι ⧸ P) L).comp (Ideal.Quotient.mk P)
-  have hq : ∀ f, f ∉ W → q f ≠ 0 := fun f hf h => hf (hPW (by
-    rwa [RingHom.comp_apply, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at h))
+  have hq : ∀ f, f ∉ W → q f ≠ 0 := fun f hf h =>
+    hf (hPW (by
+      rwa [RingHom.comp_apply, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at
+        h))
   have hnz : ∀ v, v ∉ W → Ideal.Quotient.mk P v ∈ nonZeroDivisors (MRing ι ⧸ P) := fun v hv =>
     mem_nonZeroDivisors_of_ne_zero fun h => hv (hPW (Ideal.Quotient.eq_zero_iff_mem.mp h))
 
@@ -36,9 +38,11 @@ theorem LocRingChartLoc.proof : LocRingChartLoc.Statement := by
   let B : Subring L := Subring.closure (Set.range g)
   have hTB : Subring.closure ((Finset.univ.image g : Finset L) : Set L) = B := by
     rw [Finset.coe_image, Finset.coe_univ, Set.image_univ]
-  have hBS : B ≤ locRing P W := Subring.closure_le.mpr (by
-    rintro _ ⟨p, rfl⟩
-    exact hfrac _ _ _ (AvoidRing.isMultiHomog_X p.1 p.2) (AvoidRing.isMultiHomog_X p.1 (c p.1)) (hc p.1))
+  have hBS : B ≤ locRing P W :=
+    Subring.closure_le.mpr (by
+      rintro _ ⟨p, rfl⟩
+      exact hfrac _ _ _ (AvoidRing.isMultiHomog_X p.1 p.2) (AvoidRing.isMultiHomog_X p.1 (c p.1))
+        (hc p.1))
   let θ : MRing ι →+* L := eval₂Hom (Int.castRingHom L) g
   have hθB : ∀ f, θ f ∈ B := by
     intro f
@@ -59,10 +63,14 @@ theorem LocRingChartLoc.proof : LocRingChartLoc.Statement := by
       refine Finset.prod_congr rfl fun k _ => ?_
       show q (X ⟨k, c k⟩ ^ a k) = ∏ y, q (X ⟨k, c k⟩) ^ m ⟨k, y⟩
       rw [map_pow, Finset.prod_pow_eq_pow_sum, hu m hm k]
-    have hθm : θ (monomial m (AddMonoidAlgebra.coeff u m)) = ((AddMonoidAlgebra.coeff u m : ℤ) : L) * ∏ p, g p ^ m p := by
+    have hθm
+        : θ (monomial m (AddMonoidAlgebra.coeff u m))
+          = ((AddMonoidAlgebra.coeff u m : ℤ) : L) * ∏ p, g p ^ m p := by
       rw [show θ _ = eval₂ (Int.castRingHom L) g _ from rfl, eval₂_monomial, eq_intCast,
         Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
-    have hqm : q (monomial m (AddMonoidAlgebra.coeff u m)) = ((AddMonoidAlgebra.coeff u m : ℤ) : L) * ∏ p, q (X p) ^ m p := by
+    have hqm
+        : q (monomial m (AddMonoidAlgebra.coeff u m))
+          = ((AddMonoidAlgebra.coeff u m : ℤ) : L) * ∏ p, q (X p) ^ m p := by
       rw [monomial_eq, map_mul, map_finsuppProd, Finsupp.prod_fintype _ _ (fun _ => by simp)]
       simp only [map_pow]
       congr 1

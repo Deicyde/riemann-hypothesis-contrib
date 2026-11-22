@@ -11,9 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Valuation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.IndefiniteRowSideFullHecke.GoodPairSystems (TwDatum Twisted SameBelow SamePair LiesUnder TwistedPlaceSettings namedPrimes expDat GoodDatum GoodSystem
-  recorded ExistsChoice WithToricIntegralityConstant FamTwGood TwGoodClosed)
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open GlobalTheory.IndefiniteRowSideFullHecke.GoodPairSystems
+  (TwDatum Twisted SameBelow SamePair LiesUnder TwistedPlaceSettings namedPrimes expDat GoodDatum
+    GoodSystem recorded ExistsChoice WithToricIntegralityConstant FamTwGood TwGoodClosed)
 
 namespace GlobalTheory.TwistGoodCompare
 
@@ -22,10 +24,12 @@ variable {D : D7}
 def AtPlace (t : D.what₂.places.Pl → TwDatum D) : Prop :=
   ∀ w, Twisted D w → LiesUnder D (t w).1 w ∨ LiesUnder D (t w).1 (D.what₂.places.conj w)
 
-theorem isUnit_of_toOe (c : NChoice D) (w : D.what₂.places.Pl) (y : D.ntw.O0 (c.twI w))
+theorem isUnit_of_toOe
+    (c : NChoice D) (w : D.what₂.places.Pl) (y : D.ntw.O0 (c.twI w))
     (h : IsUnit (algebraMap (D.ntw.Ok (c.twI w) (c.k' w)) (c.Oe w)
       (algebraMap (D.ntw.O (c.twI w)) (D.ntw.Ok (c.twI w) (c.k' w))
-        (algebraMap (D.ntw.O0 (c.twI w)) (D.ntw.O (c.twI w)) y)))) : IsUnit y := by
+        (algebraMap (D.ntw.O0 (c.twI w)) (D.ntw.O (c.twI w)) y))))
+    : IsUnit y := by
   haveI := c.Oe_loc w
   have h1 := (isUnit_map_iff _ _).1 h
   clear h
@@ -40,7 +44,8 @@ theorem isUnit_of_toOe (c : NChoice D) (w : D.what₂.places.Pl) (y : D.ntw.O0 (
     have := congrArg (algebraMap (D.ntw.O0 i) (FractionRing (D.ntw.O0 i))) h0
     rw [map_natCast, map_zero, ← map_natCast (D.ntw.emb0 i), map_eq_zero] at this
     exact (D.ntw.lPrime i).out.ne_zero (by exact_mod_cast this)
-  have hP : ((IsLocalRing.maximalIdeal (D.ntw.O i)).comap (algebraMap (D.ntw.O0 i) (D.ntw.O i))).IsMaximal := by
+  have hP : ((IsLocalRing.maximalIdeal (D.ntw.O i)).comap
+      (algebraMap (D.ntw.O0 i) (D.ntw.O i))).IsMaximal := by
     refine Ideal.IsPrime.isMaximal inferInstance fun h0 => hl ?_
     rw [← Ideal.mem_bot, ← h0, Ideal.mem_comap, map_natCast]
     exact D.ntw.O_l i
@@ -48,11 +53,13 @@ theorem isUnit_of_toOe (c : NChoice D) (w : D.what₂.places.Pl) (y : D.ntw.O0 (
   rw [← IsLocalRing.eq_maximalIdeal hP, Ideal.mem_comap] at hm
   exact hm h2
 
-theorem pos_iff_not_isUnit (c : NChoice D) (w : D.what₂.places.Pl) (x : D.what₂.LL) (z : c.Oe w)
-    (h : c.embW w x = algebraMap (c.Oe w) (FractionRing (c.Oe w)) z) :
-    0 < D.what₂.places.val w x ↔ ¬ IsUnit z := by
+theorem pos_iff_not_isUnit
+    (c : NChoice D) (w : D.what₂.places.Pl) (x : D.what₂.LL)
+    (z : c.Oe w) (h : c.embW w x = algebraMap (c.Oe w) (FractionRing (c.Oe w)) z)
+    : 0 < D.what₂.places.val w x ↔ ¬ IsUnit z := by
   rcases eq_or_ne x 0 with rfl | h0
-  · have : z = 0 := IsFractionRing.injective (c.Oe w) (FractionRing (c.Oe w)) (by rw [← h, map_zero, map_zero])
+  · have : z = 0 :=
+      IsFractionRing.injective (c.Oe w) (FractionRing (c.Oe w)) (by rw [← h, map_zero, map_zero])
     simp [this]
   have hx : 0 ≤ D.what₂.places.val w x := (c.embW_w w x).2 ⟨z, h.symm⟩
   have hmul := (D.what₂.places.val w).map_mul x x⁻¹
@@ -72,26 +79,34 @@ theorem pos_iff_not_isUnit (c : NChoice D) (w : D.what₂.places.Pl) (x : D.what
     rw [map_inv₀, h]
     exact eq_inv_of_mul_eq_one_left (by rw [← map_mul, Units.inv_mul, map_one])
 
-theorem exists_star (hG : IsGalois ℚ ↥D.LL0) (x : ↥D.LL0) : ∃ x' : ↥D.LL0, (x' : D.what₂.LL) = star (x : D.what₂.LL) := by
+theorem exists_star (hG : IsGalois ℚ ↥D.LL0) (x : ↥D.LL0)
+    : ∃ x' : ↥D.LL0, (x' : D.what₂.LL) = star (x : D.what₂.LL) := by
   let σ : D.what₂.LL →ₐ[ℚ] D.what₂.LL := (starRingEnd D.what₂.LL).toRatAlgHom
   exact ⟨σ.restrictNormal ↥D.LL0 x, σ.restrictNormal_commutes ↥D.LL0 x⟩
 
-theorem liesUnder_of_tie (hG : IsGalois ℚ ↥D.LL0) {c : NChoice D} (h : NChTie D c) (w : D.what₂.places.Pl) :
-    LiesUnder D (c.twI w) (if c.sd w then w else D.what₂.places.conj w) := by
+theorem liesUnder_of_tie
+    (hG : IsGalois ℚ ↥D.LL0) {c : NChoice D} (h : NChTie D c) (w : D.what₂.places.Pl)
+    : LiesUnder D (c.twI w) (if c.sd w then w else D.what₂.places.conj w) := by
   intro x
   have hint : IsIntegral (D.ntw.O0 (c.twI w)) (D.ntw.emb0 (c.twI w) (x : ↥D.LL0)) :=
     (RingOfIntegers.isIntegral_coe x).map_of_comp_eq (Int.castRingHom _) (D.ntw.emb0 (c.twI w))
       (RingHom.ext_int _ _)
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral hint
-  have hleft : (∃ y' ∈ IsLocalRing.maximalIdeal (D.ntw.O0 (c.twI w)),
-      algebraMap _ (FractionRing (D.ntw.O0 (c.twI w))) y' = D.ntw.emb0 (c.twI w) (x : ↥D.LL0)) ↔ ¬ IsUnit y := by
+  have hleft
+      : (∃ y' ∈ IsLocalRing.maximalIdeal (D.ntw.O0 (c.twI w)),
+          algebraMap _ (FractionRing (D.ntw.O0 (c.twI w))) y' = D.ntw.emb0 (c.twI w) (x : ↥D.LL0))
+        ↔ ¬ IsUnit y := by
     refine ⟨fun ⟨y', h1, h2⟩ => ?_, fun h1 => ⟨y, h1, hy⟩⟩
     rw [← IsFractionRing.injective _ _ (h2.trans hy.symm)]
     exact h1
-  have key : ∀ x' : ↥D.LL0, (if c.sd w then D.ntw.emb0 (c.twI w) else D.ntw.emb0b (c.twI w)) x' =
-      D.ntw.emb0 (c.twI w) (x : ↥D.LL0) → (0 < D.what₂.places.val w (x' : D.what₂.LL) ↔ ¬ IsUnit y) := by
+  have key
+      : ∀ x' : ↥D.LL0,
+        (if c.sd w then D.ntw.emb0 (c.twI w) else D.ntw.emb0b (c.twI w)) x'
+            = D.ntw.emb0 (c.twI w) (x : ↥D.LL0)
+          → (0 < D.what₂.places.val w (x' : D.what₂.LL) ↔ ¬ IsUnit y) := by
     intro x' hx'
-    have e := h.embedding_baseField_condition w x' y 1 one_ne_zero (by rw [hx', map_one, mul_one, hy])
+    have e :=
+      h.embedding_baseField_condition w x' y 1 one_ne_zero (by rw [hx', map_one, mul_one, hy])
     simp only [map_one, mul_one] at e
     rw [pos_iff_not_isUnit c w _ _ e, not_iff_not]
     exact ⟨isUnit_of_toOe c w y, fun hu => ((hu.map _).map _).map _⟩
@@ -105,7 +120,8 @@ theorem liesUnder_of_tie (hG : IsGalois ℚ ↥D.LL0) {c : NChoice D} (h : NChTi
   · rw [if_pos rfl]
     exact (key x (by rw [hs, if_pos rfl])).symm
 
-theorem atPlace_of_tie (hG : IsGalois ℚ ↥D.LL0) {c : NChoice D} (h : NChTie D c) : AtPlace (recorded c) := by
+theorem atPlace_of_tie (hG : IsGalois ℚ ↥D.LL0) {c : NChoice D} (h : NChTie D c)
+    : AtPlace (recorded c) := by
   intro w _
   have := liesUnder_of_tie hG h w
   split_ifs at this

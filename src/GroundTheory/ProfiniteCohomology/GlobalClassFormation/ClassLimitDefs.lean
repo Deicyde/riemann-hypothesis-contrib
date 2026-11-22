@@ -31,22 +31,27 @@ instance isDiscreteRep_classRep : IsDiscreteRep classRep := by
   exact congrArg Additive.ofMul (IdeleClassLimit.smul_of_eq_of_mem_fixingSubgroup hσ c)
 
 def diagMor : unitsRep ⟶ IdeleLimit.rep :=
-  Rep.ofHom ⟨(MonoidHom.toAdditive IdeleLimit.diag).toIntLinearMap, fun σ => LinearMap.ext fun x =>
-    congrArg Additive.ofMul (IdeleLimit.diag_map σ x.toMul)⟩
+  Rep.ofHom ⟨
+    (MonoidHom.toAdditive IdeleLimit.diag).toIntLinearMap,
+    fun σ => LinearMap.ext fun x => congrArg Additive.ofMul (IdeleLimit.diag_map σ x.toMul)
+  ⟩
 
 def toClassMor : IdeleLimit.rep ⟶ classRep :=
-  Rep.ofHom ⟨(MonoidHom.toAdditive IdeleLimit.toClassLimit).toIntLinearMap, fun σ => LinearMap.ext
-    fun x => congrArg Additive.ofMul (IdeleLimit.toClassLimit_smul σ x.toMul)⟩
+  Rep.ofHom ⟨
+    (MonoidHom.toAdditive IdeleLimit.toClassLimit).toIntLinearMap,
+    fun σ => LinearMap.ext fun x => congrArg Additive.ofMul (IdeleLimit.toClassLimit_smul σ x.toMul)
+  ⟩
 
 def idelesShortComplex : ShortComplex (Rep ℤ (ℚ̄ ≃ₐ[ℚ] ℚ̄)) :=
   ShortComplex.mk diagMor toClassMor (by
     ext x
     exact congrArg Additive.ofMul (IdeleLimit.toClassLimit_diag x.toMul))
 
-theorem shortExact_of_injective_of_surjective {k G : Type u} [CommRing k] [Group G]
+theorem shortExact_of_injective_of_surjective
+    {k G : Type u} [CommRing k] [Group G]
     (S : ShortComplex (Rep.{u} k G)) (hf : Function.Injective S.f.hom)
-    (hex : ∀ b, S.g.hom b = 0 → ∃ a, S.f.hom a = b) (hg : Function.Surjective S.g.hom) :
-    S.ShortExact := by
+    (hex : ∀ b, S.g.hom b = 0 → ∃ a, S.f.hom a = b) (hg : Function.Surjective S.g.hom)
+    : S.ShortExact := by
   refine ShortComplex.ShortExact.mk' ?_ ((Rep.mono_iff_injective S.f).2 hf)
     ((Rep.epi_iff_surjective S.g).2 hg)
   rw [← ShortComplex.exact_map_iff_of_faithful S (forget₂ (Rep.{u} k G) (ModuleCat.{u} k)),
@@ -54,11 +59,12 @@ theorem shortExact_of_injective_of_surjective {k G : Type u} [CommRing k] [Group
   exact hex
 
 theorem idelesShortComplex_shortExact : idelesShortComplex.ShortExact := by
-  refine shortExact_of_injective_of_surjective _ (fun x y h =>
-    congrArg Additive.ofMul (IdeleLimit.diag_injective (congrArg Additive.toMul h))) (fun z hz => ?_)
+  refine shortExact_of_injective_of_surjective _
+    (fun x y h => congrArg Additive.ofMul (IdeleLimit.diag_injective (congrArg Additive.toMul h)))
+    (fun z hz => ?_)
     (fun c => ?_)
-  · obtain ⟨a, ha⟩ := (IdeleLimit.mem_range_diag_iff (Additive.toMul z)).2
-      (congrArg Additive.toMul hz)
+  · obtain ⟨a, ha⟩ :=
+      (IdeleLimit.mem_range_diag_iff (Additive.toMul z)).2 (congrArg Additive.toMul hz)
     exact ⟨Additive.ofMul a, congrArg Additive.ofMul ha⟩
   · obtain ⟨z, hz⟩ := IdeleLimit.toClassLimit_surjective (Additive.toMul c)
     exact ⟨Additive.ofMul z, congrArg Additive.ofMul hz⟩

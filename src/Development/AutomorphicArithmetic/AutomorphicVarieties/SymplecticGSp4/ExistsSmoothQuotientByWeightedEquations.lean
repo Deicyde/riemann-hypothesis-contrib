@@ -9,13 +9,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem quot_facts {O X R R' : Type} [CommRing O] [AddCommGroup X] [CommRing R] [Algebra O R]
-    [CommRing R'] [Algebra O R'] (W : WPres O X R) (h : W.HasOrigin) (p : R →ₐ[O] R') (hp : Function.Surjective p)
-    (hh : IsHomog O W.wt (RingHom.ker (p.comp W.π))) (x' : R' →ₐ[O] O) (hx : x'.comp p = W.origin h) :
-    ∃ h' : (W.quot p hp hh).HasOrigin, (W.quot p hp hh).origin h' = x' ∧
-      (W.quot p hp hh).part = fun j => (W.part j).map p.toLinearMap := by
+private theorem quot_facts
+    {O X R R' : Type}
+    [CommRing O] [AddCommGroup X] [CommRing R] [Algebra O R] [CommRing R'] [Algebra O R']
+    (W : WPres O X R) (h : W.HasOrigin)
+    (p : R →ₐ[O] R') (hp : Function.Surjective p) (hh : IsHomog O W.wt (RingHom.ker (p.comp W.π)))
+    (x' : R' →ₐ[O] O) (hx : x'.comp p = W.origin h)
+    : ∃ h' : (W.quot p hp hh).HasOrigin,
+      (W.quot p hp hh).origin h' = x'
+        ∧ (W.quot p hp hh).part = fun j => (W.part j).map p.toLinearMap := by
   have hq : ∀ f : MvPowerSeries W.σ O, p (W.π f) = 0 → MvPowerSeries.constantCoeff f = 0 := by
     intro f hf
     have h1 := congrArg (fun g => g (W.π f)) hx
@@ -34,8 +40,10 @@ private theorem quot_facts {O X R R' : Type} [CommRing O] [AddCommGroup X] [Comm
     rw [← Submodule.map_comp]
     rfl
 
-private theorem der_sq {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (x : A →ₐ[O] O)
-    (D : A →ₗ[O] O) (hD : D ∈ PtDer x O) : ∀ g ∈ RingHom.ker x ^ 2, D g = 0 := by
+private theorem der_sq
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (x : A →ₐ[O] O) (D : A →ₗ[O] O) (hD : D ∈ PtDer x O)
+    : ∀ g ∈ RingHom.ker x ^ 2, D g = 0 := by
   intro g hg
   rw [pow_two] at hg
   refine Submodule.mul_induction_on hg (fun a ha b hb => ?_) ?_
@@ -44,9 +52,11 @@ private theorem der_sq {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (x :
   · intro a b ha hb
     rw [map_add (f := _), ha, hb, add_zero]
 
-private theorem indep {O A κ : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A] [Fintype κ] (x : A →ₐ[O] O)
-    (g : κ → A) (hd : ∀ k, ∃ δ ∈ PtDer x O, δ (g k) ≠ 0 ∧ ∀ k', k' ≠ k → δ (g k') = 0) :
-    LinearIndependent O (fun i => (satSq x).mkQ (g i)) := by
+private theorem indep
+    {O A κ : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A] [Fintype κ]
+    (x : A →ₐ[O] O) (g : κ → A)
+    (hd : ∀ k, ∃ δ ∈ PtDer x O, δ (g k) ≠ 0 ∧ ∀ k', k' ≠ k → δ (g k') = 0)
+    : LinearIndependent O (fun i => (satSq x).mkQ (g i)) := by
   classical
   rw [Fintype.linearIndependent_iff]
   intro c hc k
@@ -68,19 +78,23 @@ private theorem indep {O A κ : Type} [CommRing O] [IsDomain O] [CommRing A] [Al
     · exact h
     · exact absurd h hk
 
-private theorem der_desc {O A A' κ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing A'] [Algebra O A']
-    (x : A →ₐ[O] O) (g : κ → A) (hg : ∀ k, x (g k) = 0) (p : A →ₐ[O] A') (hp : Function.Surjective p)
-    (hk : RingHom.ker p = Ideal.span (Set.range g)) (x' : A' →ₐ[O] O) (hx : x'.comp p = x)
-    (δ : A →ₗ[O] O) (hδ : δ ∈ PtDer x O) (h0 : ∀ k, δ (g k) = 0) :
-    ∃ δ' ∈ PtDer x' O, ∀ y, δ' (p y) = δ y := by
+private theorem der_desc
+    {O A A' κ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing A'] [Algebra O A']
+    (x : A →ₐ[O] O) (g : κ → A) (hg : ∀ k, x (g k) = 0)
+    (p : A →ₐ[O] A') (hp : Function.Surjective p) (hk : RingHom.ker p = Ideal.span (Set.range g))
+    (x' : A' →ₐ[O] O) (hx : x'.comp p = x)
+    (δ : A →ₗ[O] O) (hδ : δ ∈ PtDer x O) (h0 : ∀ k, δ (g k) = 0)
+    : ∃ δ' ∈ PtDer x' O, ∀ y, δ' (p y) = δ y := by
   have hker : ∀ y, y ∈ Ideal.span (Set.range g) → x y = 0 ∧ δ y = 0 := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem z hz =>
       obtain ⟨k, rfl⟩ := hz
       exact ⟨hg k, h0 k⟩
-    | zero => simp
-    | add a b _ _ ha hb => simp [ha.1, ha.2, hb.1, hb.2]
+    | zero =>
+      simp
+    | add a b _ _ ha hb =>
+      simp [ha.1, ha.2, hb.1, hb.2]
     | smul a z _ hz =>
       refine ⟨?_, ?_⟩
       · simp [hz.1]
@@ -107,8 +121,23 @@ private theorem der_desc {O A A' κ : Type} [CommRing O] [CommRing A] [Algebra O
   have hb : x' (p b) = x b := by rw [← hx]; rfl
   rw [ha, hb]
 
-theorem UpperTheory.exists_smooth_quotient_by_weighted_equations :
-    ∀ (O X : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [AddCommGroup X] [DecidableEq X] [Module.Free ℤ X] [Module.Finite ℤ X] (P : Type) [CommRing P] [Algebra O P] [IsCO O P] (W : WPres O X P) (h : W.HasOrigin) (n : X → ℕ), SmoothPt W.part (W.origin h) n → ∀ (κ : Type) [Fintype κ] (g : κ → P) (w : κ → X), (∀ k, g k ∈ W.part (w k) ∧ W.origin h (g k) = 0) → (∀ k, ∃ δ ∈ PtDer (W.origin h) O, δ (g k) ≠ 0 ∧ ∀ k', k' ≠ k → δ (g k') = 0) → ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (_ : IsDomain R) (q : P →ₐ[O] R) (W' : WPres O X R) (h' : W'.HasOrigin) (n' : X → ℕ), Function.Surjective q ∧ (∀ s, ∃ s', W'.wt s = W.wt s') ∧ (∀ j, W'.part j = (W.part j).map q.toLinearMap) ∧ (W'.origin h').comp q = W.origin h ∧ (∀ k, q (g k) = 0) ∧ (∀ δ ∈ PtDer (W.origin h) O, (∀ k, δ (g k) = 0) → ∀ y, q y = 0 → δ y = 0) ∧ SmoothPt W'.gr (W'.originA h') n' ∧ ∀ j, n' j + Nat.card {k // w k = j} = n j := by
+theorem UpperTheory.exists_smooth_quotient_by_weighted_equations
+    : ∀ (O X : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O] [AddCommGroup X] [DecidableEq X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] (P : Type) [CommRing P] [Algebra O P] [IsCO O P] (W : WPres O X P)
+        (h : W.HasOrigin) (n : X → ℕ),
+      SmoothPt W.part (W.origin h) n
+        → ∀ (κ : Type) [Fintype κ] (g : κ → P) (w : κ → X),
+          (∀ k, g k ∈ W.part (w k) ∧ W.origin h (g k) = 0)
+            → (∀ k, ∃ δ ∈ PtDer (W.origin h) O, δ (g k) ≠ 0 ∧ ∀ k', k' ≠ k → δ (g k') = 0)
+            → ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (_ : IsDomain R)
+                (q : P →ₐ[O] R) (W' : WPres O X R) (h' : W'.HasOrigin) (n' : X → ℕ),
+              Function.Surjective q ∧ (∀ s, ∃ s', W'.wt s = W.wt s')
+                ∧ (∀ j, W'.part j = (W.part j).map q.toLinearMap)
+                ∧ (W'.origin h').comp q = W.origin h ∧ (∀ k, q (g k) = 0)
+                ∧ (∀ δ ∈ PtDer (W.origin h) O, (∀ k, δ (g k) = 0) → ∀ y, q y = 0 → δ y = 0)
+                ∧ SmoothPt W'.gr (W'.originA h') n'
+                ∧ ∀ j, n' j + Nat.card {k // w k = j} = n j := by
   intro O X _ _ _ _ _ _ _ _ _ P _ _ _ W h n hs κ _ g w hgw hd
   classical
   obtain ⟨τ, _, wt0, φ, hc, hn⟩ := hs
@@ -185,9 +214,25 @@ theorem UpperTheory.exists_smooth_quotient_by_weighted_equations :
     rw [hpart2, hpart1]
     show _ = Submodule.map (p2.toLinearMap.comp p.toLinearMap) _
     rw [Submodule.map_comp]
-  refine ⟨(P ⧸ I) ⧸ J, inferInstance, inferInstance, co_quot O P _ q hq, inferInstance, q, W2, h2,
-    fun j => Nat.card {i // wt' i = j}, hq, fun s => ⟨s, rfl⟩, hpartq, ?_, ?_, ?_,
-    ⟨τ', inferInstance, wt', _, hgr, fun j => rfl⟩, ?_⟩
+  refine ⟨
+    (P ⧸ I) ⧸ J,
+    inferInstance,
+    inferInstance,
+    co_quot O P _ q hq,
+    inferInstance,
+    q,
+    W2,
+    h2,
+    fun j => Nat.card {i // wt' i = j},
+    hq,
+    fun s => ⟨s, rfl⟩,
+    hpartq,
+    ?_,
+    ?_,
+    ?_,
+    ⟨τ', inferInstance, wt', _, hgr, fun j => rfl⟩,
+    ?_
+  ⟩
   · rw [ho2]
     ext y
     rfl
@@ -199,7 +244,8 @@ theorem UpperTheory.exists_smooth_quotient_by_weighted_equations :
       exact Ideal.subset_span ⟨k, rfl⟩
     rw [this, map_zero]
   · intro δ hδ h0 y hy
-    obtain ⟨δ', hδ'mem, hδ'⟩ := der_desc (W.origin h) g (fun k => (hgw k).2) p hp hpker x' hx' δ hδ h0
+    obtain ⟨δ', hδ'mem, hδ'⟩ :=
+      der_desc (W.origin h) g (fun k => (hgw k).2) p hp hpker x' hx' δ hδ h0
     rw [← hδ' y]
     have hJy : p y ∈ J := by
       have : p2 (p y) = 0 := hy

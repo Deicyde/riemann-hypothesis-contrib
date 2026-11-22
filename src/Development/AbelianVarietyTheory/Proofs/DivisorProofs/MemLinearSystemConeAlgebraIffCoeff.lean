@@ -15,9 +15,10 @@ set_option autoImplicit false
 
 namespace GlobalTheory.DegCmp
 
-theorem X_pow_mul_C_mem_coneAlg {K V Ω : Type} [Field K] [AddCommGroup V] [Module K V] [Field Ω] [Algebra K Ω]
-    (ev : V →ₗ[K] Ω) (d : ℕ) (t : Ω) (ht : t ∈ ((LinearMap.range ev) ^ d : Submodule K Ω)) :
-    (Polynomial.X ^ d * Polynomial.C t : Polynomial Ω) ∈ coneAlg ev := by
+theorem X_pow_mul_C_mem_coneAlg
+    {K V Ω : Type} [Field K] [AddCommGroup V] [Module K V] [Field Ω] [Algebra K Ω]
+    (ev : V →ₗ[K] Ω) (d : ℕ) (t : Ω) (ht : t ∈ ((LinearMap.range ev) ^ d : Submodule K Ω))
+    : (Polynomial.X ^ d * Polynomial.C t : Polynomial Ω) ∈ coneAlg ev := by
   induction ht using Submodule.pow_induction_on_left' with
   | algebraMap r =>
     rw [pow_zero, one_mul]
@@ -27,14 +28,19 @@ theorem X_pow_mul_C_mem_coneAlg {K V Ω : Type} [Field K] [AddCommGroup V] [Modu
     exact add_mem hx hy
   | mem_mul m hm i x _ hx =>
     obtain ⟨v, rfl⟩ := hm
-    have h : (Polynomial.X * Polynomial.C (ev v) : Polynomial Ω) ∈ coneAlg ev := Algebra.subset_adjoin ⟨v, rfl⟩
-    have e : (Polynomial.X ^ i.succ * Polynomial.C (ev v * x) : Polynomial Ω) =
-        (Polynomial.X * Polynomial.C (ev v)) * (Polynomial.X ^ i * Polynomial.C x) := by
+    have h : (Polynomial.X * Polynomial.C (ev v) : Polynomial Ω) ∈ coneAlg ev :=
+      Algebra.subset_adjoin ⟨v, rfl⟩
+    have e
+        : (Polynomial.X ^ i.succ * Polynomial.C (ev v * x) : Polynomial Ω)
+          = (Polynomial.X * Polynomial.C (ev v)) * (Polynomial.X ^ i * Polynomial.C x) := by
       rw [map_mul, pow_succ]; ring
     rw [e]
     exact mul_mem h hx
 
-theorem mem_coneAlg_iff_coeff : ∀ (K V Ω : Type) [Field K] [AddCommGroup V] [Module K V] [Field Ω] [Algebra K Ω] (ev : V →ₗ[K] Ω) (p : Polynomial Ω), p ∈ coneAlg ev ↔ ∀ d : ℕ, p.coeff d ∈ ((LinearMap.range ev) ^ d : Submodule K Ω) := by
+theorem mem_coneAlg_iff_coeff
+    : ∀ (K V Ω : Type) [Field K] [AddCommGroup V] [Module K V] [Field Ω] [Algebra K Ω]
+        (ev : V →ₗ[K] Ω) (p : Polynomial Ω),
+      p ∈ coneAlg ev ↔ ∀ d : ℕ, p.coeff d ∈ ((LinearMap.range ev) ^ d : Submodule K Ω) := by
   intro K V Ω _ _ _ _ _ ev p
   constructor
   · intro hp

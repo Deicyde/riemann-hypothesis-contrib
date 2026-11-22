@@ -11,13 +11,23 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Resid
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.TwoTorsionDescent
 
-theorem exists_finite_ext_of_sq_eq_one : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] (ga : K →+* Ω) (A : PolAV (Sp K)) (G : Over (Sp Ω)) [GrpObj G] (α : G.left ⟶ A.A.left), IsGrpPullback G A.A (spMap ga) α → ∀ x : 𝟙_ (Over (Sp Ω)) ⟶ G, x * x = 1 → ∃ (K' : Type) (_ : Field K') (io : K →+* K') (l : K' →+* Ω) (y : Over.mk (spMap io) ⟶ A.A), io.Finite ∧ l.comp io = ga ∧ y * y = 1 ∧ spMap l ≫ y.left = x.left ≫ α := by
+theorem exists_finite_ext_of_sq_eq_one
+    : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] (ga : K →+* Ω) (A : PolAV (Sp K))
+        (G : Over (Sp Ω)) [GrpObj G] (α : G.left ⟶ A.A.left),
+      IsGrpPullback G A.A (spMap ga) α
+        → ∀ x : 𝟙_ (Over (Sp Ω)) ⟶ G,
+          x * x = 1
+            → ∃ (K' : Type) (_ : Field K') (io : K →+* K') (l : K' →+* Ω)
+                (y : Over.mk (spMap io) ⟶ A.A),
+              io.Finite ∧ l.comp io = ga ∧ y * y = 1 ∧ spMap l ≫ y.left = x.left ≫ α := by
   intro K Ω _ _ _ ga A G _ α h x hx
 
   set T : Over (Sp K) := Over.mk ((𝟙_ (Over (Sp Ω))).hom ≫ spMap ga) with hT
@@ -38,7 +48,8 @@ theorem exists_finite_ext_of_sq_eq_one : ∀ (K Ω : Type) [Field K] [CharZero K
     rw [e]
     exact (IsUnit.mk0 (2 : K) two_ne_zero).map _
   haveI := A.isAb
-  have hfin : IsFinite (torsion A.A 2).hom := (GlobalTheory.GrpTangent.finiteEtale_mulN_torsion A.A h2).2.1
+  have hfin : IsFinite (torsion A.A 2).hom :=
+    (GlobalTheory.GrpTangent.finiteEtale_mulN_torsion A.A h2).2.1
   set X := (torsion A.A 2).left
   set p := (torsion A.A 2).hom
   let tl : Sp Ω ⟶ X := t.left
@@ -51,16 +62,21 @@ theorem exists_finite_ext_of_sq_eq_one : ∀ (K Ω : Type) [Field K] [CharZero K
   haveI : s.asIdeal.IsPrime := s.isPrime
   haveI : s.asIdeal.IsMaximal := by rw [Ideal.eq_bot_of_prime s.asIdeal]; exact Ideal.bot_isMaximal
   let c : K →+* (Sp K).residueField s :=
-    (Scheme.Spec.residueFieldIso (CommRingCat.of K) s).inv.hom.comp (algebraMap K s.asIdeal.ResidueField)
+    (Scheme.Spec.residueFieldIso (CommRingCat.of K) s).inv.hom.comp
+      (algebraMap K s.asIdeal.ResidueField)
   have hc : spMap c = (Sp K).fromSpecResidueField s := by
     rw [← Scheme.Spec.map_residueFieldIso_inv_eq_fromSpecResidueField, ← Spec.map_comp]
     rfl
   have hcfin : c.Finite := by
     refine RingHom.Finite.of_surjective _ ?_
-    refine (Scheme.Spec.residueFieldIso (CommRingCat.of K) s).commRingCatIsoToRingEquiv.symm.surjective.comp ?_
+    refine (Scheme.Spec.residueFieldIso (CommRingCat.of K)
+      s).commRingCatIsoToRingEquiv.symm.surjective.comp ?_
     have hq : Function.Surjective (Ideal.Quotient.mk s.asIdeal) := Ideal.Quotient.mk_surjective
     have hb := Ideal.bijective_algebraMap_quotient_residueField s.asIdeal
-    have e : (algebraMap K s.asIdeal.ResidueField) = (algebraMap (K ⧸ s.asIdeal) s.asIdeal.ResidueField).comp (Ideal.Quotient.mk s.asIdeal) := by
+    have e
+        : (algebraMap K s.asIdeal.ResidueField)
+          = (algebraMap (K ⧸ s.asIdeal) s.asIdeal.ResidueField).comp
+            (Ideal.Quotient.mk s.asIdeal) := by
       ext a; rfl
     rw [e]
     exact hb.2.comp hq

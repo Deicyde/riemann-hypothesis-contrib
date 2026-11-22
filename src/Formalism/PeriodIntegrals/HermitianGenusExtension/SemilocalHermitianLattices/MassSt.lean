@@ -13,7 +13,8 @@ namespace ReciprocityTheory.ChartRestriction.L3
 
 section Defs
 
-variable {K V : Type*} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type*} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 def IsTotPosDef (h : V →ₗ⋆[K] V →ₗ[K] K) : Prop :=

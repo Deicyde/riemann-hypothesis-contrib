@@ -9,45 +9,58 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
-  Filter
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW Filter
 open scoped TensorProduct
 
 def qV {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) : ℝ :=
   (Nat.card (𝓞 F ⧸ v.asIdeal) : ℝ)
 
-def QvSum : Prop := ∀ (F : Type) [Field F] [NumberField F],
-  Summable fun v : HeightOneSpectrum (𝓞 F) => (qV v)⁻¹ ^ 2
+def QvSum : Prop :=
+  ∀ (F : Type) [Field F] [NumberField F], Summable fun v : HeightOneSpectrum (𝓞 F) => (qV v)⁻¹ ^ 2
 
-def ArchPos : Prop := InCtx fun F E _ _ _ _ _ σ M J a X0 hT =>
-  ∀ ψ, IsCharAF F ψ → ∀ μinf, SdW F E σ M J (Ainf F) (psiInf F ψ) a μinf →
-    ∀ νinf, SdHerm F E σ (Ainf F) (psiInf F ψ) a νinf →
-    ∀ fibInf : HermR (Ainf F) σ a → Measure (Fin a → Fin M → Ainf F ⊗[F] E),
-    IsFibreFamily μinf (gramR (Ainf F) σ J) Subtype.val
-      {X | LinearIndependent (Ainf F ⊗[F] E) X} νinf Set.univ fibInf →
-    ∃ Φinf : (Fin a → Fin M → Ainf F ⊗[F] E) → ℂ, Continuous Φinf ∧ HasCompactSupport Φinf ∧
-      ∫ X, Φinf X ∂(fibInf (hermOf (Ainf F) σ (gramE σ J X0) hT)) ≠ 0
+def ArchPos : Prop :=
+  InCtx fun F E _ _ _ _ _ σ M J a X0 hT =>
+    ∀ ψ,
+      IsCharAF F ψ
+        → ∀ μinf,
+          SdW F E σ M J (Ainf F) (psiInf F ψ) a μinf
+            → ∀ νinf,
+              SdHerm F E σ (Ainf F) (psiInf F ψ) a νinf
+                → ∀ fibInf : HermR (Ainf F) σ a → Measure (Fin a → Fin M → Ainf F ⊗[F] E),
+                  IsFibreFamily μinf (gramR (Ainf F) σ J) Subtype.val
+                      {X | LinearIndependent (Ainf F ⊗[F] E) X} νinf Set.univ fibInf
+                    → ∃ Φinf : (Fin a → Fin M → Ainf F ⊗[F] E) → ℂ,
+                      Continuous Φinf ∧ HasCompactSupport Φinf
+                        ∧ ∫ X, Φinf X ∂(fibInf (hermOf (Ainf F) σ (gramE σ J X0) hT)) ≠ 0
 
-def LocPos : Prop := InCtx fun F E _ _ _ _ _ σ M J a X0 hT =>
-  ∀ ψ, IsCharAF F ψ → ∀ v : HeightOneSpectrum (𝓞 F),
-    ∀ μv, SdW F E σ M J (Fv F v) (psiV F ψ v) a μv →
-    ∀ νv, SdHerm F E σ (Fv F v) (psiV F ψ v) a νv →
-    ∀ fibV : HermR (Fv F v) σ a → Measure (Fin a → Fin M → Fv F v ⊗[F] E),
-    IsFibreFamily μv (gramR (Fv F v) σ J) Subtype.val
-      {X | LinearIndependent (Fv F v ⊗[F] E) X} νv Set.univ fibV →
-    ∃ Φv : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ, IsSB Φv ∧
-      ∫ X, Φv X ∂(fibV (hermOf (Fv F v) σ (gramE σ J X0) hT)) ≠ 0
+def LocPos : Prop :=
+  InCtx fun F E _ _ _ _ _ σ M J a X0 hT =>
+    ∀ ψ,
+      IsCharAF F ψ
+        → ∀ v : HeightOneSpectrum (𝓞 F), ∀ μv,
+          SdW F E σ M J (Fv F v) (psiV F ψ v) a μv
+            → ∀ νv,
+              SdHerm F E σ (Fv F v) (psiV F ψ v) a νv
+                → ∀ fibV : HermR (Fv F v) σ a → Measure (Fin a → Fin M → Fv F v ⊗[F] E),
+                  IsFibreFamily μv (gramR (Fv F v) σ J) Subtype.val
+                      {X | LinearIndependent (Fv F v ⊗[F] E) X} νv Set.univ fibV
+                    → ∃ Φv : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ,
+                      IsSB Φv ∧ ∫ X, Φv X ∂(fibV (hermOf (Fv F v) σ (gramE σ J X0) hT)) ≠ 0
 
-def DensAA : Prop := InCtx fun F E _ _ _ _ _ σ M J a X0 hT =>
-  ∀ ψ, IsCharAF F ψ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∃ C : ℝ,
-    ∀ᶠ v in cofinite,
-    ∀ μv, SdW F E σ M J (Fv F v) (psiV F ψ v) a μv →
-    ∀ νv, SdHerm F E σ (Fv F v) (psiV F ψ v) a νv →
-    ∀ fibV : HermR (Fv F v) σ a → Measure (Fin a → Fin M → Fv F v ⊗[F] E),
-    IsFibreFamily μv (gramR (Fv F v) σ J) Subtype.val
-      {X | LinearIndependent (Fv F v ⊗[F] E) X} νv Set.univ fibV →
-    ‖∫ X, (latV b v).indicator (1 : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ) X ∂(fibV (hermOf (Fv F v) σ (gramE σ J X0) hT)) - 1‖ ≤
-      C * (qV v)⁻¹ ^ 2
+def DensAA : Prop :=
+  InCtx fun F E _ _ _ _ _ σ M J a X0 hT =>
+    ∀ ψ,
+      IsCharAF F ψ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∃ C : ℝ,
+          ∀ᶠ v in cofinite,
+          ∀ μv, SdW F E σ M J (Fv F v) (psiV F ψ v) a μv →
+          ∀ νv, SdHerm F E σ (Fv F v) (psiV F ψ v) a νv →
+          ∀ fibV : HermR (Fv F v) σ a → Measure (Fin a → Fin M → Fv F v ⊗[F] E),
+          IsFibreFamily μv (gramR (Fv F v) σ J) Subtype.val
+            {X | LinearIndependent (Fv F v ⊗[F] E) X} νv Set.univ fibV →
+          ‖∫ X, (latV b v).indicator (1 : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ) X ∂(fibV (hermOf (Fv F v) σ (gramE σ J X0) hT)) - 1‖ ≤
+            C * (qV v)⁻¹ ^ 2
 
 theorem nuNeZero_of_dens (hA : ArchPos) (hL : LocPos) (hD : DensAA) (hQ : QvSum) : NuNeZero := by
   classical
@@ -63,8 +76,9 @@ theorem nuNeZero_of_dens (hA : ArchPos) (hL : LocPos) (hD : DensAA) (hQ : QvSum)
   obtain ⟨C, hC⟩ := hD F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ _ b
   obtain ⟨Φinf, hcΦ, hcs, hIinf⟩ :=
     hA F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ μinf hμinf νinf hνinf fibInf hfi
-  have hpos := fun v => hL F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ v (μv v) (hμv v)
-    (νv v) (hνv v) (fibV v) (hfv v)
+  have hpos := fun v =>
+    hL F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ v (μv v) (hμv v) (νv v) (hνv v) (fibV v)
+      (hfv v)
   choose Φp hΦpSB hΦp using hpos
   let I : HeightOneSpectrum (𝓞 F) → ℂ := fun v =>
     ∫ X, (latV b v).indicator (1 : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ) X ∂(fibV v (hermOf (Fv F v) σ (gramE σ J X0) hT))
@@ -96,8 +110,7 @@ theorem nuNeZero_of_dens (hA : ArchPos) (hL : LocPos) (hD : DensAA) (hQ : QvSum)
     ∫ X, Φv v X ∂(fibV v (hermOf (Fv F v) σ (gramE σ J X0) hT))
   have hJ0 : ∀ v, Jv v ≠ 0 := fun v => by
     by_cases h : good v
-    · have e : Jv v = I v := by
-        simp only [Jv, I, Φv, if_pos h]
+    · have e : Jv v = I v := by simp only [Jv, I, Φv, if_pos h]
       rw [e]
       intro hI
       have := h.1
@@ -110,8 +123,7 @@ theorem nuNeZero_of_dens (hA : ArchPos) (hL : LocPos) (hD : DensAA) (hQ : QvSum)
   have hJs : Summable fun v => ‖Jv v - 1‖ := by
     refine Summable.of_norm_bounded_eventually hsum ?_
     filter_upwards [hgood] with v hv
-    have e : Jv v = I v := by
-      simp only [Jv, I, Φv, if_pos hv]
+    have e : Jv v = I v := by simp only [Jv, I, Φv, if_pos hv]
     rw [e, norm_norm]
     exact hv.1
   have hne : ∏' v, (1 + (Jv v - 1)) ≠ 0 :=

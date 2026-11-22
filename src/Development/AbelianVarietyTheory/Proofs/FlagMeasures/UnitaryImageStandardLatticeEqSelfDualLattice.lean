@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramePairCoor
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
 noncomputable section
@@ -15,9 +16,11 @@ namespace GlobalTheory.StdLatImg
 
 open GlobalTheory.HL.CoordInnerSnd
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ}
 
 def gen (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)) : Set V :=
   {v | (∀ a, H.h v (Fr.es a) ∈ M.L.O) ∧ (∀ a, H.h v (Fr.e a) ∈ M.L.O) ∧
@@ -49,9 +52,11 @@ namespace GlobalTheory.StdLatImg
 
 open GlobalTheory.HL.CoordInnerSnd
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ}
 
 lemma memL_iff (Fr : FrameD H r) (Λ : Submodule M.L.O V) (L : Submodule M.L.O (H.Wb Fr.f))
     (hL : (L : Set (H.Wb Fr.f)) = H.Lset Λ Fr.f) (w : ↥(H.perp (H.X Fr.f))) :
@@ -110,9 +115,11 @@ namespace GlobalTheory.StdLatImg
 
 open GlobalTheory.HL.CoordInnerSnd
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ}
 
 lemma h_gen_mem (Fr : FrameD H r) (Λ : Submodule M.L.O V) (hSD : H.IsSelfDual Λ)
     (L : Submodule M.L.O (H.Wb Fr.f)) (hL : (L : Set (H.Wb Fr.f)) = H.Lset Λ Fr.f)
@@ -148,7 +155,18 @@ lemma h_gen_mem (Fr : FrameD H r) (Λ : Submodule M.L.O V) (hSD : H.IsSelfDual �
   · refine M.L.O.sum_mem fun a _ => M.L.O.mul_mem (hv2 a) ?_
     rw [H.h_herm]; exact cj_mem' (hs1 a)
 
-theorem eq_img_lamStd : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E) {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r) (Λ : Submodule M.L.O V), H.IsSelfDual Λ → (∀ a : Fin r, Fr.f a.castSucc ∈ Λ) → ∀ L : Submodule M.L.O (H.Wb Fr.f), (L : Set (H.Wb Fr.f)) = H.Lset Λ Fr.f → ∀ n : V ≃ₗ[E] V, IsUnitary H n → (∀ a : Fin r, n (Fr.f a.castSucc) = Fr.f a.castSucc) → (∀ a, n (Fr.es a) ∈ Λ) → (∀ v ∈ H.perp (H.X Fr.f), n v - v ∈ H.X Fr.f) → Λ = img n (Fr.LamStd L) := by
+theorem eq_img_lamStd
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E) {V : Type}
+        [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r)
+        (Λ : Submodule M.L.O V),
+      H.IsSelfDual Λ → (∀ a : Fin r, Fr.f a.castSucc ∈ Λ)
+        → ∀ L : Submodule M.L.O (H.Wb Fr.f),
+          (L : Set (H.Wb Fr.f)) = H.Lset Λ Fr.f
+            → ∀ n : V ≃ₗ[E] V,
+              IsUnitary H n → (∀ a : Fin r, n (Fr.f a.castSucc) = Fr.f a.castSucc)
+                → (∀ a, n (Fr.es a) ∈ Λ) → (∀ v ∈ H.perp (H.X Fr.f), n v - v ∈ H.X Fr.f)
+                → Λ = img n (Fr.LamStd L) := by
   intro F _ _ _ E _ _ _ _ M V _ _ H r Fr Λ hSD he L hL n hn hfix hes hX
   have hb := fun {u : V} (hu : u ∈ Λ) => symm_mem_gen Fr Λ hSD he L hL n hn hfix hes hX hu
   have hgen : FrameD.LamStd Fr L = Submodule.span M.L.O (gen Fr L) := rfl

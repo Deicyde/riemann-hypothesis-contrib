@@ -8,25 +8,34 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 noncomputable section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP.EisImage
 
-theorem isUnit_of_constantCoeff {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [CharP O l] [PerfectRing O l]
-    (c : WittVector l O) (h : IsUnit (WittVector.constantCoeff c)) : IsUnit c := by
+theorem isUnit_of_constantCoeff
+    {l : ℕ} [Fact l.Prime]
+    {O : Type} [CommRing O] [CharP O l] [PerfectRing O l]
+    (c : WittVector l O) (h : IsUnit (WittVector.constantCoeff c))
+    : IsUnit c := by
   obtain ⟨u, hu⟩ := h
-  have h1 : c * WittVector.teichmuller l ((u⁻¹ : Oˣ) : O) - 1 ∈ Ideal.span {(l : WittVector l O)} := by
+  have h1
+      : c * WittVector.teichmuller l ((u⁻¹ : Oˣ) : O) - 1 ∈ Ideal.span {(l : WittVector l O)} := by
     rw [← WittVector.ker_constantCoeff, RingHom.mem_ker, map_sub, map_mul, map_one, ← hu,
       WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero, Units.mul_inv, sub_self]
   have h2 := IsAdicComplete.le_jacobson_bot (Ideal.span {(l : WittVector l O)}) h1
   have h3 := Ideal.isUnit_of_sub_one_mem_jacobson_bot _ h2
   exact isUnit_of_mul_isUnit_left h3
 
-theorem exists_eq {R : Type} [CommRing R] (l : R) (P : Polynomial R) (hm : P.Monic) (hd : 0 < P.natDegree)
-    (hc : ∀ i < P.natDegree, l ∣ P.coeff i) (w : R) (h0 : P.coeff 0 = l * w) :
-    ∃ G : Polynomial R, P = Polynomial.X ^ P.natDegree +
-      Polynomial.C l * (Polynomial.C w + Polynomial.X * G) := by
+theorem exists_eq
+    {R : Type} [CommRing R]
+    (l : R) (P : Polynomial R)
+    (hm : P.Monic) (hd : 0 < P.natDegree) (hc : ∀ i < P.natDegree, l ∣ P.coeff i)
+    (w : R) (h0 : P.coeff 0 = l * w)
+    : ∃ G : Polynomial R,
+      P = Polynomial.X ^ P.natDegree + Polynomial.C l * (Polynomial.C w + Polynomial.X * G) := by
   have h1 : Polynomial.C l ∣ (P - Polynomial.X ^ P.natDegree).divX := by
     rw [Polynomial.C_dvd_iff_dvd_coeff]
     intro i
@@ -44,7 +53,15 @@ theorem exists_eq {R : Type} [CommRing R] (l : R) (P : Polynomial R) (hm : P.Mon
   rw [hG, Polynomial.coeff_sub, Polynomial.coeff_X_pow, if_neg hd.ne, sub_zero, h0, map_mul] at h2
   linear_combination -h2
 
-theorem map_E_eq : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (O : Type) [CommRing O] [IsLocalRing O] [CharP O l] [PerfectRing O l] (ψ : OCb l →+* O), ¬ IsUnit (ψ bk.flat) → ∃ w : WittVector l O, IsUnit w ∧ WittVector.map ψ (bk.ev bk.E) = WittVector.teichmuller l (ψ bk.flat) ^ bk.Ep.natDegree + ((l : ℕ) : WittVector l O) * w := by
+theorem map_E_eq
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (O : Type) [CommRing O] [IsLocalRing O]
+        [CharP O l] [PerfectRing O l] (ψ : OCb l →+* O),
+      ¬ IsUnit (ψ bk.flat)
+        → ∃ w : WittVector l O,
+          IsUnit w
+            ∧ WittVector.map ψ (bk.ev bk.E)
+              = WittVector.teichmuller l (ψ bk.flat) ^ bk.Ep.natDegree
+                + ((l : ℕ) : WittVector l O) * w := by
   intro l _ K bk O _ _ _ _ ψ hψ
   obtain ⟨w₀, hw₀⟩ := bk.coeff_zero
   obtain ⟨G, hG⟩ := exists_eq (l : Wq l bk.a) bk.Ep bk.monic bk.deg_pos bk.dvd_coeff w₀ hw₀
@@ -57,7 +74,8 @@ theorem map_E_eq : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (O : 
   · apply isUnit_of_constantCoeff
     have hu : IsUnit (WittVector.constantCoeff (f (Polynomial.C (w₀ : Wq l bk.a)))) :=
       ((w₀.isUnit.map Polynomial.C).map f).map _
-    rw [map_add (f := _), map_mul, hX, map_add (f := _), map_mul, WittVector.constantCoeff_apply (WittVector.teichmuller l _),
+    rw [map_add (f := _), map_mul, hX, map_add (f := _), map_mul,
+      WittVector.constantCoeff_apply (WittVector.teichmuller l _),
       WittVector.teichmuller_coeff_zero]
     by_contra hn
     have h1 : ψ bk.flat * WittVector.constantCoeff (f G) ∈ IsLocalRing.maximalIdeal O :=

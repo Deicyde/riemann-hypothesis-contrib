@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace GroundTheory.Variant₂.N1
 
-theorem exists_lt_norm_pow_sub_pow_lt {p : ℕ} [hp : Fact (Nat.Prime p)] {c : PadicAlgCl p}
-    (hc : ‖c‖ ≤ 1) {ε : ℝ} (hε : 0 < ε) (f : ℕ → ℕ) :
-    ∃ (k₀ : ℕ) (k₁ : ℕ), k₀ < k₁ ∧ ‖c ^ f k₁ - c ^ f k₀‖ < ε := by
+theorem exists_lt_norm_pow_sub_pow_lt
+    {p : ℕ} [hp : Fact (Nat.Prime p)]
+    {c : PadicAlgCl p} (hc : ‖c‖ ≤ 1)
+    {ε : ℝ} (hε : 0 < ε)
+    (f : ℕ → ℕ)
+    : ∃ (k₀ : ℕ) (k₁ : ℕ), k₀ < k₁ ∧ ‖c ^ f k₁ - c ^ f k₀‖ < ε := by
   set S : Submodule ℚ_[p] (PadicAlgCl p) :=
     Subalgebra.toSubmodule (Algebra.adjoin ℚ_[p] {c}) with hS
   have hint : IsIntegral ℚ_[p] c := Algebra.IsIntegral.isIntegral c
@@ -29,8 +32,9 @@ theorem exists_lt_norm_pow_sub_pow_lt {p : ℕ} [hp : Fact (Nat.Prime p)] {c : P
   have h1 : dist (x (φ (N + 1))) a < ε / 2 := hN (N + 1) (Nat.le_succ N)
   have h2 : dist (x (φ N)) a < ε / 2 := hN N le_rfl
   have h3 : dist (x (φ (N + 1))) (x (φ N)) < ε :=
-    calc dist (x (φ (N + 1))) (x (φ N)) ≤ dist (x (φ (N + 1))) a + dist (x (φ N)) a :=
-          dist_triangle_right _ _ _
+    calc
+      dist (x (φ (N + 1))) (x (φ N))
+        ≤ dist (x (φ (N + 1))) a + dist (x (φ N)) a := dist_triangle_right _ _ _
       _ < ε / 2 + ε / 2 := add_lt_add h1 h2
       _ = ε := add_halves ε
   rw [dist_eq_norm] at h3

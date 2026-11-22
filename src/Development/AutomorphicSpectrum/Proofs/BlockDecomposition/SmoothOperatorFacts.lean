@@ -27,27 +27,33 @@ namespace GlobalTheory.CompanionTheory.FcSmooth
 
 variable {n : ℕ}
 
-theorem isSec_comb (E : KMod n) (c : ℂ) {f f' : Mat n → E.V} (h : IsSec E f) (h' : IsSec E f') :
-    IsSec E (fun y => c • f y + f' y) := by
+theorem isSec_comb (E : KMod n) (c : ℂ) {f f' : Mat n → E.V} (h : IsSec E f) (h' : IsSec E f')
+    : IsSec E (fun y => c • f y + f' y) := by
   intro g hg k
   simp only [h g hg k, h' g hg k, map_add (f := _), map_smul]
 
 section
 
-variable [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (E : KMod n)
+variable
+  [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (E : KMod n)
 
-theorem word_est (hAE : AlgEst) (hL : LgFacts) (hU : Unimod) (hR : RCalc) (hC : CalcSteps)
-    (h : C₀(ℝ, ℂ)) (hh : ∀ m : ℕ, ∃ h' : C₀(ℝ, ℂ), ∀ y, h' y = (y : ℂ) ^ m * h y) :
-    haveI := FiniteDimensional.complete ℂ E.V
-    ∀ (Ω : Msob μ E.V →ₗ[ℂ] Msob μ E.V) (T : Lp E.V 2 μ →L[ℂ] Lp E.V 2 μ) (F : FCalc (Lp E.V 2 μ) (Msob μ E.V) Ω T),
-      (∀ (f : Mat n → E.V) (hf : cls μ f ∈ Msob μ E.V), Sob μ f → (Ω ⟨cls μ f, hf⟩ : Lp E.V 2 μ) = cls μ (Om f)) →
-      ∀ w : List (Bool × Fin n × Fin n), ∃ C : ℝ, ∀ f f' : Mat n → E.V, IsSec E f' → Sob μ f' →
-        cls μ f' = F.Φ h (cls μ f) → ‖cls μ (Rw w f')‖ ≤ C * ‖cls μ f‖ := by
+theorem word_est
+    (hAE : AlgEst) (hL : LgFacts) (hU : Unimod) (hR : RCalc) (hC : CalcSteps)
+    (h : C₀(ℝ, ℂ)) (hh : ∀ m : ℕ, ∃ h' : C₀(ℝ, ℂ), ∀ y, h' y = (y : ℂ) ^ m * h y)
+    : haveI := FiniteDimensional.complete ℂ E.V
+      ∀ (Ω : Msob μ E.V →ₗ[ℂ] Msob μ E.V) (T : Lp E.V 2 μ →L[ℂ] Lp E.V 2 μ)
+          (F : FCalc (Lp E.V 2 μ) (Msob μ E.V) Ω T),
+        (∀ (f : Mat n → E.V) (hf : cls μ f ∈ Msob μ E.V),
+            Sob μ f → (Ω ⟨cls μ f, hf⟩ : Lp E.V 2 μ) = cls μ (Om f))
+          → ∀ w : List (Bool × Fin n × Fin n), ∃ C : ℝ, ∀ f f' : Mat n → E.V,
+            IsSec E f' → Sob μ f' → cls μ f' = F.Φ h (cls μ f)
+              → ‖cls μ (Rw w f')‖ ≤ C * ‖cls μ f‖ := by
   haveI := FiniteDimensional.complete ℂ E.V
   intro Ω T F hΩ w
   obtain ⟨-, -, -, -, hCF, -, -, -, -, -, -, -, hOF, hIb, -⟩ := hC
   choose hm hhm using hh
-  obtain ⟨C₁, hC₁⟩ := (GlobalTheory.T.right_word_laplacian_power_bound) n μ E.V hL hU hR hAE hCF hIb w
+  obtain ⟨C₁, hC₁⟩ :=
+    (GlobalTheory.T.right_word_laplacian_power_bound) n μ E.V hL hU hR hAE hCF hIb w
   obtain ⟨Q, hQ⟩ := (GlobalTheory.T.laplacian_casimir_relation) n E hR hOF
   choose Cj hCj using (GlobalTheory.T.laplacian_power_casimir_bound) n μ E Q hL hU hR hCF hQ
   refine ⟨|C₁| * ∑ j ∈ range (w.length + 1), |Cj j| * ∑ i ∈ range (j + 1), ‖hm i‖, ?_⟩
@@ -73,25 +79,32 @@ theorem word_est (hAE : AlgEst) (hL : LgFacts) (hU : Unimod) (hR : RCalc) (hC : 
   have hn : ∀ i, ‖cls μ (Om^[i] f')‖ ≤ ‖hm i‖ * ‖cls μ f‖ := by
     intro i
     rw [hit]
-    exact ((F.Φ (hm i)).le_opNorm _).trans (mul_le_mul_of_nonneg_right (F.norm_le _) (norm_nonneg _))
+    exact ((F.Φ (hm i)).le_opNorm _).trans
+      (mul_le_mul_of_nonneg_right (F.norm_le _) (norm_nonneg _))
   have hj : ∀ j, ‖cls μ (Lap^[j] f')‖ ≤ (|Cj j| * ∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖ := by
     intro j
-    have hs : ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ ≤ (∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖ := by
+    have hs
+        : ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ ≤ (∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖ := by
       rw [Finset.sum_mul]
       exact Finset.sum_le_sum fun i _ => hn i
-    have h0 : 0 ≤ ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ := Finset.sum_nonneg fun _ _ => norm_nonneg _
-    calc _ ≤ Cj j * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ := hCj j f' hS hsec
+    have h0 : 0 ≤ ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ :=
+      Finset.sum_nonneg fun _ _ => norm_nonneg _
+    calc
+      _ ≤ Cj j * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ := hCj j f' hS hsec
       _ ≤ |Cj j| * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f')‖ :=
         mul_le_mul_of_nonneg_right (le_abs_self _) h0
       _ ≤ |Cj j| * ((∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖) :=
         mul_le_mul_of_nonneg_left hs (abs_nonneg _)
       _ = _ := by ring
-  have h0 : 0 ≤ ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖ := Finset.sum_nonneg fun _ _ => norm_nonneg _
-  have hs : ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖ ≤
-      (∑ j ∈ range (w.length + 1), |Cj j| * ∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖ := by
+  have h0 : 0 ≤ ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖ :=
+    Finset.sum_nonneg fun _ _ => norm_nonneg _
+  have hs
+      : ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖
+        ≤ (∑ j ∈ range (w.length + 1), |Cj j| * ∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖ := by
     rw [Finset.sum_mul]
     exact Finset.sum_le_sum fun j _ => hj j
-  calc _ ≤ C₁ * ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖ := hC₁ f' hS
+  calc
+    _ ≤ C₁ * ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖ := hC₁ f' hS
     _ ≤ |C₁| * ∑ j ∈ range (w.length + 1), ‖cls μ (Lap^[j] f')‖ :=
       mul_le_mul_of_nonneg_right (le_abs_self _) h0
     _ ≤ |C₁| * ((∑ j ∈ range (w.length + 1), |Cj j| * ∑ i ∈ range (j + 1), ‖hm i‖) * ‖cls μ f‖) :=
@@ -123,14 +136,18 @@ theorem smoothOp : SmoothOp := by
       simp only [Rw, id] at this
       rw [this, hfcl, hfcl]
       simp [sub_eq_neg_add]
-    have e2 : cls μ (fun y => (-1 : ℂ) • a l y + a k y) = F.Φ h (cls μ (fun y => (-1 : ℂ) • fs l y + fs k y)) := by
+    have e2
+        : cls μ (fun y => (-1 : ℂ) • a l y + a k y)
+          = F.Φ h (cls μ (fun y => (-1 : ℂ) • fs l y + fs k y)) := by
       have := c1.2 []
       simp only [Rw, id] at this
       rw [this, hacl', hacl', e1, map_sub]
       simp [sub_eq_neg_add]
     have b := hCw w _ _ (isSec_comb E (-1) (hasec l) (hasec k)) c1.1 e2
     rw [c1.2 w, e1] at b
-    have e3 : (-1 : ℂ) • cls μ (Rw w (a l)) + cls μ (Rw w (a k)) = cls μ (Rw w (a k)) - cls μ (Rw w (a l)) := by
+    have e3
+        : (-1 : ℂ) • cls μ (Rw w (a l)) + cls μ (Rw w (a k))
+          = cls μ (Rw w (a k)) - cls μ (Rw w (a l)) := by
       simp [sub_eq_neg_add]
     rw [e3] at b
     exact b.trans (mul_le_mul_of_nonneg_right (le_abs_self _) (norm_nonneg _))
@@ -172,7 +189,9 @@ theorem smoothOp : SmoothOp := by
     exact tendsto_nhds_unique t1 t2
   · have h1 : (1 : Mat n) ∈ GLs n := by simp [GLs]
     have t1 : Tendsto (fun k => ‖a k 1‖) atTop (𝓝 ‖b 1‖) := (hbp 1 h1).norm
-    have t2 : Tendsto (fun k => (|Cs| * ∑ w ∈ S, |Cw w|) * ‖xs k‖) atTop (𝓝 ((|Cs| * ∑ w ∈ S, |Cw w|) * ‖x‖)) :=
+    have t2 : Tendsto
+        (fun k => (|Cs| * ∑ w ∈ S, |Cw w|) * ‖xs k‖)
+        atTop (𝓝 ((|Cs| * ∑ w ∈ S, |Cw w|) * ‖x‖)) :=
       hlim.norm.const_mul _
     refine le_of_tendsto_of_tendsto' t1 t2 fun k => ?_
     have b1 := hb E.V (a k) (haS k) 1 h1
@@ -183,7 +202,8 @@ theorem smoothOp : SmoothOp := by
       have := hCw w (fs k) (a k) (hasec k) (haS k) (by rw [hacl', hfcl])
       rw [hfcl] at this
       exact this.trans (mul_le_mul_of_nonneg_right (le_abs_self _) (norm_nonneg _))
-    calc _ ≤ Cs * ∑ w ∈ S, ‖cls μ (Rw w (a k))‖ := b1
+    calc
+      _ ≤ Cs * ∑ w ∈ S, ‖cls μ (Rw w (a k))‖ := b1
       _ ≤ |Cs| * ∑ w ∈ S, ‖cls μ (Rw w (a k))‖ := mul_le_mul_of_nonneg_right (le_abs_self _) h0
       _ ≤ |Cs| * ((∑ w ∈ S, |Cw w|) * ‖xs k‖) := mul_le_mul_of_nonneg_left hs (abs_nonneg _)
       _ = _ := by ring

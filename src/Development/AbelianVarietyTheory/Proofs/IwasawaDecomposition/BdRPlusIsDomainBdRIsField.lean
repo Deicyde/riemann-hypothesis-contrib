@@ -17,8 +17,11 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc.BdRField
 
-theorem eq_pow_mul_unit {R : Type} [CommRing R] (π : R) (hsep : ∀ y : R, (∀ n : ℕ, π ^ n ∣ y) → y = 0)
-    (hu : ∀ y : R, ¬ π ∣ y → IsUnit y) (y : R) (hy : y ≠ 0) : ∃ (n : ℕ) (u : R), IsUnit u ∧ y = π ^ n * u := by
+theorem eq_pow_mul_unit
+    {R : Type} [CommRing R]
+    (π : R) (hsep : ∀ y : R, (∀ n : ℕ, π ^ n ∣ y) → y = 0) (hu : ∀ y : R, ¬ π ∣ y → IsUnit y)
+    (y : R) (hy : y ≠ 0)
+    : ∃ (n : ℕ) (u : R), IsUnit u ∧ y = π ^ n * u := by
   classical
   have h : ∃ n : ℕ, ¬ π ^ n ∣ y := by
     by_contra h
@@ -41,24 +44,26 @@ theorem eq_pow_mul_unit {R : Type} [CommRing R] (π : R) (hsep : ∀ y : R, (∀
   rw [hn] at this
   exact this (by rw [pow_succ]; exact mul_dvd_mul_left _ hd)
 
-theorem general {R S : Type} [CommRing R] [CommRing S] [Algebra R S] [Nontrivial R] (M : Submonoid R)
-    [IsLocalization M S] (π : R) (hreg : ∀ y : R, π * y = 0 → y = 0)
-    (hsep : ∀ y : R, (∀ n : ℕ, π ^ n ∣ y) → y = 0)
-    (hu : ∀ y : R, ¬ π ∣ y → IsUnit y) (hπ : π ∈ M) (hM : ∀ m ∈ M, ∃ n : ℕ, m ∣ π ^ n) :
-    IsDomain R ∧ Function.Injective (algebraMap R S) ∧ IsField S ∧
-      ∀ x : S, ∃ (n : ℕ) (y : R), x * algebraMap R S π ^ n = algebraMap R S y := by
+theorem general
+    {R S : Type} [CommRing R] [CommRing S] [Algebra R S] [Nontrivial R]
+    (M : Submonoid R) [IsLocalization M S]
+    (π : R) (hreg : ∀ y : R, π * y = 0 → y = 0) (hsep : ∀ y : R, (∀ n : ℕ, π ^ n ∣ y) → y = 0)
+    (hu : ∀ y : R, ¬ π ∣ y → IsUnit y) (hπ : π ∈ M) (hM : ∀ m ∈ M, ∃ n : ℕ, m ∣ π ^ n)
+    : IsDomain R ∧ Function.Injective (algebraMap R S) ∧ IsField S
+      ∧ ∀ x : S, ∃ (n : ℕ) (y : R), x * algebraMap R S π ^ n = algebraMap R S y := by
   have hregn : ∀ (n : ℕ) (y : R), π ^ n * y = 0 → y = 0 := by
     intro n
     induction n with
     | zero => intro y h; simpa using h
     | succ n ih => intro y h; exact ih y (hreg _ (by rw [← h]; ring))
-  have : NoZeroDivisors R := ⟨fun {a b} h => by
-    by_cases ha : a = 0
-    · exact Or.inl ha
-    obtain ⟨n, u, hu', rfl⟩ := eq_pow_mul_unit π hsep hu a ha
-    right
-    rw [mul_assoc] at h
-    exact (hu'.mul_right_eq_zero).1 (hregn n _ h)⟩
+  have : NoZeroDivisors R :=
+    ⟨fun {a b} h => by
+      by_cases ha : a = 0
+      · exact Or.inl ha
+      obtain ⟨n, u, hu', rfl⟩ := eq_pow_mul_unit π hsep hu a ha
+      right
+      rw [mul_assoc] at h
+      exact (hu'.mul_right_eq_zero).1 (hregn n _ h)⟩
   have hD : IsDomain R := NoZeroDivisors.to_isDomain R
   have hle : M ≤ nonZeroDivisors R := by
     intro m hm
@@ -104,10 +109,12 @@ theorem exists_isEps (l : ℕ) [Fact l.Prime] : ∃ e : Per.Fl l, IsEps e := by
     rw [← this, map_one]
     exact congrArg Subtype.val e
 
-theorem of_isEps (l : ℕ) [Fact l.Prime] (e : Per.Fl l) (he : IsEps e) :
-    IsDomain (Per.BdRp l) ∧ Function.Injective (algebraMap (Per.BdRp l) (Per.BdR l)) ∧ IsField (Per.BdR l) ∧
-      ∀ x : Per.BdR l, ∃ (n : ℕ) (y : Per.BdRp l), x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ n =
-        algebraMap (Per.BdRp l) (Per.BdR l) y := by
+theorem of_isEps (l : ℕ) [Fact l.Prime] (e : Per.Fl l) (he : IsEps e)
+    : IsDomain (Per.BdRp l) ∧ Function.Injective (algebraMap (Per.BdRp l) (Per.BdR l))
+      ∧ IsField (Per.BdR l)
+      ∧ ∀ x : Per.BdR l, ∃ (n : ℕ) (y : Per.BdRp l),
+        x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ n
+          = algebraMap (Per.BdRp l) (Per.BdR l) y := by
   obtain ⟨hF, hreg, hc, -⟩ := GlobalTheory.T.bdRPlus_filtration_eq_fontaineXi_pow l e he
   have hk := GlobalTheory.T.kerThetaLocalized_eq_span_fontaineXiElement l e he
   obtain ⟨-, hθ, hu, -, -⟩ := GlobalTheory.T.thetaBdRPlus_surjective_ker_units_equivariant l
@@ -126,7 +133,15 @@ theorem of_isEps (l : ℕ) [Fact l.Prime] (e : Per.Fl l) (he : IsEps e) :
   · rintro _ ⟨k, rfl⟩
     exact ⟨k, dvd_rfl⟩
 
-theorem bdR_isField : ∀ (l : ℕ) [Fact l.Prime], IsDomain (Per.BdRp l) ∧ Function.Injective (algebraMap (Per.BdRp l) (Per.BdR l)) ∧ IsField (Per.BdR l) ∧ ∀ e : Per.Fl l, IsEps e → ∀ x : Per.BdR l, ∃ (n : ℕ) (y : Per.BdRp l), x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ n = algebraMap (Per.BdRp l) (Per.BdR l) y := by
+theorem bdR_isField
+    : ∀ (l : ℕ) [Fact l.Prime],
+      IsDomain (Per.BdRp l) ∧ Function.Injective (algebraMap (Per.BdRp l) (Per.BdR l))
+        ∧ IsField (Per.BdR l)
+        ∧ ∀ e : Per.Fl l,
+          IsEps e
+            → ∀ x : Per.BdR l, ∃ (n : ℕ) (y : Per.BdRp l),
+              x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ n
+                = algebraMap (Per.BdRp l) (Per.BdR l) y := by
   intro l _
   obtain ⟨e, he⟩ := exists_isEps l
   obtain ⟨h1, h2, h3, -⟩ := of_isEps l e he

@@ -29,12 +29,13 @@ theorem invInvariant : InvInvariant := by
   have hR := indefinite_unitary_unimodular n ε
   haveI : (muG ε).IsMulRightInvariant := ⟨hR⟩
   show (muG ε).inv = muG ε
-  have key : (muG ε).inv =
-      MeasureTheory.Measure.haarScalarFactor (muG ε).inv (muG ε) • muG ε := by
+  have key : (muG ε).inv = MeasureTheory.Measure.haarScalarFactor (muG ε).inv (muG ε) • muG ε := by
     exact MeasureTheory.Measure.isMulLeftInvariant_eq_smul _ _
   generalize MeasureTheory.Measure.haarScalarFactor (muG ε).inv (muG ε) = c at key
   have h2 : muG ε = (c * c) • muG ε := by
-    calc muG ε = (muG ε).inv.inv := (MeasureTheory.Measure.inv_inv _).symm
+    calc
+      muG ε
+        = (muG ε).inv.inv := (MeasureTheory.Measure.inv_inv _).symm
       _ = (c • muG ε).inv := by rw [← key]
       _ = c • (muG ε).inv := MeasureTheory.Measure.map_smul _ measurable_inv.aemeasurable
       _ = (c * c) • muG ε := by rw [key, smul_smul]
@@ -63,8 +64,10 @@ theorem rdExt : RdExt := right_derivative_extends
 theorem rdLeft : RdLeft := right_derivative_left_invariant
 theorem rdLin : RdLin := right_derivative_linear
 theorem rdSmooth : RdSmooth := rdSmooth_of right_derivative_extends
-theorem eabGl : EabGl := eabGl_of complex_parts_mem_lie_algebra_holds (rdLin_of right_derivative_extends)
-  (rdBracket_of right_derivative_extends (rdSmooth_of right_derivative_extends)) (rdSmooth_of right_derivative_extends)
+theorem eabGl : EabGl :=
+  eabGl_of complex_parts_mem_lie_algebra_holds (rdLin_of right_derivative_extends)
+    (rdBracket_of right_derivative_extends (rdSmooth_of right_derivative_extends))
+    (rdSmooth_of right_derivative_extends)
 end Formalism.REAL
 
 namespace Formalism.REAL

@@ -12,11 +12,11 @@ open AlgebraicGeometry CategoryTheory CategoryTheory.Limits Opposite
 
 namespace GlobalTheory.HilbAff
 
-theorem representing_qc_qs_loft : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B]
-    [Module.Free A B] [Module.Finite A B] (r : ℕ) (H : Scheme.{0})
-    (R : (GlobalTheory.HilbAff.functor A B r).RepresentableBy H),
-    QuasiCompact (R.homEquiv (𝟙 H)).1 ∧ QuasiSeparated (R.homEquiv (𝟙 H)).1 ∧
-      LocallyOfFiniteType (R.homEquiv (𝟙 H)).1 := by
+theorem representing_qc_qs_loft
+    : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Module.Free A B] [Module.Finite A B]
+        (r : ℕ) (H : Scheme.{0}) (R : (GlobalTheory.HilbAff.functor A B r).RepresentableBy H),
+      QuasiCompact (R.homEquiv (𝟙 H)).1 ∧ QuasiSeparated (R.homEquiv (𝟙 H)).1
+        ∧ LocallyOfFiniteType (R.homEquiv (𝟙 H)).1 := by
   intro A B _ _ _ _ _ r H R
   classical
   let e : Module.Basis (Fin (Fintype.card (Module.Free.ChooseBasisIndex A B))) A B :=
@@ -27,12 +27,14 @@ theorem representing_qc_qs_loft : ∀ (A B : Type) [CommRing A] [CommRing B] [Al
     intro Z b
     have := R.homEquiv_comp b (𝟙 H)
     rwa [Category.comp_id] at this
-  have hmap : ∀ {Z Z' : Scheme.{0}} (a : Z' ⟶ Z) (b : Z ⟶ H),
-      (functor A B r).map a.op ((functor A B r).map b.op ξ) = (functor A B r).map (a ≫ b).op ξ := by
+  have hmap
+      : ∀ {Z Z' : Scheme.{0}} (a : Z' ⟶ Z) (b : Z ⟶ H),
+        (functor A B r).map a.op ((functor A B r).map b.op ξ)
+          = (functor A B r).map (a ≫ b).op ξ := by
     intro Z Z' a b
     rw [← hR b, ← hR (a ≫ b), R.homEquiv_comp]
-  have hrc : ∀ {X Y Z : Scheme.{0}} (a : X ⟶ Y) (b : Y ⟶ Z),
-      Set.range (a ≫ b) = b '' Set.range a := by
+  have hrc
+      : ∀ {X Y Z : Scheme.{0}} (a : X ⟶ Y) (b : Y ⟶ Z), Set.range (a ≫ b) = b '' Set.range a := by
     intro X Y Z a b
     ext p
     simp
@@ -41,7 +43,8 @@ theorem representing_qc_qs_loft : ∀ (A B : Type) [CommRing A] [CommRing B] [Al
   have hcov : ⨆ σ, W σ = ⊤ := by
     rw [eq_top_iff]
     intro h _
-    obtain ⟨σ, U, hU, hb⟩ := GlobalTheory.T.exists_affineHilbertChartBasic_neighbourhood A B N r e H ξ h
+    obtain ⟨σ, U, hU, hb⟩ :=
+      GlobalTheory.T.exists_affineHilbertChartBasic_neighbourhood A B N r e H ξ h
     have := (hW σ _ U.ι).2 hb
     rw [Scheme.Opens.range_ι] at this
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨σ, this hU⟩
@@ -71,17 +74,21 @@ theorem representing_qc_qs_loft : ∀ (A B : Type) [CommRing A] [CommRing B] [Al
     haveI := hg σ; haveI := hXa σ; exact IsAffine.of_isIso (g σ)
   have hint : ∀ (U : H.Opens), CompactSpace U.toScheme → ∀ τ, IsCompact ((U : Set H) ∩ W τ) := by
     intro U hU τ
-    obtain ⟨V, hV, hVc⟩ := GlobalTheory.T.exists_open_affineHilbertChartBasic_locus A B N r e τ U.toScheme ((functor A B r).map U.ι.op ξ)
-    have key : ∀ (Z' : Scheme.{0}) (a : Z' ⟶ U.toScheme),
-        Set.range a ⊆ V ↔ U.ι '' Set.range a ⊆ W τ := fun Z' a => by
+    obtain ⟨V, hV, hVc⟩ :=
+      GlobalTheory.T.exists_open_affineHilbertChartBasic_locus A B N r e τ U.toScheme
+        ((functor A B r).map U.ι.op ξ)
+    have key
+        : ∀ (Z' : Scheme.{0}) (a : Z' ⟶ U.toScheme),
+          Set.range a ⊆ V ↔ U.ι '' Set.range a ⊆ W τ := fun Z' a => by
       rw [hV, hmap, ← hW, hrc]
     have hVeq : (V : Set U.toScheme) = U.ι ⁻¹' (W τ) := by
       apply subset_antisymm
       · have := (key _ V.ι).1 (by rw [Scheme.Opens.range_ι])
         rw [Scheme.Opens.range_ι] at this
         exact Set.image_subset_iff.1 this
-      · have := (key _ (U.ι ⁻¹ᵁ W τ).ι).2 (by
-          rw [Scheme.Opens.range_ι]; exact Set.image_preimage_subset _ _)
+      · have :=
+          (key _ (U.ι ⁻¹ᵁ W τ).ι).2
+            (by rw [Scheme.Opens.range_ι]; exact Set.image_preimage_subset _ _)
         rw [Scheme.Opens.range_ι] at this
         exact this
     have : (U : Set H) ∩ W τ = U.ι '' V := by
@@ -100,8 +107,7 @@ theorem representing_qc_qs_loft : ∀ (A B : Type) [CommRing A] [CommRing B] [Al
     rw [this]
     exact isCompact_iUnion fun σ => (hWa σ).isCompact
   · rw [quasiSeparated_iff_quasiSeparatedSpace]
-    exact Scheme.quasiSeparatedSpace_of_isOpenCover W hcov hWa
-      (fun σ τ => hint (W σ) (hWc' σ) τ)
+    exact Scheme.quasiSeparatedSpace_of_isOpenCover W hcov hWa (fun σ τ => hint (W σ) (hWc' σ) τ)
   · haveI : IsZariskiLocalAtSource @LocallyOfFiniteType := HasRingHomProperty.instIsZariskiLocalAtSource
     refine IsZariskiLocalAtSource.of_iSup_eq_top (P := @LocallyOfFiniteType) W hcov fun σ => ?_
     rw [hgx σ]

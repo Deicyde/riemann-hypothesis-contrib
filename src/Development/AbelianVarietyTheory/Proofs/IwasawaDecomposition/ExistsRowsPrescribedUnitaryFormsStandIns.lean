@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV GlobalTheory.Mem GlobalTheory.MemN GlobalTheory.Mem.Col2 GlobalTheory.Mem.Df
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV GlobalTheory.Mem GlobalTheory.MemN GlobalTheory.Mem.Col2 GlobalTheory.Mem.Df
 
 namespace GlobalTheory.Mem.DfGen
 
@@ -25,10 +26,12 @@ instance {B : Base} (C : Cols B) (u : B.Word) : FiniteDimensional ℂ (RamSp C u
   haveI := (C.mem u).A.Mu0_fd
   Submodule.finiteDimensional_of_le (S₁ := (C.mem u).A.Mram) (S₂ := (C.mem u).A.Mu0) inf_le_left
 
-def ramEq {B : Base} (C : Cols B) (u : B.Word) : RamSp C u ≃ₗ[ℂ] (C.mem u).A.Mram := LinearEquiv.refl ℂ _
+def ramEq {B : Base} (C : Cols B) (u : B.Word) : RamSp C u ≃ₗ[ℂ] (C.mem u).A.Mram :=
+  LinearEquiv.refl ℂ _
 
-@[reducible] def core {B : Base} (C : Cols B) (h : SpectralModel.ColsPos C) (u : B.Word) :
-    InnerProductSpace.Core ℂ (RamSp C u) where
+@[reducible]
+def core {B : Base} (C : Cols B) (h : SpectralModel.ColsPos C) (u : B.Word)
+    : InnerProductSpace.Core ℂ (RamSp C u) where
   inner x y := (C.fm u).ipC 0 (ramEq C u x).1 (ramEq C u y).1
   conj_inner_symm x y := (h u).1 _ (ramEq C u x).2.1 _ (ramEq C u y).2.1
   re_inner_nonneg x := by
@@ -42,7 +45,8 @@ def ramEq {B : Base} (C : Cols B) (u : B.Word) : RamSp C u ≃ₗ[ℂ] (C.mem u)
     exact Finset.sum_congr rfl fun c _ => by ring
   definite x hx := by
     by_contra h0
-    have h1 : (ramEq C u x).1 ≠ 0 := fun h1 => h0 ((ramEq C u).injective (Subtype.ext (by simpa using h1)))
+    have h1 : (ramEq C u x).1 ≠ 0 := fun h1 =>
+      h0 ((ramEq C u).injective (Subtype.ext (by simpa using h1)))
     have := (h u).2 _ (ramEq C u x).2.1 h1
     rw [show (C.fm u).ipC 0 (ramEq C u x).1 (ramEq C u x).1 = 0 from hx] at this
     simp at this
@@ -50,8 +54,11 @@ def ramEq {B : Base} (C : Cols B) (u : B.Word) : RamSp C u ≃ₗ[ℂ] (C.mem u)
 def stdCongr {a b : ℕ} (h : a = b) : EuclideanSpace ℂ (Fin a) ≃ₗᵢ[ℂ] EuclideanSpace ℂ (Fin b) :=
   LinearIsometryEquiv.piLpCongrLeft 2 ℂ ℂ (finCongr h)
 
-def stdLat (O : Type) [CommRing O] (φ : O →+* ℂ) (a : ℕ) : Rows.OLat O φ (EuclideanSpace ℂ (Fin a)) where
-  gen := by classical exact Finset.univ.image (EuclideanSpace.basisFun (Fin a) ℂ).toBasis
+def stdLat (O : Type) [CommRing O] (φ : O →+* ℂ) (a : ℕ)
+    : Rows.OLat O φ (EuclideanSpace ℂ (Fin a)) where
+  gen := by
+    classical
+    exact Finset.univ.image (EuclideanSpace.basisFun (Fin a) ℂ).toBasis
   span_top := by
     classical
     rw [Finset.coe_image, Finset.coe_univ, Set.image_univ]
@@ -62,18 +69,23 @@ theorem subsingleton_std {k : ℕ} (h : k = 0) : Subsingleton (EuclideanSpace �
   exact ⟨fun x y => by ext i; exact i.elim0⟩
 
 def sigParB (B : Base) (τ : Tau B.R) (i : ℕ) : ℚ :=
-  if h : i < B.R.k - 1 then (B.hc τ).v ⟨i, h⟩
-  else if hb : i - (B.R.k - 1) < B.R.m then -(B.hc τ).b ⟨i - (B.R.k - 1), hb⟩ else 0
+  if h : i < B.R.k - 1 then
+    (B.hc τ).v ⟨i, h⟩
+  else if hb : i - (B.R.k - 1) < B.R.m then
+    - (B.hc τ).b ⟨i - (B.R.k - 1), hb⟩
+  else
+    0
 
 def eQB (B : Base) (j : ℕ) (τ : Tau B.R) : ℚ :=
   if h : 1 ≤ j ∧ j ≤ B.R.m then (B.hc τ).e ⟨j - 1, by omega⟩ else 0
 
 def aPlusB (B : Base) (j : ℕ) (τ : Tau B.R) (i : ℕ) : ℚ :=
-  sigParB B τ i + eQB B j τ - ((B.R.nV : ℚ) - 1 - 2 * (i : ℚ)) / 2 -
-    (((B.R.k : ℚ) + j - 1) - ((B.R.m : ℚ) - j)) / 2
+  sigParB B τ i + eQB B j τ - ((B.R.nV : ℚ) - 1 - 2 * (i : ℚ)) / 2
+    - (((B.R.k : ℚ) + j - 1) - ((B.R.m : ℚ) - j)) / 2
 
 def aMinusB (B : Base) (j : ℕ) (τ : Tau B.R) (c : ℕ) : ℚ :=
-  (if h : j + c < B.R.m then (B.hc τ).b ⟨j + c, h⟩ else 0) - eQB B j τ - ((B.R.t : ℚ) + 1 + 2 * (c : ℚ)) / 2
+  (if h : j + c < B.R.m then (B.hc τ).b ⟨j + c, h⟩ else 0) - eQB B j τ
+    - ((B.R.t : ℚ) + 1 + 2 * (c : ℚ)) / 2
 
 theorem eQB_int (B : Base) (j : ℕ) (τ : Tau B.R) : ∃ z : ℤ, eQB B j τ = z := by
   unfold eQB
@@ -113,18 +125,24 @@ theorem aMinusB_int (B : Base) (j : ℕ) (τ : Tau B.R) (c : ℕ) : ∃ z : ℤ,
   push_cast
   ring
 
-def kaBigB (B : Base) (j : ℕ) (τ : Tau B.R) (i : Fin (B.R.sigW j).1) : ℤ := (aPlusB_int B j τ i).choose
+def kaBigB (B : Base) (j : ℕ) (τ : Tau B.R) (i : Fin (B.R.sigW j).1) : ℤ :=
+  (aPlusB_int B j τ i).choose
 
-def kaSmallB (B : Base) (j : ℕ) (τ : Tau B.R) (c : Fin (B.R.sigW j).2) : ℤ := -(aMinusB_int B j τ c).choose
+def kaSmallB (B : Base) (j : ℕ) (τ : Tau B.R) (c : Fin (B.R.sigW j).2) : ℤ :=
+  -(aMinusB_int B j τ c).choose
 
-def rowsStd (B : Base) (C : Cols B) (hC : SpectralModel.ColsPos C) (n : C.Tup → ℕ)
+def rowsStd
+    (B : Base) (C : Cols B) (hC : SpectralModel.ColsPos C) (n : C.Tup → ℕ)
     (e0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n C.mu0)))
     (eT : ∀ u a, (C.PTw u a).Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n a)))
     (L : ∀ a, Rows.OLat B.O (B.embLL.comp B.OtoLL) (EuclideanSpace ℂ (Fin (n a))))
-    (mt : B.places.Pl → C.Tup) (hmt : ∀ w, mt (B.places.conj w) = mt w) : RowsRest B C :=
+    (mt : B.places.Pl → C.Tup) (hmt : ∀ w, mt (B.places.conj w) = mt w)
+    : RowsRest B C :=
   letI nN : ∀ u, NormedAddCommGroup (RamSp C u) := fun u => (core C hC u).toNormedAddCommGroup
-  letI nI : ∀ u, InnerProductSpace ℂ (RamSp C u) := fun u => InnerProductSpace.ofCore (core C hC u).toCore
-  { muAt := fun _ => C.mu0
+  letI nI : ∀ u, InnerProductSpace ℂ (RamSp C u) := fun u =>
+    InnerProductSpace.ofCore (core C hC u).toCore
+  {
+    muAt := fun _ => C.mu0
     muAt_conj := fun _ => rfl
     muTw := mt
     muTw_conj := hmt
@@ -156,8 +174,10 @@ def rowsStd (B : Base) (C : Cols B) (hC : SpectralModel.ColsPos C) (n : C.Tup �
     instMui := nI
     perCol := fun u a φ F =>
       haveI := Classical.dec (a = C.mu0)
-      if h : a = C.mu0 then (C.mem u).P.PtilCol (ramEq C u φ).1 ((e0 u).symm (h ▸ F))
-      else (C.PTw u a).PtilCol (C.e0Tw u a (ramEq C u φ).1) ((eT u a).symm F)
+      if h : a = C.mu0 then
+        (C.mem u).P.PtilCol (ramEq C u φ).1 ((e0 u).symm (h ▸ F))
+      else
+        (C.PTw u a).PtilCol (C.e0Tw u a (ramEq C u φ).1) ((eT u a).symm F)
     Bu := fun _ _ _ => 0
     ze := fun _ _ => 1
     rowsRest_wordColumnUnit_baseTuple := fun _ => rfl
@@ -194,41 +214,67 @@ def rowsStd (B : Base) (C : Cols B) (hC : SpectralModel.ColsPos C) (n : C.Tup �
     Bu_linR := fun _ _ => ⟨fun _ _ => by simp, fun _ _ => by simp⟩
     eMtTw := eT
     perCol_tie := fun u a h φ F => dif_neg h
-    eMu_isom := fun _ _ _ => rfl }
+    eMu_isom := fun _ _ _ => rfl
+  }
 
-theorem standIn_rowsStd (B : Base) (C : Cols B) (hC : SpectralModel.ColsPos C) (n : C.Tup → ℕ)
+theorem standIn_rowsStd
+    (B : Base) (C : Cols B) (hC : SpectralModel.ColsPos C) (n : C.Tup → ℕ)
     (e0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n C.mu0)))
     (eT : ∀ u a, (C.PTw u a).Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n a)))
     (L : ∀ a, Rows.OLat B.O (B.embLL.comp B.OtoLL) (EuclideanSpace ℂ (Fin (n a))))
-    (mt : B.places.Pl → C.Tup) (hmt : ∀ w, mt (B.places.conj w) = mt w) :
-    StandIn (rowsStd B C hC n e0 eT L mt hmt) := by
-  exact
-    { drows := rfl
-      d0 := rfl
-      dall := rfl
-      delp := rfl
-      ft := ⟨fun x => nomatch x⟩
-      mult := fun a j hj => subsingleton_std (if_neg hj)
-      io := fun _ _ => rfl
-      mj := fun _ => subsingleton_std rfl
-      mt := fun _ _ => subsingleton_std rfl
-      eMt := fun _ _ => rfl
-      bu := fun _ _ _ => rfl
-      ij := fun _ _ _ => ⟨rfl, rfl⟩
-      eta := fun _ _ => rfl
-      sha := shaOK_shaTrue B.toPre
-      kap := fun V S N G j _ _ τ =>
-        ⟨fun i => (aPlusB_int B j τ i).choose_spec.symm,
-         fun c => by
-           show ((-(aMinusB_int B j τ c).choose : ℤ) : ℚ) = -aMinusB B j τ c
-           push_cast
-           rw [← (aMinusB_int B j τ c).choose_spec]⟩ }
+    (mt : B.places.Pl → C.Tup) (hmt : ∀ w, mt (B.places.conj w) = mt w)
+    : StandIn (rowsStd B C hC n e0 eT L mt hmt) := by
+  exact {
+    drows := rfl
+    d0 := rfl
+    dall := rfl
+    delp := rfl
+    ft := ⟨fun x => nomatch x⟩
+    mult := fun a j hj => subsingleton_std (if_neg hj)
+    io := fun _ _ => rfl
+    mj := fun _ => subsingleton_std rfl
+    mt := fun _ _ => subsingleton_std rfl
+    eMt := fun _ _ => rfl
+    bu := fun _ _ _ => rfl
+    ij := fun _ _ _ => ⟨rfl, rfl⟩
+    eta := fun _ _ => rfl
+    sha := shaOK_shaTrue B.toPre
+    kap := fun V S N G j _ _ τ => ⟨
+      fun i => (aPlusB_int B j τ i).choose_spec.symm,
+      fun c => by
+        show ((-(aMinusB_int B j τ c).choose : ℤ) : ℚ) = -aMinusB B j τ c
+        push_cast
+        rw [← (aMinusB_int B j τ c).choose_spec]
+    ⟩
+  }
 
-theorem exists_rowsRest_std : ∀ (B : Base) (C : Cols B) (n : C.Tup → ℕ) (e0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n C.mu0))) (eT : ∀ u a, (C.PTw u a).Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n a))) (L : ∀ a, Rows.OLat B.O (B.embLL.comp B.OtoLL) (EuclideanSpace ℂ (Fin (n a)))) (mt : B.places.Pl → C.Tup), (∀ w, mt (B.places.conj w) = mt w) → SpectralModel.ColsPos C → ∃ (W : RowsRest B C) (g : ∀ a, EuclideanSpace ℂ (Fin (n a)) ≃ₗᵢ[ℂ] W.Amb a), StandIn W ∧ (∀ w, W.muAt w = C.mu0) ∧ (∀ w, W.muTw w = mt w) ∧ (∀ u F, W.eMt0 u F = g C.mu0 (e0 u F)) ∧ (∀ u a F, W.eMtTw u a F = g a (eT u a F)) ∧ (∀ a y, g a y ∈ (W.Mtilde a).carrier ↔ y ∈ (L a).carrier) ∧ (∀ a y, g a y ∈ (W.Mtilde a).gen ↔ y ∈ (L a).gen) ∧ (∀ a, W.eOp a = LinearMap.id) ∧ ∀ u a, W.ze u a = 1 := by
+theorem exists_rowsRest_std
+    : ∀ (B : Base) (C : Cols B) (n : C.Tup → ℕ)
+        (e0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n C.mu0)))
+        (eT : ∀ u a, (C.PTw u a).Mt ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (n a)))
+        (L : ∀ a, Rows.OLat B.O (B.embLL.comp B.OtoLL) (EuclideanSpace ℂ (Fin (n a))))
+        (mt : B.places.Pl → C.Tup),
+      (∀ w, mt (B.places.conj w) = mt w) → SpectralModel.ColsPos C
+        → ∃ (W : RowsRest B C) (g : ∀ a, EuclideanSpace ℂ (Fin (n a)) ≃ₗᵢ[ℂ] W.Amb a),
+          StandIn W ∧ (∀ w, W.muAt w = C.mu0) ∧ (∀ w, W.muTw w = mt w)
+            ∧ (∀ u F, W.eMt0 u F = g C.mu0 (e0 u F)) ∧ (∀ u a F, W.eMtTw u a F = g a (eT u a F))
+            ∧ (∀ a y, g a y ∈ (W.Mtilde a).carrier ↔ y ∈ (L a).carrier)
+            ∧ (∀ a y, g a y ∈ (W.Mtilde a).gen ↔ y ∈ (L a).gen) ∧ (∀ a, W.eOp a = LinearMap.id)
+            ∧ ∀ u a, W.ze u a = 1 := by
   intro B C n e0 eT L mt hmt hC
-  exact ⟨rowsStd B C hC n e0 eT L mt hmt, fun a => LinearIsometryEquiv.refl ℂ _,
-    standIn_rowsStd B C hC n e0 eT L mt hmt, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, fun _ _ _ => rfl,
-    fun _ _ => Iff.rfl, fun _ _ => Iff.rfl, fun _ => rfl, fun _ _ => rfl⟩
+  exact ⟨
+    rowsStd B C hC n e0 eT L mt hmt,
+    fun a => LinearIsometryEquiv.refl ℂ _,
+    standIn_rowsStd B C hC n e0 eT L mt hmt,
+    fun _ => rfl,
+    fun _ => rfl,
+    fun _ _ => rfl,
+    fun _ _ _ => rfl,
+    fun _ _ => Iff.rfl,
+    fun _ _ => Iff.rfl,
+    fun _ => rfl,
+    fun _ _ => rfl
+  ⟩
 
 end GlobalTheory.Mem.DfGen
 

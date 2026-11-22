@@ -8,10 +8,12 @@ open Filter Topology
 
 namespace GlobalTheory.CompanionTheory.HolFamily
 
-theorem continuousOn_deriv_family (P : Type) [TopologicalSpace P] (U : Set ℂ) (hU : IsOpen U)
+theorem continuousOn_deriv_family
+    (P : Type) [TopologicalSpace P]
+    (U : Set ℂ) (hU : IsOpen U)
     (H : P → ℂ → ℂ) (hc : ContinuousOn (fun q : P × ℂ => H q.1 q.2) (Set.univ ×ˢ U))
-    (hd : ∀ p, DifferentiableOn ℂ (H p) U) :
-    ContinuousOn (fun q : P × ℂ => deriv (H q.1) q.2) (Set.univ ×ˢ U) := by
+    (hd : ∀ p, DifferentiableOn ℂ (H p) U)
+    : ContinuousOn (fun q : P × ℂ => deriv (H q.1) q.2) (Set.univ ×ˢ U) := by
   rintro ⟨p0, z0⟩ ⟨-, hz0⟩
   simp only at hz0
   obtain ⟨e, he, hball⟩ := Metric.isOpen_iff.1 hU z0 hz0
@@ -19,7 +21,8 @@ theorem continuousOn_deriv_family (P : Type) [TopologicalSpace P] (U : Set ℂ) 
   set R := e / 3 with hRdef
   have hKU : Metric.closedBall z0 (2 * R) ⊆ U := by
     refine (Metric.closedBall_subset_ball ?_).trans hball
-    rw [hRdef]; linarith
+    rw [hRdef]
+    linarith
   let K : Set ℂ := Metric.closedBall z0 (2 * R)
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 (isCompact_closedBall z0 (2 * R))
   have hFc : Continuous (fun x : P × K => H x.1 x.2) := by
@@ -56,27 +59,30 @@ theorem continuousOn_deriv_family (P : Type) [TopologicalSpace P] (U : Set ℂ) 
     intro w hw
     have hwK : w ∈ K := hsub (Metric.sphere_subset_closedBall hw)
     have := ContinuousMap.dist_apply_le_dist (f := G p) (g := G p0) (⟨w, hwK⟩ : K)
-    have h5 : dist (G p ⟨w, hwK⟩) (G p0 ⟨w, hwK⟩) = ‖H p w - H p0 w‖ := by
-      rw [dist_eq_norm]; rfl
+    have h5 : dist (G p ⟨w, hwK⟩) (G p0 ⟨w, hwK⟩) = ‖H p w - H p0 w‖ := by rw [dist_eq_norm]; rfl
     rw [← h5]
     exact this.trans hp.le
   have hcauchy : ‖deriv (fun w => H p w - H p0 w) z‖ ≤ ε / 2 * R / 2 / R :=
-    Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hR
-      (hfd.diffContOnCl_ball (hsub.trans hKU)) hbound
+    Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hR (hfd.diffContOnCl_ball (hsub.trans hKU))
+      hbound
   have hval : ε / 2 * R / 2 / R = ε / 4 := by field_simp; ring
   rw [hval, hderiv] at hcauchy
-  calc dist (deriv (H p) z) (deriv (H p0) z0)
-      ≤ dist (deriv (H p) z) (deriv (H p0) z) + dist (deriv (H p0) z) (deriv (H p0) z0) :=
-        dist_triangle _ _ _
+  calc
+    dist (deriv (H p) z) (deriv (H p0) z0)
+        ≤ dist (deriv (H p) z) (deriv (H p0) z) + dist (deriv (H p0) z) (deriv (H p0) z0) :=
+      dist_triangle _ _ _
     _ < ε := by
-        rw [dist_eq_norm (deriv (H p) z)]
-        linarith
+      rw [dist_eq_norm (deriv (H p) z)]
+      linarith
 
-theorem continuousOn_iteratedDeriv_family :
-    ∀ (P : Type) [TopologicalSpace P] (U : Set ℂ), IsOpen U → ∀ H : P → ℂ → ℂ,
-      ContinuousOn (fun q : P × ℂ => H q.1 q.2) (Set.univ ×ˢ U) →
-      (∀ p, DifferentiableOn ℂ (H p) U) →
-        ∀ r : ℕ, ContinuousOn (fun q : P × ℂ => iteratedDeriv r (H q.1) q.2) (Set.univ ×ˢ U) := by
+theorem continuousOn_iteratedDeriv_family
+    : ∀ (P : Type) [TopologicalSpace P] (U : Set ℂ),
+      IsOpen U
+        → ∀ H : P → ℂ → ℂ,
+          ContinuousOn (fun q : P × ℂ => H q.1 q.2) (Set.univ ×ˢ U)
+            → (∀ p, DifferentiableOn ℂ (H p) U)
+            → ∀ r : ℕ,
+              ContinuousOn (fun q : P × ℂ => iteratedDeriv r (H q.1) q.2) (Set.univ ×ˢ U) := by
   intro P _ U hU H hc hd r
   have hdiff : ∀ (r : ℕ) (p : P), DifferentiableOn ℂ (iteratedDeriv r (H p)) U := by
     intro r p

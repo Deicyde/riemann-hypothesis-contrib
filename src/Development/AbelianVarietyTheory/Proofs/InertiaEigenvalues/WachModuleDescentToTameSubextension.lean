@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLat
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
-theorem GlobalTheory.NL.p9_statement : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), P9 D HW F := by
+theorem GlobalTheory.NL.p9_statement
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW),
+      P9 D HW F := by
   intro D HW F l _ K s LL h T hT hs hl
   have hp : ((D.loc l).PD K).p = l := (D.loc l).PD_p K
   rw [hp] at hl ⊢

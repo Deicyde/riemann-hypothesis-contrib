@@ -11,13 +11,18 @@ namespace Formalism.BasicNotions.Examples₂
 
 open NumberField IsDedekindDomain
 
-theorem norm_le_one_iff_val {F C : Type} [Field F] [NumberField F] [NormedField C] (φ : F →+* C)
-    (w : HeightOneSpectrum (𝓞 F)) (h1 : ∀ x : 𝓞 F, ‖φ (x : F)‖ ≤ 1)
-    (h2 : ∀ x : 𝓞 F, x ∈ w.asIdeal ↔ ‖φ (x : F)‖ < 1) (x : F) : ‖φ x‖ ≤ 1 ↔ w.valuation F x ≤ 1 := by
+theorem norm_le_one_iff_val
+    {F C : Type} [Field F] [NumberField F] [NormedField C]
+    (φ : F →+* C) (w : HeightOneSpectrum (𝓞 F))
+    (h1 : ∀ x : 𝓞 F, ‖φ (x : F)‖ ≤ 1) (h2 : ∀ x : 𝓞 F, x ∈ w.asIdeal ↔ ‖φ (x : F)‖ < 1) (x : F)
+    : ‖φ x‖ ≤ 1 ↔ w.valuation F x ≤ 1 := by
   have hu : ∀ d : 𝓞 F, d ∉ w.asIdeal → ‖φ (d : F)‖ = 1 := fun d hd =>
     le_antisymm (h1 d) (not_lt.mp fun h => hd ((h2 d).mpr h))
-  have key : ∀ y : F, w.valuation F y ≤ 1 → ∃ n : 𝓞 F, ‖φ y‖ = ‖φ (n : F)‖ ∧
-      w.valuation F y = w.valuation F (n : F) := fun y hy => by
+  have key
+      : ∀ y : F,
+        w.valuation F y ≤ 1
+          → ∃ n : 𝓞 F,
+            ‖φ y‖ = ‖φ (n : F)‖ ∧ w.valuation F y = w.valuation F (n : F) := fun y hy => by
     obtain ⟨n, d, h⟩ := w.exists_primeCompl_mul_eq_of_integer y hy
     have hd : w.valuation F (algebraMap (𝓞 F) F d) = 1 := w.valuation_eq_one_iff_notMem.mpr d.2
     refine ⟨n, ?_, ?_⟩
@@ -35,15 +40,18 @@ theorem norm_le_one_iff_val {F C : Type} [Field F] [NumberField F] [NormedField 
     rw [← e1, map_inv₀, norm_inv, inv_lt_one₀ (norm_pos_iff.mpr ((map_ne_zero φ).mpr hx))] at this
     exact absurd h (not_le.mpr this)
   · obtain ⟨n, e1, -⟩ := key x h
-    rw [e1]; exact h1 n
+    rw [e1]
+    exact h1 n
 
-theorem resChar_mem' (D : D7) (w : D.what₂.places.Pl) :
-    ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+theorem resChar_mem' (D : D7) (w : D.what₂.places.Pl)
+    : ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
   have hp := D.what₂.places.resChar_prime w
   have hne : ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) ≠ 0 := Nat.cast_ne_zero.mpr hp.ne_zero
   have h := D.what₂.places.val_resChar w
   rw [D.val_eq w _ hne] at h
-  have h1 : vAdd (D.plEq w) ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) = (D.what₂.places.ramIdx w : ℤ) :=
+  have h1
+      : vAdd (D.plEq w) ((D.what₂.places.resChar w : ℕ) : D.what₂.LL)
+        = (D.what₂.places.ramIdx w : ℤ) :=
     WithTop.coe_injective h
   have h2 : (0 : ℤ) < D.what₂.places.ramIdx w := by exact_mod_cast D.what₂.places.ramIdx_pos w
   rw [← (D.plEq w).valuation_lt_one_iff_mem (K := D.what₂.LL)]
@@ -53,8 +61,8 @@ theorem resChar_mem' (D : D7) (w : D.what₂.places.Pl) :
   unfold vAdd at h1
   omega
 
-theorem mem_intW_iff (D : D7) (w : D.what₂.places.Pl) (x : D.what₂.LL) :
-    x ∈ intW D.what₂.places w ↔ (D.plEq w).valuation D.what₂.LL x ≤ 1 := by
+theorem mem_intW_iff (D : D7) (w : D.what₂.places.Pl) (x : D.what₂.LL)
+    : x ∈ intW D.what₂.places w ↔ (D.plEq w).valuation D.what₂.LL x ≤ 1 := by
   show (0 : WithTop ℤ) ≤ D.what₂.places.val w x ↔ _
   by_cases hx : x = 0
   · subst hx; simp
@@ -62,11 +70,16 @@ theorem mem_intW_iff (D : D7) (w : D.what₂.places.Pl) (x : D.what₂.LL) :
     rw [D.val_eq w x hx, ← WithTop.coe_zero, WithTop.coe_le_coe, vAdd, neg_nonneg]
     conv_rhs => rw [← WithZero.exp_log hv, ← WithZero.exp_zero, WithZero.exp_le_exp]
 
-theorem exists_lamExt {K : Type} [Field K] [NumberField K] (e : K →+* ℂ) {C : Type} [Field C] [IsAlgClosed C]
-    (f : K →+* C) : ∃ lam : (algebraicClosure ℚ ℂ) →+* C, ∀ x : K, ∃ hx : e x ∈ algebraicClosure ℚ ℂ,
+theorem exists_lamExt
+    {K : Type} [Field K] [NumberField K]
+    (e : K →+* ℂ)
+    {C : Type} [Field C] [IsAlgClosed C]
+    (f : K →+* C)
+    : ∃ lam : (algebraicClosure ℚ ℂ) →+* C, ∀ x : K, ∃ hx : e x ∈ algebraicClosure ℚ ℂ,
       f x = lam ⟨e x, hx⟩ := by
   have hmem : ∀ x : K, e x ∈ algebraicClosure ℚ ℂ := fun x =>
-    (mem_algebraicClosure_iff).mpr ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom e.toRatAlgHom)
+    (mem_algebraicClosure_iff).mpr
+      ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom e.toRatAlgHom)
   let j : K →+* algebraicClosure ℚ ℂ := e.codRestrict (algebraicClosure ℚ ℂ).toSubring hmem
   let _ : Algebra K (algebraicClosure ℚ ℂ) := j.toAlgebra
   let _ : Algebra K C := f.toAlgebra
@@ -74,16 +87,15 @@ theorem exists_lamExt {K : Type} [Field K] [NumberField K] (e : K →+* ℂ) {C 
   have : Algebra.IsAlgebraic K (algebraicClosure ℚ ℂ) := Algebra.IsAlgebraic.tower_top (K := ℚ) K
   let l : algebraicClosure ℚ ℂ →ₐ[K] C := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   exact ⟨l.toRingHom, fun x => ⟨hmem x, (l.commutes x).symm⟩⟩
 
-theorem exists_placeEmb (D : D7) (w : D.what₂.places.Pl) [Fact (D.what₂.places.resChar w).Prime] :
-    ∃ (lam : (algebraicClosure ℚ ℂ) →+* ℂ_[D.what₂.places.resChar w])
-      (iL : D.what₂.LL →+* ℂ_[D.what₂.places.resChar w]),
-      (∀ x, ∃ hx : D.what₂.embLL x ∈ algebraicClosure ℚ ℂ, iL x = lam ⟨D.what₂.embLL x, hx⟩) ∧
-      ∀ x, x ∈ intW D.what₂.places w ↔ ‖iL x‖ ≤ 1 := by
+theorem exists_placeEmb (D : D7) (w : D.what₂.places.Pl) [Fact (D.what₂.places.resChar w).Prime]
+    : ∃ (lam : (algebraicClosure ℚ ℂ) →+* ℂ_[D.what₂.places.resChar w])
+        (iL : D.what₂.LL →+* ℂ_[D.what₂.places.resChar w]),
+      (∀ x, ∃ hx : D.what₂.embLL x ∈ algebraicClosure ℚ ℂ, iL x = lam ⟨D.what₂.embLL x, hx⟩)
+        ∧ ∀ x, x ∈ intW D.what₂.places w ↔ ‖iL x‖ ≤ 1 := by
   obtain ⟨φ, hφ⟩ := LB.exists_embAt (l := D.what₂.places.resChar w) (D.plEq w) (resChar_mem' D w)
   let iL := (algebraMap (PadicAlgCl (D.what₂.places.resChar w)) ℂ_[D.what₂.places.resChar w]).comp φ
   have hn : ∀ x, ‖iL x‖ = ‖φ x‖ := fun x => PadicComplex.norm_extends _ (φ x)
@@ -92,8 +104,9 @@ theorem exists_placeEmb (D : D7) (w : D.what₂.places.Pl) [Fact (D.what₂.plac
   rw [mem_intW_iff, hn]
   refine (norm_le_one_iff_val φ _ (fun y => ?_) hφ x).symm
   have hi : IsIntegral ℤ (φ (y : D.what₂.LL)) := (RingOfIntegers.isIntegral_coe y).map φ.toIntAlgHom
-  have h2 := (Valuation.integer.integers (NormedField.valuation (K := PadicAlgCl (D.what₂.places.resChar w)))
-    ).isIntegral_iff_v_le_one.mp hi.tower_top
+  have h2 :=
+    (Valuation.integer.integers (NormedField.valuation
+      (K := PadicAlgCl (D.what₂.places.resChar w)))).isIntegral_iff_v_le_one.mp hi.tower_top
   exact_mod_cast (show ‖φ (y : D.what₂.LL)‖₊ ≤ 1 from h2)
 
 end Formalism.BasicNotions.Examples₂

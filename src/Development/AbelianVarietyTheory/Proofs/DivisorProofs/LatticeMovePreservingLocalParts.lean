@@ -8,23 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsClassFam
 open NumberField IsDedekindDomain
 open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker
 open GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.ColumnNormCompare
-open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields recPrimes recWts recSeam recGlob Twist)
+open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound
+  (recFields recPrimes recWts recSeam recGlob Twist)
 
 namespace GlobalTheory.SemilocalBasis
 
-def awayFrom {R : Type} [CommRing R] [IsDomain R] (SB : Finset (HeightOneSpectrum R)) :
-    Submonoid R where
+def awayFrom {R : Type} [CommRing R] [IsDomain R] (SB : Finset (HeightOneSpectrum R))
+    : Submonoid R where
   carrier := {s | s ≠ 0 ∧ ∀ P ∈ SB, s ∉ P.asIdeal}
   one_mem' := ⟨one_ne_zero, fun P _ h => P.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h)⟩
-  mul_mem' := fun {a b} ha hb => ⟨mul_ne_zero ha.1 hb.1, fun P hP h =>
-    (P.isPrime.mem_or_mem h).elim (ha.2 P hP) (hb.2 P hP)⟩
+  mul_mem' := fun {a b} ha hb =>
+    ⟨mul_ne_zero ha.1 hb.1, fun P hP h => (P.isPrime.mem_or_mem h).elim (ha.2 P hP) (hb.2 P hP)⟩
 
-theorem awayFrom_le {R : Type} [CommRing R] [IsDomain R] (SB : Finset (HeightOneSpectrum R)) :
-    awayFrom SB ≤ nonZeroDivisors R := fun _ h => mem_nonZeroDivisors_of_ne_zero h.1
+theorem awayFrom_le {R : Type} [CommRing R] [IsDomain R] (SB : Finset (HeightOneSpectrum R))
+    : awayFrom SB ≤ nonZeroDivisors R := fun _ h =>
+  mem_nonZeroDivisors_of_ne_zero h.1
 
-theorem isPrincipalIdealRing_awayFrom {R : Type} [CommRing R] [IsDedekindDomain R]
-    (SB : Finset (HeightOneSpectrum R)) (A : Type) [CommRing A] [IsDomain A] [Algebra R A]
-    [IsLocalization (awayFrom SB) A] : IsPrincipalIdealRing A := by
+theorem isPrincipalIdealRing_awayFrom
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (SB : Finset (HeightOneSpectrum R)) (A : Type)
+    [CommRing A] [IsDomain A] [Algebra R A] [IsLocalization (awayFrom SB) A]
+    : IsPrincipalIdealRing A := by
   classical
   haveI : IsDedekindDomain A := IsLocalization.isDedekindDomain R (awayFrom_le SB) A
   apply IsPrincipalIdealRing.of_finite_primes
@@ -42,7 +46,9 @@ theorem isPrincipalIdealRing_awayFrom {R : Type} [CommRing R] [IsDedekindDomain 
   refine ((T.finite_toSet).preimage hinj.injOn).subset ?_
   intro I hI
   have hI' : I.IsPrime := hI
-  have hsub : ((I.comap (algebraMap R A) : Ideal R) : Set R) ⊆ ⋃ i ∈ (T : Set (Ideal R)), ((id i : Ideal R) : Set R) := by
+  have hsub
+      : ((I.comap (algebraMap R A) : Ideal R) : Set R)
+        ⊆ ⋃ i ∈ (T : Set (Ideal R)), ((id i : Ideal R) : Set R) := by
     intro s hs
     by_contra hn
     simp only [Set.mem_iUnion, not_exists, id] at hn
@@ -59,11 +65,14 @@ theorem isPrincipalIdealRing_awayFrom {R : Type} [CommRing R] [IsDedekindDomain 
     rw [hmax.eq_of_le (hT Q hQ).ne_top hle]
     exact hQ
 
-theorem exists_basis {R : Type} [CommRing R] [IsDedekindDomain R] (K : Type) [Field K]
-    [Algebra R K] [IsFractionRing R K] (n : ℕ) (SB : Finset (HeightOneSpectrum R))
-    (N : Submodule R (Fin n → K)) (hN : Submodule.IsFullLattice K N) :
-    ∃ v : Module.Basis (Fin n) K (Fin n → K), (∀ i, v i ∈ N) ∧
-      ∀ x ∈ N, ∃ s ∈ awayFrom SB, s • x ∈ Submodule.span R (Set.range v) := by
+theorem exists_basis
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (K : Type) [Field K] [Algebra R K] [IsFractionRing R K]
+    (n : ℕ)
+    (SB : Finset (HeightOneSpectrum R))
+    (N : Submodule R (Fin n → K)) (hN : Submodule.IsFullLattice K N)
+    : ∃ v : Module.Basis (Fin n) K (Fin n → K),
+      (∀ i, v i ∈ N) ∧ ∀ x ∈ N, ∃ s ∈ awayFrom SB, s • x ∈ Submodule.span R (Set.range v) := by
   classical
   let A : Subalgebra R K := Localization.subalgebra K (awayFrom SB) (awayFrom_le SB)
   haveI : IsLocalization (awayFrom SB) A :=
@@ -72,8 +81,9 @@ theorem exists_basis {R : Type} [CommRing R] [IsDedekindDomain R] (K : Type) [Fi
   haveI : IsFractionRing A K :=
     IsFractionRing.isFractionRing_of_isDomain_of_isLocalization (awayFrom SB) A K
 
-  have clear : ∀ (X : Set (Fin n → K)) (x : Fin n → K), x ∈ Submodule.span A X →
-      ∃ s ∈ awayFrom SB, s • x ∈ Submodule.span R X := by
+  have clear
+      : ∀ (X : Set (Fin n → K)) (x : Fin n → K),
+        x ∈ Submodule.span A X → ∃ s ∈ awayFrom SB, s • x ∈ Submodule.span R X := by
     intro X x hx
     induction hx using Submodule.span_induction with
     | mem x hx => exact ⟨1, one_mem _, by simpa using Submodule.subset_span hx⟩
@@ -109,7 +119,8 @@ theorem exists_basis {R : Type} [CommRing R] [IsDedekindDomain R] (K : Type) [Fi
   haveI : Module.Free A M := Submodule.IsLattice.free K M
   haveI : Module.Finite A M := Module.Finite.iff_fg.2 hM.fg
   have hrk : Module.finrank A M = n := by
-    simpa using ((Submodule.IsFullLattice.finrank_eq K M).trans (Module.finrank_fintype_fun_eq_card K))
+    simpa using
+      ((Submodule.IsFullLattice.finrank_eq K M).trans (Module.finrank_fintype_fun_eq_card K))
   let b : Module.Basis (Fin n) A M := Module.finBasisOfFinrankEq A M hrk
   have hb : ∀ i, ∃ s ∈ awayFrom SB, s • (b i : Fin n → K) ∈ N := by
     intro i
@@ -117,7 +128,9 @@ theorem exists_basis {R : Type} [CommRing R] [IsDedekindDomain R] (K : Type) [Fi
     exact ⟨s, hs, by simpa using h⟩
   choose s hs hsb using hb
   let b' : Module.Basis (Fin n) A M :=
-    b.isUnitSMul (w := fun i => algebraMap R A (s i)) (fun i => IsLocalization.map_units A ⟨s i, hs i⟩)
+    b.isUnitSMul
+      (w := fun i => algebraMap R A (s i))
+      (fun i => IsLocalization.map_units A ⟨s i, hs i⟩)
   have hb' : ∀ i, (b' i : Fin n → K) = s i • (b i : Fin n → K) := by
     intro i
     simp only [b', Module.Basis.isUnitSMul_apply, Submodule.coe_smul, algebraMap_smul]
@@ -136,12 +149,16 @@ theorem exists_basis {R : Type} [CommRing R] [IsDedekindDomain R] (K : Type) [Fi
     refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, ?_⟩)
     rw [Module.Basis.extendOfIsFullLattice_apply]
 
-theorem mem_localization_iff {R : Type} [CommRing R] {W : Type} [AddCommGroup W] [Module R W]
-    (p : Ideal R) [p.IsPrime] (L : Submodule R W) (x : W) :
-    x ∈ Formalism.HermitianLatticesTheory.localization₂ p L ↔ ∃ s, s ∉ p ∧ s • x ∈ L := Iff.rfl
+theorem mem_localization_iff
+    {R : Type} [CommRing R]
+    {W : Type} [AddCommGroup W] [Module R W]
+    (p : Ideal R) [p.IsPrime]
+    (L : Submodule R W) (x : W)
+    : x ∈ Formalism.HermitianLatticesTheory.localization₂ p L ↔ ∃ s, s ∉ p ∧ s • x ∈ L :=
+  Iff.rfl
 
-theorem stdLat_eq_span (E : Type) [Field E] (n : ℕ) :
-    Formalism.L2.Col.stdLat E n = Submodule.span (𝓞 E) (Set.range (Pi.basisFun E (Fin n))) := by
+theorem stdLat_eq_span (E : Type) [Field E] (n : ℕ)
+    : Formalism.L2.Col.stdLat E n = Submodule.span (𝓞 E) (Set.range (Pi.basisFun E (Fin n))) := by
   classical
   apply le_antisymm
   · intro x hx
@@ -162,18 +179,24 @@ theorem stdLat_eq_span (E : Type) [Field E] (n : ℕ) :
       exact Submodule.mem_one.2 ⟨1, by simp⟩
     · exact Submodule.mem_one.2 ⟨0, by simp [h]⟩
 
-theorem exists_equiv (E : Type) [Field E] [NumberField E] (n : ℕ)
-    (SB : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (𝓞 E) (Sp E n))
-    (hN : Submodule.IsFullLattice E N) :
-    ∃ γ : Sp E n ≃ₗ[E] Sp E n, (∀ x ∈ Formalism.L2.Col.stdLat E n, γ x ∈ N) ∧
-      ∀ P ∈ SB, ∀ x, γ x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N ↔
-        x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Formalism.L2.Col.stdLat E n) := by
+theorem exists_equiv
+    (E : Type) [Field E] [NumberField E]
+    (n : ℕ)
+    (SB : Finset (HeightOneSpectrum (𝓞 E)))
+    (N : Submodule (𝓞 E) (Sp E n)) (hN : Submodule.IsFullLattice E N)
+    : ∃ γ : Sp E n ≃ₗ[E] Sp E n,
+      (∀ x ∈ Formalism.L2.Col.stdLat E n, γ x ∈ N)
+        ∧ ∀ P ∈ SB, ∀ x,
+          γ x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N
+            ↔ x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+              (Formalism.L2.Col.stdLat E n) := by
   obtain ⟨v, hv, hgen⟩ := exists_basis E n SB N hN
   let γ : Sp E n ≃ₗ[E] Sp E n := (Pi.basisFun E (Fin n)).equiv v (Equiv.refl _)
   have key : ∀ x, x ∈ Formalism.L2.Col.stdLat E n ↔ γ x ∈ Submodule.span (𝓞 E) (Set.range v) := by
     intro x
-    have hmap : (Formalism.L2.Col.stdLat E n).map ((γ.restrictScalars (𝓞 E)) : Sp E n →ₗ[𝓞 E] Sp E n)
-        = Submodule.span (𝓞 E) (Set.range v) := by
+    have hmap
+        : (Formalism.L2.Col.stdLat E n).map ((γ.restrictScalars (𝓞 E)) : Sp E n →ₗ[𝓞 E] Sp E n)
+          = Submodule.span (𝓞 E) (Set.range v) := by
       rw [stdLat_eq_span, Submodule.map_span, ← Set.range_comp]
       congr 2
       funext i
@@ -189,8 +212,7 @@ theorem exists_equiv (E : Type) [Field E] [NumberField E] (n : ℕ)
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     exact hv i
-  have hsm : ∀ (s : 𝓞 E) x, γ (s • x) = s • γ x := fun s x =>
-    (γ.restrictScalars (𝓞 E)).map_smul s x
+  have hsm : ∀ (s : 𝓞 E) x, γ (s • x) = s • γ x := fun s x => (γ.restrictScalars (𝓞 E)).map_smul s x
   refine ⟨γ, fun x hx => hle ((key x).1 hx), fun P hP x => ?_⟩
   rw [mem_localization_iff, mem_localization_iff]
   constructor

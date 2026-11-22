@@ -23,14 +23,13 @@ section Val
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) :=
-  V.v.map_lt_add ha hb
+theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) := V.v.map_lt_add ha hb
 
-theorem mm_neg {a : C} (ha : V.MM a) : V.MM (-a) := by
-  unfold VF.MM; rw [V.v.map_neg]; exact ha
+theorem mm_neg {a : C} (ha : V.MM a) : V.MM (-a) := by unfold VF.MM; rw [V.v.map_neg]; exact ha
 
 theorem mm_mul {a b : C} (ha : V.MM a) (hb : V.Ge 0 b) : V.MM (a * b) := by
-  unfold VF.MM; rw [V.v.map_mul]
+  unfold VF.MM
+  rw [V.v.map_mul]
   have hb' : (0 : WithTop ℝ) ≤ V.v b := by simpa [VF.Ge] using hb
   exact lt_of_lt_of_le ha (le_add_of_nonneg_right hb')
 
@@ -41,14 +40,12 @@ theorem mm_or {a b : C} (h : V.MM (a * b)) : V.MM a ∨ V.MM b := by
   rw [not_or, not_lt, not_lt] at hc
   exact absurd h (not_lt.mpr (add_nonpos hc.1 hc.2))
 
-theorem not_mm_one : ¬ V.MM (1 : C) := by
-  unfold VF.MM; rw [V.v.map_one]; exact lt_irrefl _
+theorem not_mm_one : ¬ V.MM (1 : C) := by unfold VF.MM; rw [V.v.map_one]; exact lt_irrefl _
 
-theorem mm_l : V.MM (V.l : C) := by
-  unfold VF.MM; rw [V.v_l]; exact zero_lt_one
+theorem mm_l : V.MM (V.l : C) := by unfold VF.MM; rw [V.v_l]; exact zero_lt_one
 
-theorem mm_pow_sub {a b : C} (h : V.MM (a - b)) (ha : V.Ge 0 a) (hb : V.Ge 0 b) (n : ℕ) :
-    V.MM (a ^ n - b ^ n) := by
+theorem mm_pow_sub {a b : C} (h : V.MM (a - b)) (ha : V.Ge 0 a) (hb : V.Ge 0 b) (n : ℕ)
+    : V.MM (a ^ n - b ^ n) := by
   induction n with
   | zero => simp [VF.MM]
   | succ n ih =>
@@ -105,29 +102,38 @@ theorem exists_lower_vec (v : κ → C) : ∃ b : ℕ, ∀ i, V.Ge (-(b : ℝ)) 
   linarith
 
 omit [DecidableEq κ] in
-theorem ge_mulVec {M : Matrix κ κ C} (hM : ∀ i j, V.Ge 0 (M i j)) {v : κ → C} {w : ℝ}
-    (hv : ∀ i, V.Ge w (v i)) (i : κ) : V.Ge w (M.mulVec v i) :=
+theorem ge_mulVec
+    {M : Matrix κ κ C} (hM : ∀ i j, V.Ge 0 (M i j))
+    {v : κ → C} {w : ℝ} (hv : ∀ i, V.Ge w (v i))
+    (i : κ)
+    : V.Ge w (M.mulVec v i) :=
   VF.Ge.sum fun j _ => (hM i j).mul_int (hv j)
 
-theorem ge_pow_mulVec {M : Matrix κ κ C} (hM : ∀ i j, V.Ge 0 (M i j)) {v : κ → C} {w : ℝ}
-    (hv : ∀ i, V.Ge w (v i)) (k : ℕ) : ∀ i, V.Ge w ((M ^ k).mulVec v i) := by
+theorem ge_pow_mulVec
+    {M : Matrix κ κ C} (hM : ∀ i j, V.Ge 0 (M i j))
+    {v : κ → C} {w : ℝ} (hv : ∀ i, V.Ge w (v i))
+    (k : ℕ)
+    : ∀ i, V.Ge w ((M ^ k).mulVec v i) := by
   induction k with
   | zero => simpa using hv
   | succ k ih => rw [pow_succ', ← Matrix.mulVec_mulVec]; exact ge_mulVec hM ih
 
 omit [DecidableEq κ] in
-theorem uniform {P : κ → ℕ → Prop} (h : ∀ i, ∃ n0 : ℕ, ∀ n ≥ n0, P i n) :
-    ∃ n0 : ℕ, ∀ n ≥ n0, ∀ i, P i n := by
+theorem uniform {P : κ → ℕ → Prop} (h : ∀ i, ∃ n0 : ℕ, ∀ n ≥ n0, P i n)
+    : ∃ n0 : ℕ, ∀ n ≥ n0, ∀ i, P i n := by
   choose b hb using h
   refine ⟨∑ i, b i, fun n hn i => hb i n (le_trans ?_ hn)⟩
   exact Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)
 
 end Val
 
-theorem frob_iter {C : Type} [Field C] {V : VF C} {O : Type} [CommRing O] {d : ℕ}
-    (em : ZMod d → (O →+* C)) (h0 : ∀ a x, V.Ge 0 (em a x))
-    (h1 : ∀ a x, V.MM (em (a + 1) x - em a x ^ V.l)) (a : ZMod d) (x : O) (n : ℕ) :
-    V.MM (em (a + n) x - em a x ^ (V.l ^ n)) := by
+theorem frob_iter
+    {C : Type} [Field C]
+    {V : VF C} {O : Type} [CommRing O]
+    {d : ℕ} (em : ZMod d → (O →+* C)) (h0 : ∀ a x, V.Ge 0 (em a x))
+    (h1 : ∀ a x, V.MM (em (a + 1) x - em a x ^ V.l)) (a : ZMod d)
+    (x : O) (n : ℕ)
+    : V.MM (em (a + n) x - em a x ^ (V.l ^ n)) := by
   induction n with
   | zero => simp [VF.MM]
   | succ n ih =>
@@ -137,7 +143,20 @@ theorem frob_iter {C : Type} [Field C] {V : VF C} {O : Type} [CommRing O] {d : �
     push_cast
     rwa [← add_assoc]
 
-theorem limit_idempotent_range : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : VF C) (O : Type) [CommRing O] (κ : Type) [Fintype κ] [DecidableEq κ] (L : O →+* Matrix κ κ C), (∀ x i j, V.Ge 0 (L x i j)) → ∀ (d : ℕ) [NeZero d] (em : ZMod d → (O →+* C)), (∀ a x, V.Ge 0 (em a x)) → (∀ a x, V.MM (em (a + 1) x - em a x ^ V.l)) → ∀ ε : O, (∃ y, ε * ε - ε = (V.l : O) * y) → (∀ x : O, (∀ a, V.MM (em a x)) → ∃ y, ε * x = (V.l : O) * y) → ∀ E : Matrix κ κ C, (∀ (N : ℕ) (v : κ → C) i, ∃ n0 : ℕ, ∀ n ≥ n0, V.Ge N (E.mulVec v i - (L (ε ^ (V.l ^ n))).mulVec v i)) → ∀ v : κ → C, ∃ w : ZMod d → κ → C, (∀ a x, (L x).mulVec (w a) = em a x • w a) ∧ E.mulVec v = ∑ a, w a := by
+theorem limit_idempotent_range
+    : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : VF C) (O : Type) [CommRing O] (κ : Type)
+        [Fintype κ] [DecidableEq κ] (L : O →+* Matrix κ κ C),
+      (∀ x i j, V.Ge 0 (L x i j))
+        → ∀ (d : ℕ) [NeZero d] (em : ZMod d → (O →+* C)),
+          (∀ a x, V.Ge 0 (em a x)) → (∀ a x, V.MM (em (a + 1) x - em a x ^ V.l))
+            → ∀ ε : O,
+              (∃ y, ε * ε - ε = (V.l : O) * y)
+                → (∀ x : O, (∀ a, V.MM (em a x)) → ∃ y, ε * x = (V.l : O) * y)
+                → ∀ E : Matrix κ κ C,
+                  (∀ (N : ℕ) (v : κ → C) i, ∃ n0 : ℕ, ∀ n ≥ n0,
+                      V.Ge N (E.mulVec v i - (L (ε ^ (V.l ^ n))).mulVec v i))
+                    → ∀ v : κ → C, ∃ w : ZMod d → κ → C,
+                      (∀ a x, (L x).mulVec (w a) = em a x • w a) ∧ E.mulVec v = ∑ a, w a := by
   intro C _ _ V O _ κ _ _ L hL d _ em h0 h1 ε hε hP E hE v
   have hd : 0 < d := Nat.pos_of_ne_zero (NeZero.ne d)
   have hF : ∀ x : O, ∃ y, ε * (x ^ (V.l ^ d) - x) = (V.l : O) * y := by
@@ -146,15 +165,17 @@ theorem limit_idempotent_range : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : V
     intro a
     have := mm_neg (frob_iter em h0 h1 a x d)
     simpa using this
-  have hzero : ∃ w : ZMod d → κ → C, (∀ a x, (L x).mulVec (w a) = em a x • w a) ∧
-      (0 : κ → C) = ∑ a, w a := ⟨0, by simp, by simp⟩
-  have htop := Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
-    (fun x : O => Matrix.toLin' (L x))
-    (fun x y _ => by
-      show Matrix.toLin' (L x) * Matrix.toLin' (L y) = Matrix.toLin' (L y) * Matrix.toLin' (L x)
-      rw [Module.End.mul_eq_comp, Module.End.mul_eq_comp, ← Matrix.toLin'_mul,
-        ← Matrix.toLin'_mul, ← map_mul, ← map_mul, mul_comm])
-    (fun x => Module.End.iSup_maxGenEigenspace_eq_top _)
+  have hzero
+      : ∃ w : ZMod d → κ → C, (∀ a x, (L x).mulVec (w a) = em a x • w a) ∧ (0 : κ → C) = ∑ a, w a :=
+    ⟨0, by simp, by simp⟩
+  have htop :=
+    Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
+      (fun x : O => Matrix.toLin' (L x))
+      (fun x y _ => by
+        show Matrix.toLin' (L x) * Matrix.toLin' (L y) = Matrix.toLin' (L y) * Matrix.toLin' (L x)
+        rw [Module.End.mul_eq_comp, Module.End.mul_eq_comp, ← Matrix.toLin'_mul,
+          ← Matrix.toLin'_mul, ← map_mul, ← map_mul, mul_comm])
+      (fun x => Module.End.iSup_maxGenEigenspace_eq_top _)
   have hv : v ∈ ⨆ χ : O → C, ⨅ x, Module.End.maxGenEigenspace (Matrix.toLin' (L x)) (χ x) := by
     rw [htop]; trivial
   induction hv using Submodule.iSup_induction' with
@@ -176,12 +197,13 @@ theorem limit_idempotent_range : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : V
       exact hk
     by_cases hv0 : v = 0
     · subst hv0; simpa using hzero
-    obtain ⟨ψ, hψχ, hψ⟩ := GlobalTheory.T.exists_integral_character_generalizedEigen C V O κ L hL χ v hv0 hgen
+    obtain ⟨ψ, hψχ, hψ⟩ :=
+      GlobalTheory.T.exists_integral_character_generalizedEigen C V O κ L hL χ v hv0 hgen
     by_cases hw0 : E.mulVec v = 0
     · rw [hw0]; exact hzero
     set w := E.mulVec v with hwdef
-    have hEu : ∀ N : ℕ, ∃ n0 : ℕ, ∀ n ≥ n0, ∀ i,
-        V.Ge N (w i - (L (ε ^ (V.l ^ n))).mulVec v i) := fun N => uniform (hE N v)
+    have hEu : ∀ N : ℕ, ∃ n0 : ℕ, ∀ n ≥ n0, ∀ i, V.Ge N (w i - (L (ε ^ (V.l ^ n))).mulVec v i) :=
+      fun N => uniform (hE N v)
     have hgenw : ∀ x, ∃ k : ℕ, ((L x - ψ x • (1 : Matrix κ κ C)) ^ k).mulVec w = 0 := by
       intro x
       obtain ⟨k, hk⟩ := hgen x
@@ -192,16 +214,17 @@ theorem limit_idempotent_range : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : V
         intro i j
         rw [Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
         refine (hL x i j).sub ((hψ x).mul_int ?_)
-        rw [← map_one L]; exact hL 1 i j
+        rw [← map_one L]
+        exact hL 1 i j
       have hc : Commute (L x - ψ x • (1 : Matrix κ κ C)) (L (ε ^ (V.l ^ n))) := by
         refine Commute.sub_left ((Commute.all _ _).map L) ?_
         exact (Commute.one_left _).smul_left _
       have h2 := ge_pow_mulVec hint (v := w - (L (ε ^ (V.l ^ n))).mulVec v) (hn n le_rfl) k i
-      rw [Matrix.mulVec_sub, Matrix.mulVec_mulVec v _ (L _), (hc.pow_left k).eq, ← Matrix.mulVec_mulVec, hk,
-        Matrix.mulVec_zero, sub_zero] at h2
+      rw [Matrix.mulVec_sub, Matrix.mulVec_mulVec v _ (L _), (hc.pow_left k).eq,
+          ← Matrix.mulVec_mulVec, hk, Matrix.mulVec_zero, sub_zero]
+        at h2
       exact h2
-    have hfix : ∀ (N : ℕ) i, ∃ n0 : ℕ, ∀ n ≥ n0,
-        V.Ge N (w i - (L (ε ^ (V.l ^ n))).mulVec w i) := by
+    have hfix : ∀ (N : ℕ) i, ∃ n0 : ℕ, ∀ n ≥ n0, V.Ge N (w i - (L (ε ^ (V.l ^ n))).mulVec w i) := by
       intro N i
       obtain ⟨n0, hn0⟩ := hEu N
       obtain ⟨b, hb⟩ := exists_lower_vec (V := V) v
@@ -219,13 +242,16 @@ theorem limit_idempotent_range : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : V
           ← Nat.cast_smul_eq_nsmul C, Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul, Nat.cast_pow]
         refine ((ge_l_pow (n + 1)).mul (ge_mulVec (hL z) hb i)).mono ?_
         have : (N : ℝ) + b ≤ n := by exact_mod_cast hn2
-        push_cast; linarith
+        push_cast
+        linarith
       have h3 := (hA.sub hB).sub hC
       convert h3 using 1
       simp only [map_sub, map_mul, Matrix.mulVec_sub, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec,
         Pi.sub_apply]
       ring
-    have heig := GlobalTheory.T.eigenvector_of_generalized_eigen_unramified C V O κ L hL d hd ε hε hF ψ w hψ hgenw hfix
+    have heig :=
+      GlobalTheory.T.eigenvector_of_generalized_eigen_unramified C V O κ L hL d hd ε hε hF ψ w hψ
+        hgenw hfix
     have hnot : ¬ V.MM (ψ ε) := by
       intro hm
       apply hw0
@@ -248,10 +274,13 @@ theorem limit_idempotent_range : ∀ (C : Type) [Field C] [IsAlgClosed C] (V : V
       obtain ⟨y, hy⟩ := hε
       have := hl (ε - 1) y (by rw [← hy]; ring)
       simpa using this
-    obtain ⟨a, ha⟩ := GlobalTheory.T.exists_embedding_congr_integral_character C V O d em h0 h1 ψ hψ fun x hx => by
-      obtain ⟨y, hy⟩ := hP x hx
-      exact hl x y hy
-    have hψa := GlobalTheory.T.ringHom_eq_of_congruent_integral_unramified C V O d hd ε hε hF ψ (em a) hψ (h0 a) hone ha
+    obtain ⟨a, ha⟩ :=
+      GlobalTheory.T.exists_embedding_congr_integral_character C V O d em h0 h1 ψ hψ fun x hx => by
+        obtain ⟨y, hy⟩ := hP x hx
+        exact hl x y hy
+    have hψa :=
+      GlobalTheory.T.ringHom_eq_of_congruent_integral_unramified C V O d hd ε hε hF ψ (em a) hψ
+        (h0 a) hone ha
     refine ⟨Pi.single a w, fun b x => ?_, by simp⟩
     by_cases hb : b = a
     · subst hb; rw [Pi.single_eq_same, heig, hψa]

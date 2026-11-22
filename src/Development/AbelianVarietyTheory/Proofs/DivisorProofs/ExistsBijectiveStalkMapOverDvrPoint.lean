@@ -9,9 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StalkMapInje
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -25,10 +27,13 @@ noncomputable section
 
 namespace GlobalTheory.CompHS.Modif
 
-theorem exists_bijective_stalkMap_of_dvr : ∀ (F : Type) [Field F] (Y : Scheme.{0}) [IsIntegral Y] (p : Y ⟶ Sp F)
-    (U : Y.Opens) (d : ℕ) (M : Modif p U d), IsProjOver p → (U : Set Y).Nonempty → ∀ y : Y,
-      IsDiscreteValuationRing (Y.presheaf.stalk y) →
-      ∃ x : M.X, M.σ x = y ∧ Function.Bijective (M.σ.stalkMap x).hom := by
+theorem exists_bijective_stalkMap_of_dvr
+    : ∀ (F : Type) [Field F] (Y : Scheme.{0}) [IsIntegral Y] (p : Y ⟶ Sp F) (U : Y.Opens) (d : ℕ)
+        (M : Modif p U d),
+      IsProjOver p → (U : Set Y).Nonempty
+        → ∀ y : Y,
+          IsDiscreteValuationRing (Y.presheaf.stalk y)
+            → ∃ x : M.X, M.σ x = y ∧ Function.Bijective (M.σ.stalkMap x).hom := by
   intro F _ Y _ p U d M hp hU y hR
   have hprop : ∀ {Z : Scheme.{0}} {s : Z ⟶ Sp F}, IsProjOver s → IsProper s := by
     intro Z s hs
@@ -77,8 +82,9 @@ theorem exists_bijective_stalkMap_of_dvr : ∀ (F : Type) [Field F] (Y : Scheme.
     have h : UniversallyClosed M.σ := inferInstance
     rw [UniversallyClosed.eq_valuativeCriterion] at h
     exact h.1
-  obtain ⟨⟨L⟩⟩ := hE (@ValuativeCommSq.mk _ _ M.σ R inferInstance ‹IsDomain R› inferInstance K inferInstance
-    inferInstance inferInstance i₁ i₂ ⟨hi₁⟩)
+  obtain ⟨⟨L⟩⟩ :=
+    hE (@ValuativeCommSq.mk _ _ M.σ R inferInstance ‹IsDomain R› inferInstance K inferInstance
+      inferInstance inferInstance i₁ i₂ ⟨hi₁⟩)
   let c := IsLocalRing.closedPoint R
   have hfr : L.l ≫ M.σ = i₂ := L.fac_right
   refine ⟨L.l c, ?_, ?_⟩
@@ -95,14 +101,17 @@ theorem exists_bijective_stalkMap_of_dvr : ∀ (F : Type) [Field F] (Y : Scheme.
     exact ConcreteCategory.bijective_of_isIso _
   have hb := key _ hfr
   have e₀ := Scheme.Hom.stalkMap_comp L.l M.σ c
-  have hb2 : Function.Bijective (M.σ.stalkMap (L.l c) ≫ L.l.stalkMap c).hom := by rw [← e₀]; exact hb
+  have hb2 : Function.Bijective (M.σ.stalkMap (L.l c) ≫ L.l.stalkMap c).hom := by
+    rw [← e₀]; exact hb
   replace hb : Function.Bijective ((L.l.stalkMap c).hom ∘ (M.σ.stalkMap (L.l c)).hom) := hb2
 
   let t := genericPoint (Spec R)
-  have ht : ∀ u : Spec R, t ⤳ u := fun u => (genericPoint_spec (Spec R)).specializes (Set.mem_univ u)
+  have ht : ∀ u : Spec R, t ⤳ u := fun u =>
+    (genericPoint_spec (Spec R)).specializes (Set.mem_univ u)
   have hσt : M.σ (L.l t) = η := by
     show (L.l ≫ M.σ) t = η
-    rw [hfr]; exact hgen t ht
+    rw [hfr]
+    exact hgen t ht
   have hσg : M.σ (genericPoint M.X) = η := by
     have h1 : M.σ (genericPoint M.X) ⤳ η :=
       hσt ▸ ((genericPoint_spec M.X).specializes (Set.mem_univ (L.l t))).map M.σ.continuous
@@ -127,12 +136,15 @@ theorem exists_bijective_stalkMap_of_dvr : ∀ (F : Type) [Field F] (Y : Scheme.
     have i2 : Function.Injective (M.X.presheaf.stalkSpecializes (hsp.map L.l.continuous)).hom := by
       refine (injective_iff_map_eq_zero _).2 fun a ha => ?_
       obtain ⟨V, hV, f, rfl⟩ := M.X.presheaf.germ_exist a
-      have e := congrArg (fun φ => φ.hom f) (M.X.presheaf.germ_stalkSpecializes hV (hsp.map L.l.continuous))
+      have e :=
+        congrArg (fun φ => φ.hom f) (M.X.presheaf.germ_stalkSpecializes hV (hsp.map L.l.continuous))
       simp only [CommRingCat.hom_comp, RingHom.comp_apply] at e
       rw [e] at ha
       rw [germ_injective_of_isIntegral M.X _ _ (ha.trans (map_zero _).symm), map_zero]
-    have i3 : Function.Injective (((Spec R).presheaf.stalkSpecializes hsp).hom ∘ (L.l.stalkMap c).hom) := by
-      have h4 : Function.Injective (M.X.presheaf.stalkSpecializes (hsp.map L.l.continuous) ≫ L.l.stalkMap t).hom :=
+    have i3 : Function.Injective
+        (((Spec R).presheaf.stalkSpecializes hsp).hom ∘ (L.l.stalkMap c).hom) := by
+      have h4 : Function.Injective
+          (M.X.presheaf.stalkSpecializes (hsp.map L.l.continuous) ≫ L.l.stalkMap t).hom :=
         i1.comp i2
       rw [nat] at h4
       exact h4

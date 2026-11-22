@@ -18,8 +18,8 @@ def PowSpanFinrankBounded.Statement : Prop :=
 
 def PrincipalReductionOfBoundedGens.Statement : Prop :=
   ∀ (A : Type u) [CommRing A] [IsLocalRing A] [IsNoetherianRing A] (I : Ideal A),
-    (∃ e : ℕ, ∀ n : ℕ, (I ^ n).spanFinrank ≤ e) →
-      ∃ k : ℕ, 1 ≤ k ∧ ∃ y ∈ I ^ k, ∃ n : ℕ, I ^ (n + k) = Ideal.span {y} * I ^ n
+    (∃ e : ℕ, ∀ n : ℕ, (I ^ n).spanFinrank ≤ e)
+      → ∃ k : ℕ, 1 ≤ k ∧ ∃ y ∈ I ^ k, ∃ n : ℕ, I ^ (n + k) = Ideal.span {y} * I ^ n
 
 end Lemmas
 

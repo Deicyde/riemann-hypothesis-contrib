@@ -62,133 +62,75 @@ def GammaProduct : Prop :=
   ∀ (K : Type) [Field K] [Fintype K] (k : ℕ),
     Nat.card (GL (Fin k) K) = Nat.card (upUniG K k) * ∏ i ∈ Icc 1 k, (Fintype.card K ^ i - 1)
 
-def PrimeTail : Prop :=
-  ∀ (s N : ℕ), 2 ≤ s → ∑ l ∈ Icc 2 N, ((l : ℝ) ^ s)⁻¹ ≤ 3 * ((2 : ℝ) ^ s)⁻¹
+def PrimeTail : Prop := ∀ (s N : ℕ), 2 ≤ s → ∑ l ∈ Icc 2 N, ((l : ℝ) ^ s)⁻¹ ≤ 3 * ((2 : ℝ) ^ s)⁻¹
 
 def lead {A : Type} [CommRing A] {r : ℕ} (M : Matrix (Fin r) (Fin r) A) (l : ℕ) (hl : l ≤ r) : A :=
   (M.submatrix (Fin.castLE hl) (Fin.castLE hl)).det
 
 def LDUExists : Prop :=
   ∀ (A : Type) [CommRing A] (r : ℕ) (M : Matrix (Fin r) (Fin r) A),
-    (∀ (l : ℕ) (hl : l < r), IsUnit (lead M l hl.le)) →
-    ∃ (L U : Matrix (Fin r) (Fin r) A) (d : Fin r → A), IsLowUni L ∧ IsUpUni U ∧
-      M = L * Matrix.diagonal d * U ∧
-      ∀ (l : ℕ) (hl : l < r), lead M (l + 1) hl = d ⟨l, hl⟩ * lead M l hl.le
+    (∀ (l : ℕ) (hl : l < r), IsUnit (lead M l hl.le))
+      → ∃ (L U : Matrix (Fin r) (Fin r) A) (d : Fin r → A),
+        IsLowUni L ∧ IsUpUni U ∧ M = L * Matrix.diagonal d * U
+          ∧ ∀ (l : ℕ) (hl : l < r), lead M (l + 1) hl = d ⟨l, hl⟩ * lead M l hl.le
 
 structure MassData (P : Type) where
-
   g : P → ℝ
-
   glk : P → ℝ
-
   uk : P → ℝ
-
   nn : P → ℝ
-
   gg : P → ℝ
-
   μKp : P → ℝ
-
   μKnatp : P → ℝ
-
   μKppp : P → ℝ
-
   μSp : P → ℝ
-
   μSp' : P → ℝ
-
   μSppp : P → ℝ
-
   μSppp' : P → ℝ
-
   Mp : P → ℝ
-
   localVolumeAtPlace : P → ℝ
-
   μKo : ℝ
-
   μSo : ℝ
-
   μSo' : ℝ
-
   Mo : ℝ
-
   localVolumeArchimedean : ℝ
-
   μH : ℝ
-
   μH' : ℝ
-
   μHpp : ℝ
-
   μHpp' : ℝ
-
   μN : ℝ
-
   μN' : ℝ
-
   volZZ : ℝ
-
   volPP : ℝ
-
   al : ℝ
-
   volG : ℝ
-
   volHa : ℝ
-
   volHa' : ℝ
-
   volNa : ℝ
-
   volNa' : ℝ
-
   volB : ℝ
-
   volH : ℝ
-
   volH' : ℝ
-
   volN : ℝ
-
   volN' : ℝ
-
   Coo : ℝ
-
   deg : ℝ
-
   dimπ : ℝ
-
   dimπ' : ℝ
-
   ρ0 : ℝ
-
   ρ0' : ℝ
-
   d : ℝ
-
   d' : ℝ
-
   n0c : ℝ
-
   supdens : ℝ
-
   e1 : ℝ
-
   δ : ℝ
-
   Kgs2 : ℝ
-
   KV : ℝ
-
   Sig : ℝ
-
   KtopV : ℝ
-
   IntN : ℝ
-
   IntC : ℝ
-
   IntOO : ℝ
 
 namespace MassData
@@ -232,14 +174,15 @@ noncomputable def GS : ℝ := B.tt * (B.d / B.dimπ) * B.KV
 noncomputable def Smod : ℝ := B.c0 * B.c0' * B.KtopV
 
 def Pos : Prop :=
-  (∀ p, 0 < B.g p ∧ 0 < B.glk p ∧ 0 < B.uk p ∧ 0 < B.nn p ∧ 0 < B.gg p ∧ 0 < B.μKp p ∧
-    0 < B.μKnatp p ∧ 0 < B.μKppp p ∧ 0 < B.μSp p ∧ 0 < B.μSp' p ∧ 0 < B.μSppp p ∧ 0 < B.μSppp' p ∧
-    0 < B.Mp p ∧ 0 < B.localVolumeAtPlace p) ∧
-  0 < B.μKo ∧ 0 < B.μSo ∧ 0 < B.μSo' ∧ 0 < B.Mo ∧ 0 < B.localVolumeArchimedean ∧ 0 < B.μH ∧ 0 < B.μH' ∧
-  0 < B.μHpp ∧ 0 < B.μHpp' ∧ 0 < B.μN ∧ 0 < B.μN' ∧ 0 < B.volZZ ∧ 0 < B.volPP ∧ 0 < B.al ∧ 0 < B.volG ∧
-  0 < B.volHa ∧ 0 < B.volHa' ∧ 0 < B.volNa ∧ 0 < B.volNa' ∧ 0 < B.volB ∧ 0 < B.volH ∧
-  0 < B.volH' ∧ 0 < B.volN ∧ 0 < B.volN' ∧ 0 < B.Coo ∧ 0 < B.deg ∧ 0 < B.dimπ ∧ 0 < B.dimπ' ∧
-  0 < B.ρ0 ∧ 0 < B.ρ0' ∧ 0 < B.d ∧ 0 < B.d' ∧ 0 < B.n0c ∧ 0 ≤ B.supdens ∧ 0 ≤ B.δ
+  (∀ p,
+      0 < B.g p ∧ 0 < B.glk p ∧ 0 < B.uk p ∧ 0 < B.nn p ∧ 0 < B.gg p ∧ 0 < B.μKp p ∧ 0 < B.μKnatp p
+        ∧ 0 < B.μKppp p ∧ 0 < B.μSp p ∧ 0 < B.μSp' p ∧ 0 < B.μSppp p ∧ 0 < B.μSppp' p ∧ 0 < B.Mp p
+        ∧ 0 < B.localVolumeAtPlace p)
+    ∧ 0 < B.μKo ∧ 0 < B.μSo ∧ 0 < B.μSo' ∧ 0 < B.Mo ∧ 0 < B.localVolumeArchimedean ∧ 0 < B.μH
+    ∧ 0 < B.μH' ∧ 0 < B.μHpp ∧ 0 < B.μHpp' ∧ 0 < B.μN ∧ 0 < B.μN' ∧ 0 < B.volZZ ∧ 0 < B.volPP
+    ∧ 0 < B.al ∧ 0 < B.volG ∧ 0 < B.volHa ∧ 0 < B.volHa' ∧ 0 < B.volNa ∧ 0 < B.volNa' ∧ 0 < B.volB
+    ∧ 0 < B.volH ∧ 0 < B.volH' ∧ 0 < B.volN ∧ 0 < B.volN' ∧ 0 < B.Coo ∧ 0 < B.deg ∧ 0 < B.dimπ
+    ∧ 0 < B.dimπ' ∧ 0 < B.ρ0 ∧ 0 < B.ρ0' ∧ 0 < B.d ∧ 0 < B.d' ∧ 0 < B.n0c ∧ 0 ≤ B.supdens ∧ 0 ≤ B.δ
 
 def InTwoA : Prop := B.Kgs2 ≤ B.tt * B.Gam1 * B.Sig
 
@@ -265,57 +208,61 @@ def InLevelS : Prop :=
   B.μS = B.μN * B.μH ∧ B.μSpp = B.μN * B.μHpp ∧ B.μS' = B.μN' * B.μH' ∧ B.μSpp' = B.μN' * B.μHpp'
 
 def InMasses : Prop :=
-  B.ρ0 = B.volHa / (B.volH * B.μH) ∧ B.volNa = B.volN * B.μN ∧
-  B.ρ0' = B.volHa' / (B.volH' * B.μH') ∧ B.volNa' = B.volN' * B.μN'
+  B.ρ0 = B.volHa / (B.volH * B.μH) ∧ B.volNa = B.volN * B.μN ∧ B.ρ0' = B.volHa' / (B.volH' * B.μH')
+    ∧ B.volNa' = B.volN' * B.μN'
 
 def InColumns : Prop :=
-  B.d = B.dimπ * (B.volHa / (B.volH * B.μHpp)) ∧ B.μH / B.μHpp = B.Gam1 ∧
-  B.d' = B.dimπ' * (B.volHa' / (B.volH' * B.μHpp')) ∧ B.μH' / B.μHpp' = B.Gam1
+  B.d = B.dimπ * (B.volHa / (B.volH * B.μHpp)) ∧ B.μH / B.μHpp = B.Gam1
+    ∧ B.d' = B.dimπ' * (B.volHa' / (B.volH' * B.μHpp')) ∧ B.μH' / B.μHpp' = B.Gam1
 
 def InOrdinary : Prop := B.Mo / B.localVolumeArchimedean = B.μKo ^ 2 / (B.μSo * B.μSo')
 
 def InTyped : Prop :=
-  ∀ p, B.Mp p / B.localVolumeAtPlace p = B.μKp p * B.μKnatp p / (B.μSp p * B.μSp' p) ∧
-    B.μSp p = B.ga p * B.μSppp p ∧ B.μSp' p = B.ga p * B.μSppp' p
+  ∀ p,
+    B.Mp p / B.localVolumeAtPlace p = B.μKp p * B.μKnatp p / (B.μSp p * B.μSp' p)
+      ∧ B.μSp p = B.ga p * B.μSppp p ∧ B.μSp' p = B.ga p * B.μSppp' p
 
 def InIndices : Prop :=
-  ∀ p, B.μKp p = B.gg p / (B.nn p * B.uk p) * B.μKppp p ∧
-    B.μKnatp p / B.μKp p = B.glk p * B.nn p / B.gg p
+  ∀ p,
+    B.μKp p = B.gg p / (B.nn p * B.uk p) * B.μKppp p
+      ∧ B.μKnatp p / B.μKp p = B.glk p * B.nn p / B.gg p
 
 end MassData
 
 def Columns : Prop :=
-  ∀ (P : Type) [Fintype P] (B : MassData P), B.Pos → B.InVolumes → B.InLevelS → B.InMasses →
-    B.InColumns →
-    B.ρ0 * B.volN * B.volH = B.volHa / B.μS ∧ B.d = B.Gam1 * B.ρ0 * B.dimπ ∧
-    1 / B.c0 = B.d * B.μSpp / B.volHa ∧
-    B.ρ0' * B.volN' * B.volH' = B.volHa' / B.μS' ∧ B.d' = B.Gam1 * B.ρ0' * B.dimπ' ∧
-    1 / B.c0' = B.d' * B.μSpp' / B.volHa'
+  ∀ (P : Type) [Fintype P] (B : MassData P),
+    B.Pos → B.InVolumes → B.InLevelS → B.InMasses → B.InColumns
+      → B.ρ0 * B.volN * B.volH = B.volHa / B.μS ∧ B.d = B.Gam1 * B.ρ0 * B.dimπ
+        ∧ 1 / B.c0 = B.d * B.μSpp / B.volHa ∧ B.ρ0' * B.volN' * B.volH' = B.volHa' / B.μS'
+        ∧ B.d' = B.Gam1 * B.ρ0' * B.dimπ' ∧ 1 / B.c0' = B.d' * B.μSpp' / B.volHa'
 
 def KnatGamma : Prop :=
-  ∀ (P : Type) [Fintype P] (B : MassData P), B.Pos → B.InIndices →
-    ∀ p, B.μKnatp p = B.ga p * B.μKppp p
+  ∀ (P : Type) [Fintype P] (B : MassData P),
+    B.Pos → B.InIndices → ∀ p, B.μKnatp p = B.ga p * B.μKppp p
 
 def LocalProduct : Prop :=
-  ∀ (P : Type) [Fintype P] (B : MassData P), B.Pos → B.InOrdinary → B.InTyped → B.InIndices →
-    B.MM / B.unitLevelVolume / B.μK = B.μKpp / (B.Gam1 * B.μSpp * B.μSpp') ∧
-    B.MM / B.unitLevelVolume / B.μK = B.μKnat / (B.μS * B.μS')
+  ∀ (P : Type) [Fintype P] (B : MassData P),
+    B.Pos → B.InOrdinary → B.InTyped → B.InIndices
+      → B.MM / B.unitLevelVolume / B.μK = B.μKpp / (B.Gam1 * B.μSpp * B.μSpp')
+        ∧ B.MM / B.unitLevelVolume / B.μK = B.μKnat / (B.μS * B.μS')
 
 def JacobianConstant : Prop :=
-  ∀ (P : Type) [Fintype P] (B : MassData P), B.Pos → B.InJacMod → B.InNu →
-    B.IntN = B.volZZ / B.unitLevelVolume * B.Coo⁻¹ * B.IntOO
+  ∀ (P : Type) [Fintype P] (B : MassData P),
+    B.Pos → B.InJacMod → B.InNu → B.IntN = B.volZZ / B.unitLevelVolume * B.Coo⁻¹ * B.IntOO
 
 def SigBound : Prop :=
-  ∀ (P : Type) [Fintype P] (B : MassData P), B.Pos → B.InForm → B.InKernel → B.InMass → B.InDens →
-    B.InTheoremA → B.InJacMod → B.InNu → B.InInfinity →
-    B.Sig ≤ (1 + B.δ) * B.e1 * (B.c0 * B.c0')⁻¹ * B.volB * (B.MM / B.unitLevelVolume) / (B.μK * B.deg)
+  ∀ (P : Type) [Fintype P] (B : MassData P),
+    B.Pos → B.InForm → B.InKernel → B.InMass → B.InDens → B.InTheoremA → B.InJacMod → B.InNu
+      → B.InInfinity
+      → B.Sig
+        ≤ (1 + B.δ) * B.e1 * (B.c0 * B.c0')⁻¹ * B.volB * (B.MM / B.unitLevelVolume) / (B.μK * B.deg)
 
 def MainTheorem : Prop :=
-  ∀ (P : Type) [Fintype P] (B : MassData P), B.Pos → B.InTwoA → B.InForm → B.InKernel → B.InMass →
-    B.InDens → B.InTheoremA → B.InJacMod → B.InNu → B.InInfinity → B.InVolumes → B.InLevelS →
-    B.InMasses → B.InColumns → B.InOrdinary → B.InTyped → B.InIndices →
-    B.GS = B.tt * B.Gam1 * B.Sig ∧
-    B.GS ≤ (1 + B.δ) * B.e1 * B.tt * (B.d * B.d' / B.Dstar) ∧
-    B.Kgs2 ≤ (1 + B.δ) * B.e1 * B.tt * (B.d * B.d' / B.Dstar)
+  ∀ (P : Type) [Fintype P] (B : MassData P),
+    B.Pos → B.InTwoA → B.InForm → B.InKernel → B.InMass → B.InDens → B.InTheoremA → B.InJacMod
+      → B.InNu → B.InInfinity → B.InVolumes → B.InLevelS → B.InMasses → B.InColumns → B.InOrdinary
+      → B.InTyped → B.InIndices
+      → B.GS = B.tt * B.Gam1 * B.Sig ∧ B.GS ≤ (1 + B.δ) * B.e1 * B.tt * (B.d * B.d' / B.Dstar)
+        ∧ B.Kgs2 ≤ (1 + B.δ) * B.e1 * B.tt * (B.d * B.d' / B.Dstar)
 
 end Formalism.FourierDecayAlt.S3

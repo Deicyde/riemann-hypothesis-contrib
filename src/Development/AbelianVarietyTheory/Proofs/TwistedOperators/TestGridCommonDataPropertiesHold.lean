@@ -23,8 +23,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.Grow
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.Grow
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.SepRows GlobalTheory.CoreOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -35,10 +39,18 @@ namespace GlobalTheory.CoreOnto
 
 theorem comOK : ComOK := by
   intro D _ _ T L μ0 _ sc _ G W M _
-  have hchi : ∀ k, k < D.R.m → ChrEq (G.ch.chi (D.R.m - k)) (G.ch.chiH (D.R.m - k)) :=
-    fun k hk => G.ch.chi_eq _ (by omega) (by omega)
-  refine ⟨W.θ_is, W.ψ_std, fun k (hk : k < D.R.m) => ?_, fun k (hk : k < D.R.m) τ => ?_, fun k (hk : k < D.R.m) => ?_,
-    fun i k hik (hk : k < D.R.m) τ => ?_, ?_, ?_⟩
+  have hchi : ∀ k, k < D.R.m → ChrEq (G.ch.chi (D.R.m - k)) (G.ch.chiH (D.R.m - k)) := fun k hk =>
+    G.ch.chi_eq _ (by omega) (by omega)
+  refine ⟨
+    W.θ_is,
+    W.ψ_std,
+    fun k (hk : k < D.R.m) => ?_,
+    fun k (hk : k < D.R.m) τ => ?_,
+    fun k (hk : k < D.R.m) => ?_,
+    fun i k hik (hk : k < D.R.m) τ => ?_,
+    ?_,
+    ?_
+  ⟩
   · show IsHeckeChar D (G.ch.chi (D.R.m - k))⁻¹ ∧ Formalism.L2.Theta.ResEta D (G.ch.chi (D.R.m - k))⁻¹ 0
     have hw := W.om_is (.core k) (show k + 1 ≤ D.R.m by omega)
     have e := (G.chr_core (i := k) (by omega)).1
@@ -48,10 +60,19 @@ theorem comOK : ComOK := by
     rw [e] at h1 h2
     rw [hr] at h2
     obtain ⟨a, ha⟩ := even_rankP D (k + 1)
-    exact GlobalTheory.StdUnn.isHeckeChar_resEta_inv D _ 0 h1 (Formalism.L2.Theta.resEta_parity h2 (by omega))
+    exact GlobalTheory.StdUnn.isHeckeChar_resEta_inv D _ 0 h1
+      (Formalism.L2.Theta.resEta_parity h2 (by omega))
   · show HasInfExp D (G.ch.chi (D.R.m - k))⁻¹ τ (-(cen D sc.cGap τ (D.R.m - k) : ℚ))
-    have h := GlobalTheory.HeckeInfExp.hasInfExp_of_chrEq D _ _ (fun τ => (cen D sc.cGap τ (D.R.m - k) : ℚ)) (hchi k hk)
-      ⟨fun τ => 2 * cen D sc.cGap τ (D.R.m - k), fun τ => by push_cast; ring, G.ch.inf _ (by omega) (by omega)⟩ τ
+    have h :=
+      GlobalTheory.HeckeInfExp.hasInfExp_of_chrEq D _ _
+        (fun τ => (cen D sc.cGap τ (D.R.m - k) : ℚ))
+        (hchi k hk)
+        ⟨
+          fun τ => 2 * cen D sc.cGap τ (D.R.m - k),
+          fun τ => by push_cast; ring,
+          G.ch.inf _ (by omega) (by omega)
+        ⟩
+        τ
     exact GlobalTheory.Chain.StepVac.hasInfExp_inv h
   · show GlobalTheory.LFun.UnrOff (G.ch.chi (D.R.m - k))⁻¹ (G.pl.S0 : Set (HeightOneSpectrum (𝓞 D.host.F)))
     intro w hw
@@ -59,7 +80,8 @@ theorem comOK : ComOK := by
       (GlobalTheory.LFun.unrAt_iff_of_chrEq (hchi k hk) w).2 (G.ch.unr _ (by omega) (by omega) w hw)
     intro x hx
     have := hu x hx
-    simp only [GlobalTheory.LFun.locChar, MonoidHom.comp_apply, MonoidHom.inv_apply, map_inv] at this ⊢
+    simp only [GlobalTheory.LFun.locChar, MonoidHom.comp_apply, MonoidHom.inv_apply, map_inv]
+      at this ⊢
     rw [this, inv_one]
   · show -(cen D sc.cGap τ (D.R.m - i) : ℚ) ≠ -(cen D sc.cGap τ (D.R.m - k) : ℚ)
     intro h
@@ -75,9 +97,12 @@ theorem comOK : ComOK := by
       rw [e1, hga] at this
       push_cast
       linarith
-    have hf : cen D sc.cGap τ (D.R.m - k) = cen D sc.cGap τ (D.R.m - i) + (((k - i) * gap D sc.cGap : ℕ) : ℤ) := by
+    have hf
+        : cen D sc.cGap τ (D.R.m - k)
+          = cen D sc.cGap τ (D.R.m - i) + (((k - i) * gap D sc.cGap : ℕ) : ℤ) := by
       rw [hc, hc, hmid, Int.floor_add_intCast]
-    have h' : cen D sc.cGap τ (D.R.m - i) = cen D sc.cGap τ (D.R.m - k) := by exact_mod_cast neg_inj.1 h
+    have h' : cen D sc.cGap τ (D.R.m - i) = cen D sc.cGap τ (D.R.m - k) := by
+      exact_mod_cast neg_inj.1 h
     have hpos : 0 < (k - i) * gap D sc.cGap := Nat.mul_pos (by omega) hg
     omega
   · show 1 ≤ D.R.r + 1

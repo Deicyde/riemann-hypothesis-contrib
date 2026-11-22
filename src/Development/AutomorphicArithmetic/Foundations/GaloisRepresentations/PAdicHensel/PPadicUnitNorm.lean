@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1
 open scoped TensorProduct
 
 private lemma UpperTheory.Gal.G1.normInt_eq_one {q : ℕ} [Fact q.Prime] {n : ℤ} (h : ¬ (q : ℤ) ∣ n) :
@@ -36,8 +38,7 @@ private lemma UpperTheory.Gal.G1.hens {q : ℕ} [Fact q.Prime] (c d a : ℤ_[q])
   obtain ⟨z, hz, -⟩ := hensels_lemma (F := F) (a := a) (by rw [hn, hF]; simpa using h)
   exact ⟨z, by rwa [hF] at hz⟩
 
-theorem UpperTheory.Gal.G1.pPadicUnitNorm :
-    PadicUnitNorm := by
+theorem UpperTheory.Gal.G1.pPadicUnitNorm : PadicUnitNorm := by
   intro q _ D hqD u hu
   have hq2 : ¬ (q : ℤ) ∣ 2 := fun h => hqD (Dvd.dvd.mul_right h D)
   have hqd : ¬ (q : ℤ) ∣ D := fun h => hqD (Dvd.dvd.mul_left h 2)
@@ -55,13 +56,13 @@ theorem UpperTheory.Gal.G1.pPadicUnitNorm :
   have hUc : ((U : ℤ_[q]) : ℚ_[q]) = u := rfl
   have hub : PadicInt.toZMod U ≠ 0 := fun h0 =>
     absurd hU ((UpperTheory.Gal.G1.norm_lt_one_iff_toZMod U).mpr h0).ne
-  have hDb : -(D : ZMod q) ≠ 0 := by
-    simpa [ZMod.intCast_zmod_eq_zero_iff_dvd] using hqd
-  obtain ⟨a, b, hab⟩ := FiniteField.exists_root_sum_quadratic
-    (f := Polynomial.X ^ 2)
-    (g := Polynomial.C (-(D : ZMod q)) * Polynomial.X ^ 2 + Polynomial.C 0 * Polynomial.X
-      + Polynomial.C (-PadicInt.toZMod U))
-    (by simp) (Polynomial.degree_quadratic hDb) hodd
+  have hDb : -(D : ZMod q) ≠ 0 := by simpa [ZMod.intCast_zmod_eq_zero_iff_dvd] using hqd
+  obtain ⟨a, b, hab⟩ :=
+    FiniteField.exists_root_sum_quadratic (f := Polynomial.X ^ 2)
+      (g :=
+        Polynomial.C (-(D : ZMod q)) * Polynomial.X ^ 2 + Polynomial.C 0 * Polynomial.X
+          + Polynomial.C (- PadicInt.toZMod U))
+      (by simp) (Polynomial.degree_quadratic hDb) hodd
   have hab' : a ^ 2 - (D : ZMod q) * b ^ 2 - PadicInt.toZMod U = 0 := by
     simp at hab
     linear_combination hab
@@ -83,20 +84,28 @@ theorem UpperTheory.Gal.G1.pPadicUnitNorm :
     simpa using hab'
   rcases hor with ha | hb
   · have hx1 : ‖x0‖ = 1 := UpperTheory.Gal.G1.norm_eq_one_of_toZMod (by rwa [hx])
-    obtain ⟨z, hz⟩ := UpperTheory.Gal.G1.hens 1 (-((D : ℤ_[q]) * y0 ^ 2 + U)) x0 h2 (by simp) hx1 (by
-      have e : 1 * x0 ^ 2 + -((D : ℤ_[q]) * y0 ^ 2 + U) = x0 ^ 2 - (D : ℤ_[q]) * y0 ^ 2 - U := by ring
-      rw [e]; exact key)
+    obtain ⟨z, hz⟩ :=
+      UpperTheory.Gal.G1.hens 1 (-((D : ℤ_[q]) * y0 ^ 2 + U)) x0 h2 (by simp) hx1 (by
+        have e : 1 * x0 ^ 2 + -((D : ℤ_[q]) * y0 ^ 2 + U) = x0 ^ 2 - (D : ℤ_[q]) * y0 ^ 2 - U := by
+          ring
+        rw [e]
+        exact key)
     refine ⟨z, y0, ?_⟩
     have h3 := congrArg (fun t : ℤ_[q] => (t : ℚ_[q])) hz
-    simp only [PadicInt.coe_add, PadicInt.coe_mul, PadicInt.coe_pow, PadicInt.coe_neg, PadicInt.coe_one,
-      PadicInt.coe_zero, PadicInt.coe_intCast, hUc] at h3
+    simp only [PadicInt.coe_add, PadicInt.coe_mul, PadicInt.coe_pow, PadicInt.coe_neg,
+        PadicInt.coe_one, PadicInt.coe_zero, PadicInt.coe_intCast, hUc]
+      at h3
     linear_combination -h3
   · have hy1 : ‖y0‖ = 1 := UpperTheory.Gal.G1.norm_eq_one_of_toZMod (by rwa [hy])
-    obtain ⟨z, hz⟩ := UpperTheory.Gal.G1.hens (D : ℤ_[q]) (U - x0 ^ 2) y0 h2 hD hy1 (by
-      have e : (D : ℤ_[q]) * y0 ^ 2 + (U - x0 ^ 2) = -(x0 ^ 2 - (D : ℤ_[q]) * y0 ^ 2 - U) := by ring
-      rw [e, norm_neg]; exact key)
+    obtain ⟨z, hz⟩ :=
+      UpperTheory.Gal.G1.hens (D : ℤ_[q]) (U - x0 ^ 2) y0 h2 hD hy1 (by
+        have e : (D : ℤ_[q]) * y0 ^ 2 + (U - x0 ^ 2) = -(x0 ^ 2 - (D : ℤ_[q]) * y0 ^ 2 - U) := by
+          ring
+        rw [e, norm_neg]
+        exact key)
     refine ⟨x0, z, ?_⟩
     have h3 := congrArg (fun t : ℤ_[q] => (t : ℚ_[q])) hz
     simp only [PadicInt.coe_add, PadicInt.coe_sub, PadicInt.coe_mul, PadicInt.coe_pow,
-      PadicInt.coe_zero, PadicInt.coe_intCast, hUc] at h3
+        PadicInt.coe_zero, PadicInt.coe_intCast, hUc]
+      at h3
     linear_combination h3

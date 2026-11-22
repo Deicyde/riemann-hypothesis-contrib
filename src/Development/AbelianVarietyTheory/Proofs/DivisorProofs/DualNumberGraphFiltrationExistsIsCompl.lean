@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Can
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 
 noncomputable section
@@ -16,28 +18,44 @@ namespace GlobalTheory.HTRealise
 
 variable {k : Type} [Field k]
 
-def coordSub (A₀ : Over (Sp k)) [GrpObj A₀] (S : Submodule k (HdR A₀)) :
-    Submodule (DualNumber k) (Crys (epsDP k) (GlobalTheory.DeRham.epsRed k) A₀) where
-  carrier := {d | ∃ u ∈ S, ∃ v ∈ S, ∀ c : primDR A₀,
-    d ((constMor A₀).pull c) = TrivSqZeroExt.inl (u c) + TrivSqZeroExt.inr (v c)}
+def coordSub (A₀ : Over (Sp k)) [GrpObj A₀] (S : Submodule k (HdR A₀))
+    : Submodule (DualNumber k) (Crys (epsDP k) (GlobalTheory.DeRham.epsRed k) A₀) where
+  carrier :=
+    {d | ∃ u ∈ S, ∃ v ∈ S, ∀ c : primDR A₀,
+      d ((constMor A₀).pull c) = TrivSqZeroExt.inl (u c) + TrivSqZeroExt.inr (v c)}
   add_mem' := by
     rintro d d' ⟨x, hx, y, hy, e⟩ ⟨x', hx', y', hy', e'⟩
     refine ⟨x + x', add_mem hx hx', y + y', add_mem hy hy', fun c => ?_⟩
     rw [LinearMap.add_apply, e, e']
     ext <;> simp <;> ring
-  zero_mem' := ⟨0, zero_mem _, 0, zero_mem _, fun c => by
-    rw [LinearMap.zero_apply]
-    ext <;> simp⟩
+  zero_mem' := ⟨
+    0,
+    zero_mem _,
+    0,
+    zero_mem _,
+    fun c => by
+      rw [LinearMap.zero_apply]
+      ext <;> simp
+  ⟩
   smul_mem' := by
     rintro r d ⟨x, hx, y, hy, e⟩
-    refine ⟨r.fst • x, Submodule.smul_mem _ _ hx, r.fst • y + r.snd • x,
-      add_mem (Submodule.smul_mem _ _ hy) (Submodule.smul_mem _ _ hx), fun c => ?_⟩
+    refine ⟨
+      r.fst • x,
+      Submodule.smul_mem _ _ hx,
+      r.fst • y + r.snd • x,
+      add_mem (Submodule.smul_mem _ _ hy) (Submodule.smul_mem _ _ hx),
+      fun c => ?_
+    ⟩
     rw [LinearMap.smul_apply, e, smul_eq_mul]
     ext <;> simp <;> ring
 
-theorem coords_unique {A₀ : Over (Sp k)} [GrpObj A₀] {u v u' v' : HdR A₀}
-    (h : ∀ c : primDR A₀, TrivSqZeroExt.inl (u c) + TrivSqZeroExt.inr (v c)
-      = (TrivSqZeroExt.inl (u' c) + TrivSqZeroExt.inr (v' c) : DualNumber k)) : u = u' ∧ v = v' := by
+theorem coords_unique
+    {A₀ : Over (Sp k)} [GrpObj A₀]
+    {u v u' v' : HdR A₀}
+    (h : ∀ c : primDR A₀,
+      TrivSqZeroExt.inl (u c) + TrivSqZeroExt.inr (v c)
+        = (TrivSqZeroExt.inl (u' c) + TrivSqZeroExt.inr (v' c) : DualNumber k))
+    : u = u' ∧ v = v' := by
   constructor
   · refine LinearMap.ext fun c => ?_
     have := congrArg TrivSqZeroExt.fst (h c)
@@ -46,16 +64,20 @@ theorem coords_unique {A₀ : Over (Sp k)} [GrpObj A₀] {u v u' v' : HdR A₀}
     have := congrArg TrivSqZeroExt.snd (h c)
     simpa using this
 
-theorem graphFil_exists_isCompl : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [GrpObj A₀], IsAbelianScheme A₀ →
-    ∀ f : HdR A₀ →ₗ[k] HdR A₀, ∃ M : Submodule (DualNumber k) (Crys (epsDP k) (GlobalTheory.DeRham.epsRed k) A₀),
-      IsCompl (GlobalTheory.HTRealise.graphFil A₀ f) M := by
+theorem graphFil_exists_isCompl
+    : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [GrpObj A₀],
+      IsAbelianScheme A₀
+        → ∀ f : HdR A₀ →ₗ[k] HdR A₀,
+          ∃ M : Submodule (DualNumber k) (Crys (epsDP k) (GlobalTheory.DeRham.epsRed k) A₀),
+            IsCompl (GlobalTheory.HTRealise.graphFil A₀ f) M := by
   intro k _ A₀ _ hA f
   obtain ⟨W, hW⟩ := Submodule.exists_isCompl (Fil A₀)
   refine ⟨coordSub A₀ W, ?_, ?_⟩
   · rw [Submodule.disjoint_def]
     rintro d ⟨x, hx, y, hy, e⟩ ⟨u, hu, v, hv, e'⟩
-    obtain ⟨h1, h2⟩ := coords_unique (u := x) (v := f x + y) (u' := u) (v' := v)
-      (fun c => by rw [LinearMap.add_apply]; exact (e c).symm.trans (e' c))
+    obtain ⟨h1, h2⟩ :=
+      coords_unique (u := x) (v := f x + y) (u' := u) (v' := v)
+        (fun c => by rw [LinearMap.add_apply]; exact (e c).symm.trans (e' c))
     subst h1
     have hx0 : x = 0 := (Submodule.disjoint_def.1 hW.disjoint) x hx hu
     subst hx0

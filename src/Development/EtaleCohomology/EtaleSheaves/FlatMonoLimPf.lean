@@ -9,8 +9,10 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace LateralTheory.E.FlatMonoLimPf
 
-theorem exists_lift {X Y T : Scheme.{0}} (m : X ⟶ Y) [Mono m] [Flat m] [QuasiCompact m] (t : T ⟶ Y)
-    (h : Set.range t ⊆ Set.range m) : ∃ b : T ⟶ X, b ≫ m = t := by
+theorem exists_lift
+    {X Y T : Scheme.{0}} (m : X ⟶ Y) [Mono m] [Flat m] [QuasiCompact m]
+    (t : T ⟶ Y) (h : Set.range t ⊆ Set.range m)
+    : ∃ b : T ⟶ X, b ≫ m = t := by
   have hs : Surjective (pullback.fst t m) := by
     constructor
     rw [← Set.range_eq_univ, Scheme.Pullback.range_fst]
@@ -25,8 +27,8 @@ theorem FlatMonoLim_of : LateralTheory.E.NbIsoPf.FlatMonoLim := by
   have hsub : ∀ j, Set.range m ⊆ Set.range (ι j) := fun j => hr ▸ Set.iInter_subset _ j
   have hind : ∀ j k, c.π.app j ≫ ι j = c.π.app k ≫ ι k := by
     intro j k
-    rw [← c.w (IsCofiltered.minToLeft j k), ← c.w (IsCofiltered.minToRight j k), Category.assoc, Category.assoc,
-      hc, hc]
+    rw [← c.w (IsCofiltered.minToLeft j k), ← c.w (IsCofiltered.minToRight j k), Category.assoc,
+      Category.assoc, hc, hc]
   obtain ⟨j0⟩ : Nonempty J := IsCofiltered.nonempty
   have hp : Set.range (c.π.app j0 ≫ ι j0) ⊆ Set.range m := by
     rw [hr]
@@ -35,13 +37,15 @@ theorem FlatMonoLim_of : LateralTheory.E.NbIsoPf.FlatMonoLim := by
     rintro _ ⟨x, rfl⟩
     exact ⟨c.π.app j x, (Scheme.Hom.comp_apply _ _ _).symm⟩
   obtain ⟨b, hb⟩ := exists_lift m _ hp
-  let s : Cone D :=
-    { pt := X
-      π :=
-        { app := fun j => IsOpenImmersion.lift (ι j) m (hsub j)
-          naturality := fun j k f => by
-            rw [← cancel_mono (ι k)]
-            simp [hc] } }
+  let s : Cone D := {
+    pt := X
+    π := {
+      app := fun j => IsOpenImmersion.lift (ι j) m (hsub j)
+      naturality := fun j k f => by
+        rw [← cancel_mono (ι k)]
+        simp [hc]
+    }
+  }
   have hs : ∀ j, hl.lift s ≫ c.π.app j ≫ ι j = m := by
     intro j
     rw [hl.fac_assoc]

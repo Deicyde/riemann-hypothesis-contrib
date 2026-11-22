@@ -14,20 +14,21 @@ namespace GlobalTheory.WigSh.Model
 def Box {n : ℕ} (L : Fin (n + 1) → ℤ) (M : Fin n → ℤ) : Prop :=
   ∀ j : Fin n, L j.succ < M j ∧ M j ≤ L j.castSucc
 
-theorem Box.strictAnti {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h : Box L M) :
-    StrictAnti L := by
+theorem Box.strictAnti {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h : Box L M)
+    : StrictAnti L := by
   rw [Fin.strictAnti_iff_succ_lt]
   intro j
   exact lt_of_lt_of_le (h j).1 (h j).2
 
-theorem prod_erase_eq {n : ℕ} (f : Fin (n + 1) → ℝ) (l : Fin (n + 1)) :
-    ∏ j ∈ univ.erase l, f j = ∏ j : Fin n, f (l.succAbove j) := by
+theorem prod_erase_eq {n : ℕ} (f : Fin (n + 1) → ℝ) (l : Fin (n + 1))
+    : ∏ j ∈ univ.erase l, f j = ∏ j : Fin n, f (l.succAbove j) := by
   rw [← Finset.compl_singleton, ← Fin.image_succAbove_univ,
     Finset.prod_image (fun a _ b _ hab => Fin.succAbove_right_injective hab)]
 
-theorem factor_nonneg {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h : Box L M)
-    (l : Fin (n + 1)) (j : Fin n) (e : ℤ) (he0 : 0 ≤ e) (he1 : e ≤ 1) :
-    0 ≤ ((M j : ℝ) - e - L l) / ((L (l.succAbove j) : ℝ) - L l) := by
+theorem factor_nonneg
+    {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h : Box L M) (l : Fin (n + 1)) (j : Fin n)
+    (e : ℤ) (he0 : 0 ≤ e) (he1 : e ≤ 1)
+    : 0 ≤ ((M j : ℝ) - e - L l) / ((L (l.succAbove j) : ℝ) - L l) := by
   have hA := h.strictAnti
   have he0' : (0 : ℝ) ≤ e := by exact_mod_cast he0
   have he1' : (e : ℝ) ≤ 1 := by exact_mod_cast he1
@@ -46,8 +47,9 @@ theorem factor_nonneg {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h
     have h5 : (L j.succ : ℝ) < L l := by exact_mod_cast h2
     apply div_nonneg_of_nonpos <;> linarith
 
-theorem placeWeight_nonneg {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h : Box L M)
-    (l : Fin (n + 1)) : 0 ≤ wP L M l := by
+theorem placeWeight_nonneg
+    {n : ℕ} {L : Fin (n + 1) → ℤ} {M : Fin n → ℤ} (h : Box L M) (l : Fin (n + 1))
+    : 0 ≤ wP L M l := by
   unfold GlobalTheory.WigSh.wP
   rw [prod_erase_eq, ← Finset.prod_div_distrib]
   refine Finset.prod_nonneg fun j _ => ?_

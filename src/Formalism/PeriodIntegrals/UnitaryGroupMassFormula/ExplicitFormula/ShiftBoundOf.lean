@@ -12,9 +12,10 @@ namespace PI.EF
 
 open Complex DirichletCharacter
 
-theorem shiftBound_of {κ Cs Cr : ℝ} (hκ : 0 < κ) (hCs : 0 ≤ Cs) (hCr : 0 ≤ Cr) (hRP : RegularPart)
-    (hCI : ContourIdentity) (hS : SidesBound κ Cs) (hR : RegAtZero Cr) :
-    ShiftBound κ (Cs + Cr + 3) := by
+theorem shiftBound_of
+    {κ Cs Cr : ℝ} (hκ : 0 < κ) (hCs : 0 ≤ Cs) (hCr : 0 ≤ Cr)
+    (hRP : RegularPart) (hCI : ContourIdentity) (hS : SidesBound κ Cs) (hR : RegAtZero Cr)
+    : ShiftBound κ (Cs + Cr + 3) := by
   intro N _ χ hχ u T T' hT hTu hTT' hT'T hg
   have hN1 : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne N)
   have hu2 : (2 : ℝ) ≤ u := hT.trans hTu
@@ -42,13 +43,15 @@ theorem shiftBound_of {κ Cs Cr : ℝ} (hκ : 0 < κ) (hCs : 0 ≤ Cs) (hCr : 0 
   set c : ℂ := 2 * Real.pi * I with hc
   have hc0 : c ≠ 0 := by
     rw [hc]
-    exact mul_ne_zero (mul_ne_zero two_ne_zero (Complex.ofReal_ne_zero.mpr Real.pi_ne_zero)) I_ne_zero
+    exact mul_ne_zero (mul_ne_zero two_ne_zero (Complex.ofReal_ne_zero.mpr Real.pi_ne_zero))
+      I_ne_zero
   have hcn : ‖c‖ = 2 * Real.pi := by
     rw [hc, norm_mul, norm_mul, Complex.norm_I, mul_one, Complex.norm_real, Real.norm_eq_abs,
       abs_of_pos Real.pi_pos]
     norm_num
-  have hA : vertInt χ u T' - del1 χ * u + zsum χ T' u =
-      (R + c * vertInt χ u T') / c + (Z - H 0) - eps0 χ * (Real.log u : ℂ) - del1 χ := by
+  have hA
+      : vertInt χ u T' - del1 χ * u + zsum χ T' u
+        = (R + c * vertInt χ u T') / c + (Z - H 0) - eps0 χ * (Real.log u : ℂ) - del1 χ := by
     rw [hCIe]
     field_simp
     ring
@@ -66,9 +69,12 @@ theorem shiftBound_of {κ Cs Cr : ℝ} (hκ : 0 < κ) (hCs : 0 ≤ Cs) (hCr : 0 
   have h2N : Real.log (2 * N) ≤ Real.log (N * u) := Real.log_le_log (by positivity) (by nlinarith)
   have hL : 1 ≤ u * Real.log (N * u * T) ^ 2 / T := by
     have h4 : (4 : ℝ) ≤ N * u * T := by
-      calc (4 : ℝ) = 1 * 2 * 2 := by norm_num
-        _ ≤ N * u * T := mul_le_mul (mul_le_mul hN1 hu2 (by norm_num) (by linarith)) hT (by norm_num)
-          (by positivity)
+      calc
+        (4 : ℝ)
+          = 1 * 2 * 2 := by norm_num
+        _ ≤ N * u * T :=
+          mul_le_mul (mul_le_mul hN1 hu2 (by norm_num) (by linarith)) hT (by norm_num)
+            (by positivity)
     have hl4 : 1 ≤ Real.log (N * u * T) := by
       have h5 : Real.log 4 ≤ Real.log (N * u * T) := Real.log_le_log (by norm_num) h4
       have h6 : 1 < Real.log 4 := by
@@ -85,19 +91,21 @@ theorem shiftBound_of {κ Cs Cr : ℝ} (hκ : 0 < κ) (hCs : 0 ≤ Cs) (hCr : 0 
   have hErr3 : Real.log (2 * N) ≤ Err N u T := by unfold Err; linarith
   have hmain : ‖(R + c * vertInt χ u T') / c‖ ≤ Cs * Err N u T := by
     rw [norm_div, hcn, div_le_iff₀ (by positivity)]
-    calc ‖R + c * vertInt χ u T'‖ ≤ Cs * Err N u T := hSe
+    calc
+      ‖R + c * vertInt χ u T'‖
+        ≤ Cs * Err N u T := hSe
       _ ≤ Cs * Err N u T * (2 * Real.pi) :=
         le_mul_of_one_le_right (by positivity) (by linarith [Real.pi_gt_three])
   have heps : ‖eps0 χ * (Real.log u : ℂ)‖ ≤ Real.log u := by
     rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hlogu]
     exact mul_le_of_le_one_left hlogu.le hE1
-  calc ‖(R + c * vertInt χ u T') / c + (Z - H 0) - eps0 χ * (Real.log u : ℂ) - del1 χ‖
-      ≤ ‖(R + c * vertInt χ u T') / c‖ + ‖Z - H 0‖ + ‖eps0 χ * (Real.log u : ℂ)‖ + ‖del1 χ‖ := by
-        refine (norm_sub_le _ _).trans (add_le_add ((norm_sub_le _ _).trans
-          (add_le_add (norm_add_le _ _) le_rfl)) le_rfl)
-    _ ≤ Cs * Err N u T + (Cr * Real.log (2 * N) + S1 χ) + Real.log u + 1 := by
-        gcongr
+  calc
+    ‖(R + c * vertInt χ u T') / c + (Z - H 0) - eps0 χ * (Real.log u : ℂ) - del1 χ‖
+        ≤ ‖(R + c * vertInt χ u T') / c‖ + ‖Z - H 0‖ + ‖eps0 χ * (Real.log u : ℂ)‖ + ‖del1 χ‖ := by
+      refine (norm_sub_le _ _).trans
+        (add_le_add ((norm_sub_le _ _).trans (add_le_add (norm_add_le _ _) le_rfl)) le_rfl)
+    _ ≤ Cs * Err N u T + (Cr * Real.log (2 * N) + S1 χ) + Real.log u + 1 := by gcongr
     _ ≤ (Cs + Cr + 3) * (Err N u T + S1 χ) := by
-        nlinarith [mul_nonneg hCs hS1, mul_nonneg hCr hS1, mul_le_mul_of_nonneg_left hErr3 hCr]
+      nlinarith [mul_nonneg hCs hS1, mul_nonneg hCr hS1, mul_le_mul_of_nonneg_left hErr3 hCr]
 
 end PI.EF

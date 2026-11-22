@@ -26,16 +26,22 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TameBlock
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open scoped Pointwise
 
 namespace GlobalTheory.DepthZeroType
 
-theorem isSplitPl_of_over (D : D7) (k : Fin 2) (w : PlE D.host) (hw : w ∈ placesOver D.host.E (D.host.g k)) :
-    IsSplitPl D.host w := by
+theorem isSplitPl_of_over
+    (D : D7) (k : Fin 2) (w : PlE D.host) (hw : w ∈ placesOver D.host.E (D.host.g k))
+    : IsSplitPl D.host w := by
   haveI : IsGalois ℚ D.host.E := D.host.hostE_isGalois
-  have hP := (GlobalTheory.Mem.Chr.splitsC_place (p := D.host.g k) (D.host.g_prime k) (D.nd.g_split k) w hw).2.2
+  have hP :=
+    (GlobalTheory.Mem.Chr.splitsC_place (p := D.host.g k) (D.host.g_prime k) (D.nd.g_split k) w
+      hw).2.2
   by_contra hn
   have hle : ∀ x ∈ w.asIdeal, D.host.conj • x ∈ w.asIdeal := by
     intro x hx
@@ -49,10 +55,12 @@ theorem isSplitPl_of_over (D : D7) (k : Fin 2) (w : PlE D.host) (hw : w ∈ plac
     rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem] at hy
     simpa using hle _ hy
   have hm : (D.host.conj • w.asIdeal).IsMaximal :=
-    Ideal.map_isMaximal_of_equiv (MulSemiringAction.toRingEquiv _ (𝓞 D.host.E) D.host.conj) (hp := w.isMaximal)
+    Ideal.map_isMaximal_of_equiv (MulSemiringAction.toRingEquiv _ (𝓞 D.host.E) D.host.conj)
+      (hp := w.isMaximal)
   exact hm.eq_of_le w.isMaximal.ne_top h1
 
-theorem mem_Ine_of_wild (D : D7) (w : PlE D.host) {σ} (hσ : σ ∈ wildSet D.nd (D.nd.plOm.1 w)) :
-    σ ∈ Ine (F := D.host.E) (D.nd.plOm.1 w) := GlobalTheory.TameGenPowers.wild_mem_Ine hσ
+theorem mem_Ine_of_wild (D : D7) (w : PlE D.host) {σ} (hσ : σ ∈ wildSet D.nd (D.nd.plOm.1 w))
+    : σ ∈ Ine (F := D.host.E) (D.nd.plOm.1 w) :=
+  GlobalTheory.TameGenPowers.wild_mem_Ine hσ
 
 end GlobalTheory.DepthZeroType

@@ -22,10 +22,13 @@ def val (ψ : PChar) (a : ℕ) : ℂ := ψ.χ (a : ZMod ψ.N)
 
 def one : PChar := ⟨1, 1, DirichletCharacter.isPrimitive_one_level_one⟩
 
-def inv (ψ : PChar) : PChar :=
-  ⟨ψ.N, ψ.χ⁻¹, by
+def inv (ψ : PChar) : PChar := ⟨
+  ψ.N,
+  ψ.χ⁻¹,
+  by
     have h : ψ.χ.conductor = ψ.N := ψ.prim
-    exact (DirichletCharacter.conductor_inv ψ.χ).trans h⟩
+    exact (DirichletCharacter.conductor_inv ψ.χ).trans h
+⟩
 
 def of {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) : PChar :=
   @PChar.mk χ.conductor ⟨χ.conductor_ne_zero⟩ χ.primitiveCharacter χ.primitiveCharacter_isPrimitive
@@ -38,7 +41,6 @@ structure KSet where
   KEPT : Finset PChar
   one_mem : PChar.one ∈ KEPT
   inv_mem : ∀ ψ ∈ KEPT, ψ.inv ∈ KEPT
-
   psK : Option PChar
   psK_spec : ∀ ψ, psK = some ψ → ψ ∈ KEPT ∧ ψ.χ.Odd ∧ ψ.IsReal
 
@@ -50,7 +52,6 @@ structure HType extends KSet where
   one_le_J : 1 ≤ J
   P0 : ℕ
   P0_pos : 0 < P0
-
   t : ℝ → ℕ
   Ct : ℝ
   t_le : ∀ x : ℝ, 1 ≤ x → (t x : ℝ) ≤ x ^ Ct
@@ -65,8 +66,7 @@ namespace HostRaw
 
 variable {φ : Frame} (H : HostRaw φ)
 
-theorem condN_pos : 0 < H.condN :=
-  Nat.mul_pos (Nat.mul_pos H.QS_pos H.hyp.1.pos) H.hyp.2.1.pos
+theorem condN_pos : 0 < H.condN := Nat.mul_pos (Nat.mul_pos H.QS_pos H.hyp.1.pos) H.hyp.2.1.pos
 
 instance condN_neZero : NeZero H.condN := ⟨H.condN_pos.ne'⟩
 

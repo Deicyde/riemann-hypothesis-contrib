@@ -13,7 +13,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -30,8 +32,8 @@ lemma hdx (x : Bool × Mat k r) {f : Mat k r → E} (hf : Differentiable ℝ f) 
     exact (hf g).hasFDerivAt
   exact hd.comp_hasDerivAt 0 (crv_hasDerivAt x g)
 
-private theorem dx_eq_deriv_crv (x : Bool × Mat k r) (f : Mat k r → E) (g : Mat k r) :
-    Dx x f g = deriv (fun t : ℝ => f (crv x g t)) 0 := by
+private theorem dx_eq_deriv_crv (x : Bool × Mat k r) (f : Mat k r → E) (g : Mat k r)
+    : Dx x f g = deriv (fun t : ℝ => f (crv x g t)) 0 := by
   rcases x with ⟨b, X⟩
   cases b <;> rfl
 
@@ -157,24 +159,37 @@ lemma spl_len {w w₁ w₂ : List (Bool × Mat k r)} (h : Spl w w₁ w₂) : w�
   rw [← List.length_append]
   exact hp.length_eq
 
-private theorem adm_of_sublist {n : ℕ} {w w' : List (Bool × Mat k r)} (h : admitted n w)
-    (hw : w'.Sublist w) : admitted n w' := by
+private theorem adm_of_sublist
+    {n : ℕ} {w w' : List (Bool × Mat k r)} (h : admitted n w) (hw : w'.Sublist w)
+    : admitted n w' := by
   obtain ⟨u, v, hu, hv, hlen, rfl⟩ := h
   obtain ⟨l₁, l₂, rfl, h1, h2⟩ := List.sublist_append_iff.1 hw
   unfold wL at h1
   unfold wR at h2
   obtain ⟨u', hu', rfl⟩ := List.sublist_map_iff.1 h1
   obtain ⟨v', hv', rfl⟩ := List.sublist_map_iff.1 h2
-  exact ⟨u', v', fun X hX => hu X (hu'.subset hX), fun X hX => hv X (hv'.subset hX),
-    by have := hu'.length_le; have := hv'.length_le; omega, rfl⟩
+  exact ⟨
+    u',
+    v',
+    fun X hX => hu X (hu'.subset hX),
+    fun X hX => hv X (hv'.subset hX),
+    by have := hu'.length_le; have := hv'.length_le; omega,
+    rfl
+  ⟩
 
-theorem fdb (ψ : Mat k r → F) (hψ : ContDiff ℝ ∞ ψ) (S : Set (Mat k r)) (K : Set F) (hK : ∀ g ∈ S, ψ g ∈ K)
-    (Y : Mat k r → ℝ) (hY : ∀ g ∈ S, 1 ≤ Y g) (α β : ℕ) (M : ℝ) (n : ℕ)
-    (H : ∀ w, admitted n w → w ≠ [] → ∀ g ∈ S, ‖Dw w ψ g‖ ≤ M * Y g ^ (α * w.length + β)) :
-    ∀ m : ℕ, ∀ (E₁ : Type) [NormedAddCommGroup E₁] [NormedSpace ℂ E₁] (Φ : F → E₁), ContDiff ℝ ∞ Φ →
-      (∀ j : ℕ, ∃ B : ℝ, ∀ y ∈ K, ‖iteratedFDeriv ℝ j Φ y‖ ≤ B) →
-      ∃ C : ℝ, 0 ≤ C ∧ ∀ w, admitted n w → w.length ≤ m → ∀ g ∈ S,
-        ‖Dw w (fun g => Φ (ψ g)) g‖ ≤ C * Y g ^ ((α + β) * w.length) := by
+theorem fdb
+    (ψ : Mat k r → F) (hψ : ContDiff ℝ ∞ ψ)
+    (S : Set (Mat k r)) (K : Set F) (hK : ∀ g ∈ S, ψ g ∈ K)
+    (Y : Mat k r → ℝ) (hY : ∀ g ∈ S, 1 ≤ Y g)
+    (α β : ℕ) (M : ℝ) (n : ℕ)
+    (H : ∀ w, admitted n w → w ≠ [] → ∀ g ∈ S, ‖Dw w ψ g‖ ≤ M * Y g ^ (α * w.length + β))
+    : ∀ m : ℕ, ∀ (E₁ : Type) [NormedAddCommGroup E₁] [NormedSpace ℂ E₁] (Φ : F → E₁),
+      ContDiff ℝ ∞ Φ → (∀ j : ℕ, ∃ B : ℝ, ∀ y ∈ K, ‖iteratedFDeriv ℝ j Φ y‖ ≤ B)
+        → ∃ C : ℝ,
+          0 ≤ C
+            ∧ ∀ w,
+              admitted n w → w.length ≤ m
+                → ∀ g ∈ S, ‖Dw w (fun g => Φ (ψ g)) g‖ ≤ C * Y g ^ ((α + β) * w.length) := by
   intro m
   induction m with
   | zero =>
@@ -189,15 +204,17 @@ theorem fdb (ψ : Mat k r → F) (hψ : ContDiff ℝ ∞ ψ) (S : Set (Mat k r))
     exact h0.trans (le_max_left _ _)
   | succ m ih =>
     intro E₁ _ _ Φ hΦ hB
-    obtain ⟨C', hC'0, hC'⟩ := ih (F →L[ℝ] E₁) (fderiv ℝ Φ) (hΦ.fderiv_right (m := ∞) (by simp))
-      (fun j => by
+    obtain ⟨C', hC'0, hC'⟩ :=
+      ih (F →L[ℝ] E₁) (fderiv ℝ Φ) (hΦ.fderiv_right (m := ∞) (by simp)) (fun j => by
         obtain ⟨B, hB'⟩ := hB (j + 1)
         exact ⟨B, fun y hy => by rw [norm_iteratedFDeriv_fderiv]; exact hB' y hy⟩)
     obtain ⟨B0, hB0⟩ := hB 0
     have hM' : 0 ≤ max M 0 := le_max_right _ _
-    refine ⟨max B0 0 + 2 ^ m * (C' * max M 0),
+    refine ⟨
+      max B0 0 + 2 ^ m * (C' * max M 0),
       add_nonneg (le_max_right _ _) (mul_nonneg (pow_nonneg (by norm_num) _) (mul_nonneg hC'0 hM')),
-      fun w hwA hw g hg => ?_⟩
+      fun w hwA hw g hg => ?_
+    ⟩
     have hY1 := hY g hg
     have hY0 : 0 ≤ Y g := by linarith
     have hrest : 0 ≤ 2 ^ m * (C' * max M 0) :=
@@ -212,38 +229,46 @@ theorem fdb (ψ : Mat k r → F) (hψ : ContDiff ℝ ∞ ψ) (S : Set (Mat k r))
       have hlen : w'.length ≤ m := by
         rw [List.length_append, List.length_singleton] at hw
         omega
-      have key := leibA g (C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1))) w'
-        (fun g => fderiv ℝ Φ (ψ g)) (Dx x ψ) ((hΦ.fderiv_right (m := ∞) (by simp)).comp hψ) (cdx x hψ)
-        (fun w₁ w₂ hs => by
-          have hl := spl_len hs
-          have h1 : ‖Dw w₁ (fun g => fderiv ℝ Φ (ψ g)) g‖ ≤ C' * Y g ^ ((α + β) * w₁.length) :=
-            hC' w₁ (adm_of_sublist hwA (hs.1.trans (List.sublist_append_left _ _))) (by omega) g hg
-          have h2 : ‖Dw w₂ (Dx x ψ) g‖ ≤ max M 0 * Y g ^ (α * (w₂ ++ [x]).length + β) := by
-            rw [← dw_append_singleton']
-            exact (H (w₂ ++ [x]) (adm_of_sublist hwA (hs.2.1.append_right [x])) (by simp) g hg).trans
-              (mul_le_mul_of_nonneg_right (le_max_left _ _) (pow_nonneg hY0 _))
-          have hexp : (α + β) * w₁.length + (α * (w₂ ++ [x]).length + β) ≤
-              (α + β) * (w'.length + 1) := by
-            rw [List.length_append, List.length_singleton]
-            nlinarith
-          calc ‖Dw w₁ (fun g => fderiv ℝ Φ (ψ g)) g‖ * ‖Dw w₂ (Dx x ψ) g‖
-              ≤ (C' * Y g ^ ((α + β) * w₁.length)) * (max M 0 * Y g ^ (α * (w₂ ++ [x]).length + β)) :=
+      have key :=
+        leibA g (C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1))) w'
+          (fun g => fderiv ℝ Φ (ψ g))
+          (Dx x ψ) ((hΦ.fderiv_right (m := ∞) (by simp)).comp hψ) (cdx x hψ)
+          (fun w₁ w₂ hs => by
+            have hl := spl_len hs
+            have h1 : ‖Dw w₁ (fun g => fderiv ℝ Φ (ψ g)) g‖ ≤ C' * Y g ^ ((α + β) * w₁.length) :=
+              hC' w₁ (adm_of_sublist hwA (hs.1.trans (List.sublist_append_left _ _))) (by omega) g
+                hg
+            have h2 : ‖Dw w₂ (Dx x ψ) g‖ ≤ max M 0 * Y g ^ (α * (w₂ ++ [x]).length + β) := by
+              rw [← dw_append_singleton']
+              exact
+                (H (w₂ ++ [x]) (adm_of_sublist hwA (hs.2.1.append_right [x])) (by simp) g hg).trans
+                  (mul_le_mul_of_nonneg_right (le_max_left _ _) (pow_nonneg hY0 _))
+            have hexp
+                : (α + β) * w₁.length + (α * (w₂ ++ [x]).length + β)
+                  ≤ (α + β) * (w'.length + 1) := by
+              rw [List.length_append, List.length_singleton]
+              nlinarith
+            calc
+              ‖Dw w₁ (fun g => fderiv ℝ Φ (ψ g)) g‖ * ‖Dw w₂ (Dx x ψ) g‖
+                  ≤ (C' * Y g ^ ((α + β) * w₁.length))
+                    * (max M 0 * Y g ^ (α * (w₂ ++ [x]).length + β)) :=
                 mul_le_mul h1 h2 (norm_nonneg _) (mul_nonneg hC'0 (pow_nonneg hY0 _))
-            _ = C' * max M 0 * Y g ^ ((α + β) * w₁.length + (α * (w₂ ++ [x]).length + β)) := by
+              _ = C' * max M 0 * Y g ^ ((α + β) * w₁.length + (α * (w₂ ++ [x]).length + β)) := by
                 rw [pow_add]
                 ring
-            _ ≤ C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1)) :=
+              _ ≤ C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1)) :=
                 mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hY1 hexp) (mul_nonneg hC'0 hM'))
       have hP : 0 ≤ C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1)) :=
         mul_nonneg (mul_nonneg hC'0 hM') (pow_nonneg hY0 _)
-      calc _ ≤ 2 ^ w'.length * (C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1))) := key
+      calc
+        _ ≤ 2 ^ w'.length * (C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1))) := key
         _ ≤ 2 ^ m * (C' * max M 0 * Y g ^ ((α + β) * (w'.length + 1))) :=
-            mul_le_mul_of_nonneg_right (pow_le_pow_right₀ (by norm_num) hlen) hP
+          mul_le_mul_of_nonneg_right (pow_le_pow_right₀ (by norm_num) hlen) hP
         _ ≤ (max B0 0 + 2 ^ m * (C' * max M 0)) * Y g ^ ((α + β) * (w' ++ [x]).length) := by
-            rw [List.length_append, List.length_singleton]
-            have : 0 ≤ max B0 0 * Y g ^ ((α + β) * (w'.length + 1)) :=
-              mul_nonneg (le_max_right _ _) (pow_nonneg hY0 _)
-            nlinarith
+          rw [List.length_append, List.length_singleton]
+          have : 0 ≤ max B0 0 * Y g ^ ((α + β) * (w'.length + 1)) :=
+            mul_nonneg (le_max_right _ _) (pow_nonneg hY0 _)
+          nlinarith
 
 end app
 

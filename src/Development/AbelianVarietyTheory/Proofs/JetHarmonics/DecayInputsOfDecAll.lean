@@ -17,7 +17,8 @@ open scoped InnerProductSpace
 open Formalism.QuantumDeterminants (UH Hpk IsHCParam GapAtLeast)
 open Formalism.FourierDecayAlt.B (gN)
 open GlobalTheory.Count (dOp rkR)
-open GlobalTheory.IndefiniteRowSideFullHecke.SideNormalisedGap (Mat decExp dimV DecGap DecKFin DecSmooth)
+open GlobalTheory.IndefiniteRowSideFullHecke.SideNormalisedGap
+  (Mat decExp dimV DecGap DecKFin DecSmooth)
 
 lemma hs_le_op {n : ℕ} (x : Matrix (Fin n) (Fin n) ℂ) :
     ∑ i, ∑ j, Complex.normSq (x i j) ≤ n * ‖Matrix.toEuclideanCLM (n := Fin n) (𝕜 := ℂ) x‖ ^ 2 := by

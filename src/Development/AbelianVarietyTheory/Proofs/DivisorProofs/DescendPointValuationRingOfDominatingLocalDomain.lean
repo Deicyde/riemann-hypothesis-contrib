@@ -10,22 +10,33 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 
 noncomputable section
 
 namespace GlobalTheory
 
-theorem descend_point_to_valuationRing_of_dominating_local_domain : ∀ (V K W L : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K] [CommRing W] [IsDomain W] [IsLocalRing W] [Field L] [Algebra W L] [IsFractionRing W L] [Algebra V W] [Algebra K L], (algebraMap W L).comp (algebraMap V W) = (algebraMap K L).comp (algebraMap V K) → IsLocalHom (algebraMap V W) → ∀ (X : Scheme.{0}) (x : Sp K ⟶ X) (f : Sp W ⟶ X), spMap (algebraMap K L) ≫ x = spMap (algebraMap W L) ≫ f → ∃ x' : Sp V ⟶ X, spMap (algebraMap V K) ≫ x' = x := by
+theorem descend_point_to_valuationRing_of_dominating_local_domain
+    : ∀ (V K W L : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
+        [IsFractionRing V K] [CommRing W] [IsDomain W] [IsLocalRing W] [Field L] [Algebra W L]
+        [IsFractionRing W L] [Algebra V W] [Algebra K L],
+      (algebraMap W L).comp (algebraMap V W) = (algebraMap K L).comp (algebraMap V K)
+        → IsLocalHom (algebraMap V W)
+        → ∀ (X : Scheme.{0}) (x : Sp K ⟶ X) (f : Sp W ⟶ X),
+          spMap (algebraMap K L) ≫ x = spMap (algebraMap W L) ≫ f
+            → ∃ x' : Sp V ⟶ X, spMap (algebraMap V K) ≫ x' = x := by
   intro V K W L _ _ _ _ _ _ _ _ _ _ _ _ _ _ hcomm hloc X x f hxf
   classical
-
   let c : Sp W := IsLocalRing.closedPoint W
-  obtain ⟨U, hU, hcU, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens)
-    (show f c ∈ (⊤ : X.Opens) from trivial)
+  obtain ⟨U, hU, hcU, -⟩ :=
+    (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens) (show f c ∈ (⊤ : X.Opens) from
+      trivial)
   have hU' : IsAffineOpen U := hU
   have hfU : ∀ a : Sp W, f a ∈ U := fun a =>
     ((IsLocalRing.specializes_closedPoint (R := W) a).map f.continuous).mem_open U.isOpen hcU
@@ -52,7 +63,8 @@ theorem descend_point_to_valuationRing_of_dominating_local_domain : ∀ (V K W L
   set α := Spec.preimage (IsOpenImmersion.lift hU'.fromSpec x hrx) with hα
   have key : α ≫ CommRingCat.ofHom (algebraMap K L) = β ≫ CommRingCat.ofHom (algebraMap W L) := by
     apply Spec.map_injective
-    rw [← cancel_mono hU'.fromSpec, Spec.map_comp, Spec.map_comp, Category.assoc, Category.assoc, hx₁, hf₁]
+    rw [← cancel_mono hU'.fromSpec, Spec.map_comp, Spec.map_comp, Category.assoc, Category.assoc,
+      hx₁, hf₁]
     exact hxf
   have key' : ∀ r, algebraMap K L (α.hom r) = algebraMap W L (β.hom r) := fun r => by
     have e := congrArg (fun h => h.hom r) key
@@ -75,12 +87,12 @@ theorem descend_point_to_valuationRing_of_dominating_local_domain : ∀ (V K W L
         apply (isUnit_map_iff (algebraMap V W) b).1
         refine isUnit_iff_exists_inv.2 ⟨β.hom r, ?_⟩
         apply IsFractionRing.injective W L
-        rw [map_mul, map_one, ← key', ← RingHom.comp_apply, hcomm, RingHom.comp_apply, hb, ← map_mul,
-          inv_mul_cancel₀ h0, map_one]
+        rw [map_mul, map_one, ← key', ← RingHom.comp_apply, hcomm, RingHom.comp_apply, hb,
+          ← map_mul, inv_mul_cancel₀ h0, map_one]
   have hinj : Function.Injective (algebraMap V K) := IsFractionRing.injective V K
   let e : V ≃+* (algebraMap V K).range :=
-    RingEquiv.ofBijective (algebraMap V K).rangeRestrict ⟨fun a b h => hinj (congrArg Subtype.val h),
-      (algebraMap V K).rangeRestrict_surjective⟩
+    RingEquiv.ofBijective (algebraMap V K).rangeRestrict
+      ⟨fun a b h => hinj (congrArg Subtype.val h), (algebraMap V K).rangeRestrict_surjective⟩
   let χ : Γ(X, U) →+* V := e.symm.toRingHom.comp (α.hom.codRestrict _ hmem)
   have hχ : (algebraMap V K).comp χ = α.hom := by
     ext r

@@ -14,29 +14,35 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmFiniteA
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
-open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum GlobalTheory.NormSum GlobalTheory.FunObj.StdDatum
+open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
+  GlobalTheory.NormSum GlobalTheory.FunObj.StdDatum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
 
 namespace GlobalTheory.PowIdem
 
-theorem exists_period {M : Type*} [Monoid M] [Finite M] (y : M) :
-    ∃ i p : ℕ, 0 < p ∧ i + p ≤ Nat.card M ∧ y ^ (i + p) = y ^ i := by
+theorem exists_period {M : Type*} [Monoid M] [Finite M] (y : M)
+    : ∃ i p : ℕ, 0 < p ∧ i + p ≤ Nat.card M ∧ y ^ (i + p) = y ^ i := by
   classical
   haveI := Fintype.ofFinite M
-  obtain ⟨a, b, hab, h⟩ := Fintype.exists_ne_map_eq_of_card_lt
-    (fun i : Fin (Nat.card M + 1) => y ^ (i : ℕ)) (by simp [Nat.card_eq_fintype_card])
+  obtain ⟨a, b, hab, h⟩ :=
+    Fintype.exists_ne_map_eq_of_card_lt (fun i : Fin (Nat.card M + 1) => y ^ (i : ℕ)) (by
+      simp [Nat.card_eq_fintype_card])
   have ha := a.isLt
   have hb := b.isLt
   rcases lt_or_gt_of_ne (Fin.val_injective.ne hab) with hlt | hlt
   · refine ⟨a, b - a, by omega, by omega, ?_⟩
-    rw [Nat.add_sub_cancel' hlt.le]; exact h.symm
+    rw [Nat.add_sub_cancel' hlt.le]
+    exact h.symm
   · refine ⟨b, a - b, by omega, by omega, ?_⟩
-    rw [Nat.add_sub_cancel' hlt.le]; exact h
+    rw [Nat.add_sub_cancel' hlt.le]
+    exact h
 
-theorem pow_add_mul_factorial {M : Type*} [Monoid M] [Finite M] (y : M) (n : ℕ)
-    (hn : Nat.card M ≤ n) (k j : ℕ) (hk : n ≤ k) : y ^ (k + j * n.factorial) = y ^ k := by
+theorem pow_add_mul_factorial
+    {M : Type*} [Monoid M] [Finite M] (y : M) (n : ℕ) (hn : Nat.card M ≤ n) (k j : ℕ) (hk : n ≤ k)
+    : y ^ (k + j * n.factorial) = y ^ k := by
   obtain ⟨i, p, hp, hip, h⟩ := exists_period y
   have step : ∀ t, i ≤ t → y ^ (t + p) = y ^ t := by
     intro t ht
@@ -53,15 +59,14 @@ theorem pow_add_mul_factorial {M : Type*} [Monoid M] [Finite M] (y : M) (n : ℕ
   rw [hc, show j * (p * c) = (j * c) * p by ring]
   exact iter _ _ (by omega)
 
-theorem finite_quot (D : D7) (N : ℕ) (hN : 0 < N) :
-    Finite (OhE D ⧸ Ideal.span {(N : OhE D)}) := by
+theorem finite_quot (D : D7) (N : ℕ) (hN : 0 < N) : Finite (OhE D ⧸ Ideal.span {(N : OhE D)}) := by
   let ι : 𝓞 D.host.E →+* OhE D :=
-    ((inc D).comp (algebraMap (𝓞 D.host.E) D.host.E)).codRestrict _
-      fun x => GlobalTheory.CongApprox.inc_mem_OhE D x
+    ((inc D).comp (algebraMap (𝓞 D.host.E) D.host.E)).codRestrict _ fun x =>
+      GlobalTheory.CongApprox.inc_mem_OhE D x
   haveI : Finite (𝓞 D.host.E ⧸ Ideal.span {(N : 𝓞 D.host.E)}) :=
     Ideal.finiteQuotientOfFreeOfNeBot _ (by simpa using hN.ne')
-  refine Finite.of_surjective (Ideal.quotientMap (I := Ideal.span {(N : 𝓞 D.host.E)})
-    (Ideal.span {(N : OhE D)}) ι ?_) ?_
+  refine Finite.of_surjective
+    (Ideal.quotientMap (I := Ideal.span {(N : 𝓞 D.host.E)}) (Ideal.span {(N : OhE D)}) ι ?_) ?_
   · rw [Ideal.span_le, Set.singleton_subset_iff]
     change ι N ∈ Ideal.span {(N : OhE D)}
     rw [map_natCast]
@@ -76,9 +81,10 @@ theorem finite_quot (D : D7) (N : ℕ) (hN : 0 < N) :
     rw [h, add_sub_cancel_left]
     simp
 
-theorem exists_of_mk_eq (D : D7) (N : ℕ) (a b : OhE D)
-    (h : Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) a = Ideal.Quotient.mk _ b) :
-    ∃ w ∈ OhE D, (a : AE D) = b + (N : AE D) * w := by
+theorem exists_of_mk_eq
+    (D : D7) (N : ℕ)
+    (a b : OhE D) (h : Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) a = Ideal.Quotient.mk _ b)
+    : ∃ w ∈ OhE D, (a : AE D) = b + (N : AE D) * w := by
   rw [Ideal.Quotient.eq, Ideal.mem_span_singleton] at h
   obtain ⟨c, hc⟩ := h
   refine ⟨c, c.2, ?_⟩
@@ -86,16 +92,17 @@ theorem exists_of_mk_eq (D : D7) (N : ℕ) (a b : OhE D)
   push_cast at this
   linear_combination this
 
-theorem mk_eq_of_exists (D : D7) (N : ℕ) (a b : OhE D) (w : AE D) (hw : w ∈ OhE D)
-    (h : (a : AE D) = b + (N : AE D) * w) :
-    Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) a = Ideal.Quotient.mk _ b := by
+theorem mk_eq_of_exists
+    (D : D7) (N : ℕ) (a b : OhE D) (w : AE D) (hw : w ∈ OhE D) (h : (a : AE D) = b + (N : AE D) * w)
+    : Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) a = Ideal.Quotient.mk _ b := by
   rw [Ideal.Quotient.eq, Ideal.mem_span_singleton]
   refine ⟨⟨w, hw⟩, Subtype.ext ?_⟩
   push_cast
   linear_combination h
 
-theorem pow_sub_one_mem (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (y : AE D) (hy : y ∈ OhE D)
-    (hy1 : y - 1 ∈ hatId D 𝔪) (k : ℕ) : y ^ k - 1 ∈ hatId D 𝔪 := by
+theorem pow_sub_one_mem
+    (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (y : AE D) (hy : y ∈ OhE D) (hy1 : y - 1 ∈ hatId D 𝔪) (k : ℕ)
+    : y ^ k - 1 ∈ hatId D 𝔪 := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -103,23 +110,31 @@ theorem pow_sub_one_mem (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (y : AE D) (hy :
     rw [e]
     exact add_mem (GlobalTheory.CongApprox.mul_mem_hatId D 𝔪 y hy _ ih) hy1
 
-
 set_option maxHeartbeats 1600000 in
-theorem exists_idem : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪 ≠ ⊥ → ∀ y ∈ OhE D, y - 1 ∈ hatId D 𝔪 → ∃ g ∈ OhE D, y * g * (y * g) = y * g ∧ y * g - 1 ∈ hatId D 𝔪 := by
+theorem exists_idem
+    : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)),
+      𝔪 ≠ ⊥
+        → ∀ y ∈ OhE D,
+          y - 1 ∈ hatId D 𝔪 → ∃ g ∈ OhE D, y * g * (y * g) = y * g ∧ y * g - 1 ∈ hatId D 𝔪 := by
   intro D 𝔪 h𝔪 y hy hy1
   obtain ⟨hsep, hcpl⟩ := GlobalTheory.T.cmFiniteAdele_integral_separated_complete D
-  let R : ℕ → ℕ := fun N =>
-    ∑ n ∈ Finset.range (N + 1), Nat.card (OhE D ⧸ Ideal.span {(n : OhE D)})
+  let R : ℕ → ℕ := fun N => ∑ n ∈ Finset.range (N + 1), Nat.card (OhE D ⧸ Ideal.span {(n : OhE D)})
   have hR : ∀ N : ℕ, Nat.card (OhE D ⧸ Ideal.span {(N : OhE D)}) ≤ R N := fun N =>
-    Finset.single_le_sum (f := fun n : ℕ => Nat.card (OhE D ⧸ Ideal.span {((n : ℕ) : OhE D)}))
-      (fun _ _ => Nat.zero_le _) (Finset.self_mem_range_succ N)
+    Finset.single_le_sum
+      (f := fun n : ℕ => Nat.card (OhE D ⧸ Ideal.span {((n : ℕ) : OhE D)}))
+      (fun _ _ => Nat.zero_le _)
+      (Finset.self_mem_range_succ N)
   have hRmono : ∀ N M, N ≤ M → R N ≤ R M := fun N M h =>
     Finset.sum_le_sum_of_subset (by intro a ha; simp only [Finset.mem_range] at ha ⊢; omega)
   let ys : OhE D := ⟨y, hy⟩
   let e : ℕ → ℕ := fun N => 2 * (R N).factorial - 1
-  have key : ∀ N : ℕ, 0 < N → ∀ k j, R N ≤ k →
-      (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (k + j * (R N).factorial) =
-        (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ k := by
+  have key
+      : ∀ N : ℕ,
+        0 < N
+          → ∀ k j,
+            R N ≤ k
+              → (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (k + j * (R N).factorial)
+                = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ k := by
     intro N hN k j hk
     haveI := finite_quot D N hN
     exact pow_add_mul_factorial _ _ (hR N) k j hk
@@ -160,14 +175,20 @@ theorem exists_idem : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪 ≠ ⊥ 
     rw [map_pow, map_pow, hj, key N hN _ _ (he N)]
   obtain ⟨g, hg, hgN⟩ := hcpl x hx hcong
   let gs : OhE D := ⟨g, hg⟩
-  have hmk : ∀ N : ℕ, 0 < N → Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) gs =
-      (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ e N := by
+  have hmk
+      : ∀ N : ℕ,
+        0 < N
+          → Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) gs
+            = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ e N := by
     intro N hN
     obtain ⟨w, hw, h⟩ := hgN N hN
     rw [← map_pow]
     exact mk_eq_of_exists D N gs (ys ^ e N) w hw h
-  have hyg : ∀ N : ℕ, 0 < N → Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) =
-      (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial) := by
+  have hyg
+      : ∀ N : ℕ,
+        0 < N
+          → Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs)
+            = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial) := by
     intro N hN
     rw [map_mul, hmk N hN, ← he1]
     exact (pow_succ' _ _).symm
@@ -175,38 +196,47 @@ theorem exists_idem : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪 ≠ ⊥ 
   · have h0 : y * g * (y * g) - y * g = 0 := by
       apply hsep
       intro N hN
-      have hq : Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs * (ys * gs)) =
-          Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) := by
+      have hq
+          : Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs * (ys * gs))
+            = Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) := by
         have hk : R N ≤ 2 * (R N).factorial := (he N).trans ((Nat.le_succ _).trans (he1 N).le)
-        calc Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs * (ys * gs))
-            = Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) *
-                Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) := map_mul _ _ _
-          _ = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial) *
-                (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial) := by
-              rw [hyg N hN]
-          _ = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^
-                (2 * (R N).factorial + 2 * (R N).factorial) := (pow_add _ _ _).symm
+        calc
+          Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs * (ys * gs))
+              = Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs)
+                * Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) :=
+            map_mul _ _ _
+          _ = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial)
+              * (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial) := by
+            rw [hyg N hN]
+          _ = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys)
+              ^ (2 * (R N).factorial + 2 * (R N).factorial) :=
+            (pow_add _ _ _).symm
           _ = (Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) ys) ^ (2 * (R N).factorial) :=
-              key N hN _ 2 hk
+            key N hN _ 2 hk
           _ = Ideal.Quotient.mk (Ideal.span {(N : OhE D)}) (ys * gs) := (hyg N hN).symm
       obtain ⟨w, hw, h⟩ := exists_of_mk_eq D N _ _ hq
       refine ⟨w, hw, ?_⟩
       have h' : y * g * (y * g) = y * g + (N : AE D) * w := h
-      rw [h']; ring
+      rw [h']
+      ring
     exact sub_eq_zero.1 h0
   · have hN0 : 0 < Ideal.absNorm 𝔪 := by
       rcases Nat.eq_zero_or_pos (Ideal.absNorm 𝔪) with h0 | h0
       · exact absurd (Ideal.absNorm_eq_zero_iff.1 h0) h𝔪
       · exact h0
-    obtain ⟨w, hw, h⟩ := exists_of_mk_eq D (Ideal.absNorm 𝔪) (ys * gs) (ys ^ (2 * (R (Ideal.absNorm 𝔪)).factorial))
-      (by rw [map_pow]; exact hyg _ hN0)
+    obtain ⟨w, hw, h⟩ :=
+      exists_of_mk_eq D (Ideal.absNorm 𝔪) (ys * gs) (ys ^ (2 * (R (Ideal.absNorm 𝔪)).factorial))
+        (by rw [map_pow]; exact hyg _ hN0)
     have h' : y * g = y ^ (2 * (R (Ideal.absNorm 𝔪)).factorial) + (Ideal.absNorm 𝔪 : AE D) * w := by
       exact h
     have hmem : (Ideal.absNorm 𝔪 : AE D) * w ∈ hatId D 𝔪 := by
-      refine AddSubgroup.subset_closure ⟨(Ideal.absNorm 𝔪 : 𝓞 D.host.E), Ideal.absNorm_mem 𝔪, w, hw, ?_⟩
+      refine AddSubgroup.subset_closure
+        ⟨(Ideal.absNorm 𝔪 : 𝓞 D.host.E), Ideal.absNorm_mem 𝔪, w, hw, ?_⟩
       congr 1
-    rw [h', show y ^ (2 * (R (Ideal.absNorm 𝔪)).factorial) + (Ideal.absNorm 𝔪 : AE D) * w - 1 =
-      (y ^ (2 * (R (Ideal.absNorm 𝔪)).factorial) - 1) + (Ideal.absNorm 𝔪 : AE D) * w by ring]
+    rw [h',
+      show y ^ (2 * (R (Ideal.absNorm 𝔪)).factorial) + (Ideal.absNorm 𝔪 : AE D) * w - 1
+          = (y ^ (2 * (R (Ideal.absNorm 𝔪)).factorial) - 1) + (Ideal.absNorm 𝔪 : AE D) * w by
+        ring]
     exact add_mem (pow_sub_one_mem D 𝔪 y hy hy1 _) hmem
 
 end GlobalTheory.PowIdem

@@ -25,27 +25,33 @@ def headIdx {j N : ℕ} (h : j ≤ N) (a : Fin j) : Fin N := Fin.castLE h a
 
 def tailIdx {j N : ℕ} (h : j ≤ N) (a : Fin (N - j)) : Fin N := ⟨j + a, by have := a.isLt; omega⟩
 
-def IsAdaptedFrame (y : (Σ k, ι k) → Ω) (W : ChartBundle ℤ (segreCoord y) N E) (F : Submodule Ω E)
-    {j : ℕ} (hj : j ≤ N) (c : (k : K) → ι k) (f : Ω) (b : Fin N → E) : Prop :=
-  IsFrameOver y W c f b ∧ Submodule.span Ω (Set.range b) = ⊤ ∧
-    Submodule.span Ω (Set.range (b ∘ headIdx hj)) = F
+def IsAdaptedFrame
+    (y : (Σ k, ι k) → Ω) (W : ChartBundle ℤ (segreCoord y) N E)
+    (F : Submodule Ω E)
+    {j : ℕ} (hj : j ≤ N)
+    (c : (k : K) → ι k) (f : Ω) (b : Fin N → E)
+    : Prop :=
+  IsFrameOver y W c f b ∧ Submodule.span Ω (Set.range b) = ⊤
+    ∧ Submodule.span Ω (Set.range (b ∘ headIdx hj)) = F
 
 def quotWedge (F : Submodule Ω E) {j : ℕ} (hj : j ≤ N) (b : Fin N → E) : ⋀[Ω]^(N - j) (E ⧸ F) :=
   exteriorPower.ιMulti Ω (N - j) fun a => F.mkQ (b (tailIdx hj a))
 
-variable {y : (Σ k, ι k) → Ω} {W : ChartBundle ℤ (segreCoord y) N E} {Xo : Set ((Σ k, ι k) → ℂ)}
+variable
+  {y : (Σ k, ι k) → Ω} {W : ChartBundle ℤ (segreCoord y) N E} {Xo : Set ((Σ k, ι k) → ℂ)}
   {P : Ideal (MRing ι)} {n nc : ℕ} {Bd : Set ((Σ k, ι k) → ℂ)} {χ : Fin nc → SncChart P n Bd}
 
-
 open Classical in
-def gramAt (hm : HermMetric y W Xo χ) (b : Fin N → E) (z : (Σ k, ι k) → ℂ) :
-    Matrix (Fin N) (Fin N) ℂ :=
+def gramAt (hm : HermMetric y W Xo χ) (b : Fin N → E) (z : (Σ k, ι k) → ℂ)
+    : Matrix (Fin N) (Fin N) ℂ :=
   if hl : ∃ l, InFrameDomain y (hm.chart l) (hm.fr l) z then
     if hS : ∃ S : Matrix (Fin N) (Fin N) Ω, ∀ q, b q = ∑ p, S p q • hm.b hl.choose p then
-      (Matrix.of fun p q => valAt y (hS.choose p q) z)ᴴ * hm.gram hl.choose z *
-        Matrix.of fun p q => valAt y (hS.choose p q) z
-    else 0
-  else 0
+      (Matrix.of fun p q => valAt y (hS.choose p q) z)ᴴ * hm.gram hl.choose z
+        * Matrix.of fun p q => valAt y (hS.choose p q) z
+    else
+      0
+  else
+    0
 
 def quotNormSq {j : ℕ} (hj : j ≤ N) (G : Matrix (Fin N) (Fin N) ℂ) : ℝ :=
   G.det.re / (G.submatrix (headIdx hj) (headIdx hj)).det.re
@@ -54,29 +60,36 @@ end Frames
 
 section Main
 
-theorem ComponentData.j_le_N {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] {Ω : Type} [Field Ω]
-    [Algebra ℚ Ω] {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
-    (D : ComponentData II Ψ K ι Ω E) : D.j ≤ D.N :=
+theorem ComponentData.j_le_N
+    {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
+    (D : ComponentData II Ψ K ι Ω E)
+    : D.j ≤ D.N :=
   D.j_le.trans (Nat.sub_le _ _)
 
-variable {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+variable
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
   {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
 
 structure HodgeData (D : ComponentData II Ψ K ι Ω E) where
-
   F : ∀ τ, Submodule Ω (E τ)
-
   aMu : K → ℤ
-
   Λ : PiTensorProduct Ω fun τ => ⋀[Ω]^(D.N - D.j) (E τ ⧸ F τ)
-
-  locally : ∀ c : (k : K) → ι k, segreCoord D.y c ≠ 0 →
-    ∃ (m : ℕ) (f cc : Fin m → Ω), (∀ l, f l ∈ chartRing ℤ (segreCoord D.y) c) ∧
-      (∀ l, cc l ∈ chartRing ℤ (segreCoord D.y) c) ∧ ∑ l, cc l * f l = 1 ∧
-      ∀ l, ∃ b : ∀ τ, Fin D.N → E τ,
-        (∀ τ, IsAdaptedFrame D.y (D.W τ) (F τ) D.j_le_N c (f l) (b τ)) ∧
-        ∃ u : Ω, IsUnitOn D.y c (f l) u ∧
-          Λ = (u * chartMono D.y c aMu) • PiTensorProduct.tprod Ω fun τ => quotWedge (F τ) D.j_le_N (b τ)
+  locally
+    : ∀ c : (k : K) → ι k,
+      segreCoord D.y c ≠ 0
+        → ∃ (m : ℕ) (f cc : Fin m → Ω),
+          (∀ l, f l ∈ chartRing ℤ (segreCoord D.y) c) ∧ (∀ l, cc l ∈ chartRing ℤ (segreCoord D.y) c)
+            ∧ ∑ l, cc l * f l = 1
+            ∧ ∀ l, ∃ b : ∀ τ, Fin D.N → E τ,
+              (∀ τ, IsAdaptedFrame D.y (D.W τ) (F τ) D.j_le_N c (f l) (b τ))
+                ∧ ∃ u : Ω,
+                  IsUnitOn D.y c (f l) u
+                    ∧ Λ
+                      = (u * chartMono D.y c aMu)
+                        • PiTensorProduct.tprod Ω fun τ => quotWedge (F τ) D.j_le_N (b τ)
 
 variable {D : ComponentData II Ψ K ι Ω E}
 
@@ -88,12 +101,14 @@ structure MuFrameAt (H : HodgeData D) (z : (Σ k, ι k) → ℂ) where
   adapted : ∀ τ, IsAdaptedFrame D.y (D.W τ) (H.F τ) D.j_le_N c f (b τ)
   u : Ω
   unit : IsUnitOn D.y c f u
-  eq : H.Λ = (u * chartMono D.y c H.aMu) • PiTensorProduct.tprod Ω fun τ => quotWedge (H.F τ) D.j_le_N (b τ)
+  eq
+    : H.Λ
+      = (u * chartMono D.y c H.aMu)
+        • PiTensorProduct.tprod Ω fun τ => quotWedge (H.F τ) D.j_le_N (b τ)
 
 def MuFrameAt.norm {H : HodgeData D} {z : (Σ k, ι k) → ℂ} (d : MuFrameAt H z) : ℝ :=
-  ‖valAt D.y d.u z‖ * (∏ k, ‖z ⟨k, d.c k⟩‖ ^ H.aMu k) *
-    ∏ τ, Real.sqrt (quotNormSq D.j_le_N (gramAt (D.h τ) (d.b τ) z))
-
+  ‖valAt D.y d.u z‖ * (∏ k, ‖z ⟨k, d.c k⟩‖ ^ H.aMu k)
+    * ∏ τ, Real.sqrt (quotNormSq D.j_le_N (gramAt (D.h τ) (d.b τ) z))
 
 open Classical in
 def muMetric (H : HodgeData D) (z : (Σ k, ι k) → ℂ) : ℝ :=

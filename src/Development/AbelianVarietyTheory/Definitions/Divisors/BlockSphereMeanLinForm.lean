@@ -12,5 +12,4 @@ noncomputable section
 open MvPolynomial NumberField
 namespace GlobalTheory.ChowHt.Model
 
-
 end GlobalTheory.ChowHt.Model

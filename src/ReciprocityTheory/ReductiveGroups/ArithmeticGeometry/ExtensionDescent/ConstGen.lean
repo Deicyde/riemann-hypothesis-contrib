@@ -27,23 +27,18 @@ def thetaLB (L : LB A.left) (k : ℤ) {T : Over S} (x : T ⟶ A) : LB (T ⊗ A).
   LB.LinComb L (K := Fin 2) ![(snd T A).left, (translPt A x).left] ![k, -k]
 
 structure ThetaGrp (L : LB A.left) (k : ℤ) (T : Over S) where
-
   pt : T ⟶ A
-
   φ : LB.Gen (thetaLB A L k pt)
-
   isGen : φ.IsGen
 
-def constGen (L : LB A.left) {T : Over S} (c : Γ(T.left, ⊤)ˣ) :
-    LB.Gen (LB.LinComb L (Y := (T ⊗ A).left) (K := PEmpty) PEmpty.elim PEmpty.elim) where
+def constGen (L : LB A.left) {T : Over S} (c : Γ(T.left, ⊤)ˣ)
+    : LB.Gen (LB.LinComb L (Y := (T ⊗ A).left) (K := PEmpty) PEmpty.elim PEmpty.elim) where
   s := fun _ => res le_top (Units.map (fst T A).left.appTop.hom.toMonoidHom c)
 
-def CommIsOf (L : LB A.left) (k : ℤ) {T : Over S} (θx θy : ThetaGrp A L k T)
-    (c : Γ(T.left, ⊤)ˣ) : Prop :=
-  LB.Gen.Corr L _ _ _ _
-    (LB.mulGen L _ _ _ _ θx.φ (LB.pullGen L _ _ θy.φ (translT A θx.pt).left))
-    (LB.mulGen L _ _ _ _
-      (LB.mulGen L _ _ _ _ θy.φ (LB.pullGen L _ _ θx.φ (translT A θy.pt).left))
+def CommIsOf (L : LB A.left) (k : ℤ) {T : Over S} (θx θy : ThetaGrp A L k T) (c : Γ(T.left, ⊤)ˣ)
+    : Prop :=
+  LB.Gen.Corr L _ _ _ _ (LB.mulGen L _ _ _ _ θx.φ (LB.pullGen L _ _ θy.φ (translT A θx.pt).left))
+    (LB.mulGen L _ _ _ _ (LB.mulGen L _ _ _ _ θy.φ (LB.pullGen L _ _ θx.φ (translT A θy.pt).left))
       (constGen A L c))
 
 abbrev overRes {T : Over S} (V : T.left.Opens) : Over S := Over.mk (V.ι ≫ T.hom)
@@ -54,9 +49,9 @@ def unitRes {T : Over S} (V : T.left.Opens) (c : Γ(T.left, ⊤)ˣ) : Γ((overRe
   Units.map V.ι.appTop.hom.toMonoidHom c
 
 def WeilIs (L : LB A.left) (k : ℤ) {T : Over S} (x y : T ⟶ A) (c : Γ(T.left, ⊤)ˣ) : Prop :=
-  ∀ p : T.left, ∃ V : T.left.Opens, p ∈ V ∧
-    (∃ θx θy : ThetaGrp A L k (overRes V), θx.pt = overResι V ≫ x ∧ θy.pt = overResι V ≫ y) ∧
-    ∀ θx θy : ThetaGrp A L k (overRes V), θx.pt = overResι V ≫ x → θy.pt = overResι V ≫ y →
-      CommIsOf A L k θx θy (unitRes V c)
+  ∀ p : T.left, ∃ V : T.left.Opens,
+    p ∈ V ∧ (∃ θx θy : ThetaGrp A L k (overRes V), θx.pt = overResι V ≫ x ∧ θy.pt = overResι V ≫ y)
+      ∧ ∀ θx θy : ThetaGrp A L k (overRes V),
+        θx.pt = overResι V ≫ x → θy.pt = overResι V ≫ y → CommIsOf A L k θx θy (unitRes V c)
 
 end ReciprocityTheory.ChartRestriction.G.Out

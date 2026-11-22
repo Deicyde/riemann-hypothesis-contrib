@@ -10,20 +10,23 @@ open Polynomial Matrix GlobalTheory.LatOrb
 
 namespace GlobalTheory.LatOrb
 
-theorem herm_mulVec_eq_adj {K : Type} [Field K] (σ : K →+* K)
-    {n : ℕ} (x : Matrix (Fin n) (Fin n) K) (y m : Fin n → K) :
-    herm σ y (x *ᵥ m) = herm σ ((x.map σ)ᵀ *ᵥ y) m := by
+theorem herm_mulVec_eq_adj
+    {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (x : Matrix (Fin n) (Fin n) K) (y m : Fin n → K)
+    : herm σ y (x *ᵥ m) = herm σ ((x.map σ)ᵀ *ᵥ y) m := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [herm, Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.transpose_apply,
-    Matrix.map_apply, Finset.sum_mul, Finset.mul_sum]
+      Matrix.map_apply, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
   ring
 
-theorem matLat_adj_mul_eq_of_selfDual : ∀ {O K : Type} [CommRing O] [Field K] [Algebra O K] (σ : K →+* K),
-    (∀ x, σ (σ x) = x) → ∀ (n : ℕ) (x : Matrix (Fin n) (Fin n) K), IsUnit x →
-    ∀ M : Submodule O (Fin n → K), SelfDual O σ M → SelfDual O σ (matLat O x M) →
-    matLat O ((x.map σ)ᵀ * x) M = M := by
+theorem matLat_adj_mul_eq_of_selfDual
+    : ∀ {O K : Type} [CommRing O] [Field K] [Algebra O K] (σ : K →+* K),
+      (∀ x, σ (σ x) = x)
+        → ∀ (n : ℕ) (x : Matrix (Fin n) (Fin n) K),
+          IsUnit x
+            → ∀ M : Submodule O (Fin n → K),
+              SelfDual O σ M → SelfDual O σ (matLat O x M) → matLat O ((x.map σ)ᵀ * x) M = M := by
   intro O K _ _ _ σ _ n x hx M hM hxM
 
   have key : ∀ y, y ∈ matLat O x M ↔ (x.map σ)ᵀ *ᵥ y ∈ M := by
@@ -53,8 +56,8 @@ theorem matLat_adj_mul_eq_of_selfDual : ∀ {O K : Type} [CommRing O] [Field K] 
     set A := (x.map σ)ᵀ * x with hA
     refine ⟨A⁻¹ *ᵥ u, ?_, ?_⟩
     · have h1 : (x.map σ)ᵀ *ᵥ (x *ᵥ (A⁻¹ *ᵥ u)) ∈ M := by
-        rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, ← hA,
-          Matrix.mul_nonsing_inv A hdet, Matrix.one_mulVec]
+        rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, ← hA, Matrix.mul_nonsing_inv A hdet,
+          Matrix.one_mulVec]
         exact hu
       obtain ⟨m', hm', hxm'⟩ := (mem_matLat x M _).1 ((key _).2 h1)
       have : m' = A⁻¹ *ᵥ u := by

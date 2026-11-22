@@ -14,8 +14,9 @@ namespace Formalism.HermitianLattices.Ext.L3.ThirdPropositionSlot
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem absNorm_extP (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F)) :
-    Ideal.absNorm (extP K 𝔭) = Ideal.absNorm 𝔭 ^ 2 := by
+theorem absNorm_extP
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F))
+    : Ideal.absNorm (extP K 𝔭) = Ideal.absNorm 𝔭 ^ 2 := by
   induction 𝔭 using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => simp [extP]
   | h₂ x hx =>
@@ -28,28 +29,37 @@ theorem absNorm_extP (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : 
     simp only [extP] at ih hq ⊢
     rw [Ideal.map_mul, map_mul, map_mul, ih, hq, mul_pow]
 
-theorem map_comap_eq_of_inert (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P = P) :
-    extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = P := by
+theorem map_comap_eq_of_inert
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)}
+    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P = P)
+    : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = P := by
   obtain ⟨θ, hθ⟩ := exists_sub_conjO_notMem hK hP
   rw [conjIdeal_eq_comap] at hc
   exact SplitPrimeIdeals.map_comap_of_inert conjO_conjO (conjO_eq_iff_mem_range hF) hP hc hθ
 
-theorem extP_split (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≠ P) :
-    extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = P * Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
+theorem extP_split
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)}
+    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≠ P)
+    : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K)))
+      = P * Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
   have hP' := conjIdeal_isMaximal hK hP
   have h1 : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) ≤ P := Ideal.map_comap_le
-  have h2 : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) ≤ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
-    have : (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P).comap (algebraMap (𝓞 F) (𝓞 K)) =
-        P.comap (algebraMap (𝓞 F) (𝓞 K)) := by
+  have h2
+      : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K)))
+        ≤ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
+    have : (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P).comap (algebraMap (𝓞 F) (𝓞 K))
+        = P.comap (algebraMap (𝓞 F) (𝓞 K)) := by
       rw [conjIdeal_eq_comap]
       exact SplitPrimeIdeals.comap_ι_comap (conjO_eq_iff_mem_range hF) P
     rw [← this]
     exact Ideal.map_comap_le
   have hcop : IsCoprime P (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P) :=
     (Ideal.isCoprime_iff_sup_eq).2 (hP.coprime_of_ne hP' (Ne.symm hc))
-  have h3 : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) ≤ P * Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
+  have h3
+      : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K)))
+        ≤ P * Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
     rw [Ideal.mul_eq_inf_of_isCoprime hcop]
     exact le_inf h1 h2
   obtain ⟨C, hC⟩ := Ideal.dvd_iff_le.2 h3
@@ -63,13 +73,15 @@ theorem extP_split (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : Is
   have hC1 : Ideal.absNorm C = 1 := Nat.eq_of_mul_eq_mul_left hpos (by rw [hN, mul_one])
   rw [hC, Ideal.absNorm_eq_one_iff.1 hC1, Ideal.mul_top]
 
-theorem alphaStd_one (𝔭 : Ideal (𝓞 F)) :
-    alphaStd K 𝔭 1 = 1 - etaF K F 𝔭 * (Ideal.absNorm 𝔭 : ℝ)⁻¹ := by
+theorem alphaStd_one (𝔭 : Ideal (𝓞 F))
+    : alphaStd K 𝔭 1 = 1 - etaF K F 𝔭 * (Ideal.absNorm 𝔭 : ℝ)⁻¹ := by
   simp [alphaStd]
 
-theorem normRepCount_extP (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {j : ℕ} (hj : 1 ≤ j) :
-    (normRepCount K (extP K 𝔭 ^ j) 1 1 : ℝ) = (Ideal.absNorm 𝔭 : ℝ) ^ j * alphaStd K 𝔭 1 := by
+theorem normRepCount_extP
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {j : ℕ} (hj : 1 ≤ j)
+    : (normRepCount K (extP K 𝔭 ^ j) 1 1 : ℝ) = (Ideal.absNorm 𝔭 : ℝ) ^ j * alphaStd K 𝔭 1 := by
   obtain ⟨P, hP, rfl⟩ := exists_maximal_over hK hF h𝔭
   have h1 : (1 : 𝓞 K) ∉ P := fun h => hP.ne_top ((Ideal.eq_top_iff_one P).2 h)
   have hd := localDensity K hK P hP 1 j le_rfl hj 1 (map_one _) h1

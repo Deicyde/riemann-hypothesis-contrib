@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.Star
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Matrix
 open GlobalTheory.DualPairCheck
 open scoped TensorProduct
 
@@ -34,7 +36,8 @@ theorem gram_det_ne (V : HSp D) : V.gram.det ≠ 0 := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Module.Basis.equivFun_symm_apply, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [map_smul, smul_eq_mul, mul_comm]; rfl
+      rw [map_smul, smul_eq_mul, mul_comm]
+      rfl
     rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, h2, h1, smul_zero]
   exact V.frame.equivFun.symm.injective (this.trans (map_zero _).symm)
 
@@ -49,13 +52,15 @@ theorem gram_conj (V : HSp D) : ((V.gram.map (incA D)).map (cA D))ᵀ = V.gram.m
 section Generic
 variable {A : Type} [CommRing A] {m n : ℕ}
 
-theorem inv_conj (σ : A →+* A) (P Pi : Matrix (Fin n) (Fin n) A) (h : P * Pi = 1) (hP : (P.map σ)ᵀ = P) :
-    (Pi.map σ)ᵀ = Pi := by
+theorem inv_conj
+    (σ : A →+* A) (P Pi : Matrix (Fin n) (Fin n) A) (h : P * Pi = 1) (hP : (P.map σ)ᵀ = P)
+    : (Pi.map σ)ᵀ = Pi := by
   have h' : Pi * P = 1 := mul_eq_one_comm.1 h
   have h2 : P * (Pi.map σ)ᵀ = 1 := by
     rw [← hP, ← Matrix.transpose_mul, ← Matrix.map_mul, h',
       Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one]
-  calc _ = (Pi * P) * (Pi.map σ)ᵀ := by rw [h', Matrix.one_mul]
+  calc
+    _ = (Pi * P) * (Pi.map σ)ᵀ := by rw [h', Matrix.one_mul]
     _ = _ := by rw [Matrix.mul_assoc, h2, Matrix.mul_one]
 
 end Generic

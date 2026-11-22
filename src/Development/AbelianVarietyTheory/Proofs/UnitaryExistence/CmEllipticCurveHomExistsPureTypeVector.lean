@@ -9,34 +9,49 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FamilyUni
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType GlobalTheory.CompRat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType
+  GlobalTheory.CompRat
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.CurveHomLift
 
 open UniformLift
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {σ : KA l →+* ℂ} {g : ℕ} {ty : Fin g → (E →+* ℂ)}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {σ : KA l →+* ℂ} {g : ℕ}
+  {ty : Fin g → (E →+* ℂ)}
 
-theorem exists_linear_lift_of_isHolTo (F : FamilyUnif Xo σ ty) (i : Fin F.n) (P : (F.Di i).La →+ (Fin g → ℂ))
-    (hP : IsPeriod (F.Di i) ty P) {m : ℕ} (e : (Fin m → ℂ) → (Over.mk (F.u i P) ⟶ Xo.univ.t.G))
-    (he : ∀ z w, e (z + w) = e z * e w) (hol : IsHolTo Set.univ fun z => (e z).left) :
-    ∃ L : (Fin m → ℂ) →ₗ[ℂ] (Fin g → ℂ), ∀ z, F.ex i P (L z) = e z := by
+theorem exists_linear_lift_of_isHolTo
+    (F : FamilyUnif Xo σ ty) (i : Fin F.n) (P : (F.Di i).La →+ (Fin g → ℂ))
+    (hP : IsPeriod (F.Di i) ty P)
+    {m : ℕ} (e : (Fin m → ℂ) → (Over.mk (F.u i P) ⟶ Xo.univ.t.G))
+    (he : ∀ z w, e (z + w) = e z * e w) (hol : IsHolTo Set.univ fun z => (e z).left)
+    : ∃ L : (Fin m → ℂ) →ₗ[ℂ] (Fin g → ℂ), ∀ z, F.ex i P (L z) = e z := by
   have hsm : Smooth Xo.univ.t.G.hom := Xo.univ.t.semi.smooth
   have hsm' : Smooth (pullback.snd Xo.univ.t.G.hom (F.u i P)) := inferInstance
   have hol' := ExpUniqFamily.isHolTo_ex F i P hP
   have he' := F.ex_add i P hP
-  have hd := isDerivAt0_fibre _ Xo.univ.t.G (F.u i P) g (F.ex i P) _ _ _ (fun z => fibPt _ (F.ex i P z))
-    (IsPullback.of_hasPullback Xo.univ.t.G.hom (F.u i P))
-    (fun z => ⟨fibPt_fst _ _, fibPt_snd _ _⟩) hol' (F.ex_diff i P hP)
-  obtain ⟨k, k0, hka, hk⟩ := LocalLift.exists_local_lift _ (pullback.snd Xo.univ.t.G.hom (F.u i P)) m g
-    (fun z => fibPt _ (e z)) (fun z => fibPt _ (F.ex i P z)) hsm'
-    (fun z => fibPt_snd _ _) (fun z => fibPt_snd _ _)
-    (HolFibre.isHolTo_fibPt isOpen_univ _ _ e hol) (HolFibre.isHolTo_fibPt isOpen_univ _ _ _ hol') hd
-    (by simp only [map_zero_eq_one e he, map_zero_eq_one _ he'])
-  have hker : ((toAddHom (F.ex i P) he').ker : Set (Fin g → ℂ)) = P.range := Set.ext fun z => F.ex_ker i P hP z
+  have hd :=
+    isDerivAt0_fibre _ Xo.univ.t.G (F.u i P) g (F.ex i P) _ _ _
+      (fun z => fibPt _ (F.ex i P z))
+      (IsPullback.of_hasPullback Xo.univ.t.G.hom (F.u i P))
+      (fun z => ⟨fibPt_fst _ _, fibPt_snd _ _⟩)
+      hol' (F.ex_diff i P hP)
+  obtain ⟨k, k0, hka, hk⟩ :=
+    LocalLift.exists_local_lift _ (pullback.snd Xo.univ.t.G.hom (F.u i P)) m g
+      (fun z => fibPt _ (e z))
+      (fun z => fibPt _ (F.ex i P z))
+      hsm'
+      (fun z => fibPt_snd _ _)
+      (fun z => fibPt_snd _ _)
+      (HolFibre.isHolTo_fibPt isOpen_univ _ _ e hol) (HolFibre.isHolTo_fibPt isOpen_univ _ _ _ hol')
+      hd (by simp only [map_zero_eq_one e he, map_zero_eq_one _ he'])
+  have hker : ((toAddHom (F.ex i P) he').ker : Set (Fin g → ℂ)) = P.range :=
+    Set.ext fun z => F.ex_ker i P hP z
   exact (existsUnique_linearMap_lift_of_germ (ex := toAddHom e he) (ex' := toAddHom (F.ex i P) he')
     (hker ▸ isDiscrete_iff_discreteTopology.2 hP.2.2.1) hka.differentiableAt k0
     (hk.mono fun z hz => fibPt_injective _ hz)).exists
@@ -53,11 +68,23 @@ theorem pt_one (C : Curve H) : C.pt 1 = C.pt 0 := by
   have h0 := (C.u.ker _).2 ((C.lat fun _ => C.c * 0).2 ⟨0, 0, by simp⟩)
   rw [Curve.pt, Curve.pt, h1, h0]
 
-theorem exists_pure_vector : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (F : FamilyUnif Xo σ ty), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → l.A = 1 → ∀ C : Curve H, ∀ (i : Fin F.n) (P : (F.Di i).La →+ (Fin g → ℂ)) (hP : IsPeriod (F.Di i) ty P), ∀ (φ : C.P.A.left ⟶ Xo.univ.t.G.left) (x : ℂ → (Over.mk (F.u i P) ⟶ Xo.univ.t.G)) (ε : ℤˣ), (∀ z, (x z).left = C.pt z ≫ φ) → (∀ z w, x (z + w) = x z * x w) → (∀ z, x ((1 + ((ε : ℤ) : ℂ) * H.rt0) / 2 * z) = x z ≫ Xo.univ.t.act.act H.w0) → ∃ a ∈ lat hP (((ε : ℤ) : ℂ) * H.rt0), ∀ z : ℂ, x z = F.ex i P (z • P a) := by
+theorem exists_pure_vector
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ))
+        (F : FamilyUnif Xo σ ty),
+      1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → l.A = 1
+        → ∀ C : Curve H,
+          ∀ (i : Fin F.n) (P : (F.Di i).La →+ (Fin g → ℂ)) (hP : IsPeriod (F.Di i) ty P),
+            ∀ (φ : C.P.A.left ⟶ Xo.univ.t.G.left) (x : ℂ → (Over.mk (F.u i P) ⟶ Xo.univ.t.G))
+                (ε : ℤˣ),
+              (∀ z, (x z).left = C.pt z ≫ φ) → (∀ z w, x (z + w) = x z * x w)
+                → (∀ z, x ((1 + ((ε : ℤ) : ℂ) * H.rt0) / 2 * z) = x z ≫ Xo.univ.t.act.act H.w0)
+                → ∃ a ∈ lat hP (((ε : ℤ) : ℂ) * H.rt0), ∀ z : ℂ, x z = F.ex i P (z • P a) := by
   intro E _ _ _ H D l Xo σ g ty F _ _ _ _ C i P hP φ x ε hx hadd hw
-  obtain ⟨L, hL⟩ := exists_linear_lift_of_isHolTo F i P hP (m := 1) (fun z => x (z 0)) (fun z w => hadd _ _) (by
-    simp only [hx]
-    exact HolFibre.isHolTo_comp (isHolTo_pt C) φ)
+  obtain ⟨L, hL⟩ :=
+    exists_linear_lift_of_isHolTo F i P hP (m := 1) (fun z => x (z 0)) (fun z w => hadd _ _) (by
+      simp only [hx]
+      exact HolFibre.isHolTo_comp (isHolTo_pt C) φ)
   have hv : ∀ z : ℂ, x z = F.ex i P (z • L fun _ => 1) := fun z => by
     rw [← map_smul, hL]
     simp

@@ -6,7 +6,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix WithZero
 
 namespace GlobalTheory.CompanionTheory.SW.QuadIso
@@ -197,10 +198,13 @@ lemma measure_ball (lam : Measure K) [lam.IsAddLeftInvariant] {a c : K}
       exact hne ⟨_, h, v_quad_lt ha hc hM⟩
     rw [hem, Set.not_nonempty_iff_eq_empty.1 hne]
 
-theorem measure_quad [SecondCountableTopology K] [IsTopologicalRing K] (lam : Measure K) [lam.IsAddLeftInvariant]
-    (hfin : lam {s | Valued.v s < 1} ≠ ⊤) {a c : K}
-    (ha : Valued.v a = 1) (hc : Valued.v c ≤ 1) {A : Set K} (hA : MeasurableSet A) :
-    lam {t | Valued.v t < 1 ∧ a * t + c * t ^ 2 ∈ A} = lam (A ∩ {s | Valued.v s < 1}) := by
+theorem measure_quad
+    [SecondCountableTopology K] [IsTopologicalRing K]
+    (lam : Measure K) [lam.IsAddLeftInvariant]
+    (hfin : lam {s | Valued.v s < 1} ≠ ⊤)
+    {a c : K} (ha : Valued.v a = 1) (hc : Valued.v c ≤ 1)
+    {A : Set K} (hA : MeasurableSet A)
+    : lam {t | Valued.v t < 1 ∧ a * t + c * t ^ 2 ∈ A} = lam (A ∩ {s | Valued.v s < 1}) := by
   have hMo : IsOpen {s : K | Valued.v s < 1} :=
     isOpen_ball_of_isRadius ⟨1, by rw [Units.val_one, map_one]⟩
   have hM : MeasurableSet {s : K | Valued.v s < 1} := hMo.measurableSet
@@ -211,8 +215,9 @@ theorem measure_quad [SecondCountableTopology K] [IsTopologicalRing K] (lam : Me
     ⟨by simpa using hfin.lt_top⟩
   haveI : IsFiniteMeasure ((lam.restrict {s | Valued.v s < 1}).map fun t : K => a * t + c * t ^ 2) :=
     Measure.isFiniteMeasure_map _ _
-  have hmeas : (lam.restrict {s | Valued.v s < 1}).map (fun t : K => a * t + c * t ^ 2) =
-      lam.restrict {s | Valued.v s < 1} := by
+  have hmeas
+      : (lam.restrict {s | Valued.v s < 1}).map (fun t : K => a * t + c * t ^ 2)
+        = lam.restrict {s | Valued.v s < 1} := by
     refine ext_of_generate_finite _
       (BorelSpace.measurable_eq.trans isTopologicalBasis_vball.borel_eq_generateFrom)
       isPiSystem_vball ?_ ?_
@@ -222,8 +227,10 @@ theorem measure_quad [SecondCountableTopology K] [IsTopologicalRing K] (lam : Me
       exact measure_ball lam ha hc x hγ.ne_zero
     · rw [Measure.map_apply hf MeasurableSet.univ]
       simp
-  have key : ((lam.restrict {s | Valued.v s < 1}).map fun t : K => a * t + c * t ^ 2) A =
-      lam.restrict {s | Valued.v s < 1} A := by rw [hmeas]
+  have key
+      : ((lam.restrict {s | Valued.v s < 1}).map fun t : K => a * t + c * t ^ 2) A
+        = lam.restrict {s | Valued.v s < 1} A := by
+    rw [hmeas]
   rw [Measure.map_apply hf hA, Measure.restrict_apply (hf hA), Measure.restrict_apply hA] at key
   rw [← key]
   congr 1
@@ -232,7 +239,15 @@ theorem measure_quad [SecondCountableTopology K] [IsTopologicalRing K] (lam : Me
 
 end GlobalTheory.CompanionTheory.SW.QuadIso
 
-theorem GlobalTheory.CompanionTheory.SW.QuadIso.measure_quad_Fv : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)), IsStdV v lam → Valued.v (2 : Fv F v) = 1 → ∀ a c : Fv F v, Valued.v a = 1 → c ∈ v.adicCompletionIntegers F → ∀ A : Set (Fv F v), MeasurableSet A → lam {t | Valued.v t < 1 ∧ a * t + c * t ^ 2 ∈ A} = lam (A ∩ {s | Valued.v s < 1}) := by
+theorem GlobalTheory.CompanionTheory.SW.QuadIso.measure_quad_Fv
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)),
+      IsStdV v lam → Valued.v (2 : Fv F v) = 1
+        → ∀ a c : Fv F v,
+          Valued.v a = 1 → c ∈ v.adicCompletionIntegers F
+            → ∀ A : Set (Fv F v),
+              MeasurableSet A
+                → lam {t | Valued.v t < 1 ∧ a * t + c * t ^ 2 ∈ A}
+                  = lam (A ∩ {s | Valued.v s < 1}) := by
   intro F _ _ v lam hlam _ a c ha hc A hA
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   obtain ⟨hH, h1⟩ := hlam

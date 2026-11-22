@@ -5,10 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology Polynomial
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+  Polynomial
 
-theorem UpperTheory.norm_le_one_of_frobenius_eigenvector_mem_fil_zero :
-    ∀ {l : ℕ} [Fact l.Prime] (c : Bcr l) (δ : ℚ_[l]), c ≠ 0 → (PP l).φB c = algebraMap ℚ_[l] (Bcr l) δ * c → (PP l).ιB c ∈ ((PP l).PD (botExt l)).Fil 0 → ‖δ‖ ≤ 1 := by
+theorem UpperTheory.norm_le_one_of_frobenius_eigenvector_mem_fil_zero
+    : ∀ {l : ℕ} [Fact l.Prime] (c : Bcr l) (δ : ℚ_[l]),
+      c ≠ 0 → (PP l).φB c = algebraMap ℚ_[l] (Bcr l) δ * c
+        → (PP l).ιB c ∈ ((PP l).PD (botExt l)).Fil 0
+        → ‖δ‖ ≤ 1 := by
   intro l _ c δ hc hφ hF
   by_contra hδ
   have hδ0 : δ ≠ 0 := by
@@ -17,15 +22,17 @@ theorem UpperTheory.norm_le_one_of_frobenius_eigenvector_mem_fil_zero :
   have hv : δ.valuation < 0 := by
     by_contra h
     exact hδ ((Padic.norm_le_one_iff_val_nonneg δ).2 (not_lt.1 h))
-  obtain ⟨a, ha⟩ : ∃ a : ℕ, ((a + 1 : ℕ) : ℤ) = -δ.valuation := ⟨(-δ.valuation - 1).toNat, by push_cast; omega⟩
+  obtain ⟨a, ha⟩ : ∃ a : ℕ, ((a + 1 : ℕ) : ℤ) = -δ.valuation :=
+    ⟨(-δ.valuation - 1).toNat, by push_cast; omega⟩
   have hl : (l : ℝ) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
   have hu : ‖δ * (l : ℚ_[l]) ^ (a + 1)‖ = 1 := by
     rw [norm_mul, Padic.norm_p_pow, Padic.norm_eq_zpow_neg_valuation hδ0, ← zpow_add₀ hl, ha]
     simp
   let u : ℤ_[l] := ⟨δ * (l : ℚ_[l]) ^ (a + 1), hu.le⟩
   have huu : IsUnit u := PadicInt.isUnit_iff.2 hu
-  obtain ⟨N, N', hNN, hN, hN', hφN, -⟩ := UpperTheory.exists_algebraic_element_of_algebraicVectorSubspace (l := l) (n := 1) (Matrix.of fun _ _ => u)
-    (by rw [Matrix.det_fin_one]; exact huu)
+  obtain ⟨N, N', hNN, hN, hN', hφN, -⟩ :=
+    UpperTheory.exists_algebraic_element_of_algebraicVectorSubspace (l := l) (n := 1)
+      (Matrix.of fun _ _ => u) (by rw [Matrix.det_fin_one]; exact huu)
   set P := PP l with hP
   set D := P.PD (botExt l) with hD
   have h1 : N 0 0 * N' 0 0 = 1 := by
@@ -59,7 +66,8 @@ theorem UpperTheory.norm_le_one_of_frobenius_eigenvector_mem_fil_zero :
     rw [map_mul, map_mul, pow_succ, map_mul]
     have e1 : D.ι c ∈ D.Fil 0 := by rw [P.PD_ι]; exact hF
     have e2 : D.ι w' ∈ D.Fil 0 := by rw [P.PD_ι]; exact hN' 0 0
-    exact D.Fil_mul 1 0 _ _ (D.Fil_mul 0 1 _ _ e1 (D.Fil_mul 0 1 _ _ (htp a) D.mem_filtration_one)) e2
+    exact D.Fil_mul 1 0 _ _ (D.Fil_mul 0 1 _ _ e1 (D.Fil_mul 0 1 _ _ (htp a) D.mem_filtration_one))
+      e2
   obtain ⟨r, hr⟩ := D.fund _ hb (D.Fil_anti 0 hF1)
   have hr0 : r ≠ 0 := by
     rintro rfl

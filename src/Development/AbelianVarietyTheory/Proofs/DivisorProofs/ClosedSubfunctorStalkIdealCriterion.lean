@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.RelativeAmplene
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped TensorProduct CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.AbLaw GlobalTheory.CatCoh GlobalTheory.CechDR GlobalTheory.AbCoh
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.AbLaw GlobalTheory.CatCoh GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.FinStalk
 
-theorem stalk_isArtinianRing (K : Type) [Field K] (X : Scheme) (f : X ⟶ Sp K) [IsFinite f] (x : X) :
-    IsArtinianRing (X.presheaf.stalk x) := by
+theorem stalk_isArtinianRing (K : Type) [Field K] (X : Scheme) (f : X ⟶ Sp K) [IsFinite f] (x : X)
+    : IsArtinianRing (X.presheaf.stalk x) := by
   have : IsAffine X := isAffine_of_isAffineHom f
   have hfin : ((Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ f.appTop).hom.Finite :=
     f.finite_appTop.comp (RingHom.Finite.of_surjective _
@@ -33,12 +36,21 @@ end GlobalTheory.FinStalk
 
 namespace GlobalTheory.FinStalk
 
-theorem stalk_quotient_ne_top_and_isArtinianRing : ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A] (H : Over (Sp K)) [GrpObj H] (j : H ⟶ A), IsMonHom j → IsClosedImmersion j.left → IsFinite H.hom → ∀ x₀ : A.left, x₀ ∈ Set.range (η[A]).left.base → ∀ J : Ideal (A.left.presheaf.stalk x₀), (∀ (R' : Type) [CommRing R'] (ψ : A.left.presheaf.stalk x₀ →+* R'), (∃ y : Sp R' ⟶ H.left, y ≫ j.left = Spec.map (CommRingCat.ofHom ψ) ≫ A.left.fromSpecStalk x₀) ↔ J ≤ RingHom.ker ψ) → J ≠ ⊤ ∧ IsArtinianRing (A.left.presheaf.stalk x₀ ⧸ J) := by
+theorem stalk_quotient_ne_top_and_isArtinianRing
+    : ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A] (H : Over (Sp K)) [GrpObj H] (j : H ⟶ A),
+      IsMonHom j → IsClosedImmersion j.left → IsFinite H.hom
+        → ∀ x₀ : A.left,
+          x₀ ∈ Set.range (η[A]).left.base
+            → ∀ J : Ideal (A.left.presheaf.stalk x₀),
+              (∀ (R' : Type) [CommRing R'] (ψ : A.left.presheaf.stalk x₀ →+* R'),
+                  (∃ y : Sp R' ⟶ H.left,
+                      y ≫ j.left = Spec.map (CommRingCat.ofHom ψ) ≫ A.left.fromSpecStalk x₀)
+                    ↔ J ≤ RingHom.ker ψ)
+                → J ≠ ⊤ ∧ IsArtinianRing (A.left.presheaf.stalk x₀ ⧸ J) := by
   intro K _ A _ H _ j hj hci hfin x₀ hx₀ J hJ
   obtain ⟨p, hp⟩ := hx₀
   have hη : (η[H] ≫ j).left = η[A].left := congrArg CommaMorphism.left (IsMonHom.one_hom j)
-  obtain ⟨h₀, e⟩ : ∃ h₀ : H.left, x₀ = j.left.base h₀ :=
-    ⟨η[H].left.base p, by rw [← hp, ← hη]; rfl⟩
+  obtain ⟨h₀, e⟩ : ∃ h₀ : H.left, x₀ = j.left.base h₀ := ⟨η[H].left.base p, by rw [← hp, ← hη]; rfl⟩
   subst e
 
   have hJ1 : J ≤ RingHom.ker (j.left.stalkMap h₀).hom :=
@@ -55,15 +67,17 @@ theorem stalk_quotient_ne_top_and_isArtinianRing : ∀ (K : Type) [Field K] (A :
   let R := CommRingCat.of (A.left.presheaf.stalk (j.left.base h₀) ⧸ J)
   have hpt : y.base (IsLocalRing.closedPoint R) = h₀ := by
     apply j.left.isClosedEmbedding.injective
-    have : j.left.base (y.base (IsLocalRing.closedPoint R)) = (A.left.fromSpecStalk (j.left.base h₀)).base
-        ((Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))).base (IsLocalRing.closedPoint R)) :=
+    have : j.left.base (y.base (IsLocalRing.closedPoint R))
+        = (A.left.fromSpecStalk (j.left.base h₀)).base
+          ((Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))).base (IsLocalRing.closedPoint R)) :=
       congrArg (fun g : Sp R ⟶ A.left => g.base (IsLocalRing.closedPoint R)) hy
     rw [this]
     haveI : IsLocalHom (CommRingCat.ofHom (Ideal.Quotient.mk J)).hom := by
       change IsLocalHom (Ideal.Quotient.mk J); infer_instance
     rw [Spec_closedPoint, Scheme.fromSpecStalk_closedPoint]
-  have key : ∀ z (_ : y.base (IsLocalRing.closedPoint R) = z),
-      ∃ φ : H.left.presheaf.stalk z ⟶ R, Spec.map φ ≫ H.left.fromSpecStalk z = y := by
+  have key
+      : ∀ z (_ : y.base (IsLocalRing.closedPoint R) = z), ∃ φ : H.left.presheaf.stalk z ⟶ R,
+        Spec.map φ ≫ H.left.fromSpecStalk z = y := by
     rintro z rfl
     exact ⟨_, Scheme.Spec_stalkClosedPointTo_fromSpecStalk y⟩
   obtain ⟨φ, hφ⟩ := key h₀ hpt
@@ -74,8 +88,7 @@ theorem stalk_quotient_ne_top_and_isArtinianRing : ∀ (K : Type) [Field K] (A :
   have hsurj : Function.Surjective φ.hom := by
     intro r
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective (I := J) r
-    exact ⟨(j.left.stalkMap h₀).hom a, by
-      rw [← CommRingCat.comp_apply, hcomp]; rfl⟩
+    exact ⟨(j.left.stalkMap h₀).hom a, by rw [← CommRingCat.comp_apply, hcomp]; rfl⟩
   haveI := stalk_isArtinianRing K H.left H.hom h₀
   exact hsurj.isArtinianRing
 

@@ -14,9 +14,10 @@ namespace PI.UnitaryGroupMassFormula.LCG
 theorem sublattice_of_lattice : LatSub := by
   intro I x u u' hu hu'
   simp only [PI.LatCountG.latSet, Set.mem_setOf_eq] at hu hu' ⊢
-  have h : (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) ((u - u') i)) =
-      (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u i)) -
-        (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u' i)) := by
+  have h
+      : (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) ((u - u') i))
+        = (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u i))
+          - (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u' i)) := by
     funext i
     simp [map_sub]
   rw [h, Matrix.mulVec_sub]
@@ -25,14 +26,20 @@ theorem sublattice_of_lattice : LatSub := by
 theorem lattice_map_image : LatMap := by
   intro I x y γ g hγ hK u hu
   simp only [PI.LatCountG.latSet, Set.mem_setOf_eq] at hu ⊢
-  have h1 : (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)
-      (((g : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ u) i)) =
-      I.fmat γ.2 *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u i)) := by
+  have h1
+      : (fun i =>
+          Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)
+            (((g : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ u) i))
+        = I.fmat γ.2
+          *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u i)) := by
     funext i
     rw [hγ]
     exact RingHom.map_mulVec _ _ _ i
   have hK' : ∀ v, v ∈ I.Lf ↔ I.fmat (x⁻¹ * γ * y).2 *ᵥ v ∈ I.Lf := hK
-  have hk := (hK' (I.fmat y.2⁻¹ *ᵥ fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u i))).1 hu
+  have hk :=
+    (hK'
+      (I.fmat y.2⁻¹
+        *ᵥ fun i => Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (u i))).1 hu
   rw [h1]
   convert hk using 1
   rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]

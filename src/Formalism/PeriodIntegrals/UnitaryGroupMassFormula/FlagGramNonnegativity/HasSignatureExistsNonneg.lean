@@ -15,16 +15,15 @@ theorem cT_star_eq {m n : Type} (M : Matrix m n ℂ) : cT (starRingEnd ℂ) M = 
   ext i j
   simp [cT, Matrix.conjTranspose_apply]
 
-theorem form_mulVec {m n : Type} [Fintype m] [Fintype n] (A : Matrix m n ℂ) (B : Matrix m m ℂ)
-    (u : n → ℂ) :
-    star (A *ᵥ u) ⬝ᵥ (B *ᵥ (A *ᵥ u)) = star u ⬝ᵥ ((Aᴴ * B * A) *ᵥ u) := by
+theorem form_mulVec
+    {m n : Type} [Fintype m] [Fintype n] (A : Matrix m n ℂ) (B : Matrix m m ℂ) (u : n → ℂ)
+    : star (A *ᵥ u) ⬝ᵥ (B *ᵥ (A *ᵥ u)) = star u ⬝ᵥ ((Aᴴ * B * A) *ᵥ u) := by
   rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
     Matrix.mul_assoc]
 
-theorem form_reindex {n m : Type} [Fintype n] [Fintype m] (e : n ≃ m) (J : Matrix n n ℂ)
-    (x : n → ℂ) :
-    star (fun i => x (e.symm i)) ⬝ᵥ ((J.reindex e e) *ᵥ (fun i => x (e.symm i))) =
-      star x ⬝ᵥ (J *ᵥ x) := by
+theorem form_reindex {n m : Type} [Fintype n] [Fintype m] (e : n ≃ m) (J : Matrix n n ℂ) (x : n → ℂ)
+    : star (fun i => x (e.symm i)) ⬝ᵥ ((J.reindex e e) *ᵥ (fun i => x (e.symm i)))
+      = star x ⬝ᵥ (J *ᵥ x) := by
   have h : (J.reindex e e) *ᵥ (fun i => x (e.symm i)) = fun i => (J *ᵥ x) (e.symm i) := by
     rw [Matrix.reindex_apply, Matrix.submatrix_mulVec_equiv]
     funext i
@@ -33,17 +32,18 @@ theorem form_reindex {n m : Type} [Fintype n] [Fintype m] (e : n ≃ m) (J : Mat
   simp only [dotProduct, Pi.star_apply]
   exact Equiv.sum_comp e.symm (fun i => star (x i) * (J *ᵥ x) i)
 
-theorem Jpq_mulVec_of {p q : ℕ} (u : Fin p ⊕ Fin q → ℂ) (hu : ∀ j, u (Sum.inr j) = 0) :
-    Jpq p q *ᵥ u = u := by
+theorem Jpq_mulVec_of {p q : ℕ} (u : Fin p ⊕ Fin q → ℂ) (hu : ∀ j, u (Sum.inr j) = 0)
+    : Jpq p q *ᵥ u = u := by
   have h0 : (u ∘ Sum.inr) = 0 := funext hu
   rw [Jpq, Matrix.fromBlocks_mulVec, h0]
   funext i
   cases i <;> simp [hu]
 
-theorem hasSignature_exists_nonneg {N p q : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
-    (J : Matrix (Fin N) (Fin N) ℂ) (hJ : HasSignature J p q) (hq : q < Fintype.card ι)
-    (X : Matrix (Fin N) ι ℂ) :
-    ∃ c : ι → ℂ, c ≠ 0 ∧ 0 ≤ (star (X *ᵥ c) ⬝ᵥ (J *ᵥ (X *ᵥ c))).re := by
+theorem hasSignature_exists_nonneg
+    {N p q : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
+    (J : Matrix (Fin N) (Fin N) ℂ) (hJ : HasSignature J p q)
+    (hq : q < Fintype.card ι) (X : Matrix (Fin N) ι ℂ)
+    : ∃ c : ι → ℂ, c ≠ 0 ∧ 0 ≤ (star (X *ᵥ c) ⬝ᵥ (J *ᵥ (X *ᵥ c))).re := by
   obtain ⟨e, P, hP⟩ := hJ
   let Q : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ := ((P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) : Matrix _ _ ℂ)
   let Y : Matrix (Fin p ⊕ Fin q) ι ℂ := Q * X.submatrix e.symm id

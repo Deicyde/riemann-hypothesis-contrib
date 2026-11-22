@@ -6,7 +6,8 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.
 
 noncomputable section
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField
 open scoped TensorProduct ContDiff
 
 namespace Formalism.IndefR.DatumF
@@ -27,12 +28,15 @@ abbrev cAF (σ : E →ₐ[F] E) : AEF F E →+* AEF F E := sigR (AF F) σ
 
 abbrev GAF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) : Type := HA (AF F) σ J
 
-def GQF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) : Subgroup (GAF σ J) := HFinIn (AF F) σ J
+def GQF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) : Subgroup (GAF σ J) :=
+  HFinIn (AF F) σ J
 
-def matHomF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) : GAF σ J →* GL (Fin n) (AF F ⊗[F] E) :=
+def matHomF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    : GAF σ J →* GL (Fin n) (AF F ⊗[F] E) :=
   (HR (AF F) σ J).subtype
 
-def mtF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : GAF σ J) : Matrix (Fin n) (Fin n) (AEF F E) :=
+def mtF (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : GAF σ J)
+    : Matrix (Fin n) (Fin n) (AEF F E) :=
   (matHomF σ J g).1
 
 variable (F E) in
@@ -53,9 +57,11 @@ def IsInfEmbF (τ : E →+* ℂ) (θ : Ainf F ⊗[F] E →+* ℂ) : Prop :=
 def IsInfFamF {Tau : Type} (tauE : Tau → (E →+* ℂ)) (θ : Tau → (Ainf F ⊗[F] E →+* ℂ)) : Prop :=
   ∀ ρ, IsInfEmbF (tauE ρ) (θ ρ)
 
-def IsStdCharF {Tau : Type} [Fintype Tau] (tauE : Tau → (E →+* ℂ)) (ψ : AddChar (AF F) ℂ) (s : ℤ) : Prop :=
+def IsStdCharF {Tau : Type} [Fintype Tau] (tauE : Tau → (E →+* ℂ)) (ψ : AddChar (AF F) ℂ) (s : ℤ)
+    : Prop :=
   IsCharAF F ψ ∧ AllSome (IsInfFamF (F := F) tauE) fun θ =>
-    ∀ x : Ainf F, psiInf F ψ x = Complex.exp (2 * Real.pi * Complex.I * s * ∑ ρ, θ ρ (x ⊗ₜ[F] (1 : E)))
+    ∀ x : Ainf F,
+      psiInf F ψ x = Complex.exp (2 * Real.pi * Complex.I * s * ∑ ρ, θ ρ (x ⊗ₜ[F] (1 : E)))
 
 variable (F E) in
 def idFF : (AF F)ˣ →* (AEF F E)ˣ := Units.map (algebraMap (AF F) (AEF F E)).toMonoidHom
@@ -65,8 +71,8 @@ def IsHeckeCharF (χ : (AEF F E)ˣ →* Circle) : Prop :=
 
 variable (E) in
 def IsEtaF (η : (AF F)ˣ →* Circle) : Prop :=
-  Continuous η ∧ (∀ a : Fˣ, η (Units.map (algebraMap F (AF F)).toMonoidHom a) = 1) ∧
-    (∀ x : (AEF F E)ˣ, η (Units.map (Algebra.norm (AF F) : AEF F E →* AF F) x) = 1) ∧ η ≠ 1
+  Continuous η ∧ (∀ a : Fˣ, η (Units.map (algebraMap F (AF F)).toMonoidHom a) = 1)
+    ∧ (∀ x : (AEF F E)ˣ, η (Units.map (Algebra.norm (AF F) : AEF F E →* AF F) x) = 1) ∧ η ≠ 1
 
 def ResEtaF (χ : (AEF F E)ˣ →* Circle) (n : ℕ) : Prop :=
   AllSome (IsEtaF E) fun η => ∀ a, χ (idFF F E a) = η a ^ n
@@ -76,22 +82,31 @@ def IsPlaceIdemF (v : HeightOneSpectrum (𝓞 F)) (ε : AF F) : Prop :=
   ∃ α : Af F, ε = pairA F 0 α ∧ evalV F v α = 1 ∧ ∀ v', v' ≠ v → evalV F v' α = 0
 
 def IsSplitIdemF (σ : E →ₐ[F] E) (e : AEF F E) : Prop :=
-  e * e = e ∧ e * cAF σ e = 0 ∧ ∃ v ε, IsPlaceIdemF F v ε ∧ e + cAF σ e = algebraMap (AF F) (AEF F E) ε
+  e * e = e ∧ e * cAF σ e = 0
+    ∧ ∃ v ε, IsPlaceIdemF F v ε ∧ e + cAF σ e = algebraMap (AF F) (AEF F E) ε
 
-def SuppAtF (σ : E →ₐ[F] E) (e : AEF F E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : GAF σ J) : Prop :=
+def SuppAtF (σ : E →ₐ[F] E) (e : AEF F E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : GAF σ J)
+    : Prop :=
   ∀ i j, (e + cAF σ e) * (mtF σ J g - 1) i j = (mtF σ J g - 1) i j
 
-def IsDetAtF (σ : E →ₐ[F] E) (e : AEF F E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : GAF σ J) (x : (AEF F E)ˣ) :
-    Prop :=
+def IsDetAtF
+    (σ : E →ₐ[F] E)
+    (e : AEF F E)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : GAF σ J)
+    (x : (AEF F E)ˣ)
+    : Prop :=
   (x : AEF F E) = e * (mtF σ J g).det + (1 - e)
 
 end Real
 
 section Orient
 
-variable (σ : E →ₐ[F] E) {nS nT : ℕ} (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E)
+variable
+  (σ : E →ₐ[F] E) {nS nT : ℕ} (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E)
 
-abbrev WOF (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (nS nT : ℕ) : Type :=
+abbrev WOF
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (nS nT : ℕ)
+    : Type :=
   Matrix (Fin nT) (Fin nS) (AEF F E)
 
 scoped instance measWOF (nS nT : ℕ) : MeasurableSpace (WOF F E nS nT) := borel _
@@ -111,44 +126,67 @@ def symplOF (xi0 : E) (x y : WOF F E nS nT) : AF F :=
 def symplOHF (xi0 : E) (x y : WOF F E nS nT) : AF F :=
   algebraMap F (AF F) (1 / 2) * symplOF σ JS JT xi0 x y
 
-def heisOF (xi0 : E) (ψ : AddChar (AF F) ℂ) (w₀ : WOF F E nS nT) (f : WOF F E nS nT → ℂ) : WOF F E nS nT → ℂ :=
-  fun w => ψ (symplOHF σ JS JT xi0 w w₀) * f (w + w₀)
+def heisOF (xi0 : E) (ψ : AddChar (AF F) ℂ) (w₀ : WOF F E nS nT) (f : WOF F E nS nT → ℂ)
+    : WOF F E nS nT → ℂ := fun w =>
+  ψ (symplOHF σ JS JT xi0 w w₀) * f (w + w₀)
 
 def actOF (g : GAF σ JS) (h : GAF σ JT) (x : WOF F E nS nT) : WOF F E nS nT :=
   HMul.hMul (HMul.hMul (mtF σ JT h) (x : Matrix (Fin nT) (Fin nS) (AEF F E))) (mtF σ JS g⁻¹)
 
 structure IsThetaFunOF (xi0 : E) (ψ : AddChar (AF F) ℂ) (f : WOF F E nS nT → ℂ) : Prop where
   quasi : ∀ γ w, f (ratWF γ + w) = ψ (-(symplOHF σ JS JT xi0 (ratWF γ) w)) * f w
-  level : ∃ U : AddSubgroup (WOF F E nS nT), IsOpen (U : Set (WOF F E nS nT)) ∧
-    ∀ u ∈ U, u.map (infPartF F E) = 0 → heisOF σ JS JT xi0 ψ u f = f
+  level
+    : ∃ U : AddSubgroup (WOF F E nS nT),
+      IsOpen (U : Set (WOF F E nS nT))
+        ∧ ∀ u ∈ U, u.map (infPartF F E) = 0 → heisOF σ JS JT xi0 ψ u f = f
   cont : Continuous f
-  smooth : ∀ (k : ℕ) (L : (Fin k → ℝ) →+ WOF F E nS nT), Continuous L → (∀ t, (L t).map (finPartF F E) = 0) →
-    ∀ w, ContDiff ℝ ∞ fun t => f (w + L t)
+  smooth
+    : ∀ (k : ℕ) (L : (Fin k → ℝ) →+ WOF F E nS nT),
+      Continuous L → (∀ t, (L t).map (finPartF F E) = 0) → ∀ w, ContDiff ℝ ∞ fun t => f (w + L t)
 
 def splitFacOF (χS χT : (AEF F E)ˣ →* Circle) (x y : (AEF F E)ˣ) : Circle := (χT x)⁻¹ * χS y
 
-structure IsWeilDatumOF {Tau : Type} [Fintype Tau] (tauE : Tau → (E →+* ℂ)) (xi0 : E) (ψ : AddChar (AF F) ℂ)
-    (χS χT : (AEF F E)ˣ →* Circle)
-    (om : GAF σ JS × GAF σ JT →* Module.End ℂ (WOF F E nS nT → ℂ)) : Prop where
+structure IsWeilDatumOF
+    {Tau : Type} [Fintype Tau]
+    (tauE : Tau → (E →+* ℂ)) (xi0 : E) (ψ : AddChar (AF F) ℂ) (χS χT : (AEF F E)ˣ →* Circle)
+    (om : GAF σ JS × GAF σ JT →* Module.End ℂ (WOF F E nS nT → ℂ))
+    : Prop where
   std : IsStdCharF tauE ψ (-1)
   hecS : IsHeckeCharF χS
   hecT : IsHeckeCharF χT
   resS : ResEtaF χS nS
   resT : ResEtaF χT nT
   om_pres : ∀ p f, IsThetaFunOF σ JS JT xi0 ψ f → IsThetaFunOF σ JS JT xi0 ψ (om p f)
-  om_heis : ∀ g h w₀ f, IsThetaFunOF σ JS JT xi0 ψ f →
-    om (g, h) (heisOF σ JS JT xi0 ψ w₀ f) = heisOF σ JS JT xi0 ψ (actOF σ JS JT g h w₀) (om (g, h) f)
+  om_heis
+    : ∀ g h w₀ f,
+      IsThetaFunOF σ JS JT xi0 ψ f
+        → om (g, h) (heisOF σ JS JT xi0 ψ w₀ f)
+          = heisOF σ JS JT xi0 ψ (actOF σ JS JT g h w₀) (om (g, h) f)
   om_aut : ∀ γ ∈ GQF σ JS, ∀ γ' ∈ GQF σ JT, ∀ f, IsThetaFunOF σ JS JT xi0 ψ f → om (γ, γ') f 0 = f 0
-  om_cont : ∀ f, IsThetaFunOF σ JS JT xi0 ψ f → ∀ w, Continuous fun p : GAF σ JS × GAF σ JT => om p f w
-  om_unit : ∀ (μ : Measure (WOF F E nS nT)) (𝓕 : Set (WOF F E nS nT)), μ.IsAddHaarMeasure →
-    IsAddFundamentalDomain (ratLF F E nS nT) 𝓕 μ → ∀ p f, IsThetaFunOF σ JS JT xi0 ψ f →
-      ∫⁻ w in 𝓕, ‖om p f w‖ₑ ^ 2 ∂μ = ∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ
-  om_split : ∀ e, IsSplitIdemF σ e → ∀ g h, SuppAtF σ e JS g → SuppAtF σ e JT h → ∀ x y,
-    IsDetAtF σ e JS g x → IsDetAtF σ e JT h y →
-    ∃ r : ℝ, 0 < r ∧ ∀ ℓ : (WOF F E nS nT → ℂ) →ₗ[ℂ] ℂ,
-      (∀ u : WOF F E nS nT, (∀ i j, cAF σ e * u i j = u i j) → ∀ f, IsThetaFunOF σ JS JT xi0 ψ f →
-        ℓ (heisOF σ JS JT xi0 ψ u f) = ℓ f) →
-      ∀ f, IsThetaFunOF σ JS JT xi0 ψ f → ℓ (om (g, h) f) = (r : ℂ) * (splitFacOF χS χT x y : ℂ) * ℓ f
+  om_cont
+    : ∀ f, IsThetaFunOF σ JS JT xi0 ψ f → ∀ w, Continuous fun p : GAF σ JS × GAF σ JT => om p f w
+  om_unit
+    : ∀ (μ : Measure (WOF F E nS nT)) (𝓕 : Set (WOF F E nS nT)),
+      μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratLF F E nS nT) 𝓕 μ
+        → ∀ p f,
+          IsThetaFunOF σ JS JT xi0 ψ f → ∫⁻ w in 𝓕, ‖om p f w‖ₑ ^ 2 ∂μ = ∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ
+  om_split
+    : ∀ e,
+      IsSplitIdemF σ e
+        → ∀ g h,
+          SuppAtF σ e JS g → SuppAtF σ e JT h
+            → ∀ x y,
+              IsDetAtF σ e JS g x → IsDetAtF σ e JT h y
+                → ∃ r : ℝ,
+                  0 < r
+                    ∧ ∀ ℓ : (WOF F E nS nT → ℂ) →ₗ[ℂ] ℂ,
+                      (∀ u : WOF F E nS nT,
+                          (∀ i j, cAF σ e * u i j = u i j)
+                            → ∀ f,
+                              IsThetaFunOF σ JS JT xi0 ψ f → ℓ (heisOF σ JS JT xi0 ψ u f) = ℓ f)
+                        → ∀ f,
+                          IsThetaFunOF σ JS JT xi0 ψ f
+                            → ℓ (om (g, h) f) = (r : ℂ) * (splitFacOF χS χT x y : ℂ) * ℓ f
 
 variable {σ JS JT}
 

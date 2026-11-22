@@ -14,10 +14,12 @@ open GroundTheory.Heights₂.Heights.FieldNumbers
 
 universe u
 
-theorem relDim_eq_of_ringKrullDim {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K]
-    {ι : K → Type} (I : Ideal (MRing ι F)) (n : ℕ)
-    (h : ringKrullDim (MRing ι F ⧸ I) = ((n + Fintype.card K : ℕ) : WithBot ℕ∞)) :
-    relDim I = (n : WithBot (WithTop ℤ)) := by
+theorem relDim_eq_of_ringKrullDim
+    {F : Type u} [Field F]
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} (I : Ideal (MRing ι F))
+    (n : ℕ) (h : ringKrullDim (MRing ι F ⧸ I) = ((n + Fintype.card K : ℕ) : WithBot ℕ∞))
+    : relDim I = (n : WithBot (WithTop ℤ)) := by
   unfold relDim
   rw [h]
   show ((((n + Fintype.card K : ℕ) : ℤ) - Fintype.card K : ℤ) : WithBot (WithTop ℤ)) = _
@@ -25,7 +27,8 @@ theorem relDim_eq_of_ringKrullDim {F : Type u} [Field F] {K : Type} [Fintype K] 
   simp
   rfl
 
-theorem IntNumRatSection.proof (h : CutRational.Statement.{u}) : IntNumRatSection.Statement.{u} := by
+theorem IntNumRatSection.proof (h : CutRational.Statement.{u})
+    : IntNumRatSection.Statement.{u} := by
   intro F _ K _ _ ι _ n V hV hdim L A f g α β hf hg hfV hgV hA
   have hrel : relDim V = ((n + 1 : ℕ) : WithBot (WithTop ℤ)) :=
     relDim_eq_of_ringKrullDim V (n + 1) hdim

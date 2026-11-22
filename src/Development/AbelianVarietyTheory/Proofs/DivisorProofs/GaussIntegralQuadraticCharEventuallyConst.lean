@@ -15,13 +15,17 @@ open scoped Topology Classical
 
 namespace GlobalTheory.KSp
 
-theorem setIntegral_addSubgroup_add {X : Type} [AddCommGroup X] [MeasurableSpace X]
-    [MeasurableAdd X] (μ : Measure X) [μ.IsAddRightInvariant] (H : AddSubgroup X)
-    (hH : MeasurableSet (H : Set X)) {h : X} (hh : h ∈ H) (g : X → ℂ) :
-    ∫ x in (H : Set X), g (x + h) ∂μ = ∫ x in (H : Set X), g x ∂μ := by
+theorem setIntegral_addSubgroup_add
+    {X : Type} [AddCommGroup X] [MeasurableSpace X] [MeasurableAdd X]
+    (μ : Measure X) [μ.IsAddRightInvariant]
+    (H : AddSubgroup X) (hH : MeasurableSet (H : Set X))
+    {h : X} (hh : h ∈ H)
+    (g : X → ℂ)
+    : ∫ x in (H : Set X), g (x + h) ∂μ = ∫ x in (H : Set X), g x ∂μ := by
   rw [← integral_indicator hH, ← integral_indicator hH]
-  have key : (Set.indicator (H : Set X) fun x => g (x + h)) =
-      fun x => Set.indicator (H : Set X) g (x + h) := by
+  have key
+      : (Set.indicator (H : Set X) fun x => g (x + h))
+        = fun x => Set.indicator (H : Set X) g (x + h) := by
     funext x
     by_cases hx : x ∈ H
     · have hx' : x + h ∈ H := H.add_mem hx hh
@@ -30,14 +34,18 @@ theorem setIntegral_addSubgroup_add {X : Type} [AddCommGroup X] [MeasurableSpace
       simp [Set.indicator_apply, hx, hx']
   rw [key, integral_add_right_eq_self (Set.indicator (H : Set X) g) h]
 
-theorem setIntegral_pair_char {X : Type} [AddCommGroup X] [TopologicalSpace X] [MeasurableSpace X]
-    [MeasurableAdd X] (μ : Measure X) [μ.IsAddRightInvariant] {e : X → X → ℂ} (he : IsPair e)
-    (M : AddSubgroup X) (hM : MeasurableSet (M : Set X)) (x : X) :
-    ∫ m in (M : Set X), e x m ∂μ =
-      if ∀ m ∈ (M : Set X), e m x = 1 then ((μ.real (M : Set X) : ℝ) : ℂ) else 0 := by
+theorem setIntegral_pair_char
+    {X : Type} [AddCommGroup X] [TopologicalSpace X] [MeasurableSpace X] [MeasurableAdd X]
+    (μ : Measure X) [μ.IsAddRightInvariant]
+    {e : X → X → ℂ} (he : IsPair e)
+    (M : AddSubgroup X) (hM : MeasurableSet (M : Set X))
+    (x : X)
+    : ∫ m in (M : Set X), e x m ∂μ
+      = if ∀ m ∈ (M : Set X), e m x = 1 then ((μ.real (M : Set X) : ℝ) : ℂ) else 0 := by
   split_ifs with hx
-  · rw [setIntegral_congr_fun hM (g := fun _ => (1 : ℂ)) (fun m hm => by
-      simp only; rw [he.symm]; exact hx m hm)]
+  · rw [setIntegral_congr_fun hM
+      (g := fun _ => (1 : ℂ))
+      (fun m hm => by simp only; rw [he.symm]; exact hx m hm)]
     rw [setIntegral_const]
     simp
   · push_neg at hx
@@ -48,19 +56,27 @@ theorem setIntegral_pair_char {X : Type} [AddCommGroup X] [TopologicalSpace X] [
     simp only [hsplit] at h
     rw [integral_mul_const] at h
     have hne' : e x m₀ ≠ 1 := by rwa [he.symm]
-    have h2 : (∫ m in (M : Set X), e x m ∂μ) * (e x m₀ - 1) = 0 := by
-      rw [mul_sub, h]; ring
+    have h2 : (∫ m in (M : Set X), e x m ∂μ) * (e x m₀ - 1) = 0 := by rw [mul_sub, h]; ring
     rcases mul_eq_zero.mp h2 with h3 | h3
     · exact h3
     · exact absurd (sub_eq_zero.mp h3) hne'
 
-theorem gauss_integral_eventually_const : ∀ (X : Type) [AddCommGroup X] [TopologicalSpace X] [MeasurableSpace X]
-    [BorelSpace X] (_ : Good X) (μ : Measure X) [μ.IsAddHaarMeasure] (e : X → X → ℂ), IsPair e →
-    ∀ f : X → ℂ, IsLocallyConstant f → f 0 = 1 → (∀ x y, f (x + y) = f x * f y * e x y) →
-    ∃ (γ : ℂ) (K : Set X), IsCompact K ∧ ∀ L : AddSubgroup X, IsCompact (L : Set X) → IsOpen (L : Set X) →
-      K ⊆ L → ∫ x in (L : Set X), f x ∂μ = γ := by
+theorem gauss_integral_eventually_const
+    : ∀ (X : Type) [AddCommGroup X] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
+        (_ : Good X) (μ : Measure X) [μ.IsAddHaarMeasure] (e : X → X → ℂ),
+      IsPair e
+        → ∀ f : X → ℂ,
+          IsLocallyConstant f → f 0 = 1 → (∀ x y, f (x + y) = f x * f y * e x y)
+            → ∃ (γ : ℂ) (K : Set X),
+              IsCompact K
+                ∧ ∀ L : AddSubgroup X,
+                  IsCompact (L : Set X) → IsOpen (L : Set X) → K ⊆ L
+                    → ∫ x in (L : Set X), f x ∂μ = γ := by
   intro X _ _ _ _ hG μ _ e he f hf hf0 hfe
-  haveI := hG.grp; haveI := hG.t2; haveI := hG.lc; haveI := hG.sc
+  haveI := hG.grp
+  haveI := hG.t2
+  haveI := hG.lc
+  haveI := hG.sc
   obtain ⟨M, hMc, hMo, hMf⟩ := hG.small {x | f x = 1} ((hf.isOpen_fiber 1).mem_nhds hf0)
   have hMn : (M : Set X) ∈ 𝓝 (0 : X) := hMo.mem_nhds M.zero_mem
   obtain ⟨K₀, hK₀c, hK₀⟩ := he.big _ hMn
@@ -84,8 +100,10 @@ theorem gauss_integral_eventually_const : ∀ (X : Type) [AddCommGroup X] [Topol
   have h1 : ∀ m ∈ (M : Set X), ∫ x in (L : Set X), f x * e x m ∂μ = A := by
     intro m hm
     rw [hA, ← setIntegral_addSubgroup_add μ L hLm (hML hm) f]
-    congr 1; funext x
-    rw [hfe, show f m = 1 from hMf hm]; ring
+    congr 1
+    funext x
+    rw [hfe, show f m = 1 from hMf hm]
+    ring
   obtain ⟨C, hC⟩ := hLc.exists_bound_of_continuousOn hf.continuous.continuousOn
   have hint : Integrable (Function.uncurry fun m x => f x * e x m)
       ((μ.restrict (M : Set X)).prod (μ.restrict (L : Set X))) := by
@@ -100,10 +118,12 @@ theorem gauss_integral_eventually_const : ∀ (X : Type) [AddCommGroup X] [Topol
   have h3 := integral_integral_swap hint
   rw [setIntegral_congr_fun hMm h1, setIntegral_const] at h3
   simp_rw [integral_const_mul, setIntegral_pair_char μ he M hMm] at h3
-  have h4 : ∫ x in (L : Set X), f x * (if ∀ m ∈ (M : Set X), e m x = 1 then ((μ.real (M : Set X) : ℝ) : ℂ) else 0) ∂μ
-      = ((μ.real (M : Set X) : ℝ) : ℂ) * ∫ x in M', f x ∂μ := by
-    have : (fun x => f x * (if ∀ m ∈ (M : Set X), e m x = 1 then ((μ.real (M : Set X) : ℝ) : ℂ) else 0)) =
-        Set.indicator M' (fun x => ((μ.real (M : Set X) : ℝ) : ℂ) * f x) := by
+  have h4
+      : ∫ x in (L : Set X), f x * (if ∀ m ∈ (M : Set X), e m x = 1 then ((μ.real (M : Set X) : ℝ) : ℂ) else 0) ∂μ
+        = ((μ.real (M : Set X) : ℝ) : ℂ) * ∫ x in M', f x ∂μ := by
+    have : (fun x =>
+          f x * (if ∀ m ∈ (M : Set X), e m x = 1 then ((μ.real (M : Set X) : ℝ) : ℂ) else 0))
+        = Set.indicator M' (fun x => ((μ.real (M : Set X) : ℝ) : ℂ) * f x) := by
       funext x
       by_cases hx : x ∈ M'
       · rw [Set.indicator_of_mem hx, if_pos (show ∀ m ∈ (M : Set X), e m x = 1 from hx)]; ring
@@ -113,7 +133,8 @@ theorem gauss_integral_eventually_const : ∀ (X : Type) [AddCommGroup X] [Topol
   rw [h4, Complex.real_smul] at h3
   have hpos : ((μ.real (M : Set X) : ℝ) : ℂ) ≠ 0 := by
     rw [Complex.ofReal_ne_zero, measureReal_def]
-    exact ENNReal.toReal_ne_zero.mpr ⟨(hMo.measure_pos μ ⟨0, M.zero_mem⟩).ne', hMc.measure_lt_top.ne⟩
+    exact ENNReal.toReal_ne_zero.mpr
+      ⟨(hMo.measure_pos μ ⟨0, M.zero_mem⟩).ne', hMc.measure_lt_top.ne⟩
   exact mul_left_cancel₀ hpos h3
 
 end GlobalTheory.KSp

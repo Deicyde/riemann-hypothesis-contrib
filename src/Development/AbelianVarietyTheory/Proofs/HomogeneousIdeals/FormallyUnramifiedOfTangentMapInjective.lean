@@ -32,16 +32,19 @@ def derToDual (D : Derivation R A k) : A →+* DualNumber k where
 @[simp] lemma snd_derToDual (D : Derivation R A k) (a : A) :
     (derToDual D a).snd = D a := by simp [derToDual]
 
-def dualToDer (φ : A →+* DualNumber k) (h₁ : ∀ a, (φ a).fst = algebraMap A k a)
-    (h₂ : ∀ r, (φ (algebraMap R A r)).snd = 0) : Derivation R A k :=
+def dualToDer
+    (φ : A →+* DualNumber k)
+    (h₁ : ∀ a, (φ a).fst = algebraMap A k a) (h₂ : ∀ r, (φ (algebraMap R A r)).snd = 0)
+    : Derivation R A k :=
   Derivation.mk'
-    { toFun a := (φ a).snd
+    {
+      toFun a := (φ a).snd
       map_add' a b := by simp
       map_smul' r a := by
         rw [Algebra.smul_def, map_mul, DualNumber.snd_mul, h₂, h₁, ← IsScalarTower.algebraMap_apply]
-        simp [Algebra.smul_def] }
-    (fun a b => by
-      simp [h₁, Algebra.smul_def, mul_comm])
+        simp [Algebra.smul_def]
+    }
+    (fun a b => by simp [h₁, Algebra.smul_def, mul_comm])
 
 end Der
 
@@ -90,40 +93,52 @@ lemma formallySmooth_of_split [Algebra R A] [Algebra R B] [Algebra A B] [IsScala
     obtain ⟨y, rfl⟩ := (Algebra.H1Cotangent.exact_map_δ R A B x).mp h₁
     rw [Subsingleton.elim y 0, map_zero]
 
-theorem formallySmooth_of_dual_lift [Field k] [IsLocalRing B] (α : R →+* A) (β : A →+* B)
+theorem formallySmooth_of_dual_lift
+    [Field k] [IsLocalRing B]
+    (α : R →+* A) (β : A →+* B)
     (hA : α.EssFiniteType) (hB : (β.comp α).EssFiniteType) (hs : (β.comp α).FormallySmooth)
     (x : B →+* k) [IsLocalHom x]
-    (H : ∀ ψ : A →+* DualNumber k, (∀ a, (ψ a).fst = x (β a)) → (∀ r, (ψ (α r)).snd = 0) →
-      ∃ φ : B →+* DualNumber k, (∀ b, (φ b).fst = x b) ∧ ∀ a, φ (β a) = ψ a) :
-    β.FormallySmooth := by
+    (H : ∀ ψ : A →+* DualNumber k,
+      (∀ a, (ψ a).fst = x (β a)) → (∀ r, (ψ (α r)).snd = 0)
+        → ∃ φ : B →+* DualNumber k, (∀ b, (φ b).fst = x b) ∧ ∀ a, φ (β a) = ψ a)
+    : β.FormallySmooth := by
   algebraize [α, β, β.comp α, x, x.comp β, (x.comp β).comp α]
   have : IsScalarTower R B k := .of_algebraMap_eq' rfl
   haveI : IsLocalHom (algebraMap B k) := ‹_›
   letI : Algebra (IsLocalRing.ResidueField B) k := (IsLocalRing.ResidueField.lift x).toAlgebra
   haveI : IsScalarTower B (IsLocalRing.ResidueField B) k := .of_algebraMap_eq fun _ => rfl
   haveI : Module.Free B Ω[B⁄R] := Module.free_of_flat_of_isLocalRing
-  obtain ⟨r, hr⟩ := (IsLocalRing.split_injective_iff_lTensor_residueField_injective
-    (KaehlerDifferential.mapBaseChange R A B)).mpr (lTensor_injective_of_extend (k := k) _ fun χ => by
-      let D : Derivation R A k :=
-        ((χ.restrictScalars A) ∘ₗ TensorProduct.mk A B Ω[A⁄R] 1).compDer (KaehlerDifferential.D R A)
-      obtain ⟨φ, h₁, h₂⟩ := H (derToDual D) (fun a => fst_derToDual D a)
-        (fun r => (snd_derToDual D _).trans (D.map_algebraMap r))
-      let E : Derivation R B k := dualToDer φ h₁ (fun r => by
-        change (φ (β (α r))).snd = 0
-        rw [h₂]; exact (snd_derToDual D _).trans (D.map_algebraMap r))
-      refine ⟨E.liftKaehlerDifferential, ?_⟩
-      refine TensorProduct.AlgebraTensorModule.curry_injective (LinearMap.ext_ring ?_)
-      refine Derivation.liftKaehlerDifferential_unique _ _ (Derivation.ext fun a => ?_)
-      have : E (algebraMap A B a) = D a := by
-        change (φ (β a)).snd = _
-        rw [h₂, snd_derToDual]
-      simpa [D, KaehlerDifferential.map_D] using this)
+  obtain ⟨r, hr⟩ :=
+    (IsLocalRing.split_injective_iff_lTensor_residueField_injective
+        (KaehlerDifferential.mapBaseChange R A B)).mpr
+      (lTensor_injective_of_extend (k := k) _ fun χ => by
+        let D : Derivation R A k :=
+          ((χ.restrictScalars A) ∘ₗ TensorProduct.mk A B Ω[A⁄R] 1).compDer
+            (KaehlerDifferential.D R A)
+        obtain ⟨φ, h₁, h₂⟩ :=
+          H (derToDual D)
+            (fun a => fst_derToDual D a)
+            (fun r => (snd_derToDual D _).trans (D.map_algebraMap r))
+        let E : Derivation R B k :=
+          dualToDer φ h₁ (fun r => by
+            change (φ (β (α r))).snd = 0
+            rw [h₂]
+            exact (snd_derToDual D _).trans (D.map_algebraMap r))
+        refine ⟨E.liftKaehlerDifferential, ?_⟩
+        refine TensorProduct.AlgebraTensorModule.curry_injective (LinearMap.ext_ring ?_)
+        refine Derivation.liftKaehlerDifferential_unique _ _ (Derivation.ext fun a => ?_)
+        have : E (algebraMap A B a) = D a := by
+          change (φ (β a)).snd = _
+          rw [h₂, snd_derToDual]
+        simpa [D, KaehlerDifferential.map_D] using this)
   exact formallySmooth_of_split r hr
 
-theorem formallyUnramified_of_dual_const.{u} {A B : Type u} [CommRing A] [CommRing B]
+theorem formallyUnramified_of_dual_const.{u}
+    {A B : Type u} [CommRing A] [CommRing B]
     (β : A →+* B) (hβ : β.EssFiniteType)
     (H : ∀ (k : Type u) [Field k] [IsAlgClosed k] (φ : B →+* DualNumber k),
-      (∀ a, (φ (β a)).snd = 0) → ∀ b, (φ b).snd = 0) : β.FormallyUnramified := by
+      (∀ a, (φ (β a)).snd = 0) → ∀ b, (φ b).snd = 0)
+    : β.FormallyUnramified := by
   algebraize [β]
   refine ⟨?_⟩
   rw [← Module.support_eq_empty_iff (R := B), Set.eq_empty_iff_forall_notMem]
@@ -162,25 +177,29 @@ lemma dualPt_dualBase (k : Type u) [CommRing k] : dualPt k ≫ dualBase k = 𝟙
   rw [← Spec.map_comp, ← CommRingCat.ofHom_comp, ← Spec.map_id]
   congr 1
 
-theorem formallyUnramified_of_tangent {X Y : Scheme.{u}} (f : X ⟶ Y) [LocallyOfFiniteType f]
+theorem formallyUnramified_of_tangent
+    {X Y : Scheme.{u}} (f : X ⟶ Y) [LocallyOfFiniteType f]
     (H : ∀ (k : Type u) [Field k] [IsAlgClosed k] (w : Spec (.of (DualNumber k)) ⟶ X),
-      w ≫ f = dualBase k ≫ dualPt k ≫ w ≫ f → w = dualBase k ≫ dualPt k ≫ w) :
-    FormallyUnramified f := by
-  refine ⟨fun {U} hU {V} hV e => formallyUnramified_of_dual_const _
-    (f.finiteType_appLE hU hV e).essFiniteType fun k _ _ φ hφ b => ?_⟩
-  have := H k (Spec.map (CommRingCat.ofHom φ) ≫ hV.fromSpec) (by
-    simp only [Category.assoc, ← hU.SpecMap_appLE_fromSpec f hV e, ← Spec.map_comp_assoc]
-    congr 2
-    ext a
-    · rfl
-    · exact hφ a)
+      w ≫ f = dualBase k ≫ dualPt k ≫ w ≫ f → w = dualBase k ≫ dualPt k ≫ w)
+    : FormallyUnramified f := by
+  refine ⟨fun {U} hU {V} hV e =>
+    formallyUnramified_of_dual_const _ (f.finiteType_appLE hU hV e).essFiniteType
+      fun k _ _ φ hφ b => ?_⟩
+  have :=
+    H k (Spec.map (CommRingCat.ofHom φ) ≫ hV.fromSpec) (by
+      simp only [Category.assoc, ← hU.SpecMap_appLE_fromSpec f hV e, ← Spec.map_comp_assoc]
+      congr 2
+      ext a
+      · rfl
+      · exact hφ a)
   simp only [← Spec.map_comp_assoc] at this
   rw [cancel_mono, Spec.map_inj] at this
   exact congrArg TrivSqZeroExt.snd congr($this b)
 
-theorem locallyOfFinitePresentation_of_comp {X Y S : Scheme.{u}} (f : X ⟶ Y) (π : Y ⟶ S)
-    [LocallyOfFinitePresentation (f ≫ π)] [LocallyOfFiniteType π] :
-    LocallyOfFinitePresentation f := by
+theorem locallyOfFinitePresentation_of_comp
+    {X Y S : Scheme.{u}} (f : X ⟶ Y) (π : Y ⟶ S)
+    [LocallyOfFinitePresentation (f ≫ π)] [LocallyOfFiniteType π]
+    : LocallyOfFinitePresentation f := by
   rw [HasRingHomProperty.iff_exists_appLE (P := @LocallyOfFinitePresentation)
     (RingHom.finitePresentation_stableUnderComposition.stableUnderCompositionWithLocalizationAway
       RingHom.finitePresentation_holdsForLocalizationAway).1]
@@ -191,31 +210,42 @@ theorem locallyOfFinitePresentation_of_comp {X Y S : Scheme.{u}} (f : X ⟶ Y) (
     Y.isBasis_affineOpens.exists_subset_of_mem_open hxW (π ⁻¹ᵁ W).isOpen
   obtain ⟨_, ⟨V, hV, rfl⟩, hxV, hVU : V ≤ f ⁻¹ᵁ U⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open hxU (f ⁻¹ᵁ U).isOpen
-  refine ⟨⟨U, hU⟩, ⟨V, hV⟩, hxV, hVU, RingHom.FinitePresentation.of_comp_finiteType
-    (π.appLE W U hUW).hom ?_ (π.finiteType_appLE hW hU hUW)⟩
+  refine ⟨
+    ⟨U, hU⟩,
+    ⟨V, hV⟩,
+    hxV,
+    hVU,
+    RingHom.FinitePresentation.of_comp_finiteType (π.appLE W U hUW).hom ?_
+      (π.finiteType_appLE hW hU hUW)
+  ⟩
   rw [← CommRingCat.hom_comp, Scheme.Hom.appLE_comp_appLE]
   exact (f ≫ π).finitePresentation_appLE hW hV _
 
-theorem locallyQuasiFinite_of_formallyUnramified {X Y : Scheme.{u}} (f : X ⟶ Y)
-    [FormallyUnramified f] [LocallyOfFiniteType f] : LocallyQuasiFinite f := by
+theorem locallyQuasiFinite_of_formallyUnramified
+    {X Y : Scheme.{u}} (f : X ⟶ Y) [FormallyUnramified f] [LocallyOfFiniteType f]
+    : LocallyQuasiFinite f := by
   refine ⟨fun {U} hU {V} hV e => ?_⟩
   have h₁ := f.formallyUnramified_appLE hU hV e
   have h₂ := f.finiteType_appLE hU hV e
   algebraize [(f.appLE U V e).hom]
   exact inferInstanceAs (Algebra.QuasiFinite _ _)
 
-theorem hom_ext_of_ker_inf {D E₁ E₂ : CommRingCat.{u}} (p₁ : D ⟶ E₁) (p₂ : D ⟶ E₂)
-    (hs : Function.Surjective (Spec.map p₁)) (h : ∀ d, p₁ d = 0 → p₂ d = 0 → d = 0)
-    {X : Scheme.{u}} {g g' : Spec D ⟶ X} (h₁ : Spec.map p₁ ≫ g = Spec.map p₁ ≫ g')
-    (h₂ : Spec.map p₂ ≫ g = Spec.map p₂ ≫ g') : g = g' := by
+theorem hom_ext_of_ker_inf
+    {D E₁ E₂ : CommRingCat.{u}} (p₁ : D ⟶ E₁) (p₂ : D ⟶ E₂) (hs : Function.Surjective (Spec.map p₁))
+    (h : ∀ d, p₁ d = 0 → p₂ d = 0 → d = 0)
+    {X : Scheme.{u}} {g g' : Spec D ⟶ X}
+    (h₁ : Spec.map p₁ ≫ g = Spec.map p₁ ≫ g') (h₂ : Spec.map p₂ ≫ g = Spec.map p₂ ≫ g')
+    : g = g' := by
   have hsurj : Function.Surjective (equalizer.ι g g') := by
     intro y
     obtain ⟨z, rfl⟩ := hs y
     exact ⟨equalizer.lift _ h₁ z, by rw [← Scheme.Hom.comp_apply, equalizer.lift_ι]⟩
   have : IsClosedImmersion (equalizer.ι g g') :=
     .of_isPreimmersion _ (by rw [hsurj.range_eq]; exact isClosed_univ)
-  have key : ∀ {E : CommRingCat.{u}} (p : D ⟶ E) (_ : Spec.map p ≫ g = Spec.map p ≫ g')
-      (d : Γ(Spec D, ⊤)), (equalizer.ι g g').appTop d = 0 → p ((Scheme.ΓSpecIso D).hom d) = 0 := by
+  have key
+      : ∀ {E : CommRingCat.{u}} (p : D ⟶ E) (_ : Spec.map p ≫ g = Spec.map p ≫ g')
+          (d : Γ(Spec D, ⊤)),
+        (equalizer.ι g g').appTop d = 0 → p ((Scheme.ΓSpecIso D).hom d) = 0 := by
     intro E p hp d hd
     have e : (Spec.map p).appTop d = 0 := by
       rw [← equalizer.lift_ι _ hp, Scheme.Hom.comp_appTop, CommRingCat.comp_apply, hd, map_zero]
@@ -234,12 +264,13 @@ lemma SpecMap_fromSpecStalk_closedPoint {X : Scheme.{u}} {x : X} {R : CommRingCa
   exact (Scheme.Hom.comp_apply _ _ _).trans
     ((congrArg (X.fromSpecStalk x) Spec_closedPoint).trans Scheme.fromSpecStalk_closedPoint)
 
-theorem smooth_of_tangent {X Y S : Scheme.{u}} (f : X ⟶ Y) (π : Y ⟶ S) [Smooth (f ≫ π)]
-    [LocallyOfFiniteType π]
+theorem smooth_of_tangent
+    {X Y S : Scheme.{u}} (f : X ⟶ Y) (π : Y ⟶ S) [Smooth (f ≫ π)] [LocallyOfFiniteType π]
     (H : ∀ (k : Type u) [Field k] [IsAlgClosed k] (x : Spec (.of k) ⟶ X)
-      (v : Spec (.of (DualNumber k)) ⟶ Y), dualPt k ≫ v = x ≫ f → v ≫ π = dualBase k ≫ x ≫ f ≫ π →
-      ∃ w : Spec (.of (DualNumber k)) ⟶ X, dualPt k ≫ w = x ∧ w ≫ f = v) :
-    Smooth f := by
+        (v : Spec (.of (DualNumber k)) ⟶ Y),
+      dualPt k ≫ v = x ≫ f → v ≫ π = dualBase k ≫ x ≫ f ≫ π
+        → ∃ w : Spec (.of (DualNumber k)) ⟶ X, dualPt k ≫ w = x ∧ w ≫ f = v)
+    : Smooth f := by
   have := locallyOfFinitePresentation_of_comp f π
   rw [← Scheme.Hom.smoothLocus_eq_top_iff, ← top_le_iff]
   rintro x -
@@ -251,19 +282,22 @@ theorem smooth_of_tangent {X Y S : Scheme.{u}} (f : X ⟶ Y) (π : Y ⟶ S) [Smo
   refine formallySmooth_of_dual_lift (π.stalkMap (f x)).hom (f.stalkMap x).hom
     (LocallyOfFiniteType.stalkMap π _) (e ▸ LocallyOfFiniteType.stalkMap (f ≫ π) x)
     (e ▸ (f ≫ π).smoothLocus_eq_top.ge (Set.mem_univ x)) ξ fun ψ h₁ h₂ => ?_
-  obtain ⟨w, hw₁, hw₂⟩ := H k (Spec.map (CommRingCat.ofHom ξ) ≫ X.fromSpecStalk x)
-    (Spec.map (CommRingCat.ofHom ψ) ≫ Y.fromSpecStalk (f x)) (by
-      simp only [Category.assoc, ← Scheme.SpecMap_stalkMap_fromSpecStalk, ← Spec.map_comp_assoc]
-      congr 2
-      ext a
-      exact h₁ a) (by
-      rw [Category.assoc, Category.assoc, ← Scheme.SpecMap_stalkMap_fromSpecStalk_assoc,
-        ← Scheme.SpecMap_stalkMap_fromSpecStalk]
-      simp only [← Spec.map_comp_assoc]
-      congr 2
-      ext a
-      · exact h₁ _
-      · exact h₂ a)
+  obtain ⟨w, hw₁, hw₂⟩ :=
+    H k (Spec.map (CommRingCat.ofHom ξ) ≫ X.fromSpecStalk x)
+      (Spec.map (CommRingCat.ofHom ψ) ≫ Y.fromSpecStalk (f x))
+      (by
+        simp only [Category.assoc, ← Scheme.SpecMap_stalkMap_fromSpecStalk, ← Spec.map_comp_assoc]
+        congr 2
+        ext a
+        exact h₁ a)
+      (by
+        rw [Category.assoc, Category.assoc, ← Scheme.SpecMap_stalkMap_fromSpecStalk_assoc,
+          ← Scheme.SpecMap_stalkMap_fromSpecStalk]
+        simp only [← Spec.map_comp_assoc]
+        congr 2
+        ext a
+        · exact h₁ _
+        · exact h₂ a)
   obtain ⟨⟨y, φ, hφ⟩, rfl⟩ := (SpecToEquivOfLocalRing X (.of (DualNumber k))).symm.surjective w
   change _ ≫ Spec.map φ ≫ X.fromSpecStalk y = _ at hw₁
   change (Spec.map φ ≫ X.fromSpecStalk y) ≫ f = _ at hw₂
@@ -279,7 +313,8 @@ theorem smooth_of_tangent {X Y S : Scheme.{u}} (f : X ⟶ Y) (π : Y ⟶ S) [Smo
         (SpecMap_fromSpecStalk_closedPoint _))
   rw [cancel_mono, Spec.map_inj] at hw₁
   rw [Category.assoc, ← Scheme.SpecMap_stalkMap_fromSpecStalk, ← Spec.map_comp_assoc, cancel_mono,
-    Spec.map_inj] at hw₂
+      Spec.map_inj]
+    at hw₂
   exact ⟨φ.hom, fun b => congr($hw₁ b), fun a => congr($hw₂ a)⟩
 
 end Sch
@@ -321,8 +356,9 @@ lemma isTangent_comp {w : epsR R ⟶ G} (hw : IsTangent w) (f : G ⟶ H) [IsMonH
   rw [isTangent_iff] at hw ⊢
   rw [← Category.assoc, hw, one_comp]
 
-def tangentMap (f : G ⟶ H) [IsMonHom f] (w : {w : epsR R ⟶ G // IsTangent w}) :
-    {w : epsR R ⟶ H // IsTangent w} := ⟨w.1 ≫ f, isTangent_comp w.2 f⟩
+def tangentMap (f : G ⟶ H) [IsMonHom f] (w : {w : epsR R ⟶ G // IsTangent w})
+    : {w : epsR R ⟶ H // IsTangent w} :=
+  ⟨w.1 ≫ f, isTangent_comp w.2 f⟩
 
 @[simp] lemma tangentMap_coe (f : G ⟶ H) [IsMonHom f] (w : {w : epsR R ⟶ G // IsTangent w}) :
     (tangentMap f w).1 = w.1 ≫ f := rfl
@@ -369,10 +405,12 @@ lemma isTangent_epsScale (c : R) {w : epsR R ⟶ G} (hw : IsTangent w) :
 lemma epsScale_zero_comp {w : epsR R ⟶ G} (hw : IsTangent w) : epsScale 0 ≫ w = 1 := by
   rw [epsScale_zero, Category.assoc, (isTangent_iff w).mp hw, comp_one]
 
-def sqZeroMap {M N : Type} [AddCommGroup M] [Module R M] [Module Rᵐᵒᵖ M] [IsCentralScalar R M]
-    [AddCommGroup N] [Module R N] [Module Rᵐᵒᵖ N] [IsCentralScalar R N] (l : M →ₗ[R] N) :
-    Over.mk (spMap (algebraMap R (TrivSqZeroExt R N))) ⟶
-      Over.mk (spMap (algebraMap R (TrivSqZeroExt R M))) :=
+def sqZeroMap
+    {M N : Type} [AddCommGroup M] [Module R M] [Module Rᵐᵒᵖ M] [IsCentralScalar R M]
+    [AddCommGroup N] [Module R N] [Module Rᵐᵒᵖ N] [IsCentralScalar R N]
+    (l : M →ₗ[R] N)
+    : Over.mk (spMap (algebraMap R (TrivSqZeroExt R N)))
+      ⟶ Over.mk (spMap (algebraMap R (TrivSqZeroExt R M))) :=
   Over.homMk (spMap (TrivSqZeroExt.map l).toRingHom) (by
     change Spec.map _ ≫ Spec.map _ = Spec.map _
     rw [← Spec.map_comp]
@@ -391,8 +429,8 @@ lemma sqZeroMap_comp_eq {M : Type} [AddCommGroup M] [Module R M] [Module Rᵐᵒ
     rw [mul_comm, ← smul_eq_mul, ← map_smul, ← map_smul, smul_eq_mul, _root_.mul_one]
   ext <;> simp [epsScaleR, this]
 
-theorem epsScale_add_comp (a b : R) {w : epsR R ⟶ G} (hw : IsTangent w) :
-    epsScale (a + b) ≫ w = (epsScale a ≫ w) * (epsScale b ≫ w) := by
+theorem epsScale_add_comp (a b : R) {w : epsR R ⟶ G} (hw : IsTangent w)
+    : epsScale (a + b) ≫ w = (epsScale a ≫ w) * (epsScale b ≫ w) := by
   let i₁ := LinearMap.inl R R R
   let i₂ := LinearMap.inr R R R
   have key : sqZeroMap (i₁ + i₂) ≫ w = (sqZeroMap i₁ ≫ w) * (sqZeroMap i₂ ≫ w) := by
@@ -401,7 +439,8 @@ theorem epsScale_add_comp (a b : R) {w : epsR R ⟶ G} (hw : IsTangent w) :
       (CommRingCat.ofHom (TrivSqZeroExt.map (LinearMap.fst R R R)).toRingHom)
       (CommRingCat.ofHom (TrivSqZeroExt.map (LinearMap.snd R R R)).toRingHom) ?_ ?_ ?_ ?_
     · refine (PrimeSpectrum.isHomeomorph_comap (TrivSqZeroExt.map (LinearMap.fst R R R)).toRingHom
-        (fun x => ⟨1, one_pos, TrivSqZeroExt.map i₁ x, by ext <;> simp [i₁]⟩) fun d hd => ?_).surjective
+        (fun x => ⟨1, one_pos, TrivSqZeroExt.map i₁ x, by ext <;> simp [i₁]⟩)
+        fun d hd => ?_).surjective
       have h : d.fst = 0 := by simpa using congrArg TrivSqZeroExt.fst hd
       exact ⟨2, by ext1 <;> simp [pow_two, h]⟩
     · intro d h₁ h₂
@@ -423,8 +462,8 @@ theorem epsScale_add_comp (a b : R) {w : epsR R ⟶ G} (hw : IsTangent w) :
   simp only [comp_mul, ← Category.assoc, sqZeroMap_comp_eq] at this
   simpa [i₁, i₂] using this
 
-theorem pow_eq_epsScale_comp {w : epsR R ⟶ G} (hw : IsTangent w) (n : ℕ) :
-    w ^ n = epsScale (n : R) ≫ w := by
+theorem pow_eq_epsScale_comp {w : epsR R ⟶ G} (hw : IsTangent w) (n : ℕ)
+    : w ^ n = epsScale (n : R) ≫ w := by
   induction n with
   | zero => rw [pow_zero, Nat.cast_zero, epsScale_zero_comp hw]
   | succ n ih =>
@@ -450,8 +489,8 @@ instance isMonHom_mulN (G : Over S) [GrpObj G] [IsCommMonObj G] (n : ℕ) : IsMo
     rw [comp_mulN, mul_eq_mul, comp_mul, mul_pow]
     congr 1 <;> simp [comp_mulN]
 
-theorem pullback_map_mulN {S' : Scheme.{0}} (p : S' ⟶ S) (G : Over S) [GrpObj G] (n : ℕ) :
-    (Over.pullback p).map (mulN G n) = mulN ((Over.pullback p).obj G) n := by
+theorem pullback_map_mulN {S' : Scheme.{0}} (p : S' ⟶ S) (G : Over S) [GrpObj G] (n : ℕ)
+    : (Over.pullback p).map (mulN G n) = mulN ((Over.pullback p).obj G) n := by
   rw [mulN_eq_pow, mulN_eq_pow, ← (Over.pullback p).map_id]
   exact map_pow (Over.pullback p).homMonoidHom _ _
 
@@ -544,38 +583,40 @@ lemma eq_of_tangentMap_injective
 
 end Field
 
-theorem formallyUnramified_of_tangentMap_injective (f : G ⟶ H) [IsMonHom f]
-    [LocallyOfFiniteType f.left]
+theorem formallyUnramified_of_tangentMap_injective
+    (f : G ⟶ H) [IsMonHom f] [LocallyOfFiniteType f.left]
     (h : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : Sp k ⟶ S),
-      Function.Injective (tangentMap ((Over.pullback p).map f))) :
-    FormallyUnramified f.left := by
+      Function.Injective (tangentMap ((Over.pullback p).map f)))
+    : FormallyUnramified f.left := by
   refine formallyUnramified_of_tangent _ fun k _ _ w hw => ?_
   let p : Sp k ⟶ S := dualPt k ≫ w ≫ G.hom
   have hw' : w ≫ G.hom = dualBase k ≫ p := by
     have := congrArg (· ≫ H.hom) hw
     simpa [p] using this
   let w₀ : Over.mk (dualBase k ≫ p) ⟶ G := Over.homMk w hw'
-  exact congrArg Over.Hom.left (eq_of_tangentMap_injective p f (h k p) w₀
-    (epsBaseAt p ≫ epsZeroAt p ≫ w₀) (by rw [epsZeroAt_epsBaseAt_assoc])
-    (Over.OverMorphism.ext (by simpa [w₀, epsBaseAt, epsZeroAt] using hw)))
+  exact congrArg Over.Hom.left
+    (eq_of_tangentMap_injective p f (h k p) w₀ (epsBaseAt p ≫ epsZeroAt p ≫ w₀)
+      (by rw [epsZeroAt_epsBaseAt_assoc])
+      (Over.OverMorphism.ext (by simpa [w₀, epsBaseAt, epsZeroAt] using hw)))
 
-theorem smooth_of_tangentMap_surjective (f : G ⟶ H) [IsMonHom f] [Smooth G.hom]
-    [LocallyOfFiniteType H.hom]
+theorem smooth_of_tangentMap_surjective
+    (f : G ⟶ H) [IsMonHom f] [Smooth G.hom] [LocallyOfFiniteType H.hom]
     (h : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : Sp k ⟶ S),
-      Function.Surjective (tangentMap ((Over.pullback p).map f))) :
-    Smooth f.left := by
+      Function.Surjective (tangentMap ((Over.pullback p).map f)))
+    : Smooth f.left := by
   have : Smooth (f.left ≫ H.hom) := by rw [Over.w]; infer_instance
   refine smooth_of_tangent f.left H.hom fun k _ _ x v h₁ h₂ => ?_
   let p : Sp k ⟶ S := x ≫ f.left ≫ H.hom
-  obtain ⟨w, hw₁, hw₂⟩ := exists_lift_of_tangentMap_surjective p f (h k p)
-    (Over.homMk x (by simp [p])) (Over.homMk v h₂) (Over.OverMorphism.ext h₁)
+  obtain ⟨w, hw₁, hw₂⟩ :=
+    exists_lift_of_tangentMap_surjective p f (h k p) (Over.homMk x (by simp [p])) (Over.homMk v h₂)
+      (Over.OverMorphism.ext h₁)
   exact ⟨w.left, congrArg Over.Hom.left hw₁, congrArg Over.Hom.left hw₂⟩
 
-theorem etale_of_tangentMap_bijective (f : G ⟶ H) [IsMonHom f] [Smooth G.hom]
-    [LocallyOfFiniteType H.hom]
+theorem etale_of_tangentMap_bijective
+    (f : G ⟶ H) [IsMonHom f] [Smooth G.hom] [LocallyOfFiniteType H.hom]
     (h : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : Sp k ⟶ S),
-      Function.Bijective (tangentMap ((Over.pullback p).map f))) :
-    Etale f.left := by
+      Function.Bijective (tangentMap ((Over.pullback p).map f)))
+    : Etale f.left := by
   have := smooth_of_tangentMap_surjective f fun k _ _ p => (h k p).2
   have := formallyUnramified_of_tangentMap_injective f fun k _ _ p => (h k p).1
   exact Etale.of_formallyUnramified_of_flat _
@@ -584,12 +625,17 @@ end Base
 
 section MulN
 
-theorem tangentMap_mulN_bijective {R : Type} [CommRing R] (G : Over (Sp R)) [GrpObj G]
-    [IsCommMonObj G] {n : ℕ} (hn : IsUnit (n : R)) : Function.Bijective (tangentMap (mulN G n)) := by
+theorem tangentMap_mulN_bijective
+    {R : Type} [CommRing R]
+    (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+    {n : ℕ} (hn : IsUnit (n : R))
+    : Function.Bijective (tangentMap (mulN G n)) := by
   obtain ⟨u, hu⟩ := hn
-  refine Function.bijective_iff_has_inverse.mpr
-    ⟨fun w => ⟨epsScale (↑u⁻¹ : R) ≫ w.1, isTangent_epsScale _ w.2⟩, fun w => Subtype.ext ?_,
-      fun w => Subtype.ext ?_⟩
+  refine Function.bijective_iff_has_inverse.mpr ⟨
+    fun w => ⟨epsScale (↑u⁻¹ : R) ≫ w.1, isTangent_epsScale _ w.2⟩,
+    fun w => Subtype.ext ?_,
+    fun w => Subtype.ext ?_
+  ⟩
   · simp only [tangentMap_coe]
     rw [comp_mulN, pow_eq_epsScale_comp w.2, epsScale_mul_assoc, ← hu, Units.inv_mul, epsScale_one,
       Category.id_comp]
@@ -609,49 +655,55 @@ lemma tangentMap_pullback_mulN_bijective [IsCommMonObj G] {n : ℕ} (hn : IsUnit
   convert tangentMap_mulN_bijective ((Over.pullback p).obj G) (isUnit_natCast_of_point hn p) using 2
   exact pullback_map_mulN p G n
 
-theorem formallyUnramified_mulN [IsCommMonObj G] [LocallyOfFiniteType G.hom] {n : ℕ}
-    (hn : IsUnit (n : Γ(S, ⊤))) : FormallyUnramified (mulN G n).left := by
+theorem formallyUnramified_mulN
+    [IsCommMonObj G] [LocallyOfFiniteType G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : FormallyUnramified (mulN G n).left := by
   have : LocallyOfFiniteType ((mulN G n).left ≫ G.hom) := by rw [Over.w]; infer_instance
   have := locallyOfFiniteType_of_comp (mulN G n).left G.hom
   exact formallyUnramified_of_tangentMap_injective _ fun k _ _ p =>
     (tangentMap_pullback_mulN_bijective G hn p).1
 
-theorem etale_mulN [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤))) :
-    Etale (mulN G n).left :=
+theorem etale_mulN [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : Etale (mulN G n).left :=
   etale_of_tangentMap_bijective _ fun _ _ _ p => tangentMap_pullback_mulN_bijective G hn p
 
-theorem etale_id_pow [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤))) :
-    Etale (𝟙 G ^ n).left := mulN_eq_pow G n ▸ etale_mulN G hn
+theorem etale_id_pow [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : Etale (𝟙 G ^ n).left :=
+  mulN_eq_pow G n ▸ etale_mulN G hn
 
-theorem isPullback_torsion (n : ℕ) :
-    IsPullback (torsion.ι G n).left (torsion G n).hom (mulN G n).left η[G].left := by
+theorem isPullback_torsion (n : ℕ)
+    : IsPullback (torsion.ι G n).left (torsion G n).hom (mulN G n).left η[G].left := by
   have h := (IsPullback.of_hasPullback (mulN G n) (η : 𝟙_ (Over S) ⟶ G)).map (Over.forget S)
   have e : (pullback.snd (mulN G n) (η : 𝟙_ (Over S) ⟶ G)).left = (torsion G n).hom :=
     (Category.comp_id _).symm.trans (Over.w (pullback.snd (mulN G n) (η : 𝟙_ (Over S) ⟶ G)))
   exact e ▸ h
 
-theorem etale_torsion [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤))) :
-    Etale (torsion G n).hom :=
+theorem etale_torsion [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : Etale (torsion G n).hom :=
   MorphismProperty.of_isPullback (P := @Etale) (isPullback_torsion G n) (etale_mulN G hn)
 
-theorem isFinite_mulN [IsCommMonObj G] [Smooth G.hom] [IsProper G.hom] {n : ℕ}
-    (hn : IsUnit (n : Γ(S, ⊤))) : IsFinite (mulN G n).left := by
+theorem isFinite_mulN
+    [IsCommMonObj G] [Smooth G.hom] [IsProper G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : IsFinite (mulN G n).left := by
   have := etale_mulN G hn
   have : IsProper ((mulN G n).left ≫ G.hom) := by rw [Over.w]; infer_instance
   have := IsProper.of_comp (mulN G n).left G.hom
   have := locallyQuasiFinite_of_formallyUnramified (mulN G n).left
   exact IsFinite.of_isProper_of_locallyQuasiFinite _
 
-theorem isFinite_id_pow [IsCommMonObj G] [Smooth G.hom] [IsProper G.hom] {n : ℕ}
-    (hn : IsUnit (n : Γ(S, ⊤))) : IsFinite (𝟙 G ^ n).left := mulN_eq_pow G n ▸ isFinite_mulN G hn
+theorem isFinite_id_pow
+    [IsCommMonObj G] [Smooth G.hom] [IsProper G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : IsFinite (𝟙 G ^ n).left :=
+  mulN_eq_pow G n ▸ isFinite_mulN G hn
 
-theorem isFinite_torsion [IsCommMonObj G] [Smooth G.hom] [IsProper G.hom] {n : ℕ}
-    (hn : IsUnit (n : Γ(S, ⊤))) : IsFinite (torsion G n).hom :=
+theorem isFinite_torsion
+    [IsCommMonObj G] [Smooth G.hom] [IsProper G.hom] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : IsFinite (torsion G n).hom :=
   MorphismProperty.of_isPullback (P := @IsFinite) (isPullback_torsion G n) (isFinite_mulN G hn)
 
-theorem finiteEtale_mulN_torsion [hG : IsAbelianScheme G] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤))) :
-    (IsFinite (mulN G n).left ∧ Etale (mulN G n).left) ∧
-      IsFinite (torsion G n).hom ∧ Etale (torsion G n).hom :=
+theorem finiteEtale_mulN_torsion [hG : IsAbelianScheme G] {n : ℕ} (hn : IsUnit (n : Γ(S, ⊤)))
+    : (IsFinite (mulN G n).left ∧ Etale (mulN G n).left) ∧ IsFinite (torsion G n).hom
+      ∧ Etale (torsion G n).hom :=
   have := hG.comm
   have := hG.smooth
   have := hG.proper

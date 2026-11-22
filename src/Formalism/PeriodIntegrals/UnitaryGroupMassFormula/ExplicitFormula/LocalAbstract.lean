@@ -11,8 +11,7 @@ namespace PI.EF.Loc
 
 open Complex Metric Set Filter Topology
 
-def locC (r R' R : ℝ) : ℝ :=
-  4 * (r + R') / (R' - r) ^ 2 + R' / (R * (R - R')) / Real.log (R / R')
+def locC (r R' R : ℝ) : ℝ := 4 * (r + R') / (R' - r) ^ 2 + R' / (R * (R - R')) / Real.log (R / R')
 
 lemma locC_pos {r R' R : ℝ} (hr : 0 < r) (hrR' : r < R') (hR'R : R' < R) : 0 < locC r R' R := by
   have hR' : 0 < R' := hr.trans hrR'
@@ -32,15 +31,15 @@ variable {r R' R M : ℝ} {f h : ℂ → ℂ} {s₀ : ℂ} {Z : Finset ℂ} {m :
 def gfun (s₀ : ℂ) (R : ℝ) (Z : Finset ℂ) (m : ℂ → ℕ) (h : ℂ → ℂ) (z : ℂ) : ℂ :=
   (∏ ρ ∈ Z, (refl s₀ R ρ z) ^ (m ρ)) * h z
 
-private theorem differentiableOn_gfun_of_differentiableOn {U : Set ℂ} (hh : DifferentiableOn ℂ h U) :
-    DifferentiableOn ℂ (gfun s₀ R Z m h) U := by
+private theorem differentiableOn_gfun_of_differentiableOn {U : Set ℂ} (hh : DifferentiableOn ℂ h U)
+    : DifferentiableOn ℂ (gfun s₀ R Z m h) U := by
   have e : gfun s₀ R Z m h = fun z => (∏ ρ ∈ Z, refl s₀ R ρ z ^ m ρ) * h z := rfl
   rw [e]
   refine DifferentiableOn.mul ?_ hh
   have hd : Differentiable ℂ (fun z => ∏ ρ ∈ Z, refl s₀ R ρ z ^ m ρ) := by
     first
-      | exact Differentiable.finset_prod fun ρ _ => (differentiable_refl s₀ R ρ).pow (m ρ)
-      | (have hbd := differentiable_refl s₀ R; fun_prop)
+    | exact Differentiable.finset_prod fun ρ _ => (differentiable_refl s₀ R ρ).pow (m ρ)
+    | (have hbd := differentiable_refl s₀ R; fun_prop)
   exact hd.differentiableOn
 
 lemma gfun_bounds (hR' : 0 < R') (hR'R : R' < R)
@@ -109,13 +108,14 @@ lemma gfun_bounds (hR' : 0 < R') (hR'R : R' < R)
     rw [Real.log_div hR.ne' hR'.ne', mul_sub]
     linarith
 
-theorem core (hDL : PI.DiscLog) (hr : 0 < r) (hrR' : r < R') (hR'R : R' < R) (hM : 0 < M)
+theorem core
+    (hDL : PI.DiscLog) (hr : 0 < r) (hrR' : r < R') (hR'R : R' < R) (hM : 0 < M)
     (hZ : ∀ ρ : ℂ, ρ ∈ Z ↔ (ρ ∈ closedBall s₀ R' ∧ f ρ = 0))
     (hh : DifferentiableOn ℂ h (closedBall s₀ R)) (hh0 : ∀ z ∈ closedBall s₀ R', h z ≠ 0)
     (hfac : ∀ z ∈ closedBall s₀ R, f z = (∏ ρ ∈ Z, (z - ρ) ^ m ρ) * h z)
-    (hb : ∀ s ∈ closedBall s₀ R, ‖f s‖ ≤ Real.exp M * ‖f s₀‖) :
-    ∀ s ∈ closedBall s₀ r, f s ≠ 0 →
-      ‖logDeriv f s - ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ)‖ ≤ locC r R' R * M := by
+    (hb : ∀ s ∈ closedBall s₀ R, ‖f s‖ ≤ Real.exp M * ‖f s₀‖)
+    : ∀ s ∈ closedBall s₀ r,
+      f s ≠ 0 → ‖logDeriv f s - ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ)‖ ≤ locC r R' R * M := by
   intro s hs hfs
   have hR' : 0 < R' := hr.trans hrR'
   have hR : 0 < R := hR'.trans hR'R
@@ -137,8 +137,11 @@ theorem core (hDL : PI.DiscLog) (hr : 0 < r) (hrR' : r < R') (hR'R : R' < R) (hM
     have e1 : logDeriv f s = logDeriv (fun z => (∏ ρ ∈ Z, (z - ρ) ^ m ρ) * h z) s := by
       rw [logDeriv_apply, logDeriv_apply, hfeq.deriv_eq, hfeq.eq_of_nhds]
     rw [e1]
-    refine (logDeriv_prod_pow_mul (φ := fun ρ z => z - ρ) (h := h) hρs
-      (fun ρ _ => by fun_prop) hhs hhd).trans ?_
+    refine (logDeriv_prod_pow_mul
+      (φ := fun ρ z => z - ρ)
+      (h := h) hρs
+      (fun ρ _ => by fun_prop)
+      hhs hhd).trans ?_
     congr 1
     refine Finset.sum_congr rfl fun ρ _ => ?_
     show (m ρ : ℂ) * logDeriv (fun z => z - ρ) s = (m ρ : ℂ) / (s - ρ)
@@ -149,67 +152,77 @@ theorem core (hDL : PI.DiscLog) (hr : 0 < r) (hrR' : r < R') (hR'R : R' < R) (hM
     have h1 := le_norm_refl (R' := R') hR ((hZ ρ).1 hρ).1 hz
     rw [h0, norm_zero] at h1
     linarith
-  have hlg : logDeriv (gfun s₀ R Z m h) s =
-      (∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s) + logDeriv h s :=
-    logDeriv_prod_pow_mul (φ := fun ρ => refl s₀ R ρ) (fun ρ hρ => hBne s hsR ρ hρ)
-      (fun ρ _ => (differentiable_refl s₀ R ρ).differentiableAt) hhs hhd
+  have hlg
+      : logDeriv (gfun s₀ R Z m h) s
+        = (∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s) + logDeriv h s :=
+    logDeriv_prod_pow_mul
+      (φ := fun ρ => refl s₀ R ρ)
+      (fun ρ hρ => hBne s hsR ρ hρ)
+      (fun ρ _ => (differentiable_refl s₀ R ρ).differentiableAt)
+      hhs hhd
   have hsub : ball s₀ R' ⊆ closedBall s₀ R :=
     ball_subset_closedBall.trans (closedBall_subset_closedBall hR'R.le)
   have hgne : ∀ z ∈ ball s₀ R', gfun s₀ R Z m h z ≠ 0 := by
     intro z hz
     simp only [gfun]
-    exact mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun ρ hρ => pow_ne_zero _ (hBne z (hsub hz) ρ hρ))
+    exact mul_ne_zero
+      (Finset.prod_ne_zero_iff.mpr fun ρ hρ => pow_ne_zero _ (hBne z (hsub hz) ρ hρ))
       (hh0 z (ball_subset_closedBall hz))
-  have hLg := logDeriv_bound_of_zero_free hDL hr hrR' hM
-    (differentiableOn_gfun_of_differentiableOn (hh.mono hsub)) hgne (fun z hz => hg z (hsub hz)) s hs
+  have hLg :=
+    logDeriv_bound_of_zero_free hDL hr hrR' hM
+      (differentiableOn_gfun_of_differentiableOn (hh.mono hsub)) hgne
+      (fun z hz => hg z (hsub hz))
+      s hs
   have hLg' : ‖logDeriv (gfun s₀ R Z m h) s‖ ≤ 4 * (r + R') / (R' - r) ^ 2 * M := by
     rw [logDeriv_apply]
     exact hLg
   have hK : 0 ≤ R' / (R * (R - R')) := div_nonneg hR'.le (mul_pos hR (by linarith)).le
   have hlog : 0 < Real.log (R / R') := Real.log_pos ((one_lt_div hR').mpr hR'R)
-  have hNle : ((∑ ρ ∈ Z, m ρ : ℕ) : ℝ) ≤ M / Real.log (R / R') := by
-    exact (le_div_iff₀ hlog).mpr hN
-  have hsumB : ‖∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖ ≤
-      R' / (R * (R - R')) / Real.log (R / R') * M := by
-    calc ‖∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖
+  have hNle : ((∑ ρ ∈ Z, m ρ : ℕ) : ℝ) ≤ M / Real.log (R / R') := by exact (le_div_iff₀ hlog).mpr hN
+  have hsumB
+      : ‖∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖
+        ≤ R' / (R * (R - R')) / Real.log (R / R') * M := by
+    calc
+      ‖∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖
         ≤ ∑ ρ ∈ Z, ‖(m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖ := norm_sum_le _ _
       _ ≤ ∑ ρ ∈ Z, (m ρ : ℝ) * (R' / (R * (R - R'))) := by
-          refine Finset.sum_le_sum fun ρ hρ => ?_
-          rw [norm_mul]
-          have hn : ‖(m ρ : ℂ)‖ = (m ρ : ℝ) := by
-            exact Complex.norm_natCast _
-          rw [hn]
-          exact mul_le_mul_of_nonneg_left
-            (norm_logDeriv_refl_le hR'R hR ((hZ ρ).1 hρ).1 hsR) (Nat.cast_nonneg _)
-      _ = ((∑ ρ ∈ Z, m ρ : ℕ) : ℝ) * (R' / (R * (R - R'))) := by
-          rw [Nat.cast_sum, Finset.sum_mul]
-      _ ≤ M / Real.log (R / R') * (R' / (R * (R - R'))) :=
-          mul_le_mul_of_nonneg_right hNle hK
+        refine Finset.sum_le_sum fun ρ hρ => ?_
+        rw [norm_mul]
+        have hn : ‖(m ρ : ℂ)‖ = (m ρ : ℝ) := by exact Complex.norm_natCast _
+        rw [hn]
+        exact mul_le_mul_of_nonneg_left (norm_logDeriv_refl_le hR'R hR ((hZ ρ).1 hρ).1 hsR)
+          (Nat.cast_nonneg _)
+      _ = ((∑ ρ ∈ Z, m ρ : ℕ) : ℝ) * (R' / (R * (R - R'))) := by rw [Nat.cast_sum, Finset.sum_mul]
+      _ ≤ M / Real.log (R / R') * (R' / (R * (R - R'))) := mul_le_mul_of_nonneg_right hNle hK
       _ = R' / (R * (R - R')) / Real.log (R / R') * M := by ring
-  have hdiff : logDeriv f s - ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ) =
-      logDeriv (gfun s₀ R Z m h) s -
-        ∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s := by
+  have hdiff
+      : logDeriv f s - ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ)
+        = logDeriv (gfun s₀ R Z m h) s - ∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s := by
     rw [hlf, hlg]
     ring
   rw [hdiff]
-  calc _ ≤ ‖logDeriv (gfun s₀ R Z m h) s‖ +
-        ‖∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖ := norm_sub_le _ _
+  calc
+    _ ≤ ‖logDeriv (gfun s₀ R Z m h) s‖ + ‖∑ ρ ∈ Z, (m ρ : ℂ) * logDeriv (refl s₀ R ρ) s‖ :=
+      norm_sub_le _ _
     _ ≤ 4 * (r + R') / (R' - r) ^ 2 * M + R' / (R * (R - R')) / Real.log (R / R') * M :=
-        add_le_add hLg' hsumB
+      add_le_add hLg' hsumB
     _ = locC r R' R * M := by
-        unfold locC
-        ring
+      unfold locC
+      ring
 
 end core
 
-theorem local_abstract (hDF : PI.DiscFactor) (hDL : PI.DiscLog) {r R' R : ℝ} (hr : 0 < r)
-    (hrR' : r < R') (hR'R : R' < R) (f : ℂ → ℂ) (s₀ : ℂ) (M : ℝ)
-    (hf : AnalyticOnNhd ℂ f (closedBall s₀ R)) (hf0 : f s₀ ≠ 0) (hM : 0 ≤ M)
-    (hb : ∀ s ∈ closedBall s₀ R, ‖f s‖ ≤ Real.exp M * ‖f s₀‖) :
-    ({ρ | ρ ∈ closedBall s₀ R' ∧ f ρ = 0}).Finite ∧
-      ∀ s ∈ closedBall s₀ r, f s ≠ 0 →
-        ‖logDeriv f s - ∑ᶠ ρ ∈ {ρ | ρ ∈ closedBall s₀ R' ∧ f ρ = 0},
-            (analyticOrderNatAt f ρ : ℂ) / (s - ρ)‖ ≤ locC r R' R * M := by
+theorem local_abstract
+    (hDF : PI.DiscFactor) (hDL : PI.DiscLog)
+    {r R' R : ℝ} (hr : 0 < r) (hrR' : r < R') (hR'R : R' < R)
+    (f : ℂ → ℂ) (s₀ : ℂ) (M : ℝ) (hf : AnalyticOnNhd ℂ f (closedBall s₀ R)) (hf0 : f s₀ ≠ 0)
+    (hM : 0 ≤ M) (hb : ∀ s ∈ closedBall s₀ R, ‖f s‖ ≤ Real.exp M * ‖f s₀‖)
+    : ({ρ | ρ ∈ closedBall s₀ R' ∧ f ρ = 0}).Finite
+      ∧ ∀ s ∈ closedBall s₀ r,
+        f s ≠ 0
+          → ‖logDeriv f s - ∑ᶠ ρ ∈ {ρ | ρ ∈ closedBall s₀ R' ∧ f ρ = 0},
+                (analyticOrderNatAt f ρ : ℂ) / (s - ρ)‖
+            ≤ locC r R' R * M := by
   have hR' : 0 < R' := hr.trans hrR'
   have hfd : DifferentiableOn ℂ f (closedBall s₀ R) := hf.differentiableOn
   obtain ⟨Z, m, h, hZ, -, hh, hh0, hfac⟩ := hDF f s₀ R R' hR' hR'R hfd hf0
@@ -220,9 +233,9 @@ theorem local_abstract (hDF : PI.DiscFactor) (hDL : PI.DiscLog) {r R' R : ℝ} (
   have hord : ∀ ρ ∈ Z, analyticOrderNatAt f ρ = m ρ := by
     intro ρ hρ
     have hρR : ρ ∈ ball s₀ R := closedBall_subset_ball hR'R ((hZ ρ).1 hρ).1
-    exact order_eq_of_factor hρ (isOpen_ball.mem_nhds hρR)
-      (hf ρ (ball_subset_closedBall hρR)) (hh.mono ball_subset_closedBall)
-      (hh0 ρ ((hZ ρ).1 hρ).1) fun z hz => hfac z (ball_subset_closedBall hz)
+    exact order_eq_of_factor hρ (isOpen_ball.mem_nhds hρR) (hf ρ (ball_subset_closedBall hρR))
+      (hh.mono ball_subset_closedBall) (hh0 ρ ((hZ ρ).1 hρ).1)
+      fun z hz => hfac z (ball_subset_closedBall hz)
   refine ⟨by rw [hset]; exact Z.finite_toSet, ?_⟩
   intro s hs hfs
   have hsum : ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ) = ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ) :=
@@ -232,13 +245,12 @@ theorem local_abstract (hDF : PI.DiscFactor) (hDL : PI.DiscLog) {r R' R : ℝ} (
   refine le_of_forall_pos_le_add fun ε hε => ?_
   have hεC : 0 < ε / locC r R' R := div_pos hε hC
   have hM' : 0 < M + ε / locC r R' R := add_pos_of_nonneg_of_pos hM hεC
-  have hb' : ∀ z ∈ closedBall s₀ R,
-      ‖f z‖ ≤ Real.exp (M + ε / locC r R' R) * ‖f s₀‖ := fun z hz =>
+  have hb' : ∀ z ∈ closedBall s₀ R, ‖f z‖ ≤ Real.exp (M + ε / locC r R' R) * ‖f s₀‖ := fun z hz =>
     (hb z hz).trans (mul_le_mul_of_nonneg_right (Real.exp_le_exp.mpr (by linarith)) (norm_nonneg _))
   have key := core hDL hr hrR' hR'R hM' hZ hh hh0 hfac hb' s hs hfs
-  have hCε : locC r R' R * (ε / locC r R' R) = ε := by
-    exact mul_div_cancel₀ ε hC.ne'
-  calc _ ≤ locC r R' R * (M + ε / locC r R' R) := key
+  have hCε : locC r R' R * (ε / locC r R' R) = ε := by exact mul_div_cancel₀ ε hC.ne'
+  calc
+    _ ≤ locC r R' R * (M + ε / locC r R' R) := key
     _ = locC r R' R * M + ε := by rw [mul_add, hCε]
 
 end PI.EF.Loc

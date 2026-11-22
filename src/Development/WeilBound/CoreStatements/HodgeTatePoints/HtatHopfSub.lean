@@ -9,11 +9,14 @@ public import Development.WeilBound.CoreStatements.HodgeTatePoints.TwhopfSec
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
-theorem PositivityTheory.HtPt.Htat.SubgroupHopfOrder.btOrder_isHopfOrder_of_finOpenSub :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens), Γ.IsFinOpenSub U → IsHopfOrder (Γ.btOrder U) := by
+theorem PositivityTheory.HtPt.Htat.SubgroupHopfOrder.btOrder_isHopfOrder_of_finOpenSub
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T]
+        [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens),
+      Γ.IsFinOpenSub U → IsHopfOrder (Γ.btOrder U) := by
   intro R _ _ _ T _ _ Γ U hU
   obtain ⟨H, A, hH, hA, hAf⟩ := PositivityTheory.HtPt.Twhopf.sub_order R T Γ U hU
   have key : Γ.btOrder U = indOrder H.subtype A := by
@@ -30,5 +33,8 @@ theorem PositivityTheory.HtPt.Htat.SubgroupHopfOrder.btOrder_isHopfOrder_of_finO
   rw [key]
   exact PositivityTheory.HtPt.Twhopf.ind_hopf R T H H.subtype H.subtype_injective A hA
 
-theorem PositivityTheory.HtPt.Htat.bt_sub_hopf : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens), Γ.IsFinOpenSub U → IsHopfOrder (Γ.btOrder U) :=
+theorem PositivityTheory.HtPt.Htat.bt_sub_hopf
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T]
+        [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens),
+      Γ.IsFinOpenSub U → IsHopfOrder (Γ.btOrder U) :=
   @PositivityTheory.HtPt.Htat.SubgroupHopfOrder.btOrder_isHopfOrder_of_finOpenSub

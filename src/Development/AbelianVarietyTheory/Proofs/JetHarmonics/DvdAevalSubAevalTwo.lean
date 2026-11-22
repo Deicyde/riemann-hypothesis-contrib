@@ -10,9 +10,11 @@ open scoped ComplexConjugate BigOperators Topology
 
 namespace GlobalTheory.MomOne
 
-theorem dvd_aeval_sub_aeval_two {K A : Type*} [CommRing K] [CommRing A] [Algebra K A]
-    (a u w u' w' : A) (hu : a ∣ u - u') (hw : a ∣ w - w') (P : MvPolynomial (Fin 2) K) :
-    a ∣ MvPolynomial.aeval ![u, w] P - MvPolynomial.aeval ![u', w'] P := by
+theorem dvd_aeval_sub_aeval_two
+    {K A : Type*} [CommRing K] [CommRing A] [Algebra K A]
+    (a u w u' w' : A) (hu : a ∣ u - u') (hw : a ∣ w - w')
+    (P : MvPolynomial (Fin 2) K)
+    : a ∣ MvPolynomial.aeval ![u, w] P - MvPolynomial.aeval ![u', w'] P := by
   induction P using MvPolynomial.induction_on with
   | C c => simp
   | add p r hp hr =>
@@ -30,11 +32,11 @@ theorem dvd_aeval_sub_aeval_two {K A : Type*} [CommRing K] [CommRing A] [Algebra
     convert this using 1
     ring
 
-theorem X_pow_succ_dvd_of_DT {q : ℕ} [Fact q.Prime] (f : ℂ_[q]⟦X⟧) (n : ℕ)
-    (h0 : constantCoeff f = 0) (hD : (X : ℂ_[q]⟦X⟧) ^ n ∣ DT f) :
-    (X : ℂ_[q]⟦X⟧) ^ (n + 1) ∣ f := by
-  have hu : IsUnit (1 + X : ℂ_[q]⟦X⟧) := by
-    rw [PowerSeries.isUnit_iff_constantCoeff]; simp
+theorem X_pow_succ_dvd_of_DT
+    {q : ℕ} [Fact q.Prime]
+    (f : ℂ_[q]⟦X⟧) (n : ℕ) (h0 : constantCoeff f = 0) (hD : (X : ℂ_[q]⟦X⟧) ^ n ∣ DT f)
+    : (X : ℂ_[q]⟦X⟧) ^ (n + 1) ∣ f := by
+  have hu : IsUnit (1 + X : ℂ_[q]⟦X⟧) := by rw [PowerSeries.isUnit_iff_constantCoeff]; simp
   unfold DT at hD
   rw [hu.dvd_mul_left, X_pow_dvd_iff] at hD
   rw [X_pow_dvd_iff]
@@ -47,7 +49,12 @@ theorem X_pow_succ_dvd_of_DT {q : ℕ} [Fact q.Prime] (f : ℂ_[q]⟦X⟧) (n : 
     have hk : ((k : ℂ_[q]) + 1) ≠ 0 := by exact_mod_cast Nat.succ_ne_zero k
     exact (mul_eq_zero.mp this).resolve_right hk
 
-theorem ode_unique : ∀ (q : ℕ) [Fact q.Prime] (P₁ P₂ : MvPolynomial (Fin 2) ℂ_[q]) (u w u' w' : ℂ_[q]⟦X⟧), DT u = MvPolynomial.aeval ![u, w] P₁ → DT w = MvPolynomial.aeval ![u, w] P₂ → DT u' = MvPolynomial.aeval ![u', w'] P₁ → DT w' = MvPolynomial.aeval ![u', w'] P₂ → constantCoeff u = constantCoeff u' → constantCoeff w = constantCoeff w' → u = u' ∧ w = w' := by
+theorem ode_unique
+    : ∀ (q : ℕ) [Fact q.Prime] (P₁ P₂ : MvPolynomial (Fin 2) ℂ_[q]) (u w u' w' : ℂ_[q]⟦X⟧),
+      DT u = MvPolynomial.aeval ![u, w] P₁ → DT w = MvPolynomial.aeval ![u, w] P₂
+        → DT u' = MvPolynomial.aeval ![u', w'] P₁ → DT w' = MvPolynomial.aeval ![u', w'] P₂
+        → constantCoeff u = constantCoeff u' → constantCoeff w = constantCoeff w'
+        → u = u' ∧ w = w' := by
   intro q _ P₁ P₂ u w u' w' h1 h2 h3 h4 hu hw
   have hsub : ∀ f g : ℂ_[q]⟦X⟧, DT (f - g) = DT f - DT g := by
     intro f g

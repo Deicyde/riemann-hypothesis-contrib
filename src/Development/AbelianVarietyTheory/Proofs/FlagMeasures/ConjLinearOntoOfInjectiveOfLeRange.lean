@@ -6,26 +6,32 @@ public import Formalism.LocalToGlobal.HermitianForms.IsLocBasis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.Forms Formalism.UG Matrix NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.Forms Formalism.UG Matrix
+  NumberField IsDedekindDomain
 open scoped InnerProductSpace TensorProduct
 
 namespace GlobalTheory
 
-theorem conjLinear_onto_of_injective_of_le_range :
-    ∀ (W M : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [AddCommGroup M] [Module ℂ M] (S : Submodule ℂ M) (J₀ J₁ : W →ₗ⋆[ℂ] M), (∀ p ∈ S, ∃ ξ, J₀ ξ = p) → Function.Injective J₁ → (∀ ξ, J₁ ξ ∈ S) → ∀ p ∈ S, ∃ ξ, J₁ ξ = p := by
+theorem conjLinear_onto_of_injective_of_le_range
+    : ∀ (W M : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [AddCommGroup M]
+        [Module ℂ M] (S : Submodule ℂ M) (J₀ J₁ : W →ₗ⋆[ℂ] M),
+      (∀ p ∈ S, ∃ ξ, J₀ ξ = p) → Function.Injective J₁ → (∀ ξ, J₁ ξ ∈ S)
+        → ∀ p ∈ S, ∃ ξ, J₁ ξ = p := by
   intro W M _ _ _ _ _ S J₀ J₁ h0 hinj hS
-  let f0 : W →ₗ[ℝ] M :=
-    { toFun := J₀
-      map_add' := J₀.map_add
-      map_smul' := fun r x => by
-        show J₀ (r • x) = r • J₀ x
-        rw [← Complex.coe_smul, J₀.map_smulₛₗ, Complex.conj_ofReal, Complex.coe_smul] }
-  let f1 : W →ₗ[ℝ] M :=
-    { toFun := J₁
-      map_add' := J₁.map_add
-      map_smul' := fun r x => by
-        show J₁ (r • x) = r • J₁ x
-        rw [← Complex.coe_smul, J₁.map_smulₛₗ, Complex.conj_ofReal, Complex.coe_smul] }
+  let f0 : W →ₗ[ℝ] M := {
+    toFun := J₀
+    map_add' := J₀.map_add
+    map_smul' := fun r x => by
+      show J₀ (r • x) = r • J₀ x
+      rw [← Complex.coe_smul, J₀.map_smulₛₗ, Complex.conj_ofReal, Complex.coe_smul]
+  }
+  let f1 : W →ₗ[ℝ] M := {
+    toFun := J₁
+    map_add' := J₁.map_add
+    map_smul' := fun r x => by
+      show J₁ (r • x) = r • J₁ x
+      rw [← Complex.coe_smul, J₁.map_smulₛₗ, Complex.conj_ofReal, Complex.coe_smul]
+  }
 
   have hle0 : S.restrictScalars ℝ ≤ LinearMap.range f0 := fun p hp => h0 p hp
   have hle1 : LinearMap.range f1 ≤ S.restrictScalars ℝ := by

@@ -13,12 +13,14 @@ noncomputable section
 
 namespace PseudoEisenstein
 
-theorem differentiableOn_integral_of_bound {α : Type*} [MeasurableSpace α] {μ : Measure α}
-    {F : ℂ → α → ℂ} {U : Set ℂ} (hU : IsOpen U) (hF : ∀ x, DifferentiableOn ℂ (fun s => F s x) U)
+theorem differentiableOn_integral_of_bound
+    {α : Type*} [MeasurableSpace α]
+    {μ : Measure α} {F : ℂ → α → ℂ} {U : Set ℂ}
+    (hU : IsOpen U) (hF : ∀ x, DifferentiableOn ℂ (fun s => F s x) U)
     (hmeas : ∀ s ∈ U, AEStronglyMeasurable (F s) μ)
-    (hbound : ∀ s₀ ∈ U, ∃ ε > 0, closedBall s₀ ε ⊆ U ∧ ∃ B : α → ℝ, Integrable B μ ∧
-      ∀ s ∈ closedBall s₀ ε, ∀ x, ‖F s x‖ ≤ B x) :
-    DifferentiableOn ℂ (fun s => ∫ x, F s x ∂μ) U := by
+    (hbound : ∀ s₀ ∈ U, ∃ ε > 0,
+      closedBall s₀ ε ⊆ U ∧ ∃ B : α → ℝ, Integrable B μ ∧ ∀ s ∈ closedBall s₀ ε, ∀ x, ‖F s x‖ ≤ B x)
+    : DifferentiableOn ℂ (fun s => ∫ x, F s x ∂μ) U := by
   classical
   intro s₀ hs₀
   obtain ⟨ε, hε, hsub, B, hB, hle⟩ := hbound s₀ hs₀
@@ -28,7 +30,9 @@ theorem differentiableOn_integral_of_bound {α : Type*} [MeasurableSpace α] {μ
     intro s hs z hz
     rw [mem_closedBall] at hz ⊢
     rw [mem_ball] at hs
-    calc dist z s₀ ≤ dist z s + dist s s₀ := dist_triangle _ _ _
+    calc
+      dist z s₀
+        ≤ dist z s + dist s s₀ := dist_triangle _ _ _
       _ ≤ r + r := add_le_add hz hs.le
       _ = ε := by rw [hr]; ring
   have hderiv : ∀ x, ∀ s ∈ U, HasDerivAt (fun z => F z x) (deriv (fun z => F z x) s) s :=
@@ -42,7 +46,8 @@ theorem differentiableOn_integral_of_bound {α : Type*} [MeasurableSpace α] {μ
       exact ht (hU.mem_nhds hs₀)
     set q : ℕ → α → ℂ := fun n x => if s₀ + ((n : ℂ) + 1)⁻¹ ∈ U then
       ((n : ℂ) + 1) * (F (s₀ + ((n : ℂ) + 1)⁻¹) x - F s₀ x) else 0 with hq
-    refine aestronglyMeasurable_of_tendsto_ae atTop (f := q) (fun n => ?_)
+    refine aestronglyMeasurable_of_tendsto_ae atTop (f := q)
+      (fun n => ?_)
       (Eventually.of_forall fun x => ?_)
     · simp only [hq]
       split_ifs with h
@@ -59,22 +64,21 @@ theorem differentiableOn_integral_of_bound {α : Type*} [MeasurableSpace α] {μ
       filter_upwards [hev] with n hn
       simp only [hq, Function.comp_apply, if_pos hn, slope, vsub_eq_sub, add_sub_cancel_left,
         inv_inv, smul_eq_mul]
-  have key := hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := μ) (x₀ := s₀)
-    (F := F) (F' := fun s x => deriv (fun z => F z x) s) (bound := fun x => B x / r)
-    (ball_mem_nhds s₀ hr0)
-    (eventually_of_mem (hU.mem_nhds hs₀) hmeas)
-    (hB.mono' (hmeas s₀ hs₀) (Eventually.of_forall fun x => hle s₀ (mem_closedBall_self hε.le) x))
-    hF'meas
-    (Eventually.of_forall fun x s hs => ?_) (hB.div_const r)
-    (Eventually.of_forall fun x s hs => hderiv x s (hsub (hball s hs (mem_closedBall_self hr0.le))))
+  have key :=
+    hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := μ) (x₀ := s₀) (F := F)
+      (F' := fun s x => deriv (fun z => F z x) s)
+      (bound := fun x => B x / r)
+      (ball_mem_nhds s₀ hr0) (eventually_of_mem (hU.mem_nhds hs₀) hmeas)
+      (hB.mono' (hmeas s₀ hs₀) (Eventually.of_forall fun x => hle s₀ (mem_closedBall_self hε.le) x))
+      hF'meas (Eventually.of_forall fun x s hs => ?_) (hB.div_const r)
+      (Eventually.of_forall fun x s hs =>
+        hderiv x s (hsub (hball s hs (mem_closedBall_self hr0.le))))
   · exact key.2.differentiableAt.differentiableWithinAt
   · refine Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hr0 ?_ fun z hz =>
       hle z (hball s hs (sphere_subset_closedBall hz)) x
     refine DifferentiableOn.diffContOnCl ?_
     rw [closure_ball s hr0.ne']
     exact (hF x).mono ((hball s hs).trans hsub)
-
-
 
 end PseudoEisenstein
 

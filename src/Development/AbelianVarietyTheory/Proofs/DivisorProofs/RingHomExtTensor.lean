@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.RingHomTensorExtensionality
 
-theorem ringHom_ext_tensor {R A B C : Type} [CommRing R] [CommRing A] [CommRing B] [CommRing C]
-    [Algebra R A] [Algebra R B] {g h : TensorProduct R A B →+* C}
-    (ha : ∀ a : A, g (a ⊗ₜ[R] (1 : B)) = h (a ⊗ₜ[R] (1 : B)))
-    (hb : ∀ b : B, g ((1 : A) ⊗ₜ[R] b) = h ((1 : A) ⊗ₜ[R] b)) : g = h := by
+theorem ringHom_ext_tensor
+    {R A B C : Type} [CommRing R] [CommRing A] [CommRing B] [CommRing C] [Algebra R A] [Algebra R B]
+    {g h : TensorProduct R A B →+* C} (ha : ∀ a : A, g (a ⊗ₜ[R] (1 : B)) = h (a ⊗ₜ[R] (1 : B)))
+    (hb : ∀ b : B, g ((1 : A) ⊗ₜ[R] b) = h ((1 : A) ⊗ₜ[R] b))
+    : g = h := by
   refine RingHom.ext fun x => ?_
   induction x using TensorProduct.induction_on with
   | zero => rw [map_zero, map_zero]

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsIntegralOfQ
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.HL
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.HL
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open Formalism.L2.SG.Pf Formalism.L2.SG.Pf.BBTie
@@ -20,18 +21,30 @@ theorem ddS_ne (D : D7) : ddS D ≠ 0 := by
   · exact differentIdeal_ne_bot
   · exact FaithfulSMul.algebraMap_injective _ _
 
-theorem mem_ddPow_neg_iff : ∀ (D : D7) (Z : LocDat D) (n : ℕ), n ≤ D.R.rS → ∀ y : D.host.E,
-    y ∈ (ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) ↔
-      ∀ p : PlF D, (D.s.atP p).ιE y * (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) *
-        (D.s.atP p).ιE (uP p : D.host.E)) ^ n ∈ (Z.M p).L.O := by
+theorem mem_ddPow_neg_iff
+    : ∀ (D : D7) (Z : LocDat D) (n : ℕ),
+      n ≤ D.R.rS
+        → ∀ y : D.host.E,
+          y ∈ (ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+            ↔ ∀ p : PlF D,
+              (D.s.atP p).ιE y
+                  * (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)
+                      * (D.s.atP p).ιE (uP p : D.host.E))
+                    ^ n
+                ∈ (Z.M p).L.O := by
   intro D Z n hn y
   let a : Fin (D.R.rS + 1) := ⟨D.R.rS - n, by omega⟩
   have he : ((D.R.rS : ℤ) - ((a : ℕ) : ℤ)) = n := by
     show ((D.R.rS : ℤ) - ((D.R.rS - n : ℕ) : ℤ)) = n
-    rw [Nat.cast_sub hn]; ring
-  have hspan : ∀ p : PlF D, Submodule.span (Z.M p).L.O ((D.s.atP p).ιE ''
-      ((ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) : Set D.host.E)) =
-      Submodule.span (Z.M p).L.O {frFac Z.δ p a} := by
+    rw [Nat.cast_sub hn]
+    ring
+  have hspan
+      : ∀ p : PlF D,
+        Submodule.span (Z.M p).L.O
+            ((D.s.atP p).ιE
+              '' ((ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+                : Set D.host.E))
+          = Submodule.span (Z.M p).L.O {frFac Z.δ p a} := by
     intro p
     have h := locDiffC_holds D Z p a
     rw [he] at h
@@ -44,8 +57,11 @@ theorem mem_ddPow_neg_iff : ∀ (D : D7) (Z : LocDat D) (n : ℕ), n ≤ D.R.rS 
     set U := (bt_T_unit Z p).unit
     have hU : (U : (D.s.atP p).Ep) = btT Z p := IsUnit.unit_spec _
     rw [← hU, ← Units.val_pow_eq_pow_val, ← Units.val_mul, inv_pow, inv_mul_cancel, Units.val_one]
-  have hinv : ∀ z : D.host.E, z ∈ (ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) ↔
-      ∀ d ∈ ddS D ^ n, z * d ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
+  have hinv
+      : ∀ z : D.host.E,
+        z ∈ (ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+          ↔ ∀ d ∈ ddS D ^ n,
+            z * d ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
     intro z
     rw [zpow_neg, zpow_natCast, FractionalIdeal.mem_inv_iff (pow_ne_zero n (ddS_ne D))]
   constructor
@@ -62,9 +78,13 @@ theorem mem_ddPow_neg_iff : ∀ (D : D7) (Z : LocDat D) (n : ℕ), n ≤ D.R.rS 
     rw [FractionalIdeal.mem_one_iff]
     have hloc : ∀ p : PlF D, (D.s.atP p).ιE (y * d) ∈ (Z.M p).L.O := by
       intro p
-      have hmem : ∀ x ∈ Submodule.span (Z.M p).L.O ((D.s.atP p).ιE ''
-          ((ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) : Set D.host.E)),
-          (D.s.atP p).ιE d * x ∈ (Z.M p).L.O := by
+      have hmem
+          : ∀ x
+              ∈ Submodule.span (Z.M p).L.O
+                ((D.s.atP p).ιE
+                  '' ((ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+                    : Set D.host.E)),
+            (D.s.atP p).ιE d * x ∈ (Z.M p).L.O := by
         intro x hx
         induction hx using Submodule.span_induction with
         | mem x hx =>
@@ -78,10 +98,13 @@ theorem mem_ddPow_neg_iff : ∀ (D : D7) (Z : LocDat D) (n : ℕ), n ≤ D.R.rS 
       have hdf : (D.s.atP p).ιE d * frFac Z.δ p a ∈ (Z.M p).L.O :=
         hmem _ (by rw [hspan p]; exact Submodule.subset_span (Set.mem_singleton _))
       have hyp : (D.s.atP p).ιE y * btT Z p ^ n ∈ (Z.M p).L.O := h p
-      have e : (D.s.atP p).ιE (y * d) =
-          ((D.s.atP p).ιE y * btT Z p ^ n) * ((D.s.atP p).ιE d * frFac Z.δ p a) := by
-        calc (D.s.atP p).ιE (y * d) = (D.s.atP p).ιE y * (D.s.atP p).ιE d * (frFac Z.δ p a * btT Z p ^ n) := by
-              rw [hf p, mul_one, map_mul]
+      have e
+          : (D.s.atP p).ιE (y * d)
+            = ((D.s.atP p).ιE y * btT Z p ^ n) * ((D.s.atP p).ιE d * frFac Z.δ p a) := by
+        calc
+          (D.s.atP p).ιE (y * d)
+              = (D.s.atP p).ιE y * (D.s.atP p).ιE d * (frFac Z.δ p a * btT Z p ^ n) := by
+            rw [hf p, mul_one, map_mul]
           _ = _ := by ring
       rw [e]
       exact mul_mem hyp hdf

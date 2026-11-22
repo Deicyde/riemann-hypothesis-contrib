@@ -33,19 +33,19 @@ private lemma exists_map {k G : Type} [CommRing k] [Group G] [TopologicalSpace G
     fun m x => (hB m _).2 (((hA m _).1 ⟨x, rfl⟩).comp f.hom)
   exact ⟨φ, fun m x t => congr_fun (hφ m x) t⟩
 
-theorem UpperTheory.cochain_injective_exact :
-    ∀ {k G : Type} [CommRing k] [Group G] [TopologicalSpace G] (A B C : Rep.{0, 0, 0} k G)
+theorem UpperTheory.cochain_injective_exact
+    : ∀ {k G : Type} [CommRing k] [Group G] [TopologicalSpace G] (A B C : Rep.{0, 0, 0} k G)
         (f : A ⟶ B) (g : B ⟶ C) (KA KB KC : CochainComplex (ModuleCat.{0} k) ℕ)
         (ιA : KA ⟶ groupCohomology.inhomogeneousCochains A)
         (ιB : KB ⟶ groupCohomology.inhomogeneousCochains B)
         (ιC : KC ⟶ groupCohomology.inhomogeneousCochains C),
-        Function.Injective f.hom → Function.Exact f.hom g.hom → Function.Surjective g.hom →
-        (∀ m : ℕ, Function.Injective (ιA.f m).hom) → (∀ m : ℕ, Function.Injective (ιB.f m).hom) →
-        (∀ m : ℕ, Function.Injective (ιC.f m).hom) →
-        (∀ (m : ℕ) (x : (Fin m → G) → A.V), (∃ y, (ιA.f m).hom y = x) ↔ IsLocallyConstant x) →
-        (∀ (m : ℕ) (x : (Fin m → G) → B.V), (∃ y, (ιB.f m).hom y = x) ↔ IsLocallyConstant x) →
-        (∀ (m : ℕ) (x : (Fin m → G) → C.V), (∃ y, (ιC.f m).hom y = x) ↔ IsLocallyConstant x) →
-        ∃ (φ : KA ⟶ KB) (ψ : KB ⟶ KC) (w : CategoryTheory.CategoryStruct.comp φ ψ = 0),
+      Function.Injective f.hom → Function.Exact f.hom g.hom → Function.Surjective g.hom
+        → (∀ m : ℕ, Function.Injective (ιA.f m).hom) → (∀ m : ℕ, Function.Injective (ιB.f m).hom)
+        → (∀ m : ℕ, Function.Injective (ιC.f m).hom)
+        → (∀ (m : ℕ) (x : (Fin m → G) → A.V), (∃ y, (ιA.f m).hom y = x) ↔ IsLocallyConstant x)
+        → (∀ (m : ℕ) (x : (Fin m → G) → B.V), (∃ y, (ιB.f m).hom y = x) ↔ IsLocallyConstant x)
+        → (∀ (m : ℕ) (x : (Fin m → G) → C.V), (∃ y, (ιC.f m).hom y = x) ↔ IsLocallyConstant x)
+        → ∃ (φ : KA ⟶ KB) (ψ : KB ⟶ KC) (w : CategoryTheory.CategoryStruct.comp φ ψ = 0),
           (CategoryTheory.ShortComplex.mk φ ψ w).ShortExact := by
   intro k G _ _ _ A B C f g KA KB KC ιA ιB ιC hf hfg hg iA iB iC hA hB hC
   obtain ⟨φ, hφ⟩ := exists_map f ιA ιB iB hA hB

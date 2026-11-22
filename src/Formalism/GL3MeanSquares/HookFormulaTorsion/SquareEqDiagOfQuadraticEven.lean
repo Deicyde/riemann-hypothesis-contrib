@@ -9,12 +9,13 @@ open Finset
 
 namespace Formalism.HermitianLattices.WeilRepresentation.CocycleEighthPower
 
-open Formalism.HermitianLattices.WeilRepresentation Formalism.HermitianLattices.IntegralLatticeDensity
+open Formalism.HermitianLattices.WeilRepresentation
+  Formalism.HermitianLattices.IntegralLatticeDensity
 
 theorem t_heis : HeisenbergCocycle := by
   intro V _ H hadd hherm F x y z
   have hadd2 : ∀ x y y', H x (y + y') = H x y + H x y' := by
-    intro x y y'; rw [hherm (y+y') x, hadd, map_add (f := _), ← hherm, ← hherm]
+    intro x y y'; rw [hherm (y + y') x, hadd, map_add (f := _), ← hherm, ← hherm]
   have hc : H y x = H x y - 2 * Complex.I * ((H x y).im : ℂ) := by
     rw [hherm x y]; apply Complex.ext <;> simp <;> ring
   unfold Heisenberg₂

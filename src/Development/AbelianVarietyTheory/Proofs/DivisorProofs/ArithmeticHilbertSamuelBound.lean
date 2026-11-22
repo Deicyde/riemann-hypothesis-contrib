@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRightI
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.HermTools GlobalTheory.Vanishing GlobalTheory.Adelic GlobalTheory.HilbertSamuel GlobalTheory.ChowHt GlobalTheory.TangentOrigin
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.HermTools GlobalTheory.Vanishing
+  GlobalTheory.Adelic GlobalTheory.HilbertSamuel GlobalTheory.ChowHt GlobalTheory.TangentOrigin
 open GlobalTheory.IndefiniteRowSideFullHecke.RadicalPowers
 open GlobalTheory.HSCore GlobalTheory.QCoh
 open GlobalTheory
@@ -22,6 +24,9 @@ open GlobalTheory.HSShort GlobalTheory.HSChoice MvPolynomial
 namespace GlobalTheory.HSShort
 
 theorem geoBound_of_quoted' : Quoted → GeoBound := fun hQ =>
-  GlobalTheory.T.explicit_arithmetic_hilbertSamuel_bound hQ (GlobalTheory.T.bertiniNumberField_of_hilbertSamuel₂ hQ) (GlobalTheory.HeightTieProof.heightTie GlobalTheory.HSShort.htMul) GlobalTheory.T.slopeLowerBound_topLattice_offHypersurface
+  GlobalTheory.T.explicit_arithmetic_hilbertSamuel_bound hQ
+    (GlobalTheory.T.bertiniNumberField_of_hilbertSamuel₂ hQ)
+    (GlobalTheory.HeightTieProof.heightTie GlobalTheory.HSShort.htMul)
+    GlobalTheory.T.slopeLowerBound_topLattice_offHypersurface
 
 end GlobalTheory.HSShort

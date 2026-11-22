@@ -11,25 +11,32 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField Matrix
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField Matrix
 open IsDedekindDomain
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct Classical ComplexOrder
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.DiscreteGroups.LocalClassField
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKCx GlobalTheory.PELU
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.DiscreteGroups.LocalClassField
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo
+  GlobalTheory.LKCx GlobalTheory.PELU
 attribute [local instance] Over.cartesianMonoidalCategory
 open UpperTheory.ComplexUniformization
 
-private theorem form_re_eq {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : H.IsHermitian) (x : Fin n → ℂ) :
-    (star x ⬝ᵥ (H *ᵥ x)).re = ∑ i, hH.eigenvalues i *
-      Complex.normSq ((star (hH.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *ᵥ x) i) := by
+private theorem form_re_eq
+    {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : H.IsHermitian) (x : Fin n → ℂ)
+    : (star x ⬝ᵥ (H *ᵥ x)).re
+      = ∑ i, hH.eigenvalues i *
+        Complex.normSq ((star (hH.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *ᵥ x) i) := by
   set U : Matrix (Fin n) (Fin n) ℂ := (hH.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   have hspec : H = U * diagonal (RCLike.ofReal ∘ hH.eigenvalues) * star U := by
     have h0 := hH.spectral_theorem
     rwa [Unitary.conjStarAlgAut_apply] at h0
   have hsy : star (star U *ᵥ x) = star x ᵥ* U := by
     rw [star_mulVec, ← star_eq_conjTranspose, star_star]
-  have hL : star x ⬝ᵥ (H *ᵥ x) =
-      star (star U *ᵥ x) ⬝ᵥ (diagonal (RCLike.ofReal ∘ hH.eigenvalues) *ᵥ (star U *ᵥ x)) := by
+  have hL
+      : star x ⬝ᵥ (H *ᵥ x)
+        = star (star U *ᵥ x) ⬝ᵥ (diagonal (RCLike.ofReal ∘ hH.eigenvalues) *ᵥ (star U *ᵥ x)) := by
     rw [hsy, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, ← hspec]
   rw [hL, dotProduct, Complex.re_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
@@ -39,17 +46,19 @@ private theorem form_re_eq {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : H.Is
   simp [Complex.ofReal_re, Complex.ofReal_im]
   ring
 
-private theorem finrank_le_of_coord {n : ℕ} (U : Matrix (Fin n) (Fin n) ℂ) (p : Fin n → Prop)
-    [Fintype {i // p i}] (W : Submodule ℂ (Fin n → ℂ)) (h : ∀ x ∈ W, (∀ i, p i → (U *ᵥ x) i = 0) → x = 0) :
-    Module.finrank ℂ W ≤ Fintype.card {i // p i} := by
-  let f : W →ₗ[ℂ] ({i // p i} → ℂ) :=
-    { toFun := fun x i => (U *ᵥ (x : Fin n → ℂ)) i.1
-      map_add' := fun x y => by
-        ext i
-        simp [mulVec_add]
-      map_smul' := fun c x => by
-        ext i
-        simp [mulVec_smul] }
+private theorem finrank_le_of_coord
+    {n : ℕ} (U : Matrix (Fin n) (Fin n) ℂ) (p : Fin n → Prop) [Fintype {i // p i}]
+    (W : Submodule ℂ (Fin n → ℂ)) (h : ∀ x ∈ W, (∀ i, p i → (U *ᵥ x) i = 0) → x = 0)
+    : Module.finrank ℂ W ≤ Fintype.card {i // p i} := by
+  let f : W →ₗ[ℂ] ({i // p i} → ℂ) := {
+    toFun := fun x i => (U *ᵥ (x : Fin n → ℂ)) i.1
+    map_add' := fun x y => by
+      ext i
+      simp [mulVec_add]
+    map_smul' := fun c x => by
+      ext i
+      simp [mulVec_smul]
+  }
   have hinj : Function.Injective f := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro x hx
@@ -60,11 +69,12 @@ private theorem finrank_le_of_coord {n : ℕ} (U : Matrix (Fin n) (Fin n) ℂ) (
   have h1 := LinearMap.finrank_le_finrank_of_injective hinj
   rwa [Module.finrank_pi] at h1
 
-private theorem sig_eq_finrank {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : H.IsHermitian)
-    (A B : Submodule ℂ (Fin n → ℂ)) (hAB : Module.finrank ℂ A + Module.finrank ℂ B = n)
+private theorem sig_eq_finrank
+    {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : H.IsHermitian) (A B : Submodule ℂ (Fin n → ℂ))
+    (hAB : Module.finrank ℂ A + Module.finrank ℂ B = n)
     (hA : ∀ x ∈ A, x ≠ 0 → 0 < (star x ⬝ᵥ (H *ᵥ x)).re)
-    (hB : ∀ x ∈ B, x ≠ 0 → (star x ⬝ᵥ (H *ᵥ x)).re < 0) :
-    sigPosH hH = Module.finrank ℂ A := by
+    (hB : ∀ x ∈ B, x ≠ 0 → (star x ⬝ᵥ (H *ᵥ x)).re < 0)
+    : sigPosH hH = Module.finrank ℂ A := by
   set U : Matrix (Fin n) (Fin n) ℂ := star (hH.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   have hA' : Module.finrank ℂ A ≤ Fintype.card {i // 0 < hH.eigenvalues i} := by
     apply finrank_le_of_coord U (fun i => 0 < hH.eigenvalues i) A
@@ -94,8 +104,9 @@ private theorem sig_eq_finrank {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : 
       · rw [hz i hi]
         simp
     linarith
-  have hc : Fintype.card {i // ¬ 0 < hH.eigenvalues i} =
-      n - Fintype.card {i // 0 < hH.eigenvalues i} := by
+  have hc
+      : Fintype.card {i // ¬ 0 < hH.eigenvalues i}
+        = n - Fintype.card {i // 0 < hH.eigenvalues i} := by
     rw [Fintype.card_subtype_compl, Fintype.card_fin]
   have hle : Fintype.card {i // 0 < hH.eigenvalues i} ≤ n := by
     simpa using Fintype.card_subtype_le (fun i => 0 < hH.eigenvalues i)
@@ -105,16 +116,20 @@ private theorem sig_eq_finrank {n : ℕ} {H : Matrix (Fin n) (Fin n) ℂ} (hH : 
   rw [hs]
   omega
 
-theorem UpperTheory.hermitian_congruent_and_positive_eigenvector_of_signature :
-    ∀ (n δ : ℕ) (H K J : Matrix (Fin n) (Fin n) ℂ) (e : ℂ) (hH : H.IsHermitian) (hK : K.IsHermitian), (e = Complex.I ∨ e = -Complex.I) → J * J = -1 → ((-e) • (H * J)).PosDef → Matrix.trace J = e * (2 * (δ : ℂ) - (n : ℂ)) → K.det ≠ 0 → sigPosH hK = δ → (∃ Z : GL (Fin n) ℂ, H = (Z : Matrix (Fin n) (Fin n) ℂ)ᴴ * K * (Z : Matrix (Fin n) (Fin n) ℂ)) ∧ (0 < δ → ∃ z : Fin n → ℂ, J *ᵥ z = e • z ∧ 0 < (star z ⬝ᵥ (H *ᵥ z)).re) := by
+theorem UpperTheory.hermitian_congruent_and_positive_eigenvector_of_signature
+    : ∀ (n δ : ℕ) (H K J : Matrix (Fin n) (Fin n) ℂ) (e : ℂ) (hH : H.IsHermitian)
+        (hK : K.IsHermitian),
+      (e = Complex.I ∨ e = -Complex.I) → J * J = -1 → ((-e) • (H * J)).PosDef
+        → Matrix.trace J = e * (2 * (δ : ℂ) - (n : ℂ)) → K.det ≠ 0 → sigPosH hK = δ
+        → (∃ Z : GL (Fin n) ℂ,
+            H = (Z : Matrix (Fin n) (Fin n) ℂ)ᴴ * K * (Z : Matrix (Fin n) (Fin n) ℂ))
+          ∧ (0 < δ → ∃ z : Fin n → ℂ, J *ᵥ z = e • z ∧ 0 < (star z ⬝ᵥ (H *ᵥ z)).re) := by
   intro n δ H K J e hH hK he hJJ hM htr hKdet hKsig
-  have he2 : e * e = -1 := by
-    rcases he with rfl | rfl <;> simp
+  have he2 : e * e = -1 := by rcases he with rfl | rfl <;> simp
   set E : Matrix (Fin n) (Fin n) ℂ := e • J with hEdef
   have hEE : E * E = 1 := by
     rw [hEdef, smul_mul_smul_comm, he2, hJJ, neg_smul, smul_neg, one_smul, neg_neg]
-  have hJE : J = (-e) • E := by
-    rw [hEdef, smul_smul, neg_mul, he2, neg_neg, one_smul]
+  have hJE : J = (-e) • E := by rw [hEdef, smul_smul, neg_mul, he2, neg_neg, one_smul]
   set P : Matrix (Fin n) (Fin n) ℂ := (1 / 2 : ℂ) • (1 - E) with hPdef
   have h2 : (1 - E) * (1 - E) = (2 : ℂ) • (1 - E) := by
     rw [sub_mul, mul_sub, mul_sub, _root_.one_mul, _root_.mul_one, _root_.one_mul, hEE, two_smul]
@@ -130,12 +145,13 @@ theorem UpperTheory.hermitian_congruent_and_positive_eigenvector_of_signature :
     rw [Module.End.mul_eq_comp, ← Matrix.toLin'_mul, hPP]
   have hJrange : ∀ x ∈ LinearMap.range f, J *ᵥ x = e • x := by
     rintro x ⟨y, rfl⟩
-    rw [hfdef, Matrix.toLin'_apply, hJE, smul_mulVec, mulVec_mulVec, hEP, neg_mulVec,
-      smul_neg, ← neg_smul, neg_neg]
+    rw [hfdef, Matrix.toLin'_apply, hJE, smul_mulVec, mulVec_mulVec, hEP, neg_mulVec, smul_neg,
+      ← neg_smul, neg_neg]
   have hJker : ∀ x ∈ LinearMap.ker f, J *ᵥ x = (-e) • x := by
     intro x hx
-    rw [LinearMap.mem_ker, hfdef, Matrix.toLin'_apply, hPdef, smul_mulVec, sub_mulVec,
-      one_mulVec, smul_eq_zero] at hx
+    rw [LinearMap.mem_ker, hfdef, Matrix.toLin'_apply, hPdef, smul_mulVec, sub_mulVec, one_mulVec,
+        smul_eq_zero]
+      at hx
     have hx' : x = E *ᵥ x := by
       rcases hx with h | h
       · norm_num at h
@@ -165,8 +181,7 @@ theorem UpperTheory.hermitian_congruent_and_positive_eigenvector_of_signature :
     have h0 := (LinearMap.IsIdempotentElem.isProj_range f hidem).trace
     rw [hfdef, Matrix.trace_toLin'_eq, htrP] at h0
     exact_mod_cast h0.symm
-  have hsig : sigPosH hH = δ := by
-    rw [sig_eq_finrank hH _ _ hAB hApos hBneg, hrank]
+  have hsig : sigPosH hH = δ := by rw [sig_eq_finrank hH _ _ hAB hApos hBneg, hrank]
   have hHdet : H.det ≠ 0 := by
     intro h0
     have hd := hM.det_pos

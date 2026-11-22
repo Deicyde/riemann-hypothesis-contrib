@@ -9,9 +9,11 @@ open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootE
 
 namespace GlobalTheory.RootEx
 
-theorem exists_mem_SB_eq_one_on_compact (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] (C : Set (n → k)) (hC : IsCompact C) :
-    ∃ χ ∈ SB (n → k), ∀ u ∈ C, χ u = 1 := by
+theorem exists_mem_SB_eq_one_on_compact
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : Type) [Fintype n]
+    (C : Set (n → k)) (hC : IsCompact C)
+    : ∃ χ ∈ SB (n → k), ∀ u ∈ C, χ u = 1 := by
   classical
   haveI : T2Space k := by
     letI := IsTopologicalAddGroup.rightUniformSpace k
@@ -25,8 +27,9 @@ theorem exists_mem_SB_eq_one_on_compact (k : Type) [Field k] [ValuativeRel k] [T
   let U : (n → k) → Set (n → k) := fun x => (Homeomorph.addLeft x) '' B
   have hUo : ∀ x, IsOpen (U x) := fun x => (Homeomorph.addLeft x).isOpenMap _ hBo
   have hUc : ∀ x, IsCompact (U x) := fun x => hBc.image (Homeomorph.addLeft x).continuous
-  obtain ⟨t, ht⟩ := hC.elim_finite_subcover U hUo fun x _ =>
-    Set.mem_iUnion.mpr ⟨x, 0, fun _ _ => zero_mem _, by simp⟩
+  obtain ⟨t, ht⟩ :=
+    hC.elim_finite_subcover U hUo fun x _ =>
+      Set.mem_iUnion.mpr ⟨x, 0, fun _ _ => zero_mem _, by simp⟩
   set K : Set (n → k) := ⋃ x ∈ t, U x with hK
   have hKo : IsOpen K := isOpen_biUnion fun x _ => hUo x
   have hKc : IsCompact K := t.isCompact_biUnion fun x _ => hUc x

@@ -8,17 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSheafSh
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheory.EtC
+  UpperTheory.Gal.TranscendenceTraces
 
-private theorem ds_res_map_comm {R : Type} [CommRing R] {Z S : Scheme} (p : Z ⟶ S) {G G' : Shv R}
-    (f : G ⟶ G') {W V : Scheme} (k : W ⟶ V) (x : DS p G V) :
-    DS.res p G' k (DS.map p f V x) = DS.map p f W (DS.res p G k x) := by
+private theorem ds_res_map_comm
+    {R : Type} [CommRing R]
+    {Z S : Scheme} (p : Z ⟶ S)
+    {G G' : Shv R} (f : G ⟶ G')
+    {W V : Scheme} (k : W ⟶ V) (x : DS p G V)
+    : DS.res p G' k (DS.map p f V x) = DS.map p f W (DS.res p G k x) := by
   have h := congrArg (fun φ => ModuleCat.Hom.hom φ x) (((phiPF p R).map f).naturality k.op)
   simp only [phiPF, phiP, ModuleCat.hom_comp, ModuleCat.hom_ofHom] at h
   exact h.symm
 
-theorem UpperTheory.Gal.TranscendenceTraces.phiExact_of :
-    DSLoc → PhiExact := by
+theorem UpperTheory.Gal.TranscendenceTraces.phiExact_of : DSLoc → PhiExact := by
   intro hD R _ Z S p _ T hT
   obtain ⟨-, hmono, -, -, hloc, -, -⟩ := GlobalTheory.T.etaleLocal_property_calculus_rules
   rw [GlobalTheory.T.etaleSheaf_shortComplex_exact_iff_locally]

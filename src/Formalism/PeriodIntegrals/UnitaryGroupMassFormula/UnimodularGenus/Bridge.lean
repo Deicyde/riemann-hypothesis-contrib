@@ -34,15 +34,14 @@ theorem isomLocStd : IsomLocStd := by
       rw [← (LinearMap.isSymm_def.mp hs) (e x) y, hxy, map_zero]
     -- Localization preserves the ambient span, and self-duality puts the orthogonal vector in it.
     let : p.IsPrime := hp.isPrime
-    have hloc {y : Sp E n}
-        (hy : y ∈ Formalism.HermitianLatticesTheory.loc (K := E) p N) : y ∈ W := by
+    have hloc {y : Sp E n} (hy : y ∈ Formalism.HermitianLatticesTheory.loc (K := E) p N)
+        : y ∈ W := by
       obtain ⟨s, hs', hsy⟩ := hy
       have hs₀ : algebraMap (𝓞 E) E s ≠ 0 := by
         intro hzero
         have : s = 0 := IsFractionRing.injective (𝓞 E) E (by simpa using hzero)
         exact locBasic_hcompl_not_mem p s hs' (this ▸ p.zero_mem)
-      exact (W.smul_mem_iff hs₀).mp
-        (by rw [algebraMap_smul]; exact Submodule.subset_span hsy)
+      exact (W.smul_mem_iff hs₀).mp (by rw [algebraMap_smul]; exact Submodule.subset_span hsy)
     have hxW : e x ∈ W := by
       apply hloc
       change Formalism.HermitianLatticesTheory.IsUnimodularAt (hStd E n) p N at hu
@@ -52,8 +51,10 @@ theorem isomLocStd : IsomLocStd := by
       rw [horth y (hloc hy)]
       exact Submodule.zero_mem _
     obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
-    have hpos := ReciprocityTheory.ChartRestriction.L3.isTotPosDef_of_ortho hE hs hI (e x)
-      (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) φ
+    have hpos :=
+      ReciprocityTheory.ChartRestriction.L3.isTotPosDef_of_ortho hE hs hI (e x)
+        (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+        φ
     simp [horth (e x) hxW] at hpos
   exact ReciprocityTheory.ChartRestriction.L3.exists_isom_loc hE hs hI hFull p hp hu
 

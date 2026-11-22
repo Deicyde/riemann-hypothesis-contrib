@@ -35,17 +35,19 @@ def good (A : Subalgebra ℂ (Module.End ℂ M)) : Submodule ℂ M where
     haveI : FiniteDimensional ℂ (orb A x) := hx
     haveI : FiniteDimensional ℂ (orb A y) := hy
     show FiniteDimensional ℂ (orb A (x + y))
-    have : orb A (x + y) ≤ orb A x ⊔ orb A y := orb_le.mpr (fun a ha => by
-      rw [map_add (f := _)]
-      exact Submodule.add_mem_sup (mem_orb ha) (mem_orb ha))
+    have : orb A (x + y) ≤ orb A x ⊔ orb A y :=
+      orb_le.mpr (fun a ha => by
+        rw [map_add (f := _)]
+        exact Submodule.add_mem_sup (mem_orb ha) (mem_orb ha))
     exact Submodule.finiteDimensional_of_le this
   smul_mem' := by
     intro c x hx
     haveI : FiniteDimensional ℂ (orb A x) := hx
     show FiniteDimensional ℂ (orb A (c • x))
-    have : orb A (c • x) ≤ orb A x := orb_le.mpr (fun a ha => by
-      rw [map_smul]
-      exact Submodule.smul_mem _ c (mem_orb ha))
+    have : orb A (c • x) ≤ orb A x :=
+      orb_le.mpr (fun a ha => by
+        rw [map_smul]
+        exact Submodule.smul_mem _ c (mem_orb ha))
     exact Submodule.finiteDimensional_of_le this
 
 lemma mem_good {A : Subalgebra ℂ (Module.End ℂ M)} {x : M} :
@@ -113,21 +115,26 @@ lemma grow_good {A B : Subalgebra ℂ (Module.End ℂ M)} {W : Submodule ℂ M} 
       exact Submodule.mem_map_of_mem (mem_orb hb))
     exact mem_good.mpr (Submodule.finiteDimensional_of_le hle))
 
-theorem main : ∀ (M : Type) [inst : AddCommGroup M] [inst_1 : Module ℂ M] (ι : Type) [Finite ι]
-    (A : ι → Subalgebra ℂ (Module.End ℂ M)),
-    (∀ (i j : ι), i ≠ j → ∀ a ∈ A i, ∀ b ∈ A j, a * b = b * a) → ∀ (m : M),
-    (∀ (i : ι), FiniteDimensional ℂ ↥(Submodule.span ℂ {x : M | ∃ a ∈ A i, x = (a : M → M) m})) →
-    ∃ (W : Submodule ℂ M), FiniteDimensional ℂ ↥W ∧ m ∈ W ∧
-      ∀ (i : ι), ∀ a ∈ A i, ∀ x ∈ W, (a : M → M) x ∈ W := by
+theorem main
+    : ∀ (M : Type) [inst : AddCommGroup M] [inst_1 : Module ℂ M] (ι : Type) [Finite ι]
+        (A : ι → Subalgebra ℂ (Module.End ℂ M)),
+      (∀ (i j : ι), i ≠ j → ∀ a ∈ A i, ∀ b ∈ A j, a * b = b * a)
+        → ∀ (m : M),
+          (∀ (i : ι),
+              FiniteDimensional ℂ ↥(Submodule.span ℂ {x : M | ∃ a ∈ A i, x = (a : M → M) m}))
+            → ∃ (W : Submodule ℂ M),
+              FiniteDimensional ℂ ↥W ∧ m ∈ W
+                ∧ ∀ (i : ι), ∀ a ∈ A i, ∀ x ∈ W, (a : M → M) x ∈ W := by
   intro M _ _ ι _ A hcomm m hfin
   classical
   haveI := Fintype.ofFinite ι
-  have key : ∀ S : Finset ι, ∃ W : Submodule ℂ M, FiniteDimensional ℂ W ∧ m ∈ W ∧
-      (∀ i ∈ S, ∀ a ∈ A i, ∀ x ∈ W, a x ∈ W) ∧ (∀ j, j ∉ S → W ≤ good (A j)) := by
+  have key
+      : ∀ S : Finset ι, ∃ W : Submodule ℂ M,
+        FiniteDimensional ℂ W ∧ m ∈ W ∧ (∀ i ∈ S, ∀ a ∈ A i, ∀ x ∈ W, a x ∈ W)
+          ∧ (∀ j, j ∉ S → W ≤ good (A j)) := by
     intro S
     refine Finset.induction_on S ?_ ?_
-    · refine ⟨Submodule.span ℂ {m}, inferInstance, Submodule.mem_span_singleton_self m,
-        by simp, ?_⟩
+    · refine ⟨Submodule.span ℂ {m}, inferInstance, Submodule.mem_span_singleton_self m, by simp, ?_⟩
       intro j _
       rw [Submodule.span_le, Set.singleton_subset_iff]
       exact mem_good.mpr (hfin j)

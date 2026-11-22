@@ -8,13 +8,20 @@ public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.ModDefs
 @[expose] public section
 
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate
-open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
+open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal
+  ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
 open GlobalTheory.CMVal GlobalTheory.HeckeGal
 open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.WpFam
 
-theorem kerReps_transport : ∀ (K : Type) [Field K] (ι : K →+* ℂ) (Λ₀ Λ₁ : PeriodPair) (T : K → K → Prop) (a : K) (S : Finset ℂ), IsTr ι Λ₀ Λ₁ T → a ≠ 0 → (∀ x x', T x x' → T (a * x) (a * x')) → IsKerReps Λ₀ (ι a) S → ∃ (φ : ℂ → ℂ) (S' : Finset ℂ), IsKerReps Λ₁ (ι a) S' ∧ Set.BijOn φ S S' ∧ ∀ P ∈ S, ∃ k k' : K, ι k = P ∧ ι k' = φ P ∧ T k k' := by
+theorem kerReps_transport
+    : ∀ (K : Type) [Field K] (ι : K →+* ℂ) (Λ₀ Λ₁ : PeriodPair) (T : K → K → Prop) (a : K)
+        (S : Finset ℂ),
+      IsTr ι Λ₀ Λ₁ T → a ≠ 0 → (∀ x x', T x x' → T (a * x) (a * x')) → IsKerReps Λ₀ (ι a) S
+        → ∃ (φ : ℂ → ℂ) (S' : Finset ℂ),
+          IsKerReps Λ₁ (ι a) S' ∧ Set.BijOn φ S S'
+            ∧ ∀ P ∈ S, ∃ k k' : K, ι k = P ∧ ι k' = φ P ∧ T k k' := by
   intro K _ ι Λ₀ Λ₁ T a S hT ha hmul hS
   classical
   have hιa : ι a ≠ 0 := (map_ne_zero ι).mpr ha
@@ -25,7 +32,8 @@ theorem kerReps_transport : ∀ (K : Type) [Field K] (ι : K →+* ℂ) (Λ₀ �
     obtain ⟨b, hb⟩ := hT.rat₀ _ (hS1 P hP).1
     obtain ⟨k', hk'⟩ := hT.left (b / a)
     refine ⟨b / a, k', ?_, hk'⟩
-    rw [map_div₀, hb]; field_simp
+    rw [map_div₀, hb]
+    field_simp
   choose! k k' hk hT' using hex
   set φ : ℂ → ℂ := fun P => ι (k' P) with hφ
 
@@ -41,8 +49,17 @@ theorem kerReps_transport : ∀ (K : Type) [Field K] (ι : K →+* ℂ) (Λ₀ �
     have h1 := hT.mem_iff _ _ (hT.sub _ _ _ _ (hT' P hP) (hT' Q hQ))
     rw [map_sub, map_sub, hk P hP, hk Q hQ] at h1
     exact hS2 P hP Q hQ (h1.mpr h)
-  refine ⟨φ, S.image φ, ⟨?_, ?_, ?_⟩, ⟨fun P hP => Finset.mem_coe.mpr (Finset.mem_image_of_mem φ hP),
-    fun P hP Q hQ h => hdiff P hP Q hQ (by rw [h, sub_self]; exact zero_mem _), ?_⟩, ?_⟩
+  refine ⟨
+    φ,
+    S.image φ,
+    ⟨?_, ?_, ?_⟩,
+    ⟨
+      fun P hP => Finset.mem_coe.mpr (Finset.mem_image_of_mem φ hP),
+      fun P hP Q hQ h => hdiff P hP Q hQ (by rw [h, sub_self]; exact zero_mem _),
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · intro P' hP'
     obtain ⟨P, hP, rfl⟩ := Finset.mem_image.mp hP'
     exact himg P hP

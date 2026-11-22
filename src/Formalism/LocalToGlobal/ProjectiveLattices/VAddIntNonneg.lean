@@ -28,7 +28,8 @@ structure IsNormOn (C : Submodule K R) (σ : K →+* ℂ) (N : R → ℝ) : Prop
   smul : ∀ (a : K), ∀ f ∈ C, N (a • f) = ‖σ a‖ * N f
   add : ∀ f ∈ C, ∀ g ∈ C, N (f + g) ≤ N f + N g
 
-theorem vAdd_int_nonneg (la : HeightOneSpectrum (𝓞 K)) {a : 𝓞 K} (ha : (a : K) ≠ 0) : 0 ≤ vAdd la (a : K) := by
+theorem vAdd_int_nonneg (la : HeightOneSpectrum (𝓞 K)) {a : 𝓞 K} (ha : (a : K) ≠ 0)
+    : 0 ≤ vAdd la (a : K) := by
   unfold vAdd
   have h1 := la.valuation_le_one (K := K) a
   have h2 : (la.valuation K) (a : K) ≠ 0 := (Valuation.ne_zero_iff _).mpr ha
@@ -38,13 +39,17 @@ theorem vAdd_int_nonneg (la : HeightOneSpectrum (𝓞 K)) {a : 𝓞 K} (ha : (a 
 
 variable [Algebra (𝓞 K) R] [IsScalarTower (𝓞 K) K R]
 
-def latOf (C : Submodule K R) (Vs : HeightOneSpectrum (𝓞 K) → Set (R → EReal))
-    (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v) : Submodule (𝓞 K) C where
+def latOf
+    (C : Submodule K R)
+    (Vs : HeightOneSpectrum (𝓞 K) → Set (R → EReal)) (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v)
+    : Submodule (𝓞 K) C where
   carrier := {F | ∀ la, ∀ v ∈ Vs la, 0 ≤ v F}
   zero_mem' := fun la v hv => by
     change 0 ≤ v 0
-    rw [(hV la v hv).zero]; exact le_top
-  add_mem' := fun {F F'} hF hF' la v hv => (le_min (hF la v hv) (hF' la v hv)).trans ((hV la v hv).add _ _)
+    rw [(hV la v hv).zero]
+    exact le_top
+  add_mem' := fun {F F'} hF hF' la v hv =>
+    (le_min (hF la v hv) (hF' la v hv)).trans ((hV la v hv).add _ _)
   smul_mem' := fun a F hF la v hv => by
     have h1 : ((a • F : C) : R) = (a : K) • (F : R) := (algebraMap_smul K a (F : R)).symm
     rw [h1]
@@ -69,13 +74,18 @@ theorem deg_inj {j : ℕ} : Function.Injective (deg (D := D) (j := j)) := by
   obtain ⟨rfl, rfl, rfl⟩ := h
   rfl
 
-theorem deg_wadd {j : ℕ} (w w' : WeightFamilies.Wt D j) : deg (WeightAlgebra.wadd w w') = deg w + deg w' := rfl
+theorem deg_wadd {j : ℕ} (w w' : WeightFamilies.Wt D j)
+    : deg (WeightAlgebra.wadd w w') = deg w + deg w' :=
+  rfl
 
 section Rec
 
-variable {K : Type} [Field K] [NumberField K] (eO : 𝓞 K ≃+* D.what₂.O)
+variable
+  {K : Type} [Field K] [NumberField K]
+  (eO : 𝓞 K ≃+* D.what₂.O)
   {R : ℕ → Type} [∀ j, CommRing (R j)] [∀ j, Algebra K (R j)] [∀ j, Algebra (𝓞 K) (R j)]
-  [∀ j, IsScalarTower (𝓞 K) K (R j)] (C : ∀ j, WeightFamilies.Wt D j → Submodule K (R j))
+  [∀ j, IsScalarTower (𝓞 K) K (R j)]
+  (C : ∀ j, WeightFamilies.Wt D j → Submodule K (R j))
 
 def cutR (j : ℕ) (w : WeightFamilies.Wt D j) : Submodule K (R j) := C j w ⊓ ⨅ _ : ¬ InR D j, ⊥
 
@@ -83,10 +93,12 @@ omit [NumberField K] [∀ j, Algebra (𝓞 K) (R j)] [∀ j, IsScalarTower (𝓞
 theorem cutR_le (j : ℕ) (w : WeightFamilies.Wt D j) : cutR C j w ≤ C j w := inf_le_left
 
 omit [NumberField K] [∀ j, Algebra (𝓞 K) (R j)] [∀ j, IsScalarTower (𝓞 K) K (R j)] in
-theorem cutR_eq {j : ℕ} (h : InR D j) (w : WeightFamilies.Wt D j) : cutR C j w = C j w := by simp [cutR, h]
+theorem cutR_eq {j : ℕ} (h : InR D j) (w : WeightFamilies.Wt D j) : cutR C j w = C j w := by
+  simp [cutR, h]
 
 omit [NumberField K] [∀ j, Algebra (𝓞 K) (R j)] [∀ j, IsScalarTower (𝓞 K) K (R j)] in
-theorem cutR_out {j : ℕ} (h : ¬ InR D j) (w : WeightFamilies.Wt D j) : cutR C j w = ⊥ := by simp [cutR, h]
+theorem cutR_out {j : ℕ} (h : ¬ InR D j) (w : WeightFamilies.Wt D j) : cutR C j w = ⊥ := by
+  simp [cutR, h]
 
 omit [NumberField K] [∀ j, Algebra (𝓞 K) (R j)] [∀ j, IsScalarTower (𝓞 K) K (R j)] in
 theorem cutR_zero {j : ℕ} (h : ¬ InR D j) {w : WeightFamilies.Wt D j} (F : cutR C j w) : F = 0 := by
@@ -94,26 +106,33 @@ theorem cutR_zero {j : ℕ} (h : ¬ InR D j) {w : WeightFamilies.Wt D j} (F : cu
   have := F.2
   simpa [cutR_out C h w] using this
 
-
 open Classical in
-def cutN (N : ∀ j, WeightFamilies.Wt D j → (K →+* ℂ) → R j → ℝ) (j : ℕ) (w : WeightFamilies.Wt D j) (σ : K →+* ℂ)
-    (F : cutR C j w) : ℝ := if InR D j then N j w σ F else 0
+def cutN
+    (N : ∀ j, WeightFamilies.Wt D j → (K →+* ℂ) → R j → ℝ)
+    (j : ℕ) (w : WeightFamilies.Wt D j)
+    (σ : K →+* ℂ) (F : cutR C j w)
+    : ℝ :=
+  if InR D j then N j w σ F else 0
 
 section Norm
 
-variable {C} {N : ∀ j, WeightFamilies.Wt D j → (K →+* ℂ) → R j → ℝ}
+variable
+  {C} {N : ∀ j, WeightFamilies.Wt D j → (K →+* ℂ) → R j → ℝ}
   (hN : ∀ j, InR D j → ∀ w σ, IsNormOn (C j w) σ (N j w σ))
 include hN
 
 omit [∀ j, Algebra (𝓞 K) (R j)] [∀ j, IsScalarTower (𝓞 K) K (R j)]
 
 theorem cutN_nonneg (j w σ) (F : cutR C j w) : 0 ≤ cutN C N j w σ F := by
-  unfold cutN; split_ifs with h
+  unfold cutN
+  split_ifs with h
   · exact (hN j h w σ).nonneg _ (cutR_le C j w F.2)
   · exact le_rfl
 
-theorem cutN_smul (j w σ) (a : K) (F : cutR C j w) : cutN C N j w σ (a • F) = ‖σ a‖ * cutN C N j w σ F := by
-  unfold cutN; split_ifs with h
+theorem cutN_smul (j w σ) (a : K) (F : cutR C j w)
+    : cutN C N j w σ (a • F) = ‖σ a‖ * cutN C N j w σ F := by
+  unfold cutN
+  split_ifs with h
   · exact (hN j h w σ).smul a _ (cutR_le C j w F.2)
   · simp
 
@@ -121,33 +140,40 @@ theorem cutN_eq_zero (j w σ) (F : cutR C j w) : cutN C N j w σ F = 0 ↔ F = 0
   constructor
   · intro h0
     by_cases h : InR D j
-    · unfold cutN at h0; rw [if_pos h] at h0
+    · unfold cutN at h0
+      rw [if_pos h] at h0
       exact Subtype.ext ((hN j h w σ).defin _ (cutR_le C j w F.2) h0)
     · exact cutR_zero C h F
   · rintro rfl
     have := cutN_smul hN j w σ 0 0
     simpa using this
 
-theorem cutN_add (j w σ) (F G : cutR C j w) : cutN C N j w σ (F + G) ≤ cutN C N j w σ F + cutN C N j w σ G := by
-  unfold cutN; split_ifs with h
+theorem cutN_add (j w σ) (F G : cutR C j w)
+    : cutN C N j w σ (F + G) ≤ cutN C N j w σ F + cutN C N j w σ G := by
+  unfold cutN
+  split_ifs with h
   · exact (hN j h w σ).add _ (cutR_le C j w F.2) _ (cutR_le C j w G.2)
   · simp
 
 end Norm
 
-variable (hfd : ∀ j, InR D j → ∀ w, FiniteDimensional K (C j w))
+variable
+  (hfd : ∀ j, InR D j → ∀ w, FiniteDimensional K (C j w))
   (Vs : ∀ j, HeightOneSpectrum (𝓞 K) → Set (R j → EReal)) (hV : ∀ j la, ∀ v ∈ Vs j la, IsVal la v)
   (Ns Nl : ∀ j, WeightFamilies.Wt D j → (K →+* ℂ) → R j → ℝ)
   (hNs : ∀ j, InR D j → ∀ w σ, IsNormOn (C j w) σ (Ns j w σ))
   (hNl : ∀ j, InR D j → ∀ w σ, IsNormOn (C j w) σ (Nl j w σ))
   (hle : ∀ j, InR D j → ∀ w σ, ∀ f ∈ C j w, Nl j w σ f ≤ Ns j w σ f)
-  (Cu : ℕ → Type) (Xc : ∀ j, Cu j → Submodule (𝓞 D.host.E) (Fin (WeightFamilies.rho D j) → D.host.E))
+  (Cu : ℕ → Type)
+  (Xc : ∀ j, Cu j → Submodule (𝓞 D.host.E) (Fin (WeightFamilies.rho D j) → D.host.E))
   (hXc : ∀ j c, Submodule.IsLattice D.host.E (Xc j c))
   (FJ : ∀ j (c : Cu j), WeightFamilies.ExpoSet D (Xc j c) → WeightFamilies.Wt D j → Type)
   [∀ j c χ w, AddCommGroup (FJ j c χ w)] [∀ j c χ w, Module K (FJ j c χ w)]
-  (sg : ∀ j (c : Cu j) (χ : WeightFamilies.ExpoSet D (Xc j c)) (w : WeightFamilies.Wt D j), C j w →ₗ[K] FJ j c χ w)
+  (sg : ∀ j (c : Cu j) (χ : WeightFamilies.ExpoSet D (Xc j c)) (w : WeightFamilies.Wt D j),
+    C j w →ₗ[K] FJ j c χ w)
 
-@[reducible] def mkB : WeightFamilies.Prov D where
+@[reducible]
+def mkB : WeightFamilies.Prov D where
   KO := K
   eO := eO
   Cusp j w := cutR C j w
@@ -167,7 +193,8 @@ variable (hfd : ∀ j, InR D j → ∀ w, FiniteDimensional K (C j w))
   l2Norm_smul_alt := cutN_smul hNl
   l2Norm_add_le' := cutN_add hNl
   l2Norm_le_supNorm_alt j w σ F := by
-    unfold cutN; split_ifs with h
+    unfold cutN
+    split_ifs with h
     · exact hle j h w σ _ (cutR_le C j w F.2)
     · exact le_rfl
   Cu := Cu
@@ -179,22 +206,26 @@ variable (hfd : ∀ j, InR D j → ∀ w, FiniteDimensional K (C j w))
 def spanIn (j : ℕ) (w : WeightFamilies.Wt D j) (s : Set (R j)) : Submodule (𝓞 K) (cutR C j w) :=
   (Submodule.span (𝓞 K) s).comap ((cutR C j w).subtype.restrictScalars (𝓞 K))
 
-def mkX (P : ModuliIntegralCharts.Prov D) (j : ℕ) (hj : InR D j)
-    (hmul : ∀ w w', ∀ f ∈ C j w, ∀ g ∈ C j w', f * g ∈ C j (WeightAlgebra.wadd w w'))
+def mkX
+    (P : ModuliIntegralCharts.Prov D)
+    (j : ℕ)
+    (hj : InR D j) (hmul : ∀ w w', ∀ f ∈ C j w, ∀ g ∈ C j w', f * g ∈ C j (WeightAlgebra.wadd w w'))
     (dat : P.Dat) (hrk : j < D.R.m → P.rk dat = D.R.r) (hjj : j < D.R.m → P.jj dat = (D.R.sigW j).1)
     (Pt : HeightOneSpectrum (𝓞 K) → Type)
-    (p66 : ∀ la, Pt la → (P.loc dat (WeightAlgebra.resCh la)).Pt (P.loc dat (WeightAlgebra.resCh la)).YY)
+    (p66 : ∀ la,
+      Pt la → (P.loc dat (WeightAlgebra.resCh la)).Pt (P.loc dat (WeightAlgebra.resCh la)).YY)
     (pv : ∀ la, Pt la → R j → EReal) (hpv : ∀ la y, IsVal la (pv la y))
     (hlat : ∀ w, ∀ f ∈ C j w, (∀ la, ∀ v ∈ Vs j la, 0 ≤ v f) ↔ ∀ la y, 0 ≤ pv la y f)
-    (th sh : WeightFamilies.Wt D j → Set (R j)) :
-    WeightAlgebra.PJ D (mkB eO C hfd Vs hV Ns Nl hNs hNl hle Cu Xc hXc FJ sg) P j where
+    (th sh : WeightFamilies.Wt D j → Set (R j))
+    : WeightAlgebra.PJ D (mkB eO C hfd Vs hV Ns Nl hNs hNl hle Cu Xc hXc FJ sg) P j where
   Forms := AddMonoidAlgebra (R j) (Deg D j)
   inc w := incG deg (cutR C j) w
   inc_inj w := incG_inj deg (cutR C j) w
   inc_indep := incG_indep deg (cutR C j) deg_inj
-  inc_mul w w' F G :=
-    ⟨⟨_, by rw [cutR_eq C hj]; exact hmul w w' _ (cutR_le C j w F.2) _ (cutR_le C j w' G.2)⟩,
-      incG_mul deg (cutR C j) (deg_wadd w w') F G _⟩
+  inc_mul w w' F G := ⟨
+    ⟨_, by rw [cutR_eq C hj]; exact hmul w w' _ (cutR_le C j w F.2) _ (cutR_le C j w' G.2)⟩,
+    incG_mul deg (cutR C j) (deg_wadd w w') F G _
+  ⟩
   dat := dat
   dat_rk := hrk
   dat_jj := hjj

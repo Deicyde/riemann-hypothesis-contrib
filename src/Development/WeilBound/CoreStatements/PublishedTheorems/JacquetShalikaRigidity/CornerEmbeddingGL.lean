@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -21,20 +23,24 @@ section Ring
 
 variable {R : Type} [CommRing R] {k m : ℕ}
 
-theorem embM_apply (A : Matrix (Fin k) (Fin k) R) (i c : Fin m) :
-    embM m A i c = if h : (i : ℕ) < k ∧ (c : ℕ) < k then A ⟨i, h.1⟩ ⟨c, h.2⟩ else (1 : Matrix (Fin m) (Fin m) R) i c :=
+theorem embM_apply (A : Matrix (Fin k) (Fin k) R) (i c : Fin m)
+    : embM m A i c
+      = if h : (i : ℕ) < k ∧ (c : ℕ) < k then
+          A ⟨i, h.1⟩ ⟨c, h.2⟩
+        else
+          (1 : Matrix (Fin m) (Fin m) R) i c :=
   rfl
 
-theorem embM_castLE (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R) (i c : Fin k) :
-    embM m A (Fin.castLE h i) (Fin.castLE h c) = A i c := by
+theorem embM_castLE (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R) (i c : Fin k)
+    : embM m A (Fin.castLE h i) (Fin.castLE h c) = A i c := by
   rw [embM_apply, dif_pos ⟨i.2, c.2⟩]; rfl
 
-theorem embM_out (A : Matrix (Fin k) (Fin k) R) (i c : Fin m) (h : ¬ ((i : ℕ) < k ∧ (c : ℕ) < k)) :
-    embM m A i c = (1 : Matrix (Fin m) (Fin m) R) i c := by
+theorem embM_out (A : Matrix (Fin k) (Fin k) R) (i c : Fin m) (h : ¬((i : ℕ) < k ∧ (c : ℕ) < k))
+    : embM m A i c = (1 : Matrix (Fin m) (Fin m) R) i c := by
   rw [embM_apply, dite_eq_right h]
 
-theorem one_corner (i c : Fin m) (h : (i : ℕ) < k ∧ (c : ℕ) < k) :
-    (1 : Matrix (Fin k) (Fin k) R) ⟨i, h.1⟩ ⟨c, h.2⟩ = (1 : Matrix (Fin m) (Fin m) R) i c := by
+theorem one_corner (i c : Fin m) (h : (i : ℕ) < k ∧ (c : ℕ) < k)
+    : (1 : Matrix (Fin k) (Fin k) R) ⟨i, h.1⟩ ⟨c, h.2⟩ = (1 : Matrix (Fin m) (Fin m) R) i c := by
   simp only [Matrix.one_apply, Fin.ext_iff]
 
 theorem embM_one : embM m (1 : Matrix (Fin k) (Fin k) R) = 1 := by
@@ -44,14 +50,16 @@ theorem embM_one : embM m (1 : Matrix (Fin k) (Fin k) R) = 1 := by
   · exact one_corner i c h
   · rfl
 
-def eqv (h : k ≤ m) : Fin k ⊕ Fin (m - k) ≃ Fin m := finSumFinEquiv.trans (finCongr (Nat.add_sub_cancel' h))
+def eqv (h : k ≤ m) : Fin k ⊕ Fin (m - k) ≃ Fin m :=
+  finSumFinEquiv.trans (finCongr (Nat.add_sub_cancel' h))
 
 theorem eqv_inl (h : k ≤ m) (x : Fin k) : ((eqv h (Sum.inl x) : Fin m) : ℕ) = x := by simp [eqv]
 
-theorem eqv_inr (h : k ≤ m) (x : Fin (m - k)) : ((eqv h (Sum.inr x) : Fin m) : ℕ) = k + x := by simp [eqv]
+theorem eqv_inr (h : k ≤ m) (x : Fin (m - k)) : ((eqv h (Sum.inr x) : Fin m) : ℕ) = k + x := by
+  simp [eqv]
 
-theorem embM_eq (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R) :
-    embM m A = Matrix.reindex (eqv h) (eqv h) (Matrix.fromBlocks A 0 0 1) := by
+theorem embM_eq (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R)
+    : embM m A = Matrix.reindex (eqv h) (eqv h) (Matrix.fromBlocks A 0 0 1) := by
   ext i c
   obtain ⟨x, rfl⟩ := (eqv h).surjective i
   obtain ⟨y, rfl⟩ := (eqv h).surjective c
@@ -59,16 +67,20 @@ theorem embM_eq (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R) :
   rcases x with x | x <;> rcases y with y | y
   · rw [embM_apply, dif_pos (by rw [eqv_inl, eqv_inl]; exact ⟨x.2, y.2⟩), Matrix.fromBlocks_apply₁₁]
     congr 1
-  · rw [embM_out _ _ _ (by rw [eqv_inl, eqv_inr]; omega), Matrix.fromBlocks_apply₁₂, Matrix.one_apply_ne]
+  · rw [embM_out _ _ _ (by rw [eqv_inl, eqv_inr]; omega), Matrix.fromBlocks_apply₁₂,
+      Matrix.one_apply_ne]
     · rfl
     · intro e; have := congrArg Fin.val e; rw [eqv_inl, eqv_inr] at this; omega
-  · rw [embM_out _ _ _ (by rw [eqv_inl, eqv_inr]; omega), Matrix.fromBlocks_apply₂₁, Matrix.one_apply_ne]
+  · rw [embM_out _ _ _ (by rw [eqv_inl, eqv_inr]; omega), Matrix.fromBlocks_apply₂₁,
+      Matrix.one_apply_ne]
     · rfl
     · intro e; have := congrArg Fin.val e; rw [eqv_inl, eqv_inr] at this; omega
-  · rw [embM_out _ _ _ (by rw [eqv_inr, eqv_inr]; omega), Matrix.fromBlocks_apply₂₂, Matrix.one_apply, Matrix.one_apply]
+  · rw [embM_out _ _ _ (by rw [eqv_inr, eqv_inr]; omega), Matrix.fromBlocks_apply₂₂,
+      Matrix.one_apply, Matrix.one_apply]
     simp only [(eqv h).injective.eq_iff, Sum.inr.injEq]
 
-theorem embM_mul (h : k ≤ m) (A B : Matrix (Fin k) (Fin k) R) : embM m (A * B) = embM m A * embM m B := by
+theorem embM_mul (h : k ≤ m) (A B : Matrix (Fin k) (Fin k) R)
+    : embM m (A * B) = embM m A * embM m B := by
   rw [embM_eq h, embM_eq h, embM_eq h]
   simp only [Matrix.reindex_apply, Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
   simp
@@ -76,22 +88,25 @@ theorem embM_mul (h : k ≤ m) (A B : Matrix (Fin k) (Fin k) R) : embM m (A * B)
 theorem embM_det (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R) : (embM m A).det = A.det := by
   rw [embM_eq h, Matrix.det_reindex_self, Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, mul_one]
 
-def cor (h : k ≤ m) (M : Matrix (Fin m) (Fin m) R) : Matrix (Fin k) (Fin k) R := M.submatrix (Fin.castLE h) (Fin.castLE h)
+def cor (h : k ≤ m) (M : Matrix (Fin m) (Fin m) R) : Matrix (Fin k) (Fin k) R :=
+  M.submatrix (Fin.castLE h) (Fin.castLE h)
 
 theorem cor_embM (h : k ≤ m) (A : Matrix (Fin k) (Fin k) R) : cor h (embM m A) = A := by
   ext i c; exact embM_castLE h A i c
 
-theorem embM_cor (h : k ≤ m) (M : Matrix (Fin m) (Fin m) R)
-    (hM : ∀ i c : Fin m, (k ≤ (i : ℕ) ∨ k ≤ (c : ℕ)) → M i c = (1 : Matrix (Fin m) (Fin m) R) i c) :
-    embM m (cor h M) = M := by
+theorem embM_cor
+    (h : k ≤ m)
+    (M : Matrix (Fin m) (Fin m) R)
+    (hM : ∀ i c : Fin m, (k ≤ (i : ℕ) ∨ k ≤ (c : ℕ)) → M i c = (1 : Matrix (Fin m) (Fin m) R) i c)
+    : embM m (cor h M) = M := by
   ext i c
   rw [embM_apply]
   split_ifs with hic
   · rfl
   · exact (hM i c (by omega)).symm
 
-theorem embM_map {S : Type} [CommRing S] (f : R →+* S) (A : Matrix (Fin k) (Fin k) R) :
-    (embM m A).map f = embM m (A.map f) := by
+theorem embM_map {S : Type} [CommRing S] (f : R →+* S) (A : Matrix (Fin k) (Fin k) R)
+    : (embM m A).map f = embM m (A.map f) := by
   ext i c
   simp only [Matrix.map_apply, embM_apply]
   split_ifs
@@ -99,8 +114,12 @@ theorem embM_map {S : Type} [CommRing S] (f : R →+* S) (A : Matrix (Fin k) (Fi
   · rw [Matrix.one_apply, Matrix.one_apply]; split_ifs <;> simp
 
 def embGL (h : k ≤ m) : GL (Fin k) R →* GL (Fin m) R where
-  toFun g := ⟨embM m g.val, embM m (g⁻¹).val, by rw [← embM_mul h, Units.mul_inv, embM_one],
-    by rw [← embM_mul h, Units.inv_mul, embM_one]⟩
+  toFun g := ⟨
+    embM m g.val,
+    embM m (g⁻¹).val,
+    by rw [← embM_mul h, Units.mul_inv, embM_one],
+    by rw [← embM_mul h, Units.inv_mul, embM_one]
+  ⟩
   map_one' := Units.ext embM_one
   map_mul' g g' := Units.ext (by simp only [Units.val_mul]; exact embM_mul h _ _)
 
@@ -111,28 +130,40 @@ variable {ι : GL (Fin k) R →* GL (Fin m) R}
 theorem emb_inv (hι : IsEmb ι) (g : GL (Fin k) R) : ((ι g)⁻¹).val = embM m (g⁻¹).val := by
   rw [← map_inv, hι]
 
-theorem map_emb {S : Type} [CommRing S] (p : R →+* S) {ιS : GL (Fin k) S →* GL (Fin m) S} (hι : IsEmb ι)
-    (hS : IsEmb ιS) (g : GL (Fin k) R) :
-    GeneralLinearGroup.map p (ι g) = ιS (GeneralLinearGroup.map p g) := by
+theorem map_emb
+    {S : Type} [CommRing S]
+    (p : R →+* S)
+    {ιS : GL (Fin k) S →* GL (Fin m) S}
+    (hι : IsEmb ι) (hS : IsEmb ιS) (g : GL (Fin k) R)
+    : GeneralLinearGroup.map p (ι g) = ιS (GeneralLinearGroup.map p g) := by
   refine Units.ext ?_
   rw [hS]
   change (ι g).val.map p = _
   rw [hι]
   exact embM_map p _
 
-theorem corner_embM {S : Type} [CommRing S] (s : R →ₙ+* S) (A : Matrix (Fin k) (Fin k) R) :
-    (1 - matN m s 1 + matN m s (embM m A) : Matrix (Fin m) (Fin m) S) = embM m (1 - matN k s 1 + matN k s A) := by
+theorem corner_embM {S : Type} [CommRing S] (s : R →ₙ+* S) (A : Matrix (Fin k) (Fin k) R)
+    : (1 - matN m s 1 + matN m s (embM m A) : Matrix (Fin m) (Fin m) S)
+      = embM m (1 - matN k s 1 + matN k s A) := by
   ext i c
   rw [embM_apply (m := m) (1 - matN k s 1 + matN k s A)]
-  change (1 : Matrix (Fin m) (Fin m) S) i c - s ((1 : Matrix (Fin m) (Fin m) R) i c) + s (embM m A i c) = _
+  change (1 : Matrix (Fin m) (Fin m) S) i c - s ((1 : Matrix (Fin m) (Fin m) R) i c)
+      + s (embM m A i c)
+    = _
   rw [embM_apply]
   split_ifs with h
-  · change _ = (1 : Matrix (Fin k) (Fin k) S) ⟨i, h.1⟩ ⟨c, h.2⟩ - s ((1 : Matrix (Fin k) (Fin k) R) ⟨i, h.1⟩ ⟨c, h.2⟩) + s (A ⟨i, h.1⟩ ⟨c, h.2⟩)
+  · change _
+      = (1 : Matrix (Fin k) (Fin k) S) ⟨i, h.1⟩ ⟨c, h.2⟩
+        - s ((1 : Matrix (Fin k) (Fin k) R) ⟨i, h.1⟩ ⟨c, h.2⟩) + s (A ⟨i, h.1⟩ ⟨c, h.2⟩)
     rw [one_corner i c h, one_corner i c h]
   · exact sub_add_cancel _ _
 
-theorem cornerGL_emb {S : Type} [CommRing S] (s : R →ₙ+* S) {ιS : GL (Fin k) S →* GL (Fin m) S} (hι : IsEmb ι)
-    (hS : IsEmb ιS) (g : GL (Fin k) R) : ιS (cornerGL k s g) = cornerGL m s (ι g) := by
+theorem cornerGL_emb
+    {S : Type} [CommRing S]
+    (s : R →ₙ+* S)
+    {ιS : GL (Fin k) S →* GL (Fin m) S}
+    (hι : IsEmb ι) (hS : IsEmb ιS) (g : GL (Fin k) R)
+    : ιS (cornerGL k s g) = cornerGL m s (ι g) := by
   refine Units.ext ?_
   rw [hS]
   change embM m (1 - matN k s 1 + matN k s g.val) = 1 - matN m s 1 + matN m s (ι g).val
@@ -141,12 +172,14 @@ theorem cornerGL_emb {S : Type} [CommRing S] (s : R →ₙ+* S) {ιS : GL (Fin k
 theorem blk_emb (hι : IsEmb ι) (g : GL (Fin k) R) : GlobalTheory k (ι g) := fun i c hic => by
   rw [hι]; exact embM_out _ _ _ (by omega)
 
-theorem det_emb (h : k ≤ m) (hι : IsEmb ι) (g : GL (Fin k) R) :
-    GeneralLinearGroup.det (ι g) = GeneralLinearGroup.det g := by
+theorem det_emb (h : k ≤ m) (hι : IsEmb ι) (g : GL (Fin k) R)
+    : GeneralLinearGroup.det (ι g) = GeneralLinearGroup.det g := by
   refine Units.ext ?_
-  rw [Matrix.GeneralLinearGroup.val_det_apply, Matrix.GeneralLinearGroup.val_det_apply, hι, embM_det h]
+  rw [Matrix.GeneralLinearGroup.val_det_apply, Matrix.GeneralLinearGroup.val_det_apply, hι,
+    embM_det h]
 
-theorem surj_emb (h : k ≤ m) (hι : IsEmb ι) (x : GL (Fin m) R) (hx : GlobalTheory k x) : ∃ g, x = ι g := by
+theorem surj_emb (h : k ≤ m) (hι : IsEmb ι) (x : GL (Fin m) R) (hx : GlobalTheory k x)
+    : ∃ g, x = ι g := by
   have hx' : embM m (cor h x.val) = x.val := embM_cor h _ hx
   have hd : IsUnit (cor h x.val).det := by
     have := (Matrix.isUnit_iff_isUnit_det _).mp x.isUnit
@@ -183,26 +216,35 @@ theorem continuous_emb (hι : IsEmb ι) : Continuous ι := by
   · have e : (Units.val ∘ ι) = embM m ∘ (fun g : GL (Fin k) R => g.val) := funext hι
     rw [e]
     exact continuous_embM.comp Units.continuous_val
-  · have e : (fun g => ((ι g)⁻¹ : GL (Fin m) R).val) = embM m ∘ (fun g : GL (Fin k) R => (g⁻¹).val) :=
+  · have e
+        : (fun g => ((ι g)⁻¹ : GL (Fin m) R).val) = embM m ∘ (fun g : GL (Fin k) R => (g⁻¹).val) :=
       funext (emb_inv hι)
     rw [e]
     exact continuous_embM.comp Units.continuous_coe_inv
 
 theorem inducing_emb (h : k ≤ m) (hι : IsEmb ι) : IsInducing ι := by
-  let P : Matrix (Fin k) (Fin k) R × (Matrix (Fin k) (Fin k) R)ᵐᵒᵖ → Matrix (Fin m) (Fin m) R × (Matrix (Fin m) (Fin m) R)ᵐᵒᵖ :=
-    fun p => (embM m p.1, MulOpposite.op (embM m p.2.unop))
-  let Q : Matrix (Fin m) (Fin m) R × (Matrix (Fin m) (Fin m) R)ᵐᵒᵖ → Matrix (Fin k) (Fin k) R × (Matrix (Fin k) (Fin k) R)ᵐᵒᵖ :=
-    fun p => (cor h p.1, MulOpposite.op (cor h p.2.unop))
+  let P
+      : Matrix (Fin k) (Fin k) R × (Matrix (Fin k) (Fin k) R)ᵐᵒᵖ
+        → Matrix (Fin m) (Fin m) R × (Matrix (Fin m) (Fin m) R)ᵐᵒᵖ := fun p =>
+    (embM m p.1, MulOpposite.op (embM m p.2.unop))
+  let Q
+      : Matrix (Fin m) (Fin m) R × (Matrix (Fin m) (Fin m) R)ᵐᵒᵖ
+        → Matrix (Fin k) (Fin k) R × (Matrix (Fin k) (Fin k) R)ᵐᵒᵖ := fun p =>
+    (cor h p.1, MulOpposite.op (cor h p.2.unop))
   have hQP : Function.LeftInverse Q P := fun p => by
     simp only [P, Q, cor_embM, MulOpposite.unop_op, MulOpposite.op_unop, Prod.mk.eta]
   have hP : Continuous P :=
     (continuous_embM.comp continuous_fst).prodMk
-      (MulOpposite.continuous_op.comp (continuous_embM.comp (MulOpposite.continuous_unop.comp continuous_snd)))
+      (MulOpposite.continuous_op.comp (continuous_embM.comp (MulOpposite.continuous_unop.comp
+        continuous_snd)))
   have hQ : Continuous Q :=
     ((continuous_cor h).comp continuous_fst).prodMk
-      (MulOpposite.continuous_op.comp ((continuous_cor h).comp (MulOpposite.continuous_unop.comp continuous_snd)))
+      (MulOpposite.continuous_op.comp ((continuous_cor h).comp
+        (MulOpposite.continuous_unop.comp continuous_snd)))
   have hPe : IsEmbedding P := hQP.isEmbedding hQ hP
-  have e : Units.embedProduct (Matrix (Fin m) (Fin m) R) ∘ ι = P ∘ Units.embedProduct (Matrix (Fin k) (Fin k) R) := by
+  have e
+      : Units.embedProduct (Matrix (Fin m) (Fin m) R) ∘ ι
+        = P ∘ Units.embedProduct (Matrix (Fin k) (Fin k) R) := by
     funext g
     simp only [Function.comp_apply, Units.embedProduct_apply, P, MulOpposite.unop_op]
     rw [hι, emb_inv hι]
@@ -212,21 +254,25 @@ theorem inducing_emb (h : k ≤ m) (hι : IsEmb ι) : IsInducing ι := by
 
 theorem closedEmb_emb (h : k ≤ m) (hι : IsEmb ι) : IsClosedEmbedding ι := by
   refine ⟨⟨inducing_emb h hι, inj_emb h hι⟩, ?_⟩
-  have e : Set.range ι = ⋂ i : Fin m, ⋂ c : Fin m,
-      {x : GL (Fin m) R | (k ≤ (i : ℕ) ∨ k ≤ (c : ℕ)) → x.val i c = (1 : Matrix (Fin m) (Fin m) R) i c} := by
-    ext x
-    simp only [Set.mem_range, Set.mem_iInter, Set.mem_setOf_eq]
-    constructor
-    · rintro ⟨g, rfl⟩ i c hic
-      exact blk_emb hι g i c hic
-    · intro hx
-      obtain ⟨g, hg⟩ := surj_emb h hι x hx
-      exact ⟨g, hg.symm⟩
+  have e
+      : Set.range ι
+        = ⋂ i : Fin m, ⋂ c : Fin m,
+          {x : GL (Fin m) R | (k ≤ (i : ℕ) ∨ k ≤ (c : ℕ)) → x.val i c = (1 : Matrix (Fin m) (Fin m) R) i c} :=
+    by
+      ext x
+      simp only [Set.mem_range, Set.mem_iInter, Set.mem_setOf_eq]
+      constructor
+      · rintro ⟨g, rfl⟩ i c hic
+        exact blk_emb hι g i c hic
+      · intro hx
+        obtain ⟨g, hg⟩ := surj_emb h hι x hx
+        exact ⟨g, hg.symm⟩
   rw [e]
   refine isClosed_iInter fun i => isClosed_iInter fun c => ?_
   by_cases hp : (k ≤ (i : ℕ) ∨ k ≤ (c : ℕ))
   · simp only [hp, true_implies]
-    exact isClosed_eq ((Units.continuous_val (M := Matrix (Fin m) (Fin m) R)).matrix_elem i c) continuous_const
+    exact isClosed_eq ((Units.continuous_val (M := Matrix (Fin m) (Fin m) R)).matrix_elem i c)
+      continuous_const
   · simp only [hp, false_implies, Set.setOf_true]
     exact isClosed_univ
 
@@ -234,11 +280,12 @@ end Top
 
 section Loc
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {k m : ℕ}
-  {ι : GL (Fin k) F →* GL (Fin m) F}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  {k m : ℕ} {ι : GL (Fin k) F →* GL (Fin m) F}
 
-theorem unip_emb (hι : IsEmb ι) (n : GL (Fin k) F) (hn : n ∈ Iwasawa.unipotent F k) :
-    ι n ∈ Iwasawa.unipotent F m := by
+theorem unip_emb (hι : IsEmb ι) (n : GL (Fin k) F) (hn : n ∈ Iwasawa.unipotent F k)
+    : ι n ∈ Iwasawa.unipotent F m := by
   rw [Iwasawa.mem_unipotent] at hn ⊢
   obtain ⟨hu, hd⟩ := hn
   refine ⟨fun i c hlt => ?_, fun i => ?_⟩
@@ -253,8 +300,8 @@ theorem unip_emb (hι : IsEmb ι) (n : GL (Fin k) F) (hn : n ∈ Iwasawa.unipote
     · exact hd _
     · exact Matrix.one_apply_eq i
 
-theorem int_emb (hι : IsEmb ι) (κ : GL (Fin k) F) (hκ : κ ∈ GLnLocal.integralGL F k) :
-    ι κ ∈ GLnLocal.integralGL F m := by
+theorem int_emb (hι : IsEmb ι) (κ : GL (Fin k) F) (hκ : κ ∈ GLnLocal.integralGL F k)
+    : ι κ ∈ GLnLocal.integralGL F m := by
   rw [GLnLocal.mem_integralGL_iff] at hκ ⊢
   obtain ⟨h1, h2⟩ := hκ
   refine ⟨fun i c => ?_, fun i c => ?_⟩
@@ -276,8 +323,8 @@ theorem int_emb (hι : IsEmb ι) (κ : GL (Fin k) F) (hκ : κ ∈ GLnLocal.inte
       · exact one_mem _
       · exact zero_mem _
 
-theorem torus_emb (hι : IsEmb ι) (l : Fin k → ℤ) :
-    ι (Iwasawa.torusPow F k l) = Iwasawa.torusPow F m (pad m l) := by
+theorem torus_emb (hι : IsEmb ι) (l : Fin k → ℤ)
+    : ι (Iwasawa.torusPow F k l) = Iwasawa.torusPow F m (pad m l) := by
   refine Units.ext ?_
   rw [hι, Iwasawa.coe_torusPow, Iwasawa.coe_torusPow]
   ext i c
@@ -302,7 +349,9 @@ theorem uu_emb (h : k ≤ m) (hι : IsEmb ι) (n : GA E k) : UU 0 (ι n) ↔ UU 
   constructor
   · rintro ⟨h1, h2, -⟩
     refine ⟨fun i c hc => ?_, fun i => ?_, fun i c hc => absurd hc (Nat.not_lt_zero _)⟩
-    · have := h1 (Fin.castLE h i) (Fin.castLE h c) (show ((Fin.castLE h c : Fin m) : ℕ) < (Fin.castLE h i : Fin m) from hc)
+    · have :=
+        h1 (Fin.castLE h i) (Fin.castLE h c)
+          (show ((Fin.castLE h c : Fin m) : ℕ) < (Fin.castLE h i : Fin m) from hc)
       rwa [embM_castLE] at this
     · have := h2 (Fin.castLE h i)
       rwa [embM_castLE] at this
@@ -317,7 +366,8 @@ theorem uu_emb (h : k ≤ m) (hι : IsEmb ι) (n : GA E k) : UU 0 (ι n) ↔ UU 
       · exact h2 _
       · exact Matrix.one_apply_eq i
 
-theorem psN_emb (h : k ≤ m) (hι : IsEmb ι) (ψ : AddChar (Ad E) ℂ) (n : GA E k) : psN ψ (ι n) = psN ψ n := by
+theorem psN_emb (h : k ≤ m) (hι : IsEmb ι) (ψ : AddChar (Ad E) ℂ) (n : GA E k)
+    : psN ψ (ι n) = psN ψ n := by
   unfold psN
   congr 1
   rw [Finset.sum_filter, Finset.sum_filter]
@@ -342,22 +392,41 @@ end CornerEmbeddingGL
 
 theorem corner_embedding_of : jumpWindows.G0 → CornerEmbedding := by
   intro _ E _ _ _ m k hkm
-  refine ⟨fun R _ => ⟨CornerEmbeddingGL.embGL hkm, CornerEmbeddingGL.isEmb_embGL hkm⟩, fun ι hι => ?_⟩
+  refine
+    ⟨fun R _ => ⟨CornerEmbeddingGL.embGL hkm, CornerEmbeddingGL.isEmb_embGL hkm⟩, fun ι hι => ?_⟩
   have hce := CornerEmbeddingGL.closedEmb_emb hkm hι
-  refine ⟨CornerEmbeddingGL.continuous_emb hι, CornerEmbeddingGL.blk_emb hι, CornerEmbeddingGL.surj_emb hkm hι, fun g => ?_, fun U hU => ?_,
-    fun C hC => hce.isCompact_preimage hC, fun ιE hE γ => (CornerEmbeddingGL.map_emb _ hE hι γ).symm, fun w ιw hw => ?_,
-    fun κ hκ => ?_, CornerEmbeddingGL.uu_emb hkm hι, fun ψ n => CornerEmbeddingGL.psN_emb hkm hι ψ n⟩
+  refine ⟨
+    CornerEmbeddingGL.continuous_emb hι,
+    CornerEmbeddingGL.blk_emb hι,
+    CornerEmbeddingGL.surj_emb hkm hι,
+    fun g => ?_,
+    fun U hU => ?_,
+    fun C hC => hce.isCompact_preimage hC,
+    fun ιE hE γ => (CornerEmbeddingGL.map_emb _ hE hι γ).symm,
+    fun w ιw hw => ?_,
+    fun κ hκ => ?_,
+    CornerEmbeddingGL.uu_emb hkm hι,
+    fun ψ n => CornerEmbeddingGL.psN_emb hkm hι ψ n
+  ⟩
   · unfold Dt
     rw [CornerEmbeddingGL.det_emb hkm hι]
   · rw [hce.isInducing.nhds_eq_comap 1, map_one, Filter.mem_comap] at hU
     obtain ⟨t, ht, hsub⟩ := hU
     exact ⟨t, ht, fun g hg => hsub hg⟩
-  · refine ⟨fun x => ?_, fun g => CornerEmbeddingGL.map_emb _ hι hw g, fun n hn => CornerEmbeddingGL.unip_emb hw n hn,
-      fun κ hκ => CornerEmbeddingGL.int_emb hw κ hκ, fun l => CornerEmbeddingGL.torus_emb hw l⟩
-    change ι (cornerGL k (sFin E) (cornerGL k (sLoc E w) x)) = cornerGL m (sFin E) (cornerGL m (sLoc E w) (ιw x))
-    rw [CornerEmbeddingGL.cornerGL_emb (sFin E) (CornerEmbeddingGL.isEmb_embGL hkm) hι, CornerEmbeddingGL.cornerGL_emb (sLoc E w) hw (CornerEmbeddingGL.isEmb_embGL hkm)]
+  · refine ⟨
+      fun x => ?_,
+      fun g => CornerEmbeddingGL.map_emb _ hι hw g,
+      fun n hn => CornerEmbeddingGL.unip_emb hw n hn,
+      fun κ hκ => CornerEmbeddingGL.int_emb hw κ hκ,
+      fun l => CornerEmbeddingGL.torus_emb hw l
+    ⟩
+    change ι (cornerGL k (sFin E) (cornerGL k (sLoc E w) x))
+      = cornerGL m (sFin E) (cornerGL m (sLoc E w) (ιw x))
+    rw [CornerEmbeddingGL.cornerGL_emb (sFin E) (CornerEmbeddingGL.isEmb_embGL hkm) hι,
+      CornerEmbeddingGL.cornerGL_emb (sLoc E w) hw (CornerEmbeddingGL.isEmb_embGL hkm)]
   · change GeneralLinearGroup.map (pInf E) (ι κ) = 1
-    rw [CornerEmbeddingGL.map_emb (pInf E) hι (CornerEmbeddingGL.isEmb_embGL hkm) κ, show GeneralLinearGroup.map (pInf E) κ = 1 from hκ, map_one]
+    rw [CornerEmbeddingGL.map_emb (pInf E) hι (CornerEmbeddingGL.isEmb_embGL hkm) κ,
+      show GeneralLinearGroup.map (pInf E) κ = 1 from hκ, map_one]
 
 end PositivityTheory.AdelicQuotientData
 

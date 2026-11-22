@@ -13,9 +13,11 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.PMon.Gauss
 
-theorem vr_iterate_phi (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (hx : x ≠ 0) :
-    ∀ k : ℕ, (φc l)^[k] x ≠ 0 ∧ ∀ r : ℝ, 0 < r → r ≤ 1 →
-      vr l r ((φc l)^[k] x) = (l : ℝ) ^ k * vr l (r / (l : ℝ) ^ k) x := by
+theorem vr_iterate_phi (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (hx : x ≠ 0)
+    : ∀ k : ℕ,
+      (φc l)^[k] x ≠ 0
+        ∧ ∀ r : ℝ,
+          0 < r → r ≤ 1 → vr l r ((φc l)^[k] x) = (l : ℝ) ^ k * vr l (r / (l : ℝ) ^ k) x := by
   have hl1 : (1 : ℝ) ≤ l := by exact_mod_cast (Fact.out : l.Prime).one_lt.le
   have hl0 : (0 : ℝ) < l := by linarith
   intro k
@@ -34,16 +36,23 @@ theorem vr_iterate_phi (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (hx 
     rw [e]
     ring
 
-theorem vr_sub_eq_int_mul : ∀ (l : ℕ) [Fact l.Prime] (h s : ℕ), s < h → ∀ w w' : Formalism.Per.Acris l,
-    (φc l)^[h] w' = (l : Formalism.Per.Acris l) ^ s * w' → w ≠ 0 → w' ≠ 0 →
-    φc l w * w' = w * φc l w' → ∃ n : ℤ, ∀ r ∈ Set.Ioc (0 : ℝ) 1, vr l r w - vr l r w' = n * r := by
+theorem vr_sub_eq_int_mul
+    : ∀ (l : ℕ) [Fact l.Prime] (h s : ℕ),
+      s < h
+        → ∀ w w' : Formalism.Per.Acris l,
+          (φc l)^[h] w' = (l : Formalism.Per.Acris l) ^ s * w' → w ≠ 0 → w' ≠ 0
+            → φc l w * w' = w * φc l w'
+            → ∃ n : ℤ, ∀ r ∈ Set.Ioc (0 : ℝ) 1, vr l r w - vr l r w' = n * r := by
   intro l _ h s hsh w w' hfix hw hw' hrat
   have hl2 : 2 ≤ l := (Fact.out : l.Prime).two_le
   have hl0 : (0 : ℝ) < l := by exact_mod_cast (by omega : 0 < l)
   obtain ⟨cA, kA, sA⟩ := GlobalTheory.T.acrisValuationAtRadius_concave_cont_slope l w hw
   obtain ⟨cB, kB, sB⟩ := GlobalTheory.T.acrisValuationAtRadius_concave_cont_slope l w' hw'
-  have key := GlobalTheory.T.exists_int_sub_mul_eq_int_mul_of_homogeneous l h s 1 hl2 hsh le_rfl (fun r => vr l r w) (fun r => vr l r w')
-    cA cB kA kB sA sB ?_ ?_
+  have key :=
+    GlobalTheory.T.exists_int_sub_mul_eq_int_mul_of_homogeneous l h s 1 hl2 hsh le_rfl
+      (fun r => vr l r w)
+      (fun r => vr l r w')
+      cA cB kA kB sA sB ?_ ?_
   · obtain ⟨n, hn⟩ := key
     exact ⟨n, fun r hr => by simpa using hn r hr⟩
   · rintro r ⟨hr0, hr1⟩
@@ -56,8 +65,8 @@ theorem vr_sub_eq_int_mul : ∀ (l : ℕ) [Fact l.Prime] (h s : ℕ), s < h → 
     have hlr1 : (l : ℝ) * r ≤ 1 := by rw [le_div_iff₀ hl0] at hr1; linarith
     obtain ⟨hmul, hphi, -, -⟩ := GlobalTheory.T.acrisValuation_radius_laws l (l * r) hlr0 hlr1
     have e := congrArg (vr l (l * r)) hrat
-    rw [hmul _ _ (hphi w hw).1 hw', hmul _ _ hw (hphi w' hw').1, (hphi w hw).2,
-      (hphi w' hw').2] at e
+    rw [hmul _ _ (hphi w hw).1 hw', hmul _ _ hw (hphi w' hw').1, (hphi w hw).2, (hphi w' hw').2]
+      at e
     have hc : (l : ℝ) * r / l = r := by field_simp
     rw [hc] at e
     show vr l (l * r) w - ((1 : ℕ) : ℝ) * vr l (l * r) w' = l * (vr l r w - ((1 : ℕ) : ℝ) * vr l r w')

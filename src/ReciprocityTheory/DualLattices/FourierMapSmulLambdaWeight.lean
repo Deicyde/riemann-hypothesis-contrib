@@ -12,12 +12,14 @@ namespace ReciprocityTheory.PGsh.Up.U3
 
 open ReciprocityTheory.PGsh.L2
 
-variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [Field C] {v : Valuation C NNReal}
-  {R : Type} [CommRing R] [Algebra R C]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
-theorem exists_charEquiv [NeZero p] {ζ : C} (hζ : IsPrimitiveRoot ζ p) :
-    ∃ e : ZMod p ≃ AddChar (ZMod p) C, (∀ h h', e (h + h') = e h * e h') ∧
-      ∀ h a, e h a = ζ ^ (h * a).val := by
+theorem exists_charEquiv [NeZero p] {ζ : C} (hζ : IsPrimitiveRoot ζ p)
+    : ∃ e : ZMod p ≃ AddChar (ZMod p) C,
+      (∀ h h', e (h + h') = e h * e h') ∧ ∀ h a, e h a = ζ ^ (h * a).val := by
   have hp1 : ζ ^ p = 1 := hζ.pow_eq_one
   let ψ : AddChar (ZMod p) C := AddChar.zmodChar p hp1
   have hψ : ∀ a, ψ a = ζ ^ a.val := fun a => AddChar.zmodChar_apply hp1 a
@@ -36,7 +38,8 @@ theorem exists_charEquiv [NeZero p] {ζ : C} (hζ : IsPrimitiveRoot ζ p) :
   have hsurj : Function.Surjective f := by
     intro χ
     have h1 : χ 1 ^ p = 1 := by
-      rw [← AddChar.map_nsmul_eq_pow, nsmul_eq_mul, mul_one, ZMod.natCast_self, AddChar.map_zero_eq_one]
+      rw [← AddChar.map_nsmul_eq_pow, nsmul_eq_mul, mul_one, ZMod.natCast_self,
+        AddChar.map_zero_eq_one]
     obtain ⟨k, hk, hkχ⟩ := hζ.eq_pow_of_pow_eq_one h1
     refine ⟨(k : ZMod p), ?_⟩
     ext a
@@ -50,9 +53,11 @@ theorem exists_charEquiv [NeZero p] {ζ : C} (hζ : IsPrimitiveRoot ζ p) :
   · intro h a
     exact hf h a
 
-theorem v_gamma (hv : v.Integers R) (hpv : v (p : C) < 1) {ω : ZMod p → C} (hω : IsTeich v ω)
-    {ζ : C} (hζ : IsPrimitiveRoot ζ p) :
-    v (∑ a, u0 ω a * ζ ^ a.val) ^ (p - 1) = v (p : C) := by
+theorem v_gamma
+    (hv : v.Integers R) (hpv : v (p : C) < 1)
+    {ω : ZMod p → C} (hω : IsTeich v ω)
+    {ζ : C} (hζ : IsPrimitiveRoot ζ p)
+    : v (∑ a, u0 ω a * ζ ^ a.val) ^ (p - 1) = v (p : C) := by
   have hpp : 2 ≤ p := hp.out.two_le
   have hζ1 : v ζ ≤ 1 := by
     by_contra h
@@ -77,7 +82,11 @@ theorem v_gamma (hv : v.Integers R) (hpv : v (p : C) < 1) {ω : ZMod p → C} (h
     | zero => exact ⟨0, by simp, by simp⟩
     | succ n ih =>
       obtain ⟨s, hs1, hs⟩ := ih
-      refine ⟨n + ζ * s, Valuation.map_add_le v (hnat n) (by rw [map_mul]; exact mul_le_one' hζ1 hs1), ?_⟩
+      refine ⟨
+        n + ζ * s,
+        Valuation.map_add_le v (hnat n) (by rw [map_mul]; exact mul_le_one' hζ1 hs1),
+        ?_
+      ⟩
       push_cast
       linear_combination ζ * hs
   choose s hs1 hs using hdec
@@ -88,8 +97,11 @@ theorem v_gamma (hv : v.Integers R) (hpv : v (p : C) < 1) {ω : ZMod p → C} (h
     have := hω.lam_eq ω
     rw [hω.lam_omega, hω.zero] at this
     simpa using this.symm
-  have hγ : ∑ a, u0 ω a * ζ ^ a.val = (ζ - 1) * (((p : C) - 1) +
-      (∑ a, wt ω a * ((a.val : C) - ω a) + (ζ - 1) * ∑ a, wt ω a * s a.val)) := by
+  have hγ
+      : ∑ a, u0 ω a * ζ ^ a.val
+        = (ζ - 1)
+          * (((p : C) - 1)
+            + (∑ a, wt ω a * ((a.val : C) - ω a) + (ζ - 1) * ∑ a, wt ω a * s a.val)) := by
     rw [h1, ← h2]
     simp only [Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -100,13 +112,16 @@ theorem v_gamma (hv : v.Integers R) (hpv : v (p : C) < 1) {ω : ZMod p → C} (h
     · apply Valuation.map_sum_lt v one_ne_zero
       intro a _
       rw [map_mul]
-      calc v (wt ω a) * v ((a.val : C) - ω a) ≤ 1 * v ((a.val : C) - ω a) := by
-            gcongr; exact hω.wt_int a
+      calc
+        v (wt ω a) * v ((a.val : C) - ω a)
+          ≤ 1 * v ((a.val : C) - ω a) := by gcongr; exact hω.wt_int a
         _ < 1 := by rw [one_mul, Valuation.map_sub_swap]; exact hω.cong a
     · rw [map_mul]
       have hsum : v (∑ a, wt ω a * s a.val) ≤ 1 :=
         Valuation.map_sum_le v fun a _ => by rw [map_mul]; exact mul_le_one' (hω.wt_int a) (hs1 _)
-      calc v (ζ - 1) * v (∑ a, wt ω a * s a.val) ≤ v (ζ - 1) * 1 := by gcongr
+      calc
+        v (ζ - 1) * v (∑ a, wt ω a * s a.val)
+          ≤ v (ζ - 1) * 1 := by gcongr
         _ < 1 := by rw [mul_one]; exact hπ1
   have hp1 : v ((p : C) - 1) = 1 := by
     have hnd : ¬ (p : ℤ) ∣ (p : ℤ) - 1 := by
@@ -117,16 +132,19 @@ theorem v_gamma (hv : v.Integers R) (hpv : v (p : C) < 1) {ω : ZMod p → C} (h
     have := v_intCast_eq_one hv hpv hnd
     push_cast at this
     exact this
-  have hunit : v ((p : C) - 1 + (∑ a, wt ω a * ((a.val : C) - ω a) +
-      (ζ - 1) * ∑ a, wt ω a * s a.val)) = 1 := by
+  have hunit
+      : v ((p : C) - 1 + (∑ a, wt ω a * ((a.val : C) - ω a) + (ζ - 1) * ∑ a, wt ω a * s a.val))
+        = 1 := by
     rw [Valuation.map_add_eq_of_lt_left v (by rw [hp1]; exact hδ), hp1]
   rw [hγ, map_mul, hunit, mul_one]
   exact val_prim_root hζ
 
-theorem fourierMap_smul_lambdaWeight {ω : ZMod p → C} (hω : IsTeich v ω) {ζ : C}
-    (e : ZMod p ≃ AddChar (ZMod p) C) (he2 : ∀ h a, e h a = ζ ^ (h * a).val) (c : C) :
-    fourier (R := R) (fun h a => e h a) (fun a => c * u0 ω a) =
-      fun h => (c * ∑ a, u0 ω a * ζ ^ a.val) * ω h := by
+theorem fourierMap_smul_lambdaWeight
+    {ω : ZMod p → C} (hω : IsTeich v ω)
+    {ζ : C} (e : ZMod p ≃ AddChar (ZMod p) C) (he2 : ∀ h a, e h a = ζ ^ (h * a).val)
+    (c : C)
+    : fourier (R := R) (fun h a => e h a) (fun a => c * u0 ω a)
+      = fun h => (c * ∑ a, u0 ω a * ζ ^ a.val) * ω h := by
   have hω0 : ∀ h : ZMod p, h ≠ 0 → ω h ≠ 0 := by
     intro h hh
     have := hω.sep h 0 hh
@@ -152,23 +170,29 @@ theorem fourierMap_smul_lambdaWeight {ω : ZMod p → C} (hω : IsTeich v ω) {�
     have hi : h⁻¹ ≠ 0 := inv_ne_zero hh
     have e1 := hwt h⁻¹ hi
     have e2 : ω h⁻¹ * ω h = 1 := by rw [← hω.mul, inv_mul_cancel₀ hh, hω.one]
-    calc wt ω h⁻¹ = wt ω h⁻¹ * (ω h⁻¹ * ω h) := by rw [e2, mul_one]
+    calc
+      wt ω h⁻¹
+        = wt ω h⁻¹ * (ω h⁻¹ * ω h) := by rw [e2, mul_one]
       _ = ω h := by rw [← mul_assoc, e1, one_mul]
-  have hwt0 : wt ω 0 = 0 := by
-    simp only [wt, hω.zero]; exact zero_pow (by omega)
+  have hwt0 : wt ω 0 = 0 := by simp only [wt, hω.zero]; exact zero_pow (by omega)
   have hS : ∀ h : ZMod p, h ≠ 0 → sS ω = ω h * sS ω := by
     intro h hh
-    have := Fintype.sum_bijective (h⁻¹ * ·) (mulLeft_bijective₀ h⁻¹ (inv_ne_zero hh))
-      (fun b => wt ω (h⁻¹ * b)) (wt ω) (fun _ => rfl)
+    have :=
+      Fintype.sum_bijective (h⁻¹ * ·) (mulLeft_bijective₀ h⁻¹ (inv_ne_zero hh))
+        (fun b => wt ω (h⁻¹ * b))
+        (wt ω)
+        (fun _ => rfl)
     simp only [hwtmul, hwtinv h hh, ← Finset.mul_sum] at this
-    simp only [sS]; exact this.symm
+    simp only [sS]
+    exact this.symm
   have hu : ∀ h : ZMod p, h ≠ 0 → ∀ b, u0 ω (h⁻¹ * b) = ω h * u0 ω b := by
     intro h hh b
     simp only [u0]
     by_cases hb : b = 0
     · subst hb
       simp only [mul_zero, if_true, hwt0]
-      nth_rewrite 1 [hS h hh]; ring
+      nth_rewrite 1 [hS h hh]
+      ring
     · have : h⁻¹ * b ≠ 0 := mul_ne_zero (inv_ne_zero hh) hb
       simp only [this, hb, if_false, sub_zero, hwtmul, hwtinv h hh]
   funext h
@@ -179,9 +203,11 @@ theorem fourierMap_smul_lambdaWeight {ω : ZMod p → C} (hω : IsTeich v ω) {�
     rw [← Finset.mul_sum]
     simp only [u0, Finset.sum_sub_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     simp [sS]
-  · have hb := Fintype.sum_bijective (h⁻¹ * ·) (mulLeft_bijective₀ h⁻¹ (inv_ne_zero hh))
-      (fun b => c * u0 ω (h⁻¹ * b) * ζ ^ (h * (h⁻¹ * b)).val)
-      (fun a => c * u0 ω a * ζ ^ (h * a).val) (fun _ => rfl)
+  · have hb :=
+      Fintype.sum_bijective (h⁻¹ * ·) (mulLeft_bijective₀ h⁻¹ (inv_ne_zero hh))
+        (fun b => c * u0 ω (h⁻¹ * b) * ζ ^ (h * (h⁻¹ * b)).val)
+        (fun a => c * u0 ω a * ζ ^ (h * a).val)
+        (fun _ => rfl)
     rw [← hb]
     simp only [hu h hh, ← mul_assoc, mul_inv_cancel₀ hh, one_mul]
     rw [Finset.mul_sum, Finset.sum_mul]

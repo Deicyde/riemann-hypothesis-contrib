@@ -16,9 +16,10 @@ namespace GlobalTheory
 
 namespace SeriesTensor
 
-private theorem mem_smul_top_iff {R M ι : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    [Fintype ι] (b : Module.Basis ι R M) (I : Ideal R) (x : M) :
-    x ∈ (I • ⊤ : Submodule R M) ↔ ∀ i, b.repr x i ∈ I := by
+private theorem mem_smul_top_iff
+    {R M ι : Type} [CommRing R] [AddCommGroup M] [Module R M] [Fintype ι]
+    (b : Module.Basis ι R M) (I : Ideal R) (x : M)
+    : x ∈ (I • ⊤ : Submodule R M) ↔ ∀ i, b.repr x i ∈ I := by
   constructor
   · intro hx i
     have hle : (I • ⊤ : Submodule R M) ≤ Submodule.comap (b.coord i) I :=
@@ -30,9 +31,11 @@ private theorem mem_smul_top_iff {R M ι : Type} [CommRing R] [AddCommGroup M] [
     rw [← b.sum_repr x]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (h i) Submodule.mem_top
 
-private theorem isAdicComplete_of_basis {R M ι : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    [Fintype ι] (b : Module.Basis ι R M) (I : Ideal R) [hI : IsAdicComplete I R] :
-    IsAdicComplete I M := by
+private theorem isAdicComplete_of_basis
+    {R M ι : Type} [CommRing R] [AddCommGroup M] [Module R M] [Fintype ι]
+    (b : Module.Basis ι R M)
+    (I : Ideal R) [hI : IsAdicComplete I R]
+    : IsAdicComplete I M := by
   have htop : ∀ k : ℕ, (I ^ k • ⊤ : Submodule R R) = I ^ k := fun k => by
     rw [smul_eq_mul, Ideal.mul_top]
   have hH : IsHausdorff I M := by
@@ -69,9 +72,12 @@ private theorem isAdicComplete_of_basis {R M ι : Type} [CommRing R] [AddCommGro
     exact this
   exact { toIsHausdorff := hH, toIsPrecomplete := hP' }
 
-private theorem exists_pow_mem {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O]
-    [Algebra O C] (hv : v.Integers O) {a c : O} (ha : algebraMap O C a ≠ 0) (hc : ¬ IsUnit c) :
-    ∃ n : ℕ, c ^ n ∈ Ideal.span {a} := by
+private theorem exists_pow_mem
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {a c : O} (ha : algebraMap O C a ≠ 0) (hc : ¬ IsUnit c)
+    : ∃ n : ℕ, c ^ n ∈ Ideal.span {a} := by
   have h1 : v (algebraMap O C c) < 1 :=
     lt_of_le_of_ne (hv.map_le_one c) fun h => hc (hv.isUnit_iff_valuation_eq_one.2 h)
   have h0 : 0 < v (algebraMap O C a) := pos_iff_ne_zero.2 ((Valuation.ne_zero_iff v).2 ha)
@@ -80,11 +86,12 @@ private theorem exists_pow_mem {C : Type} [Field C] {v : Valuation C NNReal} {O 
   rw [map_pow, map_pow]
   exact hn.le
 
-private theorem exists_pow_X_mem {O σ A : Type} [CommRing O] [IsLocalRing O] [CommRing A]
-    [Algebra O A] [Algebra.IsIntegral O A] (I : Ideal O)
-    (hI : ∀ c : O, ¬ IsUnit c → ∃ n : ℕ, c ^ n ∈ I) (π : MvPowerSeries σ O →ₐ[O] A)
-    (hπ : Function.Surjective π) (j : σ) :
-    ∃ M : ℕ, π (MvPowerSeries.X j) ^ M ∈ I.map (algebraMap O A) := by
+private theorem exists_pow_X_mem
+    {O σ A : Type} [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Algebra.IsIntegral O A]
+    (I : Ideal O) (hI : ∀ c : O, ¬ IsUnit c → ∃ n : ℕ, c ^ n ∈ I)
+    (π : MvPowerSeries σ O →ₐ[O] A) (hπ : Function.Surjective π)
+    (j : σ)
+    : ∃ M : ℕ, π (MvPowerSeries.X j) ^ M ∈ I.map (algebraMap O A) := by
   change π (MvPowerSeries.X j) ∈ (I.map (algebraMap O A)).radical
   rw [Ideal.radical_eq_sInf, Submodule.mem_sInf]
   rintro (P : Ideal A) ⟨hIP, hP⟩
@@ -108,10 +115,12 @@ private theorem exists_pow_X_mem {O σ A : Type} [CommRing O] [IsLocalRing O] [C
   rw [← h3] at h4
   exact h4
 
-private theorem pow_mem_map {O A B : Type} [CommRing O] [CommRing A] [CommRing B] [Algebra O A]
-    [Algebra O B] (I : Ideal O) (e : A →ₐ[O] B) {x : A}
-    (h : ∃ M : ℕ, x ^ M ∈ I.map (algebraMap O A)) :
-    ∃ M : ℕ, e x ^ M ∈ I.map (algebraMap O B) := by
+private theorem pow_mem_map
+    {O A B : Type} [CommRing O] [CommRing A] [CommRing B] [Algebra O A] [Algebra O B]
+    (I : Ideal O)
+    (e : A →ₐ[O] B)
+    {x : A} (h : ∃ M : ℕ, x ^ M ∈ I.map (algebraMap O A))
+    : ∃ M : ℕ, e x ^ M ∈ I.map (algebraMap O B) := by
   obtain ⟨M, hM⟩ := h
   refine ⟨M, ?_⟩
   have := Ideal.mem_map_of_mem (e : A →+* B) hM
@@ -122,16 +131,19 @@ end SeriesTensor
 
 end GlobalTheory
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-private theorem SeriesTensor.ev_pt_X {R : Type} [CommRing R] {d : ℕ} (k : Fin 2) (i : Fin d) :
-    ev (n := 2) ![pt R d k] (MvPowerSeries.X ((0 : Fin 1), i)) = MvPowerSeries.X (k, i) := by
+private theorem SeriesTensor.ev_pt_X {R : Type} [CommRing R] {d : ℕ} (k : Fin 2) (i : Fin d)
+    : ev (n := 2) ![pt R d k] (MvPowerSeries.X ((0 : Fin 1), i)) = MvPowerSeries.X (k, i) := by
   unfold ev
   rw [MvPowerSeries.subst_X]
   · rfl
@@ -140,9 +152,20 @@ private theorem SeriesTensor.ev_pt_X {R : Type} [CommRing R] {d : ℕ} (k : Fin 
     fin_cases a
     exact MvPowerSeries.constantCoeff_X _
 
-
 open SeriesTensor in
-theorem series_two_points_eq_sum_mul : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (d : ℕ) (J : Ideal (PS O 1 d)), Module.Free O (PS O 1 d ⧸ J) → Module.Finite O (PS O 1 d ⧸ J) → ∀ f : PS O 2 d, ∃ (m : ℕ) (g h : Fin m → PS O 1 d), ∀ (Φ : PS O 2 d →ₐ[O] O) (φ φ' : PS O 1 d →ₐ[O] O), (∀ u, Φ (ev (n := 2) ![pt O d 0] u) = φ u) → (∀ u, Φ (ev (n := 2) ![pt O d 1] u) = φ' u) → (∀ u ∈ J, φ u = 0) → (∀ u ∈ J, φ' u = 0) → Φ f = ∑ i, φ (g i) * φ' (h i) := by
+theorem series_two_points_eq_sum_mul
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (d : ℕ)
+            (J : Ideal (PS O 1 d)),
+          Module.Free O (PS O 1 d ⧸ J) → Module.Finite O (PS O 1 d ⧸ J)
+            → ∀ f : PS O 2 d, ∃ (m : ℕ) (g h : Fin m → PS O 1 d),
+              ∀ (Φ : PS O 2 d →ₐ[O] O) (φ φ' : PS O 1 d →ₐ[O] O),
+                (∀ u, Φ (ev (n := 2) ![pt O d 0] u) = φ u)
+                  → (∀ u, Φ (ev (n := 2) ![pt O d 1] u) = φ' u) → (∀ u ∈ J, φ u = 0)
+                  → (∀ u ∈ J, φ' u = 0)
+                  → Φ f = ∑ i, φ (g i) * φ' (h i) := by
   intro p _ C _ _ _ v O _ _ hv _ _ d J hfree hfin f
   have hdom : IsDomain O := hv.hom_inj.isDomain _
   have := ValuationRing.of_integers v hv
@@ -176,21 +199,24 @@ theorem series_two_points_eq_sum_mul : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [
   have hH : IsHausdorff (I.map (algebraMap O O)) O := by
     rw [IsHausdorff.map_algebraMap_iff]
     infer_instance
-  have key := (mvPowerSeries_eval_of_pow_mem O _ _ _ hnil).2 hH O
-    (Φ : PS O 2 d →+* O) (T.comp Ψ : PS O 2 d →+* O)
-    (fun t => (Φ.commutes t).trans ((T.comp Ψ).commutes t).symm) (fun _ => rfl) (by
-      rintro ⟨k, i⟩
-      change T (Ψ (MvPowerSeries.X (k, i))) = _
-      rw [hΨ, ← ev_pt_X k i]
-      fin_cases k
-      · refine Eq.trans ?_ (h0 _).symm
-        change T (π _ ⊗ₜ 1) = _
-        rw [Algebra.TensorProduct.lift_tmul, map_one, _root_.mul_one]
-        rfl
-      · refine Eq.trans ?_ (h1 _).symm
-        change T (1 ⊗ₜ π _) = _
-        rw [Algebra.TensorProduct.lift_tmul, map_one, _root_.one_mul]
-        rfl)
+  have key :=
+    (mvPowerSeries_eval_of_pow_mem O _ _ _ hnil).2 hH O (Φ : PS O 2 d →+* O)
+      (T.comp Ψ : PS O 2 d →+* O)
+      (fun t => (Φ.commutes t).trans ((T.comp Ψ).commutes t).symm)
+      (fun _ => rfl)
+      (by
+        rintro ⟨k, i⟩
+        change T (Ψ (MvPowerSeries.X (k, i))) = _
+        rw [hΨ, ← ev_pt_X k i]
+        fin_cases k
+        · refine Eq.trans ?_ (h0 _).symm
+          change T (π _ ⊗ₜ 1) = _
+          rw [Algebra.TensorProduct.lift_tmul, map_one, _root_.mul_one]
+          rfl
+        · refine Eq.trans ?_ (h1 _).symm
+          change T (1 ⊗ₜ π _) = _
+          rw [Algebra.TensorProduct.lift_tmul, map_one, _root_.one_mul]
+          rfl)
   have hf : Φ f = T (Ψ f) := RingHom.congr_fun key f
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hf, hxy, map_sum]

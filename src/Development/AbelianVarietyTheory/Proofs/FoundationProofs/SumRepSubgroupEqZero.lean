@@ -10,9 +10,12 @@ noncomputable section
 
 namespace GlobalTheory.NoFixedCharSum
 
-theorem sum_rep_subgroup_eq_zero {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (τ : Representation ℂ G V) (N : Subgroup G) [Fintype N]
-    (h : ∀ v : V, (∀ n ∈ N, τ n v = v) → v = 0) : ∑ n : N, τ (n : G) = 0 := by
+theorem sum_rep_subgroup_eq_zero
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (τ : Representation ℂ G V)
+    (N : Subgroup G) [Fintype N]
+    (h : ∀ v : V, (∀ n ∈ N, τ n v = v) → v = 0)
+    : ∑ n : N, τ (n : G) = 0 := by
   ext v
   simp only [LinearMap.sum_apply, LinearMap.zero_apply]
   apply h

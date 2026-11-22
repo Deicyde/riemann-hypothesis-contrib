@@ -10,12 +10,16 @@ open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalThe
 
 namespace PositivityTheory.RgUd.Form.LeviSmoothness.asm
 
-open PositivityTheory.RgUd.Form PositivityTheory.RgUd.Form.ColumnElementGluing PositivityTheory.RgUd.Form.LeviSmoothness
+open PositivityTheory.RgUd.Form PositivityTheory.RgUd.Form.ColumnElementGluing
+  PositivityTheory.RgUd.Form.LeviSmoothness
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem re_le_of_selfadj {V : Type} [AddCommGroup V] [Module ℂ V] {B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hB : IsPsd B) (u v : V)
-    (h : B u v = B u u) : (B u u).re ≤ (B v v).re := by
+theorem re_le_of_selfadj
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hB : IsPsd B)
+    (u v : V) (h : B u v = B u u)
+    : (B u u).re ≤ (B v v).re := by
   have h1 := hB.2 (v - u)
   have h2 := hB.1 u v
   rw [h] at h2

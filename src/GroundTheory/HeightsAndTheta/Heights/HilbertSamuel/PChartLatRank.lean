@@ -10,11 +10,16 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
-theorem chartLat_subset_chartLatQ {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
-    [CharZero Ω] (y : (Σ k, ι k) → Ω) (a : K → ℤ) (n : ℕ) {s : Ω} (hs : s ∈ chartLat y a n) :
-    s ∈ chartLatQ y a n := by
+theorem chartLat_subset_chartLatQ
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (y : (Σ k, ι k) → Ω) (a : K → ℤ) (n : ℕ)
+    {s : Ω} (hs : s ∈ chartLat y a n)
+    : s ∈ chartLatQ y a n := by
   intro c hc
   have hle : chartRingZ y c ≤ (chartRingQ y c).restrictScalars ℤ :=
     Algebra.adjoin_le (Algebra.subset_adjoin (R := ℚ))

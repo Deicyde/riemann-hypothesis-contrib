@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 noncomputable section
 
-open ValuativeRel Matrix GlobalTheory.SplitWeil UpperTheory.ConvolutionTheory.Loc UpperTheory.Gal.Join
+open ValuativeRel Matrix GlobalTheory.SplitWeil UpperTheory.ConvolutionTheory.Loc
+  UpperTheory.Gal.Join
 open GlobalTheory.SmGL hiding iwahori
 
 namespace UpperTheory.Gal.InertialTypesAlt.L
@@ -18,16 +19,18 @@ section Mat
 
 variable {k : Type} [Field k] {n : ℕ}
 
-private def colM (p : Fin n) (a : Fin n → k) : Matrix (Fin n) (Fin n) k := fun i j => if j = p then a i else 0
+private def colM (p : Fin n) (a : Fin n → k) : Matrix (Fin n) (Fin n) k := fun i j =>
+  if j = p then a i else 0
 
-private def rowM (p : Fin n) (b : Fin n → k) : Matrix (Fin n) (Fin n) k := fun i j => if i = p then b j else 0
+private def rowM (p : Fin n) (b : Fin n → k) : Matrix (Fin n) (Fin n) k := fun i j =>
+  if i = p then b j else 0
 
-private theorem colM_mul (p : Fin n) (a : Fin n → k) (M : Matrix (Fin n) (Fin n) k) (i j : Fin n) :
-    (colM p a * M) i j = a i * M p j := by
+private theorem colM_mul (p : Fin n) (a : Fin n → k) (M : Matrix (Fin n) (Fin n) k) (i j : Fin n)
+    : (colM p a * M) i j = a i * M p j := by
   simp [Matrix.mul_apply, colM, ite_mul]
 
-private theorem mul_rowM (p : Fin n) (b : Fin n → k) (M : Matrix (Fin n) (Fin n) k) (i j : Fin n) :
-    (M * rowM p b) i j = M i p * b j := by
+private theorem mul_rowM (p : Fin n) (b : Fin n → k) (M : Matrix (Fin n) (Fin n) k) (i j : Fin n)
+    : (M * rowM p b) i j = M i p * b j := by
   simp [Matrix.mul_apply, rowM, mul_ite]
 
 private theorem colM_sq {p : Fin n} {a : Fin n → k} (h : a p = 0) : colM p a * colM p a = 0 := by
@@ -46,23 +49,29 @@ private def nilU (A : Matrix (Fin n) (Fin n) k) (h : A * A = 0) : GL (Fin n) k w
   val_inv := by simp [add_mul, mul_sub, h]
   inv_val := by simp [sub_mul, mul_add, h]
 
-private theorem mem_low {g : GL (Fin n) k} :
-    g ∈ unipBLower k (Fin n) ↔ (∀ i j, i < j → (g : Matrix (Fin n) (Fin n) k) i j = 0) ∧
-      ∀ i, (g : Matrix (Fin n) (Fin n) k) i i = 1 := by
-  refine (mem_unipRad (e := opp (points (Fin n)))).trans (and_congr Iff.rfl ⟨fun h i => ?_, fun h i _ _ => ?_⟩)
+private theorem mem_low {g : GL (Fin n) k}
+    : g ∈ unipBLower k (Fin n)
+      ↔ (∀ i j, i < j → (g : Matrix (Fin n) (Fin n) k) i j = 0)
+        ∧ ∀ i, (g : Matrix (Fin n) (Fin n) k) i i = 1 := by
+  refine (mem_unipRad (e := opp (points (Fin n)))).trans
+    (and_congr Iff.rfl ⟨fun h i => ?_, fun h i _ _ => ?_⟩)
   · exact (h i () ()).trans (by simp)
   · exact (h i).trans (by simp)
 
-private theorem conj_entry (t : Fin n → kˣ) (u : GL (Fin n) k) (i j : Fin n) :
-    ((diagT k (Fin n) t * u * (diagT k (Fin n) t)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j =
-      (t i : k) * (u : Matrix (Fin n) (Fin n) k) i j * (t j : k)⁻¹ := by
-  rw [← map_inv, Units.val_mul, Units.val_mul, val_diagT, val_diagT, Matrix.mul_diagonal, Matrix.diagonal_mul]
+private theorem conj_entry (t : Fin n → kˣ) (u : GL (Fin n) k) (i j : Fin n)
+    : ((diagT k (Fin n) t * u * (diagT k (Fin n) t)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i
+        j
+      = (t i : k) * (u : Matrix (Fin n) (Fin n) k) i j * (t j : k)⁻¹ := by
+  rw [← map_inv, Units.val_mul, Units.val_mul, val_diagT, val_diagT, Matrix.mul_diagonal,
+    Matrix.diagonal_mul]
   simp
 
-private theorem conj_entry' (t : Fin n → kˣ) (u : GL (Fin n) k) (i j : Fin n) :
-    (((diagT k (Fin n) t)⁻¹ * u * diagT k (Fin n) t : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j =
-      (t j : k) * (u : Matrix (Fin n) (Fin n) k) i j * (t i : k)⁻¹ := by
-  rw [← map_inv, Units.val_mul, Units.val_mul, val_diagT, val_diagT, Matrix.mul_diagonal, Matrix.diagonal_mul]
+private theorem conj_entry' (t : Fin n → kˣ) (u : GL (Fin n) k) (i j : Fin n)
+    : (((diagT k (Fin n) t)⁻¹ * u * diagT k (Fin n) t : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i
+        j
+      = (t j : k) * (u : Matrix (Fin n) (Fin n) k) i j * (t i : k)⁻¹ := by
+  rw [← map_inv, Units.val_mul, Units.val_mul, val_diagT, val_diagT, Matrix.mul_diagonal,
+    Matrix.diagonal_mul]
   simp
   ring
 
@@ -72,14 +81,15 @@ section Val
 
 variable {k : Type} [Field k] [ValuativeRel k]
 
-private theorem val_one_of {r : ValueGroupWithZero k} (hr : r < 1) {x : k} (h : valuation k (x - 1) ≤ r) :
-    valuation k x = 1 := by
+private theorem val_one_of
+    {r : ValueGroupWithZero k} (hr : r < 1) {x : k} (h : valuation k (x - 1) ≤ r)
+    : valuation k x = 1 := by
   have h1 : valuation k (x - 1) < valuation k (1 : k) := by simpa using h.trans_lt hr
   have e := Valuation.map_add_eq_of_lt_left (valuation k) h1
   simpa using e
 
-private theorem val_le {x z : kˣ} (h : valuation k (x : k) ≤ valuation k (z : k)) (y : k) :
-    valuation k ((x : k) * y * (z : k)⁻¹) ≤ valuation k y := by
+private theorem val_le {x z : kˣ} (h : valuation k (x : k) ≤ valuation k (z : k)) (y : k)
+    : valuation k ((x : k) * y * (z : k)⁻¹) ≤ valuation k y := by
   have hz : 0 < valuation k (z : k) := zero_lt_iff.2 (by simp)
   rw [map_mul, map_mul, map_inv₀, mul_comm (valuation k (x : k)), mul_assoc]
   refine mul_le_of_le_one_right' ?_
@@ -90,14 +100,19 @@ end Val
 
 section Fact
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-private theorem nat_mul_factorial_bound {r : ValueGroupWithZero k} (hr : r < 1) (K : Subgroup (GL (Fin n) k))
-    (hK : (K : Set (GL (Fin n) k)) = ball n r) :
-    ∀ m, m ≤ n → ∀ g ∈ K,
-      (∀ i j : Fin n, i ≠ j → (m ≤ i.1 ∨ m ≤ j.1) → (g : Matrix (Fin n) (Fin n) k) i j = 0) →
-      ∃ u ∈ K ⊓ unipB k (Fin n), ∃ d, diagT k (Fin n) d ∈ K ∧ ∃ c ∈ K ⊓ unipBLower k (Fin n),
-        g = u * diagT k (Fin n) d * c := by
+private theorem nat_mul_factorial_bound
+    {r : ValueGroupWithZero k} (hr : r < 1)
+    (K : Subgroup (GL (Fin n) k)) (hK : (K : Set (GL (Fin n) k)) = ball n r)
+    : ∀ m,
+      m ≤ n
+        → ∀ g ∈ K,
+          (∀ i j : Fin n, i ≠ j → (m ≤ i.1 ∨ m ≤ j.1) → (g : Matrix (Fin n) (Fin n) k) i j = 0)
+            → ∃ u ∈ K ⊓ unipB k (Fin n), ∃ d,
+              diagT k (Fin n) d ∈ K
+                ∧ ∃ c ∈ K ⊓ unipBLower k (Fin n), g = u * diagT k (Fin n) d * c := by
   have hmem : ∀ g, g ∈ K ↔ g ∈ ball n r := fun g => by rw [← SetLike.mem_coe, hK]
   have hd1 : ∀ g ∈ K, ∀ i, valuation k ((g : Matrix (Fin n) (Fin n) k) i i) = 1 := fun g hg i =>
     val_one_of hr (by simpa using (hmem g).1 hg i i)
@@ -121,12 +136,17 @@ private theorem nat_mul_factorial_bound {r : ValueGroupWithZero k} (hr : r < 1) 
   | succ m ih =>
     intro hm g hg hc
     let p : Fin n := ⟨m, hm⟩
-    have hgr : ∀ i j, valuation k ((g : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) ≤ r :=
+    have hgr
+        : ∀ i j,
+          valuation k ((g : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j)
+            ≤ r :=
       (hmem g).1 hg
     have hpp : valuation k ((g : Matrix (Fin n) (Fin n) k) p p) = 1 := hd1 g hg p
     have hp0 : (g : Matrix (Fin n) (Fin n) k) p p ≠ 0 := fun h => by simp [h] at hpp
-    let a : Fin n → k := fun i => if i < p then (g : Matrix (Fin n) (Fin n) k) i p / (g : Matrix (Fin n) (Fin n) k) p p else 0
-    let b : Fin n → k := fun j => if j < p then (g : Matrix (Fin n) (Fin n) k) p j / (g : Matrix (Fin n) (Fin n) k) p p else 0
+    let a : Fin n → k := fun i =>
+      if i < p then (g : Matrix (Fin n) (Fin n) k) i p / (g : Matrix (Fin n) (Fin n) k) p p else 0
+    let b : Fin n → k := fun j =>
+      if j < p then (g : Matrix (Fin n) (Fin n) k) p j / (g : Matrix (Fin n) (Fin n) k) p p else 0
     have ap : a p = 0 := by simp [a]
     have bp : b p = 0 := by simp [b]
     have ha : ∀ i, valuation k (a i) ≤ r := fun i => by
@@ -187,15 +207,22 @@ private theorem nat_mul_factorial_bound {r : ValueGroupWithZero k} (hr : r < 1) 
         · subst h
           simp [bp]
         · simp
-    have hH : ∀ i j, (((U⁻¹ * g : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j =
-        (g : Matrix (Fin n) (Fin n) k) i j - a i * (g : Matrix (Fin n) (Fin n) k) p j := fun i j => by
+    have hH
+        : ∀ i j,
+          (((U⁻¹ * g : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j
+            = (g : Matrix (Fin n) (Fin n) k) i j
+              - a i * (g : Matrix (Fin n) (Fin n) k) p j := fun i j => by
       rw [Units.val_mul, hUi, sub_mul, one_mul, Matrix.sub_apply, colM_mul]
-    have hE : ∀ i j, (((U⁻¹ * g * L⁻¹ : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j =
-        (((U⁻¹ * g : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j -
-          (((U⁻¹ * g : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i p * b j := fun i j => by
+    have hE
+        : ∀ i j,
+          (((U⁻¹ * g * L⁻¹ : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j
+            = (((U⁻¹ * g : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j
+              - (((U⁻¹ * g : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i p * b j := fun i j => by
       rw [Units.val_mul _ (L⁻¹), hLi, mul_sub, mul_one, Matrix.sub_apply, mul_rowM]
-    have hclean : ∀ i j : Fin n, i ≠ j → (m ≤ i.1 ∨ m ≤ j.1) →
-        (((U⁻¹ * g * L⁻¹ : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j = 0 := by
+    have hclean
+        : ∀ i j : Fin n,
+          i ≠ j → (m ≤ i.1 ∨ m ≤ j.1)
+            → (((U⁻¹ * g * L⁻¹ : GL (Fin n) k)) : Matrix (Fin n) (Fin n) k) i j = 0 := by
       intro i j hij hor
       rw [hE, hH, hH]
       by_cases hi : m + 1 ≤ i.1
@@ -222,38 +249,54 @@ private theorem nat_mul_factorial_bound {r : ValueGroupWithZero k} (hr : r < 1) 
       · have hi' : i = p := Fin.ext (by simp only [p]; omega)
         subst hi'
         have hjp : j < p := lt_of_le_of_ne (Fin.le_def.2 (by simp only [p]; omega)) (Ne.symm hij)
-        have e : (g : Matrix (Fin n) (Fin n) k) p p * ((g : Matrix (Fin n) (Fin n) k) p j / (g : Matrix (Fin n) (Fin n) k) p p) =
-            (g : Matrix (Fin n) (Fin n) k) p j := by field_simp
+        have e
+            : (g : Matrix (Fin n) (Fin n) k) p p
+                * ((g : Matrix (Fin n) (Fin n) k) p j / (g : Matrix (Fin n) (Fin n) k) p p)
+              = (g : Matrix (Fin n) (Fin n) k) p j := by
+          field_simp
         simp only [ap, zero_mul, sub_zero, b, if_pos hjp, e, sub_self]
       · have hj' : j = p := Fin.ext (by simp only [p]; omega)
         subst hj'
         have hip : i < p := lt_of_le_of_ne (Fin.le_def.2 (by simp only [p]; omega)) hij
-        have e : (g : Matrix (Fin n) (Fin n) k) i p / (g : Matrix (Fin n) (Fin n) k) p p * (g : Matrix (Fin n) (Fin n) k) p p =
-            (g : Matrix (Fin n) (Fin n) k) i p := by field_simp
+        have e
+            : (g : Matrix (Fin n) (Fin n) k) i p / (g : Matrix (Fin n) (Fin n) k) p p
+                * (g : Matrix (Fin n) (Fin n) k) p p
+              = (g : Matrix (Fin n) (Fin n) k) i p := by
+          field_simp
         simp only [bp, mul_zero, sub_zero, a, if_pos hip, e, sub_self]
-    obtain ⟨u, hu, d, hd, c, hc', e⟩ := ih (by omega) (U⁻¹ * g * L⁻¹)
-      (K.mul_mem (K.mul_mem (K.inv_mem hU.1) hg) (K.inv_mem hL.1)) hclean
-    refine ⟨U * u, (K ⊓ unipB k (Fin n)).mul_mem hU hu, d, hd, c * L,
-      (K ⊓ unipBLower k (Fin n)).mul_mem hc' hL, ?_⟩
-    calc g = U * (U⁻¹ * g * L⁻¹) * L := by group
+    obtain ⟨u, hu, d, hd, c, hc', e⟩ :=
+      ih (by omega) (U⁻¹ * g * L⁻¹) (K.mul_mem (K.mul_mem (K.inv_mem hU.1) hg) (K.inv_mem hL.1))
+        hclean
+    refine ⟨
+      U * u,
+      (K ⊓ unipB k (Fin n)).mul_mem hU hu,
+      d,
+      hd,
+      c * L,
+      (K ⊓ unipBLower k (Fin n)).mul_mem hc' hL,
+      ?_
+    ⟩
+    calc
+      g = U * (U⁻¹ * g * L⁻¹) * L := by group
       _ = U * u * diagT k (Fin n) d * (c * L) := by rw [e]; group
 
 end Fact
 
 end UpperTheory.Gal.InertialTypesAlt.L
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.ballLev :
-    UpperTheory.Gal.InertialTypesAlt.L.BallLev := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.ballLev
+    : UpperTheory.Gal.InertialTypesAlt.L.BallLev := by
   intro k _ _ _ _ n r h0 h1 K hK
   have hmem : ∀ g, g ∈ K ↔ g ∈ ball n r := fun g => by rw [← SetLike.mem_coe, hK]
   obtain ⟨K₀, e₀, ho, hc⟩ := UpperTheory.ConvolutionTheory.Loc.ballSub k n r h0 h1
   have eK : (K : Set (GL (Fin n) k)) = K₀ := hK.trans e₀.symm
   refine ⟨⟨⟨eK ▸ hc, eK ▸ ho⟩, ?_, ?_, ?_⟩, fun t => ?_⟩
   · intro g hg
-    exact UpperTheory.Gal.InertialTypesAlt.L.nat_mul_factorial_bound h1 K hK n le_rfl g hg fun i j _ h => by
-      have := i.2
-      have := j.2
-      omega
+    exact UpperTheory.Gal.InertialTypesAlt.L.nat_mul_factorial_bound h1 K hK n le_rfl g hg
+      fun i j _ h => by
+        have := i.2
+        have := j.2
+        omega
   · intro t ht u hu
     obtain ⟨hu1, hu2⟩ := (mem_unipB k).1 hu.2
     have hur := (hmem u).1 hu.1

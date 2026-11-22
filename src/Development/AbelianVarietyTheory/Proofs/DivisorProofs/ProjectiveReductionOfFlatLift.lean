@@ -18,11 +18,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory.FlatLift
 
-theorem projective_of_nilpotent_of_reduced_quotient (D : Type) [CommRing D] [IsArtinianRing D] (x : D) (hx : IsNilpotent x)
-    (hr : IsReduced (D ⧸ Ideal.span {x})) (N : Type 1) [AddCommGroup N] [Module D N]
-    [Module.Finite D N]
-    (h : ∀ n : N, x • n = 0 → n ∈ Ideal.span {a : D | x * a = 0} • (⊤ : Submodule D N)) :
-    Module.Projective D N := by
+theorem projective_of_nilpotent_of_reduced_quotient
+    (D : Type) [CommRing D] [IsArtinianRing D]
+    (x : D) (hx : IsNilpotent x) (hr : IsReduced (D ⧸ Ideal.span {x}))
+    (N : Type 1) [AddCommGroup N] [Module D N] [Module.Finite D N]
+    (h : ∀ n : N, x • n = 0 → n ∈ Ideal.span {a : D | x * a = 0} • (⊤ : Submodule D N))
+    : Module.Projective D N := by
   have hflat : Module.Flat D N := by
     apply Module.flat_of_localized_maximal
     intro P _
@@ -34,7 +35,19 @@ theorem projective_of_nilpotent_of_reduced_quotient (D : Type) [CommRing D] [IsA
   haveI : Module.FinitePresentation D N := Module.finitePresentation_of_finite D N
   exact Module.Flat.projective_of_finitePresentation
 
-theorem projective_reduction_of_flat_lift : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (Λ : Type) [CommRing Λ] (k : Type) [Field k] (π : Λ →+* k), Function.Surjective π → RingHom.ker π = Ideal.span {(p : Λ)} → (p : Λ) ^ 2 = 0 → (∀ x : Λ, (p : Λ) * x = 0 → x ∈ Ideal.span {(p : Λ)}) → ∀ (M : Type 1) [AddCommGroup M] [Module Λ M] [Module (Λ ⊗[ℤ] 𝓞 F) M] [IsScalarTower Λ (Λ ⊗[ℤ] 𝓞 F) M], Module.Finite Λ M → Module.Free Λ M → ∀ (N : Type 1) [AddCommGroup N] [Module (k ⊗[ℤ] 𝓞 F) N] (f : M →ₛₗ[(Algebra.TensorProduct.map π.toIntAlgHom (AlgHom.id ℤ (𝓞 F))).toRingHom] N), Function.Surjective f → (∀ m, f m = 0 → m ∈ (RingHom.ker π) • (⊤ : Submodule Λ M)) → Module.Projective (k ⊗[ℤ] 𝓞 F) N := by
+theorem projective_reduction_of_flat_lift
+    : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (Λ : Type) [CommRing Λ]
+        (k : Type) [Field k] (π : Λ →+* k),
+      Function.Surjective π → RingHom.ker π = Ideal.span {(p : Λ)} → (p : Λ) ^ 2 = 0
+        → (∀ x : Λ, (p : Λ) * x = 0 → x ∈ Ideal.span {(p : Λ)})
+        → ∀ (M : Type 1) [AddCommGroup M] [Module Λ M] [Module (Λ ⊗[ℤ] 𝓞 F) M]
+            [IsScalarTower Λ (Λ ⊗[ℤ] 𝓞 F) M],
+          Module.Finite Λ M → Module.Free Λ M
+            → ∀ (N : Type 1) [AddCommGroup N] [Module (k ⊗[ℤ] 𝓞 F) N]
+                (f
+                  : M →ₛₗ[(Algebra.TensorProduct.map π.toIntAlgHom (AlgHom.id ℤ (𝓞 F))).toRingHom] N),
+              Function.Surjective f → (∀ m, f m = 0 → m ∈ (RingHom.ker π) • (⊤ : Submodule Λ M))
+                → Module.Projective (k ⊗[ℤ] 𝓞 F) N := by
   intro p _ F _ _ Λ _ k _ π hπ hker hp2 hann M _ _ _ _ hfin hfree N _ _ f hf hkerf
   have hpk : (p : k) = 0 := by
     have : (p : Λ) ∈ RingHom.ker π := by rw [hker]; exact Ideal.subset_span rfl
@@ -55,10 +68,15 @@ theorem projective_reduction_of_flat_lift : ∀ (p : ℕ) [Fact p.Prime] (F : Ty
     have hne : Ideal.span {(p : 𝓞 F)} ≠ ⊥ := by
       simp [Ideal.span_singleton_eq_bot, (Fact.out : p.Prime).ne_zero]
     haveI : Finite (𝓞 F ⧸ Ideal.span {(p : 𝓞 F)}) := Ideal.finiteQuotientOfFreeOfNeBot _ hne
-    exact Finite.of_surjective _ (Ideal.Quotient.factor_surjective
-      (Ideal.span_mono (by simp : ({(p : 𝓞 F)} : Set (𝓞 F)) ⊆ {(p : 𝓞 F), ϖ})))
-  have hredD := GlobalTheory.T.isReduced_quot_tensor_of_reduced_mod_p (𝓞 F) k p ϖ hpk (GlobalTheory.T.isReduced_field_tensor_int_finite_reduced _ k)
-  have hannN := GlobalTheory.T.annihilator_lift_of_mul_eq_p_alt p (𝓞 F) Λ k π hpk hp2 M hkerp N f hf hkerf' ϖ z hϖz
+    exact Finite.of_surjective _
+      (Ideal.Quotient.factor_surjective (Ideal.span_mono
+        (by simp : ({(p : 𝓞 F)} : Set (𝓞 F)) ⊆ {(p : 𝓞 F), ϖ})))
+  have hredD :=
+    GlobalTheory.T.isReduced_quot_tensor_of_reduced_mod_p (𝓞 F) k p ϖ hpk
+      (GlobalTheory.T.isReduced_field_tensor_int_finite_reduced _ k)
+  have hannN :=
+    GlobalTheory.T.annihilator_lift_of_mul_eq_p_alt p (𝓞 F) Λ k π hpk hp2 M hkerp N f hf hkerf' ϖ z
+      hϖz
   exact projective_of_nilpotent_of_reduced_quotient _ _ hnil hredD N hannN
 
 end GlobalTheory.FlatLift

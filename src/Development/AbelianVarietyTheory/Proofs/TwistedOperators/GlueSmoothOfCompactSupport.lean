@@ -13,12 +13,13 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem glue_smooth_of_compactSupport : ∀ (H : Type) [TopologicalSpace H] (X : Type) [NormedAddCommGroup X]
-    [NormedSpace ℝ X] [FiniteDimensional ℝ X] (c : H → X) (f : H → ℂ), Continuous c →
-    HasCompactSupport f →
-    (∀ a, ∃ V : Set X, IsOpen V ∧ c a ∈ V ∧ ∃ Φ : X → ℂ, ContDiffOn ℝ ∞ Φ V ∧
-      ∀ g, c g ∈ V → f g = Φ (c g)) →
-    ∃ Φ : X → ℂ, ContDiff ℝ ∞ Φ ∧ ∀ g, f g = Φ (c g) := by
+theorem glue_smooth_of_compactSupport
+    : ∀ (H : Type) [TopologicalSpace H] (X : Type) [NormedAddCommGroup X] [NormedSpace ℝ X]
+        [FiniteDimensional ℝ X] (c : H → X) (f : H → ℂ),
+      Continuous c → HasCompactSupport f
+        → (∀ a, ∃ V : Set X,
+          IsOpen V ∧ c a ∈ V ∧ ∃ Φ : X → ℂ, ContDiffOn ℝ ∞ Φ V ∧ ∀ g, c g ∈ V → f g = Φ (c g))
+        → ∃ Φ : X → ℂ, ContDiff ℝ ∞ Φ ∧ ∀ g, f g = Φ (c g) := by
   intro H _ X _ _ _ c f hc hf hloc
   choose V hVo hcV Φ hΦ hfΦ using hloc
   have hs : IsClosed (c '' tsupport f) := (hf.isCompact.image hc).isClosed

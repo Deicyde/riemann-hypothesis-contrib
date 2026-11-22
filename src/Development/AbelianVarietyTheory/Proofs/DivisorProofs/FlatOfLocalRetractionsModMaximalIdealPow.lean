@@ -13,25 +13,25 @@ section
 
 variable {A B : Type*} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B]
 
-theorem isLocalHom_mk_maximalIdeal_pow_succ (n : ℕ) :
-    IsLocalHom (Ideal.Quotient.mk (maximalIdeal A ^ (n + 1))) := by
+theorem isLocalHom_mk_maximalIdeal_pow_succ (n : ℕ)
+    : IsLocalHom (Ideal.Quotient.mk (maximalIdeal A ^ (n + 1))) := by
   refine ⟨fun a ha => ?_⟩
   by_contra hu
   obtain ⟨c, hc⟩ := ha.exists_right_inv
   obtain ⟨c, rfl⟩ := Ideal.Quotient.mk_surjective c
-  rw [← map_mul, ← map_one (Ideal.Quotient.mk (maximalIdeal A ^ (n + 1))),
-    Ideal.Quotient.eq] at hc
+  rw [← map_mul, ← map_one (Ideal.Quotient.mk (maximalIdeal A ^ (n + 1))), Ideal.Quotient.eq] at hc
   have h1 : a * c - 1 ∈ maximalIdeal A := Ideal.pow_le_self n.succ_ne_zero hc
   have h2 : a * c ∈ maximalIdeal A := Ideal.mul_mem_right _ _ hu
   have h3 : (1 : A) ∈ maximalIdeal A := by simpa using sub_mem h2 h1
   exact (maximalIdeal.isMaximal A).ne_top ((Ideal.eq_top_iff_one _).mpr h3)
 
-theorem quotientMap_pow_bijective_of_retraction (φ : A →+* B) [IsLocalHom φ] (n : ℕ)
-    (hle : maximalIdeal A ^ (n + 1) ≤ (maximalIdeal B ^ (n + 1)).comap φ)
+theorem quotientMap_pow_bijective_of_retraction
+    (φ : A →+* B) [IsLocalHom φ]
+    (n : ℕ) (hle : maximalIdeal A ^ (n + 1) ≤ (maximalIdeal B ^ (n + 1)).comap φ)
     (ψ : B →+* A ⧸ maximalIdeal A ^ (n + 1)) (hψ : ψ.comp φ = Ideal.Quotient.mk _)
-    (huniq : ∀ g₁ g₂ : B →+* B ⧸ maximalIdeal B ^ (n + 1), IsLocalHom g₁ → IsLocalHom g₂ →
-      g₁.comp φ = g₂.comp φ → g₁ = g₂) :
-    Function.Bijective (Ideal.quotientMap (maximalIdeal B ^ (n + 1)) φ hle) := by
+    (huniq : ∀ g₁ g₂ : B →+* B ⧸ maximalIdeal B ^ (n + 1),
+      IsLocalHom g₁ → IsLocalHom g₂ → g₁.comp φ = g₂.comp φ → g₁ = g₂)
+    : Function.Bijective (Ideal.quotientMap (maximalIdeal B ^ (n + 1)) φ hle) := by
   haveI hA := isLocalHom_mk_maximalIdeal_pow_succ (A := A) n
   haveI hB := isLocalHom_mk_maximalIdeal_pow_succ (A := B) n
   have hψφ : ∀ a, ψ (φ a) = Ideal.Quotient.mk _ a := fun a => RingHom.congr_fun hψ a
@@ -47,15 +47,18 @@ theorem quotientMap_pow_bijective_of_retraction (φ : A →+* B) [IsLocalHom φ]
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [Ideal.quotientMap_mk] at hx
     exact (IsUnit.of_map φ _ (IsUnit.of_map (Ideal.Quotient.mk _) _ hx)).map _
-  have key := huniq (Ideal.Quotient.mk _)
-    ((Ideal.quotientMap (maximalIdeal B ^ (n + 1)) φ hle).comp ψ) hB inferInstance (by
-      ext a
-      simp [hψφ])
+  have key :=
+    huniq (Ideal.Quotient.mk _) ((Ideal.quotientMap (maximalIdeal B ^ (n + 1)) φ hle).comp ψ) hB
+      inferInstance
+      (by
+        ext a
+        simp [hψφ])
   refine ⟨(injective_iff_map_eq_zero _).mpr fun x hx => ?_, fun y => ?_⟩
   · obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [Ideal.quotientMap_mk, Ideal.Quotient.eq_zero_iff_mem] at hx
-    have h1 : maximalIdeal B ≤ ((maximalIdeal A).map
-        (Ideal.Quotient.mk (maximalIdeal A ^ (n + 1)))).comap ψ := by
+    have h1
+        : maximalIdeal B
+          ≤ ((maximalIdeal A).map (Ideal.Quotient.mk (maximalIdeal A ^ (n + 1)))).comap ψ := by
       intro b hb
       obtain ⟨c, hc⟩ := Ideal.Quotient.mk_surjective (ψ b)
       rw [Ideal.mem_comap, ← hc]
@@ -68,14 +71,19 @@ theorem quotientMap_pow_bijective_of_retraction (φ : A →+* B) [IsLocalHom φ]
 
 end
 
-theorem flat_of_retractions_mod_pow {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A]
-    [IsLocalRing B] [IsNoetherianRing A] [IsNoetherianRing B] (φ : A →+* B) [IsLocalHom φ]
+theorem flat_of_retractions_mod_pow
+    {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B] [IsNoetherianRing A]
+    [IsNoetherianRing B]
+    (φ : A →+* B) [IsLocalHom φ]
     (hex : ∀ n : ℕ, ∃ ψ : B →+* A ⧸ maximalIdeal A ^ (n + 1), ψ.comp φ = Ideal.Quotient.mk _)
-    (huniq : ∀ n : ℕ, ∀ g₁ g₂ : B →+* B ⧸ maximalIdeal B ^ (n + 1), IsLocalHom g₁ →
-      IsLocalHom g₂ → g₁.comp φ = g₂.comp φ → g₁ = g₂) : φ.Flat := by
+    (huniq : ∀ n : ℕ, ∀ g₁ g₂ : B →+* B ⧸ maximalIdeal B ^ (n + 1),
+      IsLocalHom g₁ → IsLocalHom g₂ → g₁.comp φ = g₂.comp φ → g₁ = g₂)
+    : φ.Flat := by
   have hle : maximalIdeal A ≤ (maximalIdeal B).comap φ := fun a ha => map_nonunit φ a ha
-  have hbij : ∀ n : ℕ, Function.Bijective
-      (Ideal.quotientMap (maximalIdeal B ^ n) φ (pow_le_comap_pow_of_le hle n)) := by
+  have hbij
+      : ∀ n : ℕ,
+        Function.Bijective (Ideal.quotientMap (maximalIdeal B ^ n) φ
+          (pow_le_comap_pow_of_le hle n)) := by
     intro n
     cases n with
     | zero =>
@@ -94,8 +102,7 @@ theorem flat_of_retractions_mod_pow {A B : Type} [CommRing A] [CommRing B] [IsLo
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
   rw [Ideal.quotientMap_mk, Ideal.Quotient.eq] at hx
   have hxm : x ∈ maximalIdeal A := by
-    have : φ x ∈ maximalIdeal B := by
-      simpa using add_mem (Ideal.pow_le_self two_ne_zero hx) hy
+    have : φ x ∈ maximalIdeal B := by simpa using add_mem (Ideal.pow_le_self two_ne_zero hx) hy
     exact fun hu => this (hu.map φ)
   rw [show y = φ x - (φ x - y) by ring]
   refine sub_mem (Submodule.mem_sup_left (Ideal.mem_map_of_mem _ hxm)) (Submodule.mem_sup_right ?_)

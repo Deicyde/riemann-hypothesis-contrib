@@ -20,15 +20,20 @@ theorem countable_latS : Countable (latS L N) := by
   haveI : Countable (Matrix.SpecialLinearGroup (Fin N) (𝓞 L)) := by
     unfold Matrix.SpecialLinearGroup; infer_instance
   unfold latS
-  exact (MonoidHom.pi fun w => Matrix.SpecialLinearGroup.map (embO (L := L) w)).rangeRestrict_surjective.countable
+  exact (MonoidHom.pi fun w =>
+    Matrix.SpecialLinearGroup.map (embO (L := L) w)).rangeRestrict_surjective.countable
 
-theorem mean_shift (d : Dom L N) {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : Sp L N → E)
-    (hf : ∀ (g : latS L N) (x : Sp L N), f ((g : Sp L N) * x) = f x) (s : Sp L N) :
-    ∫ y in d.D, f (y * s) ∂d.μ = ∫ y in d.D, f y ∂d.μ := by
+theorem mean_shift
+    (d : Dom L N)
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (f : Sp L N → E) (hf : ∀ (g : latS L N) (x : Sp L N), f ((g : Sp L N) * x) = f x)
+    (s : Sp L N)
+    : ∫ y in d.D, f (y * s) ∂d.μ = ∫ y in d.D, f y ∂d.μ := by
   haveI := d.haar
   haveI := d.right
   haveI : Countable (latS L N) := countable_latS
-  have hmp : MeasurePreserving (fun y : Sp L N => y * s) d.μ d.μ := measurePreserving_mul_right d.μ s
+  have hmp : MeasurePreserving (fun y : Sp L N => y * s) d.μ d.μ :=
+    measurePreserving_mul_right d.μ s
   have hemb : MeasurableEmbedding (fun y : Sp L N => y * s) := measurableEmbedding_mulRight s
   have hD' : IsFundamentalDomain (latS L N) ((fun y : Sp L N => y * s) ⁻¹' d.D) d.μ :=
     d.fund.preimage_of_equiv hmp.quasiMeasurePreserving Function.bijective_id
@@ -38,25 +43,24 @@ theorem mean_shift (d : Dom L N) {E : Type} [NormedAddCommGroup E] [NormedSpace 
   intro g x
   simp [Subgroup.smul_def, mul_assoc, hf]
 
-private theorem fr_eq_of_actL_eq {q : ℕ} (ω : Form (HS L N) q) {x y : Gp L N}
-    (h : actL x = actL y) : fr ω x = fr ω y := by
+private theorem fr_eq_of_actL_eq {q : ℕ} (ω : Form (HS L N) q) {x y : Gp L N} (h : actL x = actL y)
+    : fr ω x = fr ω y := by
   unfold fr; rw [h]
 
-private theorem fr_mul_eq_comp_actL_of_fixes_one {q : ℕ} (ω : Form (HS L N) q) (x u : Gp L N)
-    (hu : actL u (one L N).1 = (one L N).1) :
-    fr ω (x * u) = (fr ω x).compContinuousLinearMap (actL u) := by
-  have hc : actL (x * u) = (actL x).comp (actL u) := by
-    ext h; simp [actL_mul]
+private theorem fr_mul_eq_comp_actL_of_fixes_one
+    {q : ℕ} (ω : Form (HS L N) q) (x u : Gp L N) (hu : actL u (one L N).1 = (one L N).1)
+    : fr ω (x * u) = (fr ω x).compContinuousLinearMap (actL u) := by
+  have hc : actL (x * u) = (actL x).comp (actL u) := by ext h; simp [actL_mul]
   unfold fr
   rw [hc, ContinuousLinearMap.comp_apply, hu]
   ext v
   simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, ContinuousLinearMap.coe_comp']
   rfl
 
-private theorem fr_emb_mul_eq_of_fInv {q : ℕ} (ω : Form (HS L N) q) (hγ : ∀ γ, FInv ω (emb L N γ))
-    (γ : Gm L N) (x : Gp L N) : fr ω (emb L N γ * x) = fr ω x := by
-  have hc : actL (emb L N γ * x) = (actL (emb L N γ)).comp (actL x) := by
-    ext h; simp [actL_mul]
+private theorem fr_emb_mul_eq_of_fInv
+    {q : ℕ} (ω : Form (HS L N) q) (hγ : ∀ γ, FInv ω (emb L N γ)) (γ : Gm L N) (x : Gp L N)
+    : fr ω (emb L N γ * x) = fr ω x := by
+  have hc : actL (emb L N γ * x) = (actL (emb L N γ)).comp (actL x) := by ext h; simp [actL_mul]
   have hp : actL x (one L N).1 ∈ Pos L N := actL_pos x (one L N).2
   unfold fr
   rw [hc, ContinuousLinearMap.comp_apply, ← hγ γ _ hp]
@@ -64,8 +68,8 @@ private theorem fr_emb_mul_eq_of_fInv {q : ℕ} (ω : Form (HS L N) q) (hγ : �
   simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, ContinuousLinearMap.coe_comp']
   rfl
 
-private theorem exists_emb_eq_ofS_of_mem_latS (g : Sp L N) (hg : g ∈ latS L N) :
-    ∃ γ : Gm L N, ofS L N g = emb L N γ := by
+private theorem exists_emb_eq_ofS_of_mem_latS (g : Sp L N) (hg : g ∈ latS L N)
+    : ∃ γ : Gm L N, ofS L N g = emb L N γ := by
   obtain ⟨A, rfl⟩ := hg
   refine ⟨Matrix.SpecialLinearGroup.toGL A, ?_⟩
   funext w
@@ -73,10 +77,10 @@ private theorem exists_emb_eq_ofS_of_mem_latS (g : Sp L N) (hg : g ∈ latS L N)
   ext i j
   rfl
 
-private theorem exists_ofS_actL_eq_of_fixes_one (hN : 1 ≤ N) (u : Gp L N) (hu : actL u (one L N).1 = (one L N).1) :
-    ∃ k : Sp L N, actL u = actL (ofS L N k) := by
-  have hone : ∀ w, mat ((one L N) : HS L N) w = 1 := by
-    intro w; unfold one; simp [mat_mkHS]
+private theorem exists_ofS_actL_eq_of_fixes_one
+    (hN : 1 ≤ N) (u : Gp L N) (hu : actL u (one L N).1 = (one L N).1)
+    : ∃ k : Sp L N, actL u = actL (ofS L N k) := by
+  have hone : ∀ w, mat ((one L N) : HS L N) w = 1 := by intro w; unfold one; simp [mat_mkHS]
   have hN0 : N ≠ 0 := by omega
   have hV : ∀ w, ((u w)⁻¹).valᴴ * ((u w)⁻¹).val = 1 := by
     intro w
@@ -88,8 +92,7 @@ private theorem exists_ofS_actL_eq_of_fixes_one (hN : 1 ≤ N) (u : Gp L N) (hu 
     have h1 := congrArg Matrix.det (hV w)
     rw [Matrix.det_mul, Matrix.det_conjTranspose, Matrix.det_one] at h1
     have h2 : ‖((u w)⁻¹).val.det‖ = 1 := by
-      have h3 : ((‖((u w)⁻¹).val.det‖ : ℂ)) ^ 2 = 1 := by
-        rw [← Complex.conj_mul']; simpa using h1
+      have h3 : ((‖((u w)⁻¹).val.det‖ : ℂ)) ^ 2 = 1 := by rw [← Complex.conj_mul']; simpa using h1
       have h4 : ‖((u w)⁻¹).val.det‖ ^ 2 = 1 := by exact_mod_cast h3
       exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).mp h4
     have h5 := congrArg Matrix.det (Units.mul_inv (u w))
@@ -106,8 +109,10 @@ private theorem exists_ofS_actL_eq_of_fixes_one (hN : 1 ≤ N) (u : Gp L N) (hu 
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hN0).mp h1
   have hc0 : ∀ w, c w ≠ 0 := fun w h => by simpa [h] using hcn w
   have hU0 : ∀ w, (u w).val.det ≠ 0 := fun w h => by simpa [h] using hdet w
-  let k : Sp L N := fun w => ⟨(c w)⁻¹ • (u w).val, by
-    rw [Matrix.det_smul, Fintype.card_fin, inv_pow, hcN, inv_mul_cancel₀ (hU0 w)]⟩
+  let k : Sp L N := fun w => ⟨
+    (c w)⁻¹ • (u w).val,
+    by rw [Matrix.det_smul, Fintype.card_fin, inv_pow, hcN, inv_mul_cancel₀ (hU0 w)]
+  ⟩
   refine ⟨k, ?_⟩
   ext h : 1
   apply HS_ext
@@ -125,30 +130,35 @@ private theorem exists_ofS_actL_eq_of_fixes_one (hN : 1 ≤ N) (u : Gp L N) (hu 
   simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul]
   rw [hs, one_smul]
 
-theorem mean_inv (hN : 1 ≤ N) (d : Dom L N) {q : ℕ} (ω : Form (HS L N) q)
-    (hγ : ∀ γ, FInv ω (emb L N γ)) (hs : ∀ s, FInv ω (scal L N s))
-    (hi : IntegrableOn (fun x => fr ω (ofS L N x)) d.D d.μ) {u : Gp L N}
-    (hu : actL u (one L N).1 = (one L N).1) :
-    (∫ y in d.D, fr ω (ofS L N y) ∂d.μ).compContinuousLinearMap (actL u) =
-      ∫ y in d.D, fr ω (ofS L N y) ∂d.μ := by
+theorem mean_inv
+    (hN : 1 ≤ N)
+    (d : Dom L N)
+    {q : ℕ} (ω : Form (HS L N) q) (hγ : ∀ γ, FInv ω (emb L N γ)) (hs : ∀ s, FInv ω (scal L N s))
+    (hi : IntegrableOn (fun x => fr ω (ofS L N x)) d.D d.μ)
+    {u : Gp L N} (hu : actL u (one L N).1 = (one L N).1)
+    : (∫ y in d.D, fr ω (ofS L N y) ∂d.μ).compContinuousLinearMap (actL u)
+      = ∫ y in d.D, fr ω (ofS L N y) ∂d.μ := by
   obtain ⟨k, hk⟩ := exists_ofS_actL_eq_of_fixes_one hN u hu
-  have hinv : ∀ (g : latS L N) (x : Sp L N),
-      fr ω (ofS L N ((g : Sp L N) * x)) = fr ω (ofS L N x) := by
+  have hinv
+      : ∀ (g : latS L N) (x : Sp L N), fr ω (ofS L N ((g : Sp L N) * x)) = fr ω (ofS L N x) := by
     intro g x
     obtain ⟨γ, hγe⟩ := exists_emb_eq_ofS_of_mem_latS (g : Sp L N) g.2
     rw [map_mul, hγe]
     exact fr_emb_mul_eq_of_fInv ω hγ γ _
-  have step : ∀ y : Sp L N, (fr ω (ofS L N y)).compContinuousLinearMap (actL u) =
-      fr ω (ofS L N (y * k)) := by
+  have step
+      : ∀ y : Sp L N,
+        (fr ω (ofS L N y)).compContinuousLinearMap (actL u) = fr ω (ofS L N (y * k)) := by
     intro y
     rw [← fr_mul_eq_comp_actL_of_fixes_one ω _ u hu]
     apply fr_eq_of_actL_eq
     ext h : 1
     simp [map_mul, actL_mul, hk]
   have hcomm := (ContinuousAlternatingMap.compContinuousLinearMapCLM (actL u)).integral_comp_comm hi
-  have happ : ∀ F : HS L N [⋀^Fin q]→L[ℝ] ℝ,
-      ContinuousAlternatingMap.compContinuousLinearMapCLM (actL u) F = F.compContinuousLinearMap (actL u) :=
-    fun F => rfl
+  have happ
+      : ∀ F : HS L N [⋀^Fin q]→L[ℝ] ℝ,
+        ContinuousAlternatingMap.compContinuousLinearMapCLM (actL u) F
+          = F.compContinuousLinearMap (actL u) := fun F =>
+    rfl
   rw [happ] at hcomm
   simp only [happ, step] at hcomm
   rw [← hcomm]
@@ -158,10 +168,10 @@ end PositivityTheory.KB.MeanLatticeAction
 
 namespace PositivityTheory.KB
 
-private theorem exists_actL_one_eq_of_mem_Pos {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N)
-    (hh : h ∈ Pos L N) : ∃ x : Gp L N, actL x (one L N).1 = h := by
-  have hone : ∀ w, mat ((one L N) : HS L N) w = 1 := by
-    intro w; unfold one; simp [mat_mkHS]
+private theorem exists_actL_one_eq_of_mem_Pos
+    {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N) (hh : h ∈ Pos L N)
+    : ∃ x : Gp L N, actL x (one L N).1 = h := by
+  have hone : ∀ w, mat ((one L N) : HS L N) w = 1 := by intro w; unfold one; simp [mat_mkHS]
   have hB : ∀ w, ∃ B : Matrix (Fin N) (Fin N) ℂ, mat h w = Bᴴ * B ∧ IsUnit B.det := by
     intro w
     open scoped ComplexOrder MatrixOrder in
@@ -181,12 +191,13 @@ private theorem exists_actL_one_eq_of_mem_Pos {L : Type} [Field L] [NumberField 
 
 theorem sMean_of : SMean := by
   intro L _ _ N q hN d ω _hc hγ hs hi
-  have hmul : ∀ (a b : Gp L N) (t : HS L N), actL a (actL b t) = actL (a * b) t :=
-    fun a b t => (actL_mul a b t).symm
+  have hmul : ∀ (a b : Gp L N) (t : HS L N), actL a (actL b t) = actL (a * b) t := fun a b t =>
+    (actL_mul a b t).symm
   set I := ∫ y in d.D, fr ω (ofS L N y) ∂d.μ with hI
   set M : HS L N [⋀^Fin q]→L[ℝ] ℝ := (d.μ.real d.D)⁻¹ • I with hM0
-  have hM : ∀ u : Gp L N, actL u (one L N).1 = (one L N).1 →
-      M.compContinuousLinearMap (actL u) = M := by
+  have hM
+      : ∀ u : Gp L N,
+        actL u (one L N).1 = (one L N).1 → M.compContinuousLinearMap (actL u) = M := by
     intro u hu
     have h1 := MeanLatticeAction.mean_inv hN d ω hγ hs hi hu
     ext v
@@ -197,8 +208,10 @@ theorem sMean_of : SMean := by
     rw [hI, h2]
   classical
   let ωb : Form (HS L N) q := fun h =>
-    if hx : ∃ x : Gp L N, actL x (one L N).1 = h then M.compContinuousLinearMap (actL hx.choose⁻¹)
-    else 0
+    if hx : ∃ x : Gp L N, actL x (one L N).1 = h then
+      M.compContinuousLinearMap (actL hx.choose⁻¹)
+    else
+      0
   have hωb : ∀ z : Gp L N, ωb (actL z (one L N).1) = M.compContinuousLinearMap (actL z⁻¹) := by
     intro z
     have hx : ∃ x : Gp L N, actL x (one L N).1 = actL z (one L N).1 := ⟨z, rfl⟩

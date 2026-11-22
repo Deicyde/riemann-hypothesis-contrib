@@ -29,8 +29,9 @@ theorem geX_neg {x : Kc} {g : ℝ} (hx : geX p Oc x g) : geX p Oc (-x) g := by
   have h := geX_mul (Oc.neg_mem Oc.one_mem) hx
   simpa using h
 
-theorem geX_add (hval : ∀ x : Kc, x ∈ Oc ∨ x⁻¹ ∈ Oc) {x y : Kc} {g : ℝ} (hx : geX p Oc x g) (hy : geX p Oc y g) :
-    geX p Oc (x + y) g := by
+theorem geX_add
+    (hval : ∀ x : Kc, x ∈ Oc ∨ x⁻¹ ∈ Oc) {x y : Kc} {g : ℝ} (hx : geX p Oc x g) (hy : geX p Oc y g)
+    : geX p Oc (x + y) g := by
   intro a b hb hab
   rcases eq_or_ne y 0 with rfl | hy0
   · simpa using hx a b hb hab
@@ -46,7 +47,6 @@ theorem geX_add (hval : ∀ x : Kc, x ∈ Oc ∨ x⁻¹ ∈ Oc) {x y : Kc} {g : 
       rw [← mul_assoc, ← mul_pow, add_mul, one_mul, div_mul_cancel₀ y hx0]
     rw [e]
     exact Oc.mul_mem (Oc.pow_mem (Oc.add_mem Oc.one_mem h) b) (hx a b hb hab)
-
 
 variable (p Oc) in
 def MG (hval : ∀ x : Kc, x ∈ Oc ∨ x⁻¹ ∈ Oc) (g : ℝ) : AddSubgroup Kc where

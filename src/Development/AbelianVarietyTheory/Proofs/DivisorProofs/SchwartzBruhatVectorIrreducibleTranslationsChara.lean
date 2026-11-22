@@ -31,24 +31,25 @@ def toCircle (ψ0 : AddChar k ℂ) (h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1) : AddChar
   map_zero_eq_one' := Circle.ext (by simp)
   map_add_eq_mul' a b := Circle.ext (AddChar.map_add_eq_mul ψ0 a b)
 
-theorem coe_toCircle (ψ0 : AddChar k ℂ) (h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1) (x : k) :
-    ((toCircle ψ0 h1 x : Circle) : ℂ) = ψ0 x := rfl
+theorem coe_toCircle (ψ0 : AddChar k ℂ) (h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1) (x : k)
+    : ((toCircle ψ0 h1 x : Circle) : ℂ) = ψ0 x :=
+  rfl
 
-theorem continuous_toCircle (ψ0 : AddChar k ℂ) (h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1) (hψ : Continuous ψ0) :
-    Continuous (toCircle ψ0 h1) :=
+theorem continuous_toCircle (ψ0 : AddChar k ℂ) (h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1) (hψ : Continuous ψ0)
+    : Continuous (toCircle ψ0 h1) :=
   hψ.subtype_mk _
 
-theorem sb_irreducible_vec : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
-    {κ : Type} [Fintype κ] (ψ0 : AddChar k ℂ), Continuous ψ0 →
-    (∀ x : k, (∀ y ∈ 𝒪[k], ψ0 (x * y) = 1) ↔ x ∈ 𝒪[k]) →
-    ∀ W : Submodule ℂ ((κ → k) → ℂ), W ≤ GlobalTheory.WeilM.SB (κ → k) →
-    (∀ φ ∈ W, ∀ v : κ → k, (fun x => φ (x + v)) ∈ W) →
-    (∀ φ ∈ W, ∀ y : κ → k, (fun x => ψ0 (x ⬝ᵥ y) * φ x) ∈ W) →
-    ∀ φ₀ ∈ W, φ₀ ≠ 0 → W = GlobalTheory.WeilM.SB (κ → k) := by
+theorem sb_irreducible_vec
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [CharZero k] {κ : Type} [Fintype κ] (ψ0 : AddChar k ℂ),
+      Continuous ψ0 → (∀ x : k, (∀ y ∈ 𝒪[k], ψ0 (x * y) = 1) ↔ x ∈ 𝒪[k])
+        → ∀ W : Submodule ℂ ((κ → k) → ℂ),
+          W ≤ GlobalTheory.WeilM.SB (κ → k) → (∀ φ ∈ W, ∀ v : κ → k, (fun x => φ (x + v)) ∈ W)
+            → (∀ φ ∈ W, ∀ y : κ → k, (fun x => ψ0 (x ⬝ᵥ y) * φ x) ∈ W)
+            → ∀ φ₀ ∈ W, φ₀ ≠ 0 → W = GlobalTheory.WeilM.SB (κ → k) := by
   intro k _ _ _ _ _ κ _ ψ0 hψ hcond W hW hT hM φ₀ h0 hne
   classical
-  have h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1 := fun y hy => by
-    simpa using (hcond 1).2 (one_mem _) y hy
+  have h1 : ∀ y ∈ 𝒪[k], ψ0 y = 1 := fun y hy => by simpa using (hcond 1).2 (one_mem _) y hy
   set ψ := toCircle ψ0 h1 with hψdef
   have hψc : Continuous ψ := continuous_toCircle ψ0 h1 hψ
   have hψ1 : ψ ≠ 1 := by
@@ -73,43 +74,54 @@ theorem sb_irreducible_vec : ∀ {k : Type} [Field k] [ValuativeRel k] [Topologi
   have hto : Continuous toM := by fun_prop
   have hfr : Continuous frM := by fun_prop
   have hft : ∀ t, toM (frM t) = t := fun t => by funext i j; rfl
-  let e : Matrix κ Unit k ≃ₜ (κ → k) :=
-    { toFun := frM, invFun := toM, left_inv := hft, right_inv := fun x => rfl,
-      continuous_toFun := hfr, continuous_invFun := hto }
-  have SBto : ∀ φ : (κ → k) → ℂ, φ ∈ GlobalTheory.WeilM.SB (κ → k) → (fun t => φ (frM t)) ∈ GlobalTheory.SplitWeil.SB (Matrix κ Unit k) :=
-    fun φ hφ => ⟨hφ.1.comp_continuous hfr, hφ.2.comp_homeomorph e⟩
+  let e : Matrix κ Unit k ≃ₜ (κ → k) := {
+    toFun := frM
+    invFun := toM
+    left_inv := hft
+    right_inv := fun x => rfl
+    continuous_toFun := hfr
+    continuous_invFun := hto
+  }
+  have SBto
+      : ∀ φ : (κ → k) → ℂ,
+        φ ∈ GlobalTheory.WeilM.SB (κ → k)
+          → (fun t => φ (frM t)) ∈ GlobalTheory.SplitWeil.SB (Matrix κ Unit k) := fun φ hφ =>
+    ⟨hφ.1.comp_continuous hfr, hφ.2.comp_homeomorph e⟩
   let W' : Submodule ℂ (Matrix κ Unit k → ℂ) := W.comap (LinearMap.funLeft ℂ ℂ toM)
   have mem' : ∀ Φ, Φ ∈ W' ↔ (fun x => Φ (toM x)) ∈ W := fun Φ => Iff.rfl
   have hW' : W' ≤ GlobalTheory.SplitWeil.SB (Matrix κ Unit k) := by
     intro Φ hΦ
     have := SBto _ (hW ((mem' Φ).1 hΦ))
     simpa only [hft] using this
-  have key := GlobalTheory.IrredSB.sb_irreducible k κ Unit ψ hψc hψ1 W' hW'
-    (fun Φ hΦ x _ => by
-      rw [mem']
-      have := hT _ ((mem' Φ).1 hΦ) (frM x)
-      have hv : ∀ v, toM (v + frM x) = toM v + x := fun v => by
-        funext i j
-        cases j
-        rfl
-      show (fun v => Φ (toM v + x)) ∈ W
-      simpa only [hv] using this)
-    (fun Φ hΦ b _ => by
-      rw [mem']
-      have := hM _ ((mem' Φ).1 hΦ) (fun i => b i ())
-      have hs : ∀ v, (∑ r, ∑ q, b r q * toM v r q) = v ⬝ᵥ (fun i => b i ()) := fun v => by
-        rw [dotProduct]
-        refine Finset.sum_congr rfl fun r _ => ?_
-        rw [Fintype.sum_unique]
-        exact mul_comm _ _
-      show (fun v => ((ψ (∑ r, ∑ q, b r q * toM v r q) : Circle) : ℂ) * Φ (toM v)) ∈ W
-      simp only [hs]
-      exact this)
-    (fun t => φ₀ (frM t)) ((mem' _).2 h0) (by
-      intro h
-      apply hne
-      funext x
-      exact congrFun h (toM x))
+  have key :=
+    GlobalTheory.IrredSB.sb_irreducible k κ Unit ψ hψc hψ1 W' hW'
+      (fun Φ hΦ x _ => by
+        rw [mem']
+        have := hT _ ((mem' Φ).1 hΦ) (frM x)
+        have hv : ∀ v, toM (v + frM x) = toM v + x := fun v => by
+          funext i j
+          cases j
+          rfl
+        show (fun v => Φ (toM v + x)) ∈ W
+        simpa only [hv] using this)
+      (fun Φ hΦ b _ => by
+        rw [mem']
+        have := hM _ ((mem' Φ).1 hΦ) (fun i => b i ())
+        have hs : ∀ v, (∑ r, ∑ q, b r q * toM v r q) = v ⬝ᵥ (fun i => b i ()) := fun v => by
+          rw [dotProduct]
+          refine Finset.sum_congr rfl fun r _ => ?_
+          rw [Fintype.sum_unique]
+          exact mul_comm _ _
+        show (fun v => ((ψ (∑ r, ∑ q, b r q * toM v r q) : Circle) : ℂ) * Φ (toM v)) ∈ W
+        simp only [hs]
+        exact this)
+      (fun t => φ₀ (frM t))
+      ((mem' _).2 h0)
+      (by
+        intro h
+        apply hne
+        funext x
+        exact congrFun h (toM x))
   refine le_antisymm hW fun φ hφ => ?_
   · have : (fun t => φ (frM t)) ∈ W' := key ▸ SBto φ hφ
     exact (mem' _).1 this

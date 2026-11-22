@@ -9,38 +9,45 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic
+open CategoryTheory AlgebraicGeometry TopologicalSpace ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory GlobalTheory.CechPic
 
 namespace GlobalTheory.ArInt
 
-theorem interNum_one_lbPow_of_curve {κ : Type} [Field κ] {C : Scheme.{0}} [Algebra κ Γ(C, ⊤)]
-    [IsProper (strHom κ (X := C))] {H N : LB C} (hH : IsAmpleLB H) (hd : topologicalKrullDim C = 1)
-    (hN : N.IsLB) (n : ℕ) :
-    interNum κ (structureModule C) ![lbPow N n] = n * interNum κ (structureModule C) ![N] := by
+theorem interNum_one_lbPow_of_curve
+    {κ : Type} [Field κ]
+    {C : Scheme.{0}} [Algebra κ Γ(C, ⊤)] [IsProper (strHom κ (X := C))]
+    {H N : LB C} (hH : IsAmpleLB H)
+    (hd : topologicalKrullDim C = 1) (hN : N.IsLB) (n : ℕ)
+    : interNum κ (structureModule C) ![lbPow N n] = n * interNum κ (structureModule C) ![N] := by
   induction n with
   | zero =>
     rw [interNum_eq_zero_of_cls_eq_zero κ _ (isLB_vecOne (isLB_lbPow hN 0)) 0
       ((cls_lbPow hN 0 _).trans (zero_nsmul _))]
     simp
   | succ n ih =>
-    rw [interNum_one_of_cls_eq_add hH hd (isLB_lbPow hN (n + 1)) (isLB_lbPow hN n) hN
-      (by
+    rw [interNum_one_of_cls_eq_add hH hd (isLB_lbPow hN (n + 1)) (isLB_lbPow hN n) hN (by
         calc
           _ = (n + 1) • cls N hN := cls_lbPow hN (n + 1) _
           _ = n • cls N hN + cls N hN := succ_nsmul _ _
-          _ = _ := by rw [cls_lbPow hN n _]), ih]
+          _ = _ := by rw [cls_lbPow hN n _]),
+      ih]
     push_cast
     ring
 
-theorem nefFib_pow_iff : ∀ (k : Type) [CommRing k] [Module.Finite ℤ k] (X : Scheme.{0})
-    (p : X ⟶ Sp k), IsProjOver p → ∀ (L : HermLB p) (m : ℕ), 0 < m →
-      (ArInt.NefFib (L.pow m) ↔ ArInt.NefFib L) := by
+theorem nefFib_pow_iff
+    : ∀ (k : Type) [CommRing k] [Module.Finite ℤ k] (X : Scheme.{0}) (p : X ⟶ Sp k),
+      IsProjOver p
+        → ∀ (L : HermLB p) (m : ℕ), 0 < m → (ArInt.NefFib (L.pow m) ↔ ArInt.NefFib L) := by
   intro k _ _ X p hp L m hm
   obtain ⟨hpr, A, hA⟩ := (isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp
-  have key : ∀ (Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i] [IsIntegral Z] (κ : Type)
-      [Field κ] [Finite κ] [Algebra κ Γ(Z, ⊤)], topologicalKrullDim Z = 1 →
-      topSelfIntersection κ ((L.pow m).B.pull i) 1 = m * topSelfIntersection κ (L.B.pull i) 1 := by
+  have key
+      : ∀ (Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i] [IsIntegral Z] (κ : Type) [Field κ]
+          [Finite κ] [Algebra κ Γ(Z, ⊤)],
+        topologicalKrullDim Z = 1
+          → topSelfIntersection κ ((L.pow m).B.pull i) 1
+            = m * topSelfIntersection κ (L.B.pull i) 1 := by
     intro Z i _ _ κ _ _ _ hd
     have : IsFinite (spMap (Int.castRingHom k)) := by
       rw [spMap, IsFinite.SpecMap_iff]
@@ -51,15 +58,19 @@ theorem nefFib_pow_iff : ∀ (k : Type) [CommRing k] [Module.Finite ℤ k] (X : 
     have : IsProper (strHom κ (X := Z)) := IsProper.of_comp _ (spMap (Int.castRingHom κ))
     have hAZ := hA.pull_of_isClosedImmersion i
     have hN : (L.B.pull i).IsLB := LB.isLB_pull L.isLB i
-    have e1 : topSelfIntersection κ ((L.pow m).B.pull i) 1 =
-        interNum κ (structureModule Z) ![lbPow (L.B.pull i) m] :=
-      interNum_congr_cls κ _ (fun _ => LB.isLB_pull (L.pow m).isLB i)
-        (isLB_vecOne (isLB_lbPow hN m)) fun j => by
+    have e1
+        : topSelfIntersection κ ((L.pow m).B.pull i) 1
+          = interNum κ (structureModule Z) ![lbPow (L.B.pull i) m] :=
+      interNum_congr_cls κ _
+        (fun _ => LB.isLB_pull (L.pow m).isLB i)
+        (isLB_vecOne (isLB_lbPow hN m))
+        fun j => by
           fin_cases j
           exact (cls_pull (L.pow m).isLB i _).trans
             ((congrArg (pull i) (cls_lbPow L.isLB m (L.pow m).isLB)).trans
               ((map_nsmul (pull i) m _).trans (cls_lbPow hN m _).symm))
-    have e2 : topSelfIntersection κ (L.B.pull i) 1 = interNum κ (structureModule Z) ![L.B.pull i] := by
+    have e2
+        : topSelfIntersection κ (L.B.pull i) 1 = interNum κ (structureModule Z) ![L.B.pull i] := by
       rw [topSelf_def]
       congr 1
       funext j

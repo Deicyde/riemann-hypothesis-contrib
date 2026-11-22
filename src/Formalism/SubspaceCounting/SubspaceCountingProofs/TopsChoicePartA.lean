@@ -12,14 +12,15 @@ namespace Formalism.G0
 
 namespace TopsConditionalProbabilityWindows
 
-
 open Classical in
-def P (U : Finset ℕ) (δ : ℝ) (A : Finset ℕ → Prop) : ℝ :=
-  by classical exact ∑ t ∈ U.powerset, if A t then δ ^ t.card * (1 - δ) ^ (U.card - t.card) else 0
+def P (U : Finset ℕ) (δ : ℝ) (A : Finset ℕ → Prop) : ℝ := by
+  classical
+  exact ∑ t ∈ U.powerset, if A t then δ ^ t.card * (1 - δ) ^ (U.card - t.card) else 0
 
-theorem key (n L K : ℕ) (t : Finset ℕ) (h0t : 0 ∉ t) (h : ¬ CondA n (insert 0 t) L K) :
-    ∃ i ∈ range n, ∃ S ∈ powersetCard (if 0 ∈ window n i L then K else K + 1)
-      ((window n i L).erase 0), S ⊆ t := by
+theorem key (n L K : ℕ) (t : Finset ℕ) (h0t : 0 ∉ t) (h : ¬ CondA n (insert 0 t) L K)
+    : ∃ i ∈ range n,
+      ∃ S ∈ powersetCard (if 0 ∈ window n i L then K else K + 1) ((window n i L).erase 0),
+        S ⊆ t := by
   classical
   unfold CondA at h
   push Not at h
@@ -58,6 +59,5 @@ theorem key (n L K : ℕ) (t : Finset ℕ) (h0t : 0 ∉ t) (h : ¬ CondA n (inse
   · exact fun x hx => (mem_inter.1 (hSs hx)).1
 
 end TopsConditionalProbabilityWindows
-
 
 end Formalism.G0

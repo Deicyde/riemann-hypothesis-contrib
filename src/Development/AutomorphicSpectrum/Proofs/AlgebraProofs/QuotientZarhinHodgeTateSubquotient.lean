@@ -28,8 +28,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
 theorem subquotientStatement_of_quotient_zarhin_hodgeTate
-    (hQ : QuotientByFiniteFlatStatement) (hZ : ZarhinStatement) (hH : HodgeTateDatumStatement) :
-    SubquotientStatement := by
+    (hQ : QuotientByFiniteFlatStatement) (hZ : ZarhinStatement) (hH : HodgeTateDatumStatement)
+    : SubquotientStatement := by
   intro p _ C _ _ _ v R _ _ hv hp hc N _ M hM K
   obtain ⟨A, _, L, hA, hL, hamp, T, N', _, pt, hpt, i, π, hiπ, hst, rfl⟩ := hM
   classical
@@ -41,8 +41,12 @@ theorem subquotientStatement_of_quotient_zarhin_hodgeTate
   haveI : Finite N := Finite.of_injective i hi
   letI : Fintype N := Fintype.ofFinite N
   obtain ⟨⟨AA, hAA⟩, -⟩ := GlobalTheory.T.torsion_points_hopf_order p C v R hv hp A T N' pt hpt
-  have hgen := GlobalTheory.T.abelian_scheme_torsion_augmentation hQ hZ hH p C v R hv hp hc A L hA hL hamp T N' pt hpt (K.map i)
-  have hret := GlobalTheory.T.hopf_order_retract_restriction p C v R hv hp N' AA N i π hiπ (by rw [hAA]; exact hst)
+  have hgen :=
+    GlobalTheory.T.abelian_scheme_torsion_augmentation hQ hZ hH p C v R hv hp hc A L hA hL hamp T N'
+      pt hpt (K.map i)
+  have hret :=
+    GlobalTheory.T.hopf_order_retract_restriction p C v R hv hp N' AA N i π hiπ
+      (by rw [hAA]; exact hst)
   rw [← hAA]
   exact hret.2.2 K (by rw [hAA]; exact hgen)
 

@@ -11,7 +11,9 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 noncomputable section
 namespace GlobalTheory.FourKFub
 
-variable {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+variable
+  {F E : Type}
+  [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
 
 theorem secondCountableK [Unram F E] (A : Et F E) : SecondCountableTopology A.K := by
   haveI : LocallyCompactSpace F := Unram.lcF E
@@ -32,10 +34,21 @@ theorem stdChar_continuous (ψ : AddChar F ℂ) (hψ : IsStdChar ψ) : Continuou
 theorem psiK_continuous (A : Et F E) (ψ : AddChar F ℂ) (hψ : IsStdChar ψ) : Continuous (A.psiK ψ) :=
   (stdChar_continuous ψ hψ).comp (IsModuleTopology.continuous_of_linearMap (Algebra.trace F A.K))
 
-theorem psiK_add (A : Et F E) (ψ : AddChar F ℂ) (x y : A.K) : A.psiK ψ (x + y) = A.psiK ψ x * A.psiK ψ y := by
+theorem psiK_add (A : Et F E) (ψ : AddChar F ℂ) (x y : A.K)
+    : A.psiK ψ (x + y) = A.psiK ψ x * A.psiK ψ y := by
   simp only [Et.psiK, map_add (f := _), AddChar.map_add_eq_mul]
 
-theorem fourK_eq_fourB_tilde : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ), IsStdChar ψ → ∀ (μK : Measure A.K), μK.IsAddHaarMeasure → ∀ φ' : A.K × A.K → ℂ, IsTest φ' → ∀ b c : A.K, A.fourK μK ψ φ' (b, c) = fourB μK (A.kerK ψ) (fun c' => A.tilde μK ψ φ' c' c) b := by
+theorem fourK_eq_fourB_tilde
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ
+        → ∀ (μK : Measure A.K),
+          μK.IsAddHaarMeasure
+            → ∀ φ' : A.K × A.K → ℂ,
+              IsTest φ'
+                → ∀ b c : A.K,
+                  A.fourK μK ψ φ' (b, c)
+                    = fourB μK (A.kerK ψ) (fun c' => A.tilde μK ψ φ' c' c) b := by
   intro F E _ _ _ _ _ A ψ hψ μK hμ φ' hφ b c
   haveI := secondCountableK A
   have hc := psiK_continuous A ψ hψ

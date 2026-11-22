@@ -20,48 +20,68 @@ variable {E : Type} [Field E] [NumberField E]
 
 variable {dim : (E →+* ℂ) → ℕ}
 
-theorem isU_add_shortIndep {I : Submodule ℤ (Vsp dim)} {x y u v : Vsp dim} (hu : IsU I x u)
-    (hv : IsU I y v) : IsU I (x + y) (u + v) :=
-  ⟨(IR I).add_mem hu.1 hv.1, fun a ha => by
-    rw [inner_add_left, hu.2 a ha, hv.2 a ha, Hf_im_add_left]⟩
+theorem isU_add_shortIndep
+    {I : Submodule ℤ (Vsp dim)} {x y u v : Vsp dim} (hu : IsU I x u) (hv : IsU I y v)
+    : IsU I (x + y) (u + v) := ⟨
+  (IR I).add_mem hu.1 hv.1,
+  fun a ha => by rw [inner_add_left, hu.2 a ha, hv.2 a ha, Hf_im_add_left]
+⟩
 
 theorem isU_zero_shortIndep (I : Submodule ℤ (Vsp dim)) : IsU I 0 0 :=
   ⟨(IR I).zero_mem, fun a _ => by rw [inner_zero_left, Hf_im_zero_left]⟩
 
-theorem isU_zsmul_shortIndep {I : Submodule ℤ (Vsp dim)} {x u : Vsp dim} (k : ℤ) (hu : IsU I x u) :
-    IsU I (k • x) (k • u) := by
+theorem isU_zsmul_shortIndep {I : Submodule ℤ (Vsp dim)} {x u : Vsp dim} (k : ℤ) (hu : IsU I x u)
+    : IsU I (k • x) (k • u) := by
   rw [← Int.cast_smul_eq_zsmul ℝ k x, ← Int.cast_smul_eq_zsmul ℝ k u]
-  exact ⟨(IR I).smul_mem _ hu.1, fun a ha => by
-    rw [real_inner_smul_left, hu.2 a ha, Hf_im_smul_left]⟩
+  exact
+    ⟨(IR I).smul_mem _ hu.1, fun a ha => by rw [real_inner_smul_left, hu.2 a ha, Hf_im_smul_left]⟩
 
 end lin
 
-theorem exists_short_independent_isU :
-    (∀ (N : ℕ) (M : Submodule ℤ (EuclideanSpace ℝ (Fin N))), DiscreteTopology M → Submodule.span ℝ (M : Set (EuclideanSpace ℝ (Fin N))) = ⊤ → ∀ lam : ℝ, 0 < lam → (∀ z : EuclideanSpace ℝ (Fin N), (∀ y ∈ M, ∃ k : ℤ, inner ℝ z y = (k : ℝ)) → z ≠ 0 → lam ≤ ‖z‖) → ∃ v : Fin N → EuclideanSpace ℝ (Fin N), (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ (N : ℝ) ^ 2 / lam) → (∀ (E : Type) [Field E] [NumberField E] (X : PT E) (a : Vsp X.dim), ((∀ y ∈ X.L, (Hf y a).im = 0) → a = 0) ∧ ((∀ y ∈ X.L, ∃ k : ℤ, (Hf y a).im = k) → a ∈ X.L)) → (∀ (E : Type) [Field E] [NumberField E] (X : PT E) (I : Submodule ℤ (Vsp X.dim)), I ≤ X.L → (∀ x ∈ X.L, x ∈ IR I → x ∈ I) → 0 < X.la1 → ∃ x u : Fin (Module.finrank ℝ (IR I)) → Vsp X.dim, (∀ j, x j ∈ X.L ∧ IsU I (x j) (u j)) ∧ LinearIndependent ℝ u ∧ ∀ j, ‖u j‖ ≤ (Module.finrank ℝ (IR I) : ℝ) ^ 2 / X.la1) := by
+theorem exists_short_independent_isU
+    : (∀ (N : ℕ) (M : Submodule ℤ (EuclideanSpace ℝ (Fin N))),
+        DiscreteTopology M → Submodule.span ℝ (M : Set (EuclideanSpace ℝ (Fin N))) = ⊤
+          → ∀ lam : ℝ,
+            0 < lam
+              → (∀ z : EuclideanSpace ℝ (Fin N),
+                (∀ y ∈ M, ∃ k : ℤ, inner ℝ z y = (k : ℝ)) → z ≠ 0 → lam ≤ ‖z‖)
+              → ∃ v : Fin N → EuclideanSpace ℝ (Fin N),
+                (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ (N : ℝ) ^ 2 / lam)
+      → (∀ (E : Type) [Field E] [NumberField E] (X : PT E) (a : Vsp X.dim),
+        ((∀ y ∈ X.L, (Hf y a).im = 0) → a = 0) ∧ ((∀ y ∈ X.L, ∃ k : ℤ, (Hf y a).im = k) → a ∈ X.L))
+      → (∀ (E : Type) [Field E] [NumberField E] (X : PT E) (I : Submodule ℤ (Vsp X.dim)),
+        I ≤ X.L → (∀ x ∈ X.L, x ∈ IR I → x ∈ I) → 0 < X.la1
+          → ∃ x u : Fin (Module.finrank ℝ (IR I)) → Vsp X.dim,
+            (∀ j, x j ∈ X.L ∧ IsU I (x j) (u j)) ∧ LinearIndependent ℝ u
+              ∧ ∀ j, ‖u j‖ ≤ (Module.finrank ℝ (IR I) : ℝ) ^ 2 / X.la1) := by
   intro htrans hpair E _ _ X I hle hsat hla
   set K := IR I with hK
   set N := Module.finrank ℝ K with hNdef
   let e : K ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin N) := (stdOrthonormalBasis ℝ K).repr
-  let M : Submodule ℤ (EuclideanSpace ℝ (Fin N)) :=
-    { carrier := {z | ∃ y ∈ X.L, IsU I y ((e.symm z : K) : Vsp X.dim)}
-      add_mem' := by
-        rintro z z' ⟨y, hy, hu⟩ ⟨y', hy', hu'⟩
-        exact ⟨y + y', X.L.add_mem hy hy', by simpa using isU_add_shortIndep hu hu'⟩
-      zero_mem' := ⟨0, X.L.zero_mem, by simpa using isU_zero_shortIndep I⟩
-      smul_mem' := by
-        rintro k z ⟨y, hy, hu⟩
-        exact ⟨k • y, X.L.smul_mem k hy, by simpa using isU_zsmul_shortIndep k hu⟩ }
+  let M : Submodule ℤ (EuclideanSpace ℝ (Fin N)) := {
+    carrier := {z | ∃ y ∈ X.L, IsU I y ((e.symm z : K) : Vsp X.dim)}
+    add_mem' := by
+      rintro z z' ⟨y, hy, hu⟩ ⟨y', hy', hu'⟩
+      exact ⟨y + y', X.L.add_mem hy hy', by simpa using isU_add_shortIndep hu hu'⟩
+    zero_mem' := ⟨0, X.L.zero_mem, by simpa using isU_zero_shortIndep I⟩
+    smul_mem' := by
+      rintro k z ⟨y, hy, hu⟩
+      exact ⟨k • y, X.L.smul_mem k hy, by simpa using isU_zsmul_shortIndep k hu⟩
+  }
   have hmemM : ∀ y ∈ X.L, ∀ u, IsU I y u → ∃ z ∈ M, ((e.symm z : K) : Vsp X.dim) = u :=
     fun y hy u hu => ⟨e ⟨u, hu.1⟩, ⟨y, hy, by simpa using hu⟩, by simp⟩
-  have hinner : ∀ z z' : EuclideanSpace ℝ (Fin N),
-      ⟪z, z'⟫_ℝ = ⟪((e.symm z : K) : Vsp X.dim), ((e.symm z' : K) : Vsp X.dim)⟫_ℝ := by
+  have hinner
+      : ∀ z z' : EuclideanSpace ℝ (Fin N),
+        ⟪z, z'⟫_ℝ = ⟪((e.symm z : K) : Vsp X.dim), ((e.symm z' : K) : Vsp X.dim)⟫_ℝ := by
     intro z z'
     rw [← Submodule.coe_inner, LinearIsometryEquiv.inner_map_map]
   have hnormE : ∀ z, ‖((e.symm z : K) : Vsp X.dim)‖ = ‖z‖ := by
     intro z
     rw [← e.symm.norm_map z]
     rfl
-  have hdual : ∀ z : EuclideanSpace ℝ (Fin N), (∀ y ∈ M, ∃ k : ℤ, inner ℝ z y = (k : ℝ)) → ((e.symm z : K) : Vsp X.dim) ∈ I := by
+  have hdual
+      : ∀ z : EuclideanSpace ℝ (Fin N),
+        (∀ y ∈ M, ∃ k : ℤ, inner ℝ z y = (k : ℝ)) → ((e.symm z : K) : Vsp X.dim) ∈ I := by
     intro z hz
     apply hsat _ ?_ (e.symm z).2
     apply (hpair E X _).2
@@ -119,8 +139,11 @@ theorem exists_short_independent_isU :
       exact one_le_abs_im X hy (hle (hsI has)) ha
     have h2 : |⟪u, a⟫_ℝ| ≤ ‖u‖ * ‖a‖ := abs_real_inner_le_norm _ _
     have h3 : ‖a‖ ≤ A := by
-      have := Finset.single_le_sum (f := fun a => ‖a‖) (fun _ _ => norm_nonneg _)
-        ((Set.Finite.mem_toFinset hsfin).2 has)
+      have :=
+        Finset.single_le_sum
+          (f := fun a => ‖a‖)
+          (fun _ _ => norm_nonneg _)
+          ((Set.Finite.mem_toFinset hsfin).2 has)
       linarith
     rw [← hnormE z, div_le_iff₀ hApos]
     nlinarith [norm_nonneg u]
@@ -132,16 +155,19 @@ theorem exists_short_independent_isU :
     rw [dist_zero_right] at hz
     have : ‖(z : EuclideanSpace ℝ (Fin N))‖ = ‖z‖ := rfl
     linarith
-  obtain ⟨v, hvM, hvli, hvt⟩ := htrans N M hdisc hspan X.la1 hla (by
-    intro z hz hz0
-    have ha := hdual z hz
-    have hne : ((e.symm z : K) : Vsp X.dim) ≠ 0 := by
-      intro h0
-      apply hz0
-      have : e.symm z = 0 := Subtype.ext h0
-      simpa using congrArg e this
-    calc X.la1 ≤ ‖((e.symm z : K) : Vsp X.dim)‖ := sq_le_Qy_of_le_firstMinimum X (hle ha) hne
-      _ = ‖z‖ := hnormE _)
+  obtain ⟨v, hvM, hvli, hvt⟩ :=
+    htrans N M hdisc hspan X.la1 hla (by
+      intro z hz hz0
+      have ha := hdual z hz
+      have hne : ((e.symm z : K) : Vsp X.dim) ≠ 0 := by
+        intro h0
+        apply hz0
+        have : e.symm z = 0 := Subtype.ext h0
+        simpa using congrArg e this
+      calc
+        X.la1
+          ≤ ‖((e.symm z : K) : Vsp X.dim)‖ := sq_le_Qy_of_le_firstMinimum X (hle ha) hne
+        _ = ‖z‖ := hnormE _)
   choose y hy hyU using hvM
   refine ⟨y, fun j => ((e.symm (v j) : K) : Vsp X.dim), fun j => ⟨hy j, hyU j⟩, ?_, ?_⟩
   · exact (hvli.map' e.symm.toLinearEquiv.toLinearMap (LinearEquiv.ker _)).map' K.subtype

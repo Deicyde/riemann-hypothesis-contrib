@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.StmtFields
 
 open NumberField Formalism.HC UpperTheory.Top UpperTheory.V
 
-theorem UpperTheory.V.error_terms_le_sqrt_exp_rpow :
-    ∀ eps K C : ℝ, 0 < eps → ∃ x0 : ℝ, ∀ x ≥ x0, ∀ u : ℝ, 1 ≤ u → Real.log u ≤ 2 * x ^ (eps / 4) →
-      Real.exp (x ^ (4 * eps / 5)) * Real.log 2 + K * Real.exp (8 * x ^ (eps / 4)) + (u ^ C + C * Real.exp (x ^ (4 * eps / 5))) ≤
-        Real.sqrt (Real.exp (x ^ eps)) := by
+theorem UpperTheory.V.error_terms_le_sqrt_exp_rpow
+    : ∀ eps K C : ℝ,
+      0 < eps
+        → ∃ x0 : ℝ, ∀ x ≥ x0, ∀ u : ℝ,
+          1 ≤ u → Real.log u ≤ 2 * x ^ (eps / 4)
+            → Real.exp (x ^ (4 * eps / 5)) * Real.log 2 + K * Real.exp (8 * x ^ (eps / 4))
+                + (u ^ C + C * Real.exp (x ^ (4 * eps / 5)))
+              ≤ Real.sqrt (Real.exp (x ^ eps)) := by
   intro eps K C heps
   set N : ℝ := Real.log 2 + |C| + |K| + 1 with hN
   set D : ℝ := 9 + 2 * |C| with hD
@@ -50,10 +54,8 @@ theorem UpperTheory.V.error_terms_le_sqrt_exp_rpow :
   have huC : u ^ C ≤ Real.exp (D * b) := by
     rw [Real.rpow_def_of_pos hupos]
     apply Real.exp_le_exp.mpr
-    have e1 : Real.log u * C ≤ Real.log u * |C| :=
-      mul_le_mul_of_nonneg_left (le_abs_self C) hlogu
-    have e2 : Real.log u * |C| ≤ (2 * a) * |C| :=
-      mul_le_mul_of_nonneg_right hlog (abs_nonneg C)
+    have e1 : Real.log u * C ≤ Real.log u * |C| := mul_le_mul_of_nonneg_left (le_abs_self C) hlogu
+    have e2 : Real.log u * |C| ≤ (2 * a) * |C| := mul_le_mul_of_nonneg_right hlog (abs_nonneg C)
     have e3 : (2 * a) * |C| ≤ (2 * b) * |C| :=
       mul_le_mul_of_nonneg_right (by linarith) (abs_nonneg C)
     have e4 : (2 * b) * |C| ≤ D * b := by
@@ -63,8 +65,7 @@ theorem UpperTheory.V.error_terms_le_sqrt_exp_rpow :
   have hK : K * Real.exp (8 * a) ≤ |K| * Real.exp (D * b) := by
     have : K * Real.exp (8 * a) ≤ |K| * Real.exp (8 * a) :=
       mul_le_mul_of_nonneg_right (le_abs_self K) (Real.exp_pos _).le
-    have h2 : Real.exp (8 * a) ≤ Real.exp (D * b) :=
-      Real.exp_le_exp.mpr (by nlinarith)
+    have h2 : Real.exp (8 * a) ≤ Real.exp (D * b) := Real.exp_le_exp.mpr (by nlinarith)
     have h3 := mul_le_mul_of_nonneg_left h2 (abs_nonneg K)
     linarith
   have hE : Real.exp b ≤ Real.exp (D * b) := Real.exp_le_exp.mpr (by nlinarith)
@@ -75,16 +76,17 @@ theorem UpperTheory.V.error_terms_le_sqrt_exp_rpow :
     linarith
   have hL2 : Real.exp b * Real.log 2 ≤ Real.exp (D * b) * Real.log 2 :=
     mul_le_mul_of_nonneg_right hE hl2.le
-  have hsum : Real.exp b * Real.log 2 + K * Real.exp (8 * a) + (u ^ C + C * Real.exp b)
-      ≤ N * Real.exp (D * b) := by
+  have hsum
+      : Real.exp b * Real.log 2 + K * Real.exp (8 * a) + (u ^ C + C * Real.exp b)
+        ≤ N * Real.exp (D * b) := by
     rw [hN]
     nlinarith
   have hfin : N * Real.exp (D * b) ≤ Real.exp (x ^ eps / 2) := by
-    rw [← Real.exp_log (by linarith : (0:ℝ) < N), ← Real.exp_add]
+    rw [← Real.exp_log (by linarith : (0 : ℝ) < N), ← Real.exp_add]
     apply Real.exp_le_exp.mpr
     rw [hc]
     have : b * (D + Real.log N + 1) ≤ b * s / 2 := by
-      have := mul_le_mul_of_nonneg_left hsT (by linarith : (0:ℝ) ≤ b)
+      have := mul_le_mul_of_nonneg_left hsT (by linarith : (0 : ℝ) ≤ b)
       rw [hTdef] at this
       linarith
     nlinarith

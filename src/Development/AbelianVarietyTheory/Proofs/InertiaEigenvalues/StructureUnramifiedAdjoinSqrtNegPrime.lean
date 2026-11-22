@@ -13,24 +13,26 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Finrank
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal NumberField IsDedekindDomain
 
 namespace GlobalTheory.SqrtNegL
 
 open Polynomial
 
-theorem natDegree_minpoly_sqrt (l : ℕ) [Fact l.Prime] (F : IntermediateField ℚ_[l] (Om l)) (y : Om l)
-    (hF : F ≤ MaximalUnramifiedExtension l) (hy : y ^ 2 = -(l : Om l)) (hyK : y ∉ MaximalUnramifiedExtension l) :
-    (minpoly F y).natDegree = 2 := by
+theorem natDegree_minpoly_sqrt
+    (l : ℕ) [Fact l.Prime]
+    (F : IntermediateField ℚ_[l] (Om l)) (y : Om l) (hF : F ≤ MaximalUnramifiedExtension l)
+    (hy : y ^ 2 = -(l : Om l)) (hyK : y ∉ MaximalUnramifiedExtension l)
+    : (minpoly F y).natDegree = 2 := by
   have hint : IsIntegral F y := (Algebra.IsIntegral.isIntegral (R := ℚ_[l]) y).tower_top
   have hmon : (X ^ 2 + C ((l : ℕ) : F)).Monic :=
     (monic_X_pow 2).add_of_left (degree_C_le.trans_lt (by simp))
   have hdeg : (X ^ 2 + C ((l : ℕ) : F)).natDegree = 2 := by
     rw [natDegree_add_eq_left_of_natDegree_lt] <;> simp
-  have hev : aeval y (X ^ 2 + C ((l : ℕ) : F)) = 0 := by
-    simp [hy]
-  have h1 : (minpoly F y).natDegree ≤ 2 :=
-    hdeg ▸ natDegree_le_natDegree (minpoly.min F y hmon hev)
+  have hev : aeval y (X ^ 2 + C ((l : ℕ) : F)) = 0 := by simp [hy]
+  have h1 : (minpoly F y).natDegree ≤ 2 := hdeg ▸ natDegree_le_natDegree (minpoly.min F y hmon hev)
   have h2 : 0 < (minpoly F y).natDegree := minpoly.natDegree_pos hint
   have h3 : (minpoly F y).natDegree ≠ 1 := by
     intro h
@@ -40,10 +42,21 @@ theorem natDegree_minpoly_sqrt (l : ℕ) [Fact l.Prime] (F : IntermediateField �
     exact hF a.2
   omega
 
-theorem structure_sqrt_neg : ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (K : FinExt l) (M : IntermediateField ℚ_[l] (Om l)) (y : Om l), M ≤ MaximalUnramifiedExtension l → y ^ 2 = -(l : Om l) → y ∉ MaximalUnramifiedExtension l → y ∈ IntermediateField.adjoin ℚ_[l] {x : Om l | x ^ (l ^ 1) = 1} → K.1 = M ⊔ IntermediateField.adjoin ℚ_[l] {y} → K.1 = K0 K ⊔ IntermediateField.adjoin ℚ_[l] {y} ∧ K.1 ≤ Ks K 1 ∧ Module.finrank ↥(K0 K) ↥K.1 = 2 ∧ Module.finrank ℚ_[l] ↥(Ks K 1) = (l - 1) / 2 * Module.finrank ℚ_[l] ↥K.1 := by
+theorem structure_sqrt_neg
+    : ∀ (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∀ (K : FinExt l) (M : IntermediateField ℚ_[l] (Om l)) (y : Om l),
+          M ≤ MaximalUnramifiedExtension l → y ^ 2 = -(l : Om l) → y ∉ MaximalUnramifiedExtension l
+            → y ∈ IntermediateField.adjoin ℚ_[l] {x : Om l | x ^ (l ^ 1) = 1}
+            → K.1 = M ⊔ IntermediateField.adjoin ℚ_[l] {y}
+            → K.1 = K0 K ⊔ IntermediateField.adjoin ℚ_[l] {y} ∧ K.1 ≤ Ks K 1
+              ∧ Module.finrank ↥(K0 K) ↥K.1 = 2
+              ∧ Module.finrank ℚ_[l] ↥(Ks K 1) = (l - 1) / 2 * Module.finrank ℚ_[l] ↥K.1 := by
   intro l _ hl2 K M y hM hy hyK hyz hK
-  have hyK1 : y ∈ K.1 := hK ▸ (le_sup_right : IntermediateField.adjoin ℚ_[l] {y} ≤ _)
-      (IntermediateField.mem_adjoin_simple_self _ _)
+  have hyK1 : y ∈ K.1 :=
+    hK
+      ▸ (le_sup_right : IntermediateField.adjoin ℚ_[l] {y} ≤ _)
+        (IntermediateField.mem_adjoin_simple_self _ _)
   have hMK0 : M ≤ K0 K := le_inf (hK ▸ le_sup_left) hM
   have hA : IntermediateField.adjoin ℚ_[l] {y} ≤ K.1 :=
     (IntermediateField.adjoin_simple_le_iff).2 hyK1

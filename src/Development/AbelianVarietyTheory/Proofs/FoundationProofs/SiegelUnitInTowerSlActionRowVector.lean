@@ -47,19 +47,24 @@ theorem mob_ofSL (γ : SL(2, ℤ)) (τ : ℍ) : mob (ofSL γ) τ = ((γ • τ :
   rw [UpperHalfPlane.coe_specialLinearGroup_apply]
   simp [mob, ent, ofSL]
 
-theorem an_injective {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (T : Tower Ω ε) :
-    Function.Injective T.an := by
+theorem an_injective {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (T : Tower Ω ε)
+    : Function.Injective T.an := by
   have := neBot_Hs
   exact T.an.injective
 
-theorem siegel_eq {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (T : Tower Ω ε) {c : ℕ} {x : Fin 2 → ℚ} {f : T.K}
-    (hf : T.an f = ((sgC c x : ℂ → ℂ) : Mero)) : siegel T c x = f := by
+theorem siegel_eq
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (T : Tower Ω ε)
+    {c : ℕ} {x : Fin 2 → ℚ} {f : T.K} (hf : T.an f = ((sgC c x : ℂ → ℂ) : Mero))
+    : siegel T c x = f := by
   have hex : ∃ g : T.K, T.an g = ((sgC c x : ℂ → ℂ) : Mero) := ⟨f, hf⟩
   apply an_injective T
   rw [siegel, dite_eq_left hex, hex.choose_spec, hf]
 
-theorem sl_siegel : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε) (c : ℕ)
-    (x : Fin 2 → ℚ) (γ : SL(2, ℤ)), admitted c x → T.sl (ofSL γ) (siegel T c x) = siegel T c (act x γ) := by
+theorem sl_siegel
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε) (c : ℕ)
+        (x : Fin 2 → ℚ) (γ : SL(2, ℤ)),
+      admitted c x → T.sl (ofSL γ) (siegel T c x) = siegel T c (act x γ) := by
   intro Ω _ _ _ ε T c x γ hx
   symm
   apply siegel_eq

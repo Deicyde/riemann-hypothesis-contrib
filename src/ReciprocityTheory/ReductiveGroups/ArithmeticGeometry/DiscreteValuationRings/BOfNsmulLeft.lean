@@ -17,17 +17,22 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace ReciprocityTheory.ChartRestriction.G.DVR
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing QForm
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing
+  QForm
 
 section Basic
 
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
   {D : DegData V (maximalIdeal V)} {F : Type} [Field F] [Algebra (FractionRing V) F]
   {v : AddValuation F (WithTop ℚ)}
 
-theorem vge_of_zero {k : ℕ} {α : D.toPre.X}
+theorem vge_of_zero
+    {k : ℕ} {α : D.toPre.X}
     {s : LB.Sec (LB.LinComb D.toPre.P.L (DegPre.famφ D.toPre F α) (DegPre.famε k))}
-    (h : ∀ j, s.f j = 0) (r : ℚ) : VGe D F v k α s r := by
+    (h : ∀ j, s.f j = 0)
+    (r : ℚ)
+    : VGe D F v k α s r := by
   unfold VGe
   refine ⟨0, Fin.elim0, Fin.elim0, Fin.elim0, fun i => i.elim0, fun i => i.elim0, fun j => ?_⟩
   rw [h j, Fin.sum_univ_zero]
@@ -44,7 +49,8 @@ theorem n4 : ValuationBoundAtZero := by
     · obtain ⟨z, rfl⟩ := h
       have h1 := GC.valuation_ge_at_zero hϖ hv (hnu (β + R' • z)) (hx _)
       refine le_trans (WithTop.coe_le_coe.2 ?_) h1
-      rw [zero_add]; exact hq z
+      rw [zero_add]
+      exact hq z
     · push Not at h
       exact GC.valuation_ge_at_zero hϖ hv (vge_of_zero (v := v) (hsupp α h) q) (hx α)
   obtain ⟨S, hS⟩ := hsum q
@@ -55,31 +61,37 @@ theorem n4 : ValuationBoundAtZero := by
 
 section Q
 
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {ϖ : V}
-  {D : DegData V (maximalIdeal V)} {Q : D.toPre.X → ℤ}
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+  {ϖ : V} {D : DegData V (maximalIdeal V)} {Q : D.toPre.X → ℤ}
 
-theorem bOf_zero_left (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (b : D.toPre.X) : bOf D.toPre Q 0 b = 0 := by
+theorem bOf_zero_left (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (b : D.toPre.X)
+    : bOf D.toPre Q 0 b = 0 := by
   simp [bOf, QForm.Q_zero hϖ D hQ]
 
-theorem bOf_nsmul_left (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (n : ℕ) (a b : D.toPre.X) :
-    bOf D.toPre Q (n • a) b = n * bOf D.toPre Q a b := by
+theorem bOf_nsmul_left (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (n : ℕ) (a b : D.toPre.X)
+    : bOf D.toPre Q (n • a) b = n * bOf D.toPre Q a b := by
   induction n with
   | zero => simp [bOf_zero_left hϖ hQ]
   | succ n ih => rw [succ_nsmul, QForm.bOf_add_left hϖ D hQ, ih]; push_cast; ring
 
-theorem Q_nsmul (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (n : ℕ) (a : D.toPre.X) : Q (n • a) = n ^ 2 * Q a := by
+theorem Q_nsmul (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (n : ℕ) (a : D.toPre.X)
+    : Q (n • a) = n ^ 2 * Q a := by
   induction n with
   | zero => simp [QForm.Q_zero hϖ D hQ]
   | succ n ih =>
     have h2 := QForm.two_Q_eq hϖ D hQ a
     have hb := bOf_nsmul_left hϖ hQ n a a
     have e : Q (n • a + a) = Q (n • a) + Q a + bOf D.toPre Q (n • a) a := by simp only [bOf]; ring
-    rw [succ_nsmul, e, ih, hb, ← h2]; push_cast; ring
+    rw [succ_nsmul, e, ih, hb, ← h2]
+    push_cast
+    ring
 
-theorem q_shift (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (α m : D.toPre.X) (k : ℕ) :
-    Q (α + k • m) = Q α + k * (k * Q m + bOf D.toPre Q m α) := by
+theorem q_shift (hϖ : Irreducible ϖ) (hQ : IsQ D.toPre ϖ Q) (α m : D.toPre.X) (k : ℕ)
+    : Q (α + k • m) = Q α + k * (k * Q m + bOf D.toPre Q m α) := by
   have e1 : Q (α + k • m) = Q α + Q (k • m) + bOf D.toPre Q α (k • m) := by simp only [bOf]; ring
-  rw [e1, QForm.bOf_comm D α (k • m), bOf_nsmul_left hϖ hQ, Q_nsmul hϖ hQ]; ring
+  rw [e1, QForm.bOf_comm D α (k • m), bOf_nsmul_left hϖ hQ, Q_nsmul hϖ hQ]
+  ring
 
 end Q
 
@@ -89,17 +101,25 @@ theorem n1a : ValuationMinRepresentatives := by
   obtain ⟨α, hα, m0, rfl⟩ := hS χ
   have H := SectionScalarValuation.fe_move hϖ hQ hv k m0 α s (h α hα)
   have hk0 : (k : ℚ) ≠ 0 := by exact_mod_cast (by omega : k ≠ 0)
-  have e : r + (Q α : ℚ) / k + ((k * Q m0 + bOf D.toPre Q m0 α : ℤ) : ℚ) = r + (Q (α + k • m0) : ℚ) / k := by
+  have e
+      : r + (Q α : ℚ) / k + ((k * Q m0 + bOf D.toPre Q m0 α : ℤ) : ℚ)
+        = r + (Q (α + k • m0) : ℚ) / k := by
     rw [q_shift hϖ hQ α m0 k]; push_cast; field_simp; ring
   rwa [e] at H
 
-theorem exists_val_eq {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {ϖ : V}
-    {F : Type} [Field F] [IsAlgClosed F] [Algebra (FractionRing V) F] {v : AddValuation F (WithTop ℚ)}
-    (hv : ValOver ϖ F v) {r : ℚ} (hr : 0 < r) : ∃ ζ : F, ζ ≠ 0 ∧ v ζ = ((r : ℚ) : WithTop ℚ) := by
-  obtain ⟨ζ, hζ⟩ := IsAlgClosed.exists_pow_nat_eq
-    (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) ϖ ^ r.num)) r.den_pos
-  have hv1 : v (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) ϖ ^ r.num)) =
-      ((r.num : ℚ) : WithTop ℚ) := hv _ _ ⟨1, by simp⟩
+theorem exists_val_eq
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    {ϖ : V} {F : Type} [Field F] [IsAlgClosed F] [Algebra (FractionRing V) F]
+    {v : AddValuation F (WithTop ℚ)} (hv : ValOver ϖ F v)
+    {r : ℚ} (hr : 0 < r)
+    : ∃ ζ : F, ζ ≠ 0 ∧ v ζ = ((r : ℚ) : WithTop ℚ) := by
+  obtain ⟨ζ, hζ⟩ :=
+    IsAlgClosed.exists_pow_nat_eq
+      (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) ϖ ^ r.num)) r.den_pos
+  have hv1
+      : v (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) ϖ ^ r.num))
+        = ((r.num : ℚ) : WithTop ℚ) :=
+    hv _ _ ⟨1, by simp⟩
   have hpow : v (ζ ^ r.den) = r.den • v ζ := AddValuation.map_pow v ζ r.den
   rw [hζ, hv1] at hpow
   obtain ⟨k, hk⟩ := Nat.exists_eq_succ_of_ne_zero r.den_nz
@@ -111,7 +131,8 @@ theorem exists_val_eq {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationR
   rw [← hx, ← WithTop.coe_nsmul, WithTop.coe_eq_coe, nsmul_eq_mul] at hpow
   have hq : (r.den : ℚ) ≠ 0 := by exact_mod_cast r.den_nz
   have hxr : x = r := by
-    have h2 : x = (r.num : ℚ) / (r.den : ℚ) := eq_div_of_mul_eq hq (by rw [mul_comm]; exact hpow.symm)
+    have h2 : x = (r.num : ℚ) / (r.den : ℚ) :=
+      eq_div_of_mul_eq hq (by rw [mul_comm]; exact hpow.symm)
     rw [h2, Rat.num_div_den]
   exact ⟨ζ, fun h0 => hne (by rw [h0, AddValuation.map_zero]), by rw [← hx, hxr]⟩
 
@@ -120,9 +141,15 @@ theorem n1c : PositiveValuationMaximalIdeal := by
   constructor
   · rintro ⟨r, hr, hs⟩
     obtain ⟨ζ, hζ0, hvζ⟩ := exists_val_eq hv hr
-    refine ⟨ζ, ζ⁻¹ • s, by rw [hvζ]; exact_mod_cast hr, ?_,
-      (isSmul_iff ζ (ζ⁻¹ • s) s).2 (by rw [smul_smul, mul_inv_cancel₀ hζ0, one_smul])⟩
-    have h := NuGe.smul Q (q := -r) (by rw [AddValuation.map_inv, hvζ]; rfl) ((isSmul_iff _ _ _).2 rfl) hs
+    refine ⟨
+      ζ,
+      ζ⁻¹ • s,
+      by rw [hvζ]; exact_mod_cast hr,
+      ?_,
+      (isSmul_iff ζ (ζ⁻¹ • s) s).2 (by rw [smul_smul, mul_inv_cancel₀ hζ0, one_smul])
+    ⟩
+    have h :=
+      NuGe.smul Q (q := -r) (by rw [AddValuation.map_inv, hvζ]; rfl) ((isSmul_iff _ _ _).2 rfl) hs
     rwa [add_neg_cancel] at h
   · rintro ⟨ζ, s', hvζ, hs', hsm⟩
     obtain ⟨q, hq, hqle⟩ : ∃ q : ℚ, 0 < q ∧ ((q : ℚ) : WithTop ℚ) ≤ v ζ := by

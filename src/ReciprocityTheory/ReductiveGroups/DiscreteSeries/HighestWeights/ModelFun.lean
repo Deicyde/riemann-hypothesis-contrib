@@ -18,15 +18,16 @@ variable {n : ℕ}
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 def blkMinor (ε : Fin n → Bool) (a : Fin n) (x : Matrix (Fin n) (Fin n) ℂ) : ℂ :=
-  (x.submatrix (fun b : {b : Fin n // ε b = ε a ∧ b ≤ a} => (b : Fin n))
+  (x.submatrix
+    (fun b : {b : Fin n // ε b = ε a ∧ b ≤ a} => (b : Fin n))
     (fun b : {b : Fin n // ε b = ε a ∧ b ≤ a} => (b : Fin n))).det
-
 
 open Classical in
 def mexp (ε : Fin n → Bool) (m : Fin n → ℤ) (a : Fin n) : ℤ :=
   if h : (Finset.univ.filter fun b : Fin n => a < b ∧ ε b = ε a).Nonempty then
     m a - m ((Finset.univ.filter fun b : Fin n => a < b ∧ ε b = ε a).min' h)
-  else m a
+  else
+    m a
 
 def NonnegDom (ε : Fin n → Bool) (m : Fin n → ℤ) : Prop :=
   (∀ a b, a < b → ε a = ε b → m b ≤ m a) ∧ ∀ a, 0 ≤ m a
@@ -36,7 +37,8 @@ def f0 (ε : Fin n → Bool) (m : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ
 
 def f0K (ε : Fin n → Bool) (m : Fin n → ℤ) (k : KG ε) : ℂ := f0 ε m (toMK k)
 
-theorem mexp_nonneg (ε : Fin n → Bool) {m : Fin n → ℤ} (hm : NonnegDom ε m) (a : Fin n) : 0 ≤ mexp ε m a := by
+theorem mexp_nonneg (ε : Fin n → Bool) {m : Fin n → ℤ} (hm : NonnegDom ε m) (a : Fin n)
+    : 0 ≤ mexp ε m a := by
   unfold mexp
   split_ifs with h
   · have hb := (Finset.mem_filter.1 (Finset.min'_mem _ h)).2
@@ -72,17 +74,14 @@ lemma hwmf_diff_blkMinor (ε : Fin n → Bool) (a : Fin n) : Differentiable ℂ 
        intro σ _
        exact (differentiable_const _).mul (hwmf_diff_prod _ _ (fun i => hwmf_diff_entry _ _)))
 
-theorem differentiable_highest_weight_fn (ε : Fin n → Bool) (m : Fin n → ℤ) : Differentiable ℂ (f0 ε m) := by
+theorem differentiable_highest_weight_fn (ε : Fin n → Bool) (m : Fin n → ℤ)
+    : Differentiable ℂ (f0 ε m) := by
   show Differentiable ℂ (fun x : Matrix (Fin n) (Fin n) ℂ => f0 ε m x)
   simp only [f0]
   exact hwmf_diff_prod _ _ (fun a => (hwmf_diff_blkMinor ε a).pow _)
 
 theorem highest_weight_fn_K_one (ε : Fin n → Bool) (m : Fin n → ℤ) : f0K ε m 1 = 1 := by
-  have h1 : toMK (1 : KG ε) = 1 := by
-    first
-      | exact toMK_one
-      | simp [toMK]
-      | rfl
+  have h1 : toMK (1 : KG ε) = 1 := by first | exact toMK_one | simp [toMK] | rfl
   unfold f0K f0 blkMinor
   rw [h1]
   simp [Matrix.submatrix_one _ Subtype.val_injective]
@@ -98,19 +97,22 @@ lemma hwmf_hasDerivAt_A (X Y : Matrix (Fin n) (Fin n) ℂ) :
     funext t; congr 3
   rw [e]; exact h
 
-theorem hasDerivAt_f0K (ε : Fin n → Bool) (m : Fin n → ℤ) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
-    (x : KG ε) :
-    HasDerivAt (fun t : ℝ => f0K ε m (x * kcurve ε X t)) (fderiv ℂ (f0 ε m) (toMK x) (toMK x * X)) 0 := by
+theorem hasDerivAt_f0K
+    (ε : Fin n → Bool) (m : Fin n → ℤ) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (x : KG ε)
+    : HasDerivAt
+      (fun t : ℝ => f0K ε m (x * kcurve ε X t))
+      (fderiv ℂ (f0 ε m) (toMK x) (toMK x * X)) 0 := by
   have hspec := (kcurve_spec ε hX).2.1
   have hmul : ∀ a b : KG ε, toMK (a * b) = toMK a * toMK b := by
     intro a b
     first
-      | exact toMK_mul a b
-      | (simp [toMK, toM]; done)
-      | (simp only [toMK]; exact map_mul _ _ _)
-      | (simp only [toMK, toM]; rfl)
-  have hfun : (fun t : ℝ => f0K ε m (x * kcurve ε X t)) =
-      fun t : ℝ => f0 ε m (toMK x * NormedSpace.exp ((t : ℂ) • X)) := by
+    | exact toMK_mul a b
+    | (simp [toMK, toM]; done)
+    | (simp only [toMK]; exact map_mul _ _ _)
+    | (simp only [toMK, toM]; rfl)
+  have hfun
+      : (fun t : ℝ => f0K ε m (x * kcurve ε X t))
+        = fun t : ℝ => f0 ε m (toMK x * NormedSpace.exp ((t : ℂ) • X)) := by
     funext t
     show f0 ε m (toMK (x * kcurve ε X t)) = _
     rw [hmul, hspec t]
@@ -130,26 +132,26 @@ lemma hwmf_cpart_sum (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ) :
        linear_combination (-(1 / 2) * (Z i j + (Jm ε * Zᴴ * Jm ε) i j)) * Complex.I_sq)
     | (simp [Complex.I_sq]; ring)
 
-private theorem inK_cp1_lemma (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ) :
-    inK ε (cpart1 ε (bdPart ε Z)) := by
+private theorem inK_cp1_lemma (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ)
+    : inK ε (cpart1 ε (bdPart ε Z)) := by
   unfold inK inG cpart1 Jm bdPart
-  constructor <;> ext a b <;>
-    simp [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply, Matrix.sub_mul, Matrix.mul_sub,
-      Matrix.smul_mul, Matrix.mul_smul, Complex.star_def, map_div₀] <;>
-    rcases Bool.eq_false_or_eq_true (ε a) with ha | ha <;>
-    rcases Bool.eq_false_or_eq_true (ε b) with hb | hb <;>
-    simp [ha, hb, Complex.conj_ofNat, map_ofNat] <;> ring
+  constructor <;> ext a b
+    <;> simp [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply, Matrix.sub_mul,
+      Matrix.mul_sub, Matrix.smul_mul, Matrix.mul_smul, Complex.star_def, map_div₀]
+    <;> rcases Bool.eq_false_or_eq_true (ε a) with ha | ha
+    <;> rcases Bool.eq_false_or_eq_true (ε b) with hb | hb
+    <;> simp [ha, hb, Complex.conj_ofNat, map_ofNat] <;> ring
 
-private theorem inK_cp2_lemma_2 (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ) :
-    inK ε (cpart2 ε (bdPart ε Z)) := by
+private theorem inK_cp2_lemma_2 (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ)
+    : inK ε (cpart2 ε (bdPart ε Z)) := by
   unfold inK inG cpart2 Jm bdPart
-  constructor <;> ext a b <;>
-    simp [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply, Matrix.sub_mul, Matrix.mul_sub,
-      Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, Complex.star_def, map_div₀,
-      Complex.conj_I] <;>
-    rcases Bool.eq_false_or_eq_true (ε a) with ha | ha <;>
-    rcases Bool.eq_false_or_eq_true (ε b) with hb | hb <;>
-    simp [ha, hb, Complex.conj_ofNat, map_ofNat] <;> ring
+  constructor <;> ext a b
+    <;> simp [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply, Matrix.sub_mul,
+      Matrix.mul_sub, Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul,
+      Complex.star_def, map_div₀, Complex.conj_I]
+    <;> rcases Bool.eq_false_or_eq_true (ε a) with ha | ha
+    <;> rcases Bool.eq_false_or_eq_true (ε b) with hb | hb
+    <;> simp [ha, hb, Complex.conj_ofNat, map_ofNat] <;> ring
 
 lemma hwmf_rdc (ε : Fin n → Bool) (m : Fin n → ℤ) (Z : Matrix (Fin n) (Fin n) ℂ) (x : KG ε) :
     rdc ε Z (f0K ε m) x = fderiv ℂ (f0 ε m) (toMK x) (toMK x * bdPart ε Z) := by
@@ -318,45 +320,64 @@ lemma hwmf_bd_single (ε : Fin n → Bool) {a b : Fin n} (he : ε a = ε b) :
     rw [if_pos he]
   · rw [Matrix.single_apply, if_neg h, ite_self]
 
-private theorem f0_dg_lemma (ε : Fin n → Bool) (m : Fin n → ℤ) (a : Fin n) (X : Matrix (Fin n) (Fin n) ℂ)
-    (s : ℂ) : f0 ε m (X * (1 + s • single a a (1 : ℂ))) =
-      f0 ε m X * (1 + s) ^ (∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c),
-        (mexp ε m c).toNat) := by
+private theorem f0_dg_lemma
+    (ε : Fin n → Bool) (m : Fin n → ℤ) (a : Fin n) (X : Matrix (Fin n) (Fin n) ℂ) (s : ℂ)
+    : f0 ε m (X * (1 + s • single a a (1 : ℂ)))
+      = f0 ε m X
+        * (1 + s)
+          ^ (∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c),
+              (mexp ε m c).toNat) := by
   unfold f0
   simp only [hwmf_blk_dg, mul_pow, Finset.prod_mul_distrib, ite_pow, one_pow]
   congr 1
   rw [← Finset.prod_filter, Finset.prod_pow_eq_pow_sum]
 
-theorem rdc_f0K_wt (ε : Fin n → Bool) {m : Fin n → ℤ} (hm : NonnegDom ε m) (a : Fin n) (x : KG ε) :
-    rdc ε (Matrix.single a a 1) (f0K ε m) x = ((m a : ℤ) : ℂ) * f0K ε m x := by
+theorem rdc_f0K_wt (ε : Fin n → Bool) {m : Fin n → ℤ} (hm : NonnegDom ε m) (a : Fin n) (x : KG ε)
+    : rdc ε (Matrix.single a a 1) (f0K ε m) x = ((m a : ℤ) : ℂ) * f0K ε m x := by
   rw [hwmf_rdc, hwmf_bd_single ε rfl]
   have h1 := hwmf_line ε m (toMK x) (single a a 1)
-  have hc : (fun s : ℂ => f0 ε m (toMK x * (1 + s • single a a (1 : ℂ)))) = fun s =>
-      f0 ε m (toMK x) * (1 + s) ^ (∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c),
-        (mexp ε m c).toNat) := by
+  have hc
+      : (fun s : ℂ => f0 ε m (toMK x * (1 + s • single a a (1 : ℂ))))
+        = fun s =>
+          f0 ε m (toMK x)
+            * (1 + s)
+              ^ (∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c),
+                  (mexp ε m c).toNat) := by
     funext s
     exact f0_dg_lemma ε m a (toMK x) s
   rw [hc] at h1
-  have h2 := (((hasDerivAt_id' (0 : ℂ)).const_add 1).pow (∑ c ∈ Finset.univ.filter
-    (fun c : Fin n => ε a = ε c ∧ a ≤ c), (mexp ε m c).toNat)).const_mul (f0 ε m (toMK x))
+  have h2 :=
+    (((hasDerivAt_id' (0 : ℂ)).const_add 1).pow
+      (∑ c ∈ Finset.univ.filter
+        (fun c : Fin n => ε a = ε c ∧ a ≤ c), (mexp ε m c).toNat)).const_mul (f0 ε m (toMK x))
   rw [h1.unique h2]
-  have hsum : ((∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c), (mexp ε m c).toNat : ℕ) : ℤ)
-      = m a := by
+  have hsum
+      : ((∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c), (mexp ε m c).toNat : ℕ)
+          : ℤ)
+        = m a := by
     rw [Nat.cast_sum, ← hwmf_tele ε m _ a rfl]
     exact Finset.sum_congr rfl fun c _ => Int.toNat_of_nonneg (mexp_nonneg ε hm c)
-  have hsumC : ((∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c), (mexp ε m c).toNat : ℕ) : ℂ)
-      = ((m a : ℤ) : ℂ) := by
+  have hsumC
+      : ((∑ c ∈ Finset.univ.filter (fun c : Fin n => ε a = ε c ∧ a ≤ c), (mexp ε m c).toNat : ℕ)
+          : ℂ)
+        = ((m a : ℤ) : ℂ) := by
     rw [← hsum, Int.cast_natCast]
   simp only [add_zero, one_pow, mul_one]
   rw [hsumC]
   unfold f0K
   ring
 
-theorem rdc_f0K_hw (ε : Fin n → Bool) {m : Fin n → ℤ} (hm : NonnegDom ε m) {a b : Fin n} (hab : a < b)
-    (he : ε a = ε b) (x : KG ε) : rdc ε (Matrix.single a b 1) (f0K ε m) x = 0 := by
+theorem rdc_f0K_hw
+    (ε : Fin n → Bool)
+    {m : Fin n → ℤ} (hm : NonnegDom ε m)
+    {a b : Fin n} (hab : a < b) (he : ε a = ε b)
+    (x : KG ε)
+    : rdc ε (Matrix.single a b 1) (f0K ε m) x = 0 := by
   rw [hwmf_rdc, hwmf_bd_single ε he]
   have h1 := hwmf_line ε m (toMK x) (single a b 1)
-  have hc : (fun s : ℂ => f0 ε m (toMK x * (1 + s • single a b (1 : ℂ)))) = fun _ => f0 ε m (toMK x) := by
+  have hc
+      : (fun s : ℂ => f0 ε m (toMK x * (1 + s • single a b (1 : ℂ))))
+        = fun _ => f0 ε m (toMK x) := by
     funext s
     unfold f0
     simp only [hwmf_blk_tv ε hab he]

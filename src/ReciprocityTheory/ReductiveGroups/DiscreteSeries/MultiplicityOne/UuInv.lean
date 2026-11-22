@@ -16,10 +16,13 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1.SymE
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
-  ReciprocityTheory.ChartRestriction.DS.Mult1.SymB ReciprocityTheory.ChartRestriction.DS.Mult1.SymC ReciprocityTheory.ChartRestriction.DS.Mult1.SymD
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
+  ReciprocityTheory.ChartRestriction.DS.Mult1.SymB ReciprocityTheory.ChartRestriction.DS.Mult1.SymC
+  ReciprocityTheory.ChartRestriction.DS.Mult1.SymD
 
-variable {k r : ℕ} {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
 
 private theorem hpk_sq_lemma : Hpk k r * Hpk k r = 1 := by
   ext i j
@@ -67,25 +70,28 @@ lemma uu_inv {z : Fin (2 * r + k + 1) → ℂ} {γ : Matrix (Fin (k + 1)) (Fin (
     _ = ((u⁻¹)ᴴ * uᴴ) * Hpk k r * (u * u⁻¹) := by simp only [Matrix.mul_assoc]
     _ = Hpk k r := by rw [h2, h3, Matrix.one_mul, Matrix.mul_one]
 
-theorem core (D : RealPlaceData k r Wp Wp) (hD : IsDiag D) (hCI : ConjInv D) (hclW : IsClosed (UWset k r D.z))
-    (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (hE : IsUnit (embWb k r γ).det)
-    (hgW : D.μW.map (gb γ) = D.μW) (hgN : D.μN.map (gb γ) = D.μN)
-    (hlam : ∀ m ∈ Nset k r, lam k r D.z (gbar k r γ m) = -lam k r D.z m)
+theorem core
+    (D : RealPlaceData k r Wp Wp)
+    (hD : IsDiag D) (hCI : ConjInv D) (hclW : IsClosed (UWset k r D.z))
+    (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (hE : IsUnit (embWb k r γ).det) (hgW : D.μW.map (gb γ) = D.μW) (hgN : D.μN.map (gb γ) = D.μN)
+    (hlam : ∀ m ∈ Nset k r, lam k r D.z (gbar k r γ m) = - lam k r D.z m)
     (hWbar : ∀ h ∈ UWset k r D.z, gbar k r γ h ∈ UWset k r D.z)
     (hT6 : ∀ y ∈ UWset k r D.z, ∃ u₀ ∈ UUset k r D.z γ, th k r γ y = u₀ * y * u₀⁻¹)
     {g0 : Mat k r} (hg0 : th k r γ g0 = g0) (hcomm : ∀ u ∈ UUset k r D.z γ, u * g0 = g0 * u)
-    (f : Mat k r → ℂ) (hEf : ∫⁻ p, ‖rho D p (scalF Wp f) g0‖ₑ ∂D.μSS ≠ ∞) :
-    JF D (scalF Wp (f ∘ th k r γ)) g0 = JF D (scalF Wp f) g0 := by
+    (f : Mat k r → ℂ) (hEf : ∫⁻ p, ‖rho D p (scalF Wp f) g0‖ₑ ∂D.μSS ≠ ∞)
+    : JF D (scalF Wp (f ∘ th k r γ)) g0 = JF D (scalF Wp f) g0 := by
   have hz : D.z' = D.z := hD.z_eq
   have hπ : D.π' = D.π := hD.π_eq
-  have Bc : ∀ F : Mat k r → (Wp →L[ℂ] Wp), ∀ u ∈ UUset k r D.z γ,
-      (JF D F g0).comp (D.π u) = (D.π u).comp (JF D F g0) := by
+  have Bc
+      : ∀ F : Mat k r → (Wp →L[ℂ] Wp), ∀ u ∈ UUset k r D.z γ,
+        (JF D F g0).comp (D.π u) = (D.π u).comp (JF D F g0) := by
     intro F u hu
     have hu' : u ∈ UWset k r D.z' := hz ▸ hu.1
     have e := J_equiv D hCI hu.1 hu' F g0
     have eg : u⁻¹ * g0 * u = g0 := by
-      rw [Matrix.mul_assoc, ← hcomm u hu, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ (isUnit_of_uh hu.1.1),
-        Matrix.one_mul]
+      rw [Matrix.mul_assoc, ← hcomm u hu, ← Matrix.mul_assoc,
+        Matrix.nonsing_inv_mul _ (isUnit_of_uh hu.1.1), Matrix.one_mul]
     rw [eg, Lab_apply, hπ] at e
     conv_lhs => rw [e]
     ext v
@@ -94,8 +100,9 @@ theorem core (D : RealPlaceData k r Wp Wp) (hD : IsDiag D) (hCI : ConjInv D) (hc
   have hB' : JF D (scalF Wp (f ∘ th k r γ)) g0 = ∫ p, Psi D γ f g0 p ∂D.μSS :=
     J_th D hD γ hE hgW hgN hlam hg0 f
   have hC := aesm_C D hD γ hclW hgW
-  have hPC : ∀ᵐ p ∂D.μSS, Psi D γ f g0 p = (Phi D f g0 p).comp (Cf D γ p) ∧
-      Phi D f g0 p = (Psi D γ f g0 p).comp (Cb D γ p) ∧ ‖Cf D γ p‖ ≤ 1 ∧ ‖Cb D γ p‖ ≤ 1 := by
+  have hPC
+      : ∀ᵐ p ∂D.μSS, Psi D γ f g0 p = (Phi D f g0 p).comp (Cf D γ p) ∧
+        Phi D f g0 p = (Psi D γ f g0 p).comp (Cb D γ p) ∧ ‖Cf D γ p‖ ≤ 1 ∧ ‖Cb D γ p‖ ≤ 1 := by
     filter_upwards [ae_in D] with p hp using psi_eq_C D hD γ hWbar hp f g0
   by_cases hm : AEStronglyMeasurable (Phi D f g0) D.μSS
   swap
@@ -106,17 +113,22 @@ theorem core (D : RealPlaceData k r Wp Wp) (hD : IsDiag D) (hCI : ConjInv D) (hc
     refine ⟨hm, hasFiniteIntegral_iff_enorm.2 ?_⟩
     have e : ∀ p, ‖Phi D f g0 p‖ₑ = ‖rho D p (scalF Wp f) g0‖ₑ := fun p => by
       have h1 : ‖ph D p‖ₑ = 1 := by
-        rw [enorm_eq_nnnorm, show ‖ph D p‖₊ = 1 from NNReal.eq (by rw [coe_nnnorm, NNReal.coe_one]; exact norm_ph D p),
+        rw [enorm_eq_nnnorm,
+          show ‖ph D p‖₊ = 1 from NNReal.eq (by rw [coe_nnnorm, NNReal.coe_one]; exact norm_ph D p),
           ENNReal.coe_one]
-      rw [show Phi D f g0 p = ph D p • rho D p (scalF Wp f) g0 by rw [rho_scalF, hπ]; rfl, enorm_smul, h1, one_mul]
-    calc ∫⁻ p, ‖Phi D f g0 p‖ₑ ∂D.μSS = ∫⁻ p, ‖rho D p (scalF Wp f) g0‖ₑ ∂D.μSS := lintegral_congr e
+      rw [show Phi D f g0 p = ph D p • rho D p (scalF Wp f) g0 by rw [rho_scalF, hπ]; rfl,
+        enorm_smul, h1, one_mul]
+    calc
+      ∫⁻ p, ‖Phi D f g0 p‖ₑ ∂D.μSS
+        = ∫⁻ p, ‖rho D p (scalF Wp f) g0‖ₑ ∂D.μSS := lintegral_congr e
       _ < ∞ := hEf.lt_top
   have hPsiM : AEStronglyMeasurable (Psi D γ f g0) D.μSS :=
     (aesm_comp hm hC.1).congr (hPC.mono fun p hp => hp.1.symm)
   have hPsiI : Integrable (Psi D γ f g0) D.μSS := by
     refine hPhiI.norm.mono' hPsiM (hPC.mono fun p hp => ?_)
     rw [hp.1]
-    exact (ContinuousLinearMap.opNorm_comp_le _ _).trans (mul_le_of_le_one_right (norm_nonneg _) hp.2.2.1)
+    exact (ContinuousLinearMap.opNorm_comp_le _ _).trans
+      (mul_le_of_le_one_right (norm_nonneg _) hp.2.2.1)
   obtain ⟨Y, hY⟩ : ∃ Y, Y = JF D (scalF Wp (f ∘ th k r γ)) g0 - JF D (scalF Wp f) g0 := ⟨_, rfl⟩
   have hYc : ∀ u ∈ UUset k r D.z γ, Y.comp (D.π u) = (D.π u).comp Y := fun u hu => by
     rw [hY, ContinuousLinearMap.sub_comp, ContinuousLinearMap.comp_sub, Bc _ u hu, Bc _ u hu]
@@ -126,21 +138,27 @@ theorem core (D : RealPlaceData k r Wp Wp) (hD : IsDiag D) (hCI : ConjInv D) (hc
     have hh' : Matrix.of p.2.1 ∈ UWset k r D.z := hz ▸ hp.2.2.1
     have hy : Matrix.of p.1.1 * (Matrix.of p.2.1)⁻¹ ∈ UWset k r D.z := uw_mul hh (uw_inv hh')
     obtain ⟨u₀, hu₀, hth⟩ := hT6 _ hy
-    have hop : (D.π (gbar k r γ (Matrix.of p.2.1))).comp (D.π (gbar k r γ (Matrix.of p.1.1))⁻¹) =
-        ((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1 : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp).comp
-          (((D.π (Matrix.of p.1.1)).comp (D.π (Matrix.of p.2.1)⁻¹)).comp
-            (((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1).symm : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp)) := by
-      rw [← D.π_rep.2 _ (hWbar _ hh') _ (uw_inv (hWbar _ hh)), ← th_mul_inv γ hE (isUnit_of_uh hh'.1), hth,
-        D.π_rep.2 _ (uw_mul hu₀.1 hy) _ (uw_inv hu₀.1), D.π_rep.2 _ hu₀.1 _ hy, D.π_rep.2 _ hh _ (uw_inv hh')]
+    have hop
+        : (D.π (gbar k r γ (Matrix.of p.2.1))).comp (D.π (gbar k r γ (Matrix.of p.1.1))⁻¹)
+          = ((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1 : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp).comp
+            (((D.π (Matrix.of p.1.1)).comp (D.π (Matrix.of p.2.1)⁻¹)).comp
+              (((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1).symm : Wp ≃ₗᵢ[ℂ] Wp)
+                : Wp →L[ℂ] Wp)) := by
+      rw [← D.π_rep.2 _ (hWbar _ hh') _ (uw_inv (hWbar _ hh)),
+        ← th_mul_inv γ hE (isUnit_of_uh hh'.1), hth, D.π_rep.2 _ (uw_mul hu₀.1 hy) _ (uw_inv hu₀.1),
+        D.π_rep.2 _ hu₀.1 _ hy, D.π_rep.2 _ hh _ (uw_inv hh')]
       ext v
       rfl
-    have h2 : Y.comp (((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1).symm : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp) =
-        (((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1).symm : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp).comp Y := by
+    have h2
+        : Y.comp (((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1).symm : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp)
+          = (((piLIE D.z D.π D.π_rep D.π_unitary u₀ hu₀.1).symm : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp).comp
+            Y := by
       rw [← pi_inv_eq D hu₀.1]
       exact hYc _ (uu_inv hu₀)
     simp only [Psi, Phi, hop, map_smul, trY_conj Y _ _ h2]
   have hI1 : trY Y (∫ p, Psi D γ f g0 p ∂D.μSS) = trY Y (∫ p, Phi D f g0 p ∂D.μSS) := by
-    rw [← ContinuousLinearMap.integral_comp_comm _ hPsiI, ← ContinuousLinearMap.integral_comp_comm _ hPhiI]
+    rw [← ContinuousLinearMap.integral_comp_comm _ hPsiI,
+      ← ContinuousLinearMap.integral_comp_comm _ hPhiI]
     exact integral_congr_ae key
   have hYY : trY Y (JF D (scalF Wp (f ∘ th k r γ)) g0 - JF D (scalF Wp f) g0) = 0 := by
     rw [map_sub, hB, hB', hI1, sub_self]
@@ -152,12 +170,21 @@ end ReciprocityTheory.ChartRestriction.DS.Mult1.SymE
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA ReciprocityTheory.ChartRestriction.DS.Mult1.SymB
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ReciprocityTheory.ChartRestriction.DS.Mult1.SymA ReciprocityTheory.ChartRestriction.DS.Mult1.SymB
   ReciprocityTheory.ChartRestriction.DS.Mult1.SymE
 
 theorem stSym (hIn : UnitaryGroupStructuralFacts) : StSym := by
   intro k r Wp _ _ _ D X hD hX γ hγ f q _ hq hT hEf
-  obtain ⟨⟨-, -, -, -, -, -, -, -, -, -, -, -, hCIall, -, -, -, -, -, -, -, -, hClW, -⟩, -, -, hBCF, hUWb, -⟩ := id hIn
+  obtain ⟨
+      ⟨-, -, -, -, -, -, -, -, -, -, -, -, hCIall, -, -, -, -, -, -, -, -, hClW, -⟩,
+      -,
+      -,
+      hBCF,
+      hUWb,
+      -
+    ⟩ :=
+    id hIn
   have hCI : ConjInv D := hCIall k r Wp Wp D
   obtain ⟨-, -, hW1, -, -, -, -, hμN, hμW⟩ := stInvGroup hIn k r Wp D X hD hX γ hγ
   have hChar := stInvChar k r Wp D X hD hX γ hγ
@@ -199,13 +226,18 @@ theorem stSym (hIn : UnitaryGroupStructuralFacts) : StSym := by
   obtain ⟨-, -, -, hg0th, h₀, hh₀, h₀', hh₀', hgq⟩ := stReps hIn k r Wp D X hD hX γ hγ q.1 d hc hd
   rw [hqd] at hgq
   have hh₀'' : h₀' ∈ UWset k r D.z' := hD.z_eq ▸ hh₀'
-  have red : ∀ F : Mat k r → (Wp →L[ℂ] Wp),
-      JF D F (gq D q) = (Lab D hh₀ hh₀'').symm (JF D F (g0 k r γ q.1 d)) := fun F => by
+  have red
+      : ∀ F : Mat k r → (Wp →L[ℂ] Wp),
+        JF D F (gq D q) = (Lab D hh₀ hh₀'').symm (JF D F (g0 k r γ q.1 d)) := fun F => by
     rw [J_equiv D hCI hh₀ hh₀'' F (g0 k r γ q.1 d), ← hgq, ContinuousLinearEquiv.symm_apply_apply]
   have hEf0 : ∫⁻ p, ‖rho D p (scalF Wp f) (g0 k r γ q.1 d)‖ₑ ∂D.μSS ≠ ∞ := by
     rw [E_equiv D hCI hh₀ hh₀'', ← hgq]
     exact hEf
-  rw [red, red, core D hD hCI (hClW k r D.z).closed γ hE hμW hμN (fun m hm => (hChar m hm).1) hW1 hL6 hg0th
-    (fun u hu => big_cell_commute_frame_element hBCF hUWb D.k_pos hγ hu q.1 d) f hEf0]
+  rw [red, red,
+    core D hD hCI (hClW k r D.z).closed γ hE hμW hμN
+      (fun m hm => (hChar m hm).1)
+      hW1 hL6 hg0th
+      (fun u hu => big_cell_commute_frame_element hBCF hUWb D.k_pos hγ hu q.1 d)
+      f hEf0]
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1

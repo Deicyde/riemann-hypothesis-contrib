@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FormallyUnram
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
 open scoped Matrix TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -19,13 +21,28 @@ namespace GlobalTheory
 
 open IsDedekindDomain HeightOneSpectrum WithZero
 
-theorem locGen_val_eq (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (d : 𝓞 F) :
-    Valued.v (algebraMap F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) (d : F)) = v.intValuation d := by
+theorem locGen_val_eq (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (d : 𝓞 F)
+    : Valued.v (algebraMap F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+        (d : F))
+      = v.intValuation d := by
   have h := valuedAdicCompletion_eq_valuation' (K := F) v (d : F)
   rw [← valuation_of_algebraMap (K := F) v d]
   exact h
 
-theorem ideal_localGenerator : ∀ (F : Type) [Field F] [NumberField F] (I : Ideal (𝓞 F)) (v : IsDedekindDomain.HeightOneSpectrum (𝓞 F)), I ≠ ⊥ → ∃ z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v, z ≠ 0 ∧ (¬ I ≤ v.asIdeal → z = 1) ∧ (∀ d ∈ I, Valued.v (algebraMap F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) (d : F)) ≤ Valued.v z) ∧ ∃ d ∈ I, Valued.v (algebraMap F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) (d : F)) = Valued.v z := by
+theorem ideal_localGenerator
+    : ∀ (F : Type) [Field F] [NumberField F] (I : Ideal (𝓞 F))
+        (v : IsDedekindDomain.HeightOneSpectrum (𝓞 F)),
+      I ≠ ⊥
+        → ∃ z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v,
+          z ≠ 0 ∧ (¬ I ≤ v.asIdeal → z = 1)
+            ∧ (∀ d ∈ I,
+              Valued.v (algebraMap F
+                  (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) (d : F))
+                ≤ Valued.v z)
+            ∧ ∃ d ∈ I,
+              Valued.v (algebraMap F
+                  (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) (d : F))
+                = Valued.v z := by
   intro F _ _ I v hI
   by_cases hv : I ≤ v.asIdeal
   · classical

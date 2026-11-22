@@ -6,27 +6,35 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.CechRep
 
 variable {V W : Scheme.{0}} (f : V ⟶ W)
 
 def IsPow (n : ℕ) (Z : Scheme.{0}) (p : Fin (n + 1) → (Z ⟶ V)) : Prop :=
-  (∀ i, p i ≫ f = p 0 ≫ f) ∧ ∀ (U : Scheme.{0}) (y : Fin (n + 1) → (U ⟶ V)), (∀ i, y i ≫ f = y 0 ≫ f) →
-    ∃! g : U ⟶ Z, ∀ i, g ≫ p i = y i
+  (∀ i, p i ≫ f = p 0 ≫ f)
+    ∧ ∀ (U : Scheme.{0}) (y : Fin (n + 1) → (U ⟶ V)),
+      (∀ i, y i ≫ f = y 0 ≫ f) → ∃! g : U ⟶ Z, ∀ i, g ≫ p i = y i
 
-theorem exists_pow (P : MorphismProperty Scheme.{0}) [P.IsStableUnderBaseChange] [P.IsMultiplicative]
-    (hf : P f) (n : ℕ) : ∃ (Z : Scheme.{0}) (p : Fin (n + 1) → (Z ⟶ V)), IsPow f n Z p ∧ P (p 0) := by
+theorem exists_pow
+    (P : MorphismProperty Scheme.{0}) [P.IsStableUnderBaseChange] [P.IsMultiplicative]
+    (hf : P f) (n : ℕ)
+    : ∃ (Z : Scheme.{0}) (p : Fin (n + 1) → (Z ⟶ V)), IsPow f n Z p ∧ P (p 0) := by
   induction n with
   | zero =>
-    refine ⟨V, fun _ => 𝟙 V, ⟨fun _ => rfl, fun U y _ => ⟨y 0, fun i => ?_, fun g hg => ?_⟩⟩, P.id_mem V⟩
+    refine
+      ⟨V, fun _ => 𝟙 V, ⟨fun _ => rfl, fun U y _ => ⟨y 0, fun i => ?_, fun g hg => ?_⟩⟩, P.id_mem V⟩
     · rw [Fin.fin_one_eq_zero i]; simp
     · simpa using hg 0
   | succ n ih =>
     obtain ⟨Z, p, ⟨hc, hu⟩, hP⟩ := ih
     let q : Fin (n + 2) → (pullback (p 0 ≫ f) f ⟶ V) :=
-      Fin.snoc (α := fun _ => pullback (p 0 ≫ f) f ⟶ V) (fun j => pullback.fst _ _ ≫ p j) (pullback.snd _ _)
+      Fin.snoc
+        (α := fun _ => pullback (p 0 ≫ f) f ⟶ V)
+        (fun j => pullback.fst _ _ ≫ p j)
+        (pullback.snd _ _)
     have qc : ∀ j : Fin (n + 1), q j.castSucc = pullback.fst _ _ ≫ p j := fun j => by simp [q]
     have ql : q (Fin.last _) = pullback.snd _ _ := by simp [q]
     have hz : (Fin.castSucc (0 : Fin (n + 1)) : Fin (n + 2)) = 0 := rfl
@@ -61,15 +69,19 @@ variable {V W : Scheme.{0}} (f : V ⟶ W)
 
 noncomputable section
 
-def isLimitPow {n : ℕ} {Z : Scheme.{0}} {p : Fin (n + 1) → (Z ⟶ V)} (h : IsPow f n Z p) :
-    IsLimit (WidePullbackShape.mkCone (F := WidePullbackShape.wideCospan W (fun _ : Fin (n + 1) => V) (fun _ => f))
-      (p 0 ≫ f) p (fun j => h.1 j)) := by
-  have hs : ∀ s : Cone (WidePullbackShape.wideCospan W (fun _ : Fin (n + 1) => V) (fun _ => f)),
-      ∀ j, s.π.app (some j) ≫ f = s.π.app (some 0) ≫ f := fun s j => by
+def isLimitPow {n : ℕ} {Z : Scheme.{0}} {p : Fin (n + 1) → (Z ⟶ V)} (h : IsPow f n Z p)
+    : IsLimit (WidePullbackShape.mkCone
+      (F := WidePullbackShape.wideCospan W (fun _ : Fin (n + 1) => V) (fun _ => f)) (p 0 ≫ f) p
+      (fun j => h.1 j)) := by
+  have hs
+      : ∀ s : Cone (WidePullbackShape.wideCospan W (fun _ : Fin (n + 1) => V) (fun _ => f)), ∀ j,
+        s.π.app (some j) ≫ f = s.π.app (some 0) ≫ f := fun s j => by
     have a : s.π.app (some j) ≫ f = s.π.app none := s.w (WidePullbackShape.Hom.term j)
     have b : s.π.app (some 0) ≫ f = s.π.app none := s.w (WidePullbackShape.Hom.term 0)
     rw [a, b]
-  refine IsLimit.mk (fun s => (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).exists.choose) (fun s j => ?_)
+  refine IsLimit.mk
+    (fun s => (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).exists.choose)
+    (fun s j => ?_)
     (fun s m hm => ?_)
   · have hl := (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).exists.choose_spec
     cases j with
@@ -78,22 +90,32 @@ def isLimitPow {n : ℕ} {Z : Scheme.{0}} {p : Fin (n + 1) → (Z ⟶ V)} (h : I
       change (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).exists.choose ≫ (p 0 ≫ f) = s.π.app none
       rw [← Category.assoc, hl 0]
       exact b
-    | some j =>
-      exact hl j
-  · exact (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).unique (fun j => hm (some j))
+    | some j => exact hl j
+  · exact (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).unique
+      (fun j => hm (some j))
       (h.2 s.pt (fun j => s.π.app (some j)) (hs s)).exists.choose_spec
 
 end
 
 end GlobalTheory.EtC.CechRep
 
-theorem GlobalTheory.EtC.cech_level_representable : ∀ (P : MorphismProperty Scheme.{0}) [P.IsStableUnderBaseChange] [P.IsMultiplicative] (V W : Scheme.{0}) (f : V ⟶ W), P f → ∀ k : SimplexCategoryᵒᵖ, ∃ (Z : Scheme.{0}) (π : Z ⟶ V) (e : yoneda.obj Z ≅ (cech f).obj k), P π ∧ e.hom ≫ (cechAug f).app k = yoneda.map (π ≫ f) := by
+theorem GlobalTheory.EtC.cech_level_representable
+    : ∀ (P : MorphismProperty Scheme.{0}) [P.IsStableUnderBaseChange] [P.IsMultiplicative]
+        (V W : Scheme.{0}) (f : V ⟶ W),
+      P f
+        → ∀ k : SimplexCategoryᵒᵖ,
+          ∃ (Z : Scheme.{0}) (π : Z ⟶ V) (e : yoneda.obj Z ≅ (cech f).obj k),
+            P π ∧ e.hom ≫ (cechAug f).app k = yoneda.map (π ≫ f) := by
   intro P _ _ V W f hf k
   obtain ⟨Z, p, h, hP⟩ := GlobalTheory.EtC.CechRep.exists_pow f P hf k.unop.len
   have hY := isLimitOfPreserves yoneda (GlobalTheory.EtC.CechRep.isLimitPow f h)
-  let D := WidePullbackShape.wideCospan (yoneda.obj W) (fun _ : Fin (k.unop.len + 1) => yoneda.obj V)
-    (fun _ => yoneda.map f)
-  let iso : WidePullbackShape.wideCospan W (fun _ : Fin (k.unop.len + 1) => V) (fun _ => f) ⋙ yoneda ≅ D :=
+  let D :=
+    WidePullbackShape.wideCospan (yoneda.obj W)
+      (fun _ : Fin (k.unop.len + 1) => yoneda.obj V)
+      (fun _ => yoneda.map f)
+  let iso
+      : WidePullbackShape.wideCospan W (fun _ : Fin (k.unop.len + 1) => V) (fun _ => f) ⋙ yoneda
+        ≅ D :=
     WidePullbackShape.diagramIsoWideCospan _
   have hL := (IsLimit.postcomposeHomEquiv iso _).symm hY
   refine ⟨Z, p 0, IsLimit.conePointUniqueUpToIso hL (limit.isLimit D), hP, ?_⟩

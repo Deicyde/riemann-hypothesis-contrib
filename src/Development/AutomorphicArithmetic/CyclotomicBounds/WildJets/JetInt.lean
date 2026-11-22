@@ -14,8 +14,11 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.WildJets.BvvInt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -27,13 +30,14 @@ private noncomputable abbrev zPol (σ : Type) : Subring (MvPolynomial σ ℂ) :=
 
 private theorem zX_mem {σ : Type} (v : σ) : (X v : MvPolynomial σ ℂ) ∈ zPol σ := ⟨X v, map_X _ _⟩
 
-private theorem zcoeff {σ : Type} {p : MvPolynomial σ ℂ} (hp : p ∈ zPol σ) (m : σ →₀ ℕ) :
-    ∃ z : ℤ, p.coeff m = (z : ℂ) := by
+private theorem zcoeff {σ : Type} {p : MvPolynomial σ ℂ} (hp : p ∈ zPol σ) (m : σ →₀ ℕ)
+    : ∃ z : ℤ, p.coeff m = (z : ℂ) := by
   obtain ⟨q, rfl⟩ := RingHom.mem_range.mp hp
   exact ⟨q.coeff m, by simp [MvPolynomial.coeff_map]⟩
 
-private theorem zdet_mem {σ : Type} {s : ℕ} (M : Matrix (Fin s) (Fin s) (MvPolynomial σ ℂ))
-    (h : ∀ p q, M p q ∈ zPol σ) : M.det ∈ zPol σ := by
+private theorem zdet_mem
+    {σ : Type} {s : ℕ} (M : Matrix (Fin s) (Fin s) (MvPolynomial σ ℂ)) (h : ∀ p q, M p q ∈ zPol σ)
+    : M.det ∈ zPol σ := by
   choose M' hM' using fun p q => RingHom.mem_range.mp (h p q)
   refine RingHom.mem_range.mpr ⟨(Matrix.of M').det, ?_⟩
   rw [RingHom.map_det]
@@ -41,8 +45,10 @@ private theorem zdet_mem {σ : Type} {s : ℕ} (M : Matrix (Fin s) (Fin s) (MvPo
   refine Matrix.ext fun p q => ?_
   simpa using hM' p q
 
-private theorem zaeval_mem {σ τ : Type} {p : MvPolynomial σ ℂ} (hp : p ∈ zPol σ) (g : σ → MvPolynomial τ ℂ)
-    (hg : ∀ v, g v ∈ zPol τ) : aeval g p ∈ zPol τ := by
+private theorem zaeval_mem
+    {σ τ : Type} {p : MvPolynomial σ ℂ}
+    (hp : p ∈ zPol σ) (g : σ → MvPolynomial τ ℂ) (hg : ∀ v, g v ∈ zPol τ)
+    : aeval g p ∈ zPol τ := by
   obtain ⟨q, rfl⟩ := RingHom.mem_range.mp hp
   clear hp
   induction q using MvPolynomial.induction_on with
@@ -58,49 +64,59 @@ private theorem zaeval_mem {σ τ : Type} {p : MvPolynomial σ ℂ} (hp : p ∈ 
 
 variable {ι : Type} [Fintype ι] {a b : ℕ}
 
-private theorem zsubD_mem {P : Pol ℂ ι a} (hP : P ∈ zPol (ι × Fin a × Fin a)) :
-    subD ℂ ι a b P ∈ zPol ((ι × Fin b × Fin b) ⊕ DVar ι a b) := by
+private theorem zsubD_mem {P : Pol ℂ ι a} (hP : P ∈ zPol (ι × Fin a × Fin a))
+    : subD ℂ ι a b P ∈ zPol ((ι × Fin b × Fin b) ⊕ DVar ι a b) := by
   unfold subD
   refine zaeval_mem hP _ fun v => ?_
   split_ifs
   · exact sum_mem fun β _ => mul_mem (zX_mem _) (zX_mem _)
   · exact zero_mem _
 
-private theorem jetLin_mono (J : (DVar ι a b →₀ ℕ) → ℂ) (m : (ι × Fin b × Fin b) ⊕ DVar ι a b →₀ ℕ) (c : ℂ) :
-    jetLin J (monomial m c) =
-      monomial (m.comapDomain Sum.inl Sum.inl_injective.injOn) (c * J (m.comapDomain Sum.inr Sum.inr_injective.injOn)) := by
-  have e : (monomial m c : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ) =
-      c • (basisMonomials _ ℂ) m := by
+private theorem jetLin_mono
+    (J : (DVar ι a b →₀ ℕ) → ℂ) (m : (ι × Fin b × Fin b) ⊕ DVar ι a b →₀ ℕ) (c : ℂ)
+    : jetLin J (monomial m c)
+      = monomial (m.comapDomain Sum.inl Sum.inl_injective.injOn)
+        (c * J (m.comapDomain Sum.inr Sum.inr_injective.injOn)) := by
+  have e
+      : (monomial m c : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ)
+        = c • (basisMonomials _ ℂ) m := by
     rw [MvPolynomial.coe_basisMonomials, smul_monomial, smul_eq_mul, mul_one]
   rw [e, map_smul]
   simp only [jetLin, Module.Basis.constr_basis, smul_monomial, smul_eq_mul]
 
 open Classical in
-private theorem jetLin_zmem (k : DVar ι a b →₀ ℕ)
-    {p : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ} (hp : p ∈ zPol _) :
-    jetLin (fun m => if m = k then (1 : ℂ) else 0) p ∈ zPol (ι × Fin b × Fin b) := by
+private theorem jetLin_zmem
+    (k : DVar ι a b →₀ ℕ) {p : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ} (hp : p ∈ zPol _)
+    : jetLin (fun m => if m = k then (1 : ℂ) else 0) p ∈ zPol (ι × Fin b × Fin b) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [p.as_sum, map_sum]
   refine sum_mem fun μ _ => ?_
   rw [jetLin_mono]
   obtain ⟨z, hz⟩ := zcoeff hp μ
-  refine RingHom.mem_range.mpr ⟨monomial (μ.comapDomain Sum.inl Sum.inl_injective.injOn)
-    (z * if μ.comapDomain Sum.inr Sum.inr_injective.injOn = k then 1 else 0), ?_⟩
+  refine RingHom.mem_range.mpr ⟨
+    monomial (μ.comapDomain Sum.inl Sum.inl_injective.injOn)
+      (z * if μ.comapDomain Sum.inr Sum.inr_injective.injOn = k then 1 else 0),
+    ?_
+  ⟩
   rw [MvPolynomial.map_monomial, hz]
   split_ifs <;> simp
 
 open Classical in
-private theorem jetLin_split (p : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ) :
-    ∃ S : Finset (DVar ι a b →₀ ℕ), ∀ J : (DVar ι a b →₀ ℕ) → ℂ,
+private theorem jetLin_split (p : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ)
+    : ∃ S : Finset (DVar ι a b →₀ ℕ), ∀ J : (DVar ι a b →₀ ℕ) → ℂ,
       jetLin J p = ∑ k ∈ S, J k • jetLin (fun m => if m = k then (1 : ℂ) else 0) p := by
-  have hsplit : ∀ J' : (DVar ι a b →₀ ℕ) → ℂ, jetLin J' p = ∑ μ ∈ p.support,
-      monomial (μ.comapDomain Sum.inl Sum.inl_injective.injOn)
-        (AddMonoidAlgebra.coeff p μ * J' (μ.comapDomain Sum.inr Sum.inr_injective.injOn)) := by
-    intro J'
-    conv_lhs => rw [p.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    simp only [jetLin_mono]
+  have hsplit
+      : ∀ J' : (DVar ι a b →₀ ℕ) → ℂ,
+        jetLin J' p
+          = ∑ μ ∈ p.support,
+            monomial (μ.comapDomain Sum.inl Sum.inl_injective.injOn)
+              (AddMonoidAlgebra.coeff p μ * J' (μ.comapDomain Sum.inr Sum.inr_injective.injOn)) :=
+    by
+      intro J'
+      conv_lhs => rw [p.as_sum]
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum]
+      simp only [jetLin_mono]
   refine ⟨p.support.image (fun μ => μ.comapDomain Sum.inr Sum.inr_injective.injOn), fun J => ?_⟩
   rw [hsplit J]
   simp only [hsplit, Finset.smul_sum]
@@ -115,11 +131,14 @@ private theorem jetLin_split (p : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar 
 
 end
 
-theorem UpperTheory.WildA.jetInt :
-    ∀ {ι : Type} [Fintype ι] {a b : ℕ} (lam : ι → DomWeight a) (lam' : ι → DomWeight b) (n : ι → ℕ),
-      Formalism.L2.Ker.JetInVV ℂ lam lam' n → ∀ (j : VVIdx lam) (i : VVIdx lam'),
-      ∃ c : (Formalism.L2.Ker.DVar ι a b →₀ ℕ) →₀ ℤ, ∀ J : (Formalism.L2.Ker.DVar ι a b →₀ ℕ) → ℂ,
-        (bVV ℂ lam').repr (Formalism.L2.Ker.jetOp lam lam' J n (bVV ℂ lam j)) i = c.sum fun m z => (z : ℂ) * J m := by
+theorem UpperTheory.WildA.jetInt
+    : ∀ {ι : Type} [Fintype ι] {a b : ℕ} (lam : ι → DomWeight a) (lam' : ι → DomWeight b)
+        (n : ι → ℕ),
+      Formalism.L2.Ker.JetInVV ℂ lam lam' n
+        → ∀ (j : VVIdx lam) (i : VVIdx lam'), ∃ c : (Formalism.L2.Ker.DVar ι a b →₀ ℕ) →₀ ℤ,
+          ∀ J : (Formalism.L2.Ker.DVar ι a b →₀ ℕ) → ℂ,
+            (bVV ℂ lam').repr (Formalism.L2.Ker.jetOp lam lam' J n (bVV ℂ lam j)) i
+              = c.sum fun m z => (z : ℂ) * J m := by
   intro ι _ a b lam lam' n hV j i
   classical
   obtain ⟨P, hP⟩ : ∃ P, P = bVVfun ℂ lam j := ⟨_, rfl⟩
@@ -134,7 +153,9 @@ theorem UpperTheory.WildA.jetInt :
     zdet_mem _ (fun p q => zX_mem _)
   have hsh : P * ∏ τ, Formalism.L2.Ker.frDet ℂ a τ ^ n τ ∈ zPol (ι × Fin a × Fin a) :=
     mul_mem hPz (prod_mem fun τ _ => pow_mem (hdet τ) _)
-  obtain ⟨Q, hQ⟩ : ∃ Q, Q = Formalism.L2.Ker.subD ℂ ι a b (P * ∏ τ, Formalism.L2.Ker.frDet ℂ a τ ^ n τ) := ⟨_, rfl⟩
+  obtain ⟨Q, hQ⟩
+      : ∃ Q, Q = Formalism.L2.Ker.subD ℂ ι a b (P * ∏ τ, Formalism.L2.Ker.frDet ℂ a τ ^ n τ) :=
+    ⟨_, rfl⟩
   have hQz : Q ∈ zPol _ := by
     rw [hQ]
     exact zsubD_mem hsh
@@ -143,8 +164,11 @@ theorem UpperTheory.WildA.jetInt :
     rw [hQ]
     rfl
   obtain ⟨S, hS⟩ := jetLin_split Q
-  have hint : ∀ k, ∃ z : ℤ, (bVV ℂ lam').repr
-      ⟨Formalism.L2.Ker.jetMap (fun m => if m = k then (1 : ℂ) else 0) n P, hV _ P hPmem⟩ i = z := by
+  have hint
+      : ∀ k, ∃ z : ℤ,
+        (bVV ℂ lam').repr
+            ⟨Formalism.L2.Ker.jetMap (fun m => if m = k then (1 : ℂ) else 0) n P, hV _ P hPmem⟩ i
+          = z := by
     intro k
     apply UpperTheory.WildA.bvvInt
     intro m
@@ -154,26 +178,31 @@ theorem UpperTheory.WildA.jetInt :
     exact jetLin_zmem k hQz
   choose z hz using hint
   refine ⟨∑ k ∈ S, Finsupp.single k (z k), fun J => ?_⟩
-  have hop : Formalism.L2.Ker.jetOp lam lam' J n (bVV ℂ lam j) = ⟨Formalism.L2.Ker.jetMap J n P, hV J P hPmem⟩ := by
+  have hop
+      : Formalism.L2.Ker.jetOp lam lam' J n (bVV ℂ lam j)
+        = ⟨Formalism.L2.Ker.jetMap J n P, hV J P hPmem⟩ := by
     show Formalism.L2.Ker.retrVV ℂ lam' (Formalism.L2.Ker.jetMap J n ((bVV ℂ lam j : Pol ℂ ι a))) = _
     have hb : ((bVV ℂ lam j : Pol ℂ ι a)) = P := by rw [bVV_coe, hP]
     rw [hb]
     exact Submodule.projectionOnto_apply_left _ ⟨_, hV J P hPmem⟩
-  have hsum : (⟨Formalism.L2.Ker.jetMap J n P, hV J P hPmem⟩ : VV ℂ lam') =
-      ∑ k ∈ S, J k • (⟨Formalism.L2.Ker.jetMap (fun m => if m = k then (1 : ℂ) else 0) n P, hV _ P hPmem⟩ : VV ℂ lam') := by
-    apply Subtype.ext
-    rw [Submodule.coe_sum]
-    simp only [Submodule.coe_smul, hJQ]
-    exact hS J
+  have hsum
+      : (⟨Formalism.L2.Ker.jetMap J n P, hV J P hPmem⟩ : VV ℂ lam')
+        = ∑ k ∈ S, J k • (⟨Formalism.L2.Ker.jetMap (fun m => if m = k then (1 : ℂ) else 0) n P, hV _ P hPmem⟩ : VV ℂ lam') :=
+    by
+      apply Subtype.ext
+      rw [Submodule.coe_sum]
+      simp only [Submodule.coe_smul, hJQ]
+      exact hS J
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hop, hsum, map_sum, Finsupp.finsetSum_apply]
   simp only [map_smul, Finsupp.smul_apply, smul_eq_mul, hz]
-  let f : ((Formalism.L2.Ker.DVar ι a b →₀ ℕ) →₀ ℤ) →+ ℂ :=
-    { toFun := fun c => c.sum fun m z => (z : ℂ) * J m
-      map_zero' := by simp
-      map_add' := by
-        intro x y
-        exact Finsupp.sum_add_index' (by simp) (by intros; push_cast; ring) }
+  let f : ((Formalism.L2.Ker.DVar ι a b →₀ ℕ) →₀ ℤ) →+ ℂ := {
+    toFun := fun c => c.sum fun m z => (z : ℂ) * J m
+    map_zero' := by simp
+    map_add' := by
+      intro x y
+      exact Finsupp.sum_add_index' (by simp) (by intros; push_cast; ring)
+  }
   change ∑ x ∈ S, J x * (z x : ℂ) = f (∑ k ∈ S, Finsupp.single k (z k))
   rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_

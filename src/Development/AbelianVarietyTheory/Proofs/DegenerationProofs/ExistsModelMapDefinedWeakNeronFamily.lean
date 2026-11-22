@@ -14,22 +14,24 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsIntegra
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 set_option backward.isDefEq.respectTransparency false
 
 namespace GlobalTheory.SS.WeakNeronDef
 
-theorem fromSpecStalk_comp {X : Scheme.{0}} {B : CommRingCat.{0}} (p : X ⟶ Spec B) (x : X) :
-    X.fromSpecStalk x ≫ p =
-      Spec.map ((Scheme.ΓSpecIso B).inv ≫ p.appTop ≫ X.presheaf.germ ⊤ x trivial) := by
+theorem fromSpecStalk_comp {X : Scheme.{0}} {B : CommRingCat.{0}} (p : X ⟶ Spec B) (x : X)
+    : X.fromSpecStalk x ≫ p
+      = Spec.map ((Scheme.ΓSpecIso B).inv ≫ p.appTop ≫ X.presheaf.germ ⊤ x trivial) := by
   apply ext_of_isAffine
   rw [Scheme.Hom.comp_appTop, Scheme.fromSpecStalk_appTop, ← cancel_epi (Scheme.ΓSpecIso B).inv,
     ← Scheme.ΓSpecIso_inv_naturality]
   simp
 
-theorem isDominant_fromSpecStalk (X : Scheme.{0}) [IsIntegral X] (x : X) : IsDominant (X.fromSpecStalk x) := by
+theorem isDominant_fromSpecStalk (X : Scheme.{0}) [IsIntegral X] (x : X)
+    : IsDominant (X.fromSpecStalk x) := by
   refine ⟨?_⟩
   have h : genericPoint X ∈ Set.range (X.fromSpecStalk x) := by
     rw [Scheme.range_fromSpecStalk]
@@ -50,26 +52,31 @@ theorem isPullback_j (N : Model R A) : IsPullback N.j A.hom N.Y.hom (spMap (alge
 
 variable [IsDomain R] [IsDiscreteValuationRing R] [IsFractionRing R K]
 
-theorem exists_dvr_point (N : Model R A) [IsIntegral N.Y.left] (hN : N.Irr) {ϖ : R} (hϖ : Irreducible ϖ) :
-    ∃ y ∈ N.sp, IsDiscreteValuationRing (N.Y.left.presheaf.stalk y) ∧
-      Irreducible (((Scheme.ΓSpecIso (.of R)).inv ≫ N.Y.hom.appTop ≫
-        N.Y.left.presheaf.germ ⊤ y trivial).hom ϖ) := by
+theorem exists_dvr_point
+    (N : Model R A) [IsIntegral N.Y.left] (hN : N.Irr) {ϖ : R} (hϖ : Irreducible ϖ)
+    : ∃ y ∈ N.sp,
+      IsDiscreteValuationRing (N.Y.left.presheaf.stalk y) ∧ Irreducible
+        (((Scheme.ΓSpecIso (.of R)).inv ≫ N.Y.hom.appTop ≫ N.Y.left.presheaf.germ ⊤ y trivial).hom
+          ϖ) := by
   have := N.smooth
-  have hs := IsPullback.of_hasPullback N.Y.hom (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R)))
+  have hs :=
+    IsPullback.of_hasPullback N.Y.hom (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R)))
   set i := pullback.fst N.Y.hom (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R))) with hi
   have : IsClosedImmersion (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R))) :=
     IsClosedImmersion.spec_of_surjective _ IsLocalRing.residue_surjective
   have : IsClosedImmersion i := by rw [hi]; infer_instance
-  have := GlobalTheory.isReduced_of_smooth_of_isReduced
-    (pullback.snd N.Y.hom (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R))))
+  have :=
+    GlobalTheory.isReduced_of_smooth_of_isReduced (pullback.snd N.Y.hom
+      (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R))))
   have hr : Set.range i = N.sp := Set.ext fun x => DvrModel.mem_range_special hs x
-  have : IrreducibleSpace ↥(pullback N.Y.hom (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R)))) := by
-    have h1 : IrreducibleSpace (Set.range i) := by
-      rw [hr]; exact Subtype.irreducibleSpace hN
+  have : IrreducibleSpace ↥(pullback N.Y.hom
+      (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R)))) := by
+    have h1 : IrreducibleSpace (Set.range i) := by rw [hr]; exact Subtype.irreducibleSpace hN
     exact i.isClosedEmbedding.isEmbedding.toHomeomorph.symm.surjective.irreducibleSpace
       i.isClosedEmbedding.isEmbedding.toHomeomorph.symm.continuous
-  have := isIntegral_of_irreducibleSpace_of_isReduced
-    (pullback N.Y.hom (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R))))
+  have :=
+    isIntegral_of_irreducibleSpace_of_isReduced (pullback N.Y.hom
+      (Spec.map (CommRingCat.ofHom (IsLocalRing.residue R))))
   exact ⟨i (genericPoint _), hr.le ⟨_, rfl⟩, DvrModel.isDiscreteValuationRing_stalk_generic hϖ hs⟩
 
 end GlobalTheory.SS.WeakNeronDef
@@ -78,7 +85,10 @@ namespace GlobalTheory.SS
 
 open WeakNeronDef
 
-theorem exists_defAt_of_weakNeron : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] (A : Over (Sp K)) [IsIntegral A.left] (I : Type) (M : I → Model R A), WeakNeron M → ∀ N : Model R A, N.Irr → ∃ i, ∃ y ∈ N.sp, DefAt N (M i) (𝟙 A) y := by
+theorem exists_defAt_of_weakNeron
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] (A : Over (Sp K)) [IsIntegral A.left] (I : Type) (M : I → Model R A),
+      WeakNeron M → ∀ N : Model R A, N.Irr → ∃ i, ∃ y ∈ N.sp, DefAt N (M i) (𝟙 A) y := by
   intro R K _ _ _ _ _ _ A _ I M hM N hN
   have := N.smooth
   have hK := isPullback_j N
@@ -97,19 +107,21 @@ theorem exists_defAt_of_weakNeron : ∀ (R K : Type) [CommRing R] [IsDomain R] [
   have hu : IsUnit (((algebraMap R' K').comp (algebraMap R R')) ϖ) :=
     ((map_ne_zero_iff _ (IsFractionRing.injective R' K')).2 hi'.ne_zero).isUnit
   let k : K →+* K' := IsLocalization.Away.lift ϖ hu
-  have hk : spMap k ≫ spMap (algebraMap R K) = spMap ((algebraMap R' K').comp (algebraMap R R')) := by
+  have hk
+      : spMap k ≫ spMap (algebraMap R K) = spMap ((algebraMap R' K').comp (algebraMap R R')) := by
     rw [← Spec.map_comp, ← IsLocalization.Away.lift_comp ϖ (S := K) hu]; rfl
   have hw : (spMap (algebraMap R' K') ≫ s) ≫ N.Y.hom = spMap k ≫ spMap (algebraMap R K) := by
     rw [hk, Category.assoc, hs, ← Spec.map_comp]; rfl
   let a := hK.lift _ _ hw
   have ha : a ≫ N.j = spMap (algebraMap R' K') ≫ s := hK.lift_fst _ _ _
   have ha' : a ≫ A.hom = spMap k := hK.lift_snd _ _ _
-  obtain ⟨i, b, hb, hb'⟩ := hM R' K' (by
-    rw [hϖ.maximalIdeal_eq, hi'.maximalIdeal_eq, Ideal.map_span, Set.image_singleton]) a
-    (by rw [← Category.assoc, ha', hk])
+  obtain ⟨i, b, hb, hb'⟩ :=
+    hM R' K' (by rw [hϖ.maximalIdeal_eq, hi'.maximalIdeal_eq, Ideal.map_span, Set.image_singleton])
+      a (by rw [← Category.assoc, ha', hk])
   have := (M i).smooth
   have := (M i).sep
-  obtain ⟨U, hU, g, h₁, h₂⟩ := spread_out_of_isGermInjective' N.Y.hom (M i).Y.hom (x := y) b (hb.trans hs.symm)
+  obtain ⟨U, hU, g, h₁, h₂⟩ :=
+    spread_out_of_isGermInjective' N.Y.hom (M i).Y.hom (x := y) b (hb.trans hs.symm)
   refine ⟨i, y, hy, U, g, hU, h₂, ?_⟩
   let t : Sp R' ⟶ U.toScheme := U.fromSpecStalkOfMem y hU
   have ht : t ≫ U.ι = s := Scheme.Opens.fromSpecStalkOfMem_ι _ _ _
@@ -120,8 +132,7 @@ theorem exists_defAt_of_weakNeron : ∀ (R K : Type) [CommRing R] [IsDomain R] [
   have hc₂ : c ≫ (N.j ∣_ U) = spMap (algebraMap R' K') ≫ t := hP.lift_fst _ _ _
   have : IsDominant s := isDominant_fromSpecStalk _ _
   have := GlobalTheory.isDominant_spMap_of_isFractionRing R' K'
-  have : IsDominant (c ≫ (N.j ⁻¹ᵁ U).ι ≫ N.j) := by
-    rw [← Category.assoc, hc₁, ha]; infer_instance
+  have : IsDominant (c ≫ (N.j ⁻¹ᵁ U).ι ≫ N.j) := by rw [← Category.assoc, hc₁, ha]; infer_instance
   have : IsDominant c := IsDominant.of_comp_of_isOpenImmersion c ((N.j ⁻¹ᵁ U).ι ≫ N.j)
   refine ext_of_isDominant_of_isSeparated (M i).Y.hom ?_ c ?_
   · simp only [Category.assoc, h₂, Over.id_left, Category.id_comp, Model.j_hom]

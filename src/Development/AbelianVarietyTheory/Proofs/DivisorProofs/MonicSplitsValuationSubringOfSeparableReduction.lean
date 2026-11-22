@@ -8,14 +8,14 @@ open Polynomial IsLocalRing
 
 namespace GlobalTheory
 
-theorem monic_splits_of_separable_residue (Ω : Type) [Field Ω] [IsSepClosed Ω]
-    (V : ValuationSubring Ω) (q : Polynomial V) (hq : q.Monic)
-    (hs : (q.map (IsLocalRing.residue V)).Separable) :
-    ∃ s : Multiset V, q = (s.map fun b => Polynomial.X - Polynomial.C b).prod := by
+theorem monic_splits_of_separable_residue
+    (Ω : Type) [Field Ω] [IsSepClosed Ω]
+    (V : ValuationSubring Ω) (q : Polynomial V)
+    (hq : q.Monic) (hs : (q.map (IsLocalRing.residue V)).Separable)
+    : ∃ s : Multiset V, q = (s.map fun b => Polynomial.X - Polynomial.C b).prod := by
   have hinj : Function.Injective (algebraMap V Ω) := IsFractionRing.injective V Ω
 
-  have hdegree : ∀ g : Polynomial Ω, Irreducible g → g ∣ q.map (algebraMap V Ω) →
-      g.degree = 1 := by
+  have hdegree : ∀ g : Polynomial Ω, Irreducible g → g ∣ q.map (algebraMap V Ω) → g.degree = 1 := by
     intro g hg hgd
     obtain ⟨g₀, hg₀⟩ := IsIntegrallyClosed.eq_map_mul_C_of_dvd Ω hq hgd
     have hg0 : g ≠ 0 := hg.ne_zero
@@ -30,8 +30,7 @@ theorem monic_splits_of_separable_residue (Ω : Type) [Field Ω] [IsSepClosed Ω
       rw [← map_dvd_map (algebraMap V Ω) hinj hg₀m, hmap]
       refine dvd_trans (Dvd.intro (C g.leadingCoeff) ?_) hgd
       rw [mul_assoc, ← C_mul, inv_mul_cancel₀ hlc, C_1, mul_one]
-    have hsep₀ : (g₀.map (residue V)).Separable :=
-      hs.of_dvd (Polynomial.map_dvd _ hdvd)
+    have hsep₀ : (g₀.map (residue V)).Separable := hs.of_dvd (Polynomial.map_dvd _ hdvd)
     have hdeg : (g₀.map (residue V)).natDegree = g.natDegree := by
       rw [hg₀m.natDegree_map, ← natDegree_map_eq_of_injective hinj, hmap,
         natDegree_mul_C (inv_ne_zero hlc)]
@@ -63,8 +62,7 @@ theorem monic_splits_of_separable_residue (Ω : Type) [Field Ω] [IsSepClosed Ω
     rw [← hu]
     refine (Splits.multisetProd fun f hf ↦ ?_).mul u.isUnit.splits
     let h := UniqueFactorizationMonoid.irreducible_of_factor f hf
-    exact Splits.of_degree_eq_one (hdegree f h
-      (UniqueFactorizationMonoid.dvd_of_mem_factors hf))
+    exact Splits.of_degree_eq_one (hdegree f h (UniqueFactorizationMonoid.dvd_of_mem_factors hf))
   have hroots : ∀ a ∈ (q.map (algebraMap V Ω)).roots, a ∈ (algebraMap V Ω).range := by
     intro a ha
     have hne : q.map (algebraMap V Ω) ≠ 0 := (hq.map _).ne_zero

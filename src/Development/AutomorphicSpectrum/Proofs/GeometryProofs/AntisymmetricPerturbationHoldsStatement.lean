@@ -20,10 +20,14 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.antisymmetric_perturbation_holds : GroundTheory.Heights₂.Heights.AntisymPerturbation.Statement := by
+theorem _root_.GlobalTheory.T.antisymmetric_perturbation_holds
+    : GroundTheory.Heights₂.Heights.AntisymPerturbation.Statement := by
   exact GroundTheory.Heights₂.Heights.AntisymPerturbation.proof
     (GroundTheory.Heights₂.Heights.AntisymStability.proof
       GroundTheory.Heights₂.Heights.AntisymDivisible.proof)

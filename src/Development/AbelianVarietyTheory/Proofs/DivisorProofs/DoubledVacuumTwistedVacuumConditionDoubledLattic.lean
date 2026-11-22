@@ -14,7 +14,9 @@ public import ReciprocityTheory.GeneralLinearIntegers.AlgebraMapIntMemOint
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 open scoped GlobalTheory.VacAny
 
@@ -22,11 +24,17 @@ noncomputable section
 
 namespace GlobalTheory.DblVacLine
 
-theorem norm_psiAt_le {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ) (v : Pl (F := F))
-    (y : Fv F v) : ‖GlobalTheory.LatVac.psiAt ψ v y‖ ≤ 1 := by
+theorem norm_psiAt_le
+    {F : Type} [Field F] [NumberField F]
+    (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ)
+    (v : Pl (F := F)) (y : Fv F v)
+    : ‖GlobalTheory.LatVac.psiAt ψ v y‖ ≤ 1 := by
   have hc := GlobalTheory.SchrSB.continuous_psiAt ψ hψ v
-  have hK := (ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers v).image
-    (f := fun t : Fv F v => ‖GlobalTheory.LatVac.psiAt ψ v (y * t)‖) ((hc.comp (continuous_const.mul continuous_id)).norm)
+  have hK :=
+    (ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers
+        v).image
+      (f := fun t : Fv F v => ‖GlobalTheory.LatVac.psiAt ψ v (y * t)‖)
+      ((hc.comp (continuous_const.mul continuous_id)).norm)
   obtain ⟨C, hC⟩ := hK.bddAbove
   by_contra h
   push_neg at h
@@ -37,40 +45,60 @@ theorem norm_psiAt_le {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) 
     rw [mul_comm, ← nsmul_eq_mul, AddChar.map_nsmul_eq_pow, norm_pow]
   linarith
 
-theorem norm_psiAt {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ) (v : Pl (F := F))
-    (y : Fv F v) : ‖GlobalTheory.LatVac.psiAt ψ v y‖ = 1 := by
+theorem norm_psiAt
+    {F : Type} [Field F] [NumberField F]
+    (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ)
+    (v : Pl (F := F)) (y : Fv F v)
+    : ‖GlobalTheory.LatVac.psiAt ψ v y‖ = 1 := by
   have h1 := norm_psiAt_le ψ hψ v y
   have h2 := norm_psiAt_le ψ hψ v (-y)
   have h3 : ‖GlobalTheory.LatVac.psiAt ψ v y‖ * ‖GlobalTheory.LatVac.psiAt ψ v (-y)‖ = 1 := by
     rw [← norm_mul, ← AddChar.map_add_eq_mul, add_neg_cancel, AddChar.map_zero_eq_one, norm_one]
   nlinarith [norm_nonneg (GlobalTheory.LatVac.psiAt ψ v y), norm_nonneg (GlobalTheory.LatVac.psiAt ψ v (-y))]
 
-theorem star_psiAt {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ) (v : Pl (F := F))
-    (y : Fv F v) : star (GlobalTheory.LatVac.psiAt ψ v y) = GlobalTheory.LatVac.psiAt ψ v (-y) := by
+theorem star_psiAt
+    {F : Type} [Field F] [NumberField F]
+    (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ)
+    (v : Pl (F := F)) (y : Fv F v)
+    : star (GlobalTheory.LatVac.psiAt ψ v y) = GlobalTheory.LatVac.psiAt ψ v (-y) := by
   rw [AddChar.map_neg_eq_inv]
   refine eq_inv_of_mul_eq_one_left ?_
   rw [Complex.star_def, Complex.conj_mul', norm_psiAt ψ hψ v y]
   simp
 
-theorem symp_dbl_fromCols {R E : Type} [CommRing R] [CommRing E] [Algebra R E] (c : E →ₐ[R] E) {α β : Type}
-    [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β] (ξ : E) (JA : Matrix α α E) (JB : Matrix β β E)
-    (w₁ w₂ : Matrix α β E) :
-    symp (R := R) c ξ JA (dbl JB) (Matrix.fromCols w₁ w₂) (Matrix.fromCols w₁ w₂) =
-      symp (R := R) c ξ JA JB w₁ w₁ - symp (R := R) c ξ JA JB w₂ w₂ := by
+theorem symp_dbl_fromCols
+    {R E : Type} [CommRing R] [CommRing E] [Algebra R E]
+    (c : E →ₐ[R] E)
+    {α β : Type} [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+    (ξ : E) (JA : Matrix α α E) (JB : Matrix β β E) (w₁ w₂ : Matrix α β E)
+    : symp (R := R) c ξ JA (dbl JB) (Matrix.fromCols w₁ w₂) (Matrix.fromCols w₁ w₂)
+      = symp (R := R) c ξ JA JB w₁ w₁ - symp (R := R) c ξ JA JB w₂ w₂ := by
   unfold symp
   rw [← map_sub, ← mul_sub]
   congr 2
   unfold hTens
   simp only [dbl, Fintype.sum_sum_type, Matrix.fromCols_apply_inl, Matrix.fromCols_apply_inr,
-    Matrix.fromBlocks_apply₁₁, Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂,
-    Matrix.zero_apply, Matrix.neg_apply, mul_zero, zero_mul, Finset.sum_const_zero, add_zero, zero_add, mul_neg,
-    neg_mul, Finset.sum_neg_distrib]
+    Matrix.fromBlocks_apply₁₁, Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁,
+    Matrix.fromBlocks_apply₂₂, Matrix.zero_apply, Matrix.neg_apply, mul_zero, zero_mul,
+    Finset.sum_const_zero, add_zero, zero_add, mul_neg, neg_mul, Finset.sum_neg_distrib]
   rw [Finset.sum_add_distrib, Finset.sum_neg_distrib, sub_eq_add_neg]
 
-theorem at_symp_self {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) {n d : ℕ} (JA : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) (JB : Matrix (Fin d) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
-    (ξ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (v : Pl (F := F)) {w : Matrix (Fin n) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))} (hw : At (evFin F v) w) :
-    At (evFin F v) (symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) ξ JA JB w w) := by
+theorem at_symp_self
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {n d : ℕ}
+    (JA : Matrix (Fin n) (Fin n)
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+    (JB : Matrix (Fin d) (Fin d)
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+    (ξ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (v : Pl (F := F))
+    {w : Matrix (Fin n) (Fin d)
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))}
+    (hw : At (evFin F v) w)
+    : At (evFin F v)
+      (symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) ξ JA
+        JB w w) := by
   intro u hu
   have h1 := GlobalTheory.LatVac.symp_smul_smul σ JA JB ξ u 1 w w
   have h0 := GlobalTheory.LatVac.symp_smul_smul σ JA JB ξ 0 1 w w

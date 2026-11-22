@@ -34,8 +34,9 @@ def KStable (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (W : Submodule ℂ V) :
   ∀ X, IsKC X → ∀ w ∈ W, act X w ∈ W
 
 def OfType (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (μ : Ix p q → ℚ) (v : V) : Prop :=
-  ∃ W : Submodule ℂ V, FiniteDimensional ℂ W ∧ v ∈ W ∧ KStable act W ∧
-    ∀ (ν : Ix p q → ℚ) (w : V), w ∈ W → IsHW act ν w → ν = μ
+  ∃ W : Submodule ℂ V,
+    FiniteDimensional ℂ W ∧ v ∈ W ∧ KStable act W
+      ∧ ∀ (ν : Ix p q → ℚ) (w : V), w ∈ W → IsHW act ν w → ν = μ
 
 end Modules
 
@@ -56,14 +57,13 @@ def pad (x : List ℤ) (k : ℕ) (y : List ℤ) : List ℚ :=
 
 def JointShape (p q r s : ℕ) (μ : Ix p q → ℚ) (μ' : Ix r s → ℚ) : Prop :=
   ∃ a b c d : List ℤ,
-    (∀ v ∈ a, 0 < v) ∧ (∀ v ∈ c, 0 < v) ∧ (∀ v ∈ b, v < 0) ∧ (∀ v ∈ d, v < 0) ∧
-    a.Pairwise (· ≥ ·) ∧ b.Pairwise (· ≥ ·) ∧ c.Pairwise (· ≥ ·) ∧ d.Pairwise (· ≥ ·) ∧
-    a.length + b.length ≤ p ∧ c.length + d.length ≤ q ∧
-    a.length + d.length ≤ r ∧ c.length + b.length ≤ s ∧
-    shiftNu (cPair r s) μ =
-      ofBlocks (pad a (p - a.length - b.length) b) (pad c (q - c.length - d.length) d) ∧
-    shiftNu (cPair p q) μ' =
-      ofBlocks (pad a (r - a.length - d.length) d) (pad c (s - c.length - b.length) b)
+    (∀ v ∈ a, 0 < v) ∧ (∀ v ∈ c, 0 < v) ∧ (∀ v ∈ b, v < 0) ∧ (∀ v ∈ d, v < 0) ∧ a.Pairwise (· ≥ ·)
+      ∧ b.Pairwise (· ≥ ·) ∧ c.Pairwise (· ≥ ·) ∧ d.Pairwise (· ≥ ·) ∧ a.length + b.length ≤ p
+      ∧ c.length + d.length ≤ q ∧ a.length + d.length ≤ r ∧ c.length + b.length ≤ s
+      ∧ shiftNu (cPair r s) μ
+        = ofBlocks (pad a (p - a.length - b.length) b) (pad c (q - c.length - d.length) d)
+      ∧ shiftNu (cPair p q) μ'
+        = ofBlocks (pad a (r - a.length - d.length) d) (pad c (s - c.length - b.length) b)
 
 def Jset (p q r s : ℕ) : Set (Pol p q r s) :=
   {P | (∀ X, IsPC X → minusPart (fockAct1 p q r s X) P = 0) ∧ (∀ Y, IsPC Y → minusPart (fockAct2 p q r s Y) P = 0)}

@@ -6,34 +6,40 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.EigenframeMatrices
 
-open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.GramSchmidtSelfImaginary
+open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.GramSchmidtSelfImaginary
 open scoped ComplexConjugate
 
 noncomputable section
 
-variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E] {r : ℕ}
-  (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) {n : ℕ} (p : ℕ) (f g : Fin n → Fin r → ℂ)
+variable
+  {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
+  {r : ℕ}
+  (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
+  {n : ℕ}
+  (p : ℕ) (f g : Fin n → Fin r → ℂ)
 
 def eps (k : Fin n) : ℂ := if (k : ℕ) < p then 1 else -1
 
 def Mmat : Matrix (Fin r) (Fin r) ℂ :=
-  Matrix.of fun a b => (if a = b then 1 else 0) +
-    ∑ k, (eps p k * (g k - f k) a) * ∑ m, τ (G b m) * conj (f k m)
+  Matrix.of fun a b =>
+    (if a = b then 1 else 0) + ∑ k, (eps p k * (g k - f k) a) * ∑ m, τ (G b m) * conj (f k m)
 
 theorem eps_sq (k : Fin n) : eps p k * eps p k = 1 := by
   unfold eps
   split_ifs <;> norm_num
 
-theorem Mmat_mulVec (v : Fin r → ℂ) :
-    Mmat τ G p f g *ᵥ v = v + ∑ k, (eps p k * hermC τ G v (f k)) • (g k - f k) := by
+theorem Mmat_mulVec (v : Fin r → ℂ)
+    : Mmat τ G p f g *ᵥ v = v + ∑ k, (eps p k * hermC τ G v (f k)) • (g k - f k) := by
   ext a
-  simp only [Matrix.mulVec, dotProduct, Mmat, Matrix.of_apply, add_mul, Finset.sum_add_distrib, ite_mul,
-    one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true, Pi.add_apply, Finset.sum_apply,
-    Pi.smul_apply, smul_eq_mul, hermC, Pi.sub_apply]
+  simp only [Matrix.mulVec, dotProduct, Mmat, Matrix.of_apply, add_mul, Finset.sum_add_distrib,
+    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true, Pi.add_apply,
+    Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hermC, Pi.sub_apply]
   congr 1
   simp only [Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun m _ => ?_
+  refine Finset.sum_congr rfl fun k _ =>
+    Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun m _ => ?_
   ring
 
 private lemma hermC_add_left' (u u' v : Fin r → ℂ) :
@@ -71,19 +77,21 @@ private lemma hermC_sum_smul_right {m : ℕ} (u : Fin r → ℂ) (d : Fin m → 
           Finset.sum_congr rfl fun b _ => ?_
         ring
 
-theorem expand (q : Fin n → Fin r → ℂ) (x y : Fin r → ℂ) (c d : Fin n → ℂ)
-    (hx : ∀ l, hermC τ G x (q l) = 0) (hy : ∀ k, hermC τ G (q k) y = 0) :
-    hermC τ G (x + ∑ k, c k • q k) (y + ∑ l, d l • q l) =
-      hermC τ G x y + ∑ k, ∑ l, c k * conj (d l) * hermC τ G (q k) (q l) := by
+theorem expand
+    (q : Fin n → Fin r → ℂ) (x y : Fin r → ℂ)
+    (c d : Fin n → ℂ) (hx : ∀ l, hermC τ G x (q l) = 0) (hy : ∀ k, hermC τ G (q k) y = 0)
+    : hermC τ G (x + ∑ k, c k • q k) (y + ∑ l, d l • q l)
+      = hermC τ G x y + ∑ k, ∑ l, c k * conj (d l) * hermC τ G (q k) (q l) := by
   rw [hermC_add_left', hermC_add_right_fundamental_domains', hermC_add_right_fundamental_domains']
-  simp only [hermC_sum_smul_right, hermC_sum_smul_left, hx, hy, mul_zero, Finset.sum_const_zero, add_zero,
-    Finset.mul_sum]
+  simp only [hermC_sum_smul_right, hermC_sum_smul_left, hx, hy, mul_zero, Finset.sum_const_zero,
+    add_zero, Finset.mul_sum]
   rw [zero_add, Finset.sum_comm]
   congr 1
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
   ring
 
-variable (hG : ∀ a b, cc (G a b) = G b a)
+variable
+  (hG : ∀ a b, cc (G a b) = G b a)
   (hf : ∀ k l, hermC τ G (f k) (f l) = if k = l then (if (k : ℕ) < p then 1 else -1) else 0)
 include hG hf
 
@@ -116,16 +124,23 @@ private lemma hermC_eq_conj_hermC_swap (u v : Fin r → ℂ) : hermC τ G u v = 
   simp only [cc, IsCMField.complexEmbedding_complexConj]
   ring
 
-theorem Mmat_unitary (hgf : ∀ k, g k ∈ Submodule.span ℂ (Set.range f))
+theorem Mmat_unitary
+    (hgf : ∀ k, g k ∈ Submodule.span ℂ (Set.range f))
     (hg : ∀ k l, hermC τ G (g k) (g l) = if k = l then (if (k : ℕ) < p then 1 else -1) else 0)
-    (v w : Fin r → ℂ) :
-    hermC τ G (Mmat τ G p f g *ᵥ v) (Mmat τ G p f g *ᵥ w) = hermC τ G v w := by
-  have hconj : ∀ u u', hermC τ G u u' = conj (hermC τ G u' u) := hermC_eq_conj_hermC_swap τ G p f hG hf
-  have hdec : ∀ u : Fin r → ℂ, ∃ (x : Fin r → ℂ) (cu : Fin n → ℂ),
-      u = x + ∑ k, cu k • f k ∧ ∀ l, hermC τ G x (f l) = 0 := by
+    (v w : Fin r → ℂ)
+    : hermC τ G (Mmat τ G p f g *ᵥ v) (Mmat τ G p f g *ᵥ w) = hermC τ G v w := by
+  have hconj : ∀ u u', hermC τ G u u' = conj (hermC τ G u' u) :=
+    hermC_eq_conj_hermC_swap τ G p f hG hf
+  have hdec
+      : ∀ u : Fin r → ℂ, ∃ (x : Fin r → ℂ) (cu : Fin n → ℂ),
+        u = x + ∑ k, cu k • f k ∧ ∀ l, hermC τ G x (f l) = 0 := by
     intro u
-    refine ⟨u + ∑ k, (-(eps p k * hermC τ G u (f k))) • f k, fun k => eps p k * hermC τ G u (f k), ?_,
-      fun l => ?_⟩
+    refine ⟨
+      u + ∑ k, (-(eps p k * hermC τ G u (f k))) • f k,
+      fun k => eps p k * hermC τ G u (f k),
+      ?_,
+      fun l => ?_
+    ⟩
     · simp only [neg_smul, Finset.sum_neg_distrib]
       abel
     · rw [hermC_add_left', hermC_sum_smul_left]
@@ -148,12 +163,14 @@ theorem Mmat_unitary (hgf : ∀ k, g k ∈ Submodule.span ℂ (Set.range f))
     expand τ G f xv xw cv cw hxv (fun k => by rw [hconj, hxw k, map_zero])]
   simp only [hg, hf]
 
-theorem Mmat_span (hgf : ∀ k, g k ∈ Submodule.span ℂ (Set.range f)) (v : Fin r → ℂ)
-    (hv : v ∈ Submodule.span ℂ (Set.range f)) :
-    Mmat τ G p f g *ᵥ v ∈ Submodule.span ℂ (Set.range f) := by
+theorem Mmat_span
+    (hgf : ∀ k, g k ∈ Submodule.span ℂ (Set.range f))
+    (v : Fin r → ℂ) (hv : v ∈ Submodule.span ℂ (Set.range f))
+    : Mmat τ G p f g *ᵥ v ∈ Submodule.span ℂ (Set.range f) := by
   rw [Mmat_mulVec]
-  exact Submodule.add_mem _ hv (Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _
-    (Submodule.sub_mem _ (hgf k) (Submodule.subset_span ⟨k, rfl⟩)))
+  exact Submodule.add_mem _ hv
+    (Submodule.sum_mem _ fun k _ =>
+      Submodule.smul_mem _ _ (Submodule.sub_mem _ (hgf k) (Submodule.subset_span ⟨k, rfl⟩)))
 
 end
 

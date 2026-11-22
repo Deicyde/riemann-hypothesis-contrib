@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open GlobalTheory.CechPic GlobalTheory.AbDual
 open GlobalTheory.IndefiniteRowSideFullHecke.ZeroSectionBase (IsPrincipalPol sqToBase toBase)
@@ -23,21 +24,26 @@ namespace PositivityTheory.PrwZar.Z2
 
 variable {Ω : Type} [Field Ω] [IsAlgClosed Ω]
 
-private theorem pfiF_fib_subset_lemma {G' : Over (Sp Ω)} (σ : 𝟙_ (Over (Sp Ω)) ⟶ G') {K : Type} [Field K]
+private theorem pfiF_fib_subset_lemma
+    {G' : Over (Sp Ω)} (σ : 𝟙_ (Over (Sp Ω)) ⟶ G')
+    {K : Type} [Field K]
     (a : Spec (CommRingCat.of K) ⟶ G'.left) (p : (𝟙_ (Over (Sp Ω))).left)
-    (ha : a (IsLocalRing.closedPoint K) = σ.left p) :
-    a = (a ≫ G'.hom) ≫ σ.left := by
+    (ha : a (IsLocalRing.closedPoint K) = σ.left p)
+    : a = (a ≫ G'.hom) ≫ σ.left := by
   have sec : σ.left ≫ G'.hom = 𝟙 _ := by simpa using Over.w σ
-  obtain ⟨τ, hτ⟩ := GlobalTheory.exists_factor_of_lift_fromSpecResidueField G'.hom p
-    (Scheme.fromSpecResidueField _ p ≫ σ.left)
-    (by rw [Category.assoc, sec, Category.comp_id]; rfl) a
-    (ha.trans (congrArg (fun q => σ.left q) (Scheme.fromSpecResidueField_apply p _)).symm)
+  obtain ⟨τ, hτ⟩ :=
+    GlobalTheory.exists_factor_of_lift_fromSpecResidueField G'.hom p
+      (Scheme.fromSpecResidueField _ p ≫ σ.left)
+      (by rw [Category.assoc, sec, Category.comp_id]; rfl) a
+      (ha.trans (congrArg (fun q => σ.left q) (Scheme.fromSpecResidueField_apply p _)).symm)
   rw [← hτ]
   simp only [Category.assoc, sec, Category.comp_id]
 
-theorem pfiF_range_finite_closed {G : Over (Sp Ω)} [GrpObj G] (hG : IsAbelianScheme G) (H : Over (Sp Ω))
-    (j : H ⟶ G) (hH : IsFinite H.hom) :
-    (Set.range j.left).Finite ∧ ∀ z ∈ Set.range j.left, IsClosed ({z} : Set G.left) := by
+theorem pfiF_range_finite_closed
+    {G : Over (Sp Ω)} [GrpObj G]
+    (hG : IsAbelianScheme G)
+    (H : Over (Sp Ω)) (j : H ⟶ G) (hH : IsFinite H.hom)
+    : (Set.range j.left).Finite ∧ ∀ z ∈ Set.range j.left, IsClosed ({z} : Set G.left) := by
   haveI : IsFinite H.hom := hH
   haveI : IsProper G.hom := hG.proper
   haveI : IsLocallyArtinian H.left := .of_locallyQuasiFinite H.hom
@@ -50,24 +56,26 @@ theorem pfiF_range_finite_closed {G : Over (Sp Ω)} [GrpObj G] (hG : IsAbelianSc
   have hc := j.left.isClosedMap {h} (isClosed_discrete _)
   simpa [Set.image_singleton] using hc
 
-private theorem pfiF_fib_closed_lemma_2 {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G'] (f : G ⟶ G')
-    [IsMonHom f] (H : Over (Sp Ω)) (j : H ⟶ G)
+private theorem pfiF_fib_closed_lemma_2
+    {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G']
+    (f : G ⟶ G') [IsMonHom f]
+    (H : Over (Sp Ω)) (j : H ⟶ G)
     (hj : ∀ (T : Over (Sp Ω)) (x : T ⟶ G), x ≫ f = 1 → ∃ z : T ⟶ H, z ≫ j = x)
     (s : 𝟙_ (Over (Sp Ω)) ⟶ G) (p : (𝟙_ (Over (Sp Ω))).left) (y : G.left)
-    (hy : f.left y = f.left (s.left p)) : y ∈ Set.range (j * (toUnit H ≫ s)).left := by
+    (hy : f.left y = f.left (s.left p))
+    : y ∈ Set.range (j * (toUnit H ≫ s)).left := by
   let T : Over (Sp Ω) := Over.mk (G.left.fromSpecResidueField y ≫ G.hom)
   let x : T ⟶ G := Over.homMk (G.left.fromSpecResidueField y) rfl
   let c : T ⟶ G := toUnit T ≫ s
   have e1 := Scheme.fromSpecResidueField_apply y (IsLocalRing.closedPoint (G.left.residueField y))
-  have hfy : (G.left.fromSpecResidueField y ≫ f.left) (IsLocalRing.closedPoint _) =
-      (s ≫ f).left p :=
+  have hfy
+      : (G.left.fromSpecResidueField y ≫ f.left) (IsLocalRing.closedPoint _) = (s ≫ f).left p :=
     (congrArg f.left e1).trans hy
   have key := pfiF_fib_subset_lemma (s ≫ f) (G.left.fromSpecResidueField y ≫ f.left) p hfy
   have hxc : x ≫ f = c ≫ f := by
     apply Over.OverMorphism.ext
     change G.left.fromSpecResidueField y ≫ f.left = (toUnit T ≫ (s ≫ f)).left
-    have hb : (G.left.fromSpecResidueField y ≫ f.left) ≫ G'.hom = (toUnit T).left := by
-      simp [T]
+    have hb : (G.left.fromSpecResidueField y ≫ f.left) ≫ G'.hom = (toUnit T).left := by simp [T]
     rw [Over.comp_left]
     exact key.trans (congrArg (· ≫ (s ≫ f).left) hb)
   have hx' : (x * c⁻¹) ≫ f = 1 := by
@@ -82,15 +90,19 @@ private theorem pfiF_fib_closed_lemma_2 {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj
         toUnit_unique (z ≫ toUnit H) (toUnit T)]
     rw [hm, hz, inv_mul_cancel_right]
   refine ⟨z.left (IsLocalRing.closedPoint (G.left.residueField y)), ?_⟩
-  have h2 := congrArg
-    (fun g : T ⟶ G => g.left (IsLocalRing.closedPoint (G.left.residueField y))) hxz
+  have h2 :=
+    congrArg (fun g : T ⟶ G => g.left (IsLocalRing.closedPoint (G.left.residueField y))) hxz
   exact h2.symm.trans e1
 
-theorem pfiF_fib_closed {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G'] (hG : IsAbelianScheme G) (f : G ⟶ G')
-    [IsMonHom f] (H : Over (Sp Ω)) (j : H ⟶ G) (hH : IsFinite H.hom)
-    (hj : ∀ (T : Over (Sp Ω)) (x : T ⟶ G), x ≫ f = 1 → ∃ z : T ⟶ H, z ≫ j = x)
-    (x : G.left) (hx : IsClosed ({x} : Set G.left)) :
-    (f.left ⁻¹' {f.left x}).Finite ∧ ∀ z ∈ f.left ⁻¹' {f.left x}, IsClosed ({z} : Set G.left) := by
+theorem pfiF_fib_closed
+    {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G']
+    (hG : IsAbelianScheme G)
+    (f : G ⟶ G') [IsMonHom f]
+    (H : Over (Sp Ω)) (j : H ⟶ G)
+    (hH : IsFinite H.hom) (hj : ∀ (T : Over (Sp Ω)) (x : T ⟶ G), x ≫ f = 1 → ∃ z : T ⟶ H, z ≫ j = x)
+    (x : G.left) (hx : IsClosed ({x} : Set G.left))
+    : (f.left ⁻¹' {f.left x}).Finite
+      ∧ ∀ z ∈ f.left ⁻¹' {f.left x}, IsClosed ({z} : Set G.left) := by
   haveI : LocallyOfFiniteType G.hom := by haveI := hG.smooth; infer_instance
   obtain ⟨s, hs⟩ := GlobalTheory.RationalPoint.exists_pt_mem (X := G) hx ⟨x, rfl⟩
   have hsx : s.left (IsLocalRing.closedPoint Ω) = x := hs
@@ -100,10 +112,14 @@ theorem pfiF_fib_closed {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G'] (hG : IsAbe
   obtain ⟨hfin, hcl⟩ := pfiF_range_finite_closed hG H (j * (toUnit H ≫ s)) hH
   exact ⟨hfin.subset hsub, fun z hz => hcl z (hsub hz)⟩
 
-theorem isFinite_of_ker {Ω : Type} [Field Ω] [IsAlgClosed Ω] {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G']
-    (hG : IsAbelianScheme G) (hG' : IsAbelianScheme G') (f : G ⟶ G') [IsMonHom f] (H : Over (Sp Ω))
-    (j : H ⟶ G) (hH : IsFinite H.hom)
-    (hj : ∀ (T : Over (Sp Ω)) (x : T ⟶ G), x ≫ f = 1 → ∃ z : T ⟶ H, z ≫ j = x) : IsFinite f.left := by
+theorem isFinite_of_ker
+    {Ω : Type} [Field Ω] [IsAlgClosed Ω]
+    {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G']
+    (hG : IsAbelianScheme G) (hG' : IsAbelianScheme G')
+    (f : G ⟶ G') [IsMonHom f]
+    (H : Over (Sp Ω)) (j : H ⟶ G)
+    (hH : IsFinite H.hom) (hj : ∀ (T : Over (Sp Ω)) (x : T ⟶ G), x ≫ f = 1 → ∃ z : T ⟶ H, z ≫ j = x)
+    : IsFinite f.left := by
   haveI : IsProper G.hom := hG.proper
   haveI : IsProper G'.hom := hG'.proper
   haveI : IsProper (f.left ≫ G'.hom) := by rw [Over.w f]; infer_instance

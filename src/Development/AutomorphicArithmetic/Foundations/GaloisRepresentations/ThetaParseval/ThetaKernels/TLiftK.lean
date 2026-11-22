@@ -5,5 +5,4 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-theorem UpperTheory.TP.K.tLiftK : UpperTheory.TP.TLiftK :=
-  UpperTheory.TP.tLift_holds_k
+theorem UpperTheory.TP.K.tLiftK : UpperTheory.TP.TLiftK := UpperTheory.TP.tLift_holds_k

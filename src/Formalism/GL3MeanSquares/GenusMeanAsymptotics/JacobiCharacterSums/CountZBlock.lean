@@ -53,32 +53,39 @@ theorem blockCountOf_statement : BlockCountOf := by
             refine norm_cpow_neg_le_one' (hmemn n hn) ?_
             simp only [Complex.sub_re, Complex.ofReal_re]
             linarith [(hT i hi).2.2.1]
-          calc ‖cv i n‖ * ‖(n : ℂ) ^ (-(ρ i - (s0 : ℂ)))‖ ≤ 1 * 1 :=
-                mul_le_mul (hcv i n) h2 (norm_nonneg _) zero_le_one
+          calc
+            ‖cv i n‖ * ‖(n : ℂ) ^ (-(ρ i - (s0 : ℂ)))‖
+              ≤ 1 * 1 := mul_le_mul (hcv i n) h2 (norm_nonneg _) zero_le_one
             _ = 1 := one_mul 1
-        calc ‖v i n‖ * ‖v i n‖ ≤ 1 * 1 := mul_le_mul h1 h1 (norm_nonneg _) zero_le_one
+        calc
+          ‖v i n‖ * ‖v i n‖
+            ≤ 1 * 1 := mul_le_mul h1 h1 (norm_nonneg _) zero_le_one
           _ = 1 := one_mul 1
-      calc ∑ n ∈ Ioc U (2 * U), ‖v i n * (starRingEnd ℂ) (v i n)‖ ≤ ∑ n ∈ Ioc U (2 * U), (1 : ℝ) :=
-            Finset.sum_le_sum hone
+      calc
+        ∑ n ∈ Ioc U (2 * U), ‖v i n * (starRingEnd ℂ) (v i n)‖
+          ≤ ∑ n ∈ Ioc U (2 * U), (1 : ℝ) := Finset.sum_le_sum hone
         _ = U := by
           rw [Finset.sum_const, Nat.card_Ioc, nsmul_eq_mul, mul_one, show 2 * U - U = U by omega]
-    have hoff : ∀ j ∈ T.erase i,
-        ‖∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v j n)‖ ≤ 8 * Q ^ 3 := by
+    have hoff
+        : ∀ j ∈ T.erase i, ‖∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v j n)‖ ≤ 8 * Q ^ 3 := by
       intro j hj
       obtain ⟨hji, hjT⟩ := Finset.mem_erase.mp hj
       obtain ⟨hpi, hqi, hri1, hri2, himi, -⟩ := hT i hi
       obtain ⟨hpj, hqj, hrj1, hrj2, himj, -⟩ := hT j hjT
       set w : ℂ := (ρ i - (s0 : ℂ)) + (starRingEnd ℂ) (ρ j - (s0 : ℂ)) with hw
-      have hsum : ∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v j n) =
-          ∑ n ∈ Ioc U (2 * U), cv i n * (starRingEnd ℂ) (cv j n) * (n : ℂ) ^ (-w) := by
+      have hsum
+          : ∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v j n)
+            = ∑ n ∈ Ioc U (2 * U), cv i n * (starRingEnd ℂ) (cv j n) * (n : ℂ) ^ (-w) := by
         refine Finset.sum_congr rfl fun n hn => ?_
         have hn0 : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (hmemn n hn).ne'
         simp only [hv, map_mul, conj_natCast_cpow_neg]
-        rw [hw, show -((ρ i - (s0 : ℂ)) + (starRingEnd ℂ) (ρ j - (s0 : ℂ))) =
-            -(ρ i - (s0 : ℂ)) + -(starRingEnd ℂ) (ρ j - (s0 : ℂ)) by ring, Complex.cpow_add _ _ hn0]
+        rw [hw,
+          show -((ρ i - (s0 : ℂ)) + (starRingEnd ℂ) (ρ j - (s0 : ℂ)))
+              = -(ρ i - (s0 : ℂ)) + - (starRingEnd ℂ) (ρ j - (s0 : ℂ)) by
+            ring,
+          Complex.cpow_add _ _ hn0]
         ring
-      have hwre : w.re = (ρ i).re - s0 + ((ρ j).re - s0) := by
-        simp [hw, Complex.conj_re]
+      have hwre : w.re = (ρ i).re - s0 + ((ρ j).re - s0) := by simp [hw, Complex.conj_re]
       have hwim : w.im = (ρ i).im - (ρ j).im := by
         simp [hw, Complex.conj_im]
         ring
@@ -93,28 +100,32 @@ theorem blockCountOf_statement : BlockCountOf := by
           constructor <;> linarith
         have him : |w.im| ≤ 2 * Q := by
           rw [hwim]
-          calc |(ρ i).im - (ρ j).im| ≤ |(ρ i).im| + |(ρ j).im| := abs_sub _ _
+          calc
+            |(ρ i).im - (ρ j).im|
+              ≤ |(ρ i).im| + |(ρ j).im| := abs_sub _ _
             _ ≤ 2 * Q := by linarith
         linarith
       have hqq : (((i.1 + 1) * (j.1 + 1) : ℕ) : ℝ) ≤ Q ^ 2 := by
         push_cast at hqi hqj ⊢
         rw [sq]
         exact mul_le_mul hqi hqj (by positivity) hQ0.le
-      calc 2 * (((i.1 + 1) * (j.1 + 1) : ℕ) : ℝ) * (1 + ‖w‖) ≤ 2 * Q ^ 2 * (2 + 2 * Q) :=
-            mul_le_mul (mul_le_mul_of_nonneg_left hqq (by norm_num)) (by linarith)
-              (by positivity) (by positivity)
+      calc
+        2 * (((i.1 + 1) * (j.1 + 1) : ℕ) : ℝ) * (1 + ‖w‖) ≤ 2 * Q ^ 2 * (2 + 2 * Q) :=
+          mul_le_mul (mul_le_mul_of_nonneg_left hqq (by norm_num)) (by linarith) (by positivity)
+            (by positivity)
         _ ≤ 8 * Q ^ 3 := by
           nlinarith [mul_le_mul_of_nonneg_left (show (1 : ℝ) ≤ Q by linarith) (sq_nonneg Q)]
-    calc ‖∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v i n)‖ +
-          ∑ j ∈ T.erase i, ‖∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v j n)‖
-        ≤ U + (T.erase i).card * (8 * Q ^ 3) := by
-          refine add_le_add hdiag ?_
-          have := Finset.sum_le_card_nsmul _ _ _ hoff
-          rwa [nsmul_eq_mul] at this
+    calc
+      ‖∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v i n)‖
+            + ∑ j ∈ T.erase i, ‖∑ n ∈ Ioc U (2 * U), v i n * (starRingEnd ℂ) (v j n)‖
+          ≤ U + (T.erase i).card * (8 * Q ^ 3) := by
+        refine add_le_add hdiag ?_
+        have := Finset.sum_le_card_nsmul _ _ _ hoff
+        rwa [nsmul_eq_mul] at this
       _ ≤ Δ := by
-          rw [hΔ]
-          have hc : ((T.erase i).card : ℝ) ≤ T.card := by exact_mod_cast Finset.card_erase_le
-          nlinarith [pow_pos hQ0 3]
+        rw [hΔ]
+        have hc : ((T.erase i).card : ℝ) ≤ T.card := by exact_mod_cast Finset.card_erase_le
+        nlinarith [pow_pos hQ0 3]
   have hD := hDual PC ℕ T (Ioc U (2 * U)) b v Δ hΔ0 hrow
   have hblk : ∀ i ∈ T, ∑ n ∈ Ioc U (2 * U), b n * v i n = blk Y N U i (ρ i) := by
     intro i hi
@@ -122,7 +133,7 @@ theorem blockCountOf_statement : BlockCountOf := by
     refine Finset.sum_congr rfl fun n hn => ?_
     have hn0 : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (hmemn n hn).ne'
     simp only [hb, hv]
-    rw [show -ρ i = -(s0 : ℂ) + -(ρ i - (s0 : ℂ)) by ring, Complex.cpow_add _ _ hn0]
+    rw [show - ρ i = -(s0 : ℂ) + -(ρ i - (s0 : ℂ)) by ring, Complex.cpow_add _ _ hn0]
     ring
   have hbn : ∑ n ∈ Ioc U (2 * U), ‖b n‖ ^ 2 ≤ C * (U : ℝ) ^ (-(197 / 200 : ℝ)) := by
     refine le_trans (le_of_eq ?_) (hL Y N U hU)
@@ -130,34 +141,42 @@ theorem blockCountOf_statement : BlockCountOf := by
     simp only [hb]
     rw [norm_mul, Complex.norm_natCast_cpow_of_pos (hmemn n hn)]
     simp only [Complex.neg_re, Complex.ofReal_re]
-  have hlow : (T.card : ℝ) * (1 / (2 * (J : ℝ))) ^ 2 ≤
-      ∑ i ∈ T, ‖∑ n ∈ Ioc U (2 * U), b n * v i n‖ ^ 2 := by
-    have := Finset.card_nsmul_le_sum T (fun i => ‖∑ n ∈ Ioc U (2 * U), b n * v i n‖ ^ 2)
-      ((1 / (2 * (J : ℝ))) ^ 2) (fun i hi => by
-        rw [hblk i hi]
-        exact pow_le_pow_left₀ (by positivity) (hT i hi).2.2.2.2.2 2)
+  have hlow
+      : (T.card : ℝ) * (1 / (2 * (J : ℝ))) ^ 2
+        ≤ ∑ i ∈ T, ‖∑ n ∈ Ioc U (2 * U), b n * v i n‖ ^ 2 := by
+    have :=
+      Finset.card_nsmul_le_sum T
+        (fun i => ‖∑ n ∈ Ioc U (2 * U), b n * v i n‖ ^ 2)
+        ((1 / (2 * (J : ℝ))) ^ 2)
+        (fun i hi => by
+          rw [hblk i hi]
+          exact pow_le_pow_left₀ (by positivity) (hT i hi).2.2.2.2.2 2)
     rwa [nsmul_eq_mul] at this
   have hup := hD.trans (mul_le_mul_of_nonneg_right hbn hΔ0)
   have hUU : (U : ℝ) ^ (-(197 / 200 : ℝ)) * U = (U : ℝ) ^ (3 / 200 : ℝ) := by
     rw [← Real.rpow_add_one hU0.ne']
     norm_num
   have ht : (0 : ℝ) ≤ T.card := Nat.cast_nonneg _
-  have hsm : (T.card : ℝ) * (8 * Q ^ 3 * (C * (U : ℝ) ^ (-(197 / 200 : ℝ)))) ≤
-      T.card * (1 / (8 * (J : ℝ) ^ 2)) := by
+  have hsm
+      : (T.card : ℝ) * (8 * Q ^ 3 * (C * (U : ℝ) ^ (-(197 / 200 : ℝ))))
+        ≤ T.card * (1 / (8 * (J : ℝ) ^ 2)) := by
     refine mul_le_mul_of_nonneg_left ?_ ht
-    calc 8 * Q ^ 3 * (C * (U : ℝ) ^ (-(197 / 200 : ℝ))) = 8 * Q ^ 3 * C * (U : ℝ) ^ (-(197 / 200 : ℝ)) := by
-          ring
+    calc
+      8 * Q ^ 3 * (C * (U : ℝ) ^ (-(197 / 200 : ℝ)))
+        = 8 * Q ^ 3 * C * (U : ℝ) ^ (-(197 / 200 : ℝ)) := by ring
       _ ≤ _ := hsmall
-  have key : (T.card : ℝ) * (1 / (2 * (J : ℝ))) ^ 2 ≤
-      C * (U : ℝ) ^ (3 / 200 : ℝ) + T.card * (1 / (8 * (J : ℝ) ^ 2)) := by
-    calc _ ≤ _ := hlow.trans hup
-      _ = C * ((U : ℝ) ^ (-(197 / 200 : ℝ)) * U) +
-            T.card * (8 * Q ^ 3 * (C * (U : ℝ) ^ (-(197 / 200 : ℝ)))) := by
-          rw [hΔ]
-          ring
+  have key
+      : (T.card : ℝ) * (1 / (2 * (J : ℝ))) ^ 2
+        ≤ C * (U : ℝ) ^ (3 / 200 : ℝ) + T.card * (1 / (8 * (J : ℝ) ^ 2)) := by
+    calc
+      _ ≤ _ := hlow.trans hup
+      _ = C * ((U : ℝ) ^ (-(197 / 200 : ℝ)) * U)
+          + T.card * (8 * Q ^ 3 * (C * (U : ℝ) ^ (-(197 / 200 : ℝ)))) := by
+        rw [hΔ]
+        ring
       _ ≤ _ := by
-          rw [hUU]
-          linarith [hsm]
+        rw [hUU]
+        linarith [hsm]
   have e1 : (T.card : ℝ) * (1 / (2 * (J : ℝ))) ^ 2 = 2 * ((T.card : ℝ) / (8 * (J : ℝ) ^ 2)) := by
     field_simp
     ring
@@ -166,7 +185,9 @@ theorem blockCountOf_statement : BlockCountOf := by
   rw [e1, e2] at key
   have h3 : (T.card : ℝ) / (8 * (J : ℝ) ^ 2) ≤ C * (U : ℝ) ^ (3 / 200 : ℝ) := by linarith
   rw [div_le_iff₀ (by positivity)] at h3
-  calc (T.card : ℝ) ≤ C * (U : ℝ) ^ (3 / 200 : ℝ) * (8 * (J : ℝ) ^ 2) := h3
+  calc
+    (T.card : ℝ)
+      ≤ C * (U : ℝ) ^ (3 / 200 : ℝ) * (8 * (J : ℝ) ^ 2) := h3
     _ = 8 * (J : ℝ) ^ 2 * C * (U : ℝ) ^ (3 / 200 : ℝ) := by ring
 
 end Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD

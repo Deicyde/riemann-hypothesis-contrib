@@ -12,7 +12,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Coordina
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.graded_form_vector_bundle : GlobalTheory.CompanionTheory.GrForm.StExists → GlobalTheory.CompanionTheory.GrForm.StAdd → GlobalTheory.CompanionTheory.GrForm.StSmul → GlobalTheory.CompanionTheory.GrForm.StRes → GlobalTheory.CompanionTheory.GrForm.StAct → GlobalTheory.CompanionTheory.GrForm.StLoc → GlobalTheory.CompanionTheory.GrForm.StVB := by
-  first | exact @GlobalTheory.CompanionTheory.GrVB.main | exact GlobalTheory.CompanionTheory.GrVB.main | (intros; apply GlobalTheory.CompanionTheory.GrVB.main <;> assumption)
+theorem _root_.GlobalTheory.T.graded_form_vector_bundle
+    : GlobalTheory.CompanionTheory.GrForm.StExists → GlobalTheory.CompanionTheory.GrForm.StAdd
+      → GlobalTheory.CompanionTheory.GrForm.StSmul → GlobalTheory.CompanionTheory.GrForm.StRes
+      → GlobalTheory.CompanionTheory.GrForm.StAct → GlobalTheory.CompanionTheory.GrForm.StLoc
+      → GlobalTheory.CompanionTheory.GrForm.StVB := by
+  first
+  | exact @GlobalTheory.CompanionTheory.GrVB.main
+  | exact GlobalTheory.CompanionTheory.GrVB.main
+  | (intros; apply GlobalTheory.CompanionTheory.GrVB.main <;> assumption)

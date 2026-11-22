@@ -12,13 +12,17 @@ namespace PositivityTheory.KB.JoinReconstruction
 
 open PositivityTheory.KB
 
-theorem lem_Lz {L : Type} [Field L] [NumberField L] {N k : ℕ} (d : Dom L N) {ω' ωb : Form (HS L N) (k + 1)}
+theorem lem_Lz
+    {L : Type} [Field L] [NumberField L]
+    {N k : ℕ} (d : Dom L N)
+    {ω' ωb : Form (HS L N) (k + 1)}
     (hω'c : ContinuousOn ω' (Pos L N)) (hωbc : ContinuousOn ωb (Pos L N))
     (hγ : ∀ γ, FInv (ω' - ωb) (emb L N γ)) (hs : ∀ s, FInv (ω' - ωb) (scal L N s))
     (hωbfr : ∀ x, fr ωb x = (d.μ.real d.D)⁻¹ • ∫ y in d.D, fr ω' (ofS L N y) ∂d.μ)
     (hint' : IntegrableOn (fun x => fr ω' (ofS L N x)) d.D d.μ)
-    (hsq' : IntegrableOn (fun x => ‖fr ω' (ofS L N x)‖ ^ 2) d.D d.μ) (u : Fin (k + 1) → HS L N) :
-    Lz d (fun x => fr (ω' - ωb) x u) := by
+    (hsq' : IntegrableOn (fun x => ‖fr ω' (ofS L N x)‖ ^ 2) d.D d.μ)
+    (u : Fin (k + 1) → HS L N)
+    : Lz d (fun x => fr (ω' - ωb) x u) := by
   let E : (HS L N [⋀^Fin (k + 1)]→L[ℝ] ℝ) →L[ℝ] ℝ :=
     (ContinuousMultilinearMap.apply ℝ (fun _ : Fin (k + 1) => HS L N) ℝ u).comp
       (ContinuousAlternatingMap.toContinuousMultilinearMapCLM ℝ)

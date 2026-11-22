@@ -12,15 +12,18 @@ open PositivityTheory.Lit1.GEN.W_killed_a
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-theorem mem_gsOpenSubgroup_placesOver_iff {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1)))
+theorem mem_gsOpenSubgroup_placesOver_iff
+    {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (K' L : FiniteSubfield) [Fact (K ≤ K')] [Fact (K ≤ L)] [Fact (K' ≤ L)]
     (hK' : ∀ x : K'.1, algebraMap K'.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
     (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
     (hL'' : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K'.1 ℚ̄ (placesOver S))
-    (τ : galUnramifiedOutside K'.1 ℚ̄ (placesOver S)) :
-    τ ∈ gsOpenSubgroup (placesOver S) hL'' ↔
-      ((((gsBaseChange S hK').symm τ : (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S))) :
-        galUnramifiedOutside K.1 ℚ̄ S) ∈ gsOpenSubgroup S hL) := by
+    (τ : galUnramifiedOutside K'.1 ℚ̄ (placesOver S))
+    : τ ∈ gsOpenSubgroup (placesOver S) hL''
+      ↔ ((((gsBaseChange S hK').symm τ
+            : (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)))
+          : galUnramifiedOutside K.1 ℚ̄ S)
+        ∈ gsOpenSubgroup S hL) := by
   rw [mem_gsOpenSubgroup_iff, mem_gsOpenSubgroup_iff]
   refine forall_congr' fun x => ?_
   rw [Subtype.ext_iff, Subtype.ext_iff, coe_gsBaseChange_symm_apply]

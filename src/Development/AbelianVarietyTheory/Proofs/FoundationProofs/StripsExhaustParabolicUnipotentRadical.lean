@@ -12,10 +12,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Glo
 
 namespace GlobalTheory.PsType
 
-theorem strip_exhaust : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (r t : ℕ) (ψ : Fin (r + t) → kˣ →* ℂˣ) (ϖ : k), (∀ i, IsSmoothChar (ψ i)) → ϖ ≠ 0 → valuation k ϖ < 1 →
-    (∀ x : k, valuation k x < 1 → valuation k x ≤ valuation k ϖ) →
-    ∀ y ∈ unipRad k (two (stdSum (rfl : r + t = r + t))), ∃ m, y ∈ strip ψ r ϖ m := by
+theorem strip_exhaust
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (r t : ℕ) (ψ : Fin (r + t) → kˣ →* ℂˣ) (ϖ : k),
+      (∀ i, IsSmoothChar (ψ i)) → ϖ ≠ 0 → valuation k ϖ < 1
+        → (∀ x : k, valuation k x < 1 → valuation k x ≤ valuation k ϖ)
+        → ∀ y ∈ unipRad k (two (stdSum (rfl : r + t = r + t))), ∃ m, y ∈ strip ψ r ϖ m := by
   intro k _ _ _ _ r t ψ ϖ hψ _ hϖ _ y hy
   have hy' := (GlobalTheory.CuspEntries.mem_unipRad_two_stdSum rfl y).1 hy
 
@@ -31,10 +33,12 @@ theorem strip_exhaust : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
   have hball : {z : k | valuation k z < 1} ∈ 𝓝 (0 : k) :=
     (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.2 ⟨1, one_ne_zero, fun _ hz => hz⟩
   have P := (triv_ev_props k)
-  have hev : ∀ i j : Fin (r + t), ∀ᶠ m : ℕ in atTop,
-      (if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
-        valuation k (ϖ ^ m * y.val i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * y.val i j)
-      else y.val i j = (1 : Matrix (Fin (r + t)) (Fin (r + t)) k) i j) := by
+  have hev
+      : ∀ i j : Fin (r + t),
+        ∀ᶠ m : ℕ in atTop,
+          (if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
+            valuation k (ϖ ^ m * y.val i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * y.val i j)
+          else y.val i j = (1 : Matrix (Fin (r + t)) (Fin (r + t)) k) i j) := by
     intro i j
     by_cases hij : (i : ℕ) < r ∧ r ≤ (j : ℕ)
     · simp only [hij, and_self, if_true]
@@ -55,10 +59,11 @@ theorem strip_exhaust : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
       exact ⟨hm.1.le, hm.2⟩
     · simp only [hij, if_false]
       exact Eventually.of_forall fun _ => hy' i j hij
-  have hall : ∀ᶠ m : ℕ in atTop, ∀ i j : Fin (r + t),
-      (if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
-        valuation k (ϖ ^ m * y.val i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * y.val i j)
-      else y.val i j = (1 : Matrix (Fin (r + t)) (Fin (r + t)) k) i j) := by
+  have hall
+      : ∀ᶠ m : ℕ in atTop, ∀ i j : Fin (r + t),
+        (if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
+          valuation k (ϖ ^ m * y.val i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * y.val i j)
+        else y.val i j = (1 : Matrix (Fin (r + t)) (Fin (r + t)) k) i j) := by
     rw [eventually_all]
     intro i
     rw [eventually_all]

@@ -18,17 +18,18 @@ variable {k : Type} [CommRing k]
 
 section Points
 
-scoped instance sectionsAlgebra (X : Over (Spec (CommRingCat.of k))) (U : X.left.Opens) :
-    Algebra k Γ(X.left, U) :=
+scoped instance sectionsAlgebra (X : Over (Spec (CommRingCat.of k))) (U : X.left.Opens)
+    : Algebra k Γ(X.left, U) :=
   ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ X.hom.appLE ⊤ U le_top).hom.toAlgebra
 
-theorem algebraMap_sections (X : Over (Spec (CommRingCat.of k))) (U : X.left.Opens) :
-    algebraMap k Γ(X.left, U) =
-      ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ X.hom.appLE ⊤ U le_top).hom := rfl
+theorem algebraMap_sections (X : Over (Spec (CommRingCat.of k))) (U : X.left.Opens)
+    : algebraMap k Γ(X.left, U)
+      = ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ X.hom.appLE ⊤ U le_top).hom :=
+  rfl
 
 variable {X : Over (Spec (CommRingCat.of k))}
-variable {A B C : Type} [CommRing A] [Algebra k A] [CommRing B] [Algebra k B]
-  [CommRing C] [Algebra k C]
+variable
+  {A B C : Type} [CommRing A] [Algebra k A] [CommRing B] [Algebra k B] [CommRing C] [Algebra k C]
 
 theorem spMap_injective : Function.Injective (spMap : (A →ₐ[k] B) → (sp B ⟶ sp A)) := by
   intro φ ψ h
@@ -46,8 +47,9 @@ theorem spMap_surjective : Function.Surjective (spMap : (A →ₐ[k] B) → (sp 
 
 def affinePoint {U : X.left.Opens} (hU : IsAffineOpen U) : sp Γ(X.left, U) ⟶ X :=
   Over.homMk hU.fromSpec (by
-    have h := IsAffineOpen.SpecMap_appLE_fromSpec X.hom
-      (isAffineOpen_top (Spec (CommRingCat.of k))) hU (le_top : U ≤ X.hom ⁻¹ᵁ ⊤)
+    have h :=
+      IsAffineOpen.SpecMap_appLE_fromSpec X.hom (isAffineOpen_top (Spec (CommRingCat.of k))) hU
+        (le_top : U ≤ X.hom ⁻¹ᵁ ⊤)
     rw [IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv] at h
     change hU.fromSpec ≫ X.hom = Spec.map (CommRingCat.ofHom (algebraMap k Γ(X.left, U)))
     rw [← h, algebraMap_sections, CommRingCat.ofHom_hom, Spec.map_comp])
@@ -56,20 +58,14 @@ end Points
 
 section Families
 
-abbrev AlgClass (k : Type) [CommRing k] : Type 1 :=
-  ∀ (A : Type) [CommRing A] [Algebra k A], Prop
+abbrev AlgClass (k : Type) [CommRing k] : Type 1 := ∀ (A : Type) [CommRing A] [Algebra k A], Prop
 
 variable {𝒯 𝒯' : AlgClass k} {X : Over (Spec (CommRingCat.of k))}
-
-
 
 section
 variable (A : Type) [CommRing A] [Algebra k A] (hA : 𝒯 A) (x : sp A ⟶ X)
 
 end
-
-
-
 
 end Families
 

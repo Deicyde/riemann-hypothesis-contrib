@@ -11,15 +11,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.BZMir
 
-theorem mem_MirUin_iff_mem_derUnipM (k : Type) [Field k] (n : ℕ) (g : Mir k n) :
-    g ∈ MirUin k n ↔ g ∈ derUnipM k n n := by
+theorem mem_MirUin_iff_mem_derUnipM (k : Type) [Field k] (n : ℕ) (g : Mir k n)
+    : g ∈ MirUin k n ↔ g ∈ derUnipM k n n := by
   rw [MirUin, derUnipM, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, derUnip, Subgroup.mem_inf]
   constructor
   · rintro ⟨v, hv⟩
     rw [← hv]
     refine ⟨(mem_unipB k).2 ⟨fun i j hji => ?_, fun i => ?_⟩, fun i hi => ?_⟩
-    · have hj : j ≠ Fin.last n := fun h => by
-        subst h; exact absurd hji (not_lt.2 (Fin.le_last i))
+    · have hj : j ≠ Fin.last n := fun h => by subst h; exact absurd hji (not_lt.2 (Fin.le_last i))
       have hij : i ≠ j := (ne_of_lt hji).symm
       simp [unip, colMat, Matrix.one_apply, hj, hij]
     · by_cases hi : i = Fin.last n
@@ -29,7 +28,10 @@ theorem mem_MirUin_iff_mem_derUnipM (k : Type) [Field k] (n : ℕ) (g : Mir k n)
       ext l
       simp [unip, colMat, hi', Matrix.col, Matrix.one_apply, Pi.single_apply, eq_comm]
   · rintro ⟨hB, hC⟩
-    refine ⟨Multiplicative.ofAdd (fun i => (g : GL (Fin (n + 1)) k).val (Fin.castSucc i) (Fin.last n)), ?_⟩
+    refine ⟨
+      Multiplicative.ofAdd (fun i => (g : GL (Fin (n + 1)) k).val (Fin.castSucc i) (Fin.last n)),
+      ?_
+    ⟩
     ext i j
     show (1 + colMat k n _) i j = _
     induction j using Fin.lastCases with
@@ -44,20 +46,28 @@ theorem mem_MirUin_iff_mem_derUnipM (k : Type) [Field k] (n : ℕ) (g : Mir k n)
       rw [h]
       simp [colMat, Fin.castSucc_ne_last, Matrix.one_apply, Pi.single_apply]
 
-theorem derCharM_self_apply {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (ψ : AddChar k Circle) (n : ℕ) (x : derUnipM k n n) : derCharM k ψ n n x = 1 := by
-  change Circle.toUnits (ψ (∑ p ∈ Finset.univ.filter
-    (fun p : Fin (n + 1) × Fin (n + 1) => (p.2 : ℕ) = p.1 + 1 ∧ n ≤ (p.1 : ℕ)), _)) = 1
+theorem derCharM_self_apply
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ψ : AddChar k Circle)
+    (n : ℕ) (x : derUnipM k n n)
+    : derCharM k ψ n n x = 1 := by
+  change Circle.toUnits (ψ
+      (∑ p ∈ Finset.univ.filter
+        (fun p : Fin (n + 1) × Fin (n + 1) => (p.2 : ℕ) = p.1 + 1 ∧ n ≤ (p.1 : ℕ)), _))
+    = 1
   rw [Finset.sum_eq_zero, AddChar.map_zero_eq_one, map_one]
   intro p hp
   have h := (Finset.mem_filter.1 hp).2
   have := p.2.isLt
   omega
 
-theorem twKer_MirUin_eq_derUnipM (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle) (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (τ : Representation ℂ (Mir k n) V) :
-    twKer τ (MirUin k n) 1 = twKer τ (derUnipM k n n) (derCharM k ψ n n) := by
+theorem twKer_MirUin_eq_derUnipM
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ψ : AddChar k Circle)
+    (n : ℕ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (τ : Representation ℂ (Mir k n) V)
+    : twKer τ (MirUin k n) 1 = twKer τ (derUnipM k n n) (derCharM k ψ n n) := by
   apply le_antisymm
   · refine Submodule.span_le.2 ?_
     rintro w ⟨u, v, rfl⟩

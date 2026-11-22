@@ -8,18 +8,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 namespace GlobalTheory.HilbertThetaSeries.GaussPow
 
-theorem reps_bij {V : Type} [AddCommGroup V] {A B : AddSubgroup V} {T : Finset V} (h : IsReps A B T) :
-    Function.Bijective (fun y : T => (QuotientAddGroup.mk ⟨y.1, h.1 y.1 y.2⟩ : B ⧸ A.addSubgroupOf B)) := by
+theorem reps_bij {V : Type} [AddCommGroup V] {A B : AddSubgroup V} {T : Finset V} (h : IsReps A B T)
+    : Function.Bijective (fun y : T =>
+      (QuotientAddGroup.mk ⟨y.1, h.1 y.1 y.2⟩ : B ⧸ A.addSubgroupOf B)) := by
   obtain ⟨hT, hu⟩ := h
   constructor
   · rintro ⟨y1, hy1⟩ ⟨y2, hy2⟩ hxy
     simp only [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf, AddSubgroup.coe_add,
-      AddSubgroup.coe_neg] at hxy
+        AddSubgroup.coe_neg]
+      at hxy
     obtain ⟨z, _, hz⟩ := hu y1 (hT y1 hy1)
     have a1 := hz y1 ⟨hy1, by simp⟩
     have a2 : y2 = z := by
@@ -38,17 +42,18 @@ theorem reps_bij {V : Type} [AddCommGroup V] {A B : AddSubgroup V} {T : Finset V
     rw [e]
     exact hxy
 
-theorem reps_card {V : Type} [AddCommGroup V] {A B : AddSubgroup V} {T : Finset V} (h : IsReps A B T) :
-    T.card = A.relIndex B := by
+theorem reps_card
+    {V : Type} [AddCommGroup V] {A B : AddSubgroup V} {T : Finset V} (h : IsReps A B T)
+    : T.card = A.relIndex B := by
   rw [AddSubgroup.relIndex, AddSubgroup.index, ← Nat.card_eq_of_bijective _ (reps_bij h)]
   simp
 
-theorem card_image {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} (hCB : C ≤ B)
-    (P : B ⧸ A.addSubgroupOf B → Prop) (hAC : A ≤ C)
-    (hP : ∀ x : B, P (QuotientAddGroup.mk x) ↔ x.1 ∈ C) :
-    Nat.card {u // P u} = A.relIndex C := by
-  let g : C →+ B ⧸ A.addSubgroupOf B :=
-    (QuotientAddGroup.mk' _).comp (AddSubgroup.inclusion hCB)
+theorem card_image
+    {V : Type} [AddCommGroup V]
+    {A B C : AddSubgroup V} (hCB : C ≤ B) (P : B ⧸ A.addSubgroupOf B → Prop) (hAC : A ≤ C)
+    (hP : ∀ x : B, P (QuotientAddGroup.mk x) ↔ x.1 ∈ C)
+    : Nat.card {u // P u} = A.relIndex C := by
+  let g : C →+ B ⧸ A.addSubgroupOf B := (QuotientAddGroup.mk' _).comp (AddSubgroup.inclusion hCB)
   have hker : g.ker = A.addSubgroupOf C := by
     ext x
     simp [g, AddMonoidHom.mem_ker, QuotientAddGroup.eq_zero_iff, AddSubgroup.mem_addSubgroupOf]
@@ -59,10 +64,10 @@ theorem card_image {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} (hCB : C 
     constructor
     · rintro ⟨c, hc⟩
       simp only [g, AddMonoidHom.coe_comp, Function.comp_apply, QuotientAddGroup.mk'_apply,
-        QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf, AddSubgroup.coe_add,
-        AddSubgroup.coe_neg] at hc
-      have e : x.1 = (c : V) + (-(AddSubgroup.inclusion hCB c : V) + x.1) := by
-        simp
+          QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf, AddSubgroup.coe_add,
+          AddSubgroup.coe_neg]
+        at hc
+      have e : x.1 = (c : V) + (-(AddSubgroup.inclusion hCB c : V) + x.1) := by simp
       rw [e]
       exact C.add_mem c.2 (hAC hc)
     · intro hx
@@ -71,13 +76,16 @@ theorem card_image {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} (hCB : C 
     Nat.card_congr (QuotientAddGroup.quotientKerEquivRange g).toEquiv]
   exact (Nat.card_congr (Equiv.subtypeEquivRight hrange)).symm
 
-theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Finset V} (h : IsReps A B T)
-    (hAC : A ≤ C) (hCB : C ≤ B) (f : V → ℂ) (g : V → V → ℂ) (e : ℕ) (he : 0 < e)
-    (h1 : ∀ x ∈ B, f x ^ e = 1) (h2 : ∀ x y, f (x + y) = f x * f y * g x y)
-    (h3 : ∀ x y z, g (x + y) z = g x z * g y z) (h4 : ∀ (n : ℤ) x, f (n • x) = f x ^ (n ^ 2))
-    (h5 : ∀ x ∈ B, ∀ l ∈ A, f (x + l) = f x)
-    (h6 : ∀ u ∈ B, (∀ x ∈ B, g u x = 1) ↔ u ∈ C) (h7 : ∀ u ∈ C, f u = 1) :
-    (∑ x ∈ T, f x) ^ 8 = ((T.card : ℂ) * (A.relIndex C : ℂ)) ^ 4 := by
+theorem gauss_reps
+    {V : Type} [AddCommGroup V]
+    {A B C : AddSubgroup V} {T : Finset V} (h : IsReps A B T) (hAC : A ≤ C) (hCB : C ≤ B)
+    (f : V → ℂ)
+    (g : V → V → ℂ)
+    (e : ℕ) (he : 0 < e) (h1 : ∀ x ∈ B, f x ^ e = 1)
+    (h2 : ∀ x y, f (x + y) = f x * f y * g x y) (h3 : ∀ x y z, g (x + y) z = g x z * g y z)
+    (h4 : ∀ (n : ℤ) x, f (n • x) = f x ^ (n ^ 2)) (h5 : ∀ x ∈ B, ∀ l ∈ A, f (x + l) = f x)
+    (h6 : ∀ u ∈ B, (∀ x ∈ B, g u x = 1) ↔ u ∈ C) (h7 : ∀ u ∈ C, f u = 1)
+    : (∑ x ∈ T, f x) ^ 8 = ((T.card : ℂ) * (A.relIndex C : ℂ)) ^ 4 := by
   classical
   have hbij := reps_bij h
   haveI : Finite (B ⧸ A.addSubgroupOf B) := Finite.of_surjective _ hbij.2
@@ -100,7 +108,8 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
   have hfP : ∀ x ∈ B, ∀ y, y - x ∈ A → f y = f x := by
     intro x hx y hl
     have e : y = x + (y - x) := by abel
-    rw [e]; exact h5 x hx _ hl
+    rw [e]
+    exact h5 x hx _ hl
   have hgC : ∀ l ∈ C, ∀ z ∈ B, g l z = 1 := fun l hl z hz => (h6 l (hCB hl)).mpr hl z hz
   have hgP1 : ∀ x ∈ B, ∀ y, y - x ∈ A → ∀ z ∈ B, g y z = g x z := by
     intro x hx y hl z hz
@@ -113,21 +122,26 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
     intro x hx y hl z hz
     have hy : y ∈ B := by
       have e : y = x + (y - x) := by abel
-      rw [e]; exact B.add_mem hx ((hAC.trans hCB) hl)
+      rw [e]
+      exact B.add_mem hx ((hAC.trans hCB) hl)
     rw [hgsymm z hz y hy, hgsymm z hz x hx]
     exact hgP1 x hx y hl z hz
   let r : (B ⧸ A.addSubgroupOf B) → V := fun q => ((Quotient.out q : B) : V)
   have hrB : ∀ q, r q ∈ B := fun q => (Quotient.out q).2
-  have hmk : ∀ q : B ⧸ A.addSubgroupOf B, (QuotientAddGroup.mk (Quotient.out q) : B ⧸ A.addSubgroupOf B) = q :=
-    fun q => Quotient.out_eq q
+  have hmk
+      : ∀ q : B ⧸ A.addSubgroupOf B,
+        (QuotientAddGroup.mk (Quotient.out q) : B ⧸ A.addSubgroupOf B) = q := fun q =>
+    Quotient.out_eq q
   have hrmk : ∀ x : B, r (QuotientAddGroup.mk x) - x.1 ∈ A := by
     intro x
     have e := hmk (QuotientAddGroup.mk x : B ⧸ A.addSubgroupOf B)
     rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf] at e
-    have e2 : r (QuotientAddGroup.mk x) - x.1 =
-        -((-(Quotient.out (QuotientAddGroup.mk x : B ⧸ A.addSubgroupOf B)) + x : B) : V) := by
+    have e2
+        : r (QuotientAddGroup.mk x) - x.1
+          = -((-(Quotient.out (QuotientAddGroup.mk x : B ⧸ A.addSubgroupOf B)) + x : B) : V) := by
       simp only [r, AddSubgroup.coe_add, AddSubgroup.coe_neg]; abel
-    rw [e2]; exact A.neg_mem e
+    rw [e2]
+    exact A.neg_mem e
   have hr_add : ∀ p q, r (p + q) - (r p + r q) ∈ A := by
     intro p q
     have e := hrmk (Quotient.out p + Quotient.out q)
@@ -166,27 +180,27 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
     have := hFadd p q
     rw [h0, mul_zero] at this
     exact hFne _ this
-  let φ : (B ⧸ A.addSubgroupOf B) → Additive ℂˣ := fun q => Additive.ofMul (Units.mk0 (Fq q) (hFne q))
-  let β : (B ⧸ A.addSubgroupOf B) → (B ⧸ A.addSubgroupOf B) → Additive ℂˣ :=
-    fun p q => Additive.ofMul (Units.mk0 (Gq p q) (hGne p q))
-  have hext : ∀ u v : Additive ℂˣ, ((Additive.toMul u : ℂˣ) : ℂ) = ((Additive.toMul v : ℂˣ) : ℂ) → u = v :=
-    fun u v huv => Additive.toMul.injective (Units.ext huv)
-  have hφadd : ∀ p q, φ (p + q) = φ p + φ q + β p q := by
-    intro p q; apply hext; simp [φ, β, hFadd]
-  have hβadd1 : ∀ p q s, β (p + q) s = β p s + β q s := by
-    intro p q s; apply hext; simp [β, hGadd1]
-  have hβadd2 : ∀ p q s, β s (p + q) = β s p + β s q := by
-    intro p q s; apply hext; simp [β, hGadd2]
-  have hφsmul : ∀ (m : ℤ) p, φ (m • p) = (m ^ 2) • φ p := by
-    intro m p; apply hext; simp [φ, hFsmul]
-  have hφe : ∀ q, (e : ℤ) • φ q = 0 := by
-    intro q; apply hext; simp [φ, hFe]
+  let φ : (B ⧸ A.addSubgroupOf B) → Additive ℂˣ := fun q =>
+    Additive.ofMul (Units.mk0 (Fq q) (hFne q))
+  let β : (B ⧸ A.addSubgroupOf B) → (B ⧸ A.addSubgroupOf B) → Additive ℂˣ := fun p q =>
+    Additive.ofMul (Units.mk0 (Gq p q) (hGne p q))
+  have hext
+      : ∀ u v : Additive ℂˣ,
+        ((Additive.toMul u : ℂˣ) : ℂ) = ((Additive.toMul v : ℂˣ) : ℂ) → u = v := fun u v huv =>
+    Additive.toMul.injective (Units.ext huv)
+  have hφadd : ∀ p q, φ (p + q) = φ p + φ q + β p q := by intro p q; apply hext; simp [φ, β, hFadd]
+  have hβadd1 : ∀ p q s, β (p + q) s = β p s + β q s := by intro p q s; apply hext; simp [β, hGadd1]
+  have hβadd2 : ∀ p q s, β s (p + q) = β s p + β s q := by intro p q s; apply hext; simp [β, hGadd2]
+  have hφsmul : ∀ (m : ℤ) p, φ (m • p) = (m ^ 2) • φ p := by intro m p; apply hext; simp [φ, hFsmul]
+  have hφe : ∀ q, (e : ℤ) • φ q = 0 := by intro q; apply hext; simp [φ, hFe]
   have hβz1 : ∀ (m : ℤ) p q, β (m • p) q = m • β p q := fun m p q =>
     map_zsmul (AddMonoidHom.mk' (fun p => β p q) (fun p p' => hβadd1 p p' q)) m p
   have hβz2 : ∀ (m : ℤ) p q, β q (m • p) = m • β q p := fun m p q =>
     map_zsmul (AddMonoidHom.mk' (fun p => β q p) (fun p p' => hβadd2 p p' q)) m p
-  obtain ⟨za, zb, zc, zd, hs⟩ : ∃ za zb zc zd : ℤ, za ^ 2 + zb ^ 2 + zc ^ 2 + zd ^ 2 =
-      (Fintype.card (B ⧸ A.addSubgroupOf B) : ℤ) * (e : ℤ) - 1 := by
+  obtain ⟨za, zb, zc, zd, hs⟩
+      : ∃ za zb zc zd : ℤ,
+        za ^ 2 + zb ^ 2 + zc ^ 2 + zd ^ 2
+          = (Fintype.card (B ⧸ A.addSubgroupOf B) : ℤ) * (e : ℤ) - 1 := by
     obtain ⟨a0, b0, c0, d0, habcd⟩ :=
       Nat.sum_four_squares (Fintype.card (B ⧸ A.addSubgroupOf B) * e - 1)
     refine ⟨a0, b0, c0, d0, ?_⟩
@@ -199,7 +213,7 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
     have h0 : ((Fintype.card (B ⧸ A.addSubgroupOf B) : ℤ)) • q = 0 := by
       rw [natCast_zsmul]; exact card_nsmul_eq_zero
     rw [hs, sub_smul, one_smul, mul_comm, mul_smul, h0, smul_zero, zero_sub]
-  have hsφ : ∀ q, (za ^ 2 + zb ^ 2 + zc ^ 2 + zd ^ 2) • φ q = -φ q := by
+  have hsφ : ∀ q, (za ^ 2 + zb ^ 2 + zc ^ 2 + zd ^ 2) • φ q = - φ q := by
     intro q
     rw [hs, sub_smul, one_smul, mul_smul, hφe, smul_zero, zero_sub]
   let Φ : (Fin 4 → B ⧸ A.addSubgroupOf B) → (Fin 4 → B ⧸ A.addSubgroupOf B) := fun x =>
@@ -242,16 +256,19 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
     rw [Fin.sum_univ_four, Fin.sum_univ_four, hΦ0, hΦ1, hΦ2, hΦ3]
     simp only [hφadd, hφsmul, hβadd1, hβadd2, hβz1, hβz2]
     linear_combination (norm := module) hsφ (x 0) + hsφ (x 1) + hsφ (x 2) + hsφ (x 3)
-  have hpow4 : ∀ H : (B ⧸ A.addSubgroupOf B) → ℂ,
-      (∑ q, H q) ^ 4 = ∑ x : Fin 4 → B ⧸ A.addSubgroupOf B, ∏ i, H (x i) := by
+  have hpow4
+      : ∀ H : (B ⧸ A.addSubgroupOf B) → ℂ,
+        (∑ q, H q) ^ 4 = ∑ x : Fin 4 → B ⧸ A.addSubgroupOf B, ∏ i, H (x i) := by
     intro H
     rw [← Fintype.prod_sum]
     simp
-  have hprod : ∀ y : Fin 4 → B ⧸ A.addSubgroupOf B,
-      ∏ i, Fq (y i) = ((Additive.toMul (∑ i, φ (y i)) : ℂˣ) : ℂ) := by
+  have hprod
+      : ∀ y : Fin 4 → B ⧸ A.addSubgroupOf B,
+        ∏ i, Fq (y i) = ((Additive.toMul (∑ i, φ (y i)) : ℂˣ) : ℂ) := by
     intro y; simp [φ, toMul_sum, Units.coe_prod]
-  have hprodinv : ∀ y : Fin 4 → B ⧸ A.addSubgroupOf B,
-      ∏ i, (Fq (y i))⁻¹ = ((Additive.toMul (∑ i, -φ (y i)) : ℂˣ) : ℂ) := by
+  have hprodinv
+      : ∀ y : Fin 4 → B ⧸ A.addSubgroupOf B,
+        ∏ i, (Fq (y i))⁻¹ = ((Additive.toMul (∑ i, -φ (y i)) : ℂˣ) : ℂ) := by
     intro y; simp [φ, toMul_sum, Units.coe_prod]
   have h44 : (∑ q, Fq q) ^ 4 = (∑ q, (Fq q)⁻¹) ^ 4 := by
     rw [hpow4 Fq, hpow4 (fun q => (Fq q)⁻¹),
@@ -259,8 +276,8 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
         (hΦbij.sum_comp (fun y => ∏ i, Fq (y i))).symm]
     refine Finset.sum_congr rfl (fun x _ => ?_)
     rw [hprod (Φ x), hprodinv x, hrow x]
-  have hchar : ∀ u, ∑ q, Gq u q =
-      if r u ∈ C then (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) else 0 := by
+  have hchar
+      : ∀ u, ∑ q, Gq u q = if r u ∈ C then (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) else 0 := by
     intro u
     split_ifs with hu
     · have h1' : ∀ q, Gq u q = 1 := fun q => (h6 (r u) (hrB u)).mpr hu (r q) (hrB q)
@@ -274,9 +291,10 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
         exact hx1
       have hsh : ∑ q, Gq u q = (∑ q, Gq u q) * Gq u (QuotientAddGroup.mk (⟨x, hxB⟩ : B)) := by
         have hs1 : ∑ q, Gq u q = ∑ q, Gq u (q + QuotientAddGroup.mk (⟨x, hxB⟩ : B)) :=
-          (Fintype.sum_equiv (Equiv.addRight
-            (QuotientAddGroup.mk (⟨x, hxB⟩ : B) : B ⧸ A.addSubgroupOf B))
-            (fun q => Gq u (q + QuotientAddGroup.mk (⟨x, hxB⟩ : B))) (fun q => Gq u q)
+          (Fintype.sum_equiv
+            (Equiv.addRight (QuotientAddGroup.mk (⟨x, hxB⟩ : B) : B ⧸ A.addSubgroupOf B))
+            (fun q => Gq u (q + QuotientAddGroup.mk (⟨x, hxB⟩ : B)))
+            (fun q => Gq u q)
             (fun q => rfl)).symm
         rw [Finset.sum_mul]
         rw [hs1]
@@ -286,31 +304,35 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
       rcases mul_eq_zero.mp h' with h'' | h''
       · exact h''
       · exact absurd (sub_eq_zero.mp h'') hq0
-  have hmul : (∑ q, Fq q) * (∑ q, (Fq q)⁻¹) =
-      (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) * (Fintype.card {u // r u ∈ C} : ℂ) := by
-    calc (∑ q, Fq q) * (∑ q, (Fq q)⁻¹) = ∑ q, ∑ p, Fq p * (Fq q)⁻¹ := by
-          rw [Finset.sum_mul_sum, Finset.sum_comm]
+  have hmul
+      : (∑ q, Fq q) * (∑ q, (Fq q)⁻¹)
+        = (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) * (Fintype.card {u // r u ∈ C} : ℂ) := by
+    calc
+      (∑ q, Fq q) * (∑ q, (Fq q)⁻¹)
+        = ∑ q, ∑ p, Fq p * (Fq q)⁻¹ := by rw [Finset.sum_mul_sum, Finset.sum_comm]
       _ = ∑ q, ∑ u, Fq u * Gq u q := by
-          refine Finset.sum_congr rfl (fun q _ => ?_)
-          rw [← Fintype.sum_equiv (Equiv.addRight q) (fun u => Fq (u + q) * (Fq q)⁻¹)
-            (fun p => Fq p * (Fq q)⁻¹) (fun u => rfl)]
-          refine Finset.sum_congr rfl (fun u _ => ?_)
-          rw [hFadd, mul_right_comm (Fq u) (Fq q), mul_assoc (Fq u * Gq u q),
-            mul_inv_cancel₀ (hFne q), mul_one]
+        refine Finset.sum_congr rfl (fun q _ => ?_)
+        rw [← Fintype.sum_equiv (Equiv.addRight q)
+          (fun u => Fq (u + q) * (Fq q)⁻¹)
+          (fun p => Fq p * (Fq q)⁻¹)
+          (fun u => rfl)]
+        refine Finset.sum_congr rfl (fun u _ => ?_)
+        rw [hFadd, mul_right_comm (Fq u) (Fq q), mul_assoc (Fq u * Gq u q),
+          mul_inv_cancel₀ (hFne q), mul_one]
       _ = ∑ u, Fq u * ∑ q, Gq u q := by
-          rw [Finset.sum_comm]
-          refine Finset.sum_congr rfl (fun u _ => ?_)
-          rw [Finset.mul_sum]
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl (fun u _ => ?_)
+        rw [Finset.mul_sum]
       _ = ∑ u, if r u ∈ C then (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) else 0 := by
-          refine Finset.sum_congr rfl (fun u _ => ?_)
-          rw [hchar u]
-          split_ifs with hu
-          · rw [show Fq u = 1 from h7 _ hu, one_mul]
-          · rw [mul_zero]
+        refine Finset.sum_congr rfl (fun u _ => ?_)
+        rw [hchar u]
+        split_ifs with hu
+        · rw [show Fq u = 1 from h7 _ hu, one_mul]
+        · rw [mul_zero]
       _ = _ := by
-          simp only [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const,
-            nsmul_eq_mul, Fintype.card_subtype]
-          ring
+        simp only [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul,
+          Fintype.card_subtype]
+        ring
   have hcardQ : Fintype.card (B ⧸ A.addSubgroupOf B) = T.card := by
     rw [reps_card h, AddSubgroup.relIndex, AddSubgroup.index, Nat.card_eq_fintype_card]
   have hcardC : Fintype.card {u // r u ∈ C} = A.relIndex C := by
@@ -321,20 +343,22 @@ theorem gauss_reps {V : Type} [AddCommGroup V] {A B C : AddSubgroup V} {T : Fins
     constructor
     · intro hx
       have e : x.1 = r (QuotientAddGroup.mk x) - (r (QuotientAddGroup.mk x) - x.1) := by abel
-      rw [e]; exact C.sub_mem hx hl
+      rw [e]
+      exact C.sub_mem hx hl
     · intro hx
       have e : r (QuotientAddGroup.mk x) = x.1 + (r (QuotientAddGroup.mk x) - x.1) := by abel
-      rw [e]; exact C.add_mem hx hl
+      rw [e]
+      exact C.add_mem hx hl
   have hS : ∑ x ∈ T, f x = ∑ q, Fq q := by
     rw [← Finset.sum_coe_sort T, ← hbij.sum_comp Fq]
     refine Finset.sum_congr rfl (fun y _ => ?_)
     show f y.1 = f (r (QuotientAddGroup.mk ⟨y.1, h.1 y.1 y.2⟩))
     exact (hfP _ (h.1 y.1 y.2) _ (hrmk ⟨y.1, h.1 y.1 y.2⟩)).symm
-  have hfin : (∑ q, Fq q) ^ 8 = ((∑ q, Fq q) * (∑ q, (Fq q)⁻¹)) ^ 4 := by
-    rw [mul_pow, ← h44]; ring
+  have hfin : (∑ q, Fq q) ^ 8 = ((∑ q, Fq q) * (∑ q, (Fq q)⁻¹)) ^ 4 := by rw [mul_pow, ← h44]; ring
   rw [hS, hfin, hmul, hcardQ, hcardC]
 
-theorem et_zsmul {F : Type} [Field F] [NumberField F] (n : ℤ) (x : F) : et ((n : F) * x) = et x ^ n := by
+theorem et_zsmul {F : Type} [Field F] [NumberField F] (n : ℤ) (x : F)
+    : et ((n : F) * x) = et x ^ n := by
   unfold et
   rw [← zsmul_eq_mul, map_zsmul, zsmul_eq_mul, Rat.cast_mul, Rat.cast_intCast,
     ← Complex.exp_int_mul]
@@ -345,19 +369,33 @@ end GlobalTheory.HilbertThetaSeries.GaussPow
 
 namespace GlobalTheory.HilbertThetaSeries
 
-
 open GaussPow in
-theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ), EvenPos G → ∀ t : ℕ, G.det = (t : ℤ) ^ 2 → ∀ k : ℕ, Fintype.card κ = 2 * k → ∀ (N : ℕ) (a b c d : F) (T : Finset (κ → F)), 0 < N → (∀ y ∈ dualL F G, (N : F) • y ∈ LL F κ ∧ IsIntegral ℤ ((N : F) * QF G y)) → IsIntegral ℤ a → IsIntegral ℤ b → IsIntegral ℤ (c / N) → IsIntegral ℤ d → a * d - b * c = 1 → c ≠ 0 → IsReps (aL κ c) (aL κ (1 : F)) T → (wC k t c c * ∑ x ∈ T, et (a / c * QF G x)) ^ 8 = 1 := by
+theorem gaussSum_pow_eight
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ]
+        (G : Matrix κ κ ℤ),
+      EvenPos G
+        → ∀ t : ℕ,
+          G.det = (t : ℤ) ^ 2
+            → ∀ k : ℕ,
+              Fintype.card κ = 2 * k
+                → ∀ (N : ℕ) (a b c d : F) (T : Finset (κ → F)),
+                  0 < N → (∀ y ∈ dualL F G, (N : F) • y ∈ LL F κ ∧ IsIntegral ℤ ((N : F) * QF G y))
+                    → IsIntegral ℤ a → IsIntegral ℤ b → IsIntegral ℤ (c / N) → IsIntegral ℤ d
+                    → a * d - b * c = 1 → c ≠ 0 → IsReps (aL κ c) (aL κ (1 : F)) T
+                    → (wC k t c c * ∑ x ∈ T, et (a / c * QF G x)) ^ 8 = 1 := by
   intro F _ _ κ _ _ G hG t ht k hk N a b c d T hN hdual ha hb hcN hd hadbc hc0 hT
   classical
-  obtain ⟨hsym, hlin, hadd, hint, hLL, haL, het, hLd⟩ := GlobalTheory.T.evenPos_gramForm_integral_lattice_properties F κ G hG
-  obtain ⟨-, -, -, hdsmul, hidx⟩ := GlobalTheory.T.dualLattice_index_eq_discr_pow_mul_det_pow F κ G hG
+  obtain ⟨hsym, hlin, hadd, hint, hLL, haL, het, hLd⟩ :=
+    GlobalTheory.T.evenPos_gramForm_integral_lattice_properties F κ G hG
+  obtain ⟨-, -, -, hdsmul, hidx⟩ :=
+    GlobalTheory.T.dualLattice_index_eq_discr_pow_mul_det_pow F κ G hG
   have hN0 : (N : F) ≠ 0 := by exact_mod_cast hN.ne'
   have hNI : IsIntegral ℤ (N : F) := by
     simpa using (isIntegral_algebraMap (R := ℤ) (A := F) (x := (N : ℤ)))
   have hcI : IsIntegral ℤ c := by
     have e : c = (N : F) * (c / N) := by rw [mul_div_cancel₀ c hN0]
-    rw [e]; exact hNI.mul hcN
+    rw [e]
+    exact hNI.mul hcN
   have hsmulL : ∀ z : F, IsIntegral ℤ z → ∀ x ∈ LL F κ, z • x ∈ LL F κ := by
     intro z hz x hx
     rw [hLL] at hx ⊢
@@ -379,16 +417,19 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
     simpa using this
   let f : (κ → F) → ℂ := fun x => et (a / c * QF G x)
   let g : (κ → F) → (κ → F) → ℂ := fun x y => et (a / c * BF G x y)
-  let C : AddSubgroup (κ → F) := aL κ (1 : F) ⊓
-    (dualL F G).comap (DistribSMul.toAddMonoidHom (κ → F) (a / c))
+  let C : AddSubgroup (κ → F) :=
+    aL κ (1 : F) ⊓ (dualL F G).comap (DistribSMul.toAddMonoidHom (κ → F) (a / c))
   have hCmem : ∀ u, u ∈ C ↔ u ∈ LL F κ ∧ (a / c) • u ∈ dualL F G := by
     intro u
     simp only [C, AddSubgroup.mem_inf, AddSubgroup.mem_comap, DistribSMul.toAddMonoidHom_apply, hB]
   have h2 : ∀ x y, f (x + y) = f x * f y * g x y := by
     intro x y
     show et (a / c * QF G (x + y)) = et (a / c * QF G x) * et (a / c * QF G y) * et (a / c * BF G x y)
-    rw [(hsym x y).2, show a / c * (QF G x + BF G x y + QF G y) =
-      a / c * QF G x + a / c * QF G y + a / c * BF G x y by ring, het_add, het_add]
+    rw [(hsym x y).2,
+      show a / c * (QF G x + BF G x y + QF G y)
+          = a / c * QF G x + a / c * QF G y + a / c * BF G x y by
+        ring,
+      het_add, het_add]
   have h3 : ∀ x y z, g (x + y) z = g x z * g y z := by
     intro x y z
     show et (a / c * BF G (x + y) z) = et (a / c * BF G x z) * et (a / c * BF G y z)
@@ -406,8 +447,7 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
     rw [hB] at hx
     show et (a / c * QF G (x + c • l')) = et (a / c * QF G x)
     rw [(hsym x _).2, (hsym x (c • l')).1, (hlin c l' x).1, (hlin c l' l').2.1]
-    have e1 : a / c * (c * BF G l' x) = a * BF G l' x := by
-      rw [← mul_assoc, div_mul_cancel₀ a hc0]
+    have e1 : a / c * (c * BF G l' x) = a * BF G l' x := by rw [← mul_assoc, div_mul_cancel₀ a hc0]
     have e2 : a / c * (c ^ 2 * QF G l') = a * c * QF G l' := by
       rw [← mul_assoc, pow_two, ← mul_assoc, div_mul_cancel₀ a hc0]
     rw [mul_add, mul_add, e1, e2, add_assoc, het_add,
@@ -436,8 +476,8 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
     rw [(hlin (a / c) u u).2.1] at hNQ
     show et (a / c * QF G u) = 1
     apply hetI
-    have key : a / c * QF G u =
-        d * ((c / N) * ((N : F) * ((a / c) ^ 2 * QF G u))) - a * b * QF G u := by
+    have key
+        : a / c * QF G u = d * ((c / N) * ((N : F) * ((a / c) ^ 2 * QF G u))) - a * b * QF G u := by
       have e : a / c * QF G u = (a / c * QF G u) * (a * d - b * c) := by rw [hadbc, mul_one]
       rw [e]
       field_simp
@@ -458,11 +498,15 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
     rw [GaussPow.reps_card hT, AddSubgroup.relIndex, AddSubgroup.index, Nat.card_eq_fintype_card]
   have hnA : ∀ x ∈ aL κ (1 : F), (T.card : ℤ) • x ∈ aL κ c := by
     intro x hx
-    have h0 : Fintype.card (aL κ (1 : F) ⧸ (aL κ c).addSubgroupOf (aL κ (1 : F))) •
-        (QuotientAddGroup.mk (⟨x, hx⟩ : aL κ (1 : F)) :
-          aL κ (1 : F) ⧸ (aL κ c).addSubgroupOf (aL κ (1 : F))) = 0 := card_nsmul_eq_zero
+    have h0
+        : Fintype.card (aL κ (1 : F) ⧸ (aL κ c).addSubgroupOf (aL κ (1 : F)))
+            • (QuotientAddGroup.mk (⟨x, hx⟩ : aL κ (1 : F))
+              : aL κ (1 : F) ⧸ (aL κ c).addSubgroupOf (aL κ (1 : F)))
+          = 0 :=
+      card_nsmul_eq_zero
     rw [hcardT, ← QuotientAddGroup.mk_nsmul, QuotientAddGroup.eq_zero_iff,
-      AddSubgroup.mem_addSubgroupOf] at h0
+        AddSubgroup.mem_addSubgroupOf]
+      at h0
     rw [natCast_zsmul]
     simpa using h0
   have hTpos : 0 < T.card := by
@@ -501,7 +545,9 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
     · rintro ⟨u, hu, rfl⟩
       obtain ⟨huL, hud⟩ := (hCmem u).mp hu
       have hs : c⁻¹ = d * (a / c) - b := by
-        calc c⁻¹ = (a * d - b * c) * c⁻¹ := by rw [hadbc, one_mul]
+        calc
+          c⁻¹
+            = (a * d - b * c) * c⁻¹ := by rw [hadbc, one_mul]
           _ = d * (a / c) - b * (c * c⁻¹) := by ring
           _ = d * (a / c) - b := by rw [mul_inv_cancel₀ hc0, mul_one]
       rw [hs, sub_smul, mul_smul]
@@ -515,7 +561,9 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
         exact hdsmul a y ha hy
   have hrel : (aL κ c).relIndex C = (LL F κ).relIndex (dualL F G) := by
     rw [hAeq, AddSubgroup.relIndex_comap, hdeq]
-  obtain ⟨T', hT', -, -, hT'c⟩ := GlobalTheory.T.exists_finite_reps_scaled_lattice_card_norm F κ c 1 hc0 one_ne_zero (by simpa using hcI)
+  obtain ⟨T', hT', -, -, hT'c⟩ :=
+    GlobalTheory.T.exists_finite_reps_scaled_lattice_card_norm F κ c 1 hc0 one_ne_zero
+      (by simpa using hcI)
   have hTc : (T.card : ℚ) = |Algebra.norm ℚ c| ^ (2 * k) := by
     rw [GaussPow.reps_card hT, ← GaussPow.reps_card hT', hT'c, div_one, hk]
   have hdet : G.det ≠ 0 := by
@@ -530,20 +578,22 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
       rw [ht]
       simp
     exact_mod_cast this
-  have hn0 : ((Algebra.norm ℚ c : ℚ) : ℂ) ≠ 0 := by
-    exact_mod_cast Algebra.norm_ne_zero_iff.mpr hc0
+  have hn0 : ((Algebra.norm ℚ c : ℚ) : ℂ) ≠ 0 := by exact_mod_cast Algebra.norm_ne_zero_iff.mpr hc0
   have hδ0 : (((discr F).natAbs : ℕ) : ℂ) ≠ 0 := by
     exact_mod_cast Int.natAbs_ne_zero.mpr (NumberField.discr_ne_zero F)
-  have hRC : ((LL F κ).relIndex (dualL F G) : ℂ) =
-      (((discr F).natAbs : ℕ) : ℂ) ^ (2 * k) * (t : ℂ) ^ (2 * Module.finrank ℚ F) := by
-    have h' : (((LL F κ).relIndex (dualL F G) : ℕ) : ℤ) =
-        (((discr F).natAbs : ℕ) : ℤ) ^ (2 * k) * (t : ℤ) ^ (2 * Module.finrank ℚ F) := by
+  have hRC
+      : ((LL F κ).relIndex (dualL F G) : ℂ)
+        = (((discr F).natAbs : ℕ) : ℂ) ^ (2 * k) * (t : ℂ) ^ (2 * Module.finrank ℚ F) := by
+    have h'
+        : (((LL F κ).relIndex (dualL F G) : ℕ) : ℤ)
+          = (((discr F).natAbs : ℕ) : ℤ) ^ (2 * k) * (t : ℤ) ^ (2 * Module.finrank ℚ F) := by
       rw [hidx, hk, ht, ← pow_mul]
     exact_mod_cast congrArg (fun z : ℤ => (z : ℂ)) h'
   have hTC : (T.card : ℂ) = (((|Algebra.norm ℚ c| ^ (2 * k) : ℚ)) : ℂ) := by
     rw [← hTc, Rat.cast_natCast]
-  have hq4 : ((((|Algebra.norm ℚ c| ^ (2 * k) : ℚ)) : ℂ)) ^ 4 =
-      ((Algebra.norm ℚ c : ℚ) : ℂ) ^ (2 * k * 4) := by
+  have hq4
+      : ((((|Algebra.norm ℚ c| ^ (2 * k) : ℚ)) : ℂ)) ^ 4
+        = ((Algebra.norm ℚ c : ℚ) : ℂ) ^ (2 * k * 4) := by
     rw [← Rat.cast_pow, ← pow_mul, Even.pow_abs ⟨4 * k, by ring⟩, Rat.cast_pow]
   have hI : ((-Complex.I) ^ (k * Module.finrank ℚ F)) ^ 8 = 1 := by
     rw [← pow_mul, mul_comm, pow_mul,
@@ -560,8 +610,25 @@ theorem gaussSum_pow_eight : ∀ (F : Type) [Field F] [NumberField F] (κ : Type
 
 end GlobalTheory.HilbertThetaSeries
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.lattice_normalized_gaussSum_eighth_root : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ), EvenPos G → ∀ t : ℕ, G.det = (t : ℤ) ^ 2 → ∀ k : ℕ, Fintype.card κ = 2 * k → ∀ (N : ℕ) (a b c d : F) (T : Finset (κ → F)), 0 < N → (∀ y ∈ dualL F G, (N : F) • y ∈ LL F κ ∧ IsIntegral ℤ ((N : F) * QF G y)) → IsIntegral ℤ a → IsIntegral ℤ b → IsIntegral ℤ (c / N) → IsIntegral ℤ d → a * d - b * c = 1 → c ≠ 0 → IsReps (aL κ c) (aL κ (1 : F)) T → (wC k t c c * ∑ x ∈ T, et (a / c * QF G x)) ^ 8 = 1 := by
-  first | exact @GlobalTheory.HilbertThetaSeries.gaussSum_pow_eight | exact GlobalTheory.HilbertThetaSeries.gaussSum_pow_eight | (intros; apply GlobalTheory.HilbertThetaSeries.gaussSum_pow_eight <;> assumption)
+theorem _root_.GlobalTheory.T.lattice_normalized_gaussSum_eighth_root
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ]
+        (G : Matrix κ κ ℤ),
+      EvenPos G
+        → ∀ t : ℕ,
+          G.det = (t : ℤ) ^ 2
+            → ∀ k : ℕ,
+              Fintype.card κ = 2 * k
+                → ∀ (N : ℕ) (a b c d : F) (T : Finset (κ → F)),
+                  0 < N → (∀ y ∈ dualL F G, (N : F) • y ∈ LL F κ ∧ IsIntegral ℤ ((N : F) * QF G y))
+                    → IsIntegral ℤ a → IsIntegral ℤ b → IsIntegral ℤ (c / N) → IsIntegral ℤ d
+                    → a * d - b * c = 1 → c ≠ 0 → IsReps (aL κ c) (aL κ (1 : F)) T
+                    → (wC k t c c * ∑ x ∈ T, et (a / c * QF G x)) ^ 8 = 1 := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.gaussSum_pow_eight
+  | exact GlobalTheory.HilbertThetaSeries.gaussSum_pow_eight
+  | (intros; apply GlobalTheory.HilbertThetaSeries.gaussSum_pow_eight <;> assumption)

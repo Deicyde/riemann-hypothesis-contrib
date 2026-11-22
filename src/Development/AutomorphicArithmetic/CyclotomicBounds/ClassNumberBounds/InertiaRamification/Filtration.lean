@@ -146,33 +146,37 @@ private lemma filt_index {G : Type*} [CommGroup G] [Finite G] (U H : Subgroup G)
   push_cast
   field_simp
 
-theorem avgCondExp_annihilator (H : Subgroup (ZMod N)ˣ) :
-    avgCondExp l (annihilator ℂ (H : Set (ZMod N)ˣ)) =
-      ∑ t ∈ Finset.range (N.factorization l),
-        (1 - (Nat.card ↥(higherUnits N l t ⊓ H) : ℚ) / (Nat.card (higherUnits N l t) : ℚ)) := by
+theorem avgCondExp_annihilator (H : Subgroup (ZMod N)ˣ)
+    : avgCondExp l (annihilator ℂ (H : Set (ZMod N)ˣ))
+      = ∑ t ∈ Finset.range (N.factorization l),
+          (1 - (Nat.card ↥(higherUnits N l t ⊓ H) : ℚ) / (Nat.card (higherUnits N l t) : ℚ)) := by
   classical
   set X := annihilator ℂ (H : Set (ZMod N)ˣ) with hX
   haveI : Fintype X := Fintype.ofFinite X
   have hX0 : (Nat.card X : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
-  have hc : ∀ ψ : DirichletCharacter ℂ N, (condExp l ψ : ℚ) =
-      ∑ t ∈ Finset.range (N.factorization l),
-        (1 - if ψ ∈ annihilator ℂ (higherUnits N l t : Set (ZMod N)ˣ) then (1 : ℚ) else 0) := by
-    intro ψ
-    have hle : condExp l ψ ≤ N.factorization l :=
-      (Nat.factorization_le_iff_dvd ψ.conductor_ne_zero (NeZero.ne N)).mpr ψ.conductor_dvd_level l
-    have h1 : ∀ t ∈ Finset.range (N.factorization l),
-        (1 - if ψ ∈ annihilator ℂ (higherUnits N l t : Set (ZMod N)ˣ) then (1 : ℚ) else 0) =
-          if t < condExp l ψ then 1 else 0 := by
-      intro t ht
-      have := filt_mem_ann l (Finset.mem_range.mp ht).le ψ
-      by_cases h : t < condExp l ψ
-      · rw [if_neg (by rw [this]; omega), if_pos h, sub_zero]
-      · rw [if_pos (by rw [this]; omega), if_neg h, sub_self]
-    rw [Finset.sum_congr rfl h1, Finset.sum_boole]
-    have : (Finset.range (N.factorization l)).filter (fun t => t < condExp l ψ) =
-        Finset.range (condExp l ψ) := by
-      ext t; simp only [Finset.mem_filter, Finset.mem_range]; omega
-    rw [this, Finset.card_range]
+  have hc
+      : ∀ ψ : DirichletCharacter ℂ N,
+        (condExp l ψ : ℚ)
+          = ∑ t ∈ Finset.range (N.factorization l),
+              (1 - if ψ ∈ annihilator ℂ (higherUnits N l t : Set (ZMod N)ˣ) then (1 : ℚ) else 0) :=
+    by
+      intro ψ
+      have hle : condExp l ψ ≤ N.factorization l :=
+        (Nat.factorization_le_iff_dvd ψ.conductor_ne_zero (NeZero.ne N)).mpr ψ.conductor_dvd_level l
+      have h1
+          : ∀ t ∈ Finset.range (N.factorization l),
+            (1 - if ψ ∈ annihilator ℂ (higherUnits N l t : Set (ZMod N)ˣ) then (1 : ℚ) else 0)
+              = if t < condExp l ψ then 1 else 0 := by
+        intro t ht
+        have := filt_mem_ann l (Finset.mem_range.mp ht).le ψ
+        by_cases h : t < condExp l ψ
+        · rw [if_neg (by rw [this]; omega), if_pos h, sub_zero]
+        · rw [if_pos (by rw [this]; omega), if_neg h, sub_self]
+      rw [Finset.sum_congr rfl h1, Finset.sum_boole]
+      have : (Finset.range (N.factorization l)).filter (fun t => t < condExp l ψ)
+          = Finset.range (condExp l ψ) := by
+        ext t; simp only [Finset.mem_filter, Finset.mem_range]; omega
+      rw [this, Finset.card_range]
   rw [avgCondExp, finsum_eq_sum_of_fintype]
   simp only [hc]
   rw [Finset.sum_comm, Finset.sum_div]
@@ -185,14 +189,14 @@ theorem avgCondExp_annihilator (H : Subgroup (ZMod N)ˣ) :
   · congr 2
     rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
     refine Nat.card_congr ((Equiv.subtypeSubtypeEquivSubtypeInter (· ∈ X)
-      (· ∈ annihilator ℂ (higherUnits N l t : Set (ZMod N)ˣ))).trans
-        (Equiv.subtypeEquivRight fun ψ => (filt_ann_sup _ _ ψ).symm))
+        (· ∈ annihilator ℂ (higherUnits N l t : Set (ZMod N)ˣ))).trans
+      (Equiv.subtypeEquivRight fun ψ => (filt_ann_sup _ _ ψ).symm))
 
-theorem rootWeight_eq_sum (g : (ZMod N)ˣ) (hg : g ≠ 1) :
-    rootWeight l (addOrderOf ((g : ZMod N) - 1)) =
-      ∑ t ∈ Finset.range (N.factorization l),
-        Set.indicator (higherUnits N l t : Set (ZMod N)ˣ)
-          (fun _ => 1 / (Nat.card (higherUnits N l t) : ℚ)) g := by
+theorem rootWeight_eq_sum (g : (ZMod N)ˣ) (hg : g ≠ 1)
+    : rootWeight l (addOrderOf ((g : ZMod N) - 1))
+      = ∑ t ∈ Finset.range (N.factorization l),
+          Set.indicator (higherUnits N l t : Set (ZMod N)ˣ)
+            (fun _ => 1 / (Nat.card (higherUnits N l t) : ℚ)) g := by
   classical
   have hl : l.Prime := Fact.out
   have hm1 : addOrderOf ((g : ZMod N) - 1) ≠ 1 := by
@@ -207,11 +211,15 @@ theorem rootWeight_eq_sum (g : (ZMod N)ˣ) (hg : g ≠ 1) :
     have hsv : s ≤ N.factorization l := by
       rw [hs] at hmN
       exact (hl.pow_dvd_iff_le_factorization (NeZero.ne N)).mp hmN
-    have h1 : ∀ t ∈ Finset.range (N.factorization l),
-        Set.indicator (higherUnits N l t : Set (ZMod N)ˣ)
-          (fun _ => 1 / (Nat.card (higherUnits N l t) : ℚ)) g =
-        if t < N.factorization l - s + 1 then
-          (Nat.totient (l ^ t) : ℚ) / (Nat.totient (l ^ N.factorization l) : ℚ) else 0 := by
+    have h1
+        : ∀ t ∈ Finset.range (N.factorization l),
+          Set.indicator (higherUnits N l t : Set (ZMod N)ˣ)
+              (fun _ => 1 / (Nat.card (higherUnits N l t) : ℚ))
+              g
+            = if t < N.factorization l - s + 1 then
+                (Nat.totient (l ^ t) : ℚ) / (Nat.totient (l ^ N.factorization l) : ℚ)
+              else
+                0 := by
       intro t ht
       have ht' := (Finset.mem_range.mp ht).le
       have h2 := filt_mem_higher l ht' g
@@ -225,8 +233,8 @@ theorem rootWeight_eq_sum (g : (ZMod N)ˣ) (hg : g ≠ 1) :
       push_cast
       field_simp
     rw [Finset.sum_congr rfl h1, ← Finset.sum_filter]
-    have : (Finset.range (N.factorization l)).filter (fun t => t < N.factorization l - s + 1) =
-        Finset.range (N.factorization l - s + 1) := by
+    have : (Finset.range (N.factorization l)).filter (fun t => t < N.factorization l - s + 1)
+        = Finset.range (N.factorization l - s + 1) := by
       ext t; simp only [Finset.mem_filter, Finset.mem_range]; omega
     rw [this, filt_telescope l (by omega), hs, Nat.sub_sub_self hsv]
   · symm
@@ -235,26 +243,29 @@ theorem rootWeight_eq_sum (g : (ZMod N)ˣ) (hg : g ≠ 1) :
     obtain ⟨s, -, hs⟩ := (Nat.dvd_prime_pow hl).mp h2
     exact ⟨s, hs⟩
 
-
 open scoped Classical in
 open Classical in
-theorem sum_rootWeight_eq_avgCondExp (H : Subgroup (ZMod N)ˣ) :
-    ∑ g ∈ Finset.univ.filter (fun g : (ZMod N)ˣ => g ∉ H),
-        rootWeight l (addOrderOf ((g : ZMod N) - 1)) =
-      avgCondExp l (annihilator ℂ (H : Set (ZMod N)ˣ)) := by
-  rw [avgCondExp_annihilator, Finset.sum_congr rfl (fun g hg => rootWeight_eq_sum l g
-    (by rintro rfl; exact (Finset.mem_filter.mp hg).2 H.one_mem)), Finset.sum_comm]
+theorem sum_rootWeight_eq_avgCondExp (H : Subgroup (ZMod N)ˣ)
+    : ∑ g ∈ Finset.univ.filter (fun g : (ZMod N)ˣ => g ∉ H),
+          rootWeight l (addOrderOf ((g : ZMod N) - 1))
+      = avgCondExp l (annihilator ℂ (H : Set (ZMod N)ˣ)) := by
+  rw [avgCondExp_annihilator,
+    Finset.sum_congr rfl (fun g hg =>
+      rootWeight_eq_sum l g (by rintro rfl; exact (Finset.mem_filter.mp hg).2 H.one_mem)),
+    Finset.sum_comm]
   refine Finset.sum_congr rfl fun t _ => ?_
   generalize higherUnits N l t = U
   have h4 : (Nat.card U : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   simp only [Set.indicator_apply, SetLike.mem_coe]
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, Finset.filter_comm]
-  have h1 := Finset.card_filter_add_card_filter_not
-    (s := Finset.univ.filter (fun g : (ZMod N)ˣ => g ∈ U)) (fun g => g ∈ H)
+  have h1 :=
+    Finset.card_filter_add_card_filter_not (s := Finset.univ.filter (fun g : (ZMod N)ˣ => g ∈ U))
+      (fun g => g ∈ H)
   have h2 : (Finset.univ.filter (fun g : (ZMod N)ˣ => g ∈ U)).card = Nat.card U := by
     rw [← Fintype.card_subtype, Nat.card_eq_fintype_card]
-  have h3 : ((Finset.univ.filter (fun g : (ZMod N)ˣ => g ∈ U)).filter (fun g => g ∈ H)).card =
-      Nat.card ↥(U ⊓ H) := by
+  have h3
+      : ((Finset.univ.filter (fun g : (ZMod N)ˣ => g ∈ U)).filter (fun g => g ∈ H)).card
+        = Nat.card ↥(U ⊓ H) := by
     rw [Finset.filter_filter, ← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
     rfl
   rw [h2, h3] at h1

@@ -9,8 +9,19 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.ExistsSpecial
 open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
 
 set_option maxHeartbeats 400000 in
-theorem UpperTheory.mem_range_of_proper_generic_fibre_separated :
-    ∀ (R Ω : Type) [CommRing R] [IsDomain R] [Field Ω] [Algebra R Ω], Function.Injective (algebraMap R Ω) → ∀ {B Y D C : Scheme.{0}} (ι : Sp R ⟶ B) [IsOpenImmersion ι] (π : Y ⟶ B) [IsSeparated π] [IrreducibleSpace Y] (j : D ⟶ Y) [IsOpenImmersion j], Dense (Set.range j) → ∀ (q : D ⟶ Sp R), j ≫ π = q ≫ ι → ∀ (c : C ⟶ Sp Ω) [IsProper c] (v : C ⟶ D), IsPullback v c q (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) → ∀ (y : Y), π y ∈ Set.range (Spec.map (CommRingCat.ofHom (algebraMap R Ω)) ≫ ι) → y ∈ Set.range j := by
+theorem UpperTheory.mem_range_of_proper_generic_fibre_separated
+    : ∀ (R Ω : Type) [CommRing R] [IsDomain R] [Field Ω] [Algebra R Ω],
+      Function.Injective (algebraMap R Ω)
+        → ∀ {B Y D C : Scheme.{0}} (ι : Sp R ⟶ B) [IsOpenImmersion ι] (π : Y ⟶ B) [IsSeparated π]
+            [IrreducibleSpace Y] (j : D ⟶ Y) [IsOpenImmersion j],
+          Dense (Set.range j)
+            → ∀ (q : D ⟶ Sp R),
+              j ≫ π = q ≫ ι
+                → ∀ (c : C ⟶ Sp Ω) [IsProper c] (v : C ⟶ D),
+                  IsPullback v c q (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))
+                    → ∀ (y : Y),
+                      π y ∈ Set.range (Spec.map (CommRingCat.ofHom (algebraMap R Ω)) ≫ ι)
+                        → y ∈ Set.range j := by
   intro R Ω _ _ _ _ hinj B Y D C ι _ π _ _ j _ hd q hq c _ v hpb y hy
   set g := Spec.map (CommRingCat.ofHom (algebraMap R Ω)) with hg
   let U' : Y.Opens := π ⁻¹ᵁ ι.opensRange
@@ -27,8 +38,7 @@ theorem UpperTheory.mem_range_of_proper_generic_fibre_separated :
     exact z.2
   let w : (U' : Scheme) ⟶ Sp R := IsOpenImmersion.lift ι (U'.ι ≫ π) hπU
   have hw : w ≫ ι = U'.ι ≫ π := IsOpenImmersion.lift_fac _ _ _
-  have hjw : jU ≫ w = q := by
-    rw [← cancel_mono ι, Category.assoc, hw, ← Category.assoc, hjUf, hq]
+  have hjw : jU ≫ w = q := by rw [← cancel_mono ι, Category.assoc, hw, ← Category.assoc, hjUf, hq]
   haveI : IsSeparated (w ≫ ι) := by rw [hw]; infer_instance
   haveI : IsSeparated w := IsSeparated.of_comp w ι
   let m : C ⟶ pullback w g := pullback.lift (v ≫ jU) c (by rw [Category.assoc, hjw, hpb.w])
@@ -71,11 +81,12 @@ theorem UpperTheory.mem_range_of_proper_generic_fibre_separated :
   obtain ⟨d, hdξ⟩ := hξ
   have hsp : jU d ⤳ yU := by
     apply (U'.ι.isOpenEmbedding.isInducing.specializes_iff).mp
-    have e2 : U'.ι (jU d) = genericPoint Y := by
-      rw [← Scheme.Hom.comp_apply, hjUf, hdξ]
+    have e2 : U'.ι (jU d) = genericPoint Y := by rw [← Scheme.Hom.comp_apply, hjUf, hdξ]
     rw [e2]
     exact (genericPoint_spec Y).specializes (Set.mem_univ _)
-  obtain ⟨x', hx'sp, hx'fst⟩ := UpperTheory.exists_specializes_lift_generic_base_change R Ω hinj w y' (jU d) (by rw [hy'1]; exact hsp)
+  obtain ⟨x', hx'sp, hx'fst⟩ :=
+    UpperTheory.exists_specializes_lift_generic_base_change R Ω hinj w y' (jU d)
+      (by rw [hy'1]; exact hsp)
   have hx'm : x' ∈ Set.range m := hrange ⟨d, hx'fst.symm⟩
   have hy'm : y' ∈ Set.range m := hx'sp.mem_closed m.isClosedMap.isClosed_range hx'm
   obtain ⟨c0, hc0⟩ := hy'm

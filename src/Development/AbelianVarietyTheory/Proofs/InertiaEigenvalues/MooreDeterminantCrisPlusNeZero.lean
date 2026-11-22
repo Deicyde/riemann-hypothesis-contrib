@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DeRhamP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 noncomputable section
@@ -17,9 +18,12 @@ namespace GlobalTheory.PMon.MooreDeterminant
 
 variable {B Q : Type} [CommRing B] [IsDomain B] [Field Q] [Algebra Q B]
 
-theorem det_mem (S : B → Prop) (h0 : ∀ q : Q, S (algebraMap Q B q))
-    (hadd : ∀ a b, S a → S b → S (a + b)) (hmul : ∀ a b, S a → S b → S (a * b))
-    {ι : Type} [Fintype ι] [DecidableEq ι] (M : Matrix ι ι B) (hM : ∀ i j, S (M i j)) : S M.det := by
+theorem det_mem
+    (S : B → Prop) (h0 : ∀ q : Q, S (algebraMap Q B q)) (hadd : ∀ a b, S a → S b → S (a + b))
+    (hmul : ∀ a b, S a → S b → S (a * b))
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (M : Matrix ι ι B) (hM : ∀ i j, S (M i j))
+    : S M.det := by
   rw [Matrix.det_apply]
   have hz : S 0 := by simpa using h0 0
   refine Finset.sum_induction _ S hadd hz ?_
@@ -33,14 +37,19 @@ theorem det_mem (S : B → Prop) (h0 : ∀ q : Q, S (algebraMap Q B q))
 
 theorem iter_eq (φ : B →+* B) (m : ℕ) : ⇑(φ ^ m) = (⇑φ)^[m] := RingHom.coe_pow φ m
 
-theorem moore_core (φ : B →+* B) (S : B → Prop)
-    (hφ : ∀ b, S b → S (φ b)) (h0 : ∀ q : Q, S (algebraMap Q B q))
+theorem moore_core
+    (φ : B →+* B) (S : B → Prop) (hφ : ∀ b, S b → S (φ b)) (h0 : ∀ q : Q, S (algebraMap Q B q))
     (hadd : ∀ a b, S a → S b → S (a + b)) (hmul : ∀ a b, S a → S b → S (a * b))
-    (L : B) (hL : φ L = L) (h : ℕ)
-    (ratio : ∀ s, s < h → ∀ ω ω' : B, S ω → S ω' → φ^[h] ω = L ^ s * ω → φ^[h] ω' = L ^ s * ω' → ω' ≠ 0 →
-      φ ω * ω' = ω * φ ω' → ∃ c : Q, ω = c • ω') :
-    ∀ (n : ℕ) (a : Fin (n + 1) → B), n + 1 ≤ h → (∀ j, S (a j)) → (∀ j, φ^[h] (a j) = L * a j) →
-      LinearIndependent Q a → (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a j)).det ≠ 0 := by
+    (L : B) (hL : φ L = L)
+    (h : ℕ)
+    (ratio : ∀ s,
+      s < h
+        → ∀ ω ω' : B,
+          S ω → S ω' → φ^[h] ω = L ^ s * ω → φ^[h] ω' = L ^ s * ω' → ω' ≠ 0 → φ ω * ω' = ω * φ ω'
+            → ∃ c : Q, ω = c • ω')
+    : ∀ (n : ℕ) (a : Fin (n + 1) → B),
+      n + 1 ≤ h → (∀ j, S (a j)) → (∀ j, φ^[h] (a j) = L * a j) → LinearIndependent Q a
+        → (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a j)).det ≠ 0 := by
   have hSit : ∀ (i : ℕ) b, S b → S (φ^[i] b) := by
     intro i
     induction i with
@@ -56,10 +65,15 @@ theorem moore_core (φ : B →+* B) (S : B → Prop)
     intro a hk hSa hfa ha hdet
     set M : Matrix (Fin (n + 2)) (Fin (n + 2)) B := Matrix.of fun i j => φ^[i] (a j) with hMdef
 
-    have hA := ih (a ∘ Fin.castSucc) (by omega) (fun j => hSa _) (fun j => hfa _)
-      (ha.comp _ (Fin.castSucc_injective _))
+    have hA :=
+      ih (a ∘ Fin.castSucc) (by omega)
+        (fun j => hSa _)
+        (fun j => hfa _)
+        (ha.comp _ (Fin.castSucc_injective _))
     set ω : Fin (n + 2) → B := fun m => (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a (m.succAbove j))).det with hωdef
-    have hωl : ω (Fin.last _) = (Matrix.of fun i j : Fin (n + 1) => φ^[i] ((a ∘ Fin.castSucc) j)).det := by
+    have hωl
+        : ω (Fin.last _)
+          = (Matrix.of fun i j : Fin (n + 1) => φ^[i] ((a ∘ Fin.castSucc) j)).det := by
       simp [ω, Fin.succAbove_last]
     have hωl0 : ω (Fin.last _) ≠ 0 := by rw [hωl]; exact hA
     have hu : ∀ m, M.adjugate m (Fin.last _) = (-1) ^ ((n + 1 : ℕ) + (m : ℕ)) * ω m := by
@@ -87,15 +101,18 @@ theorem moore_core (φ : B →+* B) (S : B → Prop)
       have e1 := hker i 0
       have e2 := hker i (Fin.last _)
       simp only [v, mul_sub, Finset.sum_sub_distrib]
-      have : ∑ m, M i m * (M.adjugate (Fin.last _) (Fin.last _) * M.adjugate m 0) =
-          M.adjugate (Fin.last _) (Fin.last _) * ∑ m, M i m * M.adjugate m 0 := by
+      have : ∑ m, M i m * (M.adjugate (Fin.last _) (Fin.last _) * M.adjugate m 0)
+          = M.adjugate (Fin.last _) (Fin.last _) * ∑ m, M i m * M.adjugate m 0 := by
         rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring
-      have : ∑ m, M i m * (M.adjugate (Fin.last _) 0 * M.adjugate m (Fin.last _)) =
-          M.adjugate (Fin.last _) 0 * ∑ m, M i m * M.adjugate m (Fin.last _) := by
+      have : ∑ m, M i m * (M.adjugate (Fin.last _) 0 * M.adjugate m (Fin.last _))
+          = M.adjugate (Fin.last _) 0 * ∑ m, M i m * M.adjugate m (Fin.last _) := by
         rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring
       simp_all
     have hvl : v (Fin.last _) = 0 := by simp only [v]; ring
-    have hv' : Matrix.mulVec (Matrix.of fun i j : Fin (n + 1) => φ^[i] ((a ∘ Fin.castSucc) j)) (v ∘ Fin.castSucc) = 0 := by
+    have hv'
+        : Matrix.mulVec (Matrix.of fun i j : Fin (n + 1) => φ^[i] ((a ∘ Fin.castSucc) j))
+            (v ∘ Fin.castSucc)
+          = 0 := by
       funext i
       have := hv (Fin.castSucc i)
       rw [Fin.sum_univ_castSucc, hvl, mul_zero, add_zero] at this
@@ -123,11 +140,13 @@ theorem moore_core (φ : B →+* B) (S : B → Prop)
       rw [← iter_eq, hωdef]
       simp only
       rw [RingHom.map_det]
-      have : (φ ^ h).mapMatrix (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a (m.succAbove j))) =
-          L • (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a (m.succAbove j))) := by
+      have : (φ ^ h).mapMatrix (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a (m.succAbove j)))
+          = L • (Matrix.of fun i j : Fin (n + 1) => φ^[i] (a (m.succAbove j))) := by
         ext i j
-        simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul, iter_eq]
-        rw [← Function.iterate_add_apply, add_comm, Function.iterate_add_apply, hfa, ← iter_eq, map_mul, iter_eq, hLi]
+        simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Matrix.smul_apply,
+          smul_eq_mul, iter_eq]
+        rw [← Function.iterate_add_apply, add_comm, Function.iterate_add_apply, hfa, ← iter_eq,
+          map_mul, iter_eq, hLi]
       rw [this, Matrix.det_smul, Fintype.card_fin]
 
     have hrat : ∀ m, ∃ c : Q, ω m = c • ω (Fin.last _) := fun m =>
@@ -140,13 +159,14 @@ theorem moore_core (φ : B →+* B) (S : B → Prop)
       rw [← hrow, Finset.sum_mul]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [hu, hc m]
-      simp only [M, Matrix.of_apply, Fin.val_zero, Function.iterate_zero, id, hd, Algebra.smul_def, map_mul, map_pow,
-        map_neg, map_one]
+      simp only [M, Matrix.of_apply, Fin.val_zero, Function.iterate_zero, id, hd, Algebra.smul_def,
+        map_mul, map_pow, map_neg, map_one]
       ring
     have hsum0 : ∑ m, d m • a m = 0 := (mul_eq_zero.1 hsum).resolve_right hωl0
     have hdl := Fintype.linearIndependent_iff.1 ha d hsum0 (Fin.last _)
     have hcl : c (Fin.last _) = 0 := by
-      simp only [hd, mul_eq_zero, pow_eq_zero_iff', neg_eq_zero, one_ne_zero, false_and, false_or] at hdl
+      simp only [hd, mul_eq_zero, pow_eq_zero_iff', neg_eq_zero, one_ne_zero, false_and, false_or]
+        at hdl
       exact hdl
     apply hωl0
     rw [hc (Fin.last _), hcl, zero_smul]
@@ -158,15 +178,20 @@ namespace GlobalTheory.PMon
 theorem moore_statement : Moore := by
   intro l _ P AI T h k hk a hPa hfa ha
   obtain ⟨hF, hinj, -⟩ := GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T
-  obtain ⟨hpφ, -, hpR, hpQ, -⟩ := GlobalTheory.T.bcrisPlus_frobeniusStable_subring_in_filZero l P AI T
+  obtain ⟨hpφ, -, hpR, hpQ, -⟩ :=
+    GlobalTheory.T.bcrisPlus_frobeniusStable_subring_in_filZero l P AI T
   haveI : IsDomain P.R.BdR := hF.isDomain
   haveI : IsDomain P.R.B := Function.Injective.isDomain (P.ιB : P.R.B →+* P.R.BdR) hinj
   cases k with
   | zero => simp
   | succ n =>
-    exact GlobalTheory.PMon.MooreDeterminant.moore_core (Q := ℚ_[l]) (P.φB : P.R.B →+* P.R.B) (Plus T) hpφ hpQ
-      (fun a b ha hb => (hpR a b ha hb).1) (fun a b ha hb => (hpR a b ha hb).2) (l : P.R.B) (map_natCast _ l) h
-      (fun s hs ω ω' h1 h2 h3 h4 h5 h6 => GlobalTheory.T.crisPlus_frob_eigenvector_ratio_padic l P AI T h s hs ω ω' h1 h2 h3 h4 h5 h6)
+    exact GlobalTheory.PMon.MooreDeterminant.moore_core (Q := ℚ_[l]) (P.φB : P.R.B →+* P.R.B)
+      (Plus T) hpφ hpQ
+      (fun a b ha hb => (hpR a b ha hb).1)
+      (fun a b ha hb => (hpR a b ha hb).2)
+      (l : P.R.B) (map_natCast _ l) h
+      (fun s hs ω ω' h1 h2 h3 h4 h5 h6 =>
+        GlobalTheory.T.crisPlus_frob_eigenvector_ratio_padic l P AI T h s hs ω ω' h1 h2 h3 h4 h5 h6)
       n a hk hPa hfa ha
 
 end GlobalTheory.PMon

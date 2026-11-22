@@ -23,13 +23,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.BCT
 
-theorem avg_eq_of_le_rStab : ∀ (H : Type) [Group H] (u : H → ℂ) (S : Subgroup H), S ≤ rStab u → S.index ≠ 0 →
-    avg u = (S.index : ℂ)⁻¹ * ∑ᶠ q : H ⧸ S, u q.out := by
+theorem avg_eq_of_le_rStab
+    : ∀ (H : Type) [Group H] (u : H → ℂ) (S : Subgroup H),
+      S ≤ rStab u → S.index ≠ 0 → avg u = (S.index : ℂ)⁻¹ * ∑ᶠ q : H ⧸ S, u q.out := by
   intro H _ u S hS hi
   haveI : S.FiniteIndex := ⟨hi⟩
   haveI : (rStab u).FiniteIndex := Subgroup.finiteIndex_of_le hS
@@ -50,11 +52,13 @@ theorem avg_eq_of_le_rStab : ∀ (H : Type) [Group H] (u : H → ℂ) (S : Subgr
     have : Finite ((H ⧸ rStab u) × (rStab u) ⧸ S.subgroupOf (rStab u)) := Finite.of_equiv _ e
     exact Finite.prod_right (H ⧸ rStab u)
   haveI : Fintype ((rStab u) ⧸ S.subgroupOf (rStab u)) := Fintype.ofFinite _
-  have hsum : ∑ᶠ q : H ⧸ S, u q.out =
-      (S.relIndex (rStab u) : ℂ) * ∑ᶠ p : H ⧸ rStab u, u p.out := by
+  have hsum : ∑ᶠ q : H ⧸ S, u q.out = (S.relIndex (rStab u) : ℂ) * ∑ᶠ p : H ⧸ rStab u, u p.out := by
     rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype]
-    have h1 : ∀ q : H ⧸ S, u q.out = (fun p : (H ⧸ rStab u) × ((rStab u) ⧸ S.subgroupOf (rStab u)) =>
-        u p.1.out) (e q) := by
+    have h1
+        : ∀ q : H ⧸ S,
+          u q.out
+            = (fun p : (H ⧸ rStab u) × ((rStab u) ⧸ S.subgroupOf (rStab u)) => u p.1.out) (e
+              q) := by
       intro q
       simp only
       rw [he q, hu]

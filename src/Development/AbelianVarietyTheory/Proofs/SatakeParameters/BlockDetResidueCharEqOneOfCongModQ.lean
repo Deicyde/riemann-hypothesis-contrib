@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TwistedK1
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col
 
 noncomputable section
 
@@ -18,16 +19,20 @@ open GlobalTheory.TopStep
 
 variable {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K]
 
-theorem entry_cong (P : HeightOneSpectrum (𝓞 E)) {N : ℕ} (g : HomE E N N)
-    (hg : ∀ x ∈ stdAt E N P, (qOf P : E)⁻¹ • (g x - x) ∈ stdAt E N P) (s t : Fin N) :
-    IntAt P (g (Pi.single t 1) s) ∧ redP P (g (Pi.single t 1) s) = if s = t then 1 else 0 := by
+theorem entry_cong
+    (P : HeightOneSpectrum (𝓞 E))
+    {N : ℕ}
+    (g : HomE E N N) (hg : ∀ x ∈ stdAt E N P, (qOf P : E)⁻¹ • (g x - x) ∈ stdAt E N P) (s t : Fin N)
+    : IntAt P (g (Pi.single t 1) s) ∧ redP P (g (Pi.single t 1) s) = if s = t then 1 else 0 := by
   classical
   have hq0 : ((qOf P : ℕ) : E) ≠ 0 := qOf_ne_zero
   have hx := mem_stdAt.1 (hg _ (single_mem_stdAt (P := P) t)) s
   set δ : E := (Pi.single t (1 : E) : Sp E N) s with hδ
   have hδI : IntAt P δ := mem_stdAt.1 (single_mem_stdAt (P := P) t) s
   have hdiv : IntAt P ((g (Pi.single t 1) s - δ) / (qOf P : E)) := by
-    have e : (((qOf P : E)⁻¹ • (g (Pi.single t 1) - Pi.single t 1) : Sp E N)) s = (g (Pi.single t 1) s - δ) / (qOf P : E) := by
+    have e
+        : (((qOf P : E)⁻¹ • (g (Pi.single t 1) - Pi.single t 1) : Sp E N)) s
+          = (g (Pi.single t 1) s - δ) / (qOf P : E) := by
       rw [Pi.smul_apply, Pi.sub_apply, smul_eq_mul, div_eq_mul_inv, mul_comm]
     rw [← e]
     exact hx
@@ -47,15 +52,19 @@ theorem entry_cong (P : HeightOneSpectrum (𝓞 E)) {N : ℕ} (g : HomE E N N)
   · exact reduction_one₂
   · exact reduction_zero
 
-theorem lamQB_eq_one_of_cong : ∀ {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K] (P : HeightOneSpectrum (𝓞 E))
-    (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (kj n N : ℕ) (g : HomE E N N), n ≤ N →
-    (∀ x ∈ stdAt E N P, (qOf P : E)⁻¹ • (g x - x) ∈ stdAt E N P) → LocE.lamQB ξ kj n g = 1 := by
+theorem lamQB_eq_one_of_cong
+    : ∀ {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K] (P : HeightOneSpectrum (𝓞 E))
+        (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (kj n N : ℕ) (g : HomE E N N),
+      n ≤ N → (∀ x ∈ stdAt E N P, (qOf P : E)⁻¹ • (g x - x) ∈ stdAt E N P)
+        → LocE.lamQB ξ kj n g = 1 := by
   intro E K _ _ _ _ P ξ kj n N g hn hg
   classical
   unfold LocE.lamQB
   set D : Matrix (Fin (n - kj)) (Fin (n - kj)) E := Matrix.of fun s t : Fin (n - kj) =>
     Loc.atN (g (Loc.eN E N (kj + t.1))) (kj + s.1) with hD
-  have hent : ∀ s t : Fin (n - kj), IntAt P (D s t) ∧ redP P (D s t) = (1 : Matrix _ _ (𝓞 E ⧸ P.asIdeal)) s t := by
+  have hent
+      : ∀ s t : Fin (n - kj),
+        IntAt P (D s t) ∧ redP P (D s t) = (1 : Matrix _ _ (𝓞 E ⧸ P.asIdeal)) s t := by
     intro s t
     have hs : kj + s.1 < N := by have := s.2; omega
     have ht : kj + t.1 < N := by have := t.2; omega
@@ -78,7 +87,8 @@ theorem lamQB_eq_one_of_cong : ∀ {E K : Type} [Field E] [NumberField E] [StarR
     rw [h2, Matrix.one_apply]
     by_cases hst : s = t
     · rw [if_pos (Fin.ext (by simp [hst])), if_pos hst]
-    · rw [if_neg (fun h => hst (Fin.ext (by have := congrArg Fin.val h; simp at this; omega))), if_neg hst]
+    · rw [if_neg (fun h => hst (Fin.ext (by have := congrArg Fin.val h; simp at this; omega))),
+        if_neg hst]
   have hdet : redP P D.det = 1 := by
     rw [(det_int fun s t => (hent s t).1).2]
     have : D.map (redP P) = 1 := Matrix.ext fun s t => (hent s t).2

@@ -15,11 +15,13 @@ open IsLocalRing GlobalTheory.Henselisation Polynomial
 
 namespace GlobalTheory.Henselisation
 
-theorem eval_derivative_scaleRoots_mul {S : Type*} [CommRing S] (p : S[X]) (s x : S) :
-    (derivative (p.scaleRoots s)).eval (s * x) = s ^ (p.natDegree - 1) * (derivative p).eval x := by
+theorem eval_derivative_scaleRoots_mul {S : Type*} [CommRing S] (p : S[X]) (s x : S)
+    : (derivative (p.scaleRoots s)).eval (s * x)
+      = s ^ (p.natDegree - 1) * (derivative p).eval x := by
   have h1 : (derivative (p.scaleRoots s)).natDegree < p.natDegree + 1 := by
     have := natDegree_derivative_le (p.scaleRoots s)
-    rw [natDegree_scaleRoots] at this; omega
+    rw [natDegree_scaleRoots] at this
+    omega
   have h2 : (derivative p).natDegree < p.natDegree + 1 := by
     have := natDegree_derivative_le p; omega
   rw [eval_eq_sum_range' h1, eval_eq_sum_range' h2, Finset.mul_sum]
@@ -28,20 +30,21 @@ theorem eval_derivative_scaleRoots_mul {S : Type*} [CommRing S] (p : S[X]) (s x 
   by_cases hkd : k + 1 ≤ p.natDegree
   · have e : s ^ (p.natDegree - (k + 1)) * (s * x) ^ k = s ^ (p.natDegree - 1) * x ^ k := by
       rw [mul_pow, ← mul_assoc, ← pow_add]; congr 2; omega
-    calc _ = p.coeff (k + 1) * (↑k + 1) * (s ^ (p.natDegree - (k + 1)) * (s * x) ^ k) := by ring
+    calc
+      _ = p.coeff (k + 1) * (↑k + 1) * (s ^ (p.natDegree - (k + 1)) * (s * x) ^ k) := by ring
       _ = _ := by rw [e]; ring
   · rw [coeff_eq_zero_of_natDegree_lt (by omega)]; ring
 
-theorem isUnit_of_sub_mem_maximalIdeal {S : Type*} [CommRing S] [IsLocalRing S] {x u : S}
-    (hu : IsUnit u) (h : x - u ∈ maximalIdeal S) : IsUnit x := by
+theorem isUnit_of_sub_mem_maximalIdeal
+    {S : Type*} [CommRing S] [IsLocalRing S] {x u : S} (hu : IsUnit u) (h : x - u ∈ maximalIdeal S)
+    : IsUnit x := by
   by_contra hx
   have hx' : x ∈ maximalIdeal S := (mem_maximalIdeal x).2 hx
-  have : u ∈ maximalIdeal S := by
-    have := Ideal.sub_mem _ hx' h; simpa using this
+  have : u ∈ maximalIdeal S := by have := Ideal.sub_mem _ hx' h; simpa using this
   exact (mem_maximalIdeal u).1 this hu
 
-theorem henselianLocalRing_hens : ∀ (R : Type) [CommRing R] [IsLocalRing R],
-    HenselianLocalRing (Hens R) := by
+theorem henselianLocalRing_hens
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R], HenselianLocalRing (Hens R) := by
   intro R _ _
   haveI : IsDirected (EtNbhd R) (· ≤ ·) := GlobalTheory.T.pointedEtaleNeighbourhoodLocalRing_isDirected R
   obtain ⟨hloc, hofloc⟩ := GlobalTheory.T.isLocalRing_hens_and_isLocalHom_of R
@@ -55,31 +58,39 @@ theorem henselianLocalRing_hens : ∀ (R : Type) [CommRing R] [IsLocalRing R],
   set ρ := algebraMap R (Hens R) r with hρdef
   have hρ : a₀ - ρ ∈ maximalIdeal (Hens R) := by
     haveI := hofloc i'
-    rw [← hb₀, hρdef, ← GlobalTheory.T.etaleNbhdLocalRingToHenselisation_algebraMap R i' r, ← (Hens.of i').map_sub b₀ ((algebraMap R i'.B) r)]; exact map_nonunit _ _ hr
+    rw [← hb₀, hρdef, ← GlobalTheory.T.etaleNbhdLocalRingToHenselisation_algebraMap R i' r,
+      ← (Hens.of i').map_sub b₀ ((algebraMap R i'.B) r)]
+    exact map_nonunit _ _ hr
   have hfρ : f.eval ρ ∈ maximalIdeal (Hens R) := by
     have hd := sub_dvd_eval_sub ρ a₀ f
     have : f.eval ρ - f.eval a₀ ∈ maximalIdeal (Hens R) := by
       obtain ⟨c, hc⟩ := hd
-      rw [hc]; apply Ideal.mul_mem_right
-      have := (Ideal.neg_mem_iff _).2 hρ; simpa using this
+      rw [hc]
+      apply Ideal.mul_mem_right
+      have := (Ideal.neg_mem_iff _).2 hρ
+      simpa using this
     simpa using Ideal.add_mem _ this hfa₀
   have hf'ρ : IsUnit (f.derivative.eval ρ) := by
     refine isUnit_of_sub_mem_maximalIdeal hf'a₀ ?_
     obtain ⟨c, hc⟩ := sub_dvd_eval_sub ρ a₀ (derivative f)
-    rw [hc]; apply Ideal.mul_mem_right
-    have := (Ideal.neg_mem_iff _).2 hρ; simpa using this
+    rw [hc]
+    apply Ideal.mul_mem_right
+    have := (Ideal.neg_mem_iff _).2 hρ
+    simpa using this
 
   obtain ⟨i, g, hg⟩ : ∃ (i : EtNbhd R) (g : Polynomial i.B), g.map (Hens.of i) = f :=
     Ring.DirectLimit.Polynomial.exists_of (f' := fun _ _ h => EtNbhd.trans h) f
   haveI := hofloc i
-  have hgm : g.Monic := monic_of_injective (GlobalTheory.T.etaleNbhdLocalRingToHenselisation_injective_of_nbhd R i) (hg ▸ hf)
+  have hgm : g.Monic :=
+    monic_of_injective (GlobalTheory.T.etaleNbhdLocalRingToHenselisation_injective_of_nbhd R i)
+      (hg ▸ hf)
   let M := i.q.primeCompl
   let ψ : i.A →+* i.B := algebraMap i.A i.B
   let s : M := IsLocalization.commonDenom M g.support g.coeff
-  have hl := IsLocalization.scaleRoots_commonDenom_mem_lifts M g
-    (by rw [hgm.leadingCoeff]; exact ⟨1, map_one _⟩)
-  obtain ⟨h, hhmap, -, hhm⟩ := lifts_and_natDegree_eq_and_monic hl
-    ((monic_scaleRoots_iff _).2 hgm)
+  have hl :=
+    IsLocalization.scaleRoots_commonDenom_mem_lifts M g
+      (by rw [hgm.leadingCoeff]; exact ⟨1, map_one _⟩)
+  obtain ⟨h, hhmap, -, hhm⟩ := lifts_and_natDegree_eq_and_monic hl ((monic_scaleRoots_iff _).2 hgm)
   let Φ : i.A →+* Hens R := (Hens.of i).comp ψ
   let u : Hens R := Φ s
   have hu : IsUnit u := (IsLocalization.map_units i.B s).map (Hens.of i)
@@ -89,8 +100,8 @@ theorem henselianLocalRing_hens : ∀ (R : Type) [CommRing R] [IsLocalRing R],
   let a₀' : i.A := (s : i.A) * algebraMap R i.A r
   have hΦa₀' : Φ a₀' = u * ρ := by simp only [a₀', map_mul, hΦr]; rfl
   have hhΦ : h.map Φ = f.scaleRoots u := by
-    rw [show Φ = (Hens.of i).comp ψ from rfl, ← Polynomial.map_map, hhmap, map_scaleRoots _ _ _
-      (by rw [hgm.leadingCoeff, map_one]; exact one_ne_zero), hg]
+    rw [show Φ = (Hens.of i).comp ψ from rfl, ← Polynomial.map_map, hhmap,
+      map_scaleRoots _ _ _ (by rw [hgm.leadingCoeff, map_one]; exact one_ne_zero), hg]
     rfl
   have key1 : Φ (h.eval a₀') = u ^ f.natDegree * f.eval ρ := by
     rw [← eval₂_at_apply, ← eval_map, hhΦ, hΦa₀']
@@ -113,23 +124,24 @@ theorem henselianLocalRing_hens : ∀ (R : Type) [CommRing R] [IsLocalRing R],
     have hΦm : Φ (h.derivative.eval a₀') ∈ maximalIdeal (Hens R) := map_nonunit (Hens.of i) _ hm
     rw [key2] at hΦm
     exact (mem_maximalIdeal _).1 hΦm ((hu.pow _).mul hf'ρ)
-  obtain ⟨j, hij, c, hc, hcm⟩ := GlobalTheory.T.exists_le_isRoot_of_simpleRoot_pointedEtaleNbhd R i h a₀' hhm hpt1 hpt2
+  obtain ⟨j, hij, c, hc, hcm⟩ :=
+    GlobalTheory.T.exists_le_isRoot_of_simpleRoot_pointedEtaleNbhd R i h a₀' hhm hpt1 hpt2
   haveI := hofloc j
   have hofj : (Hens.of j).comp (EtNbhd.trans hij) = Hens.of i :=
     RingHom.ext fun x => Ring.DirectLimit.of_f hij x
-  have hΦj : (Hens.of j).comp ((EtNbhd.trans hij).comp ψ) = Φ := by
-    rw [← RingHom.comp_assoc, hofj]
+  have hΦj : (Hens.of j).comp ((EtNbhd.trans hij).comp ψ) = Φ := by rw [← RingHom.comp_assoc, hofj]
   set c' := Hens.of j c
   have hroot : (f.scaleRoots u).eval c' = 0 := by
     rw [← hhΦ, ← hΦj, ← Polynomial.map_map, eval_map, eval₂_at_apply, hc.eq_zero, map_zero]
   have hcm' : c' - u * ρ ∈ maximalIdeal (Hens R) := by
     have := map_nonunit (Hens.of j) _ hcm
-    rwa [(Hens.of j).map_sub c ((EtNbhd.trans hij) (ψ a₀')), ← RingHom.comp_apply (Hens.of j) (EtNbhd.trans hij),
-      ← RingHom.comp_apply ((Hens.of j).comp (EtNbhd.trans hij)) ψ, hofj,
-      show (Hens.of i).comp ψ = Φ from rfl, hΦa₀'] at this
+    rwa [(Hens.of j).map_sub c ((EtNbhd.trans hij) (ψ a₀')),
+        ← RingHom.comp_apply (Hens.of j) (EtNbhd.trans hij),
+        ← RingHom.comp_apply ((Hens.of j).comp (EtNbhd.trans hij)) ψ, hofj,
+        show (Hens.of i).comp ψ = Φ from rfl, hΦa₀']
+      at this
   refine ⟨↑hu.unit⁻¹ * c', ?_, ?_⟩
-  · have hc' : c' = u * (↑hu.unit⁻¹ * c') := by
-      rw [← mul_assoc, hu.mul_val_inv, one_mul]
+  · have hc' : c' = u * (↑hu.unit⁻¹ * c') := by rw [← mul_assoc, hu.mul_val_inv, one_mul]
     have e := scaleRoots_eval₂_mul (p := f) (RingHom.id _) (↑hu.unit⁻¹ * c') u
     simp only [RingHom.id_apply] at e
     change eval (u * _) _ = u ^ _ * eval _ f at e

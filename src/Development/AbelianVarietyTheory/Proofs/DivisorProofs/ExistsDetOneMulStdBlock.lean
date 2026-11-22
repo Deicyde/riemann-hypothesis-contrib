@@ -8,10 +8,13 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem exists_det_one_mul_stdBlock {K : Type} [Field K] {n r : ℕ} (hrn : r < n)
-    (y : Matrix (Fin n) (Fin r) K) (hy : y.rank = r) :
-    ∃ g : GL (Fin n) K, Matrix.GeneralLinearGroup.det g = 1 ∧
-      g.val * (Matrix.of fun (a : Fin n) (b : Fin r) => if (a : ℕ) = (b : ℕ) then (1 : K) else 0) = y := by
+theorem exists_det_one_mul_stdBlock
+    {K : Type} [Field K] {n r : ℕ} (hrn : r < n) (y : Matrix (Fin n) (Fin r) K) (hy : y.rank = r)
+    : ∃ g : GL (Fin n) K,
+      Matrix.GeneralLinearGroup.det g = 1
+        ∧ g.val
+            * (Matrix.of fun (a : Fin n) (b : Fin r) => if (a : ℕ) = (b : ℕ) then (1 : K) else 0)
+          = y := by
   classical
   have hli : LinearIndependent K y.col := by
     rw [linearIndependent_iff_card_eq_finrank_span, Fintype.card_fin]
@@ -19,7 +22,8 @@ theorem exists_det_one_mul_stdBlock {K : Type} [Field K] {n r : ℕ} (hrn : r < 
     exact hy.symm
   let b := Module.Basis.sumExtend hli
   have hfin : Finite (Fin r ⊕ Module.Basis.sumExtendIndex hli) := Module.Finite.finite_basis b
-  have : Finite (Module.Basis.sumExtendIndex hli) := Finite.of_injective (Sum.inr : _ → Fin r ⊕ _) Sum.inr_injective
+  have : Finite (Module.Basis.sumExtendIndex hli) :=
+    Finite.of_injective (Sum.inr : _ → Fin r ⊕ _) Sum.inr_injective
   have : Fintype (Module.Basis.sumExtendIndex hli) := Fintype.ofFinite _
   have hcard : Fintype.card (Fin r ⊕ Module.Basis.sumExtendIndex hli) = n := by
     rw [← Module.finrank_eq_card_basis b, Module.finrank_fin_fun]
@@ -37,7 +41,8 @@ theorem exists_det_one_mul_stdBlock {K : Type} [Field K] {n r : ℕ} (hrn : r < 
     intro c c' h
     simp only [τ] at h
     split_ifs at h
-    all_goals first
+    all_goals
+      first
       | (simp only [Sum.inl.injEq, Fin.mk.injEq] at h; ext; omega)
       | (simp only [Sum.inr.injEq, EmbeddingLike.apply_eq_iff_eq, Fin.mk.injEq] at h; ext; omega)
       | exact absurd h Sum.inl_ne_inr
@@ -52,7 +57,8 @@ theorem exists_det_one_mul_stdBlock {K : Type} [Field K] {n r : ℕ} (hrn : r < 
   let D : Matrix (Fin n) (Fin n) K := Matrix.diagonal fun a => if a = last then g₀.det⁻¹ else 1
   let g := g₀ * D
   have hgdet : g.det = 1 := by
-    simp only [g, D, Matrix.det_mul, Matrix.det_diagonal, Finset.prod_ite_eq', Finset.mem_univ, if_true]
+    simp only [g, D, Matrix.det_mul, Matrix.det_diagonal, Finset.prod_ite_eq', Finset.mem_univ,
+      if_true]
     exact mul_inv_cancel₀ hdet
   have hU : IsUnit g := (Matrix.isUnit_iff_isUnit_det g).mpr (by rw [hgdet]; exact isUnit_one)
   refine ⟨hU.unit, ?_, ?_⟩
@@ -66,7 +72,8 @@ theorem exists_det_one_mul_stdBlock {K : Type} [Field K] {n r : ℕ} (hrn : r < 
     rw [IsUnit.unit_spec]
     ext i c
     simp only [g, D, Matrix.mul_assoc, Matrix.mul_apply, Matrix.diagonal_apply, Matrix.of_apply, hE]
-    simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ,
+      if_true]
     have hne : Fin.castLE hrn.le c ≠ last := by
       intro h
       have h2 := congrArg Fin.val h

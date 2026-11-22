@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsSigmaLi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory GlobalTheory.AutFinLit GlobalTheory.Published.AutFin
-open GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies (LieAt LieInf atPlace IsExpFam IsSmoothInf wordDer)
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta MeasureTheory GlobalTheory.AutFinLit GlobalTheory.Published.AutFin
+open GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies
+  (LieAt LieInf atPlace IsExpFam IsSmoothInf wordDer)
 open scoped TensorProduct DirectSum Classical
 
 namespace GlobalTheory
 
-theorem exists_finset_eval_injective {Z : Type} (T : Submodule ℂ (Z → ℂ))
-    [FiniteDimensional ℂ T] :
-    ∃ Y : Finset Z, ∀ g ∈ T, (∀ y ∈ Y, g y = 0) → g = 0 := by
+theorem exists_finset_eval_injective {Z : Type} (T : Submodule ℂ (Z → ℂ)) [FiniteDimensional ℂ T]
+    : ∃ Y : Finset Z, ∀ g ∈ T, (∀ y ∈ Y, g y = 0) → g = 0 := by
   classical
   let φ : Z → Module.Dual ℂ T := fun z => (LinearMap.proj z).comp T.subtype
   have hfg : (Submodule.span ℂ (Set.range φ)).FG := IsNoetherian.noetherian _
@@ -33,30 +35,35 @@ theorem exists_finset_eval_injective {Z : Type} (T : Submodule ℂ (Z → ℂ))
   have hz := hle (Submodule.subset_span ⟨z, rfl⟩)
   simpa [φ] using hz
 
-theorem finiteDimensional_span_separately (ι : Type) [Fintype ι] [DecidableEq ι] (X : ι → Type)
-    (S : ∀ i, Submodule ℂ (X i → ℂ)) (hS : ∀ i, FiniteDimensional ℂ (S i)) :
-    FiniteDimensional ℂ (Submodule.span ℂ
-      {f : (∀ i, X i) → ℂ | ∀ i x, (fun y => f (Function.update x i y)) ∈ S i}) := by
+theorem finiteDimensional_span_separately
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (X : ι → Type) (S : ∀ i, Submodule ℂ (X i → ℂ)) (hS : ∀ i, FiniteDimensional ℂ (S i))
+    : FiniteDimensional ℂ
+      (Submodule.span ℂ
+        {f : (∀ i, X i) → ℂ | ∀ i x, (fun y => f (Function.update x i y)) ∈ S i}) := by
   classical
   choose Y hY using fun i => @exists_finset_eval_injective (X i) (S i) (hS i)
-  let P : Submodule ℂ ((∀ i, X i) → ℂ) :=
-    { carrier := {f | ∀ i x, (fun y => f (Function.update x i y)) ∈ S i}
-      add_mem' := fun {f g} hf hg i x => (S i).add_mem (hf i x) (hg i x)
-      zero_mem' := fun i x => (S i).zero_mem
-      smul_mem' := fun c f hf i x => (S i).smul_mem c (hf i x) }
-  have hle : Submodule.span ℂ
-      {f : (∀ i, X i) → ℂ | ∀ i x, (fun y => f (Function.update x i y)) ∈ S i} ≤ P :=
+  let P : Submodule ℂ ((∀ i, X i) → ℂ) := {
+    carrier := {f | ∀ i x, (fun y => f (Function.update x i y)) ∈ S i}
+    add_mem' := fun {f g} hf hg i x => (S i).add_mem (hf i x) (hg i x)
+    zero_mem' := fun i x => (S i).zero_mem
+    smul_mem' := fun c f hf i x => (S i).smul_mem c (hf i x)
+  }
+  have hle
+      : Submodule.span ℂ {f : (∀ i, X i) → ℂ | ∀ i x, (fun y => f (Function.update x i y)) ∈ S i}
+        ≤ P :=
     Submodule.span_le.2 fun f hf => hf
-  let L : P →ₗ[ℂ] ((∀ i, Y i) → ℂ) :=
-    { toFun := fun f y => (f : (∀ i, X i) → ℂ) (fun i => (y i : X i))
-      map_add' := fun f g => rfl
-      map_smul' := fun c f => rfl }
+  let L : P →ₗ[ℂ] ((∀ i, Y i) → ℂ) := {
+    toFun := fun f y => (f : (∀ i, X i) → ℂ) (fun i => (y i : X i))
+    map_add' := fun f g => rfl
+    map_smul' := fun c f => rfl
+  }
   have hL : Function.Injective L := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro f hf
     have hfP : ∀ i x, (fun y => (f : (∀ i, X i) → ℂ) (Function.update x i y)) ∈ S i := f.2
-    have key : ∀ A : Finset ι, ∀ x : ∀ i, X i, (∀ j ∉ A, x j ∈ Y j) →
-        (f : (∀ i, X i) → ℂ) x = 0 := by
+    have key
+        : ∀ A : Finset ι, ∀ x : ∀ i, X i, (∀ j ∉ A, x j ∈ Y j) → (f : (∀ i, X i) → ℂ) x = 0 := by
       intro A
       induction A using Finset.induction_on with
       | empty =>

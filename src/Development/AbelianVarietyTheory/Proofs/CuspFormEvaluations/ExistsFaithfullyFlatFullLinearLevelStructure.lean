@@ -15,8 +15,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
@@ -25,9 +28,9 @@ namespace LevelFlat
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem exists_finite_quotient (Dw : Datum H) (k : ℕ) (hk : 0 < k) :
-    ∃ (J : Type) (_ : Fintype J) (π : Dw.La → J) (r : J → Dw.La), (∀ j, π (r j) = j) ∧
-      ∀ a b, π a = π b ↔ Dw.ModN k (a - b) := by
+theorem exists_finite_quotient (Dw : Datum H) (k : ℕ) (hk : 0 < k)
+    : ∃ (J : Type) (_ : Fintype J) (π : Dw.La → J) (r : J → Dw.La),
+      (∀ j, π (r j) = j) ∧ ∀ a b, π a = π b ↔ Dw.ModN k (a - b) := by
   have : Module.Finite (𝓞 E) Dw.La := Dw.fin
   have : Module.Finite ℤ Dw.La := Module.Finite.trans (𝓞 E) Dw.La
   set N : Submodule ℤ Dw.La := LinearMap.range ((k : ℤ) • LinearMap.id : Dw.La →ₗ[ℤ] Dw.La) with hN
@@ -48,8 +51,14 @@ theorem exists_finite_quotient (Dw : Datum H) (k : ℕ) (hk : 0 < k) :
       rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero, hmem]
       exact ⟨a, by simp⟩
   have : Finite (Dw.La ⧸ N) := Module.finite_of_fg_torsion _ htor
-  refine ⟨Dw.La ⧸ N, Fintype.ofFinite _, N.mkQ, Function.surjInv N.mkQ_surjective,
-    fun j => Function.surjInv_eq N.mkQ_surjective j, ?_⟩
+  refine ⟨
+    Dw.La ⧸ N,
+    Fintype.ofFinite _,
+    N.mkQ,
+    Function.surjInv N.mkQ_surjective,
+    fun j => Function.surjInv_eq N.mkQ_surjective j,
+    ?_
+  ⟩
   intro a b
   rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq, hmem]
 
@@ -57,20 +66,35 @@ private lemma eq_one_of_isIdempotentElem_of_isUnit {T : Type} [CommRing T] {x : 
     x = 1 :=
   hu.mul_left_cancel (by rw [_root_.mul_one]; exact h)
 
-theorem exists_element (hL : Laws) {Dw : Datum H} {l : Level H} (Xo : Moduli Dw l) (B : Type) [CommRing B]
-    (x0 : Sp B ⟶ Xo.X) (k : ℕ) (hk : 0 < k) (I I' : Type) [Fintype I] [Fintype I']
+theorem exists_element
+    (hL : Laws)
+    {Dw : Datum H} {l : Level H} (Xo : Moduli Dw l)
+    (B : Type) [CommRing B]
+    (x0 : Sp B ⟶ Xo.X)
+    (k : ℕ) (hk : 0 < k)
+    (I I' : Type) [Fintype I] [Fintype I']
     (a b : I → (ptO Xo x0 ⟶ Xo.univ.t.G)) (c d : I' → (ptO Xo x0 ⟶ Xo.univ.t.G))
-    (ha : ∀ i, a i ^ k = 1) (hb : ∀ i, b i ^ k = 1) (hc : ∀ i, c i ^ k = 1) (hd : ∀ i, d i ^ k = 1) :
-    ∃ e : B, (∀ (T : Type) [CommRing T] (χ : B →+* T), IsUnit (χ e) →
-        (∀ i, spMap χ ≫ (a i).left = spMap χ ≫ (b i).left) ∧
-          (Nontrivial T → ∀ j, spMap χ ≫ (c j).left ≠ spMap χ ≫ (d j).left)) ∧
-      ∀ (K : Type) [Field K] (χ : B →+* K), (∀ i, spMap χ ≫ (a i).left = spMap χ ≫ (b i).left) →
-        (∀ j, spMap χ ≫ (c j).left ≠ spMap χ ≫ (d j).left) → IsUnit (χ e) := by
-  have hA : ∀ i, ∃ e : B, IsIdempotentElem e ∧ ∀ (T : Type) [CommRing T] (χ : B →+* T),
-      χ e = 1 ↔ spMap χ ≫ (a i).left = spMap χ ≫ (b i).left := fun i =>
+    (ha : ∀ i, a i ^ k = 1) (hb : ∀ i, b i ^ k = 1) (hc : ∀ i, c i ^ k = 1) (hd : ∀ i, d i ^ k = 1)
+    : ∃ e : B,
+      (∀ (T : Type) [CommRing T] (χ : B →+* T),
+          IsUnit (χ e)
+            → (∀ i, spMap χ ≫ (a i).left = spMap χ ≫ (b i).left)
+              ∧ (Nontrivial T → ∀ j, spMap χ ≫ (c j).left ≠ spMap χ ≫ (d j).left))
+        ∧ ∀ (K : Type) [Field K] (χ : B →+* K),
+          (∀ i, spMap χ ≫ (a i).left = spMap χ ≫ (b i).left)
+            → (∀ j, spMap χ ≫ (c j).left ≠ spMap χ ≫ (d j).left)
+            → IsUnit (χ e) := by
+  have hA
+      : ∀ i, ∃ e : B,
+        IsIdempotentElem e
+          ∧ ∀ (T : Type) [CommRing T] (χ : B →+* T),
+            χ e = 1 ↔ spMap χ ≫ (a i).left = spMap χ ≫ (b i).left := fun i =>
     exists_isIdempotentElem_torsion_eq hL E H Dw l Xo B x0 k hk (a i) (b i) (ha i) (hb i)
-  have hC : ∀ j, ∃ e : B, IsIdempotentElem e ∧ ∀ (T : Type) [CommRing T] (χ : B →+* T),
-      χ e = 1 ↔ spMap χ ≫ (c j).left = spMap χ ≫ (d j).left := fun j =>
+  have hC
+      : ∀ j, ∃ e : B,
+        IsIdempotentElem e
+          ∧ ∀ (T : Type) [CommRing T] (χ : B →+* T),
+            χ e = 1 ↔ spMap χ ≫ (c j).left = spMap χ ≫ (d j).left := fun j =>
     exists_isIdempotentElem_torsion_eq hL E H Dw l Xo B x0 k hk (c j) (d j) (hc j) (hd j)
   choose ea hea hea' using hA
   choose ec hec hec' using hC
@@ -82,8 +106,10 @@ theorem exists_element (hL : Laws) {Dw : Datum H} {l : Level H} (Xo : Moduli Dw 
         isUnit_of_dvd_unit (dvd_mul_of_dvd_left (Finset.dvd_prod_of_mem _ (Finset.mem_univ i)) _) hu
       exact (hea' i T χ).mp (eq_one_of_isIdempotentElem_of_isUnit ((hea i).map χ) hui)
     · have huj : IsUnit (χ (1 - ec j)) :=
-        isUnit_of_dvd_unit (dvd_mul_of_dvd_right (Finset.dvd_prod_of_mem _ (Finset.mem_univ j)) _) hu
-      have h1 : χ (1 - ec j) = 1 := eq_one_of_isIdempotentElem_of_isUnit (((hec j).one_sub).map χ) huj
+        isUnit_of_dvd_unit (dvd_mul_of_dvd_right (Finset.dvd_prod_of_mem _ (Finset.mem_univ j)) _)
+          hu
+      have h1 : χ (1 - ec j) = 1 :=
+        eq_one_of_isIdempotentElem_of_isUnit (((hec j).one_sub).map χ) huj
       have h2 : χ (ec j) = 1 := (hec' j T χ).mpr hj
       rw [map_sub, map_one, h2, sub_self] at h1
       exact zero_ne_one h1
@@ -97,10 +123,14 @@ theorem exists_element (hL : Laws) {Dw : Datum H} {l : Level H} (Xo : Moduli Dw 
     rw [map_mul, map_prod, map_prod]
     simp [h1, h0]
 
-theorem lin_of_generators {X : Scheme.{0}} {O M : Type} [CommRing O] [AddCommGroup M] [Module O M] {G T : Over X}
-    [GrpObj G] (A : Geo.Tor.OAct O G) (ev : M → (T ⟶ G)) (hadd : ∀ a b, ev (a + b) = ev a * ev b) {s : Set O}
-    (hs : AddSubgroup.closure s = ⊤) (h : ∀ o ∈ s, ∀ a, ev (o • a) = ev a ≫ A.act o) (o : O) (a : M) :
-    ev (o • a) = ev a ≫ A.act o := by
+theorem lin_of_generators
+    {X : Scheme.{0}} {O M : Type} [CommRing O] [AddCommGroup M] [Module O M]
+    {G T : Over X} [GrpObj G]
+    (A : Geo.Tor.OAct O G)
+    (ev : M → (T ⟶ G)) (hadd : ∀ a b, ev (a + b) = ev a * ev b)
+    {s : Set O} (hs : AddSubgroup.closure s = ⊤) (h : ∀ o ∈ s, ∀ a, ev (o • a) = ev a ≫ A.act o)
+    (o : O) (a : M)
+    : ev (o • a) = ev a ≫ A.act o := by
   have hev0 : ev 0 = 1 := by
     have h0 := hadd 0 0
     rw [add_zero] at h0
@@ -151,10 +181,18 @@ private lemma modN_smul' {E : Type} [Field E] [NumberField E] [IsCMField E] {H :
 
 end LevelFlat
 
-
 open LevelFlat in
-theorem exists_faithfullyFlat_linear_level :
-    Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (S : Type) [CommRing S] (x0 : Sp S ⟶ Xo.X) (k : ℕ), 0 < k → ∃ (B : Type) (_ : CommRing B) (φ : S →+* B) (ev : Dw.La → (ptO Xo (spMap φ ≫ x0) ⟶ Xo.univ.t.G)), φ.FaithfullyFlat ∧ (∀ a b, ev (a + b) = ev a * ev b) ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o) ∧ (∀ a, ev (k • a) = 1) ∧ ∀ (K : Type) [Field K] (χ : B →+* K) (a b : Dw.La), spMap χ ≫ (ev a).left = spMap χ ≫ (ev b).left → Dw.ModN k (a - b) := by
+theorem exists_faithfullyFlat_linear_level
+    : Laws
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+          (l : Level H) (Xo : Moduli Dw l) (S : Type) [CommRing S] (x0 : Sp S ⟶ Xo.X) (k : ℕ),
+        0 < k
+          → ∃ (B : Type) (_ : CommRing B) (φ : S →+* B)
+              (ev : Dw.La → (ptO Xo (spMap φ ≫ x0) ⟶ Xo.univ.t.G)),
+            φ.FaithfullyFlat ∧ (∀ a b, ev (a + b) = ev a * ev b)
+              ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o) ∧ (∀ a, ev (k • a) = 1)
+              ∧ ∀ (K : Type) [Field K] (χ : B →+* K) (a b : Dw.La),
+                spMap χ ≫ (ev a).left = spMap χ ≫ (ev b).left → Dw.ModN k (a - b) := by
   intro hL E _ _ _ H Dw l Xo S _ x0 k hk
   classical
   obtain ⟨J, hJ, π, r, hπr, hπ⟩ := LevelFlat.exists_finite_quotient Dw k hk
@@ -175,8 +213,7 @@ theorem exists_faithfullyFlat_linear_level :
 
   let fc : {p : J × J // p.1 ≠ p.2} → (ptO Xo (spMap φ ≫ x0) ⟶ Xo.univ.t.G) := fun p => w p.1.1
   let fd : {p : J × J // p.1 ≠ p.2} → (ptO Xo (spMap φ ≫ x0) ⟶ Xo.univ.t.G) := fun p => w p.1.2
-  have hfa : ∀ i, fa i ^ k = 1 := by
-    rintro (p | q) <;> exact hw _
+  have hfa : ∀ i, fa i ^ k = 1 := by rintro (p | q) <;> exact hw _
   have hfb : ∀ i, fb i ^ k = 1 := by
     rintro (p | q)
     · show (w p.1 * w p.2) ^ k = 1
@@ -184,8 +221,10 @@ theorem exists_faithfullyFlat_linear_level :
     · show (w q.2 ≫ Xo.univ.t.act.act (q.1 : 𝓞 E)) ^ k = 1
       have := Xo.univ.t.act.hom (q.1 : 𝓞 E)
       rw [← MonObj.pow_comp, hw, MonObj.one_comp]
-  obtain ⟨e, he1, he2⟩ := LevelFlat.exists_element hL Xo B (spMap φ ≫ x0) k hk _ _ fa fb fc fd hfa hfb
-    (fun p => hw _) (fun p => hw _)
+  obtain ⟨e, he1, he2⟩ :=
+    LevelFlat.exists_element hL Xo B (spMap φ ≫ x0) k hk _ _ fa fb fc fd hfa hfb
+      (fun p => hw _)
+      (fun p => hw _)
   set B' := Localization.Away e
   set alg := algebraMap B B'
   have halg : spMap alg ≫ (spMap φ ≫ x0) = spMap (alg.comp φ) ≫ x0 := by
@@ -218,8 +257,7 @@ theorem exists_faithfullyFlat_linear_level :
     | zero => rw [zero_smul, pow_zero, hev0]
     | succ n ih => rw [succ_nsmul, hadd, ih, pow_succ]
   refine ⟨B', inferInstance, alg.comp φ, ev, ?_, hadd, ?_, ?_, ?_⟩
-  ·
-    rw [RingHom.FaithfullyFlat.iff_flat_and_comap_surjective]
+  · rw [RingHom.FaithfullyFlat.iff_flat_and_comap_surjective]
     refine ⟨RingHom.Flat.comp hφ ?_, ?_⟩
     · exact RingHom.flat_algebraMap_iff.mpr (IsLocalization.flat B' (Submonoid.powers e))
     · intro p
@@ -227,8 +265,7 @@ theorem exists_faithfullyFlat_linear_level :
       set Kp := AlgebraicClosure κ
       set ψ : S →+* Kp := (algebraMap κ Kp).comp (algebraMap S κ) with hψ
       set xp : Sp Kp ⟶ Xo.X := spMap ψ ≫ x0
-      have hβ : xp ≫ Xo.s = spMap (Spec.preimage (xp ≫ Xo.s)).hom := by
-        simp [spMap]
+      have hβ : xp ≫ Xo.s = spMap (Spec.preimage (xp ≫ Xo.s)).hom := by simp [spMap]
       obtain ⟨_, I, _, _, _⟩ := Xo.univ.geom Kp xp _ hβ
       let u : J → (ptO Xo (spMap ψ ≫ x0) ⟶ Xo.univ.t.G) := fun j => I.ev k (r j)
       have hu : ∀ j, u j ^ k = 1 := fun j => (I.onto k hk (u j)).mpr ⟨r j, rfl⟩
@@ -236,8 +273,7 @@ theorem exists_faithfullyFlat_linear_level :
       have hmχ : spMap χ ≫ (spMap φ ≫ x0) = spMap ψ ≫ x0 := by
         rw [← hχφ, LevelFlat.spMap_comp_moduli_spaces φ χ, Category.assoc]
       let mχ : ptO Xo (spMap ψ ≫ x0) ⟶ ptO Xo (spMap φ ≫ x0) := Over.homMk (spMap χ) hmχ
-      have hmχw : ∀ j, mχ ≫ w j = u j := fun j =>
-        Over.OverMorphism.ext (by rw [hχu j]; rfl)
+      have hmχw : ∀ j, mχ ≫ w j = u j := fun j => Over.OverMorphism.ext (by rw [hχu j]; rfl)
 
       have hIeq : ∀ a b, I.ev k a = I.ev k b ↔ Dw.ModN k (a - b) := by
         intro a b
@@ -263,8 +299,7 @@ theorem exists_faithfullyFlat_linear_level :
               show I.ev k (r (π (r j1 + r j2))) = I.ev k (r j1) * I.ev k (r j2)
               rw [hrepI, I.add]
             exact congrArg (fun f => f.left) h1
-          · have h1 : mχ ≫ w (π ((o : 𝓞 E) • r j)) =
-                mχ ≫ (w j ≫ Xo.univ.t.act.act (o : 𝓞 E)) := by
+          · have h1 : mχ ≫ w (π ((o : 𝓞 E) • r j)) = mχ ≫ (w j ≫ Xo.univ.t.act.act (o : 𝓞 E)) := by
               rw [← Category.assoc, hmχw, hmχw]
               show I.ev k (r (π ((o : 𝓞 E) • r j))) = I.ev k (r j) ≫ Xo.univ.t.act.act (o : 𝓞 E)
               rw [hrepI, I.lin]
@@ -276,15 +311,19 @@ theorem exists_faithfullyFlat_linear_level :
           have h2 := (hIeq _ _).mp h1
           rw [← hπr j1, ← hπr j2]
           exact (hπ _ _).mpr h2
-      refine ⟨⟨RingHom.ker (IsLocalization.Away.lift e hχe),
-        RingHom.ker_isPrime (IsLocalization.Away.lift e hχe)⟩, ?_⟩
+      refine ⟨
+        ⟨
+          RingHom.ker (IsLocalization.Away.lift e hχe),
+          RingHom.ker_isPrime (IsLocalization.Away.lift e hχe)
+        ⟩,
+        ?_
+      ⟩
       ext x
       simp only [PrimeSpectrum.comap_asIdeal, Ideal.mem_comap, RingHom.mem_ker]
       rw [← RingHom.comp_apply, ← RingHom.comp_assoc, IsLocalization.Away.lift_comp, hχφ, hψ,
         RingHom.comp_apply, map_eq_zero_iff _ (algebraMap κ Kp).injective,
         Ideal.algebraMap_residueField_eq_zero]
-  ·
-    intro o a
+  · intro o a
     refine LevelFlat.lin_of_generators Xo.univ.t.act ev hadd hgen ?_ o a
     intro o ho a
     have hoa : π (o • a) = π (o • r (π a)) := by
@@ -293,13 +332,11 @@ theorem exists_faithfullyFlat_linear_level :
     show m ≫ w (π (o • a)) = (m ≫ w (π a)) ≫ Xo.univ.t.act.act o
     rw [hoa, Category.assoc]
     exact heq' (Sum.inr (⟨o, ho⟩, π a))
-  ·
-    intro a
+  · intro a
     rw [hpow]
     show (m ≫ w (π a)) ^ k = 1
     rw [← MonObj.comp_pow, hw, MonObj.comp_one]
-  ·
-    intro K _ χ a b hab
+  · intro K _ χ a b hab
     by_contra hnab
     have hne' : π a ≠ π b := fun h => hnab ((hπ a b).mp h)
     have hK : IsUnit ((χ.comp alg) e) := hunit.map χ

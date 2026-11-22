@@ -14,9 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitTorusTa
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 
 set_option autoImplicit false
@@ -31,9 +34,10 @@ theorem one_left' (T : Over S) : (1 : T ⟶ G).left = T.hom ≫ η[G].left := by
   show (toUnit T ≫ η[G]).left = _
   rw [Over.comp_left, Over.toUnit_left]
 
-theorem mul_left_congr {T T' : Over S} (x y : T ⟶ G) (x' y' : T' ⟶ G) (u : Z ⟶ T.left) (u' : Z ⟶ T'.left)
-    (hx : u ≫ x.left = u' ≫ x'.left) (hy : u ≫ y.left = u' ≫ y'.left) :
-    u ≫ (x * y).left = u' ≫ (x' * y').left := by
+theorem mul_left_congr
+    {T T' : Over S} (x y : T ⟶ G) (x' y' : T' ⟶ G) (u : Z ⟶ T.left) (u' : Z ⟶ T'.left)
+    (hx : u ≫ x.left = u' ≫ x'.left) (hy : u ≫ y.left = u' ≫ y'.left)
+    : u ≫ (x * y).left = u' ≫ (x' * y').left := by
   have hb : u' ≫ T'.hom = u ≫ T.hom := by
     rw [← Over.w x, ← Over.w x', ← Category.assoc, ← hx, Category.assoc]
   let U : Over.mk (u ≫ T.hom) ⟶ T := Over.homMk u rfl
@@ -45,9 +49,12 @@ theorem mul_left_congr {T T' : Over S} (x y : T ⟶ G) (x' y' : T' ⟶ G) (u : Z
 
 end Grp
 
-theorem pull_one_left {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} [GrpObj G] {G' : Over S'} [GrpObj G']
-    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (T : Over S') :
-    (1 : T ⟶ G').left ≫ φ = (T.hom ≫ f) ≫ η[G].left := by
+theorem pull_one_left
+    {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} [GrpObj G]
+    {G' : Over S'} [GrpObj G']
+    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (T : Over S')
+    : (1 : T ⟶ G').left ≫ φ = (T.hom ≫ f) ≫ η[G].left := by
   have hw : ((1 : T ⟶ G').left ≫ φ) ≫ G.hom = (Over.mk (T.hom ≫ f)).hom := by
     rw [Category.assoc, h.1.w, ← Category.assoc, Over.w]; rfl
   let x₀ : Over.mk (T.hom ≫ f) ⟶ G := Over.homMk ((1 : T ⟶ G').left ≫ φ) hw
@@ -61,26 +68,44 @@ theorem pull_one_left {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} [GrpObj G]
 end GlobalTheory.TorLie
 
 open GlobalTheory.TorLie in
-theorem GlobalTheory.torus_part_lie : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (O : Type) [Ring O] (act : O → (G ⟶ G)), (∀ a, IsMonHom (act a)) → act 1 = 𝟙 G → (∀ a b, act (a * b) = act a ≫ act b) → (∀ a b, act (a + b) = act a * act b) → ∀ (k : Type) [Field k] (x : Sp k ⟶ S) (E : TorusExtension ((Over.pullback x).obj G)), letI := E.addCommGroup; ∃ (ρ : O →+* Module.End ℤ E.X) (U : (E.X →+ k) → (epsPt x ⟶ G)), Function.Injective U ∧ (∀ l, spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ (U l).left = (1 : Over.mk x ⟶ G).left) ∧ (∀ l l', U (l + l') = U l * U l') ∧ (∀ (t : k) l, (U ((AddMonoidHom.mulLeft t).comp l)).left = spMap (epsScale t) ≫ (U l).left) ∧ ∀ a l, U l ≫ act a = U (l.comp (ρ a).toAddMonoidHom) := by
+theorem GlobalTheory.torus_part_lie
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (O : Type) [Ring O]
+        (act : O → (G ⟶ G)),
+      (∀ a, IsMonHom (act a)) → act 1 = 𝟙 G → (∀ a b, act (a * b) = act a ≫ act b)
+        → (∀ a b, act (a + b) = act a * act b)
+        → ∀ (k : Type) [Field k] (x : Sp k ⟶ S) (E : TorusExtension ((Over.pullback x).obj G)),
+          letI := E.addCommGroup
+          ∃ (ρ : O →+* Module.End ℤ E.X) (U : (E.X →+ k) → (epsPt x ⟶ G)),
+            Function.Injective U
+              ∧ (∀ l,
+                spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ (U l).left
+                  = (1 : Over.mk x ⟶ G).left)
+              ∧ (∀ l l', U (l + l') = U l * U l')
+              ∧ (∀ (t : k) l,
+                (U ((AddMonoidHom.mulLeft t).comp l)).left = spMap (epsScale t) ≫ (U l).left)
+              ∧ ∀ a l, U l ≫ act a = U (l.comp (ρ a).toAddMonoidHom) := by
   intro S G _ _ O _ act hhom h1 hmul hadd k _ x E
   letI := E.addCommGroup
   haveI := E.i_hom
   set Gx := (Over.pullback x).obj G with hGx
   have hGP := isGrpPullback_pullback G x
   obtain ⟨act', ⟨hhom', h1', hmul', hadd'⟩, hact'⟩ :=
-    GlobalTheory.T.exists_ring_action_pullback_cartesian_group_schemes S (Sp k) x G Gx (pullback.fst G.hom x) hGP O act hhom h1 hmul hadd
-  obtain ⟨ρ, hρ⟩ := GlobalTheory.T.ringHom_characterEnd_of_torusExtension_action k Gx E O act' hhom' h1' hmul' hadd'
-  obtain ⟨U₀, hinj, hone, hU₀mul, hscale, hequi⟩ := GlobalTheory.T.splitTorus_tangentVectors_addMonoidHom k E.X
+    GlobalTheory.T.exists_ring_action_pullback_cartesian_group_schemes S (Sp k) x G Gx
+      (pullback.fst G.hom x) hGP O act hhom h1 hmul hadd
+  obtain ⟨ρ, hρ⟩ :=
+    GlobalTheory.T.ringHom_characterEnd_of_torusExtension_action k Gx E O act' hhom' h1' hmul' hadd'
+  obtain ⟨U₀, hinj, hone, hU₀mul, hscale, hequi⟩ :=
+    GlobalTheory.T.splitTorus_tangentVectors_addMonoidHom k E.X
 
-  have heq : ∀ l, ((U₀ l ≫ E.i).left ≫ pullback.fst G.hom x) ≫ G.hom = (epsPt (𝟙 (Sp k))).hom ≫ x := by
+  have heq
+      : ∀ l, ((U₀ l ≫ E.i).left ≫ pullback.fst G.hom x) ≫ G.hom = (epsPt (𝟙 (Sp k))).hom ≫ x := by
     intro l
     rw [Category.assoc, pullback.condition, ← Category.assoc]
     exact congrArg (· ≫ x) (Over.w (U₀ l ≫ E.i))
   have hw : ∀ l, ((U₀ l ≫ E.i).left ≫ pullback.fst G.hom x) ≫ G.hom = (epsPt x).hom := by
     intro l; rw [heq l]; simp [epsPt]
   let U : (E.X →+ k) → (epsPt x ⟶ G) := fun l => Over.homMk _ (hw l)
-  have hUl : ∀ l, (U l).left = (U₀ l).left ≫ E.i.left ≫ pullback.fst G.hom x := by
-    intro l; simp [U]
+  have hUl : ∀ l, (U l).left = (U₀ l).left ≫ E.i.left ≫ pullback.fst G.hom x := by intro l; simp [U]
   haveI : Mono E.i := E.isKernel.mono_fst_of_mono (IsTerminal.mono_from isTerminalTensorUnit _)
   refine ⟨ρ, U, ?_, ?_, ?_, ?_, ?_⟩
   · intro l l' h
@@ -112,6 +137,7 @@ theorem GlobalTheory.torus_part_lie : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj 
     have hτl : τ.left ≫ E.i.left = E.i.left ≫ (act' a).left := by
       simpa using congrArg Over.Hom.left hτ
     apply Over.OverMorphism.ext
-    have hτU : U₀ l ≫ τ = U₀ (l.comp (ρ a).toAddMonoidHom) := hequi τ (ρ a).toAddMonoidHom (fun χ => hχ χ) l
+    have hτU : U₀ l ≫ τ = U₀ (l.comp (ρ a).toAddMonoidHom) :=
+      hequi τ (ρ a).toAddMonoidHom (fun χ => hχ χ) l
     rw [Over.comp_left, hUl, hUl, ← hτU, Over.comp_left]
     simp only [Category.assoc, ← hact' a, reassoc_of% hτl]

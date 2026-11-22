@@ -22,10 +22,9 @@ theorem semilin_norm_sub_le {a b : K} {t : ℝ} (ha : ‖a‖ ≤ t) (hb : ‖b�
   rw [sub_eq_add_neg]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha (by rwa [norm_neg]))
 
-
 omit [CompleteSpace K] [CharZero K] in
-theorem semilin_norm_pow_sub_pow {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) (n : ℕ) :
-    ‖a ^ n - b ^ n‖ ≤ ‖a - b‖ := by
+theorem semilin_norm_pow_sub_pow {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) (n : ℕ)
+    : ‖a ^ n - b ^ n‖ ≤ ‖a - b‖ := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -33,17 +32,20 @@ theorem semilin_norm_pow_sub_pow {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ �
     rw [e]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
     · rw [norm_mul]
-      calc ‖a‖ * ‖a ^ n - b ^ n‖ ≤ 1 * ‖a - b‖ := mul_le_mul ha ih (norm_nonneg _) zero_le_one
+      calc
+        ‖a‖ * ‖a ^ n - b ^ n‖
+          ≤ 1 * ‖a - b‖ := mul_le_mul ha ih (norm_nonneg _) zero_le_one
         _ = ‖a - b‖ := one_mul _
     · rw [norm_mul, norm_pow]
-      calc ‖a - b‖ * ‖b‖ ^ n ≤ ‖a - b‖ * 1 :=
-            mul_le_mul_of_nonneg_left (pow_le_one₀ (norm_nonneg _) hb) (norm_nonneg _)
+      calc
+        ‖a - b‖ * ‖b‖ ^ n ≤ ‖a - b‖ * 1 :=
+          mul_le_mul_of_nonneg_left (pow_le_one₀ (norm_nonneg _) hb) (norm_nonneg _)
         _ = ‖a - b‖ := mul_one _
 
-
 omit [CompleteSpace K] [CharZero K] in
-theorem FrobField.norm_sq_sub_pow_le {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (x : K) (hx : ‖x‖ ≤ 1) :
-    ‖σ (σ x) - x ^ (l ^ 2)‖ ≤ ‖(l : K)‖ := by
+theorem FrobField.norm_sq_sub_pow_le
+    {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (x : K) (hx : ‖x‖ ≤ 1)
+    : ‖σ (σ x) - x ^ (l ^ 2)‖ ≤ ‖(l : K)‖ := by
   have hp : x ^ (l ^ 2) = (x ^ l) ^ l := by rw [← pow_mul, sq]
   have e : σ (σ x) - x ^ (l ^ 2) = σ (σ x - x ^ l) + ((σ x) ^ l - (x ^ l) ^ l) := by
     rw [hp, map_sub, map_pow]
@@ -53,31 +55,34 @@ theorem FrobField.norm_sq_sub_pow_le {l : ℕ} {σ : K →+* K} (h : FrobField K
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
   · rw [h.isom]; exact h1
   · refine (semilin_norm_pow_sub_pow (by rw [h.isom]; exact hx) ?_ l).trans h1
-    rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hx
-
+    rw [norm_pow]
+    exact pow_le_one₀ (norm_nonneg _) hx
 
 open Polynomial in
-theorem semilin_root {l : ℕ} (hR : ResClosed K l) {m : ℕ} (hm : 2 ≤ m) (a b : K) (ha : ‖a‖ ≤ 1)
-    (hb : ‖b‖ ≤ 1) : ∃ x : K, ‖x‖ ≤ 1 ∧ ‖x ^ m + a * x + b‖ ≤ ‖(l : K)‖ := by
+theorem semilin_root
+    {l : ℕ} (hR : ResClosed K l) {m : ℕ} (hm : 2 ≤ m) (a b : K) (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1)
+    : ∃ x : K, ‖x‖ ≤ 1 ∧ ‖x ^ m + a * x + b‖ ≤ ‖(l : K)‖ := by
   have hdeg : (C a * X + C b : K[X]).degree < (X ^ m : K[X]).degree := by
     rw [degree_X_pow]
     exact lt_of_le_of_lt degree_linear_le (by exact_mod_cast hm)
-  have hmon : (X ^ m + (C a * X + C b) : K[X]).Monic := monic_X_pow_add (by rwa [degree_X_pow] at hdeg)
+  have hmon : (X ^ m + (C a * X + C b) : K[X]).Monic :=
+    monic_X_pow_add (by rwa [degree_X_pow] at hdeg)
   have hnat : (X ^ m + (C a * X + C b) : K[X]).natDegree = m := by
     rw [natDegree_add_eq_left_of_degree_lt hdeg, natDegree_X_pow]
   have hco : ∀ i, ‖(X ^ m + (C a * X + C b) : K[X]).coeff i‖ ≤ 1 := by
     intro i
     simp only [coeff_add, coeff_X_pow, coeff_C_mul_X, coeff_C]
-    refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_
-      ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_))) <;> split_ifs <;> simp [ha, hb]
+    refine (IsUltrametricDist.norm_add_le_max _ _).trans
+        (max_le ?_ ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)))
+      <;> split_ifs <;> simp [ha, hb]
   obtain ⟨x, hx, hev⟩ := hR _ hmon (by omega) hco
   refine ⟨x, hx, ?_⟩
   simpa [add_assoc] using hev
 
-
 open Filter Topology in
-theorem lang_semilinear {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : ResClosed K l)
-    (c : K) (hc : ‖c‖ = 1) : ∃ ε : K, ‖ε‖ = 1 ∧ ε = c * σ (σ ε) := by
+theorem lang_semilinear
+    {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : ResClosed K l) (c : K) (hc : ‖c‖ = 1)
+    : ∃ ε : K, ‖ε‖ = 1 ∧ ε = c * σ (σ ε) := by
   have hl2 : 2 ≤ l := h.prime.two_le
   have hc0 : c ≠ 0 := norm_ne_zero_iff.mp (by rw [hc]; norm_num)
   have hcc : c * c⁻¹ = 1 := mul_inv_cancel₀ hc0
@@ -88,8 +93,8 @@ theorem lang_semilinear {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : 
 
   let P : ℕ → K → Prop := fun n ε => ‖ε‖ = 1 ∧ ‖ε - c * σ (σ ε)‖ ≤ ‖(l : K)‖ ^ (n + 1)
   have h0 : ∃ ε, P 0 ε := by
-    obtain ⟨x, hx, hev⟩ := semilin_root hR (m := l ^ 2 - 1) (by omega) 0 (-c⁻¹) (by simp)
-      (by rw [norm_neg, hci])
+    obtain ⟨x, hx, hev⟩ :=
+      semilin_root hR (m := l ^ 2 - 1) (by omega) 0 (-c⁻¹) (by simp) (by rw [norm_neg, hci])
     rw [zero_mul, add_zero, ← sub_eq_add_neg] at hev
     have hx1 : ‖x‖ = 1 := by
       have h1 : ‖x ^ (l ^ 2 - 1)‖ = 1 := by
@@ -98,9 +103,9 @@ theorem lang_semilinear {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : 
       rw [norm_pow] at h1
       exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by omega)).mp h1
     refine ⟨x, hx1, ?_⟩
-    have hxq : x ^ (l ^ 2) = x * x ^ (l ^ 2 - 1) := by
-      rw [← pow_succ']; congr 1; omega
-    have e : x - c * σ (σ x) = -(c * x) * (x ^ (l ^ 2 - 1) - c⁻¹) - c * (σ (σ x) - x ^ (l ^ 2)) := by
+    have hxq : x ^ (l ^ 2) = x * x ^ (l ^ 2 - 1) := by rw [← pow_succ']; congr 1; omega
+    have e
+        : x - c * σ (σ x) = -(c * x) * (x ^ (l ^ 2 - 1) - c⁻¹) - c * (σ (σ x) - x ^ (l ^ 2)) := by
       rw [hxq]
       linear_combination (-x) * hcc
     rw [e, zero_add, pow_one]
@@ -118,18 +123,22 @@ theorem lang_semilinear {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : 
       have hpos : 0 < ‖(l : K)‖ ^ (n + 1) := by rw [← hnl]; exact norm_pos_iff.mpr hlam0
       rw [hρ, norm_mul, hnl] at hε2
       exact le_of_mul_le_mul_left (by rwa [mul_one]) hpos
-    obtain ⟨δ, hδ, hev⟩ := semilin_root hR (m := l ^ 2) (by omega) (-c⁻¹) (-(c⁻¹ * ρ))
-      (by rw [norm_neg, hci]) (by rw [norm_neg, norm_mul, hci, one_mul]; exact hρ1)
+    obtain ⟨δ, hδ, hev⟩ :=
+      semilin_root hR (m := l ^ 2) (by omega) (-c⁻¹) (-(c⁻¹ * ρ)) (by rw [norm_neg, hci])
+        (by rw [norm_neg, norm_mul, hci, one_mul]; exact hρ1)
     have hσl : σ (σ ((l : K) ^ (n + 1))) = (l : K) ^ (n + 1) := by simp [map_pow, map_natCast]
     have hlδ : ‖(l : K) ^ (n + 1) * δ‖ ≤ ‖(l : K)‖ ^ (n + 1) := by
       rw [norm_mul, hnl]
-      calc ‖(l : K)‖ ^ (n + 1) * ‖δ‖ ≤ ‖(l : K)‖ ^ (n + 1) * 1 :=
-            mul_le_mul_of_nonneg_left hδ (by positivity)
+      calc
+        ‖(l : K)‖ ^ (n + 1) * ‖δ‖
+          ≤ ‖(l : K)‖ ^ (n + 1) * 1 := mul_le_mul_of_nonneg_left hδ (by positivity)
         _ = _ := mul_one _
     refine ⟨ε + (l : K) ^ (n + 1) * δ, ⟨?_, ?_⟩, ?_⟩
     · rw [semilin_norm_add_of_lt (by rw [hε1]; exact hlδ.trans_lt hsm), hε1]
-    · have e : ε + (l : K) ^ (n + 1) * δ - c * σ (σ (ε + (l : K) ^ (n + 1) * δ)) =
-          (l : K) ^ (n + 1) * (-c * (δ ^ (l ^ 2) + -c⁻¹ * δ + -(c⁻¹ * ρ)) - c * (σ (σ δ) - δ ^ (l ^ 2))) := by
+    · have e
+          : ε + (l : K) ^ (n + 1) * δ - c * σ (σ (ε + (l : K) ^ (n + 1) * δ))
+            = (l : K) ^ (n + 1)
+              * (-c * (δ ^ (l ^ 2) + -c⁻¹ * δ + -(c⁻¹ * ρ)) - c * (σ (σ δ) - δ ^ (l ^ 2))) := by
         rw [map_add (f := _), map_add (f := _), map_mul, map_mul, hσl]
         linear_combination hρ - ((l : K) ^ (n + 1) * ρ + (l : K) ^ (n + 1) * δ) * hcc
       rw [e, norm_mul, hnl, pow_succ ‖(l : K)‖ (n + 1)]
@@ -141,8 +150,11 @@ theorem lang_semilinear {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : 
   obtain ⟨ε0, hε0⟩ := h0
   choose g hg using hstep
   let v : (n : ℕ) → {x : K // P n x} := fun n =>
-    Nat.rec (motive := fun n => {x : K // P n x}) ⟨ε0, hε0⟩
-      (fun n ih => ⟨g n ih.1 ih.2, (hg n ih.1 ih.2).1⟩) n
+    Nat.rec
+      (motive := fun n => {x : K // P n x})
+      ⟨ε0, hε0⟩
+      (fun n ih => ⟨g n ih.1 ih.2, (hg n ih.1 ih.2).1⟩)
+      n
   let u : ℕ → K := fun n => (v n).1
   have hu : ∀ n, P n (u n) := fun n => (v n).2
   have hud : ∀ n, ‖u (n + 1) - u n‖ ≤ ‖(l : K)‖ ^ (n + 1) := fun n => (hg n (u n) (hu n)).2
@@ -152,14 +164,17 @@ theorem lang_semilinear {l : ℕ} {σ : K →+* K} (h : FrobField K l σ) (hR : 
     exact hud n
   obtain ⟨ε, hlim⟩ := cauchySeq_tendsto_of_complete hcau
   have hσc : Continuous σ := ((AddMonoidHomClass.isometry_iff_norm σ).mpr h.isom).continuous
-  have hres : Filter.Tendsto (fun n => u n - c * σ (σ (u n))) Filter.atTop (nhds (ε - c * σ (σ ε))) :=
+  have hres
+      : Filter.Tendsto (fun n => u n - c * σ (σ (u n))) Filter.atTop (nhds (ε - c * σ (σ ε))) :=
     hlim.sub ((((hσc.comp hσc).tendsto ε).comp hlim).const_mul c)
   have hres0 : Filter.Tendsto (fun n => u n - c * σ (σ (u n))) Filter.atTop (nhds 0) :=
-    squeeze_zero_norm (fun n => (hu n).2.trans (pow_le_pow_of_le_one (norm_nonneg _) hl1.le (Nat.le_succ n)))
+    squeeze_zero_norm
+      (fun n => (hu n).2.trans (pow_le_pow_of_le_one (norm_nonneg _) hl1.le (Nat.le_succ n)))
       (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hl1)
   have hn : Filter.Tendsto (fun n => ‖u n‖) Filter.atTop (nhds ‖ε‖) := hlim.norm
   have hconst : (fun n => ‖u n‖) = fun _ => (1 : ℝ) := funext fun n => (hu n).1
   rw [hconst] at hn
-  exact ⟨ε, tendsto_nhds_unique hn tendsto_const_nhds, sub_eq_zero.mp (tendsto_nhds_unique hres hres0)⟩
+  exact
+    ⟨ε, tendsto_nhds_unique hn tendsto_const_nhds, sub_eq_zero.mp (tendsto_nhds_unique hres hres0)⟩
 
 end ReciprocityTheory.ChartRestriction.L1

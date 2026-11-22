@@ -19,7 +19,6 @@ def FinOrb (K K' : Subgroup G) (x : G) : Prop := (MulAction.orbit K (x : G ⧸ K
 
 def HeckePair (I : Subgroup G) : Prop := ∀ x : G, FinOrb I I x
 
-
 open scoped Classical in
 open Classical in
 def hk2 (ρ : Representation A G M) (K K' : Subgroup G) (x : G) : fixd ρ K' →ₗ[A] fixd ρ K :=
@@ -35,15 +34,16 @@ def inc (ρ : Representation A G M) {I K : Subgroup G} (h : I ≤ K) : fixd ρ K
 
 def trc (ρ : Representation A G M) (K I : Subgroup G) : fixd ρ I →ₗ[A] fixd ρ K := hk2 ρ K I 1
 
-
 variable (A)
 
-abbrev permRep (I : Subgroup G) : Representation A G (MonoidAlgebra A (G ⧸ I)) := Representation.ofMulAction A G (G ⧸ I)
+abbrev permRep (I : Subgroup G) : Representation A G (MonoidAlgebra A (G ⧸ I)) :=
+  Representation.ofMulAction A G (G ⧸ I)
 
 def HkAlg (I : Subgroup G) : Subalgebra A (Module.End A (fixd (permRep A I) I)) :=
   Algebra.adjoin A (Set.range (hk (permRep A I) I))
 
-def hT (I : Subgroup G) (x : G) : HkAlg A I := ⟨hk (permRep A I) I x, Algebra.subset_adjoin ⟨x, rfl⟩⟩
+def hT (I : Subgroup G) (x : G) : HkAlg A I :=
+  ⟨hk (permRep A I) I x, Algebra.subset_adjoin ⟨x, rfl⟩⟩
 
 structure LeviFact (I : Subgroup G) where
   Uf : Subgroup G
@@ -72,8 +72,8 @@ def invLen (w : Equiv.Perm (Fin n)) : ℕ :=
 def pm (R : Type) [CommRing R] (n : ℕ) : Equiv.Perm (Fin n) →* GL (Fin n) R :=
   (Matrix.permMatrixHom (n := Fin n) (R := R)).toHomUnits
 
-theorem pm_apply (R : Type) [CommRing R] (w : Equiv.Perm (Fin n)) (i j : Fin n) :
-    (pm R n w : Matrix (Fin n) (Fin n) R) i j = if i = w j then 1 else 0 := by
+theorem pm_apply (R : Type) [CommRing R] (w : Equiv.Perm (Fin n)) (i j : Fin n)
+    : (pm R n w : Matrix (Fin n) (Fin n) R) i j = if i = w j then 1 else 0 := by
   simp only [pm, MonoidHom.coe_toHomUnits, Matrix.permMatrixHom_apply, Equiv.Perm.permMatrix,
     PEquiv.toMatrix_apply, Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq]
   congr 1
@@ -83,10 +83,12 @@ end Perm
 
 section GeneralLinearIntegers
 
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
+variable
+  (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
 
 def unitsC (C : Subgroup 𝓀[k]ˣ) : Subgroup kˣ :=
-  (C.comap (Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom)).map (Units.map (algebraMap 𝒪[k] k).toMonoidHom)
+  (C.comap (Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom)).map
+    (Units.map (algebraMap 𝒪[k] k).toMonoidHom)
 
 def torC (C : Subgroup 𝓀[k]ˣ) : Subgroup (Fin n → kˣ) := Subgroup.pi Set.univ fun _ => unitsC k C
 

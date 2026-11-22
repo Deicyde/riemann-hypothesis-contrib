@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsMat
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
+open Formalism.BasicNotions.TH GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
 open Formalism.MainNotions.SchurIrreducible (IrrU IrrGK IsHCMod)
 open scoped TensorProduct
 
@@ -53,8 +54,11 @@ lemma wt_shift {act : Mat p q →ₗ[ℂ] Module.End ℂ V} (hL : IsLieAct act) 
   · simp [h1, h2, Ne.symm h2]
 
 def InCone (ν μ : Ix p q → ℚ) : Prop :=
-  ∃ m : Ix p q → Ix p q → ℕ, (∀ a b, m a b ≠ 0 → ∃ i j, a = Sum.inl i ∧ b = Sum.inr j) ∧
-    μ = fun c => ν c + ∑ a, ∑ b, (m a b : ℚ) * ((if c = a then 1 else 0) - (if c = b then 1 else 0))
+  ∃ m : Ix p q → Ix p q → ℕ,
+    (∀ a b, m a b ≠ 0 → ∃ i j, a = Sum.inl i ∧ b = Sum.inr j)
+      ∧ μ
+        = fun c =>
+          ν c + ∑ a, ∑ b, (m a b : ℚ) * ((if c = a then 1 else 0) - (if c = b then 1 else 0))
 
 lemma inCone_self (μ : Ix p q → ℚ) : InCone μ μ :=
   ⟨fun _ _ => 0, by simp, by simp⟩
@@ -143,66 +147,86 @@ lemma wt_orth {act : Mat p q →ₗ[ℂ] Module.End ℂ V} {H : Type} [NormedAdd
   refine (mul_eq_zero.1 h).resolve_left fun h0 => hc ?_
   exact_mod_cast sub_eq_zero.1 h0
 
-theorem cone : ∀ (p q : ℕ) (M : GKMod p q) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (E : M.V →ₗ[ℂ] H), Function.Injective E → (∀ Z x y, inner ℂ (E (M.act Z x)) (E y) = inner ℂ (E x) (E (M.act (adjZ Z) y))) → ∀ (Λ : Ix p q → ℚ) (e : M.V), e ∈ hwSub M.act Λ → KilledByLower M.act e → genSub M.act {e} = ⊤ → ∀ (μ : Ix p q → ℚ) (v : M.V), IsHW M.act μ v → ∃ m : Ix p q → Ix p q → ℕ, (∀ a b, m a b ≠ 0 → ∃ i j, a = Sum.inl i ∧ b = Sum.inr j) ∧ μ = fun c => Λ c + ∑ a, ∑ b, (m a b : ℚ) * ((if c = a then 1 else 0) - (if c = b then 1 else 0)) := by
-  intro p q M H _ _ E hE hadj Λ e he hlow hgen μ v hv
-  by_contra hcone
-  change ¬ InCone Λ μ at hcone
-  obtain ⟨D, hvD, hDm, hDp, hDle⟩ := exists_down M.lie hv.2
-  rw [mem_hw] at he
-  let C : Submodule ℂ M.V := ((D.map E)ᗮ).comap E
-  have hC : ∀ x, x ∈ C ↔ ∀ d ∈ D, inner ℂ (E d) (E x) = 0 := by
-    intro x
-    simp only [C, Submodule.mem_comap, Submodule.mem_orthogonal]
-    constructor
-    · intro h d hd; exact h _ ⟨d, hd, rfl⟩
-    · rintro h _ ⟨d, hd, rfl⟩; exact h d hd
-  have hstab : ∀ a b, (∀ d ∈ D, M.act (Eab a b) d ∈ D) → ∀ x ∈ C, M.act (Eab b a) x ∈ C := by
-    intro a b h x hx
-    rw [hC] at hx ⊢
-    intro d hd
-    have := hadj (adjZ (Eab b a)) d x
-    rw [GlobalTheory.FockTensor.adjZ_adjZ] at this
-    rw [← this, GlobalTheory.FockTensor.adjZ_Eab, map_smul, LinearMap.smul_apply]
-    exact hx _ (D.smul_mem _ (h d hd))
-  have heC : e ∈ C := by
-    rw [hC]
-    intro d hd
-    refine Submodule.iSup_induction _ (motive := fun x => inner ℂ (E x) (E e) = 0) (hDle hd) ?_
-      (by simp) ?_
-    · intro ν y hy
-      exact wt_orth E hadj (fun h : ν.1 = Λ => hcone (h ▸ ν.2)) hy he.1
-    · intro y z hy hz
-      rw [map_add (f := _), inner_add_left, hy, hz, add_zero]
-  let r : Ix p q → ℕ := Sum.elim (fun i => q + i.1) (fun j => j.1)
-  have hr : Function.Injective r := by
-    rintro (a | a) (b | b) h <;> simp only [r, Sum.elim_inl, Sum.elim_inr] at h
-    · congr 1; ext; omega
-    · have := b.2; omega
-    · have := a.2; omega
-    · congr 1; ext; omega
-  have hcase : ∀ a b, r a < r b → posC a b ∨ ∃ i j, a = Sum.inr j ∧ b = Sum.inl i := by
-    rintro (a | a) (b | b) h <;> simp only [r, Sum.elim_inl, Sum.elim_inr] at h
-    · left; show a < b; rw [Fin.lt_def]; omega
-    · have := b.2; omega
-    · exact Or.inr ⟨_, _, rfl, rfl⟩
-    · left; exact h
-  obtain ⟨U, heU, hU, hUmin, -⟩ := GlobalTheory.ExtremalGen.exists_generated p q M.V M.act M.lie (fun _ _ => True)
-    ⟨fun _ => trivial, fun _ => trivial, fun _ _ => trivial⟩ r hr Λ e he.1 (by
-      intro a b _ h
-      rcases hcase a b h with h | ⟨i, j, rfl, rfl⟩
-      · exact he.2 a b h
-      · exact hlow i j)
-  have hUC : U ≤ C := hUmin C heC (by
-    intro a b _ h
-    refine hstab a b ?_
-    rcases hcase a b h with h | ⟨i, j, rfl, rfl⟩
-    · exact hDp a b h
-    · exact hDm i j)
-  have hgU : genSub M.act {e} ≤ U :=
-    sInf_le ⟨by simpa using heU, fun Z y hy => act_mem U y (fun a b => hU a b trivial y hy) Z⟩
-  have hvC : v ∈ C := hUC (hgU (hgen ▸ Submodule.mem_top))
-  have h0 := (hC v).1 hvC v hvD
-  rw [inner_self_eq_zero] at h0
-  exact hv.1 (hE (by rw [h0, map_zero]))
+theorem cone
+    : ∀ (p q : ℕ) (M : GKMod p q) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (E : M.V →ₗ[ℂ] H),
+      Function.Injective E
+        → (∀ Z x y, inner ℂ (E (M.act Z x)) (E y) = inner ℂ (E x) (E (M.act (adjZ Z) y)))
+        → ∀ (Λ : Ix p q → ℚ) (e : M.V),
+          e ∈ hwSub M.act Λ → KilledByLower M.act e → genSub M.act {e} = ⊤
+            → ∀ (μ : Ix p q → ℚ) (v : M.V),
+              IsHW M.act μ v
+                → ∃ m : Ix p q → Ix p q → ℕ,
+                  (∀ a b, m a b ≠ 0 → ∃ i j, a = Sum.inl i ∧ b = Sum.inr j)
+                    ∧ μ
+                      = fun c =>
+                        Λ c
+                          + ∑ a, ∑ b, (m a b : ℚ) * ((if c = a then 1 else 0) - (if c = b then 1 else 0)) :=
+  by
+    intro p q M H _ _ E hE hadj Λ e he hlow hgen μ v hv
+    by_contra hcone
+    change ¬ InCone Λ μ at hcone
+    obtain ⟨D, hvD, hDm, hDp, hDle⟩ := exists_down M.lie hv.2
+    rw [mem_hw] at he
+    let C : Submodule ℂ M.V := ((D.map E)ᗮ).comap E
+    have hC : ∀ x, x ∈ C ↔ ∀ d ∈ D, inner ℂ (E d) (E x) = 0 := by
+      intro x
+      simp only [C, Submodule.mem_comap, Submodule.mem_orthogonal]
+      constructor
+      · intro h d hd; exact h _ ⟨d, hd, rfl⟩
+      · rintro h _ ⟨d, hd, rfl⟩; exact h d hd
+    have hstab : ∀ a b, (∀ d ∈ D, M.act (Eab a b) d ∈ D) → ∀ x ∈ C, M.act (Eab b a) x ∈ C := by
+      intro a b h x hx
+      rw [hC] at hx ⊢
+      intro d hd
+      have := hadj (adjZ (Eab b a)) d x
+      rw [GlobalTheory.FockTensor.adjZ_adjZ] at this
+      rw [← this, GlobalTheory.FockTensor.adjZ_Eab, map_smul, LinearMap.smul_apply]
+      exact hx _ (D.smul_mem _ (h d hd))
+    have heC : e ∈ C := by
+      rw [hC]
+      intro d hd
+      refine Submodule.iSup_induction _
+        (motive := fun x => inner ℂ (E x) (E e) = 0)
+        (hDle hd) ?_ (by simp) ?_
+      · intro ν y hy
+        exact wt_orth E hadj (fun h : ν.1 = Λ => hcone (h ▸ ν.2)) hy he.1
+      · intro y z hy hz
+        rw [map_add (f := _), inner_add_left, hy, hz, add_zero]
+    let r : Ix p q → ℕ := Sum.elim (fun i => q + i.1) (fun j => j.1)
+    have hr : Function.Injective r := by
+      rintro (a | a) (b | b) h <;> simp only [r, Sum.elim_inl, Sum.elim_inr] at h
+      · congr 1; ext; omega
+      · have := b.2; omega
+      · have := a.2; omega
+      · congr 1; ext; omega
+    have hcase : ∀ a b, r a < r b → posC a b ∨ ∃ i j, a = Sum.inr j ∧ b = Sum.inl i := by
+      rintro (a | a) (b | b) h <;> simp only [r, Sum.elim_inl, Sum.elim_inr] at h
+      · left; show a < b; rw [Fin.lt_def]; omega
+      · have := b.2; omega
+      · exact Or.inr ⟨_, _, rfl, rfl⟩
+      · left; exact h
+    obtain ⟨U, heU, hU, hUmin, -⟩ :=
+      GlobalTheory.ExtremalGen.exists_generated p q M.V M.act M.lie
+        (fun _ _ => True)
+        ⟨fun _ => trivial, fun _ => trivial, fun _ _ => trivial⟩ r hr Λ e he.1
+        (by
+          intro a b _ h
+          rcases hcase a b h with h | ⟨i, j, rfl, rfl⟩
+          · exact he.2 a b h
+          · exact hlow i j)
+    have hUC : U ≤ C :=
+      hUmin C heC (by
+        intro a b _ h
+        refine hstab a b ?_
+        rcases hcase a b h with h | ⟨i, j, rfl, rfl⟩
+        · exact hDp a b h
+        · exact hDm i j)
+    have hgU : genSub M.act {e} ≤ U :=
+      sInf_le ⟨by simpa using heU, fun Z y hy => act_mem U y (fun a b => hU a b trivial y hy) Z⟩
+    have hvC : v ∈ C := hUC (hgU (hgen ▸ Submodule.mem_top))
+    have h0 := (hC v).1 hvC v hvD
+    rw [inner_self_eq_zero] at h0
+    exact hv.1 (hE (by rw [h0, map_zero]))
 
 end GlobalTheory.LowestCone

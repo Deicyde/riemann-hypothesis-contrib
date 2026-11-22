@@ -12,9 +12,9 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem posDef_exists_conjTranspose_mul_mul_eq_one :
-    ∀ (d : ℕ) (H : Matrix (Fin d) (Fin d) ℂ), H.PosDef →
-      ∃ y₀ : GL (Fin d) ℂ, (y₀.1).conjTranspose * H * y₀.1 = 1 := by
+theorem posDef_exists_conjTranspose_mul_mul_eq_one
+    : ∀ (d : ℕ) (H : Matrix (Fin d) (Fin d) ℂ),
+      H.PosDef → ∃ y₀ : GL (Fin d) ℂ, (y₀.1).conjTranspose * H * y₀.1 = 1 := by
   intro d H hP
   have hH : H.IsHermitian := hP.isHermitian
   set U : Matrix (Fin d) (Fin d) ℂ := (hH.eigenvectorUnitary : Matrix (Fin d) (Fin d) ℂ) with hUdef
@@ -32,11 +32,13 @@ theorem posDef_exists_conjTranspose_mul_mul_eq_one :
   let t : Fin d → ℂ := fun i => ((r i : ℝ) : ℂ)
   have hst : diagonal s * diagonal t = 1 := by
     rw [diagonal_mul_diagonal, ← diagonal_one]
-    congr 1; funext i
+    congr 1
+    funext i
     simp only [s, t, ← Complex.ofReal_mul, inv_mul_cancel₀ (hr i).ne', Complex.ofReal_one]
   have hts : diagonal t * diagonal s = 1 := by
     rw [diagonal_mul_diagonal, ← diagonal_one]
-    congr 1; funext i
+    congr 1
+    funext i
     simp only [s, t, ← Complex.ofReal_mul, mul_inv_cancel₀ (hr i).ne', Complex.ofReal_one]
   let Y : Matrix (Fin d) (Fin d) ℂ := U * diagonal s
   let Z : Matrix (Fin d) (Fin d) ℂ := diagonal t * Uᴴ
@@ -50,20 +52,24 @@ theorem posDef_exists_conjTranspose_mul_mul_eq_one :
   show Yᴴ * H * Y = 1
   have hsH : (diagonal s)ᴴ = diagonal s := by
     rw [diagonal_conjTranspose]
-    congr 1; funext i
+    congr 1
+    funext i
     simp [s]
   have hdiag : diagonal s * diagonal (fun i => ((hH.eigenvalues i : ℝ) : ℂ)) * diagonal s = 1 := by
     rw [diagonal_mul_diagonal, diagonal_mul_diagonal, ← diagonal_one]
-    congr 1; funext i
+    congr 1
+    funext i
     simp only [s, ← hrr i, ← Complex.ofReal_mul]
     rw [show (r i)⁻¹ * (r i * r i) * (r i)⁻¹ = ((r i)⁻¹ * r i) * (r i * (r i)⁻¹) by ring,
       inv_mul_cancel₀ (hr i).ne', mul_inv_cancel₀ (hr i).ne']
     simp
   simp only [Y]
   rw [conjTranspose_mul, hsH, hspec]
-  calc diagonal s * Uᴴ * (U * diagonal (fun i => ((hH.eigenvalues i : ℝ) : ℂ)) * Uᴴ) * (U * diagonal s)
-      = diagonal s * (Uᴴ * U) * diagonal (fun i => ((hH.eigenvalues i : ℝ) : ℂ)) * (Uᴴ * U) * diagonal s := by
-        simp only [Matrix.mul_assoc]
+  calc
+    diagonal s * Uᴴ * (U * diagonal (fun i => ((hH.eigenvalues i : ℝ) : ℂ)) * Uᴴ) * (U * diagonal s)
+        = diagonal s * (Uᴴ * U) * diagonal (fun i => ((hH.eigenvalues i : ℝ) : ℂ)) * (Uᴴ * U)
+          * diagonal s := by
+      simp only [Matrix.mul_assoc]
     _ = 1 := by rw [hU1, Matrix.mul_one, Matrix.mul_one, hdiag]
 
 end GlobalTheory

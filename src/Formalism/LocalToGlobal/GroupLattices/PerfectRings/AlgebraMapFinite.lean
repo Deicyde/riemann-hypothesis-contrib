@@ -29,8 +29,8 @@ theorem toRes_surjective : Function.Surjective (toRes π) := by
   obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective q
   exact ⟨⟨r, 0⟩, rfl⟩
 
-theorem mem_span_om (z : QuadraticAlgebra R π 0) :
-    z ∈ Ideal.span {(ω : QuadraticAlgebra R π 0)} ↔ π ∣ z.re := by
+theorem mem_span_om (z : QuadraticAlgebra R π 0)
+    : z ∈ Ideal.span {(ω : QuadraticAlgebra R π 0)} ↔ π ∣ z.re := by
   rw [Ideal.mem_span_singleton]
   constructor
   · rintro ⟨c, rfl⟩
@@ -44,13 +44,15 @@ theorem ker_toRes : RingHom.ker (toRes π) = Ideal.span {(ω : QuadraticAlgebra 
   rw [RingHom.mem_ker, toRes_apply, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton,
     mem_span_om]
 
-def resEquiv : (QuadraticAlgebra R π 0 ⧸ Ideal.span {(ω : QuadraticAlgebra R π 0)}) ≃+* (R ⧸ Ideal.span {π}) :=
+def resEquiv
+    : (QuadraticAlgebra R π 0 ⧸ Ideal.span {(ω : QuadraticAlgebra R π 0)})
+      ≃+* (R ⧸ Ideal.span {π}) :=
   (Ideal.quotEquivOfEq (ker_toRes π).symm).trans
     (RingHom.quotientKerEquivOfSurjective (toRes_surjective π))
 
-theorem card_res :
-    Nat.card (QuadraticAlgebra R π 0 ⧸ Ideal.span {(ω : QuadraticAlgebra R π 0)}) =
-      Nat.card (R ⧸ Ideal.span {π}) :=
+theorem card_res
+    : Nat.card (QuadraticAlgebra R π 0 ⧸ Ideal.span {(ω : QuadraticAlgebra R π 0)})
+      = Nat.card (R ⧸ Ideal.span {π}) :=
   Nat.card_congr (resEquiv π).toEquiv
 
 theorem algebraMap_finite : (algebraMap R (QuadraticAlgebra R π 0)).Finite := by

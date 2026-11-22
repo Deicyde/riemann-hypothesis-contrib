@@ -18,20 +18,24 @@ theorem c_mul_swap (S : Sys X M) (x y : X) : S.c x y * S.c y x = 1 := by
   rw [S.c_add_left, S.c_add_right, S.c_add_right, S.c_self, S.c_self] at h
   simpa using h
 
-theorem rho_comm (S : Sys X M) (x y : X) (v : M) :
-    S.rho x (S.rho y v) = S.c x y ^ 2 • S.rho y (S.rho x v) := by
+theorem rho_comm (S : Sys X M) (x y : X) (v : M)
+    : S.rho x (S.rho y v) = S.c x y ^ 2 • S.rho y (S.rho x v) := by
   rw [S.9 x y v, S.9 y x v, smul_smul, add_comm y x]
   congr 1
   have h := GlobalTheory.CompanionTheory.FinHeis.LawLine.c_mul_swap S x y
-  calc S.c x y = S.c x y * (S.c x y * S.c y x) := by rw [h, mul_one]
+  calc
+    S.c x y
+      = S.c x y * (S.c x y * S.c y x) := by rw [h, mul_one]
     _ = S.c x y ^ 2 * S.c y x := by ring
 
-theorem orth (S : Sys X M) (al : X → ℂ) (Γ : AddSubgroup X) (φ φ' : M) (x : X)
-    (hΓ : SelfDual S Γ) (hal : IsSemi S al Γ) (hφ : Law S al Γ φ) (hφ' : Law S al Γ φ')
-    (hx : x ∉ Γ) : S.B φ' (S.rho x φ) = 0 := by
+theorem orth
+    (S : Sys X M) (al : X → ℂ) (Γ : AddSubgroup X) (φ φ' : M) (x : X)
+    (hΓ : SelfDual S Γ) (hal : IsSemi S al Γ) (hφ : Law S al Γ φ) (hφ' : Law S al Γ φ') (hx : x ∉ Γ)
+    : S.B φ' (S.rho x φ) = 0 := by
   have hΓ₀ : ∀ y, y ∈ Γ ↔ ∀ γ ∈ Γ, S.c γ y ^ 2 = 1 := hΓ
-  obtain ⟨hal₁, -⟩ : (∀ y ∈ Γ, al y = 1 ∨ al y = -1) ∧
-      ∀ y ∈ Γ, ∀ z ∈ Γ, al (y + z) = al y * al z * S.c y z := hal
+  obtain ⟨hal₁, -⟩
+      : (∀ y ∈ Γ, al y = 1 ∨ al y = -1) ∧ ∀ y ∈ Γ, ∀ z ∈ Γ, al (y + z) = al y * al z * S.c y z :=
+    hal
   have hφ₀ : ∀ γ ∈ Γ, S.rho γ φ = (al γ)⁻¹ • φ := hφ
   have hφ₀' : ∀ γ ∈ Γ, S.rho γ φ' = (al γ)⁻¹ • φ' := hφ'
   have hnot : ¬ ∀ γ ∈ Γ, S.c γ x ^ 2 = 1 := fun h => hx ((hΓ₀ x).2 h)
@@ -48,9 +52,11 @@ theorem orth (S : Sys X M) (al : X → ℂ) (Γ : AddSubgroup X) (φ φ' : M) (x
   · exact absurd (sub_eq_zero.1 h) hcx
   · exact h
 
-theorem law_line {X M : Type} [AddCommGroup X] [AddCommGroup M] [Module ℂ M] (S : Sys X M)
-    (al : X → ℂ) (Γ : AddSubgroup X) (φ φ' : M) (hΓ : SelfDual S Γ) (hal : IsSemi S al Γ)
-    (hφ : Law S al Γ φ) (hc : Cyclic S φ) (hφ' : Law S al Γ φ') : ∃ a : ℂ, φ' = a • φ := by
+theorem law_line
+    {X M : Type} [AddCommGroup X] [AddCommGroup M] [Module ℂ M]
+    (S : Sys X M) (al : X → ℂ) (Γ : AddSubgroup X) (φ φ' : M) (hΓ : SelfDual S Γ)
+    (hal : IsSemi S al Γ) (hφ : Law S al Γ φ) (hc : Cyclic S φ) (hφ' : Law S al Γ φ')
+    : ∃ a : ℂ, φ' = a • φ := by
   have hφ₀ : ∀ γ ∈ Γ, S.rho γ φ = (al γ)⁻¹ • φ := hφ
   have hφ₀' : ∀ γ ∈ Γ, S.rho γ φ' = (al γ)⁻¹ • φ' := hφ'
   have hc₀ : Submodule.span ℂ (Set.range fun x => S.rho x φ) = ⊤ := hc

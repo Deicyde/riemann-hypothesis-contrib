@@ -19,19 +19,21 @@ open Reduction AutomorphicForm
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-
 variable (K) in
-theorem exists_natCast_mul_mem_of_mem_nhds {W : Set (FiniteAdeleRing (𝓞 K) K)}
-    (hW : W ∈ 𝓝 (0 : FiniteAdeleRing (𝓞 K) K)) :
-    ∃ M : ℕ, 0 < M ∧ ∀ a ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 K) K,
-      (M : FiniteAdeleRing (𝓞 K) K) * a ∈ W := by
+theorem exists_natCast_mul_mem_of_mem_nhds
+    {W : Set (FiniteAdeleRing (𝓞 K) K)} (hW : W ∈ 𝓝 (0 : FiniteAdeleRing (𝓞 K) K))
+    : ∃ M : ℕ,
+      0 < M
+        ∧ ∀ a ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 K) K,
+          (M : FiniteAdeleRing (𝓞 K) K) * a ∈ W := by
   set O := GroundTheory.Global.integralFiniteAdeles (𝓞 K) K
   have hO : IsCompact (O : Set (FiniteAdeleRing (𝓞 K) K)) :=
     GroundTheory.Global.isCompact_integralFiniteAdeles K
   set N := {c : FiniteAdeleRing (𝓞 K) K | ∀ a ∈ (O : Set (FiniteAdeleRing (𝓞 K) K)), c * a ∈ W}
   have hN : N ∈ 𝓝 (0 : FiniteAdeleRing (𝓞 K) K) := by
     refine hO.eventually_forall_of_forall_eventually fun a _ => ?_
-    have h := (continuous_mul (M := FiniteAdeleRing (𝓞 K) K)).tendsto ((0 : FiniteAdeleRing (𝓞 K) K), a)
+    have h :=
+      (continuous_mul (M := FiniteAdeleRing (𝓞 K) K)).tendsto ((0 : FiniteAdeleRing (𝓞 K) K), a)
     rw [zero_mul] at h
     exact h hW
   obtain ⟨V, hV, hVV⟩ := exists_nhds_zero_half hN
@@ -44,21 +46,24 @@ theorem exists_natCast_mul_mem_of_mem_nhds {W : Set (FiniteAdeleRing (𝓞 K) K)
   have hsub : ∀ v ∈ V', ∀ w ∈ V', v - w ∈ N := fun v hv w hw => by
     rw [sub_eq_add_neg]
     exact hVV v hv.1 (-w) hw.2
-  obtain ⟨t, -, hcover⟩ := hO.elim_nhds_subcover (fun c => {y | y - c ∈ V'}) fun c _ => by
-    have := (continuous_sub_right c).tendsto c
-    rw [sub_self] at this
-    exact this hV'
+  obtain ⟨t, -, hcover⟩ :=
+    hO.elim_nhds_subcover
+      (fun c => {y | y - c ∈ V'})
+      fun c _ => by
+        have := (continuous_sub_right c).tendsto c
+        rw [sub_self] at this
+        exact this hV'
   have hmem : ∀ j : ℕ, ∃ c : t, (j : FiniteAdeleRing (𝓞 K) K) - c ∈ V' := by
     intro j
-    have hj : (j : FiniteAdeleRing (𝓞 K) K) ∈ (O : Set (FiniteAdeleRing (𝓞 K) K)) :=
-      natCast_mem O j
+    have hj : (j : FiniteAdeleRing (𝓞 K) K) ∈ (O : Set (FiniteAdeleRing (𝓞 K) K)) := natCast_mem O j
     obtain ⟨c, hc, hjc⟩ := mem_iUnion₂.1 (hcover hj)
     exact ⟨⟨c, hc⟩, hjc⟩
   choose f hf using hmem
-  obtain ⟨j, j', hne, hjj⟩ := Fintype.exists_ne_map_eq_of_card_lt
-    (fun i : Fin (t.card + 1) => f i) (by simp)
-  have key : ∀ i i' : Fin (t.card + 1), f i = f i' →
-      ((i : ℕ) : FiniteAdeleRing (𝓞 K) K) - (i' : ℕ) ∈ N := by
+  obtain ⟨j, j', hne, hjj⟩ :=
+    Fintype.exists_ne_map_eq_of_card_lt (fun i : Fin (t.card + 1) => f i) (by simp)
+  have key
+      : ∀ i i' : Fin (t.card + 1),
+        f i = f i' → ((i : ℕ) : FiniteAdeleRing (𝓞 K) K) - (i' : ℕ) ∈ N := by
     intro i i' h
     have h1 := hf i
     have h2 := hf i'
@@ -73,17 +78,18 @@ theorem exists_natCast_mul_mem_of_mem_nhds {W : Set (FiniteAdeleRing (𝓞 K) K)
     rw [Nat.cast_sub hlt.le]
     exact key j j' hjj a ha
 
-theorem continuous_unipMatrix' {r : ℕ} {R : Type*} [CommRing R] [TopologicalSpace R]
-    [IsTopologicalRing R] :
-    Continuous (unipMatrix : (UPos n r → R) → Matrix (Fin n) (Fin n) R) := by
+theorem continuous_unipMatrix'
+    {r : ℕ} {R : Type*} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
+    : Continuous (unipMatrix : (UPos n r → R) → Matrix (Fin n) (Fin n) R) := by
   refine continuous_const.add (continuous_pi fun i => continuous_pi fun j => ?_)
   simp only [blockEntry_apply]
   split_ifs
   · exact continuous_apply _
   · exact continuous_const
 
-theorem continuous_unipGL' {r : ℕ} {R : Type*} [CommRing R] [TopologicalSpace R]
-    [IsTopologicalRing R] : Continuous (unipGL : (UPos n r → R) → GL (Fin n) R) :=
+theorem continuous_unipGL'
+    {r : ℕ} {R : Type*} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
+    : Continuous (unipGL : (UPos n r → R) → GL (Fin n) R) :=
   Units.continuous_iff.2 ⟨continuous_unipMatrix', continuous_unipMatrix'.comp continuous_neg⟩
 
 theorem adele_add_fst (p q : 𝔸[K]) : (p + q).1 = p.1 + q.1 := rfl
@@ -98,8 +104,8 @@ theorem adele_zero_fst : (0 : 𝔸[K]).1 = 0 := rfl
 
 theorem adele_zero_snd : (0 : 𝔸[K]).2 = 0 := rfl
 
-theorem prodEquiv_unipGL_fst {r : ℕ} (z : UPos n r → 𝔸[K]) (hz : ∀ p, (z p).1 = 0) :
-    (AdelicGLn.prodEquiv K n (unipGL z)).1 = 1 := by
+theorem prodEquiv_unipGL_fst {r : ℕ} (z : UPos n r → 𝔸[K]) (hz : ∀ p, (z p).1 = 0)
+    : (AdelicGLn.prodEquiv K n (unipGL z)).1 = 1 := by
   refine Units.ext (Matrix.ext fun a b => ?_)
   rw [AdelicGLn.prodEquiv_apply_fst, coe_unipGL, Units.val_one]
   simp only [unipMatrix, Matrix.add_apply, blockEntry_apply, Matrix.one_apply]
@@ -110,8 +116,8 @@ theorem prodEquiv_unipGL_fst {r : ℕ} (z : UPos n r → 𝔸[K]) (hz : ∀ p, (
   · rw [hz, adele_zero_fst, add_zero]
   · rw [adele_zero_fst, add_zero]
 
-theorem prodEquiv_unipGL_snd {r : ℕ} (z : UPos n r → 𝔸[K]) :
-    (AdelicGLn.prodEquiv K n (unipGL z)).2 = unipGL fun p => (z p).2 := by
+theorem prodEquiv_unipGL_snd {r : ℕ} (z : UPos n r → 𝔸[K])
+    : (AdelicGLn.prodEquiv K n (unipGL z)).2 = unipGL fun p => (z p).2 := by
   refine Units.ext (Matrix.ext fun a b => ?_)
   rw [AdelicGLn.prodEquiv_apply_snd, coe_unipGL, coe_unipGL]
   simp only [unipMatrix, Matrix.add_apply, blockEntry_apply, Matrix.one_apply]
@@ -122,18 +128,24 @@ theorem prodEquiv_unipGL_snd {r : ℕ} (z : UPos n r → 𝔸[K]) :
   · rw [adele_zero_snd]
   · rw [adele_zero_snd]
 
-theorem exists_natCast_conj_unipGL_mem (U : Subgroup (AdelicGLn.integralFiniteGL K n))
-    (hU : IsOpen (U : Set (AdelicGLn.integralFiniteGL K n))) {ω : Set (AdelicGLn.AdelicGL K n)}
-    (hω : IsCompact ω) (r : ℕ) :
-    ∃ M : ℕ, 0 < M ∧ ∀ b ∈ ω, ∀ (ρ : Fin n → ℝ) (hρ : ∀ i, 0 < ρ i),
-      ∀ k ∈ (maxCompact (K := K) (n := n)), ∀ z : UPos n r → 𝔸[K], (∀ p, (z p).1 = 0) →
-        (∀ p, ∃ a ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 K) K,
-          (z p).2 = (M : FiniteAdeleRing (𝓞 K) K) * a) →
-        ∃ u : U, ((b * diagUnits n (fun i => posIdele (ρ i) (hρ i)) * k)⁻¹ :
-            AdelicGLn.AdelicGL K n) * unipGL z * (b * diagUnits n (fun i => posIdele (ρ i) (hρ i)) * k) =
-          finEmb K n ((u : AdelicGLn.integralFiniteGL K n) : AdelicGLn.FiniteAdelicGL K n) := by
+theorem exists_natCast_conj_unipGL_mem
+    (U : Subgroup (AdelicGLn.integralFiniteGL K n))
+    (hU : IsOpen (U : Set (AdelicGLn.integralFiniteGL K n)))
+    {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω)
+    (r : ℕ)
+    : ∃ M : ℕ,
+      0 < M
+        ∧ ∀ b ∈ ω, ∀ (ρ : Fin n → ℝ) (hρ : ∀ i, 0 < ρ i), ∀ k ∈ (maxCompact (K := K) (n := n)),
+          ∀ z : UPos n r → 𝔸[K],
+            (∀ p, (z p).1 = 0)
+              → (∀ p, ∃ a ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 K) K,
+                (z p).2 = (M : FiniteAdeleRing (𝓞 K) K) * a)
+              → ∃ u : U,
+                ((b * diagUnits n (fun i => posIdele (ρ i) (hρ i)) * k)⁻¹ : AdelicGLn.AdelicGL K n)
+                    * unipGL z * (b * diagUnits n (fun i => posIdele (ρ i) (hρ i)) * k)
+                  = finEmb K n
+                    ((u : AdelicGLn.integralFiniteGL K n) : AdelicGLn.FiniteAdelicGL K n) := by
   classical
-
   set U' : Set (AdelicGLn.FiniteAdelicGL K n) :=
     Subtype.val '' (U : Set (AdelicGLn.integralFiniteGL K n))
   have hU' : IsOpen U' := (AdelicGLn.isOpen_integralFiniteGL K n).isOpenMap_subtype_val _ hU
@@ -142,22 +154,28 @@ theorem exists_natCast_conj_unipGL_mem (U : Subgroup (AdelicGLn.integralFiniteGL
   set Cf : Set (AdelicGLn.FiniteAdelicGL K n) :=
     (fun p : AdelicGLn.AdelicGL K n × AdelicGLn.AdelicGL K n => (AdelicGLn.prodEquiv K n (p.1 * p.2)).2) ''
       (ω ×ˢ (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n)))
-  have hCf : IsCompact Cf := (hω.prod isCompact_maxCompact).image
-    (continuous_snd.comp ((AdelicGLn.prodEquiv K n).continuous.comp (continuous_fst.mul continuous_snd)))
+  have hCf : IsCompact Cf :=
+    (hω.prod isCompact_maxCompact).image
+      (continuous_snd.comp ((AdelicGLn.prodEquiv K n).continuous.comp
+        (continuous_fst.mul continuous_snd)))
 
-  have hcont : Continuous fun q : (UPos n r → FiniteAdeleRing (𝓞 K) K) × AdelicGLn.FiniteAdelicGL K n =>
-      q.2⁻¹ * unipGL q.1 * q.2 :=
+  have hcont
+      : Continuous fun q : (UPos n r → FiniteAdeleRing (𝓞 K) K) × AdelicGLn.FiniteAdelicGL K n =>
+        q.2⁻¹ * unipGL q.1 * q.2 :=
     (continuous_snd.inv.mul (continuous_unipGL'.comp continuous_fst)).mul continuous_snd
-  have hev : ∀ᶠ w in 𝓝 (0 : UPos n r → FiniteAdeleRing (𝓞 K) K), ∀ c ∈ Cf,
-      c⁻¹ * unipGL w * c ∈ U' := by
+  have hev
+      : ∀ᶠ w in 𝓝 (0 : UPos n r → FiniteAdeleRing (𝓞 K) K), ∀ c ∈ Cf,
+        c⁻¹ * unipGL w * c ∈ U' := by
     refine hCf.eventually_forall_of_forall_eventually fun c _ => ?_
     refine (hcont.tendsto ((0 : UPos n r → FiniteAdeleRing (𝓞 K) K), c)).eventually
       (hU'.mem_nhds ?_)
     simp only [unipGL_zero, mul_one, inv_mul_cancel]
     exact h1U'
   rw [nhds_pi] at hev
-  have hev' : {w : UPos n r → FiniteAdeleRing (𝓞 K) K | ∀ c ∈ Cf, c⁻¹ * unipGL w * c ∈ U'} ∈
-      Filter.pi fun _ => 𝓝 (0 : FiniteAdeleRing (𝓞 K) K) := hev
+  have hev'
+      : {w : UPos n r → FiniteAdeleRing (𝓞 K) K | ∀ c ∈ Cf, c⁻¹ * unipGL w * c ∈ U'}
+        ∈ Filter.pi fun _ => 𝓝 (0 : FiniteAdeleRing (𝓞 K) K) :=
+    hev
   rw [Filter.mem_pi] at hev'
   obtain ⟨I, -, tt, htt, hIt⟩ := hev'
   obtain ⟨M, hM, hMW⟩ := exists_natCast_mul_mem_of_mem_nhds K (Filter.iInter_mem.2 htt)

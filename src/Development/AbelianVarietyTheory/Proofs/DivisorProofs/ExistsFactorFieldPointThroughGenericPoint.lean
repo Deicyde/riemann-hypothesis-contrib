@@ -11,13 +11,19 @@ open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem Modif.factor_gp (R : Type) [CommRing R] [IsDomain R] (M : Modif R) (L : Type) [Field L] (ρ : R →+* L)
-    (y : Sp L ⟶ M.S) (hρ : Function.Injective ρ) (hy : y ≫ M.π = spMap ρ) :
-    ∃ ga : FractionRing R →+* L, (∀ r, ga (algebraMap R _ r) = ρ r) ∧ y = spMap ga ≫ M.gp := by
+theorem Modif.factor_gp
+    (R : Type) [CommRing R] [IsDomain R]
+    (M : Modif R)
+    (L : Type) [Field L]
+    (ρ : R →+* L) (y : Sp L ⟶ M.S) (hρ : Function.Injective ρ) (hy : y ≫ M.π = spMap ρ)
+    : ∃ ga : FractionRing R →+* L, (∀ r, ga (algebraMap R _ r) = ρ r) ∧ y = spMap ga ≫ M.gp := by
   have hI := M.integral
   have hdom := M.dominant
   have hsub : ∀ (K : Type) [Field K] (a b : Sp K), a = b := fun K _ a b =>
-    PrimeSpectrum.ext (by haveI := a.isPrime; haveI := b.isPrime; rw [Ideal.eq_bot_of_prime a.asIdeal, Ideal.eq_bot_of_prime b.asIdeal])
+    PrimeSpectrum.ext (by
+      haveI := a.isPrime
+      haveI := b.isPrime
+      rw [Ideal.eq_bot_of_prime a.asIdeal, Ideal.eq_bot_of_prime b.asIdeal])
   let p : Sp L := IsLocalRing.closedPoint L
   obtain ⟨V, hV, hxV, -⟩ := exists_isAffineOpen_mem_and_subset (x := y p) (U := ⊤) trivial
   have hyV : Set.range y ⊆ Set.range hV.fromSpec := by
@@ -58,8 +64,8 @@ theorem Modif.factor_gp (R : Type) [CommRing R] [IsDomain R] (M : Modif R) (L : 
     have hs0 : ρ s ≠ 0 := (map_ne_zero_iff ρ hρ).2 (nonZeroDivisors.ne_zero s.2)
     have hcs : bg.hom (c.hom s) = algebraMap R (FractionRing R) s := RingHom.congr_fun hcg s
     have hcr : bg.hom (c.hom r) = algebraMap R (FractionRing R) r := RingHom.congr_fun hcg r
-    have h1 : c.hom s * b = c.hom r := hinj (by
-      rw [map_mul, hcs, hcr, ← hrs]; exact IsLocalization.mk'_spec' (FractionRing R) r s)
+    have h1 : c.hom s * b = c.hom r :=
+      hinj (by rw [map_mul, hcs, hcr, ← hrs]; exact IsLocalization.mk'_spec' (FractionRing R) r s)
     have h2 := congrArg by'.hom h1
     have hys : by'.hom (c.hom s) = ρ s := RingHom.congr_fun hcy s
     have hyr : by'.hom (c.hom r) = ρ r := RingHom.congr_fun hcy r

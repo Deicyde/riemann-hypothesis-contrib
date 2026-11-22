@@ -14,10 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.I
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 set_option autoImplicit false
 
@@ -25,8 +27,9 @@ noncomputable section
 
 namespace GlobalTheory.CutOutSections
 
-theorem sec_eq_zero_of_nonzeroLocus_eq_bot {Y : Scheme.{0}} [IsReduced Y] {M : LB Y} (s : M.Sec)
-    (h : nonzeroLocus s = ⊥) : s = 0 := by
+theorem sec_eq_zero_of_nonzeroLocus_eq_bot
+    {Y : Scheme.{0}} [IsReduced Y] {M : LB Y} (s : M.Sec) (h : nonzeroLocus s = ⊥)
+    : s = 0 := by
   apply DVR.SecOps.sec_ext
   intro k
   have hk : Y.basicOpen (s.f k) = ⊥ := le_bot_iff.1 ((basicOpen_le_nonzeroLocus s k).trans h.le)
@@ -34,14 +37,15 @@ theorem sec_eq_zero_of_nonzeroLocus_eq_bot {Y : Scheme.{0}} [IsReduced Y] {M : L
   rw [hk]
   rfl
 
-theorem eventually_isGenerated_lbPow {X : Scheme.{0}} {N : LB X} (hN : IsAmpleLB N) :
-    ∀ᶠ k in atTop, IsGenerated (lbPow N k) := by
+theorem eventually_isGenerated_lbPow {X : Scheme.{0}} {N : LB X} (hN : IsAmpleLB N)
+    : ∀ᶠ k in atTop, IsGenerated (lbPow N k) := by
   refine (hN.eventually_isGenerated_tens_lbPow (LB.isLB_triv X)).mono fun k hk => ?_
   obtain ⟨c, u, hu⟩ := hk
   have hP := isLB_lbPow hN.isLB k
   have hT := isLB_tens (LB.isLB_triv X) hP
-  obtain ⟨v, hv⟩ := CechPic.exists_generating_secs_of_cls_eq X _ _ hT hP
-    (by simp only [CechPic.cls_tens (LB.isLB_triv X) hP, cls_triv, zero_add]) (Fin c) u hu
+  obtain ⟨v, hv⟩ :=
+    CechPic.exists_generating_secs_of_cls_eq X _ _ hT hP
+      (by simp only [CechPic.cls_tens (LB.isLB_triv X) hP, cls_triv, zero_add]) (Fin c) u hu
   exact ⟨c, v, hv⟩
 
 theorem eventually_exists_secs_cutting_out : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ), IsProjOver p → ∀ (N : LB X) (Z : Closeds X), IsAmpleLB N → ∀ᶠ l in atTop, ∃ (r : ℕ) (κ : Fin r → (lbPow N l).Sec), (∀ i, GlobalTheory.secPull (κ i) (redι Z) = 0) ∧ (∀ i, ∀ y ∈ Z, y ∉ nonzeroLocus (κ i)) ∧ ∀ y, y ∉ Z → ∃ i, y ∈ nonzeroLocus (κ i) := by

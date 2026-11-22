@@ -18,8 +18,8 @@ section ExtIso
 
 variable {𝒜 : Type*} [Category 𝒜] [Abelian 𝒜] [HasExt.{w'} 𝒜]
 
-noncomputable def extAddEquivOfIsoLeft {X X' : 𝒜} (e : X ≅ X') (Y : 𝒜) (n : ℕ) :
-    Ext X Y n ≃+ Ext X' Y n where
+noncomputable def extAddEquivOfIsoLeft {X X' : 𝒜} (e : X ≅ X') (Y : 𝒜) (n : ℕ)
+    : Ext X Y n ≃+ Ext X' Y n where
   toFun x := (Ext.mk₀ e.inv).comp x (zero_add n)
   invFun x := (Ext.mk₀ e.hom).comp x (zero_add n)
   left_inv x := by simp
@@ -38,8 +38,8 @@ end Terminal
 
 section Zero
 
-noncomputable def freeYonedaHomAddEquiv (U : C) (P : Cᵒᵖ ⥤ AddCommGrpCat.{v}) :
-    (yoneda.obj U ⋙ AddCommGrpCat.free.{v} ⟶ P) ≃+ P.obj (op U) where
+noncomputable def freeYonedaHomAddEquiv (U : C) (P : Cᵒᵖ ⥤ AddCommGrpCat.{v})
+    : (yoneda.obj U ⋙ AddCommGrpCat.free.{v} ⟶ P) ≃+ P.obj (op U) where
   toEquiv := ((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv (yoneda.obj U) P).trans yonedaEquiv
   map_add' _ _ := rfl
 
@@ -49,12 +49,13 @@ lemma freeYonedaHomAddEquiv_apply (U : C) (P : Cᵒᵖ ⥤ AddCommGrpCat.{v})
 
 variable [HasSheafify J AddCommGrpCat.{v}]
 
-noncomputable abbrev freeSheaf (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}]
-    (U : C) : Sheaf J AddCommGrpCat.{v} :=
+noncomputable abbrev freeSheaf
+    (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}] (U : C)
+    : Sheaf J AddCommGrpCat.{v} :=
   (presheafToSheaf J AddCommGrpCat.{v}).obj (yoneda.obj U ⋙ AddCommGrpCat.free)
 
-noncomputable def freeSheafHomAddEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v}) :
-    (freeSheaf J U ⟶ F) ≃+ F.obj.obj (op U) :=
+noncomputable def freeSheafHomAddEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
+    : (freeSheaf J U ⟶ F) ≃+ F.obj.obj (op U) :=
   ((sheafificationAdjunction J AddCommGrpCat.{v}).homAddEquiv _ F).trans
     (freeYonedaHomAddEquiv U F.obj)
 
@@ -67,8 +68,8 @@ lemma freeSheafHomAddEquiv_naturality (U : C) {F G : Sheaf J AddCommGrpCat.{v}}
 
 variable [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
 
-noncomputable def H'.equiv₀ (F : Sheaf J AddCommGrpCat.{v}) (U : C) :
-    F.H' 0 U ≃+ F.obj.obj (op U) :=
+noncomputable def H'.equiv₀ (F : Sheaf J AddCommGrpCat.{v}) (U : C)
+    : F.H' 0 U ≃+ F.obj.obj (op U) :=
   (Ext.addEquiv₀ (X := freeSheaf J U) (Y := F)).trans (freeSheafHomAddEquiv U F)
 
 lemma cohomologyPresheafFunctor_map_app_apply {F G : Sheaf J AddCommGrpCat.{v}} (φ : F ⟶ G)
@@ -101,8 +102,8 @@ lemma H.eq_zero_of_injective (F : Sheaf J AddCommGrpCat.{v}) [Injective F] {n : 
     (x : Sheaf.H F (n + 1)) : x = 0 :=
   Ext.eq_zero_of_injective x
 
-instance H'.subsingleton_of_injective (F : Sheaf J AddCommGrpCat.{v}) [Injective F] (n : ℕ)
-    (U : C) : Subsingleton (F.H' (n + 1) U) :=
+instance H'.subsingleton_of_injective (F : Sheaf J AddCommGrpCat.{v}) [Injective F] (n : ℕ) (U : C)
+    : Subsingleton (F.H' (n + 1) U) :=
   subsingleton_of_forall_eq 0 fun x =>
     Ext.eq_zero_of_injective (show Ext (freeSheaf J U) F (n + 1) from x)
 
@@ -110,7 +111,8 @@ end Injective
 
 section LongExact
 
-variable [HasSheafify J AddCommGrpCat.{v}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
+variable
+  [HasSheafify J AddCommGrpCat.{v}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
   {S : ShortComplex (Sheaf J AddCommGrpCat.{v})} (hS : S.ShortExact)
 
 noncomputable def H.δ (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁) : Sheaf.H S.X₃ n₀ →+ Sheaf.H S.X₁ n₁ :=
@@ -119,18 +121,17 @@ noncomputable def H.δ (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁) : Sheaf.H S.X₃ 
 lemma H.δ_apply (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁) (x : Sheaf.H S.X₃ n₀) :
     H.δ hS n₀ n₁ h x = x.comp hS.extClass h := rfl
 
-
 include hS in
-theorem H.exact₂ {n : ℕ} (y : Sheaf.H S.X₂ n) (hy : Sheaf.H.map S.g n y = 0) :
-    ∃ x : Sheaf.H S.X₁ n, Sheaf.H.map S.f n x = y :=
+theorem H.exact₂ {n : ℕ} (y : Sheaf.H S.X₂ n) (hy : Sheaf.H.map S.g n y = 0)
+    : ∃ x : Sheaf.H S.X₁ n, Sheaf.H.map S.f n x = y :=
   Ext.covariant_sequence_exact₂ _ hS y hy
 
-theorem H.exact₃ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (y : Sheaf.H S.X₃ n₀)
-    (hy : H.δ hS n₀ n₁ h y = 0) : ∃ x : Sheaf.H S.X₂ n₀, Sheaf.H.map S.g n₀ x = y :=
+theorem H.exact₃ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (y : Sheaf.H S.X₃ n₀) (hy : H.δ hS n₀ n₁ h y = 0)
+    : ∃ x : Sheaf.H S.X₂ n₀, Sheaf.H.map S.g n₀ x = y :=
   Ext.covariant_sequence_exact₃ _ hS y h hy
 
-theorem H.exact₁ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (x : Sheaf.H S.X₁ n₁)
-    (hx : Sheaf.H.map S.f n₁ x = 0) : ∃ y : Sheaf.H S.X₃ n₀, H.δ hS n₀ n₁ h y = x :=
+theorem H.exact₁ {n₀ n₁ : ℕ} (h : n₀ + 1 = n₁) (x : Sheaf.H S.X₁ n₁) (hx : Sheaf.H.map S.f n₁ x = 0)
+    : ∃ y : Sheaf.H S.X₃ n₀, H.δ hS n₀ n₁ h y = x :=
   Ext.covariant_sequence_exact₁ _ hS x hx h
 
 lemma H.map_g_map_f {n : ℕ} (x : Sheaf.H S.X₁ n) :

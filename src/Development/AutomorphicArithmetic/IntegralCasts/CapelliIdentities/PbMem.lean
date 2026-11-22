@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.Qi43
 
-theorem pb_mem {B C : Type} [Group B] [Group C] (J : B →* C) (UQ : Subgroup C)
-    (hc : ∀ u ∈ UQ, ∀ g : B, Commute u (J g)) (K : Subgroup B) (x : C) :
-    x ∈ UQ ⊔ Subgroup.map J K ↔ ∃ u ∈ UQ, ∃ k ∈ K, x = u * J k := by
+theorem pb_mem
+    {B C : Type} [Group B] [Group C]
+    (J : B →* C) (UQ : Subgroup C) (hc : ∀ u ∈ UQ, ∀ g : B, Commute u (J g))
+    (K : Subgroup B) (x : C)
+    : x ∈ UQ ⊔ Subgroup.map J K ↔ ∃ u ∈ UQ, ∃ k ∈ K, x = u * J k := by
   constructor
   · intro hx
     rw [Subgroup.sup_eq_closure] at hx
@@ -18,7 +20,8 @@ theorem pb_mem {B C : Type} [Group B] [Group C] (J : B →* C) (UQ : Subgroup C)
       · exact ⟨y, hy, 1, K.one_mem, by simp⟩
       · obtain ⟨k, hk, rfl⟩ := Subgroup.mem_map.mp hy
         exact ⟨1, UQ.one_mem, k, hk, by simp⟩
-    | one => exact ⟨1, UQ.one_mem, 1, K.one_mem, by simp⟩
+    | one =>
+      exact ⟨1, UQ.one_mem, 1, K.one_mem, by simp⟩
     | mul y z _ _ hy hz =>
       obtain ⟨u, hu, k, hk, rfl⟩ := hy
       obtain ⟨v, hv, l, hl, rfl⟩ := hz

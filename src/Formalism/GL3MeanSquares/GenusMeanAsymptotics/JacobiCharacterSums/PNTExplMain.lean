@@ -33,10 +33,13 @@ theorem smoothed_explicit_formula : ExplicitS := by
   refine ⟨C, by linarith, ?_⟩
   intro M _ χ T hM hT
   have hM' : (3 : ℝ) ≤ M := by exact_mod_cast hM
-  obtain ⟨σ₁, T', δ, hσ, hσ', hTT', hT'T, hδ0, hδ', hδlow, hgapre, hgapim⟩ := hch κ hκ hκ' M χ T hM hT
+  obtain ⟨σ₁, T', δ, hσ, hσ', hTT', hT'T, hδ0, hδ', hδlow, hgapre, hgapim⟩ :=
+    hch κ hκ hκ' M χ T hM hT
   obtain ⟨Z₀, hZ₀, hwin, _⟩ := hbox M χ (T + 1) hM (by linarith)
-  have hZ : ∀ ρ : ℂ, ρ ∈ Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T') ↔
-      (exLF χ ρ = 0 ∧ σ₁ < ρ.re ∧ |ρ.im| < T') := by
+  have hZ
+      : ∀ ρ : ℂ,
+        ρ ∈ Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')
+          ↔ (exLF χ ρ = 0 ∧ σ₁ < ρ.re ∧ |ρ.im| < T') := by
     intro ρ
     rw [Finset.mem_filter, hZ₀]
     constructor
@@ -44,7 +47,17 @@ theorem smoothed_explicit_formula : ExplicitS := by
       exact ⟨h0, h1, h2⟩
     · rintro ⟨h0, h1, h2⟩
       exact ⟨⟨h0, by linarith, by linarith⟩, h1, h2⟩
-  refine ⟨Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T'), exOrd χ, explicitFormulaConstant χ, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T'),
+    exOrd χ,
+    explicitFormulaConstant χ,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro ρ hρ
     obtain ⟨h0, h1, h2⟩ := (hZ ρ).1 hρ
     exact ⟨(isLZero_iff_exLF χ ρ).2 h0, by linarith, by linarith⟩
@@ -61,23 +74,30 @@ theorem smoothed_explicit_formula : ExplicitS := by
     have h0 := ((hZ ρ).1 hρ).1
     exact exOrd_eq_one χ h0 (exLF_deriv_ne_zero χ h0 hd)
   · intro t
-    have hsub : (Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')).filter (fun ρ => |ρ.im - t| ≤ 1) ⊆
-        Z₀.filter (fun ρ => |ρ.im - t| ≤ 1) :=
+    have hsub
+        : (Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')).filter (fun ρ => |ρ.im - t| ≤ 1)
+          ⊆ Z₀.filter (fun ρ => |ρ.im - t| ≤ 1) :=
       Finset.filter_subset_filter _ (Finset.filter_subset _ _)
-    have h1 : (∑ ρ ∈ (Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')).filter (fun ρ => |ρ.im - t| ≤ 1),
-        exOrd χ ρ) ≤ ∑ ρ ∈ Z₀.filter (fun ρ => |ρ.im - t| ≤ 1), exOrd χ ρ :=
+    have h1
+        : (∑ ρ ∈ (Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')).filter (fun ρ => |ρ.im - t| ≤ 1),
+            exOrd χ ρ)
+          ≤ ∑ ρ ∈ Z₀.filter (fun ρ => |ρ.im - t| ≤ 1), exOrd χ ρ :=
       Finset.sum_le_sum_of_subset hsub
     have h2 : (0 : ℝ) ≤ Real.log ((M : ℝ) * (|t| + 2)) := by
       apply Real.log_nonneg
       have := abs_nonneg t
       nlinarith
-    calc ((∑ ρ ∈ (Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')).filter (fun ρ => |ρ.im - t| ≤ 1),
-        exOrd χ ρ : ℕ) : ℝ) ≤ ((∑ ρ ∈ Z₀.filter (fun ρ => |ρ.im - t| ≤ 1), exOrd χ ρ : ℕ) : ℝ) := by
-          exact_mod_cast h1
+    calc
+      ((∑ ρ ∈ (Z₀.filter (fun ρ => σ₁ < ρ.re ∧ |ρ.im| < T')).filter (fun ρ => |ρ.im - t| ≤ 1),
+              exOrd χ ρ
+            : ℕ)
+          : ℝ)
+        ≤ ((∑ ρ ∈ Z₀.filter (fun ρ => |ρ.im - t| ≤ 1), exOrd χ ρ : ℕ) : ℝ) := by exact_mod_cast h1
       _ ≤ C₄ * Real.log ((M : ℝ) * (|t| + 2)) := hwin t
       _ ≤ C * Real.log ((M : ℝ) * (|t| + 2)) := by gcongr
   · intro y hy
-    have hmain := hcore κ hκ hκ' M χ T σ₁ T' δ hM hT hσ hσ' hTT' hT'T hδ0 hδ' hgapre hgapim _ hZ y hy
+    have hmain :=
+      hcore κ hκ hκ' M χ T σ₁ T' δ hM hT hσ hσ' hTT' hT'T hδ0 hδ' hgapre hgapim _ hZ y hy
     refine hmain.trans ?_
     have hl1 := exm_log_ge_one (M : ℝ) T hM' hT
     have hNle := exm_N_le κ C₁ C₂ (M : ℝ) T δ hκ hC₁ hC₂ hM' hT hδ0 hδlow
@@ -90,13 +110,16 @@ theorem smoothed_explicit_formula : ExplicitS := by
     have hy0 : 0 < y := by linarith
     have hly := exm_log_y y hy
     have hX : 1 ≤ (M : ℝ) * T := by nlinarith
-    have hfin := sum_le_mul_rpow_add AL AW C ((M : ℝ) * T) (y ^ (-(κ / 2)))
-      (Real.log y * Real.log ((M : ℝ) * T) ^ 2 / T) hC4 hCL hCW hX (Real.rpow_nonneg hy0.le _)
-      (by have : 0 < T := by linarith
+    have hfin :=
+      sum_le_mul_rpow_add AL AW C ((M : ℝ) * T) (y ^ (-(κ / 2)))
+        (Real.log y * Real.log ((M : ℝ) * T) ^ 2 / T) hC4 hCL hCW hX (Real.rpow_nonneg hy0.le _)
+        (by
+          have : 0 < T := by linarith
           positivity)
     refine le_trans ?_ hfin
     have hsum := add_le_add (add_le_add ht hl) (add_le_add hh hh)
-    calc _ = _ := by ring
+    calc
+      _ = _ := by ring
       _ ≤ _ := hsum
       _ = _ := by rw [hAW, hAL]; ring
 

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SpehSha
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
 
 namespace PositivityTheory.Rg.BcB.F.Rig.B
 

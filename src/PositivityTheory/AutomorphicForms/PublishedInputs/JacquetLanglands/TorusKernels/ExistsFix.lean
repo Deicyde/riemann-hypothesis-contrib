@@ -12,9 +12,11 @@ open scoped ENNReal NNReal ComplexConjugate
 namespace UpperTheory.Esk.RadialIntegralLemmas
 open UpperTheory.Esk
 
-theorem kap_rot (m : GL (Fin 2) ℝ) (a b : ℝ) (h00 : m 0 0 = a) (h01 : m 0 1 = b)
-    (h10 : m 1 0 = -b) (h11 : m 1 1 = a) (hb : b ≠ 0) (z : P) (hz : 0 < z.1.im) :
-    kap z (m • z) ≤ (a ^ 2 + b ^ 2) / b ^ 2 * kap iP z := by
+theorem kap_rot
+    (m : GL (Fin 2) ℝ) (a b : ℝ)
+    (h00 : m 0 0 = a) (h01 : m 0 1 = b) (h10 : m 1 0 = -b) (h11 : m 1 1 = a) (hb : b ≠ 0)
+    (z : P) (hz : 0 < z.1.im)
+    : kap z (m • z) ≤ (a ^ 2 + b ^ 2) / b ^ 2 * kap iP z := by
   set x := z.1.re with hx
   set y := z.1.im with hy
   have hden : den m z.1 ≠ 0 := den_ne m z.2
@@ -25,22 +27,28 @@ theorem kap_rot (m : GL (Fin 2) ℝ) (a b : ℝ) (h00 : m 0 0 = a) (h01 : m 0 1 
   have hwim : (m • z).1.im = (a ^ 2 + b ^ 2) * y / Complex.normSq (den m z.1) := by
     rw [coe_smul, im_div, hdet]
   have hwpos : 0 < (m • z).1.im := by rw [hwim]; positivity
-  have hconj : z.1 - conj (m • z).1 = (z.1 * conj (den m z.1) - conj (num m z.1)) / conj (den m z.1) := by
+  have hconj
+      : z.1 - conj (m • z).1 = (z.1 * conj (den m z.1) - conj (num m z.1)) / conj (den m z.1) := by
     have : conj (den m z.1) ≠ 0 := (map_ne_zero _).2 hden
     rw [coe_smul, map_div₀]
     field_simp
-  have hE : Complex.normSq (z.1 * conj (den m z.1) - conj (num m z.1)) =
-      b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2 := by
+  have hE
+      : Complex.normSq (z.1 * conj (den m z.1) - conj (num m z.1))
+        = b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2 := by
     rw [Complex.normSq_apply]
     simp [num, den, h00, h01, h10, h11, ← hx, ← hy]
     ring
-  have hN : ‖z.1 - conj (m • z).1‖ ^ 2 = (b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2) / Complex.normSq (den m z.1) := by
+  have hN
+      : ‖z.1 - conj (m • z).1‖ ^ 2
+        = (b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2) / Complex.normSq (den m z.1) := by
     rw [hconj, Complex.sq_norm, Complex.normSq_div, Complex.normSq_conj, hE]
   have hI : ‖iP.1 - conj z.1‖ ^ 2 = x ^ 2 + (1 + y) ^ 2 := by
     rw [Complex.sq_norm, Complex.normSq_apply]
     simp [iP, ← hx, ← hy]
     ring
-  have hk1 : kap z (m • z) = 4 * (a ^ 2 + b ^ 2) * y ^ 2 / (b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2) := by
+  have hk1
+      : kap z (m • z)
+        = 4 * (a ^ 2 + b ^ 2) * y ^ 2 / (b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2) := by
     rw [kap, if_pos (mul_pos hz hwpos), hN, hwim]
     simp only [← hy]
     field_simp
@@ -52,7 +60,9 @@ theorem kap_rot (m : GL (Fin 2) ℝ) (a b : ℝ) (h00 : m 0 0 = a) (h01 : m 0 1 
   have hR : 0 < x ^ 2 + (1 + y) ^ 2 := by positivity
   rw [div_mul_div_comm, div_le_div_iff₀ hQ (mul_pos hb2 hR)]
   have h1 : 2 * y ≤ x ^ 2 + y ^ 2 + 1 := by nlinarith [sq_nonneg x, sq_nonneg (y - 1)]
-  have key : b ^ 2 * (y * (x ^ 2 + y ^ 2 + 1) + 2 * y ^ 2) ≤ b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2 := by
+  have key
+      : b ^ 2 * (y * (x ^ 2 + y ^ 2 + 1) + 2 * y ^ 2)
+        ≤ b ^ 2 * (x ^ 2 + y ^ 2 + 1) ^ 2 + 4 * a ^ 2 * y ^ 2 := by
     have : y * (x ^ 2 + y ^ 2 + 1) + 2 * y ^ 2 ≤ (x ^ 2 + y ^ 2 + 1) ^ 2 := by nlinarith
     nlinarith [mul_le_mul_of_nonneg_left this hb2.le, sq_nonneg a, sq_nonneg y]
   have e : x ^ 2 + (1 + y) ^ 2 = (x ^ 2 + y ^ 2 + 1) + 2 * y := by ring
@@ -60,7 +70,8 @@ theorem kap_rot (m : GL (Fin 2) ℝ) (a b : ℝ) (h00 : m 0 0 = a) (h01 : m 0 1 
   have hs' : 0 ≤ 4 * (a ^ 2 + b ^ 2) * y := by positivity
   nlinarith [mul_le_mul_of_nonneg_left key hs']
 
-theorem exists_fix (g : GL (Fin 2) ℝ) (hg : g.val.trace ^ 2 < 4 * g.val.det) : ∃ z : P, g • z = z := by
+theorem exists_fix (g : GL (Fin 2) ℝ) (hg : g.val.trace ^ 2 < 4 * g.val.det)
+    : ∃ z : P, g • z = z := by
   have htr : g.val.trace = g 0 0 + g 1 1 := Matrix.trace_fin_two _
   rw [htr, det_eq] at hg
   set p := g 0 0 with hp
@@ -75,8 +86,7 @@ theorem exists_fix (g : GL (Fin 2) ℝ) (hg : g.val.trace ^ 2 < 4 * g.val.det) :
     nlinarith [sq_nonneg (p - t)]
   set sD := Real.sqrt D with hsD
   have hsD0 : 0 < sD := Real.sqrt_pos.2 hD0
-  have hsD2 : (sD : ℂ) ^ 2 = (D : ℂ) := by
-    rw [← Complex.ofReal_pow, hsD, Real.sq_sqrt hD0.le]
+  have hsD2 : (sD : ℂ) ^ 2 = (D : ℂ) := by rw [← Complex.ofReal_pow, hsD, Real.sq_sqrt hD0.le]
   set z0 : ℂ := (((p - t : ℝ) : ℂ) + Complex.I * sD) / (2 * (r : ℂ)) with hz0
   have hrc : (r : ℂ) ≠ 0 := Complex.ofReal_ne_zero.2 hr0
   have him : z0.im ≠ 0 := by
@@ -87,8 +97,7 @@ theorem exists_fix (g : GL (Fin 2) ℝ) (hg : g.val.trace ^ 2 < 4 * g.val.det) :
       Complex.I_im, mul_zero, mul_one, zero_add]
     rw [add_zero]
     exact div_ne_zero hsD0.ne' (mul_ne_zero two_ne_zero hr0)
-  have hz : (2 * (r : ℂ)) * z0 = ((p - t : ℝ) : ℂ) + Complex.I * sD := by
-    rw [hz0]; field_simp
+  have hz : (2 * (r : ℂ)) * z0 = ((p - t : ℝ) : ℂ) + Complex.I * sD := by rw [hz0]; field_simp
   have hquad : (r : ℂ) * z0 ^ 2 + ((t : ℂ) - p) * z0 - q = 0 := by
     have h4 : (4 * (r : ℂ)) ≠ 0 := mul_ne_zero (by norm_num) hrc
     apply mul_left_cancel₀ h4

@@ -6,18 +6,19 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.IsScaleStable
 @[expose] public section
 
 set_option maxSynthPendingDepth 1
-open GroundTheory.Heights₂.Heights MeasureTheory MvPolynomial Matrix GlobalTheory.CompanionTheory.Ar.Short.Crofton
+open GroundTheory.Heights₂.Heights MeasureTheory MvPolynomial Matrix
+  GlobalTheory.CompanionTheory.Ar.Short.Crofton
 open scoped ENNReal
 
 namespace GlobalTheory.CompanionTheory.Ar.Short.Crofton.LayerCake
 
-noncomputable def lay (x : ℝ≥0∞) : ℝ≥0∞ :=
-  ∑' l : ℕ, if ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0
+noncomputable def lay (x : ℝ≥0∞) : ℝ≥0∞ := ∑' l : ℕ, if ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0
 
 theorem lay_le (x : ℝ≥0∞) : lay x ≤ x := by
-  have key : ∀ N : ℕ,
-      ∑ l ∈ Finset.range N, (if ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0) ≤ x ∧
-      ∑ l ∈ Finset.range N, (if ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0) ≤ N := by
+  have key
+      : ∀ N : ℕ,
+        ∑ l ∈ Finset.range N, (if ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0) ≤ x
+          ∧ ∑ l ∈ Finset.range N, (if ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0) ≤ N := by
     intro N
     induction N with
     | zero => simp
@@ -68,9 +69,10 @@ theorem two_lt_two {a b : ℝ≥0∞} (h : a < b) : 2 * a < 2 * b :=
   (ENNReal.mul_lt_mul_iff_right two_ne_zero ENNReal.ofNat_ne_top).2 h
 
 theorem two_mul_lay_le (x : ℝ≥0∞) : 2 * lay x ≤ lay (2 * x) := by
-  have e : lay (2 * x) =
-      (∑' l : ℕ, if (((2 * l : ℕ) : ℝ≥0∞) + 1) < 2 * x then (1 : ℝ≥0∞) else 0) +
-      ∑' l : ℕ, if (((2 * l + 1 : ℕ) : ℝ≥0∞) + 1) < 2 * x then (1 : ℝ≥0∞) else 0 := by
+  have e
+      : lay (2 * x)
+        = (∑' l : ℕ, if (((2 * l : ℕ) : ℝ≥0∞) + 1) < 2 * x then (1 : ℝ≥0∞) else 0)
+          + ∑' l : ℕ, if (((2 * l + 1 : ℕ) : ℝ≥0∞) + 1) < 2 * x then (1 : ℝ≥0∞) else 0 := by
     rw [lay]
     exact (tsum_even_add_odd ENNReal.summable ENNReal.summable).symm
   rw [two_mul, e, lay]
@@ -116,65 +118,71 @@ theorem inv_mul_cancel_two_pow (k : ℕ) (x : ℝ≥0∞) : (2 ^ k : ℝ≥0∞)
 
 theorem iSup_dy (x : ℝ≥0∞) : ⨆ k, dy k x = x := by
   refine le_antisymm (iSup_le fun k => ?_) ?_
-  · calc dy k x ≤ (2 ^ k : ℝ≥0∞)⁻¹ * (2 ^ k * x) := by
-          rw [dy]; gcongr; exact lay_le _
+  · calc
+      dy k x
+        ≤ (2 ^ k : ℝ≥0∞)⁻¹ * (2 ^ k * x) := by rw [dy]; gcongr; exact lay_le _
       _ = x := inv_mul_cancel_two_pow k x
   · have hb : ∀ k : ℕ, x ≤ (⨆ j, dy j x) + (2 : ℝ≥0∞)⁻¹ ^ k := by
       intro k
-      calc x = (2 ^ k : ℝ≥0∞)⁻¹ * (2 ^ k * x) := (inv_mul_cancel_two_pow k x).symm
-        _ ≤ (2 ^ k : ℝ≥0∞)⁻¹ * (lay (2 ^ k * x) + 1) := by
-            gcongr; exact le_lay_add_one _
-        _ = dy k x + (2 : ℝ≥0∞)⁻¹ ^ k := by rw [mul_add, mul_one, ENNReal.inv_pow, dy, ENNReal.inv_pow]
+      calc
+        x = (2 ^ k : ℝ≥0∞)⁻¹ * (2 ^ k * x) := (inv_mul_cancel_two_pow k x).symm
+        _ ≤ (2 ^ k : ℝ≥0∞)⁻¹ * (lay (2 ^ k * x) + 1) := by gcongr; exact le_lay_add_one _
+        _ = dy k x + (2 : ℝ≥0∞)⁻¹ ^ k := by
+          rw [mul_add, mul_one, ENNReal.inv_pow, dy, ENNReal.inv_pow]
         _ ≤ _ := by gcongr; exact le_iSup (fun j => dy j x) k
-    have ht : Filter.Tendsto (fun k : ℕ => (⨆ j, dy j x) + (2 : ℝ≥0∞)⁻¹ ^ k) Filter.atTop
-        (nhds ((⨆ j, dy j x) + 0)) :=
-      tendsto_const_nhds.add (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one
-        (ENNReal.inv_lt_one.2 (by norm_num)))
+    have ht : Filter.Tendsto
+        (fun k : ℕ => (⨆ j, dy j x) + (2 : ℝ≥0∞)⁻¹ ^ k)
+        Filter.atTop (nhds ((⨆ j, dy j x) + 0)) :=
+      tendsto_const_nhds.add (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one (ENNReal.inv_lt_one.2
+        (by norm_num)))
     rw [add_zero] at ht
     exact ge_of_tendsto' ht hb
 
-theorem lt_pow_mul_iff (k : ℕ) (b x : ℝ≥0∞) :
-    b < 2 ^ k * x ↔ (2 ^ k : ℝ≥0∞)⁻¹ * b < x := by
+theorem lt_pow_mul_iff (k : ℕ) (b x : ℝ≥0∞) : b < 2 ^ k * x ↔ (2 ^ k : ℝ≥0∞)⁻¹ * b < x := by
   constructor
   · intro h
-    have := (ENNReal.mul_lt_mul_iff_right (ENNReal.inv_ne_zero.2 (two_pow_ne_top' k))
-      (ENNReal.inv_ne_top.2 (two_pow_ne_zero' k))).2 h
+    have :=
+      (ENNReal.mul_lt_mul_iff_right (ENNReal.inv_ne_zero.2 (two_pow_ne_top' k))
+        (ENNReal.inv_ne_top.2 (two_pow_ne_zero' k))).2 h
     rwa [inv_mul_cancel_two_pow] at this
   · intro h
     have := (ENNReal.mul_lt_mul_iff_right (two_pow_ne_zero' k) (two_pow_ne_top' k)).2 h
-    rwa [← mul_assoc, ENNReal.mul_inv_cancel (two_pow_ne_zero' k) (two_pow_ne_top' k),
-      one_mul] at this
+    rwa [← mul_assoc, ENNReal.mul_inv_cancel (two_pow_ne_zero' k) (two_pow_ne_top' k), one_mul] at
+      this
 
-theorem dy_eq_tsum (k : ℕ) (x : ℝ≥0∞) :
-    dy k x = ∑' l : ℕ, (2 ^ k : ℝ≥0∞)⁻¹ *
-      (if (2 ^ k : ℝ≥0∞)⁻¹ * ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0) := by
+theorem dy_eq_tsum (k : ℕ) (x : ℝ≥0∞)
+    : dy k x
+      = ∑' l : ℕ, (2 ^ k : ℝ≥0∞)⁻¹ *
+        (if (2 ^ k : ℝ≥0∞)⁻¹ * ((l : ℝ≥0∞) + 1) < x then (1 : ℝ≥0∞) else 0) := by
   rw [dy, lay, ENNReal.tsum_mul_left]
   simp only [lt_pow_mul_iff]
 
-theorem tsum_ite_lt {Y : Type} (S : Set Y) (φ : Y → ℝ≥0∞) (s : ℝ≥0∞) :
-    ∑' y : S, (if s < φ y then (1 : ℝ≥0∞) else 0) =
-      (((S ∩ {y | s < φ y}).encard : ℕ∞) : ℝ≥0∞) := by
+theorem tsum_ite_lt {Y : Type} (S : Set Y) (φ : Y → ℝ≥0∞) (s : ℝ≥0∞)
+    : ∑' y : S, (if s < φ y then (1 : ℝ≥0∞) else 0)
+      = (((S ∩ {y | s < φ y}).encard : ℕ∞) : ℝ≥0∞) := by
   rw [← ENNReal.tsum_set_one, tsum_subtype S (fun y => if s < φ y then (1 : ℝ≥0∞) else 0),
     tsum_subtype (S ∩ {y | s < φ y}) (fun _ => (1 : ℝ≥0∞))]
   refine tsum_congr fun y => ?_
   by_cases h1 : y ∈ S <;> by_cases h2 : s < φ y <;> simp [Set.indicator, h1, h2]
 
-theorem tsum_iSup_of_mono {ι : Type} (f : ℕ → ι → ℝ≥0∞) (hf : ∀ i, Monotone fun k => f k i) :
-    ∑' i, ⨆ k, f k i = ⨆ k, ∑' i, f k i := by
+theorem tsum_iSup_of_mono {ι : Type} (f : ℕ → ι → ℝ≥0∞) (hf : ∀ i, Monotone fun k => f k i)
+    : ∑' i, ⨆ k, f k i = ⨆ k, ∑' i, f k i := by
   simp_rw [ENNReal.tsum_eq_iSup_sum]
   rw [iSup_comm]
   refine iSup_congr fun s => ?_
   exact ENNReal.finsetSum_iSup_of_monotone hf
 
 theorem measurable_lintegral_tsum_of_level_counts
-    {Ω Y : Type} [MeasurableSpace Ω] [MeasurableSpace Y] (P : Measure Ω) (ν : Measure Y)
-    (L : Ω → Set Y) (φ : Y → ℝ≥0∞) (c : ℝ≥0∞) (hφ : Measurable φ)
+    {Ω Y : Type} [MeasurableSpace Ω] [MeasurableSpace Y]
+    (P : Measure Ω) (ν : Measure Y) (L : Ω → Set Y) (φ : Y → ℝ≥0∞) (c : ℝ≥0∞) (hφ : Measurable φ)
     (hN : ∀ s : ℝ≥0∞, Measurable fun ω => (((L ω ∩ {y | s < φ y}).encard : ℕ∞) : ℝ≥0∞))
-    (hI : ∀ s : ℝ≥0∞, ∫⁻ ω, (((L ω ∩ {y | s < φ y}).encard : ℕ∞) : ℝ≥0∞) ∂P = c * ν {y | s < φ y}) :
-    Measurable (fun ω => ∑' y : L ω, φ y) ∧ ∫⁻ ω, ∑' y : L ω, φ y ∂P = c * ∫⁻ y, φ y ∂ν := by
-
-  have hG : ∀ k ω, ∑' y : L ω, dy k (φ y) = ∑' l : ℕ, (2 ^ k : ℝ≥0∞)⁻¹ *
-      (((L ω ∩ {y | (2 ^ k : ℝ≥0∞)⁻¹ * ((l : ℝ≥0∞) + 1) < φ y}).encard : ℕ∞) : ℝ≥0∞) := by
+    (hI : ∀ s : ℝ≥0∞, ∫⁻ ω, (((L ω ∩ {y | s < φ y}).encard : ℕ∞) : ℝ≥0∞) ∂P = c * ν {y | s < φ y})
+    : Measurable (fun ω => ∑' y : L ω, φ y) ∧ ∫⁻ ω, ∑' y : L ω, φ y ∂P = c * ∫⁻ y, φ y ∂ν := by
+  have hG
+      : ∀ k ω,
+        ∑' y : L ω, dy k (φ y)
+          = ∑' l : ℕ, (2 ^ k : ℝ≥0∞)⁻¹ *
+            (((L ω ∩ {y | (2 ^ k : ℝ≥0∞)⁻¹ * ((l : ℝ≥0∞) + 1) < φ y}).encard : ℕ∞) : ℝ≥0∞) := by
     intro k ω
     simp_rw [dy_eq_tsum]
     rw [ENNReal.tsum_comm]
@@ -209,8 +217,9 @@ theorem measurable_lintegral_tsum_of_level_counts
   have hdm : ∀ k, Measurable fun y => dy k (φ y) := by
     intro k
     simp_rw [dy_eq_tsum]
-    exact Measurable.tsum fun l => (Measurable.ite
-      (measurableSet_lt measurable_const hφ) measurable_const measurable_const).const_mul _
+    exact Measurable.tsum fun l =>
+      (Measurable.ite (measurableSet_lt measurable_const hφ) measurable_const
+        measurable_const).const_mul _
   refine ⟨?_, ?_⟩
   · rw [hS]
     exact Measurable.iSup hGm

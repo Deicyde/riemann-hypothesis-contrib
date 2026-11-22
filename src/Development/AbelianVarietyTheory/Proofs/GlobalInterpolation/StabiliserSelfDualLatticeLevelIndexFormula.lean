@@ -11,9 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MemLoc
 
 namespace GlobalTheory.LevelIndex
 
-theorem selfDualLatticeIndex_stabiliserLevelIndexFormula : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeIndex.StabiliserLevelIndexFormula :=
+theorem selfDualLatticeIndex_stabiliserLevelIndexFormula
+    : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeIndex.StabiliserLevelIndexFormula :=
   GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeLevel.indexKU_iff.mp
     (GlobalTheory.LevelIndex.indexKU_of_selfDualOverBase
-      (GlobalTheory.OverCompare.overLattice_iff_selfDualOverBase.mp GlobalTheory.OverLat.overLattice))
+      (GlobalTheory.OverCompare.overLattice_iff_selfDualOverBase.mp
+        GlobalTheory.OverLat.overLattice))
 
 end GlobalTheory.LevelIndex

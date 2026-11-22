@@ -20,8 +20,8 @@ theorem isKC_one {p q : ℕ} : IsKC (1 : Mat p q) := by
   rintro rfl
   exact h ((sameBlock_iff_isLeft a a).2 rfl)
 
-theorem isKC_kronecker {p q r s : ℕ} (A : Mat p q) (B : Mat r s) (hA : IsKC A) (hB : IsKC B) :
-    IsKC (Matrix.reindex (lineEquiv p q r s) (lineEquiv p q r s)
+theorem isKC_kronecker {p q r s : ℕ} (A : Mat p q) (B : Mat r s) (hA : IsKC A) (hB : IsKC B)
+    : IsKC (Matrix.reindex (lineEquiv p q r s) (lineEquiv p q r s)
       (Matrix.kroneckerMap (· * ·) A B)) := by
   intro x y hxy
   obtain ⟨⟨a, c⟩, rfl⟩ := (lineEquiv p q r s).surjective x
@@ -37,9 +37,11 @@ theorem isKC_kronecker {p q r s : ℕ} (A : Mat p q) (B : Mat r s) (hA : IsKC A)
     · rw [hB c d h2, mul_zero]
   · rw [hA a b h1, zero_mul]
 
-theorem emb_mem_Kset {p q r s : ℕ} {T0 : GrpData (p * r + q * s) (p * s + q * r)}
-    {T1 : GrpData p q} {T2 : GrpData r s} (F : FockData T0 T1 T2) {g : T1.G} {h : T2.G}
-    (hg : g ∈ T1.Kset) (hh : h ∈ T2.Kset) : F.emb (g, h) ∈ T0.Kset := by
+theorem emb_mem_Kset
+    {p q r s : ℕ} {T0 : GrpData (p * r + q * s) (p * s + q * r)} {T1 : GrpData p q}
+    {T2 : GrpData r s} (F : FockData T0 T1 T2)
+    {g : T1.G} {h : T2.G} (hg : g ∈ T1.Kset) (hh : h ∈ T2.Kset)
+    : F.emb (g, h) ∈ T0.Kset := by
   change IsKC _
   rw [F.emb_cov]
   exact isKC_kronecker _ _ hg hh
@@ -49,13 +51,18 @@ theorem one_mem_Kset {p q : ℕ} (T : GrpData p q) : (1 : T.G) ∈ T.Kset := by
   rw [map_one, Units.val_one]
   exact isKC_one
 
-theorem exists_finite {p q r s : ℕ} {T0 : GrpData (p * r + q * s) (p * s + q * r)}
-    {T1 : GrpData p q} {T2 : GrpData r s} (F : FockData T0 T1 T2)
-    (H : ∀ k ∈ T0.Kset, ∀ (d : ℕ), ∀ P ∈ homog (Ix p q × Ix r s) d,
-      ∃ Q ∈ homog (Ix p q × Ix r s) d, F.Om k (F.ι P) = F.ι Q) (P : Pol p q r s) :
-    ∃ W : Submodule ℂ F.H, FiniteDimensional ℂ W ∧ ∀ k ∈ T0.Kset, F.Om k (F.ι P) ∈ W := by
-  refine ⟨(MvPolynomial.restrictTotalDegree (Ix p q × Ix r s) ℂ P.totalDegree).map F.ι,
-    inferInstance, fun k hk => ?_⟩
+theorem exists_finite
+    {p q r s : ℕ} {T0 : GrpData (p * r + q * s) (p * s + q * r)} {T1 : GrpData p q}
+    {T2 : GrpData r s} (F : FockData T0 T1 T2)
+    (H : ∀ k ∈ T0.Kset, ∀ (d : ℕ), ∀ P ∈ homog (Ix p q × Ix r s) d, ∃ Q ∈ homog (Ix p q × Ix r s) d,
+      F.Om k (F.ι P) = F.ι Q)
+    (P : Pol p q r s)
+    : ∃ W : Submodule ℂ F.H, FiniteDimensional ℂ W ∧ ∀ k ∈ T0.Kset, F.Om k (F.ι P) ∈ W := by
+  refine ⟨
+    (MvPolynomial.restrictTotalDegree (Ix p q × Ix r s) ℂ P.totalDegree).map F.ι,
+    inferInstance,
+    fun k hk => ?_
+  ⟩
   conv_rhs => rw [← MvPolynomial.sum_homogeneousComponent P]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum]
@@ -68,7 +75,13 @@ theorem exists_finite {p q r s : ℕ} {T0 : GrpData (p * r + q * s) (p * s + q *
   have h2 := Finset.mem_range.1 hd
   omega
 
-theorem kfin_fock : ∀ (p q r s : ℕ) (T0 : GrpData (p * r + q * s) (p * s + q * r)) (T1 : GrpData p q) (T2 : GrpData r s) (F : FockData T0 T1 T2), (∀ k ∈ T0.Kset, ∀ (d : ℕ), ∀ P ∈ homog (Ix p q × Ix r s) d, ∃ Q ∈ homog (Ix p q × Ix r s) d, F.Om k (F.ι P) = F.ι Q) → ∀ P : Pol p q r s, KFin T1 (fun g => F.π (g, 1)) (F.ι P) ∧ KFin T2 (fun h => F.π (1, h)) (F.ι P) := by
+theorem kfin_fock
+    : ∀ (p q r s : ℕ) (T0 : GrpData (p * r + q * s) (p * s + q * r)) (T1 : GrpData p q)
+        (T2 : GrpData r s) (F : FockData T0 T1 T2),
+      (∀ k ∈ T0.Kset, ∀ (d : ℕ), ∀ P ∈ homog (Ix p q × Ix r s) d, ∃ Q ∈ homog (Ix p q × Ix r s) d,
+          F.Om k (F.ι P) = F.ι Q)
+        → ∀ P : Pol p q r s,
+          KFin T1 (fun g => F.π (g, 1)) (F.ι P) ∧ KFin T2 (fun h => F.π (1, h)) (F.ι P) := by
   intro p q r s T0 T1 T2 F H P
   obtain ⟨W, hW, hmem⟩ := exists_finite F H P
   constructor

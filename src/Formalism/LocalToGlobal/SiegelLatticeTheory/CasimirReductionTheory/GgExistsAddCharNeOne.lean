@@ -49,13 +49,19 @@ open scoped InnerProductSpace Matrix
 def thetaJ {n : ℕ} (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
   -(Formalism.REAL.Jm ε * Yᴴ * Formalism.REAL.Jm ε)
 
-def dsigC {n : ℕ} (ε : Fin n → Bool) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (Y : Matrix (Fin n) (Fin n) ℂ) (v : H) : H :=
-  PI.PhMeasCore.dsig σ ((1 / 2 : ℂ) • (Y + thetaJ ε Y)) v +
-    Complex.I • PI.PhMeasCore.dsig σ ((1 / (2 * Complex.I)) • (Y - thetaJ ε Y)) v
+def dsigC
+    {n : ℕ} (ε : Fin n → Bool)
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (Y : Matrix (Fin n) (Fin n) ℂ) (v : H)
+    : H :=
+  PI.PhMeasCore.dsig σ ((1 / 2 : ℂ) • (Y + thetaJ ε Y)) v
+    + Complex.I • PI.PhMeasCore.dsig σ ((1 / (2 * Complex.I)) • (Y - thetaJ ε Y)) v
 
-def dsigCW {n : ℕ} (ε : Fin n → Bool) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : List (Matrix (Fin n) (Fin n) ℂ) → H → H
+def dsigCW
+    {n : ℕ} (ε : Fin n → Bool)
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    : List (Matrix (Fin n) (Fin n) ℂ) → H → H
   | [], v => v
   | Y :: w, v => dsigC ε σ Y (dsigCW ε σ w v)
 
@@ -63,8 +69,11 @@ def unitM {n : ℕ} (ab : Fin n × Fin n) : Matrix (Fin n) (Fin n) ℂ := Matrix
 
 def Egl (n : ℕ) : Fin n → Fin n → FreeAlgebra ℂ (Fin n × Fin n) := fun a b => FreeAlgebra.ι ℂ (a, b)
 
-def actU {n : ℕ} (ε : Fin n → Bool) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (p : FreeAlgebra ℂ (Fin n × Fin n)) (v : H) : H :=
+def actU
+    {n : ℕ} (ε : Fin n → Bool)
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (p : FreeAlgebra ℂ (Fin n × Fin n)) (v : H)
+    : H :=
   Finsupp.sum (FreeAlgebra.equivMonoidAlgebraFreeMonoid p).coeff
     fun (w : FreeMonoid (Fin n × Fin n)) (c : ℂ) => c • dsigCW ε σ (w.toList.map unitM) v
 
@@ -79,21 +88,27 @@ section BesselMultOne
 
 open Formalism.MainNotions.S
 
-theorem psi_eq_psiGen (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) :
-    Formalism.QuantumDeterminants.psi k r z c = psiGen k r z (fun _ => c) := by
+theorem psi_eq_psiGen (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ)
+    : Formalism.QuantumDeterminants.psi k r z c = psiGen k r z (fun _ => c) := by
   funext g
-  simp only [Formalism.QuantumDeterminants.psi, psiGen, Formalism.QuantumDeterminants.ell, ellA, Finset.mul_sum]
+  simp only [Formalism.QuantumDeterminants.psi, psiGen, Formalism.QuantumDeterminants.ell, ellA,
+    Finset.mul_sum]
 
 def BesselMultOne : Prop :=
-  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (H : Type) [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H))
-    (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (Wp : Type) [NormedAddCommGroup Wp]
-    [InnerProductSpace ℂ Wp] (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)),
-    Formalism.QuantumDeterminants.IsHCParam lam → IsDSHpk k r ε lam σ → Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z →
-    (∀ a, c a ≠ 0) → IsHCTypeW k r z u π →
-    ∀ B₁ B₂ : H → Wp, IsBesselMapSm (k := k) (r := r) z (psiGen k r z c) σ π B₁ →
-      IsBesselMapSm (k := k) (r := r) z (psiGen k r z c) σ π B₂ →
-      ∃ a b : ℂ, (a ≠ 0 ∨ b ≠ 0) ∧ ∀ v ∈ smoothVecs (k := k) (r := r) σ, a • B₁ v + b • B₂ v = 0
+  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (H : Type)
+      [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+      (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H))
+      (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (Wp : Type)
+      [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+      (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)),
+    Formalism.QuantumDeterminants.IsHCParam lam → IsDSHpk k r ε lam σ
+      → Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z
+      → (∀ a, c a ≠ 0) → IsHCTypeW k r z u π
+      → ∀ B₁ B₂ : H → Wp,
+        IsBesselMapSm (k := k) (r := r) z (psiGen k r z c) σ π B₁
+          → IsBesselMapSm (k := k) (r := r) z (psiGen k r z c) σ π B₂
+          → ∃ a b : ℂ,
+            (a ≠ 0 ∨ b ≠ 0) ∧ ∀ v ∈ smoothVecs (k := k) (r := r) σ, a • B₁ v + b • B₂ v = 0
 
 end BesselMultOne
 
@@ -113,7 +128,6 @@ section Herm
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
 end Herm
-
 
 end GlobalHyps
 
@@ -138,8 +152,9 @@ def latSet (x : I.GA) : Set (Fin I.n → I.E) :=
 def coordV (x : I.GA) (v : InfinitePlace I.F) (u : Fin I.n → I.E) : Fin I.n → ℂ :=
   (Formalism.MainNotions.S.uMat (x.1 v)⁻¹ * (I.P v)⁻¹) *ᵥ (fun i => I.φ v (u i))
 
-def gramV (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E) : Matrix (Fin j) (Fin j) ℂ :=
-  fun a c => ∑ i, star (coordV I x v (b a) i) * coordV I x v (b c) i
+def gramV (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E)
+    : Matrix (Fin j) (Fin j) ℂ := fun a c =>
+  ∑ i, star (coordV I x v (b a) i) * coordV I x v (b c) i
 
 structure Sub (x : I.GA) where
   j : ℕ
@@ -152,8 +167,8 @@ structure Sub (x : I.GA) where
   B_span : (B : Set (Fin I.n → I.E)) ⊆ Submodule.span I.E (Set.range b)
 
 def ht {x : I.GA} (s : Sub I x) : ℝ :=
-  (∏ v, (gramV I x v s.b).det.re) /
-    (Nat.card (s.B ⧸ (Submodule.span (𝓞 I.E) (Set.range s.b)).comap s.B.subtype) : ℝ)
+  (∏ v, (gramV I x v s.b).det.re)
+    / (Nat.card (s.B ⧸ (Submodule.span (𝓞 I.E) (Set.range s.b)).comap s.B.subtype) : ℝ)
 
 def size {x : I.GA} (s : Sub I x) : ℝ := ht I s ^ ((1 : ℝ) / (2 * (I.f : ℝ) * (s.j : ℝ)))
 
@@ -162,8 +177,8 @@ def tau1 (x : I.GA) : ℝ := min (1 / 2) (⨅ s : Sub I x, size I s)
 end Size
 
 def ReductionTau : Prop :=
-  ∀ I : Formalism.MainNotions.S.AutInst, 1 ≤ I.n →
-    Continuous (Size.tau1 I) ∧ ∀ x : I.GA, 0 < Size.tau1 I x ∧ Size.tau1 I x ≤ 1 / 2
+  ∀ I : Formalism.MainNotions.S.AutInst,
+    1 ≤ I.n → Continuous (Size.tau1 I) ∧ ∀ x : I.GA, 0 < Size.tau1 I x ∧ Size.tau1 I x ≤ 1 / 2
 
 end TextTau
 
@@ -179,19 +194,29 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 def GapStatementAt (C : ℝ) : Prop :=
   ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
-    (b : Fin (2 * r + 2) → ℝ), RealPlaceNumericalSetting k r z c u v b → GapC C k r b →
-  ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Mat k r → (H →L[ℂ] H)),
-    IsDSHpk k r (eps48 k r) (lam48 k r v b) σ →
-  ∀ (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
-    (π : Mat k r → (Vp →L[ℂ] Vp)), IsHCTypeW k r z u π →
-  ∀ w : H, IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w →
-  ∀ μG μS ν : Measure (Formalism.QuantumDeterminants.Mt k r),
-    IsHaarOn (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) μG → IsHaarOn (Formalism.QuantumDeterminants.Sset k r z) μS →
-    IsQuotMeas μG μS ν →
-  ∃ W : Mat k r → Vp,
-    AEStronglyMeasurable (fun x => W (Matrix.of x)) μG ∧ AEStronglyMeasurable (fun x => W (Matrix.of x)) ν ∧
-    IsSPsiEquiv z (psiGen k r z c) π W ∧ l2SG ν W < ⊤ ∧ l2SG ν W ≠ 0 ∧
-    ∀ x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r), rconv μG (eFun μG σ w) W x = W x
+      (b : Fin (2 * r + 2) → ℝ),
+    RealPlaceNumericalSetting k r z c u v b → GapC C k r b
+      → ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+          (σ : Mat k r → (H →L[ℂ] H)),
+        IsDSHpk k r (eps48 k r) (lam48 k r v b) σ
+          → ∀ (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
+              (π : Mat k r → (Vp →L[ℂ] Vp)),
+            IsHCTypeW k r z u π
+              → ∀ w : H,
+                IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w
+                  → ∀ μG μS ν : Measure (Formalism.QuantumDeterminants.Mt k r),
+                    IsHaarOn
+                        (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r))
+                        μG
+                      → IsHaarOn (Formalism.QuantumDeterminants.Sset k r z) μS → IsQuotMeas μG μS ν
+                      → ∃ W : Mat k r → Vp,
+                        AEStronglyMeasurable (fun x => W (Matrix.of x)) μG
+                          ∧ AEStronglyMeasurable (fun x => W (Matrix.of x)) ν
+                          ∧ IsSPsiEquiv z (psiGen k r z c) π W ∧ l2SG ν W < ⊤ ∧ l2SG ν W ≠ 0
+                          ∧ ∀ x
+                              ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk
+                                k r),
+                            rconv μG (eFun μG σ w) W x = W x
 
 def GapStatementAlt : Prop := GapStatementAt 0
 

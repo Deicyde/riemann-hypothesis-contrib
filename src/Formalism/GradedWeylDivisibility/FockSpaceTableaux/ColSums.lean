@@ -10,8 +10,8 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-theorem lccomp_weight_colW_apply {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (t : Fin n) :
-    (Finsupp.weight (colW r n) m) t = ∑ a : Fin r, m (a, t) := by
+theorem lccomp_weight_colW_apply {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (t : Fin n)
+    : (Finsupp.weight (colW r n) m) t = ∑ a : Fin r, m (a, t) := by
   classical
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
     Fintype.sum_prod_type]

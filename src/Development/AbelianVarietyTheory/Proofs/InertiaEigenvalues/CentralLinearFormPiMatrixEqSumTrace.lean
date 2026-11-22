@@ -8,9 +8,10 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem linearForm_matrix_eq_smul_trace_of_comm (k : Type) [Field k] (m : ℕ)
-    (t : Matrix (Fin m) (Fin m) k →ₗ[k] k) (ht : ∀ x y, t (x * y) = t (y * x)) :
-    ∃ c : k, ∀ x, t x = c * x.trace := by
+theorem linearForm_matrix_eq_smul_trace_of_comm
+    (k : Type) [Field k]
+    (m : ℕ) (t : Matrix (Fin m) (Fin m) k →ₗ[k] k) (ht : ∀ x y, t (x * y) = t (y * x))
+    : ∃ c : k, ∀ x, t x = c * x.trace := by
   rcases Nat.eq_zero_or_pos m with hm | hm
   · subst hm
     refine ⟨0, fun x => ?_⟩
@@ -40,18 +41,20 @@ theorem linearForm_matrix_eq_smul_trace_of_comm (k : Type) [Field k] (m : ℕ)
     conv_lhs => rw [hx]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_smul, key, smul_eq_mul, mul_ite, mul_zero, Finset.sum_ite_eq,
-      Finset.mem_univ, if_true]
+        Finset.mem_univ, if_true]
     rw [trace, Finset.mul_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     simp [mul_comm]
 
-theorem centralLinearForm_pi_matrix_eq_sum_trace :
-    ∀ (k : Type) [Field k] (N : ℕ) (n : Fin N → ℕ)
-      (τ : (Π i, Matrix (Fin (n i)) (Fin (n i)) k) →ₗ[k] k),
+theorem centralLinearForm_pi_matrix_eq_sum_trace
+    : ∀ (k : Type) [Field k] (N : ℕ) (n : Fin N → ℕ)
+        (τ : (Π i, Matrix (Fin (n i)) (Fin (n i)) k) →ₗ[k] k),
       (∀ x y, τ (x * y) = τ (y * x)) → ∃ c : Fin N → k, ∀ x, τ x = ∑ i, c i * (x i).trace := by
   intro k _ N n τ hτ
-  have h : ∀ i, ∃ c : k, ∀ A, (τ ∘ₗ LinearMap.single k (fun i => Matrix (Fin (n i)) (Fin (n i)) k) i) A
-      = c * A.trace := by
+  have h
+      : ∀ i, ∃ c : k, ∀ A,
+        (τ ∘ₗ LinearMap.single k (fun i => Matrix (Fin (n i)) (Fin (n i)) k) i) A
+          = c * A.trace := by
     intro i
     refine linearForm_matrix_eq_smul_trace_of_comm k (n i) _ fun A B => ?_
     simp only [LinearMap.coe_comp, Function.comp_apply, LinearMap.coe_single]

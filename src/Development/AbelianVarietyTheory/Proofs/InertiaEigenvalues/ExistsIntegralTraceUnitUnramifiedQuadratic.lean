@@ -14,16 +14,17 @@ variable {K : Type} [NormedField K] [IsUltrametricDist K]
 theorem norm_sub_le_max_of_ultra (x y : K) : ‖x - y‖ ≤ max ‖x‖ ‖y‖ := by
   simpa [sub_eq_add_neg, norm_neg] using IsUltrametricDist.norm_add_le_max x (-y)
 
-theorem norm_sq_sub_sq_le {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) :
-    ‖x ^ 2 - y ^ 2‖ ≤ ‖x - y‖ := by
+theorem norm_sq_sub_sq_le {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) : ‖x ^ 2 - y ^ 2‖ ≤ ‖x - y‖ := by
   have h1 : x ^ 2 - y ^ 2 = (x - y) * (x + y) := by ring
   rw [h1, norm_mul]
   have h2 : ‖x + y‖ ≤ 1 := (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
-  calc ‖x - y‖ * ‖x + y‖ ≤ ‖x - y‖ * 1 := mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
+  calc
+    ‖x - y‖ * ‖x + y‖
+      ≤ ‖x - y‖ * 1 := mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
     _ = ‖x - y‖ := mul_one _
 
-theorem norm_pow_two_pow_sub_le {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (k : ℕ) :
-    ‖x ^ 2 ^ k - y ^ 2 ^ k‖ ≤ ‖x - y‖ := by
+theorem norm_pow_two_pow_sub_le {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (k : ℕ)
+    : ‖x ^ 2 ^ k - y ^ 2 ^ k‖ ≤ ‖x - y‖ := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -32,8 +33,9 @@ theorem norm_pow_two_pow_sub_le {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤
     exact (norm_sq_sub_sq_le (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hx)
       (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hy)).trans ih
 
-theorem norm_sub_lt_one_of_sq {x y : K} (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1)
-    (h : ‖x ^ 2 - y ^ 2‖ < 1) : ‖x - y‖ < 1 := by
+theorem norm_sub_lt_one_of_sq
+    {x y : K} (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (h : ‖x ^ 2 - y ^ 2‖ < 1)
+    : ‖x - y‖ < 1 := by
   by_contra hc
   push_neg at hc
   have hle : ‖x - y‖ ≤ 1 := (norm_sub_le_max_of_ultra x y).trans (max_le hx hy)
@@ -42,7 +44,9 @@ theorem norm_sub_lt_one_of_sq {x y : K} (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ �
   have hA : ‖(x - y) ^ 2‖ = 1 := by rw [norm_pow, heq, one_pow]
   have hB : ‖2 * y * (x - y)‖ < 1 := by
     rw [norm_mul, norm_mul, heq, mul_one]
-    calc ‖(2 : K)‖ * ‖y‖ ≤ ‖(2 : K)‖ * 1 := mul_le_mul_of_nonneg_left hy (norm_nonneg _)
+    calc
+      ‖(2 : K)‖ * ‖y‖
+        ≤ ‖(2 : K)‖ * 1 := mul_le_mul_of_nonneg_left hy (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact h2
   have h3 : ‖(x - y) ^ 2 + 2 * y * (x - y)‖ = 1 := by
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hA]; exact hB.ne'), hA]
@@ -50,8 +54,11 @@ theorem norm_sub_lt_one_of_sq {x y : K} (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ �
   rw [e, h3] at h
   exact lt_irrefl _ h
 
-theorem norm_sub_lt_one_of_pow {x y : K} (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (k : ℕ)
-    (h : ‖x ^ 2 ^ k - y ^ 2 ^ k‖ < 1) : ‖x - y‖ < 1 := by
+theorem norm_sub_lt_one_of_pow
+    {x y : K}
+    (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1)
+    (k : ℕ) (h : ‖x ^ 2 ^ k - y ^ 2 ^ k‖ < 1)
+    : ‖x - y‖ < 1 := by
   induction k generalizing x y with
   | zero => simpa using h
   | succ k ih =>
@@ -61,8 +68,8 @@ theorem norm_sub_lt_one_of_pow {x y : K} (h2 : ‖(2 : K)‖ < 1) (hx : ‖x‖ 
     have hy2 : ‖y ^ 2‖ ≤ 1 := by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hy
     exact norm_sub_lt_one_of_sq h2 hx hy (ih hx2 hy2 h)
 
-theorem exists_pow_close [ProperSpace K] {w : K} (hw : ‖w‖ ≤ 1) :
-    ∃ i j : ℕ, i < j ∧ ‖w ^ 2 ^ i - w ^ 2 ^ j‖ < 1 := by
+theorem exists_pow_close [ProperSpace K] {w : K} (hw : ‖w‖ ≤ 1)
+    : ∃ i j : ℕ, i < j ∧ ‖w ^ 2 ^ i - w ^ 2 ^ j‖ < 1 := by
   have hmem : ∀ n : ℕ, w ^ 2 ^ n ∈ Metric.closedBall (0 : K) 1 := fun n => by
     rw [mem_closedBall_zero_iff, norm_pow]; exact pow_le_one₀ (norm_nonneg _) hw
   obtain ⟨a, -, φ, hφ, hlim⟩ := (isCompact_closedBall (0 : K) 1).tendsto_subseq hmem
@@ -71,17 +78,19 @@ theorem exists_pow_close [ProperSpace K] {w : K} (hw : ‖w‖ ≤ 1) :
   have h1 : dist (w ^ 2 ^ φ N) a < 1 / 2 := hN N le_rfl
   have h2 : dist (w ^ 2 ^ φ (N + 1)) a < 1 / 2 := hN (N + 1) (Nat.le_succ N)
   rw [← dist_eq_norm]
-  calc dist (w ^ 2 ^ φ N) (w ^ 2 ^ φ (N + 1)) ≤ dist (w ^ 2 ^ φ N) a + dist a (w ^ 2 ^ φ (N + 1)) :=
-        dist_triangle _ _ _
+  calc
+    dist (w ^ 2 ^ φ N) (w ^ 2 ^ φ (N + 1))
+      ≤ dist (w ^ 2 ^ φ N) a + dist a (w ^ 2 ^ φ (N + 1)) := dist_triangle _ _ _
     _ < 1 / 2 + 1 / 2 := add_lt_add h1 (by rw [dist_comm]; exact h2)
     _ = 1 := by norm_num
 
 end Ultra
 
-theorem exists_trace_unit : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E],
-    (∀ y : E, algebraMap F E (Algebra.trace F E y) = y + star y) →
-      ∃ u : E, ‖u‖ ≤ 1 ∧ ‖Algebra.trace F E u‖ = 1 := by
+theorem exists_trace_unit
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E],
+      (∀ y : E, algebraMap F E (Algebra.trace F E y) = y + star y)
+        → ∃ u : E, ‖u‖ ≤ 1 ∧ ‖Algebra.trace F E u‖ = 1 := by
   intro F E _ _ _ _ hU htr
   haveI : IsUltrametricDist F := hU.ultraF
   haveI : IsUltrametricDist E := hU.ultraE
@@ -98,18 +107,19 @@ theorem exists_trace_unit : ∀ (F E : Type) [NontriviallyNormedField F] [Nontri
     simpa using this
   rcases h2le.lt_or_eq with h2 | h2
   swap
-  ·
-    refine ⟨2⁻¹, by rw [norm_inv, h2, inv_one], ?_⟩
+  · refine ⟨2⁻¹, by rw [norm_inv, h2, inv_one], ?_⟩
     have hs : star (2⁻¹ : E) = 2⁻¹ := by
       have : (2⁻¹ : E) = algebraMap F E 2⁻¹ := by rw [map_inv₀, map_ofNat]
       rw [this, hU.star_fix]
     rw [← norm_algebraMap' E, htr, hs, ← two_mul, mul_inv_cancel₀ h20, norm_one]
 
   obtain ⟨y, hy⟩ := hU.star_ne
-  have hyF : ∀ a : F, y - algebraMap F E a ≠ 0 := fun a h => hy (by rw [sub_eq_zero.1 h, hU.star_fix])
+  have hyF : ∀ a : F, y - algebraMap F E a ≠ 0 := fun a h =>
+    hy (by rw [sub_eq_zero.1 h, hU.star_fix])
   have hcont : Continuous fun a : F => ‖y - algebraMap F E a‖ := by fun_prop
-  obtain ⟨x, -, hx⟩ := (isCompact_closedBall (0 : F) ‖y‖).exists_isMinOn
-    (Metric.nonempty_closedBall.2 (norm_nonneg _)) hcont.continuousOn
+  obtain ⟨x, -, hx⟩ :=
+    (isCompact_closedBall (0 : F) ‖y‖).exists_isMinOn (Metric.nonempty_closedBall.2 (norm_nonneg _))
+      hcont.continuousOn
   have hmin : ∀ a : F, ‖y - algebraMap F E x‖ ≤ ‖y - algebraMap F E a‖ := by
     intro a
     have h0 : ‖y - algebraMap F E x‖ ≤ ‖y‖ := by
@@ -142,7 +152,8 @@ theorem exists_trace_unit : ∀ (F E : Type) [NontriviallyNormedField F] [Nontri
   refine ⟨u, hu1.le, ?_⟩
   have hle : ‖Algebra.trace F E u‖ ≤ 1 := by
     rw [← norm_algebraMap' E, htr]
-    exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hu1.le (by rw [hU.norm_star]; exact hu1.le))
+    exact (IsUltrametricDist.norm_add_le_max _ _).trans
+      (max_le hu1.le (by rw [hU.norm_star]; exact hu1.le))
   refine le_antisymm hle (not_lt.1 fun hs => ?_)
 
   set n := u * star u with hn
@@ -171,8 +182,9 @@ theorem exists_trace_unit : ∀ (F E : Type) [NontriviallyNormedField F] [Nontri
     (norm_pow_two_pow_sub_le (by rw [norm_pow, hu1, one_pow]) hvn m).trans_lt hq
   have hC : ‖u - algebraMap F E (v ^ 2 ^ m)‖ < 1 := by
     rw [map_pow]
-    have e3 : u - (algebraMap F E v) ^ 2 ^ m =
-        (u - u ^ 2 ^ (m + 1)) + ((u ^ 2) ^ 2 ^ m - (algebraMap F E v) ^ 2 ^ m) := by
+    have e3
+        : u - (algebraMap F E v) ^ 2 ^ m
+          = (u - u ^ 2 ^ (m + 1)) + ((u ^ 2) ^ 2 ^ m - (algebraMap F E v) ^ 2 ^ m) := by
       rw [e2]; ring
     rw [e3]
     exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt hA hB)

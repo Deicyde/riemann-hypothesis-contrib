@@ -8,10 +8,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMemKAt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct ComplexConjugate
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -26,28 +29,30 @@ section Alg
 
 variable {R A : Type} [CommRing R] [CommRing A] [Algebra R A] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-
 omit [DecidableEq ι] in
-theorem glue_mul {e : R} (he : e * e = e) (a b c d : Matrix ι ι A) :
-    (e • a + (1 - e) • b) * (e • c + (1 - e) • d) = e • (a * c) + (1 - e) • (b * d) := by
+theorem glue_mul {e : R} (he : e * e = e) (a b c d : Matrix ι ι A)
+    : (e • a + (1 - e) • b) * (e • c + (1 - e) • d) = e • (a * c) + (1 - e) • (b * d) := by
   have h1 : e * (1 - e) = 0 := by rw [mul_sub, he, mul_one, sub_self]
   have h2 : (1 - e) * e = 0 := by rw [mul_comm, h1]
   have h3 : (1 - e) * (1 - e) = 1 - e := by rw [mul_sub, h2, mul_one, sub_zero]
-  simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_add, smul_smul, he, h1, h2, h3,
-    zero_smul, add_zero, zero_add]
+  simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_add, smul_smul,
+    he, h1, h2, h3, zero_smul, add_zero, zero_add]
 
 omit [Fintype ι] [DecidableEq ι] in
 theorem glue_self (e : R) (a : Matrix ι ι A) : e • a + (1 - e) • a = a := by
   rw [← add_smul, add_sub_cancel, one_smul]
 
-theorem exists_glue (c : A →ₐ[R] A) (J : Matrix ι ι A) {e : R} (he : e * e = e) (g h : GlobalTheory.WeilM.UG c J) :
-    ∃ p : GlobalTheory.WeilM.UG c J, (p.1.1 : Matrix ι ι A) = e • g.1.1 + (1 - e) • h.1.1 ∧
-      ((p⁻¹).1.1 : Matrix ι ι A) = e • (g⁻¹).1.1 + (1 - e) • (h⁻¹).1.1 := by
-  let q : GL ι A :=
-    { val := e • g.1.1 + (1 - e) • h.1.1
-      inv := e • g.1.2 + (1 - e) • h.1.2
-      val_inv := by rw [glue_mul he, g.1.3, h.1.3, glue_self]
-      inv_val := by rw [glue_mul he, g.1.4, h.1.4, glue_self] }
+theorem exists_glue
+    (c : A →ₐ[R] A) (J : Matrix ι ι A) {e : R} (he : e * e = e) (g h : GlobalTheory.WeilM.UG c J)
+    : ∃ p : GlobalTheory.WeilM.UG c J,
+      (p.1.1 : Matrix ι ι A) = e • g.1.1 + (1 - e) • h.1.1
+        ∧ ((p⁻¹).1.1 : Matrix ι ι A) = e • (g⁻¹).1.1 + (1 - e) • (h⁻¹).1.1 := by
+  let q : GL ι A := {
+    val := e • g.1.1 + (1 - e) • h.1.1
+    inv := e • g.1.2 + (1 - e) • h.1.2
+    val_inv := by rw [glue_mul he, g.1.3, h.1.3, glue_self]
+    inv_val := by rw [glue_mul he, g.1.4, h.1.4, glue_self]
+  }
   have hq : q ∈ GlobalTheory.WeilM.UG c J := by
     have hg : (g.1.1)ᵀ * J * (g.1.1).map c = J := g.2
     have hh : (h.1.1)ᵀ * J * (h.1.1).map c = J := h.2
@@ -63,19 +68,26 @@ theorem exists_glue (c : A →ₐ[R] A) (J : Matrix ι ι A) {e : R} (he : e * e
 
 end Alg
 
-theorem exists_idem {F : Type} [Field F] [NumberField F] (S : Finset (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))) :
-    ∃ e : AF F, e * e = e ∧ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F e = 0 ∧ (∀ w ∈ S, GlobalTheory.AdelicU.evFin F w e = 1) ∧
-      (∀ w ∉ S, GlobalTheory.AdelicU.evFin F w e = 0) ∧
-      ∀ u : AF F, (∀ w ∈ S, GlobalTheory.AdelicU.evFin F w u = 0) → u * e = 0 := by
+theorem exists_idem
+    {F : Type} [Field F] [NumberField F]
+    (S : Finset (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)))
+    : ∃ e : AF F,
+      e * e = e ∧ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F e = 0
+        ∧ (∀ w ∈ S, GlobalTheory.AdelicU.evFin F w e = 1)
+        ∧ (∀ w ∉ S, GlobalTheory.AdelicU.evFin F w e = 0)
+        ∧ ∀ u : AF F, (∀ w ∈ S, GlobalTheory.AdelicU.evFin F w u = 0) → u * e = 0 := by
   classical
-  let b : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af F := ∑ v ∈ S, GlobalTheory.AdelicU.singleFin v 1
-  have hb1 : ∀ w ∈ S, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w b = 1 := by
+  let b : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af F :=
+    ∑ v ∈ S, GlobalTheory.AdelicU.singleFin v 1
+  have hb1
+      : ∀ w ∈ S, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w b = 1 := by
     intro w hw
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.sum_eq_single_of_mem w hw, GlobalTheory.AdelicU.evalV_singleFin_self]
     intro v _ hv
     exact GlobalTheory.AdelicU.evalV_singleFin_ne hv.symm 1
-  have hb0 : ∀ w ∉ S, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w b = 0 := by
+  have hb0
+      : ∀ w ∉ S, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w b = 0 := by
     intro w hw
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]

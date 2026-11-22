@@ -83,14 +83,14 @@ lemma cnt_one (T Q c : ℕ) (hT : T ≤ Q) : cnt T Q 1 c = if c % Q < T then 1 e
     intro a _
     exact if_neg (fun e => h (lt_of_eq_of_lt e.symm a.isLt))
 
-private theorem eq_of_add_pred_mul_mod_eq_of_lt (Q c a b : ℕ) (hQ : 1 ≤ Q) (ha : a < Q) (hb : b < Q)
-    (h : (c + (Q - 1) * a) % Q = (c + (Q - 1) * b) % Q) : a = b := by
-  have h1 : (a + (c + (Q - 1) * a) % Q) % Q = c % Q :=
-    (shift_iff Q a _ c hQ).2 (Nat.mod_mod _ _)
+private theorem eq_of_add_pred_mul_mod_eq_of_lt
+    (Q c a b : ℕ)
+    (hQ : 1 ≤ Q) (ha : a < Q) (hb : b < Q) (h : (c + (Q - 1) * a) % Q = (c + (Q - 1) * b) % Q)
+    : a = b := by
+  have h1 : (a + (c + (Q - 1) * a) % Q) % Q = c % Q := (shift_iff Q a _ c hQ).2 (Nat.mod_mod _ _)
   have h2 : (b + (c + (Q - 1) * a) % Q) % Q = c % Q :=
     (shift_iff Q b _ c hQ).2 (by rw [Nat.mod_mod, h])
-  have h3 : Nat.ModEq Q (a + (c + (Q - 1) * a) % Q) (b + (c + (Q - 1) * a) % Q) :=
-    h1.trans h2.symm
+  have h3 : Nat.ModEq Q (a + (c + (Q - 1) * a) % Q) (b + (c + (Q - 1) * a) % Q) := h1.trans h2.symm
   have h4 : Nat.ModEq Q a b := Nat.ModEq.add_right_cancel' _ h3
   have h5 : a % Q = b % Q := h4
   rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at h5
@@ -141,8 +141,8 @@ lemma cnt_ge (T Q : ℕ) (hQ : 1 ≤ Q) (hT : T ≤ Q) (s : ℕ) :
       _ ≤ ∑ a : Fin T, cnt T Q (s + 2) (c + (Q - 1) * a) :=
           Finset.sum_le_sum (fun a _ => ih _)
 
-private theorem pow_mul_sub_natCast_add_two_mul_le_sub_pow_mul (q b : ℝ) (hb : 0 ≤ b) (hbq : b ≤ q) :
-    ∀ m : ℕ, q ^ m * (q - ((m : ℝ) + 2) * b) ≤ (q - b) ^ m * (q - 2 * b) := by
+private theorem pow_mul_sub_natCast_add_two_mul_le_sub_pow_mul (q b : ℝ) (hb : 0 ≤ b) (hbq : b ≤ q)
+    : ∀ m : ℕ, q ^ m * (q - ((m : ℝ) + 2) * b) ≤ (q - b) ^ m * (q - 2 * b) := by
   intro m
   induction m with
   | zero => simp
@@ -150,12 +150,12 @@ private theorem pow_mul_sub_natCast_add_two_mul_le_sub_pow_mul (q b : ℝ) (hb :
     have hq : 0 ≤ q := le_trans hb hbq
     have h1 : (q - b) * (q ^ m * (q - ((m : ℝ) + 2) * b)) ≤ (q - b) * ((q - b) ^ m * (q - 2 * b)) :=
       mul_le_mul_of_nonneg_left ih (by linarith)
-    have h2 : 0 ≤ q ^ m * (((m : ℝ) + 2) * b ^ 2) :=
-      mul_nonneg (pow_nonneg hq m) (by positivity)
-    calc q ^ (m + 1) * (q - (((m + 1 : ℕ) : ℝ) + 2) * b)
-        = (q - b) * (q ^ m * (q - ((m : ℝ) + 2) * b)) - q ^ m * (((m : ℝ) + 2) * b ^ 2) := by
-          push_cast
-          ring
+    have h2 : 0 ≤ q ^ m * (((m : ℝ) + 2) * b ^ 2) := mul_nonneg (pow_nonneg hq m) (by positivity)
+    calc
+      q ^ (m + 1) * (q - (((m + 1 : ℕ) : ℝ) + 2) * b)
+          = (q - b) * (q ^ m * (q - ((m : ℝ) + 2) * b)) - q ^ m * (((m : ℝ) + 2) * b ^ 2) := by
+        push_cast
+        ring
       _ ≤ (q - b) * ((q - b) ^ m * (q - 2 * b)) := by linarith
       _ = (q - b) ^ (m + 1) * (q - 2 * b) := by ring
 
@@ -167,10 +167,13 @@ theorem residueClassLowerBound : ResidueClassLowerBound := by
   have key := cnt_ge (Q - 2 * be) Q (by omega) (by omega) m c
   have key' := (Nat.cast_le (α := ℝ)).mpr key
   refine le_trans ?_ key'
-  have eq1 : (Q : ℝ) ^ (m + 1) * (1 - 2 * ((m + 2 : ℕ) : ℝ) * (be : ℝ) / (Q : ℝ)) =
-      (Q : ℝ) ^ m * ((Q : ℝ) - ((m : ℝ) + 2) * (2 * (be : ℝ))) := by
-    have h : (Q : ℝ) ^ (m + 1) * (1 - 2 * ((m + 2 : ℕ) : ℝ) * (be : ℝ) / (Q : ℝ)) =
-        (Q : ℝ) ^ m * (Q : ℝ) - (Q : ℝ) ^ m * (((m : ℝ) + 2) * (2 * (be : ℝ))) * ((Q : ℝ) / (Q : ℝ)) := by
+  have eq1
+      : (Q : ℝ) ^ (m + 1) * (1 - 2 * ((m + 2 : ℕ) : ℝ) * (be : ℝ) / (Q : ℝ))
+        = (Q : ℝ) ^ m * ((Q : ℝ) - ((m : ℝ) + 2) * (2 * (be : ℝ))) := by
+    have h
+        : (Q : ℝ) ^ (m + 1) * (1 - 2 * ((m + 2 : ℕ) : ℝ) * (be : ℝ) / (Q : ℝ))
+          = (Q : ℝ) ^ m * (Q : ℝ)
+            - (Q : ℝ) ^ m * (((m : ℝ) + 2) * (2 * (be : ℝ))) * ((Q : ℝ) / (Q : ℝ)) := by
       push_cast
       ring
     rw [h, div_self hQne, mul_one]
@@ -184,10 +187,10 @@ theorem residueClassLowerBound : ResidueClassLowerBound := by
     have c2 : ((Q - 2 * (2 * be) : ℕ) : ℝ) = (Q : ℝ) - 2 * (2 * (be : ℝ)) := by
       rw [Nat.cast_sub h4] <;> push_cast <;> ring
     rw [Nat.cast_mul, Nat.cast_pow, e1, c1, c2]
-    exact pow_mul_sub_natCast_add_two_mul_le_sub_pow_mul (Q : ℝ) (2 * (be : ℝ)) (by positivity) (by exact_mod_cast hQ.le) m
+    exact pow_mul_sub_natCast_add_two_mul_le_sub_pow_mul (Q : ℝ) (2 * (be : ℝ)) (by positivity)
+      (by exact_mod_cast hQ.le) m
   · have hneg : (Q : ℝ) - ((m : ℝ) + 2) * (2 * (be : ℝ)) ≤ 0 := by
-      have h1 : (Q : ℝ) ≤ 2 * (2 * (be : ℝ)) := by
-        exact_mod_cast (show Q ≤ 2 * (2 * be) by omega)
+      have h1 : (Q : ℝ) ≤ 2 * (2 * (be : ℝ)) := by exact_mod_cast (show Q ≤ 2 * (2 * be) by omega)
       have h2 : (0 : ℝ) ≤ (m : ℝ) * (be : ℝ) := by positivity
       nlinarith
     have hp : (0 : ℝ) ≤ (Q : ℝ) ^ m := by positivity

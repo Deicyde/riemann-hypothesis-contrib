@@ -8,11 +8,13 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem trace_monic_over_mvPolynomial {K : Type} [Field K] (F : Subfield K) [FiniteDimensional F K]
-    {ι : Type} (z : ι → K) (hz : ∀ i, z i ∈ F) (v : K)
-    (hv : IsIntegral (Subring.closure (Set.range z)) v) :
-    ∃ f : Polynomial (MvPolynomial ι ℤ), f.Monic ∧
-      f.eval₂ (aeval z).toRingHom (Algebra.trace F K v : K) = 0 := by
+theorem trace_monic_over_mvPolynomial
+    {K : Type} [Field K]
+    (F : Subfield K) [FiniteDimensional F K]
+    {ι : Type} (z : ι → K) (hz : ∀ i, z i ∈ F)
+    (v : K) (hv : IsIntegral (Subring.closure (Set.range z)) v)
+    : ∃ f : Polynomial (MvPolynomial ι ℤ),
+      f.Monic ∧ f.eval₂ (aeval z).toRingHom (Algebra.trace F K v : K) = 0 := by
   set φ : MvPolynomial ι ℤ →+* K := (aeval z).toRingHom with hφdef
   set S : Subring K := Subring.closure (Set.range z) with hSdef
   have hφF : ∀ p, φ p ∈ F := by
@@ -26,8 +28,7 @@ theorem trace_monic_over_mvPolynomial {K : Type} [Field K] (F : Subfield K) [Fin
     induction p using MvPolynomial.induction_on with
     | C a => simpa [hφdef] using S.intCast_mem a
     | add p q hp hq => simpa [map_add (f := _)] using S.add_mem hp hq
-    | mul_X p i hp =>
-        simpa [map_mul, hφdef] using S.mul_mem hp (Subring.subset_closure ⟨i, rfl⟩)
+    | mul_X p i hp => simpa [map_mul, hφdef] using S.mul_mem hp (Subring.subset_closure ⟨i, rfl⟩)
   let ψ : MvPolynomial ι ℤ →+* F := φ.codRestrict F hφF
   let θ : MvPolynomial ι ℤ →+* S := φ.codRestrict S hφS
   letI : Algebra (MvPolynomial ι ℤ) K := φ.toAlgebra

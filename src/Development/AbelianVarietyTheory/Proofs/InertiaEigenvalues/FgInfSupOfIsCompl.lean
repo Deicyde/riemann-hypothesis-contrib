@@ -8,10 +8,11 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem fg_inf_sup_of_isCompl (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (A : Submodule (𝓞 K) V) (U U' : Submodule K V) :
-    A.FG → IsCompl U U' →
-      (U.restrictScalars (𝓞 K) ⊓ (A ⊔ U'.restrictScalars (𝓞 K))).FG := by
+theorem fg_inf_sup_of_isCompl
+    (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    [IsScalarTower (𝓞 K) K V]
+    (A : Submodule (𝓞 K) V) (U U' : Submodule K V)
+    : A.FG → IsCompl U U' → (U.restrictScalars (𝓞 K) ⊓ (A ⊔ U'.restrictScalars (𝓞 K))).FG := by
   intro hA h
   let p : V →ₗ[K] V := U.subtype ∘ₗ Submodule.linearProjOfIsCompl U U' h
   let q : V →ₗ[𝓞 K] V := p.restrictScalars (𝓞 K)

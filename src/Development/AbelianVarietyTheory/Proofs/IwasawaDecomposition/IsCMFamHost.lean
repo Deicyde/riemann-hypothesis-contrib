@@ -6,13 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HermPartIsHer
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.Mem.Vol
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain
+  NumberField Matrix GlobalTheory.Mem.Vol
 open scoped TensorProduct
 
 namespace GlobalTheory.Mem.Vol
 
-theorem isCMFam_host (R : Ranks) (H : Host R) (I : Type) (e : I ≃ R.Psi) :
-    IsCMFam (fun i => H.emb (e i).1) := by
+theorem isCMFam_host (R : Ranks) (H : Host R) (I : Type) (e : I ≃ R.Psi)
+    : IsCMFam (fun i => H.emb (e i).1) := by
   refine ⟨fun i j h => ?_, fun w => ?_⟩
   · rcases NumberField.InfinitePlace.mk_eq_iff.1 h with h1 | h1
     · exact e.injective (GlobalTheory.CuspAlgComparison.tau_injective H h1)

@@ -7,18 +7,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 set_option autoImplicit false
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
 namespace MulLaw
 
-theorem natCard_eq_of_equiv_pi_field {R : Type} [Field R] {U V : Type} [AddCommGroup U]
-    [Module R U] [AddCommGroup V] [Module R V] {X : Type} (e : U ≃ₗ[R] (X → V)) {m : ℕ}
-    (hm : 0 < m) (hU : Module.finrank R U = m) (hV : Module.finrank R V = 1) :
-    Nat.card X = m := by
+theorem natCard_eq_of_equiv_pi_field
+    {R : Type} [Field R]
+    {U V : Type} [AddCommGroup U] [Module R U] [AddCommGroup V] [Module R V]
+    {X : Type} (e : U ≃ₗ[R] (X → V))
+    {m : ℕ} (hm : 0 < m) (hU : Module.finrank R U = m)
+    (hV : Module.finrank R V = 1)
+    : Nat.card X = m := by
   classical
   haveI : Module.Finite R U := Module.finite_of_finrank_pos (hU ▸ hm)
   haveI : Module.Finite R V := Module.finite_of_finrank_pos (hV ▸ Nat.one_pos)
@@ -29,19 +34,23 @@ theorem natCard_eq_of_equiv_pi_field {R : Type} [Field R] {U V : Type} [AddCommG
   haveI := Fintype.ofFinite X
   rw [← hU, e₂.finrank_eq, Module.finrank_fintype_fun_eq_card, Nat.card_eq_fintype_card]
 
-theorem natCard_eq_of_equiv_pi {R : Type} [CommRing R] (hR : IsField R) {U V : Type}
-    [AddCommGroup U] [Module R U] [AddCommGroup V] [Module R V] {X : Type}
-    (e : U ≃ₗ[R] (X → V)) {m : ℕ}
-    (hm : 0 < m) (hU : Module.finrank R U = m) (hV : Module.finrank R V = 1) :
-    Nat.card X = m := by
+theorem natCard_eq_of_equiv_pi
+    {R : Type} [CommRing R]
+    (hR : IsField R)
+    {U V : Type} [AddCommGroup U] [Module R U] [AddCommGroup V] [Module R V]
+    {X : Type} (e : U ≃ₗ[R] (X → V))
+    {m : ℕ} (hm : 0 < m) (hU : Module.finrank R U = m)
+    (hV : Module.finrank R V = 1)
+    : Nat.card X = m := by
   letI := hR.toField
   exact natCard_eq_of_equiv_pi_field e hm hU hV
 
-noncomputable def basePointsEquiv {S S' : Scheme.{0}} {f : S' ⟶ S} {A : Over S} {A' : Over S'}
-    [GrpObj A] [GrpObj A'] {g : A'.left ⟶ A.left} (hg : IsPullback g A'.hom A.hom f)
-    (hmul : ∀ (T : Over S') (x y : T ⟶ A'),
-      toBase hg.w (x * y) = toBase hg.w x * toBase hg.w y) (T : Over S') :
-    (T ⟶ A') ≃* (Over.mk (T.hom ≫ f) ⟶ A) where
+noncomputable def basePointsEquiv
+    {S S' : Scheme.{0}} {f : S' ⟶ S} {A : Over S} {A' : Over S'} [GrpObj A] [GrpObj A']
+    {g : A'.left ⟶ A.left} (hg : IsPullback g A'.hom A.hom f)
+    (hmul : ∀ (T : Over S') (x y : T ⟶ A'), toBase hg.w (x * y) = toBase hg.w x * toBase hg.w y)
+    (T : Over S')
+    : (T ⟶ A') ≃* (Over.mk (T.hom ≫ f) ⟶ A) where
   toFun x := toBase hg.w x
   invFun y := Over.homMk (hg.lift y.left T.hom (Over.w y)) (hg.lift_snd _ _ _)
   left_inv x := by

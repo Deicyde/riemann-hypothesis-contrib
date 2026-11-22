@@ -13,19 +13,18 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem generalizingMap_of_flat {X Y : Scheme.{u}} (f : X ⟶ Y) [AlgebraicGeometry.Flat f] :
-    GeneralizingMap (fun x : ↥X => f x) :=
+private theorem generalizingMap_of_flat {X Y : Scheme.{u}} (f : X ⟶ Y) [AlgebraicGeometry.Flat f]
+    : GeneralizingMap (fun x : ↥X => f x) :=
   AlgebraicGeometry.Flat.generalizingMap f
 
 theorem closure_image_mem_irreducibleComponents_of_generalizingMap
     {X Y : Scheme.{u}} (f : X ⟶ Y) (hf : GeneralizingMap (fun x : ↥X => f x))
-    {C : Set ↥X} (hC : C ∈ irreducibleComponents ↥X) :
-    closure ((fun x : ↥X => f x) '' C) ∈ irreducibleComponents ↥Y := by
+    {C : Set ↥X} (hC : C ∈ irreducibleComponents ↥X)
+    : closure ((fun x : ↥X => f x) '' C) ∈ irreducibleComponents ↥Y := by
   have hcont : Continuous (fun x : ↥X => f x) := f.continuous
   have hCirr : IsIrreducible C := hC.1
   have hCmax : ∀ ⦃b : Set ↥X⦄, IsIrreducible b → C ≤ b → b ≤ C := hC.2
-  have hCcl : closure C = C :=
-    subset_antisymm (hCmax hCirr.closure subset_closure) subset_closure
+  have hCcl : closure C = C := subset_antisymm (hCmax hCirr.closure subset_closure) subset_closure
   have hCclosed : IsClosed C := by rw [← hCcl]; exact isClosed_closure
   obtain ⟨η, hη⟩ := QuasiSober.sober hCirr hCclosed
   have hη' : closure ({η} : Set ↥X) = C := hη
@@ -70,17 +69,17 @@ theorem closure_image_mem_irreducibleComponents_of_generalizingMap
   rw [← h2, hz']
   exact subset_closure hw
 
-theorem support_comap {X Y : Scheme.{u}} (f : X ⟶ Y) (I : Y.IdealSheafData) :
-    ((I.comap f).support : Set ↥X) = (fun x : ↥X => f x) ⁻¹' (I.support : Set ↥Y) := by
+theorem support_comap {X Y : Scheme.{u}} (f : X ⟶ Y) (I : Y.IdealSheafData)
+    : ((I.comap f).support : Set ↥X) = (fun x : ↥X => f x) ⁻¹' (I.support : Set ↥Y) := by
   rw [AlgebraicGeometry.Scheme.IdealSheafData.support_comap I f]
   rfl
 
 namespace NonzeroOnComponents
 
-theorem comap_of_generalizingMap {X Y : Scheme.{u}} {I : Y.IdealSheafData}
-    (hI : NonzeroOnComponents I) (f : X ⟶ Y)
-    (hf : GeneralizingMap (fun x : ↥X => f x)) :
-    NonzeroOnComponents (I.comap f) := by
+theorem comap_of_generalizingMap
+    {X Y : Scheme.{u}} {I : Y.IdealSheafData}
+    (hI : NonzeroOnComponents I) (f : X ⟶ Y) (hf : GeneralizingMap (fun x : ↥X => f x))
+    : NonzeroOnComponents (I.comap f) := by
   intro T hT hsub
   have hsub' : closure ((fun x : ↥X => f x) '' T) ⊆ (I.support : Set ↥Y) := by
     refine closure_minimal ?_ I.support.2
@@ -90,22 +89,24 @@ theorem comap_of_generalizingMap {X Y : Scheme.{u}} {I : Y.IdealSheafData}
     exact hx
   exact hI _ (closure_image_mem_irreducibleComponents_of_generalizingMap f hf hT) hsub'
 
-theorem comap_of_flat {X Y : Scheme.{u}} {I : Y.IdealSheafData}
-    (hI : NonzeroOnComponents I) (f : X ⟶ Y) [AlgebraicGeometry.Flat f] :
-    NonzeroOnComponents (I.comap f) :=
+theorem comap_of_flat
+    {X Y : Scheme.{u}} {I : Y.IdealSheafData} (hI : NonzeroOnComponents I) (f : X ⟶ Y)
+    [AlgebraicGeometry.Flat f]
+    : NonzeroOnComponents (I.comap f) :=
   hI.comap_of_generalizingMap f (generalizingMap_of_flat f)
 
-theorem comap_of_isOpenImmersion {X Y : Scheme.{u}} {I : Y.IdealSheafData}
-    (hI : NonzeroOnComponents I) (f : X ⟶ Y) [AlgebraicGeometry.IsOpenImmersion f] :
-    NonzeroOnComponents (I.comap f) :=
+theorem comap_of_isOpenImmersion
+    {X Y : Scheme.{u}} {I : Y.IdealSheafData} (hI : NonzeroOnComponents I) (f : X ⟶ Y)
+    [AlgebraicGeometry.IsOpenImmersion f]
+    : NonzeroOnComponents (I.comap f) :=
   hI.comap_of_generalizingMap f f.isOpenEmbedding.generalizingMap
 
 end NonzeroOnComponents
 
 theorem closure_image_mem_irreducibleComponents_of_flat
     {X Y : Scheme.{u}} (f : X ⟶ Y) [AlgebraicGeometry.Flat f]
-    {C : Set ↥X} (hC : C ∈ irreducibleComponents ↥X) :
-    closure ((fun x : ↥X => f x) '' C) ∈ irreducibleComponents ↥Y :=
+    {C : Set ↥X} (hC : C ∈ irreducibleComponents ↥X)
+    : closure ((fun x : ↥X => f x) '' C) ∈ irreducibleComponents ↥Y :=
   closure_image_mem_irreducibleComponents_of_generalizingMap f (generalizingMap_of_flat f) hC
 
 end FunctorialResolution.EmbeddedResolution

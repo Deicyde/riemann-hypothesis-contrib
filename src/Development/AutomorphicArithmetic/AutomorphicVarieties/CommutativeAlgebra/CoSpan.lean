@@ -6,9 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem co_span_dual (O : Type) [CommRing O] [IsLocalRing O] (M : Type) [AddCommGroup M] [Module O M]
-    (h : Module.IsTorsionBySet O M (maximalIdeal O)) (x : M) (hx : x ≠ 0) :
-    ∃ D : M →ₗ[O] ResidueField O, D x ≠ 0 := by
+private theorem co_span_dual
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (M : Type) [AddCommGroup M] [Module O M]
+    (h : Module.IsTorsionBySet O M (maximalIdeal O))
+    (x : M) (hx : x ≠ 0)
+    : ∃ D : M →ₗ[O] ResidueField O, D x ≠ 0 := by
   letI : Module (ResidueField O) M := h.module
   haveI : IsScalarTower O (ResidueField O) M := h.isScalarTower
   have := (Module.forall_dual_apply_eq_zero_iff (ResidueField O) x).not.2 hx
@@ -16,10 +19,13 @@ private theorem co_span_dual (O : Type) [CommRing O] [IsLocalRing O] (M : Type) 
   obtain ⟨φ, hφ⟩ := this
   exact ⟨φ.restrictScalars O, hφ⟩
 
-theorem UpperTheory.V.Alg.co_span :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (i : B →ₐ[O] R) (S : Set R), S ⊆ maximalIdeal R →
-      (∀ f f' : R →ₐ[O] DualNumber (ResidueField O), f.comp i = f'.comp i → (∀ s ∈ S, f s = f' s) → f = f') →
-      maximalIdeal R ≤ Ideal.span S ⊔ (maximalIdeal B).map i ⊔ maximalIdeal R ^ 2 := by
+theorem UpperTheory.V.Alg.co_span
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (i : B →ₐ[O] R) (S : Set R),
+      S ⊆ maximalIdeal R
+        → (∀ f f' : R →ₐ[O] DualNumber (ResidueField O),
+          f.comp i = f'.comp i → (∀ s ∈ S, f s = f' s) → f = f')
+        → maximalIdeal R ≤ Ideal.span S ⊔ (maximalIdeal B).map i ⊔ maximalIdeal R ^ 2 := by
   intro O _ _ R _ _ _ B _ _ _ i S hS H x hx
   set I : Ideal R := Ideal.span S ⊔ (maximalIdeal B).map i ⊔ maximalIdeal R ^ 2 with hI
   by_contra hxI
@@ -37,7 +43,8 @@ theorem UpperTheory.V.Alg.co_span :
   let N : Submodule O R := I.restrictScalars O ⊔ Submodule.span O {1}
   have hIN : ∀ y ∈ I, y ∈ N := fun y hy => Submodule.mem_sup_left hy
   have hON : ∀ a : O, algebraMap O R a ∈ N := fun a =>
-    Submodule.mem_sup_right (Submodule.mem_span_singleton.2 ⟨a, (Algebra.algebraMap_eq_smul_one a).symm⟩)
+    Submodule.mem_sup_right (Submodule.mem_span_singleton.2
+      ⟨a, (Algebra.algebraMap_eq_smul_one a).symm⟩)
   have hxN : N.mkQ x ≠ 0 := by
     intro h
     obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.1 ((Submodule.Quotient.mk_eq_zero N).1 h)
@@ -61,42 +68,48 @@ theorem UpperTheory.V.Alg.co_span :
   have hD : ∀ y ∈ N, D y = 0 := fun y hy => by
     show φ (N.mkQ y) = 0
     rw [show N.mkQ y = 0 from (Submodule.Quotient.mk_eq_zero N).2 hy, map_zero]
-  have hres : ∀ (y : R) (a : O), y - algebraMap O R a ∈ maximalIdeal R → res O R y = algebraMap O _ a :=
-    fun y a ha => by
-      have := (res_eq_zero_iff O R _).2 ha
-      rwa [map_sub, AlgHom.commutes, sub_eq_zero] at this
+  have hres
+      : ∀ (y : R) (a : O),
+        y - algebraMap O R a ∈ maximalIdeal R → res O R y = algebraMap O _ a := fun y a ha => by
+    have := (res_eq_zero_iff O R _).2 ha
+    rwa [map_sub, AlgHom.commutes, sub_eq_zero] at this
   have hmul : ∀ y z, D (y * z) = res O R y * D z + D y * res O R z := fun y z => by
     obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) y
     obtain ⟨b, hb⟩ := IsCO.res_surj (O := O) z
     have h1 : D ((y - algebraMap O R a) * (z - algebraMap O R b)) = 0 :=
       hD _ (hIN _ (Ideal.mem_sup_right (by rw [pow_two]; exact Ideal.mul_mem_mul ha hb)))
-    have h2 : y * z = (y - algebraMap O R a) * (z - algebraMap O R b) + a • z + b • y
-        - algebraMap O R (a * b) := by
+    have h2
+        : y * z
+          = (y - algebraMap O R a) * (z - algebraMap O R b) + a • z + b • y
+            - algebraMap O R (a * b) := by
       simp only [Algebra.smul_def, map_mul]; ring
-    rw [h2, map_sub, map_add (f := _), map_add (f := _), h1, hD _ (hON _), map_smul, map_smul, hres y a ha, hres z b hb]
-    simp only [Algebra.smul_def]; ring
-  let f : R →ₐ[O] DualNumber (ResidueField O) :=
-    { toFun := fun y => (res O R y, D y)
-      map_one' := by
-        ext
-        · exact map_one (res O R)
-        · exact hD _ (by simpa using hON 1)
-      map_mul' := fun y z => by
-        ext
-        · exact map_mul (res O R) y z
-        · exact hmul y z
-      map_zero' := by
-        ext
-        · exact map_zero (res O R)
-        · exact map_zero D
-      map_add' := fun y z => by
-        ext
-        · exact map_add (res O R) y z
-        · exact map_add D y z
-      commutes' := fun a => by
-        ext
-        · exact (res O R).commutes a
-        · exact hD _ (hON a) }
+    rw [h2, map_sub, map_add (f := _), map_add (f := _), h1, hD _ (hON _), map_smul, map_smul,
+      hres y a ha, hres z b hb]
+    simp only [Algebra.smul_def]
+    ring
+  let f : R →ₐ[O] DualNumber (ResidueField O) := {
+    toFun := fun y => (res O R y, D y)
+    map_one' := by
+      ext
+      · exact map_one (res O R)
+      · exact hD _ (by simpa using hON 1)
+    map_mul' := fun y z => by
+      ext
+      · exact map_mul (res O R) y z
+      · exact hmul y z
+    map_zero' := by
+      ext
+      · exact map_zero (res O R)
+      · exact map_zero D
+    map_add' := fun y z => by
+      ext
+      · exact map_add (res O R) y z
+      · exact map_add D y z
+    commutes' := fun a => by
+      ext
+      · exact (res O R).commutes a
+      · exact hD _ (hON a)
+  }
   let f' : R →ₐ[O] DualNumber (ResidueField O) :=
     (TrivSqZeroExt.inlAlgHom O (ResidueField O) (ResidueField O)).comp (res O R)
   have key : ∀ y, D y = 0 → f y = f' y := fun y hy => by

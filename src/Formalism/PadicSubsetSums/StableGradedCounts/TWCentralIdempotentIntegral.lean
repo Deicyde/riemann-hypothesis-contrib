@@ -8,8 +8,9 @@ open Polynomial
 
 namespace Formalism.IrreducibleCountingLemmas.TW
 
-theorem isIntegral_trace_of_isIntegral {K n : Type} [Field K] [Fintype n] [DecidableEq n]
-    (M : Matrix n n K) (hM : IsIntegral ℤ M) : IsIntegral ℤ M.trace := by
+theorem isIntegral_trace_of_isIntegral
+    {K n : Type} [Field K] [Fintype n] [DecidableEq n] (M : Matrix n n K) (hM : IsIntegral ℤ M)
+    : IsIntegral ℤ M.trace := by
   let L := AlgebraicClosure K
   let φ : Matrix n n K →ₐ[ℤ] Matrix n n L := ((algebraMap K L).mapMatrix).toIntAlgHom
   have hM' : IsIntegral ℤ (φ M) := hM.map φ
@@ -17,8 +18,7 @@ theorem isIntegral_trace_of_isIntegral {K n : Type} [Field K] [Fintype n] [Decid
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.trace, Matrix.diag, map_sum]
     rfl
-  rw [← isIntegral_algebraMap_iff (A := K) (B := L) , htr,
-    Matrix.trace_eq_sum_roots_charpoly]
+  rw [← isIntegral_algebraMap_iff (A := K) (B := L), htr, Matrix.trace_eq_sum_roots_charpoly]
   refine IsIntegral.multiset_sum fun μ hμ => ?_
   have hroot : IsRoot (φ M).charpoly μ := (mem_roots'.1 hμ).2
   have hspec : μ ∈ spectrum L (φ M) := Matrix.mem_spectrum_iff_isRoot_charpoly.2 hroot
@@ -44,8 +44,8 @@ theorem central_idempotent_integral_twist : CentralIdempotentIntegral := by
     induction k with
     | zero => simp [hx]
     | succ k ih =>
-      rw [pow_succ, ih, hx, mul_assoc, ← mul_assoc (MonoidAlgebra.single _ _) e, ← hc,
-        mul_assoc, ← mul_assoc e e, he, MonoidAlgebra.single_mul_single, ← pow_succ, one_mul]
+      rw [pow_succ, ih, hx, mul_assoc, ← mul_assoc (MonoidAlgebra.single _ _) e, ← hc, mul_assoc,
+        ← mul_assoc e e, he, MonoidAlgebra.single_mul_single, ← pow_succ, one_mul]
   have hcard : 0 < Fintype.card G := Fintype.card_pos
   have hxe : x ^ Fintype.card G = e := by
     obtain ⟨k, hk⟩ := Nat.exists_eq_succ_of_ne_zero hcard.ne'
@@ -57,8 +57,9 @@ theorem central_idempotent_integral_twist : CentralIdempotentIntegral := by
   have hxi : IsIntegral ℤ x := IsIntegral.of_pow hcard (hxe ▸ hei)
   have hMi : IsIntegral ℤ (Algebra.leftMulMatrix (MonoidAlgebra.basis G K) x) :=
     hxi.map (A := K) (Algebra.leftMulMatrix (MonoidAlgebra.basis G K))
-  have htr : (Algebra.leftMulMatrix (MonoidAlgebra.basis G K) x).trace
-      = (Fintype.card G : K) * e.coeff g := by
+  have htr
+      : (Algebra.leftMulMatrix (MonoidAlgebra.basis G K) x).trace
+        = (Fintype.card G : K) * e.coeff g := by
     have : ∀ i : G, Algebra.leftMulMatrix (MonoidAlgebra.basis G K) x i i = e.coeff g := by
       intro i
       rw [Algebra.leftMulMatrix_eq_repr_mul, MonoidAlgebra.basis_apply]

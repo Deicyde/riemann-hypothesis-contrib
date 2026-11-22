@@ -17,7 +17,9 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.SplitWeil GlobalTheory.LocFrame
 open GlobalTheory.EmbChart (idem)
 open GlobalTheory.StepData (LatFrame)
@@ -33,11 +35,15 @@ open GlobalTheory.AdelicU (splitProj compFin isCMExt_host)
 variable {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)}
 
 theorem cA_cA' (z : AE D) : cA D (cA D z) = z := Formalism.L2.Theta.cA_cA z
-theorem cA_alg (a : AF D.host.F) : cA D (algebraMap (AF D.host.F) (AE D) a) = algebraMap (AF D.host.F) (AE D) a := by
+theorem cA_alg (a : AF D.host.F)
+    : cA D (algebraMap (AF D.host.F) (AE D) a) = algebraMap (AF D.host.F) (AE D) a := by
   change a ⊗ₜ[D.host.F] D.sp.cm.sig 1 = _
-  rw [map_one]; rfl
+  rw [map_one]
+  rfl
 
-theorem compFin_cA (z : AE D) : compFin D.host.F D.host.E v (cA D z) = sigR _ D.sp.cm.sig (compFin D.host.F D.host.E v z) := by
+theorem compFin_cA (z : AE D)
+    : compFin D.host.F D.host.E v (cA D z)
+      = sigR _ D.sp.cm.sig (compFin D.host.F D.host.E v z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
@@ -52,11 +58,13 @@ theorem piW_idem : piW τ (idem τ) = 1 := by
   change splitProj τ (compFin _ _ v (idem τ)) = 1
   rw [GlobalTheory.EmbChart.compFin_idem, GlobalTheory.AdelicU.splitProj_splitIdem]
 
-theorem piW_alg (a : Fv D.host.F v) : piW τ (algebraMap (AF D.host.F) (AE D) (atPlace v a)) = a := by
+theorem piW_alg (a : Fv D.host.F v)
+    : piW τ (algebraMap (AF D.host.F) (AE D) (atPlace v a)) = a := by
   rw [(chart_piW τ).2.2.1]
   exact GlobalTheory.AdelicU.evalV_singleFin_self v a
 
-theorem piW_cA (z : AE D) : piW τ (cA D z) = splitProj (τ.comp D.sp.cm.sig) (compFin D.host.F D.host.E v z) := by
+theorem piW_cA (z : AE D)
+    : piW τ (cA D z) = splitProj (τ.comp D.sp.cm.sig) (compFin D.host.F D.host.E v z) := by
   change splitProj τ (compFin _ _ v (cA D z)) = _
   rw [compFin_cA, GlobalTheory.AdelicU.splitProj_comp]
 
@@ -70,15 +78,18 @@ theorem idem_mul_self : idem τ * idem τ = idem τ := (GlobalTheory.EmbChart.is
 
 section Frame
 
-variable (V : HSp D) {ι : Type} [Fintype ι] [DecidableEq ι] (β : LatFrame (Fv D.host.F v) ι (Fin V.rank))
+variable
+  (V : HSp D) {ι : Type} [Fintype ι] [DecidableEq ι] (β : LatFrame (Fv D.host.F v) ι (Fin V.rank))
 
 end Frame
 
 section FJ
 
-variable {V V₀ : HSp D} {σ : ℕ} (d : HypDec V V₀ (σ + 1)) {n : Type} [Fintype n] [DecidableEq n]
-  {γ : LatFrame (Fv D.host.F v) n (Fin V₀.rank)} {β : LatFrame (Fv D.host.F v) (n ⊕ Fin (2 * (σ + 1))) (Fin V.rank)}
-  {t : ℕ → Fv D.host.F v}
+variable
+  {V V₀ : HSp D} {σ : ℕ} (d : HypDec V V₀ (σ + 1))
+  {n : Type} [Fintype n] [DecidableEq n]
+  {γ : LatFrame (Fv D.host.F v) n (Fin V₀.rank)}
+  {β : LatFrame (Fv D.host.F v) (n ⊕ Fin (2 * (σ + 1))) (Fin V.rank)} {t : ℕ → Fv D.host.F v}
 
 variable {τ}
 

@@ -27,18 +27,25 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.PointSurjectivity
 
 namespace GlobalTheory.CompanionTheory.PointSurjectivity
 
-theorem not_acyclic_cechLB_of_triv {R : Type} [CommRing R] {X : Scheme.{0}} [Nonempty X]
-    (f : X ⟶ Spec (CommRingCat.of R)) (N : LB X)
-    (hN : N.IsLB) (hT : Triv N) (κ : Type) [LinearOrder κ] [Fintype κ] (D : κ → X.Opens)
-    (hc : ⨆ i, D i = ⊤) : ¬ (cechLB f N D).Acyclic := by
+theorem not_acyclic_cechLB_of_triv
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}} [Nonempty X]
+    (f : X ⟶ Spec (CommRingCat.of R))
+    (N : LB X) (hN : N.IsLB) (hT : Triv N)
+    (κ : Type) [LinearOrder κ] [Fintype κ]
+    (D : κ → X.Opens) (hc : ⨆ i, D i = ⊤)
+    : ¬(cechLB f N D).Acyclic := by
   intro hac
   obtain ⟨t, ht⟩ := hT
   let σ : LB.Sec N := ⟨fun i => (t.s i).val, fun i j => congrArg Units.val (ht i j)⟩
@@ -58,12 +65,17 @@ theorem not_acyclic_cechLB_of_triv {R : Type} [CommRing R] {X : Scheme.{0}} [Non
   have hpW : p ∈ (⨅ j ∈ ({i} : Finset κ), D j) ⊓ N.U c := by
     refine ⟨?_, hcp⟩
     simpa using hi
-  have hu : IsUnit (rs X (inf_le_right : (⨅ j ∈ ({i} : Finset κ), D j) ⊓ N.U c ≤ N.U c)
-      (t.s c).val) := (t.s c).isUnit.map (rs X inf_le_right)
-  have e₃ : rs X (inf_le_right : (⨅ j ∈ ({i} : Finset κ), D j) ⊓ N.U c ≤ N.U c) (t.s c).val = 0 := by
+  have hu
+      : IsUnit (rs X (inf_le_right : (⨅ j ∈ ({i} : Finset κ), D j) ⊓ N.U c ≤ N.U c) (t.s c).val) :=
+    (t.s c).isUnit.map (rs X inf_le_right)
+  have e₃
+      : rs X (inf_le_right : (⨅ j ∈ ({i} : Finset κ), D j) ⊓ N.U c ≤ N.U c) (t.s c).val = 0 := by
     let y : SecOnR f N (⨅ j ∈ (∅ : Finset κ), D j) := x
-    have e₄ : rs X (inf_le_inf_right _ (iInf_le_iInf_of_subset D (Finset.empty_subset {i})))
-        (SecOnR.coord y c) = 0 := e₂
+    have e₄
+        : rs X (inf_le_inf_right _ (iInf_le_iInf_of_subset D (Finset.empty_subset {i})))
+            (SecOnR.coord y c)
+          = 0 :=
+      e₂
     have e₅ : SecOnR.coord y c = rs X inf_le_right (t.s c).val := GlobalTheory.LB.coord_ofSec _ _ _
     rw [e₅, rs_rs] at e₄
     exact e₄

@@ -31,8 +31,11 @@ def tensorSpan {X : Type} (M : Submodule R (X → C)) : Submodule R (X × X → 
 def IsLat {X : Type} [Fintype X] [DecidableEq X] (M : Submodule R (X → C)) : Prop :=
   ∃ B : Matrix X X C, IsUnit B.det ∧ M = Submodule.span R (Set.range fun j x => B x j)
 
-def HasColen (v : Valuation C NNReal) {X : Type} [Fintype X] [DecidableEq X]
-    (M : Submodule R (X → C)) (c : NNReal) : Prop :=
+def HasColen
+    (v : Valuation C NNReal)
+    {X : Type} [Fintype X] [DecidableEq X]
+    (M : Submodule R (X → C)) (c : NNReal)
+    : Prop :=
   ∃ B : Matrix X X C, M = Submodule.span R (Set.range fun j x => B x j) ∧ v B.det = c
 
 def addPull (N : Type) [AddCommGroup N] : (N → C) →ₗ[R] (N × N → C) :=
@@ -63,8 +66,7 @@ def dualLat {X : Type} [Fintype X] (M : Submodule R (X → C)) : Submodule R (X 
     refine ⟨c * r, ?_⟩
     simp only [map_mul, hr, Pi.smul_apply, Algebra.smul_def, Finset.mul_sum, mul_assoc]
 
-def fourier {N H : Type} [Fintype N] (e : H → N → C) :
-    (N → C) →ₗ[R] (H → C) where
+def fourier {N H : Type} [Fintype N] (e : H → N → C) : (N → C) →ₗ[R] (H → C) where
   toFun u h := ∑ a, u a * e h a
   map_add' u w := by ext h; simp [add_mul, Finset.sum_add_distrib]
   map_smul' c u := by ext h; simp [Algebra.smul_def, Finset.mul_sum, mul_assoc]
@@ -78,14 +80,14 @@ def resK {N : Type} [AddCommGroup N] (K : AddSubgroup N) : (N → C) →ₗ[R] (
 def pullQ {N : Type} [AddCommGroup N] (K : AddSubgroup N) : (N ⧸ K → C) →ₗ[R] (N → C) :=
   LinearMap.funLeft R C (QuotientAddGroup.mk : N → N ⧸ K)
 
-def extK {N : Type} [AddCommGroup N] (K : AddSubgroup N) [DecidablePred (· ∈ K)] :
-    (K → C) →ₗ[R] (N → C) where
+def extK {N : Type} [AddCommGroup N] (K : AddSubgroup N) [DecidablePred (· ∈ K)]
+    : (K → C) →ₗ[R] (N → C) where
   toFun u a := if h : a ∈ K then u ⟨a, h⟩ else 0
   map_add' u w := by ext a; by_cases h : a ∈ K <;> simp [h]
   map_smul' c u := by ext a; by_cases h : a ∈ K <;> simp [h]
 
-def pushQ {N : Type} [AddCommGroup N] [Fintype N] (K : AddSubgroup N)
-    [DecidableEq (N ⧸ K)] : (N → C) →ₗ[R] (N ⧸ K → C) where
+def pushQ {N : Type} [AddCommGroup N] [Fintype N] (K : AddSubgroup N) [DecidableEq (N ⧸ K)]
+    : (N → C) →ₗ[R] (N ⧸ K → C) where
   toFun u c := ∑ a ∈ Finset.univ.filter (fun a : N => (a : N ⧸ K) = c), u a
   map_add' u w := by ext c; simp [Finset.sum_add_distrib]
   map_smul' c u := by ext d; simp [Finset.smul_sum]

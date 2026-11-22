@@ -17,30 +17,36 @@ namespace GlobalTheory.UnitLemma.IntegralFinite
 
 open Matrix
 
-theorem isIntegral_matrix_trace {R F : Type} [CommRing R] [Field F] [Algebra R F] {n : Type}
-    [Fintype n] [DecidableEq n] (M : Matrix n n F) (hM : IsIntegral R M) : IsIntegral R M.trace := by
+theorem isIntegral_matrix_trace
+    {R F : Type} [CommRing R] [Field F] [Algebra R F]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n F) (hM : IsIntegral R M)
+    : IsIntegral R M.trace := by
   first
   | exact @_root_.GlobalTheory.TargetStatementAlt.target
   | exact _root_.GlobalTheory.TargetStatementAlt.target
   | (apply _root_.GlobalTheory.TargetStatementAlt.target <;> assumption)
   | (intros; apply _root_.GlobalTheory.TargetStatementAlt.target <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.TargetStatementAlt.target <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.TargetStatementAlt.target <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.TargetStatementAlt.target ..)
 
 variable {K : UQ} (B : InvAlg K)
 
-theorem isIntegral_trace {x : B.A} (hx : IsIntegral K.O x) :
-    IsIntegral K.O (Algebra.trace K.E B.A x) := by
+theorem isIntegral_trace {x : B.A} (hx : IsIntegral K.O x)
+    : IsIntegral K.O (Algebra.trace K.E B.A x) := by
   let bs := Module.finBasis K.E B.A
   rw [Algebra.trace_eq_matrix_trace bs]
   exact isIntegral_matrix_trace _ (hx.map ((Algebra.leftMulMatrix bs).restrictScalars K.O))
 
-theorem trace_mem_range {x : B.A} (hx : IsIntegral K.O x) :
-    ∃ c : K.O, algebraMap K.O K.E c = Algebra.trace K.E B.A x :=
+theorem trace_mem_range {x : B.A} (hx : IsIntegral K.O x)
+    : ∃ c : K.O, algebraMap K.O K.E c = Algebra.trace K.E B.A x :=
   IsIntegrallyClosed.isIntegral_iff.mp (isIntegral_trace B hx)
 
-theorem finite_integralClosure :
-    ∀ (K : UQ) (B : InvAlg K), B.P.Separable → Module.Finite K.O (integralClosure K.O B.A) := by
+theorem finite_integralClosure
+    : ∀ (K : UQ) (B : InvAlg K), B.P.Separable → Module.Finite K.O (integralClosure K.O B.A) := by
   intro K B hsep
   classical
   let bs := Module.finBasis K.E B.A
@@ -57,11 +63,13 @@ theorem finite_integralClosure :
     simpa [b, Module.Basis.isUnitSMul_apply, algebraMap_smul] using h
   have hnd : (Algebra.traceForm K.E B.A).Nondegenerate := by
     refine ⟨fun a ha => ?_, fun a ha => ?_⟩
-    · exact Centraliser.eq_zero_of_trace_mul B hsep a (fun z => by simpa [Algebra.traceForm_apply] using ha z)
+    · exact Centraliser.eq_zero_of_trace_mul B hsep a
+        (fun z => by simpa [Algebra.traceForm_apply] using ha z)
     · exact Centraliser.eq_zero_of_trace_mul B hsep a
         (fun z => by simpa [Algebra.traceForm_apply, mul_comm] using ha z)
   let d := (Algebra.traceForm K.E B.A).dualBasis hnd b
-  have hle : Subalgebra.toSubmodule (integralClosure K.O B.A) ≤ Submodule.span K.O (Set.range d) := by
+  have hle
+      : Subalgebra.toSubmodule (integralClosure K.O B.A) ≤ Submodule.span K.O (Set.range d) := by
     intro x hx
     have hx' : IsIntegral K.O x := hx
     rw [← d.sum_repr x]

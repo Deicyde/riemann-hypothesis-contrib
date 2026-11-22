@@ -18,11 +18,12 @@ open GlobalTheory.CompanionTheory.Ar.Chg GlobalTheory.CompanionTheory.Ar.Chg.Deg
 open GroundTheory.Heights₂.Heights.LowerBoundFree (mem_mCoordIdeal_of_aeval_eq_zero)
 open GlobalTheory.CompanionTheory.Ar.Giv (aeval_eq_zero_of_mem_mCoordIdeal)
 
-variable {K₀ K : Type} [Fintype K₀] [Fintype K] {J₀ : K₀ → Type} {J : K → Type} [∀ k, Fintype (J₀ k)]
-  [∀ k, Fintype (J k)]
+variable
+  {K₀ K : Type} [Fintype K₀] [Fintype K]
+  {J₀ : K₀ → Type} {J : K → Type} [∀ k, Fintype (J₀ k)] [∀ k, Fintype (J k)]
 
-theorem homog_add {f g : MRing J} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f + g) a := by
+theorem homog_add {f g : MRing J} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.1 (MvPolynomial.support_add hm) with h | h
@@ -38,23 +39,27 @@ theorem homog_zero (a : K → ℕ) : IsMultiHomog (0 : MRing J) a := by
   intro m hm
   simp at hm
 
-theorem homog_sum {X : Type} (s : Finset X) {f : X → MRing J} {a : K → ℕ} (h : ∀ x ∈ s, IsMultiHomog (f x) a) :
-    IsMultiHomog (∑ x ∈ s, f x) a := by
+theorem homog_sum
+    {X : Type} (s : Finset X) {f : X → MRing J} {a : K → ℕ} (h : ∀ x ∈ s, IsMultiHomog (f x) a)
+    : IsMultiHomog (∑ x ∈ s, f x) a := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using homog_zero a
   | insert x s hx ih =>
     rw [Finset.sum_insert hx]
-    exact homog_add (h x (Finset.mem_insert_self x s)) (ih fun u hu => h u (Finset.mem_insert_of_mem hu))
+    exact homog_add (h x (Finset.mem_insert_self x s))
+      (ih fun u hu => h u (Finset.mem_insert_of_mem hu))
 
-theorem homog_pow {f : MRing J} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ) : IsMultiHomog (f ^ n) (n • a) := by
+theorem homog_pow {f : MRing J} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ)
+    : IsMultiHomog (f ^ n) (n • a) := by
   induction n with
   | zero => simpa using (isMultiHomog_one' (J₀ := J))
   | succ n ih =>
     rw [pow_succ, succ_nsmul]
     exact isMultiHomog_mul' ih hf
 
-theorem homog_X [DecidableEq K] (k : K) (i : J k) : IsMultiHomog (X ⟨k, i⟩ : MRing J) (Pi.single k 1) := by
+theorem homog_X [DecidableEq K] (k : K) (i : J k)
+    : IsMultiHomog (X ⟨k, i⟩ : MRing J) (Pi.single k 1) := by
   classical
   intro m hm k'
   rw [MvPolynomial.support_X, Finset.mem_singleton] at hm
@@ -74,16 +79,20 @@ theorem homog_X [DecidableEq K] (k : K) (i : J k) : IsMultiHomog (X ⟨k, i⟩ :
     intro e
     exact h (Sigma.mk.inj e).1.symm
 
-theorem homog_mono (c : ∀ k, J k) (a : K → ℕ) : IsMultiHomog (∏ k, (X ⟨k, c k⟩ : MRing J) ^ a k) a := by
+theorem homog_mono (c : ∀ k, J k) (a : K → ℕ)
+    : IsMultiHomog (∏ k, (X ⟨k, c k⟩ : MRing J) ^ a k) a := by
   classical
-  have h := isMultiHomog_prod' (J₀ := J) Finset.univ (f := fun k => (X ⟨k, c k⟩ : MRing J) ^ a k)
-    (a := fun k => a k • Pi.single k 1) fun k _ => homog_pow (homog_X k (c k)) (a k)
+  have h :=
+    isMultiHomog_prod' (J₀ := J) Finset.univ
+      (f := fun k => (X ⟨k, c k⟩ : MRing J) ^ a k)
+      (a := fun k => a k • Pi.single k 1)
+      fun k _ => homog_pow (homog_X k (c k)) (a k)
   convert h using 1
   funext k
   simp [Finset.sum_apply, Pi.single_apply]
 
-theorem exists_blkV {κ : K₀ → K} {v : (Σ k, J₀ k) → Σ k, J k} (hv : IsBlockMap κ v) :
-    ∃ bx : ∀ k, J₀ k ≃ J (κ k), v = blkV κ bx := by
+theorem exists_blkV {κ : K₀ → K} {v : (Σ k, J₀ k) → Σ k, J k} (hv : IsBlockMap κ v)
+    : ∃ bx : ∀ k, J₀ k ≃ J (κ k), v = blkV κ bx := by
   have hq : ∀ k (i : J₀ k), ∃ i' : J (κ k), v ⟨k, i⟩ = ⟨κ k, i'⟩ := by
     intro k i
     have h1 := hv.2.2.1 ⟨k, i⟩
@@ -112,24 +121,36 @@ theorem exists_blkV {κ : K₀ → K} {v : (Σ k, J₀ k) → Σ k, J k} (hv : I
   obtain ⟨k, i⟩ := p
   exact hg k i
 
-theorem common_den {Ω₀ : Type} [Field Ω₀] (y₀ : (Σ k, J₀ k) → Ω₀) (hB : Birational y₀) (b : ℕ → Ω₀) (n : ℕ) :
-    ∃ (c : ℕ → MRing J₀) (a : K₀ → ℕ) (H : Ω₀), H ≠ 0 ∧ ∀ j ∈ Finset.range n,
-      IsMultiHomog (c j) a ∧ aeval y₀ (c j) = b j * H := by
+theorem common_den
+    {Ω₀ : Type} [Field Ω₀] (y₀ : (Σ k, J₀ k) → Ω₀) (hB : Birational y₀) (b : ℕ → Ω₀) (n : ℕ)
+    : ∃ (c : ℕ → MRing J₀) (a : K₀ → ℕ) (H : Ω₀),
+      H ≠ 0 ∧ ∀ j ∈ Finset.range n, IsMultiHomog (c j) a ∧ aeval y₀ (c j) = b j * H := by
   classical
   choose d g h hg hh h0 he using fun j => hB (b j)
-  refine ⟨fun j => g j * ∏ k ∈ (Finset.range n).erase j, h k, ∑ k ∈ Finset.range n, d k,
-    ∏ k ∈ Finset.range n, aeval y₀ (h k), Finset.prod_ne_zero_iff.2 fun k _ => h0 k, fun j hj => ⟨?_, ?_⟩⟩
+  refine ⟨
+    fun j => g j * ∏ k ∈ (Finset.range n).erase j, h k,
+    ∑ k ∈ Finset.range n, d k,
+    ∏ k ∈ Finset.range n, aeval y₀ (h k),
+    Finset.prod_ne_zero_iff.2 fun k _ => h0 k,
+    fun j hj => ⟨?_, ?_⟩
+  ⟩
   · rw [← Finset.add_sum_erase _ _ hj]
     exact isMultiHomog_mul' (hg j) (isMultiHomog_prod' _ fun k _ => hh k)
   · rw [← Finset.mul_prod_erase _ _ hj, map_mul, map_prod, he, mul_assoc]
 
-theorem zeros_proj {Ω₀ Ω : Type} [Field Ω₀] [Field Ω] (y₀ : (Σ k, J₀ k) → Ω₀) (y : (Σ k, J k) → Ω) (i : Ω₀ →+* Ω)
+theorem zeros_proj
+    {Ω₀ Ω : Type} [Field Ω₀] [Field Ω]
+    (y₀ : (Σ k, J₀ k) → Ω₀)
+    (y : (Σ k, J k) → Ω)
+    (i : Ω₀ →+* Ω)
     {κ : K₀ → K} {v : (Σ k, J₀ k) → Σ k, J k} (hv : IsBlockMap κ v) (hy : ∀ p, y (v p) = i (y₀ p))
     (hB : Birational y₀) (halg : ∀ α : Ω, (letI := i.toAlgebra; IsAlgebraic Ω₀ α))
-    {F : MRing J} {aF : K → ℕ} (hF : IsMultiHomog F aF) (hFP : F ∉ mCoordIdeal y) :
-    ∃ (G : MRing J₀) (b : K₀ → ℕ), IsMultiHomog G b ∧ aeval y₀ G ≠ 0 ∧
-      ∀ z ∈ mcPts (mCoordIdeal y), eval z (map (Int.castRingHom ℂ) F) = 0 →
-        eval (fun p => z (v p)) (map (Int.castRingHom ℂ) G) = 0 := by
+    {F : MRing J} {aF : K → ℕ} (hF : IsMultiHomog F aF) (hFP : F ∉ mCoordIdeal y)
+    : ∃ (G : MRing J₀) (b : K₀ → ℕ),
+      IsMultiHomog G b ∧ aeval y₀ G ≠ 0
+        ∧ ∀ z ∈ mcPts (mCoordIdeal y),
+          eval z (map (Int.castRingHom ℂ) F) = 0
+            → eval (fun p => z (v p)) (map (Int.castRingHom ℂ) G) = 0 := by
   classical
   letI := i.toAlgebra
   have hFy : aeval y F ≠ 0 := fun h => hFP (mem_mCoordIdeal_of_aeval_eq_zero y hF h)
@@ -139,9 +160,12 @@ theorem zeros_proj {Ω₀ Ω : Type} [Field Ω₀] [Field Ω] (y₀ : (Σ k, J�
     congr 2
     funext p
     exact hy p
-  have key : ∀ c : ∀ k, J k, ∃ (G : MRing J₀) (b : K₀ → ℕ), IsMultiHomog G b ∧ aeval y₀ G ≠ 0 ∧
-      ∀ z ∈ mcPts (mCoordIdeal y), (∀ k, z ⟨k, c k⟩ ≠ 0) → eval z (map (Int.castRingHom ℂ) F) = 0 →
-        eval (fun p => z (v p)) (map (Int.castRingHom ℂ) G) = 0 := by
+  have key
+      : ∀ c : ∀ k, J k, ∃ (G : MRing J₀) (b : K₀ → ℕ),
+        IsMultiHomog G b ∧ aeval y₀ G ≠ 0
+          ∧ ∀ z ∈ mcPts (mCoordIdeal y),
+            (∀ k, z ⟨k, c k⟩ ≠ 0) → eval z (map (Int.castRingHom ℂ) F) = 0
+              → eval (fun p => z (v p)) (map (Int.castRingHom ℂ) G) = 0 := by
     intro c
     by_cases hc : ∀ k, y ⟨k, c k⟩ ≠ 0
     · let M : MRing J := ∏ k, (X ⟨k, c k⟩ : MRing J) ^ aF k
@@ -165,17 +189,22 @@ theorem zeros_proj {Ω₀ Ω : Type} [Field Ω₀] [Field Ω] (y₀ : (Σ k, J�
       have hΦh : IsMultiHomog Φ (Function.extend κ a 0 + n • aF) := by
         refine homog_sum _ fun j hj => ?_
         have hjn : j ≤ n := Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)
-        have h1 := isMultiHomog_mul' (isMultiHomog_mul' (isMultiHomog_rename' hv (hcc j hj).1) (homog_pow hF j))
-          (homog_pow hM (n - j))
+        have h1 :=
+          isMultiHomog_mul'
+            (isMultiHomog_mul' (isMultiHomog_rename' hv (hcc j hj).1) (homog_pow hF j))
+            (homog_pow hM (n - j))
         convert h1 using 1
         rw [add_assoc, ← add_nsmul, Nat.add_sub_cancel' hjn]
       have hΦy : aeval y Φ = 0 := by
-        have hterm : ∀ j ∈ Finset.range (n + 1), aeval y (rename v (cc j) * F ^ j * M ^ (n - j)) =
-            (i H * aeval y M ^ n) * (p.coeff j • α ^ j) := by
+        have hterm
+            : ∀ j ∈ Finset.range (n + 1),
+              aeval y (rename v (cc j) * F ^ j * M ^ (n - j))
+                = (i H * aeval y M ^ n) * (p.coeff j • α ^ j) := by
           intro j hj
           have hjn : j ≤ n := Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)
           rw [map_mul, map_mul, map_pow, map_pow, hren, (hcc j hj).2, mul_assoc,
-            GlobalTheory.CompanionTheory.Ar.Rel.pow_mul_pow_sub_eq _ _ hMy hjn, Algebra.smul_def, map_mul]
+            GlobalTheory.CompanionTheory.Ar.Rel.pow_mul_pow_sub_eq _ _ hMy hjn, Algebra.smul_def,
+            map_mul]
           show _ = _ * (i (p.coeff j) * α ^ j)
           ring
         set_option synthInstance.maxHeartbeats 100000 in
@@ -207,9 +236,11 @@ theorem zeros_proj {Ω₀ Ω : Type} [Field Ω₀] [Field Ω] (y₀ : (Σ k, J�
     rw [map_prod, map_prod]
     exact Finset.prod_eq_zero (Finset.mem_univ c) (hz c z hzP hc hFz)
 
-theorem birational_of_closure {Ω : Type} [Field Ω] {n : ℕ} (yf : Fin n → Ω)
-    (hgen : Subfield.closure (Set.range fun ij : Fin n × Fin n => yf ij.1 / yf ij.2) = ⊤) :
-    Birational (ι := fun _ : Unit => Fin n) fun p => yf p.2 := by
+theorem birational_of_closure
+    {Ω : Type} [Field Ω]
+    {n : ℕ} (yf : Fin n → Ω)
+    (hgen : Subfield.closure (Set.range fun ij : Fin n × Fin n => yf ij.1 / yf ij.2) = ⊤)
+    : Birational (ι := fun _ : Unit => Fin n) fun p => yf p.2 := by
   classical
   intro s
   have hs : s ∈ Subfield.closure (Set.range fun ij : Fin n × Fin n => yf ij.1 / yf ij.2) := by
@@ -219,13 +250,29 @@ theorem birational_of_closure {Ω : Type} [Field Ω] {n : ℕ} (yf : Fin n → �
     obtain ⟨⟨a, b⟩, rfl⟩ := hx
     by_cases hb : yf b = 0
     · exact ⟨0, 0, 1, homog_zero _, isMultiHomog_one', by simp, by simp [hb]⟩
-    · exact ⟨Pi.single () 1, X ⟨(), a⟩, X ⟨(), b⟩, homog_X _ _, homog_X _ _, by simpa using hb, by simp [hb]⟩
-  | one => exact ⟨0, 1, 1, isMultiHomog_one', isMultiHomog_one', by simp, by simp⟩
+    · exact ⟨
+        Pi.single () 1,
+        X ⟨(), a⟩,
+        X ⟨(), b⟩,
+        homog_X _ _,
+        homog_X _ _,
+        by simpa using hb,
+        by simp [hb]
+      ⟩
+  | one =>
+    exact ⟨0, 1, 1, isMultiHomog_one', isMultiHomog_one', by simp, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨d, g, h, hg, hh, h0, he⟩ := hx
     obtain ⟨d', g', h', hg', hh', h0', he'⟩ := hy
-    refine ⟨d + d', g * h' + h * g', h * h', homog_add (isMultiHomog_mul' hg hh') (isMultiHomog_mul' hh hg'),
-      isMultiHomog_mul' hh hh', by rw [map_mul]; exact mul_ne_zero h0 h0', ?_⟩
+    refine ⟨
+      d + d',
+      g * h' + h * g',
+      h * h',
+      homog_add (isMultiHomog_mul' hg hh') (isMultiHomog_mul' hh hg'),
+      isMultiHomog_mul' hh hh',
+      by rw [map_mul]; exact mul_ne_zero h0 h0',
+      ?_
+    ⟩
     simp only [map_add (f := _), map_mul, he, he']
     ring
   | neg x _ hx =>
@@ -241,8 +288,15 @@ theorem birational_of_closure {Ω : Type} [Field Ω] {n : ℕ} (yf : Fin n → �
   | mul x y _ _ hx hy =>
     obtain ⟨d, g, h, hg, hh, h0, he⟩ := hx
     obtain ⟨d', g', h', hg', hh', h0', he'⟩ := hy
-    refine ⟨d + d', g * g', h * h', isMultiHomog_mul' hg hg',
-      isMultiHomog_mul' hh hh', by rw [map_mul]; exact mul_ne_zero h0 h0', ?_⟩
+    refine ⟨
+      d + d',
+      g * g',
+      h * h',
+      isMultiHomog_mul' hg hg',
+      isMultiHomog_mul' hh hh',
+      by rw [map_mul]; exact mul_ne_zero h0 h0',
+      ?_
+    ⟩
     simp only [map_mul, he, he']
     ring
 

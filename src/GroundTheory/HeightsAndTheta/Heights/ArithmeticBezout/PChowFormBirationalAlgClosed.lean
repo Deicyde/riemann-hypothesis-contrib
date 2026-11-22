@@ -15,8 +15,9 @@ open MvPolynomial
 
 noncomputable section
 
-theorem not_dvd_pderiv_of_pderiv_ne_zero {F σ : Type*} [Field F] {g : MvPolynomial σ F}
-    (hg : g ≠ 0) {i : σ} (hne : pderiv i g ≠ 0) : ¬ g ∣ pderiv i g := by
+theorem not_dvd_pderiv_of_pderiv_ne_zero
+    {F σ : Type*} [Field F] {g : MvPolynomial σ F} (hg : g ≠ 0) {i : σ} (hne : pderiv i g ≠ 0)
+    : ¬ g ∣ pderiv i g := by
   classical
   rintro ⟨q, hq⟩
   have hi : 0 < degreeOf i g := by
@@ -37,10 +38,12 @@ theorem not_dvd_pderiv_of_pderiv_ne_zero {F σ : Type*} [Field F] {g : MvPolynom
   rw [hq, degreeOf_mul_eq hg (right_ne_zero_of_mul (hq ▸ hne))] at hlt
   omega
 
-theorem IsChowForm.exists_pderiv_ne_zero {F : Type} [Field F] [IsAlgClosed F] {p : ℕ} [hp : Fact p.Prime]
-    [CharP F p] {n k : ℕ} {P : Ideal (MvPolynomial (Fin n) F)} (hP : IsProjPrime P)
-    {g : MvPolynomial (Fin (k + 1) × Fin n) F} (hg : IsChowForm P (k + 1) g) :
-    ∃ l, pderiv (0, l) g ≠ 0 := by
+theorem IsChowForm.exists_pderiv_ne_zero
+    {F : Type} [Field F] [IsAlgClosed F]
+    {p : ℕ} [hp : Fact p.Prime] [CharP F p]
+    {n k : ℕ} {P : Ideal (MvPolynomial (Fin n) F)} (hP : IsProjPrime P)
+    {g : MvPolynomial (Fin (k + 1) × Fin n) F} (hg : IsChowForm P (k + 1) g)
+    : ∃ l, pderiv (0, l) g ≠ 0 := by
   classical
   by_contra hcon
   push Not at hcon
@@ -48,7 +51,8 @@ theorem IsChowForm.exists_pderiv_ne_zero {F : Type} [Field F] [IsAlgClosed F] {p
   have hall : ∀ v, pderiv v g = 0 := by
     rintro ⟨i, l⟩
     obtain ⟨c, hc2, hc⟩ := hg.rename_swap 0 i
-    have hinj : Function.Injective (Prod.map (Equiv.swap (0 : Fin (k + 1)) i) (id : Fin n → Fin n)) :=
+    have hinj
+        : Function.Injective (Prod.map (Equiv.swap (0 : Fin (k + 1)) i) (id : Fin n → Fin n)) :=
       (Equiv.swap 0 i).injective.prodMap Function.injective_id
     have h := pderiv_rename hinj (0, l) g
     rw [hc, pderiv_C_mul, hcon l, map_zero, Prod.map_apply, Equiv.swap_apply_left, id] at h
@@ -75,7 +79,10 @@ theorem IsChowForm.exists_pderiv_ne_zero {F : Type} [Field F] [IsAlgClosed F] {p
   obtain ⟨h, hgh⟩ : ∃ h : MvPolynomial (Fin (k + 1) × Fin n) F, h ^ p = g := by
     have hroot : ∀ a : F, ∃ b : F, b ^ p = a := fun a => IsAlgClosed.exists_pow_nat_eq a hp.out.pos
     choose r hr using hroot
-    refine ⟨∑ s ∈ g.support, monomial (Finsupp.mapRange (· / p) (Nat.zero_div p) s) (r (AddMonoidAlgebra.coeff g s)), ?_⟩
+    refine ⟨
+      ∑ s ∈ g.support, monomial (Finsupp.mapRange (· / p) (Nat.zero_div p) s) (r (AddMonoidAlgebra.coeff g s)),
+      ?_
+    ⟩
     rw [sum_pow_char]
     conv_rhs => rw [as_sum g]
     refine Finset.sum_congr rfl fun s hs => ?_
@@ -114,7 +121,6 @@ theorem ChowFormBirationalAlgClosed.proof : ChowFormBirationalAlgClosed.Statemen
   · exact ChowFormBirational.full F n k P g c hP hg hc
   have := hP.isPrime
   classical
-
   have hmem : ∀ h, h ∈ incIdeal P (k + 1) ↔ g ∣ h := by
     intro h
     rw [← hg.2 h, incIdeal]
@@ -122,14 +128,17 @@ theorem ChowFormBirationalAlgClosed.proof : ChowFormBirationalAlgClosed.Statemen
   have hg0 : aeval (genSubst (genPt P) c) g = 0 :=
     (IncidenceGeneric.full F n (k + 1) P c hc g).1 ((hmem g).2 dvd_rfl)
 
-  have hA : ∀ m, aeval (genSubst (genPt P) c) (pderiv (0, m) g) =
-      C (genPt P m) * ∑ l, aeval (genSubst (genPt P) c) (pderiv (0, l) g) * C (c l) := by
+  have hA
+      : ∀ m,
+        aeval (genSubst (genPt P) c) (pderiv (0, m) g)
+          = C (genPt P m) * ∑ l, aeval (genSubst (genPt P) c) (pderiv (0, l) g) * C (c l) := by
     intro m
     have h := pderiv_aeval_eq_sum (genSubst (genPt P) c) (0, m) g
     rw [hg0, map_zero] at h
     simp only [pderiv_genSubst, mul_sub, Finset.sum_sub_distrib, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, Fintype.sum_prod_type, Fin.sum_univ_succ,
-      Fin.succ_ne_zero, if_false, Finset.sum_const_zero, add_zero] at h
+        Finset.sum_ite_eq', Finset.mem_univ, if_true, Fintype.sum_prod_type, Fin.sum_univ_succ,
+        Fin.succ_ne_zero, if_false, Finset.sum_const_zero, add_zero]
+      at h
     rw [eq_comm, sub_eq_zero] at h
     rw [h, Finset.mul_sum]
     exact Finset.sum_congr rfl fun l _ => by ring
@@ -138,8 +147,9 @@ theorem ChowFormBirationalAlgClosed.proof : ChowFormBirationalAlgClosed.Statemen
 
   obtain ⟨l, hl⟩ := IsChowForm.exists_pderiv_ne_zero (p := p) hP hg
   refine ⟨Pi.single l 1, ?_, fun m => ?_⟩
-  · have hsum : (∑ l', C ((Pi.single l (1 : F) : Fin n → F) l') * pderiv (0, l') g) =
-        pderiv (0, l) g := by
+  · have hsum
+        : (∑ l', C ((Pi.single l (1 : F) : Fin n → F) l') * pderiv (0, l') g)
+          = pderiv (0, l) g := by
       rw [Finset.sum_eq_single l]
       · simp
       · intro b _ hb; simp [hb]
@@ -147,10 +157,10 @@ theorem ChowFormBirationalAlgClosed.proof : ChowFormBirationalAlgClosed.Statemen
     rw [hsum, hmem]
     exact not_dvd_pderiv_of_pderiv_ne_zero hg.1 hl
   set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sum, map_mul, aeval_C, MvPolynomial.algebraMap_apply, hρ]
-      simp only [Finset.sum_mul, Finset.mul_sum]
-      refine Finset.sum_congr rfl fun l' _ => ?_
-      ring
+  · simp only [map_sum, map_mul, aeval_C, MvPolynomial.algebraMap_apply, hρ]
+    simp only [Finset.sum_mul, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun l' _ => ?_
+    ring
 
 end
 

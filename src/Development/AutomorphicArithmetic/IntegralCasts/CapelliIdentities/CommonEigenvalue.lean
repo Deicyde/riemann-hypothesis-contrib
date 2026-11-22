@@ -4,14 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.CommonEigenvectorOfCommutingSet.common_eig :
-    ∀ {k : Type} [inst : Field k] [IsAlgClosed k]
-    {V : Type} [inst_2 : AddCommGroup V] [inst_3 : _root_.Module k V] [FiniteDimensional k V] (S : Set (Module.End k V)),
-    (∀ f ∈ S, ∀ f' ∈ S, f * f' = f' * f) →
-      ∀ (d : ℕ) (W : Submodule k V),
-        Module.finrank k ↥W = d →
-          W ≠ ⊥ →
-            (∀ f ∈ S, ∀ x ∈ W, (f : V → V) x ∈ W) → ∃ v ∈ W, v ≠ (0 : V) ∧ ∀ f ∈ S, ∃ (c : k), (f : V → V) v = c • v := by
+theorem UpperTheory.Reformulated.B.CommonEigenvectorOfCommutingSet.common_eig
+    : ∀ {k : Type} [inst : Field k] [IsAlgClosed k] {V : Type} [inst_2 : AddCommGroup V]
+        [inst_3 : _root_.Module k V] [FiniteDimensional k V] (S : Set (Module.End k V)),
+      (∀ f ∈ S, ∀ f' ∈ S, f * f' = f' * f)
+        → ∀ (d : ℕ) (W : Submodule k V),
+          Module.finrank k ↥W = d → W ≠ ⊥ → (∀ f ∈ S, ∀ x ∈ W, (f : V → V) x ∈ W)
+            → ∃ v ∈ W, v ≠ (0 : V) ∧ ∀ f ∈ S, ∃ (c : k), (f : V → V) v = c • v := by
   intro k _ _ V _ _ _ S hS d
   induction d using Nat.strong_induction_on with
   | _ d ih =>
@@ -34,8 +33,7 @@ theorem UpperTheory.Reformulated.B.CommonEigenvectorOfCommutingSet.common_eig :
         exact hfx μ (Module.End.mem_eigenspace_iff.mp hx'.2)
       have hne : W ⊓ f.eigenspace μ ≠ ⊥ := by
         intro hb
-        have hm : (w : V) ∈ W ⊓ f.eigenspace μ :=
-          ⟨w.2, Module.End.mem_eigenspace_iff.mpr hwe⟩
+        have hm : (w : V) ∈ W ⊓ f.eigenspace μ := ⟨w.2, Module.End.mem_eigenspace_iff.mpr hwe⟩
         rw [hb] at hm
         exact hw0 ((Submodule.mem_bot k).mp hm)
       have hinv' : ∀ g ∈ S, ∀ y ∈ W ⊓ f.eigenspace μ, g y ∈ W ⊓ f.eigenspace μ := by

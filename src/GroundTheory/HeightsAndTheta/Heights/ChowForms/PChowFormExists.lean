@@ -12,9 +12,11 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem constantCoeff_eq_zero_of_isProjPrime {F : Type*} [Field F] {n : ℕ}
-    {P : Ideal (MvPolynomial (Fin n) F)} (hP : IsProjPrime P) {f : MvPolynomial (Fin n) F}
-    (hf : f ∈ P) : constantCoeff f = 0 := by
+theorem constantCoeff_eq_zero_of_isProjPrime
+    {F : Type*} [Field F]
+    {n : ℕ} {P : Ideal (MvPolynomial (Fin n) F)} (hP : IsProjPrime P)
+    {f : MvPolynomial (Fin n) F} (hf : f ∈ P)
+    : constantCoeff f = 0 := by
   by_contra h
   have h0 : homogeneousComponent 0 f ∈ P := hP.isHomog f hf 0
   rw [homogeneousComponent_zero] at h0
@@ -23,9 +25,11 @@ theorem constantCoeff_eq_zero_of_isProjPrime {F : Type*} [Field F] {n : ℕ}
   have hc : AddMonoidAlgebra.coeff f 0 ≠ 0 := by simpa [constantCoeff] using h
   exact hc.isUnit.map C
 
-theorem one_le_of_isProjPrime {F : Type*} [Field F] {n k : ℕ}
-    {P : Ideal (MvPolynomial (Fin n) F)} (hP : IsProjPrime P)
-    (hk : ringKrullDim (MvPolynomial (Fin n) F ⧸ P) = ((k : ℕ) : WithBot ℕ∞)) : 1 ≤ k := by
+theorem one_le_of_isProjPrime
+    {F : Type*} [Field F]
+    {n k : ℕ} {P : Ideal (MvPolynomial (Fin n) F)}
+    (hP : IsProjPrime P) (hk : ringKrullDim (MvPolynomial (Fin n) F ⧸ P) = ((k : ℕ) : WithBot ℕ∞))
+    : 1 ≤ k := by
   rcases Nat.eq_zero_or_pos k with rfl | h
   · exfalso
     have := hP.isPrime
@@ -34,16 +38,16 @@ theorem one_le_of_isProjPrime {F : Type*} [Field F] {n k : ℕ}
       simpa using hk
     have hmax : P.IsMaximal :=
       Ideal.Quotient.maximal_of_isField _ Ring.KrullDimLE.isField_of_isDomain
-    have hle : P ≤ RingHom.ker (constantCoeff : MvPolynomial (Fin n) F →+* F) :=
-      fun f hf => constantCoeff_eq_zero_of_isProjPrime hP hf
+    have hle : P ≤ RingHom.ker (constantCoeff : MvPolynomial (Fin n) F →+* F) := fun f hf =>
+      constantCoeff_eq_zero_of_isProjPrime hP hf
     have heq := hmax.eq_of_le (RingHom.ker_ne_top _) hle
     obtain ⟨j, hj⟩ := hP.isRelevant
     rw [heq] at hj
     exact hj (by simp [RingHom.mem_ker])
   · exact h
 
-theorem ChowFormExists.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdealPrime.Statement) :
-    ChowFormExists.Statement := by
+theorem ChowFormExists.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdealPrime.Statement)
+    : ChowFormExists.Statement := by
   intro F _ n k P hP hdim
   have hk : 1 ≤ k := one_le_of_isProjPrime hP hdim
   obtain ⟨j, -⟩ := hP.isRelevant

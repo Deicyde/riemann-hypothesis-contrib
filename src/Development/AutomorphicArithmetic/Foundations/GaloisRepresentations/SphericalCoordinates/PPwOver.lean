@@ -5,14 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NontrivialOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem list_prod_ofFn_eq_of_eq_one_of_ne' {M : Type*} [Monoid M] :
-    ∀ {m : ℕ} (f : Fin m → M) (i : Fin m), (∀ j, j ≠ i → f j = 1) → (List.ofFn f).prod = f i := by
+private theorem list_prod_ofFn_eq_of_eq_one_of_ne' {M : Type*} [Monoid M]
+    : ∀ {m : ℕ} (f : Fin m → M) (i : Fin m), (∀ j, j ≠ i → f j = 1) → (List.ofFn f).prod = f i := by
   intro m
   induction m with
   | zero => intro f i; exact i.elim0
@@ -29,9 +32,13 @@ private theorem list_prod_ofFn_eq_of_eq_one_of_ne' {M : Type*} [Monoid M] :
       rw [hfs 0 (Fin.succ_ne_zero i').symm, _root_.one_mul]
       exact ih (fun j => f j.succ) i' (fun j hj => hfs _ (fun h => hj (Fin.succ_injective _ h)))
 
-private theorem matEnd_diagonal_pr {S : Scheme.{0}} {O : Type} [Ring O] {A : Over S} [GrpObj A] (act : OActN O A) {m : ℕ}
-    (d : Fin m → O) (i : Fin m) :
-    GlobalTheory.KS.matEnd act (Matrix.diagonal d) ≫ GlobalTheory.KS.pr A i = GlobalTheory.KS.pr A i ≫ act.act (d i) := by
+private theorem matEnd_diagonal_pr
+    {S : Scheme.{0}} {O : Type} [Ring O]
+    {A : Over S} [GrpObj A]
+    (act : OActN O A)
+    {m : ℕ} (d : Fin m → O) (i : Fin m)
+    : GlobalTheory.KS.matEnd act (Matrix.diagonal d) ≫ GlobalTheory.KS.pr A i
+      = GlobalTheory.KS.pr A i ≫ act.act (d i) := by
   unfold GlobalTheory.KS.matEnd GlobalTheory.KS.pr
   rw [Pi.lift_comp_π]
   rw [list_prod_ofFn_eq_of_eq_one_of_ne' _ i]
@@ -39,14 +46,14 @@ private theorem matEnd_diagonal_pr {S : Scheme.{0}} {O : Type} [Ring O] {A : Ove
   · intro j hj
     simp [Matrix.diagonal_apply_ne' d hj, GlobalTheory.KS.Model.act_zero, Hom.one_def]
 
-theorem UpperTheory.Gal.W2.pwOver_of :
-    UpperTheory.Gal.W2.PwOver := by
+theorem UpperTheory.Gal.W2.pwOver_of : UpperTheory.Gal.W2.PwOver := by
   intro p _ D G L gb N N' h X X' c k
   have hpw : c.pw k ≫ (KS.pow X.univ.A k).hom = (KS.pow X'.univ.A k).hom ≫ c.q := by
     delta Leg.pw
     exact KS.Model.powMap_over _ _ _ k
-  have hpr : ∀ i : Fin k,
-      c.pw k ≫ Over.Hom.left (KS.pr X.univ.A i) = Over.Hom.left (KS.pr X'.univ.A i) ≫ c.tot := by
+  have hpr
+      : ∀ i : Fin k,
+        c.pw k ≫ Over.Hom.left (KS.pr X.univ.A i) = Over.Hom.left (KS.pr X'.univ.A i) ≫ c.tot := by
     intro i
     delta Leg.pw
     exact KS.Model.powMap_pr _ _ _ k i
@@ -58,8 +65,9 @@ theorem UpperTheory.Gal.W2.pwOver_of :
     rw [← Category.assoc, h1, Category.assoc, c.φ.act b, Category.assoc]
   · delta Leg.tw
     rw [Category.assoc, Over.w, hpw]
-  · have hm := congrArg Over.Hom.left
-      (matEnd_diagonal_pr X.univ.act (fun s => (algebraMap (𝓞 D.F) D.O (α s) : D.toG.O)) i)
+  · have hm :=
+      congrArg Over.Hom.left
+        (matEnd_diagonal_pr X.univ.act (fun s => (algebraMap (𝓞 D.F) D.O (α s) : D.toG.O)) i)
     rw [Over.comp_left, Over.comp_left] at hm
     delta Leg.tw
     refine (Category.assoc _ _ _).trans ((congrArg (c.pw k ≫ ·) hm).trans ?_)

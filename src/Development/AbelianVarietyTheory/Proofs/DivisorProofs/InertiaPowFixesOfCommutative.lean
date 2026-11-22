@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubMemPowSuc
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,16 +18,31 @@ noncomputable section
 
 namespace GlobalTheory.TameInertia
 
-theorem eq_one_of_pow_eq_one_of_sub_mem_sq : ∀ (A B : Type) [CommRing A] [CommRing B] [IsDomain B] [IsNoetherianRing B] [Algebra A B] (Q : Ideal B) (ρ : B ≃ₐ[A] B) (m : ℕ), Q ≠ ⊤ → IsUnit (m : B) → ρ ^ m = 1 → (∀ x, ρ x - x ∈ Q) → (∀ x ∈ Q, ρ x - x ∈ Q ^ 2) → ρ = 1 := by
+theorem eq_one_of_pow_eq_one_of_sub_mem_sq
+    : ∀ (A B : Type) [CommRing A] [CommRing B] [IsDomain B] [IsNoetherianRing B] [Algebra A B]
+        (Q : Ideal B) (ρ : B ≃ₐ[A] B) (m : ℕ),
+      Q ≠ ⊤ → IsUnit (m : B) → ρ ^ m = 1 → (∀ x, ρ x - x ∈ Q) → (∀ x ∈ Q, ρ x - x ∈ Q ^ 2)
+        → ρ = 1 := by
   first
   | exact @_root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one
   | exact _root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one
   | (apply _root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one <;> assumption)
-  | (intros; apply _root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.AlgEquivTrivialPowerCongruence.algEquiv_eq_one ..)
 
-theorem exists_generator_mod_sq : ∀ (B : Type) [CommRing B] [IsDedekindDomain B] (Q : Ideal B) [Q.IsPrime], Q ≠ ⊥ → (∃ π ∈ Q, π ∉ Q ^ 2 ∧ ∀ x ∈ Q, ∃ c, x - c * π ∈ Q ^ 2) ∧ ∀ a b : B, a * b ∈ Q ^ 2 → a ∉ Q → b ∈ Q ^ 2 := by
+theorem exists_generator_mod_sq
+    : ∀ (B : Type) [CommRing B] [IsDedekindDomain B] (Q : Ideal B) [Q.IsPrime],
+      Q ≠ ⊥
+        → (∃ π ∈ Q, π ∉ Q ^ 2 ∧ ∀ x ∈ Q, ∃ c, x - c * π ∈ Q ^ 2)
+          ∧ ∀ a b : B, a * b ∈ Q ^ 2 → a ∉ Q → b ∈ Q ^ 2 := by
   intro B _ _ Q hQ hQ0
   have hQt : Q ≠ ⊤ := Ideal.IsPrime.ne_top hQ
   have hmax : Q.IsMaximal := Ideal.IsPrime.isMaximal hQ hQ0
@@ -46,15 +62,19 @@ theorem exists_generator_mod_sq : ∀ (B : Type) [CommRing B] [IsDedekindDomain 
     obtain ⟨y, hy, w, hw, rfl⟩ := Submodule.mem_sup.1 hx
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hy
     exact ⟨c, by simpa using hw⟩
-  · have hrad : (Q ^ 2).radical = Q := by
-      rw [Ideal.radical_pow Q two_ne_zero, hQ.radical]
-    have hprim : (Q ^ 2).IsPrimary := Ideal.isPrimary_of_isMaximal_radical (by rw [hrad]; exact hmax)
+  · have hrad : (Q ^ 2).radical = Q := by rw [Ideal.radical_pow Q two_ne_zero, hQ.radical]
+    have hprim : (Q ^ 2).IsPrimary :=
+      Ideal.isPrimary_of_isMaximal_radical (by rw [hrad]; exact hmax)
     rcases (Ideal.isPrimary_iff.1 hprim).2 (by rw [mul_comm]; exact hab) with h | h
     · exact h
     · rw [hrad] at h
       exact absurd h ha
 
-theorem exists_tame_scalar : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (Q : Ideal B) (π : B), π ∈ Q → (∀ x ∈ Q, ∃ c, x - c * π ∈ Q ^ 2) → ∀ ρ : B ≃ₐ[A] B, (∀ x, ρ x - x ∈ Q) → ∃ c : B, ∀ k : ℕ, ∀ x ∈ Q, (ρ ^ k) x - c ^ k * x ∈ Q ^ 2 := by
+theorem exists_tame_scalar
+    : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (Q : Ideal B) (π : B),
+      π ∈ Q → (∀ x ∈ Q, ∃ c, x - c * π ∈ Q ^ 2)
+        → ∀ ρ : B ≃ₐ[A] B,
+          (∀ x, ρ x - x ∈ Q) → ∃ c : B, ∀ k : ℕ, ∀ x ∈ Q, (ρ ^ k) x - c ^ k * x ∈ Q ^ 2 := by
   intro A B _ _ _ Q π hπ hgen ρ hI
   have hmul : ∀ a b : B, a ∈ Q → b ∈ Q → a * b ∈ Q ^ 2 := fun a b ha hb => by
     rw [pow_two]; exact Ideal.mul_mem_mul ha hb
@@ -74,21 +94,30 @@ theorem exists_tame_scalar : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra
     have e : ρ x - c * x = (ρ d - d) * ρ π + d * (ρ π - c * π) + (ρ w - c * w) := by
       rw [hx', map_add (f := _), map_mul]; ring
     rw [e]
-    refine Ideal.add_mem _ (Ideal.add_mem _ (hmul _ _ (hI d) (hρQ π hπ)) (Ideal.mul_mem_left _ _ hc)) ?_
+    refine Ideal.add_mem _
+      (Ideal.add_mem _ (hmul _ _ (hI d) (hρQ π hπ)) (Ideal.mul_mem_left _ _ hc)) ?_
     exact Ideal.sub_mem _ (hρQ2 w hd) (Ideal.mul_mem_left _ _ hd)
   refine ⟨c, fun k => ?_⟩
   induction k with
   | zero => intro x _; simp
   | succ k ih =>
     intro x hx
-    have e : (ρ ^ (k + 1)) x - c ^ (k + 1) * x =
-        ρ ((ρ ^ k) x - c ^ k * x) + (ρ (c ^ k) - c ^ k) * ρ x + c ^ k * (ρ x - c * x) := by
+    have e
+        : (ρ ^ (k + 1)) x - c ^ (k + 1) * x
+          = ρ ((ρ ^ k) x - c ^ k * x) + (ρ (c ^ k) - c ^ k) * ρ x + c ^ k * (ρ x - c * x) := by
       rw [pow_succ', AlgEquiv.mul_apply, map_sub, map_mul]; ring
     rw [e]
     exact Ideal.add_mem _ (Ideal.add_mem _ (hρQ2 _ (ih x hx)) (hmul _ _ (hI _) (hρQ x hx)))
       (Ideal.mul_mem_left _ _ (h1 x hx))
 
-theorem pow_card_sub_one_sub_mem_sq : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (Q : Ideal B) [Q.IsPrime] (π : B), π ∈ Q → π ∉ Q ^ 2 → (∀ x ∈ Q, ∃ c, x - c * π ∈ Q ^ 2) → (∀ a b : B, a * b ∈ Q ^ 2 → a ∉ Q → b ∈ Q ^ 2) → ∀ (ρ φ : B ≃ₐ[A] B) (q : ℕ) (c : B), IsOfFinOrder ρ → IsOfFinOrder φ → ρ * φ = φ * ρ → (∀ x, φ x - x ^ q ∈ Q) → (∀ k : ℕ, ∀ x ∈ Q, (ρ ^ k) x - c ^ k * x ∈ Q ^ 2) → ∀ x ∈ Q, (ρ ^ (q - 1)) x - x ∈ Q ^ 2 := by
+theorem pow_card_sub_one_sub_mem_sq
+    : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (Q : Ideal B) [Q.IsPrime] (π : B),
+      π ∈ Q → π ∉ Q ^ 2 → (∀ x ∈ Q, ∃ c, x - c * π ∈ Q ^ 2)
+        → (∀ a b : B, a * b ∈ Q ^ 2 → a ∉ Q → b ∈ Q ^ 2)
+        → ∀ (ρ φ : B ≃ₐ[A] B) (q : ℕ) (c : B),
+          IsOfFinOrder ρ → IsOfFinOrder φ → ρ * φ = φ * ρ → (∀ x, φ x - x ^ q ∈ Q)
+            → (∀ k : ℕ, ∀ x ∈ Q, (ρ ^ k) x - c ^ k * x ∈ Q ^ 2)
+            → ∀ x ∈ Q, (ρ ^ (q - 1)) x - x ∈ Q ^ 2 := by
   intro A B _ _ _ Q hQ π hπ hπ2 hgen hprim ρ φ q c hρf hφf hcomm hφ hc
   rcases Nat.eq_zero_or_pos q with rfl | hq
   · intro x _; simp
@@ -118,9 +147,10 @@ theorem pow_card_sub_one_sub_mem_sq : ∀ (A B : Type) [CommRing A] [CommRing B]
   have hφQ : ∀ x ∈ Q, φ x ∈ Q := fun x hx => by
     have := Q.add_mem (hφ x) (Q.pow_mem_of_mem hx q hq)
     rwa [sub_add_cancel] at this
-  have hcQ : c ∉ Q := fun hcQ => hfin ρ hρf hρQ (by
-    have := Ideal.add_mem _ (hc1 π hπ) (hmul c π hcQ hπ)
-    rwa [sub_add_cancel] at this)
+  have hcQ : c ∉ Q := fun hcQ =>
+    hfin ρ hρf hρQ (by
+      have := Ideal.add_mem _ (hc1 π hπ) (hmul c π hcQ hπ)
+      rwa [sub_add_cancel] at this)
   have hφπ : φ π ∉ Q ^ 2 := fun h => hfin φ hφf hφQ h
   have hd : (φ c - c) * φ π ∈ Q ^ 2 := by
     have h1 := hc1 (φ π) (hφQ π hπ)
@@ -140,11 +170,18 @@ theorem pow_card_sub_one_sub_mem_sq : ∀ (A B : Type) [CommRing A] [CommRing B]
     exact Ideal.sub_mem _ hφc (hφ c)
   have hcq' : c ^ (q - 1) - 1 ∈ Q := (hQ.mem_or_mem hcq).resolve_left hcQ
   intro x hx
-  have e : (ρ ^ (q - 1)) x - x = ((ρ ^ (q - 1)) x - c ^ (q - 1) * x) + (c ^ (q - 1) - 1) * x := by ring
+  have e : (ρ ^ (q - 1)) x - x = ((ρ ^ (q - 1)) x - c ^ (q - 1) * x) + (c ^ (q - 1) - 1) * x := by
+    ring
   rw [e]
   exact Ideal.add_mem _ (hc (q - 1) x hx) (hmul _ _ hcq' hx)
 
-theorem integral_mem_and_valuation_lt_one : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω] [Algebra R Ω] [IsScalarTower R K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring → (∀ x : Ω, IsIntegral R x → x ∈ V) ∧ ∀ r : R, (V.valuation (algebraMap R Ω r) < 1 ↔ r ∈ maximalIdeal R) := by
+theorem integral_mem_and_valuation_lt_one
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] [Field Ω] [Algebra K Ω] [Algebra R Ω] [IsScalarTower R K Ω]
+        (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → (∀ x : Ω, IsIntegral R x → x ∈ V)
+          ∧ ∀ r : R, (V.valuation (algebraMap R Ω r) < 1 ↔ r ∈ maximalIdeal R) := by
   intro R K Ω _ _ _ _ _ _ _ _ _ _ V hV
   have memV : ∀ a : K, algebraMap K Ω a ∈ V ↔ a ∈ (algebraMap R K).range := fun a => by
     rw [← hV]; rfl
@@ -162,10 +199,15 @@ theorem integral_mem_and_valuation_lt_one : ∀ (R K Ω : Type) [CommRing R] [Is
       by_contra hr
       have hu : IsUnit r := by simpa [mem_maximalIdeal, mem_nonunits_iff] using hr
       obtain ⟨u, rfl⟩ := hu
-      have h1 : V.valuation (algebraMap R Ω (u : R)) * V.valuation (algebraMap R Ω ((u⁻¹ : Rˣ) : R)) = 1 := by
+      have h1
+          : V.valuation (algebraMap R Ω (u : R)) * V.valuation (algebraMap R Ω ((u⁻¹ : Rˣ) : R))
+            = 1 := by
         rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
-      have h2 : V.valuation (algebraMap R Ω ((u⁻¹ : Rˣ) : R)) ≤ 1 := (V.valuation_le_one_iff _).2 (hRV _)
-      have h3 : V.valuation (algebraMap R Ω (u : R)) * V.valuation (algebraMap R Ω ((u⁻¹ : Rˣ) : R)) < 1 :=
+      have h2 : V.valuation (algebraMap R Ω ((u⁻¹ : Rˣ) : R)) ≤ 1 :=
+        (V.valuation_le_one_iff _).2 (hRV _)
+      have h3
+          : V.valuation (algebraMap R Ω (u : R)) * V.valuation (algebraMap R Ω ((u⁻¹ : Rˣ) : R))
+            < 1 :=
         mul_lt_one_of_lt_of_le h h2
       rw [h1] at h3
       exact lt_irrefl _ h3
@@ -186,7 +228,11 @@ theorem integral_mem_and_valuation_lt_one : ∀ (R K Ω : Type) [CommRing R] [Is
       have := IsFractionRing.injective R K hrs
       exact (mem_maximalIdeal _ |>.1 hr) ⟨⟨r, s, this, by rw [mul_comm]; exact this⟩, rfl⟩
 
-theorem exists_frobenius : ∀ (R B G : Type) [CommRing R] [IsLocalRing R] [Finite (ResidueField R)] [CommRing B] [Algebra R B] [Module.Finite R B] [Group G] [Finite G] [MulSemiringAction G B] [SMulCommClass G R B] [Algebra.IsInvariant R B G] (Q : Ideal B) [Q.IsPrime], Q.under R = maximalIdeal R → ∃ σ : G, ∀ x : B, σ • x - x ^ Nat.card (ResidueField R) ∈ Q := by
+theorem exists_frobenius
+    : ∀ (R B G : Type) [CommRing R] [IsLocalRing R] [Finite (ResidueField R)] [CommRing B]
+        [Algebra R B] [Module.Finite R B] [Group G] [Finite G] [MulSemiringAction G B]
+        [SMulCommClass G R B] [Algebra.IsInvariant R B G] (Q : Ideal B) [Q.IsPrime],
+      Q.under R = maximalIdeal R → ∃ σ : G, ∀ x : B, σ • x - x ^ Nat.card (ResidueField R) ∈ Q := by
   intro R B G _ _ _ _ _ _ _ _ _ _ _ Q _ hQ
   haveI : Q.LiesOver (maximalIdeal R) := ⟨hQ.symm⟩
   haveI : Finite (R ⧸ maximalIdeal R) := inferInstanceAs (Finite (ResidueField R))
@@ -199,7 +245,15 @@ theorem exists_frobenius : ∀ (R B G : Type) [CommRing R] [IsLocalRing R] [Fini
   rw [hQ] at this
   exact this
 
-theorem inertia_pow_fixes_of_commutative : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Finite (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring → ∀ (L : IntermediateField K Ω), FiniteDimensional K L → IsGalois K L → (∀ σ τ : L ≃ₐ[K] L, σ * τ = τ * σ) → ∀ σ ∈ inertia K V, ∃ a : ℕ, ∀ x ∈ L, (σ ^ ((Nat.card (ResidueField R) - 1) * ringChar (ResidueField R) ^ a)) x = x := by
+theorem inertia_pow_fixes_of_commutative
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [Finite (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω]
+        [Algebra K Ω] (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → ∀ (L : IntermediateField K Ω),
+          FiniteDimensional K L → IsGalois K L → (∀ σ τ : L ≃ₐ[K] L, σ * τ = τ * σ)
+            → ∀ σ ∈ inertia K V, ∃ a : ℕ, ∀ x ∈ L,
+              (σ ^ ((Nat.card (ResidueField R) - 1) * ringChar (ResidueField R) ^ a)) x = x := by
   intro R K Ω _ _ _ _ _ _ _ _ _ V hV L hfin hgal hab σ hσ
   haveI := hfin
   haveI := hgal
@@ -235,8 +289,7 @@ theorem inertia_pow_fixes_of_commutative : ∀ (R K Ω : Type) [CommRing R] [IsD
       rw [hunder]
       exact hϖ.not_isUnit
     rw [h, Ideal.mem_bot] at h1
-    have h2 : algebraMap R L ϖ = 0 := by
-      rw [IsScalarTower.algebraMap_apply R B L, h1, map_zero]
+    have h2 : algebraMap R L ϖ = 0 := by rw [IsScalarTower.algebraMap_apply R B L, h1, map_zero]
     rw [IsScalarTower.algebraMap_apply R K L, map_eq_zero] at h2
     exact hϖ.ne_zero (IsFractionRing.injective R K (h2.trans (map_zero _).symm))
   obtain ⟨φ, hφ⟩ := exists_frobenius R B (B ≃ₐ[R] B) Q hunder
@@ -247,8 +300,9 @@ theorem inertia_pow_fixes_of_commutative : ∀ (R K Ω : Type) [CommRing R] [IsD
   have hρ : ρ ∈ Q.inertia (B ≃ₐ[R] B) := fun b => by
     show ρ • b - b ∈ Q
     rw [hQmem]
-    have e : algebraMap L Ω (algebraMap B L (ρ • b - b)) =
-        σ (algebraMap L Ω (algebraMap B L b)) - algebraMap L Ω (algebraMap B L b) := by
+    have e
+        : algebraMap L Ω (algebraMap B L (ρ • b - b))
+          = σ (algebraMap L Ω (algebraMap B L b)) - algebraMap L Ω (algebraMap B L b) := by
       rw [AlgEquiv.smul_def, (algebraMap B L).map_sub, (algebraMap L Ω).map_sub,
         algebraMap_galRestrict_apply, AlgEquiv.restrictNormal_commutes]
     rw [e]
@@ -267,7 +321,8 @@ theorem inertia_pow_fixes_of_commutative : ∀ (R K Ω : Type) [CommRing R] [IsD
   have hNm : p ^ a * m = N := Nat.ordProj_mul_ordCompl_eq_self N p
   have hcop : Nat.Coprime p m := Nat.coprime_ordCompl hp hN.ne'
   have hmk : (m : ResidueField R) ≠ 0 := fun h =>
-    hp.one_lt.ne' (Nat.Coprime.eq_one_of_dvd hcop ((CharP.cast_eq_zero_iff (ResidueField R) p m).1 h))
+    hp.one_lt.ne' (Nat.Coprime.eq_one_of_dvd hcop
+      ((CharP.cast_eq_zero_iff (ResidueField R) p m).1 h))
   have hmR : IsUnit (m : R) := by
     rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_natCast]
     exact hmk
@@ -276,13 +331,16 @@ theorem inertia_pow_fixes_of_commutative : ∀ (R K Ω : Type) [CommRing R] [IsD
   have hρ1I : ρ1 ∈ Q.inertia (B ≃ₐ[R] B) := Subgroup.pow_mem _ hρ _
   obtain ⟨⟨π, hπQ, hπ2, hπgen⟩, hprim⟩ := exists_generator_mod_sq B Q hQ0
   obtain ⟨c, hc⟩ := exists_tame_scalar R B Q π hπQ hπgen ρ1 hρ1I
-  have h2 := pow_card_sub_one_sub_mem_sq R B Q π hπQ hπ2 hπgen hprim ρ1 φ q c (isOfFinOrder_of_finite _) (isOfFinOrder_of_finite _)
-    (hcomm _ _) (fun x => hφ x) hc
+  have h2 :=
+    pow_card_sub_one_sub_mem_sq R B Q π hπQ hπ2 hπgen hprim ρ1 φ q c (isOfFinOrder_of_finite _)
+      (isOfFinOrder_of_finite _) (hcomm _ _)
+      (fun x => hφ x)
+      hc
   have hρ2 : ρ1 ^ (q - 1) = 1 := by
-    refine eq_one_of_pow_eq_one_of_sub_mem_sq R B Q (ρ1 ^ (q - 1)) m (Ideal.IsPrime.ne_top inferInstance) hmB ?_
-      (Subgroup.pow_mem _ hρ1I _) h2
-    rw [hρ1, ← pow_mul, ← pow_mul, show p ^ a * ((q - 1) * m) = N * (q - 1) by rw [← hNm]; ring, pow_mul,
-      pow_orderOf_eq_one, one_pow]
+    refine eq_one_of_pow_eq_one_of_sub_mem_sq R B Q (ρ1 ^ (q - 1)) m
+      (Ideal.IsPrime.ne_top inferInstance) hmB ?_ (Subgroup.pow_mem _ hρ1I _) h2
+    rw [hρ1, ← pow_mul, ← pow_mul, show p ^ a * ((q - 1) * m) = N * (q - 1) by rw [← hNm]; ring,
+      pow_mul, pow_orderOf_eq_one, one_pow]
   have hτn : τ ^ ((q - 1) * p ^ a) = 1 := by
     apply (galRestrict R K L B).injective
     rw [map_pow, map_one, ← hρdef, mul_comm, pow_mul]

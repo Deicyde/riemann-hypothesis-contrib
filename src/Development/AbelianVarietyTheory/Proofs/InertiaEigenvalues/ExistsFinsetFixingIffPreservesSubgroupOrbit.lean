@@ -5,13 +5,15 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory
 
-theorem orbit_stab_cut_finite (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (H : Subgroup (G E Ω)) (y : Ω) :
-    ∃ s : Finset Ω, ∀ σ : G E Ω, (∀ x ∈ s, σ x = x) ↔ ∀ τ ∈ H, ∃ τ' ∈ H, σ (τ y) = τ' y := by
+theorem orbit_stab_cut_finite
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (H : Subgroup (G E Ω)) (y : Ω)
+    : ∃ s : Finset Ω, ∀ σ : G E Ω, (∀ x ∈ s, σ x = x) ↔ ∀ τ ∈ H, ∃ τ' ∈ H, σ (τ y) = τ' y := by
   classical
   haveI : Algebra.IsAlgebraic E Ω := IsAlgClosure.isAlgebraic
   have hint : IsIntegral E y := Algebra.IsIntegral.isIntegral y
@@ -27,8 +29,9 @@ theorem orbit_stab_cut_finite (E Ω : Type) [Field E] [NumberField E] [Field Ω]
   have hmemO : ∀ t, t ∈ O ↔ ∃ τ ∈ H, τ y = t := fun t => by simp [O, S]
   set P : Polynomial Ω := ∏ t ∈ O, (X - C t) with hP
   refine ⟨(Finset.range (P.natDegree + 1)).image P.coeff, fun σ => ?_⟩
-  have key : (∀ x ∈ (Finset.range (P.natDegree + 1)).image P.coeff, σ x = x) ↔
-      P.map (σ : Ω →+* Ω) = P := by
+  have key
+      : (∀ x ∈ (Finset.range (P.natDegree + 1)).image P.coeff, σ x = x)
+        ↔ P.map (σ : Ω →+* Ω) = P := by
     constructor
     · intro h
       ext n
@@ -40,8 +43,7 @@ theorem orbit_stab_cut_finite (E Ω : Type) [Field E] [NumberField E] [Field Ω]
       obtain ⟨n, -, rfl⟩ := Finset.mem_image.1 hx
       have := congrArg (fun p => p.coeff n) h
       simpa [coeff_map] using this
-  have hmap : P.map (σ : Ω →+* Ω) = ∏ t ∈ O, (X - C (σ t)) := by
-    simp [hP, Polynomial.map_prod]
+  have hmap : P.map (σ : Ω →+* Ω) = ∏ t ∈ O, (X - C (σ t)) := by simp [hP, Polynomial.map_prod]
   rw [key, hmap]
   constructor
   · intro h τ hτ
@@ -63,9 +65,9 @@ theorem orbit_stab_cut_finite (E Ω : Type) [Field E] [NumberField E] [Field Ω]
       exact (hmemO _).2 ⟨τ', hτ', he.symm⟩
     have heq : O.image σ = O :=
       Finset.eq_of_subset_of_card_le hsub (by rw [Finset.card_image_of_injective _ hinj])
-    calc ∏ t ∈ O, (X - C (σ t)) = ∏ u ∈ O.image σ, (X - C u) :=
-          by
-          rw [Finset.prod_image (fun a _ b _ hab => hinj hab)]
+    calc
+      ∏ t ∈ O, (X - C (σ t))
+        = ∏ u ∈ O.image σ, (X - C u) := by rw [Finset.prod_image (fun a _ b _ hab => hinj hab)]
       _ = P := by rw [heq]
 
 end GlobalTheory

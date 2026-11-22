@@ -6,15 +6,19 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LocRatio
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.TorusUnif
 open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.Xgn.FiniteSurjectivePointLift
 
-theorem exists_ringHom (L A : Type) [Field L] [CommRing A] [Nontrivial A] (φ : L →+* A) (hφ : φ.Finite) :
-    ∃ ψ : A →+* AlgebraicClosure L, ψ.comp φ = algebraMap L (AlgebraicClosure L) := by
+theorem exists_ringHom
+    (L A : Type) [Field L] [CommRing A] [Nontrivial A] (φ : L →+* A) (hφ : φ.Finite)
+    : ∃ ψ : A →+* AlgebraicClosure L, ψ.comp φ = algebraMap L (AlgebraicClosure L) := by
   letI := φ.toAlgebra
   haveI : Module.Finite L A := hφ
   obtain ⟨m, hm⟩ := Ideal.exists_maximal A
@@ -23,15 +27,17 @@ theorem exists_ringHom (L A : Type) [Field L] [CommRing A] [Nontrivial A] (φ : 
   haveI : Algebra.IsAlgebraic L (A ⧸ m) := inferInstance
   let j : (A ⧸ m) →ₐ[L] AlgebraicClosure L := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨(j.comp (Ideal.Quotient.mkₐ L m)).toRingHom, ?_⟩
   ext x
   exact (j.comp (Ideal.Quotient.mkₐ L m)).commutes x
 
-theorem exists_point (L : Type) [Field L] (P : Scheme.{0}) [Nonempty P] (g : P ⟶ Spec (CommRingCat.of L))
-    [IsFinite g] : ∃ x : Spec (CommRingCat.of (AlgebraicClosure L)) ⟶ P,
+theorem exists_point
+    (L : Type) [Field L]
+    (P : Scheme.{0}) [Nonempty P]
+    (g : P ⟶ Spec (CommRingCat.of L)) [IsFinite g]
+    : ∃ x : Spec (CommRingCat.of (AlgebraicClosure L)) ⟶ P,
       x ≫ g = Spec.map (CommRingCat.ofHom (algebraMap L (AlgebraicClosure L))) := by
   haveI hA : IsAffine P := isAffine_of_isAffineHom g
   have hfin : (g.appTop).hom.Finite := g.finite_app ⊤ (isAffineOpen_top _)
@@ -51,8 +57,11 @@ theorem exists_point (L : Type) [Field L] (P : Scheme.{0}) [Nonempty P] (g : P �
 
 end PositivityTheory.Xgn.FiniteSurjectivePointLift
 
-theorem PositivityTheory.Xgn.finite_surjective_point_lift : ∀ (Z' Z : Scheme.{0}) (π : Z' ⟶ Z), IsFinite π → Surjective π → ∀ (L : Type) [Field L] (zZ : Sp L ⟶ Z),
-    ∃ x : Sp (AlgebraicClosure L) ⟶ Z', x ≫ π = spMap (algebraMap L (AlgebraicClosure L)) ≫ zZ := by
+theorem PositivityTheory.Xgn.finite_surjective_point_lift
+    : ∀ (Z' Z : Scheme.{0}) (π : Z' ⟶ Z),
+      IsFinite π → Surjective π
+        → ∀ (L : Type) [Field L] (zZ : Sp L ⟶ Z), ∃ x : Sp (AlgebraicClosure L) ⟶ Z',
+          x ≫ π = spMap (algebraMap L (AlgebraicClosure L)) ≫ zZ := by
   intro Z' Z π hfin hsurj L _ zZ
   haveI : Surjective (pullback.snd π zZ) := inferInstance
   obtain ⟨p, -⟩ := (pullback.snd π zZ).surjective (IsLocalRing.closedPoint L)

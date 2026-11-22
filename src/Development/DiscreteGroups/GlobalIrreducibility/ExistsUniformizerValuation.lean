@@ -15,16 +15,17 @@ namespace DiscreteGroups.sglob.DzType
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem valuation_le_iff_ord_le (x y : kˣ) :
-    valuation k (x : k) ≤ valuation k (y : k) ↔ ord k y ≤ ord k x := by
+theorem valuation_le_iff_ord_le (x y : kˣ)
+    : valuation k (x : k) ≤ valuation k (y : k) ↔ ord k y ≤ ord k x := by
   set φ := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k
   have hx : φ (valuation k (x : k)) ≠ 0 := by simp
   have hy : φ (valuation k (y : k)) ≠ 0 := by simp
-  have ho : ∀ z : kˣ, ord k z = -WithZero.log (φ (valuation k (z : k))) := fun _ => rfl
-  rw [← φ.strictMono.le_iff_le, ← WithZero.exp_log hx, ← WithZero.exp_log hy, WithZero.exp_le_exp, ho x, ho y]
+  have ho : ∀ z : kˣ, ord k z = - WithZero.log (φ (valuation k (z : k))) := fun _ => rfl
+  rw [← φ.strictMono.le_iff_le, ← WithZero.exp_log hx, ← WithZero.exp_log hy, WithZero.exp_le_exp,
+    ho x, ho y]
   omega
 
-theorem ord_inv_eq_neg_ord (x : kˣ) : ord k x⁻¹ = -ord k x := by
+theorem ord_inv_eq_neg_ord (x : kˣ) : ord k x⁻¹ = - ord k x := by
   have h := ord_mul k x⁻¹ x
   rw [inv_mul_cancel, ord_eq_zero (k := k) (x := 1) (by simp)] at h
   omega
@@ -42,8 +43,8 @@ theorem exists_uniformizer_valuation : ∃ t : kˣ, valuation k (t : k) = unifor
     exact absurd ht.symm (by simp)
   exact ⟨Units.mk0 t h0, ht⟩
 
-theorem exists_ball_char_trivial (ψ : AddChar k Circle) (hψ : Continuous ψ) :
-    ∃ s : kˣ, ∀ y ∈ cball s, ψ y = 1 := by
+theorem exists_ball_char_trivial (ψ : AddChar k Circle) (hψ : Continuous ψ)
+    : ∃ s : kˣ, ∀ y ∈ cball s, ψ y = 1 := by
   have hU : {x : k | ‖(ψ x : ℂ) - 1‖ < 1 / 2} ∈ nhds (0 : k) := by
     have hc : Continuous fun x : k => ‖(ψ x : ℂ) - 1‖ :=
       ((continuous_subtype_val.comp hψ).sub continuous_const).norm
@@ -55,14 +56,16 @@ theorem exists_ball_char_trivial (ψ : AddChar k Circle) (hψ : Continuous ψ) :
     induction n with
     | zero => simp [cball]
     | succ n ih => rw [succ_nsmul]; exact add_mem_cball ih hy
-  have h := GlobalTheory.CharConductor.eq_one_of_pow_near_one (z := (ψ y : ℂ)) fun n => by
-    have := hs (hn n)
-    simp only [Set.mem_ofPred_eq, AddChar.map_nsmul_eq_pow] at this
-    simpa using this
+  have h :=
+    GlobalTheory.CharConductor.eq_one_of_pow_near_one (z := (ψ y : ℂ)) fun n => by
+      have := hs (hn n)
+      simp only [Set.mem_ofPred_eq, AddChar.map_nsmul_eq_pow] at this
+      simpa using this
   exact Circle.ext (by rw [h, Circle.coe_one])
 
-theorem exists_hasConductor_of_continuous_ne_one (ψ : AddChar k Circle) (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) :
-    ∃ c : kˣ, HasConductor ψ c := by
+theorem exists_hasConductor_of_continuous_ne_one
+    (ψ : AddChar k Circle) (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
+    : ∃ c : kˣ, HasConductor ψ c := by
   obtain ⟨s, hs⟩ := exists_ball_char_trivial ψ hψ
   obtain ⟨t, ht⟩ := exists_uniformizer_valuation (k := k)
   have hot : ord k t = 1 := ord_eq_one (k := k) ht
@@ -78,8 +81,9 @@ theorem exists_hasConductor_of_continuous_ne_one (ψ : AddChar k Circle) (hψ : 
       exact hψ1 (by ext x; rw [h x, AddChar.one_apply])
     have hx0 : x ≠ 0 := by rintro rfl; exact hx (AddChar.map_zero_eq_one ψ)
     refine ⟨(ord k s - ord k (Units.mk0 x hx0)).toNat, fun h => hx (h x ?_)⟩
-    have := (valuation_le_iff_ord_le (Units.mk0 x hx0) (b (ord k s - ord k (Units.mk0 x hx0)).toNat)).2
-      (by rw [hb]; omega)
+    have :=
+      (valuation_le_iff_ord_le (Units.mk0 x hx0) (b (ord k s - ord k (Units.mk0 x hx0)).toNat)).2
+        (by rw [hb]; omega)
     simpa using this
   classical
   set N := Nat.find hex with hNdef
@@ -106,9 +110,8 @@ theorem exists_hasConductor_of_continuous_ne_one (ψ : AddChar k Circle) (hψ : 
   have := (valuation_le_iff_ord_le (b N) (Units.mk0 x hx0)).2 (by omega)
   simpa using this
 
-
-theorem residue_eq_iff_valuation_lt (a b : 𝒪[k]) :
-    IsLocalRing.residue 𝒪[k] a = IsLocalRing.residue 𝒪[k] b ↔ valuation k ((a : k) - b) < 1 := by
+theorem residue_eq_iff_valuation_lt (a b : 𝒪[k])
+    : IsLocalRing.residue 𝒪[k] a = IsLocalRing.residue 𝒪[k] b ↔ valuation k ((a : k) - b) < 1 := by
   have hv := Valuation.integer.integers (valuation k)
   have h1 : valuation k (((a - b : 𝒪[k])) : k) ≤ 1 := (Valuation.mem_integer_iff _ _).1 (a - b).2
   have e : ∀ x : 𝒪[k], algebraMap 𝒪[k] k x = (x : k) := fun _ => rfl
@@ -116,6 +119,5 @@ theorem residue_eq_iff_valuation_lt (a b : 𝒪[k]) :
     mem_nonunits_iff, hv.isUnit_iff_valuation_eq_one, e]
   push_cast at h1 ⊢
   exact ⟨fun h => lt_of_le_of_ne h1 h, fun h => h.ne⟩
-
 
 end DiscreteGroups.sglob.DzType

@@ -6,7 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitPlac
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -18,8 +23,9 @@ open GlobalTheory.TwistChoice (Reading ReadsAt)
 
 namespace GlobalTheory.SplitByCompl
 
-theorem eq_of_w_eq : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (s s' : SplitPlace L),
-    s.w = s'.w → s = s' := by
+theorem eq_of_w_eq
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (s s' : SplitPlace L),
+      s.w = s'.w → s = s' := by
   intro L _ _ _ s s' h
   have hv : s.v = s'.v := HeightOneSpectrum.ext (by rw [← s'.w_under, ← s.w_under, h])
   obtain ⟨v, si⟩ := s
@@ -34,12 +40,13 @@ theorem eq_of_w_eq : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (s s
   have hww : w = w' := hw.symm.trans (h.trans hw')
   subst hww
   have e : (i' : v.adicCompletion (maximalRealSubfield L) →+* w.adicCompletion L) = i :=
-    DFunLike.coe_injective ((HeightOneSpectrum.denseRange_algebraMap (maximalRealSubfield L) v).equalizer
-      hi' hi (funext fun y => by
-        have h1 := hix (algebraMap _ L y)
-        have h2 := hix' (algebraMap _ L y)
-        rw [AlgHom.commutes] at h1 h2
-        exact h2.trans h1.symm))
+    DFunLike.coe_injective
+      ((HeightOneSpectrum.denseRange_algebraMap (maximalRealSubfield L) v).equalizer hi' hi
+        (funext fun y => by
+          have h1 := hix (algebraMap _ L y)
+          have h2 := hix' (algebraMap _ L y)
+          rw [AlgHom.commutes] at h1 h2
+          exact h2.trans h1.symm))
   have e' : ∀ x, i' x = i x := fun x =>
     congrArg (fun f : v.adicCompletion (maximalRealSubfield L) →+* w.adicCompletion L => f x) e
   have hs : si = si' := AlgHom.ext fun x => i.injective (by rw [hix, ← e', hix'])

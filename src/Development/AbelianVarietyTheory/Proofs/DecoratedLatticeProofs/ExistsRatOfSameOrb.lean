@@ -14,11 +14,15 @@ open NumberField IsDedekindDomain Matrix ValuativeRel Formalism.L2.Col
 open scoped Classical
 
 namespace GlobalTheory.QPl.RatOrb
-open GlobalTheory.StepData GlobalTheory.SplitWeil GlobalTheory.TwBridge.Lev GlobalTheory.TwBridge.LevOrb
+open GlobalTheory.StepData GlobalTheory.SplitWeil GlobalTheory.TwBridge.Lev
+  GlobalTheory.TwBridge.LevOrb
 
-theorem image_val_mem_nhds {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {B : Type} [Fintype B] [DecidableEq B] {S : Set (GL B k)} (hS : IsOpen S) {h : GL B k} (hh : h ∈ S) :
-    Units.val '' S ∈ nhds h.val := by
+theorem image_val_mem_nhds
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {B : Type} [Fintype B] [DecidableEq B]
+    {S : Set (GL B k)} (hS : IsOpen S)
+    {h : GL B k} (hh : h ∈ S)
+    : Units.val '' S ∈ nhds h.val := by
   obtain ⟨W, hW, rfl⟩ := isOpen_induced_iff.1 hS
   have hd : h.val.det ≠ 0 := h.det_ne_zero
   have hc : ContinuousAt (Inv.inv : Matrix B B k → Matrix B B k) h.val := by
@@ -37,7 +41,22 @@ theorem image_val_mem_nhds {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
   rw [Set.mem_preimage, key]
   exact hN1
 
-theorem exists_rat_of_sameOrb : ∀ {E k : Type} [Field E] [NumberField E] [StarRing E] [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (P : HeightOneSpectrum (𝓞 E)) (ι : E →+* k) (ϖ : kˣ), GlobalTheory.SymBridge.IsCompl P (qOf P) ι ϖ → ∀ {A : Type} [Fintype A] [DecidableEq A] {n : ℕ} (e : A ≃ Fin n) (Jl : Subgroup (GL (A ⊕ Fin 0) k)), IsOpen (Jl : Set (GL (A ⊕ Fin 0) k)) → Jl ≤ GlobalTheory.SplitWeil.KO k (A ⊕ Fin 0) → ∀ (M : ℕ) (c : (A → k) ⧸ GlobalTheory.StepData.box A (ϖ ^ M)) (y₀ : Sp E n), GlobalTheory.QPl.SameOrb Jl (GlobalTheory.StepData.box A (ϖ ^ M)) c (Submodule.Quotient.mk fun a => ι (y₀ (e a))) → ∃ r ∈ GLint E n P, ∃ g ∈ Jl, g.val.toBlocks₁₁ = GlobalTheory.SymBridge.toLoc ι e e r.toLinearMap ∧ ∀ y : Sp E n, ((qOf P : E) ^ M)⁻¹ • (r.symm y - y₀) ∈ stdAt E n P → c = Submodule.Quotient.mk fun a => ι (y (e a)) := by
+theorem exists_rat_of_sameOrb
+    : ∀ {E k : Type} [Field E] [NumberField E] [StarRing E] [Field k] [ValuativeRel k]
+        [TopologicalSpace k] [IsNonarchimedeanLocalField k] (P : HeightOneSpectrum (𝓞 E))
+        (ι : E →+* k) (ϖ : kˣ),
+      GlobalTheory.SymBridge.IsCompl P (qOf P) ι ϖ
+        → ∀ {A : Type} [Fintype A] [DecidableEq A] {n : ℕ} (e : A ≃ Fin n)
+            (Jl : Subgroup (GL (A ⊕ Fin 0) k)),
+          IsOpen (Jl : Set (GL (A ⊕ Fin 0) k)) → Jl ≤ GlobalTheory.SplitWeil.KO k (A ⊕ Fin 0)
+            → ∀ (M : ℕ) (c : (A → k) ⧸ GlobalTheory.StepData.box A (ϖ ^ M)) (y₀ : Sp E n),
+              GlobalTheory.QPl.SameOrb Jl (GlobalTheory.StepData.box A (ϖ ^ M)) c
+                  (Submodule.Quotient.mk fun a => ι (y₀ (e a)))
+                → ∃ r ∈ GLint E n P, ∃ g ∈ Jl,
+                  g.val.toBlocks₁₁ = GlobalTheory.SymBridge.toLoc ι e e r.toLinearMap
+                    ∧ ∀ y : Sp E n,
+                      ((qOf P : E) ^ M)⁻¹ • (r.symm y - y₀) ∈ stdAt E n P
+                        → c = Submodule.Quotient.mk fun a => ι (y (e a)) := by
   intro E k _ _ _ _ _ _ _ P ι ϖ hc A _ _ n e Jl hJo hJ M c y₀
   rintro ⟨g₀, hg₀, y₁, rfl, hy⟩
   rw [Submodule.Quotient.eq] at hy
@@ -45,12 +64,16 @@ theorem exists_rat_of_sameOrb : ∀ {E k : Type} [Field E] [NumberField E] [Star
   have he : ∀ a, e' (.inl a) = e a := fun a => rfl
   have h0 : (g₀⁻¹).val.toBlocks₁₁ *ᵥ (fun a => ι (y₀ (e a))) - y₁ ∈ box A (ϖ ^ M) := by
     have := neg_mem (GlobalTheory.TwBridge.LevOrb.mulVec_mem_box (hJ (inv_mem hg₀)) _ hy)
-    rwa [mulVec_sub, mulVec_mulVec, ← CoupStab.toBlocks₁₁_mul, Units.inv_mul, CoupStab.toBlocks₁₁_one, one_mulVec,
-      neg_sub] at this
-  have hU2 : IsOpen {N : Matrix (A ⊕ Fin 0) (A ⊕ Fin 0) k |
-      N.toBlocks₁₁ *ᵥ (fun a => ι (y₀ (e a))) - y₁ ∈ box A (ϖ ^ M)} := by
-    refine (CoupStab.isOpen_box (ϖ ^ M)).preimage (f := fun N : Matrix (A ⊕ Fin 0) (A ⊕ Fin 0) k =>
-      N.toBlocks₁₁ *ᵥ (fun a => ι (y₀ (e a))) - y₁) ?_
+    rwa [mulVec_sub, mulVec_mulVec, ← CoupStab.toBlocks₁₁_mul, Units.inv_mul,
+        CoupStab.toBlocks₁₁_one, one_mulVec, neg_sub]
+      at this
+  have hU2 : IsOpen
+      {N : Matrix (A ⊕ Fin 0) (A ⊕ Fin 0) k |
+        N.toBlocks₁₁ *ᵥ (fun a => ι (y₀ (e a))) - y₁ ∈ box A (ϖ ^ M)} := by
+    refine (CoupStab.isOpen_box (ϖ ^ M)).preimage
+      (f := fun N : Matrix (A ⊕ Fin 0) (A ⊕ Fin 0) k =>
+        N.toBlocks₁₁ *ᵥ (fun a => ι (y₀ (e a))) - y₁)
+      ?_
     have hb : Continuous fun N : Matrix (A ⊕ Fin 0) (A ⊕ Fin 0) k => N.toBlocks₁₁ :=
       continuous_pi fun i => continuous_pi fun j => continuous_apply_apply (Sum.inl i) (Sum.inl j)
     exact (hb.matrix_mulVec continuous_const).sub continuous_const
@@ -58,7 +81,14 @@ theorem exists_rat_of_sameOrb : ∀ {E k : Type} [Field E] [NumberField E] [Star
   obtain ⟨M₀, ⟨a1, a2⟩, -⟩ := exists_approx ι hc.dense (g₀⁻¹).val (hUo.inter hU2) ⟨hUm, h0⟩
   obtain ⟨g, hg, ev⟩ := hU a1
   obtain ⟨r, hr⟩ := exists_phi ι e' M₀ g ev
-  refine ⟨r, (GlobalTheory.VolBridge.mem_stabL_stdAt_iff_locHom_mem_KO P ι hc.int e' r).2 ?_, g, hg, ?_, fun y hy' => ?_⟩
+  refine ⟨
+    r,
+    (GlobalTheory.VolBridge.mem_stabL_stdAt_iff_locHom_mem_KO P ι hc.int e' r).2 ?_,
+    g,
+    hg,
+    ?_,
+    fun y hy' => ?_
+  ⟩
   · rw [show GlobalTheory.VolBridge.locHom ι e' r = phi ι e' r from Units.ext rfl, hr]
     exact hJ hg
   · rw [← hr]

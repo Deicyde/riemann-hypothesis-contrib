@@ -11,15 +11,17 @@ namespace ReciprocityTheory.MultiplicativeHeights
 open MeasureTheory Metric
 
 def BlockPoly (k n : ℕ) (a : Fin k → ℕ) (F : (Fin k → Fin n → ℂ) → ℂ) : Prop :=
-  Continuous F ∧ ∀ (b : Fin k) (p : Fin k → Fin n → ℂ), ∃ g : MvPolynomial (Fin n) ℂ,
-    g.IsHomogeneous (a b) ∧ ∀ w, F (Function.update p b w) = MvPolynomial.eval w g
+  Continuous F
+    ∧ ∀ (b : Fin k) (p : Fin k → Fin n → ℂ), ∃ g : MvPolynomial (Fin n) ℂ,
+      g.IsHomogeneous (a b) ∧ ∀ w, F (Function.update p b w) = MvPolynomial.eval w g
 
 def onSpheres {k n : ℕ} (F : (Fin k → Fin n → ℂ) → ℂ) (z : Fin k → UnitSphereC n) : ℂ :=
   F fun b => spherePoint (z b)
 
-theorem BlockPoly.restrict {k n : ℕ} {a : Fin (k + 1) → ℕ} {F : (Fin (k + 1) → Fin n → ℂ) → ℂ}
-    (hF : BlockPoly (k + 1) n a F) (v : Fin n → ℂ) :
-    BlockPoly k n (fun j => a j.succ) (fun p => F (Fin.cons v p)) := by
+theorem BlockPoly.restrict
+    {k n : ℕ} {a : Fin (k + 1) → ℕ} {F : (Fin (k + 1) → Fin n → ℂ) → ℂ}
+    (hF : BlockPoly (k + 1) n a F) (v : Fin n → ℂ)
+    : BlockPoly k n (fun j => a j.succ) (fun p => F (Fin.cons v p)) := by
   refine ⟨hF.1.comp (continuous_const.finCons continuous_id), fun b p => ?_⟩
   obtain ⟨g, hg, hgF⟩ := hF.2 b.succ (Fin.cons v p)
   refine ⟨g, hg, fun w => ?_⟩
@@ -27,11 +29,15 @@ theorem BlockPoly.restrict {k n : ℕ} {a : Fin (k + 1) → ℕ} {F : (Fin (k + 
   rw [Fin.cons_update]
   exact hgF w
 
-theorem blockPoly_claim (hSJ : SJStatement) (n : ℕ) : ∀ (k : ℕ) (a : Fin k → ℕ)
-    (F : (Fin k → Fin n → ℂ) → ℂ), BlockPoly k n a F → ∀ z0 : Fin k → UnitSphereC n,
-    onSpheres F z0 ≠ 0 →
-    Integrable (fun z => Real.log ‖onSpheres F z‖) (Measure.pi fun _ : Fin k => sphereProb n) ∧
-      Measure.pi (fun _ : Fin k => sphereProb n) {z | onSpheres F z = 0} = 0 := by
+theorem blockPoly_claim (hSJ : SJStatement) (n : ℕ)
+    : ∀ (k : ℕ) (a : Fin k → ℕ) (F : (Fin k → Fin n → ℂ) → ℂ),
+      BlockPoly k n a F
+        → ∀ z0 : Fin k → UnitSphereC n,
+          onSpheres F z0 ≠ 0
+            → Integrable
+                (fun z => Real.log ‖onSpheres F z‖)
+                (Measure.pi fun _ : Fin k => sphereProb n)
+              ∧ Measure.pi (fun _ : Fin k => sphereProb n) {z | onSpheres F z = 0} = 0 := by
   haveI : IsFiniteMeasure (sphereProb n) := by unfold sphereProb; infer_instance
   intro k
   induction k with
@@ -91,10 +97,13 @@ theorem blockPoly_claim (hSJ : SJStatement) (n : ℕ) : ∀ (k : ℕ) (a : Fin k
     have hgood : ∀ᵐ z' ∂ν, H (z', z0 0) ≠ 0 := by
       rw [ae_iff]
       simpa using ihNull
-    have hslice : ∀ z', H (z', z0 0) ≠ 0 →
-        Integrable (fun w => Real.log ‖H (z', w)‖) μ ∧
-        Real.log ‖H (z', z0 0)‖ - (a 0 : ℝ) / 2 * (harmonic (n - 1) : ℝ) ≤
-          ∫ w, Real.log ‖H (z', w)‖ ∂μ ∧ μ {w | H (z', w) = 0} = 0 := by
+    have hslice
+        : ∀ z',
+          H (z', z0 0) ≠ 0
+            → Integrable (fun w => Real.log ‖H (z', w)‖) μ
+              ∧ Real.log ‖H (z', z0 0)‖ - (a 0 : ℝ) / 2 * (harmonic (n - 1) : ℝ)
+                ≤ ∫ w, Real.log ‖H (z', w)‖ ∂μ
+              ∧ μ {w | H (z', w) = 0} = 0 := by
       intro z' hz'
       obtain ⟨g, hg, hgF⟩ := hF.2 0 (Fin.cons 0 (fun b => spherePoint (z' b)))
       have hHw : ∀ w, H (z', w) = MvPolynomial.eval (spherePoint w) g := by
@@ -132,17 +141,16 @@ theorem blockPoly_claim (hSJ : SJStatement) (n : ℕ) : ∀ (k : ℕ) (a : Fin k
       rw [integrable_prod_iff hfm]
       refine ⟨hgood.mono fun z' hz' => (hslice z' hz').1, ?_⟩
       refine Integrable.mono'
-        (g := fun z' => ∫ _w, (2 * M) ∂μ -
-          (Real.log ‖H (z', z0 0)‖ - (a 0 : ℝ) / 2 * (harmonic (n - 1) : ℝ)))
-        ((integrable_const _).sub (ihInt.sub (integrable_const _)))
-        hfm.norm.integral_prod_right' ?_
+        (g := fun z' =>
+          ∫ _w, (2 * M) ∂μ - (Real.log ‖H (z', z0 0)‖ - (a 0 : ℝ) / 2 * (harmonic (n - 1) : ℝ)))
+        ((integrable_const _).sub (ihInt.sub (integrable_const _))) hfm.norm.integral_prod_right' ?_
       filter_upwards [hgood] with z' hz'
       obtain ⟨hI, hL, -⟩ := hslice z' hz'
       rw [Real.norm_eq_abs, abs_of_nonneg (integral_nonneg fun _ => norm_nonneg _)]
-      calc ∫ w, ‖Real.log ‖H (z', w)‖‖ ∂μ ≤ ∫ w, (2 * M - Real.log ‖H (z', w)‖) ∂μ :=
-            integral_mono hI.norm ((integrable_const _).sub hI) (fun w => habs _)
-        _ = ∫ _w, (2 * M) ∂μ - ∫ w, Real.log ‖H (z', w)‖ ∂μ :=
-            integral_sub (integrable_const _) hI
+      calc
+        ∫ w, ‖Real.log ‖H (z', w)‖‖ ∂μ ≤ ∫ w, (2 * M - Real.log ‖H (z', w)‖) ∂μ :=
+          integral_mono hI.norm ((integrable_const _).sub hI) (fun w => habs _)
+        _ = ∫ _w, (2 * M) ∂μ - ∫ w, Real.log ‖H (z', w)‖ ∂μ := integral_sub (integrable_const _) hI
         _ ≤ _ := by linarith
     have hNull2 : (ν.prod μ) {q | H q = 0} = 0 := by
       have hms : MeasurableSet {q | H q = 0} := hHm (measurableSet_singleton 0)

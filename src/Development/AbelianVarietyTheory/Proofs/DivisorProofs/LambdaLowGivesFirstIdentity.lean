@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscrim
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions NumberField Formalism.L2.Indef Formalism.L2.Indef.Tree GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+open Formalism.BasicNotions Formalism.MainNotions NumberField Formalism.L2.Indef
+  Formalism.L2.Indef.Tree GlobalTheory.BigTop GlobalTheory.BigTop.Fun
 
 noncomputable section
 
@@ -37,19 +38,23 @@ theorem La_le_three {D : D7} (L : SizeData₂ D) (hS : SizesAt L) : L.La ≤ 3 *
   have hnc : (D.R.n : ℝ) ≤ szCond L := by
     have h := D.host.four_ord_le_condN
     have h' : D.R.n ≤ D.host.QS * D.host.q * D.host.d := by rw [D.R.n_eq_ord]; omega
-    unfold szCond; exact_mod_cast h'
+    unfold szCond
+    exact_mod_cast h'
   have hc1 : 1 ≤ szCond L := hn.trans hnc
   have hcb : szCond L ≤ L.sc.b := by
     have h1 : szCond L ≤ szCond L ^ 36 := le_self_pow₀ hc1 (by norm_num)
     have h2 : (1 : ℝ) ≤ (D.R.t : ℝ) ^ 150 := one_le_pow₀ hT.1
     have h3 : Real.sqrt L.sc.b ≤ L.sc.b := Real.sqrt_le_iff.2 ⟨by linarith, by nlinarith⟩
-    have h4 : szCond L ^ 36 ≤ szCond L ^ 36 * (D.R.t : ℝ) ^ 150 := le_mul_of_one_le_right (by positivity) h2
+    have h4 : szCond L ^ 36 ≤ szCond L ^ 36 * (D.R.t : ℝ) ^ 150 :=
+      le_mul_of_one_le_right (by positivity) h2
     have h5 : szCond L ^ 36 * (D.R.t : ℝ) ^ 150 ≤ Real.sqrt L.sc.b := hC
     linarith
   have hxn : L.sc.x ≤ (D.R.n : ℝ) := by
     refine le_trans ?_ hN.1
     have he := L.sc.eps_pos
-    calc L.sc.x = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
+    calc
+      L.sc.x
+        = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
       _ ≤ _ := Real.rpow_le_rpow_of_exponent_le hx.le (by unfold szTh; linarith)
   have hs : Real.sqrt ((D.host.q : ℝ) * D.host.d) ≤ (D.host.q : ℝ) * D.host.d :=
     Real.sqrt_le_iff.2 ⟨by linarith, by nlinarith⟩
@@ -62,7 +67,8 @@ theorem La_le_three {D : D7} (L : SizeData₂ D) (hS : SizesAt L) : L.La ≤ 3 *
   have hr0 : 0 < D.host.rdE := by linarith
   have e : L.La = Real.log L.sc.x + L.sc.L + Real.log D.host.rdE := by
     unfold SizeData₂.La Scale.a Scale.b
-    rw [Real.log_mul (by positivity) hr0.ne', Real.log_mul hx0.ne' (Real.exp_pos _).ne', Real.log_exp]
+    rw [Real.log_mul (by positivity) hr0.ne', Real.log_mul hx0.ne' (Real.exp_pos _).ne',
+      Real.log_exp]
   rw [e]
   linarith
 

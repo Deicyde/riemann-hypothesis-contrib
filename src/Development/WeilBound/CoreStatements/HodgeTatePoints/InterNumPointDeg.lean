@@ -31,12 +31,14 @@ theorem surjectiveClosed : SurjectiveClosed.Statement.{u, w} :=
 theorem finiteSections : FiniteSections.Statement.{u, w} :=
   FiniteSections.proof Extension.proof (TildeTail.proof SerreTail.full)
 
-theorem intersectionNumberCut_of_mixedTwistShift (h : MixedTwistShift.Statement.{u, w}) : InterNumCut.Statement.{u, w} :=
-  InterNumCut.proof (CycleSplit.Filt.proof (CycleSplit.Filt.Step.proof surjectiveClosed finiteSections))
+theorem intersectionNumberCut_of_mixedTwistShift (h : MixedTwistShift.Statement.{u, w})
+    : InterNumCut.Statement.{u, w} :=
+  InterNumCut.proof
+    (CycleSplit.Filt.proof (CycleSplit.Filt.Step.proof surjectiveClosed finiteSections))
     (CutRestrLenExact.proof surjectiveClosed finiteSections) h
 
 theorem interNumPointDeg : InterNumPointDeg.Statement.{u, w} :=
-  InterNumPointDeg.proof (InterNumRestrict.proof
-    (RestrLenRestrict.proof surjectiveClosed PrimeFiltration.RestrictQuot.proof))
+  InterNumPointDeg.proof (InterNumRestrict.proof (RestrLenRestrict.proof surjectiveClosed
+    PrimeFiltration.RestrictQuot.proof))
 
 end PositivityTheory.HtPt.Kra

@@ -7,14 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Loc
 
-private theorem comap_relIndex_ne_zero {G H : Type} [Group G] [Group H] (p : G →* H) (A B : Subgroup H)
-    (T : Subgroup G) (hAB : A.relIndex B ≠ 0) (hT : ∀ g ∈ T, p g ∈ B) : (A.comap p).relIndex T ≠ 0 := by
+private theorem comap_relIndex_ne_zero
+    {G H : Type} [Group G] [Group H]
+    (p : G →* H) (A B : Subgroup H) (T : Subgroup G)
+    (hAB : A.relIndex B ≠ 0) (hT : ∀ g ∈ T, p g ∈ B)
+    : (A.comap p).relIndex T ≠ 0 := by
   rw [Subgroup.relIndex_comap]
   intro h
   exact hAB (Subgroup.relIndex_eq_zero_of_le_right (Subgroup.map_le_iff_le_comap.mpr hT) h)
 
-private theorem finset_relIndex_ne_zero {G I : Type} [Group G] (H : I → Subgroup G) (T : Subgroup G) (S : Finset I)
-    (h : ∀ v ∈ S, (H v).relIndex T ≠ 0) : ∃ W : Subgroup G, W.relIndex T ≠ 0 ∧ ∀ v ∈ S, W ≤ H v := by
+private theorem finset_relIndex_ne_zero
+    {G I : Type} [Group G]
+    (H : I → Subgroup G) (T : Subgroup G) (S : Finset I) (h : ∀ v ∈ S, (H v).relIndex T ≠ 0)
+    : ∃ W : Subgroup G, W.relIndex T ≠ 0 ∧ ∀ v ∈ S, W ≤ H v := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨⊤, by simp, by simp⟩
@@ -26,8 +31,7 @@ private theorem finset_relIndex_ne_zero {G I : Type} [Group G] (H : I → Subgro
     · exact inf_le_left
     · exact inf_le_right.trans (hWS v hv)
 
-theorem UpperTheory.orbitalFiber_level_finite :
-    UpperTheory.V.Z.Sym.Glob.Fib.LevFin := by
+theorem UpperTheory.orbitalFiber_level_finite : UpperTheory.V.Z.Sym.Glob.Fib.LevFin := by
   unfold Fib.LevFin
   intro F _ _ Δ D hD
   have hDet : Fib.DetOne := UpperTheory.orbitalFiber_det_eq_one

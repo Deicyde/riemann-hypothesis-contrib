@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.nonempty_algEquiv :
-    ∀ (R : Type) [CommRing R] (p : Ideal R) (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B] (B' : Type) [CommRing B'] [IsLocalRing B'] [Algebra R B'],
+theorem UpperTheory.V.AlgebraTools.IsCplAt.nonempty_algEquiv
+    : ∀ (R : Type) [CommRing R] (p : Ideal R) (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B]
+        (B' : Type) [CommRing B'] [IsLocalRing B'] [Algebra R B'],
       IsCplAt R p B → IsCplAt R p B' → Nonempty (B ≃ₐ[R] B') := by
   intro R _ p B _ _ _ B' _ _ _ hB hB'
   haveI : IsAdicComplete (maximalIdeal B) B := hB.complete

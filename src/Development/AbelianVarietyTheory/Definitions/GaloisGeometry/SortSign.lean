@@ -19,10 +19,13 @@ namespace GlobalTheory.PD
 
 section Hmap
 
-variable {k : Type} [Field k] {M M' : Type} [AddCommGroup M] [Module k M] [AddCommGroup M'] [Module k M']
+variable
+  {k : Type} [Field k] {M M' : Type} [AddCommGroup M] [Module k M] [AddCommGroup M'] [Module k M']
 
-def Cx.hmap (K : Cx k M) (L : Cx k M') (f : M →ₗ[k] M') (hf : IsMap K L f) (n : ℤ) : K.H n →ₗ[k] L.H n :=
-  Submodule.mapQ _ _ ((f.restrict (p := K.Z n) (q := L.Z n) fun a ha => by
+def Cx.hmap (K : Cx k M) (L : Cx k M') (f : M →ₗ[k] M') (hf : IsMap K L f) (n : ℤ)
+    : K.H n →ₗ[k] L.H n :=
+  Submodule.mapQ _ _
+    ((f.restrict (p := K.Z n) (q := L.Z n) fun a ha => by
       refine ⟨(hf n a ha.1).1, ?_⟩
       change L.D (f a) = 0
       rw [← (hf n a ha.1).2]
@@ -35,17 +38,19 @@ def Cx.hmap (K : Cx k M) (L : Cx k M') (f : M →ₗ[k] M') (hf : IsMap K L f) (
       · have h1 := (hf (n - 1) c hc).1
         exact h1
       · change L.D (f c) = f a
-        rw [← (hf (n - 1) c hc).2, e]; rfl)
+        rw [← (hf (n - 1) c hc).2, e]
+        rfl)
 
 end Hmap
 
 section Pull
 
-variable {k : Type} [Field k] {ι κ : Type} [LinearOrder ι] [LinearOrder κ] {E E' : Type} [AddCommGroup E] [Module k E]
-  [AddCommGroup E'] [Module k E']
+variable
+  {k : Type} [Field k]
+  {ι κ : Type} [LinearOrder ι] [LinearOrder κ]
+  {E E' : Type} [AddCommGroup E] [Module k E] [AddCommGroup E'] [Module k E']
 
 def sortSign (τ : κ → ι) (s : Finset κ) : ℤ := ∏ a ∈ s, ∏ b ∈ s, if a < b ∧ τ b < τ a then -1 else 1
-
 
 open Classical in
 def pullC (τ : κ → ι) (φ : E →ₗ[k] E') : (Finset ι → E) →ₗ[k] (Finset κ → E') where
@@ -64,8 +69,9 @@ section Rat
 variable (k : Type) [Field k] {K K' : Type} [Field K] [Field K'] [Algebra k K] [Algebra k K']
 
 def IsDRMap (ψ : K →ₐ[k] K') (φ : DR k K →ₗ[k] DR k K') : Prop :=
-  ∀ (q : ℕ) (b : K) (v : Fin q → K), φ (b • ExteriorAlgebra.ιMulti K q fun j => D k K (v j)) =
-    ψ b • ExteriorAlgebra.ιMulti K' q fun j => D k K' (ψ (v j))
+  ∀ (q : ℕ) (b : K) (v : Fin q → K),
+    φ (b • ExteriorAlgebra.ιMulti K q fun j => D k K (v j))
+      = ψ b • ExteriorAlgebra.ιMulti K' q fun j => D k K' (ψ (v j))
 
 end Rat
 

@@ -7,19 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegralExten
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
+  GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G.IotaConj
 
-theorem sigR_inclE {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E)
-    (R : Type) [CommRing R] [Algebra F R] (x : E) :
-    sigR σ R (inclE (F := F) R x) = inclE (F := F) R (σ x) := by
+theorem sigR_inclE
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (R : Type) [CommRing R] [Algebra F R]
+    (x : E)
+    : sigR σ R (inclE (F := F) R x) = inclE (F := F) R (σ x) := by
   simp [sigR, inclE]
 
-theorem sigR_mem_OAd {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) {a : E ⊗[F] Ad F} (ha : a ∈ OAd F E) : sigR σ (Ad F) a ∈ OAd F E := by
-
+theorem sigR_mem_OAd
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {a : E ⊗[F] Ad F} (ha : a ∈ OAd F E)
+    : sigR σ (Ad F) a ∈ OAd F E := by
   have key : OAd F E ≤ (OAd F E).comap (sigR σ (Ad F)) := by
     show tensInt (F := F) (Ad F) (intOE E) (intAd F) ≤
       (tensInt (F := F) (Ad F) (intOE E) (intAd F)).comap (sigR σ (Ad F))
@@ -34,20 +40,20 @@ theorem sigR_mem_OAd {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
       simp [sigR]
   exact key ha
 
-theorem iota_sigR (F E F' E' : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    [Field F'] [NumberField F'] [Field E'] [NumberField E'] [Algebra F' E']
+theorem iota_sigR
+    (F E F' E' : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [Field F']
+    [NumberField F'] [Field E'] [NumberField E'] [Algebra F' E']
     (σ : E →ₐ[F] E) (σ' : E' →ₐ[F'] E') (e : E ≃+* E') (ι : E ⊗[F] Ad F ≃+* E' ⊗[F'] Ad F')
     (he : ∀ x, e (σ x) = σ' (e x))
     (hι : ∀ x, ι (inclE (F := F) (Ad F) x) = inclE (F := F') (Ad F') (e x))
-    (hO : ∀ a, a ∈ OAd F E ↔ ι a ∈ OAd F' E') (a : E ⊗[F] Ad F) :
-    ι (sigR σ (Ad F) a) = sigR σ' (Ad F') (ι a) := by
+    (hO : ∀ a, a ∈ OAd F E ↔ ι a ∈ OAd F' E') (a : E ⊗[F] Ad F)
+    : ι (sigR σ (Ad F) a) = sigR σ' (Ad F') (ι a) := by
   obtain ⟨-, h2, -, h4, -⟩ := GlobalTheory.T.integralExtensionFiniteAdeles_basic_properties F E
   obtain ⟨-, -, h3', -, -⟩ := GlobalTheory.T.integralExtensionFiniteAdeles_basic_properties F' E'
 
   set D : E ⊗[F] Ad F → E' ⊗[F'] Ad F' :=
     fun b => ι (sigR σ (Ad F) b) - sigR σ' (Ad F') (ι b) with hD
-  have Dadd : ∀ b c, D (b + c) = D b + D c := by
-    intro b c; simp only [hD, map_add (f := _)]; abel
+  have Dadd : ∀ b c, D (b + c) = D b + D c := by intro b c; simp only [hD, map_add (f := _)]; abel
   have Dmul : ∀ (m : ℕ) b, D ((m : E ⊗[F] Ad F) * b) = (m : E' ⊗[F'] Ad F') * D b := by
     intro m b; simp only [hD, map_mul, map_natCast]; ring
   have Dincl : ∀ x : E, D (inclE (F := F) (Ad F) x) = 0 := by

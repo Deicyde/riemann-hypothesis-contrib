@@ -16,21 +16,26 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-private theorem KRep.rel_op_curve {ε : Fin n → Bool} (R : KRep ε)
-    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (γ : ℝ → KG ε)
-    (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) (t : ℝ) :
-    R.op (γ t) = NormedSpace.exp ((t : ℂ) • R.dτ X) := by
+private theorem KRep.rel_op_curve
+    {ε : Fin n → Bool} (R : KRep ε)
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    (γ : ℝ → KG ε) (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+    (t : ℝ)
+    : R.op (γ t) = NormedSpace.exp ((t : ℂ) • R.dτ X) := by
   have hmul : ∀ a b : KG ε, toMK (a * b) = toMK a * toMK b := fun a b => rfl
   have hinj : ∀ a b : KG ε, toMK a = toMK b → a = b := fun a b h =>
     Subtype.ext (Subtype.ext (Units.ext h))
-  have hexp : ∀ s u : ℝ, NormedSpace.exp (((s + u : ℝ) : ℂ) • X) =
-      NormedSpace.exp ((s : ℂ) • X) * NormedSpace.exp ((u : ℂ) • X) := by
+  have hexp
+      : ∀ s u : ℝ,
+        NormedSpace.exp (((s + u : ℝ) : ℂ) • X)
+          = NormedSpace.exp ((s : ℂ) • X) * NormedSpace.exp ((u : ℂ) • X) := by
     intro s u
     rw [Complex.ofReal_add, add_smul]
     exact Matrix.exp_add_of_commute _ _ (((Commute.refl X).smul_left _).smul_right _)
   have hγadd : ∀ s u : ℝ, γ (s + u) = γ s * γ u := fun s u =>
     hinj _ _ (by rw [hmul, hγ, hγ, hγ, hexp])
-  have hγ0 : γ 0 = 1 := hinj _ _ (by rw [hγ, Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero]; rfl)
+  have hγ0 : γ 0 = 1 :=
+    hinj _ _ (by rw [hγ, Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero]; rfl)
   have hop_mul : ∀ a b : KG ε, R.op (a * b) = R.op a * R.op b := by
     intro a b; simp [KRep.op, map_mul]
   have hop_one : R.op 1 = 1 := by simp [KRep.op]
@@ -45,23 +50,29 @@ private theorem KRep.rel_op_curve {ε : Fin n → Bool} (R : KRep ε)
     rw [← hop_mul, ← hγadd]
     congr 2
     ring
-  have hE : ∀ s : ℝ, HasDerivAt (fun u : ℝ => NormedSpace.exp ((u : ℂ) • (-A)))
-      (NormedSpace.exp ((s : ℂ) • (-A)) * (-A)) s := by
+  have hE
+      : ∀ s : ℝ,
+        HasDerivAt
+          (fun u : ℝ => NormedSpace.exp ((u : ℂ) • (-A)))
+          (NormedSpace.exp ((s : ℂ) • (-A)) * (-A)) s := by
     intro s
     first
-      | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) (-A) (s : ℂ)).comp_ofReal
-      | exact HasDerivAt.comp_ofReal (e := fun u : ℂ => NormedSpace.exp (u • (-A)))
-          (hasDerivAt_exp_smul_const (-A) (s : ℂ))
-      | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) s)
-      | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) s)
-  have hcomm : ∀ s : ℝ, A * NormedSpace.exp ((s : ℂ) • (-A)) = NormedSpace.exp ((s : ℂ) • (-A)) * A :=
+    | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) (-A) (s : ℂ)).comp_ofReal
+    | exact HasDerivAt.comp_ofReal
+        (e := fun u : ℂ => NormedSpace.exp (u • (-A)))
+        (hasDerivAt_exp_smul_const (-A) (s : ℂ))
+    | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) s)
+    | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) s)
+  have hcomm
+      : ∀ s : ℝ, A * NormedSpace.exp ((s : ℂ) • (-A)) = NormedSpace.exp ((s : ℂ) • (-A)) * A :=
     fun s => (((Commute.refl A).neg_right.smul_right (s : ℂ)).exp_right).eq
   have hg : ∀ s : ℝ, HasDerivAt (fun u => R.op (γ u) * NormedSpace.exp ((u : ℂ) • (-A))) 0 s := by
     intro s
     have h := (hd s).mul (hE s)
     refine h.congr_deriv ?_
     rw [mul_assoc, hcomm, mul_neg, mul_neg, add_neg_cancel]
-  have hconst := is_const_of_deriv_eq_zero (fun s => (hg s).differentiableAt) (fun s => (hg s).deriv)
+  have hconst :=
+    is_const_of_deriv_eq_zero (fun s => (hg s).differentiableAt) (fun s => (hg s).deriv)
   have hg0 : R.op (γ 0) * NormedSpace.exp (((0 : ℝ) : ℂ) • (-A)) = 1 := by
     rw [hγ0, hop_one, Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero, one_mul]
   have hEE : NormedSpace.exp ((t : ℂ) • (-A)) * NormedSpace.exp ((t : ℂ) • A) = 1 := by
@@ -71,15 +82,17 @@ private theorem KRep.rel_op_curve {ε : Fin n → Bool} (R : KRep ε)
         | exact NormedAlgebra.restrictScalars ℚ ℝ _
     rw [← NormedSpace.exp_add_of_commute ((Commute.refl A).neg_left.smul_left _ |>.smul_right _),
       smul_neg, neg_add_cancel, NormedSpace.exp_zero]
-  calc R.op (γ t) = R.op (γ t) * (NormedSpace.exp ((t : ℂ) • (-A)) * NormedSpace.exp ((t : ℂ) • A)) := by
-        rw [hEE, mul_one]
+  calc
+    R.op (γ t)
+        = R.op (γ t) * (NormedSpace.exp ((t : ℂ) • (-A)) * NormedSpace.exp ((t : ℂ) • A)) := by
+      rw [hEE, mul_one]
     _ = (R.op (γ t) * NormedSpace.exp ((t : ℂ) • (-A))) * NormedSpace.exp ((t : ℂ) • A) := by
-        rw [mul_assoc]
-    _ = NormedSpace.exp ((t : ℂ) • A) := by
-        rw [hconst t 0, hg0, one_mul]
+      rw [mul_assoc]
+    _ = NormedSpace.exp ((t : ℂ) • A) := by rw [hconst t 0, hg0, one_mul]
 
-private theorem exists_curve_toMK_eq_exp_smul_of_inK {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) :
-    ∃ γ : ℝ → KG ε, ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X) := by
+private theorem exists_curve_toMK_eq_exp_smul_of_inK
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    : ∃ γ : ℝ → KG ε, ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X) := by
   obtain ⟨hG, hJ⟩ := hX
   have hJJ : Jm ε * Jm ε = 1 := by
     rw [Jm, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -88,11 +101,14 @@ private theorem exists_curve_toMK_eq_exp_smul_of_inK {ε : Fin n → Bool} {X : 
     split_ifs <;> norm_num
   have hskew : Xᴴ = -X := by
     have h1 : Xᴴ * Jm ε = -(X * Jm ε) := by rw [hJ]; exact eq_neg_of_add_eq_zero_left hG
-    calc Xᴴ = Xᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJJ, Matrix.mul_one]
+    calc
+      Xᴴ
+        = Xᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJJ, Matrix.mul_one]
       _ = -X := by rw [h1, Matrix.neg_mul, Matrix.mul_assoc, hJJ, Matrix.mul_one]
   have hE : ∀ t : ℝ, (NormedSpace.exp ((t : ℂ) • X))ᴴ = NormedSpace.exp ((t : ℂ) • (-X)) := by
     intro t
-    rw [← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hskew, Complex.star_def, Complex.conj_ofReal]
+    rw [← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hskew, Complex.star_def,
+      Complex.conj_ofReal]
   have hinv1 : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • (-X)) * NormedSpace.exp ((t : ℂ) • X) = 1 := by
     intro t
     rw [← Matrix.exp_add_of_commute _ _ (((Commute.refl X).neg_left.smul_left _).smul_right _),
@@ -101,7 +117,8 @@ private theorem exists_curve_toMK_eq_exp_smul_of_inK {ε : Fin n → Bool} {X : 
     intro t
     rw [← Matrix.exp_add_of_commute _ _ (((Commute.refl X).neg_right.smul_left _).smul_right _),
       smul_neg, add_neg_cancel, NormedSpace.exp_zero]
-  have hcJ : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) * Jm ε = Jm ε * NormedSpace.exp ((t : ℂ) • X) := by
+  have hcJ
+      : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) * Jm ε = Jm ε * NormedSpace.exp ((t : ℂ) • X) := by
     intro t
     have hJi : (Jm ε)⁻¹ = Jm ε := Matrix.inv_eq_right_inv hJJ
     have hJu : IsUnit (Jm ε) := ⟨⟨Jm ε, Jm ε, hJJ, hJJ⟩, rfl⟩
@@ -109,9 +126,11 @@ private theorem exists_curve_toMK_eq_exp_smul_of_inK {ε : Fin n → Bool} {X : 
       rw [hJi, Matrix.mul_smul, Matrix.smul_mul, ← hJ, Matrix.mul_assoc, hJJ, Matrix.mul_one]
     have h := Matrix.exp_conj (Jm ε) ((t : ℂ) • X) hJu
     rw [hXc, hJi] at h
-    calc NormedSpace.exp ((t : ℂ) • X) * Jm ε
+    calc
+      NormedSpace.exp ((t : ℂ) • X) * Jm ε
         = Jm ε * NormedSpace.exp ((t : ℂ) • X) * Jm ε * Jm ε := by rw [← h]
-      _ = Jm ε * NormedSpace.exp ((t : ℂ) • X) := by rw [Matrix.mul_assoc _ (Jm ε), hJJ, Matrix.mul_one]
+      _ = Jm ε * NormedSpace.exp ((t : ℂ) • X) := by
+        rw [Matrix.mul_assoc _ (Jm ε), hJJ, Matrix.mul_one]
   let u : ℝ → (Matrix (Fin n) (Fin n) ℂ)ˣ := fun t =>
     ⟨NormedSpace.exp ((t : ℂ) • X), NormedSpace.exp ((t : ℂ) • (-X)), hinv2 t, hinv1 t⟩
   have hU : ∀ t : ℝ, u t ∈ UJ ε := by
@@ -126,8 +145,9 @@ private theorem exists_curve_toMK_eq_exp_smul_of_inK {ε : Fin n → Bool} {X : 
     rw [hE, hinv2]
   exact ⟨fun t => ⟨⟨u t, hU t⟩, hK t⟩, fun t => rfl⟩
 
-private theorem KRep.rel_star_dτ {ε : Fin n → Bool} (R : KRep ε)
-    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) : star (R.dτ X) = -R.dτ X := by
+private theorem KRep.rel_star_dτ
+    {ε : Fin n → Bool} (R : KRep ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    : star (R.dτ X) = - R.dτ X := by
   obtain ⟨γ, hγ⟩ := exists_curve_toMK_eq_exp_smul_of_inK hX
   set A := R.dτ X with hA
   have hf : ∀ s : ℝ, R.op (γ s) = NormedSpace.exp ((s : ℂ) • A) := R.rel_op_curve hX γ hγ
@@ -140,39 +160,45 @@ private theorem KRep.rel_star_dτ {ε : Fin n → Bool} (R : KRep ε)
     rw [← NormedSpace.exp_add_of_commute ((Commute.refl A).neg_left.smul_left _ |>.smul_right _),
       smul_neg, neg_add_cancel, NormedSpace.exp_zero]
   have hU : ∀ s : ℝ, R.op (γ s) * star (R.op (γ s)) = 1 := fun s => (R.τ (γ s)).2.2
-  have hstar : ∀ s : ℝ, star (NormedSpace.exp ((s : ℂ) • A)) = NormedSpace.exp ((s : ℂ) • (-A)) := by
+  have hstar
+      : ∀ s : ℝ, star (NormedSpace.exp ((s : ℂ) • A)) = NormedSpace.exp ((s : ℂ) • (-A)) := by
     intro s
-    calc star (NormedSpace.exp ((s : ℂ) • A))
-        = (NormedSpace.exp ((s : ℂ) • (-A)) * NormedSpace.exp ((s : ℂ) • A)) *
-            star (NormedSpace.exp ((s : ℂ) • A)) := by rw [hEE, one_mul]
+    calc
+      star (NormedSpace.exp ((s : ℂ) • A))
+          = (NormedSpace.exp ((s : ℂ) • (-A)) * NormedSpace.exp ((s : ℂ) • A))
+            * star (NormedSpace.exp ((s : ℂ) • A)) := by
+        rw [hEE, one_mul]
       _ = NormedSpace.exp ((s : ℂ) • (-A)) := by rw [mul_assoc, ← hf, hU, mul_one]
-  have hfun : (fun s : ℝ => NormedSpace.exp ((s : ℂ) • star A)) =
-      fun s : ℝ => NormedSpace.exp ((s : ℂ) • (-A)) := by
+  have hfun
+      : (fun s : ℝ => NormedSpace.exp ((s : ℂ) • star A))
+        = fun s : ℝ => NormedSpace.exp ((s : ℂ) • (-A)) := by
     funext s
     rw [← hstar]
     first
-      | rw [NormedSpace.star_exp, star_smul, Complex.star_def, Complex.conj_ofReal]
-      | rw [← NormedSpace.exp_star, star_smul, Complex.star_def, Complex.conj_ofReal]
-      | rw [star_exp, star_smul, Complex.star_def, Complex.conj_ofReal]
-  have d1 : HasDerivAt (fun s : ℝ => NormedSpace.exp ((s : ℂ) • star A))
+    | rw [NormedSpace.star_exp, star_smul, Complex.star_def, Complex.conj_ofReal]
+    | rw [← NormedSpace.exp_star, star_smul, Complex.star_def, Complex.conj_ofReal]
+    | rw [star_exp, star_smul, Complex.star_def, Complex.conj_ofReal]
+  have d1 : HasDerivAt
+      (fun s : ℝ => NormedSpace.exp ((s : ℂ) • star A))
       (NormedSpace.exp (((0 : ℝ) : ℂ) • star A) * star A) 0 := by
     first
-      | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) (star A) ((0 : ℝ) : ℂ)).comp_ofReal
-      | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (star A) (0 : ℝ))
-      | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (star A) (0 : ℝ))
-  have d2 : HasDerivAt (fun s : ℝ => NormedSpace.exp ((s : ℂ) • (-A)))
+    | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) (star A) ((0 : ℝ) : ℂ)).comp_ofReal
+    | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (star A) (0 : ℝ))
+    | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (star A) (0 : ℝ))
+  have d2 : HasDerivAt
+      (fun s : ℝ => NormedSpace.exp ((s : ℂ) • (-A)))
       (NormedSpace.exp (((0 : ℝ) : ℂ) • (-A)) * (-A)) 0 := by
     first
-      | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) (-A) ((0 : ℝ) : ℂ)).comp_ofReal
-      | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) (0 : ℝ))
-      | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) (0 : ℝ))
+    | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) (-A) ((0 : ℝ) : ℂ)).comp_ofReal
+    | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) (0 : ℝ))
+    | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) (-A) (0 : ℝ))
   rw [hfun] at d1
   have h := d1.unique d2
   simpa using h
 
-private theorem KRep.rel_conj_dτ {ε : Fin n → Bool} (R : KRep ε) (k : KG ε)
-    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) :
-    R.op k * R.dτ Y * star (R.op k) = R.dτ (toMK k * Y * star (toMK k)) := by
+private theorem KRep.rel_conj_dτ
+    {ε : Fin n → Bool} (R : KRep ε) (k : KG ε) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y)
+    : R.op k * R.dτ Y * star (R.op k) = R.dτ (toMK k * Y * star (toMK k)) := by
   obtain ⟨γ, hγ⟩ := exists_curve_toMK_eq_exp_smul_of_inK hY
   have hmul : ∀ a b : KG ε, toMK (a * b) = toMK a * toMK b := fun a b => rfl
   have hone : toMK (1 : KG ε) = 1 := rfl
@@ -188,7 +214,9 @@ private theorem KRep.rel_conj_dτ {ε : Fin n → Bool} (R : KRep ε) (k : KG ε
   have hKs' : K * star K = 1 := (Matrix.mem_unitaryGroup_iff).mp hkK.1
   have hkinv : toMK k⁻¹ = star K := by
     have h1 : K * toMK k⁻¹ = 1 := by rw [hKdef, ← hmul, mul_inv_cancel, hone]
-    calc toMK k⁻¹ = (star K * K) * toMK k⁻¹ := by rw [hKs, Matrix.one_mul]
+    calc
+      toMK k⁻¹
+        = (star K * K) * toMK k⁻¹ := by rw [hKs, Matrix.one_mul]
       _ = star K := by rw [Matrix.mul_assoc, h1, Matrix.mul_one]
   have hJh : (Jm ε)ᴴ = Jm ε := by
     rw [Jm, Matrix.diagonal_conjTranspose]
@@ -214,7 +242,9 @@ private theorem KRep.rel_conj_dτ {ε : Fin n → Bool} (R : KRep ε) (k : KG ε
         rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← hkK.2]
         simp only [Matrix.mul_assoc]
       rw [hZh, e1, e2, ← Matrix.add_mul, ← Matrix.mul_add, hG, Matrix.mul_zero, Matrix.zero_mul]
-    · calc Z * Jm ε = K * (Y * Jm ε) * star K := by simp only [hZ, Matrix.mul_assoc, hJs]
+    · calc
+        Z * Jm ε
+          = K * (Y * Jm ε) * star K := by simp only [hZ, Matrix.mul_assoc, hJs]
         _ = K * (Jm ε * Y) * star K := by rw [hJ]
         _ = Jm ε * Z := by rw [hZ]; simp only [← Matrix.mul_assoc, hkK.2]
   have hKi : K⁻¹ = star K := Matrix.inv_eq_right_inv hKs'
@@ -237,19 +267,24 @@ section MatDeriv
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-private theorem KRep.rel_dτ_conj_hasDerivAt {ε : Fin n → Bool} (R : KRep ε)
-    (X Y : Matrix (Fin n) (Fin n) ℂ) :
-    HasDerivAt (fun y : ℝ => R.dτ (NormedSpace.exp ((y : ℂ) • X) * Y *
-      NormedSpace.exp ((y : ℂ) • (-X)))) (R.dτ (X * Y - Y * X)) 0 := by
+private theorem KRep.rel_dτ_conj_hasDerivAt
+    {ε : Fin n → Bool} (R : KRep ε) (X Y : Matrix (Fin n) (Fin n) ℂ)
+    : HasDerivAt
+      (fun y : ℝ => R.dτ (NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X))))
+      (R.dτ (X * Y - Y * X)) 0 := by
   let L : Matrix (Fin n) (Fin n) ℂ →L[ℂ] (R.V →L[ℂ] R.V) := LinearMap.toContinuousLinearMap R.dτ
-  have he : ∀ Z : Matrix (Fin n) (Fin n) ℂ, HasDerivAt (fun y : ℝ => NormedSpace.exp ((y : ℂ) • Z))
-      (NormedSpace.exp (((0 : ℝ) : ℂ) • Z) * Z) 0 := by
+  have he
+      : ∀ Z : Matrix (Fin n) (Fin n) ℂ,
+        HasDerivAt
+          (fun y : ℝ => NormedSpace.exp ((y : ℂ) • Z))
+          (NormedSpace.exp (((0 : ℝ) : ℂ) • Z) * Z) 0 := by
     intro Z
     first
-      | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) Z ((0 : ℝ) : ℂ)).comp_ofReal
-      | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
-      | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
-  have hf : HasDerivAt (fun y : ℝ => NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X)))
+    | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) Z ((0 : ℝ) : ℂ)).comp_ofReal
+    | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
+    | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
+  have hf : HasDerivAt
+      (fun y : ℝ => NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X)))
       (X * Y - Y * X) 0 := by
     have h := ((he X).mul_const Y).mul (he (-X))
     refine h.congr_deriv ?_
@@ -260,9 +295,9 @@ private theorem KRep.rel_dτ_conj_hasDerivAt {ε : Fin n → Bool} (R : KRep ε)
 
 end MatDeriv
 
-private theorem KRep.rel_dτ_bracket {ε : Fin n → Bool} (R : KRep ε)
-    {X Y : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (hY : inK ε Y) :
-    R.dτ X * R.dτ Y - R.dτ Y * R.dτ X = R.dτ (X * Y - Y * X) := by
+private theorem KRep.rel_dτ_bracket
+    {ε : Fin n → Bool} (R : KRep ε) {X Y : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (hY : inK ε Y)
+    : R.dτ X * R.dτ Y - R.dτ Y * R.dτ X = R.dτ (X * Y - Y * X) := by
   obtain ⟨γ, hγ⟩ := exists_curve_toMK_eq_exp_smul_of_inK hX
   have hJJ : Jm ε * Jm ε = 1 := by
     rw [Jm, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -272,48 +307,64 @@ private theorem KRep.rel_dτ_bracket {ε : Fin n → Bool} (R : KRep ε)
   have hskew : Xᴴ = -X := by
     obtain ⟨hG, hJ⟩ := hX
     have h1 : Xᴴ * Jm ε = -(X * Jm ε) := by rw [hJ]; exact eq_neg_of_add_eq_zero_left hG
-    calc Xᴴ = Xᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJJ, Matrix.mul_one]
+    calc
+      Xᴴ
+        = Xᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJJ, Matrix.mul_one]
       _ = -X := by rw [h1, Matrix.neg_mul, Matrix.mul_assoc, hJJ, Matrix.mul_one]
-  have hstarM : ∀ y : ℝ, star (NormedSpace.exp ((y : ℂ) • X)) = NormedSpace.exp ((y : ℂ) • (-X)) := by
+  have hstarM
+      : ∀ y : ℝ, star (NormedSpace.exp ((y : ℂ) • X)) = NormedSpace.exp ((y : ℂ) • (-X)) := by
     intro y
     rw [Matrix.star_eq_conjTranspose, ← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hskew,
       Complex.star_def, Complex.conj_ofReal]
-  have hsA : star (R.dτ X) = -R.dτ X := R.rel_star_dτ hX
-  have hstarO : ∀ y : ℝ, star (NormedSpace.exp ((y : ℂ) • R.dτ X)) =
-      NormedSpace.exp ((y : ℂ) • (-R.dτ X)) := by
+  have hsA : star (R.dτ X) = - R.dτ X := R.rel_star_dτ hX
+  have hstarO
+      : ∀ y : ℝ,
+        star (NormedSpace.exp ((y : ℂ) • R.dτ X)) = NormedSpace.exp ((y : ℂ) • (- R.dτ X)) := by
     intro y
     first
-      | rw [NormedSpace.star_exp, star_smul, Complex.star_def, Complex.conj_ofReal, hsA]
-      | rw [← NormedSpace.exp_star, star_smul, Complex.star_def, Complex.conj_ofReal, hsA]
-      | rw [star_exp, star_smul, Complex.star_def, Complex.conj_ofReal, hsA]
-  have hG : ∀ y : ℝ, R.dτ (NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X))) =
-      NormedSpace.exp ((y : ℂ) • R.dτ X) * R.dτ Y * NormedSpace.exp ((y : ℂ) • (-R.dτ X)) := by
+    | rw [NormedSpace.star_exp, star_smul, Complex.star_def, Complex.conj_ofReal, hsA]
+    | rw [← NormedSpace.exp_star, star_smul, Complex.star_def, Complex.conj_ofReal, hsA]
+    | rw [star_exp, star_smul, Complex.star_def, Complex.conj_ofReal, hsA]
+  have hG
+      : ∀ y : ℝ,
+        R.dτ (NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X)))
+          = NormedSpace.exp ((y : ℂ) • R.dτ X) * R.dτ Y
+            * NormedSpace.exp ((y : ℂ) • (- R.dτ X)) := by
     intro y
     have h := R.rel_conj_dτ (γ y) hY
     rw [hγ, hstarM, R.rel_op_curve hX γ hγ, hstarO] at h
     exact h.symm
-  have he : ∀ Z : R.V →L[ℂ] R.V, HasDerivAt (fun y : ℝ => NormedSpace.exp ((y : ℂ) • Z))
-      (NormedSpace.exp (((0 : ℝ) : ℂ) • Z) * Z) 0 := by
+  have he
+      : ∀ Z : R.V →L[ℂ] R.V,
+        HasDerivAt
+          (fun y : ℝ => NormedSpace.exp ((y : ℂ) • Z))
+          (NormedSpace.exp (((0 : ℝ) : ℂ) • Z) * Z) 0 := by
     intro Z
     first
-      | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) Z ((0 : ℝ) : ℂ)).comp_ofReal
-      | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
-      | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
-  have hd : HasDerivAt (fun y : ℝ => NormedSpace.exp ((y : ℂ) • R.dτ X) * R.dτ Y *
-      NormedSpace.exp ((y : ℂ) • (-R.dτ X))) (R.dτ X * R.dτ Y - R.dτ Y * R.dτ X) 0 := by
-    have h := ((he (R.dτ X)).mul_const (R.dτ Y)).mul (he (-R.dτ X))
+    | exact (hasDerivAt_exp_smul_const (𝕂 := ℂ) Z ((0 : ℝ) : ℂ)).comp_ofReal
+    | (simp only [← Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
+    | (simp only [Complex.coe_smul]; exact hasDerivAt_exp_smul_const (𝕂 := ℝ) Z 0)
+  have hd : HasDerivAt
+      (fun y : ℝ =>
+        NormedSpace.exp ((y : ℂ) • R.dτ X) * R.dτ Y * NormedSpace.exp ((y : ℂ) • (- R.dτ X)))
+      (R.dτ X * R.dτ Y - R.dτ Y * R.dτ X) 0 := by
+    have h := ((he (R.dτ X)).mul_const (R.dτ Y)).mul (he (- R.dτ X))
     refine h.congr_deriv ?_
     simp only [Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero, one_mul, mul_one, mul_neg]
     abel
   have hd' := R.rel_dτ_conj_hasDerivAt X Y
-  have hfun : (fun y : ℝ => R.dτ (NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X)))) =
-      fun y : ℝ => NormedSpace.exp ((y : ℂ) • R.dτ X) * R.dτ Y * NormedSpace.exp ((y : ℂ) • (-R.dτ X)) :=
+  have hfun
+      : (fun y : ℝ => R.dτ (NormedSpace.exp ((y : ℂ) • X) * Y * NormedSpace.exp ((y : ℂ) • (-X))))
+        = fun y : ℝ =>
+          NormedSpace.exp ((y : ℂ) • R.dτ X) * R.dτ Y * NormedSpace.exp ((y : ℂ) • (- R.dτ X)) :=
     funext hG
   rw [hfun] at hd'
   exact hd.unique hd'
 
-private theorem inK_of_support_sign_eq_of_skewAdjoint {ε : Fin n → Bool} (X : Matrix (Fin n) (Fin n) ℂ)
-    (hX : ∀ i j, X i j ≠ 0 → ε i = ε j) (hs : Xᴴ = -X) : inK ε X := by
+private theorem inK_of_support_sign_eq_of_skewAdjoint
+    {ε : Fin n → Bool}
+    (X : Matrix (Fin n) (Fin n) ℂ) (hX : ∀ i j, X i j ≠ 0 → ε i = ε j) (hs : Xᴴ = -X)
+    : inK ε X := by
   have hc : X * Jm ε = Jm ε * X := by
     ext i j
     simp only [Jm, Matrix.mul_diagonal, Matrix.diagonal_mul]
@@ -324,9 +375,10 @@ private theorem inK_of_support_sign_eq_of_skewAdjoint {ε : Fin n → Bool} (X :
   unfold inG
   rw [hs, neg_mul, hc, neg_add_cancel]
 
-private theorem inK_single_sub_single_and_I_smul_add_of_sign_eq {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b) :
-    inK ε (Matrix.single a b (1 : ℂ) - Matrix.single b a 1) ∧
-      inK ε (Complex.I • (Matrix.single a b (1 : ℂ) + Matrix.single b a 1)) := by
+private theorem inK_single_sub_single_and_I_smul_add_of_sign_eq
+    {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b)
+    : inK ε (Matrix.single a b (1 : ℂ) - Matrix.single b a 1)
+      ∧ inK ε (Complex.I • (Matrix.single a b (1 : ℂ) + Matrix.single b a 1)) := by
   constructor
   · apply inK_of_support_sign_eq_of_skewAdjoint
     · intro i j h
@@ -337,8 +389,9 @@ private theorem inK_single_sub_single_and_I_smul_add_of_sign_eq {ε : Fin n → 
         · obtain ⟨rfl, rfl⟩ := e2; exact hab.symm
         · simp [e1, e2] at h
     · ext i j
-      simp only [Matrix.conjTranspose_apply, Matrix.sub_apply, Matrix.neg_apply, Matrix.single_apply,
-        show (a = j ∧ b = i) ↔ (b = i ∧ a = j) from and_comm, show (b = j ∧ a = i) ↔ (a = i ∧ b = j) from and_comm]
+      simp only [Matrix.conjTranspose_apply, Matrix.sub_apply, Matrix.neg_apply,
+        Matrix.single_apply, show (a = j ∧ b = i) ↔ (b = i ∧ a = j) from and_comm,
+        show (b = j ∧ a = i) ↔ (a = i ∧ b = j) from and_comm]
       by_cases e1 : a = i ∧ b = j <;> by_cases e2 : b = i ∧ a = j <;> simp [e1, e2]
   · apply inK_of_support_sign_eq_of_skewAdjoint
     · intro i j h
@@ -350,17 +403,18 @@ private theorem inK_single_sub_single_and_I_smul_add_of_sign_eq {ε : Fin n → 
         · simp [e1, e2] at h
     · ext i j
       simp only [Matrix.conjTranspose_apply, Matrix.smul_apply, Matrix.add_apply, Matrix.neg_apply,
-        Matrix.single_apply, smul_eq_mul,
-        show (a = j ∧ b = i) ↔ (b = i ∧ a = j) from and_comm, show (b = j ∧ a = i) ↔ (a = i ∧ b = j) from and_comm]
-      by_cases e1 : a = i ∧ b = j <;> by_cases e2 : b = i ∧ a = j <;>
-        simp [e1, e2, Complex.conj_I, map_ofNat] <;> ring
+        Matrix.single_apply, smul_eq_mul, show (a = j ∧ b = i) ↔ (b = i ∧ a = j) from and_comm,
+        show (b = j ∧ a = i) ↔ (a = i ∧ b = j) from and_comm]
+      by_cases e1 : a = i ∧ b = j <;> by_cases e2 : b = i ∧ a = j
+        <;> simp [e1, e2, Complex.conj_I, map_ofNat] <;> ring
 
-private theorem KRep.rel_dτ_bracket_single {ε : Fin n → Bool} (R : KRep ε)
-    {a b c d : Fin n} (hab : ε a = ε b) (hcd : ε c = ε d) :
-    R.dτ (Matrix.single a b 1) * R.dτ (Matrix.single c d 1) -
-        R.dτ (Matrix.single c d 1) * R.dτ (Matrix.single a b 1) =
-      R.dτ (Matrix.single a b 1 * Matrix.single c d 1 -
-        Matrix.single c d 1 * Matrix.single a b 1) := by
+private theorem KRep.rel_dτ_bracket_single
+    {ε : Fin n → Bool} (R : KRep ε) {a b c d : Fin n} (hab : ε a = ε b) (hcd : ε c = ε d)
+    : R.dτ (Matrix.single a b 1) * R.dτ (Matrix.single c d 1)
+        - R.dτ (Matrix.single c d 1) * R.dτ (Matrix.single a b 1)
+      = R.dτ
+        (Matrix.single a b 1 * Matrix.single c d 1
+          - Matrix.single c d 1 * Matrix.single a b 1) := by
   set D : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ → (R.V →L[ℂ] R.V) :=
     fun X Y => R.dτ X * R.dτ Y - R.dτ Y * R.dτ X - R.dτ (X * Y - Y * X) with hD
   have Dal : ∀ X X' Y, D (X + X') Y = D X Y + D X' Y := by
@@ -376,19 +430,33 @@ private theorem KRep.rel_dτ_bracket_single {ε : Fin n → Bool} (R : KRep ε)
   obtain ⟨hX1, hZ1⟩ := inK_single_sub_single_and_I_smul_add_of_sign_eq (ε := ε) hab
   obtain ⟨hY1, hW1⟩ := inK_single_sub_single_and_I_smul_add_of_sign_eq (ε := ε) hcd
   have hI : Complex.I ≠ 0 := Complex.I_ne_zero
-  have h12 : D (Matrix.single a b 1 - Matrix.single b a 1) (Matrix.single c d 1 + Matrix.single d c 1) = 0 := by
+  have h12
+      : D (Matrix.single a b 1 - Matrix.single b a 1) (Matrix.single c d 1 + Matrix.single d c 1)
+        = 0 := by
     have := base _ _ hX1 hW1; rw [Dsr] at this; exact (smul_eq_zero.mp this).resolve_left hI
-  have h21 : D (Matrix.single a b 1 + Matrix.single b a 1) (Matrix.single c d 1 - Matrix.single d c 1) = 0 := by
+  have h21
+      : D (Matrix.single a b 1 + Matrix.single b a 1) (Matrix.single c d 1 - Matrix.single d c 1)
+        = 0 := by
     have := base _ _ hZ1 hY1; rw [Dsl] at this; exact (smul_eq_zero.mp this).resolve_left hI
-  have h22 : D (Matrix.single a b 1 + Matrix.single b a 1) (Matrix.single c d 1 + Matrix.single d c 1) = 0 := by
-    have := base _ _ hZ1 hW1; rw [Dsl, Dsr, smul_smul] at this
+  have h22
+      : D (Matrix.single a b 1 + Matrix.single b a 1) (Matrix.single c d 1 + Matrix.single d c 1)
+        = 0 := by
+    have := base _ _ hZ1 hW1
+    rw [Dsl, Dsr, smul_smul] at this
     exact (smul_eq_zero.mp this).resolve_left (mul_ne_zero hI hI)
   have h11 := base _ _ hX1 hY1
-  have split : ∀ u v : Fin n, Matrix.single u v (1 : ℂ) =
-      (1 / 2 : ℂ) • ((Matrix.single u v 1 - Matrix.single v u 1) + (Matrix.single u v 1 + Matrix.single v u 1)) := by
+  have split
+      : ∀ u v : Fin n,
+        Matrix.single u v (1 : ℂ)
+          = (1 / 2 : ℂ)
+            • ((Matrix.single u v 1 - Matrix.single v u 1)
+              + (Matrix.single u v 1 + Matrix.single v u 1)) := by
     intro u v
-    rw [show (Matrix.single u v (1 : ℂ) - Matrix.single v u 1) + (Matrix.single u v 1 + Matrix.single v u 1) =
-      (2 : ℂ) • Matrix.single u v 1 by rw [two_smul]; abel, smul_smul]
+    rw [show (Matrix.single u v (1 : ℂ) - Matrix.single v u 1)
+            + (Matrix.single u v 1 + Matrix.single v u 1)
+          = (2 : ℂ) • Matrix.single u v 1 by
+        rw [two_smul]; abel,
+      smul_smul]
     norm_num
   have key : D (Matrix.single a b 1) (Matrix.single c d 1) = 0 := by
     rw [split a b, split c d, Dsl, Dsr, Dal, Dar (Matrix.single a b 1 - Matrix.single b a 1),
@@ -396,24 +464,28 @@ private theorem KRep.rel_dτ_bracket_single {ε : Fin n → Bool} (R : KRep ε)
     simp
   exact sub_eq_zero.mp key
 
-private theorem KRep.rel_star_dτ_single {ε : Fin n → Bool} (R : KRep ε)
-    {a b : Fin n} (hab : ε a = ε b) :
-    star (R.dτ (Matrix.single a b 1)) = R.dτ (Matrix.single b a 1) := by
+private theorem KRep.rel_star_dτ_single
+    {ε : Fin n → Bool} (R : KRep ε) {a b : Fin n} (hab : ε a = ε b)
+    : star (R.dτ (Matrix.single a b 1)) = R.dτ (Matrix.single b a 1) := by
   have h1 := (inK_single_sub_single_and_I_smul_add_of_sign_eq (ε := ε) hab).1
   have h2 := (inK_single_sub_single_and_I_smul_add_of_sign_eq (ε := ε) hab).2
   have s1 := R.rel_star_dτ h1
   have s2 := R.rel_star_dτ h2
-  simp only [map_sub, map_add (f := _), map_smul, star_sub, star_add, star_smul, Complex.star_def, Complex.conj_I] at s1 s2
+  simp only [map_sub, map_add (f := _), map_smul, star_sub, star_add, star_smul, Complex.star_def,
+      Complex.conj_I]
+    at s1 s2
   set A := R.dτ (Matrix.single a b 1)
   set B := R.dτ (Matrix.single b a 1)
   have h3 : star A - star B = B - A := by rw [s1]; abel
   have h4 : star A + star B = A + B := by
     have := congrArg (fun x => Complex.I • x) s2
-    exact (by simpa [smul_add, smul_smul, Complex.I_mul_I, neg_smul, smul_neg, mul_neg] using this :
-      star A + star B = B + A).trans (add_comm B A)
+    exact (by simpa [smul_add, smul_smul, Complex.I_mul_I, neg_smul, smul_neg, mul_neg] using this
+      : star A + star B = B + A).trans (add_comm B A)
   have h5 : (2 : ℂ) • star A = (2 : ℂ) • B := by
     rw [two_smul, two_smul]
-    calc star A + star A = (star A - star B) + (star A + star B) := by abel
+    calc
+      star A + star A
+        = (star A - star B) + (star A + star B) := by abel
       _ = (B - A) + (A + B) := by rw [h3, h4]
       _ = B + B := by abel
   exact smul_right_injective _ two_ne_zero h5
@@ -427,16 +499,27 @@ theorem KRep.kUnit_units {ε : Fin n → Bool} (R : KRep ε) : Formalism.REAL.KU
 theorem KRep.kRel_units {ε : Fin n → Bool} (R : KRep ε) : Formalism.REAL.KRel ε R.units := by
   intro a b c d hab hcd
   have h := R.rel_dτ_bracket_single hab hcd
-  have key : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1 =
-      (if b = c then Matrix.single a d 1 else 0) - (if d = a then Matrix.single c b 1 else 0) := by
-    by_cases hbc : b = c <;> by_cases hda : d = a <;> simp only [hbc, hda, if_true, if_false] <;>
-      first
-      | simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, hbc, hda, Ne.symm hda]
-      | (subst hbc; subst hda; simp [Matrix.single_mul_single_same])
-      | (subst hbc; simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, hda, Ne.symm hda])
-      | (subst hda; simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, hbc, Ne.symm hbc])
-  have e : ∀ P Q : R.V →L[ℂ] R.V, ((P * Q - Q * P : R.V →L[ℂ] R.V) : Module.End ℂ R.V) =
-      (P : Module.End ℂ R.V) * Q - (Q : Module.End ℂ R.V) * P := by
+  have key
+      : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1
+        = (if b = c then Matrix.single a d 1 else 0)
+          - (if d = a then Matrix.single c b 1 else 0) := by
+    by_cases hbc : b = c <;> by_cases hda : d = a <;> simp only [hbc, hda, if_true, if_false]
+      <;> first
+        | simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, hbc, hda,
+            Ne.symm hda]
+        | (subst hbc; subst hda; simp [Matrix.single_mul_single_same])
+        | (
+            subst hbc
+            simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, hda, Ne.symm hda]
+          )
+        | (
+            subst hda
+            simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, hbc, Ne.symm hbc]
+          )
+  have e
+      : ∀ P Q : R.V →L[ℂ] R.V,
+        ((P * Q - Q * P : R.V →L[ℂ] R.V) : Module.End ℂ R.V)
+          = (P : Module.End ℂ R.V) * Q - (Q : Module.End ℂ R.V) * P := by
     intro P Q; ext x; simp
   simp only [KRep.units]
   rw [← e, h, key, map_sub]

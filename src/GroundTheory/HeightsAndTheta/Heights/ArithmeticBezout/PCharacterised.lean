@@ -15,9 +15,12 @@ open MvPolynomial MeasureTheory NumberField
 
 noncomputable section
 
-theorem not_isChowForm_zero (hPt : ProjPrimeHasPoint.Statement) {F : Type} [Field F] {n : ℕ}
-    {W : Ideal (MvPolynomial (Fin n) F)} (hW : IsProjPrime W) (g : MvPolynomial (Fin 0 × Fin n) F) :
-    ¬ IsChowForm W 0 g := by
+theorem not_isChowForm_zero
+    (hPt : ProjPrimeHasPoint.Statement)
+    {F : Type} [Field F]
+    {n : ℕ} {W : Ideal (MvPolynomial (Fin n) F)}
+    (hW : IsProjPrime W) (g : MvPolynomial (Fin 0 × Fin n) F)
+    : ¬ IsChowForm W 0 g := by
   intro hg
   obtain ⟨x, hx, hxW⟩ := hPt F n W hW
   have hunit : g ∣ 1 := by

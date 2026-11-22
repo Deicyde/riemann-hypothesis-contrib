@@ -11,10 +11,15 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.GeneralLinea
 
 @[expose] public section
 
-open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas
+open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult UpperTheory.Lit.Cas
 
-theorem UpperTheory.Lit.Cas.centred :
-    GlobalTheory.Published.EssSquareIntegrableSegments → GlobalTheory.Published.IrreducibleAdmissibleGL → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k] (Δ : Segment k) (y : IrrGL (k := k)), IsLSeg Δ y.rep → (∀ (t : kˣ) (c : ℂ), ScalarBy y t c → ‖c‖ = 1) → IsSqIntCoeff y.rep := by
+theorem UpperTheory.Lit.Cas.centred
+    : GlobalTheory.Published.EssSquareIntegrableSegments
+      → GlobalTheory.Published.IrreducibleAdmissibleGL
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+          [CharZero k] (Δ : Segment k) (y : IrrGL (k := k)),
+        IsLSeg Δ y.rep → (∀ (t : kˣ) (c : ℂ), ScalarBy y t c → ‖c‖ = 1) → IsSqIntCoeff y.rep := by
   intro H HA k _ _ _ _ _ Δ δ h hu
   have hpos : 0 < δ.1 := by
     obtain ⟨hd, -⟩ := h
@@ -25,8 +30,10 @@ theorem UpperTheory.Lit.Cas.centred :
   obtain ⟨χ, hχ, hsq⟩ := (H k δ hpos).2 ⟨Δ, h⟩
   let e := δ.twEquiv χ hχ
   let τ := (δ.tw χ hχ).rep
-  have he : ∀ g w, e.toLinearEquiv.symm (τ g w) =
-      ((detChar (Fin δ.1) χ g : ℂˣ) : ℂ) • δ.rep g (e.toLinearEquiv.symm w) := fun g w => by
+  have he
+      : ∀ g w,
+        e.toLinearEquiv.symm (τ g w)
+          = ((detChar (Fin δ.1) χ g : ℂˣ) : ℂ) • δ.rep g (e.toLinearEquiv.symm w) := fun g w => by
     obtain ⟨u, rfl⟩ := e.toLinearEquiv.surjective w
     have := e.toIntertwiningMap.isIntertwining _ _ g u
     rw [LinearEquiv.symm_apply_apply]
@@ -48,31 +55,45 @@ theorem UpperTheory.Lit.Cas.centred :
       exact congrArg _ (hc _)
     rw [norm_mul, hc1, mul_one] at hz1
     have hdz : ((detChar (Fin δ.1) χ z : ℂˣ) : ℂ) = ((χ a : ℂˣ) : ℂ) ^ δ.1 := by
-      have hdet : Matrix.GeneralLinearGroup.det z = a ^ δ.1 := Units.ext (by
-        simp [z, Matrix.GeneralLinearGroup.scalar, Matrix.algebraMap_eq_diagonal, Matrix.det_diagonal])
+      have hdet : Matrix.GeneralLinearGroup.det z = a ^ δ.1 :=
+        Units.ext (by
+          simp [z, Matrix.GeneralLinearGroup.scalar, Matrix.algebraMap_eq_diagonal,
+            Matrix.det_diagonal])
       rw [detChar_apply, hdet, map_pow, Units.val_pow_eq_pow_val]
     rw [hdz, norm_pow] at hz1
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hpos.ne').1 hz1
   intro m bm μ hμ v ℓ hℓ'
   let l' : Module.Dual ℂ _ := ℓ ∘ₗ e.toLinearEquiv.symm.toLinearMap
-  have hc : ∀ g, ‖l' (τ g (e.toLinearEquiv v))‖ = ‖((detChar (Fin δ.1) χ g : ℂˣ) : ℂ)‖ * ‖ℓ (δ.rep g v)‖ := fun g => by
-    simp only [l', LinearMap.comp_apply, LinearEquiv.coe_coe, he, LinearEquiv.symm_apply_apply, map_smul, smul_eq_mul,
-      norm_mul]
-  have hFc0 : ∀ g : GL (Fin δ.1) k, ‖l' (τ g (e.toLinearEquiv v))‖ = ‖((detChar (Fin δ.1) χ g : ℂˣ) : ℂ)‖ * ‖ℓ (δ.rep g v)‖ :=
+  have hc
+      : ∀ g,
+        ‖l' (τ g (e.toLinearEquiv v))‖
+          = ‖((detChar (Fin δ.1) χ g : ℂˣ) : ℂ)‖ * ‖ℓ (δ.rep g v)‖ := fun g => by
+    simp only [l', LinearMap.comp_apply, LinearEquiv.coe_coe, he, LinearEquiv.symm_apply_apply,
+      map_smul, smul_eq_mul, norm_mul]
+  have hFc0
+      : ∀ g : GL (Fin δ.1) k,
+        ‖l' (τ g (e.toLinearEquiv v))‖ = ‖((detChar (Fin δ.1) χ g : ℂˣ) : ℂ)‖ * ‖ℓ (δ.rep g v)‖ :=
     fun g => hc g
   have hopen : IsOpen {g : GL (Fin δ.1) k | l' ∘ₗ τ g = l'} := by
     have hk : IsOpen ((detChar (Fin δ.1) χ).ker : Set (GL (Fin δ.1) k)) := hχ.detChar
     refine isOpen_iff_mem_nhds.2 fun g hg => ?_
     have hg' : l' ∘ₗ τ g = l' := hg
-    have hU : {x | ℓ ∘ₗ δ.rep x = ℓ} ∩ ((detChar (Fin δ.1) χ).ker : Set (GL (Fin δ.1) k)) ∈ nhds (g⁻¹ * g) := by
-      rw [inv_mul_cancel]; exact Filter.inter_mem (hℓ'.mem_nhds (by show ℓ ∘ₗ δ.rep 1 = ℓ; rw [map_one, Module.End.one_eq_id, LinearMap.comp_id]))
+    have hU
+        : {x | ℓ ∘ₗ δ.rep x = ℓ} ∩ ((detChar (Fin δ.1) χ).ker : Set (GL (Fin δ.1) k))
+          ∈ nhds (g⁻¹ * g) := by
+      rw [inv_mul_cancel]
+      exact Filter.inter_mem
+        (hℓ'.mem_nhds (by
+          show ℓ ∘ₗ δ.rep 1 = ℓ; rw [map_one, Module.End.one_eq_id, LinearMap.comp_id]))
         (hk.mem_nhds (one_mem _))
-    refine Filter.mem_of_superset ((continuous_const_mul g⁻¹).continuousAt.preimage_mem_nhds hU) fun x hx => ?_
+    refine Filter.mem_of_superset ((continuous_const_mul g⁻¹).continuousAt.preimage_mem_nhds hU)
+      fun x hx => ?_
     obtain ⟨h1, h2⟩ := hx
     have h1' : ℓ ∘ₗ δ.rep (g⁻¹ * x) = ℓ := h1
     have h2' : detChar (Fin δ.1) χ (g⁻¹ * x) = 1 := h2
     show l' ∘ₗ τ x = l'
-    have hx' : τ x = τ g * τ (g⁻¹ * x) := (congrArg τ (mul_inv_cancel_left g x)).symm.trans (map_mul τ g (g⁻¹ * x))
+    have hx' : τ x = τ g * τ (g⁻¹ * x) :=
+      (congrArg τ (mul_inv_cancel_left g x)).symm.trans (map_mul τ g (g⁻¹ * x))
     rw [hx', Module.End.mul_eq_comp, ← LinearMap.comp_assoc, hg']
     ext w
     simp only [l', LinearMap.comp_apply, LinearEquiv.coe_coe]

@@ -13,9 +13,14 @@ open GlobalTheory.UnitLemma Matrix MeasureTheory
 
 namespace GlobalTheory.UnitLemma.TraceDet
 
-theorem det_trace_pow_mul_ne_zero : ∀ (K : UQ) (B : InvAlg K), B.P.Separable → ∀ u : B.A, IsUnit u →
-    (Matrix.of fun k l : Fin (Module.finrank K.E B.A) =>
-      Algebra.trace K.E B.A (B.g ^ ((k : ℕ) + (l : ℕ)) * u)).det ≠ 0 := by
+theorem det_trace_pow_mul_ne_zero
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.P.Separable
+        → ∀ u : B.A,
+          IsUnit u
+            → (Matrix.of fun k l : Fin (Module.finrank K.E B.A) =>
+                Algebra.trace K.E B.A (B.g ^ ((k : ℕ) + (l : ℕ)) * u)).det
+              ≠ 0 := by
   intro K B hsep u hu hdet
   classical
   obtain ⟨e, he⟩ := GlobalTheory.T.exists_power_basis_of_charpoly_separable K B hsep

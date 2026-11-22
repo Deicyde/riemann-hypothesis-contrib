@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCompactAnn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct Topology
 
 namespace GlobalTheory.FinSepChar
@@ -15,50 +17,62 @@ variable {F : Type} [Field F] [NumberField F]
 
 theorem pairA_zero_zero : pairA F 0 (0 : Af F) = 0 := Prod.ext rfl rfl
 
-theorem pairA_zero_neg (b : Af F) : pairA F 0 (-b) = -pairA F 0 b :=
+theorem pairA_zero_neg (b : Af F) : pairA F 0 (-b) = - pairA F 0 b :=
   Prod.ext (neg_zero (G := Ainf F)).symm rfl
 
-theorem algebraMap_mul_inv {a : F} (ha : a ≠ 0) :
-    algebraMap F (FiniteAdeleRing (𝓞 F) F) a * algebraMap F (FiniteAdeleRing (𝓞 F) F) a⁻¹ = 1 := by
+theorem algebraMap_mul_inv {a : F} (ha : a ≠ 0)
+    : algebraMap F (FiniteAdeleRing (𝓞 F) F) a * algebraMap F (FiniteAdeleRing (𝓞 F) F) a⁻¹
+      = 1 := by
   rw [← map_mul, mul_inv_cancel₀ ha, map_one]
 
-def ann (ψ : AddChar (AF F) ℂ) (κ : Type) [Fintype κ] (L : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F)) :
-    AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F) where
+def ann
+    (ψ : AddChar (AF F) ℂ) (κ : Type) [Fintype κ] (L : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F))
+    : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F) where
   carrier := {x | ∀ y ∈ L, ψ (pairA F 0 (x ⬝ᵥ y)) = 1}
   zero_mem' := fun y _ => by
     show ψ (pairA F 0 (0 ⬝ᵥ y)) = 1
     rw [zero_dotProduct, pairA_zero_zero, AddChar.map_zero_eq_one]
   add_mem' := fun {a b} ha hb y hy => by
     show ψ (pairA F 0 ((a + b) ⬝ᵥ y)) = 1
-    rw [add_dotProduct, GlobalTheory.AnnCompactStd.pairA_zero_add, AddChar.map_add_eq_mul, ha y hy, hb y hy, mul_one]
+    rw [add_dotProduct, GlobalTheory.AnnCompactStd.pairA_zero_add, AddChar.map_add_eq_mul, ha y hy,
+      hb y hy, mul_one]
   neg_mem' := fun {a} ha y hy => by
     show ψ (pairA F 0 ((-a) ⬝ᵥ y)) = 1
     rw [neg_dotProduct, pairA_zero_neg, AddChar.map_neg_eq_inv, ha y hy, inv_one]
 
-theorem mem_ann {ψ : AddChar (AF F) ℂ} {κ : Type} [Fintype κ] {L : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F)}
-    {x : κ → FiniteAdeleRing (𝓞 F) F} : x ∈ ann ψ κ L ↔ ∀ y ∈ L, ψ (pairA F 0 (x ⬝ᵥ y)) = 1 := Iff.rfl
+theorem mem_ann
+    {ψ : AddChar (AF F) ℂ} {κ : Type} [Fintype κ]
+    {L : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F)} {x : κ → FiniteAdeleRing (𝓞 F) F}
+    : x ∈ ann ψ κ L ↔ ∀ y ∈ L, ψ (pairA F 0 (x ⬝ᵥ y)) = 1 :=
+  Iff.rfl
 
-def scaledInt (κ : Type) (a : FiniteAdeleRing (𝓞 F) F) : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F) where
+def scaledInt (κ : Type) (a : FiniteAdeleRing (𝓞 F) F)
+    : AddSubgroup (κ → FiniteAdeleRing (𝓞 F) F) where
   carrier := {y | ∀ i, a * y i ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F}
   zero_mem' := fun i => by
     show a * 0 ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F
-    rw [mul_zero]; exact Subring.zero_mem _
+    rw [mul_zero]
+    exact Subring.zero_mem _
   add_mem' := fun {u v} hu hv i => by
     show a * (u i + v i) ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F
-    rw [mul_add]; exact Subring.add_mem _ (hu i) (hv i)
+    rw [mul_add]
+    exact Subring.add_mem _ (hu i) (hv i)
   neg_mem' := fun {u} hu i => by
     show a * (-u i) ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F
-    rw [mul_neg]; exact Subring.neg_mem _ (hu i)
+    rw [mul_neg]
+    exact Subring.neg_mem _ (hu i)
 
-theorem isOpen_scaledInt (κ : Type) [Fintype κ] (a : FiniteAdeleRing (𝓞 F) F) :
-    IsOpen (scaledInt κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)) := by
-  have h : (scaledInt κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)) =
-      ⋂ i, (fun y : κ → FiniteAdeleRing (𝓞 F) F => a * y i) ⁻¹'
-        (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F)) := by
+theorem isOpen_scaledInt (κ : Type) [Fintype κ] (a : FiniteAdeleRing (𝓞 F) F)
+    : IsOpen (scaledInt κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)) := by
+  have h
+      : (scaledInt κ a : Set (κ → FiniteAdeleRing (𝓞 F) F))
+        = ⋂ i, (fun y : κ → FiniteAdeleRing (𝓞 F) F => a * y i) ⁻¹'
+            (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F)) := by
     ext y; simp only [Set.mem_iInter, Set.mem_preimage]; exact Iff.rfl
   rw [h]
   exact isOpen_iInter_of_finite fun i =>
-    GroundTheory.Global.isOpen_integralFiniteAdeles.preimage (continuous_const.mul (continuous_apply i))
+    GroundTheory.Global.isOpen_integralFiniteAdeles.preimage (continuous_const.mul (continuous_apply
+      i))
 
 end GlobalTheory.FinSepChar
 
@@ -66,10 +80,14 @@ namespace GlobalTheory.FinSepChar
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_compact_open_separating {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (κ : Type) [Fintype κ]
-    {N : Set (κ → Af F)} (hN : N ∈ 𝓝 (0 : κ → Af F)) : ∃ U : AddSubgroup (κ → Af F),
-      IsOpen (U : Set (κ → Af F)) ∧ IsCompact (U : Set (κ → Af F)) ∧ (U : Set (κ → Af F)) ⊆ N ∧
-      ∀ x₀ ∉ U, ∃ y : κ → Af F, (∀ u ∈ U, ψ (pairA F 0 (u ⬝ᵥ y)) = 1) ∧ ψ (pairA F 0 (x₀ ⬝ᵥ y)) ≠ 1 := by
+theorem exists_compact_open_separating
+    {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
+    (κ : Type) [Fintype κ]
+    {N : Set (κ → Af F)} (hN : N ∈ 𝓝 (0 : κ → Af F))
+    : ∃ U : AddSubgroup (κ → Af F),
+      IsOpen (U : Set (κ → Af F)) ∧ IsCompact (U : Set (κ → Af F)) ∧ (U : Set (κ → Af F)) ⊆ N
+        ∧ ∀ x₀ ∉ U, ∃ y : κ → Af F,
+          (∀ u ∈ U, ψ (pairA F 0 (u ⬝ᵥ y)) = 1) ∧ ψ (pairA F 0 (x₀ ⬝ᵥ y)) ≠ 1 := by
   classical
   rw [nhds_pi, Filter.mem_pi] at hN
   obtain ⟨I, -, t, ht, hsub⟩ := hN
@@ -91,9 +109,9 @@ theorem exists_compact_open_separating {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ
   set L := scaledInt (F := F) κ (ι cc * ι dd) with hL
   have hLo : IsOpen (L : Set (κ → FiniteAdeleRing (𝓞 F) F)) := isOpen_scaledInt κ _
   refine ⟨ann ψ κ L, ?_, ?_, ?_, ?_⟩
-  ·
-    set δ := ι ee⁻¹ * (ι cc⁻¹ * ι dd⁻¹) with hδ
-    have hVo : IsOpen (scaledInt (F := F) κ δ : Set (κ → FiniteAdeleRing (𝓞 F) F)) := isOpen_scaledInt κ _
+  · set δ := ι ee⁻¹ * (ι cc⁻¹ * ι dd⁻¹) with hδ
+    have hVo : IsOpen (scaledInt (F := F) κ δ : Set (κ → FiniteAdeleRing (𝓞 F) F)) :=
+      isOpen_scaledInt κ _
     have hVU : (scaledInt (F := F) κ δ : Set (κ → FiniteAdeleRing (𝓞 F) F)) ⊆ ann ψ κ L := by
       intro x hx y hy
       have hsum : x ⬝ᵥ y = ι ee * ∑ i, (δ * x i) * ((ι cc * ι dd) * y i) := by
@@ -119,7 +137,8 @@ theorem exists_compact_open_separating {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ
           rw [Pi.single_eq_same]
           have : ι cc * ι dd * (ι cc⁻¹ * ι dd⁻¹ * s) = s := by
             linear_combination (ι dd * ι dd⁻¹ * s) * hC + s * hD
-          rw [this]; exact hs
+          rw [this]
+          exact hs
         · rw [Pi.single_eq_of_ne hk, mul_zero]; exact Subring.zero_mem _
       have h1 := hx _ hy
       rw [dotProduct_single] at h1
@@ -139,8 +158,11 @@ theorem exists_compact_open_separating {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ
 
 end GlobalTheory.FinSepChar
 
-theorem GlobalTheory.FinSepChar.finite_chars_separate : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsStd ψ →
-    ∀ (κ : Type) [Fintype κ], ∀ N ∈ nhds (0 : κ → Af F), ∃ U : AddSubgroup (κ → Af F),
-      IsOpen (U : Set (κ → Af F)) ∧ IsCompact (U : Set (κ → Af F)) ∧ (U : Set (κ → Af F)) ⊆ N ∧
-      ∀ x₀ ∉ U, ∃ y : κ → Af F, (∀ u ∈ U, ψ (pairA F 0 (u ⬝ᵥ y)) = 1) ∧ ψ (pairA F 0 (x₀ ⬝ᵥ y)) ≠ 1 :=
+theorem GlobalTheory.FinSepChar.finite_chars_separate
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      IsStd ψ
+        → ∀ (κ : Type) [Fintype κ], ∀ N ∈ nhds (0 : κ → Af F), ∃ U : AddSubgroup (κ → Af F),
+          IsOpen (U : Set (κ → Af F)) ∧ IsCompact (U : Set (κ → Af F)) ∧ (U : Set (κ → Af F)) ⊆ N
+            ∧ ∀ x₀ ∉ U, ∃ y : κ → Af F,
+              (∀ u ∈ U, ψ (pairA F 0 (u ⬝ᵥ y)) = 1) ∧ ψ (pairA F 0 (x₀ ⬝ᵥ y)) ≠ 1 :=
   fun _ _ _ _ hψ κ _ _ hN => GlobalTheory.FinSepChar.exists_compact_open_separating hψ κ hN

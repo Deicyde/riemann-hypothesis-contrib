@@ -7,10 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa UpperTheory.V.Th UpperTheory.V.Th.Coc
+open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa
+  UpperTheory.V.Th UpperTheory.V.Th.Coc
 
-theorem UpperTheory.V.Th.Coc.chQuot :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E), ∃ (E' : Type) (_ : Ring E') (_ : Algebra A E') (π : E →ₐ[A] E') (D' : Det n A E'), Function.Surjective π ∧ D'.pull π = D ∧ D'.IsCH ∧ ∀ y, π y = 0 → y ∈ D.ker := by
+theorem UpperTheory.V.Th.Coc.chQuot
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E),
+      ∃ (E' : Type) (_ : Ring E') (_ : Algebra A E') (π : E →ₐ[A] E') (D' : Det n A E'),
+        Function.Surjective π ∧ D'.pull π = D ∧ D'.IsCH ∧ ∀ y, π y = 0 → y ∈ D.ker := by
   intro n A E _ _ _ D
   let π : E →ₐ[A] D.CH.ringCon.Quotient := RingCon.mkₐ A D.CH.ringCon
   have hmem : ∀ x, π x = 0 ↔ x ∈ D.CH := fun x => by

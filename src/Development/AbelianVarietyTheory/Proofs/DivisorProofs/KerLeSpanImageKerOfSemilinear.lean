@@ -8,8 +8,14 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem ker_le_span_image_ker_of_semilinear :
-    ∀ (K X Y H W : Type) [Field K] [AddCommGroup X] [Module K X] [FiniteDimensional K X] [AddCommGroup Y] [Module K Y] [AddCommGroup H] [Module ℂ H] [AddCommGroup W] [Module ℂ W] (σ : K →+* ℂ) (θ : X →ₗ[K] Y) (j : X →ₛₗ[σ] H) (jW : Y →ₛₗ[σ] W) (T : H →ₗ[ℂ] W), Submodule.span ℂ (Set.range j) = ⊤ → (∀ (n : ℕ) (b : Fin n → Y), LinearIndependent K b → LinearIndependent ℂ fun k => jW (b k)) → (∀ x, T (j x) = jW (θ x)) → LinearMap.ker T ≤ Submodule.span ℂ (j '' (LinearMap.ker θ : Set X)) := by
+theorem ker_le_span_image_ker_of_semilinear
+    : ∀ (K X Y H W : Type) [Field K] [AddCommGroup X] [Module K X] [FiniteDimensional K X]
+        [AddCommGroup Y] [Module K Y] [AddCommGroup H] [Module ℂ H] [AddCommGroup W] [Module ℂ W]
+        (σ : K →+* ℂ) (θ : X →ₗ[K] Y) (j : X →ₛₗ[σ] H) (jW : Y →ₛₗ[σ] W) (T : H →ₗ[ℂ] W),
+      Submodule.span ℂ (Set.range j) = ⊤
+        → (∀ (n : ℕ) (b : Fin n → Y), LinearIndependent K b → LinearIndependent ℂ fun k => jW (b k))
+        → (∀ x, T (j x) = jW (θ x))
+        → LinearMap.ker T ≤ Submodule.span ℂ (j '' (LinearMap.ker θ : Set X)) := by
   intro K X Y H W _ _ _ _ _ _ _ _ _ _ σ θ j jW T hspan hind hT
   classical
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl (LinearMap.ker θ)
@@ -48,8 +54,7 @@ theorem ker_le_span_image_ker_of_semilinear :
     rw [map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
   intro h hh
-  have hmem : h ∈ N ⊔ Submodule.span ℂ (Set.range fun k => j (b k : X)) := by
-    rw [htop]; trivial
+  have hmem : h ∈ N ⊔ Submodule.span ℂ (Set.range fun k => j (b k : X)) := by rw [htop]; trivial
   obtain ⟨u, hu, s, hs, rfl⟩ := Submodule.mem_sup.1 hmem
   obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hs
   have hTu : T u = 0 := hNT hu

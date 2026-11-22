@@ -11,10 +11,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilDatumUni
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.Mem Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open GlobalTheory.Mem Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped InnerProductSpace
 
 namespace GlobalTheory.Mem.OrientedKer
@@ -25,10 +28,22 @@ theorem toTWsmall_zero (S T : HSp D) : toTWsmall S T 0 = 0 := by
   unfold toTWsmall
   rw [Matrix.zero_mul, Matrix.transpose_zero]
 
-theorem ker_eq_thetaKO : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (Wf : WeilFun D ψ) (S T : HSp D) (χS χT : IdC D), S.rank < T.rank → admitted T S χT χS → ∀ om, IsWeilDatumO ψ S T χS χT om → ∀ f, IsThetaFunO ψ S T f → ∃ Φ : ThS ψ T S, (f ≠ 0 → Φ ≠ 0) ∧ ∀ g h, Wf.ker T S χT χS Φ h g = thetaKO om g h f := by
+theorem ker_eq_thetaKO
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (Wf : WeilFun D ψ) (S T : HSp D) (χS χT : IdC D),
+          S.rank < T.rank → admitted T S χT χS
+            → ∀ om,
+              IsWeilDatumO ψ S T χS χT om
+                → ∀ f,
+                  IsThetaFunO ψ S T f
+                    → ∃ Φ : ThS ψ T S,
+                      (f ≠ 0 → Φ ≠ 0) ∧ ∀ g h, Wf.ker T S χT χS Φ h g = thetaKO om g h f := by
   intro D ψ hψ Wf S T χS χT hr ha om H f hf
   have ha' : admitted S T χS χT := ⟨ha.1.symm, ha.2.2.1, ha.2.1, ha.2.2.2.2, ha.2.2.2.1⟩
-  obtain ⟨omO, H', e⟩ := GlobalTheory.Mem.WeilOriented.exists_isWeilDatumO D ψ hψ S T χS χT _ ha' hr (Wf.core.weil S T χS χT ha')
+  obtain ⟨omO, H', e⟩ :=
+    GlobalTheory.Mem.WeilOriented.exists_isWeilDatumO D ψ hψ S T χS χT _ ha' hr
+      (Wf.core.weil S T χS χT ha')
   obtain ⟨E, -, -, hE, -, -, -, h7, -⟩ := GlobalTheory.OrientedCoord.exists_coord D S T hr.le
 
   have hf0 : IsThetaFun ψ S T fun y => f (E.symm y) := by
@@ -46,9 +61,12 @@ theorem ker_eq_thetaKO : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdCha
   refine ⟨Φ, fun h0 hΦ => h0 ?_, fun g h => ?_⟩
   · funext x
     have := congrFun (congrArg Subtype.val hΦ) (E x).transpose
-    simp only [Φ, Φ₀, Matrix.transpose_transpose, AddEquiv.symm_apply_apply, Submodule.coe_zero, Pi.zero_apply] at this
+    simp only [Φ, Φ₀, Matrix.transpose_transpose, AddEquiv.symm_apply_apply, Submodule.coe_zero,
+        Pi.zero_apply]
+      at this
     exact this
-  · have hs := Wf.om_swap S T χS χT ha' g h Φ₀ Φ (fun x => congrArg Φ₀.1 (Matrix.transpose_transpose x)) 0
+  · have hs :=
+      Wf.om_swap S T χS χT ha' g h Φ₀ Φ (fun x => congrArg Φ₀.1 (Matrix.transpose_transpose x)) 0
     rw [Matrix.transpose_zero] at hs
     have e1 := congrFun (e (g, h) Φ₀) 0
     rw [toTWsmall_zero, ← hfΦ] at e1

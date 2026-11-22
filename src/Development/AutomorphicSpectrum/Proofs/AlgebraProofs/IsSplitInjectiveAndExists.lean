@@ -10,9 +10,9 @@ open TensorProduct
 
 namespace GlobalTheory.CompanionTheory.Ar.Crv
 
-theorem isSplit_injective_and_exists (O k S : Type) [CommRing O] [Field k] [Fintype S]
-    (χ : S → (O →+* k)) (h : IsSplit χ) :
-    Function.Injective χ ∧ ∀ ψ : O →+* k, ∃ s, χ s = ψ := by
+theorem isSplit_injective_and_exists
+    (O k S : Type) [CommRing O] [Field k] [Fintype S] (χ : S → (O →+* k)) (h : IsSplit χ)
+    : Function.Injective χ ∧ ∀ ψ : O →+* k, ∃ s, χ s = ψ := by
   classical
   unfold IsSplit at h
   set F := Algebra.TensorProduct.lift (Algebra.ofId k (S → k))
@@ -62,8 +62,7 @@ theorem isSplit_injective_and_exists (O k S : Type) [CommRing O] [Field k] [Fint
       · simp [Pi.single_apply, hts]
     ext o
     have h1 := congrArg Ψ (hmul ((1 : k) ⊗ₜ[ℤ] o))
-    have h2 : Ψ ((1 : k) ⊗ₜ[ℤ] o) = ψ o := by
-      simp [Ψ]
+    have h2 : Ψ ((1 : k) ⊗ₜ[ℤ] o) = ψ o := by simp [Ψ]
     rw [map_mul, map_smul, hv, h2, smul_eq_mul, one_mul] at h1
     exact (mul_right_cancel₀ hs h1).symm
 

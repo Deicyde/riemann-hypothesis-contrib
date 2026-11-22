@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsR
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
@@ -22,8 +24,10 @@ namespace GlobalTheory.AboveL.AbSub
 
 open Polynomial Module
 
-theorem eq_one_of_charpoly {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (f : Module.End ℂ V) (hs : f.IsSemisimple) (hc : f.charpoly = (X - 1) ^ finrank ℂ V) : f = 1 := by
+theorem eq_one_of_charpoly
+    {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (f : Module.End ℂ V) (hs : f.IsSemisimple) (hc : f.charpoly = (X - 1) ^ finrank ℂ V)
+    : f = 1 := by
   have h1 : (f - algebraMap ℂ (Module.End ℂ V) 1).IsSemisimple :=
     Module.End.isSemisimple_sub_algebraMap_iff.mpr hs
   have h2 : IsNilpotent (f - algebraMap ℂ (Module.End ℂ V) 1) := by
@@ -39,7 +43,17 @@ end GlobalTheory.AboveL.AbSub
 
 namespace GlobalTheory.AboveL.AbSub
 
-theorem exists_open_sub : ∀ (K Ω : Type) [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (h : IsPlaceOver A v) (y : WD h), AbW y → ∀ σ : Weil h, deg σ ≠ 0 → ∃ V : Subgroup (Dec (F := K) A), IsOpen (V : Set (Dec (F := K) A)) ∧ commutator (Dec (F := K) A) ≤ V ∧ (⟨(σ : G K Ω), Weil_le_Dec h σ.2⟩ : Dec (F := K) A) ∈ V ∧ ∀ τ : Ine (F := K) A, ∀ g ∈ V, (g : G K Ω) = τ → y.charPol (ineIncl h τ) = (Polynomial.X - 1) ^ y.lpDim := by
+theorem exists_open_sub
+    : ∀ (K Ω : Type) [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (h : IsPlaceOver A v) (y : WD h),
+      AbW y
+        → ∀ σ : Weil h,
+          deg σ ≠ 0
+            → ∃ V : Subgroup (Dec (F := K) A),
+              IsOpen (V : Set (Dec (F := K) A)) ∧ commutator (Dec (F := K) A) ≤ V
+                ∧ (⟨(σ : G K Ω), Weil_le_Dec h σ.2⟩ : Dec (F := K) A) ∈ V
+                ∧ ∀ τ : Ine (F := K) A, ∀ g ∈ V,
+                  (g : G K Ω) = τ → y.charPol (ineIncl h τ) = (Polynomial.X - 1) ^ y.lpDim := by
   intro K Ω _ _ _ _ _ A v h y hy σ hσ
   haveI : IsGalois K Ω := IsAlgClosure.isGalois K Ω
   haveI : CompactSpace (Dec (F := K) A) := isCompact_iff_compactSpace.1 (isClosed_Dec A).isCompact
@@ -50,31 +64,35 @@ theorem exists_open_sub : ∀ (K Ω : Type) [Field Ω] [Field K] [NumberField K]
     exact eq_one_of_charpoly _ (a.semisimple _) this
   have hconj : ∀ w x : Weil h, a.ρ x = 1 → a.ρ (w * x * w⁻¹) = 1 := fun w x hx => by
     rw [map_mul, map_mul, hx, mul_one, ← map_mul, mul_inv_cancel, map_one]
-  let J : Subgroup (Dec (F := K) A) :=
-    { carrier := {d | (d : G K Ω) ∈ Ine (F := K) A ∧ ∀ hw : (d : G K Ω) ∈ Weil h, a.ρ ⟨d, hw⟩ = 1}
-      one_mem' := ⟨(Ine (F := K) A).one_mem, fun _ => map_one a.ρ⟩
-      mul_mem' := by
-        rintro d1 d2 ⟨h1, h1'⟩ ⟨h2, h2'⟩
-        refine ⟨(Ine (F := K) A).mul_mem h1 h2, fun hw => ?_⟩
-        have e := map_mul a.ρ ⟨(d1 : G K Ω), Ine_le_Weil h h1⟩ ⟨(d2 : G K Ω), Ine_le_Weil h h2⟩
-        rw [h1', h2', one_mul] at e
-        exact e
-      inv_mem' := by
-        rintro d ⟨h1, h1'⟩
-        refine ⟨(Ine (F := K) A).inv_mem h1, fun hw => ?_⟩
-        have e := map_mul a.ρ ⟨((d⁻¹ : Dec (F := K) A) : G K Ω), hw⟩ ⟨(d : G K Ω), Ine_le_Weil h h1⟩
-        rw [h1' (Ine_le_Weil h h1), mul_one] at e
-        have e1 : (⟨((d⁻¹ : Dec (F := K) A) : G K Ω), hw⟩ * ⟨(d : G K Ω), Ine_le_Weil h h1⟩ : Weil h) = 1 :=
-          Subtype.ext (inv_mul_cancel (d : G K Ω))
-        rw [e1, map_one] at e
-        exact e.symm }
-  have memJ : ∀ d : Dec (F := K) A, d ∈ J ↔ ((d : G K Ω) ∈ Ine (F := K) A ∧
-      ∀ hw : (d : G K Ω) ∈ Weil h, a.ρ ⟨d, hw⟩ = 1) := fun _ => Iff.rfl
+  let J : Subgroup (Dec (F := K) A) := {
+    carrier := {d | (d : G K Ω) ∈ Ine (F := K) A ∧ ∀ hw : (d : G K Ω) ∈ Weil h, a.ρ ⟨d, hw⟩ = 1}
+    one_mem' := ⟨(Ine (F := K) A).one_mem, fun _ => map_one a.ρ⟩
+    mul_mem' := by
+      rintro d1 d2 ⟨h1, h1'⟩ ⟨h2, h2'⟩
+      refine ⟨(Ine (F := K) A).mul_mem h1 h2, fun hw => ?_⟩
+      have e := map_mul a.ρ ⟨(d1 : G K Ω), Ine_le_Weil h h1⟩ ⟨(d2 : G K Ω), Ine_le_Weil h h2⟩
+      rw [h1', h2', one_mul] at e
+      exact e
+    inv_mem' := by
+      rintro d ⟨h1, h1'⟩
+      refine ⟨(Ine (F := K) A).inv_mem h1, fun hw => ?_⟩
+      have e := map_mul a.ρ ⟨((d⁻¹ : Dec (F := K) A) : G K Ω), hw⟩ ⟨(d : G K Ω), Ine_le_Weil h h1⟩
+      rw [h1' (Ine_le_Weil h h1), mul_one] at e
+      have e1
+          : (⟨((d⁻¹ : Dec (F := K) A) : G K Ω), hw⟩ * ⟨(d : G K Ω), Ine_le_Weil h h1⟩ : Weil h)
+            = 1 :=
+        Subtype.ext (inv_mul_cancel (d : G K Ω))
+      rw [e1, map_one] at e
+      exact e.symm
+  }
+  have memJ
+      : ∀ d : Dec (F := K) A,
+        d ∈ J ↔ ((d : G K Ω) ∈ Ine (F := K) A ∧ ∀ hw : (d : G K Ω) ∈ Weil h, a.ρ ⟨d, hw⟩ = 1) :=
+    fun _ => Iff.rfl
 
   obtain ⟨O, hO, hOS⟩ := isOpen_induced_iff.mp a.smooth
   have hO1 : (1 : G K Ω) ∈ O := by
-    have : (1 : Ine (F := K) A) ∈ Subtype.val ⁻¹' O := by
-      rw [hOS]; exact map_one a.ρ
+    have : (1 : Ine (F := K) A) ∈ Subtype.val ⁻¹' O := by rw [hOS]; exact map_one a.ρ
     exact this
   have hPW : ∀ d : Dec (F := K) A, (d : G K Ω) ∈ O → (d : G K Ω) ∈ Ine (F := K) A → d ∈ J := by
     intro d hd hI
@@ -86,25 +104,32 @@ theorem exists_open_sub : ∀ (K Ω : Type) [Field Ω] [Field K] [NumberField K]
   obtain ⟨U0, hU0⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hW0 hO1
   haveI := U0.toSubgroup.quotient_finite_of_isOpen U0.isOpen
   let ι : Weil h →* Dec (F := K) A := Subgroup.inclusion (Weil_le_Dec h)
-  obtain ⟨n, hn, -, hσn⟩ := Subgroup.exists_pow_mem_of_index_ne_zero
-    (Subgroup.index_ne_zero_of_finite (H := U0.toSubgroup)) (ι σ)
+  obtain ⟨n, hn, -, hσn⟩ :=
+    Subgroup.exists_pow_mem_of_index_ne_zero (Subgroup.index_ne_zero_of_finite (H := U0.toSubgroup))
+      (ι σ)
   have hm : 0 < n * (deg σ).natAbs := Nat.mul_pos hn (Int.natAbs_pos.mpr hσ)
   obtain ⟨ζ, hζ⟩ := GlobalTheory.exists_fixed_dvd_deg K Ω A v h _ hm
   have hW1 : IsOpen ((U0 : Set (Dec (F := K) A)) ∩ {d | (d : G K Ω) ζ = ζ}) := by
     refine U0.isOpen.inter ?_
-    have := (stabilizer_isOpen_of_isIntegral (K := K) ζ).preimage
-      (continuous_subtype_val (p := fun x => x ∈ Dec (F := K) A))
+    have :=
+      (stabilizer_isOpen_of_isIntegral (K := K) ζ).preimage
+        (continuous_subtype_val (p := fun x => x ∈ Dec (F := K) A))
     convert this using 1
     ext d
-    simp only [Set.mem_setOf_eq, Set.mem_preimage, SetLike.mem_coe, MulAction.mem_stabilizer_iff, AlgEquiv.smul_def]
-  obtain ⟨U, hU⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hW1
-    ⟨U0.toSubgroup.one_mem, AlgEquiv.one_apply ζ⟩
+    simp only [Set.mem_setOf_eq, Set.mem_preimage, SetLike.mem_coe, MulAction.mem_stabilizer_iff,
+      AlgEquiv.smul_def]
+  obtain ⟨U, hU⟩ :=
+    ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hW1
+      ⟨U0.toSubgroup.one_mem, AlgEquiv.one_apply ζ⟩
   haveI : U.toSubgroup.Normal := U.isNormal'
 
   have hdense : ∀ d : Dec (F := K) A, ∃ w : Weil h, ∃ u ∈ U.toSubgroup, d = ι w * u := by
     intro d
-    have h1 := GlobalTheory.TameQuot.closure_frob_sup_Ine K Ω A v h (ι (frob h)) (isFrob_frob (h := h))
-    have h2 : Subgroup.zpowers (ι (frob h)) ⊔ (Ine (F := K) A).subgroupOf (Dec (F := K) A) ≤ ι.range := by
+    have h1 :=
+      GlobalTheory.TameQuot.closure_frob_sup_Ine K Ω A v h (ι (frob h)) (isFrob_frob (h := h))
+    have h2
+        : Subgroup.zpowers (ι (frob h)) ⊔ (Ine (F := K) A).subgroupOf (Dec (F := K) A)
+          ≤ ι.range := by
       refine sup_le ?_ fun x hx => ⟨⟨x, Ine_le_Weil h hx⟩, rfl⟩
       rw [Subgroup.zpowers_le]
       exact ⟨_, rfl⟩
@@ -169,8 +194,13 @@ theorem exists_open_sub : ∀ (K Ω : Type) [Field Ω] [Field K] [NumberField K]
       rw [deg_mul, deg_mul, deg_mul, deg_inv, deg_inv]; ring
     exact ⟨deg_eq_zero_iff.mp hd0, fun _ => hcomm w1 w2⟩
 
-  refine ⟨Subgroup.zpowers (ι σ) ⊔ N, ?_, le_trans hcN le_sup_right,
-    Subgroup.mem_sup_left (Subgroup.mem_zpowers (ι σ)), ?_⟩
+  refine ⟨
+    Subgroup.zpowers (ι σ) ⊔ N,
+    ?_,
+    le_trans hcN le_sup_right,
+    Subgroup.mem_sup_left (Subgroup.mem_zpowers (ι σ)),
+    ?_
+  ⟩
   · exact Subgroup.isOpen_mono (le_trans (le_sup_right : U.toSubgroup ≤ N) le_sup_right) U.isOpen
   intro τ g hg hgτ
   have hgI : (g : G K Ω) ∈ Ine (F := K) A := hgτ ▸ τ.2
@@ -187,19 +217,23 @@ theorem exists_open_sub : ∀ (K Ω : Type) [Field Ω] [Field K] [NumberField K]
     exact (Weil h).mul_mem ((Weil h).inv_mem ((Weil h).mul_mem hkW (Ine_le_Weil h (hJI j hj))))
       (Ine_le_Weil h hgI)
   have hdeg : deg (⟨(u : G K Ω), huW⟩ : Weil h) = -(k * deg σ) := by
-    have e : (⟨((ι σ ^ k * (j * u) : Dec (F := K) A) : G K Ω), Ine_le_Weil h hgI⟩ : Weil h) =
-        σ ^ k * (⟨(j : G K Ω), Ine_le_Weil h (hJI j hj)⟩ * ⟨(u : G K Ω), huW⟩) := by
+    have e
+        : (⟨((ι σ ^ k * (j * u) : Dec (F := K) A) : G K Ω), Ine_le_Weil h hgI⟩ : Weil h)
+          = σ ^ k * (⟨(j : G K Ω), Ine_le_Weil h (hJI j hj)⟩ * ⟨(u : G K Ω), huW⟩) := by
       apply Subtype.ext
       simp [Subgroup.coe_zpow, ι]
     have h0 := (deg_eq_zero_iff (σ := ⟨_, Ine_le_Weil h hgI⟩)).mpr hgI
     rw [e, deg_mul, deg_mul, deg_zpow,
-      (deg_eq_zero_iff (σ := ⟨_, Ine_le_Weil h (hJI j hj)⟩)).mpr (hJI j hj)] at h0
+        (deg_eq_zero_iff (σ := ⟨_, Ine_le_Weil h (hJI j hj)⟩)).mpr (hJI j hj)]
+      at h0
     linarith
   have hnk : (n : ℤ) ∣ k := by
     have h1 := hζ ⟨(u : G K Ω), huW⟩ (hUζ u hu)
     rw [hdeg, dvd_neg, Nat.cast_mul, Int.natCast_natAbs,
-      show (n : ℤ) * |deg σ| = |(n : ℤ) * deg σ| by rw [abs_mul, abs_of_nonneg (Int.natCast_nonneg n)],
-      abs_dvd] at h1
+        show (n : ℤ) * |deg σ| = |(n : ℤ) * deg σ| by
+          rw [abs_mul, abs_of_nonneg (Int.natCast_nonneg n)],
+        abs_dvd]
+      at h1
     exact (mul_dvd_mul_iff_right hσ).mp h1
   obtain ⟨t, ht⟩ := hnk
   have hk0 : ι σ ^ k ∈ U0.toSubgroup := by

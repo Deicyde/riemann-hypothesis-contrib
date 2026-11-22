@@ -8,19 +8,23 @@ public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Pro
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Conj.SplitDisc
 
 open Module
 
-theorem injective_of_charZero (E : Type) [Field E] [NumberField E] {L : Type} [Field L] [CharZero L]
-    (g : 𝓞 E →+* L) : Function.Injective g := by
+theorem injective_of_charZero
+    (E : Type) [Field E] [NumberField E] {L : Type} [Field L] [CharZero L] (g : 𝓞 E →+* L)
+    : Function.Injective g := by
   refine (injective_iff_map_eq_zero g).2 fun x hx => ?_
   by_contra h
-  have hne := Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := RingHom.ker g) h
-    (RingHom.mem_ker.2 hx) (Algebra.IsIntegral.isIntegral x)
+  have hne :=
+    Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := RingHom.ker g) h (RingHom.mem_ker.2 hx)
+      (Algebra.IsIntegral.isIntegral x)
   apply hne
   rw [eq_bot_iff]
   intro n hn
@@ -28,15 +32,17 @@ theorem injective_of_charZero (E : Type) [Field E] [NumberField E] {L : Type} [F
   have h1 : (n : L) = 0 := by simpa using h0
   simpa using h1
 
-theorem det_sq_eq_discr (E : Type) [Field E] [NumberField E] (R S : Type) [CommRing R] [IsDomain R] [CharZero R]
-    [Fintype S] [DecidableEq S] (σ : S → (𝓞 E →+* R)) (hσ : Function.Injective σ)
-    (hc : Fintype.card S = finrank ℚ E) (e : Free.ChooseBasisIndex ℤ (𝓞 E) ≃ S) :
-    (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)).det ^ 2 = (NumberField.discr E : R) := by
+theorem det_sq_eq_discr
+    (E : Type) [Field E] [NumberField E]
+    (R S : Type) [CommRing R] [IsDomain R] [CharZero R] [Fintype S] [DecidableEq S]
+    (σ : S → (𝓞 E →+* R)) (hσ : Function.Injective σ)
+    (hc : Fintype.card S = finrank ℚ E) (e : Free.ChooseBasisIndex ℤ (𝓞 E) ≃ S)
+    : (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)).det ^ 2
+      = (NumberField.discr E : R) := by
   let F := FractionRing R
   let Ω := AlgebraicClosure F
   let i₀ : R →+* Ω := (algebraMap F Ω).comp (algebraMap R F)
-  have hi₀ : Function.Injective i₀ :=
-    (algebraMap F Ω).injective.comp (IsFractionRing.injective R F)
+  have hi₀ : Function.Injective i₀ := (algebraMap F Ω).injective.comp (IsFractionRing.injective R F)
   have : CharZero Ω := charZero_of_injective_ringHom hi₀
   let ρ : S → (𝓞 E →+* Ω) := fun s => i₀.comp (σ s)
   have hρ : ∀ s, Function.Injective (ρ s) := fun s => injective_of_charZero E (ρ s)
@@ -56,8 +62,9 @@ theorem det_sq_eq_discr (E : Type) [Field E] [NumberField E] (R S : Type) [CommR
   let e' : Free.ChooseBasisIndex ℤ (𝓞 E) ≃ (E →ₐ[ℚ] Ω) := e.trans (Equiv.ofBijective τ hbij)
   have key := Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ Ω (integralBasis E) e'
   rw [← coe_discr] at key
-  have hm : Algebra.embeddingsMatrixReindex ℚ Ω (integralBasis E) e' =
-      (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)).map i₀ := by
+  have hm
+      : Algebra.embeddingsMatrixReindex ℚ Ω (integralBasis E) e'
+        = (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)).map i₀ := by
     ext i j
     simp only [Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix, Matrix.reindex_apply,
       Matrix.submatrix_apply, Matrix.of_apply, Matrix.map_apply, integralBasis_apply]
@@ -67,15 +74,19 @@ theorem det_sq_eq_discr (E : Type) [Field E] [NumberField E] (R S : Type) [CommR
   rw [← key]
   simp
 
-theorem isSplit_of_det {O k S ι : Type} [CommRing O] [Field k] [Fintype S] [DecidableEq S] [Fintype ι] [DecidableEq ι]
+theorem isSplit_of_det
+    {O k S ι : Type} [CommRing O] [Field k] [Fintype S] [DecidableEq S] [Fintype ι] [DecidableEq ι]
     (χ : S → (O →+* k)) (b : Basis ι ℤ O) (e : ι ≃ S)
-    (h : (Matrix.of fun i j => χ (e j) (b i)).det ≠ 0) : IsSplit χ := by
+    (h : (Matrix.of fun i j => χ (e j) (b i)).det ≠ 0)
+    : IsSplit χ := by
   unfold IsSplit
   let B := Algebra.TensorProduct.basis k b
   let B' := (Pi.basisFun k S).reindex e.symm
-  let f := (Algebra.TensorProduct.lift (Algebra.ofId k (S → k)) (AlgHom.pi fun s => (χ s).toIntAlgHom)
-    (fun _ _ => Commute.all _ _))
-  have hm : LinearMap.toMatrix B B' f.toLinearMap = (Matrix.of fun i j => χ (e j) (b i)).transpose := by
+  let f :=
+    (Algebra.TensorProduct.lift (Algebra.ofId k (S → k)) (AlgHom.pi fun s => (χ s).toIntAlgHom)
+      (fun _ _ => Commute.all _ _))
+  have hm
+      : LinearMap.toMatrix B B' f.toLinearMap = (Matrix.of fun i j => χ (e j) (b i)).transpose := by
     ext i j
     simp [LinearMap.toMatrix_apply, B, B', f]
   have hu : IsUnit (LinearMap.toMatrix B B' f.toLinearMap).det := by
@@ -83,11 +94,15 @@ theorem isSplit_of_det {O k S ι : Type} [CommRing O] [Field k] [Fintype S] [Dec
     exact isUnit_iff_ne_zero.2 h
   exact (LinearEquiv.ofIsUnitDet hu).bijective
 
-theorem exists_isSplit (E : Type) [Field E] [NumberField E] (R K S : Type) [CommRing R] [IsDomain R] [CharZero R]
-    [Field K] [Fintype S] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) K] (σ : S → (𝓞 E →+* R)) (π : R →+* K)
-    (hσ : Function.Injective σ) (hc : Fintype.card S = finrank ℚ E) (hp : ¬ (p : ℤ) ∣ NumberField.discr E) :
-    ∃ χ : S → (𝓞 E →+* algebraicClosure (ZMod p) K), IsSplit χ ∧
-      ∀ s a, ((χ s a : algebraicClosure (ZMod p) K) : K) = π (σ s a) := by
+theorem exists_isSplit
+    (E : Type) [Field E] [NumberField E]
+    (R K S : Type) [CommRing R] [IsDomain R] [CharZero R] [Field K] [Fintype S]
+    (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) K]
+    (σ : S → (𝓞 E →+* R))
+    (π : R →+* K) (hσ : Function.Injective σ) (hc : Fintype.card S = finrank ℚ E)
+    (hp : ¬ (p : ℤ) ∣ NumberField.discr E)
+    : ∃ χ : S → (𝓞 E →+* algebraicClosure (ZMod p) K),
+      IsSplit χ ∧ ∀ s a, ((χ s a : algebraicClosure (ZMod p) K) : K) = π (σ s a) := by
   classical
   have hchar : CharP K p := charP_of_injective_algebraMap (algebraMap (ZMod p) K).injective p
   have hmem : ∀ s a, (π.comp (σ s)) a ∈ algebraicClosure (ZMod p) K := fun s a => by
@@ -102,17 +117,17 @@ theorem exists_isSplit (E : Type) [Field E] [NumberField E] (R K S : Type) [Comm
   let e : Free.ChooseBasisIndex ℤ (𝓞 E) ≃ S := Fintype.equivOfCardEq hcard
   refine isSplit_of_det χ (RingOfIntegers.basis E) e fun h0 => hp ?_
   have hsq := congrArg π (det_sq_eq_discr E R S σ hσ hc e)
-  have hmap : (algebraMap (algebraicClosure (ZMod p) K) K).mapMatrix
-      (Matrix.of fun i j => χ (e j) (RingOfIntegers.basis E i)) =
-      π.mapMatrix (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)) := by
+  have hmap
+      : (algebraMap (algebraicClosure (ZMod p) K) K).mapMatrix
+          (Matrix.of fun i j => χ (e j) (RingOfIntegers.basis E i))
+        = π.mapMatrix (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)) := by
     ext i j
     rfl
   have hdet : π (Matrix.of fun i j => σ (e j) (RingOfIntegers.basis E i)).det = 0 := by
     rw [RingHom.map_det, ← hmap, ← RingHom.map_det]
     simp [h0]
   rw [map_pow, hdet] at hsq
-  have hz : ((NumberField.discr E : ℤ) : K) = 0 := by
-    simpa using hsq.symm
+  have hz : ((NumberField.discr E : ℤ) : K) = 0 := by simpa using hsq.symm
   exact (CharP.intCast_eq_zero_iff K p _).1 hz
 
 end GlobalTheory.CompanionTheory.Ar.Conj.SplitDisc

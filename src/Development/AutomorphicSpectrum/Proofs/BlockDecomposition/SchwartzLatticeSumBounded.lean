@@ -10,15 +10,19 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Exi
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.EC GlobalTheory.CompanionTheory.EisUnfold
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.EC GlobalTheory.CompanionTheory.EisUnfold
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.EisUnfold
 
-private theorem exists_isCompact_sub_incA_mem (D : D7) :
-    ∃ C : Set (AE D), IsCompact C ∧ ∀ z : AE D, ∃ x : D.host.E, z - incA D x ∈ C := by
+private theorem exists_isCompact_sub_incA_mem (D : D7)
+    : ∃ C : Set (AE D), IsCompact C ∧ ∀ z : AE D, ∃ x : D.host.E, z - incA D x ∈ C := by
   classical
   obtain ⟨K0, hK0, hK0'⟩ := GlobalTheory.AdeleCocompact.exists_compact_adele D.host.F
   let b := Module.finBasis D.host.F D.host.E
@@ -27,8 +31,9 @@ private theorem exists_isCompact_sub_incA_mem (D : D7) :
   have he : Continuous e.symm :=
     IsModuleTopology.continuous_of_linearMap
       (e.symm : (Fin (Module.finrank D.host.F D.host.E) → AF D.host.F) →ₗ[AF D.host.F] AE D)
-  have h1 : ∀ x : Fin (Module.finrank D.host.F D.host.E) → D.host.F,
-      e.symm (fun i => algebraMap D.host.F (AF D.host.F) (x i)) = incA D (∑ i, x i • b i) := by
+  have h1
+      : ∀ x : Fin (Module.finrank D.host.F D.host.E) → D.host.F,
+        e.symm (fun i => algebraMap D.host.F (AF D.host.F) (x i)) = incA D (∑ i, x i • b i) := by
     intro x
     rw [show incA D (∑ i, x i • b i) = (1 : AF D.host.F) ⊗ₜ[D.host.F] (∑ i, x i • b i) from rfl,
       TensorProduct.tmul_sum]
@@ -38,18 +43,29 @@ private theorem exists_isCompact_sub_incA_mem (D : D7) :
   refine ⟨e.symm '' Set.univ.pi (fun _ => K0), (isCompact_univ_pi fun _ => hK0).image he, ?_⟩
   intro z
   choose x hx using fun i => hK0' (e z i)
-  refine ⟨∑ i, x i • b i, fun i => e z i - algebraMap D.host.F (AF D.host.F) (x i), fun i _ => hx i, ?_⟩
-  have hv : (fun i => e z i - algebraMap D.host.F (AF D.host.F) (x i)) =
-      e z - fun i => algebraMap D.host.F (AF D.host.F) (x i) := rfl
+  refine
+    ⟨∑ i, x i • b i, fun i => e z i - algebraMap D.host.F (AF D.host.F) (x i), fun i _ => hx i, ?_⟩
+  have hv
+      : (fun i => e z i - algebraMap D.host.F (AF D.host.F) (x i))
+        = e z - fun i => algebraMap D.host.F (AF D.host.F) (x i) :=
+    rfl
   rw [hv, map_sub, LinearEquiv.symm_apply_apply, h1]
 
-theorem schwartzA_continuous_and_tsum_enorm_le : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (m n : ℕ) (φ : Mx D m n → ℂ), φ ∈ schwartzA θ m n →
-    Continuous φ ∧ ∃ B : ℝ≥0, ∀ w : Mx D m n, ∑' ξ : Matrix (Fin m) (Fin n) D.host.E, ‖φ (rat ξ + w)‖ₑ ≤ B := by
+theorem schwartzA_continuous_and_tsum_enorm_le
+    : ∀ (D : D7) (θ : InfFam D),
+      IsInfFam θ
+        → ∀ (m n : ℕ) (φ : Mx D m n → ℂ),
+          φ ∈ schwartzA θ m n
+            → Continuous φ
+              ∧ ∃ B : ℝ≥0, ∀ w : Mx D m n,
+                ∑' ξ : Matrix (Fin m) (Fin n) D.host.E, ‖φ (rat ξ + w)‖ₑ ≤ B := by
   intro D θ hθ m n φ hφ
   have hSB := GlobalTheory.SchwartzPure.isSchwartzBruhat_of_mem_schwartzA D θ hθ m n φ hφ
-  obtain ⟨hcont, K, hK, hKb⟩ := GlobalTheory.T.schwartzBruhatAdelicMatrix_continuous_le_majorant D θ hθ m n φ hSB
+  obtain ⟨hcont, K, hK, hKb⟩ :=
+    GlobalTheory.T.schwartzBruhatAdelicMatrix_continuous_le_majorant D θ hθ m n φ hSB
   refine ⟨hcont, ?_⟩
-  obtain ⟨N, hN⟩ := GlobalTheory.T.exists_summable_bound_schwartz_majorant_rational_translates D θ hθ m n
+  obtain ⟨N, hN⟩ :=
+    GlobalTheory.T.exists_summable_bound_schwartz_majorant_rational_translates D θ hθ m n
   obtain ⟨C, hC, hCz⟩ := exists_isCompact_sub_incA_mem D
   choose xf hxf using hCz
   let Q : Set (Mx D m n) := {w | ∀ i j, w i j ∈ C}
@@ -78,15 +94,21 @@ theorem schwartzA_continuous_and_tsum_enorm_le : ∀ (D : D7) (θ : InfFam D), I
     rw [← ofReal_norm]
     apply ENNReal.ofReal_le_ofReal
     rw [hrat ξ]
-    calc ‖φ (x0 + rat (ξ + ξ0))‖ ≤ c * GlobalTheory.Unf.maj θ K N (x0 + rat (ξ + ξ0)) := hc _
+    calc
+      ‖φ (x0 + rat (ξ + ξ0))‖
+        ≤ c * GlobalTheory.Unf.maj θ K N (x0 + rat (ξ + ξ0)) := hc _
       _ ≤ c' * GlobalTheory.Unf.maj θ K N (x0 + rat (ξ + ξ0)) :=
         mul_le_mul_of_nonneg_right (le_max_left _ _) (GlobalTheory.Unf.maj_nonneg _ _ _ _)
       _ ≤ c' * b (ξ + ξ0) := mul_le_mul_of_nonneg_left (hb x0 hx0 _) (le_max_right _ _)
-  calc ∑' ξ, ‖φ (rat ξ + w)‖ₑ ≤ ∑' ξ, ENNReal.ofReal (c' * b (ξ + ξ0)) := ENNReal.tsum_le_tsum hpt
+  calc
+    ∑' ξ, ‖φ (rat ξ + w)‖ₑ
+      ≤ ∑' ξ, ENNReal.ofReal (c' * b (ξ + ξ0)) := ENNReal.tsum_le_tsum hpt
     _ = ∑' η, ENNReal.ofReal (c' * b η) :=
       (Equiv.addRight ξ0).tsum_eq (fun η => ENNReal.ofReal (c' * b η))
     _ = ENNReal.ofReal (∑' η, c' * b η) :=
-      (ENNReal.ofReal_tsum_of_nonneg (fun η => mul_nonneg (le_max_right _ _) (hb0 η)) (hbs.mul_left c')).symm
+      (ENNReal.ofReal_tsum_of_nonneg
+        (fun η => mul_nonneg (le_max_right _ _) (hb0 η))
+        (hbs.mul_left c')).symm
     _ = ((Real.toNNReal (c' * ∑' ξ, b ξ) : ℝ≥0) : ℝ≥0∞) := by
       rw [tsum_mul_left]
       rfl

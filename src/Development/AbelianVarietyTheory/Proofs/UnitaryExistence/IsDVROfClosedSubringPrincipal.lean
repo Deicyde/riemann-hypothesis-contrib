@@ -8,28 +8,34 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-private theorem eq_zero_of_forall_mem_pow_of_isAdicComplete {S : Type} [CommRing S] (I : Ideal S)
-    (hc : IsAdicComplete I S) (s : S) (h : ∀ n : ℕ, s ∈ I ^ n) : s = 0 := by
+private theorem eq_zero_of_forall_mem_pow_of_isAdicComplete
+    {S : Type} [CommRing S] (I : Ideal S) (hc : IsAdicComplete I S) (s : S) (h : ∀ n : ℕ, s ∈ I ^ n)
+    : s = 0 := by
   refine hc.toIsHausdorff.haus' s fun n => ?_
   rw [SModEq.sub_mem, sub_zero, smul_eq_mul, Ideal.mul_top]
   exact h n
 
-private theorem exists_limit_of_isAdicComplete {S : Type} [CommRing S] (I : Ideal S)
-    (hc : IsAdicComplete I S) (f : ℕ → S) (h : ∀ {a b : ℕ}, a ≤ b → f a - f b ∈ I ^ a) :
-    ∃ L : S, ∀ n, f n - L ∈ I ^ n := by
-  obtain ⟨L, hL⟩ := hc.toIsPrecomplete.prec' f fun {a b} hab => by
-    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
-    exact h hab
+private theorem exists_limit_of_isAdicComplete
+    {S : Type} [CommRing S]
+    (I : Ideal S) (hc : IsAdicComplete I S)
+    (f : ℕ → S) (h : ∀ {a b : ℕ}, a ≤ b → f a - f b ∈ I ^ a)
+    : ∃ L : S, ∀ n, f n - L ∈ I ^ n := by
+  obtain ⟨L, hL⟩ :=
+    hc.toIsPrecomplete.prec' f fun {a b} hab => by
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
+      exact h hab
   refine ⟨L, fun n => ?_⟩
   have := hL n
   rwa [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] at this
 
-private theorem isUnit_of_not_mem_maximalIdeal_of_closed {S : Type} [CommRing S] [IsLocalRing S]
+private theorem isUnit_of_not_mem_maximalIdeal_of_closed
+    {S : Type} [CommRing S] [IsLocalRing S]
     (Λ : Subring S) (π : Λ) (hπm : (π : S) ∈ maximalIdeal S)
     (hres : ∀ s : S, ∃ a ∈ Λ, s - a ∈ maximalIdeal S)
     (hdiv : ∀ a : Λ, (a : S) ∈ maximalIdeal S → π ∣ a)
-    (hcl : ∀ s : S, (∀ n : ℕ, ∃ a ∈ Λ, s - a ∈ maximalIdeal S ^ n) → s ∈ Λ)
-    (a : Λ) (ha : (a : S) ∉ maximalIdeal S) : IsUnit a := by
+    (hcl : ∀ s : S, (∀ n : ℕ, ∃ a ∈ Λ, s - a ∈ maximalIdeal S ^ n) → s ∈ Λ) (a : Λ)
+    (ha : (a : S) ∉ maximalIdeal S)
+    : IsUnit a := by
   have hu : IsUnit (a : S) := by
     by_contra h
     exact ha ((IsLocalRing.mem_maximalIdeal _).2 h)
@@ -49,8 +55,11 @@ private theorem isUnit_of_not_mem_maximalIdeal_of_closed {S : Type} [CommRing S]
   have htΛ : t ∈ Λ := by
     apply hcl
     intro n
-    refine ⟨(b : S) * ∑ i ∈ Finset.range n, ((π : S) * c) ^ i,
-      Λ.mul_mem hbΛ (Λ.sum_mem fun i _ => Λ.pow_mem (Λ.mul_mem π.2 c.2) i), ?_⟩
+    refine ⟨
+      (b : S) * ∑ i ∈ Finset.range n, ((π : S) * c) ^ i,
+      Λ.mul_mem hbΛ (Λ.sum_mem fun i _ => Λ.pow_mem (Λ.mul_mem π.2 c.2) i),
+      ?_
+    ⟩
     have g := mul_neg_geom_sum ((π : S) * c) n
     have e : t - (b : S) * ∑ i ∈ Finset.range n, ((π : S) * c) ^ i = t * ((π : S) * c) ^ n := by
       linear_combination ((b : S) * ∑ i ∈ Finset.range n, ((π : S) * c) ^ i) * ht
@@ -59,13 +68,13 @@ private theorem isUnit_of_not_mem_maximalIdeal_of_closed {S : Type} [CommRing S]
     exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_pow (Ideal.mul_mem_right _ _ hπm) n)
   exact isUnit_iff_exists_inv.2 ⟨⟨t, htΛ⟩, Subtype.ext ht⟩
 
-private theorem exists_pow_dvd_of_mem_maximalIdeal_pow {S : Type} [CommRing S] [IsDomain S] [IsLocalRing S]
+private theorem exists_pow_dvd_of_mem_maximalIdeal_pow
+    {S : Type} [CommRing S] [IsDomain S] [IsLocalRing S]
     (Λ : Subring S) (π : Λ) (hπ0 : (π : S) ≠ 0) (hπm : (π : S) ∈ maximalIdeal S)
-    (hc : IsAdicComplete (maximalIdeal S) S)
-    (hres : ∀ s : S, ∃ a ∈ Λ, s - a ∈ maximalIdeal S)
+    (hc : IsAdicComplete (maximalIdeal S) S) (hres : ∀ s : S, ∃ a ∈ Λ, s - a ∈ maximalIdeal S)
     (hdiv : ∀ a : Λ, (a : S) ∈ maximalIdeal S → π ∣ a)
-    (hcl : ∀ s : S, (∀ n : ℕ, ∃ a ∈ Λ, s - a ∈ maximalIdeal S ^ n) → s ∈ Λ)
-    (k : ℕ) : ∃ N : ℕ, ∀ a : Λ, (a : S) ∈ maximalIdeal S ^ N → π ^ k ∣ a := by
+    (hcl : ∀ s : S, (∀ n : ℕ, ∃ a ∈ Λ, s - a ∈ maximalIdeal S ^ n) → s ∈ Λ) (k : ℕ)
+    : ∃ N : ℕ, ∀ a : Λ, (a : S) ∈ maximalIdeal S ^ N → π ^ k ∣ a := by
   induction k with
   | zero => exact ⟨0, fun a _ => by simp⟩
   | succ k ih =>
@@ -82,19 +91,25 @@ private theorem exists_pow_dvd_of_mem_maximalIdeal_pow {S : Type} [CommRing S] [
     rw [pow_succ]
     refine mul_dvd_mul_left _ ?_
     by_contra hu
-    have hunit : IsUnit u := isUnit_of_not_mem_maximalIdeal_of_closed Λ π hπm hres hdiv hcl u fun h => hu (hdiv u h)
+    have hunit : IsUnit u :=
+      isUnit_of_not_mem_maximalIdeal_of_closed Λ π hπm hres hdiv hcl u fun h => hu (hdiv u h)
     apply hM
-    have e : π ^ k = (π ^ k * u) * ↑hunit.unit⁻¹ := by
-      rw [mul_assoc, hunit.mul_val_inv, mul_one]
+    have e : π ^ k = (π ^ k * u) * ↑hunit.unit⁻¹ := by rw [mul_assoc, hunit.mul_val_inv, mul_one]
     rw [e, Subring.coe_mul]
     exact Ideal.mul_mem_right _ _ (Ideal.pow_le_pow_right (le_max_right _ _) ha)
 
-theorem isDVR_of_closed_subring_principal :
-    ∀ (S : Type) [CommRing S] [IsDomain S] [IsLocalRing S] (Λ : Subring S) (π : Λ), (π : S) ≠ 0 → (π : S) ∈ maximalIdeal S → IsAdicComplete (maximalIdeal S) S → (∀ s : S, ∃ a ∈ Λ, s - a ∈ maximalIdeal S) → (∀ a : Λ, (a : S) ∈ maximalIdeal S → π ∣ a) → (∀ s : S, (∀ n : ℕ, ∃ a ∈ Λ, s - a ∈ maximalIdeal S ^ n) → s ∈ Λ) → ∃ _ : IsDiscreteValuationRing Λ, maximalIdeal Λ = Ideal.span {π} ∧ IsAdicComplete (maximalIdeal Λ) Λ := by
+theorem isDVR_of_closed_subring_principal
+    : ∀ (S : Type) [CommRing S] [IsDomain S] [IsLocalRing S] (Λ : Subring S) (π : Λ),
+      (π : S) ≠ 0 → (π : S) ∈ maximalIdeal S → IsAdicComplete (maximalIdeal S) S
+        → (∀ s : S, ∃ a ∈ Λ, s - a ∈ maximalIdeal S) → (∀ a : Λ, (a : S) ∈ maximalIdeal S → π ∣ a)
+        → (∀ s : S, (∀ n : ℕ, ∃ a ∈ Λ, s - a ∈ maximalIdeal S ^ n) → s ∈ Λ)
+        → ∃ _ : IsDiscreteValuationRing Λ,
+          maximalIdeal Λ = Ideal.span {π} ∧ IsAdicComplete (maximalIdeal Λ) Λ := by
   intro S _ _ _ Λ π hπ0 hπm hc hres hdiv hcl
-  have hunit : ∀ a : Λ, IsUnit a ↔ (a : S) ∉ maximalIdeal S := fun a =>
-    ⟨fun h hm => (IsLocalRing.mem_maximalIdeal _).1 hm (h.map Λ.subtype),
-      isUnit_of_not_mem_maximalIdeal_of_closed Λ π hπm hres hdiv hcl a⟩
+  have hunit : ∀ a : Λ, IsUnit a ↔ (a : S) ∉ maximalIdeal S := fun a => ⟨
+    fun h hm => (IsLocalRing.mem_maximalIdeal _).1 hm (h.map Λ.subtype),
+    isUnit_of_not_mem_maximalIdeal_of_closed Λ π hπm hres hdiv hcl a
+  ⟩
   have hsep : ∀ x : Λ, (∀ n : ℕ, π ^ n ∣ x) → x = 0 := by
     intro x hx
     have : (x : S) = 0 := by
@@ -133,9 +148,11 @@ theorem isDVR_of_closed_subring_principal :
       rw [← Nat.succ_eq_add_one, ← hk]
       exact Nat.find_spec hex
     obtain ⟨u, rfl⟩ := hk
-    have hu : IsUnit u := (hunit u).2 fun hm => hk1 (by
-      rw [pow_succ]
-      exact mul_dvd_mul_left _ (hdiv u hm))
+    have hu : IsUnit u :=
+      (hunit u).2 fun hm =>
+        hk1 (by
+          rw [pow_succ]
+          exact mul_dvd_mul_left _ (hdiv u hm))
     exact ⟨k, hu.unit, by rw [hu.unit_spec]⟩
   have hdvr : IsDiscreteValuationRing Λ :=
     IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization ⟨π, hirr, hfac⟩
@@ -166,18 +183,24 @@ theorem isDVR_of_closed_subring_principal :
       rw [e]
       exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow hπm a)
     obtain ⟨L, hL⟩ := exists_limit_of_isAdicComplete _ hc (fun n => (f n : S)) hfS
-    have hLΛ : L ∈ Λ := hcl L fun n => ⟨f n, (f n).2, by
-      rw [← neg_sub]
-      exact neg_mem (hL n)⟩
+    have hLΛ : L ∈ Λ :=
+      hcl L fun n => ⟨
+        f n,
+        (f n).2,
+        by
+          rw [← neg_sub]
+          exact neg_mem (hL n)
+      ⟩
     refine ⟨⟨L, hLΛ⟩, fun n => ?_⟩
     rw [SModEq.sub_mem, hmem]
     obtain ⟨N, hN⟩ := exists_pow_dvd_of_mem_maximalIdeal_pow Λ π hπ0 hπm hc hres hdiv hcl n
     have h1 : π ^ n ∣ f n - f (max n N) := by
       have := hf (le_max_left n N)
       rwa [SModEq.sub_mem, hmem] at this
-    have h2 : π ^ n ∣ f (max n N) - ⟨L, hLΛ⟩ := hN _ (by
-      push_cast
-      exact Ideal.pow_le_pow_right (le_max_right n N) (hL _))
+    have h2 : π ^ n ∣ f (max n N) - ⟨L, hLΛ⟩ :=
+      hN _ (by
+        push_cast
+        exact Ideal.pow_le_pow_right (le_max_right n N) (hL _))
     have := dvd_add h1 h2
     rwa [sub_add_sub_cancel] at this
 

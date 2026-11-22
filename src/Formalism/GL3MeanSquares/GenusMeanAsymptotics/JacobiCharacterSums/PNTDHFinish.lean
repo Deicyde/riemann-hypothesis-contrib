@@ -20,13 +20,19 @@ theorem logMT_ge_one (M : ℕ) (T : ℝ) (hM : 3 ≤ M) (hT : 2 ≤ T) : 1 ≤ R
   have hx : (6 : ℝ) ≤ M * T := by nlinarith
   have he := Real.exp_one_lt_d9
   have h1 : Real.exp 1 ≤ (M : ℝ) * T := by linarith
-  calc (1 : ℝ) = Real.log (Real.exp 1) := (Real.log_exp 1).symm
+  calc
+    (1 : ℝ)
+      = Real.log (Real.exp 1) := (Real.log_exp 1).symm
     _ ≤ Real.log ((M : ℝ) * T) := Real.log_le_log (Real.exp_pos 1) h1
 
-theorem region_gap : ∃ cR : ℝ, 0 < cR ∧ ∀ (M : ℕ) [NeZero M] (χ₁ χ : DirichletCharacter ℂ M) (β₁ T c₁ : ℝ)
-    (ρ : ℂ), 3 ≤ M → 2 ≤ T → χ₁ ≠ 1 → DirichletCharacter.LFunction χ₁ (β₁ : ℂ) = 0 → 0 < c₁ → c₁ ≤ cR →
-    1 - c₁ / Real.log ((M : ℝ) * T) < β₁ → IsLZero χ ρ → |ρ.im| ≤ T → (χ, ρ) ≠ (χ₁, (β₁ : ℂ)) →
-    cR / 2 ≤ (1 - ρ.re) * Real.log ((M : ℝ) * T) := by
+theorem region_gap
+    : ∃ cR : ℝ,
+      0 < cR
+        ∧ ∀ (M : ℕ) [NeZero M] (χ₁ χ : DirichletCharacter ℂ M) (β₁ T c₁ : ℝ) (ρ : ℂ),
+          3 ≤ M → 2 ≤ T → χ₁ ≠ 1 → DirichletCharacter.LFunction χ₁ (β₁ : ℂ) = 0 → 0 < c₁ → c₁ ≤ cR
+            → 1 - c₁ / Real.log ((M : ℝ) * T) < β₁ → IsLZero χ ρ → |ρ.im| ≤ T
+            → (χ, ρ) ≠ (χ₁, (β₁ : ℂ))
+            → cR / 2 ≤ (1 - ρ.re) * Real.log ((M : ℝ) * T) := by
   obtain ⟨cR, hcR, hZ⟩ := Formalism.ZeroFreeDirichlet.zFRDirichlet
   refine ⟨cR, hcR, ?_⟩
   intro M _ χ₁ χ β₁ T c₁ ρ hM hT2 hχ1ne hLz hc₁0 hc₁ hβ₁ hρ hρim hne
@@ -45,7 +51,8 @@ theorem region_gap : ∃ cR : ℝ, 0 < cR ∧ ∀ (M : ℕ) [NeZero M] (χ₁ χ
       have h2 := mul_le_mul_of_nonneg_left hlog2M hc₁0.le
       have h3 := mul_le_mul_of_nonneg_right hc₁ hLg0.le
       linarith only [h2, h3]
-    rw [Complex.ofReal_re]; linarith only [h1, hβ₁]
+    rw [Complex.ofReal_re]
+    linarith only [h1, hβ₁]
   have hLz' : IsLZero χ₁ (β₁ : ℂ) := ⟨Or.inl hχ1ne, hLz⟩
   have hZ1 := (hZ M χ₁ (β₁ : ℂ) hreg hLz').2.2.2.2
   have hnreg : ¬ InRegion cR M ρ := by
@@ -64,12 +71,15 @@ theorem region_gap : ∃ cR : ℝ, 0 < cR ∧ ∀ (M : ℕ) [NeZero M] (χ₁ χ
     have hM0 : (0 : ℝ) ≤ M := by positivity
     have hMT : (2 : ℝ) ≤ M * T := by nlinarith
     have hMT2 := mul_le_mul_of_nonneg_left hMT (by positivity : (0 : ℝ) ≤ M * T)
-    calc (M : ℝ) * (|ρ.im| + 2) ≤ M * (2 * T) := mul_le_mul_of_nonneg_left this hM0
+    calc
+      (M : ℝ) * (|ρ.im| + 2)
+        ≤ M * (2 * T) := mul_le_mul_of_nonneg_left this hM0
       _ ≤ _ := by rw [sq]; linarith
   have h1 : cR / Real.log ((M : ℝ) * (|ρ.im| + 2)) < 1 - ρ.re := by linarith
   rw [div_lt_iff₀ hlogρ0] at h1
   have hδ0 : 0 < 1 - ρ.re := by
-    by_contra h; push Not at h
+    by_contra h
+    push Not at h
     have := mul_nonpos_of_nonpos_of_nonneg h hlogρ0.le
     linarith
   have := mul_le_mul_of_nonneg_left hlogρ hδ0.le

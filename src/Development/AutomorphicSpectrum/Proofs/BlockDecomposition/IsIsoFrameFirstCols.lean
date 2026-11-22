@@ -15,9 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KernelLoc
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -30,31 +33,42 @@ namespace GlobalTheory.CompanionTheory.RegInt
 
 variable {D : D7} {V : HSp D} {r : ℕ}
 
-def firstCols (X : Matrix (Fin V.rank) (Fin r) D.host.E) (j : Fin r) :
-    Matrix (Fin V.rank) (Fin (j.val + 1)) D.host.E := X.submatrix id (Fin.castLE j.2)
+def firstCols (X : Matrix (Fin V.rank) (Fin r) D.host.E) (j : Fin r)
+    : Matrix (Fin V.rank) (Fin (j.val + 1)) D.host.E :=
+  X.submatrix id (Fin.castLE j.2)
 
-def root (t : Fin r → ℝ) (j : Fin r) : ℝ := if h : j.val + 1 < r then t j / t ⟨j.val + 1, h⟩ else t j
+def root (t : Fin r → ℝ) (j : Fin r) : ℝ :=
+  if h : j.val + 1 < r then t j / t ⟨j.val + 1, h⟩ else t j
 
-theorem isIsoFrame_firstCols {X Y : Matrix (Fin V.rank) (Fin r) D.host.E}
-    (hW : GlobalTheory.SiegelSet.IsWittFrame D.sp.cm.sig V.gram X Y) (j : Fin r) : IsIsoFrame V (firstCols X j) := by
+theorem isIsoFrame_firstCols
+    {X Y : Matrix (Fin V.rank) (Fin r) D.host.E}
+    (hW : GlobalTheory.SiegelSet.IsWittFrame D.sp.cm.sig V.gram X Y)
+    (j : Fin r)
+    : IsIsoFrame V (firstCols X j) := by
   refine ⟨Nat.succ_pos _, ?_, ?_⟩
   · have h1 : LinearIndependent D.host.E (fun i : Fin r => fun a : Fin V.rank => X a i) := by
       refine Fintype.linearIndependent_iff.2 fun g hg i => ?_
       have h3 : ∀ a, ∑ l, g l * X a l = 0 := fun a => by
         have := congrFun hg a
         simpa [Finset.sum_apply, mul_comm] using this
-      have h4 : (fun l => (D.sp.cm.sig : D.host.E →+* D.host.E) (g l)) ᵥ*
-          Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) X = 0 := by
+      have h4
+          : (fun l => (D.sp.cm.sig : D.host.E →+* D.host.E) (g l))
+              ᵥ* Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) X
+            = 0 := by
         funext a
         have := congrArg (D.sp.cm.sig : D.host.E →+* D.host.E) (h3 a)
         set_option synthInstance.maxHeartbeats 100000 in
           simp only [map_sum, map_mul, map_zero] at this
         simpa [Matrix.vecMul, dotProduct, Formalism.UG.cT] using this
       have h5 := congrArg (fun v => v ᵥ* (V.gram * Y)) h4
-      simp only [Matrix.vecMul_vecMul, Matrix.zero_vecMul, ← Matrix.mul_assoc, hW.xy, Matrix.vecMul_one] at h5
+      simp only [Matrix.vecMul_vecMul, Matrix.zero_vecMul, ← Matrix.mul_assoc, hW.xy,
+          Matrix.vecMul_one]
+        at h5
       have h6 := congrFun h5 i
       simpa using h6
-    have h2 : (firstCols X j).transpose = (fun i : Fin r => fun a : Fin V.rank => X a i) ∘ Fin.castLE j.2 := by
+    have h2
+        : (firstCols X j).transpose
+          = (fun i : Fin r => fun a : Fin V.rank => X a i) ∘ Fin.castLE j.2 := by
       funext i a; rfl
     change LinearIndependent D.host.E (firstCols X j).transpose
     rw [h2]

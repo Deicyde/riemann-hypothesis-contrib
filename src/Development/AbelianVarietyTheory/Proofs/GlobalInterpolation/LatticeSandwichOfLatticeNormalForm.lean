@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Unipot
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.QNormal
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col GlobalTheory.QNormal
 
 noncomputable section
 
@@ -22,13 +23,14 @@ section Lattice
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem intAt_zpow_mul {P : HeightOneSpectrum (𝓞 E)} {e : ℤ} (he : 0 ≤ e) {a : E} (ha : IntAt P a) :
-    IntAt P ((qOf P : E) ^ e * a) := by
+theorem intAt_zpow_mul {P : HeightOneSpectrum (𝓞 E)} {e : ℤ} (he : 0 ≤ e) {a : E} (ha : IntAt P a)
+    : IntAt P ((qOf P : E) ^ e * a) := by
   lift e to ℕ using he
   rw [zpow_natCast]
   exact GlobalTheory.Proof.NormalFormAtPrime.intAt_pow_mul e ha
 
-theorem intV_inX {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {z : Fin n → E} (hz : IntV P z) : IntV P (Loc.inX E n c z) := by
+theorem intV_inX {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {z : Fin n → E} (hz : IntV P z)
+    : IntV P (Loc.inX E n c z) := by
   intro l
   rw [inX_apply]
   split_ifs
@@ -42,20 +44,25 @@ theorem intV_eN (P : HeightOneSpectrum (𝓞 E)) (N i : ℕ) : IntV P (Loc.eN E 
   · exact intAt_one P
   · exact ⟨0, 1, one_notMem P, by simp⟩
 
-theorem intV_sum {P : HeightOneSpectrum (𝓞 E)} {N : ℕ} {ι : Type} (s : Finset ι) (f : ι → Fin N → E)
-    (h : ∀ i ∈ s, IntV P (f i)) : IntV P (∑ i ∈ s, f i) := by
+theorem intV_sum
+    {P : HeightOneSpectrum (𝓞 E)} {N : ℕ} {ι : Type}
+    (s : Finset ι) (f : ι → Fin N → E) (h : ∀ i ∈ s, IntV P (f i))
+    : IntV P (∑ i ∈ s, f i) := by
   intro l
   rw [Finset.sum_apply]
   exact intAt_sum s _ (fun i hi => h i hi l)
 
-theorem intV_glue {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {z : Fin n → E} (hz : IntV P z) (i : Fin c) :
-    IntV P (if i.1 = 0 then Loc.inX E n c z else 0) := by
+theorem intV_glue
+    {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {z : Fin n → E} (hz : IntV P z) (i : Fin c)
+    : IntV P (if i.1 = 0 then Loc.inX E n c z else 0) := by
   split_ifs
   · exact intV_inX hz
   · exact IntV.zero P
 
-theorem decomp {n c : ℕ} (x : Fin (n + c) → E) :
-    x = Loc.inX E n c (fun a => x (Fin.castAdd c a)) + ∑ i : Fin c, x (Fin.natAdd n i) • Loc.eN E (n + c) (n + i.1) := by
+theorem decomp {n c : ℕ} (x : Fin (n + c) → E)
+    : x
+      = Loc.inX E n c (fun a => x (Fin.castAdd c a))
+        + ∑ i : Fin c, x (Fin.natAdd n i) • Loc.eN E (n + c) (n + i.1) := by
   funext l
   refine Fin.addCases (fun a => ?_) (fun b => ?_) l
   · have h1 : ∀ i : Fin c, Loc.eN E (n + c) (n + i.1) (Fin.castAdd c a) = 0 := by
@@ -64,7 +71,8 @@ theorem decomp {n c : ℕ} (x : Fin (n + c) → E) :
       rw [if_neg]
       omega
     simp [inX_castAdd, Finset.sum_apply, h1]
-  · have h2 : ∀ i : Fin c, Loc.eN E (n + c) (n + i.1) (Fin.natAdd n b) = if i = b then 1 else 0 := by
+  · have h2
+        : ∀ i : Fin c, Loc.eN E (n + c) (n + i.1) (Fin.natAdd n b) = if i = b then 1 else 0 := by
       intro i
       by_cases hib : i = b
       · subst hib
@@ -79,11 +87,20 @@ theorem decomp {n c : ℕ} (x : Fin (n + c) → E) :
       rw [inX_apply, dite_eq_right (by simp)]
     simp [Finset.sum_apply, h2, h3]
 
-theorem mem_nfLat {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {e : Fin c → ℤ} (he : ∀ i, e i ≤ 0) {z : Sp E n}
-    (hz : IntV P z) {x : Sp E (n + c)} (hx : IntV P x) : x ∈ nfLat P n c e z := by
+theorem mem_nfLat
+    {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {e : Fin c → ℤ} (he : ∀ i, e i ≤ 0)
+    {z : Sp E n} (hz : IntV P z)
+    {x : Sp E (n + c)} (hx : IntV P x)
+    : x ∈ nfLat P n c e z := by
   have hq : (qOf P : E) ≠ 0 := GlobalTheory.Proof.NormalFormAtPrime.qOf_ne_zero P
   set w : Sp E n := ∑ i : Fin c, x (Fin.natAdd n i) • (if i.1 = 0 then z else 0) with hw
-  refine ⟨(fun a => x (Fin.castAdd c a)) - w, ?_, fun i => x (Fin.natAdd n i) * (qOf P : E) ^ (-e i), ?_, ?_⟩
+  refine ⟨
+    (fun a => x (Fin.castAdd c a)) - w,
+    ?_,
+    fun i => x (Fin.natAdd n i) * (qOf P : E) ^ (- e i),
+    ?_,
+    ?_
+  ⟩
   · rw [mem_stdAt_iff, sub_eq_add_neg]
     refine IntV.add (fun l => hx _) (IntV.neg ?_)
     refine intV_sum _ _ (fun i _ => IntV.smul (hx _) ?_)
@@ -94,11 +111,14 @@ theorem mem_nfLat {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {e : Fin c → �
     show IntAt P (x (Fin.natAdd n i) * (qOf P : E) ^ (-e i))
     rw [mul_comm]
     exact intAt_zpow_mul (by linarith [he i]) (hx _)
-  · have hs : ∀ i : Fin c, (x (Fin.natAdd n i) * (qOf P : E) ^ (-e i)) • nfGen (qOf P) n c e z i =
-        x (Fin.natAdd n i) • Loc.eN E (n + c) (n + i.1) +
-          Loc.inX E n c (x (Fin.natAdd n i) • (if i.1 = 0 then z else 0)) := by
+  · have hs
+        : ∀ i : Fin c,
+          (x (Fin.natAdd n i) * (qOf P : E) ^ (- e i)) • nfGen (qOf P) n c e z i
+            = x (Fin.natAdd n i) • Loc.eN E (n + c) (n + i.1)
+              + Loc.inX E n c (x (Fin.natAdd n i) • (if i.1 = 0 then z else 0)) := by
       intro i
-      simp only [nfGen, smul_smul, mul_assoc, ← zpow_add₀ hq, neg_add_cancel, zpow_zero, mul_one, smul_add]
+      simp only [nfGen, smul_smul, mul_assoc, ← zpow_add₀ hq, neg_add_cancel, zpow_zero, mul_one,
+        smul_add]
       congr 1
       split_ifs <;> simp
     set_option synthInstance.maxHeartbeats 100000 in
@@ -106,14 +126,19 @@ theorem mem_nfLat {P : HeightOneSpectrum (𝓞 E)} {n c : ℕ} {e : Fin c → �
     conv_lhs => rw [decomp x]
     abel
 
-theorem smul_int_of_mem_nfLat {P : HeightOneSpectrum (𝓞 E)} {n c j : ℕ} {e : Fin c → ℤ} (he : ∀ i, -(j : ℤ) ≤ e i)
-    {z : Sp E n} (hz : IntV P z) {x : Sp E (n + c)} (hx : x ∈ nfLat P n c e z) : IntV P (((qOf P : E) ^ j) • x) := by
+theorem smul_int_of_mem_nfLat
+    {P : HeightOneSpectrum (𝓞 E)} {n c j : ℕ} {e : Fin c → ℤ} (he : ∀ i, -(j : ℤ) ≤ e i)
+    {z : Sp E n} (hz : IntV P z)
+    {x : Sp E (n + c)} (hx : x ∈ nfLat P n c e z)
+    : IntV P (((qOf P : E) ^ j) • x) := by
   obtain ⟨l, hl, s, hs, rfl⟩ := hx
   have hq : (qOf P : E) ≠ 0 := GlobalTheory.Proof.NormalFormAtPrime.qOf_ne_zero P
   rw [mem_stdAt_iff] at hl
-  have key : ∀ i : Fin c, ((qOf P : E) ^ j) • (s i • nfGen (qOf P) n c e z i) =
-      ((qOf P : E) ^ ((j : ℤ) + e i) * s i) •
-        (Loc.eN E (n + c) (n + i.1) + if i.1 = 0 then Loc.inX E n c z else 0) := by
+  have key
+      : ∀ i : Fin c,
+        ((qOf P : E) ^ j) • (s i • nfGen (qOf P) n c e z i)
+          = ((qOf P : E) ^ ((j : ℤ) + e i) * s i)
+            • (Loc.eN E (n + c) (n + i.1) + if i.1 = 0 then Loc.inX E n c z else 0) := by
     intro i
     simp only [nfGen, smul_smul]
     congr 1

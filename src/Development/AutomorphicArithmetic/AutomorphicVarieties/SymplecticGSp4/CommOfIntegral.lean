@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem comm_of_integral {k : Type} [Field k] {p : ℕ} (hp : p.Prime) (hk : (p : k) = 0) (f g : k →+* k)
-    {x : k} (hx : IsIntegral ℤ x) : f (g x) = g (f x) := by
+private theorem comm_of_integral
+    {k : Type} [Field k]
+    {p : ℕ} (hp : p.Prime) (hk : (p : k) = 0)
+    (f g : k →+* k)
+    {x : k} (hx : IsIntegral ℤ x)
+    : f (g x) = g (f x) := by
   haveI hchar : CharP k p := (CharP.charP_iff_prime_eq_zero hp).mpr hk
   haveI : Fact p.Prime := ⟨hp⟩
   letI : Algebra (ZMod p) k := ZMod.algebra k p
@@ -84,26 +90,29 @@ private theorem resA_local {σ : G ℚ Ω} (hσ : σ ∈ Dec (F := ℚ) A) : IsL
   have h2 : A.valuation (σ a) < 1 := (valuation_apply_lt_one_iff hσ _).2 h1
   exact (A.valuation_lt_one_iff (resA hσ a)).2 h2 ha
 
-private theorem comm_mem_Ine {p : ℕ} (hp : p.Prime) (hA : A.valuation (p : Ω) < 1) {g h : G ℚ Ω}
-    (hg : g ∈ Dec (F := ℚ) A) (hh : h ∈ Dec (F := ℚ) A) : g * h * g⁻¹ * h⁻¹ ∈ Ine (F := ℚ) A := by
+private theorem comm_mem_Ine
+    {p : ℕ} (hp : p.Prime) (hA : A.valuation (p : Ω) < 1)
+    {g h : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) A) (hh : h ∈ Dec (F := ℚ) A)
+    : g * h * g⁻¹ * h⁻¹ ∈ Ine (F := ℚ) A := by
   haveI := resA_local hg
   haveI := resA_local hh
   have hkp : ((p : ℕ) : IsLocalRing.ResidueField A) = 0 := by
     rw [← map_natCast (IsLocalRing.residue A), IsLocalRing.residue_eq_zero_iff,
       ValuationSubring.valuation_lt_one_iff]
     simpa using hA
-  have hint : ∀ z : Ω, IsIntegral ℤ z → ∀ hz : z ∈ A,
-      IsIntegral ℤ (IsLocalRing.residue A ⟨z, hz⟩) := by
+  have hint
+      : ∀ z : Ω, IsIntegral ℤ z → ∀ hz : z ∈ A, IsIntegral ℤ (IsLocalRing.residue A ⟨z, hz⟩) := by
     intro z hz hzA
     have h1 : IsIntegral ℤ (⟨z, hzA⟩ : A) := by
       rw [← isIntegral_algHom_iff (A.toSubring.subtype.toIntAlgHom) Subtype.val_injective]
       exact hz
     exact h1.map_of_comp_eq (RingHom.id ℤ) (IsLocalRing.residue A) (RingHom.ext_int _ _)
-  have comm : ∀ w : A,
-      IsLocalRing.ResidueField.map (resA hg) (IsLocalRing.ResidueField.map (resA hh)
-        (IsLocalRing.residue A w)) =
-      IsLocalRing.ResidueField.map (resA hh) (IsLocalRing.ResidueField.map (resA hg)
-        (IsLocalRing.residue A w)) := by
+  have comm
+      : ∀ w : A,
+        IsLocalRing.ResidueField.map (resA hg)
+            (IsLocalRing.ResidueField.map (resA hh) (IsLocalRing.residue A w))
+          = IsLocalRing.ResidueField.map (resA hh)
+            (IsLocalRing.ResidueField.map (resA hg) (IsLocalRing.residue A w)) := by
     intro w
     obtain ⟨s, t, hs, ht, hvs, hst⟩ := exists_den ℚ A (A.valuation_le_one w)
     have hsA := mem_of_isIntegral_int A hs
@@ -111,23 +120,25 @@ private theorem comm_mem_Ine {p : ℕ} (hp : p.Prime) (hA : A.valuation (p : Ω)
     have hsunit : IsLocalRing.residue A ⟨s, hsA⟩ ≠ 0 := by
       rw [Ne, IsLocalRing.residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff]
       simp [hvs]
-    have hw : IsLocalRing.residue A w
-        = IsLocalRing.residue A ⟨t, htA⟩ / IsLocalRing.residue A ⟨s, hsA⟩ := by
+    have hw
+        : IsLocalRing.residue A w
+          = IsLocalRing.residue A ⟨t, htA⟩ / IsLocalRing.residue A ⟨s, hsA⟩ := by
       rw [eq_div_iff hsunit, ← map_mul]
       congr 1
       apply Subtype.ext
       show (w : Ω) * s = t
       rw [mul_comm]
       exact hst
-    rw [hw, map_div₀, map_div₀, map_div₀, map_div₀,
-      comm_of_integral hp hkp _ _ (hint t ht htA), comm_of_integral hp hkp _ _ (hint s hs hsA)]
+    rw [hw, map_div₀, map_div₀, map_div₀, map_div₀, comm_of_integral hp hkp _ _ (hint t ht htA),
+      comm_of_integral hp hkp _ _ (hint s hs hsA)]
   have key : ∀ y : Ω, y ∈ A → A.valuation (g (h y) - h (g y)) < 1 := by
     intro y hy
     have c := comm ⟨y, hy⟩
     rw [IsLocalRing.ResidueField.map_residue, IsLocalRing.ResidueField.map_residue,
-      IsLocalRing.ResidueField.map_residue, IsLocalRing.ResidueField.map_residue] at c
-    have c2 : IsLocalRing.residue A
-        (resA hg (resA hh ⟨y, hy⟩) - resA hh (resA hg ⟨y, hy⟩)) = 0 := by
+        IsLocalRing.ResidueField.map_residue, IsLocalRing.ResidueField.map_residue]
+      at c
+    have c2
+        : IsLocalRing.residue A (resA hg (resA hh ⟨y, hy⟩) - resA hh (resA hg ⟨y, hy⟩)) = 0 := by
       rw [map_sub, c, sub_self]
     rw [IsLocalRing.residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff] at c2
     exact c2
@@ -144,15 +155,20 @@ private theorem comm_mem_Ine {p : ℕ} (hp : p.Prime) (hA : A.valuation (p : Ω)
   have e : (g * h * g⁻¹ * h⁻¹) x - x = g (h (g⁻¹ (h⁻¹ x))) - h (g (g⁻¹ (h⁻¹ x))) := by
     simp only [AlgEquiv.mul_apply]
     congr 1
-    rw [← AlgEquiv.mul_apply g g⁻¹, mul_inv_cancel, AlgEquiv.one_apply,
-      ← AlgEquiv.mul_apply h h⁻¹, mul_inv_cancel, AlgEquiv.one_apply]
+    rw [← AlgEquiv.mul_apply g g⁻¹, mul_inv_cancel, AlgEquiv.one_apply, ← AlgEquiv.mul_apply h h⁻¹,
+      mul_inv_cancel, AlgEquiv.one_apply]
   rw [e]
   exact key _ hyA
 
 end
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.abP :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ p ∈ D.Sb, (∃ τ ∈ D.Ip p, D.ψ τ ≠ 1 ∧ ∀ s ∈ D.Ip p, ∃ n : ℕ, D.ψ s = D.ψ τ ^ n) ∧ ∀ g ∈ D.Gp p, ∀ h ∈ D.Gp p, g * h * g⁻¹ * h⁻¹ ∈ D.Ip p ⊓ D.ψ.ker := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.abP
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ p ∈ D.Sb,
+          (∃ τ ∈ D.Ip p, D.ψ τ ≠ 1 ∧ ∀ s ∈ D.Ip p, ∃ n : ℕ, D.ψ s = D.ψ τ ^ n)
+            ∧ ∀ g ∈ D.Gp p, ∀ h ∈ D.Gp p, g * h * g⁻¹ * h⁻¹ ∈ D.Ip p ⊓ D.ψ.ker := by
   intro Ω _ _ _ l _ c D hD p hp
   unfold Raw.Sb at hp
   obtain ⟨hpS, hpl, hldvd⟩ := Finset.mem_filter.mp hp
@@ -180,8 +196,10 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.abP :
       rw [hcard] at hldvd
       exact (Fact.out : l.Prime).one_lt.ne' (Nat.dvd_one.mp hldvd)
     · intro s hs
-      have hsH : (⟨D.ψ s, Subgroup.mem_map_of_mem _ hs⟩ : Subgroup.map D.ψ (D.Ip p))
-          ∈ Submonoid.powers γ := mem_powers_iff_mem_zpowers.2 (hγ _)
+      have hsH
+          : (⟨D.ψ s, Subgroup.mem_map_of_mem _ hs⟩ : Subgroup.map D.ψ (D.Ip p))
+            ∈ Submonoid.powers γ :=
+        mem_powers_iff_mem_zpowers.2 (hγ _)
       obtain ⟨n, hn⟩ := (Submonoid.mem_powers_iff _ _).mp hsH
       refine ⟨n, ?_⟩
       have h2 := congrArg Subtype.val hn
@@ -191,5 +209,5 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.abP :
   · intro g hg h hh
     refine ⟨comm_mem_Ine hpp hv hg hh, ?_⟩
     show g * h * g⁻¹ * h⁻¹ ∈ D.ψ.ker
-    rw [MonoidHom.mem_ker, map_mul, map_mul, map_mul, map_inv, map_inv,
-      mul_comm (D.ψ g), mul_assoc (D.ψ h), mul_inv_cancel, mul_one, mul_inv_cancel]
+    rw [MonoidHom.mem_ker, map_mul, map_mul, map_mul, map_inv, map_inv, mul_comm (D.ψ g),
+      mul_assoc (D.ψ h), mul_inv_cancel, mul_one, mul_inv_cancel]

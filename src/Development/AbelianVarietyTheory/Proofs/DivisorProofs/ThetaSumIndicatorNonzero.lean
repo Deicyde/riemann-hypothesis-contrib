@@ -7,15 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNatMul
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct Classical
 
 noncomputable section
 
 namespace GlobalTheory.ThetaScaledNe
 
-theorem normAtPlace_le_norm {F : Type} [Field F] [NumberField F] (w : InfinitePlace F)
-    (y : mixedEmbedding.mixedSpace F) : mixedEmbedding.normAtPlace w y ≤ ‖y‖ := by
+theorem normAtPlace_le_norm
+    {F : Type} [Field F] [NumberField F] (w : InfinitePlace F) (y : mixedEmbedding.mixedSpace F)
+    : mixedEmbedding.normAtPlace w y ≤ ‖y‖ := by
   by_cases hw : w.IsReal
   · rw [mixedEmbedding.normAtPlace_apply_of_isReal hw]
     exact (norm_le_pi_norm _ _).trans (norm_fst_le _)
@@ -23,8 +26,8 @@ theorem normAtPlace_le_norm {F : Type} [Field F] [NumberField F] (w : InfinitePl
     rw [mixedEmbedding.normAtPlace_apply_of_isComplex hc]
     exact (norm_le_pi_norm _ _).trans (norm_snd_le _)
 
-theorem one_le_norm_mixedEmbedding {F : Type} [Field F] [NumberField F] {y : 𝓞 F} (hy : y ≠ 0) :
-    1 ≤ ‖mixedEmbedding F (y : F)‖ := by
+theorem one_le_norm_mixedEmbedding {F : Type} [Field F] [NumberField F] {y : 𝓞 F} (hy : y ≠ 0)
+    : 1 ≤ ‖mixedEmbedding F (y : F)‖ := by
   by_contra h
   push_neg at h
   have hlt : ∀ z : InfinitePlace F, z (y : F) < 1 := fun z => by
@@ -35,12 +38,20 @@ theorem one_le_norm_mixedEmbedding {F : Type} [Field F] [NumberField F] {y : �
   have := InfinitePlace.one_le_of_lt_one (w := w) hy (fun z _ => hlt z)
   exact absurd (hlt w) (not_lt.mpr this)
 
-theorem exists_int_of_mem_scaledInt {F : Type} [Field F] [NumberField F] {κ : Type} {a : F} (ha : a ≠ 0)
-    {ξ : κ → F} (h : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ a)
-    (i : κ) : ∃ y : 𝓞 F, ξ i = a * (y : F) := by
+theorem exists_int_of_mem_scaledInt
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} {a : F} (ha : a ≠ 0)
+    {ξ : κ → F}
+    (h : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i))
+      ∈ GlobalTheory.EvAdm.scaledInt F κ a)
+    (i : κ)
+    : ∃ y : 𝓞 F, ξ i = a * (y : F) := by
   have hv : ∀ v : HeightOneSpectrum (𝓞 F), v.valuation F (a⁻¹ * ξ i) ≤ 1 := fun v => by
     have h1 := h i v
-    have e : (algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) v = algebraMap F (v.adicCompletion F) (ξ i) := rfl
+    have e
+        : (algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) v
+          = algebraMap F (v.adicCompletion F) (ξ i) :=
+      rfl
     rw [e, HeightOneSpectrum.mem_adicCompletionIntegers, Valuation.map_mul, map_inv₀] at h1
     rw [Valuation.map_mul, map_inv₀]
     have e1 : Valued.v (algebraMap F (v.adicCompletion F) a) = v.valuation F a :=
@@ -54,10 +65,15 @@ theorem exists_int_of_mem_scaledInt {F : Type} [Field F] [NumberField F] {κ : T
   have hy' : (y : F) = a⁻¹ * ξ i := hy
   rw [hy', mul_inv_cancel_left₀ ha]
 
-theorem exists_thetaSum_scaledInt_ne_zero : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (a : F), a ≠ 0 →
-    ∃ f : SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ,
-      thetaSum F (pureA F f ((GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)).indicator
-        (fun _ => (1 : ℂ)))) ≠ 0 := by
+theorem exists_thetaSum_scaledInt_ne_zero
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (a : F),
+      a ≠ 0
+        → ∃ f : SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ,
+          thetaSum F
+              (pureA F f
+                ((GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)).indicator
+                  (fun _ => (1 : ℂ))))
+            ≠ 0 := by
   intro F _ _ κ _ a ha
   let V := κ → mixedEmbedding.mixedSpace F
   set c : mixedEmbedding.mixedSpace F := mixedEmbedding F a⁻¹ with hc
@@ -71,13 +87,14 @@ theorem exists_thetaSum_scaledInt_ne_zero : ∀ (F : Type) [Field F] [NumberFiel
   refine ⟨f, ?_⟩
   set g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ :=
     (GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)).indicator (fun _ => (1 : ℂ)) with hg
-  have hzero : ∀ ξ : κ → F, ξ ≠ 0 → pureA F f g (fun i => algebraMap F (AdeleRing (𝓞 F) F) (ξ i)) = 0 := by
+  have hzero
+      : ∀ ξ : κ → F, ξ ≠ 0 → pureA F f g (fun i => algebraMap F (AdeleRing (𝓞 F) F) (ξ i)) = 0 := by
     intro ξ hξ
     rw [pureA_algebraMap]
-    by_cases hm : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ a
+    by_cases hm
+      : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ a
     · refine mul_eq_zero_of_left ?_ _
-      obtain ⟨i, hi⟩ : ∃ i, ξ i ≠ 0 := by
-        by_contra h; push_neg at h; exact hξ (funext h)
+      obtain ⟨i, hi⟩ : ∃ i, ξ i ≠ 0 := by by_contra h; push_neg at h; exact hξ (funext h)
       obtain ⟨y, hy⟩ := exists_int_of_mem_scaledInt ha hm i
       have hy0 : y ≠ 0 := by
         rintro rfl
@@ -99,13 +116,14 @@ theorem exists_thetaSum_scaledInt_ne_zero : ∀ (F : Type) [Field F] [NumberFiel
       exact Set.indicator_of_notMem hm _
   have h0 : pureA F f g (fun i => algebraMap F (AdeleRing (𝓞 F) F) ((0 : κ → F) i)) = 1 := by
     rw [pureA_algebraMap]
-    have hx : (fun i : κ => mixedEmbedding F ((0 : κ → F) i)) = 0 := by
-      funext i; exact map_zero _
-    have hm : (fun i : κ => algebraMap F (FiniteAdeleRing (𝓞 F) F) ((0 : κ → F) i)) ∈
-        GlobalTheory.EvAdm.scaledInt F κ a := by
+    have hx : (fun i : κ => mixedEmbedding F ((0 : κ → F) i)) = 0 := by funext i; exact map_zero _
+    have hm
+        : (fun i : κ => algebraMap F (FiniteAdeleRing (𝓞 F) F) ((0 : κ → F) i))
+          ∈ GlobalTheory.EvAdm.scaledInt F κ a := by
       have e : (fun i : κ => algebraMap F (FiniteAdeleRing (𝓞 F) F) ((0 : κ → F) i)) = 0 := by
         funext i; exact map_zero _
-      rw [e]; exact zero_mem _
+      rw [e]
+      exact zero_mem _
     rw [hx, hf, b.one_of_mem_closedBall (Metric.mem_closedBall_self (half_pos hε0).le), hg,
       Set.indicator_of_mem hm]
     simp

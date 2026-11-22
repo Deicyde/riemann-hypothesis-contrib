@@ -8,7 +8,18 @@ open PowerSeries GlobalTheory.BK
 
 namespace GlobalTheory.Proof.LiftImage
 
-theorem lift_image : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (κ : Type) [Fintype κ] [DecidableEq κ] (η H : ℕ) (D₀ : BKDat O K l e a ι η H) (D₁ : BKDat O K l e a κ η H) (F : BKHom D₀ D₁) (U : Finset ℤ), GlobalTheory.IndefiniteRowSideFullHecke.ImagePolynomialAction.Image D₁ U → ∀ ω : D₁.Pol, (∃ w ∈ D₁.Zl, D₁.Lc w = ω) → ∀ c : ℕ, (∃ w₀ ∈ D₀.Zl, F.onPol w₀ = (l : K) ^ c • ω) → ∃ w ∈ D₀.Zl, F.onPol (D₀.Lc w) = ω := by
+theorem lift_image
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (κ : Type) [Fintype κ] [DecidableEq κ] (η H : ℕ)
+        (D₀ : BKDat O K l e a ι η H) (D₁ : BKDat O K l e a κ η H) (F : BKHom D₀ D₁) (U : Finset ℤ),
+      GlobalTheory.IndefiniteRowSideFullHecke.ImagePolynomialAction.Image D₁ U
+        → ∀ ω : D₁.Pol,
+          (∃ w ∈ D₁.Zl, D₁.Lc w = ω)
+            → ∀ c : ℕ,
+              (∃ w₀ ∈ D₀.Zl, F.onPol w₀ = (l : K) ^ c • ω)
+                → ∃ w ∈ D₀.Zl, F.onPol (D₀.Lc w) = ω := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ κ _ _ η H D₀ D₁ F U hIm ω hω c hc
   obtain ⟨w₁, hw₁, hw₁ω⟩ := hω
   obtain ⟨w₀, hw₀, hw₀ω⟩ := hc

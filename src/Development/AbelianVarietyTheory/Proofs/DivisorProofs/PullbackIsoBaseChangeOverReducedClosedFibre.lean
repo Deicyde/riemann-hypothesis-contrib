@@ -12,45 +12,54 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClosedPointR
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem spMap_residue_apply_eq_closedPoint (R : Type) [CommRing R] [IsLocalRing R] (w : Sp (ResidueField R)) :
-    spMap (residue R) w = closedPoint R :=
+theorem spMap_residue_apply_eq_closedPoint
+    (R : Type) [CommRing R] [IsLocalRing R] (w : Sp (ResidueField R))
+    : spMap (residue R) w = closedPoint R :=
   IsLocalRing.PrimeSpectrum.comap_residue _ _
 
-theorem pullbackLeftPullbackSnd_congr_fst {X Y Z W : Scheme.{0}} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y) (g'' : W ⟶ Z)
-    (hg : g' ≫ g = g'') :
-    (pullbackLeftPullbackSndIso f g g' ≪≫ pullback.congrHom rfl hg).hom ≫ pullback.fst f g'' =
-      pullback.fst _ _ ≫ pullback.fst f g := by
+theorem pullbackLeftPullbackSnd_congr_fst
+    {X Y Z W : Scheme.{0}} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y) (g'' : W ⟶ Z) (hg : g' ≫ g = g'')
+    : (pullbackLeftPullbackSndIso f g g' ≪≫ pullback.congrHom rfl hg).hom ≫ pullback.fst f g''
+      = pullback.fst _ _ ≫ pullback.fst f g := by
   subst hg
   simp [pullback.map]
 
-theorem pullbackLeftPullbackSnd_congr_snd {X Y Z W : Scheme.{0}} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y) (g'' : W ⟶ Z)
-    (hg : g' ≫ g = g'') :
-    (pullbackLeftPullbackSndIso f g g' ≪≫ pullback.congrHom rfl hg).hom ≫ pullback.snd f g'' = pullback.snd _ _ := by
+theorem pullbackLeftPullbackSnd_congr_snd
+    {X Y Z W : Scheme.{0}} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y) (g'' : W ⟶ Z) (hg : g' ≫ g = g'')
+    : (pullbackLeftPullbackSndIso f g g' ≪≫ pullback.congrHom rfl hg).hom ≫ pullback.snd f g''
+      = pullback.snd _ _ := by
   subst hg
   simp [pullback.map]
 
-theorem Emb.pullback_iso_of_closed (R : Type) [CommRing R] [IsLocalRing R] (S : Scheme.{0}) (π : S ⟶ Sp R)
-    (G' : Over S) [GrpObj G'] (hG : Smooth G'.hom) (E : Emb π G') (T : Scheme.{0}) (t : T ⟶ S)
-    (k : T ⟶ Sp (ResidueField R)) (_hT : IsLocallyNoetherian T) (hTr : IsReduced T)
-    (htk : t ≫ π = k ≫ spMap (residue R)) :
-    ∃ (e : pullback G'.hom t ≅ pullback E.Y.hom k) (l : pullback G'.hom t ⟶ E.H.toScheme),
-      e.hom ≫ pullback.snd _ _ = pullback.snd _ _ ∧ l ≫ E.H.ι = pullback.fst _ _ ∧
-      l ≫ E.f = e.hom ≫ pullback.fst _ _ ≫ E.j := by
+theorem Emb.pullback_iso_of_closed
+    (R : Type) [CommRing R] [IsLocalRing R]
+    (S : Scheme.{0}) (π : S ⟶ Sp R) (G' : Over S) [GrpObj G']
+    (hG : Smooth G'.hom) (E : Emb π G')
+    (T : Scheme.{0}) (t : T ⟶ S) (k : T ⟶ Sp (ResidueField R))
+    (_hT : IsLocallyNoetherian T) (hTr : IsReduced T) (htk : t ≫ π = k ≫ spMap (residue R))
+    : ∃ (e : pullback G'.hom t ≅ pullback E.Y.hom k) (l : pullback G'.hom t ⟶ E.H.toScheme),
+      e.hom ≫ pullback.snd _ _ = pullback.snd _ _ ∧ l ≫ E.H.ι = pullback.fst _ _
+        ∧ l ≫ E.f = e.hom ≫ pullback.fst _ _ ≫ E.j := by
   haveI := hG
   haveI : IsClosedImmersion (spMap (residue R)) := IsClosedImmersion.spec_of_surjective _ residue_surjective
   haveI : IsImmersion E.j := E.imm
   haveI : Smooth E.Y.hom := E.smooth
-  have hclosed : ∀ w : (pullback G'.hom t : Scheme.{0}), π (G'.hom (pullback.fst G'.hom t w)) = closedPoint R := by
+  have hclosed
+      : ∀ w : (pullback G'.hom t : Scheme.{0}),
+        π (G'.hom (pullback.fst G'.hom t w)) = closedPoint R := by
     intro w
-    have h1 : π (G'.hom (pullback.fst G'.hom t w)) = (pullback.fst G'.hom t ≫ G'.hom ≫ π) w := by simp
+    have h1 : π (G'.hom (pullback.fst G'.hom t w)) = (pullback.fst G'.hom t ≫ G'.hom ≫ π) w := by
+      simp
     rw [h1, pullback.condition_assoc, htk]
     simp only [Scheme.Hom.comp_apply]
     exact spMap_residue_apply_eq_closedPoint R _
@@ -58,16 +67,21 @@ theorem Emb.pullback_iso_of_closed (R : Type) [CommRing R] [IsLocalRing R] (S : 
     rintro _ ⟨w, rfl⟩
     rw [Scheme.Opens.range_ι]
     exact E.H_all _ (hclosed w)
-  let l : pullback G'.hom t ⟶ E.H.toScheme := IsOpenImmersion.lift E.H.ι (pullback.fst G'.hom t) hrng
+  let l : pullback G'.hom t ⟶ E.H.toScheme :=
+    IsOpenImmersion.lift E.H.ι (pullback.fst G'.hom t) hrng
   have hl : l ≫ E.H.ι = pullback.fst G'.hom t := IsOpenImmersion.lift_fac _ _ _
   haveI : IsReduced (pullback G'.hom t) := GlobalTheory.isReduced_of_smooth_of_isReduced (pullback.snd G'.hom t)
   have hrj : Set.range (l ≫ E.f) ⊆ Set.range E.j := by
     rintro _ ⟨w, rfl⟩
-    obtain ⟨y, hy⟩ := (GlobalTheory.T.closedPoint_range_eq_fixedGroup_image R S π G' E).1 (l w) (by
-      have e1 : E.H.ι (l w) = pullback.fst G'.hom t w := by rw [← Scheme.Hom.comp_apply, hl]
-      rw [e1]; exact hclosed w)
+    obtain ⟨y, hy⟩ :=
+      (GlobalTheory.T.closedPoint_range_eq_fixedGroup_image R S π G' E).1 (l w) (by
+        have e1 : E.H.ι (l w) = pullback.fst G'.hom t w := by rw [← Scheme.Hom.comp_apply, hl]
+        rw [e1]
+        exact hclosed w)
     exact ⟨y, by rw [Scheme.Hom.comp_apply, hy]⟩
-  obtain ⟨g, hg⟩ := GlobalTheory.T.exists_lift_of_isReduced_of_isImmersion_range _ _ _ (l ≫ E.f) E.j inferInstance E.imm hrj
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.T.exists_lift_of_isReduced_of_isImmersion_range _ _ _ (l ≫ E.f) E.j inferInstance
+      E.imm hrj
   have hgY : g ≫ E.Y.hom = pullback.snd G'.hom t ≫ k := by
     rw [← cancel_mono (spMap (residue R)), Category.assoc, ← E.j_over, reassoc_of% hg, E.f_over,
       reassoc_of% hl, pullback.condition_assoc, htk, Category.assoc]

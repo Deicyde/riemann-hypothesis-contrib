@@ -12,8 +12,11 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.JoinCoordsCo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.AddBlockMulti
 
@@ -23,16 +26,21 @@ section Reindex
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
-theorem inChart_comp_equiv (ξ : Spec (CommRingCat.of Ω) ⟶ X) {κ κ' : Type} (e : κ' ≃ κ) (x : κ → Ω) (c : κ')
-    (p : Cpt ξ) : InChart ξ (x ∘ e) c p ↔ InChart ξ x (e c) p := by
+theorem inChart_comp_equiv
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X) {κ κ' : Type} (e : κ' ≃ κ) (x : κ → Ω) (c : κ') (p : Cpt ξ)
+    : InChart ξ (x ∘ e) c p ↔ InChart ξ x (e c) p := by
   unfold InChart
   refine and_congr Iff.rfl ⟨fun h c' => ?_, fun h c' => h _⟩
   simpa using h (e.symm c')
 
-theorem coordTie_comp_equiv {o : Type} [CommRing o] [Algebra o Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ κ' : Type}
-    (e : κ' ≃ κ) {x : κ → Ω} (h : CoordTie o ξ x) : CoordTie o ξ (x ∘ e) := by
-  have hr : ∀ c : κ', (Set.range fun j => (x ∘ e) j / (x ∘ e) c) = Set.range fun j => x j / x (e c) := fun c =>
-    e.surjective.range_comp (fun j => x j / x (e c))
+theorem coordTie_comp_equiv
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ κ' : Type} (e : κ' ≃ κ)
+    {x : κ → Ω} (h : CoordTie o ξ x)
+    : CoordTie o ξ (x ∘ e) := by
+  have hr
+      : ∀ c : κ', (Set.range fun j => (x ∘ e) j / (x ∘ e) c) = Set.range fun j => x j / x (e c) :=
+    fun c => e.surjective.range_comp (fun j => x j / x (e c))
   refine ⟨h.gen, fun p => ?_, fun c hc => ?_, fun c hc a => ?_⟩
   · obtain ⟨c, hc⟩ := h.cover p
     exact ⟨e.symm c, (inChart_comp_equiv ξ e x _ p).2 (by simpa using hc)⟩
@@ -55,21 +63,24 @@ theorem specializes_of_openImm {y : Y} (h : genPt (ζ ≫ f) ⤳ f y) : genPt ζ
   rw [e2] at h
   exact f.isOpenEmbedding.isInducing.specializes_iff.1 h
 
-theorem inChart_push {κ : Type} (x : κ → Ω) (c : κ) (p : Cpt ζ) :
-    InChart (ζ ≫ f) x c (push ζ f p) ↔ InChart ζ x c p := by
+theorem inChart_push {κ : Type} (x : κ → Ω) (c : κ) (p : Cpt ζ)
+    : InChart (ζ ≫ f) x c (push ζ f p) ↔ InChart ζ x c p := by
   unfold InChart
   rw [regAt_push]
 
 variable {ζ f}
 
-theorem exists_push (hR : ∀ q : X, genPt (ζ ≫ f) ⤳ q → q ∈ Set.range f) (q : Cpt (ζ ≫ f)) :
-    ∃ p : Cpt ζ, push ζ f p = q := by
+theorem exists_push (hR : ∀ q : X, genPt (ζ ≫ f) ⤳ q → q ∈ Set.range f) (q : Cpt (ζ ≫ f))
+    : ∃ p : Cpt ζ, push ζ f p = q := by
   obtain ⟨q, hq⟩ := q
   obtain ⟨y, rfl⟩ := hR q hq
   exact ⟨⟨y, specializes_of_openImm ζ f hq⟩, rfl⟩
 
-theorem coordTie_push {o : Type} [CommRing o] [Algebra o Ω] {κ : Type} {x : κ → Ω}
-    (hR : ∀ q : X, genPt (ζ ≫ f) ⤳ q → q ∈ Set.range f) (h : CoordTie o ζ x) : CoordTie o (ζ ≫ f) x := by
+theorem coordTie_push
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {κ : Type} {x : κ → Ω}
+    (hR : ∀ q : X, genPt (ζ ≫ f) ⤳ q → q ∈ Set.range f) (h : CoordTie o ζ x)
+    : CoordTie o (ζ ≫ f) x := by
   refine ⟨⟨?_, fun q => ?_⟩, fun q => ?_, fun c hc => ?_, fun c hc a => ?_⟩
   · rw [Scheme.stalkClosedPointTo_comp ζ f]
     have hb : Function.Bijective (f.stalkMap (ζ (IsLocalRing.closedPoint Ω))).hom :=
@@ -99,8 +110,11 @@ theorem coordTie_push {o : Type} [CommRing o] [Algebra o Ω] {κ : Type} {x : κ
       have := H (push ζ f p) ((inChart_push ζ f x c p).2 hp)
       rwa [regAt_push] at this
 
-theorem coordTie_of_push {o : Type} [CommRing o] [Algebra o Ω] {κ : Type} {x : κ → Ω}
-    (hR : ∀ q : X, genPt (ζ ≫ f) ⤳ q → q ∈ Set.range f) (h : CoordTie o (ζ ≫ f) x) : CoordTie o ζ x := by
+theorem coordTie_of_push
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {κ : Type} {x : κ → Ω}
+    (hR : ∀ q : X, genPt (ζ ≫ f) ⤳ q → q ∈ Set.range f) (h : CoordTie o (ζ ≫ f) x)
+    : CoordTie o ζ x := by
   refine ⟨⟨?_, fun p => ?_⟩, fun p => ?_, fun c hc => ?_, fun c hc a => ?_⟩
   · have hb : Function.Bijective (f.stalkMap (ζ (IsLocalRing.closedPoint Ω))).hom :=
       ConcreteCategory.bijective_of_isIso _
@@ -147,9 +161,10 @@ theorem spec_int_hom_ext (g g' : Spec (CommRingCat.of Ω) ⟶ Spec (CommRingCat.
   congr 1
   exact CommRingCat.hom_ext (RingHom.ext_int _ _)
 
-theorem exists_openModel {κ : Type} {x : κ → Ω} {ξ : Spec (CommRingCat.of Ω) ⟶ X} (h : CoordTie ℤ ξ x) :
-    ∃ (Y : Scheme.{0}) (ζ : Spec (CommRingCat.of Ω) ⟶ Y) (f : Y ⟶ X) (_ : IsOpenImmersion f), ζ ≫ f = ξ ∧
-      (∀ q : X, genPt ξ ⤳ q → q ∈ Set.range f) ∧ ∀ q : Y, genPt ζ ⤳ q := by
+theorem exists_openModel
+    {κ : Type} {x : κ → Ω} {ξ : Spec (CommRingCat.of Ω) ⟶ X} (h : CoordTie ℤ ξ x)
+    : ∃ (Y : Scheme.{0}) (ζ : Spec (CommRingCat.of Ω) ⟶ Y) (f : Y ⟶ X) (_ : IsOpenImmersion f),
+      ζ ≫ f = ξ ∧ (∀ q : X, genPt ξ ⤳ q → q ∈ Set.range f) ∧ ∀ q : Y, genPt ζ ⤳ q := by
   let W : X.Opens := sSup {U : X.Opens | ∀ q ∈ U, genPt ξ ⤳ q}
   have hW : ∀ q ∈ W, genPt ξ ⤳ q := by
     intro q hq
@@ -175,30 +190,34 @@ theorem exists_openModel {κ : Type} {x : κ → Ω} {ξ : Spec (CommRingCat.of 
   rw [e]
   exact hW _ q.2
 
-theorem coordTie_join {κ κ' : Type} [Finite κ] [Finite κ'] {x : κ → Ω} {w : κ' → Ω}
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} (h : CoordTie ℤ ξ x) (hw : ∀ p : Cpt ξ, ∃ l, InChart ξ w l p) :
-    CoordTie ℤ ξ (joinCo (RingHom.id Ω) x w) := by
+theorem coordTie_join
+    {κ κ' : Type} [Finite κ] [Finite κ']
+    {x : κ → Ω} {w : κ' → Ω} {ξ : Spec (CommRingCat.of Ω) ⟶ X}
+    (h : CoordTie ℤ ξ x) (hw : ∀ p : Cpt ξ, ∃ l, InChart ξ w l p)
+    : CoordTie ℤ ξ (joinCo (RingHom.id Ω) x w) := by
   obtain ⟨Y, ζ, f, _, rfl, hR, hall⟩ := exists_openModel h
-  let M : PModel ℤ x :=
-    { X := Y
-      ξ := ζ
-      s := Y.toSpecΓ ≫ Spec.map (CommRingCat.ofHom (Int.castRingHom _))
-      hover := spec_int_hom_ext _ _
-      all := hall
-      tie := coordTie_of_push hR h }
+  let M : PModel ℤ x := {
+    X := Y
+    ξ := ζ
+    s := Y.toSpecΓ ≫ Spec.map (CommRingCat.ofHom (Int.castRingHom _))
+    hover := spec_int_hom_ext _ _
+    all := hall
+    tie := coordTie_of_push hR h
+  }
   refine coordTie_push hR (GlobalTheory.T.join_coords_coordTie ℤ Ω κ x M κ' w fun p => ?_)
   obtain ⟨l, hl⟩ := hw (push ζ f p)
   exact ⟨l, (inChart_push ζ f w l p).1 hl⟩
 
 end Model
 
-theorem add_block_multi : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (K : Type)
-    [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (K' : Type) [Fintype K']
-    (J' : K' → Type) [∀ k, Fintype (J' k)] (s : (Σ k, J' k) → Ω),
-    CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) →
-    (∀ (k : K') (p : Cpt ξ), ∃ i, InChart ξ (fun i' : J' k => s ⟨k, i'⟩) i p) →
-    CoordTie ℤ ξ fun c' : (k : K ⊕ K') → Sum.elim J J' k =>
-      (∏ k, y ⟨k, c' (Sum.inl k)⟩) * ∏ k, s ⟨k, c' (Sum.inr k)⟩ := by
+theorem add_block_multi
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (K : Type)
+        [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (K' : Type)
+        [Fintype K'] (J' : K' → Type) [∀ k, Fintype (J' k)] (s : (Σ k, J' k) → Ω),
+      CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩)
+        → (∀ (k : K') (p : Cpt ξ), ∃ i, InChart ξ (fun i' : J' k => s ⟨k, i'⟩) i p)
+        → CoordTie ℤ ξ fun c' : (k : K ⊕ K') → Sum.elim J J' k =>
+          (∏ k, y ⟨k, c' (Sum.inl k)⟩) * ∏ k, s ⟨k, c' (Sum.inr k)⟩ := by
   intro X Ω _ ξ K _ J _ y K' _ J' _ s h hs
   have hw : ∀ p : Cpt ξ, ∃ i, InChart ξ (fun c : (k : K') → J' k => ∏ k, s ⟨k, c k⟩) i p := by
     intro p

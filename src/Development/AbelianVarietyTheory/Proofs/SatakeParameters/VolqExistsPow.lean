@@ -12,8 +12,9 @@ namespace GlobalTheory.ColPeriod
 
 open NumberField IsDedekindDomain Formalism.L2.Col GlobalTheory.TopStep
 
-theorem volq_index {G : Type} [Group G] (H : Subgroup G) {q k : ℕ} (hq : q.Prime) (h : ∀ g : G, g ^ q ^ k ∈ H) :
-    H.index = 0 ∨ ∃ e : ℕ, H.index = q ^ e := by
+theorem volq_index
+    {G : Type} [Group G] (H : Subgroup G) {q k : ℕ} (hq : q.Prime) (h : ∀ g : G, g ^ q ^ k ∈ H)
+    : H.index = 0 ∨ ∃ e : ℕ, H.index = q ^ e := by
   by_cases h0 : H.index = 0
   · exact Or.inl h0
   right
@@ -34,7 +35,8 @@ theorem volq_index {G : Type} [Group G] (H : Subgroup G) {q k : ℕ} (hq : q.Pri
   obtain ⟨e', -, he'⟩ := (Nat.dvd_prime_pow hq).1 hd
   exact ⟨e', he'⟩
 
-theorem volq_choose {q : ℕ} (hq : q.Prime) (a c i : ℕ) (h0 : i ≠ 0) (hi : i ≤ c) : q ^ a ∣ (q ^ (a + c)).choose i := by
+theorem volq_choose {q : ℕ} (hq : q.Prime) (a c i : ℕ) (h0 : i ≠ 0) (hi : i ≤ c)
+    : q ^ a ∣ (q ^ (a + c)).choose i := by
   by_cases h : i ≤ q ^ (a + c)
   · have h1 := Nat.factorization_choose_prime_pow_add_factorization hq h h0
     have h2 := Nat.factorization_lt q h0
@@ -43,9 +45,13 @@ theorem volq_choose {q : ℕ} (hq : q.Prime) (a c i : ℕ) (h0 : i ≠ 0) (hi : 
   · rw [Nat.choose_eq_zero_of_lt (not_le.1 h)]
     exact dvd_zero _
 
-theorem volq_pow_mem {V : Type} [AddCommGroup V] (A B : AddSubgroup V) {q : ℕ} (hq : q.Prime) (b c : ℕ)
-    (hAB : ∀ v ∈ A, q ^ b • v ∈ B) (hBA : ∀ v ∈ B, q ^ b • v ∈ A) (r : Module.End ℤ V) (hr : ∀ v ∈ B, r v ∈ B)
-    (hn : (r - 1) ^ (c + 1) = 0) : ∀ v ∈ A, (r ^ q ^ (2 * b + c)) v ∈ A := by
+theorem volq_pow_mem
+    {V : Type} [AddCommGroup V]
+    (A B : AddSubgroup V)
+    {q : ℕ} (hq : q.Prime)
+    (b c : ℕ) (hAB : ∀ v ∈ A, q ^ b • v ∈ B) (hBA : ∀ v ∈ B, q ^ b • v ∈ A)
+    (r : Module.End ℤ V) (hr : ∀ v ∈ B, r v ∈ B) (hn : (r - 1) ^ (c + 1) = 0)
+    : ∀ v ∈ A, (r ^ q ^ (2 * b + c)) v ∈ A := by
   intro v hv
   have hν : ∀ i : ℕ, ∀ v ∈ B, ((r - 1) ^ i) v ∈ B := by
     intro i
@@ -74,8 +80,8 @@ section Nil
 
 variable {k : Type} [CommRing k] {n c : ℕ}
 
-theorem volq_lower {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.N1 k n c) (i : ℕ) :
-    ∀ v ∈ Loc.Ufl k n c (i + 1), r v - v ∈ Loc.Ufl k n c i := by
+theorem volq_lower {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.N1 k n c) (i : ℕ)
+    : ∀ v ∈ Loc.Ufl k n c (i + 1), r v - v ∈ Loc.Ufl k n c i := by
   intro v hv
   have h1 : v - Loc.atN v (n + i) • Loc.eN k (n + c) (n + i) ∈ Loc.Ufl k n c i := by
     intro l hl
@@ -93,8 +99,8 @@ theorem volq_lower {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr :
   simp only [map_sub, map_smul, smul_sub]
   abel
 
-theorem volq_zero {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.N1 k n c) :
-    ∀ v ∈ Loc.Ufl k n c 0, r v - v = 0 := by
+theorem volq_zero {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.N1 k n c)
+    : ∀ v ∈ Loc.Ufl k n c 0, r v - v = 0 := by
   intro v hv
   have e : v = Loc.inX k n c fun l => v (Fin.castAdd c l) := by
     funext l
@@ -105,10 +111,12 @@ theorem volq_zero {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : 
   rw [sub_eq_zero, e]
   exact hr.2 _
 
-theorem volq_nil {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.N1 k n c) :
-    ((r.toLinearMap.restrictScalars ℤ : Module.End ℤ (Fin (n + c) → k)) - 1) ^ (c + 1) = 0 := by
-  have h : ∀ i, ∀ v ∈ Loc.Ufl k n c i,
-      (((r.toLinearMap.restrictScalars ℤ : Module.End ℤ (Fin (n + c) → k)) - 1) ^ (i + 1)) v = 0 := by
+theorem volq_nil {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.N1 k n c)
+    : ((r.toLinearMap.restrictScalars ℤ : Module.End ℤ (Fin (n + c) → k)) - 1) ^ (c + 1) = 0 := by
+  have h
+      : ∀ i, ∀ v ∈ Loc.Ufl k n c i,
+        (((r.toLinearMap.restrictScalars ℤ : Module.End ℤ (Fin (n + c) → k)) - 1) ^ (i + 1)) v
+          = 0 := by
     intro i
     induction i with
     | zero => intro v hv; simpa using volq_zero hr v hv
@@ -143,13 +151,14 @@ theorem volq_exists_pow (a : E) : ∃ b : ℕ, IntAt P ((qOf P : E) ^ b * a) := 
 
 variable [StarRing E]
 
-theorem volq_bound {N : ℕ} (f : Sp E N →ₗ[E] Sp E N) :
-    ∃ b : ℕ, ∀ b', b ≤ b' → ∀ v ∈ stdAt E N P, qOf P ^ b' • f v ∈ stdAt E N P := by
+theorem volq_bound {N : ℕ} (f : Sp E N →ₗ[E] Sp E N)
+    : ∃ b : ℕ, ∀ b', b ≤ b' → ∀ v ∈ stdAt E N P, qOf P ^ b' • f v ∈ stdAt E N P := by
   choose g hg using fun p : Fin N × Fin N => volq_exists_pow (P := P) (f (Pi.single p.2 1) p.1)
   refine ⟨Finset.univ.sup g, fun b' hb v hv => mem_stdAt.2 fun i => ?_⟩
   rw [Pi.smul_apply, apply_eq_sum, nsmul_eq_mul, Finset.mul_sum]
   refine intAt_sum _ fun j _ => ?_
-  obtain ⟨t, rfl⟩ := Nat.exists_eq_add_of_le ((Finset.le_sup (f := g) (Finset.mem_univ (i, j))).trans hb)
+  obtain ⟨t, rfl⟩ :=
+    Nat.exists_eq_add_of_le ((Finset.le_sup (f := g) (Finset.mem_univ (i, j))).trans hb)
   have := ((mem_stdAt.1 hv j).mul (hg (i, j))).mul (intAt_pow (intAt_nat (qOf P)) t)
   convert this using 1
   push_cast
@@ -161,22 +170,35 @@ theorem volq_lamY {n c : ℕ} : LocE.lamY P (qOf P) n c 0 = stdAt E (n + c) P :=
   rw [Submodule.mem_comap, mem_stdAt, mem_stdAt]
   simp [LocE.scE]
 
-theorem volq_relIndex (hq : (qOf P).Prime) {n c : ℕ} (J : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c)))
-    (hJ : J ≤ stabL E _ (stdAt E (n + c) P)) (h : Sp E (n + c) ≃ₗ[E] Sp E (n + c)) :
-    (Loc.N1 E n c ⊓ stabL E _ (stdAt E (n + c) P)).relIndex (Loc.Cbe J h ⊓ Loc.N1 E n c) = 0 ∨
-    ∃ e : ℕ, (Loc.N1 E n c ⊓ stabL E _ (stdAt E (n + c) P)).relIndex (Loc.Cbe J h ⊓ Loc.N1 E n c) = qOf P ^ e := by
+theorem volq_relIndex
+    (hq : (qOf P).Prime)
+    {n c : ℕ} (J : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c)))
+    (hJ : J ≤ stabL E _ (stdAt E (n + c) P)) (h : Sp E (n + c) ≃ₗ[E] Sp E (n + c))
+    : (Loc.N1 E n c ⊓ stabL E _ (stdAt E (n + c) P)).relIndex (Loc.Cbe J h ⊓ Loc.N1 E n c) = 0
+      ∨ ∃ e : ℕ,
+        (Loc.N1 E n c ⊓ stabL E _ (stdAt E (n + c) P)).relIndex (Loc.Cbe J h ⊓ Loc.N1 E n c)
+          = qOf P ^ e := by
   obtain ⟨b₁, h₁⟩ := volq_bound (P := P) h.toLinearMap
   obtain ⟨b₂, h₂⟩ := volq_bound (P := P) h.symm.toLinearMap
-  have key : ∀ r ∈ Loc.Cbe J h ⊓ Loc.N1 E n c, ∀ v ∈ stdAt E (n + c) P,
-      (r ^ qOf P ^ (2 * (b₁ + b₂) + c)) v ∈ stdAt E (n + c) P := by
+  have key
+      : ∀ r ∈ Loc.Cbe J h ⊓ Loc.N1 E n c, ∀ v ∈ stdAt E (n + c) P,
+        (r ^ qOf P ^ (2 * (b₁ + b₂) + c)) v ∈ stdAt E (n + c) P := by
     intro r hr v hv
     have hs : h⁻¹ * r * h ∈ stabL E _ (stdAt E (n + c) P) := by
       have := hJ (Subgroup.mem_comap.1 hr.1.2)
       simpa using this
-    have := volq_pow_mem (stdAt E (n + c) P).toAddSubgroup
-      ((stdAt E (n + c) P).toAddSubgroup.comap h.symm.toLinearMap.toAddMonoidHom) hq (b₁ + b₂) c
-      (fun v hv => ?_) (fun v hv => ?_) (r.toLinearMap.restrictScalars ℤ) (fun v hv => ?_) (volq_nil hr.2) v hv
-    · have e : ∀ m : ℕ, ((r.toLinearMap.restrictScalars ℤ : Module.End ℤ (Sp E (n + c))) ^ m) v = (r ^ m) v := by
+    have :=
+      volq_pow_mem (stdAt E (n + c) P).toAddSubgroup
+        ((stdAt E (n + c) P).toAddSubgroup.comap h.symm.toLinearMap.toAddMonoidHom) hq (b₁ + b₂) c
+        (fun v hv => ?_)
+        (fun v hv => ?_)
+        (r.toLinearMap.restrictScalars ℤ)
+        (fun v hv => ?_)
+        (volq_nil hr.2) v hv
+    · have e
+          : ∀ m : ℕ,
+            ((r.toLinearMap.restrictScalars ℤ : Module.End ℤ (Sp E (n + c))) ^ m) v
+              = (r ^ m) v := by
         intro m
         induction m with
         | zero => rfl
@@ -213,7 +235,8 @@ theorem volumeAtQ : VolumeAtQ := by
   have hq : w.valuation X.K (qOf P : X.K) = 1 := by
     have := (w.valuation_eq_one_iff_notMem (K := X.K)).2 hw
     rwa [map_natCast] at this
-  rcases volq_relIndex hd.1 (LocE.JQ P (qOf P) (R.k + j) (R.N j) (cOf R j)) inf_le_left h with h0 | ⟨e, he⟩
+  rcases volq_relIndex hd.1 (LocE.JQ P (qOf P) (R.k + j) (R.N j) (cOf R j)) inf_le_left h with
+    h0 | ⟨e, he⟩
   · rw [h0]
     simp
   · rw [he, Nat.cast_pow, map_pow, hq, one_pow, div_one]

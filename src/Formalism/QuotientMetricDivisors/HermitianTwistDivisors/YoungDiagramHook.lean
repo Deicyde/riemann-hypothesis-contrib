@@ -248,25 +248,31 @@ theorem young_diagram_factorial : RowsFactorial := by
     have hcA : ∀ i, ((w + c i : ℕ) : ℝ) ≤ A := fun i => by
       push_cast
       linarith [hcS i]
-    have hν : phRows ((Finset.univ.val.map fun i => w + c i) + blk) =
-        ∑ i : Fin n, ph ((w + c i.castSucc : ℕ) : ℝ) + ph ((w + c (Fin.last n) : ℕ) : ℝ) +
-          phRows blk := by
+    have hν
+        : phRows ((Finset.univ.val.map fun i => w + c i) + blk)
+          = ∑ i : Fin n, ph ((w + c i.castSucc : ℕ) : ℝ) + ph ((w + c (Fin.last n) : ℕ) : ℝ)
+            + phRows blk := by
       rw [phRows_add, phRows_univ, Fin.sum_univ_castSucc]
     have hfa' : ∑ i : Fin n, ph ((r i : ℕ) : ℝ) ≤ fa := le_trans (sum_ph_le_logFact r sm) hfa
-    have hpair : ∀ i : Fin n, ph ((w + c i.castSucc : ℕ) : ℝ) - ph ((r i : ℕ) : ℝ) ≤
-        ((c i.castSucc : ℝ) - c' i) * Real.log A + sh * Real.log A := by
+    have hpair
+        : ∀ i : Fin n,
+          ph ((w + c i.castSucc : ℕ) : ℝ) - ph ((r i : ℕ) : ℝ)
+            ≤ ((c i.castSucc : ℝ) - c' i) * Real.log A + sh * Real.log A := by
       intro i
       obtain ⟨h1a, h1b⟩ := abs_le.mp (hr i)
       have h2 : (c' i : ℝ) ≤ c i.castSucc := (hI.2 i).1
-      have hd : |((w + c i.castSucc : ℕ) : ℝ) - ((r i : ℕ) : ℝ)| ≤
-          ((c i.castSucc : ℝ) - c' i) + sh := by
+      have hd
+          : |((w + c i.castSucc : ℕ) : ℝ) - ((r i : ℕ) : ℝ)|
+            ≤ ((c i.castSucc : ℝ) - c' i) + sh := by
         rw [abs_le]
         push_cast
         constructor <;> linarith
       have := pair_abs (w + c i.castSucc) (r i) (log_nat_le _ hLa (hcA _)) hLa hd
       linarith
-    have hsum : ∑ i : Fin n, ph ((w + c i.castSucc : ℕ) : ℝ) - ∑ i : Fin n, ph ((r i : ℕ) : ℝ) ≤
-        (∑ i : Fin n, ((c i.castSucc : ℝ) - c' i)) * Real.log A + (n : ℝ) * (sh * Real.log A) := by
+    have hsum
+        : ∑ i : Fin n, ph ((w + c i.castSucc : ℕ) : ℝ) - ∑ i : Fin n, ph ((r i : ℕ) : ℝ)
+          ≤ (∑ i : Fin n, ((c i.castSucc : ℝ) - c' i)) * Real.log A
+            + (n : ℝ) * (sh * Real.log A) := by
       rw [← Finset.sum_sub_distrib]
       refine le_trans (Finset.sum_le_sum fun i _ => hpair i) (le_of_eq ?_)
       rw [Finset.sum_add_distrib, ← Finset.sum_mul, Finset.sum_const, Finset.card_univ,
@@ -288,16 +294,21 @@ theorem young_diagram_factorial : RowsFactorial := by
     have hcA : ∀ i : Fin n, ((w + c i : ℕ) : ℝ) ≤ A := fun i => by
       push_cast
       linarith [hcS i]
-    have hν : phRows ((aT + w) ::ₘ r0 ::ₘ ((Finset.univ.val.map fun i => w + c i) + blk)) =
-        ph ((aT + w : ℕ) : ℝ) + ph ((r0 : ℕ) : ℝ) + ∑ i : Fin n, ph ((w + c i : ℕ) : ℝ) +
-          phRows blk := by
+    have hν
+        : phRows ((aT + w) ::ₘ r0 ::ₘ ((Finset.univ.val.map fun i => w + c i) + blk))
+          = ph ((aT + w : ℕ) : ℝ) + ph ((r0 : ℕ) : ℝ) + ∑ i : Fin n, ph ((w + c i : ℕ) : ℝ)
+            + phRows blk := by
       rw [phRows_cons, phRows_cons, phRows_add, phRows_univ]
       ring
     have hfa' : ∑ i : Fin (n + 1), ph ((r i : ℕ) : ℝ) ≤ fa := le_trans (sum_ph_le_logFact r sm) hfa
-    have hfa2 : ∑ i : Fin (n + 1), ph ((r i : ℕ) : ℝ) =
-        ph ((r 0 : ℕ) : ℝ) + ∑ i : Fin n, ph ((r i.succ : ℕ) : ℝ) := Fin.sum_univ_succ _
-    have hpair : ∀ i : Fin n, ph ((w + c i : ℕ) : ℝ) - ph ((r i.succ : ℕ) : ℝ) ≤
-        ((c i : ℝ) - c' i.succ) * Real.log A + sh * Real.log A := by
+    have hfa2
+        : ∑ i : Fin (n + 1), ph ((r i : ℕ) : ℝ)
+          = ph ((r 0 : ℕ) : ℝ) + ∑ i : Fin n, ph ((r i.succ : ℕ) : ℝ) :=
+      Fin.sum_univ_succ _
+    have hpair
+        : ∀ i : Fin n,
+          ph ((w + c i : ℕ) : ℝ) - ph ((r i.succ : ℕ) : ℝ)
+            ≤ ((c i : ℝ) - c' i.succ) * Real.log A + sh * Real.log A := by
       intro i
       obtain ⟨h1a, h1b⟩ := abs_le.mp (hr i.succ)
       have h2 : (c' i.succ : ℝ) ≤ c i := (hI.2 i).2
@@ -307,15 +318,17 @@ theorem young_diagram_factorial : RowsFactorial := by
         constructor <;> linarith
       have := pair_abs (w + c i) (r i.succ) (log_nat_le _ hLa (hcA _)) hLa hd
       linarith
-    have hsum : ∑ i : Fin n, ph ((w + c i : ℕ) : ℝ) - ∑ i : Fin n, ph ((r i.succ : ℕ) : ℝ) ≤
-        (∑ i : Fin n, ((c i : ℝ) - c' i.succ)) * Real.log A + (n : ℝ) * (sh * Real.log A) := by
+    have hsum
+        : ∑ i : Fin n, ph ((w + c i : ℕ) : ℝ) - ∑ i : Fin n, ph ((r i.succ : ℕ) : ℝ)
+          ≤ (∑ i : Fin n, ((c i : ℝ) - c' i.succ)) * Real.log A + (n : ℝ) * (sh * Real.log A) := by
       rw [← Finset.sum_sub_distrib]
       refine le_trans (Finset.sum_le_sum fun i _ => hpair i) (le_of_eq ?_)
       rw [Finset.sum_add_distrib, ← Finset.sum_mul, Finset.sum_const, Finset.card_univ,
         Fintype.card_fin, nsmul_eq_mul]
     have htel : ∑ i : Fin n, ((c i : ℝ) - c' i.succ) ≤ S := telescope' hI
     have hmul := mul_le_mul_of_nonneg_right htel hL0
-    have hrest := ph_add_ph_sub_add_phRows_le_ph_add_log_mul (rz := r 0) hLa haT hr0 (by linarith) hblk hBl
+    have hrest :=
+      ph_add_ph_sub_add_phRows_le_ph_add_log_mul (rz := r 0) hLa haT hr0 (by linarith) hblk hBl
     linarith
 
 private lemma cast_sum_map_add_offset_eq {n w : ℕ} (c : Fin (n + 1) → ℕ) (blk : Multiset ℕ) :
@@ -343,8 +356,7 @@ theorem young_diagram_period : RowsPeriod := by
     subst hν
     have hs := cast_sum_map_add_offset_eq (w := w) c blk
     have hcS : ∑ i, (c i : ℝ) ≤ ((n : ℝ) + 1) * S := by
-      have h := Finset.sum_le_sum fun i (_ : i ∈ (Finset.univ : Finset (Fin (n + 1)))) =>
-        (hI.1 i).2
+      have h := Finset.sum_le_sum fun i (_ : i ∈ (Finset.univ : Finset (Fin (n + 1)))) => (hI.1 i).2
       simpa using h
     have hc0 : 0 ≤ ∑ i, (c i : ℝ) := Finset.sum_nonneg fun i _ => Nat.cast_nonneg _
     have hb0 : (0 : ℝ) ≤ blk.sum := Nat.cast_nonneg _
@@ -353,8 +365,9 @@ theorem young_diagram_period : RowsPeriod := by
     subst hν
     have hs := cast_sum_cons_cons_map_add_offset_eq (aT := aT) (w := w) (r0 := r0) c blk
     have hcS : ∑ i, (c i : ℝ) ≤ (n : ℝ) * S := by
-      have h := Finset.sum_le_sum fun i (_ : i ∈ (Finset.univ : Finset (Fin n))) =>
-        le_trans (hI.2 i).1 (hI.1 i.castSucc).2
+      have h :=
+        Finset.sum_le_sum fun i (_ : i ∈ (Finset.univ : Finset (Fin n))) =>
+          le_trans (hI.2 i).1 (hI.1 i.castSucc).2
       simpa using h
     have hc0 : 0 ≤ ∑ i, (c i : ℝ) := Finset.sum_nonneg fun i _ => Nat.cast_nonneg _
     have hb0 : (0 : ℝ) ≤ blk.sum := Nat.cast_nonneg _
@@ -373,14 +386,17 @@ private lemma prod_range_sub_eq_factorial' (n : ℕ) : ∏ j ∈ Finset.range n,
 
 theorem young_diagram_hook : RowsHook := by
   intro μ
-  have hcell : ∀ p : ℕ × ℕ, p ∈ μ.cells ↔
-      p.1 ∈ Finset.range (μ.colLen 0) ∧ p.2 ∈ Finset.range (μ.rowLen p.1) := by
+  have hcell
+      : ∀ p : ℕ × ℕ,
+        p ∈ μ.cells ↔ p.1 ∈ Finset.range (μ.colLen 0) ∧ p.2 ∈ Finset.range (μ.rowLen p.1) := by
     rintro ⟨i, j⟩
     simp only [YoungDiagram.mem_cells, Finset.mem_range]
     constructor
     · intro h
-      exact ⟨YoungDiagram.mem_iff_lt_colLen.mp (μ.up_left_mem le_rfl (Nat.zero_le j) h),
-        YoungDiagram.mem_iff_lt_rowLen.mp h⟩
+      exact ⟨
+        YoungDiagram.mem_iff_lt_colLen.mp (μ.up_left_mem le_rfl (Nat.zero_le j) h),
+        YoungDiagram.mem_iff_lt_rowLen.mp h
+      ⟩
     · intro h
       exact YoungDiagram.mem_iff_lt_rowLen.mpr h.2
   have hle : ∏ x ∈ μ.cells, (μ.rowLen x.1 - x.2) ≤ Formalism.LatticeIndexTer.hookProd μ := by
@@ -390,21 +406,25 @@ theorem young_diagram_hook : RowsHook := by
     have h1 : i < μ.colLen j := YoungDiagram.mem_iff_lt_colLen.mp h
     show μ.rowLen i - j ≤ μ.rowLen i - j + (μ.colLen j - i) - 1
     omega
-  have heq : ∏ x ∈ μ.cells, (μ.rowLen x.1 - x.2) =
-      ∏ i ∈ Finset.range (μ.colLen 0), (μ.rowLen i).factorial := by
+  have heq
+      : ∏ x ∈ μ.cells, (μ.rowLen x.1 - x.2)
+        = ∏ i ∈ Finset.range (μ.colLen 0), (μ.rowLen i).factorial := by
     rw [Finset.prod_finset_product μ.cells (Finset.range (μ.colLen 0))
-      (fun i => Finset.range (μ.rowLen i)) hcell]
+      (fun i => Finset.range (μ.rowLen i))
+      hcell]
     exact Finset.prod_congr rfl fun i _ => prod_range_sub_eq_factorial' (μ.rowLen i)
   have hpos : 0 < ∏ i ∈ Finset.range (μ.colLen 0), (μ.rowLen i).factorial :=
     Finset.prod_pos fun i _ => Nat.factorial_pos _
-  have hlog : logFactRows (μ.rowLens : Multiset ℕ) =
-      ∑ i ∈ Finset.range (μ.colLen 0), Real.log ((μ.rowLen i).factorial : ℝ) := by
+  have hlog
+      : logFactRows (μ.rowLens : Multiset ℕ)
+        = ∑ i ∈ Finset.range (μ.colLen 0), Real.log ((μ.rowLen i).factorial : ℝ) := by
     unfold logFactRows YoungDiagram.rowLens
     rw [Multiset.map_coe, List.map_map]
     rfl
-  rw [hlog, ← Real.log_prod (s := Finset.range (μ.colLen 0))
-    (f := fun i => ((μ.rowLen i).factorial : ℝ))
-    (fun i _ => (Nat.cast_pos.mpr (Nat.factorial_pos _)).ne'),
+  rw [hlog,
+    ← Real.log_prod (s := Finset.range (μ.colLen 0))
+      (f := fun i => ((μ.rowLen i).factorial : ℝ))
+      (fun i _ => (Nat.cast_pos.mpr (Nat.factorial_pos _)).ne'),
     ← Nat.cast_prod]
   apply Real.log_le_log (by exact_mod_cast hpos)
   exact_mod_cast heq.symm.le.trans hle
@@ -483,35 +503,43 @@ theorem young_diagram_step : RowsStepE := by
   have hk0 : 0 ≤ k := by
     rw [hk]
     positivity
-  refine ⟨fun j ρ => phRows (ν j ρ) - fa j ρ - (if ρ ∈ TT then ph (aT ρ : ℝ) else 0),
+  refine ⟨
+    fun j ρ => phRows (ν j ρ) - fa j ρ - (if ρ ∈ TT then ph (aT ρ : ℝ) else 0),
     fun j ρ => ((ν j ρ).sum : ℝ) - (if ρ ∈ TT then (aT ρ : ℝ) else 0) - k * (w j ρ : ℝ),
-    fun j ρ => by dsimp only; linarith, fun j ρ => by dsimp only; ring, fun j ρ => ?_, fun j ρ => ?_⟩
+    fun j ρ => by dsimp only; linarith,
+    fun j ρ => by dsimp only; ring,
+    fun j ρ => ?_,
+    fun j ρ => ?_
+  ⟩
   · dsimp only
     by_cases hρ : ρ ∈ TT
     · rw [if_pos hρ]
       have hT := htop j ρ hρ
       have h0 := top_nonneg hT
-      have hF := (young_diagram_factorial n (w j ρ) Sc (m * (t + 1) * η) (cs * N) (a * rd) La (fa j ρ)
-        (ν j ρ) (ap j ρ) hLa hLa1 (hwA j ρ) hBlA (hfa j ρ)).2 (aT ρ) (haTA j ρ hρ) hT
-      have hA := arith_fact_top (w := (w j ρ : ℝ)) (n := (n : ℝ)) (Nat.cast_nonneg _) h0.1 h0.2
-        (Nat.cast_nonneg _) hk hkN hcs hC2 hCcs hSc hLa1
+      have hF :=
+        (young_diagram_factorial n (w j ρ) Sc (m * (t + 1) * η) (cs * N) (a * rd) La (fa j ρ)
+          (ν j ρ) (ap j ρ) hLa hLa1 (hwA j ρ) hBlA (hfa j ρ)).2 (aT ρ) (haTA j ρ hρ) hT
+      have hA :=
+        arith_fact_top (w := (w j ρ : ℝ)) (n := (n : ℝ)) (Nat.cast_nonneg _) h0.1 h0.2
+          (Nat.cast_nonneg _) hk hkN hcs hC2 hCcs hSc hLa1
       linarith
     · rw [if_neg hρ]
       have hO := hoff j ρ hρ
       have h0 := off_nonneg hO
-      have hF := (young_diagram_factorial (n + 1) (w j ρ) Sc (m * (t + 1) * η) (cs * N) (a * rd) La
-        (fa j ρ) (ν j ρ) (ap j ρ) hLa hLa1 (hwA j ρ) hBlA (hfa j ρ)).1 hO
-      have hA := arith_fact_off (w := (w j ρ : ℝ)) (n := ((n + 1 : ℕ) : ℝ)) (k := k)
-        (Nat.cast_nonneg _) h0.1 h0.2 (Nat.cast_nonneg _) (by push_cast; linarith) hkN hcs hC2
-        hCcs hSc hLa1
+      have hF :=
+        (young_diagram_factorial (n + 1) (w j ρ) Sc (m * (t + 1) * η) (cs * N) (a * rd) La (fa j ρ)
+          (ν j ρ) (ap j ρ) hLa hLa1 (hwA j ρ) hBlA (hfa j ρ)).1 hO
+      have hA :=
+        arith_fact_off (w := (w j ρ : ℝ)) (n := ((n + 1 : ℕ) : ℝ)) (k := k) (Nat.cast_nonneg _) h0.1
+          h0.2 (Nat.cast_nonneg _) (by push_cast; linarith) hkN hcs hC2 hCcs hSc hLa1
       linarith
   · dsimp only
     by_cases hρ : ρ ∈ TT
     · rw [if_pos hρ, if_pos hρ]
       have hT := htop j ρ hρ
       have h0 := top_nonneg hT
-      have hP := (young_diagram_period n (w j ρ) Sc (m * (t + 1) * η) (cs * N) (ν j ρ) (ap j ρ)).2
-        (aT ρ) hT
+      have hP :=
+        (young_diagram_period n (w j ρ) Sc (m * (t + 1) * η) (cs * N) (ν j ρ) (ap j ρ)).2 (aT ρ) hT
       have hX : 0 ≤ k * b' := mul_nonneg hk0 hb'
       have e1 : k * (w j ρ : ℝ) = ((n : ℝ) + 2) * (w j ρ : ℝ) := by rw [hk]
       obtain ⟨hP1, hP2⟩ := hP
@@ -520,8 +548,8 @@ theorem young_diagram_step : RowsStepE := by
     · rw [if_neg hρ, if_neg hρ]
       have hO := hoff j ρ hρ
       have h0 := off_nonneg hO
-      have hP := (young_diagram_period (n + 1) (w j ρ) Sc (m * (t + 1) * η) (cs * N) (ν j ρ)
-        (ap j ρ)).1 hO
+      have hP :=
+        (young_diagram_period (n + 1) (w j ρ) Sc (m * (t + 1) * η) (cs * N) (ν j ρ) (ap j ρ)).1 hO
       have e1 : k * (w j ρ : ℝ) = (((n + 1 : ℕ) : ℝ) + 1) * (w j ρ : ℝ) := by
         rw [hk]
         push_cast

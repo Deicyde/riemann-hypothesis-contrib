@@ -98,8 +98,10 @@ private lemma fin_doset {X M : Type} [Group X] [Group M] (T : TyLev X M) (h : X)
 
 theorem pTfAdm : TfAdm := by
   intro X M _ _ T h _
-  have hlr : ∀ k (hk : k ∈ T.K) g, T.tf h (k * g) = (((T.ψ ⟨T.L.pr k, T.fact.2 k hk⟩)⁻¹ : ℂˣ) : ℂ) * T.tf h g ∧
-      T.tf h (g * k) = (((T.ψ ⟨T.L.pr k, T.fact.2 k hk⟩)⁻¹ : ℂˣ) : ℂ) * T.tf h g := by
+  have hlr
+      : ∀ k (hk : k ∈ T.K) g,
+        T.tf h (k * g) = (((T.ψ ⟨T.L.pr k, T.fact.2 k hk⟩)⁻¹ : ℂˣ) : ℂ) * T.tf h g
+          ∧ T.tf h (g * k) = (((T.ψ ⟨T.L.pr k, T.fact.2 k hk⟩)⁻¹ : ℂˣ) : ℂ) * T.tf h g := by
     intro k hk g
     constructor
     · unfold TyLev.tf
@@ -127,7 +129,8 @@ theorem pTfAdm : TfAdm := by
     rw [dite_eq_right hn]
     simp
   · intro j g
-    have e : (⟨T.L.pr (T.L.loc j), T.fact.2 _ (T.fact.1 j j.2)⟩ : T.J) = j := Subtype.ext (T.L.pr_loc j)
+    have e : (⟨T.L.pr (T.L.loc j), T.fact.2 _ (T.fact.1 j j.2)⟩ : T.J) = j :=
+      Subtype.ext (T.L.pr_loc j)
     rw [(hlr _ (T.fact.1 j j.2) g).2, e]
 
 end UpperTheory.Gal.W2.Seed

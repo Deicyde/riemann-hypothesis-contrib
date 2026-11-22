@@ -14,9 +14,12 @@ public import ReciprocityTheory.DualLattices.CokernelLengthComparisonOf
 
 namespace ReciprocityTheory.PGsh.Up
 
-theorem wdet_of_smith_normal_form (hS : EigenQuotientSmithStatement) : CokernelLengthComparisonStatement :=
-  cokernelLengthComparison_of wdetLen (wdetDegree_of_smith_restrict hS restrict_hopfOrder_length restrictedHopfOrderApproximation)
+theorem wdet_of_smith_normal_form (hS : EigenQuotientSmithStatement)
+    : CokernelLengthComparisonStatement :=
+  cokernelLengthComparison_of wdetLen
+    (wdetDegree_of_smith_restrict hS restrict_hopfOrder_length restrictedHopfOrderApproximation)
 
-theorem u6 : CokernelLengthComparisonStatement := wdet_of_smith_normal_form smith_normal_form_statement
+theorem u6 : CokernelLengthComparisonStatement :=
+  wdet_of_smith_normal_form smith_normal_form_statement
 
 end ReciprocityTheory.PGsh.Up

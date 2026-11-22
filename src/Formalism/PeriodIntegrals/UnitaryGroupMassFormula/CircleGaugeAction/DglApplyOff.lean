@@ -132,8 +132,8 @@ lemma dgl_norm {u : ℂ} (h : dgl r u ∈ UWb 0 r) : (starRingEnd ℂ) u * u = 1
   rw [show (starRingEnd ℂ) u = star u from rfl]
   linear_combination -h1
 
-theorem mem_UWb_iff (g : Mat 0 r) :
-    g ∈ UWb 0 r ↔ ∃ u : ℂ, (starRingEnd ℂ) u * u = 1 ∧ g = dgl r u := by
+theorem mem_UWb_iff (g : Mat 0 r)
+    : g ∈ UWb 0 r ↔ ∃ u : ℂ, (starRingEnd ℂ) u * u = 1 ∧ g = dgl r u := by
   constructor
   · intro hg
     have e := eq_dgl hg

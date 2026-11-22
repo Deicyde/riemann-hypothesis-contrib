@@ -11,16 +11,16 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace KLinesGenIndexTrans
 
-theorem toAddSubgroup_span {V : Type} [AddCommGroup V] (s : Set V) :
-    (Submodule.span ℤ s).toAddSubgroup = AddSubgroup.closure s :=
+theorem toAddSubgroup_span {V : Type} [AddCommGroup V] (s : Set V)
+    : (Submodule.span ℤ s).toAddSubgroup = AddSubgroup.closure s :=
   Submodule.span_int_eq_addSubgroupClosure s
 
 end KLinesGenIndexTrans
 
-
 open KLinesGenIndexTrans in
-theorem LinesGenIndexTrans.proof (h1 : LinesLatticeBasis.Statement)
-    (h2 : LinesGenIndexDet.Statement) : LinesGenIndexTrans.Statement := by
+theorem LinesGenIndexTrans.proof
+    (h1 : LinesLatticeBasis.Statement) (h2 : LinesGenIndexDet.Statement)
+    : LinesGenIndexTrans.Statement := by
   intro V _ _ _ A B C hA hB hC
   classical
   obtain ⟨bA, rfl⟩ := h1 V (Fin (Module.finrank ℚ V)) (Fintype.card_fin _) A hA

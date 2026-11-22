@@ -18,15 +18,16 @@ section General
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem IsCMType.bijective {I : Type} {φ : I → E →+* ℂ} (h : IsCMType φ) :
-    Function.Bijective (fun i => InfinitePlace.mk (φ i)) := by
+theorem IsCMType.bijective {I : Type} {φ : I → E →+* ℂ} (h : IsCMType φ)
+    : Function.Bijective (fun i => InfinitePlace.mk (φ i)) := by
   refine ⟨fun i j hij => ?_, fun w => ?_⟩
   · obtain ⟨k, -, hk⟩ := h (φ j)
     have h1 : j = k := hk j (Or.inl rfl)
-    have h2 : i = k := hk i (by
-      rcases InfinitePlace.mk_eq_iff.1 hij with e | e
-      · exact Or.inl e.symm
-      · exact Or.inr e.symm)
+    have h2 : i = k :=
+      hk i (by
+        rcases InfinitePlace.mk_eq_iff.1 hij with e | e
+        · exact Or.inl e.symm
+        · exact Or.inr e.symm)
     rw [h1, h2]
   · obtain ⟨i, hi, -⟩ := h w.embedding
     refine ⟨i, ?_⟩
@@ -61,7 +62,6 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 end CM
 
 section Cyclotomic
-
 
 end Cyclotomic
 

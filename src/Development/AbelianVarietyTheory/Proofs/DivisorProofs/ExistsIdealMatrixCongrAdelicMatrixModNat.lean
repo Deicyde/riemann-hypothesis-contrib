@@ -8,17 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmFiniteA
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
-open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum GlobalTheory.NormSum GlobalTheory.FunObj.StdDatum
+open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
+  GlobalTheory.NormSum GlobalTheory.FunObj.StdDatum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
 
 noncomputable section
 
 namespace GlobalTheory.FunObj.CosetApprox
 
-theorem exists_mem_approx (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (m : ℕ) (hm : 0 < m) (y : AE D)
-    (hy : y ∈ hatId D 𝔪) : ∃ b ∈ 𝔪, ∃ t ∈ IhE D ⊤, inc D (b : D.host.E) - y = (m : AE D) * t := by
+theorem exists_mem_approx
+    (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (m : ℕ) (hm : 0 < m) (y : AE D) (hy : y ∈ hatId D 𝔪)
+    : ∃ b ∈ 𝔪, ∃ t ∈ IhE D ⊤, inc D (b : D.host.E) - y = (m : AE D) * t := by
   induction hy using AddSubgroup.closure_induction with
   | mem x hx =>
     obtain ⟨b, hb, s, hs, rfl⟩ := hx
@@ -37,7 +40,8 @@ theorem exists_mem_approx (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (m : ℕ) (hm 
     · have hc : ((b * r' : 𝓞 D.host.E) : D.host.E) = (b : D.host.E) * r := rfl
       rw [hc, map_mul, e]
       ring
-  | zero => exact ⟨0, zero_mem _, 0, zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, zero_mem _, 0, zero_mem _, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨b, hb, t, ht, e⟩ := hx
     obtain ⟨b', hb', t', ht', e'⟩ := hy
@@ -52,13 +56,21 @@ theorem exists_mem_approx (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (m : ℕ) (hm 
     rw [map_neg]
     linear_combination -e
 
-theorem matrix_approx : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) {a d : ℕ} (Y : Matrix (Fin d) (Fin a) (AE D)),
-    (∀ i j, Y i j ∈ hatId D 𝔪) → ∀ m : ℕ, 0 < m → ∃ w : Matrix (Fin d) (Fin a) D.host.E,
-      (∀ i j, ∃ b ∈ 𝔪, w i j = (b : D.host.E)) ∧ ∀ i j, ∃ y ∈ IhE D ⊤, (w.map (inc D) - Y) i j = (m : AE D) * y := by
+theorem matrix_approx
+    : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) {a d : ℕ} (Y : Matrix (Fin d) (Fin a) (AE D)),
+      (∀ i j, Y i j ∈ hatId D 𝔪)
+        → ∀ m : ℕ,
+          0 < m
+            → ∃ w : Matrix (Fin d) (Fin a) D.host.E,
+              (∀ i j, ∃ b ∈ 𝔪, w i j = (b : D.host.E))
+                ∧ ∀ i j, ∃ y ∈ IhE D ⊤, (w.map (inc D) - Y) i j = (m : AE D) * y := by
   intro D 𝔪 a d Y hY m hm
   choose b hb t ht e using fun i j => exists_mem_approx D 𝔪 m hm (Y i j) (hY i j)
-  refine ⟨Matrix.of fun i j => ((b i j : 𝓞 D.host.E) : D.host.E), fun i j => ⟨b i j, hb i j, rfl⟩,
-    fun i j => ⟨t i j, ht i j, ?_⟩⟩
+  refine ⟨
+    Matrix.of fun i j => ((b i j : 𝓞 D.host.E) : D.host.E),
+    fun i j => ⟨b i j, hb i j, rfl⟩,
+    fun i j => ⟨t i j, ht i j, ?_⟩
+  ⟩
   simpa using e i j
 
 end GlobalTheory.FunObj.CosetApprox

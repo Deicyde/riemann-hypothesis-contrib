@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjuga
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -17,9 +18,12 @@ namespace PositivityTheory.Rg.BcB.F.Inert
 
 namespace UniformizerValuation
 
-theorem ordL_eq_one {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {x : L}
-    (hx : Valued.v x = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ))) :
-    ordL x = 1 := by
+theorem ordL_eq_one
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    {x : L}
+    (hx : Valued.v x
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+    : ordL x = 1 := by
   unfold ordL
   have h0 : Valued.v x ≠ 0 := by rw [hx]; exact WithZero.coe_ne_zero
   rw [dite_eq_right h0]
@@ -34,7 +38,9 @@ theorem unifEx : UnifEx := by
   intro E _ _ _ hU w hw
   obtain ⟨-, -, -, h4, -⟩ := GlobalTheory.T.placeConjugation_properties_cmField E hU w
   obtain ⟨ϖ, q, hI, -⟩ := (h4 hw).2.1
-  have hv : Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) :=
+  have hv
+      : Valued.v ϖ
+        = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) :=
     hI.2.2.2.1
   have h0 : ϖ ≠ 0 := by
     intro h

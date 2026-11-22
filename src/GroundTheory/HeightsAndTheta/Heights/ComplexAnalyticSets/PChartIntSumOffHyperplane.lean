@@ -14,15 +14,21 @@ open MvPolynomial MeasureTheory Filter Topology Matrix ComplexSets
 
 noncomputable section
 
-theorem ChartIntSumOffHyperplane.proof (hFB : FibreBound.Statement)
-    (hCN : ChartChangeSheetNull.Statement) : ChartIntSumOffHyperplane.Statement := by
+theorem ChartIntSumOffHyperplane.proof
+    (hFB : FibreBound.Statement) (hCN : ChartChangeSheetNull.Statement)
+    : ChartIntSumOffHyperplane.Statement := by
   intro n d J A u m f F φ hJ hdim hA hu hf hint
 
-  have hnull := hCN n d J J A A u u Set.univ Set.univ id id hJ hdim hJ hdim hu hu hA hA isOpen_univ
-    isOpen_univ (Set.subset_univ _) (Set.subset_univ _) differentiableOn_id differentiableOn_id
-    (fun x hx => hx) (fun x hx => hx) (fun x _ => rfl) (fun x _ => rfl)
-  have hae : ∀ᵐ y ∂(volume : Measure (Fin d → ℂ)),
-      chartDens J A f φ y = ∑ b, chartDens J A (F b) φ y := by
+  have hnull :=
+    hCN n d J J A A u u Set.univ Set.univ id id hJ hdim hJ hdim hu hu hA hA isOpen_univ isOpen_univ
+      (Set.subset_univ _) (Set.subset_univ _) differentiableOn_id differentiableOn_id
+      (fun x hx => hx)
+      (fun x hx => hx)
+      (fun x _ => rfl)
+      (fun x _ => rfl)
+  have hae
+      : ∀ᵐ y ∂(volume : Measure (Fin d → ℂ)),
+        chartDens J A f φ y = ∑ b, chartDens J A (F b) φ y := by
     filter_upwards [measure_eq_zero_iff_ae_notMem.1 hnull] with y hy
     have hfin : (fibre J A y).Finite := (hFB n d J A hJ hdim hA y).2.1
     simp only [chartDens, sheetSum]
@@ -37,7 +43,9 @@ theorem ChartIntSumOffHyperplane.proof (hFB : FibreBound.Statement)
         exact hy ⟨x, ⟨hx.1, hs, fun h => h.1 h0⟩, hx.2⟩
       rw [hf x hx.1 hux, Finset.sum_mul]
     · simp
-  calc chartInt J A f φ = ∫ y, ∑ b, chartDens J A (F b) φ y := integral_congr_ae hae
+  calc
+    chartInt J A f φ
+      = ∫ y, ∑ b, chartDens J A (F b) φ y := integral_congr_ae hae
     _ = ∑ b, chartInt J A (F b) φ := integral_finsetSum _ fun b _ => hint b
 
 end

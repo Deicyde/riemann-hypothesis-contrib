@@ -21,7 +21,8 @@ def ev2 : List ι → k
   | [x, y] => c x y
   | _ => 0
 
-variable (F : Fin d → PS k 2 d) (u : ι → Fin d → k) (q : PS k 1 d)
+variable
+  (F : Fin d → PS k 2 d) (u : ι → Fin d → k) (q : PS k 1 d)
   (hq0 : constantCoeff q = 0) (hq1 : ∀ l, constantCoeff (Dof F (u l) q) = 0)
   (hq2 : ∀ l l', Dof F (u l) (Dof F (u l') q) = C (c l l'))
 include hq2
@@ -53,9 +54,9 @@ theorem cc_T_q (b : List ι) : constantCoeff (T F u b q) = ev2 c b := by
   · rw [T_q_long c F u q hq2 _ (by simp), map_zero]
     rfl
 
-theorem cc_T_mul_q (w : List ι) (A : PS k 1 d) :
-    constantCoeff (T F u w (A * q)) =
-      ((splits w).map (fun p => constantCoeff (T F u p.1 A) * ev2 c p.2)).sum := by
+theorem cc_T_mul_q (w : List ι) (A : PS k 1 d)
+    : constantCoeff (T F u w (A * q))
+      = ((splits w).map (fun p => constantCoeff (T F u p.1 A) * ev2 c p.2)).sum := by
   rw [T_mul, map_list_sum, List.map_map]
   congr 1
   apply List.map_congr_left

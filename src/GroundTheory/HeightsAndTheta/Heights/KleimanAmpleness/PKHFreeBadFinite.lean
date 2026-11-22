@@ -9,13 +9,15 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Kleiman
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry KHFree
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry KHFree
 
 noncomputable section
 
 theorem KHFreeBadFinite.full : KHFreeBadFinite.Statement := by
   intro K _ ι _ e
-  refine (Set.Finite.pi (t := fun p : (Σ k, ι k) => Set.Icc (-|e p.1|) |e p.1|)
+  refine (Set.Finite.pi
+    (t := fun p : (Σ k, ι k) => Set.Icc (- |e p.1|) |e p.1|)
     (fun p => Set.finite_Icc _ _)).subset ?_
   rintro a ⟨hsum, hneg⟩ ⟨k, i⟩ -
   show a ⟨k, i⟩ ∈ Set.Icc (-|e k|) |e k|
@@ -37,8 +39,10 @@ theorem KHFreeBadFinite.full : KHFreeBadFinite.Statement := by
       intro j
       have hj : j ∈ negSet a k := by rw [h]; exact Finset.mem_univ j
       simpa [negSet] using hj
-    have h1 : -a ⟨k, i⟩ ≤ ∑ j, -a ⟨k, j⟩ :=
-      Finset.single_le_sum (f := fun j => -a ⟨k, j⟩) (fun j _ => by linarith [hng j])
+    have h1 : - a ⟨k, i⟩ ≤ ∑ j, -a ⟨k, j⟩ :=
+      Finset.single_le_sum
+        (f := fun j => - a ⟨k, j⟩)
+        (fun j _ => by linarith [hng j])
         (Finset.mem_univ i)
     rw [Finset.sum_neg_distrib] at h1
     rw [abs_of_neg (hng i)]

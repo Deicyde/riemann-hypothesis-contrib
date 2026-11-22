@@ -21,18 +21,22 @@ theorem prime_order_element : RationalMatrixPrimeOrderBound := by
     rw [Polynomial.cyclotomic_prime_mul_X_sub_one ℚ p]
     apply minpoly.dvd
     simp [hA]
-  have hirr : Irreducible (Polynomial.cyclotomic p ℚ) := Polynomial.cyclotomic.irreducible_rat hp.pos
+  have hirr : Irreducible (Polynomial.cyclotomic p ℚ) :=
+    Polynomial.cyclotomic.irreducible_rat hp.pos
 
   have hcd : Polynomial.cyclotomic p ℚ ∣ minpoly ℚ A := by
     by_contra hnd
-    have hcop : IsCoprime (Polynomial.cyclotomic p ℚ) (minpoly ℚ A) := hirr.coprime_iff_not_dvd.2 hnd
+    have hcop : IsCoprime (Polynomial.cyclotomic p ℚ) (minpoly ℚ A) :=
+      hirr.coprime_iff_not_dvd.2 hnd
     have hX : minpoly ℚ A ∣ Polynomial.X - 1 := hcop.symm.dvd_of_dvd_mul_left hdvd
     apply h1
     have h0 := Polynomial.aeval_eq_zero_of_dvd_aeval_eq_zero hX (minpoly.aeval ℚ A)
     simpa [sub_eq_zero] using h0
   have hle1 := Polynomial.natDegree_le_of_dvd hcd hm0
   have hle2 : (minpoly ℚ A).natDegree ≤ n := by
-    have := Polynomial.natDegree_le_of_dvd (Matrix.minpoly_dvd_charpoly A) (Matrix.charpoly_monic A).ne_zero
+    have :=
+      Polynomial.natDegree_le_of_dvd (Matrix.minpoly_dvd_charpoly A)
+        (Matrix.charpoly_monic A).ne_zero
     rwa [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin] at this
   rw [Polynomial.natDegree_cyclotomic, Nat.totient_prime hp] at hle1
   omega
@@ -45,13 +49,15 @@ section
 variable {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 variable {M : Type} [AddCommGroup M] [Module R M]
 
-
 set_option maxHeartbeats 800000 in
-theorem length_quotient_bound_general (ϖ : R) (hϖ : Irreducible ϖ) (S S0 B : Submodule R M) (U D : M →ₗ[R] M)
-    (e : ℕ) (hSB : S0 ≤ B) (hU : B.map U ≤ S) (hD : S.map D ≤ B)
-    (hUD : ∀ s ∈ S, U (D s) = ϖ ^ e • s) [Module.Free R S] [Module.Finite R S] :
-    Module.length R (S ⧸ (S0.map U).comap S.subtype) ≤
-      Module.length R (B ⧸ S0.comap B.subtype) + (e * Module.finrank R S : ℕ) := by
+theorem length_quotient_bound_general
+    (ϖ : R) (hϖ : Irreducible ϖ)
+    (S S0 B : Submodule R M)
+    (U D : M →ₗ[R] M) (e : ℕ)
+    (hSB : S0 ≤ B) (hU : B.map U ≤ S) (hD : S.map D ≤ B) (hUD : ∀ s ∈ S, U (D s) = ϖ ^ e • s)
+    [Module.Free R S] [Module.Finite R S]
+    : Module.length R (S ⧸ (S0.map U).comap S.subtype)
+      ≤ Module.length R (B ⧸ S0.comap B.subtype) + (e * Module.finrank R S : ℕ) := by
   classical
   set T1 : Submodule R S := (S0.map U).comap S.subtype with hT1
   set T2 : Submodule R S := (B.map U).comap S.subtype with hT2
@@ -70,7 +76,8 @@ theorem length_quotient_bound_general (ϖ : R) (hϖ : Irreducible ϖ) (S S0 B : 
     exact ⟨D x, hD (Submodule.mem_map_of_mem x.2), hUD x x.2⟩
 
   have hlen1 : Module.length R Q ≤ Module.length R (B ⧸ S0.comap B.subtype) := by
-    let uB : B →ₗ[R] S := (U.domRestrict B).codRestrict S (fun b => hU (Submodule.mem_map_of_mem b.2))
+    let uB : B →ₗ[R] S :=
+      (U.domRestrict B).codRestrict S (fun b => hU (Submodule.mem_map_of_mem b.2))
     have huB : ∀ b : B, uB b ∈ T2 := fun b => by
       rw [hT2, Submodule.mem_comap]
       exact ⟨b, b.2, rfl⟩

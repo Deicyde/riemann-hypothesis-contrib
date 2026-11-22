@@ -5,16 +5,20 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Transl
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H GlobalTheory.IndefiniteRowSideFullHecke.JetSumTable GlobalTheory.MomT
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H
+  GlobalTheory.IndefiniteRowSideFullHecke.JetSumTable GlobalTheory.MomT
 
 namespace GlobalTheory
 
-theorem exists_reps_sup_of_finite_quot (E : Type) [Field E] (H : Type) [AddCommGroup H]
-    [Module (𝓞 E) H] (Z₁ Z₀ : Submodule (𝓞 E) H) (C : AddSubgroup H)
-    (hfin : Finite (↥Z₁ ⧸ Z₀.comap Z₁.subtype)) :
-    ∃ R : Finset H, (∀ x ∈ R, x ∈ Z₁) ∧
-      (∀ x ∈ R, ∀ y ∈ R, x - y ∈ Z₀.toAddSubgroup ⊔ C → x = y) ∧
-      ∀ y ∈ Z₁, ∃ x ∈ R, y - x ∈ Z₀.toAddSubgroup ⊔ C := by
+theorem exists_reps_sup_of_finite_quot
+    (E : Type) [Field E]
+    (H : Type) [AddCommGroup H] [Module (𝓞 E) H]
+    (Z₁ Z₀ : Submodule (𝓞 E) H)
+    (C : AddSubgroup H) (hfin : Finite (↥Z₁ ⧸ Z₀.comap Z₁.subtype))
+    : ∃ R : Finset H,
+      (∀ x ∈ R, x ∈ Z₁) ∧ (∀ x ∈ R, ∀ y ∈ R, x - y ∈ Z₀.toAddSubgroup ⊔ C → x = y)
+        ∧ ∀ y ∈ Z₁, ∃ x ∈ R, y - x ∈ Z₀.toAddSubgroup ⊔ C := by
   classical
   letI := Fintype.ofFinite (↥Z₁ ⧸ Z₀.comap Z₁.subtype)
   set Z : AddSubgroup H := Z₀.toAddSubgroup ⊔ C with hZ
@@ -42,7 +46,16 @@ theorem exists_reps_sup_of_finite_quot (E : Type) [Field E] (H : Type) [AddCommG
     obtain ⟨x, hx, hxy⟩ := Finset.mem_image.1 h3
     exact ⟨x, hx, QuotientAddGroup.eq_iff_sub_mem.1 hxy.symm⟩
 
-theorem latSum_eq_sum_sum_reps : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (H : Type) [AddCommGroup H] [Module (𝓞 E) H] (Z₁ Z₀ : Submodule (𝓞 E) H) (C : AddSubgroup H) (J : Finset H), Z₀ ≤ Z₁ → C ≤ Z₁.toAddSubgroup → Finite (↥Z₁ ⧸ Z₀.comap Z₁.subtype) → IsReps Z₀.toAddSubgroup C J → ∃ R : Finset H, (∀ x ∈ R, x ∈ Z₁) ∧ ∀ (M : Type) [AddCommMonoid M] (f : H → M), (∀ x ∈ Z₁, ∀ y ∈ Z₀, f (x + y) = f x) → latSum Z₁ Z₀ f = ∑ x ∈ R, ∑ j ∈ J, f (x + j) := by
+theorem latSum_eq_sum_sum_reps
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (H : Type) [AddCommGroup H]
+        [Module (𝓞 E) H] (Z₁ Z₀ : Submodule (𝓞 E) H) (C : AddSubgroup H) (J : Finset H),
+      Z₀ ≤ Z₁ → C ≤ Z₁.toAddSubgroup → Finite (↥Z₁ ⧸ Z₀.comap Z₁.subtype)
+        → IsReps Z₀.toAddSubgroup C J
+        → ∃ R : Finset H,
+          (∀ x ∈ R, x ∈ Z₁)
+            ∧ ∀ (M : Type) [AddCommMonoid M] (f : H → M),
+              (∀ x ∈ Z₁, ∀ y ∈ Z₀, f (x + y) = f x)
+                → latSum Z₁ Z₀ f = ∑ x ∈ R, ∑ j ∈ J, f (x + j) := by
   intro E _ _ _ H _ _ Z₁ Z₀ C J h01 hC hfin hJ
   classical
   obtain ⟨R, hR, hRinj, hRsurj⟩ := exists_reps_sup_of_finite_quot E H Z₁ Z₀ C hfin
@@ -57,12 +70,12 @@ theorem latSum_eq_sum_sum_reps : ∀ (E : Type) [Field E] [NumberField E] [StarR
   symm
   refine Finset.sum_bij
     (fun p hp => (Submodule.Quotient.mk ⟨p.1 + p.2, hmem p hp⟩ : ↥Z₁ ⧸ Z₀.comap Z₁.subtype))
-    (fun _ _ => Finset.mem_univ _) ?_ ?_ ?_
+    (fun _ _ => Finset.mem_univ _)
+    ?_ ?_ ?_
   · rintro ⟨x, j⟩ hp ⟨x', j'⟩ hp' h
     obtain ⟨hx, hj⟩ := Finset.mem_product.1 hp
     obtain ⟨hx', hj'⟩ := Finset.mem_product.1 hp'
-    have h1 : x + j - (x' + j') ∈ Z₀ := by
-      simpa using (Submodule.Quotient.eq _).1 h
+    have h1 : x + j - (x' + j') ∈ Z₀ := by simpa using (Submodule.Quotient.eq _).1 h
     have h2 : x = x' := by
       refine hRinj x hx x' hx' ?_
       have : x - x' = (x + j - (x' + j')) + (j' - j) := by abel
@@ -83,7 +96,8 @@ theorem latSum_eq_sum_sum_reps : ∀ (E : Type) [Field E] [NumberField E] [StarR
     refine ⟨(x, j), Finset.mem_product.2 ⟨hx, hj⟩, (Submodule.Quotient.eq _).2 ?_⟩
     have h1 : x + j - y = -(a + (c - j)) := by
       have : y = x + (a + c) := by rw [hac]; abel
-      rw [this]; abel
+      rw [this]
+      abel
     have h2 : x + j - y ∈ Z₀ := by
       rw [h1]
       exact Z₀.neg_mem (Z₀.add_mem ha hcj)
@@ -91,11 +105,11 @@ theorem latSum_eq_sum_sum_reps : ∀ (E : Type) [Field E] [NumberField E] [StarR
   · intro p hp
     set w := Function.surjInv (Submodule.Quotient.mk_surjective (Z₀.comap Z₁.subtype))
       (Submodule.Quotient.mk ⟨p.1 + p.2, hmem p hp⟩) with hw
-    have h0 : Submodule.Quotient.mk w =
-        (Submodule.Quotient.mk ⟨p.1 + p.2, hmem p hp⟩ : ↥Z₁ ⧸ Z₀.comap Z₁.subtype) :=
+    have h0
+        : Submodule.Quotient.mk w
+          = (Submodule.Quotient.mk ⟨p.1 + p.2, hmem p hp⟩ : ↥Z₁ ⧸ Z₀.comap Z₁.subtype) :=
       Function.surjInv_eq _ _
-    have h1 : (w : H) - (p.1 + p.2) ∈ Z₀ := by
-      simpa using (Submodule.Quotient.eq _).1 h0
+    have h1 : (w : H) - (p.1 + p.2) ∈ Z₀ := by simpa using (Submodule.Quotient.eq _).1 h0
     have h2 := hf _ (hmem p hp) _ h1
     rw [← h2]
     congr 1

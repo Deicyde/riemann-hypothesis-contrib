@@ -45,8 +45,9 @@ private lemma mul_inv_rearrange_of_two_relations (Q G' G0 P R S T V W : U) (c1 :
   simp only [ofMul_mul, ofMul_inv, inv_inv]
   abel
 
-theorem hv_term (h : IsCub θ) (k : ℕ) (a M b x : A) :
-    hv θ k (a * M) b x * (θ a M b)⁻¹ * θ a x b = hv θ k M b x * (θ a (M * b ^ k) x * (θ a M (x * b))⁻¹) := by
+theorem hv_term (h : IsCub θ) (k : ℕ) (a M b x : A)
+    : hv θ k (a * M) b x * (θ a M b)⁻¹ * θ a x b
+      = hv θ k M b x * (θ a (M * b ^ k) x * (θ a M (x * b))⁻¹) := by
   have c1 := h.coc a M x b
   have c2 : θ a (M * x) b * θ a M x = θ a M (x * b) * θ a x b := by
     have e := h.coc M x b a
@@ -63,14 +64,16 @@ private lemma eq_mul_div_mul_mul_inv_of_mul_inv_mul_eq {X Y R S F1 F0 : U} (e : 
   simp only [ofMul_mul, ofMul_inv]
   abel
 
-theorem phiPow_indep (h : IsCub θ) (k : ℕ) (a b : A) :
-    (∏ i ∈ Finset.range k, hv θ k (a * (b ^ k) ^ i) b (b ^ (k - 1 - i))) * cubN θ k 1 b a *
-        (∏ i ∈ Finset.range k, θ a ((b ^ k) ^ i) b)⁻¹ =
-      ∏ i ∈ Finset.range k, hv θ k ((b ^ k) ^ i) b (b ^ (k - 1 - i)) := by
-  have hf : ∀ i ∈ Finset.range k, hv θ k (a * (b ^ k) ^ i) b (b ^ (k - 1 - i)) =
-      hv θ k ((b ^ k) ^ i) b (b ^ (k - 1 - i)) *
-        (θ a ((b ^ k) ^ (i + 1)) (b ^ (k - (i + 1))) / θ a ((b ^ k) ^ i) (b ^ (k - i))) *
-        θ a ((b ^ k) ^ i) b * (θ a (b ^ (k - 1 - i)) b)⁻¹ := by
+theorem phiPow_indep (h : IsCub θ) (k : ℕ) (a b : A)
+    : (∏ i ∈ Finset.range k, hv θ k (a * (b ^ k) ^ i) b (b ^ (k - 1 - i))) * cubN θ k 1 b a
+        * (∏ i ∈ Finset.range k, θ a ((b ^ k) ^ i) b)⁻¹
+      = ∏ i ∈ Finset.range k, hv θ k ((b ^ k) ^ i) b (b ^ (k - 1 - i)) := by
+  have hf
+      : ∀ i ∈ Finset.range k,
+        hv θ k (a * (b ^ k) ^ i) b (b ^ (k - 1 - i))
+          = hv θ k ((b ^ k) ^ i) b (b ^ (k - 1 - i))
+            * (θ a ((b ^ k) ^ (i + 1)) (b ^ (k - (i + 1))) / θ a ((b ^ k) ^ i) (b ^ (k - i)))
+            * θ a ((b ^ k) ^ i) b * (θ a (b ^ (k - 1 - i)) b)⁻¹ := by
     intro i hi
     rw [Finset.mem_range] at hi
     have e := hv_term h k a ((b ^ k) ^ i) b (b ^ (k - 1 - i))
@@ -83,14 +86,14 @@ theorem phiPow_indep (h : IsCub θ) (k : ℕ) (a b : A) :
     rw [e1, e2] at e
     rw [← e3]
     exact eq_mul_div_mul_mul_inv_of_mul_inv_mul_eq e
-  have tel : ∏ i ∈ Finset.range k,
-      (θ a ((b ^ k) ^ (i + 1)) (b ^ (k - (i + 1))) / θ a ((b ^ k) ^ i) (b ^ (k - i))) =
-      θ a ((b ^ k) ^ k) (b ^ (k - k)) / θ a ((b ^ k) ^ 0) (b ^ (k - 0)) :=
+  have tel
+      : ∏ i ∈ Finset.range k,
+          (θ a ((b ^ k) ^ (i + 1)) (b ^ (k - (i + 1))) / θ a ((b ^ k) ^ i) (b ^ (k - i)))
+        = θ a ((b ^ k) ^ k) (b ^ (k - k)) / θ a ((b ^ k) ^ 0) (b ^ (k - 0)) :=
     Finset.prod_range_div (fun j => θ a ((b ^ k) ^ j) (b ^ (k - j))) k
   have f1 : θ a ((b ^ k) ^ k) (b ^ (k - k)) = 1 := by
     rw [Nat.sub_self, pow_zero, ← cub_rot h 1 a, h.face]
-  have f0 : θ a ((b ^ k) ^ 0) (b ^ (k - 0)) = 1 := by
-    rw [pow_zero, cub_rot h a 1, h.face]
+  have f0 : θ a ((b ^ k) ^ 0) (b ^ (k - 0)) = 1 := by rw [pow_zero, cub_rot h a 1, h.face]
   have refl : ∏ i ∈ Finset.range k, θ a (b ^ (k - 1 - i)) b = ∏ i ∈ Finset.range k, θ a (b ^ i) b :=
     Finset.prod_range_reflect (fun j => θ a (b ^ j) b) k
   have cub : cubN θ k 1 b a = ∏ i ∈ Finset.range k, θ a (b ^ i) b := by

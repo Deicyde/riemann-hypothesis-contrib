@@ -28,10 +28,7 @@ open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5
 
 theorem lambda_of_lattice_holds : LamOfLat := by
   intro D cc δ hcc hδ
-  exact lattice_ideal_lattice_holds D.host.K D.host.d (discriminant_mod_four D) ⟨D.host.sqrtMinusD, br_sqrt_mem D⟩
-    (br_sqrt_sq D) (br_finrank_K D) (brPhi D) cc δ hcc hδ
-
-
-
+  exact lattice_ideal_lattice_holds D.host.K D.host.d (discriminant_mod_four D)
+    ⟨D.host.sqrtMinusD, br_sqrt_mem D⟩ (br_sqrt_sq D) (br_finrank_K D) (brPhi D) cc δ hcc hδ
 
 end Formalism.L2.Th1.F2

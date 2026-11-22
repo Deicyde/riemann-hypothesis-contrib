@@ -20,9 +20,11 @@ namespace FlagLineSectionProof
 
 variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type} {F : Type*} [Field F] {M : ℕ}
 
-theorem chartMon_not_mem {W : Ideal (MRing (bundleIdx ι M) F)} [hW : W.IsPrime] {c : ∀ k, ι k}
-    (hc : ∀ k, (X ⟨some k, c k⟩ : MRing (bundleIdx ι M) F) ∉ W) (α : K → ℕ) :
-    chartMon F M c α ∉ W := by
+theorem chartMon_not_mem
+    {W : Ideal (MRing (bundleIdx ι M) F)} [hW : W.IsPrime]
+    {c : ∀ k, ι k} (hc : ∀ k, (X ⟨some k, c k⟩ : MRing (bundleIdx ι M) F) ∉ W)
+    (α : K → ℕ)
+    : chartMon F M c α ∉ W := by
   unfold chartMon
   rw [Ideal.IsPrime.prod_mem_iff]
   rintro ⟨k, _, hk⟩
@@ -30,12 +32,13 @@ theorem chartMon_not_mem {W : Ideal (MRing (bundleIdx ι M) F)} [hW : W.IsPrime]
 
 end FlagLineSectionProof
 
-
 open FlagLineSectionProof in
 theorem FlagLineSection.proof : FlagLineSection.Statement := by
   intro F _ Ω _ _ K _ _ ι _ y e hy _ N E _ _ B w b hB M a φ hφ Φ _ _ t ht h0
-  have hXn : ∀ l : Fin M, projMap F y w φ (truncCoord t 1) (X ⟨none, l⟩) =
-      C (t ⟨0, h0⟩ * algebraMap Ω Φ (φ l (w ⟨0, h0⟩))) * X none := by
+  have hXn
+      : ∀ l : Fin M,
+        projMap F y w φ (truncCoord t 1) (X ⟨none, l⟩)
+          = C (t ⟨0, h0⟩ * algebraMap Ω Φ (φ l (w ⟨0, h0⟩))) * X none := by
     intro l
     rw [projMap_X_none, sum_truncCoord_one t h0]
   have ht0 : t ⟨0, h0⟩ ≠ 0 := fun h => ht.transcendental ⟨0, h0⟩ (h ▸ isAlgebraic_zero)
@@ -55,21 +58,35 @@ theorem FlagLineSection.proof : FlagLineSection.Statement := by
     simp [hcon] at hsum0
   have hu0 : φ l0 (w ⟨0, h0⟩) ≠ 0 := left_ne_zero_of_mul hl0
   obtain ⟨n0, A0, hA0⟩ := exists_chartForm (M := M) y w φ (truncCoord t 1) c0 hs0 (hξ0 l0)
-  obtain ⟨p, q, hpq⟩ : ∃ p q : K → ℕ, ∀ k, (p k : ℤ) - q k = -(b ⟨0, h0⟩ k - a k) - n0 :=
-    ⟨fun k => (-(b ⟨0, h0⟩ k - a k) - n0).toNat, fun k => (-(-(b ⟨0, h0⟩ k - a k) - n0)).toNat,
-      fun k => Int.toNat_sub_toNat_neg _⟩
-  have hfval : projMap F y w φ (truncCoord t 1) (X ⟨none, l0⟩ * chartMon F M c0 q) =
-      C (t ⟨0, h0⟩ * algebraMap Ω Φ (φ l0 (w ⟨0, h0⟩))) * X none *
-        (C (algebraMap Ω Φ (∏ k, y ⟨k, c0 k⟩ ^ q k)) * tMon q) := by
+  obtain ⟨p, q, hpq⟩ : ∃ p q : K → ℕ, ∀ k, (p k : ℤ) - q k = -(b ⟨0, h0⟩ k - a k) - n0 := ⟨
+    fun k => (-(b ⟨0, h0⟩ k - a k) - n0).toNat,
+    fun k => (-(-(b ⟨0, h0⟩ k - a k) - n0)).toNat,
+    fun k => Int.toNat_sub_toNat_neg _
+  ⟩
+  have hfval
+      : projMap F y w φ (truncCoord t 1) (X ⟨none, l0⟩ * chartMon F M c0 q)
+        = C (t ⟨0, h0⟩ * algebraMap Ω Φ (φ l0 (w ⟨0, h0⟩))) * X none
+          * (C (algebraMap Ω Φ (∏ k, y ⟨k, c0 k⟩ ^ q k)) * tMon q) := by
     rw [map_mul, hXn, projMap_chartMon]
-  have hgval : projMap F y w φ (truncCoord t 1) (A0 * chartMon F M c0 p) =
-      C (algebraMap Ω Φ (φ l0 (w ⟨0, h0⟩) * chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0)) *
-        tMon (fun _ => n0) * (C (algebraMap Ω Φ (∏ k, y ⟨k, c0 k⟩ ^ p k)) * tMon p) := by
+  have hgval
+      : projMap F y w φ (truncCoord t 1) (A0 * chartMon F M c0 p)
+        = C (algebraMap Ω Φ (φ l0 (w ⟨0, h0⟩) * chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0))
+          * tMon (fun _ => n0) * (C (algebraMap Ω Φ (∏ k, y ⟨k, c0 k⟩ ^ p k)) * tMon p) := by
     rw [map_mul, hA0.2, projMap_chartMon]
-  have hprod0 : ∀ r : K → ℕ, ∏ k, y ⟨k, c0 k⟩ ^ r k ≠ 0 :=
-    fun r => Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (live0 k)
-  refine ⟨Pi.single none 1 + liftN q, liftN (fun _ => n0) + liftN p,
-    X ⟨none, l0⟩ * chartMon F M c0 q, A0 * chartMon F M c0 p, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  have hprod0 : ∀ r : K → ℕ, ∏ k, y ⟨k, c0 k⟩ ^ r k ≠ 0 := fun r =>
+    Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (live0 k)
+  refine ⟨
+    Pi.single none 1 + liftN q,
+    liftN (fun _ => n0) + liftN p,
+    X ⟨none, l0⟩ * chartMon F M c0 q,
+    A0 * chartMon F M c0 p,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact (isMultiHomog_X_none l0).mul (isMultiHomog_chartMon c0 q)
   · exact hA0.1.mul (isMultiHomog_chartMon c0 p)
   · rw [mem_projIdeal_iff, hfval]
@@ -111,21 +128,28 @@ theorem FlagLineSection.proof : FlagLineSection.Statement := by
       set m := nξ + nv with hm
       choose Ξ hΞ using hnξ m (by omega)
       choose V hV using hnv m (by omega)
-      have htm : (tMon (fun _ : K => m + m) : MvPolynomial (Option K) Φ) =
-          tMon (fun _ => m) * tMon (fun _ => m) := tMon_add (fun _ => m) (fun _ => m)
-      have hR0 : ∑ l, V l * Ξ l - chartMon F M c (fun _ => m + m) ∈ projIdeal F y w φ (truncCoord t 1) := by
+      have htm
+          : (tMon (fun _ : K => m + m) : MvPolynomial (Option K) Φ)
+            = tMon (fun _ => m) * tMon (fun _ => m) :=
+        tMon_add (fun _ => m) (fun _ => m)
+      have hR0
+          : ∑ l, V l * Ξ l - chartMon F M c (fun _ => m + m)
+            ∈ projIdeal F y w φ (truncCoord t 1) := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [mem_projIdeal_iff, map_sub, map_sum, projMap_chartMon, htm, sub_eq_zero]
-        have e1 : ∀ l, projMap F y w φ (truncCoord t 1) (V l * Ξ l) =
-            C (algebraMap Ω Φ (vc l * (φ l (w ⟨0, h0⟩) * chartZ y c (b ⟨0, h0⟩ - a)))) *
-              (C (algebraMap Ω Φ (segreVec y c ^ (m + m))) * (tMon (fun _ => m) * tMon (fun _ => m))) := by
+        have e1
+            : ∀ l,
+              projMap F y w φ (truncCoord t 1) (V l * Ξ l)
+                = C (algebraMap Ω Φ (vc l * (φ l (w ⟨0, h0⟩) * chartZ y c (b ⟨0, h0⟩ - a))))
+                  * (C (algebraMap Ω Φ (segreVec y c ^ (m + m)))
+                    * (tMon (fun _ => m) * tMon (fun _ => m))) := by
           intro l
           rw [map_mul, (hV l).2, (hΞ l).2]
           simp only [map_mul, map_pow, pow_add]
           ring
         set_option synthInstance.maxHeartbeats 100000 in
           rw [Finset.sum_congr rfl (fun l _ => e1 l), ← Finset.sum_mul, ← map_sum, ← map_sum, hsumc,
-          map_one, map_one, one_mul]
+            map_one, map_one, one_mul]
         simp [segreVec, Finset.prod_pow]
       have hS : chartMon F M c (fun _ => m + m) ∉ W := chartMon_not_mem hcW _
       obtain ⟨l2, hl2⟩ : ∃ l2, Ξ l2 ∉ W := by
@@ -135,24 +159,30 @@ theorem FlagLineSection.proof : FlagLineSection.Statement := by
         apply hS
         have := W.sub_mem hsumW (hPW hR0)
         rwa [sub_sub_cancel] at this
-      have hR1 : X ⟨none, l1⟩ * Ξ l2 - X ⟨none, l2⟩ * Ξ l1 ∈ projIdeal F y w φ (truncCoord t 1) := by
-        rw [mem_projIdeal_iff, map_sub, map_mul, map_mul, hXn, hXn, (hΞ l2).2, (hΞ l1).2, sub_eq_zero]
+      have hR1
+          : X ⟨none, l1⟩ * Ξ l2 - X ⟨none, l2⟩ * Ξ l1 ∈ projIdeal F y w φ (truncCoord t 1) := by
+        rw [mem_projIdeal_iff, map_sub, map_mul, map_mul, hXn, hXn, (hΞ l2).2, (hΞ l1).2,
+          sub_eq_zero]
         simp only [map_mul]
         ring
       have h12 : X ⟨none, l1⟩ * Ξ l2 ∉ W := fun h => (hWp.mem_or_mem h).elim hl1 hl2
-      have h21 : X ⟨none, l2⟩ * Ξ l1 ∉ W := fun h => h12 (by
-        have := W.add_mem (hPW hR1) h
-        rwa [sub_add_cancel] at this)
+      have h21 : X ⟨none, l2⟩ * Ξ l1 ∉ W := fun h =>
+        h12 (by
+          have := W.add_mem (hPW hR1) h
+          rwa [sub_add_cancel] at this)
       have hx2 : (X ⟨none, l2⟩ : MRing (bundleIdx ι M) F) ∉ W := fun h => h21 (W.mul_mem_right _ h)
-      obtain ⟨α, β, hαβ⟩ : ∃ α β : K → ℕ, ∀ k, (β k : ℤ) - α k = m + (b ⟨0, h0⟩ k - a k) :=
-        ⟨fun k => (-(m + (b ⟨0, h0⟩ k - a k))).toNat, fun k => (m + (b ⟨0, h0⟩ k - a k)).toNat,
-          fun k => Int.toNat_sub_toNat_neg _⟩
-      have hne1 : Ξ l2 * chartMon F M c α ∉ W :=
-        fun h => (hWp.mem_or_mem h).elim hl2 (chartMon_not_mem hcW α)
-      have hne2 : X ⟨none, l2⟩ * chartMon F M c β ∉ W :=
-        fun h => (hWp.mem_or_mem h).elim hx2 (chartMon_not_mem hcW β)
-      have hT : (tMon (fun _ => m) * tMon α * tMon q : MvPolynomial (Option K) Φ) =
-          tMon β * tMon (fun _ => n0) * tMon p := by
+      obtain ⟨α, β, hαβ⟩ : ∃ α β : K → ℕ, ∀ k, (β k : ℤ) - α k = m + (b ⟨0, h0⟩ k - a k) := ⟨
+        fun k => (-(m + (b ⟨0, h0⟩ k - a k))).toNat,
+        fun k => (m + (b ⟨0, h0⟩ k - a k)).toNat,
+        fun k => Int.toNat_sub_toNat_neg _
+      ⟩
+      have hne1 : Ξ l2 * chartMon F M c α ∉ W := fun h =>
+        (hWp.mem_or_mem h).elim hl2 (chartMon_not_mem hcW α)
+      have hne2 : X ⟨none, l2⟩ * chartMon F M c β ∉ W := fun h =>
+        (hWp.mem_or_mem h).elim hx2 (chartMon_not_mem hcW β)
+      have hT
+          : (tMon (fun _ => m) * tMon α * tMon q : MvPolynomial (Option K) Φ)
+            = tMon β * tMon (fun _ => n0) * tMon p := by
         rw [← tMon_add, ← tMon_add, ← tMon_add, ← tMon_add]
         congr 1
         funext k
@@ -160,48 +190,60 @@ theorem FlagLineSection.proof : FlagLineSection.Statement := by
         have h2 := hpq k
         simp only [Pi.add_apply]
         omega
-      have hc1 : chartZ y c (b ⟨0, h0⟩ - a) * segreVec y c ^ m * ∏ k, y ⟨k, c k⟩ ^ α k =
-          ∏ k, y ⟨k, c k⟩ ^ β k := by
+      have hc1
+          : chartZ y c (b ⟨0, h0⟩ - a) * segreVec y c ^ m * ∏ k, y ⟨k, c k⟩ ^ α k
+            = ∏ k, y ⟨k, c k⟩ ^ β k := by
         rw [segreVec_pow, ← chartZ_natCast, ← chartZ_natCast, ← chartZ_add live, ← chartZ_add live]
         congr 1
         funext k
         have h1 := hαβ k
         simp only [Pi.add_apply, Pi.sub_apply]
         omega
-      have hc0 : chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0 * ∏ k, y ⟨k, c0 k⟩ ^ p k =
-          ∏ k, y ⟨k, c0 k⟩ ^ q k := by
-        rw [segreVec_pow, ← chartZ_natCast, ← chartZ_natCast, ← chartZ_add live0, ← chartZ_add live0]
+      have hc0
+          : chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0 * ∏ k, y ⟨k, c0 k⟩ ^ p k
+            = ∏ k, y ⟨k, c0 k⟩ ^ q k := by
+        rw [segreVec_pow, ← chartZ_natCast, ← chartZ_natCast, ← chartZ_add live0,
+          ← chartZ_add live0]
         congr 1
         funext k
         have h2 := hpq k
         simp only [Pi.add_apply, Pi.sub_apply]
         omega
-      have hΩ : φ l2 (w ⟨0, h0⟩) * chartZ y c (b ⟨0, h0⟩ - a) * segreVec y c ^ m *
-            (∏ k, y ⟨k, c k⟩ ^ α k) * φ l0 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c0 k⟩ ^ q k) =
-          φ l2 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c k⟩ ^ β k) *
-            (φ l0 (w ⟨0, h0⟩) * chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0) *
-            (∏ k, y ⟨k, c0 k⟩ ^ p k) := by
+      have hΩ
+          : φ l2 (w ⟨0, h0⟩) * chartZ y c (b ⟨0, h0⟩ - a) * segreVec y c ^ m
+              * (∏ k, y ⟨k, c k⟩ ^ α k) * φ l0 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c0 k⟩ ^ q k)
+            = φ l2 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c k⟩ ^ β k)
+              * (φ l0 (w ⟨0, h0⟩) * chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0)
+              * (∏ k, y ⟨k, c0 k⟩ ^ p k) := by
         rw [← hc1, ← hc0]
         ring
-      have hcross : (Ξ l2 * chartMon F M c α) * (X ⟨none, l0⟩ * chartMon F M c0 q) -
-          (X ⟨none, l2⟩ * chartMon F M c β) * (A0 * chartMon F M c0 p) ∈
-            projIdeal F y w φ (truncCoord t 1) := by
+      have hcross
+          : (Ξ l2 * chartMon F M c α) * (X ⟨none, l0⟩ * chartMon F M c0 q)
+              - (X ⟨none, l2⟩ * chartMon F M c β) * (A0 * chartMon F M c0 p)
+            ∈ projIdeal F y w φ (truncCoord t 1) := by
         rw [mem_projIdeal_iff, map_sub, map_mul (projMap F y w φ (truncCoord t 1)) (Ξ l2 * _),
           map_mul (projMap F y w φ (truncCoord t 1)) (X ⟨none, l2⟩ * _), hfval, hgval,
           map_mul (projMap F y w φ (truncCoord t 1)) (Ξ l2),
-          map_mul (projMap F y w φ (truncCoord t 1)) (X ⟨none, l2⟩), (hΞ l2).2, hXn, projMap_chartMon, projMap_chartMon, sub_eq_zero]
-        calc _ = C (t ⟨0, h0⟩) * C (algebraMap Ω Φ (φ l2 (w ⟨0, h0⟩) * chartZ y c (b ⟨0, h0⟩ - a) *
-                segreVec y c ^ m * (∏ k, y ⟨k, c k⟩ ^ α k) * φ l0 (w ⟨0, h0⟩) *
-                (∏ k, y ⟨k, c0 k⟩ ^ q k))) * X none * (tMon (fun _ => m) * tMon α * tMon q) := by
-              simp only [map_mul]
-              ring
-          _ = C (t ⟨0, h0⟩) * C (algebraMap Ω Φ (φ l2 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c k⟩ ^ β k) *
-                (φ l0 (w ⟨0, h0⟩) * chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0) *
-                (∏ k, y ⟨k, c0 k⟩ ^ p k))) * X none * (tMon β * tMon (fun _ => n0) * tMon p) := by
-              rw [hΩ, hT]
+          map_mul (projMap F y w φ (truncCoord t 1)) (X ⟨none, l2⟩), (hΞ l2).2, hXn,
+          projMap_chartMon, projMap_chartMon, sub_eq_zero]
+        calc
+          _ = C (t ⟨0, h0⟩)
+              * C (algebraMap Ω Φ
+                (φ l2 (w ⟨0, h0⟩) * chartZ y c (b ⟨0, h0⟩ - a) * segreVec y c ^ m
+                  * (∏ k, y ⟨k, c k⟩ ^ α k) * φ l0 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c0 k⟩ ^ q k)))
+              * X none * (tMon (fun _ => m) * tMon α * tMon q) := by
+            simp only [map_mul]
+            ring
+          _ = C (t ⟨0, h0⟩)
+              * C (algebraMap Ω Φ
+                (φ l2 (w ⟨0, h0⟩) * (∏ k, y ⟨k, c k⟩ ^ β k)
+                  * (φ l0 (w ⟨0, h0⟩) * chartZ y c0 (b ⟨0, h0⟩ - a) * segreVec y c0 ^ n0)
+                  * (∏ k, y ⟨k, c0 k⟩ ^ p k)))
+              * X none * (tMon β * tMon (fun _ => n0) * tMon p) := by
+            rw [hΩ, hT]
           _ = _ := by
-              simp only [map_mul]
-              ring
+            simp only [map_mul]
+            ring
       rw [divCycle_eq_of_mul_sub_mem hne1 hne2 hcross, sub_self]
     · have hz : ∀ h, divCycle (projIdeal F y w φ (truncCoord t 1)) h W = 0 := by
         intro h

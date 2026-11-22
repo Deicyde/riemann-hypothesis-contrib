@@ -11,13 +11,16 @@ noncomputable section
 
 namespace Formalism.H
 
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+variable
+  {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
-theorem coeff_integrand_periodic (Λ : Submodule ℤ V) (G : V → ℂ)
-    (hper : ∀ (l : Λ) (x : V), G ((l : V) + x) = G x) (μ : V) (hμ : μ ∈ dual Λ) (l : Λ) (y : V) :
-    G ((l : V) + y) * Complex.exp (-(2 * Real.pi * Complex.I * (⟪μ, (l : V) + y⟫ : ℝ))) =
-      G y * Complex.exp (-(2 * Real.pi * Complex.I * (⟪μ, y⟫ : ℝ))) := by
+theorem coeff_integrand_periodic
+    (Λ : Submodule ℤ V) (G : V → ℂ) (hper : ∀ (l : Λ) (x : V), G ((l : V) + x) = G x)
+    (μ : V) (hμ : μ ∈ dual Λ)
+    (l : Λ) (y : V)
+    : G ((l : V) + y) * Complex.exp (-(2 * Real.pi * Complex.I * (⟪μ, (l : V) + y⟫ : ℝ)))
+      = G y * Complex.exp (-(2 * Real.pi * Complex.I * (⟪μ, y⟫ : ℝ))) := by
   obtain ⟨n, hn⟩ : ∃ n : ℤ, (n : ℝ) = ⟪μ, (l : V)⟫ := by
     have hm : innerₗ V μ (l : V) ∈ (1 : Submodule ℤ ℝ) := hμ (l : V) l.2
     obtain ⟨n, hn⟩ := Submodule.mem_one.mp hm
@@ -30,8 +33,10 @@ theorem coeff_integrand_periodic (Λ : Submodule ℤ V) (G : V → ℂ)
   push_cast
   ring
 
-theorem lattice_fourier_series (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-    [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] : LatticeFourierSeries V := by
+theorem lattice_fourier_series
+    (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+    [MeasurableSpace V] [BorelSpace V]
+    : LatticeFourierSeries V := by
   intro Λ _ _ G hG hper D hD hsum x
   classical
   have : Module.Free ℤ Λ := ZLattice.module_free ℝ Λ
@@ -61,12 +66,14 @@ theorem lattice_fourier_series (V : Type*) [NormedAddCommGroup V] [InnerProductS
     have h := dualVec_mem e m
     rw [he] at h
     exact h
-  have hcoef : ∀ m, c (dualVec e m) = (ZLattice.covolume Λ : ℂ) * UnitAddTorus.mFourierCoeff g m := by
+  have hcoef
+      : ∀ m, c (dualVec e m) = (ZLattice.covolume Λ : ℂ) * UnitAddTorus.mFourierCoeff g m := by
     intro m
     simp only [hc]
     rw [hD.setIntegral_eq hF (fun l y => coeff_integrand_periodic Λ G hper _ (hmem m) l y),
       integral_fundamentalDomain_eq, hcov, mFourierCoeff_torusFunC]
-  let E : (Module.Free.ChooseBasisIndex ℤ Λ → ℤ) ≃ dual Λ := (dualEquiv e).trans (Equiv.subtypeEquivRight (fun v => by rw [he]))
+  let E : (Module.Free.ChooseBasisIndex ℤ Λ → ℤ) ≃ dual Λ :=
+    (dualEquiv e).trans (Equiv.subtypeEquivRight (fun v => by rw [he]))
   have hE : ∀ m, ((E m : dual Λ) : V) = dualVec e m := fun m => rfl
   have hsumE : Summable (fun m => c (dualVec e m)) := by
     have := (E.summable_iff (f := fun μ : dual Λ => c μ)).2 hsum
@@ -74,8 +81,7 @@ theorem lattice_fourier_series (V : Type*) [NormedAddCommGroup V] [InnerProductS
   have hsg : Summable (UnitAddTorus.mFourierCoeff g) := by
     refine (hsumE.mul_left ((ZLattice.covolume Λ : ℂ)⁻¹)).congr fun m => ?_
     rw [hcoef, ← mul_assoc, inv_mul_cancel₀ hcov0, one_mul]
-  have hx := UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsg
-    (torusProj _ (e.equivFunL x))
+  have hx := UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsg (torusProj _ (e.equivFunL x))
   have hgx : g (torusProj _ (e.equivFunL x)) = G x := by
     show torusFun e G _ = _
     rw [torusFun_proj e G hper', ContinuousLinearEquiv.symm_apply_apply]
@@ -85,7 +91,7 @@ theorem lattice_fourier_series (V : Type*) [NormedAddCommGroup V] [InnerProductS
   funext m
   simp only [Function.comp_apply, hE, smul_eq_mul]
   change ((ZLattice.covolume Λ : ℂ)⁻¹ * c (dualVec e m)) * _ = _
-  rw [mFourier_torusProj e, ContinuousLinearEquiv.symm_apply_apply,
-    hcoef, ← mul_assoc, inv_mul_cancel₀ hcov0, one_mul]
+  rw [mFourier_torusProj e, ContinuousLinearEquiv.symm_apply_apply, hcoef, ← mul_assoc,
+    inv_mul_cancel₀ hcov0, one_mul]
 
 end Formalism.H

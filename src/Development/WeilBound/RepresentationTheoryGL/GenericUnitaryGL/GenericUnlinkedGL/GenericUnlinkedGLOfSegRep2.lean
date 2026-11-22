@@ -12,9 +12,15 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 
 namespace GlobalTheory.RgGu
 
-theorem genericUnlinkedGL_of_segRep2 (hZ : GlobalTheory.Published.SegmentRepresentation) : GlobalTheory.Published.GenericUnlinkedGL :=
-  genericUnlinkedGL_of (fun k _ _ _ _ _ => suppExists k) (fun k _ _ _ _ _ => genericUnique k)
-    (fun k _ _ _ _ _ => unlinkedRealize (k := k)
-      (GlobalTheory.CompanionTheory.SegCoarse.lSegJacquet PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top hZ) (GlobalTheory.RgGu.Nup2.nuPair k))
+theorem genericUnlinkedGL_of_segRep2 (hZ : GlobalTheory.Published.SegmentRepresentation)
+    : GlobalTheory.Published.GenericUnlinkedGL :=
+  genericUnlinkedGL_of
+    (fun k _ _ _ _ _ => suppExists k)
+    (fun k _ _ _ _ _ => genericUnique k)
+    (fun k _ _ _ _ _ =>
+      unlinkedRealize (k := k)
+        (GlobalTheory.CompanionTheory.SegCoarse.lSegJacquet
+          PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top hZ)
+        (GlobalTheory.RgGu.Nup2.nuPair k))
 
 end GlobalTheory.RgGu

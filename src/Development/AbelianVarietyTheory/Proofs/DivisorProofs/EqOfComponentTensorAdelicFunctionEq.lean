@@ -15,12 +15,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatAtVAtStab
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open scoped TensorProduct
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames Formalism.L2.DIV
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames Formalism.L2.DIV
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
 open ValuativeRel
@@ -34,38 +39,61 @@ open scoped Classical
 
 namespace GlobalTheory.TensUniq
 
-theorem exists_sInf_ne_zero (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] :
-    ∃ f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ, f 0 ≠ 0 := by
+theorem exists_sInf_ne_zero (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
+    : ∃ f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ, f 0 ≠ 0 := by
   let b : ContDiffBump (0 : κ → mixedEmbedding.mixedSpace F) := ⟨1, 2, one_pos, one_lt_two⟩
-  have hc : HasCompactSupport (fun x => ((b x : ℝ) : ℂ)) := b.hasCompactSupport.comp_left Complex.ofReal_zero
-  have hd : ContDiff ℝ (⊤ : ℕ∞) (fun x => ((b x : ℝ) : ℂ)) := Complex.ofRealCLM.contDiff.comp b.contDiff
+  have hc : HasCompactSupport (fun x => ((b x : ℝ) : ℂ)) :=
+    b.hasCompactSupport.comp_left Complex.ofReal_zero
+  have hd : ContDiff ℝ (⊤ : ℕ∞) (fun x => ((b x : ℝ) : ℂ)) :=
+    Complex.ofRealCLM.contDiff.comp b.contDiff
   refine ⟨hc.toSchwartzMap hd, ?_⟩
   have h1 : b 0 = 1 := b.one_of_mem_closedBall (by simp [b])
   show ((b 0 : ℝ) : ℂ) ≠ 0
-  rw [h1]; exact one_ne_zero
+  rw [h1]
+  exact one_ne_zero
 
-theorem pure_mem_schA {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ)
-    (φ : ∀ v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F), (κ → Fv F v) → ℂ) (hSB : ∀ v, φ v ∈ GlobalTheory.WeilM.SB _)
-    (hstd : ∀ᶠ v in Filter.cofinite, φ v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1) :
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ ∈ GlobalTheory.WeilM.schA F κ := by
-  have hg : (fun y : κ → FiniteAdeleRing (𝓞 F) F => ∏ᶠ v, φ v fun i => Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v (y i)) ∈
-      GlobalTheory.WeilM.SB _ :=
-    ⟨GlobalTheory.WeilM.isLocallyConstant_finprod_evalV φ hSB hstd, GlobalTheory.AdelicCoordSupport.hasCompactSupport_finprod φ hSB hstd⟩
+theorem pure_mem_schA
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (f : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ)
+    (φ : ∀ v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F),
+      (κ → Fv F v) → ℂ)
+    (hSB : ∀ v, φ v ∈ GlobalTheory.WeilM.SB _)
+    (hstd
+      : ∀ᶠ v in Filter.cofinite, φ v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1)
+    : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ
+      ∈ GlobalTheory.WeilM.schA F κ := by
+  have hg
+      : (fun y : κ → FiniteAdeleRing (𝓞 F) F =>
+          ∏ᶠ v, φ v fun i => Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v (y i))
+        ∈ GlobalTheory.WeilM.SB _ := ⟨
+    GlobalTheory.WeilM.isLocallyConstant_finprod_evalV φ hSB hstd,
+    GlobalTheory.AdelicCoordSupport.hasCompactSupport_finprod φ hSB hstd
+  ⟩
   exact Submodule.subset_span ⟨f, _, hg, rfl⟩
 
 end GlobalTheory.TensUniq
 
 namespace GlobalTheory.TensUniq
 
-theorem eq_of_tens_eq : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
-    (φ φ₁ φ₂ : (κ → Fv F v) → ℂ), φ ∈ GlobalTheory.WeilM.SB _ →
-    (∀ r, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest (evFin F v) φ r → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (evFin F v) φ₁ r = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (evFin F v) φ₂ r) →
-    φ₁ = φ₂ := by
+theorem eq_of_tens_eq
+    : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+        (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
+        (φ φ₁ φ₂ : (κ → Fv F v) → ℂ),
+      φ ∈ GlobalTheory.WeilM.SB _
+        → (∀ r,
+          GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest (evFin F v) φ r
+            → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (evFin F v) φ₁ r
+              = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (evFin F v) φ₂ r)
+        → φ₁ = φ₂ := by
   intro F _ _ κ _ v φ φ₁ φ₂ hφ h
   obtain ⟨f, hf⟩ := exists_sInf_ne_zero F κ
-  let φs : ∀ w : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F), (κ → Fv F w) → ℂ :=
-    fun w => Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1
-  have hstd : ∀ᶠ w in Filter.cofinite, φs w = Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1 :=
+  let φs
+      : ∀ w : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F),
+        (κ → Fv F w) → ℂ := fun w =>
+    Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1
+  have hstd
+      : ∀ᶠ w in Filter.cofinite, φs w = Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1 :=
     Filter.Eventually.of_forall fun _ => rfl
   obtain ⟨r, hr, hrt⟩ := GlobalTheory.PureFactor.exists_rest_factor v f φs hstd
   have hRest : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rest (evFin F v) φ r := by
@@ -80,11 +108,16 @@ theorem eq_of_tens_eq : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fi
     simp only [GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens, one_mul] at e
     rw [e]
     unfold GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure
-    have hI : (fun i : κ => GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F ((0 : κ → AF F) i)) = 0 := by
+    have hI
+        : (fun i : κ =>
+            GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F ((0 : κ → AF F) i))
+          = 0 := by
       funext i
       show (InfiniteAdeleRing.ringEquiv_mixedSpace F) (0 : AF F).1 = 0
       exact map_zero _
-    have hP : (∏ᶠ w, Function.update φs v (fun _ => 1) w fun i => evFin F w ((0 : κ → AF F) i)) = 1 := by
+    have hP
+        : (∏ᶠ w, Function.update φs v (fun _ => 1) w fun i => evFin F w ((0 : κ → AF F) i))
+          = 1 := by
       refine finprod_eq_one_of_forall_eq_one fun w => ?_
       by_cases hw : w = v
       · subst hw; rw [Function.update_self]

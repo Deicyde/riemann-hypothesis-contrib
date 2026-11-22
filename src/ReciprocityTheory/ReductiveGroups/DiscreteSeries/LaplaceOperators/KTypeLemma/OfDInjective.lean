@@ -16,9 +16,12 @@ open ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-def sub (A : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ := A.submatrix Fin.revPerm Fin.revPerm
+def sub (A : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
+  A.submatrix Fin.revPerm Fin.revPerm
 
-theorem sub_apply (A : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n) : sub A a b = A (Fin.rev a) (Fin.rev b) := rfl
+theorem sub_apply (A : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n)
+    : sub A a b = A (Fin.rev a) (Fin.rev b) :=
+  rfl
 
 theorem sub_mul (A B : Matrix (Fin n) (Fin n) ℂ) : sub (A * B) = sub A * sub B := by
   simp only [sub]
@@ -69,10 +72,10 @@ theorem Pr_Pr : Pr n * Pr n = 1 := by
   ext i j
   simp [Pr, Matrix.one_apply]
 
-theorem Pr_inv : (Pr n)⁻¹ = Pr n := by
-  exact Matrix.inv_eq_left_inv Pr_Pr
+theorem Pr_inv : (Pr n)⁻¹ = Pr n := by exact Matrix.inv_eq_left_inv Pr_Pr
 
-theorem exp_sub (A : Matrix (Fin n) (Fin n) ℂ) : NormedSpace.exp (sub A) = sub (NormedSpace.exp A) := by
+theorem exp_sub (A : Matrix (Fin n) (Fin n) ℂ)
+    : NormedSpace.exp (sub A) = sub (NormedSpace.exp A) := by
   have hu : IsUnit (Pr n) := ⟨⟨Pr n, Pr n, Pr_Pr, Pr_Pr⟩, rfl⟩
   rw [← Pr_conj, ← Pr_conj (NormedSpace.exp A)]
   have h1 : Pr n * A * Pr n = Pr n * A * (Pr n)⁻¹ := by rw [Pr_inv]
@@ -82,19 +85,19 @@ theorem Jm_rev (ε : Fin n → Bool) : sub (Jm (ε ∘ Fin.rev)) = Jm ε := by
   ext a b
   simp [sub, Jm, Matrix.diagonal_apply]
 
-theorem inUJ_sub {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset (ε ∘ Fin.rev)) :
-    sub g ∈ UJset ε := by
+theorem inUJ_sub {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset (ε ∘ Fin.rev))
+    : sub g ∈ UJset ε := by
   show (sub g)ᴴ * Jm ε * sub g = Jm ε
   have hg' : gᴴ * Jm (ε ∘ Fin.rev) * g = Jm (ε ∘ Fin.rev) := hg
   rw [← Jm_rev ε, sub_H, ← sub_mul, ← sub_mul, hg']
 
-theorem inG_sub {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG (ε ∘ Fin.rev) X) :
-    inG ε (sub X) := by
+theorem inG_sub {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG (ε ∘ Fin.rev) X)
+    : inG ε (sub X) := by
   unfold inG at *
   rw [← Jm_rev ε, sub_H, ← sub_mul, ← sub_mul, ← sub_add, hX, sub_zero]
 
-theorem K_sub {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset (ε ∘ Fin.rev)) :
-    sub k ∈ Kset ε := by
+theorem K_sub {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset (ε ∘ Fin.rev))
+    : sub k ∈ Kset ε := by
   simp only [Kset, Set.mem_setOf_eq] at hk ⊢
   obtain ⟨hu, hc⟩ := hk
   refine ⟨?_, ?_⟩
@@ -103,13 +106,14 @@ theorem K_sub {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈
     rw [sub_H, ← sub_mul, hu, sub_one]
   · rw [← Jm_rev ε, ← sub_mul, ← sub_mul, hc]
 
-theorem inG_entry {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X) (a b : Fin n) :
-    X b a = (if ε a = ε b then -1 else 1) * conj (X a b) := by
+theorem inG_entry {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X) (a b : Fin n)
+    : X b a = (if ε a = ε b then -1 else 1) * conj (X a b) := by
   have h := congrFun (congrFun hX b) a
   rw [Matrix.add_apply, Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply,
-    Matrix.zero_apply] at h
-  cases hεa : ε a <;> cases hεb : ε b <;> simp [hεa, hεb, Complex.star_def] at h ⊢ <;>
-    first | linear_combination h | linear_combination -h
+      Matrix.zero_apply]
+    at h
+  cases hεa : ε a <;> cases hεb : ε b <;> simp [hεa, hεb, Complex.star_def] at h ⊢
+    <;> first | linear_combination h | linear_combination -h
 
 section Conj
 
@@ -127,15 +131,17 @@ def toD (x : cjSub D) : D := ⟨ofCj (x : Cj H), x.2⟩
 
 def ofD (u : D) : cjSub D := ⟨toCj (u : H), u.2⟩
 
-@[simp] theorem toD_ofD (u : D) : toD (ofD u) = u := rfl
+@[simp]
+theorem toD_ofD (u : D) : toD (ofD u) = u := rfl
 
-@[simp] theorem ofD_toD (x : cjSub D) : ofD (toD x) = x := rfl
+@[simp]
+theorem ofD_toD (x : cjSub D) : ofD (toD x) = x := rfl
 
 theorem ofD_add (u v : D) : ofD (u + v) = ofD u + ofD v := rfl
 
 theorem ofD_sub (u v : D) : ofD (u - v) = ofD u - ofD v := rfl
 
-theorem ofD_neg (u : D) : ofD (-u) = -ofD u := rfl
+theorem ofD_neg (u : D) : ofD (-u) = - ofD u := rfl
 
 theorem ofD_zero : ofD (0 : D) = 0 := rfl
 
@@ -158,7 +164,8 @@ def ofDh : D →+ cjSub D where
   map_zero' := rfl
   map_add' := ofD_add
 
-theorem ofD_sum {ι : Type*} (s : Finset ι) (f : ι → D) : ofD (∑ i ∈ s, f i) = ∑ i ∈ s, ofD (f i) := by
+theorem ofD_sum {ι : Type*} (s : Finset ι) (f : ι → D)
+    : ofD (∑ i ∈ s, f i) = ∑ i ∈ s, ofD (f i) := by
   exact map_sum ofDh f s
 
 def ofDL : D →ₛₗ[starRingEnd ℂ] cjSub D where
@@ -188,23 +195,29 @@ theorem sg_ne (ε : Fin n → Bool) (a : Fin n) : sg ε a ≠ 0 := by
   unfold sg
   split_ifs <;> norm_num
 
-def Edd (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ D) (a b : Fin n) : Module.End ℂ (cjSub D) :=
+def Edd (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ D) (a b : Fin n)
+    : Module.End ℂ (cjSub D) :=
   cjEnd ((-(sg ε a * sg ε b)) • E (Fin.rev b) (Fin.rev a))
 
-theorem Edd_ofD (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ D) (a b : Fin n) (u : D) :
-    Edd ε E a b (ofD u) = ofD ((-(sg ε a * sg ε b)) • E (Fin.rev b) (Fin.rev a) u) := rfl
+theorem Edd_ofD (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ D) (a b : Fin n) (u : D)
+    : Edd ε E a b (ofD u) = ofD ((-(sg ε a * sg ε b)) • E (Fin.rev b) (Fin.rev a) u) :=
+  rfl
 
-theorem glRep_Edd (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ D} (hE : IsGlRep E) :
-    IsGlRep (Edd ε E) := by
+theorem glRep_Edd (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ D} (hE : IsGlRep E)
+    : IsGlRep (Edd ε E) := by
   intro a b c d
   apply LinearMap.ext
   intro x
   obtain ⟨u, rfl⟩ : ∃ u, x = ofD u := ⟨toD x, (ofD_toD x).symm⟩
-  have key := congrArg (fun T : Module.End ℂ D => T u) (hE (Fin.rev b) (Fin.rev a) (Fin.rev d) (Fin.rev c))
+  have key :=
+    congrArg (fun T : Module.End ℂ D => T u) (hE (Fin.rev b) (Fin.rev a) (Fin.rev d) (Fin.rev c))
   simp only [LinearMap.sub_apply, Module.End.mul_apply, Fin.rev_inj] at key
-  have lhs : (Edd ε E a b * Edd ε E c d - Edd ε E c d * Edd ε E a b) (ofD u) =
-      ofD ((sg ε a * sg ε b * (sg ε c * sg ε d)) • (E (Fin.rev b) (Fin.rev a) (E (Fin.rev d) (Fin.rev c) u) -
-        E (Fin.rev d) (Fin.rev c) (E (Fin.rev b) (Fin.rev a) u))) := by
+  have lhs
+      : (Edd ε E a b * Edd ε E c d - Edd ε E c d * Edd ε E a b) (ofD u)
+        = ofD
+          ((sg ε a * sg ε b * (sg ε c * sg ε d))
+            • (E (Fin.rev b) (Fin.rev a) (E (Fin.rev d) (Fin.rev c) u)
+              - E (Fin.rev d) (Fin.rev c) (E (Fin.rev b) (Fin.rev a) u))) := by
     simp only [LinearMap.sub_apply, Module.End.mul_apply, Edd_ofD, LinearMap.map_smul]
     rw [← ofD_sub]
     congr 1
@@ -220,8 +233,8 @@ theorem glRep_Edd (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ 
     split_ifs <;> module
   · subst c
     have hda' : ¬ Fin.rev a = Fin.rev d := fun h => hda (Fin.rev_injective h).symm
-    simp only [eq_self_iff_true, if_true, if_neg hda, if_neg (Ne.symm hda), if_neg hda', LinearMap.zero_apply, Edd_ofD,
-      sub_zero, zero_sub]
+    simp only [eq_self_iff_true, if_true, if_neg hda, if_neg (Ne.symm hda), if_neg hda',
+      LinearMap.zero_apply, Edd_ofD, sub_zero, zero_sub]
     first
     | (congr 1; unfold sg; split_ifs <;> module)
     | (rw [← ofD_neg]; congr 1; unfold sg; split_ifs <;> module)
@@ -229,16 +242,16 @@ theorem glRep_Edd (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ 
     | (simp only [← ofD_neg, ← ofD_sub, ← ofD_zero]; congr 1; unfold sg; split_ifs <;> module)
   · subst d
     have hbc' : ¬ Fin.rev c = Fin.rev b := fun h => hbc (Fin.rev_injective h).symm
-    simp only [eq_self_iff_true, if_true, if_neg hbc, if_neg (Ne.symm hbc), if_neg hbc', LinearMap.zero_apply, Edd_ofD,
-      sub_zero, zero_sub]
+    simp only [eq_self_iff_true, if_true, if_neg hbc, if_neg (Ne.symm hbc), if_neg hbc',
+      LinearMap.zero_apply, Edd_ofD, sub_zero, zero_sub]
     simp only [sub_zero, zero_sub, LinearMap.zero_apply, ← ofD_neg, ← ofD_sub]
     congr 1
     unfold sg
     split_ifs <;> module
   · have hda' : ¬ Fin.rev a = Fin.rev d := fun h => hda (Fin.rev_injective h).symm
     have hbc' : ¬ Fin.rev c = Fin.rev b := fun h => hbc (Fin.rev_injective h).symm
-    simp only [if_neg hbc, if_neg (Ne.symm hbc), if_neg hda, if_neg (Ne.symm hda), if_neg hda', if_neg hbc', LinearMap.zero_apply,
-      sub_zero, smul_zero]
+    simp only [if_neg hbc, if_neg (Ne.symm hbc), if_neg hda, if_neg (Ne.symm hda), if_neg hda',
+      if_neg hbc', LinearMap.zero_apply, sub_zero, smul_zero]
     simp [ofD_zero]
 
 end Conj

@@ -5,16 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.G1.pZUnitNorm :
-    PadicUnitNorm → ZUnitNorm := by
+theorem UpperTheory.Gal.G1.pZUnitNorm : PadicUnitNorm → ZUnitNorm := by
   intro hP v D hv u hu
   haveI : Fact (Rat.HeightOneSpectrum.primesEquiv v : ℕ).Prime :=
     ⟨(Rat.HeightOneSpectrum.primesEquiv v).2⟩
-  have hint : ∀ z : v.adicCompletion ℚ, Valued.v z ≤ 1 →
-      ‖Rat.HeightOneSpectrum.adicCompletion.padicEquiv v z‖ ≤ 1 := by
+  have hint
+      : ∀ z : v.adicCompletion ℚ,
+        Valued.v z ≤ 1 → ‖Rat.HeightOneSpectrum.adicCompletion.padicEquiv v z‖ ≤ 1 := by
     intro z hz
     exact (Rat.HeightOneSpectrum.adicCompletion.padicEquiv_bijOn v).mapsTo
       ((HeightOneSpectrum.mem_adicCompletionIntegers ℤ ℚ v).2 hz)
@@ -43,7 +45,10 @@ theorem UpperTheory.Gal.G1.pZUnitNorm :
     rw [← hxe]
     exact hx
   obtain ⟨x, y, hxy⟩ := hP _ D hdiv _ hn
-  refine ⟨(Rat.HeightOneSpectrum.adicCompletion.padicEquiv v).symm x,
-    (Rat.HeightOneSpectrum.adicCompletion.padicEquiv v).symm y, ?_⟩
+  refine ⟨
+    (Rat.HeightOneSpectrum.adicCompletion.padicEquiv v).symm x,
+    (Rat.HeightOneSpectrum.adicCompletion.padicEquiv v).symm y,
+    ?_
+  ⟩
   have h2 := congrArg (Rat.HeightOneSpectrum.adicCompletion.padicEquiv v).symm hxy
   simpa using h2

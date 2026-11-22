@@ -9,17 +9,22 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.ValuationCompleteness
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain PositivityTheory.PfSWUS.Loc PositivityTheory.SiegelWeilFormula.Gunr Filter Topology
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain PositivityTheory.PfSWUS.Loc
+  PositivityTheory.SiegelWeilFormula.Gunr Filter Topology
 open scoped TensorProduct
 
 section Abstract
 
-variable {K A : Type} [NormedField K] [CommRing A] [Algebra K A] {d : ℕ}
-  (b : Module.Basis (Fin d) K A) (S : Subring A)
+variable
+  {K A : Type} [NormedField K] [CommRing A] [Algebra K A]
+  {d : ℕ} (b : Module.Basis (Fin d) K A)
+  (S : Subring A)
 
-theorem mem_lev_iff (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1) {ϖ : K} (h0 : ϖ ≠ 0)
-    (hϖ : algebraMap K A ϖ ∈ S) (a : S) (k : ℕ) :
-    a ∈ lev (⟨_, hϖ⟩ : S) k ↔ ∀ i, ‖b.repr (a : A) i‖ ≤ ‖ϖ‖ ^ k := by
+theorem mem_lev_iff
+    (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1)
+    {ϖ : K} (h0 : ϖ ≠ 0) (hϖ : algebraMap K A ϖ ∈ S)
+    (a : S) (k : ℕ)
+    : a ∈ lev (⟨_, hϖ⟩ : S) k ↔ ∀ i, ‖b.repr (a : A) i‖ ≤ ‖ϖ‖ ^ k := by
   have hpow : ∀ c : A, c * (algebraMap K A ϖ) ^ k = ϖ ^ k • c := by
     intro c
     rw [← map_pow, Algebra.smul_def, mul_comm]
@@ -31,11 +36,12 @@ theorem mem_lev_iff (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1) {ϖ 
   · intro ha i
     rw [lev, Ideal.mem_span_singleton'] at ha
     obtain ⟨c, hc⟩ := ha
-    have hc' : (a : A) = ϖ ^ k • (c : A) := by
-      rw [← hc, hcoe]
+    have hc' : (a : A) = ϖ ^ k • (c : A) := by rw [← hc, hcoe]
     rw [hc', map_smul, Finsupp.smul_apply, smul_eq_mul, norm_mul, norm_pow]
     have hci := (hS c).1 c.2 i
-    calc ‖ϖ‖ ^ k * ‖b.repr (c : A) i‖ ≤ ‖ϖ‖ ^ k * 1 := by gcongr
+    calc
+      ‖ϖ‖ ^ k * ‖b.repr (c : A) i‖
+        ≤ ‖ϖ‖ ^ k * 1 := by gcongr
       _ = ‖ϖ‖ ^ k := mul_one _
   · intro ha
     rw [lev, Ideal.mem_span_singleton']
@@ -52,12 +58,15 @@ theorem mem_lev_iff (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1) {ϖ 
     change ϖ ^ k • ((ϖ ^ k)⁻¹ • (a : A)) = (a : A)
     rw [smul_smul, mul_inv_cancel₀ (pow_ne_zero k h0), one_smul]
 
-theorem separated (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1) {ϖ : K} (h0 : ϖ ≠ 0) (h1 : ‖ϖ‖ < 1)
-    (hϖ : algebraMap K A ϖ ∈ S) (a : S) (h : ∀ k, a ∈ lev (⟨_, hϖ⟩ : S) k) : a = 0 := by
+theorem separated
+    (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1)
+    {ϖ : K} (h0 : ϖ ≠ 0) (h1 : ‖ϖ‖ < 1) (hϖ : algebraMap K A ϖ ∈ S)
+    (a : S) (h : ∀ k, a ∈ lev (⟨_, hϖ⟩ : S) k)
+    : a = 0 := by
   have hi : ∀ i, b.repr (a : A) i = 0 := by
     intro i
-    have hle : ∀ k : ℕ, ‖b.repr (a : A) i‖ ≤ ‖ϖ‖ ^ k :=
-      fun k => (mem_lev_iff b S hS h0 hϖ a k).1 (h k) i
+    have hle : ∀ k : ℕ, ‖b.repr (a : A) i‖ ≤ ‖ϖ‖ ^ k := fun k =>
+      (mem_lev_iff b S hS h0 hϖ a k).1 (h k) i
     have ht : Tendsto (fun k : ℕ => ‖ϖ‖ ^ k) atTop (𝓝 0) :=
       tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) h1
     exact norm_le_zero_iff.mp (ge_of_tendsto' ht hle)
@@ -69,9 +78,11 @@ theorem separated (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1) {ϖ : 
 
 variable [CompleteSpace K] [IsUltrametricDist K]
 
-theorem complete (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1) {ϖ : K} (h0 : ϖ ≠ 0) (h1 : ‖ϖ‖ < 1)
-    (hϖ : algebraMap K A ϖ ∈ S) (f : ℕ → S) (hf : ∀ k, f (k + 1) - f k ∈ lev (⟨_, hϖ⟩ : S) k) :
-    ∃ a, ∀ k, a - f k ∈ lev (⟨_, hϖ⟩ : S) k := by
+theorem complete
+    (hS : ∀ x, x ∈ S ↔ ∀ i, ‖b.repr x i‖ ≤ 1)
+    {ϖ : K} (h0 : ϖ ≠ 0) (h1 : ‖ϖ‖ < 1) (hϖ : algebraMap K A ϖ ∈ S)
+    (f : ℕ → S) (hf : ∀ k, f (k + 1) - f k ∈ lev (⟨_, hϖ⟩ : S) k)
+    : ∃ a, ∀ k, a - f k ∈ lev (⟨_, hϖ⟩ : S) k := by
   set x : ℕ → Fin d → K := fun k i => b.repr (f k : A) i with hx
   have hstep : ∀ k i, ‖x (k + 1) i - x k i‖ ≤ ‖ϖ‖ ^ k := by
     intro k i

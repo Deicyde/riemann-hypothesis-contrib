@@ -6,10 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published
 
-theorem UpperTheory.ideleNorm_valuation_of_local_compatibility :
-    UpperTheory.V.Af.Bc.NormLoc → UpperTheory.V.Af.Bc.NormVal := by
+theorem UpperTheory.ideleNorm_valuation_of_local_compatibility
+    : UpperTheory.V.Af.Bc.NormLoc → UpperTheory.V.Af.Bc.NormVal := by
   intro hN
   unfold UpperTheory.V.Af.Bc.NormLoc at hN
   unfold UpperTheory.V.Af.Bc.NormVal
@@ -18,10 +21,14 @@ theorem UpperTheory.ideleNorm_valuation_of_local_compatibility :
   have hunr : ∀ x : (HeightOneSpectrum.adicCompletion _ u)ˣ, IsUnitAt u x → χ.loc u x = 1 := by
     unfold HChar.UnrAt at hχ
     exact hχ
-  have hloc : ∀ x : (HeightOneSpectrum.adicCompletion E w)ˣ,
-      ((compNorm E) χ).loc w x = (χ : Ideles _ →* ℂˣ) (ideleNorm E (localIdele E w x)) := fun x => rfl
-  have hlocF : ∀ y : (HeightOneSpectrum.adicCompletion _ u)ˣ,
-      χ.loc u y = (χ : Ideles _ →* ℂˣ) (localIdele _ u y) := fun y => rfl
+  have hloc
+      : ∀ x : (HeightOneSpectrum.adicCompletion E w)ˣ,
+        ((compNorm E) χ).loc w x = (χ : Ideles _ →* ℂˣ) (ideleNorm E (localIdele E w x)) := fun x =>
+    rfl
+  have hlocF
+      : ∀ y : (HeightOneSpectrum.adicCompletion _ u)ˣ,
+        χ.loc u y = (χ : Ideles _ →* ℂˣ) (localIdele _ u y) := fun y =>
+    rfl
   constructor
   · unfold HChar.UnrAt
     intro x hx
@@ -40,8 +47,8 @@ theorem UpperTheory.ideleNorm_valuation_of_local_compatibility :
     have hone : χ.loc u (y * ((atFin u (unif u)) ^ f)⁻¹) = 1 := by
       apply hunr
       unfold IsUnitAt
-      rw [Units.val_mul, map_mul, Units.val_inv_eq_inv_val, map_inv₀, Units.val_pow_eq_pow_val, map_pow,
-        hv f hf, hpw, hpu, mul_inv_cancel₀]
+      rw [Units.val_mul, map_mul, Units.val_inv_eq_inv_val, map_inv₀, Units.val_pow_eq_pow_val,
+        map_pow, hv f hf, hpw, hpu, mul_inv_cancel₀]
       exact pow_ne_zero _ (by simp)
     rw [map_mul, map_inv, mul_inv_eq_one] at hone
     exact hone

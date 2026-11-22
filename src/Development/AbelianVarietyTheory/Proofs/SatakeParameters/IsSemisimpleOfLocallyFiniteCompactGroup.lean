@@ -9,9 +9,10 @@ namespace GlobalTheory.LocFinSemisimple
 
 variable {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ K V}
 
-theorem exists_isAtom_le : ∀ (n : ℕ) (Y : Subrepresentation ρ),
-    FiniteDimensional ℂ Y.toSubmodule → Module.finrank ℂ Y.toSubmodule = n → Y ≠ ⊥ →
-      ∃ T : Subrepresentation ρ, IsAtom T ∧ T ≤ Y := by
+theorem exists_isAtom_le
+    : ∀ (n : ℕ) (Y : Subrepresentation ρ),
+      FiniteDimensional ℂ Y.toSubmodule → Module.finrank ℂ Y.toSubmodule = n → Y ≠ ⊥
+        → ∃ T : Subrepresentation ρ, IsAtom T ∧ T ≤ Y := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -35,10 +36,10 @@ def ofInvariant (U : Submodule ℂ V) (hU : ∀ k, ∀ u ∈ U, ρ k u ∈ U) : 
 
 variable [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
 
-theorem isSemisimple_ofInvariant (U : Submodule ℂ V) (hU : ∀ k, ∀ u ∈ U, ρ k u ∈ U)
-    (hfd : FiniteDimensional ℂ U)
-    (hc : ∀ (ℓ : Module.Dual ℂ V), ∀ u ∈ U, Continuous fun k => ℓ (ρ k u)) :
-    (ofInvariant U hU).toRepresentation.IsSemisimpleRepresentation := by
+theorem isSemisimple_ofInvariant
+    (U : Submodule ℂ V) (hU : ∀ k, ∀ u ∈ U, ρ k u ∈ U) (hfd : FiniteDimensional ℂ U)
+    (hc : ∀ (ℓ : Module.Dual ℂ V), ∀ u ∈ U, Continuous fun k => ℓ (ρ k u))
+    : (ofInvariant U hU).toRepresentation.IsSemisimpleRepresentation := by
   haveI : FiniteDimensional ℂ (ofInvariant U hU).toSubmodule := hfd
   refine GlobalTheory.isSemisimpleRepresentation_of_continuous_coeff _ fun l v => ?_
   obtain ⟨g, hg⟩ := LinearMap.exists_extend (p := U) l
@@ -48,35 +49,42 @@ theorem isSemisimple_ofInvariant (U : Submodule ℂ V) (hU : ∀ k, ∀ u ∈ U,
   exact hc g v v.2
 
 theorem le_iSup_atoms
-    (H : ∀ v : V, ∃ U : Submodule ℂ V, v ∈ U ∧ FiniteDimensional ℂ U ∧ (∀ k, ∀ u ∈ U, ρ k u ∈ U) ∧
-      ∀ (ℓ : Module.Dual ℂ V), ∀ u ∈ U, Continuous fun k => ℓ (ρ k u))
-    (X : Subrepresentation ρ) :
-    X.toSubmodule ≤ ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule := by
+    (H : ∀ v : V, ∃ U : Submodule ℂ V,
+      v ∈ U ∧ FiniteDimensional ℂ U ∧ (∀ k, ∀ u ∈ U, ρ k u ∈ U)
+        ∧ ∀ (ℓ : Module.Dual ℂ V), ∀ u ∈ U, Continuous fun k => ℓ (ρ k u))
+    (X : Subrepresentation ρ)
+    : X.toSubmodule ≤ ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule := by
   set N := ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule with hNdef
   have hNX : N ≤ X.toSubmodule := iSup₂_le fun S hS => hS.2
   have hNinv : ∀ k, ∀ x ∈ N, ρ k x ∈ N := by
     intro k
-    have : N ≤ N.comap (ρ k) := iSup₂_le fun S hS x hx =>
-      (le_iSup₂ (f := fun (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X) => S.toSubmodule) S hS)
-        (S.apply_mem_toSubmodule k hx)
+    have : N ≤ N.comap (ρ k) :=
+      iSup₂_le fun S hS x hx =>
+        (le_iSup₂ (f := fun (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X) => S.toSubmodule) S hS)
+          (S.apply_mem_toSubmodule k hx)
     exact fun x hx => this hx
   intro x hxX
   obtain ⟨U, hxU, hfd, hU, hc⟩ := H x
   let R := ofInvariant U hU
   haveI : ComplementedLattice (Subrepresentation R.toRepresentation) :=
     isSemisimple_ofInvariant U hU hfd hc
-  let W : Subrepresentation R.toRepresentation :=
-    ⟨N.comap U.subtype, fun k w hw => hNinv k _ hw⟩
+  let W : Subrepresentation R.toRepresentation := ⟨N.comap U.subtype, fun k w hw => hNinv k _ hw⟩
   obtain ⟨W', hW'⟩ := exists_isCompl W
   have hdis : W.toSubmodule ⊓ W'.toSubmodule = ⊥ :=
     congrArg Subrepresentation.toSubmodule hW'.inf_eq_bot
   have hsup : W.toSubmodule ⊔ W'.toSubmodule = ⊤ :=
     congrArg Subrepresentation.toSubmodule hW'.sup_eq_top
   let Xc : Submodule ℂ U := X.toSubmodule.comap U.subtype
-  let Y : Subrepresentation ρ := ⟨(W'.toSubmodule ⊓ Xc).map U.subtype, by
-    rintro k _ ⟨u, ⟨hu1, hu2⟩, rfl⟩
-    exact ⟨R.toRepresentation k u, ⟨W'.apply_mem_toSubmodule k hu1,
-      X.apply_mem_toSubmodule k hu2⟩, rfl⟩⟩
+  let Y : Subrepresentation ρ := ⟨
+    (W'.toSubmodule ⊓ Xc).map U.subtype,
+    by
+      rintro k _ ⟨u, ⟨hu1, hu2⟩, rfl⟩
+      exact ⟨
+        R.toRepresentation k u,
+        ⟨W'.apply_mem_toSubmodule k hu1, X.apply_mem_toSubmodule k hu2⟩,
+        rfl
+      ⟩
+  ⟩
   have hY : Y = ⊥ := by
     by_contra hne
     haveI : FiniteDimensional ℂ Y.toSubmodule := Submodule.finiteDimensional_of_le
@@ -87,7 +95,9 @@ theorem le_iSup_atoms
       obtain ⟨u, ⟨_, hu2⟩, rfl⟩ := hTY ht
       exact hu2
     have hTN : T.toSubmodule ≤ N :=
-      le_iSup₂ (f := fun (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X) => S.toSubmodule) T ⟨hT, hTX⟩
+      le_iSup₂
+        (f := fun (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X) => S.toSubmodule)
+        T ⟨hT, hTX⟩
     have hT0 : T.toSubmodule ≠ ⊥ := fun h => hT.1 (Subrepresentation.toSubmodule_injective h)
     obtain ⟨t, ht, ht0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hT0
     obtain ⟨u, ⟨hu1, _⟩, rfl⟩ := hTY ht
@@ -101,26 +111,27 @@ theorem le_iSup_atoms
   have hsum : (w : V) + (w' : V) = x := congrArg Subtype.val hww
   have hw'X : w' ∈ Xc := by
     have h1 : (w : V) ∈ X.toSubmodule := hNX hw
-    have h2 : (w' : V) = x - w := by
-      rw [← hsum]; abel
+    have h2 : (w' : V) = x - w := by rw [← hsum]; abel
     show (w' : V) ∈ X.toSubmodule
     rw [h2]
     exact X.toSubmodule.sub_mem hxX h1
   have hw'0 : (w' : V) ∈ Y.toSubmodule := ⟨w', ⟨hw', hw'X⟩, rfl⟩
   rw [hY] at hw'0
   have : (w' : V) = 0 := (Submodule.mem_bot ℂ).1 hw'0
-  have hxw : x = w := by
-    rw [← hsum, ‹(w' : V) = 0›, add_zero]
+  have hxw : x = w := by rw [← hsum, ‹(w' : V) = 0›, add_zero]
   rw [hxw]
   exact hw
 
-theorem semisimple_of_locallyFinite : ∀ (K V : Type) [Group K] [TopologicalSpace K]
-    [IsTopologicalGroup K] [CompactSpace K] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ K V), (∀ v : V, ∃ U : Submodule ℂ V, v ∈ U ∧ FiniteDimensional ℂ U ∧
-      (∀ k, ∀ u ∈ U, ρ k u ∈ U) ∧ ∀ (ℓ : Module.Dual ℂ V), ∀ u ∈ U, Continuous fun k => ℓ (ρ k u)) →
-    ρ.IsSemisimpleRepresentation ∧ (∀ S : Subrepresentation ρ, IsAtom S →
-      FiniteDimensional ℂ S.toSubmodule) ∧ ∀ X : Subrepresentation ρ,
-        X.toSubmodule = ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule := by
+theorem semisimple_of_locallyFinite
+    : ∀ (K V : Type) [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
+        [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ K V),
+      (∀ v : V, ∃ U : Submodule ℂ V,
+          v ∈ U ∧ FiniteDimensional ℂ U ∧ (∀ k, ∀ u ∈ U, ρ k u ∈ U)
+            ∧ ∀ (ℓ : Module.Dual ℂ V), ∀ u ∈ U, Continuous fun k => ℓ (ρ k u))
+        → ρ.IsSemisimpleRepresentation
+          ∧ (∀ S : Subrepresentation ρ, IsAtom S → FiniteDimensional ℂ S.toSubmodule)
+          ∧ ∀ X : Subrepresentation ρ,
+            X.toSubmodule = ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule := by
   intro K V _ _ _ _ _ _ ρ H
   have hle := le_iSup_atoms H
   refine ⟨?_, ?_, fun X => le_antisymm (hle X) (iSup₂_le fun S hS => hS.2)⟩
@@ -131,8 +142,8 @@ theorem semisimple_of_locallyFinite : ∀ (K V : Type) [Group K] [TopologicalSpa
       IsSimpleModule (MonoidAlgebra ℂ K) m} with hs
     have hZ : (e.symm s).toSubmodule = ⊤ := by
       refine eq_top_iff.2 ((hle ⊤).trans (iSup₂_le fun S hS => ?_))
-      have : S ≤ e.symm s := e.le_symm_apply.2
-        (le_sSup (isSimpleModule_iff_isAtom.2 ((e.isAtom_iff S).2 hS.1)))
+      have : S ≤ e.symm s :=
+        e.le_symm_apply.2 (le_sSup (isSimpleModule_iff_isAtom.2 ((e.isAtom_iff S).2 hS.1)))
       exact this
     have h1 : e.symm s = ⊤ := Subrepresentation.toSubmodule_injective hZ
     rw [← e.apply_symm_apply s, h1, e.map_top]
@@ -144,8 +155,7 @@ theorem semisimple_of_locallyFinite : ∀ (K V : Type) [Group K] [TopologicalSpa
     · have hm : v ∈ (S ⊓ ofInvariant U hU).toSubmodule := ⟨hv, hvU⟩
       rw [h] at hm
       exact absurd ((Submodule.mem_bot ℂ).1 hm) hv0
-    · have hSU : S.toSubmodule ≤ U := by
-        rw [← h]; exact fun x hx => hx.2
+    · have hSU : S.toSubmodule ≤ U := by rw [← h]; exact fun x hx => hx.2
       exact Submodule.finiteDimensional_of_le hSU
 
 end GlobalTheory.LocFinSemisimple

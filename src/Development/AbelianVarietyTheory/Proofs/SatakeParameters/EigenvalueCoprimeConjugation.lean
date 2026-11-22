@@ -11,7 +11,9 @@ noncomputable section
 
 namespace GlobalTheory.Proof.EigenvalueCoprimeConjugation
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual Formalism.CyclotomicNorms ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual Formalism.CyclotomicNorms ReciprocityTheory.Gal Polynomial NumberField
+  IsDedekindDomain
 open GlobalTheory.TameLabels GlobalTheory.WeilDeligne
 
 variable (D : D7)

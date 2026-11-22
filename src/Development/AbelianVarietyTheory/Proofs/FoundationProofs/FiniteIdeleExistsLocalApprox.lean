@@ -6,26 +6,32 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBas
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links Formalism.L2.JoinChr Formalism.L2.Host
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links
+  Formalism.L2.JoinChr Formalism.L2.Host
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory
 
-theorem adicCompletion_exists_approx_lt (L : Type) [Field L] [NumberField L]
-    (P : HeightOneSpectrum (𝓞 L)) (y c : P.adicCompletion L) (hc : c ≠ 0) :
-    ∃ k : L, Valued.v (y - algebraMap L (P.adicCompletion L) k) < Valued.v c := by
+theorem adicCompletion_exists_approx_lt
+    (L : Type) [Field L] [NumberField L]
+    (P : HeightOneSpectrum (𝓞 L)) (y c : P.adicCompletion L) (hc : c ≠ 0)
+    : ∃ k : L, Valued.v (y - algebraMap L (P.adicCompletion L) k) < Valued.v c := by
   have ho : IsOpen {z : P.adicCompletion L | Valued.v (y - z) < Valued.v c} := by
-    have h0 := (Valued.isOpen_ball (P.adicCompletion L)
-      ((Valued.v : Valuation (P.adicCompletion L) (WithZero (Multiplicative ℤ))).restrict c)).preimage
-        (continuous_sub_left y)
+    have h0 :=
+      (Valued.isOpen_ball (P.adicCompletion L)
+        ((Valued.v : Valuation (P.adicCompletion L) (WithZero (Multiplicative ℤ))).restrict
+          c)).preimage (continuous_sub_left y)
     simpa only [Set.preimage_ofPred_eq, Valuation.restrict_lt_iff] using h0
   have hy : y ∈ {z : P.adicCompletion L | Valued.v (y - z) < Valued.v c} := by
     show Valued.v (y - y) < Valued.v c
     rw [sub_self, map_zero]
     exact (Valuation.pos_iff _).2 hc
-  obtain ⟨k, hk⟩ := (IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap (R := 𝓞 L) (K := L)
-    (v := P)).exists_mem_open ho ⟨y, hy⟩
+  obtain ⟨k, hk⟩ :=
+    (IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap (R := 𝓞 L) (K := L)
+      (v := P)).exists_mem_open ho ⟨y, hy⟩
   exact ⟨k, hk⟩
 
 private lemma valued_v_algebraMap_adicCompletion_foundation (L : Type) [Field L] [NumberField L]
@@ -33,19 +39,22 @@ private lemma valued_v_algebraMap_adicCompletion_foundation (L : Type) [Field L]
     Valued.v (algebraMap L (P.adicCompletion L) k) = P.valuation L k :=
   IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (R := 𝓞 L) (v := P) k
 
-theorem adicCompletion_exists_unit_approx (L : Type) [Field L] [NumberField L] (N : ℕ) (hN : 0 < N)
-    (P : HeightOneSpectrum (𝓞 L)) (y : P.adicCompletion L) (hy : y ≠ 0) :
-    ∃ k : Lˣ, Valued.v y = P.valuation L (k : L) ∧
-      Valued.v (y - algebraMap L _ (k : L)) ≤ P.valuation L (N : L) * P.valuation L (k : L) ∧
-      Valued.v (y - algebraMap L _ (k : L)) ≤ WithZero.exp (-1 : ℤ) * P.valuation L (k : L) := by
+theorem adicCompletion_exists_unit_approx
+    (L : Type) [Field L] [NumberField L]
+    (N : ℕ) (hN : 0 < N)
+    (P : HeightOneSpectrum (𝓞 L)) (y : P.adicCompletion L) (hy : y ≠ 0)
+    : ∃ k : Lˣ,
+      Valued.v y = P.valuation L (k : L)
+        ∧ Valued.v (y - algebraMap L _ (k : L)) ≤ P.valuation L (N : L) * P.valuation L (k : L)
+        ∧ Valued.v (y - algebraMap L _ (k : L))
+          ≤ WithZero.exp (-1 : ℤ) * P.valuation L (k : L) := by
   obtain ⟨π, hπ⟩ := P.valuation_exists_uniformizer L
   have hπ0 : π ≠ 0 := by
     intro h
     rw [h, map_zero] at hπ
     exact WithZero.exp_ne_zero hπ.symm
   have hN0 : (N : L) ≠ 0 := Nat.cast_ne_zero.2 hN.ne'
-  have hN1 : P.valuation L (N : L) ≤ 1 := by
-    simpa using P.valuation_le_one (K := L) (N : 𝓞 L)
+  have hN1 : P.valuation L (N : L) ≤ 1 := by simpa using P.valuation_le_one (K := L) (N : 𝓞 L)
   have he1 : (WithZero.exp (-1 : ℤ) : WithZero (Multiplicative ℤ)) ≤ 1 := by
     rw [← WithZero.exp_zero, WithZero.exp_le_exp]
     norm_num
@@ -79,8 +88,19 @@ theorem adicCompletion_exists_unit_approx (L : Type) [Field L] [NumberField L] (
     gcongr ?_ * _
     exact mul_le_of_le_one_left' hN1
 
-theorem finiteIdele_exists_local_approx :
-    ∀ (L : Type) [Field L] [NumberField L] (N : ℕ), 0 < N → ∀ x : (FiniteAdeleRing (𝓞 L) L)ˣ, ∃ (S : Finset (HeightOneSpectrum (𝓞 L))) (k : HeightOneSpectrum (𝓞 L) → Lˣ), (∀ P ∈ S, Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P) = P.valuation L (k P : L) ∧ Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P - algebraMap L _ (k P : L)) ≤ P.valuation L (N : L) * P.valuation L (k P : L) ∧ Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P - algebraMap L _ (k P : L)) ≤ WithZero.exp (-1 : ℤ) * P.valuation L (k P : L)) ∧ ∀ P, P ∉ S → Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P) = 1 ∧ (N : 𝓞 L) ∉ P.asIdeal := by
+theorem finiteIdele_exists_local_approx
+    : ∀ (L : Type) [Field L] [NumberField L] (N : ℕ),
+      0 < N
+        → ∀ x : (FiniteAdeleRing (𝓞 L) L)ˣ,
+          ∃ (S : Finset (HeightOneSpectrum (𝓞 L))) (k : HeightOneSpectrum (𝓞 L) → Lˣ),
+            (∀ P ∈ S,
+                Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P) = P.valuation L (k P : L)
+                  ∧ Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P - algebraMap L _ (k P : L))
+                    ≤ P.valuation L (N : L) * P.valuation L (k P : L)
+                  ∧ Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P - algebraMap L _ (k P : L))
+                    ≤ WithZero.exp (-1 : ℤ) * P.valuation L (k P : L))
+              ∧ ∀ P,
+                P ∉ S → Valued.v ((x : FiniteAdeleRing (𝓞 L) L) P) = 1 ∧ (N : 𝓞 L) ∉ P.asIdeal := by
   intro L _ _ N hN x
   obtain ⟨hx0, hx1⟩ := FiniteAdeleRing.isUnit_iff.1 x.isUnit
   choose k hk using fun P => adicCompletion_exists_unit_approx L N hN P _ (hx0 P)

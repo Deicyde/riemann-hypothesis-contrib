@@ -11,11 +11,16 @@ open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.Spherical
 
 namespace GlobalTheory.CompanionTheory.SphComp
 
-theorem form_heckeVec_dosetInd {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] {K : Subgroup G}
-    (hK : IsCommensurated K) (ρ : Representation ℂ G V) {x : V} (hx : x ∈ fixed ρ K)
-    (l : Module.Dual ℂ V) (hl : ∀ k ∈ K, l ∘ₗ ρ k = l) (g : G) :
-    l (heckeVec ρ K (dosetInd ℂ K g) x) =
-      (Nat.card {c : G ⧸ K // (c.out : G) ∈ DoubleCoset.doubleCoset g (K : Set G) K} : ℂ) * l (ρ g x) := by
+theorem form_heckeVec_dosetInd
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    {K : Subgroup G} (hK : IsCommensurated K)
+    (ρ : Representation ℂ G V)
+    {x : V} (hx : x ∈ fixed ρ K)
+    (l : Module.Dual ℂ V) (hl : ∀ k ∈ K, l ∘ₗ ρ k = l)
+    (g : G)
+    : l (heckeVec ρ K (dosetInd ℂ K g) x)
+      = (Nat.card {c : G ⧸ K // (c.out : G) ∈ DoubleCoset.doubleCoset g (K : Set G) K} : ℂ)
+        * l (ρ g x) := by
   classical
   set D := DoubleCoset.doubleCoset g (K : Set G) K with hD
   have hm := Formalism.UG.Final.DosetIndMem G K ℂ g
@@ -31,12 +36,14 @@ theorem form_heckeVec_dosetInd {G V : Type} [Group G] [AddCommGroup V] [Module �
     obtain ⟨a, ha, b, hb, rfl⟩ := DoubleCoset.mem_doubleCoset.1 hγ
     have e := LinearMap.congr_fun (hl a ha) (ρ g (ρ b x))
     simp only [LinearMap.comp_apply] at e
-    rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, e, GlobalTheory.LGrp.mem_fixed.1 hx _ hb]
-  have e1 : l (heckeVec ρ K (dosetInd ℂ K g) x) =
-      ∑ᶠ c : G ⧸ K, l (dosetInd ℂ K g c.out • ρ c.out x) :=
+    rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, e,
+      GlobalTheory.LGrp.mem_fixed.1 hx _ hb]
+  have e1
+      : l (heckeVec ρ K (dosetInd ℂ K g) x) = ∑ᶠ c : G ⧸ K, l (dosetInd ℂ K g c.out • ρ c.out x) :=
     l.toAddMonoidHom.map_finsum (finite_heckeVec hK hm ρ x)
-  have e2 : (fun c : G ⧸ K => l (dosetInd ℂ K g c.out • ρ c.out x)) =
-      Set.indicator {c : G ⧸ K | c.out ∈ D} (fun _ => l (ρ g x)) := by
+  have e2
+      : (fun c : G ⧸ K => l (dosetInd ℂ K g c.out • ρ c.out x))
+        = Set.indicator {c : G ⧸ K | c.out ∈ D} (fun _ => l (ρ g x)) := by
     funext c
     by_cases h : c.out ∈ D
     · have h1 : dosetInd ℂ K g c.out = 1 := by
@@ -47,7 +54,8 @@ theorem form_heckeVec_dosetInd {G V : Type} [Group G] [AddCommGroup V] [Module �
     · have h1 : dosetInd ℂ K g c.out = 0 := by
         simp only [dosetInd]
         exact Set.indicator_of_notMem h _
-      rw [Set.indicator_of_notMem (show c ∉ {c : G ⧸ K | c.out ∈ D} from h), h1, zero_smul, map_zero]
+      rw [Set.indicator_of_notMem (show c ∉ {c : G ⧸ K | c.out ∈ D} from h), h1, zero_smul,
+        map_zero]
   have hc : Nat.card {c : G ⧸ K // c.out ∈ D} = hfin.toFinset.card := by
     rw [← Set.ncard_eq_toFinset_card _ hfin]
     exact Nat.card_coe_set_eq {c : G ⧸ K | c.out ∈ D}

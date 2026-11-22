@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace Bl.SecondBlockLemmaO
 
-theorem goal1 :
-  ∀ {V : Type} [inst : CommRing.{0} V] [inst_1 : IsDomain.{0} V] [IsDiscreteValuationRing.{0} V] {ϖ : V},
-  Irreducible.{0} ϖ → IsLocalization.Away.{0, 0} ϖ (FractionRing.{0} V) := by
+theorem goal1
+    : ∀ {V : Type} [inst : CommRing.{0} V] [inst_1 : IsDomain.{0} V] [IsDiscreteValuationRing.{0} V]
+        {ϖ : V},
+      Irreducible.{0} ϖ → IsLocalization.Away.{0, 0} ϖ (FractionRing.{0} V) := by
   intro V _ _ _ ϖ hϖ
   have hϖ0 : ϖ ≠ 0 := hϖ.ne_zero
   have hinj := IsFractionRing.injective V (FractionRing V)
@@ -22,7 +23,9 @@ theorem goal1 :
     have hbK : algebraMap V (FractionRing V) b ≠ 0 := (map_ne_zero_iff _ hinj).2 hb0
     obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 hϖ
     refine ⟨⟨a * ↑u⁻¹, ⟨ϖ ^ n, n, rfl⟩⟩, ?_⟩
-    have hu' : algebraMap V (FractionRing V) (↑u⁻¹ : V) * algebraMap V (FractionRing V) (↑u : V) = 1 := by
+    have hu'
+        : algebraMap V (FractionRing V) (↑u⁻¹ : V) * algebraMap V (FractionRing V) (↑u : V)
+          = 1 := by
       rw [← map_mul, Units.inv_mul, map_one]
     show algebraMap V (FractionRing V) a / algebraMap V (FractionRing V) b *
       algebraMap V (FractionRing V) (ϖ ^ n) = algebraMap V (FractionRing V) (a * ↑u⁻¹)

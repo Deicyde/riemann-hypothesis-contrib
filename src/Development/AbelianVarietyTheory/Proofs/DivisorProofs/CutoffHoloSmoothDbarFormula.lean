@@ -8,14 +8,28 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 namespace GlobalTheory.L2Cutoff
 
-theorem cutoff_smooth_dbar : ∀ (n : ℕ) (M : Type) [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M], ∀ (X : EtaleStein n M) (ψ : M → ℝ) (G : M → ℂ) (Ω : Set M) (δ b : ℝ) (θ : ℝ → ℝ), SmoothR n X.z ψ → ContDiff ℝ ∞ θ → (∀ t, b ≤ t → θ t = 0) → IsOpen Ω → (∀ e : OpenPartialHomeomorph M (V n), IsChart n X.z e → DifferentiableOn ℂ (G ∘ e.symm) (e.target ∩ e.symm ⁻¹' Ω)) → (∀ x, δ * ψ x ≤ b → x ∈ Ω) → Smooth n X.z (fun x => (θ (δ * ψ x) : ℂ) * G x) ∧ ∀ (x : M) (ξ : Fin n → ℂ), dbarDot n X.z (fun y => (θ (δ * ψ y) : ℂ) * G y) x ξ = ((deriv θ (δ * ψ x) * δ : ℝ) : ℂ) * G x * dbarDot n X.z (fun y => (ψ y : ℂ)) x ξ := by
+theorem cutoff_smooth_dbar
+    : ∀ (n : ℕ) (M : Type) [TopologicalSpace M] [T2Space M] [SecondCountableTopology M]
+        [MeasurableSpace M] [BorelSpace M],
+      ∀ (X : EtaleStein n M) (ψ : M → ℝ) (G : M → ℂ) (Ω : Set M) (δ b : ℝ) (θ : ℝ → ℝ),
+        SmoothR n X.z ψ → ContDiff ℝ ∞ θ → (∀ t, b ≤ t → θ t = 0) → IsOpen Ω
+          → (∀ e : OpenPartialHomeomorph M (V n),
+            IsChart n X.z e → DifferentiableOn ℂ (G ∘ e.symm) (e.target ∩ e.symm ⁻¹' Ω))
+          → (∀ x, δ * ψ x ≤ b → x ∈ Ω)
+          → Smooth n X.z (fun x => (θ (δ * ψ x) : ℂ) * G x)
+            ∧ ∀ (x : M) (ξ : Fin n → ℂ),
+              dbarDot n X.z (fun y => (θ (δ * ψ y) : ℂ) * G y) x ξ
+                = ((deriv θ (δ * ψ x) * δ : ℝ) : ℂ) * G x
+                  * dbarDot n X.z (fun y => (ψ y : ℂ)) x ξ := by
   intro n M _ _ _ _ _ X ψ G Ω δ b θ hψ hθ hθ0 hΩ hG hsub
-  have hψe : ∀ e : OpenPartialHomeomorph M (V n), IsChart n X.z e →
-      ContDiffOn ℝ ∞ (fun v => ψ (e.symm v)) e.target := by
+  have hψe
+      : ∀ e : OpenPartialHomeomorph M (V n),
+        IsChart n X.z e → ContDiffOn ℝ ∞ (fun v => ψ (e.symm v)) e.target := by
     intro e he
     have h1 := (Complex.reCLM.contDiff (n := ∞)).comp_contDiffOn (hψ e he)
     refine h1.congr fun v _ => ?_
@@ -25,14 +39,17 @@ theorem cutoff_smooth_dbar : ∀ (n : ℕ) (M : Type) [TopologicalSpace M] [T2Sp
     intro t ht
     filter_upwards [lt_mem_nhds ht] with s hs
     exact hθ0 s hs.le
-  have hloc : ∀ e : OpenPartialHomeomorph M (V n), IsChart n X.z e → ∀ v ∈ e.target,
-      (e.symm v ∈ Ω → DifferentiableAt ℂ (G ∘ e.symm) v) ∧
-      (e.symm v ∉ Ω → ((fun x => (θ (δ * ψ x) : ℂ) * G x) ∘ e.symm) =ᶠ[𝓝 v] fun _ => 0) := by
+  have hloc
+      : ∀ e : OpenPartialHomeomorph M (V n),
+        IsChart n X.z e
+          → ∀ v ∈ e.target,
+            (e.symm v ∈ Ω → DifferentiableAt ℂ (G ∘ e.symm) v)
+              ∧ (e.symm v ∉ Ω
+                → ((fun x => (θ (δ * ψ x) : ℂ) * G x) ∘ e.symm) =ᶠ[𝓝 v] fun _ => 0) := by
     intro e he v hv
     constructor
     · intro hvΩ
-      exact (hG e he).differentiableAt
-        ((e.isOpen_inter_preimage_symm hΩ).mem_nhds ⟨hv, hvΩ⟩)
+      exact (hG e he).differentiableAt ((e.isOpen_inter_preimage_symm hΩ).mem_nhds ⟨hv, hvΩ⟩)
     · intro hvΩ
       have hb : b < δ * ψ (e.symm v) := by
         by_contra h
@@ -47,12 +64,12 @@ theorem cutoff_smooth_dbar : ∀ (n : ℕ) (M : Type) [TopologicalSpace M] [T2Sp
     by_cases hvΩ : e.symm v ∈ Ω
     · have hU := (e.isOpen_inter_preimage_symm hΩ).mem_nhds ⟨hv, hvΩ⟩
       have hGc : ContDiffAt ℝ ∞ (G ∘ e.symm) v :=
-        ((contDiffOn_of_differentiableOn n _ _ (e.isOpen_inter_preimage_symm hΩ) (hG e he)).contDiffAt
-          hU).restrict_scalars ℝ
+        ((contDiffOn_of_differentiableOn n _ _ (e.isOpen_inter_preimage_symm hΩ)
+          (hG e he)).contDiffAt hU).restrict_scalars ℝ
       have hk : ContDiffAt ℝ ∞ (fun w => ((θ (δ * ψ (e.symm w)) : ℝ) : ℂ)) v :=
         Complex.ofRealCLM.contDiff.contDiffAt.comp v
-          (hθ.contDiffAt.comp v (contDiffAt_const.mul
-            ((hψe e he).contDiffAt (e.open_target.mem_nhds hv))))
+          (hθ.contDiffAt.comp v
+            (contDiffAt_const.mul ((hψe e he).contDiffAt (e.open_target.mem_nhds hv))))
       exact hk.mul hGc
     · exact contDiffAt_const.congr_of_eventuallyEq ((hloc e he v hv).2 hvΩ)
   · intro x ξ
@@ -70,15 +87,19 @@ theorem cutoff_smooth_dbar : ∀ (n : ℕ) (M : Type) [TopologicalSpace M] [T2Sp
         ((hψe e he).contDiffAt (e.open_target.mem_nhds hv)).differentiableAt (by simp)
       have hkd : DifferentiableAt ℝ (fun t => θ (δ * t)) (ψ (e.symm (X.z x))) :=
         (hθd _).comp _ ((differentiableAt_id).const_mul δ)
-      have hderiv : deriv (fun t => θ (δ * t)) (ψ (e.symm (X.z x))) =
-          deriv θ (δ * ψ (e.symm (X.z x))) * δ := by
+      have hderiv
+          : deriv (fun t => θ (δ * t)) (ψ (e.symm (X.z x)))
+            = deriv θ (δ * ψ (e.symm (X.z x))) * δ := by
         have h1 : HasDerivAt (fun t : ℝ => δ * t) δ (ψ (e.symm (X.z x))) := by
           simpa using (hasDerivAt_id (ψ (e.symm (X.z x)))).const_mul δ
         exact ((hθd _).hasDerivAt.comp _ h1).deriv
-      have h1 : ((fun y => (θ (δ * ψ y) : ℂ) * G y) ∘ e.symm) =
-          fun w => (((fun t => θ (δ * t)) (ψ (e.symm w)) : ℝ) : ℂ) * (G ∘ e.symm) w := rfl
-      have hkd' : DifferentiableAt ℝ (fun w => (((fun t => θ (δ * t)) (ψ (e.symm w)) : ℝ) : ℂ))
-          (X.z x) := differentiableAt_ofReal (DifferentiableAt.comp (f := fun w => ψ (e.symm w)) (X.z x) hkd hψd)
+      have h1
+          : ((fun y => (θ (δ * ψ y) : ℂ) * G y) ∘ e.symm)
+            = fun w => (((fun t => θ (δ * t)) (ψ (e.symm w)) : ℝ) : ℂ) * (G ∘ e.symm) w :=
+        rfl
+      have hkd'
+          : DifferentiableAt ℝ (fun w => (((fun t => θ (δ * t)) (ψ (e.symm w)) : ℝ) : ℂ)) (X.z x) :=
+        differentiableAt_ofReal (DifferentiableAt.comp (f := fun w => ψ (e.symm w)) (X.z x) hkd hψd)
       rw [h1, wdb_mul hkd' (hGd.restrictScalars ℝ), wdb_of_differentiableAt hGd,
         wdb_ofReal_comp (k := fun t => θ (δ * t)) (v := fun w => ψ (e.symm w)) hkd hψd, hderiv]
       have h2 : ((fun y => (ψ y : ℂ)) ∘ e.symm) = fun w => ((ψ (e.symm w) : ℝ) : ℂ) := rfl
@@ -89,8 +110,7 @@ theorem cutoff_smooth_dbar : ∀ (n : ℕ) (M : Type) [TopologicalSpace M] [T2Sp
     · have hb : b < δ * ψ x := by
         by_contra h
         exact hxΩ (hsub _ (not_lt.1 h))
-      rw [wdb_congr ((hloc e he _ hv).2 (by rw [hsx]; exact hxΩ)),
-        ((hθzero _ hb).deriv_eq)]
+      rw [wdb_congr ((hloc e he _ hv).2 (by rw [hsx]; exact hxΩ)), ((hθzero _ hb).deriv_eq)]
       simp [wdb]
 
 end GlobalTheory.L2Cutoff

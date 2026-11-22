@@ -14,13 +14,14 @@ open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Desc Polynomial Filter Topolo
 
 namespace GlobalTheory.UnitLemma.SgnProd
 
-theorem val_mul (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0) :
-    val K.O (x * y) = val K.O x + val K.O y := by
+theorem val_mul (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0)
+    : val K.O (x * y) = val K.O x + val K.O y := by
   unfold val
-  rw [map_mul, WithZero.log_mul ((Valuation.ne_zero_iff _).2 hx) ((Valuation.ne_zero_iff _).2 hy), neg_add]
+  rw [map_mul, WithZero.log_mul ((Valuation.ne_zero_iff _).2 hx) ((Valuation.ne_zero_iff _).2 hy),
+    neg_add]
 
-theorem eta_mul (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0) :
-    K.eta (x * y) = K.eta x * K.eta y := by
+theorem eta_mul (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0)
+    : K.eta (x * y) = K.eta x * K.eta y := by
   unfold UQ.eta
   rw [val_mul K hx hy, zpow_add₀ (by norm_num)]
 
@@ -36,25 +37,32 @@ theorem eta_of_sq_one (K : UQ) {ε : K.E} (h : ε * ε = 1) (a : K.E) : K.eta (�
   · simp [ha]
   rw [val_mul K hε ha, hv, zero_add]
 
-theorem exists_basis_lat (K : UQ) {V : Type} [AddCommGroup V] [Module K.E V] [Module K.O V]
-    [IsScalarTower K.O K.E V] [Module.Finite K.E V] (L : Submodule K.O V) (hfg : L.FG) (hsp : Submodule.span K.E (L : Set V) = ⊤) :
-    ∃ e : Module.Basis (Fin (Module.finrank K.E V)) K.E V, Submodule.span K.O (Set.range e) = L := by
+theorem exists_basis_lat
+    (K : UQ)
+    {V : Type}
+    [AddCommGroup V] [Module K.E V] [Module K.O V] [IsScalarTower K.O K.E V] [Module.Finite K.E V]
+    (L : Submodule K.O V) (hfg : L.FG) (hsp : Submodule.span K.E (L : Set V) = ⊤)
+    : ∃ e : Module.Basis (Fin (Module.finrank K.E V)) K.E V,
+      Submodule.span K.O (Set.range e) = L := by
   have : Submodule.IsLattice K.E L := Submodule.IsLattice.of_fg K.E hfg
   have : Submodule.IsFullLattice K.E L := ⟨hsp⟩
   have : Module.Finite K.O L := Submodule.IsLattice.finite K.E L
   have : Module.Free K.O L := Submodule.IsLattice.free K.E L
   let b := Module.finBasisOfFinrankEq K.O L (Submodule.IsFullLattice.finrank_eq K.E L)
   refine ⟨b.extendOfIsFullLattice K.E, ?_⟩
-  have : Set.range (b.extendOfIsFullLattice K.E) = L.subtype '' Set.range b := by
-    ext x; simp
+  have : Set.range (b.extendOfIsFullLattice K.E) = L.subtype '' Set.range b := by ext x; simp
   rw [this, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
 
-theorem exists_smul_mem (K : UQ) {V : Type} [AddCommGroup V] [Module K.E V] [Module K.O V]
-    [IsScalarTower K.O K.E V] [Module.Finite K.E V] (L : Submodule K.O V) (hfg : L.FG) (hsp : Submodule.span K.E (L : Set V) = ⊤) (y : V) :
-    ∃ s : K.O, s ≠ 0 ∧ s • y ∈ L := by
+theorem exists_smul_mem
+    (K : UQ)
+    {V : Type}
+    [AddCommGroup V] [Module K.E V] [Module K.O V] [IsScalarTower K.O K.E V] [Module.Finite K.E V]
+    (L : Submodule K.O V) (hfg : L.FG) (hsp : Submodule.span K.E (L : Set V) = ⊤)
+    (y : V)
+    : ∃ s : K.O, s ≠ 0 ∧ s • y ∈ L := by
   obtain ⟨e, he⟩ := exists_basis_lat K L hfg hsp
-  obtain ⟨⟨s, hs⟩, hsc⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors K.O) Finset.univ
-    (fun i => e.repr y i)
+  obtain ⟨⟨s, hs⟩, hsc⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors K.O) Finset.univ (fun i => e.repr y i)
   choose a ha using fun i => hsc i (Finset.mem_univ i)
   refine ⟨s, nonZeroDivisors.ne_zero hs, ?_⟩
   have : s • y = ∑ i, a i • e i := by
@@ -69,10 +77,12 @@ end GlobalTheory.UnitLemma.SgnProd
 
 namespace GlobalTheory.UnitLemma.SgnProd
 
-theorem det_trace_ne_zero {K : UQ} (B : InvAlg K) (hsep : B.P.Separable)
-    (e : Module.Basis (Fin (Module.finrank K.E B.A)) K.E B.A) :
-    (Matrix.of fun k l : Fin (Module.finrank K.E B.A) =>
-      Algebra.trace K.E B.A (B.g ^ (k : ℕ) * e l)).det ≠ 0 := by
+theorem det_trace_ne_zero
+    {K : UQ}
+    (B : InvAlg K) (hsep : B.P.Separable) (e : Module.Basis (Fin (Module.finrank K.E B.A)) K.E B.A)
+    : (Matrix.of fun k l : Fin (Module.finrank K.E B.A) =>
+        Algebra.trace K.E B.A (B.g ^ (k : ℕ) * e l)).det
+      ≠ 0 := by
   intro h0
   obtain ⟨c, hc, hvm⟩ := Matrix.exists_vecMul_eq_zero_iff.2 h0
   set q : K.E[X] := ∑ k : Fin (Module.finrank K.E B.A), C (c k) * X ^ (k : ℕ) with hq
@@ -104,13 +114,16 @@ theorem det_trace_ne_zero {K : UQ} (B : InvAlg K) (hsep : B.P.Separable)
   funext k
   have := congrArg (fun p : K.E[X] => p.coeff k) hq0
   simp only [hq, Polynomial.finsetSum_coeff, coeff_C_mul_X_pow, coeff_zero] at this
-  rw [Finset.sum_eq_single k (fun b _ hb => if_neg (fun h => hb (Fin.ext h.symm))) (by simp)] at this
+  rw [Finset.sum_eq_single k (fun b _ hb => if_neg (fun h => hb (Fin.ext h.symm))) (by simp)]
+    at this
   simpa using this
 
-theorem trace_mat_toMatrix {E A : Type} [Field E] [CommRing A] [Algebra E A] {ι κ : Type} [Fintype ι]
-    [DecidableEq ι] (b : Module.Basis ι E A) (x : κ → A) (f : ι → A) :
-    (Matrix.of fun k l => Algebra.trace E A (x k * f l)) =
-      (Matrix.of fun k i => Algebra.trace E A (x k * b i)) * b.toMatrix f := by
+theorem trace_mat_toMatrix
+    {E A : Type} [Field E] [CommRing A] [Algebra E A]
+    {ι κ : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι E A) (x : κ → A) (f : ι → A)
+    : (Matrix.of fun k l => Algebra.trace E A (x k * f l))
+      = (Matrix.of fun k i => Algebra.trace E A (x k * b i)) * b.toMatrix f := by
   ext k l
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Matrix.of_apply, Matrix.mul_apply, ← b.sum_toMatrix_smul_self f l, Finset.mul_sum, map_sum]
@@ -123,16 +136,17 @@ namespace GlobalTheory.UnitLemma.SgnProd
 
 open Module
 
-theorem lattice_split (K : UQ) (V₁ V₂ : Type) [AddCommGroup V₁] [Module K.E V₁] [Module K.O V₁]
-    [IsScalarTower K.O K.E V₁] [Module.Finite K.E V₁] [AddCommGroup V₂] [Module K.E V₂] [Module K.O V₂]
-    [IsScalarTower K.O K.E V₂] [Module.Finite K.E V₂] (M : Submodule K.O (V₁ × V₂)) (hfg : M.FG)
-    (hsp : Submodule.span K.E (M : Set (V₁ × V₂)) = ⊤) :
-    ∃ (e₁ : Basis (Fin (finrank K.E V₁)) K.E V₁) (e₂ : Basis (Fin (finrank K.E V₂)) K.E V₂)
-      (x : Fin (finrank K.E V₂) → V₁ × V₂),
-      Submodule.span K.O (Set.range e₁) = M.comap (LinearMap.inl K.O V₁ V₂) ∧
-      Submodule.span K.O (Set.range e₂) = M.map (LinearMap.snd K.O V₁ V₂) ∧
-      (∀ j, (x j).2 = e₂ j) ∧
-      Submodule.span K.O (Set.range (Fin.addCases (fun i => ((e₁ i, 0) : V₁ × V₂)) x)) = M := by
+theorem lattice_split
+    (K : UQ) (V₁ V₂ : Type) [AddCommGroup V₁] [Module K.E V₁] [Module K.O V₁]
+    [IsScalarTower K.O K.E V₁] [Module.Finite K.E V₁] [AddCommGroup V₂] [Module K.E V₂]
+    [Module K.O V₂] [IsScalarTower K.O K.E V₂] [Module.Finite K.E V₂]
+    (M : Submodule K.O (V₁ × V₂)) (hfg : M.FG) (hsp : Submodule.span K.E (M : Set (V₁ × V₂)) = ⊤)
+    : ∃ (e₁ : Basis (Fin (finrank K.E V₁)) K.E V₁) (e₂ : Basis (Fin (finrank K.E V₂)) K.E V₂)
+        (x : Fin (finrank K.E V₂) → V₁ × V₂),
+      Submodule.span K.O (Set.range e₁) = M.comap (LinearMap.inl K.O V₁ V₂)
+        ∧ Submodule.span K.O (Set.range e₂) = M.map (LinearMap.snd K.O V₁ V₂)
+        ∧ (∀ j, (x j).2 = e₂ j)
+        ∧ Submodule.span K.O (Set.range (Fin.addCases (fun i => ((e₁ i, 0) : V₁ × V₂)) x)) = M := by
   set M₁ := M.comap (LinearMap.inl K.O V₁ V₂) with hM₁
   set M₂ := M.map (LinearMap.snd K.O V₁ V₂) with hM₂
   have hfg₁ : M₁.FG := by
@@ -155,7 +169,8 @@ theorem lattice_split (K : UQ) (V₁ V₂ : Type) [AddCommGroup V₁] [Module K.
   have hsp₂ : Submodule.span K.E (M₂ : Set V₂) = ⊤ := by
     have h1 : (M₂ : Set V₂) = (LinearMap.snd K.E V₁ V₂) '' (M : Set (V₁ × V₂)) := by
       rw [hM₂, Submodule.map_coe]; rfl
-    rw [h1, Submodule.span_image, hsp, Submodule.map_top, LinearMap.range_eq_top.2 LinearMap.snd_surjective]
+    rw [h1, Submodule.span_image, hsp, Submodule.map_top,
+      LinearMap.range_eq_top.2 LinearMap.snd_surjective]
   obtain ⟨e₁, he₁⟩ := exists_basis_lat K M₁ hfg₁ hsp₁
   obtain ⟨e₂, he₂⟩ := exists_basis_lat K M₂ hfg₂ hsp₂
   have hlift : ∀ j, ∃ x ∈ M, x.2 = e₂ j := fun j => by
@@ -183,7 +198,8 @@ theorem lattice_split (K : UQ) (V₁ V₂ : Type) [AddCommGroup V₁] [Module K.
     have hz1 : z.1 ∈ M₁ := by
       show LinearMap.inl K.O V₁ V₂ z.1 ∈ M
       have : LinearMap.inl K.O V₁ V₂ z.1 = z := Prod.ext rfl hz2.symm
-      rw [this]; exact hzM
+      rw [this]
+      exact hzM
     rw [← he₁, Submodule.mem_span_range_iff_exists_fun] at hz1
     obtain ⟨d, hd⟩ := hz1
     have hyz : y = ∑ i, d i • ((e₁ i, 0) : V₁ × V₂) + ∑ j, c j • x j := by
@@ -204,17 +220,27 @@ namespace GlobalTheory.UnitLemma.SgnProd
 
 open Module
 
-theorem det_trace_lift {E A₁ A₂ : Type} [Field E] [CommRing A₁] [CommRing A₂] [Algebra E A₁] [Algebra E A₂]
-    {a b : ℕ} (g : A₁ × A₂) (e₁ : Basis (Fin a) E A₁) (e₂ : Basis (Fin b) E A₂) (x : Fin b → A₁ × A₂)
-    (hx : ∀ j, (x j).2 = e₂ j) :
-    (Matrix.of fun k l : Fin (a + b) => Algebra.trace E (A₁ × A₂)
-      (g ^ (k : ℕ) * Fin.addCases (fun i => ((e₁ i, 0) : A₁ × A₂)) x l)).det =
-    (Matrix.of fun k l : Fin (a + b) => Algebra.trace E (A₁ × A₂)
-      (g ^ (k : ℕ) * Fin.addCases (fun i => ((e₁ i, 0) : A₁ × A₂)) (fun j => ((0, e₂ j) : A₁ × A₂)) l)).det := by
+theorem det_trace_lift
+    {E A₁ A₂ : Type} [Field E] [CommRing A₁] [CommRing A₂] [Algebra E A₁] [Algebra E A₂]
+    {a b : ℕ}
+    (g : A₁ × A₂) (e₁ : Basis (Fin a) E A₁)
+    (e₂ : Basis (Fin b) E A₂) (x : Fin b → A₁ × A₂) (hx : ∀ j, (x j).2 = e₂ j)
+    : (Matrix.of fun k l : Fin (a + b) =>
+        Algebra.trace E (A₁ × A₂)
+          (g ^ (k : ℕ) * Fin.addCases (fun i => ((e₁ i, 0) : A₁ × A₂)) x l)).det
+      = (Matrix.of fun k l : Fin (a + b) =>
+        Algebra.trace E (A₁ × A₂)
+          (g ^ (k : ℕ) * Fin.addCases
+            (fun i => ((e₁ i, 0) : A₁ × A₂))
+            (fun j => ((0, e₂ j) : A₁ × A₂))
+            l)).det := by
   classical
   set f : Fin (a + b) → A₁ × A₂ := Fin.addCases (fun i => ((e₁ i, 0) : A₁ × A₂)) x with hf
   let b₀ := (e₁.prod e₂).reindex finSumFinEquiv
-  have hb₀ : ∀ l, b₀ l = Fin.addCases (fun i => ((e₁ i, 0) : A₁ × A₂)) (fun j => ((0, e₂ j) : A₁ × A₂)) l := by
+  have hb₀
+      : ∀ l,
+        b₀ l
+          = Fin.addCases (fun i => ((e₁ i, 0) : A₁ × A₂)) (fun j => ((0, e₂ j) : A₁ × A₂)) l := by
     intro l
     induction l using Fin.addCases with
     | left i => simp [b₀]
@@ -223,13 +249,16 @@ theorem det_trace_lift {E A₁ A₂ : Type} [Field E] [CommRing A₁] [CommRing 
   rw [h, Matrix.det_mul]
   simp only [hb₀]
   suffices hU : (b₀.toMatrix f).det = 1 by rw [hU, mul_one]
-  have hcc : ∀ i' l', b₀.toMatrix f (Fin.castAdd b i') (Fin.castAdd b l') = if l' = i' then 1 else 0 := by
+  have hcc
+      : ∀ i' l',
+        b₀.toMatrix f (Fin.castAdd b i') (Fin.castAdd b l') = if l' = i' then 1 else 0 := by
     intro i' l'
     simp [Basis.toMatrix_apply, b₀, hf, Finsupp.single_apply]
   have hnc : ∀ j' l', b₀.toMatrix f (Fin.natAdd a j') (Fin.castAdd b l') = 0 := by
     intro j' l'
     simp [Basis.toMatrix_apply, b₀, hf]
-  have hnn : ∀ j' j, b₀.toMatrix f (Fin.natAdd a j') (Fin.natAdd a j) = if j = j' then 1 else 0 := by
+  have hnn
+      : ∀ j' j, b₀.toMatrix f (Fin.natAdd a j') (Fin.natAdd a j) = if j = j' then 1 else 0 := by
     intro j' j
     simp [Basis.toMatrix_apply, b₀, hf, hx, Finsupp.single_apply]
   have htri : (b₀.toMatrix f).BlockTriangular id := by
@@ -263,22 +292,28 @@ namespace GlobalTheory.UnitLemma.SgnProd
 
 open Module
 
-theorem sgnLat_prod : ∀ (K : UQ) (B₁ B₂ : InvAlg K), (B₁.P * B₂.P).Separable → ∀ M ∈ (B₁.prod B₂).Lin,
-    (B₁.prod B₂).sgnLat M = K.eta (resultant B₁.P B₂.P) *
-      B₁.sgnLat (M.comap (LinearMap.inl K.O B₁.A B₂.A)) * B₂.sgnLat (M.map (LinearMap.snd K.O B₁.A B₂.A)) := by
+theorem sgnLat_prod
+    : ∀ (K : UQ) (B₁ B₂ : InvAlg K),
+      (B₁.P * B₂.P).Separable
+        → ∀ M ∈ (B₁.prod B₂).Lin,
+          (B₁.prod B₂).sgnLat M
+            = K.eta (resultant B₁.P B₂.P) * B₁.sgnLat (M.comap (LinearMap.inl K.O B₁.A B₂.A))
+              * B₂.sgnLat (M.map (LinearMap.snd K.O B₁.A B₂.A)) := by
   intro K B₁ B₂ hsep M hM
   obtain ⟨hfg, hsp⟩ := hM.1
   obtain ⟨e₁, e₂, x, he₁, he₂, hx, hspan⟩ := lattice_split K B₁.A B₂.A M hfg hsp
   have hP : (B₁.prod B₂).P = B₁.P * B₂.P := by
-    have h1 : LinearMap.mulLeft K.E (B₁.prod B₂).g =
-        (LinearMap.mulLeft K.E B₁.g).prodMap (LinearMap.mulLeft K.E B₂.g) := by
+    have h1
+        : LinearMap.mulLeft K.E (B₁.prod B₂).g
+          = (LinearMap.mulLeft K.E B₁.g).prodMap (LinearMap.mulLeft K.E B₂.g) := by
       exact LinearMap.ext fun _ => rfl
     have h2 := LinearMap.charpoly_prodMap (LinearMap.mulLeft K.E B₁.g) (LinearMap.mulLeft K.E B₂.g)
     rw [← h1] at h2
     exact h2
   let f : Fin (finrank K.E B₁.A + finrank K.E B₂.A) → B₁.A × B₂.A :=
     Fin.addCases (fun i => ((e₁ i, 0) : B₁.A × B₂.A)) x
-  have hcard : Fintype.card (Fin (finrank K.E B₁.A + finrank K.E B₂.A)) = finrank K.E (B₁.A × B₂.A) := by
+  have hcard
+      : Fintype.card (Fin (finrank K.E B₁.A + finrank K.E B₂.A)) = finrank K.E (B₁.A × B₂.A) := by
     simp [Module.finrank_prod]
   have htop : ⊤ ≤ Submodule.span K.E (Set.range f) := by
     rw [← Submodule.span_span_of_tower K.O, hspan]
@@ -298,10 +333,11 @@ theorem sgnLat_prod : ∀ (K : UQ) (B₁ B₂ : InvAlg K), (B₁.P * B₂.P).Sep
   have key := SgnBasis.sgnLat_span_basis K (B₁.prod B₂) bF
   rw [hspanF] at key
   rw [key, ← he₁, ← he₂, SgnBasis.sgnLat_span_basis K B₁ e₁, SgnBasis.sgnLat_span_basis K B₂ e₂]
-  have hdet : (Matrix.of fun k l : Fin (finrank K.E (B₁.prod B₂).A) =>
-      Algebra.trace K.E (B₁.prod B₂).A ((B₁.prod B₂).g ^ (k : ℕ) * bF l)).det =
-      (Matrix.of fun k l : Fin (finrank K.E B₁.A + finrank K.E B₂.A) =>
-        Algebra.trace K.E (B₁.A × B₂.A) ((B₁.g, B₂.g) ^ (k : ℕ) * f l)).det := by
+  have hdet
+      : (Matrix.of fun k l : Fin (finrank K.E (B₁.prod B₂).A) =>
+          Algebra.trace K.E (B₁.prod B₂).A ((B₁.prod B₂).g ^ (k : ℕ) * bF l)).det
+        = (Matrix.of fun k l : Fin (finrank K.E B₁.A + finrank K.E B₂.A) =>
+          Algebra.trace K.E (B₁.A × B₂.A) ((B₁.g, B₂.g) ^ (k : ℕ) * f l)).det := by
     rw [← Matrix.det_submatrix_equiv_self (finCongr hN).symm]
     congr 1
     ext k l
@@ -313,16 +349,20 @@ theorem sgnLat_prod : ∀ (K : UQ) (B₁ B₂ : InvAlg K), (B₁.P * B₂.P).Sep
     simp only [finCongr_symm, finCongr_apply, Fin.val_cast]
     rfl
   obtain ⟨ε, hε, hL7⟩ := GlobalTheory.det_trace_pow_prod K.E B₁.A B₂.A B₁.g B₂.g _ _ e₁ e₂ hsep
-  have hchain : (Matrix.of fun k l : Fin (finrank K.E (B₁.prod B₂).A) =>
-      Algebra.trace K.E (B₁.prod B₂).A ((B₁.prod B₂).g ^ (k : ℕ) * bF l)).det =
-      ε * resultant B₁.P B₂.P * (Matrix.of fun k l : Fin (finrank K.E B₁.A) =>
-        Algebra.trace K.E B₁.A (B₁.g ^ (k : ℕ) * e₁ l)).det * (Matrix.of fun k l : Fin (finrank K.E B₂.A) =>
-        Algebra.trace K.E B₂.A (B₂.g ^ (k : ℕ) * e₂ l)).det :=
+  have hchain
+      : (Matrix.of fun k l : Fin (finrank K.E (B₁.prod B₂).A) =>
+          Algebra.trace K.E (B₁.prod B₂).A ((B₁.prod B₂).g ^ (k : ℕ) * bF l)).det
+        = ε * resultant B₁.P B₂.P
+          * (Matrix.of fun k l : Fin (finrank K.E B₁.A) =>
+            Algebra.trace K.E B₁.A (B₁.g ^ (k : ℕ) * e₁ l)).det
+          * (Matrix.of fun k l : Fin (finrank K.E B₂.A) =>
+            Algebra.trace K.E B₂.A (B₂.g ^ (k : ℕ) * e₂ l)).det :=
     hdet.trans ((det_trace_lift (B₁.g, B₂.g) e₁ e₂ x hx).trans hL7)
   have hne := det_trace_ne_zero (B₁.prod B₂) (by rw [hP]; exact hsep) bF
   rw [hchain] at hne ⊢
   simp only [mul_ne_zero_iff] at hne
   obtain ⟨⟨⟨-, hR⟩, h₁⟩, h₂⟩ := hne
-  rw [mul_assoc, mul_assoc, eta_of_sq_one K hε, eta_mul K hR (mul_ne_zero h₁ h₂), eta_mul K h₁ h₂, mul_assoc]
+  rw [mul_assoc, mul_assoc, eta_of_sq_one K hε, eta_mul K hR (mul_ne_zero h₁ h₂), eta_mul K h₁ h₂,
+    mul_assoc]
 
 end GlobalTheory.UnitLemma.SgnProd

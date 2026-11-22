@@ -11,11 +11,20 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CcMulSelf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
-theorem rat_jump_sets_eq_int_multisets : ∀ (D : D7) (i : D.nd.Loc) (ρ : D.what₂.Tau) (g : D.R.GG) (ep up : Bool), LJ.PlaceOf D ρ g → (up = true ↔ LJ.TypeU D ep g) → ∀ a : ℤ, ((a : ℚ) ∈ LJ.dualS (LJ.JJ D up (D.nd.j i) ρ) ↔ a ∈ jT1 (hcAt D g) (liftIdx D i) (pos (if ep then 1 else -1) g)) ∧ ((a : ℚ) ∈ LJ.dualS (LJ.JW D up (D.nd.j i) ρ) ↔ a ∈ jT2 (hcAt D g) (liftIdx D i) (pos (if ep then 1 else -1) g)) := by
+theorem rat_jump_sets_eq_int_multisets
+    : ∀ (D : D7) (i : D.nd.Loc) (ρ : D.what₂.Tau) (g : D.R.GG) (ep up : Bool),
+      LJ.PlaceOf D ρ g → (up = true ↔ LJ.TypeU D ep g)
+        → ∀ a : ℤ,
+          ((a : ℚ) ∈ LJ.dualS (LJ.JJ D up (D.nd.j i) ρ)
+              ↔ a ∈ jT1 (hcAt D g) (liftIdx D i) (pos (if ep then 1 else -1) g))
+            ∧ ((a : ℚ) ∈ LJ.dualS (LJ.JW D up (D.nd.j i) ρ)
+              ↔ a ∈ jT2 (hcAt D g) (liftIdx D i) (pos (if ep then 1 else -1) g)) := by
   intro D i ρ g ep up hpl hup a
   have hP : hcAt D g = D.hc ρ := hcAt_eq_hc D ρ g hpl
   have hs : pos (if ep then 1 else -1) g = up := by
@@ -33,7 +42,10 @@ theorem rat_jump_sets_eq_int_multisets : ∀ (D : D7) (i : D.nd.Loc) (ρ : D.wha
     intro x
     refine exists_congr fun c => and_congr Iff.rfl ?_
     exact_mod_cast Iff.rfl
-  have hblk' : ∀ x : ℤ, (∃ c : ℕ, c < D.R.t ∧ (D.R.t : ℚ) - 1 - (x : ℚ) = (c : ℚ)) ↔ ∃ c : ℕ, c < D.R.t ∧ x = c := by
+  have hblk'
+      : ∀ x : ℤ,
+        (∃ c : ℕ, c < D.R.t ∧ (D.R.t : ℚ) - 1 - (x : ℚ) = (c : ℚ))
+          ↔ ∃ c : ℕ, c < D.R.t ∧ x = c := by
     intro x
     constructor
     · rintro ⟨c, hc, h⟩
@@ -46,14 +58,15 @@ theorem rat_jump_sets_eq_int_multisets : ∀ (D : D7) (i : D.nd.Loc) (ρ : D.wha
       push_cast [show c ≤ D.R.t - 1 by omega, show 1 ≤ D.R.t by omega]
       ring
   cases up
-  · simp only [LJ.dualS, LJ.JJ, LJ.JW, LJ.cloudT, LJ.lowT, LJ.Jm, LJ.Jp, LJ.reflS, LJ.refl, LJ.cloudJ, LJ.lowJ,
-      LJ.blockJ, Set.mem_setOf_eq, Set.mem_union, Bool.false_eq_true, if_false, hsz, hc0]
+  · simp only [LJ.dualS, LJ.JJ, LJ.JW, LJ.cloudT, LJ.lowT, LJ.Jm, LJ.Jp, LJ.reflS, LJ.refl,
+      LJ.cloudJ, LJ.lowJ, LJ.blockJ, Set.mem_setOf_eq, Set.mem_union, Bool.false_eq_true, if_false,
+      hsz, hc0]
     refine ⟨or_congr Iff.rfl ?_, by push_cast⟩
     have := hblk' (-a - 1)
     push_cast at this
     exact this
-  · simp only [LJ.dualS, LJ.JJ, LJ.JW, LJ.cloudT, LJ.lowT, LJ.Jm, LJ.Jp, LJ.reflS, LJ.refl, LJ.cloudJ, LJ.lowJ,
-      LJ.blockJ, Set.mem_setOf_eq, Set.mem_union, if_true, hsz, hc0]
+  · simp only [LJ.dualS, LJ.JJ, LJ.JW, LJ.cloudT, LJ.lowT, LJ.Jm, LJ.Jp, LJ.reflS, LJ.refl,
+      LJ.cloudJ, LJ.lowJ, LJ.blockJ, Set.mem_setOf_eq, Set.mem_union, if_true, hsz, hc0]
     refine ⟨or_congr Iff.rfl ?_, by push_cast⟩
     have := hblk (-a - 1)
     push_cast at this

@@ -13,10 +13,11 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem ChartNormCount.proof (hSC : ChartSpecCount.Statement) (hNP : ChartNormPts.Statement) :
-    ChartNormCount.Statement := by
+theorem ChartNormCount.proof (hSC : ChartSpecCount.Statement) (hNP : ChartNormPts.Statement)
+    : ChartNormCount.Statement := by
   intro K _ ι _ K' _ ι' _ κ v P' n G j hv hP' hZ hj hfin
   classical
   have hchar : CharZero G.Φ := by
@@ -27,13 +28,16 @@ theorem ChartNormCount.proof (hSC : ChartSpecCount.Statement) (hNP : ChartNormPt
     have h2 : (N : ℤ) ∈ (imageZ v P').comap (C : ℤ →+* MRing ι) := hmem
     rw [hZ.2.2.1] at h2
     exact_mod_cast (Ideal.mem_bot.mp h2)
-  obtain ⟨E, hE, hcount⟩ := hSC (MRing ι) G.Φ G.Φ' (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom _
-    (fun q : Σ k : FibreBlock κ, ι' k.1 => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, j q.1⟩) G.gen hfin
+  obtain ⟨E, hE, hcount⟩ :=
+    hSC (MRing ι) G.Φ G.Φ' (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom _
+      (fun q : Σ k : FibreBlock κ, ι' k.1 => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, j q.1⟩)
+      G.gen hfin
   refine ⟨E, fun hm => hE ?_, fun w hw hEw => ?_⟩
   · rw [← G.ker_x] at hm
     exact hm
-  have hker : RingHom.ker (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom ≤
-      RingHom.ker (eval₂Hom (Int.castRingHom ℂ) w) := by
+  have hker
+      : RingHom.ker (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom
+        ≤ RingHom.ker (eval₂Hom (Int.castRingHom ℂ) w) := by
     intro f hf
     have hf' : f ∈ imageZ v P' := by
       rw [← G.ker_x]
@@ -41,15 +45,19 @@ theorem ChartNormCount.proof (hSC : ChartSpecCount.Statement) (hNP : ChartNormPt
     have h0 := hw.2 f hf'
     rw [RingHom.mem_ker, coe_eval₂Hom]
     rwa [eval_map] at h0
-  have hψE : eval₂Hom (Int.castRingHom ℂ) w E ≠ 0 := by
-    rwa [coe_eval₂Hom, ← eval_map]
+  have hψE : eval₂Hom (Int.castRingHom ℂ) w E ≠ 0 := by rwa [coe_eval₂Hom, ← eval_map]
   obtain ⟨hZfin, hZcard, hZne⟩ := hcount _ hker hψE
   have hmh : IsMultiHomogIdeal P' := hP'.2.1.2.1
-  have hiff : ∀ z' : (Σ k', ι' k') → ℂ, (∀ p, z' (v p) = w p) → (∀ k : FibreBlock κ, z' ⟨k.1, j k⟩ = 1) →
-      (z' ∈ mcPts P' ↔ ∀ F : MvPolynomial (Σ k : FibreBlock κ, ι' k.1) (MRing ι),
-        eval₂ ((algebraMap G.Φ G.Φ').comp (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom)
-          (fun q => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, j q.1⟩) F = 0 →
-        eval₂ (eval₂Hom (Int.castRingHom ℂ) w) (fun q => z' ⟨q.1.1, q.2⟩) F = 0) := by
+  have hiff
+      : ∀ z' : (Σ k', ι' k') → ℂ,
+        (∀ p, z' (v p) = w p) → (∀ k : FibreBlock κ, z' ⟨k.1, j k⟩ = 1)
+          → (z' ∈ mcPts P'
+            ↔ ∀ F : MvPolynomial (Σ k : FibreBlock κ, ι' k.1) (MRing ι),
+              eval₂ ((algebraMap G.Φ G.Φ').comp (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom)
+                    (fun q => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, j q.1⟩)
+                    F
+                  = 0
+                → eval₂ (eval₂Hom (Int.castRingHom ℂ) w) (fun q => z' ⟨q.1.1, q.2⟩) F = 0) := by
     intro z' hzw hz1
     have hw' : (fun p => z' (v p)) = w := funext hzw
     have hwz : (fun p => z' (v p)) ∈ mcPts (imageZ v P') := by

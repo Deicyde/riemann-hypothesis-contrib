@@ -29,7 +29,9 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.EnormPowLeI
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates
 open MeasureTheory Topology Asymptotics Filter Metric
 open scoped ENNReal
 open GlobalTheory.IndefiniteRowSideFullHecke.SpanSubtraction
@@ -50,9 +52,9 @@ section Hyp
 
 variable {X : Data E r}
 
-
 open Classical in
-def unitVec (e : Ent X) : Fin (nd X) → ℂ := fun k => if (Fintype.equivFin (Ent X)).symm k = e then 1 else 0
+def unitVec (e : Ent X) : Fin (nd X) → ℂ := fun k =>
+  if (Fintype.equivFin (Ent X)).symm k = e then 1 else 0
 
 open NumberField in
 open MeasureTheory Topology Asymptotics Filter Metric in
@@ -210,54 +212,88 @@ private lemma sum_mul_norm_unitVec_sq_eq (c : _root_.ReciprocityTheory.ChartRest
   · intro h
     exact absurd (Finset.mem_univ e) h
 
-
 open NumberField in
 open MeasureTheory Topology Asymptotics Filter Metric in
 open scoped ENNReal in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 variable {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} in
-theorem _root_.GlobalTheory.DivisionVolume.margin_iff (h0 : 0 < X.p0) (h1 : X.p0 < r)
-    (la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r) (m : ℝ) :
-    (∀ x0, _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0 → ∀ z ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X x0, ∀ ξ : Fin (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) → ℂ,
-      m * _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviRh X x0 z ξ ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviO X x0 (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.phla X la) z ξ - _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviDens X x0 z ξ) ↔
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.SpanSubtraction.GapsPairing X (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) m := by
+theorem _root_.GlobalTheory.DivisionVolume.margin_iff
+    (h0 : 0 < X.p0) (h1 : X.p0 < r) (la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r)
+    (m : ℝ)
+    : (∀ x0,
+        _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0
+          → ∀ z ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X x0,
+            ∀ ξ : Fin (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) → ℂ,
+              m * _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviRh X x0 z ξ
+                ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviO X x0
+                    (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.phla X la) z ξ
+                  - _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviDens X x0 z ξ)
+      ↔ _root_.GlobalTheory.IndefiniteRowSideFullHecke.SpanSubtraction.GapsPairing X
+        (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) m := by
   constructor
   · intro H τ
     have hx0 := _root_.GlobalTheory.OrthNear.isOrth_x0F X
-    have h0mem : (0 : _root_.ReciprocityTheory.L2DbarEstimates.V (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)) ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X) := by
+    have h0mem
+        : (0 : _root_.ReciprocityTheory.L2DbarEstimates.V
+            (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X))
+          ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X
+            (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X) := by
       obtain ⟨R, hR, hb⟩ := _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.good_ball X la
       have := hb 0 (Metric.mem_ball_self hR)
-      exact _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.cpt_mem_dom X (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.orth_mem_dom X hx0) hx0 this.1 this.2.1
-    have key : ∀ e : _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.Ent X,
-        m * (_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).2 *
-          ((_root_.GlobalTheory.CurvMargin.blockWt X e.1 (↑e.2 : Fin r × Fin r).2 : ℝ) -
-            (_root_.GlobalTheory.CurvMargin.blockWt X e.1 (↑e.2 : Fin r × Fin r).1 : ℝ))) ≤
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).2 *
-          (((la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) e.1 (↑e.2 : Fin r × Fin r).2 : ℝ) -
-            ((la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) e.1 (↑e.2 : Fin r × Fin r).1 : ℝ)) := by
+      exact _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.cpt_mem_dom X
+        (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.PoinPf.orth_mem_dom X hx0) hx0 this.1
+        this.2.1
+    have key
+        : ∀ e : _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.Ent X,
+          m * (_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).1
+              * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).2
+              * ((_root_.GlobalTheory.CurvMargin.blockWt X e.1 (↑e.2 : Fin r × Fin r).2 : ℝ)
+                - (_root_.GlobalTheory.CurvMargin.blockWt X e.1 (↑e.2 : Fin r × Fin r).1 : ℝ)))
+            ≤ _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).1
+              * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 ↑(↑e.2 : Fin r × Fin r).2
+              * (((la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) e.1
+                    (↑e.2 : Fin r × Fin r).2
+                  : ℝ)
+                - ((la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) e.1
+                    (↑e.2 : Fin r × Fin r).1
+                  : ℝ)) := by
       intro e
       have h := H _ hx0 0 h0mem (_root_.GlobalTheory.DivisionVolume.unitVec e)
       rw [leviWeight_sub_leviDensity_eq_lemma hx0 la h0mem,
-        _root_.GlobalTheory.CurvMargin.leviRh_eq X _ hx0 h0mem] at h
-      have hR : _root_.GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm.curv X (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X) (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) 0
-          (_root_.GlobalTheory.DivisionVolume.unitVec e) =
-          _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviM X (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.phla X (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X)) (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X) 0 (_root_.GlobalTheory.DivisionVolume.unitVec e) :=
+          _root_.GlobalTheory.CurvMargin.leviRh_eq X _ hx0 h0mem]
+        at h
+      have hR
+          : _root_.GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm.curv X
+              (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X)
+              (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) 0
+              (_root_.GlobalTheory.DivisionVolume.unitVec e)
+            = _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviM X
+              (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.phla X
+                (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X))
+              (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.x0F X) 0
+              (_root_.GlobalTheory.DivisionVolume.unitVec e) :=
         rfl
       rw [hR, _root_.GlobalTheory.LeviZero.leviZero r X _ _ hx0,
-        _root_.GlobalTheory.LeviZero.leviZero r X _ _ hx0] at h
+          _root_.GlobalTheory.LeviZero.leviZero r X _ _ hx0]
+        at h
       simp only [sum_mul_norm_unitVec_sq_eq] at h
       exact h
     refine ⟨fun i j hij hjp => ?_, fun i0 i1 hi0 hi1 => ?_⟩
     · have hlt : i < j := Fin.lt_iff_val_lt_val.2 (by omega)
       have h := key (τ, ⟨(j, i), hlt⟩)
       clear key H hx0 h0mem
-      simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn, _root_.GlobalTheory.CurvMargin.blockWt, Pi.sub_apply] at h
+      simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn,
+          _root_.GlobalTheory.CurvMargin.blockWt, Pi.sub_apply]
+        at h
       by_cases hi : (i : ℕ) < X.p0
       · have hj : (j : ℕ) < X.p0 := by omega
         simp only [hi, hj, if_true] at h
         norm_num at h
         simp only [Pi.sub_apply]
-        have h' : ((la τ j - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ j : ℤ) : ℝ) ≤ ((la τ i - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ i : ℤ) : ℝ) := by
+        have h'
+            : ((la τ j - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ j : ℤ) : ℝ)
+              ≤ ((la τ i - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ i : ℤ)
+                : ℝ) := by
           push_cast
           linarith
         exact_mod_cast h'
@@ -265,14 +301,19 @@ theorem _root_.GlobalTheory.DivisionVolume.margin_iff (h0 : 0 < X.p0) (h1 : X.p0
         simp only [hi, hj, if_false] at h
         norm_num at h
         simp only [Pi.sub_apply]
-        have h' : ((la τ j - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ j : ℤ) : ℝ) ≤ ((la τ i - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ i : ℤ) : ℝ) := by
+        have h'
+            : ((la τ j - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ j : ℤ) : ℝ)
+              ≤ ((la τ i - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X τ i : ℤ)
+                : ℝ) := by
           push_cast
           linarith
         exact_mod_cast h'
     · have hlt : i0 < i1 := Fin.lt_iff_val_lt_val.2 (by omega)
       have h := key (τ, ⟨(i1, i0), hlt⟩)
       clear key H hx0 h0mem
-      simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn, _root_.GlobalTheory.CurvMargin.blockWt, Pi.sub_apply] at h
+      simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.sgn,
+          _root_.GlobalTheory.CurvMargin.blockWt, Pi.sub_apply]
+        at h
       have hi0' : (i0 : ℕ) < X.p0 := by omega
       have hi1' : ¬ (i1 : ℕ) < X.p0 := by omega
       simp only [hi0', hi1', if_true, if_false] at h
@@ -281,7 +322,8 @@ theorem _root_.GlobalTheory.DivisionVolume.margin_iff (h0 : 0 < X.p0) (h1 : X.p0
       linarith
   · intro hG x0 hx0 z hz ξ
     rw [leviWeight_sub_leviDensity_eq_lemma hx0 la hz ξ]
-    refine _root_.GlobalTheory.FrameThetaCompare.margin_of_gaps X h0 (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) m ?_ ?_ hx0 hz ξ
+    refine _root_.GlobalTheory.FrameThetaCompare.margin_of_gaps X h0
+      (la - _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW X) m ?_ ?_ hx0 hz ξ
     · intro τ a b hab
       exact (hG τ).1 a b hab.1 hab.2
     · intro τ a b ha hb

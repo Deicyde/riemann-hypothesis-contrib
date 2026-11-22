@@ -11,16 +11,21 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ExistsUn
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.JetSer
 
-theorem mem_sup_pow_of_toJet_mem_map {R : Type} [CommRing R] {κ : Type} [Finite κ] (m : ℕ)
-    (I : Ideal (MvPowerSeries κ R)) (g : MvPowerSeries κ R) (hg : toJet m g ∈ I.map (toJetHom R κ m)) :
-    g ∈ I ⊔ Ideal.span (Set.range (MvPowerSeries.X : κ → MvPowerSeries κ R)) ^ (m + 1) := by
+theorem mem_sup_pow_of_toJet_mem_map
+    {R : Type} [CommRing R]
+    {κ : Type} [Finite κ]
+    (m : ℕ) (I : Ideal (MvPowerSeries κ R)) (g : MvPowerSeries κ R)
+    (hg : toJet m g ∈ I.map (toJetHom R κ m))
+    : g ∈ I ⊔ Ideal.span (Set.range (MvPowerSeries.X : κ → MvPowerSeries κ R)) ^ (m + 1) := by
   have hs : Function.Surjective (toJetHom R κ m) := fun q => by
     obtain ⟨P, rfl⟩ := Ideal.Quotient.mk_surjective q
     exact ⟨P, toJet_coe m P⟩
@@ -33,8 +38,9 @@ theorem mem_sup_pow_of_toJet_mem_map {R : Type} [CommRing R] {κ : Type} [Finite
   rw [this]
   exact Ideal.add_mem _ (Ideal.mem_sup_left hh) (Ideal.mem_sup_right h2)
 
-theorem locallyOfFiniteType_pullback_unit {S : Scheme.{0}} (G : Over S) [GrpObj G] [LocallyOfFiniteType G.hom]
-    (f : G ⟶ G) : LocallyOfFiniteType (pullback f η[G]).hom := by
+theorem locallyOfFiniteType_pullback_unit
+    {S : Scheme.{0}} (G : Over S) [GrpObj G] [LocallyOfFiniteType G.hom] (f : G ⟶ G)
+    : LocallyOfFiniteType (pullback f η[G]).hom := by
   have h1 : LocallyOfFiniteType (f.left ≫ G.hom) := by rw [Over.w f]; infer_instance
   have h2 : LocallyOfFiniteType f.left := locallyOfFiniteType_of_comp f.left G.hom
   have h3 := (IsPullback.of_hasPullback f η[G]).map (Over.forget S)
@@ -46,28 +52,47 @@ theorem locallyOfFiniteType_pullback_unit {S : Scheme.{0}} (G : Over S) [GrpObj 
   rw [h5]
   exact h4
 
-theorem exists_pow_le_span_sup_pow_succ : ∀ (k : Type) [Field k] (G : Over (Spec (CommRingCat.of k))) [GrpObj G] [LocallyOfFiniteType G.hom] (f : G ⟶ G), η[G] ≫ f = η[G] → (∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (t : Sp Ω ⟶ Spec (CommRingCat.of k)), Finite {x : Over.mk t ⟶ G // x ≫ f = 1}) → ∀ (d : ℕ) (x : GlobalTheory.JetSer.Fam G (Fin d)), Chart.IsUnivChart G d x → ∀ φ : Pt k 1 d, GlobalTheory.JetSer.IsMapOf x x f φ → ∃ M : ℕ, Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin d → PS k 1 d)) ^ M ≤ Ideal.span (Set.range φ) ⊔ Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin d → PS k 1 d)) ^ (M + 1) := by
+theorem exists_pow_le_span_sup_pow_succ
+    : ∀ (k : Type) [Field k] (G : Over (Spec (CommRingCat.of k))) [GrpObj G]
+        [LocallyOfFiniteType G.hom] (f : G ⟶ G),
+      η[G] ≫ f = η[G]
+        → (∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (t : Sp Ω ⟶ Spec (CommRingCat.of k)),
+          Finite {x : Over.mk t ⟶ G // x ≫ f = 1})
+        → ∀ (d : ℕ) (x : GlobalTheory.JetSer.Fam G (Fin d)),
+          Chart.IsUnivChart G d x
+            → ∀ φ : Pt k 1 d,
+              GlobalTheory.JetSer.IsMapOf x x f φ
+                → ∃ M : ℕ,
+                  Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin d → PS k 1 d)) ^ M
+                    ≤ Ideal.span (Set.range φ)
+                      ⊔ Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin d → PS k 1 d))
+                        ^ (M + 1) := by
   intro k _ G _ _ f hf hfin d x hx φ hφ
   haveI := locallyOfFiniteType_pullback_unit G f
-  have hext : ∀ {T : Over (Spec (CommRingCat.of k))} (u v : T ⟶ pullback f η[G]),
-      u ≫ pullback.fst f η[G] = v ≫ pullback.fst f η[G] → u = v := fun u v h =>
+  have hext
+      : ∀ {T : Over (Spec (CommRingCat.of k))} (u v : T ⟶ pullback f η[G]),
+        u ≫ pullback.fst f η[G] = v ≫ pullback.fst f η[G] → u = v := fun u v h =>
     pullback.hom_ext h (toUnit_unique _ _)
-  have hfinK : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (t : Sp Ω ⟶ Spec (CommRingCat.of k)),
-      Finite (Over.mk t ⟶ pullback f η[G]) := by
+  have hfinK
+      : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (t : Sp Ω ⟶ Spec (CommRingCat.of k)),
+        Finite (Over.mk t ⟶ pullback f η[G]) := by
     intro Ω _ _ t
     haveI := hfin Ω t
     refine Finite.of_injective (β := {x : Over.mk t ⟶ G // x ≫ f = 1})
-      (fun u => ⟨u ≫ pullback.fst f η[G], ?_⟩) (fun u v h => hext u v (congrArg Subtype.val h))
+      (fun u => ⟨u ≫ pullback.fst f η[G], ?_⟩)
+      (fun u v h => hext u v (congrArg Subtype.val h))
     rw [Category.assoc, pullback.condition, ← Category.assoc, Hom.one_def]
     congr 1
     exact toUnit_unique _ _
   have h1f : (1 : Chart.sp (R₀ := k) k ⟶ G) ≫ f = toUnit _ ≫ η[G] := by
     rw [Hom.one_def, Category.assoc, hf]
   obtain ⟨A, _, _, aug, M, io, hM, hio, hU⟩ :=
-    GlobalTheory.T.exists_universal_thickening_of_finite_points k (pullback f η[G]) hfinK (pullback.lift 1 (toUnit _) h1f)
+    GlobalTheory.T.exists_universal_thickening_of_finite_points k (pullback f η[G]) hfinK
+      (pullback.lift 1 (toUnit _) h1f)
   refine ⟨M + 1, ?_⟩
   obtain ⟨hex, -, hfp, -, -⟩ := repSt_of_jetAlgSt jetAlg k G d x hx (Fin 1 × Fin d)
-  obtain ⟨y, hy, -⟩ := hex (pt k (n := 1) d 0) (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gp_pt 0)
+  obtain ⟨y, hy, -⟩ :=
+    hex (pt k (n := 1) d 0) (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gp_pt 0)
   have hy' := hφ.2 1 _ y hy
   rw [ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.gt_comp1_pt_right] at hy'
   obtain ⟨ψ₀, hψ₀, hy₀⟩ := hy.2 (M + 1)
@@ -96,20 +121,22 @@ theorem exists_pow_le_span_sup_pow_succ : ∀ (k : Type) [Field k] (G : Over (Sp
     have e : π.comp ψ₁ = (Algebra.ofId k _).comp (Chart.jetAug k (Fin d) (M + 1)) := by
       refine Chart.jet_ext fun j => ?_
       rw [AlgHom.comp_apply, AlgHom.comp_apply, Chart.jetAug_zR, map_zero, hψ₁]
-      exact Ideal.Quotient.eq_zero_iff_mem.2
-        (Ideal.mem_map_of_mem (toJetHom k (Fin 1 × Fin d) (M + 1)) (Ideal.subset_span ⟨j, rfl⟩))
+      exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_map_of_mem
+        (toJetHom k (Fin 1 × Fin d) (M + 1)) (Ideal.subset_span ⟨j, rfl⟩))
     have hy₁' : y (M + 1) ≫ f = Chart.spMap ψ₁ ≫ x (M + 1) := hy₁
-    rw [Category.assoc, hy₁', ← Category.assoc, Chart.spMap_comp, e, ← Chart.spMap_comp, Category.assoc, hxa,
-      ← Hom.one_def]
+    rw [Category.assoc, hy₁', ← Category.assoc, Chart.spMap_comp, e, ← Chart.spMap_comp,
+      Category.assoc, hxa, ← Hom.one_def]
     exact MonObj.comp_one _
   have hzone : Chart.spMap augQ ≫ Chart.spMap π ≫ y (M + 1) = 1 := by
     rw [← Category.assoc, Chart.spMap_comp, haπ, hya]
-  obtain ⟨a, ha, hza⟩ := hU _ augQ (M + 1) hkQ (pullback.lift _ (toUnit _) hz) (hext _ _ (by
-    rw [Category.assoc, pullback.lift_fst, pullback.lift_fst, hzone]))
+  obtain ⟨a, ha, hza⟩ :=
+    hU _ augQ (M + 1) hkQ (pullback.lift _ (toUnit _) hz)
+      (hext _ _ (by rw [Category.assoc, pullback.lift_fst, pullback.lift_fst, hzone]))
   have hM' : RingHom.ker aug ^ (M + 1 + 1) = ⊥ := by
     rw [pow_succ (RingHom.ker aug) (M + 1), hM, Ideal.bot_mul]
-  obtain ⟨ψ, ⟨hψa, hψ⟩, -⟩ := hx.2.2 A aug (M + 1) hM' (io ≫ pullback.fst f η[G]) (by
-    rw [← Category.assoc, hio, pullback.lift_fst])
+  obtain ⟨ψ, ⟨hψa, hψ⟩, -⟩ :=
+    hx.2.2 A aug (M + 1) hM' (io ≫ pullback.fst f η[G])
+      (by rw [← Category.assoc, hio, pullback.lift_fst])
   have hz0 : ∀ j, ψ₀ (Chart.zR (M + 1) j) = Chart.zR (M + 1) (0, j) := fun j =>
     (hψ₀ j).trans (toJet_X (M + 1) _)
   have heq : a.comp ψ = π.comp ψ₀ := by
@@ -121,8 +148,9 @@ theorem exists_pow_le_span_sup_pow_succ : ∀ (k : Type) [Field k] (G : Over (Sp
       rw [AlgHom.comp_apply, hz0, Chart.jetAug_zR, Chart.jetAug_zR]
     · rw [hy₀, ← Category.assoc, Chart.spMap_comp]
   let Θ := π.comp (toJetHom k (Fin 1 × Fin d) (M + 1))
-  have hΘ : Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin d → PS k 1 d)) ≤
-      ((RingHom.ker aug).map a).comap Θ := by
+  have hΘ
+      : Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin d → PS k 1 d))
+        ≤ ((RingHom.ker aug).map a).comap Θ := by
     rw [Ideal.span_le]
     rintro _ ⟨⟨i, j⟩, rfl⟩
     obtain rfl : i = 0 := Subsingleton.elim _ _

@@ -17,16 +17,19 @@ section ss2
 
 variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-theorem memLp_bz_of_sup {s : ℕ} (hs : s ≠ 0) {β : ℂ} (hβ : β ≠ 0) {ε : ℂ} (hε : ‖ε‖ = 1)
+theorem memLp_bz_of_sup
+    {s : ℕ} (hs : s ≠ 0)
+    {β : ℂ} (hβ : β ≠ 0)
+    {ε : ℂ} (hε : ‖ε‖ = 1)
     (ut : ℂ → ℂ → H) (bt : ℂ → H) (SS : ℝ) (memU : ∀ x : ℂ, x ≠ 0 → MemLp (ut x) 2 volume)
     (sup : ∀ x : ℂ, x ≠ 0 → ∫ D, ‖ut x D‖ ^ 2 ≤ SS) (hbt : StronglyMeasurable bt)
     (hloc : ∀ K : Set ℂ, IsCompact K → (0 : ℂ) ∉ K → IntegrableOn (fun z => ‖bz s bt z‖ ^ 2) K)
-    (germ : ∀ K : Set ℂ, IsCompact K → (0 : ℂ) ∉ K → ∃ C : ℝ, ∀ x : ℂ, x ≠ 0 →
-      ∀ᵐ D, D ∈ K → ‖ut x D - mainD s β ε bt x D‖ ≤ C * ‖x‖⁻¹) :
-    MemLp (bz s bt) 2 volume ∧ ∫ z, ‖bz s bt z‖ ^ 2 ≤ SS := by
+    (germ : ∀ K : Set ℂ,
+      IsCompact K → (0 : ℂ) ∉ K
+        → ∃ C : ℝ, ∀ x : ℂ, x ≠ 0 → ∀ᵐ D, D ∈ K → ‖ut x D - mainD s β ε bt x D‖ ≤ C * ‖x‖⁻¹)
+    : MemLp (bz s bt) 2 volume ∧ ∫ z, ‖bz s bt z‖ ^ 2 ≤ SS := by
   have hSS : 0 ≤ SS := (integral_nonneg fun D => sq_nonneg ‖ut 1 D‖).trans (sup 1 one_ne_zero)
-  have hε0 : ε ≠ 0 := by
-    intro h; rw [h, norm_zero] at hε; exact zero_ne_one hε
+  have hε0 : ε ≠ 0 := by intro h; rw [h, norm_zero] at hε; exact zero_ne_one hε
   let K : ℕ → Set ℂ := fun n => {z : ℂ | ε⁻¹ * z ^ s ∈ ann n}
   have hKc : ∀ n, IsCompact (K n) := fun n => isCompact_preimage_pow hs hε (isCompact_ann n)
   have hK0 : ∀ n, (0 : ℂ) ∉ K n := fun n => zero_notMem_preimage_pow hs ε (zero_notMem_ann n)
@@ -56,8 +59,7 @@ theorem memLp_bz_of_sup {s : ℕ} (hs : s ≠ 0) {β : ℂ} (hβ : β ≠ 0) {ε
     rw [← ofReal_integral_eq_lintegral_ofReal hi (ae_of_all _ fun z => sq_nonneg _)]
     exact ENNReal.ofReal_le_ofReal (hbound n)
   have hsup : (fun z => ENNReal.ofReal (‖bz s bt z‖ ^ 2)) =ᵐ[volume] fun z => ⨆ n, g n z := by
-    have h0 : ∀ᵐ z : ℂ ∂volume, z ≠ 0 := by
-      rw [ae_iff]; simp
+    have h0 : ∀ᵐ z : ℂ ∂volume, z ≠ 0 := by rw [ae_iff]; simp
     filter_upwards [h0] with z hz
     have hw : ε⁻¹ * z ^ s ≠ 0 := mul_ne_zero (inv_ne_zero hε0) (pow_ne_zero _ hz)
     obtain ⟨n, hn⟩ := exists_mem_ann hw

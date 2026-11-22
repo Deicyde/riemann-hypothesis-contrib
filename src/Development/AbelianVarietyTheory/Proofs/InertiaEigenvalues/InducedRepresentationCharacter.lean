@@ -14,8 +14,8 @@ namespace GlobalTheory.InertiaEigenvalues
 
 open BrauerSchur
 
-theorem exists_transversal_index {G : Type} [Group G] [Finite G] (H : Subgroup G) :
-    ∃ t : Fin H.index → G, (∀ i j, (t i)⁻¹ * t j ∈ H ↔ i = j) ∧ ∀ x, ∃ i, (t i)⁻¹ * x ∈ H := by
+theorem exists_transversal_index {G : Type} [Group G] [Finite G] (H : Subgroup G)
+    : ∃ t : Fin H.index → G, (∀ i j, (t i)⁻¹ * t j ∈ H ↔ i = j) ∧ ∀ x, ∃ i, (t i)⁻¹ * x ∈ H := by
   classical
   let e : G ⧸ H ≃ Fin H.index := Finite.equivFin (G ⧸ H)
   refine ⟨fun i => (e.symm i).out, fun i j => ?_, fun x => ⟨e (x : G ⧸ H), ?_⟩⟩
@@ -23,16 +23,19 @@ theorem exists_transversal_index {G : Type} [Group G] [Finite G] (H : Subgroup G
   · rw [← QuotientGroup.eq]
     simp only [Equiv.symm_apply_apply, QuotientGroup.out_eq']
 
-theorem inducedRep_cyclic_trace (G : Type) [Group G] [Fintype G] (H : Subgroup G) (χ : H →* ℂˣ) :
-    ∃ (R : Representation ℂ G (Fin H.index → ℂ)) (v : Fin H.index → ℂ),
-      (∀ σ : H, R σ v = (χ σ : ℂ) • v) ∧ Submodule.span ℂ (Set.range fun g => R g v) = ⊤ ∧
-      ∀ g, LinearMap.trace ℂ (Fin H.index → ℂ) (R g) = GlobalTheory.Published.indFun H (fun x => (χ x : ℂ)) g := by
+theorem inducedRep_cyclic_trace (G : Type) [Group G] [Fintype G] (H : Subgroup G) (χ : H →* ℂˣ)
+    : ∃ (R : Representation ℂ G (Fin H.index → ℂ)) (v : Fin H.index → ℂ),
+      (∀ σ : H, R σ v = (χ σ : ℂ) • v) ∧ Submodule.span ℂ (Set.range fun g => R g v) = ⊤
+        ∧ ∀ g,
+          LinearMap.trace ℂ (Fin H.index → ℂ) (R g)
+            = GlobalTheory.Published.indFun H (fun x => (χ x : ℂ)) g := by
   classical
   obtain ⟨t, ht, hc⟩ := exists_transversal_index H
   obtain ⟨i0, hi0⟩ := hc 1
   rw [mul_one] at hi0
   have hti0 : t i0 ∈ H := by simpa using H.inv_mem hi0
-  have memiff : ∀ (k i : Fin H.index) (a : G), (t i)⁻¹ * a ∈ H → ((t k)⁻¹ * a * t i0 ∈ H ↔ k = i) := by
+  have memiff
+      : ∀ (k i : Fin H.index) (a : G), (t i)⁻¹ * a ∈ H → ((t k)⁻¹ * a * t i0 ∈ H ↔ k = i) := by
     intro k i a ha
     rw [← ht k i]
     constructor
@@ -62,10 +65,14 @@ theorem inducedRep_cyclic_trace (G : Type) [Group G] [Fintype G] (H : Subgroup G
       rw [memiff k i0 _ hσ]
       exact hk
   · rw [eq_top_iff]
-    have hsingle : ∀ i, Pi.single i (1 : ℂ) ∈ Submodule.span ℂ (Set.range fun g => indRep H χ t ht hc g (Pi.single i0 1)) := by
+    have hsingle
+        : ∀ i,
+          Pi.single i (1 : ℂ)
+            ∈ Submodule.span ℂ (Set.range fun g => indRep H χ t ht hc g (Pi.single i0 1)) := by
       intro i
       have hti : (t i)⁻¹ * t i ∈ H := by simpa using H.one_mem
-      have hval : indRep H χ t ht hc (t i) (Pi.single i0 1) = dot H χ (t i0) • Pi.single i (1 : ℂ) := by
+      have hval
+          : indRep H χ t ht hc (t i) (Pi.single i0 1) = dot H χ (t i0) • Pi.single i (1 : ℂ) := by
         ext k
         show Matrix.toLin' (indMat H χ t (t i)) (Pi.single i0 1) k = _
         rw [Matrix.toLin'_apply, Matrix.mulVec_single_one]
@@ -82,7 +89,8 @@ theorem inducedRep_cyclic_trace (G : Type) [Group G] [Fintype G] (H : Subgroup G
         unfold dot
         rw [dite_eq_left hti0]
         exact Units.ne_zero _
-      have : Pi.single i (1 : ℂ) = (dot H χ (t i0))⁻¹ • indRep H χ t ht hc (t i) (Pi.single i0 1) := by
+      have : Pi.single i (1 : ℂ)
+          = (dot H χ (t i0))⁻¹ • indRep H χ t ht hc (t i) (Pi.single i0 1) := by
         rw [hval, smul_smul, inv_mul_cancel₀ hne, one_smul]
       rw [this]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨t i, rfl⟩)
@@ -91,7 +99,8 @@ theorem inducedRep_cyclic_trace (G : Type) [Group G] [Fintype G] (H : Subgroup G
     refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
     have e : (fun j => if i = j then (1 : ℂ) else 0) = Pi.single i 1 := by
       ext j; simp [Pi.single_apply, eq_comm]
-    rw [e]; exact hsingle i
+    rw [e]
+    exact hsingle i
   · intro g
     rw [indRep_trace, ← indFun_eq_sum H χ t ht hc g]
     rfl

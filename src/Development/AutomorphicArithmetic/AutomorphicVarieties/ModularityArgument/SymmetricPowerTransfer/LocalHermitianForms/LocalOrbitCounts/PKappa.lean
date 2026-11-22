@@ -20,16 +20,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem sum_split (I : ℕ → ℕ) (q : ℕ) (h0 : I 0 = 1) (h1 : I 1 + 1 = q)
-    (hs : ∀ m, 1 ≤ m → I (m + 1) = q * I m) (n : ℕ) :
-    ∑ m ∈ Finset.range (n + 1), I m = q ^ n := by
+private theorem sum_split
+    (I : ℕ → ℕ) (q : ℕ)
+    (h0 : I 0 = 1) (h1 : I 1 + 1 = q) (hs : ∀ m, 1 ≤ m → I (m + 1) = q * I m) (n : ℕ)
+    : ∑ m ∈ Finset.range (n + 1), I m = q ^ n := by
   have key : ∀ k, I (k + 1) + q ^ k = q ^ (k + 1) := by
     intro k
     induction k with
     | zero => simpa using h1
     | succ k ih =>
       rw [hs (k + 1) (by omega)]
-      calc q * I (k + 1) + q ^ (k + 1) = q * (I (k + 1) + q ^ k) := by ring
+      calc
+        q * I (k + 1) + q ^ (k + 1)
+          = q * (I (k + 1) + q ^ k) := by ring
         _ = q ^ (k + 1 + 1) := by rw [ih]; ring
   induction n with
   | zero => simp [h0]
@@ -37,9 +40,10 @@ private theorem sum_split (I : ℕ → ℕ) (q : ℕ) (h0 : I 0 = 1) (h1 : I 1 +
     rw [Finset.sum_range_succ, ih]
     linarith [key k]
 
-private theorem sum_inert (I : ℕ → ℕ) (q : ℕ) (h0 : I 0 = 1) (h1 : I 1 = q + 1)
-    (hs : ∀ m, 1 ≤ m → I (m + 1) = q * I m) (n : ℕ) :
-    ∑ m ∈ Finset.range (n + 1), (-1 : ℤ) ^ (n + m) * (I m : ℤ) = (q : ℤ) ^ n := by
+private theorem sum_inert
+    (I : ℕ → ℕ) (q : ℕ)
+    (h0 : I 0 = 1) (h1 : I 1 = q + 1) (hs : ∀ m, 1 ≤ m → I (m + 1) = q * I m) (n : ℕ)
+    : ∑ m ∈ Finset.range (n + 1), (-1 : ℤ) ^ (n + m) * (I m : ℤ) = (q : ℤ) ^ n := by
   have key : ∀ k, (I (k + 1) : ℤ) = (q : ℤ) ^ (k + 1) + (q : ℤ) ^ k := by
     intro k
     induction k with
@@ -53,8 +57,9 @@ private theorem sum_inert (I : ℕ → ℕ) (q : ℕ) (h0 : I 0 = 1) (h1 : I 1 =
   | zero => simp [h0]
   | succ k ih =>
     rw [Finset.sum_range_succ]
-    have e : ∑ m ∈ Finset.range (k + 1), (-1 : ℤ) ^ (k + 1 + m) * (I m : ℤ)
-        = -∑ m ∈ Finset.range (k + 1), (-1 : ℤ) ^ (k + m) * (I m : ℤ) := by
+    have e
+        : ∑ m ∈ Finset.range (k + 1), (-1 : ℤ) ^ (k + 1 + m) * (I m : ℤ)
+          = - ∑ m ∈ Finset.range (k + 1), (-1 : ℤ) ^ (k + m) * (I m : ℤ) := by
       rw [← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl (fun m _ => ?_)
       rw [show k + 1 + m = (k + m) + 1 by omega, pow_succ]
@@ -63,10 +68,11 @@ private theorem sum_inert (I : ℕ → ℕ) (q : ℕ) (h0 : I 0 = 1) (h1 : I 1 =
     norm_num
 
 section
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ : K}
+variable
+  {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ : K}
 
-private theorem ev_odd (L : IsLoc O Δ) {g y : K} (hg0 : g ≠ 0) (hg : ¬ EvenVal O g) (hy : y ≠ 0) :
-    EvenVal O (y * g) ↔ ¬ EvenVal O y := by
+private theorem ev_odd (L : IsLoc O Δ) {g y : K} (hg0 : g ≠ 0) (hg : ¬ EvenVal O g) (hy : y ≠ 0)
+    : EvenVal O (y * g) ↔ ¬ EvenVal O y := by
   constructor
   · intro h hy'
     apply hg
@@ -78,8 +84,8 @@ private theorem ev_odd (L : IsLoc O Δ) {g y : K} (hg0 : g ≠ 0) (hg : ¬ EvenV
     have e := PS.even_mul h1 h2
     rwa [show y / g * g ^ 2 = y * g by field_simp] at e
 
-private theorem ev_pow (L : IsLoc O Δ) {π : O} (hπ : Irreducible π) (k : ℕ) :
-    EvenVal O (algebraMap O K (π ^ k)) ↔ Even k := by
+private theorem ev_pow (L : IsLoc O Δ) {π : O} (hπ : Irreducible π) (k : ℕ)
+    : EvenVal O (algebraMap O K (π ^ k)) ↔ Even k := by
   haveI := L.frac
   have hinj := IsFractionRing.injective O K
   have hπ0 : algebraMap O K π ≠ 0 := by
@@ -98,12 +104,12 @@ private theorem ev_pow (L : IsLoc O Δ) {π : O} (hπ : Irreducible π) (k : ℕ
 
 end
 
-theorem UpperTheory.V.Z.Sym.Loc.pKappa :
-    UpperTheory.V.Z.Sym.Loc.PKappa := by
+theorem UpperTheory.V.Z.Sym.Loc.pKappa : UpperTheory.V.Z.Sym.Loc.PKappa := by
   unfold UpperTheory.V.Z.Sym.Loc.PKappa
   intro O K _ _ _ _ _ Δ τ L hD hτ s ε hDs
   classical
-  obtain ⟨π, n, e, h, x, hC, hspan⟩ := UpperTheory.exists_discriminant_normal_form O K Δ τ L hD hτ s ε hDs
+  obtain ⟨π, n, e, h, x, hC, hspan⟩ :=
+    UpperTheory.exists_discriminant_normal_form O K Δ τ L hD hτ s ε hDs
   have hπ : Irreducible π := hC.irr
   haveI := L.frac
   have hinj := IsFractionRing.injective O K
@@ -122,9 +128,13 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
     have h1 := (UpperTheory.stabilizer_order_level_antitone_le_units O K Δ τ L hD π n e h x hC m).1
     have h2 := (UpperTheory.stabilizer_order_level_antitone_le_units O K Δ τ L hD π n e h x hC m).2
     simp only [hr]
-    rw [← Subgroup.relIndex_mul_relIndex _ _ _ h1 h2, UpperTheory.relIndex_stabilizer_succ_eq_card_residueField O K Δ τ L hD π n e h x hC m hm]
-  have hcount : ∀ t : Kˣ, ((PS.Gs O τ (↑t) 1).ncard : ℂ) = ∑ m ∈ Finset.range (n + 1),
-      if EvenVal O ((t : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0 := by
+    rw [← Subgroup.relIndex_mul_relIndex _ _ _ h1 h2,
+      UpperTheory.relIndex_stabilizer_succ_eq_card_residueField O K Δ τ L hD π n e h x hC m hm]
+  have hcount
+      : ∀ t : Kˣ,
+        ((PS.Gs O τ (↑t) 1).ncard : ℂ)
+          = ∑ m ∈ Finset.range (n + 1),
+            if EvenVal O ((t : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0 := by
     intro t
     rw [PK.gs_count L hD hC t]
     push_cast
@@ -136,7 +146,8 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
   have hL := hsLaw O K Δ L
   by_cases hsq : IsSquare (τ ^ 2 - 4)
   · have hE : IsSquare (e : O) := hDe.1 hsq
-    have r1 : r 1 + 1 = q := (UpperTheory.relIndex_stabilizer_level_one_of_isSquare_unit O K Δ τ L hD π n e h x hC).2 hE
+    have r1 : r 1 + 1 = q :=
+      (UpperTheory.relIndex_stabilizer_level_one_of_isSquare_unit O K Δ τ L hD π n e h x hC).2 hE
     have hall : ∀ t : Kˣ, t ∈ NE τ := fun t => (hsNE O K Δ τ L hD t).2 (hL.2.2.2 _ _ hD hsq)
     obtain ⟨b, hb⟩ := MonoidHom.mem_range.1 (hall (Units.mk0 (algebraMap O K π) hπ0))
     have hnb' : PS.nU b = Units.mk0 (algebraMap O K π) hπ0 := hb
@@ -166,14 +177,18 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
       intro z hz
       exfalso
       apply hodd
-      have h1 : EvenVal O (QuadraticAlgebra.norm ((z ^ 2 * 1 * b⁻¹ : (Etau K τ)ˣ) : Etau K τ)) := hC13.1 _ hz
-      have h2 : EvenVal O (((PS.nU z : Kˣ) : K) ^ 2) := ⟨1, _, Units.ne_zero _, by rw [Units.val_one, map_one, one_mul]⟩
+      have h1 : EvenVal O (QuadraticAlgebra.norm ((z ^ 2 * 1 * b⁻¹ : (Etau K τ)ˣ) : Etau K τ)) :=
+        hC13.1 _ hz
+      have h2 : EvenVal O (((PS.nU z : Kˣ) : K) ^ 2) :=
+        ⟨1, _, Units.ne_zero _, by rw [Units.val_one, map_one, one_mul]⟩
       have h3 := PS.even_mul h2 (PS.even_inv h1)
-      have e3 : ((PS.nU z : Kˣ) : K) ^ 2 * (QuadraticAlgebra.norm ((z ^ 2 * 1 * b⁻¹ : (Etau K τ)ˣ) : Etau K τ))⁻¹
-          = algebraMap O K π := by
+      have e3
+          : ((PS.nU z : Kˣ) : K) ^ 2
+              * (QuadraticAlgebra.norm ((z ^ 2 * 1 * b⁻¹ : (Etau K τ)ˣ) : Etau K τ))⁻¹
+            = algebraMap O K π := by
         rw [← PS.nU_val, ← hnb, ← PS.nU_val]
-        simp only [map_mul, map_pow, map_one, mul_one, map_inv, Units.val_mul, Units.val_pow_eq_pow_val,
-          Units.val_inv_eq_inv_val]
+        simp only [map_mul, map_pow, map_one, mul_one, map_inv, Units.val_mul,
+          Units.val_pow_eq_pow_val, Units.val_inv_eq_inv_val]
         field_simp
       rwa [e3] at h3
     have disj : ∀ t : K, Disjoint (PS.Gs O τ t 1) (PS.Gs O τ t b) := by
@@ -185,12 +200,15 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
       have e1 : b = (1 * c) * ((1 * c)⁻¹ * (b * c')) * c'⁻¹ := by group
       rw [e1]
       exact (Cint O τ).mul_mem ((Cint O τ).mul_mem (by rwa [one_mul]) hu) ((Cint O τ).inv_mem hc')
-    have hp : ∀ t : Kˣ, pcount O τ (t : K) = ((PS.Gs O τ (↑t) 1).ncard : ℂ)
-        + ((PS.Gs O τ (↑(t * Units.mk0 (algebraMap O K π) hπ0)) 1).ncard : ℂ) := by
+    have hp
+        : ∀ t : Kˣ,
+          pcount O τ (t : K)
+            = ((PS.Gs O τ (↑t) 1).ncard : ℂ)
+              + ((PS.Gs O τ (↑(t * Units.mk0 (algebraMap O K π) hπ0)) 1).ncard : ℂ) := by
       intro t
       rw [PS.pcount_eq L hD t 1 b cover uniq,
-        Set.ncard_union_eq (disj _) (PS.gs_fin L hD t 1) (PS.gs_fin L hD t b), PS.gs_ncard (↑t) b, hnb',
-        ← Units.val_mul]
+        Set.ncard_union_eq (disj _) (PS.gs_fin L hD t 1) (PS.gs_fin L hD t b), PS.gs_ncard (↑t) b,
+        hnb', ← Units.val_mul]
       exact Nat.cast_add _ _
     haveI : Unique (Kˣ ⧸ NE τ) :=
       { default := 1
@@ -198,28 +216,37 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
           obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective u
           exact (QuotientGroup.eq_one_iff a).2 (hall a) }
     rw [finsum_unique]
-    have hterm : ∀ t0 : Kˣ, ∀ m ∈ Finset.range (n + 1),
-        ((if EvenVal O ((t0 : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0) +
-          (if EvenVal O (((t0 * Units.mk0 (algebraMap O K π) hπ0 : Kˣ) : K) * algebraMap O K (π ^ (n + m)))
-            then (r m : ℂ) else 0)) = (r m : ℂ) := by
+    have hterm
+        : ∀ t0 : Kˣ, ∀ m ∈ Finset.range (n + 1),
+          ((if EvenVal O ((t0 : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0)
+              + (if EvenVal O
+                     (((t0 * Units.mk0 (algebraMap O K π) hπ0 : Kˣ) : K)
+                       * algebraMap O K (π ^ (n + m))) then
+                   (r m : ℂ)
+                 else
+                   0))
+            = (r m : ℂ) := by
       intro t0 m _
       rw [Units.val_mul, Units.val_mk0,
         show (t0 : K) * algebraMap O K π * algebraMap O K (π ^ (n + m))
-          = (t0 : K) * algebraMap O K (π ^ (n + m)) * algebraMap O K π by ring,
+            = (t0 : K) * algebraMap O K (π ^ (n + m)) * algebraMap O K π by
+          ring,
         ev_odd L hπ0 hodd (mul_ne_zero (Units.ne_zero t0) (hP m))]
       by_cases hE : EvenVal O ((t0 : K) * algebraMap O K (π ^ (n + m)))
       · rw [if_pos hE, if_neg (not_not.2 hE), add_zero]
       · rw [if_neg hE, if_pos hE, zero_add]
-    rw [hL.2.2.2 _ _ hD hsq, one_mul, hp, hcount, hcount, ← Finset.sum_add_distrib, Finset.sum_congr rfl (hterm _)]
+    rw [hL.2.2.2 _ _ hD hsq, one_mul, hp, hcount, hcount, ← Finset.sum_add_distrib,
+      Finset.sum_congr rfl (hterm _)]
     exact_mod_cast sum_split r q r0 r1 rs n
   · have hE : ¬ IsSquare (e : O) := fun h' => hsq (hDe.2 h')
-    have r1 : r 1 = q + 1 := (UpperTheory.relIndex_stabilizer_level_one_of_isSquare_unit O K Δ τ L hD π n e h x hC).1 hE
+    have r1 : r 1 = q + 1 :=
+      (UpperTheory.relIndex_stabilizer_level_one_of_isSquare_unit O K Δ τ L hD π n e h x hC).1 hE
     have hCt : Cint O τ = ⊤ := UpperTheory.compactTorusUnits_eq_top_of_nonsplit O K Δ τ L hD hsq
     obtain ⟨⟨g, hg⟩, hfin⟩ := UpperTheory.finsum_quotient_norms_of_nonsplit O K Δ τ L hD hsq
     have cover : ∀ y : (Etau K τ)ˣ, ∃ z, ∃ c ∈ Cint O τ, y = 1 * c * z ^ 2 ∨ y = 1 * c * z ^ 2 :=
       fun y => ⟨1, y, by rw [hCt]; exact Subgroup.mem_top _, Or.inl (by simp)⟩
-    have uniq : ∀ z : (Etau K τ)ˣ, z ^ 2 * 1 * 1⁻¹ ∈ Cint O τ → z ∈ Cint O τ :=
-      fun z _ => by rw [hCt]; exact Subgroup.mem_top _
+    have uniq : ∀ z : (Etau K τ)ˣ, z ^ 2 * 1 * 1⁻¹ ∈ Cint O τ → z ∈ Cint O τ := fun z _ => by
+      rw [hCt]; exact Subgroup.mem_top _
     have hp : ∀ t : Kˣ, pcount O τ (t : K) = ((PS.Gs O τ (↑t) 1).ncard : ℂ) := by
       intro t
       rw [PS.pcount_eq L hD t 1 1 cover uniq, Set.union_self]
@@ -248,8 +275,10 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
       have h2 := hL.2.1 _ _ hDv hev
       rw [hg1] at h2
       norm_num at h2
-    have hinv : ∀ t ∈ NE τ, ∀ y : Kˣ, hs (τ ^ 2 - 4) ((t * y : Kˣ) : K) * pcount O τ ((t * y : Kˣ) : K)
-        = hs (τ ^ 2 - 4) (y : K) * pcount O τ (y : K) := by
+    have hinv
+        : ∀ t ∈ NE τ, ∀ y : Kˣ,
+          hs (τ ^ 2 - 4) ((t * y : Kˣ) : K) * pcount O τ ((t * y : Kˣ) : K)
+            = hs (τ ^ 2 - 4) (y : K) * pcount O τ (y : K) := by
       intro t ht y
       obtain ⟨a, ha⟩ := MonoidHom.mem_range.1 ht
       have ha' : PS.nU a = t := ha
@@ -259,10 +288,11 @@ theorem UpperTheory.V.Z.Sym.Loc.pKappa :
       rw [Units.val_mul, mul_comm, ← ha', ← PS.gs_ncard, hGs]
     have hf := hfin (fun t : Kˣ => hs (τ ^ 2 - 4) (t : K) * pcount O τ (t : K)) hinv g hg
     rw [hf]
-    have hterm : ∀ m ∈ Finset.range (n + 1),
-        ((if EvenVal O (((1 : Kˣ) : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0) +
-          -(if EvenVal O ((g : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0))
-          = (-1 : ℂ) ^ (n + m) * (r m : ℂ) := by
+    have hterm
+        : ∀ m ∈ Finset.range (n + 1),
+          ((if EvenVal O (((1 : Kˣ) : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0)
+              + -(if EvenVal O ((g : K) * algebraMap O K (π ^ (n + m))) then (r m : ℂ) else 0))
+            = (-1 : ℂ) ^ (n + m) * (r m : ℂ) := by
       intro m _
       rw [Units.val_one, one_mul, ev_pow L hπ, mul_comm (g : K),
         ev_odd L (Units.ne_zero g) hgodd (hP m), ev_pow L hπ]

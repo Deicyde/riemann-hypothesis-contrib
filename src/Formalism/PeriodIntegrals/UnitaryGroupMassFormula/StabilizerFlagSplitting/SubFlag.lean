@@ -21,8 +21,8 @@ def SubFlag : Prop :=
   ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), inWb k r z → Sset k r z ⊆ FlagStab k r z
 
 def UnipN : Prop :=
-  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), StdZ k r z →
-    ∀ g ∈ Sset k r z, ∀ p : ℕ, (g - 1) ^ p = 0 → g ∈ Nset k r
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+    StdZ k r z → ∀ g ∈ Sset k r z, ∀ p : ℕ, (g - 1) ^ p = 0 → g ∈ Nset k r
 
 def NPerp : Prop :=
   ∀ (k r : ℕ), ∀ g ∈ Nset k r, ∀ v : Fin (2 * r + k + 1) → ℂ,

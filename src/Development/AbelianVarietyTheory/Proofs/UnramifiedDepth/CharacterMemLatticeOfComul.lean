@@ -11,37 +11,51 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEi
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-private def latConv {C N : Type} [Field C] [Add N] (φ ψ : (N → C) →ₗ[C] C) :
-    (N → C) →ₗ[C] C where
+private def latConv {C N : Type} [Field C] [Add N] (φ ψ : (N → C) →ₗ[C] C) : (N → C) →ₗ[C] C where
   toFun f := φ (fun x => ψ (fun y => f (x + y)))
   map_add' f g := by
-    rw [← map_add (f := _)]; congr 1; funext x
-    rw [Pi.add_apply, ← map_add (f := _)]; rfl
+    rw [← map_add (f := _)]
+    congr 1
+    funext x
+    rw [Pi.add_apply, ← map_add (f := _)]
+    rfl
   map_smul' c f := by
-    rw [RingHom.id_apply, ← map_smul]; congr 1; funext x
-    rw [Pi.smul_apply, ← map_smul]; rfl
+    rw [RingHom.id_apply, ← map_smul]
+    congr 1
+    funext x
+    rw [Pi.smul_apply, ← map_smul]
+    rfl
 
-private theorem latConv_sum {C N : Type} [Field C] [Add N] (φ ψ : (N → C) →ₗ[C] C)
-    {m : ℕ} (f : N → C) (g h : Fin m → N → C) (hf : ∀ x y, f (x + y) = ∑ i, g i x * h i y) :
-    latConv φ ψ f = ∑ i, φ (g i) * ψ (h i) := by
+private theorem latConv_sum
+    {C N : Type} [Field C] [Add N]
+    (φ ψ : (N → C) →ₗ[C] C)
+    {m : ℕ} (f : N → C) (g h : Fin m → N → C) (hf : ∀ x y, f (x + y) = ∑ i, g i x * h i y)
+    : latConv φ ψ f = ∑ i, φ (g i) * ψ (h i) := by
   have h1 : ∀ x, (fun y => f (x + y)) = ∑ i, g i x • h i := by
     intro x; funext y; simp [hf, Finset.sum_apply]
   have h2 : (fun x => ψ (fun y => f (x + y))) = ∑ i, ψ (h i) • g i := by
     funext x; rw [h1]; simp [Finset.sum_apply, mul_comm]
   change φ (fun x => ψ (fun y => f (x + y))) = _
-  rw [h2]; simp [mul_comm]
+  rw [h2]
+  simp [mul_comm]
 
-private theorem lat_bound {C V : Type} [Field C] [AddCommGroup V] [Module C V]
-    (v : Valuation C NNReal) (S : Set V) {k : V} (hk : k ∈ Submodule.span C S) :
-    ∃ M : NNReal, ∀ φ : V →ₗ[C] C, (∀ f ∈ S, v (φ f) ≤ 1) → v (φ k) ≤ M := by
+private theorem lat_bound
+    {C V : Type} [Field C] [AddCommGroup V] [Module C V]
+    (v : Valuation C NNReal)
+    (S : Set V)
+    {k : V} (hk : k ∈ Submodule.span C S)
+    : ∃ M : NNReal, ∀ φ : V →ₗ[C] C, (∀ f ∈ S, v (φ f) ≤ 1) → v (φ k) ≤ M := by
   induction hk using Submodule.span_induction with
   | mem x hx => exact ⟨1, fun φ hφ => hφ x hx⟩
   | zero => exact ⟨0, fun φ _ => by simp⟩
@@ -58,10 +72,14 @@ private theorem lat_bound {C V : Type} [Field C] [AddCommGroup V] [Module C V]
     gcongr
     exact hM φ hφ
 
-private theorem lat_dual {C : Type} [Field C] (v : Valuation C NNReal) {O : Type} [CommRing O]
-    [Algebra O C] (hv : v.Integers O) {N : Type} (A : Submodule O (N → C)) (hfg : A.FG)
-    (hsp : Submodule.span C (A : Set (N → C)) = ⊤) (k : N → C)
-    (hk : ∀ φ : (N → C) →ₗ[C] C, (∀ f ∈ A, v (φ f) ≤ 1) → v (φ k) ≤ 1) : k ∈ A := by
+private theorem lat_dual
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {N : Type} (A : Submodule O (N → C)) (hfg : A.FG) (hsp : Submodule.span C (A : Set (N → C)) = ⊤)
+    (k : N → C) (hk : ∀ φ : (N → C) →ₗ[C] C, (∀ f ∈ A, v (φ f) ≤ 1) → v (φ k) ≤ 1)
+    : k ∈ A := by
   classical
   have := hv.hom_inj.isDomain
   have := ValuationRing.of_integers v hv
@@ -82,8 +100,7 @@ private theorem lat_dual {C : Type} [Field C] (v : Valuation C NNReal) {O : Type
   have hR : LinearIndependent O w := b.linearIndependent.map' A.subtype (Submodule.ker_subtype _)
   have hC : LinearIndependent C w := (LinearIndependent.iff_fractionRing O C).1 hR
   have hspR : Submodule.span O (Set.range w) = A := by
-    have : Set.range w = A.subtype '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range w = A.subtype '' Set.range b := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, b.span_eq, Submodule.map_subtype_top]
   have hspC : Submodule.span C (Set.range w) = ⊤ := by
     rw [← Submodule.span_span_of_tower O, hspR, hsp]
@@ -97,8 +114,10 @@ private theorem lat_dual {C : Type} [Field C] (v : Valuation C NNReal) {O : Type
       obtain ⟨j, rfl⟩ := hx
       rw [← hb, Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply]
       split_ifs <;> simp
-    | zero => simp
-    | add x y _ _ hx hy => rw [map_add (f := _)]; exact v.map_add_le hx hy
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      rw [map_add (f := _)]; exact v.map_add_le hx hy
     | smul c x _ hx =>
       rw [← algebraMap_smul C c x, map_smul, smul_eq_mul, map_mul]
       exact mul_le_one' (hv.map_le_one c) hx
@@ -109,7 +128,15 @@ private theorem lat_dual {C : Type} [Field C] (v : Valuation C NNReal) {O : Type
   rw [ho', algebraMap_smul, hb]
   exact A.smul_mem _ (b i).2
 
-theorem character_mem_lattice_of_comul : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ (N : Type) [AddCommMonoid N] [Finite N] (A : Submodule O (N → C)), A.FG → Submodule.span C (A : Set (N → C)) = ⊤ → (∀ f ∈ A, ∃ (m : ℕ) (g h : Fin m → N → C), (∀ i, g i ∈ A) ∧ (∀ i, h i ∈ A) ∧ ∀ x y, f (x + y) = ∑ i, g i x * h i y) → (∀ f ∈ A, ∃ o : O, algebraMap O C o = f 0) → ∀ κ : N → C, κ 0 = 1 → (∀ x y, κ (x + y) = κ x * κ y) → κ ∈ A := by
+theorem character_mem_lattice_of_comul
+    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ (N : Type) [AddCommMonoid N] [Finite N] (A : Submodule O (N → C)),
+          A.FG → Submodule.span C (A : Set (N → C)) = ⊤
+            → (∀ f ∈ A, ∃ (m : ℕ) (g h : Fin m → N → C),
+              (∀ i, g i ∈ A) ∧ (∀ i, h i ∈ A) ∧ ∀ x y, f (x + y) = ∑ i, g i x * h i y)
+            → (∀ f ∈ A, ∃ o : O, algebraMap O C o = f 0)
+            → ∀ κ : N → C, κ 0 = 1 → (∀ x y, κ (x + y) = κ x * κ y) → κ ∈ A := by
   intro C _ v O _ _ hv N _ _ A hfg hsp hco h0 k hk0 hk
   refine lat_dual v hv A hfg hsp k fun φ hφ => ?_
   obtain ⟨M, hM⟩ := lat_bound v (A : Set (N → C)) (k := k) (by rw [hsp]; trivial)

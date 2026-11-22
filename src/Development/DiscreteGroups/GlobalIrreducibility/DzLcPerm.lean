@@ -15,8 +15,10 @@ namespace DiscreteGroups.sglob.DzLc
 
 variable {F : Type} [Field F] {N : ℕ}
 
-theorem strict_left_mul {b : Fin N → ℕ} {X Y : Matrix (Fin N) (Fin N) F}
-    (hX : X.BlockTriangular b) (hY : GlobalTheory.FiniteGL.IsStrictBlock b Y) : GlobalTheory.FiniteGL.IsStrictBlock b (X * Y) := by
+theorem strict_left_mul
+    {b : Fin N → ℕ} {X Y : Matrix (Fin N) (Fin N) F}
+    (hX : X.BlockTriangular b) (hY : GlobalTheory.FiniteGL.IsStrictBlock b Y)
+    : GlobalTheory.FiniteGL.IsStrictBlock b (X * Y) := by
   intro i j hij
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
@@ -24,23 +26,28 @@ theorem strict_left_mul {b : Fin N → ℕ} {X Y : Matrix (Fin N) (Fin N) F}
   · rw [hX h, zero_mul]
   · rw [hY l j (le_trans hij h), mul_zero]
 
-theorem conj_mem_unipRadical {b : Fin N → ℕ} {p u : GL (Fin N) F}
-    (hp : (p : Matrix (Fin N) (Fin N) F).BlockTriangular b) (hu : u ∈ GlobalTheory.FiniteGL.unipRadical F b) :
-    p * u * p⁻¹ ∈ GlobalTheory.FiniteGL.unipRadical F b := by
+theorem conj_mem_unipRadical
+    {b : Fin N → ℕ} {p u : GL (Fin N) F} (hp : (p : Matrix (Fin N) (Fin N) F).BlockTriangular b)
+    (hu : u ∈ GlobalTheory.FiniteGL.unipRadical F b)
+    : p * u * p⁻¹ ∈ GlobalTheory.FiniteGL.unipRadical F b := by
   have hpi : ((p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F).BlockTriangular b := by
     let _ := p.invertible
     rw [Matrix.coe_units_inv]
     exact Matrix.blockTriangular_inv_of_blockTriangular hp
-  have h1 : (p : Matrix (Fin N) (Fin N) F) * ((p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) = 1 := by
+  have h1
+      : (p : Matrix (Fin N) (Fin N) F) * ((p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) = 1 := by
     rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
-  have e : ((p * u * p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) - 1 =
-      (p : Matrix (Fin N) (Fin N) F) * ((u : Matrix (Fin N) (Fin N) F) - 1) *
-        ((p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) := by
+  have e
+      : ((p * u * p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) - 1
+        = (p : Matrix (Fin N) (Fin N) F) * ((u : Matrix (Fin N) (Fin N) F) - 1)
+          * ((p⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) := by
     rw [Units.val_mul, Units.val_mul, mul_sub, sub_mul, mul_one, h1]
   refine GlobalTheory.FiniteGL.mem_unipRadical.2 fun i j hij => ?_
   rw [e, Matrix.mul_assoc]
   exact strict_left_mul hp
-    (GlobalTheory.FiniteGL.IsStrictBlock.mul_blockTriangular (GlobalTheory.FiniteGL.mem_unipRadical.1 hu) hpi) i j hij
+    (GlobalTheory.FiniteGL.IsStrictBlock.mul_blockTriangular
+      (GlobalTheory.FiniteGL.mem_unipRadical.1 hu) hpi)
+    i j hij
 
 theorem monotone_twoBlocks (a : ℕ) : Monotone (GlobalTheory.FiniteGL.twoBlocks N a) := by
   intro i j hij
@@ -48,9 +55,9 @@ theorem monotone_twoBlocks (a : ℕ) : Monotone (GlobalTheory.FiniteGL.twoBlocks
   simp only [GlobalTheory.FiniteGL.twoBlocks]
   split_ifs <;> omega
 
-theorem blockUpper_le_normalizer (b : Fin N → ℕ) :
-    GroundTheory.Automorphic.Iwasawa.blockUpper F N b ≤
-      Subgroup.normalizer (GlobalTheory.FiniteGL.unipRadical F b : Set (GL (Fin N) F)) := by
+theorem blockUpper_le_normalizer (b : Fin N → ℕ)
+    : GroundTheory.Automorphic.Iwasawa.blockUpper F N b
+      ≤ Subgroup.normalizer (GlobalTheory.FiniteGL.unipRadical F b : Set (GL (Fin N) F)) := by
   intro p hp
   refine Subgroup.mem_normalizer_iff.2 fun u => ⟨fun hu => conj_mem_unipRadical hp hu, fun hu => ?_⟩
   have hp' : p⁻¹ ∈ GroundTheory.Automorphic.Iwasawa.blockUpper F N b := inv_mem hp
@@ -58,8 +65,8 @@ theorem blockUpper_le_normalizer (b : Fin N → ℕ) :
   have e : p⁻¹ * (p * u * p⁻¹) * p⁻¹⁻¹ = u := by group
   rwa [e] at this
 
-theorem exists_cut (f : Fin N → ℕ) (hf : Monotone f) (h : ∃ x y, f x ≠ f y) :
-    ∃ a, 0 < a ∧ a < N ∧ ∀ i j : Fin N, (i : ℕ) < a → a ≤ (j : ℕ) → f i < f j := by
+theorem exists_cut (f : Fin N → ℕ) (hf : Monotone f) (h : ∃ x y, f x ≠ f y)
+    : ∃ a, 0 < a ∧ a < N ∧ ∀ i j : Fin N, (i : ℕ) < a → a ≤ (j : ℕ) → f i < f j := by
   classical
   obtain ⟨x, y, hxy⟩ := h
   have hN : 0 < N := x.pos
@@ -81,12 +88,15 @@ theorem exists_cut (f : Fin N → ℕ) (hf : Monotone f) (h : ∃ x y, f x ≠ f
     rw [h1]
     exact lt_of_lt_of_le (lt_of_le_of_ne h3 (Ne.symm hne)) h2
 
-theorem exists_perm_conj {s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin N)
-    (he : GlobalTheory.SmGL.unipRad F e ≠ ⊥) :
-    ∃ (Q : GL (Fin N) F) (a : ℕ), 0 < a ∧ a < N ∧
-      ∀ x ∈ GlobalTheory.FiniteGL.unipRadical F (GlobalTheory.FiniteGL.twoBlocks N a), Q * x * Q⁻¹ ∈ GlobalTheory.SmGL.unipRad F e := by
+theorem exists_perm_conj
+    {s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin N) (he : GlobalTheory.SmGL.unipRad F e ≠ ⊥)
+    : ∃ (Q : GL (Fin N) F) (a : ℕ),
+      0 < a ∧ a < N
+        ∧ ∀ x ∈ GlobalTheory.FiniteGL.unipRadical F (GlobalTheory.FiniteGL.twoBlocks N a),
+          Q * x * Q⁻¹ ∈ GlobalTheory.SmGL.unipRad F e := by
   classical
-  obtain ⟨β, hβ⟩ : ∃ β : Fin N → ℕ, β = fun x => ((GlobalTheory.SmGL.blk e x : Fin s) : ℕ) := ⟨_, rfl⟩
+  obtain ⟨β, hβ⟩ : ∃ β : Fin N → ℕ, β = fun x => ((GlobalTheory.SmGL.blk e x : Fin s) : ℕ) :=
+    ⟨_, rfl⟩
   have hβe : ∀ c (i : Fin (d c)), β (e ⟨c, i⟩) = c := fun c i => by subst hβ; simp
   obtain ⟨x0, y0, hxy⟩ : ∃ x y, β x ≠ β y := by
     by_contra hcon
@@ -106,8 +116,7 @@ theorem exists_perm_conj {s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) �
     simp [Matrix.one_apply, e.injective.eq_iff]
   obtain ⟨ν, hν⟩ : ∃ ν : Equiv.Perm (Fin N), ν = Tuple.sort β := ⟨_, rfl⟩
   have hmono : Monotone (β ∘ ν) := hν ▸ Tuple.monotone_sort β
-  obtain ⟨a, ha0, haN, hcut⟩ := exists_cut (β ∘ ν) hmono
-    ⟨ν.symm x0, ν.symm y0, by simpa using hxy⟩
+  obtain ⟨a, ha0, haN, hcut⟩ := exists_cut (β ∘ ν) hmono ⟨ν.symm x0, ν.symm y0, by simpa using hxy⟩
   have h12 : (ν.symm.toPEquiv.toMatrix : Matrix (Fin N) (Fin N) F) * ν.toPEquiv.toMatrix = 1 := by
     rw [PEquiv.toMatrix_toPEquiv_mul]
     ext u v
@@ -117,8 +126,10 @@ theorem exists_perm_conj {s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) �
     ext u v
     simp [PEquiv.toMatrix_apply, Matrix.one_apply]
   let Q : GL (Fin N) F := ⟨_, _, h12, h21⟩
-  have hQ : ∀ X : GL (Fin N) F, ∀ u v, ((Q * X * Q⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) u v =
-      (X : Matrix (Fin N) (Fin N) F) (ν.symm u) (ν.symm v) := by
+  have hQ
+      : ∀ X : GL (Fin N) F, ∀ u v,
+        ((Q * X * Q⁻¹ : GL (Fin N) F) : Matrix (Fin N) (Fin N) F) u v
+          = (X : Matrix (Fin N) (Fin N) F) (ν.symm u) (ν.symm v) := by
     intro X u v
     show (((ν.symm.toPEquiv.toMatrix : Matrix (Fin N) (Fin N) F) * (X : Matrix (Fin N) (Fin N) F) *
       ν.toPEquiv.toMatrix : Matrix (Fin N) (Fin N) F)) u v = _
@@ -126,8 +137,10 @@ theorem exists_perm_conj {s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) �
     simp
   refine ⟨Q, a, ha0, haN, fun x hx => ?_⟩
   have hxe := GlobalTheory.FiniteGL.mem_unipRadical.1 hx
-  have key : ∀ p q : Fin N, (x : Matrix (Fin N) (Fin N) F) p q ≠ (1 : Matrix (Fin N) (Fin N) F) p q →
-      β (ν p) < β (ν q) := by
+  have key
+      : ∀ p q : Fin N,
+        (x : Matrix (Fin N) (Fin N) F) p q ≠ (1 : Matrix (Fin N) (Fin N) F) p q
+          → β (ν p) < β (ν q) := by
     intro p q hpq
     by_cases hp : (p : ℕ) < a
     · by_cases hq : a ≤ (q : ℕ)
@@ -142,7 +155,8 @@ theorem exists_perm_conj {s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) �
       have h := hxe p q (by unfold GlobalTheory.FiniteGL.twoBlocks; split_ifs <;> omega)
       rw [Matrix.sub_apply, sub_eq_zero] at h
       exact h
-  refine GlobalTheory.SmGL.mem_unipRad.2 ⟨GlobalTheory.SmGL.mem_parab.2 fun u v huv => ?_, fun c i j => ?_⟩
+  refine GlobalTheory.SmGL.mem_unipRad.2
+    ⟨GlobalTheory.SmGL.mem_parab.2 fun u v huv => ?_, fun c i j => ?_⟩
   · rw [hQ x u v]
     have hne : u ≠ v := fun h => by subst h; exact lt_irrefl _ huv
     have h1 : (1 : Matrix (Fin N) (Fin N) F) (ν.symm u) (ν.symm v) = 0 :=

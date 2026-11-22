@@ -13,8 +13,8 @@ open MvPolynomial
 
 theorem EvalSpecFirst.proof : EvalSpecFirst.Statement := by
   intro n k f v w
-  change eval₂Hom (RingHom.id ℂ) w (bind₁ (specFirstVar v) f) =
-    eval₂Hom (RingHom.id ℂ) (consGroup v w) f
+  change eval₂Hom (RingHom.id ℂ) w (bind₁ (specFirstVar v) f)
+    = eval₂Hom (RingHom.id ℂ) (consGroup v w) f
   rw [eval₂Hom_bind₁]
   congr 2
   funext ij

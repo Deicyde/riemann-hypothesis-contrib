@@ -36,8 +36,8 @@ private lemma summ {α ι : Type} [Fintype ι] {f : α → ℝ}
 
 end UpperTheory.Reformulated.B.Yva3.Helpers
 
-theorem UpperTheory.Reformulated.B.Yva3.main :
-    ∀ {k : Type} [inst : Field k] [NumberField k] {ι : Type} [inst : Fintype ι] {f : k → ℝ},
+theorem UpperTheory.Reformulated.B.Yva3.main
+    : ∀ {k : Type} [inst : Field k] [NumberField k] {ι : Type} [inst : Fintype ι] {f : k → ℝ},
       Summable f → (∀ (a : k), (0 : ℝ) ≤ f a) → Summable fun (ξ : ι → k) ↦ ∏ i : ι, f (ξ i) := by
   intro k _ _ ι _ f hf h0
   exact UpperTheory.Reformulated.B.Yva3.Helpers.summ hf h0

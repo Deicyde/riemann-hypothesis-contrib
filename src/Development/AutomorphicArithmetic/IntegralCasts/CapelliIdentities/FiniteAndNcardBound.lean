@@ -5,15 +5,13 @@ public import Mathlib
 @[expose] public section
 
 open NumberField in
-theorem UpperTheory.Reformulated.B.FiniteAndNcardBound.finite_and_ncard_le :
-    ∀ (E : Type) [inst : Field E] [NumberField E],
-    ∃ (C : ℝ) (N : ℕ),
-      ∀ (R : ℝ),
-        (1 : ℝ) ≤ R →
-          {r : NumberField.RingOfIntegers E | ∀ (w : NumberField.InfinitePlace E), (w : E → ℝ) (↑r : E) ≤ R}.Finite ∧
-            (↑{r : NumberField.RingOfIntegers E | ∀ (w : NumberField.InfinitePlace E), (w : E → ℝ) (↑r : E) ≤ R}.ncard :
-                ℝ) ≤
-              C * R ^ N := by
+theorem UpperTheory.Reformulated.B.FiniteAndNcardBound.finite_and_ncard_le
+    : ∀ (E : Type) [inst : Field E] [NumberField E], ∃ (C : ℝ) (N : ℕ), ∀ (R : ℝ),
+      (1 : ℝ) ≤ R
+        → {r : NumberField.RingOfIntegers E | ∀ (w : NumberField.InfinitePlace E), (w : E → ℝ) (↑r : E) ≤ R}.Finite
+          ∧ (↑{r : NumberField.RingOfIntegers E | ∀ (w : NumberField.InfinitePlace E), (w : E → ℝ) (↑r : E) ≤ R}.ncard
+              : ℝ)
+            ≤ C * R ^ N := by
   intro E _ _
   classical
   let L := LinearMap.toContinuousLinearMap (canonicalEmbedding.latticeBasis E).equivFun.toLinearMap
@@ -30,11 +28,11 @@ theorem UpperTheory.Reformulated.B.FiniteAndNcardBound.finite_and_ncard_le :
   let T : Finset (Module.Free.ChooseBasisIndex ℤ (RingOfIntegers E) → ℤ) :=
     Fintype.piFinset fun _ => Finset.Icc (-(M : ℤ)) M
   have hT : T.card = (2 * M + 1) ^ n := by
-    have h1 : (Finset.Icc (-(M : ℤ)) M).card = 2 * M + 1 := by
-      rw [Int.card_Icc]; omega
+    have h1 : (Finset.Icc (-(M : ℤ)) M).card = 2 * M + 1 := by rw [Int.card_Icc]; omega
     simp only [T, n, Fintype.card_piFinset, h1, Finset.prod_const, Finset.card_univ]
-  have hmaps : ∀ r ∈ {r : RingOfIntegers E | ∀ (w : InfinitePlace E), (w : E → ℝ) (↑r : E) ≤ R},
-      f r ∈ (T : Set _) := by
+  have hmaps
+      : ∀ r ∈ {r : RingOfIntegers E | ∀ (w : InfinitePlace E), (w : E → ℝ) (↑r : E) ≤ R},
+        f r ∈ (T : Set _) := by
     intro r hr
     have h1 : ‖canonicalEmbedding E (r : E)‖ ≤ R := by
       rw [canonicalEmbedding.norm_le_iff]
@@ -60,9 +58,10 @@ theorem UpperTheory.Reformulated.B.FiniteAndNcardBound.finite_and_ncard_le :
     exact hmaps r hr
   · have h := Set.ncard_le_ncard_of_injOn f hmaps hf.injOn T.finite_toSet
     rw [Set.ncard_coe_finset, hT] at h
-    calc _ ≤ (((2 * M + 1) ^ n : ℕ) : ℝ) := by exact_mod_cast h
+    calc
+      _ ≤ (((2 * M + 1) ^ n : ℕ) : ℝ) := by exact_mod_cast h
       _ = (2 * (M : ℝ) + 1) ^ n := by push_cast; rfl
       _ ≤ ((2 * c + 3) * R) ^ n := by
-          apply pow_le_pow_left₀ (by positivity)
-          nlinarith
+        apply pow_le_pow_left₀ (by positivity)
+        nlinarith
       _ = _ := mul_pow _ _ _

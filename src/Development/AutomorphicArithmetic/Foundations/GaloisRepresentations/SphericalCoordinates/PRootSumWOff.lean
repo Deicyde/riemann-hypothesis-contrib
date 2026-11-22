@@ -5,8 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 open scoped Classical
@@ -15,8 +17,8 @@ namespace UpperTheory.Gal.W2.RootOff
 
 open UpperTheory.Gal.Schur
 
-private theorem rts_conj {F : Type} [Field F] [NumberField F] (χ : F[X]) (τ : F →+* ℂ) :
-    rts χ τ = (rts χ (ComplexEmbedding.conjugate τ)).map (starRingEnd ℂ) := by
+private theorem rts_conj {F : Type} [Field F] [NumberField F] (χ : F[X]) (τ : F →+* ℂ)
+    : rts χ τ = (rts χ (ComplexEmbedding.conjugate τ)).map (starRingEnd ℂ) := by
   have h : rts χ (ComplexEmbedding.conjugate τ) = (rts χ τ).map (starRingEnd ℂ) := by
     unfold rts
     have e : χ.map (ComplexEmbedding.conjugate τ) = (χ.map τ).map (starRingEnd ℂ) := by
@@ -29,12 +31,15 @@ private theorem rts_conj {F : Type} [Field F] [NumberField F] (χ : F[X]) (τ : 
   funext z
   simp
 
-private theorem ball_eq {F : Type} [Field F] [NumberField F] {n : ℕ} (t₀ : F →+* ℂ) (χ : F[X])
-    (g₀ g₁ : Fin n → ℂ) (y q : ℂ) (hr : rts χ t₀ = Finset.univ.val.map g₀)
-    (hi : Function.Injective g₀) (h0 : ∀ k, g₀ k ≠ 0) (h1 : ∀ k, g₁ k ≠ 0)
-    (hq : ∀ k, g₀ k * g₁ k = q) (i : Fin n) :
-    ballW t₀ y χ (g₀ i) =
-      ∏ j ∈ Finset.univ.erase i, ((g₁ i - y * g₁ j) * Ring.inverse (g₁ i - g₁ j)) := by
+private theorem ball_eq
+    {F : Type} [Field F] [NumberField F]
+    {n : ℕ}
+    (t₀ : F →+* ℂ) (χ : F[X]) (g₀ g₁ : Fin n → ℂ)
+    (y q : ℂ)
+    (hr : rts χ t₀ = Finset.univ.val.map g₀) (hi : Function.Injective g₀) (h0 : ∀ k, g₀ k ≠ 0)
+    (h1 : ∀ k, g₁ k ≠ 0) (hq : ∀ k, g₀ k * g₁ k = q) (i : Fin n)
+    : ballW t₀ y χ (g₀ i)
+      = ∏ j ∈ Finset.univ.erase i, ((g₁ i - y * g₁ j) * Ring.inverse (g₁ i - g₁ j)) := by
   have hqne : q ≠ 0 := by
     rw [← hq i]
     exact mul_ne_zero (h0 i) (h1 i)
@@ -64,39 +69,50 @@ private theorem ball_eq {F : Type} [Field F] [NumberField F] {n : ℕ} (t₀ : F
   rw [div_eq_iff hden]
   field_simp
 
-private theorem fib_eq {F : Type} [Field F] [NumberField F] {n : ℕ} (t₀ t₁ : F →+* ℂ)
-    (ht₁ : t₁ = ComplexEmbedding.conjugate t₀) (hne : t₀ ≠ t₁) (ε : (F →+* ℂ) → ℕ) (χ : F[X])
-    (g : (F →+* ℂ) → Fin n → ℂ) (y : ℂ) (x : F)
-    (hr : ∀ τ, rts χ τ = Finset.univ.val.map (g τ))
-    (hi : Function.Injective (g t₀)) (hc : ∀ k, g t₁ k = (starRingEnd ℂ) (g t₀ k)) (i : Fin n) :
-    fibW t₀ ε x y χ (g t₀ i) = ∏ τ, detOne (τ x) (twist t₀ t₁ ε y i g τ) := by
+private theorem fib_eq
+    {F : Type} [Field F] [NumberField F]
+    {n : ℕ}
+    (t₀ t₁ : F →+* ℂ) (ht₁ : t₁ = ComplexEmbedding.conjugate t₀) (hne : t₀ ≠ t₁)
+    (ε : (F →+* ℂ) → ℕ)
+    (χ : F[X]) (g : (F →+* ℂ) → Fin n → ℂ)
+    (y : ℂ) (x : F) (hr : ∀ τ, rts χ τ = Finset.univ.val.map (g τ)) (hi : Function.Injective (g t₀))
+    (hc : ∀ k, g t₁ k = (starRingEnd ℂ) (g t₀ k)) (i : Fin n)
+    : fibW t₀ ε x y χ (g t₀ i) = ∏ τ, detOne (τ x) (twist t₀ t₁ ε y i g τ) := by
   subst ht₁
-  have herase : ∀ f : ℂ → ℂ, (Multiset.map f ((rts χ t₀).erase (g t₀ i))).prod
-      = ∏ j ∈ Finset.univ.erase i, f (g t₀ j) := by
+  have herase
+      : ∀ f : ℂ → ℂ,
+        (Multiset.map f ((rts χ t₀).erase (g t₀ i))).prod
+          = ∏ j ∈ Finset.univ.erase i, f (g t₀ j) := by
     intro f
     rw [hr, ← Multiset.map_erase _ hi, ← Finset.erase_val, Multiset.map_map, Finset.prod_map_val]
     rfl
-  have hA : detOne (t₀ x) (twist t₀ (ComplexEmbedding.conjugate t₀) ε y i g t₀)
-      = (1 - t₀ x * (y * g t₀ i)) * ∏ j ∈ Finset.univ.erase i, (1 - t₀ x * g t₀ j) := by
+  have hA
+      : detOne (t₀ x) (twist t₀ (ComplexEmbedding.conjugate t₀) ε y i g t₀)
+        = (1 - t₀ x * (y * g t₀ i)) * ∏ j ∈ Finset.univ.erase i, (1 - t₀ x * g t₀ j) := by
     unfold detOne twist scaleAt
     rw [if_pos rfl, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), if_pos rfl]
     congr 1
     apply Finset.prod_congr rfl
     intro j hj
     rw [if_neg (Finset.ne_of_mem_erase hj)]
-  have hB : detOne ((ComplexEmbedding.conjugate t₀) x) (twist t₀ (ComplexEmbedding.conjugate t₀) ε y i g (ComplexEmbedding.conjugate t₀))
-      = (1 - (starRingEnd ℂ) (t₀ x) * (starRingEnd ℂ) (g t₀ i)) *
-        ∏ j ∈ Finset.univ.erase i, (1 - (starRingEnd ℂ) (t₀ x) * (y * (starRingEnd ℂ) (g t₀ j))) := by
-    unfold detOne twist scaleOff
-    rw [if_neg (Ne.symm hne), if_pos rfl, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), if_pos rfl,
-      ComplexEmbedding.conjugate_coe_eq, hc]
-    congr 1
-    apply Finset.prod_congr rfl
-    intro j hj
-    rw [if_neg (Finset.ne_of_mem_erase hj), hc]
-  have hC : ∀ τ ∈ (Finset.univ.erase t₀).erase (ComplexEmbedding.conjugate t₀),
-      detOne (τ x) (twist t₀ (ComplexEmbedding.conjugate t₀) ε y i g τ)
-        = (Multiset.map (fun r => 1 - τ x * (y ^ ε τ * r)) (rts χ τ)).prod := by
+  have hB
+      : detOne ((ComplexEmbedding.conjugate t₀) x)
+          (twist t₀ (ComplexEmbedding.conjugate t₀) ε y i g (ComplexEmbedding.conjugate t₀))
+        = (1 - (starRingEnd ℂ) (t₀ x) * (starRingEnd ℂ) (g t₀ i))
+          * ∏ j ∈ Finset.univ.erase i, (1 - (starRingEnd ℂ) (t₀ x) * (y * (starRingEnd ℂ) (g t₀ j))) :=
+    by
+      unfold detOne twist scaleOff
+      rw [if_neg (Ne.symm hne), if_pos rfl,
+        ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), if_pos rfl,
+        ComplexEmbedding.conjugate_coe_eq, hc]
+      congr 1
+      apply Finset.prod_congr rfl
+      intro j hj
+      rw [if_neg (Finset.ne_of_mem_erase hj), hc]
+  have hC
+      : ∀ τ ∈ (Finset.univ.erase t₀).erase (ComplexEmbedding.conjugate t₀),
+        detOne (τ x) (twist t₀ (ComplexEmbedding.conjugate t₀) ε y i g τ)
+          = (Multiset.map (fun r => 1 - τ x * (y ^ ε τ * r)) (rts χ τ)).prod := by
     intro τ hτ
     have h1 := Finset.ne_of_mem_erase hτ
     have h2 := Finset.ne_of_mem_erase (Finset.mem_of_mem_erase hτ)
@@ -104,7 +120,8 @@ private theorem fib_eq {F : Type} [Field F] [NumberField F] {n : ℕ} (t₀ t₁
     rw [if_neg h2, if_neg h1, hr τ, Multiset.map_map, Finset.prod_map_val]
     rfl
   rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ t₀),
-    ← Finset.mul_prod_erase (Finset.univ.erase t₀) _ (Finset.mem_erase.mpr ⟨hne.symm, Finset.mem_univ _⟩),
+    ← Finset.mul_prod_erase (Finset.univ.erase t₀) _
+      (Finset.mem_erase.mpr ⟨hne.symm, Finset.mem_univ _⟩),
     hA, hB, Finset.prod_congr rfl hC]
   unfold fibW
   rw [herase, herase]
@@ -112,8 +129,7 @@ private theorem fib_eq {F : Type} [Field F] [NumberField F] {n : ℕ} (t₀ t₁
 
 end UpperTheory.Gal.W2.RootOff
 
-theorem UpperTheory.Gal.W2.rootSumWOff_of :
-    UpperTheory.Gal.W2.RootSumWOff := by
+theorem UpperTheory.Gal.W2.rootSumWOff_of : UpperTheory.Gal.W2.RootSumWOff := by
   intro F _ _ n t₀ ε lam m hconj hlam
   obtain ⟨k₀, hk₀⟩ := UpperTheory.Gal.Schur.FibreSum_holds F ℂ n lam
   refine ⟨k₀, fun k hk => ?_⟩
@@ -123,7 +139,8 @@ theorem UpperTheory.Gal.W2.rootSumWOff_of :
   obtain ⟨q, hq⟩ := hqe
   set t₁ := ComplexEmbedding.conjugate t₀ with ht₁
   have hne : t₀ ≠ t₁ := Ne.symm hconj
-  let g : (F →+* ℂ) → Fin n → ℂ := fun τ => if τ = t₀ then (fun k => starRingEnd ℂ (r t₁ k)) else r τ
+  let g : (F →+* ℂ) → Fin n → ℂ := fun τ =>
+    if τ = t₀ then (fun k => starRingEnd ℂ (r t₁ k)) else r τ
   have hg0 : g t₀ = fun k => starRingEnd ℂ (r t₁ k) := if_pos rfl
   have hg1 : ∀ τ, τ ≠ t₀ → g τ = r τ := fun τ h => if_neg h
   have hrg : ∀ τ, rts χ τ = Multiset.map (g τ) Finset.univ.val := by
@@ -160,10 +177,12 @@ theorem UpperTheory.Gal.W2.rootSumWOff_of :
     intro k
     rw [hcc k]
     exact hq _ (hmem t₀ k)
-  have hunit : ∀ i j : Fin n, j ≠ i → IsUnit (g t₁ j - g t₁ i) :=
-    fun i j h => isUnit_iff_ne_zero.mpr (sub_ne_zero.mpr (fun e => h (hinj t₁ e)))
+  have hunit : ∀ i j : Fin n, j ≠ i → IsUnit (g t₁ j - g t₁ i) := fun i j h =>
+    isUnit_iff_ne_zero.mpr (sub_ne_zero.mpr (fun e => h (hinj t₁ e)))
   have key := (hc ℂ t₀ t₁ hne ε m g y).2 hlam hunit
-  have hsch : ∏ τ, UpperTheory.Gal.Schur.sch (lam τ) (r τ) = ∏ τ, UpperTheory.Gal.Schur.sch (lam τ) (g τ) := by
+  have hsch
+      : ∏ τ, UpperTheory.Gal.Schur.sch (lam τ) (r τ)
+        = ∏ τ, UpperTheory.Gal.Schur.sch (lam τ) (g τ) := by
     apply Finset.prod_congr rfl
     intro τ _
     by_cases h : τ = t₀
@@ -176,8 +195,10 @@ theorem UpperTheory.Gal.W2.rootSumWOff_of :
       have e2 : (rts χ t₀).prod = ∏ k, g t₀ k := by
         rw [hrg]
         exact Finset.prod_map_val _ _
-      rw [hl, (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (r τ)).2 _ m, (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (g τ)).2 _ m,
-        (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (r τ)).1, (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (g τ)).1, h, ← e1, ← e2]
+      rw [hl, (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (r τ)).2 _ m,
+        (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (g τ)).2 _ m,
+        (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (r τ)).1,
+        (UpperTheory.Gal.Schur.SchurDet_holds ℂ n (g τ)).1, h, ← e1, ← e2]
     · rw [hg1 τ h]
   rw [hsch, ← key]
   apply Finsupp.sum_congr
@@ -189,8 +210,10 @@ theorem UpperTheory.Gal.W2.rootSumWOff_of :
   intro i _
   simp only [Function.comp, locW]
   rw [RootOff.ball_eq t₀ χ (g t₀) (g t₁) y q (hrg t₀) (hinj t₀) (hnz t₀) (hnz t₁) hq' i]
-  have hf : ∀ s, fibW t₀ ε (↑(α s)) y χ (g t₀ i)
-      = ∏ τ, UpperTheory.Gal.Schur.detOne (τ ↑(α s)) (UpperTheory.Gal.Schur.twist t₀ t₁ ε y i g τ) :=
+  have hf
+      : ∀ s,
+        fibW t₀ ε (↑(α s)) y χ (g t₀ i)
+          = ∏ τ, UpperTheory.Gal.Schur.detOne (τ ↑(α s)) (UpperTheory.Gal.Schur.twist t₀ t₁ ε y i g τ) :=
     fun s => RootOff.fib_eq t₀ t₁ rfl hne ε χ g y _ hrg (hinj t₀) hcc i
   rw [Finset.prod_congr rfl (fun s _ => hf s), Finset.prod_comm]
   exact mul_comm _ _

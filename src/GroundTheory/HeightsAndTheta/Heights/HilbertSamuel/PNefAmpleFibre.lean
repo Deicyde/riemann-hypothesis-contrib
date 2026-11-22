@@ -14,7 +14,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 set_option linter.unusedSectionVars false
 
@@ -29,51 +30,53 @@ abbrev red : MRing ι →+* MRingOver (ZMod p) ι := MvPolynomial.map (Int.castR
 theorem red_surjective : Function.Surjective (red (ι := ι) p) :=
   MvPolynomial.map_surjective _ (fun x => ZMod.intCast_surjective x)
 
-theorem ker_red_le {J : Ideal (MRing ι)} (hp : ((p : ℕ) : MRing ι) ∈ J) :
-    RingHom.ker (red (ι := ι) p) ≤ J := by
-  rw [MvPolynomial.ker_map, ZMod.ker_intCastRingHom, Ideal.map_span, Set.image_singleton, Ideal.span_le,
-    Set.singleton_subset_iff]
+theorem ker_red_le {J : Ideal (MRing ι)} (hp : ((p : ℕ) : MRing ι) ∈ J)
+    : RingHom.ker (red (ι := ι) p) ≤ J := by
+  rw [MvPolynomial.ker_map, ZMod.ker_intCastRingHom, Ideal.map_span, Set.image_singleton,
+    Ideal.span_le, Set.singleton_subset_iff]
   simpa using hp
 
-theorem mem_map_red_iff {J : Ideal (MRing ι)} (hp : ((p : ℕ) : MRing ι) ∈ J) (g : MRing ι) :
-    red p g ∈ J.map (red p) ↔ g ∈ J := by
+theorem mem_map_red_iff {J : Ideal (MRing ι)} (hp : ((p : ℕ) : MRing ι) ∈ J) (g : MRing ι)
+    : red p g ∈ J.map (red p) ↔ g ∈ J := by
   rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective _ (red_surjective p), sup_eq_left.mpr]
   rw [← RingHom.ker_eq_comap_bot]
   exact ker_red_le p hp
 
-theorem ringKrullDim_red {J : Ideal (MRing ι)} (hp : ((p : ℕ) : MRing ι) ∈ J) :
-    ringKrullDim (MRingOver (ZMod p) ι ⧸ J.map (red p)) = ringKrullDim (MRing ι ⧸ J) := by
+theorem ringKrullDim_red {J : Ideal (MRing ι)} (hp : ((p : ℕ) : MRing ι) ∈ J)
+    : ringKrullDim (MRingOver (ZMod p) ι ⧸ J.map (red p)) = ringKrullDim (MRing ι ⧸ J) := by
   have e : J = RingHom.ker ((Ideal.Quotient.mk (J.map (red p))).comp (red p)) := by
     ext g
     rw [RingHom.mem_ker, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem, mem_map_red_iff p hp]
   exact (ringKrullDim_eq_of_ringEquiv ((Ideal.quotEquivOfEq e).trans
-    (RingHom.quotientKerEquivOfSurjective (Ideal.Quotient.mk_surjective.comp (red_surjective p))))).symm
+    (RingHom.quotientKerEquivOfSurjective (Ideal.Quotient.mk_surjective.comp (red_surjective
+      p))))).symm
 
 end Reduction
 
 section Homog
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {R S : Type} [CommRing R] [CommRing S]
+variable
+  {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {R S : Type} [CommRing R] [CommRing S]
 
-theorem map_weightedHomogeneousComponent (f : R →+* S) (w : (Σ k, ι k) → K → ℕ) (b : K → ℕ)
-    (g : MRingOver R ι) :
-    weightedHomogeneousComponent w b (MvPolynomial.map f g) =
-      MvPolynomial.map f (weightedHomogeneousComponent w b g) := by
+theorem map_weightedHomogeneousComponent
+    (f : R →+* S) (w : (Σ k, ι k) → K → ℕ) (b : K → ℕ) (g : MRingOver R ι)
+    : weightedHomogeneousComponent w b (MvPolynomial.map f g)
+      = MvPolynomial.map f (weightedHomogeneousComponent w b g) := by
   classical
   ext d
   rw [coeff_weightedHomogeneousComponent, coeff_map, coeff_map, coeff_weightedHomogeneousComponent]
   split_ifs <;> simp
 
-theorem isMultiHomogIdeal_map (f : R →+* S) {V : Ideal (MRingOver R ι)} (hV : IsMultiHomogIdeal V) :
-    IsMultiHomogIdeal (V.map (MvPolynomial.map f)) := by
+theorem isMultiHomogIdeal_map (f : R →+* S) {V : Ideal (MRingOver R ι)} (hV : IsMultiHomogIdeal V)
+    : IsMultiHomogIdeal (V.map (MvPolynomial.map f)) := by
   obtain ⟨T, hT, rfl⟩ := hV
   refine ⟨MvPolynomial.map f '' T, ?_, by rw [Ideal.map_span]⟩
   rintro _ ⟨g, hg, rfl⟩
   obtain ⟨a, ha⟩ := hT g hg
   exact ⟨a, fun m hm => ha m (support_map_subset _ _ hm)⟩
 
-theorem isMultiHomogIdeal_comap (f : R →+* S) {W : Ideal (MRingOver S ι)} (hW : IsMultiHomogIdeal W) :
-    IsMultiHomogIdeal (W.comap (MvPolynomial.map f)) := by
+theorem isMultiHomogIdeal_comap (f : R →+* S) {W : Ideal (MRingOver S ι)} (hW : IsMultiHomogIdeal W)
+    : IsMultiHomogIdeal (W.comap (MvPolynomial.map f)) := by
   classical
   have hW' := (Bridge.isMultiHomogIdeal_iff (R := S) W).mpr hW
   refine (Bridge.isMultiHomogIdeal_iff (R := R) _).mp fun g hg b => ?_
@@ -86,9 +89,12 @@ section Nef
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem nefOnF_map_red (ℓ : ℕ) [Fact ℓ.Prime] (hGeo : GeoNumStatement ι) {I : IFamily (ZMod ℓ) ι}
-    (hI : IsFieldIntersection I) {P : Ideal (MRing ι)} {α : K → ℤ} (hN : NefOnFibres P α) :
-    KH.NefOnF I (P.map (red ℓ)) α := by
+theorem nefOnF_map_red
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (hGeo : GeoNumStatement ι)
+    {I : IFamily (ZMod ℓ) ι} (hI : IsFieldIntersection I)
+    {P : Ideal (MRing ι)} {α : K → ℤ} (hN : NefOnFibres P α)
+    : KH.NefOnF I (P.map (red ℓ)) α := by
   intro W' hW' hle
   obtain ⟨⟨hW'p, hW'h, hW'r⟩, hW'd⟩ := hW'
   set W := W'.comap (red ℓ) with hWdef
@@ -109,12 +115,14 @@ theorem nefOnF_map_red (ℓ : ℕ) [Fact ℓ.Prime] (hGeo : GeoNumStatement ι) 
     rw [← ringKrullDim_red ℓ hpW, hmap, hW'd]
   have hchar : charOf W ≠ 0 := by
     intro h0
-    have hg : Submodule.IsPrincipal.generator (W.comap (C : ℤ →+* MRing ι)) = 0 := Int.natAbs_eq_zero.mp h0
+    have hg : Submodule.IsPrincipal.generator (W.comap (C : ℤ →+* MRing ι)) = 0 :=
+      Int.natAbs_eq_zero.mp h0
     have hmem : ((ℓ : ℕ) : ℤ) ∈ W.comap (C : ℤ →+* MRing ι) := by
       rw [Ideal.mem_comap, map_natCast]
       exact hpW
     rw [← Submodule.IsPrincipal.span_singleton_generator (W.comap (C : ℤ →+* MRing ι)), hg,
-      Ideal.mem_span_singleton, zero_dvd_iff] at hmem
+        Ideal.mem_span_singleton, zero_dvd_iff]
+      at hmem
     exact (Fact.out : ℓ.Prime).ne_zero (by exact_mod_cast hmem)
   have hWp : IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom (ZMod ℓ)))) 1 := by
     show IsProjVarF (W.map (red ℓ)) 1
@@ -133,18 +141,17 @@ end Nef
 
 end NefAmpleFibreAlt
 
-
 open NefAmpleFibreAlt in
-theorem NefAmpleFibre.proof (hK : KleimanScheme.Statement)
+theorem NefAmpleFibre.proof
+    (hK : KleimanScheme.Statement)
     (hGeo : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)], GeoNumStatement ι)
     (hR4 : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)],
-      ExistsUniqueStatement F ι) :
-    NefAmpleFibre.Statement := by
+      ExistsUniqueStatement F ι)
+    : NefAmpleFibre.Statement := by
   intro K _ _ ι _ _ Ω _ y D α b a ℓ hP hN hb ha hℓ
   have : Fact ℓ.Prime := ⟨hℓ⟩
   obtain ⟨I, hI, -⟩ := hR4 (ZMod ℓ) K ι
-  have e : ((b : ℤ) • α + fun _ => (a : ℤ)) = (b • α + fun _ => (a : ℤ)) := by
-    rw [natCast_zsmul]
+  have e : ((b : ℤ) • α + fun _ => (a : ℤ)) = (b • α + fun _ => (a : ℤ)) := by rw [natCast_zsmul]
   rw [e]
   exact hK (ZMod ℓ) K ι I (fibreIdeal ℓ y) α b a hI (isMultiHomogIdeal_map _ hP.2.1.2.1)
     (nefOnF_map_red ℓ (hGeo K ι) hI hN) hb ha

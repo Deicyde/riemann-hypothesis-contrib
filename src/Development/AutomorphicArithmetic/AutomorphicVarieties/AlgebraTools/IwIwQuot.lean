@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 
 namespace UpperTheory.V.AlgebraTools
 
@@ -13,8 +14,8 @@ section Ring
 
 variable {R n : Type} [CommRing R] [Fintype n] [DecidableEq n] [LinearOrder n]
 
-private theorem q_diag_mul {a b : GL n R} (ha : a ∈ borel R n) (hb : b ∈ borel R n) (i : n) :
-    ((a * b : GL n R) : Matrix n n R) i i = (a : Matrix n n R) i i * (b : Matrix n n R) i i := by
+private theorem q_diag_mul {a b : GL n R} (ha : a ∈ borel R n) (hb : b ∈ borel R n) (i : n)
+    : ((a * b : GL n R) : Matrix n n R) i i = (a : Matrix n n R) i i * (b : Matrix n n R) i i := by
   rw [Units.val_mul, Matrix.mul_apply, Finset.sum_eq_single i]
   · intro l _ hl
     rcases lt_or_gt_of_ne hl with h | h
@@ -22,16 +23,19 @@ private theorem q_diag_mul {a b : GL n R} (ha : a ∈ borel R n) (hb : b ∈ bor
     · rw [(mem_borel R).1 hb l i h, mul_zero]
   · simp
 
-private theorem q_exD : ∃ D : borel R n →* (n → Rˣ),
-    ∀ (g : borel R n) (i : n), (D g i : R) = ((g : GL n R) : Matrix n n R) i i := by
-  let D0 : n → (borel R n →* R) := fun i =>
-    { toFun := fun g => ((g : GL n R) : Matrix n n R) i i
-      map_one' := by simp
-      map_mul' := fun a b => q_diag_mul a.2 b.2 i }
+private theorem q_exD
+    : ∃ D : borel R n →* (n → Rˣ), ∀ (g : borel R n) (i : n),
+      (D g i : R) = ((g : GL n R) : Matrix n n R) i i := by
+  let D0 : n → (borel R n →* R) := fun i => {
+    toFun := fun g => ((g : GL n R) : Matrix n n R) i i
+    map_one' := by simp
+    map_mul' := fun a b => q_diag_mul a.2 b.2 i
+  }
   exact ⟨MonoidHom.pi fun i => (D0 i).toHomUnits, fun g i => rfl⟩
 
-private theorem q_map_diagT {S : Type} [CommRing S] (f : R →+* S) (d : n → Rˣ) :
-    GeneralLinearGroup.map (n := n) f (diagT R n d) = diagT S n fun i => Units.map f.toMonoidHom (d i) := by
+private theorem q_map_diagT {S : Type} [CommRing S] (f : R →+* S) (d : n → Rˣ)
+    : GeneralLinearGroup.map (n := n) f (diagT R n d)
+      = diagT S n fun i => Units.map f.toMonoidHom (d i) := by
   ext i j
   show f ((diagT R n d : Matrix n n R) i j) = _
   rw [val_diagT, val_diagT, diagonal_apply, diagonal_apply]
@@ -43,11 +47,15 @@ end Ring
 
 section Loc
 
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
+variable
+  (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
 
-private theorem q_exF : ∃ F : iwC k n ⊤ →* (Fin n → 𝓀[k]ˣ), ∀ (h : GL (Fin n) 𝒪[k])
-    (hh : GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k) h ∈ iwC k n ⊤) (i : Fin n),
-    (F ⟨_, hh⟩ i : 𝓀[k]) = IsLocalRing.residue 𝒪[k] ((h : Matrix (Fin n) (Fin n) 𝒪[k]) i i) := by
+private theorem q_exF
+    : ∃ F : iwC k n ⊤ →* (Fin n → 𝓀[k]ˣ),
+      ∀ (h : GL (Fin n) 𝒪[k])
+          (hh : GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k) h ∈ iwC k n ⊤) (i : Fin n),
+        (F ⟨_, hh⟩ i : 𝓀[k])
+          = IsLocalRing.residue 𝒪[k] ((h : Matrix (Fin n) (Fin n) 𝒪[k]) i i) := by
   have hinj : Function.Injective (algebraMap 𝒪[k] k) := Subtype.val_injective
   have hinj2 : Function.Injective (GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k)) := by
     intro a b hab
@@ -59,7 +67,10 @@ private theorem q_exF : ∃ F : iwC k n ⊤ →* (Fin n → 𝓀[k]ˣ), ∀ (h :
   have hle : iwC k n ⊤ ≤ H.map (GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k)) :=
     le_of_eq (memIwC k n ⊤).2.1
   let e := H.equivMapOfInjective _ hinj2
-  refine ⟨D.comp ((r.subgroupComap _).comp (e.symm.toMonoidHom.comp (Subgroup.inclusion hle))), fun h hh i => ?_⟩
+  refine ⟨
+    D.comp ((r.subgroupComap _).comp (e.symm.toMonoidHom.comp (Subgroup.inclusion hle))),
+    fun h hh i => ?_
+  ⟩
   have hH : h ∈ H := by
     obtain ⟨h', h1, h2⟩ := hle hh
     rwa [← hinj2 h2]
@@ -74,18 +85,34 @@ end Loc
 
 end UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.iwQuot :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (C : Subgroup 𝓀[k]ˣ), ∃ f : iwC k n ⊤ →* (Fin n → 𝓀[k]ˣ ⧸ C), Function.Surjective f ∧ (∀ g : iwC k n ⊤, f g = 1 ↔ (g : GL (Fin n) k) ∈ iwC k n C) ∧ ∀ (u : Fin n → 𝒪[k]ˣ) (h : diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (u i)) ∈ iwC k n ⊤) (i : Fin n), f ⟨_, h⟩ i = ((Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom (u i) : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) := by
+theorem UpperTheory.V.AlgebraTools.iwQuot
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (C : Subgroup 𝓀[k]ˣ),
+      ∃ f : iwC k n ⊤ →* (Fin n → 𝓀[k]ˣ ⧸ C),
+        Function.Surjective f ∧ (∀ g : iwC k n ⊤, f g = 1 ↔ (g : GL (Fin n) k) ∈ iwC k n C)
+          ∧ ∀ (u : Fin n → 𝒪[k]ˣ)
+              (h : diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (u i))
+                ∈ iwC k n ⊤)
+              (i : Fin n),
+            f ⟨_, h⟩ i
+              = ((Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom (u i) : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) := by
   intro k _ _ _ _ n C
   have hinj : Function.Injective (algebraMap 𝒪[k] k) := Subtype.val_injective
   obtain ⟨F, hF⟩ := q_exF k n
   let f : iwC k n ⊤ →* (Fin n → 𝓀[k]ˣ ⧸ C) :=
     MonoidHom.pi fun i => (QuotientGroup.mk' C).comp ((Pi.evalMonoidHom _ i).comp F)
   have hf : ∀ g i, f g i = ((F g i : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) := fun _ _ => rfl
-  have h3 : ∀ (u : Fin n → 𝒪[k]ˣ) (h : diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (u i)) ∈ iwC k n ⊤) (i : Fin n), f ⟨_, h⟩ i = ((Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom (u i) : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) := by
+  have h3
+      : ∀ (u : Fin n → 𝒪[k]ˣ)
+          (h : diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (u i))
+            ∈ iwC k n ⊤)
+          (i : Fin n),
+        f ⟨_, h⟩ i
+          = ((Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom (u i) : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) := by
     intro u h i
     have e := q_map_diagT (algebraMap 𝒪[k] k) u
-    have h' : GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k) (diagT _ _ u) ∈ iwC k n ⊤ := e ▸ h
+    have h' : GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k) (diagT _ _ u) ∈ iwC k n ⊤ :=
+      e ▸ h
     have e2 : (⟨_, h⟩ : iwC k n ⊤) = ⟨_, h'⟩ := Subtype.ext e.symm
     rw [hf, e2]
     congr 1
@@ -93,8 +120,9 @@ theorem UpperTheory.V.AlgebraTools.iwQuot :
     rw [hF, val_diagT, diagonal_apply_eq]
     rfl
   refine ⟨f, fun y => ?_, fun g => ?_, h3⟩
-  · have h1 : ∀ i, ∃ u : 𝒪[k]ˣ,
-        ((Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom u : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) = y i := by
+  · have h1
+        : ∀ i, ∃ u : 𝒪[k]ˣ,
+          ((Units.map (IsLocalRing.residue 𝒪[k]).toMonoidHom u : 𝓀[k]ˣ) : 𝓀[k]ˣ ⧸ C) = y i := by
       intro i
       obtain ⟨c, hc⟩ := QuotientGroup.mk_surjective (y i)
       obtain ⟨x, hx⟩ := IsLocalRing.residue_surjective (R := 𝒪[k]) (c : 𝓀[k])
@@ -107,7 +135,8 @@ theorem UpperTheory.V.AlgebraTools.iwQuot :
       congr 1
       exact Units.ext hx
     choose u hu using h1
-    have h : diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (u i)) ∈ iwC k n ⊤ :=
+    have h
+        : diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (u i)) ∈ iwC k n ⊤ :=
       Subgroup.mem_sup_right ⟨_, fun i _ => ⟨u i, trivial, rfl⟩, rfl⟩
     exact ⟨⟨_, h⟩, funext fun i => (h3 u h i).trans (hu i)⟩
   · obtain ⟨g, hg⟩ := g

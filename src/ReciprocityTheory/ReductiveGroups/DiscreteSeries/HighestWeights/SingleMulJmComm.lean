@@ -14,20 +14,18 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem inK_entry_eq_zero {ε : Fin n → Bool} {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y)
-    {a b : Fin n} (hab : ε a ≠ ε b) : Y a b = 0 := by
+theorem inK_entry_eq_zero
+    {ε : Fin n → Bool} {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) {a b : Fin n} (hab : ε a ≠ ε b)
+    : Y a b = 0 := by
   obtain ⟨-, h2⟩ := hY
   have h := congrFun (congrFun h2 a) b
   unfold Jm at h
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul] at h
-  cases ha : ε a <;> cases hb : ε b <;> simp [ha, hb] at hab h <;>
-    first
-    | exact h
-    | linear_combination (1 / 2 : ℂ) * h
-    | linear_combination (-1 / 2 : ℂ) * h
+  cases ha : ε a <;> cases hb : ε b <;> simp [ha, hb] at hab h
+    <;> first | exact h | linear_combination (1 / 2 : ℂ) * h | linear_combination (-1 / 2 : ℂ) * h
 
-theorem single_mul_Jm_comm {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b) (c : ℂ) :
-    Matrix.single a b c * Jm ε = Jm ε * Matrix.single a b c := by
+theorem single_mul_Jm_comm {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b) (c : ℂ)
+    : Matrix.single a b c * Jm ε = Jm ε * Matrix.single a b c := by
   unfold Jm
   ext i j
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul]
@@ -40,9 +38,11 @@ theorem single_mul_Jm_comm {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε 
     · simp [Matrix.single_apply, hj]
   · simp [Matrix.single_apply, hi]
 
-private theorem pow_mem_lemma {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    (W : Submodule ℂ V) (A : V →L[ℂ] V) (hA : ∀ v ∈ W, A v ∈ W) (k : ℕ) :
-    ∀ v ∈ W, (A ^ k) v ∈ W := by
+private theorem pow_mem_lemma
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    (W : Submodule ℂ V) (A : V →L[ℂ] V) (hA : ∀ v ∈ W, A v ∈ W)
+    (k : ℕ)
+    : ∀ v ∈ W, (A ^ k) v ∈ W := by
   induction k with
   | zero => intro v hv; simpa using hv
   | succ k ih =>
@@ -50,26 +50,29 @@ private theorem pow_mem_lemma {V : Type*} [NormedAddCommGroup V] [NormedSpace �
     rw [pow_succ', ContinuousLinearMap.mul_apply]
     exact hA _ (ih v hv)
 
-theorem exp_mem_of_stable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
-    [FiniteDimensional ℂ V] (W : Submodule ℂ V) (A : V →L[ℂ] V) (hA : ∀ v ∈ W, A v ∈ W) :
-    ∀ v ∈ W, NormedSpace.exp A v ∈ W := by
+theorem exp_mem_of_stable
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V] [FiniteDimensional ℂ V]
+    (W : Submodule ℂ V) (A : V →L[ℂ] V) (hA : ∀ v ∈ W, A v ∈ W)
+    : ∀ v ∈ W, NormedSpace.exp A v ∈ W := by
   intro v hv
-  have hs := (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℂ) A).mapL
-    (ContinuousLinearMap.apply ℂ V v)
+  have hs := (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℂ) A).mapL (ContinuousLinearMap.apply ℂ V v)
   refine (Submodule.closed_of_finiteDimensional W).mem_of_tendsto hs.tendsto_sum_nat
     (Filter.Eventually.of_forall fun m => ?_)
   refine Submodule.sum_mem _ fun k _ => ?_
   simp only [ContinuousLinearMap.apply_apply, ContinuousLinearMap.smul_apply]
   exact W.smul_mem _ (pow_mem_lemma W A hA k v hv)
 
-theorem inK_of_skew_comm {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (h1 : Xᴴ = -X)
-    (h2 : X * Jm ε = Jm ε * X) : inK ε X := by
+theorem inK_of_skew_comm
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (h1 : Xᴴ = -X) (h2 : X * Jm ε = Jm ε * X)
+    : inK ε X := by
   unfold inK inG
   refine ⟨?_, h2⟩
   rw [h1, ← h2, neg_mul, neg_add_cancel]
 
-theorem KType.dτ_irred {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (W : Submodule ℂ T.V)
-    (hW : ∀ a b, ε a = ε b → ∀ v ∈ W, T.dτ (Matrix.single a b 1) v ∈ W) : W = ⊥ ∨ W = ⊤ := by
+theorem KType.dτ_irred
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (W : Submodule ℂ T.V)
+    (hW : ∀ a b, ε a = ε b → ∀ v ∈ W, T.dτ (Matrix.single a b 1) v ∈ W)
+    : W = ⊥ ∨ W = ⊤ := by
   have hstab : ∀ Y, inK ε Y → ∀ v ∈ W, T.dτ Y v ∈ W := by
     intro Y hY v hv
     set_option synthInstance.maxHeartbeats 100000 in

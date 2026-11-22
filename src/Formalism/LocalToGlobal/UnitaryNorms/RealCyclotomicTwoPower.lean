@@ -43,16 +43,17 @@ abbrev GalOf (L : Fld) : Subgroup (Qb ≃ₐ[ℚ] Qb) := L.fixingSubgroup
 def restr (L : Fld) (s : Qb ≃ₐ[ℚ] Qb) : L →ₐ[ℚ] Qb := (s : Qb →ₐ[ℚ] Qb).comp L.val
 
 def ActsAs (e q d : ℕ) (s : EQ e q d →ₐ[ℚ] Qb) (g : GG e) : Prop :=
-  (∀ x : EQ e q d, (x : Qb) ∈ sqrts (-(q : ℤ)) → s x = (((g.1.1 : ℤˣ) : ℤ) : Qb) * x) ∧
-  (∀ x : EQ e q d, (x : Qb) ∈ sqrts (-(d : ℤ)) → s x = (((g.1.2 : ℤˣ) : ℤ) : Qb) * x) ∧
-  ∃ u : (ZMod (2 ^ (e + 2)))ˣ, hcl e u = g.2 ∧
-    ∀ (x : EQ e q d) (z : Qb), z ∈ mus (2 ^ (e + 2)) → (x : Qb) = z + z⁻¹ →
-      s x = z ^ (u : ZMod (2 ^ (e + 2))).val + z⁻¹ ^ (u : ZMod (2 ^ (e + 2))).val
+  (∀ x : EQ e q d, (x : Qb) ∈ sqrts (-(q : ℤ)) → s x = (((g.1.1 : ℤˣ) : ℤ) : Qb) * x)
+    ∧ (∀ x : EQ e q d, (x : Qb) ∈ sqrts (-(d : ℤ)) → s x = (((g.1.2 : ℤˣ) : ℤ) : Qb) * x)
+    ∧ ∃ u : (ZMod (2 ^ (e + 2)))ˣ,
+      hcl e u = g.2
+        ∧ ∀ (x : EQ e q d) (z : Qb),
+          z ∈ mus (2 ^ (e + 2)) → (x : Qb) = z + z⁻¹
+            → s x = z ^ (u : ZMod (2 ^ (e + 2))).val + z⁻¹ ^ (u : ZMod (2 ^ (e + 2))).val
 
 def condN (e q d : ℕ) : ℕ := 2 ^ (e + 2) * q * d
 
 def IsCond (L : Fld) (N : ℕ) : Prop := L ≤ cycQ N ∧ ∀ M : ℕ, 0 < M → L ≤ cycQ M → N ∣ M
-
 
 open Classical in
 def sqSign {p : ℕ} (u : (ZMod p)ˣ) : ℤˣ := if IsSquare (u : ZMod p) then 1 else -1

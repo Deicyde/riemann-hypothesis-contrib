@@ -12,7 +12,8 @@ namespace GroundTheory.LocalField
 open ValuativeRel MeasureTheory Measure Topology Filter
 open scoped WithZero NNReal ENNReal Pointwise
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   [MeasurableSpace K] [BorelSpace K]
 
 section Symmetric
@@ -20,9 +21,9 @@ section Symmetric
 variable (μ : Measure K) [μ.IsAddHaarMeasure] {ψ : AddChar K Circle} (hψ : Continuous ψ)
 include hψ
 
-theorem integral_mul_localFourier_comm {f g : K → ℂ} (hf : f ∈ schwartzBruhat K)
-    (hg : g ∈ schwartzBruhat K) (y : K) :
-    ∫ x, f x * localFourier μ ψ g (x * y) ∂μ = ∫ x, g x * localFourier μ ψ f (x * y) ∂μ := by
+theorem integral_mul_localFourier_comm
+    {f g : K → ℂ} (hf : f ∈ schwartzBruhat K) (hg : g ∈ schwartzBruhat K) (y : K)
+    : ∫ x, f x * localFourier μ ψ g (x * y) ∂μ = ∫ x, g x * localFourier μ ψ f (x * y) ∂μ := by
   have hψc : Continuous fun x => (ψ x : ℂ) := continuous_subtype_val.comp hψ
   have hfi := integrable_of_mem_schwartzBruhat μ hf
   have hgi := integrable_of_mem_schwartzBruhat μ hg
@@ -31,8 +32,9 @@ theorem integral_mul_localFourier_comm {f g : K → ℂ} (hf : f ∈ schwartzBru
     have hdom : Integrable (fun p : K × K => ‖f p.1‖ * ‖g p.2‖) (μ.prod μ) :=
       hfi.norm.mul_prod hgi.norm
     refine hdom.mono' (Continuous.aestronglyMeasurable ?_) (Eventually.of_forall fun p => ?_)
-    · exact (hf.1.continuous.comp continuous_fst).mul ((hg.1.continuous.comp continuous_snd).mul
-        (hψc.comp (continuous_snd.mul (continuous_fst.mul continuous_const))))
+    · exact (hf.1.continuous.comp continuous_fst).mul
+        ((hg.1.continuous.comp continuous_snd).mul
+          (hψc.comp (continuous_snd.mul (continuous_fst.mul continuous_const))))
     · simp [G, Function.uncurry, Circle.norm_coe]
   have e1 : ∫ x, f x * localFourier μ ψ g (x * y) ∂μ = ∫ x, ∫ z, G x z ∂μ ∂μ := by
     refine integral_congr_ae (Eventually.of_forall fun x => ?_)
@@ -54,11 +56,12 @@ section Multiplicative
 
 theorem haarIntegers_singleton_zero : haarIntegers K {0} = 0 := by
   have hq : (1 : ℝ≥0) < (residueCard K : ℝ≥0) := one_lt_residueCard_nnreal
-  have ht : Tendsto (fun n : ℕ => (((residueCard K : ℝ≥0) ^ (-(n : ℤ)) : ℝ≥0) : ℝ≥0∞)) atTop
-      (𝓝 0) := by
+  have ht
+      : Tendsto (fun n : ℕ => (((residueCard K : ℝ≥0) ^ (-(n : ℤ)) : ℝ≥0) : ℝ≥0∞)) atTop (𝓝 0) := by
     rw [← ENNReal.coe_zero, ENNReal.tendsto_coe]
-    have e : (fun n : ℕ => (residueCard K : ℝ≥0) ^ (-(n : ℤ))) =
-        fun n : ℕ => ((residueCard K : ℝ≥0)⁻¹) ^ n := by
+    have e
+        : (fun n : ℕ => (residueCard K : ℝ≥0) ^ (-(n : ℤ)))
+          = fun n : ℕ => ((residueCard K : ℝ≥0)⁻¹) ^ n := by
       funext n
       rw [zpow_neg, zpow_natCast, inv_pow]
     rw [e]
@@ -67,9 +70,9 @@ theorem haarIntegers_singleton_zero : haarIntegers K {0} = 0 := by
   rw [← haarIntegers_valBall]
   exact measure_mono (Set.singleton_subset_iff.mpr (zero_mem _))
 
-theorem integral_multHaar_mul_modulus (h : K → ℂ) :
-    ∫ u, h u * ((modulus (u : K) : ℝ) : ℂ) ∂multHaar K =
-      (multHaarConst K).toReal * ∫ x, h x ∂haarIntegers K := by
+theorem integral_multHaar_mul_modulus (h : K → ℂ)
+    : ∫ u, h u * ((modulus (u : K) : ℝ) : ℂ) ∂multHaar K
+      = (multHaarConst K).toReal * ∫ x, h x ∂haarIntegers K := by
   rw [integral_multHaar (fun x => h x * ((modulus x : ℝ) : ℂ)), Complex.real_smul]
   congr 1
   have hae : ∀ᵐ x ∂haarIntegers K, x ∈ ({0}ᶜ : Set K) := by
@@ -83,10 +86,10 @@ theorem integral_multHaar_mul_modulus (h : K → ℂ) :
 variable (μ : Measure K) [μ.IsAddHaarMeasure] {ψ : AddChar K Circle} (hψ : Continuous ψ)
 include hψ
 
-theorem integral_multHaar_mul_localFourier_comm {f g : K → ℂ} (hf : f ∈ schwartzBruhat K)
-    (hg : g ∈ schwartzBruhat K) (y : K) :
-    ∫ u, f u * localFourier μ ψ g ((u : K) * y) * ((modulus (u : K) : ℝ) : ℂ) ∂multHaar K =
-      ∫ u, g u * localFourier μ ψ f ((u : K) * y) * ((modulus (u : K) : ℝ) : ℂ) ∂multHaar K := by
+theorem integral_multHaar_mul_localFourier_comm
+    {f g : K → ℂ} (hf : f ∈ schwartzBruhat K) (hg : g ∈ schwartzBruhat K) (y : K)
+    : ∫ u, f u * localFourier μ ψ g ((u : K) * y) * ((modulus (u : K) : ℝ) : ℂ) ∂multHaar K
+      = ∫ u, g u * localFourier μ ψ f ((u : K) * y) * ((modulus (u : K) : ℝ) : ℂ) ∂multHaar K := by
   rw [integral_multHaar_mul_modulus (fun x => f x * localFourier μ ψ g (x * y)),
     integral_multHaar_mul_modulus (fun x => g x * localFourier μ ψ f (x * y))]
   congr 1
@@ -98,10 +101,11 @@ theorem integral_multHaar_mul_localFourier_comm {f g : K → ℂ} (hf : f ∈ sc
       exact ((isOpen_valBall 0).measure_pos μ ⟨0, zero_mem _⟩).ne'
     · rw [← coe_valBall_zero]
       exact (isCompact_valBall 0).measure_lt_top.ne
-  have hJ : ∀ F : K → ℂ, ∫ x, F x ∂μ = ((μ (𝒪[K] : Set K)).toReal : ℂ) * ∫ x, F x ∂haarIntegers K :=
-    fun F => by
-      conv_lhs => rw [hμ]
-      rw [integral_smul_measure, Complex.real_smul]
+  have hJ
+      : ∀ F : K → ℂ,
+        ∫ x, F x ∂μ = ((μ (𝒪[K] : Set K)).toReal : ℂ) * ∫ x, F x ∂haarIntegers K := fun F => by
+    conv_lhs => rw [hμ]
+    rw [integral_smul_measure, Complex.real_smul]
   rw [hJ, hJ] at key
   exact mul_left_cancel₀ (Complex.ofReal_ne_zero.mpr hc) key
 
@@ -109,17 +113,19 @@ end Multiplicative
 
 section Tate
 
-variable (μ : Measure K) [μ.IsAddHaarMeasure] {ψ : AddChar K Circle} (hψ : Continuous ψ)
-  (hψ1 : ψ ≠ 1) {χ : Kˣ →* ℂˣ} (hχ : Continuous χ)
+variable
+  (μ : Measure K) [μ.IsAddHaarMeasure]
+  {ψ : AddChar K Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
+  {χ : Kˣ →* ℂˣ} (hχ : Continuous χ)
 include hψ hψ1 hχ
 
-theorem localZeta_mul_localZeta_fourier_eq {f g : K → ℂ} (hf : f ∈ schwartzBruhat K)
-    (hg : g ∈ schwartzBruhat K) {s : ℂ} (hs1 : -quasiCharExponent χ < s.re)
-    (hs2 : s.re < 1 - quasiCharExponent χ) :
-    localZeta f χ s * localZeta (localFourier μ ψ g) χ⁻¹ (1 - s) =
-      ∫ y, ((χ y : ℂˣ) : ℂ)⁻¹ * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s) *
-        ∫ x, f x * localFourier μ ψ g ((x : K) * (y : K)) * ((modulus (x : K) : ℝ) : ℂ)
-          ∂multHaar K ∂multHaar K := by
+theorem localZeta_mul_localZeta_fourier_eq
+    {f g : K → ℂ} (hf : f ∈ schwartzBruhat K) (hg : g ∈ schwartzBruhat K)
+    {s : ℂ} (hs1 : - quasiCharExponent χ < s.re) (hs2 : s.re < 1 - quasiCharExponent χ)
+    : localZeta f χ s * localZeta (localFourier μ ψ g) χ⁻¹ (1 - s)
+      = ∫ y, ((χ y : ℂˣ) : ℂ)⁻¹ * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s) *
+          ∫ x, f x * localFourier μ ψ g ((x : K) * (y : K)) * ((modulus (x : K) : ℝ) : ℂ)
+            ∂multHaar K ∂multHaar K := by
   set F₁ : Kˣ → ℂ := fun u => f u * ((χ u : ℂˣ) : ℂ) * ((modulus (u : K) : ℝ) : ℂ) ^ s
   set G₁ : Kˣ → ℂ := fun u => localFourier μ ψ g u * (((χ⁻¹) u : ℂˣ) : ℂ) *
     ((modulus (u : K) : ℝ) : ℂ) ^ (1 - s)
@@ -132,50 +138,57 @@ theorem localZeta_mul_localZeta_fourier_eq {f g : K → ℂ} (hf : f ∈ schwart
   have hH : Integrable (Function.uncurry fun x y : Kˣ => F₁ x * G₁ (x * y))
       ((multHaar K).prod (multHaar K)) :=
     (measurePreserving_prod_mul (multHaar K) (multHaar K)).integrable_comp_of_integrable hP
-  have hpt : ∀ x y : Kˣ, F₁ x * G₁ (x * y) =
-      ((χ y : ℂˣ) : ℂ)⁻¹ * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s) *
-        (f x * localFourier μ ψ g ((x : K) * (y : K)) * ((modulus (x : K) : ℝ) : ℂ)) := by
+  have hpt
+      : ∀ x y : Kˣ,
+        F₁ x * G₁ (x * y)
+          = ((χ y : ℂˣ) : ℂ)⁻¹ * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s)
+            * (f x * localFourier μ ψ g ((x : K) * (y : K)) * ((modulus (x : K) : ℝ) : ℂ)) := by
     intro x y
     have hx0 : ((modulus (x : K) : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (modulus_pos x.ne_zero).ne'
     have e1 : (((χ⁻¹) (x * y) : ℂˣ) : ℂ) = ((χ x : ℂˣ) : ℂ)⁻¹ * ((χ y : ℂˣ) : ℂ)⁻¹ := by
       rw [MonoidHom.inv_apply, map_mul, mul_inv, Units.val_mul, Units.val_inv_eq_inv_val,
         Units.val_inv_eq_inv_val]
-    have e2 : ((modulus ((x * y : Kˣ) : K) : ℝ) : ℂ) ^ (1 - s) =
-        ((modulus (x : K) : ℝ) : ℂ) ^ (1 - s) * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s) := by
+    have e2
+        : ((modulus ((x * y : Kˣ) : K) : ℝ) : ℂ) ^ (1 - s)
+          = ((modulus (x : K) : ℝ) : ℂ) ^ (1 - s) * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s) := by
       rw [Units.val_mul, modulus_mul, NNReal.coe_mul, Complex.ofReal_mul,
         Complex.mul_cpow_ofReal_nonneg (NNReal.coe_nonneg _) (NNReal.coe_nonneg _)]
-    have e3 : ((modulus (x : K) : ℝ) : ℂ) ^ s * ((modulus (x : K) : ℝ) : ℂ) ^ (1 - s) =
-        ((modulus (x : K) : ℝ) : ℂ) := by
+    have e3
+        : ((modulus (x : K) : ℝ) : ℂ) ^ s * ((modulus (x : K) : ℝ) : ℂ) ^ (1 - s)
+          = ((modulus (x : K) : ℝ) : ℂ) := by
       rw [← Complex.cpow_add _ _ hx0, add_sub_cancel, Complex.cpow_one]
     have hχx : ((χ x : ℂˣ) : ℂ) * ((χ x : ℂˣ) : ℂ)⁻¹ = 1 := mul_inv_cancel₀ (χ x).ne_zero
     simp only [F₁, G₁]
     rw [e1, e2, Units.val_mul]
-    calc f x * ((χ x : ℂˣ) : ℂ) * ((modulus (x : K) : ℝ) : ℂ) ^ s *
-          (localFourier μ ψ g ((x : K) * (y : K)) * (((χ x : ℂˣ) : ℂ)⁻¹ * ((χ y : ℂˣ) : ℂ)⁻¹) *
-            (((modulus (x : K) : ℝ) : ℂ) ^ (1 - s) * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s)))
-        = (((χ x : ℂˣ) : ℂ) * ((χ x : ℂˣ) : ℂ)⁻¹) *
-            (((modulus (x : K) : ℝ) : ℂ) ^ s * ((modulus (x : K) : ℝ) : ℂ) ^ (1 - s)) *
-            (((χ y : ℂˣ) : ℂ)⁻¹ * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s) *
-              (f x * localFourier μ ψ g ((x : K) * (y : K)))) := by ring
+    calc
+      f x * ((χ x : ℂˣ) : ℂ) * ((modulus (x : K) : ℝ) : ℂ) ^ s
+            * (localFourier μ ψ g ((x : K) * (y : K)) * (((χ x : ℂˣ) : ℂ)⁻¹ * ((χ y : ℂˣ) : ℂ)⁻¹)
+              * (((modulus (x : K) : ℝ) : ℂ) ^ (1 - s) * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s)))
+          = (((χ x : ℂˣ) : ℂ) * ((χ x : ℂˣ) : ℂ)⁻¹)
+            * (((modulus (x : K) : ℝ) : ℂ) ^ s * ((modulus (x : K) : ℝ) : ℂ) ^ (1 - s))
+            * (((χ y : ℂˣ) : ℂ)⁻¹ * ((modulus (y : K) : ℝ) : ℂ) ^ (1 - s)
+              * (f x * localFourier μ ψ g ((x : K) * (y : K)))) := by
+        ring
       _ = _ := by rw [hχx, e3]; ring
-  calc localZeta f χ s * localZeta (localFourier μ ψ g) χ⁻¹ (1 - s)
+  calc
+    localZeta f χ s * localZeta (localFourier μ ψ g) χ⁻¹ (1 - s)
       = (∫ x, F₁ x ∂multHaar K) * ∫ y, G₁ y ∂multHaar K := rfl
     _ = ∫ x, F₁ x * ∫ y, G₁ y ∂multHaar K ∂multHaar K := (integral_mul_const _ _).symm
     _ = ∫ x, ∫ y, F₁ x * G₁ (x * y) ∂multHaar K ∂multHaar K := by
-        refine integral_congr_ae (Eventually.of_forall fun x => ?_)
-        simp only
-        rw [integral_const_mul, integral_mul_left_eq_self (μ := multHaar K) G₁ x]
+      refine integral_congr_ae (Eventually.of_forall fun x => ?_)
+      simp only
+      rw [integral_const_mul, integral_mul_left_eq_self (μ := multHaar K) G₁ x]
     _ = ∫ y, ∫ x, F₁ x * G₁ (x * y) ∂multHaar K ∂multHaar K := integral_integral_swap hH
     _ = _ := by
-        refine integral_congr_ae (Eventually.of_forall fun y => ?_)
-        simp only [hpt]
-        rw [integral_const_mul]
+      refine integral_congr_ae (Eventually.of_forall fun y => ?_)
+      simp only [hpt]
+      rw [integral_const_mul]
 
-theorem localZeta_mul_localZeta_fourier_comm {f g : K → ℂ} (hf : f ∈ schwartzBruhat K)
-    (hg : g ∈ schwartzBruhat K) {s : ℂ} (hs1 : -quasiCharExponent χ < s.re)
-    (hs2 : s.re < 1 - quasiCharExponent χ) :
-    localZeta f χ s * localZeta (localFourier μ ψ g) χ⁻¹ (1 - s) =
-      localZeta g χ s * localZeta (localFourier μ ψ f) χ⁻¹ (1 - s) := by
+theorem localZeta_mul_localZeta_fourier_comm
+    {f g : K → ℂ} (hf : f ∈ schwartzBruhat K) (hg : g ∈ schwartzBruhat K)
+    {s : ℂ} (hs1 : - quasiCharExponent χ < s.re) (hs2 : s.re < 1 - quasiCharExponent χ)
+    : localZeta f χ s * localZeta (localFourier μ ψ g) χ⁻¹ (1 - s)
+      = localZeta g χ s * localZeta (localFourier μ ψ f) χ⁻¹ (1 - s) := by
   rw [localZeta_mul_localZeta_fourier_eq μ hψ hψ1 hχ hf hg hs1 hs2,
     localZeta_mul_localZeta_fourier_eq μ hψ hψ1 hχ hg hf hs1 hs2]
   refine integral_congr_ae (Eventually.of_forall fun y => ?_)

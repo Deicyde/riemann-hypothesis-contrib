@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.L2.Ker
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.L2.DIV
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,7 +23,9 @@ end Mem
 
 section Comparison₂
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D} {K : G.Consts} {Y : DivX D} {cX : ExtraC}
+variable
+  {D : D7} {L : SizeData₂ D}
+  {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D} {K : G.Consts} {Y : DivX D} {cX : ExtraC}
 
 def KerEntTied.MemSideU {ex : Extra D L hT Gi Gl K Y cX} (t : KerEntTied ex) : Prop :=
   ∀ u, IsMemAt (t.memObj u) (ex.errX.piT u)

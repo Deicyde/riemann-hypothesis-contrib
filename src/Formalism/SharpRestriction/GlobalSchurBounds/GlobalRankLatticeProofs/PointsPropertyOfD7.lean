@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot33
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.TwoAdicCyclotomicDecomposition Ideal
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.TwoAdicCyclotomicDecomposition Ideal
 open scoped Pointwise
 open Formalism.MainNotions.UnusedSlot33.SlopeTestRemainingChoices
 
@@ -23,11 +24,12 @@ theorem span_ne_bot {p : ℕ} (hp : p.Prime) : span {(p : ℤ)} ≠ ⊥ := by
   rw [Ne, Ideal.span_singleton_eq_bot]
   exact_mod_cast hp.ne_zero
 
-private theorem ram_of_unit (D : D7) (p : ℕ) (hp : p.Prime) (hN : p ∣ D.host.condN)
+private theorem ram_of_unit
+    (D : D7) (p : ℕ) (hp : p.Prime) (hN : p ∣ D.host.condN)
     (P : Ideal (𝓞 D.host.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
-    (u : (ZMod D.host.condN)ˣ) (hu : (u : ZMod D.host.condN).val ≡ 1 [MOD D.host.condN / p])
-    (hu1 : D.host.art u ≠ 1) :
-    ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, σ ≠ 1 ∧ ∀ x : 𝓞 D.host.E, σ • x - x ∈ P := by
+    (u : (ZMod D.host.condN)ˣ)
+    (hu : (u : ZMod D.host.condN).val ≡ 1 [MOD D.host.condN / p]) (hu1 : D.host.art u ≠ 1)
+    : ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, σ ≠ 1 ∧ ∀ x : 𝓞 D.host.E, σ • x - x ∈ P := by
   haveI : Fact p.Prime := ⟨hp⟩
   have hu' : (u : ZMod D.host.condN).val ≡ 1 [MOD ordCompl[p] D.host.condN] := by
     by_cases hN0 : D.host.condN = 0
@@ -49,8 +51,9 @@ private theorem ram_of_unit (D : D7) (p : ℕ) (hp : p.Prime) (hN : p ∣ D.host
     rwa [MulEquiv.apply_symm_apply, map_one] at this
   · exact (D.host.der.inertia p P _).2 ⟨u, hu', by rw [MulEquiv.apply_symm_apply]⟩
 
-private theorem exists_unit_q (D : D7) : ∃ u : (ZMod D.host.condN)ˣ,
-    (u : ZMod D.host.condN).val ≡ 1 [MOD D.host.condN / D.host.q] ∧ D.host.art u ≠ 1 := by
+private theorem exists_unit_q (D : D7)
+    : ∃ u : (ZMod D.host.condN)ˣ,
+      (u : ZMod D.host.condN).val ≡ 1 [MOD D.host.condN / D.host.q] ∧ D.host.art u ≠ 1 := by
   have hq := D.host.q_prime
   have hq4 := D.host.q_mod_four
   have hco := D.host.coprime_QSd_q
@@ -78,16 +81,17 @@ private theorem exists_unit_q (D : D7) : ∃ u : (ZMod D.host.condN)ˣ,
     rw [h3, jacobiSym.at_neg_one (Nat.odd_iff.2 (by omega)), ZMod.χ₄_nat_three_mod_four hq4] at h
     exact absurd (show (1 : ℤ) = -1 from h) (by decide)
 
-theorem ram_iff (D : D7) (p : ℕ) (hp : p.Prime) :
-    1 < (span {(p : ℤ)}).ramificationIdxIn (𝓞 D.host.E) ↔ p ∣ D.host.condN := by
+theorem ram_iff (D : D7) (p : ℕ) (hp : p.Prime)
+    : 1 < (span {(p : ℤ)}).ramificationIdxIn (𝓞 D.host.E) ↔ p ∣ D.host.condN := by
   have hEgal := D.host.galois
   have : IsGaloisGroup Gal(D.host.E/ℚ) ℤ (𝓞 D.host.E) :=
     IsGaloisGroup.of_isFractionRing _ _ _ ℚ D.host.E
   have := span_prime hp
   have : Fact p.Prime := ⟨hp⟩
   obtain ⟨⟨P, hPp, hPl⟩⟩ : Nonempty ((span {(p : ℤ)}).primesOver (𝓞 D.host.E)) := inferInstance
-  have hram : (∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, σ ≠ 1 ∧ ∀ x : 𝓞 D.host.E, σ • x - x ∈ P) ↔
-      p ∣ D.host.condN := by
+  have hram
+      : (∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, σ ≠ 1 ∧ ∀ x : 𝓞 D.host.E, σ • x - x ∈ P)
+        ↔ p ∣ D.host.condN := by
     constructor
     · rintro ⟨σ, hσ1, hσ⟩
       by_contra hN
@@ -99,8 +103,11 @@ theorem ram_iff (D : D7) (p : ℕ) (hp : p.Prime) :
       · obtain ⟨u, hu, hu1⟩ := exists_unit_q D
         exact ram_of_unit D p hp hN P u (h ▸ hu) hu1
       · subst h
-        refine ⟨D.host.gal.symm D.R.iod, fun h2 => ?_,
-          (D.host.der.inertia_d P _).2 (Or.inr (D.host.gal.apply_symm_apply _))⟩
+        refine ⟨
+          D.host.gal.symm D.R.iod,
+          fun h2 => ?_,
+          (D.host.der.inertia_d P _).2 (Or.inr (D.host.gal.apply_symm_apply _))
+        ⟩
         have h3 : D.R.iod = 1 := by simpa using congrArg D.host.gal h2
         exact absurd (congrArg (fun g => g.1.2) h3) (by simp [Formalism.HC.Frame.iod])
   rw [← card_inertia_eq_ramificationIdxIn (G := Gal(D.host.E/ℚ)) (span {(p : ℤ)}) P, ← hram,
@@ -112,10 +119,10 @@ theorem ram_iff (D : D7) (p : ℕ) (hp : p.Prime) :
   · rintro ⟨σ, hσ1, hσ⟩
     exact ⟨⟨⟨σ, AddSubgroup.mem_inertia.2 hσ⟩, 1, fun h1 => hσ1 (congrArg Subtype.val h1)⟩⟩
 
-theorem inert_iff_mem_zpowers (D : D7) (p : ℕ) (hp : p.Prime)
-    (hram : (span {(p : ℤ)}).ramificationIdxIn (𝓞 D.host.E) = 1)
-    (𝔭 : Ideal (𝓞 D.host.F)) (h𝔭 : 𝔭.IsPrime) (hlies : 𝔭.LiesOver (span {(p : ℤ)})) :
-    Inert D 𝔭 ↔ D.R.cc ∈ Subgroup.zpowers (frob D p) := by
+theorem inert_iff_mem_zpowers
+    (D : D7) (p : ℕ) (hp : p.Prime) (hram : (span {(p : ℤ)}).ramificationIdxIn (𝓞 D.host.E) = 1)
+    (𝔭 : Ideal (𝓞 D.host.F)) (h𝔭 : 𝔭.IsPrime) (hlies : 𝔭.LiesOver (span {(p : ℤ)}))
+    : Inert D 𝔭 ↔ D.R.cc ∈ Subgroup.zpowers (frob D p) := by
   haveI hpf : Fact p.Prime := ⟨hp⟩
   have hgal : ∀ σ, D.host.galE σ = D.host.gal σ := fun σ => rfl
   have hbot : 𝔭 ≠ ⊥ := by
@@ -181,7 +188,8 @@ theorem inert_iff_mem_zpowers (D : D7) (p : ℕ) (hp : p.Prime)
         exact hcc1 hmem
   · obtain ⟨σ, hσ⟩ := (D.host.der.frob p hN P).1
     have hcop : Nat.Coprime p D.host.condN := (Nat.Prime.coprime_iff_not_dvd hp).2 hN
-    have hu : ((ZMod.unitOfCoprime p hcop : (ZMod D.host.condN)ˣ) : ZMod D.host.condN) = (p : ZMod _) :=
+    have hu
+        : ((ZMod.unitOfCoprime p hcop : (ZMod D.host.condN)ˣ) : ZMod D.host.condN) = (p : ZMod _) :=
       ZMod.coe_unitOfCoprime p hcop
     have hgs : D.host.gal σ = D.host.art (ZMod.unitOfCoprime p hcop) :=
       ((D.host.der.frob p hN P).2.1 σ _ hu).1 hσ
@@ -207,7 +215,8 @@ theorem inertPart_holds (D : D7) : InertPart D := by
   rw [SlopeTestRemainingChoices.inert_iff_mem_zpowers D p hp hram 𝔭 h𝔭 hlies, hfr]
   exact cc_mem_zpowers_gOf D φ₀ h
 
-theorem points_property_of_d7 (D : D7) : PointsLemma D := lemma_one_three_of_inert D (inertPart_holds D)
+theorem points_property_of_d7 (D : D7) : PointsLemma D :=
+  lemma_one_three_of_inert D (inertPart_holds D)
 
 end Formalism.MainNotions.UnusedSlot33
 

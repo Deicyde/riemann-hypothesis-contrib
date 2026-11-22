@@ -21,7 +21,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FixedPointsG
 
 @[expose] public section
 
-open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 open Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -35,13 +36,14 @@ section defs
 
 variable (k r : ℕ)
 
-def Xsp : Submodule ℂ (Fin (2 * r + k + 1) → ℂ) := Submodule.span ℂ (Set.range fun a : Fin r => bvec (eI k r a))
+def Xsp : Submodule ℂ (Fin (2 * r + k + 1) → ℂ) :=
+  Submodule.span ℂ (Set.range fun a : Fin r => bvec (eI k r a))
 
 def Wsp (z : Fin (2 * r + k + 1) → ℂ) : Set (Fin (2 * r + k + 1) → ℂ) :=
   {v | inWb k r v ∧ herm (Hpk k r) v z = 0}
 
-def wbPart (v : Fin (2 * r + k + 1) → ℂ) : Fin (2 * r + k + 1) → ℂ :=
-  fun i => if r ≤ i.val ∧ i.val ≤ r + k then v i else 0
+def wbPart (v : Fin (2 * r + k + 1) → ℂ) : Fin (2 * r + k + 1) → ℂ := fun i =>
+  if r ≤ i.val ∧ i.val ≤ r + k then v i else 0
 
 def prW (z v : Fin (2 * r + k + 1) → ℂ) : Fin (2 * r + k + 1) → ℂ :=
   wbPart k r v + (herm (Hpk k r) (wbPart k r v) z / (Tz k r z : ℂ)) • z
@@ -52,7 +54,8 @@ def xcof (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) : Fin (2 * r + k +
 def xcofL (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) : Fin (2 * r + k + 1) → ℂ :=
   ∑ a, star ((Zhat k r z z' g).adjugate (Fin.last r) a) • fvec k r z a
 
-def omW (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) : Fin (2 * r + k + 1) → ℂ := prW k r z (xcof k r z z' g)
+def omW (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) : Fin (2 * r + k + 1) → ℂ :=
+  prW k r z (xcof k r z z' g)
 
 def omW' (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) : Fin (2 * r + k + 1) → ℂ :=
   prW k r z' (g⁻¹ *ᵥ xcofL k r z z' g)

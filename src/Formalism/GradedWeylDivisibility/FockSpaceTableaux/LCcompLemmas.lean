@@ -10,33 +10,35 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-def lccompW {r n : ℕ} (l j : Fin n) : Option (Fin r × Fin n) → (Fin r × Fin n →₀ ℕ) :=
-  fun o => match o with
-    | none => 0
-    | some v => pairW l j v
+def lccompW {r n : ℕ} (l j : Fin n) : Option (Fin r × Fin n) → (Fin r × Fin n →₀ ℕ) := fun o =>
+  match o with
+  | none => 0
+  | some v => pairW l j v
 
-theorem lccomp_pairW_col {r n : ℕ} (l j : Fin n) (b : Fin r) :
-    pairW (r := r) l j (b, l) = Finsupp.single (b, l) 1 := by
+theorem lccomp_pairW_col {r n : ℕ} (l j : Fin n) (b : Fin r)
+    : pairW (r := r) l j (b, l) = Finsupp.single (b, l) 1 := by
   unfold pairW
   split_ifs <;> rfl
 
-theorem lccomp_image_var_homog {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n) (v : Fin r × Fin n) :
-    IsWeightedHomogeneous (lccompW l j)
-      ((if v.2 = j then X (some v) + X none * X (some (v.1, l)) else X (some v) :
-        MvPolynomial (Option (Fin r × Fin n)) B)) (pairW l j v) := by
+theorem lccomp_image_var_homog {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n) (v : Fin r × Fin n)
+    : IsWeightedHomogeneous (lccompW l j)
+      ((if v.2 = j then X (some v) + X none * X (some (v.1, l)) else X (some v)
+        : MvPolynomial (Option (Fin r × Fin n)) B))
+      (pairW l j v) := by
   split_ifs with h
   · refine IsWeightedHomogeneous.add (isWeightedHomogeneous_X B (lccompW l j) (some v)) ?_
-    have hm := (isWeightedHomogeneous_X B (lccompW l j) none).mul
-      (isWeightedHomogeneous_X B (lccompW l j) (some (v.1, l)))
+    have hm :=
+      (isWeightedHomogeneous_X B (lccompW l j) none).mul
+        (isWeightedHomogeneous_X B (lccompW l j) (some (v.1, l)))
     convert hm using 1
     show pairW l j v = 0 + pairW l j (v.1, l)
     rw [lccomp_pairW_col, zero_add]
     simp only [pairW, if_pos h]
   · exact isWeightedHomogeneous_X B (lccompW l j) (some v)
 
-theorem lccomp_colAddGen_monomial_homog {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n)
-    (d : Fin r × Fin n →₀ ℕ) (a : B) :
-    IsWeightedHomogeneous (lccompW l j) (colAddGen B l j (monomial d a))
+theorem lccomp_colAddGen_monomial_homog
+    {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n) (d : Fin r × Fin n →₀ ℕ) (a : B)
+    : IsWeightedHomogeneous (lccompW l j) (colAddGen B l j (monomial d a))
       (Finsupp.weight (pairW l j) d) := by
   classical
   have hp : IsWeightedHomogeneous (lccompW l j)
@@ -51,10 +53,11 @@ theorem lccomp_colAddGen_monomial_homog {B : Type*} [CommRing B] {r n : ℕ} (l 
   rw [colAddGen, aeval_monomial, MvPolynomial.algebraMap_eq, Finsupp.weight_apply]
   exact h
 
-theorem lccomp_colAddGen_homog {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n)
-    (ω : Fin r × Fin n →₀ ℕ) (f : MvPolynomial (Fin r × Fin n) B)
-    (hf : IsWeightedHomogeneous (pairW l j) f ω) :
-    IsWeightedHomogeneous (lccompW l j) (colAddGen B l j f) ω := by
+theorem lccomp_colAddGen_homog
+    {B : Type*} [CommRing B]
+    {r n : ℕ} (l j : Fin n) (ω : Fin r × Fin n →₀ ℕ) (f : MvPolynomial (Fin r × Fin n) B)
+    (hf : IsWeightedHomogeneous (pairW l j) f ω)
+    : IsWeightedHomogeneous (lccompW l j) (colAddGen B l j f) ω := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [f.as_sum, map_sum]
@@ -62,10 +65,11 @@ theorem lccomp_colAddGen_homog {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n
   have h := lccomp_colAddGen_monomial_homog (B := B) l j d (AddMonoidAlgebra.coeff f d)
   rwa [hf (mem_support_iff.mp hd)] at h
 
-theorem lccomp_sum_components {R : Type*} [CommRing R] {σ M : Type*} [AddCommMonoid M] [DecidableEq M]
-    (w : σ → M) (f : MvPolynomial σ R) (T : Finset M)
-    (hT : ∀ d ∈ f.support, Finsupp.weight w d ∈ T) :
-    f = ∑ ω' ∈ T, weightedHomogeneousComponent w ω' f := by
+theorem lccomp_sum_components
+    {R : Type*} [CommRing R]
+    {σ M : Type*} [AddCommMonoid M] [DecidableEq M]
+    (w : σ → M) (f : MvPolynomial σ R) (T : Finset M) (hT : ∀ d ∈ f.support, Finsupp.weight w d ∈ T)
+    : f = ∑ ω' ∈ T, weightedHomogeneousComponent w ω' f := by
   classical
   ext d
   rw [coeff_sum]
@@ -99,20 +103,22 @@ private lemma weightedHomogeneousComponent_eq_zero_of_ne_isWH {σ M R : Type*} [
     exact hn (hd.symm.trans (h hne))
   · rfl
 
-theorem lccomp_component_colAddGen {B : Type*} [CommRing B] {r n : ℕ} (l j : Fin n)
-    (ω : Fin r × Fin n →₀ ℕ) (f : MvPolynomial (Fin r × Fin n) B) :
-    weightedHomogeneousComponent (lccompW l j) ω (colAddGen B l j f) =
-      colAddGen B l j (weightedHomogeneousComponent (pairW l j) ω f) := by
+theorem lccomp_component_colAddGen
+    {B : Type*} [CommRing B]
+    {r n : ℕ} (l j : Fin n) (ω : Fin r × Fin n →₀ ℕ) (f : MvPolynomial (Fin r × Fin n) B)
+    : weightedHomogeneousComponent (lccompW l j) ω (colAddGen B l j f)
+      = colAddGen B l j (weightedHomogeneousComponent (pairW l j) ω f) := by
   classical
-  have hf := lccomp_sum_components (pairW l j) f (f.support.image (Finsupp.weight (pairW l j)))
-    (fun d hd => Finset.mem_image_of_mem _ hd)
+  have hf :=
+    lccomp_sum_components (pairW l j) f (f.support.image (Finsupp.weight (pairW l j)))
+      (fun d hd => Finset.mem_image_of_mem _ hd)
   conv_lhs => rw [hf]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum]
   by_cases hω : ω ∈ f.support.image (Finsupp.weight (pairW l j))
   · rw [Finset.sum_eq_single ω]
-    · exact weightedHomogeneousComponent_self_of_isWH_ring
-        (lccomp_colAddGen_homog l j ω _ (weightedHomogeneousComponent_isWeightedHomogeneous ω f))
+    · exact weightedHomogeneousComponent_self_of_isWH_ring (lccomp_colAddGen_homog l j ω _
+        (weightedHomogeneousComponent_isWeightedHomogeneous ω f))
     · intro b _ hb
       exact weightedHomogeneousComponent_eq_zero_of_ne_isWH
         (lccomp_colAddGen_homog l j b _ (weightedHomogeneousComponent_isWeightedHomogeneous b f))
@@ -135,9 +141,11 @@ theorem lccomp_component_colAddGen {B : Type*} [CommRing B] {r n : ℕ} (l j : F
       rintro rfl
       exact hω hb
 
-theorem lccomp_degreeOf_component_le {R : Type*} [CommRing R] {σ M : Type*} [AddCommMonoid M]
-    (w : σ → M) (ω : M) (p : MvPolynomial σ R) (i : σ) :
-    degreeOf i (weightedHomogeneousComponent w ω p) ≤ degreeOf i p := by
+theorem lccomp_degreeOf_component_le
+    {R : Type*} [CommRing R]
+    {σ M : Type*} [AddCommMonoid M]
+    (w : σ → M) (ω : M) (p : MvPolynomial σ R) (i : σ)
+    : degreeOf i (weightedHomogeneousComponent w ω p) ≤ degreeOf i p := by
   classical
   rw [degreeOf_le_iff]
   intro m hm

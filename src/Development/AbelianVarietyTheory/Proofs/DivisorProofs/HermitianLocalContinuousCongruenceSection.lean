@@ -6,14 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem dedekind_pow_maximal_mul_mem_span (B : Type) [CommRing B] [IsDedekindDomain B] (f : B)
-    (hf : f ≠ 0) (P : Ideal B) (hP : P.IsMaximal) :
-    ∃ N : ℕ, ∀ b ∈ P ^ N, ∃ s : B, s ∉ P ∧ s * b ∈ Ideal.span {f} := by
+theorem dedekind_pow_maximal_mul_mem_span
+    (B : Type) [CommRing B] [IsDedekindDomain B]
+    (f : B) (hf : f ≠ 0)
+    (P : Ideal B) (hP : P.IsMaximal)
+    : ∃ N : ℕ, ∀ b ∈ P ^ N, ∃ s : B, s ∉ P ∧ s * b ∈ Ideal.span {f} := by
   classical
   have hI0 : Ideal.span {f} ≠ (0 : Ideal B) := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hf
-  have hPu : ¬ IsUnit P := by
-    rw [Ideal.isUnit_iff]; exact hP.ne_top
+  have hPu : ¬ IsUnit P := by rw [Ideal.isUnit_iff]; exact hP.ne_top
   have hfin : FiniteMultiplicity P (Ideal.span {f}) := FiniteMultiplicity.of_not_isUnit hPu hI0
   have key : ¬ P ^ (multiplicity P (Ideal.span {f}) + 1) ∣ Ideal.span {f} :=
     hfin.not_pow_dvd_of_multiplicity_lt (Nat.lt_succ_self _)

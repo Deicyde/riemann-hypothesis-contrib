@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 namespace GlobalTheory.HilbertThetaSeries.QAff
@@ -22,49 +24,54 @@ theorem sum_reAt (x : F) : ∑ v, reAt v x = ((Algebra.trace ℚ F x : ℚ) : �
   rw [Complex.ofReal_sum, Complex.ofReal_ratCast]
   simp_rw [hv]
   rw [← eq_ratCast (algebraMap ℚ ℂ), trace_eq_sum_embeddings (K := ℚ) (L := F) (E := ℂ)]
-  rw [← Fintype.sum_equiv (RingHom.equivRatAlgHom F ℂ) (fun φ : F →+* ℂ => φ x)
-    (fun σ : F →ₐ[ℚ] ℂ => σ x) (fun _ => rfl)]
+  rw [← Fintype.sum_equiv (RingHom.equivRatAlgHom F ℂ)
+    (fun φ : F →+* ℂ => φ x)
+    (fun σ : F →ₐ[ℚ] ℂ => σ x)
+    (fun _ => rfl)]
   symm
-  refine Fintype.sum_equiv ((Equiv.subtypeUnivEquiv
-    (fun φ : F →+* ℂ => IsTotallyReal.complexEmbedding_isReal φ)).symm.trans
-    (InfinitePlace.mkReal.trans
-      (Equiv.subtypeUnivEquiv (fun v : InfinitePlace F => IsTotallyReal.isReal v)))) _ _ ?_
+  refine Fintype.sum_equiv
+    ((Equiv.subtypeUnivEquiv (fun φ : F →+* ℂ =>
+        IsTotallyReal.complexEmbedding_isReal φ)).symm.trans
+      (InfinitePlace.mkReal.trans (Equiv.subtypeUnivEquiv (fun v : InfinitePlace F =>
+        IsTotallyReal.isReal v))))
+    _ _ ?_
   intro φ
   simp [InfinitePlace.embedding_mk_eq_of_isReal (IsTotallyReal.complexEmbedding_isReal φ)]
 
 theorem reAt_mul (v : InfinitePlace F) (x y : F) : reAt v (x * y) = reAt v x * reAt v y := by
   rw [← rhom_eq, ← rhom_eq, ← rhom_eq, map_mul, Pi.mul_apply]
 
-theorem e00 (ε : Fˣ) (b : F) (v : InfinitePlace F) :
-    ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 0 0 = reAt v (ε : F) :=
+theorem e00 (ε : Fˣ) (b : F) (v : InfinitePlace F)
+    : ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 0 0 = reAt v (ε : F) :=
   rhom_eq v _
 
-theorem e01 (ε : Fˣ) (b : F) (v : InfinitePlace F) :
-    ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 0 1 = reAt v b :=
+theorem e01 (ε : Fˣ) (b : F) (v : InfinitePlace F)
+    : ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 0 1 = reAt v b :=
   rhom_eq v _
 
-theorem e10 (ε : Fˣ) (b : F) (v : InfinitePlace F) :
-    ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 1 0 = 0 := by
+theorem e10 (ε : Fˣ) (b : F) (v : InfinitePlace F)
+    : ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 1 0 = 0 := by
   simp [cmp, toInf, aff]
 
-theorem e11 (ε : Fˣ) (b : F) (v : InfinitePlace F) :
-    ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 1 1 = 1 := by
+theorem e11 (ε : Fˣ) (b : F) (v : InfinitePlace F)
+    : ((cmp v (toInf (aff ε b)) : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ) 1 1 = 1 := by
   simp [cmp, toInf, aff]
 
-theorem denom_aff (ε : Fˣ) (b : F) (v : InfinitePlace F) (w : ℂ) :
-    UpperHalfPlane.denom (cmp v (toInf (aff ε b))) w = 1 := by
+theorem denom_aff (ε : Fˣ) (b : F) (v : InfinitePlace F) (w : ℂ)
+    : UpperHalfPlane.denom (cmp v (toInf (aff ε b))) w = 1 := by
   rw [UpperHalfPlane.denom, e10, e11]; simp
 
-theorem act_aff (ε : Fˣ) (b : F) (hε : TP (ε : F)) (z : Hn F) (v : InfinitePlace F) :
-    ((act (toInf (aff ε b)) z v : UpperHalfPlane) : ℂ) = (reAt v (ε : F) : ℂ) * (z v : ℂ) + (reAt v b : ℂ) := by
+theorem act_aff (ε : Fˣ) (b : F) (hε : TP (ε : F)) (z : Hn F) (v : InfinitePlace F)
+    : ((act (toInf (aff ε b)) z v : UpperHalfPlane) : ℂ)
+      = (reAt v (ε : F) : ℂ) * (z v : ℂ) + (reAt v b : ℂ) := by
   have hd : 0 < ((Matrix.GeneralLinearGroup.det (cmp v (toInf (aff ε b))) : ℝˣ) : ℝ) := by
     simpa [Matrix.det_fin_two, e00, e01, e10, e11] using hε v
   simp only [act]
   rw [UpperHalfPlane.coe_smul_of_det_pos hd, denom_aff, div_one, UpperHalfPlane.num]
   simp [e00, e01]
 
-theorem ez_aff (ε : Fˣ) (b : F) (hε : TP (ε : F)) (z : Hn F) (η : F) :
-    ez η (act (toInf (aff ε b)) z) = ez (η * ε) z * et (η * b) := by
+theorem ez_aff (ε : Fˣ) (b : F) (hε : TP (ε : F)) (z : Hn F) (η : F)
+    : ez η (act (toInf (aff ε b)) z) = ez (η * ε) z * et (η * b) := by
   simp only [ez, et, act_aff ε b hε]
   rw [← Complex.exp_add, ← Complex.ofReal_ratCast, ← sum_reAt]
   congr 1
@@ -75,8 +82,8 @@ theorem ez_aff (ε : Fˣ) (b : F) (hε : TP (ε : F)) (z : Hn F) (η : F) :
   refine Finset.sum_congr rfl (fun v _ => ?_)
   ring
 
-theorem weightSlash_hilbertAffine_apply (k : ℕ) (f : Hn F → ℂ) (ε : Fˣ) (b : F) (z : Hn F) :
-    sl0 k (toInf (aff ε b)) f z = f (act (toInf (aff ε b)) z) := by
+theorem weightSlash_hilbertAffine_apply (k : ℕ) (f : Hn F → ℂ) (ε : Fˣ) (b : F) (z : Hn F)
+    : sl0 k (toInf (aff ε b)) f z = f (act (toInf (aff ε b)) z) := by
   simp only [sl0, denom_aff, Finset.prod_const_one, inv_one, one_pow, one_mul]
 
 omit [IsTotallyReal F] in
@@ -87,8 +94,7 @@ theorem exists_den (x : F) : ∃ E : ℕ, 0 < E ∧ IsIntegral ℤ ((E : F) * x)
   rw [Algebra.smul_def, algebraMap_int_eq, Int.coe_castRingHom] at hint
   refine ⟨y.natAbs, Int.natAbs_pos.mpr hy, ?_⟩
   rcases le_total 0 y with h | h
-  · have e : ((y.natAbs : ℕ) : F) = (y : F) := by
-      rw [← Int.cast_natCast, Int.natAbs_of_nonneg h]
+  · have e : ((y.natAbs : ℕ) : F) = (y : F) := by rw [← Int.cast_natCast, Int.natAbs_of_nonneg h]
     rw [e]
     exact hint
   · have e : ((y.natAbs : ℕ) : F) = -(y : F) := by
@@ -96,8 +102,11 @@ theorem exists_den (x : F) : ∃ E : ℕ, 0 < E ∧ IsIntegral ℤ ((E : F) * x)
     rw [e, neg_mul]
     exact hint.neg
 
-theorem hasQ_aff : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (f : Hn F → ℂ) (a : F → ℂ) (ε : Fˣ) (b : F),
-    TP (ε : F) → HasQ f a → HasQ (sl0 k (toInf (aff ε b)) f) (fun ξ => a (ξ / ε) * et (ξ / ε * b)) := by
+theorem hasQ_aff
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (f : Hn F → ℂ) (a : F → ℂ)
+        (ε : Fˣ) (b : F),
+      TP (ε : F) → HasQ f a
+        → HasQ (sl0 k (toInf (aff ε b)) f) (fun ξ => a (ξ / ε) * et (ξ / ε * b)) := by
   intro F _ _ _ k f a ε b hε hf
   obtain ⟨⟨D, hD, hDa⟩, hsum⟩ := hf
   obtain ⟨E, hE, hEint⟩ := exists_den (ε : F)
@@ -133,8 +142,17 @@ theorem hasQ_aff : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k
 
 end GlobalTheory.HilbertThetaSeries.QAff
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.hasQExpansion_affineTranslate_coeff : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (f : Hn F → ℂ) (a : F → ℂ) (ε : Fˣ) (b : F), TP (ε : F) → HasQ f a → HasQ (sl0 k (toInf (aff ε b)) f) (fun ξ => a (ξ / ε) * et (ξ / ε * b)) := by
-  first | exact @GlobalTheory.HilbertThetaSeries.QAff.hasQ_aff | exact GlobalTheory.HilbertThetaSeries.QAff.hasQ_aff | (intros; apply GlobalTheory.HilbertThetaSeries.QAff.hasQ_aff <;> assumption)
+theorem _root_.GlobalTheory.T.hasQExpansion_affineTranslate_coeff
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (f : Hn F → ℂ) (a : F → ℂ)
+        (ε : Fˣ) (b : F),
+      TP (ε : F) → HasQ f a
+        → HasQ (sl0 k (toInf (aff ε b)) f) (fun ξ => a (ξ / ε) * et (ξ / ε * b)) := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.QAff.hasQ_aff
+  | exact GlobalTheory.HilbertThetaSeries.QAff.hasQ_aff
+  | (intros; apply GlobalTheory.HilbertThetaSeries.QAff.hasQ_aff <;> assumption)

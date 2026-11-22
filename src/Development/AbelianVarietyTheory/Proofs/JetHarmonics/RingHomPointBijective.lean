@@ -15,19 +15,19 @@ noncomputable section
 
 namespace GlobalTheory.MomOne
 
-def ringHomPointFun {k k' : Type*} [Field k] [Field k'] (f : k →+* k') (W : WeierstrassCurve k) :
-    W.toAffine.Point → (W.map f).toAffine.Point
+def ringHomPointFun {k k' : Type*} [Field k] [Field k'] (f : k →+* k') (W : WeierstrassCurve k)
+    : W.toAffine.Point → (W.map f).toAffine.Point
   | .zero => 0
   | .some x y hP => .some (f x) (f y) ((W.toAffine.map_nonsingular f.injective x y).mpr hP)
 
-def ringHomPoint {k k' : Type*} [Field k] [Field k'] (f : k →+* k') (W : WeierstrassCurve k) :
-    W.toAffine.Point →+ (W.map f).toAffine.Point :=
+def ringHomPoint {k k' : Type*} [Field k] [Field k'] (f : k →+* k') (W : WeierstrassCurve k)
+    : W.toAffine.Point →+ (W.map f).toAffine.Point :=
   AddMonoidHom.mk' (ringHomPointFun f W) <| by
     refine GlobalTheory.map_add_of_triples _ rfl ?_ ?_
     · rintro (_ | ⟨x, y, hP⟩)
       · rfl
-      · simp only [Point.neg_some, ringHomPointFun, Point.some.injEq, true_and, negY,
-          map_a₁, map_a₃, map_sub, map_neg, map_mul]
+      · simp only [Point.neg_some, ringHomPointFun, Point.some.injEq, true_and, negY, map_a₁,
+          map_a₃, map_sub, map_neg, map_mul]
     · rintro (_ | ⟨x₁, y₁, h₁⟩) (_ | ⟨x₂, y₂, h₂⟩) (_ | ⟨x₃, y₃, h₃⟩) hP hQ hR h
       any_goals first | exact absurd rfl hP | exact absurd rfl hQ | exact absurd rfl hR
       obtain ⟨l, n, e₁, e₂, e₃, s₁, s₂, -⟩ := GlobalTheory.exists_line_of_add_add_eq_zero h
@@ -72,49 +72,44 @@ private lemma ringHomPoint_eq_zero_iff {k k' : Type*} [Field k] [Field k']
   · rw [ringHomPoint_some]
     simp
 
-
 open PowerSeries WeierstrassCurve WeierstrassCurve.Affine in
 open scoped ComplexConjugate BigOperators Topology in
 open Classical in
-theorem _root_.GlobalTheory.MomOne.Mdl.exists_pointHom (q : ℕ) [Fact q.Prime]
-    (M : _root_.GlobalTheory.MomOne.Mdl q) (hM : M.Ok) :
-    ∃ φ : ℂ →+ M.W.toAffine.Point, Function.Surjective φ ∧
-      (∀ z, φ z = 0 ↔ z ∈ M.L.lattice) ∧
-      ∀ z ∉ M.L.lattice, ∃ h,
-        φ z = WeierstrassCurve.Affine.Point.some (M.ι (M.x z))
-          (M.ι (M.y z)) h := by
+theorem _root_.GlobalTheory.MomOne.Mdl.exists_pointHom
+    (q : ℕ) [Fact q.Prime] (M : _root_.GlobalTheory.MomOne.Mdl q) (hM : M.Ok)
+    : ∃ φ : ℂ →+ M.W.toAffine.Point,
+      Function.Surjective φ ∧ (∀ z, φ z = 0 ↔ z ∈ M.L.lattice)
+        ∧ ∀ z ∉ M.L.lattice, ∃ h,
+          φ z = WeierstrassCurve.Affine.Point.some (M.ι (M.x z)) (M.ι (M.y z)) h := by
   obtain ⟨hc, -, -, -, -, -, -, h₄, h₆⟩ := hM
-  have hιc : M.ι M.c ≠ 0 :=
-    (map_ne_zero M.ι).mpr hc
-  obtain ⟨C, hCu, hCr, hCs, hCt⟩ : ∃ C : VariableChange ℂ_[q],
-      (C.u : ℂ_[q]) = (M.ι M.c)⁻¹ ∧
-      C.r = -(M.W.b₂ / 12) ∧ C.s = -(M.W.a₁ / 2) ∧
-      C.t = M.W.a₁ * M.W.b₂ / 24 -
-        M.W.a₃ / 2 :=
+  have hιc : M.ι M.c ≠ 0 := (map_ne_zero M.ι).mpr hc
+  obtain ⟨C, hCu, hCr, hCs, hCt⟩
+      : ∃ C : VariableChange ℂ_[q],
+        (C.u : ℂ_[q]) = (M.ι M.c)⁻¹ ∧ C.r = -(M.W.b₂ / 12) ∧ C.s = -(M.W.a₁ / 2)
+          ∧ C.t = M.W.a₁ * M.W.b₂ / 24 - M.W.a₃ / 2 :=
     ⟨⟨Units.mk0 _ (inv_ne_zero hιc), _, _, _⟩, rfl, rfl, rfl, rfl⟩
-  have hCu' : ((C.u⁻¹ : ℂ_[q]ˣ) : ℂ_[q]) = M.ι M.c := by
-    rw [Units.val_inv_eq_inv_val, hCu, inv_inv]
-  have hE : (_root_.GlobalTheory.latticeCurve M.L).a₁ = 0 ∧
-      (_root_.GlobalTheory.latticeCurve M.L).a₂ = 0 ∧
-      (_root_.GlobalTheory.latticeCurve M.L).a₃ = 0 ∧
-      (_root_.GlobalTheory.latticeCurve M.L).a₄ = -M.L.g₂ / 4 ∧
-      (_root_.GlobalTheory.latticeCurve M.L).a₆ = -M.L.g₃ / 4 := by
+  have hCu' : ((C.u⁻¹ : ℂ_[q]ˣ) : ℂ_[q]) = M.ι M.c := by rw [Units.val_inv_eq_inv_val, hCu, inv_inv]
+  have hE
+      : (_root_.GlobalTheory.latticeCurve M.L).a₁ = 0
+        ∧ (_root_.GlobalTheory.latticeCurve M.L).a₂ = 0
+        ∧ (_root_.GlobalTheory.latticeCurve M.L).a₃ = 0
+        ∧ (_root_.GlobalTheory.latticeCurve M.L).a₄ = -M.L.g₂ / 4
+        ∧ (_root_.GlobalTheory.latticeCurve M.L).a₆ = -M.L.g₃ / 4 := by
     simp [_root_.GlobalTheory.latticeCurve]
   obtain ⟨hE₁, hE₂, hE₃, hE₄, hE₆⟩ := hE
-  have hg₂ : M.ι M.L.g₂ =
-      M.W.c₄ / 12 * M.ι M.c ^ 4 := by
+  have hg₂ : M.ι M.L.g₂ = M.W.c₄ / 12 * M.ι M.c ^ 4 := by
     rw [h₄, map_div₀, map_pow, div_mul_cancel₀ _ (pow_ne_zero 4 hιc)]
-  have hg₃ : M.ι M.L.g₃ =
-      M.W.c₆ / 216 * M.ι M.c ^ 6 := by
+  have hg₃ : M.ι M.L.g₃ = M.W.c₆ / 216 * M.ι M.c ^ 6 := by
     rw [h₆, map_div₀, map_pow, div_mul_cancel₀ _ (pow_ne_zero 6 hιc)]
-  have hC : C • M.W =
-      (_root_.GlobalTheory.latticeCurve M.L).map (M.ι : ℂ →+* ℂ_[q]) := by
+  have hC : C • M.W = (_root_.GlobalTheory.latticeCurve M.L).map (M.ι : ℂ →+* ℂ_[q]) := by
     ext
     · rw [variableChange_a₁, hCu', hCs, map_a₁, hE₁]; simp only [map_zero]; ring
     · rw [variableChange_a₂, hCu', hCs, hCr, map_a₂, hE₂]
-      simp only [map_zero, WeierstrassCurve.b₂]; ring
+      simp only [map_zero, WeierstrassCurve.b₂]
+      ring
     · rw [variableChange_a₃, hCu', hCt, hCr, map_a₃, hE₃]
-      simp only [map_zero, WeierstrassCurve.b₂]; ring
+      simp only [map_zero, WeierstrassCurve.b₂]
+      ring
     · rw [variableChange_a₄, hCu', hCs, hCt, hCr, map_a₄, hE₄]
       simp only [RingHom.coe_coe, map_div₀, map_neg, map_ofNat, hg₂, WeierstrassCurve.c₄,
         WeierstrassCurve.b₂, WeierstrassCurve.b₄]
@@ -126,14 +121,16 @@ theorem _root_.GlobalTheory.MomOne.Mdl.exists_pointHom (q : ℕ) [Fact q.Prime]
   let φ : ℂ →+ M.W.toAffine.Point :=
     (_root_.GlobalTheory.variableChangePoint C hC).comp
       ((_root_.GlobalTheory.MomOne.ringHomPoint (M.ι : ℂ →+* ℂ_[q])
-        (_root_.GlobalTheory.latticeCurve M.L)).comp
-        (_root_.GlobalTheory.latticePointHom M.L))
-  have hφ : ∀ z, φ z = _root_.GlobalTheory.variableChangePoint C hC
-      (_root_.GlobalTheory.MomOne.ringHomPoint (M.ι : ℂ →+* ℂ_[q])
-        (_root_.GlobalTheory.latticeCurve M.L)
-        (_root_.GlobalTheory.latticePoint M.L z)) := by
+        (_root_.GlobalTheory.latticeCurve M.L)).comp (_root_.GlobalTheory.latticePointHom M.L))
+  have hφ
+      : ∀ z,
+        φ z
+          = _root_.GlobalTheory.variableChangePoint C hC
+            (_root_.GlobalTheory.MomOne.ringHomPoint (M.ι : ℂ →+* ℂ_[q])
+              (_root_.GlobalTheory.latticeCurve M.L) (_root_.GlobalTheory.latticePoint M.L z)) := by
     intro z
-    simp only [φ, AddMonoidHom.coe_comp, Function.comp_apply, _root_.GlobalTheory.latticePointHom_apply]
+    simp only [φ, AddMonoidHom.coe_comp, Function.comp_apply,
+      _root_.GlobalTheory.latticePointHom_apply]
   refine ⟨φ, ?_, ?_, ?_⟩
   · intro P
     obtain ⟨P₁, rfl⟩ := (_root_.GlobalTheory.variableChangePoint_bijective C hC).2 P
@@ -144,21 +141,22 @@ theorem _root_.GlobalTheory.MomOne.Mdl.exists_pointHom (q : ℕ) [Fact q.Prime]
     rw [hφ, map_eq_zero_iff _ (_root_.GlobalTheory.variableChangePoint_bijective C hC).1,
       ringHomPoint_eq_zero_iff, _root_.GlobalTheory.latticePoint_eq_zero_iff]
   · intro z hz
-    have key : ∀ {a b a' b' : ℂ_[q]} (h : M.W.toAffine.Nonsingular a b),
-        a = a' → b = b' → ∃ h', (Point.some a b h : M.W.toAffine.Point) =
-          Point.some a' b' h' := by
+    have key
+        : ∀ {a b a' b' : ℂ_[q]} (h : M.W.toAffine.Nonsingular a b),
+          a = a' → b = b'
+            → ∃ h', (Point.some a b h : M.W.toAffine.Point) = Point.some a' b' h' := by
       rintro a b a' b' h rfl rfl
       exact ⟨h, rfl⟩
-    have hx : (C.u : ℂ_[q]) ^ 2 * M.ι (M.L.weierstrassP z) + C.r =
-        M.ι (M.x z) := by
+    have hx : (C.u : ℂ_[q]) ^ 2 * M.ι (M.L.weierstrassP z) + C.r = M.ι (M.x z) := by
       show _ = M.ι (M.L.weierstrassP z / M.c ^ 2 -
         M.ι.symm (M.W.b₂ / 12))
       rw [map_sub, map_div₀, map_pow, RingEquiv.apply_symm_apply, hCu, hCr]
       field_simp
       ring
-    have hy : (C.u : ℂ_[q]) ^ 3 * M.ι (M.L.derivWeierstrassP z / 2) +
-        (C.u : ℂ_[q]) ^ 2 * C.s * M.ι (M.L.weierstrassP z) + C.t =
-        M.ι (M.y z) := by
+    have hy
+        : (C.u : ℂ_[q]) ^ 3 * M.ι (M.L.derivWeierstrassP z / 2)
+            + (C.u : ℂ_[q]) ^ 2 * C.s * M.ι (M.L.weierstrassP z) + C.t
+          = M.ι (M.y z) := by
       show _ = M.ι ((M.L.derivWeierstrassP z /
         M.c ^ 3 - M.ι.symm M.W.a₁ *
         M.x z - M.ι.symm M.W.a₃) / 2)
@@ -166,8 +164,8 @@ theorem _root_.GlobalTheory.MomOne.Mdl.exists_pointHom (q : ℕ) [Fact q.Prime]
       rw [← hx, hCu, hCr, hCs, hCt]
       field_simp
       ring
-    rw [hφ, _root_.GlobalTheory.latticePoint_of_notMem M.L hz,
-      ringHomPoint_some, _root_.GlobalTheory.variableChangePoint_some]
+    rw [hφ, _root_.GlobalTheory.latticePoint_of_notMem M.L hz, ringHomPoint_some,
+      _root_.GlobalTheory.variableChangePoint_some]
     exact key _ hx hy
 
 end GlobalTheory.MomOne

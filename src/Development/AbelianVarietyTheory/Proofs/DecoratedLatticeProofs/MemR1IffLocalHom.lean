@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExcha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
 
 noncomputable section
 namespace GlobalTheory.RankOneMatrix
@@ -24,16 +25,18 @@ theorem eN_eq_zero {N j : ℕ} (h : N ≤ j) : Loc.eN E N j = 0 := by
   have : l.val ≠ j := by have := l.isLt; omega
   simp [Loc.eN, this]
 
-theorem mem_Ufl {v : Sp E (M + c)} {i : ℕ} :
-    v ∈ Loc.Ufl E M c i ↔ ∀ l : Fin (M + c), M + i ≤ l.val → v l = 0 := by
+theorem mem_Ufl {v : Sp E (M + c)} {i : ℕ}
+    : v ∈ Loc.Ufl E M c i ↔ ∀ l : Fin (M + c), M + i ≤ l.val → v l = 0 := by
   show (∀ l : Fin (M + c), l.1 ∉ {l | l < M + i} → v l = 0) ↔ _
   simp only [Set.mem_setOf_eq, not_lt]
 
 def ColCond (x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)) : Prop :=
-  ∀ l m : Fin (M + c), stepAt M m ≤ stepAt M l → (M ≤ l.val ∨ M ≤ m.val) →
-    x (Pi.single m 1) l = (Pi.single m 1 : Sp E (M + c)) l
+  ∀ l m : Fin (M + c),
+    stepAt M m ≤ stepAt M l → (M ≤ l.val ∨ M ≤ m.val)
+      → x (Pi.single m 1) l = (Pi.single m 1 : Sp E (M + c)) l
 
-theorem colCond_of_R1cond {x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)} (h : Loc.R1cond E M c x) : ColCond x := by
+theorem colCond_of_R1cond {x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)} (h : Loc.R1cond E M c x)
+    : ColCond x := by
   intro l m hlm hM
   by_cases hm : m.val < M
   · have hl : M ≤ l.val := hM.resolve_right (by omega)
@@ -64,7 +67,8 @@ theorem colCond_of_R1cond {x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)} (h : Loc.R1c
       rw [Pi.sub_apply, sub_eq_zero, ← hsingle] at h3
       exact h3
 
-theorem R1cond_of_colCond {x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)} (h : ColCond x) : Loc.R1cond E M c x := by
+theorem R1cond_of_colCond {x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)} (h : ColCond x)
+    : Loc.R1cond E M c x := by
   refine ⟨fun i v hv => ?_, ?_, fun i => ?_⟩
   · rw [mem_Ufl] at hv ⊢
     intro l hl
@@ -88,7 +92,8 @@ theorem R1cond_of_colCond {x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)} (h : ColCond
   · by_cases hc : M + i < M + c
     · rw [mem_Ufl, eN_eq_single hc]
       intro l hl
-      rw [Pi.sub_apply, h l _ (by simp only [stepAt, Fin.val_mk]; split_ifs <;> omega) (Or.inr (by simp)), sub_self]
+      rw [Pi.sub_apply,
+        h l _ (by simp only [stepAt, Fin.val_mk]; split_ifs <;> omega) (Or.inr (by simp)), sub_self]
     · rw [eN_eq_zero (by omega), map_zero, sub_zero]
       exact zero_mem _
 
@@ -97,7 +102,10 @@ theorem R1cond_iff_colCond (x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)) : Loc.R1con
 
 section Matrix
 
-variable {k : Type} [Field k] (ι : E →+* k) {A : Type} [Fintype A] [DecidableEq A]
+variable
+  {k : Type} [Field k]
+  (ι : E →+* k)
+  {A : Type} [Fintype A] [DecidableEq A]
   (e : A ⊕ Fin c ≃ Fin (M + c)) (he : ∀ i : Fin c, (e (Sum.inr i)).val = M + i.val)
 
 include he in
@@ -117,18 +125,22 @@ theorem isRight_iff (r : A ⊕ Fin c) : r.isRight ↔ M ≤ (e r).val := by
     exact this
   · simp [he i]
 
-
 include he in
-theorem inR_locHom_iff (x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)) : VolN.InR 1 (locHom ι e x) ↔ ColCond x := by
+theorem inR_locHom_iff (x : Sp E (M + c) ≃ₗ[E] Sp E (M + c))
+    : VolN.InR 1 (locHom ι e x) ↔ ColCond x := by
   have hval : ∀ r s, (locHom ι e x).val r s = ι (x (Pi.single (e s) 1) (e r)) := fun r s => rfl
-  have hone : ∀ r s, (1 : Matrix (A ⊕ Fin c) (A ⊕ Fin c) k) r s = ι ((Pi.single (e s) (1 : E) : Sp E (M + c)) (e r)) := by
+  have hone
+      : ∀ r s,
+        (1 : Matrix (A ⊕ Fin c) (A ⊕ Fin c) k) r s
+          = ι ((Pi.single (e s) (1 : E) : Sp E (M + c)) (e r)) := by
     intro r s
     simp only [Matrix.one_apply, Pi.single_apply, e.apply_eq_iff_eq]
     split_ifs <;> simp
   constructor
   · intro h l m hlm hM
-    have := h (e.symm l) (e.symm m) (by rw [lev_eq_stepAt e he, lev_eq_stepAt e he]; simpa using hlm)
-      (by rw [isRight_iff e he, isRight_iff e he]; simpa using hM)
+    have :=
+      h (e.symm l) (e.symm m) (by rw [lev_eq_stepAt e he, lev_eq_stepAt e he]; simpa using hlm)
+        (by rw [isRight_iff e he, isRight_iff e he]; simpa using hM)
     rw [hval, hone] at this
     simpa using ι.injective this
   · intro h r s hrs hR
@@ -140,13 +152,16 @@ theorem inR_locHom_iff (x : Sp E (M + c) ≃ₗ[E] Sp E (M + c)) : VolN.InR 1 (l
 
 end Matrix
 
-theorem mem_rationalFirstParabolic_iff_localGL_mem_rootExchange : ∀ {E k : Type} [Field E] [Field k] (ι : E →+* k) {A : Type} [Fintype A] [DecidableEq A] {M c c' : ℕ}
-    (e : A ⊕ Fin c ≃ Fin (M + c')), c' = c → (∀ i : Fin c, (e (Sum.inr i)).val = M + i.val) →
-    ∀ x : Sp E (M + c') ≃ₗ[E] Sp E (M + c'), x ∈ Loc.R1 E M c' ↔ locHom ι e x ∈ R k A c 1 := by
+theorem mem_rationalFirstParabolic_iff_localGL_mem_rootExchange
+    : ∀ {E k : Type} [Field E] [Field k] (ι : E →+* k) {A : Type} [Fintype A] [DecidableEq A]
+        {M c c' : ℕ} (e : A ⊕ Fin c ≃ Fin (M + c')),
+      c' = c → (∀ i : Fin c, (e (Sum.inr i)).val = M + i.val)
+        → ∀ x : Sp E (M + c') ≃ₗ[E] Sp E (M + c'),
+          x ∈ Loc.R1 E M c' ↔ locHom ι e x ∈ R k A c 1 := by
   intro E k _ _ ι A _ _ M c c' e hcc he x
   subst hcc
-  rw [VolN.mem_R_iff, ← map_inv, inR_locHom_iff ι e he, inR_locHom_iff ι e he,
-    ← R1cond_iff_colCond, ← R1cond_iff_colCond]
+  rw [VolN.mem_R_iff, ← map_inv, inR_locHom_iff ι e he, inR_locHom_iff ι e he, ← R1cond_iff_colCond,
+    ← R1cond_iff_colCond]
   exact Iff.rfl
 
 end GlobalTheory.RankOneMatrix

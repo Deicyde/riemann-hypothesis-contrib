@@ -24,12 +24,14 @@ theorem Retr.one {S N : Subgroup G} {π : G → G} (h : Retr S N π) : π 1 = 1 
   rw [mul_one] at h1
   simpa using h1
 
-theorem Retr.inv {S N : Subgroup G} {π : G → G} (h : Retr S N π) {x : G} (hx : x ∈ N) : π x⁻¹ = (π x)⁻¹ := by
+theorem Retr.inv {S N : Subgroup G} {π : G → G} (h : Retr S N π) {x : G} (hx : x ∈ N)
+    : π x⁻¹ = (π x)⁻¹ := by
   have h1 := h.mul x⁻¹ (N.inv_mem hx) x hx
   rw [inv_mul_cancel, h.one] at h1
   exact eq_inv_of_mul_eq_one_left h1.symm
 
-def img {S N : Subgroup G} {π : G → G} (h : Retr S N π) (H : Subgroup G) (hH : H ≤ N) : Subgroup G where
+def img {S N : Subgroup G} {π : G → G} (h : Retr S N π) (H : Subgroup G) (hH : H ≤ N)
+    : Subgroup G where
   carrier := π '' H
   mul_mem' := by
     rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
@@ -39,8 +41,11 @@ def img {S N : Subgroup G} {π : G → G} (h : Retr S N π) (H : Subgroup G) (hH
     rintro _ ⟨x, hx, rfl⟩
     exact ⟨x⁻¹, H.inv_mem hx, h.inv (hH hx)⟩
 
-theorem cj_eq_cj_img {S N : Subgroup G} {π : G → G} (h : Retr S N π) {H : Subgroup G} (hH : H ≤ N) {g₀ : G}
-    (hg : g₀ ∈ N) (hC : cj g₀ H ≤ S) : cj g₀ H = cj (π g₀) (img h H hH) := by
+theorem cj_eq_cj_img
+    {S N : Subgroup G} {π : G → G} (h : Retr S N π)
+    {H : Subgroup G} (hH : H ≤ N)
+    {g₀ : G} (hg : g₀ ∈ N) (hC : cj g₀ H ≤ S)
+    : cj g₀ H = cj (π g₀) (img h H hH) := by
   ext y
   rw [mem_cj, mem_cj]
   constructor
@@ -57,7 +62,8 @@ theorem cj_eq_cj_img {S N : Subgroup G} {π : G → G} (h : Retr S N π) {H : Su
     have hzS := hC hz
     have e1 : π (g₀⁻¹ * x * g₀) = g₀⁻¹ * x * g₀ := h.id _ hzS
     rw [h.mul _ (N.mul_mem (N.inv_mem hg) (hH hx)) _ hg, h.mul _ (N.inv_mem hg) _ (hH hx), h.inv hg,
-      hxe] at e1
+        hxe]
+      at e1
     have hyz : y = g₀⁻¹ * x * g₀ := by
       rw [← e1]
       group

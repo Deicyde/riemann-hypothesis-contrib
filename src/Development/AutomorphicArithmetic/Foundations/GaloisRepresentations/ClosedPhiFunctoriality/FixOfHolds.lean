@@ -6,20 +6,25 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal
+  GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim
+  GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
 open scoped Formalism.Per NNReal
 open UpperTheory.Gal.ClosedPhiFromClosedTrace
 
-private theorem fix_aux {A S : Type} [CommSemiring A] [Semiring S] [Algebra A S] (φ : S →ₐ[A] S) (x y : ℕ) (c : S)
-    (h : (φ ^ y) c = (φ ^ x) c) : (φ ^ ((x : ℤ) - y).natAbs) ((φ ^ y) c) = (φ ^ y) c := by
+private theorem fix_aux
+    {A S : Type} [CommSemiring A] [Semiring S] [Algebra A S]
+    (φ : S →ₐ[A] S) (x y : ℕ) (c : S) (h : (φ ^ y) c = (φ ^ x) c)
+    : (φ ^ ((x : ℤ) - y).natAbs) ((φ ^ y) c) = (φ ^ y) c := by
   rcases le_total x y with hxy | hxy
   · have e : ((x : ℤ) - y).natAbs = y - x := by omega
     rw [e, h, ← AlgHom.mul_apply, ← pow_add, Nat.sub_add_cancel hxy, h]
   · have e : ((x : ℤ) - y).natAbs = x - y := by omega
     rw [e, ← AlgHom.mul_apply, ← pow_add, Nat.sub_add_cancel hxy, h]
 
-theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.fixOf_holds :
-    FixOf := by
+theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.fixOf_holds : FixOf := by
   intro l _ E Ω _ _ _ _ _ w A h O _ _ _ Bw hj g c hc
   obtain ⟨a, b, hσ⟩ := g.2
   have hal : (alpha l g) = ((resDeg l w * a : ℕ) : ℤ) - ((resDeg l w * b : ℕ) : ℤ) := by

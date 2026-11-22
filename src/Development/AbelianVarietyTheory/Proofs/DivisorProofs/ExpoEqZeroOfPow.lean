@@ -20,8 +20,12 @@ open UpperTheory.V.TR (infGL CuspSub)
 
 namespace GlobalTheory.HenQ
 
-theorem expo_eq_zero_of_pow {K : Type} [Field K] [NumberField K] [IsTotallyReal K] (ξ : Formalism.L2.Host.HChar K) {N : ℕ}
-    (hN : 0 < N) (h : ξ ^ N = 1) (v : InfinitePlace K) : TR.expo ξ v = 0 := by
+theorem expo_eq_zero_of_pow
+    {K : Type} [Field K] [NumberField K] [IsTotallyReal K]
+    (ξ : Formalism.L2.Host.HChar K)
+    {N : ℕ} (hN : 0 < N) (h : ξ ^ N = 1)
+    (v : InfinitePlace K)
+    : TR.expo ξ v = 0 := by
   classical
   have key : ∀ k : ℕ, ∀ z, TR.dchi (ξ ^ k) z = (k : ℂ) * TR.dchi ξ z := by
     intro k

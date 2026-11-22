@@ -10,22 +10,34 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem IsKum.minpoly_eq {p : ℕ} {F E : Type} [Field F] [Field E] [Algebra F E] {ζ δ : F} {θ : E}
-    {σ : E ≃ₐ[F] E} (h : IsKum p ζ δ θ σ) : minpoly F θ = X ^ p - C δ := by
+theorem IsKum.minpoly_eq
+    {p : ℕ} {F E : Type} [Field F] [Field E] [Algebra F E]
+    {ζ δ : F} {θ : E} {σ : E ≃ₐ[F] E} (h : IsKum p ζ δ θ σ)
+    : minpoly F θ = X ^ p - C δ := by
   have hirr : Irreducible (X ^ p - C δ) := X_pow_sub_C_irreducible_of_prime h.prime h.nonpow
   refine (minpoly.eq_of_irreducible_of_monic hirr ?_ (monic_X_pow_sub_C δ h.prime.ne_zero)).symm
   simp [h.pow]
 
-theorem IsKum.pow_apply {p : ℕ} {F E : Type} [Field F] [Field E] [Algebra F E] {ζ δ : F} {θ : E}
-    {σ : E ≃ₐ[F] E} (h : IsKum p ζ δ θ σ) (k : ℕ) :
-    (σ ^ k) θ = algebraMap F E (ζ ^ k) * θ := by
+theorem IsKum.pow_apply
+    {p : ℕ} {F E : Type} [Field F] [Field E] [Algebra F E]
+    {ζ δ : F} {θ : E} {σ : E ≃ₐ[F] E} (h : IsKum p ζ δ θ σ)
+    (k : ℕ)
+    : (σ ^ k) θ = algebraMap F E (ζ ^ k) * θ := by
   induction k with
   | zero => simp
   | succ k ih =>
     rw [pow_succ', AlgEquiv.mul_apply, ih, map_mul, AlgEquiv.commutes, h.conj, pow_succ', map_mul]
     ring
 
-theorem kummer_galois : ∀ (p : ℕ) (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (ζ δ : F) (θ : E) (σ : E ≃ₐ[F] E), IsKum p ζ δ θ σ → FiniteDimensional F E ∧ Module.finrank F E = p ∧ IsGalois F E ∧ orderOf σ = p ∧ (∀ τ : E ≃ₐ[F] E, τ ∈ Subgroup.zpowers σ) ∧ Nonempty (E ≃ₐ[F] AdjoinRoot (X ^ p - C δ : F[X])) ∧ ∀ (L : Type) [Field L] [Algebra F L] (r : L), r ^ p = algebraMap F L δ → ∃ ψ : E →ₐ[F] L, ψ θ = r := by
+theorem kummer_galois
+    : ∀ (p : ℕ) (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (ζ δ : F) (θ : E)
+        (σ : E ≃ₐ[F] E),
+      IsKum p ζ δ θ σ
+        → FiniteDimensional F E ∧ Module.finrank F E = p ∧ IsGalois F E ∧ orderOf σ = p
+          ∧ (∀ τ : E ≃ₐ[F] E, τ ∈ Subgroup.zpowers σ)
+          ∧ Nonempty (E ≃ₐ[F] AdjoinRoot (X ^ p - C δ : F[X]))
+          ∧ ∀ (L : Type) [Field L] [Algebra F L] (r : L),
+            r ^ p = algebraMap F L δ → ∃ ψ : E →ₐ[F] L, ψ θ = r := by
   intro p F E _ _ _ _ ζ δ θ σ h
   have hp := h.prime
   have hp0 : p ≠ 0 := hp.ne_zero
@@ -49,7 +61,8 @@ theorem kummer_galois : ∀ (p : ℕ) (F E : Type) [Field F] [CharZero F] [Field
   have hfin : FiniteDimensional F E := IsSplittingField.finiteDimensional E (X ^ p - C δ)
   have hrank : Module.finrank F E = p :=
     finrank_of_isSplittingField_X_pow_sub_C (hζ := hζ) (H := hirr) (L := E)
-  have hgal : IsGalois F E := isGalois_of_isSplittingField_X_pow_sub_C (hζ := hζ) (H := hirr) (L := E)
+  have hgal : IsGalois F E :=
+    isGalois_of_isSplittingField_X_pow_sub_C (hζ := hζ) (H := hirr) (L := E)
   have hext : ∀ τ₁ τ₂ : E ≃ₐ[F] E, τ₁ θ = τ₂ θ → τ₁ = τ₂ := by
     intro τ₁ τ₂ hτ
     apply AlgEquiv.coe_toAlgHom_injective
@@ -72,8 +85,7 @@ theorem kummer_galois : ∀ (p : ℕ) (F E : Type) [Field F] [CharZero F] [Field
   have hall : ∀ τ : E ≃ₐ[F] E, τ ∈ Subgroup.zpowers σ := by
     intro τ
     have hτp : (τ θ) ^ p = algebraMap F E δ := by rw [← map_pow, h.pow, AlgEquiv.commutes]
-    have hq : (τ θ / θ) ^ p = 1 := by
-      rw [div_pow, hτp, ← h.pow, div_self (pow_ne_zero _ hθ0)]
+    have hq : (τ θ / θ) ^ p = 1 := by rw [div_pow, hτp, ← h.pow, div_self (pow_ne_zero _ hθ0)]
     obtain ⟨i, -, hi⟩ := (h.root.map_of_injective hinj).eq_pow_of_pow_eq_one hq
     rw [Subgroup.mem_zpowers_iff]
     refine ⟨i, hext _ _ ?_⟩
@@ -81,8 +93,10 @@ theorem kummer_galois : ∀ (p : ℕ) (F E : Type) [Field F] [CharZero F] [Field
   let e : AdjoinRoot (X ^ p - C δ : F[X]) ≃ₐ[F] E := adjoinRootXPowSubCEquiv hζ hirr h.pow
   refine ⟨hfin, hrank, hgal, hord, hall, ⟨e.symm⟩, ?_⟩
   intro L _ _ r hr
-  refine ⟨(AdjoinRoot.liftAlgHom (X ^ p - C δ) (Algebra.ofId F L) r (by simp [hr])).comp
-    e.symm.toAlgHom, ?_⟩
+  refine ⟨
+    (AdjoinRoot.liftAlgHom (X ^ p - C δ) (Algebra.ofId F L) r (by simp [hr])).comp e.symm.toAlgHom,
+    ?_
+  ⟩
   simp only [AlgHom.comp_apply, AlgEquiv.coe_toAlgHom, e, adjoinRootXPowSubCEquiv_symm_eq_root,
     AdjoinRoot.liftAlgHom_root]
 

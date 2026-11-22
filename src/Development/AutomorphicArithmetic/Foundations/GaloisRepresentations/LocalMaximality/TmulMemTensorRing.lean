@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 noncomputable section
@@ -185,8 +186,7 @@ private lemma scale_mem {I J : Finset (Fin (d + 1))} {j : Fin (d + 1)} (w : rA �
 
 end
 
-theorem kernelZero_holds :
-    Ker0 := by
+theorem kernelZero_holds : Ker0 := by
   intro F _ _ d x _ I J j hI hJ m hm h0
   obtain ⟨w, rfl⟩ := hm
   obtain ⟨N, hN⟩ := scale_mem x (j := j) w
@@ -203,7 +203,8 @@ theorem kernelZero_holds :
     have h0' : Algebra.TensorProduct.lmul' ℂ m = 0 := h0
     rw [map_mul, h0', mul_zero]
   have h2 : c ^ N * m ∈ PP x I J j := by
-    have e : Algebra.TensorProduct.map (rA ℂ (xv x) {j}).val (rA ℂ (xv x) {j}).val w' = c ^ N * m := hw'
+    have e : Algebra.TensorProduct.map (rA ℂ (xv x) {j}).val (rA ℂ (xv x) {j}).val w' = c ^ N * m :=
+      hw'
     rw [e, hz] at h1
     simpa using h1
   have h3 := mul_mem_PP x (pow_mem huR N) h2

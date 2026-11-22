@@ -10,13 +10,14 @@ open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 
 namespace GlobalTheory
 
-
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry in
-theorem _root_.GlobalTheory.over_points_ext_of_injective (S : Scheme.{0}) (G : Over S) [IsSeparated G.hom]
-    (W F : Type) [CommRing W] [CommRing F] (φ : W →+* F) (hφ : Function.Injective φ)
+theorem _root_.GlobalTheory.over_points_ext_of_injective
+    (S : Scheme.{0}) (G : Over S) [IsSeparated G.hom]
+    (W F : Type) [CommRing W] [CommRing F]
+    (φ : W →+* F) (hφ : Function.Injective φ)
     (p : Spec (CommRingCat.of W) ⟶ S) (y y' : Over.mk p ⟶ G)
-    (h : (Spec.map (CommRingCat.ofHom φ)) ≫ y.left = (Spec.map (CommRingCat.ofHom φ)) ≫ y'.left) :
-    y = y' := by
+    (h : (Spec.map (CommRingCat.ofHom φ)) ≫ y.left = (Spec.map (CommRingCat.ofHom φ)) ≫ y'.left)
+    : y = y' := by
   let d : Over.mk (Spec.map (CommRingCat.ofHom φ) ≫ p) ⟶ Over.mk p :=
     Over.homMk (Spec.map (CommRingCat.ofHom φ)) rfl
   have hd : d ≫ y = d ≫ y' := by
@@ -34,7 +35,6 @@ theorem _root_.GlobalTheory.over_points_ext_of_injective (S : Scheme.{0}) (G : O
   have hiso : IsIso (equalizer.ι y y').left :=
     _root_.GlobalTheory.isIso_of_isClosedImmersion_of_schemeDominant _
   ext1
-  rw [← cancel_epi (equalizer.ι y y').left, ← Over.comp_left, ← Over.comp_left,
-    equalizer.condition]
+  rw [← cancel_epi (equalizer.ι y y').left, ← Over.comp_left, ← Over.comp_left, equalizer.condition]
 
 end GlobalTheory

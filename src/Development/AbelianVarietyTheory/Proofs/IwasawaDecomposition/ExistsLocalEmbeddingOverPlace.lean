@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -17,8 +20,8 @@ namespace GlobalTheory.LocEmbExist
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem isIntegral_or_isIntegral_inv (w : HeightOneSpectrum (𝓞 E)) (x : GlobalTheory.LocDict.Kbar w) :
-    IsIntegral (w.adicCompletionIntegers E) x ∨ IsIntegral (w.adicCompletionIntegers E) x⁻¹ := by
+theorem isIntegral_or_isIntegral_inv (w : HeightOneSpectrum (𝓞 E)) (x : GlobalTheory.LocDict.Kbar w)
+    : IsIntegral (w.adicCompletionIntegers E) x ∨ IsIntegral (w.adicCompletionIntegers E) x⁻¹ := by
   rcases eq_or_ne x 0 with rfl | hx
   · exact Or.inl isIntegral_zero
   let K := w.adicCompletion E
@@ -29,8 +32,10 @@ theorem isIntegral_or_isIntegral_inv (w : HeightOneSpectrum (𝓞 E)) (x : Globa
   have hy0 : y ≠ 0 := fun h => hx (congrArg Subtype.val h)
   let f : L →ₐ[w.adicCompletionIntegers E] GlobalTheory.LocDict.Kbar w := L.val.restrictScalars _
   have hf : Function.Injective f := L.val.injective
-  have key : ∀ z : L, IsIntegral (w.adicCompletionIntegers E) (z : GlobalTheory.LocDict.Kbar w) ↔
-      Valued.v (Algebra.norm K z) ≤ 1 := fun z => by
+  have key
+      : ∀ z : L,
+        IsIntegral (w.adicCompletionIntegers E) (z : GlobalTheory.LocDict.Kbar w)
+          ↔ Valued.v (Algebra.norm K z) ≤ 1 := fun z => by
     rw [← GlobalTheory.CNorm.isIntegral_iff_valued_norm_le_one E w L z]
     exact isIntegral_algHom_iff f hf
   have hyx : ((y⁻¹ : L) : GlobalTheory.LocDict.Kbar w) = x⁻¹ := by simp [y]
@@ -41,23 +46,30 @@ theorem isIntegral_or_isIntegral_inv (w : HeightOneSpectrum (𝓞 E)) (x : Globa
   · right
     rw [← hyx]
     refine (key _).2 ?_
-    calc Valued.v (Algebra.norm K y⁻¹) = 1 * Valued.v (Algebra.norm K y⁻¹) := (one_mul _).symm
+    calc
+      Valued.v (Algebra.norm K y⁻¹)
+        = 1 * Valued.v (Algebra.norm K y⁻¹) := (one_mul _).symm
       _ ≤ Valued.v (Algebra.norm K y) * Valued.v (Algebra.norm K y⁻¹) := mul_le_mul' h le_rfl
       _ = 1 := hmul
 
 def intValRing (w : HeightOneSpectrum (𝓞 E)) : ValuationSubring (GlobalTheory.LocDict.Kbar w) where
-  toSubring := (integralClosure (w.adicCompletionIntegers E) (GlobalTheory.LocDict.Kbar w)).toSubring
+  toSubring :=
+    (integralClosure (w.adicCompletionIntegers E) (GlobalTheory.LocDict.Kbar w)).toSubring
   mem_or_inv_mem' x := isIntegral_or_isIntegral_inv w x
 
-theorem isIntegral_algebraMap_iff (w : HeightOneSpectrum (𝓞 E)) (e : E) :
-    IsIntegral (w.adicCompletionIntegers E) (algebraMap E (GlobalTheory.LocDict.Kbar w) e) ↔
-      w.valuation E e ≤ 1 := by
+theorem isIntegral_algebraMap_iff (w : HeightOneSpectrum (𝓞 E)) (e : E)
+    : IsIntegral (w.adicCompletionIntegers E) (algebraMap E (GlobalTheory.LocDict.Kbar w) e)
+      ↔ w.valuation E e ≤ 1 := by
   let K := w.adicCompletion E
-  have h1 : algebraMap E (GlobalTheory.LocDict.Kbar w) e = algebraMap K (GlobalTheory.LocDict.Kbar w) (algebraMap E K e) :=
+  have h1
+      : algebraMap E (GlobalTheory.LocDict.Kbar w) e
+        = algebraMap K (GlobalTheory.LocDict.Kbar w) (algebraMap E K e) :=
     IsScalarTower.algebraMap_apply E K _ e
   let f : K →ₐ[w.adicCompletionIntegers E] GlobalTheory.LocDict.Kbar w :=
     (IsScalarTower.toAlgHom K K (GlobalTheory.LocDict.Kbar w)).restrictScalars _
-  rw [h1, show algebraMap K (GlobalTheory.LocDict.Kbar w) (algebraMap E K e) = f (algebraMap E K e) from rfl,
+  rw [h1,
+    show algebraMap K (GlobalTheory.LocDict.Kbar w) (algebraMap E K e) = f (algebraMap E K e) from
+      rfl,
     isIntegral_algHom_iff f f.toRingHom.injective, IsIntegrallyClosed.isIntegral_iff (K := K)]
   have hv : Valued.v (algebraMap E K e) = w.valuation E e :=
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation' w e
@@ -73,9 +85,12 @@ theorem isIntegral_algebraMap_iff (w : HeightOneSpectrum (𝓞 E)) (e : E) :
     rw [HeightOneSpectrum.mem_adicCompletionIntegers, hv]
     exact h
 
-theorem valuation_lt_one_iff_of_mem_iff {Ω : Type} [Field Ω] [Algebra E Ω] (B : ValuationSubring Ω)
-    (w : HeightOneSpectrum (𝓞 E)) (hB : ∀ e : E, algebraMap E Ω e ∈ B ↔ w.valuation E e ≤ 1) (e : E) :
-    B.valuation (algebraMap E Ω e) < 1 ↔ w.valuation E e < 1 := by
+theorem valuation_lt_one_iff_of_mem_iff
+    {Ω : Type} [Field Ω] [Algebra E Ω]
+    (B : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
+    (hB : ∀ e : E, algebraMap E Ω e ∈ B ↔ w.valuation E e ≤ 1)
+    (e : E)
+    : B.valuation (algebraMap E Ω e) < 1 ↔ w.valuation E e < 1 := by
   rcases eq_or_ne e 0 with rfl | he
   · simp
   have ha : algebraMap E Ω e ≠ 0 := (map_ne_zero _).2 he
@@ -89,13 +104,16 @@ end GlobalTheory.LocEmbExist
 
 namespace GlobalTheory.LocDict
 
-theorem exists_isLocEmb : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w), ∃ ι : Ω →ₐ[E] Kbar w, IsLocEmb A w ι := by
+theorem exists_isLocEmb
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w),
+      ∃ ι : Ω →ₐ[E] Kbar w,
+        IsLocEmb A w ι := by
   intro E Ω _ _ _ _ _ A w h
   have : Algebra.IsAlgebraic E Ω := IsAlgClosure.isAlgebraic
   let ι₀ : Ω →ₐ[E] Kbar w := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let A₀ : ValuationSubring Ω := (GlobalTheory.LocEmbExist.intValRing w).comap ι₀.toRingHom
   have hA₀ : ∀ z, z ∈ A₀ ↔ IsIntegral (w.adicCompletionIntegers E) (ι₀ z) := fun _ => Iff.rfl

@@ -11,31 +11,39 @@ open scoped ComplexConjugate
 
 noncomputable section
 
-theorem mem_dom_iff {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
-    (x : Frame X.Ψ r) : x ∈ X.dom ↔ ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧
-      ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := Iff.rfl
+theorem mem_dom_iff
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r) (x : Frame X.Ψ r)
+    : x ∈ X.dom
+      ↔ ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧ ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re :=
+  Iff.rfl
 
-theorem gram_eq {E : Type} [Field E] {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
-    (M : Matrix (Fin r) (Fin r) ℂ) :
-    gram τ G M = M.transpose * G.map τ * M.map (starRingEnd ℂ) := by
+theorem gram_eq
+    {E : Type} [Field E]
+    {r : ℕ}
+    (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (M : Matrix (Fin r) (Fin r) ℂ)
+    : gram τ G M = M.transpose * G.map τ * M.map (starRingEnd ℂ) := by
   ext a b
-  simp only [gram, hermC, col, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply,
-    Finset.sum_mul]
+  simp only [gram, hermC, col, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply,
+    Matrix.map_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
 
-theorem det_ne_of_gram {E : Type} [Field E] {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
-    (M : Matrix (Fin r) (Fin r) ℂ) (h : (gram τ G M).det ≠ 0) : M.det ≠ 0 := by
+theorem det_ne_of_gram
+    {E : Type} [Field E]
+    {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (M : Matrix (Fin r) (Fin r) ℂ)
+    (h : (gram τ G M).det ≠ 0)
+    : M.det ≠ 0 := by
   rw [gram_eq, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose] at h
   intro h0
   apply h
   rw [h0, zero_mul, zero_mul]
 
-theorem lminor_last {r : ℕ} (M : Matrix (Fin r) (Fin r) ℂ) : lminor M (Fin.last r) = M.det := by
-  rfl
+theorem lminor_last {r : ℕ} (M : Matrix (Fin r) (Fin r) ℂ) : lminor M (Fin.last r) = M.det := by rfl
 
-theorem det_of_minors {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
-    (x : Frame X.Ψ r) (τ : X.Ψ) (h : ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re) :
-    (mat x τ).det ≠ 0 := by
+theorem det_of_minors
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (X : Data E r) (x : Frame X.Ψ r) (τ : X.Ψ)
+    (h : ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re)
+    : (mat x τ).det ≠ 0 := by
   have h1 := h (Fin.last r)
   have h2 : dmin X.Gm x τ (Fin.last r) ≠ 0 := by
     intro h0
@@ -56,8 +64,9 @@ theorem chart_zero_eq_alt {E : Type} [Field E] [NumberField E] [IsCMField E] : X
 
 theorem normFactor_pos_alt {E : Type} [Field E] [NumberField E] [IsCMField E] : NfacPos E := by
   intro r X la x hx
-  have hx' : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧
-      ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := hx
+  have hx'
+      : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧ ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re :=
+    hx
   unfold Data.nfac
   refine Finset.prod_pos (fun τ _ => Finset.prod_pos (fun i _ => Real.rpow_pos_of_pos ?_ _))
   have hne : ∀ j, dmin X.Gm x τ j ≠ 0 := by
@@ -110,25 +119,29 @@ theorem orthonormal_domain {E : Type} [Field E] [NumberField E] [IsCMField E] : 
     exact mul_self_pos.mpr (hps i)
   exact ⟨det_of_minors X x τ hpos, hpos⟩
 
-theorem opN_smul {m n : ℕ} (t : ℂ) (A : Matrix (Fin m) (Fin n) ℂ) :
-    Data.opN (t • A) = ‖t‖ * Data.opN A := by
+theorem opN_smul {m n : ℕ} (t : ℂ) (A : Matrix (Fin m) (Fin n) ℂ)
+    : Data.opN (t • A) = ‖t‖ * Data.opN A := by
   unfold Data.opN
-  have key : ∀ v : Fin n → ℂ, √(∑ i, ‖Matrix.mulVec (t • A) v i‖ ^ 2) =
-      ‖t‖ * √(∑ i, ‖Matrix.mulVec A v i‖ ^ 2) := by
+  have key
+      : ∀ v : Fin n → ℂ,
+        √(∑ i, ‖Matrix.mulVec (t • A) v i‖ ^ 2) = ‖t‖ * √(∑ i, ‖Matrix.mulVec A v i‖ ^ 2) := by
     intro v
     simp only [Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul, norm_mul, mul_pow, ← Finset.mul_sum]
     rw [Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (norm_nonneg _)]
   open scoped Pointwise in
-  have hset : {s | ∃ v : Fin n → ℂ, v ≠ 0 ∧
-        s = √(∑ i, ‖Matrix.mulVec (t • A) v i‖ ^ 2) / √(∑ j, ‖v j‖ ^ 2)} =
-      ‖t‖ • {s | ∃ v : Fin n → ℂ, v ≠ 0 ∧ s = √(∑ i, ‖Matrix.mulVec A v i‖ ^ 2) / √(∑ j, ‖v j‖ ^ 2)} := by
-    ext s
-    simp only [Set.mem_setOf_eq, Set.mem_smul_set, smul_eq_mul]
-    constructor
-    · rintro ⟨v, hv, rfl⟩
-      exact ⟨_, ⟨v, hv, rfl⟩, by rw [key, mul_div_assoc]⟩
-    · rintro ⟨_, ⟨v, hv, rfl⟩, rfl⟩
-      exact ⟨v, hv, by rw [key, mul_div_assoc]⟩
+  have hset
+      : {s | ∃ v : Fin n → ℂ, v ≠ 0 ∧
+          s = √(∑ i, ‖Matrix.mulVec (t • A) v i‖ ^ 2) / √(∑ j, ‖v j‖ ^ 2)}
+        = ‖t‖
+          • {s | ∃ v : Fin n → ℂ, v ≠ 0 ∧ s = √(∑ i, ‖Matrix.mulVec A v i‖ ^ 2) / √(∑ j, ‖v j‖ ^ 2)} :=
+    by
+      ext s
+      simp only [Set.mem_setOf_eq, Set.mem_smul_set, smul_eq_mul]
+      constructor
+      · rintro ⟨v, hv, rfl⟩
+        exact ⟨_, ⟨v, hv, rfl⟩, by rw [key, mul_div_assoc]⟩
+      · rintro ⟨_, ⟨v, hv, rfl⟩, rfl⟩
+        exact ⟨v, hv, by rw [key, mul_div_assoc]⟩
   open scoped Pointwise in
   rw [hset, Real.sSup_smul_of_nonneg (norm_nonneg t), smul_eq_mul]
 
@@ -166,14 +179,19 @@ theorem borel_flag_translate {E : Type} [Field E] [NumberField E] [IsCMField E] 
     funext k
     simp [col, mat, rmul, Matrix.mul_apply, Finset.sum_apply, mul_comm]
     rfl
-  have hli : ∀ y : Matrix (Fin r) (Fin r) ℂ, y.det ≠ 0 →
-      LinearIndependent ℂ (fun a : Fin X.p0 => col y (Fin.castLE X.p0_le a)) := by
+  have hli
+      : ∀ y : Matrix (Fin r) (Fin r) ℂ,
+        y.det ≠ 0 → LinearIndependent ℂ (fun a : Fin X.p0 => col y (Fin.castLE X.p0_le a)) := by
     intro y hy
-    have h1 := Matrix.linearIndependent_cols_of_isUnit
-      ((Matrix.isUnit_iff_isUnit_det y).mpr (isUnit_iff_ne_zero.mpr hy))
+    have h1 :=
+      Matrix.linearIndependent_cols_of_isUnit ((Matrix.isUnit_iff_isUnit_det y).mpr
+        (isUnit_iff_ne_zero.mpr hy))
     exact h1.comp (Fin.castLE X.p0_le) (Fin.castLE_injective _)
-  have hle : Submodule.span ℂ (Set.range fun a : Fin X.p0 => col (mat (rmul x b) τ) (Fin.castLE X.p0_le a)) ≤
-      Submodule.span ℂ (Set.range fun a : Fin X.p0 => col (mat x τ) (Fin.castLE X.p0_le a)) := by
+  have hle
+      : Submodule.span ℂ
+          (Set.range fun a : Fin X.p0 => col (mat (rmul x b) τ) (Fin.castLE X.p0_le a))
+        ≤ Submodule.span ℂ
+          (Set.range fun a : Fin X.p0 => col (mat x τ) (Fin.castLE X.p0_le a)) := by
     rw [Submodule.span_le]
     rintro _ ⟨a, rfl⟩
     simp only [hcol]

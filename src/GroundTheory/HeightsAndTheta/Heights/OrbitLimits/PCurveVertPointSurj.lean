@@ -18,10 +18,10 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo HilbertSamuel.Section
 
 noncomputable section
 
-
 open CurveVerticalPointSurjective in
-theorem CurveVertPointSurj.proof (hFin : CurveRingFinite.Statement) (hC : CurveClosedPointChart.Statement) :
-    CurveVertPointSurj.Statement := by
+theorem CurveVertPointSurj.proof
+    (hFin : CurveRingFinite.Statement) (hC : CurveClosedPointChart.Statement)
+    : CurveVertPointSurj.Statement := by
   classical
   intro K _ ι _ Ω _ y s d hP hs hsP m hm hlen
   have hfin := hFin K ι Ω y hP
@@ -45,31 +45,39 @@ theorem CurveVertPointSurj.proof (hFin : CurveRingFinite.Statement) (hC : CurveC
     (IsLocalization.lift_injective_iff hunit).mpr fun x x' =>
       ⟨fun h => by rw [hinj0 h], fun h => by rw [Subtype.val_injective h]⟩
   have hφB : ∀ x : curveRing y, φ (algebraMap _ L x) = x := fun x => IsLocalization.lift_eq hunit x
-  have hφmk : ∀ (a : curveRing y) (b : m.primeCompl) (v : Ω),
-      φ (IsLocalization.mk' L a b) = v ↔ (a : Ω) = ((b : curveRing y) : Ω) * v :=
-    fun a b v => IsLocalization.lift_mk'_spec hunit a v b
+  have hφmk
+      : ∀ (a : curveRing y) (b : m.primeCompl) (v : Ω),
+        φ (IsLocalization.mk' L a b) = v ↔ (a : Ω) = ((b : curveRing y) : Ω) * v := fun a b v =>
+    IsLocalization.lift_mk'_spec hunit a v b
 
   choose α β hβ hαβ using hrat
   let ρ : (Σ k, ι k) → L := fun p => IsLocalization.mk' L (α p) (⟨β p, hβ p⟩ : m.primeCompl)
   have hφρ : ∀ p, φ (ρ p) = y p / y ⟨p.1, c p.1⟩ := fun p => (hφmk _ _ _).mpr (hαβ p).symm
-  have hφev : ∀ {g : MRing ι} {e : K → ℕ}, IsMultiHomog g e →
-      φ (aeval ρ g) = aeval y g * (∏ k, y ⟨k, c k⟩ ^ e k)⁻¹ := by
+  have hφev
+      : ∀ {g : MRing ι} {e : K → ℕ},
+        IsMultiHomog g e → φ (aeval ρ g) = aeval y g * (∏ k, y ⟨k, c k⟩ ^ e k)⁻¹ := by
     intro g e hg
-    rw [ringHom_aeval φ ρ g, show (fun p => φ (ρ p)) = fun p => y p / y ⟨p.1, c p.1⟩ from funext hφρ]
+    rw [ringHom_aeval φ ρ g,
+      show (fun p => φ (ρ p)) = fun p => y p / y ⟨p.1, c p.1⟩ from funext hφρ]
     exact CurveVerticalPointResidue.aeval_div y c g e hg
-  have hevB : ∀ {g : MRing ι} {e : K → ℕ} (x : curveRing y), IsMultiHomog g e →
-      aeval y g = (x : Ω) * ∏ k, y ⟨k, c k⟩ ^ e k → aeval ρ g = algebraMap _ L x := by
+  have hevB
+      : ∀ {g : MRing ι} {e : K → ℕ} (x : curveRing y),
+        IsMultiHomog g e → aeval y g = (x : Ω) * ∏ k, y ⟨k, c k⟩ ^ e k
+          → aeval ρ g = algebraMap _ L x := by
     intro g e x hg hgx
     apply hφinj
     rw [hφev hg, hφB, hgx, mul_assoc, mul_inv_cancel₀ (hYne e), mul_one]
 
   let r : (Σ k, ι k) → IsLocalRing.ResidueField L := fun p => IsLocalRing.residue L (ρ p)
-  have hWform : ∀ {g : MRing ι} {e : K → ℕ}, IsMultiHomog g e →
-      (g ∈ mCoordIdeal r ↔ aeval ρ g ∈ IsLocalRing.maximalIdeal L) := by
+  have hWform
+      : ∀ {g : MRing ι} {e : K → ℕ},
+        IsMultiHomog g e → (g ∈ mCoordIdeal r ↔ aeval ρ g ∈ IsLocalRing.maximalIdeal L) := by
     intro g e hg
     rw [mem_mCoordIdeal_iff r hg, ← IsLocalRing.residue_eq_zero_iff, ringHom_aeval]
-  have hWB : ∀ {g : MRing ι} {e : K → ℕ} (x : curveRing y), IsMultiHomog g e →
-      aeval y g = (x : Ω) * ∏ k, y ⟨k, c k⟩ ^ e k → (g ∈ mCoordIdeal r ↔ x ∈ m) := by
+  have hWB
+      : ∀ {g : MRing ι} {e : K → ℕ} (x : curveRing y),
+        IsMultiHomog g e → aeval y g = (x : Ω) * ∏ k, y ⟨k, c k⟩ ^ e k
+          → (g ∈ mCoordIdeal r ↔ x ∈ m) := by
     intro g e x hg hgx
     rw [hWform hg, hevB x hg hgx]
     exact IsLocalization.AtPrime.to_map_mem_maximal_iff L m x
@@ -127,11 +135,12 @@ theorem CurveVertPointSurj.proof (hFin : CurveRingFinite.Statement) (hC : CurveC
       obtain ⟨e, g, hg, hgx⟩ := exists_form y c hyc x
       have hgW : g ∈ mCoordIdeal r := (hWB x hg hgx).mpr hx
       have hXW : chartMon c e ∉ mCoordIdeal r := chartMon_notMem hWprime hXc e
-      have hval : (x : Ω) * aeval y (chartMon c e) = aeval y g := by
-        rw [aeval_chartMon, hgx]
-      have key : x ∈ {b : curveRing y | ∃ (d : K → ℕ) (g h : MRing ι),
-          IsMultiHomog g d ∧ IsMultiHomog h d ∧ g ∈ mCoordIdeal r ∧ h ∉ mCoordIdeal r ∧
-            (b : Ω) * aeval y h = aeval y g} :=
+      have hval : (x : Ω) * aeval y (chartMon c e) = aeval y g := by rw [aeval_chartMon, hgx]
+      have key
+          : x
+            ∈ {b : curveRing y | ∃ (d : K → ℕ) (g h : MRing ι),
+              IsMultiHomog g d ∧ IsMultiHomog h d ∧ g ∈ mCoordIdeal r ∧ h ∉ mCoordIdeal r ∧
+                (b : Ω) * aeval y h = aeval y g} :=
         ⟨e, g, chartMon c e, hg, homog_chartMon c e, hgW, hXW, hval⟩
       exact Ideal.subset_span key
   have ha0 : a ≠ 0 := by
@@ -145,9 +154,11 @@ theorem CurveVertPointSurj.proof (hFin : CurveRingFinite.Statement) (hC : CurveC
     have h2 := hbx
     rw [h0, ZeroMemClass.coe_zero, zero_mul] at h2
     exact mul_ne_zero hb0 hx0 h2
-  have hWfrac : ∀ {f : MRing ι} {n : K → ℕ}, IsMultiHomog f n → f ∈ mCoordIdeal r →
-      ∃ a' b' : curveRing y, a' ∈ m ∧ b' ∉ m ∧
-        (b' : Ω) * aeval y f = (a' : Ω) * ∏ k, y ⟨k, c k⟩ ^ n k := by
+  have hWfrac
+      : ∀ {f : MRing ι} {n : K → ℕ},
+        IsMultiHomog f n → f ∈ mCoordIdeal r
+          → ∃ a' b' : curveRing y,
+            a' ∈ m ∧ b' ∉ m ∧ (b' : Ω) * aeval y f = (a' : Ω) * ∏ k, y ⟨k, c k⟩ ^ n k := by
     intro f n hf hfW
     obtain ⟨⟨a', b'⟩, hab'⟩ := IsLocalization.mk'_surjective m.primeCompl (aeval ρ f)
     dsimp only at hab'
@@ -159,8 +170,9 @@ theorem CurveVertPointSurj.proof (hFin : CurveRingFinite.Statement) (hC : CurveC
       rw [← hab'] at h1
       rw [(hφmk a' b' _).mp h1, mul_assoc, inv_mul_cancel_right₀ (hYne n)]
 
-  have hmin : ∀ Q : Ideal (MRing ι), Q.IsPrime → mCoordIdeal y ⊔ Ideal.span {s} ≤ Q →
-      Q ≤ mCoordIdeal r → mCoordIdeal r ≤ Q := by
+  have hmin
+      : ∀ Q : Ideal (MRing ι),
+        Q.IsPrime → mCoordIdeal y ⊔ Ideal.span {s} ≤ Q → Q ≤ mCoordIdeal r → mCoordIdeal r ≤ Q := by
     intro Q hQ hJQ hQW
     have hPQ : mCoordIdeal y ≤ Q := le_trans le_sup_left hJQ
     have hsQ : s ∈ Q := hJQ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self s))

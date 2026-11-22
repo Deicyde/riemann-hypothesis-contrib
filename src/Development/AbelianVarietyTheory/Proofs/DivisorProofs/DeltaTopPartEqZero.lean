@@ -13,9 +13,11 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-theorem delta_topPart_eq_zero {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E)
-    (c : Finset ι → E) (k : ℕ) (hc : Dtot d c = 0) (hk : ∀ s, k < s.card → c s = 0) :
-    delta (fun s => if s.card = k then c s else 0) = 0 := by
+theorem delta_topPart_eq_zero
+    {ι : Type} [LinearOrder ι]
+    {E : Type} [AddCommGroup E]
+    (d : E →+ E) (c : Finset ι → E) (k : ℕ) (hc : Dtot d c = 0) (hk : ∀ s, k < s.card → c s = 0)
+    : delta (fun s => if s.card = k then c s else 0) = 0 := by
   funext t
   by_cases ht : t.card = k + 1
   · have h1 : delta c t = 0 := by
@@ -30,11 +32,21 @@ theorem delta_topPart_eq_zero {ι : Type} [LinearOrder ι] {E : Type} [AddCommGr
     have : (t.erase i).card ≠ k := by omega
     simp only [this, if_false, smul_zero]
 
-theorem hypZero_of_cechZero : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E) (T : ℕ → Finset ι → AddSubgroup E), (∀ x, d (d x) = 0) → (∀ q s t, s.Nonempty → s ⊆ t → T q s ≤ T q t) → (∀ q s x, x ∈ T q s → d x ∈ T (q + 1) s) → ∀ n, (∀ q b, q + b = n → CechZero (T q) b) → HypZero d T n := by
+theorem hypZero_of_cechZero
+    : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E)
+        (T : ℕ → Finset ι → AddSubgroup E),
+      (∀ x, d (d x) = 0) → (∀ q s t, s.Nonempty → s ⊆ t → T q s ≤ T q t)
+        → (∀ q s x, x ∈ T q s → d x ∈ T (q + 1) s)
+        → ∀ n, (∀ q b, q + b = n → CechZero (T q) b) → HypZero d T n := by
   intro ι _ E _ d T hdd hmono hdT n hC
-  obtain ⟨-, -, hadd, hsub, -, hDD⟩ := GlobalTheory.T.cech_and_total_differential_additive_square_zero (ι := ι) d
-  have key : ∀ k, k ≤ n + 1 → ∀ c, InTot T (n + 1) c → Dtot d c = 0 →
-      (∀ s, k < s.card → c s = 0) → ∃ y, InTot T n y ∧ Dtot d y = c := by
+  obtain ⟨-, -, hadd, hsub, -, hDD⟩ :=
+    GlobalTheory.T.cech_and_total_differential_additive_square_zero (ι := ι) d
+  have key
+      : ∀ k,
+        k ≤ n + 1
+          → ∀ c,
+            InTot T (n + 1) c → Dtot d c = 0 → (∀ s, k < s.card → c s = 0)
+              → ∃ y, InTot T n y ∧ Dtot d y = c := by
     intro k
     induction k with
     | zero =>
@@ -63,10 +75,11 @@ theorem hypZero_of_cechZero : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCo
         · obtain rfl : q' = q := by omega
           exact hy.2.1 s
         · rw [hy.2.2 s h]; exact (T q' s).zero_mem
-      have hDy : InTot T (n + 1) (Dtot d y) := (GlobalTheory.T.isTotalCochainOfDegree_succ_of_differentials d T hmono n y hyT).2 hdT
+      have hDy : InTot T (n + 1) (Dtot d y) :=
+        (GlobalTheory.T.isTotalCochainOfDegree_succ_of_differentials d T hmono n y hyT).2 hdT
       have h1 : InTot T (n + 1) (c - Dtot d y) := by
-        refine ⟨?_, fun q' s hs => (T q' s).sub_mem (hc.2.1 q' s hs) (hDy.2.1 q' s hs),
-          fun s hs => ?_⟩
+        refine
+          ⟨?_, fun q' s hs => (T q' s).sub_mem (hc.2.1 q' s hs) (hDy.2.1 q' s hs), fun s hs => ?_⟩
         · rw [Pi.sub_apply, hc.1, hDy.1, sub_zero]
         · rw [Pi.sub_apply, hc.2.2 s hs, hDy.2.2 s hs, sub_zero]
       have h2 : Dtot d (c - Dtot d y) = 0 := by rw [hsub, hD, hDD hdd, sub_zero]
@@ -77,8 +90,11 @@ theorem hypZero_of_cechZero : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCo
         · simp [Dtot, hyc, hys, h]
         · simp [Dtot, hyc, hys, h, h0 s (by omega)]
       obtain ⟨z, hz, hzc⟩ := ih (by omega) _ h1 h2 h3
-      refine ⟨z + y, ⟨?_, fun q' s hs => (T q' s).add_mem (hz.2.1 q' s hs) (hyT.2.1 q' s hs),
-        fun s hs => ?_⟩, ?_⟩
+      refine ⟨
+        z + y,
+        ⟨?_, fun q' s hs => (T q' s).add_mem (hz.2.1 q' s hs) (hyT.2.1 q' s hs), fun s hs => ?_⟩,
+        ?_
+      ⟩
       · rw [Pi.add_apply, hz.1, hyT.1, add_zero]
       · rw [Pi.add_apply, hz.2.2 s hs, hyT.2.2 s hs, add_zero]
       · rw [hadd, hzc, sub_add_cancel]

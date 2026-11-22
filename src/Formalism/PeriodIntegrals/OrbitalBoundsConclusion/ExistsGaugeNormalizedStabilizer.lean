@@ -6,4 +6,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CircleGaugeActio
 
 @[expose] public section
 
-theorem exists_gaugeNormalizedStabilizer : PI.ExistsGaugeMeasureForEachRank.ExistsGaugeMeasureForEachRank := fun r => ⟨PI.ExistsGaugeMeasureForEachRank.W.μG r, PI.ExistsGaugeMeasureForEachRank.W.gauge r⟩
+theorem exists_gaugeNormalizedStabilizer
+    : PI.ExistsGaugeMeasureForEachRank.ExistsGaugeMeasureForEachRank := fun r =>
+  ⟨PI.ExistsGaugeMeasureForEachRank.W.μG r, PI.ExistsGaugeMeasureForEachRank.W.gauge r⟩

@@ -8,12 +8,15 @@ open scoped ContDiff
 
 namespace GlobalTheory
 
-theorem charSeries_kill_finset {A I : Type} [AddCommGroup A] (e : I → A → ℂ) (c : I → ℂ) (i₀ : I)
-    (hmul : ∀ i a b, e i (a + b) = e i a * e i b) (hle : ∀ i a, ‖e i a‖ ≤ 1)
-    (h0 : ∀ a, e i₀ a = 1) (hneg : ∀ i, i ≠ i₀ → ∃ a, e i a = -1)
-    (hs : Summable (fun i => ‖c i‖)) (hF : ∀ a, ∑' i, c i * e i a = 0) (s : Finset I) :
-    ∃ c' : I → ℂ, c' i₀ = c i₀ ∧ (∀ i ∈ s, i ≠ i₀ → c' i = 0) ∧ (∀ i, ‖c' i‖ ≤ ‖c i‖) ∧
-      ∀ a, ∑' i, c' i * e i a = 0 := by
+theorem charSeries_kill_finset
+    {A I : Type} [AddCommGroup A]
+    (e : I → A → ℂ) (c : I → ℂ) (i₀ : I)
+    (hmul : ∀ i a b, e i (a + b) = e i a * e i b) (hle : ∀ i a, ‖e i a‖ ≤ 1) (h0 : ∀ a, e i₀ a = 1)
+    (hneg : ∀ i, i ≠ i₀ → ∃ a, e i a = -1) (hs : Summable (fun i => ‖c i‖))
+    (hF : ∀ a, ∑' i, c i * e i a = 0) (s : Finset I)
+    : ∃ c' : I → ℂ,
+      c' i₀ = c i₀ ∧ (∀ i ∈ s, i ≠ i₀ → c' i = 0) ∧ (∀ i, ‖c' i‖ ≤ ‖c i‖)
+        ∧ ∀ a, ∑' i, c' i * e i a = 0 := by
   classical
   refine Finset.induction_on s ⟨c, rfl, by simp, fun i => le_rfl, hF⟩ ?_
   intro j s _ ih
@@ -28,7 +31,8 @@ theorem charSeries_kill_finset {A I : Type} [AddCommGroup A] (e : I → A → �
   · obtain ⟨b, hb⟩ := hneg j hji
     refine ⟨fun i => c' i * (1 + e i b) / 2, ?_, ?_, ?_, ?_⟩
     · show c' i₀ * (1 + e i₀ b) / 2 = c i₀
-      rw [h0 b, h1]; ring
+      rw [h0 b, h1]
+      ring
     · intro i hi hne
       show c' i * (1 + e i b) / 2 = 0
       rcases Finset.mem_insert.1 hi with rfl | hi
@@ -39,7 +43,9 @@ theorem charSeries_kill_finset {A I : Type} [AddCommGroup A] (e : I → A → �
       have h2b : ‖(1 : ℂ) + e i b‖ ≤ 2 :=
         (norm_add_le _ _).trans (by rw [norm_one]; linarith [hle i b])
       rw [norm_div, norm_mul, show ‖(2 : ℂ)‖ = 2 by simp]
-      calc ‖c' i‖ * ‖1 + e i b‖ / 2 ≤ ‖c' i‖ * 2 / 2 := by gcongr
+      calc
+        ‖c' i‖ * ‖1 + e i b‖ / 2
+          ≤ ‖c' i‖ * 2 / 2 := by gcongr
         _ = ‖c' i‖ := by ring
         _ ≤ ‖c i‖ := h3 i
     · intro a
@@ -54,7 +60,11 @@ theorem charSeries_kill_finset {A I : Type} [AddCommGroup A] (e : I → A → �
       rw [tsum_div_const, (hsum a).tsum_add (hsum (b + a)), h4 a, h4 (b + a)]
       simp
 
-theorem charSeries_exists_ne_zero : ∀ (A I : Type) [AddCommGroup A] (e : I → A → ℂ) (c : I → ℂ) (i₀ : I), (∀ i a b, e i (a + b) = e i a * e i b) → (∀ i a, ‖e i a‖ ≤ 1) → (∀ a, e i₀ a = 1) → (∀ i, i ≠ i₀ → ∃ a, e i a = -1) → Summable (fun i => ‖c i‖) → c i₀ ≠ 0 → ∃ a, ∑' i, c i * e i a ≠ 0 := by
+theorem charSeries_exists_ne_zero
+    : ∀ (A I : Type) [AddCommGroup A] (e : I → A → ℂ) (c : I → ℂ) (i₀ : I),
+      (∀ i a b, e i (a + b) = e i a * e i b) → (∀ i a, ‖e i a‖ ≤ 1) → (∀ a, e i₀ a = 1)
+        → (∀ i, i ≠ i₀ → ∃ a, e i a = -1) → Summable (fun i => ‖c i‖) → c i₀ ≠ 0
+        → ∃ a, ∑' i, c i * e i a ≠ 0 := by
   intro A I _ e c i₀ hmul hle h0 hneg hs hc
   by_contra hcon
   push Not at hcon
@@ -67,13 +77,12 @@ theorem charSeries_exists_ne_zero : ∀ (A I : Type) [AddCommGroup A] (e : I →
       rw [add_zero, ha] at h
       linear_combination h
   have hpos : 0 < ‖c i₀‖ := norm_pos_iff.2 hc
-  obtain ⟨s, hs1, hs2⟩ := (((tendsto_order.1
-    (tendsto_tsum_compl_atTop_zero (fun i => ‖c i‖))).2 _ hpos).and
-    (Filter.eventually_ge_atTop {i₀})).exists
+  obtain ⟨s, hs1, hs2⟩ :=
+    (((tendsto_order.1 (tendsto_tsum_compl_atTop_zero (fun i => ‖c i‖))).2 _ hpos).and
+      (Filter.eventually_ge_atTop {i₀})).exists
   have htail : ∑' x : {x // x ∉ s}, ‖c x‖ < ‖c i₀‖ := hs1
   have hi0 : i₀ ∈ s := hs2 (Finset.mem_singleton_self i₀)
-  obtain ⟨c', hc'0, hc's, hc'le, hc'F⟩ :=
-    charSeries_kill_finset e c i₀ hmul hle h0 hneg hs hcon s
+  obtain ⟨c', hc'0, hc's, hc'le, hc'F⟩ := charSeries_kill_finset e c i₀ hmul hle h0 hneg hs hcon s
   have hsum' : Summable c' := Summable.of_norm_bounded hs hc'le
   have key := hc'F 0
   simp only [he0, mul_one] at key

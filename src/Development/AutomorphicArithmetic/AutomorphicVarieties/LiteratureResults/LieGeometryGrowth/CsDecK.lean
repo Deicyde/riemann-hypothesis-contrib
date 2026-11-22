@@ -9,12 +9,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 open scoped Topology
 open UpperTheory.V.Lit.Geo
 
-theorem UpperTheory.V.Lit.Geo.Cs.decK :
-    UpperTheory.V.Lit.Geo.Cs.DecK := by
+theorem UpperTheory.V.Lit.Geo.Cs.decK : UpperTheory.V.Lit.Geo.Cs.DecK := by
   intro E _ _ _ a ho U Ξ f Y C c f₀ hS W hW lam hl q k A B hA hB
   obtain ⟨hfl, hflow⟩ := fieldFlow E a ho U Ξ Y C hS.fld W hW
   obtain ⟨z, hz⟩ := zwSz E a U Y C hS.fld W hW (k + 1)
@@ -25,8 +25,12 @@ theorem UpperTheory.V.Lit.Geo.Cs.decK :
   obtain ⟨hfield, hfz, hq⟩ := twOps E a ho U Ξ W hfl g x
   have hsm := ((hq (q + 1)).1 w).1
   have heq := (hq q).2 w
-  have key : ∀ t ∈ Set.Icc (0 : ℝ) 1, Sz k (Tw U Ξ w.1 g x) (flow (Zw U W g x) t (hOne E a))
-      (D₁ * (M * (Real.exp (B * L + A * C) * Real.exp (B * |lam (pt g x)| - A * f (pt g x))))) := by
+  have key
+      : ∀ t ∈ Set.Icc (0 : ℝ) 1,
+        Sz k (Tw U Ξ w.1 g x) (flow (Zw U W g x) t (hOne E a))
+          (D₁
+            * (M
+              * (Real.exp (B * L + A * C) * Real.exp (B * |lam (pt g x)| - A * f (pt g x))))) := by
     intro t ht
     have ht' : |t| ≤ 1 := abs_le.2 ⟨by linarith [ht.1], ht.2⟩
     obtain ⟨h, hh, h1, h2⟩ := hS.root (pt g x) t ht'
@@ -43,7 +47,9 @@ theorem UpperTheory.V.Lit.Geo.Cs.decK :
     have b2 := mul_le_mul_of_nonneg_left b1 hB
     have b3 := mul_le_mul_of_nonneg_left hn.1 hA
     linarith
-  have main := hhom (cone E a) (Zw U W g x) (Tw U Ξ w.1 g x) _ ho hfield hsm (hOne E a) hOne_mem_cone (hz g x) key
+  have main :=
+    hhom (cone E a) (Zw U W g x) (Tw U Ξ w.1 g x) _ ho hfield hsm (hOne E a) hOne_mem_cone (hz g x)
+      key
   refine (main.congr ?_).mono (le_of_eq (by ring))
   filter_upwards [ho.mem_nhds hOne_mem_cone] with p hp
   exact (heq p hp).symm

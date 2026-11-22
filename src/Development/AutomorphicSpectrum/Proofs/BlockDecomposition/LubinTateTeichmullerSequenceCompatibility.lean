@@ -10,8 +10,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormSubL
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 open GlobalTheory.CompanionTheory.LTPer.Tilt
 
@@ -22,10 +25,13 @@ variable {l : ℕ} [Fact l.Prime]
 theorem continuous_omC : Continuous (omC (l := l)) :=
   (AddMonoidHomClass.isometry_of_norm (omC (l := l)) norm_omC).continuous
 
-theorem tail_le (K : FinExt l) (c : ℕ → ↥(OL K)) (y x : Om l) (hy : ‖omC y‖ ≤ 1)
-    (hs : HasSum (fun k : ℕ => ((c k : ↥K.1) : Om l) * y ^ k) x) (D : ℕ) :
-    ‖omC x - ∑ i ∈ Finset.range D, oc K (c i) * omC y ^ i‖ ≤ ‖omC y‖ ^ D := by
-  have ht : Filter.Tendsto (fun N => ∑ i ∈ Finset.range N, oc K (c i) * omC y ^ i)
+theorem tail_le
+    (K : FinExt l) (c : ℕ → ↥(OL K))
+    (y x : Om l) (hy : ‖omC y‖ ≤ 1) (hs : HasSum (fun k : ℕ => ((c k : ↥K.1) : Om l) * y ^ k) x)
+    (D : ℕ)
+    : ‖omC x - ∑ i ∈ Finset.range D, oc K (c i) * omC y ^ i‖ ≤ ‖omC y‖ ^ D := by
+  have ht : Filter.Tendsto
+      (fun N => ∑ i ∈ Finset.range N, oc K (c i) * omC y ^ i)
       Filter.atTop (nhds (omC x)) := by
     have h1 := (continuous_omC (l := l)).continuousAt.tendsto.comp hs.tendsto_sum_nat
     refine h1.congr fun N => ?_
@@ -41,14 +47,15 @@ theorem tail_le (K : FinExt l) (c : ℕ → ↥(OL K)) (y x : Om l) (hy : ‖omC
   exact (mul_le_of_le_one_left (by positivity) (norm_oc_le_one K _)).trans
     (pow_le_pow_of_le_one (norm_nonneg _) hy (Finset.mem_Ico.1 hk).1)
 
-theorem norm_read {ρ : ℝ} (hρ : ‖(l : ℂ_[l])‖ ≤ ρ) (a y : Tl l) (b : ℕ → Tl l)
-    (A Y : ℂ_[l]) (B : ℕ → ℂ_[l]) (D : ℕ) (hY : ‖Y‖ ≤ 1) (hA : ‖sh a - A‖ ≤ ρ)
-    (hy : ‖sh y - Y‖ ≤ ρ) (hb : ∀ i, ‖sh (b i) - B i‖ ≤ ρ) :
-    ‖a - ∑ i ∈ Finset.range D, b i * y ^ i‖ ≤
-      max ρ ‖A - ∑ i ∈ Finset.range D, B i * Y ^ i‖ := by
+theorem norm_read
+    {ρ : ℝ} (hρ : ‖(l : ℂ_[l])‖ ≤ ρ)
+    (a y : Tl l) (b : ℕ → Tl l) (A Y : ℂ_[l]) (B : ℕ → ℂ_[l])
+    (D : ℕ) (hY : ‖Y‖ ≤ 1) (hA : ‖sh a - A‖ ≤ ρ) (hy : ‖sh y - Y‖ ≤ ρ)
+    (hb : ∀ i, ‖sh (b i) - B i‖ ≤ ρ)
+    : ‖a - ∑ i ∈ Finset.range D, b i * y ^ i‖ ≤ max ρ ‖A - ∑ i ∈ Finset.range D, B i * Y ^ i‖ := by
   have h1 : ‖sh (∑ i ∈ Finset.range D, b i * y ^ i) - ∑ i ∈ Finset.range D, B i * Y ^ i‖ ≤ ρ :=
-    near_sum hρ _ fun i _ => near_mul (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hY)
-      (hb i) (near_pow hρ hY hy i)
+    near_sum hρ _ fun i _ =>
+      near_mul (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hY) (hb i) (near_pow hρ hY hy i)
   have h2 := near_sub hρ hA h1
   rw [norm_eq_norm_sh]
   set x := a - ∑ i ∈ Finset.range D, b i * y ^ i
@@ -57,27 +64,26 @@ theorem norm_read {ρ : ℝ} (hρ : ‖(l : ℂ_[l])‖ ≤ ρ) (a y : Tl l) (b 
   rw [e]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le_max h2 le_rfl)
 
-theorem pow_read (N : ℕ) (a y : Tl l) (b : ℕ → Tl l) (D : ℕ) :
-    (a - ∑ i ∈ Finset.range D, b i * y ^ i) ^ l ^ N =
-      a ^ l ^ N - ∑ i ∈ Finset.range D, b i ^ l ^ N * (y ^ l ^ N) ^ i := by
+theorem pow_read (N : ℕ) (a y : Tl l) (b : ℕ → Tl l) (D : ℕ)
+    : (a - ∑ i ∈ Finset.range D, b i * y ^ i) ^ l ^ N
+      = a ^ l ^ N - ∑ i ∈ Finset.range D, b i ^ l ^ N * (y ^ l ^ N) ^ i := by
   rw [sub_pow_char_pow, sum_pow_char_pow]
   refine congrArg _ (Finset.sum_congr rfl fun i _ => ?_)
   rw [mul_pow, ← pow_mul, ← pow_mul, mul_comm i]
 
-theorem pow_compat {f : ℕ} {u : ℕ → Tl l} (hu : ∀ n, u (n + 1) ^ l ^ f = u n) (n m : ℕ) :
-    u (n + m) ^ l ^ (f * m) = u n := by
+theorem pow_compat {f : ℕ} {u : ℕ → Tl l} (hu : ∀ n, u (n + 1) ^ l ^ f = u n) (n m : ℕ)
+    : u (n + m) ^ l ^ (f * m) = u n := by
   induction m with
   | zero => simp
-  | succ m ih =>
-    rw [← add_assoc, mul_add, mul_one, add_comm (f * m) f, pow_add, pow_mul, hu, ih]
+  | succ m ih => rw [← add_assoc, mul_add, mul_one, add_comm (f * m) f, pow_add, pow_mul, hu, ih]
 
 theorem pow_fixed {f : ℕ} {x : Tl l} (hx : x ^ l ^ f = x) (m : ℕ) : x ^ l ^ (f * m) = x := by
   induction m with
   | zero => simp
   | succ m ih => rw [mul_add, mul_one, add_comm (f * m) f, pow_add, pow_mul, hx, ih]
 
-theorem exists_pow_le {f : ℕ} (hf : 0 < f) {ρ ε : ℝ} (h0 : 0 ≤ ρ) (h1 : ρ < 1) (hε : 0 < ε) :
-    ∃ m, 2 ≤ m ∧ ρ ^ l ^ (f * m) ≤ ε := by
+theorem exists_pow_le {f : ℕ} (hf : 0 < f) {ρ ε : ℝ} (h0 : 0 ≤ ρ) (h1 : ρ < 1) (hε : 0 < ε)
+    : ∃ m, 2 ≤ m ∧ ρ ^ l ^ (f * m) ≤ ε := by
   obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one hε h1
   refine ⟨N + 2, by omega, (pow_le_pow_of_le_one h0 h1.le ?_).trans hN.le⟩
   have h2 : N + 2 < l ^ (N + 2) := Nat.lt_pow_self (Fact.out : l.Prime).one_lt
@@ -85,14 +91,18 @@ theorem exists_pow_le {f : ℕ} (hf : 0 < f) {ρ ε : ℝ} (h0 : 0 ≤ ρ) (h1 :
     Nat.pow_le_pow_right (Fact.out : l.Prime).pos (Nat.le_mul_of_pos_left _ hf)
   omega
 
-theorem galdiv : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)) (z : ℕ → Om l) (f : ℕ), 0 < f →
-    ‖(l : ℂ_[l])‖ ≤ ‖oc K π‖ → ‖oc K π‖ < 1 →
-    (∀ n, ‖omC (z n)‖ < 1) → (∀ n, 2 ≤ n → ‖oc K π‖ < ‖omC (z n)‖) →
-    ∀ (u : ℕ → Tl l), (∀ n, u (n + 1) ^ l ^ f = u n) → (∀ n, ‖sh (u n) - omC (z n)‖ ≤ ‖oc K π‖) →
-    ∀ (r₀ : ↥(OL K) →+* Tl l), (∀ c, r₀ c ^ l ^ f = r₀ c) → (∀ c, ‖sh (r₀ c) - oc K c‖ ≤ ‖oc K π‖) →
-    (∀ n, u n ≠ 0) → ∀ (g : GQ l) (c : ℕ → ↥(OL K)),
-    (∀ n, HasSum (fun k : ℕ => ((c k : ↥K.1) : Om l) * z n ^ k) (g (z n))) → ∀ n D : ℕ,
-    u n ^ D ∣ actT g (u n) - ∑ i ∈ Finset.range D, r₀ (c i) * u n ^ i := by
+theorem galdiv
+    : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)) (z : ℕ → Om l) (f : ℕ),
+      0 < f → ‖(l : ℂ_[l])‖ ≤ ‖oc K π‖ → ‖oc K π‖ < 1 → (∀ n, ‖omC (z n)‖ < 1)
+        → (∀ n, 2 ≤ n → ‖oc K π‖ < ‖omC (z n)‖)
+        → ∀ (u : ℕ → Tl l),
+          (∀ n, u (n + 1) ^ l ^ f = u n) → (∀ n, ‖sh (u n) - omC (z n)‖ ≤ ‖oc K π‖)
+            → ∀ (r₀ : ↥(OL K) →+* Tl l),
+              (∀ c, r₀ c ^ l ^ f = r₀ c) → (∀ c, ‖sh (r₀ c) - oc K c‖ ≤ ‖oc K π‖) → (∀ n, u n ≠ 0)
+                → ∀ (g : GQ l) (c : ℕ → ↥(OL K)),
+                  (∀ n, HasSum (fun k : ℕ => ((c k : ↥K.1) : Om l) * z n ^ k) (g (z n)))
+                    → ∀ n D : ℕ,
+                      u n ^ D ∣ actT g (u n) - ∑ i ∈ Finset.range D, r₀ (c i) * u n ^ i := by
   intro l _ K π z f hf hl hπ hz1 hz2 u hu hun r₀ hr hrn hu0 g c hs n D
   rw [GroundTheory.PAdicHodge.preTilt_dvd_iff_norm_le, norm_pow]
   set ρ := ‖oc K π‖ with hρdef
@@ -116,8 +126,13 @@ theorem galdiv : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)) (z
   have hA : ‖sh (actT g (u k)) - omC (g (z k))‖ ≤ ρ := by
     rw [sh_actT, ← galCp_omC, ← map_sub, norm_galCp]
     exact hun k
-  have hread := norm_read hl (actT g (u k)) (u k) (fun i => r₀ (c i)) (omC (g (z k))) (omC (z k))
-    (fun i => oc K (c i)) D hzk hA (hun k) (fun i => hrn _)
+  have hread :=
+    norm_read hl (actT g (u k)) (u k)
+      (fun i => r₀ (c i))
+      (omC (g (z k))) (omC (z k))
+      (fun i => oc K (c i))
+      D hzk hA (hun k)
+      (fun i => hrn _)
   have htail := tail_le K c (z k) (g (z k)) hzk (hs k) D
   have hx : ‖actT g (u k) - ∑ i ∈ Finset.range D, r₀ (c i) * u k ^ i‖ ≤ max ρ (‖u k‖ ^ D) :=
     hread.trans (max_le_max le_rfl (htail.trans (pow_le_pow_left₀ (norm_nonneg _) hnorm D)))

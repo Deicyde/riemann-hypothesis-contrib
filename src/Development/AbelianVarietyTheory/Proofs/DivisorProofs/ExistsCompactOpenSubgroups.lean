@@ -9,17 +9,20 @@ open NumberField IsDedekindDomain Filter Topology
 
 namespace GlobalTheory.FinAdeleNbhd
 
-theorem exists_prod_openCompact_subset :
-    ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (V : Set (κ → FiniteAdeleRing (𝓞 F) F)),
-    V ∈ 𝓝 (0 : κ → FiniteAdeleRing (𝓞 F) F) →
-    ∃ N : ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), AddSubgroup (v.adicCompletion F),
-      (∀ v, IsOpen (N v : Set (v.adicCompletion F))) ∧ (∀ v, IsCompact (N v : Set (v.adicCompletion F))) ∧
-      (∀ᶠ v in Filter.cofinite, (N v : Set (v.adicCompletion F)) = v.adicCompletionIntegers F) ∧
-      {y : κ → FiniteAdeleRing (𝓞 F) F | ∀ i v, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v (y i) ∈ N v} ∈ 𝓝 (0 : κ → FiniteAdeleRing (𝓞 F) F) ∧
-      {y : κ → FiniteAdeleRing (𝓞 F) F | ∀ i v, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v (y i) ∈ N v} ⊆ V := by
+theorem exists_prod_openCompact_subset
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
+        (V : Set (κ → FiniteAdeleRing (𝓞 F) F)),
+      V ∈ 𝓝 (0 : κ → FiniteAdeleRing (𝓞 F) F)
+        → ∃ N : ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), AddSubgroup (v.adicCompletion F),
+          (∀ v, IsOpen (N v : Set (v.adicCompletion F)))
+            ∧ (∀ v, IsCompact (N v : Set (v.adicCompletion F)))
+            ∧ (∀ᶠ v in Filter.cofinite, (N v : Set (v.adicCompletion F)) = v.adicCompletionIntegers F)
+            ∧ {y : κ → FiniteAdeleRing (𝓞 F) F | ∀ i v, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v (y i) ∈ N v}
+              ∈ 𝓝 (0 : κ → FiniteAdeleRing (𝓞 F) F)
+            ∧ {y : κ → FiniteAdeleRing (𝓞 F) F | ∀ i v, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v (y i) ∈ N v}
+              ⊆ V := by
   intro F _ _ κ _ V hV
   classical
-
   rw [nhds_pi, Filter.mem_pi'] at hV
   obtain ⟨J, s, hs, hJs⟩ := hV
   set W : Set (FiniteAdeleRing (𝓞 F) F) := ⋂ i, s i with hWdef
@@ -47,7 +50,8 @@ theorem exists_prod_openCompact_subset :
   have hOset : ∀ v, ((O v : AddSubgroup (R v)) : Set (R v)) = A v := fun v => rfl
   have hOopen : ∀ v, IsOpen (A v) := fun v => Valued.isOpen_valuationSubring _
   have hOcpt : ∀ v, IsCompact (A v) := fun v =>
-    isCompact_iff_compactSpace.2 (GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers F v)
+    isCompact_iff_compactSpace.2 (GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers
+      F v)
   let N : ∀ v, AddSubgroup (R v) := fun v => if v ∈ I then (G v).toAddSubgroup ⊓ O v else O v
   have hNO : ∀ v, ∀ x ∈ N v, x ∈ A v := by
     intro v x hx
@@ -56,7 +60,8 @@ theorem exists_prod_openCompact_subset :
     · simp only [N, hv, if_false] at hx; exact hx
   have hNG : ∀ v ∈ I, ∀ x ∈ N v, x ∈ (G v : Set (R v)) := by
     intro v hv x hx
-    simp only [N, hv, if_true] at hx; exact hx.1
+    simp only [N, hv, if_true] at hx
+    exact hx.1
   have hNopen : ∀ v, IsOpen (N v : Set (R v)) := by
     intro v
     by_cases hv : v ∈ I
@@ -71,10 +76,13 @@ theorem exists_prod_openCompact_subset :
     · simp only [N, hv, if_false]; exact hOcpt v
   refine ⟨N, hNopen, hNcpt, ?_, ?_, ?_⟩
   · filter_upwards [I.eventually_cofinite_notMem] with v hv
-    simp only [N, hv, if_false]; rfl
-  ·
-    let P : Set (FiniteAdeleRing (𝓞 F) F) := {a | ∀ v, a v ∈ N v}
-    have hPeq : P = {a : FiniteAdeleRing (𝓞 F) F | ∀ v, v ∉ I → a v ∈ A v} ∩ ⋂ v ∈ I, (fun a : FiniteAdeleRing (𝓞 F) F => a v) ⁻¹' (N v : Set (R v)) := by
+    simp only [N, hv, if_false]
+    rfl
+  · let P : Set (FiniteAdeleRing (𝓞 F) F) := {a | ∀ v, a v ∈ N v}
+    have hPeq
+        : P
+          = {a : FiniteAdeleRing (𝓞 F) F | ∀ v, v ∉ I → a v ∈ A v}
+            ∩ ⋂ v ∈ I, (fun a : FiniteAdeleRing (𝓞 F) F => a v) ⁻¹' (N v : Set (R v)) := by
       ext a
       simp only [P, Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage]
       constructor
@@ -83,19 +91,20 @@ theorem exists_prod_openCompact_subset :
         by_cases hv : v ∈ I
         · exact h2 v hv
         · have := h1 v hv
-          simp only [N, hv, if_false]; exact this
+          simp only [N, hv, if_false]
+          exact this
     have hPopen : IsOpen P := by
       rw [hPeq]
       refine IsOpen.inter (RestrictedProduct.isOpen_forall_imp_mem hOopen) ?_
-      exact isOpen_biInter_finset fun v _ => (hNopen v).preimage (RestrictedProduct.continuous_eval v)
+      exact isOpen_biInter_finset fun v _ =>
+        (hNopen v).preimage (RestrictedProduct.continuous_eval v)
     have hP0 : (0 : FiniteAdeleRing (𝓞 F) F) ∈ P := fun v => (N v).zero_mem
     have : (Set.univ : Set κ).pi (fun _ => P) ∈ 𝓝 (0 : κ → FiniteAdeleRing (𝓞 F) F) :=
       set_pi_mem_nhds Set.finite_univ fun i _ => hPopen.mem_nhds hP0
     refine Filter.mem_of_superset this ?_
     intro y hy i v
     exact hy i (Set.mem_univ i) v
-  ·
-    intro y hy
+  · intro y hy
     apply hWV
     intro i
     have hyi : ∀ v, (y i) v ∈ N v := fun v => hy i v

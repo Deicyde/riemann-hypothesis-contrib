@@ -78,22 +78,23 @@ lemma zero_of_H {X Y : DerivedCategory C} (n : ℤ) [X.IsLE n] [Y.IsGE n] (φ : 
 end LateralTheory.E.LeafTruncPf
 
 open LateralTheory.E.LeafTruncPf in
-theorem LateralTheory.E.LeafGhostRelCut.LeafTrunc_of : LateralTheory.E.LeafGhostRelCut.LeafTrunc := by
+theorem LateralTheory.E.LeafGhostRelCut.LeafTrunc_of
+    : LateralTheory.E.LeafGhostRelCut.LeafTrunc := by
   intro A _ _ _ K0 K1 K2 L f g ℓ hK0 hf hg hK2 hL hℓ
   have : K0.IsLE 2 := (DerivedCategory.isLE_iff K0 2).2 hK0
   have : K2.IsGE 0 := (DerivedCategory.isGE_iff K2 0).2 hK2
   have : L.IsLE 0 := (DerivedCategory.isLE_iff L 0).2 (fun i hi => hL i (by lia))
-  have : DerivedCategory.TStructure.t.IsLE
-      ((DerivedCategory.TStructure.t.truncLT 2).obj K1) 1 :=
+  have : DerivedCategory.TStructure.t.IsLE ((DerivedCategory.TStructure.t.truncLT 2).obj K1) 1 :=
     DerivedCategory.TStructure.t.isLE_truncLT_obj _ _ _
-  have hP : DerivedCategory.TStructure.t.IsLE
-      ((DerivedCategory.TStructure.t.truncLT 1).obj K2) 0 :=
+  have hP : DerivedCategory.TStructure.t.IsLE ((DerivedCategory.TStructure.t.truncLT 1).obj K2) 0 :=
     DerivedCategory.TStructure.t.isLE_truncLT_obj _ _ _
   have e1 : f ≫ (DerivedCategory.TStructure.t.truncGEπ 2).app K1 = 0 :=
     zero_of_H 2 _ (by simp [Functor.map_comp, hf])
   obtain ⟨f', hf'⟩ := lift_LT 2 f e1
-  have e2 : ((DerivedCategory.TStructure.t.truncLTι 2).app K1 ≫ g) ≫
-      (DerivedCategory.TStructure.t.truncGEπ 1).app K2 = 0 :=
+  have e2
+      : ((DerivedCategory.TStructure.t.truncLTι 2).app K1 ≫ g)
+          ≫ (DerivedCategory.TStructure.t.truncGEπ 1).app K2
+        = 0 :=
     zero_of_H 1 _ (by simp [Functor.map_comp, hg])
   obtain ⟨w, hw⟩ := lift_LT 1 _ e2
   have e3 : ℓ ≫ (DerivedCategory.TStructure.t.truncGEπ 1).app K2 = 0 :=
@@ -105,17 +106,19 @@ theorem LateralTheory.E.LeafGhostRelCut.LeafTrunc_of : LateralTheory.E.LeafGhost
     rcases eq_or_ne m 0 with rfl | hm
     · have hm0 := mono_H_ι K2 0
       rw [zero_add] at hm0
-      have hc : IsIso ((DerivedCategory.homologyFunctor A 0).map ℓ' ≫
-          (DerivedCategory.homologyFunctor A 0).map
+      have hc : IsIso
+          ((DerivedCategory.homologyFunctor A 0).map ℓ' ≫ (DerivedCategory.homologyFunctor A 0).map
             ((DerivedCategory.TStructure.t.truncLTι 1).app K2)) := by
         rw [← Functor.map_comp, ← hℓ']; exact hℓ
       have : Epi ((DerivedCategory.homologyFunctor A 0).map
           ((DerivedCategory.TStructure.t.truncLTι 1).app K2)) :=
         epi_of_epi ((DerivedCategory.homologyFunctor A 0).map ℓ') _
       have : IsIso ((DerivedCategory.homologyFunctor A 0).map
-          ((DerivedCategory.TStructure.t.truncLTι 1).app K2)) := isIso_of_mono_of_epi _
-      exact IsIso.of_isIso_comp_right _ ((DerivedCategory.homologyFunctor A 0).map
-        ((DerivedCategory.TStructure.t.truncLTι 1).app K2))
+          ((DerivedCategory.TStructure.t.truncLTι 1).app K2)) :=
+        isIso_of_mono_of_epi _
+      exact IsIso.of_isIso_comp_right _
+        ((DerivedCategory.homologyFunctor A 0).map
+          ((DerivedCategory.TStructure.t.truncLTι 1).app K2))
     · have hZ : IsZero ((DerivedCategory.homologyFunctor A m).obj
           ((DerivedCategory.TStructure.t.truncLT 1).obj K2)) := by
         rcases lt_or_gt_of_ne hm with h | h

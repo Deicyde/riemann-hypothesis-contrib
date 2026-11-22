@@ -9,15 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.MaximalIde
 
 set_option autoImplicit false
 noncomputable section
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
 namespace GlobalTheory.PlaceInt.MatAct
 
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (maximalIdeal V) V] [CharZero V]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+  [IsAdicComplete (maximalIdeal V) V] [CharZero V]
   {d : ℕ} {O : Type} [CommRing O] [StarRing O]
 
 def Sm {m : ℕ} (x : Pt V m d) : Prop := ∀ i, MvPowerSeries.constantCoeff (x i) ∈ maximalIdeal V
@@ -27,7 +32,8 @@ lemma sm_zero {m : ℕ} : Sm (0 : Pt V m d) := by
   intro i
   simp
 
-@[ext] structure SP (B : FB V d O) (m : ℕ) where
+@[ext]
+structure SP (B : FB V d O) (m : ℕ) where
   val : Pt V m d
   sm : Sm val
 
@@ -35,10 +41,17 @@ variable (B : FB V d O) {m : ℕ}
 
 instance : Zero (SP B m) := ⟨⟨0, sm_zero⟩⟩
 instance : Add (SP B m) :=
-  ⟨fun x y => ⟨addV B.G.F x.val y.val, (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val x.val x.sm y.sm x.sm).1⟩⟩
+  ⟨fun x y => ⟨
+    addV B.G.F x.val y.val,
+    (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val x.val x.sm y.sm
+      x.sm).1
+  ⟩⟩
 instance : SMul O (SP B m) :=
-  ⟨fun a x => ⟨compV (B.A.act a) x.val,
-    ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm x.sm x.sm).2.2.2.2.2.2.2 a a).1⟩⟩
+  ⟨fun a x => ⟨
+    compV (B.A.act a) x.val,
+    ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm x.sm
+      x.sm).2.2.2.2.2.2.2 a a).1
+  ⟩⟩
 
 lemma add_comm' (x y : SP B m) : x + y = y + x :=
   SP.ext (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val x.val x.sm y.sm x.sm).2.1
@@ -46,7 +59,9 @@ lemma add_zero' (x : SP B m) : x + 0 = x :=
   SP.ext (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm x.sm x.sm).2.2.2.1
 
 instance : AddCommMonoid (SP B m) where
-  add_assoc x y z := SP.ext (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val z.val x.sm y.sm z.sm).2.2.1
+  add_assoc x y z :=
+    SP.ext (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val z.val x.sm
+      y.sm z.sm).2.2.1
   add_comm := add_comm' B
   add_zero := add_zero' B
   zero_add x := by rw [add_comm', add_zero']
@@ -58,14 +73,20 @@ lemma mul_smul' (a b : O) (x : SP B m) : (a * b) • x = a • b • x :=
   SP.ext ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm x.sm x.sm).2.2.2.2.2.2.2 a b).2.2.2
 
 instance : Module O (SP B m) where
-  one_smul x := SP.ext (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm x.sm x.sm).2.2.2.2.2.1
+  one_smul x :=
+    SP.ext (GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm
+      x.sm x.sm).2.2.2.2.2.1
   mul_smul := mul_smul' B
   smul_zero a := by
     have h := mul_smul' B a 0 (0 : SP B m)
     rw [mul_zero, zero_smul'] at h
     exact h.symm
-  smul_add a x y := SP.ext ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val x.val x.sm y.sm x.sm).2.2.2.2.2.2.2 a a).2.1
-  add_smul a b x := SP.ext ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm x.sm x.sm).2.2.2.2.2.2.2 a b).2.2.1
+  smul_add a x y :=
+    SP.ext ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val y.val x.val x.sm
+      y.sm x.sm).2.2.2.2.2.2.2 a a).2.1
+  add_smul a b x :=
+    SP.ext ((GlobalTheory.T.maximal_ideal_formal_points_form_module V d O B m x.val x.val x.val x.sm
+      x.sm x.sm).2.2.2.2.2.2.2 a b).2.2.1
   zero_smul := zero_smul' B
 
 lemma foldr_val (l : List (SP B m)) : (l.map SP.val).foldr (addV B.G.F) 0 = l.sum.val := by
@@ -108,7 +129,6 @@ lemma evV_const {n : ℕ} (x : Fin n → Pt V m d) (hx : ∀ b i, MvPowerSeries.
   rw [h]
   exact MvPowerSeries.constantCoeff_subst_eq_zero (MvPowerSeries.hasSubst_of_constantCoeff_zero ha) ha hf
 
-
 variable (B) in
 def evL {n : ℕ} (x : Fin n → Pt V m d) (hx : ∀ b, Sm (x b)) : SP B n →ₗ[O] SP B m where
   toFun a := ⟨fun i => evV x (a.val i), fun i => evV_sm x hx _ (a.sm i)⟩
@@ -129,7 +149,8 @@ def evL {n : ℕ} (x : Fin n → Pt V m d) (hx : ∀ b, Sm (x b)) : SP B n →�
     rw [evV_comp _ _ _ hx]
     · congr 1
       funext k
-      fin_cases k; rfl
+      fin_cases k
+      rfl
     · intro k
       fin_cases k
       exact a.sm
@@ -200,14 +221,38 @@ lemma foldr_const (l : List (Pt V m d)) (hl : ∀ a ∈ l, ∀ i, MvPowerSeries.
       · exact ih (fun c hc => hl' c (by simp [hc])) j
   exact key l hl i
 
-theorem matV_laws : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (maximalIdeal V) V] [CharZero V] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (B : FB V d O) (n m : ℕ) (p q : Matrix (Fin n) (Fin n) O) (x y : Fin n → Pt V m d), (∀ b i, MvPowerSeries.constantCoeff (x b i) ∈ maximalIdeal V) → (∀ b i, MvPowerSeries.constantCoeff (y b i) ∈ maximalIdeal V) → (∀ b i, MvPowerSeries.constantCoeff (matV B p x b i) ∈ maximalIdeal V) ∧ matV B (p * q) x = matV B p (matV B q x) ∧ (matV B p (fun b => addV B.G.F (x b) (y b)) = fun b => addV B.G.F (matV B p x b) (matV B p y b)) ∧ (∀ a : O, matV B (a • (1 : Matrix (Fin n) (Fin n) O)) x = fun b => compV (B.A.act a) (x b)) ∧ (∀ b i, evV x (matV B p (fun j => pt V (n := n) d j) b i) = matV B p x b i) ∧ (∀ b i, MvPowerSeries.constantCoeff (matV B p (fun j => pt V (n := n) d j) b i) = 0) ∧ ∀ f : PS V n d, pullM B (p * q) f = pullM B q (pullM B p f) := by
+theorem matV_laws
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [IsAdicComplete (maximalIdeal V) V] [CharZero V] (d : ℕ) (O : Type) [CommRing O]
+        [StarRing O] (B : FB V d O) (n m : ℕ) (p q : Matrix (Fin n) (Fin n) O)
+        (x y : Fin n → Pt V m d),
+      (∀ b i, MvPowerSeries.constantCoeff (x b i) ∈ maximalIdeal V)
+        → (∀ b i, MvPowerSeries.constantCoeff (y b i) ∈ maximalIdeal V)
+        → (∀ b i, MvPowerSeries.constantCoeff (matV B p x b i) ∈ maximalIdeal V)
+          ∧ matV B (p * q) x = matV B p (matV B q x)
+          ∧ (matV B p (fun b => addV B.G.F (x b) (y b))
+            = fun b => addV B.G.F (matV B p x b) (matV B p y b))
+          ∧ (∀ a : O,
+            matV B (a • (1 : Matrix (Fin n) (Fin n) O)) x = fun b => compV (B.A.act a) (x b))
+          ∧ (∀ b i, evV x (matV B p (fun j => pt V (n := n) d j) b i) = matV B p x b i)
+          ∧ (∀ b i, MvPowerSeries.constantCoeff (matV B p (fun j => pt V (n := n) d j) b i) = 0)
+          ∧ ∀ f : PS V n d, pullM B (p * q) f = pullM B q (pullM B p f) := by
   intro V _ _ _ _ _ d O _ _ B n m p q x y hx hy
   have hx' : ∀ b, Sm (x b) := hx
   have hy' : ∀ b, Sm (y b) := hy
   have hpt : ∀ j : Fin n, Sm (pt V (n := n) d j) := fun j => sm_pt j
-  refine ⟨fun b => matV_sm p x hx' b, matV_mul p q x hx', ?_, ?_, fun b i => evV_matV p x hx' b i, ?_, ?_⟩
-  · have h1 : matV B p (fun b => addV B.G.F (x b) (y b)) =
-        fun k => (∑ j, p k j • ((⟨x j, hx' j⟩ : SP B m) + ⟨y j, hy' j⟩)).val :=
+  refine ⟨
+    fun b => matV_sm p x hx' b,
+    matV_mul p q x hx',
+    ?_,
+    ?_,
+    fun b i => evV_matV p x hx' b i,
+    ?_,
+    ?_
+  ⟩
+  · have h1
+        : matV B p (fun b => addV B.G.F (x b) (y b))
+          = fun k => (∑ j, p k j • ((⟨x j, hx' j⟩ : SP B m) + ⟨y j, hy' j⟩)).val :=
       matV_val B p fun j => (⟨x j, hx' j⟩ : SP B m) + ⟨y j, hy' j⟩
     have h2 : matV B p x = fun k => (∑ j, p k j • (⟨x j, hx' j⟩ : SP B m)).val :=
       matV_val B p fun j => (⟨x j, hx' j⟩ : SP B m)
@@ -219,8 +264,10 @@ theorem matV_laws : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuatio
     rw [← Finset.sum_add_distrib]
     simp only [smul_add]
   · intro a
-    have h2 : matV B (a • (1 : Matrix (Fin n) (Fin n) O)) x =
-        fun k => (∑ j, (a • (1 : Matrix (Fin n) (Fin n) O)) k j • (⟨x j, hx' j⟩ : SP B m)).val :=
+    have h2
+        : matV B (a • (1 : Matrix (Fin n) (Fin n) O)) x
+          = fun k =>
+            (∑ j, (a • (1 : Matrix (Fin n) (Fin n) O)) k j • (⟨x j, hx' j⟩ : SP B m)).val :=
       matV_val B _ fun j => (⟨x j, hx' j⟩ : SP B m)
     rw [h2]
     funext k

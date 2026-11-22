@@ -305,30 +305,34 @@ lemma prime_sum_le (s : Finset ℕ) (hs : ∀ p ∈ s, p.Prime) :
 end W5
 
 theorem prime_mod_six_of_large : PrimeSumSq := by
-  have h1 : ∀ s : Finset ℕ, (∀ p ∈ s, p.Prime) →
-      ∑ p ∈ s, 2 * Real.log (p : ℝ) / (p : ℝ) ^ 2 ≤ 999 / 1000 := by
+  have h1
+      : ∀ s : Finset ℕ,
+        (∀ p ∈ s, p.Prime) → ∑ p ∈ s, 2 * Real.log (p : ℝ) / (p : ℝ) ^ 2 ≤ 999 / 1000 := by
     intro s hs
     have h := W5.prime_sum_le s hs
-    have e : ∑ p ∈ s, 2 * Real.log (p : ℝ) / (p : ℝ) ^ 2 =
-        2 * ∑ p ∈ s, Real.log (p : ℝ) / (p : ℝ) ^ 2 := by
+    have e
+        : ∑ p ∈ s, 2 * Real.log (p : ℝ) / (p : ℝ) ^ 2
+          = 2 * ∑ p ∈ s, Real.log (p : ℝ) / (p : ℝ) ^ 2 := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl (fun p _ => by ring)
     rw [e]
     linarith
-  have h2 : ∀ u : Finset Nat.Primes,
-      ∑ p ∈ u, 2 * Real.log ((p : ℕ) : ℝ) / ((p : ℕ) : ℝ) ^ 2 ≤ 999 / 1000 := by
+  have h2
+      : ∀ u : Finset Nat.Primes,
+        ∑ p ∈ u, 2 * Real.log ((p : ℕ) : ℝ) / ((p : ℕ) : ℝ) ^ 2 ≤ 999 / 1000 := by
     intro u
-    have h := h1 (u.map ⟨Subtype.val, Subtype.val_injective⟩) (by
-      intro p hp
-      obtain ⟨q, -, rfl⟩ := Finset.mem_map.1 hp
-      exact q.2)
-    have e := Finset.sum_map u ⟨Subtype.val, Subtype.val_injective⟩
-      (fun p : ℕ => 2 * Real.log (p : ℝ) / (p : ℝ) ^ 2)
+    have h :=
+      h1 (u.map ⟨Subtype.val, Subtype.val_injective⟩) (by
+        intro p hp
+        obtain ⟨q, -, rfl⟩ := Finset.mem_map.1 hp
+        exact q.2)
+    have e :=
+      Finset.sum_map u ⟨Subtype.val, Subtype.val_injective⟩
+        (fun p : ℕ => 2 * Real.log (p : ℝ) / (p : ℝ) ^ 2)
     exact le_of_eq_of_le e.symm h
   have h0 : 0 ≤ fun p : Nat.Primes => 2 * Real.log ((p : ℕ) : ℝ) / ((p : ℕ) : ℝ) ^ 2 := fun p =>
     div_nonneg (mul_nonneg (by norm_num) (Real.log_natCast_nonneg _)) (by positivity)
-  exact ⟨h1, summable_of_sum_le h0 h2,
-    lt_of_le_of_lt (Real.tsum_le_of_sum_le h0 h2) (by norm_num)⟩
+  exact ⟨h1, summable_of_sum_le h0 h2, lt_of_le_of_lt (Real.tsum_le_of_sum_le h0 h2) (by norm_num)⟩
 
 namespace W5
 
@@ -356,8 +360,7 @@ theorem place_sum_natural : PlaceSumNat := by
   have ha : (n : K) ≠ 0 := by exact_mod_cast hn.ne'
   set I := FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (n : K) with hIdef
   have hD := Formalism.LatticeIndexTer.log_product_formula K (n : K) ha
-  have hdeg : (finrank ℚ K : ℝ) ≠ 0 := by
-    exact_mod_cast (Module.finrank_pos (R := ℚ) (M := K)).ne'
+  have hdeg : (finrank ℚ K : ℝ) ≠ 0 := by exact_mod_cast (Module.finrank_pos (R := ℚ) (M := K)).ne'
   set g : HeightOneSpectrum (𝓞 K) → ℝ := fun w =>
     (FractionalIdeal.count K w I : ℝ) * Real.log (Ideal.absNorm w.asIdeal : ℝ) with hg
   have hgfin : (Function.support g).Finite := by
@@ -369,13 +372,14 @@ theorem place_sum_natural : PlaceSumNat := by
     intro h0
     apply hw
     simp only [hg, h0, Int.cast_zero, zero_mul]
-  have hfun : (fun w : HeightOneSpectrum (𝓞 K) => lw w * (vw w (n : K) : ℝ)) =
-      fun w => (finrank ℚ K : ℝ)⁻¹ * g w := by
+  have hfun
+      : (fun w : HeightOneSpectrum (𝓞 K) => lw w * (vw w (n : K) : ℝ))
+        = fun w => (finrank ℚ K : ℝ)⁻¹ * g w := by
     funext w
     simp only [lw, vw, hg, hIdef]
     field_simp
-  have hfin : (Function.support fun w : HeightOneSpectrum (𝓞 K) =>
-      lw w * (vw w (n : K) : ℝ)).Finite := by
+  have hfin
+      : (Function.support fun w : HeightOneSpectrum (𝓞 K) => lw w * (vw w (n : K) : ℝ)).Finite := by
     rw [hfun]
     exact hgfin.subset (Function.support_mul_subset_right _ _)
   have hlhs : ∑ σ : K →+* ℂ, Real.log ‖σ (n : K)‖ = (finrank ℚ K : ℝ) * Real.log (n : ℝ) := by
@@ -388,10 +392,11 @@ theorem place_sum_natural : PlaceSumNat := by
     rw [hfun, ← mul_finsum, hg, ← hD, hlhs]
     field_simp
   refine ⟨hfin, hsum, fun S => ?_⟩
-  rw [← hsum, finsum_eq_sum_of_support_subset (s := S ∪ hfin.toFinset) _ (by
-    intro w hw
-    rw [Finset.coe_union]
-    exact Or.inr (by simpa using hw))]
+  rw [← hsum,
+    finsum_eq_sum_of_support_subset (s := S ∪ hfin.toFinset) _ (by
+      intro w hw
+      rw [Finset.coe_union]
+      exact Or.inr (by simpa using hw))]
   exact Finset.sum_le_sum_of_subset_of_nonneg Finset.subset_union_left
     (fun w _ _ => mul_nonneg (W5.lw_nonneg w) (by exact_mod_cast W5.vw_nat_nonneg w n))
 
@@ -399,9 +404,17 @@ theorem untwisted_choice : UntwistedChoice := by
   intro Pl J _ S Tw D hD hTS l ell I Ic jT F err Jx η hA hF h3 h4
   classical
   have hD' : (0 : ℝ) < D := by exact_mod_cast hD
-  refine ⟨fun w j => if w ∈ Tw then err w j else (I w j + Ic w j) / D,
+  refine ⟨
+    fun w j => if w ∈ Tw then err w j else (I w j + Ic w j) / D,
     fun w j => if w ∈ Tw then Jx w j else jT w j / D,
-    fun w j => if w ∈ Tw then η w j else 0, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    fun w j => if w ∈ Tw then η w j else 0,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro w hw j
     simp only [hw, if_true, and_self]
   · intro w hw
@@ -425,8 +438,7 @@ theorem untwisted_choice : UntwistedChoice := by
       rw [← add_div, hA w hw hT j, zero_div, mul_zero])]
     exact Finset.sum_congr rfl (fun w hw => by simp only [hw, if_true])
   · intro j
-    rw [← Finset.sum_subset hTS (fun w hw hT => by
-      simp only [hT, if_false, mul_zero, zero_div])]
+    rw [← Finset.sum_subset hTS (fun w hw hT => by simp only [hT, if_false, mul_zero, zero_div])]
     exact Finset.sum_congr rfl (fun w hw => by simp only [hw, if_true])
   · intro j
     exact (Finset.sum_subset hTS (fun w hw hT => by rw [hF w hw hT j, mul_zero])).symm

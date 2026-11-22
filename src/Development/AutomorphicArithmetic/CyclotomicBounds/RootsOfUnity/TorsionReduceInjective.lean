@@ -10,14 +10,16 @@ noncomputable section
 
 namespace UpperTheory.Mu
 
-theorem torsion_reduce_injective (L : Type) [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
-    (hw : ((NumberField.Units.torsionOrder L : ℕ) : 𝓞 L) ∉ v.asIdeal) :
-    Function.Injective ((Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom).comp
+theorem torsion_reduce_injective
+    (L : Type) [Field L] [NumberField L]
+    (v : HeightOneSpectrum (𝓞 L)) (hw : ((NumberField.Units.torsionOrder L : ℕ) : 𝓞 L) ∉ v.asIdeal)
+    : Function.Injective ((Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom).comp
       (NumberField.Units.torsion L).subtype) := by
   rw [injective_iff_map_eq_one]
   intro ζ hζ
   by_contra hne
-  have hmk : Ideal.Quotient.mk v.asIdeal (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) = 1 := by
+  have hmk
+      : Ideal.Quotient.mk v.asIdeal (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) = 1 := by
     have h := congrArg (fun u : (𝓞 L ⧸ v.asIdeal)ˣ => (u : 𝓞 L ⧸ v.asIdeal)) hζ
     simpa using h
   have hx1 : (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) ≠ 1 := by
@@ -25,15 +27,20 @@ theorem torsion_reduce_injective (L : Type) [Field L] [NumberField L] (v : Heigh
     apply hne
     apply Subtype.ext
     exact Units.ext h
-  have hpow : (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) ^ NumberField.Units.torsionOrder L = 1 := by
+  have hpow
+      : (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) ^ NumberField.Units.torsionOrder L
+        = 1 := by
     have h : ζ ^ Nat.card (NumberField.Units.torsion L) = 1 := pow_card_eq_one'
     show (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) ^ Nat.card (NumberField.Units.torsion L) = 1
     rw [← Units.val_pow_eq_pow_val, ← Subgroup.coe_pow, h]
     simp
-  have hsum : ∑ i ∈ Finset.range (NumberField.Units.torsionOrder L),
-      (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) ^ i = 0 := by
-    have h := geom_sum_mul (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L)
-      (NumberField.Units.torsionOrder L)
+  have hsum
+      : ∑ i ∈ Finset.range (NumberField.Units.torsionOrder L),
+          (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L) ^ i
+        = 0 := by
+    have h :=
+      geom_sum_mul (((ζ : NumberField.Units.torsion L) : (𝓞 L)ˣ) : 𝓞 L)
+        (NumberField.Units.torsionOrder L)
     rw [hpow, sub_self] at h
     exact (mul_eq_zero.1 h).resolve_right (sub_ne_zero.2 hx1)
   apply hw
@@ -44,7 +51,14 @@ theorem torsion_reduce_injective (L : Type) [Field L] [NumberField L] (v : Heigh
   simp only [map_pow, hmk, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one] at h
   simpa using h
 
-theorem tame_ext : ∀ (L : Type) [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L)), ((NumberField.Units.torsionOrder L : ℕ) : 𝓞 L) ∉ v.asIdeal → NumberField.Units.torsionOrder L + 1 < Ideal.absNorm v.asIdeal → ∀ ε : NumberField.Units.torsion L →* ℂˣ, ∃ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ, θ ≠ 1 ∧ ∀ ζ : NumberField.Units.torsion L, θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom (ζ : (𝓞 L)ˣ)) = ε ζ := by
+theorem tame_ext
+    : ∀ (L : Type) [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L)),
+      ((NumberField.Units.torsionOrder L : ℕ) : 𝓞 L) ∉ v.asIdeal
+        → NumberField.Units.torsionOrder L + 1 < Ideal.absNorm v.asIdeal
+        → ∀ ε : NumberField.Units.torsion L →* ℂˣ, ∃ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ,
+          θ ≠ 1
+            ∧ ∀ ζ : NumberField.Units.torsion L,
+              θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom (ζ : (𝓞 L)ˣ)) = ε ζ := by
   intro L _ _ v hw hN ε
   haveI := v.isMaximal
   have hf := torsion_reduce_injective L v hw
@@ -55,10 +69,11 @@ theorem tame_ext : ∀ (L : Type) [Field L] [NumberField L] (v : HeightOneSpectr
   haveI : Finite (𝓞 L ⧸ v.asIdeal) := Nat.finite_of_card_ne_zero (by rw [hcardk]; omega)
   let e := MonoidHom.ofInjective hf
   obtain ⟨θ0, hθ0⟩ := MonoidHom.domRestrict_surjective (M := ℂ) f.range (ε.comp e.symm.toMonoidHom)
-  have hext : ∀ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ,
-      MonoidHom.domRestrictHom f.range ℂˣ θ = ε.comp e.symm.toMonoidHom →
-      ∀ ζ : NumberField.Units.torsion L,
-        θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom (ζ : (𝓞 L)ˣ)) = ε ζ := by
+  have hext
+      : ∀ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ,
+        MonoidHom.domRestrictHom f.range ℂˣ θ = ε.comp e.symm.toMonoidHom
+          → ∀ ζ : NumberField.Units.torsion L,
+            θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom (ζ : (𝓞 L)ˣ)) = ε ζ := by
     intro θ hθ ζ
     have h := DFunLike.congr_fun hθ (e ζ)
     have h2 : e.symm (e ζ) = ζ := e.symm_apply_apply ζ

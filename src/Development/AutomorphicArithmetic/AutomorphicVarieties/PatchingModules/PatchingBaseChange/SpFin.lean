@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsDiscret
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-private theorem spf_nilp {k Q : Type} [Field k] [CommRing Q] (φ : k →+* Q) (x : Q)
-    (hx : ∀ y, IsUnit (x * y + 1)) (f : Polynomial k) (hf : f ≠ 0) (h : f.eval₂ φ x = 0) :
-    IsNilpotent x := by
+private theorem spf_nilp
+    {k Q : Type} [Field k] [CommRing Q]
+    (φ : k →+* Q)
+    (x : Q) (hx : ∀ y, IsUnit (x * y + 1))
+    (f : Polynomial k) (hf : f ≠ 0) (h : f.eval₂ φ x = 0)
+    : IsNilpotent x := by
   obtain ⟨g, hg, hd⟩ := Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd f hf 0
   rw [map_zero, sub_zero] at hg hd
   rw [Polynomial.X_dvd_iff] at hd
@@ -26,10 +29,13 @@ private theorem spf_nilp {k Q : Type} [Field k] [CommRing Q] (φ : k →+* Q) (x
   rw [hg, Polynomial.eval₂_mul, Polynomial.eval₂_pow, Polynomial.eval₂_X] at h
   exact ⟨_, hu.mul_left_eq_zero.1 h⟩
 
-private theorem spf_nilp2 {k Q : Type} [Field k] [CommRing Q] (φ : k →+* Q) {n : ℕ} (x : Fin n → Q)
-    (c : Fin n → k) (f : Polynomial k)
-    (h : ∏ i, (Polynomial.X - Polynomial.C (φ (c i) + x i)) = f.map φ) (i : Fin n)
-    (hx : ∀ y, IsUnit (x i * y + 1)) : IsNilpotent (x i) := by
+private theorem spf_nilp2
+    {k Q : Type} [Field k] [CommRing Q]
+    (φ : k →+* Q)
+    {n : ℕ} (x : Fin n → Q) (c : Fin n → k)
+    (f : Polynomial k) (h : ∏ i, (Polynomial.X - Polynomial.C (φ (c i) + x i)) = f.map φ)
+    (i : Fin n) (hx : ∀ y, IsUnit (x i * y + 1))
+    : IsNilpotent (x i) := by
   classical
   rcases subsingleton_or_nontrivial Q with hQ | hQ
   · exact ⟨1, Subsingleton.elim _ _⟩
@@ -46,11 +52,15 @@ private theorem spf_nilp2 {k Q : Type} [Field k] [CommRing Q] (φ : k →+* Q) {
   · intro h0
     apply hf
     rwa [← Polynomial.taylor_apply, Polynomial.taylor_eq_zero] at h0
-  · rw [Polynomial.eval₂_comp, Polynomial.eval₂_add, Polynomial.eval₂_X, Polynomial.eval₂_C, add_comm]
+  · rw [Polynomial.eval₂_comp, Polynomial.eval₂_add, Polynomial.eval₂_X, Polynomial.eval₂_C,
+      add_comm]
     exact hroot
 
-theorem UpperTheory.V.Pa.BC.sp_fin :
-    ∀ (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [IsAdicComplete (maximalIdeal B) B] (q n : ℕ) (P : Fin q → Polynomial B) (ut : Fin q → Fin n → B), Module.Finite B (Sp P ut) ∧ IsNoetherianRing (Sp P ut) := by
+theorem UpperTheory.V.Pa.BC.sp_fin
+    : ∀ (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
+        [IsAdicComplete (maximalIdeal B) B] (q n : ℕ) (P : Fin q → Polynomial B)
+        (ut : Fin q → Fin n → B),
+      Module.Finite B (Sp P ut) ∧ IsNoetherianRing (Sp P ut) := by
   intro B _ _ _ _ q n P ut
   classical
   let k := ResidueField B
@@ -60,8 +70,9 @@ theorem UpperTheory.V.Pa.BC.sp_fin :
   let φ : k →+* (MvPowerSeries (Fin q × Fin n) k ⧸ Jb) := π.comp MvPowerSeries.C
   let ψ : MvPowerSeries (Fin q × Fin n) B →+* (MvPowerSeries (Fin q × Fin n) k ⧸ Jb) :=
     π.comp (MvPowerSeries.map (residue B))
-  have hunit : ∀ (p : Fin q × Fin n) (y : MvPowerSeries (Fin q × Fin n) k ⧸ Jb),
-      IsUnit (π (MvPowerSeries.X p) * y + 1) := by
+  have hunit
+      : ∀ (p : Fin q × Fin n) (y : MvPowerSeries (Fin q × Fin n) k ⧸ Jb),
+        IsUnit (π (MvPowerSeries.X p) * y + 1) := by
     intro p y
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
     rw [← map_mul, ← map_one π, ← map_add (f := _)]
@@ -70,10 +81,14 @@ theorem UpperTheory.V.Pa.BC.sp_fin :
     simp
   have hnil : ∀ p : Fin q × Fin n, IsNilpotent (π (MvPowerSeries.X p)) := by
     rintro ⟨j, i⟩
-    refine spf_nilp2 φ (fun i => π (MvPowerSeries.X (j, i))) (fun i => residue B (ut j i))
+    refine spf_nilp2 φ
+      (fun i => π (MvPowerSeries.X (j, i)))
+      (fun i => residue B (ut j i))
       ((P j).map (residue B)) ?_ i (hunit _)
-    have hD : (∏ i, (Polynomial.X - Polynomial.C (MvPowerSeries.C (ut j i) + MvPowerSeries.X (j, i))) -
-        (P j).map MvPowerSeries.C).map ψ = 0 := by
+    have hD
+        : (∏ i, (Polynomial.X - Polynomial.C (MvPowerSeries.C (ut j i) + MvPowerSeries.X (j, i)))
+            - (P j).map MvPowerSeries.C).map ψ
+          = 0 := by
       ext k'
       rw [Polynomial.coeff_map, Polynomial.coeff_zero]
       show π _ = 0
@@ -87,25 +102,36 @@ theorem UpperTheory.V.Pa.BC.sp_fin :
     rw [← hD]
     refine Finset.prod_congr rfl fun i _ => ?_
     simp [ψ, φ, MvPowerSeries.map_C, MvPowerSeries.map_X]
-  have hle : Ideal.map π (Ideal.span (Set.range
-      (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k))) ≤ nilradical _ := by
+  have hle
+      : Ideal.map π
+          (Ideal.span (Set.range
+            (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k)))
+        ≤ nilradical _ := by
     rw [Ideal.map_span, Ideal.span_le]
     rintro _ ⟨_, ⟨p, rfl⟩, rfl⟩
     exact mem_nilradical.2 (hnil p)
-  have hfg : (Ideal.map π (Ideal.span (Set.range
-      (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k)))).FG := by
+  have hfg : (Ideal.map π
+      (Ideal.span (Set.range
+        (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k)))).FG := by
     rw [Ideal.map_span]
     exact Submodule.fg_span ((Set.finite_range _).image _)
   obtain ⟨N, hN⟩ := (Ideal.FG.isNilpotent_iff_le_nilradical hfg).2 hle
-  have hpow : Ideal.span (Set.range
-      (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k)) ^ N ≤ Jb := by
-    have h0 : Ideal.map π (Ideal.span (Set.range
-        (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k)) ^ N) = ⊥ := by
+  have hpow
+      : Ideal.span (Set.range (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k))
+          ^ N
+        ≤ Jb := by
+    have h0
+        : Ideal.map π
+            (Ideal.span (Set.range
+                (MvPowerSeries.X : Fin q × Fin n → MvPowerSeries (Fin q × Fin n) k))
+              ^ N)
+          = ⊥ := by
       rw [Ideal.map_pow, hN, Ideal.zero_eq_bot]
     rw [Ideal.map_eq_bot_iff_le_ker, Ideal.mk_ker] at h0
     exact h0
   have hfin : Module.Finite B (MvPowerSeries (Fin q × Fin n) B ⧸ J) :=
-    GlobalTheory.FormalIsogeny.finite_quotient_of_residue J (GlobalTheory.FormalIsogeny.finite_quotient_of_pow_le hpow)
+    GlobalTheory.FormalIsogeny.finite_quotient_of_residue J
+      (GlobalTheory.FormalIsogeny.finite_quotient_of_pow_le hpow)
   have hfin' : Module.Finite B (Sp P ut) := hfin
   refine ⟨hfin', ?_⟩
   have hB : IsNoetherian B (Sp P ut) := inferInstance

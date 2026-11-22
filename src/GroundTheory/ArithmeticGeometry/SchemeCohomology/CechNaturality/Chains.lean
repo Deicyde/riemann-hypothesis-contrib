@@ -28,10 +28,11 @@ noncomputable def chainSimplicial (ι : Type w) : SimplicialObject AddCommGrpCat
   obj n := AddCommGrpCat.of (Chain ι n.unop.len)
   map θ := AddCommGrpCat.ofHom (chainMap θ.unop.toOrderHom)
   map_id n := AddCommGrpCat.ext fun c => Finsupp.mapDomain_id
-  map_comp θ θ' := AddCommGrpCat.ext fun c => by
-    change Finsupp.mapDomain _ c = Finsupp.mapDomain _ (Finsupp.mapDomain _ c)
-    rw [← Finsupp.mapDomain_comp]
-    rfl
+  map_comp θ θ' :=
+    AddCommGrpCat.ext fun c => by
+      change Finsupp.mapDomain _ c = Finsupp.mapDomain _ (Finsupp.mapDomain _ c)
+      rw [← Finsupp.mapDomain_comp]
+      rfl
 
 noncomputable def bd (n : ℕ) : Chain ι (n + 1) →+ Chain ι n :=
   (AlgebraicTopology.AlternatingFaceMapComplex.objD (chainSimplicial ι) n).hom
@@ -252,7 +253,8 @@ lemma bd_ocone_zero (s : ι) {c : Chain ι 0} (hc : c ∈ Finsupp.supported ℤ 
       exact (le_antisymm hsj (not_lt.1 hlt)).symm
     rw [ocone_single_of_not_lt hlt, map_zero, hj, sub_self]
 
-noncomputable def minIdx {n : ℕ} (i : Fin (n + 1) → ι) : ι := Finset.univ.inf' Finset.univ_nonempty i
+noncomputable def minIdx {n : ℕ} (i : Fin (n + 1) → ι) : ι :=
+  Finset.univ.inf' Finset.univ_nonempty i
 
 lemma minIdx_le {n : ℕ} (i : Fin (n + 1) → ι) (a : Fin (n + 1)) : minIdx i ≤ i a :=
   Finset.inf'_le _ (Finset.mem_univ a)
@@ -298,27 +300,29 @@ lemma lin_rho_zero (c : Chain ι 0) : lin (rho (ι := ι) 0) c = c := by
   | add f g hf hg => rw [map_add (f := _), hf, hg]
   | single i z => rw [lin_single, rho, Finsupp.smul_single_one]
 
-theorem rho_mem : ∀ (n : ℕ) (i : Fin (n + 1) → ι),
-    rho n i ∈ Finsupp.supported ℤ ℤ (ordIn (Set.range i))
+theorem rho_mem
+    : ∀ (n : ℕ) (i : Fin (n + 1) → ι), rho n i ∈ Finsupp.supported ℤ ℤ (ordIn (Set.range i))
   | 0, i => Finsupp.single_mem_supported ℤ _ (mem_ordIn.2 ⟨strictMono_of_fin_one _, subset_rfl⟩)
   | n + 1, i => by
     refine ocone_mem_ordIn i ?_
     refine map_mem_supported _ (fun j hj z => ?_) (bd_mem_rangeIn (single_mem_rangeIn i 1))
     rw [lin_single]
-    exact Submodule.smul_mem _ z (Finsupp.supported_mono
-      (fun k hk => mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
-      (rho_mem n j))
+    exact Submodule.smul_mem _ z
+      (Finsupp.supported_mono
+        (fun k hk => mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
+        (rho_mem n j))
 
-theorem bd_rho : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
-    bd n (rho (n + 1) i) = lin (rho n) (bd n (Finsupp.single i 1))
+theorem bd_rho
+    : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
+      bd n (rho (n + 1) i) = lin (rho n) (bd n (Finsupp.single i 1))
   | 0, i => by
-    have hx : lin (rho (ι := ι) 0) (bd 0 (Finsupp.single i 1)) ∈
-        Finsupp.supported ℤ ℤ (ordFrom (minIdx i)) := by
+    have hx
+        : lin (rho (ι := ι) 0) (bd 0 (Finsupp.single i 1))
+          ∈ Finsupp.supported ℤ ℤ (ordFrom (minIdx i)) := by
       rw [lin_rho_zero]
       have hsubset : rangeIn (n := 0) (Set.range i) ⊆ ordFrom (minIdx i) := by
         intro j hj
-        exact ordIn_subset_ordFrom i
-          (mem_ordIn.2 ⟨strictMono_of_fin_one j, mem_rangeIn.1 hj⟩)
+        exact ordIn_subset_ordFrom i (mem_ordIn.2 ⟨strictMono_of_fin_one j, mem_rangeIn.1 hj⟩)
       exact Finsupp.supported_mono hsubset (bd_mem_rangeIn (single_mem_rangeIn i 1))
     change bd 0 (ocone (minIdx i) (lin (rho 0) (bd 0 (Finsupp.single i 1)))) = _
     rw [bd_ocone_zero _ hx, lin_rho_zero, aug_bd, zero_smul, sub_zero]
@@ -336,17 +340,19 @@ theorem bd_rho : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
       refine Finsupp.supported_mono (ordIn_subset_ordFrom i) ?_
       refine map_mem_supported _ (fun j hj z => ?_) (bd_mem_rangeIn (single_mem_rangeIn i 1))
       rw [lin_single]
-      exact Submodule.smul_mem _ z (Finsupp.supported_mono
-        (fun k hk => mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
-        (rho_mem (n + 1) j))
+      exact Submodule.smul_mem _ z
+        (Finsupp.supported_mono
+          (fun k hk =>
+            mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
+          (rho_mem (n + 1) j))
     have hbx : bd n x = 0 := by rw [hxdef, hlin, bd_bd, map_zero]
     have key := bd_ocone_add_ocone_bd n (minIdx i) hx
     rw [hbx, map_zero, add_zero] at key
     change bd (n + 1) (ocone (minIdx i) x) = x
     exact key
 
-theorem rho_of_strictMono : ∀ (n : ℕ) (i : Fin (n + 1) → ι), StrictMono i →
-    rho n i = Finsupp.single i 1
+theorem rho_of_strictMono
+    : ∀ (n : ℕ) (i : Fin (n + 1) → ι), StrictMono i → rho n i = Finsupp.single i 1
   | 0, _, _ => rfl
   | n + 1, i, hi => by
     have h1 : lin (rho n) (bd n (Finsupp.single i 1)) = bd n (Finsupp.single i 1) := by
@@ -357,22 +363,26 @@ theorem rho_of_strictMono : ∀ (n : ℕ) (i : Fin (n + 1) → ι), StrictMono i
         rho_of_strictMono n _ (hi.comp (Fin.strictMono_succAbove k))]
     change ocone (minIdx i) (lin (rho n) (bd n (Finsupp.single i 1))) = _
     rw [h1, minIdx_of_strictMono hi]
-    have key := bd_ocone_add_ocone_bd n (i 0) (c := Finsupp.single i 1)
-      (Finsupp.single_mem_supported ℤ _ (mem_ordFrom.2 ⟨hi, le_rfl⟩))
+    have key :=
+      bd_ocone_add_ocone_bd n (i 0) (c := Finsupp.single i 1)
+        (Finsupp.single_mem_supported ℤ _ (mem_ordFrom.2 ⟨hi, le_rfl⟩))
     rw [ocone_single_of_not_lt (lt_irrefl _), map_zero, zero_add] at key
     exact key
 
 noncomputable def hmt : (n : ℕ) → (Fin (n + 1) → ι) → Chain ι (n + 1)
   | 0, _ => 0
-  | n + 1, i => cone (i 0)
-      (Finsupp.single i 1 - rho (n + 1) i - lin (hmt n) (bd n (Finsupp.single i 1)))
+  | n + 1, i =>
+    cone (i 0) (Finsupp.single i 1 - rho (n + 1) i - lin (hmt n) (bd n (Finsupp.single i 1)))
 
-theorem hmt_mem : ∀ (n : ℕ) (i : Fin (n + 1) → ι),
-    hmt n i ∈ Finsupp.supported ℤ ℤ (rangeIn (Set.range i))
+theorem hmt_mem
+    : ∀ (n : ℕ) (i : Fin (n + 1) → ι), hmt n i ∈ Finsupp.supported ℤ ℤ (rangeIn (Set.range i))
   | 0, _ => Submodule.zero_mem _
   | n + 1, i => by
-    refine cone_mem_rangeIn (Set.mem_range_self 0) (Submodule.sub_mem _ (Submodule.sub_mem _
-      (single_mem_rangeIn i 1) (Finsupp.supported_mono (ordIn_subset_rangeIn _) (rho_mem _ i))) ?_)
+    refine cone_mem_rangeIn (Set.mem_range_self 0)
+      (Submodule.sub_mem _
+        (Submodule.sub_mem _ (single_mem_rangeIn i 1)
+          (Finsupp.supported_mono (ordIn_subset_rangeIn _) (rho_mem _ i)))
+        ?_)
     exact lin_mem_rangeIn _ (fun j _ => hmt_mem n j) (bd_mem_rangeIn (single_mem_rangeIn i 1))
 
 lemma lin_hmt_zero (c : Chain ι 0) : lin (hmt (ι := ι) 0) c = 0 := by
@@ -381,9 +391,10 @@ lemma lin_hmt_zero (c : Chain ι 0) : lin (hmt (ι := ι) 0) c = 0 := by
   | add f g hf hg => rw [map_add (f := _), hf, hg, add_zero]
   | single i z => rw [lin_single, hmt, smul_zero]
 
-theorem boundary_homotopy : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
-    bd (n + 1) (hmt (n + 1) i) + lin (hmt n) (bd n (Finsupp.single i 1)) =
-      Finsupp.single i 1 - rho (n + 1) i
+theorem boundary_homotopy
+    : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
+      bd (n + 1) (hmt (n + 1) i) + lin (hmt n) (bd n (Finsupp.single i 1))
+        = Finsupp.single i 1 - rho (n + 1) i
   | n, i => by
     set y := Finsupp.single i 1 - rho (n + 1) i - lin (hmt n) (bd n (Finsupp.single i 1))
       with hydef
@@ -393,16 +404,19 @@ theorem boundary_homotopy : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
       | zero => rw [lin_hmt_zero, lin_rho_zero, map_zero, sub_self, sub_zero]
       | succ n =>
         have ih := boundary_homotopy n
-        have hlin : ∀ c : Chain ι (n + 1), bd (n + 1) (lin (hmt (n + 1)) c) =
-            c - lin (rho (n + 1)) c - lin (hmt n) (bd n c) := by
+        have hlin
+            : ∀ c : Chain ι (n + 1),
+              bd (n + 1) (lin (hmt (n + 1)) c)
+                = c - lin (rho (n + 1)) c - lin (hmt n) (bd n c) := by
           intro c
-          have : (bd (n + 1)).comp (lin (hmt (ι := ι) (n + 1))) =
-              AddMonoidHom.id _ - lin (rho (ι := ι) (n + 1)) - (lin (hmt (ι := ι) n)).comp (bd n) := by
+          have : (bd (n + 1)).comp (lin (hmt (ι := ι) (n + 1)))
+              = AddMonoidHom.id _ - lin (rho (ι := ι) (n + 1))
+                - (lin (hmt (ι := ι) n)).comp (bd n) := by
             refine Finsupp.addHom_ext fun j z => ?_
             simp only [AddMonoidHom.comp_apply, AddMonoidHom.sub_apply, AddMonoidHom.id_apply,
               lin_single, map_zsmul]
-            rw [← Finsupp.smul_single_one j z, map_zsmul, map_zsmul, ← smul_sub, ← smul_sub,
-              ← ih j, add_sub_cancel_right]
+            rw [← Finsupp.smul_single_one j z, map_zsmul, map_zsmul, ← smul_sub, ← smul_sub, ← ih j,
+              add_sub_cancel_right]
           exact congrArg (fun L => L c) this
         rw [hlin, bd_bd, map_zero, sub_zero]
         abel

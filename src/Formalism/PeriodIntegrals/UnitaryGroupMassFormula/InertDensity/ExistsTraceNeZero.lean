@@ -16,78 +16,77 @@ theorem card_L (h2 : Module.finrank K L = 2) : Fintype.card L = Fintype.card K ^
 omit [Fintype L] [Algebra K L] in
 theorem one_lt_q : 1 < Fintype.card K := Fintype.one_lt_card
 
-
 variable (K) in
 def conj : L →+* L := (FiniteField.frobeniusAlgHom K L).toRingHom
 
+omit [Fintype L] in
+theorem frob_add (x y : L)
+    : (x + y) ^ Fintype.card K = x ^ Fintype.card K + y ^ Fintype.card K := by
+  simpa only [FiniteField.coe_frobeniusAlgHom] using map_add (FiniteField.frobeniusAlgHom K L) x y
 
 omit [Fintype L] in
-theorem frob_add (x y : L) :
-    (x + y) ^ Fintype.card K = x ^ Fintype.card K + y ^ Fintype.card K :=
-  by simpa only [FiniteField.coe_frobeniusAlgHom] using
-    map_add (FiniteField.frobeniusAlgHom K L) x y
+theorem frob_sub (x y : L)
+    : (x - y) ^ Fintype.card K = x ^ Fintype.card K - y ^ Fintype.card K := by
+  simpa only [FiniteField.coe_frobeniusAlgHom] using map_sub (FiniteField.frobeniusAlgHom K L) x y
 
 omit [Fintype L] in
-theorem frob_sub (x y : L) :
-    (x - y) ^ Fintype.card K = x ^ Fintype.card K - y ^ Fintype.card K :=
-  by simpa only [FiniteField.coe_frobeniusAlgHom] using
-    map_sub (FiniteField.frobeniusAlgHom K L) x y
+theorem frob_sum {ι : Type} (s : Finset ι) (f : ι → L)
+    : (∑ i ∈ s, f i) ^ Fintype.card K = ∑ i ∈ s, f i ^ Fintype.card K := by
+  simpa only [FiniteField.coe_frobeniusAlgHom] using map_sum (FiniteField.frobeniusAlgHom K L) f s
 
 omit [Fintype L] in
-theorem frob_sum {ι : Type} (s : Finset ι) (f : ι → L) :
-    (∑ i ∈ s, f i) ^ Fintype.card K = ∑ i ∈ s, f i ^ Fintype.card K :=
-  by simpa only [FiniteField.coe_frobeniusAlgHom] using
-    map_sum (FiniteField.frobeniusAlgHom K L) f s
-
-omit [Fintype L] in
-theorem frob_algebraMap (a : K) :
-    (algebraMap K L a) ^ Fintype.card K = algebraMap K L a := by
+theorem frob_algebraMap (a : K) : (algebraMap K L a) ^ Fintype.card K = algebraMap K L a := by
   rw [← map_pow, FiniteField.pow_card]
 
-theorem frob_frob (h2 : Module.finrank K L = 2) (x : L) :
-    (x ^ Fintype.card K) ^ Fintype.card K = x := by
+theorem frob_frob (h2 : Module.finrank K L = 2) (x : L)
+    : (x ^ Fintype.card K) ^ Fintype.card K = x := by
   rw [← pow_mul, ← sq, ← card_L h2, FiniteField.pow_card]
 
-theorem card_fixed [DecidableEq L] : #{x : L | x ^ Fintype.card K = x} = Fintype.card K := by
+theorem card_fixed [DecidableEq L] : # {x : L | x ^ Fintype.card K = x} = Fintype.card K := by
   have hq := one_lt_q (K := K)
   apply le_antisymm
   · have hne := Polynomial.X_pow_sub_X_ne_zero (R := L) hq
-    calc #{x : L | x ^ Fintype.card K = x}
-        ≤ ((X ^ Fintype.card K - X : L[X]).roots.toFinset).card := by
-          apply card_le_card
-          intro x hx
-          simp only [mem_filter, mem_univ, true_and] at hx
-          rw [Multiset.mem_toFinset, mem_roots hne]
-          simp [hx]
-      _ ≤ Multiset.card (X ^ Fintype.card K - X : L[X]).roots := Multiset.toFinset_card_le _
-      _ ≤ (X ^ Fintype.card K - X : L[X]).natDegree := card_roots' _
-      _ = Fintype.card K := Polynomial.natDegree_X_pow_sub_X (R := L) hq
-  · calc Fintype.card K = (univ.image (algebraMap K L)).card := by
-          rw [card_image_of_injective _ (algebraMap K L).injective, card_univ]
-      _ ≤ _ := by
-          apply card_le_card
-          intro x hx
-          obtain ⟨a, -, rfl⟩ := mem_image.mp hx
-          simp [frob_algebraMap]
-
-theorem norm_fixed (h2 : Module.finrank K L = 2) (x : L) :
-    (x ^ (Fintype.card K + 1)) ^ Fintype.card K = x ^ (Fintype.card K + 1) := by
-  rw [← pow_mul, mul_comm, pow_mul, pow_succ, frob_frob h2, ← pow_succ']
-
-omit [Fintype K] [Algebra K L] in
-theorem card_root_le [DecidableEq L] (n : ℕ) (a : L) : #{x : L | x ^ (n + 1) = a} ≤ n + 1 := by
-  calc #{x : L | x ^ (n + 1) = a} ≤ (nthRoots (n + 1) a).toFinset.card := by
+    calc
+      # {x : L | x ^ Fintype.card K = x}
+          ≤ ((X ^ Fintype.card K - X : L[X]).roots.toFinset).card := by
         apply card_le_card
         intro x hx
         simp only [mem_filter, mem_univ, true_and] at hx
-        rw [Multiset.mem_toFinset, mem_nthRoots (Nat.succ_pos n)]
-        exact hx
+        rw [Multiset.mem_toFinset, mem_roots hne]
+        simp [hx]
+      _ ≤ Multiset.card (X ^ Fintype.card K - X : L[X]).roots := Multiset.toFinset_card_le _
+      _ ≤ (X ^ Fintype.card K - X : L[X]).natDegree := card_roots' _
+      _ = Fintype.card K := Polynomial.natDegree_X_pow_sub_X (R := L) hq
+  · calc
+      Fintype.card K = (univ.image (algebraMap K L)).card := by
+        rw [card_image_of_injective _ (algebraMap K L).injective, card_univ]
+      _ ≤ _ := by
+        apply card_le_card
+        intro x hx
+        obtain ⟨a, -, rfl⟩ := mem_image.mp hx
+        simp [frob_algebraMap]
+
+theorem norm_fixed (h2 : Module.finrank K L = 2) (x : L)
+    : (x ^ (Fintype.card K + 1)) ^ Fintype.card K = x ^ (Fintype.card K + 1) := by
+  rw [← pow_mul, mul_comm, pow_mul, pow_succ, frob_frob h2, ← pow_succ']
+
+omit [Fintype K] [Algebra K L] in
+theorem card_root_le [DecidableEq L] (n : ℕ) (a : L) : # {x : L | x ^ (n + 1) = a} ≤ n + 1 := by
+  calc
+    # {x : L | x ^ (n + 1) = a} ≤ (nthRoots (n + 1) a).toFinset.card := by
+      apply card_le_card
+      intro x hx
+      simp only [mem_filter, mem_univ, true_and] at hx
+      rw [Multiset.mem_toFinset, mem_nthRoots (Nat.succ_pos n)]
+      exact hx
     _ ≤ Multiset.card (nthRoots (n + 1) a) := Multiset.toFinset_card_le _
     _ ≤ n + 1 := card_nthRoots _ _
 
-theorem card_norm_fibre [DecidableEq L] (h2 : Module.finrank K L = 2) (a : L) (ha0 : a ≠ 0)
-    (haq : a ^ Fintype.card K = a) :
-    #{x : L | x ^ (Fintype.card K + 1) = a} = Fintype.card K + 1 := by
+theorem card_norm_fibre
+    [DecidableEq L]
+    (h2 : Module.finrank K L = 2)
+    (a : L) (ha0 : a ≠ 0) (haq : a ^ Fintype.card K = a)
+    : # {x : L | x ^ (Fintype.card K + 1) = a} = Fintype.card K + 1 := by
   set q := Fintype.card K with hqdef
   have hq : 1 < q := one_lt_q
   set F : Finset L := {b : L | b ≠ 0 ∧ b ^ q = b} with hF
@@ -127,10 +126,10 @@ theorem card_norm_fibre [DecidableEq L] (h2 : Module.finrank K L = 2) (a : L) (h
       subst hx
       exact hb0 (by rw [← h, zero_pow (by omega)])
     · exact fun h => h.2
-  have hle : ∀ b ∈ F, #{x : L | x ^ (q + 1) = b} ≤ q + 1 := fun b _ => card_root_le q b
+  have hle : ∀ b ∈ F, # {x : L | x ^ (q + 1) = b} ≤ q + 1 := fun b _ => card_root_le q b
   have haF : a ∈ F := by simp [hF, ha0, haq]
   by_contra hne
-  have hlt : #{x : L | x ^ (q + 1) = a} < q + 1 := lt_of_le_of_ne (hle a haF) hne
+  have hlt : # {x : L | x ^ (q + 1) = a} < q + 1 := lt_of_le_of_ne (hle a haF) hne
   have := sum_lt_sum hle ⟨a, haF, hlt⟩
   rw [hsum, sum_const, smul_eq_mul] at this
   have e : F.card = q - 1 := by omega
@@ -143,14 +142,14 @@ theorem card_norm_fibre [DecidableEq L] (h2 : Module.finrank K L = 2) (a : L) (h
   omega
 
 omit [Fintype K] [Algebra K L] in
-theorem card_norm_zero [DecidableEq L] (n : ℕ) : #{x : L | x ^ (n + 1) = 0} = 1 := by
+theorem card_norm_zero [DecidableEq L] (n : ℕ) : # {x : L | x ^ (n + 1) = 0} = 1 := by
   rw [card_eq_one]
   refine ⟨0, ?_⟩
   ext x
   simp
 
-theorem exists_trace_ne_zero (h2 : Module.finrank K L = 2) (z : L) (hz : z ≠ 0) :
-    ∃ c : L, c * z + (c * z) ^ Fintype.card K ≠ 0 := by
+theorem exists_trace_ne_zero (h2 : Module.finrank K L = 2) (z : L) (hz : z ≠ 0)
+    : ∃ c : L, c * z + (c * z) ^ Fintype.card K ≠ 0 := by
   classical
   by_contra hall
   push Not at hall
@@ -167,8 +166,7 @@ theorem exists_trace_ne_zero (h2 : Module.finrank K L = 2) (z : L) (hz : z ≠ 0
       exact (neg_eq_of_add_eq_zero_right this)
     rw [e1, e2]
   have hc := card_fixed (K := K) (L := L)
-  have huniv : ({x : L | x ^ Fintype.card K = x} : Finset L) = univ := by
-    ext t; simp [hfix t]
+  have huniv : ({x : L | x ^ Fintype.card K = x} : Finset L) = univ := by ext t; simp [hfix t]
   rw [huniv, card_univ, card_L h2] at hc
   have hq := one_lt_q (K := K)
   have : Fintype.card K ^ 2 > Fintype.card K := by nlinarith

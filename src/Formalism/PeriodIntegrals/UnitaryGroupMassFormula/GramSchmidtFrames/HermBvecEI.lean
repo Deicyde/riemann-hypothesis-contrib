@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSchmidtFrame
 
 @[expose] public section
 
-open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 open Matrix
 
 noncomputable section
@@ -204,9 +205,11 @@ lemma regroup (M : B.Mat k r) (A C : Fin (r + 1) → ℂ) (U' : Matrix (Fin (r +
         refine Finset.sum_congr rfl fun c _ => ?_
         rw [Matrix.mulVec_smul]
 
-theorem xcof_N {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hz' : C2.StdZ k r z') {n n' : B.Mat k r}
-    (hn : n ∈ Nset k r) (hn' : n' ∈ Nset k r) (y : B.Mat k r) :
-    xcof k r z z' (n * y * n') = n *ᵥ xcof k r z z' y := by
+theorem xcof_N
+    {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hz' : C2.StdZ k r z')
+    {n n' : B.Mat k r} (hn : n ∈ Nset k r) (hn' : n' ∈ Nset k r)
+    (y : B.Mat k r)
+    : xcof k r z z' (n * y * n') = n *ᵥ xcof k r z z' y := by
   have hF' := Formalism.FourierDecayAlt.P.unipotent_map_frame k r z' hz'
   have hF := Formalism.FourierDecayAlt.P.unipotent_map_frame k r z hz
   have hS : n ∈ Sset k r z := ⟨1, one_mem_UW z, n, hn, (one_mul _).symm⟩
@@ -224,12 +227,16 @@ theorem xcof_N {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hz' : 
     adj_of_inv hdU (by rw [← Matrix.conjTranspose_mul, hVU, Matrix.conjTranspose_one])
   have hU'adj : C2.uMap k r z' n' * (C2.uMap k r z' n').adjugate = 1 := by
     rw [Matrix.mul_adjugate, unitri_det hU', one_smul]
-  have hadj : (Zhat k r z z' (n * y * n')).adjugate =
-      (C2.uMap k r z' n').adjugate * ((Zhat k r z z' y).adjugate * (C2.uMap k r z n)ᴴ) := by
+  have hadj
+      : (Zhat k r z z' (n * y * n')).adjugate
+        = (C2.uMap k r z' n').adjugate * ((Zhat k r z z' y).adjugate * (C2.uMap k r z n)ᴴ) := by
     rw [zhat_N hz hz' hn hn' y, Matrix.adjugate_mul_distrib, Matrix.adjugate_mul_distrib, hadjU]
-  have hfr : ∀ b, n' *ᵥ fvec k r z' b = ∑ c, C2.uMap k r z' n' c b • fvec k r z' c := (hF'.1 n' hS').1
+  have hfr : ∀ b, n' *ᵥ fvec k r z' b = ∑ c, C2.uMap k r z' n' c b • fvec k r z' c :=
+    (hF'.1 n' hS').1
   unfold xcof
-  have e1 : ∀ b, (n * y * n') *ᵥ fvec k r z' b = (n * y) *ᵥ ∑ c, C2.uMap k r z' n' c b • fvec k r z' c := by
+  have e1
+      : ∀ b,
+        (n * y * n') *ᵥ fvec k r z' b = (n * y) *ᵥ ∑ c, C2.uMap k r z' n' c b • fvec k r z' c := by
     intro b; rw [← hfr b, mulVec_mulVec]
   simp only [e1]
   rw [regroup (n * y) _ _ _ _ (key_alg hU'adj hadj hV), ← mulVec_mulVec, mv_sum y]

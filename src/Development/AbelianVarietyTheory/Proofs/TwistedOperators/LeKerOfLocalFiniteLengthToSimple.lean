@@ -16,11 +16,12 @@ variable {W : Type} [AddCommGroup W] [Module ℂ W]
 def MinStab (A : Set (Module.End ℂ W)) (T : Submodule ℂ W) : Prop :=
   Stab A T ∧ ∀ U : Submodule ℂ W, Stab A U → U ≤ T → U = ⊥ ∨ U = T
 
-theorem MinStab.map {A : Set (Module.End ℂ W)} {T : Submodule ℂ W} (hT : MinStab A T)
-    (b : Module.End ℂ W) (hb : ∀ a ∈ A, a * b = b * a) : MinStab A (T.map b) := by
+theorem MinStab.map
+    {A : Set (Module.End ℂ W)} {T : Submodule ℂ W} (hT : MinStab A T)
+    (b : Module.End ℂ W) (hb : ∀ a ∈ A, a * b = b * a)
+    : MinStab A (T.map b) := by
   obtain ⟨hTs, hTmin⟩ := hT
-  have hcomm' : ∀ a ∈ A, ∀ x, a (b x) = b (a x) := fun a ha x =>
-    LinearMap.congr_fun (hb a ha) x
+  have hcomm' : ∀ a ∈ A, ∀ x, a (b x) = b (a x) := fun a ha x => LinearMap.congr_fun (hb a ha) x
   refine ⟨?_, ?_⟩
   · intro a ha y hy
     obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hy
@@ -49,9 +50,10 @@ theorem MinStab.map {A : Set (Module.End ℂ W)} {T : Submodule ℂ W} (hT : Min
       have hx' : x ∈ T ⊓ U.comap b := by rw [h]; exact hx
       exact hx'.2
 
-theorem exists_stab_compl {A : Set (Module.End ℂ W)}
-    (htop : sSup {T | MinStab A T} = ⊤) (K : Submodule ℂ W) (hK : Stab A K) :
-    ∃ C : Submodule ℂ W, Stab A C ∧ C ⊓ K = ⊥ ∧ C ⊔ K = ⊤ := by
+theorem exists_stab_compl
+    {A : Set (Module.End ℂ W)} (htop : sSup {T | MinStab A T} = ⊤)
+    (K : Submodule ℂ W) (hK : Stab A K)
+    : ∃ C : Submodule ℂ W, Stab A C ∧ C ⊓ K = ⊥ ∧ C ⊔ K = ⊤ := by
   have hsup : ∀ N N' : Submodule ℂ W, Stab A N → Stab A N' → Stab A (N ⊔ N') := by
     intro N N' hN hN' a ha x hx
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
@@ -86,8 +88,7 @@ theorem exists_stab_compl {A : Set (Module.End ℂ W)}
     simp only [not_exists, not_and, not_not] at h
     exact hne (top_unique (by rw [← htop]; exact sSup_le fun T hT => h T hT))
   obtain ⟨T, ⟨hTs, hTmin⟩, hTn⟩ := hex
-  have hI : Stab A (T ⊓ (C ⊔ K)) := fun a ha x hx =>
-    ⟨hTs a ha x hx.1, hsup C K hCs hK a ha x hx.2⟩
+  have hI : Stab A (T ⊓ (C ⊔ K)) := fun a ha x hx => ⟨hTs a ha x hx.1, hsup C K hCs hK a ha x hx.2⟩
   rcases hTmin _ hI inf_le_left with h | h
   · have hmem : C ⊔ T ∈ S := by
       refine ⟨hsup C T hCs hTs, ?_⟩
@@ -97,8 +98,9 @@ theorem exists_stab_compl {A : Set (Module.End ℂ W)}
       obtain ⟨c, hc, t, ht, rfl⟩ := Submodule.mem_sup.mp hx
       have ht' : t ∈ T ⊓ (C ⊔ K) := by
         refine ⟨ht, ?_⟩
-        simpa using Submodule.sub_mem _ (Submodule.mem_sup_right hxK : c + t ∈ C ⊔ K)
-          (Submodule.mem_sup_left hc : c ∈ C ⊔ K)
+        simpa using
+          Submodule.sub_mem _ (Submodule.mem_sup_right hxK : c + t ∈ C ⊔ K)
+            (Submodule.mem_sup_left hc : c ∈ C ⊔ K)
       have ht0 : t = 0 := by
         rw [h] at ht'
         exact (Submodule.mem_bot ℂ).mp ht'
@@ -112,21 +114,19 @@ theorem exists_stab_compl {A : Set (Module.End ℂ W)}
 
 end HeadKill
 
-theorem le_ker_of_simple_commuting {M W : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup W]
-    [Module ℂ W]
+theorem le_ker_of_simple_commuting
+    {M W : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup W] [Module ℂ W]
     (Op : Set (Module.End ℂ M)) (Rel K : Submodule ℂ M) (φ : M →ₗ[ℂ] W)
     (act : Module.End ℂ M → Module.End ℂ W) (B : Set (Module.End ℂ W))
-    (hL : ∃ L : ℕ, ∀ (m : ℕ) (N : Fin m → Submodule ℂ M), StrictMono N →
-        (∀ j, Rel ≤ N j ∧ ∀ g ∈ Op, ∀ x ∈ N j, g x ∈ N j) → m ≤ L)
-    (hmax : ∀ N : Submodule ℂ M, Rel ≤ N → Stab Op N → N ≠ ⊤ → N ≤ K)
-    (hKtop : K ≠ ⊤) (hK : Stab Op K) (hRel : Rel ≤ LinearMap.ker φ)
-    (hφ : ∀ g ∈ Op, φ ∘ₗ g = act g ∘ₗ φ)
+    (hL : ∃ L : ℕ, ∀ (m : ℕ) (N : Fin m → Submodule ℂ M),
+      StrictMono N → (∀ j, Rel ≤ N j ∧ ∀ g ∈ Op, ∀ x ∈ N j, g x ∈ N j) → m ≤ L)
+    (hmax : ∀ N : Submodule ℂ M, Rel ≤ N → Stab Op N → N ≠ ⊤ → N ≤ K) (hKtop : K ≠ ⊤)
+    (hK : Stab Op K) (hRel : Rel ≤ LinearMap.ker φ) (hφ : ∀ g ∈ Op, φ ∘ₗ g = act g ∘ₗ φ)
     (hcomm : ∀ g ∈ Op, ∀ b ∈ B, act g * b = b * act g)
-    (hsimple : ∀ U : Submodule ℂ W, Stab (act '' Op ∪ B) U → U = ⊥ ∨ U = ⊤) :
-    K ≤ LinearMap.ker φ := by
+    (hsimple : ∀ U : Submodule ℂ W, Stab (act '' Op ∪ B) U → U = ⊥ ∨ U = ⊤)
+    : K ≤ LinearMap.ker φ := by
   classical
-  have hint : ∀ g ∈ Op, ∀ x, φ (g x) = act g (φ x) := fun g hg x =>
-    LinearMap.congr_fun (hφ g hg) x
+  have hint : ∀ g ∈ Op, ∀ x, φ (g x) = act g (φ x) := fun g hg x => LinearMap.congr_fun (hφ g hg) x
   by_cases hφ0 : LinearMap.range φ = ⊥
   · intro x _
     have hx : φ x ∈ LinearMap.range φ := LinearMap.mem_range_self φ x
@@ -191,7 +191,9 @@ theorem le_ker_of_simple_commuting {M W : Type} [AddCommGroup M] [Module ℂ M] 
             (le_sSup (MinStab.map hT' a (hbcomm a ha)) : T'.map a ≤ _) (Submodule.mem_map_of_mem hy)
         exact fun x hx => hle hx
     rcases hsimple _ hst with h | h
-    · exact absurd (eq_bot_iff.mpr ((le_sSup (show T ∈ {T | MinStab (act '' Op) T} from hTms)).trans h.le)) hTP.2.2
+    · exact absurd
+        (eq_bot_iff.mpr ((le_sSup (show T ∈ {T | MinStab (act '' Op) T} from hTms)).trans h.le))
+        hTP.2.2
     · exact h
   have hKs : Stab (act '' Op) (K.map φ) := by
     intro a ha y hy
@@ -217,7 +219,7 @@ theorem le_ker_of_simple_commuting {M W : Type} [AddCommGroup M] [Module ℂ M] 
     have h2 : φ k ∈ C ⊓ K.map φ := ⟨h1, Submodule.mem_map_of_mem hk⟩
     rw [hCK] at h2
     exact (Submodule.mem_bot ℂ).mp h2
-  · exact absurd (top_unique (hNK.symm.le.trans
-      (sup_le (hmax _ (hRelc C) (hcomap C hCs) hN) le_rfl))) hKtop
+  · exact absurd
+      (top_unique (hNK.symm.le.trans (sup_le (hmax _ (hRelc C) (hcomap C hCs) hN) le_rfl))) hKtop
 
 end GlobalTheory.TensHead

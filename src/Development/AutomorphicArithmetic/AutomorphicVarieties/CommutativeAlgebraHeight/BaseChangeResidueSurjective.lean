@@ -7,12 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.CA ReciprocityTheory.CA
 
-private theorem base_change_residue_surjective (O' R T : Type) [CommRing O'] [IsLocalRing O'] [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R] [CommRing T] [Algebra O' T] [Algebra R T]
-    [Module.Finite R T] (φ : T →+* ResidueField O') (hφ : ∀ a, φ (algebraMap O' T a) = residue O' a)
+private theorem base_change_residue_surjective
+    (O' R T : Type) [CommRing O'] [IsLocalRing O'] [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    [IsAdicComplete (maximalIdeal R) R] [CommRing T] [Algebra O' T] [Algebra R T]
+    [Module.Finite R T]
+    (φ : T →+* ResidueField O') (hφ : ∀ a, φ (algebraMap O' T a) = residue O' a)
     (hm : ∀ r ∈ maximalIdeal R, φ (algebraMap R T r) = 0)
-    (hs : ∀ x : T, ∃ a : O', x - algebraMap O' T a ∈ (maximalIdeal R).map (algebraMap R T)) :
-    IsCO O' T := by
+    (hs : ∀ x : T, ∃ a : O', x - algebraMap O' T a ∈ (maximalIdeal R).map (algebraMap R T))
+    : IsCO O' T := by
   have hJ : (maximalIdeal R).map (algebraMap R T) ≤ Ideal.jacobson ⊥ := by
     rw [Ideal.map_le_iff_le_comap]
     intro r hr
@@ -72,8 +74,10 @@ private theorem base_change_residue_surjective (O' R T : Type) [CommRing O'] [Is
       exact not_isUnit_zero h7
     exact h6 ha
 
-theorem UpperTheory.V.CA.cl_bc :
-    ∀ (O O' R : Type) [CommRing O] [IsLocalRing O] [CommRing O'] [IsLocalRing O'] [Algebra O O'] [Module.Finite O O'] [IsLocalHom (algebraMap O O')] [CommRing R] [Algebra O R] [IsCO O R], IsCO O' (TensorProduct O O' R) := by
+theorem UpperTheory.V.CA.cl_bc
+    : ∀ (O O' R : Type) [CommRing O] [IsLocalRing O] [CommRing O'] [IsLocalRing O'] [Algebra O O']
+        [Module.Finite O O'] [IsLocalHom (algebraMap O O')] [CommRing R] [Algebra O R] [IsCO O R],
+      IsCO O' (TensorProduct O O' R) := by
   intro O O' R _ _ _ _ _ _ _ _ _ _
   letI : Algebra R (TensorProduct O O' R) := Algebra.TensorProduct.rightAlgebra
   have hR : ∀ r : R, algebraMap R (TensorProduct O O' R) r = 1 ⊗ₜ r := fun r => rfl
@@ -92,7 +96,8 @@ theorem UpperTheory.V.CA.cl_bc :
   let f : O' →ₐ[O] ResidueField O' := IsScalarTower.toAlgHom O O' (ResidueField O')
   let g : R →ₐ[O] ResidueField O' :=
     (IsScalarTower.toAlgHom O (ResidueField O) (ResidueField O')).comp (res O R)
-  let φ : TensorProduct O O' R →+* ResidueField O' := (Algebra.TensorProduct.productMap f g).toRingHom
+  let φ : TensorProduct O O' R →+* ResidueField O' :=
+    (Algebra.TensorProduct.productMap f g).toRingHom
   refine base_change_residue_surjective O' R (TensorProduct O O' R) φ ?_ ?_ ?_
   · intro a
     simp [φ, f, g]
@@ -107,18 +112,23 @@ theorem UpperTheory.V.CA.cl_bc :
     | tmul o r =>
       obtain ⟨c, hc⟩ := IsCO.res_surj (O := O) r
       refine ⟨algebraMap O O' c * o, ?_⟩
-      have e2 : o ⊗ₜ[O] r - algebraMap O' (TensorProduct O O' R) (algebraMap O O' c * o) =
-          algebraMap O' (TensorProduct O O' R) o * algebraMap R (TensorProduct O O' R) (r - algebraMap O R c) := by
-        rw [hR, hL, hL, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, TensorProduct.tmul_sub,
-          ← Algebra.smul_def, TensorProduct.smul_tmul, Algebra.algebraMap_eq_smul_one]
+      have e2
+          : o ⊗ₜ[O] r - algebraMap O' (TensorProduct O O' R) (algebraMap O O' c * o)
+            = algebraMap O' (TensorProduct O O' R) o
+              * algebraMap R (TensorProduct O O' R) (r - algebraMap O R c) := by
+        rw [hR, hL, hL, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul,
+          TensorProduct.tmul_sub, ← Algebra.smul_def, TensorProduct.smul_tmul,
+          Algebra.algebraMap_eq_smul_one]
       rw [e2]
       exact Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ hc)
     | add x y hx hy =>
       obtain ⟨a, ha⟩ := hx
       obtain ⟨b, hb⟩ := hy
       refine ⟨a + b, ?_⟩
-      have e3 : x + y - algebraMap O' (TensorProduct O O' R) (a + b) =
-          (x - algebraMap O' (TensorProduct O O' R) a) + (y - algebraMap O' (TensorProduct O O' R) b) := by
+      have e3
+          : x + y - algebraMap O' (TensorProduct O O' R) (a + b)
+            = (x - algebraMap O' (TensorProduct O O' R) a)
+              + (y - algebraMap O' (TensorProduct O O' R) b) := by
         rw [map_add (f := _)]
         ring
       rw [e3]

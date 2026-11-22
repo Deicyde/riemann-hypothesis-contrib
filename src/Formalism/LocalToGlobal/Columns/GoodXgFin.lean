@@ -20,11 +20,11 @@ variable {G : Type} [Group G] [Fintype G]
 def gxIrrSet (k : Type) [Field k] : Set (G → k) :=
   {ψ | ∃ (n : ℕ) (ρ : Representation k G (Fin n → k)), ρ.IsIrreducible ∧ ρ.character = ψ}
 
-
 open Classical in
-theorem gx_orth {k : Type} [Field k] [IsAlgClosed k] [CharZero k] {ψ ψ' : G → k}
-    (hψ : ψ ∈ gxIrrSet (G := G) k) (hψ' : ψ' ∈ gxIrrSet (G := G) k) :
-    (Nat.card G : k)⁻¹ * ∑ g : G, ψ g * ψ' g⁻¹ = if ψ = ψ' then 1 else 0 := by
+theorem gx_orth
+    {k : Type} [Field k] [IsAlgClosed k] [CharZero k]
+    {ψ ψ' : G → k} (hψ : ψ ∈ gxIrrSet (G := G) k) (hψ' : ψ' ∈ gxIrrSet (G := G) k)
+    : (Nat.card G : k)⁻¹ * ∑ g : G, ψ g * ψ' g⁻¹ = if ψ = ψ' then 1 else 0 := by
   classical
   obtain ⟨n, ρ, hρ, rfl⟩ := hψ
   obtain ⟨n', ρ', hρ', rfl⟩ := hψ'
@@ -35,7 +35,6 @@ theorem gx_orth {k : Type} [Field k] [IsAlgClosed k] [CharZero k] {ψ ψ' : G �
   by_cases h : ρ.character = ρ'.character
   · rw [if_pos h]
     have : Nonempty (ρ'.Equiv ρ) := by
-
       by_contra hne
       have h1 := Representation.char_orthonormal ρ ρ
       rw [if_pos ⟨Representation.Equiv.refl ρ⟩] at h1
@@ -49,8 +48,8 @@ theorem gx_orth {k : Type} [Field k] [IsAlgClosed k] [CharZero k] {ψ ψ' : G �
     have : ¬ Nonempty (ρ'.Equiv ρ) := fun ⟨φ⟩ => h (Representation.char_iso φ).symm
     rw [if_neg this]
 
-theorem gx_linInd {k : Type} [Field k] [IsAlgClosed k] [CharZero k] :
-    LinearIndependent k (fun ψ : gxIrrSet (G := G) k => (ψ : G → k)) := by
+theorem gx_linInd {k : Type} [Field k] [IsAlgClosed k] [CharZero k]
+    : LinearIndependent k (fun ψ : gxIrrSet (G := G) k => (ψ : G → k)) := by
   classical
   rw [linearIndependent_iff']
   intro s c hs ψ0 hψ0
@@ -58,9 +57,11 @@ theorem gx_linInd {k : Type} [Field k] [IsAlgClosed k] [CharZero k] :
     intro g
     have := congrFun hs g
     simpa [Finset.sum_apply] using this
-  have h3 : ∑ ψ ∈ s, c ψ * ((Nat.card G : k)⁻¹ * ∑ g : G, (ψ : G → k) g * (ψ0 : G → k) g⁻¹) = 0 := by
-    have hre : ∑ ψ ∈ s, c ψ * ((Nat.card G : k)⁻¹ * ∑ g : G, (ψ : G → k) g * (ψ0 : G → k) g⁻¹)
-        = (Nat.card G : k)⁻¹ * ∑ g : G, (∑ ψ ∈ s, c ψ * (ψ : G → k) g) * (ψ0 : G → k) g⁻¹ := by
+  have h3
+      : ∑ ψ ∈ s, c ψ * ((Nat.card G : k)⁻¹ * ∑ g : G, (ψ : G → k) g * (ψ0 : G → k) g⁻¹) = 0 := by
+    have hre
+        : ∑ ψ ∈ s, c ψ * ((Nat.card G : k)⁻¹ * ∑ g : G, (ψ : G → k) g * (ψ0 : G → k) g⁻¹)
+          = (Nat.card G : k)⁻¹ * ∑ g : G, (∑ ψ ∈ s, c ψ * (ψ : G → k) g) * (ψ0 : G → k) g⁻¹ := by
       simp_rw [Finset.mul_sum, Finset.sum_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun g _ => ?_
@@ -69,8 +70,10 @@ theorem gx_linInd {k : Type} [Field k] [IsAlgClosed k] [CharZero k] :
       ring
     rw [hre]
     simp [key]
-  have h4 : ∀ ψ ∈ s, c ψ * ((Nat.card G : k)⁻¹ * ∑ g : G, (ψ : G → k) g * (ψ0 : G → k) g⁻¹) =
-      if ψ = ψ0 then c ψ else 0 := by
+  have h4
+      : ∀ ψ ∈ s,
+        c ψ * ((Nat.card G : k)⁻¹ * ∑ g : G, (ψ : G → k) g * (ψ0 : G → k) g⁻¹)
+          = if ψ = ψ0 then c ψ else 0 := by
     intro ψ _
     rw [gx_orth ψ.2 ψ0.2]
     by_cases h : ψ = ψ0
@@ -80,12 +83,16 @@ theorem gx_linInd {k : Type} [Field k] [IsAlgClosed k] [CharZero k] :
   rw [Finset.sum_congr rfl h4, Finset.sum_ite_eq' s ψ0 c] at h3
   simpa [hψ0] using h3
 
-theorem gxIrrSet_finite {k : Type} [Field k] [IsAlgClosed k] [CharZero k] : (gxIrrSet (G := G) k).Finite := Set.finite_coe_iff.1 (gx_linInd (G := G) (k := k)).finite
+theorem gxIrrSet_finite {k : Type} [Field k] [IsAlgClosed k] [CharZero k]
+    : (gxIrrSet (G := G) k).Finite :=
+  Set.finite_coe_iff.1 (gx_linInd (G := G) (k := k)).finite
 
-theorem absIrrChar_finite {K : Type} [Field K] [CharZero K] : {χ : G → K | IsAbsIrrChar χ}.Finite := by
+theorem absIrrChar_finite {K : Type} [Field K] [CharZero K]
+    : {χ : G → K | IsAbsIrrChar χ}.Finite := by
   haveI : CharZero (AlgebraicClosure K) :=
     charZero_of_injective_algebraMap (algebraMap K (AlgebraicClosure K)).injective
-  apply Set.Finite.of_finite_image (f := fun χ : G → K => fun t => algebraMap K (AlgebraicClosure K) (χ t))
+  apply Set.Finite.of_finite_image
+    (f := fun χ : G → K => fun t => algebraMap K (AlgebraicClosure K) (χ t))
   · apply (gxIrrSet_finite (G := G) (k := AlgebraicClosure K)).subset
     rintro _ ⟨χ, ⟨n, ρ, hρ, hχ⟩, rfl⟩
     exact ⟨n, ρ, hρ, funext hχ⟩

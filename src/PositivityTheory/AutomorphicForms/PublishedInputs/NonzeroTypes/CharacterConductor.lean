@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ
 
@@ -38,13 +39,13 @@ theorem cond_one : cond (1 : 𝒪[k]ˣ →* ℂˣ) = 0 := by
   intro u _
   rfl
 
-theorem res_div_swap {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b : Fin s) :
-    res (μ b / μ a) = (res (μ a / μ b))⁻¹ := by
+theorem res_div_swap {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b : Fin s)
+    : res (μ b / μ a) = (res (μ a / μ b))⁻¹ := by
   ext u
   simp [res, MonoidHom.div_apply, MonoidHom.inv_apply, inv_div]
 
-theorem res_div_mul {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b c : Fin s) (u : 𝒪[k]ˣ) :
-    res (μ a / μ c) u = res (μ a / μ b) u * res (μ b / μ c) u := by
+theorem res_div_mul {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b c : Fin s) (u : 𝒪[k]ˣ)
+    : res (μ a / μ c) u = res (μ a / μ b) u * res (μ b / μ c) u := by
   simp [res, MonoidHom.div_apply, div_mul_div_cancel₀]
 
 theorem cc_self {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a : Fin s) : cc μ a a = 0 := by
@@ -56,22 +57,24 @@ theorem cc_comm {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b : Fin s) : cc μ 
   unfold cc
   rw [res_div_swap μ a b, cond_eq, cond_eq, CS_inv]
 
-theorem cc_ultra {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b c : Fin s)
-    (hab : (CS (res (μ a / μ b))).Nonempty) (hbc : (CS (res (μ b / μ c))).Nonempty) :
-    cc μ a c ≤ max (cc μ a b) (cc μ b c) := by
+theorem cc_ultra
+    {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b c : Fin s) (hab : (CS (res (μ a / μ b))).Nonempty)
+    (hbc : (CS (res (μ b / μ c))).Nonempty)
+    : cc μ a c ≤ max (cc μ a b) (cc μ b c) := by
   have h1 : cc μ a b ∈ CS (res (μ a / μ b)) := Nat.sInf_mem hab
   have h2 : cc μ b c ∈ CS (res (μ b / μ c)) := Nat.sInf_mem hbc
   have h3 : max (cc μ a b) (cc μ b c) ∈ CS (res (μ a / μ c)) := by
     intro u hu
-    rw [res_div_mul μ a b c u,
-      CS_mono _ h1 (le_max_left _ _) u hu, CS_mono _ h2 (le_max_right _ _) u hu, one_mul]
+    rw [res_div_mul μ a b c u, CS_mono _ h1 (le_max_left _ _) u hu,
+      CS_mono _ h2 (le_max_right _ _) u hu, one_mul]
   exact Nat.sInf_le h3
 
-theorem step_ccBasic_of_cond :
-    ∀ (s : ℕ) (μ : Fin s → kˣ →* ℂˣ),
-      (∀ a b : Fin s, ∃ c : ℕ, ∀ u : 𝒪[k]ˣ, (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c →
-        res (μ a / μ b) u = 1) →
-      ∀ a b c : Fin s, cc μ a a = 0 ∧ cc μ a b = cc μ b a ∧ cc μ a c ≤ max (cc μ a b) (cc μ b c) := by
+theorem step_ccBasic_of_cond
+    : ∀ (s : ℕ) (μ : Fin s → kˣ →* ℂˣ),
+      (∀ a b : Fin s, ∃ c : ℕ, ∀ u : 𝒪[k]ˣ,
+          (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c → res (μ a / μ b) u = 1)
+        → ∀ a b c : Fin s,
+          cc μ a a = 0 ∧ cc μ a b = cc μ b a ∧ cc μ a c ≤ max (cc μ a b) (cc μ b c) := by
   intro s μ hμ a b c
   refine ⟨cc_self μ a, cc_comm μ a b, cc_ultra μ a b c ?_ ?_⟩
   · obtain ⟨c0, h⟩ := hμ a b
@@ -83,8 +86,7 @@ end CharacterConductor
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem step_ccBasic : CompactConductorBasicProp (k := k) :=
-  CharacterConductor.step_ccBasic_of_cond
+theorem step_ccBasic : CompactConductorBasicProp (k := k) := CharacterConductor.step_ccBasic_of_cond
 
 end Grp
 

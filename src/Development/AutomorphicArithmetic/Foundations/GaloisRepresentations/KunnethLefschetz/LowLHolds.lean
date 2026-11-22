@@ -6,13 +6,15 @@ public import Development.EtaleCohomology.EtaleTrace.H0LimitCoherence
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace LateralTheory.EtaleTrace.H0LimitCoherence
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  LateralTheory.EtaleTrace.H0LimitCoherence
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.KunnethLefschetz
 
-private theorem sub_of (l : ℕ) [Fact l.Prime] {E : Spc} {n : ℤ} (h : ∀ j, Subsingleton (Ht (l ^ j) E n 0)) :
-    Subsingleton (HQ l E n 0) := by
+private theorem sub_of
+    (l : ℕ) [Fact l.Prime] {E : Spc} {n : ℤ} (h : ∀ j, Subsingleton (Ht (l ^ j) E n 0))
+    : Subsingleton (HQ l E n 0) := by
   have hx : ∀ x : Hl l E n 0, x = 0 := by
     intro x
     apply Subtype.ext
@@ -28,24 +30,27 @@ theorem lowL_holds : LowL := by
   have hu : IsUnit ((l : ℕ) : Γ(S k, ⊤)) := by
     simpa using (isUnit_iff_ne_zero.mpr hl).map (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom
   obtain ⟨ω, hω, hone⟩ := hR.one_def (S k) hu
-  obtain ⟨hsurj, hinj⟩ := rep_of ω
-    (fun j z => by
-      obtain ⟨a, ha⟩ := (hT j).1.1 z
-      exact ⟨a, by rw [ha]; simp [lv, hω]⟩)
-    (fun j a ha => (hT j).1.2 a (by simpa [lv, hω] using ha))
+  obtain ⟨hsurj, hinj⟩ :=
+    rep_of ω
+      (fun j z => by
+        obtain ⟨a, ha⟩ := (hT j).1.1 z
+        exact ⟨a, by rw [ha]; simp [lv, hω]⟩)
+      (fun j a ha => (hT j).1.2 a (by simpa [lv, hω] using ha))
   let e : ℤ_[l] ≃ₗ[ℤ_[l]] Hl l (sch.obj (S k)) 0 0 :=
-    LinearEquiv.ofBijective (LinearMap.toSpanSingleton ℤ_[l] _ ω)
-      ⟨fun c d hcd => by
-        have h0 : (c - d) • ω = 0 := by
-          simpa [sub_smul, sub_eq_zero] using hcd
+    LinearEquiv.ofBijective (LinearMap.toSpanSingleton ℤ_[l] _ ω) ⟨
+      fun c d hcd => by
+        have h0 : (c - d) • ω = 0 := by simpa [sub_smul, sub_eq_zero] using hcd
         exact sub_eq_zero.mp (hinj _ h0),
-       fun x => by
+      fun x => by
         obtain ⟨c, hc⟩ := hsurj x
-        exact ⟨c, by simp [hc]⟩⟩
+        exact ⟨c, by simp [hc]⟩
+    ⟩
   let Φ : V l (S k) 0 ≃ₗ[ℤ_[l]] ℚ_[l] :=
-    (TensorProduct.congr (LinearEquiv.refl ℤ_[l] ℚ_[l]) e.symm).trans (TensorProduct.rid ℤ_[l] ℚ_[l])
-  have hΦ : ∀ (q : ℚ_[l]) (u : Hl l (sch.obj (S k)) 0 0),
-      Φ (q ⊗ₜ u) = ((e.symm u : ℤ_[l]) : ℚ_[l]) * q := by
+    (TensorProduct.congr (LinearEquiv.refl ℤ_[l] ℚ_[l]) e.symm).trans
+      (TensorProduct.rid ℤ_[l] ℚ_[l])
+  have hΦ
+      : ∀ (q : ℚ_[l]) (u : Hl l (sch.obj (S k)) 0 0),
+        Φ (q ⊗ₜ u) = ((e.symm u : ℤ_[l]) : ℚ_[l]) * q := by
     intro q u
     simp [Φ, Algebra.smul_def]
   have he : ∀ c : ℤ_[l], e.symm (c • ω) = c := by
@@ -62,8 +67,9 @@ theorem lowL_holds : LowL := by
     rw [one_smul] at this
     rw [this]
     simp
-  have key : ∀ (b : ℤ_[l]) (u : Hl l (sch.obj (S k)) 0 0), b ≠ 0 →
-      ((b : ℚ_[l])⁻¹ ⊗ₜ[ℤ_[l]] u : V l (S k) 0) = 0 → u = 0 := by
+  have key
+      : ∀ (b : ℤ_[l]) (u : Hl l (sch.obj (S k)) 0 0),
+        b ≠ 0 → ((b : ℚ_[l])⁻¹ ⊗ₜ[ℤ_[l]] u : V l (S k) 0) = 0 → u = 0 := by
     intro b u hb h
     have h1 := congrArg Φ h
     rw [hΦ, map_zero] at h1
@@ -74,8 +80,9 @@ theorem lowL_holds : LowL := by
       · exact absurd h3 (inv_ne_zero hb')
     have h4 : e.symm u = 0 := Subtype.ext h2
     simpa using congrArg e h4
-  have hpb : ∀ {X : Scheme} (y : S k ⟶ X) (q : ℚ_[l]) (x : Hl l (sch.obj X) 0 0),
-      pb l y 0 (q ⊗ₜ x) = q ⊗ₜ pullHl l (sch.map y) 0 0 x := by
+  have hpb
+      : ∀ {X : Scheme} (y : S k ⟶ X) (q : ℚ_[l]) (x : Hl l (sch.obj X) 0 0),
+        pb l y 0 (q ⊗ₜ x) = q ⊗ₜ pullHl l (sch.map y) 0 0 x := by
     intro X y q x
     simp only [pb, pullHQ, LinearMap.baseChange_tmul]
   refine ⟨?_, ?_, ?_, ?_, ?_⟩

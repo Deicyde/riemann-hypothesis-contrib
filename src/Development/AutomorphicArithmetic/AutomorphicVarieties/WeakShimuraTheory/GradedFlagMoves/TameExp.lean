@@ -5,13 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Valua
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 private theorem UpperTheory.V.Ws.Rt.wild_mem_ker
-    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} (hl : l.Prime)
-    {A : ValuationSubring Ω} (hvl : ¬ A.valuation (l : Ω) < 1) {N : Type} [Group N]
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} (hl : l.Prime)
+    {A : ValuationSubring Ω} (hvl : ¬ A.valuation (l : Ω) < 1)
+    {N : Type} [Group N]
     (ψ : Ine (F := F) A →* N) (ho : IsOpen (ψ.ker : Set (Ine (F := F) A))) (hψ : ∀ σ, ψ σ ^ l = 1)
-    (σ : Ine (F := F) A) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ.1 y / y - 1) < 1) : ψ σ = 1 := by
+    (σ : Ine (F := F) A) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ.1 y / y - 1) < 1)
+    : ψ σ = 1 := by
   obtain ⟨t, ht, hte⟩ := isOpen_induced_iff.1 ho
   have h1t : (1 : G F Ω) ∈ t := by
     have h1 : (1 : Ine (F := F) A) ∈ (Subtype.val ⁻¹' t : Set (Ine (F := F) A)) := by
@@ -29,8 +34,7 @@ private theorem UpperTheory.V.Ws.Rt.wild_mem_ker
     have hx' := congrArg (fun φ => φ ⟨x, hx⟩) he
     simp only [f, AlgHom.comp_apply, IntermediateField.val_mk, AlgHom.coe_coe] at hx'
     have hx'' : (σ.1 ^ i) x = (σ.1 ^ j) x := hx'
-    have hj : σ.1 ^ j = σ.1 ^ i * σ.1 ^ (j - i) := by
-      rw [← pow_add, Nat.add_sub_cancel' hlt.le]
+    have hj : σ.1 ^ j = σ.1 ^ i * σ.1 ^ (j - i) := by rw [← pow_add, Nat.add_sub_cancel' hlt.le]
     rw [hj, AlgEquiv.mul_apply] at hx''
     exact ((σ.1 ^ i).injective hx'').symm
   obtain ⟨n, hn0, hn⟩ := hfix
@@ -54,10 +58,14 @@ private theorem UpperTheory.V.Ws.Rt.wild_mem_ker
   have hg := pow_gcd_eq_one.2 ⟨hψ σ, hker⟩
   rwa [hcop.gcd_eq_one, pow_one] at hg
 
-theorem UpperTheory.V.Ws.Rt.tameExp :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω), ¬ A.valuation (l : Ω) < 1 →
-      ∀ (M : Type) [Monoid M] (φ : Ine (F := F) A →* M), IsLocallyConstant φ → (∀ σ, φ σ ^ l = 1) →
-      ∀ θ : Ine (F := F) A →* Multiplicative (ZMod l), IsOpen (θ.ker : Set (Ine (F := F) A)) → θ ≠ 1 → ∀ σ, θ σ = 1 → φ σ = 1 := by
+theorem UpperTheory.V.Ws.Rt.tameExp
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (A : ValuationSubring Ω),
+      ¬ A.valuation (l : Ω) < 1
+        → ∀ (M : Type) [Monoid M] (φ : Ine (F := F) A →* M),
+          IsLocallyConstant φ → (∀ σ, φ σ ^ l = 1)
+            → ∀ θ : Ine (F := F) A →* Multiplicative (ZMod l),
+              IsOpen (θ.ker : Set (Ine (F := F) A)) → θ ≠ 1 → ∀ σ, θ σ = 1 → φ σ = 1 := by
   intro F Ω _ _ _ _ _ l _ A hvl M _ φ hφ hφl θ hθo hθ1 σ hσ
   have hl : l.Prime := Fact.out
   obtain ⟨γ, hγ⟩ := GlobalTheory.TameInertiaGen.exists_tameGenAt_of_valuationSubring (E := F) A
@@ -83,8 +91,10 @@ theorem UpperTheory.V.Ws.Rt.tameExp :
     intro h
     apply hθ1
     ext τ
-    have hm := GlobalTheory.TameCharUnique.mem_of_tameGen hγ θ.ker (θ.ker.isClosed_of_isOpen hθo) h
-      (fun τ hτ => wθ τ hτ) τ
+    have hm :=
+      GlobalTheory.TameCharUnique.mem_of_tameGen hγ θ.ker (θ.ker.isClosed_of_isOpen hθo) h
+        (fun τ hτ => wθ τ hτ)
+        τ
     simpa [MonoidHom.mem_ker] using hm
   let Φ := φ'.prod θ
   let S := (Subgroup.zpowers (Φ ⟨γ, hγ.1⟩)).comap Φ
@@ -100,13 +110,15 @@ theorem UpperTheory.V.Ws.Rt.tameExp :
     apply Subgroup.isOpen_mono hle
     rw [Subgroup.coe_inf]
     exact hφ'o.inter hθo
-  have hσS := GlobalTheory.TameCharUnique.mem_of_tameGen hγ S (S.isClosed_of_isOpen hSo)
-    (Subgroup.mem_zpowers _)
-    (fun τ hτ => by
-      have h1 : Φ τ = 1 := by simp [Φ, wφ τ hτ, wθ τ hτ]
-      show Φ τ ∈ Subgroup.zpowers (Φ ⟨γ, hγ.1⟩)
-      rw [h1]
-      exact Subgroup.one_mem _) σ
+  have hσS :=
+    GlobalTheory.TameCharUnique.mem_of_tameGen hγ S (S.isClosed_of_isOpen hSo)
+      (Subgroup.mem_zpowers _)
+      (fun τ hτ => by
+        have h1 : Φ τ = 1 := by simp [Φ, wφ τ hτ, wθ τ hτ]
+        show Φ τ ∈ Subgroup.zpowers (Φ ⟨γ, hγ.1⟩)
+        rw [h1]
+        exact Subgroup.one_mem _)
+      σ
   obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.1 hσS
   have hk1 : φ' ⟨γ, hγ.1⟩ ^ k = φ' σ := by
     have := congrArg Prod.fst hk
@@ -120,7 +132,6 @@ theorem UpperTheory.V.Ws.Rt.tameExp :
     rw [← hord]
     exact orderOf_dvd_iff_zpow_eq_one.2 hk2
   obtain ⟨j, rfl⟩ := hdvd
-  have hu : φ' σ = 1 := by
-    rw [← hk1, zpow_mul, zpow_natCast, hφ'l, one_zpow]
+  have hu : φ' σ = 1 := by rw [← hk1, zpow_mul, zpow_natCast, hφ'l, one_zpow]
   have hv := congrArg Units.val hu
   simpa [φ'] using hv

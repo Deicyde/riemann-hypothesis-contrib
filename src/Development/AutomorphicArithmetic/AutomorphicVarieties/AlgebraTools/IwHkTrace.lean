@@ -5,17 +5,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 
-private theorem double_coset_operator_sum {A G M : Type} [CommRing A] [Group G] [AddCommGroup M] [Module A M] (ρ : Representation A G M)
-    (K K' : Subgroup G) (x : G) (h : (MulAction.orbit K (x : G ⧸ K')).Finite) (v : fixd ρ K') :
-    (hk2 ρ K K' x v : M) = ∑ q ∈ Set.Finite.toFinset h, ρ q.out v := by
+private theorem double_coset_operator_sum
+    {A G M : Type} [CommRing A] [Group G] [AddCommGroup M] [Module A M]
+    (ρ : Representation A G M)
+    (K K' : Subgroup G) (x : G) (h : (MulAction.orbit K (x : G ⧸ K')).Finite)
+    (v : fixd ρ K')
+    : (hk2 ρ K K' x v : M) = ∑ q ∈ Set.Finite.toFinset h, ρ q.out v := by
   rw [(hkApply A G M ρ K K' x h).1 v, dc,
-    finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ K' => ρ q.out), finsum_mem_eq_finite_toFinset_sum _ h,
-    LinearMap.sum_apply]
+    finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ K' => ρ q.out),
+    finsum_mem_eq_finite_toFinset_sum _ h, LinearMap.sum_apply]
 
-private theorem mem_orb {G : Type} [Group G] (K K' : Subgroup G) (x g : G) :
-    (g : G ⧸ K') ∈ MulAction.orbit K (x : G ⧸ K') ↔ ∃ a ∈ K, ∃ b ∈ K', g = a * x * b := by
+private theorem mem_orb {G : Type} [Group G] (K K' : Subgroup G) (x g : G)
+    : (g : G ⧸ K') ∈ MulAction.orbit K (x : G ⧸ K') ↔ ∃ a ∈ K, ∃ b ∈ K', g = a * x * b := by
   constructor
   · rintro ⟨a, ha⟩
     have ha' : (((a : G) * x : G) : G ⧸ K') = g := ha
@@ -25,21 +29,30 @@ private theorem mem_orb {G : Type} [Group G] (K K' : Subgroup G) (x g : G) :
     change ((a * x : G) : G ⧸ K') = _
     exact (QuotientGroup.mk_mul_of_mem _ hb).symm
 
-theorem UpperTheory.V.AlgebraTools.hkTrace :
-    ∀ (A G M : Type) [CommRing A] [Group G] [AddCommGroup M] [Module A M] (ρ : Representation A G M) (I K : Subgroup G) (h : I ≤ K) (ι : Type) [Fintype ι] (w : ι → G), HeckePair I → (∀ i, w i ∈ K) → (∀ g ∈ K, ∃! i, ∃ a ∈ I, ∃ b ∈ I, g = a * w i * b) → FinOrb K I 1 ∧ ∑ i, hk ρ I (w i) = inc ρ h ∘ₗ trc ρ K I ∧ ∀ v : fixd ρ K, trc ρ K I (inc ρ h v) = (I.relIndex K : A) • v := by
+theorem UpperTheory.V.AlgebraTools.hkTrace
+    : ∀ (A G M : Type) [CommRing A] [Group G] [AddCommGroup M] [Module A M]
+        (ρ : Representation A G M) (I K : Subgroup G) (h : I ≤ K) (ι : Type) [Fintype ι]
+        (w : ι → G),
+      HeckePair I → (∀ i, w i ∈ K) → (∀ g ∈ K, ∃! i, ∃ a ∈ I, ∃ b ∈ I, g = a * w i * b)
+        → FinOrb K I 1 ∧ ∑ i, hk ρ I (w i) = inc ρ h ∘ₗ trc ρ K I
+          ∧ ∀ v : fixd ρ K, trc ρ K I (inc ρ h v) = (I.relIndex K : A) • v := by
   intro A G M _ _ _ _ ρ I K h ι _ w hI hw hu
   classical
   replace hI : ∀ x : G, (MulAction.orbit I (x : G ⧸ I)).Finite := hI
   have hK : ∀ g : G, (g : G ⧸ I) ∈ MulAction.orbit K ((1 : G) : G ⧸ I) ↔ g ∈ K := fun g => by
     rw [mem_orb]
-    exact ⟨fun ⟨a, ha, b, hb, e⟩ => e ▸ mul_mem (mul_mem ha (one_mem _)) (h hb),
-      fun hg => ⟨g, hg, 1, one_mem _, by simp⟩⟩
+    exact ⟨
+      fun ⟨a, ha, b, hb, e⟩ => e ▸ mul_mem (mul_mem ha (one_mem _)) (h hb),
+      fun hg => ⟨g, hg, 1, one_mem _, by simp⟩
+    ⟩
   have hU : MulAction.orbit K ((1 : G) : G ⧸ I) = ⋃ i, MulAction.orbit I (w i : G ⧸ I) := by
     ext q
     obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
     simp only [Set.mem_iUnion, hK, mem_orb]
-    exact ⟨fun hg => (hu g hg).exists,
-      fun ⟨i, a, ha, b, hb, e⟩ => e ▸ mul_mem (mul_mem (h ha) (hw i)) (h hb)⟩
+    exact ⟨
+      fun hg => (hu g hg).exists,
+      fun ⟨i, a, ha, b, hb, e⟩ => e ▸ mul_mem (mul_mem (h ha) (hw i)) (h hb)
+    ⟩
   have hF : (MulAction.orbit K ((1 : G) : G ⧸ I)).Finite := by
     rw [hU]
     exact Set.finite_iUnion fun i => hI (w i)
@@ -47,7 +60,8 @@ theorem UpperTheory.V.AlgebraTools.hkTrace :
   · ext v
     change _ = (hk2 ρ K I 1 v : M)
     rw [LinearMap.sum_apply, Submodule.coe_sum, double_coset_operator_sum ρ K I 1 hF]
-    have e : Set.Finite.toFinset hF = Finset.univ.biUnion fun i => Set.Finite.toFinset (hI (w i)) := by
+    have e
+        : Set.Finite.toFinset hF = Finset.univ.biUnion fun i => Set.Finite.toFinset (hI (w i)) := by
       ext q
       simp [hU]
     rw [e, Finset.sum_biUnion]

@@ -11,21 +11,22 @@ open GlobalTheory.IndefiniteRowSideFullHecke.HodgePeriodGram GlobalTheory.HermFr
 
 namespace GlobalTheory.CurvForm
 
-theorem form_mulVec_left {g : ℕ} (K M : Matrix (Fin g) (Fin g) ℂ) (v w : Fin g → ℂ) :
-    form K (M *ᵥ v) w = form (Mᵀ * K) v w := by
+theorem form_mulVec_left {g : ℕ} (K M : Matrix (Fin g) (Fin g) ℂ) (v w : Fin g → ℂ)
+    : form K (M *ᵥ v) w = form (Mᵀ * K) v w := by
   simp only [form]
   rw [← vecMul_transpose, ← dotProduct_mulVec, mulVec_mulVec]
 
-theorem form_mulVec_right {g : ℕ} (K M : Matrix (Fin g) (Fin g) ℂ) (v w : Fin g → ℂ) :
-    form K v (M *ᵥ w) = form (K * Mᴴᵀ) v w := by
+theorem form_mulVec_right {g : ℕ} (K M : Matrix (Fin g) (Fin g) ℂ) (v w : Fin g → ℂ)
+    : form K v (M *ᵥ w) = form (K * Mᴴᵀ) v w := by
   simp only [form]
   rw [star_mulVec, ← mulVec_transpose, mulVec_mulVec]
 
-theorem form_curv_self_eq : ∀ (n g : ℕ) (H : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ) (z : Fin n → ℂ),
-    MContDiffAt 2 H z → IsUnit (H z).det → (∀ᶠ x in 𝓝 z, (H x).IsSymm) →
-    (∀ᶠ x in 𝓝 z, (H x).IsHermitian) → (∀ ξ η, mddbar H z ξ η = 0) →
-    ∀ ξ v, form (H z) (curv H z ξ ξ *ᵥ v) v =
-      form (H z)⁻¹ (mdel H z ξ *ᵥ v) (mdel H z ξ *ᵥ v) := by
+theorem form_curv_self_eq
+    : ∀ (n g : ℕ) (H : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ) (z : Fin n → ℂ),
+      MContDiffAt 2 H z → IsUnit (H z).det → (∀ᶠ x in 𝓝 z, (H x).IsSymm)
+        → (∀ᶠ x in 𝓝 z, (H x).IsHermitian) → (∀ ξ η, mddbar H z ξ η = 0)
+        → ∀ ξ v,
+          form (H z) (curv H z ξ ξ *ᵥ v) v = form (H z)⁻¹ (mdel H z ξ *ᵥ v) (mdel H z ξ *ᵥ v) := by
   intro n g H z h2 hu hs hh hdd ξ v
   have hP : (mdel H z ξ)ᵀ = mdel H z ξ := by
     rw [← mdel_transpose, mdel_congr (hs.mono fun x hx => hx.eq)]

@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.pl_sub :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (H K : Subgroup Γ) [H.Normal] [K.Normal], IsOpen (K : Set Γ) → H ≤ K → ∀ U : OpenNormalSubgroup K, (∀ h : K, (h : Γ) ∈ H → ∃ e : ℕ, h ^ l ^ e ∈ U) → ∀ g : K, (g : Γ) ∈ PL (l := l) H → g ∈ U := by
+theorem UpperTheory.V.Pa.pl_sub
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (H K : Subgroup Γ) [H.Normal] [K.Normal],
+      IsOpen (K : Set Γ) → H ≤ K
+        → ∀ U : OpenNormalSubgroup K,
+          (∀ h : K, (h : Γ) ∈ H → ∃ e : ℕ, h ^ l ^ e ∈ U)
+            → ∀ g : K, (g : Γ) ∈ PL (l := l) H → g ∈ U := by
   intro l _ Γ _ _ _ _ _ H K _ _ hK hHK U hU g hg
   have hl : l.Prime := Fact.out
   have hKc : IsClosed (K : Set Γ) := OpenSubgroup.isClosed ⟨K, hK⟩
@@ -45,9 +51,10 @@ theorem UpperTheory.V.Pa.pl_sub :
   haveI : O.FiniteIndex := O.finiteIndex_of_finite_quotient
   have hCo : IsOpen (O.normalCore : Set Γ) :=
     Subgroup.isOpen_of_isClosed_of_finiteIndex _ (O.normalCore_isClosed hOc)
-  let C : OpenNormalSubgroup Γ :=
-    { toOpenSubgroup := ⟨O.normalCore, hCo⟩
-      isNormal' := O.normalCore_normal }
+  let C : OpenNormalSubgroup Γ := {
+    toOpenSubgroup := ⟨O.normalCore, hCo⟩
+    isNormal' := O.normalCore_normal
+  }
   have hcond : ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ C.toOpenSubgroup := by
     intro h hh
     refine ⟨U.toSubgroup.index, ?_⟩

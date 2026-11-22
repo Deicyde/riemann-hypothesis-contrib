@@ -15,6 +15,7 @@ namespace Formalism.L2.Col
 open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV
 
 def OcbLevIsSym : Prop :=
-  ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m) (m2 : ℕ), R.m = m2 + 2 → OcbLevIs Ch (colLevSym Ch) m2
+  ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m) (m2 : ℕ),
+    R.m = m2 + 2 → OcbLevIs Ch (colLevSym Ch) m2
 
 end Formalism.L2.Col

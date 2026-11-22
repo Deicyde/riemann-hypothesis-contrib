@@ -8,13 +8,14 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem rat_alternating_orthogonal_orthogonal_le :
-    ∀ (r : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (V : Submodule ℚ (Fin r → ℚ)), Mqᵀ = -Mq →
-      Mq.det ≠ 0 → ∀ x : Fin r → ℚ,
-      (∀ y : Fin r → ℚ, (∀ w ∈ V, y ⬝ᵥ Mq *ᵥ w = 0) → x ⬝ᵥ Mq *ᵥ y = 0) → x ∈ V := by
+theorem rat_alternating_orthogonal_orthogonal_le
+    : ∀ (r : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (V : Submodule ℚ (Fin r → ℚ)),
+      Mqᵀ = -Mq → Mq.det ≠ 0
+        → ∀ x : Fin r → ℚ,
+          (∀ y : Fin r → ℚ, (∀ w ∈ V, y ⬝ᵥ Mq *ᵥ w = 0) → x ⬝ᵥ Mq *ᵥ y = 0) → x ∈ V := by
   intro r Mq V hT hdet x hx
-  have hB : ∀ u v : Fin r → ℚ, Matrix.toBilin' Mq u v = u ⬝ᵥ Mq *ᵥ v :=
-    fun u v => Matrix.toBilin'_apply' Mq u v
+  have hB : ∀ u v : Fin r → ℚ, Matrix.toBilin' Mq u v = u ⬝ᵥ Mq *ᵥ v := fun u v =>
+    Matrix.toBilin'_apply' Mq u v
   have hanti : ∀ u v : Fin r → ℚ, u ⬝ᵥ Mq *ᵥ v = -(v ⬝ᵥ Mq *ᵥ u) := by
     intro u v
     have h1 : v ⬝ᵥ Mqᵀ *ᵥ u = u ⬝ᵥ Mq *ᵥ v := by

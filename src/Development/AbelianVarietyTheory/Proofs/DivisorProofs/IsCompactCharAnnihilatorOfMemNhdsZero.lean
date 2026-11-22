@@ -9,10 +9,12 @@ open Matrix Topology
 
 namespace GlobalTheory.JSW
 
-theorem isCompact_charAnnihilator_of_mem_nhds_zero {F : Type} [NormedField F] [ProperSpace F] (ψ : AddChar F ℂ)
-    (hlc : IsLocallyConstant ψ) (hψ : ψ ≠ 1) {ι : Type} [Fintype ι] (L : Set (ι → F))
-    (hL : L ∈ nhds (0 : ι → F)) :
-    IsCompact {r : ι → F | ∀ y ∈ L, ψ (r ⬝ᵥ y) = 1} := by
+theorem isCompact_charAnnihilator_of_mem_nhds_zero
+    {F : Type} [NormedField F] [ProperSpace F]
+    (ψ : AddChar F ℂ) (hlc : IsLocallyConstant ψ) (hψ : ψ ≠ 1)
+    {ι : Type} [Fintype ι]
+    (L : Set (ι → F)) (hL : L ∈ nhds (0 : ι → F))
+    : IsCompact {r : ι → F | ∀ y ∈ L, ψ (r ⬝ᵥ y) = 1} := by
   classical
   obtain ⟨t, ht⟩ := AddChar.ne_one_iff.1 hψ
   obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1 hL
@@ -32,8 +34,7 @@ theorem isCompact_charAnnihilator_of_mem_nhds_zero {F : Type} [NormedField F] [P
     intro i
     by_contra hlt
     push_neg at hlt
-    have hri : r i ≠ 0 := by
-      intro h0; rw [h0, norm_zero] at hlt; linarith
+    have hri : r i ≠ 0 := by intro h0; rw [h0, norm_zero] at hlt; linarith
     have hpos : 0 < ‖r i‖ := norm_pos_iff.2 hri
     have hy : Pi.single i (t / r i) ∈ L := by
       apply hball

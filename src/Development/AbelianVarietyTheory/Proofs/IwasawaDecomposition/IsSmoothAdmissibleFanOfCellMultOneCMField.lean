@@ -10,37 +10,41 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsStr
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan.SmoothEnd
 
 section Gen
 
-variable {O : Type} [CommRing O] {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X]
-  [Module.Finite O X] {m : ℕ}
-
+variable
+  {O : Type} [CommRing O]
+  {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+  {m : ℕ}
 
 omit [Module.Finite O X] in
-theorem smul_cancel {β β' : LinearMap.BilinForm ℤ X} {k : ℤ} (hk : k ≠ 0) (h : k • β = k • β') : β = β' := by
+theorem smul_cancel {β β' : LinearMap.BilinForm ℤ X} {k : ℤ} (hk : k ≠ 0) (h : k • β = k • β')
+    : β = β' := by
   ext x y
   have h1 := LinearMap.congr_fun₂ h x y
   simp only [LinearMap.smul_apply, smul_eq_mul] at h1
   exact mul_left_cancel₀ hk h1
 
-
 omit [Module.Finite O X] in
-theorem isPrim_of_isPartOfBasis {v : Fin m → balForms bar X} (h : IsPartOfBasis v) (i : Fin m) : IsPrim bar (v i) := by
+theorem isPrim_of_isPartOfBasis {v : Fin m → balForms bar X} (h : IsPartOfBasis v) (i : Fin m)
+    : IsPrim bar (v i) := by
   intro k β' hk
   have h1 : (k : ℤ) • β' = v i := by rw [natCast_zsmul]; exact hk.symm
   rcases Int.isUnit_iff.mp (h.isUnit_of_smul h1) with h2 | h2
   · exact_mod_cast h2
   · omega
 
-
 omit [Module.Finite O X] in
-theorem eq_of_isPrim {x y : LinearMap.BilinForm ℤ X} (hx : x ∈ balForms bar X) (hy : y ∈ balForms bar X)
-    (px : IsPrim bar ⟨x, hx⟩) (py : IsPrim bar ⟨y, hy⟩) {k n : ℕ} (hk : 0 < k) (hn : 0 < n)
-    (h : (k : ℤ) • x = (n : ℤ) • y) : x = y := by
+theorem eq_of_isPrim
+    {x y : LinearMap.BilinForm ℤ X} (hx : x ∈ balForms bar X) (hy : y ∈ balForms bar X)
+    (px : IsPrim bar ⟨x, hx⟩) (py : IsPrim bar ⟨y, hy⟩)
+    {k n : ℕ} (hk : 0 < k) (hn : 0 < n) (h : (k : ℤ) • x = (n : ℤ) • y)
+    : x = y := by
   have hg : 0 < Nat.gcd k n := Nat.gcd_pos_of_pos_left _ hk
   have hc : Nat.Coprime (k / Nat.gcd k n) (n / Nat.gcd k n) := Nat.coprime_div_gcd_div_gcd hg
   set k' := k / Nat.gcd k n with hk'
@@ -48,7 +52,8 @@ theorem eq_of_isPrim {x y : LinearMap.BilinForm ℤ X} (hx : x ∈ balForms bar 
   have hk1 : k = k' * Nat.gcd k n := (Nat.div_mul_cancel (Nat.gcd_dvd_left k n)).symm
   have hn1 : n = n' * Nat.gcd k n := (Nat.div_mul_cancel (Nat.gcd_dvd_right k n)).symm
   have hkn : (k' : ℤ) • x = (n' : ℤ) • y := by
-    have e : ((Nat.gcd k n : ℕ) : ℤ) • ((k' : ℤ) • x) = ((Nat.gcd k n : ℕ) : ℤ) • ((n' : ℤ) • y) := by
+    have e
+        : ((Nat.gcd k n : ℕ) : ℤ) • ((k' : ℤ) • x) = ((Nat.gcd k n : ℕ) : ℤ) • ((n' : ℤ) • y) := by
       rw [smul_smul, smul_smul, ← Nat.cast_mul, ← Nat.cast_mul, mul_comm (Nat.gcd k n) k',
         mul_comm (Nat.gcd k n) n', ← hk1, ← hn1]
       exact h
@@ -57,14 +62,16 @@ theorem eq_of_isPrim {x y : LinearMap.BilinForm ℤ X} (hx : x ∈ balForms bar 
   have hz : s • y + t • x ∈ balForms bar X :=
     Submodule.add_mem _ (Submodule.smul_mem _ s hy) (Submodule.smul_mem _ t hx)
   have hyz : (k' : ℤ) • (s • y + t • x) = y := by
-    calc (k' : ℤ) • (s • y + t • x) = ((k' : ℤ) * s) • y + t • ((k' : ℤ) • x) := by
-          rw [smul_add, smul_smul, smul_smul, smul_smul, mul_comm t]
+    calc
+      (k' : ℤ) • (s • y + t • x) = ((k' : ℤ) * s) • y + t • ((k' : ℤ) • x) := by
+        rw [smul_add, smul_smul, smul_smul, smul_smul, mul_comm t]
       _ = ((k' : ℤ) * s) • y + t • ((n' : ℤ) • y) := by rw [hkn]
       _ = (s * k' + t * n' : ℤ) • y := by rw [smul_smul, ← add_smul, mul_comm (k' : ℤ) s]
       _ = y := by rw [hst, one_smul]
   have hxz : (n' : ℤ) • (s • y + t • x) = x := by
-    calc (n' : ℤ) • (s • y + t • x) = s • ((n' : ℤ) • y) + ((n' : ℤ) * t) • x := by
-          rw [smul_add, smul_smul, smul_smul, smul_smul, mul_comm s]
+    calc
+      (n' : ℤ) • (s • y + t • x) = s • ((n' : ℤ) • y) + ((n' : ℤ) * t) • x := by
+        rw [smul_add, smul_smul, smul_smul, smul_smul, mul_comm s]
       _ = s • ((k' : ℤ) • x) + ((n' : ℤ) * t) • x := by rw [← hkn]
       _ = (s * k' + t * n' : ℤ) • x := by rw [smul_smul, ← add_smul, mul_comm (n' : ℤ) t]
       _ = x := by rw [hst, one_smul]
@@ -80,8 +87,10 @@ theorem eq_of_isPrim {x y : LinearMap.BilinForm ℤ X} (hx : x ∈ balForms bar 
   rw [en, Nat.cast_one, one_smul] at hxz
   rw [← hxz, hyz]
 
-theorem exists_prim [Module.Finite ℤ O] {β : LinearMap.BilinForm ℤ X} (hβ : β ∈ balForms bar X) (h0 : β ≠ 0) :
-    ∃ (n : ℕ) (u : LinearMap.BilinForm ℤ X) (hu : u ∈ balForms bar X), 0 < n ∧ β = (n : ℤ) • u ∧ IsPrim bar ⟨u, hu⟩ := by
+theorem exists_prim
+    [Module.Finite ℤ O] {β : LinearMap.BilinForm ℤ X} (hβ : β ∈ balForms bar X) (h0 : β ≠ 0)
+    : ∃ (n : ℕ) (u : LinearMap.BilinForm ℤ X) (hu : u ∈ balForms bar X),
+      0 < n ∧ β = (n : ℤ) • u ∧ IsPrim bar ⟨u, hu⟩ := by
   classical
   obtain ⟨a, b, hab⟩ : ∃ a b, β a b ≠ 0 := by
     by_contra hc
@@ -93,9 +102,12 @@ theorem exists_prim [Module.Finite ℤ O] {β : LinearMap.BilinForm ℤ X} (hβ 
     have hu0 : u a b ≠ 0 := by intro h'; apply hab; rw [e, h', mul_zero]
     rw [e, Int.natAbs_mul, Int.natAbs_natCast]
     exact Nat.le_mul_of_pos_right n (Int.natAbs_pos.mpr hu0)
-  have P1 : (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u) 1 := ⟨one_pos, β, hβ, by simp⟩
+  have P1 : (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u) 1 :=
+    ⟨one_pos, β, hβ, by simp⟩
   have hM : 1 ≤ (β a b).natAbs := Int.natAbs_pos.mpr hab
-  obtain ⟨hNpos, u, hu, hβu⟩ := Nat.findGreatest_spec (P := (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u)) hM P1
+  obtain ⟨hNpos, u, hu, hβu⟩ :=
+    Nat.findGreatest_spec (P := (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u)) hM
+      P1
   refine ⟨_, u, hu, hNpos, hβu, ?_⟩
   intro k β' hk
   have hk' : u = (k : ℤ) • (β' : LinearMap.BilinForm ℤ X) := by
@@ -104,9 +116,14 @@ theorem exists_prim [Module.Finite ℤ O] {β : LinearMap.BilinForm ℤ X} (hβ 
   rcases Nat.eq_zero_or_pos k with h0k | h0k
   · exfalso; apply h0; rw [hβu, hk', h0k]; simp
   · have hP : (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u)
-        (Nat.findGreatest (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u) (β a b).natAbs * k) :=
+        (Nat.findGreatest
+            (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u)
+            (β a b).natAbs
+          * k) :=
       ⟨Nat.mul_pos hNpos h0k, β', β'.2, hβu.trans (by rw [hk', smul_smul, Nat.cast_mul])⟩
-    have hle := Nat.le_findGreatest (P := (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u)) (bound _ _ hP.2.choose_spec.2) hP
+    have hle :=
+      Nat.le_findGreatest (P := (fun n : ℕ => 0 < n ∧ ∃ u, u ∈ balForms bar X ∧ β = (n : ℤ) • u))
+        (bound _ _ hP.2.choose_spec.2) hP
     have : k ≤ 1 := Nat.le_of_mul_le_mul_left (by simpa using hle) hNpos
     omega
 
@@ -138,8 +155,11 @@ private lemma evalZ_eq_mul_evalZ_of_eq_nsmul {δ u : Fin m → LinearMap.BilinFo
   rw [e]
   field_simp
 
-theorem cell_rescale {δ u : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell bar φ δ) (n : Fin m → ℕ) (hn : ∀ i, 0 < n i)
-    (hu : ∀ i, δ i = (n i : ℤ) • u i) (hmem : ∀ i, u i ∈ balForms bar X) : IsCell bar φ u := by
+theorem cell_rescale
+    {δ u : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell bar φ δ)
+    (n : Fin m → ℕ) (hn : ∀ i, 0 < n i) (hu : ∀ i, δ i = (n i : ℤ) • u i)
+    (hmem : ∀ i, u i ∈ balForms bar X)
+    : IsCell bar φ u := by
   refine ⟨hmem, fun i y => ?_, ?_, ?_⟩
   · have h1 := h.nonneg i y
     rw [hu i] at h1
@@ -147,9 +167,11 @@ theorem cell_rescale {δ u : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell ba
     have hn' : (0 : ℤ) < n i := by exact_mod_cast hn i
     nlinarith
   · intro c hc
-    have key : φ.eval X (fun a b => ∑ i, c i / n i * (δ i a b : ℝ)) = ∑ i, c i / n i * φ.evalZ (δ i) :=
+    have key
+        : φ.eval X (fun a b => ∑ i, c i / n i * (δ i a b : ℝ)) = ∑ i, c i / n i * φ.evalZ (δ i) :=
       h.linear _ (fun i => div_nonneg (hc i) (Nat.cast_nonneg _))
-    have hf : (fun a b => ∑ i, c i / n i * (δ i a b : ℝ)) = fun a b => ∑ i, c i * (u i a b : ℝ) := by
+    have hf
+        : (fun a b => ∑ i, c i / n i * (δ i a b : ℝ)) = fun a b => ∑ i, c i * (u i a b : ℝ) := by
       funext a b
       refine Finset.sum_congr rfl fun i _ => ?_
       have hni : (n i : ℝ) ≠ 0 := by exact_mod_cast (hn i).ne'
@@ -178,15 +200,22 @@ theorem cell_rescale {δ u : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell ba
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hu i, natCast_zsmul, mul_smul]
 
-theorem linearIndependent_of_smul {δ u : Fin m → LinearMap.BilinForm ℤ X} (h : LinearIndependent ℤ δ) (n : Fin m → ℕ)
-    (hn : ∀ i, 0 < n i) (hu : ∀ i, δ i = (n i : ℤ) • u i) : LinearIndependent ℤ u := by
+theorem linearIndependent_of_smul
+    {δ u : Fin m → LinearMap.BilinForm ℤ X} (h : LinearIndependent ℤ δ)
+    (n : Fin m → ℕ) (hn : ∀ i, 0 < n i) (hu : ∀ i, δ i = (n i : ℤ) • u i)
+    : LinearIndependent ℤ u := by
   rw [Fintype.linearIndependent_iff] at h ⊢
   intro g hg i
-  have hprod : ∀ j, (g j * ∏ l ∈ Finset.univ.erase j, (n l : ℤ)) • δ j = (∏ l, (n l : ℤ)) • (g j • u j) := by
+  have hprod
+      : ∀ j,
+        (g j * ∏ l ∈ Finset.univ.erase j, (n l : ℤ)) • δ j = (∏ l, (n l : ℤ)) • (g j • u j) := by
     intro j
-    rw [hu j, smul_smul, smul_smul, mul_assoc, Finset.prod_erase_mul _ _ (Finset.mem_univ j), mul_comm (g j)]
-  have key := h (fun j => g j * ∏ l ∈ Finset.univ.erase j, (n l : ℤ)) (by
-    simp only [hprod, ← Finset.smul_sum, hg, smul_zero]) i
+    rw [hu j, smul_smul, smul_smul, mul_assoc, Finset.prod_erase_mul _ _ (Finset.mem_univ j),
+      mul_comm (g j)]
+  have key :=
+    h
+      (fun j => g j * ∏ l ∈ Finset.univ.erase j, (n l : ℤ))
+      (by simp only [hprod, ← Finset.smul_sum, hg, smul_zero]) i
   have hp : ∏ l ∈ Finset.univ.erase i, (n l : ℤ) ≠ 0 :=
     Finset.prod_ne_zero_iff.mpr fun l _ => by exact_mod_cast (hn l).ne'
   exact (mul_eq_zero.mp key).resolve_right hp
@@ -197,30 +226,44 @@ end GlobalTheory.PolFan.SmoothEnd
 
 namespace GlobalTheory.PolFan.SmoothEnd
 
-theorem mem_cone_of_sum : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (γ' : Fin m' → LinearMap.BilinForm ℤ X), IsCell bar φ γ → IsCell bar φ γ' → ∀ (c : Fin m' → ℝ), (∀ i, 0 ≤ c i) → ∑ j, toReal (γ j) = ∑ i, c i • toReal (γ' i) → ∀ j, ∃ a : Fin m' → ℝ, (∀ i, 0 ≤ a i) ∧ toReal (γ j) = ∑ i, a i • toReal (γ' i) := by
+theorem mem_cone_of_sum
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X]
+        [Module O X] [Module.Finite O X] (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X)
+        (γ' : Fin m' → LinearMap.BilinForm ℤ X),
+      IsCell bar φ γ → IsCell bar φ γ'
+        → ∀ (c : Fin m' → ℝ),
+          (∀ i, 0 ≤ c i) → ∑ j, toReal (γ j) = ∑ i, c i • toReal (γ' i)
+            → ∀ j, ∃ a : Fin m' → ℝ, (∀ i, 0 ≤ a i) ∧ toReal (γ j) = ∑ i, a i • toReal (γ' i) := by
   intro O _ bar φ X _ _ _ m m' γ γ' hγ hγ' c hc hsum j
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hγ'.strict
   have lin1 : φ.eval X (fun a b => ∑ j, (1 : ℝ) * (γ j a b : ℝ)) = ∑ j, (1 : ℝ) * φ.evalZ (γ j) :=
     hγ.linear _ (fun _ => zero_le_one)
-  have lin2 : φ.eval X (fun a b => ∑ i, c i * (γ' i a b : ℝ)) = ∑ i, c i * φ.evalZ (γ' i) := hγ'.linear c hc
+  have lin2 : φ.eval X (fun a b => ∑ i, c i * (γ' i a b : ℝ)) = ∑ i, c i * φ.evalZ (γ' i) :=
+    hγ'.linear c hc
   have hfun : (fun a b => ∑ j, (1 : ℝ) * (γ j a b : ℝ)) = fun a b => ∑ i, c i * (γ' i a b : ℝ) := by
     funext a b
     have := LinearMap.congr_fun₂ hsum a b
-    simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul] at this
+    simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply,
+        smul_eq_mul]
+      at this
     simpa using this
   have eqφ : ∑ j, φ.evalZ (γ j) = ∑ i, c i * φ.evalZ (γ' i) := by
     have := lin1.symm.trans ((congrArg (φ.eval X) hfun).trans lin2)
     simpa using this
-  have hℓ := sum_mul_eq_of_sum_toReal_eq (j := LinearMap.id) (fun _ _ h => h) ℓ (u := γ) (w := γ')
-    (a := fun _ => (1 : ℝ)) (b := c) (by simpa using hsum)
+  have hℓ :=
+    sum_mul_eq_of_sum_toReal_eq (j := LinearMap.id)
+      (fun _ _ h => h)
+      ℓ (u := γ) (w := γ')
+      (a := fun _ => (1 : ℝ))
+      (b := c) (by simpa using hsum)
   simp only [one_mul] at hℓ
   have hsum0 : ∑ j, ((ℓ (γ j) : ℝ) - N * φ.evalZ (γ j)) = 0 := by
     rw [Finset.sum_sub_distrib, ← Finset.mul_sum, eqφ, hℓ, Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [h1 i]
     ring
-  have hnn : ∀ j ∈ Finset.univ, 0 ≤ ((ℓ (γ j) : ℝ) - N * φ.evalZ (γ j)) :=
-    fun j _ => sub_nonneg.mpr (h2 _ (hγ.mem j) (hγ.nonneg j))
+  have hnn : ∀ j ∈ Finset.univ, 0 ≤ ((ℓ (γ j) : ℝ) - N * φ.evalZ (γ j)) := fun j _ =>
+    sub_nonneg.mpr (h2 _ (hγ.mem j) (hγ.nonneg j))
   have hj0 := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hsum0 j (Finset.mem_univ j)
   obtain ⟨k, c', hk, hkc⟩ := h3 (γ j) (hγ.mem j) (hγ.nonneg j) (by linarith)
   refine ⟨fun i => (c' i : ℝ) / k, fun i => by positivity, ?_⟩
@@ -228,7 +271,8 @@ theorem mem_cone_of_sum : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvF
   ext a b
   have h4 := congrArg (fun f : LinearMap.BilinForm ℤ X => ((f a b : ℤ) : ℝ)) hkc
   simp only [LinearMap.smul_apply, LinearMap.sum_apply, Finset.sum_apply, nsmul_eq_mul, smul_eq_mul,
-    Int.cast_sum, Int.cast_mul, Int.cast_natCast] at h4
+      Int.cast_sum, Int.cast_mul, Int.cast_natCast]
+    at h4
   simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul]
   have h5 : ∑ x, (c' x : ℝ) / k * (γ' x a b : ℝ) = 1 / k * ∑ x, (c' x : ℝ) * (γ' x a b : ℝ) := by
     rw [Finset.mul_sum]
@@ -240,7 +284,11 @@ end GlobalTheory.PolFan.SmoothEnd
 
 namespace GlobalTheory.PolFan.SmoothEnd
 
-theorem isPartOfBasis_of_card_torsion_le_one : ∀ (L : Type) [AddCommGroup L] [Module.Free ℤ L] [Module.Finite ℤ L] (m : ℕ) (v : Fin m → L), LinearIndependent ℤ v → Nat.card (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range v))) ≤ 1 → IsPartOfBasis v := by
+theorem isPartOfBasis_of_card_torsion_le_one
+    : ∀ (L : Type) [AddCommGroup L] [Module.Free ℤ L] [Module.Finite ℤ L] (m : ℕ) (v : Fin m → L),
+      LinearIndependent ℤ v
+        → Nat.card (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range v))) ≤ 1
+        → IsPartOfBasis v := by
   intro L _ _ _ m v hv hT
   haveI : _root_.Finite (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range v))) :=
     Module.finite_of_fg_torsion _ Submodule.torsion_isTorsion
@@ -249,36 +297,57 @@ theorem isPartOfBasis_of_card_torsion_le_one : ∀ (L : Type) [AddCommGroup L] [
   haveI : Module.IsTorsionFree ℤ (L ⧸ Submodule.span ℤ (Set.range v)) :=
     Submodule.isTorsionFree_iff_torsion_eq_bot.mpr Submodule.eq_bot_of_subsingleton
   set bQ := Module.finBasis ℤ (L ⧸ Submodule.span ℤ (Set.range v)) with hbQ
-  obtain ⟨s, hs⟩ : ∃ s : Fin (Module.finrank ℤ (L ⧸ Submodule.span ℤ (Set.range v))) → L,
-      ∀ k, Submodule.Quotient.mk (s k) = bQ k :=
-    ⟨fun k => (Submodule.Quotient.mk_surjective _ (bQ k)).choose,
-      fun k => (Submodule.Quotient.mk_surjective _ (bQ k)).choose_spec⟩
+  obtain ⟨s, hs⟩
+      : ∃ s : Fin (Module.finrank ℤ (L ⧸ Submodule.span ℤ (Set.range v))) → L, ∀ k,
+        Submodule.Quotient.mk (s k) = bQ k := ⟨
+    fun k => (Submodule.Quotient.mk_surjective _ (bQ k)).choose,
+    fun k => (Submodule.Quotient.mk_surjective _ (bQ k)).choose_spec
+  ⟩
   have hf : LinearIndependent ℤ
       (fun i => (⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v))) :=
     LinearIndependent.of_comp (Submodule.span ℤ (Set.range v)).subtype hv
-  have hg : LinearIndependent ℤ (Submodule.Quotient.mk (p := Submodule.span ℤ (Set.range v)) ∘ s) := by
+  have hg
+      : LinearIndependent ℤ (Submodule.Quotient.mk (p := Submodule.span ℤ (Set.range v)) ∘ s) := by
     have e : (Submodule.Quotient.mk (p := Submodule.span ℤ (Set.range v)) ∘ s) = ⇑bQ := funext hs
     rw [e]
     exact bQ.linearIndependent
   have hli := LinearIndependent.sumElim_of_quotient hf s hg
-  have hsp : ⊤ ≤ Submodule.span ℤ (Set.range (Sum.elim
-      (fun i => ((⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v)) : L)) s)) := by
+  have hsp
+      : ⊤
+        ≤ Submodule.span ℤ
+          (Set.range (Sum.elim
+            (fun i =>
+              ((⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v)) : L))
+            s)) := by
     intro x _
     have hx := bQ.sum_repr (Submodule.Quotient.mk x)
-    have hmem : x - ∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k ∈ Submodule.span ℤ (Set.range v) := by
+    have hmem
+        : x - ∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k ∈ Submodule.span ℤ (Set.range v) := by
       rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub]
-      have e : (Submodule.Quotient.mk (∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k) :
-          L ⧸ Submodule.span ℤ (Set.range v)) = ∑ k, bQ.repr (Submodule.Quotient.mk x) k • bQ k := by
-        change (Submodule.span ℤ (Set.range v)).mkQ (∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k) = _
+      have e
+          : (Submodule.Quotient.mk (∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k)
+              : L ⧸ Submodule.span ℤ (Set.range v))
+            = ∑ k, bQ.repr (Submodule.Quotient.mk x) k • bQ k := by
+        change (Submodule.span ℤ (Set.range v)).mkQ (∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k)
+          = _
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum]
         simp only [map_smul, Submodule.mkQ_apply, hs]
       rw [e, hx, sub_self]
-    have h1 : Submodule.span ℤ (Set.range v) ≤ Submodule.span ℤ (Set.range (Sum.elim
-        (fun i => ((⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v)) : L)) s)) :=
+    have h1
+        : Submodule.span ℤ (Set.range v)
+          ≤ Submodule.span ℤ
+            (Set.range (Sum.elim
+              (fun i =>
+                ((⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v)) : L))
+              s)) :=
       Submodule.span_mono (by rintro _ ⟨i, rfl⟩; exact ⟨Sum.inl i, rfl⟩)
-    have h2 : ∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k ∈ Submodule.span ℤ (Set.range (Sum.elim
-        (fun i => ((⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v)) : L)) s)) :=
+    have h2
+        : ∑ k, bQ.repr (Submodule.Quotient.mk x) k • s k ∈ Submodule.span ℤ
+          (Set.range (Sum.elim
+            (fun i =>
+              ((⟨v i, Submodule.subset_span ⟨i, rfl⟩⟩ : Submodule.span ℤ (Set.range v)) : L))
+            s)) :=
       Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨Sum.inr k, rfl⟩)
     have h3 := Submodule.add_mem _ (h1 hmem) h2
     rwa [sub_add_cancel] at h3
@@ -288,24 +357,39 @@ end GlobalTheory.PolFan.SmoothEnd
 
 namespace GlobalTheory.PolFan.SmoothEnd
 
-theorem ray_of_mem_cone : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (γ' : Fin m' → LinearMap.BilinForm ℤ X), IsCone bar φ γ → IsCell bar φ γ' → ∀ (a : Fin m → Fin m' → ℝ), (∀ j i, 0 ≤ a j i) → (∀ j, toReal (γ j) = ∑ i, a j i • toReal (γ' i)) → ∀ j, ∃ (i : Fin m') (k n : ℕ), 0 < k ∧ 0 < n ∧ (k : ℤ) • γ' i = (n : ℤ) • γ j := by
+theorem ray_of_mem_cone
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X]
+        [Module O X] [Module.Finite O X] (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X)
+        (γ' : Fin m' → LinearMap.BilinForm ℤ X),
+      IsCone bar φ γ → IsCell bar φ γ'
+        → ∀ (a : Fin m → Fin m' → ℝ),
+          (∀ j i, 0 ≤ a j i) → (∀ j, toReal (γ j) = ∑ i, a j i • toReal (γ' i))
+            → ∀ j, ∃ (i : Fin m') (k n : ℕ), 0 < k ∧ 0 < n ∧ (k : ℤ) • γ' i = (n : ℤ) • γ j := by
   intro O _ bar φ X _ _ _ m m' γ γ' hγ hγ' a ha hsum j
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hγ.strict
   have hfun : (fun x y => ∑ i, a j i * (γ' i x y : ℝ)) = fun x y => (γ j x y : ℝ) := by
     funext x y
     have := LinearMap.congr_fun₂ (hsum j) x y
-    simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul] at this
+    simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply,
+        smul_eq_mul]
+      at this
     exact this.symm
   have hev : φ.evalZ (γ j) = ∑ i, a j i * φ.evalZ (γ' i) := by
     have := hγ'.linear (a j) (ha j)
     rw [hfun] at this
     exact this
   have hℓ : (ℓ (γ j) : ℝ) = ∑ i, a j i * (ℓ (γ' i) : ℝ) := by
-    have := sum_mul_eq_of_sum_toReal_eq (j := LinearMap.id) (fun _ _ h => h) ℓ (u := fun _ : Unit => γ j)
-      (w := γ') (a := fun _ => (1 : ℝ)) (b := a j) (by simpa using hsum j)
+    have :=
+      sum_mul_eq_of_sum_toReal_eq (j := LinearMap.id)
+        (fun _ _ h => h)
+        ℓ
+        (u := fun _ : Unit => γ j)
+        (w := γ')
+        (a := fun _ => (1 : ℝ))
+        (b := a j) (by simpa using hsum j)
     simpa using this
-  have hterm : ∀ i ∈ Finset.univ, 0 ≤ a j i * ((ℓ (γ' i) : ℝ) - N * φ.evalZ (γ' i)) :=
-    fun i _ => mul_nonneg (ha j i) (sub_nonneg.mpr (h2 _ (hγ'.mem i) (hγ'.nonneg i)))
+  have hterm : ∀ i ∈ Finset.univ, 0 ≤ a j i * ((ℓ (γ' i) : ℝ) - N * φ.evalZ (γ' i)) := fun i _ =>
+    mul_nonneg (ha j i) (sub_nonneg.mpr (h2 _ (hγ'.mem i) (hγ'.nonneg i)))
   have hzero : ∑ i, a j i * ((ℓ (γ' i) : ℝ) - N * φ.evalZ (γ' i)) = 0 := by
     simp only [mul_sub, Finset.sum_sub_distrib]
     rw [← hℓ, h1 j, hev, Finset.mul_sum]
@@ -323,26 +407,29 @@ theorem ray_of_mem_cone : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvF
     apply toReal_injective
     rw [hsum j]
     ext x y
-    simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-      LinearMap.zero_apply, Int.cast_zero]
+    simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply,
+      smul_eq_mul, LinearMap.zero_apply, Int.cast_zero]
     refine Finset.sum_eq_zero fun i _ => ?_
     by_cases h0 : a j i = 0
     · simp [h0]
     · simp [hne i h0]
   obtain ⟨ψ, hψ⟩ := hγ.basis.exists_dual
   have hψ' : ∀ l l', ψ l ⟨γ l', hγ.mem l'⟩ = if l = l' then 1 else 0 := fun l l' => hψ l l'
-  have hcoef : ∀ i', ∀ (k : ℕ) (c : Fin m → ℕ), k • γ' i' = ∑ l, c l • γ l →
-      ∀ l, (k : ℤ) * ψ l ⟨γ' i', hγ'.mem i'⟩ = c l := by
+  have hcoef
+      : ∀ i', ∀ (k : ℕ) (c : Fin m → ℕ),
+        k • γ' i' = ∑ l, c l • γ l → ∀ l, (k : ℤ) * ψ l ⟨γ' i', hγ'.mem i'⟩ = c l := by
     intro i' k c hkc l
-    have hsub : k • (⟨γ' i', hγ'.mem i'⟩ : balForms bar X) =
-        ∑ l', c l' • (⟨γ l', hγ.mem l'⟩ : balForms bar X) := by
+    have hsub
+        : k • (⟨γ' i', hγ'.mem i'⟩ : balForms bar X)
+          = ∑ l', c l' • (⟨γ l', hγ.mem l'⟩ : balForms bar X) := by
       apply Subtype.ext
       simpa using hkc
     have := congrArg (ψ l) hsub
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_nsmul, map_sum] at this
-    simp only [map_nsmul, hψ', nsmul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ,
-      if_true] at this
+    simp only [map_nsmul, hψ', nsmul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
+        Finset.mem_univ, if_true]
+      at this
     exact this
   have hψface : ∀ l i', a j i' ≠ 0 → 0 ≤ ψ l ⟨γ' i', hγ'.mem i'⟩ := by
     intro l i' hai'
@@ -353,12 +440,14 @@ theorem ray_of_mem_cone : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvF
     nlinarith
   have hψzero : ∀ l, l ≠ j → ψ l ⟨γ' i, hγ'.mem i⟩ = 0 := by
     intro l hl
-    have e := sum_mul_eq_of_sum_toReal_eq (j := (balForms bar X).subtype) (balForms bar X).injective_subtype
-      (ψ l) (u := fun _ : Unit => (⟨γ j, hγ.mem j⟩ : balForms bar X))
-      (w := fun i' => (⟨γ' i', hγ'.mem i'⟩ : balForms bar X)) (a := fun _ => (1 : ℝ)) (b := a j)
-      (by simpa using hsum j)
-    have e' : ∑ i', a j i' * (ψ l ⟨γ' i', hγ'.mem i'⟩ : ℝ) = 0 := by
-      simpa [hψ', hl] using e.symm
+    have e :=
+      sum_mul_eq_of_sum_toReal_eq (j := (balForms bar X).subtype) (balForms bar X).injective_subtype
+        (ψ l)
+        (u := fun _ : Unit => (⟨γ j, hγ.mem j⟩ : balForms bar X))
+        (w := fun i' => (⟨γ' i', hγ'.mem i'⟩ : balForms bar X))
+        (a := fun _ => (1 : ℝ))
+        (b := a j) (by simpa using hsum j)
+    have e' : ∑ i', a j i' * (ψ l ⟨γ' i', hγ'.mem i'⟩ : ℝ) = 0 := by simpa [hψ', hl] using e.symm
     have hnn : ∀ i' ∈ Finset.univ, 0 ≤ a j i' * (ψ l ⟨γ' i', hγ'.mem i'⟩ : ℝ) := by
       intro i' _
       by_cases h0 : a j i' = 0
@@ -392,13 +481,16 @@ end GlobalTheory.PolFan.SmoothEnd
 
 namespace GlobalTheory.PolFan.SmoothEnd
 
-variable {O : Type} [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] {bar : O → O} {φ lab : InvFun O}
-  {q : ℕ}
+variable
+  {O : Type} [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O]
+  {bar : O → O} {φ lab : InvFun O} {q : ℕ}
 
-theorem cellMult_le_maxMult {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
-    (hX : Module.finrank O X ≤ q) {m : ℕ} {δ : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell bar φ δ)
-    (hli : LinearIndependent ℤ δ) (hp : ∀ i, IsPrim bar (⟨δ i, h.mem i⟩ : balForms bar X)) :
-    ((cellMult bar fun i => (⟨δ i, h.mem i⟩ : balForms bar X)) : ℕ∞) ≤ maxMult bar q φ := by
+theorem cellMult_le_maxMult
+    {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
+    (hX : Module.finrank O X ≤ q)
+    {m : ℕ} {δ : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell bar φ δ) (hli : LinearIndependent ℤ δ)
+    (hp : ∀ i, IsPrim bar (⟨δ i, h.mem i⟩ : balForms bar X))
+    : ((cellMult bar fun i => (⟨δ i, h.mem i⟩ : balForms bar X)) : ℕ∞) ≤ maxMult bar q φ := by
   refine le_iSup_of_le X ?_
   refine le_iSup_of_le (inferInstance : AddCommGroup X) ?_
   refine le_iSup_of_le (inferInstance : Module O X) ?_
@@ -432,16 +524,31 @@ private lemma balForms_free_and_finite (X : Type) [AddCommGroup X] [Module O X] 
     Function.Injective.moduleIsTorsionFree F hF (fun c β => map_smul F c β)
   exact ⟨inferInstance, inferInstance⟩
 
-theorem onModule (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X],
-      Dominates bar X) (hPF : IsPolyFan bar q φ) (hSL : SimpLab bar q φ lab) (hM : maxMult bar q φ ≤ 1)
+theorem onModule
+    (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X],
+      Dominates bar X)
+    (hPF : IsPolyFan bar q φ) (hSL : SimpLab bar q φ lab) (hM : maxMult bar q φ ≤ 1)
     (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
-    (hX : Module.finrank O X ≤ q) : IsPolFanOn bar φ X ∧ ∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X),
-      IsCone bar φ γ → NoEquivRays O γ := by
+    (hX : Module.finrank O X ≤ q)
+    : IsPolFanOn bar φ X
+      ∧ ∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCone bar φ γ → NoEquivRays O γ := by
   have hP : IsPolyFanOn bar φ X := hPF X hX
   have hDX : Dominates bar X := hD X
   obtain ⟨hfree, hfin⟩ := balForms_free_and_finite (bar := bar) X
-  refine ⟨⟨hP.homog, hP.superadd, hP.integral, hP.pos,
-    fun m m' γ s hγ => hγ.comp s (GlobalTheory.T.isStrict_face_of_smoothCone_polyhedralFan O bar φ X hP hDX m m' γ s hγ), ?_, ?_⟩, ?_⟩
+  refine ⟨
+    ⟨
+      hP.homog,
+      hP.superadd,
+      hP.integral,
+      hP.pos,
+      fun m m' γ s hγ =>
+        hγ.comp s
+          (GlobalTheory.T.isStrict_face_of_smoothCone_polyhedralFan O bar φ X hP hDX m m' γ s hγ),
+      ?_,
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · intro B hB
     obtain ⟨S0, -, hS0⟩ := hP.finite
     obtain ⟨e, m, δ, c, hδ, -, hc, hBe⟩ := hS0 B hB
@@ -456,23 +563,35 @@ theorem onModule (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Fini
       have := hmult.trans hM
       exact_mod_cast this
     have hbasis : IsPartOfBasis (fun i => (⟨u i, hcell.mem i⟩ : balForms bar X)) :=
-      isPartOfBasis_of_card_torsion_le_one _ m' _ (LinearIndependent.of_comp (balForms bar X).subtype hliu) hmult1
+      isPartOfBasis_of_card_torsion_le_one _ m' _
+        (LinearIndependent.of_comp (balForms bar X).subtype hliu) hmult1
     have hcone : IsCone bar φ u := ⟨hcell.mem, hcell.nonneg, hbasis, hcell.linear, hcell.strict⟩
-    refine ⟨m', fun i => pull e.symm.toLinearMap (u i), fun i => (∑ j, c j * a j i) * n i,
-      hcone.pull_equiv e.symm, fun i => ?_, ?_⟩
+    refine ⟨
+      m',
+      fun i => pull e.symm.toLinearMap (u i),
+      fun i => (∑ j, c j * a j i) * n i,
+      hcone.pull_equiv e.symm,
+      fun i => ?_,
+      ?_
+    ⟩
     · exact mul_nonneg (Finset.sum_nonneg fun j _ => mul_nonneg (hc j) (ha j i)) (Nat.cast_nonneg _)
     · ext x y
       have h1 := LinearMap.congr_fun₂ hBe (e.symm x) (e.symm y)
-      simp only [pullR_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply, LinearMap.sum_apply,
-        Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul, toReal_apply] at h1
+      simp only [pullR_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply,
+          LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul, toReal_apply]
+        at h1
       rw [h1]
-      simp only [LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul, toReal_apply,
-        pull_apply, LinearEquiv.coe_coe]
-      have h2 : ∀ j, (δ j (e.symm x) (e.symm y) : ℝ) =
-          ∑ i, a j i * ((n i : ℝ) * (u i (e.symm x) (e.symm y) : ℝ)) := by
+      simp only [LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+        toReal_apply, pull_apply, LinearEquiv.coe_coe]
+      have h2
+          : ∀ j,
+            (δ j (e.symm x) (e.symm y) : ℝ)
+              = ∑ i, a j i * ((n i : ℝ) * (u i (e.symm x) (e.symm y) : ℝ)) := by
         intro j
         have h3 := LinearMap.congr_fun₂ (hδa j) (e.symm x) (e.symm y)
-        simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, smul_eq_mul] at h3
+        simp only [toReal_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply,
+            smul_eq_mul]
+          at h3
         rw [h3]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [hnu i]
@@ -481,13 +600,25 @@ theorem onModule (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Fini
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   · obtain ⟨S0, hS0f, hS0⟩ := hP.finite
-    refine ⟨{β | ∃ h : β ∈ balForms bar X, IsPrim bar ⟨β, h⟩ ∧ ∃ β₀ ∈ S0, ∃ k n : ℕ, 0 < k ∧ 0 < n ∧
-      (k : ℤ) • β₀ = (n : ℤ) • β}, ?_, ?_⟩
-    · refine Set.Finite.subset (hS0f.biUnion (t := fun β₀ => {β | ∃ h : β ∈ balForms bar X, IsPrim bar ⟨β, h⟩ ∧
-        ∃ k n : ℕ, 0 < k ∧ 0 < n ∧ (k : ℤ) • β₀ = (n : ℤ) • β}) fun β₀ _ => Set.Subsingleton.finite ?_) ?_
+    refine ⟨
+      {β | ∃ h : β ∈ balForms bar X, IsPrim bar ⟨β, h⟩ ∧ ∃ β₀ ∈ S0, ∃ k n : ℕ, 0 < k ∧ 0 < n ∧
+        (k : ℤ) • β₀ = (n : ℤ) • β},
+      ?_,
+      ?_
+    ⟩
+    · refine Set.Finite.subset
+        (hS0f.biUnion
+          (t := fun β₀ =>
+            {β | ∃ h : β ∈ balForms bar X, IsPrim bar ⟨β, h⟩ ∧
+              ∃ k n : ℕ, 0 < k ∧ 0 < n ∧ (k : ℤ) • β₀ = (n : ℤ) • β})
+          fun β₀ _ => Set.Subsingleton.finite ?_)
+        ?_
       · rintro x ⟨hx, px, k, n, hk, hn, hkn⟩ y ⟨hy, py, k', n', hk', hn', hkn'⟩
-        refine eq_of_isPrim hx hy px py (k := k' * n) (n := k * n') (Nat.mul_pos hk' hn) (Nat.mul_pos hk hn') ?_
-        calc ((k' * n : ℕ) : ℤ) • x = (k' : ℤ) • ((n : ℤ) • x) := by rw [smul_smul, Nat.cast_mul]
+        refine eq_of_isPrim hx hy px py (k := k' * n) (n := k * n') (Nat.mul_pos hk' hn)
+          (Nat.mul_pos hk hn') ?_
+        calc
+          ((k' * n : ℕ) : ℤ) • x
+            = (k' : ℤ) • ((n : ℤ) • x) := by rw [smul_smul, Nat.cast_mul]
           _ = (k' : ℤ) • ((k : ℤ) • β₀) := by rw [hkn]
           _ = (k : ℤ) • ((k' : ℤ) • β₀) := by rw [smul_smul, smul_smul, mul_comm]
           _ = (k : ℤ) • ((n' : ℤ) • y) := by rw [hkn']
@@ -496,7 +627,11 @@ theorem onModule (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Fini
         exact Set.mem_biUnion hβ₀ ⟨hβ, pβ, k, n, hk, hn, h⟩
     · intro m γ hγ
       have hB : ∑ j, toReal (γ j) ∈ psdCone (bar := bar) (X := X) := by
-        have := ConeSub.sum_smul_toReal_mem_psdCone O bar X m γ (fun _ => 1) hγ.mem hγ.nonneg (fun _ => zero_le_one)
+        have :=
+          ConeSub.sum_smul_toReal_mem_psdCone O bar X m γ
+            (fun _ => 1)
+            hγ.mem hγ.nonneg
+            (fun _ => zero_le_one)
         simpa using this
       obtain ⟨e, m', δ, c, hδ, hδS, hc, hBe⟩ := hS0 _ hB
       have hγe : IsCone bar φ fun j => pull e.toLinearMap (γ j) := hγ.pull_equiv e
@@ -509,7 +644,8 @@ theorem onModule (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Fini
       have hray := ray_of_mem_cone O bar φ X m m' _ δ hγe hδ a ha hja
       refine ⟨e, fun j => ?_⟩
       obtain ⟨i, k, n, hk, hn, hkn⟩ := hray j
-      exact ⟨pull_mem _ (hγ.mem j), isPrim_of_isPartOfBasis hγe.basis j, δ i, hδS i, k, n, hk, hn, hkn⟩
+      exact
+        ⟨pull_mem _ (hγ.mem j), isPrim_of_isPartOfBasis hγe.basis j, δ i, hδS i, k, n, hk, hn, hkn⟩
   · intro m γ hγ e i j hij
     obtain ⟨hlab, hcell⟩ := hSL
     obtain ⟨m', δ, hδ, -, hinj, hcone⟩ := hcell X hX m γ hγ.isCell
@@ -517,31 +653,36 @@ theorem onModule (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Fini
     have hray := ray_of_mem_cone O bar φ X m m' γ δ hγ hδ a ha hja
     obtain ⟨li, ki, ni, hki, hni, hi⟩ := hray i
     obtain ⟨lj, kj, nj, hkj, hnj, hj⟩ := hray j
-    have lab_ray : ∀ l t (kk nn : ℕ), 0 < kk → 0 < nn → (kk : ℤ) • δ l = (nn : ℤ) • γ t →
-        lab.evalZ (δ l) = lab.evalZ (γ t) := by
+    have lab_ray
+        : ∀ l t (kk nn : ℕ),
+          0 < kk → 0 < nn → (kk : ℤ) • δ l = (nn : ℤ) • γ t
+            → lab.evalZ (δ l) = lab.evalZ (γ t) := by
       intro l t kk nn hkk hnn h
       rw [← hlab X hX (δ l) (hδ.mem l) (hδ.nonneg l) kk hkk, h,
         hlab X hX (γ t) (hγ.mem t) (hγ.nonneg t) nn hnn]
     have hli := lab_ray _ _ _ _ hki hni hi
     have hlj := lab_ray _ _ _ _ hkj hnj hj
-    have hinv : lab.evalZ (γ i) = lab.evalZ (γ j) := by
-      rw [← hij, evalZ_pull lab e.surjective]
+    have hinv : lab.evalZ (γ i) = lab.evalZ (γ j) := by rw [← hij, evalZ_pull lab e.surjective]
     have hl : li = lj := hinj (show lab.evalZ (δ li) = lab.evalZ (δ lj) by rw [hli, hlj, hinv])
     rw [← hl] at hj
     have hxy : γ i = γ j := by
       refine eq_of_isPrim (hγ.mem i) (hγ.mem j) (isPrim_of_isPartOfBasis hγ.basis i)
         (isPrim_of_isPartOfBasis hγ.basis j) (k := kj * ni) (n := ki * nj) (Nat.mul_pos hkj hni)
         (Nat.mul_pos hki hnj) ?_
-      calc ((kj * ni : ℕ) : ℤ) • γ i = (kj : ℤ) • ((ni : ℤ) • γ i) := by rw [smul_smul, Nat.cast_mul]
+      calc
+        ((kj * ni : ℕ) : ℤ) • γ i
+          = (kj : ℤ) • ((ni : ℤ) • γ i) := by rw [smul_smul, Nat.cast_mul]
         _ = (kj : ℤ) • ((ki : ℤ) • δ li) := by rw [hi]
         _ = (ki : ℤ) • ((kj : ℤ) • δ li) := by rw [smul_smul, smul_smul, mul_comm]
         _ = (ki : ℤ) • ((nj : ℤ) • γ j) := by rw [hj]
         _ = ((ki * nj : ℕ) : ℤ) • γ j := by rw [smul_smul, Nat.cast_mul]
     exact hγ.injective hxy
 
-theorem isPolFan_of_maxMult_le_one (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
-      [Module.Projective O X], Dominates bar X) (hPF : IsPolyFan bar q φ) (hSL : SimpLab bar q φ lab)
-    (hM : maxMult bar q φ ≤ 1) : IsPolFan bar q φ ∧ NoSelfInt bar q φ := by
+theorem isPolFan_of_maxMult_le_one
+    (hD : ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X],
+      Dominates bar X)
+    (hPF : IsPolyFan bar q φ) (hSL : SimpLab bar q φ lab) (hM : maxMult bar q φ ≤ 1)
+    : IsPolFan bar q φ ∧ NoSelfInt bar q φ := by
   refine ⟨?_, ?_⟩
   · intro X _ _ _ _ hX
     exact (onModule hD hPF hSL hM X hX).1
@@ -550,8 +691,14 @@ theorem isPolFan_of_maxMult_le_one (hD : ∀ (X : Type) [AddCommGroup X] [Module
 
 end GlobalTheory.PolFan.SmoothEnd
 
-
 open GlobalTheory.PolFan.SmoothEnd in
-theorem GlobalTheory.PolFan.smoothEnd : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (q : ℕ) (φ lab : InvFun (𝓞 E)), (∀ (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] [Module.Projective (𝓞 E) X], Dominates H.bar X) → IsPolyFan H.bar q φ → SimpLab H.bar q φ lab → maxMult H.bar q φ ≤ 1 → IsPolFan H.bar q φ ∧ NoSelfInt H.bar q φ := by
+theorem GlobalTheory.PolFan.smoothEnd
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (q : ℕ)
+        (φ lab : InvFun (𝓞 E)),
+      (∀ (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+            [Module.Projective (𝓞 E) X],
+          Dominates H.bar X)
+        → IsPolyFan H.bar q φ → SimpLab H.bar q φ lab → maxMult H.bar q φ ≤ 1
+        → IsPolFan H.bar q φ ∧ NoSelfInt H.bar q φ := by
   intro E _ _ _ H q φ lab hD hPF hSL hM
   exact isPolFan_of_maxMult_le_one hD hPF hSL hM

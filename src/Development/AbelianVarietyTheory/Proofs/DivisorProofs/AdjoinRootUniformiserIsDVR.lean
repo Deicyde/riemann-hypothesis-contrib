@@ -12,7 +12,12 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem adjoinRoot_uniformiser_isDVR : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (π : R) (e : ℕ), Irreducible π → 0 < e → ∀ [IsDomain (AdjoinRoot (Polynomial.X ^ e - Polynomial.C π : Polynomial R))], IsDiscreteValuationRing (AdjoinRoot (Polynomial.X ^ e - Polynomial.C π : Polynomial R)) := by
+theorem adjoinRoot_uniformiser_isDVR
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (π : R) (e : ℕ),
+      Irreducible π → 0 < e
+        → ∀ [IsDomain (AdjoinRoot (Polynomial.X ^ e - Polynomial.C π : Polynomial R))],
+          IsDiscreteValuationRing (AdjoinRoot
+            (Polynomial.X ^ e - Polynomial.C π : Polynomial R)) := by
   intro R _ _ _ π e hπ he _
   set f : R[X] := X ^ e - C π with hf
   have hmon : f.Monic := monic_X_pow_sub_C π he.ne'
@@ -38,18 +43,17 @@ theorem adjoinRoot_uniformiser_isDVR : ∀ (R : Type) [CommRing R] [IsDomain R] 
     rfl
   have hπm : π ∈ maximalIdeal R := (mem_maximalIdeal _).2 hπ.not_isUnit
 
-  have hcomap : ∀ M : Ideal (AdjoinRoot f), M.IsMaximal →
-      M.comap (algebraMap R (AdjoinRoot f)) = maximalIdeal R := by
+  have hcomap
+      : ∀ M : Ideal (AdjoinRoot f),
+        M.IsMaximal → M.comap (algebraMap R (AdjoinRoot f)) = maximalIdeal R := by
     intro M hM
     letI : M.IsMaximal := hM
-    exact IsLocalRing.eq_maximalIdeal
-      (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
-        (algebraMap R (AdjoinRoot f))
-        (algebraMap_isIntegral_iff.mpr (inferInstance : Algebra.IsIntegral R (AdjoinRoot f))) M)
+    exact IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
+      (algebraMap R (AdjoinRoot f))
+      (algebraMap_isIntegral_iff.mpr (inferInstance : Algebra.IsIntegral R (AdjoinRoot f))) M)
   have hxM : ∀ M : Ideal (AdjoinRoot f), M.IsMaximal → x ∈ M := by
     intro M hM
-    have : algebraMap R _ π ∈ M := by
-      rw [← Ideal.mem_comap, hcomap M hM]; exact hπm
+    have : algebraMap R _ π ∈ M := by rw [← Ideal.mem_comap, hcomap M hM]; exact hπm
     rw [← hxe] at this
     exact hM.isPrime.mem_of_pow_mem e this
   have hle : ∀ M N : Ideal (AdjoinRoot f), M.IsMaximal → N.IsMaximal → M ≤ N := by
@@ -59,8 +63,7 @@ theorem adjoinRoot_uniformiser_isDVR : ∀ (R : Type) [CommRing R] [IsDomain R] 
       have := M.sub_mem ha (M.mul_mem_right y (hxM M hM))
       simpa using this
     have hr' : r ∈ maximalIdeal R := by rw [← hcomap M hM]; exact hr
-    have hrN : algebraMap R _ r ∈ N := by
-      rw [← Ideal.mem_comap, hcomap N hN]; exact hr'
+    have hrN : algebraMap R _ r ∈ N := by rw [← Ideal.mem_comap, hcomap N hN]; exact hr'
     exact N.add_mem hrN (N.mul_mem_right y (hxM N hN))
   haveI : IsLocalRing (AdjoinRoot f) :=
     IsLocalRing.of_unique_max_ideal (by
@@ -71,12 +74,13 @@ theorem adjoinRoot_uniformiser_isDVR : ∀ (R : Type) [CommRing R] [IsDomain R] 
     · intro a ha
       obtain ⟨r, y, rfl⟩ := hdec a
       have hr : algebraMap R _ r ∈ maximalIdeal (AdjoinRoot f) := by
-        have := Ideal.sub_mem (maximalIdeal (AdjoinRoot f)) ha
-          (Ideal.mul_mem_right y (maximalIdeal (AdjoinRoot f)) (hxM _ (maximalIdeal.isMaximal _)))
+        have :=
+          Ideal.sub_mem (maximalIdeal (AdjoinRoot f)) ha
+            (Ideal.mul_mem_right y (maximalIdeal (AdjoinRoot f)) (hxM _ (maximalIdeal.isMaximal _)))
         simpa using this
-      have hr' : r ∈ maximalIdeal R := by
-        rw [← hcomap _ (maximalIdeal.isMaximal _)]; exact hr
-      rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer π).1 hπ, Ideal.mem_span_singleton] at hr'
+      have hr' : r ∈ maximalIdeal R := by rw [← hcomap _ (maximalIdeal.isMaximal _)]; exact hr
+      rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer π).1 hπ, Ideal.mem_span_singleton]
+        at hr'
       obtain ⟨s, rfl⟩ := hr'
       refine Ideal.add_mem _ ?_ (Ideal.mul_mem_right _ _ (Ideal.subset_span rfl))
       rw [map_mul, ← hxe, Ideal.mem_span_singleton]
@@ -91,6 +95,7 @@ theorem adjoinRoot_uniformiser_isDVR : ∀ (R : Type) [CommRing R] [IsDomain R] 
     intro hF
     obtain ⟨b, hb⟩ := hF.mul_inv_cancel hx0
     exact (mem_maximalIdeal x).1 (hxM _ (maximalIdeal.isMaximal _)) (IsUnit.of_mul_eq_one b hb)
-  exact ((IsDiscreteValuationRing.TFAE (AdjoinRoot f) hnf).out 5 1).1 (show (maximalIdeal (AdjoinRoot f)).IsPrincipal from ⟨⟨x, hmax⟩⟩)
+  exact ((IsDiscreteValuationRing.TFAE (AdjoinRoot f) hnf).out 5 1).1
+    (show (maximalIdeal (AdjoinRoot f)).IsPrincipal from ⟨⟨x, hmax⟩⟩)
 
 end GlobalTheory

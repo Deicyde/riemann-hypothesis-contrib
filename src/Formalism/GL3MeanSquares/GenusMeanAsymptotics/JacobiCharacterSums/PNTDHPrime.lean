@@ -157,11 +157,14 @@ theorem deuring_heilbronn_prime_sum : DHPrimeOf := by
   obtain ⟨CH, hCH, hHyp⟩ := hH
   obtain ⟨CD, hCD, hL1⟩ := lfunction_one_le_of_siegel_zero
   obtain ⟨CT, hCT, hMert⟩ := Formalism.HermitianLattices.Ext.BoxTail.tail_mertens
-  refine ⟨max (max (30 * CD) (18 * CT + 9)) (110 * CH),
-    lt_of_lt_of_le (by linarith : (0 : ℝ) < 18 * CT + 9) (le_max_of_le_left (le_max_right _ _)), ?_⟩
+  refine ⟨
+    max (max (30 * CD) (18 * CT + 9)) (110 * CH),
+    lt_of_lt_of_le (by linarith : (0 : ℝ) < 18 * CT + 9) (le_max_of_le_left (le_max_right _ _)),
+    ?_
+  ⟩
   intro M _ χ₁ β₁ σ k hM h1 hne hz hβ hβ1 hσ hσ2
-  exact dhpr_main χ₁ k hM h1 hβ1 hσ hσ2 hCH.le hCD hCT
-    (le_max_of_le_left (le_max_left _ _)) (le_max_of_le_left (le_max_right _ _)) (le_max_right _ _)
-    (hL1 M χ₁ β₁ hne hz hβ hβ1) hMert (fun y x hy hyx => hHyp M χ₁ y x hM h1 hne hy hyx)
+  exact dhpr_main χ₁ k hM h1 hβ1 hσ hσ2 hCH.le hCD hCT (le_max_of_le_left (le_max_left _ _))
+    (le_max_of_le_left (le_max_right _ _)) (le_max_right _ _) (hL1 M χ₁ β₁ hne hz hβ hβ1) hMert
+    (fun y x hy hyx => hHyp M χ₁ y x hM h1 hne hy hyx)
 
 end Formalism.HermitianLattices.Ext.PrimesInProgressions

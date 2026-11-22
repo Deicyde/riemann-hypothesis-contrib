@@ -14,20 +14,20 @@ def bigPt {n : ℕ} (d : Fin n → ℂ) : C.LPt := List.ofFn fun i => (1, d i)
 
 def BigCellVan : Prop :=
   ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : M.Par) (p : KB.Pl P Wp Wq)
-    (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)), KB.CptCoef p.T.base F → Top.IsRadOf P p.T.base 0 F →
-    ∀ d : Fin (P.r + 1) → ℂ, (∀ i, d i ≠ 0) → p.V F (bigPt d) = 0
+      [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : M.Par)
+      (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)),
+    KB.CptCoef p.T.base F → Top.IsRadOf P p.T.base 0 F
+      → ∀ d : Fin (P.r + 1) → ℂ, (∀ i, d i ≠ 0) → p.V F (bigPt d) = 0
 
 def DensCOfParts : Prop := KB.PhiZero → KB.KloostDens → BigCellVan → KB.DensC
 
 namespace Dens
 
-theorem ptEntry_ones (l : List ℂ) (a b : ℕ) :
-    D.ptEntry (l.map fun c => (1, c)) a b = if a = b ∧ a < l.length then l.getD a 0 else 0 := by
+theorem ptEntry_ones (l : List ℂ) (a b : ℕ)
+    : D.ptEntry (l.map fun c => (1, c)) a b = if a = b ∧ a < l.length then l.getD a 0 else 0 := by
   induction l generalizing a b with
   | nil => simp [D.ptEntry]
-  | cons c l ih =>
-    cases a <;> cases b <;> simp [D.ptEntry, ih]
+  | cons c l ih => cases a <;> cases b <;> simp [D.ptEntry, ih]
 
 theorem ptMatN_bigPt {n : ℕ} (d : Fin n → ℂ) : D.ptMatN (bigPt d) n = U.hMat 1 d := by
   ext a b
@@ -55,8 +55,10 @@ theorem density_constant_of_parts : DensCOfParts := by
   intro hPZ hKD hBV Wp Wq _ _ _ _ _ _ P p F hC hR a
   obtain ⟨Φ0, hs, hcs, hdet, hV⟩ := hPZ Wp Wq P p F hC
   by_cases ha : D.IsLocPt a (P.r + 1)
-  · have key : ∀ n, D.ptSize a = n →
-        ∃ (σ : Equiv.Perm (Fin n)) (d : Fin n → ℂ), U.hMat σ d = D.ptMatN a n := by
+  · have key
+        : ∀ n,
+          D.ptSize a = n
+            → ∃ (σ : Equiv.Perm (Fin n)) (d : Fin n → ℂ), U.hMat σ d = D.ptMatN a n := by
       rintro n rfl
       obtain ⟨σ, d, -, h⟩ := Asm.exists_hMat a ha.1
       exact ⟨σ, d, h⟩
@@ -73,7 +75,8 @@ end Formalism.FourierDecayAlt.P.PBJ
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem pb_densC_of (hPZ : Formalism.FourierDecayAlt.KB.PhiZero) (hBV : PBJ.BigCellVan) : Formalism.FourierDecayAlt.KB.DensC :=
+theorem pb_densC_of (hPZ : Formalism.FourierDecayAlt.KB.PhiZero) (hBV : PBJ.BigCellVan)
+    : Formalism.FourierDecayAlt.KB.DensC :=
   PBJ.density_constant_of_parts hPZ kloosterman_density hBV
 
 end Formalism.FourierDecayAlt.P

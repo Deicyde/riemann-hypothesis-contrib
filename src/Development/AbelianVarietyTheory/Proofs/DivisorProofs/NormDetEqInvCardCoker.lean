@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDimEqO
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
@@ -16,28 +18,31 @@ noncomputable section
 namespace GlobalTheory
 namespace DetIndexPadic
 
-theorem norm_card_quot_span (l : ℕ) [Fact l.Prime] {x : ℤ_[l]} (hx : x ≠ 0) :
-    ‖((Nat.card (ℤ_[l] ⧸ Ideal.span {x}) : ℕ) : ℚ_[l])‖ = ‖x‖ := by
+theorem norm_card_quot_span (l : ℕ) [Fact l.Prime] {x : ℤ_[l]} (hx : x ≠ 0)
+    : ‖((Nat.card (ℤ_[l] ⧸ Ideal.span {x}) : ℕ) : ℚ_[l])‖ = ‖x‖ := by
   have h1 : Ideal.span {x} = RingHom.ker (PadicInt.toZModPow (p := l) x.valuation) := by
     rw [PadicInt.ker_toZModPow]
     conv_lhs => rw [PadicInt.unitCoeff_spec hx]
     exact Ideal.span_singleton_mul_left_unit (PadicInt.unitCoeff hx).isUnit _
   have h2 : Nat.card (ℤ_[l] ⧸ Ideal.span {x}) = l ^ x.valuation := by
-    rw [h1, Nat.card_congr (RingHom.quotientKerEquivOfSurjective
-      (ZMod.ringHom_surjective (PadicInt.toZModPow (p := l) x.valuation))).toEquiv, Nat.card_zmod]
+    rw [h1,
+      Nat.card_congr (RingHom.quotientKerEquivOfSurjective (ZMod.ringHom_surjective
+        (PadicInt.toZModPow (p := l) x.valuation))).toEquiv,
+      Nat.card_zmod]
   rw [h2, PadicInt.norm_eq_zpow_neg_valuation hx]
   push_cast
   rw [Padic.norm_p_pow]
 
-theorem det_ne_zero_of_finite_coker (l : ℕ) [Fact l.Prime] {T : Type} [AddCommGroup T]
-    [Module ℤ_[l] T] [Module.Free ℤ_[l] T] [Module.Finite ℤ_[l] T] (φ : T →ₗ[ℤ_[l]] T)
-    (hc : Nat.card (T ⧸ LinearMap.range φ) ≠ 0) : LinearMap.det φ ≠ 0 := by
+theorem det_ne_zero_of_finite_coker
+    (l : ℕ) [Fact l.Prime]
+    {T : Type} [AddCommGroup T] [Module ℤ_[l] T] [Module.Free ℤ_[l] T] [Module.Finite ℤ_[l] T]
+    (φ : T →ₗ[ℤ_[l]] T) (hc : Nat.card (T ⧸ LinearMap.range φ) ≠ 0)
+    : LinearMap.det φ ≠ 0 := by
   classical
   set n := Nat.card (T ⧸ LinearMap.range φ)
   have hk : ∀ x : T, ∃ y, φ y = ((n : ℤ_[l])) • x := by
     intro x
-    have h0 := card_nsmul_eq_zero' (G := T ⧸ LinearMap.range φ)
-      (x := Submodule.Quotient.mk x)
+    have h0 := card_nsmul_eq_zero' (G := T ⧸ LinearMap.range φ) (x := Submodule.Quotient.mk x)
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at h0
     obtain ⟨y, hy⟩ := h0
     exact ⟨y, by rw [hy, Nat.cast_smul_eq_nsmul]⟩
@@ -53,14 +58,15 @@ theorem det_ne_zero_of_finite_coker (l : ℕ) [Fact l.Prime] {T : Type} [AddComm
   rw [h0, zero_mul] at hd
   exact pow_ne_zero _ (Nat.cast_ne_zero.2 hc) hd.symm
 
-theorem norm_det_eq_of_card_coker : ∀ (l : ℕ) [Fact l.Prime] (T : Type) [AddCommGroup T]
-    [Module ℤ_[l] T] [Module.Free ℤ_[l] T] [Module.Finite ℤ_[l] T] (φ : T →ₗ[ℤ_[l]] T) (a : ℕ),
-    Nat.card (T ⧸ LinearMap.range φ) = l ^ a → ‖LinearMap.det φ‖ = (l : ℝ) ^ (-(a : ℤ)) := by
+theorem norm_det_eq_of_card_coker
+    : ∀ (l : ℕ) [Fact l.Prime] (T : Type) [AddCommGroup T] [Module ℤ_[l] T] [Module.Free ℤ_[l] T]
+        [Module.Finite ℤ_[l] T] (φ : T →ₗ[ℤ_[l]] T) (a : ℕ),
+      Nat.card (T ⧸ LinearMap.range φ) = l ^ a → ‖LinearMap.det φ‖ = (l : ℝ) ^ (-(a : ℤ)) := by
   intro l _ T _ _ _ _ φ a hcard
   classical
   have hl := (Fact.out : l.Prime)
-  have hdet : LinearMap.det φ ≠ 0 := det_ne_zero_of_finite_coker l φ
-    (by rw [hcard]; exact pow_ne_zero _ hl.ne_zero)
+  have hdet : LinearMap.det φ ≠ 0 :=
+    det_ne_zero_of_finite_coker l φ (by rw [hcard]; exact pow_ne_zero _ hl.ne_zero)
   have hinj : Function.Injective φ := by
     rw [← LinearMap.ker_eq_bot]
     by_contra h
@@ -88,8 +94,7 @@ theorem norm_det_eq_of_card_coker : ∀ (l : ℕ) [Fact l.Prime] (T : Type) [Add
     · rw [hij, Matrix.diagonal_apply_eq, Finsupp.single_eq_same]
     · rw [Matrix.diagonal_apply_ne _ hij, Finsupp.single_eq_of_ne hij]
   have hass := LinearMap.associated_det_comp_equiv N.subtype e e'
-  have h0 : N.subtype ∘ₗ (e : T →ₗ[ℤ_[l]] N) = φ := by
-    ext x; rfl
+  have h0 : N.subtype ∘ₗ (e : T →ₗ[ℤ_[l]] N) = φ := by ext x; rfl
   rw [h0] at hass
   have h1 : LinearMap.det f = ∏ i, c i := by
     rw [← LinearMap.det_toMatrix b', hm, Matrix.det_diagonal]

@@ -9,9 +9,14 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EqZeroOf
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+  PositivityTheory.Rg.Rsw.L
 open IsDedekindDomain NumberField
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -22,11 +27,11 @@ open RestrictedProduct InfinitePlace.Completion
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_nat_mem (S : Finset (HeightOneSpectrum (𝓞 F))) :
-    ∃ N : ℕ, 2 ≤ N ∧ ∀ v ∈ S, ((N : ℕ) : 𝓞 F) ∈ v.asIdeal := by
+theorem exists_nat_mem (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : ∃ N : ℕ, 2 ≤ N ∧ ∀ v ∈ S, ((N : ℕ) : 𝓞 F) ∈ v.asIdeal := by
   have hpos : 0 < ∏ v ∈ S, Ideal.absNorm v.asIdeal :=
-    Finset.prod_pos fun v _ => Nat.pos_of_ne_zero (by
-      rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot)
+    Finset.prod_pos fun v _ =>
+      Nat.pos_of_ne_zero (by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot)
   refine ⟨2 * ∏ v ∈ S, Ideal.absNorm v.asIdeal, by omega, fun v hv => ?_⟩
   obtain ⟨c, hc⟩ : Ideal.absNorm v.asIdeal ∣ 2 * ∏ v ∈ S, Ideal.absNorm v.asIdeal :=
     (Finset.dvd_prod_of_mem _ hv).mul_left 2
@@ -41,8 +46,8 @@ theorem tau_pos {N : ℕ} (hN : 2 ≤ N) (k : ℕ) : 0 < tau N k := by
   unfold tau
   positivity
 
-theorem tendsto_tau_fin (v : HeightOneSpectrum (𝓞 F)) {N : ℕ} (hN : ((N : ℕ) : 𝓞 F) ∈ v.asIdeal) :
-    Tendsto (fun k => algebraMap F (v.adicCompletion F) ((tau N k : ℚ) : F)) atTop (𝓝 0) := by
+theorem tendsto_tau_fin (v : HeightOneSpectrum (𝓞 F)) {N : ℕ} (hN : ((N : ℕ) : 𝓞 F) ∈ v.asIdeal)
+    : Tendsto (fun k => algebraMap F (v.adicCompletion F) ((tau N k : ℚ) : F)) atTop (𝓝 0) := by
   have hv : Valued.v (N : v.adicCompletion F) < 1 := by
     have e : (N : v.adicCompletion F) = algebraMap (𝓞 F) (v.adicCompletion F) (N : 𝓞 F) :=
       (map_natCast _ N).symm
@@ -58,8 +63,8 @@ theorem tendsto_tau_fin (v : HeightOneSpectrum (𝓞 F)) {N : ℕ} (hN : ((N : �
   refine h3.congr fun k => ?_
   simp [tau, map_div₀, map_add (f := _), map_pow, map_natCast]
 
-theorem tendsto_tau_inf (w : InfinitePlace F) {N : ℕ} (hN : 2 ≤ N) :
-    Tendsto (fun k => algebraMap F w.Completion ((tau N k : ℚ) : F)) atTop (𝓝 0) := by
+theorem tendsto_tau_inf (w : InfinitePlace F) {N : ℕ} (hN : 2 ≤ N)
+    : Tendsto (fun k => algebraMap F w.Completion ((tau N k : ℚ) : F)) atTop (𝓝 0) := by
   rw [tendsto_zero_iff_norm_tendsto_zero]
   have hnorm : ∀ k, ‖algebraMap F w.Completion ((tau N k : ℚ) : F)‖ = (tau N k : ℝ) := fun k => by
     rw [← (isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _)]
@@ -81,30 +86,32 @@ theorem tendsto_tau_inf (w : InfinitePlace F) {N : ℕ} (hN : 2 ≤ N) :
   refine squeeze_zero (fun k => by exact_mod_cast (tau_pos hN k).le) hb ?_
   exact tendsto_pow_atTop_nhds_zero_of_lt_one (by norm_num) (by norm_num)
 
-
 open Classical in
-def finS (S : Finset (HeightOneSpectrum (𝓞 F))) (q : F) :
-    Πʳ v : HeightOneSpectrum (𝓞 F), [v.adicCompletion F, v.adicCompletionIntegers F]_[𝓟 ((S : Set (HeightOneSpectrum (𝓞 F)))ᶜ)] :=
-  ⟨fun v => if v ∈ S then algebraMap F (v.adicCompletion F) q else 0, by
-    rw [Filter.eventually_principal]
-    intro v hv
-    have hv' : v ∉ S := by simpa using hv
-    simp only [if_neg hv']
-    exact zero_mem _⟩
+def finS (S : Finset (HeightOneSpectrum (𝓞 F))) (q : F)
+    : Πʳ v : HeightOneSpectrum (𝓞 F), [v.adicCompletion F, v.adicCompletionIntegers F]_[𝓟 ((S : Set (HeightOneSpectrum (𝓞 F)))ᶜ)] :=
+  ⟨
+    fun v => if v ∈ S then algebraMap F (v.adicCompletion F) q else 0,
+    by
+      rw [Filter.eventually_principal]
+      intro v hv
+      have hv' : v ∉ S := by simpa using hv
+      simp only [if_neg hv']
+      exact zero_mem _
+  ⟩
 
-theorem cofinite_le (S : Finset (HeightOneSpectrum (𝓞 F))) :
-    (cofinite : Filter (HeightOneSpectrum (𝓞 F))) ≤ 𝓟 ((S : Set (HeightOneSpectrum (𝓞 F)))ᶜ) := by
+theorem cofinite_le (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : (cofinite : Filter (HeightOneSpectrum (𝓞 F))) ≤ 𝓟 ((S : Set (HeightOneSpectrum (𝓞 F)))ᶜ) := by
   rw [le_principal_iff, mem_cofinite, compl_compl]
   exact S.finite_toSet
 
 def sAd (S : Finset (HeightOneSpectrum (𝓞 F))) (q : F) : AF F :=
-  (fun w => algebraMap F w.Completion q,
-    RestrictedProduct.inclusion _ _ (cofinite_le S) (finS S q))
+  (fun w => algebraMap F w.Completion q, RestrictedProduct.inclusion _ _ (cofinite_le S) (finS S q))
 
-theorem tendsto_sAd (S : Finset (HeightOneSpectrum (𝓞 F))) (q : ℕ → F)
+theorem tendsto_sAd
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (q : ℕ → F)
     (hi : ∀ w : InfinitePlace F, Tendsto (fun k => algebraMap F w.Completion (q k)) atTop (𝓝 0))
-    (hf : ∀ v ∈ S, Tendsto (fun k => algebraMap F (v.adicCompletion F) (q k)) atTop (𝓝 0)) :
-    Tendsto (fun k => sAd S (q k)) atTop (𝓝 0) := by
+    (hf : ∀ v ∈ S, Tendsto (fun k => algebraMap F (v.adicCompletion F) (q k)) atTop (𝓝 0))
+    : Tendsto (fun k => sAd S (q k)) atTop (𝓝 0) := by
   have h1 : Tendsto (fun k => finS S (q k)) atTop (𝓝 0) := by
     rw [RestrictedProduct.isEmbedding_coe_of_principal.isInducing.tendsto_nhds_iff, tendsto_pi_nhds]
     intro v
@@ -117,21 +124,24 @@ theorem tendsto_sAd (S : Finset (HeightOneSpectrum (𝓞 F))) (q : ℕ → F)
   have h2 := ((RestrictedProduct.continuous_inclusion (cofinite_le S)).tendsto 0).comp h1
   refine Tendsto.prodMk_nhds (tendsto_pi_nhds.2 hi) h2
 
-theorem one_tmul_algebraMap {A E : Type} [CommRing A] [Algebra F A] [Field E] [Algebra F E] (q : F) :
-    (1 : A) ⊗ₜ[F] algebraMap F E q = algebraMap F A q ⊗ₜ[F] (1 : E) := by
+theorem one_tmul_algebraMap {A E : Type} [CommRing A] [Algebra F A] [Field E] [Algebra F E] (q : F)
+    : (1 : A) ⊗ₜ[F] algebraMap F E q = algebraMap F A q ⊗ₜ[F] (1 : E) := by
   rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul,
     TensorProduct.smul_tmul']
 
-theorem ring_hom_mul_sub_eq_zero {A B : Type*} [CommRing A] [CommRing B] (f : A →+* B) (x e y : A) (c : B)
-    (hc : f e = c) (h : f x * c = f y) : f (x * e - y) = 0 := by
+theorem ring_hom_mul_sub_eq_zero
+    {A B : Type*} [CommRing A] [CommRing B]
+    (f : A →+* B) (x e y : A) (c : B) (hc : f e = c) (h : f x * c = f y)
+    : f (x * e - y) = 0 := by
   rw [map_sub, map_mul, hc, h, sub_self]
 
-
 open Classical in
-theorem tensor_key {E : Type} [Field E] [Algebra F E] (S : Finset (HeightOneSpectrum (𝓞 F)))
-    (e : AF F ⊗[F] E) (hi : ∀ w, compInf F E w e = 1)
-    (hf : ∀ v, compFin F E v e = if v ∈ S then 1 else 0) (q : F) :
-    ((1 : AF F) ⊗ₜ[F] algebraMap F E q) * e = sAd S q ⊗ₜ[F] (1 : E) := by
+theorem tensor_key
+    {E : Type} [Field E] [Algebra F E]
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (e : AF F ⊗[F] E)
+    (hi : ∀ w, compInf F E w e = 1) (hf : ∀ v, compFin F E v e = if v ∈ S then 1 else 0)
+    (q : F)
+    : ((1 : AF F) ⊗ₜ[F] algebraMap F E q) * e = sAd S q ⊗ₜ[F] (1 : E) := by
   rw [← sub_eq_zero]
   refine GlobalTheory.CompanionTheory.AdeleComp.tensor_eq_zero _ (fun w => ?_) (fun v => ?_)
   · refine ring_hom_mul_sub_eq_zero (compInf F E w) _ _ _ _ (hi w) ?_
@@ -149,12 +159,13 @@ theorem tensor_key {E : Type} [Field E] [Algebra F E] (S : Finset (HeightOneSpec
       show 0 = evFin F v (sAd S q) ⊗ₜ[F] (1 : E)
       rw [h, TensorProduct.zero_tmul]
 
-theorem incA_mul_idem (D : D7) (S : Finset (Pl D)) (e : AE D) (he : IsIdem S e) (q : ℚ) :
-    incA D ((q : ℚ) : D.host.E) * e = sAd S ((q : ℚ) : D.host.F) • (1 : AE D) := by
+theorem incA_mul_idem (D : D7) (S : Finset (Pl D)) (e : AE D) (he : IsIdem S e) (q : ℚ)
+    : incA D ((q : ℚ) : D.host.E) * e = sAd S ((q : ℚ) : D.host.F) • (1 : AE D) := by
   have hq : ((q : ℚ) : D.host.E) = algebraMap D.host.F D.host.E ((q : ℚ) : D.host.F) :=
     (map_ratCast (algebraMap D.host.F D.host.E) q).symm
-  have hs : sAd S ((q : ℚ) : D.host.F) • (1 : AE D) =
-      sAd S ((q : ℚ) : D.host.F) ⊗ₜ[D.host.F] (1 : D.host.E) := by
+  have hs
+      : sAd S ((q : ℚ) : D.host.F) • (1 : AE D)
+        = sAd S ((q : ℚ) : D.host.F) ⊗ₜ[D.host.F] (1 : D.host.E) := by
     show _ • ((1 : AF D.host.F) ⊗ₜ[D.host.F] (1 : D.host.E)) = _
     rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
   rw [hs, hq]
@@ -169,8 +180,9 @@ theorem smallRat : PositivityTheory.Rg.Rsw.L.IdemEx → PositivityTheory.Rg.Rsw.
     have h := ht.smul_const (1 : AE D)
     rw [zero_smul] at h
     exact h.congr fun k => (incA_mul_idem D S e he _).symm
-  have hall : ∀ᶠ k in atTop, ∀ j : Fin M,
-      ((j.1 + 1 : ℕ) : AE D) * (incA D ((tau N k : ℚ) : D.host.E) * e) ∈ V := by
+  have hall
+      : ∀ᶠ k in atTop, ∀ j : Fin M,
+        ((j.1 + 1 : ℕ) : AE D) * (incA D ((tau N k : ℚ) : D.host.E) * e) ∈ V := by
     rw [Filter.eventually_all]
     intro j
     have h := hz.const_mul ((j.1 + 1 : ℕ) : AE D)
@@ -182,8 +194,9 @@ theorem smallRat : PositivityTheory.Rg.Rsw.L.IdemEx → PositivityTheory.Rg.Rsw.
     have h2 : i.1 + 1 = j.1 + 1 := by exact_mod_cast h
     exact Fin.ext (by omega)
   · have h := hk j
-    have e1 : incA D (((((j.1 + 1 : ℕ) : ℚ) * tau N k : ℚ)) : D.host.E) =
-        ((j.1 + 1 : ℕ) : AE D) * incA D ((tau N k : ℚ) : D.host.E) := by
+    have e1
+        : incA D (((((j.1 + 1 : ℕ) : ℚ) * tau N k : ℚ)) : D.host.E)
+          = ((j.1 + 1 : ℕ) : AE D) * incA D ((tau N k : ℚ) : D.host.E) := by
       rw [Rat.cast_mul, map_mul, Rat.cast_natCast, map_natCast]
     show incA D (((((j.1 + 1 : ℕ) : ℚ) * tau N k : ℚ)) : D.host.E) * e ∈ V
     rw [e1, mul_assoc]

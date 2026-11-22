@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.dual_convex : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] (q : Y → E →L[ℝ] ℝ) (T : Set E), Convex ℝ (posDual T) ∧ ∀ h : E, IsClosed (normalCone q h) ∧ Convex ℝ (normalCone q h) := by
+theorem UpperTheory.V.ConeExtensionAcyclic.dual_convex
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] (q : Y → E →L[ℝ] ℝ) (T : Set E),
+      Convex ℝ (posDual T) ∧ ∀ h : E, IsClosed (normalCone q h) ∧ Convex ℝ (normalCone q h) := by
   intro E Y _ _ q T
   refine ⟨?_, fun h => ⟨?_, ?_⟩⟩
   · intro x hx y hy a b ha hb hab
@@ -26,7 +28,8 @@ theorem UpperTheory.V.ConeExtensionAcyclic.dual_convex : ∀ {E Y : Type} [Norme
       simp [normalCone]
     rw [e]
     exact isClosed_biInter fun h' _ =>
-      isClosed_le (ContinuousLinearMap.apply ℝ ℝ h).continuous (ContinuousLinearMap.apply ℝ ℝ h').continuous
+      isClosed_le (ContinuousLinearMap.apply ℝ ℝ h).continuous
+        (ContinuousLinearMap.apply ℝ ℝ h').continuous
   · intro x hx y hy a b ha hb hab
     simp only [normalCone, Set.mem_setOf_eq] at hx hy ⊢
     intro h' hh'

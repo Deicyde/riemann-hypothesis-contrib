@@ -14,8 +14,11 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.RealGaloisRepres
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -24,8 +27,8 @@ namespace GlobalTheory.ExSplitCM
 
 variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
 
-theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ p : ℕ, p.Prime ∧ ((p : ℕ) : 𝓞 F) ∈ v.asIdeal := by
+theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 F))
+    : ∃ p : ℕ, p.Prime ∧ ((p : ℕ) : 𝓞 F) ∈ v.asIdeal := by
   have hmax := v.isMaximal
   letI : Field (𝓞 F ⧸ v.asIdeal) := Ideal.Quotient.field v.asIdeal
   have hfin : Finite (𝓞 F ⧸ v.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ v.ne_bot
@@ -34,8 +37,11 @@ theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 F)) :
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact CharP.cast_eq_zero _ p
 
-theorem prime_eq_of_mem (u : HeightOneSpectrum (𝓞 F)) {p p' : ℕ} (hp : p.Prime) (hp' : p'.Prime)
-    (h : ((p : ℕ) : 𝓞 F) ∈ u.asIdeal) (h' : ((p' : ℕ) : 𝓞 F) ∈ u.asIdeal) : p = p' := by
+theorem prime_eq_of_mem
+    (u : HeightOneSpectrum (𝓞 F))
+    {p p' : ℕ} (hp : p.Prime) (hp' : p'.Prime) (h : ((p : ℕ) : 𝓞 F) ∈ u.asIdeal)
+    (h' : ((p' : ℕ) : 𝓞 F) ∈ u.asIdeal)
+    : p = p' := by
   by_contra hne
   have hc : Nat.gcd p p' = 1 := (Nat.coprime_primes hp hp').2 hne
   have hm : (((Nat.gcd p p' : ℕ) : ℤ) : 𝓞 F) ∈ u.asIdeal := by
@@ -46,24 +52,28 @@ theorem prime_eq_of_mem (u : HeightOneSpectrum (𝓞 F)) {p p' : ℕ} (hp : p.Pr
   simp only [Nat.cast_one, Int.cast_one] at hm
   exact u.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 hm)
 
-theorem finite_primes_of_finite {B : Set (HeightOneSpectrum (𝓞 F))} (hB : B.Finite) :
-    {p : ℕ | p.Prime ∧ ∃ u ∈ B, ((p : ℕ) : 𝓞 F) ∈ u.asIdeal}.Finite := by
-  refine (hB.biUnion (t := fun u => {p : ℕ | p.Prime ∧ ((p : ℕ) : 𝓞 F) ∈ u.asIdeal})
-    fun u _ => Set.Subsingleton.finite fun p hp p' hp' => prime_eq_of_mem u hp.1 hp'.1 hp.2 hp'.2).subset ?_
+theorem finite_primes_of_finite {B : Set (HeightOneSpectrum (𝓞 F))} (hB : B.Finite)
+    : {p : ℕ | p.Prime ∧ ∃ u ∈ B, ((p : ℕ) : 𝓞 F) ∈ u.asIdeal}.Finite := by
+  refine (hB.biUnion
+    (t := fun u => {p : ℕ | p.Prime ∧ ((p : ℕ) : 𝓞 F) ∈ u.asIdeal})
+    fun u _ =>
+      Set.Subsingleton.finite fun p hp p' hp' => prime_eq_of_mem u hp.1 hp'.1 hp.2 hp'.2).subset ?_
   rintro p ⟨hp, u, hu, h⟩
   exact Set.mem_biUnion hu ⟨hp, h⟩
 
-theorem exists_mem_of_prime {p : ℕ} (hp : p.Prime) :
-    ∃ u : HeightOneSpectrum (𝓞 F), ((p : ℕ) : 𝓞 F) ∈ u.asIdeal := by
+theorem exists_mem_of_prime {p : ℕ} (hp : p.Prime)
+    : ∃ u : HeightOneSpectrum (𝓞 F), ((p : ℕ) : 𝓞 F) ∈ u.asIdeal := by
   have hnu : ¬ IsUnit ((p : ℕ) : 𝓞 F) := by
     intro h
     have h2 := h.map (Algebra.norm ℤ (S := 𝓞 F))
     rw [show ((p : ℕ) : 𝓞 F) = algebraMap ℤ (𝓞 F) (p : ℤ) by simp, Algebra.norm_algebraMap,
-      isUnit_pow_iff Module.finrank_pos.ne', Int.isUnit_iff] at h2
+        isUnit_pow_iff Module.finrank_pos.ne', Int.isUnit_iff]
+      at h2
     have := hp.two_le
     omega
-  obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 F)})
-    (by rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨M, hM, hle⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 F)})
+      (by rwa [Ne, Ideal.span_singleton_eq_top])
   have hne : M ≠ ⊥ := by
     intro h
     rw [h] at hle
@@ -72,25 +82,30 @@ theorem exists_mem_of_prime {p : ℕ} (hp : p.Prime) :
     exact hp.ne_zero (by exact_mod_cast h0)
   exact ⟨⟨M, hM.isPrime, hne⟩, hle (Ideal.mem_span_singleton_self _)⟩
 
-theorem mem_range_res_iff (K : IntermediateField F Ω) (σ : G F Ω) :
-    σ ∈ (res F Ω ↥K).range ↔ ∀ x ∈ K, σ x = x := by
+theorem mem_range_res_iff (K : IntermediateField F Ω) (σ : G F Ω)
+    : σ ∈ (res F Ω ↥K).range ↔ ∀ x ∈ K, σ x = x := by
   constructor
   · rintro ⟨τ, rfl⟩ x hx
     exact τ.commutes (⟨x, hx⟩ : K)
   · intro h
     exact ⟨AlgEquiv.ofRingEquiv (f := σ.toRingEquiv) fun x => h _ x.2, rfl⟩
 
-theorem fix_adjoin {δ : Ω} (hint : IsIntegral F δ) (s : G F Ω) (h : s δ = δ) :
-    ∀ x ∈ IntermediateField.adjoin F {δ}, s x = x := by
+theorem fix_adjoin {δ : Ω} (hint : IsIntegral F δ) (s : G F Ω) (h : s δ = δ)
+    : ∀ x ∈ IntermediateField.adjoin F {δ}, s x = x := by
   intro x hx
   rw [← IntermediateField.mem_toSubalgebra,
-    IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic] at hx
-  have := (AlgHom.eqOn_adjoin_iff (φ := (s : Ω →ₐ[F] Ω)) (ψ := AlgHom.id F Ω)).2
-    (by simpa [Set.EqOn] using h) hx
+      IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic]
+    at hx
+  have :=
+    (AlgHom.eqOn_adjoin_iff (φ := (s : Ω →ₐ[F] Ω)) (ψ := AlgHom.id F Ω)).2
+      (by simpa [Set.EqOn] using h) hx
   simpa using this
 
-theorem exists_qcm [IsTotallyReal F] [IsAlgClosure F Ω] (d : F) (δ : Ω) (hδ : δ ^ 2 = algebraMap F Ω d)
-    (hd : ∀ φ : F →+* ℝ, φ d < 0) : ∃ Q : QCM F Ω, Q.K = IntermediateField.adjoin F {δ} := by
+theorem exists_qcm
+    [IsTotallyReal F] [IsAlgClosure F Ω]
+    (d : F) (δ : Ω) (hδ : δ ^ 2 = algebraMap F Ω d)
+    (hd : ∀ φ : F →+* ℝ, φ d < 0)
+    : ∃ Q : QCM F Ω, Q.K = IntermediateField.adjoin F {δ} := by
   have halg : Algebra.IsAlgebraic F Ω := IsAlgClosure.isAlgebraic
   have hint : IsIntegral F δ := (halg.isAlgebraic δ).isIntegral
   let K : IntermediateField F Ω := IntermediateField.adjoin F {δ}
@@ -119,8 +134,7 @@ theorem exists_qcm [IsTotallyReal F] [IsAlgClosure F Ω] (d : F) (δ : Ω) (hδ 
     exact absurd h3 (not_lt.2 (sq_nonneg _))
   have hpos := minpoly.natDegree_pos hint
   have hdeg : (minpoly F δ).natDegree = 2 := by omega
-  have hrk : Module.finrank F K = 2 := by
-    rw [← hdeg]; exact IntermediateField.adjoin.finrank hint
+  have hrk : Module.finrank F K = 2 := by rw [← hdeg]; exact IntermediateField.adjoin.finrank hint
   haveI : IsTotallyComplex K := by
     refine ⟨fun w => ?_⟩
     rw [← InfinitePlace.not_isReal_iff_isComplex]

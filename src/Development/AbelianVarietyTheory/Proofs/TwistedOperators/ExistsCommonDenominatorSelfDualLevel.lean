@@ -7,8 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsN
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.Grow
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.Grow
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.ChainFr GlobalTheory.SepRows GlobalTheory.SepPer Matrix
 open scoped TensorProduct InnerProductSpace
@@ -18,10 +22,11 @@ namespace GlobalTheory.LevelDenom
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem natCast_smul_mem_hatL_std (Λ : Submodule (𝓞 E) (Fin n → E)) (c : ℕ)
-    (hc : ∀ y ∈ Λ, c • y ∈ Formalism.L2.Col.stdLat E n) (x : Fin n → E ⊗[F] Formalism.L2.Herm.Af F)
-    (hx : x ∈ Formalism.L2.Herm.hatL (F := F) Λ) :
-    (c : E ⊗[F] Formalism.L2.Herm.Af F) • x ∈ Formalism.UG.latS (F := F) (Formalism.L2.Herm.Af F) (Formalism.L2.Herm.intAf F E) (Formalism.L2.Col.stdLat E n) := by
+theorem natCast_smul_mem_hatL_std
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (c : ℕ) (hc : ∀ y ∈ Λ, c • y ∈ Formalism.L2.Col.stdLat E n)
+    (x : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) (hx : x ∈ Formalism.L2.Herm.hatL (F := F) Λ)
+    : (c : E ⊗[F] Formalism.L2.Herm.Af F) • x ∈ Formalism.UG.latS (F := F) (Formalism.L2.Herm.Af F)
+      (Formalism.L2.Herm.intAf F E) (Formalism.L2.Col.stdLat E n) := by
   unfold Formalism.L2.Herm.hatL Formalism.UG.latS at hx
   induction hx using Submodule.span_induction with
   | mem y hy =>
@@ -30,45 +35,63 @@ theorem natCast_smul_mem_hatL_std (Λ : Submodule (𝓞 E) (Fin n → E)) (c : �
     refine ⟨c • l, hc l hl, ?_⟩
     funext i
     simp [nsmul_eq_mul, map_mul, map_natCast]
-  | zero => simp
-  | add a b _ _ ha hb => rw [smul_add]; exact add_mem ha hb
+  | zero =>
+    simp
+  | add a b _ _ ha hb =>
+    rw [smul_add]; exact add_mem ha hb
   | smul a y _ hy =>
     rw [smul_comm]
     exact Submodule.smul_mem _ a hy
 
-theorem exists_nsmul_le_std (Λ : Submodule (𝓞 E) (Fin n → E)) (hfg : Λ.FG) :
-    ∃ c : ℕ, 0 < c ∧ ∀ y ∈ Λ, c • y ∈ Formalism.L2.Col.stdLat E n := by
+theorem exists_nsmul_le_std (Λ : Submodule (𝓞 E) (Fin n → E)) (hfg : Λ.FG)
+    : ∃ c : ℕ, 0 < c ∧ ∀ y ∈ Λ, c • y ∈ Formalism.L2.Col.stdLat E n := by
   obtain ⟨S, hS⟩ := hfg
-  obtain ⟨c, hc, h⟩ := GlobalTheory.LatSandwich.exists_nsmul_le S (Formalism.L2.Pj.stdLat E n)
-    (fun x _ => GlobalTheory.LatSandwich.exists_nsmul_mem_stdLat x)
+  obtain ⟨c, hc, h⟩ :=
+    GlobalTheory.LatSandwich.exists_nsmul_le S (Formalism.L2.Pj.stdLat E n)
+      (fun x _ => GlobalTheory.LatSandwich.exists_nsmul_mem_stdLat x)
   exact ⟨c, hc, fun y hy => h y (by rw [hS]; exact hy)⟩
 
-theorem exists_nsmul_single_mem (Λ : Submodule (𝓞 E) (Fin n → E)) (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤) :
-    ∃ c : ℕ, 0 < c ∧ ∀ j, c • (Pi.single j (1 : E) : Fin n → E) ∈ Λ := by
+theorem exists_nsmul_single_mem
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤)
+    : ∃ c : ℕ, 0 < c ∧ ∀ j, c • (Pi.single j (1 : E) : Fin n → E) ∈ Λ := by
   classical
-  obtain ⟨c, hc, h⟩ := GlobalTheory.LatSandwich.exists_nsmul_le (Finset.univ.image fun j : Fin n => (Pi.single j (1 : E) : Fin n → E)) Λ
-    (fun x _ => GlobalTheory.LatSandwich.exists_nsmul_mem_of_span Λ hsp x)
+  obtain ⟨c, hc, h⟩ :=
+    GlobalTheory.LatSandwich.exists_nsmul_le
+      (Finset.univ.image fun j : Fin n => (Pi.single j (1 : E) : Fin n → E)) Λ
+      (fun x _ => GlobalTheory.LatSandwich.exists_nsmul_mem_of_span Λ hsp x)
   exact ⟨c, hc, fun j => h _ (Submodule.subset_span (by simp))⟩
 
 end GlobalTheory.LevelDenom
 
 namespace GlobalTheory.LevelDenom
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] {n : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  {n : ℕ}
 
-theorem exists_denom_stab (hc : Formalism.BasicNotions.CMData F E) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E))
-    (hfg : Λ.FG) (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤) :
-    ∃ b : ℕ, 0 < b ∧ ∀ k ∈ congLev hc J Λ ⊤, ∀ i j,
-      (b : E ⊗[F] Formalism.L2.Herm.Af F) * k.1 i j ∈ Formalism.L2.Herm.intAf F E := by
+theorem exists_denom_stab
+    (hc : Formalism.BasicNotions.CMData F E) (J : Matrix (Fin n) (Fin n) E)
+    (Λ : Submodule (𝓞 E) (Fin n → E))
+    (hfg : Λ.FG) (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤)
+    : ∃ b : ℕ,
+      0 < b
+        ∧ ∀ k ∈ congLev hc J Λ ⊤, ∀ i j,
+          (b : E ⊗[F] Formalism.L2.Herm.Af F) * k.1 i j ∈ Formalism.L2.Herm.intAf F E := by
   classical
   obtain ⟨a, ha, hae⟩ := exists_nsmul_single_mem Λ hsp
   obtain ⟨c, hc0, hce⟩ := exists_nsmul_le_std Λ hfg
   refine ⟨a * c, Nat.mul_pos ha hc0, fun k hk i j => ?_⟩
   have hs := hk.2.1
-  have hzmem : (fun l => Formalism.UG.inclE (Formalism.L2.Herm.Af F) ((a • (Pi.single j (1 : E) : Fin n → E)) l)) ∈
-      Formalism.L2.Herm.hatL (F := F) Λ := Submodule.subset_span ⟨_, hae j, rfl⟩
-  have ez : (fun l => Formalism.UG.inclE (Formalism.L2.Herm.Af F) ((a • (Pi.single j (1 : E) : Fin n → E)) l)) =
-      (a : E ⊗[F] Formalism.L2.Herm.Af F) • (Pi.single j 1 : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) := by
+  have hzmem
+      : (fun l =>
+          Formalism.UG.inclE (Formalism.L2.Herm.Af F) ((a • (Pi.single j (1 : E) : Fin n → E)) l))
+        ∈ Formalism.L2.Herm.hatL (F := F) Λ :=
+    Submodule.subset_span ⟨_, hae j, rfl⟩
+  have ez
+      : (fun l =>
+          Formalism.UG.inclE (Formalism.L2.Herm.Af F) ((a • (Pi.single j (1 : E) : Fin n → E)) l))
+        = (a : E ⊗[F] Formalism.L2.Herm.Af F)
+          • (Pi.single j 1 : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) := by
     funext l
     by_cases e : l = j
     · subst e; simp [nsmul_eq_mul]
@@ -86,7 +109,13 @@ end GlobalTheory.LevelDenom
 
 namespace GlobalTheory.LevelDenom
 
-theorem exists_denom_congLev : ∀ (D : D7) (V : HSp D) (Λ : Lat V), IsSelfDualC V Λ → ∃ b : ℕ, 0 < b ∧ ∀ k ∈ congLev D.sp.cm V.gram Λ ⊤, ∀ i j, (b : Lev.EAf D) * k.1 i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
+theorem exists_denom_congLev
+    : ∀ (D : D7) (V : HSp D) (Λ : Lat V),
+      IsSelfDualC V Λ
+        → ∃ b : ℕ,
+          0 < b
+            ∧ ∀ k ∈ congLev D.sp.cm V.gram Λ ⊤, ∀ i j,
+              (b : Lev.EAf D) * k.1 i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
   intro D V Λ hΛ
   classical
   haveI := hΛ.1
@@ -119,11 +148,13 @@ theorem exists_denom_congLev : ∀ (D : D7) (V : HSp D) (Λ : Lat V), IsSelfDual
     have hn : (c * d : D.host.E) ≠ 0 := by
       exact mul_ne_zero (Nat.cast_ne_zero.mpr (Nat.ne_of_gt hc))
         (Nat.cast_ne_zero.mpr (Nat.ne_of_gt hd))
-    have hm' : (c * d : D.host.E) • y ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) := by
+    have hm'
+        : (c * d : D.host.E) • y ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) := by
       simpa [Nat.cast_mul, ← Nat.cast_smul_eq_nsmul D.host.E] using hm
-    have := Submodule.smul_mem (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))) (c * d : D.host.E)⁻¹ hm'
+    have :=
+      Submodule.smul_mem (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)))
+        (c * d : D.host.E)⁻¹ hm'
     simpa only [smul_smul, inv_mul_cancel₀ hn, one_smul] using this
-  exact exists_denom_stab D.sp.cm V.gram Λ (Submodule.IsLattice.fg D.host.E Λ)
-    hsp
+  exact exists_denom_stab D.sp.cm V.gram Λ (Submodule.IsLattice.fg D.host.E Λ) hsp
 
 end GlobalTheory.LevelDenom

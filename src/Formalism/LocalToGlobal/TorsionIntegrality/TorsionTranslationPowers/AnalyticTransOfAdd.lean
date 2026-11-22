@@ -23,7 +23,8 @@ theorem opUTh0Root : OpUTh0Root := OpUTh0Root_of
 
 theorem ptOfInt_of_add (hA : PtOfAdd) : PtOfInt := PtOfInt_of hA ptOfZero torsionIntegral
 theorem kernelPtInt_of_add (hA : PtOfAdd) : KernelPtInt := KernelPtInt_of (ptOfInt_of_add hA)
-theorem cm4Int_of_add (hA : PtOfAdd) : CMIntegrality := cm_integrality_of_torsion_points (ptOfInt_of_add hA)
+theorem cm4Int_of_add (hA : PtOfAdd) : CMIntegrality :=
+  cm_integrality_of_torsion_points (ptOfInt_of_add hA)
 theorem analyticTrans_of_add (hA : PtOfAdd) : AnalyticTrans :=
   AnalyticTrans_of analyticSys hA ptOfZero (ptOfInt_of_add hA) transUnit
 theorem th0Analytic_of_add (hA : PtOfAdd) : ThetaZeroAnalytic :=

@@ -6,25 +6,26 @@ public import Mathlib
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace
 
-private theorem idempotent_mul_eval₂_mul_eq {A B : Type} [CommRing A] [CommRing B] (a : A →+* B) (e b : B)
-    (he : IsIdempotentElem e) (p : Polynomial A) :
-    e * p.eval₂ a (e * b) = e * p.eval₂ a b := by
+private theorem idempotent_mul_eval₂_mul_eq
+    {A B : Type} [CommRing A] [CommRing B]
+    (a : A →+* B)
+    (e b : B) (he : IsIdempotentElem e)
+    (p : Polynomial A)
+    : e * p.eval₂ a (e * b) = e * p.eval₂ a b := by
   rw [Polynomial.eval₂_eq_sum_range, Polynomial.eval₂_eq_sum_range, Finset.mul_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   have h := he.pow_succ_eq i
   rw [mul_pow]
   linear_combination (a (p.coeff i) * b ^ i) * h
 
-theorem UpperTheory.integralClosure_range_isLocalization_idempotent :
-    ∀ {A B B' C C' : Type} [CommRing A] [CommRing B] [CommRing B'] [CommRing C] [CommRing C']
+theorem UpperTheory.integralClosure_range_isLocalization_idempotent
+    : ∀ {A B B' C C' : Type} [CommRing A] [CommRing B] [CommRing B'] [CommRing C] [CommRing C']
         (a : A →+* B) (jB : B →+* B') (t : C →+* B) (t' : C' →+* B') (mC : C →+* C'),
-        Function.Injective t → Function.Injective t' →
-        (∀ b, b ∈ t.range ↔ a.IsIntegralElem b) →
-        (∀ b, b ∈ t'.range ↔ (jB.comp a).IsIntegralElem b) →
-        (∀ c, jB (t c) = t' (mC c)) →
-        ∀ (S : Submonoid B), (∀ s ∈ S, IsIdempotentElem s) →
-        @IsLocalization B _ S B' _ jB.toAlgebra →
-        mC.Flat ∧ Epi (CommRingCat.ofHom mC) := by
+      Function.Injective t → Function.Injective t' → (∀ b, b ∈ t.range ↔ a.IsIntegralElem b)
+        → (∀ b, b ∈ t'.range ↔ (jB.comp a).IsIntegralElem b) → (∀ c, jB (t c) = t' (mC c))
+        → ∀ (S : Submonoid B),
+          (∀ s ∈ S, IsIdempotentElem s) → @IsLocalization B _ S B' _ jB.toAlgebra
+            → mC.Flat ∧ Epi (CommRingCat.ofHom mC) := by
   intro A B B' C C' _ _ _ _ _ a jB t t' mC ht ht' hC hC' hcomm S hS hloc
   letI := jB.toAlgebra
   have h1 : ∀ s ∈ S, jB s = 1 := by
@@ -35,8 +36,11 @@ theorem UpperTheory.integralClosure_range_isLocalization_idempotent :
   have hint : ∀ s ∈ S, s ∈ t.range := by
     intro s hs
     rw [hC]
-    refine ⟨Polynomial.X * (Polynomial.X - Polynomial.C 1),
-      Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1), ?_⟩
+    refine ⟨
+      Polynomial.X * (Polynomial.X - Polynomial.C 1),
+      Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1),
+      ?_
+    ⟩
     rw [Polynomial.eval₂_mul, Polynomial.eval₂_X, Polynomial.eval₂_sub, Polynomial.eval₂_X,
       Polynomial.eval₂_C, map_one, mul_sub, mul_one, (hS s hs).eq, sub_self]
   have hsurj : Function.Surjective mC := by
@@ -56,9 +60,11 @@ theorem UpperTheory.integralClosure_range_isLocalization_idempotent :
       rw [hC]
       refine ⟨Polynomial.X * p, Polynomial.monic_X.mul hp, ?_⟩
       rw [Polynomial.eval₂_mul, Polynomial.eval₂_X]
-      calc s' * b * Polynomial.eval₂ a (s' * b) p
+      calc
+        s' * b * Polynomial.eval₂ a (s' * b) p
           = b * (s' * Polynomial.eval₂ a (s' * b) p) := by ring
-        _ = b * (s' * Polynomial.eval₂ a b p) := by rw [idempotent_mul_eval₂_mul_eq a s' b (hS s' hs') p]
+        _ = b * (s' * Polynomial.eval₂ a b p) := by
+          rw [idempotent_mul_eval₂_mul_eq a s' b (hS s' hs') p]
         _ = 0 := by rw [hs'0, mul_zero]
     obtain ⟨c0, hc0⟩ := hsb
     refine ⟨c0, ht' ?_⟩

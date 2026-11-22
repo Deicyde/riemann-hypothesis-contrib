@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 open UpperHalfPlane hiding I
 open CongruenceSubgroup
 
-theorem UpperTheory.V.Af.Nf.archBd :
-    UpperTheory.V.Af.Nf.ArchBd := by
+theorem UpperTheory.V.Af.Nf.archBd : UpperTheory.V.Af.Nf.ArchBd := by
   intro k M hM f
   haveI : NeZero M := ⟨by omega⟩
   obtain ⟨C, hC⟩ := CuspFormClass.exists_bound f
@@ -28,8 +27,9 @@ theorem UpperTheory.V.Af.Nf.archBd :
   have hn : Complex.normSq J = ‖J‖ ^ 2 := Complex.normSq_eq_norm_sq J
   have hJpos : 0 < ‖J‖ := norm_pos_iff.mpr hJ0
   have hDpos : 0 < |x.det| := abs_pos.mpr hx
-  have hq : (((x 0 0 : ℂ) * (UpperHalfPlane.I : ℂ) + (x 0 1 : ℂ)) / J).im =
-      x.det / Complex.normSq J := by
+  have hq
+      : (((x 0 0 : ℂ) * (UpperHalfPlane.I : ℂ) + (x 0 1 : ℂ)) / J).im
+        = x.det / Complex.normSq J := by
     rw [Complex.div_im, Matrix.det_fin_two]
     simp [J]
     ring
@@ -50,15 +50,15 @@ theorem UpperTheory.V.Af.Nf.archBd :
   have hb := hC (ofComplex w)
   rw [hτ] at hb
   have hpow : (|x.det| / ‖J‖ ^ 2) ^ (((k : ℤ) : ℝ) / 2) = |x.det| ^ ((k : ℝ) / 2) / ‖J‖ ^ k := by
-    rw [Real.div_rpow hDpos.le (by positivity), ← Real.rpow_natCast ‖J‖ 2,
-      ← Real.rpow_mul hJpos.le]
+    rw [Real.div_rpow hDpos.le (by positivity), ← Real.rpow_natCast ‖J‖ 2, ← Real.rpow_mul hJpos.le]
     push_cast
     congr 1
     rw [show (2 : ℝ) * ((k : ℝ) / 2) = ((k : ℕ) : ℝ) by ring, Real.rpow_natCast]
   rw [hpow] at hb
   rw [norm_mul, norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity), norm_zpow]
-  calc _ ≤ |x.det| ^ ((k : ℝ) / 2) * ‖J‖ ^ (-(k : ℤ)) *
-        (C / (|x.det| ^ ((k : ℝ) / 2) / ‖J‖ ^ k)) := by gcongr
+  calc
+    _ ≤ |x.det| ^ ((k : ℝ) / 2) * ‖J‖ ^ (-(k : ℤ)) * (C / (|x.det| ^ ((k : ℝ) / 2) / ‖J‖ ^ k)) := by
+      gcongr
     _ = C := by
       have h1 : 0 < |x.det| ^ ((k : ℝ) / 2) := by positivity
       have h2 : 0 < ‖J‖ ^ k := by positivity

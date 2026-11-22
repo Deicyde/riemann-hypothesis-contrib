@@ -12,36 +12,46 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ColA
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 open PowerSeries
 namespace GlobalTheory.FrobStick
 
-theorem det_column_alg {R : Type*} [CommRing R] (x e w q : Fin 3 → R) (ε r a₁ a₃ S D1 D2 D3 : R)
+theorem det_column_alg
+    {R : Type*} [CommRing R]
+    (x e w q : Fin 3 → R) (ε r a₁ a₃ S D1 D2 D3 : R)
     (hq : ∀ i, q i * w i = 1) (hu : IsUnit (2 * ε ^ 4))
-    (h : Matrix.det (Matrix.of fun i j => (![ε ^ 3 * x i ^ 3 * e i ^ 3,
-      ε * e i ^ 3 * (x i * q i + ε ^ 2 * r * x i ^ 3),
-      e i ^ 3 * q i * (a₁ * x i + a₃ * x i ^ 3 * w i - 2)] : Fin 3 → R) j) =
-      2 * (ε * S) * (ε * D1) * (ε * D2) * (ε * D3)) :
-    (x 0 ^ 3 * w 0 * (x 2 - x 1) + x 1 ^ 3 * w 1 * (x 0 - x 2) + x 2 ^ 3 * w 2 * (x 1 - x 0))
-      * e 0 ^ 3 * e 1 ^ 3 * e 2 ^ 3 = w 0 * w 1 * w 2 * S * D1 * D2 * D3 := by
-  have hrow : ∀ i, e i ^ 3 * q i * (a₁ * x i + a₃ * x i ^ 3 * w i - 2)
-      = e i ^ 3 * (a₁ * x i * q i + a₃ * x i ^ 3 - 2 * q i) := fun i => by
+    (h : Matrix.det (Matrix.of fun i j =>
+        (![ε ^ 3 * x i ^ 3 * e i ^ 3,
+              ε * e i ^ 3 * (x i * q i + ε ^ 2 * r * x i ^ 3),
+              e i ^ 3 * q i * (a₁ * x i + a₃ * x i ^ 3 * w i - 2)]
+            : Fin 3 → R)
+          j)
+      = 2 * (ε * S) * (ε * D1) * (ε * D2) * (ε * D3))
+    : (x 0 ^ 3 * w 0 * (x 2 - x 1) + x 1 ^ 3 * w 1 * (x 0 - x 2) + x 2 ^ 3 * w 2 * (x 1 - x 0))
+        * e 0 ^ 3 * e 1 ^ 3 * e 2 ^ 3
+      = w 0 * w 1 * w 2 * S * D1 * D2 * D3 := by
+  have hrow
+      : ∀ i,
+        e i ^ 3 * q i * (a₁ * x i + a₃ * x i ^ 3 * w i - 2)
+          = e i ^ 3 * (a₁ * x i * q i + a₃ * x i ^ 3 - 2 * q i) := fun i => by
     linear_combination e i ^ 3 * a₃ * x i ^ 3 * hq i
   simp only [hrow] at h
   rw [Matrix.det_fin_three] at h
   simp only [Matrix.of_apply, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val] at h
-  have h2 : 2 * ε ^ 4 * (e 0 ^ 3 * e 1 ^ 3 * e 2 ^ 3 *
-      (x 0 ^ 3 * (q 1 * q 2) * (x 2 - x 1) + x 1 ^ 3 * (q 0 * q 2) * (x 0 - x 2)
-        + x 2 ^ 3 * (q 0 * q 1) * (x 1 - x 0))) = 2 * ε ^ 4 * (S * D1 * D2 * D3) := by
+  have h2
+      : 2 * ε ^ 4
+          * (e 0 ^ 3 * e 1 ^ 3 * e 2 ^ 3
+            * (x 0 ^ 3 * (q 1 * q 2) * (x 2 - x 1) + x 1 ^ 3 * (q 0 * q 2) * (x 0 - x 2)
+              + x 2 ^ 3 * (q 0 * q 1) * (x 1 - x 0)))
+        = 2 * ε ^ 4 * (S * D1 * D2 * D3) := by
     linear_combination h
   have h3 := hu.mul_left_cancel h2
-  have h12 : q 1 * q 2 * (w 1 * w 2) = 1 := by
-    rw [mul_mul_mul_comm, hq, hq, one_mul]
-  have h02 : q 0 * q 2 * (w 0 * w 2) = 1 := by
-    rw [mul_mul_mul_comm, hq, hq, one_mul]
-  have h01 : q 0 * q 1 * (w 0 * w 1) = 1 := by
-    rw [mul_mul_mul_comm, hq, hq, one_mul]
+  have h12 : q 1 * q 2 * (w 1 * w 2) = 1 := by rw [mul_mul_mul_comm, hq, hq, one_mul]
+  have h02 : q 0 * q 2 * (w 0 * w 2) = 1 := by rw [mul_mul_mul_comm, hq, hq, one_mul]
+  have h01 : q 0 * q 1 * (w 0 * w 1) = 1 := by rw [mul_mul_mul_comm, hq, hq, one_mul]
   linear_combination w 0 * w 1 * w 2 * h3
     - e 0 ^ 3 * e 1 ^ 3 * e 2 ^ 3 * (x 0 ^ 3 * w 0 * (x 2 - x 1) * h12
       + x 1 ^ 3 * w 1 * (x 0 - x 2) * h02 + x 2 ^ 3 * w 2 * (x 1 - x 0) * h01)

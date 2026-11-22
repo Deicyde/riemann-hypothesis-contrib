@@ -12,8 +12,11 @@ namespace GlobalTheory.Proof.exists_semisimplification'
 
 variable {k Γ : Type} [Field k] [Group Γ] {V : Type} [AddCommGroup V] [Module k V]
 
-def glue (ρ s : Representation k Γ V) (U : Submodule k V) (p : V →ₗ[k] V) (hp : ∀ v, p v ∈ U)
-    (hpU : ∀ u ∈ U, p u = u) (hρ : Stable ρ U) (hs : Stable s U) : Representation k Γ V where
+def glue
+    (ρ s : Representation k Γ V)
+    (U : Submodule k V) (p : V →ₗ[k] V) (hp : ∀ v, p v ∈ U) (hpU : ∀ u ∈ U, p u = u)
+    (hρ : Stable ρ U) (hs : Stable s U)
+    : Representation k Γ V where
   toFun g := s g ∘ₗ p + (LinearMap.id - p) ∘ₗ ρ g ∘ₗ (LinearMap.id - p)
   map_one' := by
     refine LinearMap.ext fun v => ?_
@@ -27,16 +30,18 @@ def glue (ρ s : Representation k Γ V) (U : Submodule k V) (p : V →ₗ[k] V) 
     have h5 : p (ρ g (ρ h (p v))) = ρ g (ρ h (p v)) := hpU _ (hρ g _ (hρ h _ (hp v)))
     simp [h1, h2, h3, h4, h5]
 
-theorem glue_apply (ρ s : Representation k Γ V) (U : Submodule k V) (p : V →ₗ[k] V) (hp : ∀ v, p v ∈ U)
-    (hpU : ∀ u ∈ U, p u = u) (hρ : Stable ρ U) (hs : Stable s U) (g : Γ) (v : V) :
-    glue ρ s U p hp hpU hρ hs g v = s g (p v) + (ρ g (v - p v) - p (ρ g (v - p v))) := rfl
+theorem glue_apply
+    (ρ s : Representation k Γ V)
+    (U : Submodule k V) (p : V →ₗ[k] V) (hp : ∀ v, p v ∈ U) (hpU : ∀ u ∈ U, p u = u)
+    (hρ : Stable ρ U) (hs : Stable s U) (g : Γ) (v : V)
+    : glue ρ s U p hp hpU hρ hs g v = s g (p v) + (ρ g (v - p v) - p (ρ g (v - p v))) :=
+  rfl
 
 def Partial (ρ : Representation k Γ V) (U : Submodule k V) : Prop :=
   ∃ (s : Representation k Γ V) (m : ℕ) (Ws : ℕ → Submodule k V),
-    Stable s U ∧
-    (∀ W ≤ U, Stable s W → ∃ W', Stable s W' ∧ Disjoint W W' ∧ W ⊔ W' = U) ∧
-    (∀ j < m, Stable s (Ws j)) ∧ (Finset.range m).SupIndep Ws ∧ (Finset.range m).sup Ws = U ∧
-    ∀ j < m, ∀ g, ∀ v ∈ Ws j, ρ g v - s g v ∈ (Finset.range j).sup Ws
+    Stable s U ∧ (∀ W ≤ U, Stable s W → ∃ W', Stable s W' ∧ Disjoint W W' ∧ W ⊔ W' = U)
+      ∧ (∀ j < m, Stable s (Ws j)) ∧ (Finset.range m).SupIndep Ws ∧ (Finset.range m).sup Ws = U
+      ∧ ∀ j < m, ∀ g, ∀ v ∈ Ws j, ρ g v - s g v ∈ (Finset.range j).sup Ws
 
 theorem partial_bot (ρ : Representation k Γ V) : Partial ρ ⊥ := by
   unfold Partial
@@ -55,21 +60,25 @@ theorem partial_bot (ρ : Representation k Γ V) : Partial ρ ⊥ := by
   · intro j hj
     exact absurd hj (Nat.not_lt_zero j)
 
-private theorem stable_sup' (f : Representation k Γ V) (A B : Submodule k V) (hA : Stable f A)
-    (hB : Stable f B) : Stable f (A ⊔ B) := by
+private theorem stable_sup'
+    (f : Representation k Γ V) (A B : Submodule k V) (hA : Stable f A) (hB : Stable f B)
+    : Stable f (A ⊔ B) := by
   intro g x hx
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx
   rw [map_add (f := _)]
   exact Submodule.add_mem_sup (hA g a ha) (hB g b hb)
 
-theorem partial_step (ρ : Representation k Γ V) (U U' : Submodule k V) (hU : Stable ρ U)
-    (hU' : Stable ρ U') (hle : U' ≤ U)
-    (hmax : ∀ X, Stable ρ X → U' ≤ X → X ≤ U → X = U' ∨ X = U) (h : Partial ρ U') : Partial ρ U := by
+theorem partial_step
+    (ρ : Representation k Γ V) (U U' : Submodule k V) (hU : Stable ρ U) (hU' : Stable ρ U')
+    (hle : U' ≤ U) (hmax : ∀ X, Stable ρ X → U' ≤ X → X ≤ U → X = U' ∨ X = U) (h : Partial ρ U')
+    : Partial ρ U := by
   obtain ⟨s, m, Ws, hsU', hcomp, hWst, hind, hsup, htri⟩ := h
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl U'
-  obtain ⟨p, hp, hpU⟩ : ∃ p : V →ₗ[k] V, (∀ v, p v ∈ U') ∧ ∀ u ∈ U', p u = u :=
-    ⟨U'.projection C hC, fun v => Submodule.projection_apply_mem hC v,
-      fun u hu => Submodule.projection_apply_left hC ⟨u, hu⟩⟩
+  obtain ⟨p, hp, hpU⟩ : ∃ p : V →ₗ[k] V, (∀ v, p v ∈ U') ∧ ∀ u ∈ U', p u = u := ⟨
+    U'.projection C hC,
+    fun v => Submodule.projection_apply_mem hC v,
+    fun u hu => Submodule.projection_apply_left hC ⟨u, hu⟩
+  ⟩
   have hpp : ∀ v, p (p v) = p v := fun v => hpU _ (hp v)
   set s' := glue ρ s U' p hp hpU hU' hsU' with hs'
   have hA : ∀ g, ∀ u ∈ U', s' g u = s g u := by
@@ -135,8 +144,8 @@ theorem partial_step (ρ : Representation k Γ V) (U U' : Submodule k V) (hU : S
       rw [ha0, zero_add]
       exact hb
   have hWsle : ∀ j < m, Ws j ≤ U' := fun j hj => hsup ▸ Finset.le_sup (Finset.mem_range.mpr hj)
-  have hsuple : ∀ t ⊆ Finset.range m, t.sup Ws ≤ U' :=
-    fun t ht => Finset.sup_le fun j hj => hWsle j (Finset.mem_range.mp (ht hj))
+  have hsuple : ∀ t ⊆ Finset.range m, t.sup Ws ≤ U' := fun t ht =>
+    Finset.sup_le fun j hj => hWsle j (Finset.mem_range.mp (ht hj))
   unfold Partial
   refine ⟨s', m + 1, fun j => if j < m then Ws j else Wm, hs'U, ?_, ?_, ?_, ?_, ?_⟩
   · intro W hWU hW
@@ -239,8 +248,10 @@ theorem partial_step (ρ : Representation k Γ V) (U U' : Submodule k V) (hU : S
   · rw [Finset.range_add_one, Finset.sup_insert, if_neg (lt_irrefl m),
       Finset.sup_congr rfl (fun j hj => if_pos (Finset.mem_range.mp hj)), hsup, sup_comm, hsupU]
   · intro j hj g v hv
-    have hsame : (Finset.range j).sup (fun j => if j < m then Ws j else Wm) = (Finset.range j).sup Ws :=
-      Finset.sup_congr rfl (fun i hi => if_pos (lt_of_lt_of_le (Finset.mem_range.mp hi) (Nat.lt_succ_iff.mp hj)))
+    have hsame
+        : (Finset.range j).sup (fun j => if j < m then Ws j else Wm) = (Finset.range j).sup Ws :=
+      Finset.sup_congr rfl
+        (fun i hi => if_pos (lt_of_lt_of_le (Finset.mem_range.mp hi) (Nat.lt_succ_iff.mp hj)))
     rw [hsame]
     by_cases hjm : j < m
     · simp only [if_pos hjm] at hv
@@ -252,8 +263,8 @@ theorem partial_step (ρ : Representation k Γ V) (U U' : Submodule k V) (hU : S
       rw [hB g v hv.2, sub_sub_cancel, hsup]
       exact hp _
 
-private theorem partial_of_stable_finrank [FiniteDimensional k V] (ρ : Representation k Γ V) (n : ℕ) :
-    ∀ U : Submodule k V, Module.finrank k U = n → Stable ρ U → Partial ρ U := by
+private theorem partial_of_stable_finrank [FiniteDimensional k V] (ρ : Representation k Γ V) (n : ℕ)
+    : ∀ U : Submodule k V, Module.finrank k U = n → Stable ρ U → Partial ρ U := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro U hn hU
@@ -277,19 +288,24 @@ private theorem partial_of_stable_finrank [FiniteDimensional k V] (ρ : Represen
       exact partial_step ρ U U' hU hU' hlt.le hmax
         (ih _ (hn ▸ Submodule.finrank_lt_finrank_of_lt hlt) U' rfl hU')
 
-theorem partial_of_stable [FiniteDimensional k V] (ρ : Representation k Γ V) (U : Submodule k V) :
-    Stable ρ U → Partial ρ U := by
+theorem partial_of_stable [FiniteDimensional k V] (ρ : Representation k Γ V) (U : Submodule k V)
+    : Stable ρ U → Partial ρ U := by
   intro hU
   exact partial_of_stable_finrank ρ _ U rfl hU
 
-theorem exists_isSemisimplificationOf : ∀ {k Γ : Type} [Field k] [Group Γ] {V : Type} [AddCommGroup V]
-    [Module k V] [FiniteDimensional k V] (ρ : Representation k Γ V),
-    ∃ s : Representation k Γ V, GlobalTheory.IndefiniteRowSideFullHecke.SemisimplificationConstituents.IsSemisimplificationOf s ρ := by
+theorem exists_isSemisimplificationOf
+    : ∀ {k Γ : Type} [Field k] [Group Γ] {V : Type} [AddCommGroup V] [Module k V]
+        [FiniteDimensional k V] (ρ : Representation k Γ V),
+      ∃ s : Representation k Γ V,
+        GlobalTheory.IndefiniteRowSideFullHecke.SemisimplificationConstituents.IsSemisimplificationOf
+          s ρ := by
   intro k Γ _ _ V _ _ _ ρ
   obtain ⟨s, m, Ws, -, hcomp, hst, hind, hsup, htri⟩ :=
     partial_of_stable ρ ⊤ (fun _ _ _ => Submodule.mem_top)
   refine ⟨s, ?_⟩
-  unfold GlobalTheory.IndefiniteRowSideFullHecke.SemisimplificationConstituents.IsSemisimplificationOf IsSS
+  unfold
+    GlobalTheory.IndefiniteRowSideFullHecke.SemisimplificationConstituents.IsSemisimplificationOf
+    IsSS
   refine ⟨?_, m, fun j => Ws j, LinearEquiv.refl k V, fun j => hst j j.isLt, ?_, ?_⟩
   · intro W hW
     obtain ⟨W', hW', hd, hs⟩ := hcomp W le_top hW
@@ -298,16 +314,17 @@ theorem exists_isSemisimplificationOf : ∀ {k Γ : Type} [Field k] [Group Γ] {
     refine ⟨?_, ?_⟩
     · rw [iSupIndep_iff_supIndep_univ]
       intro t _ i _ hit
-      have h := hind (t := t.map Fin.valEmbedding)
-        (by
-          intro x hx
-          obtain ⟨a, _, rfl⟩ := Finset.mem_map.mp hx
-          exact Finset.mem_range.mpr a.isLt)
-        (Finset.mem_range.mpr i.isLt)
-        (by
-          intro hx
-          obtain ⟨a, ha, hai⟩ := Finset.mem_map.mp hx
-          exact hit (Fin.ext hai ▸ ha))
+      have h :=
+        hind (t := t.map Fin.valEmbedding)
+          (by
+            intro x hx
+            obtain ⟨a, _, rfl⟩ := Finset.mem_map.mp hx
+            exact Finset.mem_range.mpr a.isLt)
+          (Finset.mem_range.mpr i.isLt)
+          (by
+            intro hx
+            obtain ⟨a, ha, hai⟩ := Finset.mem_map.mp hx
+            exact hit (Fin.ext hai ▸ ha))
       rw [Finset.sup_map] at h
       exact h
     · refine eq_top_iff.mpr ?_

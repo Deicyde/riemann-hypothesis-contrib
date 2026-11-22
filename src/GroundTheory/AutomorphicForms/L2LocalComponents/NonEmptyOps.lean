@@ -26,8 +26,9 @@ variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpac
 variable {G : Subgroup 𝔸ˣ} {𝔤 : Submodule ℝ 𝔸} (h : IsExpLieAlgebra G 𝔤)
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (π : BanachRep G E)
 
-theorem isSmoothVector_of_commute (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g ∘L S) {v : E}
-    (hv : h.IsSmoothVector π v) : h.IsSmoothVector π (S v) := by
+theorem isSmoothVector_of_commute
+    (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g ∘L S) {v : E} (hv : h.IsSmoothVector π v)
+    : h.IsSmoothVector π (S v) := by
   rw [isSmoothVector_iff] at hv ⊢
   have e : h.expOrbit π (S v) = (S.restrictScalars ℝ) ∘ h.expOrbit π v := by
     funext Y
@@ -36,19 +37,23 @@ theorem isSmoothVector_of_commute (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g =
   rw [e]
   exact (S.restrictScalars ℝ).contDiff.comp hv
 
-theorem derivOp_of_commute (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g ∘L S) {v : E}
-    (hv : h.IsSmoothVector π v) (X : 𝔤) : h.derivOp π X (S v) = S (h.derivOp π X v) := by
+theorem derivOp_of_commute
+    (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g ∘L S) {v : E} (hv : h.IsSmoothVector π v) (X : 𝔤)
+    : h.derivOp π X (S v) = S (h.derivOp π X v) := by
   have e : h.expOrbit π (S v) = (S.restrictScalars ℝ) ∘ h.expOrbit π v := by
     funext Y
     simp only [expOrbit, Function.comp_apply, ContinuousLinearMap.coe_restrictScalars']
     exact (congrArg (fun T : E →L[ℂ] E => T v) (hS _)).symm
   unfold derivOp
-  rw [e, ((S.restrictScalars ℝ).hasFDerivAt.comp 0 (h.differentiable_expOrbit π hv 0).hasFDerivAt).fderiv]
+  rw [e,
+    ((S.restrictScalars ℝ).hasFDerivAt.comp 0
+      (h.differentiable_expOrbit π hv 0).hasFDerivAt).fderiv]
   rfl
 
-theorem uAction_of_commute (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g ∘L S)
-    (u : UniversalEnvelopingAlgebra ℝ h.lieSubalgebra) (v : h.smoothVectors π) :
-    (h.uAction π u ⟨S v, h.isSmoothVector_of_commute π S hS v.2⟩ : E) = S (h.uAction π u v) := by
+theorem uAction_of_commute
+    (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g ∘L S)
+    (u : UniversalEnvelopingAlgebra ℝ h.lieSubalgebra) (v : h.smoothVectors π)
+    : (h.uAction π u ⟨S v, h.isSmoothVector_of_commute π S hS v.2⟩ : E) = S (h.uAction π u v) := by
   obtain ⟨t, rfl⟩ : ∃ t, UniversalEnvelopingAlgebra.mkAlgHom ℝ h.lieSubalgebra t = u :=
     RingCon.mkₐ_surjective (α := ℝ) (UniversalEnvelopingAlgebra.ringCon ℝ h.lieSubalgebra) u
   induction t using TensorAlgebra.induction generalizing v with
@@ -62,14 +67,18 @@ theorem uAction_of_commute (S : E →L[ℂ] E) (hS : ∀ g, S ∘L π g = π g �
     exact h.derivOp_of_commute π S hS v.2 _
   | mul a b iha ihb =>
     rw [map_mul, map_mul, mul_apply_eq_comp, mul_apply_eq_comp]
-    have e : (h.uAction π (UniversalEnvelopingAlgebra.mkAlgHom ℝ h.lieSubalgebra b)
-        ⟨S v, h.isSmoothVector_of_commute π S hS v.2⟩) =
-        ⟨S (h.uAction π (UniversalEnvelopingAlgebra.mkAlgHom ℝ h.lieSubalgebra b) v),
-          h.isSmoothVector_of_commute π S hS (h.uAction π _ v).2⟩ := Subtype.ext (ihb v)
+    have e
+        : (h.uAction π (UniversalEnvelopingAlgebra.mkAlgHom ℝ h.lieSubalgebra b)
+            ⟨S v, h.isSmoothVector_of_commute π S hS v.2⟩)
+          = ⟨
+            S (h.uAction π (UniversalEnvelopingAlgebra.mkAlgHom ℝ h.lieSubalgebra b) v),
+            h.isSmoothVector_of_commute π S hS (h.uAction π _ v).2
+          ⟩ :=
+      Subtype.ext (ihb v)
     rw [e, iha]
   | add a b iha ihb =>
-    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, Submodule.coe_add, Submodule.coe_add,
-      iha, ihb, map_add]
+    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply,
+      Submodule.coe_add, Submodule.coe_add, iha, ihb, map_add]
 
 end IsExpLieAlgebra
 
@@ -83,35 +92,42 @@ variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
 variable (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
 
-theorem norm_archRepT_le (a : archGroup K n) : ‖archRepT μ a‖ ≤ 1 :=
-  (archURepT μ).norm_map_le a
+theorem norm_archRepT_le (a : archGroup K n) : ‖archRepT μ a‖ ≤ 1 := (archURepT μ).norm_map_le a
 
 variable (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
 
-def archOp {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ) :
-    CuspL2 μ →L[ℂ] CuspL2 μ :=
+def archOp {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
+    : CuspL2 μ →L[ℂ] CuspL2 μ :=
   LinearMap.mkContinuous
-    { toFun := (archRepT μ).integrated ν κ
+    {
+      toFun := (archRepT μ).integrated ν κ
       map_add' := (isExpLieAlgebra K n).integrated_add (archRepT μ) (μ := ν) hκ
-      map_smul' := IsExpLieAlgebra.integrated_smul (archRepT μ) (μ := ν) κ }
-    (∫ a, ‖κ a‖ ∂ν) fun x =>
-      (isExpLieAlgebra K n).norm_integrated_le (archRepT μ) ν (norm_archRepT_le μ) hκ x
+      map_smul' := IsExpLieAlgebra.integrated_smul (archRepT μ) (μ := ν) κ
+    }
+    (∫ a, ‖κ a‖ ∂ν)
+    fun x => (isExpLieAlgebra K n).norm_integrated_le (archRepT μ) ν (norm_archRepT_le μ) hκ x
 
-theorem archOp_eq_integral {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
-    (x : CuspL2 μ) : archOp μ ν hκ x = ∫ a, κ a • archRepT μ a x ∂ν := rfl
+theorem archOp_eq_integral
+    {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ) (x : CuspL2 μ)
+    : archOp μ ν hκ x = ∫ a, κ a • archRepT μ a x ∂ν :=
+  rfl
 
-theorem archOp_comm {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
-    (S : CuspL2 μ →L[ℂ] CuspL2 μ) (hS : ∀ a, S ∘L archRepT μ a = archRepT μ a ∘L S) (x : CuspL2 μ) :
-    S (archOp μ ν hκ x) = archOp μ ν hκ (S x) := by
+theorem archOp_comm
+    {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
+    (S : CuspL2 μ →L[ℂ] CuspL2 μ) (hS : ∀ a, S ∘L archRepT μ a = archRepT μ a ∘L S)
+    (x : CuspL2 μ)
+    : S (archOp μ ν hκ x) = archOp μ ν hκ (S x) := by
   rw [archOp_eq_integral, archOp_eq_integral,
     ← S.integral_comp_comm (integrable_smul_archRepT μ ν (hκ.continuous _) hκ.2 x)]
   refine integral_congr_ae (Eventually.of_forall fun a => ?_)
   simp only [map_smul]
   exact congrArg (κ a • ·) (congrArg (fun T : CuspL2 μ →L[ℂ] CuspL2 μ => T x) (hS a))
 
-theorem inner_archOp {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
-    (hreal : ∀ a, starRingEnd ℂ (κ a) = κ a) (hsymm : ∀ a, κ a⁻¹ = κ a) (x y : CuspL2 μ) :
-    ⟪archOp μ ν hκ x, y⟫_ℂ = ⟪x, archOp μ ν hκ y⟫_ℂ := by
+theorem inner_archOp
+    {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
+    (hreal : ∀ a, starRingEnd ℂ (κ a) = κ a) (hsymm : ∀ a, κ a⁻¹ = κ a)
+    (x y : CuspL2 μ)
+    : ⟪archOp μ ν hκ x, y⟫_ℂ = ⟪x, archOp μ ν hκ y⟫_ℂ := by
   have hix := integrable_smul_archRepT μ ν (hκ.continuous _) hκ.2 x
   have hiy := integrable_smul_archRepT μ ν (hκ.continuous _) hκ.2 y
   rw [archOp_eq_integral, archOp_eq_integral, ← inner_conj_symm, ← integral_inner hix,
@@ -126,14 +142,18 @@ theorem inner_archOp {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).I
   refine integral_congr_ae (Eventually.of_forall fun a => ?_)
   simp only [inv_inv, hsymm, inner_smul_right]
 
-theorem archOp_comm_archCompact {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
-    (hconj : ∀ k ∈ archCompact K n, ∀ a, κ (k * a * k⁻¹) = κ a) {k : archGroup K n}
-    (hk : k ∈ archCompact K n) (x : CuspL2 μ) :
-    archRepT μ k (archOp μ ν hκ x) = archOp μ ν hκ (archRepT μ k x) := by
+theorem archOp_comm_archCompact
+    {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
+    (hconj : ∀ k ∈ archCompact K n, ∀ a, κ (k * a * k⁻¹) = κ a)
+    {k : archGroup K n} (hk : k ∈ archCompact K n)
+    (x : CuspL2 μ)
+    : archRepT μ k (archOp μ ν hκ x) = archOp μ ν hκ (archRepT μ k x) := by
   rw [archOp_eq_integral, archOp_eq_integral,
     ← (archRepT μ k).integral_comp_comm (integrable_smul_archRepT μ ν (hκ.continuous _) hκ.2 x)]
-  have e : ∀ a, archRepT μ k (κ a • archRepT μ a x) =
-      (fun b => κ b • archRepT μ b (archRepT μ k x)) (k * a * k⁻¹) := by
+  have e
+      : ∀ a,
+        archRepT μ k (κ a • archRepT μ a x)
+          = (fun b => κ b • archRepT μ b (archRepT μ k x)) (k * a * k⁻¹) := by
     intro a
     show _ = κ (k * a * k⁻¹) • archRepT μ (k * a * k⁻¹) (archRepT μ k x)
     rw [hconj k hk a, map_smul, ← BanachRep.map_mul_apply, ← BanachRep.map_mul_apply]
@@ -148,8 +168,8 @@ def fixU (U : Subgroup (AdelicGLn.integralFiniteGL K n)) : Submodule ℂ (CuspL2
   zero_mem' u _ := map_zero _
   smul_mem' c x hx u hu := by rw [map_smul, hx u hu]
 
-theorem isClosed_fixU (U : Subgroup (AdelicGLn.integralFiniteGL K n)) :
-    IsClosed (fixU μ U : Set (CuspL2 μ)) := by
+theorem isClosed_fixU (U : Subgroup (AdelicGLn.integralFiniteGL K n))
+    : IsClosed (fixU μ U : Set (CuspL2 μ)) := by
   have : (fixU μ U : Set (CuspL2 μ)) = ⋂ u ∈ U, {y | cuspRepT μ (finOne K n u) y = y} := by
     ext y; simp [fixU]
   rw [this]
@@ -158,33 +178,43 @@ theorem isClosed_fixU (U : Subgroup (AdelicGLn.integralFiniteGL K n)) :
 instance (U : Subgroup (AdelicGLn.integralFiniteGL K n)) : CompleteSpace (fixU μ U) :=
   (isClosed_fixU μ U).completeSpace_coe
 
-theorem finOne_archP_comm (u : AdelicGLn.integralFiniteGL K n) (a : archGroup K n) :
-    finOne K n u * archP K n a = archP K n a * finOne K n u := by
+theorem finOne_archP_comm (u : AdelicGLn.integralFiniteGL K n) (a : archGroup K n)
+    : finOne K n u * archP K n a = archP K n a * finOne K n u := by
   ext1
   simp only [Subgroup.coe_mul, coe_finOne, archimedeanProjection_apply]
   exact (archProj_mul_finEmb_comm (a : ArchUnits K n) (u : AdelicGLn.FiniteAdelicGL K n)).symm
 
-theorem archRepT_mem_fixU {U : Subgroup (AdelicGLn.integralFiniteGL K n)} (a : archGroup K n)
-    {y : CuspL2 μ} (hy : y ∈ fixU μ U) : archRepT μ a y ∈ fixU μ U := by
+theorem archRepT_mem_fixU
+    {U : Subgroup (AdelicGLn.integralFiniteGL K n)}
+    (a : archGroup K n)
+    {y : CuspL2 μ} (hy : y ∈ fixU μ U)
+    : archRepT μ a y ∈ fixU μ U := by
   intro u hu
-  rw [archRepT_apply, ← UnitaryRep.map_mul_apply, finOne_archP_comm, UnitaryRep.map_mul_apply, hy u hu]
+  rw [archRepT_apply, ← UnitaryRep.map_mul_apply, finOne_archP_comm, UnitaryRep.map_mul_apply,
+    hy u hu]
 
-theorem starProjection_fixU_comm (U : Subgroup (AdelicGLn.integralFiniteGL K n)) (a : archGroup K n) :
-    (fixU μ U).starProjection ∘L archRepT μ a = archRepT μ a ∘L (fixU μ U).starProjection := by
-  have h := ((UnitaryRep.isInvariant_iff_commute_starProjection (π := archURepT μ) (fixU μ U)).1
-    (fun b y hy => archRepT_mem_fixU μ b hy)) a
+theorem starProjection_fixU_comm (U : Subgroup (AdelicGLn.integralFiniteGL K n)) (a : archGroup K n)
+    : (fixU μ U).starProjection ∘L archRepT μ a = archRepT μ a ∘L (fixU μ U).starProjection := by
+  have h :=
+    ((UnitaryRep.isInvariant_iff_commute_starProjection (π := archURepT μ) (fixU μ U)).1
+        (fun b y hy => archRepT_mem_fixU μ b hy))
+      a
   exact h.eq.symm
 
-theorem integrated_eq_smul_archOp {U : Subgroup (AdelicGLn.integralFiniteGL K n)}
-    {κ : archGroup K n → ℂ} (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
+theorem integrated_eq_smul_archOp
+    {U : Subgroup (AdelicGLn.integralFiniteGL K n)} {κ : archGroup K n → ℂ}
+    (hκ : (isExpLieAlgebra K n).IsTestFunction κ)
     {F₀ : CompactlySupportedContinuousMap (normOneGL (K := K) (n := n)) ℂ} {c : ℝ}
-    (hint : ∀ Θ : normOneGL (K := K) (n := n) → ℂ, Continuous Θ → (∀ u ∈ U, ∀ x, Θ (x * finOne K n u) = Θ x) →
-      ∫ x, F₀ x * Θ x ∂μ = c * ∫ a, κ a * Θ (archP K n a) ∂ν)
-    {y : CuspL2 μ} (hy : y ∈ fixU μ U) :
-    (cuspRepT μ).integrated μ (UnitaryRep.ccToL1 μ F₀) y = (c : ℂ) • archOp μ ν hκ y := by
+    (hint : ∀ Θ : normOneGL (K := K) (n := n) → ℂ,
+      Continuous Θ → (∀ u ∈ U, ∀ x, Θ (x * finOne K n u) = Θ x)
+        → ∫ x, F₀ x * Θ x ∂μ = c * ∫ a, κ a * Θ (archP K n a) ∂ν)
+    {y : CuspL2 μ} (hy : y ∈ fixU μ U)
+    : (cuspRepT μ).integrated μ (UnitaryRep.ccToL1 μ F₀) y = (c : ℂ) • archOp μ ν hκ y := by
   refine ext_inner_left ℂ fun w => ?_
   rw [inner_integrated_ccToL1_eq (cuspRepT μ) μ F₀ w y,
-    hint (fun x => ⟪w, cuspRepT μ x y⟫_ℂ) (continuous_const.inner ((cuspRepT μ).continuous_orbit y))
+    hint
+      (fun x => ⟪w, cuspRepT μ x y⟫_ℂ)
+      (continuous_const.inner ((cuspRepT μ).continuous_orbit y))
       (fun u hu x => by rw [UnitaryRep.map_mul_apply, hy u hu]),
     inner_smul_right, archOp_eq_integral,
     ← integral_inner (integrable_smul_archRepT μ ν (hκ.continuous _) hκ.2 y)]

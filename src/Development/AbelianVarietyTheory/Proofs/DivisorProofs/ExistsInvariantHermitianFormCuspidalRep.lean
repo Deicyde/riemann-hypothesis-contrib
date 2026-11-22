@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquareIntegr
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.ContraPair
-open MeasureTheory GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC
+open MeasureTheory GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.UnitaryBC
 
 noncomputable section
 
@@ -24,7 +25,16 @@ namespace GlobalTheory.GelfandKazhdanHerm
 
 open scoped InnerProductSpace
 
-theorem exists_invariant_hermitian : GlobalTheory.Published.CuspFormsBoundedGL → ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (π : CuspSub E a), GlobalTheory.DiscSpec.IsNormalised π → ∃ H : π.V →ₗ⋆[ℂ] π.V →ₗ[ℂ] ℂ, (∀ φ ψ, starRingEnd ℂ (H φ ψ) = H ψ φ) ∧ (∀ φ, φ ≠ 0 → 0 < (H φ φ).re) ∧ (∀ k φ ψ, H (π.op (.fin k) φ) (π.op (.fin k) ψ) = H φ ψ) ∧ (∀ k φ ψ, H (π.op (.cpt k) φ) (π.op (.cpt k) ψ) = H φ ψ) ∧ ∀ X φ ψ, H (π.op (.lie X) φ) ψ + H φ (π.op (.lie X) ψ) = 0 := by
+theorem exists_invariant_hermitian
+    : GlobalTheory.Published.CuspFormsBoundedGL
+      → ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+          (π : CuspSub E a),
+        GlobalTheory.DiscSpec.IsNormalised π
+          → ∃ H : π.V →ₗ⋆[ℂ] π.V →ₗ[ℂ] ℂ,
+            (∀ φ ψ, starRingEnd ℂ (H φ ψ) = H ψ φ) ∧ (∀ φ, φ ≠ 0 → 0 < (H φ φ).re)
+              ∧ (∀ k φ ψ, H (π.op (.fin k) φ) (π.op (.fin k) ψ) = H φ ψ)
+              ∧ (∀ k φ ψ, H (π.op (.cpt k) φ) (π.op (.cpt k) ψ) = H φ ψ)
+              ∧ ∀ X φ ψ, H (π.op (.lie X) φ) ψ + H φ (π.op (.lie X) ψ) = 0 := by
   intro hB E _ _ _ a π hπ
   let μ : Measure (GA E a) := Measure.haar
   haveI : μ.IsMulRightInvariant := GlobalTheory.CovolGL.isMulRightInvariant E a μ
@@ -36,8 +46,9 @@ theorem exists_invariant_hermitian : GlobalTheory.Published.CuspFormsBoundedGL �
       (GlobalTheory.DiscChar.isSqInt_of_bounded (hπ φ hφ) hC)
   let T := toL2ₗ μ π.V hm
   have hinj : Function.Injective T := toL2ₗ_injective hm hc
-  have hR : ∀ (g : GA E a) (x y : L2 (latticeGL E a) μ),
-      ⟪R (latticeGL E a) μ g x, R (latticeGL E a) μ g y⟫_ℂ = ⟪x, y⟫_ℂ := fun g x y => by
+  have hR
+      : ∀ (g : GA E a) (x y : L2 (latticeGL E a) μ),
+        ⟪R (latticeGL E a) μ g x, R (latticeGL E a) μ g y⟫_ℂ = ⟪x, y⟫_ℂ := fun g x y => by
     let U : L2 (latticeGL E a) μ →ₗᵢ[ℂ] L2 (latticeGL E a) μ :=
       ⟨(R (latticeGL E a) μ g).toLinearMap, fun v => norm_R _ v⟩
     exact U.inner_map_map x y
@@ -48,10 +59,10 @@ theorem exists_invariant_hermitian : GlobalTheory.Published.CuspFormsBoundedGL �
     have hT : T φ ≠ 0 := fun e => h0 (hinj (e.trans (map_zero T).symm))
     change 0 < (⟪T φ, T φ⟫_ℂ).re
     first
-      | exact (re_inner_self_pos (𝕜 := ℂ)).2 hT
-      | exact inner_self_pos.2 hT
-      | exact (RCLike.inner_self_pos).2 hT
-      | (rw [inner_self_eq_norm_sq_to_K]; norm_cast; simpa using hT)
+    | exact (re_inner_self_pos (𝕜 := ℂ)).2 hT
+    | exact inner_self_pos.2 hT
+    | exact (RCLike.inner_self_pos).2 hT
+    | (rw [inner_self_eq_norm_sq_to_K]; norm_cast; simpa using hT)
   · intro k φ ψ
     change ⟪T (π.op (.fin k) φ), T (π.op (.fin k) ψ)⟫_ℂ = ⟪T φ, T ψ⟫_ℂ
     rw [← hR (finGL E a k) (T φ) (T ψ)]
@@ -66,7 +77,10 @@ theorem exists_invariant_hermitian : GlobalTheory.Published.CuspFormsBoundedGL �
     · exact (R_toL2ₗ hm ψ (π.stable (.cpt k) _ ψ.2)).symm
   · intro X φ ψ
     change ⟪T (π.op (.lie X) φ), T ψ⟫_ℂ + ⟪T φ, T (π.op (.lie X) ψ)⟫_ℂ = 0
-    have := GlobalTheory.T.lie_skew_adjoint_matrix E a μ π.V hm π.stable (fun θ hθ => (π.cusp θ hθ).1) X φ ψ
+    have :=
+      GlobalTheory.T.lie_skew_adjoint_matrix E a μ π.V hm π.stable
+        (fun θ hθ => (π.cusp θ hθ).1)
+        X φ ψ
     rw [eq_neg_iff_add_eq_zero] at this
     exact this
 

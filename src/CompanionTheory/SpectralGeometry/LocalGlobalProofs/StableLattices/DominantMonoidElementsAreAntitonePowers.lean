@@ -21,15 +21,17 @@ theorem tExp_antitone (n : ℕ) (i : Fin (n + 2)) : Antitone (tExp n i) := by
       simp [hj, hk]
     · by_cases hj : (j : ℕ) < i <;> simp [hj, hk]
 
-theorem closure_tGen_antitone (L : Type) [NontriviallyNormedField L] [IsUltrametricDist L] (n : ℕ)
-    (p : Lˣ) (s : GL (Fin n) L)
-    (hs : s ∈ Submonoid.closure (Set.range (tGen p : Fin (n + 2) → GL (Fin n) L))) :
-    ∃ a : Fin n → ℤ, Antitone a ∧ s = dPow p a := by
+theorem closure_tGen_antitone
+    (L : Type) [NontriviallyNormedField L] [IsUltrametricDist L]
+    (n : ℕ) (p : Lˣ) (s : GL (Fin n) L)
+    (hs : s ∈ Submonoid.closure (Set.range (tGen p : Fin (n + 2) → GL (Fin n) L)))
+    : ∃ a : Fin n → ℤ, Antitone a ∧ s = dPow p a := by
   induction hs using Submonoid.closure_induction with
   | mem x hx =>
     obtain ⟨i, rfl⟩ := hx
     exact ⟨tExp n i, tExp_antitone n i, rfl⟩
-  | one => exact ⟨0, fun _ _ _ => le_rfl, (dPow_zero p).symm⟩
+  | one =>
+    exact ⟨0, fun _ _ _ => le_rfl, (dPow_zero p).symm⟩
   | mul x y _ _ hx hy =>
     obtain ⟨a, ha, rfl⟩ := hx
     obtain ⟨b, hb, rfl⟩ := hy

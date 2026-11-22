@@ -8,14 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemOfIsom
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
+open Formalism.BasicNotions.TH GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
 open Formalism.MainNotions.SchurIrreducible (IrrU IrrGK IsHCMod)
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem irrU_of_dense_graded_irrGK :
-    ∀ (p q : ℕ) (T : GrpData p q) (σ : URep T) (M : GKMod p q) (j : M.V →ₗ[ℂ] σ.H), Function.Injective j → Dense (Set.range j) → (∀ Y ∈ upq p q, ∀ x, HasDerivAt (fun t : ℝ => σ.π (T.expt (t • Y)) (j x)) (j (M.act Y x)) 0) → IrrGK M → ∀ (N : ℕ → Submodule ℂ M.V) (k : T.G) (lam : ℕ → ℂ), (∀ m, FiniteDimensional ℂ (N m)) → (⨆ m, N m) = ⊤ → k ∈ T.Kset → Function.Injective lam → (∀ m, ∀ x ∈ N m, σ.π k (j x) = lam m • j x) → IrrU σ := by
+theorem irrU_of_dense_graded_irrGK
+    : ∀ (p q : ℕ) (T : GrpData p q) (σ : URep T) (M : GKMod p q) (j : M.V →ₗ[ℂ] σ.H),
+      Function.Injective j → Dense (Set.range j)
+        → (∀ Y ∈ upq p q, ∀ x,
+          HasDerivAt (fun t : ℝ => σ.π (T.expt (t • Y)) (j x)) (j (M.act Y x)) 0)
+        → IrrGK M
+        → ∀ (N : ℕ → Submodule ℂ M.V) (k : T.G) (lam : ℕ → ℂ),
+          (∀ m, FiniteDimensional ℂ (N m)) → (⨆ m, N m) = ⊤ → k ∈ T.Kset → Function.Injective lam
+            → (∀ m, ∀ x ∈ N m, σ.π k (j x) = lam m • j x)
+            → IrrU σ := by
   intro p q T σ M j hinj hd hder hirr N k lam hfin hN _ hlam heig
   haveI := hirr.1
   refine ⟨hinj.nontrivial, fun S hS hinv => ?_⟩
@@ -60,9 +69,12 @@ theorem irrU_of_dense_graded_irrGK :
         exact Sᗮ.sub_mem (Sᗮ.smul_mem _ hb) (hperp b hb)
       have h3 : σ.π k a = lam m • a :=
         sub_eq_zero.1 (inner_self_eq_zero.1 (Submodule.inner_right_of_mem_orthogonal h1 h2))
-      have h4 := GlobalTheory.mem_of_isometry_eigen_of_dense_iSup σ.H (σ.π k) (σ.isom k)
-        (fun m => (N m).map j) lam hlam (fun m => by haveI := hfin m; infer_instance)
-        (by rintro m _ ⟨x, hx, rfl⟩; exact heig m x hx) hdense m a h3
+      have h4 :=
+        GlobalTheory.mem_of_isometry_eigen_of_dense_iSup σ.H (σ.π k) (σ.isom k)
+          (fun m => (N m).map j)
+          lam hlam
+          (fun m => by haveI := hfin m; infer_instance)
+          (by rintro m _ ⟨x, hx, rfl⟩; exact heig m x hx) hdense m a h3
       obtain ⟨x', -, hx'⟩ := h4
       have h5 : x' ∈ S.comap j := by rw [Submodule.mem_comap, hx']; exact ha
       rw [h, Submodule.mem_bot] at h5

@@ -12,16 +12,18 @@ noncomputable section
 
 namespace QmCapCommW
 
-abbrev Pt (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r)) : Type := {g : Mx k r // g ∈ Glev k r i ∩ D}
-
+abbrev Pt (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r)) : Type :=
+  {g : Mx k r // g ∈ Glev k r i ∩ D}
 
 open Classical in
-def ext0 {k r : ℕ} {i : Fin (r + 1)} {D : Set (Mx k r)} {E : Type} [Zero E] (φ : Pt k r i D → E) : Mx k r → E :=
-  fun g => if h : g ∈ Glev k r i ∩ D then φ ⟨g, h⟩ else 0
+def ext0 {k r : ℕ} {i : Fin (r + 1)} {D : Set (Mx k r)} {E : Type} [Zero E] (φ : Pt k r i D → E)
+    : Mx k r → E := fun g =>
+  if h : g ∈ Glev k r i ∩ D then φ ⟨g, h⟩ else 0
 
 section Core
 
-variable {k r : ℕ} {i : Fin (r + 1)} {D : Set (Mx k r)} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable
+  {k r : ℕ} {i : Fin (r + 1)} {D : Set (Mx k r)} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
 lemma extension_by_zero_apply {φ : Pt k r i D → E} {g : Mx k r} (hg : g ∈ Glev k r i ∩ D) : ext0 φ g = φ ⟨g, hg⟩ := by
   simp only [ext0, dif_pos hg]
@@ -62,25 +64,27 @@ lemma smooth_lin {f f' : Mx k r → E} (hf : SmoothLev k r i D f) (hf' : SmoothL
   show f g + c • f' g = F1 g + c • F2 g
   rw [hf1 g hg.1 hgl, hf2 g hg.2 hgl]
 
-
 variable (k r i D E) in
 def SS : Submodule ℂ (Pt k r i D → E) where
   carrier := {φ | SmoothLev k r i D (ext0 φ)}
   add_mem' {φ ψ} hφ hψ := by
     show SmoothLev k r i D (ext0 (φ + ψ))
-    rw [matrixExtendByZero_add]; exact smooth_lin hφ hψ 1
+    rw [matrixExtendByZero_add]
+    exact smooth_lin hφ hψ 1
   zero_mem' := by
     show SmoothLev k r i D (ext0 (0 : Pt k r i D → E))
-    rw [matrixExtendByZero_zero]; exact smooth_zero
+    rw [matrixExtendByZero_zero]
+    exact smooth_zero
   smul_mem' c φ hφ := by
     show SmoothLev k r i D (ext0 (c • φ))
-    rw [extendByZeroOffSubset_smul_apply]; exact smooth_lin smooth_zero hφ c
+    rw [extendByZeroOffSubset_smul_apply]
+    exact smooth_lin smooth_zero hφ c
 
 lemma eh_zero (a b : Fin (2 * r + k + 1)) (g : Mx k r) : EH k r a b (fun _ : Mx k r => (0 : E)) g = 0 := by
   simp [EH, EabH, RdV]
 
-def TT (a b : Fin (mdim k r i)) (φ : Pt k r i D → E) : Pt k r i D → E :=
-  fun p => EH k r (posL k r i a) (posL k r i b) (ext0 φ) p.1
+def TT (a b : Fin (mdim k r i)) (φ : Pt k r i D → E) : Pt k r i D → E := fun p =>
+  EH k r (posL k r i a) (posL k r i b) (ext0 φ) p.1
 
 lemma TT_mem (hP : EabPres) (hD : IsOpen D) {φ : Pt k r i D → E} (hφ : φ ∈ SS k r i D E) (a b : Fin (mdim k r i)) :
     TT a b φ ∈ SS k r i D E := by
@@ -112,7 +116,8 @@ def EE (hP : EabPres) (hD : IsOpen D) (a b : Fin (mdim k r i)) : Module.End ℂ 
   map_add' x y := Subtype.ext (TT_add hP hD x.2 y.2 a b)
   map_smul' c x := Subtype.ext (TT_smul hP hD x.2 c a b)
 
-def Rep (F : Mx k r → E) (φ : Pt k r i D → E) : Prop := ∀ g (hg : g ∈ Glev k r i ∩ D), F g = φ ⟨g, hg⟩
+def Rep (F : Mx k r → E) (φ : Pt k r i D → E) : Prop :=
+  ∀ g (hg : g ∈ Glev k r i ∩ D), F g = φ ⟨g, hg⟩
 
 lemma EE_rep (hC : CapCongr) (hP : EabPres) (hD : IsOpen D) {F : Mx k r → E} {x : SS k r i D E}
     (h : Rep F x.1) (a b : Fin (mdim k r i)) :
@@ -220,7 +225,9 @@ theorem capelli_operator_transfer : CapTransfer := by
   unfold QdetCommute at hQ
   intro E _ _ k r i D f hD hf g hg u v
   have hmem : (fun q : Pt k r i D => f q.1) ∈ SS k r i D E :=
-    smooth_congr hD (fun g' hg' => (extension_by_zero_apply (φ := fun q : Pt k r i D => f q.1) hg').symm) hf
+    smooth_congr hD
+      (fun g' hg' => (extension_by_zero_apply (φ := fun q : Pt k r i D => f q.1) hg').symm)
+      hf
   let x : SS k r i D E := ⟨fun q => f q.1, hmem⟩
   have hx : Rep f x.1 := fun _ _ => rfl
   have h1 := qdet_rep hC hP hD u (qdet_rep hC hP hD v hx)

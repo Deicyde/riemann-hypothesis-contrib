@@ -5,7 +5,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.SW.QuadRing
@@ -14,30 +15,30 @@ open GlobalTheory.CompanionTheory.SW.GoodRing
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem quad_at {d : ℕ} (b : Module.Basis (Fin d) F E)
-    (b₂ : Module.Basis (Fin 2) F E) (D : F) (hb0 : b₂ 0 = 1)
-    (hD : b₂ 1 * b₂ 1 = algebraMap F E D) (v : HeightOneSpectrum (𝓞 F))
-    (hD1 : Valued.v (algebraMap F (Fv F v) D) = 1)
+theorem quad_at
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (b₂ : Module.Basis (Fin 2) F E) (D : F) (hb0 : b₂ 0 = 1) (hD : b₂ 1 * b₂ 1 = algebraMap F E D)
+    (v : HeightOneSpectrum (𝓞 F)) (hD1 : Valued.v (algebraMap F (Fv F v) D) = 1)
     (h21 : Valued.v (algebraMap F (Fv F v) 2) = 1)
-    (hBC : ∀ k j, (Algebra.TensorProduct.basis (Fv F v) b₂).repr (inclR (Fv F v) (b k)) j ∈
-      v.adicCompletionIntegers F)
-    (hCB : ∀ j k, (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (Fv F v) (b₂ j)) k ∈
-      v.adicCompletionIntegers F)
+    (hBC : ∀ k j,
+      (Algebra.TensorProduct.basis (Fv F v) b₂).repr (inclR (Fv F v) (b k)) j
+        ∈ v.adicCompletionIntegers F)
+    (hCB : ∀ j k,
+      (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (Fv F v) (b₂ j)) k
+        ∈ v.adicCompletionIntegers F)
     (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-      v.adicCompletionIntegers F) :
-    ∃ (ι : v.adicCompletionIntegers F →+* O) (δ : O) (D : v.adicCompletionIntegers F),
-      (δ * δ = ι D) ∧ (∀ y : O, ∃ p q : v.adicCompletionIntegers F, y = ι p + ι q * δ) ∧
-      (∀ p q : v.adicCompletionIntegers F, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) ∧
-      IsUnit D ∧ IsUnit (2 : v.adicCompletionIntegers F) := by
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    : ∃ (ι : v.adicCompletionIntegers F →+* O) (δ : O) (D : v.adicCompletionIntegers F),
+      (δ * δ = ι D) ∧ (∀ y : O, ∃ p q : v.adicCompletionIntegers F, y = ι p + ι q * δ)
+        ∧ (∀ p q : v.adicCompletionIntegers F, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) ∧ IsUnit D
+        ∧ IsUnit (2 : v.adicCompletionIntegers F) := by
   set K := Fv F v with hK
   set B := Algebra.TensorProduct.basis K b₂ with hB
   set C := Algebra.TensorProduct.basis K b with hC
   let Rs : Subring K := (v.adicCompletionIntegers F).toSubring
-  have hB0 : B 0 = 1 := by
-    rw [hB, Algebra.TensorProduct.basis_apply, hb0]; rfl
-  have hB1 : B 1 = inclR K (b₂ 1) := by
-    rw [hB, Algebra.TensorProduct.basis_apply]; rfl
+  have hB0 : B 0 = 1 := by rw [hB, Algebra.TensorProduct.basis_apply, hb0]; rfl
+  have hB1 : B 1 = inclR K (b₂ 1) := by rw [hB, Algebra.TensorProduct.basis_apply]; rfl
   have hBD : B 1 * B 1 = algebraMap K (K ⊗[F] E) (algebraMap F K D) := by
     rw [hB1, ← map_mul, hD]
     show (1 : Fv F v) ⊗ₜ[F] algebraMap F E D = (algebraMap F (Fv F v) D) ⊗ₜ[F] (1 : E)
@@ -50,11 +51,13 @@ theorem quad_at {d : ℕ} (b : Module.Basis (Fin d) F E)
   have hCB' : ∀ j k, C.repr (B j) k ∈ Rs := fun j k => by
     have := hCB j k
     rwa [show inclR K (b₂ j) = B j by rw [hB, Algebra.TensorProduct.basis_apply]; rfl] at this
-  have hOB : ∀ y, y ∈ O ↔ ∀ j, B.repr y j ∈ Rs := fun y =>
-    ⟨fun hy j => coord_mem Rs C B hBC' y ((hO y).1 hy) j,
-      fun hy => (hO y).2 fun k => coord_mem Rs B C hCB' y hy k⟩
-  have hpq : ∀ p q : K, p ∈ Rs → q ∈ Rs →
-      algebraMap K (K ⊗[F] E) p + algebraMap K (K ⊗[F] E) q * B 1 ∈ O := by
+  have hOB : ∀ y, y ∈ O ↔ ∀ j, B.repr y j ∈ Rs := fun y => ⟨
+    fun hy j => coord_mem Rs C B hBC' y ((hO y).1 hy) j,
+    fun hy => (hO y).2 fun k => coord_mem Rs B C hCB' y hy k
+  ⟩
+  have hpq
+      : ∀ p q : K,
+        p ∈ Rs → q ∈ Rs → algebraMap K (K ⊗[F] E) p + algebraMap K (K ⊗[F] E) q * B 1 ∈ O := by
     intro p q hp hq
     have h := coord_two B hB0 p q
     refine (hOB _).2 (Fin.forall_fin_two.2 ⟨?_, ?_⟩)
@@ -87,10 +90,11 @@ theorem quad_at {d : ℕ} (b : Module.Basis (Fin d) F E)
     HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one
   have hv2 : Valued.v (2 : K) = 1 := by simpa [map_ofNat] using h21
   have hDu : IsUnit D' := (hunit D').2 hD1
-  have h2u : IsUnit (2 : v.adicCompletionIntegers F) := (hunit 2).2 (by
-    rw [show ((2 : v.adicCompletionIntegers F) : K) = 2 from
-      map_ofNat (v.adicCompletionIntegers F).subtype 2]
-    exact hv2)
+  have h2u : IsUnit (2 : v.adicCompletionIntegers F) :=
+    (hunit 2).2 (by
+      rw [show ((2 : v.adicCompletionIntegers F) : K) = 2 from
+        map_ofNat (v.adicCompletionIntegers F).subtype 2]
+      exact hv2)
   exact ⟨ι, δ, D', hδ, hsp, hinj, hDu, h2u⟩
 
 theorem quad_ring : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ O : Subring (Fv F v ⊗[F] E), (∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F) → ∃ (ι : v.adicCompletionIntegers F →+* O) (δ : O) (D : v.adicCompletionIntegers F), (δ * δ = ι D) ∧ (∀ y : O, ∃ p q : v.adicCompletionIntegers F, y = ι p + ι q * δ) ∧ (∀ p q : v.adicCompletionIntegers F, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) ∧ IsUnit D ∧ IsUnit (2 : v.adicCompletionIntegers F) := by

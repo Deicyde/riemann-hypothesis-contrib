@@ -6,16 +6,26 @@ public import Development.WeilBound.CoreStatements.RationalSupMetrics.AevalCoord
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small
+  Filter Topology
 
-private theorem isMultiHomog_mul_rational_sup_metrics {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] {f g : MRing ι}
-    {d e : K → ℕ} (hf : IsMultiHomog f d) (hg : IsMultiHomog g e) : IsMultiHomog (f * g) (d + e) := by
+private theorem isMultiHomog_mul_rational_sup_metrics
+    {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)]
+    {f g : MRing ι} {d e : K → ℕ} (hf : IsMultiHomog f d) (hg : IsMultiHomog g e)
+    : IsMultiHomog (f * g) (d + e) := by
   classical
   intro m hm k
   obtain ⟨a, ha, b, hb, rfl⟩ := Finset.mem_add.mp (support_mul f g hm)
   simp only [Finsupp.add_apply, Finset.sum_add_distrib, Pi.add_apply, hf a ha k, hg b hb k]
 
-theorem MultiProjectiveCoordinates.exists_form_with_valuation : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω), Birational y → IsRelevant (mCoordIdeal y) → ∀ (a : K → ℤ) (s : Ω), ∃ h : MRing ι, IsFormOff (mCoordIdeal y) h ∧ ∀ (𝕜 : Type) [Field 𝕜] (z : (Σ k, ι k) → 𝕜), aeval z h ≠ 0 → ∃ w, HasVal y a s z w := by
+theorem MultiProjectiveCoordinates.exists_form_with_valuation
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
+        (y : (Σ k, ι k) → Ω),
+      Birational y → IsRelevant (mCoordIdeal y)
+        → ∀ (a : K → ℤ) (s : Ω), ∃ h : MRing ι,
+          IsFormOff (mCoordIdeal y) h
+            ∧ ∀ (𝕜 : Type) [Field 𝕜] (z : (Σ k, ι k) → 𝕜),
+              aeval z h ≠ 0 → ∃ w, HasVal y a s z w := by
   intro K _ ι _ Ω _ y hbir hrel a s
   classical
   choose i hi using hrel
@@ -48,14 +58,24 @@ theorem MultiProjectiveCoordinates.exists_form_with_valuation : ∀ (K : Type) [
     · rw [hpe]
       exact hy _
     · exact absurd (by simp [mon, hpe]) hp
-  obtain ⟨Mp, hMph, hMpn⟩ : ∃ M : MRing ι, IsMultiHomog M (fun k => (a k).toNat) ∧ aeval y M ≠ 0 :=
-    ⟨monomial (mon fun k => (a k).toNat) 1, hmon_homog (fun k => (a k).toNat), hmon_ne (fun k => (a k).toNat)⟩
-  obtain ⟨Mn, hMnh, hMnn⟩ : ∃ M : MRing ι, IsMultiHomog M (fun k => (-a k).toNat) ∧ aeval y M ≠ 0 :=
-    ⟨monomial (mon fun k => (-a k).toNat) 1, hmon_homog (fun k => (-a k).toNat), hmon_ne (fun k => (-a k).toNat)⟩
+  obtain ⟨Mp, hMph, hMpn⟩
+      : ∃ M : MRing ι, IsMultiHomog M (fun k => (a k).toNat) ∧ aeval y M ≠ 0 := ⟨
+    monomial (mon fun k => (a k).toNat) 1,
+    hmon_homog (fun k => (a k).toNat),
+    hmon_ne (fun k => (a k).toNat)
+  ⟩
+  obtain ⟨Mn, hMnh, hMnn⟩
+      : ∃ M : MRing ι, IsMultiHomog M (fun k => (- a k).toNat) ∧ aeval y M ≠ 0 := ⟨
+    monomial (mon fun k => (- a k).toNat) 1,
+    hmon_homog (fun k => (- a k).toNat),
+    hmon_ne (fun k => (- a k).toNat)
+  ⟩
   clear hmon_homog hmon_ne
   obtain ⟨d, g0, h0, hg0, hh0, hy0, hgy0⟩ := hbir (s * aeval y Mn / aeval y Mp)
-  have hH : IsMultiHomog (h0 * Mn) (d + fun k => (-a k).toNat) := isMultiHomog_mul_rational_sup_metrics hh0 hMnh
-  have hG : IsMultiHomog (g0 * Mp) (d + fun k => (a k).toNat) := isMultiHomog_mul_rational_sup_metrics hg0 hMph
+  have hH : IsMultiHomog (h0 * Mn) (d + fun k => (- a k).toNat) :=
+    isMultiHomog_mul_rational_sup_metrics hh0 hMnh
+  have hG : IsMultiHomog (g0 * Mp) (d + fun k => (a k).toNat) :=
+    isMultiHomog_mul_rational_sup_metrics hg0 hMph
   refine ⟨h0 * Mn, ⟨⟨_, hH⟩, ?_⟩, ?_⟩
   · intro hmem
     have hk : mConeMap y (h0 * Mn) = 0 := RingHom.mem_ker.mp hmem

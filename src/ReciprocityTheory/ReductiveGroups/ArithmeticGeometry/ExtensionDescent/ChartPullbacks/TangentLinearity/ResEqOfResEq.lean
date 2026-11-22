@@ -195,10 +195,12 @@ end Z
 
 section Unit
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {O : Type} [Ring O] [StarRing O]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {O : Type} [Ring O] [StarRing O]
   {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G)
-  (ιG : RingAct G O) (e : ℕ) (a : O)
+  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (ιG : RingAct G O) (e : ℕ) (a : O)
 
 lemma eSec_h : eSec (thickObj R I e G) ≫ ((Over.pullback (thick R I e)).map (ιG.act a)).left =
     eSec (thickObj R I e G) := by
@@ -251,20 +253,27 @@ open ZeroLinearity
 
 section Main
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {O : Type} [Ring O] [StarRing O]
-  {D : DegData R I} [Module O D.toPre.X] {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G)
-  (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
-  (hO : ∀ a : O, (Over.pullback (thick R I e)).map (ιG.act a) ≫ (U.gt e).q =
-      (U.gt e).q ≫ (Over.pullback (thick R I e)).map (ιD.onB.act a))
-  (u : LB.Gen (LB.LinComb D.toPre.P.L
-    (rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a)) rosatiε))
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {O : Type} [Ring O] [StarRing O]
+  {D : DegData R I} [Module O D.toPre.X]
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O)
+  (χ : D.toPre.X)
+  (hO : ∀ a : O,
+    (Over.pullback (thick R I e)).map (ιG.act a) ≫ (U.gt e).q
+      = (U.gt e).q ≫ (Over.pullback (thick R I e)).map (ιD.onB.act a))
+  (u : LB.Gen (LB.LinComb D.toPre.P.L (rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a))
+    rosatiε))
 
-theorem u_zero (hGF : GlobalFnsSt) (hu : u.IsGen)
+theorem u_zero
+    (hGF : GlobalFnsSt) (hu : u.IsGen)
     (hu0 : LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ u (zero2 D.toPre.P.A))
-      (LB.oneGen D.toPre.P.L)) :
-    LB.Gen.Corr D.toPre.P.L _ _ _ _
-      (LB.pullGen D.toPre.P.L _ _ u (lift (𝟙 D.toPre.P.A) (toUnit D.toPre.P.A ≫ η[D.toPre.P.A])).left)
+      (LB.oneGen D.toPre.P.L))
+    : LB.Gen.Corr D.toPre.P.L _ _ _ _
+      (LB.pullGen D.toPre.P.L _ _ u
+        (lift (𝟙 D.toPre.P.A) (toUnit D.toPre.P.A ≫ η[D.toPre.P.A])).left)
       (LB.oneGen D.toPre.P.L) := by
   classical
   have hL := D.toPre.P.isLB
@@ -272,12 +281,16 @@ theorem u_zero (hGF : GlobalFnsSt) (hu : u.IsGen)
   let ψ : Fin 6 → (D.toPre.P.A.left ⟶ D.toPre.P.A.left) := fun k =>
     (zz D.toPre.P.A).left ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k
   have hs := zz_sameSum D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a)
-  let canon := Canon.canonGen D.toPre.P.L (Y := D.toPre.P.A.left) (K := PEmpty) PEmpty.elim
-    PEmpty.elim ψ rosatiε (fun k => k.elim) (LB.oneGen D.toPre.P.L)
-  have hcan : canon.IsGen :=
-    Canon.canonGen_isGen hL _ _ _ _ hs _ _ (LB.isGen_oneGen D.toPre.P.L)
-  have hcc := Canon.canonGen_corr hL (Y := D.toPre.P.A.left) (K := PEmpty) PEmpty.elim PEmpty.elim
-    ψ rosatiε (fun k => k.elim) (LB.oneGen D.toPre.P.L)
+  let canon :=
+    Canon.canonGen D.toPre.P.L (Y := D.toPre.P.A.left) (K := PEmpty) PEmpty.elim PEmpty.elim ψ
+      rosatiε
+      (fun k => k.elim)
+      (LB.oneGen D.toPre.P.L)
+  have hcan : canon.IsGen := Canon.canonGen_isGen hL _ _ _ _ hs _ _ (LB.isGen_oneGen D.toPre.P.L)
+  have hcc :=
+    Canon.canonGen_corr hL (Y := D.toPre.P.A.left) (K := PEmpty) PEmpty.elim PEmpty.elim ψ rosatiε
+      (fun k => k.elim)
+      (LB.oneGen D.toPre.P.L)
   let v := LB.pullGen D.toPre.P.L _ _ u (zz D.toPre.P.A).left
   have hv : v.IsGen := LB.isGen_pullGen (L := D.toPre.P.L) _ _ _ hu _
   obtain ⟨κ, hκ⟩ := ratio_glue _ (linComb_cover _ hL ψ rosatiε) v canon hv hcan
@@ -286,39 +299,52 @@ theorem u_zero (hGF : GlobalFnsSt) (hu : u.IsGen)
   have hz : ηA ≫ (zz D.toPre.P.A).left = zero2 D.toPre.P.A := by
     rw [← Over.comp_left, comp_lift, Category.comp_id, ← Category.assoc,
       toUnit_unique (η[D.toPre.P.A] ≫ toUnit D.toPre.P.A) (𝟙 _), Category.id_comp]
-  have hψz : ∀ k, ηA ≫ ψ k = zero2 D.toPre.P.A ≫
-      rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k := fun k => by
+  have hψz
+      : ∀ k,
+        ηA ≫ ψ k
+          = zero2 D.toPre.P.A
+            ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k := fun k => by
     rw [← hz, Category.assoc]
   choose idx hidx using fun s : (𝟙_ (Over (Spec (CommRingCat.of R)))).left =>
     idx_exists D.toPre.P.L hL s
-  let js : (𝟙_ (Over (Spec (CommRingCat.of R)))).left → Fin 6 → D.toPre.P.L.ι :=
-    fun s k => idx s (ηA ≫ ψ k)
-  let Us : (𝟙_ (Over (Spec (CommRingCat.of R)))).left → (𝟙_ (Over (Spec (CommRingCat.of R)))).left.Opens :=
-    fun s => LB.wchart D.toPre.P.L (fun k => ηA ≫ ψ k) (js s)
+  let js : (𝟙_ (Over (Spec (CommRingCat.of R)))).left → Fin 6 → D.toPre.P.L.ι := fun s k =>
+    idx s (ηA ≫ ψ k)
+  let Us
+      : (𝟙_ (Over (Spec (CommRingCat.of R)))).left
+        → (𝟙_ (Over (Spec (CommRingCat.of R)))).left.Opens := fun s =>
+    LB.wchart D.toPre.P.L (fun k => ηA ≫ ψ k) (js s)
   have hUs : ∀ s, s ∈ Us s := fun s => Set.mem_iInter.2 fun k => hidx s _
-  have hcov : ⨆ s, Us s = ⊤ :=
-    top_unique fun s _ => TopologicalSpace.Opens.mem_iSup.2 ⟨s, hUs s⟩
+  have hcov : ⨆ s, Us s = ⊤ := top_unique fun s _ => TopologicalSpace.Opens.mem_iSup.2 ⟨s, hUs s⟩
   have key : ∀ s, res (fun _ _ => trivial : Us s ≤ ηA ⁻¹ᵁ ⊤) (pullU ηA ⊤ κ) = 1 := by
     intro s
 
     have coh1 : LB.Coh D.toPre.P.L (fun k => ηA ≫ ψ k) (js s) := fun k1 k2 h => congrArg (idx s) h
-    have coh2 : LB.Coh D.toPre.P.L (fun k => zero2 D.toPre.P.A ≫
-        rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k) (js s) :=
-      fun k1 k2 h => congrArg (idx s) (((hψz k1).trans h).trans (hψz k2).symm)
-    have cross : ∀ k k', ηA ≫ ψ k = zero2 D.toPre.P.A ≫
-        rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k' → js s k = js s k' :=
-      fun k k' h => congrArg (idx s) (h.trans (hψz k').symm)
-    have e := corr_pull_comp D.toPre.P.L u (zz D.toPre.P.A).left ηA (zero2 D.toPre.P.A) hz
-      (js s) (js s) coh1 coh2 cross
+    have coh2 : LB.Coh D.toPre.P.L
+        (fun k => zero2 D.toPre.P.A ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)
+        (js s) := fun k1 k2 h =>
+      congrArg (idx s) (((hψz k1).trans h).trans (hψz k2).symm)
+    have cross
+        : ∀ k k',
+          ηA ≫ ψ k = zero2 D.toPre.P.A ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k'
+            → js s k = js s k' := fun k k' h =>
+      congrArg (idx s) (h.trans (hψz k').symm)
+    have e :=
+      corr_pull_comp D.toPre.P.L u (zz D.toPre.P.A).left ηA (zero2 D.toPre.P.A) hz (js s) (js s)
+        coh1 coh2 cross
     have one := corr_one_alt D.toPre.P.L hu0 (js s) coh2
-    have h2 : Us s ≤ LB.wchart D.toPre.P.L (fun k => zero2 D.toPre.P.A ≫
-        rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k) (js s) :=
-      fun x hx => Set.mem_iInter.2 fun k => by
+    have h2
+        : Us s
+          ≤ LB.wchart D.toPre.P.L
+            (fun k =>
+              zero2 D.toPre.P.A ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)
+            (js s) := fun x hx =>
+      Set.mem_iInter.2 fun k => by
         have := Set.mem_iInter.1 hx k
         beta_reduce at this ⊢
         rwa [hψz k] at this
     have e' := res_eq_of_res_eq' _ _ (le_rfl : Us s ≤ Us s) h2 e
-    have e'' := (Canon.res_refl _ _).symm.trans (e'.trans ((congrArg (res h2) one).trans (map_one _)))
+    have e'' :=
+      (Canon.res_refl _ _).symm.trans (e'.trans ((congrArg (res h2) one).trans (map_one _)))
 
     have cohψ : LB.Coh D.toPre.P.L ψ (js s) := fun k1 k2 h => congrArg (idx s) (congrArg (ηA ≫ ·) h)
     have cone := corr_one_alt D.toPre.P.L (corr_symm' D.toPre.P.L hcc) (js s) cohψ
@@ -326,8 +352,9 @@ theorem u_zero (hGF : GlobalFnsSt) (hu : u.IsGen)
     have hh : Us s ≤ ηA ⁻¹ᵁ LB.wchart D.toPre.P.L ψ (js s) := LBVal.wchart_pull_le _ ψ ηA (js s)
     have e5 : v.s (js s) = res le_top κ :=
       (hκ (js s)).trans ((congrArg (res le_top κ * ·) cone).trans (_root_.mul_one _))
-    have e4 : res hh (pullU ηA _ (v.s (js s))) = res (fun _ _ => trivial : Us s ≤ ηA ⁻¹ᵁ ⊤)
-        (pullU ηA ⊤ κ) :=
+    have e4
+        : res hh (pullU ηA _ (v.s (js s)))
+          = res (fun _ _ => trivial : Us s ≤ ηA ⁻¹ᵁ ⊤) (pullU ηA ⊤ κ) :=
       (congrArg (fun x => res hh (pullU ηA _ x)) e5).trans
         (Canon.res_pullU_eq ηA le_top (fun _ _ => trivial) hh κ).symm
     exact e4.symm.trans e''
@@ -347,13 +374,13 @@ theorem u_zero (hGF : GlobalFnsSt) (hu : u.IsGen)
   have h1 : v.s j = canon.s j := (hκ j).trans (by rw [hκ1, map_one, _root_.one_mul])
   exact (congrArg (res _) h1).trans ((corr_symm' D.toPre.P.L hcc) j j' hj hj' hm)
 
-
 include hO in
-theorem rho_e (hGF : GlobalFnsSt) (hu : u.IsGen)
+theorem rho_e
+    (hGF : GlobalFnsSt) (hu : u.IsGen)
     (hu0 : LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ u (zero2 D.toPre.P.A))
       (LB.oneGen D.toPre.P.L))
-    (ρ : Γ((thickObj R I e G).left, ⊤)ˣ) (hρ : PairProp U ιD ιG e a χ u ρ) :
-    (eSec (thickObj R I e G)).appTop.hom ρ.val = 1 := by
+    (ρ : Γ((thickObj R I e G).left, ⊤)ˣ) (hρ : PairProp U ιD ιG e a χ u ρ)
+    : (eSec (thickObj R I e G)).appTop.hom ρ.val = 1 := by
   classical
   have hL := D.toPre.P.isLB
   have hz0 := u_zero ιD a u hGF hu hu0
@@ -366,31 +393,35 @@ theorem rho_e (hGF : GlobalFnsSt) (hu : u.IsGen)
   let jA : S' → Fin 4 ⊕ Fin 6 → D.toPre.P.L.ι := fun s k => idx s (ε ≫ φA U ιD e a χ k)
   let jB : S' → Fin 4 → D.toPre.P.L.ι := fun s k => idx s (ε ≫ φB U ιG e a χ k)
   let Us : S' → S'.Opens := fun s =>
-    LB.wchart D.toPre.P.L (fun k => ε ≫ φB U ιG e a χ k) (jB s) ⊓
-      LB.wchart D.toPre.P.L (fun k => ε ≫ φA U ιD e a χ k) (jA s)
+    LB.wchart D.toPre.P.L (fun k => ε ≫ φB U ιG e a χ k) (jB s)
+      ⊓ LB.wchart D.toPre.P.L (fun k => ε ≫ φA U ιD e a χ k) (jA s)
   have hUs : ∀ s, s ∈ Us s := fun s =>
     ⟨Set.mem_iInter.2 fun k => hidx s _, Set.mem_iInter.2 fun k => hidx s _⟩
-  have hcov : ⨆ s, Us s = ⊤ :=
-    top_unique fun s _ => TopologicalSpace.Opens.mem_iSup.2 ⟨s, hUs s⟩
+  have hcov : ⨆ s, Us s = ⊤ := top_unique fun s _ => TopologicalSpace.Opens.mem_iSup.2 ⟨s, hUs s⟩
   have key : ∀ s, (ε.appLE ⊤ (Us s) (fun _ _ => trivial)).hom ρ.val = 1 := by
     intro s
-    have cA : LB.Coh D.toPre.P.L (φA U ιD e a χ) (jA s) :=
-      fun k1 k2 h => congrArg (idx s) (congrArg (ε ≫ ·) h)
-    have cB : LB.Coh D.toPre.P.L (φB U ιG e a χ) (jB s) :=
-      fun k1 k2 h => congrArg (idx s) (congrArg (ε ≫ ·) h)
-    have cross : ∀ k k', φB U ιG e a χ k = φA U ιD e a χ k' → jB s k = jA s k' :=
-      fun k k' h => congrArg (idx s) (congrArg (ε ≫ ·) h)
+    have cA : LB.Coh D.toPre.P.L (φA U ιD e a χ) (jA s) := fun k1 k2 h =>
+      congrArg (idx s) (congrArg (ε ≫ ·) h)
+    have cB : LB.Coh D.toPre.P.L (φB U ιG e a χ) (jB s) := fun k1 k2 h =>
+      congrArg (idx s) (congrArg (ε ≫ ·) h)
+    have cross : ∀ k k', φB U ιG e a χ k = φA U ιD e a χ k' → jB s k = jA s k' := fun k k' h =>
+      congrArg (idx s) (congrArg (ε ≫ ·) h)
     have P := hρ (jA s) (jB s) cA cB cross
-    have hU : Us s ≤ ε ⁻¹ᵁ (LB.wchart D.toPre.P.L (φB U ιG e a χ) (jB s) ⊓
-        LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s)) :=
-      fun x hx => ⟨LBVal.wchart_pull_le _ _ ε _ hx.1, LBVal.wchart_pull_le _ _ ε _ hx.2⟩
-    have P2 := (congrArg (fun w => (ε.appLE _ (Us s) hU).hom (Units.val w)) P).trans
-      (map_mul (ε.appLE _ (Us s) hU).hom _ _)
-    have P' := (appLE_res ε _ hU _).symm.trans (P2.trans
-      (congrArg₂ (· * ·) (appLE_res ε _ hU ρ) (appLE_res ε _ hU _)))
+    have hU
+        : Us s
+          ≤ ε
+            ⁻¹ᵁ (LB.wchart D.toPre.P.L (φB U ιG e a χ) (jB s)
+              ⊓ LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s)) := fun x hx =>
+      ⟨LBVal.wchart_pull_le _ _ ε _ hx.1, LBVal.wchart_pull_le _ _ ε _ hx.2⟩
+    have P2 :=
+      (congrArg (fun w => (ε.appLE _ (Us s) hU).hom (Units.val w)) P).trans
+        (map_mul (ε.appLE _ (Us s) hU).hom _ _)
+    have P' :=
+      (appLE_res ε _ hU _).symm.trans
+        (P2.trans (congrArg₂ (· * ·) (appLE_res ε _ hU ρ) (appLE_res ε _ hU _)))
 
-    have hB : Us s ≤ ε ⁻¹ᵁ LB.wchart D.toPre.P.L (φB U ιG e a χ) (jB s) :=
-      fun x hx => LBVal.wchart_pull_le _ _ ε _ hx.1
+    have hB : Us s ≤ ε ⁻¹ᵁ LB.wchart D.toPre.P.L (φB U ιG e a χ) (jB s) := fun x hx =>
+      LBVal.wchart_pull_le _ _ ε _ hx.1
     have hBO : ∀ k, ε ≫ φB U ιG e a χ k = ε ≫ D.toPre.Oφ (U.gt e).pG χ k := fun k => by
       show ε ≫ ((Over.pullback (thick R I e)).map (ιG.act a)).left ≫ _ = _
       rw [← Category.assoc, F1]
@@ -399,72 +430,114 @@ theorem rho_e (hGF : GlobalFnsSt) (hu : u.IsGen)
       have cohB : LB.Coh D.toPre.P.L (fun k => ε ≫ D.toPre.Oφ (U.gt e).pG χ k) (jB s) :=
         fun k1 k2 h => congrArg (idx s) (((hBO k1).trans h).trans (hBO k2).symm)
       have hV : Us s ≤ LB.wchart D.toPre.P.L (fun k => ε ≫ D.toPre.Oφ (U.gt e).pG χ k) (jB s) :=
-        fun x hx => Set.mem_iInter.2 fun k => by
-          have := Set.mem_iInter.1 hx.1 k
-          beta_reduce at this ⊢
-          rwa [hBO k] at this
-      have m : ((Over.pullback (thick R I e)).map (ιG.act a)).left.appLE _ _
-          (LBVal.wchart_pull_le _ _ _ (jB s)) ≫ ε.appLE _ (Us s) hB =
-          ε.appLE _ (Us s) (hV.trans (LBVal.wchart_pull_le _ _ ε (jB s))) := by
+        fun x hx =>
+          Set.mem_iInter.2 fun k => by
+            have := Set.mem_iInter.1 hx.1 k
+            beta_reduce at this ⊢
+            rwa [hBO k] at this
+      have m
+          : ((Over.pullback (thick R I e)).map (ιG.act a)).left.appLE _ _
+                (LBVal.wchart_pull_le _ _ _ (jB s))
+              ≫ ε.appLE _ (Us s) hB
+            = ε.appLE _ (Us s) (hV.trans (LBVal.wchart_pull_le _ _ ε (jB s))) := by
         rw [Scheme.Hom.appLE_comp_appLE]
         exact Semi.TorusInj.appLE_of_eq F1 _
       rw [← appLE_one D.toPre.P.L ((U.gt e).t χ) ε ((U.gt e).t_unit χ) (jB s) cohB (Us s) hV, ← m]
       rfl
 
-    have hA : Us s ≤ ε ⁻¹ᵁ LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s) :=
-      fun x hx => LBVal.wchart_pull_le _ _ ε _ hx.2
-    have M := LBVal.mulGen_val D.toPre.P.L _ _ _ _ ((U.gt e).t (star a • χ))
-      (LB.pullGen D.toPre.P.L _ _ u (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left) (jA s) _ le_rfl
-    have L1 := (congrArg (ε.appLE _ (Us s) hA).hom ((map_rfl' _).symm.trans M)).trans
-      (map_mul (ε.appLE _ (Us s) hA).hom _ _)
+    have hA : Us s ≤ ε ⁻¹ᵁ LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s) := fun x hx =>
+      LBVal.wchart_pull_le _ _ ε _ hx.2
+    have M :=
+      LBVal.mulGen_val D.toPre.P.L _ _ _ _ ((U.gt e).t (star a • χ))
+        (LB.pullGen D.toPre.P.L _ _ u (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left) (jA s) _
+        le_rfl
+    have L1 :=
+      (congrArg (ε.appLE _ (Us s) hA).hom ((map_rfl' _).symm.trans M)).trans
+        (map_mul (ε.appLE _ (Us s) hA).hom _ _)
 
-    have coh1 : LB.Coh D.toPre.P.L (fun k => ε ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k)
-        (jA s ∘ Sum.inl) := fun k1 k2 h => congrArg (idx s) h
-    have hV1 : Us s ≤ LB.wchart D.toPre.P.L (fun k => ε ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k)
-        (jA s ∘ Sum.inl) := fun x hx => Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx.2 (Sum.inl k)
-    have T1 := appLE_one D.toPre.P.L ((U.gt e).t (star a • χ)) ε ((U.gt e).t_unit _) (jA s ∘ Sum.inl)
-      coh1 (Us s) hV1
-    have m1 := congrArg (fun ψ => ψ.hom (((U.gt e).t (star a • χ)).s (jA s ∘ Sum.inl)).val)
-      (Scheme.Hom.map_appLE ε hA (homOfLE (fun x hx =>
-        Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx (Sum.inl k) :
-          LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s) ≤ _)).op)
+    have coh1 : LB.Coh D.toPre.P.L
+        (fun k => ε ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k)
+        (jA s ∘ Sum.inl) := fun k1 k2 h =>
+      congrArg (idx s) h
+    have hV1
+        : Us s
+          ≤ LB.wchart D.toPre.P.L
+            (fun k => ε ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k)
+            (jA s ∘ Sum.inl) := fun x hx =>
+      Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx.2 (Sum.inl k)
+    have T1 :=
+      appLE_one D.toPre.P.L ((U.gt e).t (star a • χ)) ε ((U.gt e).t_unit _) (jA s ∘ Sum.inl) coh1
+        (Us s) hV1
+    have m1 :=
+      congrArg
+        (fun ψ => ψ.hom (((U.gt e).t (star a • χ)).s (jA s ∘ Sum.inl)).val)
+        (Scheme.Hom.map_appLE ε hA
+          (homOfLE
+            (fun x hx => Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx (Sum.inl k)
+              : LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s) ≤ _)).op)
 
-    have hF2k : ∀ k, ε ≫ φA U ιD e a χ (Sum.inr k) = cS ≫ ((zz D.toPre.P.A).left ≫
-        rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k) := fun k => by
+    have hF2k
+        : ∀ k,
+          ε ≫ φA U ιD e a χ (Sum.inr k)
+            = cS
+              ≫ ((zz D.toPre.P.A).left
+                ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k) := fun k => by
       show ε ≫ (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left ≫ _ = _
       rw [← Category.assoc, F2, Category.assoc]
-    have coh2 : LB.Coh D.toPre.P.L (fun k => cS ≫ ((zz D.toPre.P.A).left ≫
-        rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)) (jA s ∘ Sum.inr) :=
-      fun k1 k2 h => congrArg (idx s) (((hF2k k1).trans h).trans (hF2k k2).symm)
-    have hV2' : Us s ≤ LB.wchart D.toPre.P.L (fun k => cS ≫ ((zz D.toPre.P.A).left ≫
-        rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)) (jA s ∘ Sum.inr) :=
-      fun x hx => Set.mem_iInter.2 fun k => by
+    have coh2 : LB.Coh D.toPre.P.L
+        (fun k =>
+          cS ≫ ((zz D.toPre.P.A).left ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k))
+        (jA s ∘ Sum.inr) := fun k1 k2 h =>
+      congrArg (idx s) (((hF2k k1).trans h).trans (hF2k k2).symm)
+    have hV2'
+        : Us s
+          ≤ LB.wchart D.toPre.P.L
+            (fun k =>
+              cS
+                ≫ ((zz D.toPre.P.A).left
+                  ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k))
+            (jA s ∘ Sum.inr) := fun x hx =>
+      Set.mem_iInter.2 fun k => by
         have := Set.mem_iInter.1 hx.2 (Sum.inr k)
         beta_reduce at this ⊢
         rwa [hF2k k] at this
-    have T2 := appLE_one D.toPre.P.L (LB.pullGen D.toPre.P.L _ _ u (zz D.toPre.P.A).left) cS
-      (corr_one_pull D.toPre.P.L hz0 cS) (jA s ∘ Sum.inr) coh2 (Us s) hV2'
-    have hW2 : Us s ≤ ε ⁻¹ᵁ LB.wchart D.toPre.P.L (fun k =>
-        (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left ≫
-          rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k) (jA s ∘ Sum.inr) :=
-      fun x hx => LBVal.wchart_pull_le _ _ ε _ (Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx.2 (Sum.inr k))
-    have m2 : (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left.appLE _ _
-        (LBVal.wchart_pull_le _ _ _ (jA s ∘ Sum.inr)) ≫ ε.appLE _ (Us s) hW2 =
-        (zz D.toPre.P.A).left.appLE _ _ (LBVal.wchart_pull_le _ _ _ (jA s ∘ Sum.inr)) ≫
-          cS.appLE _ (Us s) (hV2'.trans (LBVal.wchart_pull_le _ _ cS _)) := by
+    have T2 :=
+      appLE_one D.toPre.P.L (LB.pullGen D.toPre.P.L _ _ u (zz D.toPre.P.A).left) cS
+        (corr_one_pull D.toPre.P.L hz0 cS) (jA s ∘ Sum.inr) coh2 (Us s) hV2'
+    have hW2
+        : Us s
+          ≤ ε ⁻¹ᵁ LB.wchart D.toPre.P.L
+            (fun k =>
+              (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left
+                ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)
+            (jA s ∘ Sum.inr) := fun x hx =>
+      LBVal.wchart_pull_le _ _ ε _ (Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx.2 (Sum.inr k))
+    have m2
+        : (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left.appLE _ _
+              (LBVal.wchart_pull_le _ _ _ (jA s ∘ Sum.inr))
+            ≫ ε.appLE _ (Us s) hW2
+          = (zz D.toPre.P.A).left.appLE _ _ (LBVal.wchart_pull_le _ _ _ (jA s ∘ Sum.inr))
+            ≫ cS.appLE _ (Us s) (hV2'.trans (LBVal.wchart_pull_le _ _ cS _)) := by
       rw [Scheme.Hom.appLE_comp_appLE, Scheme.Hom.appLE_comp_appLE]
       exact Semi.TorusInj.appLE_of_eq F2 _
-    have V2 : (ε.appLE _ (Us s) hW2).hom ((LB.pullGen D.toPre.P.L _ _ u
-        (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left).s (jA s ∘ Sum.inr)).val = 1 := by
+    have V2
+        : (ε.appLE _ (Us s) hW2).hom
+            ((LB.pullGen D.toPre.P.L _ _ u (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left).s
+              (jA s ∘ Sum.inr)).val
+          = 1 := by
       refine (congrArg (ε.appLE _ (Us s) hW2).hom (pullGen_s_val D.toPre.P.L _ _ _)).trans ?_
       refine (congrArg (fun ψ => ψ.hom (u.s (jA s ∘ Sum.inr)).val) m2).trans ?_
       refine Eq.trans ?_ T2
       exact congrArg (cS.appLE _ (Us s) _).hom (pullGen_s_val D.toPre.P.L _ _ _).symm
-    have m3 := congrArg (fun ψ => ψ.hom ((LB.pullGen D.toPre.P.L _ _ u
-        (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left).s (jA s ∘ Sum.inr)).val)
-      (Scheme.Hom.map_appLE ε hA (homOfLE (fun x hx =>
-        Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx (Sum.inr k) :
-          LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s) ≤ _)).op)
+    have m3 :=
+      congrArg
+        (fun ψ =>
+          ψ.hom ((LB.pullGen D.toPre.P.L _ _ u (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left).s
+            (jA s ∘ Sum.inr)).val)
+        (Scheme.Hom.map_appLE ε hA
+          (homOfLE
+            (fun x hx => Set.mem_iInter.2 fun k => Set.mem_iInter.1 hx (Sum.inr k)
+              : LB.wchart D.toPre.P.L (φA U ιD e a χ) (jA s) ≤ _)).op)
     have LHS1 : (ε.appLE _ (Us s) hA).hom ((lhs U ιD e a χ u).s (jA s)).val = 1 :=
       L1.trans ((congrArg₂ (· * ·) (m1.trans T1) (m3.trans V2)).trans (_root_.mul_one _))
     exact (_root_.mul_one _).symm.trans ((congrArg _ R1).symm.trans (P'.symm.trans LHS1))

@@ -8,6 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFinite
 
 namespace GlobalTheory.PsCo.Pc3
 
-theorem uFin : UFin := GlobalTheory.T.uniformFiniteness_of_reproducingPolynomial_averaging GlobalTheory.T.exists_reproducingPolynomial_valueAtOne_maxCompact GlobalTheory.T.exists_finiteDim_stable_polyAverages_weights
+theorem uFin : UFin :=
+  GlobalTheory.T.uniformFiniteness_of_reproducingPolynomial_averaging
+    GlobalTheory.T.exists_reproducingPolynomial_valueAtOne_maxCompact
+    GlobalTheory.T.exists_finiteDim_stable_polyAverages_weights
 
 end GlobalTheory.PsCo.Pc3

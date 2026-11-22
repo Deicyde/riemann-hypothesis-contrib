@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwoMulInvOf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SWQ GlobalTheory.ThetaTransform
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SWQ
+  GlobalTheory.ThetaTransform
 open scoped Matrix Classical
 
 namespace GlobalTheory.SchwartzDecay
@@ -19,19 +21,21 @@ theorem continuous_mixed : Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace F)
   · exact (isometry_extensionEmbeddingOfIsReal v.2).continuous.comp (continuous_apply _)
   · exact (isometry_extensionEmbedding v.1).continuous.comp (continuous_apply _)
 
-theorem norm_le_mixed (x : InfiniteAdeleRing F) (v : InfinitePlace F) :
-    ‖x v‖ ≤ ‖InfiniteAdeleRing.ringEquiv_mixedSpace F x‖ := by
+theorem norm_le_mixed (x : InfiniteAdeleRing F) (v : InfinitePlace F)
+    : ‖x v‖ ≤ ‖InfiniteAdeleRing.ringEquiv_mixedSpace F x‖ := by
   set e := InfiniteAdeleRing.ringEquiv_mixedSpace F
   rcases v.isReal_or_isComplex with hv | hv
-  · calc ‖x v‖ = ‖(e x).1 ⟨v, hv⟩‖ :=
-          ((isometry_extensionEmbeddingOfIsReal hv).norm_map_of_map_zero (map_zero _) (x v)).symm
+  · calc
+      ‖x v‖ = ‖(e x).1 ⟨v, hv⟩‖ :=
+        ((isometry_extensionEmbeddingOfIsReal hv).norm_map_of_map_zero (map_zero _) (x v)).symm
       _ ≤ ‖e x‖ := (norm_le_pi_norm (e x).1 ⟨v, hv⟩).trans (norm_fst_le (e x))
-  · calc ‖x v‖ = ‖(e x).2 ⟨v, hv⟩‖ :=
-          ((isometry_extensionEmbedding v).norm_map_of_map_zero (map_zero _) (x v)).symm
+  · calc
+      ‖x v‖ = ‖(e x).2 ⟨v, hv⟩‖ :=
+        ((isometry_extensionEmbedding v).norm_map_of_map_zero (map_zero _) (x v)).symm
       _ ≤ ‖e x‖ := (norm_le_pi_norm (e x).2 ⟨v, hv⟩).trans (norm_snd_le (e x))
 
-theorem abs_re_le (x : Ainf F) (v : InfinitePlace F) :
-    |re x v| ≤ ‖InfiniteAdeleRing.ringEquiv_mixedSpace F x‖ := by
+theorem abs_re_le (x : Ainf F) (v : InfinitePlace F)
+    : |re x v| ≤ ‖InfiniteAdeleRing.ringEquiv_mixedSpace F x‖ := by
   refine (Complex.abs_re_le_norm _).trans ?_
   rw [(isometry_extensionEmbedding v).norm_map_of_map_zero (map_zero _) (x v)]
   exact norm_le_mixed x v
@@ -39,13 +43,15 @@ theorem abs_re_le (x : Ainf F) (v : InfinitePlace F) :
 theorem sz_nonneg (u : Fin N → AF F) : 0 ≤ sz u :=
   Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
 
-theorem sz_le (u : Fin N → AF F) :
-    sz u ≤ (N * Fintype.card (InfinitePlace F) : ℝ) *
-      ‖fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (u i).1‖ := by
+theorem sz_le (u : Fin N → AF F)
+    : sz u
+      ≤ (N * Fintype.card (InfinitePlace F) : ℝ)
+        * ‖fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (u i).1‖ := by
   set t : Fin N → mixedEmbedding.mixedSpace F := fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (u i).1
-  calc sz u ≤ ∑ _l : Fin N, ∑ _w : InfinitePlace F, ‖t‖ :=
-        Finset.sum_le_sum fun l _ => Finset.sum_le_sum fun w _ =>
-          (abs_re_le (inf u l) w).trans (norm_le_pi_norm t l)
+  calc
+    sz u ≤ ∑ _l : Fin N, ∑ _w : InfinitePlace F, ‖t‖ :=
+      Finset.sum_le_sum fun l _ =>
+        Finset.sum_le_sum fun w _ => (abs_re_le (inf u l) w).trans (norm_le_pi_norm t l)
     _ = _ := by simp [mul_assoc]
 
 theorem decay_add {Φ Ψ : (Fin N → AF F) → ℂ} (h : Decay Φ) (h' : Decay Ψ) : Decay (Φ + Ψ) := by
@@ -58,8 +64,9 @@ theorem decay_add {Φ Ψ : (Fin N → AF F) → ℂ} (h : Decay Φ) (h' : Decay 
     obtain ⟨C', hC'⟩ := hd' k
     refine ⟨C + C', fun u => ?_⟩
     have h0 : 0 ≤ (1 + sz u) ^ k := pow_nonneg (by linarith [sz_nonneg u]) k
-    calc ‖(Φ + Ψ) u‖ * (1 + sz u) ^ k ≤ (‖Φ u‖ + ‖Ψ u‖) * (1 + sz u) ^ k :=
-          mul_le_mul_of_nonneg_right (norm_add_le _ _) h0
+    calc
+      ‖(Φ + Ψ) u‖ * (1 + sz u) ^ k
+        ≤ (‖Φ u‖ + ‖Ψ u‖) * (1 + sz u) ^ k := mul_le_mul_of_nonneg_right (norm_add_le _ _) h0
       _ ≤ C + C' := by rw [add_mul]; exact add_le_add (hC u) (hC' u)
 
 theorem decay_smul (a : ℂ) {Φ : (Fin N → AF F) → ℂ} (h : Decay Φ) : Decay (a • Φ) := by
@@ -70,14 +77,19 @@ theorem decay_smul (a : ℂ) {Φ : (Fin N → AF F) → ℂ} (h : Decay Φ) : De
   rw [Pi.smul_apply, norm_smul, mul_assoc]
   exact mul_le_mul_of_nonneg_left (hC u) (norm_nonneg a)
 
-theorem schwartz_bound {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : SchwartzMap V ℂ) (k : ℕ) :
-    ∃ C : ℝ, ∀ t, (1 + ‖t‖) ^ k * ‖f t‖ ≤ C := by
-  have := fun t => SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℝ) (m := (k, 0)) (k := k) (n := 0) le_rfl le_rfl f t
+theorem schwartz_bound
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : SchwartzMap V ℂ) (k : ℕ)
+    : ∃ C : ℝ, ∀ t, (1 + ‖t‖) ^ k * ‖f t‖ ≤ C := by
+  have := fun t =>
+    SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℝ) (m := (k, 0)) (k := k) (n := 0) le_rfl le_rfl
+      f t
   simp only [norm_iteratedFDeriv_zero] at this
   exact ⟨_, this⟩
 
-theorem decay_pure (f : SchwartzMap (Fin N → mixedEmbedding.mixedSpace F) ℂ) (g : (Fin N → Af F) → ℂ)
-    (hg : g ∈ GlobalTheory.WeilM.SB (Fin N → Af F)) : Decay (GlobalTheory.WeilM.pureA F f g) := by
+theorem decay_pure
+    (f : SchwartzMap (Fin N → mixedEmbedding.mixedSpace F) ℂ)
+    (g : (Fin N → Af F) → ℂ) (hg : g ∈ GlobalTheory.WeilM.SB (Fin N → Af F))
+    : Decay (GlobalTheory.WeilM.pureA F f g) := by
   obtain ⟨hg1, hg2⟩ := hg
   refine ⟨?_, ⟨tsupport g, hg2, fun u hu => ?_⟩, fun k => ?_⟩
   · refine Continuous.mul (f.continuous.comp (continuous_pi fun i => ?_))
@@ -98,16 +110,18 @@ theorem decay_pure (f : SchwartzMap (Fin N → mixedEmbedding.mixedSpace F) ℂ)
       rw [← mul_pow]
       exact pow_le_pow_left₀ (by linarith [sz_nonneg u]) h1 k
     have hC0 : 0 ≤ C := le_trans (by positivity) (hC 0)
-    calc ‖GlobalTheory.WeilM.pureA F f g u‖ * (1 + sz u) ^ k
+    calc
+      ‖GlobalTheory.WeilM.pureA F f g u‖ * (1 + sz u) ^ k
         = ‖f t‖ * ‖g fun i => (u i).2‖ * (1 + sz u) ^ k := by rw [← norm_mul]; rfl
       _ ≤ ‖f t‖ * ‖g fun i => (u i).2‖ * ((1 + c) ^ k * (1 + ‖t‖) ^ k) :=
-          mul_le_mul_of_nonneg_left h2 (by positivity)
+        mul_le_mul_of_nonneg_left h2 (by positivity)
       _ = (1 + c) ^ k * ((1 + ‖t‖) ^ k * ‖f t‖) * ‖g fun i => (u i).2‖ := by ring
       _ ≤ (1 + c) ^ k * C * B :=
-          mul_le_mul (mul_le_mul_of_nonneg_left (hC t) (by positivity)) (hB _) (norm_nonneg _) (by positivity)
+        mul_le_mul (mul_le_mul_of_nonneg_left (hC t) (by positivity)) (hB _) (norm_nonneg _)
+          (by positivity)
 
-theorem decay_of_mem_schA (F : Type) [Field F] [NumberField F] (N : ℕ) :
-    ∀ Φ ∈ GlobalTheory.WeilM.schA F (Fin N), Decay Φ := by
+theorem decay_of_mem_schA (F : Type) [Field F] [NumberField F] (N : ℕ)
+    : ∀ Φ ∈ GlobalTheory.WeilM.schA F (Fin N), Decay Φ := by
   intro Φ hΦ
   induction hΦ using Submodule.span_induction with
   | mem x hx =>

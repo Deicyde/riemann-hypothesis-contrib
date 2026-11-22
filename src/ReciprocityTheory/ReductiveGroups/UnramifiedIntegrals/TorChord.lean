@@ -20,22 +20,30 @@ variable {C : Type} [NormedField C] [IsUltrametricDist C]
 theorem chord_norm_add {a b : C} (h : ‖b‖ < ‖a‖) : ‖a + b‖ = ‖a‖ := by
   rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h.ne', max_eq_left h.le]
 
-theorem chord_norm_y_sq (W : WeierstrassCurve C) (hW : IntegralModel W) {x y : C}
-    (h : W.toAffine.Equation x y) (hx : 1 < ‖x‖) : ‖y‖ ^ 2 = ‖x‖ ^ 3 := by
+theorem chord_norm_y_sq
+    (W : WeierstrassCurve C) (hW : IntegralModel W)
+    {x y : C} (h : W.toAffine.Equation x y) (hx : 1 < ‖x‖)
+    : ‖y‖ ^ 2 = ‖x‖ ^ 3 := by
   obtain ⟨h1, h2, h3, h4, h6⟩ := hW
   rw [Affine.equation_iff] at h
   have hx0 : 0 < ‖x‖ := lt_trans one_pos hx
   have e2 : ‖W.a₂ * x ^ 2‖ < ‖x ^ 3‖ := by
     rw [norm_mul, norm_pow, norm_pow]
-    calc ‖W.a₂‖ * ‖x‖ ^ 2 ≤ 1 * ‖x‖ ^ 2 := by gcongr
+    calc
+      ‖W.a₂‖ * ‖x‖ ^ 2
+        ≤ 1 * ‖x‖ ^ 2 := by gcongr
       _ < ‖x‖ ^ 3 := by nlinarith [pow_pos hx0 2]
   have e4 : ‖W.a₄ * x‖ < ‖x ^ 3‖ := by
     rw [norm_mul, norm_pow]
-    calc ‖W.a₄‖ * ‖x‖ ≤ 1 * ‖x‖ := by gcongr
+    calc
+      ‖W.a₄‖ * ‖x‖
+        ≤ 1 * ‖x‖ := by gcongr
       _ < ‖x‖ ^ 3 := by nlinarith [pow_pos hx0 2, mul_pos hx0 hx0]
   have e6 : ‖W.a₆‖ < ‖x ^ 3‖ := by
     rw [norm_pow]
-    calc ‖W.a₆‖ ≤ 1 := h6
+    calc
+      ‖W.a₆‖
+        ≤ 1 := h6
       _ < ‖x‖ ^ 3 := one_lt_pow₀ hx (by norm_num)
   have hR : ‖x ^ 3 + W.a₂ * x ^ 2 + W.a₄ * x + W.a₆‖ = ‖x‖ ^ 3 := by
     have s1 := chord_norm_add e2
@@ -47,29 +55,35 @@ theorem chord_norm_y_sq (W : WeierstrassCurve C) (hW : IntegralModel W) {x y : C
   have hc : ‖W.a₁ * x + W.a₃‖ ≤ ‖x‖ := by
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ (h3.trans hx.le))
     rw [norm_mul]
-    calc ‖W.a₁‖ * ‖x‖ ≤ 1 * ‖x‖ := by gcongr
+    calc
+      ‖W.a₁‖ * ‖x‖
+        ≤ 1 * ‖x‖ := by gcongr
       _ = ‖x‖ := one_mul _
   have hyx : ‖x‖ < ‖y‖ := by
     by_contra hcon
     rw [not_lt] at hcon
     have hs : ‖y + (W.a₁ * x + W.a₃)‖ ≤ ‖x‖ :=
       (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hcon hc)
-    have : ‖y‖ * ‖y + (W.a₁ * x + W.a₃)‖ ≤ ‖x‖ * ‖x‖ :=
-      mul_le_mul hcon hs (norm_nonneg _) hx0.le
+    have : ‖y‖ * ‖y + (W.a₁ * x + W.a₃)‖ ≤ ‖x‖ * ‖x‖ := mul_le_mul hcon hs (norm_nonneg _) hx0.le
     nlinarith [mul_pos hx0 hx0]
   rw [chord_norm_add (lt_of_le_of_lt hc hyx)] at hR
-  rw [← hR]; ring
+  rw [← hR]
+  ring
 
-theorem chord_norm_u_sq (W : WeierstrassCurve C) (hW : IntegralModel W) {x y : C}
-    (h : W.toAffine.Equation x y) (hx : 1 < ‖x‖) : ‖-x / y‖ ^ 2 * ‖x‖ = 1 := by
+theorem chord_norm_u_sq
+    (W : WeierstrassCurve C) (hW : IntegralModel W)
+    {x y : C} (h : W.toAffine.Equation x y) (hx : 1 < ‖x‖)
+    : ‖-x / y‖ ^ 2 * ‖x‖ = 1 := by
   have hy := chord_norm_y_sq W hW h hx
   have hx0 : 0 < ‖x‖ := by linarith
   have hx0' := hx0.ne'
   rw [norm_div, norm_neg, div_pow, hy]
   field_simp
 
-theorem formalGroup_param_norm_lt_one (W : WeierstrassCurve C) (hW : IntegralModel W) (P : W.toAffine.Point) (hP : InFormalGroupPoints P) :
-    ‖uOf P‖ < 1 := by
+theorem formalGroup_param_norm_lt_one
+    (W : WeierstrassCurve C) (hW : IntegralModel W) (P : W.toAffine.Point)
+    (hP : InFormalGroupPoints P)
+    : ‖uOf P‖ < 1 := by
   rcases P with _ | @⟨x, y, h⟩
   · simp [uOf]
   · have hx : 1 < ‖x‖ := hP
@@ -80,8 +94,10 @@ theorem formalGroup_param_norm_lt_one (W : WeierstrassCurve C) (hW : IntegralMod
     have : 1 ≤ ‖-x / y‖ ^ 2 := one_le_pow₀ hcon
     nlinarith
 
-theorem chord_adjoin_le (W : WeierstrassCurve C) (hW : IntegralModel W) {c : C}
-    (hc : c ∈ Algebra.adjoin ℤ ({W.a₁, W.a₂, W.a₃, W.a₄, W.a₆} : Set C)) : ‖c‖ ≤ 1 := by
+theorem chord_adjoin_le
+    (W : WeierstrassCurve C) (hW : IntegralModel W)
+    {c : C} (hc : c ∈ Algebra.adjoin ℤ ({W.a₁, W.a₂, W.a₃, W.a₄, W.a₆} : Set C))
+    : ‖c‖ ≤ 1 := by
   obtain ⟨h1, h2, h3, h4, h6⟩ := hW
   induction hc using Algebra.adjoin_induction with
   | mem x hx =>
@@ -96,22 +112,25 @@ theorem chord_adjoin_le (W : WeierstrassCurve C) (hW : IntegralModel W) {c : C}
     rw [norm_mul]
     exact mul_le_one₀ hx (norm_nonneg _) hy
 
-theorem chord_eval_est [CompleteSpace C] {F : MvPowerSeries (Fin 2) C} (hF : Formalism.G.IntegralMv F)
-    (h00 : MvPowerSeries.constantCoeff F = 0)
-    (h10 : MvPowerSeries.coeff (Finsupp.single 0 1) F = 1)
-    (h01 : MvPowerSeries.coeff (Finsupp.single 1 1) F = 1) {a b : C} (ha : ‖a‖ < 1) (hb : ‖b‖ < 1) :
-    ‖evalMv2 F a b - a - b‖ ≤ (max ‖a‖ ‖b‖) ^ 2 := by
+theorem chord_eval_est
+    [CompleteSpace C]
+    {F : MvPowerSeries (Fin 2) C} (hF : Formalism.G.IntegralMv F)
+    (h00 : MvPowerSeries.constantCoeff F = 0) (h10 : MvPowerSeries.coeff (Finsupp.single 0 1) F = 1)
+    (h01 : MvPowerSeries.coeff (Finsupp.single 1 1) F = 1)
+    {a b : C} (ha : ‖a‖ < 1) (hb : ‖b‖ < 1)
+    : ‖evalMv2 F a b - a - b‖ ≤ (max ‖a‖ ‖b‖) ^ 2 := by
   set r := max ‖a‖ ‖b‖ with hr
   have hr0 : 0 ≤ r := le_trans (norm_nonneg a) (le_max_left _ _)
   have hr1 : r < 1 := max_lt ha hb
   set G : MvPowerSeries (Fin 2) C := F - MvPowerSeries.X 0 - MvPowerSeries.X 1 with hG
   have hI1 : Formalism.G.IntegralMv (F - MvPowerSeries.X 0) :=
     (FormalGroupPointsHom.IL C).sub_mem hF (FormalGroupPointsHom.integral_X 0)
-  have hIG : Formalism.G.IntegralMv G := (FormalGroupPointsHom.IL C).sub_mem hI1 (FormalGroupPointsHom.integral_X 1)
+  have hIG : Formalism.G.IntegralMv G :=
+    (FormalGroupPointsHom.IL C).sub_mem hI1 (FormalGroupPointsHom.integral_X 1)
   have hev : evalMv2 G a b = evalMv2 F a b - a - b := by
     rw [hG, FormalGroupPointsHom.evalMv2_sub hI1 (FormalGroupPointsHom.integral_X 1) ha hb,
-      FormalGroupPointsHom.evalMv2_sub hF (FormalGroupPointsHom.integral_X 0) ha hb, FormalGroupPointsHom.evalMv2_X0,
-      FormalGroupPointsHom.evalMv2_X1]
+      FormalGroupPointsHom.evalMv2_sub hF (FormalGroupPointsHom.integral_X 0) ha hb,
+      FormalGroupPointsHom.evalMv2_X0, FormalGroupPointsHom.evalMv2_X1]
   rw [← hev, FormalGroupPointsHom.evalMv2_eq]
   apply IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg (pow_nonneg hr0 2)
   intro d
@@ -142,15 +161,17 @@ theorem chord_eval_est [CompleteSpace C] {F : MvPowerSeries (Fin 2) C} (hF : For
     rw [FormalGroupPointsHom.term, hz, zero_mul, norm_zero]
     exact pow_nonneg hr0 2
 
-theorem formalGroup_add_estimate [CompleteSpace C] (W : WeierstrassCurve C) (hW : IntegralModel W)
-    (P Q : W.toAffine.Point) (hP : InFormalGroupPoints P) (hQ : InFormalGroupPoints Q) :
-    ‖uOf (P + Q) - uOf P - uOf Q‖ ≤ (max ‖uOf P‖ ‖uOf Q‖) ^ 2 := by
+theorem formalGroup_add_estimate
+    [CompleteSpace C]
+    (W : WeierstrassCurve C) (hW : IntegralModel W) (P Q : W.toAffine.Point)
+    (hP : InFormalGroupPoints P) (hQ : InFormalGroupPoints Q)
+    : ‖uOf (P + Q) - uOf P - uOf Q‖ ≤ (max ‖uOf P‖ ‖uOf Q‖) ^ 2 := by
   obtain ⟨w, hw, -⟩ := wSeriesUnique.{0} C W
   obtain ⟨F, hFc, hch⟩ := wFormalGroup.{0} C W w hw
   have hF : Formalism.G.IntegralMv F.toPowerSeries := fun d => chord_adjoin_le W hW (hFc d)
   have hadd : uOf (P + Q) = evalMv2 F.toPowerSeries (uOf P) (uOf Q) :=
-    FormalGroupPointsHom.e1hom_main wSubstUnique wChordSubst formal_group_points_param
-      hW hw F hF hch P Q hP hQ
+    FormalGroupPointsHom.e1hom_main wSubstUnique wChordSubst formal_group_points_param hW hw F hF
+      hch P Q hP hQ
   rw [hadd]
   exact chord_eval_est hF F.zero_constantCoeff F.lin_coeff_X F.lin_coeff_Y
     (formalGroup_param_norm_lt_one W hW P hP) (formalGroup_param_norm_lt_one W hW Q hQ)

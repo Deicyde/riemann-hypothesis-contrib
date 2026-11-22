@@ -13,21 +13,24 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.MemSupSpan
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ChF
 
-private theorem isAdicComplete_germIdeal (R κ : Type) [CommRing R] [Finite κ] :
-    IsAdicComplete (germIdeal κ R) (MvPowerSeries κ R) := by
+private theorem isAdicComplete_germIdeal (R κ : Type) [CommRing R] [Finite κ]
+    : IsAdicComplete (germIdeal κ R) (MvPowerSeries κ R) := by
   have h := (mem_sup_span_X_pow_iff_and_isAdicComplete R ⊥ κ).2 inferInstance
   rwa [Ideal.map_bot, bot_sup_eq, ← germIdeal_eq_span] at h
 
-private theorem eq_zero_or_single {κ : Type} {e : κ →₀ ℕ} (he : e.degree < 2) :
-    e = 0 ∨ ∃ k, e = Finsupp.single k 1 := by
+private theorem eq_zero_or_single {κ : Type} {e : κ →₀ ℕ} (he : e.degree < 2)
+    : e = 0 ∨ ∃ k, e = Finsupp.single k 1 := by
   classical
   by_cases h0 : e = 0
   · exact Or.inl h0
@@ -41,7 +44,10 @@ private theorem eq_zero_or_single {κ : Type} {e : κ →₀ ℕ} (he : e.degree
     have : c = 0 := (Finsupp.degree_eq_zero_iff c).1 (by omega)
     exact ⟨k, by rw [hc, this, add_zero]⟩
 
-theorem sub_surjective_of_lin_leftInverse : ∀ (R : Type) [CommRing R] (d r : ℕ) (φ : Fin d → PS R 1 r) (A' : Matrix (Fin r) (Fin d) R), (∀ j, MvPowerSeries.constantCoeff (φ j) = 0) → A' * lin φ = 1 → Function.Surjective (fun f : PS R 1 d => sub ![φ] f) := by
+theorem sub_surjective_of_lin_leftInverse
+    : ∀ (R : Type) [CommRing R] (d r : ℕ) (φ : Fin d → PS R 1 r) (A' : Matrix (Fin r) (Fin d) R),
+      (∀ j, MvPowerSeries.constantCoeff (φ j) = 0) → A' * lin φ = 1
+        → Function.Surjective (fun f : PS R 1 d => sub ![φ] f) := by
   intro R _ d r φ A' h0 hA
   classical
   set a : Fin 1 × Fin d → PS R 1 r := fun q => (![φ] : Fin 1 → Fin d → PS R 1 r) q.1 q.2 with ha
@@ -79,8 +85,9 @@ theorem sub_surjective_of_lin_leftInverse : ∀ (R : Type) [CommRing R] (d r : �
           refine Ideal.sum_mem _ fun j _ => Submodule.smul_of_tower_mem _ _ ?_
           rw [← hfX (0, j)]
           exact Ideal.mem_map_of_mem _ (X_mem_germIdeal _)
-        have h2 : (MvPowerSeries.X ((0 : Fin 1), i) : PS R 1 r) - ∑ j, A' i j • φ j ∈
-            germIdeal (Fin 1 × Fin r) R ^ 2 := by
+        have h2
+            : (MvPowerSeries.X ((0 : Fin 1), i) : PS R 1 r) - ∑ j, A' i j • φ j
+              ∈ germIdeal (Fin 1 × Fin r) R ^ 2 := by
           refine mem_germIdeal_pow_iff.2 fun e he => ?_
           rcases eq_zero_or_single he with rfl | ⟨⟨k0, k⟩, rfl⟩
           · simp [h0]
@@ -102,8 +109,9 @@ theorem sub_surjective_of_lin_leftInverse : ∀ (R : Type) [CommRing R] (d r : �
     refine surjective_of_mk_map_comp_surjective (I := germIdeal (Fin 1 × Fin d) R) f fun y => ?_
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
     refine ⟨MvPowerSeries.C (MvPowerSeries.constantCoeff y), ?_⟩
-    have h5 : f (MvPowerSeries.C (MvPowerSeries.constantCoeff y)) =
-        MvPowerSeries.C (MvPowerSeries.constantCoeff y) :=
+    have h5
+        : f (MvPowerSeries.C (MvPowerSeries.constantCoeff y))
+          = MvPowerSeries.C (MvPowerSeries.constantCoeff y) :=
       (MvPowerSeries.substAlgHom (R := R) hs).commutes _
     rw [RingHom.comp_apply, h5, Ideal.Quotient.eq, hmap]
     exact RingHom.mem_ker.2 (by simp)

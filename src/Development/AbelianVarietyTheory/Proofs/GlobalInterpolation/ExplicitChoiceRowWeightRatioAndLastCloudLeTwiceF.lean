@@ -10,16 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.SzRowS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem rpow_mul_X'_le_b (eps c : ℝ) (he : 0 < eps) : ∃ x0 : ℝ, ∀ s : Scale, s.eps = eps → x0 ≤ s.x →
-    s.x ^ c * s.X' ≤ s.b ∧ s.x ^ 10 ≤ s.X' := by
-  obtain ⟨x0, h0⟩ := GlobalTheory.log_add_rpow_mul_log_pow_le_rpow (eps / 3) eps c 1 1 0 (by positivity)
-    (by linarith) one_pos
-  obtain ⟨x1, h1⟩ := GlobalTheory.log_add_rpow_mul_log_pow_le_rpow 0 (eps / 3) 10 0 1 0 le_rfl
-    (by linarith) one_pos
+theorem rpow_mul_X'_le_b (eps c : ℝ) (he : 0 < eps)
+    : ∃ x0 : ℝ, ∀ s : Scale, s.eps = eps → x0 ≤ s.x → s.x ^ c * s.X' ≤ s.b ∧ s.x ^ 10 ≤ s.X' := by
+  obtain ⟨x0, h0⟩ :=
+    GlobalTheory.log_add_rpow_mul_log_pow_le_rpow (eps / 3) eps c 1 1 0 (by positivity)
+      (by linarith) one_pos
+  obtain ⟨x1, h1⟩ :=
+    GlobalTheory.log_add_rpow_mul_log_pow_le_rpow 0 (eps / 3) 10 0 1 0 le_rfl (by linarith) one_pos
   refine ⟨max x0 x1, fun s hs hx => ?_⟩
   have hx1 : 1 ≤ s.x := s.one_lt_alt.le
   have hx0 : 0 < s.x := by linarith
@@ -35,10 +37,15 @@ theorem rpow_mul_X'_le_b (eps c : ℝ) (he : 0 < eps) : ∃ x0 : ℝ, ∀ s : Sc
     rw [e, Scale.X']
     exact Real.exp_le_exp.2 h3
 
-theorem szRow_size_ratio : SzRow (fun C D L => (∀ j j' τ τ', 1 ≤ j → j ≤ D.R.m → 1 ≤ j' → j' ≤ D.R.m → wj D j τ ≤ L.sc.X'' D.R.n * wj D j' τ') ∧ (∀ τ (hm : 0 < D.R.m), (D.hc τ).b ⟨D.R.m - 1, by omega⟩ ≤ 2 * (D.hc τ).b ⟨0, hm⟩)) := by
+theorem szRow_size_ratio
+    : SzRow (fun C D L =>
+      (∀ j j' τ τ',
+          1 ≤ j → j ≤ D.R.m → 1 ≤ j' → j' ≤ D.R.m → wj D j τ ≤ L.sc.X'' D.R.n * wj D j' τ')
+        ∧ (∀ τ (hm : 0 < D.R.m), (D.hc τ).b ⟨D.R.m - 1, by omega⟩ ≤ 2 * (D.hc τ).b ⟨0, hm⟩)) := by
   intro eps he he' C hC
   obtain ⟨CN, x1, hLa⟩ := GlobalTheory.topCount_and_lambda_bounds eps he he'
-  obtain ⟨x2, hx2'⟩ := GlobalTheory.const_mul_rpow_mul_log_pow_le_rpow eps 1 (2 * C.GK.La * CN ^ 2) 2 (by linarith)
+  obtain ⟨x2, hx2'⟩ :=
+    GlobalTheory.const_mul_rpow_mul_log_pow_le_rpow eps 1 (2 * C.GK.La * CN ^ 2) 2 (by linarith)
   have hK : 1 ≤ C.GK.La := hC.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1 _ (by simp [FC.cMid])
   refine ⟨0, fun cD _ => ⟨0, fun ch hch => ?_⟩⟩
   obtain ⟨x0, hx0⟩ := rpow_mul_X'_le_b eps (ch + 9) he
@@ -82,7 +89,8 @@ theorem szRow_size_ratio : SzRow (fun C D L => (∀ j j' τ τ', 1 ≤ j → j �
     have h1 : L.sc.x ^ 10 * (L.sc.b / L.sc.X') ≤ L.sc.X' * (L.sc.b / L.sc.X') := by gcongr
     have h2 : L.sc.X' * (L.sc.b / L.sc.X') = L.sc.b := by field_simp
     rw [eb']
-    calc 8 * (L.sc.x ^ 6 * (L.sc.x * (L.sc.b / L.sc.X')))
+    calc
+      8 * (L.sc.x ^ 6 * (L.sc.x * (L.sc.b / L.sc.X')))
         ≤ L.sc.x ^ 3 * (L.sc.x ^ 6 * (L.sc.x * (L.sc.b / L.sc.X'))) := by gcongr
       _ = L.sc.x ^ 10 * (L.sc.b / L.sc.X') := by ring
       _ ≤ L.sc.b := h1.trans h2.le
@@ -110,19 +118,26 @@ theorem szRow_size_ratio : SzRow (fun C D L => (∀ j j' τ τ', 1 ≤ j → j �
   have hbT : ∀ t, (L.bT t : ℝ) ≤ L.sc.b' + 2 * (L.sc.x ^ 6 * L.sc.b') := by
     intro t
     refine (hV.bT_le t).trans ?_
-    have d1 : L.sc.delta1 ≤ 1 := Real.rpow_le_one_of_one_le_of_nonpos hx1 (by have := L.sc.eps_pos; linarith)
+    have d1 : L.sc.delta1 ≤ 1 :=
+      Real.rpow_le_one_of_one_le_of_nonpos hx1 (by have := L.sc.eps_pos; linarith)
     have d0 : 0 ≤ L.sc.delta1 := Real.rpow_nonneg hxp.le _
     have e1 : L.sc.x ^ L.sc.eps ≤ L.sc.x := by
-      have := Real.rpow_le_rpow_of_exponent_le hx1 (show L.sc.eps ≤ 1 by have := L.sc.eps_lt; linarith)
+      have :=
+        Real.rpow_le_rpow_of_exponent_le hx1 (show L.sc.eps ≤ 1 by have := L.sc.eps_lt; linarith)
       rwa [Real.rpow_one] at this
     have e0 : 0 ≤ L.sc.x ^ L.sc.eps := Real.rpow_nonneg hxp.le _
-    have h1 : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / (D.R.k : ℝ) ≤
-        2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' / (D.R.k : ℝ) := by gcongr
-    have h2 : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' / (D.R.k : ℝ) ≤
-        2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' :=
+    have h1
+        : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / (D.R.k : ℝ)
+          ≤ 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' / (D.R.k : ℝ) := by
+      gcongr
+    have h2
+        : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' / (D.R.k : ℝ)
+          ≤ 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' :=
       div_le_self (by positivity) hk1
-    have h3 : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b' ≤
-        2 * L.sc.x ^ 4 * 1 * L.sc.x * L.sc.x * L.sc.b' := by gcongr
+    have h3
+        : 2 * (D.R.n : ℝ) * L.sc.delta1 * L.sc.x ^ L.sc.eps * L.sc.x * L.sc.b'
+          ≤ 2 * L.sc.x ^ 4 * 1 * L.sc.x * L.sc.x * L.sc.b' := by
+      gcongr
     have h4 : 2 * L.sc.x ^ 4 * 1 * L.sc.x * L.sc.x * L.sc.b' = 2 * (L.sc.x ^ 6 * L.sc.b') := by ring
     linarith
   have hd0 : 0 ≤ L.sc.b' / L.sc.x := by positivity
@@ -145,9 +160,10 @@ theorem szRow_size_ratio : SzRow (fun C D L => (∀ j j' τ τ', 1 ≤ j → j �
   refine ⟨fun j j' τ τ' a1 a2 a3 a4 => ?_, fun τ hm0 => ?_⟩
   · have hXX : L.sc.X'' D.R.n * L.sc.w'' D.R.n = L.sc.x * L.sc.b := by
       rw [Scale.X'', div_mul_cancel₀ _ hw0.ne', Scale.a]
-    have hXX0 : 0 ≤ L.sc.X'' D.R.n := by
-      rw [Scale.X'', Scale.a]; positivity
-    calc wj D j τ ≤ 2 * L.sc.b := (hwin j τ a1 a2).2
+    have hXX0 : 0 ≤ L.sc.X'' D.R.n := by rw [Scale.X'', Scale.a]; positivity
+    calc
+      wj D j τ
+        ≤ 2 * L.sc.b := (hwin j τ a1 a2).2
       _ ≤ L.sc.x * L.sc.b := by gcongr
       _ = L.sc.X'' D.R.n * L.sc.w'' D.R.n := hXX.symm
       _ ≤ L.sc.X'' D.R.n * wj D j' τ' := by gcongr; exact (hwin j' τ' a3 a4).1
@@ -159,8 +175,7 @@ theorem szRow_size_ratio : SzRow (fun C D L => (∀ j j' τ τ', 1 ≤ j → j �
         obtain ⟨t, htT, hteq⟩ := Finset.mem_image.1 h1
         rw [htop τ ⟨t, htT⟩ hteq.symm]
         have h2 := L.bT_ge ⟨t, htT⟩
-        have h3 : (0 : ℝ) ≤ (⌊L.sc.b' / L.sc.x⌋ : ℤ) := by
-          exact_mod_cast Int.floor_nonneg.2 hd0
+        have h3 : (0 : ℝ) ≤ (⌊L.sc.b' / L.sc.x⌋ : ℤ) := by exact_mod_cast Int.floor_nonneg.2 hd0
         push_cast
         linarith
       · by_cases h2 : (D.eTau τ : D.R.GG) ∈ D.host.thickPlaces
@@ -174,8 +189,8 @@ theorem szRow_size_ratio : SzRow (fun C D L => (∀ j j' τ τ', 1 ≤ j → j �
       gcongr
       omega
     rw [(hbj τ _).1, (hbj τ _).1, ← Rat.cast_le (K := ℝ)]
-    simp only [Rat.cast_add, Rat.cast_mul, Rat.cast_intCast, Rat.cast_natCast, Rat.cast_ofNat, Nat.cast_zero,
-      zero_mul, add_zero]
+    simp only [Rat.cast_add, Rat.cast_mul, Rat.cast_intCast, Rat.cast_natCast, Rat.cast_ofNat,
+      Nat.cast_zero, zero_mul, add_zero]
     linarith
 
 end GlobalTheory.EX

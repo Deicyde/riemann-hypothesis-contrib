@@ -12,30 +12,33 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E]
 
-def Bn (X : PT E) (n : ℕ) :
-    Basis (Σ _ : Fin n, Fin (2 * Fintype.card (Idx X.dim))) ℝ (Fin n → Vsp X.dim) :=
+def Bn (X : PT E) (n : ℕ)
+    : Basis (Σ _ : Fin n, Fin (2 * Fintype.card (Idx X.dim))) ℝ (Fin n → Vsp X.dim) :=
   Pi.basis fun _ => X.b
 
-theorem Bn_repr (X : PT E) (n : ℕ) (v : Fin n → Vsp X.dim) (k : Fin n)
-    (i : Fin (2 * Fintype.card (Idx X.dim))) : (Bn X n).repr v ⟨k, i⟩ = X.b.repr (v k) i := by
+theorem Bn_repr
+    (X : PT E) (n : ℕ) (v : Fin n → Vsp X.dim) (k : Fin n) (i : Fin (2 * Fintype.card (Idx X.dim)))
+    : (Bn X n).repr v ⟨k, i⟩ = X.b.repr (v k) i := by
   exact Pi.basis_repr _ _ _
 
 instance volHaar (X : PT E) (n : ℕ) : (volume : Measure (Fin n → Vsp X.dim)).IsAddHaarMeasure :=
   Measure.pi.isAddHaarMeasure (fun _ => volume)
 
-instance cntL (X : PT E) (n : ℕ) : Countable (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup :=
+instance cntL (X : PT E) (n : ℕ)
+    : Countable (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup :=
   inferInstanceAs (Countable (Submodule.span ℤ (Set.range (Bn X n))))
 
 theorem fd_eq (X : PT E) (n : ℕ) : X.fd n = ZSpan.fundamentalDomain (Bn X n) := by
   ext v
   simp only [PT.fd, Set.mem_ofPred_eq, ZSpan.mem_fundamentalDomain, Sigma.forall, Bn_repr]
 
-theorem mem_spanBn (X : PT E) (n : ℕ) (v : Fin n → Vsp X.dim) :
-    v ∈ Submodule.span ℤ (Set.range (Bn X n)) ↔ ∀ k, v k ∈ X.L := by
+theorem mem_spanBn (X : PT E) (n : ℕ) (v : Fin n → Vsp X.dim)
+    : v ∈ Submodule.span ℤ (Set.range (Bn X n)) ↔ ∀ k, v k ∈ X.L := by
   simp only [PT.L, lat, Basis.mem_span_iff_repr_mem, Sigma.forall, Bn_repr]
 
-theorem fd_fund (X : PT E) (n : ℕ) :
-    IsAddFundamentalDomain (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup (X.fd n) volume := by
+theorem fd_fund (X : PT E) (n : ℕ)
+    : IsAddFundamentalDomain (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup (X.fd n)
+      volume := by
   rw [fd_eq]
   exact ZSpan.isAddFundamentalDomain (Bn X n) volume
 
@@ -49,17 +52,20 @@ theorem fd_ne_zero (X : PT E) (n : ℕ) : volume (X.fd n) ≠ 0 := by
 
 theorem fd_ne_top (X : PT E) (n : ℕ) : volume (X.fd n) ≠ ⊤ := (fd_bdd X n).measure_lt_top.ne
 
-theorem fd_trans (X : PT E) (n : ℕ) (a : Fin n → Vsp X.dim) :
-    IsAddFundamentalDomain (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup
+theorem fd_trans (X : PT E) (n : ℕ) (a : Fin n → Vsp X.dim)
+    : IsAddFundamentalDomain (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup
       ((fun u => u + a) ⁻¹' X.fd n) volume := by
-  refine (fd_fund X n).preimage_of_equiv (measurePreserving_add_right volume a).quasiMeasurePreserving
-    (e := id) Function.bijective_id (fun g x => ?_)
+  refine (fd_fund X n).preimage_of_equiv
+    (measurePreserving_add_right volume a).quasiMeasurePreserving (e := id) Function.bijective_id
+    (fun g x => ?_)
   show ((g : Fin n → Vsp X.dim) + x) + a = (g : Fin n → Vsp X.dim) + (x + a)
   exact add_assoc _ _ _
 
-theorem per_span (X : PT E) (n : ℕ) {F : Type} (g : (Fin n → Vsp X.dim) → F)
-    (hper : ∀ γ : Fin n → Vsp X.dim, (∀ k, γ k ∈ X.L) → ∀ v, g (v + γ) = g v) :
-    ∀ (γ : (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup) (x), g (γ +ᵥ x) = g x := by
+theorem per_span
+    (X : PT E) (n : ℕ)
+    {F : Type} (g : (Fin n → Vsp X.dim) → F)
+    (hper : ∀ γ : Fin n → Vsp X.dim, (∀ k, γ k ∈ X.L) → ∀ v, g (v + γ) = g v)
+    : ∀ (γ : (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup) (x), g (γ +ᵥ x) = g x := by
   intro γ x
   have h1 : γ +ᵥ x = x + (γ : Fin n → Vsp X.dim) := add_comm _ _
   rw [h1]
@@ -67,14 +73,18 @@ theorem per_span (X : PT E) (n : ℕ) {F : Type} (g : (Fin n → Vsp X.dim) → 
 
 theorem stepI : StepI := by
   intro E _ _ X n g hg
-  exact (hg.continuousOn.integrableOn_compact (fd_bdd X n).isCompact_closure).mono_set subset_closure
+  exact (hg.continuousOn.integrableOn_compact (fd_bdd X n).isCompact_closure).mono_set
+    subset_closure
 
 theorem stepT : StepT := by
   intro E _ _ X n F _ _ _ g hg hper a
   rw [setAverage_eq, setAverage_eq]
   congr 1
-  have h1 := (measurePreserving_add_right (volume : Measure (Fin n → Vsp X.dim)) a).setIntegral_preimage_emb
-    (measurableEmbedding_addRight a) (fun v => g (v - a)) (X.fd n)
+  have h1 :=
+    (measurePreserving_add_right (volume : Measure (Fin n → Vsp X.dim)) a).setIntegral_preimage_emb
+      (measurableEmbedding_addRight a)
+      (fun v => g (v - a))
+      (X.fd n)
   simp only [add_sub_cancel_right] at h1
   rw [← h1]
   haveI : VAddInvariantMeasure (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup
@@ -101,7 +111,8 @@ theorem stepPos : StepPos := by
     exact mul_pos (pow_pos (norm_pos_iff.mpr hv) 2) (Real.exp_pos _)
   have hUpos : 0 < volume U := hUopen.measure_pos volume hUne
   have hUfd : 0 < volume (U ∩ X.fd n) := by
-    open Pointwise in (
+    open Pointwise in
+    (
       have hinv : ∀ g : (Submodule.span ℤ (Set.range (Bn X n))).toAddSubgroup, g +ᵥ U = U := by
         intro g
         ext v
@@ -113,7 +124,8 @@ theorem stepPos : StepPos := by
         ⟨fun g s _ => measure_preimage_add volume (g : Fin n → Vsp X.dim) s⟩
       rw [pos_iff_ne_zero]
       intro h0
-      exact hUpos.ne' ((fd_fund X n).measure_zero_of_invariant U hinv h0))
+      exact hUpos.ne' ((fd_fund X n).measure_zero_of_invariant U hinv h0)
+    )
   have hint : IntegrableOn (X.ptN2 q F) (X.fd n) volume :=
     (hc.continuousOn.integrableOn_compact (fd_bdd X n).isCompact_closure).mono_set subset_closure
   have hpos : 0 < ∫ v in X.fd n, X.ptN2 q F v := by
@@ -124,8 +136,8 @@ theorem stepPos : StepPos := by
   rw [PT.l2, setAverage_eq, smul_eq_mul]
   refine mul_pos (inv_pos.mpr ?_) hpos
   first
-    | (rw [measureReal_def]; exact ENNReal.toReal_pos (fd_ne_zero X n) (fd_ne_top X n))
-    | exact ENNReal.toReal_pos (fd_ne_zero X n) (fd_ne_top X n)
+  | (rw [measureReal_def]; exact ENNReal.toReal_pos (fd_ne_zero X n) (fd_ne_top X n))
+  | exact ENNReal.toReal_pos (fd_ne_zero X n) (fd_ne_top X n)
 
 theorem stepF : StepF := by
   intro E _ _ X n f hf
@@ -162,16 +174,16 @@ theorem stepDual : StepDual := by
     have h3 := hm y' hy'
     rw [hHadd, Complex.add_im, h2, h3] at h1
     exact_mod_cast h1.symm
-  obtain ⟨x', hx'L, hx'⟩ := X.perfect (AddMonoidHom.mk' (fun y : X.L => m y)
-    (fun y y' => hadd y y.2 y' y'.2))
+  obtain ⟨x', hx'L, hx'⟩ :=
+    X.perfect (AddMonoidHom.mk' (fun y : X.L => m y) (fun y y' => hadd y y.2 y' y'.2))
   set z := x - x' with hzdef
   have hz : ∀ y ∈ X.L, (Hf z y).im = 0 := by
     intro y hy
     have h1 := hx' ⟨y, hy⟩
     simp only [AddMonoidHom.mk'_apply] at h1
     rw [hzdef, hHsub, Complex.sub_im, hm y hy, h1, sub_self]
-  let A : Vsp X.dim →+ ℝ := AddMonoidHom.mk' (fun y => (Hf z y).im)
-    (fun y y' => by simp only [hHadd, Complex.add_im])
+  let A : Vsp X.dim →+ ℝ :=
+    AddMonoidHom.mk' (fun y => (Hf z y).im) (fun y y' => by simp only [hHadd, Complex.add_im])
   have hA : ∀ y, (Hf z y).im = 0 := by
     intro y
     have h1 : (Hf z y).im = A y := rfl
@@ -180,11 +192,12 @@ theorem stepDual : StepDual := by
     refine Finset.sum_eq_zero (fun i _ => ?_)
     show (Hf z (X.b.repr y i • X.b i)).im = 0
     rw [hHsmul, hz (X.b i) (Submodule.subset_span ⟨i, rfl⟩), mul_zero]
-  have hI : (Hf z (Complex.I • z)).im = -∑ i, Complex.normSq (z i) := by
+  have hI : (Hf z (Complex.I • z)).im = - ∑ i, Complex.normSq (z i) := by
     simp only [Hf, PiLp.smul_apply, smul_eq_mul, Complex.im_sum, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl (fun i _ => ?_)
     simp only [map_mul, Complex.conj_I, Complex.mul_im, Complex.mul_re, Complex.conj_re,
-      Complex.conj_im, Complex.I_re, Complex.I_im, Complex.normSq_apply, Complex.neg_re, Complex.neg_im]
+      Complex.conj_im, Complex.I_re, Complex.I_im, Complex.normSq_apply, Complex.neg_re,
+      Complex.neg_im]
     ring
   have hsum : ∑ i, Complex.normSq (z i) = 0 := by
     have h1 := hA (Complex.I • z)
@@ -192,8 +205,9 @@ theorem stepDual : StepDual := by
     linarith
   have hz0 : z = 0 := by
     ext i
-    have h1 := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => Complex.normSq_nonneg (z j))).mp hsum i
-      (Finset.mem_univ i)
+    have h1 :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => Complex.normSq_nonneg (z j))).mp hsum i
+        (Finset.mem_univ i)
     simpa using Complex.normSq_eq_zero.mp h1
   have hxx : x = x' := sub_eq_zero.mp hz0
   rw [hxx]

@@ -12,15 +12,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec
+  GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys
 attribute [local instance] GlobalTheory.TypeRec.factG
 open GlobalTheory.PRep GlobalTheory.SmGL
 
 namespace GlobalTheory.SmGL.JacquetEmptyFirstBlock
 
-theorem jacquet_nontrivial : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V),
-    π.IsIrreducible → ∀ (h : 0 + n = n), Nontrivial (Jacquet π (unipRad k (two (stdSum h)))) := by
+theorem jacquet_nontrivial
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V),
+      π.IsIrreducible → ∀ (h : 0 + n = n), Nontrivial (Jacquet π (unipRad k (two (stdSum h)))) := by
   intro k _ _ _ _ n V _ _ π hπ h
   have key : ∀ x, GlobalTheory.SmGL.blk (two (stdSum h)) x = true := by
     intro x
@@ -46,8 +50,8 @@ theorem jacquet_nontrivial : ∀ (k : Type) [Field k] [ValuativeRel k] [Topologi
     by_contra hV
     rw [not_nontrivial_iff_subsingleton] at hV
     have : IsSimpleOrder (Subrepresentation π) := hπ
-    exact (bot_ne_top : (⊥ : Subrepresentation π) ≠ ⊤)
-      (Subrepresentation.ext (Subsingleton.elim _ _))
+    exact (bot_ne_top : (⊥ : Subrepresentation π) ≠ ⊤) (Subrepresentation.ext (Subsingleton.elim _
+      _))
   rw [hbot]
   show Nontrivial (V ⧸ twKer π ⊥ 1)
   rw [hker]

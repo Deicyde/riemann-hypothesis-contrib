@@ -10,8 +10,8 @@ open MvPolynomial
 
 variable {σ : Type} [Fintype σ]
 
-noncomputable def eQ (x : PrimeSpectrum (MvPolynomial σ ℤ)) (h : ChZero x.asIdeal) :
-    PrimeSpectrum (MvPolynomial σ ℚ) :=
+noncomputable def eQ (x : PrimeSpectrum (MvPolynomial σ ℤ)) (h : ChZero x.asIdeal)
+    : PrimeSpectrum (MvPolynomial σ ℚ) :=
   ⟨Ideal.map (MvPolynomial.map (Int.castRingHom ℚ)) x.asIdeal, map_isPrime x.asIdeal h⟩
 
 lemma eQ_lt {x y : PrimeSpectrum (MvPolynomial σ ℤ)} (hx : ChZero x.asIdeal)

@@ -21,23 +21,27 @@ theorem log_gamma_nat_le (n : ℕ) (hn : 1 ≤ n) : Real.log (Real.Gamma n) ≤ 
     rw [Nat.cast_succ, Real.Gamma_nat_eq_factorial]
   have hf : (m.factorial : ℝ) ≤ ((m + 1 : ℕ) : ℝ) ^ (m + 1) := by
     have h1 : m.factorial ≤ (m + 1) ^ (m + 1) :=
-      (Nat.factorial_le_pow m).trans ((Nat.pow_le_pow_left (Nat.le_succ m) m).trans
-        (Nat.pow_le_pow_right (Nat.succ_pos m) (Nat.le_succ m)))
+      (Nat.factorial_le_pow m).trans
+        ((Nat.pow_le_pow_left (Nat.le_succ m) m).trans
+          (Nat.pow_le_pow_right (Nat.succ_pos m) (Nat.le_succ m)))
     exact_mod_cast h1
   rw [hg, ← Real.log_pow]
   exact Real.log_le_log (by exact_mod_cast Nat.factorial_pos m) hf
 
-theorem log_cmConst_le {Φ : Type} [Fintype Φ] (dF d : ℝ) (k : ℕ) (κ : Φ → ℕ) (hdF : 0 < dF) (hd : 1 ≤ d)
-    (hk : 1 ≤ k) :
-    Real.log (Formalism.PairingDivisionLocalBalance.cmConst dF d k κ) ≤ (((k : ℝ) - 1) / 2) * Real.log dF +
-      ∑ τ, Real.log (Real.Gamma ((k : ℝ) + κ τ)) + (Formalism.PairingDivisionLocalBalance.absK κ : ℝ) * 8 := by
+theorem log_cmConst_le
+    {Φ : Type} [Fintype Φ] (dF d : ℝ) (k : ℕ) (κ : Φ → ℕ) (hdF : 0 < dF) (hd : 1 ≤ d) (hk : 1 ≤ k)
+    : Real.log (Formalism.PairingDivisionLocalBalance.cmConst dF d k κ)
+      ≤ (((k : ℝ) - 1) / 2) * Real.log dF + ∑ τ, Real.log (Real.Gamma ((k : ℝ) + κ τ))
+        + (Formalism.PairingDivisionLocalBalance.absK κ : ℝ) * 8 := by
   have hk' : (1 : ℝ) ≤ k := by exact_mod_cast hk
   have hG : ∀ τ, 0 < Real.Gamma ((k : ℝ) + κ τ) := fun τ =>
     Real.Gamma_pos_of_pos (by have : (0 : ℝ) ≤ κ τ := Nat.cast_nonneg _; linarith)
   have hsd : 1 ≤ Real.sqrt d := by rw [Real.one_le_sqrt]; exact hd
   have hq : 0 < 2 * Real.pi / Real.sqrt d := div_pos (by positivity) (by linarith)
   unfold Formalism.PairingDivisionLocalBalance.cmConst
-  rw [Real.log_mul (mul_ne_zero (Real.rpow_pos_of_pos hdF _).ne' (Finset.prod_ne_zero_iff.2 fun τ _ => (hG τ).ne'))
+  rw [Real.log_mul
+      (mul_ne_zero (Real.rpow_pos_of_pos hdF _).ne'
+        (Finset.prod_ne_zero_iff.2 fun τ _ => (hG τ).ne'))
       (pow_ne_zero _ hq.ne'),
     Real.log_mul (Real.rpow_pos_of_pos hdF _).ne' (Finset.prod_ne_zero_iff.2 fun τ _ => (hG τ).ne'),
     Real.log_rpow hdF, Real.log_prod (fun τ _ => (hG τ).ne'), Real.log_pow]
@@ -55,11 +59,16 @@ namespace GlobalTheory.SizesArch
 
 open Formalism.BasicNotions NumberField GlobalTheory.ChiGrid
 
-theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions.D7) (large₂ : Formalism.BasicNotions.SizeData₂ D), large₂.sc.eps = ε → x₁ ≤ large₂.sc.x →
-    Rec large₂ → ∀ (i j : Fin D.R.m) (s : ℕ), 1 ≤ s → s ≤ halfRank D i j →
-      Real.log (C0 D.host.E D.host.d (2 * s) (kap D 1 i j s)) +
-        (Formalism.PairingDivisionLocalBalance.wtM (2 * s) (kap D 1 i j s) : ℝ) * ((Real.log D.host.d + |large₂.logDerivativeAtOne|) / 2) ≤
-        bTH D Cx large₂.sc.x large₂.sc.b := by
+theorem sizes
+    : ∀ ε : ℝ, ∃ Cx x₁ : ℝ,
+      ∀ (D : Formalism.BasicNotions.D7) (large₂ : Formalism.BasicNotions.SizeData₂ D),
+        large₂.sc.eps = ε → x₁ ≤ large₂.sc.x → Rec large₂
+          → ∀ (i j : Fin D.R.m) (s : ℕ),
+            1 ≤ s → s ≤ halfRank D i j
+              → Real.log (C0 D.host.E D.host.d (2 * s) (kap D 1 i j s))
+                  + (Formalism.PairingDivisionLocalBalance.wtM (2 * s) (kap D 1 i j s) : ℝ)
+                    * ((Real.log D.host.d + |large₂.logDerivativeAtOne|) / 2)
+                ≤ bTH D Cx large₂.sc.x large₂.sc.b := by
   intro ε
   refine ⟨200, 0, fun D large₂ _ _ hR i j s hs1 hs2 => ?_⟩
   obtain ⟨-, -, hm4, hm, -, hmfNd, -, -, -, hrd1, hrd2, -, -, -⟩ := hR.size
@@ -87,10 +96,13 @@ theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions
   have hκ : ∀ τ, (kap D 1 i j s τ : ℝ) ≤ 5 * large₂.sc.b := by
     intro τ
     obtain ⟨e0, e1⟩ := GlobalTheory.BigTop.Fun.numE_bounds hR.size τ j.2
-    obtain ⟨c0, c1⟩ := GlobalTheory.BigTop.Fun.cen_bounds hR.size τ (i := D.R.m - i) (by omega) (by omega)
+    obtain ⟨c0, c1⟩ :=
+      GlobalTheory.BigTop.Fun.cen_bounds hR.size τ (i := D.R.m - i) (by omega) (by omega)
     have h : (kap D 1 i j s τ : ℤ) ≤ (num D 1 τ).e (j + 1) + cen D 1 τ (D.R.m - i) := by
       unfold kap; omega
-    have h' : ((kap D 1 i j s τ : ℤ) : ℝ) ≤ ((num D 1 τ).e (j + 1) : ℝ) + (cen D 1 τ (D.R.m - i) : ℝ) := by
+    have h'
+        : ((kap D 1 i j s τ : ℤ) : ℝ)
+          ≤ ((num D 1 τ).e (j + 1) : ℝ) + (cen D 1 τ (D.R.m - i) : ℝ) := by
       exact_mod_cast h
     push_cast at h'
     linarith
@@ -110,16 +122,22 @@ theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions
   have hdF : |(discr (maximalRealSubfield D.host.E) : ℝ)| = (2 * D.host.v) ^ D.R.f := by
     rw [← hR.hF]; exact GlobalTheory.CovDom.NormConst.abs_discr_F D
   have h2v : 2 * D.host.v = D.host.rdE := by show 2 * (D.host.rdE / 2) = D.host.rdE; ring
-  have hdF0 : 0 < |(discr (maximalRealSubfield D.host.E) : ℝ)| := abs_pos.2 (by exact_mod_cast discr_ne_zero _)
-  have hlogdF : Real.log |(discr (maximalRealSubfield D.host.E) : ℝ)| ≤ (D.R.f : ℝ) * large₂.sc.L := by
+  have hdF0 : 0 < |(discr (maximalRealSubfield D.host.E) : ℝ)| :=
+    abs_pos.2 (by exact_mod_cast discr_ne_zero _)
+  have hlogdF
+      : Real.log |(discr (maximalRealSubfield D.host.E) : ℝ)| ≤ (D.R.f : ℝ) * large₂.sc.L := by
     rw [hdF, Real.log_pow, h2v]
     have : Real.log D.host.rdE ≤ large₂.sc.L := by linarith
     exact mul_le_mul_of_nonneg_left this (Nat.cast_nonneg _)
 
-  have hC := log_cmConst_le |(discr (maximalRealSubfield D.host.E) : ℝ)| (D.host.d : ℝ) (2 * s) (kap D 1 i j s) hdF0 hd1
-    (by omega)
-  have hC0 : C0 D.host.E D.host.d (2 * s) (kap D 1 i j s) =
-      Formalism.PairingDivisionLocalBalance.cmConst |(discr (maximalRealSubfield D.host.E) : ℝ)| (D.host.d : ℝ) (2 * s) (kap D 1 i j s) := rfl
+  have hC :=
+    log_cmConst_le |(discr (maximalRealSubfield D.host.E) : ℝ)| (D.host.d : ℝ) (2 * s)
+      (kap D 1 i j s) hdF0 hd1 (by omega)
+  have hC0
+      : C0 D.host.E D.host.d (2 * s) (kap D 1 i j s)
+        = Formalism.PairingDivisionLocalBalance.cmConst |(discr (maximalRealSubfield D.host.E) : ℝ)|
+          (D.host.d : ℝ) (2 * s) (kap D 1 i j s) :=
+    rfl
   rw [hC0]
   set b := large₂.sc.b
   set L := large₂.sc.L
@@ -128,7 +146,9 @@ theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions
   have hk : ((2 * s : ℕ) : ℝ) ≤ 2 * b := by push_cast; linarith
   have hk1 : (1 : ℝ) ≤ ((2 * s : ℕ) : ℝ) := by exact_mod_cast (show 1 ≤ 2 * s by omega)
 
-  have T1 : (((2 * s : ℕ) : ℝ) - 1) / 2 * Real.log |(discr (maximalRealSubfield D.host.E) : ℝ)| ≤ 2 * (F * b * L) := by
+  have T1
+      : (((2 * s : ℕ) : ℝ) - 1) / 2 * Real.log |(discr (maximalRealSubfield D.host.E) : ℝ)|
+        ≤ 2 * (F * b * L) := by
     have a1 : 0 ≤ (((2 * s : ℕ) : ℝ) - 1) / 2 := by linarith
     have a2 := mul_le_mul_of_nonneg_left hlogdF a1
     have a3 : (((2 * s : ℕ) : ℝ) - 1) / 2 ≤ b := by linarith
@@ -136,10 +156,13 @@ theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions
     have a5 := mul_le_mul_of_nonneg_right a3 a4
     nlinarith
 
-  have T2 : ∑ τ, Real.log (Real.Gamma (((2 * s : ℕ) : ℝ) + kap D 1 i j s τ)) ≤ 49 * (F * b * L) := by
-    have each : ∀ τ, Real.log (Real.Gamma (((2 * s : ℕ) : ℝ) + kap D 1 i j s τ)) ≤ 49 * (b * L) := by
+  have T2
+      : ∑ τ, Real.log (Real.Gamma (((2 * s : ℕ) : ℝ) + kap D 1 i j s τ)) ≤ 49 * (F * b * L) := by
+    have each
+        : ∀ τ, Real.log (Real.Gamma (((2 * s : ℕ) : ℝ) + kap D 1 i j s τ)) ≤ 49 * (b * L) := by
       intro τ
-      have e : ((2 * s : ℕ) : ℝ) + kap D 1 i j s τ = ((2 * s + kap D 1 i j s τ : ℕ) : ℝ) := by push_cast; ring
+      have e : ((2 * s : ℕ) : ℝ) + kap D 1 i j s τ = ((2 * s + kap D 1 i j s τ : ℕ) : ℝ) := by
+        push_cast; ring
       rw [e]
       have hn1 : 1 ≤ 2 * s + kap D 1 i j s τ := by omega
       refine (log_gamma_nat_le _ hn1).trans ?_
@@ -163,19 +186,26 @@ theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions
     refine (Finset.sum_le_sum fun τ _ => hκ τ).trans ?_
     rw [Finset.sum_const, Finset.card_univ, hcard, nsmul_eq_mul]
     linarith
-  have hsumκ0 : (0 : ℝ) ≤ Formalism.PairingDivisionLocalBalance.absK (kap D 1 i j s) := Nat.cast_nonneg _
-  have T3 : (Formalism.PairingDivisionLocalBalance.absK (kap D 1 i j s) : ℝ) * 8 ≤ 40 * (F * b * L) := by
+  have hsumκ0 : (0 : ℝ) ≤ Formalism.PairingDivisionLocalBalance.absK (kap D 1 i j s) :=
+    Nat.cast_nonneg _
+  have T3
+      : (Formalism.PairingDivisionLocalBalance.absK (kap D 1 i j s) : ℝ) * 8
+        ≤ 40 * (F * b * L) := by
     have : F * b ≤ F * b * L := le_mul_of_one_le_right (by positivity) hL1
     linarith
 
-  have hM : (Formalism.PairingDivisionLocalBalance.wtM (2 * s) (kap D 1 i j s) : ℝ) ≤ 12 * (F * b) := by
+  have hM
+      : (Formalism.PairingDivisionLocalBalance.wtM (2 * s) (kap D 1 i j s) : ℝ) ≤ 12 * (F * b) := by
     unfold Formalism.PairingDivisionLocalBalance.wtM
     push_cast
     rw [hcard]
     have : (2 * (s : ℝ)) * F ≤ 2 * b * F := mul_le_mul_of_nonneg_right (by linarith) (by positivity)
     push_cast at hsumκ
     linarith
-  have T4 : (Formalism.PairingDivisionLocalBalance.wtM (2 * s) (kap D 1 i j s) : ℝ) * ((Real.log D.host.d + |large₂.logDerivativeAtOne|) / 2) ≤ 12 * (F * b * L) := by
+  have T4
+      : (Formalism.PairingDivisionLocalBalance.wtM (2 * s) (kap D 1 i j s) : ℝ)
+          * ((Real.log D.host.d + |large₂.logDerivativeAtOne|) / 2)
+        ≤ 12 * (F * b * L) := by
     have a1 : (Real.log D.host.d + |large₂.logDerivativeAtOne|) / 2 ≤ L := by linarith
     have a2 : 0 ≤ (Real.log D.host.d + |large₂.logDerivativeAtOne|) / 2 := by positivity
     have := mul_le_mul hM a1 a2 (by positivity)
@@ -183,7 +213,9 @@ theorem sizes : ∀ ε : ℝ, ∃ Cx x₁ : ℝ, ∀ (D : Formalism.BasicNotions
   have hfin : 0 ≤ F * b * Real.log large₂.sc.x := by positivity
   unfold bTH
   rw [hbL]
-  have e : 200 * (D.R.f : ℝ) * b * (L + Real.log large₂.sc.x) = 200 * (F * b * L) + 200 * (F * b * Real.log large₂.sc.x) := by
+  have e
+      : 200 * (D.R.f : ℝ) * b * (L + Real.log large₂.sc.x)
+        = 200 * (F * b * L) + 200 * (F * b * Real.log large₂.sc.x) := by
     rw [hF]; ring
   rw [e]
   have hP : 0 ≤ F * b * L := by positivity

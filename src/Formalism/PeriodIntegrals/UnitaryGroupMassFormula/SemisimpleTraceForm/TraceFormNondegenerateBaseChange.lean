@@ -26,8 +26,7 @@ theorem traceFormNondegenerate_baseChange : AscendStep := by
     have h1 := congrArg Subtype.val (b.sum_repr (⟨x, hx⟩ : P))
     simp only [Submodule.coe_sum, Submodule.coe_smul] at h1
     exact h1
-  have hli : LinearIndependent K β :=
-    b.linearIndependent.map' P.subtype (Submodule.ker_subtype P)
+  have hli : LinearIndependent K β := b.linearIndependent.map' P.subtype (Submodule.ker_subtype P)
   let G : Matrix (Fin m) (Fin m) K := Matrix.of fun i j => Matrix.trace (β i * β j)
   have hG : G.det ≠ 0 := by
     intro h0
@@ -54,13 +53,13 @@ theorem traceFormNondegenerate_baseChange : AscendStep := by
     induction hy using Algebra.adjoin_induction with
     | mem x hx => exact Algebra.subset_adjoin ⟨x, hx, rfl⟩
     | algebraMap r =>
-        have : f (algebraMap K _ r) = algebraMap L (Matrix (Fin a) (Fin a) L) (algebraMap K L r) := by
-          ext i j
-          rw [hf, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.algebraMap_matrix_apply,
-            Matrix.algebraMap_matrix_apply]
-          split_ifs <;> simp
-        rw [this]
-        exact Subalgebra.algebraMap_mem _ _
+      have : f (algebraMap K _ r) = algebraMap L (Matrix (Fin a) (Fin a) L) (algebraMap K L r) := by
+        ext i j
+        rw [hf, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.algebraMap_matrix_apply,
+          Matrix.algebraMap_matrix_apply]
+        split_ifs <;> simp
+      rw [this]
+      exact Subalgebra.algebraMap_mem _ _
     | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
     | mul x y _ _ hx hy => rw [map_mul]; exact mul_mem hx hy
   have hfsmul : ∀ (c : K) (M : Matrix (Fin a) (Fin a) K), f (c • M) = algebraMap K L c • f M := by
@@ -68,17 +67,19 @@ theorem traceFormNondegenerate_baseChange : AscendStep := by
     ext i j
     simp [hf]
 
-  have hBspan : ∀ x ∈ Algebra.adjoin L (f '' S),
-      x ∈ Submodule.span L (Set.range fun i => f (β i)) := by
+  have hBspan
+      : ∀ x ∈ Algebra.adjoin L (f '' S), x ∈ Submodule.span L (Set.range fun i => f (β i)) := by
     intro x hx
     have hx' : x ∈ Subalgebra.toSubmodule (Algebra.adjoin L (f '' S)) := hx
     rw [Algebra.adjoin_eq_span] at hx'
     refine (Submodule.span_le.mpr ?_) hx'
-    have hcl : (Submonoid.closure (f '' S) : Set (Matrix (Fin a) (Fin a) L)) ⊆
-        (Submonoid.map (f : Matrix (Fin a) (Fin a) K →* Matrix (Fin a) (Fin a) L)
-          (Algebra.adjoin K S).toSubmonoid : Set _) := by
-      have : Submonoid.closure (f '' S) ≤
-          Submonoid.map (f : Matrix (Fin a) (Fin a) K →* Matrix (Fin a) (Fin a) L)
+    have hcl
+        : (Submonoid.closure (f '' S) : Set (Matrix (Fin a) (Fin a) L))
+          ⊆ (Submonoid.map (f : Matrix (Fin a) (Fin a) K →* Matrix (Fin a) (Fin a) L)
+              (Algebra.adjoin K S).toSubmonoid
+            : Set _) := by
+      have : Submonoid.closure (f '' S)
+          ≤ Submonoid.map (f : Matrix (Fin a) (Fin a) K →* Matrix (Fin a) (Fin a) L)
             (Algebra.adjoin K S).toSubmonoid := by
         rw [Submonoid.closure_le]
         rintro _ ⟨s, hs, rfl⟩

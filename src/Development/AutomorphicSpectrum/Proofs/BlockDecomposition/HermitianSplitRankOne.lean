@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NonemptyA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR GlobalTheory.CompanionTheory.KFin
+open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+  GlobalTheory.CompanionTheory.KFin
 open Formalism.UG (cT)
 open scoped TensorProduct NNReal
 
@@ -31,15 +33,20 @@ theorem swapHerm_sub_right (hH : IsHerm c h) (x y z : V) : h x (y - z) = h x y -
   rw [sub_add_cancel] at this
   exact eq_sub_of_add_eq this.symm
 
-theorem swapHerm_part {e e' : R} (hce : c e = e') (hH : IsHerm c h) {a : V} (ha : e • a = a) (z : V) :
-    h a z = e' * h a z := by
-  calc h a z = h (e • a) z := by rw [ha]
+theorem swapHerm_part {e e' : R} (hce : c e = e') (hH : IsHerm c h) {a : V} (ha : e • a = a) (z : V)
+    : h a z = e' * h a z := by
+  calc
+    h a z
+      = h (e • a) z := by rw [ha]
     _ = e' * h a z := by rw [swapHerm_smul_left hH, hce]
 
-theorem swapHerm_self {e e' : R} (hee : e * e' = 0) (hce : c e = e') (hH : IsHerm c h) {a : V}
-    (ha : e • a = a) : h a a = 0 := by
+theorem swapHerm_self
+    {e e' : R} (hee : e * e' = 0) (hce : c e = e') (hH : IsHerm c h) {a : V} (ha : e • a = a)
+    : h a a = 0 := by
   have h1 : h a a = e * h a a := by
-    calc h a a = h a (e • a) := by rw [ha]
+    calc
+      h a a
+        = h a (e • a) := by rw [ha]
       _ = e * h a a := hH.smul_right e a a
   have h2 := swapHerm_part hce hH ha a
   rw [h1, h2, ← mul_assoc, hee, zero_mul]
@@ -49,10 +56,12 @@ theorem swapHerm_exists_ne (hP : IsPerfect h) {a : V} (ha : a ≠ 0) : ∃ y, h 
   push_neg at hne
   exact ha (hP.nondeg a hne)
 
-theorem swapHerm_pair_ne {e e' : R} (hee : e * e' = 0) (hce : c e = e') (hce' : c e' = e)
-    (hu : ∀ u, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u) (hH : IsHerm c h) (hP : IsPerfect h)
-    (hno : ∀ x y, h x x = 0 → h x y ≠ 1) {a b : V} (ha : e • a = a) (hb : e' • b = b)
-    (ha0 : a ≠ 0) (hb0 : b ≠ 0) : h a b ≠ 0 := by
+theorem swapHerm_pair_ne
+    {e e' : R} (hee : e * e' = 0) (hce : c e = e') (hce' : c e' = e)
+    (hu : ∀ u, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u)
+    (hH : IsHerm c h) (hP : IsPerfect h) (hno : ∀ x y, h x x = 0 → h x y ≠ 1)
+    {a b : V} (ha : e • a = a) (hb : e' • b = b) (ha0 : a ≠ 0) (hb0 : b ≠ 0)
+    : h a b ≠ 0 := by
   intro hab
   have hee' : e' * e = 0 := by rw [mul_comm]; exact hee
   have haa : h a a = 0 := swapHerm_self hee hce hH ha
@@ -75,35 +84,45 @@ theorem swapHerm_pair_ne {e e' : R} (hee : e * e' = 0) (hce : c e = e') (hce' : 
   have hpb : h b y = e * h b y := swapHerm_part hce' hH hb y
   have hunit : IsUnit (h (a + b) y) := by
     apply hu
-    · rw [swapHerm_add_left hH, mul_add, hpa, ← mul_assoc, hee, zero_mul, zero_add, ← hpb]; exact hyb
-    · rw [swapHerm_add_left hH, mul_add, hpb, ← mul_assoc, hee', zero_mul, add_zero, ← hpa]; exact hya
+    · rw [swapHerm_add_left hH, mul_add, hpa, ← mul_assoc, hee, zero_mul, zero_add, ← hpb]
+      exact hyb
+    · rw [swapHerm_add_left hH, mul_add, hpb, ← mul_assoc, hee', zero_mul, add_zero, ← hpa]
+      exact hya
   obtain ⟨U, hU⟩ := hunit
   apply hno (a + b) ((↑U⁻¹ : R) • y) hxx
   rw [hH.smul_right, ← hU, Units.inv_mul]
 
-theorem swapHerm_partner {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e = e')
-    (hH : IsHerm c h) (hP : IsPerfect h) {a : V} (ha : e • a = a) (ha0 : a ≠ 0) :
-    ∃ b : V, e' • b = b ∧ b ≠ 0 := by
+theorem swapHerm_partner
+    {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e = e')
+    (hH : IsHerm c h) (hP : IsPerfect h)
+    {a : V} (ha : e • a = a) (ha0 : a ≠ 0)
+    : ∃ b : V, e' • b = b ∧ b ≠ 0 := by
   obtain ⟨y, hy⟩ := swapHerm_exists_ne hP ha0
   have hidem : e' * e' = e' := by
     have h0 : e' * e = 0 := by rw [mul_comm]; exact hee
-    calc e' * e' = e' * (e + e') - e' * e := by ring
+    calc
+      e' * e'
+        = e' * (e + e') - e' * e := by ring
       _ = e' := by rw [he, h0, mul_one, sub_zero]
   refine ⟨e' • y, by rw [← mul_smul, hidem], fun h0 => hy ?_⟩
   have h1 : h a (e' • y) = h a y := by rw [hH.smul_right, ← swapHerm_part hce hH ha y]
   rw [← h1, h0, swapHerm_zero_right hH]
 
-theorem swapHerm_coord {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e = e') (hce' : c e' = e)
-    (hu : ∀ u, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u) (hH : IsHerm c h) (hP : IsPerfect h)
-    (hno : ∀ x y, h x x = 0 → h x y ≠ 1) {a b : V} (ha : e • a = a) (hb : e' • b = b)
-    (ha0 : a ≠ 0) (hb0 : b ≠ 0) {z : V} (hz : e' • z = z) : ∃ ρ : R, z = ρ • b := by
+theorem swapHerm_coord
+    {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e = e') (hce' : c e' = e)
+    (hu : ∀ u, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u)
+    (hH : IsHerm c h) (hP : IsPerfect h) (hno : ∀ x y, h x x = 0 → h x y ≠ 1)
+    {a b : V} (ha : e • a = a) (hb : e' • b = b) (ha0 : a ≠ 0) (hb0 : b ≠ 0)
+    {z : V} (hz : e' • z = z)
+    : ∃ ρ : R, z = ρ • b := by
   have hβ := swapHerm_pair_ne hee hce hce' hu hH hP hno ha hb ha0 hb0
   have hee' : e' * e = 0 := by rw [mul_comm]; exact hee
   have hidem : e * e = e := by
-    calc e * e = e * (e + e') - e * e' := by ring
+    calc
+      e * e
+        = e * (e + e') - e * e' := by ring
       _ = e := by rw [he, hee, mul_one, sub_zero]
-  have he0 : e ≠ 0 := by
-    intro h0; apply ha0; rw [← ha, h0, zero_smul]
+  have he0 : e ≠ 0 := by intro h0; apply ha0; rw [← ha, h0, zero_smul]
   have hpβ : h a b = e' * h a b := swapHerm_part hce hH ha b
   have hpγ : h a z = e' * h a z := swapHerm_part hce hH ha z
   have hunit : IsUnit (e + h a b) := by
@@ -122,26 +141,34 @@ theorem swapHerm_coord {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c 
     show h a z * ↑U⁻¹ * (e' * ↑U) = h a z * e' * (↑U⁻¹ * ↑U) by ring, Units.inv_mul, mul_one,
     mul_comm, ← hpγ, sub_self]
 
-theorem swapHerm_gen {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e = e') (hce' : c e' = e)
-    (hu : ∀ u, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u) (hH : IsHerm c h) (hP : IsPerfect h)
-    (hno : ∀ x y, h x x = 0 → h x y ≠ 1) {a b : V} (ha : e • a = a) (hb : e' • b = b)
-    (ha0 : a ≠ 0) (hb0 : b ≠ 0) :
-    (∀ x, ∃ r : R, x = r • (a + b)) ∧ IsUnit (h (a + b) (a + b)) := by
+theorem swapHerm_gen
+    {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e = e') (hce' : c e' = e)
+    (hu : ∀ u, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u)
+    (hH : IsHerm c h) (hP : IsPerfect h) (hno : ∀ x y, h x x = 0 → h x y ≠ 1)
+    {a b : V} (ha : e • a = a) (hb : e' • b = b) (ha0 : a ≠ 0) (hb0 : b ≠ 0)
+    : (∀ x, ∃ r : R, x = r • (a + b)) ∧ IsUnit (h (a + b) (a + b)) := by
   have hee' : e' * e = 0 := by rw [mul_comm]; exact hee
   have he' : e' + e = 1 := by rw [add_comm]; exact he
   have hidem : e * e = e := by
-    calc e * e = e * (e + e') - e * e' := by ring
+    calc
+      e * e
+        = e * (e + e') - e * e' := by ring
       _ = e := by rw [he, hee, mul_one, sub_zero]
   have hidem' : e' * e' = e' := by
-    calc e' * e' = e' * (e + e') - e' * e := by ring
+    calc
+      e' * e'
+        = e' * (e + e') - e' * e := by ring
       _ = e' := by rw [he, hee', mul_one, sub_zero]
   have he'a : e' • a = 0 := by rw [← ha, ← mul_smul, hee', zero_smul]
   have heb : e • b = 0 := by rw [← hb, ← mul_smul, hee, zero_smul]
   refine ⟨fun x => ?_, ?_⟩
-  · obtain ⟨ρ', hρ'⟩ := swapHerm_coord he hee hce hce' hu hH hP hno ha hb ha0 hb0 (z := e' • x)
-      (by rw [← mul_smul, hidem'])
-    obtain ⟨ρ, hρ⟩ := swapHerm_coord he' hee' hce' hce (fun u h1 h2 => hu u h2 h1) hH hP hno hb ha hb0 ha0
-      (z := e • x) (by rw [← mul_smul, hidem])
+  · obtain ⟨ρ', hρ'⟩ :=
+      swapHerm_coord he hee hce hce' hu hH hP hno ha hb ha0 hb0 (z := e' • x)
+        (by rw [← mul_smul, hidem'])
+    obtain ⟨ρ, hρ⟩ :=
+      swapHerm_coord he' hee' hce' hce
+        (fun u h1 h2 => hu u h2 h1)
+        hH hP hno hb ha hb0 ha0 (z := e • x) (by rw [← mul_smul, hidem])
     refine ⟨ρ * e + ρ' * e', ?_⟩
     rw [smul_add, add_smul, add_smul, mul_smul, mul_smul, mul_smul, mul_smul, ha, hb, he'a, heb,
       smul_zero, smul_zero, add_zero, zero_add, ← hρ, ← hρ', ← add_smul, he, one_smul]
@@ -150,8 +177,7 @@ theorem swapHerm_gen {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e 
     have hbb : h b b = 0 := swapHerm_self hee' hce' hH hb
     have hpβ : h a b = e' * h a b := swapHerm_part hce hH ha b
     have hpβ' : h b a = e * h b a := swapHerm_part hce' hH hb a
-    have hβ' : h b a ≠ 0 := by
-      intro h0; apply hβ; rw [hH.symm b a, h0, map_zero]
+    have hβ' : h b a ≠ 0 := by intro h0; apply hβ; rw [hH.symm b a, h0, map_zero]
     rw [swapHerm_add_left hH, hH.add_right, hH.add_right, haa, hbb, zero_add, add_zero]
     apply hu
     · rw [mul_add, hpβ, ← mul_assoc, hee, zero_mul, zero_add, ← hpβ']; exact hβ'
@@ -159,10 +185,11 @@ theorem swapHerm_gen {e e' : R} (he : e + e' = 1) (hee : e * e' = 0) (hce : c e 
 
 end SwapHerm
 
-theorem hermitian_split_rank_one_struct {k R V : Type} [Field k] [CommRing R] [AddCommGroup V] [Module R V]
-    (φ : R ≃+* k × k) (c : R →+* R) (hc : ∀ r, φ (c r) = (φ r).swap) (h : V → V → R)
-    (hH : IsHerm c h) (hP : IsPerfect h) (hno : ∀ x y, h x x = 0 → h x y ≠ 1) :
-    Subsingleton V ∨ ∃ w₀ : V, (∀ x, ∃ r : R, x = r • w₀) ∧ IsUnit (h w₀ w₀) := by
+theorem hermitian_split_rank_one_struct
+    {k R V : Type} [Field k] [CommRing R] [AddCommGroup V] [Module R V]
+    (φ : R ≃+* k × k) (c : R →+* R) (hc : ∀ r, φ (c r) = (φ r).swap)
+    (h : V → V → R) (hH : IsHerm c h) (hP : IsPerfect h) (hno : ∀ x y, h x x = 0 → h x y ≠ 1)
+    : Subsingleton V ∨ ∃ w₀ : V, (∀ x, ∃ r : R, x = r • w₀) ∧ IsUnit (h w₀ w₀) := by
   obtain ⟨e, he_def⟩ : ∃ e : R, e = φ.symm (1, 0) := ⟨_, rfl⟩
   obtain ⟨e', he'_def⟩ : ∃ e' : R, e' = φ.symm (0, 1) := ⟨_, rfl⟩
   have hφe : φ e = (1, 0) := by rw [he_def]; simp
@@ -174,20 +201,30 @@ theorem hermitian_split_rank_one_struct {k R V : Type} [Field k] [CommRing R] [A
   have hu : ∀ u : R, e * u ≠ 0 → e' * u ≠ 0 → IsUnit u := by
     intro u h1 h2
     have h1' : (φ u).1 ≠ 0 := by
-      intro h0; apply h1; apply φ.injective
-      rw [map_mul, hφe, map_zero]; ext <;> simp [h0]
+      intro h0
+      apply h1
+      apply φ.injective
+      rw [map_mul, hφe, map_zero]
+      ext <;> simp [h0]
     have h2' : (φ u).2 ≠ 0 := by
-      intro h0; apply h2; apply φ.injective
-      rw [map_mul, hφe', map_zero]; ext <;> simp [h0]
+      intro h0
+      apply h2
+      apply φ.injective
+      rw [map_mul, hφe', map_zero]
+      ext <;> simp [h0]
     rw [← isUnit_map_iff φ, Prod.isUnit_iff]
     exact ⟨isUnit_iff_ne_zero.mpr h1', isUnit_iff_ne_zero.mpr h2'⟩
   have hee' : e' * e = 0 := by rw [mul_comm]; exact hee
   have he' : e' + e = 1 := by rw [add_comm]; exact he
   have hidem : e * e = e := by
-    calc e * e = e * (e + e') - e * e' := by ring
+    calc
+      e * e
+        = e * (e + e') - e * e' := by ring
       _ = e := by rw [he, hee, mul_one, sub_zero]
   have hidem' : e' * e' = e' := by
-    calc e' * e' = e' * (e + e') - e' * e := by ring
+    calc
+      e' * e'
+        = e' * (e + e') - e' * e := by ring
       _ = e' := by rw [he, hee', mul_one, sub_zero]
   rcases subsingleton_or_nontrivial V with hs | hs
   · exact Or.inl hs
@@ -203,10 +240,13 @@ theorem hermitian_split_rank_one_struct {k R V : Type} [Field k] [CommRing R] [A
     obtain ⟨b, hb, hb0⟩ := swapHerm_partner he hee hce hH hP ha hev
     exact ⟨_, swapHerm_gen he hee hce hce' hu hH hP hno ha hb hev hb0⟩
 
-theorem hermSwap_struct : ∀ {k R V : Type} [Field k] [CommRing R] [AddCommGroup V] [Module R V]
-    (φ : R ≃+* k × k) (c : R →+* R), (∀ r, φ (c r) = (φ r).swap) → ∀ h : V → V → R, IsHerm c h →
-    IsPerfect h → (∀ x y, h x x = 0 → h x y ≠ 1) →
-    Subsingleton V ∨ ∃ w₀ : V, (∀ x, ∃ r : R, x = r • w₀) ∧ IsUnit (h w₀ w₀) := by
+theorem hermSwap_struct
+    : ∀ {k R V : Type} [Field k] [CommRing R] [AddCommGroup V] [Module R V] (φ : R ≃+* k × k)
+        (c : R →+* R),
+      (∀ r, φ (c r) = (φ r).swap)
+        → ∀ h : V → V → R,
+          IsHerm c h → IsPerfect h → (∀ x y, h x x = 0 → h x y ≠ 1)
+            → Subsingleton V ∨ ∃ w₀ : V, (∀ x, ∃ r : R, x = r • w₀) ∧ IsUnit (h w₀ w₀) := by
   intro k R V _ _ _ _ φ c hc h hH hP hno
   exact hermitian_split_rank_one_struct φ c hc h hH hP hno
 

@@ -17,31 +17,42 @@ def gcone {n : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℚ) : Se
 def hcone {n : ℕ} {ι : Type*} (A : Finset ι) (f : ι → Fin n → ℚ) : Set (Fin n → ℚ) :=
   {x | ∀ a ∈ A, 0 ≤ f a ⬝ᵥ x}
 
-theorem gcone_sub {n : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℚ) (X : Set (Fin n → ℚ))
+theorem gcone_sub
+    {n : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℚ) (X : Set (Fin n → ℚ))
     (h0 : (0 : Fin n → ℚ) ∈ X) (hadd : ∀ x ∈ X, ∀ y ∈ X, x + y ∈ X)
-    (hsmul : ∀ r : ℚ, 0 ≤ r → ∀ x ∈ X, r • x ∈ X) (hf : ∀ i ∈ s, f i ∈ X) :
-    gcone s f ⊆ X := by
+    (hsmul : ∀ r : ℚ, 0 ≤ r → ∀ x ∈ X, r • x ∈ X) (hf : ∀ i ∈ s, f i ∈ X)
+    : gcone s f ⊆ X := by
   rintro x ⟨c, hc, rfl⟩
-  exact Finset.sum_induction _ (· ∈ X) (fun a b ha hb => hadd a ha b hb) h0
+  exact Finset.sum_induction _ (· ∈ X)
+    (fun a b ha hb => hadd a ha b hb)
+    h0
     (fun i hi => hsmul _ (hc i hi) _ (hf i hi))
 
-theorem zero_mem_gcone {n : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℚ) :
-    (0 : Fin n → ℚ) ∈ gcone s f :=
+theorem zero_mem_gcone {n : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℚ)
+    : (0 : Fin n → ℚ) ∈ gcone s f :=
   ⟨0, fun _ _ => le_rfl, by simp⟩
 
-theorem mem_gcone {n : ℕ} {ι : Type*} {s : Finset ι} {f : ι → Fin n → ℚ} {i : ι} (hi : i ∈ s) :
-    f i ∈ gcone s f := by
+theorem mem_gcone {n : ℕ} {ι : Type*} {s : Finset ι} {f : ι → Fin n → ℚ} {i : ι} (hi : i ∈ s)
+    : f i ∈ gcone s f := by
   classical
   refine ⟨fun j => if j = i then 1 else 0, fun j _ => ?_, ?_⟩
   · by_cases h : j = i <;> simp [h]
   · simp [ite_smul, hi]
 
-theorem mem_gcone_insert {n : ℕ} {ι : Type*} [DecidableEq ι] {s : Finset ι} {f : ι → Fin n → ℚ}
-    {w : ι} (hw : w ∉ s) (x : Fin n → ℚ) :
-    x ∈ gcone (insert w s) f ↔ ∃ t : ℚ, 0 ≤ t ∧ x - t • f w ∈ gcone s f := by
+theorem mem_gcone_insert
+    {n : ℕ} {ι : Type*} [DecidableEq ι]
+    {s : Finset ι} {f : ι → Fin n → ℚ} {w : ι} (hw : w ∉ s)
+    (x : Fin n → ℚ)
+    : x ∈ gcone (insert w s) f ↔ ∃ t : ℚ, 0 ≤ t ∧ x - t • f w ∈ gcone s f := by
   constructor
   · rintro ⟨c, hc, rfl⟩
-    refine ⟨c w, hc w (Finset.mem_insert_self w s), c, fun i hi => hc i (Finset.mem_insert_of_mem hi), ?_⟩
+    refine ⟨
+      c w,
+      hc w (Finset.mem_insert_self w s),
+      c,
+      fun i hi => hc i (Finset.mem_insert_of_mem hi),
+      ?_
+    ⟩
     rw [Finset.sum_insert hw]
     abel
   · rintro ⟨t, ht, c, hc, hx⟩
@@ -61,10 +72,10 @@ theorem mem_gcone_insert {n : ℕ} {ι : Type*} [DecidableEq ι] {s : Finset ι}
       rw [hs, ← hx]
       abel
 
-theorem fm_scalar {κ : Type*} (P : Finset κ) (u c : κ → ℚ) :
-    (∃ t : ℚ, ∀ p ∈ P, 0 ≤ u p + c p * t) ↔
-      (∀ p ∈ P, c p = 0 → 0 ≤ u p) ∧
-      (∀ p ∈ P, ∀ q ∈ P, 0 < c p → c q < 0 → 0 ≤ c p * u q - c q * u p) := by
+theorem fm_scalar {κ : Type*} (P : Finset κ) (u c : κ → ℚ)
+    : (∃ t : ℚ, ∀ p ∈ P, 0 ≤ u p + c p * t)
+      ↔ (∀ p ∈ P, c p = 0 → 0 ≤ u p)
+        ∧ (∀ p ∈ P, ∀ q ∈ P, 0 < c p → c q < 0 → 0 ≤ c p * u q - c q * u p) := by
   classical
   constructor
   · rintro ⟨t, ht⟩
@@ -73,21 +84,25 @@ theorem fm_scalar {κ : Type*} (P : Finset κ) (u c : κ → ℚ) :
     have h2 := ht q hq
     nlinarith [mul_nonneg (neg_nonneg.2 hcq.le) h1, mul_nonneg hcp.le h2]
   · rintro ⟨h0, h1⟩
-    obtain ⟨b, eb⟩ : ∃ b : κ → ℚ, ∀ p, c p ≠ 0 → c p * b p = -u p :=
-      ⟨fun p => -u p * (c p)⁻¹, fun p hp => by
+    obtain ⟨b, eb⟩ : ∃ b : κ → ℚ, ∀ p, c p ≠ 0 → c p * b p = - u p := ⟨
+      fun p => - u p * (c p)⁻¹,
+      fun p hp => by
         show c p * (-u p * (c p)⁻¹) = -u p
-        rw [mul_left_comm, mul_inv_cancel₀ hp, mul_one]⟩
+        rw [mul_left_comm, mul_inv_cancel₀ hp, mul_one]
+    ⟩
     have key : ∀ p ∈ P, ∀ q ∈ P, 0 < c p → c q < 0 → b p ≤ b q := by
       intro p hp q hq hcp hcq
       by_contra hlt
       push_neg at hlt
-      have e1 : c p * b p * c q = -u p * c q := by rw [eb p hcp.ne']
-      have e2 : c q * b q * c p = -u q * c p := by rw [eb q hcq.ne]
+      have e1 : c p * b p * c q = - u p * c q := by rw [eb p hcp.ne']
+      have e2 : c q * b q * c p = - u q * c p := by rw [eb q hcq.ne]
       have hm := mul_pos (mul_pos hcp (neg_pos.2 hcq)) (sub_pos.2 hlt)
       have h3 := h1 p hp q hq hcp hcq
       nlinarith
-    have good : ∀ t : ℚ, (∀ p ∈ P, 0 < c p → b p ≤ t) → (∀ q ∈ P, c q < 0 → t ≤ b q) →
-        ∀ p ∈ P, 0 ≤ u p + c p * t := by
+    have good
+        : ∀ t : ℚ,
+          (∀ p ∈ P, 0 < c p → b p ≤ t) → (∀ q ∈ P, c q < 0 → t ≤ b q)
+            → ∀ p ∈ P, 0 ≤ u p + c p * t := by
       intro t hlo hhi p hp
       rcases lt_trichotomy (c p) 0 with hn | hz | hpos
       · have h4 := mul_le_mul_of_nonpos_left (hhi p hp hn) hn.le
@@ -116,24 +131,28 @@ theorem fm_scalar {κ : Type*} (P : Finset κ) (u c : κ → ℚ) :
           exact ⟨q0, hq0.1, hq0.2, fun q hq hc => hm q (Finset.mem_filter.2 ⟨hq, hc⟩)⟩
         exact ⟨b q0, good _ (fun p hp hcp => absurd hcp (not_lt.2 (hL p hp))) hmin⟩
       · push_neg at hU
-        exact ⟨0, good 0 (fun p hp hcp => absurd hcp (not_lt.2 (hL p hp)))
-          (fun q hq hcq => absurd hcq (not_lt.2 (hU q hq)))⟩
+        exact ⟨
+          0,
+          good 0
+            (fun p hp hcp => absurd hcp (not_lt.2 (hL p hp)))
+            (fun q hq hcq => absurd hcq (not_lt.2 (hU q hq)))
+        ⟩
 
 def fmSet {n : ℕ} (P : Finset ((Fin n → ℚ) × ℚ)) : Finset (Fin n → ℚ) :=
-  (P.filter (fun p => p.2 = 0)).image Prod.fst ∪
-    ((P.filter (fun p => 0 < p.2)) ×ˢ (P.filter (fun p => p.2 < 0))).image
+  (P.filter (fun p => p.2 = 0)).image Prod.fst
+    ∪ ((P.filter (fun p => 0 < p.2)) ×ˢ (P.filter (fun p => p.2 < 0))).image
       (fun pq => pq.1.2 • pq.2.1 - pq.2.2 • pq.1.1)
 
-theorem fm_dot {n : ℕ} (a b : ℚ) (u v x : Fin n → ℚ) :
-    (a • u - b • v) ⬝ᵥ x = a * (u ⬝ᵥ x) - b * (v ⬝ᵥ x) := by
+theorem fm_dot {n : ℕ} (a b : ℚ) (u v x : Fin n → ℚ)
+    : (a • u - b • v) ⬝ᵥ x = a * (u ⬝ᵥ x) - b * (v ⬝ᵥ x) := by
   show ∑ i, (a • u - b • v) i * x i = a * ∑ i, u i * x i - b * ∑ i, v i * x i
   rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl fun i _ => by
     simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
     ring
 
-theorem fm_vec {n : ℕ} (P : Finset ((Fin n → ℚ) × ℚ)) (x : Fin n → ℚ) :
-    (∃ t : ℚ, ∀ p ∈ P, 0 ≤ p.1 ⬝ᵥ x + p.2 * t) ↔ x ∈ hcone (fmSet P) id := by
+theorem fm_vec {n : ℕ} (P : Finset ((Fin n → ℚ) × ℚ)) (x : Fin n → ℚ)
+    : (∃ t : ℚ, ∀ p ∈ P, 0 ≤ p.1 ⬝ᵥ x + p.2 * t) ↔ x ∈ hcone (fmSet P) id := by
   refine (fm_scalar P (fun p => p.1 ⬝ᵥ x) (fun p => p.2)).trans ?_
   constructor
   · rintro ⟨h0, h1⟩
@@ -150,16 +169,25 @@ theorem fm_vec {n : ℕ} (P : Finset ((Fin n → ℚ) × ℚ)) (x : Fin n → �
       exact h1 p hpq.1.1 q hpq.2.1 hpq.1.2 hpq.2.2
   · intro h
     have h' : ∀ a ∈ fmSet P, 0 ≤ a ⬝ᵥ x := h
-    refine ⟨fun p hp hz => h' p.1 (Finset.mem_union_left _
-      (Finset.mem_image_of_mem _ (Finset.mem_filter.2 ⟨hp, hz⟩))), fun p hp q hq hcp hcq => ?_⟩
-    have h2 := h' (p.2 • q.1 - q.2 • p.1) (Finset.mem_union_right _ (Finset.mem_image.2
-      ⟨(p, q), Finset.mem_product.2 ⟨Finset.mem_filter.2 ⟨hp, hcp⟩, Finset.mem_filter.2 ⟨hq, hcq⟩⟩, rfl⟩))
+    refine ⟨
+      fun p hp hz =>
+        h' p.1 (Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_filter.2 ⟨hp, hz⟩))),
+      fun p hp q hq hcp hcq => ?_
+    ⟩
+    have h2 :=
+      h' (p.2 • q.1 - q.2 • p.1)
+        (Finset.mem_union_right _
+          (Finset.mem_image.2 ⟨
+            (p, q),
+            Finset.mem_product.2 ⟨Finset.mem_filter.2 ⟨hp, hcp⟩, Finset.mem_filter.2 ⟨hq, hcq⟩⟩,
+            rfl
+          ⟩))
     rw [fm_dot] at h2
     exact h2
 
 def stdIneq (n : ℕ) : Finset (Fin n → ℚ) :=
-  (Finset.univ.image fun i : Fin n => (Pi.single i 1 : Fin n → ℚ)) ∪
-    (Finset.univ.image fun i : Fin n => -(Pi.single i 1 : Fin n → ℚ))
+  (Finset.univ.image fun i : Fin n => (Pi.single i 1 : Fin n → ℚ))
+    ∪ (Finset.univ.image fun i : Fin n => -(Pi.single i 1 : Fin n → ℚ))
 
 private theorem rat_dotProduct_zero_right {n : ℕ} (a : Fin n → ℚ) : a ⬝ᵥ (0 : Fin n → ℚ) = 0 := by
   show ∑ j, a j * (0 : Fin n → ℚ) j = 0
@@ -172,11 +200,12 @@ theorem mem_hcone_stdIneq (n : ℕ) (x : Fin n → ℚ) : x ∈ hcone (stdIneq n
     have h1 : 0 ≤ (Pi.single i (1 : ℚ) : Fin n → ℚ) ⬝ᵥ x :=
       h (Pi.single i 1) (Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
     have h2 : 0 ≤ (-(Pi.single i (1 : ℚ)) : Fin n → ℚ) ⬝ᵥ x :=
-      h (-(Pi.single i 1)) (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
+      h (-(Pi.single i 1))
+        (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
     have e1 : (Pi.single i (1 : ℚ) : Fin n → ℚ) ⬝ᵥ x = x i := by
       show ∑ j, (Pi.single i (1 : ℚ) : Fin n → ℚ) j * x j = x i
       simp [Pi.single_apply]
-    have e2 : (-(Pi.single i (1 : ℚ)) : Fin n → ℚ) ⬝ᵥ x = -x i := by
+    have e2 : (-(Pi.single i (1 : ℚ)) : Fin n → ℚ) ⬝ᵥ x = - x i := by
       rw [← e1]
       show ∑ j, (-(Pi.single i (1 : ℚ)) : Fin n → ℚ) j * x j = -∑ j, (Pi.single i (1 : ℚ) : Fin n → ℚ) j * x j
       rw [← Finset.sum_neg_distrib]
@@ -190,8 +219,8 @@ theorem mem_hcone_stdIneq (n : ℕ) (x : Fin n → ℚ) : x ∈ hcone (stdIneq n
     intro a _
     exact le_of_eq (rat_dotProduct_zero_right _).symm
 
-theorem mem_gcone_empty {n : ℕ} (x : Fin n → ℚ) :
-    x ∈ gcone (∅ : Finset (Fin n → ℚ)) id ↔ x = 0 := by
+theorem mem_gcone_empty {n : ℕ} (x : Fin n → ℚ)
+    : x ∈ gcone (∅ : Finset (Fin n → ℚ)) id ↔ x = 0 := by
   constructor
   · rintro ⟨c, -, hx⟩
     simpa using hx
@@ -202,23 +231,24 @@ private theorem rat_dotProduct_zero_left {n : ℕ} (x : Fin n → ℚ) : (0 : Fi
   show ∑ j, (0 : Fin n → ℚ) j * x j = 0
   simp
 
-private theorem rat_dotProduct_sub_smul_right {n : ℕ} (a x w : Fin n → ℚ) (t : ℚ) :
-    a ⬝ᵥ (x - t • w) = a ⬝ᵥ x - t * (a ⬝ᵥ w) := by
+private theorem rat_dotProduct_sub_smul_right {n : ℕ} (a x w : Fin n → ℚ) (t : ℚ)
+    : a ⬝ᵥ (x - t • w) = a ⬝ᵥ x - t * (a ⬝ᵥ w) := by
   show ∑ j, a j * (x - t • w) j = ∑ j, a j * x j - t * ∑ j, a j * w j
   rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl fun j _ => by
     simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
     ring
 
-theorem minkowskiQ {n : ℕ} (T : Finset (Fin n → ℚ)) :
-    ∃ A : Finset (Fin n → ℚ), gcone T id = hcone A id := by
+theorem minkowskiQ {n : ℕ} (T : Finset (Fin n → ℚ))
+    : ∃ A : Finset (Fin n → ℚ), gcone T id = hcone A id := by
   refine Finset.induction_on T ?_ ?_
-  · exact ⟨stdIneq n, Set.ext fun x => by
-      rw [mem_gcone_empty, mem_hcone_stdIneq]⟩
+  · exact ⟨stdIneq n, Set.ext fun x => by rw [mem_gcone_empty, mem_hcone_stdIneq]⟩
   · intro w T hw ih
     obtain ⟨A, hA⟩ := ih
-    refine ⟨fmSet (A.image (fun a => (a, -(a ⬝ᵥ w))) ∪ {((0 : Fin n → ℚ), (1 : ℚ))}),
-      Set.ext fun x => ?_⟩
+    refine ⟨
+      fmSet (A.image (fun a => (a, -(a ⬝ᵥ w))) ∪ {((0 : Fin n → ℚ), (1 : ℚ))}),
+      Set.ext fun x => ?_
+    ⟩
     rw [← fm_vec, mem_gcone_insert hw, hA]
     refine exists_congr fun t => ?_
     constructor
@@ -237,7 +267,8 @@ theorem minkowskiQ {n : ℕ} (T : Finset (Fin n → ℚ)) :
         exact ht
     · intro h
       have ht : 0 ≤ t := by
-        have h0 := h ((0 : Fin n → ℚ), (1 : ℚ)) (Finset.mem_union_right _ (Finset.mem_singleton_self _))
+        have h0 :=
+          h ((0 : Fin n → ℚ), (1 : ℚ)) (Finset.mem_union_right _ (Finset.mem_singleton_self _))
         have h0' : 0 ≤ (0 : Fin n → ℚ) ⬝ᵥ x + 1 * t := h0
         rw [rat_dotProduct_zero_left, one_mul, zero_add] at h0'
         exact h0'
@@ -256,28 +287,33 @@ private theorem rat_dotProduct_comm {n : ℕ} (a b : Fin n → ℚ) : a ⬝ᵥ b
   show ∑ j, a j * b j = ∑ j, b j * a j
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-private theorem rat_dotProduct_add_left {n : ℕ} (a b x : Fin n → ℚ) : (a + b) ⬝ᵥ x = a ⬝ᵥ x + b ⬝ᵥ x := by
+private theorem rat_dotProduct_add_left {n : ℕ} (a b x : Fin n → ℚ)
+    : (a + b) ⬝ᵥ x = a ⬝ᵥ x + b ⬝ᵥ x := by
   show ∑ j, (a + b) j * x j = ∑ j, a j * x j + ∑ j, b j * x j
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun j _ => add_mul (a j) (b j) (x j)
 
-private theorem rat_dotProduct_add_right {n : ℕ} (a x y : Fin n → ℚ) : a ⬝ᵥ (x + y) = a ⬝ᵥ x + a ⬝ᵥ y := by
+private theorem rat_dotProduct_add_right {n : ℕ} (a x y : Fin n → ℚ)
+    : a ⬝ᵥ (x + y) = a ⬝ᵥ x + a ⬝ᵥ y := by
   show ∑ j, a j * (x + y) j = ∑ j, a j * x j + ∑ j, a j * y j
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun j _ => mul_add (a j) (x j) (y j)
 
-private theorem rat_dotProduct_smul_left {n : ℕ} (r : ℚ) (a x : Fin n → ℚ) : (r • a) ⬝ᵥ x = r * (a ⬝ᵥ x) := by
+private theorem rat_dotProduct_smul_left {n : ℕ} (r : ℚ) (a x : Fin n → ℚ)
+    : (r • a) ⬝ᵥ x = r * (a ⬝ᵥ x) := by
   show ∑ j, (r • a) j * x j = r * ∑ j, a j * x j
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl fun j _ => mul_assoc r (a j) (x j)
 
-private theorem rat_dotProduct_smul_right {n : ℕ} (r : ℚ) (a x : Fin n → ℚ) : a ⬝ᵥ (r • x) = r * (a ⬝ᵥ x) := by
+private theorem rat_dotProduct_smul_right {n : ℕ} (r : ℚ) (a x : Fin n → ℚ)
+    : a ⬝ᵥ (r • x) = r * (a ⬝ᵥ x) := by
   show ∑ j, a j * (r • x) j = r * ∑ j, a j * x j
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl fun j _ => mul_left_comm (a j) r (x j)
 
-private theorem dotProduct_nonneg_of_mem_hcone_of_mem_gcone {n : ℕ} {A : Finset (Fin n → ℚ)} {x d : Fin n → ℚ}
-    (hx : x ∈ hcone A id) (hd : d ∈ gcone A id) : 0 ≤ d ⬝ᵥ x := by
+private theorem dotProduct_nonneg_of_mem_hcone_of_mem_gcone
+    {n : ℕ} {A : Finset (Fin n → ℚ)} {x d : Fin n → ℚ} (hx : x ∈ hcone A id) (hd : d ∈ gcone A id)
+    : 0 ≤ d ⬝ᵥ x := by
   have hsub : gcone A id ⊆ {e | 0 ≤ e ⬝ᵥ x} :=
     gcone_sub A id _
       (by show 0 ≤ (0 : Fin n → ℚ) ⬝ᵥ x; exact le_of_eq (rat_dotProduct_zero_left x).symm)
@@ -295,8 +331,8 @@ private theorem dotProduct_nonneg_of_mem_hcone_of_mem_gcone {n : ℕ} {A : Finse
       (fun a ha => hx a ha)
   exact hsub hd
 
-theorem weylQ {n : ℕ} (A : Finset (Fin n → ℚ)) :
-    ∃ B : Finset (Fin n → ℚ), hcone A id = gcone B id := by
+theorem weylQ {n : ℕ} (A : Finset (Fin n → ℚ))
+    : ∃ B : Finset (Fin n → ℚ), hcone A id = gcone B id := by
   obtain ⟨B, hB⟩ := minkowskiQ A
   obtain ⟨D, hD⟩ := minkowskiQ B
   refine ⟨B, Set.Subset.antisymm ?_ ?_⟩
@@ -341,13 +377,17 @@ theorem weylQ {n : ℕ} (A : Finset (Fin n → ℚ)) :
       rw [rat_dotProduct_comm]
       exact h2
 
-theorem exists_int_multiple {n : ℕ} (v : Fin n → ℚ) :
-    ∃ N : ℚ, 0 < N ∧ ∃ z : Fin n → ℤ, GordanCones.toQ z = N • v := by
+theorem exists_int_multiple {n : ℕ} (v : Fin n → ℚ)
+    : ∃ N : ℚ, 0 < N ∧ ∃ z : Fin n → ℤ, GordanCones.toQ z = N • v := by
   classical
   have hden : ∀ q : ℚ, 0 < q.den := fun q => q.den_pos
   have key : ∀ q : ℚ, q * (q.den : ℚ) = (q.num : ℚ) := fun q => Rat.mul_den_eq_num q
-  refine ⟨∏ j, ((v j).den : ℚ), Finset.prod_pos fun j _ => by exact_mod_cast hden (v j),
-    fun i => (v i).num * ∏ j ∈ Finset.univ.erase i, ((v j).den : ℤ), ?_⟩
+  refine ⟨
+    ∏ j, ((v j).den : ℚ),
+    Finset.prod_pos fun j _ => by exact_mod_cast hden (v j),
+    fun i => (v i).num * ∏ j ∈ Finset.univ.erase i, ((v j).den : ℤ),
+    ?_
+  ⟩
   funext i
   show ((((v i).num * ∏ j ∈ Finset.univ.erase i, ((v j).den : ℤ) : ℤ)) : ℚ) =
     (∏ j, ((v j).den : ℚ)) * v i
@@ -359,11 +399,9 @@ theorem exists_int_multiple {n : ℕ} (v : Fin n → ℚ) :
 noncomputable def intOf {n : ℕ} (v : Fin n → ℚ) : Fin n → ℤ :=
   (exists_int_multiple v).choose_spec.2.choose
 
-noncomputable def mulOf {n : ℕ} (v : Fin n → ℚ) : ℚ :=
-  (exists_int_multiple v).choose
+noncomputable def mulOf {n : ℕ} (v : Fin n → ℚ) : ℚ := (exists_int_multiple v).choose
 
-theorem mulOf_pos {n : ℕ} (v : Fin n → ℚ) : 0 < mulOf v :=
-  (exists_int_multiple v).choose_spec.1
+theorem mulOf_pos {n : ℕ} (v : Fin n → ℚ) : 0 < mulOf v := (exists_int_multiple v).choose_spec.1
 
 theorem toQ_intOf {n : ℕ} (v : Fin n → ℚ) : GordanCones.toQ (intOf v) = mulOf v • v :=
   (exists_int_multiple v).choose_spec.2.choose_spec

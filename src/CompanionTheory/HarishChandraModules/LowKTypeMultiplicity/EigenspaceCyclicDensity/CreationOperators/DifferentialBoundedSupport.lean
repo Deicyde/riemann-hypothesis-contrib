@@ -17,30 +17,36 @@ variable {n : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
 abbrev Tri (ε : Fin n → Bool) (i j k : Pos n) : Prop :=
   cpt ε i ∧ cpt ε j ∧ i.1.2 = j.1.1 ∧ k.1.1 = i.1.1 ∧ k.1.2 = j.1.2
 
-theorem bd_apply (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (x : Cn n V) (A : Finset (Pos n)) :
-    bd ε E x A = (∑ i : Pos n, if cpt ε i then E i.1.1 i.1.2 (ann i x A) else 0) +
-      ∑ i : Pos n, ∑ j : Pos n, ∑ k : Pos n, if Tri ε i j k then cre k (ann j (ann i x)) A else 0 := by
-  simp only [bd, LinearMap.add_apply, Pi.add_apply, LinearMap.sum_apply, Finset.sum_apply]
-  congr 1
-  · refine Finset.sum_congr rfl fun i _ => ?_
-    split_ifs <;> rfl
-  · refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
-    split_ifs <;> rfl
+theorem bd_apply
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (x : Cn n V) (A : Finset (Pos n))
+    : bd ε E x A
+      = (∑ i : Pos n, if cpt ε i then E i.1.1 i.1.2 (ann i x A) else 0)
+        + ∑ i : Pos n, ∑ j : Pos n, ∑ k : Pos n, if Tri ε i j k then cre k (ann j (ann i x)) A else 0 :=
+  by
+    simp only [bd, LinearMap.add_apply, Pi.add_apply, LinearMap.sum_apply, Finset.sum_apply]
+    congr 1
+    · refine Finset.sum_congr rfl fun i _ => ?_
+      split_ifs <;> rfl
+    · refine Finset.sum_congr rfl fun i _ =>
+        Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
+      split_ifs <;> rfl
 
-theorem ann_ne {i : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : ann i x A ≠ 0) : i ∉ A ∧ x (insert i A) ≠ 0 := by
+theorem ann_ne {i : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : ann i x A ≠ 0)
+    : i ∉ A ∧ x (insert i A) ≠ 0 := by
   rw [ann_apply] at h
   by_cases hi : i ∈ A
   · simp [hi] at h
   · exact ⟨hi, fun h0 => h (by simp [h0])⟩
 
-theorem cre_ne {i : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : cre i x A ≠ 0) : i ∈ A ∧ x (A.erase i) ≠ 0 := by
+theorem cre_ne {i : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : cre i x A ≠ 0)
+    : i ∈ A ∧ x (A.erase i) ≠ 0 := by
   rw [cre_apply] at h
   by_cases hi : i ∈ A
   · exact ⟨hi, fun h0 => h (by simp [h0])⟩
   · simp [hi] at h
 
-theorem tri_ne {i j k : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : cre k (ann j (ann i x)) A ≠ 0) :
-    k ∈ A ∧ j ∉ A.erase k ∧ i ∉ insert j (A.erase k) ∧ x (insert i (insert j (A.erase k))) ≠ 0 :=
+theorem tri_ne {i j k : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : cre k (ann j (ann i x)) A ≠ 0)
+    : k ∈ A ∧ j ∉ A.erase k ∧ i ∉ insert j (A.erase k) ∧ x (insert i (insert j (A.erase k))) ≠ 0 :=
   let h1 := cre_ne h
   let h2 := ann_ne h1.2
   let h3 := ann_ne h2.2
@@ -49,12 +55,15 @@ theorem tri_ne {i j k : Pos n} {x : Cn n V} {A : Finset (Pos n)} (h : cre k (ann
 theorem Tri.cptk {ε : Fin n → Bool} {i j k : Pos n} (h : Tri ε i j k) : cpt ε k := by
   obtain ⟨h1, h2, h3, h4, h5⟩ := h
   show ε k.1.1 = ε k.1.2
-  rw [h4, h5, h1, h3]; exact h2
+  rw [h4, h5, h1, h3]
+  exact h2
 
-theorem bd_sub_ne {ε₀ ε : Fin n → Bool} (h0 : ∀ a b, ε a = ε b → ε₀ a = ε₀ b) (E : Fin n → Fin n → Module.End ℂ V)
-    (x : Cn n V) (A : Finset (Pos n)) (h : bd ε₀ E x A ≠ bd ε E x A) :
-    (∃ i, cpt ε₀ i ∧ ¬cpt ε i ∧ ann i x A ≠ 0) ∨
-      ∃ i j k, Tri ε₀ i j k ∧ ¬(cpt ε i ∧ cpt ε j) ∧ cre k (ann j (ann i x)) A ≠ 0 := by
+theorem bd_sub_ne
+    {ε₀ ε : Fin n → Bool} (h0 : ∀ a b, ε a = ε b → ε₀ a = ε₀ b)
+    (E : Fin n → Fin n → Module.End ℂ V) (x : Cn n V) (A : Finset (Pos n))
+    (h : bd ε₀ E x A ≠ bd ε E x A)
+    : (∃ i, cpt ε₀ i ∧ ¬ cpt ε i ∧ ann i x A ≠ 0)
+      ∨ ∃ i j k, Tri ε₀ i j k ∧ ¬(cpt ε i ∧ cpt ε j) ∧ cre k (ann j (ann i x)) A ≠ 0 := by
   by_contra hc
   push Not at hc
   apply h
@@ -67,7 +76,8 @@ theorem bd_sub_ne {ε₀ ε : Fin n → Bool} (h0 : ∀ a b, ε a = ε b → ε�
       split_ifs with h2
       · rw [hc.1 i h2 h1, map_zero]
       · rfl
-  · refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
+  · refine Finset.sum_congr rfl fun i _ =>
+      Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
     by_cases h1 : Tri ε i j k
     · rw [if_pos h1, if_pos ⟨h0 _ _ h1.1, h0 _ _ h1.2.1, h1.2.2⟩]
     · rw [if_neg h1]
@@ -75,9 +85,10 @@ theorem bd_sub_ne {ε₀ ε : Fin n → Bool} (h0 : ∀ a b, ε a = ε b → ε�
       · exact hc.2 i j k h2 fun a b => h1 ⟨a, b, h2.2.2⟩
       · rfl
 
-theorem bd_ne (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (x : Cn n V) (A : Finset (Pos n))
-    (h : bd ε E x A ≠ 0) :
-    (∃ i, cpt ε i ∧ ann i x A ≠ 0) ∨ ∃ i j k, Tri ε i j k ∧ cre k (ann j (ann i x)) A ≠ 0 := by
+theorem bd_ne
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (x : Cn n V) (A : Finset (Pos n))
+    (h : bd ε E x A ≠ 0)
+    : (∃ i, cpt ε i ∧ ann i x A ≠ 0) ∨ ∃ i j k, Tri ε i j k ∧ cre k (ann j (ann i x)) A ≠ 0 := by
   by_contra hc
   push Not at hc
   apply h
@@ -91,15 +102,19 @@ theorem bd_ne (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (
     · rw [hc.1 i h2, map_zero]
     · rfl
 
-theorem filter_erase_of_not {p : Pos n → Prop} [DecidablePred p] {k : Pos n} (hk : ¬p k) (A : Finset (Pos n)) :
-    (A.erase k).filter p = A.filter p := by
+theorem filter_erase_of_not
+    {p : Pos n → Prop} [DecidablePred p] {k : Pos n} (hk : ¬ p k) (A : Finset (Pos n))
+    : (A.erase k).filter p = A.filter p := by
   ext a
   simp only [mem_filter, mem_erase]
   exact ⟨fun h => ⟨h.1.2, h.2⟩, fun h => ⟨⟨fun e => hk (e ▸ h.2), h.1⟩, h.2⟩⟩
 
-theorem sup_bd {ε : Fin n → Bool} (E : Fin n → Fin n → Module.End ℂ V) {B : Finset (Pos n)} {j : ℕ} {x : Cn n V}
-    (hx : Sup ε B j x) {A : Finset (Pos n)} (h : bd ε E x A ≠ 0) :
-    (A.filter fun i => ¬cpt ε i) = B ∧ (A.filter (cpt ε)).card + 1 = j := by
+theorem sup_bd
+    {ε : Fin n → Bool}
+    (E : Fin n → Fin n → Module.End ℂ V)
+    {B : Finset (Pos n)} {j : ℕ} {x : Cn n V} (hx : Sup ε B j x)
+    {A : Finset (Pos n)} (h : bd ε E x A ≠ 0)
+    : (A.filter fun i => ¬ cpt ε i) = B ∧ (A.filter (cpt ε)).card + 1 = j := by
   rcases bd_ne ε E x A h with ⟨i, hi, h1⟩ | ⟨i, j', k, ht, h1⟩
   · obtain ⟨h2, h3⟩ := ann_ne h1
     obtain ⟨e1, e2⟩ := hx _ h3
@@ -109,19 +124,27 @@ theorem sup_bd {ε : Fin n → Bool} (E : Fin n → Fin n → Module.End ℂ V) 
   · obtain ⟨h2, h3, h4, h5⟩ := tri_ne h1
     obtain ⟨e1, e2⟩ := hx _ h5
     rw [filter_insert, if_neg (not_not.2 ht.1), filter_insert, if_neg (not_not.2 ht.2.1),
-      filter_erase_of_not (not_not.2 ht.cptk)] at e1
-    rw [filter_insert, if_pos ht.1, card_insert_of_notMem (fun h => h4 (mem_filter.1 h).1), filter_insert,
-      if_pos ht.2.1, card_insert_of_notMem (fun h => h3 (mem_filter.1 h).1), filter_erase] at e2
+        filter_erase_of_not (not_not.2 ht.cptk)]
+      at e1
+    rw [filter_insert, if_pos ht.1, card_insert_of_notMem (fun h => h4 (mem_filter.1 h).1),
+        filter_insert, if_pos ht.2.1, card_insert_of_notMem (fun h => h3 (mem_filter.1 h).1),
+        filter_erase]
+      at e2
     have := card_erase_add_one (mem_filter.2 ⟨h2, ht.cptk⟩ : k ∈ A.filter (cpt ε))
     exact ⟨e1, by omega⟩
 
-theorem pot_insert {i : Pos n} {B : Finset (Pos n)} (h : i ∉ B) :
-    pot (insert i B) = n - ((i.1.2 : ℕ) - (i.1.1 : ℕ)) + pot B := Finset.sum_insert h
+theorem pot_insert {i : Pos n} {B : Finset (Pos n)} (h : i ∉ B)
+    : pot (insert i B) = n - ((i.1.2 : ℕ) - (i.1.1 : ℕ)) + pot B :=
+  Finset.sum_insert h
 
 theorem differential_bounded_support : BdSup := by
   intro n ε V _ _ E
-  refine ⟨fun B j x hx A hA => ?_, fun B x hx => ?_, fun ε₀ x h0 hr => ⟨?_, fun A hA i hi hc => ?_⟩,
-    fun B j x hx A hA => ?_⟩
+  refine ⟨
+    fun B j x hx A hA => ?_,
+    fun B x hx => ?_,
+    fun ε₀ x h0 hr => ⟨?_, fun A hA i hi hc => ?_⟩,
+    fun B j x hx A hA => ?_
+  ⟩
   · have := sup_bd E hx hA
     exact ⟨this.1, by omega⟩
   · funext A
@@ -133,18 +156,23 @@ theorem differential_bounded_support : BdSup := by
     rcases bd_sub_ne h0 E x A h with ⟨i, h1, h2, h3⟩ | ⟨i, j, k, ht, h2, h3⟩
     · exact h2 (hr _ (ann_ne h3).2 i (mem_insert_self _ _) h1)
     · have h5 := (tri_ne h3).2.2.2
-      exact h2 ⟨hr _ h5 i (mem_insert_self _ _) ht.1, hr _ h5 j (mem_insert_of_mem (mem_insert_self _ _)) ht.2.1⟩
+      exact h2 ⟨
+        hr _ h5 i (mem_insert_self _ _) ht.1,
+        hr _ h5 j (mem_insert_of_mem (mem_insert_self _ _)) ht.2.1
+      ⟩
   · rcases bd_ne ε E x A hA with ⟨i', _, h1⟩ | ⟨i', j, k, ht, h1⟩
     · exact hr _ (ann_ne h1).2 i (mem_insert_of_mem hi) hc
     · by_cases hk : i = k
       · exact hk ▸ ht.cptk
-      · exact hr _ (tri_ne h1).2.2.2 i (mem_insert_of_mem (mem_insert_of_mem (mem_erase.2 ⟨hk, hi⟩))) hc
+      · exact hr _ (tri_ne h1).2.2.2 i
+          (mem_insert_of_mem (mem_insert_of_mem (mem_erase.2 ⟨hk, hi⟩))) hc
   · have hne : bd (allT n) E x A ≠ bd ε E x A := fun h => hA (by rw [Pi.sub_apply, h, sub_self])
     have hcard : ∀ S, x S ≠ 0 → S.card = B.card + j := fun S hS => by
       obtain ⟨e1, e2⟩ := hx S hS
       rw [← e1, ← e2, add_comm, card_filter_add_card_filter_not]
     have hpos : ∀ i : Pos n, (i.1.1 : ℕ) < i.1.2 ∧ (i.1.2 : ℕ) < n := fun i => ⟨i.2, i.1.2.2⟩
-    rcases bd_sub_ne (ε₀ := allT n) (fun _ _ _ => rfl) E x A hne with ⟨i, -, h2, h3⟩ | ⟨i, j', k, ht, h2, h3⟩
+    rcases bd_sub_ne (ε₀ := allT n) (fun _ _ _ => rfl) E x A hne with
+      ⟨i, -, h2, h3⟩ | ⟨i, j', k, ht, h2, h3⟩
     · obtain ⟨h4, h5⟩ := ann_ne h3
       have e1 := (hx _ h5).1
       have e2 := hcard _ h5
@@ -169,11 +197,12 @@ theorem differential_bounded_support : BdSup := by
       set R := (A.erase k).filter fun i => ¬cpt ε i with hR
       have hjR : j' ∉ R := fun h => h5 (mem_filter.1 h).1
       have hiR : i ∉ R := fun h => h6 (mem_insert_of_mem (mem_filter.1 h).1)
-      have hij : i ∉ insert j' R := fun h => h6 (by
-        rcases mem_insert.1 h with h | h
-        · exact h ▸ mem_insert_self _ _
-        · exact absurd h hiR)
-      have hA' : (A.filter fun i => ¬cpt ε i) = if ¬cpt ε k then insert k R else R := by
+      have hij : i ∉ insert j' R := fun h =>
+        h6 (by
+          rcases mem_insert.1 h with h | h
+          · exact h ▸ mem_insert_self _ _
+          · exact absurd h hiR)
+      have hA' : (A.filter fun i => ¬ cpt ε i) = if ¬ cpt ε k then insert k R else R := by
         conv_lhs => rw [← insert_erase h4, filter_insert]
       have hkR : k ∉ R := fun h => notMem_erase k A (mem_filter.1 h).1
       have hk : cpt ε k ↔ (cpt ε i ↔ cpt ε j') := by
@@ -182,12 +211,15 @@ theorem differential_bounded_support : BdSup := by
       rw [hA', ← e1, filter_insert, filter_insert, ← hR]
       by_cases ci : cpt ε i <;> by_cases cj : cpt ε j'
       · exact absurd ⟨ci, cj⟩ h2
-      · have ck : ¬cpt ε k := by rw [hk]; tauto
-        rw [if_pos ck, if_neg (not_not.2 ci), if_pos cj, pot_insert hkR, pot_insert hjR]; omega
-      · have ck : ¬cpt ε k := by rw [hk]; tauto
-        rw [if_pos ck, if_pos ci, if_neg (not_not.2 cj), pot_insert hkR, pot_insert hiR]; omega
+      · have ck : ¬ cpt ε k := by rw [hk]; tauto
+        rw [if_pos ck, if_neg (not_not.2 ci), if_pos cj, pot_insert hkR, pot_insert hjR]
+        omega
+      · have ck : ¬ cpt ε k := by rw [hk]; tauto
+        rw [if_pos ck, if_pos ci, if_neg (not_not.2 cj), pot_insert hkR, pot_insert hiR]
+        omega
       · have ck : cpt ε k := by rw [hk]; tauto
-        rw [if_neg (not_not.2 ck), if_pos ci, if_pos cj, pot_insert hij, pot_insert hjR]; omega
+        rw [if_neg (not_not.2 ck), if_pos ci, if_pos cj, pot_insert hij, pot_insert hjR]
+        omega
 
 theorem wt_om (ε : Fin n → Bool) : wt (om ε) = (2 : ℝ) • PI.UpqRep.rhoC ε := by
   funext c
@@ -219,7 +251,8 @@ theorem top_degree_cycle : TopCycle := by
         have e : insert i (insert j (A.erase k)) = om ε := by
           by_contra h'; exact h4 (Pi.single_eq_of_ne h' _)
         have ci : cpt ε i := (mem_filter.1 (e ▸ mem_insert_self _ _ : i ∈ om ε)).2
-        have cj : cpt ε j := (mem_filter.1 (e ▸ mem_insert_of_mem (mem_insert_self _ _) : j ∈ om ε)).2
+        have cj : cpt ε j :=
+          (mem_filter.1 (e ▸ mem_insert_of_mem (mem_insert_self _ _) : j ∈ om ε)).2
         have ck : k ∈ om ε := mem_filter.2 ⟨mem_univ _, Tri.cptk ⟨ci, cj, ht.2.2⟩⟩
         rw [← e] at ck
         obtain ⟨-, -, t1, t2, t3⟩ := ht
@@ -248,17 +281,22 @@ theorem top_degree_cycle : TopCycle := by
       simp
     · simp [Pi.single_eq_of_ne e]
 
-theorem lift_ann (φ : V →ₗ[ℂ] W) (i : Pos n) (x : Cn n V) : lift n φ (ann i x) = ann i (lift n φ x) := by
+theorem lift_ann (φ : V →ₗ[ℂ] W) (i : Pos n) (x : Cn n V)
+    : lift n φ (ann i x) = ann i (lift n φ x) := by
   funext A
   by_cases h : i ∈ A <;> simp [ann_apply, h]
 
-theorem lift_cre (φ : V →ₗ[ℂ] W) (i : Pos n) (x : Cn n V) : lift n φ (cre i x) = cre i (lift n φ x) := by
+theorem lift_cre (φ : V →ₗ[ℂ] W) (i : Pos n) (x : Cn n V)
+    : lift n φ (cre i x) = cre i (lift n φ x) := by
   funext A
   by_cases h : i ∈ A <;> simp [cre_apply, h]
 
-theorem lift_bd {ε : Fin n → Bool} (φ : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V)
-    (F : Fin n → Fin n → Module.End ℂ W) (h : ∀ i : Pos n, cpt ε i → ∀ x, φ (E i.1.1 i.1.2 x) = F i.1.1 i.1.2 (φ x))
-    (x : Cn n V) : lift n φ (bd ε E x) = bd ε F (lift n φ x) := by
+theorem lift_bd
+    {ε : Fin n → Bool}
+    (φ : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin n → Module.End ℂ W)
+    (h : ∀ i : Pos n, cpt ε i → ∀ x, φ (E i.1.1 i.1.2 x) = F i.1.1 i.1.2 (φ x))
+    (x : Cn n V)
+    : lift n φ (bd ε E x) = bd ε F (lift n φ x) := by
   funext A
   set_option synthInstance.maxHeartbeats 100000 in
     rw [lift_apply, bd_apply, bd_apply, map_add (f := _), map_sum, map_sum]

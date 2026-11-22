@@ -16,15 +16,17 @@ open ReciprocityTheory.ChartRestriction.DS
 def highestWeightBoundConst {n : ℕ} (ε : Fin n → Bool) (d Λ₀ : Fin n → ℝ) : ℝ :=
   |nsq (rho n) - nsq (rhoN ε - rhoC ε)| + 2 * ∑ a, |d a| + 2 * ∑ a, |Λ₀ a| + 1
 
-theorem one_le_highestWeightBoundConst {n : ℕ} (ε : Fin n → Bool) (d Λ₀ : Fin n → ℝ) : 1 ≤ highestWeightBoundConst ε d Λ₀ := by
+theorem one_le_highestWeightBoundConst {n : ℕ} (ε : Fin n → Bool) (d Λ₀ : Fin n → ℝ)
+    : 1 ≤ highestWeightBoundConst ε d Λ₀ := by
   unfold highestWeightBoundConst
   have h1 : 0 ≤ ∑ a, |d a| := sum_nonneg fun a _ => abs_nonneg _
   have h2 : 0 ≤ ∑ a, |Λ₀ a| := sum_nonneg fun a _ => abs_nonneg _
   have h3 := abs_nonneg (nsq (rho n) - nsq (rhoN ε - rhoC ε))
   linarith
 
-theorem le_mul_of_sq_le_mul_sq {x C s : ℝ} (_hx : 0 ≤ x) (hC : 1 ≤ C) (hs : 1 ≤ s) (h : x ^ 2 ≤ C * s ^ 2) :
-    x ≤ C * s := by
+theorem le_mul_of_sq_le_mul_sq
+    {x C s : ℝ} (_hx : 0 ≤ x) (hC : 1 ≤ C) (hs : 1 ≤ s) (h : x ^ 2 ≤ C * s ^ 2)
+    : x ≤ C * s := by
   have h1 : C * s ^ 2 ≤ (C * s) ^ 2 := by
     nlinarith [mul_nonneg (mul_nonneg (by linarith : (0:ℝ) ≤ C - 1) (by linarith : (0:ℝ) ≤ C))
       (sq_nonneg s)]
@@ -33,33 +35,41 @@ theorem le_mul_of_sq_le_mul_sq {x C s : ℝ} (_hx : 0 ≤ x) (hC : 1 ≤ C) (hs 
 
 section Datum
 
-variable {n : ℕ} {ε : Fin n → Bool} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
   {E : Fin n → Fin n → Module.End ℂ M} {lam : Fin n → ℝ} {w : M}
 
-theorem noncompact_lowering_norm_small (hw : IsHWDatum ε E lam w) {a b : Fin n} (hab : a < b) (hne : ε a ≠ ε b) :
-    ‖E b a w‖ ^ 2 ≤ |nsq (rho n) - nsq (rhoN ε - rhoC ε)| := by
+theorem noncompact_lowering_norm_small
+    (hw : IsHWDatum ε E lam w) {a b : Fin n} (hab : a < b) (hne : ε a ≠ ε b)
+    : ‖E b a w‖ ^ 2 ≤ |nsq (rho n) - nsq (rhoN ε - rhoC ε)| := by
   have hb := b2Id
   unfold RaisingLoweringNormIdentities at hb
   have h3 := (hb n ε M E lam w hw).2.2
   have h1 : ‖E b a w‖ ^ 2 ≤ ∑ b' ∈ univ.filter (fun b' => a < b' ∧ ε a ≠ ε b'), ‖E b' a w‖ ^ 2 :=
     single_le_sum (f := fun b' => ‖E b' a w‖ ^ 2) (fun _ _ => sq_nonneg _) (by simp [hab, hne])
-  have h2 : (∑ b' ∈ univ.filter (fun b' => a < b' ∧ ε a ≠ ε b'), ‖E b' a w‖ ^ 2) ≤
-      ∑ a', ∑ b' ∈ univ.filter (fun b' => a' < b' ∧ ε a' ≠ ε b'), ‖E b' a' w‖ ^ 2 :=
-    single_le_sum (f := fun a' => ∑ b' ∈ univ.filter (fun b' => a' < b' ∧ ε a' ≠ ε b'), ‖E b' a' w‖ ^ 2)
-      (fun _ _ => sum_nonneg fun _ _ => sq_nonneg _) (mem_univ a)
+  have h2
+      : (∑ b' ∈ univ.filter (fun b' => a < b' ∧ ε a ≠ ε b'), ‖E b' a w‖ ^ 2)
+        ≤ ∑ a', ∑ b' ∈ univ.filter (fun b' => a' < b' ∧ ε a' ≠ ε b'), ‖E b' a' w‖ ^ 2 :=
+    single_le_sum
+      (f := fun a' => ∑ b' ∈ univ.filter (fun b' => a' < b' ∧ ε a' ≠ ε b'), ‖E b' a' w‖ ^ 2)
+      (fun _ _ => sum_nonneg fun _ _ => sq_nonneg _)
+      (mem_univ a)
   have h4 : 0 ≤ ∑ a', ∑ b' ∈ univ.filter (fun b' => a' < b' ∧ ε a' ≠ ε b'), ‖E b' a' w‖ ^ 2 :=
     sum_nonneg fun _ _ => sum_nonneg fun _ _ => sq_nonneg _
   have h5 := le_abs_self (nsq (rho n) - nsq (rhoN ε - rhoC ε))
   linarith
 
-theorem highest_weight_datum_bounds {d Λ₀ : Fin n → ℝ} {t : ℝ} (ht : 1 ≤ t) (hw : IsHWDatum ε E lam w)
-    (hΛ : lowK ε lam = t • d + Λ₀) :
-    (∀ a b, InNP ε d a b → ‖E a b w‖ ≤ highestWeightBoundConst ε d Λ₀) ∧
-      (∀ a b, InLL ε d a b →
-        ‖E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w‖ ≤ highestWeightBoundConst ε d Λ₀) ∧
-      ∀ X : Matrix (Fin n) (Fin n) ℂ,
-        ‖actM E X w - ((t : ℂ) * trace (dMat d * X)) • w‖ ≤
-          highestWeightBoundConst ε d Λ₀ * Real.sqrt t * l1 X := by
+theorem highest_weight_datum_bounds
+    {d Λ₀ : Fin n → ℝ} {t : ℝ} (ht : 1 ≤ t)
+    (hw : IsHWDatum ε E lam w) (hΛ : lowK ε lam = t • d + Λ₀)
+    : (∀ a b, InNP ε d a b → ‖E a b w‖ ≤ highestWeightBoundConst ε d Λ₀)
+      ∧ (∀ a b,
+        InLL ε d a b
+          → ‖E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w‖
+            ≤ highestWeightBoundConst ε d Λ₀)
+      ∧ ∀ X : Matrix (Fin n) (Fin n) ℂ,
+        ‖actM E X w - ((t : ℂ) * trace (dMat d * X)) • w‖
+          ≤ highestWeightBoundConst ε d Λ₀ * Real.sqrt t * l1 X := by
   have hb := b2Id
   unfold RaisingLoweringNormIdentities at hb
   obtain ⟨hI1, hI2, -⟩ := hb n ε M E lam w hw
@@ -104,21 +114,23 @@ theorem highest_weight_datum_bounds {d Λ₀ : Fin n → ℝ} {t : ℝ} (ht : 1 
     · have h1 := hI2 a b h he
       have h2 := noncompact_lowering_norm_small hw h he
       have h3 := hdiff a b
-      rw [h1]; nlinarith
+      rw [h1]
+      nlinarith
     · have h1 := hI1 b a h he.symm
       have h3 := hdiff b a
-      rw [h1]; nlinarith
+      rw [h1]
+      nlinarith
     · have h2 := noncompact_lowering_norm_small hw h (Ne.symm he)
       nlinarith
   have hsq1 : 1 ≤ Real.sqrt t := by
-    rw [show (1:ℝ) = Real.sqrt 1 from Real.sqrt_one.symm]; exact Real.sqrt_le_sqrt ht
+    rw [show (1 : ℝ) = Real.sqrt 1 from Real.sqrt_one.symm]; exact Real.sqrt_le_sqrt ht
   have hsq2 : Real.sqrt t ^ 2 = t := Real.sq_sqrt ht0
   have hdg : ∀ a, ‖E a a w - (((t * d a : ℝ)) : ℂ) • w‖ = |Λ₀ a| := by
     intro a
     rw [hdiag a, ← sub_smul, ← Complex.ofReal_sub, norm_smul, hw1, mul_one, hL a]
     rw [show t * d a + Λ₀ a - t * d a = Λ₀ a by ring, Complex.norm_real, Real.norm_eq_abs]
-  have hentry : ∀ a b,
-      ‖E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w‖ ≤ C * Real.sqrt t := by
+  have hentry
+      : ∀ a b, ‖E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w‖ ≤ C * Real.sqrt t := by
     intro a b
     by_cases hab : a = b
     · subst hab
@@ -153,8 +165,9 @@ theorem highest_weight_datum_bounds {d Λ₀ : Fin n → ℝ} {t : ℝ} (ht : 1 
         have := le_mul_of_sq_le_mul_sq (norm_nonneg (E a b w)) hC1 le_rfl (by rw [h1]; nlinarith)
         linarith
   · intro X
-    have key : actM E X w - ((t : ℂ) * trace (dMat d * X)) • w =
-        ∑ a, ∑ b, X a b • (E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w) := by
+    have key
+        : actM E X w - ((t : ℂ) * trace (dMat d * X)) • w
+          = ∑ a, ∑ b, X a b • (E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w) := by
       simp only [smul_sub, Finset.sum_sub_distrib]
       congr 1
       · simp [actM, LinearMap.sum_apply]
@@ -166,24 +179,31 @@ theorem highest_weight_datum_bounds {d Λ₀ : Fin n → ℝ} {t : ℝ} (ht : 1 
         push_cast
         ring
     rw [key]
-    calc ‖∑ a, ∑ b, X a b • (E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w)‖
-        ≤ ∑ a, ∑ b, ‖X a b‖ * (C * Real.sqrt t) :=
-          (norm_sum_le _ _).trans (sum_le_sum fun a _ => (norm_sum_le _ _).trans
-            (sum_le_sum fun b _ => by
-              rw [norm_smul]; exact mul_le_mul_of_nonneg_left (hentry a b) (norm_nonneg _)))
+    calc
+      ‖∑ a, ∑ b, X a b • (E a b w - (if a = b then (((t * d a : ℝ)) : ℂ) else 0) • w)‖
+          ≤ ∑ a, ∑ b, ‖X a b‖ * (C * Real.sqrt t) :=
+        (norm_sum_le _ _).trans
+          (sum_le_sum fun a _ =>
+            (norm_sum_le _ _).trans
+              (sum_le_sum fun b _ => by
+                rw [norm_smul]; exact mul_le_mul_of_nonneg_left (hentry a b) (norm_nonneg _)))
       _ = C * Real.sqrt t * l1 X := by
-          unfold l1
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl fun a _ => ?_
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl fun b _ => ?_
-          ring
+        unfold l1
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun a _ => ?_
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun b _ => ?_
+        ring
 
 end Datum
 
 theorem b2 : HighestWeightVectorUniformBounds := by
   intro n ε d Λ₀
-  refine ⟨highestWeightBoundConst ε d Λ₀, le_trans zero_le_one (one_le_highestWeightBoundConst ε d Λ₀), ?_⟩
+  refine ⟨
+    highestWeightBoundConst ε d Λ₀,
+    le_trans zero_le_one (one_le_highestWeightBoundConst ε d Λ₀),
+    ?_
+  ⟩
   intro t ht M _ _ E lam w hw hΛ
   exact highest_weight_datum_bounds ht hw hΛ
 

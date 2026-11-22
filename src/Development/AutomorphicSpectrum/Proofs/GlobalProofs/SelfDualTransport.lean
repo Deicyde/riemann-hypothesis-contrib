@@ -24,10 +24,14 @@ open scoped TensorProduct ENNReal Matrix NumberField.AdeleRing
 
 variable {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem exists_test : ∃ f ∈ schwartzBruhatPi (K := F) (ι := ι), HasCompactSupport f ∧ f 0 ≠ 0 := GlobalTheory.T.exists_schwartzBruhat_compact_support_nonzero F ι
+theorem exists_test : ∃ f ∈ schwartzBruhatPi (K := F) (ι := ι), HasCompactSupport f ∧ f 0 ≠ 0 :=
+  GlobalTheory.T.exists_schwartzBruhat_compact_support_nonzero F ι
 
-theorem selfDual_eq (G : Matrix ι ι F) (hs : G.IsSymm) (hG : G.det ≠ 0) (ν : Measure (ι → 𝔸[F]))
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.SelfDual ν (chiG G)) : ν = adeleMeasurePi F := by
+theorem selfDual_eq
+    (G : Matrix ι ι F) (hs : G.IsSymm) (hG : G.det ≠ 0)
+    (ν : Measure (ι → 𝔸[F]))
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.SelfDual ν (chiG G))
+    : ν = adeleMeasurePi F := by
   obtain ⟨f0, hf0, hcs, h0⟩ := exists_test (F := F) (ι := ι)
   have hu : IsUnit G.det := isUnit_iff_ne_zero.mpr hG
   have hNM : G⁻¹ * G = 1 := Matrix.nonsing_inv_mul G hu
@@ -38,8 +42,13 @@ theorem selfDual_eq (G : Matrix ι ι F) (hs : G.IsSymm) (hG : G.det ≠ 0) (ν 
     Measure.isAddLeftInvariant_eq_smul ν (adeleMeasurePi F)
   set c : NNReal := Measure.addHaarScalarFactor ν (adeleMeasurePi F) with hcdef
 
-  have hT0 : ∀ (g : (ι → 𝔸[F]) → ℂ) y, ∫ x, g x * chiG G x y ∂(adeleMeasurePi F) = adelicFourierPi F g (Gm *ᵥ y) := fun g y => rfl
-  have hT : ∀ (g : (ι → 𝔸[F]) → ℂ) y, ∫ x, g x * chiG G x y ∂ν = (c : ℂ) * adelicFourierPi F g (Gm *ᵥ y) := by
+  have hT0
+      : ∀ (g : (ι → 𝔸[F]) → ℂ) y,
+        ∫ x, g x * chiG G x y ∂(adeleMeasurePi F) = adelicFourierPi F g (Gm *ᵥ y) := fun g y =>
+    rfl
+  have hT
+      : ∀ (g : (ι → 𝔸[F]) → ℂ) y,
+        ∫ x, g x * chiG G x y ∂ν = (c : ℂ) * adelicFourierPi F g (Gm *ᵥ y) := by
     intro g y
     rw [e, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul, hT0]
   set g1 : (ι → 𝔸[F]) → ℂ := fun y => adelicFourierPi F f0 (Gm *ᵥ y) with hg1
@@ -51,8 +60,9 @@ theorem selfDual_eq (G : Matrix ι ι F) (hs : G.IsSymm) (hG : G.det ≠ 0) (ν 
     exact ((integrable_of_mem_schwartzBruhatPi hg1m).const_mul (c : ℂ)).smul_measure_nnreal
   have h2 := h.2 f0 (continuous_of_mem_schwartzBruhatPi hf0) hcs hI 0
   simp only [hT] at h2
-  have h3 : adelicFourierPi F (fun x => (c : ℂ) * adelicFourierPi F f0 (Gm *ᵥ x)) (Gm *ᵥ 0) =
-      (c : ℂ) * adelicFourierPi F g1 (Gm *ᵥ 0) :=
+  have h3
+      : adelicFourierPi F (fun x => (c : ℂ) * adelicFourierPi F f0 (Gm *ᵥ x)) (Gm *ᵥ 0)
+        = (c : ℂ) * adelicFourierPi F g1 (Gm *ᵥ 0) :=
     congrFun (adelicFourierPi_smul (c : ℂ) g1) _
   have h4 : adelicFourierPi F g1 (Gm *ᵥ 0) = f0 0 := by
     rw [Matrix.mulVec_zero, hg1, adelicFourierPi_comp_mulVec G G⁻¹ hNM hMN, Matrix.mulVec_zero,
@@ -67,11 +77,14 @@ theorem selfDual_eq (G : Matrix ι ι F) (hs : G.IsSymm) (hG : G.det ≠ 0) (ν 
     exact_mod_cast h8
   rw [e, h7, one_smul]
 
-theorem selfDual_transport {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-    [MeasurableSpace V] [BorelSpace V] [AddCommGroup V'] [TopologicalSpace V'] [IsTopologicalAddGroup V']
-    [MeasurableSpace V'] [BorelSpace V'] (e : V ≃ₜ V') (he : ∀ x y, e (x + y) = e x + e y)
-    (χ : V → V → ℂ) (χ' : V' → V' → ℂ) (hχ : ∀ x y, χ' (e x) (e y) = χ x y) (μ : Measure V)
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.SelfDual μ χ) : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.SelfDual (μ.map e) χ' := by
+theorem selfDual_transport
+    {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    [MeasurableSpace V] [BorelSpace V] [AddCommGroup V'] [TopologicalSpace V']
+    [IsTopologicalAddGroup V'] [MeasurableSpace V'] [BorelSpace V']
+    (e : V ≃ₜ V') (he : ∀ x y, e (x + y) = e x + e y)
+    (χ : V → V → ℂ) (χ' : V' → V' → ℂ) (hχ : ∀ x y, χ' (e x) (e y) = χ x y)
+    (μ : Measure V) (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.SelfDual μ χ)
+    : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.SelfDual (μ.map e) χ' := by
   have hμ := h.1
   let a : V ≃+ V' := AddEquiv.mk' e.toEquiv he
   have ha : ∀ x, a x = e x := fun _ => rfl
@@ -87,7 +100,7 @@ theorem selfDual_transport {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [
     exact h1.congr (Filter.Eventually.of_forall fun y => by simp only [Function.comp_apply, hT])
   have h2 := h.2 Φ0 (hc.comp e.continuous) (hs.comp_homeomorph e) hI' (e.symm z)
   rw [hemb.integral_map]
-  have h3 : Φ0 (-e.symm z) = Φ (-z) := by
+  have h3 : Φ0 (- e.symm z) = Φ (-z) := by
     simp only [hΦ0]
     rw [← ha, map_neg, ha, e.apply_symm_apply]
   rw [← h3, ← h2]
@@ -98,7 +111,9 @@ theorem selfDual_transport {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [
 end Gen
 
 section Link
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.Hypotheses₂.OneV
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV
 open GroundTheory.Global GroundTheory.Automorphic.GJMatrix GroundTheory.Heights₂.Theta
 open GlobalTheory.CompanionTheory.SW.BB GlobalTheory.CompanionTheory.SW.CoordMat
 open scoped TensorProduct ENNReal Matrix NumberField.AdeleRing
@@ -109,7 +124,9 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 end Link
 
 section Main
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.Hypotheses₂.OneV
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV
 open scoped TensorProduct ENNReal
 
 end Main

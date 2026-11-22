@@ -5,11 +5,13 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsV
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.GalOfCusp
-open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Ws UpperTheory.V.Base UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.GalOfCusp
+open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Ws UpperTheory.V.Base
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.unrOfIne :
-    UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.UnrOfIne := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.unrOfIne
+    : UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.UnrOfIne := by
   intro K M Ω _ _ _ _ _ _ _ _ _ _ _ v hI w
   haveI : IsAlgClosure K Ω := ⟨IsAlgClosure.isAlgClosed M, Algebra.IsAlgebraic.trans K M Ω⟩
   obtain ⟨A, hA⟩ := ReciprocityTheory.Gal.exists_isPlaceOver Ω w.1

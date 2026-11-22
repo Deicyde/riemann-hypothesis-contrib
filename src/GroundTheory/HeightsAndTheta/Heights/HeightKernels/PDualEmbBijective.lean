@@ -17,19 +17,19 @@ namespace DualEmbeddingBijective
 
 variable {K : Type} [Field K] [NumberField K] {i : ℕ}
 
-theorem exists_zsmul_mem_dualLattice (F : HermLattice K i) (y : Fin i → K) :
-    ∃ N : ℤ, N ≠ 0 ∧ N • y ∈ dualLattice F := by
+theorem exists_zsmul_mem_dualLattice (F : HermLattice K i) (y : Fin i → K)
+    : ∃ N : ℤ, N ≠ 0 ∧ N • y ∈ dualLattice F := by
   classical
   obtain ⟨S, hS⟩ := F.fg
-  obtain ⟨d, hd0, hd⟩ := exists_integral_multiples ℤ ℚ
-    (Finset.univ.image y ∪ S.biUnion fun g => Finset.univ.image g)
-  have hint : ∀ z : K, IsIntegral ℤ z → z ∈ (algebraMap (𝓞 K) K).range :=
-    fun z hz => ⟨⟨z, hz⟩, rfl⟩
+  obtain ⟨d, hd0, hd⟩ :=
+    exists_integral_multiples ℤ ℚ (Finset.univ.image y ∪ S.biUnion fun g => Finset.univ.image g)
+  have hint : ∀ z : K, IsIntegral ℤ z → z ∈ (algebraMap (𝓞 K) K).range := fun z hz => ⟨⟨z, hz⟩, rfl⟩
   refine ⟨d * d, mul_ne_zero hd0 hd0, ?_⟩
   intro x hx
   rw [← hS] at hx
   refine Submodule.span_induction
-    (p := fun x _ => ((d * d) • y) ⬝ᵥ x ∈ (algebraMap (𝓞 K) K).range) ?_ ?_ ?_ ?_ hx
+    (p := fun x _ => ((d * d) • y) ⬝ᵥ x ∈ (algebraMap (𝓞 K) K).range)
+    ?_ ?_ ?_ ?_ hx
   · intro g hg
     have hsum : ((d * d) • y) ⬝ᵥ g = ∑ j, (d • y j) * (d • g j) := by
       simp only [dotProduct, Pi.smul_apply, zsmul_eq_mul, Int.cast_mul]
@@ -38,8 +38,9 @@ theorem exists_zsmul_mem_dualLattice (F : HermLattice K i) (y : Fin i → K) :
     rw [hsum]
     refine sum_mem fun j _ => mul_mem (hint _ (hd _ ?_)) (hint _ (hd _ ?_))
     · exact Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ j))
-    · exact Finset.mem_union_right _ (Finset.mem_biUnion.mpr
-        ⟨g, Finset.mem_coe.mp hg, Finset.mem_image_of_mem _ (Finset.mem_univ j)⟩)
+    · exact Finset.mem_union_right _
+        (Finset.mem_biUnion.mpr
+          ⟨g, Finset.mem_coe.mp hg, Finset.mem_image_of_mem _ (Finset.mem_univ j)⟩)
   · rw [dotProduct_zero]
     exact zero_mem _
   · intro x z _ _ hx hz
@@ -54,8 +55,8 @@ def pairing (w : (K →+* ℂ) × Fin i → ℂ) : (Fin i → K) →+ ℂ where
   map_zero' := by simp
   map_add' φ ψ := by simp [add_mul, Finset.sum_add_distrib]
 
-theorem pairing_single (w : (K →+* ℂ) × Fin i → ℂ) (j : Fin i) (x : K) :
-    pairing w (Pi.single j x) = ∑ σ : K →+* ℂ, w (σ, j) * σ x := by
+theorem pairing_single (w : (K →+* ℂ) × Fin i → ℂ) (j : Fin i) (x : K)
+    : pairing w (Pi.single j x) = ∑ σ : K →+* ℂ, w (σ, j) * σ x := by
   classical
   simp only [pairing, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun σ _ => ?_
@@ -65,9 +66,11 @@ theorem pairing_single (w : (K →+* ℂ) × Fin i → ℂ) (j : Fin i) (x : K) 
     simp [Pi.single_eq_of_ne hj']
   · simp
 
-theorem injective (F : HermLattice K i) {T : Type} [Fintype T] [DecidableEq T]
-    (b : Module.Basis T ℤ (dualLattice F)) :
-    Function.Injective (Matrix.mulVecLin (dualEmbMatrix b)) := by
+theorem injective
+    (F : HermLattice K i)
+    {T : Type} [Fintype T] [DecidableEq T]
+    (b : Module.Basis T ℤ (dualLattice F))
+    : Function.Injective (Matrix.mulVecLin (dualEmbMatrix b)) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro w hw
   have hb : ∀ t, pairing w (b t : Fin i → K) = 0 := fun t => by
@@ -87,8 +90,10 @@ theorem injective (F : HermLattice K i) {T : Type} [Fintype T] [DecidableEq T]
     exact (smul_eq_zero.mp h).resolve_left hN
   funext p
   obtain ⟨σ, j⟩ := p
-  have hli := (linearIndependent_monoidHom K ℂ).comp (fun σ : K →+* ℂ => σ.toMonoidHom)
-    (fun σ τ h => RingHom.ext fun x => DFunLike.congr_fun h x)
+  have hli :=
+    (linearIndependent_monoidHom K ℂ).comp
+      (fun σ : K →+* ℂ => σ.toMonoidHom)
+      (fun σ τ h => RingHom.ext fun x => DFunLike.congr_fun h x)
   rw [Fintype.linearIndependent_iff] at hli
   refine hli (fun σ => w (σ, j)) ?_ σ
   funext x
@@ -96,9 +101,8 @@ theorem injective (F : HermLattice K i) {T : Type} [Fintype T] [DecidableEq T]
   rw [pairing_single] at h
   simpa [Finset.sum_apply] using h
 
-theorem card_le (F : HermLattice K i) {T : Type} [Fintype T]
-    (b : Module.Basis T ℤ (dualLattice F)) :
-    Fintype.card T ≤ Fintype.card ((K →+* ℂ) × Fin i) := by
+theorem card_le (F : HermLattice K i) {T : Type} [Fintype T] (b : Module.Basis T ℤ (dualLattice F))
+    : Fintype.card T ≤ Fintype.card ((K →+* ℂ) × Fin i) := by
   have h1 : LinearIndependent ℤ (fun t => (b t : Fin i → K)) :=
     b.linearIndependent.map' (dualLattice F).subtype (Submodule.ker_subtype _)
   have h2 : LinearIndependent ℚ (fun t => (b t : Fin i → K)) :=

@@ -17,22 +17,27 @@ end GlobalTheory
 open GlobalTheory
 
 namespace Gp91
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.BesselNormSq
 
-theorem integral_comp_mp {X : Type} [MeasurableSpace X] {μ : Measure X} {f : X → X}
-    (hf : MeasurePreserving f μ μ) {F : X → ℂ} (hF : Integrable F μ) :
-    ∫ x, F x ∂μ = ∫ x, F (f x) ∂μ := by
+theorem integral_comp_mp
+    {X : Type} [MeasurableSpace X]
+    {μ : Measure X} {f : X → X} (hf : MeasurePreserving f μ μ)
+    {F : X → ℂ} (hF : Integrable F μ)
+    : ∫ x, F x ∂μ = ∫ x, F (f x) ∂μ := by
   have h1 : AEStronglyMeasurable F (μ.map f) := by rw [hf.map_eq]; exact hF.1
   rw [← integral_map hf.measurable.aemeasurable h1, hf.map_eq]
 
-theorem inner_integral_apply {X Wp : Type} [MeasurableSpace X] {μ : Measure X}
-    [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp]
-    {F : X → (Wp →L[ℂ] Wp)} (hF : Integrable F μ) (ξ η : Wp) :
-    ⟪η, (∫ x, F x ∂μ) ξ⟫_ℂ = ∫ x, ⟪η, F x ξ⟫_ℂ ∂μ ∧
-    ⟪(∫ x, F x ∂μ) ξ, η⟫_ℂ = ∫ x, ⟪F x ξ, η⟫_ℂ ∂μ ∧ Integrable (fun x => ⟪F x ξ, η⟫_ℂ) μ := by
+theorem inner_integral_apply
+    {X Wp : Type} [MeasurableSpace X]
+    {μ : Measure X} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp]
+    {F : X → (Wp →L[ℂ] Wp)} (hF : Integrable F μ)
+    (ξ η : Wp)
+    : ⟪η, (∫ x, F x ∂μ) ξ⟫_ℂ = ∫ x, ⟪η, F x ξ⟫_ℂ ∂μ ∧ ⟪(∫ x, F x ∂μ) ξ, η⟫_ℂ = ∫ x, ⟪F x ξ, η⟫_ℂ ∂μ
+      ∧ Integrable (fun x => ⟪F x ξ, η⟫_ℂ) μ := by
   have h1 : Integrable (fun x => F x ξ) μ := hF.apply_continuousLinearMap ξ
   have h2 : ⟪η, (∫ x, F x ∂μ) ξ⟫_ℂ = ∫ x, ⟪η, F x ξ⟫_ℂ ∂μ := by
     rw [ContinuousLinearMap.integral_apply hF, integral_inner h1]
@@ -41,7 +46,6 @@ theorem inner_integral_apply {X Wp : Type} [MeasurableSpace X] {μ : Measure X}
   simp only [inner_conj_symm]
 
 end GlobalTheory.BesselNormSq
-
 
 open GlobalTheory.BesselNormSq in
 set_option maxHeartbeats 1000000 in

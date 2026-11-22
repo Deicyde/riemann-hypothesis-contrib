@@ -14,9 +14,18 @@ namespace GlobalTheory.CompanionTheory.SW.ThW
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
 open scoped ENNReal NNReal MatrixGroups Kronecker
 
-theorem muF_latN : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F)), lf.IsAddHaarMeasure → lf (Oh F) = 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι F) (N : ℕ), 0 < N → (muF B lf (latN F ι N : Set (ι → A F))).toReal = kap F ^ Fintype.card ι * (Real.sqrt |((Algebra.norm ℚ B.det : ℚ) : ℝ)|)⁻¹ * (((N : ℝ) ^ Module.finrank ℚ F)⁻¹) ^ Fintype.card ι := by
+theorem muF_latN
+    : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)] [BorelSpace (A F)]
+        (lf : Measure (A F)),
+      lf.IsAddHaarMeasure → lf (Oh F) = 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι F) (N : ℕ),
+          0 < N
+            → (muF B lf (latN F ι N : Set (ι → A F))).toReal
+              = kap F ^ Fintype.card ι * (Real.sqrt |((Algebra.norm ℚ B.det : ℚ) : ℝ)|)⁻¹
+                * (((N : ℝ) ^ Module.finrank ℚ F)⁻¹) ^ Fintype.card ι := by
   intro F _ _ _ _ lf hH h1 ι _ _ B N hN
-  obtain ⟨hlc, hsc, ht2, -, hopen, -, -, -, -, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
+  obtain ⟨hlc, hsc, ht2, -, hopen, -, -, -, -, -⟩ :=
+    GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   haveI := hlc
   haveI := hsc
   haveI := ht2

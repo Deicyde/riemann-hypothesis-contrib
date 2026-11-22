@@ -7,15 +7,16 @@ public import Formalism.MeanHeightDescent.AverageDegreeBounds.GlobalBoundRefinem
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree NumberField GlobalTheory.MeanTop
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree
+  NumberField GlobalTheory.MeanTop
 
 namespace GlobalTheory.MeanTop.Wts
 
 variable {ι : Type} {N : ℕ} (W : Wts ι N)
 
-theorem div_gap_step (h : W.Hyp) (hd : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : ℕ) = a + 1) :
-    0 ≤ W.u1 τ a - W.u1 τ b ∧
-      ((W.T : ℤ) + W.Dd + 1) * (W.u1 τ a - W.u1 τ b) ≤ W.u τ a - W.u τ b + 2 := by
+theorem div_gap_step (h : W.Hyp) (hd : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : ℕ) = a + 1)
+    : 0 ≤ W.u1 τ a - W.u1 τ b
+      ∧ ((W.T : ℤ) + W.Dd + 1) * (W.u1 τ a - W.u1 τ b) ≤ W.u τ a - W.u τ b + 2 := by
   have hM : (0 : ℤ) < (W.T : ℤ) + W.Dd + 1 := by positivity
   have hc := h.weightConst_nonneg
   obtain ⟨h41, -, h43⟩ := h.h4 τ a b hab
@@ -31,9 +32,11 @@ theorem div_gap_step (h : W.Hyp) (hd : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (
     have h6 : (0 : ℤ) ≤ ((W.T : ℤ) + W.Dd + 2) * ((W.T : ℤ) + W.Dd + 2 + 2 * N) := by positivity
     exact ⟨Int.ediv_nonneg (by linarith) hM.le, Int.mul_ediv_self_le hM.ne'⟩
 
-theorem div_gap_sum (h : W.Hyp) (hd : W.IsDiv) (τ : ι) (n : ℕ) : ∀ a b : Fin N, (b : ℕ) = a + n →
-    0 ≤ W.u1 τ a - W.u1 τ b ∧
-      ((W.T : ℤ) + W.Dd + 1) * (W.u1 τ a - W.u1 τ b) ≤ W.u τ a - W.u τ b + 2 * n := by
+theorem div_gap_sum (h : W.Hyp) (hd : W.IsDiv) (τ : ι) (n : ℕ)
+    : ∀ a b : Fin N,
+      (b : ℕ) = a + n
+        → 0 ≤ W.u1 τ a - W.u1 τ b
+          ∧ ((W.T : ℤ) + W.Dd + 1) * (W.u1 τ a - W.u1 τ b) ≤ W.u τ a - W.u τ b + 2 * n := by
   induction n with
   | zero =>
     intro a b hab
@@ -53,9 +56,12 @@ end GlobalTheory.MeanTop.Wts
 
 namespace GlobalTheory.MeanTop
 
-theorem divided_entries : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts ι N), W.Hyp → W.IsDiv → ∀ τ i,
-    ((W.T : ℤ) + W.Dd + 1) * |W.u1 τ i| ≤ |W.u τ i| + W.c0 + 4 * N ∧
-      (W.kc ≤ (i : ℕ) + 1 → W.u1 τ i ≤ 0) ∧ ((i : ℕ) < W.kc → 0 ≤ W.u1 τ i) := by
+theorem divided_entries
+    : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts ι N),
+      W.Hyp → W.IsDiv
+        → ∀ τ i,
+          ((W.T : ℤ) + W.Dd + 1) * |W.u1 τ i| ≤ |W.u τ i| + W.c0 + 4 * N
+            ∧ (W.kc ≤ (i : ℕ) + 1 → W.u1 τ i ≤ 0) ∧ ((i : ℕ) < W.kc → 0 ≤ W.u1 τ i) := by
   intro ι _ N W h hd τ i
   have hk := h.kc_pos
   have hk2 := h.kc_lt
@@ -67,16 +73,17 @@ theorem divided_entries : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts ι N),
   have ha : (a : ℕ) + 1 = W.kc := by simp only [a]; omega
   have hu : W.u τ a = 0 := h.anchor τ a ha
   have hu1 : W.u1 τ a = 0 := (hd τ).1 a ha
-  have up : (i : ℕ) < W.kc → 0 ≤ W.u1 τ i ∧
-      ((W.T : ℤ) + W.Dd + 1) * W.u1 τ i ≤ W.u τ i + 2 * N := by
+  have up
+      : (i : ℕ) < W.kc → 0 ≤ W.u1 τ i ∧ ((W.T : ℤ) + W.Dd + 1) * W.u1 τ i ≤ W.u τ i + 2 * N := by
     intro hi'
     obtain ⟨h1, h2⟩ := W.div_gap_sum h hd τ (a - i) i a (by omega)
     have h3 : (((a : ℕ) - i : ℕ) : ℤ) ≤ N := by omega
     rw [hu1, sub_zero] at h1 h2
     rw [hu] at h2
     exact ⟨h1, by linarith⟩
-  have down : W.kc ≤ (i : ℕ) + 1 → W.u1 τ i ≤ 0 ∧
-      ((W.T : ℤ) + W.Dd + 1) * (-W.u1 τ i) ≤ -W.u τ i + 2 * N := by
+  have down
+      : W.kc ≤ (i : ℕ) + 1
+        → W.u1 τ i ≤ 0 ∧ ((W.T : ℤ) + W.Dd + 1) * (- W.u1 τ i) ≤ - W.u τ i + 2 * N := by
     intro hi'
     obtain ⟨h1, h2⟩ := W.div_gap_sum h hd τ (i - a) a i (by omega)
     have h3 : (((i : ℕ) - a : ℕ) : ℤ) ≤ N := by omega

@@ -15,19 +15,28 @@ private theorem exists_lt_apply {n : ℕ} (w : Perm (Fin n)) (hw : w ≠ 1) : �
   have heq := (Finset.sum_eq_sum_iff_of_le hle).mp hs
   exact Equiv.ext fun i => Fin.ext (by simpa using heq i (Finset.mem_univ _))
 
-theorem UpperTheory.V.AlgebraTools.hkDualEx :
-    ∀ (R : Type) [CommRing R] (n : ℕ), ∃ (ι : Type) (_ : Fintype ι) (a b : ι → MvPolynomial (Fin n) R), IsDual a b := by
+theorem UpperTheory.V.AlgebraTools.hkDualEx
+    : ∀ (R : Type) [CommRing R] (n : ℕ),
+      ∃ (ι : Type) (_ : Fintype ι) (a b : ι → MvPolynomial (Fin n) R),
+        IsDual a b := by
   intro R _ n
-  refine ⟨Finset (Fin n × Fin n), inferInstance,
+  refine ⟨
+    Finset (Fin n × Fin n),
+    inferInstance,
     fun t => if t ⊆ pairs n then ∏ p ∈ t, (X p.2 : MvPolynomial (Fin n) R) else 0,
-    fun t => ∏ p ∈ pairs n \ t, (-X p.1 : MvPolynomial (Fin n) R), ?_⟩
+    fun t => ∏ p ∈ pairs n \ t, (-X p.1 : MvPolynomial (Fin n) R),
+    ?_
+  ⟩
   intro w
-  have hsum : ∑ t : Finset (Fin n × Fin n), (if t ⊆ pairs n then ∏ p ∈ t, (X p.2 : MvPolynomial (Fin n) R) else 0) *
-      rename w (∏ p ∈ pairs n \ t, (-X p.1 : MvPolynomial (Fin n) R)) =
-      ∏ p ∈ pairs n, ((X p.2 : MvPolynomial (Fin n) R) + -X (w p.1)) := by
+  have hsum
+      : ∑ t : Finset (Fin n × Fin n), (if t ⊆ pairs n then ∏ p ∈ t, (X p.2 : MvPolynomial (Fin n) R) else 0) *
+          rename w (∏ p ∈ pairs n \ t, (-X p.1 : MvPolynomial (Fin n) R))
+        = ∏ p ∈ pairs n, ((X p.2 : MvPolynomial (Fin n) R) + -X (w p.1)) := by
     simp only [ite_mul, zero_mul]
     rw [← Finset.sum_filter]
-    have hf : Finset.univ.filter (fun t : Finset (Fin n × Fin n) => t ⊆ pairs n) = (pairs n).powerset := by
+    have hf
+        : Finset.univ.filter (fun t : Finset (Fin n × Fin n) => t ⊆ pairs n)
+          = (pairs n).powerset := by
       ext t
       simp
     rw [hf, Finset.prod_add]

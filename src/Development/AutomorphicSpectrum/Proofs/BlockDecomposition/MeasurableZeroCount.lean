@@ -18,9 +18,9 @@ variable {X : Type} [TopologicalSpace X] {d : ℕ} {α : Type} [Fintype α]
 def zeroSetIn (A : Set X) (b : α → X → ℂ) (C : Fin d → α → ℂ) : Set X :=
   {z ∈ A | ∀ k, ∑ j, C k j * b j z = 0}
 
-theorem isClosed_meets_compact {K : Set X} (hK : IsCompact K) {b : α → X → ℂ}
-    (hb : ∀ j, ContinuousOn (b j) K) :
-    IsClosed {C : Fin d → α → ℂ | ∃ z ∈ K, ∀ k, ∑ j, C k j * b j z = 0} := by
+theorem isClosed_meets_compact
+    {K : Set X} (hK : IsCompact K) {b : α → X → ℂ} (hb : ∀ j, ContinuousOn (b j) K)
+    : IsClosed {C : Fin d → α → ℂ | ∃ z ∈ K, ∀ k, ∑ j, C k j * b j z = 0} := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.mp hK
   have hF : Continuous fun p : (Fin d → α → ℂ) × K => fun k => ∑ j, p.1 k j * b j p.2 := by
     refine continuous_pi fun k => ?_
@@ -33,8 +33,9 @@ theorem isClosed_meets_compact {K : Set X} (hK : IsCompact K) {b : α → X → 
   have hclosed : IsClosed {p : (Fin d → α → ℂ) × K | ∀ k, ∑ j, p.1 k j * b j p.2 = 0} := by
     simp only [Set.ofPred_forall]
     exact isClosed_iInter fun k => isClosed_eq ((continuous_apply k).comp hF) continuous_const
-  have himage : {C : Fin d → α → ℂ | ∃ z ∈ K, ∀ k, ∑ j, C k j * b j z = 0} =
-      Prod.fst '' {p : (Fin d → α → ℂ) × K | ∀ k, ∑ j, p.1 k j * b j p.2 = 0} := by
+  have himage
+      : {C : Fin d → α → ℂ | ∃ z ∈ K, ∀ k, ∑ j, C k j * b j z = 0}
+        = Prod.fst '' {p : (Fin d → α → ℂ) × K | ∀ k, ∑ j, p.1 k j * b j p.2 = 0} := by
     ext C
     constructor
     · rintro ⟨z, hz, h⟩
@@ -44,17 +45,19 @@ theorem isClosed_meets_compact {K : Set X} (hK : IsCompact K) {b : α → X → 
   rw [himage]
   exact isClosedMap_fst_of_compactSpace _ hclosed
 
-theorem measurableSet_meets_inter [T2Space X] [SecondCountableTopology X] [LocallyCompactSpace X]
-    {A B : Set X} (hA : IsSigmaCompact A) (hB : IsOpen B) {b : α → X → ℂ}
-    (hb : ∀ j, ContinuousOn (b j) A) :
-    MeasurableSet {C : Fin d → α → ℂ | ∃ z ∈ A ∩ B, ∀ k, ∑ j, C k j * b j z = 0} := by
+theorem measurableSet_meets_inter
+    [T2Space X] [SecondCountableTopology X] [LocallyCompactSpace X]
+    {A B : Set X} (hA : IsSigmaCompact A) (hB : IsOpen B)
+    {b : α → X → ℂ} (hb : ∀ j, ContinuousOn (b j) A)
+    : MeasurableSet {C : Fin d → α → ℂ | ∃ z ∈ A ∩ B, ∀ k, ∑ j, C k j * b j z = 0} := by
   obtain ⟨K, hK, hKA⟩ := hA
   have hBσ : IsSigmaCompact B := by
     haveI := hB.locallyCompactSpace
     exact isSigmaCompact_iff_sigmaCompactSpace.mpr inferInstance
   obtain ⟨L, hL, hLB⟩ := hBσ
-  have hEq : {C : Fin d → α → ℂ | ∃ z ∈ A ∩ B, ∀ k, ∑ j, C k j * b j z = 0} =
-      ⋃ n, ⋃ m, {C : Fin d → α → ℂ | ∃ z ∈ K n ∩ L m, ∀ k, ∑ j, C k j * b j z = 0} := by
+  have hEq
+      : {C : Fin d → α → ℂ | ∃ z ∈ A ∩ B, ∀ k, ∑ j, C k j * b j z = 0}
+        = ⋃ n, ⋃ m, {C : Fin d → α → ℂ | ∃ z ∈ K n ∩ L m, ∀ k, ∑ j, C k j * b j z = 0} := by
     ext C
     simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_inter_iff]
     constructor
@@ -78,12 +81,12 @@ theorem measurableSet_meets_inter [T2Space X] [SecondCountableTopology X] [Local
   rw [← hKA]
   exact Set.mem_iUnion.mpr ⟨n, hz.1⟩
 
-theorem natCast_le_encard_zeroSetIn_iff [T2Space X] [SecondCountableTopology X] (A : Set X)
-    (b : α → X → ℂ) (C : Fin d → α → ℂ) (N : ℕ) :
-    (N : ℕ∞) ≤ (zeroSetIn A b C).encard ↔
-      ∃ f : Fin N → countableBasis X,
-        (∀ i j, i ≠ j → Disjoint (f i : Set X) (f j)) ∧
-        ∀ i, ∃ z ∈ A ∩ (f i : Set X), ∀ k, ∑ j, C k j * b j z = 0 := by
+theorem natCast_le_encard_zeroSetIn_iff
+    [T2Space X] [SecondCountableTopology X] (A : Set X) (b : α → X → ℂ) (C : Fin d → α → ℂ) (N : ℕ)
+    : (N : ℕ∞) ≤ (zeroSetIn A b C).encard
+      ↔ ∃ f : Fin N → countableBasis X,
+        (∀ i j, i ≠ j → Disjoint (f i : Set X) (f j))
+          ∧ ∀ i, ∃ z ∈ A ∩ (f i : Set X), ∀ k, ∑ j, C k j * b j z = 0 := by
   classical
   constructor
   · intro hN
@@ -123,29 +126,35 @@ theorem natCast_le_encard_zeroSetIn_iff [T2Space X] [SecondCountableTopology X] 
       obtain ⟨i, rfl⟩ := hx
       simp only [zeroSetIn, Set.mem_ofPred_eq]
       exact ⟨(hzmem i).1, hzero i⟩
-    calc (N : ℕ∞) = ((Finset.univ.image z : Finset X) : Set X).encard := by
-          rw [Set.encard_coe_eq_coe_finsetCard, Finset.card_image_of_injective _ hinj,
-            Finset.card_univ, Fintype.card_fin]
+    calc
+      (N : ℕ∞) = ((Finset.univ.image z : Finset X) : Set X).encard := by
+        rw [Set.encard_coe_eq_coe_finsetCard, Finset.card_image_of_injective _ hinj,
+          Finset.card_univ, Fintype.card_fin]
       _ ≤ (zeroSetIn A b C).encard := Set.encard_le_encard hsub
 
-theorem measurableSet_natCast_le_encard_zeroSetIn [T2Space X] [SecondCountableTopology X]
-    [LocallyCompactSpace X] {A : Set X} (hA : IsSigmaCompact A) {b : α → X → ℂ}
-    (hb : ∀ j, ContinuousOn (b j) A) (N : ℕ) :
-    MeasurableSet {C : Fin d → α → ℂ | (N : ℕ∞) ≤ (zeroSetIn A b C).encard} := by
+theorem measurableSet_natCast_le_encard_zeroSetIn
+    [T2Space X] [SecondCountableTopology X] [LocallyCompactSpace X]
+    {A : Set X} (hA : IsSigmaCompact A)
+    {b : α → X → ℂ} (hb : ∀ j, ContinuousOn (b j) A)
+    (N : ℕ)
+    : MeasurableSet {C : Fin d → α → ℂ | (N : ℕ∞) ≤ (zeroSetIn A b C).encard} := by
   classical
   haveI : Countable (countableBasis X) := (countable_countableBasis X).to_subtype
-  have hEq : {C : Fin d → α → ℂ | (N : ℕ∞) ≤ (zeroSetIn A b C).encard} =
-      ⋃ f : Fin N → countableBasis X, ⋃ (_ : ∀ i j, i ≠ j → Disjoint (f i : Set X) (f j)),
-        ⋂ i, {C : Fin d → α → ℂ | ∃ z ∈ A ∩ (f i : Set X), ∀ k, ∑ j, C k j * b j z = 0} := by
+  have hEq
+      : {C : Fin d → α → ℂ | (N : ℕ∞) ≤ (zeroSetIn A b C).encard}
+        = ⋃ f : Fin N → countableBasis X, ⋃ (_ : ∀ i j, i ≠ j → Disjoint (f i : Set X) (f j)),
+            ⋂ i, {C : Fin d → α → ℂ | ∃ z ∈ A ∩ (f i : Set X), ∀ k, ∑ j, C k j * b j z = 0} := by
     ext C
     simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_iInter, exists_prop]
     exact natCast_le_encard_zeroSetIn_iff A b C N
   rw [hEq]
-  refine MeasurableSet.iUnion fun f => MeasurableSet.iUnion fun _ => MeasurableSet.iInter fun i => ?_
+  refine MeasurableSet.iUnion fun f =>
+    MeasurableSet.iUnion fun _ => MeasurableSet.iInter fun i => ?_
   exact measurableSet_meets_inter hA ((isBasis_countableBasis X).isOpen (f i).2) hb
 
-private theorem measurable_of_natCast_le_lemma {β : Type} [MeasurableSpace β] (g : β → ℕ∞)
-    (hg : ∀ N : ℕ, MeasurableSet {x | (N : ℕ∞) ≤ g x}) : Measurable g := by
+private theorem measurable_of_natCast_le_lemma
+    {β : Type} [MeasurableSpace β] (g : β → ℕ∞) (hg : ∀ N : ℕ, MeasurableSet {x | (N : ℕ∞) ≤ g x})
+    : Measurable g := by
   refine measurable_to_countable' fun x => ?_
   induction x using ENat.recTopCoe with
   | top =>
@@ -183,17 +192,19 @@ private theorem measurable_of_natCast_le_lemma {β : Type} [MeasurableSpace β] 
     rw [h]
     exact (hg n).diff (hg (n + 1))
 
-theorem measurable_zeroCnt_of_continuousOn [T2Space X] [SecondCountableTopology X]
-    [LocallyCompactSpace X] {A : Set X} (hA : IsSigmaCompact A) {b : α → X → ℂ}
-    (hb : ∀ j, ContinuousOn (b j) A) :
-    Measurable (zeroCnt d A b : (Fin d → α → ℂ) → ℝ≥0∞) := by
+theorem measurable_zeroCnt_of_continuousOn
+    [T2Space X] [SecondCountableTopology X] [LocallyCompactSpace X]
+    {A : Set X} (hA : IsSigmaCompact A)
+    {b : α → X → ℂ} (hb : ∀ j, ContinuousOn (b j) A)
+    : Measurable (zeroCnt d A b : (Fin d → α → ℂ) → ℝ≥0∞) := by
   have hg : Measurable fun C : Fin d → α → ℂ => (zeroSetIn A b C).encard :=
     measurable_of_natCast_le_lemma _ fun N => measurableSet_natCast_le_encard_zeroSetIn hA hb N
   exact (Measurable.of_discrete (f := fun n : ℕ∞ => (n : ℝ≥0∞))).comp hg
 
-theorem measurable_zeroCnt : ∀ (d : ℕ) (α : Type) [Fintype α] (U A : Set (V d)) (b : α → V d → ℂ),
-    (∀ j, ContinuousOn (b j) U) → A ⊆ U → IsSigmaCompact A →
-      Measurable (zeroCnt d A b : (Fin d → α → ℂ) → ℝ≥0∞) := by
+theorem measurable_zeroCnt
+    : ∀ (d : ℕ) (α : Type) [Fintype α] (U A : Set (V d)) (b : α → V d → ℂ),
+      (∀ j, ContinuousOn (b j) U) → A ⊆ U → IsSigmaCompact A
+        → Measurable (zeroCnt d A b : (Fin d → α → ℂ) → ℝ≥0∞) := by
   intro d α _ U A b hb hAU hA
   exact measurable_zeroCnt_of_continuousOn hA fun j => (hb j).mono hAU
 

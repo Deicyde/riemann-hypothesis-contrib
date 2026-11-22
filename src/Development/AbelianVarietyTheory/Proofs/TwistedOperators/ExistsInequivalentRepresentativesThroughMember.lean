@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,7 +21,12 @@ open Formalism.MainNotions.S
 
 namespace GlobalTheory.TrUnion
 
-theorem exists_reps_through : ∀ (G : Type) [Group G] [TopologicalSpace G] (m : ℕ) (W : Fin m → Type) [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)] (σ : ∀ i, Representation ℂ G (W i)), ∀ i₀ : Fin m, ∃ (n : ℕ) (s : Fin n → Fin m), (∀ i j, i ≠ j → IsEmpty ((σ (s i)).Equiv (σ (s j)))) ∧ (∃ j, s j = i₀) ∧ ∀ i, ∃ j, Nonempty ((σ i).Equiv (σ (s j))) := by
+theorem exists_reps_through
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] (m : ℕ) (W : Fin m → Type)
+        [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)] (σ : ∀ i, Representation ℂ G (W i)),
+      ∀ i₀ : Fin m, ∃ (n : ℕ) (s : Fin n → Fin m),
+        (∀ i j, i ≠ j → IsEmpty ((σ (s i)).Equiv (σ (s j)))) ∧ (∃ j, s j = i₀)
+          ∧ ∀ i, ∃ j, Nonempty ((σ i).Equiv (σ (s j))) := by
   intro G _ _ m W _ _ σ i₀
   classical
   let R : Fin m → Fin m → Prop := fun i j => Nonempty ((σ i).Equiv (σ j))
@@ -53,7 +61,8 @@ theorem exists_reps_through : ∀ (G : Type) [Group G] [TopologicalSpace G] (m :
       exact htrans (hsymm (hf x)) (htrans h1 (hf y))
     have : (e.symm k).1 = (e.symm l).1 := by rw [← hx, ← hy]; exact hfc x y hxy
     exact e.symm.injective (Subtype.ext this)
-  · have hmem : i₀ ∈ T := Finset.mem_image.2 ⟨i₀, Finset.mem_univ _, by simp only [f, if_pos (hrefl i₀)]⟩
+  · have hmem : i₀ ∈ T :=
+      Finset.mem_image.2 ⟨i₀, Finset.mem_univ _, by simp only [f, if_pos (hrefl i₀)]⟩
     exact ⟨e ⟨i₀, hmem⟩, by simp⟩
   · intro i
     have hmem : f i ∈ T := Finset.mem_image_of_mem f (Finset.mem_univ i)

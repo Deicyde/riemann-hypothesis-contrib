@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 noncomputable section
 
-open MeasureTheory Formalism.MainNotions.S Formalism.MainNotions.CayleySignature Formalism.L2.SG.SplitPrimeNormLemmas Matrix
+open MeasureTheory Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
+  Formalism.L2.SG.SplitPrimeNormLemmas Matrix
 open scoped InnerProductSpace ENNReal
 
 namespace WlocSk.DecayR
@@ -95,7 +96,8 @@ theorem reproducing_formula_holds : WlocSk.ReprodG := by
     · obtain ⟨g, hg⟩ := h
       refine ⟨g, hg, ?_⟩
       show Function.extend ψ f (fun _ => 0) (Matrix.of.symm y) = f g
-      rw [← hg]; exact hE.injective.extend_apply _ _ g
+      rw [← hg]
+      exact hE.injective.extend_apply _ _ g
     · exact absurd (Function.extend_apply' f (fun _ => (0 : ℂ)) _ h) hy
   have hcont : Continuous fun g : Formalism.REAL.UJ (eps48 k r) => P'⁻¹ * uMat g * P' :=
     (continuous_const.matrix_mul (Units.continuous_val.comp continuous_subtype_val)).matrix_mul
@@ -103,24 +105,36 @@ theorem reproducing_formula_holds : WlocSk.ReprodG := by
   have hinv := OneP.unit_inv hP'.2
   have h1 := OneP.unit_star_mul hP'.2
   have h2 := OneP.unit_mul_star hP'.2
-  refine ⟨α, (fun g => P'⁻¹ * uMat g * P') '' Ω', cc.toReal⁻¹ * max a' 0, hΩc.image hcont, ?_, ?_, ?_, ?_,
-    ?_, ?_⟩
+  refine ⟨
+    α,
+    (fun g => P'⁻¹ * uMat g * P') '' Ω',
+    cc.toReal⁻¹ * max a' 0,
+    hΩc.image hcont,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rintro _ ⟨g, _, rfl⟩
-    have hg : (uMat g)ᴴ * Formalism.REAL.Jm (eps48 k r) * uMat g = Formalism.REAL.Jm (eps48 k r) := g.2
+    have hg : (uMat g)ᴴ * Formalism.REAL.Jm (eps48 k r) * uMat g = Formalism.REAL.Jm (eps48 k r) :=
+      g.2
     show (P'⁻¹ * uMat g * P')ᴴ * Formalism.QuantumDeterminants.Hpk k r * (P'⁻¹ * uMat g * P') = Formalism.QuantumDeterminants.Hpk k r
     rw [← hP'.1.2, hinv]
-    calc (P'ᴴ * uMat g * P')ᴴ * (P'ᴴ * Formalism.REAL.Jm (eps48 k r) * P') * (P'ᴴ * uMat g * P')
-        = P'ᴴ * (uMat g)ᴴ * (P' * P'ᴴ) * Formalism.REAL.Jm (eps48 k r) * (P' * P'ᴴ) * uMat g * P' := by
-          simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
+    calc
+      (P'ᴴ * uMat g * P')ᴴ * (P'ᴴ * Formalism.REAL.Jm (eps48 k r) * P') * (P'ᴴ * uMat g * P')
+          = P'ᴴ * (uMat g)ᴴ * (P' * P'ᴴ) * Formalism.REAL.Jm (eps48 k r) * (P' * P'ᴴ) * uMat g
+            * P' := by
+        simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
       _ = P'ᴴ * ((uMat g)ᴴ * Formalism.REAL.Jm (eps48 k r) * uMat g) * P' := by
-          rw [h2]; simp only [Matrix.mul_one, Matrix.mul_assoc]
+        rw [h2]; simp only [Matrix.mul_one, Matrix.mul_assoc]
       _ = P'ᴴ * Formalism.REAL.Jm (eps48 k r) * P' := by rw [hg]
   · have hfm : Measurable f := hαm.const_smul (cc.toReal⁻¹ : ℝ)
     exact hE.measurable_extend hfm measurable_const
   · intro y hy
     obtain ⟨g, hg, hyg⟩ := hcase y hy
-    have hg0 : α' g ≠ 0 := by
-      intro h0; apply hy; rw [hyg, hf]; simp [h0]
+    have hg0 : α' g ≠ 0 := by intro h0; apply hy; rw [hyg, hf]; simp [h0]
     refine ⟨g, hαs g hg0, ?_⟩
     rw [← Matrix.of.apply_symm_apply y, ← hg]
     rfl
@@ -133,23 +147,28 @@ theorem reproducing_formula_holds : WlocSk.ReprodG := by
       simp only
       rw [norm_smul, Real.norm_of_nonneg hcn]
       exact mul_le_mul_of_nonneg_left ((hαb g).trans (le_max_left _ _)) hcn
-  · have hfun : (fun x : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of x) • σ (Matrix.of x) w) ∘ ψ =
-        fun g => (cc.toReal⁻¹ : ℝ) • (α' g • σ (P'⁻¹ * uMat g * P') w) := by
+  · have hfun
+        : (fun x : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of x) • σ (Matrix.of x) w) ∘ ψ
+          = fun g => (cc.toReal⁻¹ : ℝ) • (α' g • σ (P'⁻¹ * uMat g * P') w) := by
       funext g
       simp only [Function.comp]
       rw [hαψ, hf, smul_assoc]
       rfl
     rw [hμ, hE.integrable_map_iff, hfun]
     exact (hαi.smul_measure hctop).smul _
-  · have hfun : (fun x : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of x) • σ (Matrix.of x) w) ∘ ψ =
-        fun g => (cc.toReal⁻¹ : ℝ) • (α' g • σ (P'⁻¹ * uMat g * P') w) := by
+  · have hfun
+        : (fun x : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of x) • σ (Matrix.of x) w) ∘ ψ
+          = fun g => (cc.toReal⁻¹ : ℝ) • (α' g • σ (P'⁻¹ * uMat g * P') w) := by
       funext g
       simp only [Function.comp]
       rw [hαψ, hf, smul_assoc]
       rfl
     rw [hμ, hE.integral_map, integral_smul_measure]
-    have hpt : ∀ x, α (Matrix.of (ψ x)) • σ (Matrix.of (ψ x)) w =
-        (cc.toReal⁻¹ : ℝ) • (α' x • σ (P'⁻¹ * uMat x * P') w) := fun x => congrFun hfun x
+    have hpt
+        : ∀ x,
+          α (Matrix.of (ψ x)) • σ (Matrix.of (ψ x)) w
+            = (cc.toReal⁻¹ : ℝ) • (α' x • σ (P'⁻¹ * uMat x * P') w) := fun x =>
+      congrFun hfun x
     simp_rw [hpt]
     rw [integral_smul]
     have he : ∫ g, α' g • σ (P'⁻¹ * uMat g * P') w ∂(PI.UpqRep.muG (eps48 k r)) = w := hαe

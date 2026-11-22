@@ -6,15 +6,16 @@ public import Mathlib
 
 namespace Bl.general_b_fact_third_ter
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] [StarRing.{0} E] {W : Type} [inst_3 : AddCommGroup.{0} W]
-  [inst_4 : Module.{0, 0} E W] [inst_5 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) W]
-  [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E W]
-  (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) W),
-  Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) Top.top.{0} →
-    ∀ (y : W),
-      Exists.{1} fun (ν : NumberField.RingOfIntegers.{0} E) ↦
-        And (Ne.{1} ν 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} ν y)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] [StarRing.{0} E] {W : Type}
+        [inst_3 : AddCommGroup.{0} W] [inst_4 : Module.{0, 0} E W]
+        [inst_5 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) W]
+        [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E W]
+        (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) W),
+      Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) Top.top.{0}
+        → ∀ (y : W),
+          Exists.{1} fun (ν : NumberField.RingOfIntegers.{0} E) ↦
+            And (Ne.{1} ν 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} ν y)) := by
   intro E _ _ _ W _ _ _ _ L hL y
   have hy : y ∈ Submodule.span E (L : Set W) := by rw [hL]; exact Submodule.mem_top
   induction hy using Submodule.span_induction with

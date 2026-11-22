@@ -10,15 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemPairLat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open Classical
 open scoped TensorProduct ComplexConjugate GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames Formalism.L2.DIV
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model HasExp SplitsFully Chars)
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames Formalism.L2.DIV
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation
+  (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  (Base Spc Model HasExp SplitsFully Chars)
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 open scoped nonZeroDivisors
 
@@ -44,8 +51,8 @@ lemma rows_reindex {n : Type} [Fintype n] [DecidableEq n] {p q : ℕ} (G : Matri
     fromBlocks_one_neg_one]
   simp
 
-def sortCols (pa qa pb qb : ℕ) :
-    Fin (pa + pb) ⊕ Fin (qa + qb) ≃ (Fin pa ⊕ Fin qa) ⊕ (Fin pb ⊕ Fin qb) :=
+def sortCols (pa qa pb qb : ℕ)
+    : Fin (pa + pb) ⊕ Fin (qa + qb) ≃ (Fin pa ⊕ Fin qa) ⊕ (Fin pb ⊕ Fin qb) :=
   (Equiv.sumCongr finSumFinEquiv.symm finSumFinEquiv.symm).trans (Equiv.sumSumSumComm _ _ _ _)
 
 lemma sgn_sortCols (pa qa pb qb : ℕ) :
@@ -57,9 +64,13 @@ lemma sgn_sortCols (pa qa pb qb : ℕ) :
   · rcases h : (finSumFinEquiv.symm i : Fin qa ⊕ Fin qb) with k | k <;>
       simp [sortCols, sgn, h]
 
-theorem hasSig_smul_blk : ∀ {a b d : ℕ} (e : Fin a ⊕ Fin b ≃ Fin d) (GA : Matrix (Fin a) (Fin a) ℂ) (GB : Matrix (Fin b) (Fin b) ℂ) {pa qa pb qb : ℕ} {κ : ℝ},
-    0 < κ → Formalism.UG.HasSignature GA pa qa → Formalism.UG.HasSignature GB pb qb →
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.HasSig ((κ : ℂ) • GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blk e GA GB) (pa + pb) (qa + qb) := by
+theorem hasSig_smul_blk
+    : ∀ {a b d : ℕ} (e : Fin a ⊕ Fin b ≃ Fin d) (GA : Matrix (Fin a) (Fin a) ℂ)
+        (GB : Matrix (Fin b) (Fin b) ℂ) {pa qa pb qb : ℕ} {κ : ℝ},
+      0 < κ → Formalism.UG.HasSignature GA pa qa → Formalism.UG.HasSignature GB pb qb
+        → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.HasSig
+          ((κ : ℂ) • GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blk e GA GB)
+          (pa + pb) (qa + qb) := by
   intro a b d e GA GB pa qa pb qb κ hκ hA hB
   obtain ⟨eA, PA, hPA⟩ := hA
   obtain ⟨eB, PB, hPB⟩ := hB
@@ -72,27 +83,33 @@ theorem hasSig_smul_blk : ∀ {a b d : ℕ} (e : Fin a ⊕ Fin b ≃ Fin d) (GA 
   have hcb : b = pb + qb := by simpa using Fintype.card_congr eB
   have hcd : a + b = d := by simpa using Fintype.card_congr e
   let τ := sortCols pa qa pb qb
-  let Q0 : Matrix (Fin a ⊕ Fin b) ((Fin pa ⊕ Fin qa) ⊕ (Fin pb ⊕ Fin qb)) ℂ := Matrix.fromBlocks QA 0 0 QB
+  let Q0 : Matrix (Fin a ⊕ Fin b) ((Fin pa ⊕ Fin qa) ⊕ (Fin pb ⊕ Fin qb)) ℂ :=
+    Matrix.fromBlocks QA 0 0 QB
   let Q : Matrix (Fin d) (Fin (pa + pb) ⊕ Fin (qa + qb)) ℂ := Q0.submatrix e.symm τ
-  have hQ : Qᴴ * GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blk e GA GB * Q = Matrix.fromBlocks 1 0 0 (-1) := by
-    have h0 : Q0ᴴ * Matrix.fromBlocks GA 0 0 GB * Q0 =
-        Matrix.diagonal (Sum.elim (sgn pa qa) (sgn pb qb)) := by
+  have hQ
+      : Qᴴ * GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blk e GA GB * Q
+        = Matrix.fromBlocks 1 0 0 (-1) := by
+    have h0
+        : Q0ᴴ * Matrix.fromBlocks GA 0 0 GB * Q0
+          = Matrix.diagonal (Sum.elim (sgn pa qa) (sgn pb qb)) := by
       simp only [Q0, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply]
       simp [hQA, hQB, Matrix.fromBlocks_diagonal]
-    have hb : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blk e GA GB = (Matrix.fromBlocks GA 0 0 GB).submatrix e.symm e.symm := rfl
-    rw [hb, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv, h0,
-      Matrix.submatrix_diagonal_equiv, sgn_sortCols, fromBlocks_one_neg_one]
+    have hb
+        : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.blk e GA GB
+          = (Matrix.fromBlocks GA 0 0 GB).submatrix e.symm e.symm :=
+      rfl
+    rw [hb, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv,
+      h0, Matrix.submatrix_diagonal_equiv, sgn_sortCols, fromBlocks_one_neg_one]
   refine ⟨by omega, ((((Real.sqrt κ)⁻¹ : ℝ) : ℂ)) • Q.map star, ?_⟩
   set c : ℂ := (((Real.sqrt κ)⁻¹ : ℝ) : ℂ)
-  have h1 : (c • Q.map star)ᵀ = c • Qᴴ := by
-    ext i j; simp [Matrix.conjTranspose]
-  have h2 : (c • Q.map star).map star = c • Q := by
-    ext i j; simp [c, Complex.conj_ofReal]
+  have h1 : (c • Q.map star)ᵀ = c • Qᴴ := by ext i j; simp [Matrix.conjTranspose]
+  have h2 : (c • Q.map star).map star = c • Q := by ext i j; simp [c, Complex.conj_ofReal]
   have h3 : c * (κ : ℂ) * c = 1 := by
     have hs : Real.sqrt κ ≠ 0 := (Real.sqrt_pos.2 hκ).ne'
     have : (Real.sqrt κ)⁻¹ * κ * (Real.sqrt κ)⁻¹ = 1 := by
       field_simp; nlinarith [Real.mul_self_sqrt hκ.le, Real.sq_sqrt hκ.le]
-    simp only [c]; exact_mod_cast this
+    simp only [c]
+    exact_mod_cast this
   rw [h1, h2]
   simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, hQ]
   convert one_smul ℂ (Matrix.fromBlocks 1 0 0 (-1) : Matrix (Fin (pa + pb) ⊕ Fin (qa + qb)) (Fin (pa + pb) ⊕ Fin (qa + qb)) ℂ) using 2

@@ -9,16 +9,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Poi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 namespace GlobalTheory.PairStep
 
-theorem not_kltAt_of_isNkltCentre (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
-    [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp ℂ) (n : ℕ) (hp : IsProjOver p)
-    (hn : topologicalKrullDim X = n) (Γ : X → ℚ) (z x : X) (h : IsNkltCentre p n Γ z)
-    (hz : z ⤳ x) : ¬ KltAt p n Γ x := by
+theorem not_kltAt_of_isNkltCentre
+    (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X]
+    (p : X ⟶ Sp ℂ) (n : ℕ) (hp : IsProjOver p) (hn : topologicalKrullDim X = n)
+    (Γ : X → ℚ) (z x : X) (h : IsNkltCentre p n Γ z) (hz : z ⤳ x)
+    : ¬ KltAt p n Γ x := by
   haveI : IsProper p := ((isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp).1
   rintro ⟨η', m', g', h₁, h₂, h₃, h₄⟩
   obtain ⟨E, η, m, g, hη, hm, hg, hE, hd⟩ := h

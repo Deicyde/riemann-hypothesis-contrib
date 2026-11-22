@@ -6,7 +6,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
@@ -52,8 +53,9 @@ lemma qs_sub_eq_const (a b : ℕ → ℂ) (ha : PolyB a) (hb : PolyB b) (hab : �
   · intro n hn
     rw [hab n hn, sub_self]
 
-theorem eq_of_coeff_pos_eq : ∀ (k L : ℕ) (χ : ℤ → ℂ) (a b : ℕ → ℂ), 1 ≤ k → 0 < L → MF k L χ a → MF k L χ b →
-    (∀ n, n ≠ 0 → a n = b n) → a = b := by
+theorem eq_of_coeff_pos_eq
+    : ∀ (k L : ℕ) (χ : ℤ → ℂ) (a b : ℕ → ℂ),
+      1 ≤ k → 0 < L → MF k L χ a → MF k L χ b → (∀ n, n ≠ 0 → a n = b n) → a = b := by
   intro k L χ a b hk hL ha hb hab
   set c : ℂ := a 0 - b 0 with hc
   have hconst := qs_sub_eq_const a b ha.1 hb.1 hab
@@ -88,8 +90,7 @@ theorem eq_of_coeff_pos_eq : ∀ (k L : ℕ) (χ : ℤ → ℂ) (a b : ℕ → �
   let τ₂ : ℍ := ⟨2 * Complex.I, by simp⟩
   have e1 := hone τ₁
   have e2 := hone τ₂
-  have hχ : ‖χ 1‖ ≠ 0 := by
-    intro h0; rw [h0, zero_mul] at e1; exact zero_ne_one e1
+  have hχ : ‖χ 1‖ ≠ 0 := by intro h0; rw [h0, zero_mul] at e1; exact zero_ne_one e1
   have heq : ‖(L : ℂ) * τ₁ + 1‖ ^ k = ‖(L : ℂ) * τ₂ + 1‖ ^ k :=
     mul_left_cancel₀ hχ (e1.trans e2.symm)
   have hL' : (0 : ℝ) < L := by exact_mod_cast hL
@@ -102,8 +103,7 @@ theorem eq_of_coeff_pos_eq : ∀ (k L : ℕ) (χ : ℤ → ℂ) (a b : ℕ → �
       rw [Complex.sq_norm, Complex.normSq_apply]
       simp [τ₂, UpperHalfPlane.coe_mk]
       ring
-    have : ‖(L : ℂ) * τ₁ + 1‖ ^ 2 < ‖(L : ℂ) * τ₂ + 1‖ ^ 2 := by
-      rw [s1, s2]; nlinarith
+    have : ‖(L : ℂ) * τ₁ + 1‖ ^ 2 < ‖(L : ℂ) * τ₂ + 1‖ ^ 2 := by rw [s1, s2]; nlinarith
     exact lt_of_pow_lt_pow_left₀ 2 (norm_nonneg _) this
   have := pow_lt_pow_left₀ hlt (norm_nonneg _) (by omega : k ≠ 0)
   exact absurd heq (ne_of_lt this)

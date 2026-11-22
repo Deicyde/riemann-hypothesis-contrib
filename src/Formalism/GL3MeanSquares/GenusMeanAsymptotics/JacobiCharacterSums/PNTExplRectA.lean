@@ -10,9 +10,11 @@ noncomputable section
 
 namespace Formalism.HermitianLattices.Ext.PrimesInProgressions
 
-theorem exr_ord (f h : ℂ → ℂ) (Zb : Finset ℂ) (m : ℂ → ℕ) (S : Set ℂ) (hS : IsOpen S)
+theorem exr_ord
+    (f h : ℂ → ℂ) (Zb : Finset ℂ) (m : ℂ → ℕ) (S : Set ℂ) (hS : IsOpen S)
     (hh : DifferentiableOn ℂ h S) (hfac : ∀ z ∈ S, f z = (∏ ρ ∈ Zb, (z - ρ) ^ m ρ) * h z)
-    (ρ : ℂ) (hρ : ρ ∈ Zb) (hρS : ρ ∈ S) (hhρ : h ρ ≠ 0) : analyticOrderNatAt f ρ = m ρ := by
+    (ρ : ℂ) (hρ : ρ ∈ Zb) (hρS : ρ ∈ S) (hhρ : h ρ ≠ 0)
+    : analyticOrderNatAt f ρ = m ρ := by
   classical
   have hne : ∀ ρ' ∈ Zb.erase ρ, (ρ - ρ') ^ m ρ' ≠ 0 := fun ρ' h' =>
     pow_ne_zero _ (sub_ne_zero.2 fun e => (Finset.ne_of_mem_erase h') e.symm)
@@ -29,16 +31,26 @@ theorem exr_ord (f h : ℂ → ℂ) (Zb : Finset ℂ) (m : ℂ → ℕ) (S : Set
       (Filter.eventually_of_mem (hS.mem_nhds hρS) fun z hz => (heq z hz).symm)
   have hord : analyticOrderAt f ρ = (m ρ : ℕ∞) := by
     rw [hfA.analyticOrderAt_eq_natCast]
-    exact ⟨_, hgA, hg0, Filter.eventually_of_mem (hS.mem_nhds hρS) fun z hz => by rw [heq z hz, smul_eq_mul]⟩
+    exact ⟨
+      _,
+      hgA,
+      hg0,
+      Filter.eventually_of_mem (hS.mem_nhds hρS) fun z hz => by rw [heq z hz, smul_eq_mul]
+    ⟩
   simp [analyticOrderNatAt, hord]
 
-theorem exr_logDeriv (f h : ℂ → ℂ) (Zb : Finset ℂ) (m : ℂ → ℕ) (S : Set ℂ) (hS : IsOpen S)
+theorem exr_logDeriv
+    (f h : ℂ → ℂ) (Zb : Finset ℂ) (m : ℂ → ℕ) (S : Set ℂ) (hS : IsOpen S)
     (hh : DifferentiableOn ℂ h S) (hfac : ∀ z ∈ S, f z = (∏ ρ ∈ Zb, (z - ρ) ^ m ρ) * h z)
-    (w : ℂ) (hwS : w ∈ S) (hwZ : w ∉ Zb) (hhw : h w ≠ 0) :
-    deriv f w / f w = (∑ ρ ∈ Zb, (m ρ : ℂ) / (w - ρ)) + deriv h w / h w := by
+    (w : ℂ) (hwS : w ∈ S) (hwZ : w ∉ Zb) (hhw : h w ≠ 0)
+    : deriv f w / f w = (∑ ρ ∈ Zb, (m ρ : ℂ) / (w - ρ)) + deriv h w / h w := by
   classical
-  have hPd : ∀ s : Finset ℂ, w ∉ s → HasDerivAt (fun z => ∏ ρ ∈ s, (z - ρ) ^ m ρ)
-      ((∏ ρ ∈ s, (w - ρ) ^ m ρ) * ∑ ρ ∈ s, (m ρ : ℂ) / (w - ρ)) w := by
+  have hPd
+      : ∀ s : Finset ℂ,
+        w ∉ s
+          → HasDerivAt
+            (fun z => ∏ ρ ∈ s, (z - ρ) ^ m ρ)
+            ((∏ ρ ∈ s, (w - ρ) ^ m ρ) * ∑ ρ ∈ s, (m ρ : ℂ) / (w - ρ)) w := by
     intro s
     induction s using Finset.induction_on with
     | empty => intro _; simpa using hasDerivAt_const w (1 : ℂ)
@@ -67,10 +79,13 @@ theorem exr_logDeriv (f h : ℂ → ℂ) (Zb : Finset ℂ) (m : ℂ → ℕ) (S 
   rw [hd, hfac w hwS]
   field_simp
 
-theorem exr_term (m e c w ρ y : ℂ) (hw : w ≠ 0) (hw1 : w - 1 ≠ 0) (hwρ : w - ρ ≠ 0)
-    (hρ : ρ ≠ 0) (hρ1 : ρ - 1 ≠ 0) :
-    -(m / (w - ρ)) * (e / w / (w - 1)) + m / (1 - ρ) * y / (w - 1) - (-m * (c / (ρ * (ρ - 1)))) / (w - ρ)
-      + m / (ρ - 1) * ((e / w - c / ρ) / (w - ρ) - (e / w - y) / (w - 1)) = 0 := by
+theorem exr_term
+    (m e c w ρ y : ℂ)
+    (hw : w ≠ 0) (hw1 : w - 1 ≠ 0) (hwρ : w - ρ ≠ 0) (hρ : ρ ≠ 0) (hρ1 : ρ - 1 ≠ 0)
+    : -(m / (w - ρ)) * (e / w / (w - 1)) + m / (1 - ρ) * y / (w - 1)
+        - (-m * (c / (ρ * (ρ - 1)))) / (w - ρ)
+        + m / (ρ - 1) * ((e / w - c / ρ) / (w - ρ) - (e / w - y) / (w - 1))
+      = 0 := by
   have hρ1' : 1 - ρ ≠ 0 := fun e => hρ1 (by linear_combination -e)
   field_simp
   ring

@@ -11,16 +11,15 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-private theorem exists_pos_of_sum_pos {ι : Type*} (s : Finset ι) (f : ι → ℕ)
-    (h : 0 < ∑ i ∈ s, f i) : ∃ i ∈ s, 0 < f i := by
+private theorem exists_pos_of_sum_pos {ι : Type*} (s : Finset ι) (f : ι → ℕ) (h : 0 < ∑ i ∈ s, f i)
+    : ∃ i ∈ s, 0 < f i := by
   by_contra hne
   push_neg at hne
   have hz : ∑ i ∈ s, f i = 0 := Finset.sum_eq_zero (fun i hi => by have := hne i hi; omega)
   omega
 
-private theorem colExp_apply {r n h : ℕ} (c : Fin h → Fin r) (hh : h ≤ n) (a : Fin r)
-    (t : Fin n) :
-    colExp c hh (a, t) = if ht : t.val < h then (if c ⟨t.val, ht⟩ = a then 1 else 0) else 0 := by
+private theorem colExp_apply {r n h : ℕ} (c : Fin h → Fin r) (hh : h ≤ n) (a : Fin r) (t : Fin n)
+    : colExp c hh (a, t) = if ht : t.val < h then (if c ⟨t.val, ht⟩ = a then 1 else 0) else 0 := by
   unfold colExp
   rw [Finsupp.finsetSum_apply]
   simp only [Finsupp.single_apply, Prod.mk.injEq]
@@ -48,10 +47,10 @@ private theorem colExp_apply {r n h : ℕ} (c : Fin h → Fin r) (hh : h ≤ n) 
     apply ht
     omega
 
-private theorem sum_colExp_apply_eq_ite_mem {r n h : ℕ} (c : Fin h → Fin r) (hh : h ≤ n)
-    (S : Finset (Fin r)) (t : Fin n) :
-    ∑ b ∈ S, colExp c hh (b, t) =
-      if ht : t.val < h then (if c ⟨t.val, ht⟩ ∈ S then 1 else 0) else 0 := by
+private theorem sum_colExp_apply_eq_ite_mem
+    {r n h : ℕ} (c : Fin h → Fin r) (hh : h ≤ n) (S : Finset (Fin r)) (t : Fin n)
+    : ∑ b ∈ S, colExp c hh (b, t)
+      = if ht : t.val < h then (if c ⟨t.val, ht⟩ ∈ S then 1 else 0) else 0 := by
   simp only [colExp_apply]
   by_cases ht : t.val < h
   · simp only [dif_pos ht]
@@ -116,8 +115,9 @@ theorem semistandardPeel : SSYTPeel := by
         have hc := Finset.card_le_card hsub
         rw [Fin.card_Iic] at hc
         omega
-  have hex : ∀ p : Fin h, ∃ a : Fin r, 0 < m (a, Fin.castLE hh p) ∧
-      ∀ b : Fin r, 0 < m (b, Fin.castLE hh p) → a ≤ b := by
+  have hex
+      : ∀ p : Fin h, ∃ a : Fin r,
+        0 < m (a, Fin.castLE hh p) ∧ ∀ b : Fin r, 0 < m (b, Fin.castLE hh p) → a ≤ b := by
     intro p
     have hp : 0 < ν (Fin.castLE hh p) := (hiff _).1 p.isLt
     rw [← hcol] at hp
@@ -140,11 +140,14 @@ theorem semistandardPeel : SSYTPeel := by
     apply hc2 ⟨t.val, ht⟩ b
     rw [e]
     exact hb
-  have hcstep : ∀ (l j : Fin n) (hl : l.val < h) (hj : j.val < h), j.val = l.val + 1 →
-      c ⟨l.val, hl⟩ < c ⟨j.val, hj⟩ := by
+  have hcstep
+      : ∀ (l j : Fin n) (hl : l.val < h) (hj : j.val < h),
+        j.val = l.val + 1 → c ⟨l.val, hl⟩ < c ⟨j.val, hj⟩ := by
     intro l j hl hj hlj
-    have h1 : (∑ b : Fin r with b ≤ c ⟨j.val, hj⟩, m (b, j)) ≤
-        0 + ∑ b : Fin r with b < c ⟨j.val, hj⟩, m (b, l) := hint_r l j hlj (c ⟨j.val, hj⟩)
+    have h1
+        : (∑ b : Fin r with b ≤ c ⟨j.val, hj⟩, m (b, j))
+          ≤ 0 + ∑ b : Fin r with b < c ⟨j.val, hj⟩, m (b, l) :=
+      hint_r l j hlj (c ⟨j.val, hj⟩)
     have h2 : m (c ⟨j.val, hj⟩, j) ≤ ∑ b : Fin r with b ≤ c ⟨j.val, hj⟩, m (b, j) :=
       Finset.single_le_sum (f := fun b => m (b, j)) (fun _ _ => Nat.zero_le _) (by simp)
     have h3 := hc1' j hj
@@ -187,16 +190,15 @@ theorem semistandardPeel : SSYTPeel := by
       exact Nat.zero_le _
   have hsub : ∀ x, (m - colExp c hh) x = m x - colExp c hh x := by
     intro x
-    first
-      | exact Finsupp.tsub_apply _ _ _
-      | simp
-      | rfl
-  have hpart : ∀ (S : Finset (Fin r)) (t : Fin n),
-      ∑ b ∈ S, (m - colExp c hh) (b, t) =
-        ∑ b ∈ S, m (b, t) - (if ht : t.val < h then (if c ⟨t.val, ht⟩ ∈ S then 1 else 0) else 0) := by
+    first | exact Finsupp.tsub_apply _ _ _ | simp | rfl
+  have hpart
+      : ∀ (S : Finset (Fin r)) (t : Fin n),
+        ∑ b ∈ S, (m - colExp c hh) (b, t)
+          = ∑ b ∈ S, m (b, t)
+            - (if ht : t.val < h then (if c ⟨t.val, ht⟩ ∈ S then 1 else 0) else 0) := by
     intro S t
-    have hadd : ∑ b ∈ S, (m - colExp c hh) (b, t) + ∑ b ∈ S, colExp c hh (b, t) =
-        ∑ b ∈ S, m (b, t) := by
+    have hadd
+        : ∑ b ∈ S, (m - colExp c hh) (b, t) + ∑ b ∈ S, colExp c hh (b, t) = ∑ b ∈ S, m (b, t) := by
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl (fun b _ => ?_)
       rw [hsub]
@@ -214,9 +216,9 @@ theorem semistandardPeel : SSYTPeel := by
     omega
   refine ⟨h, hh, c, hcmono, hiff, ?_, ?_, ?_⟩
   · first
-      | exact Finsupp.le_def.mpr (fun x => hle x.1 x.2)
-      | exact fun x => hle x.1 x.2
-      | (intro x; exact hle x.1 x.2)
+    | exact Finsupp.le_def.mpr (fun x => hle x.1 x.2)
+    | exact fun x => hle x.1 x.2
+    | (intro x; exact hle x.1 x.2)
   · intro l j hlj a
     show (∑ b : Fin r with b ≤ a, (m - colExp c hh) (b, j)) ≤
       0 + ∑ b : Fin r with b < a, (m - colExp c hh) (b, l)

@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilK
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -21,8 +24,8 @@ namespace GlobalTheory.CoefDescent
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-theorem pow_dvd_of_pow_dvd_inclW (k : ℕ) (a : Ainf l) (h : ((l : ℕ) : WCb l) ^ k ∣ inclW l a) :
-    ((l : ℕ) : Ainf l) ^ k ∣ a := by
+theorem pow_dvd_of_pow_dvd_inclW (k : ℕ) (a : Ainf l) (h : ((l : ℕ) : WCb l) ^ k ∣ inclW l a)
+    : ((l : ℕ) : Ainf l) ^ k ∣ a := by
   induction k generalizing a with
   | zero => simp
   | succ k ih =>
@@ -54,7 +57,8 @@ theorem isUnit_evW_X : IsUnit (bk.evW X) := by
 def Approx (n M : ℕ) (w : WCb l) : Prop :=
   ∃ (s : bk.S) (y : WCb l), bk.evW X ^ M * w = bk.evW s + (l : WCb l) ^ n * y
 
-theorem Approx.mono {n M M' : ℕ} {w : WCb l} (h : Approx bk n M w) (hM : M ≤ M') : Approx bk n M' w := by
+theorem Approx.mono {n M M' : ℕ} {w : WCb l} (h : Approx bk n M w) (hM : M ≤ M')
+    : Approx bk n M' w := by
   obtain ⟨s, y, e⟩ := h
   refine ⟨X ^ (M' - M) * s, bk.evW X ^ (M' - M) * y, ?_⟩
   have : bk.evW X ^ M' = bk.evW X ^ (M' - M) * bk.evW X ^ M := by
@@ -62,15 +66,20 @@ theorem Approx.mono {n M M' : ℕ} {w : WCb l} (h : Approx bk n M w) (hM : M ≤
   rw [this, map_mul, map_pow]
   linear_combination bk.evW X ^ (M' - M) * e
 
-theorem exists_approx {ι : Type} [Fintype ι] (n : ℕ) (w : ι → WCb l) (hw : ∀ i, w i ∈ bk.OE) :
-    ∃ M, ∀ i, Approx bk n M (w i) := by
+theorem exists_approx {ι : Type} [Fintype ι] (n : ℕ) (w : ι → WCb l) (hw : ∀ i, w i ∈ bk.OE)
+    : ∃ M, ∀ i, Approx bk n M (w i) := by
   classical
   choose m hm using fun i => hw i n
   refine ⟨Finset.univ.sup m, fun i => ?_⟩
   obtain ⟨s, y, e⟩ := hm i
   exact Approx.mono bk ⟨s, y, e⟩ (Finset.le_sup (Finset.mem_univ i))
 
-theorem descent : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' n : ℕ) (R : Matrix (Fin d) (Fin d') (WCb l)) (x : Fin d → WCb l) (a : Fin d' → Ainf l), (∀ i j, R i j ∈ bk.OE) → (∀ i, x i ∈ bk.OE) → (∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => inclW l (a j)) i) → ∃ s : Fin d' → bk.S, ∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => bk.evW (s j)) i := by
+theorem descent
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' n : ℕ)
+        (R : Matrix (Fin d) (Fin d') (WCb l)) (x : Fin d → WCb l) (a : Fin d' → Ainf l),
+      (∀ i j, R i j ∈ bk.OE) → (∀ i, x i ∈ bk.OE)
+        → (∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => inclW l (a j)) i)
+        → ∃ s : Fin d' → bk.S, ∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => bk.evW (s j)) i := by
   intro l _ K bk d d' n R x a hR hx hdiv
   obtain ⟨M₁, h₁⟩ := exists_approx bk n (fun p : Fin d × Fin d' => R p.1 p.2) (fun p => hR p.1 p.2)
   obtain ⟨M₂, h₂⟩ := exists_approx bk n x hx
@@ -87,16 +96,19 @@ theorem descent : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' 
     apply pow_dvd_of_pow_dvd_inclW
     obtain ⟨q, hq⟩ := hdiv i
     simp only [Pi.sub_apply, Matrix.mulVec, dotProduct] at hq
-    have hs : ∑ j, bk.evW (r i j) * inclW l (a j) =
-        bk.evW X ^ M * ∑ j, R i j * inclW l (a j) - (l : WCb l) ^ n * ∑ j, yR i j * inclW l (a j) := by
+    have hs
+        : ∑ j, bk.evW (r i j) * inclW l (a j)
+          = bk.evW X ^ M * ∑ j, R i j * inclW l (a j)
+            - (l : WCb l) ^ n * ∑ j, yR i j * inclW l (a j) := by
       rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun j _ => ?_
       linear_combination (-(inclW l (a j))) * hRe i j
     refine ⟨bk.evW X ^ M * q - z i + ∑ j, yR i j * inclW l (a j), ?_⟩
-    have e1 : inclW l (bk.ev (ξ i) - ∑ j, bk.ev (r i j) * a j) =
-        bk.evW (ξ i) - ∑ j, bk.evW (r i j) * inclW l (a j) := by
+    have e1
+        : inclW l (bk.ev (ξ i) - ∑ j, bk.ev (r i j) * a j)
+          = bk.evW (ξ i) - ∑ j, bk.evW (r i j) * inclW l (a j) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [BK.evW, map_sub, map_sum, map_mul]
+      simp [BK.evW, map_sub, map_sum, map_mul]
     rw [e1, hs]
     linear_combination (-1 : WCb l) * hxe i + bk.evW X ^ M * hq
   choose b' hb' using hb
@@ -118,8 +130,10 @@ theorem descent : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' 
   have hU := (isUnit_evW_X bk).pow M
   rw [← hU.dvd_mul_left]
   simp only [Pi.sub_apply, Matrix.mulVec, dotProduct]
-  have hs : bk.evW X ^ M * ∑ j, R i j * bk.evW (c (a j)) =
-      ∑ j, bk.evW (r i j) * bk.evW (c (a j)) + (l : WCb l) ^ n * ∑ j, yR i j * bk.evW (c (a j)) := by
+  have hs
+      : bk.evW X ^ M * ∑ j, R i j * bk.evW (c (a j))
+        = ∑ j, bk.evW (r i j) * bk.evW (c (a j))
+          + (l : WCb l) ^ n * ∑ j, yR i j * bk.evW (c (a j)) := by
     rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
     linear_combination (bk.evW (c (a j))) * hRe i j
@@ -128,5 +142,10 @@ theorem descent : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' 
 
 end GlobalTheory.CoefDescent
 
-theorem GlobalTheory.descentCoefficients : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' n : ℕ) (R : Matrix (Fin d) (Fin d') (WCb l)) (x : Fin d → WCb l) (a : Fin d' → Ainf l), (∀ i j, R i j ∈ bk.OE) → (∀ i, x i ∈ bk.OE) → (∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => inclW l (a j)) i) → ∃ s : Fin d' → bk.S, ∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => bk.evW (s j)) i :=
+theorem GlobalTheory.descentCoefficients
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' n : ℕ)
+        (R : Matrix (Fin d) (Fin d') (WCb l)) (x : Fin d → WCb l) (a : Fin d' → Ainf l),
+      (∀ i j, R i j ∈ bk.OE) → (∀ i, x i ∈ bk.OE)
+        → (∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => inclW l (a j)) i)
+        → ∃ s : Fin d' → bk.S, ∀ i, (l : WCb l) ^ n ∣ (x - R *ᵥ fun j => bk.evW (s j)) i :=
   GlobalTheory.CoefDescent.descent

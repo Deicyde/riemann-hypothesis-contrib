@@ -9,11 +9,13 @@ public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClas
 open scoped BigOperators
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Classical
 
-theorem UpperTheory.even_addOrderOf_hP_of_pow_le :
-    (∀ (R : Ranks) (t : R.A), Odd (addOrderOf t) → R.toFrame.h t = 0 ∧ addOrderOf t ∣ R.toFrame.o) ∧
-    ∀ (D : D7) (L : SizeData₂ D) (p : ℕ), L.sc.x ^ (L.sc.eps / 4) ≤ (addOrderOf (hP D p) : ℝ) → Even (addOrderOf (hP D p)) := by
-  have key : ∀ (R : Ranks) (t : R.A), Odd (addOrderOf t) →
-      R.toFrame.h t = 0 ∧ addOrderOf t ∣ R.toFrame.o := by
+theorem UpperTheory.even_addOrderOf_hP_of_pow_le
+    : (∀ (R : Ranks) (t : R.A), Odd (addOrderOf t) → R.toFrame.h t = 0 ∧ addOrderOf t ∣ R.toFrame.o)
+      ∧ ∀ (D : D7) (L : SizeData₂ D) (p : ℕ),
+        L.sc.x ^ (L.sc.eps / 4) ≤ (addOrderOf (hP D p) : ℝ) → Even (addOrderOf (hP D p)) := by
+  have key
+      : ∀ (R : Ranks) (t : R.A),
+        Odd (addOrderOf t) → R.toFrame.h t = 0 ∧ addOrderOf t ∣ R.toFrame.o := by
     intro R t ho
     have h1 := R.toFrame.addOrderOf_h_dvd t
     have h2 := R.toFrame.addOrderOf_h_dvd_two_pow t

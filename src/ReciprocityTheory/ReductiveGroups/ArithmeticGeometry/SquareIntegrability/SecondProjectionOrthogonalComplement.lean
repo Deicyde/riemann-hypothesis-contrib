@@ -30,7 +30,8 @@ theorem Hf_add_r (v w w' : EuclideanSpace ℂ ι) : Hf v (w + w') = Hf v w + Hf 
 theorem Hf_sub_r (v w w' : EuclideanSpace ℂ ι) : Hf v (w - w') = Hf v w - Hf v w' := by
   simp only [Hf, PiLp.sub_apply, map_sub, mul_sub, Finset.sum_sub_distrib]
 
-theorem Hf_smul_r (c : ℂ) (v w : EuclideanSpace ℂ ι) : Hf v (c • w) = (starRingEnd ℂ) c * Hf v w := by
+theorem Hf_smul_r (c : ℂ) (v w : EuclideanSpace ℂ ι)
+    : Hf v (c • w) = (starRingEnd ℂ) c * Hf v w := by
   simp only [Hf, PiLp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
@@ -42,16 +43,16 @@ theorem Hf_rsmul_l (r : ℝ) (v w : EuclideanSpace ℂ ι) : Hf (r • v) w = r 
   simp only [Hf, PiLp.smul_apply, Complex.real_smul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
-theorem Hf_sum_l {κ : Type} (s : Finset κ) (f : κ → EuclideanSpace ℂ ι) (w : EuclideanSpace ℂ ι) :
-    Hf (∑ k ∈ s, f k) w = ∑ k ∈ s, Hf (f k) w := by
+theorem Hf_sum_l {κ : Type} (s : Finset κ) (f : κ → EuclideanSpace ℂ ι) (w : EuclideanSpace ℂ ι)
+    : Hf (∑ k ∈ s, f k) w = ∑ k ∈ s, Hf (f k) w := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp [Hf]
   · intro a t ha ih
     rw [Finset.sum_insert ha, Finset.sum_insert ha, Hf_add_l, ih]
 
-theorem Hf_sum_r {κ : Type} (s : Finset κ) (v : EuclideanSpace ℂ ι) (f : κ → EuclideanSpace ℂ ι) :
-    Hf v (∑ k ∈ s, f k) = ∑ k ∈ s, Hf v (f k) := by
+theorem Hf_sum_r {κ : Type} (s : Finset κ) (v : EuclideanSpace ℂ ι) (f : κ → EuclideanSpace ℂ ι)
+    : Hf v (∑ k ∈ s, f k) = ∑ k ∈ s, Hf v (f k) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp [Hf]
@@ -138,14 +139,14 @@ theorem herm_proj_two_one (v w : EuclideanSpace ℂ ι) : Hf (p2 K v) (p1 K w) =
 theorem herm_proj_one_two (v w : EuclideanSpace ℂ ι) : Hf (p1 K v) (p2 K w) = 0 := by
   rw [Hf_swap, herm_proj_two_one hK, map_zero]
 
-theorem herm_proj_one_one (v w : EuclideanSpace ℂ ι) :
-    Hf (p1 K v) (p1 K w) = ∑ k, z K k v * (starRingEnd ℂ) (z K k w) := by
+theorem herm_proj_one_one (v w : EuclideanSpace ℂ ι)
+    : Hf (p1 K v) (p1 K w) = ∑ k, z K k v * (starRingEnd ℂ) (z K k w) := by
   rw [show p1 K w = ∑ k, z K k w • e K k from rfl, Hf_sum_r]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Hf_smul_r, show Hf (p1 K v) (e K k) = z K k (p1 K v) from rfl, coord_proj_one hK, mul_comm]
 
-theorem Hf_decomp (v w : EuclideanSpace ℂ ι) :
-    Hf v w = ∑ k, z K k v * (starRingEnd ℂ) (z K k w) + Hf (p2 K v) (p2 K w) := by
+theorem Hf_decomp (v w : EuclideanSpace ℂ ι)
+    : Hf v w = ∑ k, z K k v * (starRingEnd ℂ) (z K k w) + Hf (p2 K v) (p2 K w) := by
   have hv : v = p1 K v + p2 K v := by
     rw [p2]
     abel
@@ -153,11 +154,11 @@ theorem Hf_decomp (v w : EuclideanSpace ℂ ι) :
     rw [p2]
     abel
   conv_lhs => rw [hv, hw]
-  rw [Hf_add_l, Hf_add_r, Hf_add_r, herm_proj_one_one hK, herm_proj_one_two hK, herm_proj_two_one hK]
+  rw [Hf_add_l, Hf_add_r, Hf_add_r, herm_proj_one_one hK, herm_proj_one_two hK,
+    herm_proj_two_one hK]
   ring
 
-theorem norm_sq_decomp (v : EuclideanSpace ℂ ι) :
-    ‖v‖ ^ 2 = ∑ k, ‖z K k v‖ ^ 2 + ‖p2 K v‖ ^ 2 := by
+theorem norm_sq_decomp (v : EuclideanSpace ℂ ι) : ‖v‖ ^ 2 = ∑ k, ‖z K k v‖ ^ 2 + ‖p2 K v‖ ^ 2 := by
   have h := congrArg Complex.re (Hf_decomp hK v v)
   rw [Hf_self_re, Complex.add_re, Hf_self_re, Complex.re_sum] at h
   rw [h]
@@ -172,10 +173,11 @@ theorem norm_proj_two_le (v : EuclideanSpace ℂ ι) : ‖p2 K v‖ ≤ ‖v‖ 
 
 end iso
 
-theorem uc_mem (v : EuclideanSpace ℂ ι) : uc K v ∈ K := Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (e_mem K k)
+theorem uc_mem (v : EuclideanSpace ℂ ι) : uc K v ∈ K :=
+  Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (e_mem K k)
 
-theorem inner_uc (v : EuclideanSpace ℂ ι) (a : EuclideanSpace ℂ ι) (ha : a ∈ K) :
-    ⟪uc K v, a⟫_ℝ = (Hf v a).im := by
+theorem inner_uc (v : EuclideanSpace ℂ ι) (a : EuclideanSpace ℂ ι) (ha : a ∈ K)
+    : ⟪uc K v, a⟫_ℝ = (Hf v a).im := by
   have ha' : ∑ k, ⟪e K k, a⟫_ℝ • e K k = a := by
     have h2 := congrArg (fun x : K => (x : EuclideanSpace ℂ ι)) ((ob K).sum_repr' ⟨a, ha⟩)
     simpa only [Submodule.coe_sum, Submodule.coe_smul, Submodule.coe_inner, e] using h2
@@ -219,12 +221,14 @@ theorem norm_jj (t : EuclideanSpace ℂ (Fin (gB K))) : ‖jj K t‖ = ‖t‖ :
 theorem jj_add (t t' : EuclideanSpace ℂ (Fin (gB K))) : jj K (t + t') = jj K t + jj K t' := by
   simp [jj]
 
-theorem coord_of_mem_complement {v : EuclideanSpace ℂ ι} (hv : v ∈ V2 K) (k : Fin (dK K)) : z K k v = 0 := by
+theorem coord_of_mem_complement {v : EuclideanSpace ℂ ι} (hv : v ∈ V2 K) (k : Fin (dK K))
+    : z K k v = 0 := by
   rw [z, Hf_eq_inner]
   exact Submodule.inner_right_of_mem_orthogonal
     (Submodule.subset_span (Set.mem_range_self k) : e K k ∈ span1 K) hv
 
-theorem z_jj (t : EuclideanSpace ℂ (Fin (gB K))) (k : Fin (dK K)) : z K k (jj K t) = 0 := coord_of_mem_complement K (jj_mem K t) k
+theorem z_jj (t : EuclideanSpace ℂ (Fin (gB K))) (k : Fin (dK K)) : z K k (jj K t) = 0 :=
+  coord_of_mem_complement K (jj_mem K t) k
 
 theorem wmap_jj (t : EuclideanSpace ℂ (Fin (gB K))) : wmap K (jj K t) = t := by
   unfold wmap jj
@@ -248,12 +252,14 @@ theorem p2_mem_Z2_of_mem_Z2 (v : EuclideanSpace ℂ ι) : p2 K v ∈ V2 K := by
   | smul a x _ hx => rw [inner_smul_left, hx, mul_zero]
 
 theorem starProj_eq (v : EuclideanSpace ℂ ι) : (V2 K).starProjection v = p2 K v := by
-  refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero (p2_mem_Z2_of_mem_Z2 hK v) fun w hw => ?_
+  refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero (p2_mem_Z2_of_mem_Z2 hK v) fun w hw =>
+    ?_
   have h1 : v - p2 K v = p1 K v := by
     rw [p2]
     abel
   have h2 : p1 K v ∈ span1 K :=
-    Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_range_self k))
+    Submodule.sum_mem _ fun k _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_range_self k))
   rw [h1]
   exact Submodule.inner_right_of_mem_orthogonal h2 hw
 

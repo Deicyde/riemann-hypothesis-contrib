@@ -312,8 +312,8 @@ lemma uniformisation (a b : ℂ) (h : a ^ 3 ≠ 27 * b ^ 2) :
   · rw [e3, hπω, hμ6]
     ring
 
-theorem main (σ : ℂ ≃+* ℂ) (L : PeriodPair) :
-    ∃ L' : PeriodPair, L'.g₂ = σ L.g₂ ∧ L'.g₃ = σ L.g₃ := by
+theorem main (σ : ℂ ≃+* ℂ) (L : PeriodPair)
+    : ∃ L' : PeriodPair, L'.g₂ = σ L.g₂ ∧ L'.g₃ = σ L.g₃ := by
   apply uniformisation
   intro h
   apply disc L

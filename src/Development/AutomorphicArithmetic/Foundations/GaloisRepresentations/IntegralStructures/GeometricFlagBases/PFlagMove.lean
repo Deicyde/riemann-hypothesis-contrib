@@ -5,25 +5,33 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.Gal.Int.Geo.flagMove_of :
-    FlagMove := by
+theorem UpperTheory.Gal.Int.Geo.flagMove_of : FlagMove := by
   intro Γ k _ _ d ρ W P W' hW' hJH
-  have hPP : ∀ w : Fin d → k, (↑P : Matrix (Fin d) (Fin d) k).mulVec
-      ((↑(P⁻¹) : Matrix (Fin d) (Fin d) k).mulVec w) = w := by
+  have hPP
+      : ∀ w : Fin d → k,
+        (↑P : Matrix (Fin d) (Fin d) k).mulVec ((↑(P⁻¹) : Matrix (Fin d) (Fin d) k).mulVec w)
+          = w := by
     intro w
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
-  have hPP' : ∀ w : Fin d → k, (↑(P⁻¹) : Matrix (Fin d) (Fin d) k).mulVec
-      ((↑P : Matrix (Fin d) (Fin d) k).mulVec w) = w := by
+  have hPP'
+      : ∀ w : Fin d → k,
+        (↑(P⁻¹) : Matrix (Fin d) (Fin d) k).mulVec ((↑P : Matrix (Fin d) (Fin d) k).mulVec w)
+          = w := by
     intro w
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
-  have hc : ∀ g v, (↑P : Matrix (Fin d) (Fin d) k).mulVec ((↑(cj P ρ g) : Matrix (Fin d) (Fin d) k).mulVec v) =
-      (↑(ρ g) : Matrix (Fin d) (Fin d) k).mulVec ((↑P : Matrix (Fin d) (Fin d) k).mulVec v) := by
+  have hc
+      : ∀ g v,
+        (↑P : Matrix (Fin d) (Fin d) k).mulVec ((↑(cj P ρ g) : Matrix (Fin d) (Fin d) k).mulVec v)
+          = (↑(ρ g) : Matrix (Fin d) (Fin d) k).mulVec
+            ((↑P : Matrix (Fin d) (Fin d) k).mulVec v) := by
     intro g v
     rw [cj_apply, Units.val_mul, Units.val_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hPP]
   refine ⟨fun i g v hv => ?_, fun i U hU h1 h2 => ?_⟩
@@ -47,7 +55,8 @@ theorem UpperTheory.Gal.Int.Geo.flagMove_of :
       exact hc g u
     have hlo : W i ≤ U0 := by
       intro w hw
-      refine ⟨(↑(P⁻¹) : Matrix (Fin d) (Fin d) k).mulVec w, h1 ((hW' i _).2 (by rw [hPP]; exact hw)), ?_⟩
+      refine
+        ⟨(↑(P⁻¹) : Matrix (Fin d) (Fin d) k).mulVec w, h1 ((hW' i _).2 (by rw [hPP]; exact hw)), ?_⟩
       simp only [Matrix.mulVecLin_apply]
       exact hPP w
     have hhi : U0 ≤ W (i + 1) := by

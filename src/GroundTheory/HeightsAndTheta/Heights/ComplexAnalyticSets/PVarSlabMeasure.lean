@@ -18,8 +18,9 @@ theorem VarSlabMeasure.proof (hV : VarietySlabMeasure.Statement) : VarSlabMeasur
   intro n d J u R hJ hd hu
   obtain ⟨C, α, -, hα, hb⟩ := hV n d J u hJ hd.le hu R
   refine ⟨C, α, hα, fun ε hε hε1 => ?_⟩
-  have hset : zeroSetEuc J ∩ {z | ‖z‖ ≤ R} ∩ {z | ‖∑ j, u j * z j‖ ≤ ε} =
-      {z | z ∈ zeroSetEuc J ∧ ‖z‖ ≤ R ∧ ‖∑ j, u j * z j‖ ≤ ε} := by
+  have hset
+      : zeroSetEuc J ∩ {z | ‖z‖ ≤ R} ∩ {z | ‖∑ j, u j * z j‖ ≤ ε}
+        = {z | z ∈ zeroSetEuc J ∧ ‖z‖ ≤ R ∧ ‖∑ j, u j * z j‖ ≤ ε} := by
     ext z
     simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, and_assoc]
   rw [hset]

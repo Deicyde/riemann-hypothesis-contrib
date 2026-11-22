@@ -48,23 +48,30 @@ lemma scF_cont {G : ℝ → ℝ} (hG : ContDiff ℝ ∞ G) (j : ℕ) (y : ℝ) :
 theorem stHomot : GlobalTheory.PsCo.Pc1.StHomot := by
   intro n ε G p q hP hK t ht
   obtain ⟨hG, h0, -, -⟩ := hP
-  have hI : ∀ j, IsCutFn (fun y => ∫ s in (1:ℝ)..t, scF G j s y) ∧
-      ∀ y, deriv (fun y => ∫ s in (1:ℝ)..t, scF G j s y) y = ∫ s in (1:ℝ)..t, deriv (scF G j s) y := by
+  have hI
+      : ∀ j,
+        IsCutFn (fun y => ∫ s in (1:ℝ)..t, scF G j s y)
+          ∧ ∀ y,
+            deriv (fun y => ∫ s in (1:ℝ)..t, scF G j s y) y
+              = ∫ s in (1:ℝ)..t, deriv (scF G j s) y := by
     intro j
-    refine GlobalTheory.T.isSmoothEventuallyZeroCutoff_intervalIntegral_deriv (scF G j) 1 t (scF_contDiff hG j) ⟨2, ?_⟩
+    refine GlobalTheory.T.isSmoothEventuallyZeroCutoff_intervalIntegral_deriv (scF G j) 1 t
+      (scF_contDiff hG j) ⟨2, ?_⟩
     intro s hs y hy
     rw [Set.uIcc_of_le ht] at hs
     have : 1 < s * y := by nlinarith [hs.1]
     simp [scF, iter_zero h0 _ this]
-  have key : famF ε G p 1 - famF ε G p t = -∑ x : Mode ε, ∑ j ∈ Finset.range (nMode ε + 1),
-      adBas ε (Matrix.single x.1.2 x.1.1 1) (fun y => ∫ s in (1:ℝ)..t, scF G j s y) (q x j) := by
+  have key
+      : famF ε G p 1 - famF ε G p t
+        = - ∑ x : Mode ε, ∑ j ∈ Finset.range (nMode ε + 1),
+          adBas ε (Matrix.single x.1.2 x.1.1 1) (fun y => ∫ s in (1:ℝ)..t, scF G j s y) (q x j) := by
     funext g
     set D : ℝ → ℂ := fun s => ∑ x : Mode ε, ∑ j ∈ Finset.range (nMode ε + 1),
       ((scF G (j + 1) s (rM ε g) : ℂ) * ev g (dZ ε (Matrix.single x.1.2 x.1.1 1) (rP ε) * q x j) +
         (scF G j s (rM ε g) : ℂ) * ev g (dZ ε (Matrix.single x.1.2 x.1.1 1) (q x j))) with hD
     have hc : ∀ j, Continuous fun s => (scF G j s (rM ε g) : ℂ) := fun j =>
       Complex.continuous_ofReal.comp (scF_cont hG j _)
-    have hder : ∀ s ∈ Set.uIcc (1:ℝ) t, HasDerivAt (fun s : ℝ => famF ε G p s g) (D s) s := by
+    have hder : ∀ s ∈ Set.uIcc (1 : ℝ) t, HasDerivAt (fun s : ℝ => famF ε G p s g) (D s) s := by
       intro s hs
       rw [Set.uIcc_of_le ht] at hs
       have hs0 : 0 < s := by linarith [hs.1]
@@ -84,26 +91,33 @@ theorem stHomot : GlobalTheory.PsCo.Pc1.StHomot := by
       refine continuous_finsetSum _ fun x _ => continuous_finsetSum _ fun j _ => ?_
       exact ((hc _).mul continuous_const).add ((hc _).mul continuous_const)
     have hftc := intervalIntegral.integral_eq_sub_of_hasDerivAt hder (hDc.intervalIntegrable _ _)
-    have hint : ∫ s in (1:ℝ)..t, D s = ∑ x : Mode ε, ∑ j ∈ Finset.range (nMode ε + 1),
-        adBas ε (Matrix.single x.1.2 x.1.1 1) (fun y => ∫ s in (1:ℝ)..t, scF G j s y) (q x j) g := by
-      rw [hD, intervalIntegral.integral_finsetSum]
-      · refine Finset.sum_congr rfl fun x _ => ?_
-        rw [intervalIntegral.integral_finsetSum]
-        · refine Finset.sum_congr rfl fun j _ => ?_
-          rw [intervalIntegral.integral_add (((hc _).mul_const _).intervalIntegrable _ _)
-            (((hc _).mul_const _).intervalIntegrable _ _),
-            intervalIntegral.integral_mul_const, intervalIntegral.integral_mul_const,
-            intervalIntegral.integral_ofReal, intervalIntegral.integral_ofReal]
-          simp only [adBas, bas, (hI j).2, deriv_scF hG]
-        · intro j _
-          exact (((hc _).mul continuous_const).add ((hc _).mul continuous_const)).intervalIntegrable _ _
-      · intro x _
-        refine (continuous_finsetSum _ fun j _ => ?_).intervalIntegrable _ _
-        exact ((hc _).mul continuous_const).add ((hc _).mul continuous_const)
+    have hint
+        : ∫ s in (1:ℝ)..t, D s
+          = ∑ x : Mode ε, ∑ j ∈ Finset.range (nMode ε + 1),
+            adBas ε (Matrix.single x.1.2 x.1.1 1) (fun y => ∫ s in (1:ℝ)..t, scF G j s y) (q x j) g :=
+      by
+        rw [hD, intervalIntegral.integral_finsetSum]
+        · refine Finset.sum_congr rfl fun x _ => ?_
+          rw [intervalIntegral.integral_finsetSum]
+          · refine Finset.sum_congr rfl fun j _ => ?_
+            rw [intervalIntegral.integral_add (((hc _).mul_const _).intervalIntegrable _ _)
+                (((hc _).mul_const _).intervalIntegrable _ _),
+              intervalIntegral.integral_mul_const, intervalIntegral.integral_mul_const,
+              intervalIntegral.integral_ofReal, intervalIntegral.integral_ofReal]
+            simp only [adBas, bas, (hI j).2, deriv_scF hG]
+          · intro j _
+            exact
+              (((hc _).mul continuous_const).add ((hc _).mul continuous_const)).intervalIntegrable _
+                _
+        · intro x _
+          refine (continuous_finsetSum _ fun j _ => ?_).intervalIntegrable _ _
+          exact ((hc _).mul continuous_const).add ((hc _).mul continuous_const)
     simp only [Pi.sub_apply, Pi.neg_apply, Finset.sum_apply]
     rw [← hint, hftc]
     ring
   rw [key]
-  exact neg_mem (Submodule.sum_mem _ fun x _ => Submodule.sum_mem _ fun j _ => GlobalTheory.T.conjugationDerivCutoffPolynomial_mem_unitarySpan ε _ _ _ (hI j).1)
+  exact neg_mem (Submodule.sum_mem _ fun x _ =>
+    Submodule.sum_mem _ fun j _ =>
+      GlobalTheory.T.conjugationDerivCutoffPolynomial_mem_unitarySpan ε _ _ _ (hI j).1)
 
 end GlobalTheory.PsCo.Pc1.Homot

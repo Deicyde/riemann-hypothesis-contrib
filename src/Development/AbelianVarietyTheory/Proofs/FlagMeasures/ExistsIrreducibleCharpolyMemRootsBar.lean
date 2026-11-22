@@ -10,10 +10,13 @@ open scoped Classical
 
 namespace GlobalTheory.GLm
 
-theorem exists_irreducible_charpoly_mem_rootsBar (g : ℕ) [Fact g.Prime] (d : ℕ)
-    (z : Formalism.CyclotomicNorms.Fbar g) (hz : z ≠ 0) (hd : (minpoly (ZMod g) z).natDegree = d) :
-    ∃ y : Gn g d, Irreducible (y : Mt g d).charpoly ∧
-      z ∈ Formalism.CyclotomicNorms.rootsBar (y : Mt g d).charpoly := by
+theorem exists_irreducible_charpoly_mem_rootsBar
+    (g : ℕ) [Fact g.Prime]
+    (d : ℕ) (z : Formalism.CyclotomicNorms.Fbar g)
+    (hz : z ≠ 0) (hd : (minpoly (ZMod g) z).natDegree = d)
+    : ∃ y : Gn g d,
+      Irreducible (y : Mt g d).charpoly
+        ∧ z ∈ Formalism.CyclotomicNorms.rootsBar (y : Mt g d).charpoly := by
   subst hd
   have hi : IsIntegral (ZMod g) z := Algebra.IsIntegral.isIntegral z
   let pb := IntermediateField.adjoin.powerBasis hi

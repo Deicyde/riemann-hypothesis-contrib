@@ -9,10 +9,14 @@ public import Mathlib.RingTheory.Valuation.RankOne
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem dvd_pow_of {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {a b : A}
-    (ha : ¬ IsUnit a) (hb : b ≠ 0) : ∃ n : ℕ, b ∣ a ^ n := by
+private theorem dvd_pow_of
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    {a b : A} (ha : ¬ IsUnit a) (hb : b ≠ 0)
+    : ∃ n : ℕ, b ∣ a ^ n := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible A
   by_cases ha0 : a = 0
   · exact ⟨1, by simp [ha0]⟩
@@ -25,8 +29,12 @@ private theorem dvd_pow_of {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValua
   rw [Units.mul_left_dvd, mul_pow, ← pow_mul]
   exact Dvd.dvd.mul_left (pow_dvd_pow ϖ (Nat.le_mul_of_pos_left m (Nat.pos_of_ne_zero hk))) _
 
-private theorem arch {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
-    (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f) : MulArchimedean 𝔞.V.ValueGroup := by
+private theorem arch
+    {l : ℕ} [Fact l.Prime]
+    (𝔞 : Amb l)
+    (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f)
+    : MulArchimedean 𝔞.V.ValueGroup := by
   classical
   refine ⟨fun x y hy => ?_⟩
   obtain ⟨a, rfl⟩ := 𝔞.V.valuation_surjective x
@@ -66,18 +74,23 @@ private theorem arch {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) (A : Type) [CommRin
   rw [map_pow, hc, hd] at he
   have he' : (b⁻¹) ^ n = a⁻¹ * (e : 𝔞.K) := congrArg Subtype.val he
   have hae : a = (e : 𝔞.K) * b ^ n := by
-    calc a = a * (b⁻¹ ^ n * b ^ n) := by rw [← mul_pow, inv_mul_cancel₀ hb0, one_pow, mul_one]
+    calc
+      a = a * (b⁻¹ ^ n * b ^ n) := by rw [← mul_pow, inv_mul_cancel₀ hb0, one_pow, mul_one]
       _ = a * (a⁻¹ * (e * b ^ n)) := by rw [he', mul_assoc]
       _ = e * b ^ n := mul_inv_cancel_left₀ ha0 _
   refine ⟨n, ?_⟩
   rw [hae, map_mul, map_pow]
-  calc 𝔞.V.valuation (e : 𝔞.K) * 𝔞.V.valuation b ^ n ≤ 1 * 𝔞.V.valuation b ^ n :=
-        mul_le_mul_left (𝔞.V.valuation_le_one e) _
+  calc
+    𝔞.V.valuation (e : 𝔞.K) * 𝔞.V.valuation b ^ n
+      ≤ 1 * 𝔞.V.valuation b ^ n := mul_le_mul_left (𝔞.V.valuation_le_one e) _
     _ = 𝔞.V.valuation b ^ n := one_mul _
 
-theorem UpperTheory.V.Ws.Po.ambAbs :
-    ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (f : A →+* 𝔞.V), 𝔞.IsDvr f →
-      ∃ w : AbsoluteValue 𝔞.K ℝ, (∀ x, w x < 1 ↔ 𝔞.V.valuation x < 1) ∧ ∃ p, p ≠ 0 ∧ w p ≠ 1 := by
+theorem UpperTheory.V.Ws.Po.ambAbs
+    : ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) (A : Type) [CommRing A] [IsDomain A]
+        [IsDiscreteValuationRing A] (f : A →+* 𝔞.V),
+      𝔞.IsDvr f
+        → ∃ w : AbsoluteValue 𝔞.K ℝ,
+          (∀ x, w x < 1 ↔ 𝔞.V.valuation x < 1) ∧ ∃ p, p ≠ 0 ∧ w p ≠ 1 := by
   intro l _ 𝔞 A _ _ _ f hf
   haveI := arch 𝔞 A f hf
   haveI : MulArchimedean (𝔞.V.ValueGroup)ˣ := ⟨fun x y hy => by
@@ -120,25 +133,28 @@ theorem UpperTheory.V.Ws.Po.ambAbs :
   have g1 : gg 1 = 1 := by
     have h1 : (1 : 𝔞.V.ValueGroup) ≠ 0 := one_ne_zero
     simp only [gg, dif_neg h1, Units.mk0_one, ofMul_one, map_zero, Real.exp_zero]
-  let w : AbsoluteValue 𝔞.K ℝ :=
-    { toFun := fun x => gg (𝔞.V.valuation x)
-      map_mul' := fun x y => by
-        change gg (𝔞.V.valuation (x * y)) = gg (𝔞.V.valuation x) * gg (𝔞.V.valuation y)
-        rw [Valuation.map_mul, gmul]
-      nonneg' := fun x => gnn _
-      eq_zero' := fun x => ⟨fun h => by
-          by_contra hx
-          exact (gpos _ ((Valuation.ne_zero_iff _).2 hx)).ne' h,
-        fun h => by rw [h, Valuation.map_zero, g0]⟩
-      add_le' := fun x y => by
-        have hle := gmono.monotone (𝔞.V.valuation.map_add x y)
-        have hx := gnn (𝔞.V.valuation x)
-        have hy := gnn (𝔞.V.valuation y)
-        rcases le_total (𝔞.V.valuation x) (𝔞.V.valuation y) with h | h
-        · rw [max_eq_right h] at hle
-          linarith
-        · rw [max_eq_left h] at hle
-          linarith }
+  let w : AbsoluteValue 𝔞.K ℝ := {
+    toFun := fun x => gg (𝔞.V.valuation x)
+    map_mul' := fun x y => by
+      change gg (𝔞.V.valuation (x * y)) = gg (𝔞.V.valuation x) * gg (𝔞.V.valuation y)
+      rw [Valuation.map_mul, gmul]
+    nonneg' := fun x => gnn _
+    eq_zero' := fun x => ⟨
+      fun h => by
+        by_contra hx
+        exact (gpos _ ((Valuation.ne_zero_iff _).2 hx)).ne' h,
+      fun h => by rw [h, Valuation.map_zero, g0]
+    ⟩
+    add_le' := fun x y => by
+      have hle := gmono.monotone (𝔞.V.valuation.map_add x y)
+      have hx := gnn (𝔞.V.valuation x)
+      have hy := gnn (𝔞.V.valuation y)
+      rcases le_total (𝔞.V.valuation x) (𝔞.V.valuation y) with h | h
+      · rw [max_eq_right h] at hle
+        linarith
+      · rw [max_eq_left h] at hle
+        linarith
+  }
   refine ⟨w, fun x => ?_, ?_⟩
   · change gg (𝔞.V.valuation x) < 1 ↔ 𝔞.V.valuation x < 1
     rw [← g1]

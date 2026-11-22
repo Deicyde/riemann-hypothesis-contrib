@@ -27,8 +27,8 @@ def sub (M : HermitianBundle K) (F : Submodule (𝓞 K) M.carrier) : HermitianBu
 
 variable {M : HermitianBundle K} {F : Submodule (𝓞 K) M.carrier}
 
-theorem isTorsionFree_quotient (hF : M.Saturated F) :
-    Module.IsTorsionFree (𝓞 K) (M.carrier ⧸ F) := by
+theorem isTorsionFree_quotient (hF : M.Saturated F)
+    : Module.IsTorsionFree (𝓞 K) (M.carrier ⧸ F) := by
   refine Module.IsTorsionFree.of_smul_eq_zero fun a x hax ↦ ?_
   obtain ⟨x, rfl⟩ := F.mkQ_surjective x
   by_cases ha : a = 0
@@ -48,8 +48,7 @@ def quotSection (hF : M.Saturated F) : (M.carrier ⧸ F) →ₗ[𝓞 K] M.carrie
   letI := quot_projective hF
   (Module.projective_lifting_property F.mkQ LinearMap.id F.mkQ_surjective).choose
 
-theorem mkQ_comp_quotSection (hF : M.Saturated F) :
-    F.mkQ ∘ₗ quotSection M F hF = LinearMap.id :=
+theorem mkQ_comp_quotSection (hF : M.Saturated F) : F.mkQ ∘ₗ quotSection M F hF = LinearMap.id :=
   letI := quot_projective hF
   (Module.projective_lifting_property F.mkQ LinearMap.id F.mkQ_surjective).choose_spec
 
@@ -57,50 +56,51 @@ end HermitianBundle
 
 section Fibres
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E]
-
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
 omit [NumberField K] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] in
-theorem fibreMap_fibreMap {E' E'' : Type*} [AddCommGroup E'] [Module (𝓞 K) E']
-    [AddCommGroup E''] [Module (𝓞 K) E'']
-    (σ : K →+* ℂ) (f : E' →ₗ[𝓞 K] E) (g : E'' →ₗ[𝓞 K] E') (x : Fibre σ E'') :
-    fibreMap σ f (fibreMap σ g x) = fibreMap σ (f ∘ₗ g) x :=
+theorem fibreMap_fibreMap
+    {E' E'' : Type*} [AddCommGroup E'] [Module (𝓞 K) E'] [AddCommGroup E''] [Module (𝓞 K) E'']
+    (σ : K →+* ℂ)
+    (f : E' →ₗ[𝓞 K] E) (g : E'' →ₗ[𝓞 K] E') (x : Fibre σ E'')
+    : fibreMap σ f (fibreMap σ g x) = fibreMap σ (f ∘ₗ g) x :=
   (LinearMap.lTensor_comp_apply _ _ _ _).symm
 
-def subFibre (h : HermitianMetric K E) (σ : K →+* ℂ) (F : Submodule (𝓞 K) E) :
-    Submodule ℂ (FibreSpace h σ) :=
+def subFibre (h : HermitianMetric K E) (σ : K →+* ℂ) (F : Submodule (𝓞 K) E)
+    : Submodule ℂ (FibreSpace h σ) :=
   LinearMap.range ((FibreSpace.equiv h σ).toLinearMap ∘ₗ fibreMap σ F.subtype)
 
-def conjFS (h : HermitianMetric K E) (σ : K →+* ℂ) (y : FibreSpace h σ) :
-    FibreSpace h (conjugate σ) :=
+def conjFS (h : HermitianMetric K E) (σ : K →+* ℂ) (y : FibreSpace h σ)
+    : FibreSpace h (conjugate σ) :=
   FibreSpace.equiv h (conjugate σ) (conjMap σ E ((FibreSpace.equiv h σ).symm y))
 
 variable (h : HermitianMetric K E) (σ : K →+* ℂ)
 
-theorem conjFS_inner (y z : FibreSpace h σ) :
-    inner ℂ (conjFS h σ y) (conjFS h σ z) = starRingEnd ℂ (inner ℂ y z) :=
+theorem conjFS_inner (y z : FibreSpace h σ)
+    : inner ℂ (conjFS h σ y) (conjFS h σ z) = starRingEnd ℂ (inner ℂ y z) :=
   h.form_conj σ _ _
 
 theorem conjFS_sub (y z : FibreSpace h σ) : conjFS h σ (y - z) = conjFS h σ y - conjFS h σ z := by
   simp only [conjFS, map_sub]
 
-theorem conjFS_mem_subFibre (F : Submodule (𝓞 K) E) {y : FibreSpace h σ}
-    (hy : y ∈ subFibre h σ F) : conjFS h σ y ∈ subFibre h (conjugate σ) F := by
+theorem conjFS_mem_subFibre (F : Submodule (𝓞 K) E) {y : FibreSpace h σ} (hy : y ∈ subFibre h σ F)
+    : conjFS h σ y ∈ subFibre h (conjugate σ) F := by
   obtain ⟨z, rfl⟩ := hy
   exact ⟨conjMap σ F z, (conjMap_fibreMap σ F.subtype z).symm⟩
 
-theorem mem_subFibre_conj (F : Submodule (𝓞 K) E) {w : FibreSpace h (conjugate σ)}
-    (hw : w ∈ subFibre h (conjugate σ) F) : ∃ y ∈ subFibre h σ F, w = conjFS h σ y := by
+theorem mem_subFibre_conj
+    (F : Submodule (𝓞 K) E) {w : FibreSpace h (conjugate σ)} (hw : w ∈ subFibre h (conjugate σ) F)
+    : ∃ y ∈ subFibre h σ F, w = conjFS h σ y := by
   obtain ⟨z, rfl⟩ := hw
   obtain ⟨z', rfl⟩ := conjMap_surjective (σ := σ) (E := F) z
   refine ⟨_, ⟨z', rfl⟩, ?_⟩
   simp only [conjFS, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply]
   rw [conjMap_fibreMap]
 
-theorem starProjection_conjFS (F : Submodule (𝓞 K) E) (y : FibreSpace h σ) :
-    (subFibre h (conjugate σ) F)ᗮ.starProjection (conjFS h σ y) =
-      conjFS h σ ((subFibre h σ F)ᗮ.starProjection y) := by
+theorem starProjection_conjFS (F : Submodule (𝓞 K) E) (y : FibreSpace h σ)
+    : (subFibre h (conjugate σ) F)ᗮ.starProjection (conjFS h σ y)
+      = conjFS h σ ((subFibre h σ F)ᗮ.starProjection y) := by
   set V := subFibre h σ F
   set V' := subFibre h (conjugate σ) F
   have hp : Vᗮ.starProjection y ∈ Vᗮ := Vᗮ.starProjection_apply_mem y
@@ -125,12 +125,12 @@ namespace HermitianBundle
 
 variable (M : HermitianBundle K) (F : Submodule (𝓞 K) M.carrier) (hF : M.Saturated F)
 
-def quotFibreMap (σ : K →+* ℂ) :
-    letI := quot_projective hF
-    Fibre σ (M.carrier ⧸ F) →ₗ[ℂ] FibreSpace M.metric σ :=
+def quotFibreMap (σ : K →+* ℂ)
+    : letI := quot_projective hF
+      Fibre σ (M.carrier ⧸ F) →ₗ[ℂ] FibreSpace M.metric σ :=
   letI := quot_projective hF
-  (subFibre M.metric σ F)ᗮ.starProjection.toLinearMap ∘ₗ
-    (FibreSpace.equiv M.metric σ).toLinearMap ∘ₗ fibreMap σ (quotSection M F hF)
+  (subFibre M.metric σ F)ᗮ.starProjection.toLinearMap ∘ₗ (FibreSpace.equiv M.metric σ).toLinearMap
+    ∘ₗ fibreMap σ (quotSection M F hF)
 
 theorem quotFibreMap_injective (σ : K →+* ℂ) : Function.Injective (quotFibreMap M F hF σ) := by
   have := quot_projective hF
@@ -150,16 +150,18 @@ theorem quotFibreMap_injective (σ : K →+* ℂ) : Function.Injective (quotFibr
   rw [h4] at h3
   simpa [fibreMap] using h3.symm
 
-def quotMetric :
-    letI := quot_projective hF
-    HermitianMetric K (M.carrier ⧸ F) :=
+def quotMetric
+    : letI := quot_projective hF
+      HermitianMetric K (M.carrier ⧸ F) :=
   letI := quot_projective hF
-  { form := fun σ ↦ coreOfInjective (quotFibreMap M F hF σ) (quotFibreMap_injective M F hF σ)
+  {
+    form := fun σ ↦ coreOfInjective (quotFibreMap M F hF σ) (quotFibreMap_injective M F hF σ)
     form_conj := fun σ x y ↦ by
       simp only [coreOfInjective_inner]
-      have key : ∀ z : Fibre σ (M.carrier ⧸ F),
-          quotFibreMap M F hF (conjugate σ) (conjMap σ _ z) =
-            conjFS M.metric σ (quotFibreMap M F hF σ z) := by
+      have key
+          : ∀ z : Fibre σ (M.carrier ⧸ F),
+            quotFibreMap M F hF (conjugate σ) (conjMap σ _ z)
+              = conjFS M.metric σ (quotFibreMap M F hF σ z) := by
         intro z
         simp only [quotFibreMap, LinearMap.coe_comp, Function.comp_apply,
           ContinuousLinearMap.coe_coe]
@@ -167,7 +169,8 @@ def quotMetric :
         congr 1
         simp only [conjFS, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply]
         rw [conjMap_fibreMap]
-      rw [key, key, conjFS_inner] }
+      rw [key, key, conjFS_inner]
+  }
 
 def quot : HermitianBundle K :=
   letI := quot_projective hF
@@ -184,31 +187,33 @@ end HermitianBundle
 section BaseChange
 
 variable {L : Type*} [Field L] [NumberField L] [Algebra K L]
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E]
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
-def baseChangeCoord (τ : L →+* ℂ) :
-    Fibre τ (𝓞 L ⊗[𝓞 K] E) ≃ₗ[ℂ] Fibre (τ.comp (algebraMap K L)) E :=
+def baseChangeCoord (τ : L →+* ℂ)
+    : Fibre τ (𝓞 L ⊗[𝓞 K] E) ≃ₗ[ℂ] Fibre (τ.comp (algebraMap K L)) E :=
   letI : Algebra (𝓞 K) (ComplexAt τ) :=
     (inferInstance : Algebra (𝓞 K) (ComplexAt (τ.comp (algebraMap K L))))
   haveI : IsScalarTower (𝓞 K) (𝓞 L) (ComplexAt τ) := IsScalarTower.of_algebraMap_eq fun _ ↦ rfl
-  { (AlgebraTensorModule.cancelBaseChange (𝓞 K) (𝓞 L) (ComplexAt τ) (ComplexAt τ) E).toAddEquiv
-    with
+  {
+    (AlgebraTensorModule.cancelBaseChange (𝓞 K) (𝓞 L) (ComplexAt τ) (ComplexAt τ) E).toAddEquiv with
     map_smul' := fun c x ↦
       (AlgebraTensorModule.cancelBaseChange (𝓞 K) (𝓞 L) (ComplexAt τ) (ComplexAt τ) E).map_smul
-        (ofComplex τ c) x }
+        (ofComplex τ c) x
+  }
 
 omit [NumberField K] [NumberField L] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] in
-theorem baseChangeCoord_tmul (τ : L →+* ℂ) (z : ComplexAt τ) (b : 𝓞 L) (e : E) :
-    baseChangeCoord τ (z ⊗ₜ (b ⊗ₜ e)) =
-      (ofComplex _ (τ (b : L) * (ofComplex τ).symm z) : ComplexAt (τ.comp (algebraMap K L))) ⊗ₜ e :=
+theorem baseChangeCoord_tmul (τ : L →+* ℂ) (z : ComplexAt τ) (b : 𝓞 L) (e : E)
+    : baseChangeCoord τ (z ⊗ₜ (b ⊗ₜ e))
+      = (ofComplex _ (τ (b : L) * (ofComplex τ).symm z) : ComplexAt (τ.comp (algebraMap K L)))
+        ⊗ₜ e :=
   rfl
 
 omit [NumberField K] [NumberField L] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] in
-theorem baseChangeCoord_conjMap (τ : L →+* ℂ) (x : Fibre τ (𝓞 L ⊗[𝓞 K] E)) :
-    baseChangeCoord (conjugate τ) (conjMap τ _ x) =
-      (conjMap (τ.comp (algebraMap K L)) E (baseChangeCoord τ x) :
-        Fibre ((conjugate τ).comp (algebraMap K L)) E) := by
+theorem baseChangeCoord_conjMap (τ : L →+* ℂ) (x : Fibre τ (𝓞 L ⊗[𝓞 K] E))
+    : baseChangeCoord (conjugate τ) (conjMap τ _ x)
+      = (conjMap (τ.comp (algebraMap K L)) E (baseChangeCoord τ x)
+        : Fibre ((conjugate τ).comp (algebraMap K L)) E) := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [map_zero]
   | tmul z t =>
@@ -221,25 +226,32 @@ theorem baseChangeCoord_conjMap (τ : L →+* ℂ) (x : Fibre τ (𝓞 L ⊗[�
       simp only [map_mul]
       rfl
     | add s t hs ht => simp only [tmul_add, map_add (f := _), hs, ht]
-  | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy, map_add (f := _), map_add (f := _)]
+  | add x y hx hy =>
+    rw [map_add (f := _), map_add (f := _), hx, hy, map_add (f := _), map_add (f := _)]
 
-def HermitianMetric.baseChange (L : Type*) [Field L] [NumberField L] [Algebra K L]
-    (h : HermitianMetric K E) : HermitianMetric L (𝓞 L ⊗[𝓞 K] E) where
-  form τ := coreOfInjective
-    ((FibreSpace.equiv h (τ.comp (algebraMap K L))).toLinearMap ∘ₗ (baseChangeCoord τ).toLinearMap)
-    ((FibreSpace.equiv h _).injective.comp (baseChangeCoord τ).injective)
+def HermitianMetric.baseChange
+    (L : Type*) [Field L] [NumberField L] [Algebra K L] (h : HermitianMetric K E)
+    : HermitianMetric L (𝓞 L ⊗[𝓞 K] E) where
+  form τ :=
+    coreOfInjective
+      ((FibreSpace.equiv h (τ.comp (algebraMap K L))).toLinearMap
+        ∘ₗ (baseChangeCoord τ).toLinearMap)
+      ((FibreSpace.equiv h _).injective.comp (baseChangeCoord τ).injective)
   form_conj τ x y := by
-    change inner ℂ (FibreSpace.equiv h ((conjugate τ).comp (algebraMap K L))
-        (baseChangeCoord (conjugate τ) (conjMap τ _ x)))
+    change inner ℂ
         (FibreSpace.equiv h ((conjugate τ).comp (algebraMap K L))
-          (baseChangeCoord (conjugate τ) (conjMap τ _ y))) =
-      starRingEnd ℂ (inner ℂ (FibreSpace.equiv h (τ.comp (algebraMap K L)) (baseChangeCoord τ x))
-        (FibreSpace.equiv h (τ.comp (algebraMap K L)) (baseChangeCoord τ y)))
+          (baseChangeCoord (conjugate τ) (conjMap τ _ x)))
+        (FibreSpace.equiv h ((conjugate τ).comp (algebraMap K L))
+          (baseChangeCoord (conjugate τ) (conjMap τ _ y)))
+      = starRingEnd ℂ
+        (inner ℂ (FibreSpace.equiv h (τ.comp (algebraMap K L)) (baseChangeCoord τ x))
+          (FibreSpace.equiv h (τ.comp (algebraMap K L)) (baseChangeCoord τ y)))
     rw [baseChangeCoord_conjMap, baseChangeCoord_conjMap]
     exact h.form_conj _ _ _
 
-def HermitianBundle.baseChange (M : HermitianBundle K) (L : Type*) [Field L] [NumberField L]
-    [Algebra K L] : HermitianBundle L :=
+def HermitianBundle.baseChange
+    (M : HermitianBundle K) (L : Type*) [Field L] [NumberField L] [Algebra K L]
+    : HermitianBundle L :=
   ⟨𝓞 L ⊗[𝓞 K] M.carrier, M.metric.baseChange L⟩
 
 end BaseChange

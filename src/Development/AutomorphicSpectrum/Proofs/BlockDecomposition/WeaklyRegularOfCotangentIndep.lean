@@ -9,18 +9,22 @@ open IsLocalRing RingTheory.Sequence
 
 namespace GlobalTheory.CompanionTheory.RegSeq
 
-theorem exists_ofList_append_eq_maximalIdeal {R : Type} [CommRing R] [IsRegularLocalRing R] {r : ℕ}
-    (f : Fin r → R) (hf : ∀ i, f i ∈ maximalIdeal R)
+theorem exists_ofList_append_eq_maximalIdeal
+    {R : Type} [CommRing R] [IsRegularLocalRing R]
+    {r : ℕ} (f : Fin r → R) (hf : ∀ i, f i ∈ maximalIdeal R)
     (hli : LinearIndependent (ResidueField R)
-      (fun i => ((maximalIdeal R).toCotangent ⟨f i, hf i⟩ : CotangentSpace R))) :
-    ∃ ys : List R, Ideal.ofList (List.ofFn f ++ ys) = maximalIdeal R ∧
-      (List.ofFn f ++ ys).length = (maximalIdeal R).spanFinrank := by
+      (fun i => ((maximalIdeal R).toCotangent ⟨f i, hf i⟩ : CotangentSpace R)))
+    : ∃ ys : List R,
+      Ideal.ofList (List.ofFn f ++ ys) = maximalIdeal R
+        ∧ (List.ofFn f ++ ys).length = (maximalIdeal R).spanFinrank := by
   classical
   let W : Submodule (ResidueField R) (CotangentSpace R) :=
-    Submodule.span (ResidueField R) (Set.range (fun i => ((maximalIdeal R).toCotangent ⟨f i, hf i⟩ : CotangentSpace R)))
+    Submodule.span (ResidueField R)
+      (Set.range (fun i => ((maximalIdeal R).toCotangent ⟨f i, hf i⟩ : CotangentSpace R)))
   let c := Module.finBasis (ResidueField R) (CotangentSpace R ⧸ W)
-  have hsurj : ∀ q : CotangentSpace R ⧸ W, ∃ x : maximalIdeal R,
-      W.mkQ ((maximalIdeal R).toCotangent x : CotangentSpace R) = q := by
+  have hsurj
+      : ∀ q : CotangentSpace R ⧸ W, ∃ x : maximalIdeal R,
+        W.mkQ ((maximalIdeal R).toCotangent x : CotangentSpace R) = q := by
     intro q
     obtain ⟨w, rfl⟩ := W.mkQ_surjective q
     obtain ⟨x, rfl⟩ := (maximalIdeal R).toCotangent_surjective w
@@ -38,7 +42,11 @@ theorem exists_ofList_append_eq_maximalIdeal {R : Type} [CommRing R] [IsRegularL
     have h1 : Submodule.map W.mkQ T = ⊤ := by
       rw [eq_top_iff, ← c.span_eq, Submodule.span_le]
       rintro _ ⟨j, rfl⟩
-      exact ⟨(maximalIdeal R).toCotangent (g (c j)), Submodule.subset_span ⟨g (c j), Or.inr ⟨j, rfl⟩, rfl⟩, hg _⟩
+      exact ⟨
+        (maximalIdeal R).toCotangent (g (c j)),
+        Submodule.subset_span ⟨g (c j), Or.inr ⟨j, rfl⟩, rfl⟩,
+        hg _
+      ⟩
     have h2 := Submodule.comap_map_mkQ W T
     rw [h1, Submodule.comap_top] at h2
     rw [eq_top_iff, h2]
@@ -70,26 +78,27 @@ theorem exists_ofList_append_eq_maximalIdeal {R : Type} [CommRing R] [IsRegularL
   · rw [List.length_append, List.length_ofFn, List.length_ofFn,
       IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace]
     have h1 := Submodule.finrank_quotient_add_finrank W
-    have h2 : Module.finrank (ResidueField R) W = r := by
-      simpa using finrank_span_eq_card hli
+    have h2 : Module.finrank (ResidueField R) W = r := by simpa using finrank_span_eq_card hli
     omega
 
-theorem isWeaklyRegular_ofFn {R : Type} [CommRing R] [IsRegularLocalRing R] {r : ℕ}
-    (f : Fin r → R) (hf : ∀ i, f i ∈ maximalIdeal R)
+theorem isWeaklyRegular_ofFn
+    {R : Type} [CommRing R] [IsRegularLocalRing R]
+    {r : ℕ} (f : Fin r → R) (hf : ∀ i, f i ∈ maximalIdeal R)
     (hli : LinearIndependent (ResidueField R)
-      (fun i => ((maximalIdeal R).toCotangent ⟨f i, hf i⟩ : CotangentSpace R))) :
-    IsWeaklyRegular R (List.ofFn f) := by
+      (fun i => ((maximalIdeal R).toCotangent ⟨f i, hf i⟩ : CotangentSpace R)))
+    : IsWeaklyRegular R (List.ofFn f) := by
   obtain ⟨ys, h1, h2⟩ := exists_ofList_append_eq_maximalIdeal f hf hli
   exact ((isWeaklyRegular_append_iff R _ _).1
     (GlobalTheory.isRegular_of_length_eq_spanFinrank h1 h2).toIsWeaklyRegular).1
 
-theorem isWeaklyRegular_and_length_quotient_le_one :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsRegularLocalRing R] (d : ℕ)
-      (a : Fin d → R), ringKrullDim R ≤ d →
-      LinearIndependent (ResidueField R) (fun j : {j : Fin d // a j ∈ maximalIdeal R} =>
-        ((maximalIdeal R).toCotangent ⟨_, j.2⟩ : CotangentSpace R)) →
-      RingTheory.Sequence.IsWeaklyRegular R (List.ofFn a) ∧
-        Module.length R (R ⧸ Ideal.span (Set.range a)) ≤ 1 := by
+theorem isWeaklyRegular_and_length_quotient_le_one
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsRegularLocalRing R] (d : ℕ)
+        (a : Fin d → R),
+      ringKrullDim R ≤ d
+        → LinearIndependent (ResidueField R) (fun j : {j : Fin d // a j ∈ maximalIdeal R} =>
+          ((maximalIdeal R).toCotangent ⟨_, j.2⟩ : CotangentSpace R))
+        → RingTheory.Sequence.IsWeaklyRegular R (List.ofFn a)
+          ∧ Module.length R (R ⧸ Ideal.span (Set.range a)) ≤ 1 := by
   intro R _ _ _ _ d a hd hli
   classical
   by_cases hall : ∀ j, a j ∈ maximalIdeal R
@@ -122,8 +131,10 @@ theorem isWeaklyRegular_and_length_quotient_le_one :
   · push_neg at hall
     obtain ⟨j1, hj1⟩ := hall
     have hex : ∃ n, ∃ h : n < d, a ⟨n, h⟩ ∉ maximalIdeal R := ⟨j1.val, j1.isLt, hj1⟩
-    obtain ⟨n, hn, han, hmin⟩ : ∃ n, ∃ hn : n < d, a ⟨n, hn⟩ ∉ maximalIdeal R ∧
-        ∀ k (hk : k < n), a ⟨k, lt_trans hk hn⟩ ∈ maximalIdeal R := by
+    obtain ⟨n, hn, han, hmin⟩
+        : ∃ n, ∃ hn : n < d,
+          a ⟨n, hn⟩ ∉ maximalIdeal R
+            ∧ ∀ k (hk : k < n), a ⟨k, lt_trans hk hn⟩ ∈ maximalIdeal R := by
       refine ⟨Nat.find hex, (Nat.find_spec hex).1, (Nat.find_spec hex).2, fun k hk => ?_⟩
       by_contra hc
       exact Nat.find_min hex hk ⟨lt_trans hk (Nat.find_spec hex).1, hc⟩
@@ -145,10 +156,13 @@ theorem isWeaklyRegular_and_length_quotient_le_one :
       obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ y
       exact (Submodule.Quotient.eq _).2 Submodule.mem_top
     have hpre : IsWeaklyRegular R (List.ofFn (fun k : Fin n => a ⟨k, lt_trans k.2 hn⟩)) :=
-      isWeaklyRegular_ofFn _ (fun k => hmin k k.2)
-        (hli.comp (fun k : Fin n => ⟨⟨k, lt_trans k.2 hn⟩, hmin k k.2⟩) (fun x y h => by
-          have h5 := congrArg (fun z : {j : Fin d // a j ∈ maximalIdeal R} => (z.1 : Fin d).val) h
-          exact Fin.ext h5))
+      isWeaklyRegular_ofFn _
+        (fun k => hmin k k.2)
+        (hli.comp
+          (fun k : Fin n => ⟨⟨k, lt_trans k.2 hn⟩, hmin k k.2⟩)
+          (fun x y h => by
+            have h5 := congrArg (fun z : {j : Fin d // a j ∈ maximalIdeal R} => (z.1 : Fin d).val) h
+            exact Fin.ext h5))
     have hpre' : List.ofFn (fun k : Fin n => a ⟨k, lt_trans k.2 hn⟩) = (List.ofFn a).take n := by
       apply List.ext_getElem
       · simp only [List.length_ofFn, List.length_take]
@@ -159,8 +173,9 @@ theorem isWeaklyRegular_and_length_quotient_le_one :
     · rw [List.length_ofFn] at hi
       rcases lt_trichotomy i n with h | h | h
       · have hg := (isWeaklyRegular_iff R _).1 hpre i (by rw [List.length_ofFn]; exact h)
-        have e1 : (List.ofFn a).take i =
-            (List.ofFn (fun k : Fin n => a ⟨k, lt_trans k.2 hn⟩)).take i := by
+        have e1
+            : (List.ofFn a).take i
+              = (List.ofFn (fun k : Fin n => a ⟨k, lt_trans k.2 hn⟩)).take i := by
           rw [hpre', List.take_take, min_eq_left h.le]
         rw [e1]
         simp only [List.getElem_ofFn] at hg ⊢

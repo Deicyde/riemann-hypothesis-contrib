@@ -20,28 +20,36 @@ open Set Module Filter IsDedekindDomain NumberField GKTensor RestrictedTensor
 
 section Restrict
 
-variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
-  {G : Subgroup 𝔸ˣ} {𝔤 : Submodule ℝ 𝔸} {h : IsExpLieAlgebra G 𝔤} {K : Subgroup G}
-  {V : Type*} [AddCommGroup V] [Module ℂ V]
+variable
+  {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
+  {G : Subgroup 𝔸ˣ} {𝔤 : Submodule ℝ 𝔸} {h : IsExpLieAlgebra G 𝔤} {K : Subgroup G} {V : Type*}
+  [AddCommGroup V] [Module ℂ V]
 
-def IsExpLieAlgebra.GKModule.restrictρ (M : h.GKModule K V) (U : Submodule ℂ V)
-    (hρ : ∀ X, ∀ u ∈ U, M.ρ X u ∈ U) : h.lieSubalgebra →ₗ⁅ℝ⁆ Module.End ℂ U where
+def IsExpLieAlgebra.GKModule.restrictρ
+    (M : h.GKModule K V) (U : Submodule ℂ V) (hρ : ∀ X, ∀ u ∈ U, M.ρ X u ∈ U)
+    : h.lieSubalgebra →ₗ⁅ℝ⁆ Module.End ℂ U where
   toFun X := (M.ρ X).restrict (hρ X)
   map_add' X Y := LinearMap.ext fun u => Subtype.ext (by simp)
   map_smul' r X := LinearMap.ext fun u => Subtype.ext (by simp)
-  map_lie' {X Y} := LinearMap.ext fun u => Subtype.ext (by
-    simp [LieHom.map_lie, LieRing.of_associative_ring_bracket])
+  map_lie' {X Y} :=
+    LinearMap.ext fun u =>
+      Subtype.ext (by simp [LieHom.map_lie, LieRing.of_associative_ring_bracket])
 
-def IsExpLieAlgebra.GKModule.restrictσ (M : h.GKModule K V) (U : Submodule ℂ V)
-    (hσ : ∀ k, ∀ u ∈ U, M.σ k u ∈ U) : Representation ℂ K U where
+def IsExpLieAlgebra.GKModule.restrictσ
+    (M : h.GKModule K V) (U : Submodule ℂ V) (hσ : ∀ k, ∀ u ∈ U, M.σ k u ∈ U)
+    : Representation ℂ K U where
   toFun k := (M.σ k).restrict (hσ k)
   map_one' := LinearMap.ext fun u => Subtype.ext (by simp)
   map_mul' k₁ k₂ := LinearMap.ext fun u => Subtype.ext (by simp)
 
-def IsExpLieAlgebra.GKModule.restrict (M : h.GKModule K V) (U : Submodule ℂ V)
-    (hρ : ∀ X, ∀ u ∈ U, M.ρ X u ∈ U) (hσ : ∀ k, ∀ u ∈ U, M.σ k u ∈ U) : h.GKModule K U :=
+def IsExpLieAlgebra.GKModule.restrict
+    (M : h.GKModule K V) (U : Submodule ℂ V)
+    (hρ : ∀ X, ∀ u ∈ U, M.ρ X u ∈ U) (hσ : ∀ k, ∀ u ∈ U, M.σ k u ∈ U)
+    : h.GKModule K U :=
   IsExpLieAlgebra.GKModule.comap h M U.subtype U.injective_subtype (M.restrictρ U hρ)
-    (M.restrictσ U hσ) (fun _ _ => rfl) (fun _ _ => rfl)
+    (M.restrictσ U hσ)
+    (fun _ _ => rfl)
+    (fun _ _ => rfl)
 
 end Restrict
 
@@ -57,16 +65,15 @@ abbrev AdelicGKModule (V : Type*) [AddCommGroup V] [Module ℂ V] :=
 
 variable {K n}
 
-structure AdelicDecomposition {V : Type u} [AddCommGroup V] [Module ℂ V]
-    (Mx : AdelicGKModule K n V) where
-
+structure AdelicDecomposition
+    {V : Type u} [AddCommGroup V] [Module ℂ V] (Mx : AdelicGKModule K n V) where
   toDecomposition : Mx.Decomposition
-
   finite : AdelicGLn.TensorDecomposition K n toDecomposition.π₂
 
-theorem nonempty_adelicDecomposition {V : Type u} [AddCommGroup V] [Module ℂ V]
-    (Mx : AdelicGKModule K n V) (hirr : Mx.IsIrreducible) (hadm : Mx.IsAdmissible) :
-    Nonempty (AdelicDecomposition Mx) := by
+theorem nonempty_adelicDecomposition
+    {V : Type u} [AddCommGroup V] [Module ℂ V]
+    (Mx : AdelicGKModule K n V) (hirr : Mx.IsIrreducible) (hadm : Mx.IsAdmissible)
+    : Nonempty (AdelicDecomposition Mx) := by
   obtain ⟨D⟩ := Mx.nonempty_decomposition hirr hadm
   obtain ⟨T⟩ := AdelicGLn.nonempty_tensorDecomposition D.isAdmissible₂ D.isIrreducible₂
   exact ⟨⟨D, T⟩⟩
@@ -77,39 +84,36 @@ variable {V : Type u} [AddCommGroup V] [Module ℂ V] {Mx : AdelicGKModule K n V
 
 end AdelicDecomposition
 
-
 variable (K n) in
-def cuspSubmodule (U : Submodule ℂ (cuspForms K n))
-    (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
-    (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U)
-    (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U) : AdelicGKModule K n U where
+def cuspSubmodule
+    (U : Submodule ℂ (cuspForms K n)) (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
+    (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U) (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U)
+    : AdelicGKModule K n U where
   gk := (gkModuleCusp K n).restrict U hρ hσ
   τ := (⟨U, hτ⟩ : Subrepresentation (finRepCusp K n)).toRepresentation
-  comm_ρ X g := LinearMap.ext fun φ => Subtype.ext
-    (gkModuleCusp_ρ_finRepCusp X g φ)
-  comm_σ k g := LinearMap.ext fun φ => Subtype.ext
-    (gkModuleCusp_σ_finRepCusp k g φ)
-
+  comm_ρ X g := LinearMap.ext fun φ => Subtype.ext (gkModuleCusp_ρ_finRepCusp X g φ)
+  comm_σ k g := LinearMap.ext fun φ => Subtype.ext (gkModuleCusp_σ_finRepCusp k g φ)
 
 variable (K n) in
 structure CuspidalAutomorphicRep where
-
   carrier : Submodule ℂ (cuspForms K n)
   stable_ρ : ∀ X, ∀ φ ∈ carrier, (gkModuleCusp K n).ρ X φ ∈ carrier
   stable_σ : ∀ k, ∀ φ ∈ carrier, (gkModuleCusp K n).σ k φ ∈ carrier
   stable_τ : ∀ g, ∀ φ ∈ carrier, finRepCusp K n g φ ∈ carrier
   isIrreducible : (cuspSubmodule K n carrier stable_ρ stable_σ stable_τ).IsIrreducible
-  exists_compl : ∃ C : Submodule ℂ (cuspForms K n), IsCompl carrier C ∧
-    (∀ X, ∀ φ ∈ C, (gkModuleCusp K n).ρ X φ ∈ C) ∧ (∀ k, ∀ φ ∈ C, (gkModuleCusp K n).σ k φ ∈ C) ∧
-    ∀ g, ∀ φ ∈ C, finRepCusp K n g φ ∈ C
+  exists_compl
+    : ∃ C : Submodule ℂ (cuspForms K n),
+      IsCompl carrier C ∧ (∀ X, ∀ φ ∈ C, (gkModuleCusp K n).ρ X φ ∈ C)
+        ∧ (∀ k, ∀ φ ∈ C, (gkModuleCusp K n).σ k φ ∈ C) ∧ ∀ g, ∀ φ ∈ C, finRepCusp K n g φ ∈ C
 
 namespace CuspidalAutomorphicRep
 
 abbrev toModule (π : CuspidalAutomorphicRep K n) : AdelicGKModule K n π.carrier :=
   cuspSubmodule K n π.carrier π.stable_ρ π.stable_σ π.stable_τ
 
-theorem nonempty_adelicDecomposition (π : CuspidalAutomorphicRep K n)
-    (hadm : π.toModule.IsAdmissible) : Nonempty (AdelicDecomposition π.toModule) :=
+theorem nonempty_adelicDecomposition
+    (π : CuspidalAutomorphicRep K n) (hadm : π.toModule.IsAdmissible)
+    : Nonempty (AdelicDecomposition π.toModule) :=
   AutomorphicForm.nonempty_adelicDecomposition π.toModule π.isIrreducible hadm
 
 end CuspidalAutomorphicRep

@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem index_smul_cocycle_eq_coboundary (R G X : Type) [CommRing R] [Group G] [AddCommGroup X]
-    [Module R X] (ρ : Representation R G X) (H : Subgroup G) [H.FiniteIndex] (f : G → X)
-    (hf : ∀ g h, f (g * h) = f g + ρ g (f h)) (hH : ∃ x, ∀ h ∈ H, f h = ρ h x - x) :
-    ∃ x, ∀ g, H.index • f g = ρ g x - x := by
+theorem index_smul_cocycle_eq_coboundary
+    (R G X : Type) [CommRing R] [Group G] [AddCommGroup X] [Module R X]
+    (ρ : Representation R G X)
+    (H : Subgroup G) [H.FiniteIndex]
+    (f : G → X) (hf : ∀ g h, f (g * h) = f g + ρ g (f h)) (hH : ∃ x, ∀ h ∈ H, f h = ρ h x - x)
+    : ∃ x, ∀ g, H.index • f g = ρ g x - x := by
   classical
   obtain ⟨x₀, hx₀⟩ := hH
   haveI : Fintype (G ⧸ H) := Fintype.ofFinite _

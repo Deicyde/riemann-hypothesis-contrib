@@ -15,10 +15,12 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem smoothAffineCurve_degreeTwo_class_dies_on_principalOpen : ∀ (q : ℕ) [NeZero q] (k B : Type) [Field k] [IsAlgClosed k]
-    [CommRing B] [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B], IsUnit (q : k) →
-    ∀ (i : ℤ) (x : Ht q (sp B) 2 i), ∃ f : B, f ≠ 0 ∧
-      pull _ (spMap (algebraMap B (Localization.Away f))) _ _ x = 0 := by
+theorem smoothAffineCurve_degreeTwo_class_dies_on_principalOpen
+    : ∀ (q : ℕ) [NeZero q] (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B]
+        [Algebra k B] [Algebra.FiniteType k B],
+      IsUnit (q : k)
+        → ∀ (i : ℤ) (x : Ht q (sp B) 2 i), ∃ f : B,
+          f ≠ 0 ∧ pull _ (spMap (algebraMap B (Localization.Away f))) _ _ x = 0 := by
   intro q _ k B _ _ _ _ _ _ hq i x
   have hqB : IsUnit (q : B) := by simpa using hq.map (algebraMap k B)
   by_cases hB : IsField B
@@ -32,7 +34,9 @@ theorem smoothAffineCurve_degreeTwo_class_dies_on_principalOpen : ∀ (q : ℕ) 
     have hqK : IsUnit (q : FractionRing B) := by simpa using hqB.map (algebraMap B (FractionRing B))
     haveI : Subsingleton (Ht q (sp (FractionRing B)) 2 i) :=
       GlobalTheory.T.etale_cohomology_vanishing_algebraic_over_ratFunc q k (FractionRing B) hqK 2 i le_rfl
-    obtain ⟨f, hf, -, hx⟩ := GlobalTheory.T.class_vanishes_away_nonzero_nonunit_domain q B hB hqB 2 i x (Subsingleton.elim _ _)
+    obtain ⟨f, hf, -, hx⟩ :=
+      GlobalTheory.T.class_vanishes_away_nonzero_nonunit_domain q B hB hqB 2 i x
+        (Subsingleton.elim _ _)
     exact ⟨f, hf, hx⟩
 
 end GlobalTheory.EtC

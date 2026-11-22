@@ -15,25 +15,33 @@ namespace GlobalTheory.CompanionTheory.DSICHWMap
 open CompanionTheory.D.DSIC
 open Formalism.REAL (KHighest IsWeight)
 
-variable {T V : Type} [NormedAddCommGroup T] [InnerProductSpace ℂ T] [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {T V : Type}
+  [NormedAddCommGroup T] [InnerProductSpace ℂ T] [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
 def diagOp (A : Module.End ℂ T) (B : Module.End ℂ V) : Module.End ℂ (WithLp 2 (T × V)) :=
-  (WithLp.linearEquiv 2 ℂ (T × V)).symm.toLinearMap ∘ₗ (A.prodMap B) ∘ₗ (WithLp.linearEquiv 2 ℂ (T × V)).toLinearMap
+  (WithLp.linearEquiv 2 ℂ (T × V)).symm.toLinearMap ∘ₗ (A.prodMap B)
+    ∘ₗ (WithLp.linearEquiv 2 ℂ (T × V)).toLinearMap
 
-theorem diagOp_fst (A : Module.End ℂ T) (B : Module.End ℂ V) (x : WithLp 2 (T × V)) :
-    (WithLp.ofLp (diagOp A B x)).1 = A (WithLp.ofLp x).1 := rfl
+theorem diagOp_fst (A : Module.End ℂ T) (B : Module.End ℂ V) (x : WithLp 2 (T × V))
+    : (WithLp.ofLp (diagOp A B x)).1 = A (WithLp.ofLp x).1 :=
+  rfl
 
-theorem diagOp_snd (A : Module.End ℂ T) (B : Module.End ℂ V) (x : WithLp 2 (T × V)) :
-    (WithLp.ofLp (diagOp A B x)).2 = B (WithLp.ofLp x).2 := rfl
+theorem diagOp_snd (A : Module.End ℂ T) (B : Module.End ℂ V) (x : WithLp 2 (T × V))
+    : (WithLp.ofLp (diagOp A B x)).2 = B (WithLp.ofLp x).2 :=
+  rfl
 
-theorem sum_ext {x y : WithLp 2 (T × V)} (h1 : (WithLp.ofLp x).1 = (WithLp.ofLp y).1)
-    (h2 : (WithLp.ofLp x).2 = (WithLp.ofLp y).2) : x = y := by
+theorem sum_ext
+    {x y : WithLp 2 (T × V)}
+    (h1 : (WithLp.ofLp x).1 = (WithLp.ofLp y).1) (h2 : (WithLp.ofLp x).2 = (WithLp.ofLp y).2)
+    : x = y := by
   apply (WithLp.linearEquiv 2 ℂ (T × V)).injective
   exact Prod.ext h1 h2
 
-theorem diag_krel {n : ℕ} {ε : Fin n → Bool} {ET : Fin n → Fin n → Module.End ℂ T}
-    {E : Fin n → Fin n → Module.End ℂ V} (h1 : KRel ε ET) (h2 : KRel ε E) :
-    KRel ε (fun a b => diagOp (ET a b) (E a b)) := by
+theorem diag_krel
+    {n : ℕ} {ε : Fin n → Bool} {ET : Fin n → Fin n → Module.End ℂ T}
+    {E : Fin n → Fin n → Module.End ℂ V} (h1 : KRel ε ET) (h2 : KRel ε E)
+    : KRel ε (fun a b => diagOp (ET a b) (E a b)) := by
   intro a b c d hab hcd
   have e1 := LinearMap.congr_fun (h1 a b c d hab hcd)
   have e2 := LinearMap.congr_fun (h2 a b c d hab hcd)
@@ -44,12 +52,13 @@ theorem diag_krel {n : ℕ} {ε : Fin n → Bool} {ET : Fin n → Fin n → Modu
   · have := e2 (WithLp.ofLp x).2
     split_ifs at this ⊢ <;> exact this
 
-theorem diag_kunit {n : ℕ} {ε : Fin n → Bool} {ET : Fin n → Fin n → Module.End ℂ T}
-    {E : Fin n → Fin n → Module.End ℂ V} (h1 : KUnit ε ET) (h2 : KUnit ε E) :
-    KUnit ε (fun a b => diagOp (ET a b) (E a b)) := by
+theorem diag_kunit
+    {n : ℕ} {ε : Fin n → Bool} {ET : Fin n → Fin n → Module.End ℂ T}
+    {E : Fin n → Fin n → Module.End ℂ V} (h1 : KUnit ε ET) (h2 : KUnit ε E)
+    : KUnit ε (fun a b => diagOp (ET a b) (E a b)) := by
   intro a b hab x y
-  rw [WithLp.prod_inner_apply, WithLp.prod_inner_apply, diagOp_fst, diagOp_snd, diagOp_fst, diagOp_snd,
-    h1 a b hab, h2 a b hab]
+  rw [WithLp.prod_inner_apply, WithLp.prod_inner_apply, diagOp_fst, diagOp_snd, diagOp_fst,
+    diagOp_snd, h1 a b hab, h2 a b hab]
 
 theorem hwMap_of_lowSpan : LowSpan → HWMap := by
   intro hLS n ε T _ _ _ V _ _ ET E μ t v S hRT hUT hR hU ht hHT hH hS hSt hvS
@@ -85,10 +94,13 @@ theorem hwMap_of_lowSpan : LowSpan → HWMap := by
     exact hSt a b hab _ hx
   have hw0S' : w0 ∈ S' := (memS' w0).2 hvS
   obtain ⟨L0, -, hw0L, hL0stab, hirr, -, -⟩ :=
-    hLS n ε (WithLp 2 (T × V)) (fun a b => diagOp (ET a b) (E a b)) μ w0 S' hKR hKU hw0 hHW
-      inferInstance hStab' hw0S'
-  let πT : WithLp 2 (T × V) →ₗ[ℂ] T := LinearMap.fst ℂ T V ∘ₗ (WithLp.linearEquiv 2 ℂ (T × V)).toLinearMap
-  let πV : WithLp 2 (T × V) →ₗ[ℂ] V := LinearMap.snd ℂ T V ∘ₗ (WithLp.linearEquiv 2 ℂ (T × V)).toLinearMap
+    hLS n ε (WithLp 2 (T × V))
+      (fun a b => diagOp (ET a b) (E a b))
+      μ w0 S' hKR hKU hw0 hHW inferInstance hStab' hw0S'
+  let πT : WithLp 2 (T × V) →ₗ[ℂ] T :=
+    LinearMap.fst ℂ T V ∘ₗ (WithLp.linearEquiv 2 ℂ (T × V)).toLinearMap
+  let πV : WithLp 2 (T × V) →ₗ[ℂ] V :=
+    LinearMap.snd ℂ T V ∘ₗ (WithLp.linearEquiv 2 ℂ (T × V)).toLinearMap
   let K : Submodule ℂ (WithLp 2 (T × V)) := L0 ⊓ LinearMap.ker πT
   have hKstab : KStab ε (fun a b => diagOp (ET a b) (E a b)) K := by
     intro a b hab x hx

@@ -8,11 +8,13 @@ universe u_1 u_2
 
 namespace GlobalTheory.exists_mem_pow_sub_mem_pow_succ_facts
 
-theorem exists_mem_pow_sub_mem_pow_succ {A : Type u_1} [CommRing A] {B : Type u_2} [CommRing B]
+theorem exists_mem_pow_sub_mem_pow_succ
+    {A : Type u_1} [CommRing A]
+    {B : Type u_2} [CommRing B]
     {φ : A →+* B} {I : Ideal A} {J : Ideal B} (hIJ : I ≤ Ideal.comap φ J)
-    (h0 : ∀ b : B, ∃ a : A, φ a - b ∈ J)
-    (h1 : ∀ y ∈ J, ∃ x ∈ I, φ x - y ∈ J ^ (2 : ℕ)) (n : ℕ) :
-    ∀ y ∈ J ^ n, ∃ x ∈ I ^ n, φ x - y ∈ J ^ (n + (1 : ℕ)) := by
+    (h0 : ∀ b : B, ∃ a : A, φ a - b ∈ J) (h1 : ∀ y ∈ J, ∃ x ∈ I, φ x - y ∈ J ^ (2 : ℕ))
+    (n : ℕ)
+    : ∀ y ∈ J ^ n, ∃ x ∈ I ^ n, φ x - y ∈ J ^ (n + (1 : ℕ)) := by
   induction n with
   | zero =>
     intro y _

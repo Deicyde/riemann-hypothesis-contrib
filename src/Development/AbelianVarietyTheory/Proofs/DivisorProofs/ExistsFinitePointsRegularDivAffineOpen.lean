@@ -11,14 +11,17 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
 
 namespace GlobalTheory
 
-theorem unitAt_fromSpec_fnOf_iff {X : Scheme.{0}} [IsIntegral X] {V : X.Opens} (hA : IsAffineOpen V)
-    (hV : genericPoint X ∈ V) (Q : PrimeSpectrum Γ(X, V)) (r : Γ(X, V)) :
-    UnitAt (hA.fromSpec Q) (fnOf V hV r) ↔ r ∉ Q.asIdeal := by
+theorem unitAt_fromSpec_fnOf_iff
+    {X : Scheme.{0}} [IsIntegral X]
+    {V : X.Opens}
+    (hA : IsAffineOpen V) (hV : genericPoint X ∈ V) (Q : PrimeSpectrum Γ(X, V)) (r : Γ(X, V))
+    : UnitAt (hA.fromSpec Q) (fnOf V hV r) ↔ r ∉ Q.asIdeal := by
   have hz : hA.fromSpec Q ∈ V := by
     have h : hA.fromSpec Q ∈ Set.range hA.fromSpec := ⟨Q, rfl⟩
     rw [hA.range_fromSpec] at h
@@ -29,8 +32,17 @@ theorem unitAt_fromSpec_fnOf_iff {X : Scheme.{0}} [IsIntegral X] {V : X.Opens} (
   rw [h]
   exact PrimeSpectrum.mem_basicOpen _ _
 
-theorem exists_finite_points_regAt_div_of_affine :
-    ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (V : X.Opens), IsAffineOpen V → ∀ (hV : genericPoint X ∈ V) (a : Γ(X, V)), fnOf V hV a ≠ 0 → ∃ T : Set X, T.Finite ∧ ∀ x ∈ V, ∀ τ g : X.functionField, RegAt x τ → (∀ z ∈ T, z ⤳ x → UnitAt z τ) → RegAt x g → RegAt x (g * τ / fnOf V hV a) → RegAt x (g / fnOf V hV a) := by
+theorem exists_finite_points_regAt_div_of_affine
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (V : X.Opens),
+      IsAffineOpen V
+        → ∀ (hV : genericPoint X ∈ V) (a : Γ(X, V)),
+          fnOf V hV a ≠ 0
+            → ∃ T : Set X,
+              T.Finite
+                ∧ ∀ x ∈ V, ∀ τ g : X.functionField,
+                  RegAt x τ → (∀ z ∈ T, z ⤳ x → UnitAt z τ) → RegAt x g
+                    → RegAt x (g * τ / fnOf V hV a)
+                    → RegAt x (g / fnOf V hV a) := by
   intro X _ _ V hA hV a ha
   have : Nonempty V := ⟨⟨_, hV⟩⟩
   have : IsNoetherianRing Γ(X, V) := IsLocallyNoetherian.component_noetherian ⟨V, hA⟩
@@ -40,9 +52,13 @@ theorem exists_finite_points_regAt_div_of_affine :
   rintro x hx _ _ ⟨τ, rfl⟩ hτ ⟨g, rfl⟩ ⟨c, hc⟩
   set P : PrimeSpectrum Γ(X, V) := hA.primeIdealOf ⟨x, hx⟩ with hP
   letI : Algebra Γ(X, V) (X.presheaf.stalk x) := X.presheaf.algebra_section_stalk ⟨x, hx⟩
-  have hloc : IsLocalization.AtPrime (X.presheaf.stalk x) P.asIdeal := hA.isLocalization_stalk ⟨x, hx⟩
-  have hgerm : ∀ r : Γ(X, V), algebraMap (X.presheaf.stalk x) X.functionField
-      (algebraMap Γ(X, V) (X.presheaf.stalk x) r) = fnOf V hV r := fun r => algebraMap_germ hx r
+  have hloc : IsLocalization.AtPrime (X.presheaf.stalk x) P.asIdeal :=
+    hA.isLocalization_stalk ⟨x, hx⟩
+  have hgerm
+      : ∀ r : Γ(X, V),
+        algebraMap (X.presheaf.stalk x) X.functionField (algebraMap Γ(X, V) (X.presheaf.stalk x) r)
+          = fnOf V hV r := fun r =>
+    algebraMap_germ hx r
   let e : Localization.AtPrime P.asIdeal ≃ₐ[Γ(X, V)] X.presheaf.stalk x :=
     IsLocalization.algEquiv P.asIdeal.primeCompl _ _
   have hd : algebraMap Γ(X, V) (X.presheaf.stalk x) a ∣ g * τ := by

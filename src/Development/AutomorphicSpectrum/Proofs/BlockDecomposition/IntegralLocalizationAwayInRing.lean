@@ -5,12 +5,16 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.ValIntClosed
 
-theorem exists_eq_of_isIntegral : ∀ {S : Type} [CommRing S] (ϖ : S), ϖ ∈ nonZeroDivisors S → Val ϖ →
-    ∀ x : Localization.Away ϖ, IsIntegral S x → ∃ y : S, algebraMap S (Localization.Away ϖ) y = x := by
+theorem exists_eq_of_isIntegral
+    : ∀ {S : Type} [CommRing S] (ϖ : S),
+      ϖ ∈ nonZeroDivisors S → Val ϖ
+        → ∀ x : Localization.Away ϖ,
+          IsIntegral S x → ∃ y : S, algebraMap S (Localization.Away ϖ) y = x := by
   intro S _ ϖ hϖ hV x hx
   obtain ⟨P, hm, hP⟩ := hx
   obtain ⟨N, f, hf⟩ := IsLocalization.Away.surj ϖ x
@@ -21,17 +25,20 @@ theorem exists_eq_of_isIntegral : ∀ {S : Type} [CommRing S] (ϖ : S), ϖ ∈ n
   have hwu : IsUnit (a (ϖ ^ N)) := by
     rw [map_pow]
     exact (IsLocalization.Away.algebraMap_isUnit ϖ).pow N
-  obtain ⟨e, he, ⟨b, hb⟩, ⟨h, hh⟩⟩ := (by
-    obtain ⟨e, he, h1, h2⟩ := hV f (ϖ ^ N) ⟨N, Ideal.subset_span (by simp)⟩
-    exact ⟨e, he, Ideal.mem_span_singleton.1 h1, Ideal.mem_span_singleton.1 h2⟩ :
-      ∃ e : S, IsIdempotentElem e ∧ ϖ ^ N ∣ e * f ∧ f ∣ (1 - e) * ϖ ^ N)
+  obtain ⟨e, he, ⟨b, hb⟩, ⟨h, hh⟩⟩ :=
+    (by
+        obtain ⟨e, he, h1, h2⟩ := hV f (ϖ ^ N) ⟨N, Ideal.subset_span (by simp)⟩
+        exact ⟨e, he, Ideal.mem_span_singleton.1 h1, Ideal.mem_span_singleton.1 h2⟩
+      : ∃ e : S, IsIdempotentElem e ∧ ϖ ^ N ∣ e * f ∧ f ∣ (1 - e) * ϖ ^ N)
   set u := 1 - e with hu
   have hui : IsIdempotentElem u := he.one_sub
   set d := P.natDegree with hd
 
   have hhx : a h * x = a u := by
     apply hwu.mul_left_cancel
-    calc a (ϖ ^ N) * (a h * x) = a h * (x * a (ϖ ^ N)) := by ring
+    calc
+      a (ϖ ^ N) * (a h * x)
+        = a h * (x * a (ϖ ^ N)) := by ring
       _ = a h * a f := by rw [map_pow, hf]
       _ = a u * a (ϖ ^ N) := by rw [← map_mul, ← map_mul, hh]; ring_nf
       _ = a (ϖ ^ N) * a u := by ring
@@ -50,33 +57,37 @@ theorem exists_eq_of_isIntegral : ∀ {S : Type} [CommRing S] (ϖ : S), ϖ ∈ n
     have hlead : P.coeff d = 1 := hm
     have t1 : a u * a h ^ d * (a (P.coeff d) * x ^ d) = a u := by
       rw [hlead, map_one, one_mul, mul_assoc, ← mul_pow, hhx, hUp]
-    have t2 : ∀ i ∈ Finset.range d, a u * a h ^ d * (a (P.coeff i) * x ^ i)
-        = a u * (a h * a (P.coeff i * h ^ (d - 1 - i))) := by
+    have t2
+        : ∀ i ∈ Finset.range d,
+          a u * a h ^ d * (a (P.coeff i) * x ^ i)
+            = a u * (a h * a (P.coeff i * h ^ (d - 1 - i))) := by
       intro i hi
       have hi' : i < d := Finset.mem_range.1 hi
       have hd' : d = i + (1 + (d - 1 - i)) := by omega
       have : a h ^ d = a h ^ i * (a h * a h ^ (d - 1 - i)) := by
         conv_lhs => rw [hd', pow_add, pow_add, pow_one]
       rw [this]
-      calc a u * (a h ^ i * (a h * a h ^ (d - 1 - i))) * (a (P.coeff i) * x ^ i)
-          = (a u * (a h * x) ^ i) * (a h * (a (P.coeff i) * a h ^ (d - 1 - i))) := by
-            rw [mul_pow]; ring
-        _ = a u * (a h * a (P.coeff i * h ^ (d - 1 - i))) := by
-            rw [hhx, hUp, map_mul, map_pow]
+      calc
+        a u * (a h ^ i * (a h * a h ^ (d - 1 - i))) * (a (P.coeff i) * x ^ i)
+            = (a u * (a h * x) ^ i) * (a h * (a (P.coeff i) * a h ^ (d - 1 - i))) := by
+          rw [mul_pow]; ring
+        _ = a u * (a h * a (P.coeff i * h ^ (d - 1 - i))) := by rw [hhx, hUp, map_mul, map_pow]
     rw [t1, Finset.sum_congr rfl t2, ← Finset.mul_sum, ← Finset.mul_sum] at h0
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_mul, map_add (f := _), map_one, map_mul, hk, map_sum]
     rw [mul_add, mul_one, add_comm]
     exact h0
   have hrel' : u * (1 + h * k) = 0 := hinj (by rw [hrel, map_zero])
-  have hu' : u = - (u * h * k) := by linear_combination hrel'
+  have hu' : u = -(u * h * k) := by linear_combination hrel'
   have hdiv : ϖ ^ N ∣ f := by
     have hfe : f = e * f + u * f := by rw [hu]; ring
     have huf : u * f = ϖ ^ N * (-(k * u)) := by
-      calc u * f = - (u * h * k) * f := by rw [← hu']
-        _ = - (k * u * (f * h)) := by ring
-        _ = - (k * u * (u * ϖ ^ N)) := by rw [hh]
-        _ = - (k * (u * u) * ϖ ^ N) := by ring
+      calc
+        u * f
+          = -(u * h * k) * f := by rw [← hu']
+        _ = -(k * u * (f * h)) := by ring
+        _ = -(k * u * (u * ϖ ^ N)) := by rw [hh]
+        _ = -(k * (u * u) * ϖ ^ N) := by ring
         _ = ϖ ^ N * (-(k * u)) := by rw [hui.eq]; ring
     exact ⟨b + -(k * u), by rw [hfe, hb, huf]; ring⟩
   obtain ⟨y, hy⟩ := hdiv

@@ -5,16 +5,21 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EdgeRes
 
-theorem sec_map_res {R : Type} [CommRing R] {F G : Shv R} (φ : F ⟶ G) {V U : Scheme.{0}} (g : V ⟶ U) (y : Sec F U) :
-    Sec.map φ (Sec.res g y) = Sec.res g (Sec.map φ y) := by
+theorem sec_map_res
+    {R : Type} [CommRing R] {F G : Shv R} (φ : F ⟶ G) {V U : Scheme.{0}} (g : V ⟶ U) (y : Sec F U)
+    : Sec.map φ (Sec.res g y) = Sec.res g (Sec.map φ y) := by
   have h := φ.hom.naturality g.op
   exact congrArg (fun f => f.hom y) h
 
-theorem resGood : CrystallineSemistableComparison.E.KapSpec → CrystallineSemistableComparison.E.KapBij → CrystallineSemistableComparison.E.ResZero → CrystallineSemistableComparison.E.ResSplit → CrystallineSemistableComparison.E.ResGood := by
+theorem resGood
+    : CrystallineSemistableComparison.E.KapSpec → CrystallineSemistableComparison.E.KapBij
+      → CrystallineSemistableComparison.E.ResZero → CrystallineSemistableComparison.E.ResSplit
+      → CrystallineSemistableComparison.E.ResGood := by
   intro hS hB hZ hX hgen q _ C _ P i
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro c c' φ x
@@ -24,7 +29,8 @@ theorem resGood : CrystallineSemistableComparison.E.KapSpec → CrystallineSemis
     rw [h1] at h2
     exact h2
   · intro s c c' φ x
-    exact sec_map_res ((GlobalTheory.EtC.res _ (tw q i)).d (s : ℤ) ((s + 1 : ℕ) : ℤ)) (P.S.map φ).unop x
+    exact sec_map_res ((GlobalTheory.EtC.res _ (tw q i)).d (s : ℤ) ((s + 1 : ℕ) : ℤ))
+      (P.S.map φ).unop x
   · intro c a b h
     exact (hB hgen q i (P.U c) (P.ζ c)).1 ((hZ _ (tw q i) (P.U c)).1 h)
   · intro c y

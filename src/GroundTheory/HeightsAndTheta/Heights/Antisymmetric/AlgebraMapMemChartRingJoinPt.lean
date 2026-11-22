@@ -21,8 +21,8 @@ variable {Ω Ω' : Type} [Field Ω] [Field Ω'] [Algebra Ω Ω'] {ι κ : Type}
 
 variable {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem one_tmul_smul (s : Ω) (v : E) :
-    (1 : Ω') ⊗ₜ[Ω] (s • v) = algebraMap Ω Ω' s • ((1 : Ω') ⊗ₜ[Ω] v) := by
+theorem one_tmul_smul (s : Ω) (v : E)
+    : (1 : Ω') ⊗ₜ[Ω] (s • v) = algebraMap Ω Ω' s • ((1 : Ω') ⊗ₜ[Ω] v) := by
   rw [← TensorProduct.smul_tmul, TensorProduct.smul_tmul', Algebra.smul_def, mul_one, smul_eq_mul,
     mul_one]
 

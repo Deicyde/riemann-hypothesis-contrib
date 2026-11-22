@@ -15,28 +15,37 @@ namespace GlobalTheory
 
 section PseudoBasis
 
-variable {R K : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-  [IsFractionRing R K]
+variable {R K : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
 
-theorem exists_smul_mem_of_mem_span_fraction {V : Type} [AddCommGroup V] [Module K V] [Module R V]
-    [IsScalarTower R K V] (Λ : Submodule R V) (v : V) (hv : v ∈ Submodule.span K (Λ : Set V)) :
-    ∃ d : R, d ≠ 0 ∧ d • v ∈ Λ := by
+theorem exists_smul_mem_of_mem_span_fraction
+    {V : Type} [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+    (Λ : Submodule R V) (v : V) (hv : v ∈ Submodule.span K (Λ : Set V))
+    : ∃ d : R, d ≠ 0 ∧ d • v ∈ Λ := by
   first
-  | (rename_i h_2 h_3 h_4 h_5 h_6 h_8 h_9 h_10 h_11; revert R K h_2 h_3 h_4 h_5 h_6 V h_8 h_9 h_10 h_11 Λ v hv; exact @_root_.GlobalTheory.LatticeBoundedAction.main)
+  | (
+      rename_i h_2 h_3 h_4 h_5 h_6 h_8 h_9 h_10 h_11
+      revert R K h_2 h_3 h_4 h_5 h_6 V h_8 h_9 h_10 h_11 Λ v hv
+      exact @_root_.GlobalTheory.LatticeBoundedAction.main
+    )
   | exact @_root_.GlobalTheory.LatticeBoundedAction.main
   | exact _root_.GlobalTheory.LatticeBoundedAction.main
   | (apply _root_.GlobalTheory.LatticeBoundedAction.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.LatticeBoundedAction.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.LatticeBoundedAction.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.LatticeBoundedAction.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.LatticeBoundedAction.main ..)
 
-theorem exists_splitting_vector {V : Type} [AddCommGroup V] [Module K V] [Module R V]
-    [IsScalarTower R K V] (Λ : Submodule R V) (hfg : Λ.FG)
-    (hsp : Submodule.span K (Λ : Set V) = ⊤) (l : V →ₗ[K] K) (hl : l ≠ 0) :
-    ∃ (c : FractionalIdeal R⁰ K) (e : V), c ≠ 0 ∧ l e = 1 ∧ (∀ v ∈ Λ, l v ∈ c) ∧
-      ∀ x ∈ c, x • e ∈ Λ := by
+theorem exists_splitting_vector
+    {V : Type} [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+    (Λ : Submodule R V) (hfg : Λ.FG) (hsp : Submodule.span K (Λ : Set V) = ⊤)
+    (l : V →ₗ[K] K) (hl : l ≠ 0)
+    : ∃ (c : FractionalIdeal R⁰ K) (e : V),
+      c ≠ 0 ∧ l e = 1 ∧ (∀ v ∈ Λ, l v ∈ c) ∧ ∀ x ∈ c, x • e ∈ Λ := by
   have hfg' : (Λ.map (l.restrictScalars R)).FG := hfg.map _
-  let c : FractionalIdeal R⁰ K := ⟨Λ.map (l.restrictScalars R), FractionalIdeal.isFractional_of_fg hfg'⟩
+  let c : FractionalIdeal R⁰ K :=
+    ⟨Λ.map (l.restrictScalars R), FractionalIdeal.isFractional_of_fg hfg'⟩
   have hc : ∀ x, x ∈ c ↔ ∃ v ∈ Λ, l v = x := fun x => Iff.rfl
   have hc0 : c ≠ 0 := by
     intro h
@@ -69,13 +78,15 @@ theorem exists_splitting_vector {V : Type} [AddCommGroup V] [Module K V] [Module
   obtain ⟨e, he, he'⟩ := key 1 h1
   exact ⟨c, e, hc0, he, fun v hv => (hc _).2 ⟨v, hv, rfl⟩, he'⟩
 
-theorem exists_pseudoCoords (n : ℕ) :
-    ∀ (V : Type) [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
-      [FiniteDimensional K V], Module.finrank K V = n →
-      ∀ (Λ : Submodule R V) (I : Submodule K V), Λ.FG → Submodule.span K (Λ : Set V) = ⊤ →
-      ∃ (s : ℕ) (f : Fin n → (V →ₗ[K] K)) (c : Fin n → FractionalIdeal R⁰ K),
-        (∀ v, (∀ a, f a v = 0) → v = 0) ∧ (∀ a, c a ≠ 0) ∧ (∀ v, v ∈ Λ ↔ ∀ a, f a v ∈ c a) ∧
-        ∀ v, v ∈ I ↔ ∀ a : Fin n, s ≤ (a : ℕ) → f a v = 0 := by
+theorem exists_pseudoCoords (n : ℕ)
+    : ∀ (V : Type) [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+        [FiniteDimensional K V],
+      Module.finrank K V = n
+        → ∀ (Λ : Submodule R V) (I : Submodule K V),
+          Λ.FG → Submodule.span K (Λ : Set V) = ⊤
+            → ∃ (s : ℕ) (f : Fin n → (V →ₗ[K] K)) (c : Fin n → FractionalIdeal R⁰ K),
+              (∀ v, (∀ a, f a v = 0) → v = 0) ∧ (∀ a, c a ≠ 0) ∧ (∀ v, v ∈ Λ ↔ ∀ a, f a v ∈ c a)
+                ∧ ∀ v, v ∈ I ↔ ∀ a : Fin n, s ≤ (a : ℕ) → f a v = 0 := by
   induction n with
   | zero =>
     intro V _ _ _ _ _ hV Λ I _ _
@@ -105,7 +116,8 @@ theorem exists_pseudoCoords (n : ℕ) :
         intro x _
         exact ⟨x • e, by simp [he]⟩
       rw [h2, finrank_top, Module.finrank_self, hV] at h1
-      rw [hW]; omega
+      rw [hW]
+      omega
     let ι : W →ₗ[R] V := W.subtype.restrictScalars R
     have hι : Function.Injective ι := Subtype.val_injective
     let Λ' : Submodule R W := Λ.comap ι
@@ -116,8 +128,8 @@ theorem exists_pseudoCoords (n : ℕ) :
     have hsp' : Submodule.span K (Λ' : Set W) = ⊤ := by
       rw [eq_top_iff]
       intro w _
-      obtain ⟨d, hd, hdw⟩ := exists_smul_mem_of_mem_span_fraction (K := K) Λ (w : V)
-        (by rw [hsp]; trivial)
+      obtain ⟨d, hd, hdw⟩ :=
+        exists_smul_mem_of_mem_span_fraction (K := K) Λ (w : V) (by rw [hsp]; trivial)
       have hd1 : algebraMap R K d ≠ 0 := by simpa using hd
       have hm : algebraMap R K d • w ∈ Λ' := by
         rw [hΛ']
@@ -127,20 +139,17 @@ theorem exists_pseudoCoords (n : ℕ) :
       rw [this]
       exact Submodule.smul_mem _ _ (Submodule.subset_span hm)
     obtain ⟨s, f, c, hf, hc, hfΛ, hfI⟩ := ih W hWn Λ' (I.comap W.subtype) hfg' hsp'
-    let p : V →ₗ[K] W := LinearMap.codRestrict W (LinearMap.id - l.smulRight e) (by
-      intro v
-      simp [hW, he])
+    let p : V →ₗ[K] W :=
+      LinearMap.codRestrict W (LinearMap.id - l.smulRight e) (by
+        intro v
+        simp [hW, he])
     have hp : ∀ v, (p v : V) = v - l v • e := fun v => rfl
     let F : Fin (n + 1) → (V →ₗ[K] K) := Fin.snoc (fun a => f a ∘ₗ p) l
     let C : Fin (n + 1) → FractionalIdeal R⁰ K := Fin.snoc c c0
-    have hF1 : ∀ a v, F (Fin.castSucc a) v = f a (p v) := by
-      intro a v; simp [F]
-    have hF2 : ∀ v, F (Fin.last n) v = l v := by
-      intro v; simp [F]
-    have hC1 : ∀ a, C (Fin.castSucc a) = c a := by
-      intro a; simp [C]
-    have hC2 : C (Fin.last n) = c0 := by
-      simp [C]
+    have hF1 : ∀ a v, F (Fin.castSucc a) v = f a (p v) := by intro a v; simp [F]
+    have hF2 : ∀ v, F (Fin.last n) v = l v := by intro v; simp [F]
+    have hC1 : ∀ a, C (Fin.castSucc a) = c a := by intro a; simp [C]
+    have hC2 : C (Fin.last n) = c0 := by simp [C]
     have A1 : ∀ v, (∀ a, F a v = 0) → v = 0 := by
       intro v hv
       have h1 : l v = 0 := by rw [← hF2]; exact hv _
@@ -168,13 +177,15 @@ theorem exists_pseudoCoords (n : ℕ) :
     · refine ⟨n + 1, F, C, A1, A2, A3, ?_⟩
       intro v
       refine ⟨fun _ a ha => absurd a.2 (not_lt.2 ha), fun _ => ?_⟩
-      rw [hI]; trivial
+      rw [hI]
+      trivial
     · refine ⟨min s n, F, C, A1, A2, A3, ?_⟩
       intro v
       rw [Fin.forall_fin_succ']
       simp only [hF1, hF2]
-      have hh : (∀ a : Fin n, min s n ≤ ((Fin.castSucc a : Fin (n + 1)) : ℕ) → f a (p v) = 0) ↔
-          (p v : V) ∈ I := by
+      have hh
+          : (∀ a : Fin n, min s n ≤ ((Fin.castSucc a : Fin (n + 1)) : ℕ) → f a (p v) = 0)
+            ↔ (p v : V) ∈ I := by
         rw [show ((p v : V) ∈ I) ↔ p v ∈ I.comap W.subtype from Iff.rfl, hfI]
         refine forall_congr' fun a => imp_congr_left ?_
         have := a.2
@@ -191,13 +202,19 @@ theorem exists_pseudoCoords (n : ℕ) :
 
 end PseudoBasis
 
-theorem exists_pseudoBasis_adapted :
-    ∀ (E : Type) [Field E] [NumberField E] (r : ℕ) (Λ : Submodule (𝓞 E) (Fin r → E)) (I : Submodule E (Fin r → E)), Λ.FG → Submodule.span E (Λ : Set (Fin r → E)) = ⊤ → ∃ (s : ℕ) (e : Module.Basis (Fin r) E (Fin r → E)) (c : Fin r → FractionalIdeal (𝓞 E)⁰ E), (∀ a, c a ≠ 0) ∧ (∀ v, v ∈ Λ ↔ ∀ a, e.repr v a ∈ c a) ∧ ∀ v, v ∈ I ↔ ∀ a : Fin r, s ≤ (a : ℕ) → e.repr v a = 0 := by
+theorem exists_pseudoBasis_adapted
+    : ∀ (E : Type) [Field E] [NumberField E] (r : ℕ) (Λ : Submodule (𝓞 E) (Fin r → E))
+        (I : Submodule E (Fin r → E)),
+      Λ.FG → Submodule.span E (Λ : Set (Fin r → E)) = ⊤
+        → ∃ (s : ℕ) (e : Module.Basis (Fin r) E (Fin r → E)) (c : Fin r → FractionalIdeal (𝓞 E)⁰ E),
+          (∀ a, c a ≠ 0) ∧ (∀ v, v ∈ Λ ↔ ∀ a, e.repr v a ∈ c a)
+            ∧ ∀ v, v ∈ I ↔ ∀ a : Fin r, s ≤ (a : ℕ) → e.repr v a = 0 := by
   intro E _ _ r Λ I hfg hsp
   obtain ⟨s, f, c, hf, hc, hΛ, hI⟩ :=
     exists_pseudoCoords (R := 𝓞 E) (K := E) r (Fin r → E) (by simp) Λ I hfg hsp
   have hinj : Function.Injective (LinearMap.pi f) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     exact hf v fun a => congrFun hv a
   let φ : (Fin r → E) ≃ₗ[E] (Fin r → E) := LinearEquiv.ofInjectiveEndo _ hinj

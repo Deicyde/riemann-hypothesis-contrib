@@ -19,8 +19,8 @@ private def phiK (τ r : K) (h : r * r = -1 + τ * r) : Etau K τ →ₐ[K] K wh
   map_zero' := by simp
   map_add' x y := by simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.im_add]; ring
   commutes' a := by
-    simp only [QuadraticAlgebra.algebraMap_re, QuadraticAlgebra.algebraMap_im, zero_mul,
-      add_zero, Algebra.algebraMap_self_apply]
+    simp only [QuadraticAlgebra.algebraMap_re, QuadraticAlgebra.algebraMap_im, zero_mul, add_zero,
+      Algebra.algebraMap_self_apply]
 
 private lemma phiK_apply (h : r * r = -1 + τ * r) (x : Etau K τ) : phiK τ r h x = x.re + x.im * r := rfl
 
@@ -108,8 +108,14 @@ private lemma phiK_int (O : Type) [CommRing O] [Algebra O K]
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.evenValuation_norm_compactUnits_of_split :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → IsSquare (τ ^ 2 - 4) → (∀ c ∈ Cint O τ, EvenVal O (QuadraticAlgebra.norm ((c : (Etau K τ)ˣ) : Etau K τ))) ∧ ∀ y : (Etau K τ)ˣ, EvenVal O (QuadraticAlgebra.norm (y : Etau K τ)) → ∃ z : (Etau K τ)ˣ, ∃ c ∈ Cint O τ, y = c * z ^ 2 := by
+theorem UpperTheory.evenValuation_norm_compactUnits_of_split
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → IsSquare (τ ^ 2 - 4)
+        → (∀ c ∈ Cint O τ, EvenVal O (QuadraticAlgebra.norm ((c : (Etau K τ)ˣ) : Etau K τ)))
+          ∧ ∀ y : (Etau K τ)ˣ,
+            EvenVal O (QuadraticAlgebra.norm (y : Etau K τ))
+              → ∃ z : (Etau K τ)ˣ, ∃ c ∈ Cint O τ, y = c * z ^ 2 := by
   intro O K _ _ _ _ _ Δ τ hL hτ hsq
   haveI := hL.frac
   have h2 : (2 : K) ≠ 0 := by
@@ -151,17 +157,20 @@ theorem UpperTheory.evenValuation_norm_compactUnits_of_split :
   have hint : ∀ v : K, (∃ w : O, algebraMap O K w = v) → IsIntegral O v := by
     rintro v ⟨w, rfl⟩
     exact isIntegral_algebraMap
-  have huv : ∀ (u : Oˣ) (v : K), v = algebraMap O K (u : O) → IsIntegral O v ∧ IsIntegral O v⁻¹ := by
+  have huv
+      : ∀ (u : Oˣ) (v : K), v = algebraMap O K (u : O) → IsIntegral O v ∧ IsIntegral O v⁻¹ := by
     intro u v hv
     refine ⟨hint v ⟨u, hv.symm⟩, hint v⁻¹ ⟨(u⁻¹ : Oˣ), ?_⟩⟩
     rw [hv, map_units_inv]
-  have hcint : ∀ (c : (Etau K τ)ˣ) (u : Oˣ),
-      phiK τ r hr (c : Etau K τ) * (phiK τ r' hr' (c : Etau K τ))⁻¹ = algebraMap O K (u : O) →
-      c ∈ Cint O τ := by
+  have hcint
+      : ∀ (c : (Etau K τ)ˣ) (u : Oˣ),
+        phiK τ r hr (c : Etau K τ) * (phiK τ r' hr' (c : Etau K τ))⁻¹ = algebraMap O K (u : O)
+          → c ∈ Cint O τ := by
     intro c u hu
     obtain ⟨i1, i2⟩ := huv u _ hu
-    have e2 : phiK τ r' hr' (c : Etau K τ) * (phiK τ r hr (c : Etau K τ))⁻¹
-        = (phiK τ r hr (c : Etau K τ) * (phiK τ r' hr' (c : Etau K τ))⁻¹)⁻¹ := by
+    have e2
+        : phiK τ r' hr' (c : Etau K τ) * (phiK τ r hr (c : Etau K τ))⁻¹
+          = (phiK τ r hr (c : Etau K τ) * (phiK τ r' hr' (c : Etau K τ))⁻¹)⁻¹ := by
       rw [mul_inv, inv_inv, mul_comm]
     refine ⟨?_, ?_⟩
     · rw [phiK_int O hr hr' hne, phiK_quo hr hr' hsum, phiK_quo hr' hr hsum', e2]
@@ -191,8 +200,8 @@ theorem UpperTheory.evenValuation_norm_compactUnits_of_split :
   · rintro y ⟨u, t, ht, hy⟩
     have hA := phiK_ne hr y
     have hB := phiK_ne hr' y
-    obtain ⟨z, hz1, hz2⟩ := phiK_surjU hr hr' hne 1 (phiK τ r' hr' (y : Etau K τ) / t) one_ne_zero
-      (div_ne_zero hB ht)
+    obtain ⟨z, hz1, hz2⟩ :=
+      phiK_surjU hr hr' hne 1 (phiK τ r' hr' (y : Etau K τ) / t) one_ne_zero (div_ne_zero hB ht)
     refine ⟨z, y * (z ^ 2)⁻¹, ?_, (inv_mul_cancel_right y (z ^ 2)).symm⟩
     apply hcint _ u
     rw [Units.val_mul, map_mul, map_mul, phiK_inv, phiK_inv, Units.val_pow_eq_pow_val, map_pow,

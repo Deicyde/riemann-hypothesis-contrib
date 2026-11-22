@@ -34,15 +34,18 @@ lemma app_res {X Y : Scheme.{0}} (f : Y ⟶ X) {V W : X.Opens} (h : W ≤ V) (x 
 
 variable [IsDomain R]
 
-theorem exists_div {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat p] {a : R} (ha : a ≠ 0)
+theorem exists_div
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat p]
+    {a : R} (ha : a ≠ 0)
     {J : Ideal R} (hJ : J ≤ Ideal.span {a})
-    (V : X.Opens) (x : Γ(X, V)) (hx : (pullback.fst p (tq J)).app V x = 0) :
-    ∃ g : Γ(X, V), x = toW p V a * g := by
+    (V : X.Opens) (x : Γ(X, V)) (hx : (pullback.fst p (tq J)).app V x = 0)
+    : ∃ g : Γ(X, V), x = toW p V a * g := by
   classical
   set π := pullback.fst p (tq J)
   let ι := {W : X.affineOpens // (W : X.Opens) ≤ V}
   let U : ι → X.Opens := fun W => W.1
-  have hloc : ∀ W : ι, ∃ g : Γ(X, U W), (X.presheaf.map (homOfLE W.2).op).hom x = toW p (U W) a * g := by
+  have hloc
+      : ∀ W : ι, ∃ g : Γ(X, U W), (X.presheaf.map (homOfLE W.2).op).hom x = toW p (U W) a * g := by
     intro W
     have h0 : (π.app (U W)).hom ((X.presheaf.map (homOfLE W.2).op).hom x) = 0 := by
       rw [← app_res, hx, map_zero]
@@ -53,7 +56,8 @@ theorem exists_div {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat p]
   choose g hg using hloc
   have hcover : V ≤ iSup U := by
     intro y hy
-    obtain ⟨W, hW, hyW, hWV⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens) hy
+    obtain ⟨W, hW, hyW, hWV⟩ :=
+      (TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens) hy
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨⟨⟨W, hW⟩, hWV⟩, hyW⟩
   have hcompat : TopCat.Presheaf.IsCompatible X.sheaf.1 U g := by
     intro i j
@@ -67,7 +71,8 @@ theorem exists_div {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat p]
     rw [map_mul, toW_res, ← CommRingCat.comp_apply, ← Functor.map_comp] at e1 e2
     rw [sub_eq_zero]
     exact e1.symm.trans e2
-  obtain ⟨s, hs, -⟩ := TopCat.Sheaf.existsUnique_gluing' X.sheaf U V (fun i => homOfLE i.2) hcover g hcompat
+  obtain ⟨s, hs, -⟩ :=
+    TopCat.Sheaf.existsUnique_gluing' X.sheaf U V (fun i => homOfLE i.2) hcover g hcompat
   refine ⟨s, ?_⟩
   apply TopCat.Sheaf.eq_of_locally_eq' X.sheaf U V (fun i => homOfLE i.2) hcover
   intro i
@@ -113,17 +118,20 @@ lemma app_toW_of_mem {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) (J : I
 
 variable [IsDomain R]
 
-
 set_option maxHeartbeats 400000 in
-theorem vanish_of_mul {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat p] {a : R} (ha : a ≠ 0)
-    (e : ℕ) {J₁ J₂ : Ideal R} (h1 : J₁ ≤ Ideal.span {a ^ (e + 2)}) (h2 : a ^ (e + 1) ∈ J₂)
-    (ι : pullback p (tq J₂) ⟶ pullback p (tq J₁)) (hι : ι ≫ pullback.fst p (tq J₁) = pullback.fst p (tq J₂))
-    (V : (pullback p (tq J₁)).Opens) (y : Γ(pullback p (tq J₁), V))
-    (hy : toW (pullback.fst p (tq J₁) ≫ p) V a * y = 0) :
-    (ι.app V) y = 0 := by
+theorem vanish_of_mul
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat p]
+    {a : R} (ha : a ≠ 0)
+    (e : ℕ)
+    {J₁ J₂ : Ideal R} (h1 : J₁ ≤ Ideal.span {a ^ (e + 2)}) (h2 : a ^ (e + 1) ∈ J₂)
+    (ι : pullback p (tq J₂) ⟶ pullback p (tq J₁))
+    (hι : ι ≫ pullback.fst p (tq J₁) = pullback.fst p (tq J₂)) (V : (pullback p (tq J₁)).Opens)
+    (y : Γ(pullback p (tq J₁), V)) (hy : toW (pullback.fst p (tq J₁) ≫ p) V a * y = 0)
+    : (ι.app V) y = 0 := by
   set π₁ := pullback.fst p (tq J₁)
   set π₂ := pullback.fst p (tq J₂)
-  have : IsClosedImmersion (tq J₁) := IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
+  have : IsClosedImmersion (tq J₁) :=
+    IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
   have : IsClosedImmersion π₁ := inferInstance
   refine TopCat.Presheaf.section_ext (pullback p (tq J₂)).sheaf _ _ 0 fun z hz => ?_
 
@@ -132,12 +140,14 @@ theorem vanish_of_mul {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat
   have hz0 : π₁.base (ι.base z) ∈ V₀ := by
     have : ι.base z ∈ (π₁.base ⁻¹' V₀) := by rw [hV₀e]; exact hz
     exact this
-  obtain ⟨W, hW, hzW, hWV₀⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens)
-    (show π₁.base (ι.base z) ∈ (⟨V₀, hV₀⟩ : X.Opens) from hz0)
+  obtain ⟨W, hW, hzW, hWV₀⟩ :=
+    (TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens)
+      (show π₁.base (ι.base z) ∈ (⟨V₀, hV₀⟩ : X.Opens) from hz0)
   have hWV : π₁ ⁻¹ᵁ W ≤ V := by
     intro u hu
     have : u ∈ π₁.base ⁻¹' V₀ := hWV₀ hu
-    rw [hV₀e] at this; exact this
+    rw [hV₀e] at this
+    exact this
 
   obtain ⟨hs, hk⟩ := app_fst_tq p J₁ W hW
   obtain ⟨yt, hyt⟩ := hs (((pullback p (tq J₁)).presheaf.map (homOfLE hWV).op).hom y)
@@ -156,21 +166,28 @@ theorem vanish_of_mul {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of R)) [Flat
     intro u hu
     apply hWV
     show π₁.base (ι.base u) ∈ W
-    rw [← Scheme.Hom.comp_apply, hι]; exact hu
+    rw [← Scheme.Hom.comp_apply, hι]
+    exact hu
   have hW2' : π₂ ⁻¹ᵁ W ≤ ι ⁻¹ᵁ (π₁ ⁻¹ᵁ W) := by
     intro u hu
     show π₁.base (ι.base u) ∈ W
-    rw [← Scheme.Hom.comp_apply, hι]; exact hu
+    rw [← Scheme.Hom.comp_apply, hι]
+    exact hu
   have hzW2 : z ∈ π₂ ⁻¹ᵁ W := by
     show π₂.base z ∈ W
-    rw [← hι, Scheme.Hom.comp_apply]; exact hzW
-  have e5 : ((pullback p (tq J₂)).presheaf.map (homOfLE hW2).op).hom ((ι.app V) y) = (π₂.app W) yt := by
-    have a1 : ((pullback p (tq J₂)).presheaf.map (homOfLE hW2).op).hom ((ι.app V) y) =
-        (ι.appLE V (π₂ ⁻¹ᵁ W) hW2) y := by
+    rw [← hι, Scheme.Hom.comp_apply]
+    exact hzW
+  have e5
+      : ((pullback p (tq J₂)).presheaf.map (homOfLE hW2).op).hom ((ι.app V) y) = (π₂.app W) yt := by
+    have a1
+        : ((pullback p (tq J₂)).presheaf.map (homOfLE hW2).op).hom ((ι.app V) y)
+          = (ι.appLE V (π₂ ⁻¹ᵁ W) hW2) y := by
       rw [Scheme.Hom.app_eq_appLE, ← CommRingCat.comp_apply]
       erw [Scheme.Hom.appLE_map]
-    have a2 : (ι.appLE V (π₂ ⁻¹ᵁ W) hW2) y =
-        (ι.appLE (π₁ ⁻¹ᵁ W) (π₂ ⁻¹ᵁ W) hW2') (((pullback p (tq J₁)).presheaf.map (homOfLE hWV).op).hom y) := by
+    have a2
+        : (ι.appLE V (π₂ ⁻¹ᵁ W) hW2) y
+          = (ι.appLE (π₁ ⁻¹ᵁ W) (π₂ ⁻¹ᵁ W) hW2')
+            (((pullback p (tq J₁)).presheaf.map (homOfLE hWV).op).hom y) := by
       rw [← CommRingCat.comp_apply]
       erw [Scheme.Hom.map_appLE]
     have a3 : (ι.appLE (π₁ ⁻¹ᵁ W) (π₂ ⁻¹ᵁ W) hW2') ((π₁.app W) yt) = (π₂.app W) yt := by

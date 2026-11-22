@@ -12,8 +12,8 @@ section
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ}
 
-private theorem eOm_red (ε : Ω →+* ℂ) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) :
-    eOm ε (1 / ((k * m : ℕ) : ℚ)) ^ k = eOm ε (1 / (m : ℚ)) := by
+private theorem eOm_red (ε : Ω →+* ℂ) {k m : ℕ} (hk : 0 < k) (hm : 0 < m)
+    : eOm ε (1 / ((k * m : ℕ) : ℚ)) ^ k = eOm ε (1 / (m : ℚ)) := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   apply ε.injective
   rw [map_pow, eps_eOm, eps_eOm, ← Complex.exp_nat_mul]
@@ -23,18 +23,21 @@ private theorem eOm_red (ε : Ω →+* ℂ) {k m : ℕ} (hk : 0 < k) (hm : 0 < m
   push_cast
   field_simp
 
-private theorem zt_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) : zt X (k * m) ^ k = zt X m := by
+private theorem zt_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m)
+    : zt X (k * m) ^ k = zt X m := by
   unfold zt
   rw [← map_pow, ← map_pow, eOm_red ε hk hm]
 
-private theorem cast_val {k m : ℕ} (hk : 0 < k) (hm : 0 < m) (i : ZMod (k * m)) :
-    (ZMod.castHom (dvd_mul_left m k) (ZMod m) i).val = i.val % m := by
+private theorem cast_val {k m : ℕ} (hk : 0 < k) (hm : 0 < m) (i : ZMod (k * m))
+    : (ZMod.castHom (dvd_mul_left m k) (ZMod m) i).val = i.val % m := by
   haveI : NeZero (k * m) := ⟨(Nat.mul_pos hk hm).ne'⟩
   rw [ZMod.castHom_apply, ZMod.cast_eq_val, ZMod.val_natCast]
 
-private theorem lg_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) {a b : Kb X} (hb : b ≠ 0)
-    (h : a ^ (k * m) = b ^ (k * m)) :
-    lg X m (a ^ k) (b ^ k) = ZMod.castHom (dvd_mul_left m k) (ZMod m) (lg X (k * m) a b) := by
+private theorem lg_red
+    (X : Tower Ω ε)
+    {k m : ℕ} (hk : 0 < k) (hm : 0 < m)
+    {a b : Kb X} (hb : b ≠ 0) (h : a ^ (k * m) = b ^ (k * m))
+    : lg X m (a ^ k) (b ^ k) = ZMod.castHom (dvd_mul_left m k) (ZMod m) (lg X (k * m) a b) := by
   obtain ⟨-, hrep1, -, -, -, -, -⟩ := lgB Ω ε X (k * m) (Nat.mul_pos hk hm)
   obtain ⟨hp2, -, huniq2, -, -, -, -⟩ := lgB Ω ε X m hm
   apply huniq2 _ _ _ (pow_ne_zero _ hb)
@@ -45,9 +48,12 @@ private theorem lg_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) {
   rw [← e, ← zt_red X hk hm, ← pow_mul, mul_comm k (lg X (k * m) a b).val, pow_mul, ← mul_pow,
     ← hrep1 a b hb h]
 
-private theorem ka_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) {θ : Kb X} {u : X.K} (hu : u ≠ 0)
-    (hθ : θ ^ (k * m) = io X u) {h : RingAut (Kb X)} (hh : InD X h) :
-    ka X m (θ ^ k) h = ZMod.castHom (dvd_mul_left m k) (ZMod m) (ka X (k * m) θ h) := by
+private theorem ka_red
+    (X : Tower Ω ε)
+    {k m : ℕ} (hk : 0 < k) (hm : 0 < m)
+    {θ : Kb X} {u : X.K} (hu : u ≠ 0) (hθ : θ ^ (k * m) = io X u)
+    {h : RingAut (Kb X)} (hh : InD X h)
+    : ka X m (θ ^ k) h = ZMod.castHom (dvd_mul_left m k) (ZMod m) (ka X (k * m) θ h) := by
   have h0 : θ ≠ 0 := by
     rintro rfl
     rw [zero_pow (Nat.mul_pos hk hm).ne'] at hθ
@@ -56,8 +62,8 @@ private theorem ka_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) {
   rw [map_pow]
   exact lg_red X hk hm h0 (by rw [← map_pow, hθ, hh])
 
-private theorem cyc_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) (s : Ω ≃ₐ[ℚ] Ω) :
-    cyc m s = ZMod.castHom (dvd_mul_left m k) (ZMod m) (cyc (k * m) s) := by
+private theorem cyc_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) (s : Ω ≃ₐ[ℚ] Ω)
+    : cyc m s = ZMod.castHom (dvd_mul_left m k) (ZMod m) (cyc (k * m) s) := by
   haveI : NeZero m := ⟨hm.ne'⟩
   obtain ⟨hp, -, -, -, -, -, hcyc⟩ := lgB Ω ε X m hm
   obtain ⟨-, -, -, -, -, -, hcyc2⟩ := lgB Ω ε X (k * m) (Nat.mul_pos hk hm)
@@ -74,8 +80,7 @@ private theorem cyc_red (X : Tower Ω ε) {k m : ℕ} (hk : 0 < k) (hm : 0 < m) 
 
 end
 
-theorem UpperTheory.V.Z.Kato.Sym.redB :
-    UpperTheory.V.Z.Kato.Sym.RedB := by
+theorem UpperTheory.V.Z.Kato.Sym.redB : UpperTheory.V.Z.Kato.Sym.RedB := by
   intro Ω _ _ _ ε X k m hk hm
   have hkm := Nat.mul_pos hk hm
   refine ⟨fun u v P hP => ⟨hP.hu, hP.hv, ?_, ?_, ?_, ?_, ?_⟩, ?_⟩
@@ -83,7 +88,8 @@ theorem UpperTheory.V.Z.Kato.Sym.redB :
   · rw [← hP.hb, pow_mul]; rfl
   · intro g h hg hh
     simp only [Pt.red]
-    rw [ka_red X hk hm hP.hu.1 hP.ha hg, ka_red X hk hm hP.hv.1 hP.hb hh, ← map_mul, hP.cob g h hg hh, map_add (f := _), map_sub]
+    rw [ka_red X hk hm hP.hu.1 hP.ha hg, ka_red X hk hm hP.hv.1 hP.hb hh, ← map_mul,
+      hP.cob g h hg hh, map_add (f := _), map_sub]
   · obtain ⟨B, hB⟩ := hP.lc
     refine ⟨B, fun h h' a b c => ?_⟩
     simp only [Pt.red]
@@ -101,5 +107,6 @@ theorem UpperTheory.V.Z.Kato.Sym.redB :
     have eb : σ P.b ^ (k * m) = Q.b ^ (k * m) := by rw [← map_pow, hP.hb, hσ, hQ.hb]
     rw [ka_red X hk hm f.ne_zero hθ hh, hd h hh]
     simp only [dif, Pt.mv, Pt.red, map_add (f := _), map_sub, map_mul, map_pow]
-    rw [ka_red X hk hm hQ.hu.1 hQ.ha hh, ka_red X hk hm hQ.hv.1 hQ.hb hh, lg_red X hk hm (nz _ _ hQ.hu.1 hQ.ha) ea,
-      lg_red X hk hm (nz _ _ hQ.hv.1 hQ.hb) eb, cyc_red X hk hm s]
+    rw [ka_red X hk hm hQ.hu.1 hQ.ha hh, ka_red X hk hm hQ.hv.1 hQ.hb hh,
+      lg_red X hk hm (nz _ _ hQ.hu.1 hQ.ha) ea, lg_red X hk hm (nz _ _ hQ.hv.1 hQ.hb) eb,
+      cyc_red X hk hm s]

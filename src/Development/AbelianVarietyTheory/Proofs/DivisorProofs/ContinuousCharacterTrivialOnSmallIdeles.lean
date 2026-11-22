@@ -8,14 +8,17 @@ public import GroundTheory.GlobalFields.TateThesis.AdelicCharDual
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThetaDenom
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThetaDenom
 open scoped TensorProduct NNReal Matrix
 
 namespace GlobalTheory.PsiTriv
 
-theorem exists_nat_trivial {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ) :
-    ∃ m : ℕ, 0 < m ∧ ∀ t : AF F, t.1 = 0 → (∀ v, ‖evFin F v t‖ ≤ ‖(m : Fv F v)‖) → ψ t = 1 := by
+theorem exists_nat_trivial
+    {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ)
+    : ∃ m : ℕ, 0 < m ∧ ∀ t : AF F, t.1 = 0 → (∀ v, ‖evFin F v t‖ ≤ ‖(m : Fv F v)‖) → ψ t = 1 := by
   classical
   let f : FiniteAdeleRing (𝓞 F) F → AF F := fun y => (0, y)
   have hf : Continuous f := continuous_const.prodMk continuous_id
@@ -23,13 +26,15 @@ theorem exists_nat_trivial {F : Type} [Field F] [NumberField F] (ψ : AddChar (A
     refine ((isOpen_lt (continuous_norm.comp (continuous_id.sub continuous_const))
       continuous_const).preimage (hψ.comp hf)).mem_nhds ?_
     show ‖ψ (0 : AF F) - 1‖ < 1 / 2
-    rw [AddChar.map_zero_eq_one]; norm_num
+    rw [AddChar.map_zero_eq_one]
+    norm_num
   obtain ⟨d, hd0, hd⟩ := GroundTheory.Global.exists_forall_mul_mem_of_mem_nhds hW
   set D : FiniteAdeleRing (𝓞 F) F := algebraMap F _ (algebraMap (𝓞 F) F d) with hD
   have htriv : ∀ y ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F, ψ (f (D * y)) = 1 := by
     intro y hy
     refine GroundTheory.Global.eq_one_of_sq_mem
-      (s := {z | ∃ y ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F, ψ (f (D * y)) = z}) ?_ ?_ ⟨y, hy, rfl⟩
+      (s := {z | ∃ y ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 F) F, ψ (f (D * y)) = z}) ?_ ?_
+      ⟨y, hy, rfl⟩
     · rintro _ ⟨a, ha, rfl⟩
       refine ⟨a + a, add_mem ha ha, ?_⟩
       rw [sq, ← AddChar.map_add_eq_mul]
@@ -54,8 +59,10 @@ theorem exists_nat_trivial {F : Type} [Field F] [NumberField F] (ψ : AddChar (A
   have hv : ‖t.2 v‖ ≤ _ := ht v
   rw [HeightOneSpectrum.mem_adicCompletionIntegers, ← Valued.toNormedField.norm_le_one_iff]
   have hy : y v = algebraMap F (Fv F v) (algebraMap (𝓞 F) F d)⁻¹ * t.2 v := rfl
-  have hm : ((Ideal.absNorm (Ideal.span {d}) : ℕ) : Fv F v) =
-      algebraMap F (Fv F v) (algebraMap (𝓞 F) F e) * algebraMap F (Fv F v) (algebraMap (𝓞 F) F d) := by
+  have hm
+      : ((Ideal.absNorm (Ideal.span {d}) : ℕ) : Fv F v)
+        = algebraMap F (Fv F v) (algebraMap (𝓞 F) F e)
+          * algebraMap F (Fv F v) (algebraMap (𝓞 F) F d) := by
     rw [← map_mul, ← map_mul, he, map_natCast, map_natCast]
   have hdv : algebraMap F (Fv F v) (algebraMap (𝓞 F) F d) ≠ 0 := (map_ne_zero _).2 hdF
   have he1 : ‖algebraMap F (Fv F v) (algebraMap (𝓞 F) F e)‖ ≤ 1 := FinitePlace.norm_le_one F v e

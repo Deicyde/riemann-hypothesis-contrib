@@ -28,10 +28,13 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Top.Inh
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.GlobalTheoryTheory GlobalTheory.EX
+  GlobalTheory.EX.OB GlobalTheory.Mem NumberField IsDedekindDomain
 
-theorem g_big (eps : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (g : ℕ), s.eps = eps → x0 ≤ s.x →
-    RankVal s R → ((R.k : ℝ) * s.b) ^ 8 ≤ g → 2 * R.f * R.k < g - 1 := by
+theorem g_big (eps : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52)
+    : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (g : ℕ),
+      s.eps = eps → x0 ≤ s.x → RankVal s R → ((R.k : ℝ) * s.b) ^ 8 ≤ g → 2 * R.f * R.k < g - 1 := by
   obtain ⟨x3, hx3⟩ := rank_basic_bounds eps h0 h1
   obtain ⟨x4, hx4⟩ := GlobalTheory.scale_poly_comparison eps 4 1 h0 one_pos
   refine ⟨max x3 (max x4 10), fun s R g he hx hR hg => ?_⟩
@@ -50,7 +53,9 @@ theorem g_big (eps : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) : ∃ x0 : ℝ, ∀
     exact le_trans (by exact_mod_cast le_mul_of_one_le_right (by positivity) hX1) hb
   have h3 : 1 ≤ s.x ^ 3 := one_le_pow₀ (by linarith)
   have h4 : 10 * s.x ^ 3 ≤ s.b := by
-    calc 10 * s.x ^ 3 ≤ s.x * s.x ^ 3 := mul_le_mul_of_nonneg_right y5 (by positivity)
+    calc
+      10 * s.x ^ 3
+        ≤ s.x * s.x ^ 3 := mul_le_mul_of_nonneg_right y5 (by positivity)
       _ = s.x ^ 4 := by ring
       _ ≤ s.b := hb'
   have hk1 : (1 : ℝ) ≤ R.k := by exact_mod_cast (by omega : 1 ≤ R.k)
@@ -64,7 +69,6 @@ theorem g_big (eps : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) : ∃ x0 : ℝ, ∀
     nlinarith
   have c4 : 2 * R.f * R.k + 1 < g := by exact_mod_cast c3
   omega
-
 
 end GlobalTheory.Mem.Top.Inh
 

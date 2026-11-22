@@ -11,7 +11,9 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.IsIntegralOfL
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry IsLocalRing GlobalTheory.EtC UpperTheory.Et LateralTheory.E.t_E2Cut LateralTheory.E.LineOneCut LateralTheory.E.StandardEtaleChartsMultivariableHensel
+open CategoryTheory Limits AlgebraicGeometry IsLocalRing GlobalTheory.EtC UpperTheory.Et
+  LateralTheory.E.t_E2Cut LateralTheory.E.LineOneCut
+  LateralTheory.E.StandardEtaleChartsMultivariableHensel
 
 private lemma aic_of_equiv {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) (h : AIC R) : AIC S := by
   intro p hp hd
@@ -91,16 +93,29 @@ private lemma inj_of {R S : Type} [CommRing R] [IsDomain R] [CommRing S] [Nontri
     simp at ht
   exact (mul_eq_zero.mp hk).resolve_left (pow_ne_zero _ ht0)
 
-theorem UpperTheory.isAffine_isDomain_pullback_standard_opens :
-    ∀ (A : Type) [CommRing A] {Z U V : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)), AICSch Z → ∀ (ι₁ : U ⟶ Z) (ι₂ : V ⟶ Z) [IsOpenImmersion ι₁] [IsOpenImmersion ι₂] [IsAffine U] [IsAffine V],
-      StdPair p ι₁ ι₂ → IsAffine (pullback ι₁ ι₂) ∧ (Nonempty ↥(pullback ι₁ ι₂) →
-        letI : Algebra A Γ(pullback ι₁ ι₂, ⊤) := (((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (pullback.fst ι₁ ι₂ ≫ ι₁ ≫ p).appTop).hom).toAlgebra
-        IsDomain Γ(pullback ι₁ ι₂, ⊤) ∧ Function.Injective (pullback.fst ι₁ ι₂).appTop.hom ∧ Function.Injective (pullback.snd ι₁ ι₂).appTop.hom ∧
-        ∃ T : TC A Γ(pullback ι₁ ι₂, ⊤), T.Int ∧ Roots T.B ∧ Roots T.C ∧ (T.B : Set Γ(pullback ι₁ ι₂, ⊤)) = Set.range (pullback.fst ι₁ ι₂).appTop.hom ∧
-          (T.C : Set Γ(pullback ι₁ ι₂, ⊤)) = Set.range (pullback.snd ι₁ ι₂).appTop.hom) := by
+theorem UpperTheory.isAffine_isDomain_pullback_standard_opens
+    : ∀ (A : Type) [CommRing A] {Z U V : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)),
+      AICSch Z
+        → ∀ (ι₁ : U ⟶ Z) (ι₂ : V ⟶ Z) [IsOpenImmersion ι₁] [IsOpenImmersion ι₂] [IsAffine U]
+            [IsAffine V],
+          StdPair p ι₁ ι₂
+            → IsAffine (pullback ι₁ ι₂)
+              ∧ (Nonempty ↥(pullback ι₁ ι₂)
+                → letI : Algebra A Γ(pullback ι₁ ι₂, ⊤) :=
+                    (((Scheme.ΓSpecIso (CommRingCat.of A)).inv
+                      ≫ (pullback.fst ι₁ ι₂ ≫ ι₁ ≫ p).appTop).hom).toAlgebra
+                  IsDomain Γ(pullback ι₁ ι₂, ⊤) ∧ Function.Injective (pullback.fst ι₁ ι₂).appTop.hom
+                    ∧ Function.Injective (pullback.snd ι₁ ι₂).appTop.hom
+                    ∧ ∃ T : TC A Γ(pullback ι₁ ι₂, ⊤),
+                      T.Int ∧ Roots T.B ∧ Roots T.C
+                        ∧ (T.B : Set Γ(pullback ι₁ ι₂, ⊤))
+                          = Set.range (pullback.fst ι₁ ι₂).appTop.hom
+                        ∧ (T.C : Set Γ(pullback ι₁ ι₂, ⊤))
+                          = Set.range (pullback.snd ι₁ ι₂).appTop.hom) := by
   intro A _ Z U V p hZ ι₁ ι₂ _ _ _ _ hstd
   obtain ⟨L, u, l, f, hu, -, hf, rfl, r1, r2⟩ := hstd
-  obtain ⟨τ, σ, a0, a1, gτ, gσ, bτ, bσ, hts⟩ := UpperTheory.projectiveLine_std_opens_basicOpen_generators
+  obtain ⟨τ, σ, a0, a1, gτ, gσ, bτ, bσ, hts⟩ :=
+    UpperTheory.projectiveLine_std_opens_basicOpen_generators
   have h1 : (⊤ : U.Opens) ≤ (ι₁ ≫ u ≫ f) ⁻¹ᵁ stdOpen 0 := by
     intro x _
     have m : ι₁ x ∈ ((u ≫ f) ⁻¹ᵁ stdOpen 0 : Set Z) := r1 ▸ ⟨x, rfl⟩
@@ -109,11 +124,15 @@ theorem UpperTheory.isAffine_isDomain_pullback_standard_opens :
     intro x _
     have m : ι₂ x ∈ ((u ≫ f) ⁻¹ᵁ stdOpen 1 : Set Z) := r2 ▸ ⟨x, rfl⟩
     exact m
-  have sq : IsPullback (pullback.fst ι₁ ι₂) (pullback.snd ι₁ ι₂) ι₁ ι₂ := IsPullback.of_hasPullback ι₁ ι₂
+  have sq : IsPullback (pullback.fst ι₁ ι₂) (pullback.snd ι₁ ι₂) ι₁ ι₂ :=
+    IsPullback.of_hasPullback ι₁ ι₂
   have ra := range_fst_eq (u ≫ f) _ _ τ bτ ι₁ ι₂ r2 h1 _ _ sq
-  have rb := range_fst_eq (u ≫ f) (stdOpen 1) (stdOpen 0) σ (bσ.trans (inf_comm _ _)) ι₂ ι₁ r1 h2 _ _ sq.flip
-  obtain ⟨aff, locA, kerA⟩ := UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen (pullback.fst ι₁ ι₂) _ ra
-  obtain ⟨-, locB, kerB⟩ := UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen (pullback.snd ι₁ ι₂) _ rb
+  have rb :=
+    range_fst_eq (u ≫ f) (stdOpen 1) (stdOpen 0) σ (bσ.trans (inf_comm _ _)) ι₂ ι₁ r1 h2 _ _ sq.flip
+  obtain ⟨aff, locA, kerA⟩ :=
+    UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen (pullback.fst ι₁ ι₂) _ ra
+  obtain ⟨-, locB, kerB⟩ :=
+    UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen (pullback.snd ι₁ ι₂) _ rb
   refine ⟨aff, fun hne => ?_⟩
   letI : Algebra A Γ(pullback ι₁ ι₂, ⊤) := (((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (pullback.fst ι₁ ι₂ ≫ ι₁ ≫ u ≫ l).appTop).hom).toAlgebra
   haveI : IsIntegral Z := hZ.1
@@ -122,12 +141,14 @@ theorem UpperTheory.isAffine_isDomain_pullback_standard_opens :
   haveI : IsIntegral U := isIntegral_of_isOpenImmersion ι₁
   haveI : IsIntegral V := isIntegral_of_isOpenImmersion ι₂
   haveI : IsIntegral (pullback ι₁ ι₂) := isIntegral_of_isOpenImmersion (pullback.fst ι₁ ι₂ ≫ ι₁)
-  have ts := ts_eq (stdOpen 0) (stdOpen 1) τ σ hts _ _ h1 h2 (pullback.fst ι₁ ι₂) (pullback.snd ι₁ ι₂)
-    (by rw [pullback.condition_assoc])
+  have ts :=
+    ts_eq (stdOpen 0) (stdOpen 1) τ σ hts _ _ h1 h2 (pullback.fst ι₁ ι₂) (pullback.snd ι₁ ι₂)
+      (by rw [pullback.condition_assoc])
   have injA := inj_of _ _ (IsUnit.of_mul_eq_one _ ts) kerA
   have injB := inj_of _ _ (IsUnit.of_mul_eq_one _ ((mul_comm _ _).trans ts)) kerB
   refine ⟨inferInstance, injA, injB, ?_⟩
-  exact UpperTheory.isIntegral_of_localization_cover_unit_product _ _ ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι₁ ≫ u ≫ l).appTop).hom
+  exact UpperTheory.isIntegral_of_localization_cover_unit_product _ _
+    ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι₁ ≫ u ≫ l).appTop).hom
     ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι₂ ≫ u ≫ l).appTop).hom
     (by
       show _ = ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (pullback.fst ι₁ ι₂ ≫ ι₁ ≫ u ≫ l).appTop).hom
@@ -137,7 +158,11 @@ theorem UpperTheory.isAffine_isDomain_pullback_standard_opens :
       show _ = ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (pullback.fst ι₁ ι₂ ≫ ι₁ ≫ u ≫ l).appTop).hom
       rw [pullback.condition_assoc, Scheme.Hom.comp_appTop (pullback.snd ι₁ ι₂)]
       rfl)
-    injA injB _ _ ts locA locB (UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart A u l f hu hf _ a0 τ gτ ι₁ r1 h1) (UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart A u l f hu hf _ a1 σ gσ ι₂ r2 h2)
+    injA injB _ _ ts locA locB
+    (UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart A u l f hu hf _ a0 τ gτ ι₁ r1
+      h1)
+    (UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart A u l f hu hf _ a1 σ gσ ι₂ r2
+      h2)
     (aic_chart hZ ι₁) (aic_chart hZ ι₂)
 
 end

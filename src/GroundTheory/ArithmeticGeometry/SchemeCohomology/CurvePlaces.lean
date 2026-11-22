@@ -24,8 +24,9 @@ section ToPlace
 
 open GroundTheory.FunctionField
 
-variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (.of k))] [IsIntegral X]
-  [IsLocallyNoetherian X] [IsNormalScheme X]
+variable
+  {k : Type u} [Field k]
+  {X : Scheme.{u}} [X.Over (Spec (.of k))] [IsIntegral X] [IsLocallyNoetherian X] [IsNormalScheme X]
 
 namespace PrimeDivisor
 
@@ -83,8 +84,8 @@ lemma fromSpecStalk_genericPoint_comp :
 
 variable (R : ValuationSubring X.functionField)
 
-noncomputable def centerMorphism {x : X} (φ : X.presheaf.stalk x ⟶ CommRingCat.of R) :
-    Spec (.of R) ⟶ X :=
+noncomputable def centerMorphism {x : X} (φ : X.presheaf.stalk x ⟶ CommRingCat.of R)
+    : Spec (.of R) ⟶ X :=
   Spec.map φ ≫ X.fromSpecStalk x
 
 lemma specMap_comp_centerMorphism {x : X} (φ : X.presheaf.stalk x ⟶ CommRingCat.of R)
@@ -104,7 +105,6 @@ lemma centerMorphism_closedPoint {x : X} (φ : X.presheaf.stalk x ⟶ CommRingCa
   change X.fromSpecStalk x (Spec.map φ (IsLocalRing.closedPoint R)) = x
   rw [Spec_closedPoint, Scheme.fromSpecStalk_closedPoint]
 
-
 omit [IsIntegral X] in
 lemma eq_of_specMap_comp_eq {A K : Type u} [CommRing A] [CommRing K] [Algebra A K]
     (hι : Function.Injective (algebraMap A K)) {g₁ g₂ : Spec (.of A) ⟶ Spec (.of k)}
@@ -117,26 +117,35 @@ lemma eq_of_specMap_comp_eq {A K : Type u} [CommRing A] [CommRing K] [Algebra A 
   have h' := congr($h a)
   exact hι h'
 
-theorem center_unique [IsSeparated (X ↘ Spec (.of k))] {x y : X}
-    (φ : X.presheaf.stalk x ⟶ CommRingCat.of R) (ψ : X.presheaf.stalk y ⟶ CommRingCat.of R)
-    [IsLocalHom φ.hom] [IsLocalHom ψ.hom]
+theorem center_unique
+    [IsSeparated (X ↘ Spec (.of k))]
+    {x y : X} (φ : X.presheaf.stalk x ⟶ CommRingCat.of R)
+    (ψ : X.presheaf.stalk y ⟶ CommRingCat.of R) [IsLocalHom φ.hom] [IsLocalHom ψ.hom]
     (hφ : ∀ a, ((φ a : R) : X.functionField) = algebraMap (X.presheaf.stalk x) X.functionField a)
-    (hψ : ∀ a, ((ψ a : R) : X.functionField) = algebraMap (X.presheaf.stalk y) X.functionField a) :
-    x = y := by
-  let S : ValuativeCommSq (X ↘ Spec (.of k)) :=
-    { R := R, K := X.functionField, i₁ := X.fromSpecStalk (genericPoint X),
-      i₂ := centerMorphism R φ ≫ (X ↘ Spec (.of k)),
-      commSq := ⟨by rw [← specMap_comp_centerMorphism R φ hφ, Category.assoc]⟩ }
+    (hψ : ∀ a, ((ψ a : R) : X.functionField) = algebraMap (X.presheaf.stalk y) X.functionField a)
+    : x = y := by
+  let S : ValuativeCommSq (X ↘ Spec (.of k)) := {
+    R := R
+    K := X.functionField
+    i₁ := X.fromSpecStalk (genericPoint X)
+    i₂ := centerMorphism R φ ≫ (X ↘ Spec (.of k))
+    commSq := ⟨by rw [← specMap_comp_centerMorphism R φ hφ, Category.assoc]⟩
+  }
   have hU := IsSeparated.valuativeCriterion (X ↘ Spec (.of k)) S
-  let l₁ : S.commSq.LiftStruct :=
-    { l := centerMorphism R φ, fac_left := specMap_comp_centerMorphism R φ hφ, fac_right := rfl }
-  let l₂ : S.commSq.LiftStruct :=
-    { l := centerMorphism R ψ, fac_left := specMap_comp_centerMorphism R ψ hψ,
-      fac_right := by
-        refine eq_of_specMap_comp_eq (A := R) (K := X.functionField) Subtype.val_injective ?_
-        change _ ≫ centerMorphism R ψ ≫ _ = _ ≫ centerMorphism R φ ≫ _
-        rw [← Category.assoc, ← Category.assoc, specMap_comp_centerMorphism R ψ hψ,
-          specMap_comp_centerMorphism R φ hφ] }
+  let l₁ : S.commSq.LiftStruct := {
+    l := centerMorphism R φ
+    fac_left := specMap_comp_centerMorphism R φ hφ
+    fac_right := rfl
+  }
+  let l₂ : S.commSq.LiftStruct := {
+    l := centerMorphism R ψ
+    fac_left := specMap_comp_centerMorphism R ψ hψ
+    fac_right := by
+      refine eq_of_specMap_comp_eq (A := R) (K := X.functionField) Subtype.val_injective ?_
+      change _ ≫ centerMorphism R ψ ≫ _ = _ ≫ centerMorphism R φ ≫ _
+      rw [← Category.assoc, ← Category.assoc, specMap_comp_centerMorphism R ψ hψ,
+        specMap_comp_centerMorphism R φ hφ]
+  }
   have h := congrArg CommSq.LiftStruct.l (Subsingleton.elim l₁ l₂)
   rw [← centerMorphism_closedPoint R φ, ← centerMorphism_closedPoint R ψ]
   exact congrArg (fun g : Spec (.of R) ⟶ X => g (IsLocalRing.closedPoint R)) h
@@ -151,19 +160,24 @@ lemma compatible_of_specMap_comp {x : X} (φ : X.presheaf.stalk x ⟶ CommRingCa
     cancel_mono, Spec.map_inj] at h
   exact congr($h a)
 
-theorem exists_center [UniversallyClosed (X ↘ Spec (.of k))]
-    (hR : ∀ c : k, algebraMap k X.functionField c ∈ R) :
-    ∃ (x : X) (φ : X.presheaf.stalk x ⟶ CommRingCat.of R), IsLocalHom φ.hom ∧
-      ∀ a, ((φ a : R) : X.functionField) = algebraMap (X.presheaf.stalk x) X.functionField a := by
+theorem exists_center
+    [UniversallyClosed (X ↘ Spec (.of k))] (hR : ∀ c : k, algebraMap k X.functionField c ∈ R)
+    : ∃ (x : X) (φ : X.presheaf.stalk x ⟶ CommRingCat.of R),
+      IsLocalHom φ.hom
+        ∧ ∀ a,
+          ((φ a : R) : X.functionField) = algebraMap (X.presheaf.stalk x) X.functionField a := by
   have hE : ValuativeCriterion.Existence (X ↘ Spec (.of k)) := by
     have h := ‹UniversallyClosed (X ↘ Spec (.of k))›
     rw [UniversallyClosed.eq_valuativeCriterion] at h
     exact h.1
   let ρ : k →+* R := (algebraMap k X.functionField).codRestrict R hR
-  let S : ValuativeCommSq (X ↘ Spec (.of k)) :=
-    { R := R, K := X.functionField, i₁ := X.fromSpecStalk (genericPoint X),
-      i₂ := Spec.map (CommRingCat.ofHom ρ),
-      commSq := ⟨by rw [fromSpecStalk_genericPoint_comp, ← Spec.map_comp]; rfl⟩ }
+  let S : ValuativeCommSq (X ↘ Spec (.of k)) := {
+    R := R
+    K := X.functionField
+    i₁ := X.fromSpecStalk (genericPoint X)
+    i₂ := Spec.map (CommRingCat.ofHom ρ)
+    commSq := ⟨by rw [fromSpecStalk_genericPoint_comp, ← Spec.map_comp]; rfl⟩
+  }
   obtain ⟨l, hl₁, -⟩ := (hE S).exists_lift
   refine ⟨l (IsLocalRing.closedPoint R), Scheme.stalkClosedPointTo l, inferInstance, ?_⟩
   refine compatible_of_specMap_comp R _ ?_
@@ -177,8 +191,10 @@ section PlaceEquiv
 
 open GroundTheory.FunctionField
 
-theorem valuationSubring_eq_of_le {K : Type*} [Field K] {A B : ValuationSubring K} (hAB : A ≤ B)
-    (hloc : ∀ a ∈ A, a⁻¹ ∈ B → a⁻¹ ∈ A) : A = B := by
+theorem valuationSubring_eq_of_le
+    {K : Type*} [Field K]
+    {A B : ValuationSubring K} (hAB : A ≤ B) (hloc : ∀ a ∈ A, a⁻¹ ∈ B → a⁻¹ ∈ A)
+    : A = B := by
   refine le_antisymm hAB fun b hb => ?_
   by_contra hbA
   have hinv : b⁻¹ ∈ A := (A.mem_or_inv_mem b).resolve_left hbA
@@ -186,13 +202,14 @@ theorem valuationSubring_eq_of_le {K : Type*} [Field K] {A B : ValuationSubring 
   rw [inv_inv] at this
   exact hbA this
 
-variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (.of k))] [IsIntegral X]
-  [IsLocallyNoetherian X] [IsNormalScheme X]
+variable
+  {k : Type u} [Field k]
+  {X : Scheme.{u}} [X.Over (Spec (.of k))] [IsIntegral X] [IsLocallyNoetherian X] [IsNormalScheme X]
 
 namespace PrimeDivisor
 
-noncomputable def stalkToPlaceRing (Z : PrimeDivisor X) :
-    X.presheaf.stalk Z.point ⟶ CommRingCat.of (Z.toPlace (k := k)).ring :=
+noncomputable def stalkToPlaceRing (Z : PrimeDivisor X)
+    : X.presheaf.stalk Z.point ⟶ CommRingCat.of (Z.toPlace (k := k)).ring :=
   CommRingCat.ofHom ((algebraMap (X.presheaf.stalk Z.point) X.functionField).codRestrict
     (Z.toPlace (k := k)).ring fun a => (Z.mem_toPlace_ring _).mpr (Z.valuation_algebraMap_le_one a))
 
@@ -204,7 +221,8 @@ instance (Z : PrimeDivisor X) : IsLocalHom (Z.stalkToPlaceRing (k := k)).hom := 
   refine ⟨fun a ha => ?_⟩
   have := Z.isDedekindDomain_stalk
   obtain ⟨b, hb⟩ := ha.exists_right_inv
-  have hK : algebraMap (X.presheaf.stalk Z.point) X.functionField a * (b : X.functionField) = 1 := by
+  have hK
+      : algebraMap (X.presheaf.stalk Z.point) X.functionField a * (b : X.functionField) = 1 := by
     rw [← stalkToPlaceRing_apply (k := k)]
     exact congrArg Subtype.val hb
   have hb1 : Z.valuation (b : X.functionField) ≤ 1 := (Z.mem_toPlace_ring _).mp b.2
@@ -214,8 +232,9 @@ instance (Z : PrimeDivisor X) : IsLocalHom (Z.stalkToPlaceRing (k := k)).hom := 
     rw [map_mul, map_one] at h1
     by_contra hlt
     push Not at hlt
-    have : Z.valuation (algebraMap (X.presheaf.stalk Z.point) X.functionField a) *
-        Z.valuation (b : X.functionField) < 1 :=
+    have : Z.valuation (algebraMap (X.presheaf.stalk Z.point) X.functionField a)
+          * Z.valuation (b : X.functionField)
+        < 1 :=
       mul_lt_one_of_lt_of_le hlt hb1
     rw [h1] at this
     exact lt_irrefl _ this
@@ -234,22 +253,23 @@ end PrimeDivisor
 
 variable [IsProper (X ↘ Spec (.of k))]
 
-theorem PrimeDivisor.toPlace_injective :
-    Function.Injective (PrimeDivisor.toPlace (k := k) (X := X)) := by
+theorem PrimeDivisor.toPlace_injective
+    : Function.Injective (PrimeDivisor.toPlace (k := k) (X := X)) := by
   intro Z W h
   have hring : (Z.toPlace (k := k)).ring = (W.toPlace (k := k)).ring := congrArg Place.ring h
   apply PrimeDivisor.point_injective
   let ψ : X.presheaf.stalk W.point ⟶ CommRingCat.of (Z.toPlace (k := k)).ring :=
-    W.stalkToPlaceRing (k := k) ≫ CommRingCat.ofHom (RingEquiv.subringCongr
-      (congrArg ValuationSubring.toSubring hring.symm)).toRingHom
+    W.stalkToPlaceRing (k := k) ≫ CommRingCat.ofHom (RingEquiv.subringCongr (congrArg
+      ValuationSubring.toSubring hring.symm)).toRingHom
   have : IsLocalHom ψ.hom := by
     dsimp [ψ]
     infer_instance
   exact center_unique (k := k) (Z.toPlace (k := k)).ring (Z.stalkToPlaceRing (k := k)) ψ
-    (fun a => rfl) (fun a => rfl)
+    (fun a => rfl)
+    (fun a => rfl)
 
-theorem PrimeDivisor.toPlace_surjective (hX : topologicalKrullDim X ≤ 1) :
-    Function.Surjective (PrimeDivisor.toPlace (k := k) (X := X)) := by
+theorem PrimeDivisor.toPlace_surjective (hX : topologicalKrullDim X ≤ 1)
+    : Function.Surjective (PrimeDivisor.toPlace (k := k) (X := X)) := by
   intro v
   obtain ⟨x, φ, hφl, hφ⟩ := exists_center (k := k) v.ring v.algebraMap_mem
   have hx : x ≠ genericPoint X := by
@@ -258,8 +278,9 @@ theorem PrimeDivisor.toPlace_surjective (hX : topologicalKrullDim X ≤ 1) :
     rw [eq_top_iff]
     intro f _
     have hs : x ⤳ genericPoint X := hxη ▸ specializes_rfl
-    have h2 : algebraMap (X.presheaf.stalk x) X.functionField
-        (X.presheaf.stalkSpecializes hs f) = f := by
+    have h2
+        : algebraMap (X.presheaf.stalk x) X.functionField (X.presheaf.stalkSpecializes hs f)
+          = f := by
       rw [RingHom.algebraMap_toAlgebra, ← CommRingCat.comp_apply,
         TopCat.Presheaf.stalkSpecializes_comp, TopCat.Presheaf.stalkSpecializes_refl]
       rfl
@@ -268,8 +289,10 @@ theorem PrimeDivisor.toPlace_surjective (hX : topologicalKrullDim X ≤ 1) :
     exact h3
   let Z : PrimeDivisor X := ⟨x, ringKrullDim_stalk_eq_one hX hx⟩
   refine ⟨Z, Place.ext ?_⟩
-  have hrange : ∀ f : X.functionField, f ∈ (Z.toPlace (k := k)).ring ↔
-      f ∈ (algebraMap (X.presheaf.stalk x) X.functionField).range := fun f =>
+  have hrange
+      : ∀ f : X.functionField,
+        f ∈ (Z.toPlace (k := k)).ring
+          ↔ f ∈ (algebraMap (X.presheaf.stalk x) X.functionField).range := fun f =>
     (Z.mem_toPlace_ring f).trans (Z.valuation_le_one_iff f)
   refine valuationSubring_eq_of_le ?_ ?_
   · intro f hf
@@ -290,11 +313,13 @@ theorem PrimeDivisor.toPlace_surjective (hX : topologicalKrullDim X ≤ 1) :
     have hau : IsUnit a := (isUnit_map_iff φ.hom a).mp hu
     obtain ⟨u, rfl⟩ := hau
     rw [hrange]
-    exact ⟨((u⁻¹ : (X.presheaf.stalk x)ˣ) : X.presheaf.stalk x),
-      map_units_inv (algebraMap (X.presheaf.stalk x) X.functionField) u⟩
+    exact ⟨
+      ((u⁻¹ : (X.presheaf.stalk x)ˣ) : X.presheaf.stalk x),
+      map_units_inv (algebraMap (X.presheaf.stalk x) X.functionField) u
+    ⟩
 
-noncomputable def placeEquiv (hX : topologicalKrullDim X ≤ 1) :
-    PrimeDivisor X ≃ Place k X.functionField :=
+noncomputable def placeEquiv (hX : topologicalKrullDim X ≤ 1)
+    : PrimeDivisor X ≃ Place k X.functionField :=
   Equiv.ofBijective PrimeDivisor.toPlace
     ⟨PrimeDivisor.toPlace_injective, PrimeDivisor.toPlace_surjective hX⟩
 

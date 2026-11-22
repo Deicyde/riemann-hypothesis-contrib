@@ -5,14 +5,19 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.HeckeC
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.StringRepresentationDecomposition
+open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
+  Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal
+  GlobalTheory.StringRepresentationDecomposition
 
 noncomputable section
 
 namespace GlobalTheory.WildChar
 
-theorem val_natCast_not_lt {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {l p : ℕ}
-    (hcop : Nat.Coprime l p) (hp : A.valuation (p : Ω) < 1) : ¬ A.valuation (l : Ω) < 1 := by
+theorem val_natCast_not_lt
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {l p : ℕ} (hcop : Nat.Coprime l p) (hp : A.valuation (p : Ω) < 1)
+    : ¬ A.valuation (l : Ω) < 1 := by
   intro hl
   have e : ((l : ℤ) * l.gcdA p + (p : ℤ) * l.gcdB p : ℤ) = 1 := by
     have := Nat.gcd_eq_gcd_ab l p
@@ -32,23 +37,27 @@ theorem val_natCast_not_lt {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {l p
   rw [e', map_one] at h1
   exact lt_irrefl _ h1
 
-theorem sub_lt_of_wild {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω)
-    (τ : Gal(Ω/F)) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1) (y : Ω) (hy : y ≠ 0) :
-    A.valuation (τ y - y) < A.valuation y := by
+theorem sub_lt_of_wild
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) (τ : Gal(Ω/F)) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1)
+    (y : Ω) (hy : y ≠ 0)
+    : A.valuation (τ y - y) < A.valuation y := by
   have hv : A.valuation y ≠ 0 := by simpa using hy
   have h := hτ y hy
   have e : τ y / y - 1 = (τ y - y) / y := by field_simp
   rw [e, map_div₀] at h
   have hpos : 0 < A.valuation y := zero_lt_iff.mpr hv
-  calc A.valuation (τ y - y) = A.valuation (τ y - y) / A.valuation y * A.valuation y := by
-        rw [div_mul_cancel₀ _ hv]
-    _ < 1 * A.valuation y := by
-        exact mul_lt_mul_of_pos_right h hpos
+  calc
+    A.valuation (τ y - y)
+      = A.valuation (τ y - y) / A.valuation y * A.valuation y := by rw [div_mul_cancel₀ _ hv]
+    _ < 1 * A.valuation y := by exact mul_lt_mul_of_pos_right h hpos
     _ = A.valuation y := one_mul _
 
-theorem pow_sub_lt {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω)
-    (τ : Gal(Ω/F)) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1) (y : Ω) (hy : y ≠ 0) :
-    ∀ i : ℕ, A.valuation ((τ ^ i) y - y) < A.valuation y := by
+theorem pow_sub_lt
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) (τ : Gal(Ω/F)) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1)
+    (y : Ω) (hy : y ≠ 0)
+    : ∀ i : ℕ, A.valuation ((τ ^ i) y - y) < A.valuation y := by
   have hv : A.valuation y ≠ 0 := by simpa using hy
   intro i
   induction i with
@@ -63,10 +72,13 @@ theorem pow_sub_lt {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (A : Valuat
     rw [e]
     exact lt_of_le_of_lt (A.valuation.map_add _ _) (max_lt h1 ih)
 
-theorem fix_of_pow_fix {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (p : ℕ)
-    (A : ValuationSubring Ω) (hp : A.valuation (p : Ω) < 1)
+theorem fix_of_pow_fix
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    (p : ℕ) (A : ValuationSubring Ω) (hp : A.valuation (p : Ω) < 1)
     (τ : Gal(Ω/F)) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1)
-    (n : ℕ) (hn : Nat.Coprime n p) (y : Ω) (hy : (τ ^ n) y = y) : τ y = y := by
+    (n : ℕ) (hn : Nat.Coprime n p)
+    (y : Ω) (hy : (τ ^ n) y = y)
+    : τ y = y := by
   by_contra hne
   set e := τ y - y with he
   have he0 : e ≠ 0 := sub_ne_zero.mpr hne
@@ -74,9 +86,10 @@ theorem fix_of_pow_fix {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (p : �
     have : ∀ i, (τ ^ i) e = (τ ^ (i + 1)) y - (τ ^ i) y := by
       intro i; rw [he, map_sub, pow_succ, AlgEquiv.mul_apply]
     simp_rw [this]
-    rw [Finset.sum_range_sub (fun i => (τ ^ i) y) n, hy]; simp
-  have hsplit : ∑ i ∈ Finset.range n, (τ ^ i) e =
-      (n : Ω) * e + ∑ i ∈ Finset.range n, ((τ ^ i) e - e) := by
+    rw [Finset.sum_range_sub (fun i => (τ ^ i) y) n, hy]
+    simp
+  have hsplit
+      : ∑ i ∈ Finset.range n, (τ ^ i) e = (n : Ω) * e + ∑ i ∈ Finset.range n, ((τ ^ i) e - e) := by
     rw [Finset.sum_sub_distrib]; simp
   have hlt : A.valuation (∑ i ∈ Finset.range n, ((τ ^ i) e - e)) < A.valuation e :=
     Valuation.map_sum_lt _ (by simpa using he0) (fun i _ => pow_sub_lt A τ hτ e he0 i)
@@ -90,11 +103,15 @@ theorem fix_of_pow_fix {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (p : �
   rw [this] at hlt
   exact lt_irrefl _ hlt
 
-theorem main : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (p : ℕ) [Fact p.Prime] (A : ValuationSubring Ω), A.valuation (p : Ω) < 1 →
-    ∀ (R : Type) [CommRing R] (χ : G F Ω →* Rˣ), IsOpen (χ.ker : Set (G F Ω)) →
-    ∀ σ : G F Ω, (∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) →
-    ∀ m : ℕ, 0 < m → Nat.Coprime m p → χ σ ^ m = 1 → χ σ = 1 := by
+theorem main
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (p : ℕ)
+        [Fact p.Prime] (A : ValuationSubring Ω),
+      A.valuation (p : Ω) < 1
+        → ∀ (R : Type) [CommRing R] (χ : G F Ω →* Rˣ),
+          IsOpen (χ.ker : Set (G F Ω))
+            → ∀ σ : G F Ω,
+              (∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+                → ∀ m : ℕ, 0 < m → Nat.Coprime m p → χ σ ^ m = 1 → χ σ = 1 := by
   intro F Ω _ _ _ _ _ p hpr A hp R _ χ hK σ hσ m _ hmp hχm
   have : Normal F Ω := IsAlgClosure.normal F Ω
   obtain ⟨E, hfin, hnorm, hE⟩ :=
@@ -106,7 +123,8 @@ theorem main : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F
     have := AlgEquiv.restrictNormal_commutes τ E ⟨a, ha⟩
     have h2 : (AlgEquiv.restrictNormal τ E) ⟨a, ha⟩ = ⟨a, ha⟩ := by
       have h3 : AlgEquiv.restrictNormalHom E τ = AlgEquiv.restrictNormal τ E := rfl
-      rw [← h3, h1]; rfl
+      rw [← h3, h1]
+      rfl
     rw [h2] at this
     exact this.symm
   have hσk : ∀ a ∈ E, (σ ^ k) a = a := by

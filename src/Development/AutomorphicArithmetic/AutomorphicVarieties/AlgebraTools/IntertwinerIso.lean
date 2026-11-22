@@ -6,8 +6,13 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.intertwiner_iso :
-    ∀ {F Γ : Type} [Field F] {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] (ρ : Γ → Matrix m m F) (ρ' : Γ → Matrix n n F), Submodule.span F (Set.range ρ) = ⊤ → Submodule.span F (Set.range ρ') = ⊤ → (∀ V : Matrix m n F, (∀ g, ρ g * V = V * ρ' g) → V ≠ 0 → ∃ V' : Matrix n m F, V * V' = 1 ∧ V' * V = 1) ∧ ∀ V : Matrix m m F, (∀ g, ρ g * V = V * ρ g) → ∃ c : F, V = c • (1 : Matrix m m F) := by
+theorem UpperTheory.V.AlgebraTools.intertwiner_iso
+    : ∀ {F Γ : Type} [Field F] {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+        (ρ : Γ → Matrix m m F) (ρ' : Γ → Matrix n n F),
+      Submodule.span F (Set.range ρ) = ⊤ → Submodule.span F (Set.range ρ') = ⊤
+        → (∀ V : Matrix m n F,
+            (∀ g, ρ g * V = V * ρ' g) → V ≠ 0 → ∃ V' : Matrix n m F, V * V' = 1 ∧ V' * V = 1)
+          ∧ ∀ V : Matrix m m F, (∀ g, ρ g * V = V * ρ g) → ∃ c : F, V = c • (1 : Matrix m m F) := by
   intro F Γ _ m n _ _ _ _ ρ ρ' hρ hρ'
   refine ⟨fun V hV hV0 => ?_, fun V hV => ?_⟩
   · have hR : ∀ A : Matrix m m F, ∃ C : Matrix n n F, A * V = V * C := by
@@ -17,7 +22,8 @@ theorem UpperTheory.V.AlgebraTools.intertwiner_iso :
       | mem x hx =>
         obtain ⟨g, rfl⟩ := hx
         exact ⟨ρ' g, hV g⟩
-      | zero => exact ⟨0, by rw [Matrix.zero_mul, Matrix.mul_zero]⟩
+      | zero =>
+        exact ⟨0, by rw [Matrix.zero_mul, Matrix.mul_zero]⟩
       | add x y _ _ hx hy =>
         obtain ⟨C, hC⟩ := hx
         obtain ⟨D, hD⟩ := hy
@@ -32,7 +38,8 @@ theorem UpperTheory.V.AlgebraTools.intertwiner_iso :
       | mem x hx =>
         obtain ⟨g, rfl⟩ := hx
         exact ⟨ρ g, (hV g).symm⟩
-      | zero => exact ⟨0, by rw [Matrix.zero_mul, Matrix.mul_zero]⟩
+      | zero =>
+        exact ⟨0, by rw [Matrix.zero_mul, Matrix.mul_zero]⟩
       | add x y _ _ hx hy =>
         obtain ⟨C, hC⟩ := hx
         obtain ⟨D, hD⟩ := hy

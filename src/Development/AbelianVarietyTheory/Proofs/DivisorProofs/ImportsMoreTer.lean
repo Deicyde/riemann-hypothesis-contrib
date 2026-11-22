@@ -6,11 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.IntegerMultipleMembership
 
-theorem exists_int_smul_mem {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
-    (z : Fin n → E) : ∃ (m : ℤ), m ≠ (0 : ℤ) ∧ m • z ∈ L := by
-  have hz : z ∈ Submodule.span E (L : Set (Fin n → E)) := by
-    rw [hL.span_eq_top]; trivial
+theorem exists_int_smul_mem
+    {E : Type} [inst : Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
+    (hL : Submodule.IsFullLattice E L) (z : Fin n → E)
+    : ∃ (m : ℤ), m ≠ (0 : ℤ) ∧ m • z ∈ L := by
+  have hz : z ∈ Submodule.span E (L : Set (Fin n → E)) := by rw [hL.span_eq_top]; trivial
   induction hz using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -29,10 +30,10 @@ theorem exists_int_smul_mem {E : Type} [inst : Field E] [NumberField E] {n : ℕ
     obtain ⟨k, hk, hkc⟩ := hc.exists_integral_multiple
     refine ⟨k * a, mul_ne_zero hk ha, ?_⟩
     have h := L.smul_mem (⟨k • c, hkc⟩ : NumberField.RingOfIntegers E) hax
-    have e : (k * a) • c • x
-        = (⟨k • c, hkc⟩ : NumberField.RingOfIntegers E) • a • x := by
+    have e : (k * a) • c • x = (⟨k • c, hkc⟩ : NumberField.RingOfIntegers E) • a • x := by
       change _ = (k • c) • a • x
       rw [mul_smul, smul_comm a c x, smul_assoc]
-    rw [e]; exact h
+    rw [e]
+    exact h
 
 end GlobalTheory.IntegerMultipleMembership

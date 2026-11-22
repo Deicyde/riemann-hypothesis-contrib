@@ -13,7 +13,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRSSnRe
 namespace Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity
 
 theorem jfSmoothBuilt_of_chart (hE : ChartEqs) (hR : EllRegW) : JfSmoothBuilt :=
-  jfSmoothBuilt_of_rest nilpotent_derivative group_equations_post_holds smooth_of_coefficients_holds hE hR
+  jfSmoothBuilt_of_rest nilpotent_derivative group_equations_post_holds smooth_of_coefficients_holds
+    hE hR
 
 end Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity
 

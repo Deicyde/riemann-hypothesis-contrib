@@ -15,9 +15,11 @@ section Disj
 
 variable {k σ τ : Type} [Field k] [DecidableEq σ] [DecidableEq τ]
 
-theorem mapDomain_add_inj (e : τ → σ) (he : Function.Injective e) (a b : τ →₀ ℕ) (β β' : σ →₀ ℕ)
-    (hβ : ∀ x, β (e x) = 0) (hβ' : ∀ x, β' (e x) = 0)
-    (h : Finsupp.mapDomain e a + β = Finsupp.mapDomain e b + β') : a = b ∧ β = β' := by
+theorem mapDomain_add_inj
+    (e : τ → σ) (he : Function.Injective e)
+    (a b : τ →₀ ℕ) (β β' : σ →₀ ℕ) (hβ : ∀ x, β (e x) = 0) (hβ' : ∀ x, β' (e x) = 0)
+    (h : Finsupp.mapDomain e a + β = Finsupp.mapDomain e b + β')
+    : a = b ∧ β = β' := by
   have ha : a = b := by
     ext x
     have h1 := DFunLike.congr_fun h (e x)
@@ -25,8 +27,9 @@ theorem mapDomain_add_inj (e : τ → σ) (he : Function.Injective e) (a b : τ 
   subst ha
   exact ⟨rfl, add_left_cancel h⟩
 
-theorem mfac_mapDomain_add (e : τ → σ) (he : Function.Injective e) (a : τ →₀ ℕ) (β : σ →₀ ℕ)
-    (hβ : ∀ x, β (e x) = 0) : (mfac (Finsupp.mapDomain e a + β) : k) = mfac a * mfac β := by
+theorem mfac_mapDomain_add
+    (e : τ → σ) (he : Function.Injective e) (a : τ →₀ ℕ) (β : σ →₀ ℕ) (hβ : ∀ x, β (e x) = 0)
+    : (mfac (Finsupp.mapDomain e a + β) : k) = mfac a * mfac β := by
   unfold mfac
   have hd : Disjoint (Finsupp.mapDomain e a).support β.support := by
     rw [Finset.disjoint_left]
@@ -35,10 +38,13 @@ theorem mfac_mapDomain_add (e : τ → σ) (he : Function.Injective e) (a : τ �
     exact (Finsupp.mem_support_iff.1 hx') (hβ y)
   rw [Finsupp.prod_add_index_of_disjoint hd, Finsupp.prod_mapDomain_index_inj he]
 
-theorem fockK_rename_mul (e : τ → σ) (he : Function.Injective e) (A B : MvPolynomial τ k) (β β' : σ →₀ ℕ) (c : k)
-    (hβ : ∀ x, β (e x) = 0) (hβ' : ∀ x, β' (e x) = 0) :
-    Formalism.GM.M.fockK (rename e A * monomial β 1) (rename e B * monomial β' c) =
-      if β = β' then c * mfac β * Formalism.GM.M.fockK A B else 0 := by
+theorem fockK_rename_mul
+    (e : τ → σ) (he : Function.Injective e)
+    (A B : MvPolynomial τ k)
+    (β β' : σ →₀ ℕ)
+    (c : k) (hβ : ∀ x, β (e x) = 0) (hβ' : ∀ x, β' (e x) = 0)
+    : Formalism.GM.M.fockK (rename e A * monomial β 1) (rename e B * monomial β' c)
+      = if β = β' then c * mfac β * Formalism.GM.M.fockK A B else 0 := by
   classical
   set F := rename e A * monomial β (1 : k) with hF
   set G := rename e B * monomial β' c with hG
@@ -63,15 +69,18 @@ theorem fockK_rename_mul (e : τ → σ) (he : Function.Injective e) (A B : MvPo
     · by_contra hne
       rw [hG, MvPolynomial.coeff_mul_monomial'] at hne
       split_ifs at hne with hle
-      · have h1 : (rename e B).coeff (Finsupp.mapDomain e m + β - β') ≠ 0 := fun h0 => hne (by rw [h0, zero_mul])
+      · have h1 : (rename e B).coeff (Finsupp.mapDomain e m + β - β') ≠ 0 := fun h0 =>
+          hne (by rw [h0, zero_mul])
         obtain ⟨u, hu, -⟩ := MvPolynomial.coeff_rename_ne_zero e B _ h1
         have h2 : Finsupp.mapDomain e m + β = Finsupp.mapDomain e u + β' := by
           rw [hu]
           exact (tsub_add_cancel_of_le hle).symm
         exact hb (mapDomain_add_inj e he m u β β' hβ hβ' h2).2
       · exact hne rfl
-  have hmf : ∀ m : τ →₀ ℕ, ((Finsupp.mapDomain e m + β).prod fun _ j => (j.factorial : k)) =
-      (m.prod fun _ j => (j.factorial : k)) * (β.prod fun _ j => (j.factorial : k)) :=
+  have hmf
+      : ∀ m : τ →₀ ℕ,
+        ((Finsupp.mapDomain e m + β).prod fun _ j => (j.factorial : k))
+          = (m.prod fun _ j => (j.factorial : k)) * (β.prod fun _ j => (j.factorial : k)) :=
     fun m => mfac_mapDomain_add e he m β hβ
   unfold Formalism.GM.M.fockK
   have hsub : F.support ⊆ A.support.image (fun m => Finsupp.mapDomain e m + β) := by
@@ -82,8 +91,8 @@ theorem fockK_rename_mul (e : τ → σ) (he : Function.Injective e) (A B : MvPo
     rw [MvPolynomial.mem_support_iff, not_not] at hn
     rw [hn]
     ring)]
-  have hinj : Set.InjOn (fun m => Finsupp.mapDomain e m + β) A.support :=
-    fun a _ b _ hab => (mapDomain_add_inj e he a b β β hβ hβ hab).1
+  have hinj : Set.InjOn (fun m => Finsupp.mapDomain e m + β) A.support := fun a _ b _ hab =>
+    (mapDomain_add_inj e he a b β β hβ hβ hab).1
   rw [Finset.sum_image hinj]
   simp only [hcF, hcG, hmf]
   split_ifs with hb

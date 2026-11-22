@@ -14,7 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Split
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -23,18 +26,24 @@ namespace GlobalTheory.RtSumScalar
 
 section Main
 
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem rtSum_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GAf L n → W)} (hS : NG.IsSubrep ρ S)
-    (hiso : NG.IsoRep S S') (K : Subgroup (GAf L n)) (R : Finset (GAf L n)) (c : ℂ)
+theorem rtSum_iso
+    {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GAf L n → W)}
+    (hS : NG.IsSubrep ρ S) (hiso : NG.IsoRep S S')
+    (K : Subgroup (GAf L n)) (R : Finset (GAf L n)) (c : ℂ)
     (hc : ∀ f ∈ S, (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f)
-    (f' : GAf L n → W) (hf' : f' ∈ S') (hfix : ∀ κ ∈ K, NG.rt L n κ f' = f') :
-    ∑ γ ∈ R, NG.rt L n γ f' = c • f' := by
+    (f' : GAf L n → W) (hf' : f' ∈ S') (hfix : ∀ κ ∈ K, NG.rt L n κ f' = f')
+    : ∑ γ ∈ R, NG.rt L n γ f' = c • f' := by
   classical
   obtain ⟨T, hT⟩ := hiso
   set f : S := T.symm ⟨f', hf'⟩ with hfdef
   have hTf : T f = ⟨f', hf'⟩ := T.apply_symm_apply _
-  have hrt : ∀ h : GAf L n, ((T ⟨NG.rt L n h f, hS.stable h _ f.2⟩ : S') : GAf L n → W) = NG.rt L n h f' := by
+  have hrt
+      : ∀ h : GAf L n,
+        ((T ⟨NG.rt L n h f, hS.stable h _ f.2⟩ : S') : GAf L n → W) = NG.rt L n h f' := by
     intro h
     have := hT h f ⟨_, hS.stable h _ f.2⟩ rfl
     rw [this, hTf]
@@ -46,8 +55,7 @@ theorem rtSum_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GA
     exact congrArg Subtype.val (T.injective h2)
   have hcf := hc f f.2 hffix
   let σ : S := ∑ γ ∈ R, (⟨NG.rt L n γ f, hS.stable _ _ f.2⟩ : S)
-  have hσ : (σ : GAf L n → W) = ∑ γ ∈ R, NG.rt L n γ f := by
-    rw [Submodule.coe_sum]
+  have hσ : (σ : GAf L n → W) = ∑ γ ∈ R, NG.rt L n γ f := by rw [Submodule.coe_sum]
   have hTσ : ((T σ : S') : GAf L n → W) = ∑ γ ∈ R, NG.rt L n γ f' := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Submodule.coe_sum]
@@ -57,12 +65,13 @@ theorem rtSum_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GA
   simp only [map_smul, Submodule.coe_smul, hTσ, hTf] at h3
   exact h3
 
-theorem rtSum_finset_sum {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (GAf L n → W)} (hS : NG.IsIrrRep ρ S)
+theorem rtSum_finset_sum
+    {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (GAf L n → W)} (hS : NG.IsIrrRep ρ S)
     (K : Subgroup (GAf L n)) (R : Finset (GAf L n)) (c : ℂ)
     (hc : ∀ f ∈ S, (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f)
-    (t : Finset (Submodule ℂ (GAf L n → W))) :
-    (↑t ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'}) → ∀ f ∈ (⨆ i ∈ t, i),
-      (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f := by
+    (t : Finset (Submodule ℂ (GAf L n → W)))
+    : (↑t ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'})
+      → ∀ f ∈ (⨆ i ∈ t, i), (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -73,8 +82,8 @@ theorem rtSum_finset_sum {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ
   | insert a t ha ih =>
     intro hsub f hf hfix
     have haF : NG.IsIrrRep ρ a ∧ NG.IsoRep S a := hsub (Finset.mem_insert_self a t)
-    have htF : (↑t : Set _) ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'} :=
-      fun x hx => hsub (Finset.mem_insert_of_mem hx)
+    have htF : (↑t : Set _) ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'} := fun x hx =>
+      hsub (Finset.mem_insert_of_mem hx)
     rw [Finset.iSup_insert] at hf
     have hMst : ∀ h, ∀ g ∈ (⨆ i ∈ t, i), NG.rt L n h g ∈ (⨆ i ∈ t, i) :=
       GlobalTheory.HeckeScalarAll.iSup_finset_stable' t (fun i hi => (htF hi).1.1.stable)
@@ -108,7 +117,14 @@ theorem rtSum_finset_sum {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ
 
 end Main
 
-theorem rtSum_isoTyp : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (W : Type) [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ (GQ L n) W) (S : Submodule ℂ (GAf L n → W)), NG.IsIrrRep ρ S → ∀ (K : Subgroup (GAf L n)) (R : Finset (GAf L n)) (c : ℂ), (∀ f ∈ S, (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f) → ∀ f ∈ NG.isoTyp ρ S, (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f := by
+theorem rtSum_isoTyp
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (W : Type) [AddCommGroup W]
+        [Module ℂ W] (ρ : Representation ℂ (GQ L n) W) (S : Submodule ℂ (GAf L n → W)),
+      NG.IsIrrRep ρ S
+        → ∀ (K : Subgroup (GAf L n)) (R : Finset (GAf L n)) (c : ℂ),
+          (∀ f ∈ S, (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f)
+            → ∀ f ∈ NG.isoTyp ρ S,
+              (∀ κ ∈ K, NG.rt L n κ f = f) → ∑ γ ∈ R, NG.rt L n γ f = c • f := by
   intro L _ _ _ n W _ _ ρ S hS K R c hc f hf hfix
   obtain ⟨t, ht, hft⟩ := Submodule.mem_sSup_iff_exists_finset.1 hf
   exact rtSum_finset_sum hS K R c hc t ht f hft hfix

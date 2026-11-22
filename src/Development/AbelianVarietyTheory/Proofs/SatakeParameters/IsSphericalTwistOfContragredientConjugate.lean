@@ -24,8 +24,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.GalCut GlobalTheory.Published
 
@@ -35,18 +37,27 @@ namespace GlobalTheory.ContraPair.SphTwist
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a : ℕ}
 
-theorem conjFin_locGL_mem (w : HeightOneSpectrum (𝓞 E))
-    (hw : conjSrc (IsCMField.complexConj E).toRingEquiv w = w) (k : GL (Fin a) (w.adicCompletion E))
-    (hk : k ∈ GlobalTheory.LFun.KGL w (n := a)) : ∃ k' ∈ GlobalTheory.LFun.KGL w (n := a),
-      Matrix.GeneralLinearGroup.map (conjFin (IsCMField.complexConj E).toRingEquiv) (locGL E a w k) = locGL E a w k' := by
-  have key : ∀ u (h : conjSrc (IsCMField.complexConj E).toRingEquiv w = u) (k : GL (Fin a) (u.adicCompletion E)),
-      k ∈ GlobalTheory.LFun.KGL u (n := a) → ∃ k' ∈ GlobalTheory.LFun.KGL w (n := a),
-        Matrix.GeneralLinearGroup.map (conjFin (IsCMField.complexConj E).toRingEquiv) (locGL E a u k) = locGL E a w k' := by
+theorem conjFin_locGL_mem
+    (w : HeightOneSpectrum (𝓞 E)) (hw : conjSrc (IsCMField.complexConj E).toRingEquiv w = w)
+    (k : GL (Fin a) (w.adicCompletion E)) (hk : k ∈ GlobalTheory.LFun.KGL w (n := a))
+    : ∃ k' ∈ GlobalTheory.LFun.KGL w (n := a),
+      Matrix.GeneralLinearGroup.map (conjFin (IsCMField.complexConj E).toRingEquiv) (locGL E a w k)
+        = locGL E a w k' := by
+  have key
+      : ∀ u (h : conjSrc (IsCMField.complexConj E).toRingEquiv w = u)
+          (k : GL (Fin a) (u.adicCompletion E)),
+        k ∈ GlobalTheory.LFun.KGL u (n := a)
+          → ∃ k' ∈ GlobalTheory.LFun.KGL w (n := a),
+            Matrix.GeneralLinearGroup.map (conjFin (IsCMField.complexConj E).toRingEquiv)
+                (locGL E a u k)
+              = locGL E a w k' := by
     intro u h k hk
     subst h
     refine ⟨_, ?_, GlobalTheory.ConjPairLoc.conjFin_locGL _ w k⟩
     obtain ⟨k0, rfl⟩ := hk
-    let r : Formalism.UG.Ov E (conjSrc (IsCMField.complexConj E).toRingEquiv w) →+* Formalism.UG.Ov E w :=
+    let r
+        : Formalism.UG.Ov E (conjSrc (IsCMField.complexConj E).toRingEquiv w)
+          →+* Formalism.UG.Ov E w :=
       (conjLoc (IsCMField.complexConj E).toRingEquiv w).restrict _ _ fun x hx => by
         change _ ∈ w.adicCompletionIntegers E
         change x ∈ (conjSrc (IsCMField.complexConj E).toRingEquiv w).adicCompletionIntegers E at hx
@@ -60,9 +71,16 @@ theorem conjFin_locGL_mem (w : HeightOneSpectrum (𝓞 E))
 
 end GlobalTheory.ContraPair.SphTwist
 
-
 open GlobalTheory.ContraPair.SphTwist in
-theorem GlobalTheory.ContraPair.isSpherical_twist_of_dualIsConjBy : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a : ℕ), 1 ≤ a → ∀ (π : CuspSub E a) (ψ : HChar E), GlobalTheory.ContraPair.DualIsConjBy π ψ → ∀ w : HeightOneSpectrum (𝓞 E), ¬ GlobalTheory.UnitaryBC.IsSplitAt w → (∃ B, (CG.mk π).HasSat w B) → GlobalTheory.LGrp.IsSpherical ((π.twist ψ⁻¹).locRep w) (GlobalTheory.LFun.KGL w (n := a)) := by
+theorem GlobalTheory.ContraPair.isSpherical_twist_of_dualIsConjBy
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a : ℕ),
+      1 ≤ a
+        → ∀ (π : CuspSub E a) (ψ : HChar E),
+          GlobalTheory.ContraPair.DualIsConjBy π ψ
+            → ∀ w : HeightOneSpectrum (𝓞 E),
+              ¬ GlobalTheory.UnitaryBC.IsSplitAt w → (∃ B, (CG.mk π).HasSat w B)
+                → GlobalTheory.LGrp.IsSpherical ((π.twist ψ⁻¹).locRep w)
+                  (GlobalTheory.LFun.KGL w (n := a)) := by
   intro E _ _ _ a _ π ψ hP w hns hS
   obtain ⟨B0, hB0⟩ := hS
   obtain ⟨B, -, hB2, hfin, -, -⟩ := hP
@@ -75,7 +93,9 @@ theorem GlobalTheory.ContraPair.isSpherical_twist_of_dualIsConjBy : ∀ (E : Typ
   have hw : conjSrc (IsCMField.complexConj E).toRingEquiv w = w := by
     by_contra h
     exact hns ⟨_, h, GlobalTheory.DefU.LocRet.under_conjSrc w⟩
-  have hL : ∀ k ∈ GlobalTheory.LFun.KGL w (n := a), B.flip x ((π.twist ψ⁻¹).locRep w k y) = B.flip x y := by
+  have hL
+      : ∀ k ∈ GlobalTheory.LFun.KGL w (n := a),
+        B.flip x ((π.twist ψ⁻¹).locRep w k y) = B.flip x y := by
     intro k hk
     obtain ⟨k', hk', e⟩ := GlobalTheory.ContraPair.SphTwist.conjFin_locGL_mem w hw k hk
     have hx' : π.op (.fin (locGL E a w k')) x = x := GlobalTheory.LGrp.mem_fixed.1 hx k' hk'
@@ -84,8 +104,9 @@ theorem GlobalTheory.ContraPair.isSpherical_twist_of_dualIsConjBy : ∀ (E : Typ
     conv_lhs => rw [← hx']
     rw [← e]
     exact h1
-  obtain ⟨v, hv, hve⟩ := GlobalTheory.SmGL.IwahoriOnto.exists_fixed_map_eq ((π.twist ψ⁻¹).isSmooth_locRep w)
-    (GlobalTheory.LFun.SatCompare.isOpen_isCompact_KGL w a).2 (B.flip x) y hL
+  obtain ⟨v, hv, hve⟩ :=
+    GlobalTheory.SmGL.IwahoriOnto.exists_fixed_map_eq ((π.twist ψ⁻¹).isSmooth_locRep w)
+      (GlobalTheory.LFun.SatCompare.isOpen_isCompact_KGL w a).2 (B.flip x) y hL
   refine (Submodule.ne_bot_iff _).2 ⟨v, hv, fun h => hy ?_⟩
   have : B.flip x v = B y x := hve
   rw [← this, h, map_zero]

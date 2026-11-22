@@ -8,9 +8,10 @@ namespace ReciprocityTheory.CA
 
 open IsLocalRing
 
-theorem dimFormula_arith (a b : ℕ∞) (c d : WithBot ℕ∞) (n : ℕ) (hc : c ≠ ⊥) (hd : d ≠ ⊥)
-    (h1 : ((a + b : ℕ∞) : WithBot ℕ∞) + c = n) (h2 : (a : WithBot ℕ∞) + d = n) :
-    (b : WithBot ℕ∞) + c = d := by
+theorem dimFormula_arith
+    (a b : ℕ∞) (c d : WithBot ℕ∞) (n : ℕ) (hc : c ≠ ⊥) (hd : d ≠ ⊥)
+    (h1 : ((a + b : ℕ∞) : WithBot ℕ∞) + c = n) (h2 : (a : WithBot ℕ∞) + d = n)
+    : (b : WithBot ℕ∞) + c = d := by
   obtain ⟨c, rfl⟩ := WithBot.ne_bot_iff_exists.mp hc
   obtain ⟨d, rfl⟩ := WithBot.ne_bot_iff_exists.mp hd
   have e1 : a + b + c = (n : ℕ∞) := by exact_mod_cast h1

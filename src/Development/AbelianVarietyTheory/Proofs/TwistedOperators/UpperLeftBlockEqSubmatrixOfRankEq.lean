@@ -24,8 +24,9 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.Congruenc
 noncomputable section
 
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.L2.Pj
-  Formalism.IndefR.FWT
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.L2.Pj Formalism.IndefR.FWT
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level)
 open scoped TensorProduct Matrix
 
@@ -39,8 +40,11 @@ variable {D : D7} {V : HSp D}
 
 variable {β : GL (Fin V.rank) (EAf D)} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)}
 
-theorem le_of_half {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {l : Level H} {Pg : Finset (Pl D.host.E)}
-    (h : l.Mb = ∏ w ∈ Pg, w.asIdeal) {w : Pl D.host.E} (hw : w ∈ Pg) : l.Mb ≤ w.asIdeal :=
+theorem le_of_half
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {l : Level H}
+    {Pg : Finset (Pl D.host.E)} (h : l.Mb = ∏ w ∈ Pg, w.asIdeal)
+    {w : Pl D.host.E} (hw : w ∈ Pg)
+    : l.Mb ≤ w.asIdeal :=
   h.le.trans (Ideal.prod_le_inf.trans (Finset.inf_le hw))
 
 end Lattice
@@ -49,12 +53,18 @@ section Group
 
 variable {D : D7} {V : HSp D} (β : GL (Fin V.rank) (EAf D))
 
-variable {β} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} {H H' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E}
+variable
+  {β} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)}
+  {H H' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E}
 
-theorem liftsExist_of_half (hβ : IsSDFrame V β Λ 1) (l : Level H) (L : LevDat D.host.E ℂ V.rank) (hQ : L.Q = ∅)
-    (h : l.Mb = ∏ w ∈ L.Pg, w.asIdeal) : LiftsExist V β L := by
+theorem liftsExist_of_half
+    (hβ : IsSDFrame V β Λ 1)
+    (l : Level H) (L : LevDat D.host.E ℂ V.rank) (hQ : L.Q = ∅) (h : l.Mb = ∏ w ∈ L.Pg, w.asIdeal)
+    : LiftsExist V β L := by
   obtain ⟨c, hc⟩ := hβ
-  refine GlobalTheory.ParahoricLift.liftsExist _ _ _ _ _ hc (fun PP h1 PP' h' => ?_) (hQ ▸ Finset.disjoint_empty_right _)
+  refine GlobalTheory.ParahoricLift.liftsExist _ _ _ _ _ hc
+    (fun PP h1 PP' h' => ?_)
+    (hQ ▸ Finset.disjoint_empty_right _)
   rcases h' with h' | h'
   · exact GlobalTheory.LevelAction.not_isConjPl l (le_of_half h h1) (le_of_half h h')
   · exact absurd (hQ ▸ h') (Finset.notMem_empty _)
@@ -63,32 +73,39 @@ end Group
 
 section Record
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
-
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
 
 open Classical in
-theorem exists_half_prod {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} (l : Level H) (hM : l.M = D.host.g 0 * D.host.g 1) :
-    (∀ Pg : Finset (Pl D.host.E), (∀ w, w ∈ Pg ↔ l.Mb ≤ w.asIdeal) → l.Mb = ∏ w ∈ Pg, w.asIdeal) ∧
-      ∃ Pg : Finset (Pl D.host.E), l.Mb = ∏ w ∈ Pg, w.asIdeal := by
+theorem exists_half_prod
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E}
+    (l : Level H) (hM : l.M = D.host.g 0 * D.host.g 1)
+    : (∀ Pg : Finset (Pl D.host.E), (∀ w, w ∈ Pg ↔ l.Mb ≤ w.asIdeal) → l.Mb = ∏ w ∈ Pg, w.asIdeal)
+      ∧ ∃ Pg : Finset (Pl D.host.E), l.Mb = ∏ w ∈ Pg, w.asIdeal := by
   have hprod := l.prod
   rw [hM] at hprod
-  have hs : Squarefree l.Mb := (hprod ▸ GlobalTheory.CoverHalf.squarefree_span_g D : Squarefree (l.Mb * _)).of_mul_left
-  refine ⟨fun Pg h => GlobalTheory.CoverHalf.eq_prod_of_squarefree hs _ h,
-    (Ideal.finite_factors hs.ne_zero).toFinset, GlobalTheory.CoverHalf.eq_prod_of_squarefree hs _ fun w => ?_⟩
+  have hs : Squarefree l.Mb :=
+    (hprod ▸ GlobalTheory.CoverHalf.squarefree_span_g D : Squarefree (l.Mb * _)).of_mul_left
+  refine ⟨
+    fun Pg h => GlobalTheory.CoverHalf.eq_prod_of_squarefree hs _ h,
+    (Ideal.finite_factors hs.ne_zero).toFinset,
+    GlobalTheory.CoverHalf.eq_prod_of_squarefree hs _ fun w => ?_
+  ⟩
   rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_iff_le]
 
-theorem mem_Pg_iff {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0) (w : Pl D.host.E) :
-    w ∈ L.Pg ↔ (GlobalTheory.HalfOnRecord.designLevel L.C.P).Mb ≤ w.asIdeal := by
+theorem mem_Pg_iff {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0) (w : Pl D.host.E)
+    : w ∈ L.Pg ↔ (GlobalTheory.HalfOnRecord.designLevel L.C.P).Mb ≤ w.asIdeal := by
   rw [hL.Pg, GlobalTheory.HalfOnRecord.designLevel_Mb, GlobalTheory.CoverHalf.prod_map_le_iff]
   rfl
 
-theorem designLevel_prod {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0) :
-    (GlobalTheory.HalfOnRecord.designLevel L.C.P).Mb = ∏ w ∈ L.Pg, w.asIdeal :=
+theorem designLevel_prod {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0)
+    : (GlobalTheory.HalfOnRecord.designLevel L.C.P).Mb = ∏ w ∈ L.Pg, w.asIdeal :=
   (exists_half_prod _ rfl).1 _ (mem_Pg_iff hL)
 
-theorem levelLiftsExist_gridVertexSpaces {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0) (i : Fin D.R.m) :
-    LiftsExist (Wc D i) (L.βW i) (L.datWp i L.triv) :=
-  liftsExist_of_half (hL.βW i) (GlobalTheory.HalfOnRecord.designLevel L.C.P) _ rfl (designLevel_prod hL)
+theorem levelLiftsExist_gridVertexSpaces {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0) (i : Fin D.R.m)
+    : LiftsExist (Wc D i) (L.βW i) (L.datWp i L.triv) :=
+  liftsExist_of_half (hL.βW i) (GlobalTheory.HalfOnRecord.designLevel L.C.P) _ rfl
+    (designLevel_prod hL)
 
 variable (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (R : RealDat D A T.Q.c.F)
 
@@ -96,12 +113,16 @@ end Record
 
 section Main
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
 
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelGroupLifts (LevGrp IsGeoRep UnitConstEquivariant)
-open GlobalTheory.IndefiniteRowSideFullHecke.GeometricConstantEquiv (Cusp IsGeo ReadTwist KeepsIntegral ConstEquiv GeoActAt)
+open GlobalTheory.IndefiniteRowSideFullHecke.GeometricConstantEquiv
+  (Cusp IsGeo ReadTwist KeepsIntegral ConstEquiv GeoActAt)
 
-variable {T : CoreJ D} [Algebra T.Q.c.F D.what₂.LL] {R : RealDat D A T.Q.c.F} {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)}
+variable
+  {T : CoreJ D} [Algebra T.Q.c.F D.what₂.LL]
+  {R : RealDat D A T.Q.c.F} {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)}
 
 end Main
 

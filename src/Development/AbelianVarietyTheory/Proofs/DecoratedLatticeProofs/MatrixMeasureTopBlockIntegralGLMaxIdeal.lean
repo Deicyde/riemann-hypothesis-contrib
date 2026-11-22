@@ -20,32 +20,41 @@ namespace GlobalTheory.RectBlockVolume
 section Gen
 variable {k : Type} [MeasurableSpace k] (ν : Measure k) [SigmaFinite ν]
 
-def rectEquiv (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [Fintype C] :
-    Matrix (A ⊕ D) (B ⊕ C) k ≃ᵐ ((Matrix A B k × Matrix A C k) × (Matrix D B k × Matrix D C k)) :=
+def rectEquiv (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [Fintype C]
+    : Matrix (A ⊕ D) (B ⊕ C) k ≃ᵐ ((Matrix A B k × Matrix A C k) × (Matrix D B k × Matrix D C k)) :=
   (MeasurableEquiv.sumPiEquivProdPi (fun _ : A ⊕ D => (B ⊕ C) → k)).trans
-    (MeasurableEquiv.prodCongr (GlobalTheory.BlockVolume.colSplit A B C) (GlobalTheory.BlockVolume.colSplit D B C))
+    (MeasurableEquiv.prodCongr (GlobalTheory.BlockVolume.colSplit A B C)
+      (GlobalTheory.BlockVolume.colSplit D B C))
 
-theorem rectEquiv_mp (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [Fintype C] :
-    MeasurePreserving (rectEquiv (k := k) A D B C) (GlobalTheory.SplitWeil.volM ν (A ⊕ D) (B ⊕ C))
+theorem rectEquiv_mp (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [Fintype C]
+    : MeasurePreserving (rectEquiv (k := k) A D B C) (GlobalTheory.SplitWeil.volM ν (A ⊕ D) (B ⊕ C))
       (((GlobalTheory.SplitWeil.volM ν A B).prod (GlobalTheory.SplitWeil.volM ν A C)).prod
         ((GlobalTheory.SplitWeil.volM ν D B).prod (GlobalTheory.SplitWeil.volM ν D C))) := by
   have h1 := measurePreserving_sumPiEquivProdPi (fun _ : A ⊕ D => Measure.pi fun _ : B ⊕ C => ν)
-  have h2 := (GlobalTheory.BlockVolume.colSplit_mp ν A B C).prod (GlobalTheory.BlockVolume.colSplit_mp ν D B C)
+  have h2 :=
+    (GlobalTheory.BlockVolume.colSplit_mp ν A B C).prod
+      (GlobalTheory.BlockVolume.colSplit_mp ν D B C)
   exact h2.comp h1
 
-theorem volM_rect_blocks (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [Fintype C]
-    (S₁₁ : Set (Matrix A B k)) (S₁₂ : Set (Matrix A C k)) (S₂₁ : Set (Matrix D B k)) (S₂₂ : Set (Matrix D C k)) :
-    GlobalTheory.SplitWeil.volM ν (A ⊕ D) (B ⊕ C)
-                 {x | x.toBlocks₁₁ ∈ S₁₁ ∧ x.toBlocks₁₂ ∈ S₁₂ ∧ x.toBlocks₂₁ ∈ S₂₁ ∧ x.toBlocks₂₂ ∈ S₂₂} =
-      GlobalTheory.SplitWeil.volM ν A B S₁₁ * GlobalTheory.SplitWeil.volM ν A C S₁₂ * GlobalTheory.SplitWeil.volM ν D B S₂₁ *
-        GlobalTheory.SplitWeil.volM ν D C S₂₂ := by
+theorem volM_rect_blocks
+    (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [Fintype C]
+    (S₁₁ : Set (Matrix A B k)) (S₁₂ : Set (Matrix A C k)) (S₂₁ : Set (Matrix D B k))
+    (S₂₂ : Set (Matrix D C k))
+    : GlobalTheory.SplitWeil.volM ν (A ⊕ D) (B ⊕ C)
+        {x | x.toBlocks₁₁ ∈ S₁₁ ∧ x.toBlocks₁₂ ∈ S₁₂ ∧ x.toBlocks₂₁ ∈ S₂₁ ∧ x.toBlocks₂₂ ∈ S₂₂}
+      = GlobalTheory.SplitWeil.volM ν A B S₁₁ * GlobalTheory.SplitWeil.volM ν A C S₁₂
+        * GlobalTheory.SplitWeil.volM ν D B S₂₁ * GlobalTheory.SplitWeil.volM ν D C S₂₂ := by
   haveI hσ : ∀ (m n : Type) [Fintype m] [Fintype n], SigmaFinite (GlobalTheory.SplitWeil.volM ν m n) := fun m n _ _ => by
     exact (inferInstance : SigmaFinite (Measure.pi fun _ : m => Measure.pi fun _ : n => ν :
       Measure (m → n → k)))
-  haveI := hσ A B; haveI := hσ A C; haveI := hσ D B; haveI := hσ D C
-  have hset : {x : Matrix (A ⊕ D) (B ⊕ C) k | x.toBlocks₁₁ ∈ S₁₁ ∧ x.toBlocks₁₂ ∈ S₁₂ ∧
-      x.toBlocks₂₁ ∈ S₂₁ ∧ x.toBlocks₂₂ ∈ S₂₂} =
-      rectEquiv (k := k) A D B C ⁻¹' ((S₁₁ ×ˢ S₁₂) ×ˢ (S₂₁ ×ˢ S₂₂)) := by
+  haveI := hσ A B
+  haveI := hσ A C
+  haveI := hσ D B
+  haveI := hσ D C
+  have hset
+      : {x : Matrix (A ⊕ D) (B ⊕ C) k | x.toBlocks₁₁ ∈ S₁₁ ∧ x.toBlocks₁₂ ∈ S₁₂ ∧
+          x.toBlocks₂₁ ∈ S₂₁ ∧ x.toBlocks₂₂ ∈ S₂₂}
+        = rectEquiv (k := k) A D B C ⁻¹' ((S₁₁ ×ˢ S₁₂) ×ˢ (S₂₁ ×ˢ S₂₂)) := by
     ext x
     exact ⟨fun ⟨h1, h2, h3, h4⟩ => ⟨⟨h1, h2⟩, h3, h4⟩, fun ⟨⟨h1, h2⟩, h3, h4⟩ => ⟨h1, h2, h3, h4⟩⟩
   rw [hset]
@@ -53,24 +62,33 @@ theorem volM_rect_blocks (A D B C : Type) [Fintype A] [Fintype D] [Fintype B] [F
   rw [Measure.prod_prod, Measure.prod_prod, Measure.prod_prod]
   ring
 
-def reidx (r a' b' : ℕ) : Matrix (Fin r ⊕ Fin b') (Fin r ⊕ Fin a') k ≃ᵐ Matrix (Fin (r + b')) (Fin (r + a')) k :=
-  (MeasurableEquiv.piCongrRight fun _ => MeasurableEquiv.piCongrLeft (fun _ => k) finSumFinEquiv).trans
+def reidx (r a' b' : ℕ)
+    : Matrix (Fin r ⊕ Fin b') (Fin r ⊕ Fin a') k ≃ᵐ Matrix (Fin (r + b')) (Fin (r + a')) k :=
+  (MeasurableEquiv.piCongrRight fun _ =>
+      MeasurableEquiv.piCongrLeft (fun _ => k) finSumFinEquiv).trans
     (MeasurableEquiv.piCongrLeft (fun _ => Fin (r + a') → k) finSumFinEquiv)
 
-theorem reidx_apply (r a' b' : ℕ) (y : Matrix (Fin r ⊕ Fin b') (Fin r ⊕ Fin a') k) (i : Fin r ⊕ Fin b')
-    (j : Fin r ⊕ Fin a') : reidx r a' b' y (finSumFinEquiv i) (finSumFinEquiv j) = y i j := by
+theorem reidx_apply
+    (r a' b' : ℕ)
+    (y : Matrix (Fin r ⊕ Fin b') (Fin r ⊕ Fin a') k) (i : Fin r ⊕ Fin b') (j : Fin r ⊕ Fin a')
+    : reidx r a' b' y (finSumFinEquiv i) (finSumFinEquiv j) = y i j := by
   show Equiv.piCongrLeft (fun _ => Fin (r + a') → k) finSumFinEquiv
     (fun i => Equiv.piCongrLeft (fun _ => k) finSumFinEquiv (y i)) (finSumFinEquiv i) (finSumFinEquiv j) = y i j
   rw [Equiv.piCongrLeft_apply_apply, Equiv.piCongrLeft_apply_apply]
 
-theorem reidx_mp (r a' b' : ℕ) :
-    MeasurePreserving (reidx (k := k) r a' b') (GlobalTheory.SplitWeil.volM ν (Fin r ⊕ Fin b') (Fin r ⊕ Fin a'))
+theorem reidx_mp (r a' b' : ℕ)
+    : MeasurePreserving (reidx (k := k) r a' b')
+      (GlobalTheory.SplitWeil.volM ν (Fin r ⊕ Fin b') (Fin r ⊕ Fin a'))
       (GlobalTheory.SplitWeil.volM ν (Fin (r + b')) (Fin (r + a'))) := by
-  have h1 := measurePreserving_pi (fun _ : Fin r ⊕ Fin b' => Measure.pi fun _ : Fin r ⊕ Fin a' => ν)
-    (fun _ => Measure.pi fun _ : Fin (r + a') => ν)
-    (fun _ => measurePreserving_piCongrLeft (fun _ : Fin (r + a') => ν) finSumFinEquiv)
-  have h2 := measurePreserving_piCongrLeft (fun _ : Fin (r + b') => Measure.pi fun _ : Fin (r + a') => ν)
-    finSumFinEquiv
+  have h1 :=
+    measurePreserving_pi
+      (fun _ : Fin r ⊕ Fin b' => Measure.pi fun _ : Fin r ⊕ Fin a' => ν)
+      (fun _ => Measure.pi fun _ : Fin (r + a') => ν)
+      (fun _ => measurePreserving_piCongrLeft (fun _ : Fin (r + a') => ν) finSumFinEquiv)
+  have h2 :=
+    measurePreserving_piCongrLeft
+      (fun _ : Fin (r + b') => Measure.pi fun _ : Fin (r + a') => ν)
+      finSumFinEquiv
   exact h2.comp h1
 
 end Gen
@@ -78,9 +96,10 @@ end Gen
 section Loc
 open ValuativeRel
 
-theorem pi_smul_const (ι : Type) [Fintype ι] {X : Type} [MeasurableSpace X] (μ : Measure X) [SigmaFinite μ]
-    (c : ℝ≥0) :
-    Measure.pi (fun _ : ι => (c : ℝ≥0∞) • μ) = ((c : ℝ≥0∞) ^ Fintype.card ι) • Measure.pi (fun _ : ι => μ) := by
+theorem pi_smul_const
+    (ι : Type) [Fintype ι] {X : Type} [MeasurableSpace X] (μ : Measure X) [SigmaFinite μ] (c : ℝ≥0)
+    : Measure.pi (fun _ : ι => (c : ℝ≥0∞) • μ)
+      = ((c : ℝ≥0∞) ^ Fintype.card ι) • Measure.pi (fun _ : ι => μ) := by
   haveI : SigmaFinite ((c : ℝ≥0∞) • μ) := by
     have e : (c : ℝ≥0∞) • μ = c • μ := by
       ext s _
@@ -92,9 +111,9 @@ theorem pi_smul_const (ι : Type) [Fintype ι] {X : Type} [MeasurableSpace X] (�
 
 variable {k : Type} [MeasurableSpace k]
 
-theorem volM_smul (ν : Measure k) [SigmaFinite ν] (c : ℝ≥0) (m n : Type) [Fintype m] [Fintype n] :
-    GlobalTheory.SplitWeil.volM ((c : ℝ≥0∞) • ν) m n =
-      ((c : ℝ≥0∞) ^ (Fintype.card n * Fintype.card m)) • GlobalTheory.SplitWeil.volM ν m n := by
+theorem volM_smul (ν : Measure k) [SigmaFinite ν] (c : ℝ≥0) (m n : Type) [Fintype m] [Fintype n]
+    : GlobalTheory.SplitWeil.volM ((c : ℝ≥0∞) • ν) m n
+      = ((c : ℝ≥0∞) ^ (Fintype.card n * Fintype.card m)) • GlobalTheory.SplitWeil.volM ν m n := by
   unfold GlobalTheory.SplitWeil.volM
   rw [pi_smul_const n ν c]
   have e : ((c : ℝ≥0∞) ^ Fintype.card n) = ((c ^ Fintype.card n : ℝ≥0) : ℝ≥0∞) := by push_cast; rfl
@@ -103,15 +122,18 @@ theorem volM_smul (ν : Measure k) [SigmaFinite ν] (c : ℝ≥0) (m n : Type) [
   rw [← pow_mul]
   rfl
 
-variable [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [BorelSpace k]
+variable
+  [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [BorelSpace k]
 
-theorem volKO_real (ν : Measure k) [ν.IsAddHaarMeasure] (r : ℕ) :
-    (GlobalTheory.SplitWeil.volM ν (Fin r) (Fin r) (Units.val '' (GlobalTheory.SplitWeil.KO k (Fin r) : Set (GL (Fin r) k)))).toReal =
-      (ν (𝒪[k] : Set k)).toReal ^ (r * r) *
-        ∏ n ∈ Finset.Ioc 0 r, (1 - ((GlobalTheory.SplitWeil.resCard k : ℝ) ^ n)⁻¹) := by
+theorem volKO_real (ν : Measure k) [ν.IsAddHaarMeasure] (r : ℕ)
+    : (GlobalTheory.SplitWeil.volM ν (Fin r) (Fin r)
+        (Units.val '' (GlobalTheory.SplitWeil.KO k (Fin r) : Set (GL (Fin r) k)))).toReal
+      = (ν (𝒪[k] : Set k)).toReal ^ (r * r)
+        * ∏ n ∈ Finset.Ioc 0 r, (1 - ((GlobalTheory.SplitWeil.resCard k : ℝ) ^ n)⁻¹) := by
   haveI := GlobalTheory.SplitWeil.secondCountable k
   haveI : SigmaFinite ν := inferInstance
-  have h0 : ν (𝒪[k] : Set k) ≠ 0 := (GlobalTheory.SplitWeil.isOpen_int k).measure_ne_zero ν ⟨0, zero_mem _⟩
+  have h0 : ν (𝒪[k] : Set k) ≠ 0 :=
+    (GlobalTheory.SplitWeil.isOpen_int k).measure_ne_zero ν ⟨0, zero_mem _⟩
   have htop : ν (𝒪[k] : Set k) ≠ ∞ := (GlobalTheory.SplitWeil.isCompact_int k).measure_lt_top.ne
   set c : ℝ≥0 := (ν (𝒪[k] : Set k)).toNNReal with hcdef
   have hcc : (c : ℝ≥0∞) = ν (𝒪[k] : Set k) := ENNReal.coe_toNNReal htop
@@ -119,18 +141,24 @@ theorem volKO_real (ν : Measure k) [ν.IsAddHaarMeasure] (r : ℕ) :
   set ν₁ : Measure k := (c : ℝ≥0∞)⁻¹ • ν with hν₁def
   haveI hH : ν₁.IsAddHaarMeasure :=
     Measure.IsAddHaarMeasure.smul ν (ENNReal.inv_ne_zero.2 ENNReal.coe_ne_top) (ENNReal.inv_ne_top.2 hc0)
-  have hν₁ : GlobalTheory.SplitWeil.IsUnitVol ν₁ := ⟨hH, by
-    rw [hν₁def, Measure.smul_apply, smul_eq_mul, ← hcc, ENNReal.inv_mul_cancel hc0 ENNReal.coe_ne_top]⟩
+  have hν₁ : GlobalTheory.SplitWeil.IsUnitVol ν₁ := ⟨
+    hH,
+    by
+      rw [hν₁def, Measure.smul_apply, smul_eq_mul, ← hcc,
+        ENNReal.inv_mul_cancel hc0 ENNReal.coe_ne_top]
+  ⟩
   have hνeq : ν = (c : ℝ≥0∞) • ν₁ := by
     rw [hν₁def, smul_smul, ENNReal.mul_inv_cancel hc0 ENNReal.coe_ne_top, one_smul]
   haveI : SigmaFinite ν₁ := inferInstance
-  have hV : GlobalTheory.SplitWeil.volM ν (Fin r) (Fin r) = ((c : ℝ≥0∞) ^ (r * r)) • GlobalTheory.SplitWeil.volM ν₁ (Fin r) (Fin r) := by
+  have hV
+      : GlobalTheory.SplitWeil.volM ν (Fin r) (Fin r)
+        = ((c : ℝ≥0∞) ^ (r * r)) • GlobalTheory.SplitWeil.volM ν₁ (Fin r) (Fin r) := by
     conv_lhs => rw [hνeq]
     rw [volM_smul, Fintype.card_fin]
   have h1 := GlobalTheory.ChainStepIdentities.volAdd_eq k ν₁ hν₁ r
   unfold GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection.volAdd at h1
-  rw [hV, Measure.smul_apply, smul_eq_mul, ENNReal.toReal_mul, ← Measure.real, h1, ENNReal.toReal_pow, ← hcc,
-    ENNReal.coe_toReal]
+  rw [hV, Measure.smul_apply, smul_eq_mul, ENNReal.toReal_mul, ← Measure.real, h1,
+    ENNReal.toReal_pow, ← hcc, ENNReal.coe_toReal]
   congr 1
   have hIcc : Finset.Icc 1 r = Finset.Ioc 0 r := by ext; simp; omega
   rw [hIcc]
@@ -139,7 +167,6 @@ theorem volKO_real (ν : Measure k) [ν.IsAddHaarMeasure] (r : ℕ) :
 
 end Loc
 end GlobalTheory.RectBlockVolume
-
 
 open ValuativeRel in
 theorem GlobalTheory.RectBlockVolume.vol_topBlock_KO : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ν : Measure k), ν.IsAddHaarMeasure → ∀ (a b r : ℕ), r ≤ a → r ≤ b → (GlobalTheory.SplitWeil.volM ν (Fin b) (Fin a) {x | topL r x ∈ Units.val '' (GlobalTheory.SplitWeil.KO k (Fin r) : Set (GL (Fin r) k)) ∧ (∀ i j, ValuativeRel.valuation k (x i j) ≤ 1) ∧ ∀ i j, r ≤ i.val → j.val < r → ValuativeRel.valuation k (x i j) < 1}).toReal = (GlobalTheory.SplitWeil.volM ν (Fin b) (Fin a) {x | ∀ i j, ValuativeRel.valuation k (x i j) ≤ 1}).toReal * ((∏ n ∈ Finset.Ioc 0 r, (1 - ((GlobalTheory.SplitWeil.resCard k : ℝ) ^ n)⁻¹)) * ((GlobalTheory.SplitWeil.resCard k : ℝ) ^ (r * (b - r)))⁻¹) := by

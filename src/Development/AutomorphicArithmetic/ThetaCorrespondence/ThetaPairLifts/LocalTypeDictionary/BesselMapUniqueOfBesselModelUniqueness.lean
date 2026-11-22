@@ -12,8 +12,9 @@ open scoped ContDiff
 namespace GlobalTheory.BesselMapOne
 section Smooth
 open Formalism.MainNotions.S Formalism.L2.Theta Formalism.QuantumDeterminants GlobalTheory.SmVec
-variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {J : Matrix (Fin n) (Fin n) ℂ}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+variable
+  {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {J : Matrix (Fin n) (Fin n) ℂ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 section
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 end
@@ -29,7 +30,8 @@ variable {k : ℕ} {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
 end Dual
 section Main
 open PI.UpqRep PI.HwUniqW GlobalTheory.RealBessel PI.BesselMapUniq GlobalTheory.SmVec
-variable {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)}
 end Main
 end GlobalTheory.BesselMapOne

@@ -12,14 +12,17 @@ namespace PositivityTheory.Rg.Sw.HSt.CompactCayleyBlocks
 
 variable {n : ℕ}
 
-theorem span_unitary_matrix :
-    Submodule.span ℂ (unitary (Matrix (Fin n) (Fin n) ℂ) : Set (Matrix (Fin n) (Fin n) ℂ)) = ⊤ := by
-  open scoped Matrix.Norms.L2Operator in exact CStarAlgebra.span_unitary (A := Matrix (Fin n) (Fin n) ℂ)
+theorem span_unitary_matrix
+    : Submodule.span ℂ (unitary (Matrix (Fin n) (Fin n) ℂ) : Set (Matrix (Fin n) (Fin n) ℂ))
+      = ⊤ := by
+  open scoped Matrix.Norms.L2Operator in
+  exact CStarAlgebra.span_unitary (A := Matrix (Fin n) (Fin n) ℂ)
 
-def pm (σ : Equiv.Perm (Fin n)) : Matrix (Fin n) (Fin n) ℂ := Matrix.of fun i j => if σ i = j then 1 else 0
+def pm (σ : Equiv.Perm (Fin n)) : Matrix (Fin n) (Fin n) ℂ :=
+  Matrix.of fun i j => if σ i = j then 1 else 0
 
-theorem pm_conj (σ : Equiv.Perm (Fin n)) (X : Matrix (Fin n) (Fin n) ℂ) :
-    pm σ * X * (pm σ)ᴴ = X.submatrix σ σ := by
+theorem pm_conj (σ : Equiv.Perm (Fin n)) (X : Matrix (Fin n) (Fin n) ℂ)
+    : pm σ * X * (pm σ)ᴴ = X.submatrix σ σ := by
   ext i j
   simp [pm, Matrix.mul_apply, Matrix.conjTranspose_apply, eq_comm]
 
@@ -33,15 +36,17 @@ theorem pm_unit (σ : Equiv.Perm (Fin n)) : (pm σ)ᴴ * pm σ = 1 := by
     simp [this]
   · simp
 
-def dph (a : Fin n) : Matrix (Fin n) (Fin n) ℂ := Matrix.diagonal fun i => if i = a then Complex.I else 1
+def dph (a : Fin n) : Matrix (Fin n) (Fin n) ℂ :=
+  Matrix.diagonal fun i => if i = a then Complex.I else 1
 
 theorem dph_unit (a : Fin n) : (dph a)ᴴ * dph a = 1 := by
   rw [dph, diagonal_conjTranspose, diagonal_mul_diagonal, ← diagonal_one]
-  congr 1; funext i
+  congr 1
+  funext i
   by_cases hi : i = a <;> simp [hi]
 
-theorem dph_conj {a b : Fin n} (hab : a ≠ b) :
-    dph a * Matrix.single a b (1 : ℂ) * (dph a)ᴴ = Complex.I • Matrix.single a b (1 : ℂ) := by
+theorem dph_conj {a b : Fin n} (hab : a ≠ b)
+    : dph a * Matrix.single a b (1 : ℂ) * (dph a)ᴴ = Complex.I • Matrix.single a b (1 : ℂ) := by
   ext i j
   rw [dph, diagonal_conjTranspose, Matrix.mul_diagonal, Matrix.diagonal_mul]
   simp only [Matrix.single_apply, Matrix.smul_apply, smul_eq_mul, Pi.star_apply]
@@ -51,10 +56,10 @@ theorem dph_conj {a b : Fin n} (hab : a ≠ b) :
   · simp [hi]
   · simp [hi, hj]
 
-theorem inv_trace (L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ℂ)
-    (h : ∀ U X : Matrix (Fin n) (Fin n) ℂ, Uᴴ * U = 1 → Xᴴ * X = 1 → L (U * X * Uᴴ) = L X) :
-    ∀ X, L X = L 1 / n * X.trace := by
-
+theorem inv_trace
+    (L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ℂ)
+    (h : ∀ U X : Matrix (Fin n) (Fin n) ℂ, Uᴴ * U = 1 → Xᴴ * X = 1 → L (U * X * Uᴴ) = L X)
+    : ∀ X, L X = L 1 / n * X.trace := by
   have h' : ∀ U X : Matrix (Fin n) (Fin n) ℂ, Uᴴ * U = 1 → L (U * X * Uᴴ) = L X := by
     intro U X hU
     let C : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ℂ :=
@@ -82,7 +87,8 @@ theorem inv_trace (L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ℂ)
     intro a b
     have e := h' (pm (Equiv.swap a b)) (Matrix.single a a 1) (pm_unit _)
     rw [pm_conj] at e
-    have : (Matrix.single a a (1 : ℂ)).submatrix (Equiv.swap a b) (Equiv.swap a b) = Matrix.single b b 1 := by
+    have : (Matrix.single a a (1 : ℂ)).submatrix (Equiv.swap a b) (Equiv.swap a b)
+        = Matrix.single b b 1 := by
       have key : ∀ x, a = (Equiv.swap a b) x ↔ b = x := by
         intro x; rw [eq_comm, Equiv.swap_apply_eq_iff, Equiv.swap_apply_left, eq_comm]
       ext i j
@@ -103,14 +109,18 @@ theorem inv_trace (L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ℂ)
     rw [Matrix.trace, Finset.mul_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Finset.sum_eq_single a]
-    · rw [show Matrix.single a a (Y a a) = Y a a • Matrix.single a a (1 : ℂ) by rw [Matrix.smul_single, smul_eq_mul, mul_one],
-        L.map_smul, smul_eq_mul, hdiag a ⟨0, hn⟩, Matrix.diag_apply]; ring
+    · rw [show Matrix.single a a (Y a a) = Y a a • Matrix.single a a (1 : ℂ) by
+          rw [Matrix.smul_single, smul_eq_mul, mul_one],
+        L.map_smul, smul_eq_mul, hdiag a ⟨0, hn⟩, Matrix.diag_apply]
+      ring
     · intro b _ hb
-      rw [show Matrix.single a b (Y a b) = Y a b • Matrix.single a b (1 : ℂ) by rw [Matrix.smul_single, smul_eq_mul, mul_one],
+      rw [show Matrix.single a b (Y a b) = Y a b • Matrix.single a b (1 : ℂ) by
+          rw [Matrix.smul_single, smul_eq_mul, mul_one],
         L.map_smul, hoff a b (Ne.symm hb), smul_zero]
     · simp
   have h1 : L 1 = κ * n := by rw [hsum, trace_one, Fintype.card_fin]
   have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
-  rw [hsum X, h1]; field_simp
+  rw [hsum X, h1]
+  field_simp
 
 end PositivityTheory.Rg.Sw.HSt.CompactCayleyBlocks

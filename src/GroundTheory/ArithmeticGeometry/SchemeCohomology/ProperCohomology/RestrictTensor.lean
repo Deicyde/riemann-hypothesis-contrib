@@ -41,16 +41,20 @@ lemma sec'_smul (r : Γ(Y, f ''ᵁ U)) (m : ((preMod Y).obj M).obj (op (f ''ᵁ 
   change r • m = ringInv f U (ringHom f U r) • m
   rw [ringInv_ringHom]
 
-def toImage :
-    ((preMod X).obj (M.restrict f)).obj (op U) ⊗[Γ(X, U)]
-      ((preMod X).obj (N.restrict f)).obj (op U) →+
-      ((preMod Y).obj M).obj (op (f ''ᵁ U)) ⊗[Γ(Y, f ''ᵁ U)]
-        ((preMod Y).obj N).obj (op (f ''ᵁ U)) :=
+def toImage
+    : ((preMod X).obj (M.restrict f)).obj (op U) ⊗[Γ(X, U)]
+        ((preMod X).obj (N.restrict f)).obj (op U)
+      →+ ((preMod Y).obj M).obj (op (f ''ᵁ U)) ⊗[Γ(Y, f ''ᵁ U)]
+           ((preMod Y).obj N).obj (op (f ''ᵁ U)) :=
   TensorProduct.liftAddHom
-    (AddMonoidHom.mk' (fun m => AddMonoidHom.mk' (fun n => sec f M U m ⊗ₜ sec f N U n)
-      (fun a b => by rw [map_add (f := _), tmul_add]))
-      (fun a b => by ext n; simp only [AddMonoidHom.mk'_apply, AddMonoidHom.add_apply, map_add (f := _),
-        add_tmul]))
+    (AddMonoidHom.mk'
+      (fun m =>
+        AddMonoidHom.mk'
+          (fun n => sec f M U m ⊗ₜ sec f N U n)
+          (fun a b => by rw [map_add (f := _), tmul_add]))
+      (fun a b => by
+        ext n
+        simp only [AddMonoidHom.mk'_apply, AddMonoidHom.add_apply, map_add (f := _), add_tmul]))
     (fun r m n => by
       simp only [AddMonoidHom.mk'_apply, sec_smul]
       exact smul_tmul _ _ _)
@@ -59,16 +63,20 @@ lemma toImage_tmul (m : ((preMod X).obj (M.restrict f)).obj (op U))
     (n : ((preMod X).obj (N.restrict f)).obj (op U)) :
     toImage f M N U (m ⊗ₜ n) = sec f M U m ⊗ₜ sec f N U n := rfl
 
-def ofImage :
-    ((preMod Y).obj M).obj (op (f ''ᵁ U)) ⊗[Γ(Y, f ''ᵁ U)]
-      ((preMod Y).obj N).obj (op (f ''ᵁ U)) →+
-      ((preMod X).obj (M.restrict f)).obj (op U) ⊗[Γ(X, U)]
-        ((preMod X).obj (N.restrict f)).obj (op U) :=
+def ofImage
+    : ((preMod Y).obj M).obj (op (f ''ᵁ U)) ⊗[Γ(Y, f ''ᵁ U)]
+        ((preMod Y).obj N).obj (op (f ''ᵁ U))
+      →+ ((preMod X).obj (M.restrict f)).obj (op U) ⊗[Γ(X, U)]
+           ((preMod X).obj (N.restrict f)).obj (op U) :=
   TensorProduct.liftAddHom
-    (AddMonoidHom.mk' (fun m => AddMonoidHom.mk' (fun n => sec' f M U m ⊗ₜ sec' f N U n)
-      (fun a b => by rw [map_add (f := _), tmul_add]))
-      (fun a b => by ext n; simp only [AddMonoidHom.mk'_apply, AddMonoidHom.add_apply, map_add (f := _),
-        add_tmul]))
+    (AddMonoidHom.mk'
+      (fun m =>
+        AddMonoidHom.mk'
+          (fun n => sec' f M U m ⊗ₜ sec' f N U n)
+          (fun a b => by rw [map_add (f := _), tmul_add]))
+      (fun a b => by
+        ext n
+        simp only [AddMonoidHom.mk'_apply, AddMonoidHom.add_apply, map_add (f := _), add_tmul]))
     (fun r m n => by
       simp only [AddMonoidHom.mk'_apply, sec'_smul]
       exact smul_tmul _ _ _)
@@ -93,10 +101,11 @@ lemma toImage_smul (r : Γ(X, U)) (z : ((preMod X).obj (M.restrict f)).obj (op U
     rw [TensorProduct.smul_tmul', toImage_tmul, toImage_tmul, sec_smul, TensorProduct.smul_tmul']
   | add a b ha hb => rw [smul_add, map_add (f := _), map_add (f := _), ha, hb, smul_add]
 
-def compApp : ((preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f)).obj (op U) →+
-    ((preMod X).obj ((M ⊗ N).restrict f)).obj (op U) :=
-  (sec' f (M ⊗ N) U).comp (((tensorToSheaf M N).app (op (f ''ᵁ U))).hom.toAddMonoidHom.comp
-    (toImage f M N U))
+def compApp
+    : ((preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f)).obj (op U)
+      →+ ((preMod X).obj ((M ⊗ N).restrict f)).obj (op U) :=
+  (sec' f (M ⊗ N) U).comp
+    (((tensorToSheaf M N).app (op (f ''ᵁ U))).hom.toAddMonoidHom.comp (toImage f M N U))
 
 lemma compApp_smul (r : Γ(X, U))
     (z : ((preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f)).obj (op U)) :
@@ -107,23 +116,29 @@ lemma compApp_smul (r : Γ(X, U))
     (toImage_smul f M N U r z)).trans
       (((tensorToSheaf M N).app (op (f ''ᵁ U))).hom.map_smul (ringInv f U r) (toImage f M N U z)))
 
-def comp : (preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f) ⟶
-    (preMod X).obj ((M ⊗ N).restrict f) :=
+def comp
+    : (preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f)
+      ⟶ (preMod X).obj ((M ⊗ N).restrict f) :=
   PresheafOfModules.homMk
-    { app := fun U => AddCommGrpCat.ofHom (compApp f M N U.unop)
+    {
+      app := fun U => AddCommGrpCat.ofHom (compApp f M N U.unop)
       naturality := fun U V g => by
         ext z
-        let L := (compApp f M N V.unop).comp (((preMod X).obj (M.restrict f) ⊗
-          (preMod X).obj (N.restrict f)).map g).hom.toAddMonoidHom
-        let R := (((preMod X).obj ((M ⊗ N).restrict f)).map g).hom.toAddMonoidHom.comp
-          (compApp f M N U.unop)
+        let L :=
+          (compApp f M N V.unop).comp
+            (((preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f)).map
+              g).hom.toAddMonoidHom
+        let R :=
+          (((preMod X).obj ((M ⊗ N).restrict f)).map g).hom.toAddMonoidHom.comp
+            (compApp f M N U.unop)
         change L z = R z
         induction z using TensorProduct.inductionOn with
         | tmul m n =>
           exact PresheafOfModules.naturality_apply (tensorToSheaf M N)
             (f.opensFunctor.map g.unop).op (sec f M U.unop m ⊗ₜ sec f N U.unop n)
         | add a b ha hb =>
-          exact (map_add L a b).trans ((congrArg₂ (· + ·) ha hb).trans (map_add R a b).symm) }
+          exact (map_add L a b).trans ((congrArg₂ (· + ·) ha hb).trans (map_add R a b).symm)
+    }
     (fun U r z => compApp_smul f M N U.unop r z)
 
 lemma toImage_map {U V : X.Opens} (h : V ≤ U)
@@ -180,8 +195,9 @@ lemma W_comp : ModulesTensor.W (Opens.grothendieckTopology X) X.sheaf.obj (comp 
     erw [toImage_ofImage]
     exact hw
 
-def sheafifyIso : (sheafifyMod X).obj ((preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f)) ≅
-    (M ⊗ N).restrict f :=
+def sheafifyIso
+    : (sheafifyMod X).obj ((preMod X).obj (M.restrict f) ⊗ (preMod X).obj (N.restrict f))
+      ≅ (M ⊗ N).restrict f :=
   haveI : IsIso ((sheafifyMod X).map (comp f M N)) :=
     Localization.inverts (modulesSheafification (Opens.grothendieckTopology X) X.sheaf)
       (ModulesTensor.W (Opens.grothendieckTopology X) X.sheaf.obj) _ (W_comp f M N)
@@ -189,21 +205,21 @@ def sheafifyIso : (sheafifyMod X).obj ((preMod X).obj (M.restrict f) ⊗ (preMod
 
 end RestrictTensor
 
-
 open RestrictTensor in
-def restrictTensorIso {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f] (M N : Y.Modules) :
-    (M ⊗ N).restrict f ≅ M.restrict f ⊗ N.restrict f :=
+def restrictTensorIso {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f] (M N : Y.Modules)
+    : (M ⊗ N).restrict f ≅ M.restrict f ⊗ N.restrict f :=
   (sheafifyIso f M N).symm ≪≫ tensorIso (M.restrict f) (N.restrict f)
 
-
 attribute [local instance] MvPolynomial.gradedAlgebra in
-def restrictTwistIso {A : Type u} [CommRing A] {n : ℕ} {U X : Scheme.{u}} (f : U ⟶ X)
-    [IsOpenImmersion f] (i : X ⟶ projectiveSpace A n) (G : X.Modules) (k : ℤ) :
-    ProjScheme.twist (f ≫ i) (G.restrict f) k ≅ (ProjScheme.twist i G k).restrict f :=
+def restrictTwistIso
+    {A : Type u} [CommRing A]
+    {n : ℕ} {U X : Scheme.{u}} (f : U ⟶ X) [IsOpenImmersion f]
+    (i : X ⟶ projectiveSpace A n) (G : X.Modules) (k : ℤ)
+    : ProjScheme.twist (f ≫ i) (G.restrict f) k ≅ (ProjScheme.twist i G k).restrict f :=
   (whiskerLeftIso (G.restrict f)
-    (((Scheme.Modules.pullbackComp f i).app _).symm ≪≫
-      ((Scheme.Modules.restrictFunctorIsoPullback f).app _).symm)) ≪≫
-    (restrictTensorIso f G (ProjScheme.twistingSheaf i k)).symm
+      (((Scheme.Modules.pullbackComp f i).app _).symm
+        ≪≫ ((Scheme.Modules.restrictFunctorIsoPullback f).app _).symm))
+    ≪≫ (restrictTensorIso f G (ProjScheme.twistingSheaf i k)).symm
 
 end
 

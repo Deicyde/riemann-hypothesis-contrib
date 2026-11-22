@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,13 +23,17 @@ noncomputable section
 
 namespace GlobalTheory.RatPartition
 
-theorem finite_ratW_mem {D : D7} (A T : HSp D) {C : Set (WO A T)} (hC : IsCompact C) :
-    {γ : Matrix (Fin T.rank) (Fin A.rank) D.host.E | ratW T A γ ∈ C}.Finite := by
+theorem finite_ratW_mem {D : D7} (A T : HSp D) {C : Set (WO A T)} (hC : IsCompact C)
+    : {γ : Matrix (Fin T.rank) (Fin A.rank) D.host.E | ratW T A γ ∈ C}.Finite := by
   obtain ⟨i1, -, -, i4, i5, -⟩ := lattice_Mx D T.rank A.rank
-  haveI := i1; haveI := i4; haveI := i5
+  haveI := i1
+  haveI := i4
+  haveI := i5
   haveI : T1Space (Mx D T.rank A.rank) := @T2Space.t1Space _ _ i4
-  have hLc : IsClosed (ratMx D T.rank A.rank : Set (Mx D T.rank A.rank)) := AddSubgroup.isClosed_of_discrete
-  let φ : Matrix (Fin T.rank) (Fin A.rank) D.host.E → ratMx D T.rank A.rank := fun γ => ⟨ratW T A γ, γ, rfl⟩
+  have hLc : IsClosed (ratMx D T.rank A.rank : Set (Mx D T.rank A.rank)) :=
+    AddSubgroup.isClosed_of_discrete
+  let φ : Matrix (Fin T.rank) (Fin A.rank) D.host.E → ratMx D T.rank A.rank := fun γ =>
+    ⟨ratW T A γ, γ, rfl⟩
   have hφ : Function.Injective φ := fun a b h =>
     Matrix.map_injective GlobalTheory.MixModel.incA_injective (congrArg Subtype.val h)
   have hs : IsCompact ((↑) ⁻¹' C : Set (ratMx D T.rank A.rank)) := by
@@ -35,18 +41,26 @@ theorem finite_ratW_mem {D : D7} (A T : HSp D) {C : Set (WO A T)} (hC : IsCompac
     exact hC.inter_right hLc
   exact (hs.finite_of_discrete.preimage (f := φ) hφ.injOn : _)
 
-theorem exists_partition_one : ∀ (D : D7) (A T : HSp D), ∃ χ : WO A T → ℝ, Continuous χ ∧ HasCompactSupport χ ∧
-    (∀ u, 0 ≤ χ u) ∧ ∀ u, HasSum (fun γ : Matrix (Fin T.rank) (Fin A.rank) D.host.E => χ (ratW T A γ + u)) 1 := by
+theorem exists_partition_one
+    : ∀ (D : D7) (A T : HSp D), ∃ χ : WO A T → ℝ,
+      Continuous χ ∧ HasCompactSupport χ ∧ (∀ u, 0 ≤ χ u)
+        ∧ ∀ u,
+          HasSum (fun γ : Matrix (Fin T.rank) (Fin A.rank) D.host.E => χ (ratW T A γ + u)) 1 := by
   intro D A T
   obtain ⟨i1, i2, i3, i4, i5, K, hK, hKc⟩ := lattice_Mx D T.rank A.rank
-  haveI := i1; haveI := i2; haveI := i4
+  haveI := i1
+  haveI := i2
+  haveI := i4
   haveI : RegularSpace (Mx D T.rank A.rank) := IsTopologicalAddGroup.regularSpace _
   haveI : ContinuousSub (Mx D T.rank A.rank) := IsTopologicalAddGroup.to_continuousSub
-  obtain ⟨f, hf1, -, hfc, hf01⟩ := exists_continuous_one_zero_of_isCompact hK isClosed_empty (Set.disjoint_empty K)
+  obtain ⟨f, hf1, -, hfc, hf01⟩ :=
+    exists_continuous_one_zero_of_isCompact hK isClosed_empty (Set.disjoint_empty K)
   have hS : IsCompact (tsupport f) := hfc
   let g : Matrix (Fin T.rank) (Fin A.rank) D.host.E → WO A T → ℝ := fun γ u => f (ratW T A γ + u)
-  have hgc : ∀ γ, Continuous (g γ) := fun γ => f.continuous.comp (continuous_const_add (ratW T A γ : WO A T))
-  have hfin : ∀ N : Set (WO A T), IsCompact N → {γ | (Function.support (g γ) ∩ N).Nonempty}.Finite := by
+  have hgc : ∀ γ, Continuous (g γ) := fun γ =>
+    f.continuous.comp (continuous_const_add (ratW T A γ : WO A T))
+  have hfin
+      : ∀ N : Set (WO A T), IsCompact N → {γ | (Function.support (g γ) ∩ N).Nonempty}.Finite := by
     intro N hN
     refine (finite_ratW_mem A T ((hS.prod hN).image (continuous_fst.sub continuous_snd))).subset ?_
     rintro γ ⟨u, hu, huN⟩
@@ -78,8 +92,13 @@ theorem exists_partition_one : ∀ (D : D7) (A T : HSp D), ∃ χ : WO A T → �
     simp only [s, e]
     exact finsum_comp_equiv (Equiv.addRight γ₀) (f := fun γ => g γ u)
   have hpos : ∀ u, 0 < s u := fun u => zero_lt_one.trans_le (hs1 u)
-  refine ⟨fun u => f u * (s u)⁻¹, f.continuous.mul (hs_cont.inv₀ fun u => (hpos u).ne'), hfc.mul_right,
-    fun u => mul_nonneg (hf01 u).1 (inv_nonneg.2 (hpos u).le), fun u => ?_⟩
+  refine ⟨
+    fun u => f u * (s u)⁻¹,
+    f.continuous.mul (hs_cont.inv₀ fun u => (hpos u).ne'),
+    hfc.mul_right,
+    fun u => mul_nonneg (hf01 u).1 (inv_nonneg.2 (hpos u).le),
+    fun u => ?_
+  ⟩
   have e : (fun γ => f (ratW T A γ + u) * (s (ratW T A γ + u))⁻¹) = fun γ => g γ u * (s u)⁻¹ := by
     funext γ
     rw [hs_inv]

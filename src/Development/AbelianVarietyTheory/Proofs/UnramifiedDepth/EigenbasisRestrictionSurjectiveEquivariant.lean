@@ -15,8 +15,11 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEi
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -25,9 +28,11 @@ set_option autoImplicit false
 
 namespace GlobalTheory.ChF
 
-private theorem exists_leftInv {O OE : Type} [CommRing O] [IsDomain O] [ValuationRing O] [CommRing OE] {d n : ℕ}
-    (ρ : OE → Matrix (Fin d) (Fin d) O) (τ : OE →+* O) (W : Fin n → Fin d → O) (h : EigB ρ τ W) :
-    ∃ G : Matrix (Fin n) (Fin d) O, ∀ i, G *ᵥ W i = Pi.single i 1 := by
+private theorem exists_leftInv
+    {O OE : Type} [CommRing O] [IsDomain O] [ValuationRing O] [CommRing OE]
+    {d n : ℕ} (ρ : OE → Matrix (Fin d) (Fin d) O)
+    (τ : OE →+* O) (W : Fin n → Fin d → O) (h : EigB ρ τ W)
+    : ∃ G : Matrix (Fin n) (Fin d) O, ∀ i, G *ᵥ W i = Pi.single i 1 := by
   classical
   let φ : (Fin n → O) →ₗ[O] (Fin d → O) := Fintype.linearCombination O W
   have hφ : ∀ c, φ c = ∑ i, c i • W i := fun c => Fintype.linearCombination_apply O W c
@@ -60,14 +65,19 @@ private theorem exists_leftInv {O OE : Type} [CommRing O] [IsDomain O] [Valuatio
   haveI : Module.Flat O ((Fin d → O) ⧸ LinearMap.range φ) :=
     Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.mpr htf
   haveI : Module.Free O ((Fin d → O) ⧸ LinearMap.range φ) := Module.free_of_flat_of_isLocalRing
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property (LinearMap.range φ).mkQ LinearMap.id
-    (Submodule.mkQ_surjective _)
-  have hmem : ∀ y, (LinearMap.id - s ∘ₗ (LinearMap.range φ).mkQ : (Fin d → O) →ₗ[O] (Fin d → O)) y ∈ LinearMap.range φ := by
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property (LinearMap.range φ).mkQ LinearMap.id
+      (Submodule.mkQ_surjective _)
+  have hmem
+      : ∀ y,
+        (LinearMap.id - s ∘ₗ (LinearMap.range φ).mkQ : (Fin d → O) →ₗ[O] (Fin d → O)) y
+          ∈ LinearMap.range φ := by
     intro y
     rw [← Submodule.Quotient.mk_eq_zero, ← Submodule.mkQ_apply]
     have := LinearMap.congr_fun hs ((LinearMap.range φ).mkQ y)
     simp only [LinearMap.comp_apply, LinearMap.id_apply] at this
-    simp only [LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.id_apply, map_sub, this, sub_self]
+    simp only [LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.id_apply, map_sub, this,
+      sub_self]
   let g : (Fin d → O) →ₗ[O] (Fin n → O) :=
     (LinearEquiv.ofInjective φ hinj).symm.toLinearMap ∘ₗ LinearMap.codRestrict _ _ hmem
   have hg : ∀ c, g (φ c) = c := by
@@ -77,14 +87,22 @@ private theorem exists_leftInv {O OE : Type} [CommRing O] [IsDomain O] [Valuatio
     simp only [g, LinearMap.comp_apply, LinearEquiv.coe_coe]
     rw [LinearEquiv.symm_apply_eq]
     ext1
-    simp only [LinearMap.codRestrict_apply, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.id_apply, h0,
-      map_zero, sub_zero, LinearEquiv.ofInjective_apply]
+    simp only [LinearMap.codRestrict_apply, LinearMap.sub_apply, LinearMap.comp_apply,
+      LinearMap.id_apply, h0, map_zero, sub_zero, LinearEquiv.ofInjective_apply]
   refine ⟨LinearMap.toMatrix' g, fun i => ?_⟩
   rw [LinearMap.toMatrix'_mulVec, ← hg (Pi.single i 1), hφ]
   congr 1
   simp [Pi.single_apply]
 
-theorem eigB_res_surjective : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ (OE : Type) [CommRing OE] (d n : ℕ) (ρ : OE → Matrix (Fin d) (Fin d) O) (τ : OE →+* O) (W : Fin n → Fin d → O), EigB ρ τ W → Function.Surjective (Pdiv.ChartF.res W) ∧ (∀ a f, Pdiv.ChartF.res W ((ρ a)ᵀ *ᵥ f) = τ a • Pdiv.ChartF.res W f) ∧ eigDim C ρ ((algebraMap O C).comp τ) = n := by
+theorem eigB_res_surjective
+    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ (OE : Type) [CommRing OE] (d n : ℕ) (ρ : OE → Matrix (Fin d) (Fin d) O) (τ : OE →+* O)
+            (W : Fin n → Fin d → O),
+          EigB ρ τ W
+            → Function.Surjective (Pdiv.ChartF.res W)
+              ∧ (∀ a f, Pdiv.ChartF.res W ((ρ a)ᵀ *ᵥ f) = τ a • Pdiv.ChartF.res W f)
+              ∧ eigDim C ρ ((algebraMap O C).comp τ) = n := by
   classical
   intro C _ v O _ _ hv OE _ d n ρ τ W h
   haveI : IsDomain O := Function.Injective.isDomain (algebraMap O C) hv.hom_inj
@@ -96,15 +114,17 @@ theorem eigB_res_surjective : ∀ (C : Type) [Field C] (v : Valuation C NNReal) 
       ext i k
       have := congrFun (hG i) k
       simp only [Matrix.mulVec, dotProduct, Pi.single_apply] at this
-      simp only [Matrix.mul_apply, Matrix.of_apply, Matrix.transpose_apply, Matrix.one_apply, eq_comm (a := i), ← this, mul_comm]
+      simp only [Matrix.mul_apply, Matrix.of_apply, Matrix.transpose_apply, Matrix.one_apply,
+        eq_comm (a := i), ← this, mul_comm]
     simp only [Pdiv.ChartF.res, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, h1, Matrix.one_mulVec]
   · ext i
     have : Pdiv.ChartF.res W ((ρ a)ᵀ *ᵥ f) i = W i ⬝ᵥ ((ρ a)ᵀ *ᵥ f) := rfl
     rw [this, Matrix.dotProduct_mulVec, Matrix.vecMul_transpose, h.1, smul_dotProduct]
     rfl
   · let W' : Fin n → Fin d → C := fun i => algebraMap O C ∘ W i
-    have hmap : ∀ {m : ℕ} (M : Matrix (Fin m) (Fin d) O) (y : Fin d → O),
-        M.map (algebraMap O C) *ᵥ (algebraMap O C ∘ y) = algebraMap O C ∘ (M *ᵥ y) := by
+    have hmap
+        : ∀ {m : ℕ} (M : Matrix (Fin m) (Fin d) O) (y : Fin d → O),
+          M.map (algebraMap O C) *ᵥ (algebraMap O C ∘ y) = algebraMap O C ∘ (M *ᵥ y) := by
       intro m M y
       ext k
       exact (RingHom.map_mulVec (algebraMap O C) M y k).symm
@@ -117,12 +137,15 @@ theorem eigB_res_surjective : ∀ (C : Type) [Field C] (v : Valuation C NNReal) 
         simp [Pi.single_apply, apply_ite]
       rw [this]
       exact (Pi.basisFun C (Fin n)).linearIndependent
-    have hsp : (⨅ a : OE, Module.End.eigenspace (Matrix.toLin' ((ρ a).map (algebraMap O C)))
-        (((algebraMap O C).comp τ) a)) = Submodule.span C (Set.range W') := by
+    have hsp
+        : (⨅ a : OE, Module.End.eigenspace (Matrix.toLin' ((ρ a).map (algebraMap O C)))
+            (((algebraMap O C).comp τ) a))
+          = Submodule.span C (Set.range W') := by
       apply le_antisymm
       · intro x hx
         simp only [Submodule.mem_iInf, Module.End.mem_eigenspace_iff, Matrix.toLin'_apply] at hx
-        obtain ⟨⟨b, hb⟩, hbx⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) x
+        obtain ⟨⟨b, hb⟩, hbx⟩ :=
+          IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) x
         choose y hy using hbx
         have hb0 : algebraMap O C b ≠ 0 := by
           rw [map_ne_zero_iff _ hv.hom_inj]; exact nonZeroDivisors.ne_zero hb
@@ -147,7 +170,8 @@ theorem eigB_res_surjective : ∀ (C : Type) [Field C] (v : Valuation C NNReal) 
         exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
       · rw [Submodule.span_le]
         rintro _ ⟨i, rfl⟩
-        simp only [SetLike.mem_coe, Submodule.mem_iInf, Module.End.mem_eigenspace_iff, Matrix.toLin'_apply]
+        simp only [SetLike.mem_coe, Submodule.mem_iInf, Module.End.mem_eigenspace_iff,
+          Matrix.toLin'_apply]
         intro a
         simp only [W', hmap, h.1]
         ext k

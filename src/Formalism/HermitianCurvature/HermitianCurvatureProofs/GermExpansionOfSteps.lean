@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.ThetaExistenceInductiveFromPieces
 
 noncomputable section
 
-open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6 Filter Topology
+open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6
+  Filter Topology
 
 namespace Formalism.FourierDecayAlt.P
 

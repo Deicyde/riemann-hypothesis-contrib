@@ -11,17 +11,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 noncomputable section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym.Sig
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym.Sig
 
 section Gen
 
 variable {G : Type} [Group G]
 
-private theorem sum_reps {I : Subgroup G} (F : LeviFact I) (a : G) (hI : HeckePair I) (hp : F.Pos a)
-    (hn : F.NormJ a) (s : Finset G) (hs : ∀ u ∈ s, u ∈ F.Uf ⊓ I)
-    (hs' : ∀ x ∈ F.Uf ⊓ I, ∃! u, u ∈ s ∧ a⁻¹ * (u⁻¹ * x) * a ∈ I)
-    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (ρ : Representation A G M) (v : fixd ρ I) :
-    (hk ρ I a v : M) = ∑ u ∈ s, ρ (u * a) v := by
+private theorem sum_reps
+    {I : Subgroup G} (F : LeviFact I)
+    (a : G)
+    (hI : HeckePair I) (hp : F.Pos a) (hn : F.NormJ a)
+    (s : Finset G)
+    (hs : ∀ u ∈ s, u ∈ F.Uf ⊓ I) (hs' : ∀ x ∈ F.Uf ⊓ I, ∃! u, u ∈ s ∧ a⁻¹ * (u⁻¹ * x) * a ∈ I)
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (ρ : Representation A G M) (v : fixd ρ I)
+    : (hk ρ I a v : M) = ∑ u ∈ s, ρ (u * a) v := by
   classical
   obtain ⟨-, h2, -⟩ := hkApply A G M ρ I I a (hI a)
   have hsm : ∀ g : I, g • (a : G ⧸ I) = ((g * a : G) : G ⧸ I) := fun g => rfl
@@ -64,10 +69,14 @@ private theorem sum_reps {I : Subgroup G} (F : LeviFact I) (a : G) (hI : HeckePa
         exact hyq
       simp [hw']
 
-private theorem hk_eq_uOp (D : Iwa G) {I : Subgroup G} (F : LeviFact I) (a : G) (hI : HeckePair I)
-    (hp : F.Pos a) (hn : F.NormJ a) (hU : F.Uf ⊓ I = D.N)
-    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (ρ : Representation A G M) (v : fixd ρ I) :
-    (hk ρ I a v : M) = D.uOp ρ a v := by
+private theorem hk_eq_uOp
+    (D : Iwa G)
+    {I : Subgroup G} (F : LeviFact I)
+    (a : G)
+    (hI : HeckePair I) (hp : F.Pos a) (hn : F.NormJ a) (hU : F.Uf ⊓ I = D.N)
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (ρ : Representation A G M) (v : fixd ρ I)
+    : (hk ρ I a v : M) = D.uOp ρ a v := by
   classical
   have hNI : ∀ y ∈ D.N, y ∈ F.Uf ⊓ I := fun y hy => hU ▸ hy
   have hND : ∀ y ∈ F.Uf ⊓ I, y ∈ D.N := fun y hy => by rwa [hU] at hy
@@ -84,8 +93,10 @@ private theorem hk_eq_uOp (D : Iwa G) {I : Subgroup G} (F : LeviFact I) (a : G) 
       refine ⟨a⁻¹ * y * a, h, ?_⟩
       simp only [MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_coe, MulAut.conj_apply]
       group
-  have heq : ∀ u x : D.N, ((u : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N) = (x : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N)) ↔
-      a⁻¹ * ((u : G)⁻¹ * x) * a ∈ I := by
+  have heq
+      : ∀ u x : D.N,
+        ((u : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N) = (x : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N))
+          ↔ a⁻¹ * ((u : G)⁻¹ * x) * a ∈ I := by
     intro u x
     rw [QuotientGroup.eq, Subgroup.mem_subgroupOf, hc]
     push_cast
@@ -100,26 +111,33 @@ private theorem hk_eq_uOp (D : Iwa G) {I : Subgroup G} (F : LeviFact I) (a : G) 
   have hfin : Finite (↥D.N ⧸ (D.Nconj a).subgroupOf D.N) := by
     have := (hI a).to_subtype
     refine Finite.of_injective (β := MulAction.orbit I (a : G ⧸ I))
-      (fun q => ⟨(((Quotient.out q : D.N) : G) * a : G), ⟨⟨_, (hNI _ (Quotient.out q).2).2⟩, rfl⟩⟩) ?_
+      (fun q => ⟨(((Quotient.out q : D.N) : G) * a : G), ⟨⟨_, (hNI _ (Quotient.out q).2).2⟩, rfl⟩⟩)
+      ?_
     intro q q' hqq
-    have h1 : (((Quotient.out q : D.N) : G) * a : G ⧸ I) = (((Quotient.out q' : D.N) : G) * a : G ⧸ I) :=
+    have h1
+        : (((Quotient.out q : D.N) : G) * a : G ⧸ I)
+          = (((Quotient.out q' : D.N) : G) * a : G ⧸ I) :=
       congrArg Subtype.val hqq
     rw [QuotientGroup.eq] at h1
     have h2 : a⁻¹ * (((Quotient.out q : D.N) : G)⁻¹ * (Quotient.out q' : D.N)) * a ∈ I := by
-      have e : a⁻¹ * (((Quotient.out q : D.N) : G)⁻¹ * (Quotient.out q' : D.N)) * a =
-          (((Quotient.out q : D.N) : G) * a)⁻¹ * (((Quotient.out q' : D.N) : G) * a) := by group
+      have e
+          : a⁻¹ * (((Quotient.out q : D.N) : G)⁻¹ * (Quotient.out q' : D.N)) * a
+            = (((Quotient.out q : D.N) : G) * a)⁻¹ * (((Quotient.out q' : D.N) : G) * a) := by
+        group
       rw [e]
       exact h1
     rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q']
     exact (heq _ _).mpr h2
   haveI := Fintype.ofFinite (↥D.N ⧸ (D.Nconj a).subgroupOf D.N)
-  have hinj : Function.Injective (fun q : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N => ((Quotient.out q : D.N) : G)) := by
+  have hinj : Function.Injective (fun q : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N =>
+      ((Quotient.out q : D.N) : G)) := by
     intro q q' h
     have h' : Quotient.out q = Quotient.out q' := Subtype.ext h
     rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q', h']
   rw [Iwa.uOp, finsum_eq_sum_of_fintype, LinearMap.sum_apply,
     sum_reps F a hI hp hn
-      (Finset.univ.image fun q : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N => ((Quotient.out q : D.N) : G)) ?_ ?_ ρ v]
+      (Finset.univ.image fun q : ↥D.N ⧸ (D.Nconj a).subgroupOf D.N => ((Quotient.out q : D.N) : G))
+      ?_ ?_ ρ v]
   · exact Finset.sum_image (f := fun u => ρ (u * a) v) (fun q _ q' _ h => hinj h)
   · intro u hu
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.mp hu
@@ -141,7 +159,8 @@ end Gen
 
 section Lin
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
 private def lf (V : Lev k) (n : ℕ) : LeviFact (V.J n) where
   Uf := unipB k (Fin n)
@@ -158,13 +177,25 @@ private def lf (V : Lev k) (n : ℕ) : LeviFact (V.J n) where
     exact GlAx.uniq t hu hl h
   fact g hg := by
     obtain ⟨a, ha, _, ⟨s, hs, rfl⟩, b, hb, rfl⟩ := (factJ k V n).1 g hg
-    exact ⟨a, ⟨ha.1, V.N_le ha⟩, diagT k (Fin n) s, ⟨⟨s, rfl⟩, V.dg_mem fun i => hs i trivial⟩, b,
-      ⟨hb.1, V.Nm_le hb⟩, rfl⟩
+    exact ⟨
+      a,
+      ⟨ha.1, V.N_le ha⟩,
+      diagT k (Fin n) s,
+      ⟨⟨s, rfl⟩, V.dg_mem fun i => hs i trivial⟩,
+      b,
+      ⟨hb.1, V.Nm_le hb⟩,
+      rfl
+    ⟩
 
-private theorem low_mem (V : Lev k) {l : GL (Fin n) k}
-    (h : l ∈ (unipB k (Fin n)).comap (GlobalTheory.CuspRep.invT n k)) (h' : l ∈ V.J n) : l ∈ (glIwa k n).Nm V.c := by
+private theorem low_mem
+    (V : Lev k)
+    {l : GL (Fin n) k}
+    (h : l ∈ (unipB k (Fin n)).comap (GlobalTheory.CuspRep.invT n k)) (h' : l ∈ V.J n)
+    : l ∈ (glIwa k n).Nm V.c := by
   obtain ⟨a, ha, _, ⟨s, _, rfl⟩, b, hb, rfl⟩ := (factJ k V n).1 _ h'
-  have hy : b * (a * diagT k (Fin n) s * b)⁻¹ ∈ (unipB k (Fin n)).comap (GlobalTheory.CuspRep.invT n k) :=
+  have hy
+      : b * (a * diagT k (Fin n) s * b)⁻¹
+        ∈ (unipB k (Fin n)).comap (GlobalTheory.CuspRep.invT n k) :=
     Subgroup.mul_mem _ hb.1 (Subgroup.inv_mem _ h)
   have key : a * diagT k (Fin n) s * (b * (a * diagT k (Fin n) s * b)⁻¹) = 1 := by group
   obtain ⟨rfl, hs1⟩ := GlAx.uniq s ha.1 hy key
@@ -187,10 +218,10 @@ private theorem pos (V : Lev k) {d : Fin n → kˣ} (hd : Dom d) : (lf V n).Pos 
     exact V.N_le (GlAx.conj_N (t := d) (fun i => val_ord (d i)) ha hN)
   · rintro l ⟨hl, hJ⟩
     have hm : l ∈ (glData k n).Nm V.c := low_mem V hl hJ
-    have hv : ∀ i, valuation k ↑((d⁻¹) i) = uniformizer k ^ (-ord k (d i)) := by
+    have hv : ∀ i, valuation k ↑((d⁻¹) i) = uniformizer k ^ (- ord k (d i)) := by
       intro i
       rw [Pi.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, val_ord, _root_.zpow_neg]
-    have hc : ∀ i j : Fin n, j < i → (V.c : ℤ) + -ord k (d j) ≤ V.c + -ord k (d i) := by
+    have hc : ∀ i j : Fin n, j < i → (V.c : ℤ) + - ord k (d j) ≤ V.c + - ord k (d i) := by
       intro i j hji
       have := ha hji.le
       simp only at this
@@ -214,14 +245,14 @@ private theorem normJ (V : Lev k) (d : Fin n → kˣ) : (lf V n).NormJ (dg d) :=
 
 end Lin
 
-theorem UpperTheory.V.Z.Sym.Sig.hkMul :
-    UpperTheory.V.Z.Sym.Sig.HkMul := by
+theorem UpperTheory.V.Z.Sym.Sig.hkMul : UpperTheory.V.Z.Sym.Sig.HkMul := by
   intro k _ _ _ _ V n M _ _ ρ
   have hJ : HeckePair (V.J n) := ((finFacts k V).2.2.2.2.2 n).1
   constructor
   · intro d d' hd hd'
-    have h := (leviMul ℂ _ M ρ (V.J n) (lf V n) (dg d) (dg d') hJ (pos V hd) (pos V hd')
-      (Or.inl (normJ V d))).2
+    have h :=
+      (leviMul ℂ _ M ρ (V.J n) (lf V n) (dg d) (dg d') hJ (pos V hd) (pos V hd')
+        (Or.inl (normJ V d))).2
     rw [h]
     congr 1
     exact (map_mul (diagT k (Fin n)) d d').symm

@@ -14,17 +14,19 @@ namespace CasimirPowerCommute
 
 variable {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem comm_pow (E : Fin n → Fin n → Module.End ℂ V) (hE : IsGlRep E) (c d : Fin n) :
-    ∀ (k : ℕ) (a b : Fin n), E c d * (Mm E ^ k) a b - (Mm E ^ k) a b * E c d =
-      (if d = a then (Mm E ^ k) c b else 0) - (if b = c then (Mm E ^ k) a d else 0) := by
+theorem comm_pow (E : Fin n → Fin n → Module.End ℂ V) (hE : IsGlRep E) (c d : Fin n)
+    : ∀ (k : ℕ) (a b : Fin n),
+      E c d * (Mm E ^ k) a b - (Mm E ^ k) a b * E c d
+        = (if d = a then (Mm E ^ k) c b else 0) - (if b = c then (Mm E ^ k) a d else 0) := by
   have hM : ∀ i j, Mm E i j = E i j := fun _ _ => rfl
   intro k
   induction k with
   | zero =>
     intro a b
     simp only [pow_zero, Matrix.one_apply]
-    have h0 : (if d = a then (if c = b then (1 : Module.End ℂ V) else 0) else 0) =
-        (if b = c then (if a = d then 1 else 0) else 0) := by
+    have h0
+        : (if d = a then (if c = b then (1 : Module.End ℂ V) else 0) else 0)
+          = (if b = c then (if a = d then 1 else 0) else 0) := by
       by_cases h2 : d = a
       · subst h2
         by_cases h3 : b = c
@@ -35,9 +37,11 @@ theorem comm_pow (E : Fin n → Fin n → Module.End ℂ V) (hE : IsGlRep E) (c 
     split_ifs <;> simp
   | succ k ih =>
     intro a b
-    have key : ∀ j, E c d * ((Mm E ^ k) a j * E j b) - ((Mm E ^ k) a j * E j b) * E c d
-        = (E c d * (Mm E ^ k) a j - (Mm E ^ k) a j * E c d) * E j b
-          + (Mm E ^ k) a j * (E c d * E j b - E j b * E c d) := by
+    have key
+        : ∀ j,
+          E c d * ((Mm E ^ k) a j * E j b) - ((Mm E ^ k) a j * E j b) * E c d
+            = (E c d * (Mm E ^ k) a j - (Mm E ^ k) a j * E c d) * E j b
+              + (Mm E ^ k) a j * (E c d * E j b - E j b * E c d) := by
       intro j; noncomm_ring
     simp only [pow_succ, Matrix.mul_apply, hM]
     rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]

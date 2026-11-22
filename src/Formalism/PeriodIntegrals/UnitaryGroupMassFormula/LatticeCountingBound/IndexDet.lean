@@ -90,8 +90,9 @@ theorem determinant_index_formula : DetIdx := by
     positivity
   set O := (oLat K k).toAddSubgroup with hOdef
 
-  obtain ⟨⟨d, hd⟩, hdT⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
-    (Finset.univ.image fun p : Fin k × Fin k => N p.1 p.2)
+  obtain ⟨⟨d, hd⟩, hdT⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
+      (Finset.univ.image fun p : Fin k × Fin k => N p.1 p.2)
   have hd0 : d ≠ 0 := nonZeroDivisors.ne_zero hd
   set dK := algebraMap (𝓞 K) K d with hdKdef
   have hdK : dK ≠ 0 := by
@@ -121,8 +122,7 @@ theorem determinant_index_formula : DetIdx := by
   have hDdet0 : Dm.det ≠ 0 := by rw [hDdet]; exact pow_ne_zero _ hd0
   set T := vm (Gm.map (algebraMap (𝓞 K) K)) with hTdef
   set S := vm (Dm.map (algebraMap (𝓞 K) K)) with hSdef
-  have hT : ∀ s, T s = dK • (s ᵥ* N) := by
-    intro s; rw [hTdef, vm_apply, hGmap, Matrix.vecMul_smul]
+  have hT : ∀ s, T s = dK • (s ᵥ* N) := by intro s; rw [hTdef, vm_apply, hGmap, Matrix.vecMul_smul]
   have hS : ∀ s, S s = dK • s := by
     intro s; rw [hSdef, vm_apply, hDmap, Matrix.vecMul_smul, Matrix.vecMul_one]
   have hTinj : Function.Injective T := by
@@ -163,14 +163,17 @@ theorem determinant_index_formula : DetIdx := by
     rw [← AddSubgroup.relIndex_mul_relIndex (hHK := (inf_le_right : X ⊓ Z ≤ Z)) (hKL := hZO_le),
       AddSubgroup.inf_relIndex_right]
   have h1 : X.relIndex O ≤ (X ⊓ Z).relIndex O :=
-    AddSubgroup.relIndex_le_of_le_left (hHK := (inf_le_left : X ⊓ Z ≤ X)) (hHL := by rw [hmul]; exact mul_ne_zero hXZ0 hZO0)
-  have h2 : X.relIndex Z ≤ X.relIndex Y := AddSubgroup.relIndex_le_of_le_right (hKL := hZY) (hHL := hXY0)
+    AddSubgroup.relIndex_le_of_le_left (hHK := (inf_le_left : X ⊓ Z ≤ X))
+      (hHL := by rw [hmul]; exact mul_ne_zero hXZ0 hZO0)
+  have h2 : X.relIndex Z ≤ X.relIndex Y :=
+    AddSubgroup.relIndex_le_of_le_right (hKL := hZY) (hHL := hXY0)
   have key : X.relIndex O ≤ X.relIndex Y * Z.relIndex O := by
     rw [hmul] at h1
     exact h1.trans (Nat.mul_le_mul_right _ h2)
   rw [hXO, hXY, hZO] at key
-  have keyR : ((Algebra.norm ℤ Gm.det).natAbs : ℝ) ≤
-      (O.relIndex Q : ℝ) * ((D.relIndex O : ℝ) * ((Algebra.norm ℤ Dm.det).natAbs : ℝ)) := by
+  have keyR
+      : ((Algebra.norm ℤ Gm.det).natAbs : ℝ)
+        ≤ (O.relIndex Q : ℝ) * ((D.relIndex O : ℝ) * ((Algebra.norm ℤ Dm.det).natAbs : ℝ)) := by
     exact_mod_cast key
   rw [natAbs_norm_real, natAbs_norm_real, hdetG, hDdet, map_pow, map_mul, map_pow] at keyR
   simp only [Rat.cast_mul, Rat.cast_pow, abs_mul, abs_pow] at keyR
@@ -178,9 +181,10 @@ theorem determinant_index_formula : DetIdx := by
     apply pow_pos
     rw [abs_pos, Rat.cast_ne_zero]
     exact Algebra.norm_ne_zero_iff.mpr hdK
-  have : |((Algebra.norm ℚ dK : ℚ) : ℝ)| ^ k * |((Algebra.norm ℚ N.det : ℚ) : ℝ)| ≤
-      |((Algebra.norm ℚ dK : ℚ) : ℝ)| ^ k * ((O.relIndex Q : ℝ) * (D.relIndex O : ℝ)) := by
-    calc _ ≤ _ := keyR
+  have : |((Algebra.norm ℚ dK : ℚ) : ℝ)| ^ k * |((Algebra.norm ℚ N.det : ℚ) : ℝ)|
+      ≤ |((Algebra.norm ℚ dK : ℚ) : ℝ)| ^ k * ((O.relIndex Q : ℝ) * (D.relIndex O : ℝ)) := by
+    calc
+      _ ≤ _ := keyR
       _ = _ := by ring
   exact le_of_mul_le_mul_left this ha
 

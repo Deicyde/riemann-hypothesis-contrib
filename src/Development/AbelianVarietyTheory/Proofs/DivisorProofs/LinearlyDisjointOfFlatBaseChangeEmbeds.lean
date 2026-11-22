@@ -4,19 +4,25 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SubsetSpanBy
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 open TensorProduct
 
 namespace GlobalTheory.Desc.FlatLinDisj
 
-theorem linDisj_of_flat (R R₁ K L : Type) [CommRing R] [CommRing R₁] [CommRing K] [CommRing L] [Algebra R R₁]
-    [Algebra R K] [Module.Flat R R₁] (θ : K →+* L) (c : R₁ →+* L)
-    (h : ∀ (n : ℕ) (u : Fin n → K) (r : Fin n → R₁), ∑ j, c (r j) * θ (u j) = 0 → ∑ j, u j ⊗ₜ[R] r j = 0) :
-    LinDisj (algebraMap R K) c θ := by
+theorem linDisj_of_flat
+    (R R₁ K L : Type) [CommRing R] [CommRing R₁] [CommRing K] [CommRing L] [Algebra R R₁]
+    [Algebra R K] [Module.Flat R R₁]
+    (θ : K →+* L) (c : R₁ →+* L)
+    (h : ∀ (n : ℕ) (u : Fin n → K) (r : Fin n → R₁),
+      ∑ j, c (r j) * θ (u j) = 0 → ∑ j, u j ⊗ₜ[R] r j = 0)
+    : LinDisj (algebraMap R K) c θ := by
   intro n u hu r hr
   let f : (Fin n → R) →ₗ[R] K := Fintype.linearCombination R u
   have hf : Function.Injective f := by
@@ -35,7 +41,9 @@ theorem linDisj_of_flat (R R₁ K L : Type) [CommRing R] [CommRing R₁] [CommRi
     have := h n u r hr
     simpa [f, Fintype.linearCombination_apply_single] using this
   funext i
-  have key : TensorProduct.lid R R₁ ((LinearMap.proj (R := R) (φ := fun _ : Fin n => R) i).rTensor R₁ x) = r i := by
+  have key
+      : TensorProduct.lid R R₁ ((LinearMap.proj (R := R) (φ := fun _ : Fin n => R) i).rTensor R₁ x)
+        = r i := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hx, map_sum, map_sum]
     simp [LinearMap.rTensor_tmul, Pi.single_apply]

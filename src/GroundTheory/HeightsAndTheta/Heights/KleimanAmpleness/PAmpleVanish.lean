@@ -19,11 +19,14 @@ universe u v w
 
 section Tilde
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
-  {E : Type v} [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
+variable
+  {S : Type u} [CommRing S]
+  {Ω : Type w} [Field Ω] [Algebra S Ω]
+  {N : ℕ} {x : Fin (N + 1) → Ω} {E : Type v}
+  [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
 
-theorem FinGradedSub.tildeSys_natCast_eq_twist (M : FinGradedSub (S := S) (x := x) E) (a : ℕ) :
-    M.tildeSys (a : ℤ) = (M.tildeSys 0).twist (twistSys S x (a : ℤ)) := by
+theorem FinGradedSub.tildeSys_natCast_eq_twist (M : FinGradedSub (S := S) (x := x) E) (a : ℕ)
+    : M.tildeSys (a : ℤ) = (M.tildeSys 0).twist (twistSys S x (a : ℤ)) := by
   refine SubSystem.ext_sub fun I => ?_
   obtain ⟨i, hi⟩ := I.2.1
   have hxi : x i ≠ 0 := (mem_support x).mp (I.2.2 hi)
@@ -34,21 +37,45 @@ theorem FinGradedSub.tildeSys_natCast_eq_twist (M : FinGradedSub (S := S) (x := 
   · refine Submodule.span_le.mpr ?_
     rintro _ ⟨m, s, b, e, hs, hse, hm, hbe, rfl⟩
     have hs0 := eval_ne_zero_of_mem_monos I hs
-    refine Submodule.subset_span ⟨x i ^ a, hA, (aeval x (s * X i ^ a))⁻¹ • m,
-      Submodule.subset_span ⟨m, s * X i ^ a, b, e + a, mul_mem hs (pow_mem (X_mem_monos hi) a),
-        hse.mul (isHomogeneous_X_pow i a), hm, by push_cast; omega, rfl⟩, ?_⟩
-    rw [smul_smul, map_mul, map_pow, aeval_X, mul_inv, ← mul_assoc, mul_comm (x i ^ a),
-      mul_assoc, mul_inv_cancel₀ (pow_ne_zero a hxi), mul_one]
+    refine Submodule.subset_span ⟨
+      x i ^ a,
+      hA,
+      (aeval x (s * X i ^ a))⁻¹ • m,
+      Submodule.subset_span ⟨
+        m,
+        s * X i ^ a,
+        b,
+        e + a,
+        mul_mem hs (pow_mem (X_mem_monos hi) a),
+        hse.mul (isHomogeneous_X_pow i a),
+        hm,
+        by push_cast; omega,
+        rfl
+      ⟩,
+      ?_
+    ⟩
+    rw [smul_smul, map_mul, map_pow, aeval_X, mul_inv, ← mul_assoc, mul_comm (x i ^ a), mul_assoc,
+      mul_inv_cancel₀ (pow_ne_zero a hxi), mul_one]
   · refine Submodule.span_le.mpr ?_
     rintro _ ⟨q, hq, y, hy, rfl⟩
     change q ∈ twistMod S x (a : ℤ) I at hq
     rw [twistMod_eq_span _ I hi, zpow_natCast, Submodule.mem_span_singleton] at hq
     obtain ⟨β, rfl⟩ := hq
     have key : x i ^ a • y ∈ M.tilde (a : ℤ) I := by
-      refine Submodule.span_induction (p := fun y _ => x i ^ a • y ∈ M.tilde (a : ℤ) I) ?_ ?_ ?_ ?_ hy
+      refine
+        Submodule.span_induction (p := fun y _ => x i ^ a • y ∈ M.tilde (a : ℤ) I) ?_ ?_ ?_ ?_ hy
       · rintro _ ⟨m, s, b, e, hs, hse, hm, hbe, rfl⟩
-        refine Submodule.subset_span ⟨aeval x (X i ^ a : Poly S N) • m, s, b + a, e, hs, hse,
-          M.smul_mem a b _ m (isHomogeneous_X_pow i a) hm, by omega, ?_⟩
+        refine Submodule.subset_span ⟨
+          aeval x (X i ^ a : Poly S N) • m,
+          s,
+          b + a,
+          e,
+          hs,
+          hse,
+          M.smul_mem a b _ m (isHomogeneous_X_pow i a) hm,
+          by omega,
+          ?_
+        ⟩
         rw [smul_smul, smul_smul, map_pow, aeval_X, mul_comm]
       · rw [smul_zero]
         exact Submodule.zero_mem _
@@ -63,8 +90,10 @@ theorem FinGradedSub.tildeSys_natCast_eq_twist (M : FinGradedSub (S := S) (x := 
 
 end Tilde
 
-theorem AmpleVanish.proof (hC : VeryAmpleCech.Statement.{u, v, w}) (hE : Extension.Statement.{u, v, w})
-    (hT : TildeVanish.Statement.{u, v, w}) : AmpleVanish.Statement.{u, v, w} := by
+theorem AmpleVanish.proof
+    (hC : VeryAmpleCech.Statement.{u, v, w}) (hE : Extension.Statement.{u, v, w})
+    (hT : TildeVanish.Statement.{u, v, w})
+    : AmpleVanish.Statement.{u, v, w} := by
   intro S _ _ Ω _ _ N x E _ _ _ _ F hF H hH
   obtain ⟨r, h, hh⟩ := hH
   obtain ⟨F', hF', hiso⟩ := hC S Ω N x E F hF H r h hh

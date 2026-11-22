@@ -16,14 +16,21 @@ open ReciprocityTheory.PGsh.L2
 
 section FrobA
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
-  {σ : O ≃ₐ[ℤ_[p]] O} {cp : R} {H : HodgeTateDatum p g v R O σ cp} {U : UnramData p g v R O σ cp H}
-  {X : Fin U.m → NNReal}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+  {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
+  {H : HodgeTateDatum p g v R O σ cp} {U : UnramData p g v R O σ cp H} {X : Fin U.m → NNReal}
 
-private theorem hasLen_of_linearEquiv {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R]
-    [Algebra R C] {M M' : Type} [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M']
-    {x : NNReal} (e : M ≃ₗ[R] M') (h : HasLen v R M' x) : HasLen v R M x := by
+private theorem hasLen_of_linearEquiv
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+    {M M' : Type} [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M']
+    {x : NNReal}
+    (e : M ≃ₗ[R] M') (h : HasLen v R M' x)
+    : HasLen v R M x := by
   obtain ⟨m, c, ⟨φ⟩, hx⟩ := h
   exact ⟨m, c, ⟨e.trans φ⟩, hx⟩
 
@@ -67,8 +74,7 @@ lemma xL_pow_mem (D : Lifts H U X) (hp : 2 ≤ p) (j : Ix g) :
   rw [heq]
   exact Submodule.subset_span ⟨_, hx, _, hpow _, rfl⟩
 
-def blockEquiv (D : Lifts H U X) (τ : Fin U.m) :
-    blockL D τ ≃ₗ[R] ({l // D.κ l = τ} → R) where
+def blockEquiv (D : Lifts H U X) (τ : Fin U.m) : blockL D τ ≃ₗ[R] ({l // D.κ l = τ} → R) where
   toFun c l := c.1 l.1
   invFun d := ⟨fun k => if h : D.κ k = τ then d ⟨k, h⟩ else 0, fun k hk => by simp [hk]⟩
   left_inv c := by
@@ -83,8 +89,10 @@ def blockEquiv (D : Lifts H U X) (τ : Fin U.m) :
 
 end FrobA
 
-theorem frob_of (h1 : LiftMonomialDeterminantStatement) (h2 : FrobeniusBlockStatement) (h3 : FrobeniusLengthBoundStatement) :
-    EigenLiftsFrobeniusStatement := by
+theorem frob_of
+    (h1 : LiftMonomialDeterminantStatement) (h2 : FrobeniusBlockStatement)
+    (h3 : FrobeniusLengthBoundStatement)
+    : EigenLiftsFrobeniusStatement := by
   unfold EigenLiftsFrobeniusStatement
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hp2 hS H U X D hbasis i
   have hv := hS.integers
@@ -96,10 +104,9 @@ theorem frob_of (h1 : LiftMonomialDeterminantStatement) (h2 : FrobeniusBlockStat
     refine Submodule.span_le.mpr ?_
     rintro _ ⟨f, hf, f', hf', rfl⟩
     exact H.AA.mul_mem _ _ hf.1 hf'.1
-  have hfS : ∀ j, (fun y => xL D j y ^ p) ∈ sqIdeal (augIdeal H.AA.carrier) :=
-    fun j => xL_pow_mem D hp j
-  have hrex : ∀ j : Ix g, ∃ r : Nb p g → R,
-      coefX D (fun y => xL D j y ^ p) = algebraMap R C ∘ r :=
+  have hfS : ∀ j, (fun y => xL D j y ^ p) ∈ sqIdeal (augIdeal H.AA.carrier) := fun j =>
+    xL_pow_mem D hp j
+  have hrex : ∀ j : Ix g, ∃ r : Nb p g → R, coefX D (fun y => xL D j y ^ p) = algebraMap R C ∘ r :=
     fun j => coefX_int D hdet hbasis (hsq (hfS j))
   choose r hr using hrex
   let c : Ix g → Ix g → R := fun j k => if D.κ k = U.φ i then r j (Pi.single k 1) else 0
@@ -114,28 +121,35 @@ theorem frob_of (h1 : LiftMonomialDeterminantStatement) (h2 : FrobeniusBlockStat
   let e'' : {j // D.κ j = i} ≃ {l // D.κ l = U.φ i} := Fintype.equivOfCardEq hcard
   let eτ : {l // D.κ l = U.φ i} ≃ Fin (Fintype.card {l // D.κ l = U.φ i}) := Fintype.equivFin _
   let σE : Fin (Fintype.card {l // D.κ l = U.φ i}) ≃ {j // D.κ j = i} := eτ.symm.trans e''.symm
-  let Y : Matrix (Fin (Fintype.card {l // D.κ l = U.φ i})) (Fin (Fintype.card {l // D.κ l = U.φ i})) R :=
-    fun a b => c (σE b).1 (eτ.symm a).1
+  let Y : Matrix (Fin (Fintype.card {l // D.κ l = U.φ i})) (Fin (Fintype.card {l // D.κ l = U.φ i}))
+      R := fun a b =>
+    c (σE b).1 (eτ.symm a).1
   let Ψ : blockL D (U.φ i) ≃ₗ[R] (Fin (Fintype.card {l // D.κ l = U.φ i}) → R) :=
     (blockEquiv D (U.φ i)).trans (LinearEquiv.funCongrLeft R R eτ.symm)
   let N : Submodule R (Ix g → R) :=
     ((LinearMap.range Y.mulVecLin).comap Ψ.toLinearMap).map (blockL D (U.φ i)).subtype
-  have hcomap : N.comap (blockL D (U.φ i)).subtype = (LinearMap.range Y.mulVecLin).comap Ψ.toLinearMap :=
+  have hcomap
+      : N.comap (blockL D (U.φ i)).subtype = (LinearMap.range Y.mulVecLin).comap Ψ.toLinearMap :=
     Submodule.comap_map_eq_of_injective (blockL D (U.φ i)).injective_subtype _
-  have hmapΨ : ((LinearMap.range Y.mulVecLin).comap Ψ.toLinearMap).map Ψ.toLinearMap = LinearMap.range Y.mulVecLin :=
+  have hmapΨ
+      : ((LinearMap.range Y.mulVecLin).comap Ψ.toLinearMap).map Ψ.toLinearMap
+        = LinearMap.range Y.mulVecLin :=
     Submodule.map_comap_eq_of_surjective Ψ.surjective _
   have hlen : HasLen v R (blockL D (U.φ i) ⧸ N.comap (blockL D (U.φ i)).subtype)
       (v (algebraMap R C Y.det)) := by
     rw [hcomap]
     exact hasLen_of_linearEquiv (Submodule.Quotient.equiv _ _ Ψ hmapΨ) (Smith.hasLen_coker_det hv Y)
   have hNle : N ≤ blockL D (U.φ i) := Submodule.map_subtype_le _ _
-  have hreal : ∀ x ∈ N, ∃ f ∈ sqIdeal (augIdeal H.AA.carrier),
-      ∀ k, algebraMap R C (x k) = linX D f k := by
+  have hreal
+      : ∀ x ∈ N, ∃ f ∈ sqIdeal (augIdeal H.AA.carrier), ∀ k, algebraMap R C (x k) = linX D f k := by
     intro x hx
     obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hx
     obtain ⟨w, hw⟩ := LinearMap.mem_range.mp (Submodule.mem_comap.mp hy)
-    refine ⟨∑ b, w b • (fun t => xL D (σE b).1 t ^ p),
-      Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ (hfS _), ?_⟩
+    refine ⟨
+      ∑ b, w b • (fun t => xL D (σE b).1 t ^ p),
+      Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ (hfS _),
+      ?_
+    ⟩
     intro k
     have hyΨ : y = Ψ.symm (Y.mulVecLin w) := by rw [hw]; exact (Ψ.symm_apply_apply y).symm
     have hyk : (y : Ix g → R) k = ∑ b, c (σE b).1 k * w b := by
@@ -159,8 +173,10 @@ theorem frob_of (h1 : LiftMonomialDeterminantStatement) (h2 : FrobeniusBlockStat
     exact hc (σE b).1 (σE b).2 k
   have hYdet : v (algebraMap R C Y.det) = X i ^ p / X (U.φ i) := by
     rw [RingHom.map_det]
-    have hYZ : (algebraMap R C).mapMatrix Y = (Matrix.of fun j l : {j // D.κ j = i} =>
-        linX D (fun y => xL D j.1 y ^ p) (e'' l).1)ᵀ.submatrix σE σE := by
+    have hYZ
+        : (algebraMap R C).mapMatrix Y
+          = (Matrix.of fun j l : {j // D.κ j = i} =>
+            linX D (fun y => xL D j.1 y ^ p) (e'' l).1)ᵀ.submatrix σE σE := by
       ext a b
       show algebraMap R C (c (σE b).1 (eτ.symm a).1) =
         linX D (fun y => xL D (σE b).1 y ^ p) (e'' (σE a)).1

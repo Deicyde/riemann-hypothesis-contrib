@@ -26,20 +26,31 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsIntegralOfQ
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL GlobalTheory.HL.StdPlace NumberField IsDedekindDomain
+open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL GlobalTheory.HL.StdPlace NumberField
+  IsDedekindDomain
 open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.SelfDual
 
 open Matrix GlobalTheory.HL.Eichler GlobalTheory.UnramOrder
 
-theorem exists_orthonormal_same_span : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E), IsHermND L Hm → ∀ b : Fin m → Fin n → E, (∀ i j, hf L Hm (b i) (b j) ∈ L.O) → (∃ P : Matrix (Fin m) (Fin m) E, IsIntM L P ∧ (Matrix.of fun i j => hf L Hm (b i) (b j)) * P = 1) → ∃ b' : Fin m → Fin n → E, (∀ i j, hf L Hm (b' i) (b' j) = if i = j then 1 else 0) ∧ Submodule.span L.O (Set.range b') = Submodule.span L.O (Set.range b) := by
+theorem exists_orthonormal_same_span
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E),
+        IsHermND L Hm
+          → ∀ b : Fin m → Fin n → E,
+            (∀ i j, hf L Hm (b i) (b j) ∈ L.O)
+              → (∃ P : Matrix (Fin m) (Fin m) E,
+                IsIntM L P ∧ (Matrix.of fun i j => hf L Hm (b i) (b j)) * P = 1)
+              → ∃ b' : Fin m → Fin n → E,
+                (∀ i j, hf L Hm (b' i) (b' j) = if i = j then 1 else 0)
+                  ∧ Submodule.span L.O (Set.range b') = Submodule.span L.O (Set.range b) := by
   intro F _ _ _ _ _ E _ _ _ L n m Hm hH b hint₀ hunim
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[F]
   obtain ⟨htr, -, -, hpir, -, -, -, hnorm⟩ := order_facts L ϖ hϖ
   obtain ⟨P₀, hP₀, hGP₀⟩ := hunim
-  have hmem : ∀ i, b i ∈ Submodule.span L.O (Set.range b) := fun i =>
-    Submodule.subset_span ⟨i, rfl⟩
+  have hmem : ∀ i, b i ∈ Submodule.span L.O (Set.range b) := fun i => Submodule.subset_span ⟨i, rfl⟩
   have hsm : ∀ (a : L.O) (v : Fin n → E), a • v = (a : E) • v := fun _ _ => rfl
   let c : L.O →+* L.O := (L.cj : E →+* E).restrict L.O L.O fun x hx => cj_mem L hx
   have hcv : ∀ x : L.O, ((c x : L.O) : E) = L.cj x := fun _ => rfl
@@ -63,20 +74,21 @@ theorem exists_orthonormal_same_span : ∀ {F : Type} [Field F] [ValuativeRel F]
     exact ⟨a, Subtype.ext ha.symm⟩
   have hinj : Function.Injective (algebraMap 𝒪[F] L.O) := fun a b h =>
     Subtype.ext (algebraMap_inj L (congrArg Subtype.val h))
-  obtain ⟨P, hP, hGP⟩ := GlobalTheory.UnramifiedHermitian.exists_eq_transpose_mul_map (R₀ := 𝒪[F]) c hc hfix
-    (by
-      obtain ⟨w, hw, h⟩ := htr 1
-      exact ⟨⟨w, hw⟩, Subtype.ext (by simpa [hcv] using h)⟩)
-    (fun u hu hu' => by
-      obtain ⟨v, hv⟩ := hu'.exists_right_inv
-      have hv' := congrArg c hv
-      rw [map_mul, hu, map_one] at hv'
-      obtain ⟨s, rfl⟩ := hfix v (by linear_combination v * hv' - c v * hv)
-      obtain ⟨r, rfl⟩ := hfix u hu
-      have hr : IsUnit r := IsUnit.of_mul_eq_one s (hinj (by rw [map_mul, hv, map_one]))
-      obtain ⟨x, hx, h⟩ := hnorm hr.unit
-      exact ⟨⟨x, hx⟩, Subtype.ext h⟩)
-    hG (Matrix.isUnit_det_of_right_inverse hGQ)
+  obtain ⟨P, hP, hGP⟩ :=
+    GlobalTheory.UnramifiedHermitian.exists_eq_transpose_mul_map (R₀ := 𝒪[F]) c hc hfix
+      (by
+        obtain ⟨w, hw, h⟩ := htr 1
+        exact ⟨⟨w, hw⟩, Subtype.ext (by simpa [hcv] using h)⟩)
+      (fun u hu hu' => by
+        obtain ⟨v, hv⟩ := hu'.exists_right_inv
+        have hv' := congrArg c hv
+        rw [map_mul, hu, map_one] at hv'
+        obtain ⟨s, rfl⟩ := hfix v (by linear_combination v * hv' - c v * hv)
+        obtain ⟨r, rfl⟩ := hfix u hu
+        have hr : IsUnit r := IsUnit.of_mul_eq_one s (hinj (by rw [map_mul, hv, map_one]))
+        obtain ⟨x, hx, h⟩ := hnorm hr.unit
+        exact ⟨⟨x, hx⟩, Subtype.ext h⟩)
+      hG (Matrix.isUnit_det_of_right_inverse hGQ)
   have hQ : (P⁻¹)ᵀ * G * (P⁻¹).map c = 1 := by
     rw [hGP, ← Matrix.mul_assoc, ← Matrix.transpose_mul, Matrix.mul_nonsing_inv _ hP,
       Matrix.transpose_one, Matrix.one_mul, ← Matrix.map_mul, Matrix.mul_nonsing_inv _ hP,

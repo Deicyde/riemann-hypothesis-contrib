@@ -10,23 +10,28 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
-theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∃ σ : MulChar F R, (∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) := by
+theorem fund_ex_relay
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∃ σ : MulChar F R, (∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) := by
   intro p hpF C _ _ _ v R _ _ hR hp F _ _ _ _ f hq
   classical
   have hpp : p.Prime := hpF.out
   have hf : f ≠ 0 := by
     rintro rfl
     have h1 : 1 < Fintype.card F := by
-      first
-        | exact Fintype.one_lt_card
-        | exact Fintype.one_lt_card_iff_nontrivial.mpr inferInstance
+      first | exact Fintype.one_lt_card | exact Fintype.one_lt_card_iff_nontrivial.mpr inferInstance
     rw [hq, pow_zero] at h1
     exact lt_irrefl _ h1
   have hqpos : 0 < p ^ f := Nat.pos_of_ne_zero (pow_ne_zero _ hpp.ne_zero)
   obtain ⟨n, hqn⟩ : ∃ n, p ^ f = n + 1 := ⟨p ^ f - 1, by omega⟩
   have hn : 0 < n := by
     have h2 : p ≤ p ^ f := by
-      calc p = p ^ 1 := (pow_one p).symm
+      calc
+        p = p ^ 1 := (pow_one p).symm
         _ ≤ p ^ f := Nat.pow_le_pow_right hpp.pos (Nat.one_le_iff_ne_zero.mpr hf)
     have := hpp.two_le
     omega
@@ -44,8 +49,9 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     rw [map_natCast] at h1
     rw [h1] at hp
     exact lt_irrefl _ hp
-  obtain ⟨M, hM, hpM⟩ := Ideal.exists_le_maximal (Ideal.span {(p : R)}) (by
-    rw [Ne, Ideal.span_singleton_eq_top]; exact hpnu)
+  obtain ⟨M, hM, hpM⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {(p : R)})
+      (by rw [Ne, Ideal.span_singleton_eq_top]; exact hpnu)
   have hpM' : (p : R) ∈ M := hpM (Ideal.mem_span_singleton.mpr (dvd_refl _))
   have L2 : ∀ m ∈ M, v (algebraMap R C m) < 1 := by
     intro m hm
@@ -73,8 +79,9 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     rw [CharP.charP_iff_prime_eq_zero hpp, ← map_natCast (Ideal.Quotient.mk M) p]
     exact (hmk0 _).mpr hpM'
 
-  have H : ∀ s t : R, t ^ (p ^ f) = t → s - t ∈ M →
-      ∃ u : R, IsUnit u ∧ s ^ (p ^ f) - s = (s - t) * u := by
+  have H
+      : ∀ s t : R,
+        t ^ (p ^ f) = t → s - t ∈ M → ∃ u : R, IsUnit u ∧ s ^ (p ^ f) - s = (s - t) * u := by
     intro s t ht hst
     set G := ∑ i ∈ Finset.range (p ^ f), s ^ i * t ^ (p ^ f - 1 - i) with hG
     refine ⟨G - 1, ?_, ?_⟩
@@ -86,8 +93,9 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
         set_option synthInstance.maxHeartbeats 100000 in
           rw [hG, map_sum]
         simp only [map_mul, map_pow, hst']
-        have hsum : ∑ i ∈ Finset.range (p ^ f), Ideal.Quotient.mk M t ^ i * Ideal.Quotient.mk M t ^ (p ^ f - 1 - i)
-            = ∑ i ∈ Finset.range (p ^ f), Ideal.Quotient.mk M t ^ (p ^ f - 1) := by
+        have hsum
+            : ∑ i ∈ Finset.range (p ^ f), Ideal.Quotient.mk M t ^ i * Ideal.Quotient.mk M t ^ (p ^ f - 1 - i)
+              = ∑ i ∈ Finset.range (p ^ f), Ideal.Quotient.mk M t ^ (p ^ f - 1) := by
           apply Finset.sum_congr rfl
           intro i hi
           rw [← pow_add]
@@ -107,8 +115,10 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
       rw [← hG] at hgs
       rw [mul_sub, mul_one, mul_comm (s - t) G, hgs, ht]
       ring
-  have Uq : ∀ t1 t2 : R, t1 ^ (p ^ f) = t1 → t2 ^ (p ^ f) = t2 →
-      Ideal.Quotient.mk M t1 = Ideal.Quotient.mk M t2 → t1 = t2 := by
+  have Uq
+      : ∀ t1 t2 : R,
+        t1 ^ (p ^ f) = t1 → t2 ^ (p ^ f) = t2 → Ideal.Quotient.mk M t1 = Ideal.Quotient.mk M t2
+          → t1 = t2 := by
     intro t1 t2 h1 h2 h12
     obtain ⟨u, hu, hsu⟩ := H t1 t2 h2 (Ideal.Quotient.eq.mp h12)
     rw [h1, sub_self] at hsu
@@ -116,8 +126,9 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     exact sub_eq_zero.mp ((hu.mul_left_eq_zero).mp h3)
 
   have : NeZero ((n : ℕ) : C) := ⟨Nat.cast_ne_zero.mpr hn.ne'⟩
-  obtain ⟨ζ, hζ⟩ := IsAlgClosed.exists_root (Polynomial.cyclotomic n C) (by
-    first
+  obtain ⟨ζ, hζ⟩ :=
+    IsAlgClosed.exists_root (Polynomial.cyclotomic n C) (by
+      first
       | exact (Polynomial.degree_cyclotomic_pos n C hn).ne'
       | (rw [Polynomial.degree_cyclotomic]; exact_mod_cast (Nat.totient_pos.mpr hn).ne'))
   have hζp : IsPrimitiveRoot ζ n := (Polynomial.isRoot_cyclotomic_iff).mp hζ
@@ -151,37 +162,39 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     rw [h0, zero_pow hn.ne'] at h1
     exact zero_ne_one h1
 
-  let S : Subfield (R ⧸ M) :=
-    { carrier := {x | x ^ (p ^ f) = x}
-      mul_mem' := by
-        intro a b ha hb
-        have ha' : a ^ (p ^ f) = a := ha
-        have hb' : b ^ (p ^ f) = b := hb
-        show (a * b) ^ (p ^ f) = a * b
-        rw [mul_pow, ha', hb']
-      one_mem' := by
-        show (1 : R ⧸ M) ^ (p ^ f) = 1
-        exact one_pow _
-      add_mem' := by
-        intro a b ha hb
-        have ha' : a ^ (p ^ f) = a := ha
-        have hb' : b ^ (p ^ f) = b := hb
-        show (a + b) ^ (p ^ f) = a + b
-        rw [add_pow_char_pow, ha', hb']
-      zero_mem' := by
-        show (0 : R ⧸ M) ^ (p ^ f) = 0
-        exact zero_pow (pow_ne_zero _ hpp.ne_zero)
-      neg_mem' := by
-        intro a ha
-        have ha' : a ^ (p ^ f) = a := ha
-        show (-a) ^ (p ^ f) = -a
-        rw [neg_eq_zero_sub, sub_pow_char_pow, ha', zero_pow (pow_ne_zero _ hpp.ne_zero)]
-      inv_mem' := by
-        intro a ha
-        have ha' : a ^ (p ^ f) = a := ha
-        show a⁻¹ ^ (p ^ f) = a⁻¹
-        rw [inv_pow, ha'] }
-  let φ : Option (Fin n) → R ⧸ M := fun o => Option.elim o 0 (fun i => Ideal.Quotient.mk M z ^ (i : ℕ))
+  let S : Subfield (R ⧸ M) := {
+    carrier := {x | x ^ (p ^ f) = x}
+    mul_mem' := by
+      intro a b ha hb
+      have ha' : a ^ (p ^ f) = a := ha
+      have hb' : b ^ (p ^ f) = b := hb
+      show (a * b) ^ (p ^ f) = a * b
+      rw [mul_pow, ha', hb']
+    one_mem' := by
+      show (1 : R ⧸ M) ^ (p ^ f) = 1
+      exact one_pow _
+    add_mem' := by
+      intro a b ha hb
+      have ha' : a ^ (p ^ f) = a := ha
+      have hb' : b ^ (p ^ f) = b := hb
+      show (a + b) ^ (p ^ f) = a + b
+      rw [add_pow_char_pow, ha', hb']
+    zero_mem' := by
+      show (0 : R ⧸ M) ^ (p ^ f) = 0
+      exact zero_pow (pow_ne_zero _ hpp.ne_zero)
+    neg_mem' := by
+      intro a ha
+      have ha' : a ^ (p ^ f) = a := ha
+      show (-a) ^ (p ^ f) = -a
+      rw [neg_eq_zero_sub, sub_pow_char_pow, ha', zero_pow (pow_ne_zero _ hpp.ne_zero)]
+    inv_mem' := by
+      intro a ha
+      have ha' : a ^ (p ^ f) = a := ha
+      show a⁻¹ ^ (p ^ f) = a⁻¹
+      rw [inv_pow, ha']
+  }
+  let φ : Option (Fin n) → R ⧸ M := fun o =>
+    Option.elim o 0 (fun i => Ideal.Quotient.mk M z ^ (i : ℕ))
   have hφ : Function.Injective φ := by
     intro o1 o2 h
     cases o1 with
@@ -192,11 +205,11 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
         exact absurd (show Ideal.Quotient.mk M z ^ (j : ℕ) = 0 from h.symm) (pow_ne_zero _ hrr0)
     | some i =>
       cases o2 with
-      | none =>
-        exact absurd (show Ideal.Quotient.mk M z ^ (i : ℕ) = 0 from h) (pow_ne_zero _ hrr0)
+      | none => exact absurd (show Ideal.Quotient.mk M z ^ (i : ℕ) = 0 from h) (pow_ne_zero _ hrr0)
       | some j =>
-        have hij := hrr.pow_inj i.2 j.2
-          (show Ideal.Quotient.mk M z ^ (i : ℕ) = Ideal.Quotient.mk M z ^ (j : ℕ) from h)
+        have hij :=
+          hrr.pow_inj i.2 j.2
+            (show Ideal.Quotient.mk M z ^ (i : ℕ) = Ideal.Quotient.mk M z ^ (j : ℕ) from h)
         exact congrArg some (Fin.ext hij)
   have hdom : IsDomain (R ⧸ M) := Ideal.Quotient.isDomain M
   have hnz : NeZero n := ⟨hn.ne'⟩
@@ -234,8 +247,8 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     | some i => exact ⟨z ^ (i : ℕ), hTz i, by rw [map_pow]; exact ho⟩
   let σf : F → R := fun a => Classical.choose (hlift (e a))
   have hs1 : ∀ a, (σf a) ^ (p ^ f) = σf a := fun a => (Classical.choose_spec (hlift (e a))).1
-  have hs2 : ∀ a, Ideal.Quotient.mk M (σf a) = ((e a : S) : R ⧸ M) :=
-    fun a => (Classical.choose_spec (hlift (e a))).2
+  have hs2 : ∀ a, Ideal.Quotient.mk M (σf a) = ((e a : S) : R ⧸ M) := fun a =>
+    (Classical.choose_spec (hlift (e a))).2
   have hone : σf 1 = 1 := by
     refine Uq _ _ (hs1 1) (one_pow _) ?_
     simp only [hs2, map_one, Subfield.coe_one]
@@ -247,17 +260,18 @@ theorem fund_ex_relay : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     refine Uq _ _ (hs1 _) ?_ ?_
     · rw [mul_pow, hs1, hs1]
     · simp only [hs2, map_mul, Subfield.coe_mul]
-  let σ : MulChar F R :=
-    { toFun := σf
-      map_one' := hone
-      map_mul' := hmul
-      map_nonunit' := by
-        intro a ha
-        have ha0 : a = 0 := by
-          by_contra h
-          exact ha (isUnit_iff_ne_zero.mpr h)
-        subst ha0
-        exact hzero }
+  let σ : MulChar F R := {
+    toFun := σf
+    map_one' := hone
+    map_mul' := hmul
+    map_nonunit' := by
+      intro a ha
+      have ha0 : a = 0 := by
+        by_contra h
+        exact ha (isUnit_iff_ne_zero.mpr h)
+      subst ha0
+      exact hzero
+  }
   refine ⟨σ, fun a b => ?_⟩
   show σf (a + b) - σf a - σf b ∈ Ideal.span {(p : R)}
   obtain ⟨r, hr⟩ := exists_add_pow_prime_pow_eq hpp (σf a) (σf b) f

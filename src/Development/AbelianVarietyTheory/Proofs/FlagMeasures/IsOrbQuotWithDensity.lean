@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Thres
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.MainNotions.S GlobalTheory.ThA Formalism.QuantumDeterminants MeasureTheory Matrix
+open Formalism.FourierDecayAlt Formalism.MainNotions.S GlobalTheory.ThA
+  Formalism.QuantumDeterminants MeasureTheory Matrix
 open Formalism.FourierDecayAlt.P.Dx2.OrbJ
 
 namespace GlobalTheory.ThA.QuotCut
@@ -162,86 +163,117 @@ private lemma lintegral_inv_eq_of_mul_invariant {n : ℕ} (U : Set (Matrix (Fin 
   rw [mul_comm] at K
   exact ((ENNReal.mul_right_inj hz htop).mp K).symm
 
-theorem weil {k r : ℕ} (x : B.Mat k r) (hx : IsUnit x.det) (μR : Measure (Mt k r))
+theorem weil
+    {k r : ℕ} (x : B.Mat k r) (hx : IsUnit x.det) (μR : Measure (Mt k r))
     (hR : B.IsHaarOn (C6.Rset x) μR) (μ : Measure (B.SS k r)) [SFinite μ]
     (hinvμ : ∀ a ∈ C6.Rset x, MeasurePreserving (C6.actR x a) μ μ)
-    (Θ : B.SS k r → ENNReal) (hΘ : Measurable Θ)
-    (h1 : ∀ᵐ p ∂μ, ∫⁻ a, Θ (C6.actR x (Matrix.of a) p) ∂μR = 1)
-    (f : B.SS k r → ENNReal) (hf : Measurable f) :
-    ∫⁻ p, f p ∂μ = ∫⁻ p, (∫⁻ a, f (C6.actR x (Matrix.of a) p) ∂μR) ∂(μ.withDensity Θ) := by
+    (Θ : B.SS k r → ENNReal)
+    (hΘ : Measurable Θ) (h1 : ∀ᵐ p ∂μ, ∫⁻ a, Θ (C6.actR x (Matrix.of a) p) ∂μR = 1)
+    (f : B.SS k r → ENNReal) (hf : Measurable f)
+    : ∫⁻ p, f p ∂μ = ∫⁻ p, (∫⁻ a, f (C6.actR x (Matrix.of a) p) ∂μR) ∂(μ.withDensity Θ) := by
   have hRs : ∀ a ∈ C6.Rset x, IsUnit a.det := fun a ha => WeylGroupFacts.isUnit_of_uh ha.1.1
   have : IsFiniteMeasureOnCompacts μR := ⟨fun K hK => hR.finite_compact K hK⟩
   have : SigmaFinite μR := inferInstance
   have hU : ∀ᵐ a ∂μR, Matrix.of a ∈ C6.Rset x := ae_iff.mpr (by exact hR.conc)
   have hact := measurable_actR_of x
-  have hleft : ∀ a ∈ C6.Rset x, ∀ h : Mt k r → ENNReal, Measurable h →
-      ∫⁻ b, h (Matrix.of.symm (a * Matrix.of b)) ∂μR = ∫⁻ b, h b ∂μR := by
+  have hleft
+      : ∀ a ∈ C6.Rset x, ∀ h : Mt k r → ENNReal,
+        Measurable h → ∫⁻ b, h (Matrix.of.symm (a * Matrix.of b)) ∂μR = ∫⁻ b, h b ∂μR := by
     intro a ha h hh
     have hm : Measurable (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r)) :=
-      measurable_of_symm_mul (F := fun _ : Mt k r => a) (G := fun c : Mt k r => Matrix.of c) measurable_const measurable_id
-    have e : μR.map (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r)) = μR := hR.left a ha
-    calc ∫⁻ b, h (Matrix.of.symm (a * Matrix.of b)) ∂μR
-        = ∫⁻ b, h b ∂(μR.map (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r))) :=
-          (lintegral_map hh hm).symm
+      measurable_of_symm_mul
+        (F := fun _ : Mt k r => a)
+        (G := fun c : Mt k r => Matrix.of c)
+        measurable_const measurable_id
+    have e : μR.map (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r)) = μR :=
+      hR.left a ha
+    calc
+      ∫⁻ b, h (Matrix.of.symm (a * Matrix.of b)) ∂μR
+          = ∫⁻ b, h b ∂(μR.map (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r))) :=
+        (lintegral_map hh hm).symm
       _ = ∫⁻ b, h b ∂μR := by rw [e]
-  have hright : ∀ a ∈ C6.Rset x, ∀ h : Mt k r → ENNReal, Measurable h →
-      ∫⁻ b, h (Matrix.of.symm (Matrix.of b * a)) ∂μR = ∫⁻ b, h b ∂μR := by
+  have hright
+      : ∀ a ∈ C6.Rset x, ∀ h : Mt k r → ENNReal,
+        Measurable h → ∫⁻ b, h (Matrix.of.symm (Matrix.of b * a)) ∂μR = ∫⁻ b, h b ∂μR := by
     intro a ha h hh
     have hm : Measurable (fun c : Mt k r => (Matrix.of.symm (Matrix.of c * a) : Mt k r)) :=
-      measurable_of_symm_mul (F := fun c : Mt k r => Matrix.of c) (G := fun _ : Mt k r => a) measurable_id measurable_const
-    have e : μR.map (fun c : Mt k r => (Matrix.of.symm (Matrix.of c * a) : Mt k r)) = μR := hR.right a ha
-    calc ∫⁻ b, h (Matrix.of.symm (Matrix.of b * a)) ∂μR
-        = ∫⁻ b, h b ∂(μR.map (fun c : Mt k r => (Matrix.of.symm (Matrix.of c * a) : Mt k r))) :=
-          (lintegral_map hh hm).symm
+      measurable_of_symm_mul
+        (F := fun c : Mt k r => Matrix.of c)
+        (G := fun _ : Mt k r => a)
+        measurable_id measurable_const
+    have e : μR.map (fun c : Mt k r => (Matrix.of.symm (Matrix.of c * a) : Mt k r)) = μR :=
+      hR.right a ha
+    calc
+      ∫⁻ b, h (Matrix.of.symm (Matrix.of b * a)) ∂μR
+          = ∫⁻ b, h b ∂(μR.map (fun c : Mt k r => (Matrix.of.symm (Matrix.of c * a) : Mt k r))) :=
+        (lintegral_map hh hm).symm
       _ = ∫⁻ b, h b ∂μR := by rw [e]
   have hF : Measurable fun p => ∫⁻ a, f (C6.actR x (Matrix.of a) p) ∂μR :=
     (hf.comp (hact.comp measurable_swap)).lintegral_prod_right'
-  have hfa : ∀ p : B.SS k r, Measurable fun a : Mt k r => f (C6.actR x (Matrix.of a) p) :=
-    fun p => hf.comp (hact.comp (measurable_id.prodMk (measurable_const : Measurable fun _ : Mt k r => p)))
-  have hΘa : ∀ p : B.SS k r, Measurable fun a : Mt k r => Θ (C6.actR x (Matrix.of a) p) :=
-    fun p => hΘ.comp (hact.comp (measurable_id.prodMk (measurable_const : Measurable fun _ : Mt k r => p)))
-  have hΘi : ∀ p : B.SS k r, Measurable fun a : Mt k r => Θ (C6.actR x (Matrix.of a)⁻¹ p) :=
-    fun p => hΘ.comp (hact.comp (measurable_inv_apply_of_measurable_entries.prodMk (measurable_const : Measurable fun _ : Mt k r => p)))
+  have hfa : ∀ p : B.SS k r, Measurable fun a : Mt k r => f (C6.actR x (Matrix.of a) p) := fun p =>
+    hf.comp (hact.comp (measurable_id.prodMk (measurable_const : Measurable fun _ : Mt k r => p)))
+  have hΘa : ∀ p : B.SS k r, Measurable fun a : Mt k r => Θ (C6.actR x (Matrix.of a) p) := fun p =>
+    hΘ.comp (hact.comp (measurable_id.prodMk (measurable_const : Measurable fun _ : Mt k r => p)))
+  have hΘi
+      : ∀ p : B.SS k r, Measurable fun a : Mt k r => Θ (C6.actR x (Matrix.of a)⁻¹ p) := fun p =>
+    hΘ.comp (hact.comp (measurable_inv_apply_of_measurable_entries.prodMk
+      (measurable_const : Measurable fun _ : Mt k r => p)))
   rw [lintegral_withDensity_eq_lintegral_mul _ hΘ hF]
   symm
-  calc ∫⁻ p, (Θ * fun p => ∫⁻ a, f (C6.actR x (Matrix.of a) p) ∂μR) p ∂μ
-      = ∫⁻ p, ∫⁻ a, Θ p * f (C6.actR x (Matrix.of a) p) ∂μR ∂μ := by
-        refine lintegral_congr fun p => ?_
-        rw [Pi.mul_apply, lintegral_const_mul _ (hfa p)]
+  calc
+    ∫⁻ p, (Θ * fun p => ∫⁻ a, f (C6.actR x (Matrix.of a) p) ∂μR) p ∂μ
+        = ∫⁻ p, ∫⁻ a, Θ p * f (C6.actR x (Matrix.of a) p) ∂μR ∂μ := by
+      refine lintegral_congr fun p => ?_
+      rw [Pi.mul_apply, lintegral_const_mul _ (hfa p)]
     _ = ∫⁻ a, ∫⁻ p, Θ p * f (C6.actR x (Matrix.of a) p) ∂μ ∂μR := by
-        refine lintegral_lintegral_swap ?_
-        exact ((hΘ.comp measurable_fst).mul (hf.comp (hact.comp measurable_swap))).aemeasurable
+      refine lintegral_lintegral_swap ?_
+      exact ((hΘ.comp measurable_fst).mul (hf.comp (hact.comp measurable_swap))).aemeasurable
     _ = ∫⁻ a, ∫⁻ p, Θ (C6.actR x (Matrix.of a)⁻¹ p) * f p ∂μ ∂μR := by
-        refine lintegral_congr_ae (hU.mono fun a ha => ?_)
-        have hmp := hinvμ _ ha
-        have hu := hRs _ ha
-        have G : Measurable fun p => Θ (C6.actR x (Matrix.of a)⁻¹ p) * f p :=
-          (hΘ.comp (hact.comp ((measurable_const : Measurable fun _ : B.SS k r =>
+      refine lintegral_congr_ae (hU.mono fun a ha => ?_)
+      have hmp := hinvμ _ ha
+      have hu := hRs _ ha
+      have G : Measurable fun p => Θ (C6.actR x (Matrix.of a)⁻¹ p) * f p :=
+        (hΘ.comp (hact.comp
+          ((measurable_const : Measurable fun _ : B.SS k r =>
             (Matrix.of.symm (Matrix.of a)⁻¹ : Mt k r)).prodMk measurable_id))).mul hf
-        refine Eq.trans ?_ (hmp.lintegral_comp G)
-        refine lintegral_congr fun p => ?_
-        simp only [actR_inv_actR x hx _ hu]
+      refine Eq.trans ?_ (hmp.lintegral_comp G)
+      refine lintegral_congr fun p => ?_
+      simp only [actR_inv_actR x hx _ hu]
     _ = ∫⁻ p, ∫⁻ a, Θ (C6.actR x (Matrix.of a)⁻¹ p) * f p ∂μR ∂μ := by
-        refine lintegral_lintegral_swap ?_
-        exact ((hΘ.comp (hact.comp ((measurable_inv_apply_of_measurable_entries.comp measurable_fst).prodMk measurable_snd))).mul
-          (hf.comp measurable_snd)).aemeasurable
+      refine lintegral_lintegral_swap ?_
+      exact ((hΘ.comp (hact.comp
+        ((measurable_inv_apply_of_measurable_entries.comp measurable_fst).prodMk
+          measurable_snd))).mul (hf.comp measurable_snd)).aemeasurable
     _ = ∫⁻ p, f p * ∫⁻ a, Θ (C6.actR x (Matrix.of a)⁻¹ p) ∂μR ∂μ := by
-        refine lintegral_congr fun p => ?_
-        rw [lintegral_mul_const _ (hΘi p), mul_comm]
+      refine lintegral_congr fun p => ?_
+      rw [lintegral_mul_const _ (hΘi p), mul_comm]
     _ = ∫⁻ p, f p * ∫⁻ a, Θ (C6.actR x (Matrix.of a) p) ∂μR ∂μ := by
-        refine lintegral_congr fun p => ?_
-        have := lintegral_inv_eq_of_mul_invariant (C6.Rset x) μR hR.ne_zero hU hRs hleft hright _ (hΘa p)
-        exact congrArg (f p * ·) this
+      refine lintegral_congr fun p => ?_
+      have :=
+        lintegral_inv_eq_of_mul_invariant (C6.Rset x) μR hR.ne_zero hU hRs hleft hright _ (hΘa p)
+      exact congrArg (f p * ·) this
     _ = ∫⁻ p, f p ∂μ := lintegral_congr_ae (h1.mono fun p hp => by dsimp only; rw [hp, mul_one])
 
-theorem isOrbQuot_withDensity : ∀ (k r : ℕ) (L : LocBessel k r) (x : B.Mat k r) (μR : Measure (Mt k r)) (θ : PairSp k r → ℝ) (cN : ℝ), IsRatioN k r cN → L.κN ≠ ⊤ → x ∈ B.GV k r → B.IsHaarOn (RStab k r x) μR → Measurable θ → (∀ p, 0 ≤ θ p) → (∀ p : PairSp k r, Matrix.of p.1.2 ∈ Nset k r → Matrix.of p.2.2 ∈ Nset k r → Matrix.of p.1.1 ∈ UWset k r L.z → Matrix.of p.2.1 ∈ UWset k r L.z' → ∫ a, θ (stabAct x (Matrix.of a) p) ∂μR = 1) → IsOrbQuot L x μR ((pairMeas L).withDensity fun p => ENNReal.ofReal (θ p)) := by
+theorem isOrbQuot_withDensity
+    : ∀ (k r : ℕ) (L : LocBessel k r) (x : B.Mat k r) (μR : Measure (Mt k r)) (θ : PairSp k r → ℝ)
+        (cN : ℝ),
+      IsRatioN k r cN → L.κN ≠ ⊤ → x ∈ B.GV k r → B.IsHaarOn (RStab k r x) μR → Measurable θ
+        → (∀ p, 0 ≤ θ p)
+        → (∀ p : PairSp k r,
+          Matrix.of p.1.2 ∈ Nset k r → Matrix.of p.2.2 ∈ Nset k r → Matrix.of p.1.1 ∈ UWset k r L.z
+            → Matrix.of p.2.1 ∈ UWset k r L.z'
+            → ∫ a, θ (stabAct x (Matrix.of a) p) ∂μR = 1)
+        → IsOrbQuot L x μR ((pairMeas L).withDensity fun p => ENNReal.ofReal (θ p)) := by
   intro k r L x μR θ cN hcN hκ hx hR hθ hθ0 h1
   have hxu : IsUnit x.det := WeylGroupFacts.isUnit_of_uh hx
   have hH : B.IsHaarOn (Nset k r) (Formalism.FourierDecayAlt.D.muN k r) := P.Dx2.MN.haar r
-  have : IsFiniteMeasureOnCompacts (Formalism.FourierDecayAlt.D.muN k r) := ⟨fun K hK => hH.finite_compact K hK⟩
+  have : IsFiniteMeasureOnCompacts (Formalism.FourierDecayAlt.D.muN k r) :=
+    ⟨fun K hK => hH.finite_compact K hK⟩
   have : SigmaFinite (Formalism.FourierDecayAlt.D.muN k r) := inferInstance
   have hμN : L.μN = (L.κN * ENNReal.ofReal cN) • Formalism.FourierDecayAlt.D.muN k r := by
-    have e1 : Formalism.MainNotions.S.haarLie (Nset k r) L.κN = L.κN • Formalism.MainNotions.S.haarLie (Nset k r) 1 := by
+    have e1
+        : Formalism.MainNotions.S.haarLie (Nset k r) L.κN
+          = L.κN • Formalism.MainNotions.S.haarLie (Nset k r) 1 := by
       unfold Formalism.MainNotions.S.haarLie
       rw [one_smul]
     show Formalism.MainNotions.S.haarLie (Nset k r) L.κN = _
@@ -250,8 +282,11 @@ theorem isOrbQuot_withDensity : ∀ (k r : ℕ) (L : LocBessel k r) (x : B.Mat k
   have : SigmaFinite L.μW := L.hμW.1.1
   have : SigmaFinite L.μW' := L.hμW'.1.1
   have : SFinite (pairMeas L) := by unfold pairMeas; infer_instance
-  have hN : ∀ b ∈ Nset k r, MeasurePreserving (fun c : Mt k r => (Matrix.of.symm (b * Matrix.of c) : Mt k r))
-      L.μN L.μN := by
+  have hN
+      : ∀ b ∈ Nset k r,
+        MeasurePreserving
+          (fun c : Mt k r => (Matrix.of.symm (b * Matrix.of c) : Mt k r))
+          L.μN L.μN := by
     intro b hb
     have hc : Continuous (fun c : Mt k r => Matrix.of c) := continuous_id
     have hbc : Continuous (fun _ : Mt k r => b) := continuous_const
@@ -263,18 +298,24 @@ theorem isOrbQuot_withDensity : ∀ (k r : ℕ) (L : LocBessel k r) (x : B.Mat k
     exact hH.left b hb
   have hinv : ∀ a ∈ C6.Rset x, MeasurePreserving (C6.actR x a) (pairMeas L) (pairMeas L) := by
     intro a ha
-    have e : C6.actR x a = Prod.map (Prod.map id (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r)))
-        (Prod.map id (fun c : Mt k r => (Matrix.of.symm (x⁻¹ * a * x * Matrix.of c) : Mt k r))) := rfl
+    have e
+        : C6.actR x a
+          = Prod.map (Prod.map id (fun c : Mt k r => (Matrix.of.symm (a * Matrix.of c) : Mt k r)))
+            (Prod.map id
+              (fun c : Mt k r => (Matrix.of.symm (x⁻¹ * a * x * Matrix.of c) : Mt k r))) :=
+      rfl
     rw [e]
-    exact ((MeasurePreserving.id L.μW).prod (hN a ha.1)).prod ((MeasurePreserving.id L.μW').prod (hN _ ha.2))
+    exact ((MeasurePreserving.id L.μW).prod (hN a ha.1)).prod
+      ((MeasurePreserving.id L.μW').prod (hN _ ha.2))
   have aW : ∀ᵐ h ∂L.μW, Matrix.of h ∈ UWset k r L.z := ae_iff.mpr L.hμW.1.2.2.1
   have aW' : ∀ᵐ h ∂L.μW', Matrix.of h ∈ UWset k r L.z' := ae_iff.mpr L.hμW'.1.2.2.1
   have aN : ∀ᵐ n ∂L.μN, Matrix.of n ∈ Nset k r := by
     refine ae_iff.mpr ?_
     rw [hμN, Measure.smul_apply, smul_eq_mul]
     exact mul_eq_zero_of_right _ hH.conc
-  have aP : ∀ᵐ p ∂pairMeas L, (Matrix.of p.1.1 ∈ UWset k r L.z ∧ Matrix.of p.1.2 ∈ Nset k r) ∧
-      (Matrix.of p.2.1 ∈ UWset k r L.z' ∧ Matrix.of p.2.2 ∈ Nset k r) := by
+  have aP
+      : ∀ᵐ p ∂pairMeas L, (Matrix.of p.1.1 ∈ UWset k r L.z ∧ Matrix.of p.1.2 ∈ Nset k r) ∧
+        (Matrix.of p.2.1 ∈ UWset k r L.z' ∧ Matrix.of p.2.2 ∈ Nset k r) := by
     show ∀ᵐ p ∂((L.μW.prod L.μN).prod (L.μW'.prod L.μN)), _
     have q1 : ∀ᵐ z ∂(L.μW.prod L.μN), Matrix.of z.1 ∈ UWset k r L.z ∧ Matrix.of z.2 ∈ Nset k r :=
       (Measure.quasiMeasurePreserving_fst.ae aW).and (Measure.quasiMeasurePreserving_snd.ae aN)
@@ -293,7 +334,8 @@ theorem isOrbQuot_withDensity : ∀ (k r : ℕ) (L : LocBessel k r) (x : B.Mat k
     exact this.symm
   unfold IsOrbQuot
   intro f hf
-  exact weil x hxu μR hR (pairMeas L) hinv (fun p => ENNReal.ofReal (θ p)) (ENNReal.measurable_ofReal.comp hθ)
-    h1' f hf
+  exact weil x hxu μR hR (pairMeas L) hinv
+    (fun p => ENNReal.ofReal (θ p))
+    (ENNReal.measurable_ofReal.comp hθ) h1' f hf
 
 end GlobalTheory.ThA.QuotCut

@@ -38,57 +38,71 @@ theorem qS_eq_pow (T : Tower p Ω) (k j : ℕ) : qS T k = qS T (k + j) ^ (p ^ j)
     rw [SubmonoidClass.coe_pow]
     exact (T.qpow (k + j)).symm
 
-theorem D_zS_mem_span (T : Tower p Ω) {k m : ℕ} (h : k ≤ m) :
-    KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T k) ∈
-      Submodule.span (integralClosure (O0 p) Ω)
-        {KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T m),
-          KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T m)} := by
+theorem D_zS_mem_span (T : Tower p Ω) {k m : ℕ} (h : k ≤ m)
+    : KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T k)
+      ∈ Submodule.span (integralClosure (O0 p) Ω) {
+        KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T m),
+        KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T m)
+      } := by
   obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le h
   rw [zS_eq_pow T k j, Derivation.leibniz_pow]
-  exact Submodule.smul_of_tower_mem _ _
-    (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
+  exact Submodule.smul_of_tower_mem _ _ (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
 
-theorem D_qS_mem_span (T : Tower p Ω) {k m : ℕ} (h : k ≤ m) :
-    KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T k) ∈
-      Submodule.span (integralClosure (O0 p) Ω)
-        {KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T m),
-          KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T m)} := by
+theorem D_qS_mem_span (T : Tower p Ω) {k m : ℕ} (h : k ≤ m)
+    : KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T k)
+      ∈ Submodule.span (integralClosure (O0 p) Ω) {
+        KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T m),
+        KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T m)
+      } := by
   obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le h
   rw [qS_eq_pow T k j, Derivation.leibniz_pow]
-  exact Submodule.smul_of_tower_mem _ _
-    (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
+  exact Submodule.smul_of_tower_mem _ _ (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
 
 end Klc
 
-
-theorem p_sq_smul_kaehler_mem_span : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
-    p ≠ 2 → IsClo p Ω → ∀ (T : Tower p Ω) (η : KaehlerDifferential (O0 p) (integralClosure (O0 p) Ω))
-    (n : ℕ), ∃ m, n ≤ m ∧ ∃ x y : (integralClosure (O0 p) Ω), (p : (integralClosure (O0 p) Ω)) ^ 2 • η =
-      x • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T m) +
-        y • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T m) := by
+theorem p_sq_smul_kaehler_mem_span
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      p ≠ 2 → IsClo p Ω
+        → ∀ (T : Tower p Ω) (η : KaehlerDifferential (O0 p) (integralClosure (O0 p) Ω)) (n : ℕ),
+          ∃ m,
+            n ≤ m
+              ∧ ∃ x y : (integralClosure (O0 p) Ω),
+                (p : (integralClosure (O0 p) Ω)) ^ 2 • η
+                  = x • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T m)
+                    + y • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T m) := by
   intro p _ Ω _ _ hp2 hclo T η n
   let 𝒮 := integralClosure (O0 p) Ω
   let 𝒟 := KaehlerDifferential.D (O0 p) 𝒮
-  let N : ℕ → Submodule 𝒮 (KaehlerDifferential (O0 p) 𝒮) :=
-    fun m => Submodule.span 𝒮 {𝒟 (zS T m), 𝒟 (qS T m)}
-  have hmono : Monotone N := fun k m h => Submodule.span_le.2 (by
-    intro x hx
-    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
-    rcases hx with rfl | rfl
-    exacts [D_zS_mem_span T h, D_qS_mem_span T h])
-  have hder : ∀ B : Subalgebra (O0 p) 𝒮, IsDerOn B (fun x => 𝒟 x) := fun B =>
-    ⟨fun x _ y _ => map_add 𝒟 x y, fun x _ y _ => Derivation.leibniz 𝒟 x y,
-      fun a => (𝒟).map_algebraMap a⟩
+  let N : ℕ → Submodule 𝒮 (KaehlerDifferential (O0 p) 𝒮) := fun m =>
+    Submodule.span 𝒮 {𝒟 (zS T m), 𝒟 (qS T m)}
+  have hmono : Monotone N := fun k m h =>
+    Submodule.span_le.2 (by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl
+      exacts [D_zS_mem_span T h, D_qS_mem_span T h])
+  have hder : ∀ B : Subalgebra (O0 p) 𝒮, IsDerOn B (fun x => 𝒟 x) := fun B => ⟨
+    fun x _ y _ => map_add 𝒟 x y,
+    fun x _ y _ => Derivation.leibniz 𝒟 x y,
+    fun a => (𝒟).map_algebraMap a
+  ⟩
   have hgen : ∀ t : 𝒮, (p : 𝒮) ^ 2 • 𝒟 t ∈ ⨆ m, N m := by
     intro t
-    obtain ⟨C, tr, k, a, b, hF, htr⟩ := GlobalTheory.T.exists_almostDualTraceData_towerUnionAdjoin p Ω hp2 hclo T {t}
-    have h1 := GlobalTheory.T.almostDualTrace_derivation_mem_span_values (O0 p) 𝒮 _ (towerAlg T) C tr k a b _ htr (fun x => 𝒟 x) (hder C) t
-      (hF (by simp))
+    obtain ⟨C, tr, k, a, b, hF, htr⟩ :=
+      GlobalTheory.T.exists_almostDualTraceData_towerUnionAdjoin p Ω hp2 hclo T {t}
+    have h1 :=
+      GlobalTheory.T.almostDualTrace_derivation_mem_span_values (O0 p) 𝒮 _ (towerAlg T) C tr k a b _
+        htr
+        (fun x => 𝒟 x)
+        (hder C) t (hF (by simp))
     have h2 : Submodule.span 𝒮 ((fun x => 𝒟 x) '' (towerAlg T : Set 𝒮)) ≤ ⨆ m, N m := by
       rw [Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩
-      have h3 := GlobalTheory.T.derivationOn_adjoin_mem_span_image (O0 p) 𝒮 _ (Set.range (zS T) ∪ Set.range (qS T)) (fun x => 𝒟 x)
-        (hder _) x hx
+      have h3 :=
+        GlobalTheory.T.derivationOn_adjoin_mem_span_image (O0 p) 𝒮 _
+          (Set.range (zS T) ∪ Set.range (qS T))
+          (fun x => 𝒟 x)
+          (hder _) x hx
       refine Submodule.span_le.2 ?_ h3
       rintro _ ⟨y, (⟨k, rfl⟩ | ⟨k, rfl⟩), rfl⟩
       · exact Submodule.mem_iSup_of_mem k (Submodule.subset_span (by simp))

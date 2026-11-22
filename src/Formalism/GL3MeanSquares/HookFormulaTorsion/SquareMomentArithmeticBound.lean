@@ -46,30 +46,35 @@ theorem zeta_proposition_second : PropZ_ii := by
   have hba := hN.b'_le_a
   have hT0 := hN.logT_nonneg
   have hS0 := hN.S_nonneg
-  have hκ0 : (0:ℝ) ≤ κ := Nat.cast_nonneg κ
-  have hK1 : (1:ℝ) ≤ (κ:ℝ) + 1 := by linarith
-  have hK0 : (0:ℝ) < (κ:ℝ) + 1 := by linarith
-  have hKN : (κ:ℝ) + 1 ≤ N := by
+  have hκ0 : (0 : ℝ) ≤ κ := Nat.cast_nonneg κ
+  have hK1 : (1 : ℝ) ≤ (κ : ℝ) + 1 := by linarith
+  have hK0 : (0 : ℝ) < (κ : ℝ) + 1 := by linarith
+  have hKN : (κ : ℝ) + 1 ≤ N := by
     have : κ + 1 ≤ N := by rw [hN.N_eq]; exact Nat.le_add_right _ _
     exact_mod_cast this
-  have hNL : (N:ℝ) * L ≤ b' := by linarith [hN.lin]
-  have hNNL : (N:ℝ) ≤ N * L := by nlinarith
-  have hKb : (κ:ℝ) + 1 ≤ b' := by linarith
-  have hKa : (κ:ℝ) + 1 ≤ a := le_trans hKb hba
+  have hNL : (N : ℝ) * L ≤ b' := by linarith [hN.lin]
+  have hNNL : (N : ℝ) ≤ N * L := by nlinarith
+  have hKb : (κ : ℝ) + 1 ≤ b' := by linarith
+  have hKa : (κ : ℝ) + 1 ≤ a := le_trans hKb hba
   have hSb : S ≤ b' := by
     have := hN.small
     have := hN.eta_nonneg
-    have : (0:ℝ) ≤ (m:ℝ) * t := by positivity
+    have : (0 : ℝ) ≤ (m : ℝ) * t := by positivity
     linarith
   have ha1 : 1 ≤ a := le_trans hb1 hba
   have haa : a ≤ a ^ 2 := by nlinarith
-  have hlogK0 : 0 ≤ Real.log ((κ:ℝ) + 1) := Real.log_nonneg hK1
-  have hKbS : 0 ≤ ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1) :=
+  have hlogK0 : 0 ≤ Real.log ((κ : ℝ) + 1) := Real.log_nonneg hK1
+  have hKbS : 0 ≤ ((κ : ℝ) + 1) * (b' + S) * Real.log ((κ : ℝ) + 1) :=
     mul_nonneg (mul_nonneg hK0.le (by linarith)) hlogK0
-  have hZ4 : ∀ ρ, MeanSquareWeightBound (lam ρ) ≤ (if ρ ∈ TT then 2 * a * Real.log ((κ:ℝ) + 1) else 0)
-      + (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1) + 10 * ((κ:ℝ) + 1) ^ 2 * L) := by
+  have hZ4
+      : ∀ ρ,
+        MeanSquareWeightBound (lam ρ)
+          ≤ (if ρ ∈ TT then 2 * a * Real.log ((κ : ℝ) + 1) else 0)
+            + (4 * ((κ : ℝ) + 1) * (b' + S) * Real.log ((κ : ℝ) + 1)
+              + 10 * ((κ : ℝ) + 1) ^ 2 * L) := by
     intro ρ
-    have hp0 : (0:ℝ) ≤ (plus (lam ρ) 0 : ℝ) := by exact_mod_cast zii_plus_nonneg (lam ρ) (hanti ρ) 0
+    have hp0 : (0 : ℝ) ≤ (plus (lam ρ) 0 : ℝ) := by
+      exact_mod_cast zii_plus_nonneg (lam ρ) (hanti ρ) 0
     have hpW : (plus (lam ρ) 0 : ℝ) ≤ (wt (plus (lam ρ)) : ℝ) := by
       exact_mod_cast zii_plus0_le (lam ρ) (hanti ρ)
     unfold MeanSquareWeightBound
@@ -77,91 +82,105 @@ theorem zeta_proposition_second : PropZ_ii := by
     · rw [if_pos hρ]
       obtain ⟨h1, h2, h3, h4⟩ := hTT ρ hρ
       have hw := hwtp ρ hρ
-      have e1 : ((κ:ℝ) + 1) * (bt ρ + S) ≤ ((κ:ℝ) + 1) * (2 * (b' + S)) :=
+      have e1 : ((κ : ℝ) + 1) * (bt ρ + S) ≤ ((κ : ℝ) + 1) * (2 * (b' + S)) :=
         mul_le_mul_of_nonneg_left (by linarith) hK0.le
-      have hWb : (wt (plus (lam ρ)) : ℝ) ≤ 2 * a + 2 * (((κ:ℝ) + 1) * (b' + S)) := by linarith
-      have e2 : ((κ:ℝ) + 1) * (b' + S) ≤ a * (2 * a) :=
+      have hWb : (wt (plus (lam ρ)) : ℝ) ≤ 2 * a + 2 * (((κ : ℝ) + 1) * (b' + S)) := by linarith
+      have e2 : ((κ : ℝ) + 1) * (b' + S) ≤ a * (2 * a) :=
         mul_le_mul hKa (by linarith) (by linarith) (by linarith)
-      have hlog : Real.log ((plus (lam ρ) 0 : ℝ) + (κ:ℝ) + 1) ≤ 10 * L :=
+      have hlog : Real.log ((plus (lam ρ) 0 : ℝ) + (κ : ℝ) + 1) ≤ 10 * L :=
         zii_log_le ha1 hv1 hL1 hN.log_av (by linarith) (by nlinarith)
       have f1 := mul_le_mul_of_nonneg_right hWb hlogK0
-      have f2 := mul_le_mul_of_nonneg_left hlog (sq_nonneg ((κ:ℝ) + 1))
+      have f2 := mul_le_mul_of_nonneg_left hlog (sq_nonneg ((κ : ℝ) + 1))
       nlinarith [f1, f2, hKbS]
     · rw [if_neg hρ]
       have hw := hwtp' ρ hρ
-      have e1 : ((κ:ℝ) + 1 + 3) * S ≤ 4 * (((κ:ℝ) + 1) * (b' + S)) := by nlinarith
-      have e2 : ((κ:ℝ) + 1 + 3) * S ≤ (4 * a) * a := mul_le_mul (by linarith) (by linarith) hS0 (by linarith)
-      have hlog : Real.log ((plus (lam ρ) 0 : ℝ) + (κ:ℝ) + 1) ≤ 10 * L :=
+      have e1 : ((κ : ℝ) + 1 + 3) * S ≤ 4 * (((κ : ℝ) + 1) * (b' + S)) := by nlinarith
+      have e2 : ((κ : ℝ) + 1 + 3) * S ≤ (4 * a) * a :=
+        mul_le_mul (by linarith) (by linarith) hS0 (by linarith)
+      have hlog : Real.log ((plus (lam ρ) 0 : ℝ) + (κ : ℝ) + 1) ≤ 10 * L :=
         zii_log_le ha1 hv1 hL1 hN.log_av (by linarith) (by nlinarith)
       have f1 := mul_le_mul_of_nonneg_right (hw.trans e1) hlogK0
-      have f2 := mul_le_mul_of_nonneg_left hlog (sq_nonneg ((κ:ℝ) + 1))
+      have f2 := mul_le_mul_of_nonneg_left hlog (sq_nonneg ((κ : ℝ) + 1))
       nlinarith [f1, f2, hKbS]
-  have hsumZ4 : ∑ ρ, MeanSquareWeightBound (lam ρ) ≤ (TT.card : ℝ) * (2 * a * Real.log ((κ:ℝ) + 1))
-      + (Fintype.card ι : ℝ) * (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1)
-        + 10 * ((κ:ℝ) + 1) ^ 2 * L) := by
-    have e1 : ∑ ρ, (if ρ ∈ TT then 2 * a * Real.log ((κ:ℝ) + 1) else 0)
-        = (TT.card : ℝ) * (2 * a * Real.log ((κ:ℝ) + 1)) := by
+  have hsumZ4
+      : ∑ ρ, MeanSquareWeightBound (lam ρ)
+        ≤ (TT.card : ℝ) * (2 * a * Real.log ((κ : ℝ) + 1))
+          + (Fintype.card ι : ℝ)
+            * (4 * ((κ : ℝ) + 1) * (b' + S) * Real.log ((κ : ℝ) + 1)
+              + 10 * ((κ : ℝ) + 1) ^ 2 * L) := by
+    have e1
+        : ∑ ρ, (if ρ ∈ TT then 2 * a * Real.log ((κ:ℝ) + 1) else 0)
+          = (TT.card : ℝ) * (2 * a * Real.log ((κ : ℝ) + 1)) := by
       rw [Finset.sum_ite_mem, Finset.univ_inter, Finset.sum_const, nsmul_eq_mul]
-    have e2 : ∑ _ρ : ι, (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1) + 10 * ((κ:ℝ) + 1) ^ 2 * L)
-        = (Fintype.card ι : ℝ) * (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1)
-          + 10 * ((κ:ℝ) + 1) ^ 2 * L) := by
+    have e2
+        : ∑ _ρ : ι, (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1) + 10 * ((κ:ℝ) + 1) ^ 2 * L)
+          = (Fintype.card ι : ℝ)
+            * (4 * ((κ : ℝ) + 1) * (b' + S) * Real.log ((κ : ℝ) + 1)
+              + 10 * ((κ : ℝ) + 1) ^ 2 * L) := by
       rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-    calc ∑ ρ, MeanSquareWeightBound (lam ρ) ≤ ∑ ρ, ((if ρ ∈ TT then 2 * a * Real.log ((κ:ℝ) + 1) else 0)
-          + (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1) + 10 * ((κ:ℝ) + 1) ^ 2 * L)) :=
-          Finset.sum_le_sum fun ρ _ => hZ4 ρ
+    calc
+      ∑ ρ, MeanSquareWeightBound (lam ρ)
+          ≤ ∑ ρ, ((if ρ ∈ TT then 2 * a * Real.log ((κ:ℝ) + 1) else 0)
+            + (4 * ((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1) + 10 * ((κ:ℝ) + 1) ^ 2 * L)) :=
+        Finset.sum_le_sum fun ρ _ => hZ4 ρ
       _ = _ := by rw [Finset.sum_add_distrib, e1, e2]
-  have hwtbound : ∀ ρ, (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) * logT
-      ≤ (if ρ ∈ TT then A ρ / ((κ:ℝ) + 1) * logT else 0) + (1 + C₀) * S * logT := by
+  have hwtbound
+      : ∀ ρ,
+        (wt (lam ρ) : ℝ) / ((κ : ℝ) + 1) * logT
+          ≤ (if ρ ∈ TT then A ρ / ((κ : ℝ) + 1) * logT else 0) + (1 + C₀) * S * logT := by
     intro ρ
     have h3 : 0 ≤ C₀ * S * logT := mul_nonneg (mul_nonneg hC hS0) hT0
     have h4 : 0 ≤ S * logT := mul_nonneg hS0 hT0
     by_cases hρ : ρ ∈ TT
     · rw [if_pos hρ]
       have h := hwt ρ hρ
-      have h1 : (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) ≤ A ρ / ((κ:ℝ) + 1) + S := by
+      have h1 : (wt (lam ρ) : ℝ) / ((κ : ℝ) + 1) ≤ A ρ / ((κ : ℝ) + 1) + S := by
         rw [div_le_iff₀ hK0, add_mul, div_mul_cancel₀ _ hK0.ne']
         linarith
       have h2 := mul_le_mul_of_nonneg_right h1 hT0
       linarith
     · rw [if_neg hρ]
       have h := hwt' ρ hρ
-      have h1 : (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) ≤ C₀ * S := by
+      have h1 : (wt (lam ρ) : ℝ) / ((κ : ℝ) + 1) ≤ C₀ * S := by
         rw [div_le_iff₀ hK0]
         linarith
       have h2 := mul_le_mul_of_nonneg_right h1 hT0
       linarith
-  have hsumwt : ∑ ρ, (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) * logT
-      ≤ ∑ τ ∈ TT, A τ / ((κ:ℝ) + 1) * logT + (Fintype.card ι : ℝ) * ((1 + C₀) * S * logT) := by
-    have e1 : ∑ ρ, (if ρ ∈ TT then A ρ / ((κ:ℝ) + 1) * logT else 0)
-        = ∑ τ ∈ TT, A τ / ((κ:ℝ) + 1) * logT := by
+  have hsumwt
+      : ∑ ρ, (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) * logT
+        ≤ ∑ τ ∈ TT, A τ / ((κ:ℝ) + 1) * logT + (Fintype.card ι : ℝ) * ((1 + C₀) * S * logT) := by
+    have e1
+        : ∑ ρ, (if ρ ∈ TT then A ρ / ((κ:ℝ) + 1) * logT else 0)
+          = ∑ τ ∈ TT, A τ / ((κ:ℝ) + 1) * logT := by
       rw [Finset.sum_ite_mem, Finset.univ_inter]
     have e2 : ∑ _ρ : ι, (1 + C₀) * S * logT = (Fintype.card ι : ℝ) * ((1 + C₀) * S * logT) := by
       rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-    calc ∑ ρ, (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) * logT
-        ≤ ∑ ρ, ((if ρ ∈ TT then A ρ / ((κ:ℝ) + 1) * logT else 0) + (1 + C₀) * S * logT) :=
-          Finset.sum_le_sum fun ρ _ => hwtbound ρ
+    calc
+      ∑ ρ, (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) * logT
+          ≤ ∑ ρ, ((if ρ ∈ TT then A ρ / ((κ:ℝ) + 1) * logT else 0) + (1 + C₀) * S * logT) :=
+        Finset.sum_le_sum fun ρ _ => hwtbound ρ
       _ = _ := by rw [Finset.sum_add_distrib, e1, e2]
   have hmean : muM = -(∑ ρ, (wt (lam ρ) : ℝ) / ((κ:ℝ) + 1) * logT) + ∑ ρ, muDelta ρ := by
     rw [hM]
-    have hc : (0:ℝ) < (Fintype.card X : ℝ) := by exact_mod_cast Fintype.card_pos
+    have hc : (0 : ℝ) < (Fintype.card X : ℝ) := by exact_mod_cast Fintype.card_pos
     unfold mean
     simp only [hV]
     rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_div_cancel_left₀ _ hc.ne']
   have hDel : -(∑ ρ, MeanSquareWeightBound (lam ρ)) ≤ ∑ ρ, muDelta ρ := by
     rw [← Finset.sum_neg_distrib]
     exact Finset.sum_le_sum fun ρ _ => by rw [hD ρ]; linarith [hNab ρ, hMax ρ]
-  have hcard0 : (0:ℝ) ≤ (Fintype.card ι : ℝ) := Nat.cast_nonneg _
-  have n1 : 0 ≤ (TT.card : ℝ) * a * Real.log ((κ:ℝ) + 1) :=
+  have hcard0 : (0 : ℝ) ≤ (Fintype.card ι : ℝ) := Nat.cast_nonneg _
+  have n1 : 0 ≤ (TT.card : ℝ) * a * Real.log ((κ : ℝ) + 1) :=
     mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (by linarith)) hlogK0
-  have m1 : 0 ≤ C₀ * ((TT.card : ℝ) * a * Real.log ((κ:ℝ) + 1)) := mul_nonneg hC n1
+  have m1 : 0 ≤ C₀ * ((TT.card : ℝ) * a * Real.log ((κ : ℝ) + 1)) := mul_nonneg hC n1
   have n2 : 0 ≤ (Fintype.card ι : ℝ) * S * logT := mul_nonneg (mul_nonneg hcard0 hS0) hT0
-  have n3 : 0 ≤ (Fintype.card ι : ℝ) * (((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1)) :=
+  have n3 : 0 ≤ (Fintype.card ι : ℝ) * (((κ : ℝ) + 1) * (b' + S) * Real.log ((κ : ℝ) + 1)) :=
     mul_nonneg hcard0 hKbS
-  have m3 : 0 ≤ C₀ * ((Fintype.card ι : ℝ) * (((κ:ℝ) + 1) * (b' + S) * Real.log ((κ:ℝ) + 1))) :=
+  have m3 : 0 ≤ C₀ * ((Fintype.card ι : ℝ) * (((κ : ℝ) + 1) * (b' + S) * Real.log ((κ : ℝ) + 1))) :=
     mul_nonneg hC n3
-  have n4 : 0 ≤ (Fintype.card ι : ℝ) * (((κ:ℝ) + 1) ^ 2 * L) :=
+  have n4 : 0 ≤ (Fintype.card ι : ℝ) * (((κ : ℝ) + 1) ^ 2 * L) :=
     mul_nonneg hcard0 (mul_nonneg (sq_nonneg _) (by linarith))
-  have m4 : 0 ≤ C₀ * ((Fintype.card ι : ℝ) * (((κ:ℝ) + 1) ^ 2 * L)) := mul_nonneg hC n4
+  have m4 : 0 ≤ C₀ * ((Fintype.card ι : ℝ) * (((κ : ℝ) + 1) ^ 2 * L)) := mul_nonneg hC n4
   linarith [hmean, hDel, hsumZ4, hsumwt, n1, m1, n2, n3, m3, n4, m4]
 
 private lemma positive_part_head_le_weight {κ : ℕ} (lam : Fin (κ + 1) → ℤ) (h : Antitone lam) :
@@ -268,30 +287,32 @@ theorem zeta_proposition_third : PropZ_iii := by
   have hT := hN.logT_nonneg
   have hS := hN.S_nonneg
   have ha : 1 ≤ a := le_trans hb1 hba
-  have hmt : (0:ℝ) ≤ (m : ℝ) * t := by positivity
+  have hmt : (0 : ℝ) ≤ (m : ℝ) * t := by positivity
   have hSb : S ≤ b' := by have := hN.small; have := hN.eta_nonneg; linarith
   have hKN : (κ : ℝ) + 1 ≤ N := by
     have : κ + 1 ≤ N := by rw [hN.N_eq]; exact Nat.le_add_right _ _
     exact_mod_cast this
-  have hN0 : (0:ℝ) ≤ N := Nat.cast_nonneg N
+  have hN0 : (0 : ℝ) ≤ N := Nat.cast_nonneg N
   have hNb : (N : ℝ) ≤ b' := by
     have h1 := hN.lin
     have h2 : (N : ℝ) * 1 ≤ N * L := mul_le_mul_of_nonneg_left hL hN0
     linarith
-  have hK1 : (1:ℝ) ≤ (κ : ℝ) + 1 := by
-    have : (0:ℝ) ≤ κ := Nat.cast_nonneg κ
+  have hK1 : (1 : ℝ) ≤ (κ : ℝ) + 1 := by
+    have : (0 : ℝ) ≤ κ := Nat.cast_nonneg κ
     linarith
   have hKa : (κ : ℝ) + 1 ≤ a := by linarith
   have hlkv : 0 ≤ Real.log (((κ : ℝ) + 1) * v) := Real.log_nonneg (by nlinarith)
-  have key : ∀ ρ, ((wt (plus (lam ρ)) : ℝ) * (C₀ * Real.log (((κ : ℝ) + 1) * v))
-        + ((κ : ℝ) + 1) ^ 2 * Real.log ((plus (lam ρ) 0 : ℝ) + (κ : ℝ) + 1)
-        + |(lam ρ (Fin.last κ) : ℝ)| * logT) ≤
-      (if ρ ∈ TT then 2 * a * (C₀ * Real.log (((κ : ℝ) + 1) * v)) else 0)
-        + (4 * C₀ * ((κ : ℝ) + 1) * (b' + S) * Real.log (((κ : ℝ) + 1) * v)
-          + (2 + C₀) * (b' + S) * logT + 8 * ((κ : ℝ) + 1) ^ 2 * L) := by
+  have key
+      : ∀ ρ,
+        ((wt (plus (lam ρ)) : ℝ) * (C₀ * Real.log (((κ : ℝ) + 1) * v))
+            + ((κ : ℝ) + 1) ^ 2 * Real.log ((plus (lam ρ) 0 : ℝ) + (κ : ℝ) + 1)
+            + |(lam ρ (Fin.last κ) : ℝ)| * logT)
+          ≤ (if ρ ∈ TT then 2 * a * (C₀ * Real.log (((κ : ℝ) + 1) * v)) else 0)
+            + (4 * C₀ * ((κ : ℝ) + 1) * (b' + S) * Real.log (((κ : ℝ) + 1) * v)
+              + (2 + C₀) * (b' + S) * logT + 8 * ((κ : ℝ) + 1) ^ 2 * L) := by
     intro ρ
     obtain ⟨hp0, hpW⟩ := positive_part_head_le_weight (lam ρ) (hanti ρ)
-    have hp0' : (0:ℝ) ≤ (plus (lam ρ) 0 : ℝ) := by exact_mod_cast hp0
+    have hp0' : (0 : ℝ) ≤ (plus (lam ρ) 0 : ℝ) := by exact_mod_cast hp0
     have hpW' : (plus (lam ρ) 0 : ℝ) ≤ (wt (plus (lam ρ)) : ℝ) := by exact_mod_cast hpW
     rw [add_assoc ((plus (lam ρ) 0 : ℤ) : ℝ) (κ : ℝ) 1]
     by_cases hρ : ρ ∈ TT
@@ -302,15 +323,16 @@ theorem zeta_proposition_third : PropZ_iii := by
     · rw [if_neg hρ]
       exact ziii_other hC hK1 hKa hb1 hba hS hSb hL hv hN.log_av hT hp0' hpW' (hWo ρ hρ) (hlo ρ hρ)
   have hsum := Finset.sum_le_sum (s := (Finset.univ : Finset ι)) (fun ρ _ => key ρ)
-  have hrhs : ∀ x y : ℝ, ∑ ρ : ι, ((if ρ ∈ TT then x else 0) + y)
-      = (TT.card : ℝ) * x + (Fintype.card ι : ℝ) * y := by
+  have hrhs
+      : ∀ x y : ℝ,
+        ∑ ρ : ι, ((if ρ ∈ TT then x else 0) + y)
+          = (TT.card : ℝ) * x + (Fintype.card ι : ℝ) * y := by
     intro x y
     rw [Finset.sum_add_distrib, Finset.sum_ite_mem, Finset.univ_inter, Finset.sum_const,
       Finset.sum_const, nsmul_eq_mul, nsmul_eq_mul, Finset.card_univ]
   rw [hrhs] at hsum
   refine le_trans (le_trans hc (le_trans (hV c) hsum)) ?_
-  exact final_part_arithmetic_bound hC (Nat.cast_nonneg _) (Nat.cast_nonneg _) (by linarith) hlkv (by linarith)
-    (by linarith) hT (by linarith)
-
+  exact final_part_arithmetic_bound hC (Nat.cast_nonneg _) (Nat.cast_nonneg _) (by linarith) hlkv
+    (by linarith) (by linarith) hT (by linarith)
 
 end Formalism.HermitianLattices.TraceIntegrality

@@ -14,17 +14,25 @@ noncomputable section
 
 universe u
 
-theorem fc_zLoc_eq {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} (hD : A.D0 L w w0 s) (i : ι) (v : V n)
-    (hv : v ∈ (A.chart i).target) :
-    A.zLoc w0 s i v = A.zmap w0 s ((A.chart i).symm v) := by
-  have secS : ∀ k i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      s k i y = A.g L i j y * s k j y := by
+theorem fc_zLoc_eq
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    (hD : A.D0 L w w0 s)
+    (i : ι) (v : V n) (hv : v ∈ (A.chart i).target)
+    : A.zLoc w0 s i v = A.zmap w0 s ((A.chart i).symm v) := by
+  have secS
+      : ∀ k i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → s k i y = A.g L i j y * s k j y := by
     intro k i j y hi hj
     have hs := hD.sec_s k
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
     exact hs.2 i j y trivial hi hj
-  have secW : ∀ i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      w0 i y = A.g L i j y * w0 j y := by
+  have secW
+      : ∀ i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → w0 i y = A.g L i j y * w0 j y := by
     intro i j y hi hj
     have hs := hD.isSection_denom
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
@@ -36,10 +44,19 @@ theorem fc_zLoc_eq {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Seco
   rw [secS k i (A.pick _) _ hy (A.mem_pick _), secW i (A.pick _) _ hy (A.mem_pick _),
     mul_div_mul_left _ _ (A.g_ne L i (A.pick _) _ hy (A.mem_pick _))]
 
-theorem denominator_ne_zero_on_set {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) {y : Y}
-    (hy : y ∈ A.Mset w0 s De) (i : ι) (hi : y ∈ (A.chart i).source) : w0 i y ≠ 0 := by
-  have secW : ∀ i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      w0 i y = A.g L i j y * w0 j y := by
+theorem denominator_ne_zero_on_set
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
+    {y : Y} (hy : y ∈ A.Mset w0 s De)
+    (i : ι) (hi : y ∈ (A.chart i).source)
+    : w0 i y ≠ 0 := by
+  have secW
+      : ∀ i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → w0 i y = A.g L i j y * w0 j y := by
     intro i j y hi hj
     have hs := hD.isSection_denom
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
@@ -47,16 +64,25 @@ theorem denominator_ne_zero_on_set {n : ℕ} {Y : Type u} [TopologicalSpace Y] [
   rw [secW i (A.pick y) y hi (A.mem_pick y)]
   exact mul_ne_zero (A.g_ne L i (A.pick y) y hi (A.mem_pick y)) hy.1
 
-theorem fc_isOpen_O {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) (i : ι) :
-    IsOpen ((A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De) := by
-  have secS : ∀ k i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      s k i y = A.g L i j y * s k j y := by
+theorem fc_isOpen_O
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
+    (i : ι)
+    : IsOpen ((A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De) := by
+  have secS
+      : ∀ k i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → s k i y = A.g L i j y * s k j y := by
     intro k i j y hi hj
     have hs := hD.sec_s k
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
     exact hs.2 i j y trivial hi hj
-  have secW : ∀ i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      w0 i y = A.g L i j y * w0 j y := by
+  have secW
+      : ∀ i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → w0 i y = A.g L i j y * w0 j y := by
     intro i j y hi hj
     have hs := hD.isSection_denom
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
@@ -71,8 +97,8 @@ theorem fc_isOpen_O {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Sec
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
     simpa using hs.1 i
   set O1 := (A.chart i).target ∩ (fun v => w0 i ((A.chart i).symm v)) ⁻¹' {0}ᶜ with hO1def
-  have hO1 : IsOpen O1 := hw.continuousOn.isOpen_inter_preimage (A.chart i).open_target
-    isOpen_compl_singleton
+  have hO1 : IsOpen O1 :=
+    hw.continuousOn.isOpen_inter_preimage (A.chart i).open_target isOpen_compl_singleton
   have hzd : ∀ k, DifferentiableOn ℂ (fun v => (A.zLoc w0 s i v).ofLp k) O1 := by
     intro k
     have h1 : DifferentiableOn ℂ (fun v => s k i ((A.chart i).symm v)) O1 :=
@@ -82,8 +108,9 @@ theorem fc_isOpen_O {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Sec
     have h3 := h1.mul (h2.inv fun v (hv : v ∈ O1) => hv.2)
     refine h3.congr fun v _ => ?_
     simp [WeightedAtlas.zLoc, div_eq_mul_inv]
-  have hset : (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De =
-      O1 ∩ (fun v => MvPolynomial.eval (fun k => A.zLoc w0 s i v k) De) ⁻¹' {0}ᶜ := by
+  have hset
+      : (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De
+        = O1 ∩ (fun v => MvPolynomial.eval (fun k => A.zLoc w0 s i v k) De) ⁻¹' {0}ᶜ := by
     ext v
     constructor
     · rintro ⟨hv, hM⟩
@@ -106,16 +133,26 @@ theorem fc_isOpen_O {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Sec
   exact ((MvPolynomial.continuous_eval De).comp_continuousOn hc).isOpen_inter_preimage hO1
     isOpen_compl_singleton
 
-theorem fc_zLoc_contDiffOn {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) (i : ι) :
-    ContDiffOn ℂ ∞ (A.zLoc w0 s i) ((A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De) := by
-  have secS : ∀ k i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      s k i y = A.g L i j y * s k j y := by
+theorem fc_zLoc_contDiffOn
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
+    (i : ι)
+    : ContDiffOn ℂ ∞ (A.zLoc w0 s i)
+      ((A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De) := by
+  have secS
+      : ∀ k i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → s k i y = A.g L i j y * s k j y := by
     intro k i j y hi hj
     have hs := hD.sec_s k
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
     exact hs.2 i j y trivial hi hj
-  have secW : ∀ i j y, y ∈ (A.chart i).source → y ∈ (A.chart j).source →
-      w0 i y = A.g L i j y * w0 j y := by
+  have secW
+      : ∀ i j y,
+        y ∈ (A.chart i).source → y ∈ (A.chart j).source → w0 i y = A.g L i j y * w0 j y := by
     intro i j y hi hj
     have hs := hD.isSection_denom
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
@@ -130,8 +167,8 @@ theorem fc_zLoc_contDiffOn {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space 
     unfold WeightedAtlas.IsSec WeightedAtlas.IsSecOn at hs
     simpa using hs.1 i
   set O1 := (A.chart i).target ∩ (fun v => w0 i ((A.chart i).symm v)) ⁻¹' {0}ᶜ with hO1def
-  have hO1 : IsOpen O1 := hw.continuousOn.isOpen_inter_preimage (A.chart i).open_target
-    isOpen_compl_singleton
+  have hO1 : IsOpen O1 :=
+    hw.continuousOn.isOpen_inter_preimage (A.chart i).open_target isOpen_compl_singleton
   have hzd : ∀ k, DifferentiableOn ℂ (fun v => (A.zLoc w0 s i v).ofLp k) O1 := by
     intro k
     have h1 : DifferentiableOn ℂ (fun v => s k i ((A.chart i).symm v)) O1 :=
@@ -141,17 +178,25 @@ theorem fc_zLoc_contDiffOn {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space 
     have h3 := h1.mul (h2.inv fun v (hv : v ∈ O1) => hv.2)
     refine h3.congr fun v _ => ?_
     simp [WeightedAtlas.zLoc, div_eq_mul_inv]
-  have hsub : (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De ⊆ O1 :=
-    fun v hv => ⟨hv.1, denominator_ne_zero_on_set A hD hv.2 i ((A.chart i).map_target hv.1)⟩
+  have hsub : (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De ⊆ O1 := fun v hv =>
+    ⟨hv.1, denominator_ne_zero_on_set A hD hv.2 i ((A.chart i).map_target hv.1)⟩
   have hopen := fc_isOpen_O A (De := De) hD i
   rw [contDiffOn_euclidean]
   intro k
-  exact ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn n _ _ hopen ((hzd k).mono hsub)
+  exact ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn n _ _ hopen
+    ((hzd k).mono hsub)
 
-theorem fc_det_jz {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) {y : Y}
-    (hy : y ∈ A.Mset w0 s De) (i j : ι) (hi : y ∈ (A.chart i).source)
-    (hj : y ∈ (A.chart j).source) :
-    (fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det = (fderiv ℂ (A.zLoc w0 s j) (A.chart j y)).det * A.g A.kap i j y := by
+theorem fc_det_jz
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
+    {y : Y} (hy : y ∈ A.Mset w0 s De)
+    (i j : ι) (hi : y ∈ (A.chart i).source) (hj : y ∈ (A.chart j).source)
+    : (fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det
+      = (fderiv ℂ (A.zLoc w0 s j) (A.chart j y)).det * A.g A.kap i j y := by
   have hT : (A.chart j ∘ (A.chart i).symm) (A.chart i y) = A.chart j y := by
     simp only [Function.comp, (A.chart i).left_inv hi]
   have hov : IsOpen (ovl A.chart i j) :=
@@ -178,24 +223,42 @@ theorem fc_det_jz {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Secon
       exact hy
     exact ((fc_zLoc_contDiffOn A hD j).differentiableOn (by simp)).differentiableAt (hO.mem_nhds hm)
   rw [hev.fderiv_eq, fderiv_comp (A.chart i y) hdz hdT, hT, A.g_kap i j y hi hj]
-  change LinearMap.det (((fderiv ℂ (A.zLoc w0 s j) (A.chart j y)).comp
-      (fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y)) : V n →L[ℂ] V n) : V n →ₗ[ℂ] V n) =
-    LinearMap.det ((fderiv ℂ (A.zLoc w0 s j) (A.chart j y)) : V n →ₗ[ℂ] V n) *
-      LinearMap.det ((fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y)) : V n →ₗ[ℂ] V n)
+  change LinearMap.det
+      (((fderiv ℂ (A.zLoc w0 s j) (A.chart j y)).comp
+            (fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y))
+          : V n →L[ℂ] V n)
+        : V n →ₗ[ℂ] V n)
+    = LinearMap.det ((fderiv ℂ (A.zLoc w0 s j) (A.chart j y)) : V n →ₗ[ℂ] V n)
+      * LinearMap.det ((fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y)) : V n →ₗ[ℂ] V n)
   exact LinearMap.det_comp ((fderiv ℂ (A.zLoc w0 s j) (A.chart j y)) : V n →ₗ[ℂ] V n)
     ((fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y)) : V n →ₗ[ℂ] V n)
 
-theorem fc_jz_det_ne {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
-    (hF : A.Flat w0 s De) {y : Y} (hy : y ∈ A.Mset w0 s De) (i : ι)
-    (hi : y ∈ (A.chart i).source) : (fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det ≠ 0 := by
+theorem fc_jz_det_ne
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) (hF : A.Flat w0 s De)
+    {y : Y} (hy : y ∈ A.Mset w0 s De)
+    (i : ι) (hi : y ∈ (A.chart i).source)
+    : (fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det ≠ 0 := by
   rw [fc_det_jz A hD hy i (A.pick y) hi (A.mem_pick y)]
   exact mul_ne_zero (hF.deriv_ne y hy) (A.g_ne A.kap i (A.pick y) y hi (A.mem_pick y))
 
-theorem fc_chart_fwd {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
-    (e : OpenPartialHomeomorph (A.Mset w0 s De) (V n)) (he : IsChart n (fun y : A.Mset w0 s De => A.zmap w0 s y) e)
-    (x : A.Mset w0 s De) (hxe : x ∈ e.source) (i : ι) (hxi : (x : Y) ∈ (A.chart i).source) :
-    ∀ᶠ v in 𝓝 (A.chart i x),
-      ((e.symm (A.zLoc w0 s i v) : A.Mset w0 s De) : Y) = (A.chart i).symm v := by
+theorem fc_chart_fwd
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ}
+    (hD : A.D0 L w w0 s) (e : OpenPartialHomeomorph (A.Mset w0 s De) (V n))
+    (he : IsChart n (fun y : A.Mset w0 s De => A.zmap w0 s y) e) (x : A.Mset w0 s De)
+    (hxe : x ∈ e.source)
+    (i : ι) (hxi : (x : Y) ∈ (A.chart i).source)
+    : ∀ᶠ v in 𝓝 (A.chart i x),
+        ((e.symm (A.zLoc w0 s i v) : A.Mset w0 s De) : Y) = (A.chart i).symm v := by
   have hO := fc_isOpen_O A (De := De) hD i
   have hmO : A.chart i x ∈ (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De := by
     refine ⟨(A.chart i).map_source hxi, ?_⟩
@@ -219,27 +282,48 @@ theorem fc_chart_fwd {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Se
     exact he hp
   rw [hz, e.left_inv hp]
 
-theorem fc_zLoc_chart {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
-    (e : OpenPartialHomeomorph (A.Mset w0 s De) (V n)) (he : IsChart n (fun y : A.Mset w0 s De => A.zmap w0 s y) e)
-    (x : A.Mset w0 s De) (hxe : x ∈ e.source) (i : ι) (hxi : (x : Y) ∈ (A.chart i).source) :
-    A.zLoc w0 s i (A.chart i x) = e x := by
+theorem fc_zLoc_chart
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ}
+    (hD : A.D0 L w w0 s) (e : OpenPartialHomeomorph (A.Mset w0 s De) (V n))
+    (he : IsChart n (fun y : A.Mset w0 s De => A.zmap w0 s y) e) (x : A.Mset w0 s De)
+    (hxe : x ∈ e.source)
+    (i : ι) (hxi : (x : Y) ∈ (A.chart i).source)
+    : A.zLoc w0 s i (A.chart i x) = e x := by
   rw [fc_zLoc_eq A hD i _ ((A.chart i).map_source hxi), (A.chart i).left_inv hxi]
   exact he hxe
 
-theorem fc_mem_O {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (x : A.Mset w0 s De) (i : ι)
-    (hxi : (x : Y) ∈ (A.chart i).source) :
-    A.chart i x ∈ (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De := by
+theorem fc_mem_O
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (x : A.Mset w0 s De)
+    (i : ι) (hxi : (x : Y) ∈ (A.chart i).source)
+    : A.chart i x ∈ (A.chart i).target ∩ (A.chart i).symm ⁻¹' A.Mset w0 s De := by
   refine ⟨(A.chart i).map_source hxi, ?_⟩
   show (A.chart i).symm (A.chart i x) ∈ A.Mset w0 s De
   rw [(A.chart i).left_inv hxi]
   exact x.2
 
-theorem fc_chart_inv {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
-    (hF : A.Flat w0 s De)
-    (e : OpenPartialHomeomorph (A.Mset w0 s De) (V n)) (he : IsChart n (fun y : A.Mset w0 s De => A.zmap w0 s y) e)
-    (x : A.Mset w0 s De) (hxe : x ∈ e.source) (i : ι) (hxi : (x : Y) ∈ (A.chart i).source) :
-    ∃ G : V n → V n, ContDiffAt ℂ ∞ G (e x) ∧ G (e x) = A.chart i x ∧
-      ∀ᶠ w in 𝓝 (e x), ((e.symm w : A.Mset w0 s De) : Y) = (A.chart i).symm (G w) := by
+theorem fc_chart_inv
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ}
+    (hD : A.D0 L w w0 s) (hF : A.Flat w0 s De) (e : OpenPartialHomeomorph (A.Mset w0 s De) (V n))
+    (he : IsChart n (fun y : A.Mset w0 s De => A.zmap w0 s y) e) (x : A.Mset w0 s De)
+    (hxe : x ∈ e.source)
+    (i : ι) (hxi : (x : Y) ∈ (A.chart i).source)
+    : ∃ G : V n → V n,
+      ContDiffAt ℂ ∞ G (e x) ∧ G (e x) = A.chart i x
+        ∧ ∀ᶠ w in 𝓝 (e x), ((e.symm w : A.Mset w0 s De) : Y) = (A.chart i).symm (G w) := by
   have hO := fc_isOpen_O A (De := De) hD i
   have hmO := fc_mem_O A x i hxi
   have hcd : ContDiffAt ℂ ∞ (A.zLoc w0 s i) (A.chart i x) :=

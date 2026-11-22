@@ -10,11 +10,16 @@ namespace GlobalTheory.CommonReading
 open scoped NNReal
 
 section
-variable {l : ℕ} [Fact l.Prime] {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra A B]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra A B]
 
-theorem exists_extend [Module.Finite A B] (hi : Function.Injective (algebraMap A B)) (κ : A →+* ℂ_[l])
-    (hκ : Function.Injective κ) :
-    ∃ ι : FractionRing B →+* ℂ_[l], ∀ y, ι (algebraMap B (FractionRing B) (algebraMap A B y)) = κ y := by
+theorem exists_extend
+    [Module.Finite A B]
+    (hi : Function.Injective (algebraMap A B))
+    (κ : A →+* ℂ_[l]) (hκ : Function.Injective κ)
+    : ∃ ι : FractionRing B →+* ℂ_[l], ∀ y,
+      ι (algebraMap B (FractionRing B) (algebraMap A B y)) = κ y := by
   let _ : Algebra A ℂ_[l] := κ.toAlgebra
   have hAF : Function.Injective (algebraMap A (FractionRing B)) := by
     rw [IsScalarTower.algebraMap_eq A B (FractionRing B)]
@@ -28,15 +33,17 @@ theorem exists_extend [Module.Finite A B] (hi : Function.Injective (algebraMap A
     (IsFractionRing.isAlgebraic_iff' A B (FractionRing B)).1 inferInstance
   let φ : FractionRing B →ₐ[A] ℂ_[l] := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨φ.toRingHom, fun y => ?_⟩
   rw [← IsScalarTower.algebraMap_apply A B (FractionRing B) y]
   exact φ.commutes y
 
-theorem v_le_one [Module.Finite A B] (j : B →+* ℂ_[l]) (hκ : ∀ y, Valued.v (j (algebraMap A B y)) ≤ (1 : ℝ≥0)) (b : B) :
-    Valued.v (j b) ≤ (1 : ℝ≥0) := by
+theorem v_le_one
+    [Module.Finite A B]
+    (j : B →+* ℂ_[l]) (hκ : ∀ y, Valued.v (j (algebraMap A B y)) ≤ (1 : ℝ≥0))
+    (b : B)
+    : Valued.v (j b) ≤ (1 : ℝ≥0) := by
   obtain ⟨p, hpm, hp⟩ := Algebra.IsIntegral.isIntegral (R := A) b
   have hroot : p.eval₂ (j.comp (algebraMap A B)) (j b) = 0 := by
     rw [← Polynomial.hom_eval₂, hp, map_zero]
@@ -55,18 +62,22 @@ theorem v_le_one [Module.Finite A B] (j : B →+* ℂ_[l]) (hκ : ∀ y, Valued.
     intro i hi
     rw [Finset.mem_range] at hi
     rw [map_mul, map_pow]
-    calc Valued.v ((j.comp (algebraMap A B)) (p.coeff i)) * Valued.v (j b) ^ i
-        ≤ 1 * Valued.v (j b) ^ (p.natDegree - 1) :=
-          mul_le_mul' (hκ _) (pow_le_pow_right₀ hlt.le (by omega))
+    calc
+      Valued.v ((j.comp (algebraMap A B)) (p.coeff i)) * Valued.v (j b) ^ i
+          ≤ 1 * Valued.v (j b) ^ (p.natDegree - 1) :=
+        mul_le_mul' (hκ _) (pow_le_pow_right₀ hlt.le (by omega))
       _ = _ := one_mul _
   rw [map_pow] at h1
   have h2 : Valued.v (j b) ^ (p.natDegree - 1) < Valued.v (j b) ^ p.natDegree :=
     pow_lt_pow_right₀ hlt (by omega)
   exact absurd h1 (not_le.mpr h2)
 
-theorem mem_range_iff [IsDiscreteValuationRing B] (ι : FractionRing B →+* ℂ_[l])
-    (h : ∀ b, Valued.v (ι (algebraMap B (FractionRing B) b)) ≤ (1 : ℝ≥0)) (x : FractionRing B) :
-    x ∈ (algebraMap B (FractionRing B)).range ↔ Valued.v (ι x) ≤ (1 : ℝ≥0) := by
+theorem mem_range_iff
+    [IsDiscreteValuationRing B]
+    (ι : FractionRing B →+* ℂ_[l])
+    (h : ∀ b, Valued.v (ι (algebraMap B (FractionRing B) b)) ≤ (1 : ℝ≥0))
+    (x : FractionRing B)
+    : x ∈ (algebraMap B (FractionRing B)).range ↔ Valued.v (ι x) ≤ (1 : ℝ≥0) := by
   constructor
   · rintro ⟨b, rfl⟩
     exact h b
@@ -106,8 +117,7 @@ theorem mem_range_iff [IsDiscreteValuationRing B] (ι : FractionRing B →+* ℂ
       rintro rfl
       exact hbu (hk.symm.isUnit (by simp))
     have hdvd : ((l : ℕ) : B) ∣ b ^ n := by
-      have h2 : ϖ ^ n ∣ ϖ ^ (k * n) :=
-        pow_dvd_pow ϖ (by have := Nat.pos_of_ne_zero hk0; nlinarith)
+      have h2 : ϖ ^ n ∣ ϖ ^ (k * n) := pow_dvd_pow ϖ (by have := Nat.pos_of_ne_zero hk0; nlinarith)
       have h3 : ϖ ^ (k * n) ∣ b ^ n := by
         rw [pow_mul]
         exact (hk.pow_pow (n := n)).symm.dvd
@@ -129,8 +139,8 @@ theorem mem_range_iff [IsDiscreteValuationRing B] (ι : FractionRing B →+* ℂ
 
 end
 
-theorem exists_factor {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [NumberField L] (g : L →+* ℂ_[l]) :
-    ∃ e : L →+* PadicAlgCl l, ∀ x, algebraMap (PadicAlgCl l) ℂ_[l] (e x) = g x := by
+theorem exists_factor {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [NumberField L] (g : L →+* ℂ_[l])
+    : ∃ e : L →+* PadicAlgCl l, ∀ x, algebraMap (PadicAlgCl l) ℂ_[l] (e x) = g x := by
   have hmem : ∀ x : L, g x ∈ (algebraMap (PadicAlgCl l) ℂ_[l]).range := by
     intro x
     obtain ⟨f, hf0, hf⟩ := Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x
@@ -144,34 +154,44 @@ theorem exists_factor {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [NumberField
     have hsplit : (f.map (algebraMap ℚ (PadicAlgCl l))).Splits := IsAlgClosed.splits _
     have hP0 : f.map (algebraMap ℚ (PadicAlgCl l)) ≠ 0 :=
       (Polynomial.map_ne_zero_iff (algebraMap ℚ (PadicAlgCl l)).injective).mpr hf0
-    have hmap : f.map (algebraMap ℚ ℂ_[l]) =
-        (f.map (algebraMap ℚ (PadicAlgCl l))).map (algebraMap (PadicAlgCl l) ℂ_[l]) := by
+    have hmap
+        : f.map (algebraMap ℚ ℂ_[l])
+          = (f.map (algebraMap ℚ (PadicAlgCl l))).map (algebraMap (PadicAlgCl l) ℂ_[l]) := by
       rw [Polynomial.map_map]
       congr 1
       exact RingHom.ext_rat _ _
-    have hroot : g x ∈ ((f.map (algebraMap ℚ (PadicAlgCl l))).map (algebraMap (PadicAlgCl l) ℂ_[l])).roots := by
-      rw [Polynomial.mem_roots ((Polynomial.map_ne_zero_iff (algebraMap (PadicAlgCl l) ℂ_[l]).injective).mpr hP0)]
+    have hroot
+        : g x ∈ ((f.map (algebraMap ℚ (PadicAlgCl l))).map
+          (algebraMap (PadicAlgCl l) ℂ_[l])).roots := by
+      rw [Polynomial.mem_roots
+        ((Polynomial.map_ne_zero_iff (algebraMap (PadicAlgCl l) ℂ_[l]).injective).mpr hP0)]
       show Polynomial.eval _ _ = 0
       rw [← hmap]
       exact hg
-    rw [hsplit.roots_map_of_injective (algebraMap (PadicAlgCl l) ℂ_[l]).injective, Multiset.mem_map] at hroot
+    rw [hsplit.roots_map_of_injective (algebraMap (PadicAlgCl l) ℂ_[l]).injective, Multiset.mem_map]
+      at hroot
     obtain ⟨β, -, hβ⟩ := hroot
     exact RingHom.mem_range.mpr ⟨β, hβ⟩
-  have hr : Function.Bijective (algebraMap (PadicAlgCl l) ℂ_[l]).rangeRestrict :=
-    ⟨fun a b hab => (algebraMap (PadicAlgCl l) ℂ_[l]).injective (congrArg Subtype.val hab),
-      RingHom.rangeRestrict_surjective _⟩
+  have hr : Function.Bijective (algebraMap (PadicAlgCl l) ℂ_[l]).rangeRestrict := ⟨
+    fun a b hab => (algebraMap (PadicAlgCl l) ℂ_[l]).injective (congrArg Subtype.val hab),
+    RingHom.rangeRestrict_surjective _
+  ⟩
   let E := RingEquiv.ofBijective _ hr
   refine ⟨E.symm.toRingHom.comp (g.codRestrict _ hmem), fun x => ?_⟩
   exact congrArg Subtype.val (E.apply_symm_apply (g.codRestrict _ hmem x))
 
-theorem exists_common {l : ℕ} [Fact l.Prime] {A B L : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B]
-    [IsDiscreteValuationRing B] [Algebra A B] [Module.Finite A B] (hi : Function.Injective (algebraMap A B))
+theorem exists_common
+    {l : ℕ} [Fact l.Prime]
+    {A B L : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [IsDiscreteValuationRing B]
+    [Algebra A B] [Module.Finite A B]
+    (hi : Function.Injective (algebraMap A B))
     (κ : A →+* ℂ_[l]) (hκ : Function.Injective κ) (hv : ∀ y, Valued.v (κ y) ≤ (1 : ℝ≥0))
-    [Field L] [NumberField L] (eB : L →+* FractionRing B) (e : L →+* PadicAlgCl l)
-    (he : ∀ x, eB x ∈ (algebraMap B (FractionRing B)).range ↔ ‖e x‖ ≤ 1) :
-    ∃ (σ : PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l) (ι : FractionRing B →+* ℂ_[l]),
-      (∀ y, ι (algebraMap B (FractionRing B) (algebraMap A B y)) = κ y) ∧
-      ∀ x, ι (eB x) = algebraMap (PadicAlgCl l) ℂ_[l] (σ (e x)) := by
+    [Field L] [NumberField L]
+    (eB : L →+* FractionRing B) (e : L →+* PadicAlgCl l)
+    (he : ∀ x, eB x ∈ (algebraMap B (FractionRing B)).range ↔ ‖e x‖ ≤ 1)
+    : ∃ (σ : PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l) (ι : FractionRing B →+* ℂ_[l]),
+      (∀ y, ι (algebraMap B (FractionRing B) (algebraMap A B y)) = κ y)
+        ∧ ∀ x, ι (eB x) = algebraMap (PadicAlgCl l) ℂ_[l] (σ (e x)) := by
   obtain ⟨ι, hι⟩ := exists_extend hi κ hκ
   have hB : ∀ b, Valued.v (ι (algebraMap B (FractionRing B) b)) ≤ (1 : ℝ≥0) := by
     intro b

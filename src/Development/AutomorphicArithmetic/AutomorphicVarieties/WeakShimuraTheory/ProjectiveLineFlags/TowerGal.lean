@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-private theorem mul_eq_one_of_card_eq_two_of_ne_one {H : Type*} [Group H] (hH : Nat.card H = 2)
-    (x y : H) (hx : x ≠ 1) (hy : y ≠ 1) : x * y = 1 := by
+private theorem mul_eq_one_of_card_eq_two_of_ne_one
+    {H : Type*} [Group H] (hH : Nat.card H = 2) (x y : H) (hx : x ≠ 1) (hy : y ≠ 1)
+    : x * y = 1 := by
   classical
   haveI : Finite H := Nat.finite_of_card_ne_zero (by omega)
   haveI := Fintype.ofFinite H
@@ -21,11 +24,17 @@ private theorem mul_eq_one_of_card_eq_two_of_ne_one {H : Type*} [Group H] (hH : 
   omega
 
 set_option maxHeartbeats 400000 in
-theorem UpperTheory.V.Ws.P1.towerGal :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D), (resLe T.F_le).range = T.GalL ∧ Function.Injective (resLe T.F_le) ∧ Continuous (resLe T.F_le) ∧
-          (∀ a b : G T.F Ω, a ∉ T.GalL → b ∉ T.GalL → a * b ∈ T.GalL) ∧
-          (∀ g : G T.L Ω, resQ T.F (resLe T.F_le g) = resQ T.L g ∧ cycZ T.F Ω l (resLe T.F_le g) = cycZ T.L Ω l g ∧ cycZ ℚ Ω l (resQ T.L g) = cycZ T.L Ω l g) ∧
-          ∀ (A : ValuationSubring Ω) (g : G T.L Ω), (resLe T.F_le g ∈ Dec (F := T.F) A ↔ g ∈ Dec (F := T.L) A) ∧ (resLe T.F_le g ∈ Ine (F := T.F) A ↔ g ∈ Ine (F := T.L) A) := by
+theorem UpperTheory.V.Ws.P1.towerGal
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c) (T : Tower D),
+      (resLe T.F_le).range = T.GalL ∧ Function.Injective (resLe T.F_le) ∧ Continuous (resLe T.F_le)
+        ∧ (∀ a b : G T.F Ω, a ∉ T.GalL → b ∉ T.GalL → a * b ∈ T.GalL)
+        ∧ (∀ g : G T.L Ω,
+          resQ T.F (resLe T.F_le g) = resQ T.L g ∧ cycZ T.F Ω l (resLe T.F_le g) = cycZ T.L Ω l g
+            ∧ cycZ ℚ Ω l (resQ T.L g) = cycZ T.L Ω l g)
+        ∧ ∀ (A : ValuationSubring Ω) (g : G T.L Ω),
+          (resLe T.F_le g ∈ Dec (F := T.F) A ↔ g ∈ Dec (F := T.L) A)
+            ∧ (resLe T.F_le g ∈ Ine (F := T.F) A ↔ g ∈ Ine (F := T.L) A) := by
   intro Ω _ _ _ l _ c D T
   have hKL : T.K ≤ T.L := by
     rw [T.hL]
@@ -63,14 +72,13 @@ theorem UpperTheory.V.Ws.P1.towerGal :
     haveI : Algebra.IsQuadraticExtension ℚ T.K := ⟨T.degK⟩
     haveI hN : Normal ℚ T.K := Algebra.IsQuadraticExtension.normal ℚ T.K
     haveI : IsGalois ℚ T.K := {}
-    have hcard : Nat.card (T.K ≃ₐ[ℚ] T.K) = 2 := by
-      rw [IsGalois.card_aut_eq_finrank, T.degK]
-    have hker := @IntermediateField.restrictNormalHom_ker ℚ Ω _ _ _ T.K
-      (by convert hN)
+    have hcard : Nat.card (T.K ≃ₐ[ℚ] T.K) = 2 := by rw [IsGalois.card_aut_eq_finrank, T.degK]
+    have hker := @IntermediateField.restrictNormalHom_ker ℚ Ω _ _ _ T.K (by convert hN)
     intro a b ha hb
     rw [Subgroup.mem_comap, ← hker, MonoidHom.mem_ker] at ha hb ⊢
     rw [map_mul, map_mul]
-    exact mul_eq_one_of_card_eq_two_of_ne_one (by convert hcard <;> first | rfl | exact Subsingleton.elim _ _) _ _ ha hb
+    exact mul_eq_one_of_card_eq_two_of_ne_one
+      (by convert hcard <;> first | rfl | exact Subsingleton.elim _ _) _ _ ha hb
   · intro g
     exact ⟨by ext; rfl, rfl, rfl⟩
   · intro A g

@@ -18,20 +18,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbsFactorial
 set_option autoImplicit false
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory
 
-theorem abs_factorial_mul_chi_twist_lbPow_sub_le : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)], IsProjOver (strHom k (X := X)) → ∀ (d : ℕ) (F : X.Modules) [IsFiniteQC F], suppDim F ≤ (d : ℕ) → ∀ L : LB X, L.IsLB → ∃ C : ℕ, ∀ m : ℕ, |(d.factorial : ℤ) * chi k (twist F (lbPow L m)) - interNum k F (fun _ : Fin d => L) * (m : ℤ) ^ d| ≤ C * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)) := by
+theorem abs_factorial_mul_chi_twist_lbPow_sub_le
+    : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)],
+      IsProjOver (strHom k (X := X))
+        → ∀ (d : ℕ) (F : X.Modules) [IsFiniteQC F],
+          suppDim F ≤ (d : ℕ)
+            → ∀ L : LB X,
+              L.IsLB
+                → ∃ C : ℕ, ∀ m : ℕ,
+                  |(d.factorial : ℤ) * chi k (twist F (lbPow L m)) - interNum k F (fun _ : Fin d => L) * (m : ℤ) ^ d|
+                    ≤ C * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)) := by
   intro k _ _ X _ hproj d F _ hsupp L hL
   have hv : DiffVanish (d + 1) (chiPic k F) :=
     diffVanish_chiPic_of_isProjOver (algebraMap_eq_strHom k X) F hproj hsupp
   obtain ⟨p, hpdeg, hpeval, hpcoeff⟩ := hv.exists_polynomial_int ℚ (cls L hL) 0
   obtain ⟨C, hC⟩ := abs_factorial_mul_eval_sub_top_le d p hpdeg
   refine ⟨C, fun m => ?_⟩
-  have hmd : multiDiff (fun _ : Fin d => cls L hL) (chiPic k F) 0 =
-      interNum k F (fun _ : Fin d => L) :=
+  have hmd
+      : multiDiff (fun _ : Fin d => cls L hL) (chiPic k F) 0 = interNum k F (fun _ : Fin d => L) :=
     hv.multiDiff_chiPic (L := fun _ : Fin d => L) (by simp) (fun _ => hL) 0
   have hchi : chi k (twist F (lbPow L m)) = chiPic k F ((m : ℤ) • cls L hL) := by
     rw [← twistZ_natCast]
@@ -44,9 +54,12 @@ theorem abs_factorial_mul_chi_twist_lbPow_sub_le : ∀ (k : Type) [Field k] [Inf
     rw [hpcoeff, hmd, ← mul_assoc, mul_inv_cancel₀ (by exact_mod_cast d.factorial_ne_zero), one_mul]
   have h := hC m
   rw [heval, hfac] at h
-  have h' : ((|(d.factorial : ℤ) * chi k (twist F (lbPow L m)) -
-      interNum k F (fun _ : Fin d => L) * (m : ℤ) ^ d| : ℤ) : ℚ) ≤
-      ((C * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)) : ℤ) : ℚ) := by
+  have h'
+      : ((|(d.factorial : ℤ) * chi k (twist F (lbPow L m)) -
+              interNum k F (fun _ : Fin d => L) * (m : ℤ) ^ d|
+            : ℤ)
+          : ℚ)
+        ≤ ((C * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)) : ℤ) : ℚ) := by
     push_cast
     exact h
   exact_mod_cast h'

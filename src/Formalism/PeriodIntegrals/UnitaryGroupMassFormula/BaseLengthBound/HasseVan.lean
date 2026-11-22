@@ -7,16 +7,21 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.HasseJidPow
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField
+  IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 namespace PoleLengthBounds
 
 theorem sumN_eq {σ : Type*} (β : σ →₀ ℕ) : (β.sum fun _ n => n) = Finsupp.degree β := rfl
 
-theorem mem_Jid_smul_top_of_JHfr {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j)
-    (la : HeightOneSpectrum (𝓞 B.KO)) {N : ℕ} {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL) (u : WeightFamilies.Wt D j)
-    {b : ℕ} (hb : 1 ≤ b) (y : ↥(HK X la w u)) (hy : (y : Lw X la w) ∈ JHfr X la w u b) :
-    y ∈ Jid X la w • (⊤ : Submodule ↥(Frac0 X la w) ↥(HK X la w u)) := by
+theorem mem_Jid_smul_top_of_JHfr
+    {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+    (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO))
+    {N : ℕ} {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL)
+    (u : WeightFamilies.Wt D j)
+    {b : ℕ} (hb : 1 ≤ b)
+    (y : ↥(HK X la w u)) (hy : (y : Lw X la w) ∈ JHfr X la w u b)
+    : y ∈ Jid X la w • (⊤ : Submodule ↥(Frac0 X la w) ↥(HK X la w u)) := by
   have h1 : y ∈ Jid X la w ^ b • (⊤ : Submodule ↥(Frac0 X la w) ↥(HK X la w u)) :=
     (mem_Jid_pow_smul_top X la w).2 ((mem_JHfr X la w).1 hy)
   exact Submodule.smul_mono_left (Ideal.pow_le_self (by omega)) h1

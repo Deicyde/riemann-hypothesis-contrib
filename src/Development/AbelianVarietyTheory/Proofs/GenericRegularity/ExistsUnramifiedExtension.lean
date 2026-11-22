@@ -9,10 +9,11 @@ open TensorProduct
 
 namespace GlobalTheory.DVRBaseChange
 
-theorem exists_dvr_quotient (W : Type) [CommRing W] [IsLocalRing W] (π : W)
-    (hm : IsLocalRing.maximalIdeal W = Ideal.span {π}) (hπ : ¬ IsNilpotent π) :
-    ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V)
-      (q : W →+* V), Irreducible (q π) := by
+theorem exists_dvr_quotient
+    (W : Type) [CommRing W] [IsLocalRing W]
+    (π : W) (hm : IsLocalRing.maximalIdeal W = Ideal.span {π}) (hπ : ¬ IsNilpotent π)
+    : ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V) (q : W →+* V),
+      Irreducible (q π) := by
   classical
   have hnu : ∀ x : W, ¬ IsUnit x ↔ π ∣ x := fun x => by
     rw [← Ideal.mem_span_singleton, ← hm, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
@@ -61,10 +62,16 @@ theorem exists_dvr_quotient (W : Type) [CommRing W] [IsLocalRing W] (π : W)
     · rw [Ne, Ideal.Quotient.eq_zero_iff_mem]
       simpa using hpow 1
     · rw [← IsLocalRing.map_maximalIdeal_of_surjective (Ideal.Quotient.mk J)
-        Ideal.Quotient.mk_surjective, hm, Ideal.map_span, Set.image_singleton]
-  refine ⟨W ⧸ J, inferInstance, hdom,
+          Ideal.Quotient.mk_surjective,
+        hm, Ideal.map_span, Set.image_singleton]
+  refine ⟨
+    W ⧸ J,
+    inferInstance,
+    hdom,
     IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization ⟨_, hirr, ?_⟩,
-    Ideal.Quotient.mk J, hirr⟩
+    Ideal.Quotient.mk J,
+    hirr
+  ⟩
   intro x hx
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
   obtain ⟨n, u, hu, rfl⟩ := hfac x (fun h => hx (Ideal.Quotient.eq_zero_iff_mem.2 h))
@@ -72,18 +79,20 @@ theorem exists_dvr_quotient (W : Type) [CommRing W] [IsLocalRing W] (π : W)
   rw [map_mul, map_pow]
   exact associated_mul_unit_right _ _ (hu.map _)
 
-theorem exists_dvr_of_isRadical (S : Type) [CommRing S] (π : S)
-    (hrad : (Ideal.span {π}).IsRadical) (hne : Ideal.span {π} ≠ ⊤)
-    (hreg : ∀ s, π * s = 0 → s = 0) :
-    ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V)
-      (q : S →+* V), Irreducible (q π) := by
+theorem exists_dvr_of_isRadical
+    (S : Type) [CommRing S]
+    (π : S)
+    (hrad : (Ideal.span {π}).IsRadical) (hne : Ideal.span {π} ≠ ⊤) (hreg : ∀ s, π * s = 0 → s = 0)
+    : ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V) (q : S →+* V),
+      Irreducible (q π) := by
   obtain ⟨p, hp⟩ := Ideal.nonempty_minimalPrimes hne
   have hpp : p.IsPrime := hp.1.1
   let W := Localization.AtPrime p
   have hm : IsLocalRing.maximalIdeal W = Ideal.span {algebraMap S W π} := by
     have h1 := IsLocalization.AtPrime.radical_map_of_mem_minimalPrimes W p _ hp
     rw [← IsLocalization.map_radical p.primeCompl, hrad.radical,
-      Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_span, Set.image_singleton] at h1
+        Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_span, Set.image_singleton]
+      at h1
     exact h1.symm
   have hn : ¬ IsNilpotent (algebraMap S W π) := by
     rintro ⟨n, hn⟩
@@ -98,8 +107,13 @@ theorem exists_dvr_of_isRadical (S : Type) [CommRing S] (π : S)
   obtain ⟨V, i1, i2, i3, q, hq⟩ := exists_dvr_quotient W _ hm hn
   exact ⟨V, i1, i2, i3, q.comp (algebraMap S W), hq⟩
 
-theorem exists_unramified_extension :
-    ∀ (K F T : Type) [Field K] [CharZero K] [Field F] [Algebra K F] [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Algebra K T], ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V) (i : T →+* V) (χ : F →+* V), Function.Injective i ∧ (∀ ϖ : T, Irreducible ϖ → Irreducible (i ϖ)) ∧ IsLocalHom i ∧ ∀ a : K, i (algebraMap K T a) = χ (algebraMap K F a) := by
+theorem exists_unramified_extension
+    : ∀ (K F T : Type) [Field K] [CharZero K] [Field F] [Algebra K F] [CommRing T] [IsDomain T]
+        [IsDiscreteValuationRing T] [Algebra K T],
+      ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V) (i : T →+* V)
+          (χ : F →+* V),
+        Function.Injective i ∧ (∀ ϖ : T, Irreducible ϖ → Irreducible (i ϖ)) ∧ IsLocalHom i
+          ∧ ∀ a : K, i (algebraMap K T a) = χ (algebraMap K F a) := by
   intro K F T _ _ _ _ _ _ _ _
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible T
   let m := IsLocalRing.maximalIdeal T
@@ -109,8 +123,7 @@ theorem exists_unramified_extension :
     Algebra.TensorProduct.map (Ideal.Quotient.mkₐ K m) (AlgHom.id K F)
   have hker : RingHom.ker g = Ideal.span {ϖ ⊗ₜ[K] (1 : F)} := by
     rw [Algebra.TensorProduct.rTensor_ker _ (Ideal.Quotient.mkₐ_surjective K m)]
-    have : RingHom.ker (Ideal.Quotient.mkₐ K m) = Ideal.span {ϖ} := by
-      rw [← hm]; exact Ideal.mk_ker
+    have : RingHom.ker (Ideal.Quotient.mkₐ K m) = Ideal.span {ϖ} := by rw [← hm]; exact Ideal.mk_ker
     rw [this, Ideal.map_span, Set.image_singleton]
     rfl
   have hred : IsReduced ((T ⧸ m) ⊗[K] F) := GlobalTheory.ReducedAlg.isReduced_field_tensor _ _
@@ -135,8 +148,18 @@ theorem exists_unramified_extension :
   obtain ⟨V, i1, i2, i3, q, hq⟩ := exists_dvr_of_isRadical _ _ hrad hne hreg
   let i : T →+* V := q.comp Algebra.TensorProduct.includeLeftRingHom
   have hi : Irreducible (i ϖ) := hq
-  refine ⟨V, i1, i2, i3, i, q.comp (Algebra.TensorProduct.includeRight (R := K) (A := T)).toRingHom,
-    ?_, ?_, ⟨?_⟩, ?_⟩
+  refine ⟨
+    V,
+    i1,
+    i2,
+    i3,
+    i,
+    q.comp (Algebra.TensorProduct.includeRight (R := K) (A := T)).toRingHom,
+    ?_,
+    ?_,
+    ⟨?_⟩,
+    ?_
+  ⟩
   · rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra h0

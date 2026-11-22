@@ -14,7 +14,17 @@ open IsLocalRing
 
 namespace GlobalTheory.StrictHensFactor
 
-theorem exists_factor_strictHenselisation : ∀ (A C B : Type) [CommRing A] [IsLocalRing A] [CommRing C] [Algebra A C] [CommRing B] [HenselianLocalRing B] [IsSepClosed (ResidueField B)] [Algebra A B] [IsLocalHom (algebraMap A B)] (u : C →ₐ[A] B), ∃ (D : Type) (_ : CommRing D) (_ : IsLocalRing D) (_ : Algebra A D) (c : C →ₐ[A] D) (w : D →ₐ[A] B), w.comp c = u ∧ ∃ (P : Ideal C) (_ : P.IsPrime) (φ : Localization.AtPrime P →+* D), GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ ∧ φ.comp (algebraMap C (Localization.AtPrime P)) = (c : C →+* D) ∧ P.comap (algebraMap A C) = maximalIdeal A := by
+theorem exists_factor_strictHenselisation
+    : ∀ (A C B : Type) [CommRing A] [IsLocalRing A] [CommRing C] [Algebra A C] [CommRing B]
+        [HenselianLocalRing B] [IsSepClosed (ResidueField B)] [Algebra A B]
+        [IsLocalHom (algebraMap A B)] (u : C →ₐ[A] B),
+      ∃ (D : Type) (_ : CommRing D) (_ : IsLocalRing D) (_ : Algebra A D) (c : C →ₐ[A] D)
+          (w : D →ₐ[A] B),
+        w.comp c = u
+          ∧ ∃ (P : Ideal C) (_ : P.IsPrime) (φ : Localization.AtPrime P →+* D),
+            GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ
+              ∧ φ.comp (algebraMap C (Localization.AtPrime P)) = (c : C →+* D)
+              ∧ P.comap (algebraMap A C) = maximalIdeal A := by
   intro A C B _ _ _ _ _ _ _ _ _ u
   set P : Ideal C := (maximalIdeal B).comap (u : C →+* B) with hP
   haveI hPp : P.IsPrime := Ideal.comap_isPrime _ _
@@ -38,27 +48,32 @@ theorem exists_factor_strictHenselisation : ∀ (A C B : Type) [CommRing A] [IsL
     exact (IsLocalRing.mem_maximalIdeal _).1 ha h2
   obtain ⟨S, _, _, _, hloc, hsc, -, -, -, ι, _, _, _, Si, hmono, hcov, hA⟩ :=
     GlobalTheory.exists_strictHenselisation L (SeparableClosure (ResidueField L))
-  have hind : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap L S) := by
+  have hind : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap
+      L S) := by
     refine GlobalTheory.StrictHensUnion.indEtale_of_directed_union L S ι Si hmono hcov fun i => ?_
     obtain ⟨A', _, _, _, q, _, ⟨e⟩⟩ := hA i
     exact GlobalTheory.StrictHensUnion.indEtale_of_algEquiv e
       (GlobalTheory.StrictHensUnion.indEtale_localization_of_etale L A' q.primeCompl)
-  have hstrict : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation (algebraMap L S) :=
+  have hstrict
+      : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation
+        (algebraMap L S) :=
     ⟨inferInstance, hsc, hloc, hind⟩
-  obtain ⟨g, hg⟩ := GlobalTheory.NCyc.StrictLocLift.exists_ringHom_of_isStrictHenselisation
-    (algebraMap L S) hstrict b
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.NCyc.StrictLocLift.exists_ringHom_of_isStrictHenselisation (algebraMap L S) hstrict
+      b
   let cR : C →+* S := (algebraMap L S).comp (algebraMap C L)
   letI algAS : Algebra A S := (cR.comp (algebraMap A C)).toAlgebra
   let c : C →ₐ[A] S := { cR with commutes' := fun a => rfl }
-  have hgc : g.comp cR = (u : C →+* B) := by
-    rw [← RingHom.comp_assoc, hg, hb]
-  let w : S →ₐ[A] B :=
-    { g with
-      commutes' := fun a => by
-        change g (cR (algebraMap A C a)) = algebraMap A B a
-        rw [← RingHom.comp_apply, hgc]
-        exact u.commutes a }
-  refine ⟨S, inferInstance, inferInstance, algAS, c, w, ?_, P, hPp, algebraMap L S, hstrict, rfl, ?_⟩
+  have hgc : g.comp cR = (u : C →+* B) := by rw [← RingHom.comp_assoc, hg, hb]
+  let w : S →ₐ[A] B := {
+    g with
+    commutes' := fun a => by
+      change g (cR (algebraMap A C a)) = algebraMap A B a
+      rw [← RingHom.comp_apply, hgc]
+      exact u.commutes a
+  }
+  refine
+    ⟨S, inferInstance, inferInstance, algAS, c, w, ?_, P, hPp, algebraMap L S, hstrict, rfl, ?_⟩
   · ext x
     exact DFunLike.congr_fun hgc x
   · ext a

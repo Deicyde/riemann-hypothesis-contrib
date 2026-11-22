@@ -80,27 +80,33 @@ lemma colStep_HomD (c : ℤ) (hP hN : ℕ) (hne : hP ≠ hN) (i : Fin N) (d : Fi
   split_ifs
   all_goals first | exact hw | exact hc | exact (hne (by omega)).elim
 
-
 open Classical in
-def dgS (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (s : ℤ) : Fin N → ℕ :=
-  fun i => if i.val < j ∧ IsUsed mu c i then p ^ (s - pos i).toNat else 0
+def dgS (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (s : ℤ)
+    : Fin N → ℕ := fun i =>
+  if i.val < j ∧ IsUsed mu c i then p ^ (s - pos i).toNat else 0
 
-private theorem pow_toNat_mul_pow_toNat_eq_of_le (p : ℕ) {u v w : ℤ} (h1 : u ≤ v) (h2 : v ≤ w) :
-    p ^ (w - v).toNat * p ^ (v - u).toNat = p ^ (w - u).toNat := by
+private theorem pow_toNat_mul_pow_toNat_eq_of_le (p : ℕ) {u v w : ℤ} (h1 : u ≤ v) (h2 : v ≤ w)
+    : p ^ (w - v).toNat * p ^ (v - u).toNat = p ^ (w - u).toNat := by
   rw [← pow_add]
   congr 1
   omega
 
-private theorem dgS_eq_zero_of_none_used (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (s : ℤ)
-    (h : ∀ i : Fin N, i.val < j → ¬ IsUsed mu c i) : dgS p pos mu c j s = 0 := by
+private theorem dgS_eq_zero_of_none_used
+    (p : ℕ) (pos : Fin N → ℤ)
+    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ)
+    (s : ℤ) (h : ∀ i : Fin N, i.val < j → ¬ IsUsed mu c i)
+    : dgS p pos mu c j s = 0 := by
   funext i
   simp only [dgS, Pi.zero_apply]
   rw [if_neg]
   rintro ⟨h1, h2⟩
   exact h i h1 h2
 
-private theorem dgS_succ_eq_of_not_used (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (hj : j < N)
-    (hu : ¬ IsUsed mu c ⟨j, hj⟩) (s : ℤ) : dgS p pos mu c (j + 1) s = dgS p pos mu c j s := by
+private theorem dgS_succ_eq_of_not_used
+    (p : ℕ) (pos : Fin N → ℤ)
+    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (hj : j < N) (hu : ¬ IsUsed mu c ⟨j, hj⟩)
+    (s : ℤ)
+    : dgS p pos mu c (j + 1) s = dgS p pos mu c j s := by
   funext i
   simp only [dgS]
   split_ifs with h1 h2 h2
@@ -117,9 +123,11 @@ private theorem dgS_succ_eq_of_not_used (p : ℕ) (pos : Fin N → ℤ) (mu : Fi
     exact h1 ⟨Nat.lt_succ_of_lt h2.1, h2.2⟩
   · rfl
 
-private theorem eI_eq_dgS_succ_of_first_used (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (hj : j < N)
-    (hu : IsUsed mu c ⟨j, hj⟩) (h : ∀ i : Fin N, i.val < j → ¬ IsUsed mu c i) :
-    eI ⟨j, hj⟩ + 1 • (0 : Fin N → ℕ) = dgS p pos mu c (j + 1) (pos ⟨j, hj⟩) := by
+private theorem eI_eq_dgS_succ_of_first_used
+    (p : ℕ) (pos : Fin N → ℤ)
+    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (hj : j < N)
+    (hu : IsUsed mu c ⟨j, hj⟩) (h : ∀ i : Fin N, i.val < j → ¬ IsUsed mu c i)
+    : eI ⟨j, hj⟩ + 1 • (0 : Fin N → ℕ) = dgS p pos mu c (j + 1) (pos ⟨j, hj⟩) := by
   funext i
   simp only [Pi.add_apply, smul_zero, Pi.zero_apply, add_zero, eI, dgS]
   by_cases hij : i.val = j
@@ -131,10 +139,15 @@ private theorem eI_eq_dgS_succ_of_first_used (p : ℕ) (pos : Fin N → ℤ) (mu
     rintro ⟨h1, h2⟩
     exact h i (by omega) h2
 
-private theorem eI_add_pow_smul_dgS_eq_dgS_succ_of_used (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (hj : j < N)
-    (sl : ℤ) (hu : IsUsed mu c ⟨j, hj⟩) (hsl : sl ≤ pos ⟨j, hj⟩)
-    (hle : ∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ sl) :
-    eI ⟨j, hj⟩ + p ^ (pos ⟨j, hj⟩ - sl).toNat • dgS p pos mu c j sl = dgS p pos mu c (j + 1) (pos ⟨j, hj⟩) := by
+private theorem eI_add_pow_smul_dgS_eq_dgS_succ_of_used
+    (p : ℕ)
+    (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ)
+    (j : ℕ) (hj : j < N)
+    (sl : ℤ)
+    (hu : IsUsed mu c ⟨j, hj⟩) (hsl : sl ≤ pos ⟨j, hj⟩)
+    (hle : ∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ sl)
+    : eI ⟨j, hj⟩ + p ^ (pos ⟨j, hj⟩ - sl).toNat • dgS p pos mu c j sl
+      = dgS p pos mu c (j + 1) (pos ⟨j, hj⟩) := by
   funext i
   simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, eI, dgS]
   by_cases hij : i.val = j
@@ -152,24 +165,30 @@ private theorem eI_add_pow_smul_dgS_eq_dgS_succ_of_used (p : ℕ) (pos : Fin N �
     · rw [if_neg (fun h => hU h.2), if_neg (fun h => hU h.2)]
       simp
 
-private theorem pow_smul_dgS_eq_dgS_of_le (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (s sl : ℤ)
-    (hsl : sl ≤ s) (hle : ∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ sl) :
-    p ^ (s - sl).toNat • dgS p pos mu c j sl = dgS p pos mu c j s := by
+private theorem pow_smul_dgS_eq_dgS_of_le
+    (p : ℕ)
+    (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (s sl : ℤ)
+    (hsl : sl ≤ s) (hle : ∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ sl)
+    : p ^ (s - sl).toNat • dgS p pos mu c j sl = dgS p pos mu c j s := by
   funext i
   simp only [Pi.smul_apply, smul_eq_mul, dgS]
   split_ifs with h
   · exact pow_toNat_mul_pow_toNat_eq_of_le p (hle i h.1 h.2) hsl
   · simp
 
-private theorem homD_KKs_and_slot_properties (p : ℕ) (x : Fin N → Fin k → MvPolynomial (Fin N × Fin k) R) (pos : Fin N → ℤ)
-    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (hmono : Monotone pos) (hx : ∀ i b, HomD (eI i) (x i b)) (j : ℕ) :
-    j ≤ N →
-      ((KKs p x pos mu c j).2 = none →
-        (∀ i : Fin N, i.val < j → ¬ IsUsed mu c i) ∧ ∀ J, HomD 0 ((KKs p x pos mu c j).1 J)) ∧
-      (∀ sl, (KKs p x pos mu c j).2 = some sl →
-        (∃ i₀ : Fin N, i₀.val < j ∧ IsUsed mu c i₀ ∧ pos i₀ = sl) ∧
-        (∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ sl) ∧
-        ∀ J, HomD (dgS p pos mu c j sl) ((KKs p x pos mu c j).1 J)) := by
+private theorem homD_KKs_and_slot_properties
+    (p : ℕ)
+    (x : Fin N → Fin k → MvPolynomial (Fin N × Fin k) R) (pos : Fin N → ℤ)
+    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (hmono : Monotone pos) (hx : ∀ i b, HomD (eI i) (x i b))
+    (j : ℕ)
+    : j ≤ N
+      → ((KKs p x pos mu c j).2 = none
+          → (∀ i : Fin N, i.val < j → ¬ IsUsed mu c i) ∧ ∀ J, HomD 0 ((KKs p x pos mu c j).1 J))
+        ∧ (∀ sl,
+          (KKs p x pos mu c j).2 = some sl
+            → (∃ i₀ : Fin N, i₀.val < j ∧ IsUsed mu c i₀ ∧ pos i₀ = sl)
+              ∧ (∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ sl)
+              ∧ ∀ J, HomD (dgS p pos mu c j sl) ((KKs p x pos mu c j).1 J)) := by
   induction j with
   | zero =>
     intro _
@@ -183,8 +202,8 @@ private theorem homD_KKs_and_slot_properties (p : ℕ) (x : Fin N → Fin k → 
     intro hj
     have hjN : j < N := hj
     obtain ⟨ihN, ihS⟩ := ih (Nat.le_of_lt hjN)
-    have hmax : ∀ i : Fin N, i.val < j + 1 → pos i ≤ pos ⟨j, hjN⟩ :=
-      fun i hi => hmono (Fin.le_iff_val_le_val.2 (Nat.lt_succ_iff.1 hi))
+    have hmax : ∀ i : Fin N, i.val < j + 1 → pos i ≤ pos ⟨j, hjN⟩ := fun i hi =>
+      hmono (Fin.le_iff_val_le_val.2 (Nat.lt_succ_iff.1 hi))
     by_cases heq : colH (mu ⟨j, by omega⟩) c = colH (mu ⟨j + 1, by omega⟩) c
     · have hu : ¬ IsUsed mu c ⟨j, hjN⟩ := fun h => h heq
       have hK : KKs p x pos mu c (j + 1) = KKs p x pos mu c j := by
@@ -212,9 +231,13 @@ private theorem homD_KKs_and_slot_properties (p : ℕ) (x : Fin N → Fin k → 
       cases hst : (KKs p x pos mu c j).2 with
       | none =>
         obtain ⟨h1, h2⟩ := ihN hst
-        have hK : KKs p x pos mu c (j + 1) =
-            (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (x ⟨j, hjN⟩)
-              (powC 1 (KKs p x pos mu c j).1), some (pos ⟨j, hjN⟩)) := by
+        have hK
+            : KKs p x pos mu c (j + 1)
+              = (
+                colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (x ⟨j, hjN⟩)
+                  (powC 1 (KKs p x pos mu c j).1),
+                some (pos ⟨j, hjN⟩)
+              ) := by
           simp only [KKs, dif_pos hjN, if_neg heq, hst]
         rw [hK]
         refine ⟨fun hn => by simp at hn, fun sl hs => ?_⟩
@@ -225,9 +248,13 @@ private theorem homD_KKs_and_slot_properties (p : ℕ) (x : Fin N → Fin k → 
         exact colStep_HomD c _ _ heq ⟨j, hjN⟩ _ _ _ (hx ⟨j, hjN⟩) (fun J => (h2 J).pow 1) J
       | some sl0 =>
         obtain ⟨⟨i₀, hi₀, hU₀, he₀⟩, h2, h3⟩ := ihS sl0 hst
-        have hK : KKs p x pos mu c (j + 1) =
-            (colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (x ⟨j, hjN⟩)
-              (powC (p ^ (pos ⟨j, hjN⟩ - sl0).toNat) (KKs p x pos mu c j).1), some (pos ⟨j, hjN⟩)) := by
+        have hK
+            : KKs p x pos mu c (j + 1)
+              = (
+                colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (x ⟨j, hjN⟩)
+                  (powC (p ^ (pos ⟨j, hjN⟩ - sl0).toNat) (KKs p x pos mu c j).1),
+                some (pos ⟨j, hjN⟩)
+              ) := by
           simp only [KKs, dif_pos hjN, if_neg heq, hst]
         rw [hK]
         refine ⟨fun hn => by simp at hn, fun sl hs => ?_⟩
@@ -238,11 +265,14 @@ private theorem homD_KKs_and_slot_properties (p : ℕ) (x : Fin N → Fin k → 
         rw [← eI_add_pow_smul_dgS_eq_dgS_succ_of_used p pos mu c j hjN sl0 hu hsl h2]
         exact colStep_HomD c _ _ heq ⟨j, hjN⟩ _ _ _ (hx ⟨j, hjN⟩) (fun J => (h3 J).pow _) J
 
-theorem ZZ_HomD (p : ℕ) (x : Fin N → Fin k → MvPolynomial (Fin N × Fin k) R) (pos : Fin N → ℤ)
+theorem ZZ_HomD
+    (p : ℕ)
+    (x : Fin N → Fin k → MvPolynomial (Fin N × Fin k) R) (pos : Fin N → ℤ)
     (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (hmono : Monotone pos) (hx : ∀ i b, HomD (eI i) (x i b))
-    (j : ℕ) (hj : j ≤ N) :
-    ∀ s : ℤ, (∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ s) → ∀ J,
-      HomD (dgS p pos mu c j s) (ZZ p x pos mu c j s J) := by
+    (j : ℕ) (hj : j ≤ N)
+    : ∀ s : ℤ,
+      (∀ i : Fin N, i.val < j → IsUsed mu c i → pos i ≤ s)
+        → ∀ J, HomD (dgS p pos mu c j s) (ZZ p x pos mu c j s J) := by
   intro s hs J
   obtain ⟨hN', hS⟩ := homD_KKs_and_slot_properties p x pos mu c hmono hx j hj
   cases hst : (KKs p x pos mu c j).2 with
@@ -263,7 +293,8 @@ end Deg
 
 section Clause2
 
-variable (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [Algebra (WF p f) O] {N k : ℕ}
+variable
+  (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [Algebra (WF p f) O] {N k : ℕ}
 
 lemma XC_HomD (i : Fin N) (a : Fin k) (t : KK O) :
     HomD (eI i) (X (i, a) * C t : MvPolynomial (Fin N × Fin k) (KK O)) := by
@@ -283,13 +314,23 @@ lemma letG_HomD (LL : LiftLetters (Fin N)) (g : Matrix (Fin k) (Fin k) (WF p f))
   · exact HomD.sum _ _ fun a _ => by apply XC_HomD
   · exact HomD.sum _ _ fun a _ => by apply XC_HomD
 
-theorem lifted_column_multidegree (LL : LiftLetters (Fin N)) (g : Matrix (Fin k) (Fin k) (WF p f)) (z : ℤ)
-    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (hmono : Monotone LL.pos) (hz : ∀ i, LL.pos i ≤ z)
-    (J : Finset (Fin k)) (m : Fin N × Fin k →₀ ℕ) (hm : m ∈ (KKc p f (O := O) LL g z mu c J).support) (i : Fin N)
-    (hi : IsUsed mu c i) : multideg m i = p ^ (z - LL.pos i).toNat := by
+theorem lifted_column_multidegree
+    (LL : LiftLetters (Fin N))
+    (g : Matrix (Fin k) (Fin k) (WF p f))
+    (z : ℤ)
+    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ)
+    (hmono : Monotone LL.pos) (hz : ∀ i, LL.pos i ≤ z)
+    (J : Finset (Fin k)) (m : Fin N × Fin k →₀ ℕ)
+    (hm : m ∈ (KKc p f (O := O) LL g z mu c J).support)
+    (i : Fin N) (hi : IsUsed mu c i)
+    : multideg m i = p ^ (z - LL.pos i).toNat := by
   rw [KKc_eq] at hm
-  have H := ZZ_HomD p (letG p f (O := O) LL g) LL.pos mu c hmono (fun i b => by apply letG_HomD) N le_rfl z
-    (fun i _ _ => hz i) J m hm i
+  have H :=
+    ZZ_HomD p (letG p f (O := O) LL g) LL.pos mu c hmono
+      (fun i b => by apply letG_HomD)
+      N le_rfl z
+      (fun i _ _ => hz i)
+      J m hm i
   rw [H]
   simp [dgS, i.isLt, hi]
 

@@ -12,7 +12,9 @@ set_option maxHeartbeats 800000
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 namespace UpperTheory.V.Cu.RankFourChainReduction
 open UpperTheory.V.Ws.Chn
 end UpperTheory.V.Cu.RankFourChainReduction
@@ -24,18 +26,22 @@ theorem UpperTheory.V.Cu.chainIV_alt : _root_.UpperTheory.V.Cu.RankFourChainRedu
   have ha := red_zero 𝔞 c
   have ok0 : (T₀.fr ∅).Ok (𝔞.red c) := (std hC D T₀ hF ∅ c le_rfl).2 _ _ ha
   obtain ⟨w, s, hw, hsp, hs, hsM, hseed⟩ := hS Ω l c D T₀ h3 hok h4 ι 𝔞
-  obtain ⟨p0, hp0, hov0⟩ := UpperTheory.exists_residualRep_restriction_of_latticeShape D hG T₀ hF _ _ ha ok0 c₀ hc₀
-  obtain ⟨-, hp0P, -⟩ := goodQ D hG T₀ hF _ _ ha _ c₀ p0 hc₀ (fun w hw => rt_ne (Φ := T₀.fr ∅) ok0 w hw) hov0 hp0 ∅
+  obtain ⟨p0, hp0, hov0⟩ :=
+    UpperTheory.exists_residualRep_restriction_of_latticeShape D hG T₀ hF _ _ ha ok0 c₀ hc₀
+  obtain ⟨-, hp0P, -⟩ :=
+    goodQ D hG T₀ hF _ _ ha _ c₀ p0 hc₀ (fun w hw => rt_ne (Φ := T₀.fr ∅) ok0 w hw) hov0 hp0 ∅
   obtain ⟨W1, p2, hW1, hW1s, hp2, hp2Q, hp2A, hp2E⟩ :=
     gysinPs hC D T₀ hF _ _ ha {w} (by simpa using ⟨hw, hsp⟩) s hs hsM
   obtain ⟨W2, p3, p4, hW2, hW2s, hp3, hp4, hp3Q, hp4Q, h30, h42, h34, h3E⟩ :=
-    gysinAl hC D T₀ hF _ _ ha W1 hW1s p0 p2 (res_mono T₀ (Finset.empty_subset _) hp0) hp2 hp0P (qP hp2Q)
+    gysinAl hC D T₀ hF _ _ ha W1 hW1s p0 p2 (res_mono T₀ (Finset.empty_subset _) hp0) hp2 hp0P
+      (qP hp2Q)
   obtain ⟨T₁, hL1, ht1, hd1⟩ := diesEx D hG T₀ htame hok W2 hW2s
   refine ⟨T₁, hL1, ht1, fun T hL _ => ?_⟩
   have hT : T₀.Le T := (leFit D hG T₀ T₁ hL1).2.2.2.2.2.2 T hL
   obtain ⟨lo, -, -, -, lf, -, -⟩ := leFit D hG T₀ T hT
   have hd : ∀ w ∈ W2, Dies l w T.F := fun w hw => dies_mono hL.le (hd1 w hw)
-  obtain ⟨c₁, h, Q, hQ, hovs, hQA, hQB, hQT⟩ := hseed T hT (lo hok) (hd w (hW2 (hW1 (Finset.mem_singleton_self w))))
+  obtain ⟨c₁, h, Q, hQ, hovs, hQA, hQB, hQT⟩ :=
+    hseed T hT (lo hok) (hd w (hW2 (hW1 (Finset.mem_singleton_self w))))
   refine ⟨c₁, h, Q, hQ, fun u hu hur => ?_⟩
   have okT : (T.fr ∅).Ok (𝔞.red c) := (std hC D T (lf hF) ∅ c le_rfl).2 _ _ ha
   have hq := _root_.UpperTheory.V.Ws.Chn.seed_res_alt T 𝔞 hQ
@@ -74,14 +80,18 @@ theorem UpperTheory.V.Cu.chainIV_alt : _root_.UpperTheory.V.Cu.RankFourChainRedu
   have g0 : Good4 (T.fr ∅) (𝔞.red c) u :=
     Or.inl (ug.elim (fun x => Or.inl ⟨x.1, Or.inl x.2⟩) fun x => Or.inr (Or.inr (Or.inl x)))
   have g3 : Good4 (T.fr ∅) (𝔞.red c) q3 :=
-    Or.inl (ug.elim (fun x => Or.inl ⟨(samePs_ent hur hq3 uP.1 P3.1 s03).1 x.1, Or.inr A3⟩)
+    Or.inl (ug.elim
+      (fun x => Or.inl ⟨(samePs_ent hur hq3 uP.1 P3.1 s03).1 x.1, Or.inr A3⟩)
       fun x => Or.inr (Or.inr (Or.inl ⟨samePs_inV hq3 P3 s03 x.1, A3⟩)))
   have g4 : Good4 (T.fr ∅) (𝔞.red c) q4 :=
-    Or.inl (Or.inl ⟨(samePs_ent hq4 hq2 P4.1 P2.1 s42).2 E2, Or.inr ((sameAl_ent hq3 hq4 M3 M4 s34).1 A3)⟩)
-  have g2 : Good4 (T.fr ∅) (𝔞.red c) q2 :=
-    Or.inr (Or.inl ⟨inA_of hq2 (d0 _ hp2Q.1) s2s hQA, E2⟩)
+    Or.inl (Or.inl
+      ⟨(samePs_ent hq4 hq2 P4.1 P2.1 s42).2 E2, Or.inr ((sameAl_ent hq3 hq4 M3 M4 s34).1 A3)⟩)
+  have g2 : Good4 (T.fr ∅) (𝔞.red c) q2 := Or.inr (Or.inl ⟨inA_of hq2 (d0 _ hp2Q.1) s2s hQA, E2⟩)
   have gs : Good4 (T.fr ∅) (𝔞.red c) (Q.map (𝔞.red c₁)) := Or.inr (Or.inr ⟨hQA, hQB, hQT⟩)
-  exact ⟨g0, (((Relation.ReflTransGen.single ⟨g3, lineP _ _ okT _ _ hur hq3 uP P3 s03⟩).tail
-    ⟨g4, lineM _ _ okT _ _ hq3 hq4 M3 M4 s34⟩).tail ⟨g2, lineP _ _ okT _ _ hq4 hq2 P4 P2 s42⟩).tail
-    ⟨gs, lineM _ _ okT _ _ hq2 hq M2 Ms s2s⟩⟩
+  exact ⟨
+    g0,
+    (((Relation.ReflTransGen.single ⟨g3, lineP _ _ okT _ _ hur hq3 uP P3 s03⟩).tail
+        ⟨g4, lineM _ _ okT _ _ hq3 hq4 M3 M4 s34⟩).tail
+      ⟨g2, lineP _ _ okT _ _ hq4 hq2 P4 P2 s42⟩).tail ⟨gs, lineM _ _ okT _ _ hq2 hq M2 Ms s2s⟩
+  ⟩
 end

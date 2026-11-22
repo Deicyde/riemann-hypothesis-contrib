@@ -10,13 +10,14 @@ namespace PI.VolStabS.TopoPolish
 
 open Topology TopologicalSpace Set
 
-theorem polish_of_lcsc (Y : Type) [TopologicalSpace Y] [LocallyCompactSpace Y] [T2Space Y]
-    [SecondCountableTopology Y] : PolishSpace Y := by
+theorem polish_of_lcsc
+    (Y : Type) [TopologicalSpace Y] [LocallyCompactSpace Y] [T2Space Y] [SecondCountableTopology Y]
+    : PolishSpace Y := by
   classical
   let K := CompactExhaustion.choice Y
   let b : Set (Set (OnePoint Y)) :=
-    ((fun s : Set Y => ((↑) : Y → OnePoint Y) '' s) '' countableBasis Y) ∪
-      Set.range (fun m : ℕ => (((↑) : Y → OnePoint Y) '' K m)ᶜ)
+    ((fun s : Set Y => ((↑) : Y → OnePoint Y) '' s) '' countableBasis Y)
+      ∪ Set.range (fun m : ℕ => (((↑) : Y → OnePoint Y) '' K m)ᶜ)
   have hopen : ∀ m, IsOpen ((((↑) : Y → OnePoint Y) '' K m)ᶜ) := fun m =>
     OnePoint.isOpen_compl_image_coe.mpr ⟨(K.isCompact m).isClosed, K.isCompact m⟩
   have hb : IsTopologicalBasis b := by

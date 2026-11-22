@@ -33,10 +33,11 @@ lemma realDotC_self_eq_zero {g : ℕ} (u : Fin g → ℂ) (h : realDotC u u = 0)
   have hk := h k (Finset.mem_univ _)
   apply Complex.ext <;> simp <;> nlinarith [sq_nonneg (u k).re, sq_nonneg (u k).im]
 
-theorem continuousOn_coords_of_linearIndependent :
-    ∀ (g m : ℕ) (U : Set ℂ) (μ : ℂ → Fin m → Fin g → ℂ) (v : ℂ → Fin g → ℂ) (c : ℂ → Fin m → ℝ),
-      ContinuousOn μ U → ContinuousOn v U → (∀ s ∈ U, LinearIndependent ℝ (μ s)) →
-      (∀ s ∈ U, v s = ∑ i, c s i • μ s i) → ContinuousOn c U := by
+theorem continuousOn_coords_of_linearIndependent
+    : ∀ (g m : ℕ) (U : Set ℂ) (μ : ℂ → Fin m → Fin g → ℂ) (v : ℂ → Fin g → ℂ) (c : ℂ → Fin m → ℝ),
+      ContinuousOn μ U → ContinuousOn v U → (∀ s ∈ U, LinearIndependent ℝ (μ s))
+        → (∀ s ∈ U, v s = ∑ i, c s i • μ s i)
+        → ContinuousOn c U := by
   intro g m U μ v c hμ hv hli hc
   rw [continuousOn_iff_continuous_restrict] at hμ hv ⊢
   let G : U → Matrix (Fin m) (Fin m) ℝ := fun s a b => realDotC (μ s a) (μ s b)
@@ -48,9 +49,12 @@ theorem continuousOn_coords_of_linearIndependent :
     continuous_pi (fun a => continuous_pi (fun b' => hdot.comp ((hμa a).prodMk (hμa b'))))
   have hbc : Continuous b := continuous_pi (fun a => hdot.comp ((hμa a).prodMk hv))
   have hGc_eq : ∀ s : U, G s *ᵥ (c s) = b s := by
-    intro s; funext a
+    intro s
+    funext a
     simp only [G, b, Matrix.mulVec, dotProduct]
-    rw [hc s s.2, realDotC_sum_right]; refine Finset.sum_congr rfl (fun i _ => ?_); ring
+    rw [hc s s.2, realDotC_sum_right]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    ring
   have hdet : ∀ s : U, (G s).det ≠ 0 := by
     intro s hd
     obtain ⟨x, hx0, hx⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hd
@@ -59,9 +63,13 @@ theorem continuousOn_coords_of_linearIndependent :
       apply realDotC_self_eq_zero
       rw [realDotC_sum_right]
       have key : ∀ i, realDotC (μ s i) (∑ j, x j • μ s j) = (G s *ᵥ x) i := by
-        intro i; rw [realDotC_sum_right]; simp only [G, Matrix.mulVec, dotProduct]
-        refine Finset.sum_congr rfl (fun j _ => ?_); ring
-      simp_rw [realDotC_comm _ (μ s _), key, hx]; simp
+        intro i
+        rw [realDotC_sum_right]
+        simp only [G, Matrix.mulVec, dotProduct]
+        refine Finset.sum_congr rfl (fun j _ => ?_)
+        ring
+      simp_rw [realDotC_comm _ (μ s _), key, hx]
+      simp
     funext i
     exact Fintype.linearIndependent_iff.mp (hli s s.2) x hw i
   have hceq : U.domRestrict c = fun s => ((G s).det)⁻¹ • ((G s).adjugate *ᵥ b s) := by
@@ -71,7 +79,8 @@ theorem continuousOn_coords_of_linearIndependent :
         Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hdet s)), Matrix.one_mulVec]
     show c s = _
     rw [h1, Matrix.inv_def, Ring.inverse_eq_inv']
-    ext a; simp [Matrix.mulVec, dotProduct, Matrix.smul_apply, Finset.mul_sum, mul_assoc]
+    ext a
+    simp [Matrix.mulVec, dotProduct, Matrix.smul_apply, Finset.mul_sum, mul_assoc]
   rw [hceq]
   exact (hGc.matrix_det.inv₀ hdet).smul (hGc.matrix_adjugate.matrix_mulVec hbc)
 

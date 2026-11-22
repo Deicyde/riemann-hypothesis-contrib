@@ -9,27 +9,40 @@ open Matrix Topology
 
 namespace GlobalTheory.JSW.Cut
 
-theorem cuts_mul_open_subgroup {F : Type} [NormedField F] (ψ : AddChar F ℂ) {n : ℕ}
+theorem cuts_mul_open_subgroup
+    {F : Type} [NormedField F]
+    (ψ : AddChar F ℂ)
+    {n : ℕ}
     (U : Subgroup (GL (Fin n) F)) (hU : IsOpen (U : Set (GL (Fin n) F))) (X A : Set (GL (Fin n) F))
-    (hX : ∀ x ∈ X, ∀ u ∈ U, x * u ∈ X) (h : Cuts ψ (U : Set (GL (Fin n) F)) X A) :
-    ∃ U₁ : Subgroup (GL (Fin n) F), U₁ ≤ U ∧ IsOpen (U₁ : Set (GL (Fin n) F)) ∧
-      Cuts ψ (U : Set (GL (Fin n) F)) X {g | ∃ a ∈ A, ∃ u ∈ U₁, g = a * u} := by
+    (hX : ∀ x ∈ X, ∀ u ∈ U, x * u ∈ X) (h : Cuts ψ (U : Set (GL (Fin n) F)) X A)
+    : ∃ U₁ : Subgroup (GL (Fin n) F),
+      U₁ ≤ U ∧ IsOpen (U₁ : Set (GL (Fin n) F))
+        ∧ Cuts ψ (U : Set (GL (Fin n) F)) X {g | ∃ a ∈ A, ∃ u ∈ U₁, g = a * u} := by
   obtain ⟨T, hT⟩ := h
-  let U₁ : Subgroup (GL (Fin n) F) :=
-    { carrier := {u | u ∈ U ∧ ∀ k ∈ T.support, k⁻¹ * u * k ∈ U}
-      one_mem' := ⟨one_mem _, fun k _ => by simpa using one_mem U⟩
-      mul_mem' := fun {a b} ha hb => ⟨mul_mem ha.1 hb.1, fun k hk => by
+  let U₁ : Subgroup (GL (Fin n) F) := {
+    carrier := {u | u ∈ U ∧ ∀ k ∈ T.support, k⁻¹ * u * k ∈ U}
+    one_mem' := ⟨one_mem _, fun k _ => by simpa using one_mem U⟩
+    mul_mem' := fun {a b} ha hb => ⟨
+      mul_mem ha.1 hb.1,
+      fun k hk => by
         have := mul_mem (ha.2 k hk) (hb.2 k hk)
-        simpa [mul_assoc] using this⟩
-      inv_mem' := fun {a} ha => ⟨inv_mem ha.1, fun k hk => by
+        simpa [mul_assoc] using this
+    ⟩
+    inv_mem' := fun {a} ha => ⟨
+      inv_mem ha.1,
+      fun k hk => by
         have := inv_mem (ha.2 k hk)
-        simpa [mul_assoc] using this⟩ }
+        simpa [mul_assoc] using this
+    ⟩
+  }
   refine ⟨U₁, fun u hu => hu.1, ?_, T, ?_⟩
-  · have : (U₁ : Set (GL (Fin n) F)) = (U : Set (GL (Fin n) F)) ∩
-        ⋂ k ∈ T.support, (fun u : GL (Fin n) F => k⁻¹ * u * k) ⁻¹' (U : Set (GL (Fin n) F)) := by
-      ext u
-      simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage, SetLike.mem_coe]
-      rfl
+  · have : (U₁ : Set (GL (Fin n) F))
+        = (U : Set (GL (Fin n) F))
+          ∩ ⋂ k ∈ T.support, (fun u : GL (Fin n) F => k⁻¹ * u * k) ⁻¹' (U : Set (GL (Fin n) F)) :=
+      by
+        ext u
+        simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage, SetLike.mem_coe]
+        rfl
     rw [this]
     exact hU.inter (isOpen_biInter_finset fun k _ =>
       hU.preimage ((continuous_const.mul continuous_id).mul continuous_const))

@@ -18,24 +18,31 @@ namespace CrystallineSemistableComparison.CH
 
 variable {R : Type} [CommRing R] {C : Type u} [Category.{v} C]
 
-abbrev elF (E : C ⥤ Type t) (F : C ⥤ ModuleCat.{w} R) : E.Elements ⥤ ModuleCat.{w} R := CategoryOfElements.π E ⋙ F
+abbrev elF (E : C ⥤ Type t) (F : C ⥤ ModuleCat.{w} R) : E.Elements ⥤ ModuleCat.{w} R :=
+  CategoryOfElements.π E ⋙ F
 
-def elMor {E' E : C ⥤ Type t} (p : E' ⟶ E) (F : C ⥤ ModuleCat.{w} R) : Mor (elF E F) (elF E' F) (RingHom.id R) where
+def elMor {E' E : C ⥤ Type t} (p : E' ⟶ E) (F : C ⥤ ModuleCat.{w} R)
+    : Mor (elF E F) (elF E' F) (RingHom.id R) where
   G := CategoryOfElements.map p
   τ _ := LinearMap.id
   nat _ _ := rfl
 
-def elCoef (E : C ⥤ Type t) {F F' : C ⥤ ModuleCat.{w} R} (α : F ⟶ F') : Mor (elF E F) (elF E F') (RingHom.id R) :=
+def elCoef (E : C ⥤ Type t) {F F' : C ⥤ ModuleCat.{w} R} (α : F ⟶ F')
+    : Mor (elF E F) (elF E F') (RingHom.id R) :=
   Mor.ofNatTrans (Functor.whiskerLeft _ α)
 
 def cech {E' E : C ⥤ Type t} (p : E' ⟶ E) (n : ℕ) : C ⥤ Type t where
   obj T := {y : Fin (n + 1) → E'.obj T // ∀ i j, p.app T (y i) = p.app T (y j)}
-  map {T T'} φ := TypeCat.ofHom fun y => ⟨fun i => E'.map φ (y.1 i), fun i j => by
-    rw [NatTrans.naturality_apply, NatTrans.naturality_apply, y.2 i j]⟩
+  map {T T'} φ :=
+    TypeCat.ofHom fun y => ⟨
+      fun i => E'.map φ (y.1 i),
+      fun i j => by rw [NatTrans.naturality_apply, NatTrans.naturality_apply, y.2 i j]
+    ⟩
   map_id T := by ext y i; simp
   map_comp φ ψ := by ext y i; simp
 
-def cechMap {E' E : C ⥤ Type t} (p : E' ⟶ E) {m n : ℕ} (g : Fin (m + 1) → Fin (n + 1)) : cech p n ⟶ cech p m where
+def cechMap {E' E : C ⥤ Type t} (p : E' ⟶ E) {m n : ℕ} (g : Fin (m + 1) → Fin (n + 1))
+    : cech p n ⟶ cech p m where
   app T := TypeCat.ofHom fun y => ⟨fun i => y.1 (g i), fun i j => y.2 _ _⟩
 
 def cechAug {E' E : C ⥤ Type t} (p : E' ⟶ E) (n : ℕ) : cech p n ⟶ E where
@@ -44,31 +51,43 @@ def cechAug {E' E : C ⥤ Type t} (p : E' ⟶ E) (n : ℕ) : cech p n ⟶ E wher
     ext y
     exact NatTrans.naturality_apply p φ (y.1 0)
 
-abbrev cechCos {E' E : C ⥤ Type t} (p : E' ⟶ E) (F : C ⥤ ModuleCat.{w} R) : CosCx.{max u v w t} R where
+abbrev cechCos {E' E : C ⥤ Type t} (p : E' ⟶ E) (F : C ⥤ ModuleCat.{w} R)
+    : CosCx.{max u v w t} R where
   K n := cx (elF (cech p n) F)
   δ n i := (elMor (cechMap p i.succAbove) F).hom
   rel n j i q x := by
-    have e : (cechMap p (j.succAbove i).succAbove ≫ cechMap p (i.predAbove j).succAbove : cech p (n + 2) ⟶ cech p n) =
-        cechMap p j.succAbove ≫ cechMap p i.succAbove := by
+    have e
+        : (cechMap p (j.succAbove i).succAbove ≫ cechMap p (i.predAbove j).succAbove
+            : cech p (n + 2) ⟶ cech p n)
+          = cechMap p j.succAbove ≫ cechMap p i.succAbove := by
       ext T y
-      exact Subtype.ext (funext fun k => congrArg y.1 (Fin.succAbove_succAbove_succAbove_predAbove j i k))
+      exact Subtype.ext (funext fun k =>
+        congrArg y.1 (Fin.succAbove_succAbove_succAbove_predAbove j i k))
     exact congrArg (fun a => (elMor a F).pullC q x) e
 
-def cechAugRow {E' E : C ⥤ Type t} (p : E' ⟶ E) (F : C ⥤ ModuleCat.{w} R) :
-    DCx.AugRow (cx (elF E F)) (cechCos p F).dcx where
+def cechAugRow {E' E : C ⥤ Type t} (p : E' ⟶ E) (F : C ⥤ ModuleCat.{w} R)
+    : DCx.AugRow (cx (elF E F)) (cechCos p F).dcx where
   ε q := (elMor (cechAug p 0) F).pullC q
   hε q x := by
-    have e : (cechMap p (0 : Fin 2).succAbove ≫ cechAug p 0 : cech p 1 ⟶ E) = cechMap p (1 : Fin 2).succAbove ≫ cechAug p 0 := by
+    have e
+        : (cechMap p (0 : Fin 2).succAbove ≫ cechAug p 0 : cech p 1 ⟶ E)
+          = cechMap p (1 : Fin 2).succAbove ≫ cechAug p 0 := by
       ext T y
       exact y.2 _ _
-    have e' : (elMor (cechMap p (0 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x) =
-        (elMor (cechMap p (1 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x) :=
+    have e'
+        : (elMor (cechMap p (0 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x)
+          = (elMor (cechMap p (1 : Fin 2).succAbove) F).pullC q
+            ((elMor (cechAug p 0) F).pullC q x) :=
       congrArg (fun a => (elMor a F).pullC q x) e
     refine (Cos.d_apply ((cechCos p F).cos q) 0 _).trans ?_
     rw [Fin.sum_univ_two]
-    change (-1 : ℤ) ^ 0 • (elMor (cechMap p (0 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x) +
-      (-1 : ℤ) ^ 1 • (elMor (cechMap p (1 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x) = 0
-    rw [e']; simp
+    change (-1 : ℤ) ^ 0
+          • (elMor (cechMap p (0 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x)
+        + (-1 : ℤ) ^ 1
+          • (elMor (cechMap p (1 : Fin 2).succAbove) F).pullC q ((elMor (cechAug p 0) F).pullC q x)
+      = 0
+    rw [e']
+    simp
   comm q x := (elMor (cechAug p 0) F).d_pullC q x
 
 structure CxF (C : Type u) [Category.{v} C] (R : Type) [CommRing R] where
@@ -93,17 +112,23 @@ section Rel
 
 variable {I : Type t} [Category.{t'} I] (π : C ⥤ I)
 
-abbrev relF (F : C ⥤ ModuleCat.{w} R) (i : I) : StructuredArrow i π ⥤ ModuleCat.{w} R := StructuredArrow.proj i π ⋙ F
+abbrev relF (F : C ⥤ ModuleCat.{w} R) (i : I) : StructuredArrow i π ⥤ ModuleCat.{w} R :=
+  StructuredArrow.proj i π ⋙ F
 
-def relRes (F : C ⥤ ModuleCat.{w} R) {i i' : I} (a : i ⟶ i') : Mor (relF π F i) (relF π F i') (RingHom.id R) where
+def relRes (F : C ⥤ ModuleCat.{w} R) {i i' : I} (a : i ⟶ i')
+    : Mor (relF π F i) (relF π F i') (RingHom.id R) where
   G := StructuredArrow.map a
   τ _ := LinearMap.id
   nat _ _ := rfl
 
 def relAug (F : C ⥤ ModuleCat.{w} R) (i : I) : Mor F (relF π F i) (RingHom.id R) := Mor.restrict F _
 
-def relMor {R' : Type} [CommRing R'] {C' : Type u'} [Category.{v'} C'] {F : C ⥤ ModuleCat.{w} R} {F' : C' ⥤ ModuleCat.{w'} R'}
-    {σ : R →+* R'} (m : Mor F F' σ) (i : I) : Mor (relF π F i) (relF (m.G ⋙ π) F' i) σ where
+def relMor
+    {R' : Type} [CommRing R']
+    {C' : Type u'} [Category.{v'} C']
+    {F : C ⥤ ModuleCat.{w} R} {F' : C' ⥤ ModuleCat.{w'} R'} {σ : R →+* R'} (m : Mor F F' σ)
+    (i : I)
+    : Mor (relF π F i) (relF (m.G ⋙ π) F' i) σ where
   G := StructuredArrow.pre i m.G π
   τ x := m.τ x.right
   nat φ x := m.nat φ.right x
@@ -129,19 +154,24 @@ structure Powers (A : C) where
   δ : ∀ n, Fin (n + 1) → (K n ⟶ K (n + 1))
   aδ : ∀ n k, a n ≫ δ n k = a (n + 1)
   ιδ : ∀ n k i, ι n i ≫ δ n k = ι (n + 1) (k.succAbove i)
-  rel : ∀ n (k : Fin (n + 2)) (i : Fin (n + 1)), δ n (i.predAbove k) ≫ δ (n + 1) (k.succAbove i) = δ n i ≫ δ (n + 1) k
+  rel
+    : ∀ n (k : Fin (n + 2)) (i : Fin (n + 1)),
+      δ n (i.predAbove k) ≫ δ (n + 1) (k.succAbove i) = δ n i ≫ δ (n + 1) k
   iso0 : IsIso (a 0)
   iso1 : IsIso (ι 1 0)
-  univ : ∀ n (t : T) (x : A ⟶ j.obj t) (y : Fin n → (B ⟶ j.obj t)), (∀ i, f ≫ y i = x) →
-    ∃! z : K n ⟶ j.obj t, a n ≫ z = x ∧ ∀ i, ι n i ≫ z = y i
+  univ
+    : ∀ n (t : T) (x : A ⟶ j.obj t) (y : Fin n → (B ⟶ j.obj t)),
+      (∀ i, f ≫ y i = x) → ∃! z : K n ⟶ j.obj t, a n ≫ z = x ∧ ∀ i, ι n i ≫ z = y i
 
-def Powers.dK {A : C} (P : Powers j A) (F : C ⥤ ModuleCat.{w} R) (n : ℕ) : F.obj (P.K n) →ₗ[R] F.obj (P.K (n + 1)) :=
+def Powers.dK {A : C} (P : Powers j A) (F : C ⥤ ModuleCat.{w} R) (n : ℕ)
+    : F.obj (P.K n) →ₗ[R] F.obj (P.K (n + 1)) :=
   ∑ k : Fin (n + 1), (-1 : ℤ) ^ (k : ℕ) • (F.map (P.δ n k)).hom
 
 def Powers.Good {A : C} (P : Powers j A) (F : C ⥤ ModuleCat.{w} R) (I : Ideal R) : Prop :=
-  (∀ (t : T) (x : A ⟶ j.obj t), ∃ y : P.B ⟶ j.obj t, P.f ≫ y = x) ∧
-  (∀ s ∈ I, InjUpTo s (P.dK j F 0) ∧ ∀ n, ExactUpTo s (P.dK j F n) (P.dK j F (n + 1))) ∧
-  ∃ (t₀ : T) (g : P.B ⟶ j.obj t₀), (∀ (t : T) (y : P.B ⟶ j.obj t), ∃! φ : t₀ ⟶ t, g ≫ j.map φ = y) ∧ Almost I (F.map g).hom
+  (∀ (t : T) (x : A ⟶ j.obj t), ∃ y : P.B ⟶ j.obj t, P.f ≫ y = x)
+    ∧ (∀ s ∈ I, InjUpTo s (P.dK j F 0) ∧ ∀ n, ExactUpTo s (P.dK j F n) (P.dK j F (n + 1)))
+    ∧ ∃ (t₀ : T) (g : P.B ⟶ j.obj t₀),
+      (∀ (t : T) (y : P.B ⟶ j.obj t), ∃! φ : t₀ ⟶ t, g ≫ j.map φ = y) ∧ Almost I (F.map g).hom
 
 end Ind
 
@@ -149,19 +179,23 @@ end CrystallineSemistableComparison.CH
 
 namespace CrystallineSemistableComparison
 
-variable (R : Type) [CommRing R] (G : Type) [TopologicalSpace G] (M : Type w) [AddCommGroup M] [Module R M]
+variable
+  (R : Type) [CommRing R] (G : Type) [TopologicalSpace G] (M : Type w) [AddCommGroup M] [Module R M]
 
 abbrev lcCos : Cos.{w} R where
   X n := LocallyConstant (Fin (n + 1) → G) M
   δ n i := LocallyConstant.comapₗ R ⟨fun x k => x (i.succAbove k), by fun_prop⟩
   rel n j i f := by
     ext x
-    exact congrArg f (funext fun k => congrArg x (Fin.succAbove_succAbove_succAbove_predAbove j i k))
+    exact congrArg f
+      (funext fun k => congrArg x (Fin.succAbove_succAbove_succAbove_predAbove j i k))
 
 variable {R G M} [AddCommGroup G]
 
-def eqv (ρ : Multiplicative G →* (M →ₗ[R] M)) (S : Set G) (n : ℕ) : Submodule R ((lcCos R G M).cx.X n) where
-  carrier := {f | ∀ g ∈ S, ∀ x : Fin (n + 1) → G, f (fun i => g + x i) = ρ (Multiplicative.ofAdd g) (f x)}
+def eqv (ρ : Multiplicative G →* (M →ₗ[R] M)) (S : Set G) (n : ℕ)
+    : Submodule R ((lcCos R G M).cx.X n) where
+  carrier :=
+    {f | ∀ g ∈ S, ∀ x : Fin (n + 1) → G, f (fun i => g + x i) = ρ (Multiplicative.ofAdd g) (f x)}
   add_mem' {a b} ha hb g hg x := by
     change a _ + b _ = ρ _ (a x + b x)
     rw [ha g hg, hb g hg, map_add (f := _)]

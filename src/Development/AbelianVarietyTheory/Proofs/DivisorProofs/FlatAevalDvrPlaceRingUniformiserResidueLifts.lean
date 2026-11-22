@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoePolyMapX
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair GlobalTheory.GraphLocal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair GlobalTheory.GraphLocal
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -22,24 +24,27 @@ namespace GlobalTheory.GraphLocal.FlatPlace
 
 open MvPolynomial
 
-instance isPrime_span_X_zero (m : ℕ) :
-    (Ideal.span {(X 0 : MvPolynomial (Fin (m + 1)) ℂ)}).IsPrime :=
+instance isPrime_span_X_zero (m : ℕ)
+    : (Ideal.span {(X 0 : MvPolynomial (Fin (m + 1)) ℂ)}).IsPrime :=
   (Ideal.span_singleton_prime (X_ne_zero 0)).2 prime_X
 
-theorem exists_X_zero_pow_mul {m : ℕ} {f : MvPolynomial (Fin (m + 1)) ℂ} (hf : f ≠ 0) :
-    ∃ (n : ℕ) (g : MvPolynomial (Fin (m + 1)) ℂ),
+theorem exists_X_zero_pow_mul {m : ℕ} {f : MvPolynomial (Fin (m + 1)) ℂ} (hf : f ≠ 0)
+    : ∃ (n : ℕ) (g : MvPolynomial (Fin (m + 1)) ℂ),
       g ∉ Ideal.span {(X 0 : MvPolynomial (Fin (m + 1)) ℂ)} ∧ f = X 0 ^ n * g := by
-  obtain ⟨n, g, hg, e⟩ := WfDvdMonoid.max_power_factor hf
-    (prime_X (R := ℂ) (i := (0 : Fin (m + 1)))).irreducible
+  obtain ⟨n, g, hg, e⟩ :=
+    WfDvdMonoid.max_power_factor hf (prime_X (R := ℂ) (i := (0 : Fin (m + 1)))).irreducible
   exact ⟨n, g, fun h => hg (Ideal.mem_span_singleton.1 h), e⟩
 
-theorem isDVR_atPrime (m : ℕ) : IsDiscreteValuationRing
-    (Localization.AtPrime (Ideal.span {(X 0 : MvPolynomial (Fin (m + 1)) ℂ)})) := by
+theorem isDVR_atPrime (m : ℕ)
+    : IsDiscreteValuationRing (Localization.AtPrime (Ideal.span
+      {(X 0 : MvPolynomial (Fin (m + 1)) ℂ)})) := by
   set q := Ideal.span {(X 0 : MvPolynomial (Fin (m + 1)) ℂ)}
   set D := Localization.AtPrime q
   refine IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
     ⟨algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0), ?_, ?_⟩
-  · have hmax : IsLocalRing.maximalIdeal D = Ideal.span {algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0)} := by
+  · have hmax
+        : IsLocalRing.maximalIdeal D
+          = Ideal.span {algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0)} := by
       rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_span, Set.image_singleton]
     have h0 : algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0) ≠ 0 := by
       intro h
@@ -56,13 +61,18 @@ theorem isDVR_atPrime (m : ℕ) : IsDiscreteValuationRing
       exact hx (IsLocalization.mk'_zero _)
     obtain ⟨n, g, hg, rfl⟩ := exists_X_zero_pow_mul hf
     refine ⟨n, ?_⟩
-    have hgu : IsUnit (algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D g) := IsLocalization.map_units D (⟨g, hg⟩ : q.primeCompl)
-    have hsu : IsUnit (algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D s) := IsLocalization.map_units D s
-    have e : IsLocalization.mk' D (X 0 ^ n * g) s * algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D s =
-        algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0) ^ n * algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D g := by
+    have hgu : IsUnit (algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D g) :=
+      IsLocalization.map_units D (⟨g, hg⟩ : q.primeCompl)
+    have hsu : IsUnit (algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D s) :=
+      IsLocalization.map_units D s
+    have e
+        : IsLocalization.mk' D (X 0 ^ n * g) s * algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D s
+          = algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0) ^ n
+            * algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D g := by
       rw [IsLocalization.mk'_spec, map_mul, map_pow]
     show Associated _ (IsLocalization.mk' D (X 0 ^ n * g) s)
-    refine (associated_mul_unit_left (algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0) ^ n) _ hgu).symm.trans ?_
+    refine (associated_mul_unit_left (algebraMap (MvPolynomial (Fin (m + 1)) ℂ) D (X 0) ^ n) _
+      hgu).symm.trans ?_
     rw [← e]
     exact associated_mul_unit_left _ _ hsu
 
@@ -74,21 +84,25 @@ open MvPolynomial
 
 variable {K κ : Type} [Field K] [Field κ] [Algebra ℂ K] [Algebra ℂ κ]
 
-theorem isUnit_of_ord_eq_zero {E : Place (algebraMap ℂ K)} (y : E.ring) (hy : (y : K) ≠ 0)
-    (h0 : E.ord y = 0) : IsUnit y := by
-  refine IsUnit.of_mul_eq_one (b := ⟨(y : K)⁻¹, (E.ord_nonneg_iff (inv_ne_zero hy)).1
-    (by rw [E.ord_inv, h0]; simp)⟩) (Subtype.ext ?_)
+theorem isUnit_of_ord_eq_zero
+    {E : Place (algebraMap ℂ K)} (y : E.ring) (hy : (y : K) ≠ 0) (h0 : E.ord y = 0)
+    : IsUnit y := by
+  refine IsUnit.of_mul_eq_one
+    (b := ⟨(y : K)⁻¹, (E.ord_nonneg_iff (inv_ne_zero hy)).1 (by rw [E.ord_inv, h0]; simp)⟩)
+    (Subtype.ext ?_)
   simp [hy]
 
-theorem flat_aeval_placeAlg (k : ℕ) (R : Subring K)
-    (π : R →+* κ) (E : Place (algebraMap ℂ K)) (hER : E.Contains R) (t : E.ring) (zR : Fin k → R) :
-    (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a) →
-    (∀ a, algebraMap ℂ K a ∈ R) →
-    (∀ r : R, (r : K) ≠ 0 → (π r = 0 ↔ 0 < E.ord r)) →
-    Irreducible t → AlgebraicIndependent ℂ (fun i => π (zR i)) →
-    (MvPolynomial.aeval (Fin.cons (⟨(t : K), t.2⟩ : placeAlg E)
-        (fun i => (⟨(zR i : K), hER _ (zR i).2⟩ : placeAlg E))) :
-        MvPolynomial (Fin (k + 1)) ℂ →ₐ[ℂ] placeAlg E).toRingHom.Flat := by
+theorem flat_aeval_placeAlg
+    (k : ℕ)
+    (R : Subring K) (π : R →+* κ)
+    (E : Place (algebraMap ℂ K)) (hER : E.Contains R) (t : E.ring)
+    (zR : Fin k → R)
+    : (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a)
+      → (∀ a, algebraMap ℂ K a ∈ R) → (∀ r : R, (r : K) ≠ 0 → (π r = 0 ↔ 0 < E.ord r))
+      → Irreducible t → AlgebraicIndependent ℂ (fun i => π (zR i))
+      → (MvPolynomial.aeval (Fin.cons (⟨(t : K), t.2⟩ : placeAlg E)
+          (fun i => (⟨(zR i : K), hER _ (zR i).2⟩ : placeAlg E)))
+        : MvPolynomial (Fin (k + 1)) ℂ →ₐ[ℂ] placeAlg E).toRingHom.Flat := by
   intro hπ hc hord ht hind
   set x : Fin (k + 1) → placeAlg E := Fin.cons (⟨(t : K), t.2⟩ : placeAlg E)
     (fun i => (⟨(zR i : K), hER _ (zR i).2⟩ : placeAlg E)) with hx
@@ -98,14 +112,18 @@ theorem flat_aeval_placeAlg (k : ℕ) (R : Subring K)
   let cR : ℂ →+* R := (algebraMap ℂ K).codRestrict R hc
   have hπc : π.comp cR = algebraMap ℂ κ := RingHom.ext fun a => hπ a (hc a)
 
-  have hC : ∀ g : MvPolynomial (Fin k) ℂ,
-      φ ((finSuccEquiv ℂ k).symm (Polynomial.C g)) = aeval (fun i : Fin k => x i.succ) g := by
+  have hC
+      : ∀ g : MvPolynomial (Fin k) ℂ,
+        φ ((finSuccEquiv ℂ k).symm (Polynomial.C g)) = aeval (fun i : Fin k => x i.succ) g := by
     intro g
     induction g using MvPolynomial.induction_on with
     | C a =>
-      rw [show (Polynomial.C (MvPolynomial.C a) : Polynomial (MvPolynomial (Fin k) ℂ)) =
-        algebraMap ℂ _ a from rfl, AlgEquiv.commutes, AlgHom.commutes, aeval_C]
-    | add p r hp hr => simp only [map_add, hp, hr]
+      rw [show (Polynomial.C (MvPolynomial.C a) : Polynomial (MvPolynomial (Fin k) ℂ))
+            = algebraMap ℂ _ a from
+          rfl,
+        AlgEquiv.commutes, AlgHom.commutes, aeval_C]
+    | add p r hp hr =>
+      simp only [map_add, hp, hr]
     | mul_X p i hp =>
       rw [Polynomial.C_mul, map_mul, map_mul, hp, ← finSuccEquiv_X_succ, AlgEquiv.symm_apply_apply,
         map_mul, aeval_X, aeval_X]
@@ -121,7 +139,8 @@ theorem flat_aeval_placeAlg (k : ℕ) (R : Subring K)
     have hg : g ≠ 0 := by
       intro h0
       apply hf
-      rw [hfp, hp, h0, map_zero, add_zero, map_mul, ← finSuccEquiv_X_zero, AlgEquiv.symm_apply_apply]
+      rw [hfp, hp, h0, map_zero, add_zero, map_mul, ← finSuccEquiv_X_zero,
+        AlgEquiv.symm_apply_apply]
       exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)
 
     set wR : R := eval₂ cR zR g
@@ -157,8 +176,9 @@ theorem flat_aeval_placeAlg (k : ℕ) (R : Subring K)
       rw [hfp, hp, map_add (f := _), map_mul, map_add (f := _), map_mul, hX, hC]
     let uE : E.ring := ⟨(u : K), u.2⟩
     let vE : E.ring := ⟨(v : K), v.2⟩
-    have huE : IsUnit uE := isUnit_of_ord_eq_zero uE (by rw [← hwK] at *; simpa [uE, ← hwK] using hw0)
-      (by simpa [uE, ← hwK] using hwo)
+    have huE : IsUnit uE :=
+      isUnit_of_ord_eq_zero uE (by rw [← hwK] at *; simpa [uE, ← hwK] using hw0)
+        (by simpa [uE, ← hwK] using hwo)
     let yE : E.ring := ⟨(φ f : K), (φ f).2⟩
     have hyE : yE = t * vE + uE := Subtype.ext (by simp [yE, uE, vE, hf', x])
     have hyu : IsUnit yE := by
@@ -169,9 +189,13 @@ theorem flat_aeval_placeAlg (k : ℕ) (R : Subring K)
         have := sub_mem hy (Ideal.mul_mem_right vE _ htm)
         rwa [hyE, add_sub_cancel_left] at this
       exact this huE
-    let toA : E.ring →+* placeAlg E :=
-      { toFun := fun y => ⟨y, y.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl,
-        map_zero' := rfl, map_add' := fun _ _ => rfl }
+    let toA : E.ring →+* placeAlg E := {
+      toFun := fun y => ⟨y, y.2⟩
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl
+      map_zero' := rfl
+      map_add' := fun _ _ => rfl
+    }
     exact hyu.map toA
   set D := Localization.AtPrime q
   haveI : IsDiscreteValuationRing D := isDVR_atPrime k

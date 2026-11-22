@@ -7,11 +7,16 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EtEdge
 
-theorem repBasic : CrystallineSemistableComparison.E.EvExt → CrystallineSemistableComparison.E.EvNat → CrystallineSemistableComparison.E.InSch → CrystallineSemistableComparison.E.RepBasic := by
+theorem repBasic
+    : CrystallineSemistableComparison.E.EvExt → CrystallineSemistableComparison.E.EvNat
+      → CrystallineSemistableComparison.E.InSch
+      → CrystallineSemistableComparison.E.RepBasic := by
   intro hExt hNat hIn
   unfold CrystallineSemistableComparison.E.InSch at hIn
   unfold CrystallineSemistableComparison.E.RepBasic
@@ -32,9 +37,11 @@ theorem repBasic : CrystallineSemistableComparison.E.EvExt → CrystallineSemist
   · rintro a ⟨α, h0, rfl⟩ k hk
     exact ((hIn R X I k n (n + 1) hk rfl).2 α).2.1 h0
   · rintro Y f x a ⟨α, rfl, rfl⟩
-    refine ⟨GlobalTheory.EtC.zcomp (Cocycle.ofHom ((chains R).map (sch.map f))) α (zero_add n), rfl, ?_⟩
-    have h2 := (hNat R (sch.obj X) I n (α : Cochain _ I n) 0 n (by simp) Y).2 (sch.obj Y) (sch.map f)
-      (𝟙 Y : Y ⟶ Y)
+    refine
+      ⟨GlobalTheory.EtC.zcomp (Cocycle.ofHom ((chains R).map (sch.map f))) α (zero_add n), rfl, ?_⟩
+    have h2 :=
+      (hNat R (sch.obj X) I n (α : Cochain _ I n) 0 n (by simp) Y).2 (sch.obj Y) (sch.map f)
+        (𝟙 Y : Y ⟶ Y)
     have h1 := (hNat R (sch.obj X) I n (α : Cochain _ I n) 0 n (by simp) X).1 Y f (𝟙 X : X ⟶ X)
     have e : (Sx.map (sch.map f) (𝟙 Y : Y ⟶ Y) : Sx (sch.obj X) 0 Y) = Sx.res f (𝟙 X : X ⟶ X) := by
       show 𝟙 Y ≫ f = f ≫ 𝟙 X

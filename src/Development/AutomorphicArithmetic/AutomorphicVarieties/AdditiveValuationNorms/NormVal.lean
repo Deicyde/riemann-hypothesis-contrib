@@ -15,15 +15,16 @@ private theorem dvd_of_norm_le' {l : ℕ} [Fact l.Prime] {d y : ℤ_[l]} (h : �
   · subst hd
     rw [norm_zero, norm_le_zero_iff] at h
     exact absurd h hy
-  have hav : ∀ x : ℤ_[l], x ≠ 0 → IsDiscreteValuationRing.addVal ℤ_[l] x = x.valuation :=
-    fun x hx => IsDiscreteValuationRing.addVal_def x (PadicInt.unitCoeff hx) PadicInt.irreducible_p _
+  have hav
+      : ∀ x : ℤ_[l], x ≠ 0 → IsDiscreteValuationRing.addVal ℤ_[l] x = x.valuation := fun x hx =>
+    IsDiscreteValuationRing.addVal_def x (PadicInt.unitCoeff hx) PadicInt.irreducible_p _
       (PadicInt.unitCoeff_spec hx)
   rw [← IsDiscreteValuationRing.addVal_le_iff_dvd, hav d hd, hav y hy, Nat.cast_le]
   rw [PadicInt.norm_eq_zpow_neg_valuation hd, PadicInt.norm_le_pow_iff_le_valuation y hy] at h
   exact h
 
-private theorem vl_prod {l : ℕ} [Fact l.Prime] {ι : Type} (s : Finset ι) (f : ι → ℤ_[l]) :
-    vl l (∏ i ∈ s, f i) = ∑ i ∈ s, vl l (f i) := by
+private theorem vl_prod {l : ℕ} [Fact l.Prime] {ι : Type} (s : Finset ι) (f : ι → ℤ_[l])
+    : vl l (∏ i ∈ s, f i) = ∑ i ∈ s, vl l (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [vl]
@@ -31,8 +32,8 @@ private theorem vl_prod {l : ℕ} [Fact l.Prime] {ι : Type} (s : Finset ι) (f 
     rw [Finset.prod_insert ha, Finset.sum_insert ha, ← ih]
     exact IsDiscreteValuationRing.addVal_mul
 
-theorem UpperTheory.V.PropA.normVal :
-    ∀ (l : ℕ) [Fact l.Prime] (R c : ℕ) (d : ℤ_[l]) (x : Fin R → ℤ_[l]),
+theorem UpperTheory.V.PropA.normVal
+    : ∀ (l : ℕ) [Fact l.Prime] (R c : ℕ) (d : ℤ_[l]) (x : Fin R → ℤ_[l]),
       ∏ i, (((l : ℝ) ^ c)⁻¹ * ‖x i‖) ≤ ‖d‖ → vl l d ≤ ∑ i, ((c : ℕ∞) + vl l (x i)) := by
   intro l _ R c d x h
   have h1 : ‖∏ i, ((l : ℤ_[l]) ^ c * x i)‖ = ∏ i, (((l : ℝ) ^ c)⁻¹ * ‖x i‖) := by

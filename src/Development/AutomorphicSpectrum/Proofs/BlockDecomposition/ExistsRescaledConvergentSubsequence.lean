@@ -5,13 +5,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FinStabl
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
-open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.CompanionTheory.LimV
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
+open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  GlobalTheory.CompanionTheory.LimV
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.LimVec
 
-theorem normalised_subseq_limit : ∀ {M : Type} [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M] (g : ℕ → M), (∀ k, g k ≠ 0) → ∃ (c : ℕ → ℂ) (φ : ℕ → ℕ) (G : M), StrictMono φ ∧ G ≠ 0 ∧ ∀ ℓ : Module.Dual ℂ M, Tendsto (fun k => c k * ℓ (g (φ k))) atTop (𝓝 (ℓ G)) := by
+theorem normalised_subseq_limit
+    : ∀ {M : Type} [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M] (g : ℕ → M),
+      (∀ k, g k ≠ 0)
+        → ∃ (c : ℕ → ℂ) (φ : ℕ → ℕ) (G : M),
+          StrictMono φ ∧ G ≠ 0
+            ∧ ∀ ℓ : Module.Dual ℂ M, Tendsto (fun k => c k * ℓ (g (φ k))) atTop (𝓝 (ℓ G)) := by
   intro M _ _ _ g hg
   let e : M ≃ₗ[ℂ] (Fin (Module.finrank ℂ M) → ℂ) := (Module.finBasis ℂ M).equivFun
   let s : ℕ → ℂ := fun k => ((‖e (g k)‖⁻¹ : ℝ) : ℂ)
@@ -22,7 +29,8 @@ theorem normalised_subseq_limit : ∀ {M : Type} [AddCommGroup M] [Module ℂ M]
     rw [mem_sphere_zero_iff_norm, norm_smul]
     simp only [s, Complex.norm_real, norm_inv, norm_norm]
     exact inv_mul_cancel₀ hn
-  obtain ⟨v, hvs, φ, hφ, hlim⟩ := (isCompact_sphere (0 : Fin (Module.finrank ℂ M) → ℂ) 1).tendsto_subseq hmem
+  obtain ⟨v, hvs, φ, hφ, hlim⟩ :=
+    (isCompact_sphere (0 : Fin (Module.finrank ℂ M) → ℂ) 1).tendsto_subseq hmem
   have hv0 : v ≠ 0 := by
     intro h
     rw [h] at hvs

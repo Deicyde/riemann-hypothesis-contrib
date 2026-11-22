@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.nwtAgree_of :
-    NwtOpen → WtUnique → GenBasic → MultBC → NwtAgree := by
+theorem UpperTheory.Gal.TranscendenceTraces.nwtAgree_of
+    : NwtOpen → WtUnique → GenBasic → MultBC → NwtAgree := by
   intro hOpen hUniq hGen _ Z S p _ A B _ _ w w' hw hw' Ω _ _ z z' hz
   have hc : pullback.fst A.u B.u ≫ A.u = pullback.snd A.u B.u ≫ B.u := pullback.condition
   have hP : IsPullback (pullback.fst p (pullback.fst A.u B.u ≫ A.u))
@@ -18,24 +19,37 @@ theorem UpperTheory.Gal.TranscendenceTraces.nwtAgree_of :
       (pullback.snd p (pullback.fst A.u B.u ≫ A.u)) p (pullback.snd A.u B.u ≫ B.u) := by
     rw [← hc]
     exact hP
-  have eA : pullback.fst p (pullback.fst A.u B.u ≫ A.u) ≫ p =
-      (pullback.snd p (pullback.fst A.u B.u ≫ A.u) ≫ pullback.fst A.u B.u) ≫ A.u := by
+  have eA
+      : pullback.fst p (pullback.fst A.u B.u ≫ A.u) ≫ p
+        = (pullback.snd p (pullback.fst A.u B.u ≫ A.u) ≫ pullback.fst A.u B.u) ≫ A.u := by
     rw [Category.assoc]
     exact hP.w
-  have eB : pullback.fst p (pullback.fst A.u B.u ≫ A.u) ≫ p =
-      (pullback.snd p (pullback.fst A.u B.u ≫ A.u) ≫ pullback.snd A.u B.u) ≫ B.u := by
+  have eB
+      : pullback.fst p (pullback.fst A.u B.u ≫ A.u) ≫ p
+        = (pullback.snd p (pullback.fst A.u B.u ≫ A.u) ≫ pullback.snd A.u B.u) ≫ B.u := by
     rw [Category.assoc]
     exact hP'.w
-  let C : Sq A.r := ⟨pullback A.u B.u, pullback p (pullback.fst A.u B.u ≫ A.u), pullback.fst A.u B.u,
-    A.pb.lift _ _ eA, pullback.snd p (pullback.fst A.u B.u ≫ A.u),
-    IsPullback.of_right (by rw [A.pb.lift_fst]; exact hP) (A.pb.lift_snd _ _ _) A.pb⟩
-  let C' : Sq B.r := ⟨pullback A.u B.u, pullback p (pullback.fst A.u B.u ≫ A.u), pullback.snd A.u B.u,
-    B.pb.lift _ _ eB, pullback.snd p (pullback.fst A.u B.u ≫ A.u),
-    IsPullback.of_right (by rw [B.pb.lift_fst]; exact hP') (B.pb.lift_snd _ _ _) B.pb⟩
+  let C : Sq A.r := ⟨
+    pullback A.u B.u,
+    pullback p (pullback.fst A.u B.u ≫ A.u),
+    pullback.fst A.u B.u,
+    A.pb.lift _ _ eA,
+    pullback.snd p (pullback.fst A.u B.u ≫ A.u),
+    IsPullback.of_right (by rw [A.pb.lift_fst]; exact hP) (A.pb.lift_snd _ _ _) A.pb
+  ⟩
+  let C' : Sq B.r := ⟨
+    pullback A.u B.u,
+    pullback p (pullback.fst A.u B.u ≫ A.u),
+    pullback.snd A.u B.u,
+    B.pb.lift _ _ eB,
+    pullback.snd p (pullback.fst A.u B.u ≫ A.u),
+    IsPullback.of_right (by rw [B.pb.lift_fst]; exact hP') (B.pb.lift_snd _ _ _) B.pb
+  ⟩
   haveI : IsOpenImmersion C.u := inferInstanceAs (IsOpenImmersion (pullback.fst A.u B.u))
   haveI : IsOpenImmersion C'.u := inferInstanceAs (IsOpenImmersion (pullback.snd A.u B.u))
   have h1 : IsNwt (pullback.snd p (pullback.fst A.u B.u ≫ A.u)) (w.comap C.v) := hOpen A.r w C hw
-  have h2 : IsNwt (pullback.snd p (pullback.fst A.u B.u ≫ A.u)) (w'.comap C'.v) := hOpen B.r w' C' hw'
+  have h2 : IsNwt (pullback.snd p (pullback.fst A.u B.u ≫ A.u)) (w'.comap C'.v) :=
+    hOpen B.r w' C' hw'
   haveI : IsFinite (pullback.snd p (pullback.fst A.u B.u ≫ A.u)) := MorphismProperty.of_isPullback hP ‹_›
   have hE : w.comap C.v = w'.comap C'.v :=
     hUniq _ _ _ h1.1 h2.1 {s | GenPt s} (hGen.1 _) fun Ω _ _ y hy => by

@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Wit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -20,28 +22,34 @@ namespace GlobalTheory.LeviGLRes
 
 variable {D : D7}
 
-theorem covolOne_integral_mul_right {m n : ℕ} {μ : Measure (Mx D m n)} {𝓕 : Set (Mx D m n)}
-    (hμ : IsCovolOne (GlobalTheory.MixModel.ratMx D m n) μ 𝓕) (M M' : Mx D n n) (hM'M : M' * M = 1) (hMM' : M * M' = 1)
-    (hM : M ∈ GlobalTheory.MixModel.ratMx D n n) (hM' : M' ∈ GlobalTheory.MixModel.ratMx D n n) (φ : Mx D m n → ℂ)
-    (hφ : ∀ γ ∈ GlobalTheory.MixModel.ratMx D m n, ∀ a, φ (γ + a) = φ a) :
-    ∫ a in 𝓕, φ (a * M) ∂μ = ∫ a in 𝓕, φ a ∂μ := by
+theorem covolOne_integral_mul_right
+    {m n : ℕ} {μ : Measure (Mx D m n)} {𝓕 : Set (Mx D m n)}
+    (hμ : IsCovolOne (GlobalTheory.MixModel.ratMx D m n) μ 𝓕) (M M' : Mx D n n) (hM'M : M' * M = 1)
+    (hMM' : M * M' = 1) (hM : M ∈ GlobalTheory.MixModel.ratMx D n n)
+    (hM' : M' ∈ GlobalTheory.MixModel.ratMx D n n) (φ : Mx D m n → ℂ)
+    (hφ : ∀ γ ∈ GlobalTheory.MixModel.ratMx D m n, ∀ a, φ (γ + a) = φ a)
+    : ∫ a in 𝓕, φ (a * M) ∂μ = ∫ a in 𝓕, φ a ∂μ := by
   obtain ⟨i1, i2, i3, i4, i5, -⟩ := GlobalTheory.MixModel.lattice_Mx D m n
-  let e : Mx D m n ≃+ Mx D m n :=
-    { toFun := fun a => a * M
-      invFun := fun a => a * M'
-      left_inv := fun a => by simp only [Matrix.mul_assoc, hMM', Matrix.mul_one]
-      right_inv := fun a => by simp only [Matrix.mul_assoc, hM'M, Matrix.mul_one]
-      map_add' := fun a b => Matrix.add_mul _ _ _ }
+  let e : Mx D m n ≃+ Mx D m n := {
+    toFun := fun a => a * M
+    invFun := fun a => a * M'
+    left_inv := fun a => by simp only [Matrix.mul_assoc, hMM', Matrix.mul_one]
+    right_inv := fun a => by simp only [Matrix.mul_assoc, hM'M, Matrix.mul_one]
+    map_add' := fun a b => Matrix.add_mul _ _ _
+  }
   have he : Continuous e := continuous_id.matrix_mul continuous_const
   have he' : Continuous e.symm := continuous_id.matrix_mul continuous_const
-  have hr : ∀ x, e x ∈ GlobalTheory.MixModel.ratMx D m n ↔ x ∈ GlobalTheory.MixModel.ratMx D m n := fun x =>
-    ⟨fun h => by
-      have h2 := GlobalTheory.MixModel.ratMx_mul h hM'
-      have h3 : e x * M' = x := e.symm_apply_apply x
-      rwa [h3] at h2,
-     fun h => GlobalTheory.MixModel.ratMx_mul h hM⟩
+  have hr : ∀ x, e x ∈ GlobalTheory.MixModel.ratMx D m n ↔ x ∈ GlobalTheory.MixModel.ratMx D m n :=
+    fun x => ⟨
+      fun h => by
+        have h2 := GlobalTheory.MixModel.ratMx_mul h hM'
+        have h3 : e x * M' = x := e.symm_apply_apply x
+        rwa [h3] at h2,
+      fun h => GlobalTheory.MixModel.ratMx_mul h hM
+    ⟩
   obtain ⟨h1, hemb⟩ := GlobalTheory.Unf.ParCont.isCovolOne_map hμ e he he' hr
-  rw [← GlobalTheory.MixModel.covolOne_integral_eq hμ h1 φ hφ, hemb.setIntegral_map, Set.preimage_image_eq _ e.injective]
+  rw [← GlobalTheory.MixModel.covolOne_integral_eq hμ h1 φ hφ, hemb.setIntegral_map,
+    Set.preimage_image_eq _ e.injective]
   rfl
 
 end GlobalTheory.LeviGLRes

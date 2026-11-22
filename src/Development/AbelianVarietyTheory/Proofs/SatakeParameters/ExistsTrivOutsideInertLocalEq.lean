@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Finit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open Formalism.UG
 
@@ -23,9 +26,10 @@ namespace GlobalTheory.InertLocSurj
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-theorem compAt_conjAL (u : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (z : AL L) :
-    compAt L u (conjAL L z) = Formalism.UG.sigR (IsCMField.complexConj L).toAlgHom
-      (u.adicCompletion (maximalRealSubfield L)) (compAt L u z) := by
+theorem compAt_conjAL (u : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (z : AL L)
+    : compAt L u (conjAL L z)
+      = Formalism.UG.sigR (IsCMField.complexConj L).toAlgHom
+        (u.adicCompletion (maximalRealSubfield L)) (compAt L u z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul a b =>
@@ -33,60 +37,78 @@ theorem compAt_conjAL (u : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (z 
       GlobalTheory.InertUmax.compAt_tmul, Formalism.UG.sigR, AlgHom.coe_id, id_eq]
   | add a b ha hb => simp only [map_add (f := _)]; rw [ha, hb]
 
-theorem exists_supported (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
-    (t : L ⊗[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L)) :
-    ∃ T : AL L, compAt L v T = t ∧ ∀ u, u ≠ v → compAt L u T = 0 := by
-  let b : Module.Basis (Fin 2) (maximalRealSubfield L) L := Module.finBasisOfFinrankEq _ _
-    (Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield L) L)
+theorem exists_supported
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
+    (t : L ⊗[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L))
+    : ∃ T : AL L, compAt L v T = t ∧ ∀ u, u ≠ v → compAt L u T = 0 := by
+  let b : Module.Basis (Fin 2) (maximalRealSubfield L) L :=
+    Module.finBasisOfFinrankEq _ _
+      (Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield L) L)
   obtain ⟨a, c, rfl⟩ := GlobalTheory.InertUmax.tensor_decomp b t
   refine ⟨b 0 ⊗ₜ GlobalTheory.InertUmax.sgl L v a + b 1 ⊗ₜ GlobalTheory.InertUmax.sgl L v c, ?_, ?_⟩
-  · rw [map_add (f := _), GlobalTheory.InertUmax.compAt_tmul, GlobalTheory.InertUmax.compAt_tmul, GlobalTheory.InertUmax.sgl_same,
-      GlobalTheory.InertUmax.sgl_same]
+  · rw [map_add (f := _), GlobalTheory.InertUmax.compAt_tmul, GlobalTheory.InertUmax.compAt_tmul,
+      GlobalTheory.InertUmax.sgl_same, GlobalTheory.InertUmax.sgl_same]
   · intro u hu
-    rw [map_add (f := _), GlobalTheory.InertUmax.compAt_tmul, GlobalTheory.InertUmax.compAt_tmul, GlobalTheory.InertUmax.sgl_ne L v a hu,
-      GlobalTheory.InertUmax.sgl_ne L v c hu, tmul_zero, tmul_zero, add_zero]
+    rw [map_add (f := _), GlobalTheory.InertUmax.compAt_tmul, GlobalTheory.InertUmax.compAt_tmul,
+      GlobalTheory.InertUmax.sgl_ne L v a hu, GlobalTheory.InertUmax.sgl_ne L v c hu, tmul_zero,
+      tmul_zero, add_zero]
 
-theorem exists_trivOutside_loc_eq : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
-    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L))
-    (Dv : InertDatum L n v w), ∀ y : GL (Fin n) (w.adicCompletion L), y ∈ GU Dv.σw n →
-    ∃ x : GAf L n, TrivOutside {v} x ∧ Dv.loc x = y := by
+theorem exists_trivOutside_loc_eq
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
+        (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L))
+        (Dv : InertDatum L n v w),
+      ∀ y : GL (Fin n) (w.adicCompletion L),
+        y ∈ GU Dv.σw n → ∃ x : GAf L n, TrivOutside {v} x ∧ Dv.loc x = y := by
   intro L _ _ _ n v w Dv y hy
   classical
-  have hy' : Formalism.UG.cT Dv.σw (y : Matrix (Fin n) (Fin n) (w.adicCompletion L)) *
-      Formalism.UG.antiJ (w.adicCompletion L) n * (y : Matrix (Fin n) (Fin n) (w.adicCompletion L)) =
-      Formalism.UG.antiJ (w.adicCompletion L) n := hy
+  have hy'
+      : Formalism.UG.cT Dv.σw (y : Matrix (Fin n) (Fin n) (w.adicCompletion L))
+          * Formalism.UG.antiJ (w.adicCompletion L) n
+          * (y : Matrix (Fin n) (Fin n) (w.adicCompletion L))
+        = Formalism.UG.antiJ (w.adicCompletion L) n :=
+    hy
   let Z : Matrix (Fin n) (Fin n) (w.adicCompletion L) :=
     ((Dv.P * y * Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)
-  have hPP : (Dv.P : Matrix (Fin n) (Fin n) (w.adicCompletion L)) *
-      ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) = 1 := by
+  have hPP
+      : (Dv.P : Matrix (Fin n) (Fin n) (w.adicCompletion L))
+          * ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)
+        = 1 := by
     rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
   have hZ : Formalism.UG.cT Dv.σw Z * Z = 1 := by
     simp only [Z, Units.val_mul, Formalism.UG.cT_mul]
     have h1 := Dv.Panti
-    calc Formalism.UG.cT Dv.σw ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) *
-          (Formalism.UG.cT Dv.σw (y : Matrix (Fin n) (Fin n) _) * Formalism.UG.cT Dv.σw (Dv.P : Matrix (Fin n) (Fin n) _)) *
-          ((Dv.P : Matrix (Fin n) (Fin n) _) * (y : Matrix (Fin n) (Fin n) _) *
-            ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _))
-        = Formalism.UG.cT Dv.σw ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) *
-          (Formalism.UG.cT Dv.σw (y : Matrix (Fin n) (Fin n) _) *
-            (Formalism.UG.cT Dv.σw (Dv.P : Matrix (Fin n) (Fin n) _) * (Dv.P : Matrix (Fin n) (Fin n) _)) *
-            (y : Matrix (Fin n) (Fin n) _)) *
-          ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) := by
-          simp only [Matrix.mul_assoc]
-      _ = Formalism.UG.cT Dv.σw ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) *
-          (Formalism.UG.cT Dv.σw (Dv.P : Matrix (Fin n) (Fin n) _) * (Dv.P : Matrix (Fin n) (Fin n) _)) *
-          ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) := by
-          rw [h1, hy']
-      _ = Formalism.UG.cT Dv.σw ((Dv.P : Matrix (Fin n) (Fin n) (w.adicCompletion L)) *
-            ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)) *
-          ((Dv.P : Matrix (Fin n) (Fin n) _) *
-            ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)) := by
-          rw [Formalism.UG.cT_mul]; simp only [Matrix.mul_assoc]
+    calc
+      Formalism.UG.cT Dv.σw ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)
+            * (Formalism.UG.cT Dv.σw (y : Matrix (Fin n) (Fin n) _)
+              * Formalism.UG.cT Dv.σw (Dv.P : Matrix (Fin n) (Fin n) _))
+            * ((Dv.P : Matrix (Fin n) (Fin n) _) * (y : Matrix (Fin n) (Fin n) _)
+              * ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _))
+          = Formalism.UG.cT Dv.σw
+              ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)
+            * (Formalism.UG.cT Dv.σw (y : Matrix (Fin n) (Fin n) _)
+              * (Formalism.UG.cT Dv.σw (Dv.P : Matrix (Fin n) (Fin n) _)
+                * (Dv.P : Matrix (Fin n) (Fin n) _))
+              * (y : Matrix (Fin n) (Fin n) _))
+            * ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) := by
+        simp only [Matrix.mul_assoc]
+      _ = Formalism.UG.cT Dv.σw
+            ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)
+          * (Formalism.UG.cT Dv.σw (Dv.P : Matrix (Fin n) (Fin n) _)
+            * (Dv.P : Matrix (Fin n) (Fin n) _))
+          * ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _) := by
+        rw [h1, hy']
+      _ = Formalism.UG.cT Dv.σw
+            ((Dv.P : Matrix (Fin n) (Fin n) (w.adicCompletion L))
+              * ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _))
+          * ((Dv.P : Matrix (Fin n) (Fin n) _)
+            * ((Dv.P⁻¹ : GL (Fin n) (w.adicCompletion L)) : Matrix (Fin n) (Fin n) _)) := by
+        rw [Formalism.UG.cT_mul]; simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hPP, Formalism.UG.cT_one, Matrix.one_mul]
   have hZ' : Z * Formalism.UG.cT Dv.σw Z = 1 := mul_eq_one_comm.mp hZ
   set sg := Formalism.UG.sigR (IsCMField.complexConj L).toAlgHom
       (v.adicCompletion (maximalRealSubfield L)) with hsg
-  let Xv : Matrix (Fin n) (Fin n) (L ⊗[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L)) :=
+  let Xv : Matrix (Fin n) (Fin n)
+      (L ⊗[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L)) :=
     Z.map Dv.e.symm
   have hXZ : Xv.map Dv.e = Z := by ext i j; simp [Xv]
   have hX : Xv * conjT sg Xv = 1 := by
@@ -115,11 +137,16 @@ theorem exists_trivOutside_loc_eq : ∀ (L : Type) [Field L] [NumberField L] [Is
     show compAt L u (T (Xv i j) + if i = j then 1 - E else 0) = (1 : Matrix (Fin n) (Fin n) _) i j
     rw [Matrix.one_apply]
     by_cases h : i = j
-    · rw [if_pos h, if_pos h, map_add (f := _), hTu _ u hu, map_sub, map_one, hEu u hu, zero_add, sub_zero]
+    · rw [if_pos h, if_pos h, map_add (f := _), hTu _ u hu, map_sub, map_one, hEu u hu, zero_add,
+        sub_zero]
     · rw [if_neg h, if_neg h, map_add (f := _), hTu _ u hu, map_zero, add_zero]
-  have hmap : ∀ u, (A * conjT (conjAL L) A).map (compAt L u) =
-      A.map (compAt L u) * conjT (Formalism.UG.sigR (IsCMField.complexConj L).toAlgHom
-        (u.adicCompletion (maximalRealSubfield L))) (A.map (compAt L u)) := by
+  have hmap
+      : ∀ u,
+        (A * conjT (conjAL L) A).map (compAt L u)
+          = A.map (compAt L u) * conjT
+            (Formalism.UG.sigR (IsCMField.complexConj L).toAlgHom
+              (u.adicCompletion (maximalRealSubfield L)))
+            (A.map (compAt L u)) := by
     intro u
     rw [Matrix.map_mul]
     congr 1
@@ -130,7 +157,9 @@ theorem exists_trivOutside_loc_eq : ∀ (L : Type) [Field L] [NumberField L] [Is
     rw [← sub_eq_zero]
     apply GlobalTheory.InertUmax.eq_zero_of_compAt
     intro u
-    have h3 : (A * conjT (conjAL L) A).map (compAt L u) = (1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L u) := by
+    have h3
+        : (A * conjT (conjAL L) A).map (compAt L u)
+          = (1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L u) := by
       rw [hmap, Matrix.map_one _ (map_zero _) (map_one _)]
       rcases eq_or_ne u v with rfl | hu
       · rw [hAv]; exact hX
@@ -143,9 +172,13 @@ theorem exists_trivOutside_loc_eq : ∀ (L : Type) [Field L] [NumberField L] [Is
   refine ⟨⟨g, hg⟩, ?_, ?_⟩
   · intro u hu
     exact hAu u (by simpa using hu)
-  · have hbc : Formalism.UG.bc (n := Fin n)
-        (Dv.e : L ⊗[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L) →+* w.adicCompletion L)
-        (Matrix.GeneralLinearGroup.map (compAt L v) g) = Dv.P * y * Dv.P⁻¹ := by
+  · have hbc
+        : Formalism.UG.bc (n := Fin n)
+            (Dv.e
+              : L ⊗[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L)
+                →+* w.adicCompletion L)
+            (Matrix.GeneralLinearGroup.map (compAt L v) g)
+          = Dv.P * y * Dv.P⁻¹ := by
       apply Units.ext
       show (A.map (compAt L v)).map Dv.e = Z
       rw [hAv, hXZ]

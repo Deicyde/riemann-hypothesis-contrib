@@ -16,9 +16,11 @@ def PosOn {n : ℕ} (ε : ℝ) (Z : Matrix (Fin n) (Fin n) ℂ) (S : Submodule �
 def NonnegOn {n : ℕ} (ε : ℝ) (Z : Matrix (Fin n) (Fin n) ℂ) (S : Submodule ℂ (Fin n → ℂ)) : Prop :=
   ∀ w ∈ S, 0 ≤ ε * (star w ⬝ᵥ Z.mulVec w).re
 
-theorem integrable_of_mul_unimodular {α : Type} [MeasurableSpace α] (μ : Measure α) (a b : α → ℂ)
-    (hi : Integrable (fun x => a x * b x) μ) (hb : AEStronglyMeasurable b μ) (hb1 : ∀ x, ‖b x‖ = 1) :
-    Integrable a μ := by
+theorem integrable_of_mul_unimodular
+    {α : Type} [MeasurableSpace α]
+    (μ : Measure α) (a b : α → ℂ)
+    (hi : Integrable (fun x => a x * b x) μ) (hb : AEStronglyMeasurable b μ) (hb1 : ∀ x, ‖b x‖ = 1)
+    : Integrable a μ := by
   have hfun : a = fun x => (a x * b x) * star (b x) := by
     funext x
     rw [mul_assoc, Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq, hb1]
@@ -29,26 +31,37 @@ theorem integrable_of_mul_unimodular {α : Type} [MeasurableSpace α] (μ : Meas
   refine hi.mono hmeas (Filter.Eventually.of_forall fun x => ?_)
   rw [norm_mul, hb1, mul_one]
 
-theorem vanish_abs {X : Type} [TopologicalSpace X] [FirstCountableTopology X] [MeasurableSpace X]
-    [OpensMeasurableSpace X] (μ : Measure X) [μ.IsOpenPosMeasure] (e : X → X → ℂ)
-    (he : ∀ z, Continuous fun v => e v z) (he' : ∀ v, Continuous fun z => e v z)
-    (hen : ∀ a b, ‖e a b‖ = 1) (J : X → ℂ) (hJ : Integrable J μ) (N : Set X) (hN : IsOpen N)
-    (hb : ∀ N' : Set X, IsOpen N' → N' ⊆ N → ∀ z₁ ∈ N', ∃ Φ : X → ℂ, Continuous Φ ∧ Integrable Φ μ ∧
-      (∀ z, 0 ≤ (Φ z).re ∧ (Φ z).im = 0) ∧ (∀ z, z ∉ N' → Φ z = 0) ∧ 0 < (Φ z₁).re ∧
-      ∫ z, (∫ v, J v * e v z ∂μ) * Φ z ∂μ = 0) (z₀ : X) (hz : z₀ ∈ closure N) :
-    ∫ v, J v * e v z₀ ∂μ = 0 := by
+theorem vanish_abs
+    {X : Type}
+    [TopologicalSpace X] [FirstCountableTopology X] [MeasurableSpace X] [OpensMeasurableSpace X]
+    (μ : Measure X) [μ.IsOpenPosMeasure]
+    (e : X → X → ℂ) (he : ∀ z, Continuous fun v => e v z) (he' : ∀ v, Continuous fun z => e v z)
+    (hen : ∀ a b, ‖e a b‖ = 1)
+    (J : X → ℂ) (hJ : Integrable J μ)
+    (N : Set X) (hN : IsOpen N)
+    (hb : ∀ N' : Set X,
+      IsOpen N' → N' ⊆ N
+        → ∀ z₁ ∈ N', ∃ Φ : X → ℂ,
+          Continuous Φ ∧ Integrable Φ μ ∧ (∀ z, 0 ≤ (Φ z).re ∧ (Φ z).im = 0)
+            ∧ (∀ z, z ∉ N' → Φ z = 0) ∧ 0 < (Φ z₁).re ∧ ∫ z, (∫ v, J v * e v z ∂μ) * Φ z ∂μ = 0)
+    (z₀ : X) (hz : z₀ ∈ closure N)
+    : ∫ v, J v * e v z₀ ∂μ = 0 := by
   have hbd : ∀ z, ‖∫ v, J v * e v z ∂μ‖ ≤ ∫ v, ‖J v‖ ∂μ := by
     intro z
-    calc ‖∫ v, J v * e v z ∂μ‖ ≤ ∫ v, ‖J v * e v z‖ ∂μ := norm_integral_le_integral_norm _
+    calc
+      ‖∫ v, J v * e v z ∂μ‖
+        ≤ ∫ v, ‖J v * e v z‖ ∂μ := norm_integral_le_integral_norm _
       _ = ∫ v, ‖J v‖ ∂μ := by
         congr 1
         ext v
         rw [norm_mul, hen, mul_one]
   have hFc : Continuous fun z => ∫ v, J v * e v z ∂μ := by
-    refine continuous_of_dominated (F := fun z v => J v * e v z) (bound := fun v => ‖J v‖)
-      (fun z => hJ.1.mul (he z).aestronglyMeasurable) (fun z => Filter.Eventually.of_forall
-        fun v => by rw [norm_mul, hen, mul_one]) hJ.norm
-      (Filter.Eventually.of_forall fun v => continuous_const.mul (he' v))
+    refine continuous_of_dominated
+      (F := fun z v => J v * e v z)
+      (bound := fun v => ‖J v‖)
+      (fun z => hJ.1.mul (he z).aestronglyMeasurable)
+      (fun z => Filter.Eventually.of_forall fun v => by rw [norm_mul, hen, mul_one])
+      hJ.norm (Filter.Eventually.of_forall fun v => continuous_const.mul (he' v))
   set F : X → ℂ := fun z => ∫ v, J v * e v z ∂μ with hFdef
   have hzero : ∀ z₁ ∈ N, F z₁ = 0 := by
     intro z₁ hz₁
@@ -61,8 +74,7 @@ theorem vanish_abs {X : Type} [TopologicalSpace X] [FirstCountableTopology X] [M
       rw [← Complex.normSq_eq_conj_mul_self, Complex.ofReal_re]
       exact Complex.normSq_pos.mpr hc
     have hN'o : IsOpen (N ∩ {z | 0 < G z}) := hN.inter (isOpen_lt continuous_const hGc)
-    obtain ⟨Φ, hΦc, hΦi, hΦpos, hΦsupp, hΦ1, hint⟩ :=
-      hb _ hN'o Set.inter_subset_left z₁ ⟨hz₁, hG1⟩
+    obtain ⟨Φ, hΦc, hΦi, hΦpos, hΦsupp, hΦ1, hint⟩ := hb _ hN'o Set.inter_subset_left z₁ ⟨hz₁, hG1⟩
     have hint' : ∫ z, F z * Φ z ∂μ = 0 := hint
     have hFΦi : Integrable (fun z => F z * Φ z) μ := by
       refine Integrable.mono (hΦi.norm.const_mul (∫ v, ‖J v‖ ∂μ))
@@ -96,6 +108,7 @@ theorem vanish_abs {X : Type} [TopologicalSpace X] [FirstCountableTopology X] [M
       rw [h, integral_const_mul, hint', mul_zero, Complex.zero_re]
     linarith
   exact closure_minimal (s := N) (t := {z | F z = 0})
-    (fun z hz => hzero z hz) (isClosed_eq hFc continuous_const) hz
+    (fun z hz => hzero z hz)
+    (isClosed_eq hFc continuous_const) hz
 
 end GlobalTheory.CompanionTheory.WeilSiegel.NoFrame

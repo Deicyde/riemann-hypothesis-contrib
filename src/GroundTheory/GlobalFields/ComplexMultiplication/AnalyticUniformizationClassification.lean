@@ -15,9 +15,10 @@ noncomputable section
 namespace GroundTheory.Global
 namespace Elliptic
 
-theorem vcPoint_mul_apply (C D : VariableChange ℂ) {W W' W'' : WeierstrassCurve ℂ}
-    (hD : D • W = W') (hC : C • W' = W'') (P : W.toAffine.Point) :
-    vcPoint (C * D) (by rw [mul_smul, hD, hC]) P = vcPoint C hC (vcPoint D hD P) := by
+theorem vcPoint_mul_apply
+    (C D : VariableChange ℂ)
+    {W W' W'' : WeierstrassCurve ℂ} (hD : D • W = W') (hC : C • W' = W'') (P : W.toAffine.Point)
+    : vcPoint (C * D) (by rw [mul_smul, hD, hC]) P = vcPoint C hC (vcPoint D hD P) := by
   rcases P with _ | ⟨x, y, h⟩
   · rfl
   · rw [vcPoint_some, vcPoint_some, vcPoint_some, Affine.Point.some.injEq]
@@ -31,17 +32,19 @@ theorem vcPoint_mul_apply (C D : VariableChange ℂ) {W W' W'' : WeierstrassCurv
     · field_simp
       ring
 
-theorem vcPoint_inv_vcPoint (C : VariableChange ℂ) {W W' : WeierstrassCurve ℂ} (h : C • W = W')
-    (P : W.toAffine.Point) :
-    vcPoint C⁻¹ (by rw [← h, inv_smul_smul]) (vcPoint C h P) = P := by
+theorem vcPoint_inv_vcPoint
+    (C : VariableChange ℂ) {W W' : WeierstrassCurve ℂ} (h : C • W = W') (P : W.toAffine.Point)
+    : vcPoint C⁻¹ (by rw [← h, inv_smul_smul]) (vcPoint C h P) = P := by
   rw [← vcPoint_mul_apply]
   rcases P with _ | ⟨x, y, h'⟩
   · rfl
   · rw [vcPoint_some, Affine.Point.some.injEq]
     simp [vcX, vcY, VariableChange.one_def]
 
-theorem vcPoint_congr {C C' : VariableChange ℂ} (e : C = C') {W W' : WeierstrassCurve ℂ}
-    (h : C • W = W') (h' : C' • W = W') (P : W.toAffine.Point) : vcPoint C h P = vcPoint C' h' P := by
+theorem vcPoint_congr
+    {C C' : VariableChange ℂ} (e : C = C')
+    {W W' : WeierstrassCurve ℂ} (h : C • W = W') (h' : C' • W = W') (P : W.toAffine.Point)
+    : vcPoint C h P = vcPoint C' h' P := by
   subst e
   rfl
 
@@ -57,8 +60,8 @@ def ptY : W.toAffine.Point → ℂ
   | .zero => 0
   | .some _ y _ => y
 
-theorem exists_eq_some_ptX_ptY {P : W.toAffine.Point} (hP : P ≠ 0) :
-    ∃ h : W.toAffine.Nonsingular (ptX P) (ptY P), P = .some (ptX P) (ptY P) h := by
+theorem exists_eq_some_ptX_ptY {P : W.toAffine.Point} (hP : P ≠ 0)
+    : ∃ h : W.toAffine.Nonsingular (ptX P) (ptY P), P = .some (ptX P) (ptY P) h := by
   rcases P with _ | ⟨x, y, h⟩
   · exact absurd rfl hP
   · exact ⟨h, rfl⟩
@@ -69,16 +72,17 @@ section Core
 
 variable {L L' : PeriodPair} {g : ℂ →+ (weierstrassCurve L').toAffine.Point}
 
-theorem IsAnalyticUniformization.analyticAt_ptX_ptY (hg : IsAnalyticUniformization L.lattice g)
-    {z : ℂ} (hz : z ∉ L.lattice) :
-    AnalyticAt ℂ (fun w ↦ ptX (g w)) z ∧ AnalyticAt ℂ (fun w ↦ ptY (g w)) z := by
+theorem IsAnalyticUniformization.analyticAt_ptX_ptY
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∉ L.lattice)
+    : AnalyticAt ℂ (fun w ↦ ptX (g w)) z ∧ AnalyticAt ℂ (fun w ↦ ptY (g w)) z := by
   obtain ⟨X, Y, hX, hY, hev⟩ := hg.analyticAt_affine z (fun h ↦ hz ((hg.map_eq_zero_iff z).1 h))
   refine ⟨hX.congr ?_, hY.congr ?_⟩ <;> filter_upwards [hev] with w ⟨h, e⟩ <;> rw [e] <;> rfl
 
-theorem IsAnalyticUniformization.exists_chart (hg : IsAnalyticUniformization L.lattice g)
-    {z : ℂ} (hz : z ∈ L.lattice) :
-    ∃ U V : ℂ → ℂ, AnalyticAt ℂ U z ∧ AnalyticAt ℂ V z ∧ U z = 0 ∧ V z = 0 ∧
-      ∀ᶠ w in 𝓝[≠] z, V w ≠ 0 ∧ ptX (g w) = U w / V w ∧ ptY (g w) = 1 / V w := by
+theorem IsAnalyticUniformization.exists_chart
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∈ L.lattice)
+    : ∃ U V : ℂ → ℂ,
+      AnalyticAt ℂ U z ∧ AnalyticAt ℂ V z ∧ U z = 0 ∧ V z = 0
+        ∧ ∀ᶠ w in 𝓝[≠] z, V w ≠ 0 ∧ ptX (g w) = U w / V w ∧ ptY (g w) = 1 / V w := by
   obtain ⟨U, V, hU, hV, hev⟩ := hg.analyticAt_infinity z ((hg.map_eq_zero_iff z).2 hz)
   have h0 : U z = 0 ∧ V z = 0 := by
     rcases hev.self_of_nhds with ⟨_, hU0, hV0⟩ | ⟨_, _, e⟩
@@ -95,8 +99,8 @@ theorem IsAnalyticUniformization.exists_chart (hg : IsAnalyticUniformization L.l
   · rw [e]
     exact ⟨hV0, rfl, rfl⟩
 
-theorem IsAnalyticUniformization.meromorphic_ptX (hg : IsAnalyticUniformization L.lattice g) :
-    Meromorphic fun w ↦ ptX (g w) := fun z ↦ by
+theorem IsAnalyticUniformization.meromorphic_ptX (hg : IsAnalyticUniformization L.lattice g)
+    : Meromorphic fun w ↦ ptX (g w) := fun z ↦ by
   by_cases hz : z ∈ L.lattice
   · obtain ⟨U, V, hU, hV, -, -, hev⟩ := hg.exists_chart hz
     exact (hU.meromorphicAt.div hV.meromorphicAt).congr (by
@@ -104,8 +108,8 @@ theorem IsAnalyticUniformization.meromorphic_ptX (hg : IsAnalyticUniformization 
       exact hw.2.1.symm)
   · exact (hg.analyticAt_ptX_ptY hz).1.meromorphicAt
 
-theorem IsAnalyticUniformization.meromorphic_ptY (hg : IsAnalyticUniformization L.lattice g) :
-    Meromorphic fun w ↦ ptY (g w) := fun z ↦ by
+theorem IsAnalyticUniformization.meromorphic_ptY (hg : IsAnalyticUniformization L.lattice g)
+    : Meromorphic fun w ↦ ptY (g w) := fun z ↦ by
   by_cases hz : z ∈ L.lattice
   · obtain ⟨U, V, hU, hV, -, -, hev⟩ := hg.exists_chart hz
     exact (analyticAt_const.meromorphicAt.div hV.meromorphicAt).congr (by
@@ -113,13 +117,15 @@ theorem IsAnalyticUniformization.meromorphic_ptY (hg : IsAnalyticUniformization 
       exact hw.2.2.symm)
   · exact (hg.analyticAt_ptX_ptY hz).2.meromorphicAt
 
-theorem IsAnalyticUniformization.map_add_mem (hg : IsAnalyticUniformization L.lattice g) (z : ℂ)
-    {l : ℂ} (hl : l ∈ L.lattice) : g (z + l) = g z := by
+theorem IsAnalyticUniformization.map_add_mem
+    (hg : IsAnalyticUniformization L.lattice g) (z : ℂ) {l : ℂ} (hl : l ∈ L.lattice)
+    : g (z + l) = g z := by
   rw [map_add (f := _), (hg.map_eq_zero_iff l).2 hl, add_zero]
 
-theorem IsAnalyticUniformization.equation_ptX_ptY (hg : IsAnalyticUniformization L.lattice g)
-    {z : ℂ} (hz : z ∉ L.lattice) :
-    ptY (g z) ^ 2 = ptX (g z) ^ 3 + (weierstrassCurve L').a₄ * ptX (g z) + (weierstrassCurve L').a₆ := by
+theorem IsAnalyticUniformization.equation_ptX_ptY
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∉ L.lattice)
+    : ptY (g z) ^ 2
+      = ptX (g z) ^ 3 + (weierstrassCurve L').a₄ * ptX (g z) + (weierstrassCurve L').a₆ := by
   obtain ⟨h, -⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
   have e := (Affine.equation_iff _ _).1 h.1
   simp only [weierstrassCurve_a₁, weierstrassCurve_a₂, weierstrassCurve_a₃, zero_mul, add_zero] at e
@@ -134,36 +140,40 @@ variable {L L' : PeriodPair} {g : ℂ →+ (weierstrassCurve L').toAffine.Point}
 def omegaFun (g : ℂ →+ (weierstrassCurve L').toAffine.Point) (z : ℂ) : ℂ :=
   deriv (fun w ↦ ptX (g w)) z / (2 * ptY (g z))
 
-theorem IsAnalyticUniformization.deriv_relation (hg : IsAnalyticUniformization L.lattice g) {z : ℂ}
-    (hz : z ∉ L.lattice) : ∀ᶠ w in 𝓝 z, 2 * ptY (g w) * deriv (fun v ↦ ptY (g v)) w =
+theorem IsAnalyticUniformization.deriv_relation
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∉ L.lattice)
+    : ∀ᶠ w in 𝓝 z, 2 * ptY (g w) * deriv (fun v ↦ ptY (g v)) w =
       (3 * ptX (g w) ^ 2 + (weierstrassCurve L').a₄) * deriv (fun v ↦ ptX (g v)) w := by
   have hO := L.isClosed_lattice.isOpen_compl
   filter_upwards [hO.mem_nhds hz] with w (hw : w ∉ L.lattice)
   obtain ⟨hX, hY⟩ := hg.analyticAt_ptX_ptY hw
-  have e : (fun v ↦ ptX (g v) * ptX (g v) * ptX (g v) + (weierstrassCurve L').a₄ * ptX (g v) +
-      (weierstrassCurve L').a₆) =ᶠ[𝓝 w] fun v ↦ ptY (g v) * ptY (g v) := by
+  have e
+      : (fun v ↦ ptX (g v) * ptX (g v) * ptX (g v) + (weierstrassCurve L').a₄ * ptX (g v) +
+        (weierstrassCurve L').a₆) =ᶠ[𝓝 w] fun v ↦ ptY (g v) * ptY (g v) := by
     filter_upwards [hO.mem_nhds hw] with v (hv : v ∉ L.lattice)
     have := hg.equation_ptX_ptY hv
     linear_combination -this
   have hX' := hX.differentiableAt.hasDerivAt
   have hY' := hY.differentiableAt.hasDerivAt
   have h1 := hY'.mul hY'
-  have h2 := (((hX'.mul hX').mul hX').add (hX'.const_mul (weierstrassCurve L').a₄)).add_const
-    (weierstrassCurve L').a₆
+  have h2 :=
+    (((hX'.mul hX').mul hX').add (hX'.const_mul (weierstrassCurve L').a₄)).add_const
+      (weierstrassCurve L').a₆
   have := h1.unique (h2.congr_of_eventuallyEq e.symm)
   simp only [Pi.mul_apply] at this
   linear_combination this
 
 theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_notMem
-    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∉ L.lattice) :
-    0 ≤ meromorphicOrderAt (omegaFun g) z := by
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∉ L.lattice)
+    : 0 ≤ meromorphicOrderAt (omegaFun g) z := by
   obtain ⟨hX, hY⟩ := hg.analyticAt_ptX_ptY hz
   by_cases hY0 : ptY (g z) = 0
   · obtain ⟨h, -⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
     have hD : 3 * ptX (g z) ^ 2 + (weierstrassCurve L').a₄ ≠ 0 := by
       have h' := ((Affine.nonsingular_iff' _ _).1 h).2
       simp only [weierstrassCurve_a₁, weierstrassCurve_a₂, weierstrassCurve_a₃, hY0, zero_mul,
-        mul_zero, add_zero, zero_sub, ne_eq, neg_eq_zero, not_true_eq_false, or_false] at h'
+          mul_zero, add_zero, zero_sub, ne_eq, neg_eq_zero, not_true_eq_false, or_false]
+        at h'
       exact h'
     set T : ℂ → ℂ := fun w ↦ deriv (fun v ↦ ptY (g v)) w /
       (3 * ptX (g w) ^ 2 + (weierstrassCurve L').a₄)
@@ -186,7 +196,8 @@ theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_notMem
         linear_combination -hrel
     rw [meromorphicOrderAt_congr key]
     exact hT.meromorphicOrderAt_nonneg
-  · exact (hX.deriv.div (analyticAt_const.mul hY) (mul_ne_zero two_ne_zero hY0)).meromorphicOrderAt_nonneg
+  · exact (hX.deriv.div (analyticAt_const.mul hY)
+      (mul_ne_zero two_ne_zero hY0)).meromorphicOrderAt_nonneg
 
 end Omega
 
@@ -195,8 +206,8 @@ section OmegaLattice
 variable {L L' : PeriodPair} {g : ℂ →+ (weierstrassCurve L').toAffine.Point}
 
 theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_mem
-    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∈ L.lattice) :
-    0 ≤ meromorphicOrderAt (omegaFun g) z := by
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∈ L.lattice)
+    : 0 ≤ meromorphicOrderAt (omegaFun g) z := by
   obtain ⟨U, V, hU, hV, hU0, hV0, hev⟩ := hg.exists_chart hz
   set X : ℂ → ℂ := fun w ↦ ptX (g w) with hXdef
   set Y : ℂ → ℂ := fun w ↦ ptY (g w) with hYdef
@@ -251,7 +262,8 @@ theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_mem
       rw [h1, h2]
     have h2 : 0 ≤ meromorphicOrderAt (fun w ↦ Y w ^ 2) z := by
       rw [meromorphicOrderAt_congr e2]
-      exact (by fun_prop : AnalyticAt ℂ (fun w ↦ G w ^ 3 + a₄ * G w + a₆) z).meromorphicOrderAt_nonneg
+      exact (by fun_prop
+        : AnalyticAt ℂ (fun w ↦ G w ^ 3 + a₄ * G w + a₆) z).meromorphicOrderAt_nonneg
     rw [oY2] at h2
     have : (0 : ℤ) ≤ -(2 * k) := by exact_mod_cast h2
     omega
@@ -264,7 +276,9 @@ theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_mem
     show (m : WithTop ℤ) ≤ meromorphicOrderAt ((fun _ ↦ a₄) * X) z
     rw [meromorphicOrderAt_mul (MeromorphicAt.const a₄ z) hXm, ← hm]
     have := (analyticAt_const (v := a₄) (x := z)).meromorphicOrderAt_nonneg
-    calc (m : WithTop ℤ) = 0 + m := (zero_add _).symm
+    calc
+      (m : WithTop ℤ)
+        = 0 + m := (zero_add _).symm
       _ ≤ _ := add_le_add this le_rfl
   have h2 : (m : WithTop ℤ) ≤ meromorphicOrderAt (fun _ ↦ a₆) z :=
     le_trans (by exact_mod_cast mneg.le) analyticAt_const.meromorphicOrderAt_nonneg
@@ -276,10 +290,13 @@ theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_mem
     show meromorphicOrderAt (X ^ 3) z = _
     rw [meromorphicOrderAt_pow hXm, ← hm]
     norm_cast
-  have oRHS : meromorphicOrderAt (fun w ↦ X w ^ 3 + a₄ * X w + a₆) z = ((3 * m : ℤ) : WithTop ℤ) := by
+  have oRHS
+      : meromorphicOrderAt (fun w ↦ X w ^ 3 + a₄ * X w + a₆) z = ((3 * m : ℤ) : WithTop ℤ) := by
     have e : (fun w ↦ X w ^ 3 + a₄ * X w + a₆) = (fun w ↦ X w ^ 3) + fun w ↦ a₄ * X w + a₆ := by
       funext w; simp only [Pi.add_apply]; ring
-    have hlt : meromorphicOrderAt (fun w ↦ X w ^ 3) z < meromorphicOrderAt (fun w ↦ a₄ * X w + a₆) z := by
+    have hlt
+        : meromorphicOrderAt (fun w ↦ X w ^ 3) z
+          < meromorphicOrderAt (fun w ↦ a₄ * X w + a₆) z := by
       rw [oX3]
       exact lt_of_lt_of_le (by exact_mod_cast (by omega : 3 * m < m)) h3
     rw [e, meromorphicOrderAt_add_eq_left_of_lt hH hlt, oX3]
@@ -300,7 +317,8 @@ theorem IsAnalyticUniformization.omegaFun_order_nonneg_of_mem
   rw [e, meromorphicOrderAt_mul hXm.deriv (show MeromorphicAt (fun w ↦ 2 * Y w) z by fun_prop).inv,
     meromorphicOrderAt_inv, oX', o2Y]
   have : (0 : ℤ) ≤ m - 1 + k := by omega
-  have e' : (((m - 1 : ℤ) : WithTop ℤ) + -((-k : ℤ) : WithTop ℤ)) = ((m - 1 + k : ℤ) : WithTop ℤ) := by
+  have e'
+      : (((m - 1 : ℤ) : WithTop ℤ) + -((-k : ℤ) : WithTop ℤ)) = ((m - 1 + k : ℤ) : WithTop ℤ) := by
     norm_cast
     ring
   rw [e']
@@ -312,8 +330,10 @@ section Lift
 
 variable {L L' : PeriodPair} {g : ℂ →+ (weierstrassCurve L').toAffine.Point}
 
-theorem eq_of_eventuallyEq_codiscrete {f₁ f₂ : ℂ → ℂ} {z : ℂ} (h : f₁ =ᶠ[codiscrete ℂ] f₂)
-    (h₁ : ContinuousAt f₁ z) (h₂ : ContinuousAt f₂ z) : f₁ z = f₂ z := by
+theorem eq_of_eventuallyEq_codiscrete
+    {f₁ f₂ : ℂ → ℂ} {z : ℂ}
+    (h : f₁ =ᶠ[codiscrete ℂ] f₂) (h₁ : ContinuousAt f₁ z) (h₂ : ContinuousAt f₂ z)
+    : f₁ z = f₂ z := by
   have h' : ∀ᶠ w in 𝓝[≠] z, f₁ w = f₂ w := by
     have := (mem_codiscreteWithin_iff_forall_mem_nhdsNE.1 h) z (mem_univ z)
     rw [compl_univ, union_empty] at this
@@ -321,67 +341,74 @@ theorem eq_of_eventuallyEq_codiscrete {f₁ f₂ : ℂ → ℂ} {z : ℂ} (h : f
   exact tendsto_nhds_unique ((h₁.tendsto.mono_left nhdsWithin_le_nhds).congr' h')
     (h₂.tendsto.mono_left nhdsWithin_le_nhds)
 
-theorem IsAnalyticUniformization.meromorphic_omegaFun (hg : IsAnalyticUniformization L.lattice g) :
-    Meromorphic (omegaFun g) := fun z ↦
+theorem IsAnalyticUniformization.meromorphic_omegaFun (hg : IsAnalyticUniformization L.lattice g)
+    : Meromorphic (omegaFun g) := fun z ↦
   ((hg.meromorphic_ptX z).deriv).div ((MeromorphicAt.const 2 z).mul (hg.meromorphic_ptY z))
 
-theorem IsAnalyticUniformization.isPeriodic_omegaFun (hg : IsAnalyticUniformization L.lattice g) :
-    IsPeriodic L (omegaFun g) := by
+theorem IsAnalyticUniformization.isPeriodic_omegaFun (hg : IsAnalyticUniformization L.lattice g)
+    : IsPeriodic L (omegaFun g) := by
   intro z l hl
-  have hX : (fun w ↦ ptX (g (w + l))) = fun w ↦ ptX (g w) := funext fun w ↦ by rw [hg.map_add_mem w hl]
+  have hX : (fun w ↦ ptX (g (w + l))) = fun w ↦ ptX (g w) :=
+    funext fun w ↦ by rw [hg.map_add_mem w hl]
   simp only [omegaFun, hg.map_add_mem z hl]
   congr 1
   rw [← deriv_comp_add_const, hX]
 
-theorem IsAnalyticUniformization.exists_omegaFun_eq_const (hg : IsAnalyticUniformization L.lattice g) :
-    ∃ α : ℂ, omegaFun g =ᶠ[codiscrete ℂ] fun _ ↦ α :=
-  exists_eventuallyEq_const_of_meromorphicOrderAt_nonneg L hg.meromorphic_omegaFun hg.isPeriodic_omegaFun
+theorem IsAnalyticUniformization.exists_omegaFun_eq_const
+    (hg : IsAnalyticUniformization L.lattice g)
+    : ∃ α : ℂ, omegaFun g =ᶠ[codiscrete ℂ] fun _ ↦ α :=
+  exists_eventuallyEq_const_of_meromorphicOrderAt_nonneg L hg.meromorphic_omegaFun
+    hg.isPeriodic_omegaFun
     fun z ↦ by
       by_cases hz : z ∈ L.lattice
       · exact hg.omegaFun_order_nonneg_of_mem hz
       · exact hg.omegaFun_order_nonneg_of_notMem hz
 
-theorem IsAnalyticUniformization.ptY_eq_zero_of_two_mul_mem (hg : IsAnalyticUniformization L.lattice g)
-    {z : ℂ} (hz : z ∉ L.lattice) (h2 : 2 * z ∈ L.lattice) : ptY (g z) = 0 := by
+theorem IsAnalyticUniformization.ptY_eq_zero_of_two_mul_mem
+    (hg : IsAnalyticUniformization L.lattice g)
+    {z : ℂ} (hz : z ∉ L.lattice) (h2 : 2 * z ∈ L.lattice)
+    : ptY (g z) = 0 := by
   obtain ⟨h, e⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
-  have h0 : g z + g z = 0 := by rw [← map_add (f := _), ← two_mul]; exact (hg.map_eq_zero_iff _).2 h2
-  have hneg : g z = -g z := eq_neg_of_add_eq_zero_left h0
+  have h0 : g z + g z = 0 := by
+    rw [← map_add (f := _), ← two_mul]; exact (hg.map_eq_zero_iff _).2 h2
+  have hneg : g z = - g z := eq_neg_of_add_eq_zero_left h0
   rw [e, Affine.Point.neg_some, Affine.Point.some.injEq] at hneg
   have := hneg.2
   simp only [Affine.negY, weierstrassCurve_a₁, weierstrassCurve_a₃, zero_mul, sub_zero] at this
   linear_combination this / 2
 
-theorem IsAnalyticUniformization.two_mul_mem_of_ptY_eq_zero (hg : IsAnalyticUniformization L.lattice g)
-    {z : ℂ} (hz : z ∉ L.lattice) (hY : ptY (g z) = 0) : 2 * z ∈ L.lattice := by
+theorem IsAnalyticUniformization.two_mul_mem_of_ptY_eq_zero
+    (hg : IsAnalyticUniformization L.lattice g) {z : ℂ} (hz : z ∉ L.lattice) (hY : ptY (g z) = 0)
+    : 2 * z ∈ L.lattice := by
   obtain ⟨h, e⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
-  have hneg : -g z = g z := by
+  have hneg : - g z = g z := by
     rw [e, Affine.Point.neg_some, Affine.Point.some.injEq]
     refine ⟨rfl, ?_⟩
-    simp only [Affine.negY, weierstrassCurve_a₁, weierstrassCurve_a₃, zero_mul, sub_zero, hY, neg_zero]
+    simp only [Affine.negY, weierstrassCurve_a₁, weierstrassCurve_a₃, zero_mul, sub_zero, hY,
+      neg_zero]
   rw [← hg.map_eq_zero_iff, two_mul, map_add (f := _)]
   nth_rewrite 1 [← hneg]
   exact neg_add_cancel _
 
-theorem IsAnalyticUniformization.eventually_ptY_ne_zero (hg : IsAnalyticUniformization L.lattice g) :
-    ∀ᶠ z in codiscrete ℂ, ptY (g z) ≠ 0 := by
+theorem IsAnalyticUniformization.eventually_ptY_ne_zero (hg : IsAnalyticUniformization L.lattice g)
+    : ∀ᶠ z in codiscrete ℂ, ptY (g z) ≠ 0 := by
   filter_upwards [eventually_affine (eventually_notMem_lattice L) two_ne_zero 0] with z hz hY
   rw [add_zero] at hz
   have hz' : z ∉ L.lattice := fun h ↦ hz (by rw [two_mul]; exact add_mem h h)
   exact hz (hg.two_mul_mem_of_ptY_eq_zero hz' hY)
 
-theorem IsAnalyticUniformization.eventually_equation (hg : IsAnalyticUniformization L.lattice g) :
-    ∀ᶠ z in codiscrete ℂ, (weierstrassCurve L').toAffine.Equation (ptX (g z)) (ptY (g z)) := by
+theorem IsAnalyticUniformization.eventually_equation (hg : IsAnalyticUniformization L.lattice g)
+    : ∀ᶠ z in codiscrete ℂ, (weierstrassCurve L').toAffine.Equation (ptX (g z)) (ptY (g z)) := by
   filter_upwards [eventually_notMem_lattice L] with z hz
   obtain ⟨h, -⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
   exact h.1
 
 theorem IsAnalyticUniformization.not_eventually_ptX_eq_const
-    (hg : IsAnalyticUniformization L.lattice g) (c : ℂ) :
-    ¬ (fun z ↦ ptX (g z)) =ᶠ[codiscrete ℂ] fun _ ↦ c := by
+    (hg : IsAnalyticUniformization L.lattice g) (c : ℂ)
+    : ¬ (fun z ↦ ptX (g z)) =ᶠ[codiscrete ℂ] fun _ ↦ c := by
   intro h
   have half : ∀ z, z ∉ L.lattice → 2 * z ∈ L.lattice → g z = g (L.ω₁ / 2) := by
-    have key : ∀ z, z ∉ L.lattice → 2 * z ∈ L.lattice →
-        ∃ hn, g z = .some c 0 hn := by
+    have key : ∀ z, z ∉ L.lattice → 2 * z ∈ L.lattice → ∃ hn, g z = .some c 0 hn := by
       intro z hz h2
       obtain ⟨hn, e⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
       have hx : ptX (g z) = c :=
@@ -391,23 +418,25 @@ theorem IsAnalyticUniformization.not_eventually_ptX_eq_const
       exact exists_point_some_eq hn hx.symm hy.symm |>.imp fun _ h ↦ h
     intro z hz h2
     obtain ⟨h₁, e₁⟩ := key z hz h2
-    obtain ⟨h₂, e₂⟩ := key (L.ω₁ / 2) L.ω₁_div_two_notMem_lattice (by
-      rw [mul_div_cancel₀ _ two_ne_zero]; exact L.ω₁_mem_lattice)
+    obtain ⟨h₂, e₂⟩ :=
+      key (L.ω₁ / 2) L.ω₁_div_two_notMem_lattice
+        (by rw [mul_div_cancel₀ _ two_ne_zero]; exact L.ω₁_mem_lattice)
     rw [e₁, e₂]
-  have e := half (L.ω₂ / 2) L.ω₂_div_two_notMem_lattice (by
-    rw [mul_div_cancel₀ _ two_ne_zero]; exact L.ω₂_mem_lattice)
-  have hmem : L.ω₂ / 2 - L.ω₁ / 2 ∈ L.lattice := by
-    rw [← hg.map_eq_zero_iff, map_sub, e, sub_self]
-  have := (PeriodPair.mul_ω₁_add_mul_ω₂_mem_lattice (L := L) (α := -1 / 2) (β := 1 / 2)).1 (by
-    convert hmem using 1
-    push_cast
-    ring)
+  have e :=
+    half (L.ω₂ / 2) L.ω₂_div_two_notMem_lattice
+      (by rw [mul_div_cancel₀ _ two_ne_zero]; exact L.ω₂_mem_lattice)
+  have hmem : L.ω₂ / 2 - L.ω₁ / 2 ∈ L.lattice := by rw [← hg.map_eq_zero_iff, map_sub, e, sub_self]
+  have :=
+    (PeriodPair.mul_ω₁_add_mul_ω₂_mem_lattice (L := L) (α := -1 / 2) (β := 1 / 2)).1 (by
+      convert hmem using 1
+      push_cast
+      ring)
   norm_num at this
 
-theorem IsAnalyticUniformization.exists_mul_add (hg : IsAnalyticUniformization L.lattice g) :
-    ∃ α c : ℂ, α ≠ 0 ∧
-      (fun z ↦ ptX (g z)) =ᶠ[codiscrete ℂ] (fun z ↦ ℘[L'] (α * z + c)) ∧
-      (fun z ↦ ptY (g z)) =ᶠ[codiscrete ℂ] (fun z ↦ ℘'[L'] (α * z + c) / 2) := by
+theorem IsAnalyticUniformization.exists_mul_add (hg : IsAnalyticUniformization L.lattice g)
+    : ∃ α c : ℂ,
+      α ≠ 0 ∧ (fun z ↦ ptX (g z)) =ᶠ[codiscrete ℂ] (fun z ↦ ℘[L'] (α * z + c))
+        ∧ (fun z ↦ ptY (g z)) =ᶠ[codiscrete ℂ] (fun z ↦ ℘'[L'] (α * z + c) / 2) := by
   obtain ⟨α, hα⟩ := hg.exists_omegaFun_eq_const
   set X : ℂ → ℂ := fun z ↦ ptX (g z) with hXdef
   set Y : ℂ → ℂ := fun z ↦ ptY (g z) with hYdef
@@ -436,12 +465,14 @@ theorem IsAnalyticUniformization.exists_mul_add (hg : IsAnalyticUniformization L
       show (fun z ↦ 2 * Y z * α) = ((fun _ ↦ (2 : ℂ)) * Y) * fun _ ↦ α from rfl,
       germ_mul ((Meromorphic.const 2).mul hYm) (Meromorphic.const α),
       germ_mul (Meromorphic.const 2) hYm, germ_const, germ_const, map_ofNat]
-  have hω : omegaDeriv (omegaAt (weierstrassCurve L') (.some _ _ hPn)) = algebraMap ℂ MeroField α := by
+  have hω
+      : omegaDeriv (omegaAt (weierstrassCurve L') (.some _ _ hPn)) = algebraMap ℂ MeroField α := by
     obtain ⟨s₁, -⟩ := omegaAt_some_spec (weierstrassCurve L') hPn
     have e := congrArg omegaDeriv s₁
     rw [LinearMap.map_smul, omegaDeriv_D, germDeriv_germ hXm] at e
     simp only [WeierstrassCurve.baseChange, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃,
-      weierstrassCurve_a₁, weierstrassCurve_a₃, map_zero, zero_mul, add_zero, smul_eq_mul] at e
+        weierstrassCurve_a₁, weierstrassCurve_a₃, map_zero, zero_mul, add_zero, smul_eq_mul]
+      at e
     rw [hderiv] at e
     exact mul_left_cancel₀ h2Y e
   have hα0 : α ≠ 0 := by
@@ -451,18 +482,24 @@ theorem IsAnalyticUniformization.exists_mul_add (hg : IsAnalyticUniformization L
     obtain ⟨c, hc⟩ := exists_eq_algebraMap_of_germDeriv_eq_zero hderiv
     rw [← germ_const, germ_eq_germ_iff hXm (Meromorphic.const c)] at hc
     exact hg.not_eventually_ptX_eq_const c hc
-  have hD : omegaDeriv (omegaAt (weierstrassCurve L')
-      ((.some _ _ hPn : ((weierstrassCurve L').baseChange MeroField).toAffine.Point) -
-        affinePoint L' α 0 hα0)) = 0 := by
-    have h1 : omegaAt (weierstrassCurve L') ((.some _ _ hPn : ((weierstrassCurve L').baseChange
-        MeroField).toAffine.Point) - affinePoint L' α 0 hα0) =
-        omegaAt (weierstrassCurve L') (.some _ _ hPn) - omegaAt (weierstrassCurve L') (affinePoint L' α 0 hα0) :=
+  have hD
+      : omegaDeriv (omegaAt (weierstrassCurve L')
+          ((.some _ _ hPn : ((weierstrassCurve L').baseChange MeroField).toAffine.Point)
+            - affinePoint L' α 0 hα0))
+        = 0 := by
+    have h1
+        : omegaAt (weierstrassCurve L')
+            ((.some _ _ hPn : ((weierstrassCurve L').baseChange MeroField).toAffine.Point)
+              - affinePoint L' α 0 hα0)
+          = omegaAt (weierstrassCurve L') (.some _ _ hPn)
+            - omegaAt (weierstrassCurve L') (affinePoint L' α 0 hα0) :=
       map_sub (omegaHom (weierstrassCurve L')) _ _
     rw [h1, map_sub, hω, omegaDeriv_affinePoint, sub_self]
   obtain ⟨R, hR⟩ := exists_eq_constMap_of_omegaDeriv _ hD
   obtain ⟨c, rfl⟩ := toPoint_surjective (L := L') R
-  have hP : (.some _ _ hPn : ((weierstrassCurve L').baseChange MeroField).toAffine.Point) =
-      affinePoint L' α (0 + c) hα0 := by
+  have hP
+      : (.some _ _ hPn : ((weierstrassCurve L').baseChange MeroField).toAffine.Point)
+        = affinePoint L' α (0 + c) hα0 := by
     rw [← affinePoint_add_constMap, ← hR]
     abel
   rw [zero_add] at hP
@@ -475,19 +512,23 @@ end Lift
 
 section Classification
 
-theorem exists_mul_of_isAnalyticUniformization {L L' : PeriodPair}
-    {g : ℂ →+ (weierstrassCurve L').toAffine.Point} (hg : IsAnalyticUniformization L.lattice g) :
-    ∃ α : ℂ, α ≠ 0 ∧ (∀ z, z ∈ L.lattice ↔ α * z ∈ L'.lattice) ∧ ∀ z, g z = toPoint L' (α * z) := by
+theorem exists_mul_of_isAnalyticUniformization
+    {L L' : PeriodPair} {g : ℂ →+ (weierstrassCurve L').toAffine.Point}
+    (hg : IsAnalyticUniformization L.lattice g)
+    : ∃ α : ℂ,
+      α ≠ 0 ∧ (∀ z, z ∈ L.lattice ↔ α * z ∈ L'.lattice) ∧ ∀ z, g z = toPoint L' (α * z) := by
   obtain ⟨α, c, hα, hX, hY⟩ := hg.exists_mul_add
   have good : ∀ z, z ∉ L.lattice → α * z + c ∉ L'.lattice → g z = toPoint L' (α * z + c) := by
     intro z hz hz'
     obtain ⟨hn, e⟩ := exists_eq_some_ptX_ptY (fun h0 ↦ hz ((hg.map_eq_zero_iff z).1 h0))
     obtain ⟨hXa, hYa⟩ := hg.analyticAt_ptX_ptY hz
     have haff : ContinuousAt (fun w ↦ α * w + c) z := by fun_prop
-    have hx : ptX (g z) = ℘[L'] (α * z + c) := eq_of_eventuallyEq_codiscrete hX hXa.continuousAt
-      ((L'.analyticOnNhd_weierstrassP _ hz').continuousAt.comp_of_eq haff rfl)
-    have hy : ptY (g z) = ℘'[L'] (α * z + c) / 2 := eq_of_eventuallyEq_codiscrete hY hYa.continuousAt
-      (((L'.analyticOnNhd_derivWeierstrassP _ hz').continuousAt.comp_of_eq haff rfl).div_const 2)
+    have hx : ptX (g z) = ℘[L'] (α * z + c) :=
+      eq_of_eventuallyEq_codiscrete hX hXa.continuousAt
+        ((L'.analyticOnNhd_weierstrassP _ hz').continuousAt.comp_of_eq haff rfl)
+    have hy : ptY (g z) = ℘'[L'] (α * z + c) / 2 :=
+      eq_of_eventuallyEq_codiscrete hY hYa.continuousAt
+        (((L'.analyticOnNhd_derivWeierstrassP _ hz').continuousAt.comp_of_eq haff rfl).div_const 2)
     rw [e, toPoint_of_notMem hz']
     exact point_some_congr hx hy
   have hG : ∀ᶠ w in codiscrete ℂ, w ∉ L.lattice ∧ α * w + c ∉ L'.lattice :=
@@ -514,9 +555,10 @@ theorem exists_mul_of_isAnalyticUniformization {L L' : PeriodPair}
 
 variable {E : WeierstrassCurve ℂ} [E.IsElliptic] {L : PeriodPair}
 
-theorem exists_vcPoint_of_isAnalyticUniformization {f : ℂ →+ E.toAffine.Point}
-    (hf : IsAnalyticUniformization L.lattice f) :
-    ∃ (C : VariableChange ℂ) (h : C • weierstrassCurve L = E), ∀ z, f z = vcPoint C h (toPoint L z) := by
+theorem exists_vcPoint_of_isAnalyticUniformization
+    {f : ℂ →+ E.toAffine.Point} (hf : IsAnalyticUniformization L.lattice f)
+    : ∃ (C : VariableChange ℂ) (h : C • weierstrassCurve L = E), ∀ z,
+      f z = vcPoint C h (toPoint L z) := by
   obtain ⟨L', C', hC'⟩ := exists_variableChange_eq_weierstrassCurve E
   have hg := hf.vcPoint C' hC'
   obtain ⟨α, hα, hker, hgz⟩ := exists_mul_of_isAnalyticUniformization hg
@@ -536,9 +578,10 @@ theorem exists_vcPoint_of_isAnalyticUniformization {f : ℂ →+ E.toAffine.Poin
   show f z = vcPoint C'⁻¹ hinv (vcPoint C' hC' (f z))
   exact (vcPoint_inv_vcPoint C' hC' (f z)).symm
 
-theorem exists_mul_eq_of_isAnalyticUniformization {f₁ f₂ : ℂ →+ E.toAffine.Point}
-    (hf₁ : IsAnalyticUniformization L.lattice f₁) (hf₂ : IsAnalyticUniformization L.lattice f₂) :
-    ∃ c : ℂ, c ≠ 0 ∧ (∀ z, z ∈ L.lattice ↔ c * z ∈ L.lattice) ∧ ∀ z, f₂ z = f₁ (c * z) := by
+theorem exists_mul_eq_of_isAnalyticUniformization
+    {f₁ f₂ : ℂ →+ E.toAffine.Point}
+    (hf₁ : IsAnalyticUniformization L.lattice f₁) (hf₂ : IsAnalyticUniformization L.lattice f₂)
+    : ∃ c : ℂ, c ≠ 0 ∧ (∀ z, z ∈ L.lattice ↔ c * z ∈ L.lattice) ∧ ∀ z, f₂ z = f₁ (c * z) := by
   obtain ⟨C, hC, hf₁C⟩ := exists_vcPoint_of_isAnalyticUniformization hf₁
   have hinv : C⁻¹ • E = weierstrassCurve L := by rw [← hC, inv_smul_smul]
   have hg := hf₂.vcPoint C⁻¹ hinv

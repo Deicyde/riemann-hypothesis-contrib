@@ -5,29 +5,36 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.IntMatSep
 
-theorem nilp_eq_zero_of_commute_sep_alg {K : Type} [Field K] [IsAlgClosed K] {n : ℕ}
-    {A N : Matrix (Fin n) (Fin n) K} (hA : A.charpoly.Separable) (hN : IsNilpotent N) (hc : Commute A N) :
-    N = 0 := by
+theorem nilp_eq_zero_of_commute_sep_alg
+    {K : Type} [Field K] [IsAlgClosed K]
+    {n : ℕ} {A N : Matrix (Fin n) (Fin n) K}
+    (hA : A.charpoly.Separable) (hN : IsNilpotent N) (hc : Commute A N)
+    : N = 0 := by
   set f := Matrix.toLin' A
   have hcp : f.charpoly = A.charpoly := Matrix.charpoly_toLin' A
   have hfg : Commute f (Matrix.toLin' N) := hc.map Matrix.toLinAlgEquiv'
   have hNl : IsNilpotent (Matrix.toLin' N) := hN.map Matrix.toLinAlgEquiv'
   obtain ⟨k, hk⟩ := hNl
-  have key : ∀ μ, Module.End.maxGenEigenspace f μ ≤ LinearMap.ker (Matrix.toLin' N) := fun μ v hv => by
+  have key
+      : ∀ μ, Module.End.maxGenEigenspace f μ ≤ LinearMap.ker (Matrix.toLin' N) := fun μ v hv => by
     have h1 : Module.finrank K (Module.End.maxGenEigenspace f μ) ≤ 1 := by
-      rw [LinearMap.finrank_maxGenEigenspace_eq, hcp]; exact Polynomial.rootMultiplicity_le_one_of_separable hA μ
+      rw [LinearMap.finrank_maxGenEigenspace_eq, hcp]
+      exact Polynomial.rootMultiplicity_le_one_of_separable hA μ
     by_cases h0 : v = 0
     · simp [h0]
-    have h2 : Module.finrank K (Module.End.maxGenEigenspace f μ) = 1 := le_antisymm h1
+    have h2 : Module.finrank K (Module.End.maxGenEigenspace f μ) = 1 :=
+      le_antisymm h1
         (Module.finrank_pos_iff_exists_ne_zero.2 ⟨⟨v, hv⟩, fun h => h0 (congrArg Subtype.val h)⟩)
-    obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' (⟨v, hv⟩ : Module.End.maxGenEigenspace f μ)
-        fun h => h0 (congrArg Subtype.val h)).1 h2 ⟨_, Module.End.mapsTo_maxGenEigenspace_of_comm hfg μ hv⟩
+    obtain ⟨c, hc⟩ :=
+      (finrank_eq_one_iff_of_nonzero' (⟨v, hv⟩ : Module.End.maxGenEigenspace f μ) fun h =>
+        h0 (congrArg Subtype.val h)).1 h2 ⟨_, Module.End.mapsTo_maxGenEigenspace_of_comm hfg μ hv⟩
     have hc' : Matrix.toLin' N v = c • v := (congrArg Subtype.val hc).symm
     have hpow : ∀ m : ℕ, (Matrix.toLin' N ^ m) v = c ^ m • v := by
       intro m
@@ -44,13 +51,17 @@ theorem nilp_eq_zero_of_commute_sep_alg {K : Type} [Field K] [IsAlgClosed K] {n 
   rw [Module.End.iSup_maxGenEigenspace_eq_top, top_le_iff, LinearMap.ker_eq_top] at h3
   exact Matrix.toLin'.injective (by rw [h3, map_zero])
 
-theorem nilp_eq_zero_of_commute_sep {K : Type} [Field K] {n : ℕ}
-    {A N : Matrix (Fin n) (Fin n) K} (hA : A.charpoly.Separable) (hN : IsNilpotent N) (hc : Commute A N) :
-    N = 0 := by
-  have h := nilp_eq_zero_of_commute_sep_alg (K := AlgebraicClosure K)
-    (A := A.map (algebraMap K (AlgebraicClosure K))) (N := N.map (algebraMap K (AlgebraicClosure K)))
-    (by rw [Matrix.charpoly_map]; exact hA.map) (hN.map (algebraMap K (AlgebraicClosure K)).mapMatrix)
-    (hc.map (algebraMap K (AlgebraicClosure K)).mapMatrix)
+theorem nilp_eq_zero_of_commute_sep
+    {K : Type} [Field K]
+    {n : ℕ} {A N : Matrix (Fin n) (Fin n) K}
+    (hA : A.charpoly.Separable) (hN : IsNilpotent N) (hc : Commute A N)
+    : N = 0 := by
+  have h :=
+    nilp_eq_zero_of_commute_sep_alg (K := AlgebraicClosure K)
+      (A := A.map (algebraMap K (AlgebraicClosure K)))
+      (N := N.map (algebraMap K (AlgebraicClosure K))) (by rw [Matrix.charpoly_map]; exact hA.map)
+      (hN.map (algebraMap K (AlgebraicClosure K)).mapMatrix)
+      (hc.map (algebraMap K (AlgebraicClosure K)).mapMatrix)
   ext i j
   have := congrFun (congrFun h i) j
   simpa using this
@@ -62,16 +73,21 @@ theorem exists_lt_pow (x B : WithZero (Multiplicative ℤ)) (hx : 1 < x) : ∃ m
   rw [pow_succ]
   simpa using mul_lt_mul_of_pos_left hx (zero_lt_iff.2 h0)
 
-theorem integral_of_commute_sep : ∀ (E : Type) [Field E] [NumberField E] (w : Pl E) (n : ℕ) (P₀ : (w.adicCompletionIntegers E)[X]),
-    IsCoprime P₀ (derivative P₀) →
-    ∀ (A s : Matrix (Fin n) (Fin n) (w.adicCompletion E)), (∀ i j, A i j ∈ w.adicCompletionIntegers E) →
-    A.charpoly = P₀.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E)) → Commute s A →
-    (∃ B : WithZero (Multiplicative ℤ), ∀ (k : ℕ) (i j : Fin n), Valued.v ((s ^ k) i j) ≤ B) →
-    ∀ i j, s i j ∈ w.adicCompletionIntegers E := by
+theorem integral_of_commute_sep
+    : ∀ (E : Type) [Field E] [NumberField E] (w : Pl E) (n : ℕ)
+        (P₀ : (w.adicCompletionIntegers E)[X]),
+      IsCoprime P₀ (derivative P₀)
+        → ∀ (A s : Matrix (Fin n) (Fin n) (w.adicCompletion E)),
+          (∀ i j, A i j ∈ w.adicCompletionIntegers E)
+            → A.charpoly = P₀.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E))
+            → Commute s A
+            → (∃ B : WithZero (Multiplicative ℤ), ∀ (k : ℕ) (i j : Fin n),
+              Valued.v ((s ^ k) i j) ≤ B)
+            → ∀ i j, s i j ∈ w.adicCompletionIntegers E := by
   intro E _ _ w n P₀ hP A s hA hAc hsA hBd i j
   obtain ⟨B, hB⟩ := hBd
-  have memO : ∀ x : w.adicCompletion E, x ∈ w.adicCompletionIntegers E ↔ Valued.v x ≤ 1 :=
-    fun x => HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w
+  have memO : ∀ x : w.adicCompletion E, x ∈ w.adicCompletionIntegers E ↔ Valued.v x ≤ 1 := fun x =>
+    HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w
   by_contra hij
   haveI : Nonempty (Fin n × Fin n) := ⟨(i, j)⟩
   obtain ⟨⟨i₀, j₀⟩, hmax⟩ := Finite.exists_max (fun p : Fin n × Fin n => Valued.v (s p.1 p.2))
@@ -121,26 +137,36 @@ theorem integral_of_commute_sep : ∀ (E : Type) [Field E] [NumberField E] (w : 
       rw [← hu₀, ← Matrix.map_pow]; rfl
     have h1 := hsmall k l
     rw [← e, ← hy] at h1
-    have h2 : Valued.v (((y : w.adicCompletionIntegers E) : w.adicCompletion E)) *
-        Valued.v (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E) : w.adicCompletion E) = 1 := by
-      have hy1 : ((y : w.adicCompletionIntegers E) : w.adicCompletion E) *
-          (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E) : w.adicCompletion E) = 1 := by
+    have h2
+        : Valued.v (((y : w.adicCompletionIntegers E) : w.adicCompletion E)) * Valued.v
+            (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E)
+              : w.adicCompletion E)
+          = 1 := by
+      have hy1
+          : ((y : w.adicCompletionIntegers E) : w.adicCompletion E)
+              * (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E)
+                : w.adicCompletion E)
+            = 1 := by
         first
-          | exact congrArg Subtype.val y.mul_inv
-          | exact_mod_cast congrArg Subtype.val y.mul_inv
-          | simp
+        | exact congrArg Subtype.val y.mul_inv
+        | exact_mod_cast congrArg Subtype.val y.mul_inv
+        | simp
       rw [← map_mul, hy1, map_one]
     have h3 := (memO _).1 (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E)).2
-    have h4 : Valued.v (((y : w.adicCompletionIntegers E) : w.adicCompletion E)) *
-        Valued.v (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E) : w.adicCompletion E) < 1 :=
+    have h4
+        : Valued.v (((y : w.adicCompletionIntegers E) : w.adicCompletion E)) * Valued.v
+            (((y⁻¹ : (w.adicCompletionIntegers E)ˣ) : w.adicCompletionIntegers E)
+              : w.adicCompletion E)
+          < 1 :=
       lt_of_le_of_lt (mul_le_of_le_one_right' h3) h1
     rw [h2] at h4
     exact lt_irrefl _ h4
   have hsep : (A₀.map (IsLocalRing.residue (w.adicCompletionIntegers E))).charpoly.Separable := by
     rw [Matrix.charpoly_map, hcp]
     exact Polynomial.Separable.map hP
-  have h0 := nilp_eq_zero_of_commute_sep hsep hnil
-    (hcomm.map (IsLocalRing.residue (w.adicCompletionIntegers E)).mapMatrix)
+  have h0 :=
+    nilp_eq_zero_of_commute_sep hsep hnil
+      (hcomm.map (IsLocalRing.residue (w.adicCompletionIntegers E)).mapMatrix)
   have hone : u₀ i₀ j₀ = 1 := by
     apply Subtype.ext
     show c⁻¹ * c = 1

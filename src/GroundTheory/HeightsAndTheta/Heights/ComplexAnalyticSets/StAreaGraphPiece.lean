@@ -18,16 +18,19 @@ noncomputable section
 
 def AreaGraphPiece.Statement : Prop :=
   ∀ (k m : ℕ) (F : EuclideanSpace ℝ (Fin k) → EuclideanSpace ℝ (Fin m))
-    (A : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m)) (δ : ℝ≥0)
-    (t : Set (EuclideanSpace ℝ (Fin k))), δ < 1 → ApproximatesLinearOn F A t δ →
-      μH[(k : ℝ)] (realGraphPt F '' t) ≤
-          ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ k *
-            ENNReal.ofReal (graphJac (A : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) *
-              μH[(k : ℝ)] t ∧
-        ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ k *
-            ENNReal.ofReal (graphJac (A : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) *
-              μH[(k : ℝ)] t ≤
-          μH[(k : ℝ)] (realGraphPt F '' t)
+      (A : EuclideanSpace ℝ (Fin k) →L[ℝ] EuclideanSpace ℝ (Fin m)) (δ : ℝ≥0)
+      (t : Set (EuclideanSpace ℝ (Fin k))),
+    δ < 1 → ApproximatesLinearOn F A t δ
+      → μH[(k : ℝ)] (realGraphPt F '' t)
+          ≤ ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ k
+            * ENNReal.ofReal (graphJac
+              (A : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)))
+            * μH[(k : ℝ)] t
+        ∧ ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ k
+            * ENNReal.ofReal (graphJac
+              (A : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)))
+            * μH[(k : ℝ)] t
+          ≤ μH[(k : ℝ)] (realGraphPt F '' t)
 
 end
 

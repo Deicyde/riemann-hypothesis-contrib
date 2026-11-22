@@ -32,13 +32,15 @@ lemma addVal_prod {ι : Type*} (s : Finset ι) (a : ι → R) :
 
 end
 
-theorem main {R : Type u_1} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    {M : Type u_2} [AddCommGroup M] [Module R M] {ι : Type u_3} [Fintype ι] [DecidableEq ι]
-    {M' : Type u_4} [AddCommGroup M'] [Module R M'] (b' : Module.Basis ι R M')
-    (b : Module.Basis ι R M) (f : M' →ₗ[R] M) :
-    Module.length R (M ⧸ LinearMap.range f) =
-      (IsDiscreteValuationRing.addVal R : R → ℕ∞)
-        (Matrix.det ((LinearMap.toMatrix b' b : (M' →ₗ[R] M) → Matrix ι ι R) f)) := by
+theorem main
+    {R : Type u_1} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    {M : Type u_2} [AddCommGroup M] [Module R M]
+    {ι : Type u_3} [Fintype ι] [DecidableEq ι]
+    {M' : Type u_4} [AddCommGroup M'] [Module R M']
+    (b' : Module.Basis ι R M') (b : Module.Basis ι R M) (f : M' →ₗ[R] M)
+    : Module.length R (M ⧸ LinearMap.range f)
+      = (IsDiscreteValuationRing.addVal R : R → ℕ∞) (Matrix.det
+        ((LinearMap.toMatrix b' b : (M' →ₗ[R] M) → Matrix ι ι R) f)) := by
   set A := LinearMap.toMatrix b' b f with hA
   by_cases hf : Function.Injective f
   · set N := LinearMap.range f with hN
@@ -51,13 +53,13 @@ theorem main {R : Type u_1} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R
     have ab_eq := Submodule.smithNormalFormBotBasis_def b h
 
     have hlen : Module.length R (M ⧸ N) = IsDiscreteValuationRing.addVal R (∏ i, a i) := by
-      rw [(Submodule.quotientEquivPiSpan N b h).length_eq, Module.length_pi_of_fintype,
-        addVal_prod]
+      rw [(Submodule.quotientEquivPiSpan N b h).length_eq, Module.length_pi_of_fintype, addVal_prod]
       exact Finset.sum_congr rfl fun i _ => length_quot_span _
     rw [hlen, IsDiscreteValuationRing.addVal_eq_iff_associated]
 
     let φ : M' ≃ₗ[R] M := b'.equiv b (Equiv.refl ι)
-    have hdetA : A.det = LinearMap.det (N.subtype ∘ₗ ((φ.symm.trans e₀ : M ≃ₗ[R] N) : M →ₗ[R] N)) := by
+    have hdetA
+        : A.det = LinearMap.det (N.subtype ∘ₗ ((φ.symm.trans e₀ : M ≃ₗ[R] N) : M →ₗ[R] N)) := by
       rw [← LinearMap.det_toMatrix b]
       congr 1
       ext i j
@@ -71,8 +73,8 @@ theorem main {R : Type u_1} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R
       rw [← LinearMap.det_toMatrix bT, ← Matrix.det_diagonal]
       congr 1
       ext i j
-      rw [LinearMap.toMatrix_apply, hg, map_smul, Basis.repr_self, Finsupp.smul_single,
-        smul_eq_mul, mul_one]
+      rw [LinearMap.toMatrix_apply, hg, map_smul, Basis.repr_self, Finsupp.smul_single, smul_eq_mul,
+        mul_one]
       by_cases hij : i = j
       · subst hij; simp
       · rw [Matrix.diagonal_apply_ne _ hij, Finsupp.single_eq_of_ne hij]
@@ -80,8 +82,7 @@ theorem main {R : Type u_1} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R
     exact LinearMap.associated_det_comp_equiv _ _ _
   · have hdet : A.det = 0 := by
       rw [← Matrix.exists_mulVec_eq_zero_iff]
-      obtain ⟨x, y, hxy, hne⟩ : ∃ x y, f x = f y ∧ x ≠ y := by
-        simpa [Function.Injective] using hf
+      obtain ⟨x, y, hxy, hne⟩ : ∃ x y, f x = f y ∧ x ≠ y := by simpa [Function.Injective] using hf
       refine ⟨b'.repr (x - y), ?_, ?_⟩
       · intro h
         apply hne

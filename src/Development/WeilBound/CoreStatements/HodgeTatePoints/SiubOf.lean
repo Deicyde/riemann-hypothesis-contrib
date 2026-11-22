@@ -16,14 +16,17 @@ public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.ZpowMemSubal
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Kleiman2
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Kleiman2
 
 namespace PositivityTheory.HtPt.Siub
 
-theorem exists_multilinear {M : Type} [AddCommGroup M] {n : ℕ} (g : (Fin n → M) → ℤ)
+theorem exists_multilinear
+    {M : Type} [AddCommGroup M]
+    {n : ℕ} (g : (Fin n → M) → ℤ)
     (hg : ∀ (v : Fin n → M) (i : Fin n) (x y : M),
-      g (Function.update v i (x + y)) = g (Function.update v i x) + g (Function.update v i y)) :
-    ∃ f : MultilinearMap (RingHom.id ℤ) (fun _ : Fin n => M) ℤ, ∀ v, f v = g v := by
+      g (Function.update v i (x + y)) = g (Function.update v i x) + g (Function.update v i y))
+    : ∃ f : MultilinearMap (RingHom.id ℤ) (fun _ : Fin n => M) ℤ, ∀ v, f v = g v := by
   refine ⟨⟨g, ?_, ?_⟩, fun _ => rfl⟩
   · intro inst v i x y
     have h := hg v i x y
@@ -35,14 +38,38 @@ theorem exists_multilinear {M : Type} [AddCommGroup M] {n : ℕ} (g : (Fin n →
     simp only [AddMonoidHom.mk'_apply] at h
     convert h
 
-theorem siu_base_of (hnum : ∀ (M : Type) [AddCommGroup M] (d : ℕ) (f : MultilinearMap (RingHom.id ℤ) (fun _ : Fin (d + 1) => M) ℤ) (μ e : M), 0 < f (fun _ => μ) → ∃ t : ℚ, 0 < t ∧ ∀ (a : ℕ) (m : ℤ), 1 ≤ a → (m : ℚ) = a * t → ((d + 1 : ℕ) : ℤ) * f (Fin.snoc (α := fun _ => M) (fun _ : Fin d => a • μ + m • e) ((2 * m) • e)) < f (fun _ => a • μ + m • e)) :
-    VeryAmpleNefPlusAmple.Statement → SectionCount.Statement → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (k₀ : K) (d : ℕ) (μ : K → ℤ), IsModelWithBase F y k₀ → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y) = ((d + 1 : ℕ) : WithBot (WithTop ℤ)) → IsNef F y μ → 0 < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y) (fun _ : Fin (d + 1) => μ) → ∃ a m : ℕ, 1 ≤ a ∧ 1 ≤ m ∧ ∃ σ ∈ secOver F y (a • μ - (m : ℤ) • baseDeg k₀), σ ≠ 0 := by
+theorem siu_base_of
+    (hnum : ∀ (M : Type) [AddCommGroup M] (d : ℕ)
+        (f : MultilinearMap (RingHom.id ℤ) (fun _ : Fin (d + 1) => M) ℤ) (μ e : M),
+      0 < f (fun _ => μ)
+        → ∃ t : ℚ,
+          0 < t
+            ∧ ∀ (a : ℕ) (m : ℤ),
+              1 ≤ a → (m : ℚ) = a * t
+                → ((d + 1 : ℕ) : ℤ)
+                    * f (Fin.snoc (α := fun _ => M) (fun _ : Fin d => a • μ + m • e) ((2 * m) • e))
+                  < f (fun _ => a • μ + m • e))
+    : VeryAmpleNefPlusAmple.Statement → SectionCount.Statement
+      → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
+          [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (k₀ : K)
+          (d : ℕ) (μ : K → ℤ),
+        IsModelWithBase F y k₀
+          → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y)
+            = ((d + 1 : ℕ) : WithBot (WithTop ℤ))
+          → IsNef F y μ
+          → 0
+            < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y)
+              (fun _ : Fin (d + 1) => μ)
+          → ∃ a m : ℕ, 1 ≤ a ∧ 1 ≤ m ∧ ∃ σ ∈ secOver F y (a • μ - (m : ℤ) • baseDeg k₀), σ ≠ 0 := by
   intro hK hS F _ K _ _ ι _ Ω _ _ y k₀ d μ hy hd hnef hpos
-  have hP := GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.isMultiProjPrime_mIdealOver (S := F) y hy.1
-  obtain ⟨f, hf⟩ := exists_multilinear (M := K → ℤ) (n := d + 1)
-    (fun v => GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y) v)
-    (GroundTheory.Heights₂.Heights.FieldNumbers.IntNumAdd.full F K ι (mIdealOver F y) hP.multiHomog hP.relevant
-      (d + 1) hd)
+  have hP :=
+    GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.isMultiProjPrime_mIdealOver
+      (S := F) y hy.1
+  obtain ⟨f, hf⟩ :=
+    exists_multilinear (M := K → ℤ) (n := d + 1)
+      (fun v => GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y) v)
+      (GroundTheory.Heights₂.Heights.FieldNumbers.IntNumAdd.full F K ι (mIdealOver F y)
+        hP.multiHomog hP.relevant (d + 1) hd)
   obtain ⟨t, ht, hlt⟩ := hnum (K → ℤ) d f μ (baseDeg k₀) (by rw [hf]; exact hpos)
   obtain ⟨a, m, ha, hm, hva⟩ := hK (d + 1) F K ι Ω y k₀ hy hd μ hnef t ht
   have hmpos : 0 < m := by
@@ -57,16 +84,23 @@ theorem siu_base_of (hnum : ∀ (M : Type) [AddCommGroup M] (d : ℕ) (f : Multi
     rw [← natCast_zsmul]; push_cast; rfl
   rw [hq] at hlt'
   obtain ⟨C, hC⟩ := hS F K ι Ω y k₀ d (a • μ + (r : ℤ) • baseDeg k₀) (2 * r) hy hd hva (by omega)
-  obtain ⟨n, hn, hfin⟩ := GroundTheory.Heights₂.Heights.Kleiman.exists_pos_of_eventually_lower (d := d)
-    (sub_pos.mpr hlt') (C := C)
-    (f := fun n : ℕ => (Module.finrank F
-      (secOver F y (n • (a • μ + (r : ℤ) • baseDeg k₀ - (2 * r) • baseDeg k₀))) : ℝ))
-    (Filter.eventually_atTop.mpr ⟨1, fun n hn => by
-      have := hC n hn
-      rwa [Int.cast_sub, Int.cast_mul, Int.cast_natCast]⟩) 1 one_pos
+  obtain ⟨n, hn, hfin⟩ :=
+    GroundTheory.Heights₂.Heights.Kleiman.exists_pos_of_eventually_lower (d := d) (sub_pos.mpr hlt')
+      (C := C)
+      (f := fun n : ℕ =>
+        (Module.finrank F (secOver F y (n • (a • μ + (r : ℤ) • baseDeg k₀ - (2 * r) • baseDeg k₀)))
+          : ℝ))
+      (Filter.eventually_atTop.mpr ⟨
+        1,
+        fun n hn => by
+          have := hC n hn
+          rwa [Int.cast_sub, Int.cast_mul, Int.cast_natCast]
+      ⟩)
+      1 one_pos
   rw [one_mul] at hfin
-  have e : n • (a • μ + (r : ℤ) • baseDeg k₀ - (2 * r) • baseDeg k₀) =
-      (n * a) • μ - ((n * r : ℕ) : ℤ) • baseDeg k₀ := by
+  have e
+      : n • (a • μ + (r : ℤ) • baseDeg k₀ - (2 * r) • baseDeg k₀)
+        = (n * a) • μ - ((n * r : ℕ) : ℤ) • baseDeg k₀ := by
     module
   rw [e] at hfin
   refine ⟨n * a, n * r, Nat.mul_pos hn ha, Nat.mul_pos hn hr, ?_⟩
@@ -74,9 +108,12 @@ theorem siu_base_of (hnum : ∀ (M : Type) [AddCommGroup M] (d : ℕ) (f : Multi
   rw [h, finrank_bot] at hfin
   simp at hfin
 
-theorem prod_mem_secOver {F : Type} [Field F] {K : Type} [Fintype K] {ι : K → Type} {Ω : Type} [Field Ω]
-    [Algebra F Ω] (y : (Σ k, ι k) → Ω) (i : ∀ k, ι k) :
-    (∏ k, y ⟨k, i k⟩) ∈ secOver F y (1 : K → ℤ) := by
+theorem prod_mem_secOver
+    {F : Type} [Field F]
+    {K : Type} [Fintype K]
+    {ι : K → Type} {Ω : Type} [Field Ω] [Algebra F Ω]
+    (y : (Σ k, ι k) → Ω) (i : ∀ k, ι k)
+    : (∏ k, y ⟨k, i k⟩) ∈ secOver F y (1 : K → ℤ) := by
   simp only [secOver, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mulRight_apply,
     Subalgebra.mem_toSubmodule]
   intro c _
@@ -86,16 +123,40 @@ theorem prod_mem_secOver {F : Type} [Field F] {K : Type} [Fintype K] {ι : K →
   exact Algebra.subset_adjoin ⟨⟨k, i k⟩, rfl⟩
 
 open GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization in
-theorem siu_segre_of_base (hbase : VeryAmpleNefPlusAmple.Statement → SectionCount.Statement → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (k₀ : K) (d : ℕ) (μ : K → ℤ), IsModelWithBase F y k₀ → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y) = ((d + 1 : ℕ) : WithBot (WithTop ℤ)) → IsNef F y μ → 0 < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y) (fun _ : Fin (d + 1) => μ) → ∃ a m : ℕ, 1 ≤ a ∧ 1 ≤ m ∧ ∃ σ ∈ secOver F y (a • μ - (m : ℤ) • baseDeg k₀), σ ≠ 0) :
-    VeryAmpleNefPlusAmple.Statement → SectionCount.Statement → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (d : ℕ) (μ : K → ℤ), (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y) = ((d + 1 : ℕ) : WithBot (WithTop ℤ)) → IsNef F y μ → 0 < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y) (fun _ : Fin (d + 1) => μ) → ∃ a : ℕ, 1 ≤ a ∧ ∃ σ ∈ secOver F y (a • μ - 1), σ ≠ 0 := by
+theorem siu_segre_of_base
+    (hbase : VeryAmpleNefPlusAmple.Statement → SectionCount.Statement
+      → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
+          [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (k₀ : K)
+          (d : ℕ) (μ : K → ℤ),
+        IsModelWithBase F y k₀
+          → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y)
+            = ((d + 1 : ℕ) : WithBot (WithTop ℤ))
+          → IsNef F y μ
+          → 0
+            < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y)
+              (fun _ : Fin (d + 1) => μ)
+          → ∃ a m : ℕ, 1 ≤ a ∧ 1 ≤ m ∧ ∃ σ ∈ secOver F y (a • μ - (m : ℤ) • baseDeg k₀), σ ≠ 0)
+    : VeryAmpleNefPlusAmple.Statement → SectionCount.Statement
+      → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
+          [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (d : ℕ)
+          (μ : K → ℤ),
+        (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0)
+          → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y)
+            = ((d + 1 : ℕ) : WithBot (WithTop ℤ))
+          → IsNef F y μ
+          → 0
+            < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y)
+              (fun _ : Fin (d + 1) => μ)
+          → ∃ a : ℕ, 1 ≤ a ∧ ∃ σ ∈ secOver F y (a • μ - 1), σ ≠ 0 := by
   intro hK hS F _ K _ _ ι _ Ω _ _ y d μ hy hd hnef hpos
-  obtain ⟨a, m, ha, hm, σ, hσ, hσ0⟩ := hbase hK hS F (Unit ⊕ K) _ Ω (segreJoin y) (Sum.inl ()) d
-    (pullDeg μ) (SegreBase.proof F K ι Ω y hy).1
-    ((SegreDim.proof F K ι Ω y hy).trans hd)
-    ((SegreNef.proof SegreDim.proof SegreNum.proof F K ι Ω y hy μ).2 hnef)
-    (lt_of_lt_of_eq hpos (SegreNum.proof F K ι Ω y hy (d + 1) (fun _ => μ)).symm)
-  have e : a • pullDeg (K₁ := Unit) μ - (m : ℤ) • baseDeg (Sum.inl ()) =
-      pullDeg (a • μ) + (-(m : ℤ)) • baseDeg (Sum.inl ()) := by
+  obtain ⟨a, m, ha, hm, σ, hσ, hσ0⟩ :=
+    hbase hK hS F (Unit ⊕ K) _ Ω (segreJoin y) (Sum.inl ()) d (pullDeg μ)
+      (SegreBase.proof F K ι Ω y hy).1 ((SegreDim.proof F K ι Ω y hy).trans hd)
+      ((SegreNef.proof SegreDim.proof SegreNum.proof F K ι Ω y hy μ).2 hnef)
+      (lt_of_lt_of_eq hpos (SegreNum.proof F K ι Ω y hy (d + 1) (fun _ => μ)).symm)
+  have e
+      : a • pullDeg (K₁ := Unit) μ - (m : ℤ) • baseDeg (Sum.inl ())
+        = pullDeg (a • μ) + (-(m : ℤ)) • baseDeg (Sum.inl ()) := by
     rw [neg_smul, ← sub_eq_add_neg]
     congr 1
     funext k
@@ -106,14 +167,37 @@ theorem siu_segre_of_base (hbase : VeryAmpleNefPlusAmple.Statement → SectionCo
   have hmul := ModelTwistGenerated.secOver_mul y hσ hp
   have e' : ((a • μ + fun _ => -(m : ℤ)) + ((m - 1 : ℕ) : ℤ) • (1 : K → ℤ)) = a • μ - 1 := by
     funext k
-    simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, Pi.one_apply, smul_eq_mul, Nat.cast_sub hm]
+    simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, Pi.one_apply, smul_eq_mul,
+      Nat.cast_sub hm]
     push_cast
     ring
   rw [e'] at hmul
-  exact ⟨a, ha, _, hmul, mul_ne_zero hσ0 (pow_ne_zero _ (Finset.prod_ne_zero_iff.mpr fun k _ => hi k))⟩
+  exact
+    ⟨a, ha, _, hmul, mul_ne_zero hσ0 (pow_ne_zero _ (Finset.prod_ne_zero_iff.mpr fun k _ => hi k))⟩
 
-theorem siu_segre_of (hnum : ∀ (M : Type) [AddCommGroup M] (d : ℕ) (f : MultilinearMap (RingHom.id ℤ) (fun _ : Fin (d + 1) => M) ℤ) (μ e : M), 0 < f (fun _ => μ) → ∃ t : ℚ, 0 < t ∧ ∀ (a : ℕ) (m : ℤ), 1 ≤ a → (m : ℚ) = a * t → ((d + 1 : ℕ) : ℤ) * f (Fin.snoc (α := fun _ => M) (fun _ : Fin d => a • μ + m • e) ((2 * m) • e)) < f (fun _ => a • μ + m • e)) :
-    VeryAmpleNefPlusAmple.Statement → SectionCount.Statement → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (d : ℕ) (μ : K → ℤ), (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y) = ((d + 1 : ℕ) : WithBot (WithTop ℤ)) → IsNef F y μ → 0 < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y) (fun _ : Fin (d + 1) => μ) → ∃ a : ℕ, 1 ≤ a ∧ ∃ σ ∈ secOver F y (a • μ - 1), σ ≠ 0 :=
+theorem siu_segre_of
+    (hnum : ∀ (M : Type) [AddCommGroup M] (d : ℕ)
+        (f : MultilinearMap (RingHom.id ℤ) (fun _ : Fin (d + 1) => M) ℤ) (μ e : M),
+      0 < f (fun _ => μ)
+        → ∃ t : ℚ,
+          0 < t
+            ∧ ∀ (a : ℕ) (m : ℤ),
+              1 ≤ a → (m : ℚ) = a * t
+                → ((d + 1 : ℕ) : ℤ)
+                    * f (Fin.snoc (α := fun _ => M) (fun _ : Fin d => a • μ + m • e) ((2 * m) • e))
+                  < f (fun _ => a • μ + m • e))
+    : VeryAmpleNefPlusAmple.Statement → SectionCount.Statement
+      → ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
+          [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (d : ℕ)
+          (μ : K → ℤ),
+        (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0)
+          → GroundTheory.Heights₂.Heights.FieldNumbers.relDim (mIdealOver F y)
+            = ((d + 1 : ℕ) : WithBot (WithTop ℤ))
+          → IsNef F y μ
+          → 0
+            < GroundTheory.Heights₂.Heights.NumbersDVR.intNum F (mIdealOver F y)
+              (fun _ : Fin (d + 1) => μ)
+          → ∃ a : ℕ, 1 ≤ a ∧ ∃ σ ∈ secOver F y (a • μ - 1), σ ≠ 0 :=
   siu_segre_of_base (siu_base_of hnum)
 
 end PositivityTheory.HtPt.Siub

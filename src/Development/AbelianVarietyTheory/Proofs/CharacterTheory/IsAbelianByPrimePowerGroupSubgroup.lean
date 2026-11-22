@@ -7,8 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.Ab
 
 namespace GlobalTheory.BI
 
-theorem _root_.GlobalTheory.BI.AbByP.subgroup :
-    ∀ (G : Type) [Group G] (T : Subgroup G),
+theorem _root_.GlobalTheory.BI.AbByP.subgroup
+    : ∀ (G : Type) [Group G] (T : Subgroup G),
       _root_.GlobalTheory.BI.AbByP G → _root_.GlobalTheory.BI.AbByP T := by
   intro G _ T h
   unfold _root_.GlobalTheory.BI.AbByP at h ⊢

@@ -11,9 +11,12 @@ open scoped MatrixGroups ModularForm Manifold Topology
 
 namespace GlobalTheory
 
-theorem levelOne_form_one_add_expDecay :
-    ∀ d : ℤ, 4 ≤ d → Even d → ∃ e : ℍ → ℂ, IsMF ⊤ d e ∧
-      (fun τ : ℍ => e τ - 1) =O[atImInfty] fun τ : ℍ => Real.exp (-2 * Real.pi * τ.im) := by
+theorem levelOne_form_one_add_expDecay
+    : ∀ d : ℤ,
+      4 ≤ d → Even d
+        → ∃ e : ℍ → ℂ,
+          IsMF ⊤ d e
+            ∧ (fun τ : ℍ => e τ - 1) =O[atImInfty] fun τ : ℍ => Real.exp (-2 * Real.pi * τ.im) := by
   intro d hd hev
   obtain ⟨k, rfl⟩ := Int.eq_ofNat_of_zero_le (by omega : (0 : ℤ) ≤ d)
   have hk : 3 ≤ k := by omega
@@ -25,9 +28,10 @@ theorem levelOne_form_one_add_expDecay :
       (ModularFormClass.analyticAt_cuspFunction_zero f one_pos one_mem_strictPeriods_SL)
       (SlashInvariantFormClass.periodic_comp_ofComplex f one_mem_strictPeriods_SL)]
     exact EisensteinSeries.E_qExpansion_coeff_zero hk hk2
-  have h := exp_decay_sub_atImInfty one_pos
-    (SlashInvariantFormClass.periodic_comp_ofComplex f one_mem_strictPeriods_SL)
-    (ModularFormClass.holo f) (ModularFormClass.bdd_at_infty f)
+  have h :=
+    exp_decay_sub_atImInfty one_pos
+      (SlashInvariantFormClass.periodic_comp_ofComplex f one_mem_strictPeriods_SL)
+      (ModularFormClass.holo f) (ModularFormClass.bdd_at_infty f)
   rw [h0] at h
   simpa using h
 

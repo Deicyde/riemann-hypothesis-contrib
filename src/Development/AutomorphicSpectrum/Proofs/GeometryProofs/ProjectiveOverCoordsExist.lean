@@ -9,14 +9,22 @@ public import Development.WeilBound.CoreStatements.HodgeTatePoints.MfCoords
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.XR
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.XR
 open scoped CategoryTheory.Obj
-private theorem isLocallyNoetherian_of_closedImmersion_pSpace (o : Type) [CommRing o] [IsNoetherianRing o] (X : Scheme.{0}) (N : ℕ)
-    (i : X ⟶ PSpace o N) [IsClosedImmersion i] : IsLocallyNoetherian X := by
+private theorem isLocallyNoetherian_of_closedImmersion_pSpace
+    (o : Type) [CommRing o] [IsNoetherianRing o]
+    (X : Scheme.{0}) (N : ℕ) (i : X ⟶ PSpace o N) [IsClosedImmersion i]
+    : IsLocallyNoetherian X := by
   refine isLocallyNoetherian_of_affine_cover
-    (S := fun j : Fin (N + 1) => ⟨i ⁻¹ᵁ GlobalTheory.ProjSpace.chart o N j,
-      (GlobalTheory.ProjSpace.isAffineOpen_chart o N j).preimage i⟩) ?_ ?_
+    (S := fun j : Fin (N + 1) => ⟨
+      i ⁻¹ᵁ GlobalTheory.ProjSpace.chart o N j,
+      (GlobalTheory.ProjSpace.isAffineOpen_chart o N j).preimage i
+    ⟩)
+    ?_ ?_
   · rw [eq_top_iff]
     intro x _
     have hx : i x ∈ (⨆ j, GlobalTheory.ProjSpace.chart o N j) := by
@@ -32,7 +40,12 @@ private theorem isLocallyNoetherian_of_closedImmersion_pSpace (o : Type) [CommRi
       (Scheme.Hom.app_surjective i _ (GlobalTheory.ProjSpace.isAffineOpen_chart o N j))
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.CompanionTheory.Relay.projective_over_coords_exist : ∀ (o : Type) [CommRing o] [IsNoetherianRing o] (X : Scheme.{0}) (s : X ⟶ Sp o), IsProjOver s → ∀ (Ω : Type) [Field Ω] [Algebra o Ω] (ξ : Sp Ω ⟶ X), IsCptGen ξ → ξ ≫ s = spMap (algebraMap o Ω) → ∃ (n : ℕ) (x : Fin n → Ω), CoordTie o ξ x := by
+theorem _root_.GlobalTheory.CompanionTheory.Relay.projective_over_coords_exist
+    : ∀ (o : Type) [CommRing o] [IsNoetherianRing o] (X : Scheme.{0}) (s : X ⟶ Sp o),
+      IsProjOver s
+        → ∀ (Ω : Type) [Field Ω] [Algebra o Ω] (ξ : Sp Ω ⟶ X),
+          IsCptGen ξ → ξ ≫ s = spMap (algebraMap o Ω)
+            → ∃ (n : ℕ) (x : Fin n → Ω), CoordTie o ξ x := by
   intro o _ _ X s hs Ω _ _ ξ hξ hcomp
   obtain ⟨N, i, hi, rfl⟩ := hs
   haveI := isLocallyNoetherian_of_closedImmersion_pSpace o X N i
@@ -57,9 +70,11 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.projective_over_coords_exist :
     intro q
     rw [← U.ι.isOpenEmbedding.isInducing.specializes_iff, h1]
     exact q.2
-  obtain ⟨t, ht, heq⟩ := PositivityTheory.HtPt.Mf.exists_point (ξ' ≫ U.ι ≫ i)
-    (by simpa [Category.assoc, reassoc_of% hfac] using hcomp)
-  have hct : CoordTie o ξ' t := PositivityTheory.HtPt.Mf.coordTie_of_all (i := U.ι ≫ i) hgen' hall heq
+  obtain ⟨t, ht, heq⟩ :=
+    PositivityTheory.HtPt.Mf.exists_point (ξ' ≫ U.ι ≫ i)
+      (by simpa [Category.assoc, reassoc_of% hfac] using hcomp)
+  have hct : CoordTie o ξ' t :=
+    PositivityTheory.HtPt.Mf.coordTie_of_all (i := U.ι ≫ i) hgen' hall heq
   have h2 : genPt (ξ' ≫ U.ι) = genPt ξ := by rw [hfac]
   have hsurj : ∀ q : Cpt (ξ' ≫ U.ι), ∃ p : Cpt ξ', PositivityTheory.HtPt.Mf.push ξ' U.ι p = q := by
     intro q

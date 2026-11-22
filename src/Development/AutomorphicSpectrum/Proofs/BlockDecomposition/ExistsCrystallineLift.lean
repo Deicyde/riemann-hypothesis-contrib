@@ -10,12 +10,13 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb GroundTheory.PAdicHodge
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb GroundTheory.PAdicHodge
 
 namespace GlobalTheory.CompanionTheory.CLiftEx
 
-theorem thick_isNilpotent {b : Base} {L : b.Fun} (T : Thick L) (x : T.B) (hx : x ∈ T.J) :
-    IsNilpotent x := by
+theorem thick_isNilpotent {b : Base} {L : b.Fun} (T : Thick L) (x : T.B) (hx : x ∈ T.J)
+    : IsNilpotent x := by
   by_cases hp : b.p = 0
   · obtain ⟨k, hk⟩ := T.adm.2 hp
     refine ⟨k, ?_⟩
@@ -26,12 +27,13 @@ theorem thick_isNilpotent {b : Base} {L : b.Fun} (T : Thick L) (x : T.B) (hx : x
       rw [← Nat.cast_mul, Nat.mul_factorial_pred hp]
     rw [pow_mul, ← T.δ.factorial_mul_dpow_eq_pow hx, hfac, mul_assoc, mul_pow, hk, zero_mul]
 
-theorem unit_lift {B : Type} [CommRing B] (J : Ideal B) (hJ : ∀ x ∈ J, IsNilpotent x) (u : (B ⧸ J)ˣ) :
-    ∃ w : Bˣ, Ideal.Quotient.mk J (w : B) = (u : B ⧸ J) := by
+theorem unit_lift {B : Type} [CommRing B] (J : Ideal B) (hJ : ∀ x ∈ J, IsNilpotent x) (u : (B ⧸ J)ˣ)
+    : ∃ w : Bˣ, Ideal.Quotient.mk J (w : B) = (u : B ⧸ J) := by
   obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (u : B ⧸ J)
   obtain ⟨c, hc⟩ := Ideal.Quotient.mk_surjective ((u⁻¹ : (B ⧸ J)ˣ) : B ⧸ J)
   have hmem : a * c - 1 ∈ J := by
-    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, ha, hc, Units.mul_inv, map_one, sub_self]
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, ha, hc, Units.mul_inv, map_one,
+      sub_self]
   have hunit : IsUnit (a * c) := by
     have h1 := (hJ _ hmem).isUnit_one_add
     have h2 : (1 : B) + (a * c - 1) = a * c := by ring
@@ -39,20 +41,33 @@ theorem unit_lift {B : Type} [CommRing B] (J : Ideal B) (hJ : ∀ x ∈ J, IsNil
   obtain ⟨w, hw⟩ := isUnit_of_mul_isUnit_left hunit
   exact ⟨w, by rw [hw, ha]⟩
 
-theorem nonempty_cLift : ∀ {O : Type} [CommRing O] {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {b : Base} {ht : b.t = 1}
-    {κ : O →+* b.R ⧸ b.I} {C : Type 1} [Category.{0} C] (G : C ⥤ Thick ((B.schFn q).cr b ht κ)) (D : E.LineData X),
-    (∀ T, ∃ p : Spec (CommRingCat.of ((G.obj T).B ⧸ (G.obj T).J)) ⟶ D.Y, p ≫ D.f = B.thPt (G.obj T)) → Nonempty (B.CLift G D) := by
+theorem nonempty_cLift
+    : ∀ {O : Type} [CommRing O] {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {b : Base}
+        {ht : b.t = 1} {κ : O →+* b.R ⧸ b.I} {C : Type 1} [Category.{0} C]
+        (G : C ⥤ Thick ((B.schFn q).cr b ht κ)) (D : E.LineData X),
+      (∀ T, ∃ p : Spec (CommRingCat.of ((G.obj T).B ⧸ (G.obj T).J)) ⟶ D.Y,
+          p ≫ D.f = B.thPt (G.obj T))
+        → Nonempty (B.CLift G D) := by
   intro O _ X q b ht κ C _ G D h
   classical
   choose p hp using h
-  refine ⟨⟨p, hp, fun {T T'} φ =>
-    if h : (B.thSp (G.map φ) ≫ p T) ≫ D.f = p T' ≫ D.f then
-      (unit_lift (G.obj T').J (fun x hx => thick_isNilpotent (G.obj T') x hx)
-        (Units.map (Scheme.ΓSpecIso (CommRingCat.of ((G.obj T').B ⧸ (G.obj T').J))).hom.hom.toMonoidHom
-          (D.u (B.thSp (G.map φ) ≫ p T) (p T') h))).choose
-    else 1, fun {T T'} φ h => ?_⟩⟩
+  refine ⟨⟨
+    p,
+    hp,
+    fun {T T'} φ =>
+      if h : (B.thSp (G.map φ) ≫ p T) ≫ D.f = p T' ≫ D.f then
+        (unit_lift (G.obj T').J
+          (fun x hx => thick_isNilpotent (G.obj T') x hx)
+          (Units.map
+            (Scheme.ΓSpecIso (CommRingCat.of ((G.obj T').B ⧸ (G.obj T').J))).hom.hom.toMonoidHom
+            (D.u (B.thSp (G.map φ) ≫ p T) (p T') h))).choose
+      else
+        1,
+    fun {T T'} φ h => ?_
+  ⟩⟩
   rw [dite_eq_left h]
-  exact (unit_lift (G.obj T').J (fun x hx => thick_isNilpotent (G.obj T') x hx)
+  exact (unit_lift (G.obj T').J
+    (fun x hx => thick_isNilpotent (G.obj T') x hx)
     (Units.map (Scheme.ΓSpecIso (CommRingCat.of ((G.obj T').B ⧸ (G.obj T').J))).hom.hom.toMonoidHom
       (D.u (B.thSp (G.map φ) ≫ p T) (p T') h))).choose_spec
 

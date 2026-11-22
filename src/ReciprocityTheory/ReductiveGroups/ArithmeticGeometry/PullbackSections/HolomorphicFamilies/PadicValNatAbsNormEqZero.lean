@@ -15,11 +15,14 @@ section Gal
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem algebraMap_smul_oe (σ : E ≃ₐ[ℚ] E) (x : 𝓞 E) :
-    algebraMap (𝓞 E) E (σ • x) = σ (algebraMap (𝓞 E) E x) := rfl
+theorem algebraMap_smul_oe (σ : E ≃ₐ[ℚ] E) (x : 𝓞 E)
+    : algebraMap (𝓞 E) E (σ • x) = σ (algebraMap (𝓞 E) E x) :=
+  rfl
 
-theorem mem_differentIdeal_iff (x : 𝓞 E) : x ∈ differentIdeal ℤ (𝓞 E) ↔
-    algebraMap (𝓞 E) E x ∈ (1 / Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E) : Submodule (𝓞 E) E) := by
+theorem mem_differentIdeal_iff (x : 𝓞 E)
+    : x ∈ differentIdeal ℤ (𝓞 E)
+      ↔ algebraMap (𝓞 E) E x
+        ∈ (1 / Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E) : Submodule (𝓞 E) E) := by
   rw [← coeSubmodule_differentIdeal ℤ ℚ, IsLocalization.mem_coeSubmodule]
   constructor
   · intro h
@@ -27,8 +30,9 @@ theorem mem_differentIdeal_iff (x : 𝓞 E) : x ∈ differentIdeal ℤ (𝓞 E) 
   · rintro ⟨y, hy, e⟩
     rwa [← (IsFractionRing.injective (𝓞 E) E) e]
 
-theorem traceDual_smul (τ : E ≃ₐ[ℚ] E) {y : E} (hy : y ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E)) :
-    τ y ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E) := by
+theorem traceDual_smul
+    (τ : E ≃ₐ[ℚ] E) {y : E} (hy : y ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E))
+    : τ y ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E) := by
   rw [Submodule.mem_traceDual] at hy ⊢
   intro a ha
   obtain ⟨o, rfl⟩ := Submodule.mem_one.mp ha
@@ -39,8 +43,8 @@ theorem traceDual_smul (τ : E ≃ₐ[ℚ] E) {y : E} (hy : y ∈ Submodule.trac
   rw [← Algebra.trace_eq_of_algEquiv τ, map_mul, AlgEquiv.apply_symm_apply] at key
   exact key
 
-theorem smul_mem_differentIdeal (σ : E ≃ₐ[ℚ] E) {x : 𝓞 E} (hx : x ∈ differentIdeal ℤ (𝓞 E)) :
-    σ • x ∈ differentIdeal ℤ (𝓞 E) := by
+theorem smul_mem_differentIdeal (σ : E ≃ₐ[ℚ] E) {x : 𝓞 E} (hx : x ∈ differentIdeal ℤ (𝓞 E))
+    : σ • x ∈ differentIdeal ℤ (𝓞 E) := by
   rw [mem_differentIdeal_iff] at hx ⊢
   rw [Submodule.mem_div_iff_forall_mul_mem] at hx ⊢
   intro y hy
@@ -49,7 +53,8 @@ theorem smul_mem_differentIdeal (σ : E ≃ₐ[ℚ] E) {x : 𝓞 E} (hx : x ∈ 
   refine Submodule.mem_one.mpr ⟨σ • o, ?_⟩
   rw [algebraMap_smul_oe, ho, algebraMap_smul_oe, map_mul, AlgEquiv.apply_symm_apply]
 
-theorem smul_differentIdeal (σ : E ≃ₐ[ℚ] E) : σ • differentIdeal ℤ (𝓞 E) = differentIdeal ℤ (𝓞 E) := by
+theorem smul_differentIdeal (σ : E ≃ₐ[ℚ] E)
+    : σ • differentIdeal ℤ (𝓞 E) = differentIdeal ℤ (𝓞 E) := by
   ext x
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem]
   constructor
@@ -58,13 +63,15 @@ theorem smul_differentIdeal (σ : E ≃ₐ[ℚ] E) : σ • differentIdeal ℤ (
   · intro h
     exact smul_mem_differentIdeal σ⁻¹ h
 
-theorem smul_span_nat (σ : E ≃ₐ[ℚ] E) (ℓ : ℕ) :
-    σ • Ideal.span {(ℓ : 𝓞 E)} = Ideal.span {(ℓ : 𝓞 E)} := by
+theorem smul_span_nat (σ : E ≃ₐ[ℚ] E) (ℓ : ℕ)
+    : σ • Ideal.span {(ℓ : 𝓞 E)} = Ideal.span {(ℓ : 𝓞 E)} := by
   rw [Ideal.pointwise_smul_def, Ideal.map_span, Set.image_singleton, map_natCast]
 
-theorem count_smul (σ : E ≃ₐ[ℚ] E) {P X : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ ⊥) (hQ : (σ • P).IsPrime)
-    (hQ0 : σ • P ≠ ⊥) (hX : X ≠ ⊥) :
-    (normalizedFactors (σ • X)).count (σ • P) = (normalizedFactors X).count P := by
+theorem count_smul
+    (σ : E ≃ₐ[ℚ] E)
+    {P X : Ideal (𝓞 E)}
+    (hP : P.IsPrime) (hP0 : P ≠ ⊥) (hQ : (σ • P).IsPrime) (hQ0 : σ • P ≠ ⊥) (hX : X ≠ ⊥)
+    : (normalizedFactors (σ • X)).count (σ • P) = (normalizedFactors X).count P := by
   let f := MulDistribMulAction.toMulEquiv (Ideal (𝓞 E)) σ
   have hf : ∀ I : Ideal (𝓞 E), f I = σ • I := fun _ => rfl
   have hX' : (normalizedFactors X).prod = X :=
@@ -86,15 +93,22 @@ section Norm
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem padicValNat_multiset_prod (ℓ : ℕ) [Fact ℓ.Prime] (s : Multiset ℕ) (h : ∀ x ∈ s, x ≠ 0) :
-    padicValNat ℓ s.prod = (s.map (padicValNat ℓ)).sum := by
+theorem padicValNat_multiset_prod (ℓ : ℕ) [Fact ℓ.Prime] (s : Multiset ℕ) (h : ∀ x ∈ s, x ≠ 0)
+    : padicValNat ℓ s.prod = (s.map (padicValNat ℓ)).sum := by
   induction s using Multiset.induction_on with
   | empty => simp [Nat.padicValNat_def]
   | cons b s ih =>
     have hb : b ≠ 0 := h b (Multiset.mem_cons_self b s)
     have hs : ∀ x ∈ s, x ≠ 0 := fun x hx => h x (Multiset.mem_cons_of_mem hx)
     have hp : s.prod ≠ 0 := Multiset.prod_ne_zero (fun h0 => hs 0 h0 rfl)
-    rw [Multiset.prod_cons, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) hb hp, Multiset.map_cons, Multiset.sum_cons, ih hs]
+    rw [Multiset.prod_cons,
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        hb hp,
+      Multiset.map_cons, Multiset.sum_cons, ih hs]
 
 theorem natCast_ne_zero_oe (ℓ : ℕ) [hℓ : Fact ℓ.Prime] : (ℓ : 𝓞 E) ≠ 0 := by
   intro h
@@ -106,25 +120,29 @@ theorem span_nat_ne_bot (ℓ : ℕ) [Fact ℓ.Prime] : Ideal.span {(ℓ : 𝓞 E
   rw [Ne, Ideal.span_singleton_eq_bot]
   exact natCast_ne_zero_oe ℓ
 
-theorem mem_factors_span (ℓ : ℕ) [Fact ℓ.Prime] {Q : Ideal (𝓞 E)} (hQ : Q.IsPrime) (hQ0 : Q ≠ ⊥)
-    (hl : (ℓ : 𝓞 E) ∈ Q) : Q ∈ normalizedFactors (Ideal.span {(ℓ : 𝓞 E)}) := by
+theorem mem_factors_span
+    (ℓ : ℕ) [Fact ℓ.Prime] {Q : Ideal (𝓞 E)} (hQ : Q.IsPrime) (hQ0 : Q ≠ ⊥) (hl : (ℓ : 𝓞 E) ∈ Q)
+    : Q ∈ normalizedFactors (Ideal.span {(ℓ : 𝓞 E)}) := by
   rw [Ideal.mem_normalizedFactors_iff (span_nat_ne_bot ℓ)]
   exact ⟨hQ, (Ideal.span_singleton_le_iff_mem Q).mpr hl⟩
 
-theorem of_mem_factors_span (ℓ : ℕ) [Fact ℓ.Prime] {Q : Ideal (𝓞 E)}
-    (hQ : Q ∈ normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})) : Q.IsPrime ∧ Q ≠ ⊥ ∧ (ℓ : 𝓞 E) ∈ Q := by
+theorem of_mem_factors_span
+    (ℓ : ℕ) [Fact ℓ.Prime] {Q : Ideal (𝓞 E)} (hQ : Q ∈ normalizedFactors (Ideal.span {(ℓ : 𝓞 E)}))
+    : Q.IsPrime ∧ Q ≠ ⊥ ∧ (ℓ : 𝓞 E) ∈ Q := by
   have hQ' := (Ideal.mem_normalizedFactors_iff (span_nat_ne_bot ℓ)).mp hQ
   refine ⟨hQ'.1, ?_, (Ideal.span_singleton_le_iff_mem Q).mp hQ'.2⟩
   intro h0
   rw [h0, le_bot_iff] at hQ'
   exact span_nat_ne_bot ℓ hQ'.2
 
-theorem padicValNat_absNorm_eq_sum (ℓ : ℕ) [Fact ℓ.Prime] {X : Ideal (𝓞 E)} (hX : X ≠ ⊥) :
-    padicValNat ℓ (Ideal.absNorm X) = ∑ Q ∈ (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset,
-      (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q) := by
+theorem padicValNat_absNorm_eq_sum (ℓ : ℕ) [Fact ℓ.Prime] {X : Ideal (𝓞 E)} (hX : X ≠ ⊥)
+    : padicValNat ℓ (Ideal.absNorm X)
+      = ∑ Q ∈ (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset,
+        (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q) := by
   classical
-  have hv : ∀ Q : Ideal (𝓞 E), Q.IsPrime → Q ≠ ⊥ → (ℓ : 𝓞 E) ∉ Q →
-      padicValNat ℓ (Ideal.absNorm Q) = 0 := by
+  have hv
+      : ∀ Q : Ideal (𝓞 E),
+        Q.IsPrime → Q ≠ ⊥ → (ℓ : 𝓞 E) ∉ Q → padicValNat ℓ (Ideal.absNorm Q) = 0 := by
     intro Q hQp hQ0 hlQ
     rw [Nat.padicValNat_def]
     apply multiplicity_eq_zero_of_not_dvd
@@ -142,7 +160,8 @@ theorem padicValNat_absNorm_eq_sum (ℓ : ℕ) [Fact ℓ.Prime] {X : Ideal (𝓞
       rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, Nat.card_eq_fintype_card]
     rw [hN, hcard] at hdvd
     have heq : ℓ = ringChar (𝓞 E ⧸ Q) :=
-      (Nat.prime_dvd_prime_iff_eq (Fact.out : ℓ.Prime) hp).mp ((Fact.out : ℓ.Prime).dvd_of_dvd_pow hdvd)
+      (Nat.prime_dvd_prime_iff_eq (Fact.out : ℓ.Prime) hp).mp
+        ((Fact.out : ℓ.Prime).dvd_of_dvd_pow hdvd)
     apply hlQ
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast, heq, ringChar.Nat.cast_ringChar]
   have hX' : (normalizedFactors X).prod = X :=
@@ -159,32 +178,34 @@ theorem padicValNat_absNorm_eq_sum (ℓ : ℕ) [Fact ℓ.Prime] {X : Ideal (𝓞
   simp only [smul_eq_mul, Function.comp_apply]
   set A := (normalizedFactors X).toFinset
   set B := (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset
-  calc ∑ Q ∈ A, (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q)
-      = ∑ Q ∈ A ∪ B, (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q) := by
-        apply Finset.sum_subset Finset.subset_union_left
-        intro Q hQ hQA
-        have hQB : Q ∈ B := by
-          rcases Finset.mem_union.mp hQ with h | h
-          · exact absurd h hQA
-          · exact h
-        have hc : (normalizedFactors X).count Q = 0 :=
-          Multiset.count_eq_zero.mpr (fun h => hQA (Multiset.mem_toFinset.mpr h))
-        rw [hc, zero_mul]
+  calc
+    ∑ Q ∈ A, (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q)
+        = ∑ Q ∈ A ∪ B, (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q) := by
+      apply Finset.sum_subset Finset.subset_union_left
+      intro Q hQ hQA
+      have hQB : Q ∈ B := by
+        rcases Finset.mem_union.mp hQ with h | h
+        · exact absurd h hQA
+        · exact h
+      have hc : (normalizedFactors X).count Q = 0 :=
+        Multiset.count_eq_zero.mpr (fun h => hQA (Multiset.mem_toFinset.mpr h))
+      rw [hc, zero_mul]
     _ = ∑ Q ∈ B, (normalizedFactors X).count Q * padicValNat ℓ (Ideal.absNorm Q) := by
-        symm
-        apply Finset.sum_subset Finset.subset_union_right
-        intro Q hQ hQB
-        have hQA : Q ∈ (normalizedFactors X) := by
-          rcases Finset.mem_union.mp hQ with h | h
-          · exact Multiset.mem_toFinset.mp h
-          · exact absurd h hQB
-        have hQp : Q.IsPrime := Ideal.isPrime_of_prime (prime_of_normalized_factor Q hQA)
-        have hQ0 : Q ≠ ⊥ := ne_zero_of_mem_normalizedFactors hQA
-        have hl : (ℓ : 𝓞 E) ∉ Q := fun h =>
-          hQB (Multiset.mem_toFinset.mpr (mem_factors_span ℓ hQp hQ0 h))
-        rw [hv Q hQp hQ0 hl, mul_zero]
+      symm
+      apply Finset.sum_subset Finset.subset_union_right
+      intro Q hQ hQB
+      have hQA : Q ∈ (normalizedFactors X) := by
+        rcases Finset.mem_union.mp hQ with h | h
+        · exact Multiset.mem_toFinset.mp h
+        · exact absurd h hQB
+      have hQp : Q.IsPrime := Ideal.isPrime_of_prime (prime_of_normalized_factor Q hQA)
+      have hQ0 : Q ≠ ⊥ := ne_zero_of_mem_normalizedFactors hQA
+      have hl : (ℓ : 𝓞 E) ∉ Q := fun h =>
+        hQB (Multiset.mem_toFinset.mpr (mem_factors_span ℓ hQp hQ0 h))
+      rw [hv Q hQp hQ0 hl, mul_zero]
 
-theorem absNorm_span_nat (ℓ : ℕ) : Ideal.absNorm (Ideal.span {(ℓ : 𝓞 E)}) = ℓ ^ Module.finrank ℚ E := by
+theorem absNorm_span_nat (ℓ : ℕ)
+    : Ideal.absNorm (Ideal.span {(ℓ : 𝓞 E)}) = ℓ ^ Module.finrank ℚ E := by
   rw [Ideal.absNorm_span_singleton, ← map_natCast (algebraMap ℤ (𝓞 E)), Algebra.norm_algebraMap,
     NumberField.RingOfIntegers.rank, Int.natAbs_pow, Int.natAbs_natCast]
 
@@ -192,8 +213,11 @@ end Norm
 
 section Main
 
-theorem liesOver_span (E : Type) [Field E] [NumberField E] (ℓ : ℕ) (hℓ : ℓ.Prime) {P : Ideal (𝓞 E)}
-    (hP : P.IsPrime) (hl : (ℓ : 𝓞 E) ∈ P) : P.LiesOver (Ideal.span {(ℓ : ℤ)}) := by
+theorem liesOver_span
+    (E : Type) [Field E] [NumberField E]
+    (ℓ : ℕ) (hℓ : ℓ.Prime)
+    {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hl : (ℓ : 𝓞 E) ∈ P)
+    : P.LiesOver (Ideal.span {(ℓ : ℤ)}) := by
   have hne : (ℓ : ℤ) ≠ 0 := by exact_mod_cast hℓ.ne_zero
   have hpr : (Ideal.span {(ℓ : ℤ)}).IsPrime :=
     (Ideal.span_singleton_prime hne).mpr (Nat.prime_iff_prime_int.mp hℓ)
@@ -229,33 +253,44 @@ theorem diffExp : DiffExpSt := by
     exact multiplicity_eq_zero_of_not_dvd hm
   have hA : padicValNat ℓ (Ideal.absNorm (differentIdeal ℤ (𝓞 E))) = a := by
     rw [hnorm, hd,
-      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (pow_ne_zero _ hℓ.ne_zero) hm0,
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (pow_ne_zero _ hℓ.ne_zero) hm0,
       hpow, hmval, add_zero]
   have hn : padicValNat ℓ (Ideal.absNorm (Ideal.span {(ℓ : 𝓞 E)})) = Module.finrank ℚ E := by
     rw [absNorm_span_nat, Nat.padicValNat_def]
     exact multiplicity_base_pow hℓ.one_lt (Module.finrank ℚ E)
-  have htrans : ∀ Q ∈ (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset,
-      ∃ σ : E ≃ₐ[ℚ] E, σ • P = Q := by
+  have htrans
+      : ∀ Q ∈ (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset, ∃ σ : E ≃ₐ[ℚ] E,
+        σ • P = Q := by
     intro Q hQ
     obtain ⟨hQp, -, hlQ⟩ := of_mem_factors_span ℓ (Multiset.mem_toFinset.mp hQ)
     haveI := hP
     haveI := hQp
     have hPQ : P.under ℤ = Q.under ℤ := by
       rw [← (liesOver_span E ℓ hℓ hP hl).over, ← (liesOver_span E ℓ hℓ hQp hlQ).over]
-    obtain ⟨σ, hσ⟩ := Algebra.IsInvariant.exists_smul_of_under_eq (A := ℤ) (B := 𝓞 E) (G := E ≃ₐ[ℚ] E) P Q hPQ
+    obtain ⟨σ, hσ⟩ :=
+      Algebra.IsInvariant.exists_smul_of_under_eq (A := ℤ) (B := 𝓞 E) (G := E ≃ₐ[ℚ] E) P Q hPQ
     exact ⟨σ, hσ.symm⟩
   have hN : ∀ (σ : E ≃ₐ[ℚ] E) (Q : Ideal (𝓞 E)), Ideal.absNorm (σ • Q) = Ideal.absNorm Q := by
     intro σ Q
-    rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
+    rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply,
+      Submodule.cardQuot_apply]
     exact Nat.card_congr (Ideal.quotientEquiv Q (σ • Q) (MulSemiringAction.toRingEquiv _ _ σ)
       (by rw [Ideal.pointwise_smul_def]; rfl)).toEquiv.symm
-  have hconst : ∀ X : Ideal (𝓞 E), X ≠ ⊥ → (∀ σ : E ≃ₐ[ℚ] E, σ • X = X) →
-      padicValNat ℓ (Ideal.absNorm X) =
-        (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset.card *
-          ((normalizedFactors X).count P * padicValNat ℓ (Ideal.absNorm P)) := by
+  have hconst
+      : ∀ X : Ideal (𝓞 E),
+        X ≠ ⊥ → (∀ σ : E ≃ₐ[ℚ] E, σ • X = X)
+          → padicValNat ℓ (Ideal.absNorm X)
+            = (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).toFinset.card
+              * ((normalizedFactors X).count P * padicValNat ℓ (Ideal.absNorm P)) := by
     intro X hX hXσ
     rw [padicValNat_absNorm_eq_sum ℓ hX,
-      Finset.sum_congr rfl (g := fun _ => (normalizedFactors X).count P * padicValNat ℓ (Ideal.absNorm P)),
+      Finset.sum_congr rfl
+        (g := fun _ => (normalizedFactors X).count P * padicValNat ℓ (Ideal.absNorm P)),
       Finset.sum_const, smul_eq_mul]
     intro Q hQ
     obtain ⟨σ, rfl⟩ := htrans Q hQ
@@ -270,8 +305,11 @@ theorem diffExp : DiffExpSt := by
   rw [h1, h2]
   ring
 
-theorem count_span_pos (E : Type) [Field E] [NumberField E] (ℓ : ℕ) (hℓ : ℓ.Prime) {P : Ideal (𝓞 E)}
-    (hP : P.IsPrime) (hl : (ℓ : 𝓞 E) ∈ P) : 0 < (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).count P := by
+theorem count_span_pos
+    (E : Type) [Field E] [NumberField E]
+    (ℓ : ℕ) (hℓ : ℓ.Prime)
+    {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hl : (ℓ : 𝓞 E) ∈ P)
+    : 0 < (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).count P := by
   haveI : Fact ℓ.Prime := ⟨hℓ⟩
   have hP0 : P ≠ ⊥ := by
     rintro rfl

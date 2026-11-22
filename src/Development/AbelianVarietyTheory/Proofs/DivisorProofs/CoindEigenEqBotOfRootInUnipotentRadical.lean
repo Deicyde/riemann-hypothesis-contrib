@@ -9,15 +9,29 @@ open GlobalTheory.FinGL Formalism.L2.DIV Module
 
 namespace GlobalTheory.FinGL.MackeyRadical
 
-theorem exists_elem {F : Type} [Field F] {r : ℕ} {i j : Fin r} (h : i ≠ j) (t : F) :
-    ∃ g : GL (Fin r) F, ∀ k l, (g : Matrix (Fin r) (Fin r) F) k l =
-      (1 : Matrix (Fin r) (Fin r) F) k l + if i = k ∧ j = l then t else 0 := by
+theorem exists_elem {F : Type} [Field F] {r : ℕ} {i j : Fin r} (h : i ≠ j) (t : F)
+    : ∃ g : GL (Fin r) F, ∀ k l,
+      (g : Matrix (Fin r) (Fin r) F) k l
+        = (1 : Matrix (Fin r) (Fin r) F) k l + if i = k ∧ j = l then t else 0 := by
   refine ⟨⟨Matrix.transvection i j t, Matrix.transvection i j (-t), ?_, ?_⟩, fun k l => ?_⟩
   · rw [Matrix.transvection_mul_transvection_same _ _ h, add_neg_cancel, Matrix.transvection_zero]
   · rw [Matrix.transvection_mul_transvection_same _ _ h, neg_add_cancel, Matrix.transvection_zero]
   · simp [Matrix.transvection, Matrix.single]
 
-theorem eig_eq_bot_of_radical : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (b : Fin r → ℕ) (σ : Representation ℂ (blockTri (κ := F) b) V), IsCuspDatum b σ → ∀ (j : ℕ) (w : Equiv.Perm (Fin r)) (x : GL (Fin r) F), (∀ (g : GL (Fin r) F) (a c : Fin r), ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) a c = (g : Matrix (Fin r) (Fin r) F) (w a) (w c)) → ψ ≠ 1 → ∀ a c : Fin r, cutEdge j a c → b (w a) < b (w c) → eig σ {p | x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r} (fun p => ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x))) = ⊥ := by
+theorem eig_eq_bot_of_radical
+    : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
+        (b : Fin r → ℕ) (σ : Representation ℂ (blockTri (κ := F) b) V),
+      IsCuspDatum b σ
+        → ∀ (j : ℕ) (w : Equiv.Perm (Fin r)) (x : GL (Fin r) F),
+          (∀ (g : GL (Fin r) F) (a c : Fin r),
+              ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) a c
+                = (g : Matrix (Fin r) (Fin r) F) (w a) (w c))
+            → ψ ≠ 1
+            → ∀ a c : Fin r,
+              cutEdge j a c → b (w a) < b (w c)
+                → eig σ {p | x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r}
+                    (fun p => ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x)))
+                  = ⊥ := by
   intro F _ ψ r V _ _ b σ hσ j w x hx hψ a c hac hb
   obtain ⟨t, ht⟩ : ∃ t, ψ t ≠ 1 := by
     by_contra h
@@ -38,8 +52,10 @@ theorem eig_eq_bot_of_radical : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r
     rw [hg, if_neg, add_zero]
     rintro ⟨rfl, rfl⟩
     exact hb.ne hkl
-  have hc : ∀ k l, ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) k l =
-      (1 : Matrix (Fin r) (Fin r) F) k l + if a = k ∧ c = l then t else 0 := by
+  have hc
+      : ∀ k l,
+        ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) k l
+          = (1 : Matrix (Fin r) (Fin r) F) k l + if a = k ∧ c = l then t else 0 := by
     intro k l
     rw [hx, hg]
     simp [Matrix.one_apply]
@@ -54,13 +70,19 @@ theorem eig_eq_bot_of_radical : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r
       exact lt_irrefl _ hlt
   have hs : edgeSum (cutEdge j) (x⁻¹ * g * x) = t := by
     unfold edgeSum
-    have key : ∀ k l : Fin r, (if cutEdge j k l then ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) k l else 0) =
-        if l = c then (if k = a then t else 0) else 0 := by
+    have key
+        : ∀ k l : Fin r,
+          (if cutEdge j k l then
+             ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) k l
+           else
+             0)
+            = if l = c then (if k = a then t else 0) else 0 := by
       intro k l
       by_cases h : cutEdge j k l
       · have hkl : k ≠ l := fun e => by have := h.1; rw [e] at this; omega
         rw [if_pos h, hc, Matrix.one_apply_ne hkl, zero_add]
-        by_cases h1 : l = c <;> by_cases h2 : k = a <;> simp [h1, h2, @eq_comm _ a k, @eq_comm _ c l]
+        by_cases h1 : l = c <;> by_cases h2 : k = a
+          <;> simp [h1, h2, @eq_comm _ a k, @eq_comm _ c l]
       · rw [if_neg h]
         by_cases h1 : l = c <;> by_cases h2 : k = a <;> simp [h1, h2]
         subst h1 h2
@@ -70,7 +92,9 @@ theorem eig_eq_bot_of_radical : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r
   refine eq_bot_iff.2 fun v hv => ?_
   simp only [eig, Submodule.mem_iInf, LinearMap.mem_ker] at hv
   have := hv ⟨g, hgb⟩ hu
-  simp only [h1, hs, LinearMap.sub_apply, Module.End.one_apply, LinearMap.smul_apply, LinearMap.id_apply] at this
+  simp only [h1, hs, LinearMap.sub_apply, Module.End.one_apply, LinearMap.smul_apply,
+      LinearMap.id_apply]
+    at this
   have h2 : (1 - ψ t) • v = 0 := by rw [sub_smul, one_smul]; exact this
   rcases smul_eq_zero.1 h2 with h | h
   · exact absurd (sub_eq_zero.1 h).symm ht

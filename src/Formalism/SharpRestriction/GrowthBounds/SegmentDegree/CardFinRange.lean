@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf.TE
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 section Dict
 
@@ -22,9 +23,10 @@ theorem idx_card (i : Fin (segN F j)) : ((F.letters j).filter (· < segE F j i))
   have hIio : (Finset.univ.filter (· < i) : Finset (Fin (segN F j))) = Finset.Iio i := by
     ext k
     simp
-  have hfe : (F.letters j).filter (· < segE F j i) =
-      (Finset.univ.filter (· < i)).image
-        (fun k : Fin (segN F j) => (((F.letters j).orderIsoOfFin rfl k : {x // x ∈ F.letters j}) : ℤ)) := by
+  have hfe
+      : (F.letters j).filter (· < segE F j i)
+        = (Finset.univ.filter (· < i)).image (fun k : Fin (segN F j) =>
+          (((F.letters j).orderIsoOfFin rfl k : {x // x ∈ F.letters j}) : ℤ)) := by
     ext x
     simp only [Finset.mem_filter, Finset.mem_image, Finset.mem_univ, true_and]
     constructor
@@ -32,10 +34,11 @@ theorem idx_card (i : Fin (segN F j)) : ((F.letters j).filter (· < segE F j i))
       refine ⟨((F.letters j).orderIsoOfFin rfl).symm ⟨x, hx⟩, ?_, by simp⟩
       exact (OrderIso.symm_apply_lt _).mpr hlt
     · rintro ⟨k, hk, rfl⟩
-      exact ⟨(((F.letters j).orderIsoOfFin rfl) k).2, ((F.letters j).orderIsoOfFin rfl).strictMono hk⟩
-  have hinj : Function.Injective
-      (fun k : Fin (segN F j) => (((F.letters j).orderIsoOfFin rfl k : {x // x ∈ F.letters j}) : ℤ)) :=
-    fun a b h => (OrderIso.injective _) (Subtype.ext h)
+      exact
+        ⟨(((F.letters j).orderIsoOfFin rfl) k).2, ((F.letters j).orderIsoOfFin rfl).strictMono hk⟩
+  have hinj : Function.Injective (fun k : Fin (segN F j) =>
+      (((F.letters j).orderIsoOfFin rfl k : {x // x ∈ F.letters j}) : ℤ)) := fun a b h =>
+    (OrderIso.injective _) (Subtype.ext h)
   rw [hfe, Finset.card_image_of_injective _ hinj, hIio, Fin.card_Iio]
 
 variable {F} {j}
@@ -53,14 +56,16 @@ theorem fr_lt (hV : F.Valid L₁ N₁) (J : ℤ) : ∀ i i', i < i' → i' < r �
       exact hinc J i hr
 
 omit [NeZero r] in
-theorem fr_le (hV : F.Valid L₁ N₁) (J : ℤ) (i i' : ℕ) (h : i ≤ i') (hr : i' < r) : F.fr J i ≤ F.fr J i' := by
+theorem fr_le (hV : F.Valid L₁ N₁) (J : ℤ) (i i' : ℕ) (h : i ≤ i') (hr : i' < r)
+    : F.fr J i ≤ F.fr J i' := by
   rcases Nat.eq_or_lt_of_le h with rfl | h'
   · exact le_rfl
   · exact le_of_lt (fr_lt hV J i i' h' hr)
 
 omit [NeZero r] in
-theorem fr_inj (hV : F.Valid L₁ N₁) (J : ℤ) (i i' : ℕ) (hi : i < r) (hi' : i' < r) (h : F.fr J i = F.fr J i') :
-    i = i' := by
+theorem fr_inj
+    (hV : F.Valid L₁ N₁) (J : ℤ) (i i' : ℕ) (hi : i < r) (hi' : i' < r) (h : F.fr J i = F.fr J i')
+    : i = i' := by
   rcases lt_trichotomy i i' with h1 | h1 | h1
   · exact absurd h (ne_of_lt (fr_lt hV J i i' h1 hi'))
   · exact h1
@@ -81,7 +86,8 @@ theorem frj_mem (hV : F.Valid L₁ N₁) (j : ℤ) (i' : ℕ) (h : i' < r) : F.f
   have h3 := fr_le hV j 0 i' (by omega) h
   linarith
 
-theorem frp_mem (hV : F.Valid L₁ N₁) (j : ℤ) (i' : ℕ) (h : i' < r) : F.fr (j - 1) i' ∈ F.letters j := by
+theorem frp_mem (hV : F.Valid L₁ N₁) (j : ℤ) (i' : ℕ) (h : i' < r)
+    : F.fr (j - 1) i' ∈ F.letters j := by
   obtain ⟨_, _, _, _, hTT, _⟩ := id hV
   unfold Frames.letters
   rw [Finset.mem_filter, Finset.mem_Icc]
@@ -94,17 +100,20 @@ theorem frp_mem (hV : F.Valid L₁ N₁) (j : ℤ) (i' : ℕ) (h : i' < r) : F.f
 private theorem segE_mem_lemma_6 (J : ℤ) (i : Fin (segN F J)) : segE F J i ∈ F.letters J :=
   ((F.letters J).orderIsoOfFin rfl i).2
 
-private theorem segE_lt_lemma_7 (J : ℤ) {a b : Fin (segN F J)} : segE F J a < segE F J b ↔ a < b := by
+private theorem segE_lt_lemma_7 (J : ℤ) {a b : Fin (segN F J)}
+    : segE F J a < segE F J b ↔ a < b := by
   unfold segE
   rw [Subtype.coe_lt_coe]
   exact OrderIso.lt_iff_lt _
 
-private theorem segE_le_lemma_8 (J : ℤ) {a b : Fin (segN F J)} : segE F J a ≤ segE F J b ↔ a ≤ b := by
+private theorem segE_le_lemma_8 (J : ℤ) {a b : Fin (segN F J)}
+    : segE F J a ≤ segE F J b ↔ a ≤ b := by
   unfold segE
   rw [Subtype.coe_le_coe]
   exact OrderIso.le_iff_le _
 
-private theorem segE_surj_lemma_9 (J : ℤ) {x : ℤ} (hx : x ∈ F.letters J) : ∃ k : Fin (segN F J), segE F J k = x :=
+private theorem segE_surj_lemma_9 (J : ℤ) {x : ℤ} (hx : x ∈ F.letters J)
+    : ∃ k : Fin (segN F J), segE F J k = x :=
   ⟨((F.letters J).orderIsoOfFin rfl).symm ⟨x, hx⟩, by unfold segE; simp⟩
 
 private theorem segE_inj_lemma_10 (J : ℤ) : Function.Injective (segE F J) := by
@@ -114,8 +123,9 @@ private theorem segE_inj_lemma_10 (J : ℤ) : Function.Injective (segE F J) := b
   · exact h'
   · exact absurd h (ne_of_gt ((segE_lt_lemma_7 J).mpr h'))
 
-private theorem gap_lemma_2 (hV : F.Valid L₁ N₁) (J : ℤ) : ∀ k, k < r → ∀ x, F.fr J 0 ≤ x → x < F.fr J k →
-    posOf n' x ∈ F.TT → ∃ m < k, x = F.fr J m := by
+private theorem gap_lemma_2 (hV : F.Valid L₁ N₁) (J : ℤ)
+    : ∀ k,
+      k < r → ∀ x, F.fr J 0 ≤ x → x < F.fr J k → posOf n' x ∈ F.TT → ∃ m < k, x = F.fr J m := by
   obtain ⟨_, _, _, _, _, hgap, _⟩ := id hV
   intro k
   induction k with
@@ -130,9 +140,10 @@ private theorem gap_lemma_2 (hV : F.Valid L₁ N₁) (J : ℤ) : ∀ k, k < r �
     · exact ⟨k, by omega, h3⟩
     · exact absurd hx (hgap J k x hk h3 h2)
 
-private theorem countW_lemma_3 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi' : i' < r) :
-    ((F.letters J).filter (· < F.fr (J - 1) i')).card = i' := by
-  have hfe : (F.letters J).filter (· < F.fr (J - 1) i') = (Finset.range i').image (F.fr (J - 1)) := by
+private theorem countW_lemma_3 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi' : i' < r)
+    : ((F.letters J).filter (· < F.fr (J - 1) i')).card = i' := by
+  have hfe
+      : (F.letters J).filter (· < F.fr (J - 1) i') = (Finset.range i').image (F.fr (J - 1)) := by
     ext x
     simp only [Finset.mem_filter, Finset.mem_image, Finset.mem_range]
     constructor
@@ -148,8 +159,8 @@ private theorem countW_lemma_3 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi
   simp only [Finset.coe_range, Set.mem_Iio] at ha hb
   exact fr_inj hV (J - 1) a b (by omega) (by omega) hab
 
-private theorem countT_lemma_4 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi' : i' < r) :
-    ((F.letters J).filter (F.fr J i' ≤ ·)).card = r - i' := by
+private theorem countT_lemma_4 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi' : i' < r)
+    : ((F.letters J).filter (F.fr J i' ≤ ·)).card = r - i' := by
   have hfe : (F.letters J).filter (F.fr J i' ≤ ·) = (Finset.Ico i' r).image (F.fr J) := by
     ext x
     simp only [Finset.mem_filter, Finset.mem_image, Finset.mem_Ico]
@@ -158,8 +169,9 @@ private theorem countT_lemma_4 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi
       unfold Frames.letters at hx
       rw [Finset.mem_filter, Finset.mem_Icc] at hx
       rcases lt_or_eq_of_le hx.1.2 with hlt | heq
-      · obtain ⟨m, hm, hxm⟩ := gap_lemma_2 hV J (r - 1) (by omega) x
-          (le_trans (fr_le hV J 0 i' (Nat.zero_le _) hi') hle) hlt hx.2
+      · obtain ⟨m, hm, hxm⟩ :=
+          gap_lemma_2 hV J (r - 1) (by omega) x (le_trans (fr_le hV J 0 i' (Nat.zero_le _) hi') hle)
+            hlt hx.2
         subst hxm
         refine ⟨m, ⟨?_, by omega⟩, rfl⟩
         by_contra hc
@@ -172,11 +184,13 @@ private theorem countT_lemma_4 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi
   simp only [Finset.coe_Ico, Set.mem_Ico] at ha hb
   exact fr_inj hV J a b ha.2 hb.2 hab
 
-private theorem countTlt_lemma_5 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi' : i' < r) :
-    ((F.letters J).filter (· < F.fr J i')).card + (r - i') = (F.letters J).card := by
+private theorem countTlt_lemma_5 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (hi' : i' < r)
+    : ((F.letters J).filter (· < F.fr J i')).card + (r - i') = (F.letters J).card := by
   rw [← countT_lemma_4 hV J i' hi']
   have e := Finset.card_sdiff_add_card_eq_card (Finset.filter_subset (F.fr J i' ≤ ·) (F.letters J))
-  have hs : (F.letters J) \ (F.letters J).filter (F.fr J i' ≤ ·) = (F.letters J).filter (· < F.fr J i') := by
+  have hs
+      : (F.letters J) \ (F.letters J).filter (F.fr J i' ≤ ·)
+        = (F.letters J).filter (· < F.fr J i') := by
     ext y
     simp only [Finset.mem_sdiff, Finset.mem_filter]
     constructor
@@ -187,14 +201,17 @@ private theorem countTlt_lemma_5 (hV : F.Valid L₁ N₁) (J : ℤ) (i' : ℕ) (
   rw [hs] at e
   exact e
 
-theorem idx_w (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (i' : ℕ) (hi' : i' < r) (h : segE F j i = F.fr (j - 1) i') :
-    i.val = i' := by
+theorem idx_w
+    (hV : F.Valid L₁ N₁)
+    (i : Fin (segN F j)) (i' : ℕ) (hi' : i' < r) (h : segE F j i = F.fr (j - 1) i')
+    : i.val = i' := by
   have h1 := idx_card F j i
   rw [h, countW_lemma_3 hV j i' hi'] at h1
   exact h1.symm
 
-theorem idx_tau (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (i' : ℕ) (hi' : i' < r) (h : segE F j i = F.fr j i') :
-    i.val + (r - i') = segN F j := by
+theorem idx_tau
+    (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (i' : ℕ) (hi' : i' < r) (h : segE F j i = F.fr j i')
+    : i.val + (r - i') = segN F j := by
   have h1 := idx_card F j i
   rw [h] at h1
   have h2 := countTlt_lemma_5 hV j i' hi'
@@ -209,8 +226,8 @@ theorem r_le_segN (hV : F.Valid L₁ N₁) (j : ℤ) : r ≤ segN F j := by
   unfold segN
   omega
 
-theorem dict_tau (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (i' : Fin r) :
-    segE F j i = F.fr j i'.val ↔ i.val = (segN F j - r) + i'.val := by
+theorem dict_tau (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (i' : Fin r)
+    : segE F j i = F.fr j i'.val ↔ i.val = (segN F j - r) + i'.val := by
   have hr := r_le_segN hV j
   have hi' := i'.isLt
   constructor
@@ -226,8 +243,8 @@ theorem dict_tau (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (i' : Fin r) :
     subst hki
     exact hk
 
-theorem dict_early (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) :
-    segE F j i < F.fr j 0 ↔ i.val < segN F j - r := by
+theorem dict_early (hV : F.Valid L₁ N₁) (i : Fin (segN F j))
+    : segE F j i < F.fr j 0 ↔ i.val < segN F j - r := by
   have hr0 : 0 < r := Nat.pos_of_ne_zero (NeZero.ne r)
   have hr := r_le_segN hV j
   obtain ⟨k, hk⟩ := segE_surj_lemma_9 j (frj_mem hV j 0 hr0)
@@ -236,7 +253,8 @@ theorem dict_early (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) :
   show i.val < segN F j - r + 0 ↔ i.val < segN F j - r
   omega
 
-theorem dict_wE (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (h : i.val < r) : segE F j i = F.fr (j - 1) i.val := by
+theorem dict_wE (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (h : i.val < r)
+    : segE F j i = F.fr (j - 1) i.val := by
   obtain ⟨k, hk⟩ := segE_surj_lemma_9 j (frp_mem hV j i.val h)
   have hki : k = i := Fin.ext (idx_w hV k i.val h hk)
   subst hki
@@ -252,8 +270,8 @@ theorem dict_w (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) : F.IsW j (segE F j
   show i.val ≤ r - 1 ↔ i.val < r
   omega
 
-theorem mem_LLset_iff (hV : F.Valid L₁ N₁) (x : ℤ) :
-    x ∈ F.LLset j ↔ x ∈ F.letters j ∧ ¬ F.IsW j x ∧ x < F.fr j 0 := by
+theorem mem_LLset_iff (hV : F.Valid L₁ N₁) (x : ℤ)
+    : x ∈ F.LLset j ↔ x ∈ F.letters j ∧ ¬ F.IsW j x ∧ x < F.fr j 0 := by
   have hr0 : 0 < r := Nat.pos_of_ne_zero (NeZero.ne r)
   have h1 := fr_le hV (j - 1) 0 (r - 1) (Nat.zero_le _) (by omega)
   have h2 := fr_le hV j 0 (r - 1) (Nat.zero_le _) (by omega)
@@ -266,8 +284,8 @@ theorem mem_LLset_iff (hV : F.Valid L₁ N₁) (x : ℤ) :
   · rintro ⟨⟨_, hT⟩, ha, hb⟩
     exact ⟨⟨ha, hb⟩, hT⟩
 
-theorem dict_LL (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) :
-    segE F j i ∈ F.LLset j ↔ r ≤ i.val ∧ i.val < segN F j - r := by
+theorem dict_LL (hV : F.Valid L₁ N₁) (i : Fin (segN F j))
+    : segE F j i ∈ F.LLset j ↔ r ≤ i.val ∧ i.val < segN F j - r := by
   rw [mem_LLset_iff hV, dict_w hV, dict_early hV]
   have hm := segE_mem_lemma_6 j i
   constructor
@@ -276,8 +294,10 @@ theorem dict_LL (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) :
   · rintro ⟨h1, h2⟩
     exact ⟨hm, not_lt.mpr h1, h2⟩
 
-theorem LLset_eq_image (hV : F.Valid L₁ N₁) (j : ℤ) :
-    F.LLset j = (Finset.univ.filter fun i : Fin (segN F j) => r ≤ i.val ∧ i.val < segN F j - r).image (segE F j) := by
+theorem LLset_eq_image (hV : F.Valid L₁ N₁) (j : ℤ)
+    : F.LLset j
+      = (Finset.univ.filter fun i : Fin (segN F j) => r ≤ i.val ∧ i.val < segN F j - r).image
+        (segE F j) := by
   ext x
   simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
   constructor
@@ -289,9 +309,11 @@ theorem LLset_eq_image (hV : F.Valid L₁ N₁) (j : ℤ) :
     exact (dict_LL hV k).mpr hk
 
 omit [NeZero n'] [NeZero r] in
-theorem card_fin_range (N a b : ℕ) (hb : b ≤ N) :
-    (Finset.univ.filter fun i : Fin N => a ≤ i.val ∧ i.val < b).card = b - a := by
-  have hm : (Finset.univ.filter fun i : Fin N => a ≤ i.val ∧ i.val < b).map Fin.valEmbedding = Finset.Ico a b := by
+theorem card_fin_range (N a b : ℕ) (hb : b ≤ N)
+    : (Finset.univ.filter fun i : Fin N => a ≤ i.val ∧ i.val < b).card = b - a := by
+  have hm
+      : (Finset.univ.filter fun i : Fin N => a ≤ i.val ∧ i.val < b).map Fin.valEmbedding
+        = Finset.Ico a b := by
     ext y
     simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and, Fin.valEmbedding_apply,
       Finset.mem_Ico]
@@ -312,13 +334,16 @@ theorem two_r_le (hV : F.Valid L₁ N₁) (j : ℤ) : 2 * r ≤ segN F j - r := 
   rw [card_LLset hV j] at h1
   omega
 
-theorem card_LLset_le (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (hi : r ≤ i.val) (hi2 : i.val < segN F j - r) :
-    ((F.LLset j).filter (· ≤ segE F j i)).card = i.val + 1 - r := by
+theorem card_LLset_le
+    (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (hi : r ≤ i.val) (hi2 : i.val < segN F j - r)
+    : ((F.LLset j).filter (· ≤ segE F j i)).card = i.val + 1 - r := by
   have hiv := i.isLt
   rw [LLset_eq_image hV j]
-  have hfe : ((Finset.univ.filter fun k : Fin (segN F j) => r ≤ k.val ∧ k.val < segN F j - r).image
-      (segE F j)).filter (· ≤ segE F j i) =
-      (Finset.univ.filter fun k : Fin (segN F j) => r ≤ k.val ∧ k.val < i.val + 1).image (segE F j) := by
+  have hfe
+      : ((Finset.univ.filter fun k : Fin (segN F j) => r ≤ k.val ∧ k.val < segN F j - r).image
+          (segE F j)).filter (· ≤ segE F j i)
+        = (Finset.univ.filter fun k : Fin (segN F j) => r ≤ k.val ∧ k.val < i.val + 1).image
+          (segE F j) := by
     ext x
     simp only [Finset.mem_filter, Finset.mem_image, Finset.mem_univ, true_and]
     constructor
@@ -331,15 +356,17 @@ theorem card_LLset_le (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (hi : r ≤ 
       omega
   rw [hfe, Finset.card_image_of_injective _ (segE_inj_lemma_10 j), card_fin_range _ _ _ (by omega)]
 
-theorem dict_lateV (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (h : segN F j - r ≤ i.val + r) : Even (segE F j i) := by
+theorem dict_lateV (hV : F.Valid L₁ N₁) (i : Fin (segN F j)) (h : segN F j - r ≤ i.val + r)
+    : Even (segE F j i) := by
   obtain ⟨_, _, _, _, hTT, _, hLL, _⟩ := id hV
   have hr := r_le_segN hV j
   have h2r := two_r_le hV j
   have hiv := i.isLt
   by_cases hi : segN F j - r ≤ i.val
   · have hi' : i.val - (segN F j - r) < r := by omega
-    have he := (dict_tau hV i ⟨i.val - (segN F j - r), hi'⟩).mpr
-      (by show i.val = segN F j - r + (i.val - (segN F j - r)); omega)
+    have he :=
+      (dict_tau hV i ⟨i.val - (segN F j - r), hi'⟩).mpr
+        (by show i.val = segN F j - r + (i.val - (segN F j - r)); omega)
     rw [he]
     exact (hTT j _ hi').2
   · have hin : segE F j i ∈ F.LLset j := (dict_LL hV i).mpr ⟨by omega, by omega⟩

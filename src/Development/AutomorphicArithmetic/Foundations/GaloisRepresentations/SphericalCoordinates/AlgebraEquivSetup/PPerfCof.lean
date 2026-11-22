@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pPerfCof :
-    PerfCof := by
+theorem UpperTheory.Gal.W2.Seed.pPerfCof : PerfCof := by
   intro E _ _ _ A
   classical
   have hδ : A.δ ≠ 0 := by
@@ -26,7 +26,8 @@ theorem UpperTheory.Gal.W2.Seed.pPerfCof :
     by_contra hx0
     have h1 := LinearMap.congr_fun hx (A.δ * x)⁻¹
     rw [hΨ, mul_inv_cancel₀ (mul_ne_zero hδ hx0), LinearMap.zero_apply,
-      show (1 : E) = algebraMap ℚ E 1 from (map_one _).symm, Algebra.trace_algebraMap] at h1
+        show (1 : E) = algebraMap ℚ E 1 from (map_one _).symm, Algebra.trace_algebraMap]
+      at h1
     have hpos : 0 < Module.finrank ℚ E := Module.finrank_pos
     simp at h1
     omega
@@ -50,7 +51,8 @@ theorem UpperTheory.Gal.W2.Seed.pPerfCof :
     Nat.mul_pos (Int.natAbs_pos.mpr hy0) (Int.natAbs_pos.mpr hy0)
   have key : ∀ i z, A.trd (η i * z) = ((y.natAbs * y.natAbs : ℕ) : ℤ) * b.coord i z := by
     intro i
-    have hlin : A.trd ∘ₗ LinearMap.mulLeft ℤ (η i) = ((y.natAbs * y.natAbs : ℕ) : ℤ) • b.coord i := by
+    have hlin
+        : A.trd ∘ₗ LinearMap.mulLeft ℤ (η i) = ((y.natAbs * y.natAbs : ℕ) : ℤ) • b.coord i := by
       refine b.ext fun j => ?_
       apply Int.cast_injective (α := ℚ)
       have hb : bQ j = algebraMap (𝓞 E) E (b j) := NumberField.integralBasis_apply E j
@@ -72,8 +74,9 @@ theorem UpperTheory.Gal.W2.Seed.pPerfCof :
       · simp [Finsupp.single_apply, h]
     intro z
     exact LinearMap.congr_fun hlin z
-  have hdual : ∀ f : 𝓞 E →ₗ[ℤ] ℤ, ∃ x : 𝓞 E, ∀ z,
-      A.trd (x * z) = ((y.natAbs * y.natAbs : ℕ) : ℤ) * f z := by
+  have hdual
+      : ∀ f : 𝓞 E →ₗ[ℤ] ℤ, ∃ x : 𝓞 E, ∀ z,
+        A.trd (x * z) = ((y.natAbs * y.natAbs : ℕ) : ℤ) * f z := by
     intro f
     refine ⟨∑ i, f (b i) • η i, fun z => ?_⟩
     conv_rhs => rw [← b.sum_dual_apply_smul_coord f]
@@ -90,8 +93,11 @@ theorem UpperTheory.Gal.W2.Seed.pPerfCof :
     rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
     exact hc0
   obtain ⟨c', hc'⟩ := Ideal.mem_span_singleton.mp (Ideal.absNorm_mem (Ideal.span {A.c}))
-  refine ⟨y.natAbs * y.natAbs * Ideal.absNorm (Ideal.span {A.c}), Nat.mul_pos hDpos hN0,
-    fun q hq => ⟨_, hq, fun f => ?_, ⟨c' * ((y.natAbs * y.natAbs : ℕ) : 𝓞 E), ?_⟩⟩⟩
+  refine ⟨
+    y.natAbs * y.natAbs * Ideal.absNorm (Ideal.span {A.c}),
+    Nat.mul_pos hDpos hN0,
+    fun q hq => ⟨_, hq, fun f => ?_, ⟨c' * ((y.natAbs * y.natAbs : ℕ) : 𝓞 E), ?_⟩⟩
+  ⟩
   · obtain ⟨x, hx⟩ := hdual ((Ideal.absNorm (Ideal.span {A.c}) : ℤ) • f)
     refine ⟨x, fun z => ?_⟩
     rw [hx, LinearMap.smul_apply, smul_eq_mul]

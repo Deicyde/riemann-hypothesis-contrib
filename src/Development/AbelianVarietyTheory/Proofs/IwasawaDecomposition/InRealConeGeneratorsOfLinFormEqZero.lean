@@ -8,20 +8,24 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSmo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
-theorem inRCone_of_apply_eq_zero {X : Type} [AddCommGroup X] {m p : ℕ}
-    (δ : Fin m → LinearMap.BilinForm ℤ X) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ)
-    (e : Fin p ↪ Fin m) (β : LinearMap.BilinForm ℤ X) (hnn : ∀ i, 0 ≤ h (δ i))
-    (hz : ∀ i, h (δ i) = 0 → i ∈ Set.range e) (hβ : InRCone δ β) (hβ0 : h β = 0) :
-    InRCone (fun k => δ (e k)) β := by
+theorem inRCone_of_apply_eq_zero
+    {X : Type} [AddCommGroup X]
+    {m p : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X)
+    (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) (e : Fin p ↪ Fin m) (β : LinearMap.BilinForm ℤ X)
+    (hnn : ∀ i, 0 ≤ h (δ i)) (hz : ∀ i, h (δ i) = 0 → i ∈ Set.range e) (hβ : InRCone δ β)
+    (hβ0 : h β = 0)
+    : InRCone (fun k => δ (e k)) β := by
   obtain ⟨c, hc, hsum⟩ := hβ
   have happ := apply_eq_of_toReal_eq hsum h
   rw [hβ0, Int.cast_zero] at happ
   have hterm : ∀ i ∈ (Finset.univ : Finset (Fin m)), c i * (h (δ i) : ℝ) = 0 :=
-    (Finset.sum_eq_zero_iff_of_nonneg fun i _ => mul_nonneg (hc i) (by exact_mod_cast hnn i)).1 happ.symm
+    (Finset.sum_eq_zero_iff_of_nonneg fun i _ => mul_nonneg (hc i) (by exact_mod_cast hnn i)).1
+      happ.symm
   have hvan : ∀ i, i ∉ Set.range e → c i = 0 := by
     intro i hi
     rcases mul_eq_zero.1 (hterm i (Finset.mem_univ i)) with h1 | h1

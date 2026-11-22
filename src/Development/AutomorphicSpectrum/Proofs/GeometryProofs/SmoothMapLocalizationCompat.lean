@@ -13,8 +13,8 @@ def denomMonoid {R : Type} [CommRing R] (c : R) : Submonoid R where
     rintro _ _ ⟨n, k, hn, rfl⟩ ⟨m, l, hm, rfl⟩
     exact ⟨n * m, k + l, mul_ne_zero hn hm, by push_cast; ring⟩
 
-theorem map_denomMonoid {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (c : R) :
-    (denomMonoid c).map f = denomMonoid (f c) := by
+theorem map_denomMonoid {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (c : R)
+    : (denomMonoid c).map f = denomMonoid (f c) := by
   ext x
   constructor
   · rintro ⟨_, ⟨n, k, hn, rfl⟩, rfl⟩
@@ -22,8 +22,11 @@ theorem map_denomMonoid {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R'
   · rintro ⟨n, k, hn, rfl⟩
     exact ⟨_, ⟨n, k, hn, rfl⟩, by simp⟩
 
-theorem exists_nat_mul_mem {Ω : Type} [Field Ω] [CharZero Ω] (A : Subalgebra ℤ Ω) {x : Ω}
-    (hx : x ∈ Algebra.adjoin ℚ (A : Set Ω)) : ∃ N : ℕ, N ≠ 0 ∧ (N : Ω) * x ∈ A := by
+theorem exists_nat_mul_mem
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (A : Subalgebra ℤ Ω)
+    {x : Ω} (hx : x ∈ Algebra.adjoin ℚ (A : Set Ω))
+    : ∃ N : ℕ, N ≠ 0 ∧ (N : Ω) * x ∈ A := by
   induction hx using Algebra.adjoin_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | algebraMap r =>
@@ -46,16 +49,18 @@ theorem exists_nat_mul_mem {Ω : Type} [Field Ω] [CharZero Ω] (A : Subalgebra 
     obtain ⟨n, hn, hnx⟩ := hx
     obtain ⟨m, hm, hmy⟩ := hy
     refine ⟨n * m, mul_ne_zero hn hm, ?_⟩
-    have : ((n * m : ℕ) : Ω) * (x * y) = ((n : Ω) * x) * ((m : Ω) * y) := by
-      push_cast; ring
+    have : ((n * m : ℕ) : Ω) * (x * y) = ((n : Ω) * x) * ((m : Ω) * y) := by push_cast; ring
     rw [this]
     exact mul_mem hnx hmy
 
-theorem isLocalization_adjoin {Ω : Type} [Field Ω] [CharZero Ω] (A : Subalgebra ℤ Ω)
-    (S : Subalgebra ℚ Ω) [Algebra A S] (hι : ∀ a : A, ((algebraMap A S a : S) : Ω) = a)
-    (c : A) (N : ℕ) (hN : N ≠ 0) (h : Ω) (h0 : h ≠ 0) (hc : (c : Ω) = N * h)
-    (hS : S = Algebra.adjoin ℚ (insert h⁻¹ (A : Set Ω))) :
-    IsLocalization (denomMonoid c) S := by
+theorem isLocalization_adjoin
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (A : Subalgebra ℤ Ω) (S : Subalgebra ℚ Ω) [Algebra A S]
+    (hι : ∀ a : A, ((algebraMap A S a : S) : Ω) = a)
+    (c : A)
+    (N : ℕ) (hN : N ≠ 0)
+    (h : Ω) (h0 : h ≠ 0) (hc : (c : Ω) = N * h) (hS : S = Algebra.adjoin ℚ (insert h⁻¹ (A : Set Ω)))
+    : IsLocalization (denomMonoid c) S := by
   have hNΩ : (N : Ω) ≠ 0 := Nat.cast_ne_zero.2 hN
   have hinv : h⁻¹ ∈ S := hS ▸ Algebra.subset_adjoin (Set.mem_insert _ _)
   have hnat : ∀ n : ℕ, n ≠ 0 → IsUnit (algebraMap A S (n : A)) := by
@@ -77,8 +82,9 @@ theorem isLocalization_adjoin {Ω : Type} [Field Ω] [CharZero Ω] (A : Subalgeb
     field_simp
   have hcmem : c ∈ denomMonoid c := ⟨1, 1, one_ne_zero, by simp⟩
   have hnmem : ∀ n : ℕ, n ≠ 0 → (n : A) ∈ denomMonoid c := fun n hn => ⟨n, 0, hn, by simp⟩
-  have key : ∀ w ∈ Algebra.adjoin ℚ (insert h⁻¹ (A : Set Ω)),
-      ∃ (a : A) (m : denomMonoid c), w * (((m : A)) : Ω) = a := by
+  have key
+      : ∀ w ∈ Algebra.adjoin ℚ (insert h⁻¹ (A : Set Ω)), ∃ (a : A) (m : denomMonoid c),
+        w * (((m : A)) : Ω) = a := by
     intro w hw
     induction hw using Algebra.adjoin_induction with
     | mem x hx =>
@@ -124,7 +130,6 @@ theorem isLocalization_adjoin {Ω : Type} [Field Ω] [CharZero Ω] (A : Subalgeb
 
 end GlobalTheory.CompanionTheory.Ar.LocalisedSmooth
 
-
 open GlobalTheory.CompanionTheory.Ar.LocalisedSmooth in
 theorem GlobalTheory.CompanionTheory.Ar.LocalisedSmooth.smooth_localised
     (Ω₀ Ω : Type) [Field Ω₀] [Field Ω] [CharZero Ω₀] [CharZero Ω] [Algebra Ω₀ Ω]
@@ -133,13 +138,12 @@ theorem GlobalTheory.CompanionTheory.Ar.LocalisedSmooth.smooth_localised
     (h : Ω₀) (hh : h ∈ Algebra.adjoin ℚ (A₀ : Set Ω₀)) (h0 : h ≠ 0)
     (S : Subalgebra ℚ Ω₀) (T : Subalgebra ℚ Ω)
     (hS : S = Algebra.adjoin ℚ (insert h⁻¹ (A₀ : Set Ω₀)))
-    (hT : T = Algebra.adjoin ℚ (insert (algebraMap Ω₀ Ω h)⁻¹ (A₁ : Set Ω))) :
-    ∃ ψ : S →+* T, (∀ s, ((ψ s : T) : Ω) = algebraMap Ω₀ Ω s) ∧ ψ.Smooth := by
+    (hT : T = Algebra.adjoin ℚ (insert (algebraMap Ω₀ Ω h)⁻¹ (A₁ : Set Ω)))
+    : ∃ ψ : S →+* T, (∀ s, ((ψ s : T) : Ω) = algebraMap Ω₀ Ω s) ∧ ψ.Smooth := by
   obtain ⟨N, hN, hNh⟩ := exists_nat_mul_mem A₀ hh
   let c₀ : A₀ := ⟨(N : Ω₀) * h, hNh⟩
   have hc₀ : (c₀ : Ω₀) = N * h := rfl
-  have hc₁ : ((φ c₀ : A₁) : Ω) = N * algebraMap Ω₀ Ω h := by
-    rw [hφ, hc₀, map_mul, map_natCast]
+  have hc₁ : ((φ c₀ : A₁) : Ω) = N * algebraMap Ω₀ Ω h := by rw [hφ, hc₀, map_mul, map_natCast]
   have hAS : ∀ a : A₀, (a : Ω₀) ∈ S := fun a =>
     hS ▸ Algebra.subset_adjoin (Set.mem_insert_of_mem _ a.2)
   have hAT : ∀ a : A₁, (a : Ω) ∈ T := fun a =>

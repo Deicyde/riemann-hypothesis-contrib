@@ -5,8 +5,9 @@ public import Formalism.LocalRingCardinality.DataSpaces
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.Qh47.exists_nat_mul_integral {E : Type} [Field E] [NumberField E]
-    (a : E) : ∃ n : ℕ, 0 < n ∧ IsIntegral ℤ ((n : E) * a) := by
+private theorem UpperTheory.Reformulated.B.Qh47.exists_nat_mul_integral
+    {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ n : ℕ, 0 < n ∧ IsIntegral ℤ ((n : E) * a) := by
   have hq : IsAlgebraic ℚ a := Algebra.IsAlgebraic.isAlgebraic a
   have hz : IsAlgebraic ℤ a := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 hq
   obtain ⟨y, hy, hi⟩ := hz.exists_integral_multiple
@@ -16,15 +17,18 @@ private theorem UpperTheory.Reformulated.B.Qh47.exists_nat_mul_integral {E : Typ
   · have h2 : ((y.natAbs : ℕ) : E) = (y : E) := by
       conv_rhs => rw [h]
       exact (Int.cast_natCast _).symm
-    rw [h2]; exact hi
+    rw [h2]
+    exact hi
   · have h2 : ((y.natAbs : ℕ) : E) = -(y : E) := by
       conv_rhs => rw [h]
       rw [Int.cast_neg, neg_neg, Int.cast_natCast]
-    rw [h2, neg_mul]; exact hi.neg
+    rw [h2, neg_mul]
+    exact hi.neg
 
-theorem UpperTheory.Reformulated.B.Qh47.m_exists_nat_smul_mem :
-    ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : StarRing E] {S : Formalism.BasicNotions.HSpace E}
-      (M : Submodule (NumberField.RingOfIntegers E) S.V) {x : S.V},
+theorem UpperTheory.Reformulated.B.Qh47.m_exists_nat_smul_mem
+    : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : StarRing E]
+        {S : Formalism.BasicNotions.HSpace E} (M : Submodule (NumberField.RingOfIntegers E) S.V)
+        {x : S.V},
       x ∈ Submodule.span E (↑M : Set S.V) → ∃ (n : ℕ), (0 : ℕ) < n ∧ n • x ∈ M := by
   intro E _ _ _ S M x hx
   induction hx using Submodule.span_induction with

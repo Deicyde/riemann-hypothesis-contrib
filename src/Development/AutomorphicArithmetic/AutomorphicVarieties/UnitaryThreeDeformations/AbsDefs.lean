@@ -42,7 +42,8 @@ theorem mem_Fgr {j : ℤ} {f : FA O wt} : f ∈ Fgr O wt j ↔ ser f ∈ wtPart 
 def mkF {j : ℤ} (f : MvPowerSeries σ O) (hf : f ∈ wtPart O wt j) : FA O wt :=
   ⟨f, (WPres.free O wt).part_le_A (j := j) ⟨f, hf, rfl⟩⟩
 
-theorem mkF_mem {j : ℤ} (f : MvPowerSeries σ O) (hf : f ∈ wtPart O wt j) : mkF f hf ∈ Fgr O wt j := mem_Fgr.2 hf
+theorem mkF_mem {j : ℤ} (f : MvPowerSeries σ O) (hf : f ∈ wtPart O wt j) : mkF f hf ∈ Fgr O wt j :=
+  mem_Fgr.2 hf
 
 end Free
 
@@ -51,8 +52,12 @@ section ToA
 variable {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (W : WPres O ℤ R)
 
 theorem π_mem_A (f : FA O W.wt) : W.π (ser f) ∈ W.A := by
-  refine Submodule.iSup_induction (WPres.free O W.wt).part (motive := fun g => W.π g ∈ W.A) f.2 (fun j g hg => ?_)
-    (by simp) (fun a b ha hb => by
+  refine Submodule.iSup_induction (WPres.free O W.wt).part
+    (motive := fun g => W.π g ∈ W.A)
+    f.2
+    (fun j g hg => ?_)
+    (by simp)
+    (fun a b ha hb => by
       rw [map_add]
       exact add_mem ha hb)
   rw [free_part] at hg
@@ -65,15 +70,20 @@ theorem coe_toA (f : FA O W.wt) : (toA W f : R) = W.π (ser f) := rfl
 theorem toA_mem {j : ℤ} {f : FA O W.wt} (hf : f ∈ Fgr O W.wt j) : (toA W f : R) ∈ W.part j :=
   ⟨ser f, mem_Fgr.1 hf, rfl⟩
 
-theorem exists_toA {j : ℤ} {y : R} (hy : y ∈ W.part j) : ∃ f ∈ Fgr O W.wt j, toA W f = ⟨y, W.part_le_A hy⟩ := by
+theorem exists_toA {j : ℤ} {y : R} (hy : y ∈ W.part j)
+    : ∃ f ∈ Fgr O W.wt j, toA W f = ⟨y, W.part_le_A hy⟩ := by
   obtain ⟨g, hg, rfl⟩ := hy
   exact ⟨mkF g hg, mkF_mem g hg, rfl⟩
 
 theorem toA_surjective : Function.Surjective (toA W) := by
   rintro ⟨y, hy⟩
   have : ∃ f, (toA W f : R) = y := by
-    refine Submodule.iSup_induction W.part (motive := fun y => ∃ f, (toA W f : R) = y) hy (fun j y hy => ?_)
-      ⟨0, by simp⟩ (fun a b ⟨f, hf⟩ ⟨g, hg⟩ => ⟨f + g, by simp [hf, hg]⟩)
+    refine Submodule.iSup_induction W.part
+      (motive := fun y => ∃ f, (toA W f : R) = y)
+      hy
+      (fun j y hy => ?_)
+      ⟨0, by simp⟩
+      (fun a b ⟨f, hf⟩ ⟨g, hg⟩ => ⟨f + g, by simp [hf, hg]⟩)
     obtain ⟨f, -, hf⟩ := exists_toA W hy
     exact ⟨f, congrArg Subtype.val hf⟩
   obtain ⟨f, hf⟩ := this

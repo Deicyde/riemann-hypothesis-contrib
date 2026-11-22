@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.BlowupCategories.SpanScale
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
 
-theorem UpperTheory.isIso_of_bijective_on_simplices :
-    ∀ {S S' : Spc} (f : S ⟶ S'), (∀ (k : ℕ) (T : Scheme.{0}), Function.Bijective (fun x : Sx S k T => x.map f)) → IsIso f := by
+theorem UpperTheory.isIso_of_bijective_on_simplices
+    : ∀ {S S' : Spc} (f : S ⟶ S'),
+      (∀ (k : ℕ) (T : Scheme.{0}), Function.Bijective (fun x : Sx S k T => x.map f)) → IsIso f := by
   intro S S' f h
   haveI : ∀ n : SimplexCategoryᵒᵖ, IsIso (f.app n) := by
     intro n

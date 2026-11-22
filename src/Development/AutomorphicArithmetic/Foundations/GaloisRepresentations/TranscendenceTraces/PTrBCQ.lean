@@ -5,18 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trBCQ_of :
-    TrHl → TrBC → WtBC → TrBCQ := by
+theorem UpperTheory.Gal.TranscendenceTraces.trBCQ_of : TrHl → TrBC → WtBC → TrBCQ := by
   intro hHl hBC hWt l _ n i Z' S' Z S v p' p g _ w hpb hw hl
   haveI : IsFinite p' := MorphismProperty.of_isPullback (P := @IsFinite) hpb inferInstance
   have hw' : IsWt p' (Wt.comap v w) := hWt v p' p g w hpb hw
   have hl' : IsUnit ((l : ℕ) : Γ(S', ⊤)) := by
     have := hl.map g.appTop.hom
     rwa [map_natCast] at this
-  have key : pullHl l (sch.map g) n i ∘ₗ trHl l p w n i =
-      trHl l p' (Wt.comap v w) n i ∘ₗ pullHl l (sch.map v) n i := by
+  have key
+      : pullHl l (sch.map g) n i ∘ₗ trHl l p w n i
+        = trHl l p' (Wt.comap v w) n i ∘ₗ pullHl l (sch.map v) n i := by
     apply LinearMap.ext
     intro x
     apply Subtype.ext

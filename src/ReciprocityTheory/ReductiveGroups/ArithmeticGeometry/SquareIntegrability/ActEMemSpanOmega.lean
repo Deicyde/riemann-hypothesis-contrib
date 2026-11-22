@@ -21,7 +21,8 @@ def actE (β : E) (v : Vsp dim) : Vsp dim := WithLp.toLp 2 fun i => i.1 β * v i
 
 theorem act_eq_actE (α : 𝓞 E) (v : Vsp dim) : act α v = actE (α : E) v := rfl
 
-@[simp] theorem actE_apply (β : E) (v : Vsp dim) (i : Idx dim) : actE β v i = i.1 β * v i := rfl
+@[simp]
+theorem actE_apply (β : E) (v : Vsp dim) (i : Idx dim) : actE β v i = i.1 β * v i := rfl
 
 theorem actE_add_right (β : E) (v w : Vsp dim) : actE β (v + w) = actE β v + actE β w := by
   ext i
@@ -72,9 +73,10 @@ theorem act_mul' (α β : 𝓞 E) (v : Vsp dim) : act (α * β) v = act α (act 
   push_cast
   exact actE_mul _ _ v
 
-theorem norm_actE_le (β : E) (Ω : ℝ) (hΩ : 0 ≤ Ω) (h : ∀ σ : E →+* ℂ, ‖σ β‖ ≤ Ω) (v : Vsp dim) :
-    ‖actE β v‖ ≤ Ω * ‖v‖ := by
-  rw [EuclideanSpace.norm_eq, EuclideanSpace.norm_eq, ← Real.sqrt_sq hΩ, ← Real.sqrt_mul (sq_nonneg _)]
+theorem norm_actE_le (β : E) (Ω : ℝ) (hΩ : 0 ≤ Ω) (h : ∀ σ : E →+* ℂ, ‖σ β‖ ≤ Ω) (v : Vsp dim)
+    : ‖actE β v‖ ≤ Ω * ‖v‖ := by
+  rw [EuclideanSpace.norm_eq, EuclideanSpace.norm_eq, ← Real.sqrt_sq hΩ,
+    ← Real.sqrt_mul (sq_nonneg _)]
   apply Real.sqrt_le_sqrt
   rw [Finset.mul_sum]
   refine Finset.sum_le_sum fun i _ => ?_
@@ -82,8 +84,9 @@ theorem norm_actE_le (β : E) (Ω : ℝ) (hΩ : 0 ≤ Ω) (h : ∀ σ : E →+* 
   gcongr
   exact h i.1
 
-theorem actE_mem_of_span (β : E) (S : Set (Vsp dim)) (T : Submodule ℝ (Vsp dim))
-    (h : ∀ v ∈ S, actE β v ∈ T) : ∀ v ∈ Submodule.span ℝ S, actE β v ∈ T := by
+theorem actE_mem_of_span
+    (β : E) (S : Set (Vsp dim)) (T : Submodule ℝ (Vsp dim)) (h : ∀ v ∈ S, actE β v ∈ T)
+    : ∀ v ∈ Submodule.span ℝ S, actE β v ∈ T := by
   intro v hv
   induction hv using Submodule.span_induction with
   | mem x hx => exact h x hx
@@ -91,9 +94,9 @@ theorem actE_mem_of_span (β : E) (S : Set (Vsp dim)) (T : Submodule ℝ (Vsp di
   | add x y _ _ hx hy => rw [actE_add_right]; exact T.add_mem hx hy
   | smul r x _ hx => rw [actE_rsmul_right]; exact T.smul_mem r hx
 
-theorem actE_mem_span_omega {n : ℕ} (ω : Fin n → E) {β : E}
-    (hβ : β ∈ Submodule.span ℚ (Set.range ω)) (x : Vsp dim) :
-    actE β x ∈ Submodule.span ℝ (Set.range fun j => actE (ω j) x) := by
+theorem actE_mem_span_omega
+    {n : ℕ} (ω : Fin n → E) {β : E} (hβ : β ∈ Submodule.span ℚ (Set.range ω)) (x : Vsp dim)
+    : actE β x ∈ Submodule.span ℝ (Set.range fun j => actE (ω j) x) := by
   induction hβ using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨j, rfl⟩ := hy
@@ -104,15 +107,15 @@ theorem actE_mem_span_omega {n : ℕ} (ω : Fin n → E) {β : E}
 
 variable [IsCMField E]
 
-theorem Hf_actE (β : E) (v w : Vsp dim) :
-    Hf (actE β v) w = Hf v (actE (IsCMField.complexConj E β) w) := by
+theorem Hf_actE (β : E) (v w : Vsp dim)
+    : Hf (actE β v) w = Hf v (actE (IsCMField.complexConj E β) w) := by
   unfold Hf
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [actE_apply, map_mul, IsCMField.complexEmbedding_complexConj, Complex.conj_conj]
   ring
 
-theorem Hf_actE' (β : E) (v w : Vsp dim) :
-    Hf v (actE β w) = Hf (actE (IsCMField.complexConj E β) v) w := by
+theorem Hf_actE' (β : E) (v w : Vsp dim)
+    : Hf v (actE β w) = Hf (actE (IsCMField.complexConj E β) v) w := by
   unfold Hf
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [actE_apply, map_mul, IsCMField.complexEmbedding_complexConj]

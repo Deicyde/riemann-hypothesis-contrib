@@ -11,19 +11,20 @@ namespace PI.SzCt.UnitaryGroupMassFormula
 
 open Formalism.BasicNotions Formalism.MainNotions.G
 
-theorem eTau_tauPl (D : D7) (z : Bool × HH D) :
-    (D.eTau (tauPl D z) : D.R.GG) = plGG D z := by
+theorem eTau_tauPl (D : D7) (z : Bool × HH D) : (D.eTau (tauPl D z) : D.R.GG) = plGG D z := by
   unfold Formalism.BasicNotions.tauPl
   simp
 
-theorem ramifiedTau1_ne_ramifiedTau2 (φ : Formalism.HC.Frame) (a b : φ.A) : φ.tau1 a ≠ φ.tau2 b := by
+theorem ramifiedTau1_ne_ramifiedTau2 (φ : Formalism.HC.Frame) (a b : φ.A)
+    : φ.tau1 a ≠ φ.tau2 b := by
   intro h
   have h1 := congrArg (fun x => x.1.1) h
   simp only [Formalism.HC.Frame.tau1, Formalism.HC.Frame.tau2] at h1
   revert h1
   decide
 
-theorem tau1_injective_alt (φ : Formalism.HC.Frame) {a b : φ.A} (h : φ.tau1 a = φ.tau1 b) : a = b := by
+theorem tau1_injective_alt (φ : Formalism.HC.Frame) {a b : φ.A} (h : φ.tau1 a = φ.tau1 b)
+    : a = b := by
   simp only [Formalism.HC.Frame.tau1, Prod.mk.injEq, true_and] at h
   simpa [Formalism.HC.Frame.iota] using h
 
@@ -33,8 +34,8 @@ theorem placeFacts : PlaceFacts := by
     intro t; rw [eTau_tauPl]; simp [plGG]
   have h2 : ∀ t : HH D, (D.eTau (tauPl D (true, t)) : D.R.GG) = D.R.tau2 t := by
     intro t; rw [eTau_tauPl]; simp [plGG]
-  have hPsi : ∀ z : Bool × HH D, (D.eTau (tauPl D z) : D.R.GG) ∈ D.R.Psi :=
-    fun z => (D.eTau (tauPl D z)).2
+  have hPsi : ∀ z : Bool × HH D, (D.eTau (tauPl D z) : D.R.GG) ∈ D.R.Psi := fun z =>
+    (D.eTau (tauPl D z)).2
   have hnt : ∀ t : HH D, (D.eTau (tauPl D (true, t)) : D.R.GG) ∉ D.host.topPlaces := by
     intro t h
     rw [h2] at h

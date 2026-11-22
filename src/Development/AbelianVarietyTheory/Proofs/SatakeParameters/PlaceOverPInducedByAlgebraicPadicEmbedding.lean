@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Algebr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H
 
 noncomputable section
 
@@ -51,8 +52,11 @@ theorem smallIdeal_isPrime (ι : K →+* ℂ_[p]) : (smallIdeal ι).IsPrime := b
     push Not at hcon
     nlinarith [hcon.1, hcon.2]
 
-theorem dvd_of_natCast_mem {R : Type*} [CommRing R] (I : Ideal R) (hI : I ≠ ⊤) {q M : ℕ} (hq : q.Prime)
-    (h1 : (q : R) ∈ I) (h2 : (M : R) ∈ I) : q ∣ M := by
+theorem dvd_of_natCast_mem
+    {R : Type*} [CommRing R]
+    (I : Ideal R) (hI : I ≠ ⊤)
+    {q M : ℕ} (hq : q.Prime) (h1 : (q : R) ∈ I) (h2 : (M : R) ∈ I)
+    : q ∣ M := by
   by_contra hnd
   have hc : Nat.Coprime q M := (Nat.Prime.coprime_iff_not_dvd hq).2 hnd
   obtain ⟨u, v, huv⟩ : IsCoprime (q : R) (M : R) := Nat.Coprime.cast hc
@@ -65,8 +69,8 @@ theorem norm_p_lt_one : ‖(p : ℂ_[p])‖ < 1 := by
   rw [← h] at h2
   simpa using h2
 
-theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal) :
-    ∃ ι : K →+* ℂ_[p], w.asIdeal = smallIdeal ι := by
+theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal)
+    : ∃ ι : K →+* ℂ_[p], w.asIdeal = smallIdeal ι := by
   by_contra hcon
   push Not at hcon
   have hnle : ∀ σ : K →ₐ[ℚ] ℂ_[p], ¬ w.asIdeal ≤ smallIdeal (σ : K →+* ℂ_[p]) := by
@@ -74,12 +78,11 @@ theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈
     exact hcon (σ : K →+* ℂ_[p]) (w.isMaximal.eq_of_le (smallIdeal_isPrime _).ne_top hle)
   have σ0 : K →ₐ[ℚ] ℂ_[p] := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  have hav : ¬ ((w.asIdeal : Set (𝓞 K)) ⊆
-      ⋃ σ ∈ ((Finset.univ : Finset (K →ₐ[ℚ] ℂ_[p])) : Set (K →ₐ[ℚ] ℂ_[p])),
-        (smallIdeal (σ : K →+* ℂ_[p]) : Set (𝓞 K))) := by
+  have hav : ¬((w.asIdeal : Set (𝓞 K))
+      ⊆ ⋃ σ ∈ ((Finset.univ : Finset (K →ₐ[ℚ] ℂ_[p])) : Set (K →ₐ[ℚ] ℂ_[p])),
+          (smallIdeal (σ : K →+* ℂ_[p]) : Set (𝓞 K))) := by
     rw [Ideal.subset_union_prime σ0 σ0 (fun σ _ _ _ => smallIdeal_isPrime _)]
     rintro ⟨σ, -, hle⟩
     exact hnle σ hle
@@ -100,8 +103,11 @@ theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈
     simp
   have h1 : 1 ≤ ‖((Algebra.norm ℤ x : ℤ) : ℂ_[p])‖ := by
     rw [hprod, norm_prod]
-    exact Finset.prod_induction _ (fun t : ℝ => 1 ≤ t) (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
-      le_rfl fun σ _ => hxσ σ
+    exact Finset.prod_induction _
+      (fun t : ℝ => 1 ≤ t)
+      (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
+      le_rfl
+      fun σ _ => hxσ σ
   have h2 : ((Algebra.norm ℤ x : ℤ) : ℂ_[p]) = (p : ℂ_[p]) * ((m : ℤ) : ℂ_[p]) := by
     rw [hm]; push_cast; ring
   have h3 : ‖((m : ℤ) : ℂ_[p])‖ ≤ 1 := IsUltrametricDist.norm_intCast_le_one _ m
@@ -109,9 +115,11 @@ theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈
   have h4 := norm_p_lt_one (p := p)
   nlinarith [norm_nonneg (p : ℂ_[p]), norm_nonneg ((m : ℤ) : ℂ_[p])]
 
-theorem valuation_le_one_of_norm (ι : K →+* ℂ_[p]) (w : HeightOneSpectrum (𝓞 K))
-    (hw : ∀ y : 𝓞 K, y ∈ w.asIdeal ↔ ‖ι (y : K)‖ < 1) (x : K) (hx : ‖ι x‖ ≤ 1) :
-    w.valuation K x ≤ 1 := by
+theorem valuation_le_one_of_norm
+    (ι : K →+* ℂ_[p]) (w : HeightOneSpectrum (𝓞 K))
+    (hw : ∀ y : 𝓞 K, y ∈ w.asIdeal ↔ ‖ι (y : K)‖ < 1)
+    (x : K) (hx : ‖ι x‖ ≤ 1)
+    : w.valuation K x ≤ 1 := by
   by_contra hcon
   have hgt : 1 < w.valuation K x := not_le.1 hcon
   have hx0 : x ≠ 0 := by
@@ -126,8 +134,9 @@ theorem valuation_le_one_of_norm (ι : K →+* ℂ_[p]) (w : HeightOneSpectrum (
     rw [← w.valuation_lt_one_iff_mem (K := K)]
     change w.valuation K (algebraMap (𝓞 K) K n) < 1
     rw [← h, map_mul]
-    calc w.valuation K x⁻¹ * w.valuation K (algebraMap (𝓞 K) K d) ≤ w.valuation K x⁻¹ * 1 :=
-          mul_le_mul_right (w.valuation_le_one _) _
+    calc
+      w.valuation K x⁻¹ * w.valuation K (algebraMap (𝓞 K) K d)
+        ≤ w.valuation K x⁻¹ * 1 := mul_le_mul_right (w.valuation_le_one _) _
       _ < 1 := by rwa [mul_one]
   have hn' := (hw n).1 hn
   have h2 : ((d : 𝓞 K) : K) = x * (n : K) := by
@@ -144,7 +153,9 @@ theorem placeAbove : GlobalTheory.DatumJets.PlaceAbove := by
   refine ⟨lam, fun k => ?_⟩
   unfold GlobalTheory.IndefiniteRowSideFullHecke.IntegralityWeylConditions.IntAt
   rw [(hlam k).2]
-  exact ⟨fun h => valuation_le_one_of_norm ι w hw' k h.2,
-    fun h => ⟨(hlam k).1, GlobalTheory.MomPlace.norm_le_one_of_valuation K p ι w hw' k h⟩⟩
+  exact ⟨
+    fun h => valuation_le_one_of_norm ι w hw' k h.2,
+    fun h => ⟨(hlam k).1, GlobalTheory.MomPlace.norm_le_one_of_valuation K p ι w hw' k h⟩
+  ⟩
 
 end GlobalTheory.DatumJets.Place

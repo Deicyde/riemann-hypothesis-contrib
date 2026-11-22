@@ -18,7 +18,8 @@ noncomputable section
 
 namespace Formalism.L2.Ker.Cd
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Host Formalism.FrobeniusOrbits
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+  Formalism.L2.Host Formalism.FrobeniusOrbits
 
 section SeamLat
 
@@ -28,9 +29,10 @@ variable {D : Car} {X : Fields} (s : Seam D X)
 
 def Seam.vec {n : ℕ} (x : Sp X.E n) : Fin n → D.host.E := fun i => s.iE (x i)
 
-theorem Seam.int_iff (z : X.E) : s.iE z ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ z ∈ (algebraMap (𝓞 X.E) X.E).range := by
-  have h1 : ∀ w : D.host.E, w ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ IsIntegral ℤ w := fun w =>
-    (IsIntegralClosure.isIntegral_iff (A := 𝓞 D.host.E)).symm
+theorem Seam.int_iff (z : X.E)
+    : s.iE z ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ z ∈ (algebraMap (𝓞 X.E) X.E).range := by
+  have h1 : ∀ w : D.host.E, w ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ IsIntegral ℤ w :=
+    fun w => (IsIntegralClosure.isIntegral_iff (A := 𝓞 D.host.E)).symm
   have h2 : ∀ w : X.E, w ∈ (algebraMap (𝓞 X.E) X.E).range ↔ IsIntegral ℤ w := fun w =>
     (IsIntegralClosure.isIntegral_iff (A := 𝓞 X.E)).symm
   rw [h1, h2]
@@ -49,7 +51,9 @@ theorem Seam.vec_smulE {n : ℕ} (c : X.E) (x : Sp X.E n) : s.vec (c • x) = s.
   funext i
   simp [Seam.vec]
 
-theorem Seam.vec_smulO {n : ℕ} (r : 𝓞 X.E) (r' : 𝓞 D.host.E) (h : s.iE (r : X.E) = (r' : D.host.E)) (x : Sp X.E n) : s.vec (r • x) = r' • s.vec x := by
+theorem Seam.vec_smulO
+    {n : ℕ} (r : 𝓞 X.E) (r' : 𝓞 D.host.E) (h : s.iE (r : X.E) = (r' : D.host.E)) (x : Sp X.E n)
+    : s.vec (r • x) = r' • s.vec x := by
   funext i
   show s.iE ((r • x) i) = (r' • s.vec x) i
   rw [Pi.smul_apply, Pi.smul_apply, Algebra.smul_def, Algebra.smul_def, map_mul]
@@ -57,34 +61,40 @@ theorem Seam.vec_smulO {n : ℕ} (r : 𝓞 X.E) (r' : 𝓞 D.host.E) (h : s.iE (
   rw [h]
   rfl
 
-theorem Seam.vec_span {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span (𝓞 X.E) T) :
-    s.vec x ∈ Submodule.span (𝓞 D.host.E) (s.vec '' T) := by
+theorem Seam.vec_span
+    {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span (𝓞 X.E) T)
+    : s.vec x ∈ Submodule.span (𝓞 D.host.E) (s.vec '' T) := by
   induction hx using Submodule.span_induction with
   | mem x h => exact Submodule.subset_span ⟨x, h, rfl⟩
   | zero =>
     have : s.vec (0 : Sp X.E n) = 0 := by funext i; simp [Seam.vec]
-    rw [this]; exact Submodule.zero_mem _
-  | add x y _ _ hx hy => rw [s.vec_add]; exact Submodule.add_mem _ hx hy
+    rw [this]
+    exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+    rw [s.vec_add]; exact Submodule.add_mem _ hx hy
   | smul r x _ hx =>
     obtain ⟨r', hr'⟩ := (s.int_iff (r : X.E)).2 ⟨r, rfl⟩
     rw [s.vec_smulO r r' hr'.symm]
     exact Submodule.smul_mem _ _ hx
 
-theorem Seam.vec_spanE {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span X.E T) :
-    s.vec x ∈ Submodule.span D.host.E (s.vec '' T) := by
+theorem Seam.vec_spanE {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span X.E T)
+    : s.vec x ∈ Submodule.span D.host.E (s.vec '' T) := by
   induction hx using Submodule.span_induction with
   | mem x h => exact Submodule.subset_span ⟨x, h, rfl⟩
   | zero =>
     have : s.vec (0 : Sp X.E n) = 0 := by funext i; simp [Seam.vec]
-    rw [this]; exact Submodule.zero_mem _
+    rw [this]
+    exact Submodule.zero_mem _
   | add x y _ _ hx hy => rw [s.vec_add]; exact Submodule.add_mem _ hx hy
   | smul c x _ hx => rw [s.vec_smulE]; exact Submodule.smul_mem _ _ hx
 
-theorem Seam.vec_surj {n : ℕ} (y : Fin n → D.host.E) : s.vec (fun i => s.iE.symm (y i) : Sp X.E n) = y := by
+theorem Seam.vec_surj {n : ℕ} (y : Fin n → D.host.E)
+    : s.vec (fun i => s.iE.symm (y i) : Sp X.E n) = y := by
   funext i
   simp [Seam.vec]
 
-theorem Seam.mem_lat {n : ℕ} (N : Submodule (𝓞 X.E) (Sp X.E n)) (y : Fin n → D.host.E) : y ∈ s.lat N ↔ ∃ x ∈ N, s.vec x = y := by
+theorem Seam.mem_lat {n : ℕ} (N : Submodule (𝓞 X.E) (Sp X.E n)) (y : Fin n → D.host.E)
+    : y ∈ s.lat N ↔ ∃ x ∈ N, s.vec x = y := by
   constructor
   · intro hy
     induction hy using Submodule.span_induction with
@@ -104,8 +114,8 @@ theorem Seam.mem_lat {n : ℕ} (N : Submodule (𝓞 X.E) (Sp X.E n)) (y : Fin n 
   · rintro ⟨x, hx, rfl⟩
     exact Submodule.subset_span ⟨x, hx, rfl⟩
 
-theorem Seam.stdH_vec (hok : s.Ok) {n : ℕ} (x y : Sp X.E n) :
-    (letI := D.host.cmStar; stdH D.host.E n (s.vec x) (s.vec y)) = s.iE (hStd X.E n x y) := by
+theorem Seam.stdH_vec (hok : s.Ok) {n : ℕ} (x y : Sp X.E n)
+    : (letI := D.host.cmStar; stdH D.host.E n (s.vec x) (s.vec y)) = s.iE (hStd X.E n x y) := by
   rw [Formalism.L2.Ker.Cd.IntegralLatticeDensity.SD.stdH_eq]
   show _ = s.iE (∑ i, star (x i) * y i)
   set_option synthInstance.maxHeartbeats 100000 in
@@ -114,8 +124,8 @@ theorem Seam.stdH_vec (hok : s.Ok) {n : ℕ} (x y : Sp X.E n) :
   rw [map_mul, hok.2]
   rfl
 
-theorem Seam.sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)} (hN : IsSdLat N) :
-    (letI := D.host.cmStar; IsSDLat D.host.E n (s.lat N)) := by
+theorem Seam.sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)} (hN : IsSdLat N)
+    : (letI := D.host.cmStar; IsSDLat D.host.E n (s.lat N)) := by
   refine ⟨?_, ?_, ?_⟩
   · obtain ⟨S, hS⟩ := hN.1.fg
     have h : s.lat N = Submodule.span (𝓞 D.host.E) (s.vec '' (S : Set (Sp X.E n))) := by
@@ -164,7 +174,8 @@ theorem Seam.sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)}
           exact ⟨(x / v i) • v, hline _, div_mul_cancel₀ _ hi⟩
         have : Module.Finite (𝓞 X.E) X.E := Module.finite_def.mpr (htop ▸ hN.1.fg.map coord)
         exact RingOfIntegers.not_isField X.E
-          (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E) (Field.toIsField X.E))
+          (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E)
+            (Field.toIsField X.E))
       rw [Submodule.mem_bot]
       simpa [hv] using hpair.symm
     have h1 : (fun i => s.iE.symm (y i) : Sp X.E n) ∈ Submodule.span X.E (N : Set (Sp X.E n)) := by
@@ -190,8 +201,12 @@ theorem Seam.sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)}
       rw [← s.vec_surj y, s.stdH_vec hok, s.int_iff] at h1
       exact Submodule.mem_one.2 h1
 
-theorem Seam.admissible_of_selfDual_lattices (hok : s.Ok) {a b : ℕ} (ha : Even a) (hb : Even b) {N : Submodule (𝓞 X.E) (Sp X.E a)} {N' : Submodule (𝓞 X.E) (Sp X.E b)}
-    (hN : IsSdLat N) (hN' : IsSdLat N') : TaylorLogMetric.admitted D a b (s.lat N) (s.lat N') :=
+theorem Seam.admissible_of_selfDual_lattices
+    (hok : s.Ok)
+    {a b : ℕ} (ha : Even a) (hb : Even b)
+    {N : Submodule (𝓞 X.E) (Sp X.E a)} {N' : Submodule (𝓞 X.E) (Sp X.E b)}
+    (hN : IsSdLat N) (hN' : IsSdLat N')
+    : TaylorLogMetric.admitted D a b (s.lat N) (s.lat N') :=
   ⟨ha, hb, s.sd_lat hok hN, s.sd_lat hok hN'⟩
 
 end SeamLat
@@ -202,21 +217,34 @@ open Formalism.MainNotions
 
 variable {D : Car} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} (B : Base D cc δ)
 
-theorem Base.thMoved_analytic (hcc : TaylorLogMetric.IsCurveIdeal D cc) (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0) {N N' : ℕ}
-    {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)} {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} (hA : TaylorLogMetric.admitted D N N' L L') :
-    AnalyticOnNhd ℂ (B.thMoved N N' L L') Set.univ :=
-  (B.thMoved_mem (B.latAll hcc hδ h0) (B.thZeroMem (IntegralLatticeDensity.SO.stdOK B hcc hδ) N N') hA).1
+theorem Base.thMoved_analytic
+    (hcc : TaylorLogMetric.IsCurveIdeal D cc)
+    (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0)
+    {N N' : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}
+    {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} (hA : TaylorLogMetric.admitted D N N' L L')
+    : AnalyticOnNhd ℂ (B.thMoved N N' L L') Set.univ :=
+  (B.thMoved_mem (B.latAll hcc hδ h0) (B.thZeroMem (IntegralLatticeDensity.SO.stdOK B hcc hδ) N N')
+    hA).1
 
-theorem Base.eNat_analytic (hcc : TaylorLogMetric.IsCurveIdeal D cc) (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0) (χ : TaylorLogMetric.IdE D → ℂ) {N N' : ℕ}
-    {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)} {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} (hA : TaylorLogMetric.admitted D N N' L L') :
-    AnalyticOnNhd ℂ (B.eNat χ N N' L L') Set.univ := by
+theorem Base.eNat_analytic
+    (hcc : TaylorLogMetric.IsCurveIdeal D cc)
+    (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0)
+    (χ : TaylorLogMetric.IdE D → ℂ)
+    {N N' : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}
+    {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} (hA : TaylorLogMetric.admitted D N N' L L')
+    : AnalyticOnNhd ℂ (B.eNat χ N N' L L') Set.univ := by
   have h := B.thMoved_analytic hcc hδ h0 hA
   intro z hz
   exact analyticAt_const.mul (h z hz)
 
-theorem Base.eNat_contDiff (hcc : TaylorLogMetric.IsCurveIdeal D cc) (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0) (χ : TaylorLogMetric.IdE D → ℂ) {N N' : ℕ}
-    {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)} {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} (hA : TaylorLogMetric.admitted D N N' L L') (k : ℕ) :
-    ContDiff ℂ k (B.eNat χ N N' L L') :=
+theorem Base.eNat_contDiff
+    (hcc : TaylorLogMetric.IsCurveIdeal D cc)
+    (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0)
+    (χ : TaylorLogMetric.IdE D → ℂ)
+    {N N' : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}
+    {L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)} (hA : TaylorLogMetric.admitted D N N' L L')
+    (k : ℕ)
+    : ContDiff ℂ k (B.eNat χ N N' L L') :=
   (B.eNat_analytic hcc hδ h0 χ hA).contDiff
 
 end Analytic
@@ -225,13 +253,21 @@ section AmbE
 
 open Formalism.MainNotions
 
-variable {D : Car} {X : Fields} (s : Seam D X) {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} (B : Base D cc δ) (χ : TaylorLogMetric.IdE D → ℂ) (cD : D.what₂.Tau → ℂ)
+variable
+  {D : Car} {X : Fields} (s : Seam D X)
+  {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} (B : Base D cc δ)
+  (χ : TaylorLogMetric.IdE D → ℂ) (cD : D.what₂.Tau → ℂ)
 
-theorem ambOf_e (a b : ℕ) (N : Submodule (𝓞 X.E) (Sp X.E a)) (N' : Submodule (𝓞 X.E) (Sp X.E b)) :
-    (ambOf s B χ cD : Amb X).e a b N N' = fun z => B.eNat χ a b (s.lat N) (s.lat N') fun τ => z (s.iT.symm τ) := rfl
+theorem ambOf_e (a b : ℕ) (N : Submodule (𝓞 X.E) (Sp X.E a)) (N' : Submodule (𝓞 X.E) (Sp X.E b))
+    : (ambOf s B χ cD : Amb X).e a b N N'
+      = fun z => B.eNat χ a b (s.lat N) (s.lat N') fun τ => z (s.iT.symm τ) :=
+  rfl
 
-theorem ambOf_eSmooth (hok : s.Ok) (hcc : TaylorLogMetric.IsCurveIdeal D cc) (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0) {a b : ℕ} (ha : Even a) (hb : Even b) :
-    (ambOf s B χ cD : Amb X).ESmooth a b := by
+theorem ambOf_eSmooth
+    (hok : s.Ok) (hcc : TaylorLogMetric.IsCurveIdeal D cc)
+    (hδ : TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (h0 : δ ≠ 0)
+    {a b : ℕ} (ha : Even a) (hb : Even b)
+    : (ambOf s B χ cD : Amb X).ESmooth a b := by
   intro N N' hN hN' k
   rw [ambOf_e]
   have h := B.eNat_contDiff hcc hδ h0 χ (s.admissible_of_selfDual_lattices hok ha hb hN hN') k

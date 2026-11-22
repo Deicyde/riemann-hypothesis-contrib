@@ -46,15 +46,17 @@ theorem inTh_mem (S : Frames L r k) {Λ : Submodule L.O S.V} {x : S.V} (h : S.In
   obtain ⟨y, hy, rfl⟩ := h
   exact Λ.smul_mem ⟨algebraMap F E S.th, th_mem S⟩ hy
 
-theorem inTh_add (S : Frames L r k) {Λ : Submodule L.O S.V} {x y : S.V} (hx : S.InTh Λ x)
-    (hy : S.InTh Λ y) : S.InTh Λ (x + y) := by
+theorem inTh_add
+    (S : Frames L r k) {Λ : Submodule L.O S.V} {x y : S.V} (hx : S.InTh Λ x) (hy : S.InTh Λ y)
+    : S.InTh Λ (x + y) := by
   obtain ⟨a, ha, rfl⟩ := hx
   obtain ⟨b, hb, rfl⟩ := hy
   unfold Frames.InTh
   exact ⟨a + b, Λ.add_mem ha hb, (smul_add _ _ _).symm⟩
 
-theorem inTh_sub (S : Frames L r k) {Λ : Submodule L.O S.V} {x y : S.V} (hx : S.InTh Λ x)
-    (hy : S.InTh Λ y) : S.InTh Λ (x - y) := by
+theorem inTh_sub
+    (S : Frames L r k) {Λ : Submodule L.O S.V} {x y : S.V} (hx : S.InTh Λ x) (hy : S.InTh Λ y)
+    : S.InTh Λ (x - y) := by
   obtain ⟨a, ha, rfl⟩ := hx
   obtain ⟨b, hb, rfl⟩ := hy
   unfold Frames.InTh
@@ -63,8 +65,11 @@ theorem inTh_sub (S : Frames L r k) {Λ : Submodule L.O S.V} {x y : S.V} (hx : S
 private lemma hf_apply_apply_of_mem_isomG (S : Frames L r k) {u : S.GLV} (hu : u ∈ isomG L S.Hm) (x y : S.V) :
     hf L S.Hm (u x) (u y) = hf L S.Hm x y := hu x y
 
-theorem symm_mem_of_maps (S : Frames L r k) {Λ : Submodule L.O S.V} (hsd : IsSD L S.Hm Λ) (u : S.GLV)
-    (hu : u ∈ isomG L S.Hm) (hmap : ∀ x ∈ Λ, u x ∈ Λ) : ∀ y ∈ Λ, u.symm y ∈ Λ := by
+theorem symm_mem_of_maps
+    (S : Frames L r k)
+    {Λ : Submodule L.O S.V} (hsd : IsSD L S.Hm Λ)
+    (u : S.GLV) (hu : u ∈ isomG L S.Hm) (hmap : ∀ x ∈ Λ, u x ∈ Λ)
+    : ∀ y ∈ Λ, u.symm y ∈ Λ := by
   obtain ⟨-, hsd2⟩ := hsd
   intro y hy
   refine (hsd2 (u.symm y)).1 fun x hx => ?_
@@ -74,14 +79,17 @@ theorem symm_mem_of_maps (S : Frames L r k) {Λ : Submodule L.O S.V} (hsd : IsSD
 private lemma mem_isomG_of_hf_apply_apply (S : Frames L r k) {u : S.GLV}
     (hu : ∀ x y, hf L S.Hm (u x) (u y) = hf L S.Hm x y) : u ∈ isomG L S.Hm := hu
 
-theorem hermitianIsometry_selfDual_eq_of_thetaClose (S : Frames L r k) {Λ I : Submodule L.O S.V} (hsd : IsSD L S.Hm Λ) {m w : S.GLV}
-    (hm : m ∈ isomG L S.Hm) (hw : w ∈ isomG L S.Hm) (hI : Λ = m • I)
-    (h1 : ∀ x ∈ Λ, S.InTh Λ (m (w.symm x) - x)) :
-    Λ = w • I ∧ ∀ x ∈ I, S.InTh Λ (m x - w x) := by
-  have hu : (w.symm.trans m) ∈ isomG L S.Hm := mem_isomG_of_hf_apply_apply S fun x y => by
-    have h2 := hf_apply_apply_of_mem_isomG S hw (w.symm x) (w.symm y)
-    rw [LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply] at h2
-    rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, hf_apply_apply_of_mem_isomG S hm, h2]
+theorem hermitianIsometry_selfDual_eq_of_thetaClose
+    (S : Frames L r k)
+    {Λ I : Submodule L.O S.V} (hsd : IsSD L S.Hm Λ)
+    {m w : S.GLV} (hm : m ∈ isomG L S.Hm) (hw : w ∈ isomG L S.Hm) (hI : Λ = m • I)
+    (h1 : ∀ x ∈ Λ, S.InTh Λ (m (w.symm x) - x))
+    : Λ = w • I ∧ ∀ x ∈ I, S.InTh Λ (m x - w x) := by
+  have hu : (w.symm.trans m) ∈ isomG L S.Hm :=
+    mem_isomG_of_hf_apply_apply S fun x y => by
+      have h2 := hf_apply_apply_of_mem_isomG S hw (w.symm x) (w.symm y)
+      rw [LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply] at h2
+      rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, hf_apply_apply_of_mem_isomG S hm, h2]
   have hmaps : ∀ x ∈ Λ, (w.symm.trans m) x ∈ Λ := fun x hx => by
     have e : (w.symm.trans m) x = (m (w.symm x) - x) + x := by
       rw [LinearEquiv.trans_apply, sub_add_cancel]
@@ -119,10 +127,12 @@ private lemma mem_isomG_of_mem_Nof (S : Frames L r k) {g : Fin (r + 1) → S.V} 
 
 variable [IsNonarchimedeanLocalField F] [CharZero F]
 
-theorem isTermW_of_close (S : Frames L r k) {d : S.Datum} {Λ : Submodule L.O S.V} {m m' w w' : S.GLV}
+theorem isTermW_of_close
+    (S : Frames L r k)
+    {d : S.Datum} {Λ : Submodule L.O S.V} {m m' w w' : S.GLV}
     (hT : S.IsTermW d Λ m m') (hw : w ∈ S.N) (hw' : w' ∈ S.N')
-    (h1 : ∀ x ∈ Λ, S.InTh Λ (m (w.symm x) - x)) (h2 : ∀ x ∈ Λ, S.InTh Λ (m' (w'.symm x) - x)) :
-    S.IsTermW d Λ w w' := by
+    (h1 : ∀ x ∈ Λ, S.InTh Λ (m (w.symm x) - x)) (h2 : ∀ x ∈ Λ, S.InTh Λ (m' (w'.symm x) - x))
+    : S.IsTermW d Λ w w' := by
   unfold Frames.IsTermW at hT ⊢
   obtain ⟨hin, hin', hmN, hm'N, hΛ, hΛ', hfr, hg⟩ := hT
   have hmI := mem_isomG_of_mem_Nof S hmN
@@ -131,33 +141,42 @@ theorem isTermW_of_close (S : Frames L r k) {d : S.Datum} {Λ : Submodule L.O S.
     rw [hΛ]
     exact GlobalTheory.HL.TermBasic.isSD_smul S hmI
       (GlobalTheory.HL.StdLat.stdLat_spec L r k S S.f S.es (Or.inl ⟨rfl, rfl⟩) d.1 hin).1
-  obtain ⟨hA, hB⟩ := hermitianIsometry_selfDual_eq_of_thetaClose S hsd hmI (mem_isomG_of_mem_Nof S hw) hΛ h1
-  obtain ⟨hA', hB'⟩ := hermitianIsometry_selfDual_eq_of_thetaClose S hsd hm'I (mem_isomG_of_mem_Nof S hw') hΛ' h2
+  obtain ⟨hA, hB⟩ :=
+    hermitianIsometry_selfDual_eq_of_thetaClose S hsd hmI (mem_isomG_of_mem_Nof S hw) hΛ h1
+  obtain ⟨hA', hB'⟩ :=
+    hermitianIsometry_selfDual_eq_of_thetaClose S hsd hm'I (mem_isomG_of_mem_Nof S hw') hΛ' h2
   have hf1 : ∀ b, S.f b ∈ S.stdLat S.f S.es d.1 := fun b => by
     simpa using GlobalTheory.HL.WitIndep.frame_mem S S.f S.es (Or.inl ⟨rfl, rfl⟩) d.1 hin 1 b
   have hf2 : ∀ b, S.f' b ∈ S.stdLat S.f' S.es' d.2.1 := fun b => by
     simpa using GlobalTheory.HL.WitIndep.frame_mem S S.f' S.es' (Or.inr ⟨rfl, rfl⟩) d.2.1 hin' 1 b
   refine ⟨hin, hin', hw, hw', hA, hA', fun b => ?_, hg⟩
-  have e : w' (S.f' b) - w (S.f b) =
-      (m' (S.f' b) - m (S.f b) - (m' (S.f' b) - w' (S.f' b))) + (m (S.f b) - w (S.f b)) := by
+  have e
+      : w' (S.f' b) - w (S.f b)
+        = (m' (S.f' b) - m (S.f b) - (m' (S.f' b) - w' (S.f' b))) + (m (S.f b) - w (S.f b)) := by
     abel
   rw [e]
   exact inTh_add S (inTh_sub S (hfr b) (hB' _ (hf2 b))) (hB _ (hf1 b))
 
 end Local
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 
-theorem ext_symm (A : Places F E sig) {n : ℕ} (p : HeightOneSpectrum (𝓞 F))
-    {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} {w : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)}
-    (h : A.Ext p g⁻¹ w) : A.Ext p g w.symm := by
+theorem ext_symm
+    (A : Places F E sig)
+    {n : ℕ}
+    (p : HeightOneSpectrum (𝓞 F))
+    {g : (Fin n → E) ≃ₗ[E] (Fin n → E)}
+    {w : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)} (h : A.Ext p g⁻¹ w)
+    : A.Ext p g w.symm := by
   intro x
   rw [LinearEquiv.symm_apply_eq, h (g x)]
   congr 1
   exact (g.symm_apply_apply x).symm
 
-private theorem full_lattice_of_term {A : Places F E sig} {r k : ℕ} (G : GFrames A r k)
-    {d : G.Dat} {Λ : G.Lt} (hΛ : G.IsTerm d Λ) : Submodule.IsFullLattice E Λ := by
+private theorem full_lattice_of_term
+    {A : Places F E sig} {r k : ℕ} (G : GFrames A r k) {d : G.Dat} {Λ : G.Lt} (hΛ : G.IsTerm d Λ)
+    : Submodule.IsFullLattice E Λ := by
   refine { toIsLattice := hΛ.1, span_eq_top := ?_ }
   by_contra hne
   obtain ⟨φ, hφ, hzero⟩ :=
@@ -173,8 +192,8 @@ private theorem full_lattice_of_term {A : Places F E sig} {r k : ℕ} (G : GFram
     ∑ i : Fin (k + 2 * r + 1), (A.loc p).ιE (φ fun j => if i = j then 1 else 0) • LinearMap.proj i
   have hψ (z : G.V) : ψ (A.bc p z) = (A.loc p).ιE (φ z) := by
     rw [φ.pi_apply_eq_sum_univ z, map_sum]
-    simp only [ψ, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.proj_apply,
-      smul_eq_mul, map_mul, Places.bc]
+    simp only [ψ, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.proj_apply, smul_eq_mul,
+      map_mul, Places.bc]
     exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
   have hlat : A.lat p Λ ≤ (LinearMap.ker ψ).restrictScalars (A.L p).O := by
     apply Submodule.span_le.mpr
@@ -194,13 +213,15 @@ private theorem full_lattice_of_term {A : Places F E sig} {r k : ℕ} (G : GFram
   rw [hψ] at hz
   exact (map_eq_zero_iff _ (A.loc p).ιE.injective).mp hz
 
-
-theorem good_places (A : Places F E sig) (r k : ℕ) (G : GFrames A r k) (hk : 4 * r + 7 ≤ k)
-    (d : G.Dat) (Λ : G.Lt) (hT : G.IsTerm d Λ) :
-    {p | ¬ (G.S p).IsTermW (d p) (A.lat p Λ) 1 1}.Finite := by
+theorem good_places
+    (A : Places F E sig) (r k : ℕ)
+    (G : GFrames A r k) (hk : 4 * r + 7 ≤ k) (d : G.Dat) (Λ : G.Lt) (hT : G.IsTerm d Λ)
+    : {p | ¬ (G.S p).IsTermW (d p) (A.lat p Λ) 1 1}.Finite := by
   have hfull := full_lattice_of_term G hT
   obtain ⟨hL, hloc⟩ := hT
-  refine ((GlobalTheory.T.numberField_lattice_determined_by_local_lattices A (k + 2 * r + 1) Λ hfull).2.2.union (GlobalTheory.T.coordinateLattice_unique_term_almost_all_places A r k G hk)).subset ?_
+  refine ((GlobalTheory.T.numberField_lattice_determined_by_local_lattices A (k + 2 * r + 1) Λ
+      hfull).2.2.union (GlobalTheory.T.coordinateLattice_unique_term_almost_all_places A r k G
+    hk)).subset ?_
   intro p hp
   by_contra hq
   rw [Set.mem_union, not_or] at hq
@@ -212,7 +233,8 @@ theorem good_places (A : Places F E sig) (r k : ℕ) (G : GFrames A r k) (hk : 4
   have hT0 := hloc p
   rw [h1] at hT0 hp
   have hd : d p = d₀ := by
-    refine (GlobalTheory.HL.TermBasic.term_basic (A.L p) r k (G.S p) d₀ _ ?_).2.2.2.2.2.2.2 (d p) hT0
+    refine (GlobalTheory.HL.TermBasic.term_basic (A.L p) r k (G.S p) d₀ _ ?_).2.2.2.2.2.2.2 (d p)
+      hT0
     unfold Frames.IsTerm
     exact ⟨(1, 1), hW⟩
   rw [hd] at hp
@@ -223,26 +245,36 @@ private lemma exists_mem_Ext_of_mem_rat (A : Places F E sig) {n : ℕ}
     {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} (h : g ∈ A.rat K) (p : HeightOneSpectrum (𝓞 F)) :
     ∃ g' ∈ K p, A.Ext p g g' := h p
 
-theorem global_witnesses : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {sig : E →ₐ[F] E} (A : Places F E sig), ∀ (r k : ℕ) (G : GFrames A r k), 4 * r + 7 ≤ k → ∀ d Λ,
-    G.IsTerm d Λ → (∃ n ∈ G.N, ∃ n' ∈ G.N', ∀ p m m', A.Ext p n m → A.Ext p n' m' →
-      (G.S p).IsTermW (d p) (A.lat p Λ) m m') ∧
-    ∀ m m' : ∀ p, (G.S p).GLV, (∀ p, (G.S p).IsTermW (d p) (A.lat p Λ) (m p) (m' p)) →
-      G.om d Λ = ∏ᶠ p, (G.S p).psi (m p) * ((G.S p).psi' (m' p))⁻¹ := by
+theorem global_witnesses
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ (r k : ℕ) (G : GFrames A r k),
+        4 * r + 7 ≤ k
+          → ∀ d Λ,
+            G.IsTerm d Λ
+              → (∃ n ∈ G.N, ∃ n' ∈ G.N', ∀ p m m',
+                  A.Ext p n m → A.Ext p n' m' → (G.S p).IsTermW (d p) (A.lat p Λ) m m')
+                ∧ ∀ m m' : ∀ p, (G.S p).GLV,
+                  (∀ p, (G.S p).IsTermW (d p) (A.lat p Λ) (m p) (m' p))
+                    → G.om d Λ = ∏ᶠ p, (G.S p).psi (m p) * ((G.S p).psi' (m' p))⁻¹ := by
   intro F E _ _ _ _ _ sig A r k G hk d Λ hT
   have hfin := good_places A r k G hk d Λ hT
   have hfull := full_lattice_of_term G hT
   obtain ⟨hL, hloc⟩ := hT
-  have key : ∀ p, ∃ q : (G.S p).GLV × (G.S p).GLV, (G.S p).IsTermW (d p) (A.lat p Λ) q.1 q.2 ∧
-      ((G.S p).IsTermW (d p) (A.lat p Λ) 1 1 → q = 1) := by
+  have key
+      : ∀ p, ∃ q : (G.S p).GLV × (G.S p).GLV,
+        (G.S p).IsTermW (d p) (A.lat p Λ) q.1 q.2
+          ∧ ((G.S p).IsTermW (d p) (A.lat p Λ) 1 1 → q = 1) := by
     intro p
     by_cases h : (G.S p).IsTermW (d p) (A.lat p Λ) 1 1
     · exact ⟨1, h, fun _ => rfl⟩
     · haveI := (A.loc p).lf
       haveI := (A.loc p).char0
-      exact ⟨(G.S p).wit (d p) (A.lat p Λ),
+      exact ⟨
+        (G.S p).wit (d p) (A.lat p Λ),
         (GlobalTheory.HL.TermBasic.term_basic (A.L p) r k (G.S p) (d p) (A.lat p Λ) (hloc p)).2.1,
-        fun h' => absurd h' h⟩
+        fun h' => absurd h' h
+      ⟩
   choose q hq using key
   have hmem : ∀ p, (q p).1 ∈ (G.S p).N ∧ (q p).2 ∈ (G.S p).N' := fun p => by
     have h := (hq p).1
@@ -250,16 +282,19 @@ theorem global_witnesses : ∀ {F E : Type} [Field F] [NumberField F] [Field E] 
     exact ⟨h.2.2.1, h.2.2.2.1⟩
   have hone : ∀ p, p ∉ {p | ¬ (G.S p).IsTermW (d p) (A.lat p Λ) 1 1} → q p = 1 := fun p hp =>
     (hq p).2 (by simpa using hp)
-  have hfinN : {p | ((q p).1)⁻¹ • A.lat p Λ ≠ A.lat p Λ}.Finite := hfin.subset fun p hp => by
-    by_contra h
-    rw [Set.mem_setOf_eq, hone p h] at hp
-    exact hp (by simp)
-  have hfinN' : {p | ((q p).2)⁻¹ • A.lat p Λ ≠ A.lat p Λ}.Finite := hfin.subset fun p hp => by
-    by_contra h
-    rw [Set.mem_setOf_eq, hone p h] at hp
-    exact hp (by simp)
-  have hcfin : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) =
-      (Units.mk0 (G.S p).th (th_ne (G.S p)) : ((A.loc p).Fp)ˣ)}.Finite := by
+  have hfinN : {p | ((q p).1)⁻¹ • A.lat p Λ ≠ A.lat p Λ}.Finite :=
+    hfin.subset fun p hp => by
+      by_contra h
+      rw [Set.mem_setOf_eq, hone p h] at hp
+      exact hp (by simp)
+  have hfinN' : {p | ((q p).2)⁻¹ • A.lat p Λ ≠ A.lat p Λ}.Finite :=
+    hfin.subset fun p hp => by
+      by_contra h
+      rw [Set.mem_setOf_eq, hone p h] at hp
+      exact hp (by simp)
+  have hcfin
+      : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) =
+        (Units.mk0 (G.S p).th (th_ne (G.S p)) : ((A.loc p).Fp)ˣ)}.Finite := by
     refine G.gg_fin.subset fun p hp => ?_
     by_contra hg
     rw [Set.mem_setOf_eq] at hp hg
@@ -267,18 +302,28 @@ theorem global_witnesses : ∀ {F E : Type} [Field F] [NumberField F] [Field E] 
     refine ⟨1, ?_⟩
     rw [Units.val_mk0]
     simp [Frames.th, hg]
-  obtain ⟨g, hgN, hgP⟩ := (GlobalTheory.T.strong_approximation_unipotent_alt A r k G Λ hfull (fun p => Units.mk0 (G.S p).th (th_ne (G.S p)))
-    hcfin (fun p => ((q p).1)⁻¹) hfinN).1 (fun p => inv_mem (hmem p).1)
-  obtain ⟨g', hg'N, hg'P⟩ := (GlobalTheory.T.strong_approximation_unipotent_alt A r k G Λ hfull (fun p => Units.mk0 (G.S p).th (th_ne (G.S p)))
-    hcfin (fun p => ((q p).2)⁻¹) hfinN').2 (fun p => inv_mem (hmem p).2)
+  obtain ⟨g, hgN, hgP⟩ :=
+    (GlobalTheory.T.strong_approximation_unipotent_alt A r k G Λ hfull
+      (fun p => Units.mk0 (G.S p).th (th_ne (G.S p)))
+      hcfin
+      (fun p => ((q p).1)⁻¹)
+      hfinN).1 (fun p => inv_mem (hmem p).1)
+  obtain ⟨g', hg'N, hg'P⟩ :=
+    (GlobalTheory.T.strong_approximation_unipotent_alt A r k G Λ hfull
+      (fun p => Units.mk0 (G.S p).th (th_ne (G.S p)))
+      hcfin
+      (fun p => ((q p).2)⁻¹)
+      hfinN').2 (fun p => inv_mem (hmem p).2)
   refine ⟨⟨g⁻¹, inv_mem hgN, g'⁻¹, inv_mem hg'N, fun p m m' hm hm' => ?_⟩, fun m m' hmm => ?_⟩
   · haveI := (A.loc p).lf
     haveI := (A.loc p).char0
     have hmN : m ∈ (G.S p).N := by
-      obtain ⟨m₀, hm₀, hext⟩ := exists_mem_Ext_of_mem_rat A (K := fun p => (G.S p).N) (inv_mem hgN) p
+      obtain ⟨m₀, hm₀, hext⟩ :=
+        exists_mem_Ext_of_mem_rat A (K := fun p => (G.S p).N) (inv_mem hgN) p
       rwa [((GlobalTheory.HL.RatExt.rational_extend A _ p).2.2.1 g⁻¹).unique hm hext]
     have hm'N : m' ∈ (G.S p).N' := by
-      obtain ⟨m₀, hm₀, hext⟩ := exists_mem_Ext_of_mem_rat A (K := fun p => (G.S p).N') (inv_mem hg'N) p
+      obtain ⟨m₀, hm₀, hext⟩ :=
+        exists_mem_Ext_of_mem_rat A (K := fun p => (G.S p).N') (inv_mem hg'N) p
       rwa [((GlobalTheory.HL.RatExt.rational_extend A _ p).2.2.1 g'⁻¹).unique hm' hext]
     refine isTermW_of_close (G.S p) (hq p).1 hmN hm'N (fun x hx => ?_) (fun x hx => ?_)
     · obtain ⟨y, hy, hxy⟩ := hgP p m.symm (ext_symm A p hm) x hx
@@ -291,7 +336,7 @@ theorem global_witnesses : ∀ {F E : Type} [Field F] [NumberField F] [Field E] 
     refine finprod_congr fun p => ?_
     haveI := (A.loc p).lf
     haveI := (A.loc p).char0
-    exact (GlobalTheory.HL.WitIndep.witness_independence (A.L p) r k (G.S p) (d p) (A.lat p Λ) (m p) (m' p)
-      (hmm p)).1
+    exact (GlobalTheory.HL.WitIndep.witness_independence (A.L p) r k (G.S p) (d p) (A.lat p Λ) (m p)
+      (m' p) (hmm p)).1
 
 end GlobalTheory.HL.GlobalWit

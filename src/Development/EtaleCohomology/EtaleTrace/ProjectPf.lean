@@ -41,9 +41,15 @@ theorem Project_of (hStep : Step) (hHom : HomRel) : Project := by
   induction m with
   | zero =>
     obtain ⟨hf, hr⟩ := pf_finrank d hd v hv
-    refine ⟨v, fun i => Submodule.subset_span ⟨i, rfl⟩, hv,
-      linearIndependent_of_top_le_span_of_card_eq_finrank hv.ge (by simp [hr]), ?_⟩
-    intro O _ _ h; exact h
+    refine ⟨
+      v,
+      fun i => Submodule.subset_span ⟨i, rfl⟩,
+      hv,
+      linearIndependent_of_top_le_span_of_card_eq_finrank hv.ge (by simp [hr]),
+      ?_
+    ⟩
+    intro O _ _ h
+    exact h
   | succ m ih =>
     obtain ⟨hf, hr⟩ := pf_finrank d hd v hv
     have hdep : ¬ LinearIndependent K (jet k v) := by
@@ -60,6 +66,7 @@ theorem Project_of (hStep : Step) (hHom : HomRel) : Project := by
       obtain ⟨l, hl, hlO⟩ := hwO O hO hk ⟨i, hi, fun j => pf_div_mem v O hk _ hiO _ (hw'k j)⟩
       refine ⟨l, hl, fun j => ?_⟩
       have : v j / w l = (v j / w' i) * (w' i / w l) := by field_simp
-      rw [this]; exact O.mul_mem (hiO j) (hlO i)
+      rw [this]
+      exact O.mul_mem (hiO j) (hlO i)
 
 end LateralTheory.EtaleTrace.Cov

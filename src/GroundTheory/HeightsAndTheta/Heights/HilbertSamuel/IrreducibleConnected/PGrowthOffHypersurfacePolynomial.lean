@@ -12,8 +12,10 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open MvPolynomial
 
-theorem exists_eval_ne_zero_of_isOpen {d : ℕ} {Q : MvPolynomial (Fin d) ℂ} (hQ : Q ≠ 0)
-    {V : Set (Fin d → ℂ)} (hV : IsOpen V) (hne : V.Nonempty) : ∃ t ∈ V, eval t Q ≠ 0 := by
+theorem exists_eval_ne_zero_of_isOpen
+    {d : ℕ} {Q : MvPolynomial (Fin d) ℂ} (hQ : Q ≠ 0)
+    {V : Set (Fin d → ℂ)} (hV : IsOpen V) (hne : V.Nonempty)
+    : ∃ t ∈ V, eval t Q ≠ 0 := by
   by_contra hall
   simp only [not_exists, not_and, not_not] at hall
   obtain ⟨t, ht⟩ := hne
@@ -27,8 +29,8 @@ theorem exists_eval_ne_zero_of_isOpen {d : ℕ} {Q : MvPolynomial (Fin d) ℂ} (
     rw [ball_pi t hε]
     exact hx
 
-theorem dense_eval_ne_zero {d : ℕ} {Q : MvPolynomial (Fin d) ℂ} (hQ : Q ≠ 0) :
-    Dense {y : Fin d → ℂ | eval y Q ≠ 0} := by
+theorem dense_eval_ne_zero {d : ℕ} {Q : MvPolynomial (Fin d) ℂ} (hQ : Q ≠ 0)
+    : Dense {y : Fin d → ℂ | eval y Q ≠ 0} := by
   rw [dense_iff_inter_open]
   intro V hV hne
   obtain ⟨t, htV, ht⟩ := exists_eval_ne_zero_of_isOpen hQ hV hne

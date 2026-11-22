@@ -5,13 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base
+  UpperTheory.V.Pr UpperTheory.V
 open scoped Pointwise
 
-private theorem orbit_count {G X V : Type} [Group G] [MulAction G X] [Fintype V] (U : Subgroup G) [U.Normal]
-    (hU : U.index ≠ 0) (b : X) (p : V → X) (h1 : ∀ v, ∃ γ : G, p v = γ • b)
-    (h2 : ∀ g : G, ∃! v, ∃ u ∈ U, g • b = u • p v) :
-    ∑ v, U.relIndex (MulAction.stabilizer G (p v)) = U.index := by
+private theorem orbit_count
+    {G X V : Type} [Group G] [MulAction G X] [Fintype V]
+    (U : Subgroup G) [U.Normal]
+    (hU : U.index ≠ 0)
+    (b : X) (p : V → X)
+    (h1 : ∀ v, ∃ γ : G, p v = γ • b) (h2 : ∀ g : G, ∃! v, ∃ u ∈ U, g • b = u • p v)
+    : ∑ v, U.relIndex (MulAction.stabilizer G (p v)) = U.index := by
   classical
   have hN : U.Normal := inferInstance
   have conj_eq : ∀ γ : G, U.map (MulAut.conj γ).toMonoidHom = U := by
@@ -24,8 +28,9 @@ private theorem orbit_count {G X V : Type} [Group G] [MulAction G X] [Fintype V]
       refine ⟨γ⁻¹ * x * γ, ?_, ?_⟩
       · simpa using hN.conj_mem x hx γ⁻¹
       · simp [mul_assoc]
-  have hrel : ∀ v, U.relIndex (MulAction.stabilizer G (p v)) =
-      U.relIndex (U ⊔ MulAction.stabilizer G b) := by
+  have hrel
+      : ∀ v,
+        U.relIndex (MulAction.stabilizer G (p v)) = U.relIndex (U ⊔ MulAction.stabilizer G b) := by
     intro v
     obtain ⟨γ, hγ⟩ := h1 v
     rw [hγ, MulAction.stabilizer_smul_eq_stabilizer_map_conj]
@@ -42,8 +47,7 @@ private theorem orbit_count {G X V : Type} [Group G] [MulAction G X] [Fintype V]
     rw [← SetLike.mem_coe, Subgroup.normal_mul] at hm
     obtain ⟨a, ha, c, hc, hac⟩ := hm
     have hac' : a * c = (γ v)⁻¹ * γ w := hac
-    have hw : γ w = γ v * a * c := by
-      rw [mul_assoc, hac', mul_inv_cancel_left]
+    have hw : γ w = γ v * a * c := by rw [mul_assoc, hac', mul_inv_cancel_left]
     have h₁ : γ w • b = (γ v * a * (γ v)⁻¹) • p v := by
       rw [hw, hγ v, mul_smul, MulAction.mem_stabilizer_iff.mp hc, ← mul_smul, inv_mul_cancel_right]
     have h₂ : γ w • b = (1 : G) • p w := by rw [one_smul, hγ w]
@@ -68,8 +72,10 @@ private theorem orbit_count {G X V : Type} [Group G] [MulAction G X] [Fintype V]
   rw [Finset.sum_congr rfl (fun v _ => hrel v), Finset.sum_const, Finset.card_univ, smul_eq_mul,
     hcard, mul_comm, Subgroup.relIndex_mul_index le_sup_left]
 
-private theorem upl_normal (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (L : Type) [Field L] [NumberField L]
-    [Algebra L Ω] [IsAbelianGalois ℚ L] : (upl Ω L).Normal := by
+private theorem upl_normal
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (L : Type) [Field L] [NumberField L] [Algebra L Ω] [IsAbelianGalois ℚ L]
+    : (upl Ω L).Normal := by
   unfold upl
   constructor
   intro n hn g x hx
@@ -83,13 +89,19 @@ private theorem upl_normal (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure �
   rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, hy', hn', ← hy', ← AlgEquiv.mul_apply, mul_inv_cancel,
     AlgEquiv.one_apply]
 
-private theorem cycMod_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [hl : Fact l.Prime] {ζ : Ω}
-    (hζ : IsPrimitiveRoot ζ l) {s : G ℚ Ω} (hs : s ζ = ζ) : cycMod ℚ Ω l 1 s = 1 := by
+private theorem cycMod_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [hl : Fact l.Prime]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ l)
+    {s : G ℚ Ω} (hs : s ζ = ζ)
+    : cycMod ℚ Ω l 1 s = 1 := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   unfold cycMod cycZ
   ext
   simp only [MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, Units.val_one]
-  change PadicInt.toZModPow 1 ((cyclotomicCharacter Ω l) ((MulSemiringAction.toRingAut (G ℚ Ω) Ω) s)).val = 1
+  change PadicInt.toZModPow 1
+      ((cyclotomicCharacter Ω l) ((MulSemiringAction.toRingAut (G ℚ Ω) Ω) s)).val
+    = 1
   rw [cyclotomicCharacter.toZModPow]
   symm
   apply modularCyclotomicCharacter.unique
@@ -101,8 +113,11 @@ private theorem cycMod_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure �
   rw [← e]
   simp [hs]
 
-private theorem val_smul {Ω : Type} [Field Ω] [CharZero Ω] (g : G ℚ Ω) (B : ValuationSubring Ω) (n : ℕ)
-    (h : B.valuation (n : Ω) < 1) : (g • B).valuation (n : Ω) < 1 := by
+private theorem val_smul
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (g : G ℚ Ω)
+    (B : ValuationSubring Ω) (n : ℕ) (h : B.valuation (n : Ω) < 1)
+    : (g • B).valuation (n : Ω) < 1 := by
   have key : ∀ (A : ValuationSubring Ω) (x : Ω), x ≠ 0 → (A.valuation x < 1 ↔ x⁻¹ ∉ A) := by
     intro A x hx
     rw [← A.valuation_le_one_iff, not_le, Valuation.one_lt_val_iff _ (inv_ne_zero hx), inv_inv]
@@ -113,12 +128,12 @@ private theorem val_smul {Ω : Type} [Field Ω] [CharZero Ω] (g : G ℚ Ω) (B 
     rw [map_zero]
     exact zero_lt_one
   rw [key _ _ hn] at h ⊢
-  rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def, map_inv₀, map_natCast]
+  rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def, map_inv₀,
+    map_natCast]
   exact h
 
 set_option maxHeartbeats 400000 in
-theorem UpperTheory.V.Pr.degEq :
-    UpperTheory.V.Pr.DegEq := by
+theorem UpperTheory.V.Pr.degEq : UpperTheory.V.Pr.DegEq := by
   unfold UpperTheory.V.Pr.DegEq
   intro Ω _ _ _ l _ ι c _ N _ e ψ η σ g₁ B M hL L _ _ _ _ _ Φ k a
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -152,10 +167,12 @@ theorem UpperTheory.V.Pr.degEq :
     obtain ⟨γ, -, hγ⟩ := k.pl_conj a
     have hM : B.valuation (M : Ω) < 1 := by
       obtain ⟨t, ht⟩ := hL.dvd
-      have h1 : B.valuation ((N * t : ℕ) : Ω) ≤ 1 := (B.valuation_le_one_iff _).mpr (natCast_mem B _)
+      have h1 : B.valuation ((N * t : ℕ) : Ω) ≤ 1 :=
+        (B.valuation_le_one_iff _).mpr (natCast_mem B _)
       rw [ht, mul_assoc, Nat.cast_mul, map_mul]
-      calc B.valuation (l : Ω) * B.valuation ((N * t : ℕ) : Ω) ≤ B.valuation (l : Ω) :=
-            mul_le_of_le_one_right' h1
+      calc
+        B.valuation (l : Ω) * B.valuation ((N * t : ℕ) : Ω)
+          ≤ B.valuation (l : Ω) := mul_le_of_le_one_right' h1
         _ < 1 := hL.atl
     have hM' : (k.pl a).valuation (M : Ω) < 1 := by
       rw [hγ]

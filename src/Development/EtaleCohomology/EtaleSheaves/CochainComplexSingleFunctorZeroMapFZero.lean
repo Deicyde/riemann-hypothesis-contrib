@@ -25,14 +25,17 @@ lemma cochainComplex_singleFunctor_zero_map_f_zero {A B : C} (f : A ⟶ B) :
         (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 B).inv :=
   HomologicalComplex.single_map_f_self _ _ f
 
-def eIso (K : CochainComplex C ℤ) [K.IsStrictlyLE 0] :
-    K.stupidTrunc (ComplexShape.embeddingUpIntGE 0) ≅ (CochainComplex.singleFunctor C 0).obj (K.X 0) :=
+def eIso (K : CochainComplex C ℤ) [K.IsStrictlyLE 0]
+    : K.stupidTrunc (ComplexShape.embeddingUpIntGE 0)
+      ≅ (CochainComplex.singleFunctor C 0).obj (K.X 0) :=
   HomologicalComplex.Hom.isoOfComponents
-    (fun i => if h : i = 0 then (by
+    (fun i =>
+      if h : i = 0 then (by
         subst h
-        exact K.stupidTruncXIso (ComplexShape.embeddingUpIntGE 0) (i := 0) (by simp) ≪≫
-          (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 (K.X 0)).symm)
-      else (isZero_tr K i h).iso (HomologicalComplex.isZero_single_obj_X _ 0 _ i h))
+        exact K.stupidTruncXIso (ComplexShape.embeddingUpIntGE 0) (i := 0) (by simp)
+          ≪≫ (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 (K.X 0)).symm)
+      else
+        (isZero_tr K i h).iso (HomologicalComplex.isZero_single_obj_X _ 0 _ i h))
     (by
       intro i j hij
       simp only [ComplexShape.up_Rel] at hij

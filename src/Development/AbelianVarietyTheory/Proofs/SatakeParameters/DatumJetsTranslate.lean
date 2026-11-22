@@ -9,8 +9,11 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H GlobalTheory.MomT
-open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields recPrimes recSeam HostTie AnTie badS)
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H
+  GlobalTheory.MomT
+open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound
+  (recFields recPrimes recSeam HostTie AnTie badS)
 open GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation (StdOver)
 
 noncomputable section
@@ -19,10 +22,12 @@ namespace GlobalTheory.DatumJets.Transl
 
 open GlobalTheory.LiftTypePrime GlobalTheory.MomT.PtMoments
 
-theorem exists_denom {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Module (𝓞 E) W] {p : ℕ} (hp : p.Prime)
+theorem exists_denom
+    {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Module (𝓞 E) W]
+    {p : ℕ} (hp : p.Prime)
     {M M' : Submodule (𝓞 E) W} (hM : M.FG)
-    (h : ∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → M ≤ localization₂ P.asIdeal M') :
-    ∃ s : ℕ, Nat.Coprime s p ∧ ∀ x ∈ M, (s : 𝓞 E) • x ∈ M' := by
+    (h : ∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → M ≤ localization₂ P.asIdeal M')
+    : ∃ s : ℕ, Nat.Coprime s p ∧ ∀ x ∈ M, (s : 𝓞 E) • x ∈ M' := by
   have key : ∀ x : W, ∃ s : ℕ, Nat.Coprime s p ∧ (x ∈ M → (s : 𝓞 E) • x ∈ M') := fun x => by
     by_cases hx : x ∈ M
     swap
@@ -39,7 +44,8 @@ theorem exists_denom {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Mo
       rcases Int.natAbs_eq z with h1 | h1
       · rw [h1, Int.cast_natCast] at hz1; exact hz1
       · rw [h1, Int.cast_neg, Int.cast_natCast, neg_smul, neg_mem_iff] at hz1; exact hz1
-    obtain ⟨Q, hQ, hQp, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (Ideal.span {(p : ℤ)}) I hI
+    obtain ⟨Q, hQ, hQp, hQc⟩ :=
+      Ideal.exists_ideal_over_prime_of_isIntegral (Ideal.span {(p : ℤ)}) I hI
     have hpQ : (p : 𝓞 E) ∈ Q := by
       have : (p : ℤ) ∈ Q.comap (algebraMap ℤ (𝓞 E)) := by
         change (p : ℤ) ∈ Ideal.under ℤ Q
@@ -54,7 +60,9 @@ theorem exists_denom {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Mo
   choose f hf hfx using key
   obtain ⟨S, rfl⟩ := hM
   refine ⟨∏ x ∈ S, f x, Nat.Coprime.prod_left fun x _ => hf x, fun x hx => ?_⟩
-  refine (Submodule.span_le (p := M'.comap (((∏ x ∈ S, f x : ℕ) : 𝓞 E) • LinearMap.id))).2 (fun y hy => ?_) hx
+  refine (Submodule.span_le (p := M'.comap (((∏ x ∈ S, f x : ℕ) : 𝓞 E) • LinearMap.id))).2
+    (fun y hy => ?_)
+    hx
   obtain ⟨c, hc⟩ := Finset.dvd_prod_of_mem f (Finset.mem_coe.1 hy)
   change ((∏ x ∈ S, f x : ℕ) : 𝓞 E) • y ∈ M'
   rw [hc, mul_comm, Nat.cast_mul, mul_smul]
@@ -63,13 +71,28 @@ theorem exists_denom {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Mo
 theorem stdLat_fg (E : Type) [Field E] (n : ℕ) : (Formalism.L2.Col.stdLat E n).FG :=
   Submodule.fg_pi fun _ => by rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
 
-theorem stdAt_of_stdOver (D : D7) {p : ℕ} (hp : p.Prime) {n : ℕ} {N : Submodule (𝓞 D.host.E) (Sp D.host.E n)} (hN : N.FG)
-    (h : StdOver p N) : StdAt D p ((recSeam D).lat N) := by
-  obtain ⟨s, hs, h1⟩ := exists_denom hp hN (M' := Formalism.L2.Col.stdLat D.host.E n) fun P hP => (le_locP _ _).trans (h P hP).le
-  obtain ⟨t, ht, h2⟩ := exists_denom hp (stdLat_fg D.host.E n) (M' := N) fun P hP => (le_locP _ _).trans (h P hP).ge
-  have hl : ∀ x, x ∈ (recSeam D).lat N ↔ x ∈ N := fun x => GlobalTheory.SeamTransport.mem_lat (recSeam D) N x
-  refine ⟨Formalism.L2.Col.stdLat D.host.E n, fun x => ?_, s * t, hs.mul_left ht, fun x hx => ?_, fun x hx => ?_⟩
-  · simp only [Formalism.L2.Col.stdLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff, Submodule.mem_one]
+theorem stdAt_of_stdOver
+    (D : D7)
+    {p : ℕ} (hp : p.Prime)
+    {n : ℕ} {N : Submodule (𝓞 D.host.E) (Sp D.host.E n)} (hN : N.FG) (h : StdOver p N)
+    : StdAt D p ((recSeam D).lat N) := by
+  obtain ⟨s, hs, h1⟩ :=
+    exists_denom hp hN (M' := Formalism.L2.Col.stdLat D.host.E n) fun P hP =>
+      (le_locP _ _).trans (h P hP).le
+  obtain ⟨t, ht, h2⟩ :=
+    exists_denom hp (stdLat_fg D.host.E n) (M' := N) fun P hP => (le_locP _ _).trans (h P hP).ge
+  have hl : ∀ x, x ∈ (recSeam D).lat N ↔ x ∈ N := fun x =>
+    GlobalTheory.SeamTransport.mem_lat (recSeam D) N x
+  refine ⟨
+    Formalism.L2.Col.stdLat D.host.E n,
+    fun x => ?_,
+    s * t,
+    hs.mul_left ht,
+    fun x hx => ?_,
+    fun x hx => ?_
+  ⟩
+  · simp only [Formalism.L2.Col.stdLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff,
+      Submodule.mem_one]
     exact forall_congr' fun k => ⟨fun ⟨y, hy⟩ => hy ▸ y.isIntegral_coe, fun hy => ⟨⟨_, hy⟩, rfl⟩⟩
   · have := h1 x ((hl x).1 hx)
     rw [Nat.cast_smul_eq_nsmul] at this ⊢

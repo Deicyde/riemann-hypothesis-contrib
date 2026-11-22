@@ -24,8 +24,9 @@ theorem t2 : ExistsBoundedBasis := by
   have hcoef : ∀ g ∈ s, ∃ c : Fin j → K, ∑ a, c a • b a = g := fun g hg =>
     (Submodule.mem_span_range_iff_exists_fun K).mp (hBspan (hs ▸ Submodule.subset_span hg))
   choose! c hc using hcoef
-  obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ
-    ((s ×ˢ Finset.univ).image (fun p : (Fin n → K) × Fin j => c p.1 p.2))
+  obtain ⟨y, hy0, hy⟩ :=
+    exists_integral_multiples ℤ ℚ
+      ((s ×ˢ Finset.univ).image (fun p : (Fin n → K) × Fin j => c p.1 p.2))
   have hyg : ∀ g ∈ s, (y : ℤ) • g ∈ Submodule.span (𝓞 K) (Set.range b) := by
     intro g hg
     rw [← hc g hg, Finset.smul_sum]
@@ -40,15 +41,19 @@ theorem t2 : ExistsBoundedBasis := by
   have hyB : ∀ v ∈ B, (y : ℤ) • v ∈ Submodule.span (𝓞 K) (Set.range b) := by
     rw [← hs]
     intro v hv
-    refine Submodule.span_induction (fun g hg => hyg g hg) (by simp)
+    refine Submodule.span_induction
+      (fun g hg => hyg g hg)
+      (by simp)
       (fun u w _ _ hu hw => by rw [smul_add]; exact add_mem hu hw)
-      (fun o u _ hu => by rw [smul_comm]; exact Submodule.smul_mem _ o hu) hv
+      (fun o u _ hu => by rw [smul_comm]; exact Submodule.smul_mem _ o hu)
+      hv
   haveI : Module.Finite (𝓞 K) B := Module.Finite.iff_fg.mpr ⟨s, hs⟩
   haveI : Module.Finite ℤ (B ⧸ (Submodule.span (𝓞 K) (Set.range b)).comap B.subtype) :=
     Module.Finite.trans (𝓞 K) _
   apply Module.finite_of_fg_torsion
   intro q
-  obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective ((Submodule.span (𝓞 K) (Set.range b)).comap B.subtype) q
+  obtain ⟨v, rfl⟩ :=
+    Submodule.Quotient.mk_surjective ((Submodule.span (𝓞 K) (Set.range b)).comap B.subtype) q
   refine ⟨⟨y, mem_nonZeroDivisors_of_ne_zero hy0⟩, ?_⟩
   show (y : ℤ) • (Submodule.Quotient.mk (p := (Submodule.span (𝓞 K) (Set.range b)).comap B.subtype) v) = 0
   have hz := map_zsmul (Submodule.mkQ ((Submodule.span (𝓞 K) (Set.range b)).comap B.subtype)) y v

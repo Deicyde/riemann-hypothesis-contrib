@@ -26,19 +26,28 @@ private lemma liftUnitri {R K : Type} [CommRing R] [CommRing K] (f : R →+* K) 
   · ext i j
     simp [H, ha]
 
-theorem UpperTheory.diagonal_conjugate_mem :
-    ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ} (ϖ : kˣ), ValuativeRel.valuation k (ϖ : k) < 1 →
-        ∀ (c : ℕ) (z g : GL (Fin n) k),
-        (z : Matrix (Fin n) (Fin n) k) = Matrix.diagonal (fun i : Fin n => ((ϖ ^ ((n : ℤ) - 1 - ((i : ℕ) : ℤ)) : kˣ) : k)) →
-        g ∈ (Matrix.GeneralLinearGroup.map (n := Fin n) (algebraMap (↥(ValuativeRel.valuation k).integer) k)).range →
-        (g : Matrix (Fin n) (Fin n) k).BlockTriangular id → (∀ i, (g : Matrix (Fin n) (Fin n) k) i i = 1) →
-        z ^ c * g * (z ^ c)⁻¹ ∈ Subgroup.map (Matrix.GeneralLinearGroup.map (algebraMap (↥(ValuativeRel.valuation k).integer) k))
-          (Matrix.GeneralLinearGroup.map (n := Fin n)
-            (Ideal.Quotient.mk (IsLocalRing.maximalIdeal ↥(ValuativeRel.valuation k).integer ^ c))).ker := by
+theorem UpperTheory.diagonal_conjugate_mem
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {n : ℕ} (ϖ : kˣ),
+      ValuativeRel.valuation k (ϖ : k) < 1
+        → ∀ (c : ℕ) (z g : GL (Fin n) k),
+          (z : Matrix (Fin n) (Fin n) k)
+              = Matrix.diagonal (fun i : Fin n => ((ϖ ^ ((n : ℤ) - 1 - ((i : ℕ) : ℤ)) : kˣ) : k))
+            → g ∈ (Matrix.GeneralLinearGroup.map (n := Fin n)
+              (algebraMap (↥(ValuativeRel.valuation k).integer) k)).range
+            → (g : Matrix (Fin n) (Fin n) k).BlockTriangular id
+            → (∀ i, (g : Matrix (Fin n) (Fin n) k) i i = 1)
+            → z ^ c * g * (z ^ c)⁻¹ ∈ Subgroup.map
+              (Matrix.GeneralLinearGroup.map (algebraMap (↥(ValuativeRel.valuation k).integer) k))
+              (Matrix.GeneralLinearGroup.map (n := Fin n)
+                (Ideal.Quotient.mk
+                  (IsLocalRing.maximalIdeal ↥(ValuativeRel.valuation k).integer ^ c))).ker := by
   intro k _ _ _ _ n ϖ hϖ c z g hz hg hb hd
   obtain ⟨g0, hg0⟩ := hg
-  have hg0' : ∀ i j, algebraMap (↥(ValuativeRel.valuation k).integer) k ((g0 : Matrix (Fin n) (Fin n) _) i j)
-      = (g : Matrix (Fin n) (Fin n) k) i j := by
+  have hg0'
+      : ∀ i j,
+        algebraMap (↥(ValuativeRel.valuation k).integer) k ((g0 : Matrix (Fin n) (Fin n) _) i j)
+          = (g : Matrix (Fin n) (Fin n) k) i j := by
     intro i j
     rw [← hg0]
     simp
@@ -51,40 +60,58 @@ theorem UpperTheory.diagonal_conjugate_mem :
       rw [hq]; simp
     have h2 : ValuativeRel.valuation k ((q : ↥(ValuativeRel.valuation k).integer) : k) ≤ 1 := q.2
     rw [Subring.coe_mul, map_mul] at h1
-    have h3 : ValuativeRel.valuation k (ϖ : k) * ValuativeRel.valuation k ((q : ↥(ValuativeRel.valuation k).integer) : k) < 1 :=
+    have h3
+        : ValuativeRel.valuation k (ϖ : k)
+            * ValuativeRel.valuation k ((q : ↥(ValuativeRel.valuation k).integer) : k)
+          < 1 :=
       lt_of_le_of_lt (mul_le_of_le_one_right' h2) hϖ
     exact absurd h1 h3.ne
   let t : Fin n → kˣ := fun i => ϖ ^ ((n : ℤ) - 1 - ((i : ℕ) : ℤ))
-  have hz1 : ((z ^ c : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
-      = Matrix.diagonal (fun i => (((t i) ^ c : kˣ) : k)) := by
+  have hz1
+      : ((z ^ c : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
+        = Matrix.diagonal (fun i => (((t i) ^ c : kˣ) : k)) := by
     rw [Units.val_pow_eq_pow_val, hz, Matrix.diagonal_pow]
     congr 1
-  have hz2 : (((z ^ c)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
-      = Matrix.diagonal (fun i => ((((t i) ^ c)⁻¹ : kˣ) : k)) := by
+  have hz2
+      : (((z ^ c)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
+        = Matrix.diagonal (fun i => ((((t i) ^ c)⁻¹ : kˣ) : k)) := by
     apply Units.inv_eq_of_mul_eq_one_right
     rw [hz1, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
     congr 1
     ext i
     rw [← Units.val_mul]
     simp
-  have hent : ∀ i j, ((z ^ c * g * (z ^ c)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j
-      = (((t i) ^ c : kˣ) : k) * (g : Matrix (Fin n) (Fin n) k) i j * ((((t j) ^ c)⁻¹ : kˣ) : k) := by
+  have hent
+      : ∀ i j,
+        ((z ^ c * g * (z ^ c)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j
+          = (((t i) ^ c : kˣ) : k) * (g : Matrix (Fin n) (Fin n) k) i j
+            * ((((t j) ^ c)⁻¹ : kˣ) : k) := by
     intro i j
     rw [Units.val_mul, Units.val_mul, hz2, hz1, Matrix.mul_diagonal, Matrix.diagonal_mul]
-  have hpow : ∀ i j : Fin n, i < j →
-      (((t i) ^ c : kˣ) : k) * ((((t j) ^ c)⁻¹ : kˣ) : k) = (ϖ : k) ^ (((j : ℕ) - (i : ℕ)) * c) := by
+  have hpow
+      : ∀ i j : Fin n,
+        i < j
+          → (((t i) ^ c : kˣ) : k) * ((((t j) ^ c)⁻¹ : kˣ) : k)
+            = (ϖ : k) ^ (((j : ℕ) - (i : ℕ)) * c) := by
     intro i j hij
     rw [← Units.val_mul, ← Units.val_pow_eq_pow_val]
     congr 1
     have hle : (i : ℕ) ≤ (j : ℕ) := hij.le
     simp only [t]
-    rw [← zpow_natCast, ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, ← zpow_neg, ← zpow_add]
+    rw [← zpow_natCast, ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, ← zpow_neg,
+      ← zpow_add]
     congr 1
     push_cast [Nat.cast_sub hle]
     ring
   refine liftUnitri _ _ _
-    (fun i j => if i < j then p ^ (((j : ℕ) - (i : ℕ)) * c) * (g0 : Matrix (Fin n) (Fin n) _) i j
-      else if i = j then 1 else 0) ?_ ?_ ?_ ?_
+    (fun i j =>
+      if i < j then
+        p ^ (((j : ℕ) - (i : ℕ)) * c) * (g0 : Matrix (Fin n) (Fin n) _) i j
+      else if i = j then
+        1
+      else
+        0)
+    ?_ ?_ ?_ ?_
   · intro i j
     rw [hent]
     rcases lt_trichotomy i j with hij | rfl | hij

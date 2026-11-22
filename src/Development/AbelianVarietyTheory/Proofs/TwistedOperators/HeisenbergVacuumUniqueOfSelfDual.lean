@@ -6,10 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsInt
 
 @[expose] public section
 
-open Matrix Formalism.UG GlobalTheory.Hk3 GlobalTheory.FinWeil GlobalTheory.SphTheta ValuativeRel Classical
+open Matrix Formalism.UG GlobalTheory.Hk3 GlobalTheory.FinWeil GlobalTheory.SphTheta ValuativeRel
+  Classical
 open GlobalTheory.LFun (HasSatU IsSatVecU heckeVec)
 open GlobalTheory.LGrp (bcParam extProd)
-open GlobalTheory.WeilM (UG IsQuad Darboux symp sbClass SB IsWeilB IsWeilPair TestClass schr dbl diagCols)
+open GlobalTheory.WeilM
+  (UG IsQuad Darboux symp sbClass SB IsWeilB IsWeilPair TestClass schr dbl diagCols)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace (str chi IsUnramAdd)
 open scoped TensorProduct
 
@@ -17,12 +19,20 @@ noncomputable section
 
 namespace GlobalTheory.SphTheta
 
-theorem vacuum_unique_of_selfDual {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
-    {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} (h : IsHeis σ w γ W) (Λ : Submodule R X)
-    (hΛ : SelfDual γ Λ) (s : M) (hs : s ≠ 0) (hfix : Fixes W Λ s)
-    (hspan : Submodule.span ℂ (Set.range fun x => W x s) = ⊤) (v : M) (hv : Fixes W Λ v) : ∃ c : ℂ, v = c • s := by
-  have key : ∀ z : X, W z s = (γ (w • (Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ) : X))
-      (z - Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ)))⁻¹ • W (Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ)) s := by
+theorem vacuum_unique_of_selfDual
+    {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+    {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M} (h : IsHeis σ w γ W)
+    (Λ : Submodule R X) (hΛ : SelfDual γ Λ)
+    (s : M)
+    (hs : s ≠ 0) (hfix : Fixes W Λ s) (hspan : Submodule.span ℂ (Set.range fun x => W x s) = ⊤)
+    (v : M) (hv : Fixes W Λ v)
+    : ∃ c : ℂ, v = c • s := by
+  have key
+      : ∀ z : X,
+        W z s
+          = (γ (w • (Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ) : X))
+              (z - Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ)))⁻¹
+            • W (Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ)) s := by
     intro z
     set t : X := Quotient.out (Submodule.Quotient.mk z : X ⧸ Λ) with ht
     have hmem : z - t ∈ Λ := by
@@ -32,7 +42,10 @@ theorem vacuum_unique_of_selfDual {R X M : Type} [CommRing R] [AddCommGroup X] [
     rw [hfix _ hmem, add_sub_cancel] at h1
     rw [h1, smul_smul, inv_mul_cancel₀ (h.ne_zero _ _), one_smul]
   have hli : LinearIndependent ℂ (fun q : X ⧸ Λ => W (Quotient.out q) s) := by
-    refine linearIndependent_of_simultaneous_eigen _ (fun q (a : Λ) => γ a (Quotient.out q)) (fun a : Λ => W a) ?_ ?_ ?_
+    refine linearIndependent_of_simultaneous_eigen _
+      (fun q (a : Λ) => γ a (Quotient.out q))
+      (fun a : Λ => W a)
+      ?_ ?_ ?_
     · intro q q' hq
       have hm : (Quotient.out q : X) - Quotient.out q' ∈ Λ := by
         rw [hΛ]
@@ -62,8 +75,10 @@ theorem vacuum_unique_of_selfDual {R X M : Type} [CommRing R] [AddCommGroup X] [
     intro a ha q x
     have e : (b.coord q).comp (W a) = γ a (Quotient.out q) • b.coord q := by
       refine b.ext fun q' => ?_
-      rw [LinearMap.comp_apply, hb, h.comm, hfix a ha, ← hb, LinearMap.smul_apply, map_smul, smul_eq_mul]
-      simp only [Module.Basis.coord_apply, Module.Basis.repr_self, smul_eq_mul, Finsupp.single_apply]
+      rw [LinearMap.comp_apply, hb, h.comm, hfix a ha, ← hb, LinearMap.smul_apply, map_smul,
+        smul_eq_mul]
+      simp only [Module.Basis.coord_apply, Module.Basis.repr_self, smul_eq_mul,
+        Finsupp.single_apply]
       split_ifs with hq
       · rw [hq]
       · simp
@@ -73,9 +88,11 @@ theorem vacuum_unique_of_selfDual {R X M : Type} [CommRing R] [AddCommGroup X] [
   have hb0 : b 0 = s := by rw [hb, hfix _ h0]
   have hvan : ∀ q : X ⧸ Λ, q ≠ 0 → b.repr v q = 0 := by
     intro q hq
-    have hn : (Quotient.out q : X) ∉ Λ := fun hm => hq (by
-      have e1 : (Submodule.Quotient.mk (Quotient.out q) : X ⧸ Λ) = q := Quotient.out_eq q
-      rw [← e1]; exact (Submodule.Quotient.mk_eq_zero Λ).2 hm)
+    have hn : (Quotient.out q : X) ∉ Λ := fun hm =>
+      hq (by
+        have e1 : (Submodule.Quotient.mk (Quotient.out q) : X ⧸ Λ) = q := Quotient.out_eq q
+        rw [← e1]
+        exact (Submodule.Quotient.mk_eq_zero Λ).2 hm)
     rw [hΛ] at hn
     push_neg at hn
     obtain ⟨a, ha, hne⟩ := hn

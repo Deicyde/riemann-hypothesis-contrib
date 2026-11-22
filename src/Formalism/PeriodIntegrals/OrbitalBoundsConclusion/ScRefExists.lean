@@ -10,5 +10,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeReference
 @[expose] public section
 
 theorem sc_reference_exists : PI.ScRefExists.Target :=
-  PI.ScRefExists.Top.target_of_wframe
-    (PI.ScRefExists.WF.wFrame_of PI.ScRefExists.ApP.principal_ideal_ring_at_prime PI.ScRefExists.WB.weil_basis_existence)
+  PI.ScRefExists.Top.target_of_wframe (PI.ScRefExists.WF.wFrame_of
+    PI.ScRefExists.ApP.principal_ideal_ring_at_prime PI.ScRefExists.WB.weil_basis_existence)

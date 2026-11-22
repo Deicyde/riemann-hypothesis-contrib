@@ -20,7 +20,8 @@ theorem annulus_condition_holds : GTCAnnulus := by
   obtain ⟨h1, h2⟩ := Ann.wZ_uu hTT hα hcurv' hhol (ζ := ζ) hζ
   have hn : ‖Ann.uu TT α ζ‖ = 1 := Ann.norm_uu ζ
   have hs : star (Ann.uu TT α ζ) * Ann.uu TT α ζ = 1 := by
-    calc star (Ann.uu TT α ζ) * Ann.uu TT α ζ
+    calc
+      star (Ann.uu TT α ζ) * Ann.uu TT α ζ
         = (starRingEnd ℂ) (Ann.uu TT α ζ) * Ann.uu TT α ζ := rfl
       _ = ((‖Ann.uu TT α ζ‖ : ℝ) : ℂ) ^ 2 := Complex.conj_mul' _
       _ = 1 := by rw [hn]; norm_num

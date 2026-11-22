@@ -21,9 +21,10 @@ universe u w
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem QuotSectionsFinite.proof (hE : Extension.Statement.{u, w, w})
-    (hI : IdealTwistFamily.Statement.{u, w}) (hT : TildeFinite.Statement.{u, w})
-    (hQ : QuotientH0Finite.Statement.{u, w, w}) : QuotSectionsFinite.Statement.{u, w} := by
+theorem QuotSectionsFinite.proof
+    (hE : Extension.Statement.{u, w, w}) (hI : IdealTwistFamily.Statement.{u, w})
+    (hT : TildeFinite.Statement.{u, w}) (hQ : QuotientH0Finite.Statement.{u, w, w})
+    : QuotSectionsFinite.Statement.{u, w} := by
   intro k _ Ω _ _ N x Q J
 
   let J' : Ideal (Poly k N) := Ideal.span {f | f ∈ J ∧ ∃ e, f.IsHomogeneous e}
@@ -32,18 +33,24 @@ theorem QuotSectionsFinite.proof (hE : Extension.Statement.{u, w, w})
       Ideal.homogeneous_span _ _ fun f hf =>
         ⟨_, (mem_homogeneousSubmodule _ f).mpr hf.2.choose_spec⟩
     exact fun p hp d => homogeneousComponent_mem_of_mem h hp d
-  have hforms : ∀ (f : Poly k N) (e : ℕ), f.IsHomogeneous e → (f ∈ J ↔ f ∈ J') := fun f e hf =>
-    ⟨fun h => Ideal.subset_span ⟨h, e, hf⟩, fun h => (show J' ≤ J from Ideal.span_le.mpr (by
-      intro g hg
-      exact hg.1)) h⟩
-  have hsys : idealSys x J = idealSys x J' := SubSystem.ext_sub fun I => by
-    change idealMod J I = idealMod J' I
-    unfold idealMod
-    congr 1
-    ext a
-    constructor <;> rintro ⟨f, s, e, hf, hs, hfe, hse, rfl⟩
-    · exact ⟨f, s, e, (hforms f e hfe).mp hf, hs, hfe, hse, rfl⟩
-    · exact ⟨f, s, e, (hforms f e hfe).mpr hf, hs, hfe, hse, rfl⟩
+  have hforms : ∀ (f : Poly k N) (e : ℕ), f.IsHomogeneous e → (f ∈ J ↔ f ∈ J') := fun f e hf => ⟨
+    fun h => Ideal.subset_span ⟨h, e, hf⟩,
+    fun h =>
+      (show J' ≤ J from
+          Ideal.span_le.mpr (by
+            intro g hg
+            exact hg.1))
+        h
+  ⟩
+  have hsys : idealSys x J = idealSys x J' :=
+    SubSystem.ext_sub fun I => by
+      change idealMod J I = idealMod J' I
+      unfold idealMod
+      congr 1
+      ext a
+      constructor <;> rintro ⟨f, s, e, hf, hs, hfe, hse, rfl⟩
+      · exact ⟨f, s, e, (hforms f e hfe).mp hf, hs, hfe, hse, rfl⟩
+      · exact ⟨f, s, e, (hforms f e hfe).mpr hf, hs, hfe, hse, rfl⟩
 
   obtain ⟨F, hF, hFfg⟩ := hI k Ω N x Q J' hJ'hom
   obtain ⟨M, -, hM⟩ := hE k Ω N x Ω Q.toSubFamily Q.fg
@@ -63,8 +70,7 @@ theorem QuotSectionsFinite.proof (hE : Extension.Statement.{u, w, w})
     · rw [zero_smul]; exact Submodule.zero_mem _
     · intro a b _ _ ha hb; rw [add_smul]; exact Submodule.add_mem _ ha hb
     · intro a q _ hq'; rw [smul_assoc]; exact Submodule.smul_mem _ a hq'
-  have hH0 : Module.Finite k (Q.toSubSystem.H 0) := by
-    rw [← h0]; exact hT k Ω N x M 0 0
+  have hH0 : Module.Finite k (Q.toSubSystem.H 0) := by rw [← h0]; exact hT k Ω N x M 0 0
   have hH1 : Module.Finite k ((Q.toSubSystem.twist (idealSys x J)).H 1) := by
     rw [← h1]; exact hT k Ω N x M' 1 0
   exact hQ k Ω N x Ω Q.toSubSystem (Q.toSubSystem.twist (idealSys x J)) hle hH0 hH1

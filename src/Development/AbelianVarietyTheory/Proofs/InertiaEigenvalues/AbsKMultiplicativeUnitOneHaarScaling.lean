@@ -11,8 +11,10 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 open scoped Pointwise NNReal ENNReal
 
 namespace GlobalTheory.JR.Et
-variable {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
-  [Unram F E] (A : Et F E)
+variable
+  {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+  [StarRing E] [Unram F E]
+  (A : Et F E)
 
 theorem secondCountable_K : SecondCountableTopology A.K := by
   haveI : LocallyCompactSpace F := Unram.lcF (E := E)
@@ -27,7 +29,8 @@ theorem absK_unit (x : A.Kˣ) : A.absK (x : A.K) = (distribHaarChar A.K x : ℝ)
   unfold absK
   rw [dite_eq_left x.isUnit]
   congr 2
-  ext; rfl
+  ext
+  rfl
 
 theorem absK_mul (s t : A.K) : A.absK (s * t) = A.absK s * A.absK t := by
   by_cases hs : IsUnit s
@@ -42,9 +45,11 @@ theorem absK_mul (s t : A.K) : A.absK (s * t) = A.absK s * A.absK t := by
   · have : ¬ IsUnit (s * t) := fun h => hs (IsUnit.mul_iff.1 h).1
     simp [absK, this, hs]
 
-theorem distribHaarChar_le_one_of_mem_OK (u : A.Kˣ) (hu : (u : A.K) ∈ A.OK) : distribHaarChar A.K u ≤ 1 := by
+theorem distribHaarChar_le_one_of_mem_OK (u : A.Kˣ) (hu : (u : A.K) ∈ A.OK)
+    : distribHaarChar A.K u ≤ 1 := by
   haveI := A.secondCountable_K
-  obtain ⟨-, -, -, -, -, -, -, -, -, hO, hC, R, hR⟩ := GlobalTheory.T.etaleHermitianPair_structure_facts F E A
+  obtain ⟨-, -, -, -, -, -, -, -, -, hO, hC, R, hR⟩ :=
+    GlobalTheory.T.etaleHermitianPair_structure_facts F E A
   let μ : Measure A.K := Measure.addHaar
   have h0 : (0 : A.K) ∈ A.OK := by rw [← hR]; exact R.zero_mem
   have hm0 : μ A.OK ≠ 0 := hO.measure_ne_zero μ ⟨0, h0⟩
@@ -58,7 +63,17 @@ theorem distribHaarChar_le_one_of_mem_OK (u : A.Kˣ) (hu : (u : A.K) ∈ A.OK) :
   have := (ENNReal.mul_le_mul_iff_left hm0 hmt).1 hle
   exact_mod_cast this
 
-theorem absK_facts : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E), ((∀ s t : A.K, A.absK (s * t) = A.absK s * A.absK t) ∧ (∀ s s' : A.K, s ∈ A.OK → s' ∈ A.OK → s * s' = 1 → A.absK s = 1) ∧ (∀ (μ : Measure A.K), μ.IsAddHaarMeasure → ∀ (x : A.Kˣ) (a : A.K) (S : Set A.K), MeasurableSet S → μ {a' : A.K | (x : A.K) * a' - a ∈ S} = ENNReal.ofReal (A.absK (x : A.K))⁻¹ * μ S)) := by
+theorem absK_facts
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E),
+      ((∀ s t : A.K, A.absK (s * t) = A.absK s * A.absK t)
+        ∧ (∀ s s' : A.K, s ∈ A.OK → s' ∈ A.OK → s * s' = 1 → A.absK s = 1)
+        ∧ (∀ (μ : Measure A.K),
+          μ.IsAddHaarMeasure
+            → ∀ (x : A.Kˣ) (a : A.K) (S : Set A.K),
+              MeasurableSet S
+                → μ {a' : A.K | (x : A.K) * a' - a ∈ S}
+                  = ENNReal.ofReal (A.absK (x : A.K))⁻¹ * μ S)) := by
   intro F E _ _ _ _ _ A
   refine ⟨A.absK_mul, ?_, ?_⟩
   · intro s s' hs hs' h
@@ -69,7 +84,9 @@ theorem absK_facts : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyN
       rw [← map_mul, mul_inv_cancel, map_one]
     have : distribHaarChar A.K u = 1 := by
       refine le_antisymm h1 ?_
-      calc (1 : ℝ≥0) = distribHaarChar A.K u * distribHaarChar A.K u⁻¹ := hprod.symm
+      calc
+        (1 : ℝ≥0)
+          = distribHaarChar A.K u * distribHaarChar A.K u⁻¹ := hprod.symm
         _ ≤ distribHaarChar A.K u * 1 := mul_le_mul_of_nonneg_left h2 zero_le'
         _ = distribHaarChar A.K u := mul_one _
     have e := A.absK_unit u

@@ -7,11 +7,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb
+  GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.Eb.dimLow :
-    ∀ {l : ℕ} [Fact l.Prime] (c : Coef l) (N : ℕ) (B : Type) [CommRing B] [Algebra c.O B] [IsCO c.O B] (f : MvPowerSeries (Fin N) c.O →ₐ[c.O] B) (J : Ideal B), ((Ideal.Quotient.mk J).comp (f : MvPowerSeries (Fin N) c.O →+* B)).Finite → (∀ a, a ≠ 0 → ∀ b, f a * b ∈ J → b ∈ J) →
-        ∀ (x : B →ₐ[c.O] PadicAlgCl l) (p : Ideal B) [p.IsPrime], p = RingHom.ker x → J ≤ p → (N : WithBot ℕ∞) ≤ ringKrullDim (Localization.AtPrime p ⧸ J.map (algebraMap B (Localization.AtPrime p))) := by
+theorem UpperTheory.V.Ws.Eb.dimLow
+    : ∀ {l : ℕ} [Fact l.Prime] (c : Coef l) (N : ℕ) (B : Type) [CommRing B] [Algebra c.O B]
+        [IsCO c.O B] (f : MvPowerSeries (Fin N) c.O →ₐ[c.O] B) (J : Ideal B),
+      ((Ideal.Quotient.mk J).comp (f : MvPowerSeries (Fin N) c.O →+* B)).Finite
+        → (∀ a, a ≠ 0 → ∀ b, f a * b ∈ J → b ∈ J)
+        → ∀ (x : B →ₐ[c.O] PadicAlgCl l) (p : Ideal B) [p.IsPrime],
+          p = RingHom.ker x → J ≤ p
+            → (N : WithBot ℕ∞)
+              ≤ ringKrullDim
+                (Localization.AtPrime p ⧸ J.map (algebraMap B (Localization.AtPrime p))) := by
   intro l _ c N B _ _ _ f J hfin hreg x p _ hpx hJp
   obtain ⟨P, hP, hPp⟩ := Ideal.exists_minimalPrimes_le hJp
   haveI hPprime : P.IsPrime := hP.1.1
@@ -20,7 +30,8 @@ theorem UpperTheory.V.Ws.Eb.dimLow :
     co_quot c.O B (B ⧸ P) (Ideal.Quotient.mkₐ c.O P) Ideal.Quotient.mk_surjective
   set g : MvPowerSeries (Fin N) c.O →ₐ[c.O] B ⧸ P := (Ideal.Quotient.mkₐ c.O P).comp f with hg
   have hinj : Function.Injective g := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     by_contra hne
     have hmem : f a ∈ P := by
@@ -71,5 +82,7 @@ theorem UpperTheory.V.Ws.Eb.dimLow :
   have hψ := Ideal.Quotient.lift_surjective_of_surjective _ hker hφ
   have hdim := ringKrullDim_le_of_surjective _ hψ
   rw [IsLocalization.AtPrime.ringKrullDim_eq_height q (Localization.AtPrime q)] at hdim
-  calc (N : WithBot ℕ∞) ≤ (q.height : WithBot ℕ∞) := by exact_mod_cast hht
+  calc
+    (N : WithBot ℕ∞)
+      ≤ (q.height : WithBot ℕ∞) := by exact_mod_cast hht
     _ ≤ _ := hdim

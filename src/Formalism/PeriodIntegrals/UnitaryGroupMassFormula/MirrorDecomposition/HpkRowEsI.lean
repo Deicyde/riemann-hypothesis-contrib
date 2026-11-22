@@ -32,18 +32,22 @@ theorem hpk_sq (k r : ℕ) : Hpk k r * Hpk k r = 1 := by
     split_ifs at hl' ⊢ <;> first | omega | norm_num
   · simp
 
-theorem uh_inv {a : B.Mat k r} (ha : a ∈ UH (Hpk k r)) :
-    a * a⁻¹ = 1 ∧ a⁻¹ * a = 1 ∧ a⁻¹ ∈ UH (Hpk k r) := by
+theorem uh_inv {a : B.Mat k r} (ha : a ∈ UH (Hpk k r))
+    : a * a⁻¹ = 1 ∧ a⁻¹ * a = 1 ∧ a⁻¹ ∈ UH (Hpk k r) := by
   have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
   have hl : (Hpk k r * aᴴ * Hpk k r) * a = 1 := by
-    calc Hpk k r * aᴴ * Hpk k r * a = Hpk k r * (aᴴ * Hpk k r * a) := by simp only [Matrix.mul_assoc]
+    calc
+      Hpk k r * aᴴ * Hpk k r * a
+        = Hpk k r * (aᴴ * Hpk k r * a) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [ha', hpk_sq]
   have hinv : a⁻¹ = Hpk k r * aᴴ * Hpk k r := Matrix.inv_eq_left_inv hl
   have h1 : a⁻¹ * a = 1 := by rw [hinv]; exact hl
   have h2 : a * a⁻¹ = 1 := Matrix.mul_nonsing_inv a (Matrix.isUnit_det_of_left_inverse hl)
   refine ⟨h2, h1, ?_⟩
   show (a⁻¹)ᴴ * Hpk k r * a⁻¹ = Hpk k r
-  calc (a⁻¹)ᴴ * Hpk k r * a⁻¹ = (a⁻¹)ᴴ * (aᴴ * Hpk k r * a) * a⁻¹ := by rw [ha']
+  calc
+    (a⁻¹)ᴴ * Hpk k r * a⁻¹
+      = (a⁻¹)ᴴ * (aᴴ * Hpk k r * a) * a⁻¹ := by rw [ha']
     _ = (a * a⁻¹)ᴴ * Hpk k r * (a * a⁻¹) := by simp only [conjTranspose_mul, Matrix.mul_assoc]
     _ = Hpk k r := by rw [h2]; simp
 
@@ -63,9 +67,12 @@ def lowS (k r a : ℕ) : Submodule ℂ (Fin (2 * r + k + 1) → ℂ) where
     intro c x hx i hi
     simp [hx i hi]
 
-theorem maps_low {n : B.Mat k r} (hn : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val →
-      n i (eI k r a) = if i = eI k r a then 1 else 0) {a : ℕ} (har : a ≤ r) :
-    ∀ y ∈ lowS k r a, n *ᵥ y ∈ lowS k r a := by
+theorem maps_low
+    {n : B.Mat k r}
+    (hn : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)),
+      a.val ≤ i.val → n i (eI k r a) = if i = eI k r a then 1 else 0)
+    {a : ℕ} (har : a ≤ r)
+    : ∀ y ∈ lowS k r a, n *ᵥ y ∈ lowS k r a := by
   intro y hy i hi
   simp only [Matrix.mulVec, dotProduct]
   apply Finset.sum_eq_zero
@@ -78,8 +85,9 @@ theorem maps_low {n : B.Mat k r} (hn : ∀ (a : Fin r) (i : Fin (2 * r + k + 1))
     rw [hle] at this
     rw [this, if_neg (by intro h; rw [h] at hi; omega), zero_mul]
 
-theorem onto_low {g : B.Mat k r} (hg : g⁻¹ * g = 1) {a : ℕ} (hmaps : ∀ y ∈ lowS k r a, g *ᵥ y ∈ lowS k r a) :
-    ∀ y ∈ lowS k r a, ∃ x ∈ lowS k r a, g *ᵥ x = y := by
+theorem onto_low
+    {g : B.Mat k r} (hg : g⁻¹ * g = 1) {a : ℕ} (hmaps : ∀ y ∈ lowS k r a, g *ᵥ y ∈ lowS k r a)
+    : ∀ y ∈ lowS k r a, ∃ x ∈ lowS k r a, g *ᵥ x = y := by
   let f : lowS k r a →ₗ[ℂ] lowS k r a := (Matrix.mulVecLin g).restrict hmaps
   have hinj : Function.Injective f := by
     intro x x' hxx
@@ -139,11 +147,14 @@ theorem n_inv {n : B.Mat k r} (hn : n ∈ Nset k r) : n⁻¹ ∈ Nset k r := by
     rw [hx i hi, zero_add]
     simp [bvec, Pi.single_apply]
 
-theorem uw_inv {z : Fin (2 * r + k + 1) → ℂ} {h : B.Mat k r} (hh : h ∈ UWset k r z) : h⁻¹ ∈ UWset k r z := by
+theorem uw_inv {z : Fin (2 * r + k + 1) → ℂ} {h : B.Mat k r} (hh : h ∈ UWset k r z)
+    : h⁻¹ ∈ UWset k r z := by
   have hu := uh_inv hh.1
   have back : ∀ v, h *ᵥ v = v → h⁻¹ *ᵥ v = v := by
     intro v hv
-    calc h⁻¹ *ᵥ v = h⁻¹ *ᵥ (h *ᵥ v) := by rw [hv]
+    calc
+      h⁻¹ *ᵥ v
+        = h⁻¹ *ᵥ (h *ᵥ v) := by rw [hv]
       _ = v := by rw [Matrix.mulVec_mulVec, hu.2.1, Matrix.one_mulVec]
   exact ⟨hu.2.2, fun a => ⟨back _ (hh.2.1 a).1, back _ (hh.2.1 a).2⟩, back _ hh.2.2⟩
 

@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFramePair
 
 @[expose] public section
 
-open NumberField Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt GlobalTheory.DegAsm
+open NumberField Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt
+  GlobalTheory.DegAsm
 open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.DegAsm.WeightInf
@@ -21,30 +22,45 @@ theorem invVol_nn {G : Type} [Group G] (A B : Subgroup G) : 0 ≤ GlobalTheory.H
   unfold GlobalTheory.HL.invVol
   positivity
 
-theorem invVol_pos' {G : Type} [Group G] (A B : Subgroup G) (h1 : A.relIndex B ≠ 0) (h2 : B.relIndex A ≠ 0) :
-    0 < GlobalTheory.HL.invVol A B := by
+theorem invVol_pos'
+    {G : Type} [Group G] (A B : Subgroup G) (h1 : A.relIndex B ≠ 0) (h2 : B.relIndex A ≠ 0)
+    : 0 < GlobalTheory.HL.invVol A B := by
   unfold GlobalTheory.HL.invVol
   have h1' := Nat.pos_of_ne_zero h1
   have h2' := Nat.pos_of_ne_zero h2
   positivity
 
-theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V), Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (r : ℕ), (∀ (N : NF H r) (g : ℕ) (Λ : Submodule (𝓞 K) V), 1 ≤ g → N.IsTerm g Λ → 0 < N.om Λ ∧ ∀ s ∈ N.R, N.om (s • Λ) = N.om Λ) ∧ ∀ (F F' : FlagD H r) (𝔡 : Ideal (𝓞 K)) (Λ : Submodule (𝓞 K) V), 0 ≤ omI F F' 𝔡 Λ ∧ (∀ N : NF H r, Adapt F F' 𝔡 N → omI F F' 𝔡 Λ ≤ N.om Λ) ∧ ∀ a c : ℝ, 0 ≤ c → (∃ N : NF H r, Adapt F F' 𝔡 N) → (∀ N : NF H r, Adapt F F' 𝔡 N → a ≤ c * N.om Λ) → a ≤ c * omI F F' 𝔡 Λ := by
+theorem main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V),
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (r : ℕ),
+          (∀ (N : NF H r) (g : ℕ) (Λ : Submodule (𝓞 K) V),
+              1 ≤ g → N.IsTerm g Λ → 0 < N.om Λ ∧ ∀ s ∈ N.R, N.om (s • Λ) = N.om Λ)
+            ∧ ∀ (F F' : FlagD H r) (𝔡 : Ideal (𝓞 K)) (Λ : Submodule (𝓞 K) V),
+              0 ≤ omI F F' 𝔡 Λ ∧ (∀ N : NF H r, Adapt F F' 𝔡 N → omI F F' 𝔡 Λ ≤ N.om Λ)
+                ∧ ∀ a c : ℝ,
+                  0 ≤ c → (∃ N : NF H r, Adapt F F' 𝔡 N)
+                    → (∀ N : NF H r, Adapt F F' 𝔡 N → a ≤ c * N.om Λ)
+                    → a ≤ c * omI F F' 𝔡 Λ := by
   intro K V _ _ _ _ _ _ _ _ H hK r
   refine ⟨?_, ?_⟩
   · intro N g Λ hg hT
     have hnil := (GlobalTheory.UnipStab.common_unipotent_stabiliser K V H hK r N).2.2.2.2
     have href := (GlobalTheory.DegCnt.InnerLat.main K V H hK r N g Λ hg hT).2.2.2.2.1
     have hΛdata := ((isUnimod_iff H Λ).1 hT.1.1).1
-    have hΛ : Submodule.IsFullLattice K Λ :=
-      { toIsLattice := Submodule.IsLattice.of_fg K hΛdata.1, span_eq_top := hΛdata.2 }
+    have hΛ : Submodule.IsFullLattice K Λ := {
+      toIsLattice := Submodule.IsLattice.of_fg K hΛdata.1
+      span_eq_top := hΛdata.2
+    }
     have hrefFull : Submodule.IsFullLattice K (N.Ref (latL N.F N.F' Λ)) := by
       refine { toIsLattice := href, span_eq_top := ?_ }
       obtain ⟨-, -, hC, -, hWn, hUp, -, -, -, -, -, hPi⟩ :=
         GlobalTheory.T.hermFramePairNormalForm_geometry_summary K V H hK r N
       have hP : N.Pi ≤ Submodule.span K (N.Ref (latL N.F N.F' Λ) : Set V) := by
         rw [hPi, ← GlobalTheory.DegCnt.InnerLat.span_hermFramePair_lattice_eq_sup N]
-        exact Submodule.span_mono (show (N.P0 : Set V) ⊆ N.Ref (latL N.F N.F' Λ) from
-          fun _ hx => Submodule.mem_sup_left hx)
+        exact Submodule.span_mono (show (N.P0 : Set V) ⊆ N.Ref (latL N.F N.F' Λ) from fun _ hx =>
+          Submodule.mem_sup_left hx)
       have hW : N.Wt ≤ Submodule.span K (N.Ref (latL N.F N.F' Λ) : Set V) := by
         intro x hx
         have hxW : x ∈ N.Wn := by rw [hWn]; exact Submodule.mem_sup_left hx

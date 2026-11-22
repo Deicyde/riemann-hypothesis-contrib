@@ -8,13 +8,15 @@ namespace KStar.Selmer
 
 open Matrix Module
 
-variable {R : Type*} [Ring R] {A B C D : Type*} [AddCommGroup A] [Module R A] [AddCommGroup B]
-  [Module R B] [AddCommGroup C] [Module R C] [AddCommGroup D] [Module R D]
+variable
+  {R : Type*} [Ring R]
+  {A B C D : Type*} [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B] [AddCommGroup C]
+  [Module R C] [AddCommGroup D] [Module R D]
 
-theorem length_add_of_exact₄ (f : A →ₗ[R] B) (g : B →ₗ[R] C) (h : C →ₗ[R] D)
-    (hf : Function.Injective f) (hfg : Function.Exact f g) (hgh : Function.Exact g h)
-    (hh : Function.Surjective h) :
-    Module.length R A + Module.length R C = Module.length R B + Module.length R D := by
+theorem length_add_of_exact₄
+    (f : A →ₗ[R] B) (g : B →ₗ[R] C) (h : C →ₗ[R] D) (hf : Function.Injective f)
+    (hfg : Function.Exact f g) (hgh : Function.Exact g h) (hh : Function.Surjective h)
+    : Module.length R A + Module.length R C = Module.length R B + Module.length R D := by
   have h1 : Module.length R B = Module.length R A + Module.length R (LinearMap.range g) := by
     refine Module.length_eq_add_of_exact f g.rangeRestrict hf g.surjective_rangeRestrict ?_
     intro x
@@ -32,11 +34,12 @@ theorem length_add_of_exact₄ (f : A →ₗ[R] B) (g : B →ₗ[R] C) (h : C �
       exact y.2
   rw [h1, h2, add_assoc]
 
-theorem length_ker_eq_length_coker (f : A →ₗ[R] A) (hfin : Module.length R A ≠ ⊤) :
-    Module.length R (LinearMap.ker f) = Module.length R (A ⧸ LinearMap.range f) := by
-  have h1 := length_add_of_exact₄ (LinearMap.ker f).subtype f (LinearMap.range f).mkQ
-    (Submodule.injective_subtype _) (LinearMap.exact_subtype_ker_map f)
-    (LinearMap.exact_map_mkQ_range f) (Submodule.mkQ_surjective _)
+theorem length_ker_eq_length_coker (f : A →ₗ[R] A) (hfin : Module.length R A ≠ ⊤)
+    : Module.length R (LinearMap.ker f) = Module.length R (A ⧸ LinearMap.range f) := by
+  have h1 :=
+    length_add_of_exact₄ (LinearMap.ker f).subtype f (LinearMap.range f).mkQ
+      (Submodule.injective_subtype _) (LinearMap.exact_subtype_ker_map f)
+      (LinearMap.exact_map_mkQ_range f) (Submodule.mkQ_surjective _)
   rw [add_comm (Module.length R (LinearMap.ker f))] at h1
   exact ENat.add_right_injective_of_ne_top hfin h1
 

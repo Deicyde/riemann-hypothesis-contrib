@@ -25,12 +25,13 @@ open _root_.Formalism.HC.HostRaw
 
 variable {φ : Frame} (H : HostRaw φ)
 
-def frobG (p : ℕ) : φ.GG :=
-  if h : Nat.Coprime p H.condN then H.art (ZMod.unitOfCoprime p h) else 1
+def frobG (p : ℕ) : φ.GG := if h : Nat.Coprime p H.condN then H.art (ZMod.unitOfCoprime p h) else 1
 
 def Inert (p : ℕ) : Prop := p.Prime ∧ jacobiSym (-(H.d : ℤ)) p = -1
 
-theorem frobG_of_coprime {p : ℕ} (h : Nat.Coprime p H.condN) : H.frobG p = H.art (ZMod.unitOfCoprime p h) := dif_pos h
+theorem frobG_of_coprime {p : ℕ} (h : Nat.Coprime p H.condN)
+    : H.frobG p = H.art (ZMod.unitOfCoprime p h) :=
+  dif_pos h
 
 end HostRaw
 

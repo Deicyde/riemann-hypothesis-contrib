@@ -14,12 +14,14 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem tNorm_baseChange_of_ringHom (F F' E E' K K' : Type) [Field F] [Field F'] [Field E]
-    [Field E'] [Algebra F F'] [Algebra F E] [Algebra F' E'] [Algebra E E'] [Algebra F E']
-    [IsScalarTower F F' E'] [IsScalarTower F E E'] [Algebra.IsPushout F F' E E']
-    [FiniteDimensional F E] [Field K] [Algebra F K] [Field K'] [Algebra F' K'] (φ : K →+* K')
-    (hφ : ∀ x : F, φ (algebraMap F K x) = algebraMap F' K' (algebraMap F F' x)) (x : F)
-    (h : TNorm F E K x) : TNorm F' E' K' (algebraMap F F' x) := by
+theorem tNorm_baseChange_of_ringHom
+    (F F' E E' K K' : Type) [Field F] [Field F'] [Field E] [Field E'] [Algebra F F'] [Algebra F E]
+    [Algebra F' E'] [Algebra E E'] [Algebra F E'] [IsScalarTower F F' E'] [IsScalarTower F E E']
+    [Algebra.IsPushout F F' E E'] [FiniteDimensional F E] [Field K] [Algebra F K] [Field K']
+    [Algebra F' K']
+    (φ : K →+* K') (hφ : ∀ x : F, φ (algebraMap F K x) = algebraMap F' K' (algebraMap F F' x))
+    (x : F) (h : TNorm F E K x)
+    : TNorm F' E' K' (algebraMap F F' x) := by
   letI : Algebra F K' := ((algebraMap F' K').comp (algebraMap F F')).toAlgebra
   haveI : IsScalarTower F F' K' := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   obtain ⟨y₀, hy₀⟩ := h
@@ -34,18 +36,21 @@ theorem tNorm_baseChange_of_ringHom (F F' E E' K K' : Type) [Field F] [Field F']
   refine ⟨(e₁.symm.trans e₂) y, ?_⟩
   rw [Algebra.norm_eq_of_algEquiv, hy, ← IsScalarTower.algebraMap_apply]
 
-theorem exists_norm_eq_of_coprime_pow {F E : Type} [Field F] [Field E] [Algebra F E]
-    [FiniteDimensional F E] {m n : ℕ} (hc : Nat.Coprime m n) {x : F} (hx : x ≠ 0) {a b : E}
-    (ha : Algebra.norm F a = x ^ m) (hb : Algebra.norm F b = x ^ n) :
-    ∃ y : E, Algebra.norm F y = x := by
+theorem exists_norm_eq_of_coprime_pow
+    {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+    {m n : ℕ} (hc : Nat.Coprime m n)
+    {x : F} (hx : x ≠ 0)
+    {a b : E} (ha : Algebra.norm F a = x ^ m) (hb : Algebra.norm F b = x ^ n)
+    : ∃ y : E, Algebra.norm F y = x := by
   refine ⟨a ^ (Nat.gcdA m n) * b ^ (Nat.gcdB m n), ?_⟩
   rw [map_mul, Algebra.norm_zpow, Algebra.norm_zpow, ha, hb, ← zpow_natCast, ← zpow_natCast,
     ← zpow_mul, ← zpow_mul, ← zpow_add₀ hx, ← Nat.gcd_eq_gcd_ab, hc]
   simp
 
-theorem np_of_odd_prime_degree : ∀ (p : ℕ) (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] [IsGalois F E],
-    p.Prime → p ≠ 2 → Module.finrank F E = p → NP F E := by
+theorem np_of_odd_prime_degree
+    : ∀ (p : ℕ) (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsGalois F E],
+      p.Prime → p ≠ 2 → Module.finrank F E = p → NP F E := by
   intro p F E _ _ _ _ _ _ hp h2 hd x hx hl
   obtain ⟨F', E', _, _, _, _, _, _, _, _, _, _, ζ, hpo, htc, hg, hζ, hd', hc⟩ :=
     exists_pushout_primitiveRoot p F E hp h2 hd
@@ -63,8 +68,7 @@ theorem np_of_odd_prime_degree : ∀ (p : ℕ) (F E : Type) [Field F] [NumberFie
     np_of_finrank_prime_of_isPrimitiveRoot p F' E' ζ hp hζ hd' _ (by simpa using hx) hl'
   have h1 : Algebra.norm F (Algebra.norm E b) = x ^ Module.finrank F F' := by
     rw [Algebra.norm_norm, ← Algebra.norm_norm (S := F'), hb, Algebra.norm_algebraMap]
-  have h3 : Algebra.norm F (algebraMap F E x) = x ^ p := by
-    rw [Algebra.norm_algebraMap, hd]
+  have h3 : Algebra.norm F (algebraMap F E x) = x ^ p := by rw [Algebra.norm_algebraMap, hd]
   exact exists_norm_eq_of_coprime_pow hc hx h1 h3
 
 end GlobalTheory.CNorm

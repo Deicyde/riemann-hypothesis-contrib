@@ -28,8 +28,12 @@ theorem nuL_anti (m d : ℕ) (vec : Bool) : Antitone (nuL m d vec) := by
       simp [ha, hb]
     · split_ifs <;> omega
 
-theorem theta_inj_Hd (K : Type) [Field K] (m : ℕ) (hm : 1 ≤ m) (vec : Bool) (d : ℕ) (P : MvPolynomial (Fin (m + 1)) K)
-    (hP : P ∈ Hd K (m + 1) d) (h : theta K m vec P = 0) : P = 0 := by
+theorem theta_inj_Hd
+    (K : Type) [Field K]
+    (m : ℕ) (hm : 1 ≤ m)
+    (vec : Bool) (d : ℕ) (P : MvPolynomial (Fin (m + 1)) K)
+    (hP : P ∈ Hd K (m + 1) d) (h : theta K m vec P = 0)
+    : P = 0 := by
   have h1 : (psi K m vec).comp (theta K m vec) = aeval (fun c => qf K m vec * X c) := by
     apply MvPolynomial.algHom_ext
     intro c
@@ -42,15 +46,20 @@ theorem theta_inj_Hd (K : Type) [Field K] (m : ℕ) (hm : 1 ≤ m) (vec : Bool) 
   · exact absurd h3 (pow_ne_zero _ (Formalism.L2.G.Model.qf_ne K m vec))
   · exact h3
 
-theorem theta_mem (K : Type) [Field K] (m : ℕ) (hm : 1 ≤ m) (vec : Bool) (d : ℕ) (P : MvPolynomial (Fin (m + 1)) K)
-    (hP : P ∈ Hd K (m + 1) d) : theta K m vec P ∈ dualWeyl K (m + 1) (m + 1) (nuL m d vec) := by
+theorem theta_mem
+    (K : Type) [Field K]
+    (m : ℕ) (hm : 1 ≤ m)
+    (vec : Bool)
+    (d : ℕ) (P : MvPolynomial (Fin (m + 1)) K) (hP : P ∈ Hd K (m + 1) d)
+    : theta K m vec P ∈ dualWeyl K (m + 1) (m + 1) (nuL m d vec) := by
   rw [← Formalism.L2.G.Model.theta_Hd K m hm d vec]
   exact ⟨P, hP, rfl⟩
 
 theorem restRep : RestRep := by
   intro K _ _ m hm vec d P hP h
   apply theta_inj_Hd K m hm vec d P hP
-  apply Formalism.L2.G.Model.TS.Top.nondegK K (m + 1) (m + 1) le_rfl (nuL m d vec) (nuL_anti m d vec) _ (theta_mem K m hm vec d P hP)
+  apply Formalism.L2.G.Model.TS.Top.nondegK K (m + 1) (m + 1) le_rfl (nuL m d vec)
+    (nuL_anti m d vec) _ (theta_mem K m hm vec d P hP)
   intro P' hP'
   rw [← Formalism.L2.G.Model.theta_Hd K m hm d vec] at hP'
   obtain ⟨Q, hQ, rfl⟩ := hP'
@@ -61,11 +70,13 @@ theorem restRep2 : RestRep2 := by
   intro K _ _ m hm vec d f
   have hfinW : FiniteDimensional K ↥(dualWeyl K (m + 1) (m + 1) (nuL m d vec)) := by
     obtain ⟨b, hb, -⟩ := sSBasis K (m + 1) (m + 1) (nuL m d vec)
-    have : Finite ↥(ssIdx (m + 1) (m + 1) (nuL m d vec)) := (sSIdxFinite (m + 1) (m + 1) (nuL m d vec)).to_subtype
+    have : Finite ↥(ssIdx (m + 1) (m + 1) (nuL m d vec)) :=
+      (sSIdxFinite (m + 1) (m + 1) (nuL m d vec)).to_subtype
     rw [← hb.2.1]
     exact FiniteDimensional.span_of_finite K (Set.finite_range b)
   let φ : VV K m d →ₗ[K] ↥(dualWeyl K (m + 1) (m + 1) (nuL m d vec)) :=
-    LinearMap.codRestrict _ (thV K m vec d) (fun P => theta_mem K m hm vec d P.1 ((mem_Hd_iff _).2 P.2))
+    LinearMap.codRestrict _ (thV K m vec d)
+      (fun P => theta_mem K m hm vec d P.1 ((mem_Hd_iff _).2 P.2))
   have hφ : Function.Injective φ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro P hP
@@ -82,7 +93,8 @@ theorem restRep2 : RestRep2 := by
     rw [cForm_apply, mul_one, mul_one] at h2
     exact h2
   have hsurj : Function.Surjective (cForm K m vec d 1 1) :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).1 hinj
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).1
+      hinj
   obtain ⟨P, hP⟩ := hsurj f
   refine ⟨P, fun Q => ?_⟩
   rw [← hP, cForm_apply, mul_one, mul_one]

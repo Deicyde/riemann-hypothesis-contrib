@@ -5,15 +5,17 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology
 
 namespace GlobalTheory
 
-theorem padicInt_torsionFree_of_card_quotient_pow (l : ℕ) [Fact l.Prime] (C : Type)
-    [AddCommGroup C] [Module ℤ_[l] C] [Module.Finite ℤ_[l] C]
-    (h : ∀ r : ℕ, 0 < r →
-      Nat.card (C ⧸ LinearMap.range (LinearMap.lsmul ℤ_[l] C ((l : ℤ_[l]) ^ r))) = l ^ r) :
-    ∀ (r : ℕ) (c : C), (l : ℤ_[l]) ^ r • c = 0 → c = 0 := by
+theorem padicInt_torsionFree_of_card_quotient_pow
+    (l : ℕ) [Fact l.Prime]
+    (C : Type) [AddCommGroup C] [Module ℤ_[l] C] [Module.Finite ℤ_[l] C]
+    (h : ∀ r : ℕ,
+      0 < r → Nat.card (C ⧸ LinearMap.range (LinearMap.lsmul ℤ_[l] C ((l : ℤ_[l]) ^ r))) = l ^ r)
+    : ∀ (r : ℕ) (c : C), (l : ℤ_[l]) ^ r • c = 0 → c = 0 := by
   have hl : 0 < l := (Fact.out : l.Prime).pos
   let N : ℕ → AddSubgroup C := fun r =>
     (LinearMap.range (LinearMap.lsmul ℤ_[l] C ((l : ℤ_[l]) ^ r))).toAddSubgroup
@@ -50,8 +52,9 @@ theorem padicInt_torsionFree_of_card_quotient_pow (l : ℕ) [Fact l.Prime] (C : 
     exact zero_mem _
   have one : ∀ c : C, (l : ℤ_[l]) • c = 0 → c = 0 := by
     intro c hc
-    have hK := Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (M := C)
-      (IsLocalRing.maximalIdeal ℤ_[l]) (IsLocalRing.maximalIdeal.isMaximal _).ne_top
+    have hK :=
+      Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (M := C) (IsLocalRing.maximalIdeal ℤ_[l])
+        (IsLocalRing.maximalIdeal.isMaximal _).ne_top
     rw [← Submodule.mem_bot ℤ_[l], ← hK, Submodule.mem_iInf]
     intro i
     obtain ⟨y, hy⟩ := (hmem _ _).1 (key c hc (i + 1) i.succ_pos)

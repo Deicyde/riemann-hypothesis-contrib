@@ -14,8 +14,13 @@ def cech0Iso (f : Arrow PSh) : f.cechNerve.obj (op (SimplexCategory.mk 0)) ≅ f
   inv := WidePullback.lift f.hom (fun _ => 𝟙 _) (by simp)
   hom_inv_id := by
     apply WidePullback.hom_ext
-    · intro j; rw [Fin.fin_one_eq_zero j]; rw [Category.assoc]; erw [WidePullback.lift_π, Category.comp_id]
-    · rw [Category.assoc]; erw [WidePullback.lift_base, Category.id_comp]; exact WidePullback.π_arrow _ 0
+    · intro j
+      rw [Fin.fin_one_eq_zero j]
+      rw [Category.assoc]
+      erw [WidePullback.lift_π, Category.comp_id]
+    · rw [Category.assoc]
+      erw [WidePullback.lift_base, Category.id_comp]
+      exact WidePullback.π_arrow _ 0
   inv_hom_id := by erw [WidePullback.lift_π]
 
 theorem level0 : Level0 := by

@@ -10,14 +10,17 @@ open Finset
 namespace CompanionTheory.RgExh
 
 def FarLabels {n : ℕ} (χ χ' : Fin n → ℂ) (B : ℝ) : Prop :=
-  ∀ I I' : Finset (Fin n), Disjoint I I' → I.card = I'.card → (∑ i ∈ I, χ i - ∑ i ∈ I', χ i).re < 0 →
-    (∑ i ∈ I, χ' i - ∑ i ∈ I', χ' i).re < -B
+  ∀ I I' : Finset (Fin n),
+    Disjoint I I' → I.card = I'.card → (∑ i ∈ I, χ i - ∑ i ∈ I', χ i).re < 0
+      → (∑ i ∈ I, χ' i - ∑ i ∈ I', χ' i).re < -B
 
 def Fin.PathExists : Prop :=
-  ∀ (n : ℕ) (χ : Fin n → ℂ) (B : ℝ), ∃ C δ : ℝ, 0 < δ ∧ ∀ N₀ : ℝ, ∃ (ss : List (Fin n)) (N : ℝ), N₀ ≤ N ∧
-    GoodPath χ ss ∧ FarLabels χ (pathEnd χ ss) B ∧ (∀ s, s ∈ ss) ∧
-    (∀ a b, a ≠ b → δ * N ≤ |(pathEnd χ ss a).re - (pathEnd χ ss b).re|) ∧
-    ∀ a, |(pathEnd χ ss a).re| ≤ C * N ∧ |(pathEnd χ ss a).im| ≤ C
+  ∀ (n : ℕ) (χ : Fin n → ℂ) (B : ℝ), ∃ C δ : ℝ,
+    0 < δ
+      ∧ ∀ N₀ : ℝ, ∃ (ss : List (Fin n)) (N : ℝ),
+        N₀ ≤ N ∧ GoodPath χ ss ∧ FarLabels χ (pathEnd χ ss) B ∧ (∀ s, s ∈ ss)
+          ∧ (∀ a b, a ≠ b → δ * N ≤ |(pathEnd χ ss a).re - (pathEnd χ ss b).re|)
+          ∧ ∀ a, |(pathEnd χ ss a).re| ≤ C * N ∧ |(pathEnd χ ss a).im| ≤ C
 
 end CompanionTheory.RgExh
 
@@ -27,21 +30,25 @@ namespace GlobalTheory.CompanionTheory.RgPath
 
 variable {n : ℕ}
 
-theorem exists_pos_lower {ι : Type*} [Finite ι] (g : ι → ℝ) :
-    ∃ e : ℝ, 0 < e ∧ ∀ i, 0 < g i → e ≤ g i := by
+theorem exists_pos_lower {ι : Type*} [Finite ι] (g : ι → ℝ)
+    : ∃ e : ℝ, 0 < e ∧ ∀ i, 0 < g i → e ≤ g i := by
   classical
   cases nonempty_fintype ι
   by_cases hS : (Finset.univ.filter fun i => 0 < g i).Nonempty
   · obtain ⟨i, hi, hmin⟩ := Finset.exists_min_image _ g hS
-    exact ⟨g i, (Finset.mem_filter.1 hi).2,
-      fun j hj => hmin j (Finset.mem_filter.2 ⟨Finset.mem_univ _, hj⟩)⟩
+    exact ⟨
+      g i,
+      (Finset.mem_filter.1 hi).2,
+      fun j hj => hmin j (Finset.mem_filter.2 ⟨Finset.mem_univ _, hj⟩)
+    ⟩
   · exact ⟨1, one_pos, fun j hj => (hS ⟨j, Finset.mem_filter.2 ⟨Finset.mem_univ _, hj⟩⟩).elim⟩
 
-theorem exists_sorted (f : Fin n → ℝ) (hf : Function.Injective f) :
-    ∃ l : List (Fin n), l.Pairwise (fun a b => f b < f a) ∧ ∀ a, a ∈ l := by
+theorem exists_sorted (f : Fin n → ℝ) (hf : Function.Injective f)
+    : ∃ l : List (Fin n), l.Pairwise (fun a b => f b < f a) ∧ ∀ a, a ∈ l := by
   classical
-  have key : ∀ S : Finset (Fin n), ∃ l : List (Fin n),
-      l.Pairwise (fun a b => f b < f a) ∧ ∀ a, a ∈ l ↔ a ∈ S := by
+  have key
+      : ∀ S : Finset (Fin n), ∃ l : List (Fin n),
+        l.Pairwise (fun a b => f b < f a) ∧ ∀ a, a ∈ l ↔ a ∈ S := by
     intro S
     induction S using Finset.induction_on_max_value f with
     | empty => exact ⟨[], List.Pairwise.nil, by simp⟩
@@ -54,20 +61,21 @@ theorem exists_sorted (f : Fin n → ℝ) (hf : Function.Injective f) :
   obtain ⟨l, hl, hm⟩ := key Finset.univ
   exact ⟨l, hl, fun a => (hm a).2 (Finset.mem_univ a)⟩
 
-theorem pathEnd_append (χ : Fin n → ℂ) (l l' : List (Fin n)) :
-    pathEnd χ (l ++ l') = pathEnd (pathEnd χ l) l' := by
+theorem pathEnd_append (χ : Fin n → ℂ) (l l' : List (Fin n))
+    : pathEnd χ (l ++ l') = pathEnd (pathEnd χ l) l' := by
   induction l generalizing χ with
   | nil => rfl
   | cons s l ih => exact ih _
 
-theorem goodPath_append (χ : Fin n → ℂ) (l l' : List (Fin n)) (h : GoodPath χ l)
-    (h' : GoodPath (pathEnd χ l) l') : GoodPath χ (l ++ l') := by
+theorem goodPath_append
+    (χ : Fin n → ℂ) (l l' : List (Fin n)) (h : GoodPath χ l) (h' : GoodPath (pathEnd χ l) l')
+    : GoodPath χ (l ++ l') := by
   induction l generalizing χ with
   | nil => exact h'
   | cons s l ih => exact ⟨h.1, ih _ h.2 h'⟩
 
-theorem pathEnd_replicate (χ : Fin n → ℂ) (s : Fin n) (k : ℕ) :
-    pathEnd χ (List.replicate k s) = χ + Pi.single s (k : ℂ) := by
+theorem pathEnd_replicate (χ : Fin n → ℂ) (s : Fin n) (k : ℕ)
+    : pathEnd χ (List.replicate k s) = χ + Pi.single s (k : ℂ) := by
   induction k generalizing χ with
   | zero => funext r; simp [pathEnd]
   | succ k ih =>
@@ -77,9 +85,9 @@ theorem pathEnd_replicate (χ : Fin n → ℂ) (s : Fin n) (k : ℕ) :
     · subst h; simp; ring
     · simp [Pi.single_eq_of_ne h]
 
-theorem goodPath_replicate (χ : Fin n → ℂ) (s : Fin n) (k : ℕ)
-    (h : ∀ j : ℕ, j < k → ∀ r, r ≠ s → χ r ≠ χ s + (j : ℂ) + 1) :
-    GoodPath χ (List.replicate k s) := by
+theorem goodPath_replicate
+    (χ : Fin n → ℂ) (s : Fin n) (k : ℕ) (h : ∀ j : ℕ, j < k → ∀ r, r ≠ s → χ r ≠ χ s + (j : ℂ) + 1)
+    : GoodPath χ (List.replicate k s) := by
   induction k generalizing χ with
   | zero => trivial
   | succ k ih =>
@@ -92,17 +100,20 @@ theorem goodPath_replicate (χ : Fin n → ℂ) (s : Fin n) (k : ℕ)
       simp only [Pi.add_apply, Pi.single_eq_of_ne hr, Pi.single_eq_same, add_zero]
       intro he
       apply this
-      rw [he]; push_cast; ring
+      rw [he]
+      push_cast
+      ring
 
 def blocks (m : Fin n → ℕ) (l : List (Fin n)) : List (Fin n) :=
   l.flatMap fun a => List.replicate (m a) a
 
-theorem blocks_good (χ : Fin n → ℂ) (m : Fin n → ℕ) (f : Fin n → ℝ)
-    (hf : ∀ a, f a = (χ a).re + m a)
-    (hmono : ∀ a b, (χ a).re < (χ b).re → m a ≤ m b) (l : List (Fin n)) :
-    ∀ χ' : Fin n → ℂ, l.Pairwise (fun a b => f b < f a) → (∀ r, r ∈ l → χ' r = χ r) →
-      (∀ r, r ∉ l → χ' r = χ r + m r) → (∀ r, r ∉ l → ∀ a ∈ l, f a < f r) →
-      GoodPath χ' (blocks m l) ∧ pathEnd χ' (blocks m l) = fun a => χ a + m a := by
+theorem blocks_good
+    (χ : Fin n → ℂ) (m : Fin n → ℕ) (f : Fin n → ℝ) (hf : ∀ a, f a = (χ a).re + m a)
+    (hmono : ∀ a b, (χ a).re < (χ b).re → m a ≤ m b) (l : List (Fin n))
+    : ∀ χ' : Fin n → ℂ,
+      l.Pairwise (fun a b => f b < f a) → (∀ r, r ∈ l → χ' r = χ r)
+        → (∀ r, r ∉ l → χ' r = χ r + m r) → (∀ r, r ∉ l → ∀ a ∈ l, f a < f r)
+        → GoodPath χ' (blocks m l) ∧ pathEnd χ' (blocks m l) = fun a => χ a + m a := by
   induction l with
   | nil =>
     intro χ' _ _ h2 _
@@ -117,18 +128,18 @@ theorem blocks_good (χ : Fin n → ℂ) (m : Fin n → ℕ) (f : Fin n → ℝ)
       have := hlt r hr
       rw [h] at this
       exact lt_irrefl _ this
-    have hI := ih (χ' + Pi.single a (m a : ℂ)) hp'
-      (fun r hr => by
-        simp [Pi.single_eq_of_ne (hne r hr), h1 r (List.mem_cons_of_mem _ hr)])
-      (fun r hr => by
-        by_cases h : r = a
-        · subst h; simp [hχa]
-        · have : r ∉ a :: l := by simp [h, hr]
-          simp [Pi.single_eq_of_ne h, h2 r this])
-      (fun r hr b hbl => by
-        by_cases h : r = a
-        · subst h; exact hlt b hbl
-        · exact h3 r (by simp [h, hr]) b (List.mem_cons_of_mem _ hbl))
+    have hI :=
+      ih (χ' + Pi.single a (m a : ℂ)) hp'
+        (fun r hr => by simp [Pi.single_eq_of_ne (hne r hr), h1 r (List.mem_cons_of_mem _ hr)])
+        (fun r hr => by
+          by_cases h : r = a
+          · subst h; simp [hχa]
+          · have : r ∉ a :: l := by simp [h, hr]
+            simp [Pi.single_eq_of_ne h, h2 r this])
+        (fun r hr b hbl => by
+          by_cases h : r = a
+          · subst h; exact hlt b hbl
+          · exact h3 r (by simp [h, hr]) b (List.mem_cons_of_mem _ hbl))
     rw [hb, pathEnd_append, pathEnd_replicate]
     refine ⟨goodPath_append _ _ _ (goodPath_replicate _ _ _ fun j hj r hr => ?_) ?_, hI.2⟩
     · intro he
@@ -155,11 +166,14 @@ theorem blocks_good (χ : Fin n → ℂ) (m : Fin n → ℕ) (f : Fin n → ℝ)
     · rw [pathEnd_replicate]
       exact hI.1
 
-theorem num (χ : Fin n → ℂ) (B : ℝ) : ∃ C δ : ℝ, 0 < δ ∧ ∀ N₀ : ℝ, ∃ (m : Fin n → ℕ) (N : ℝ),
-    N₀ ≤ N ∧ (∀ a b, (χ a).re < (χ b).re → m a ≤ m b) ∧ (∀ a, 1 ≤ m a) ∧ 0 < N ∧
-    FarLabels χ (fun a => χ a + (m a : ℂ)) B ∧
-    (∀ a b, a ≠ b → δ * N ≤ |((χ a).re + m a) - ((χ b).re + m b)|) ∧
-    ∀ a, |(χ a).re + m a| ≤ C * N ∧ |(χ a).im| ≤ C := by
+theorem num (χ : Fin n → ℂ) (B : ℝ)
+    : ∃ C δ : ℝ,
+      0 < δ
+        ∧ ∀ N₀ : ℝ, ∃ (m : Fin n → ℕ) (N : ℝ),
+          N₀ ≤ N ∧ (∀ a b, (χ a).re < (χ b).re → m a ≤ m b) ∧ (∀ a, 1 ≤ m a) ∧ 0 < N
+            ∧ FarLabels χ (fun a => χ a + (m a : ℂ)) B
+            ∧ (∀ a b, a ≠ b → δ * N ≤ |((χ a).re + m a) - ((χ b).re + m b)|)
+            ∧ ∀ a, |(χ a).re + m a| ≤ C * N ∧ |(χ a).im| ≤ C := by
   classical
   set x : Fin n → ℝ := fun a => (χ a).re with hx
   set M : ℝ := ∑ a, ‖χ a‖ with hM
@@ -169,11 +183,12 @@ theorem num (χ : Fin n → ℂ) (B : ℝ) : ∃ C δ : ℝ, 0 < δ ∧ ∀ N₀
   have hxM : ∀ a, |x a| ≤ M := fun a => (Complex.abs_re_le_norm _).trans (hnorm a)
   have hiM : ∀ a, |(χ a).im| ≤ M := fun a => (Complex.abs_im_le_norm _).trans (hnorm a)
   obtain ⟨e1, he1, hE1⟩ := exists_pos_lower (fun p : Fin n × Fin n => x p.2 - x p.1)
-  obtain ⟨κ, hκ, hK⟩ := exists_pos_lower
-    (fun p : Finset (Fin n) × Finset (Fin n) => -(∑ i ∈ p.1, x i - ∑ i ∈ p.2, x i))
+  obtain ⟨κ, hκ, hK⟩ :=
+    exists_pos_lower (fun p : Finset (Fin n) × Finset (Fin n) => -(∑ i ∈ p.1, x i - ∑ i ∈ p.2, x i))
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   obtain ⟨ε, hε, hε1, hε2⟩ : ∃ ε : ℝ, 0 < ε ∧ ε * (n + 1) ≤ e1 ∧ ε * (2 * n ^ 2 + 2) ≤ κ := by
-    refine ⟨min (e1 / (n + 1)) (κ / (2 * n ^ 2 + 2)), lt_min (by positivity) (by positivity), ?_, ?_⟩
+    refine
+      ⟨min (e1 / (n + 1)) (κ / (2 * n ^ 2 + 2)), lt_min (by positivity) (by positivity), ?_, ?_⟩
     · exact (le_div_iff₀ (by positivity)).1 (min_le_left _ _)
     · exact (le_div_iff₀ (by positivity)).1 (min_le_right _ _)
   have hidx : ∀ a : Fin n, (0 : ℝ) ≤ ((a : ℕ) : ℝ) ∧ ((a : ℕ) : ℝ) ≤ n := fun a =>
@@ -182,26 +197,31 @@ theorem num (χ : Fin n → ℂ) (B : ℝ) : ∃ C δ : ℝ, 0 < δ ∧ ∀ N₀
   have hc1 : ∀ a, 1 ≤ c a := fun a => by
     have h1 := (abs_le.1 (hxM a)).1
     have h2 : 0 ≤ ε * ((a : ℕ) : ℝ) := mul_nonneg hε.le (hidx a).1
-    simp only [hc]; linarith
+    simp only [hc]
+    linarith
   have hc2 : ∀ a, c a ≤ 2 * M + 1 + ε * n := fun a => by
     have h1 := (abs_le.1 (hxM a)).2
     have h2 : ε * ((a : ℕ) : ℝ) ≤ ε * n := mul_le_mul_of_nonneg_left (hidx a).2 hε.le
-    simp only [hc]; linarith
+    simp only [hc]
+    linarith
   have hmonoc : ∀ a b, x a < x b → c a ≤ c b := fun a b h => by
     have h1 : e1 ≤ x b - x a := hE1 (a, b) (sub_pos.2 h)
     have h2 : ε * ((a : ℕ) : ℝ) ≤ ε * n := mul_le_mul_of_nonneg_left (hidx a).2 hε.le
     have h3 : 0 ≤ ε * ((b : ℕ) : ℝ) := mul_nonneg hε.le (hidx b).1
-    simp only [hc]; nlinarith
+    simp only [hc]
+    nlinarith
   have hgapc : ∀ a b, a ≠ b → ε ≤ c a - c b ∨ ε ≤ c b - c a := by
     have hlt : ∀ a b, x a < x b → ε ≤ c b - c a := fun a b h => by
       have h1 : e1 ≤ x b - x a := hE1 (a, b) (sub_pos.2 h)
       have h2 : ε * ((a : ℕ) : ℝ) ≤ ε * n := mul_le_mul_of_nonneg_left (hidx a).2 hε.le
       have h3 : 0 ≤ ε * ((b : ℕ) : ℝ) := mul_nonneg hε.le (hidx b).1
-      simp only [hc]; nlinarith
+      simp only [hc]
+      nlinarith
     have heq : ∀ a b : Fin n, x a = x b → (a : ℕ) < (b : ℕ) → ε ≤ c b - c a := fun a b h hab => by
       have h1 : ((a : ℕ) : ℝ) + 1 ≤ ((b : ℕ) : ℝ) := by exact_mod_cast hab
       have h2 := mul_le_mul_of_nonneg_left h1 hε.le
-      simp only [hc, h]; nlinarith
+      simp only [hc, h]
+      nlinarith
     intro a b hab
     rcases lt_trichotomy (x a) (x b) with h | h | h
     · exact Or.inr (hlt a b h)
@@ -240,8 +260,9 @@ theorem num (χ : Fin n → ℂ) (B : ℝ) : ∃ C δ : ℝ, 0 < δ ∧ ∀ N₀
       simp [hx, Complex.re_sum]
     rw [hvx] at hv
     have hKv : κ ≤ -(∑ i ∈ I, x i - ∑ i ∈ I', x i) := hK (I, I') (by simpa using hv)
-    have hsumc : ∀ S : Finset (Fin n), ∑ i ∈ S, c i =
-        ∑ i ∈ S, x i + ε * ∑ i ∈ S, ((i : ℕ) : ℝ) + S.card * (M + 1) := fun S => by
+    have hsumc
+        : ∀ S : Finset (Fin n),
+          ∑ i ∈ S, c i = ∑ i ∈ S, x i + ε * ∑ i ∈ S, ((i : ℕ) : ℝ) + S.card * (M + 1) := fun S => by
       simp only [hc, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_const, nsmul_eq_mul]
       ring
     have hup : ∑ i ∈ I, (m i : ℝ) ≤ N * ∑ i ∈ I, c i := by
@@ -266,8 +287,9 @@ theorem num (χ : Fin n → ℂ) (B : ℝ) : ∃ C δ : ℝ, 0 < δ ∧ ∀ N₀
       have := Finset.card_le_univ I'
       simp only [Fintype.card_fin] at this
       exact_mod_cast this
-    have hend : (∑ i ∈ I, (χ i + (m i : ℂ)) - ∑ i ∈ I', (χ i + (m i : ℂ))).re =
-        (∑ i ∈ I, x i + ∑ i ∈ I, (m i : ℝ)) - (∑ i ∈ I', x i + ∑ i ∈ I', (m i : ℝ)) := by
+    have hend
+        : (∑ i ∈ I, (χ i + (m i : ℂ)) - ∑ i ∈ I', (χ i + (m i : ℂ))).re
+          = (∑ i ∈ I, x i + ∑ i ∈ I, (m i : ℝ)) - (∑ i ∈ I', x i + ∑ i ∈ I', (m i : ℝ)) := by
       simp [hx, Complex.re_sum, Finset.sum_add_distrib]
     show (∑ i ∈ I, (χ i + (m i : ℂ)) - ∑ i ∈ I', (χ i + (m i : ℂ))).re < -B
     rw [hend]
@@ -329,8 +351,13 @@ theorem pathExists : CompanionTheory.RgExh.Fin.PathExists := by
     have := mul_pos hδ hN
     linarith
   obtain ⟨l, hl, hmem⟩ := exists_sorted _ hinj
-  obtain ⟨hg, he⟩ := blocks_good χ m _ (fun _ => rfl) hmono l χ hl (fun _ _ => rfl)
-    (fun r hr => (hr (hmem r)).elim) (fun r hr => (hr (hmem r)).elim)
+  obtain ⟨hg, he⟩ :=
+    blocks_good χ m _
+      (fun _ => rfl)
+      hmono l χ hl
+      (fun _ _ => rfl)
+      (fun r hr => (hr (hmem r)).elim)
+      (fun r hr => (hr (hmem r)).elim)
   refine ⟨blocks m l, N, hN₀, hg, ?_, ?_, ?_, ?_⟩
   · rw [he]; exact hfar
   · intro s

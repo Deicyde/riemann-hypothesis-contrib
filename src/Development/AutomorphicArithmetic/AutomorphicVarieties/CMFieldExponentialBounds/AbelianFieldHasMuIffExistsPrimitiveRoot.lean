@@ -7,15 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimeSetBou
 
 open NumberField Formalism.HC UpperTheory.Top UpperTheory.V
 
-private theorem lift_coprime {n N b : ℕ} [NeZero N] (h : n ∣ N) (hb : b.Coprime n) :
-    ∃ a : ℕ, a.Coprime N ∧ a ≡ b [MOD n] := by
+private theorem lift_coprime {n N b : ℕ} [NeZero N] (h : n ∣ N) (hb : b.Coprime n)
+    : ∃ a : ℕ, a.Coprime N ∧ a ≡ b [MOD n] := by
   obtain ⟨v, hv⟩ := ZMod.unitsMap_surjective h (ZMod.unitOfCoprime b hb)
   refine ⟨(v : ZMod N).val, ZMod.val_coe_unit_coprime v, ?_⟩
   rw [← ZMod.natCast_eq_natCast_iff, ZMod.natCast_val, ← ZMod.unitsMap_val h v, hv]
   simp
 
-private theorem exists_aut {N a : ℕ} [NeZero N] (ha : a.Coprime N) :
-    ∃ τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ, ∀ x : CyclotomicField N ℚ, x ^ N = 1 → τ x = x ^ a := by
+private theorem exists_aut {N a : ℕ} [NeZero N] (ha : a.Coprime N)
+    : ∃ τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ, ∀ x : CyclotomicField N ℚ,
+      x ^ N = 1 → τ x = x ^ a := by
   haveI : NeZero ((N : ℕ) : ℚ) := ⟨by exact_mod_cast NeZero.ne N⟩
   haveI : IsCyclotomicExtension {N} ℚ (CyclotomicField N ℚ) := CyclotomicField.isCyclotomicExtension N ℚ
   have hirr := Polynomial.cyclotomic.irreducible_rat (NeZero.pos N)
@@ -24,7 +25,8 @@ private theorem exists_aut {N a : ℕ} [NeZero N] (ha : a.Coprime N) :
   set τ := (IsCyclotomicExtension.autEquivPow (CyclotomicField N ℚ) hirr).symm (ZMod.unitOfCoprime a ha) with hτdef
   refine ⟨τ, ?_⟩
   have hτ : hζ.autToPow ℚ τ = ZMod.unitOfCoprime a ha :=
-    (IsCyclotomicExtension.autEquivPow (CyclotomicField N ℚ) hirr).apply_symm_apply (ZMod.unitOfCoprime a ha)
+    (IsCyclotomicExtension.autEquivPow (CyclotomicField N ℚ) hirr).apply_symm_apply
+      (ZMod.unitOfCoprime a ha)
   have hτζ : τ ζ = ζ ^ a := by
     rw [← hζ.autToPow_spec ℚ τ, hτ, ZMod.coe_unitOfCoprime, ZMod.val_natCast]
     conv_rhs => rw [← Nat.mod_add_div a N, pow_add, pow_mul, hζ.pow_eq_one, one_pow, mul_one]
@@ -37,9 +39,11 @@ private theorem ker_congr (A : AbF) {a b : ℕ} (h : a ≡ b [MOD A.m]) (hb : A.
   exact ⟨u, hu, e.trans ((ZMod.natCast_eq_natCast_iff _ _ _).2 h).symm⟩
 
 set_option maxHeartbeats 1000000 in
-theorem UpperTheory.V.abelianField_hasMu_iff_exists_primitiveRoot :
-    ∀ (A : AbF) (l : ℕ), l.Prime → l ≠ 2 → ∀ (L : Type) [Field L] [NumberField L], IsAbField A L →
-      (A.HasMu l ↔ ∃ z : L, IsPrimitiveRoot z l) := by
+theorem UpperTheory.V.abelianField_hasMu_iff_exists_primitiveRoot
+    : ∀ (A : AbF) (l : ℕ),
+      l.Prime → l ≠ 2
+        → ∀ (L : Type) [Field L] [NumberField L],
+          IsAbField A L → (A.HasMu l ↔ ∃ z : L, IsPrimitiveRoot z l) := by
   intro A l hl hl2 L _ _ hL
   obtain ⟨N, hN, j, ζ, hdvd, hζ, hfix⟩ := hL
   haveI : NeZero ((N : ℕ) : ℚ) := ⟨by exact_mod_cast NeZero.ne N⟩
@@ -48,8 +52,12 @@ theorem UpperTheory.V.abelianField_hasMu_iff_exists_primitiveRoot :
     have := hl.two_le
     omega
   have hker1 : A.ker 1 := ⟨1, A.H.one_mem, by simp⟩
-  have haut : ∀ a : ℕ, a.Coprime N → ∃ τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ,
-      (∀ x : CyclotomicField N ℚ, x ^ N = 1 → τ x = x ^ a) ∧ ((∀ y : L, τ (j y) = j y) ↔ A.ker a) := by
+  have haut
+      : ∀ a : ℕ,
+        a.Coprime N
+          → ∃ τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ,
+            (∀ x : CyclotomicField N ℚ, x ^ N = 1 → τ x = x ^ a)
+              ∧ ((∀ y : L, τ (j y) = j y) ↔ A.ker a) := by
     intro a ha
     obtain ⟨τ, hτ⟩ := exists_aut ha
     exact ⟨τ, hτ, hfix τ a (hτ ζ hζ.pow_eq_one)⟩
@@ -59,7 +67,8 @@ theorem UpperTheory.V.abelianField_hasMu_iff_exists_primitiveRoot :
     have hz : IsPrimitiveRoot (ζ ^ (N / l)) l :=
       IsPrimitiveRoot.pow (NeZero.pos N) hζ (by rw [Nat.div_mul_cancel hlN])
     have hord : orderOf (ζ ^ (N / l)) = l := hz.eq_orderOf.symm
-    have hfin : IsOfFinOrder (ζ ^ (N / l)) := isOfFinOrder_iff_pow_eq_one.2 ⟨l, hl.pos, hz.pow_eq_one⟩
+    have hfin : IsOfFinOrder (ζ ^ (N / l)) :=
+      isOfFinOrder_iff_pow_eq_one.2 ⟨l, hl.pos, hz.pow_eq_one⟩
     have hmem : ζ ^ (N / l) ∈ j.fieldRange := by
       haveI : IsGalois ℚ (CyclotomicField N ℚ) := IsCyclotomicExtension.isGalois {N} ℚ (CyclotomicField N ℚ)
       rw [← IsGalois.fixedField_fixingSubgroup j.fieldRange, IntermediateField.mem_fixedField_iff]
@@ -87,8 +96,10 @@ theorem UpperTheory.V.abelianField_hasMu_iff_exists_primitiveRoot :
       have hcop : Nat.Coprime N l := Nat.coprime_comm.1 ((Nat.Prime.coprime_iff_not_dvd hl).2 hnd)
       have hirr := Polynomial.cyclotomic.irreducible_rat (Nat.lcm_pos (NeZero.pos N) hl.pos)
       have h1 := IsPrimitiveRoot.lcm_totient_le_finrank hζ hw hirr
-      rw [IsCyclotomicExtension.finrank (CyclotomicField N ℚ) (Polynomial.cyclotomic.irreducible_rat (NeZero.pos N)),
-        Nat.Coprime.lcm_eq_mul hcop, Nat.totient_mul hcop, Nat.totient_prime hl] at h1
+      rw [IsCyclotomicExtension.finrank (CyclotomicField N ℚ)
+            (Polynomial.cyclotomic.irreducible_rat (NeZero.pos N)),
+          Nat.Coprime.lcm_eq_mul hcop, Nat.totient_mul hcop, Nat.totient_prime hl]
+        at h1
       have hpos : 0 < N.totient := Nat.totient_pos.2 (NeZero.pos N)
       have h2 : 2 ≤ l - 1 := by omega
       nlinarith

@@ -7,11 +7,13 @@ public import Mathlib
 namespace GlobalTheory
 
 theorem irreducible_idempotent_eq_one_and_character_eq_weight
-    (L : Type) [Field L] (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module L V]
-    [FiniteDimensional L V] (ρ : Representation L G V) (hρ : ρ.IsIrreducible) :
-    (∀ e : Module.End L V, e ≠ 0 → e * e = e → (∀ g, ρ g * e = e * ρ g) → e = 1) ∧
-    (∀ (lam : G →* Lˣ) (v : V), v ≠ 0 → (∀ g, ρ g v = (lam g : L) • v) →
-      ∀ g, ρ.character g = (lam g : L)) := by
+    (L : Type) [Field L]
+    (G : Type) [Group G]
+    (V : Type) [AddCommGroup V] [Module L V] [FiniteDimensional L V]
+    (ρ : Representation L G V) (hρ : ρ.IsIrreducible)
+    : (∀ e : Module.End L V, e ≠ 0 → e * e = e → (∀ g, ρ g * e = e * ρ g) → e = 1)
+      ∧ (∀ (lam : G →* Lˣ) (v : V),
+        v ≠ 0 → (∀ g, ρ g v = (lam g : L) • v) → ∀ g, ρ.character g = (lam g : L)) := by
   have key : ∀ (W : Submodule L V), (∀ g, ∀ x ∈ W, ρ g x ∈ W) → W ≠ ⊥ → W = ⊤ := by
     intro W hW hne
     let S : Subrepresentation ρ := ⟨W, fun g x hx => hW g x hx⟩

@@ -10,10 +10,11 @@ open Matrix
 
 variable {K : Type*} [Field K] (O : ValuationSubring K) {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem exists_gl_of_left_inv (g : O) (hg : ¬ IsUnit g) (C R N : Matrix ι ι K)
-    (hC : ∀ i j, C i j ∈ O) (hR : ∀ i j, R i j ∈ O) (hN : ∀ i j, N i j ∈ O)
-    (hRC : R * C = 1 + (g : K) • N) :
-    ∃ c : GL ι O, (c : Matrix ι ι O).map (fun x : O => (x : K)) = C := by
+theorem exists_gl_of_left_inv
+    (g : O) (hg : ¬ IsUnit g)
+    (C R N : Matrix ι ι K) (hC : ∀ i j, C i j ∈ O) (hR : ∀ i j, R i j ∈ O) (hN : ∀ i j, N i j ∈ O)
+    (hRC : R * C = 1 + (g : K) • N)
+    : ∃ c : GL ι O, (c : Matrix ι ι O).map (fun x : O => (x : K)) = C := by
   classical
   set C' : Matrix ι ι O := Matrix.of fun i j => (⟨C i j, hC i j⟩ : O) with hC'
   set R' : Matrix ι ι O := Matrix.of fun i j => (⟨R i j, hR i j⟩ : O) with hR'
@@ -22,12 +23,12 @@ theorem exists_gl_of_left_inv (g : O) (hg : ¬ IsUnit g) (C R N : Matrix ι ι K
     apply Matrix.map_injective (f := fun x : O => (x : K)) Subtype.val_injective
     ext i j
     have h := congrFun (congrFun hRC i) j
-    simp only [Matrix.map_apply, Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply,
-      smul_eq_mul] at h ⊢
+    simp only [Matrix.map_apply, Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
+      at h ⊢
     have hs : ((∑ k, R' i k * C' k j : O) : K) = ∑ k, R i k * C k j := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [show ((∑ k, R' i k * C' k j : O) : K) = algebraMap O K (∑ k, R' i k * C' k j) from rfl,
-        map_sum]
+          map_sum]
       simp only [map_mul]
       rfl
     rw [hs, h]

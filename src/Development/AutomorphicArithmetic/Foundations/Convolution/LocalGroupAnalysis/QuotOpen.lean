@@ -13,10 +13,10 @@ namespace UpperTheory.ConvolutionTheory.G
 
 section
 
-variable {G T : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-  [Group T] [TopologicalSpace T] [IsTopologicalGroup T] [T2Space T]
-  [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T]
+variable
+  {G T : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group T] [TopologicalSpace T]
+  [IsTopologicalGroup T] [T2Space T] [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T]
 
 private lemma uni_comap (μ : Measure G) (hμ : Uni μ) (U : Subgroup G) (hU : IsOpen (U : Set G)) :
     Uni (μ.comap fun u : U => (u : G)) := by
@@ -120,8 +120,9 @@ end
 end UpperTheory.ConvolutionTheory.G
 
 open MeasureTheory Topology UpperTheory.ConvolutionTheory.G in
-theorem UpperTheory.ConvolutionTheory.G.quotOpen_of :
-    UpperTheory.ConvolutionTheory.G.NormEx → UpperTheory.ConvolutionTheory.G.QuotEq → UpperTheory.ConvolutionTheory.G.QuotOpen := by
+theorem UpperTheory.ConvolutionTheory.G.quotOpen_of
+    : UpperTheory.ConvolutionTheory.G.NormEx → UpperTheory.ConvolutionTheory.G.QuotEq
+      → UpperTheory.ConvolutionTheory.G.QuotOpen := by
   classical
   intro hN hE G _ _ _ _ _ _ _ _ T _ _ _ _ _ _ _ _ μ j ν h U hU i hi
   obtain ⟨hμ, hj, hν⟩ := id h
@@ -156,9 +157,15 @@ theorem UpperTheory.ConvolutionTheory.G.quotOpen_of :
     intro t g
     simp [hi, hFi]
   obtain ⟨hq1, -, hq3⟩ := hE U (U.comap j) _ i _ hs (fun u => F u) hFm' hFi' _ hr₀
-  have key : (fun x => F x * ((((Set.range j * (U : Set G)).piecewise
-        (ext0 U fun u => (r₀ u : ENNReal)) fun g => (r' g : ENNReal)) x).toReal : ℂ)) =
-      (U : Set G).indicator (fun x => F x * (((ext0 U fun u => (r₀ u : ENNReal)) x).toReal : ℂ)) := by
+  have key
+      : (fun x =>
+          F x
+            * ((((Set.range j * (U : Set G)).piecewise (ext0 U fun u => (r₀ u : ENNReal)) fun g =>
+                  (r' g : ENNReal))
+                x).toReal
+              : ℂ))
+        = (U : Set G).indicator
+          (fun x => F x * (((ext0 U fun u => (r₀ u : ENNReal)) x).toReal : ℂ)) := by
     funext x
     by_cases hxU : x ∈ (U : Set G)
     · rw [Set.indicator_of_mem hxU, Set.piecewise_eq_of_mem]
@@ -171,20 +178,31 @@ theorem UpperTheory.ConvolutionTheory.G.quotOpen_of :
           by_contra h0
           exact hxS (hFs x h0)
         simp [this]
-  have cmp : (fun x => F x * (((ext0 U fun u => (r₀ u : ENNReal)) x).toReal : ℂ)) ∘
-      (fun u : U => (u : G)) = fun u : U => F u * (((r₀ u : ENNReal)).toReal : ℂ) := by
+  have cmp
+      : (fun x => F x * (((ext0 U fun u => (r₀ u : ENNReal)) x).toReal : ℂ))
+          ∘ (fun u : U => (u : G))
+        = fun u : U => F u * (((r₀ u : ENNReal)).toReal : ℂ) := by
     funext u
     simp only [Function.comp]
     rw [show ext0 U (fun u => (r₀ u : ENNReal)) (u : G) = _ from ext0_coe U _ u]
-  have i1 : Integrable (fun x => F x * ((((Set.range j * (U : Set G)).piecewise
-        (ext0 U fun u => (r₀ u : ENNReal)) fun g => (r' g : ENNReal)) x).toReal : ℂ)) μ ↔
-      Integrable (fun u : U => F u * (((r₀ u : ENNReal)).toReal : ℂ))
-        (μ.comap fun u : U => (u : G)) := by
+  have i1
+      : Integrable
+          (fun x =>
+            F x
+              * ((((Set.range j * (U : Set G)).piecewise (ext0 U fun u => (r₀ u : ENNReal)) fun g =>
+                    (r' g : ENNReal))
+                  x).toReal
+                : ℂ))
+          μ
+        ↔ Integrable
+          (fun u : U => F u * (((r₀ u : ENNReal)).toReal : ℂ))
+          (μ.comap fun u : U => (u : G)) := by
     rw [key, integrable_indicator_iff hUm, integrableOn_iff_comap_subtypeVal hUm]
     exact Iff.of_eq (congrArg (fun f => Integrable f (μ.comap fun u : U => (u : G))) cmp)
-  have i2 : ∫ x, F x * ((((Set.range j * (U : Set G)).piecewise
-        (ext0 U fun u => (r₀ u : ENNReal)) fun g => (r' g : ENNReal)) x).toReal : ℂ) ∂μ =
-      ∫ u : U, F u * (((r₀ u : ENNReal)).toReal : ℂ) ∂(μ.comap fun u : U => (u : G)) := by
+  have i2
+      : ∫ x, F x * ((((Set.range j * (U : Set G)).piecewise
+          (ext0 U fun u => (r₀ u : ENNReal)) fun g => (r' g : ENNReal)) x).toReal : ℂ) ∂μ
+        = ∫ u : U, F u * (((r₀ u : ENNReal)).toReal : ℂ) ∂(μ.comap fun u : U => (u : G)) := by
     rw [key, integral_indicator hUm, ← integral_subtype_comap hUm]
     exact congrArg (fun f => ∫ u : U, f u ∂(μ.comap fun u : U => (u : G))) cmp
   exact ⟨hQ1.trans (i1.trans hq1.symm), hQ3.trans (i2.trans hq3.symm)⟩

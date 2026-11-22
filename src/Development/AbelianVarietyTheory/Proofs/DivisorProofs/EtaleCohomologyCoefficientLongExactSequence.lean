@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ShortExactMa
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 namespace GlobalTheory.EtC.CoefSeq
@@ -46,36 +47,51 @@ private lemma exact_comp_surjective {A A' B C : Type*} [Zero C] {f : A → B} {g
   intro y
   rw [hfg y, Set.range_comp, hγ.range_eq, Set.image_univ]
 
-
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex in
 theorem _root_.GlobalTheory.EtC.coefSeq_exact : _root_.GlobalTheory.EtC.A7 := by
   unfold _root_.GlobalTheory.EtC.A7
   intro R _ S hS
   obtain ⟨e, ⟨hom⟩⟩ := _root_.GlobalTheory.EtC.cone_resMap_homotopyEquiv R S hS
-  refine ⟨_root_.GlobalTheory.EtC.zcomp (Cocycle.ofHom e.inv)
-    (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f)) (zero_add 1), fun K n => ?_⟩
+  refine ⟨
+    _root_.GlobalTheory.EtC.zcomp (Cocycle.ofHom e.inv)
+      (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f)) (zero_add 1),
+    fun K n => ?_
+  ⟩
   obtain ⟨ex₁, ex₂, ex₃⟩ :=
     _root_.GlobalTheory.EtC.coneSeqTgt_exact R K (_root_.GlobalTheory.EtC.resMap R S.f) n
-  have hinvhom : ∀ x, _root_.GlobalTheory.EtC.cpush K e.inv n (_root_.GlobalTheory.EtC.cpush K e.hom n x) = x := by
+  have hinvhom
+      : ∀ x,
+        _root_.GlobalTheory.EtC.cpush K e.inv n (_root_.GlobalTheory.EtC.cpush K e.hom n x)
+          = x := by
     intro x
-    rw [← _root_.GlobalTheory.EtC.InjResCmp.cpush_comp, _root_.GlobalTheory.EtC.InjResCmp.cpush_homotopy K e.homotopyHomInvId,
+    rw [← _root_.GlobalTheory.EtC.InjResCmp.cpush_comp,
+      _root_.GlobalTheory.EtC.InjResCmp.cpush_homotopy K e.homotopyHomInvId,
       _root_.GlobalTheory.EtC.InjResCmp.cpush_id]
-  have hhominv : ∀ x, _root_.GlobalTheory.EtC.cpush K e.hom n (_root_.GlobalTheory.EtC.cpush K e.inv n x) = x := by
+  have hhominv
+      : ∀ x,
+        _root_.GlobalTheory.EtC.cpush K e.hom n (_root_.GlobalTheory.EtC.cpush K e.inv n x)
+          = x := by
     intro x
-    rw [← _root_.GlobalTheory.EtC.InjResCmp.cpush_comp, _root_.GlobalTheory.EtC.InjResCmp.cpush_homotopy K e.homotopyInvHomId,
+    rw [← _root_.GlobalTheory.EtC.InjResCmp.cpush_comp,
+      _root_.GlobalTheory.EtC.InjResCmp.cpush_homotopy K e.homotopyInvHomId,
       _root_.GlobalTheory.EtC.InjResCmp.cpush_id]
-  have hg : ⇑(_root_.GlobalTheory.EtC.HK.post R K S.g n) =
-      ⇑(_root_.GlobalTheory.EtC.cpush K e.hom n) ∘
-        ⇑(_root_.GlobalTheory.EtC.cpush K (mappingCone.inr (_root_.GlobalTheory.EtC.resMap R S.f)) n) := by
+  have hg
+      : ⇑(_root_.GlobalTheory.EtC.HK.post R K S.g n)
+        = ⇑(_root_.GlobalTheory.EtC.cpush K e.hom n) ∘ ⇑(_root_.GlobalTheory.EtC.cpush K
+          (mappingCone.inr (_root_.GlobalTheory.EtC.resMap R S.f)) n) := by
     funext x
     show _root_.GlobalTheory.EtC.cpush K (_root_.GlobalTheory.EtC.resMap R S.g) n x = _
-    rw [← _root_.GlobalTheory.EtC.InjResCmp.cpush_homotopy K hom, _root_.GlobalTheory.EtC.InjResCmp.cpush_comp]
+    rw [← _root_.GlobalTheory.EtC.InjResCmp.cpush_homotopy K hom,
+      _root_.GlobalTheory.EtC.InjResCmp.cpush_comp]
     rfl
-  have hδ : ⇑(_root_.GlobalTheory.EtC.HK.ext R K
-      (_root_.GlobalTheory.EtC.zcomp (Cocycle.ofHom e.inv)
-        (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f)) (zero_add 1)) n (n + 1) rfl) =
-      ⇑(_root_.GlobalTheory.EtC.cpost K (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f)) n (n + 1) rfl) ∘
-        ⇑(_root_.GlobalTheory.EtC.cpush K e.inv n) := by
+  have hδ
+      : ⇑(_root_.GlobalTheory.EtC.HK.ext R K
+          (_root_.GlobalTheory.EtC.zcomp (Cocycle.ofHom e.inv)
+            (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f)) (zero_add 1))
+          n (n + 1) rfl)
+        = ⇑(_root_.GlobalTheory.EtC.cpost K (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f))
+            n (n + 1) rfl)
+          ∘ ⇑(_root_.GlobalTheory.EtC.cpush K e.inv n) := by
     funext y
     exact ((_root_.GlobalTheory.cocycle_comp_assoc_classes R (add_zero n) (zero_add 1) rfl rfl).2.2
       y (Cocycle.ofHom e.inv) (mappingCone.fst (_root_.GlobalTheory.EtC.resMap R S.f)))

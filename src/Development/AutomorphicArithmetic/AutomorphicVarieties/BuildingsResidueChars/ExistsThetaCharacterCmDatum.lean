@@ -8,14 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Af
 
-private theorem exists_nontrivial_l_torsion_character {A C : Type} [Group A] [Finite A] [IsCyclic A] [CommGroup C] {l : ℕ} (hl : l ∣ Nat.card A)
-    {z : C} (hz : z ≠ 1) (hzl : z ^ l = 1) : ∃ φ : A →* C, φ ≠ 1 ∧ ∀ a, φ a ^ l = 1 := by
+private theorem exists_nontrivial_l_torsion_character
+    {A C : Type} [Group A] [Finite A] [IsCyclic A] [CommGroup C]
+    {l : ℕ} (hl : l ∣ Nat.card A)
+    {z : C} (hz : z ≠ 1) (hzl : z ^ l = 1)
+    : ∃ φ : A →* C, φ ≠ 1 ∧ ∀ a, φ a ^ l = 1 := by
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := A)
   have ho : orderOf z ∣ orderOf g := by
     rw [orderOf_eq_card_of_forall_mem_zpowers hg]
     exact (orderOf_dvd_of_pow_eq_one hzl).trans hl
   have e : monoidHomOfForallMemZpowers hg ho g = z := monoidHomOfForallMemZpowers_apply_gen hg ho
-  refine ⟨monoidHomOfForallMemZpowers hg ho, fun h => hz (by rw [← e, h, MonoidHom.one_apply]), fun a => ?_⟩
+  refine ⟨
+    monoidHomOfForallMemZpowers hg ho,
+    fun h => hz (by rw [← e, h, MonoidHom.one_apply]),
+    fun a => ?_
+  ⟩
   obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg a)
   rw [map_zpow, e, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hzl, one_zpow]
 

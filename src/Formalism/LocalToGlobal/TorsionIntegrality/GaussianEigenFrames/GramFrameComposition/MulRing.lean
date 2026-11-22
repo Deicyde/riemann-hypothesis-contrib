@@ -13,8 +13,10 @@ open Formalism.L2.Th1.CM (omegaK)
 
 namespace GramFrameMultiplicativityLemmas
 
-theorem indep_sqrt {d : ℕ} (hd : 0 < d) (P Q : ℤ)
-    (h : (P : ℂ) + (Q : ℂ) * (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) = 0) : P = 0 ∧ Q = 0 := by
+theorem indep_sqrt
+    {d : ℕ} (hd : 0 < d)
+    (P Q : ℤ) (h : (P : ℂ) + (Q : ℂ) * (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) = 0)
+    : P = 0 ∧ Q = 0 := by
   have hs : 0 < Real.sqrt d := Real.sqrt_pos.mpr (by exact_mod_cast hd)
   have him := congrArg Complex.im h
   have hre := congrArg Complex.re h
@@ -24,8 +26,8 @@ theorem indep_sqrt {d : ℕ} (hd : 0 < d) (P Q : ℤ)
   · exact h1
   · exact absurd h1 (by positivity)
 
-theorem sqrt_sq (d : ℕ) :
-    (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) = -(d : ℂ) := by
+theorem sqrt_sq (d : ℕ)
+    : (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) = -(d : ℂ) := by
   have h : ((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ) = (d : ℂ) := by
     rw [← Complex.ofReal_mul, Real.mul_self_sqrt (Nat.cast_nonneg d)]; simp
   linear_combination Complex.I * Complex.I * h + (d : ℂ) * Complex.I_mul_I
@@ -42,8 +44,8 @@ theorem odd_b {a : ℕ} {b c : ℤ} {d : ℕ} (hOK : CmOK a b c d) : Odd b := by
     omega
   · exact h
 
-theorem gcd_one {a : ℕ} {b c : ℤ} {d : ℕ} (hOK : CmOK a b c d) :
-    Int.gcd (a : ℤ) (Int.gcd b c : ℤ) = 1 := by
+theorem gcd_one {a : ℕ} {b c : ℤ} {d : ℕ} (hOK : CmOK a b c d)
+    : Int.gcd (a : ℤ) (Int.gcd b c : ℤ) = 1 := by
   by_contra hne
   obtain ⟨r, hr, hrg⟩ := Nat.exists_prime_and_dvd hne
   have hg : (r : ℤ) ∣ (Int.gcd (a : ℤ) (Int.gcd b c : ℤ) : ℤ) := by exact_mod_cast hrg
@@ -64,8 +66,10 @@ theorem gcd_one {a : ℕ} {b c : ℤ} {d : ℕ} (hOK : CmOK a b c d) :
   have hu := (Irreducible.squarefree hOK.2.2.2) r hdv'
   exact hr.one_lt.ne' (Nat.isUnit_iff.mp hu)
 
-theorem dvd_of_prim {a : ℕ} {b c : ℤ} {d : ℕ} (hOK : CmOK a b c d) (y : ℤ)
-    (hb : (a : ℤ) ∣ y * b) (hc : (a : ℤ) ∣ y * c) : (a : ℤ) ∣ y := by
+theorem dvd_of_prim
+    {a : ℕ} {b c : ℤ} {d : ℕ} (hOK : CmOK a b c d)
+    (y : ℤ) (hb : (a : ℤ) ∣ y * b) (hc : (a : ℤ) ∣ y * c)
+    : (a : ℤ) ∣ y := by
   have e1 := Int.gcd_eq_gcd_ab b c
   have e2 := Int.gcd_eq_gcd_ab (a : ℤ) (Int.gcd b c : ℤ)
   rw [gcd_one hOK] at e2
@@ -99,8 +103,10 @@ theorem MulRing_proof : MulRing := by
   have f2 : (x' : ℂ) * a + y' * (((b : ℂ) + S) / 2) = z * (((b : ℂ) + S) / 2) := by
     apply mul_left_cancel₀ hlam
     linear_combination e2
-  have key : (((4 * a * a * x' + 2 * a * y' * b - 2 * x * a * b - y * (b * b - d) : ℤ)) : ℂ)
-      + ((2 * a * y' - 2 * x * a - 2 * y * b : ℤ) : ℂ) * S = 0 := by
+  have key
+      : (((4 * a * a * x' + 2 * a * y' * b - 2 * x * a * b - y * (b * b - d) : ℤ)) : ℂ)
+          + ((2 * a * y' - 2 * x * a - 2 * y * b : ℤ) : ℂ) * S
+        = 0 := by
     push_cast
     linear_combination 4 * (a : ℂ) * f2 - 2 * ((b : ℂ) + S) * f1 + (y : ℂ) * hS
   obtain ⟨k1, k2⟩ := indep_sqrt hd _ _ key

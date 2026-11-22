@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_isPrimitiveRoot_of_addChar_ne_one :
-    ∀ (R K : Type) [CommRing R] [Field K] (p : ℕ), p.Prime → (p : R) = 0 →
-      ∀ ψ : AddChar R K, ψ ≠ 1 → ∃ ζ : K, IsPrimitiveRoot ζ p := by
+theorem exists_isPrimitiveRoot_of_addChar_ne_one
+    : ∀ (R K : Type) [CommRing R] [Field K] (p : ℕ),
+      p.Prime → (p : R) = 0 → ∀ ψ : AddChar R K, ψ ≠ 1 → ∃ ζ : K, IsPrimitiveRoot ζ p := by
   intro R K _ _ p hp hpR ψ hψ
   obtain ⟨x, hx⟩ := AddChar.ne_one_iff.mp hψ
   have hpow : ψ x ^ p = 1 := by

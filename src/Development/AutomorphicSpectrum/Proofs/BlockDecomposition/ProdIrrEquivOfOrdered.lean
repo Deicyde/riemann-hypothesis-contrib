@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsL
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Cos GlobalTheory.SplitRead GlobalTheory.ProdReorder
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.Cos GlobalTheory.SplitRead GlobalTheory.ProdReorder
 
 noncomputable section
 
@@ -17,9 +18,10 @@ namespace GlobalTheory.CompanionTheory.SegReorder
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem famCongr {u : ℕ} {f g : Fin u → IrrGL (k := k)} (hfg : ∀ i, f i = g i) {T : ℕ}
-    (e : (Σ i, Fin (f i).1) ≃ Fin T) (e' : (Σ i, Fin (g i).1) ≃ Fin T) :
-    Nonempty ((multiProd e fun i => (f i).rep).Equiv (multiProd e' fun i => (g i).rep)) := by
+theorem famCongr
+    {u : ℕ} {f g : Fin u → IrrGL (k := k)} (hfg : ∀ i, f i = g i)
+    {T : ℕ} (e : (Σ i, Fin (f i).1) ≃ Fin T) (e' : (Σ i, Fin (g i).1) ≃ Fin T)
+    : Nonempty ((multiProd e fun i => (f i).rep).Equiv (multiProd e' fun i => (g i).rep)) := by
   obtain rfl : f = g := funext hfg
   exact multiProd_placing e e' _
 

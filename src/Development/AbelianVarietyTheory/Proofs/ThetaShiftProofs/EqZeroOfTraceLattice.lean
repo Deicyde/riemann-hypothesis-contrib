@@ -8,7 +8,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 @[expose] public section
 
 open NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.HermitianTraceFormVanishing GlobalTheory.ArcQ
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.HermitianTraceFormVanishing GlobalTheory.ArcQ
 
 namespace GlobalTheory.ArcFlow
 
@@ -86,7 +87,6 @@ lemma re_nonneg_of_trace (s : E)
   simp at this
   linarith
 
-
 omit [IsCMField E] in
 lemma cross_eq {Y : Type} [AddCommGroup Y] [Module (𝓞 E) Y] [Module.Finite ℤ Y]
     (hY : Module.finrank (𝓞 E) Y = 1) (η η' : Module.Dual ℤ Y) (x x' : Y) :
@@ -145,7 +145,8 @@ lemma transvMat_mulVec (G : Matrix (Fin r) (Fin r) E) (ξ v : Fin r → E) (α :
 
 section Lattice
 
-variable {La Y : Type} [AddCommGroup La] [Module (𝓞 E) La] [AddCommGroup Y] [Module (𝓞 E) Y]
+variable
+  {La Y : Type} [AddCommGroup La] [Module (𝓞 E) La] [AddCommGroup Y] [Module (𝓞 E) Y]
   (φ : La ≃ₗ[𝓞 E] X.Λ) (EF : LinearMap.BilinForm ℤ La)
   (iso : ∀ a b, ((EF a b : ℤ) : ℚ) = Algebra.trace ℚ E (-X.ξ0 * herm X.Gm (φ a : Fin r → E) (φ b)))
   (y : La →ₗ[𝓞 E] Y)
@@ -161,18 +162,24 @@ lemma pairE_eq (t : La) (η : Module.Dual ℤ Y) (ht : ∀ v, -EF t v = η (y v)
     herm_smul_left, ← map_neg, ← map_sub, ← map_zero (Algebra.trace ℚ E)]
   congr 1; ring
 
-
 include iso in
-theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ : X.κ0 = 2 * X.ξ0)
-    (hy : Function.Surjective y) (be : LinearMap.BilinForm ℤ Y) (hsym : ∀ a b, be a b = be b a)
-    (hpos : ∀ a, a ≠ 0 → 0 < be a a) (nn : La →ₗ[𝓞 E] La) (hnn : ∀ v v', -EF (nn v) v' = be (y v) (y v'))
-    (hrep : ∀ η : Module.Dual ℤ Y, ∃ t, ∀ v, -EF t v = η (y v))
-    (ξ : Module.Dual ℤ Y) (hξ : ξ ≠ 0) (t : La) (ht : ∀ v, -EF t v = ξ (y v)) (hyt : y t = 0) :
-    ∃ sE : E, X.IsIso (φ t : Fin r → E) ∧ IsBePar ξ be sE ∧ (∀ τ : E →+* ℂ, 0 < (τ sE).re) ∧
-      (∀ (N : ℕ) (s : E), LevelPar ξ N s → ∀ v ∈ X.Λ, ∃ u ∈ X.Λ,
-        (transvMat X.Gm (φ t : Fin r → E) (s * X.κ0)).mulVec v - v = (N : E) • u) ∧
-      ∀ v, (φ (nn v) : Fin r → E) =
-        (-(sE * X.κ0 * herm X.Gm (φ v : Fin r → E) (φ t))) • (φ t : Fin r → E) := by
+theorem rank_one
+    [Module.Finite ℤ Y]
+    (hY : Module.finrank (𝓞 E) Y = 1) (hκ : X.κ0 = 2 * X.ξ0) (hy : Function.Surjective y)
+    (be : LinearMap.BilinForm ℤ Y) (hsym : ∀ a b, be a b = be b a) (hpos : ∀ a, a ≠ 0 → 0 < be a a)
+    (nn : La →ₗ[𝓞 E] La) (hnn : ∀ v v', - EF (nn v) v' = be (y v) (y v'))
+    (hrep : ∀ η : Module.Dual ℤ Y, ∃ t, ∀ v, - EF t v = η (y v))
+    (ξ : Module.Dual ℤ Y) (hξ : ξ ≠ 0)
+    (t : La) (ht : ∀ v, - EF t v = ξ (y v)) (hyt : y t = 0)
+    : ∃ sE : E,
+      X.IsIso (φ t : Fin r → E) ∧ IsBePar ξ be sE ∧ (∀ τ : E →+* ℂ, 0 < (τ sE).re)
+        ∧ (∀ (N : ℕ) (s : E),
+          LevelPar ξ N s
+            → ∀ v ∈ X.Λ, ∃ u ∈ X.Λ,
+              (transvMat X.Gm (φ t : Fin r → E) (s * X.κ0)).mulVec v - v = (N : E) • u)
+        ∧ ∀ v,
+          (φ (nn v) : Fin r → E)
+            = (-(sE * X.κ0 * herm X.Gm (φ v : Fin r → E) (φ t))) • (φ t : Fin r → E) := by
   obtain ⟨p1, p2, p3, -⟩ := pairE_properties E Y ξ
   have hp := pairE_eq X φ EF iso y t ξ ht
   have hpn : ∀ v v', pairE (be (y v)) (y v') = -X.ξ0 * herm X.Gm (φ v' : Fin r → E) (φ (nn v)) :=
@@ -194,20 +201,28 @@ theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ
   set ξ' : Fin r → E := (φ t).1 with hξ'
   have hh₀ : herm X.Gm (φ v₀ : Fin r → E) ξ' ≠ 0 := fun h => hp₀ (by rw [hp, h, mul_zero])
   have hh₀' : herm X.Gm ξ' (φ v₀ : Fin r → E) ≠ 0 := by rw [← hcj]; simpa using hh₀
-  have hskew : ∀ v v', herm X.Gm (φ (nn v) : Fin r → E) (φ v') = -herm X.Gm (φ v : Fin r → E) (φ (nn v')) := by
+  have hskew
+      : ∀ v v',
+        herm X.Gm (φ (nn v) : Fin r → E) (φ v') = - herm X.Gm (φ v : Fin r → E) (φ (nn v')) := by
     intro v v'
-    have : X.ξ0 * (herm X.Gm (φ (nn v) : Fin r → E) (φ v') + herm X.Gm (φ v : Fin r → E) (φ (nn v'))) = 0 := by
+    have : X.ξ0
+          * (herm X.Gm (φ (nn v) : Fin r → E) (φ v') + herm X.Gm (φ v : Fin r → E) (φ (nn v')))
+        = 0 := by
       refine eq_zero_of_trace_mul _ fun β => ?_
       have e1 : ((EF (nn (β • v)) v' : ℤ) : ℚ) = EF (nn v') (β • v) := by
         have := (hnn (β • v) v').trans ((hsym _ _).trans (hnn v' (β • v)).symm)
         exact_mod_cast neg_injective this
-      rw [iso, iso, ← trace_cc (-X.ξ0 * herm X.Gm (φ (nn v') : Fin r → E) _), cc_mul, cc_neg, hc0, hcj,
-        map_smul nn, hsm, hsm, herm_smul_left, herm_smul_left, ← sub_eq_zero, ← map_sub] at e1
+      rw [iso, iso, ← trace_cc (-X.ξ0 * herm X.Gm (φ (nn v') : Fin r → E) _), cc_mul, cc_neg, hc0,
+          hcj, map_smul nn, hsm, hsm, herm_smul_left, herm_smul_left, ← sub_eq_zero, ← map_sub]
+        at e1
       rw [← neg_eq_zero, ← map_neg, ← e1]
-      congr 1; ring
+      congr 1
+      ring
     exact eq_neg_of_add_eq_zero_left ((mul_eq_zero.1 this).resolve_left hξ0)
-  have hmul : ∀ v, (φ (nn v) : Fin r → E) =
-      (herm X.Gm (φ (nn v) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) • ξ' := by
+  have hmul
+      : ∀ v,
+        (φ (nn v) : Fin r → E)
+          = (herm X.Gm (φ (nn v) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) • ξ' := by
     intro v
     rw [← sub_eq_zero]
     refine eq_zero_of_herm_lattice X _ fun w hw => ?_
@@ -220,12 +235,16 @@ theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ
     field_simp
     apply mul_left_cancel₀ (mul_ne_zero hξ0 hξ0)
     linear_combination e'
-  obtain ⟨α, hα⟩ : ∃ α : E, ∀ v, (φ (nn v) : Fin r → E) = (α * herm X.Gm (φ v : Fin r → E) ξ') • ξ' := by
-    refine ⟨-cc (herm X.Gm (φ (nn v₀) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) / herm X.Gm ξ' (φ v₀),
-      fun v => ?_⟩
+  obtain ⟨α, hα⟩
+      : ∃ α : E, ∀ v, (φ (nn v) : Fin r → E) = (α * herm X.Gm (φ v : Fin r → E) ξ') • ξ' := by
+    refine ⟨
+      - cc (herm X.Gm (φ (nn v₀) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) / herm X.Gm ξ' (φ v₀),
+      fun v => ?_
+    ⟩
     rw [hmul v, hskew v v₀]
     conv_lhs => rw [hmul v₀, herm_smul_right]
-    congr 1; ring
+    congr 1
+    ring
   have hαc : cc α = -α := by
     have e := hskew v₀ v₀
     rw [hα, herm_smul_left, herm_smul_right, cc_mul, hcj] at e
@@ -236,18 +255,30 @@ theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ
   have hsc : cc (-α / X.κ0) = -α / X.κ0 := by
     rw [div_eq_mul_inv, cc_mul, cc_neg, hαc, cc_inv, hκ, cc_mul, hcc2, hc0]
     field_simp
-  have htr : ∀ (s : E) v v', Algebra.trace ℚ E (2 * s * pairE ξ (y v) * cc (pairE ξ (y v'))) =
-      Algebra.trace ℚ E (-X.ξ0 * herm X.Gm ((s * X.κ0 * herm X.Gm (φ v : Fin r → E) ξ') • ξ') (φ v')) := by
+  have htr
+      : ∀ (s : E) v v',
+        Algebra.trace ℚ E (2 * s * pairE ξ (y v) * cc (pairE ξ (y v')))
+          = Algebra.trace ℚ E
+            (-X.ξ0 * herm X.Gm ((s * X.κ0 * herm X.Gm (φ v : Fin r → E) ξ') • ξ') (φ v')) := by
     intro s v v'
     rw [hp, hp, cc_mul, cc_neg, hc0, hcj, herm_smul_left, hκ]
-    congr 1; ring
+    congr 1
+    ring
   have hbe : IsBePar ξ be (-α / X.κ0) := by
     refine ⟨hsc, fun x x' => ?_⟩
     obtain ⟨v, rfl⟩ := hy x
     obtain ⟨v', rfl⟩ := hy x'
     rw [htr, ← hnn, Int.cast_neg, iso, hα v, ← map_neg, herm_smul_left, herm_smul_left]
-    congr 1; field_simp
-  refine ⟨-α / X.κ0, ⟨(φ t).2, ?_, fun h => hh₀ ?_⟩, hbe, fun τ => ?_, fun N s hs w hw => ?_, fun v => ?_⟩
+    congr 1
+    field_simp
+  refine ⟨
+    -α / X.κ0,
+    ⟨(φ t).2, ?_, fun h => hh₀ ?_⟩,
+    hbe,
+    fun τ => ?_,
+    fun N s hs w hw => ?_,
+    fun v => ?_
+  ⟩
   · have e := hp t
     have h0 : pairE (E := E) ξ (0 : Y) = 0 := by simpa using p1 0 0
     rw [hyt, h0] at e
@@ -261,24 +292,32 @@ theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ
       simp only [mul_zero, zero_mul, map_zero] at e
       have e' : be (y v₀) (y v₀) = 0 := by exact_mod_cast e.symm
       omega
-    have h1 := re_nonneg_of_trace (2 * sE * pairE ξ (y v₀) * cc (pairE ξ (y v₀))) (fun a => by
-      have e := hbe.2 (a • y v₀) (a • y v₀)
-      rw [p1, cc_mul] at e
-      have h2 : (0 : ℤ) ≤ be (a • y v₀) (a • y v₀) := by
-        by_cases h : a • y v₀ = 0
-        · simp [h]
-        · exact (hpos _ h).le
-      have h3 : (0 : ℚ) ≤ (be (a • y v₀) (a • y v₀) : ℤ) := by exact_mod_cast h2
-      rw [← e] at h3
-      refine h3.trans_eq ?_
-      congr 1; ring) τ
+    have h1 :=
+      re_nonneg_of_trace (2 * sE * pairE ξ (y v₀) * cc (pairE ξ (y v₀)))
+        (fun a => by
+          have e := hbe.2 (a • y v₀) (a • y v₀)
+          rw [p1, cc_mul] at e
+          have h2 : (0 : ℤ) ≤ be (a • y v₀) (a • y v₀) := by
+            by_cases h : a • y v₀ = 0
+            · simp [h]
+            · exact (hpos _ h).le
+          have h3 : (0 : ℚ) ≤ (be (a • y v₀) (a • y v₀) : ℤ) := by exact_mod_cast h2
+          rw [← e] at h3
+          refine h3.trans_eq ?_
+          congr 1
+          ring)
+        τ
     have him : (τ sE).im = 0 := by
       have := map_cc τ sE
       rw [hsc] at this
       exact Complex.conj_eq_iff_im.1 this.symm
-    have hre : (τ sE).re ≠ 0 := fun h => hs0 (τ.injective (by rw [map_zero]; exact Complex.ext h him))
-    have hn : 0 < Complex.normSq (τ (pairE ξ (y v₀))) := Complex.normSq_pos.2 ((map_ne_zero τ).2 hp₀)
-    rw [map_mul, map_mul, map_mul, map_cc, mul_assoc, Complex.mul_conj, Complex.re_mul_ofReal, map_ofNat] at h1
+    have hre : (τ sE).re ≠ 0 := fun h =>
+      hs0 (τ.injective (by rw [map_zero]; exact Complex.ext h him))
+    have hn : 0 < Complex.normSq (τ (pairE ξ (y v₀))) :=
+      Complex.normSq_pos.2 ((map_ne_zero τ).2 hp₀)
+    rw [map_mul, map_mul, map_mul, map_cc, mul_assoc, Complex.mul_conj, Complex.re_mul_ofReal,
+        map_ofNat]
+      at h1
     have h4 : ((2 : ℂ) * τ sE).re = 2 * (τ sE).re := by simp
     rw [h4] at h1
     have : 0 ≤ (τ sE).re := by
@@ -287,12 +326,14 @@ theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ
       nlinarith
     exact lt_of_le_of_ne this hre.symm
   · obtain ⟨v, rfl⟩ := hΛ w hw
-    obtain ⟨η, hη⟩ : ∃ η : Module.Dual ℤ Y, ∀ x,
-        Algebra.trace ℚ E (2 * s * pairE ξ (y v) * cc (pairE ξ x)) = (N : ℚ) * η x := by
+    obtain ⟨η, hη⟩
+        : ∃ η : Module.Dual ℤ Y, ∀ x,
+          Algebra.trace ℚ E (2 * s * pairE ξ (y v) * cc (pairE ξ x)) = (N : ℚ) * η x := by
       by_cases hN : N = 0
       · refine ⟨0, fun x => ?_⟩
         obtain ⟨m, hm⟩ := hs.2 (y v) x
-        rw [hm, hN]; simp
+        rw [hm, hN]
+        simp
       · choose m hm using hs.2 (y v)
         have hN' : (N : ℚ) ≠ 0 := by exact_mod_cast hN
         refine ⟨(AddMonoidHom.mk' m fun a b => ?_).toIntLinearMap, hm⟩
@@ -305,11 +346,17 @@ theorem rank_one [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1) (hκ
     refine eq_zero_of_trace_lattice X _ fun w hw => ?_
     obtain ⟨v', rfl⟩ := hΛ w hw
     have e := hη (y v')
-    rw [htr, ← ht', Int.cast_neg, iso, ← map_neg, ← nsmul_eq_mul, ← map_nsmul, ← sub_eq_zero, ← map_sub] at e
-    rw [← neg_eq_zero, ← map_neg, ← e, herm_sub_left, smul_neg, ← neg_smul, herm_smul_left X.Gm (-(N : E))]
-    congr 1; rw [nsmul_eq_mul]; ring
+    rw [htr, ← ht', Int.cast_neg, iso, ← map_neg, ← nsmul_eq_mul, ← map_nsmul, ← sub_eq_zero,
+        ← map_sub]
+      at e
+    rw [← neg_eq_zero, ← map_neg, ← e, herm_sub_left, smul_neg, ← neg_smul,
+      herm_smul_left X.Gm (-(N : E))]
+    congr 1
+    rw [nsmul_eq_mul]
+    ring
   · rw [hα v]
-    congr 1; field_simp
+    congr 1
+    field_simp
 
 end Lattice
 

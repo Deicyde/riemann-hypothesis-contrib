@@ -11,8 +11,11 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-theorem UpperTheory.HF.mem_ram :
-    ∀ {φ : Frame} (H : HostAx φ) {l : ℕ}, l.Prime → (l ∈ H.ram ↔ H.el l ≠ 1) ∧ (l ∈ H.ram ↔ l ∣ H.condE) ∧ (l ∈ H.ram ↔ H.vdH l ≠ 0) ∧ (l ∈ H.ram → 1 / 2 ≤ H.vdH l) ∧ (l ∈ H.ram → 1 - 1 / (H.el l : ℝ) ≤ H.vdH l) := by
+theorem UpperTheory.HF.mem_ram
+    : ∀ {φ : Frame} (H : HostAx φ) {l : ℕ},
+      l.Prime
+        → (l ∈ H.ram ↔ H.el l ≠ 1) ∧ (l ∈ H.ram ↔ l ∣ H.condE) ∧ (l ∈ H.ram ↔ H.vdH l ≠ 0)
+          ∧ (l ∈ H.ram → 1 / 2 ≤ H.vdH l) ∧ (l ∈ H.ram → 1 - 1 / (H.el l : ℝ) ≤ H.vdH l) := by
   intro φ H l hl
   haveI : Fact l.Prime := ⟨hl⟩
   have hN : H.condN ≠ 0 := H.condN_ne_zero
@@ -21,8 +24,7 @@ theorem UpperTheory.HF.mem_ram :
   set e := H.condE.factorization l with he
   have hlay := fun j (hj : j ≤ v) => layer_bot H.toHostRaw hl hj
   have hev : e ≤ v := ((hlay 0 (Nat.zero_le _)).2.2)
-  have hcardbot : ∀ j, j ≤ v →
-      (Nat.card (H.imgOne (H.condN / l ^ v * l ^ j)) = 1 ↔ e ≤ j) := by
+  have hcardbot : ∀ j, j ≤ v → (Nat.card (H.imgOne (H.condN / l ^ v * l ^ j)) = 1 ↔ e ≤ j) := by
     intro j hj
     rw [Subgroup.card_eq_one]
     exact (hlay j hj).1
@@ -70,7 +72,8 @@ theorem UpperTheory.HF.mem_ram :
       rw [hT0, hcardbot 0 (Nat.zero_le _)] at h0
       omega
   have hC : l ∈ H.ram ↔ H.vdH l ≠ 0 := by
-    have hd : (NumberField.discr H.E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero H.E)
+    have hd : (NumberField.discr H.E).natAbs ≠ 0 :=
+      Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero H.E)
     have hr : (Module.finrank ℚ H.E : ℝ) ≠ 0 := by
       have := Module.finrank_pos (R := ℚ) (M := H.E)
       positivity
@@ -81,8 +84,10 @@ theorem UpperTheory.HF.mem_ram :
     intro hram
     have hpos : 0 < e := hdvdE.1 (hB.1 (hC.1 hram))
     rw [vd_formula H hl, hel]
-    exact Finset.single_le_sum (f := fun j => 1 - 1 / (Nat.card (H.imgOne (H.condN / l ^ v * l ^ j)) : ℝ))
-      (fun j _ => hT _) (Finset.mem_range.2 (lt_of_lt_of_le hpos hev))
+    exact Finset.single_le_sum
+      (f := fun j => 1 - 1 / (Nat.card (H.imgOne (H.condN / l ^ v * l ^ j)) : ℝ))
+      (fun j _ => hT _)
+      (Finset.mem_range.2 (lt_of_lt_of_le hpos hev))
   refine ⟨hC.trans (hB.trans hA.symm), hC.trans hB, hC, fun hram => ?_, hlow⟩
   have h2 : 2 ≤ H.el l := by
     have h1 := (hC.trans (hB.trans hA.symm)).1 hram

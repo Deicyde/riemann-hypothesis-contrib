@@ -10,9 +10,11 @@ open Polynomial IsLocalRing
 
 variable {P : Type*} [CommRing P] [IsLocalRing P]
 
-theorem isIntegral_quotient_of_isMaximal_of_comap_eq {S : Type*} [CommRing S] [Algebra P S]
-    [Algebra.FiniteType P S] (𝔑 : Ideal S) [𝔑.IsMaximal]
-    (h : 𝔑.comap (algebraMap P S) = maximalIdeal P) : Algebra.IsIntegral P (S ⧸ 𝔑) := by
+theorem isIntegral_quotient_of_isMaximal_of_comap_eq
+    {S : Type*} [CommRing S] [Algebra P S] [Algebra.FiniteType P S]
+    (𝔑 : Ideal S) [𝔑.IsMaximal]
+    (h : 𝔑.comap (algebraMap P S) = maximalIdeal P)
+    : Algebra.IsIntegral P (S ⧸ 𝔑) := by
   classical
   letI : Field (P ⧸ maximalIdeal P) := Ideal.Quotient.field _
   letI : Field (S ⧸ 𝔑) := Ideal.Quotient.field _
@@ -38,10 +40,12 @@ theorem isIntegral_quotient_of_isMaximal_of_comap_eq {S : Type*} [CommRing S] [A
         (Ideal.Quotient.mkₐ_surjective P _)
   exact Algebra.IsIntegral.trans (P ⧸ maximalIdeal P)
 
-theorem isMaximal_comap_of_isMaximal_of_comap_eq {S' S : Type*} [CommRing S'] [CommRing S]
-    [Algebra P S'] [Algebra P S] [Algebra S' S] [IsScalarTower P S' S] [Algebra.FiniteType P S]
-    (𝔑 : Ideal S) [𝔑.IsMaximal] (h : 𝔑.comap (algebraMap P S) = maximalIdeal P) :
-    (𝔑.comap (algebraMap S' S)).IsMaximal := by
+theorem isMaximal_comap_of_isMaximal_of_comap_eq
+    {S' S : Type*} [CommRing S'] [CommRing S] [Algebra P S'] [Algebra P S] [Algebra S' S]
+    [IsScalarTower P S' S] [Algebra.FiniteType P S]
+    (𝔑 : Ideal S) [𝔑.IsMaximal]
+    (h : 𝔑.comap (algebraMap P S) = maximalIdeal P)
+    : (𝔑.comap (algebraMap S' S)).IsMaximal := by
   haveI := isIntegral_quotient_of_isMaximal_of_comap_eq 𝔑 h
   haveI : Algebra.IsIntegral S' (S ⧸ 𝔑) := by
     first
@@ -54,15 +58,18 @@ theorem isMaximal_comap_of_isMaximal_of_comap_eq {S' S : Type*} [CommRing S'] [C
     rw [Ideal.mem_comap, Ideal.mem_bot, Ideal.mem_comap]
     first
     | exact Ideal.Quotient.eq_zero_iff_mem
-    | (rw [IsScalarTower.algebraMap_apply S' S (S ⧸ 𝔑), Ideal.Quotient.algebraMap_eq]
-       exact Ideal.Quotient.eq_zero_iff_mem)
+    | (
+        rw [IsScalarTower.algebraMap_apply S' S (S ⧸ 𝔑), Ideal.Quotient.algebraMap_eq]
+        exact Ideal.Quotient.eq_zero_iff_mem
+      )
   rw [← heq]
   exact hbot
 
-theorem exists_monic_aeval_mem_of_isMaximal {S : Type*} [CommRing S] [Algebra P S]
-    [Algebra.FiniteType P S] (𝔑 : Ideal S) [𝔑.IsMaximal]
-    (h : 𝔑.comap (algebraMap P S) = maximalIdeal P) (x : S) :
-    ∃ g : P[X], g.Monic ∧ aeval x g ∈ 𝔑 := by
+theorem exists_monic_aeval_mem_of_isMaximal
+    {S : Type*} [CommRing S] [Algebra P S] [Algebra.FiniteType P S]
+    (𝔑 : Ideal S) [𝔑.IsMaximal]
+    (h : 𝔑.comap (algebraMap P S) = maximalIdeal P) (x : S)
+    : ∃ g : P[X], g.Monic ∧ aeval x g ∈ 𝔑 := by
   haveI := isIntegral_quotient_of_isMaximal_of_comap_eq 𝔑 h
   obtain ⟨g, hg, hgx⟩ := Algebra.IsIntegral.isIntegral (R := P) (Ideal.Quotient.mk 𝔑 x)
   refine ⟨g, hg, ?_⟩

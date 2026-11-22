@@ -15,8 +15,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh GlobalTheory.EtaAn
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
+  Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh
+  GlobalTheory.EtaAn
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -27,7 +32,8 @@ section
 
 variable {E : Type} [Field E] [NumberField E] {dim : (E →+* ℂ) → ℕ}
 
-theorem levReps_act_mul (a b : 𝓞 E) (v : I2.Vsp dim) : I2.act a (I2.act b v) = I2.act (a * b) v := by
+theorem levReps_act_mul (a b : 𝓞 E) (v : I2.Vsp dim)
+    : I2.act a (I2.act b v) = I2.act (a * b) v := by
   ext i
   simp only [I2.act, RingOfIntegers.coe_eq_algebraMap, map_mul]
   exact (mul_assoc _ _ _).symm
@@ -36,22 +42,40 @@ theorem levReps_act_nat (m : ℕ) (v : I2.Vsp dim) : I2.act (m : 𝓞 E) v = (m 
   ext i
   simp [I2.act]
 
-theorem levReps_act_smul (a : 𝓞 E) (c : ℂ) (v : I2.Vsp dim) : I2.act a (c • v) = c • I2.act a v := by
+theorem levReps_act_smul (a : 𝓞 E) (c : ℂ) (v : I2.Vsp dim)
+    : I2.act a (c • v) = c • I2.act a v := by
   ext i
   simp [I2.act]
   ring
 
-theorem levReps_act_add (a : 𝓞 E) (v w : I2.Vsp dim) : I2.act a (v + w) = I2.act a v + I2.act a w := by
+theorem levReps_act_add (a : 𝓞 E) (v w : I2.Vsp dim)
+    : I2.act a (v + w) = I2.act a v + I2.act a w := by
   ext i
   simp [I2.act, mul_add]
 
-theorem levReps_act_neg (a : 𝓞 E) (v : I2.Vsp dim) : I2.act a (-v) = -I2.act a v := by
+theorem levReps_act_neg (a : 𝓞 E) (v : I2.Vsp dim) : I2.act a (-v) = - I2.act a v := by
   ext i
   simp [I2.act]
 
 end
 
-theorem isReps_level_translates : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (T : I2.PT E) (mk : Dw.La →+ I2.Vsp T.dim) (α : 𝓞 E), α * H.bar α = (l.M : 𝓞 E) → l.Mb = Ideal.span {H.bar α} → (∀ a, mk a ∈ T.L) → (∀ (β : 𝓞 E) a, mk (β • a) = I2.act β (mk a)) → (∀ a, (∃ v ∈ T.L, mk a = (l.M : ℂ) • v) → ∃ b, a = l.M • b) → (∀ v ∈ T.L, ∃ a, ∃ v' ∈ T.L, v = mk a + (l.M : ℂ) • v') → ∀ x2 : LevQ Dw l → Dw.La, (∀ q, x2 q ∈ (Ideal.span {(2 : 𝓞 E)} * (l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)) ^ 2) • (⊤ : Submodule (𝓞 E) Dw.La)) → (∀ q, x2 q - levRep q ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)) → ∀ n : ℕ, ∃ K : Finset (Fin n → I2.Vsp T.dim), I2.IsReps T l.M n (vspActL α) K ∧ ∀ b ∈ K, ∃ q : Fin n → LevQ Dw l, b = fun i => I2.act (H.bar α) (-(((l.M : ℂ) ^ 2)⁻¹ • mk (x2 (q i)))) := by
+theorem isReps_level_translates
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (T : I2.PT E) (mk : Dw.La →+ I2.Vsp T.dim) (α : 𝓞 E),
+      α * H.bar α = (l.M : 𝓞 E) → l.Mb = Ideal.span {H.bar α} → (∀ a, mk a ∈ T.L)
+        → (∀ (β : 𝓞 E) a, mk (β • a) = I2.act β (mk a))
+        → (∀ a, (∃ v ∈ T.L, mk a = (l.M : ℂ) • v) → ∃ b, a = l.M • b)
+        → (∀ v ∈ T.L, ∃ a, ∃ v' ∈ T.L, v = mk a + (l.M : ℂ) • v')
+        → ∀ x2 : LevQ Dw l → Dw.La,
+          (∀ q,
+              x2 q
+                ∈ (Ideal.span {(2 : 𝓞 E)} * (l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)) ^ 2)
+                  • (⊤ : Submodule (𝓞 E) Dw.La))
+            → (∀ q, x2 q - levRep q ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La))
+            → ∀ n : ℕ, ∃ K : Finset (Fin n → I2.Vsp T.dim),
+              I2.IsReps T l.M n (vspActL α) K
+                ∧ ∀ b ∈ K, ∃ q : Fin n → LevQ Dw l,
+                  b = fun i => I2.act (H.bar α) (-(((l.M : ℂ) ^ 2)⁻¹ • mk (x2 (q i)))) := by
   intro E _ _ _ H Dw l T mk α hα hMb hL hlin hinj hsurj x2 hx2 hrep n
   classical
   haveI : Finite (LevQ Dw l) := (card_levQ E H Dw l).1
@@ -66,7 +90,9 @@ theorem isReps_level_translates : ∀ (E : Type) [Field E] [NumberField E] [IsCM
   have hmap : l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {α} := by
     rw [hMb, Ideal.map_span, Set.image_singleton]
     exact congrArg (fun z => Ideal.span {z}) hbb
-  have hsm : ∀ (c : 𝓞 E) (y : Dw.La), y ∈ Ideal.span {c} • (⊤ : Submodule (𝓞 E) Dw.La) ↔ ∃ z, y = c • z := by
+  have hsm
+      : ∀ (c : 𝓞 E) (y : Dw.La),
+        y ∈ Ideal.span {c} • (⊤ : Submodule (𝓞 E) Dw.La) ↔ ∃ z, y = c • z := by
     intro c y
     rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists]
     exact ⟨fun ⟨z, _, h⟩ => ⟨z, h.symm⟩, fun ⟨z, h⟩ => ⟨z, trivial, h.symm⟩⟩
@@ -97,15 +123,16 @@ theorem isReps_level_translates : ∀ (E : Type) [Field E] [NumberField E] [IsCM
   have hMt : ∀ q, (l.M : ℂ) • t q ∈ T.L := by
     intro q
     obtain ⟨u, hq⟩ := hu q
-    have : (l.M : ℂ) • t q = -mk (α • u) := by
+    have : (l.M : ℂ) • t q = - mk (α • u) := by
       simp only [ht]
-      rw [hq, hlin α (α • u), levReps_act_neg, levReps_act_smul, levReps_act_mul, mul_comm (H.bar α), hα,
-        levReps_act_nat, smul_neg, smul_smul, smul_smul]
+      rw [hq, hlin α (α • u), levReps_act_neg, levReps_act_smul, levReps_act_mul,
+        mul_comm (H.bar α), hα, levReps_act_nat, smul_neg, smul_smul, smul_smul]
       have : (l.M : ℂ) * ((l.M : ℂ) ^ 2)⁻¹ * l.M = 1 := by field_simp
       rw [this, one_smul]
     rw [this]
     exact T.L.neg_mem (hL _)
-  have hsub : ∀ (b : I2.Vsp T.dim) q, vspActL α (b - t q) = I2.act α b + (l.M : ℂ)⁻¹ • mk (x2 q) := by
+  have hsub
+      : ∀ (b : I2.Vsp T.dim) q, vspActL α (b - t q) = I2.act α b + (l.M : ℂ)⁻¹ • mk (x2 q) := by
     intro b q
     rw [map_sub]
     change I2.act α b - I2.act α (t q) = _
@@ -123,21 +150,27 @@ theorem isReps_level_translates : ∀ (E : Type) [Field E] [NumberField E] [IsCM
     have h2 : x2 q + α • a = (l.M : 𝓞 E) • (r • (α • u + a) + s • d) := by
       have e1 : x2 q + α • a = α • (α • u + a) := by rw [hqu, smul_add]
       have e2 : x2 q + α • a = H.bar α • d := by rw [← hd, sub_neg_eq_add]
-      calc x2 q + α • a = (r * H.bar α + s * α) • (x2 q + α • a) := by rw [hrs, one_smul]
+      calc
+        x2 q + α • a
+          = (r * H.bar α + s * α) • (x2 q + α • a) := by rw [hrs, one_smul]
         _ = (r * H.bar α) • α • (α • u + a) + (s * α) • H.bar α • d := by rw [add_smul, ← e1, ← e2]
         _ = _ := by
           rw [← hα, smul_add (α * H.bar α)]
           simp only [smul_smul (r * H.bar α), smul_smul (s * α), smul_smul (α * H.bar α)]
           congr 2 <;> ring
     have hb' : b = (l.M : ℂ)⁻¹ • mk a + v' := by
-      calc b = (l.M : ℂ)⁻¹ • (l.M : ℂ) • b := by rw [smul_smul, inv_mul_cancel₀ hM, one_smul]
+      calc
+        b = (l.M : ℂ)⁻¹ • (l.M : ℂ) • b := by rw [smul_smul, inv_mul_cancel₀ hM, one_smul]
         _ = _ := by rw [hab, smul_add, smul_smul, inv_mul_cancel₀ hM, one_smul]
     have h3 : vspActL α (b - t q) = mk (r • (α • u + a) + s • d) + I2.act α v' := by
-      rw [hsub, hb', levReps_act_add, levReps_act_smul, ← hlin, add_right_comm, ← smul_add, ← map_add (f := _),
-        add_comm (α • a), h2, hlin, levReps_act_nat, smul_smul, inv_mul_cancel₀ hM, one_smul]
+      rw [hsub, hb', levReps_act_add, levReps_act_smul, ← hlin, add_right_comm, ← smul_add,
+        ← map_add (f := _), add_comm (α • a), h2, hlin, levReps_act_nat, smul_smul,
+        inv_mul_cancel₀ hM, one_smul]
     rw [h3]
     exact T.L.add_mem (hL _) (T.stable _ _ hv')
-  have huniq : ∀ (b : I2.Vsp T.dim) q q', vspActL α (b - t q) ∈ T.L → vspActL α (b - t q') ∈ T.L → q = q' := by
+  have huniq
+      : ∀ (b : I2.Vsp T.dim) q q',
+        vspActL α (b - t q) ∈ T.L → vspActL α (b - t q') ∈ T.L → q = q' := by
     intro b q q' h h'
     have h1 := T.L.sub_mem h h'
     rw [hsub, hsub, add_sub_add_left_eq_sub, ← smul_sub, ← map_sub] at h1

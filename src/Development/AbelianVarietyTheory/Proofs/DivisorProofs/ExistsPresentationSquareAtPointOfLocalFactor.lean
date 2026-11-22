@@ -8,7 +8,25 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem sqloc_present : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A] (ε : A →ₐ[k] k) (e : A), ε e = 1 → IsIdempotentElem e → (∃ (s : ℕ) (φ : MvPolynomial (Fin s) k →ₐ[k] (A ⧸ Ideal.span {1 - e})) (g : Fin s → MvPolynomial (Fin s) k), Function.Surjective φ ∧ RingHom.ker φ = Ideal.span (Set.range g)) → ∀ (r : ℕ) (a : Fin r → A), Function.Surjective (MvPolynomial.aeval a : MvPolynomial (Fin r) k →ₐ[k] A) → ∃ (s : ℕ) (y : Fin s → A) (g : Fin s ⊕ Fin r → MvPolynomial (Fin s ⊕ Fin r) k), (∀ i, MvPolynomial.aeval (Sum.elim y a) (g i) = 0) ∧ RingHom.ker (MvPolynomial.aeval (Sum.elim y a) : MvPolynomial (Fin s ⊕ Fin r) k →ₐ[k] A) ≤ Ideal.span (Set.range g) ⊔ RingHom.ker (ε.comp (MvPolynomial.aeval (Sum.elim y a) : MvPolynomial (Fin s ⊕ Fin r) k →ₐ[k] A)) * RingHom.ker (MvPolynomial.aeval (Sum.elim y a) : MvPolynomial (Fin s ⊕ Fin r) k →ₐ[k] A) := by
+theorem sqloc_present
+    : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A] (ε : A →ₐ[k] k) (e : A),
+      ε e = 1 → IsIdempotentElem e
+        → (∃ (s : ℕ) (φ : MvPolynomial (Fin s) k →ₐ[k] (A ⧸ Ideal.span {1 - e}))
+            (g : Fin s → MvPolynomial (Fin s) k),
+          Function.Surjective φ ∧ RingHom.ker φ = Ideal.span (Set.range g))
+        → ∀ (r : ℕ) (a : Fin r → A),
+          Function.Surjective (MvPolynomial.aeval a : MvPolynomial (Fin r) k →ₐ[k] A)
+            → ∃ (s : ℕ) (y : Fin s → A) (g : Fin s ⊕ Fin r → MvPolynomial (Fin s ⊕ Fin r) k),
+              (∀ i, MvPolynomial.aeval (Sum.elim y a) (g i) = 0)
+                ∧ RingHom.ker
+                    (MvPolynomial.aeval (Sum.elim y a) : MvPolynomial (Fin s ⊕ Fin r) k →ₐ[k] A)
+                  ≤ Ideal.span (Set.range g)
+                    ⊔ RingHom.ker (ε.comp
+                        (MvPolynomial.aeval (Sum.elim y a)
+                          : MvPolynomial (Fin s ⊕ Fin r) k →ₐ[k] A))
+                      * RingHom.ker
+                        (MvPolynomial.aeval (Sum.elim y a)
+                          : MvPolynomial (Fin s ⊕ Fin r) k →ₐ[k] A) := by
   intro k A _ _ _ ε e he hidem ⟨s, φ, g', hφ, hker⟩ r a ha
   classical
   choose y hy using fun i : Fin s => Ideal.Quotient.mk_surjective (I := Ideal.span {1 - e}) (φ (MvPolynomial.X i))
@@ -34,7 +52,8 @@ theorem sqloc_present : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A]
     have := congrArg (fun f => f F) hκ
     simpa using this
   let G : Fin s ⊕ Fin r → MvPolynomial (Fin s ⊕ Fin r) k :=
-    Sum.elim (fun i => MvPolynomial.rename Sum.inl (g' i))
+    Sum.elim
+      (fun i => MvPolynomial.rename Sum.inl (g' i))
       (fun j => MvPolynomial.X (Sum.inr j) - MvPolynomial.rename Sum.inl (h j))
   have hκr : ∀ p, κ (MvPolynomial.rename Sum.inl p) = p := by
     intro p
@@ -58,7 +77,9 @@ theorem sqloc_present : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A]
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hm
     rw [map_mul, hu, ← hc]
     have h0 : e * (1 - e) = 0 := by rw [mul_sub, mul_one, hidem.eq, sub_self]
-    calc e * (c * (1 - e)) = c * (e * (1 - e)) := by ring
+    calc
+      e * (c * (1 - e))
+        = c * (e * (1 - e)) := by ring
       _ = 0 := by rw [h0, mul_zero]
   refine ⟨s, y, fun i => u * G i, hΨuG, ?_⟩
   rw [← hΨ]
@@ -66,8 +87,10 @@ theorem sqloc_present : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A]
   rw [RingHom.mem_ker] at hF
 
   have hFG : F ∈ Ideal.span (Set.range G) := by
-    have hq : (Ideal.Quotient.mkₐ k (Ideal.span (Set.range G))).comp
-        ((MvPolynomial.rename Sum.inl).comp κ) = Ideal.Quotient.mkₐ k (Ideal.span (Set.range G)) := by
+    have hq
+        : (Ideal.Quotient.mkₐ k (Ideal.span (Set.range G))).comp
+            ((MvPolynomial.rename Sum.inl).comp κ)
+          = Ideal.Quotient.mkₐ k (Ideal.span (Set.range G)) := by
       apply MvPolynomial.algHom_ext
       intro i
       rcases i with i | j
@@ -85,7 +108,8 @@ theorem sqloc_present : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A]
     have hmem : κ F ∈ Ideal.span (Set.range g') := by
       rw [← hker, RingHom.mem_ker, ← hκF, hF, map_zero]
     have h2 : MvPolynomial.rename Sum.inl (κ F) ∈ Ideal.span (Set.range G) := by
-      have := Ideal.mem_map_of_mem (MvPolynomial.rename (R := k) (Sum.inl : Fin s → Fin s ⊕ Fin r)) hmem
+      have :=
+        Ideal.mem_map_of_mem (MvPolynomial.rename (R := k) (Sum.inl : Fin s → Fin s ⊕ Fin r)) hmem
       rw [Ideal.map_span] at this
       refine Ideal.span_mono ?_ this
       rintro _ ⟨_, ⟨i, rfl⟩, rfl⟩

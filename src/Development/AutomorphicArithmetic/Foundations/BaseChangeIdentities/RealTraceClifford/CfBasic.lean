@@ -11,7 +11,8 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
 namespace UpperTheory.RealTr.CfB
@@ -30,8 +31,8 @@ private theorem cf_add (f g : FR n) (x : Wt n) : cf (f + g) x = cf f x + cf g x 
 
 private theorem cf_smul (c : ℂ) (f : FR n) (x : Wt n) : cf (c • f) x = c * cf f x := rfl
 
-private theorem cf_sum {ι : Type} (s : Finset ι) (f : ι → FR n) (x : Wt n) :
-    cf (∑ i ∈ s, f i) x = ∑ i ∈ s, cf (f i) x := by
+private theorem cf_sum {ι : Type} (s : Finset ι) (f : ι → FR n) (x : Wt n)
+    : cf (∑ i ∈ s, f i) x = ∑ i ∈ s, cf (f i) x := by
   simp [cf, Finsupp.finsetSum_apply]
 
 private theorem cf_ex (y x : Wt n) : cf (ex y) x = if y = x then 1 else 0 := by
@@ -62,8 +63,8 @@ private theorem cf_ex_mul (f : FR n) (x y : Wt n) : cf (ex y * f) x = cf f (x - 
   · intro h; rw [← h]; abel
   · intro h; rw [h]; abel
 
-private theorem cf_mul (f g : FR n) (x : Wt n) :
-    cf (f * g) x = ∑ y ∈ f.coeff.support, cf f y * cf g (x - y) := by
+private theorem cf_mul (f g : FR n) (x : Wt n)
+    : cf (f * g) x = ∑ y ∈ f.coeff.support, cf f y * cf g (x - y) := by
   conv_lhs => rw [eq_sum f]
   rw [Finset.sum_mul, cf_sum]
   refine Finset.sum_congr rfl fun y _ => ?_
@@ -89,8 +90,8 @@ private def pe (v : Equiv.Perm (Fin n)) : Wt n ≃+ Wt n where
 
 private def act (v : Equiv.Perm (Fin n)) : FR n ≃ₐ[ℂ] FR n := AddMonoidAlgebra.domCongr ℂ ℂ (pe v)
 
-private theorem cf_act (v : Equiv.Perm (Fin n)) (f : FR n) (x : Wt n) :
-    cf (act v f) x = cf f (x ∘ v.symm) :=
+private theorem cf_act (v : Equiv.Perm (Fin n)) (f : FR n) (x : Wt n)
+    : cf (act v f) x = cf f (x ∘ v.symm) :=
   AddMonoidAlgebra.coeff_domCongr (pe v) f x
 
 private theorem act_ex (v : Equiv.Perm (Fin n)) (x : Wt n) : act v (ex x) = ex (x ∘ v) :=
@@ -140,22 +141,22 @@ private theorem act_alt (x : Wt n) (v : Equiv.Perm (Fin n)) : act v (alt x) = sg
   simp only [Equiv.coe_mulRight, sg_mul]
   rw [mul_comm (sg v), mul_assoc, sg_sq, mul_one]
 
-private theorem cf_alt (x y : Wt n) :
-    cf (alt x) y = ∑ w : Equiv.Perm (Fin n), sg w * if x ∘ w = y then 1 else 0 := by
+private theorem cf_alt (x y : Wt n)
+    : cf (alt x) y = ∑ w : Equiv.Perm (Fin n), sg w * if x ∘ w = y then 1 else 0 := by
   unfold alt
   rw [cf_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
   rw [cf_smul, cf_ex]
 
-private theorem cf_alt_mul (f : FR n) (x y : Wt n) :
-    cf (alt y * f) x = ∑ w : Equiv.Perm (Fin n), sg w * cf f (x - y ∘ w) := by
+private theorem cf_alt_mul (f : FR n) (x y : Wt n)
+    : cf (alt y * f) x = ∑ w : Equiv.Perm (Fin n), sg w * cf f (x - y ∘ w) := by
   unfold alt
   rw [Finset.sum_mul, cf_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
   rw [smul_mul_assoc, cf_smul, cf_ex_mul]
 
-private theorem alt_supp (x y : Wt n) (h : cf (alt x) y ≠ 0) :
-    ∃ w : Equiv.Perm (Fin n), y = x ∘ w := by
+private theorem alt_supp (x y : Wt n) (h : cf (alt x) y ≠ 0)
+    : ∃ w : Equiv.Perm (Fin n), y = x ∘ w := by
   by_contra hc
   push_neg at hc
   apply h
@@ -175,16 +176,18 @@ private theorem alt_top (x : Wt n) (hx : StrictAnti x) : cf (alt x) x = 1 := by
     simp [hx.injective h]
   · simp
 
-private theorem alt_other (x y : Wt n) (hx : StrictAnti x) (hy : StrictAnti y) (hne : y ≠ x) :
-    cf (alt x) y = 0 := by
+private theorem alt_other (x y : Wt n) (hx : StrictAnti x) (hy : StrictAnti y) (hne : y ≠ x)
+    : cf (alt x) y = 0 := by
   by_contra h
   obtain ⟨w, rfl⟩ := alt_supp x y h
   have hw : StrictMono w := fun a b hab => by
     by_contra hc
     exact absurd (hx.antitone (not_lt.1 hc)) (not_le.2 (hy hab))
   have e : ∀ a, w a = a := fun a => by
-    have k := congrArg (fun g : Fin n ≃o Fin n => g a)
-      (Subsingleton.elim (hw.orderIsoOfSurjective w w.surjective) (OrderIso.refl _))
+    have k :=
+      congrArg
+        (fun g : Fin n ≃o Fin n => g a)
+        (Subsingleton.elim (hw.orderIsoOfSurjective w w.surjective) (OrderIso.refl _))
     simpa using k
   apply hne
   funext a
@@ -214,20 +217,37 @@ private theorem alt_zero (x : Wt n) (h : ¬ Function.Injective x) : alt x = 0 :=
 end UpperTheory.RealTr.CfB
 
 open UpperTheory.RealTr.CfB in
-theorem UpperTheory.RealTr.cfBasic :
-    ∀ n : ℕ, (∀ x y : Wt n, ex (x + y) = ex x * ex y) ∧ ex (0 : Wt n) = 1 ∧ (∀ f g : FR n, (∀ x, cf f x = cf g x) → f = g) ∧
-      (∀ (f g : FR n) (c : ℂ) x, cf (f + g) x = cf f x + cf g x ∧ cf (c • f) x = c * cf f x) ∧
-      (∀ (f : FR n) x y, cf (ex y * f) x = cf f (x - y)) ∧ (∀ (f g : FR n) x, cf (f * g) x ≠ 0 → ∃ y, cf f y ≠ 0 ∧ cf g (x - y) ≠ 0) ∧
-      (∀ (f : FR n) x y, cf (alt y * f) x = ∑ w : Equiv.Perm (Fin n), sg w * cf f (x - y ∘ w)) ∧
-      (∀ (x : Wt n) (w : Equiv.Perm (Fin n)), alt (x ∘ w) = sg w • alt x) ∧ (∀ x : Wt n, ASym (alt x)) ∧
-      (∀ f g : FR n, Sym f → (ASym g → ASym (f * g)) ∧ (Sym g → Sym (f * g))) ∧
-      (∀ x y : Wt n, cf (alt x) y ≠ 0 → ∃ w : Equiv.Perm (Fin n), y = x ∘ w) ∧
-      (∀ x : Wt n, StrictAnti x → cf (alt x) x = 1 ∧ ∀ y, StrictAnti y → y ≠ x → cf (alt x) y = 0) ∧
-      ∀ x : Wt n, ¬ Function.Injective x → alt x = 0 := by
+theorem UpperTheory.RealTr.cfBasic
+    : ∀ n : ℕ,
+      (∀ x y : Wt n, ex (x + y) = ex x * ex y) ∧ ex (0 : Wt n) = 1
+        ∧ (∀ f g : FR n, (∀ x, cf f x = cf g x) → f = g)
+        ∧ (∀ (f g : FR n) (c : ℂ) x, cf (f + g) x = cf f x + cf g x ∧ cf (c • f) x = c * cf f x)
+        ∧ (∀ (f : FR n) x y, cf (ex y * f) x = cf f (x - y))
+        ∧ (∀ (f g : FR n) x, cf (f * g) x ≠ 0 → ∃ y, cf f y ≠ 0 ∧ cf g (x - y) ≠ 0)
+        ∧ (∀ (f : FR n) x y, cf (alt y * f) x = ∑ w : Equiv.Perm (Fin n), sg w * cf f (x - y ∘ w))
+        ∧ (∀ (x : Wt n) (w : Equiv.Perm (Fin n)), alt (x ∘ w) = sg w • alt x)
+        ∧ (∀ x : Wt n, ASym (alt x))
+        ∧ (∀ f g : FR n, Sym f → (ASym g → ASym (f * g)) ∧ (Sym g → Sym (f * g)))
+        ∧ (∀ x y : Wt n, cf (alt x) y ≠ 0 → ∃ w : Equiv.Perm (Fin n), y = x ∘ w)
+        ∧ (∀ x : Wt n,
+          StrictAnti x → cf (alt x) x = 1 ∧ ∀ y, StrictAnti y → y ≠ x → cf (alt x) y = 0)
+        ∧ ∀ x : Wt n, ¬ Function.Injective x → alt x = 0 := by
   intro n
-  refine ⟨ex_add, ex_zero, fun f g h => cf_ext h, fun f g c x => ⟨cf_add f g x, cf_smul c f x⟩,
-    cf_ex_mul, ?_, cf_alt_mul, alt_comp, fun x => (asym_iff _).2 (act_alt x), ?_, alt_supp,
-    fun x hx => ⟨alt_top x hx, fun y hy hne => alt_other x y hx hy hne⟩, alt_zero⟩
+  refine ⟨
+    ex_add,
+    ex_zero,
+    fun f g h => cf_ext h,
+    fun f g c x => ⟨cf_add f g x, cf_smul c f x⟩,
+    cf_ex_mul,
+    ?_,
+    cf_alt_mul,
+    alt_comp,
+    fun x => (asym_iff _).2 (act_alt x),
+    ?_,
+    alt_supp,
+    fun x hx => ⟨alt_top x hx, fun y hy hne => alt_other x y hx hy hne⟩,
+    alt_zero
+  ⟩
   · intro f g x h
     by_contra hc
     push_neg at hc

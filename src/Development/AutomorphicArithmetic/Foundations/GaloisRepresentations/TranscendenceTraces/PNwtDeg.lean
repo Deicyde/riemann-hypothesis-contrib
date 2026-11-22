@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.nwtDeg_of :
-    WtNormal → WtDegConst → MultSum → MultBC → GenBasic → NwtDeg := by
+theorem UpperTheory.Gal.TranscendenceTraces.nwtDeg_of
+    : WtNormal → WtDegConst → MultSum → MultBC → GenBasic → NwtDeg := by
   intro hN hD hMS hBC hG Z' Z S K _ v p' p g _ _ hpb hLoc hg
   obtain ⟨hW, hgen⟩ := hN p hLoc
   obtain ⟨d, hd⟩ := hD p (nwt p) hW
@@ -31,8 +32,7 @@ theorem UpperTheory.Gal.TranscendenceTraces.nwtDeg_of :
   have h2 : Wt.push p (mult p) Ω (y ≫ g) = Wt.push p' (mult p') Ω y := by
     simp only [Wt.push]
     symm
-    rw [finsum_mem_eq_of_bijOn (fun z => z ≫ v) (fib_bijOn hpb y)
-      (g := fun z => mult p Ω z)]
+    rw [finsum_mem_eq_of_bijOn (fun z => z ≫ v) (fib_bijOn hpb y) (g := fun z => mult p Ω z)]
     intro z _
     rw [hBC v p' p g hpb]
     rfl

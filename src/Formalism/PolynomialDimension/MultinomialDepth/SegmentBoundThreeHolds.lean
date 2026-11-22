@@ -13,10 +13,14 @@ namespace Formalism.CountingSumsFrames
 
 theorem det_leading_diagonal : DetLeadDiag := by
   intro K _ n J A d hdeg hcoeff
-  have hprod : ∀ σ : Equiv.Perm (Fin n), (∏ i, A (σ i) i).coeff (n * J) = ∏ i, (A (σ i) i).coeff J := by
+  have hprod
+      : ∀ σ : Equiv.Perm (Fin n), (∏ i, A (σ i) i).coeff (n * J) = ∏ i, (A (σ i) i).coeff J := by
     intro σ
-    have h1 := Polynomial.coeff_prod_of_natDegree_le (s := Finset.univ) (fun i => A (σ i) i) J
-      (fun i _ => hdeg (σ i) i)
+    have h1 :=
+      Polynomial.coeff_prod_of_natDegree_le (s := Finset.univ)
+        (fun i => A (σ i) i)
+        J
+        (fun i _ => hdeg (σ i) i)
     rw [Finset.card_univ, Fintype.card_fin] at h1
     exact h1
   rw [Matrix.det_apply']
@@ -26,7 +30,9 @@ theorem det_leading_diagonal : DetLeadDiag := by
     refine (Polynomial.natDegree_mul_le).trans ?_
     rw [Polynomial.natDegree_intCast, zero_add]
     refine (Polynomial.natDegree_prod_le _ _).trans ?_
-    calc ∑ i, (A (σ i) i).natDegree ≤ ∑ _i : Fin n, J := Finset.sum_le_sum fun i _ => hdeg (σ i) i
+    calc
+      ∑ i, (A (σ i) i).natDegree
+        ≤ ∑ _i : Fin n, J := Finset.sum_le_sum fun i _ => hdeg (σ i) i
       _ = n * J := by simp
   · rw [Polynomial.finsetSum_coeff, Finset.sum_eq_single 1]
     · rw [← Polynomial.C_eq_intCast, Polynomial.coeff_C_mul, hprod]
@@ -35,7 +41,8 @@ theorem det_leading_diagonal : DetLeadDiag := by
     · intro σ _ hσ
       rw [← Polynomial.C_eq_intCast, Polynomial.coeff_C_mul, hprod]
       obtain ⟨i, hi⟩ := not_forall.mp (mt Equiv.ext hσ)
-      rw [Finset.prod_eq_zero (Finset.mem_univ i) (by rw [hcoeff, if_neg (by simpa using hi)]), mul_zero]
+      rw [Finset.prod_eq_zero (Finset.mem_univ i) (by rw [hcoeff, if_neg (by simpa using hi)]),
+        mul_zero]
     · intro h
       exact absurd (Finset.mem_univ _) h
 

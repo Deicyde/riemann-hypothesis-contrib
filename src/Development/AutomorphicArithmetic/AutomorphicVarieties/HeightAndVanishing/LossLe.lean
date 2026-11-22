@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-theorem UpperTheory.V.HV.lossLe :
-    ∀ l N n e : ℕ, l.Prime → l ≠ 2 → 2 ≤ N → n ≤ N → 1 ≤ e → lossAll l N n e ≤ (N * e) ^ 6 ∧ LDataCardLeFinrank.nuBound l N e ≤ 2 * N * e := by
+theorem UpperTheory.V.HV.lossLe
+    : ∀ l N n e : ℕ,
+      l.Prime → l ≠ 2 → 2 ≤ N → n ≤ N → 1 ≤ e
+        → lossAll l N n e ≤ (N * e) ^ 6 ∧ LDataCardLeFinrank.nuBound l N e ≤ 2 * N * e := by
   intro l N n e hl hl2 hN hn he
   have hfac : ∀ (p m : ℕ), m.factorization p ≤ m := by
     intro p m
@@ -23,12 +26,13 @@ theorem UpperTheory.V.HV.lossLe :
       nlinarith
     · exact Nat.zero_le _
   have hk : N.primeFactors.card ≤ N := by
-    calc N.primeFactors.card ≤ (Finset.Icc 1 N).card := by
-          apply Finset.card_le_card
-          intro p hp
-          have hp' := Nat.mem_primeFactors.mp hp
-          simp only [Finset.mem_Icc]
-          exact ⟨hp'.1.one_lt.le, Nat.le_of_dvd (by omega) hp'.2.1⟩
+    calc
+      N.primeFactors.card ≤ (Finset.Icc 1 N).card := by
+        apply Finset.card_le_card
+        intro p hp
+        have hp' := Nat.mem_primeFactors.mp hp
+        simp only [Finset.mem_Icc]
+        exact ⟨hp'.1.one_lt.le, Nat.le_of_dvd (by omega) hp'.2.1⟩
       _ = N := by simp
   have hv : n.factorization l ≤ N := (hfac l n).trans hn
   refine ⟨?_, hnu⟩
@@ -47,7 +51,8 @@ theorem UpperTheory.V.HV.lossLe :
   have b3 : N.primeFactors.card * n.factorization l ≤ M * M :=
     Nat.mul_le_mul (hk.trans hNM) (hv.trans hNM)
   have hM3 : 8 ≤ M ^ 3 := by
-    calc 8 = 2 ^ 3 := by norm_num
+    calc
+      8 = 2 ^ 3 := by norm_num
       _ ≤ M ^ 3 := Nat.pow_le_pow_left hM2 3
   have b4 : (M + M ^ 2) * (2 * M) + M * (M * M) + M * M ≤ M ^ 6 := by
     have e6 : M ^ 6 = M ^ 3 * M ^ 3 := by ring

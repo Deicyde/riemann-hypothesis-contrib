@@ -9,8 +9,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_gext :
-    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (D' : GDet n A G), (∀ (g : G) (i : ℕ), 1 ≤ i → i ≤ n → D.lam i (MonoidAlgebra.single g 1) = D'.lam i (MonoidAlgebra.single g 1)) → D = D' := by
+theorem UpperTheory.V.CA.d_gext
+    : ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (D' : GDet n A G),
+      (∀ (g : G) (i : ℕ),
+          1 ≤ i → i ≤ n → D.lam i (MonoidAlgebra.single g 1) = D'.lam i (MonoidAlgebra.single g 1))
+        → D = D' := by
   intro n A G _ _ D D' h
   have key : D.toDet = D'.toDet := by
     refine d_ext D.toDet D'.toDet (MonoidHom.mrange (MonoidAlgebra.of A G)) ?_ ?_

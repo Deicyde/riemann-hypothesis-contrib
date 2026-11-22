@@ -17,9 +17,10 @@ open scoped Classical
 
 namespace CombExtendWord
 
-theorem snoc_mem {m n : ℕ} (lam : Fin m → ℕ) (hlam : Antitone lam) (k : Fin m) (hk : 1 ≤ lam k)
-    (v : Fin n → Fin m) (hv : v ∈ latticeWords n (Function.update lam k (lam k - 1))) :
-    (Fin.snoc v k : Fin (n + 1) → Fin m) ∈ latticeWords (n + 1) lam := by
+theorem snoc_mem
+    {m n : ℕ} (lam : Fin m → ℕ) (hlam : Antitone lam) (k : Fin m) (hk : 1 ≤ lam k)
+    (v : Fin n → Fin m) (hv : v ∈ latticeWords n (Function.update lam k (lam k - 1)))
+    : (Fin.snoc v k : Fin (n + 1) → Fin m) ∈ latticeWords (n + 1) lam := by
   simp only [latticeWords, mem_filter, mem_univ, true_and] at hv ⊢
   obtain ⟨hlat, hcont⟩ := hv
   refine ⟨fun t ht i j hij => ?_, fun i => ?_⟩
@@ -33,17 +34,18 @@ theorem snoc_mem {m n : ℕ} (lam : Fin m → ℕ) (hlam : Antitone lam) (k : Fi
       exact hlam hij
   · rw [pcnt_snoc_last, hcont, update_pred_sub lam k i hk]
 
-theorem exists_word {m : ℕ} (h1 : CombPcntAppend.Statement) (μ : Fin m → ℕ) (hμ : Antitone μ) :
-    ∀ (q : ℕ) (lam : Fin m → ℕ), Antitone lam → (∀ i, μ i ≤ lam i) →
-      ∑ i, lam i = ∑ i, μ i + q →
-        ∃ s : Fin q → Fin m, ∀ n, ∀ w ∈ latticeWords n μ,
+theorem exists_word {m : ℕ} (h1 : CombPcntAppend.Statement) (μ : Fin m → ℕ) (hμ : Antitone μ)
+    : ∀ (q : ℕ) (lam : Fin m → ℕ),
+      Antitone lam → (∀ i, μ i ≤ lam i) → ∑ i, lam i = ∑ i, μ i + q
+        → ∃ s : Fin q → Fin m, ∀ n, ∀ w ∈ latticeWords n μ,
           Fin.append w s ∈ latticeWords (n + q) lam := by
   intro q
   induction q with
   | zero =>
     intro lam _ hle hsum
     have heq : ∀ i, μ i = lam i := by
-      have := (Finset.sum_eq_sum_iff_of_le (s := univ) (fun i _ => hle i)).mp (by simpa using hsum.symm)
+      have :=
+        (Finset.sum_eq_sum_iff_of_le (s := univ) (fun i _ => hle i)).mp (by simpa using hsum.symm)
       exact fun i => this i (mem_univ i)
     refine ⟨Fin.elim0, fun n w hw => ?_⟩
     simp only [latticeWords, mem_filter, mem_univ, true_and] at hw ⊢
@@ -60,12 +62,13 @@ theorem exists_word {m : ℕ} (h1 : CombPcntAppend.Statement) (μ : Fin m → �
     have hne : (univ.filter (fun i => μ i < lam i)).Nonempty := by
       by_contra hemp
       rw [Finset.not_nonempty_iff_eq_empty, Finset.filter_eq_empty_iff] at hemp
-      have : ∑ i, lam i ≤ ∑ i, μ i :=
-        Finset.sum_le_sum fun i _ => not_lt.mp (hemp (mem_univ i))
+      have : ∑ i, lam i ≤ ∑ i, μ i := Finset.sum_le_sum fun i _ => not_lt.mp (hemp (mem_univ i))
       omega
-    obtain ⟨k, hk, hkmax⟩ : ∃ k, μ k < lam k ∧ ∀ j, μ j < lam j → j ≤ k :=
-      ⟨_, (mem_filter.mp (max'_mem _ hne)).2,
-        fun j hj => le_max' _ j (mem_filter.mpr ⟨mem_univ j, hj⟩)⟩
+    obtain ⟨k, hk, hkmax⟩ : ∃ k, μ k < lam k ∧ ∀ j, μ j < lam j → j ≤ k := ⟨
+      _,
+      (mem_filter.mp (max'_mem _ hne)).2,
+      fun j hj => le_max' _ j (mem_filter.mpr ⟨mem_univ j, hj⟩)
+    ⟩
     have hgt : ∀ j, k < j → lam j = μ j := by
       intro j hj
       by_contra hne'

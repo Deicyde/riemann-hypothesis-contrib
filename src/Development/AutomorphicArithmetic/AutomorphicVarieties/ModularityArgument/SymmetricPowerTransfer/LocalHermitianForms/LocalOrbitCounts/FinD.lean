@@ -27,7 +27,8 @@ theorem UpperTheory.V.Z.Sym.Loc.finD : UpperTheory.V.Z.Sym.Loc.FinD := by
     · rintro ⟨z, hz⟩
       refine ⟨z, ?_⟩
       apply Units.ext
-      rw [show ((g : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) = Glob.mt g from rfl, hz]
+      rw [show ((g : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) = Glob.mt g from rfl,
+        hz]
       first | rfl | simp [Matrix.GeneralLinearGroup.scalar]
   have hmap : (ZD Δ ⊔ KD Δ O).map φ.toMonoidHom = ZK O K := by
     rw [Subgroup.map_sup]
@@ -47,8 +48,11 @@ theorem UpperTheory.V.Z.Sym.Loc.finD : UpperTheory.V.Z.Sym.Loc.FinD := by
     intro g
     rw [← hmap, Subgroup.mem_map_equiv]
     simp
-  have hgen : ∀ z : (Etau K τ)ˣ, (z : Etau K τ).im ≠ 0 → ∃ S : Finset (DX Δ), ∀ y : DX Δ,
-      y⁻¹ * j z * y ∈ ZD Δ ⊔ KD Δ O → ∃ t, ∃ s ∈ S, ∃ u ∈ ZD Δ ⊔ KD Δ O, y = j t * s * u := by
+  have hgen
+      : ∀ z : (Etau K τ)ˣ,
+        (z : Etau K τ).im ≠ 0
+          → ∃ S : Finset (DX Δ), ∀ y : DX Δ,
+            y⁻¹ * j z * y ∈ ZD Δ ⊔ KD Δ O → ∃ t, ∃ s ∈ S, ∃ u ∈ ZD Δ ⊔ KD Δ O, y = j t * s * u := by
     intro z hz
     obtain ⟨s, hs⟩ := finG O K Δ τ L hτ j' hj'tr z hz
     refine ⟨s.image φ.symm, ?_⟩
@@ -91,8 +95,9 @@ theorem UpperTheory.V.Z.Sym.Loc.finD : UpperTheory.V.Z.Sym.Loc.FinD := by
     · exact absurd rfl hy
   · intro y
     obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective y
-    have hst : Subgroup.comap j (MulAction.stabilizer (DX Δ) (g : DX Δ ⧸ ZD Δ ⊔ KD Δ O)) =
-        Subgroup.comap (jU j') (Subgroup.comap (MulAut.conj (φ g)⁻¹).toMonoidHom (ZK O K)) := by
+    have hst
+        : Subgroup.comap j (MulAction.stabilizer (DX Δ) (g : DX Δ ⧸ ZD Δ ⊔ KD Δ O))
+          = Subgroup.comap (jU j') (Subgroup.comap (MulAut.conj (φ g)⁻¹).toMonoidHom (ZK O K)) := by
       ext t
       simp only [Subgroup.mem_comap, MulAction.mem_stabilizer_iff, MulAction.Quotient.smul_mk,
         smul_eq_mul, QuotientGroup.eq, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, inv_inv]

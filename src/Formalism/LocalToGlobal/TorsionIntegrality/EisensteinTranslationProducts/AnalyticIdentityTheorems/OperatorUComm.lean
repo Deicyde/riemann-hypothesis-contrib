@@ -40,8 +40,8 @@ end OperatorUThetaLemmas
 
 open OperatorUThetaLemmas
 
-private theorem mul_exp_mul_exp_eq_exp_mul_of_add_eq (f a b c d : ℂ) (h : a + b = c + d) :
-    f * Complex.exp a * Complex.exp b = Complex.exp c * (f * Complex.exp d) := by
+private theorem mul_exp_mul_exp_eq_exp_mul_of_add_eq (f a b c d : ℂ) (h : a + b = c + d)
+    : f * Complex.exp a * Complex.exp b = Complex.exp c * (f * Complex.exp d) := by
   rw [mul_assoc, ← Complex.exp_add, h, Complex.exp_add]
   ring
 
@@ -50,7 +50,8 @@ theorem operator_u_mul : OpUMul := by
   simp only [opU]
   rw [add_assoc z x y]
   apply mul_exp_mul_exp_eq_exp_mul_of_add_eq
-  simp only [Formalism.L2.Th1.F.OperatorUThetaLemmas.herm_add_left, Formalism.L2.Th1.F.OperatorUThetaLemmas.herm_add_right]
+  simp only [Formalism.L2.Th1.F.OperatorUThetaLemmas.herm_add_left,
+    Formalism.L2.Th1.F.OperatorUThetaLemmas.herm_add_right]
   linear_combination (-(Real.pi : ℂ) / 2) * Formalism.L2.Th1.F.OperatorUThetaLemmas.herm_sub_herm L x y
 
 theorem operator_u_comm : OpUComm := by

@@ -15,8 +15,8 @@ namespace CrystallineSemistableComparison.KummerTwistLemmas
 
 open GlobalTheory.EtC
 
-theorem cyc_pow (p b : ℕ) (hp : p.Prime) (hb : 0 < b) :
-    ∀ a : ℕ, expand ℤ (p ^ a) (cyclotomic (p ^ b) ℤ) = cyclotomic (p ^ (a + b)) ℤ
+theorem cyc_pow (p b : ℕ) (hp : p.Prime) (hb : 0 < b)
+    : ∀ a : ℕ, expand ℤ (p ^ a) (cyclotomic (p ^ b) ℤ) = cyclotomic (p ^ (a + b)) ℤ
   | 0 => by simp
   | a + 1 => by
     rw [pow_succ', expand_mul, cyc_pow p b hp hb a,
@@ -26,8 +26,8 @@ theorem cyc_pow (p b : ℕ) (hp : p.Prime) (hb : 0 < b) :
     congr 1
     omega
 
-theorem rootLoc (p a b : ℕ) [Fact p.Prime] (hb : 0 < b) (U : Scheme.{0}) (ξ : Prim (p ^ b) Γ(U, ⊤)) :
-    Loc U fun V g => ∃ ζ : Prim (p ^ (a + b)) Γ(V, ⊤), ζ.1 ^ (p ^ a) = g.appTop.hom ξ.1 := by
+theorem rootLoc (p a b : ℕ) [Fact p.Prime] (hb : 0 < b) (U : Scheme.{0}) (ξ : Prim (p ^ b) Γ(U, ⊤))
+    : Loc U fun V g => ∃ ζ : Prim (p ^ (a + b)) Γ(V, ⊤), ζ.1 ^ (p ^ a) = g.appTop.hom ξ.1 := by
   have hp : p.Prime := Fact.out
   have hpU : IsUnit (p : Γ(U, ⊤)) := by
     have h := ξ.2.1

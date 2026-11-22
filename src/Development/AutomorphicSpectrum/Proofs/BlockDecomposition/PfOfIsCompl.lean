@@ -11,12 +11,15 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.PerfectRing
 
-theorem pf_of_isCompl : ∀ (p : ℕ) [Fact p.Prime] (B : Type) [CommRing B] (T : Type) [CommRing T]
-    (π : B) (g : B →+* T), IsCompl π g → Pf p B → Pf p T := by
+theorem pf_of_isCompl
+    : ∀ (p : ℕ) [Fact p.Prime] (B : Type) [CommRing B] (T : Type) [CommRing T] (π : B)
+        (g : B →+* T),
+      IsCompl π g → Pf p B → Pf p T := by
   intro p _ B _ T _ π g hC hB
   have hp0 : 0 < p := (Fact.out : p.Prime).pos
   have hT : (p : T) = 0 := by rw [← map_natCast g p, hB.char, map_zero]
-  obtain ⟨FB, hFB⟩ := GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p B hB.char 1
+  obtain ⟨FB, hFB⟩ :=
+    GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p B hB.char 1
   obtain ⟨FT, hFT⟩ := GlobalTheory.CompanionTheory.Frobenius.exists_ringHom_pow_prime_pow p T hT 1
   have subB : ∀ x y : B, (x - y) ^ p = x ^ p - y ^ p := fun x y => by
     have h := map_sub FB x y
@@ -79,11 +82,14 @@ theorem pf_of_isCompl : ∀ (p : ℕ) [Fact p.Prime] (B : Type) [CommRing B] (T 
       rw [map_sub]
       convert h2 using 1
       ring
-    obtain ⟨L, hL⟩ := hC.compl.toIsPrecomplete.prec (f := fun n => g (e n)) (fun {m n} hmn => by
-      beta_reduce
-      rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-        Ideal.mem_span_singleton, ← map_sub, ← map_pow]
-      exact map_dvd g (cauchy m n hmn))
+    obtain ⟨L, hL⟩ :=
+      hC.compl.toIsPrecomplete.prec
+        (f := fun n => g (e n))
+        (fun {m n} hmn => by
+          beta_reduce
+          rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+            Ideal.mem_span_singleton, ← map_sub, ← map_pow]
+          exact map_dvd g (cauchy m n hmn))
     refine ⟨L, ?_⟩
     show L ^ p = y
     rw [← sub_eq_zero]
@@ -92,11 +98,11 @@ theorem pf_of_isCompl : ∀ (p : ℕ) [Fact p.Prime] (B : Type) [CommRing B] (T 
     have hn : g π ^ n ∣ g (e n) - L := by
       have h3 := hL n
       rwa [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-        Ideal.mem_span_singleton] at h3
+          Ideal.mem_span_singleton]
+        at h3
     have h1 : g π ^ n ∣ (g (e n) - L) ^ p := dvdp _ _ hn
     rw [subT, ← map_pow g (e n) p, he'] at h1
-    have h2 : g π ^ n ∣ y - g (b n) :=
-      (pow_dvd_pow _ (Nat.le_mul_of_pos_left n hp0)).trans (hb n)
+    have h2 : g π ^ n ∣ y - g (b n) := (pow_dvd_pow _ (Nat.le_mul_of_pos_left n hp0)).trans (hb n)
     have h4 := dvd_add h1 h2
     rw [← dvd_neg]
     convert h4 using 1

@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EigenspaceDi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
 open GlobalTheory.UPel.HT
 
@@ -19,14 +21,16 @@ noncomputable section
 
 namespace GlobalTheory.UPel.HT.LieType
 
-theorem exists_ext (F : Type) [Field F] [NumberField F] (τ : 𝓞 F →+* ℂ) :
-    ∃ τ' : F →+* ℂ, ∀ c : 𝓞 F, τ' (c : F) = τ c := by
+theorem exists_ext (F : Type) [Field F] [NumberField F] (τ : 𝓞 F →+* ℂ)
+    : ∃ τ' : F →+* ℂ, ∀ c : 𝓞 F, τ' (c : F) = τ c := by
   have hinj : Function.Injective τ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra hne
-    have hI := Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := RingHom.ker τ) hne (by simpa [RingHom.mem_ker] using hx)
-      (Algebra.IsIntegral.isIntegral x)
+    have hI :=
+      Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := RingHom.ker τ) hne
+        (by simpa [RingHom.mem_ker] using hx) (Algebra.IsIntegral.isIntegral x)
     apply hI
     rw [eq_bot_iff]
     intro n hn
@@ -35,8 +39,10 @@ theorem exists_ext (F : Type) [Field F] [NumberField F] (τ : 𝓞 F →+* ℂ) 
   refine ⟨IsFractionRing.lift hinj, fun c => ?_⟩
   exact IsFractionRing.lift_algebraMap hinj c
 
-theorem root_cases {r z : ℂ} {tr nm : ℤ} (hd : tr ^ 2 - 4 * nm < 0) (hr : r ^ 2 - tr * r + nm = 0)
-    (hz : z ^ 2 - tr * z + nm = 0) : (z ≠ r ↔ (starRingEnd ℂ) z = r) := by
+theorem root_cases
+    {r z : ℂ} {tr nm : ℤ}
+    (hd : tr ^ 2 - 4 * nm < 0) (hr : r ^ 2 - tr * r + nm = 0) (hz : z ^ 2 - tr * z + nm = 0)
+    : (z ≠ r ↔ (starRingEnd ℂ) z = r) := by
   have hc : ((starRingEnd ℂ) r) ^ 2 - tr * (starRingEnd ℂ) r + nm = 0 := by
     have := congrArg (starRingEnd ℂ) hr
     simpa using this
@@ -60,17 +66,23 @@ theorem root_cases {r z : ℂ} {tr nm : ℤ} (hd : tr ^ 2 - 4 * nm < 0) (hr : r 
   constructor
   · intro h
     have : z = tr - r := (hfac z hz).resolve_left h
-    rw [this, ← hcr]; simp
+    rw [this, ← hcr]
+    simp
   · intro h hzr
     rw [hzr] at h
     exact hne h
 
-theorem lie_isType : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ) (σ : R →+* ℂ) (ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ) (o : Obj b N (spMap σ)) h hL (D' : PLat D.O D.inv) t Q e, UnifAt (o.fam h hL) σ ρ N D' t Q (𝟙 _) e → b.IsType σ ρ := by
+theorem lie_isType
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
+        (σ : R →+* ℂ) (ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ) (o : Obj b N (spMap σ)) h hL
+        (D' : PLat D.O D.inv) t Q e,
+      UnifAt (o.fam h hL) σ ρ N D' t Q (𝟙 _) e → b.IsType σ ρ := by
   intro p _ D R _ b N σ ρ o h hL D' t Q e hU
   classical
   choose τ hτ using fun i => exists_ext D.F (σ.comp (b.t i))
   have hτ' : ∀ i (c : 𝓞 D.F), τ i (c : D.F) = σ (b.t i c) := fun i c => hτ i c
-  obtain ⟨hrank, hcov⟩ := GlobalTheory.T.eigenspace_dimension_of_uniformization p D R b N σ ρ o h hL D' t Q e hU τ hτ'
+  obtain ⟨hrank, hcov⟩ :=
+    GlobalTheory.T.eigenspace_dimension_of_uniformization p D R b N σ ρ o h hL D' t Q e hU τ hτ'
   have hsum := GlobalTheory.T.finrank_jointEigenspace_add_conj_eq_mul p D D' ρ Q hU.2.1
   set r := σ b.ρ with hrdef
   have hr : r ^ 2 - D.tr * r + D.nm = 0 := by
@@ -111,14 +123,22 @@ theorem lie_isType : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [Comm
         rw [h1] at this
         exact this
       have hmem := hcov u hu'
-      have hle : (⨆ i, eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) (τ i)) ≤ ⨆ τ'' ∈ Finset.univ.image τ, eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) τ'' := by
+      have hle
+          : (⨆ i, eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) (τ i))
+            ≤ ⨆ τ'' ∈ Finset.univ.image τ, eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) τ'' := by
         refine iSup_le fun i => ?_
-        exact le_biSup (fun τ'' => eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) τ'') (Finset.mem_image_of_mem τ (Finset.mem_univ i))
-      have := (GlobalTheory.T.ringOfIntegersJointEigenspace_disjoint_biSup D.F D.g (ρ.comp (algebraMap (𝓞 D.F) D.O)) _ τ' h2).le_bot ⟨hu, hle hmem⟩
+        exact le_biSup
+          (fun τ'' => eigSp (ρ.comp (algebraMap (𝓞 D.F) D.O)) τ'')
+          (Finset.mem_image_of_mem τ (Finset.mem_univ i))
+      have :=
+        (GlobalTheory.T.ringOfIntegersJointEigenspace_disjoint_biSup D.F D.g
+          (ρ.comp (algebraMap (𝓞 D.F) D.O)) _ τ' h2).le_bot ⟨hu, hle hmem⟩
       simpa using this
     simp [hd, hbot]
-  have hA : ∀ c : 𝓞 D.F, ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => ¬ τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * τ' (c : D.F) =
-      ∑ i, (D.m : ℂ) * σ (b.t i c) := by
+  have hA
+      : ∀ c : 𝓞 D.F,
+        ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => ¬ τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * τ' (c : D.F)
+          = ∑ i, (D.m : ℂ) * σ (b.t i c) := by
     intro c
     rw [← Finset.sum_subset (s₁ := Finset.univ.image τ)]
     · rw [Finset.sum_image (fun i _ j _ h => hinj h)]
@@ -130,8 +150,10 @@ theorem lie_isType : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [Comm
     · intro x hx hx'
       have : x (D.ω : D.F) = r := by simpa using hx
       simp [hzero x this hx']
-  have hA' : ∀ c : 𝓞 D.F, ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => ¬ τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * (starRingEnd ℂ) (τ' (c : D.F)) =
-      ∑ i, (D.m : ℂ) * (starRingEnd ℂ) (σ (b.t i c)) := by
+  have hA'
+      : ∀ c : 𝓞 D.F,
+        ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => ¬ τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * (starRingEnd ℂ) (τ' (c : D.F))
+          = ∑ i, (D.m : ℂ) * (starRingEnd ℂ) (σ (b.t i c)) := by
     intro c
     rw [← Finset.sum_subset (s₁ := Finset.univ.image τ)]
     · rw [Finset.sum_image (fun i _ j _ h => hinj h)]
@@ -143,35 +165,46 @@ theorem lie_isType : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [Comm
     · intro x hx hx'
       have : x (D.ω : D.F) = r := by simpa using hx
       simp [hzero x this hx']
-  have hconj : ∀ c : 𝓞 D.F, ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (d ((starRingEnd ℂ).comp τ') : ℂ) * τ' (c : D.F) =
-      ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => ¬ τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * (starRingEnd ℂ) (τ' (c : D.F)) := by
-    intro c
-    refine Finset.sum_nbij' (fun τ' => (starRingEnd ℂ).comp τ') (fun τ' => (starRingEnd ℂ).comp τ') ?_ ?_ ?_ ?_ ?_
-    · intro x hx
-      have := (key x).1 (by simpa using hx)
-      simpa using this
-    · intro x hx
-      have hx' : x (D.ω : D.F) = r := by simpa using hx
-      have : ¬ ((starRingEnd ℂ).comp x) (D.ω : D.F) = r := by
-        exact fun h => (key x).2 h hx'
-      simpa using this
-    · intro x _; ext; simp
-    · intro x _; ext; simp
-    · intro x _; simp
+  have hconj
+      : ∀ c : 𝓞 D.F,
+        ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (d ((starRingEnd ℂ).comp τ') : ℂ) * τ' (c : D.F)
+          = ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => ¬ τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * (starRingEnd ℂ) (τ' (c : D.F)) :=
+    by
+      intro c
+      refine Finset.sum_nbij'
+        (fun τ' => (starRingEnd ℂ).comp τ')
+        (fun τ' => (starRingEnd ℂ).comp τ')
+        ?_ ?_ ?_ ?_ ?_
+      · intro x hx
+        have := (key x).1 (by simpa using hx)
+        simpa using this
+      · intro x hx
+        have hx' : x (D.ω : D.F) = r := by simpa using hx
+        have : ¬ ((starRingEnd ℂ).comp x) (D.ω : D.F) = r := by exact fun h => (key x).2 h hx'
+        simpa using this
+      · intro x _; ext; simp
+      · intro x _; ext; simp
+      · intro x _; simp
   intro c
-  have htr : (ρ (algebraMap (𝓞 D.F) D.O c)).trace = ∑ τ' : D.F →+* ℂ, (d τ' : ℂ) * τ' (c : D.F) := GlobalTheory.T.trace_ringOfIntegers_action_sum_embeddings_eigenspace D.F D.g (ρ.comp (algebraMap (𝓞 D.F) D.O)) c
-  rw [htr, ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r)]
-  have hB : ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * τ' (c : D.F) =
-      ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), ((D.m : ℂ) * D.n * τ' (c : D.F) -
-        (d ((starRingEnd ℂ).comp τ') : ℂ) * τ' (c : D.F)) := by
+  have htr : (ρ (algebraMap (𝓞 D.F) D.O c)).trace = ∑ τ' : D.F →+* ℂ, (d τ' : ℂ) * τ' (c : D.F) :=
+    GlobalTheory.T.trace_ringOfIntegers_action_sum_embeddings_eigenspace D.F D.g
+      (ρ.comp (algebraMap (𝓞 D.F) D.O)) c
+  rw [htr,
+    ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r)]
+  have hB
+      : ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (d τ' : ℂ) * τ' (c : D.F)
+        = ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), ((D.m : ℂ) * D.n * τ' (c : D.F) -
+            (d ((starRingEnd ℂ).comp τ') : ℂ) * τ' (c : D.F)) := by
     refine Finset.sum_congr rfl fun τ' _ => ?_
     have := hsum τ'
     have h' : (d τ' : ℂ) + d ((starRingEnd ℂ).comp τ') = D.m * D.n := by exact_mod_cast this
     linear_combination τ' (c : D.F) * h'
   rw [hB, Finset.sum_sub_distrib, hconj c, hA c, hA' c]
-  have e1 : ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (D.m : ℂ) * D.n * τ' (c : D.F) =
-      D.m * ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (D.n : ℂ) * τ' (c : D.F) := by
-    rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring
+  have e1
+      : ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (D.m : ℂ) * D.n * τ' (c : D.F)
+        = D.m
+          * ∑ τ' ∈ Finset.univ.filter (fun τ' : D.F →+* ℂ => τ' (D.ω : D.F) ≠ r), (D.n : ℂ) * τ' (c : D.F) :=
+    by rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring
   rw [e1]
   simp only [← Finset.mul_sum]
   ring

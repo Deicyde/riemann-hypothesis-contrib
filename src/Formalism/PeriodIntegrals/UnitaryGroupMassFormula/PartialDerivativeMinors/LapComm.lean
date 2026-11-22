@@ -14,9 +14,13 @@ namespace PI.EntAtD.W
 
 open PI.EntAtD
 
-theorem pderiv_pderiv_comm {σ R : Type} [CommRing R] (v w : σ) (f : MvPolynomial σ R) :
-    MvPolynomial.pderiv v (MvPolynomial.pderiv w f) = MvPolynomial.pderiv w (MvPolynomial.pderiv v f) := by
-  have hX : ∀ i j k : σ, MvPolynomial.pderiv i (MvPolynomial.pderiv j (MvPolynomial.X k : MvPolynomial σ R)) = 0 := by
+theorem pderiv_pderiv_comm {σ R : Type} [CommRing R] (v w : σ) (f : MvPolynomial σ R)
+    : MvPolynomial.pderiv v (MvPolynomial.pderiv w f)
+      = MvPolynomial.pderiv w (MvPolynomial.pderiv v f) := by
+  have hX
+      : ∀ i j k : σ,
+        MvPolynomial.pderiv i (MvPolynomial.pderiv j (MvPolynomial.X k : MvPolynomial σ R))
+          = 0 := by
     intro i j k
     by_cases h : k = j
     · subst h; simp
@@ -28,8 +32,8 @@ theorem pderiv_pderiv_comm {σ R : Type} [CommRing R] (v w : σ) (f : MvPolynomi
     simp only [Derivation.leibniz, smul_eq_mul, map_add (f := _), hX, mul_zero, zero_add, hp]
     ring
 
-theorem pd_comm {H : Type} {N0 N1 : ℕ} (v w : XZ (Bool × H) N0 N1) :
-    Commute (pd (H := H) (N0 := N0) (N1 := N1) v) (pd w) := by
+theorem pd_comm {H : Type} {N0 N1 : ℕ} (v w : XZ (Bool × H) N0 N1)
+    : Commute (pd (H := H) (N0 := N0) (N1 := N1) v) (pd w) := by
   refine LinearMap.ext fun f => ?_
   exact pderiv_pderiv_comm (R := ℤ) v w f
 

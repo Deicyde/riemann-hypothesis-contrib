@@ -7,12 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FixedOfPo
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass GlobalTheory.Cut
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass GlobalTheory.Cut
 
 namespace GlobalTheory.WildAdditive
 
-theorem not_isUnit_natCast (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Nontrivial O]
-    [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] : ¬ IsUnit (l : O) := by
+theorem not_isUnit_natCast
+    (l : ℕ) [Fact l.Prime]
+    (O : Type) [CommRing O] [Nontrivial O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    : ¬ IsUnit (l : O) := by
   rintro ⟨u, hu⟩
   have htop : (⊤ : Submodule ℤ_[l] O) ≤ IsLocalRing.maximalIdeal ℤ_[l] • ⊤ := by
     intro x _
@@ -23,13 +27,17 @@ theorem not_isUnit_natCast (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Non
       rw [PadicInt.maximalIdeal_eq_span_p]
       exact Ideal.subset_span rfl
     exact Submodule.smul_mem_smul hl Submodule.mem_top
-  have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (IsLocalRing.maximalIdeal ℤ_[l]) ⊤
-    (Module.finite_def.mp inferInstance) htop (IsLocalRing.maximalIdeal_le_jacobson _)
+  have hbot :=
+    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (IsLocalRing.maximalIdeal ℤ_[l]) ⊤
+      (Module.finite_def.mp inferInstance) htop (IsLocalRing.maximalIdeal_le_jacobson _)
   exact top_ne_bot hbot
 
-theorem exists_pow_nsmul_eq_zero (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (x : KOG O 1) :
-    ∃ n : ℕ, l ^ n • x = 0 := by
+theorem exists_pow_nsmul_eq_zero
+    (l : ℕ) [Fact l.Prime]
+    (O : Type)
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    (x : KOG O 1)
+    : ∃ n : ℕ, l ^ n • x = 0 := by
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   obtain ⟨a, b, hb, hab⟩ := IsFractionRing.div_surjective (A := O) (y 0)
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
@@ -51,21 +59,27 @@ theorem exists_pow_nsmul_eq_zero (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O
   subst hj
   have hb' : algebraMap O (FractionRing O) b ≠ 0 :=
     IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb
-  have hlk : ((l ^ k : ℕ) : FractionRing O) =
-      algebraMap O (FractionRing O) b * algebraMap O (FractionRing O) c := by
+  have hlk
+      : ((l ^ k : ℕ) : FractionRing O)
+        = algebraMap O (FractionRing O) b * algebraMap O (FractionRing O) c := by
     rw [← map_mul, ← hc, map_pow, map_natCast, Nat.cast_pow]
   simp only [LinearMap.compLeft_apply, Function.comp_apply, Algebra.linearMap_apply, Pi.smul_apply,
     nsmul_eq_mul, ← hab]
   rw [hlk, map_mul]
   field_simp
 
-theorem eq_zero_of_wild (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (l : ℕ)
-    (hl : l.Prime) (hlv : ((l : ℕ) : 𝓞 E) ∉ v.asIdeal) (hA : IsPlaceOver A v)
-    (M : Type) [AddCommGroup M] (f : G E Ω → M) (hf : IsLocallyConstant f)
+theorem eq_zero_of_wild
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (v : HeightOneSpectrum (𝓞 E))
+    (A : ValuationSubring Ω)
+    (l : ℕ) (hl : l.Prime) (hlv : ((l : ℕ) : 𝓞 E) ∉ v.asIdeal)
+    (hA : IsPlaceOver A v)
+    (M : Type) [AddCommGroup M]
+    (f : G E Ω → M) (hf : IsLocallyConstant f)
     (I : Subgroup (G E Ω)) (hadd : ∀ a ∈ I, ∀ b ∈ I, f (a * b) = f a + f b)
-    (hM : ∀ x : M, ∃ n : ℕ, l ^ n • x = 0) (σ : G E Ω) (hI : σ ∈ I)
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) : f σ = 0 := by
+    (hM : ∀ x : M, ∃ n : ℕ, l ^ n • x = 0)
+    (σ : G E Ω) (hI : σ ∈ I) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+    : f σ = 0 := by
   classical
   have hI1 : (1 : G E Ω) ∈ I := I.one_mem
   have hf1 : f 1 = 0 := by
@@ -110,18 +124,22 @@ theorem eq_zero_of_wild (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Alge
     simpa [hf1] using this
   obtain ⟨n, hn⟩ := hM (f σ)
   have hcop : IsCoprime ((l ^ n : ℕ) : ℤ) (d : ℤ) :=
-    Nat.isCoprime_iff_coprime.mpr (Nat.Coprime.pow_left n ((Nat.Prime.coprime_iff_not_dvd hl).mpr hdl))
+    Nat.isCoprime_iff_coprime.mpr (Nat.Coprime.pow_left n
+      ((Nat.Prime.coprime_iff_not_dvd hl).mpr hdl))
   obtain ⟨u, w, huw⟩ := hcop
-  calc f σ = (1 : ℤ) • f σ := (one_zsmul _).symm
+  calc
+    f σ
+      = (1 : ℤ) • f σ := (one_zsmul _).symm
     _ = (u * ((l ^ n : ℕ) : ℤ) + w * (d : ℤ)) • f σ := by rw [huw]
     _ = u • ((l ^ n) • f σ) + w • (d • f σ) := by
-        rw [add_smul, mul_smul, mul_smul, natCast_zsmul, natCast_zsmul]
+      rw [add_smul, mul_smul, mul_smul, natCast_zsmul, natCast_zsmul]
     _ = 0 := by rw [hn, hd0, smul_zero, smul_zero, add_zero]
 
-private theorem valuation_apply_eq_of_valuation_div_sub_one_lt {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
-    (A : ValuationSubring Ω) (σ : Ω ≃ₐ[E] Ω)
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) (y : Ω) :
-    A.valuation (σ y) = A.valuation y := by
+private theorem valuation_apply_eq_of_valuation_div_sub_one_lt
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+    (A : ValuationSubring Ω) (σ : Ω ≃ₐ[E] Ω) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+    (y : Ω)
+    : A.valuation (σ y) = A.valuation y := by
   by_cases hy : y = 0
   · simp [hy]
   · have h1 : A.valuation (σ y / y) = 1 := by
@@ -129,15 +147,16 @@ private theorem valuation_apply_eq_of_valuation_div_sub_one_lt {E Ω : Type} [Fi
       simpa using this
     rw [← div_mul_cancel₀ (σ y) hy, map_mul, h1, one_mul]
 
-private theorem mem_ine_of_valuation_div_sub_one_lt_one {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    (A : ValuationSubring Ω) (σ : G E Ω)
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) : σ ∈ Ine (F := E) A := by
+private theorem mem_ine_of_valuation_div_sub_one_lt_one
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+    (A : ValuationSubring Ω) (σ : G E Ω) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+    : σ ∈ Ine (F := E) A := by
   rw [mem_Ine]
   let : MulAction (G E Ω) (ValuationSubring Ω) := ValuationSubring.pointwiseMulAction
   refine ⟨MulAction.mem_stabilizer_iff.mpr ?_, ?_⟩
   · ext x
-    rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, ← ValuationSubring.valuation_le_one_iff,
-      ← ValuationSubring.valuation_le_one_iff]
+    rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem,
+      ← ValuationSubring.valuation_le_one_iff, ← ValuationSubring.valuation_le_one_iff]
     have key : A.valuation x = A.valuation (σ⁻¹ • x) := by
       have h := valuation_apply_eq_of_valuation_div_sub_one_lt A σ hσ (σ⁻¹ • x)
       rwa [← AlgEquiv.smul_def, smul_inv_smul] at h
@@ -145,16 +164,24 @@ private theorem mem_ine_of_valuation_div_sub_one_lt_one {E Ω : Type} [Field E] 
   · intro x hx
     by_cases h0 : x = 0
     · simp [h0]
-    · have h3 : σ x - x = x * (σ x / x - 1) := by
-        rw [mul_sub, mul_div_cancel₀ _ h0, mul_one]
+    · have h3 : σ x - x = x * (σ x / x - 1) := by rw [mul_sub, mul_div_cancel₀ _ h0, mul_one]
       rw [h3, map_mul]
-      calc _ ≤ 1 * A.valuation (σ x / x - 1) := by gcongr
+      calc
+        _ ≤ 1 * A.valuation (σ x / x - 1) := by gcongr
         _ < 1 := by rw [one_mul]; exact hσ x h0
 
-theorem main : ∀ (D : D7) (i : D.nd.Loc) (v : HeightOneSpectrum (𝓞 D.host.E)), v ∉ placesOver D.host.E (D.nd.l i) → ∀ f : GE D.nd → KOG (D.nd.O i) 1, IsLocallyConstant f → (∀ a ∈ Ine (F := D.host.E) (D.nd.plOm.1 v), ∀ b ∈ Ine (F := D.host.E) (D.nd.plOm.1 v), f (a * b) = f a + f b) → ∀ σ ∈ wildSet D.nd (D.nd.plOm.1 v), f σ = 0 := by
+theorem main
+    : ∀ (D : D7) (i : D.nd.Loc) (v : HeightOneSpectrum (𝓞 D.host.E)),
+      v ∉ placesOver D.host.E (D.nd.l i)
+        → ∀ f : GE D.nd → KOG (D.nd.O i) 1,
+          IsLocallyConstant f
+            → (∀ a ∈ Ine (F := D.host.E) (D.nd.plOm.1 v), ∀ b ∈ Ine (F := D.host.E) (D.nd.plOm.1 v),
+              f (a * b) = f a + f b)
+            → ∀ σ ∈ wildSet D.nd (D.nd.plOm.1 v), f σ = 0 := by
   intro D i v hv f hf hadd σ hσ
   exact eq_zero_of_wild D.host.E D.nd.Om v (D.nd.plOm.1 v) (D.nd.l i) (D.nd.lPrime i).out hv
     (D.nd.plOm.2 v) (KOG (D.nd.O i) 1) f hf (Ine (F := D.host.E) (D.nd.plOm.1 v)) hadd
-    (exists_pow_nsmul_eq_zero (D.nd.l i) (D.nd.O i)) σ (mem_ine_of_valuation_div_sub_one_lt_one _ σ hσ) hσ
+    (exists_pow_nsmul_eq_zero (D.nd.l i) (D.nd.O i)) σ
+    (mem_ine_of_valuation_div_sub_one_lt_one _ σ hσ) hσ
 
 end GlobalTheory.WildAdditive

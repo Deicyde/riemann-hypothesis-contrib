@@ -10,9 +10,9 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.CompanionTheory.KernelComposition
 
-theorem integral_ker_mul_eq_unfolded (hk : KerBasic) (X : Ctx) (φ ψ : X.G → ℂ) (hφ : Tst φ)
-    (hψ : Tst ψ) (x y : X.G) :
-    ∫ z, ker X.Γ φ x z * ker X.Γ ψ z y ∂X.ν = ∫ z, φ (x⁻¹ * z) * ker X.Γ ψ z y ∂X.μ := by
+theorem integral_ker_mul_eq_unfolded
+    (hk : KerBasic) (X : Ctx) (φ ψ : X.G → ℂ) (hφ : Tst φ) (hψ : Tst ψ) (x y : X.G)
+    : ∫ z, ker X.Γ φ x z * ker X.Γ ψ z y ∂X.ν = ∫ z, φ (x⁻¹ * z) * ker X.Γ ψ z y ∂X.μ := by
   haveI : MeasurableConstSMul X.Γ X.G := ⟨fun γ => measurable_const_mul (γ : X.G)⟩
   haveI : SMulInvariantMeasure X.Γ X.G X.μ := ⟨fun γ s _ => measure_preimage_mul _ γ.1 s⟩
   set g : X.G → ℂ := fun z => φ (x⁻¹ * z) * ker X.Γ ψ z y with hg
@@ -41,9 +41,9 @@ theorem integral_ker_mul_eq_unfolded (hk : KerBasic) (X : Ctx) (φ ψ : X.G → 
   rw [integral_tsum (fun γ => (hmeas γ).aestronglyMeasurable) hfin]
   exact (X.fd.integral_eq_tsum'' g hgi).symm
 
-theorem integral_shifted_eq_ker_cv (hc : CvTest) (X : Ctx) (φ ψ : X.G → ℂ) (hφ : Tst φ)
-    (hψ : Tst ψ) (x y : X.G) :
-    ∫ z, φ z * ker X.Γ ψ (x * z) y ∂X.μ = ker X.Γ (cv X.μ φ ψ) x y := by
+theorem integral_shifted_eq_ker_cv
+    (hc : CvTest) (X : Ctx) (φ ψ : X.G → ℂ) (hφ : Tst φ) (hψ : Tst ψ) (x y : X.G)
+    : ∫ z, φ z * ker X.Γ ψ (x * z) y ∂X.μ = ker X.Γ (cv X.μ φ ψ) x y := by
   have hC : IsCompact ((fun w => x * w * y⁻¹) '' (tsupport φ * tsupport ψ)) :=
     (hφ.2.isCompact.mul hψ.2.isCompact).image (by fun_prop)
   have hfin := X.proper _ hC
@@ -52,8 +52,7 @@ theorem integral_shifted_eq_ker_cv (hc : CvTest) (X : Ctx) (φ ψ : X.G → ℂ)
     intro γ h
     rw [hs, Set.Finite.mem_toFinset]
     exact ⟨_, h, by simp [mul_assoc]⟩
-  have h1 : ∀ z, φ z * ker X.Γ ψ (x * z) y =
-      ∑ γ ∈ s, φ z * ψ (z⁻¹ * (x⁻¹ * (γ : X.G) * y)) := by
+  have h1 : ∀ z, φ z * ker X.Γ ψ (x * z) y = ∑ γ ∈ s, φ z * ψ (z⁻¹ * (x⁻¹ * (γ : X.G) * y)) := by
     intro z
     by_cases hz : z ∈ tsupport φ
     · rw [ker, finsum_eq_sum_of_support_subset (s := s), Finset.mul_sum]

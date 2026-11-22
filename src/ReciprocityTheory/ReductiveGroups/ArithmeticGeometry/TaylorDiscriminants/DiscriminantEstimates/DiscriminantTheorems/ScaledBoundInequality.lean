@@ -7,5 +7,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 
 @[expose] public section
 
-theorem schwarz_ball_bound : ReciprocityTheory.ChartRestriction.G.TB.SchwarzBallSt := PI.UnitaryGroupMassFormula.TBNum.schwarzBall
-theorem euclidean_basis_exists : ReciprocityTheory.ChartRestriction.G.TB.EBasisSt := PI.UnitaryGroupMassFormula.TBNum.eBasis
+theorem schwarz_ball_bound : ReciprocityTheory.ChartRestriction.G.TB.SchwarzBallSt :=
+  PI.UnitaryGroupMassFormula.TBNum.schwarzBall
+theorem euclidean_basis_exists : ReciprocityTheory.ChartRestriction.G.TB.EBasisSt :=
+  PI.UnitaryGroupMassFormula.TBNum.eBasis

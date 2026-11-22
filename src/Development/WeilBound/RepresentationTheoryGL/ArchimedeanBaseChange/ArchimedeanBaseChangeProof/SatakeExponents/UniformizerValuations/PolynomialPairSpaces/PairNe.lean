@@ -7,12 +7,14 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.SpectralAccumulation
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  PositivityTheory.Rg.BcB.SpectralAccumulation
 
 namespace PositivityTheory.Rg.BcB.F.LemDd.PairSpaceNonzero
 
-theorem pairSpace_left_bot {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ}
-    (U₂ : Submodule ℂ (Sm E b)) : pairSpace (⊥ : Submodule ℂ (Sm E a)) U₂ = ⊥ := by
+theorem pairSpace_left_bot
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ} (U₂ : Submodule ℂ (Sm E b))
+    : pairSpace (⊥ : Submodule ℂ (Sm E a)) U₂ = ⊥ := by
   unfold pairSpace
   rw [Submodule.span_eq_bot]
   rintro F ⟨φ₁, h₁, φ₂, -, rfl⟩
@@ -21,8 +23,9 @@ theorem pairSpace_left_bot {E : Type} [Field E] [NumberField E] [IsCMField E] {a
   funext x
   simp
 
-theorem pairSpace_right_bot {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ}
-    (U₁ : Submodule ℂ (Sm E a)) : pairSpace U₁ (⊥ : Submodule ℂ (Sm E b)) = ⊥ := by
+theorem pairSpace_right_bot
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ} (U₁ : Submodule ℂ (Sm E a))
+    : pairSpace U₁ (⊥ : Submodule ℂ (Sm E b)) = ⊥ := by
   unfold pairSpace
   rw [Submodule.span_eq_bot]
   rintro F ⟨φ₁, -, φ₂, h₂, rfl⟩

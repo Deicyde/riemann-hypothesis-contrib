@@ -8,28 +8,31 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPow
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
-
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 open TensorProduct in
-theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (A : Type) [CommRing A]
-      [Algebra R A] [Algebra.FiniteType R A] (A₀ : Subalgebra R A) (x : A)
-      (Sg : Set (PrimeSpectrum R)), A₀.FG → Dense Sg →
-      (∀ P ∈ Sg, ∃ (K : Type) (_ : Field K) (_ : Algebra R K),
-        RingHom.ker (algebraMap R K) = P.asIdeal ∧
-        (1 ⊗ₜ[R] x : TensorProduct R K A) ∈
-          (Algebra.TensorProduct.map (AlgHom.id R K) A₀.val).range) →
-      ∃ a : R, a ≠ 0 ∧ a • x ∈ A₀ := by
+theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (A : Type) [CommRing A]
+        [Algebra R A] [Algebra.FiniteType R A] (A₀ : Subalgebra R A) (x : A)
+        (Sg : Set (PrimeSpectrum R)),
+      A₀.FG → Dense Sg
+        → (∀ P ∈ Sg, ∃ (K : Type) (_ : Field K) (_ : Algebra R K),
+          RingHom.ker (algebraMap R K) = P.asIdeal
+            ∧ (1 ⊗ₜ[R] x : TensorProduct R K A)
+              ∈ (Algebra.TensorProduct.map (AlgHom.id R K) A₀.val).range)
+        → ∃ a : R, a ≠ 0 ∧ a • x ∈ A₀ := by
   intro R _ _ _ A _ _ _ A₀ x Sg hfg hdense hfib
   classical
   haveI : Algebra.FiniteType R A₀ := (Subalgebra.fg_iff_finiteType A₀).1 hfg
   haveI : Algebra.FiniteType A₀ A := Algebra.FiniteType.of_restrictScalars_finiteType R A₀ A
-  obtain ⟨a, ha0, s, -, hli, hspan⟩ := _root_.GlobalTheory.GenericFreeness.exists_hasBasisAway_quotient R A₀ A (M := A) (Submodule.span A₀ ({1} : Set A)) (Submodule.fg_span_singleton 1)
+  obtain ⟨a, ha0, s, -, hli, hspan⟩ :=
+    _root_.GlobalTheory.GenericFreeness.exists_hasBasisAway_quotient R A₀ A (M := A)
+      (Submodule.span A₀ ({1} : Set A)) (Submodule.fg_span_singleton 1)
   set P := (Submodule.span A₀ ({1} : Set A)).restrictScalars R with hPdef
   have hP : ∀ y, y ∈ P ↔ y ∈ A₀ := by
     intro y
@@ -43,14 +46,18 @@ theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres :
   obtain ⟨N, hN⟩ := hspan x Submodule.mem_top
   obtain ⟨p, hp, v, hv, hpv⟩ := Submodule.mem_sup.1 hN
   obtain ⟨c, hcs, hcv⟩ := Submodule.mem_span_set.1 hv
-  have hcoord : ∀ (K : Type) [Field K] [Algebra R K], algebraMap R K a ≠ 0 → ∀ j ∈ s,
-      ∃ θ : A →ₗ[R] K, (∀ y ∈ P, θ y = 0) ∧ ∀ m ∈ s, θ m = if m = j then 1 else 0 := by
+  have hcoord
+      : ∀ (K : Type) [Field K] [Algebra R K],
+        algebraMap R K a ≠ 0
+          → ∀ j ∈ s, ∃ θ : A →ₗ[R] K,
+            (∀ y ∈ P, θ y = 0) ∧ ∀ m ∈ s, θ m = if m = j then 1 else 0 := by
     intro K _ _ haK j hj
     let S := Submonoid.powers a
     let f := LocalizedModule.mkLinearMap S (A ⧸ P)
     have hli' : LinearIndependent R (fun i : s => P.mkQ (i : A)) := hli
     have hliₐ := hli'.of_isLocalizedModule (Localization S) S f
-    have hsp : ⊤ ≤ Submodule.span (Localization S) (Set.range (⇑f ∘ fun i : s => P.mkQ (i : A))) := by
+    have hsp
+        : ⊤ ≤ Submodule.span (Localization S) (Set.range (⇑f ∘ fun i : s => P.mkQ (i : A))) := by
       intro z _
       obtain ⟨⟨q, t⟩, rfl⟩ := IsLocalizedModule.mk'_surjective S f z
       obtain ⟨y, rfl⟩ := P.mkQ_surjective q
@@ -61,17 +68,25 @@ theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres :
         rw [← hpw, map_add (f := _), hp0, zero_add]
         have := Submodule.mem_map_of_mem (f := P.mkQ) hw
         rwa [Submodule.map_span, Set.image_eq_range] at this
-      have h2 : f (P.mkQ (a ^ n • y)) ∈ Submodule.span (Localization S) (Set.range (⇑f ∘ fun i : s => P.mkQ (i : A))) := by
+      have h2
+          : f (P.mkQ (a ^ n • y))
+            ∈ Submodule.span (Localization S) (Set.range (⇑f ∘ fun i : s => P.mkQ (i : A))) := by
         have := Submodule.mem_map_of_mem (f := f) h1
         rw [Submodule.map_span, ← Set.range_comp] at this
         exact Submodule.span_le_restrictScalars R (Localization S) _ this
-      have hmemS : a ^ n * (t : R) ∈ S := S.mul_mem (Submonoid.pow_mem _ (Submonoid.mem_powers a) n) t.2
-      have hu : IsUnit (algebraMap R (Localization S) (a ^ n * t)) := IsLocalization.map_units _ ⟨_, hmemS⟩
-      have heq : (algebraMap R (Localization S) (a ^ n * t)) • IsLocalizedModule.mk' f (P.mkQ y) t = f (P.mkQ (a ^ n • y)) := by
-        rw [algebraMap_smul, mul_smul, ← Submonoid.smul_def, IsLocalizedModule.mk'_cancel', map_smul, map_smul]
+      have hmemS : a ^ n * (t : R) ∈ S :=
+        S.mul_mem (Submonoid.pow_mem _ (Submonoid.mem_powers a) n) t.2
+      have hu : IsUnit (algebraMap R (Localization S) (a ^ n * t)) :=
+        IsLocalization.map_units _ ⟨_, hmemS⟩
+      have heq
+          : (algebraMap R (Localization S) (a ^ n * t)) • IsLocalizedModule.mk' f (P.mkQ y) t
+            = f (P.mkQ (a ^ n • y)) := by
+        rw [algebraMap_smul, mul_smul, ← Submonoid.smul_def, IsLocalizedModule.mk'_cancel',
+          map_smul, map_smul]
       show IsLocalizedModule.mk' f (P.mkQ y) t ∈ _
       rw [← inv_smul_smul hu.unit (IsLocalizedModule.mk' f (P.mkQ y) t)]
-      exact Submodule.smul_of_tower_mem _ _ (by rw [Units.smul_def, IsUnit.unit_spec, heq]; exact h2)
+      exact Submodule.smul_of_tower_mem _ _
+        (by rw [Units.smul_def, IsUnit.unit_spec, heq]; exact h2)
     let b := Module.Basis.mk hliₐ hsp
     have hunit : ∀ y : S, IsUnit ((Algebra.ofId R K) y) := by
       rintro ⟨y, k, rfl⟩
@@ -82,7 +97,8 @@ theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres :
       simp [(Submodule.Quotient.mk_eq_zero P).2 hy]
     · intro m hm
       have hb : f (P.mkQ m) = b ⟨m, hm⟩ := by simp [b]
-      simp only [LinearMap.coe_comp, Function.comp_apply, LinearMap.coe_restrictScalars, hb, Module.Basis.coord_apply, Module.Basis.repr_self]
+      simp only [LinearMap.coe_comp, Function.comp_apply, LinearMap.coe_restrictScalars, hb,
+        Module.Basis.coord_apply, Module.Basis.repr_self]
       by_cases hmj : m = j
       · subst hmj; simp
       · simp [Finsupp.single_apply, hmj, Ne.symm hmj]
@@ -98,8 +114,7 @@ theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres :
       intro w
       induction w using TensorProduct.induction_on with
       | zero => simp
-      | tmul k y =>
-        rw [Algebra.TensorProduct.map_tmul, hΘ, hθP (A₀.val y) ((hP _).2 y.2), mul_zero]
+      | tmul k y => rw [Algebra.TensorProduct.map_tmul, hΘ, hθP (A₀.val y) ((hP _).2 y.2), mul_zero]
       | add z₁ z₂ h₁ h₂ => simp only [map_add (f := _), h₁, h₂, add_zero]
     have hx : θ x = 0 := by
       have hΘ0 := hΘ0' z
@@ -129,7 +144,8 @@ theorem _root_.GlobalTheory.exists_smul_mem_of_dense_fibres :
       · exact P'.asIdeal.mul_mem_left _ haP
       · exact P'.asIdeal.mul_mem_right _ (hfibre P' hP' haP j hj)
     have huniv : PrimeSpectrum.zeroLocus {c j * a} = Set.univ :=
-      Set.eq_univ_of_univ_subset (hdense.closure_eq ▸ closure_minimal hsub (PrimeSpectrum.isClosed_zeroLocus _))
+      Set.eq_univ_of_univ_subset
+        (hdense.closure_eq ▸ closure_minimal hsub (PrimeSpectrum.isClosed_zeroLocus _))
     rw [PrimeSpectrum.zeroLocus_eq_univ_iff, Set.singleton_subset_iff] at huniv
     have hz : c j * a = 0 := (mem_nilradical.1 huniv).eq_zero
     exact hne ((mul_eq_zero.1 hz).resolve_right ha0)

@@ -9,17 +9,18 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-noncomputable def unitaryCharToCircle {A : Type} [CommGroup A] (a : A →* ℂˣ)
-    (ha : ∀ y, ‖((a y : ℂˣ) : ℂ)‖ = 1) : A →* Circle where
+noncomputable def unitaryCharToCircle
+    {A : Type} [CommGroup A] (a : A →* ℂˣ) (ha : ∀ y, ‖((a y : ℂˣ) : ℂ)‖ = 1)
+    : A →* Circle where
   toFun y := ⟨(a y : ℂ), by simpa [Submonoid.unitSphere] using ha y⟩
   map_one' := by ext; simp
   map_mul' x y := by
     ext
     exact (congrArg (fun u : ℂˣ => (u : ℂ)) (map_mul a x y)).trans (Units.val_mul _ _)
 
-theorem toUnits_unitaryCharToCircle {A : Type} [CommGroup A] (a : A →* ℂˣ)
-    (ha : ∀ y, ‖((a y : ℂˣ) : ℂ)‖ = 1) (y : A) :
-    Circle.toUnits (unitaryCharToCircle a ha y) = a y := by
+theorem toUnits_unitaryCharToCircle
+    {A : Type} [CommGroup A] (a : A →* ℂˣ) (ha : ∀ y, ‖((a y : ℂˣ) : ℂ)‖ = 1) (y : A)
+    : Circle.toUnits (unitaryCharToCircle a ha y) = a y := by
   ext
   rfl
 
@@ -33,8 +34,16 @@ private lemma continuous_toUnits_comp {X : Type} [TopologicalSpace X] {f : X →
   rw [h]
   exact continuous_subtype_val.comp hf.inv
 
-theorem exists_unitary_char_of_open_subgroup_and_hom :
-    ∀ (G A : Type) [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [CommGroup A] (U : Subgroup G), IsOpen (U : Set G) → ∀ (α : A →* G) (a : A →* ℂˣ) (ψ : G →* ℂˣ), Continuous ψ → (∀ x, ‖((ψ x : ℂˣ) : ℂ)‖ = 1) → (∀ y, ‖((a y : ℂˣ) : ℂ)‖ = 1) → (∀ y, α y ∈ U → a y = ψ (α y)) → ∃ χ : G →* ℂˣ, Continuous χ ∧ (∀ x, ‖((χ x : ℂˣ) : ℂ)‖ = 1) ∧ (∀ x ∈ U, χ x = ψ x) ∧ ∀ y, χ (α y) = a y := by
+theorem exists_unitary_char_of_open_subgroup_and_hom
+    : ∀ (G A : Type) [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [CommGroup A]
+        (U : Subgroup G),
+      IsOpen (U : Set G)
+        → ∀ (α : A →* G) (a : A →* ℂˣ) (ψ : G →* ℂˣ),
+          Continuous ψ → (∀ x, ‖((ψ x : ℂˣ) : ℂ)‖ = 1) → (∀ y, ‖((a y : ℂˣ) : ℂ)‖ = 1)
+            → (∀ y, α y ∈ U → a y = ψ (α y))
+            → ∃ χ : G →* ℂˣ,
+              Continuous χ ∧ (∀ x, ‖((χ x : ℂˣ) : ℂ)‖ = 1) ∧ (∀ x ∈ U, χ x = ψ x)
+                ∧ ∀ y, χ (α y) = a y := by
   intro G A _ _ _ _ U hU α a ψ hψc hψ ha hagree
   let _ : TopologicalSpace A := ⊥
   have _ : DiscreteTopology A := ⟨rfl⟩
@@ -46,8 +55,7 @@ theorem exists_unitary_char_of_open_subgroup_and_hom :
   have ha₁coe : ∀ y, ((a₁ y : Circle) : ℂ) = (a y : ℂ) := fun y => rfl
 
   let H : Subgroup (G × A) := U.prod ⊤
-  have hH : IsOpen (H : Set (G × A)) := by
-    simpa [H, Subgroup.coe_prod] using hU.prod isOpen_univ
+  have hH : IsOpen (H : Set (G × A)) := by simpa [H, Subgroup.coe_prod] using hU.prod isOpen_univ
   let N : Subgroup (G × A) := (MonoidHom.prod α (MonoidHom.id A)).range
   let φ : H →* Circle :=
     ((ψ₁.comp (MonoidHom.fst G A)) / (a₁.comp (MonoidHom.snd G A))).comp H.subtype

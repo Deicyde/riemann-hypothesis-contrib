@@ -18,14 +18,15 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteS
 variable {K : Type*} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K]
 variable {π : UnitaryRep G H} {σ : UnitaryRep G K}
 
-
 omit [CompleteSpace H] in
 lemma nontrivial_endomorphisms [Nontrivial H] : Nontrivial (H →L[ℂ] H) := by
   obtain ⟨v, hv⟩ := exists_ne (0 : H)
   exact ⟨⟨1, 0, fun h => hv (by simpa using congrArg (fun T : H →L[ℂ] H => T v) h)⟩⟩
 
-theorem IsIrreducible.spectrum_subsingleton (hπ : IsIrreducible (π := π)) {A : H →L[ℂ] H}
-    (hA : A ∈ intertwiners (π := π) π) (hsa : IsSelfAdjoint A) : (spectrum ℝ A).Subsingleton := by
+theorem IsIrreducible.spectrum_subsingleton
+    (hπ : IsIrreducible (π := π))
+    {A : H →L[ℂ] H} (hA : A ∈ intertwiners (π := π) π) (hsa : IsSelfAdjoint A)
+    : (spectrum ℝ A).Subsingleton := by
   have := hπ.1
   have := nontrivial_endomorphisms (H := H)
   intro a ha b hb
@@ -52,10 +53,10 @@ theorem IsIrreducible.spectrum_subsingleton (hπ : IsIrreducible (π := π)) {A 
     have hmem : φ x ∈ spectrum ℝ (cfc φ A) := hs ▸ ⟨x, hx, rfl⟩
     rw [h, spectrum.zero_eq, Set.mem_singleton_iff] at hmem
     exact hφx hmem
-  have hP0 : cfc f A ≠ 0 := hne f hfc b hb (by
-    simp only [f]; rw [max_eq_left (by linarith)]; linarith)
-  have hQ0 : cfc g A ≠ 0 := hne g hgc a ha (by
-    simp only [g]; rw [max_eq_left (by linarith)]; linarith)
+  have hP0 : cfc f A ≠ 0 :=
+    hne f hfc b hb (by simp only [f]; rw [max_eq_left (by linarith)]; linarith)
+  have hQ0 : cfc g A ≠ 0 :=
+    hne g hgc a ha (by simp only [g]; rw [max_eq_left (by linarith)]; linarith)
   have hPmem : cfc f A ∈ intertwiners (π := π) π :=
     mem_intertwiners_self_iff.mpr fun h => (commute_of_mem_intertwiners hA h).cfc_real f
   set V := (LinearMap.range ((cfc f A : H →L[ℂ] H) : H →ₗ[ℂ] H)).topologicalClosure with hV
@@ -67,8 +68,9 @@ theorem IsIrreducible.spectrum_subsingleton (hπ : IsIrreducible (π := π)) {A 
     rw [hbot, Submodule.mem_bot] at this
     simpa using this
   · apply hQ0
-    have hle : LinearMap.range ((cfc f A : H →L[ℂ] H) : H →ₗ[ℂ] H) ≤
-        LinearMap.ker ((cfc g A : H →L[ℂ] H) : H →ₗ[ℂ] H) := by
+    have hle
+        : LinearMap.range ((cfc f A : H →L[ℂ] H) : H →ₗ[ℂ] H)
+          ≤ LinearMap.ker ((cfc g A : H →L[ℂ] H) : H →ₗ[ℂ] H) := by
       rintro _ ⟨v, rfl⟩
       simp only [LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
       have := congrArg (fun T : H →L[ℂ] H => T v) hQP
@@ -79,21 +81,24 @@ theorem IsIrreducible.spectrum_subsingleton (hπ : IsIrreducible (π := π)) {A 
     have : v ∈ LinearMap.ker ((cfc g A : H →L[ℂ] H) : H →ₗ[ℂ] H) := hcl Submodule.mem_top
     simpa using this
 
-theorem IsIrreducible.exists_eq_algebraMap_of_isSelfAdjoint (hπ : IsIrreducible (π := π))
-    {A : H →L[ℂ] H} (hA : A ∈ intertwiners (π := π) π) (hsa : IsSelfAdjoint A) :
-    ∃ c : ℝ, A = algebraMap ℝ (H →L[ℂ] H) c := by
+theorem IsIrreducible.exists_eq_algebraMap_of_isSelfAdjoint
+    (hπ : IsIrreducible (π := π))
+    {A : H →L[ℂ] H} (hA : A ∈ intertwiners (π := π) π) (hsa : IsSelfAdjoint A)
+    : ∃ c : ℝ, A = algebraMap ℝ (H →L[ℂ] H) c := by
   have := hπ.1
   have := nontrivial_endomorphisms (H := H)
   have hne : (spectrum ℝ A).Nonempty := ContinuousFunctionalCalculus.spectrum_nonempty A hsa
   obtain ⟨c, hc⟩ := hne
   refine ⟨c, ?_⟩
   have hsub := hπ.spectrum_subsingleton hA hsa
-  calc A = cfc (fun x : ℝ => x) A := (cfc_id' ℝ A hsa).symm
+  calc
+    A = cfc (fun x : ℝ => x) A := (cfc_id' ℝ A hsa).symm
     _ = cfc (fun _ : ℝ => c) A := cfc_congr fun x hx => hsub hx hc
     _ = algebraMap ℝ _ c := cfc_const c A hsa
 
-theorem IsIrreducible.exists_eq_smul_one (hπ : IsIrreducible (π := π)) {T : H →L[ℂ] H}
-    (hT : T ∈ intertwiners (π := π) π) : ∃ c : ℂ, T = c • (1 : H →L[ℂ] H) := by
+theorem IsIrreducible.exists_eq_smul_one
+    (hπ : IsIrreducible (π := π)) {T : H →L[ℂ] H} (hT : T ∈ intertwiners (π := π) π)
+    : ∃ c : ℂ, T = c • (1 : H →L[ℂ] H) := by
   have hstar := star_mem_intertwiners hT
   have hre : (ℜ T : H →L[ℂ] H) ∈ intertwiners (π := π) π := by
     rw [realPart_apply_coe]
@@ -108,17 +113,15 @@ theorem IsIrreducible.exists_eq_smul_one (hπ : IsIrreducible (π := π)) {T : H
   rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, ← Complex.coe_smul,
     ← Complex.coe_smul, smul_smul, ← add_smul]
 
-theorem IsIrreducible.isEquivalent_of_mem_intertwiners (hπ : IsIrreducible (π := π))
-    (hσ : IsIrreducible (π := σ)) {T : H →L[ℂ] K} (hT : T ∈ intertwiners (π := π) σ) (hT0 : T ≠ 0) :
-    π.IsEquivalent σ := by
-  obtain ⟨c, hc⟩ := hπ.exists_eq_smul_one
-    (comp_mem_intertwiners (adjoint_mem_intertwiners hT) hT)
-  obtain ⟨d, hd⟩ := hσ.exists_eq_smul_one
-    (comp_mem_intertwiners hT (adjoint_mem_intertwiners hT))
+theorem IsIrreducible.isEquivalent_of_mem_intertwiners
+    (hπ : IsIrreducible (π := π)) (hσ : IsIrreducible (π := σ))
+    {T : H →L[ℂ] K} (hT : T ∈ intertwiners (π := π) σ) (hT0 : T ≠ 0)
+    : π.IsEquivalent σ := by
+  obtain ⟨c, hc⟩ := hπ.exists_eq_smul_one (comp_mem_intertwiners (adjoint_mem_intertwiners hT) hT)
+  obtain ⟨d, hd⟩ := hσ.exists_eq_smul_one (comp_mem_intertwiners hT (adjoint_mem_intertwiners hT))
   have key : ∀ v, (‖T v‖ : ℂ) ^ 2 = c * (‖v‖ : ℂ) ^ 2 := by
     intro v
-    have h1 : ⟪v, (adjoint T ∘L T) v⟫_ℂ = ⟪T v, T v⟫_ℂ := by
-      rw [comp_apply, adjoint_inner_right]
+    have h1 : ⟪v, (adjoint T ∘L T) v⟫_ℂ = ⟪T v, T v⟫_ℂ := by rw [comp_apply, adjoint_inner_right]
     rw [hc] at h1
     simp only [smul_apply, one_apply_eq_self, inner_smul_right] at h1
     have e1 : ⟪v, v⟫_ℂ = (‖v‖ : ℂ) ^ 2 := by rw [inner_self_eq_norm_sq_to_K]; rfl
@@ -142,8 +145,7 @@ theorem IsIrreducible.isEquivalent_of_mem_intertwiners (hπ : IsIrreducible (π 
     intro v
     have h := key v
     rw [hcr] at h
-    have h' : ‖T v‖ ^ 2 = (r * ‖v‖) ^ 2 := by
-      rw [mul_pow]; exact_mod_cast h
+    have h' : ‖T v‖ ^ 2 = (r * ‖v‖) ^ 2 := by rw [mul_pow]; exact_mod_cast h
     exact (pow_left_inj₀ (norm_nonneg _) (mul_nonneg hrpos.le (norm_nonneg _)) two_ne_zero).mp h'
   have hc0 : c ≠ 0 := by rw [hcr]; exact_mod_cast (pow_pos hrpos 2).ne'
   have hcd : c = d := by
@@ -177,8 +179,10 @@ theorem IsIrreducible.isEquivalent_of_mem_intertwiners (hπ : IsIrreducible (π 
   show U (π g v) = σ g (U v)
   exact (Submodule.smul_mem _ _ hT) g v
 
-theorem IsIrreducible.eq_zero_of_not_isEquivalent (hπ : IsIrreducible (π := π)) (hσ : IsIrreducible (π := σ))
-    (hne : ¬ π.IsEquivalent σ) {T : H →L[ℂ] K} (hT : T ∈ intertwiners (π := π) σ) : T = 0 := by
+theorem IsIrreducible.eq_zero_of_not_isEquivalent
+    (hπ : IsIrreducible (π := π)) (hσ : IsIrreducible (π := σ)) (hne : ¬ π.IsEquivalent σ)
+    {T : H →L[ℂ] K} (hT : T ∈ intertwiners (π := π) σ)
+    : T = 0 := by
   by_contra h
   exact hne (hπ.isEquivalent_of_mem_intertwiners hσ hT h)
 

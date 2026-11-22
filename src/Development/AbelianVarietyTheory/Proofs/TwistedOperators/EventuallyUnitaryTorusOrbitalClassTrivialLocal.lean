@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Eventuall
 @[expose] public section
 
 open MeasureTheory Set Filter Polynomial NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots GlobalTheory.TrEll
 open GlobalTheory.IndefiniteRowSideFullHecke.AdelicUnitaryGroups (mapH diagH)
 open scoped TensorProduct ComplexConjugate Matrix
@@ -24,9 +25,15 @@ noncomputable section
 
 namespace GlobalTheory.TrEll
 
-theorem torPt_mul_comm {F E : Type} [Field F] [Field E] [Algebra F E] {σ : E →ₐ[F] E} {r : ℕ} (P : PPol σ r)
-    (k : Type) [CommRing k] [Algebra F k] (a b : HR k (star' P) (one₁ P)) : a * b = b * a := by
-  apply Subtype.ext; apply Units.ext; ext i j
+theorem torPt_mul_comm
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {σ : E →ₐ[F] E} {r : ℕ} (P : PPol σ r)
+    (k : Type) [CommRing k] [Algebra F k]
+    (a b : HR k (star' P) (one₁ P))
+    : a * b = b * a := by
+  apply Subtype.ext
+  apply Units.ext
+  ext i j
   simp [Matrix.mul_apply, Subsingleton.elim i 0, Subsingleton.elim j 0]
   exact mul_comm _ _
 

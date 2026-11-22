@@ -5,16 +5,22 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IotaScalarOn
 
 @[expose] public section
 
-open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv Matrix TensorProduct
+open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv
+  Matrix TensorProduct
 
 namespace GlobalTheory.DetInv
 
-theorem ker_map_subset_im_map (R C : Type) [CommRing R] [Field C] (f : R →+* C) (ξ ν : R) (N : ℕ)
-    (F G : Matrix (Fin N) (Fin N) R) (hξ : ξ ∈ nonZeroDivisors R) (hν : f ν ≠ 0)
+theorem ker_map_subset_im_map
+    (R C : Type) [CommRing R] [Field C]
+    (f : R →+* C)
+    (ξ ν : R)
+    (N : ℕ) (F G : Matrix (Fin N) (Fin N) R)
+    (hξ : ξ ∈ nonZeroDivisors R) (hν : f ν ≠ 0)
     (hfrac : ∀ c : C, ∃ s t : R, f s ≠ 0 ∧ c * f s = f t)
     (hker : ∃ s : R, f s ≠ 0 ∧ ∀ r : R, f r = 0 → ξ ∣ s * r)
     (hGF : G * F = (ξ * ν) • (1 : Matrix (Fin N) (Fin N) R))
-    (x : Fin N → C) (hx : F.map f *ᵥ x = 0) : ∃ y : Fin N → C, x = G.map f *ᵥ y := by
+    (x : Fin N → C) (hx : F.map f *ᵥ x = 0)
+    : ∃ y : Fin N → C, x = G.map f *ᵥ y := by
   classical
   obtain ⟨s, hs, hsker⟩ := hker
   choose a b ha hab using fun i => hfrac (x i)
@@ -46,7 +52,8 @@ theorem ker_map_subset_im_map (R C : Type) [CommRing R] [Field C] (f : R →+* C
   have hG : ξ • ((s * ν) • t) = ξ • (G *ᵥ w) := by
     have h2 : G *ᵥ (s • (F *ᵥ t)) = G *ᵥ (ξ • w) := by rw [hw']
     rw [Matrix.mulVec_smul, Matrix.mulVec_smul, Matrix.mulVec_mulVec, hGF, Matrix.smul_mulVec,
-      Matrix.one_mulVec] at h2
+        Matrix.one_mulVec]
+      at h2
     rw [← h2]
     funext i
     simp only [Pi.smul_apply, smul_eq_mul]

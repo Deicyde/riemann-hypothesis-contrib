@@ -23,38 +23,48 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsTameW
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.LlcDepth
 
-theorem eq_pow_natDegree_of_dvd {p : ℂ[X]} (hp : p.Monic) {n : ℕ} (hd : p ∣ (X - 1) ^ n) :
-    p = (X - 1) ^ p.natDegree := by
+theorem eq_pow_natDegree_of_dvd {p : ℂ[X]} (hp : p.Monic) {n : ℕ} (hd : p ∣ (X - 1) ^ n)
+    : p = (X - 1) ^ p.natDegree := by
   have e : (X - 1 : ℂ[X]) = X - C 1 := by simp
   rw [e] at hd ⊢
   obtain ⟨i, -, hi⟩ := (dvd_prime_pow (prime_X_sub_C (1 : ℂ)) n).1 hd
   have hpi := eq_of_monic_of_associated hp ((monic_X_sub_C (1 : ℂ)).pow i) hi
   rw [hpi, natDegree_pow, natDegree_X_sub_C, mul_one]
 
-theorem prod_map_pow {α : Type*} (q : ℂ[X]) (f : α → ℕ) (s : Multiset α) :
-    (s.map fun y => q ^ f y).prod = q ^ (s.map f).sum := by
+theorem prod_map_pow {α : Type*} (q : ℂ[X]) (f : α → ℕ) (s : Multiset α)
+    : (s.map fun y => q ^ f y).prod = q ^ (s.map f).sum := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih => simp [ih, pow_add]
 
-theorem fixed_ne_bot_iff_isTameWD : DepthZeroCuspidalLL → DepthZeroInduction → LanglandsExhaustionGL →
-    ZelevinskyPolynomialRing → GeometricLemma → BernsteinZelevinskyFiniteness →
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
-      (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (rc : IrrGL (k := w.adicCompletion E) → WD h), IsRecLit h rc →
-      ∀ x : IrrGL (k := w.adicCompletion E), fixed x.rep (KOne (w.adicCompletion E) (Fin x.1)) ≠ ⊥ ↔ IsTameWD (rc x) := by
+theorem fixed_ne_bot_iff_isTameWD
+    : DepthZeroCuspidalLL → DepthZeroInduction → LanglandsExhaustionGL → ZelevinskyPolynomialRing
+      → GeometricLemma → BernsteinZelevinskyFiniteness
+      → ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+          (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+          (rc : IrrGL (k := w.adicCompletion E) → WD h),
+        IsRecLit h rc
+          → ∀ x : IrrGL (k := w.adicCompletion E),
+            fixed x.rep (KOne (w.adicCompletion E) (Fin x.1)) ≠ ⊥ ↔ IsTameWD (rc x) := by
   intro hDZC hDZI hEx hZel hGeo hBZ E Ω _ _ _ _ _ A w h rc hrc x
   haveI : CharZero (w.adicCompletion E) := charZero_of_injective_algebraMap (algebraMap E _).injective
   obtain ⟨a, ha, ε, -, hL⟩ := id hrc
   obtain ⟨m, hm⟩ := hEx _ x
-  have hs : HasSupport x.rep (msupp m) := GlobalTheory.T.langlandsClassification_supercuspidalSupport_multisegment hZel _ m x hm
-  have hcp := GlobalTheory.T.central_character_rec_compatible hEx hZel hGeo hBZ E Ω A w h a ha _ rc hL x (msupp m) hs
-  have hdy : ∀ y ∈ msupp m, (fixed y.rep (KOne (w.adicCompletion E) (Fin y.1)) ≠ ⊥ ↔ IsTameWD (rc y)) :=
+  have hs : HasSupport x.rep (msupp m) :=
+    GlobalTheory.T.langlandsClassification_supercuspidalSupport_multisegment hZel _ m x hm
+  have hcp :=
+    GlobalTheory.T.central_character_rec_compatible hEx hZel hGeo hBZ E Ω A w h a ha _ rc hL x
+      (msupp m) hs
+  have hdy
+      : ∀ y ∈ msupp m, (fixed y.rep (KOne (w.adicCompletion E) (Fin y.1)) ≠ ⊥ ↔ IsTameWD (rc y)) :=
     fun y hy => hDZC E Ω A w h rc hrc y (hs.isCusp hy)
   have htame : IsTameWD (rc x) ↔ ∀ y ∈ msupp m, IsTameWD (rc y) := by
     simp only [GlobalTheory.T.isTameWeilDeligne_iff_wild_charpoly E Ω A w h]
@@ -75,8 +85,11 @@ theorem fixed_ne_bot_iff_isTameWD : DepthZeroCuspidalLL → DepthZeroInduction �
   · intro hx y hy
     rw [← hdy y hy]
     obtain ⟨n, xs, hxs, hcs⟩ := hs
-    have H := GlobalTheory.SmGL.depthZeroSupport _ x.1 (GlobalTheory.SplitRead.Irr.ofIrrRep x.2.rep) n (fun i => (xs i).1)
-      (fun i => GlobalTheory.SplitRead.Irr.ofIrrRep (xs i).2.rep) hcs ((Submodule.ne_bot_iff _).1 hx)
+    have H :=
+      GlobalTheory.SmGL.depthZeroSupport _ x.1 (GlobalTheory.SplitRead.Irr.ofIrrRep x.2.rep) n
+        (fun i => (xs i).1)
+        (fun i => GlobalTheory.SplitRead.Irr.ofIrrRep (xs i).2.rep)
+        hcs ((Submodule.ne_bot_iff _).1 hx)
     rw [← hxs] at hy
     obtain ⟨i, -, rfl⟩ := Multiset.mem_map.1 hy
     obtain ⟨v, hv, hv0⟩ := H i

@@ -8,45 +8,57 @@ noncomputable section
 
 namespace PI.LocMassTypW.WGramP
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
 open scoped TensorProduct
 
-theorem hform_sum_left {A : Type} [CommRing A] {n m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin n) (Fin n) A) (α : Fin m → A) (Y : Fin m → Fin n → A) (y : Fin n → A) :
-    Formalism.UG.hform σ J (∑ c, α c • Y c) y = ∑ c, σ (α c) * Formalism.UG.hform σ J (Y c) y := by
+theorem hform_sum_left
+    {A : Type} [CommRing A]
+    {n m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin n) (Fin n) A) (α : Fin m → A) (Y : Fin m → Fin n → A)
+    (y : Fin n → A)
+    : Formalism.UG.hform σ J (∑ c, α c • Y c) y
+      = ∑ c, σ (α c) * Formalism.UG.hform σ J (Y c) y := by
   unfold Formalism.UG.hform
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.sum_mul,
-    Finset.mul_sum]
-  calc _ = ∑ i, ∑ c, ∑ j, σ (α c) * (σ (Y c i) * J i j * y j) :=
-        Finset.sum_congr rfl fun i _ => by
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ => by ring
+      Finset.mul_sum]
+  calc
+    _ = ∑ i, ∑ c, ∑ j, σ (α c) * (σ (Y c i) * J i j * y j) :=
+      Finset.sum_congr rfl fun i _ => by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ => by ring
     _ = _ := Finset.sum_comm
 
-theorem hform_sum_right {A : Type} [CommRing A] {n m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin n) (Fin n) A) (x : Fin n → A) (β : Fin m → A) (Y : Fin m → Fin n → A) :
-    Formalism.UG.hform σ J x (∑ d, β d • Y d) = ∑ d, β d * Formalism.UG.hform σ J x (Y d) := by
+theorem hform_sum_right
+    {A : Type} [CommRing A]
+    {n m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin n) (Fin n) A) (x : Fin n → A) (β : Fin m → A)
+    (Y : Fin m → Fin n → A)
+    : Formalism.UG.hform σ J x (∑ d, β d • Y d) = ∑ d, β d * Formalism.UG.hform σ J x (Y d) := by
   unfold Formalism.UG.hform
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-  calc _ = ∑ i, ∑ d, ∑ j, β d * (σ (x i) * J i j * Y d j) :=
-        Finset.sum_congr rfl fun i _ => by
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun j _ => by ring
+  calc
+    _ = ∑ i, ∑ d, ∑ j, β d * (σ (x i) * J i j * Y d j) :=
+      Finset.sum_congr rfl fun i _ => by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun j _ => by ring
     _ = _ := Finset.sum_comm
 
 section Herm
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 theorem sigma_invol (hCM : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨τ⟩ := (inferInstance : Nonempty (E →+* ℂ))
   apply τ.injective
   rw [hCM.2.2.2 τ, hCM.2.2.2 τ, star_star]
 
-theorem hE_symm (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (x y : Fin n → E) :
-    hE σ J x y = σ (hE σ J y x) := by
+theorem hE_symm (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (x y : Fin n → E)
+    : hE σ J x y = σ (hE σ J y x) := by
   unfold hE Formalism.UG.hform
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul]
@@ -56,9 +68,12 @@ theorem hE_symm (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) (x y : Fin n → E) 
   rw [sigma_invol σ hCM, hJ.1 j i]
   ring
 
-theorem hermitian_form_standard_frame_vanishes (hCM : IsCMExt F E σ) (hJ : IsHermND σ J) {r : ℕ} (P : Frame E n r) (T : F)
-    (hP : P.IsStd σ J T) (c d : Fin (r + 1)) (hcd : ¬ (c = Fin.last r ∧ d = Fin.last r)) :
-    hE σ J (F0 P c) (F0 P d) = 0 := by
+theorem hermitian_form_standard_frame_vanishes
+    (hCM : IsCMExt F E σ) (hJ : IsHermND σ J)
+    {r : ℕ} (P : Frame E n r)
+    (T : F) (hP : P.IsStd σ J T)
+    (c d : Fin (r + 1)) (hcd : ¬(c = Fin.last r ∧ d = Fin.last r))
+    : hE σ J (F0 P c) (F0 P d) = 0 := by
   induction c using Fin.lastCases with
   | last =>
     induction d using Fin.lastCases with
@@ -75,13 +90,13 @@ theorem hermitian_form_standard_frame_vanishes (hCM : IsCMExt F E σ) (hJ : IsHe
       simp only [F0, Fin.snoc_castSucc]
       exact hP.1 i j
 
-theorem sigR_inclR (v : HeightOneSpectrum (𝓞 F)) (e : E) :
-    sigR (Fv F v) σ (inclR (Fv F v) e) = inclR (Fv F v) (σ e) := by
+theorem sigR_inclR (v : HeightOneSpectrum (𝓞 F)) (e : E)
+    : sigR (Fv F v) σ (inclR (Fv F v) e) = inclR (Fv F v) (σ e) := by
   simp [sigR, inclR, Algebra.TensorProduct.map_tmul]
 
-theorem hR_ratV (v : HeightOneSpectrum (𝓞 F)) (a b : Fin n → E) :
-    hR (Fv F v) σ J (ratV (F := F) (Fv F v) a) (ratV (F := F) (Fv F v) b) =
-      inclR (Fv F v) (hE σ J a b) := by
+theorem hR_ratV (v : HeightOneSpectrum (𝓞 F)) (a b : Fin n → E)
+    : hR (Fv F v) σ J (ratV (F := F) (Fv F v) a) (ratV (F := F) (Fv F v) b)
+      = inclR (Fv F v) (hE σ J a b) := by
   unfold hR hE Formalism.UG.hform
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, ratV, JR, Matrix.map_apply, sigR_inclR]
@@ -93,7 +108,8 @@ end PI.LocMassTypW.WGramP
 
 namespace PI.LocMassTypW
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix WGramP
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix WGramP
 open scoped TensorProduct
 
 theorem gram_matrix_unitary_invariance : GramU := by
@@ -102,7 +118,7 @@ theorem gram_matrix_unitary_invariance : GramU := by
   have hCM := hStd.1
   have hJ := hStd.2.1
   set Y : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun c => ratV (F := F) (Fv F v) (F0 P c) with hY
-  have hG0 : ∀ c d, ¬ (c = Fin.last r ∧ d = Fin.last r) → hR (Fv F v) σ J (Y c) (Y d) = 0 := by
+  have hG0 : ∀ c d, ¬(c = Fin.last r ∧ d = Fin.last r) → hR (Fv F v) σ J (Y c) (Y d) = 0 := by
     intro c d hcd
     rw [hY]
     simp only
@@ -117,14 +133,18 @@ theorem gram_matrix_unitary_invariance : GramU := by
     Formalism.UG.hform _ _ (Y a) (Y b)
   rw [hform_sum_left]
   simp only [hform_sum_right]
-  have hinner : ∀ c, ∑ d, uMat v x d b * Formalism.UG.hform (sigR (Fv F v) σ) (JR (Fv F v) J) (Y c) (Y d) =
-      uMat v x (Fin.last r) b * hR (Fv F v) σ J (Y c) (Y (Fin.last r)) := by
+  have hinner
+      : ∀ c,
+        ∑ d, uMat v x d b * Formalism.UG.hform (sigR (Fv F v) σ) (JR (Fv F v) J) (Y c) (Y d)
+          = uMat v x (Fin.last r) b * hR (Fv F v) σ J (Y c) (Y (Fin.last r)) := by
     intro c
     rw [Finset.sum_eq_single (Fin.last r)]
     · rfl
     · intro d _ hd
-      rw [show Formalism.UG.hform (sigR (Fv F v) σ) (JR (Fv F v) J) (Y c) (Y d) = hR (Fv F v) σ J (Y c) (Y d)
-        from rfl, hG0 c d (fun h => hd h.2), mul_zero]
+      rw [show Formalism.UG.hform (sigR (Fv F v) σ) (JR (Fv F v) J) (Y c) (Y d)
+            = hR (Fv F v) σ J (Y c) (Y d) from
+          rfl,
+        hG0 c d (fun h => hd h.2), mul_zero]
     · intro h; exact absurd (Finset.mem_univ _) h
   simp only [hinner]
   rw [Finset.sum_eq_single (Fin.last r)]

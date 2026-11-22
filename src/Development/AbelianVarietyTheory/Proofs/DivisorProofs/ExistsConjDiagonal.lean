@@ -6,11 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.DiagonalConjugateExistence
 
-theorem exists_conj_diagonal {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (t : Fin n → ℂ)
-    (ht : Function.Injective t)
-    (hA : Matrix.charpoly A = ∏ i : Fin n, (Polynomial.X - Polynomial.C (t i))) :
-    ∃ P : GL (Fin n) ℂ, A * (P : Matrix (Fin n) (Fin n) ℂ)
-      = (P : Matrix (Fin n) (Fin n) ℂ) * Matrix.diagonal t := by
+theorem exists_conj_diagonal
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (t : Fin n → ℂ) (ht : Function.Injective t)
+    (hA : Matrix.charpoly A = ∏ i : Fin n, (Polynomial.X - Polynomial.C (t i)))
+    : ∃ P : GL (Fin n) ℂ,
+      A * (P : Matrix (Fin n) (Fin n) ℂ) = (P : Matrix (Fin n) (Fin n) ℂ) * Matrix.diagonal t := by
   have hev : ∀ i, ∃ v : Fin n → ℂ, v ≠ 0 ∧ A.mulVec v = t i • v := by
     intro i
     have h0 : (Matrix.scalar (Fin n) (t i) - A).det = 0 := by

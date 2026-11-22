@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem l_zero {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] (f : ℤ_[l] →+* K) : (l : K) = 0 := by
+private theorem l_zero {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] (f : ℤ_[l] →+* K)
+    : (l : K) = 0 := by
   by_contra hne
   have hp : (ringChar K).Prime := CharP.char_is_prime K (ringChar K)
   have hlp : ringChar K ≠ l := by
@@ -22,19 +23,23 @@ private theorem l_zero {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] 
   rw [map_natCast, ringChar.Nat.cast_ringChar] at hu'
   exact not_isUnit_zero hu'
 
-private theorem hom_uniq {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] (f f' : ℤ_[l] →+* R) (h : (l : R) = 0) :
-    f = f' := by
+private theorem hom_uniq
+    {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] (f f' : ℤ_[l] →+* R) (h : (l : R) = 0)
+    : f = f' := by
   ext x
   have hx := PadicInt.sub_zmodRepr_mem x
   rw [PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton'] at hx
   obtain ⟨y, hy⟩ := hx
   have hx' : x = (PadicInt.zmodRepr x : ℤ_[l]) + y * l := by rw [hy]; ring
-  rw [hx', map_add (f := _), map_add (f := _), map_mul, map_mul, map_natCast, map_natCast, map_natCast, map_natCast, h]
+  rw [hx', map_add (f := _), map_add (f := _), map_mul, map_mul, map_natCast, map_natCast,
+    map_natCast, map_natCast, h]
   simp
 
-private theorem localization_quotient_separated_dvd {A K L : Type} [CommRing A] [Field K] [Algebra A K] [IsFractionRing A K] [Field L] (g : A →+* L)
-    (hi : Function.Injective g) (P : Polynomial A) (hs : (P.map (algebraMap A K)).Separable) :
-    (P.map g).Separable := by
+private theorem localization_quotient_separated_dvd
+    {A K L : Type} [CommRing A] [Field K] [Algebra A K] [IsFractionRing A K] [Field L]
+    (g : A →+* L) (hi : Function.Injective g)
+    (P : Polynomial A) (hs : (P.map (algebraMap A K)).Separable)
+    : (P.map g).Separable := by
   have hP : P.map g = (P.map (algebraMap A K)).map (IsFractionRing.lift hi) := by
     rw [Polynomial.map_map]
     congr 1
@@ -43,15 +48,21 @@ private theorem localization_quotient_separated_dvd {A K L : Type} [CommRing A] 
   rw [hP]
   exact hs.map
 
-private theorem sep_map {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] (j : A →+* B)
-    (hinj : Function.Injective j) (P : Polynomial A) (hs : (P.map (algebraMap A (FractionRing A))).Separable) :
-    ((P.map j).map (algebraMap B (FractionRing B))).Separable := by
+private theorem sep_map
+    {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B]
+    (j : A →+* B) (hinj : Function.Injective j)
+    (P : Polynomial A) (hs : (P.map (algebraMap A (FractionRing A))).Separable)
+    : ((P.map j).map (algebraMap B (FractionRing B))).Separable := by
   rw [Polynomial.map_map]
-  exact localization_quotient_separated_dvd (K := FractionRing A) ((algebraMap B (FractionRing B)).comp j)
+  exact localization_quotient_separated_dvd (K := FractionRing A)
+    ((algebraMap B (FractionRing B)).comp j)
     ((IsFractionRing.injective B (FractionRing B)).comp hinj) P hs
 
-theorem UpperTheory.V.Pa.Det.coefficientExtension_preserves_conditions_and_det :
-    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} (x x' : NP F n) (j : x.A →+* x'.A), x.Ext x' j → (∀ D : Subgroup F.G₀, x.N4 D → x'.N4 D) ∧ (x.N3 → x'.N3) ∧ GDet.ofRep (mat x'.ρ) = (GDet.ofRep (mat x.ρ)).map j := by
+theorem UpperTheory.V.Pa.Det.coefficientExtension_preserves_conditions_and_det
+    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} (x x' : NP F n) (j : x.A →+* x'.A),
+      x.Ext x' j
+        → (∀ D : Subgroup F.G₀, x.N4 D → x'.N4 D) ∧ (x.N3 → x'.N3)
+          ∧ GDet.ofRep (mat x'.ρ) = (GDet.ofRep (mat x.ρ)).map j := by
   intro l _ F n x x' j hE
   obtain ⟨hinj, hloc, hfin, hρ, ha, hψ⟩ := hE
   have hmat : ∀ g, mat x'.ρ g = (mat x.ρ g).map j := by
@@ -71,15 +82,17 @@ theorem UpperTheory.V.Pa.Det.coefficientExtension_preserves_conditions_and_det :
       intro i
       apply h4
       intro g hg
-      have lhs : ∀ (e : x.A) (M : Matrix (Fin n) (Fin n) x.A) a c,
-          p i (j e * ∑ k, j (M a k) * Z k c) = e * ∑ k, M a k * p i (Z k c) := by
+      have lhs
+          : ∀ (e : x.A) (M : Matrix (Fin n) (Fin n) x.A) a c,
+            p i (j e * ∑ k, j (M a k) * Z k c) = e * ∑ k, M a k * p i (Z k c) := by
         intro e M a c
         set_option synthInstance.maxHeartbeats 100000 in
           rw [Finset.mul_sum, map_sum, Finset.mul_sum]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [← mul_assoc, ← map_mul, hlin, mul_assoc]
-      have rhs : ∀ (M : Matrix (Fin n) (Fin n) x.A) a c,
-          p i (∑ k, Z a k * j (M k c)) = ∑ k, p i (Z a k) * M k c := by
+      have rhs
+          : ∀ (M : Matrix (Fin n) (Fin n) x.A) a c,
+            p i (∑ k, Z a k * j (M k c)) = ∑ k, p i (Z a k) * M k c := by
         intro M a c
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum]
@@ -87,7 +100,8 @@ theorem UpperTheory.V.Pa.Det.coefficientExtension_preserves_conditions_and_det :
         rw [mul_comm, hlin, mul_comm]
       ext a c
       have hac := congrFun (congrFun (hZ g hg) a) c
-      simp only [Matrix.smul_apply, Matrix.mul_apply, smul_eq_mul, hmat, Matrix.map_apply, heps] at hac
+      simp only [Matrix.smul_apply, Matrix.mul_apply, smul_eq_mul, hmat, Matrix.map_apply, heps]
+        at hac
       simp only [Matrix.smul_apply, Matrix.mul_apply, smul_eq_mul, Matrix.map_apply]
       rw [← lhs, ← rhs, hac]
     ext a c

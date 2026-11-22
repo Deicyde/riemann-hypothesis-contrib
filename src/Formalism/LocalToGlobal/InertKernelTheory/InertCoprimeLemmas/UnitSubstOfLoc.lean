@@ -15,14 +15,15 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Fo
 
 namespace ThetaInverseLemmas
 
-open Formalism.MainNotions.GL3Theta Formalism.MainNotions.Ext Formalism.MainNotions.Ext.CutA IntegralOrthonormalChange
+open Formalism.MainNotions.GL3Theta Formalism.MainNotions.Ext Formalism.MainNotions.Ext.CutA
+  IntegralOrthonormalChange
 
 section Okp
 
 variable (D : D7) {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p])
 
-theorem okp_range (a : 𝓞 D.host.K) :
-    (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K)) ∈ OKp D lam :=
+theorem okp_range (a : 𝓞 D.host.K)
+    : (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K)) ∈ OKp D lam :=
   subset_closure ⟨a, rfl⟩
 
 theorem okp_closed : IsClosed (OKp D lam) := isClosed_closure
@@ -45,9 +46,10 @@ theorem okp_intPair (n : ℤ) : ((n : ℂ_[p]), (n : ℂ_[p])) ∈ OKp D lam := 
 theorem okp_zp (u : ℤ_[p]) : (zc u, zc u) ∈ OKp D lam := by
   have hf : Continuous (fun z : ℤ_[p] => (zc z, zc z)) := zc_continuous.prodMk zc_continuous
   have hu : u ∈ closure (Set.range (Int.cast : ℤ → ℤ_[p])) := PadicInt.denseRange_intCast u
-  have h := map_mem_closure hf hu (t := OKp D lam) (by
-    rintro _ ⟨n, rfl⟩
-    simpa [zc_int] using okp_intPair D lam n)
+  have h :=
+    map_mem_closure hf hu (t := OKp D lam) (by
+      rintro _ ⟨n, rfl⟩
+      simpa [zc_int] using okp_intPair D lam n)
   rwa [(okp_closed D lam).closure_eq] at h
 
 theorem norm_p_cp : ‖(p : ℂ_[p])‖ = (p : ℝ)⁻¹ := by
@@ -56,7 +58,8 @@ theorem norm_p_cp : ‖(p : ℂ_[p])‖ = (p : ℝ)⁻¹ := by
   rw [h]
   exact PadicInt.norm_p
 
-theorem pow_dvd_of_norm (t : ℤ) (e : ℕ) (h : ‖(t : ℂ_[p])‖ ≤ ‖(p : ℂ_[p])‖ ^ e) : ((p : ℤ) ^ e) ∣ t := by
+theorem pow_dvd_of_norm (t : ℤ) (e : ℕ) (h : ‖(t : ℂ_[p])‖ ≤ ‖(p : ℂ_[p])‖ ^ e)
+    : ((p : ℤ) ^ e) ∣ t := by
   rw [norm_int_cp, norm_p_cp] at h
   apply PadicInt.norm_int_le_pow_iff_dvd.1
   rw [zpow_neg, zpow_natCast, ← inv_pow]
@@ -83,8 +86,8 @@ theorem tauKc_nat (n : ℕ) : tauKc D lam (n : D.host.K) = n := by
 
 theorem zc_mul' (a b : ℤ_[p]) : zc (a * b) = zc a * zc b := by simp [zc]
 
-theorem keyInt (k : D.host.K) (h1 : ‖tauK D lam k‖ ≤ 1) (h2 : ‖tauKc D lam k‖ ≤ 1) :
-    (tauK D lam k, tauKc D lam k) ∈ OKp D lam := by
+theorem keyInt (k : D.host.K) (h1 : ‖tauK D lam k‖ ≤ 1) (h2 : ‖tauKc D lam k‖ ≤ 1)
+    : (tauK D lam k, tauKc D lam k) ∈ OKp D lam := by
   have hp : p.Prime := Fact.out
   obtain ⟨y, hy0, hyI⟩ := (isAlg D k).exists_integral_multiple
   obtain ⟨m, hm⟩ : ∃ m : ℕ, y = m ∨ y = -m := ⟨y.natAbs, Int.natAbs_eq y⟩
@@ -112,8 +115,7 @@ theorem keyInt (k : D.host.K) (h1 : ‖tauK D lam k‖ ≤ 1) (h2 : ‖tauKc D l
     have := norm_int_cp_eq_one (p := p) (n' : ℤ) (by exact_mod_cast hn')
     simpa using this
   have hmc : (m : ℂ_[p]) = (p : ℂ_[p]) ^ e * n' := by rw [hmn]; push_cast; ring
-  have hnorm_m : ‖(m : ℂ_[p])‖ = ‖(p : ℂ_[p])‖ ^ e := by
-    rw [hmc, norm_mul, norm_pow, hn'1, mul_one]
+  have hnorm_m : ‖(m : ℂ_[p])‖ = ‖(p : ℂ_[p])‖ ^ e := by rw [hmc, norm_mul, norm_pow, hn'1, mul_one]
   have hA : ‖(m : ℂ_[p]) * tauK D lam k‖ ≤ ‖(p : ℂ_[p])‖ ^ e := by
     rw [norm_mul, hnorm_m]
     exact mul_le_of_le_one_right (pow_nonneg (norm_nonneg _) _) h1
@@ -153,8 +155,8 @@ theorem keyInt (k : D.host.K) (h1 : ‖tauK D lam k‖ ≤ 1) (h2 : ‖tauKc D l
   have hc'I : IsIntegral ℤ c' := by
     refine ⟨Polynomial.X ^ 2 - Polynomial.C t' * Polynomial.X + Polynomial.C n'', ?_, ?_⟩
     · monicity!
-    · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul, Polynomial.eval₂_pow,
-        Polynomial.eval₂_X, Polynomial.eval₂_C]
+    · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul,
+        Polynomial.eval₂_pow, Polynomial.eval₂_X, Polynomial.eval₂_C]
       simp only [eq_intCast]
       exact hK
   obtain ⟨u, hu⟩ : ∃ u : ℤ_[p], zc u * (n' : ℂ_[p]) = 1 := by
@@ -176,23 +178,30 @@ theorem keyInt (k : D.host.K) (h1 : ‖tauK D lam k‖ ≤ 1) (h2 : ‖tauKc D l
   rw [Prod.mk_mul_mk, e1, e2, ← mul_assoc, ← mul_assoc, hu, one_mul, one_mul] at hm'
   exact hm'
 
-theorem conv (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ) (x : ℂ_[p])
-    (hx : x ∈ closure (Set.range fun k : D.host.K => lamC lam (D.host.φ₀ (k : D.host.E)))) (hx1 : ‖x‖ ≤ 1) :
-    (x, σ x) ∈ OKp D lam := by
+theorem conv
+    (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ)
+    (x : ℂ_[p])
+    (hx : x ∈ closure (Set.range fun k : D.host.K => lamC lam (D.host.φ₀ (k : D.host.E))))
+    (hx1 : ‖x‖ ≤ 1)
+    : (x, σ x) ∈ OKp D lam := by
   have hσc : Continuous σ := by
     refine AddMonoidHomClass.continuous_of_bound σ 1 (fun y => ?_)
     rw [hσ.2 y, one_mul]
-  have hU : IsOpen (Metric.closedBall (0 : ℂ_[p]) 1) := IsUltrametricDist.isOpen_closedBall 0 one_ne_zero
-  have hx' : x ∈ closure (Metric.closedBall (0 : ℂ_[p]) 1 ∩
-      Set.range fun k : D.host.K => lamC lam (D.host.φ₀ (k : D.host.E))) :=
+  have hU : IsOpen (Metric.closedBall (0 : ℂ_[p]) 1) :=
+    IsUltrametricDist.isOpen_closedBall 0 one_ne_zero
+  have hx'
+      : x ∈ closure
+        (Metric.closedBall (0 : ℂ_[p]) 1
+          ∩ Set.range fun k : D.host.K => lamC lam (D.host.φ₀ (k : D.host.E))) :=
     hU.inter_closure ⟨by simpa using hx1, hx⟩
-  have h := map_mem_closure (continuous_id.prodMk hσc) hx' (t := OKp D lam) (by
-    rintro _ ⟨hy1, k, rfl⟩
-    have hy1' : ‖tauK D lam k‖ ≤ 1 := by simpa [tauK] using hy1
-    have hc : σ (tauK D lam k) = tauKc D lam k := hσ.1 k
-    have hk := keyInt D lam k hy1' (by rw [← hc, hσ.2]; exact hy1')
-    rw [← hc] at hk
-    exact hk)
+  have h :=
+    map_mem_closure (continuous_id.prodMk hσc) hx' (t := OKp D lam) (by
+      rintro _ ⟨hy1, k, rfl⟩
+      have hy1' : ‖tauK D lam k‖ ≤ 1 := by simpa [tauK] using hy1
+      have hc : σ (tauK D lam k) = tauKc D lam k := hσ.1 k
+      have hk := keyInt D lam k hy1' (by rw [← hc, hσ.2]; exact hy1')
+      rw [← hc] at hk
+      exact hk)
   rwa [(okp_closed D lam).closure_eq] at h
 
 end Key
@@ -210,13 +219,14 @@ theorem tauE_apply (x : D.host.E) : tauE D lam x = lamC lam (D.host.φ₀ x) := 
   rw [lamC_mem' lam (test_vector_mem_schwartz_bruhat D x)]
   rfl
 
-theorem gram_change (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ) {N N' r : ℕ}
-    (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (Q : Fin r → Fin r → D.host.E)
-    (hQK : ∀ i j, Q i j ∈ D.host.K) (hb' : ∀ j, b' j = ∑ i, Q i j • b i) :
-    (Matrix.of fun m n => lamC lam (D.host.φ₀ ((hYY D (b' m) (b' n) : D.host.K) : D.host.E))) =
-      (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) *
-        (Matrix.of fun m n => lamC lam (D.host.φ₀ ((hYY D (b m) (b n) : D.host.K) : D.host.E))) *
-        ((Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))).map σ)ᵀ := by
+theorem gram_change
+    (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ)
+    {N N' r : ℕ} (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (Q : Fin r → Fin r → D.host.E)
+    (hQK : ∀ i j, Q i j ∈ D.host.K) (hb' : ∀ j, b' j = ∑ i, Q i j • b i)
+    : (Matrix.of fun m n => lamC lam (D.host.φ₀ ((hYY D (b' m) (b' n) : D.host.K) : D.host.E)))
+      = (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m)))
+        * (Matrix.of fun m n => lamC lam (D.host.φ₀ ((hYY D (b m) (b n) : D.host.K) : D.host.E)))
+        * ((Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))).map σ)ᵀ := by
   have hσQ : ∀ a c, σ (lamC lam (D.host.φ₀ (Q a c))) = tauE D lam (D.host.conj (Q a c)) := by
     intro a c
     rw [tauE_apply]
@@ -224,56 +234,70 @@ theorem gram_change (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ) {N N' 
   ext m n
   simp only [Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, hσQ]
   simp only [← tauE_apply]
-  rw [hb' m, hb' n, hYY_comb D b (fun i => Q i m) (fun i => Q i n) (fun i => hQK i m) (fun i => hQK i n)]
+  rw [hb' m, hb' n,
+    hYY_comb D b (fun i => Q i m) (fun i => Q i n) (fun i => hQK i m) (fun i => hQK i n)]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun i _ => ?_
   ring
 
-theorem unitary_mat {n : Type*} [Fintype n] [DecidableEq n] {F : Type*} [CommRing F] (σ : F →+* F)
-    (A G : Matrix n n F) (h : ∀ i j, ∑ m, ∑ k, A i m * G m k * σ (A j k) = if i = j then 1 else 0) :
-    A * G * (A.map σ)ᵀ = 1 := by
+theorem unitary_mat
+    {n : Type*} [Fintype n] [DecidableEq n]
+    {F : Type*} [CommRing F]
+    (σ : F →+* F) (A G : Matrix n n F)
+    (h : ∀ i j, ∑ m, ∑ k, A i m * G m k * σ (A j k) = if i = j then 1 else 0)
+    : A * G * (A.map σ)ᵀ = 1 := by
   ext i j
   rw [Matrix.one_apply, ← h i j]
   simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
 
-theorem unitary_P {n : Type*} [Fintype n] [DecidableEq n] {F : Type*} [Field F] (σ : F →+* F)
-    (A A' G Qt : Matrix n n F) (hA : A * G * (A.map σ)ᵀ = 1)
-    (hA' : A' * (Qt * G * (Qt.map σ)ᵀ) * (A'.map σ)ᵀ = 1) (hdet : A.det ≠ 0) :
-    (A' * Qt * A⁻¹) * ((A' * Qt * A⁻¹).map σ)ᵀ = 1 := by
+theorem unitary_P
+    {n : Type*} [Fintype n] [DecidableEq n]
+    {F : Type*} [Field F]
+    (σ : F →+* F) (A A' G Qt : Matrix n n F) (hA : A * G * (A.map σ)ᵀ = 1)
+    (hA' : A' * (Qt * G * (Qt.map σ)ᵀ) * (A'.map σ)ᵀ = 1) (hdet : A.det ≠ 0)
+    : (A' * Qt * A⁻¹) * ((A' * Qt * A⁻¹).map σ)ᵀ = 1 := by
   have hBA : A⁻¹ * A = 1 := Matrix.nonsing_inv_mul A (isUnit_iff_ne_zero.2 hdet)
   have hBs : A⁻¹.map σ * A.map σ = 1 := by
     rw [← Matrix.map_mul, hBA, Matrix.map_one _ (map_zero σ) (map_one σ)]
   have hG : A⁻¹ * (A⁻¹.map σ)ᵀ = G := by
-    calc A⁻¹ * (A⁻¹.map σ)ᵀ = A⁻¹ * (A * G * (A.map σ)ᵀ) * (A⁻¹.map σ)ᵀ := by rw [hA, Matrix.mul_one]
+    calc
+      A⁻¹ * (A⁻¹.map σ)ᵀ
+        = A⁻¹ * (A * G * (A.map σ)ᵀ) * (A⁻¹.map σ)ᵀ := by rw [hA, Matrix.mul_one]
       _ = (A⁻¹ * A) * G * (A⁻¹.map σ * A.map σ)ᵀ := by
-          rw [Matrix.transpose_mul]; simp only [Matrix.mul_assoc]
+        rw [Matrix.transpose_mul]; simp only [Matrix.mul_assoc]
       _ = G := by rw [hBA, hBs]; simp
-  calc (A' * Qt * A⁻¹) * ((A' * Qt * A⁻¹).map σ)ᵀ
-      = A' * (Qt * (A⁻¹ * (A⁻¹.map σ)ᵀ) * (Qt.map σ)ᵀ) * (A'.map σ)ᵀ := by
-        simp only [Matrix.map_mul, Matrix.transpose_mul, Matrix.mul_assoc]
+  calc
+    (A' * Qt * A⁻¹) * ((A' * Qt * A⁻¹).map σ)ᵀ
+        = A' * (Qt * (A⁻¹ * (A⁻¹.map σ)ᵀ) * (Qt.map σ)ᵀ) * (A'.map σ)ᵀ := by
+      simp only [Matrix.map_mul, Matrix.transpose_mul, Matrix.mul_assoc]
     _ = 1 := by rw [hG]; exact hA'
 
-theorem lamb_change {N N' r : ℕ} (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (Q : Fin r → Fin r → D.host.E)
+theorem lamb_change
+    {N N' r : ℕ} (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (Q : Fin r → Fin r → D.host.E)
     (hQK : ∀ i j, Q i j ∈ D.host.K) (hb' : ∀ j, b' j = ∑ i, Q i j • b i) (m : Fin r)
-    (k : D.what₂.Tau × Fin N' × Fin N) :
-    lamC lam (embT D k.1 (b' m k.2.1 k.2.2)) =
-      ∑ n, lamC lam (D.host.φ₀ (Q n m)) * lamC lam (embT D k.1 (b n k.2.1 k.2.2)) := by
+    (k : D.what₂.Tau × Fin N' × Fin N)
+    : lamC lam (embT D k.1 (b' m k.2.1 k.2.2))
+      = ∑ n, lamC lam (D.host.φ₀ (Q n m)) * lamC lam (embT D k.1 (b n k.2.1 k.2.2)) := by
   rw [IntegralOrthonormalChange.lamC_embT, hb' m, Matrix.sum_apply]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Matrix.smul_apply, smul_eq_mul, map_sum, map_mul]
   refine Finset.sum_congr rfl fun n _ => ?_
-  rw [← IntegralOrthonormalChange.embT_K D k.1 _ (hQK n m), IntegralOrthonormalChange.lamC_embT, IntegralOrthonormalChange.lamC_embT]
+  rw [← IntegralOrthonormalChange.embT_K D k.1 _ (hQK n m), IntegralOrthonormalChange.lamC_embT,
+    IntegralOrthonormalChange.lamC_embT]
 
-theorem v_change {N N' r : ℕ} (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (Q : Fin r → Fin r → D.host.E)
+theorem v_change
+    {N N' r : ℕ} (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (Q : Fin r → Fin r → D.host.E)
     (hQK : ∀ i j, Q i j ∈ D.host.K) (hb' : ∀ j, b' j = ∑ i, Q i j • b i)
     (A A' : Matrix (Fin r) (Fin r) ℂ_[p]) (hdet : A.det ≠ 0)
     (v v' : Fin r → (D.what₂.Tau × Fin N' × Fin N → ℂ_[p]))
     (hv : ∀ i k, v i k = ∑ m, A i m * lamC lam (embT D k.1 (b m k.2.1 k.2.2)))
-    (hv' : ∀ i k, v' i k = ∑ m, A' i m * lamC lam (embT D k.1 (b' m k.2.1 k.2.2))) :
-    ∀ i k, v' i k = ∑ j, (A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) * A⁻¹) i j * v j k := by
+    (hv' : ∀ i k, v' i k = ∑ m, A' i m * lamC lam (embT D k.1 (b' m k.2.1 k.2.2)))
+    : ∀ i k,
+      v' i k
+        = ∑ j, (A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) * A⁻¹) i j * v j k := by
   intro i k
   set Qt : Matrix (Fin r) (Fin r) ℂ_[p] := Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m)) with hQt
   set w : Fin r → ℂ_[p] := fun n => lamC lam (embT D k.1 (b n k.2.1 k.2.2)) with hw
@@ -293,8 +317,10 @@ theorem v_change {N N' r : ℕ} (b b' : Fin r → Matrix (Fin N') (Fin N) D.host
     rw [h1, h2, Matrix.mulVec_mulVec, Matrix.mul_assoc (A' * Qt), hBA, Matrix.mul_one]
   exact congrFun h3 i
 
-theorem lift_mem {n : Type*} [Fintype n] [DecidableEq n] (R' : Subring ℂ_[p]) (X : Matrix n n ℂ_[p])
-    (hX : ∀ i j, X i j ∈ R') : X.det ∈ R' ∧ ∀ i j, X.adjugate i j ∈ R' := by
+theorem lift_mem
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (R' : Subring ℂ_[p]) (X : Matrix n n ℂ_[p]) (hX : ∀ i j, X i j ∈ R')
+    : X.det ∈ R' ∧ ∀ i j, X.adjugate i j ∈ R' := by
   let Xl : Matrix n n R' := Matrix.of fun i j => ⟨X i j, hX i j⟩
   have hX' : R'.subtype.mapMatrix Xl = X := by
     ext i j
@@ -306,17 +332,22 @@ theorem lift_mem {n : Type*} [Fintype n] [DecidableEq n] (R' : Subring ℂ_[p]) 
     rw [← hX', ← RingHom.map_adjugate]
     exact (Xl.adjugate i j).2
 
-theorem entries {r : ℕ} (A A' : Matrix (Fin r) (Fin r) ℂ_[p])
-    (Q : Fin r → Fin r → D.host.E) (hQK : ∀ i j, Q i j ∈ D.host.K)
-    (hQp : ∀ i j, ∃ s : ℕ, Nat.Coprime s p ∧ ∃ c : 𝓞 D.host.K, (s : D.host.E) * Q i j = ((c : D.host.K) : D.host.E))
-    (hA : ∀ i j, IsIntP (A i j) ∧
-      A i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
-    (hA' : ∀ i j, IsIntP (A' i j) ∧
-      A' i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
-    (hdet : ‖A.det‖ = 1) :
-    ∀ i j, (A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) * A⁻¹) i j ∈
-        closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))) ∧
-      ‖(A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) * A⁻¹) i j‖ ≤ 1 := by
+theorem entries
+    {r : ℕ} (A A' : Matrix (Fin r) (Fin r) ℂ_[p]) (Q : Fin r → Fin r → D.host.E)
+    (hQK : ∀ i j, Q i j ∈ D.host.K)
+    (hQp : ∀ i j, ∃ s : ℕ,
+      Nat.Coprime s p ∧ ∃ c : 𝓞 D.host.K, (s : D.host.E) * Q i j = ((c : D.host.K) : D.host.E))
+    (hA : ∀ i j,
+      IsIntP (A i j)
+        ∧ A i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
+    (hA' : ∀ i j,
+      IsIntP (A' i j)
+        ∧ A' i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
+    (hdet : ‖A.det‖ = 1)
+    : ∀ i j,
+      (A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) * A⁻¹) i j
+          ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E)))
+        ∧ ‖(A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m))) * A⁻¹) i j‖ ≤ 1 := by
   have hp : p.Prime := Fact.out
   set S := Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E)) with hS
   let Kc : Subfield ℂ_[p] := (tauKp D lam).fieldRange.topologicalClosure
@@ -330,13 +361,18 @@ theorem entries {r : ℕ} (A A' : Matrix (Fin r) (Fin r) ℂ_[p])
   have memR : ∀ x, x ∈ R' ↔ x ∈ closure S ∧ ‖x‖ ≤ 1 := fun x => by
     rw [← hKc]
     exact Iff.rfl
-  have mulR : ∀ X Y : Matrix (Fin r) (Fin r) ℂ_[p], (∀ i j, X i j ∈ R') → (∀ i j, Y i j ∈ R') →
-      ∀ i j, (X * Y) i j ∈ R' := fun X Y hX hY i j => by
+  have mulR
+      : ∀ X Y : Matrix (Fin r) (Fin r) ℂ_[p],
+        (∀ i j, X i j ∈ R') → (∀ i j, Y i j ∈ R')
+          → ∀ i j, (X * Y) i j ∈ R' := fun X Y hX hY i j => by
     rw [Matrix.mul_apply]
     exact sum_mem fun k _ => mul_mem (hX i k) (hY k j)
   have hAR : ∀ i j, A i j ∈ R' := fun i j => (memR _).2 ⟨(hA i j).2, (hA i j).1⟩
   have hA'R : ∀ i j, A' i j ∈ R' := fun i j => (memR _).2 ⟨(hA' i j).2, (hA' i j).1⟩
-  have hQR : ∀ m n, (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m)) : Matrix (Fin r) (Fin r) ℂ_[p]) m n ∈ R' := by
+  have hQR
+      : ∀ m n,
+        (Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m)) : Matrix (Fin r) (Fin r) ℂ_[p]) m n
+          ∈ R' := by
     intro m n
     refine (memR _).2 ⟨subset_closure ⟨⟨Q n m, hQK n m⟩, rfl⟩, ?_⟩
     obtain ⟨s, hs, c, hc⟩ := hQp n m
@@ -370,25 +406,32 @@ theorem entries {r : ℕ} (A A' : Matrix (Fin r) (Fin r) ℂ_[p])
   intro i j
   exact (memR _).1 (mulR _ _ (mulR _ _ hA'R hQR) hBR i j)
 
-theorem atLogV_change {N N' r : ℕ} (Λ : AddSubgroup ℂ) (C : WeierstrassCurve.VariableChange ℂ_[p])
-    (wq : PowerSeries ℂ_[p]) (v v' : Fin r → (D.what₂.Tau × Fin N' × Fin N → ℂ_[p]))
-    (P : Matrix (Fin r) (Fin r) ℂ_[p]) (hvP : ∀ i k, v' i k = ∑ j, P i j * v j k)
+theorem atLogV_change
+    {N N' r : ℕ}
+    (Λ : AddSubgroup ℂ) (C : WeierstrassCurve.VariableChange ℂ_[p]) (wq : PowerSeries ℂ_[p])
+    (v v' : Fin r → (D.what₂.Tau × Fin N' × Fin N → ℂ_[p])) (P : Matrix (Fin r) (Fin r) ℂ_[p])
+    (hvP : ∀ i k, v' i k = ∑ j, P i j * v j k)
     (S : Fin r → MvPowerSeries (Fin r) ℂ_[p]) (hS0 : ∀ i, MvPowerSeries.constantCoeff (S i) = 0)
-    (hSl : ∀ j, PowerSeries.subst (S j) (flog (C • wModel lam Λ) wq) =
-      ∑ i, algebraMap ℂ_[p] (MvPowerSeries (Fin r) ℂ_[p]) (P i j) *
-        PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p]) (flog (C • wModel lam Λ) wq))
-    (F : MvPowerSeries (D.what₂.Tau × Fin N' × Fin N) ℂ_[p]) :
-    atLogV D lam Λ C wq v' F = MvPowerSeries.subst S (atLogV D lam Λ C wq v F) := by
+    (hSl : ∀ j,
+      PowerSeries.subst (S j) (flog (C • wModel lam Λ) wq)
+        = ∑ i, algebraMap ℂ_[p] (MvPowerSeries (Fin r) ℂ_[p]) (P i j) *
+            PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p]) (flog (C • wModel lam Λ) wq))
+    (F : MvPowerSeries (D.what₂.Tau × Fin N' × Fin N) ℂ_[p])
+    : atLogV D lam Λ C wq v' F = MvPowerSeries.subst S (atLogV D lam Λ C wq v F) := by
   have hl0 := flog_constantCoeff (C • wModel lam Λ) wq
-  have hX : ∀ i, MvPowerSeries.constantCoeff
-      (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p]) (flog (C • wModel lam Λ) wq)) = 0 :=
-    fun i => PowerSeries.constantCoeff_subst_eq_zero (MvPowerSeries.constantCoeff_X i) _ hl0
+  have hX
+      : ∀ i,
+        MvPowerSeries.constantCoeff (PowerSeries.subst
+            (MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p]) (flog (C • wModel lam Λ) wq))
+          = 0 := fun i =>
+    PowerSeries.constantCoeff_subst_eq_zero (MvPowerSeries.constantCoeff_X i) _ hl0
   have hY : MvPowerSeries.HasSubst (fun k : D.what₂.Tau × Fin N' × Fin N =>
       ∑ i, algebraMap ℂ_[p] (MvPowerSeries (Fin r) ℂ_[p]) (((C.u⁻¹ : ℂ_[p]ˣ) : ℂ_[p]) * v i k) *
-        PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p]) (flog (C • wModel lam Λ) wq)) := by
-    apply MvPowerSeries.hasSubst_of_constantCoeff_zero
-    intro k
-    set_option synthInstance.maxHeartbeats 100000 in
+        PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p]) (flog (C • wModel lam Λ) wq)) :=
+    by
+      apply MvPowerSeries.hasSubst_of_constantCoeff_zero
+      intro k
+      set_option synthInstance.maxHeartbeats 100000 in
       simp [map_sum, hX]
   have hSs : MvPowerSeries.HasSubst S := MvPowerSeries.hasSubst_of_constantCoeff_zero hS0
   unfold atLogV
@@ -405,34 +448,51 @@ theorem atLogV_change {N N' r : ℕ} (Λ : AddSubgroup ℂ) (C : WeierstrassCurv
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem locInv_core (hU : UnitSubstLoc) (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (hcc : IsCurveIdeal D cc)
-    (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (p : ℕ) [Fact p.Prime] (hp5 : 5 ≤ p) (hin : jacobiSym (-(D.host.d : ℤ)) p = -1)
-    (lam : Qbar →+* ℂ_[p]) (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ) {N N' r : ℕ}
+theorem locInv_core
+    (hU : UnitSubstLoc)
+    (D : D7) (cc : Ideal (𝓞 D.host.K))
+    (δ : ℂ)
+    (hcc : IsCurveIdeal D cc) (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ)
+    (p : ℕ) [Fact p.Prime]
+    (hp5 : 5 ≤ p) (hin : jacobiSym (-(D.host.d : ℤ)) p = -1)
+    (lam : Qbar →+* ℂ_[p]) (σ : ℂ_[p] →+* ℂ_[p]) (hσ : IsConjP D lam σ)
+    {N N' r : ℕ}
     (b b' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (A A' : Matrix (Fin r) (Fin r) ℂ_[p])
     (Q : Fin r → Fin r → D.host.E) (hQK : ∀ i j, Q i j ∈ D.host.K)
-    (hQp : ∀ i j, ∃ s : ℕ, Nat.Coprime s p ∧ ∃ c : 𝓞 D.host.K, (s : D.host.E) * Q i j = ((c : D.host.K) : D.host.E))
+    (hQp : ∀ i j, ∃ s : ℕ,
+      Nat.Coprime s p ∧ ∃ c : 𝓞 D.host.K, (s : D.host.E) * Q i j = ((c : D.host.K) : D.host.E))
     (hb' : ∀ j, b' j = ∑ i, Q i j • b i)
-    (hA : ∀ i j, IsIntP (A i j) ∧
-      A i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
-    (hA' : ∀ i j, IsIntP (A' i j) ∧
-      A' i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
+    (hA : ∀ i j,
+      IsIntP (A i j)
+        ∧ A i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
+    (hA' : ∀ i j,
+      IsIntP (A' i j)
+        ∧ A' i j ∈ closure (Set.range fun x : D.host.K => lamC lam (D.host.φ₀ (x : D.host.E))))
     (hdet : ‖A.det‖ = 1)
-    (hAu : ∀ i j, ∑ m, ∑ n, A i m * lamC lam (D.host.φ₀ ((hYY D (b m) (b n) : D.host.K) : D.host.E)) * σ (A j n) =
-      if i = j then 1 else 0)
-    (hA'u : ∀ i j, ∑ m, ∑ n, A' i m * lamC lam (D.host.φ₀ ((hYY D (b' m) (b' n) : D.host.K) : D.host.E)) * σ (A' j n) =
-      if i = j then 1 else 0)
+    (hAu : ∀ i j,
+      ∑ m, ∑ n, A i m * lamC lam (D.host.φ₀ ((hYY D (b m) (b n) : D.host.K) : D.host.E)) * σ (A j n)
+        = if i = j then 1 else 0)
+    (hA'u : ∀ i j,
+      ∑ m, ∑ n, A' i m * lamC lam (D.host.φ₀ ((hYY D (b' m) (b' n) : D.host.K) : D.host.E)) * σ (A' j n)
+        = if i = j then 1 else 0)
     (v v' : Fin r → (D.what₂.Tau × Fin N' × Fin N → ℂ_[p]))
     (hv : ∀ i k, v i k = ∑ m, A i m * lamC lam (embT D k.1 (b m k.2.1 k.2.2)))
     (hv' : ∀ i k, v' i k = ∑ m, A' i m * lamC lam (embT D k.1 (b' m k.2.1 k.2.2)))
-    (F : MvPowerSeries (D.what₂.Tau × Fin N' × Fin N) ℂ_[p]) (hI : IntLocV D (tor0 D cc δ) p lam v F) :
-    IntLocV D (tor0 D cc δ) p lam v' F := by
+    (F : MvPowerSeries (D.what₂.Tau × Fin N' × Fin N) ℂ_[p])
+    (hI : IntLocV D (tor0 D cc δ) p lam v F)
+    : IntLocV D (tor0 D cc δ) p lam v' F := by
   set G : Matrix (Fin r) (Fin r) ℂ_[p] :=
     Matrix.of fun m n => lamC lam (D.host.φ₀ ((hYY D (b m) (b n) : D.host.K) : D.host.E)) with hGd
   set Qt : Matrix (Fin r) (Fin r) ℂ_[p] := Matrix.of fun m n => lamC lam (D.host.φ₀ (Q n m)) with hQt
   have hG' := gram_change D lam σ hσ b b' Q hQK hb'
   have hAm : A * G * (A.map σ)ᵀ = 1 := unitary_mat σ A G hAu
-  have hA'm : A' * (Matrix.of fun m n => lamC lam (D.host.φ₀ ((hYY D (b' m) (b' n) : D.host.K) : D.host.E))) *
-      (A'.map σ)ᵀ = 1 := unitary_mat σ A' _ hA'u
+  have hA'm
+      : A'
+          * (Matrix.of fun m n =>
+            lamC lam (D.host.φ₀ ((hYY D (b' m) (b' n) : D.host.K) : D.host.E)))
+          * (A'.map σ)ᵀ
+        = 1 :=
+    unitary_mat σ A' _ hA'u
   rw [hG'] at hA'm
   have hdet0 : A.det ≠ 0 := by
     intro h
@@ -440,7 +500,8 @@ theorem locInv_core (hU : UnitSubstLoc) (D : D7) (cc : Ideal (𝓞 D.host.K)) (�
     exact zero_ne_one hdet
   have hPu := unitary_P σ A A' G Qt hAm hA'm hdet0
   set P : Matrix (Fin r) (Fin r) ℂ_[p] := A' * Qt * A⁻¹ with hP
-  have hvP : ∀ i k, v' i k = ∑ j, P i j * v j k := v_change D lam b b' Q hQK hb' A A' hdet0 v v' hv hv'
+  have hvP : ∀ i k, v' i k = ∑ j, P i j * v j k :=
+    v_change D lam b b' Q hQK hb' A A' hdet0 v v' hv hv'
   have hPe := entries D lam A A' Q hQK hQp hA hA' hdet
   let M : Fin r → Fin r → ℂ_[p] × ℂ_[p] := fun i j => (P j i, σ (P j i))
   have hM : ∀ i j, M i j ∈ OKp D lam := fun i j => conv D lam σ hσ _ (hPe j i).1 (hPe j i).2
@@ -450,8 +511,7 @@ theorem locInv_core (hU : UnitSubstLoc) (D : D7) (cc : Ideal (𝓞 D.host.K)) (�
     simpa [Matrix.mul_apply, Matrix.one_apply] using h
   have hMu : ∀ j j', ∑ i, M i j * (M i j').swap = if j = j' then 1 else 0 := by
     intro j j'
-    have e1 : (∑ i, M i j * (M i j').swap).1 = ∑ i, P j i * σ (P j' i) := by
-      simp [M, Prod.fst_sum]
+    have e1 : (∑ i, M i j * (M i j').swap).1 = ∑ i, P j i * σ (P j' i) := by simp [M, Prod.fst_sum]
     have e2 : (∑ i, M i j * (M i j').swap).2 = ∑ i, P j' i * σ (P j i) := by
       simp only [M, Prod.snd_sum, Prod.snd_mul, Prod.snd_swap]
       exact Finset.sum_congr rfl fun i _ => mul_comm _ _
@@ -472,7 +532,6 @@ end Lin
 
 end ThetaInverseLemmas
 
-
 open ThetaInverseLemmas in
 theorem locInv_of (hU : UnitSubstLoc) : LocInv := by
   intro D cc δ hcc hδ p _ hp5 hin lam σ hσ N N' Y r r' v v' F hv hv' hI
@@ -482,18 +541,20 @@ theorem locInv_of (hU : UnitSubstLoc) : LocInv := by
   obtain ⟨Q, hQK, hQp, hb'⟩ := IntegralOrthonormalChange.exists_coeffs D hp hbL hb'L
   obtain ⟨Q', hQK', -, hbb⟩ := IntegralOrthonormalChange.exists_coeffs D hp hb'L hbL
   have hrr : r' = r :=
-    le_antisymm (IntegralOrthonormalChange.card_le D Q hQK hb'L.1 hb') (IntegralOrthonormalChange.card_le D Q' hQK' hbL.1 hbb)
+    le_antisymm (IntegralOrthonormalChange.card_le D Q hQK hb'L.1 hb')
+      (IntegralOrthonormalChange.card_le D Q' hQK' hbL.1 hbb)
   subst hrr
-  exact locInv_core hU D cc δ hcc hδ p hp5 hin lam σ hσ b b' A A' Q hQK hQp hb' hA hA' hdet hAu hA'u v v'
-    hvA hvA' F hI
-
+  exact locInv_core hU D cc δ hcc hδ p hp5 hin lam σ hσ b b' A A' Q hQK hQp hb' hA hA' hdet hAu hA'u
+    v v' hvA hvA' F hI
 
 open ThetaInverseLemmas in
 theorem unitSubst_of_loc (hU : UnitSubstLoc) : UnitSubst := by
   intro D cc δ hcc hδ p _ hp5 hin lam C wq hC hW r A hAK hAp hAu
   have hp : p.Prime := Fact.out
-  let M : Fin r → Fin r → ℂ_[p] × ℂ_[p] := fun i j =>
-    (Formalism.MainNotions.GL3Theta.tauK D lam ⟨A i j, hAK i j⟩, Formalism.MainNotions.GL3Theta.tauKc D lam ⟨A i j, hAK i j⟩)
+  let M : Fin r → Fin r → ℂ_[p] × ℂ_[p] := fun i j => (
+    Formalism.MainNotions.GL3Theta.tauK D lam ⟨A i j, hAK i j⟩,
+    Formalism.MainNotions.GL3Theta.tauKc D lam ⟨A i j, hAK i j⟩
+  )
   have hM : ∀ i j, M i j ∈ Formalism.MainNotions.GL3Theta.OKp D lam := by
     intro i j
     obtain ⟨s, hs, c, hc⟩ := hAp i j
@@ -520,7 +581,9 @@ theorem unitSubst_of_loc (hU : UnitSubstLoc) : UnitSubst := by
         rw [h2, tauE_apply]
         exact hc2.2
       rwa [norm_mul, hs1, one_mul] at h3
-  have hE : ∀ j j', ∑ i, tauE D lam (A i j) * tauE D lam (D.host.conj (A i j')) = if j = j' then 1 else 0 := by
+  have hE
+      : ∀ j j',
+        ∑ i, tauE D lam (A i j) * tauE D lam (D.host.conj (A i j')) = if j = j' then 1 else 0 := by
     intro j j'
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [← map_mul, ← map_sum]
@@ -528,10 +591,14 @@ theorem unitSubst_of_loc (hU : UnitSubstLoc) : UnitSubst := by
     split_ifs <;> simp
   have hMu : ∀ j j', ∑ i, M i j * (M i j').swap = if j = j' then 1 else 0 := by
     intro j j'
-    have e1 : (∑ i, M i j * (M i j').swap).1 = ∑ i, tauE D lam (A i j) * tauE D lam (D.host.conj (A i j')) := by
+    have e1
+        : (∑ i, M i j * (M i j').swap).1
+          = ∑ i, tauE D lam (A i j) * tauE D lam (D.host.conj (A i j')) := by
       simp only [M, Prod.fst_sum, Prod.fst_mul, Prod.fst_swap, tauE_apply]
       rfl
-    have e2 : (∑ i, M i j * (M i j').swap).2 = ∑ i, tauE D lam (A i j') * tauE D lam (D.host.conj (A i j)) := by
+    have e2
+        : (∑ i, M i j * (M i j').swap).2
+          = ∑ i, tauE D lam (A i j') * tauE D lam (D.host.conj (A i j)) := by
       simp only [M, Prod.snd_sum, Prod.snd_mul, Prod.snd_swap, tauE_apply]
       exact Finset.sum_congr rfl fun i _ => mul_comm _ _
     refine Prod.ext ?_ ?_
@@ -542,6 +609,7 @@ theorem unitSubst_of_loc (hU : UnitSubstLoc) : UnitSubst := by
   obtain ⟨S, hS0, hSI, hSl, V, hV, hPV⟩ := hU D cc δ hcc hδ p hp5 hin lam C wq hC hW r M hM hMu
   exact ⟨S, hS0, hSI, fun i => hSl i, V, hV, hPV⟩
 
-theorem basisInv_of_loc (hU : UnitSubstLoc) : BasisInv := basisInv_of_unitSubst (unitSubst_of_loc hU)
+theorem basisInv_of_loc (hU : UnitSubstLoc) : BasisInv :=
+  basisInv_of_unitSubst (unitSubst_of_loc hU)
 
 end Formalism.L2.KerInert

@@ -15,21 +15,21 @@ namespace GlobalTheory.CompanionTheory.EisTestFun
 
 variable {k : Type} [Field k] [NumberField k]
 
-theorem infiniteModule_ofFinite (b : (FiniteAdeleRing (𝓞 k) k)ˣ) :
-    infiniteModule (ofFinite b) = 1 := by
+theorem infiniteModule_ofFinite (b : (FiniteAdeleRing (𝓞 k) k)ˣ)
+    : infiniteModule (ofFinite b) = 1 := by
   have h : ((ofFinite b : IdeleGroup k) : AdeleRing (𝓞 k) k).1 = (1 : AdeleRing (𝓞 k) k).1 := rfl
   unfold infiniteModule
   refine Finset.prod_eq_one fun w _ => ?_
   rw [h, adele_fst_one_apply, norm_one, one_pow]
 
-theorem ideleModule_ofFinite (b : (FiniteAdeleRing (𝓞 k) k)ˣ) :
-    (ideleModule k (ofFinite b) : ℝ) = finiteModule (ofFinite b) := by
+theorem ideleModule_ofFinite (b : (FiniteAdeleRing (𝓞 k) k)ˣ)
+    : (ideleModule k (ofFinite b) : ℝ) = finiteModule (ofFinite b) := by
   rw [ideleModule_apply, infiniteModule_ofFinite, one_mul]
 
-theorem line_lc_cs {g : (Unit → FiniteAdeleRing (𝓞 k) k) → ℂ}
-    (hg : g ∈ GJMatrix.finiteSchwartzBruhatPi k) :
-    IsLocallyConstant (fun t : FiniteAdeleRing (𝓞 k) k => g fun _ => t) ∧
-      HasCompactSupport (fun t : FiniteAdeleRing (𝓞 k) k => g fun _ => t) := by
+theorem line_lc_cs
+    {g : (Unit → FiniteAdeleRing (𝓞 k) k) → ℂ} (hg : g ∈ GJMatrix.finiteSchwartzBruhatPi k)
+    : IsLocallyConstant (fun t : FiniteAdeleRing (𝓞 k) k => g fun _ => t)
+      ∧ HasCompactSupport (fun t : FiniteAdeleRing (𝓞 k) k => g fun _ => t) := by
   obtain ⟨hlc, hcs⟩ := hg
   refine ⟨hlc.comp_continuous (continuous_pi fun _ => continuous_id), ?_⟩
   exact hcs.comp_homeomorph (Homeomorph.funUnique Unit (FiniteAdeleRing (𝓞 k) k)).symm
@@ -47,8 +47,7 @@ theorem zFinPos : ZFinPos := by
     obtain ⟨r, hr, hgr⟩ := hnn (b : FiniteAdeleRing (𝓞 K) K)
     simp only [G, hgr, Complex.ofReal_re]
     exact hr
-  have hGc : Continuous G :=
-    Complex.continuous_re.comp (hlc.continuous.comp Units.continuous_val)
+  have hGc : Continuous G := Complex.continuous_re.comp (hlc.continuous.comp Units.continuous_val)
   have hGB : ∀ b, ‖G b‖ ≤ B := by
     intro b
     rw [Real.norm_eq_abs]
@@ -57,15 +56,19 @@ theorem zFinPos : ZFinPos := by
     (integrable_finiteZetaBound L hx).bdd_mul hGc.aestronglyMeasurable
       (Filter.Eventually.of_forall hGB)
   have hF0 : 0 ≤ F := fun b => mul_nonneg (hG0 b) (finiteZetaBound_nonneg L x b)
-  have hzero : ∀ b : (FiniteAdeleRing (𝓞 K) K)ˣ,
-      (b : FiniteAdeleRing (𝓞 K) K) ∉ idealFiniteAdeles L →
-        (g fun _ => (b : FiniteAdeleRing (𝓞 K) K)) = 0 := by
+  have hzero
+      : ∀ b : (FiniteAdeleRing (𝓞 K) K)ˣ,
+        (b : FiniteAdeleRing (𝓞 K) K) ∉ idealFiniteAdeles L
+          → (g fun _ => (b : FiniteAdeleRing (𝓞 K) K)) = 0 := by
     intro b hb
     by_contra hne
     exact hb (hL (subset_tsupport _ hne))
-  have heq : ∀ b : (FiniteAdeleRing (𝓞 K) K)ˣ,
-      (g fun _ => (b : FiniteAdeleRing (𝓞 K) K)) * ((1 : HeckeCharacter K).toIdele (ofFinite b) : ℂ) *
-        ((ideleModule K (ofFinite b) : ℝ) : ℂ) ^ (x : ℂ) = ((F b : ℝ) : ℂ) := by
+  have heq
+      : ∀ b : (FiniteAdeleRing (𝓞 K) K)ˣ,
+        (g fun _ => (b : FiniteAdeleRing (𝓞 K) K))
+            * ((1 : HeckeCharacter K).toIdele (ofFinite b) : ℂ)
+            * ((ideleModule K (ofFinite b) : ℝ) : ℂ) ^ (x : ℂ)
+          = ((F b : ℝ) : ℂ) := by
     intro b
     have hc : ((1 : HeckeCharacter K).toIdele (ofFinite b) : ℂ) = 1 := by
       rw [HeckeCharacter.toIdele_apply]
@@ -74,8 +77,7 @@ theorem zFinPos : ZFinPos := by
     simp only [F, G, finiteZetaBound]
     split_ifs with hb
     · obtain ⟨r, hr, hgr⟩ := hnn (b : FiniteAdeleRing (𝓞 K) K)
-      rw [hgr, Complex.ofReal_re, Complex.ofReal_mul,
-        Complex.ofReal_cpow (finiteModule_pos _).le]
+      rw [hgr, Complex.ofReal_re, Complex.ofReal_mul, Complex.ofReal_cpow (finiteModule_pos _).le]
     · rw [hzero b hb]
       simp
   have hI : zFin g 1 (x : ℂ) = ((∫ b, F b ∂finiteIdeleMeasure K : ℝ) : ℂ) := by

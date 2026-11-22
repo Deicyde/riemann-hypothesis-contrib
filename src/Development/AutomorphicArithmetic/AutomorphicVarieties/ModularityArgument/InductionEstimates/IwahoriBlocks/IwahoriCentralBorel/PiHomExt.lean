@@ -7,36 +7,55 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
-private theorem pi_hom_ext {r : ℕ} {N : Fin r → Type} [∀ i, Monoid (N i)] {M : Type} [Monoid M]
-    (f g : (∀ i, N i) →* M) (h : ∀ i x, f (Pi.mulSingle i x) = g (Pi.mulSingle i x)) : f = g := by
+private theorem pi_hom_ext
+    {r : ℕ} {N : Fin r → Type} [∀ i, Monoid (N i)]
+    {M : Type} [Monoid M]
+    (f g : (∀ i, N i) →* M) (h : ∀ i x, f (Pi.mulSingle i x) = g (Pi.mulSingle i x))
+    : f = g := by
   apply (MonoidHom.noncommPiCoprodEquiv (ι := Fin r) (N := N) (M := M)).symm.injective
   apply Subtype.ext
   funext i
   exact MonoidHom.ext fun x => h i x
 
-private noncomputable def cfH {K : Type} [Field K] [NumberField K] {n : ℕ} (v : Pl K) : FA K n →* Gw n v where
+private noncomputable def cfH {K : Type} [Field K] [NumberField K] {n : ℕ} (v : Pl K)
+    : FA K n →* Gw n v where
   toFun := GM.cf v
   map_one' := by simp only [GM.cf]; rw [map_one, finAt_one]
   map_mul' a b := by simp only [GM.cf]; rw [map_mul, finAt_mul]
 
-private theorem cf_ext {K : Type} [Field K] [NumberField K] {n : ℕ} {a b : FA K n}
-    (h : ∀ v : Pl K, GM.cf v a = GM.cf v b) : a = b := by
+private theorem cf_ext
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} {a b : FA K n} (h : ∀ v : Pl K, GM.cf v a = GM.cf v b)
+    : a = b := by
   apply (AdelicGLn.finiteRestrictedEquiv K n).injective
   ext v : 1
   exact h v
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.embEx :
-    ∀ {K : Type} [Field K] [NumberField K] (n : ℕ) {r : ℕ} (w : Fin r → Pl K), Function.Injective w → (∃ ι, IsEmb (n := n) w ι) ∧ ∀ ι : GS n w →* FA K n, IsEmb w ι →
-      Continuous ι ∧ (∀ g i, GM.cf (w i) (ι g) = g i) ∧ (∀ g, ∀ v ∉ im w, GM.cf v (ι g) = 1) ∧
-      (∀ h : FA K n, ∃ g h', h = ι g * h' ∧ ∀ i, GM.cf (w i) h' = 1) ∧ (∀ g (h' : FA K n), (∀ i, GM.cf (w i) h' = 1) → Commute (ι g) h') ∧
-      ∀ (U : ∀ v : Pl K, Subgroup (Gw n v)) (h : FA K n), h ∈ levOn (im w) U ↔
-        ∃ g h', h = ι g * h' ∧ (∀ i, g i ∈ U (w i)) ∧ (∀ i, GM.cf (w i) h' = 1) ∧ ∀ v, GM.cf v h' ∈ GLnLocal.integralGL (v.adicCompletion K) n := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.embEx
+    : ∀ {K : Type} [Field K] [NumberField K] (n : ℕ) {r : ℕ} (w : Fin r → Pl K),
+      Function.Injective w
+        → (∃ ι, IsEmb (n := n) w ι)
+          ∧ ∀ ι : GS n w →* FA K n,
+            IsEmb w ι
+              → Continuous ι ∧ (∀ g i, GM.cf (w i) (ι g) = g i)
+                ∧ (∀ g, ∀ v ∉ im w, GM.cf v (ι g) = 1)
+                ∧ (∀ h : FA K n, ∃ g h', h = ι g * h' ∧ ∀ i, GM.cf (w i) h' = 1)
+                ∧ (∀ g (h' : FA K n), (∀ i, GM.cf (w i) h' = 1) → Commute (ι g) h')
+                ∧ ∀ (U : ∀ v : Pl K, Subgroup (Gw n v)) (h : FA K n),
+                  h ∈ levOn (im w) U
+                    ↔ ∃ g h',
+                      h = ι g * h' ∧ (∀ i, g i ∈ U (w i)) ∧ (∀ i, GM.cf (w i) h' = 1)
+                        ∧ ∀ v, GM.cf v h' ∈ GLnLocal.integralGL (v.adicCompletion K) n := by
   intro K _ _ n r w hw
   have L := fun v : Pl K => UpperTheory.ConvolutionTheory.Tf.locEmb K n v
   refine ⟨?_, ?_⟩
@@ -44,12 +63,14 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.embEx :
     · intro i j hij x y
       exact (L (w i)).2.2.2.1 (w j) (fun e => hij (hw e).symm) x y
     · intro i g
-      exact MonoidHom.noncommPiCoprod_mulSingle (N := fun i => Gw n (w i)) (fun i => AdelicGLn.localEmbedding (w i)) i g
+      exact MonoidHom.noncommPiCoprod_mulSingle
+        (N := fun i => Gw n (w i))
+        (fun i => AdelicGLn.localEmbedding (w i))
+        i g
   intro ι hι
-  have hmul : ∀ (v : Pl K) (a b : FA K n), GM.cf v (a * b) = GM.cf v a * GM.cf v b :=
-    fun v a b => map_mul (cfH v) a b
-  have hinv : ∀ (v : Pl K) (a : FA K n), GM.cf v a⁻¹ = (GM.cf v a)⁻¹ :=
-    fun v a => map_inv (cfH v) a
+  have hmul : ∀ (v : Pl K) (a b : FA K n), GM.cf v (a * b) = GM.cf v a * GM.cf v b := fun v a b =>
+    map_mul (cfH v) a b
+  have hinv : ∀ (v : Pl K) (a : FA K n), GM.cf v a⁻¹ = (GM.cf v a)⁻¹ := fun v a => map_inv (cfH v) a
   have hone : ∀ v : Pl K, GM.cf v (1 : FA K n) = 1 := fun v => map_one (cfH v)
   have hcf : ∀ g i, GM.cf (w i) (ι g) = g i := by
     intro g i
@@ -96,8 +117,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.embEx :
         rw [e]
         exact continuous_const
       | insert a s ha ih =>
-        have e : (fun g => ι (tr (insert a s) g)) =
-            fun g => ι (tr s g) * AdelicGLn.localEmbedding (w a) (g a) := by
+        have e
+            : (fun g => ι (tr (insert a s) g))
+              = fun g => ι (tr s g) * AdelicGLn.localEmbedding (w a) (g a) := by
           funext g
           rw [← hι a (g a), ← map_mul]
           congr 1
@@ -121,8 +143,18 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.embEx :
   · intro U h
     constructor
     · intro hh
-      have hh' : ∀ v, GM.cf v h ∈ (if v ∈ im w then U v else GLnLocal.integralGL (v.adicCompletion K) n) := hh
-      refine ⟨fun j => GM.cf (w j) h, _, (mul_inv_cancel_left _ _).symm, fun i => ?_, hsplit h, fun v => ?_⟩
+      have hh'
+          : ∀ v,
+            GM.cf v h ∈ (if v ∈ im w then U v else GLnLocal.integralGL (v.adicCompletion K) n) :=
+        hh
+      refine ⟨
+        fun j => GM.cf (w j) h,
+        _,
+        (mul_inv_cancel_left _ _).symm,
+        fun i => ?_,
+        hsplit h,
+        fun v => ?_
+      ⟩
       · have := hh' (w i)
         rwa [if_pos (Finset.mem_image_of_mem w (Finset.mem_univ i))] at this
       · by_cases hv : v ∈ im w
@@ -134,7 +166,10 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.embEx :
           rw [hmul, hinv, hoff _ v hv, inv_one, one_mul]
           exact this
     · rintro ⟨g, h', rfl, hg, h1, hint⟩
-      have hh' : ∀ v, GM.cf v (ι g * h') ∈ (if v ∈ im w then U v else GLnLocal.integralGL (v.adicCompletion K) n) := by
+      have hh'
+          : ∀ v,
+            GM.cf v (ι g * h')
+              ∈ (if v ∈ im w then U v else GLnLocal.integralGL (v.adicCompletion K) n) := by
         intro v
         rw [hmul]
         by_cases hv : v ∈ im w

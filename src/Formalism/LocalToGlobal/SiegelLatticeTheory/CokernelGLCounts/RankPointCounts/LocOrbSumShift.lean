@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.LocOrbSumPf
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups MeasureTheory
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups MeasureTheory
 open Formalism.L2.SG.LsDatumB
 open Classical
 
@@ -18,11 +19,13 @@ section ShiftPf
 
 variable {D : Formalism.BasicNotions.D7}
 
-theorem blkMod_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) :
-    ∀ a s t x y, 1 ≤ a → a - 1 ≤ x → a - 1 ≤ y → x + y + 1 = 2 * (a - 1) + s → x ≤ D.R.rS → y ≤ D.R.rS →
-      ¬ (x = D.R.rS ∧ y = D.R.rS) →
-        blkMod δ T T' p a s t = Formalism.L2.SG.Pf.rho δ p x * Formalism.L2.SG.Pf.rho δ p y * Formalism.L2.SG.Pf.kap p *
-          (D.s.atP p).ιE t := by
+theorem blkMod_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D)
+    : ∀ a s t x y,
+      1 ≤ a → a - 1 ≤ x → a - 1 ≤ y → x + y + 1 = 2 * (a - 1) + s → x ≤ D.R.rS → y ≤ D.R.rS
+        → ¬(x = D.R.rS ∧ y = D.R.rS)
+        → blkMod δ T T' p a s t
+          = Formalism.L2.SG.Pf.rho δ p x * Formalism.L2.SG.Pf.rho δ p y * Formalism.L2.SG.Pf.kap p
+            * (D.s.atP p).ιE t := by
   intro a s t x y h1 h2 h3 h4 h5 h6 h7
   rw [← Formalism.L2.SG.Pf.blkTop_eq δ T T' p a s t x y h1 h2 h3 h4 h5 h6 h7]
   unfold blkTop
@@ -30,43 +33,52 @@ theorem blkMod_eq (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) :
   rintro ⟨hs, rfl⟩
   omega
 
-theorem modMat_off (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
-    (x y : Fin (D.R.rS + 1)) (hn : ¬ (x = Fin.last D.R.rS ∧ y = Fin.last D.R.rS)) :
-    modMat δ T T' p w x y = Formalism.L2.SG.Pf.rho δ p x * Formalism.L2.SG.Pf.rho δ p y * Formalism.L2.SG.Pf.kap p *
-      (D.s.atP p).ιE (ptMat w x y) := by
-  have hn' : ¬ ((x : ℕ) = D.R.rS ∧ (y : ℕ) = D.R.rS) := fun h =>
+theorem modMat_off
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
+    (x y : Fin (D.R.rS + 1)) (hn : ¬(x = Fin.last D.R.rS ∧ y = Fin.last D.R.rS))
+    : modMat δ T T' p w x y
+      = Formalism.L2.SG.Pf.rho δ p x * Formalism.L2.SG.Pf.rho δ p y * Formalism.L2.SG.Pf.kap p
+        * (D.s.atP p).ιE (ptMat w x y) := by
+  have hn' : ¬((x : ℕ) = D.R.rS ∧ (y : ℕ) = D.R.rS) := fun h =>
     hn ⟨Fin.ext (by rw [Fin.val_last]; exact h.1), Fin.ext (by rw [Fin.val_last]; exact h.2)⟩
-  have e := Formalism.L2.SG.Pf.ptEntry_scale (D.s.atP p).ιE (blkMod δ T T' p) (Formalism.L2.SG.Pf.rho δ p)
-    (Formalism.L2.SG.Pf.kap p) D.R.rS (blkMod_eq δ T T' p) w.1 1
-    x y le_rfl (by have := x.isLt; omega) (by have := y.isLt; omega) (by simpa using hn')
+  have e :=
+    Formalism.L2.SG.Pf.ptEntry_scale (D.s.atP p).ιE (blkMod δ T T' p) (Formalism.L2.SG.Pf.rho δ p)
+      (Formalism.L2.SG.Pf.kap p) D.R.rS (blkMod_eq δ T T' p) w.1 1 x y le_rfl
+      (by have := x.isLt; omega) (by have := y.isLt; omega) (by simpa using hn')
   simp only [Nat.sub_self, zero_add] at e
   show ptEntry (mapBlocks (blkMod δ T T' p) 1 w.1) x y = _
   rw [e]
   rfl
 
-theorem modMat_last (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
-    (l0 : List (D.host.E × ℕ)) (t : D.host.E) (hb : w.1 = l0 ++ [(t, 1)]) (hs : (l0.map Prod.snd).sum = D.R.rS) :
-    modMat δ T T' p w (Fin.last _) (Fin.last _) = blkMod δ T T' p (D.R.rS + 1) 1 t := by
+theorem modMat_last
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D)
+    (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)) (t : D.host.E)
+    (hb : w.1 = l0 ++ [(t, 1)])
+    (hs : (l0.map Prod.snd).sum = D.R.rS)
+    : modMat δ T T' p w (Fin.last _) (Fin.last _) = blkMod δ T T' p (D.R.rS + 1) 1 t := by
   show ptEntry (mapBlocks (blkMod δ T T' p) 1 w.1) D.R.rS D.R.rS = _
   have hs' : ((mapBlocks (blkMod δ T T' p) 1 l0).map Prod.snd).sum = D.R.rS := by
     rw [Formalism.L2.SG.Pf.mapBlocks_snd, hs]
-  rw [hb, Formalism.L2.SG.Pf.mapBlocks_append, Formalism.L2.SG.Pf.ptEntry_append_ge _ _ _ _ hs'.le, if_pos hs'.le, hs',
-    Nat.sub_self, hs, add_comm]
+  rw [hb, Formalism.L2.SG.Pf.mapBlocks_append, Formalism.L2.SG.Pf.ptEntry_append_ge _ _ _ _ hs'.le,
+    if_pos hs'.le, hs', Nat.sub_self, hs, add_comm]
   simp [mapBlocks, ptEntry]
 
-theorem corner_zero {B : Type} [Zero B] (f : ℕ → ℕ → D.host.E → B) (w : Point D.host.E (D.R.rS + 1))
-    (l0 : List (D.host.E × ℕ)) (t : D.host.E) (s : ℕ) (hb : w.1 = l0 ++ [(t, s)])
-    (hs : (l0.map Prod.snd).sum + s = D.R.rS + 1) (h2 : 2 ≤ s) :
-    ptEntry (mapBlocks f 1 w.1) D.R.rS D.R.rS = 0 := by
+theorem corner_zero
+    {B : Type} [Zero B]
+    (f : ℕ → ℕ → D.host.E → B)
+    (w : Point D.host.E (D.R.rS + 1)) (l0 : List (D.host.E × ℕ)) (t : D.host.E) (s : ℕ)
+    (hb : w.1 = l0 ++ [(t, s)]) (hs : (l0.map Prod.snd).sum + s = D.R.rS + 1) (h2 : 2 ≤ s)
+    : ptEntry (mapBlocks f 1 w.1) D.R.rS D.R.rS = 0 := by
   have hs' : ((mapBlocks f 1 l0).map Prod.snd).sum = (l0.map Prod.snd).sum := by
     rw [Formalism.L2.SG.Pf.mapBlocks_snd]
   have hle : ((mapBlocks f 1 l0).map Prod.snd).sum ≤ D.R.rS := by rw [hs']; omega
-  rw [hb, Formalism.L2.SG.Pf.mapBlocks_append, Formalism.L2.SG.Pf.ptEntry_append_ge _ _ _ _ hle, if_pos hle, hs']
+  rw [hb, Formalism.L2.SG.Pf.mapBlocks_append, Formalism.L2.SG.Pf.ptEntry_append_ge _ _ _ _ hle,
+    if_pos hle, hs']
   simp only [mapBlocks, ptEntry]
   split_ifs <;> first | rfl | omega
 
-theorem last_big (w : Point D.host.E (D.R.rS + 1)) (h0 : Dmin w D.R.rS = 0) :
-    ∃ l0 t s, w.1 = l0 ++ [(t, s)] ∧ (l0.map Prod.snd).sum + s = D.R.rS + 1 ∧ 2 ≤ s := by
+theorem last_big (w : Point D.host.E (D.R.rS + 1)) (h0 : Dmin w D.R.rS = 0)
+    : ∃ l0 t s, w.1 = l0 ++ [(t, s)] ∧ (l0.map Prod.snd).sum + s = D.R.rS + 1 ∧ 2 ≤ s := by
   have hne : w.1 ≠ [] := by
     intro h
     have := w.2.2
@@ -88,8 +100,9 @@ theorem last_big (w : Point D.host.E (D.R.rS + 1)) (h0 : Dmin w D.R.rS = 0) :
   rw [h0, zero_mul] at this
   exact Formalism.MainNotions.BridgeLemma.Dmin_top_ne w this
 
-theorem modShift_holds (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1)) :
-    ModShift δ T T' p w := by
+theorem modShift_holds
+    (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
+    : ModShift δ T T' p w := by
   intro a ha
   ext x y
   rw [Matrix.add_apply]
@@ -106,7 +119,8 @@ theorem modShift_holds (δ : ∀ p, (D.s.atP p).Fp) (T T' : ℕ) (p : PlF D) (w 
       show Loc.ptEntryL a.blocks D.R.rS D.R.rS = ptEntry (mapBlocks (blkMod δ T T' p) 1 w.1) D.R.rS D.R.rS
       rw [Formalism.L2.SG.Pf.ptEntryL_eq, Formalism.L2.SG.Pf.modPt_blocks δ T T' p w a ha, e1, e2]
     · obtain ⟨l0, t, hb, hs⟩ := Formalism.L2.SG.Pf.last_one w h0
-      rw [Formalism.L2.SG.Pf.amat_last δ T T' p w a ha l0 t hb hs, modMat_last δ T T' p w l0 t hb hs]
+      rw [Formalism.L2.SG.Pf.amat_last δ T T' p w a ha l0 t hb hs,
+        modMat_last δ T T' p w l0 t hb hs]
       unfold cornerSh
       rw [if_neg h0, Formalism.L2.SG.Pf.zeta_snoc w h0 l0 t hb hs]
       unfold blkTop

@@ -19,8 +19,8 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.WaveMult
 
-theorem lg_le_lg_mul_add (hL : LgFacts) {n : ℕ} {x y : Mat n} (hx : x ∈ GLs n) (hy : y ∈ GLs n) :
-    lg x ≤ lg (x * y) + lg y := by
+theorem lg_le_lg_mul_add (hL : LgFacts) {n : ℕ} {x y : Mat n} (hx : x ∈ GLs n) (hy : y ∈ GLs n)
+    : lg x ≤ lg (x * y) + lg y := by
   have hdx : x.det ≠ 0 := hx
   have hdy : y.det ≠ 0 := hy
   have hxy : x * y ∈ GLs n := by
@@ -33,8 +33,11 @@ theorem lg_le_lg_mul_add (hL : LgFacts) {n : ℕ} {x y : Mat n} (hx : x ∈ GLs 
   rw [Matrix.mul_nonsing_inv_cancel_right _ _ hu, h2] at h1
   exact h1
 
-theorem wave_cpt_bounded_time : LgFacts → WaveSpeed → ∀ (n : ℕ) (E : KMod n) (u : ℝ → Mat n → E.V),
-    IsWave E u → Cpt (u 0) → ∀ T : ℝ, ∃ R : ℝ, ∀ t, |t| ≤ T → ∀ y ∈ GLs n, R < lg y → u t y = 0 := by
+theorem wave_cpt_bounded_time
+    : LgFacts → WaveSpeed
+      → ∀ (n : ℕ) (E : KMod n) (u : ℝ → Mat n → E.V),
+        IsWave E u → Cpt (u 0)
+          → ∀ T : ℝ, ∃ R : ℝ, ∀ t, |t| ≤ T → ∀ y ∈ GLs n, R < lg y → u t y = 0 := by
   intro hL hS n E u hu hc T
   obtain ⟨c, hc'⟩ := hS n
   obtain ⟨R₀, hR₀⟩ := hc
@@ -47,8 +50,9 @@ theorem wave_cpt_bounded_time : LgFacts → WaveSpeed → ∀ (n : ℕ) (E : KMo
   have h1 := lg_le_lg_mul_add hL hx hy
   have h2 : |t| ≤ |T| := ht.trans (le_abs_self T)
   have h3 : c * (1 + |t|) ≤ |c| * (1 + |T|) :=
-    calc c * (1 + |t|) ≤ |c| * (1 + |t|) :=
-          mul_le_mul_of_nonneg_right (le_abs_self c) (by positivity)
+    calc
+      c * (1 + |t|)
+        ≤ |c| * (1 + |t|) := mul_le_mul_of_nonneg_right (le_abs_self c) (by positivity)
       _ ≤ |c| * (1 + |T|) := mul_le_mul_of_nonneg_left (by linarith) (abs_nonneg c)
   linarith
 

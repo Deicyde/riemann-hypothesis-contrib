@@ -15,9 +15,12 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.ZetaValUnique
 
-theorem classZeta_eqOn {E : Type} [Field E] [NumberField E] {C : ClassGroup (GlobalTheory.CMVal.OF E)} {Z Z' : ℂ → ℂ}
-    (h : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZeta C Z) (h' : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZeta C Z') :
-    Set.EqOn Z Z' {1}ᶜ := by
+theorem classZeta_eqOn
+    {E : Type} [Field E] [NumberField E]
+    {C : ClassGroup (GlobalTheory.CMVal.OF E)} {Z Z' : ℂ → ℂ}
+    (h : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZeta C Z)
+    (h' : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZeta C Z')
+    : Set.EqOn Z Z' {1}ᶜ := by
   have ho : IsOpen ({1}ᶜ : Set ℂ) := isOpen_compl_singleton
   have hc : IsPreconnected ({1}ᶜ : Set ℂ) :=
     (isConnected_compl_singleton_of_one_lt_rank (by simp) (1 : ℂ)).isPreconnected
@@ -27,9 +30,13 @@ theorem classZeta_eqOn {E : Type} [Field E] [NumberField E] {C : ClassGroup (Glo
   filter_upwards [hh.mem_nhds (show (2 : ℂ) ∈ {s : ℂ | 1 < s.re} by simp)] with s hs
   exact (h.2 s hs).unique (h'.2 s hs)
 
-theorem classZetaVals_unique : ∀ {E : Type} [Field E] [NumberField E] {k : ℕ}, 2 ≤ k →
-    ∀ {z z' : ClassGroup (GlobalTheory.CMVal.OF E) → ℚ}, GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZetaVals k z →
-      GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZetaVals k z' → z = z' := by
+theorem classZetaVals_unique
+    : ∀ {E : Type} [Field E] [NumberField E] {k : ℕ},
+      2 ≤ k
+        → ∀ {z z' : ClassGroup (GlobalTheory.CMVal.OF E) → ℚ},
+          GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZetaVals k z
+            → GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsClassZetaVals k z'
+            → z = z' := by
   intro E _ _ k hk z z' hz hz'
   funext C
   obtain ⟨Z, hZ, hZv⟩ := hz C

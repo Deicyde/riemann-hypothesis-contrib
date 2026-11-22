@@ -8,8 +8,11 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeVe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.RootHt GroundTheory.Heights₂.Heights
 
 noncomputable section
@@ -18,21 +21,21 @@ namespace GlobalTheory.CompanionTheory.Ar.RootHt.ArchB
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X}
 
-theorem genMap_germ (W : X.Opens) (t : Γ(X, W)) (q : Cpt ξ) (hq : q.1 ∈ W) (hW : genPt ξ ∈ W) :
-    genMap ξ q (X.presheaf.germ W q.1 hq t) =
-      (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ W (genPt ξ) hW t) := by
+theorem genMap_germ (W : X.Opens) (t : Γ(X, W)) (q : Cpt ξ) (hq : q.1 ∈ W) (hW : genPt ξ ∈ W)
+    : genMap ξ q (X.presheaf.germ W q.1 hq t)
+      = (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ W (genPt ξ) hW t) := by
   exact congrArg (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ_stalkSpecializes_apply hq q.2 t)
 
-theorem regAt_near {p : Cpt ξ} {a : Ω} (h : a ∈ regAt ξ p) :
-    ∃ W : X.Opens, p.1 ∈ W ∧ ∀ q : Cpt ξ, q.1 ∈ W → a ∈ regAt ξ q := by
+theorem regAt_near {p : Cpt ξ} {a : Ω} (h : a ∈ regAt ξ p)
+    : ∃ W : X.Opens, p.1 ∈ W ∧ ∀ q : Cpt ξ, q.1 ∈ W → a ∈ regAt ξ q := by
   obtain ⟨s, rfl⟩ := h
   obtain ⟨W, hp, t, rfl⟩ := TopCat.Presheaf.exists_germ_eq X.presheaf s
   have hW : genPt ξ ∈ W := p.2.mem_open W.isOpen hp
   refine ⟨W, hp, fun q hq => ⟨X.presheaf.germ W q.1 hq t, ?_⟩⟩
   rw [genMap_germ W t q hq hW, genMap_germ W t p hp hW]
 
-theorem regAt_near_finset {p : Cpt ξ} (A : Finset Ω) (h : ∀ a ∈ A, a ∈ regAt ξ p) :
-    ∃ W : X.Opens, p.1 ∈ W ∧ ∀ q : Cpt ξ, q.1 ∈ W → ∀ a ∈ A, a ∈ regAt ξ q := by
+theorem regAt_near_finset {p : Cpt ξ} (A : Finset Ω) (h : ∀ a ∈ A, a ∈ regAt ξ p)
+    : ∃ W : X.Opens, p.1 ∈ W ∧ ∀ q : Cpt ξ, q.1 ∈ W → ∀ a ∈ A, a ∈ regAt ξ q := by
   classical
   induction A using Finset.induction_on with
   | empty => exact ⟨⊤, trivial, fun _ _ _ ha => absurd ha (Finset.notMem_empty _)⟩
@@ -44,15 +47,23 @@ theorem regAt_near_finset {p : Cpt ξ} (A : Finset Ω) (h : ∀ a ∈ A, a ∈ r
     · exact hW' q hq.2
     · exact hW q hq.1 b hb
 
-theorem lie_near (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G : Over X) [GrpObj G] [IsCommMonObj G]
-    (g : ℕ) (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li)
+theorem lie_near
+    (X : Scheme.{0})
+    (Ω : Type) [Field Ω]
+    (ξ : Sp Ω ⟶ X)
+    (G : Over X) [GrpObj G] [IsCommMonObj G]
+    (g : ℕ)
+    (Li : Type) [AddCommGroup Li] [Module Ω Li]
+    (M : LieModel G ξ Li)
     (hξ : IsCptGen ξ) (hG : SmoothOfRelativeDimension g G.hom)
     (p : Cpt ξ) (n : ℕ) (S : Fin n → Li) (Φ : Fin n → Module.Dual Ω Li)
-    (hS : ∀ j, S j ∈ M.lat p) (hΦ : ∀ j, ∀ e ∈ M.lat p, Φ j e ∈ regAt ξ p) :
-    ∃ U : X.Opens, p.1 ∈ U ∧ ∀ q : Cpt ξ, q.1 ∈ U →
-      (∀ j, S j ∈ M.lat q) ∧ ∀ j, ∀ e ∈ M.lat q, Φ j e ∈ regAt ξ q := by
+    (hS : ∀ j, S j ∈ M.lat p) (hΦ : ∀ j, ∀ e ∈ M.lat p, Φ j e ∈ regAt ξ p)
+    : ∃ U : X.Opens,
+      p.1 ∈ U
+        ∧ ∀ q : Cpt ξ, q.1 ∈ U → (∀ j, S j ∈ M.lat q) ∧ ∀ j, ∀ e ∈ M.lat q, Φ j e ∈ regAt ξ q := by
   classical
-  obtain ⟨U, hpU, b, -, hb⟩ := (GlobalTheory.T.lie_lattice_vector_bundle_of_smooth X G g Ω ξ Li M hξ hG).1 p (Set.mem_univ p)
+  obtain ⟨U, hpU, b, -, hb⟩ :=
+    (GlobalTheory.T.lie_lattice_vector_bundle_of_smooth X G g Ω ξ Li M hξ hG).1 p (Set.mem_univ p)
   have hbp := (hb p (Set.mem_univ p) hpU).2
   have hc : ∀ j, ∃ c : Fin g → regAt ξ p, ∑ s, c s • b s = S j := fun j => by
     have := hS j
@@ -61,15 +72,17 @@ theorem lie_near (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G :
   choose c hc using hc
   have hΦb : ∀ j s, Φ j (b s) ∈ regAt ξ p := fun j s =>
     hΦ j _ (by rw [hbp]; exact Submodule.subset_span ⟨s, rfl⟩)
-  obtain ⟨W, hpW, hW⟩ := regAt_near_finset (ξ := ξ) (p := p)
-    (Finset.univ.image (fun js : Fin n × Fin g => (c js.1 js.2 : Ω)) ∪
-      Finset.univ.image (fun js : Fin n × Fin g => Φ js.1 (b js.2))) (by
-      intro a ha
-      rcases Finset.mem_union.1 ha with ha | ha
-      · obtain ⟨js, -, rfl⟩ := Finset.mem_image.1 ha
-        exact (c js.1 js.2).2
-      · obtain ⟨js, -, rfl⟩ := Finset.mem_image.1 ha
-        exact hΦb js.1 js.2)
+  obtain ⟨W, hpW, hW⟩ :=
+    regAt_near_finset (ξ := ξ) (p := p)
+      (Finset.univ.image (fun js : Fin n × Fin g => (c js.1 js.2 : Ω))
+        ∪ Finset.univ.image (fun js : Fin n × Fin g => Φ js.1 (b js.2)))
+      (by
+        intro a ha
+        rcases Finset.mem_union.1 ha with ha | ha
+        · obtain ⟨js, -, rfl⟩ := Finset.mem_image.1 ha
+          exact (c js.1 js.2).2
+        · obtain ⟨js, -, rfl⟩ := Finset.mem_image.1 ha
+          exact hΦb js.1 js.2)
   refine ⟨U ⊓ W, ⟨hpU, hpW⟩, fun q hq => ?_⟩
   have hbq := (hb q (Set.mem_univ q) hq.1).2
   have hcq : ∀ j s, (c j s : Ω) ∈ regAt ξ q := fun j s =>
@@ -87,8 +100,10 @@ theorem lie_near (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G :
     | mem x hx =>
       obtain ⟨s, rfl⟩ := hx
       exact hΦq j s
-    | zero => simp
-    | add x y _ _ hx hy => simpa using add_mem hx hy
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      simpa using add_mem hx hy
     | smul r x _ hx =>
       have : Φ j (r • x) = (r : Ω) * Φ j x := by
         show Φ j ((r : Ω) • x) = _

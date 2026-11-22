@@ -8,13 +8,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FontaineAinf
 
 @[expose] public section
 
-open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv Matrix TensorProduct
+open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv
+  Matrix TensorProduct
 
 namespace GlobalTheory.DetInv
 
-theorem ker_bC_eq_range_alC_and_ker_alC_eq_range_bC : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O], v.Integers O → ∀ (ε : PreTilt O p), IsPrimitiveRoot (root ε).untilt p → ∀ (Γ : Type) [CommRing Γ] [Algebra ℤ_[p] Γ] (h : ℕ) (D : Datum ε h Γ), LinearMap.ker (bC C D) = LinearMap.range (alC C D) ∧ LinearMap.ker (alC C D) = LinearMap.range (bC C D) := by
+theorem ker_bC_eq_range_alC_and_ker_alC_eq_range_bC
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p),
+          IsPrimitiveRoot (root ε).untilt p
+            → ∀ (Γ : Type) [CommRing Γ] [Algebra ℤ_[p] Γ] (h : ℕ) (D : Datum ε h Γ),
+              LinearMap.ker (bC C D) = LinearMap.range (alC C D)
+                ∧ LinearMap.ker (alC C D) = LinearMap.range (bC C D) := by
   intro p _ C _ _ _ v O _ _ _ _ hv ε hε Γ _ _ h D
-  obtain ⟨hdom, -, hker, hsurj, hnu, hxi, -⟩ := GlobalTheory.AinfXi.ainf_local_xi_order p C v O hv ε hε
+  obtain ⟨hdom, -, hker, hsurj, hnu, hxi, -⟩ :=
+    GlobalTheory.AinfXi.ainf_local_xi_order p C v O hv ε hε
   have hFG : D.F * D.G = mu ε • (1 : Matrix (Fin h) (Fin h) (Ainf p O)) :=
     (GlobalTheory.DetInv.datum_scalar_intertwine p C v O hv ε hε Γ h D).2.1
   have hGF : D.G * D.F = mu ε • (1 : Matrix (Fin h) (Fin h) (Ainf p O)) := D.G_mul_F
@@ -40,8 +51,7 @@ theorem ker_bC_eq_range_alC_and_ker_alC_eq_range_bC : ∀ (p : ℕ) [Fact p.Prim
       obtain ⟨t, rfl⟩ := hsurj a
       refine ⟨1, t, by simp, ?_⟩
       simp [hf, ha]
-    · have hc0 : c ≠ 0 := by
-        intro h0; apply hc; simp [h0]
+    · have hc0 : c ≠ 0 := by intro h0; apply hc; simp [h0]
       have hle : v c⁻¹ ≤ 1 := by
         rw [map_inv₀]
         push_neg at hc
@@ -53,31 +63,30 @@ theorem ker_bC_eq_range_alC_and_ker_alC_eq_range_bC : ∀ (p : ℕ) [Fact p.Prim
       · simp [hf, ha, hc0]
   have hdiv : ∃ s : Ainf p O, f s ≠ 0 ∧ ∀ r : Ainf p O, f r = 0 → xi ε ∣ s * r := by
     refine ⟨1, by simp, fun r hr => ?_⟩
-    have h1 : WittVector.fontaineTheta O p r = 0 := by
-      apply hinj; simpa [hf] using hr
+    have h1 : WittVector.fontaineTheta O p r = 0 := by apply hinj; simpa [hf] using hr
     have h2 : r ∈ RingHom.ker (WittVector.fontaineTheta O p) := h1
     rw [hker, Ideal.mem_span_singleton] at h2
     simpa using h2
   have hmuxi : mu ε = xi ε * nu ε := (xi_mul_nu ε).symm
 
-  have hcomp : ∀ X Y : Matrix (Fin h) (Fin h) (Ainf p O), X * Y = mu ε • 1 →
-      ∀ z : Fin h → C, X.map f *ᵥ (Y.map f *ᵥ z) = 0 := by
+  have hcomp
+      : ∀ X Y : Matrix (Fin h) (Fin h) (Ainf p O),
+        X * Y = mu ε • 1 → ∀ z : Fin h → C, X.map f *ᵥ (Y.map f *ᵥ z) = 0 := by
     intro X Y hXY z
     rw [Matrix.mulVec_mulVec, ← Matrix.map_mul, hXY]
     have : (mu ε • (1 : Matrix (Fin h) (Fin h) (Ainf p O))).map f = 0 := by
       ext i j
       by_cases hij : i = j <;> simp [hij, Matrix.one_apply, hfmu]
     rw [this, Matrix.zero_mulVec]
-  have hb : ∀ z, bC C D z = D.G.map f *ᵥ z := fun z => by
-    simp [bC, redC, Matrix.toLin'_apply, hf]
-  have ha : ∀ z, alC C D z = D.F.map f *ᵥ z := fun z => by
-    simp [alC, redC, Matrix.toLin'_apply, hf]
+  have hb : ∀ z, bC C D z = D.G.map f *ᵥ z := fun z => by simp [bC, redC, Matrix.toLin'_apply, hf]
+  have ha : ∀ z, alC C D z = D.F.map f *ᵥ z := fun z => by simp [alC, redC, Matrix.toLin'_apply, hf]
   constructor
   · apply le_antisymm
     · intro x hx
       rw [LinearMap.mem_ker, hb] at hx
-      obtain ⟨y, hy⟩ := GlobalTheory.DetInv.ker_map_subset_im_map (Ainf p O) C f (xi ε) (nu ε) h D.G D.F
-        hnzd hfnu hfrac hdiv (by rw [hFG, hmuxi]) x hx
+      obtain ⟨y, hy⟩ :=
+        GlobalTheory.DetInv.ker_map_subset_im_map (Ainf p O) C f (xi ε) (nu ε) h D.G D.F hnzd hfnu
+          hfrac hdiv (by rw [hFG, hmuxi]) x hx
       exact ⟨y, by rw [ha, hy]⟩
     · rintro _ ⟨y, rfl⟩
       rw [LinearMap.mem_ker, hb, ha]
@@ -85,8 +94,9 @@ theorem ker_bC_eq_range_alC_and_ker_alC_eq_range_bC : ∀ (p : ℕ) [Fact p.Prim
   · apply le_antisymm
     · intro x hx
       rw [LinearMap.mem_ker, ha] at hx
-      obtain ⟨y, hy⟩ := GlobalTheory.DetInv.ker_map_subset_im_map (Ainf p O) C f (xi ε) (nu ε) h D.F D.G
-        hnzd hfnu hfrac hdiv (by rw [hGF, hmuxi]) x hx
+      obtain ⟨y, hy⟩ :=
+        GlobalTheory.DetInv.ker_map_subset_im_map (Ainf p O) C f (xi ε) (nu ε) h D.F D.G hnzd hfnu
+          hfrac hdiv (by rw [hGF, hmuxi]) x hx
       exact ⟨y, by rw [hb, hy]⟩
     · rintro _ ⟨y, rfl⟩
       rw [LinearMap.mem_ker, hb, ha]

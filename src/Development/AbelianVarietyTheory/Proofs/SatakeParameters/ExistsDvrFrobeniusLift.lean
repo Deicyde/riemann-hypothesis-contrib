@@ -13,8 +13,8 @@ namespace GlobalTheory.UnramCompletion
 
 variable {E : Type} [Field E] [NumberField E] (Q : HeightOneSpectrum (𝓞 E))
 
-theorem intValuation_eq_of_notMem_sq {a : 𝓞 E} (h1 : a ∈ Q.asIdeal) (h2 : a ∉ Q.asIdeal ^ 2) :
-    Q.intValuation a = exp (-1 : ℤ) := by
+theorem intValuation_eq_of_notMem_sq {a : 𝓞 E} (h1 : a ∈ Q.asIdeal) (h2 : a ∉ Q.asIdeal ^ 2)
+    : Q.intValuation a = exp (-1 : ℤ) := by
   have ha : a ≠ 0 := by rintro rfl; exact h2 (zero_mem _)
   have e1 := (Q.intValuation_le_pow_iff_mem a 1).2 (by simpa using h1)
   have e2 := mt (Q.intValuation_le_pow_iff_mem a 2).1 h2
@@ -25,14 +25,16 @@ theorem intValuation_eq_of_notMem_sq {a : 𝓞 E} (h1 : a ∈ Q.asIdeal) (h2 : a
   push_cast at e1 e2
   omega
 
-theorem ringHom_ext_of_continuous {f g : Q.adicCompletion E → Q.adicCompletion E}
-    (hf : Continuous f) (hg : Continuous g)
-    (h : ∀ k : E, f (algebraMap E _ k) = g (algebraMap E _ k)) : f = g :=
+theorem ringHom_ext_of_continuous
+    {f g : Q.adicCompletion E → Q.adicCompletion E} (hf : Continuous f) (hg : Continuous g)
+    (h : ∀ k : E, f (algebraMap E _ k) = g (algebraMap E _ k))
+    : f = g :=
   (denseRange_algebraMap E Q).equalizer hf hg (funext h)
 
-theorem exists_ringEquiv (c : E ≃+* E) (hc : Mem.Chr.ConjPl c Q Q) :
-    ∃ σ : Q.adicCompletion E ≃+* Q.adicCompletion E, Continuous σ ∧
-      (∀ k : E, σ (algebraMap E _ k) = algebraMap E _ (c k)) ∧ ∀ x, Valued.v (σ x) = Valued.v x := by
+theorem exists_ringEquiv (c : E ≃+* E) (hc : Mem.Chr.ConjPl c Q Q)
+    : ∃ σ : Q.adicCompletion E ≃+* Q.adicCompletion E,
+      Continuous σ ∧ (∀ k : E, σ (algebraMap E _ k) = algebraMap E _ (c k))
+        ∧ ∀ x, Valued.v (σ x) = Valued.v x := by
   obtain ⟨s, s1, s2, s3⟩ := Mem.Chr.exists_finCompl_map c hc
   obtain ⟨t, t1, t2, -⟩ := Mem.Chr.exists_finCompl_map c.symm ((Mem.Chr.conjPl_symm_iff c Q Q).2 hc)
   refine ⟨RingEquiv.ofRingHom s t ?_ ?_, s1, s2, s3⟩

@@ -12,7 +12,8 @@ open LateralTheory.E.CechLevelsPf LateralTheory.E.LevelsPf
 
 theorem quotCop : QuotCop := by
   intro A A' B _ _ _ φ χ ι l hl I hcop R _ g c hg
-  have hg' : ∀ i, ((g i).comp (Ideal.Quotient.mk (I.map φ))).comp φ = c.comp (Ideal.Quotient.mk I) := by
+  have hg'
+      : ∀ i, ((g i).comp (Ideal.Quotient.mk (I.map φ))).comp φ = c.comp (Ideal.Quotient.mk I) := by
     intro i
     rw [RingHom.comp_assoc, ← qm_comp, ← RingHom.comp_assoc, hg i]
   obtain ⟨h', ⟨h'l, h'c⟩, h'u⟩ := hcop R _ _ hg'
@@ -22,7 +23,8 @@ theorem quotCop : QuotCop := by
       rw [Ideal.map_le_iff_le_comap]
       intro a ha
       change h' (χ a) = 0
-      rw [← RingHom.comp_apply, h'c, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem.2 ha, map_zero]
+      rw [← RingHom.comp_apply, h'c, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem.2 ha,
+        map_zero]
     exact this hb
   refine ⟨Ideal.Quotient.lift _ h' hk, ⟨fun i => ?_, ?_⟩, fun h2 ⟨h2l, h2c⟩ => ?_⟩
   · apply Ideal.Quotient.ringHom_ext
@@ -37,7 +39,8 @@ theorem quotCop : QuotCop := by
     have : h2.comp (Ideal.Quotient.mk _) = h' := by
       apply h'u
       refine ⟨fun i => ?_, ?_⟩
-      · rw [RingHom.comp_assoc, ← Ideal.quotientMap_comp_mk (le_l φ χ (l i) (hl i) I), ← RingHom.comp_assoc]
+      · rw [RingHom.comp_assoc, ← Ideal.quotientMap_comp_mk (le_l φ χ (l i) (hl i) I),
+          ← RingHom.comp_assoc]
         exact congrArg (fun f => RingHom.comp f (Ideal.Quotient.mk (I.map φ))) (h2l i)
       · rw [RingHom.comp_assoc, ← qm_comp, ← RingHom.comp_assoc, h2c]
     rw [this]

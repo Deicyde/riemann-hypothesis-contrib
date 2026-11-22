@@ -28,9 +28,11 @@ def schur (P : Mat (n + 1)) : Mat n :=
 
 def step (σ : Mat n → Mat n) (P : Mat (n + 1)) : Mat (n + 1) :=
   Matrix.of fun i j =>
-    Fin.cases (motive := fun _ => ℂ)
+    Fin.cases
+      (motive := fun _ => ℂ)
       (Fin.cases (motive := fun _ => ℂ) ((Real.sqrt (P 0 0).re : ℝ) : ℂ) (fun _ => 0) j)
-      (fun i' => Fin.cases (motive := fun _ => ℂ) (col P i') (fun j' => σ (schur P) i' j') j) i
+      (fun i' => Fin.cases (motive := fun _ => ℂ) (col P i') (fun j' => σ (schur P) i' j') j)
+      i
 
 lemma step_zero_zero (σ : Mat n → Mat n) (P : Mat (n + 1)) :
     step σ P 0 0 = ((Real.sqrt (P 0 0).re : ℝ) : ℂ) := rfl
@@ -200,9 +202,9 @@ lemma contDiffOn_step {σ : Mat n → Mat n} (hσ : ContDiffOn ℝ ∞ σ {P | P
   · exact contDiffOn_col i
   · exact contDiffOn_entry (hσ.comp contDiffOn_schur fun _ hP => schur_posDef hP) i j
 
-theorem exists_smooth_section :
-    ∀ n : ℕ, ∃ σ₀ : Mat n → Mat n, ContDiffOn ℝ ∞ σ₀ {P | P.PosDef} ∧
-      ∀ P : Mat n, P.PosDef → σ₀ P * (σ₀ P)ᴴ = P := by
+theorem exists_smooth_section
+    : ∀ n : ℕ, ∃ σ₀ : Mat n → Mat n,
+      ContDiffOn ℝ ∞ σ₀ {P | P.PosDef} ∧ ∀ P : Mat n, P.PosDef → σ₀ P * (σ₀ P)ᴴ = P := by
   intro n
   induction n with
   | zero => exact ⟨id, contDiffOn_id, fun P _ => Subsingleton.elim _ _⟩

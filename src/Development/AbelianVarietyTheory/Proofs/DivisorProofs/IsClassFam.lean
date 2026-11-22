@@ -17,9 +17,11 @@ namespace GlobalTheory.ColumnNormCompare
 open NumberField IsDedekindDomain
 open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker
 open GlobalTheory.IndefiniteRowSideFullHecke
-open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields recPrimes recWts recSeam recGlob Twist)
+open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound
+  (recFields recPrimes recWts recSeam recGlob Twist)
 
-@[reducible] def numDatumOfParameters (D : D7) (large₂ : SizeData₂ D) : NumDatum where
+@[reducible]
+def numDatumOfParameters (D : D7) (large₂ : SizeData₂ D) : NumDatum where
   R := D.R
   sc := large₂.sc
   H := D.host.toHostAx
@@ -32,11 +34,15 @@ open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields rec
 
 def plRec (D : D7) : RPl D.R ≃ D.what₂.Tau := GlobalTheory.InertCompare.plEquiv D
 
-def codeRec {D : D7} (large₂ : SizeData₂ D) (u : D.what₂.Word) : Code (numDatumOfParameters D large₂) := D.s.letter u
+def codeRec {D : D7} (large₂ : SizeData₂ D) (u : D.what₂.Word)
+    : Code (numDatumOfParameters D large₂) :=
+  D.s.letter u
 
 section Rec
 
-variable {D : D7} (large₂ : SizeData₂ D) {EX : ErrX D} (Ch : Chars (recFields D) (recPrimes EX) D.R.m)
+variable
+  {D : D7} (large₂ : SizeData₂ D)
+  {EX : ErrX D} (Ch : Chars (recFields D) (recPrimes EX) D.R.m)
   (mu0 : Fin D.R.m → Formalism.L2.Host.HChar D.host.E) (eta : Formalism.L2.Host.HChar D.host.E)
   (sel : HeightOneSpectrum (𝓞 D.host.F) → HeightOneSpectrum (𝓞 D.host.E))
 

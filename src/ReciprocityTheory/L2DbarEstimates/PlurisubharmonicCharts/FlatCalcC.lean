@@ -14,18 +14,24 @@ noncomputable section
 
 universe u
 
-theorem fc_det_real (n : ℕ) (J : V n →L[ℂ] V n) :
-    |(J.restrictScalars ℝ).det| = ‖J.det‖ ^ 2 := by
+theorem fc_det_real (n : ℕ) (J : V n →L[ℂ] V n) : |(J.restrictScalars ℝ).det| = ‖J.det‖ ^ 2 := by
   have h : (J.restrictScalars ℝ).det = Complex.normSq J.det := by
     show LinearMap.det ((J : V n →ₗ[ℂ] V n).restrictScalars ℝ) = _
     rw [LinearMap.det_restrictScalars, Algebra.norm_complex_apply]
   rw [h, abs_of_nonneg (Complex.normSq_nonneg _), Complex.normSq_eq_norm_sq]
 
-theorem fc_rho_eq {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) {y : Y}
-    (hy : y ∈ A.Mset w0 s De) (i : ι) (hi : y ∈ (A.chart i).source) :
-    Real.exp (A.ph A.kap (A.pick y) y) /
-        ‖(fderiv ℂ (A.zLoc w0 s (A.pick y)) (A.chart (A.pick y) y)).det‖ ^ 2 =
-      Real.exp (A.ph A.kap i y) / ‖(fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det‖ ^ 2 := by
+theorem fc_rho_eq
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
+    {y : Y} (hy : y ∈ A.Mset w0 s De)
+    (i : ι) (hi : y ∈ (A.chart i).source)
+    : Real.exp (A.ph A.kap (A.pick y) y)
+        / ‖(fderiv ℂ (A.zLoc w0 s (A.pick y)) (A.chart (A.pick y) y)).det‖ ^ 2
+      = Real.exp (A.ph A.kap i y) / ‖(fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det‖ ^ 2 := by
   have hp := A.mem_pick y
   have hg : 0 < ‖A.g A.kap (A.pick y) i y‖ ^ 2 :=
     pow_pos (norm_pos_iff.mpr (A.g_ne A.kap (A.pick y) i y hp hi)) 2
@@ -33,15 +39,24 @@ theorem fc_rho_eq {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [Secon
     Real.exp_log hg, norm_mul, mul_pow]
   ring
 
-theorem fc_rho_continuous {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)
-    (hF : A.Flat w0 s De) : Continuous (fun x : A.Mset w0 s De => Real.exp (A.ph A.kap (A.pick x) x) / ‖(fderiv ℂ (A.zLoc w0 s (A.pick x)) (A.chart (A.pick x) x)).det‖ ^ 2) := by
+theorem fc_rho_continuous
+    {n : ℕ} {Y : Type u}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι : Type*} {La : Type*} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ}
+    {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s) (hF : A.Flat w0 s De)
+    : Continuous (fun x : A.Mset w0 s De =>
+      Real.exp (A.ph A.kap (A.pick x) x)
+        / ‖(fderiv ℂ (A.zLoc w0 s (A.pick x)) (A.chart (A.pick x) x)).det‖ ^ 2) := by
   rw [continuous_iff_continuousAt]
   intro x0
   have hi0 : (x0 : Y) ∈ (A.chart (A.pick x0)).source := A.mem_pick _
-  have hev : (fun x : A.Mset w0 s De => Real.exp (A.ph A.kap (A.pick x) x) /
-      ‖(fderiv ℂ (A.zLoc w0 s (A.pick x)) (A.chart (A.pick x) x)).det‖ ^ 2) =ᶠ[𝓝 x0]
-      fun x : A.Mset w0 s De => Real.exp (A.ph A.kap (A.pick x0) x) /
-        ‖(fderiv ℂ (A.zLoc w0 s (A.pick x0)) (A.chart (A.pick x0) x)).det‖ ^ 2 := by
+  have hev
+      : (fun x : A.Mset w0 s De => Real.exp (A.ph A.kap (A.pick x) x) /
+        ‖(fderiv ℂ (A.zLoc w0 s (A.pick x)) (A.chart (A.pick x) x)).det‖ ^ 2) =ᶠ[𝓝 x0]
+        fun x : A.Mset w0 s De => Real.exp (A.ph A.kap (A.pick x0) x) /
+          ‖(fderiv ℂ (A.zLoc w0 s (A.pick x0)) (A.chart (A.pick x0) x)).det‖ ^ 2 := by
     have hU : ∀ᶠ x : A.Mset w0 s De in 𝓝 x0, (x : Y) ∈ (A.chart (A.pick x0)).source :=
       continuous_subtype_val.continuousAt.preimage_mem_nhds
         ((A.chart (A.pick x0)).open_source.mem_nhds hi0)
@@ -63,13 +78,14 @@ theorem fc_rho_continuous {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y
     have h1 : ContinuousAt (fderiv ℂ (A.zLoc w0 s i)) (A.chart i x0) :=
       ((fc_zLoc_contDiffOn A hD i).continuousOn_fderiv_of_isOpen hO (by simp)).continuousAt
         (hO.mem_nhds hmO)
-    exact ContinuousLinearMap.continuous_det.continuousAt.comp
-      (h1.comp_of_eq ((A.chart i).continuousAt hi0) rfl)
+    exact ContinuousLinearMap.continuous_det.continuousAt.comp (h1.comp_of_eq
+      ((A.chart i).continuousAt hi0) rfl)
   have hne := fc_jz_det_ne A hD hF x0.2 i hi0
-  have hFc : ContinuousAt (fun y => Real.exp (A.ph A.kap i y) /
-      ‖(fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det‖ ^ 2) (x0 : Y) :=
-    (Real.continuous_exp.continuousAt.comp hph).div ((continuous_norm.continuousAt.comp hdetc).pow 2)
-      (pow_ne_zero 2 (norm_ne_zero_iff.mpr hne))
+  have hFc : ContinuousAt
+      (fun y => Real.exp (A.ph A.kap i y) / ‖(fderiv ℂ (A.zLoc w0 s i) (A.chart i y)).det‖ ^ 2)
+      (x0 : Y) :=
+    (Real.continuous_exp.continuousAt.comp hph).div
+      ((continuous_norm.continuousAt.comp hdetc).pow 2) (pow_ne_zero 2 (norm_ne_zero_iff.mpr hne))
   exact hFc.comp continuous_subtype_val.continuousAt
 
 theorem fc_mu_piece {n : ℕ} {Y : Type u} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La] (A : WeightedAtlas n Y ι La) {L : La} {N : ℕ} {w : Fin N → ι → Y → ℂ} {w0 : ι → Y → ℂ} {s : Fin n → ι → Y → ℂ} {De : MvPolynomial (Fin n) ℂ} (hD : A.D0 L w w0 s)

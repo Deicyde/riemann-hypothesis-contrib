@@ -11,12 +11,15 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3.OrthogonalBases
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem sup_eq_top_of_mem_hcompl (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) {u : 𝓞 K} (hu : u ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P) :
-    Ideal.span {u} ⊔ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = ⊤ := by
+theorem sup_eq_top_of_mem_hcompl
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    {u : 𝓞 K} (hu : u ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P)
+    : Ideal.span {u} ⊔ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = ⊤ := by
   by_contra hne
   obtain ⟨Q, hQ, hle⟩ := Ideal.exists_le_maximal _ hne
   have hu' := (Formalism.HermitianLattices.Ext.L3.WA.mem_hcompl_iff hP.isPrime u).1 hu
@@ -33,18 +36,22 @@ theorem sup_eq_top_of_mem_hcompl (hK : Formalism.HermitianLatticesTheory.IsCMUnr
   · exact hu'.1 (h ▸ huQ)
   · exact hu'.2 (h ▸ huQ)
 
-private theorem isUnitIn_mul' {S : Subring K} {a b : K} (ha : Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn S a)
-    (hb : Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn S b) : Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn S (a * b) :=
+private theorem isUnitIn_mul'
+    {S : Subring K} {a b : K} (ha : Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn S a)
+    (hb : Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn S b)
+    : Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn S (a * b) :=
   ⟨mul_ne_zero ha.1 hb.1, S.mul_mem ha.2.1 hb.2.1, by rw [mul_inv]; exact S.mul_mem ha.2.2 hb.2.2⟩
 
-theorem exists_orth_basis (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) (hv : vd h L 𝔭 = 0) :
-    ∃ (b : Basis (Fin (finrank K V)) K V) (u : Fin (finrank K V) → 𝓞 K), (∀ i, b i ∈ L) ∧
-      locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) = locF 𝔭 L ∧
-      (∀ i j, algebraMap (𝓞 K) K (diagonal u i j) = h (b i) (b j)) ∧
-      (∀ i, conjO K (u i) = u i) ∧ ∀ i, Ideal.span {u i} ⊔ extP K 𝔭 = ⊤ := by
+theorem exists_orth_basis
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (hv : vd h L 𝔭 = 0)
+    : ∃ (b : Basis (Fin (finrank K V)) K V) (u : Fin (finrank K V) → 𝓞 K),
+      (∀ i, b i ∈ L) ∧ locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) = locF 𝔭 L
+        ∧ (∀ i j, algebraMap (𝓞 K) K (diagonal u i j) = h (b i) (b j)) ∧ (∀ i, conjO K (u i) = u i)
+        ∧ ∀ i, Ideal.span {u i} ⊔ extP K 𝔭 = ⊤ := by
   obtain ⟨P, hP, rfl⟩ := exists_maximal_over hK hF h𝔭
   have hU : Formalism.HermitianLatticesTheory.IsUnimodularAt h P L :=
     (isUnimodularAt_iff_vd hK hF hs hd hL hLi hP).2 hv
@@ -55,28 +62,41 @@ theorem exists_orth_basis (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
     have := hd x hx0 (Classical.arbitrary (NumberField.InfinitePlace K)).embedding
     rw [hx, map_zero, Complex.zero_re] at this
     exact lt_irrefl 0 this
-  have hS : WA.IsHermSemilocal (WA.locRing P) :=
-    ⟨fun _ ha => WA.star_mem_locRing hP.isPrime ha, WA.frac_locRing P, WA.unram_locRing hK hP,
-      WA.principal_locRing hK hP, WA.unit_or_locRing hP.isPrime⟩
-  obtain ⟨x, hxM, hxo, hxu⟩ := Formalism.HermitianLattices.Ext.L3.LocF.exists_orth_unit_frame hS
-    (Formalism.HermitianLattices.Ext.L3.LocF.locRing_local hP.isPrime) hs hdd hSD
-  have hx' : ∀ i, ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, s • x i ∈ L := fun i => hxM i
+  have hS : WA.IsHermSemilocal (WA.locRing P) := ⟨
+    fun _ ha => WA.star_mem_locRing hP.isPrime ha,
+    WA.frac_locRing P,
+    WA.unram_locRing hK hP,
+    WA.principal_locRing hK hP,
+    WA.unit_or_locRing hP.isPrime
+  ⟩
+  obtain ⟨x, hxM, hxo, hxu⟩ :=
+    Formalism.HermitianLattices.Ext.L3.LocF.exists_orth_unit_frame hS
+      (Formalism.HermitianLattices.Ext.L3.LocF.locRing_local hP.isPrime) hs hdd hSD
+  have hx' : ∀ i, ∃ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, s • x i ∈ L := fun i =>
+    hxM i
   choose s hsP hsL using hx'
   set b0 : Fin (finrank K V) → V := fun i => algebraMap (𝓞 K) K (s i) • x i with hb0
   have hb0L : ∀ i, b0 i ∈ L := by
     intro i
     simp only [hb0, algebraMap_smul]
     exact hsL i
-  have hbb : ∀ i j, h (b0 i) (b0 j) =
-      star (algebraMap (𝓞 K) K (s i)) * algebraMap (𝓞 K) K (s j) * h (x i) (x j) := by
+  have hbb
+      : ∀ i j,
+        h (b0 i) (b0 j)
+          = star (algebraMap (𝓞 K) K (s i)) * algebraMap (𝓞 K) K (s j) * h (x i) (x j) := by
     intro i j
     simp only [hb0, LinearMap.map_smulₛₗ₂, map_smul, smul_eq_mul, starRingEnd_apply]
     ring
-  have hunit : ∀ i, Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn (Formalism.HermitianLattices.Ext.L3.WA.locRing P) (h (b0 i) (b0 i)) := by
+  have hunit
+      : ∀ i,
+        Formalism.HermitianLattices.Ext.L3.WA.IsUnitIn
+          (Formalism.HermitianLattices.Ext.L3.WA.locRing P) (h (b0 i) (b0 i)) := by
     intro i
-    have hσ := (Formalism.HermitianLattices.Ext.L3.LocF.isUnitIn_algebraMap_iff hP.isPrime (s i)).2 (hsP i)
-    have hσs := (Formalism.HermitianLattices.Ext.L3.LocF.isUnitIn_algebraMap_iff hP.isPrime (conjO K (s i))).2
-      (Formalism.HermitianLattices.Ext.L3.WA.conjO_mem_hcompl (hsP i))
+    have hσ :=
+      (Formalism.HermitianLattices.Ext.L3.LocF.isUnitIn_algebraMap_iff hP.isPrime (s i)).2 (hsP i)
+    have hσs :=
+      (Formalism.HermitianLattices.Ext.L3.LocF.isUnitIn_algebraMap_iff hP.isPrime (conjO K (s i))).2
+        (Formalism.HermitianLattices.Ext.L3.WA.conjO_mem_hcompl (hsP i))
     rw [hbb]
     exact isUnitIn_mul' (isUnitIn_mul' hσs hσ) (hxu i)
   have horth : ∀ i j, i ≠ j → h (b0 i) (b0 j) = 0 := by
@@ -114,7 +134,9 @@ theorem exists_orth_basis (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
     · rintro y ⟨t, ht, hy⟩
       exact ⟨t, ht, (Submodule.span_le.2 (by rintro _ ⟨i, rfl⟩; exact hb0L i)) hy⟩
     · rintro y ⟨t, ht, hy⟩
-      have hz : t • y ∈ Formalism.HermitianLatticesTheory.loc (K := K) P (Submodule.span (𝓞 K) (Set.range b0)) := by
+      have hz
+          : t • y ∈ Formalism.HermitianLatticesTheory.loc (K := K) P
+            (Submodule.span (𝓞 K) (Set.range b0)) := by
         rw [← b.sum_repr (t • y)]
         refine Submodule.sum_mem _ fun i _ => ?_
         refine ⟨u i, huP i, ?_⟩
@@ -129,7 +151,8 @@ theorem exists_orth_basis (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
           · intro hi
             exact absurd (Finset.mem_univ i) hi
         have key : u i • (b.repr (t • y) i • b i) = a • b0 i := by
-          rw [← algebraMap_smul K (u i), smul_smul, hu i, mul_comm, ← hrep, ← ha, algebraMap_smul, hb]
+          rw [← algebraMap_smul K (u i), smul_smul, hu i, mul_comm, ← hrep, ← ha, algebraMap_smul,
+            hb]
         rw [key]
         exact Submodule.smul_mem _ a (Submodule.subset_span ⟨i, rfl⟩)
       obtain ⟨t', ht', hy'⟩ := hz

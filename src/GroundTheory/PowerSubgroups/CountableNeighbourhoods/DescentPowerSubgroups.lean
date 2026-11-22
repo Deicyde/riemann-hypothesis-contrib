@@ -6,9 +6,13 @@ public import Mathlib
 
 namespace GroundTheory.Variant₂.N1
 
-theorem exists_pow_apply_eq_self_of_aeval_eq_zero {K : Type*} [Field K] {Ω : Type*} [Field Ω]
-    [Algebra K Ω] (σ : Gal(Ω/K)) {p : Polynomial K} (hp : p ≠ 0) {x : Ω}
-    (hx : Polynomial.aeval x p = 0) : ∃ N : ℕ, 0 < N ∧ (σ ^ N) x = x := by
+theorem exists_pow_apply_eq_self_of_aeval_eq_zero
+    {K : Type*} [Field K]
+    {Ω : Type*} [Field Ω] [Algebra K Ω]
+    (σ : Gal(Ω/K))
+    {p : Polynomial K} (hp : p ≠ 0)
+    {x : Ω} (hx : Polynomial.aeval x p = 0)
+    : ∃ N : ℕ, 0 < N ∧ (σ ^ N) x = x := by
   have hmem : ∀ n : ℕ, (σ ^ n) x ∈ p.rootSet Ω := fun n => by
     rw [Polynomial.mem_rootSet_of_ne hp, Polynomial.aeval_algHom_apply, hx, map_zero]
   have : Finite (p.rootSet Ω) := (Polynomial.rootSet_finite p Ω).to_subtype

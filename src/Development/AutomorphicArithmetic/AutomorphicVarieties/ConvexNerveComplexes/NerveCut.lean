@@ -6,8 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.nerve_cut :
-    ∀ {I F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (X : Set F) (A : I → Set F) (f : F →L[ℝ] ℝ) (u : ℝ), Convex ℝ X → (∀ i, Convex ℝ (A i)) → (nerve X A = fun n => nerve (X ∩ {x | f x ≤ u}) A n ∪ nerve (X ∩ {x | u ≤ f x}) A n) ∧ (nerve (X ∩ {x | f x = u}) A = fun n => nerve (X ∩ {x | f x ≤ u}) A n ∩ nerve (X ∩ {x | u ≤ f x}) A n) := by
+theorem UpperTheory.V.ConeExtensionAcyclic.nerve_cut
+    : ∀ {I F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (X : Set F) (A : I → Set F)
+        (f : F →L[ℝ] ℝ) (u : ℝ),
+      Convex ℝ X → (∀ i, Convex ℝ (A i))
+        → (nerve X A = fun n => nerve (X ∩ {x | f x ≤ u}) A n ∪ nerve (X ∩ {x | u ≤ f x}) A n)
+          ∧ (nerve (X ∩ {x | f x = u}) A
+            = fun n => nerve (X ∩ {x | f x ≤ u}) A n ∩ nerve (X ∩ {x | u ≤ f x}) A n) := by
   intro I F _ _ X A f u hX hA
   constructor
   · funext n
@@ -34,8 +39,11 @@ theorem UpperTheory.V.ConeExtensionAcyclic.nerve_cut :
         have hab : (f y - u) / (f y - f x) + (u - f x) / (f y - f x) = 1 := by
           rw [← add_div, div_eq_one_iff_eq hne]
           ring
-        refine ⟨((f y - u) / (f y - f x)) • x + ((u - f x) / (f y - f x)) • y,
-          ⟨hX hx hy ha0 hb0 hab, ?_⟩, fun j => hA _ (ht j) (ht' j) ha0 hb0 hab⟩
+        refine ⟨
+          ((f y - u) / (f y - f x)) • x + ((u - f x) / (f y - f x)) • y,
+          ⟨hX hx hy ha0 hb0 hab, ?_⟩,
+          fun j => hA _ (ht j) (ht' j) ha0 hb0 hab
+        ⟩
         rw [map_add (f := _), map_smul, map_smul, smul_eq_mul, smul_eq_mul]
         field_simp
         ring

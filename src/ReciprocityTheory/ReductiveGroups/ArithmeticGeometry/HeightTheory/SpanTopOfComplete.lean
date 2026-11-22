@@ -6,11 +6,12 @@ public import Mathlib
 
 namespace ReciprocityTheory.ChartRestriction.G.T0.SpanTopOfComplete
 
-theorem span_eq_top_of_complete {O N : Type*} [CommRing O] [AddCommGroup N] [Module O N] (ϖ : O)
-    [IsPrecomplete (Ideal.span {ϖ}) O]
-    (hsep : ∀ x : N, (∀ k : ℕ, ∃ y : N, x = ϖ ^ k • y) → x = 0) {n : ℕ} (S : Fin n → N)
-    (hS : ∀ x : N, ∃ c : Fin n → O, ∃ y : N, x = ∑ i, c i • S i + ϖ • y) :
-    Submodule.span O (Set.range S) = ⊤ := by
+theorem span_eq_top_of_complete
+    {O N : Type*} [CommRing O] [AddCommGroup N] [Module O N]
+    (ϖ : O) [IsPrecomplete (Ideal.span {ϖ}) O]
+    (hsep : ∀ x : N, (∀ k : ℕ, ∃ y : N, x = ϖ ^ k • y) → x = 0)
+    {n : ℕ} (S : Fin n → N) (hS : ∀ x : N, ∃ c : Fin n → O, ∃ y : N, x = ∑ i, c i • S i + ϖ • y)
+    : Submodule.span O (Set.range S) = ⊤ := by
   classical
   choose c y hcy using hS
   rw [eq_top_iff]
@@ -24,12 +25,13 @@ theorem span_eq_top_of_complete {O N : Type*} [CommRing O] [AddCommGroup N] [Mod
     | zero => simp [a, xs]
     | succ k ih =>
       have hk := hcy (xs k)
-      calc x = ∑ i, a k i • S i + ϖ ^ k • xs k := ih
+      calc
+        x = ∑ i, a k i • S i + ϖ ^ k • xs k := ih
         _ = ∑ i, a k i • S i + ϖ ^ k • (∑ i, c (xs k) i • S i + ϖ • y (xs k)) := by rw [← hk]
         _ = ∑ i, a (k + 1) i • S i + ϖ ^ (k + 1) • xs (k + 1) := by
           rw [hxs]
-          simp only [a, Finset.sum_range_succ, add_smul, Finset.sum_add_distrib, smul_add, Finset.smul_sum,
-            smul_smul, pow_succ]
+          simp only [a, Finset.sum_range_succ, add_smul, Finset.sum_add_distrib, smul_add,
+            Finset.smul_sum, smul_smul, pow_succ]
           abel
 
   have hmem : ∀ m k, m ≤ k → ∀ i, a k i - a m i ∈ Ideal.span {ϖ ^ m} := by
@@ -47,18 +49,21 @@ theorem span_eq_top_of_complete {O N : Type*} [CommRing O] [AddCommGroup N] [Mod
     rw [Ideal.span_singleton_pow, Ideal.smul_eq_mul, Ideal.mul_top]
   have hlim : ∀ i, ∃ L : O, ∀ k, a k i - L ∈ Ideal.span {ϖ ^ k} := by
     intro i
-    obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := Ideal.span {ϖ}) (fun k => a k i) (fun {m k} hmk => by
-      rw [SModEq.sub_mem, hpow]
-      have := hmem m k hmk i
-      rw [← neg_sub]
-      exact (Ideal.neg_mem_iff _).2 this)
+    obtain ⟨L, hL⟩ :=
+      IsPrecomplete.prec' (I := Ideal.span {ϖ})
+        (fun k => a k i)
+        (fun {m k} hmk => by
+          rw [SModEq.sub_mem, hpow]
+          have := hmem m k hmk i
+          rw [← neg_sub]
+          exact (Ideal.neg_mem_iff _).2 this)
     exact ⟨L, fun k => by have := hL k; rwa [SModEq.sub_mem, hpow] at this⟩
   choose L hL using hlim
   have hx : x = ∑ i, L i • S i := by
     rw [← sub_eq_zero]
     refine hsep _ fun k => ?_
-    have ht : ∀ i, ∃ t : O, a k i - L i = ϖ ^ k * t := fun i => Ideal.mem_span_singleton'.1 (hL i k) |>.imp
-      fun t ht => by rw [← ht, mul_comm]
+    have ht : ∀ i, ∃ t : O, a k i - L i = ϖ ^ k * t := fun i =>
+      Ideal.mem_span_singleton'.1 (hL i k) |>.imp fun t ht => by rw [← ht, mul_comm]
     choose t ht using ht
     refine ⟨∑ i, t i • S i + xs k, ?_⟩
     conv_lhs => rw [hxa k]

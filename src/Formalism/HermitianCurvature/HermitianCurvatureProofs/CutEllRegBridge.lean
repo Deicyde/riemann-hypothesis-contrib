@@ -16,7 +16,8 @@ section bridge
 
 variable {d : ℕ}
 
-noncomputable abbrev brT (d : ℕ) : ZetaZeros.D.EllReg.E d ≃L[ℝ] (Fin d → ℝ) := EuclideanSpace.equiv (Fin d) ℝ
+noncomputable abbrev brT (d : ℕ) : ZetaZeros.D.EllReg.E d ≃L[ℝ] (Fin d → ℝ) :=
+  EuclideanSpace.equiv (Fin d) ℝ
 
 lemma brT_ev (j : Fin d) : brT d (ZetaZeros.D.EllReg.ev j) = Pi.single j 1 := by
   unfold ZetaZeros.D.EllReg.ev
@@ -65,11 +66,18 @@ end bridge
 theorem elliptic_regularity_transfer_holds : EllRegBridge := by
   intro hI d ι _ P U u hU ha hu hweak hsymb
   have hHyp : ZetaZeros.D.EllReg.Hyp (brSys P) (brT d ⁻¹' U) (u ∘ brT d) := by
-    refine ⟨hU.preimage (brT d).continuous, ?_, ?_, hu.comp (brT d).continuous.continuousOn (fun x hx => hx), ?_⟩
+    refine ⟨
+      hU.preimage (brT d).continuous,
+      ?_,
+      ?_,
+      hu.comp (brT d).continuous.continuousOn (fun x hx => hx),
+      ?_
+    ⟩
     · intro i n w
       simp only [brSys]
       split_ifs with h
-      · exact (ha i ⟨n, h⟩ w).comp_continuousLinearMap ((brT d : ZetaZeros.D.EllReg.E d →L[ℝ] (Fin d → ℝ)))
+      · exact (ha i ⟨n, h⟩ w).comp_continuousLinearMap
+          ((brT d : ZetaZeros.D.EllReg.E d →L[ℝ] (Fin d → ℝ)))
       · exact contDiffOn_const
     · intro x hx ξ hξ
       have hξ' : brT d ξ ≠ 0 := fun h => hξ ((brT d).injective (h.trans (map_zero (brT d)).symm))
@@ -77,7 +85,8 @@ theorem elliptic_regularity_transfer_holds : EllRegBridge := by
       exact ⟨i, by rw [brSys_symb]; exact hi⟩
     · intro i φ hφ hφc hφU
       have hψ : ContDiff ℝ ∞ (φ ∘ (brT d).symm) := hφ.comp (brT d).symm.contDiff
-      have hψc : HasCompactSupport (φ ∘ (brT d).symm) := hφc.comp_homeomorph (brT d).symm.toHomeomorph
+      have hψc : HasCompactSupport (φ ∘ (brT d).symm) :=
+        hφc.comp_homeomorph (brT d).symm.toHomeomorph
       have hψU : tsupport (φ ∘ (brT d).symm) ⊆ U := by
         intro y hy
         have hy' : y ∈ tsupport (φ ∘ (brT d).symm.toHomeomorph) := hy
@@ -96,7 +105,8 @@ theorem elliptic_regularity_transfer_holds : EllRegBridge := by
         (MeasurableEquiv.toLp 2 (Fin d → ℝ)).symm.measurableEmbedding
         (fun y => u y * (P i).tr (φ ∘ (brT d).symm) y)
   have key := hI d ι (brSys P) (brT d ⁻¹' U) (u ∘ brT d) hHyp
-  have h2 := key.comp_continuousLinearMap (((brT d).symm : (Fin d → ℝ) →L[ℝ] ZetaZeros.D.EllReg.E d))
+  have h2 :=
+    key.comp_continuousLinearMap (((brT d).symm : (Fin d → ℝ) →L[ℝ] ZetaZeros.D.EllReg.E d))
   have e1 : (u ∘ brT d) ∘ (((brT d).symm : (Fin d → ℝ) →L[ℝ] ZetaZeros.D.EllReg.E d)) = u := by
     funext x
     show u (brT d ((brT d).symm x)) = u x

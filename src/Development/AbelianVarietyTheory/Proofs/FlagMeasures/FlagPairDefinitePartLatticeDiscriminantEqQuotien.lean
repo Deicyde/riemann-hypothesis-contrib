@@ -16,42 +16,52 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.DegCnt.PrimPerp
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-
 omit [StarRing K] [FiniteDimensional K V] in
-theorem equiv_of_gen {D M : Submodule (𝓞 K) V} {w : V} (hw : w ∈ D) (J : Ideal (𝓞 K))
-    (h1 : ∀ a : 𝓞 K, a • w ∈ M ↔ a ∈ J) (h2 : ∀ y ∈ D, ∃ a : 𝓞 K, y - a • w ∈ M) :
-    Nonempty ((↥D ⧸ M.comap D.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ J)) := by
+theorem equiv_of_gen
+    {D M : Submodule (𝓞 K) V} {w : V} (hw : w ∈ D)
+    (J : Ideal (𝓞 K)) (h1 : ∀ a : 𝓞 K, a • w ∈ M ↔ a ∈ J)
+    (h2 : ∀ y ∈ D, ∃ a : 𝓞 K, y - a • w ∈ M)
+    : Nonempty ((↥D ⧸ M.comap D.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ J)) := by
   let φ : 𝓞 K →ₗ[𝓞 K] (↥D ⧸ M.comap D.subtype) :=
     (M.comap D.subtype).mkQ ∘ₗ LinearMap.toSpanSingleton (𝓞 K) D ⟨w, hw⟩
   have hs : Function.Surjective φ := by
     intro q
     obtain ⟨y, rfl⟩ := (M.comap D.subtype).mkQ_surjective q
     obtain ⟨a, ha⟩ := h2 y y.2
-    exact ⟨a, ((Submodule.Quotient.eq (M.comap D.subtype)).2 (show y - a • (⟨w, hw⟩ : D) ∈ M.comap D.subtype from ha)).symm⟩
+    exact ⟨
+      a,
+      ((Submodule.Quotient.eq (M.comap D.subtype)).2
+        (show y - a • (⟨w, hw⟩ : D) ∈ M.comap D.subtype from ha)).symm
+    ⟩
   have hk : LinearMap.ker φ = J := by
     ext a
     rw [LinearMap.mem_ker, ← h1]
     exact Submodule.Quotient.mk_eq_zero _
   exact ⟨(φ.quotKerEquivOfSurjective hs).symm.trans (Submodule.quotEquivOfEq _ _ hk)⟩
 
-theorem perp_prim (H : HermSpace K V) [_root_.NumberField.IsTotallyComplex K] {M : Submodule (𝓞 K) V} {S I W : Submodule K V}
+theorem perp_prim
+    (H : HermSpace K V)
+    [_root_.NumberField.IsTotallyComplex K]
+    {M : Submodule (𝓞 K) V} {S I W : Submodule K V}
     (hIS : I ≤ S) (hrad : ∀ x ∈ S, (∀ y ∈ S, H.B x y = 0) ↔ x ∈ I) (hM : IsUnimodMod H M S I)
     {z : V} {T : ℕ} (hT : 1 ≤ T) (hz : H.B z z = -(T : K))
-    (hp : ∀ t : K, t • z ∈ M ↔ t ∈ (1 : Submodule (𝓞 K) K))
-    (hW : ∀ y, y ∈ W ↔ y ∈ S ∧ H.B y z = 0) :
-    del H (M ⊓ rs (𝓞 K) W) = (T : ℝ) ^ Formalism.HermitianLatticesTheory.fDeg K ∧
-      GenBy (dual H (M ⊓ rs (𝓞 K) W)) (M ⊓ rs (𝓞 K) W) 1 ∧ IsLatMod (M ⊓ rs (𝓞 K) W) W I ∧
-      Nonempty ((↥(dual H (M ⊓ rs (𝓞 K) W)) ⧸ (M ⊓ rs (𝓞 K) W).comap (dual H (M ⊓ rs (𝓞 K) W)).subtype) ≃ₗ[𝓞 K]
-        (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)})) := by
+    (hp : ∀ t : K, t • z ∈ M ↔ t ∈ (1 : Submodule (𝓞 K) K)) (hW : ∀ y, y ∈ W ↔ y ∈ S ∧ H.B y z = 0)
+    : del H (M ⊓ rs (𝓞 K) W) = (T : ℝ) ^ Formalism.HermitianLatticesTheory.fDeg K
+      ∧ GenBy (dual H (M ⊓ rs (𝓞 K) W)) (M ⊓ rs (𝓞 K) W) 1 ∧ IsLatMod (M ⊓ rs (𝓞 K) W) W I
+      ∧ Nonempty
+        ((↥(dual H (M ⊓ rs (𝓞 K) W)) ⧸ (M ⊓ rs (𝓞 K) W).comap (dual H (M ⊓ rs (𝓞 K) W)).subtype) ≃ₗ[𝓞 K]
+          (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)})) := by
   obtain ⟨a, b⟩ := DelScale.le_of_latMod hM.1
   have hT0 : (T : K) ≠ 0 := by exact_mod_cast (by omega : T ≠ 0)
   have hzM : z ∈ M := by simpa using (hp 1).2 (Submodule.mem_one.2 ⟨1, map_one _⟩)
   have hzS : z ∈ S := b hzM
   have o1 : ∀ i ∈ I, ∀ y ∈ S, H.B i y = 0 := fun i hi => (hrad i (hIS hi)).2 hi
-  have o2 : ∀ i ∈ I, ∀ y ∈ S, H.B y i = 0 := fun i hi y hy => by rw [← H.herm, o1 i hi y hy, star_zero]
+  have o2 : ∀ i ∈ I, ∀ y ∈ S, H.B y i = 0 := fun i hi y hy => by
+    rw [← H.herm, o1 i hi y hy, star_zero]
   have hint : ∀ x ∈ M, ∀ y ∈ M, H.B x y ∈ (1 : Submodule (𝓞 K) K) := fun x hx =>
     ((mem_dual_iff H M x).1 (hM.2.symm ▸ hx)).2
   set U : Submodule K V := Submodule.span K {z} ⊔ I with hU
@@ -67,7 +77,8 @@ theorem perp_prim (H : HermSpace K V) [_root_.NumberField.IsTotallyComplex K] {M
   have hWU : S ⊓ perp H U = W := by
     ext y
     rw [hW, Submodule.mem_inf, mem_perp_iff]
-    refine and_congr_right fun hy => ⟨fun h => h z ((hmU z).2 ⟨1, 0, I.zero_mem, by simp⟩), fun h x hx => ?_⟩
+    refine and_congr_right fun hy =>
+      ⟨fun h => h z ((hmU z).2 ⟨1, 0, I.zero_mem, by simp⟩), fun h x hx => ?_⟩
     obtain ⟨t, i, hi, rfl⟩ := (hmU x).1 hx
     simp [h, o2 i hi y hy]
   have hWS : W ≤ S := fun y hy => ((hW y).1 hy).1
@@ -112,7 +123,9 @@ theorem perp_prim (H : HermSpace K V) [_root_.NumberField.IsTotallyComplex K] {M
     have h0 := ((hW y).1 hy.1).2
     obtain ⟨c, hc⟩ := Submodule.mem_one.1 (hint m' hm' z hzM)
     rw [← e'] at h0
-    simp only [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, hz, o1 i hi z hzS, smul_eq_mul, ← hc] at h0
+    simp only [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, hz,
+        o1 i hi z hzS, smul_eq_mul, ← hc]
+      at h0
     have ht : t = algebraMap (𝓞 K) K c * (T : K)⁻¹ := by
       field_simp
       linear_combination -h0
@@ -126,19 +139,25 @@ theorem perp_prim (H : HermSpace K V) [_root_.NumberField.IsTotallyComplex K] {M
     exact le_inf inf_le_right (inf_le_left.trans le_sup_left)
   obtain ⟨E⟩ := equiv_of_gen hwD _ h1 h2
   refine ⟨?_, ⟨{w}, by simp, ?_⟩, ⟨?_, Compl.span_inf (hM.1.2 ▸ hWS)⟩, ⟨E⟩⟩
-  · have i1 : idx (M ⊓ rs (𝓞 K) W) (dual H (M ⊓ rs (𝓞 K) W)) = 1 := AddSubgroup.relIndex_eq_one.2 hle
-    have i2 : idx (dual H (M ⊓ rs (𝓞 K) W)) (M ⊓ rs (𝓞 K) W) = T ^ (2 * Formalism.HermitianLatticesTheory.fDeg K) := by
-      have : idx (dual H (M ⊓ rs (𝓞 K) W)) (M ⊓ rs (𝓞 K) W) = Nat.card (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)}) :=
+  · have i1 : idx (M ⊓ rs (𝓞 K) W) (dual H (M ⊓ rs (𝓞 K) W)) = 1 :=
+      AddSubgroup.relIndex_eq_one.2 hle
+    have i2
+        : idx (dual H (M ⊓ rs (𝓞 K) W)) (M ⊓ rs (𝓞 K) W)
+          = T ^ (2 * Formalism.HermitianLatticesTheory.fDeg K) := by
+      have : idx (dual H (M ⊓ rs (𝓞 K) W)) (M ⊓ rs (𝓞 K) W)
+          = Nat.card (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)}) :=
         Nat.card_congr E.toEquiv
-      rw [this, ← Submodule.cardQuot_apply, ← Ideal.absNorm_apply, Ideal.absNorm_span_natCast, RingOfIntegers.rank,
-        IsTotallyComplex.finrank, Formalism.HermitianLatticesTheory.fDeg, InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
+      rw [this, ← Submodule.cardQuot_apply, ← Ideal.absNorm_apply, Ideal.absNorm_span_natCast,
+        RingOfIntegers.rank, IsTotallyComplex.finrank, Formalism.HermitianLatticesTheory.fDeg,
+        InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
         IsTotallyComplex.nrRealPlaces_eq_zero, zero_add]
     rw [del, gidx, i1, i2, mul_comm, pow_mul]
     simp
   · apply le_antisymm
     · intro y hy
       obtain ⟨c, hc⟩ := h2 y hy
-      exact Submodule.mem_sup.2 ⟨_, hc, c • w, Submodule.smul_mem _ c (Submodule.subset_span (by simp)), by abel⟩
+      exact Submodule.mem_sup.2
+        ⟨_, hc, c • w, Submodule.smul_mem _ c (Submodule.subset_span (by simp)), by abel⟩
     · exact sup_le hle (Submodule.span_le.2 (by simpa using hwD))
   · obtain ⟨N, hN, rfl⟩ := hM.1.1
     refine ⟨N ⊓ rs (𝓞 K) W, hN.of_le inf_le_left, ?_⟩

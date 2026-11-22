@@ -13,25 +13,30 @@ noncomputable section
 namespace GlobalTheory.Top.Irr
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders Formalism.L2.GlobalTheoryTheory.ConcN Formalism.L2.GlobalTheoryTheory.ConcNWeight Formalism.L2.GlobalTheoryTheory.AllJoin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders
+  Formalism.L2.GlobalTheoryTheory.ConcN Formalism.L2.GlobalTheoryTheory.ConcNWeight
+  Formalism.L2.GlobalTheoryTheory.AllJoin
 
 theorem tieAdmG_holds (D : D7) : TieAdmG D := fun k =>
   ⟨D.host.g_prime k, D.nd.g_split k, D.ntypes.g_Mray k, D.ntypes.g_cond k⟩
 
-theorem linkIRR_of_join_ex (eps Cs c : ℝ) (he : 0 < eps) (he1 : eps ≤ 1) (hc : 0 < c) (Fm : FamP eps)
+theorem linkIRR_of_join_ex
+    (eps Cs c : ℝ) (he : 0 < eps) (he1 : eps ≤ 1) (hc : 0 < c) (Fm : FamP eps)
     (h : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i),
-      LabelCountGoodInjective A ∧ AllJoinA A ∧ admLq (Fm.D x i) ∧
-        CountAllRows A (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) ∧ SizesRec (Fm.D x i) x Fm.ez Cs) :
-    LinkIRR Fm := by
+      LabelCountGoodInjective A ∧ AllJoinA A ∧ admLq (Fm.D x i)
+        ∧ CountAllRows A (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) ∧ SizesRec (Fm.D x i) x Fm.ez Cs)
+    : LinkIRR Fm := by
   obtain ⟨x0, hx0⟩ := h
   have hez : 0 < Fm.ez := div_pos he (lt_of_lt_of_le one_pos Fm.toFamCore.one_le_J)
-  refine linkIRR_of_allRows eps Cs c he he1 hc Fm ⟨max x0 ((3 / 2 : ℝ) ^ (1 / Fm.ez)), fun x hx i => ?_⟩
+  refine linkIRR_of_allRows eps Cs c he he1 hc Fm
+    ⟨max x0 ((3 / 2 : ℝ) ^ (1 / Fm.ez)), fun x hx i => ?_⟩
   obtain ⟨A, hT, hJ, hL, hC, hS⟩ := hx0 x (le_trans (le_max_left _ _) hx) i
   have hx1 : (3 / 2 : ℝ) ^ (1 / Fm.ez) ≤ x := le_trans (le_max_right _ _) hx
   have hxe : 3 / 2 ≤ x ^ Fm.ez := by
     have hpos : 0 ≤ (3 / 2 : ℝ) ^ (1 / Fm.ez) := by positivity
-    calc (3 / 2 : ℝ) = ((3 / 2 : ℝ) ^ (1 / Fm.ez)) ^ Fm.ez := by
-          rw [← Real.rpow_mul (by norm_num), one_div_mul_cancel hez.ne', Real.rpow_one]
+    calc
+      (3 / 2 : ℝ) = ((3 / 2 : ℝ) ^ (1 / Fm.ez)) ^ Fm.ez := by
+        rw [← Real.rpow_mul (by norm_num), one_div_mul_cancel hez.ne', Real.rpow_one]
       _ ≤ x ^ Fm.ez := Real.rpow_le_rpow hpos hx1 hez.le
   exact ⟨A, hT, hC, weight_of_join hL (tieAdmG_holds _) (rangeW_of_sizes hS hxe) hJ, hS⟩
 
@@ -40,9 +45,13 @@ end
 section
 open Formalism.BasicNotions Formalism.MainNotions
 
-theorem sizesRec_at {eps : ℝ} (Fm : FamP eps) {x : ℝ} (hx : Fm.x1 < x) (hx4 : 4 ≤ x) (i : Fm.Ix x) {Cs : ℝ}
-    (hCs : 6 ≤ Cs) : Formalism.L2.GlobalTheoryTheory.ConcN.SizesRec (Fm.D x i) x Fm.ez Cs := by
-  obtain ⟨hN, -, hK, -, -, -, hQD, -, -, -, -, -, -, -, -, -, -, -, -, -, hG, -, -⟩ := Fm.sizes x hx i
+theorem sizesRec_at
+    {eps : ℝ} (Fm : FamP eps)
+    {x : ℝ} (hx : Fm.x1 < x) (hx4 : 4 ≤ x) (i : Fm.Ix x)
+    {Cs : ℝ} (hCs : 6 ≤ Cs)
+    : Formalism.L2.GlobalTheoryTheory.ConcN.SizesRec (Fm.D x i) x Fm.ez Cs := by
+  obtain ⟨hN, -, hK, -, -, -, hQD, -, -, -, -, -, -, -, -, -, -, -, -, -, hG, -, -⟩ :=
+    Fm.sizes x hx i
   have hLx : (Fm.L x i).sc.x = x := Fm.L_x x i hx
   have hLe : (Fm.L x i).sc.eps = eps := Fm.L_eps x i
   have hε0 : 0 < eps := hLe ▸ (Fm.L x i).sc.eps_pos
@@ -76,7 +85,8 @@ theorem sizesRec_at {eps : ℝ} (Fm : FamP eps) {x : ℝ} (hx : Fm.x1 < x) (hx4 
   have hx4p : (256 : ℝ) ≤ x ^ (4 : ℝ) := by
     rw [show (4 : ℝ) = ((4 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
     have : (4 : ℝ) ^ 4 ≤ x ^ 4 := pow_le_pow_left₀ (by norm_num) hx4 4
-    norm_num at this ⊢; linarith
+    norm_num at this ⊢
+    linarith
   have hx65 : 2 * x ^ (5 : ℝ) ≤ x ^ (6 : ℝ) := by
     rw [show (6 : ℝ) = 5 + 1 by norm_num, Real.rpow_add hx0, Real.rpow_one]
     have h0 : 0 ≤ x ^ (5 : ℝ) := Real.rpow_nonneg hx0.le _
@@ -98,7 +108,9 @@ theorem sizesRec_at {eps : ℝ} (Fm : FamP eps) {x : ℝ} (hx : Fm.x1 < x) (hx4 
       rcases Nat.eq_zero_or_pos (Fm.D x i).host.q with h0 | h0
       · rw [h0] at hl; simp at hl; linarith
       · exact_mod_cast h0
-    calc Real.exp (x ^ (Fm.ez / 6)) ≤ Real.exp (Real.log (Fm.D x i).host.q) := Real.exp_le_exp.2 hl
+    calc
+      Real.exp (x ^ (Fm.ez / 6))
+        ≤ Real.exp (Real.log (Fm.D x i).host.q) := Real.exp_le_exp.2 hl
       _ = (Fm.D x i).host.q := Real.exp_log hq0
   have hd : Real.exp (x ^ (Fm.ez / 6)) ≤ ((Fm.D x i).host.d : ℝ) := by
     have hl : x ^ (Fm.ez / 6) ≤ Real.log (Fm.D x i).host.d := le_trans hεq hQD.2.2.2.1
@@ -106,12 +118,13 @@ theorem sizesRec_at {eps : ℝ} (Fm : FamP eps) {x : ℝ} (hx : Fm.x1 < x) (hx4 
       rcases Nat.eq_zero_or_pos (Fm.D x i).host.d with h0 | h0
       · rw [h0] at hl; simp at hl; linarith
       · exact_mod_cast h0
-    calc Real.exp (x ^ (Fm.ez / 6)) ≤ Real.exp (Real.log (Fm.D x i).host.d) := Real.exp_le_exp.2 hl
+    calc
+      Real.exp (x ^ (Fm.ez / 6))
+        ≤ Real.exp (Real.log (Fm.D x i).host.d) := Real.exp_le_exp.2 hl
       _ = (Fm.D x i).host.d := Real.exp_log hd0
   intro j
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  ·
-    have hg := (hG j j).1
+  · have hg := (hG j j).1
     have hb : Real.exp (8 * x ^ eps) = (Real.exp (x ^ eps)) ^ 8 := by
       rw [← Real.exp_nat_mul]; norm_num
     have hb0 : 0 ≤ Real.exp (x ^ eps) := (Real.exp_pos _).le
@@ -125,23 +138,24 @@ theorem sizesRec_at {eps : ℝ} (Fm : FamP eps) {x : ℝ} (hx : Fm.x1 < x) (hx4 
     refine le_trans (Real.exp_le_exp.2 (by linarith : 8 * x ^ Fm.ez ≤ 8 * x ^ eps)) ?_
     rw [hb]
     exact le_trans (pow_le_pow_left₀ hb0 hkb 8) hg
-  ·
-    rw [← Real.rpow_two]
+  · rw [← Real.rpow_two]
     have hn0 : (0 : ℝ) ≤ (Fm.D x i).R.n := Nat.cast_nonneg _
     have hnf : ((Fm.D x i).R.n : ℝ) ≤ (Fm.D x i).R.f := by rw [hf]; linarith
     exact le_trans h2 (le_trans hN.1 hnf)
   · exact le_trans hfkR (le_trans hkx h56)
   · exact le_trans hmfR (le_trans hfkR (le_trans hkx h56))
-  ·
-    have h256 : 256 ≤ (Fm.D x i).R.k := by exact_mod_cast hkl
+  · have h256 : 256 ≤ (Fm.D x i).R.k := by exact_mod_cast hkl
     omega
-  · have h2k : 2 * ((Fm.D x i).R.k : ℝ) ≤ 2 * x ^ (5 : ℝ) := mul_le_mul_of_nonneg_left hkx (by norm_num)
+  · have h2k : 2 * ((Fm.D x i).R.k : ℝ) ≤ 2 * x ^ (5 : ℝ) :=
+      mul_le_mul_of_nonneg_left hkx (by norm_num)
     exact le_trans hr2kR (le_trans h2k (le_trans hx65 h6))
   · rw [Nat.cast_min]
     exact le_min hq hd
 
 end
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.MainNotions.Lnk Formalism.MainNotions.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory Formalism.MainNotions.RT Formalism.L2.Top3 Formalism.L2.Top4
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.MainNotions.Lnk
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory Formalism.MainNotions.RT
+  Formalism.L2.Top3 Formalism.L2.Top4
 
 end GlobalTheory.Top.Irr

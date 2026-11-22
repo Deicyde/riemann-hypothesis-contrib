@@ -16,8 +16,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN.WpSep
 
-theorem main : ∀ (N : ℕ) [NeZero N] (τ : ℍ) (x y : Fin 2 → ZMod N), x ≠ 0 → y ≠ 0 →
-    wp N x τ = wp N y τ → x = y ∨ x = -y := by
+theorem main
+    : ∀ (N : ℕ) [NeZero N] (τ : ℍ) (x y : Fin 2 → ZMod N),
+      x ≠ 0 → y ≠ 0 → wp N x τ = wp N y τ → x = y ∨ x = -y := by
   intro N _ τ x y hx hy h1
   obtain ⟨hsub, hadd, hmem, -, -⟩ := GlobalTheory.WpFam.TorsMem.main N τ
   have hc : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := Complex.two_pi_I_ne_zero

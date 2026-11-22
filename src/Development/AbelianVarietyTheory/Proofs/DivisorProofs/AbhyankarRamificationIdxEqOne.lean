@@ -73,19 +73,24 @@ private lemma maximalIdeal_eq_span_of_kummer_tower (A W : Type) [CommRing A] [Is
   obtain ⟨z', rfl⟩ := hle hz
   exact ⟨x', z', hznz, hzw⟩
 
-
 open IsLocalRing in
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.abhyankar_ramificationIdx_eq_one : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S]
-    [Field K] [Algebra S K] [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
-    [FiniteDimensional K L] [Algebra.IsSeparable K L] (π : S) (e : ℕ) (D : Type) [CommRing D] [Algebra S D],
-    Nonempty (D ≃ₐ[S] AdjoinRoot (Polynomial.X ^ e - Polynomial.C π)) → Irreducible π → IsUnit (e : S) →
-    (∀ P : Ideal (integralClosure S L), P.IsMaximal → P.ramificationIdx S ∣ e) →
-    (∀ P : Ideal (integralClosure S L), P.IsMaximal → ∀ [P.LiesOver (maximalIdeal S)],
-      Algebra.IsSeparable (S ⧸ maximalIdeal S) (integralClosure S L ⧸ P)) →
-    ∀ [IsDomain D] [IsDiscreteValuationRing D] (Q : Ideal (integralClosure D (TensorProduct S D L))) [Q.IsMaximal],
-    Q.ramificationIdx D = 1 := by
+theorem _root_.GlobalTheory.abhyankar_ramificationIdx_eq_one
+    : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S] [Field K] [Algebra S K]
+        [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
+        [FiniteDimensional K L] [Algebra.IsSeparable K L] (π : S) (e : ℕ) (D : Type) [CommRing D]
+        [Algebra S D],
+      Nonempty (D ≃ₐ[S] AdjoinRoot (Polynomial.X ^ e - Polynomial.C π)) → Irreducible π
+        → IsUnit (e : S)
+        → (∀ P : Ideal (integralClosure S L), P.IsMaximal → P.ramificationIdx S ∣ e)
+        → (∀ P : Ideal (integralClosure S L),
+          P.IsMaximal
+            → ∀ [P.LiesOver (maximalIdeal S)],
+              Algebra.IsSeparable (S ⧸ maximalIdeal S) (integralClosure S L ⧸ P))
+        → ∀ [IsDomain D] [IsDiscreteValuationRing D]
+            (Q : Ideal (integralClosure D (TensorProduct S D L))) [Q.IsMaximal],
+          Q.ramificationIdx D = 1 := by
   intro S K L _ _ _ _ _ _ _ _ _ _ _ _ π e D _ _ ⟨ψ⟩ hπ he hdiv _ _ _ Q _
   haveI : Q.IsPrime := Ideal.IsMaximal.isPrime inferInstance
   haveI : IsDedekindDomain (integralClosure S L) := integralClosure.isDedekindDomain S K L
@@ -94,34 +99,46 @@ theorem _root_.GlobalTheory.abhyankar_ramificationIdx_eq_one : ∀ (S K L : Type
     · subst h
       simp at he
     · exact h
-  obtain ⟨ht, htnz⟩ := _root_.GlobalTheory.AbhyankarRootUnit.root_mem_maximalIdeal_and_mem_nonZeroDivisors S K L π e D ψ hπ he0 Q
-  have hte : (ψ.symm (AdjoinRoot.root (Polynomial.X ^ e - Polynomial.C π))) ^ e = algebraMap S D π := by
+  obtain ⟨ht, htnz⟩ :=
+    _root_.GlobalTheory.AbhyankarRootUnit.root_mem_maximalIdeal_and_mem_nonZeroDivisors S K L π e D
+      ψ hπ he0 Q
+  have hte
+      : (ψ.symm (AdjoinRoot.root (Polynomial.X ^ e - Polynomial.C π))) ^ e = algebraMap S D π := by
     apply ψ.injective
     rw [map_pow, AlgEquiv.apply_symm_apply, AlgEquiv.commutes]
     have h := AdjoinRoot.eval₂_root (Polynomial.X ^ e - Polynomial.C π)
     simp only [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C] at h
     rw [sub_eq_zero.1 h]
     rfl
-  have htQ : algebraMap D (integralClosure D (TensorProduct S D L))
-      (ψ.symm (AdjoinRoot.root (Polynomial.X ^ e - Polynomial.C π))) ∈ Q := by
-    rw [IsScalarTower.algebraMap_apply D (integralClosure D (TensorProduct S D L)) (Localization.AtPrime Q)] at ht
+  have htQ
+      : algebraMap D (integralClosure D (TensorProduct S D L))
+          (ψ.symm (AdjoinRoot.root (Polynomial.X ^ e - Polynomial.C π)))
+        ∈ Q := by
+    rw [IsScalarTower.algebraMap_apply D (integralClosure D (TensorProduct S D L))
+        (Localization.AtPrime Q)]
+      at ht
     exact (IsLocalization.AtPrime.to_map_mem_maximal_iff (Localization.AtPrime Q) Q _).1 ht
   have hπO : algebraMap S (integralClosure S L) π ≠ 0 := by
     intro h
     have h1 : algebraMap S L π = 0 := by
       rw [IsScalarTower.algebraMap_apply S (integralClosure S L) L, h, map_zero]
     rw [IsScalarTower.algebraMap_apply S K L, map_eq_zero_iff _ (algebraMap K L).injective,
-      IsFractionRing.to_map_eq_zero_iff] at h1
+        IsFractionRing.to_map_eq_zero_iff]
+      at h1
     exact hπ.ne_zero h1
-  have hπP : algebraMap S (integralClosure S L) π ∈
-      Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q := by
+  have hπP
+      : algebraMap S (integralClosure S L) π
+        ∈ Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q := by
     rw [Ideal.mem_comap]
-    have hpow : _root_.GlobalTheory.AbhyankarLocal.toNorm S L D (algebraMap S (integralClosure S L) π) =
-        (algebraMap D (integralClosure D (TensorProduct S D L))
-          (ψ.symm (AdjoinRoot.root (Polynomial.X ^ e - Polynomial.C π)))) ^ e := by
+    have hpow
+        : _root_.GlobalTheory.AbhyankarLocal.toNorm S L D (algebraMap S (integralClosure S L) π)
+          = (algebraMap D (integralClosure D (TensorProduct S D L))
+              (ψ.symm (AdjoinRoot.root (Polynomial.X ^ e - Polynomial.C π))))
+            ^ e := by
       apply Subtype.ext
       rw [_root_.GlobalTheory.AbhyankarLocal.toNorm_coe, ← map_pow, hte]
-      change (1 : D) ⊗ₜ[S] (algebraMap S L π) = algebraMap D (TensorProduct S D L) (algebraMap S D π)
+      change (1 : D) ⊗ₜ[S] (algebraMap S L π)
+        = algebraMap D (TensorProduct S D L) (algebraMap S D π)
       rw [Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_eq_smul_one π,
         Algebra.algebraMap_eq_smul_one π, TensorProduct.tmul_smul, TensorProduct.smul_tmul',
         Algebra.algebraMap_self, RingHom.id_apply]
@@ -132,10 +149,13 @@ theorem _root_.GlobalTheory.abhyankar_ramificationIdx_eq_one : ∀ (S K L : Type
     intro h
     rw [h] at hπP
     exact hπO hπP
-  obtain ⟨ϖ, hϖ, u, hu⟩ := _root_.GlobalTheory.pi_eq_pow_ramificationIdx_mul_unit S K L π e D
-    (Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q) hπ hπP
+  obtain ⟨ϖ, hϖ, u, hu⟩ :=
+    _root_.GlobalTheory.pi_eq_pow_ramificationIdx_mul_unit S K L π e D
+      (Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q) hπ hπP
   obtain ⟨k, hk⟩ := hdiv _ hPmax
-  obtain ⟨y, hym, hyk⟩ := _root_.GlobalTheory.AbhyankarLocal.exists_kummer_element S K L π e D ψ hπ he0 Q _ k ϖ u hk.symm hu
+  obtain ⟨y, hym, hyk⟩ :=
+    _root_.GlobalTheory.AbhyankarLocal.exists_kummer_element S K L π e D ψ hπ he0 Q _ k ϖ u hk.symm
+      hu
   have hP0 : Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q ≠ ⊥ := by
     intro h
     rw [h] at hπP
@@ -148,15 +168,19 @@ theorem _root_.GlobalTheory.abhyankar_ramificationIdx_eq_one : ∀ (S K L : Type
     · rw [h, mul_zero] at hk
       omega
     · exact h
-  have hmu : IsUnit (((Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q).ramificationIdx S : ℕ) :
-      Localization.AtPrime (Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q)) := by
-    have h := he.map (algebraMap S
-      (Localization.AtPrime (Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q)))
+  have hmu : IsUnit
+      (((Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q).ramificationIdx S : ℕ)
+        : Localization.AtPrime (Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D)
+          Q)) := by
+    have h :=
+      he.map (algebraMap S
+        (Localization.AtPrime (Ideal.comap (_root_.GlobalTheory.AbhyankarLocal.toNorm S L D) Q)))
     rw [map_natCast, hk, Nat.cast_mul] at h
     exact isUnit_of_mul_isUnit_left h
-  have hmax := maximalIdeal_eq_span_of_kummer_tower _ (Localization.AtPrime Q)
-    (_root_.GlobalTheory.AbhyankarLocal.locHom Q) ϖ u _ k hϖ hmu hk0 y _ hym hyk ht htnz
-    (_root_.GlobalTheory.AbhyankarLocal.exists_frac_closure S K L π e D ψ hπ he0 Q)
+  have hmax :=
+    maximalIdeal_eq_span_of_kummer_tower _ (Localization.AtPrime Q)
+      (_root_.GlobalTheory.AbhyankarLocal.locHom Q) ϖ u _ k hϖ hmu hk0 y _ hym hyk ht htnz
+      (_root_.GlobalTheory.AbhyankarLocal.exists_frac_closure S K L π e D ψ hπ he0 Q)
   have hunder : Ideal.under D Q = maximalIdeal D := by
     refine IsLocalRing.eq_maximalIdeal (Ideal.IsPrime.isMaximal inferInstance ?_)
     intro h
@@ -164,18 +188,21 @@ theorem _root_.GlobalTheory.abhyankar_ramificationIdx_eq_one : ∀ (S K L : Type
     rw [h, Ideal.mem_bot] at h1
     rw [h1, map_zero] at htnz
     exact zero_notMem_nonZeroDivisors htnz
-  have hmapmax : Ideal.map (algebraMap D (Localization.AtPrime Q)) (Ideal.under D Q) =
-      maximalIdeal (Localization.AtPrime Q) := by
+  have hmapmax
+      : Ideal.map (algebraMap D (Localization.AtPrime Q)) (Ideal.under D Q)
+        = maximalIdeal (Localization.AtPrime Q) := by
     refine le_antisymm ?_ ?_
     · rw [Ideal.map_le_iff_le_comap]
       intro d hd
-      rw [Ideal.mem_comap, IsScalarTower.algebraMap_apply D (integralClosure D (TensorProduct S D L))
-        (Localization.AtPrime Q)]
+      rw [Ideal.mem_comap,
+        IsScalarTower.algebraMap_apply D (integralClosure D (TensorProduct S D L))
+          (Localization.AtPrime Q)]
       exact (IsLocalization.AtPrime.to_map_mem_maximal_iff (Localization.AtPrime Q) Q _).2 hd
     · rw [hmax, Ideal.span_le, Set.singleton_subset_iff]
       exact Ideal.mem_map_of_mem _ htQ
   rw [Ideal.ramificationIdx_def, hmapmax,
-    Module.length_eq_one_iff.2 (isSimpleModule_iff_isCoatom.2 (IsLocalRing.maximalIdeal.isMaximal _).out)]
+    Module.length_eq_one_iff.2 (isSimpleModule_iff_isCoatom.2 (IsLocalRing.maximalIdeal.isMaximal
+      _).out)]
   rfl
 
 end GlobalTheory

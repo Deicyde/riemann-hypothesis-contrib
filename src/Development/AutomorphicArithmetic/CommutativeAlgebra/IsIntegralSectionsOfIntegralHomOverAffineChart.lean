@@ -7,14 +7,23 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.
 
 open CategoryTheory Limits AlgebraicGeometry
 
-theorem UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart :
-    ∀ (A : Type) [CommRing A] {P Z U L : Scheme.{0}} (u : Z ⟶ L) (l : L ⟶ Spec (CommRingCat.of A)) (f : L ⟶ P),
-        IsIntegralHom u → IsPullback f l (terminal.from P) (terminal.from _) →
-        ∀ (O : P.Opens), IsAffineOpen O → ∀ (τ : Γ(P, O)), Subring.closure {τ} = ⊤ →
-        ∀ (ι : U ⟶ Z) [IsOpenImmersion ι], Set.range ι = ((u ≫ f) ⁻¹ᵁ O : Set Z) →
-        ∀ (h : (⊤ : U.Opens) ≤ (ι ≫ u ≫ f) ⁻¹ᵁ O) (x : Γ(U, ⊤)),
-          IsIntegral (Subring.closure (Set.range ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι ≫ u ≫ l).appTop).hom ∪
-            {((ι ≫ u ≫ f).appLE O ⊤ h).hom τ})) x := by
+theorem UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart
+    : ∀ (A : Type) [CommRing A] {P Z U L : Scheme.{0}} (u : Z ⟶ L) (l : L ⟶ Spec (CommRingCat.of A))
+        (f : L ⟶ P),
+      IsIntegralHom u → IsPullback f l (terminal.from P) (terminal.from _)
+        → ∀ (O : P.Opens),
+          IsAffineOpen O
+            → ∀ (τ : Γ(P, O)),
+              Subring.closure {τ} = ⊤
+                → ∀ (ι : U ⟶ Z) [IsOpenImmersion ι],
+                  Set.range ι = ((u ≫ f) ⁻¹ᵁ O : Set Z)
+                    → ∀ (h : (⊤ : U.Opens) ≤ (ι ≫ u ≫ f) ⁻¹ᵁ O) (x : Γ(U, ⊤)),
+                      IsIntegral
+                        (Subring.closure
+                          (Set.range
+                              ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι ≫ u ≫ l).appTop).hom
+                            ∪ {((ι ≫ u ≫ f).appLE O ⊤ h).hom τ}))
+                        x := by
   intro A _ P Z U L u l f hu hpb O hO τ hτ ι _ hι h x
   haveI := hu
   haveI : IsAffineHom f := MorphismProperty.of_isPullback (P := @IsAffineHom) hpb.flip inferInstance
@@ -25,8 +34,9 @@ theorem UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart :
     rw [← hι]
     simp
   have hb : Function.Surjective (ι.appLE (u ⁻¹ᵁ (f ⁻¹ᵁ O)) ⊤ h).hom := by
-    have key : ∀ (W : Z.Opens) (_ : W = ι ''ᵁ ⊤) (e : ⊤ ≤ ι ⁻¹ᵁ W),
-        Function.Surjective (ι.appLE W ⊤ e).hom := by
+    have key
+        : ∀ (W : Z.Opens) (_ : W = ι ''ᵁ ⊤) (e : ⊤ ≤ ι ⁻¹ᵁ W),
+          Function.Surjective (ι.appLE W ⊤ e).hom := by
       rintro W rfl e
       have e2 : ι.appLE (ι ''ᵁ ⊤) ⊤ e = (ι.appIso ⊤).hom := (Scheme.Hom.appIso_hom' ι ⊤).symm
       rw [e2]
@@ -59,15 +69,13 @@ theorem UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart :
     refine ((Scheme.Hom.appLE_comp_appLE_assoc u l ⊤ (f ⁻¹ᵁ O) (u ⁻¹ᵁ (f ⁻¹ᵁ O)) _ _ _).trans
       (Scheme.Hom.appLE_comp_appLE ι (u ≫ l) ⊤ _ ⊤ _ _)).trans ?_
     rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
-    first
-      | rfl
-      | (congr 1; simp)
-      | simp [Scheme.Hom.appLE]
+    first | rfl | (congr 1; simp) | simp [Scheme.Hom.appLE]
   have c2 : ∀ y, φ.hom ((l.appLE ⊤ (f ⁻¹ᵁ O) (by simp)).hom y) ∈ S := by
     intro y
-    have hy : φ.hom ((l.appLE ⊤ (f ⁻¹ᵁ O) (by simp)).hom y) =
-        ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι ≫ u ≫ l).appTop).hom
-          ((Scheme.ΓSpecIso (CommRingCat.of A)).hom.hom y) := by
+    have hy
+        : φ.hom ((l.appLE ⊤ (f ⁻¹ᵁ O) (by simp)).hom y)
+          = ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ (ι ≫ u ≫ l).appTop).hom
+            ((Scheme.ΓSpecIso (CommRingCat.of A)).hom.hom y) := by
       rw [← CommRingCat.comp_apply, e2]
       simp
     rw [hy]
@@ -75,8 +83,9 @@ theorem UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart :
   set T := S.comap φ.hom with hT
   let g1 := CommRingCat.ofHom ((f.app O).hom.codRestrict T c1)
   let g2 := CommRingCat.ofHom ((l.appLE ⊤ (f ⁻¹ᵁ O) (by simp)).hom.codRestrict T c2)
-  have hw : Scheme.Hom.appLE (terminal.from P) ⊤ O (by simp) ≫ g1 =
-      Scheme.Hom.appTop (terminal.from (Spec (CommRingCat.of A))) ≫ g2 := by
+  have hw
+      : Scheme.Hom.appLE (terminal.from P) ⊤ O (by simp) ≫ g1
+        = Scheme.Hom.appTop (terminal.from (Spec (CommRingCat.of A))) ≫ g2 := by
     ext z
     exact congrArg (fun k => k.hom z) hpo.w
   have hid : hpo.desc g1 g2 hw ≫ CommRingCat.ofHom T.subtype = 𝟙 _ := by
@@ -90,7 +99,8 @@ theorem UpperTheory.isIntegral_sections_of_integralHom_over_affine_chart :
   have hall : ∀ y, φ.hom y ∈ S := by
     intro y
     have := congrArg (fun k => k.hom y) hid
-    simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_id, RingHom.id_apply] at this
+    simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_id, RingHom.id_apply]
+      at this
     rw [← this]
     exact ((hpo.desc g1 g2 hw).hom y).2
   obtain ⟨p, hm, hp⟩ := hφi x

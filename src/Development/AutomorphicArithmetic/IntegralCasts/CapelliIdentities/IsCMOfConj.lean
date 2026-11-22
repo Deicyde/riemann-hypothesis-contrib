@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh8.isCM_of_conj :
-    ∀ (K : Type) [inst : Field K] [inst_1 : NumberField K]
-    [NumberField.IsTotallyComplex K],
-    (∀ (x : K), ∃ (y : K), ∀ (φ : K →+* ℂ), (φ : K → ℂ) y = (starRingEnd ℂ : ℂ → ℂ) ((φ : K → ℂ) x)) →
-      NumberField.IsCMField K := by
+theorem UpperTheory.Reformulated.B.Qh8.isCM_of_conj
+    : ∀ (K : Type) [inst : Field K] [inst_1 : NumberField K] [NumberField.IsTotallyComplex K],
+      (∀ (x : K), ∃ (y : K), ∀ (φ : K →+* ℂ),
+          (φ : K → ℂ) y = (starRingEnd ℂ : ℂ → ℂ) ((φ : K → ℂ) x))
+        → NumberField.IsCMField K := by
   intro K _ _ _ h
   choose c hc using h
   let φ₀ : K →+* ℂ := Classical.choice (inferInstance : Nonempty _)
@@ -20,10 +20,10 @@ theorem UpperTheory.Reformulated.B.Qh8.isCM_of_conj :
     rw [NumberField.ComplexEmbedding.conjugate_coe_eq]
     by_contra hz
     exact hne ⟨z, hz⟩
-  have hanti : ∀ (z : K) (φ : K →+* ℂ), starRingEnd ℂ (φ (z - c z)) = -φ (z - c z) := by
+  have hanti : ∀ (z : K) (φ : K →+* ℂ), starRingEnd ℂ (φ (z - c z)) = - φ (z - c z) := by
     intro z φ
     simp [hc]
-  obtain ⟨d, hd0, hd⟩ : ∃ d : K, d ≠ 0 ∧ ∀ φ : K →+* ℂ, starRingEnd ℂ (φ d) = -φ d := by
+  obtain ⟨d, hd0, hd⟩ : ∃ d : K, d ≠ 0 ∧ ∀ φ : K →+* ℂ, starRingEnd ℂ (φ d) = - φ d := by
     refine ⟨x - c x, fun h0 => hx ?_, hanti x⟩
     rw [← hc, ← sub_eq_zero.mp h0]
   have hli : LinearIndependent (NumberField.maximalRealSubfield K) ![(1 : K), d] := by
@@ -43,8 +43,7 @@ theorem UpperTheory.Reformulated.B.Qh8.isCM_of_conj :
       rw [hs0, zero_mul, zero_add] at h1
       exact (mul_eq_zero.mp h1).resolve_right hd0
     exact ⟨Subtype.ext hs0, Subtype.ext ht0⟩
-  have hsp : ⊤ ≤ Submodule.span (NumberField.maximalRealSubfield K)
-      (Set.range ![(1 : K), d]) := by
+  have hsp : ⊤ ≤ Submodule.span (NumberField.maximalRealSubfield K) (Set.range ![(1 : K), d]) := by
     intro z _
     have ha : (z + c z) / 2 ∈ NumberField.maximalRealSubfield K := by
       intro φ

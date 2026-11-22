@@ -12,11 +12,13 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Concret
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N Module
 
 namespace GlobalTheory.GenCountUnram
 
-theorem admGenL_all : ∀ D : D7, Formalism.MainNotions.RamifiedCoefficientChains.H1fGeneratorBoundAll D.loc := by
+theorem admGenL_all
+    : ∀ D : D7, Formalism.MainNotions.RamifiedCoefficientChains.H1fGeneratorBoundAll D.loc := by
   intro D l _ K LL
   unfold Formalism.MainNotions.RamifiedCoefficientChains.H1fGeneratorBound
   intro hbij T hT
@@ -33,13 +35,18 @@ theorem admGenL_all : ∀ D : D7, Formalism.MainNotions.RamifiedCoefficientChain
   haveI := hdR0.1
   have hdR := hdR0.2
   have hK : finrank ℚ_[l] ↥K.1 = finrank ℚ_[l] ↥(K0 K) :=
-    (AlgEquiv.ofBijective (IsScalarTower.toAlgHom ℚ_[l] ↥(K0 K) ↥K.1) hbij).toLinearEquiv.finrank_eq.symm
+    (AlgEquiv.ofBijective (IsScalarTower.toAlgHom ℚ_[l] ↥(K0 K) ↥K.1)
+      hbij).toLinearEquiv.finrank_eq.symm
   refine ⟨s, hs, ?_⟩
   rw [hK] at hdR
-  have hle : finrank ↥LL.1 ↥(DdR ((D.loc l).PD K) T.ρ ⊓ FilV ((D.loc l).PD K) (LL := ↥LL.1) (V := T.V) 0)
-      ≤ finrank ↥LL.1 ↥(DdR ((D.loc l).PD K) T.ρ) := Submodule.finrank_mono inf_le_left
-  have hmul : finrank ℚ_[l] ↥(K0 K) * finrank ↥LL.1 T.V + finrank ↥LL.1 T.V
-      = (finrank ℚ_[l] ↥(K0 K) + 1) * finrank ↥LL.1 T.V := by ring
+  have hle
+      : finrank ↥LL.1 ↥(DdR ((D.loc l).PD K) T.ρ ⊓ FilV ((D.loc l).PD K) (LL := ↥LL.1) (V := T.V) 0)
+        ≤ finrank ↥LL.1 ↥(DdR ((D.loc l).PD K) T.ρ) :=
+    Submodule.finrank_mono inf_le_left
+  have hmul
+      : finrank ℚ_[l] ↥(K0 K) * finrank ↥LL.1 T.V + finrank ↥LL.1 T.V
+        = (finrank ℚ_[l] ↥(K0 K) + 1) * finrank ↥LL.1 T.V := by
+    ring
   rw [← hmul]
   zify at hcard hdR hle ⊢
   linarith

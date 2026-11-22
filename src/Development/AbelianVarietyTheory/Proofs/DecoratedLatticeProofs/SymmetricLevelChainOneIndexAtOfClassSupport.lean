@@ -9,18 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegralC
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.SymChain
 
 namespace GlobalTheory.SymChain
 
-theorem oneIndexAt_of_classAt_supportAt : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ν : Measure k), IsUnitVol ν → ∀ (s κ : ℕ) (S : SymData k s κ) (t : Type) [Fintype t] [DecidableEq t], S.ClassAt t ν → S.SupportAt t → S.OneIndexAt t ν := by
+theorem oneIndexAt_of_classAt_supportAt
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ν : Measure k),
+      IsUnitVol ν
+        → ∀ (s κ : ℕ) (S : SymData k s κ) (t : Type) [Fintype t] [DecidableEq t],
+          S.ClassAt t ν → S.SupportAt t → S.OneIndexAt t ν := by
   intro k _ _ _ _ _ _ ν hν s κ S t _ _ hC hS j c H p hp1 hpc h hE
   haveI : ν.IsAddHaarMeasure := hν.1
   obtain ⟨r, hr, u, hu, rfl⟩ := hC j c H p hp1 hpc h hE
   obtain ⟨γ, g, hg, rfl⟩ := Radical.exists_of_mem_R hr
-  have hmul : ∀ (a b : GL (XIx (Fin κ) t (j + 1) ⊕ Fin c) k) (Ψ : type_of% ((S.T t).Phi j c H)),
-      om (S.μ (j + 1)) 1 (a * b) Ψ = om (S.μ (j + 1)) 1 a (om (S.μ (j + 1)) 1 b Ψ) :=
-    fun a b Ψ => by rw [← om_mul, one_mul]
+  have hmul
+      : ∀ (a b : GL (XIx (Fin κ) t (j + 1) ⊕ Fin c) k) (Ψ : type_of% ((S.T t).Phi j c H)),
+        om (S.μ (j + 1)) 1 (a * b) Ψ
+          = om (S.μ (j + 1)) 1 a (om (S.μ (j + 1)) 1 b Ψ) := fun a b Ψ => by
+    rw [← om_mul, one_mul]
   have hne : opE S.ψ ν p (om (S.μ (j + 1)) 1 u ((S.T t).Phi j c H)) ≠ 0 := by
     intro h0
     apply hE

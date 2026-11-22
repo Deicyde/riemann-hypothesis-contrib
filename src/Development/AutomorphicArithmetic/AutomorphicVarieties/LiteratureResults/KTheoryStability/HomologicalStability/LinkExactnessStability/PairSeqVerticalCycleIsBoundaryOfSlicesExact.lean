@@ -46,9 +46,11 @@ lemma vbd_mapDomain {V W : Type} (l : List V) (c : List W →₀ ℤ) :
 
 end GlobalTheory.SeqCx.ColDecomp
 
-
 open GlobalTheory.SeqCx.ColDecomp in
-theorem GlobalTheory.SeqCx.vertical_exact_of_columns : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ), (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b) → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
+theorem GlobalTheory.SeqCx.vertical_exact_of_columns
+    : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
+      (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b)
+        → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
   classical
   intro V W D a b hex x hx hvx
   set T : Finset (List V) := x.support.image Prod.fst with hT
@@ -100,12 +102,14 @@ theorem GlobalTheory.SeqCx.vertical_exact_of_columns : ∀ (V W : Type) (D : Set
     have := hyl (Finset.mem_coe.2 hw)
     exact ⟨this.1, (hpre l hl).1, this.2⟩
   set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_sum, hdec]
-      exact Finset.sum_congr rfl (fun l hl => by rw [vbd_mapDomain, hybd l hl])
+  · rw [map_sum, hdec]
+    exact Finset.sum_congr rfl (fun l hl => by rw [vbd_mapDomain, hybd l hl])
 
 section
 open GlobalTheory.SeqCx
-theorem _root_.GlobalTheory.T.pairSeqVerticalCycle_is_boundary_of_slices_exact : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ), (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b) → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
-  first
-  | exact @GlobalTheory.SeqCx.vertical_exact_of_columns
+theorem _root_.GlobalTheory.T.pairSeqVerticalCycle_is_boundary_of_slices_exact
+    : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
+      (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b)
+        → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
+  first | exact @GlobalTheory.SeqCx.vertical_exact_of_columns
 end

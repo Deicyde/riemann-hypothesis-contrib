@@ -16,14 +16,15 @@ open scoped NNReal ENNReal
 
 noncomputable section
 
-theorem NullSmaller.zeroSetEuc_eq_preimage_equiv {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) :
-    zeroSetEuc J =
-      (EuclideanSpace.equiv (Fin n) ℂ) ⁻¹' {x : Fin n → ℂ | ∀ q ∈ J, eval x q = 0} := by
+theorem NullSmaller.zeroSetEuc_eq_preimage_equiv {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ))
+    : zeroSetEuc J
+      = (EuclideanSpace.equiv (Fin n) ℂ) ⁻¹' {x : Fin n → ℂ | ∀ q ∈ J, eval x q = 0} := by
   ext z
   rfl
 
-theorem NullSmaller.ringKrullDim_le_of_lt_succ {R : Type*} [CommRing R] {k : ℕ}
-    (h : ringKrullDim R < ((k + 1 : ℕ) : WithBot ℕ∞)) : ringKrullDim R ≤ (k : WithBot ℕ∞) := by
+theorem NullSmaller.ringKrullDim_le_of_lt_succ
+    {R : Type*} [CommRing R] {k : ℕ} (h : ringKrullDim R < ((k + 1 : ℕ) : WithBot ℕ∞))
+    : ringKrullDim R ≤ (k : WithBot ℕ∞) := by
   generalize ringKrullDim R = a at h ⊢
   induction a using WithBot.recBotCoe with
   | bot => exact bot_le

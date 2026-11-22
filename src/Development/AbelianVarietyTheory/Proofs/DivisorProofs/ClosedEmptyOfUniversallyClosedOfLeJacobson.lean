@@ -10,8 +10,12 @@ open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.AbLaw GlobalTheory.Fo
 
 namespace GlobalTheory
 
-theorem closed_empty_of_universallyClosed_of_le_jacobson :
-  ∀ (R : Type) [CommRing R] (I : Ideal R), I ≤ Ideal.jacobson ⊥ → ∀ (X : Scheme.{0}) (p : X ⟶ Spec (CommRingCat.of R)), UniversallyClosed p → ∀ Z : Set X, IsClosed Z → (∀ x ∈ Z, ¬ I ≤ (p x).asIdeal) → Z = ∅ := by
+theorem closed_empty_of_universallyClosed_of_le_jacobson
+    : ∀ (R : Type) [CommRing R] (I : Ideal R),
+      I ≤ Ideal.jacobson ⊥
+        → ∀ (X : Scheme.{0}) (p : X ⟶ Spec (CommRingCat.of R)),
+          UniversallyClosed p
+            → ∀ Z : Set X, IsClosed Z → (∀ x ∈ Z, ¬ I ≤ (p x).asIdeal) → Z = ∅ := by
   intro R _ I hI X p hp Z hZ hmiss
   by_contra hne
   obtain ⟨x, hx⟩ := Set.nonempty_iff_ne_empty.mpr hne

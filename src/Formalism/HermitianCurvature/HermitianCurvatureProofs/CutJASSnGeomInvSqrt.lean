@@ -8,7 +8,8 @@ open Formalism.FourierDecayAlt
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Geom
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.AdmissibleLieWords
 open scoped ContDiff Topology
 
 noncomputable section

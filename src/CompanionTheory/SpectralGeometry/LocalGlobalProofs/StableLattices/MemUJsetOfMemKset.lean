@@ -12,7 +12,6 @@ open PI.UpqRep (UJset Kset IsKFin IsKStableOn)
 
 namespace GlobalTheory.CompanionTheory.KFinStab
 
-theorem kFinStab : CompanionTheory.D.DSIC.KFinStab :=
-  _root_.UpperTheory.Reformulated.B.Gc1.kFinStab
+theorem kFinStab : CompanionTheory.D.DSIC.KFinStab := _root_.UpperTheory.Reformulated.B.Gc1.kFinStab
 
 end GlobalTheory.CompanionTheory.KFinStab

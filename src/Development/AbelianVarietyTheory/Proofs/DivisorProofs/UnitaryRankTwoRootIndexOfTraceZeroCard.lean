@@ -14,17 +14,16 @@ section
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L}
 
-theorem indexTwo_unitary (y : L) (hy : σ y + y = 0) :
-    cT σ !![1, y; 0, 1] * antiJ L 2 * !![1, y; 0, 1] = antiJ L 2 := by
+theorem indexTwo_unitary (y : L) (hy : σ y + y = 0)
+    : cT σ !![1, y; 0, 1] * antiJ L 2 * !![1, y; 0, 1] = antiJ L 2 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [cT, antiJ, Matrix.mul_apply, Fin.sum_univ_two]
-  rw [add_comm]; exact hy
+  rw [add_comm]
+  exact hy
 
-theorem indexTwo_exists_hom (σ : L →+* L) (T : AddSubgroup L) (hT : ∀ y, y ∈ T ↔ σ y + y = 0) :
-    ∃ ψ : Multiplicative T →* GU σ 2,
-      ∀ y, mat (ψ y) = !![1, (y.toAdd : L); 0, 1] := by
-  have h : ∀ y : Multiplicative T,
-      ∃ g : GU σ 2, mat g = !![1, (y.toAdd : L); 0, 1] := fun y =>
+theorem indexTwo_exists_hom (σ : L →+* L) (T : AddSubgroup L) (hT : ∀ y, y ∈ T ↔ σ y + y = 0)
+    : ∃ ψ : Multiplicative T →* GU σ 2, ∀ y, mat (ψ y) = !![1, (y.toAdd : L); 0, 1] := by
+  have h : ∀ y : Multiplicative T, ∃ g : GU σ 2, mat g = !![1, (y.toAdd : L); 0, 1] := fun y =>
     exists_mat _ (indexTwo_unitary _ ((hT _).1 y.toAdd.2))
   choose f hf using h
   refine ⟨MonoidHom.mk' f fun a b => mat_injective ?_, hf⟩
@@ -32,8 +31,7 @@ theorem indexTwo_exists_hom (σ : L →+* L) (T : AddSubgroup L) (hT : ∀ y, y 
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, add_comm]
 
-theorem indexTwo_mem_root (g : GU σ 2) :
-    g ∈ rootU σ ![0, 0] ↔ mat g = !![1, mat g 0 1; 0, 1] := by
+theorem indexTwo_mem_root (g : GU σ 2) : g ∈ rootU σ ![0, 0] ↔ mat g = !![1, mat g 0 1; 0, 1] := by
   constructor
   · intro h
     have h1 : ∀ i j : Fin 2, j.val ≤ i.val → mat g i j = (1 : Matrix (Fin 2) (Fin 2) L) i j := h.1
@@ -55,9 +53,11 @@ theorem indexTwo_trace (g : GU σ 2) (y : L) (h : mat g = !![1, y; 0, 1]) : σ y
   have := congrFun (congrFun h1 1) 1
   simpa [cT, antiJ, Matrix.mul_apply, Fin.sum_univ_two, add_comm] using this
 
-theorem indexTwo_conj {ϖ : L} (h0 : ϖ ≠ 0) (s g : GU σ 2)
-    (hs : mat s = Matrix.diagonal (fun i => ϖ ^ (![1, -1] : Fin 2 → ℤ) i)) (y : L)
-    (h : mat g = !![1, y; 0, 1]) : mat (s * g * s⁻¹) = !![1, ϖ * (ϖ * y); 0, 1] := by
+theorem indexTwo_conj
+    {ϖ : L} (h0 : ϖ ≠ 0)
+    (s g : GU σ 2) (hs : mat s = Matrix.diagonal (fun i => ϖ ^ (![1, -1] : Fin 2 → ℤ) i))
+    (y : L) (h : mat g = !![1, y; 0, 1])
+    : mat (s * g * s⁻¹) = !![1, ϖ * (ϖ * y); 0, 1] := by
   have e : mat s * mat g = !![1, ϖ * (ϖ * y); 0, 1] * mat s := by
     rw [hs, h]
     ext i j
@@ -104,8 +104,13 @@ theorem indexTwo_of_traceZeroIndex (H : TraceZeroIndex) : IndexTwo := by
     · rintro ⟨hK, hr⟩
       have hr' := (indexTwo_mem_root g).1 hr
       have ht := (memT _).2 (indexTwo_trace g _ hr')
-      refine ⟨Multiplicative.ofAdd ⟨mat g 0 1, ht⟩, ⟨(mem_KU_iff hU.2.1 g).1 hK 0 1, ht⟩, mat_injective ?_⟩
-      rw [hψ]; exact hr'.symm
+      refine ⟨
+        Multiplicative.ofAdd ⟨mat g 0 1, ht⟩,
+        ⟨(mem_KU_iff hU.2.1 g).1 hK 0 1, ht⟩,
+        mat_injective ?_
+      ⟩
+      rw [hψ]
+      exact hr'.symm
     · rintro ⟨y, hy, rfl⟩
       have hy1 : (y.toAdd : L) ∈ intL L := hy.1
       refine ⟨(mem_KU_iff hU.2.1 _).2 fun i j => ?_, (indexTwo_mem_root _).2 ?_⟩
@@ -116,17 +121,25 @@ theorem indexTwo_of_traceZeroIndex (H : TraceZeroIndex) : IndexTwo := by
         · exact zero_mem _
         · exact one_mem _
       · rw [hψ]; rfl
-  have e2 : ((AddSubgroup.toSubgroup (U.addSubgroupOf T)).map ψ).map (MulAut.conj s).toMonoidHom =
-      (AddSubgroup.toSubgroup (((U.map m).map m).addSubgroupOf T)).map ψ := by
+  have e2
+      : ((AddSubgroup.toSubgroup (U.addSubgroupOf T)).map ψ).map (MulAut.conj s).toMonoidHom
+        = (AddSubgroup.toSubgroup (((U.map m).map m).addSubgroupOf T)).map ψ := by
     ext g
     constructor
     · rintro ⟨_, ⟨y, hy, rfl⟩, rfl⟩
-      refine ⟨Multiplicative.ofAdd ⟨ϖ * (ϖ * (y.toAdd : L)), hmT _ (hmT _ y.toAdd.2)⟩,
-        ⟨_, ⟨_, hy, rfl⟩, rfl⟩, mat_injective ?_⟩
+      refine ⟨
+        Multiplicative.ofAdd ⟨ϖ * (ϖ * (y.toAdd : L)), hmT _ (hmT _ y.toAdd.2)⟩,
+        ⟨_, ⟨_, hy, rfl⟩, rfl⟩,
+        mat_injective ?_
+      ⟩
       rw [hψ]
       exact (indexTwo_conj h0 s _ hs _ (hψ y)).symm
     · rintro ⟨z, ⟨_, ⟨y, hy, rfl⟩, hz⟩, rfl⟩
-      refine ⟨ψ (Multiplicative.ofAdd ⟨y, hy.2⟩), ⟨Multiplicative.ofAdd ⟨y, hy.2⟩, hy, rfl⟩, mat_injective ?_⟩
+      refine ⟨
+        ψ (Multiplicative.ofAdd ⟨y, hy.2⟩),
+        ⟨Multiplicative.ofAdd ⟨y, hy.2⟩, hy, rfl⟩,
+        mat_injective ?_
+      ⟩
       refine (indexTwo_conj h0 s _ hs _ (hψ _)).trans ?_
       rw [hψ]
       exact congrArg (fun w => !![1, w; 0, 1]) hz

@@ -6,17 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUni
 
 @[expose] public section
 
-open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.HV UpperTheory.V.Base IsLocalRing
+open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.Alg
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.HV UpperTheory.V.Base IsLocalRing
 
 section SlopeTestRemainingChoices
 open MvPowerSeries
 
-private theorem gc_mem_max {E σ : Type} [Field E] (a : MvPowerSeries σ E) :
-    a ∈ maximalIdeal _ ↔ constantCoeff a = 0 := by
-  rw [mem_maximalIdeal, mem_nonunits_iff, MvPowerSeries.isUnit_iff_constantCoeff, isUnit_iff_ne_zero, not_not]
+private theorem gc_mem_max {E σ : Type} [Field E] (a : MvPowerSeries σ E)
+    : a ∈ maximalIdeal _ ↔ constantCoeff a = 0 := by
+  rw [mem_maximalIdeal, mem_nonunits_iff, MvPowerSeries.isUnit_iff_constantCoeff,
+    isUnit_iff_ne_zero, not_not]
 
-private theorem gc_order_of_mem {E σ : Type} [Field E] (N : ℕ) :
-    ∀ g ∈ maximalIdeal (MvPowerSeries σ E) ^ N, (N : ℕ∞) ≤ g.order := by
+private theorem gc_order_of_mem {E σ : Type} [Field E] (N : ℕ)
+    : ∀ g ∈ maximalIdeal (MvPowerSeries σ E) ^ N, (N : ℕ∞) ≤ g.order := by
   induction N with
   | zero => intro g _; simp
   | succ n ih =>
@@ -29,8 +31,8 @@ private theorem gc_order_of_mem {E σ : Type} [Field E] (N : ℕ) :
     · intro f g hf hg
       exact le_trans (le_min hf hg) (min_order_le_add)
 
-private theorem gc_mem_pow_iff {E σ : Type} [Field E] [Finite σ] (N : ℕ) (g : MvPowerSeries σ E) :
-    g ∈ maximalIdeal (MvPowerSeries σ E) ^ N ↔ ∀ d : σ →₀ ℕ, d.degree < N → coeff d g = 0 := by
+private theorem gc_mem_pow_iff {E σ : Type} [Field E] [Finite σ] (N : ℕ) (g : MvPowerSeries σ E)
+    : g ∈ maximalIdeal (MvPowerSeries σ E) ^ N ↔ ∀ d : σ →₀ ℕ, d.degree < N → coeff d g = 0 := by
   classical
   haveI := Fintype.ofFinite σ
   constructor
@@ -62,9 +64,14 @@ private theorem gc_mem_pow_iff {E σ : Type} [Field E] [Finite σ] (N : ℕ) (g 
           exact Classical.choose_spec h
         let gi : σ → MvPowerSeries σ E := fun i e =>
           if pick (e + Finsupp.single i 1) = i then coeff (e + Finsupp.single i 1) g else 0
-        have hgi : ∀ i e, coeff e (gi i) =
-            if pick (e + Finsupp.single i 1) = i then coeff (e + Finsupp.single i 1) g else 0 :=
-          fun i e => rfl
+        have hgi
+            : ∀ i e,
+              coeff e (gi i)
+                = if pick (e + Finsupp.single i 1) = i then
+                    coeff (e + Finsupp.single i 1) g
+                  else
+                    0 := fun i e =>
+          rfl
         have hdecomp : g = ∑ i, X i * gi i := by
           ext e
           set_option synthInstance.maxHeartbeats 100000 in
@@ -106,24 +113,28 @@ private theorem gc_mem_pow_iff {E σ : Type} [Field E] [Finite σ] (N : ℕ) (g 
           omega
         · rfl
 
-private theorem gc_coeff_single_mul {E σ : Type} [CommRing E] (i : σ) (f g : MvPowerSeries σ E) :
-    coeff (Finsupp.single i 1) (f * g) =
-      constantCoeff f * coeff (Finsupp.single i 1) g + constantCoeff g * coeff (Finsupp.single i 1) f := by
+private theorem gc_coeff_single_mul {E σ : Type} [CommRing E] (i : σ) (f g : MvPowerSeries σ E)
+    : coeff (Finsupp.single i 1) (f * g)
+      = constantCoeff f * coeff (Finsupp.single i 1) g
+        + constantCoeff g * coeff (Finsupp.single i 1) f := by
   classical
   rw [coeff_mul, Finsupp.antidiagonal_single]
   simp [Finset.Nat.antidiagonal_succ, coeff_zero_eq_constantCoeff_apply]
   ring
 
-private theorem gc_lin {A σ : Type} [CommRing A] [Fintype σ] (f : MvPowerSeries σ A) (d : σ →₀ ℕ)
-    (hd : d.degree < 2) :
-    coeff d (f - algebraMap A _ (constantCoeff f) - ∑ i, coeff (Finsupp.single i 1) f • (X i : MvPowerSeries σ A)) = 0 := by
+private theorem gc_lin
+    {A σ : Type} [CommRing A] [Fintype σ] (f : MvPowerSeries σ A) (d : σ →₀ ℕ) (hd : d.degree < 2)
+    : coeff d
+        (f - algebraMap A _ (constantCoeff f)
+          - ∑ i, coeff (Finsupp.single i 1) f • (X i : MvPowerSeries σ A))
+      = 0 := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     simp [MvPowerSeries.algebraMap_apply, coeff_C, coeff_X, map_sum]
   by_cases hd0 : d = 0
   · subst hd0
-    have hne : ∀ x : σ, ¬ (0 : σ →₀ ℕ) = Finsupp.single x 1 :=
-      fun x h => one_ne_zero (Finsupp.single_eq_zero.mp h.symm)
+    have hne : ∀ x : σ, ¬ (0 : σ →₀ ℕ) = Finsupp.single x 1 := fun x h =>
+      one_ne_zero (Finsupp.single_eq_zero.mp h.symm)
     simp [hne, coeff_zero_eq_constantCoeff_apply]
   · have h1 : Finsupp.degree d = 1 := by
       have : Finsupp.degree d ≠ 0 := fun h => hd0 ((Finsupp.degree_eq_zero_iff d).mp h)
@@ -237,8 +248,9 @@ private lemma gc_wcomp_ne {σ : Type} (wt : σ → Y) {j k : Y} (hjk : j ≠ k) 
   · exact hf n (by rw [hn]; exact fun h => hjk h.symm)
   · rfl
 
-private theorem finsupp_prod_X_pow_eq_monomial_mapDomain {A σ' τ' : Type} [CommSemiring A] (u : τ' → σ') (e : τ' →₀ ℕ) :
-    (e.prod fun i k => (X (u i) : MvPowerSeries σ' A) ^ k) = monomial (e.mapDomain u) 1 := by
+private theorem finsupp_prod_X_pow_eq_monomial_mapDomain
+    {A σ' τ' : Type} [CommSemiring A] (u : τ' → σ') (e : τ' →₀ ℕ)
+    : (e.prod fun i k => (X (u i) : MvPowerSeries σ' A) ^ k) = monomial (e.mapDomain u) 1 := by
   classical
   refine Finsupp.induction e ?_ ?_
   · simp [Finsupp.mapDomain_zero, monomial_zero_eq_C_apply]
@@ -247,15 +259,16 @@ private theorem finsupp_prod_X_pow_eq_monomial_mapDomain {A σ' τ' : Type} [Com
     rw [Finsupp.prod_single_index (by simp), ih, Finsupp.mapDomain_add, Finsupp.mapDomain_single,
       X_pow_eq, monomial_mul_monomial, one_mul]
 
-private theorem weight_mapDomain_eq_weight_comp {σ' τ' Y' : Type} [AddCommGroup Y'] (wt : σ' → Y') (u : τ' → σ')
-    (e : τ' →₀ ℕ) :
-    Finsupp.weight wt (e.mapDomain u) = Finsupp.weight (fun i => wt (u i)) e := by
+private theorem weight_mapDomain_eq_weight_comp
+    {σ' τ' Y' : Type} [AddCommGroup Y'] (wt : σ' → Y') (u : τ' → σ') (e : τ' →₀ ℕ)
+    : Finsupp.weight wt (e.mapDomain u) = Finsupp.weight (fun i => wt (u i)) e := by
   rw [Finsupp.weight_apply, Finsupp.weight_apply,
     Finsupp.sum_mapDomain_index (h := fun i c => c • wt i) (by simp) (by intros; simp [add_smul])]
 
-private theorem wcomp_monomial_eq_ite_weight {A σ' Y' : Type} [CommRing A] [AddCommGroup Y'] [DecidableEq Y']
-    (wt : σ' → Y') (k : Y') (m : σ' →₀ ℕ) (c : A) :
-    wcomp A wt k (monomial m c) = if Finsupp.weight wt m = k then monomial m c else 0 := by
+private theorem wcomp_monomial_eq_ite_weight
+    {A σ' Y' : Type} [CommRing A] [AddCommGroup Y'] [DecidableEq Y']
+    (wt : σ' → Y') (k : Y') (m : σ' →₀ ℕ) (c : A)
+    : wcomp A wt k (monomial m c) = if Finsupp.weight wt m = k then monomial m c else 0 := by
   classical
   ext n
   rw [coeff_wcomp, coeff_monomial]
@@ -579,16 +592,31 @@ private lemma gc_count [IsDomain O] [IsFractionRing O E] [Fintype τ] (x : R →
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Loc.gradedChart :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O] (E : Type) [Field E] [Algebra ℚ_[l] E] [Module.Finite ℚ_[l] E] [Algebra O E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] O E] [IsScalarTower ℤ_[l] ℚ_[l] E] [IsFractionRing O E] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] {X : Type} [AddCommGroup X] (W : WPres O X R) (h : W.HasOrigin) (P : Ideal R) {n : ℕ} (φ : R →ₐ[O] MvPowerSeries (Fin n) E), UpperTheory.V.Loc.IsCompl P (W.origin h) φ → (∃ y, W.origin h y ≠ 0 ∧ ∀ a ∈ P, y * a = 0) → ∃ (w : Fin n → X) (φ' : R →ₐ[O] MvPowerSeries (Fin n) E), UpperTheory.V.Loc.IsCompl P (W.origin h) φ' ∧ (∀ j, ∀ f ∈ W.part j, φ' f ∈ wtPart E w j) ∧ ∀ j, Nat.card {i // w i = j} = finrank E ↥(wtDer W.part (W.origin h) E j) := by
+theorem UpperTheory.V.Loc.gradedChart
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O]
+        (E : Type) [Field E] [Algebra ℚ_[l] E] [Module.Finite ℚ_[l] E] [Algebra O E]
+        [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] O E] [IsScalarTower ℤ_[l] ℚ_[l] E]
+        [IsFractionRing O E] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] {X : Type}
+        [AddCommGroup X] (W : WPres O X R) (h : W.HasOrigin) (P : Ideal R) {n : ℕ}
+        (φ : R →ₐ[O] MvPowerSeries (Fin n) E),
+      UpperTheory.V.Loc.IsCompl P (W.origin h) φ → (∃ y, W.origin h y ≠ 0 ∧ ∀ a ∈ P, y * a = 0)
+        → ∃ (w : Fin n → X) (φ' : R →ₐ[O] MvPowerSeries (Fin n) E),
+          UpperTheory.V.Loc.IsCompl P (W.origin h) φ' ∧ (∀ j, ∀ f ∈ W.part j, φ' f ∈ wtPart E w j)
+            ∧ ∀ j, Nat.card {i // w i = j} = finrank E ↥(wtDer W.part (W.origin h) E j) := by
   intro l _ O _ _ _ _ _ _ _ E _ _ _ _ _ _ _ _ R _ _ _ X _ W h P n φ hφ hy
   haveI : FaithfulSMul O E :=
     (faithfulSMul_iff_algebraMap_injective O E).mpr (IsFractionRing.injective O E)
   obtain ⟨u, hu⟩ := gc_span W h hφ
-  have hz0 : ∀ i, W.origin h ((fun i => W.z (u i)) i) = 0 := fun i => origin_at_generator_eq_zero W h (u i)
+  have hz0 : ∀ i, W.origin h ((fun i => W.z (u i)) i) = 0 := fun i =>
+    origin_at_generator_eq_zero W h (u i)
   obtain ⟨φ', hφ', hX⟩ := chartChange n P (W.origin h) φ (fun i => W.z (u i)) hφ hz0 hu
-  have hgr : ∀ j, ∀ f ∈ W.part j, φ' f ∈ wtPart E (fun i => W.wt (u i)) j :=
-    fun j f hf => gc_graded W h hφ' hy u hX j f hf
+  have hgr : ∀ j, ∀ f ∈ W.part j, φ' f ∈ wtPart E (fun i => W.wt (u i)) j := fun j f hf =>
+    gc_graded W h hφ' hy u hX j f hf
   refine ⟨fun i => W.wt (u i), φ', hφ', hgr, fun j => ?_⟩
-  exact gc_count (W.origin h) W.part hφ' hy (fun i => W.z (u i)) hX (fun i => W.wt (u i))
-    (fun i => W.z_mem (u i)) hgr j
+  exact gc_count (W.origin h) W.part hφ' hy
+    (fun i => W.z (u i))
+    hX
+    (fun i => W.wt (u i))
+    (fun i => W.z_mem (u i))
+    hgr j

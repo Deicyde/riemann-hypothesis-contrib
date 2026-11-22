@@ -84,7 +84,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chebota
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.SetPtOff
 
@@ -96,7 +98,10 @@ theorem litBurnside_all (D : D7) : LitBurnside (G D.host.E D.nd.Om) := by
   · apply GlobalTheory.BurnsideField.span_mat_eq_top_of_isIrrSub ρ
     refine ⟨?_, ?_, ?_⟩
     · intro hb
-      have : (Pi.single (⟨0, ha⟩ : Fin a) (1 : CyclotomicNorms.Fbar l) : Fin a → CyclotomicNorms.Fbar l) ∈ (⊤ : Submodule (CyclotomicNorms.Fbar l) (Fin a → CyclotomicNorms.Fbar l)) := trivial
+      have : (Pi.single (⟨0, ha⟩ : Fin a) (1 : CyclotomicNorms.Fbar l)
+            : Fin a → CyclotomicNorms.Fbar l)
+          ∈ (⊤ : Submodule (CyclotomicNorms.Fbar l) (Fin a → CyclotomicNorms.Fbar l)) :=
+        trivial
       rw [hb, Submodule.mem_bot] at this
       have h1 := congrFun this ⟨0, ha⟩
       simp at h1

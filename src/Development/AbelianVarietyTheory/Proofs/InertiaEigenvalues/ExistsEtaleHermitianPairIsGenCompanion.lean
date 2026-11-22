@@ -12,8 +12,8 @@ noncomputable section
 
 namespace GlobalTheory.JR
 
-theorem charpoly_companion {k : Type} [Field k] {r : ℕ} (p : Fin r → k) :
-    (companion p).charpoly = X ^ r + ∑ i, C (p i) * X ^ (i : ℕ) := by
+theorem charpoly_companion {k : Type} [Field k] {r : ℕ} (p : Fin r → k)
+    : (companion p).charpoly = X ^ r + ∑ i, C (p i) * X ^ (i : ℕ) := by
   set P : k[X] := X ^ r + ∑ i, C (p i) * X ^ (i : ℕ) with hP
   have hlt : (∑ i, C (p i) * X ^ (i : ℕ) : k[X]).degree < r := degree_sum_fin_lt p
   have hm : P.Monic := monic_X_pow_add hlt
@@ -42,7 +42,8 @@ theorem charpoly_companion {k : Type} [Field k] {r : ℕ} (p : Fin r → k) :
     rw [Algebra.leftMulMatrix_eq_repr_mul, hb, ← pow_succ']
     simp only [companion, Matrix.of_apply]
     by_cases hj : (j : ℕ) + 1 = r
-    · rw [if_pos hj, hj, hroot, ← b.equivFun_symm_apply, ← b.equivFun_apply, LinearEquiv.apply_symm_apply]
+    · rw [if_pos hj, hj, hroot, ← b.equivFun_symm_apply, ← b.equivFun_apply,
+        LinearEquiv.apply_symm_apply]
     · rw [if_neg hj]
       have hlt' : (j : ℕ) + 1 < r := lt_of_le_of_ne j.2 hj
       have : AdjoinRoot.root P ^ ((j : ℕ) + 1) = b ⟨(j : ℕ) + 1, hlt'⟩ := by rw [hb]
@@ -52,14 +53,16 @@ theorem charpoly_companion {k : Type} [Field k] {r : ℕ} (p : Fin r → k) :
       · rw [if_neg hi, if_neg (fun h => hi (congrArg Fin.val h).symm)]
   have hP0 : P ≠ 0 := hm.ne_zero
   haveI : Module.Finite k (AdjoinRoot P) := pb.finite
-  rw [hmat, Algebra.leftMulMatrix_apply, LinearMap.charpoly_toMatrix, ← LinearMap.charpoly_toMatrix _ pb.basis,
-    ← Algebra.leftMulMatrix_apply]
+  rw [hmat, Algebra.leftMulMatrix_apply, LinearMap.charpoly_toMatrix,
+    ← LinearMap.charpoly_toMatrix _ pb.basis, ← Algebra.leftMulMatrix_apply]
   have hg : pb.gen = AdjoinRoot.root P := rfl
-  rw [← hg, charpoly_leftMulMatrix, hg, AdjoinRoot.minpoly_root hP0, hm.leadingCoeff, inv_one, C_1, mul_one]
+  rw [← hg, charpoly_leftMulMatrix, hg, AdjoinRoot.minpoly_root hP0, hm.leadingCoeff, inv_one, C_1,
+    mul_one]
 
-theorem exists_et_isGen_companion : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (p : Fin r → F),
-    (companion p).charpoly.Separable → ∃ (A : Et F E) (τ : A.K), A.IsGen τ p := by
+theorem exists_et_isGen_companion
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (p : Fin r → F),
+      (companion p).charpoly.Separable → ∃ (A : Et F E) (τ : A.K), A.IsGen τ p := by
   intro F E _ _ _ _ _ r p hs
   rw [charpoly_companion] at hs
   exact EtExist.exists_isGen F E r p hs

@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.chart_of :
-    Chart := by
+theorem UpperTheory.Gal.TranscendenceTraces.chart_of : Chart := by
   intro Z S p _ A _ u
   haveI : IsAffine (pullback p u) := isAffine_of_isAffineHom (pullback.snd p u)
   let V := pullback p u
@@ -23,5 +23,5 @@ theorem UpperTheory.Gal.TranscendenceTraces.chart_of :
     have h2 := (IsFinite.SpecMap_iff _).1 hfin
     exact RingHom.finite_algebraMap.1 h2
   · rw [hφ']
-    exact IsPullback.of_iso (IsPullback.of_hasPullback p u) e.symm (Iso.refl _) (Iso.refl _) (Iso.refl _)
-      (by simp) (by simp) (by simp) (by simp)
+    exact IsPullback.of_iso (IsPullback.of_hasPullback p u) e.symm (Iso.refl _) (Iso.refl _)
+      (Iso.refl _) (by simp) (by simp) (by simp) (by simp)

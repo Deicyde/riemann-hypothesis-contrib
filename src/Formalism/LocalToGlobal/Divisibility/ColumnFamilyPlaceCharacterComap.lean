@@ -12,11 +12,13 @@ noncomputable section
 
 namespace Formalism.L2.DIV
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.DivisionValues Formalism.L2.Indef
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.DivisionValues
+  Formalism.L2.Indef
 
 section Gen
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
 
 namespace DefFam
 
@@ -84,23 +86,23 @@ end Gen
 
 section Inst
 
-variable {X : Col.Fields} {Pr : Col.Primes X} {R : Ranks} (W : Col.Wts X Pr.Word R) (Ch : Col.Chars X Pr R.m)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (hX : X.Ok)
+variable
+  {X : Col.Fields} {Pr : Col.Primes X} {R : Ranks} (W : Col.Wts X Pr.Word R)
+  (Ch : Col.Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S : Set ℕ}
+  (hX : X.Ok)
 
-def TupF.incl {TU TC : Finset (Tup X.F X.E X.K S)} (h : TU ⊆ TC) : TupF TU → TupF TC :=
-  fun τ => ⟨τ.1, τ.2.imp id fun hm => h hm⟩
+def TupF.incl {TU TC : Finset (Tup X.F X.E X.K S)} (h : TU ⊆ TC) : TupF TU → TupF TC := fun τ =>
+  ⟨τ.1, τ.2.imp id fun hm => h hm⟩
 
-variable (v0 : InfinitePlace X.K) {TU TC : Finset (Tup X.F X.E X.K S)} (h : TU ⊆ TC)
-  (Xg : Finset (Col.G0 X.E Pr.vGs R.r → X.K)) (S0 : Set (HeightOneSpectrum (𝓞 X.E)))
+variable
+  (v0 : InfinitePlace X.K)
+  {TU TC : Finset (Tup X.F X.E X.K S)} (h : TU ⊆ TC)
+  (Xg : Finset (Col.G0 X.E Pr.vGs R.r → X.K))
+  (S0 : Set (HeightOneSpectrum (𝓞 X.E)))
   (xiVal : Tup X.F X.E X.K S → HeightOneSpectrum (𝓞 X.E) → X.Kˣ)
-  (trIv : Fin R.m → (Col.LevOffI ∅ Pr.vGs S0 × List ℕ → X.K) → Col.LevOffI ∅ Pr.vGs S0 × List ℕ → X.K)
-
-
-
-
-
-
-
+  (trIv
+    : Fin R.m → (Col.LevOffI ∅ Pr.vGs S0 × List ℕ → X.K) → Col.LevOffI ∅ Pr.vGs S0 × List ℕ → X.K)
 
 variable (Zs : DefSub (colFam3 W Ch sel hX v0 TC Xg S0 xiVal trIv).amb3)
 

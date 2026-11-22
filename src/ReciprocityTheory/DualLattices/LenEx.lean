@@ -19,21 +19,20 @@ theorem lenEx : LenExStatement := by
   have := ValuationRing.of_integers v hv
   set Mm := LinearMap.range (Matrix.mulVecLin Aᵀ) with hMm
   set N := (LinearMap.range (Matrix.mulVecLin B)).map (Matrix.mulVecLin Ht) with hN
-  have hfgM : Mm.FG := by
-    rw [hMm, LinearMap.range_eq_map]; exact Module.Finite.fg_top.map _
-  have hfgN : N.FG := by
-    rw [hN, LinearMap.range_eq_map]; exact (Module.Finite.fg_top.map _).map _
+  have hfgM : Mm.FG := by rw [hMm, LinearMap.range_eq_map]; exact Module.Finite.fg_top.map _
+  have hfgN : N.FG := by rw [hN, LinearMap.range_eq_map]; exact (Module.Finite.fg_top.map _).map _
   set S := Mm ⊔ N with hS
   have hfgS : S.FG := hfgM.sup hfgN
   have : Module.Finite R S := Module.Finite.iff_fg.2 hfgS
-  have : Module.Free R S := L2.SecondCohomologyLattice.free_of_finite_torsionFree S (by
-    rintro r ⟨x, hx⟩ hr h
-    apply Subtype.ext
-    funext i
-    have := congrFun (congrArg Subtype.val h) i
-    simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, Submodule.coe_zero,
-      Pi.zero_apply] at this
-    exact (mul_eq_zero.1 this).resolve_left hr)
+  have : Module.Free R S :=
+    L2.SecondCohomologyLattice.free_of_finite_torsionFree S (by
+      rintro r ⟨x, hx⟩ hr h
+      apply Subtype.ext
+      funext i
+      have := congrFun (congrArg Subtype.val h) i
+      simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, Submodule.coe_zero, Pi.zero_apply]
+        at this
+      exact (mul_eq_zero.1 this).resolve_left hr)
   set bS := (Module.Free.chooseBasis R S).reindex (Fintype.equivFin _) with hbS
   set e := bS.equivFun with he
   set N' := N.comap S.subtype with hN'
@@ -44,23 +43,28 @@ theorem lenEx : LenExStatement := by
   set K := N'.map e.toLinearMap with hK
   have hfgK : K.FG := hfgN'.map _
   obtain ⟨n, gK, hgK⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hfgK
-  have smithGen (b : ℕ) (f : Fin n → Fin b → R) :
-      ∃ c : Fin b → R, Nonempty (((Fin b → R) ⧸ Submodule.span R (Set.range f)) ≃ₗ[R]
-        ((i : Fin b) → R ⧸ Ideal.span {c i})) := by
+  have smithGen (b : ℕ) (f : Fin n → Fin b → R)
+      : ∃ c : Fin b → R,
+        Nonempty
+          (((Fin b → R) ⧸ Submodule.span R (Set.range f)) ≃ₗ[R]
+            ((i : Fin b) → R ⧸ Ideal.span {c i})) := by
     induction b with
-    | zero =>
-      exact ⟨Fin.elim0, ⟨LinearEquiv.ofSubsingleton _ _⟩⟩
+    | zero => exact ⟨Fin.elim0, ⟨LinearEquiv.ofSubsingleton _ _⟩⟩
     | succ b ih =>
       obtain ⟨i, a, u, s, hu, hau, hs, -, -⟩ := Smith.exists_pivot hv (b := b) f
       obtain ⟨ep⟩ := Smith.pivot_equiv f i a u s hu hau hs
       obtain ⟨c, ⟨er⟩⟩ := ih (fun j => Fin.removeNth i (f j - s j • a • u))
-      exact ⟨Fin.cons a c,
-        ⟨(ep.trans ((LinearEquiv.refl R _).prodCongr er)).trans (Smith.consEquiv a c)⟩⟩
+      exact ⟨
+        Fin.cons a c,
+        ⟨(ep.trans ((LinearEquiv.refl R _).prodCongr er)).trans (Smith.consEquiv a c)⟩
+      ⟩
   obtain ⟨c, ⟨ec⟩⟩ := smithGen _ gK
   refine ⟨∏ i, v (algebraMap R C (c i)), _, c, ⟨?_⟩, rfl⟩
   have h1 : N.comap Mm.subtype = Mm.comap Mm.subtype ⊓ N.comap Mm.subtype := by
     rw [Submodule.comap_subtype_self, top_inf_eq]
-  exact (Submodule.quotEquivOfEq _ _ h1).trans ((LinearMap.quotientInfEquivSupQuotient Mm N).trans
-    ((Submodule.Quotient.equiv N' K e rfl).trans ((Submodule.quotEquivOfEq _ _ hgK.symm).trans ec)))
+  exact (Submodule.quotEquivOfEq _ _ h1).trans
+    ((LinearMap.quotientInfEquivSupQuotient Mm N).trans
+      ((Submodule.Quotient.equiv N' K e rfl).trans
+        ((Submodule.quotEquivOfEq _ _ hgK.symm).trans ec)))
 
 end ReciprocityTheory.PGsh.Up

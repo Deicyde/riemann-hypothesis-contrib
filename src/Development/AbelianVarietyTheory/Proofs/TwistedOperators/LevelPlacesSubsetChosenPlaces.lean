@@ -7,15 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ThetaLift
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun GlobalTheory.ChainCol
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+  GlobalTheory.ChainCol
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open Classical
 
 namespace GlobalTheory.LevelPlacesChosen
 
-theorem levelPlaces_subset_chosenPlaces : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) {μ₀ : T},
-    L.Is μ₀ → L.Pg ⊆ G.pl.W0 := by
+theorem levelPlaces_subset_chosenPlaces
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) {μ₀ : T},
+      L.Is μ₀ → L.Pg ⊆ G.pl.W0 := by
   intro D T L sc G μ₀ hμ P hP
   obtain ⟨k, hk⟩ := (hμ.Pg P).1 hP
   have hK : P.under (𝓞 D.host.K) = L.C.P.pb k := hk
@@ -26,7 +33,8 @@ theorem levelPlaces_subset_chosenPlaces : ∀ {D : D7} {T : Type} {L : LevCh D T
     rwa [map_natCast] at h2
   have hgF : ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ (P.under (𝓞 D.host.F)).asIdeal := by
     show algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ P.asIdeal
-    rw [map_natCast]; exact hgE
+    rw [map_natCast]
+    exact hgE
   have hS1 : P.under (𝓞 D.host.F) ∈ S1 D := by
     rw [S1_mem_OmF]
     fin_cases k
@@ -34,7 +42,8 @@ theorem levelPlaces_subset_chosenPlaces : ∀ {D : D7} {T : Type} {L : LevCh D T
     · exact Or.inr (Or.inl hgF)
   have hS0 : P.under (𝓞 D.host.F) ∈ insert G.pl.v0 (S1 D) := Finset.mem_insert_of_mem hS1
   have hwPg : G.pl.w (P.under (𝓞 D.host.F)) ∈ L.Pg := G.pl.w_g _ k hgF
-  have hover : (G.pl.w (P.under (𝓞 D.host.F))).under (𝓞 D.host.F) = P.under (𝓞 D.host.F) := G.pl.w_over _ hS0
+  have hover : (G.pl.w (P.under (𝓞 D.host.F))).under (𝓞 D.host.F) = P.under (𝓞 D.host.F) :=
+    G.pl.w_over _ hS0
   have heq : G.pl.w (P.under (𝓞 D.host.F)) = P := by
     rcases GlobalTheory.GoodPrimes.eq_or_conj_of_under_eq hover with h | h
     · exact h

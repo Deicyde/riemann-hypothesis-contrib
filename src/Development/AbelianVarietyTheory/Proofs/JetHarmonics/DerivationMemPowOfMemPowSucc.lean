@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.DerivationMemPow
 
-theorem derivation_mem_pow_of_mem_pow_succ {k A : Type} [CommRing k] [CommRing A] [Algebra k A]
-    (D : Derivation k A A) (I : Ideal A) (n : ℕ) :
-    ∀ x ∈ I ^ (n + (1 : ℕ)), (D : A → A) x ∈ I ^ n := by
+theorem derivation_mem_pow_of_mem_pow_succ
+    {k A : Type} [CommRing k] [CommRing A] [Algebra k A]
+    (D : Derivation k A A) (I : Ideal A) (n : ℕ)
+    : ∀ x ∈ I ^ (n + (1 : ℕ)), (D : A → A) x ∈ I ^ n := by
   induction n with
   | zero => intro x _; simp
   | succ n ih =>

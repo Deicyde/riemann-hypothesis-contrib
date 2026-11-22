@@ -11,20 +11,23 @@ namespace PI.WAU
 open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum NumberField Formalism.MainNotions.S
 open scoped TensorProduct
 
-variable {F : Type} [Field F] [NumberField F] {E : Type} [Field E] [NumberField E] [Algebra F E] {n : ℕ}
+variable
+  {F : Type} [Field F] [NumberField F] {E : Type} [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
 def ohatL (L : Submodule (𝓞 E) (Fin n → E)) : AddSubgroup (Fin n → E ⊗[F] Af F) :=
-  AddSubgroup.closure {y | ∃ c ∈ Ohat F, ∃ l ∈ L, y = ((1 : E) ⊗ₜ[F] c) • fun i => Formalism.UG.inclE (F := F) (Af F) (l i)}
+  AddSubgroup.closure
+    {y | ∃ c ∈ Ohat F, ∃ l ∈ L, y = ((1 : E) ⊗ₜ[F] c) • fun i => Formalism.UG.inclE (F := F) (Af F) (l i)}
 
-theorem smul_ohatL (L : Submodule (𝓞 E) (Fin n → E)) {a : E ⊗[F] Af F} (ha : a ∈ IntAf F E) :
-    ∀ y ∈ ohatL (F := F) L, a • y ∈ ohatL (F := F) L := by
-  let T : Subring (E ⊗[F] Af F) :=
-    { carrier := {a | ∀ y ∈ ohatL (F := F) L, a • y ∈ ohatL (F := F) L}
-      mul_mem' := fun {a c} ha hc y hy => by rw [mul_smul]; exact ha _ (hc y hy)
-      one_mem' := fun y hy => by rw [one_smul]; exact hy
-      add_mem' := fun {a c} ha hc y hy => by rw [add_smul]; exact add_mem (ha y hy) (hc y hy)
-      zero_mem' := fun y _ => by rw [zero_smul]; exact zero_mem _
-      neg_mem' := fun {a} ha y hy => by rw [neg_smul]; exact neg_mem (ha y hy) }
+theorem smul_ohatL (L : Submodule (𝓞 E) (Fin n → E)) {a : E ⊗[F] Af F} (ha : a ∈ IntAf F E)
+    : ∀ y ∈ ohatL (F := F) L, a • y ∈ ohatL (F := F) L := by
+  let T : Subring (E ⊗[F] Af F) := {
+    carrier := {a | ∀ y ∈ ohatL (F := F) L, a • y ∈ ohatL (F := F) L}
+    mul_mem' := fun {a c} ha hc y hy => by rw [mul_smul]; exact ha _ (hc y hy)
+    one_mem' := fun y hy => by rw [one_smul]; exact hy
+    add_mem' := fun {a c} ha hc y hy => by rw [add_smul]; exact add_mem (ha y hy) (hc y hy)
+    zero_mem' := fun y _ => by rw [zero_smul]; exact zero_mem _
+    neg_mem' := fun {a} ha y hy => by rw [neg_smul]; exact neg_mem (ha y hy)
+  }
   have hle : IntAf F E ≤ T := by
     apply Subring.closure_le.mpr
     rintro a (⟨⟨x, hx⟩, rfl⟩ | ⟨⟨c', hc'⟩, rfl⟩)
@@ -58,8 +61,9 @@ theorem smul_ohatL (L : Submodule (𝓞 E) (Fin n → E)) {a : E ⊗[F] Af F} (h
       | neg u _ hu => rw [smul_neg]; exact neg_mem hu
   exact hle ha
 
-theorem lamAf_le_ohatL (L : Submodule (𝓞 E) (Fin n → E)) {y : Fin n → E ⊗[F] Af F}
-    (hy : y ∈ lamAf (F := F) L) : y ∈ ohatL (F := F) L := by
+theorem lamAf_le_ohatL
+    (L : Submodule (𝓞 E) (Fin n → E)) {y : Fin n → E ⊗[F] Af F} (hy : y ∈ lamAf (F := F) L)
+    : y ∈ ohatL (F := F) L := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨l, rfl⟩ := hx
@@ -82,11 +86,11 @@ theorem intC_neg {b : Module.Basis ι F E} {x : E ⊗[F] Af F} (hx : IntC b x) :
   simp only [map_neg, Pi.neg_apply]
   exact ohat_neg (hx k)
 
-theorem exists_upper (b : Module.Basis ι F E) (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG) :
-    ∃ D : ℕ, 0 < D ∧ ∀ y ∈ lamAf (F := F) L, ∀ j, IntC b (D • y j) := by
+theorem exists_upper (b : Module.Basis ι F E) (L : Submodule (𝓞 E) (Fin n → E)) (hfg : L.FG)
+    : ∃ D : ℕ, 0 < D ∧ ∀ y ∈ lamAf (F := F) L, ∀ j, IntC b (D • y j) := by
   obtain ⟨T, hT⟩ := (hfg.restrictScalars (R := ℤ))
-  obtain ⟨D, hD, hDint⟩ := exists_den_fin (fun x : T × Fin n × ι =>
-    b.repr ((x.1 : Fin n → E) x.2.1) x.2.2)
+  obtain ⟨D, hD, hDint⟩ :=
+    exists_den_fin (fun x : T × Fin n × ι => b.repr ((x.1 : Fin n → E) x.2.1) x.2.2)
   have hQ : ∀ l ∈ L, ∀ j k, IntF ((D : F) * b.repr (l j) k) := by
     intro l hl
     have hl' : l ∈ Submodule.span ℤ (T : Set (Fin n → E)) := by rw [hT]; exact hl
@@ -120,8 +124,9 @@ theorem exists_upper (b : Module.Basis ι F E) (L : Submodule (𝓞 E) (Fin n �
     obtain ⟨c, hc, l, hl, rfl⟩ := hz
     intro k
     rw [map_nsmul, Pi.smul_apply]
-    have ew : ((((1 : E) ⊗ₜ[F] c) • fun i => Formalism.UG.inclE (F := F) (Af F) (l i)) j) =
-        (l j) ⊗ₜ[F] c := by
+    have ew
+        : ((((1 : E) ⊗ₜ[F] c) • fun i => Formalism.UG.inclE (F := F) (Af F) (l i)) j)
+          = (l j) ⊗ₜ[F] c := by
       simp [Formalism.UG.inclE, Algebra.TensorProduct.tmul_mul_tmul]
     rw [ew]
     simp only [coord, TensorProduct.lift.tmul, LinearMap.mk₂_apply]

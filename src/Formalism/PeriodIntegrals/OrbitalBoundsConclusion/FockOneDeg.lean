@@ -15,7 +15,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FockDegreeOne.Kr
 theorem fock_degree_one : PI.FockDegreeTwoParts.OneDeg :=
   PI.FockOneDegW.oneDeg_of
     (PI.FockOneDegW.Core.hwHarmDeg_of PI.FockOneDegW.fock_operators_kernel PI.FockOneDegW.harmIff)
-    (PI.FockOneDegW.reduction_of PI.FockOneDegW.fock_inner_facts PI.FockOneDegW.kernel_highest_weight
-      PI.FockOneDegW.kernel_harmonic PI.FockOneDegW.highest_weight_harmonic PI.FockOneDegW.harmonic_submodule
+    (PI.FockOneDegW.reduction_of PI.FockOneDegW.fock_inner_facts
+      PI.FockOneDegW.kernel_highest_weight PI.FockOneDegW.kernel_harmonic
+      PI.FockOneDegW.highest_weight_harmonic PI.FockOneDegW.harmonic_submodule
       PI.FockOneDegW.fock_kernel_adjoint PI.FockOneDegW.hwExist)
     PI.FockOneDegW.Swap.fock_swap_groups

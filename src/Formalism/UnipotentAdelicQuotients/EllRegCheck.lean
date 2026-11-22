@@ -22,9 +22,11 @@ namespace ZetaZeros.D.EllReg
 
 theorem elliptic_regularity_of_parts : Internal := by
   have hSP : StepOfParts :=
-    stepOfParts_of frozenDecompositionOfParts weightedNormFinite weightedNormLimit regularity_inductive_step
+    stepOfParts_of frozenDecompositionOfParts weightedNormFinite weightedNormLimit
+      regularity_inductive_step
   exact internal_of_all smoothOfSobolevAll existsBump cutoffContinuous smoothOfLocallySmooth
-    sobolevOfCompactSupport symbolLowerBound sobolevWeightLipschitz convolution_bound frozenKernelSmall
-    adjointPairingFourier iteratedPartialFourierChar integralFourierChar adjointPairingLocal weakEquationFourier hSP
+    sobolevOfCompactSupport symbolLowerBound sobolevWeightLipschitz convolution_bound
+    frozenKernelSmall adjointPairingFourier iteratedPartialFourierChar integralFourierChar
+    adjointPairingLocal weakEquationFourier hSP
 
 end ZetaZeros.D.EllReg

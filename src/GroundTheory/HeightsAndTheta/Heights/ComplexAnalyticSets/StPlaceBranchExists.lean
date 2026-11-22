@@ -16,12 +16,14 @@ noncomputable section
 
 def PlaceBranchExists.Statement : Prop :=
   ∀ (n : ℕ) (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ),
-    IsRadicalAt I q → ringKrullDim (curveLocalRing I q) = 1 →
-      ∀ P : MaximalSpectrum (curveNormalisation I q), ∃ ν : VarBranch I 1 q, ∀ f : MvPolynomial (Fin n) ℂ,
-        Ring.ord (Localization.AtPrime P.asIdeal)
-            (algebraMap (curveNormalisation I q) (Localization.AtPrime P.asIdeal)
-              (algebraMap (curveLocalRing I q) (curveNormalisation I q)
-                (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f))) = branchOrder ν f
+    IsRadicalAt I q → ringKrullDim (curveLocalRing I q) = 1
+      → ∀ P : MaximalSpectrum (curveNormalisation I q), ∃ ν : VarBranch I 1 q,
+        ∀ f : MvPolynomial (Fin n) ℂ,
+          Ring.ord (Localization.AtPrime P.asIdeal)
+              (algebraMap (curveNormalisation I q) (Localization.AtPrime P.asIdeal)
+                (algebraMap (curveLocalRing I q) (curveNormalisation I q)
+                  (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f)))
+            = branchOrder ν f
 
 end
 

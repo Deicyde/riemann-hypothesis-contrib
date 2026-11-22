@@ -5,5 +5,4 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StandardCharacte
 
 @[expose] public section
 
-theorem stdCharTR : PI.StdCharTR.Target :=
-  PI.StdCharTRWork.stdCharTR_main
+theorem stdCharTR : PI.StdCharTR.Target := PI.StdCharTRWork.stdCharTR_main

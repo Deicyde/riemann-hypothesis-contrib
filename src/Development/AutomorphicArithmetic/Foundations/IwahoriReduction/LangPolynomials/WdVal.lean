@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
-private theorem wd_irr (R : Type) [CommRing R] [IsDomain R] (l : ℕ) [hl : Fact l.Prime] (hp : Prime (l : R)) (n : ℕ) :
-    Irreducible (Polynomial.cyclotomic (l ^ (n + 1)) R) := by
+private theorem wd_irr
+    (R : Type) [CommRing R] [IsDomain R] (l : ℕ) [hl : Fact l.Prime] (hp : Prime (l : R)) (n : ℕ)
+    : Irreducible (Polynomial.cyclotomic (l ^ (n + 1)) R) := by
   classical
   have hlpos : 0 < l := hl.out.pos
   set fZ := (Polynomial.cyclotomic (l ^ (n + 1)) ℤ).comp (Polynomial.X + Polynomial.C 1) with hfZ
@@ -26,12 +29,11 @@ private theorem wd_irr (R : Type) [CommRing R] [IsDomain R] (l : ℕ) [hl : Fact
     exact one_ne_zero
   have hmon : g.Monic := (Polynomial.cyclotomic.monic _ R).comp (Polynomial.monic_X_add_C 1) hq
   have hmonZ : fZ.Monic := (Polynomial.cyclotomic.monic _ ℤ).comp (Polynomial.monic_X_add_C 1) hqZ
-  have hdeg : g.natDegree = fZ.natDegree := by
-    rw [hgZ, hmonZ.natDegree_map]
+  have hdeg : g.natDegree = fZ.natDegree := by rw [hgZ, hmonZ.natDegree_map]
   have hP : (Ideal.span {(l : R)}).IsPrime := (Ideal.span_singleton_prime hp.ne_zero).2 hp
   have hgpos : 0 < g.natDegree := by
-    rw [hg, Polynomial.natDegree_comp, Polynomial.natDegree_cyclotomic, Polynomial.natDegree_X_add_C,
-      mul_one]
+    rw [hg, Polynomial.natDegree_comp, Polynomial.natDegree_cyclotomic,
+      Polynomial.natDegree_X_add_C, mul_one]
     exact Nat.totient_pos.2 (pow_pos hlpos _)
   have hirr : Irreducible g := by
     apply Polynomial.irreducible_of_eisenstein_criterion hP
@@ -54,7 +56,9 @@ private theorem wd_irr (R : Type) [CommRing R] [IsDomain R] (l : ℕ) [hl : Fact
       apply hp.not_unit
       have h1 : (l : R) * 1 = (l : R) * ((l : R) * a) := by
         rw [mul_one]
-        calc (l : R) = (l : R) ^ 2 * a := ha
+        calc
+          (l : R)
+            = (l : R) ^ 2 * a := ha
           _ = (l : R) * ((l : R) * a) := by ring
       have h2 := mul_left_cancel₀ hp.ne_zero h1
       exact isUnit_iff_exists_inv.2 ⟨a, h2.symm⟩
@@ -65,7 +69,8 @@ private theorem wd_irr (R : Type) [CommRing R] [IsDomain R] (l : ℕ) [hl : Fact
   rw [← ht] at hirr
   exact (MulEquiv.irreducible_iff _).1 hirr
 
-private theorem wd_val {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) : ValuationRing (R0 A) := by
+private theorem wd_val {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω)
+    : ValuationRing (R0 A) := by
   refine { cond' := ?_ }
   intro a b
   have ha : (a : Ω) ∈ A ∧ ∀ s ∈ Ine A, s (a : Ω) = a := a.2
@@ -93,13 +98,16 @@ private theorem wd_val {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSub
     apply Subtype.ext
     simp [mul_div_cancel₀ _ hb0]
 
-private theorem wd_res {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (l : ℕ) [hl : Fact l.Prime]
-    (h : A.valuation (l : Ω) < 1) (m : ℕ) (z : Ω) (hz : z ^ l ^ m = 1) :
-    z ∈ A ∧ A.valuation (z - 1) < 1 := by
+private theorem wd_res
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    (l : ℕ) [hl : Fact l.Prime]
+    (h : A.valuation (l : Ω) < 1)
+    (m : ℕ) (z : Ω) (hz : z ^ l ^ m = 1)
+    : z ∈ A ∧ A.valuation (z - 1) < 1 := by
   have hN : l ^ m ≠ 0 := pow_ne_zero _ hl.out.ne_zero
   have hvz : A.valuation z = 1 := by
-    have h1 : A.valuation z ^ (l ^ m) = 1 := by
-      rw [← map_pow, hz, map_one]
+    have h1 : A.valuation z ^ (l ^ m) = 1 := by rw [← map_pow, hz, map_one]
     rcases lt_trichotomy (A.valuation z) 1 with h2 | h2 | h2
     · exact absurd h1 (ne_of_lt (pow_lt_one₀ zero_le' h2 hN))
     · exact h2
@@ -124,9 +132,12 @@ private theorem wd_res {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (l : ℕ
   have := (A.valuation_lt_one_iff (zA - 1)).1 hmem
   simpa using this
 
-private theorem prime_natCast_r0_of_valuation_lt_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fact l.Prime]
-    (A : ValuationSubring Ω) (j : Ω →+* Qbar l) (Φ : Fr l A j) (hval : A.valuation (l : Ω) < 1) :
-    Prime (l : R0 A) := by
+private theorem prime_natCast_r0_of_valuation_lt_one
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (A : ValuationSubring Ω) (j : Ω →+* Qbar l) (Φ : Fr l A j)
+    (hval : A.valuation (l : Ω) < 1)
+    : Prime (l : R0 A) := by
   have hl0 : (l : R0 A) ≠ 0 := by
     intro h0
     have h1 : ((l : R0 A) : Ω) = 0 := by
@@ -159,8 +170,7 @@ private theorem prime_natCast_r0_of_valuation_lt_one {Ω : Type} [Field Ω] [Alg
     · exact Or.inl (hback a h)
     · exact Or.inr (hback b h)
 
-theorem UpperTheory.Kd.C7.pWD :
-    UpperTheory.Kd.C7.SWD := by
+theorem UpperTheory.Kd.C7.pWD : UpperTheory.Kd.C7.SWD := by
   intro l _ _ Ω _ _ _ A hA j Φ ζ hζ m hm P
   obtain ⟨v, hv, hlv⟩ := hA
   have hval : A.valuation (l : Ω) < 1 := by
@@ -170,8 +180,9 @@ theorem UpperTheory.Kd.C7.pWD :
   have hroot : ∀ i : ℕ, (ζ m ^ i) ^ l ^ m = 1 := by
     intro i
     rw [← pow_mul, mul_comm, pow_mul, (hζ m).1.pow_eq_one, one_pow]
-  have hdiff : pv P (ζ m) - ((P.eval 1 : R0 A) : Ω)
-      = ∑ i ∈ Finset.range (P.natDegree + 1), ((P.coeff i : R0 A) : Ω) * (ζ m ^ i - 1) := by
+  have hdiff
+      : pv P (ζ m) - ((P.eval 1 : R0 A) : Ω)
+        = ∑ i ∈ Finset.range (P.natDegree + 1), ((P.coeff i : R0 A) : Ω) * (ζ m ^ i - 1) := by
     rw [pv, Polynomial.eval₂_eq_sum_range, Polynomial.eval_eq_sum_range]
     push_cast
     rw [← Finset.sum_sub_distrib]
@@ -187,7 +198,8 @@ theorem UpperTheory.Kd.C7.pWD :
     have hirr := wd_irr (R0 A) l (prime_natCast_r0_of_valuation_lt_one l A j Φ hval) k
     classical
     letI := IsBezout.toGCDDomain (R0 A)
-    have hcycroot : Polynomial.aeval (ζ (k + 1)) (Polynomial.cyclotomic (l ^ (k + 1)) (R0 A)) = 0 := by
+    have hcycroot
+        : Polynomial.aeval (ζ (k + 1)) (Polynomial.cyclotomic (l ^ (k + 1)) (R0 A)) = 0 := by
       rw [Polynomial.aeval_def, Polynomial.eval₂_eq_eval_map, Polynomial.map_cyclotomic]
       exact (hζ (k + 1)).1.isRoot_cyclotomic (pow_pos (Fact.out : l.Prime).pos _)
     have hint : IsIntegral (R0 A) (ζ (k + 1)) := ⟨_, Polynomial.cyclotomic.monic _ _, hcycroot⟩
@@ -203,8 +215,11 @@ theorem UpperTheory.Kd.C7.pWD :
     obtain ⟨Q, hQ⟩ := hCP
     unfold Fr.ser
     rw [hQ, Polynomial.map_mul, Polynomial.eval₂_mul, Polynomial.map_cyclotomic, map_mul]
-    have hc : Polynomial.eval₂ PowerSeries.C (1 + PowerSeries.X)
-        (Polynomial.cyclotomic (l ^ (k + 1)) Φ.R) = cyc Φ.R l (k + 1) := rfl
+    have hc
+        : Polynomial.eval₂ PowerSeries.C (1 + PowerSeries.X)
+            (Polynomial.cyclotomic (l ^ (k + 1)) Φ.R)
+          = cyc Φ.R l (k + 1) :=
+      rfl
     rw [hc, ev_cyc_self, zero_mul]
   · rintro ⟨hA1, hne, hinv⟩
     rw [PowerSeries.isUnit_iff_constantCoeff, hcc]

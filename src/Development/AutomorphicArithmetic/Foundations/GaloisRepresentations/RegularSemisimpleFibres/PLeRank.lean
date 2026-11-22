@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem gcd_step {m m' c l : ℕ} (hm : 0 < m) (hl : l.Prime) (h : m' * Nat.gcd m c = m) :
-    (if l ∣ m' then m' / l else m') * Nat.gcd m (c * l) = m := by
+private theorem gcd_step {m m' c l : ℕ} (hm : 0 < m) (hl : l.Prime) (h : m' * Nat.gcd m c = m)
+    : (if l ∣ m' then m' / l else m') * Nat.gcd m (c * l) = m := by
   have hg : 0 < Nat.gcd m c := Nat.gcd_pos_of_pos_left _ hm
   obtain ⟨m₁, c₁, hco, hm₁, hc₁⟩ := Nat.exists_coprime m c
   have hmm : m₁ = m' := by
@@ -20,8 +23,7 @@ private theorem gcd_step {m m' c l : ℕ} (hm : 0 < m) (hl : l.Prime) (h : m' * 
   subst hmm
   set g := Nat.gcd m c with hgdef
   have hgcd : Nat.gcd m (c * l) = Nat.gcd m₁ l * g := by
-    have e : c * l = (c₁ * l) * g := by
-      rw [hc₁]; ring
+    have e : c * l = (c₁ * l) * g := by rw [hc₁]; ring
     rw [e]
     conv_lhs => rw [hm₁]
     rw [Nat.gcd_mul_right, Nat.Coprime.gcd_mul_left_cancel_right l hco.symm]
@@ -33,11 +35,11 @@ private theorem gcd_step {m m' c l : ℕ} (hm : 0 < m) (hl : l.Prime) (h : m' * 
     rw [this, one_mul]
     exact h
 
-theorem UpperTheory.Gal.InertialTypesAlt.leRank :
-    LiftOk → LeRank := by
+theorem UpperTheory.Gal.InertialTypesAlt.leRank : LiftOk → LeRank := by
   intro hOk a b ha hab
-  have key : b.Ok ∧ ∃ c : ℕ, 0 < c ∧ b.q = a.q ^ c ∧
-      ∀ p ∈ b.L, ∃ r ∈ a.L, p.1 * Nat.gcd r.1 c = r.1 := by
+  have key
+      : b.Ok
+        ∧ ∃ c : ℕ, 0 < c ∧ b.q = a.q ^ c ∧ ∀ p ∈ b.L, ∃ r ∈ a.L, p.1 * Nat.gcd r.1 c = r.1 := by
     induction hab with
     | refl =>
       refine ⟨ha, 1, Nat.one_pos, (pow_one _).symm, fun p hp => ⟨p, hp, ?_⟩⟩
@@ -58,7 +60,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.leRank :
         have hstep := gcd_step (l := l) hm hl hsr
         have hp1 : p.1 = if l ∣ s.1 then s.1 / l else s.1 := by
           split_ifs at hps ⊢ with hd
-          · simp only [liftL, List.flatMap_cons, List.flatMap_nil, List.append_nil, List.mem_map] at hps
+          · simp only [liftL, List.flatMap_cons, List.flatMap_nil, List.append_nil, List.mem_map]
+              at hps
             obtain ⟨i, -, rfl⟩ := hps
             rfl
           · simp only [List.mem_singleton] at hps

@@ -20,7 +20,8 @@ namespace GM
 
 variable (p : ℕ) [Fact p.Prime]
 
-theorem norm_divisor_twelve_power_eq_one (h5 : 5 ≤ p) {N k : ℕ} (hN : N ∣ 12 ^ k) : ‖(N : ℂ_[p])‖ = 1 := by
+theorem norm_divisor_twelve_power_eq_one (h5 : 5 ≤ p) {N k : ℕ} (hN : N ∣ 12 ^ k)
+    : ‖(N : ℂ_[p])‖ = 1 := by
   refine Formalism.L2.Th1.E.ScaledModelNorms.norm_nat p fun h => ?_
   have hp : p.Prime := Fact.out
   have h12 : p ∣ 12 := hp.dvd_of_dvd_pow (h.trans hN)
@@ -40,7 +41,8 @@ end GM
 theorem good_model_exists_all_primes : GoodModelAll := by
   intro dK L hsq hd4 hcm p _ h5 ι
   have hD0 : L.g₂ ^ 3 - 27 * L.g₃ ^ 2 ≠ 0 := Formalism.L2.Th1.F.discNeZero L
-  obtain ⟨c, hc12⟩ := IsAlgClosed.exists_pow_nat_eq (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) (show 0 < 12 by norm_num)
+  obtain ⟨c, hc12⟩ :=
+    IsAlgClosed.exists_pow_nat_eq (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) (show 0 < 12 by norm_num)
   have hc : c ≠ 0 := by
     intro h
     rw [h] at hc12
@@ -54,16 +56,15 @@ theorem good_model_exists_all_primes : GoodModelAll := by
 
   have hΔ : a ^ 3 - 27 * b ^ 2 = 1 := by
     rw [e2, e3]
-    have : ((c ^ 4)⁻¹ * L.g₂) ^ 3 - 27 * ((c ^ 6)⁻¹ * L.g₃) ^ 2 =
-        (c ^ 12)⁻¹ * (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) := by
+    have : ((c ^ 4)⁻¹ * L.g₂) ^ 3 - 27 * ((c ^ 6)⁻¹ * L.g₃) ^ 2
+        = (c ^ 12)⁻¹ * (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) := by
       field_simp
     rw [this, hc12, inv_mul_cancel₀ hD0]
   have hj : 1728 * a ^ 3 = jInv L := by
     unfold jInv
     rw [e2, ← hc12]
     field_simp
-  have hJ : ‖ι (jInv L)‖ ≤ 1 :=
-    ReciprocityTheory.ChartRestriction.L1.jInt dK L hsq hd4 hcm p ι
+  have hJ : ‖ι (jInv L)‖ ≤ 1 := ReciprocityTheory.ChartRestriction.L1.jInt dK L hsq hd4 hcm p ι
   have ha3 : ‖ι a‖ ^ 3 ≤ 1 := by
     have h := congrArg ι hj
     rw [map_mul, map_pow, map_ofNat] at h
@@ -79,7 +80,8 @@ theorem good_model_exists_all_primes : GoodModelAll := by
     rw [norm_mul, GM.norm_27 p h5, one_mul, norm_pow] at h'
     rw [h', sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ (by simp))
-    rw [norm_pow]; exact ha3
+    rw [norm_pow]
+    exact ha3
   have hb1 : ‖ι b‖ ≤ 1 := (pow_le_one_iff_of_nonneg (norm_nonneg _) (by norm_num)).1 hb2
   unfold curveL
   refine Formalism.L2.Th1.E.ScaledModelNorms.intCurve_short p h5 _ _ ha1 hb1 ?_

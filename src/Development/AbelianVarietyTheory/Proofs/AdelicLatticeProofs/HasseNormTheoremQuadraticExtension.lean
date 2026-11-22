@@ -31,7 +31,8 @@ theorem hasseNormSt : GlobalTheory.Published.HasseNormSt := by
     · refine Subgroup.mem_iInf.mpr fun σ => ?_
       rw [mem_normSub]
       exact hreal σ
-  have h := GlobalTheory.T.sUnit_mem_globalNorm_of_mem_localNorms F (Units.mk0 δ hδ) T hT hδT hsq _ hxT hloc
+  have h :=
+    GlobalTheory.T.sUnit_mem_globalNorm_of_mem_localNorms F (Units.mk0 δ hδ) T hT hδT hsq _ hxT hloc
   rw [mem_normSub] at h
   exact h
 

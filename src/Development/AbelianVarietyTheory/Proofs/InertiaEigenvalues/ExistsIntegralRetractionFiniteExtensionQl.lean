@@ -10,16 +10,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 open GlobalTheory.BaseCoef
 
 namespace GlobalTheory.CoefRetraction
 
-theorem exists_retraction (A K L : Type) [CommRing A] [IsDomain A] [IsPrincipalIdealRing A] [Field K]
-    [Algebra A K] [IsFractionRing A K] [Field L] [Algebra K L] [Algebra A L] [IsScalarTower A K L]
-    [FiniteDimensional K L] [Algebra.IsSeparable K L] :
-    ∃ r : L →ₗ[K] K, r 1 = 1 ∧ ∀ x : L, IsIntegral A x → ∃ a : A, algebraMap A K a = r x := by
+theorem exists_retraction
+    (A K L : Type) [CommRing A] [IsDomain A] [IsPrincipalIdealRing A] [Field K] [Algebra A K]
+    [IsFractionRing A K] [Field L] [Algebra K L] [Algebra A L] [IsScalarTower A K L]
+    [FiniteDimensional K L] [Algebra.IsSeparable K L]
+    : ∃ r : L →ₗ[K] K, r 1 = 1 ∧ ∀ x : L, IsIntegral A x → ∃ a : A, algebraMap A K a = r x := by
   classical
   have : Module.IsTorsionFree A L := .trans_faithfulSMul A K L
   have : Module.Free A (integralClosure A L) :=
@@ -31,14 +34,16 @@ theorem exists_retraction (A K L : Type) [CommRing A] [IsDomain A] [IsPrincipalI
 
   let b := Module.Free.chooseBasis A (integralClosure A L)
   let bL := b.localizationLocalization K (nonZeroDivisors A) L
-  have hrepr : ∀ (z : integralClosure A L) i,
-      bL.repr (algebraMap (integralClosure A L) L z) i = algebraMap A K (b.repr z i) :=
-    fun z i => b.localizationLocalization_repr_algebraMap K (nonZeroDivisors A) L z i
+  have hrepr
+      : ∀ (z : integralClosure A L) i,
+        bL.repr (algebraMap (integralClosure A L) L z) i = algebraMap A K (b.repr z i) := fun z i =>
+    b.localizationLocalization_repr_algebraMap K (nonZeroDivisors A) L z i
 
   have hspan : (1 : A) ∈ Ideal.span (Set.range fun i => b.repr 1 i) := by
-    obtain ⟨d, hd⟩ : ∃ d : A, Ideal.span (Set.range fun i => b.repr 1 i) = Ideal.span {d} :=
-      ⟨Submodule.IsPrincipal.generator (Ideal.span (Set.range fun i => b.repr 1 i)),
-        (Submodule.IsPrincipal.span_singleton_generator _).symm⟩
+    obtain ⟨d, hd⟩ : ∃ d : A, Ideal.span (Set.range fun i => b.repr 1 i) = Ideal.span {d} := ⟨
+      Submodule.IsPrincipal.generator (Ideal.span (Set.range fun i => b.repr 1 i)),
+      (Submodule.IsPrincipal.span_singleton_generator _).symm
+    ⟩
     have hdiv : ∀ i, ∃ e : A, e * d = b.repr 1 i := fun i => by
       have hi : b.repr 1 i ∈ Ideal.span (Set.range fun i => b.repr 1 i) :=
         Ideal.subset_span ⟨i, rfl⟩
@@ -72,8 +77,7 @@ theorem exists_retraction (A K L : Type) [CommRing A] [IsDomain A] [IsPrincipalI
   obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.mp hspan
   refine ⟨∑ i, algebraMap A K (a i) • bL.coord i, ?_, ?_⟩
   · have h1 : (1 : L) = algebraMap (integralClosure A L) L 1 := (map_one _).symm
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.Basis.coord_apply,
-      smul_eq_mul]
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.Basis.coord_apply, smul_eq_mul]
     rw [h1]
     simp only [hrepr]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -83,43 +87,46 @@ theorem exists_retraction (A K L : Type) [CommRing A] [IsDomain A] [IsPrincipalI
     set z : integralClosure A L := ⟨x, show x ∈ integralClosure A L from hx⟩ with hz
     have hx' : x = algebraMap (integralClosure A L) L z := rfl
     refine ⟨∑ i, a i * b.repr z i, ?_⟩
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.Basis.coord_apply,
-      smul_eq_mul]
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.Basis.coord_apply, smul_eq_mul]
     rw [hx']
     simp only [hrepr]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [map_mul]
 
-theorem exists_retraction_closure (R F K L : Type) [CommRing R] [IsDomain R] [Field F] [Algebra R F]
-    [IsFractionRing R F] [Field K] [Algebra F K] [Algebra R K] [IsScalarTower R F K] [FiniteDimensional F K]
-    [IsPrincipalIdealRing (integralClosure R K)]
-    [Field L] [Algebra K L] [Algebra R L] [IsScalarTower R K L]
-    [FiniteDimensional K L] [Algebra.IsSeparable K L] :
-    ∃ r : L →ₗ[K] K, r 1 = 1 ∧ ∀ x : L, IsIntegral R x → IsIntegral R (r x) := by
+theorem exists_retraction_closure
+    (R F K L : Type) [CommRing R] [IsDomain R] [Field F] [Algebra R F] [IsFractionRing R F]
+    [Field K] [Algebra F K] [Algebra R K] [IsScalarTower R F K] [FiniteDimensional F K]
+    [IsPrincipalIdealRing (integralClosure R K)] [Field L] [Algebra K L] [Algebra R L]
+    [IsScalarTower R K L] [FiniteDimensional K L] [Algebra.IsSeparable K L]
+    : ∃ r : L →ₗ[K] K, r 1 = 1 ∧ ∀ x : L, IsIntegral R x → IsIntegral R (r x) := by
   have : IsScalarTower (integralClosure R K) K L := inferInstance
   have : IsFractionRing (integralClosure R K) K :=
     integralClosure.isFractionRing_of_finite_extension F K
-  have : IsScalarTower R (integralClosure R K) L := IsScalarTower.of_algebraMap_eq fun y => by
-    rw [IsScalarTower.algebraMap_apply R K L, IsScalarTower.algebraMap_apply (integralClosure R K) K L]
-    rfl
+  have : IsScalarTower R (integralClosure R K) L :=
+    IsScalarTower.of_algebraMap_eq fun y => by
+      rw [IsScalarTower.algebraMap_apply R K L,
+        IsScalarTower.algebraMap_apply (integralClosure R K) K L]
+      rfl
   obtain ⟨r, hr1, hr⟩ := exists_retraction (integralClosure R K) K L
   refine ⟨r, hr1, fun x hx => ?_⟩
   obtain ⟨a, ha⟩ := hr x (hx.tower_top)
   rw [← ha]
   exact a.2
 
-theorem exists_integral_retraction : ∀ (l : ℕ) [Fact l.Prime] (LL LL' : FinExt l) (hL : LL.1 ≤ LL'.1),
-    ∃ r : ↥LL'.1 →ₗ[ℚ_[l]] ↥LL.1, (∀ a x, r (incl hL a * x) = a * r x) ∧ r 1 = 1 ∧
-      (∀ x ∈ OL LL', r x ∈ OL LL) := by
+theorem exists_integral_retraction
+    : ∀ (l : ℕ) [Fact l.Prime] (LL LL' : FinExt l) (hL : LL.1 ≤ LL'.1),
+      ∃ r : ↥LL'.1 →ₗ[ℚ_[l]] ↥LL.1,
+        (∀ a x, r (incl hL a * x) = a * r x) ∧ r 1 = 1 ∧ (∀ x ∈ OL LL', r x ∈ OL LL) := by
   intro l _ LL LL' hL
   letI : Algebra ↥LL.1 ↥LL'.1 := (incl hL).toRingHom.toAlgebra
   have hmap : ∀ y : ↥LL.1, algebraMap ↥LL.1 ↥LL'.1 y = incl hL y := fun _ => rfl
-  have : IsScalarTower ℚ_[l] ↥LL.1 ↥LL'.1 := IsScalarTower.of_algebraMap_eq fun q => by
-    rw [hmap, AlgHom.commutes]
-  have : IsScalarTower ℤ_[l] ↥LL.1 ↥LL'.1 := IsScalarTower.of_algebraMap_eq fun z => by
-    rw [hmap, IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] ↥LL.1,
-      IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] ↥LL'.1, AlgHom.commutes]
+  have : IsScalarTower ℚ_[l] ↥LL.1 ↥LL'.1 :=
+    IsScalarTower.of_algebraMap_eq fun q => by rw [hmap, AlgHom.commutes]
+  have : IsScalarTower ℤ_[l] ↥LL.1 ↥LL'.1 :=
+    IsScalarTower.of_algebraMap_eq fun z => by
+      rw [hmap, IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] ↥LL.1,
+        IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] ↥LL'.1, AlgHom.commutes]
   have : FiniteDimensional ℚ_[l] ↥LL.1 := LL.2
   have : FiniteDimensional ℚ_[l] ↥LL'.1 := LL'.2
   have : FiniteDimensional ↥LL.1 ↥LL'.1 := FiniteDimensional.right ℚ_[l] ↥LL.1 ↥LL'.1

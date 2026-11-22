@@ -8,11 +8,11 @@ namespace Formalism.GradedWeylDivisibility
 
 open MvPolynomial
 
-def idPoint (R : Type*) [CommRing R] (r n : ℕ) : Fin r × Fin n → R :=
-  fun v => if v.1.val = v.2.val then 1 else 0
+def idPoint (R : Type*) [CommRing R] (r n : ℕ) : Fin r × Fin n → R := fun v =>
+  if v.1.val = v.2.val then 1 else 0
 
-theorem eval_idPoint_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (s : ℕ) (hr : s ≤ r)
-    (hn : s ≤ n) : eval (idPoint R r n) (lpMinor R s hr hn) = 1 := by
+theorem eval_idPoint_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (s : ℕ) (hr : s ≤ r) (hn : s ≤ n)
+    : eval (idPoint R r n) (lpMinor R s hr hn) = 1 := by
   unfold lpMinor
   rw [RingHom.map_det]
   convert Matrix.det_one (R := R) (n := Fin s)
@@ -20,11 +20,12 @@ theorem eval_idPoint_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (s : ℕ) (hr 
   simp [RingHom.mapMatrix_apply, idPoint, Matrix.one_apply]
   exact if_congr Fin.val_inj rfl rfl
 
-theorem hwrow_sum_single_castLE {r s : ℕ} (hr : s ≤ r) (σ : Equiv.Perm (Fin s)) :
-    (∑ q : Fin s, (Pi.single (Fin.castLE hr (σ q)) 1 : Fin r → ℕ)) =
-      fun a => if a.val < s then 1 else 0 := by
-  have h1 : (∑ q : Fin s, (Pi.single (Fin.castLE hr (σ q)) 1 : Fin r → ℕ)) =
-      ∑ q : Fin s, (Pi.single (Fin.castLE hr q) 1 : Fin r → ℕ) :=
+theorem hwrow_sum_single_castLE {r s : ℕ} (hr : s ≤ r) (σ : Equiv.Perm (Fin s))
+    : (∑ q : Fin s, (Pi.single (Fin.castLE hr (σ q)) 1 : Fin r → ℕ))
+      = fun a => if a.val < s then 1 else 0 := by
+  have h1
+      : (∑ q : Fin s, (Pi.single (Fin.castLE hr (σ q)) 1 : Fin r → ℕ))
+        = ∑ q : Fin s, (Pi.single (Fin.castLE hr q) 1 : Fin r → ℕ) :=
     Equiv.sum_comp σ (fun q => (Pi.single (Fin.castLE hr q) 1 : Fin r → ℕ))
   rw [h1]
   funext a
@@ -47,8 +48,8 @@ theorem hwrow_sum_single_castLE {r s : ℕ} (hr : s ≤ r) (σ : Equiv.Perm (Fin
     subst hab
     exact h b.isLt
 
-theorem lpMinor_rowHom (R : Type*) [CommRing R] {r n : ℕ} (s : ℕ) (hr : s ≤ r) (hn : s ≤ n) :
-    IsWeightedHomogeneous (rowW r n) (lpMinor R s hr hn)
+theorem lpMinor_rowHom (R : Type*) [CommRing R] {r n : ℕ} (s : ℕ) (hr : s ≤ r) (hn : s ≤ n)
+    : IsWeightedHomogeneous (rowW r n) (lpMinor R s hr hn)
       (fun a => if a.val < s then 1 else 0) := by
   unfold lpMinor
   rw [Matrix.det_apply]

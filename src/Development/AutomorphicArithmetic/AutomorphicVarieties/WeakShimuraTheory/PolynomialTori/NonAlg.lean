@@ -7,24 +7,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem fix_mul {V : Type} [Monoid V] {l n : ℕ} {x : V} (h : x ^ l ^ n = x) (m : ℕ) : x ^ l ^ (n * m) = x := by
+private theorem fix_mul {V : Type} [Monoid V] {l n : ℕ} {x : V} (h : x ^ l ^ n = x) (m : ℕ)
+    : x ^ l ^ (n * m) = x := by
   induction m with
   | zero => simp
   | succ m ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, h]
 
-private theorem fix_both {V : Type} [Monoid V] {l : ℕ} {x z : V} (hx : ∃ n : ℕ, 0 < n ∧ x ^ l ^ n = x)
-    (hz : ∃ n : ℕ, 0 < n ∧ z ^ l ^ n = z) : ∃ n : ℕ, 0 < n ∧ x ^ l ^ n = x ∧ z ^ l ^ n = z := by
+private theorem fix_both
+    {V : Type} [Monoid V]
+    {l : ℕ} {x z : V} (hx : ∃ n : ℕ, 0 < n ∧ x ^ l ^ n = x) (hz : ∃ n : ℕ, 0 < n ∧ z ^ l ^ n = z)
+    : ∃ n : ℕ, 0 < n ∧ x ^ l ^ n = x ∧ z ^ l ^ n = z := by
   obtain ⟨a, ha, hxa⟩ := hx
   obtain ⟨b, hb, hzb⟩ := hz
   refine ⟨a * b, Nat.mul_pos ha hb, fix_mul hxa b, ?_⟩
   rw [Nat.mul_comm]
   exact fix_mul hzb a
 
-theorem UpperTheory.V.Ws.Po.nonAlg :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] [Finite (ResidueField O)] (Γ : Type) [Group Γ] (R : Type) [CommRing R] [Algebra O R]
-      (ρ : Γ →* M4 R) (V : Type) [CommRing V] [IsLocalRing V] [CharP V l] (y : R →+* V), (∀ a ∈ maximalIdeal O, y (algebraMap O R a) = 0) →
-      ∀ u ∈ Algebra.adjoin O (mono ρ 0), y u ∈ maximalIdeal V → y u ≠ 0 →
-      ∃ x ∈ mono (mapRep y ρ) 0, ∀ n : ℕ, 0 < n → x ^ l ^ n ≠ x := by
+theorem UpperTheory.V.Ws.Po.nonAlg
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] [Finite (ResidueField O)]
+        (Γ : Type) [Group Γ] (R : Type) [CommRing R] [Algebra O R] (ρ : Γ →* M4 R) (V : Type)
+        [CommRing V] [IsLocalRing V] [CharP V l] (y : R →+* V),
+      (∀ a ∈ maximalIdeal O, y (algebraMap O R a) = 0)
+        → ∀ u ∈ Algebra.adjoin O (mono ρ 0),
+          y u ∈ maximalIdeal V → y u ≠ 0
+            → ∃ x ∈ mono (mapRep y ρ) 0, ∀ n : ℕ, 0 < n → x ^ l ^ n ≠ x := by
   intro l _ O _ _ _ Γ _ R _ _ ρ V _ _ _ y hy u hu hum hu0
   by_contra hcon
   push_neg at hcon
@@ -56,10 +62,12 @@ theorem UpperTheory.V.Ws.Po.nonAlg :
       obtain ⟨n, hn, hxn, hzn⟩ := fix_both hx hz
       exact ⟨n, hn, by rw [map_mul, mul_pow, hxn, hzn]⟩
   obtain ⟨n, hn, hun⟩ := key u hu
-  obtain ⟨k, hk⟩ : ∃ k, l ^ n = k + 1 + 1 :=
-    ⟨l ^ n - 2, by
+  obtain ⟨k, hk⟩ : ∃ k, l ^ n = k + 1 + 1 := ⟨
+    l ^ n - 2,
+    by
       have := Nat.one_lt_pow hn.ne' (Fact.out : l.Prime).one_lt
-      omega⟩
+      omega
+  ⟩
   apply hu0
   have hmem : y u ^ (k + 1) ∈ maximalIdeal V := Ideal.pow_mem_of_mem _ hum _ (Nat.succ_pos k)
   have hunit : IsUnit (1 - y u ^ (k + 1)) :=

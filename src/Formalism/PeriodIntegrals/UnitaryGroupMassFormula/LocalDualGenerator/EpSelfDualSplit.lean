@@ -11,8 +11,8 @@ namespace PI.LocDualGen.EpS
 
 variable {K : Type} [Field K] {L : Type} [CommRing L] [Algebra K L]
 
-theorem li (e : L) (he : IsIdempotentElem e) (h0 : e ≠ 0) (h1 : e ≠ 1) :
-    LinearIndependent K ![e, 1 - e] := by
+theorem li (e : L) (he : IsIdempotentElem e) (h0 : e ≠ 0) (h1 : e ≠ 1)
+    : LinearIndependent K ![e, 1 - e] := by
   rw [LinearIndependent.pair_iff]
   intro s t hst
   have hf : IsIdempotentElem (1 - e) := he.one_sub
@@ -38,7 +38,8 @@ theorem isIntegral_idem (e : L) (he : IsIdempotentElem e) : IsIntegral 𝒪[K] e
 
 theorem mem_of_isIntegral {c : K} (h : IsIntegral 𝒪[K] c) : c ∈ 𝒪[K] := by
   obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := 𝒪[K]) (K := K)).mp h
-  rw [← hy]; exact y.2
+  rw [← hy]
+  exact y.2
 end V
 
 variable (hr : finrank K L = 2) (e : L) (he : IsIdempotentElem e) (h0 : e ≠ 0) (h1 : e ≠ 1)
@@ -49,22 +50,23 @@ def bas : Basis (Fin 2) K L :=
 theorem bas0 : bas hr e he h0 h1 0 = e := by simp [bas]
 theorem bas1 : bas hr e he h0 h1 1 = 1 - e := by simp [bas]
 
-theorem decomp (z : L) :
-    z = (bas hr e he h0 h1).repr z 0 • e + (bas hr e he h0 h1).repr z 1 • (1 - e) := by
+theorem decomp (z : L)
+    : z = (bas hr e he h0 h1).repr z 0 • e + (bas hr e he h0 h1).repr z 1 • (1 - e) := by
   conv_lhs => rw [← (bas hr e he h0 h1).sum_repr z]
   rw [Fin.sum_univ_two, bas0, bas1]
 
-theorem repr_pair (s t : K) :
-    (bas hr e he h0 h1).repr (s • e + t • (1 - e)) 0 = s ∧
-    (bas hr e he h0 h1).repr (s • e + t • (1 - e)) 1 = t := by
+theorem repr_pair (s t : K)
+    : (bas hr e he h0 h1).repr (s • e + t • (1 - e)) 0 = s
+      ∧ (bas hr e he h0 h1).repr (s • e + t • (1 - e)) 1 = t := by
   have : s • e + t • (1 - e) = s • bas hr e he h0 h1 0 + t • bas hr e he h0 h1 1 := by
     rw [bas0, bas1]
   rw [this]
   simp
 
-theorem mul_decomp (z w : L) :
-    z * w = ((bas hr e he h0 h1).repr z 0 * (bas hr e he h0 h1).repr w 0) • e +
-      ((bas hr e he h0 h1).repr z 1 * (bas hr e he h0 h1).repr w 1) • (1 - e) := by
+theorem mul_decomp (z w : L)
+    : z * w
+      = ((bas hr e he h0 h1).repr z 0 * (bas hr e he h0 h1).repr w 0) • e
+        + ((bas hr e he h0 h1).repr z 1 * (bas hr e he h0 h1).repr w 1) • (1 - e) := by
   have hf : IsIdempotentElem (1 - e) := he.one_sub
   have hef : e * (1 - e) = 0 := by rw [mul_sub, mul_one, he.eq, sub_self]
   have hfe : (1 - e) * e = 0 := by rw [mul_comm, hef]
@@ -94,7 +96,8 @@ theorem pr_e : pr hr e he h0 h1 0 e = 1 ∧ pr hr e he h0 h1 1 e = 0 := by
   have : e = (1 : K) • e + (0 : K) • (1 - e) := by simp
   have key := repr_pair hr e he h0 h1 1 0
   rw [← this] at key
-  rw [pr_apply, pr_apply]; exact key
+  rw [pr_apply, pr_apply]
+  exact key
 
 theorem pr_f : pr hr e he h0 h1 0 (1 - e) = 0 ∧ pr hr e he h0 h1 1 (1 - e) = 1 := by
   rw [map_sub, map_sub, map_one, map_one, (pr_e hr e he h0 h1).1, (pr_e hr e he h0 h1).2]
@@ -113,12 +116,14 @@ theorem trace_eq (z : L) : Algebra.trace K L z = pr hr e he h0 h1 0 z + pr hr e 
 
 variable [ValuativeRel K]
 
-theorem int_iff (z : L) :
-    IsIntegral 𝒪[K] z ↔ pr hr e he h0 h1 0 z ∈ 𝒪[K] ∧ pr hr e he h0 h1 1 z ∈ 𝒪[K] := by
+theorem int_iff (z : L)
+    : IsIntegral 𝒪[K] z ↔ pr hr e he h0 h1 0 z ∈ 𝒪[K] ∧ pr hr e he h0 h1 1 z ∈ 𝒪[K] := by
   constructor
   · intro h
-    exact ⟨mem_of_isIntegral (h.map ((pr hr e he h0 h1 0).restrictScalars 𝒪[K])),
-      mem_of_isIntegral (h.map ((pr hr e he h0 h1 1).restrictScalars 𝒪[K]))⟩
+    exact ⟨
+      mem_of_isIntegral (h.map ((pr hr e he h0 h1 0).restrictScalars 𝒪[K])),
+      mem_of_isIntegral (h.map ((pr hr e he h0 h1 1).restrictScalars 𝒪[K]))
+    ⟩
   · rintro ⟨ha, hb⟩
     rw [decomp hr e he h0 h1 z, Algebra.smul_def, Algebra.smul_def]
     have hie := isIntegral_idem (K := K) e he
@@ -129,11 +134,10 @@ theorem int_iff (z : L) :
       isIntegral_algebraMap (R := 𝒪[K]) (x := (⟨_, hb⟩ : 𝒪[K]))
     exact (ia.mul hie).add (ib.mul hif)
 
-
 include hr e he h0 h1 in
 include hr he h0 h1 in
-theorem selfDual_split (x : L) :
-    (∀ y : L, IsIntegral 𝒪[K] y → Algebra.trace K L (x * y) ∈ 𝒪[K]) ↔ IsIntegral 𝒪[K] x := by
+theorem selfDual_split (x : L)
+    : (∀ y : L, IsIntegral 𝒪[K] y → Algebra.trace K L (x * y) ∈ 𝒪[K]) ↔ IsIntegral 𝒪[K] x := by
   have pe := pr_e hr e he h0 h1
   have pf := pr_f hr e he h0 h1
   constructor

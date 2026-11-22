@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Admissi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -17,18 +19,28 @@ noncomputable section
 
 namespace GlobalTheory.Mum
 
-theorem translate_baseChange_affineOpen : ∀ (R R₁ : Type) [CommRing R] [CommRing R₁] (ρ : R →+* R₁) (G : Over (Sp R)) [GrpObj G] (V : G.left.Opens), IsAffineOpen V → ∀ (a : Over.mk (spMap ρ) ⟶ G), ∃ W : (pullback G.hom (spMap ρ)).Opens, IsAffineOpen W ∧ ∀ (Ω : Type) [Field Ω] (z : Sp Ω ⟶ pullback G.hom (spMap ρ)) (t : Sp Ω ⟶ Sp R) (x a' : Over.mk t ⟶ G), x.left = z ≫ pullback.fst _ _ → a'.left = z ≫ pullback.snd _ _ ≫ a.left → (∀ w, (x * a').left w ∈ V) → ∀ w, z w ∈ W := by
+theorem translate_baseChange_affineOpen
+    : ∀ (R R₁ : Type) [CommRing R] [CommRing R₁] (ρ : R →+* R₁) (G : Over (Sp R)) [GrpObj G]
+        (V : G.left.Opens),
+      IsAffineOpen V
+        → ∀ (a : Over.mk (spMap ρ) ⟶ G), ∃ W : (pullback G.hom (spMap ρ)).Opens,
+          IsAffineOpen W
+            ∧ ∀ (Ω : Type) [Field Ω] (z : Sp Ω ⟶ pullback G.hom (spMap ρ)) (t : Sp Ω ⟶ Sp R)
+                (x a' : Over.mk t ⟶ G),
+              x.left = z ≫ pullback.fst _ _ → a'.left = z ≫ pullback.snd _ _ ≫ a.left
+                → (∀ w, (x * a').left w ∈ V)
+                → ∀ w, z w ∈ W := by
   intro R R₁ _ _ ρ G _ V hV a
   let f := spMap ρ
   let G₁ := (Over.pullback f).obj G
   let a₁ : Over.mk (𝟙 (Sp R₁)) ⟶ G₁ :=
-    Over.homMk (pullback.lift (f := G.hom) (g := f) a.left (𝟙 (Sp R₁))
-      ((Over.w a).trans (Category.id_comp _).symm))
+    Over.homMk
+      (pullback.lift (f := G.hom) (g := f) a.left (𝟙 (Sp R₁))
+        ((Over.w a).trans (Category.id_comp _).symm))
       (by show pullback.lift _ _ _ ≫ pullback.snd G.hom f = 𝟙 _; simp)
   let e : G₁ ⟶ Over.mk (𝟙 (Sp R₁)) := Over.homMk G₁.hom (by simp)
   let c : G₁ ⟶ G₁ := e ≫ a₁
-  have hc : ∀ g : G₁ ⟶ G₁, g ≫ c = c := fun g =>
-    by rw [← Category.assoc]; congr 1; ext; simp [e]
+  have hc : ∀ g : G₁ ⟶ G₁, g ≫ c = c := fun g => by rw [← Category.assoc]; congr 1; ext; simp [e]
   let T : G₁ ⟶ G₁ := 𝟙 G₁ * c
   let T' : G₁ ⟶ G₁ := 𝟙 G₁ * c⁻¹
   have h₁ : T ≫ T' = 𝟙 G₁ := by
@@ -48,14 +60,15 @@ theorem translate_baseChange_affineOpen : ∀ (R R₁ : Type) [CommRing R] [Comm
   subst ht
   let Z : Over (Sp R₁) := Over.mk (z ≫ pullback.snd G.hom f)
   let z' : Z ⟶ G₁ := Over.homMk z (by simp [G₁, Z])
-  have key := (isGrpPullback_pullback G f).2 Z z' (z' ≫ c) x a' (by simpa [z'] using hx)
-    (by rw [ha]; simp [z', c, e, a₁, G₁, pullback.lift_fst]; rfl)
+  have key :=
+    (isGrpPullback_pullback G f).2 Z z' (z' ≫ c) x a' (by simpa [z'] using hx)
+      (by rw [ha]; simp [z', c, e, a₁, G₁, pullback.lift_fst]; rfl)
   have hT : z' * (z' ≫ c) = z' ≫ T := by simp only [T, MonObj.comp_mul, Category.comp_id]
   rw [hT] at key
   have : (z ≫ T.left ≫ pullback.fst G.hom f) w ∈ V := by
-    have e2 : z ≫ T.left ≫ pullback.fst G.hom f = (x * a').left := by
-      rw [key]; simp [z']
-    rw [e2]; exact hxa w
+    have e2 : z ≫ T.left ≫ pullback.fst G.hom f = (x * a').left := by rw [key]; simp [z']
+    rw [e2]
+    exact hxa w
   simpa using this
 
 end GlobalTheory.Mum

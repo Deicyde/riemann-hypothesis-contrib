@@ -21,8 +21,7 @@ open PSmoothSum in
 theorem smoothSum : SmoothSum := by
   intro X P _ _ _ _ _ _ W hW K B hK hB I p hp a ha
   obtain ⟨R, hR⟩ := hB.isBounded.subset_closedBall (0 : X)
-  let φ : ContDiffBump (0 : X) :=
-    ⟨max R 0 + 1, max R 0 + 2, by positivity, by linarith⟩
+  let φ : ContDiffBump (0 : X) := ⟨max R 0 + 1, max R 0 + 2, by positivity, by linarith⟩
   let G : X × P → ℂ := fun q => ((φ q.1 : ℝ) : ℂ) * W q
   have hG : ContDiff ℝ ∞ G :=
     (Complex.ofRealCLM.contDiff.comp (φ.contDiff.comp contDiff_fst)).mul hW
@@ -36,8 +35,8 @@ theorem smoothSum : SmoothSum := by
   have hcpt : IsCompact (tsupport φ ×ˢ K) := φ.hasCompactSupport.isCompact.prod hK
   have hbound : ∀ k : ℕ, ∃ M : ℝ, ∀ x : X, ∀ y ∈ K, ‖iteratedFDeriv ℝ k G (x, y)‖ ≤ M := by
     intro k
-    obtain ⟨M, hM⟩ := hcpt.exists_bound_of_continuousOn
-      (hG.continuous_iteratedFDeriv (le_infty k)).continuousOn
+    obtain ⟨M, hM⟩ :=
+      hcpt.exists_bound_of_continuousOn (hG.continuous_iteratedFDeriv (le_infty k)).continuousOn
     refine ⟨max M 0, fun x y hy => ?_⟩
     by_cases hx : x ∈ tsupport φ
     · exact (by simpa using hM (x, y) ⟨hx, hy⟩ : _ ≤ M).trans (le_max_left _ _)
@@ -48,8 +47,9 @@ theorem smoothSum : SmoothSum := by
       simp [h0]
   choose M hM using hbound
   let L : X →L[ℝ] X × P := ContinuousLinearMap.inl ℝ X P
-  have hpart : ∀ (y : P) (k : ℕ) (x : X), y ∈ K →
-      ‖iteratedFDeriv ℝ k (fun z => G (z, y)) x‖ ≤ M k * ‖L‖ ^ k := by
+  have hpart
+      : ∀ (y : P) (k : ℕ) (x : X),
+        y ∈ K → ‖iteratedFDeriv ℝ k (fun z => G (z, y)) x‖ ≤ M k * ‖L‖ ^ k := by
     intro y k x hy
     have heq : (fun z => G (z, y)) = (fun q => G (q + (0, y))) ∘ L := by
       funext z
@@ -77,9 +77,10 @@ theorem smoothSum : SmoothSum := by
         (mul_le_mul_of_nonneg_left (hpart (p i) k x (hp i)) (norm_nonneg _))
   · intro x hx
     have hx' : dist x 0 ≤ R := hR hx
-    have h1 : φ x = 1 := φ.one_of_mem_closedBall (by
-      show dist x 0 ≤ max R 0 + 1
-      linarith [le_max_left R 0])
+    have h1 : φ x = 1 :=
+      φ.one_of_mem_closedBall (by
+        show dist x 0 ≤ max R 0 + 1
+        linarith [le_max_left R 0])
     simp [G, h1]
 
 end MainStatements.WeightKernel

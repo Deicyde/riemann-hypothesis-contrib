@@ -17,11 +17,14 @@ open NumberField IsDedekindDomain
 
 section Lattices
 
-variable {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_proj (L : Submodule (𝓞 K) V) (hfg : L.FG) (hsp : Submodule.span K (L : Set V) = ⊤) (W : Submodule K V) :
-    ∃ P : V →ₗ[K] V, (∀ v, P v ∈ W) ∧ (∀ w ∈ W, P w = w) ∧ ∀ v ∈ L, P v ∈ L := by
+theorem exists_proj
+    (L : Submodule (𝓞 K) V) (hfg : L.FG) (hsp : Submodule.span K (L : Set V) = ⊤)
+    (W : Submodule K V)
+    : ∃ P : V →ₗ[K] V, (∀ v, P v ∈ W) ∧ (∀ w ∈ W, P w = w) ∧ ∀ v ∈ L, P v ∈ L := by
   classical
   let q : V →ₗ[𝓞 K] V ⧸ W := W.mkQ.restrictScalars (𝓞 K)
   let Lb : Submodule (𝓞 K) (V ⧸ W) := L.map q
@@ -38,14 +41,16 @@ theorem exists_proj (L : Submodule (𝓞 K) V) (hfg : L.FG) (hsp : Submodule.spa
   have hfp : Module.FinitePresentation (𝓞 K) Lb := Module.finitePresentation_of_finite _ _
   have hproj : Module.Projective (𝓞 K) Lb := Module.Flat.projective_of_finitePresentation
   let qL : L →ₗ[𝓞 K] Lb := q.submoduleMap L
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property qL LinearMap.id (LinearMap.submoduleMap_surjective q L)
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property qL LinearMap.id (LinearMap.submoduleMap_surjective q L)
   have hs' : ∀ y : Lb, q (s y : V) = y := fun y => congrArg Subtype.val (LinearMap.congr_fun hs y)
   let p0 : L →ₗ[𝓞 K] V := L.subtype - L.subtype ∘ₗ s ∘ₗ qL
   have hp0 : ∀ x : L, p0 x = (x : V) - s (qL x) := fun x => rfl
   have hden : ∀ v : V, ∃ d : 𝓞 K, d ≠ 0 ∧ d • v ∈ L := by
     intro v
     have hv : v ∈ Submodule.span K (L : Set V) := by rw [hsp]; trivial
-    obtain ⟨d, hd⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (L : Set V) v hv
+    obtain ⟨d, hd⟩ :=
+      multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (L : Set V) v hv
     rw [Submodule.span_eq] at hd
     exact ⟨d, nonZeroDivisors.coe_ne_zero d, hd⟩
   have hunit : ∀ x : nonZeroDivisors (𝓞 K), IsUnit (algebraMap (𝓞 K) (Module.End (𝓞 K) V) x) :=
@@ -55,7 +60,8 @@ theorem exists_proj (L : Submodule (𝓞 K) V) (hfg : L.FG) (hsp : Submodule.spa
     obtain ⟨d, hd, hv⟩ := hden v
     exact ⟨(⟨d • v, hv⟩, ⟨d, mem_nonZeroDivisors_of_ne_zero hd⟩), rfl⟩
   let P0 : V →ₗ[𝓞 K] V := IsLocalizedModule.lift (nonZeroDivisors (𝓞 K)) L.subtype p0 hunit
-  have hP0 : ∀ x : L, P0 (x : V) = p0 x := fun x => IsLocalizedModule.lift_apply _ L.subtype p0 hunit x
+  have hP0 : ∀ x : L, P0 (x : V) = p0 x := fun x =>
+    IsLocalizedModule.lift_apply _ L.subtype p0 hunit x
   let P : V →ₗ[K] V := P0.extendScalarsOfIsLocalization (nonZeroDivisors (𝓞 K)) K
   have hP : ∀ v, P v = P0 v := fun v => rfl
   have hW : ∀ x : L, p0 x ∈ W := by
@@ -89,12 +95,12 @@ theorem exists_proj (L : Submodule (𝓞 K) V) (hfg : L.FG) (hsp : Submodule.spa
 
 end Lattices
 
-
 open Classical in
-theorem deg_eq {ι : Type} {a b : ℕ} (e : ι × Fin b × Fin a →₀ ℕ) (τ : ι) :
-    ((∑ k ∈ e.support.filter (fun k => k.1 = τ), e k : ℕ) : ℤ) = ∑ β, ∑ α, (e (τ, β, α) : ℤ) := by
+theorem deg_eq {ι : Type} {a b : ℕ} (e : ι × Fin b × Fin a →₀ ℕ) (τ : ι)
+    : ((∑ k ∈ e.support.filter (fun k => k.1 = τ), e k : ℕ) : ℤ) = ∑ β, ∑ α, (e (τ, β, α) : ℤ) := by
   rw [← Finset.sum_product', Finset.univ_product_univ, Nat.cast_sum]
-  rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.filter fun y : Fin b × Fin a => (τ, y) ∈ e.support))]
+  rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.filter fun y : Fin b × Fin a =>
+    (τ, y) ∈ e.support))]
   · refine Finset.sum_bij (fun k _ => k.2) ?_ ?_ ?_ ?_
     · intro k hk
       obtain ⟨h1, rfl⟩ := Finset.mem_filter.1 hk
@@ -110,11 +116,14 @@ theorem deg_eq {ι : Type} {a b : ℕ} (e : ι × Fin b × Fin a →₀ ℕ) (τ
     have : (τ, y) ∉ e.support := fun h => hy (Finset.mem_filter.2 ⟨Finset.mem_univ _, h⟩)
     rw [show (τ, y.1, y.2) = (τ, y) from rfl, Finsupp.notMem_support_iff.1 this, Nat.cast_zero]
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker
+  GlobalTheory.IndefiniteRowSideFullHecke
 
 section Ties
 
-variable {D : D7} {EX : ErrX D} (Ch : Chars (BadPrimesPeriodBound.recFields D) (BadPrimesPeriodBound.recPrimes EX) D.R.m)
+variable
+  {D : D7} {EX : ErrX D}
+  (Ch : Chars (BadPrimesPeriodBound.recFields D) (BadPrimesPeriodBound.recPrimes EX) D.R.m)
   (sel : HeightOneSpectrum (𝓞 D.host.F) → HeightOneSpectrum (𝓞 D.host.E))
 
 variable (m0 : Fin D.R.m → Formalism.L2.Host.HChar D.host.E)
@@ -123,8 +132,12 @@ end Ties
 
 section Statements
 
-variable (D : D7) (L : SizeData₂ D) (EX : ErrX D) (Dx : DivX D) (Ch : Chars (BadPrimesPeriodBound.recFields D) (BadPrimesPeriodBound.recPrimes EX) D.R.m)
-  (m0 : Fin D.R.m → Formalism.L2.Host.HChar D.host.E) (sel : HeightOneSpectrum (𝓞 D.host.F) → HeightOneSpectrum (𝓞 D.host.E)) {δ : ℂ}
+variable
+  (D : D7) (L : SizeData₂ D) (EX : ErrX D) (Dx : DivX D)
+  (Ch : Chars (BadPrimesPeriodBound.recFields D) (BadPrimesPeriodBound.recPrimes EX) D.R.m)
+  (m0 : Fin D.R.m → Formalism.L2.Host.HChar D.host.E)
+  (sel : HeightOneSpectrum (𝓞 D.host.F) → HeightOneSpectrum (𝓞 D.host.E))
+  {δ : ℂ}
 
 end Statements
 

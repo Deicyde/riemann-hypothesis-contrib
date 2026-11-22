@@ -56,16 +56,19 @@ lemma logDeriv_wFactor {l z : ℂ} (h : z ≠ l) :
 end SigmaLog
 
 open SigmaLog in
-theorem sigmaLogDeriv_of (h1 : SigmaProdLU) (h2 : SigmaSummable) (h3 : ZetaSummable) :
-    SigmaLogDeriv := by
+theorem sigmaLogDeriv_of (h1 : SigmaProdLU) (h2 : SigmaSummable) (h3 : ZetaSummable)
+    : SigmaLogDeriv := by
   intro L z hz
   have hne : ∀ l : L.lattice, z ≠ (l : ℂ) := fun l h => hz (h ▸ l.2)
   have hz0 : z ≠ 0 := fun h => hz (h ▸ L.lattice.zero_mem)
   set P : ℂ → ℂ := fun z => ∏' l : L.lattice, wFactor (l : ℂ) z with hP
 
   have hPne : P z ≠ 0 := by
-    have := tprod_one_add_ne_zero_of_summable (f := fun l : L.lattice => wFactor (l : ℂ) z - 1)
-      (fun l => by simpa using wFactor_ne_zero (hne l)) (h2 L z)
+    have :=
+      tprod_one_add_ne_zero_of_summable
+        (f := fun l : L.lattice => wFactor (l : ℂ) z - 1)
+        (fun l => by simpa using wFactor_ne_zero (hne l))
+        (h2 L z)
     simpa [hP] using this
 
   have hPd : DifferentiableOn ℂ P Set.univ := by
@@ -82,18 +85,22 @@ theorem sigmaLogDeriv_of (h1 : SigmaProdLU) (h2 : SigmaSummable) (h3 : ZetaSumma
     exact hasSum_ite_eq 0 (1 / z)
   have hs : HasSum (fun l : L.lattice => logDeriv (wFactor (l : ℂ)) z) (wZeta L z - 1 / z) := by
     have := (h3 L z).hasSum.sub hc
-    have he : (fun l : L.lattice => logDeriv (wFactor (l : ℂ)) z)
-        = fun l : L.lattice => (1 / (z - (l : ℂ)) + 1 / (l : ℂ) + z / (l : ℂ) ^ 2)
-            - (if (l : ℂ) = 0 then 1 / z else 0) := by
+    have he
+        : (fun l : L.lattice => logDeriv (wFactor (l : ℂ)) z)
+          = fun l : L.lattice =>
+            (1 / (z - (l : ℂ)) + 1 / (l : ℂ) + z / (l : ℂ) ^ 2)
+              - (if (l : ℂ) = 0 then 1 / z else 0) := by
       funext l
       exact logDeriv_wFactor (hne l)
     rw [he]
     exact this
   have hlog : logDeriv P z = wZeta L z - 1 / z := by
-    have := logDeriv_tprod_eq_tsum (s := Set.univ) isOpen_univ (Set.mem_univ z)
-      (f := fun (l : L.lattice) (z : ℂ) => wFactor (l : ℂ) z) (fun l => wFactor_ne_zero (hne l))
-      (fun l => (differentiable_wFactor _).differentiableOn) hs.summable
-      (h1 L).multipliableLocallyUniformlyOn hPne
+    have :=
+      logDeriv_tprod_eq_tsum (s := Set.univ) isOpen_univ (Set.mem_univ z)
+        (f := fun (l : L.lattice) (z : ℂ) => wFactor (l : ℂ) z)
+        (fun l => wFactor_ne_zero (hne l))
+        (fun l => (differentiable_wFactor _).differentiableOn)
+        hs.summable (h1 L).multipliableLocallyUniformlyOn hPne
     rw [hs.tsum_eq] at this
     exact this
   have hPderiv : HasDerivAt P ((wZeta L z - 1 / z) * P z) z := by

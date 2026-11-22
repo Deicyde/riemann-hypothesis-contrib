@@ -6,14 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 noncomputable section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 open GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum
 
 namespace UpperTheory.V.Lit.Geo
 
 def Scale {ι : Type} (q : ι → ℝ) (N : ℕ) : Prop :=
-  (∀ i, 0 ≤ q i) ∧ ∀ s t : ℝ, 0 < s → s ≤ t → (Summable fun i => Real.exp (-Real.pi * (s * q i))) ∧
-    ∑' i, Real.exp (-Real.pi * (s * q i)) ≤ (t / s) ^ N * ∑' i, Real.exp (-Real.pi * (t * q i))
+  (∀ i, 0 ≤ q i)
+    ∧ ∀ s t : ℝ,
+      0 < s → s ≤ t
+        → (Summable fun i => Real.exp (-Real.pi * (s * q i)))
+          ∧ ∑' i, Real.exp (-Real.pi * (s * q i))
+            ≤ (t / s) ^ N * ∑' i, Real.exp (-Real.pi * (t * q i))
 
 section Inf
 
@@ -40,7 +45,6 @@ def gauss (x : Fin a → Cinf E) : ℝ := Real.exp (-Real.pi * qf x)
 def quad (p : Matrix (Fin a) (Fin a) (Cinf E)) (x : Fin a → Cinf E) : ℝ :=
   ∑ w : InfinitePlace E, (((x ᵥ* p) ⬝ᵥ star x) w).re
 
-
 variable (E a) in
 def poly : Subalgebra ℂ ((Fin a → Cinf E) → ℂ) :=
   Algebra.adjoin ℂ (Set.range fun l : (Fin a → Cinf E) →ₗ[ℝ] ℂ => (l : (Fin a → Cinf E) → ℂ))
@@ -48,7 +52,8 @@ def poly : Subalgebra ℂ ((Fin a → Cinf E) → ℂ) :=
 def pg (P : (Fin a → Cinf E) → ℂ) (x : Fin a → Cinf E) : ℂ := P x * (gauss x : ℝ)
 
 def sc (y : Matrix (Fin a) (Fin a) (Cinf E)) : ℝ :=
-  Real.exp (-((∑ w : InfinitePlace E, Real.log ‖y.det w‖) / ((a : ℝ) * Fintype.card (InfinitePlace E))))
+  Real.exp (-((∑ w : InfinitePlace E, Real.log ‖y.det w‖)
+    / ((a : ℝ) * Fintype.card (InfinitePlace E))))
 
 def msum {ι : Type} (x : ι → Fin a → Cinf E) (P : (Fin a → Cinf E) → ℂ) (y : Lie E a) : ℂ :=
   ∑' i, pg P (x i ᵥ* Matrix.of y)
@@ -85,21 +90,28 @@ def pt (g : GA E a) : (Fin a → E) →+ (Fin a → Cinf E) where
 
 def rt (g : GA E a) : GA E a := (retractOne g : KernelIndexFullLattice.G1 E a).1
 
-def gsum {M : Type} [AddCommMonoid M] [TopologicalSpace M] (L : AddSubgroup (Fin a → Af E)) (F : (Fin a → Cinf E) → M)
-    (g : GA E a) : M := ∑' v : lat L g, F (pt (rt g) v.1)
+def gsum
+    {M : Type} [AddCommMonoid M] [TopologicalSpace M]
+    (L : AddSubgroup (Fin a → Af E)) (F : (Fin a → Cinf E) → M) (g : GA E a)
+    : M :=
+  ∑' v : lat L g, F (pt (rt g) v.1)
 
 def Th (L : AddSubgroup (Fin a → Af E)) (g : GA E a) : ℝ := gsum L gauss g
 
 def fn (L : AddSubgroup (Fin a → Af E)) (g : GA E a) : ℝ := Real.log (Th L g)
 
-def mean (L : AddSubgroup (Fin a → Af E)) (P : (Fin a → Cinf E) → ℂ) (g : GA E a) : ℂ := gsum L (pg P) g / (Th L g : ℝ)
+def mean (L : AddSubgroup (Fin a → Af E)) (P : (Fin a → Cinf E) → ℂ) (g : GA E a) : ℂ :=
+  gsum L (pg P) g / (Th L g : ℝ)
 
-def mom (L : AddSubgroup (Fin a → Af E)) (g : GA E a) : Herm E a :=
-  ⟨Matrix.of fun i j w => mean L (fun x => star (x i w) * x j w) g, by
+def mom (L : AddSubgroup (Fin a → Af E)) (g : GA E a) : Herm E a := ⟨
+  Matrix.of fun i j w => mean L (fun x => star (x i w) * x j w) g,
+  by
     change star _ = _
     ext i j w
-    simp only [Matrix.star_apply, Matrix.of_apply, Pi.star_apply, mean, gsum, pg, star_div₀, tsum_star, star_mul',
-      star_star, Complex.star_def, Complex.conj_ofReal, Complex.conj_tsum, map_mul, Complex.conj_conj, mul_comm]⟩
+    simp only [Matrix.star_apply, Matrix.of_apply, Pi.star_apply, mean, gsum, pg, star_div₀,
+      tsum_star, star_mul', star_star, Complex.star_def, Complex.conj_ofReal, Complex.conj_tsum,
+      map_mul, Complex.conj_conj, mul_comm]
+⟩
 
 def dev (L : AddSubgroup (Fin a → Af E)) (g : GA E a) : Herm E a :=
   mom L g - ell E a (toL (mom L g).1) • (⟨1, IsSelfAdjoint.one _⟩ : Herm E a)

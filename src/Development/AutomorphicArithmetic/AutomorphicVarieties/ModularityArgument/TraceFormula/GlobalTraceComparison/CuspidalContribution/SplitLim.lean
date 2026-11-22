@@ -6,16 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.LFun UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.LFun
+  UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
 
-private theorem rel_le_mono {s t : Multiset ℂ} {a b : ℝ} (hab : a ≤ b)
-    (h : Multiset.Rel (fun x y => ‖x - y‖ ≤ a) s t) :
-    Multiset.Rel (fun x y => ‖x - y‖ ≤ b) s t :=
+private theorem rel_le_mono
+    {s t : Multiset ℂ} {a b : ℝ} (hab : a ≤ b) (h : Multiset.Rel (fun x y => ‖x - y‖ ≤ a) s t)
+    : Multiset.Rel (fun x y => ‖x - y‖ ≤ b) s t :=
   h.mono fun _ _ _ _ hxy => hxy.trans hab
 
-private theorem rel_shift {s c : Multiset ℂ} {ε : ℝ} (α : ℂ)
-    (h : Multiset.Rel (fun x y => ‖x - y‖ ≤ ε) (s.map (· + α)) c) :
-    Multiset.Rel (fun x y => ‖x - y‖ ≤ ε) s (c.map (· - α)) := by
+private theorem rel_shift
+    {s c : Multiset ℂ} {ε : ℝ} (α : ℂ) (h : Multiset.Rel (fun x y => ‖x - y‖ ≤ ε) (s.map (· + α)) c)
+    : Multiset.Rel (fun x y => ‖x - y‖ ≤ ε) s (c.map (· - α)) := by
   rw [Multiset.rel_map_left] at h
   rw [Multiset.rel_map_right]
   refine h.mono fun x _ y _ hxy => ?_
@@ -23,8 +25,7 @@ private theorem rel_shift {s c : Multiset ℂ} {ε : ℝ} (α : ℂ)
   rw [this]
   exact hxy
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp.splitLim :
-    SplitLim := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp.splitLim : SplitLim := by
   classical
   intro E _ _ _ m₀ α β
   let A : (E →+* ℂ) → Set (Multiset ℂ × Multiset ℂ) := fun t => {x | x.1 + x.2 = m₀ t}
@@ -32,29 +33,34 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp.splitLim :
     refine ((Multiset.antidiagonal (m₀ t)).toFinset.finite_toSet).subset ?_
     intro x hx
     simpa [A, Multiset.mem_antidiagonal] using hx
-  have hS : (Set.pi Set.univ A).Finite := Set.Finite.pi' hA |>.subset (fun σ hσ t => hσ t (Set.mem_univ t))
-  let F : ((E →+* ℂ) → Multiset ℂ × Multiset ℂ) →
-      ((E →+* ℂ) → Multiset ℂ) × ((E →+* ℂ) → Multiset ℂ) :=
-    fun σ => (fun t => (σ t).1.map (· - α), fun t => (σ t).2.map (· - β))
+  have hS : (Set.pi Set.univ A).Finite :=
+    Set.Finite.pi' hA |>.subset (fun σ hσ t => hσ t (Set.mem_univ t))
+  let F
+      : ((E →+* ℂ) → Multiset ℂ × Multiset ℂ)
+        → ((E →+* ℂ) → Multiset ℂ) × ((E →+* ℂ) → Multiset ℂ) := fun σ =>
+    (fun t => (σ t).1.map (· - α), fun t => (σ t).2.map (· - β))
   refine ⟨(hS.image F).toFinset, ?_⟩
   intro m m₁ m₂ hm hto
   let Good : ((E →+* ℂ) → Multiset ℂ × Multiset ℂ) → ℕ → ℕ → Prop := fun σ j k =>
-    ∀ t, Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) (m₁ k t) ((F σ).1 t) ∧
-      Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) (m₂ k t) ((F σ).2 t)
+    ∀ t,
+      Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) (m₁ k t) ((F σ).1 t)
+        ∧ Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) (m₂ k t) ((F σ).2 t)
   have hmono : ∀ σ {i j : ℕ} {k : ℕ}, i ≤ j → Good σ j k → Good σ i k := by
     intro σ i j k hij h t
-    have hle : 1 / ((j : ℝ) + 1) ≤ 1 / ((i : ℝ) + 1) :=
-      Nat.one_div_le_one_div hij
+    have hle : 1 / ((j : ℝ) + 1) ≤ 1 / ((i : ℝ) + 1) := Nat.one_div_le_one_div hij
     exact ⟨rel_le_mono hle (h t).1, rel_le_mono hle (h t).2⟩
   have step1 : ∀ j, ∀ᶠ k in atTop, ∃ σ ∈ Set.pi Set.univ A, Good σ j k := by
     intro j
     have hpos : (0 : ℝ) < 1 / ((j : ℝ) + 1) := Nat.one_div_pos_of_nat
-    have hall : ∀ᶠ k in atTop, ∀ t, Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) (m k t) (m₀ t) :=
+    have hall
+        : ∀ᶠ k in atTop, ∀ t, Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) (m k t) (m₀ t) :=
       eventually_all.2 fun t => hto t _ hpos
     filter_upwards [hall] with k hk
-    have hsplit : ∀ t, ∃ x : Multiset ℂ × Multiset ℂ, x.1 + x.2 = m₀ t ∧
-        Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) ((m₁ k t).map (· + α)) x.1 ∧
-        Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) ((m₂ k t).map (· + β)) x.2 := by
+    have hsplit
+        : ∀ t, ∃ x : Multiset ℂ × Multiset ℂ,
+          x.1 + x.2 = m₀ t
+            ∧ Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) ((m₁ k t).map (· + α)) x.1
+            ∧ Multiset.Rel (fun x y => ‖x - y‖ ≤ 1 / ((j : ℝ) + 1)) ((m₂ k t).map (· + β)) x.2 := by
       intro t
       have h := hk t
       rw [hm k t, Multiset.rel_add_left] at h

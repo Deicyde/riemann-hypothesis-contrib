@@ -12,10 +12,11 @@ namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 namespace CISum
 
 open Classical in
-theorem centralIdem_act {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
-    [FiniteDimensional ℂ V] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (ρ : Representation ℂ G V) (σ : Representation ℂ G W) (hρ : IsIrr ρ) (hσ : IsIrr σ) :
-    σ.asAlgebraHom (centralIdem ρ) = if Nonempty (Representation.Equiv ρ σ) then 1 else 0 := by
+theorem centralIdem_act
+    {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (ρ : Representation ℂ G V) (σ : Representation ℂ G W) (hρ : IsIrr ρ) (hσ : IsIrr σ)
+    : σ.asAlgebraHom (centralIdem ρ) = if Nonempty (Representation.Equiv ρ σ) then 1 else 0 := by
   have := hρ.1
   have := hσ.1
   have hirrρ : ρ.IsIrreducible := isIrreducible_of ρ hρ.2
@@ -29,10 +30,11 @@ theorem centralIdem_act {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [M
     set_option synthInstance.maxHeartbeats 100000 in
       simp [map_sum]
     rfl
-  obtain ⟨μ, hμ⟩ := schur_scalar σ hσ.2 (fun g => c * ρ.character g⁻¹) (by
-    intro g k
-    have : (k * g * k⁻¹)⁻¹ = k * g⁻¹ * k⁻¹ := by group
-    simp only [this, Representation.char_conj])
+  obtain ⟨μ, hμ⟩ :=
+    schur_scalar σ hσ.2 (fun g => c * ρ.character g⁻¹) (by
+      intro g k
+      have : (k * g * k⁻¹)⁻¹ = k * g⁻¹ * k⁻¹ := by group
+      simp only [this, Representation.char_conj])
   have htr : μ * (Module.finrank ℂ W : ℂ) = c * ∑ g, σ.character g * ρ.character g⁻¹ := by
     have h1 := congrArg (LinearMap.trace ℂ W) hμ
     set_option synthInstance.maxHeartbeats 100000 in
@@ -57,18 +59,20 @@ theorem centralIdem_act {G V W : Type} [Group G] [Fintype G] [AddCommGroup V] [M
       exact this
     rw [this, one_smul]
   · rw [if_neg hiso] at horth
-    have hsum : ∑ g, σ.character g * ρ.character g⁻¹ = 0 := by
-      simpa [hc0] using horth
+    have hsum : ∑ g, σ.character g * ρ.character g⁻¹ = 0 := by simpa [hc0] using horth
     rw [hsum, mul_zero] at htr
     rw [(mul_eq_zero.mp htr).resolve_right hd, zero_smul]
 
-theorem isIrr_of_isIrreducible {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (h : ρ.IsIrreducible) : IsIrr ρ := by
+theorem isIrr_of_isIrreducible
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (h : ρ.IsIrreducible)
+    : IsIrr ρ := by
   unfold Representation.IsIrreducible at h
   refine ⟨?_, fun W hW => ?_⟩
   · by_contra hn
     rw [not_nontrivial_iff_subsingleton] at hn
-    exact (bot_ne_top : (⊥ : Subrepresentation ρ) ≠ ⊤) (Subrepresentation.ext (Subsingleton.elim _ _))
+    exact (bot_ne_top : (⊥ : Subrepresentation ρ) ≠ ⊤) (Subrepresentation.ext (Subsingleton.elim _
+      _))
   · rcases h.eq_bot_or_eq_top ⟨W, fun g v hv => hW g v hv⟩ with h1 | h1
     · left
       exact congrArg Subrepresentation.toSubmodule h1
@@ -90,8 +94,10 @@ theorem central_idempotents_sum_one : CentralIdemSumOne := by
     have := (hirr i).1
     exact (central_idempotent_holds G (V i) (ρ i) (hirr i).2).2 x
 
-  have hact : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-      (σ : Representation ℂ G W), IsIrr σ → σ.asAlgebraHom z = 1 := by
+  have hact
+      : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+          (σ : Representation ℂ G W),
+        IsIrr σ → σ.asAlgebraHom z = 1 := by
     intro W _ _ _ σ hσ
     obtain ⟨i₀, φ, hφ⟩ := hfull W σ hσ
     set_option synthInstance.maxHeartbeats 100000 in
@@ -111,32 +117,35 @@ theorem central_idempotents_sum_one : CentralIdemSumOne := by
     · intro h; exact absurd (Finset.mem_univ _) h
   have : NeZero (Nat.card G : ℂ) :=
     ⟨by rw [Nat.card_eq_fintype_card]; exact_mod_cast Fintype.card_ne_zero⟩
-  let N : Submodule (MonoidAlgebra ℂ G) (MonoidAlgebra ℂ G) :=
-    { carrier := {x | z * x = x}
-      add_mem' := by
-        intro x y hx hy
-        simp only [Set.mem_ofPred_eq] at hx hy ⊢
-        rw [mul_add, hx, hy]
-      zero_mem' := by simp
-      smul_mem' := by
-        intro a x hx
-        simp only [Set.mem_ofPred_eq, smul_eq_mul] at hx ⊢
-        rw [← mul_assoc, hcentral a, mul_assoc, hx] }
+  let N : Submodule (MonoidAlgebra ℂ G) (MonoidAlgebra ℂ G) := {
+    carrier := {x | z * x = x}
+    add_mem' := by
+      intro x y hx hy
+      simp only [Set.mem_ofPred_eq] at hx hy ⊢
+      rw [mul_add, hx, hy]
+    zero_mem' := by simp
+    smul_mem' := by
+      intro a x hx
+      simp only [Set.mem_ofPred_eq, smul_eq_mul] at hx ⊢
+      rw [← mul_assoc, hcentral a, mul_assoc, hx]
+  }
   have hN : N = ⊤ := by
-    rw [eq_top_iff, ← IsSemisimpleModule.sSup_simples_eq_top (MonoidAlgebra ℂ G)
-      (MonoidAlgebra ℂ G)]
+    rw [eq_top_iff,
+      ← IsSemisimpleModule.sSup_simples_eq_top (MonoidAlgebra ℂ G) (MonoidAlgebra ℂ G)]
     apply sSup_le
     intro S hS x hx
     have hS' : IsSimpleModule (MonoidAlgebra ℂ G) S := hS
-    have hirrS := (Representation.isSimpleModule_iff_irreducible_ofModule (k := ℂ) (G := G) S).mp hS'
+    have hirrS :=
+      (Representation.isSimpleModule_iff_irreducible_ofModule (k := ℂ) (G := G) S).mp hS'
     have hfd : FiniteDimensional ℂ (RestrictScalars ℂ (MonoidAlgebra ℂ G) S) := by
-      let ι : RestrictScalars ℂ (MonoidAlgebra ℂ G) S →ₗ[ℂ] MonoidAlgebra ℂ G :=
-        { toFun := fun y => ((RestrictScalars.addEquiv ℂ (MonoidAlgebra ℂ G) S y : S) :
-            MonoidAlgebra ℂ G)
-          map_add' := by intro a b; simp
-          map_smul' := by
-            intro c y
-            simp [RestrictScalars.addEquiv_map_smul, Algebra.smul_def] }
+      let ι : RestrictScalars ℂ (MonoidAlgebra ℂ G) S →ₗ[ℂ] MonoidAlgebra ℂ G := {
+        toFun := fun y =>
+          ((RestrictScalars.addEquiv ℂ (MonoidAlgebra ℂ G) S y : S) : MonoidAlgebra ℂ G)
+        map_add' := by intro a b; simp
+        map_smul' := by
+          intro c y
+          simp [RestrictScalars.addEquiv_map_smul, Algebra.smul_def]
+      }
       refine Module.Finite.of_injective ι ?_
       intro a b hab
       exact (RestrictScalars.addEquiv ℂ (MonoidAlgebra ℂ G) S).injective (Subtype.ext hab)

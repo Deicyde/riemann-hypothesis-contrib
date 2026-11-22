@@ -39,8 +39,7 @@ theorem mk_wittVector : #(WittVector p (AlgebraicClosure (ZMod p))) = 𝔠 := by
   rw [Cardinal.mk_congr (teichCoeffEquiv p (AlgebraicClosure (ZMod p)))]
   simp [teich_card_Fbar]
 
-abbrev TeichOm : Type :=
-  AlgebraicClosure (FractionRing (WittVector p (AlgebraicClosure (ZMod p))))
+abbrev TeichOm : Type := AlgebraicClosure (FractionRing (WittVector p (AlgebraicClosure (ZMod p))))
 
 theorem teich_card_Om : #(TeichOm p) = 𝔠 := by
   have hK : #(FractionRing (WittVector p (AlgebraicClosure (ZMod p)))) = 𝔠 := by
@@ -51,8 +50,8 @@ theorem teich_card_Om : #(TeichOm p) = 𝔠 := by
     rw [hK]
     exact max_le le_rfl Cardinal.aleph0_le_continuum
   · rw [← hK]
-    exact Cardinal.mk_le_of_injective
-      (algebraMap (FractionRing (WittVector p (AlgebraicClosure (ZMod p)))) (TeichOm p)).injective
+    exact Cardinal.mk_le_of_injective (algebraMap
+      (FractionRing (WittVector p (AlgebraicClosure (ZMod p)))) (TeichOm p)).injective
 
 def teichWOm : WittVector p (AlgebraicClosure (ZMod p)) →+* TeichOm p :=
   (algebraMap (FractionRing (WittVector p (AlgebraicClosure (ZMod p)))) (TeichOm p)).comp
@@ -76,9 +75,9 @@ theorem teich_Om_equiv : Nonempty (TeichOm p ≃+* ℂ) := by
     rw [teich_card_Om, Cardinal.mk_complex]
 
 def teichToC : AlgebraicClosure (ZMod p) →* ℂ :=
-  (((teich_Om_equiv p).some.toRingHom.comp (teichWOm p) :
-      WittVector p (AlgebraicClosure (ZMod p)) →+* ℂ) :
-      WittVector p (AlgebraicClosure (ZMod p)) →* ℂ).comp (WittVector.teichmuller p)
+  (((teich_Om_equiv p).some.toRingHom.comp (teichWOm p)
+      : WittVector p (AlgebraicClosure (ZMod p)) →+* ℂ)
+    : WittVector p (AlgebraicClosure (ZMod p)) →* ℂ).comp (WittVector.teichmuller p)
 
 theorem teichToC_injective : Function.Injective (teichToC p) := by
   intro x y h
@@ -107,16 +106,16 @@ def extZeroHom {K L : Type*} [Field K] [Field L] (χ : Kˣ →* Lˣ) : K →* L 
     have h1 : Units.mk0 (x * y) hxy = Units.mk0 x hx * Units.mk0 y hy := by ext; rfl
     simp [hx, hy, h1]
 
-theorem extZeroHom_of_ne {K L : Type*} [Field K] [Field L] (χ : Kˣ →* Lˣ) {x : K} (h : x ≠ 0) :
-    extZeroHom χ x = (χ (Units.mk0 x h) : L) := by
+theorem extZeroHom_of_ne {K L : Type*} [Field K] [Field L] (χ : Kˣ →* Lˣ) {x : K} (h : x ≠ 0)
+    : extZeroHom χ x = (χ (Units.mk0 x h) : L) := by
   simp [extZeroHom, h]
 
 end ExtZero
 
 section Iota
 
-theorem units_pow_surjective (L : Type*) [Field L] [IsAlgClosed L] {n : ℕ} (hn : n ≠ 0) :
-    Function.Surjective (fun a : Lˣ => a ^ n) := by
+theorem units_pow_surjective (L : Type*) [Field L] [IsAlgClosed L] {n : ℕ} (hn : n ≠ 0)
+    : Function.Surjective (fun a : Lˣ => a ^ n) := by
   intro u
   obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (u : L) (Nat.pos_of_ne_zero hn)
   have hz0 : z ≠ 0 := by
@@ -125,10 +124,12 @@ theorem units_pow_surjective (L : Type*) [Field L] [IsAlgClosed L] {n : ℕ} (hn
     exact u.ne_zero hz.symm
   exact ⟨Units.mk0 z hz0, by ext; simpa using hz⟩
 
-@[instance_reducible] def unitsDivisible (L : Type*) [Field L] [IsAlgClosed L] : DivisibleBy (Additive Lˣ) ℤ :=
+@[instance_reducible]
+def unitsDivisible (L : Type*) [Field L] [IsAlgClosed L] : DivisibleBy (Additive Lˣ) ℤ :=
   divisibleByOfSMulRightSurj (Additive Lˣ) ℤ (by
     intro n hn a
-    obtain ⟨b, hb⟩ := units_pow_surjective L (n := n.natAbs) (Int.natAbs_ne_zero.2 hn) (Additive.toMul a)
+    obtain ⟨b, hb⟩ :=
+      units_pow_surjective L (n := n.natAbs) (Int.natAbs_ne_zero.2 hn) (Additive.toMul a)
     rcases Int.natAbs_eq n with h | h
     · refine ⟨Additive.ofMul b, ?_⟩
       show n • Additive.ofMul b = a
@@ -153,16 +154,17 @@ def primeToSub : Subgroup (AlgebraicClosure (ZMod g))ˣ where
     simpa using ha
 
 omit [Fact l.Prime] in
-theorem mem_primeToSub (x : (AlgebraicClosure (ZMod g))ˣ) :
-    x ∈ primeToSub g l ↔ (orderOf x).Coprime l := Iff.rfl
+theorem mem_primeToSub (x : (AlgebraicClosure (ZMod g))ˣ)
+    : x ∈ primeToSub g l ↔ (orderOf x).Coprime l :=
+  Iff.rfl
 
 def teichU (p : ℕ) [Fact p.Prime] : (AlgebraicClosure (ZMod p))ˣ →* ℂˣ := Units.map (teichToC p)
 
 theorem teichU_injective (p : ℕ) [Fact p.Prime] : Function.Injective (teichU p) :=
   Units.map_injective (teichToC_injective p)
 
-theorem teichU_range {N : ℕ} (hN : N.Coprime l) (hN0 : N ≠ 0) (z : ℂˣ) (hz : z ^ N = 1) :
-    z ∈ (teichU l).range := by
+theorem teichU_range {N : ℕ} (hN : N.Coprime l) (hN0 : N ≠ 0) (z : ℂˣ) (hz : z ^ N = 1)
+    : z ∈ (teichU l).range := by
   have : NeZero N := ⟨hN0⟩
   have : NeZero (N : AlgebraicClosure (ZMod l)) := by
     refine ⟨fun h => ?_⟩
@@ -174,8 +176,7 @@ theorem teichU_range {N : ℕ} (hN : N.Coprime l) (hN0 : N ≠ 0) (z : ℂˣ) (h
     HasEnoughRootsOfUnity.natCard_rootsOfUnity (AlgebraicClosure (ZMod l)) N
   have hcardC : Nat.card (rootsOfUnity N ℂ) = N := Complex.card_rootsOfUnity N
   let r : rootsOfUnity N (AlgebraicClosure (ZMod l)) → rootsOfUnity N ℂ := fun y =>
-    ⟨teichU l y.1, by
-      rw [mem_rootsOfUnity, ← map_pow, (mem_rootsOfUnity _ _).1 y.2, map_one]⟩
+    ⟨teichU l y.1, by rw [mem_rootsOfUnity, ← map_pow, (mem_rootsOfUnity _ _).1 y.2, map_one]⟩
   have hr : Function.Injective r := by
     intro a b hab
     exact Subtype.ext (teichU_injective l (congrArg Subtype.val hab))
@@ -206,13 +207,15 @@ theorem iotaSub_injective : Function.Injective (iotaSub g l) := by
   have h2 : teichU g x.1 = teichU g y.1 := congrArg Subtype.val h1
   exact Subtype.ext (teichU_injective g h2)
 
-theorem iotaU_exists : ∃ χ : (AlgebraicClosure (ZMod g))ˣ →* (AlgebraicClosure (ZMod l))ˣ,
-    ∀ x : primeToSub g l, χ x.1 = iotaSub g l x := by
+theorem iotaU_exists
+    : ∃ χ : (AlgebraicClosure (ZMod g))ˣ →* (AlgebraicClosure (ZMod l))ˣ, ∀ x : primeToSub g l,
+      χ x.1 = iotaSub g l x := by
   let _ := unitsDivisible (AlgebraicClosure (ZMod l))
-  obtain ⟨h, hh⟩ := (Module.Baer.of_divisible (Additive (AlgebraicClosure (ZMod l))ˣ)).extension_property_addMonoidHom
-    (MonoidHom.toAdditive (primeToSub g l).subtype)
-    (fun a b hab => Subtype.ext (congrArg Additive.toMul hab : _))
-    (MonoidHom.toAdditive (iotaSub g l))
+  obtain ⟨h, hh⟩ :=
+    (Module.Baer.of_divisible (Additive (AlgebraicClosure (ZMod
+        l))ˣ)).extension_property_addMonoidHom (MonoidHom.toAdditive (primeToSub g l).subtype)
+      (fun a b hab => Subtype.ext (congrArg Additive.toMul hab : _))
+      (MonoidHom.toAdditive (iotaSub g l))
   refine ⟨MonoidHom.toAdditive.symm h, fun x => ?_⟩
   have := DFunLike.congr_fun hh (Additive.ofMul x)
   exact congrArg Additive.toMul this
@@ -220,19 +223,20 @@ theorem iotaU_exists : ∃ χ : (AlgebraicClosure (ZMod g))ˣ →* (AlgebraicClo
 def teichIota : AlgebraicClosure (ZMod g) →* AlgebraicClosure (ZMod l) :=
   extZeroHom (iotaU_exists g l).choose
 
-theorem teichIota_inj (x y : AlgebraicClosure (ZMod g)) (hx : x ≠ 0) (hy : y ≠ 0)
-    (hxl : (orderOf x).Coprime l) (hyl : (orderOf y).Coprime l)
-    (h : teichIota g l x = teichIota g l y) : x = y := by
-  have hX : Units.mk0 x hx ∈ primeToSub g l := by
-    rw [mem_primeToSub, ← orderOf_units]; exact hxl
-  have hY : Units.mk0 y hy ∈ primeToSub g l := by
-    rw [mem_primeToSub, ← orderOf_units]; exact hyl
+theorem teichIota_inj
+    (x y : AlgebraicClosure (ZMod g)) (hx : x ≠ 0) (hy : y ≠ 0) (hxl : (orderOf x).Coprime l)
+    (hyl : (orderOf y).Coprime l) (h : teichIota g l x = teichIota g l y)
+    : x = y := by
+  have hX : Units.mk0 x hx ∈ primeToSub g l := by rw [mem_primeToSub, ← orderOf_units]; exact hxl
+  have hY : Units.mk0 y hy ∈ primeToSub g l := by rw [mem_primeToSub, ← orderOf_units]; exact hyl
   unfold teichIota at h
   rw [extZeroHom_of_ne _ hx, extZeroHom_of_ne _ hy] at h
   have h1 := Units.ext h
   rw [(iotaU_exists g l).choose_spec ⟨_, hX⟩, (iotaU_exists g l).choose_spec ⟨_, hY⟩] at h1
   have h2 := iotaSub_injective g l h1
-  exact congrArg (fun u : primeToSub g l => ((u.1 : (AlgebraicClosure (ZMod g))ˣ) : AlgebraicClosure (ZMod g))) h2
+  exact congrArg
+    (fun u : primeToSub g l => ((u.1 : (AlgebraicClosure (ZMod g))ˣ) : AlgebraicClosure (ZMod g)))
+    h2
 
 end Iota
 

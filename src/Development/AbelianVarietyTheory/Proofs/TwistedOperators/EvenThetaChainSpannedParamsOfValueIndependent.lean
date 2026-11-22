@@ -24,8 +24,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CuspMulti
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.EvenOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -49,7 +52,9 @@ theorem parIndep_even : ∀ D : D7, ParIndep D := by
   let p : ι → Prop := fun i => PiLocalization₂.val (x i) v ≠ 0
   let f : {i // p i} → (GA D s.V → ℂ) := fun i g => conj (PiLocalization₂.val (x i.1) v g)
   have hli : LinearIndependent ℂ f := by
-    refine GlobalTheory.ChainOnto.linearIndependent_of_isParamFunV D s.V c.S {i // p i} f (fun i => B i.1) ?_ ?_ ?_
+    refine GlobalTheory.ChainOnto.linearIndependent_of_isParamFunV D s.V c.S {i // p i} f
+      (fun i => B i.1)
+      ?_ ?_ ?_
     · intro i h0
       apply i.2
       funext g
@@ -64,12 +69,15 @@ theorem parIndep_even : ∀ D : D7, ParIndep D := by
     intro g
     have := congrArg (fun y : s.CC c => PiLocalization₂.val y v g) hsum
     simpa [PiLocalization₂.val, Finset.sum_apply] using this
-  have key := hli (t.subtype p) (fun i => conj (a i.1)) ?_ ⟨i₀, hv⟩ (by simp [Finset.mem_subtype, hi₀])
+  have key :=
+    hli (t.subtype p) (fun i => conj (a i.1)) ?_ ⟨i₀, hv⟩ (by simp [Finset.mem_subtype, hi₀])
   · simpa using key
   · funext g
     rw [Finset.sum_apply]
     simp only [Pi.smul_apply, smul_eq_mul, f, Pi.zero_apply]
-    rw [Finset.sum_subtype_eq_sum_filter (f := fun i => conj (a i) * conj (PiLocalization₂.val (x i) v g)) (p := p)]
+    rw [Finset.sum_subtype_eq_sum_filter
+      (f := fun i => conj (a i) * conj (PiLocalization₂.val (x i) v g))
+      (p := p)]
     rw [Finset.sum_filter_of_ne]
     set_option synthInstance.maxHeartbeats 100000 in
       · rw [← map_zero (starRingEnd ℂ), ← hsum' g, map_sum]
@@ -78,11 +86,14 @@ theorem parIndep_even : ∀ D : D7, ParIndep D := by
       apply hne
       simp [h0]
 
-theorem eig_parOfVal_indep : GlobalTheory.Published.CuspRapidDecay → ∀ D : D7, FinDim D → MetEx D → EigSpan D ∧ ParOfVal D ∧ ParIndep D := by
+theorem eig_parOfVal_indep
+    : GlobalTheory.Published.CuspRapidDecay
+      → ∀ D : D7, FinDim D → MetEx D → EigSpan D ∧ ParOfVal D ∧ ParIndep D := by
   intro hC D hF hM
   refine ⟨?_, ?_, parIndep_even D⟩
   · intro c hc j hj s hs
-    have hspan := GlobalTheory.T.cuspMultiplicitySpace_span_sphericalEigenParts_eq_top hC D hF c hc j hj s hs
+    have hspan :=
+      GlobalTheory.T.cuspMultiplicitySpace_span_sphericalEigenParts_eq_top hC D hF c hc j hj s hs
     have hpar := GlobalTheory.T.evenRankChain_eigenPart_has_parameters hC D c hc j hj s hs
     rw [eq_top_iff, ← hspan]
     refine Submodule.span_le.2 ?_
@@ -91,7 +102,10 @@ theorem eig_parOfVal_indep : GlobalTheory.Published.CuspRapidDecay → ∀ D : D
     · rw [h0]; exact Submodule.zero_mem _
     · exact Submodule.subset_span ((hpar u e he).1 h0)
   · intro c hc j hj s hs x w B hv hf
-    obtain ⟨e, he⟩ := GlobalTheory.T.cuspMultiplicity_mem_sphericalEigenPart_of_value_params hC D hM c hc j hj s hs x w B hv hf
-    exact (GlobalTheory.T.evenRankChain_eigenPart_has_parameters hC D c hc j hj s hs x e he).2 w B hv hf
+    obtain ⟨e, he⟩ :=
+      GlobalTheory.T.cuspMultiplicity_mem_sphericalEigenPart_of_value_params hC D hM c hc j hj s hs
+        x w B hv hf
+    exact (GlobalTheory.T.evenRankChain_eigenPart_has_parameters hC D c hc j hj s hs x e he).2 w B
+      hv hf
 
 end GlobalTheory.EvenOnto

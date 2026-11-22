@@ -6,13 +6,18 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem invertible_eq_zero_of_smul_eq_zero {A : Type} [CommRing A] {M : Type} [AddCommGroup M]
-    [Module A M] [Module.Invertible A M] (a : A) (h : ∀ m : M, a • m = 0) : a = 0 := by
+theorem invertible_eq_zero_of_smul_eq_zero
+    {A : Type} [CommRing A]
+    {M : Type} [AddCommGroup M] [Module A M] [Module.Invertible A M]
+    (a : A) (h : ∀ m : M, a • m = 0)
+    : a = 0 := by
   obtain ⟨t, ht⟩ := (Module.Invertible.bijective (R := A) (M := M)).2 1
   have hz : ∀ s : Module.Dual A M ⊗[A] M, a • s = 0 := by
     intro s
@@ -23,8 +28,9 @@ theorem invertible_eq_zero_of_smul_eq_zero {A : Type} [CommRing A] {M : Type} [A
   have : a = contractLeft A M (a • t) := by rw [map_smul, ht, smul_eq_mul, mul_one]
   rw [this, hz t, map_zero]
 
-theorem mem_nonZeroDivisors_of_invertible_span_singleton : ∀ (A : Type) [CommRing A] (d : A),
-    Module.Invertible A ↥(Ideal.span {d}) → d ∈ nonZeroDivisors A := by
+theorem mem_nonZeroDivisors_of_invertible_span_singleton
+    : ∀ (A : Type) [CommRing A] (d : A),
+      Module.Invertible A ↥(Ideal.span {d}) → d ∈ nonZeroDivisors A := by
   intro A _ d hinv
   rw [mem_nonZeroDivisors_iff_right]
   intro a had
@@ -33,7 +39,9 @@ theorem mem_nonZeroDivisors_of_invertible_span_singleton : ∀ (A : Type) [CommR
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hm
   ext
   simp only [Submodule.coe_smul, smul_eq_mul, ZeroMemClass.coe_zero]
-  calc a * (c * d) = c * (a * d) := by ring
+  calc
+    a * (c * d)
+      = c * (a * d) := by ring
     _ = 0 := by rw [had, mul_zero]
 
 end GlobalTheory.BSP

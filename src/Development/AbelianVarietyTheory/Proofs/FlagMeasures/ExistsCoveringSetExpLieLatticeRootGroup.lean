@@ -14,10 +14,11 @@ namespace GlobalTheory.LoopV.Cover
 section Analysis
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
 
-
 omit [FiniteDimensional ℝ E] in
-theorem near_of_finset (Λ : Submodule ℤ E) (s : Finset E) (hs : ∀ x ∈ s, x ∈ Λ) (w : E)
-    (hw : w ∈ Submodule.span ℝ (s : Set E)) : ∃ l ∈ Λ, ‖w - l‖ ≤ ∑ x ∈ s, ‖x‖ := by
+theorem near_of_finset
+    (Λ : Submodule ℤ E) (s : Finset E) (hs : ∀ x ∈ s, x ∈ Λ)
+    (w : E) (hw : w ∈ Submodule.span ℝ (s : Set E))
+    : ∃ l ∈ Λ, ‖w - l‖ ≤ ∑ x ∈ s, ‖x‖ := by
   obtain ⟨f, -, rfl⟩ := Submodule.mem_span_finset.1 hw
   refine ⟨∑ x ∈ s, ⌊f x⌋ • x, Submodule.sum_mem _ fun x hx => Λ.smul_mem _ (hs x hx), ?_⟩
   rw [← Finset.sum_sub_distrib]
@@ -25,35 +26,38 @@ theorem near_of_finset (Λ : Submodule ℤ E) (s : Finset E) (hs : ∀ x ∈ s, 
   rw [← Int.cast_smul_eq_zsmul ℝ, ← sub_smul, norm_smul]
   have h1 := Int.floor_le (f x)
   have h2 := Int.lt_floor_add_one (f x)
-  have : ‖f x - (⌊f x⌋ : ℝ)‖ ≤ 1 := by
-    rw [Real.norm_eq_abs, abs_le]; constructor <;> linarith
+  have : ‖f x - (⌊f x⌋ : ℝ)‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_le]; constructor <;> linarith
   nlinarith [norm_nonneg x]
 
-theorem finite_norm_le (Λ : Submodule ℤ E) [DiscreteTopology Λ] (r : ℝ) :
-    {x : E | x ∈ Λ ∧ ‖x‖ ≤ r}.Finite := by
+theorem finite_norm_le (Λ : Submodule ℤ E) [DiscreteTopology Λ] (r : ℝ)
+    : {x : E | x ∈ Λ ∧ ‖x‖ ≤ r}.Finite := by
   have hd : DiscreteTopology Λ.toAddSubgroup := ‹_›
   have hc : IsClosed (Λ.toAddSubgroup : Set E) := AddSubgroup.isClosed_of_discrete
-  have := Metric.finite_isBounded_inter_isClosed (s := (Λ.toAddSubgroup : Set E))
-    (K := Metric.closedBall (0 : E) r) (isDiscrete_iff_discreteTopology.2 hd) Metric.isBounded_closedBall hc
+  have :=
+    Metric.finite_isBounded_inter_isClosed (s := (Λ.toAddSubgroup : Set E))
+      (K := Metric.closedBall (0 : E) r) (isDiscrete_iff_discreteTopology.2 hd)
+      Metric.isBounded_closedBall hc
   refine this.subset fun x hx => ⟨by simpa using hx.2, hx.1⟩
 
-theorem separated (Λ : Submodule ℤ E) [DiscreteTopology Λ] (W : Submodule ℝ E)
-    (hW : W ≤ Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ W}) :
-    ∃ ε > 0, ∀ x ∈ Λ, ∀ w ∈ W, ‖x + w‖ < ε → x ∈ W := by
+theorem separated
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ]
+    (W : Submodule ℝ E) (hW : W ≤ Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ W})
+    : ∃ ε > 0, ∀ x ∈ Λ, ∀ w ∈ W, ‖x + w‖ < ε → x ∈ W := by
   obtain ⟨s, hs, -, hsp, -⟩ := Submodule.exists_finset_span_eq_linearIndepOn ℝ {x | x ∈ Λ ∧ x ∈ W}
   set C := ∑ x ∈ s, ‖x‖ with hC
   have hfin : ({x : E | x ∈ Λ ∧ ‖x‖ ≤ C + 1} \ (W : Set E)).Finite :=
     (finite_norm_le Λ (C + 1)).sdiff
   have hcl : IsClosed (W : Set E) := W.closed_of_finiteDimensional
-  obtain ⟨δ, hδ, hd⟩ : ∃ δ > 0, ∀ x ∈ ({x : E | x ∈ Λ ∧ ‖x‖ ≤ C + 1} \ (W : Set E)),
-      δ ≤ Metric.infDist x W := by
+  obtain ⟨δ, hδ, hd⟩
+      : ∃ δ > 0, ∀ x ∈ ({x : E | x ∈ Λ ∧ ‖x‖ ≤ C + 1} \ (W : Set E)), δ ≤ Metric.infDist x W := by
     by_cases hne : ({x : E | x ∈ Λ ∧ ‖x‖ ≤ C + 1} \ (W : Set E)).Nonempty
-    · obtain ⟨x₀, hx₀, hm⟩ := Set.exists_min_image _ (fun x => Metric.infDist x (W : Set E)) hfin hne
+    · obtain ⟨x₀, hx₀, hm⟩ :=
+        Set.exists_min_image _ (fun x => Metric.infDist x (W : Set E)) hfin hne
       exact ⟨_, (hcl.notMem_iff_infDist_pos ⟨0, W.zero_mem⟩).1 hx₀.2, hm⟩
     · exact ⟨1, one_pos, fun x hx => absurd ⟨x, hx⟩ hne⟩
   refine ⟨min 1 δ, lt_min one_pos hδ, fun x hx w hw h => ?_⟩
-  obtain ⟨l, hl, hwl⟩ := near_of_finset (Λ ⊓ W.restrictScalars ℤ) s (fun x hx => hs hx) w
-    (by rw [hsp]; exact hW hw)
+  obtain ⟨l, hl, hwl⟩ :=
+    near_of_finset (Λ ⊓ W.restrictScalars ℤ) s (fun x hx => hs hx) w (by rw [hsp]; exact hW hw)
   by_contra hxW
   have h1 : x + l ∈ ({x : E | x ∈ Λ ∧ ‖x‖ ≤ C + 1} \ (W : Set E)) := by
     refine ⟨⟨Λ.add_mem hx hl.1, ?_⟩, fun h' => hxW ?_⟩
@@ -70,10 +74,13 @@ theorem separated (Λ : Submodule ℤ E) [DiscreteTopology Λ] (W : Submodule �
   have := min_le_right 1 δ
   linarith
 
-theorem exists_transversal [MeasurableSpace E] [BorelSpace E] (D : Submodule ℤ E)
-    (W : Submodule ℝ E) (ε : ℝ) (hε : 0 < ε) (h : ∀ x ∈ D, ∀ w ∈ W, ‖x + w‖ < ε → x ∈ W) :
-    ∃ F : Set E, MeasurableSet F ∧ (∀ c ∈ F, ∀ w ∈ W, c + w ∈ F) ∧
-      (∀ c, ∃ x ∈ D, c + x ∈ F) ∧ ∀ c ∈ F, ∀ x ∈ D, c + x ∈ F → x ∈ W := by
+theorem exists_transversal
+    [MeasurableSpace E] [BorelSpace E]
+    (D : Submodule ℤ E) (W : Submodule ℝ E) (ε : ℝ)
+    (hε : 0 < ε) (h : ∀ x ∈ D, ∀ w ∈ W, ‖x + w‖ < ε → x ∈ W)
+    : ∃ F : Set E,
+      MeasurableSet F ∧ (∀ c ∈ F, ∀ w ∈ W, c + w ∈ F) ∧ (∀ c, ∃ x ∈ D, c + x ∈ F)
+        ∧ ∀ c ∈ F, ∀ x ∈ D, c + x ∈ F → x ∈ W := by
   obtain ⟨p, hp⟩ := TopologicalSpace.exists_dense_seq E
   let B : ℕ → Set E := fun n => {c | ∃ w ∈ W, ‖c + w - p n‖ < ε / 2}
   let G : ℕ → Set E := fun n => {c | ∃ x ∈ D, c + x ∈ B n}
@@ -92,13 +99,15 @@ theorem exists_transversal [MeasurableSpace E] [BorelSpace E] (D : Submodule ℤ
     rintro n c w hw ⟨x, hx, h'⟩
     refine ⟨x, hx, ?_⟩
     have := hBW n _ (-w) (W.neg_mem hw) h'
-    convert this using 1; abel
+    convert this using 1
+    abel
   have hGD : ∀ n c x, x ∈ D → c + x ∈ G n → c ∈ G n := by
     rintro n c x hx ⟨y, hy, h'⟩
     exact ⟨x + y, D.add_mem hx hy, by rwa [← add_assoc]⟩
   refine ⟨⋃ n, B n \ ⋃ m < n, G m, ?_, ?_, ?_, ?_⟩
-  · exact MeasurableSet.iUnion fun n => (hB n).measurableSet.diff
-      (isOpen_iUnion fun m => isOpen_iUnion fun _ : m < n => hG m).measurableSet
+  · exact MeasurableSet.iUnion fun n =>
+      (hB n).measurableSet.diff
+        (isOpen_iUnion fun m => isOpen_iUnion fun _ : m < n => hG m).measurableSet
   · intro c hc w hw
     simp only [mem_iUnion, mem_sdiff, not_exists] at hc ⊢
     obtain ⟨n, h1, h2⟩ := hc
@@ -132,8 +141,10 @@ theorem exists_transversal [MeasurableSpace E] [BorelSpace E] (D : Submodule ℤ
 end Analysis
 
 section Measure
-variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-  [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure]
+variable
+  {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+  [BorelSpace E]
+  (μ : Measure E) [μ.IsAddHaarMeasure]
 
 omit [MeasurableSpace E] [BorelSpace E] in
 theorem countable_of_discrete (Λ : Submodule ℤ E) [DiscreteTopology Λ] : Countable Λ := by
@@ -143,14 +154,14 @@ theorem countable_of_discrete (Λ : Submodule ℤ E) [DiscreteTopology Λ] : Cou
     exact mem_iUnion.2 ⟨n, hx, hn⟩
   exact this.to_subtype
 
-theorem span_eq_top (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E)
-    (h : IsAddFundamentalDomain Λ Ω₀ μ) (hf : μ Ω₀ ≠ ⊤) :
-    Submodule.span ℝ (Λ : Set E) = ⊤ := by
+theorem span_eq_top
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ]
+    (Ω₀ : Set E) (h : IsAddFundamentalDomain Λ Ω₀ μ) (hf : μ Ω₀ ≠ ⊤)
+    : Submodule.span ℝ (Λ : Set E) = ⊤ := by
   by_contra hne
   obtain ⟨f, hf0, hker⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
   obtain ⟨e, he⟩ : ∃ e, f e = 1 := by
-    obtain ⟨v, hv⟩ : ∃ v, f v ≠ 0 := by
-      by_contra hc; push Not at hc; exact hf0 (LinearMap.ext hc)
+    obtain ⟨v, hv⟩ : ∃ v, f v ≠ 0 := by by_contra hc; push Not at hc; exact hf0 (LinearMap.ext hc)
     exact ⟨(f v)⁻¹ • v, by simp [hv]⟩
   have hfc : Continuous f := f.continuous_of_finiteDimensional
   obtain ⟨δ, hδ, hsep⟩ := separated Λ ⊥ bot_le
@@ -165,8 +176,10 @@ theorem span_eq_top (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E)
     have hto : ∀ n, IsOpen (t n) := fun n => hso.inter (isOpen_lt continuous_const hfc)
     have hanti : Antitone t := fun n m hnm c hc =>
       ⟨hc.1, lt_of_le_of_lt (Nat.cast_le.2 hnm : (n : ℝ) ≤ m) hc.2⟩
-    have hT := tendsto_measure_iInter_atTop (μ := μ) (fun n => (hto n).measurableSet.nullMeasurableSet)
-      hanti ⟨0, ne_top_of_le_ne_top hs (measure_mono inter_subset_left)⟩
+    have hT :=
+      tendsto_measure_iInter_atTop (μ := μ)
+        (fun n => (hto n).measurableSet.nullMeasurableSet)
+        hanti ⟨0, ne_top_of_le_ne_top hs (measure_mono inter_subset_left)⟩
     have hemp : (⋂ n, t n) = ∅ := by
       refine eq_empty_of_forall_notMem fun c hc => ?_
       obtain ⟨n, hn⟩ := exists_nat_ge (f c)
@@ -184,30 +197,39 @@ theorem span_eq_top (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E)
     · simp [he]
   have := countable_of_discrete Λ
   have : Countable Λ.toAddSubgroup := this
-  obtain ⟨x, hx0, hx⟩ := exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure
-    (L := Λ.toAddSubgroup) (μ := μ) (F := Ω₀) (s := s) h
-    (fun x hx => by simpa [s] using hx) ((convex_ball 0 δ).linear_preimage P)
-    (by rw [hs]; exact ENNReal.mul_lt_top hf.lt_top (by simp [lt_top_iff_ne_top]))
+  obtain ⟨x, hx0, hx⟩ :=
+    exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure (L := Λ.toAddSubgroup) (μ := μ)
+      (F := Ω₀) (s := s) h
+      (fun x hx => by simpa [s] using hx)
+      ((convex_ball 0 δ).linear_preimage P)
+      (by rw [hs]; exact ENNReal.mul_lt_top hf.lt_top (by simp [lt_top_iff_ne_top]))
   have hfx : f x = 0 := hker (Submodule.subset_span x.2)
   have : (x : E) ∈ (⊥ : Submodule ℝ E) := hsep x x.2 0 (by simp) (by simpa [s, hP, hfx] using hx)
   exact hx0 (Subtype.ext (by simpa using this))
 
-theorem exists_cover (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E)
-    (h : IsAddFundamentalDomain Λ Ω₀ μ) (W : ℕ → Submodule ℝ E) (n : ℕ) (h0 : W 0 = ⊤)
-    (hn : W n = ⊥) (hanti : Antitone W)
-    (hrat : ∀ k, W k ≤ Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ W k}) (φ : E → E → E)
-    (hφ : ∀ k, ∀ x ∈ Λ, x ∈ W k → ∀ c, φ x c - c - x ∈ W (k + 1))
-    (hcomp : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, ∀ c, φ x (φ y c) = φ z c) :
-    ∃ Ω : Set E, MeasurableSet Ω ∧ μ Ω = μ Ω₀ ∧ ∀ c, ∃ x ∈ Λ, φ x c ∈ Ω := by
-  have hF : ∀ k, ∃ F : Set E, MeasurableSet F ∧ (∀ c ∈ F, ∀ w ∈ W (k + 1), c + w ∈ F) ∧
-      (∀ c, ∃ x ∈ Λ ⊓ (W k).restrictScalars ℤ, c + x ∈ F) ∧
-      ∀ c ∈ F, ∀ x ∈ Λ ⊓ (W k).restrictScalars ℤ, c + x ∈ F → x ∈ W (k + 1) := fun k => by
+theorem exists_cover
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ]
+    (Ω₀ : Set E) (h : IsAddFundamentalDomain Λ Ω₀ μ)
+    (W : ℕ → Submodule ℝ E)
+    (n : ℕ)
+    (h0 : W 0 = ⊤) (hn : W n = ⊥) (hanti : Antitone W)
+    (hrat : ∀ k, W k ≤ Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ W k})
+    (φ : E → E → E) (hφ : ∀ k, ∀ x ∈ Λ, x ∈ W k → ∀ c, φ x c - c - x ∈ W (k + 1))
+    (hcomp : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, ∀ c, φ x (φ y c) = φ z c)
+    : ∃ Ω : Set E, MeasurableSet Ω ∧ μ Ω = μ Ω₀ ∧ ∀ c, ∃ x ∈ Λ, φ x c ∈ Ω := by
+  have hF
+      : ∀ k, ∃ F : Set E,
+        MeasurableSet F ∧ (∀ c ∈ F, ∀ w ∈ W (k + 1), c + w ∈ F)
+          ∧ (∀ c, ∃ x ∈ Λ ⊓ (W k).restrictScalars ℤ, c + x ∈ F)
+          ∧ ∀ c ∈ F, ∀ x ∈ Λ ⊓ (W k).restrictScalars ℤ, c + x ∈ F → x ∈ W (k + 1) := fun k => by
     obtain ⟨ε, hε, hs⟩ := separated Λ (W (k + 1)) (hrat _)
     exact exists_transversal _ _ ε hε fun x hx => hs x hx.1
   choose F hFm hFW hFc hFu using hF
-  have key : ∀ ψ : E → E → E, (∀ k, ∀ x ∈ Λ, x ∈ W k → ∀ c, ψ x c - c - x ∈ W (k + 1)) →
-      (∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, ∀ c, ψ x (ψ y c) = ψ z c) →
-      ∀ c, ∃ x ∈ Λ, ψ x c ∈ ⋂ k < n, F k := by
+  have key
+      : ∀ ψ : E → E → E,
+        (∀ k, ∀ x ∈ Λ, x ∈ W k → ∀ c, ψ x c - c - x ∈ W (k + 1))
+          → (∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, ∀ c, ψ x (ψ y c) = ψ z c)
+          → ∀ c, ∃ x ∈ Λ, ψ x c ∈ ⋂ k < n, F k := by
     intro ψ h1 h2 c
     have : ∀ m, ∃ x ∈ Λ, ∀ k < m, ψ x c ∈ F k := by
       intro m
@@ -221,11 +243,15 @@ theorem exists_cover (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E
         rw [← hzz]
         have hw := h1 m x hx.1 hx.2 (ψ y c)
         rcases Nat.lt_succ_iff_lt_or_eq.1 hk with hk | rfl
-        · have := hFW k _ (hyF k hk) _
-            ((W (k + 1)).add_mem (hanti (by omega : k + 1 ≤ m + 1) hw) (hanti (by omega : k + 1 ≤ m) hx.2))
-          convert this using 1; abel
+        · have :=
+            hFW k _ (hyF k hk) _
+              ((W (k + 1)).add_mem (hanti (by omega : k + 1 ≤ m + 1) hw)
+                (hanti (by omega : k + 1 ≤ m) hx.2))
+          convert this using 1
+          abel
         · have := hFW k _ hxF _ hw
-          convert this using 1; abel
+          convert this using 1
+          abel
     obtain ⟨x, hx, hh⟩ := this n
     exact ⟨x, hx, by simpa using hh⟩
   have hm : MeasurableSet (⋂ k < n, F k) :=
@@ -236,8 +262,12 @@ theorem exists_cover (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E
   have h' : IsAddFundamentalDomain Λ.toAddSubgroup Ω₀ μ := h
   refine IsAddFundamentalDomain.measure_eq (G := Λ.toAddSubgroup)
     (IsAddFundamentalDomain.mk' hm.nullMeasurableSet fun c => ?_) h'
-  obtain ⟨x, hx, hxc⟩ := key (fun x c => x + c) (fun k x _ _ c => by simp)
-    (fun x hx y hy => ⟨x + y, Λ.add_mem hx hy, fun c => by rw [add_assoc]⟩) c
+  obtain ⟨x, hx, hxc⟩ :=
+    key
+      (fun x c => x + c)
+      (fun k x _ _ c => by simp)
+      (fun x hx y hy => ⟨x + y, Λ.add_mem hx hy, fun c => by rw [add_assoc]⟩)
+      c
   refine ⟨⟨x, hx⟩, hxc, fun y hy => Subtype.ext ?_⟩
   have hy' : (y : E) + c ∈ ⋂ k < n, F k := hy
   simp only [mem_iInter] at hy' hxc
@@ -247,7 +277,8 @@ theorem exists_cover (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E
     | zero => simp [h0]
     | succ k ih =>
       refine hFu k _ (hxc k hk) _ ⟨Λ.sub_mem y.2 hx, ih (by omega)⟩ ?_
-      convert hy' k hk using 1; abel
+      convert hy' k hk using 1
+      abel
   have := this n le_rfl
   rw [hn] at this
   exact sub_eq_zero.1 this
@@ -255,12 +286,14 @@ theorem exists_cover (Λ : Submodule ℤ E) [DiscreteTopology Λ] (Ω₀ : Set E
 end Measure
 
 section Algebra
-variable {A : Type} [Ring A] [Algebra ℝ A] (M : ℕ → Submodule ℝ A) (hanti : Antitone M)
-  (hmul : ∀ i j x y, x ∈ M i → y ∈ M j → x * y ∈ M (i + j + 1))
+variable
+  {A : Type} [Ring A] [Algebra ℝ A]
+  (M : ℕ → Submodule ℝ A)
+  (hanti : Antitone M) (hmul : ∀ i j x y, x ∈ M i → y ∈ M j → x * y ∈ M (i + j + 1))
 include hanti hmul
 
-theorem pow_sub_pow_mem {j : ℕ} {x y : A} (hx : x ∈ M 0) (hy : y ∈ M 0) (h : x - y ∈ M j)
-    (i : ℕ) : x ^ (i + 2) - y ^ (i + 2) ∈ M (j + 1) := by
+theorem pow_sub_pow_mem {j : ℕ} {x y : A} (hx : x ∈ M 0) (hy : y ∈ M 0) (h : x - y ∈ M j) (i : ℕ)
+    : x ^ (i + 2) - y ^ (i + 2) ∈ M (j + 1) := by
   have hp : ∀ i, y ^ (i + 1) ∈ M 0 := fun i => by
     induction i with
     | zero => simpa using hy
@@ -275,9 +308,10 @@ theorem pow_sub_pow_mem {j : ℕ} {x y : A} (hx : x ∈ M 0) (hy : y ∈ M 0) (h
   | zero => exact step 0 (by simpa using h)
   | succ i ih => exact step _ (hanti (by omega) ih)
 
-theorem trunc_sub_mem {j : ℕ} {x y : A} (hx : x ∈ M 0) (hy : y ∈ M 0) (h : x - y ∈ M j)
-    (n : ℕ) : (∑ i ∈ Finset.range (n + 2), ((i.factorial : ℝ))⁻¹ • x ^ i) -
-      (∑ i ∈ Finset.range (n + 2), ((i.factorial : ℝ))⁻¹ • y ^ i) - (x - y) ∈ M (j + 1) := by
+theorem trunc_sub_mem {j : ℕ} {x y : A} (hx : x ∈ M 0) (hy : y ∈ M 0) (h : x - y ∈ M j) (n : ℕ)
+    : (∑ i ∈ Finset.range (n + 2), ((i.factorial : ℝ))⁻¹ • x ^ i)
+        - (∑ i ∈ Finset.range (n + 2), ((i.factorial : ℝ))⁻¹ • y ^ i) - (x - y)
+      ∈ M (j + 1) := by
   rw [← Finset.sum_sub_distrib, Finset.sum_range_succ', Finset.sum_range_succ']
   simp only [zero_add, Nat.factorial_one, Nat.cast_one, inv_one, pow_one, one_smul, pow_zero,
     sub_self, add_zero, add_sub_cancel_right]
@@ -285,13 +319,15 @@ theorem trunc_sub_mem {j : ℕ} {x y : A} (hx : x ∈ M 0) (hy : y ∈ M 0) (h :
   rw [← smul_sub]
   exact (M _).smul_mem _ (pow_sub_pow_mem M hanti hmul hx hy h i)
 
-theorem rational (n : ℕ) (hn : M n = ⊥)
+theorem rational
+    (n : ℕ) (hn : M n = ⊥)
     (hgen : ∀ k, M (k + 1) ≤ Submodule.span ℝ {z | ∃ x ∈ M 0, ∃ y ∈ M k, z = x * y - y * x})
     (e : A → A) (he0 : e 0 = 1)
     (he : ∀ j x y, x ∈ M 0 → y ∈ M 0 → x - y ∈ M j → e x - e y - (x - y) ∈ M (j + 1))
     (Λ : Submodule ℤ A) (hΛ : ∀ x ∈ Λ, x ∈ M 0) (hsp : M 0 ≤ Submodule.span ℝ (Λ : Set A))
-    (hgr : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, e x * e y = e z) (k : ℕ) :
-    M k ≤ Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ M k} := by
+    (hgr : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, e x * e y = e z)
+    (k : ℕ)
+    : M k ≤ Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ M k} := by
   set S : ℕ → Submodule ℝ A := fun k => Submodule.span ℝ {x | x ∈ Λ ∧ x ∈ M k} with hS
   have he1 : ∀ j x, x ∈ M j → e x - 1 - x ∈ M (j + 1) := fun j x hx => by
     simpa [he0] using he j x 0 (hanti (Nat.zero_le _) hx) (M 0).zero_mem (by simpa using hx)
@@ -313,8 +349,8 @@ theorem rational (n : ℕ) (hn : M n = ⊥)
     set X := e x - 1 - x
     set Y := e y - 1 - y
     have hd : e z₁ - e z₂ - (x * y - y * x) ∈ M (k + 2) := by
-      have : e z₁ - e z₂ - (x * y - y * x) =
-          (X * y - y * X) + (x * Y - Y * x) + (X * Y - Y * X) := by
+      have : e z₁ - e z₂ - (x * y - y * x)
+          = (X * y - y * X) + (x * Y - Y * x) + (X * Y - Y * X) := by
         rw [← e₁, ← e₂]; simp only [X, Y]; noncomm_ring
       rw [this]
       refine (M _).add_mem ((M _).add_mem ((M _).sub_mem ?_ ?_) ((M _).sub_mem ?_ ?_))
@@ -326,42 +362,42 @@ theorem rational (n : ℕ) (hn : M n = ⊥)
       · exact hanti (by omega) (hmul _ _ _ _ hX hY)
       · exact hanti (by omega) (hmul _ _ _ _ hY hX)
     have hc : x * y - y * x ∈ M (k + 1) :=
-      (M _).sub_mem (hanti (by omega) (hmul _ _ _ _ hx0 hyk)) (hanti (by omega) (hmul _ _ _ _ hyk hx0))
-    have hz : z₁ - z₂ ∈ M (k + 1) := hinj _ _ _ (hΛ _ hz₁) (hΛ _ hz₂)
-      (by simpa using (M _).add_mem (hanti (by omega : k + 1 ≤ k + 2) hd) hc)
+      (M _).sub_mem (hanti (by omega) (hmul _ _ _ _ hx0 hyk))
+        (hanti (by omega) (hmul _ _ _ _ hyk hx0))
+    have hz : z₁ - z₂ ∈ M (k + 1) :=
+      hinj _ _ _ (hΛ _ hz₁) (hΛ _ hz₂)
+        (by simpa using (M _).add_mem (hanti (by omega : k + 1 ≤ k + 2) hd) hc)
     have h2 := he _ _ _ (hΛ _ hz₁) (hΛ _ hz₂) hz
-    have : x * y - y * x = (z₁ - z₂) +
-        ((e z₁ - e z₂ - (z₁ - z₂)) - (e z₁ - e z₂ - (x * y - y * x))) := by abel
+    have : x * y - y * x
+        = (z₁ - z₂) + ((e z₁ - e z₂ - (z₁ - z₂)) - (e z₁ - e z₂ - (x * y - y * x))) := by
+      abel
     rw [this]
-    exact Submodule.add_mem_sup (Submodule.subset_span ⟨Λ.sub_mem hz₁ hz₂, hz⟩) ((M _).sub_mem h2 hd)
+    exact Submodule.add_mem_sup (Submodule.subset_span ⟨Λ.sub_mem hz₁ hz₂, hz⟩)
+      ((M _).sub_mem h2 hd)
   have c1 : ∀ k, M k ≤ S k ⊔ M (k + 1) := by
     intro k
     induction k with
-    | zero =>
-      refine hsp.trans (le_sup_of_le_left (Submodule.span_mono fun x hx => ⟨hx, hΛ x hx⟩))
+    | zero => refine hsp.trans (le_sup_of_le_left (Submodule.span_mono fun x hx => ⟨hx, hΛ x hx⟩))
     | succ k ih =>
       refine (hgen k).trans (Submodule.span_le.2 ?_)
       rintro _ ⟨x, hx, y, hy, rfl⟩
       obtain ⟨s, hs, m, hm, rfl⟩ := Submodule.mem_sup.1 (ih hy)
       have : x * (s + m) - (s + m) * x = (x * s - s * x) + (x * m - m * x) := by noncomm_ring
       rw [this]
-      refine Submodule.add_mem _ ?_ (Submodule.mem_sup_right ((M _).sub_mem
-        (hanti (by omega) (hmul _ _ _ _ hx hm)) (hanti (by omega) (hmul _ _ _ _ hm hx))))
+      refine Submodule.add_mem _ ?_
+        (Submodule.mem_sup_right ((M _).sub_mem (hanti (by omega) (hmul _ _ _ _ hx hm))
+          (hanti (by omega) (hmul _ _ _ _ hm hx))))
       have hx' := hsp hx
       clear hx hy this
       induction hx' using Submodule.span_induction with
       | zero => simp
-      | add a b _ _ ha hb =>
-        convert Submodule.add_mem _ ha hb using 1; noncomm_ring
-      | smul r a _ ha =>
-        convert Submodule.smul_mem _ r ha using 1; simp [smul_sub]
+      | add a b _ _ ha hb => convert Submodule.add_mem _ ha hb using 1; noncomm_ring
+      | smul r a _ ha => convert Submodule.smul_mem _ r ha using 1; simp [smul_sub]
       | mem a ha =>
         induction hs using Submodule.span_induction with
         | zero => simp
-        | add b c _ _ hb hc =>
-          convert Submodule.add_mem _ hb hc using 1; noncomm_ring
-        | smul r b _ hb =>
-          convert Submodule.smul_mem _ r hb using 1; simp [smul_sub]
+        | add b c _ _ hb hc => convert Submodule.add_mem _ hb hc using 1; noncomm_ring
+        | smul r b _ hb => convert Submodule.smul_mem _ r hb using 1; simp [smul_sub]
         | mem b hb => exact hbr k a b ha hb.1 hb.2
   have c2 : ∀ j k, n ≤ k + j → M k ≤ S k := by
     intro j
@@ -383,29 +419,29 @@ def Deep (k : ℕ) : Fin N → Fin N → Prop :=
 
 variable {R}
 
-theorem Deep.mem (ht : ∀ a b c : Fin N, (a, b) ∈ R → (b, c) ∈ R → (a, c) ∈ R) :
-    ∀ k a c, Deep R k a c → (a, c) ∈ R
+theorem Deep.mem (ht : ∀ a b c : Fin N, (a, b) ∈ R → (b, c) ∈ R → (a, c) ∈ R)
+    : ∀ k a c, Deep R k a c → (a, c) ∈ R
   | 0, _, _, h => h
   | k + 1, a, c, ⟨b, h1, h2⟩ => ht a b c h1 (Deep.mem ht k b c h2)
 
-theorem Deep.of_succ (ht : ∀ a b c : Fin N, (a, b) ∈ R → (b, c) ∈ R → (a, c) ∈ R) :
-    ∀ k a c, Deep R (k + 1) a c → Deep R k a c
+theorem Deep.of_succ (ht : ∀ a b c : Fin N, (a, b) ∈ R → (b, c) ∈ R → (a, c) ∈ R)
+    : ∀ k a c, Deep R (k + 1) a c → Deep R k a c
   | 0, a, c, h => Deep.mem ht 1 a c h
   | k + 1, _, c, ⟨b, h1, h2⟩ => ⟨b, h1, Deep.of_succ ht k b c h2⟩
 
-theorem Deep.trans (j : ℕ) (b c : Fin N) (h : Deep R j b c) :
-    ∀ i a, Deep R i a b → Deep R (i + j + 1) a c
+theorem Deep.trans (j : ℕ) (b c : Fin N) (h : Deep R j b c)
+    : ∀ i a, Deep R i a b → Deep R (i + j + 1) a c
   | 0, a, h' => by rw [Nat.zero_add]; exact ⟨b, h', h⟩
   | i + 1, a, ⟨d, h1, h2⟩ => by
-      rw [show i + 1 + j + 1 = (i + j + 1) + 1 by omega]
-      exact ⟨d, h1, Deep.trans j b c h i d h2⟩
+    rw [show i + 1 + j + 1 = (i + j + 1) + 1 by omega]
+    exact ⟨d, h1, Deep.trans j b c h i d h2⟩
 
 theorem Deep.lt (hl : ∀ q ∈ R, q.1 < q.2) : ∀ k a c, Deep R k a c → (a : ℕ) + k < c
   | 0, a, c, h => hl (a, c) h
   | k + 1, a, c, ⟨b, h1, h2⟩ => by
-      have := Deep.lt hl k b c h2
-      have : (a : ℕ) < b := hl (a, b) h1
-      omega
+    have := Deep.lt hl k b c h2
+    have : (a : ℕ) < b := hl (a, b) h1
+    omega
 
 variable (R) (ι : Type)
 
@@ -422,8 +458,9 @@ def rootMat : (ι → R → ℂ) →ₗ[ℝ] (ι → Matrix (Fin N) (Fin N) ℂ)
 
 variable {R ι}
 
-theorem deepSub_mul (i j : ℕ) (x y : ι → Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ deepSub R ι i)
-    (hy : y ∈ deepSub R ι j) : x * y ∈ deepSub R ι (i + j + 1) := by
+theorem deepSub_mul
+    (i j : ℕ) (x y : ι → Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ deepSub R ι i) (hy : y ∈ deepSub R ι j)
+    : x * y ∈ deepSub R ι (i + j + 1) := by
   intro v a c h
   rw [Pi.mul_apply, Matrix.mul_apply]
   refine Finset.sum_eq_zero fun b _ => ?_
@@ -431,9 +468,9 @@ theorem deepSub_mul (i j : ℕ) (x y : ι → Matrix (Fin N) (Fin N) ℂ) (hx : 
   · rw [hy v b c fun h2 => h (Deep.trans j b c h2 i a h1), mul_zero]
   · rw [hx v a b h1, zero_mul]
 
-theorem deepSub_gen [Fintype ι] (hl : ∀ q ∈ R, q.1 < q.2) (k : ℕ) :
-    deepSub R ι (k + 1) ≤ Submodule.span ℝ
-      {z | ∃ x ∈ deepSub R ι 0, ∃ y ∈ deepSub R ι k, z = x * y - y * x} := by
+theorem deepSub_gen [Fintype ι] (hl : ∀ q ∈ R, q.1 < q.2) (k : ℕ)
+    : deepSub R ι (k + 1)
+      ≤ Submodule.span ℝ {z | ∃ x ∈ deepSub R ι 0, ∃ y ∈ deepSub R ι k, z = x * y - y * x} := by
   intro x hx
   have : x = ∑ v, ∑ a, ∑ c, Pi.single v (Matrix.single a c (x v a c)) := by
     ext v : 1
@@ -441,18 +478,22 @@ theorem deepSub_gen [Fintype ι] (hl : ∀ q ∈ R, q.1 < q.2) (k : ℕ) :
     rw [Finset.sum_eq_single v (fun w _ hw => by simp [Pi.single_eq_of_ne hw.symm]) (by simp)]
     simpa using Matrix.matrix_eq_sum_single (x v)
   rw [this]
-  refine Submodule.sum_mem _ fun v _ => Submodule.sum_mem _ fun a _ =>
-    Submodule.sum_mem _ fun c _ => ?_
+  refine Submodule.sum_mem _ fun v _ =>
+    Submodule.sum_mem _ fun a _ => Submodule.sum_mem _ fun c _ => ?_
   by_cases h : Deep R (k + 1) a c
   · have hac := Deep.lt hl _ _ _ h
     obtain ⟨b, h1, h2⟩ := h
-    have hs : ∀ k a c z, Deep R k a c →
-        (Pi.single v (Matrix.single a c z) : ι → Matrix (Fin N) (Fin N) ℂ) ∈ deepSub R ι k := by
+    have hs
+        : ∀ k a c z,
+          Deep R k a c
+            → (Pi.single v (Matrix.single a c z) : ι → Matrix (Fin N) (Fin N) ℂ)
+              ∈ deepSub R ι k := by
       intro k a c z h w a' c' h'
       by_cases hw : w = v
       · subst hw
         rw [Pi.single_eq_same, Matrix.single_apply_of_ne]
-        rintro ⟨rfl, rfl⟩; exact h' h
+        rintro ⟨rfl, rfl⟩
+        exact h' h
       · simp [Pi.single_eq_of_ne hw]
     refine Submodule.subset_span ⟨_, hs 0 a b (x v a c) h1, _, hs k b c 1 h2, ?_⟩
     have hca : c ≠ a := by rintro rfl; omega
@@ -461,32 +502,51 @@ theorem deepSub_gen [Fintype ι] (hl : ∀ q ∈ R, q.1 < q.2) (k : ℕ) :
     simp
   · simp [hx v a c h]
 
-theorem expT_sub_mem (hl : ∀ q ∈ R, q.1 < q.2)
-    (hanti : Antitone (deepSub R ι)) (j : ℕ) (x y : ι → Matrix (Fin N) (Fin N) ℂ)
-    (hx : x ∈ deepSub R ι 0) (hy : y ∈ deepSub R ι 0) (h : x - y ∈ deepSub R ι j) :
-    (fun v => expT (x v)) - (fun v => expT (y v)) - (x - y) ∈ deepSub R ι (j + 1) := by
+theorem expT_sub_mem
+    (hl : ∀ q ∈ R, q.1 < q.2) (hanti : Antitone (deepSub R ι))
+    (j : ℕ) (x y : ι → Matrix (Fin N) (Fin N) ℂ)
+    (hx : x ∈ deepSub R ι 0) (hy : y ∈ deepSub R ι 0) (h : x - y ∈ deepSub R ι j)
+    : (fun v => expT (x v)) - (fun v => expT (y v)) - (x - y) ∈ deepSub R ι (j + 1) := by
   by_cases hN : N < 2
   · have h0 : ∀ z ∈ deepSub R ι 0, z = 0 := fun z hz => by
       ext v a c
       refine hz v a c fun h => ?_
       have := Deep.lt hl _ _ _ h
       omega
-    rw [h0 x hx, h0 y hy]; simp
-  · have he : ∀ z : ι → Matrix (Fin N) (Fin N) ℂ, (fun v => expT (z v)) =
-        ∑ i ∈ Finset.range (N - 2 + 2), ((i.factorial : ℝ))⁻¹ • z ^ i := fun z => by
+    rw [h0 x hx, h0 y hy]
+    simp
+  · have he
+        : ∀ z : ι → Matrix (Fin N) (Fin N) ℂ,
+          (fun v => expT (z v))
+            = ∑ i ∈ Finset.range (N - 2 + 2), ((i.factorial : ℝ))⁻¹ • z ^ i := fun z => by
       ext v : 1
       rw [show N - 2 + 2 = N by omega, expT, Finset.sum_apply]
       refine Finset.sum_congr rfl fun i _ => ?_
-      rw [Pi.smul_apply, Pi.pow_apply, ← Complex.coe_smul]; simp
+      rw [Pi.smul_apply, Pi.pow_apply, ← Complex.coe_smul]
+      simp
     rw [he, he]
     exact trunc_sub_mem _ hanti deepSub_mul hx hy h _
 
 end Roots
 
-theorem cover : ∀ (ι : Type) [Fintype ι] (N : ℕ) (R : Finset (Fin N × Fin N)) (Λ : Submodule ℤ (ι → R → ℂ)) (Ω₀ : Set (ι → R → ℂ)), (∀ q ∈ R, q.1 < q.2) → (∀ a b c : Fin N, (a, b) ∈ R → (b, c) ∈ R → (a, c) ∈ R) → MeasurableSet Ω₀ → MeasureTheory.IsAddFundamentalDomain Λ Ω₀ MeasureTheory.volume → MeasureTheory.volume Ω₀ ≠ ⊤ → DiscreteTopology Λ → (∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, ∀ v, expT (ofRoots R (x v) - 1) * expT (ofRoots R (y v) - 1) = expT (ofRoots R (z v) - 1)) → ∃ Ω : Set (ι → R → ℂ), MeasurableSet Ω ∧ MeasureTheory.volume Ω = MeasureTheory.volume Ω₀ ∧ ∀ c : ι → R → ℂ, ∃ x ∈ Λ, (fun v (q : R) => (expT (ofRoots R (x v) - 1) * ofRoots R (c v) : Matrix (Fin N) (Fin N) ℂ) q.1.1 q.1.2) ∈ Ω := by
+theorem cover
+    : ∀ (ι : Type) [Fintype ι] (N : ℕ) (R : Finset (Fin N × Fin N)) (Λ : Submodule ℤ (ι → R → ℂ))
+        (Ω₀ : Set (ι → R → ℂ)),
+      (∀ q ∈ R, q.1 < q.2) → (∀ a b c : Fin N, (a, b) ∈ R → (b, c) ∈ R → (a, c) ∈ R)
+        → MeasurableSet Ω₀ → MeasureTheory.IsAddFundamentalDomain Λ Ω₀ MeasureTheory.volume
+        → MeasureTheory.volume Ω₀ ≠ ⊤ → DiscreteTopology Λ
+        → (∀ x ∈ Λ, ∀ y ∈ Λ, ∃ z ∈ Λ, ∀ v,
+          expT (ofRoots R (x v) - 1) * expT (ofRoots R (y v) - 1) = expT (ofRoots R (z v) - 1))
+        → ∃ Ω : Set (ι → R → ℂ),
+          MeasurableSet Ω ∧ MeasureTheory.volume Ω = MeasureTheory.volume Ω₀
+            ∧ ∀ c : ι → R → ℂ, ∃ x ∈ Λ,
+              (fun v (q : R) =>
+                  (expT (ofRoots R (x v) - 1) * ofRoots R (c v) : Matrix (Fin N) (Fin N) ℂ) q.1.1
+                    q.1.2)
+                ∈ Ω := by
   intro ι _ N R Λ Ω₀ hl ht _ hfd hfin hdisc hgr
-  have hanti : Antitone (deepSub R ι) := antitone_nat_of_succ_le fun k x hx v a c h =>
-    hx v a c fun h' => h (Deep.of_succ ht k a c h')
+  have hanti : Antitone (deepSub R ι) :=
+    antitone_nat_of_succ_le fun k x hx v a c h => hx v a c fun h' => h (Deep.of_succ ht k a c h')
   have hn : deepSub R ι N = ⊥ := by
     refine eq_bot_iff.2 fun x hx => ?_
     ext v a c
@@ -518,8 +578,11 @@ theorem cover : ∀ (ι : Type) [Fintype ι] (N : ℕ) (R : Finset (Fin N × Fin
     rcases N with _ | N
     · exact Subsingleton.elim _ _
     · simp [e, expT, Finset.sum_range_succ']
-  have he : ∀ j x y, x ∈ deepSub R ι 0 → y ∈ deepSub R ι 0 → x - y ∈ deepSub R ι j →
-      e x - e y - (x - y) ∈ deepSub R ι (j + 1) := expT_sub_mem hl hanti
+  have he
+      : ∀ j x y,
+        x ∈ deepSub R ι 0 → y ∈ deepSub R ι 0 → x - y ∈ deepSub R ι j
+          → e x - e y - (x - y) ∈ deepSub R ι (j + 1) :=
+    expT_sub_mem hl hanti
   have : (volume : Measure (R → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   have : (volume : Measure (ι → R → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   have he1 : ∀ j x, x ∈ deepSub R ι j → e x - 1 - x ∈ deepSub R ι (j + 1) := fun j x hx => by
@@ -529,44 +592,51 @@ theorem cover : ∀ (ι : Type) [Fintype ι] (N : ℕ) (R : Finset (Fin N × Fin
     obtain ⟨z, hz, h⟩ := hgr x hx y hy
     exact ⟨z, hz, funext fun v => by simpa [hLof] using h v⟩
   have hspan := span_eq_top volume Λ Ω₀ hfd hfin
-  have hrat := rational (deepSub R ι) hanti deepSub_mul N hn (deepSub_gen hl) e he0 he
-    (Λ.map (L.restrictScalars ℤ)) (by rintro _ ⟨x, -, rfl⟩; exact hL0 x)
-    (fun a ha => by
-      rw [← hLπ a ha]
-      exact Submodule.apply_mem_span_image_of_mem_span L (s := (Λ : Set (ι → R → ℂ))) (hspan ▸ Submodule.mem_top))
-    (by
-      rintro _ ⟨x, hx, rfl⟩ _ ⟨y, hy, rfl⟩
-      obtain ⟨z, hz, h⟩ := hgr' x hx y hy
-      exact ⟨_, ⟨z, hz, rfl⟩, h⟩)
+  have hrat :=
+    rational (deepSub R ι) hanti deepSub_mul N hn (deepSub_gen hl) e he0 he
+      (Λ.map (L.restrictScalars ℤ)) (by rintro _ ⟨x, -, rfl⟩; exact hL0 x)
+      (fun a ha => by
+        rw [← hLπ a ha]
+        exact Submodule.apply_mem_span_image_of_mem_span L (s := (Λ : Set (ι → R → ℂ)))
+          (hspan ▸ Submodule.mem_top))
+      (by
+        rintro _ ⟨x, hx, rfl⟩ _ ⟨y, hy, rfl⟩
+        obtain ⟨z, hz, h⟩ := hgr' x hx y hy
+        exact ⟨_, ⟨z, hz, rfl⟩, h⟩)
   have hLφ : ∀ x c, L (π (e (L x) * (1 + L c))) = e (L x) * (1 + L c) - 1 := fun x c => by
     have h1 : e (L x) - 1 ∈ deepSub R ι 0 := by
       simpa using (deepSub R ι 0).add_mem (hanti (Nat.zero_le _) (he1 0 _ (hL0 x))) (hL0 x)
     have h2 : e (L x) * (1 + L c) - 1 ∈ deepSub R ι 0 := by
       have : e (L x) * (1 + L c) - 1 = (e (L x) - 1) + (e (L x) - 1) * L c + L c := by noncomm_ring
       rw [this]
-      exact Submodule.add_mem _ (Submodule.add_mem _ h1
-        (hanti (Nat.zero_le _) (deepSub_mul _ _ _ _ h1 (hL0 c)))) (hL0 c)
+      exact Submodule.add_mem _
+        (Submodule.add_mem _ h1 (hanti (Nat.zero_le _) (deepSub_mul _ _ _ _ h1 (hL0 c)))) (hL0 c)
     simpa using hLπ _ h2
-  obtain ⟨Ω, h1, h2, h3⟩ := exists_cover volume Λ Ω₀ hfd (fun k => (deepSub R ι k).comap L) N
-    (eq_top_iff.2 fun x _ => hL0 x) (by simp [hn, LinearMap.ker_eq_bot.2 hinj])
-    (fun i j hij => Submodule.comap_mono (hanti hij))
-    (fun k x hx => by
-      refine (Submodule.apply_mem_span_image_iff_mem_span hinj).1 (Submodule.span_mono ?_ (hrat k hx))
-      rintro _ ⟨⟨y, hy, rfl⟩, hy'⟩
-      exact ⟨y, ⟨hy, hy'⟩, rfl⟩)
-    (fun x c => π (e (L x) * (1 + L c)))
-    (fun k x _ hx c => by
-      rw [Submodule.mem_comap, map_sub, map_sub, hLφ]
-      have : e (L x) * (1 + L c) - 1 - L c - L x =
-          (e (L x) - 1 - L x) + (e (L x) - 1 - L x) * L c + L x * L c := by noncomm_ring
-      rw [this]
-      exact Submodule.add_mem _ (Submodule.add_mem _ (he1 k _ hx)
-        (hanti (by omega) (deepSub_mul _ _ _ _ (he1 k _ hx) (hL0 c))))
-        (deepSub_mul _ _ _ _ hx (hL0 c)))
-    (fun x hx y hy => by
-      obtain ⟨z, hz, h⟩ := hgr' x hx y hy
-      refine ⟨z, hz, fun c => ?_⟩
-      simp only [hLφ, add_sub_cancel, ← mul_assoc, h])
+  obtain ⟨Ω, h1, h2, h3⟩ :=
+    exists_cover volume Λ Ω₀ hfd
+      (fun k => (deepSub R ι k).comap L)
+      N (eq_top_iff.2 fun x _ => hL0 x) (by simp [hn, LinearMap.ker_eq_bot.2 hinj])
+      (fun i j hij => Submodule.comap_mono (hanti hij))
+      (fun k x hx => by
+        refine (Submodule.apply_mem_span_image_iff_mem_span hinj).1
+          (Submodule.span_mono ?_ (hrat k hx))
+        rintro _ ⟨⟨y, hy, rfl⟩, hy'⟩
+        exact ⟨y, ⟨hy, hy'⟩, rfl⟩)
+      (fun x c => π (e (L x) * (1 + L c)))
+      (fun k x _ hx c => by
+        rw [Submodule.mem_comap, map_sub, map_sub, hLφ]
+        have : e (L x) * (1 + L c) - 1 - L c - L x
+            = (e (L x) - 1 - L x) + (e (L x) - 1 - L x) * L c + L x * L c := by
+          noncomm_ring
+        rw [this]
+        exact Submodule.add_mem _
+          (Submodule.add_mem _ (he1 k _ hx)
+            (hanti (by omega) (deepSub_mul _ _ _ _ (he1 k _ hx) (hL0 c))))
+          (deepSub_mul _ _ _ _ hx (hL0 c)))
+      (fun x hx y hy => by
+        obtain ⟨z, hz, h⟩ := hgr' x hx y hy
+        refine ⟨z, hz, fun c => ?_⟩
+        simp only [hLφ, add_sub_cancel, ← mul_assoc, h])
   refine ⟨Ω, h1, h2, fun c => ?_⟩
   obtain ⟨x, hx, h⟩ := h3 c
   refine ⟨x, hx, ?_⟩

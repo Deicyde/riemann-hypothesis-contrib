@@ -279,8 +279,8 @@ lemma lie_derivative_real_comp_le {h : Matrix (Fin n) (Fin n) ℂ → ℝ} (ψ :
   · exact Complex.abs_re_le_norm _
 
 def lieDerivativeLogFrobeniusBound (ε : Fin n → Bool) (a b : Fin n) : ℝ :=
-  2 * Real.sqrt (hs (cpart1 ε (Matrix.single a b (1 : ℂ)))) +
-    2 * Real.sqrt (hs (cpart2 ε (Matrix.single a b (1 : ℂ))))
+  2 * Real.sqrt (hs (cpart1 ε (Matrix.single a b (1 : ℂ))))
+    + 2 * Real.sqrt (hs (cpart2 ε (Matrix.single a b (1 : ℂ))))
 
 lemma lie_derivative_bound_nonneg (ε : Fin n → Bool) (a b : Fin n) : 0 ≤ lieDerivativeLogFrobeniusBound ε a b := by
   unfold lieDerivativeLogFrobeniusBound; positivity
@@ -522,15 +522,16 @@ lemma smooth_on_group_sum {ι : Type*} (s : Finset ι) (f : ι → Matrix (Fin n
     (h : ∀ i ∈ s, SmoothOnG ε (f i)) : SmoothOnG ε (fun x => ∑ i ∈ s, f i x) := by
   first | exact UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum .. | (apply UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum <;> assumption) | (intros; apply UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum <;> assumption) | (apply @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum <;> assumption) | (apply @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum n ε ι s f h | exact @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum n ε ι s f | exact @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum n ε ι s | exact @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum n ε ι | exact @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum n ε | exact @UpperTheory.Reformulated.B.Qh27.smooth_on_group_sum n
 
-def signedCasimirDifference (ε : Fin n → Bool) (u : Matrix (Fin n) (Fin n) ℂ → ℂ) :
-    Matrix (Fin n) (Fin n) ℂ → ℂ :=
-  fun x => ∑ i, ∑ j, ((sgn ε i j : ℝ) : ℂ) * Eab ε j i (Eab ε i j u) x
+def signedCasimirDifference (ε : Fin n → Bool) (u : Matrix (Fin n) (Fin n) ℂ → ℂ)
+    : Matrix (Fin n) (Fin n) ℂ → ℂ := fun x =>
+  ∑ i, ∑ j, ((sgn ε i j : ℝ) : ℂ) * Eab ε j i (Eab ε i j u) x
 
 lemma smooth_signedCasimir {u : Matrix (Fin n) (Fin n) ℂ → ℂ} (hu : SmoothOnG ε u) : SmoothOnG ε (signedCasimirDifference ε u) :=
   smooth_on_group_sum _ _ fun i _ => smooth_on_group_sum _ _ fun j _ =>
     smooth_on_group_const_mul _ (smooth_lie_derivative j i (smooth_lie_derivative i j hu))
 
-def radialWeight (a R : ℝ) (x : Matrix (Fin n) (Fin n) ℂ) : ℂ := ((weightProfileAlt a R (hh x) : ℝ) : ℂ)
+def radialWeight (a R : ℝ) (x : Matrix (Fin n) (Fin n) ℂ) : ℂ :=
+  ((weightProfileAlt a R (hh x) : ℝ) : ℂ)
 
 lemma smooth_weight (hl : HhLip) (a R : ℝ) : SmoothOnG ε (radialWeight (n := n) a R) :=
   smooth_real_comp _ (contDiff_weight_profile a R) (hl n ε).1
@@ -927,7 +928,8 @@ lemma integrable_mul_conj_of_weighted {a : ℝ} (ha : 0 ≤ a) {f f' : Matrix (F
   have h4 : 0 ≤ ‖f' (toM g)‖ ^ 2 := by positivity
   nlinarith
 
-def radialCutoffFunction (R : ℝ) (x : Matrix (Fin n) (Fin n) ℂ) : ℂ := ((radialCutoff R (hh x) : ℝ) : ℂ)
+def radialCutoffFunction (R : ℝ) (x : Matrix (Fin n) (Fin n) ℂ) : ℂ :=
+  ((radialCutoff R (hh x) : ℝ) : ℂ)
 
 lemma smooth_cutoff (hl : HhLip) (R : ℝ) : SmoothOnG ε (radialCutoffFunction (n := n) R) :=
   smooth_real_comp _ (contDiff_radialCutoff R) (hl n ε).1
@@ -1098,7 +1100,8 @@ variable {ε}
 
 lemma smoothFunctions_smooth (u : smoothFunctionsOnGroup ε) : SmoothOnG ε (u : Matrix (Fin n) (Fin n) ℂ → ℂ) := u.2
 
-def quotientMkAlt (u : smoothFunctionsOnGroup ε) : SmoothFunctionsModGroup ε := Submodule.Quotient.mk u
+def quotientMkAlt (u : smoothFunctionsOnGroup ε) : SmoothFunctionsModGroup ε :=
+  Submodule.Quotient.mk u
 
 lemma quotient_mk_eq_iff {u v : smoothFunctionsOnGroup ε} :
     quotientMkAlt u = quotientMkAlt v ↔ ∀ g, inUJ ε g → (u : Matrix (Fin n) (Fin n) ℂ → ℂ) g = (v : Matrix (Fin n) (Fin n) ℂ → ℂ) g := by
@@ -1149,7 +1152,8 @@ def lieOperatorQuotient (i j : Fin n) : Module.End ℂ (SmoothFunctionsModGroup 
     rw [← quotient_mk_zero, quotient_mk_eq_iff]
     intro g hg
     show Eab ε i j u g = 0
-    rw [lie_derivative_congr (h := fun _ => (0 : ℂ)) i j (fun x hx => hu x hx) hg, lie_derivative_const_zero])
+    rw [lie_derivative_congr (h := fun _ => (0 : ℂ)) i j (fun x hx => hu x hx) hg,
+      lie_derivative_const_zero])
 
 variable {ε}
 
@@ -1243,7 +1247,8 @@ lemma signed_casimir_identity {A : Type*} [Ring A] [Algebra ℂ A] (E : Fin n �
   · rw [if_pos h, if_pos h]; simp only [Complex.ofReal_one, one_smul, two_smul]; abel
   · rw [if_neg h, if_neg h]; simp
 
-def wordActionQuotient (ε : Fin n → Bool) : List (Fin n × Fin n) → SmoothFunctionsModGroup ε → SmoothFunctionsModGroup ε
+def wordActionQuotient (ε : Fin n → Bool)
+    : List (Fin n × Fin n) → SmoothFunctionsModGroup ε → SmoothFunctionsModGroup ε
   | [] => fun m => m
   | p :: w => fun m => lieOperatorQuotient ε p.1 p.2 (wordActionQuotient ε w m)
 
@@ -1271,11 +1276,14 @@ lemma word_action_commute (X : Module.End ℂ (SmoothFunctionsModGroup ε)) (hX 
 
 variable (ε)
 
-def weightVectorsQuotient (W : Submodule ℂ (Matrix (Fin n) (Fin n) ℂ → ℂ)) : Set (SmoothFunctionsModGroup ε) :=
+def weightVectorsQuotient (W : Submodule ℂ (Matrix (Fin n) (Fin n) ℂ → ℂ))
+    : Set (SmoothFunctionsModGroup ε) :=
   {m | ∃ f ∈ W, ∃ hf : SmoothOnG ε f, m = quotientMkAlt ⟨f, hf⟩}
 
-def wordFiltration (W : Submodule ℂ (Matrix (Fin n) (Fin n) ℂ → ℂ)) (k : ℕ) : Submodule ℂ (SmoothFunctionsModGroup ε) :=
-  Submodule.span ℂ {x | ∃ w : List (Fin n × Fin n), ∃ m ∈ weightVectorsQuotient ε W, w.length ≤ k ∧ x = wordActionQuotient ε w m}
+def wordFiltration (W : Submodule ℂ (Matrix (Fin n) (Fin n) ℂ → ℂ)) (k : ℕ)
+    : Submodule ℂ (SmoothFunctionsModGroup ε) :=
+  Submodule.span ℂ
+    {x | ∃ w : List (Fin n × Fin n), ∃ m ∈ weightVectorsQuotient ε W, w.length ≤ k ∧ x = wordActionQuotient ε w m}
 
 variable {ε}
 variable {W : Submodule ℂ (Matrix (Fin n) (Fin n) ℂ → ℂ)}
@@ -1404,8 +1412,9 @@ lemma evalQuotient_mk (u : smoothFunctionsOnGroup ε) :
 
 variable (ε) in
 def weightedSquareIntegrable (a : ℝ) : Submodule ℂ (SmoothFunctionsModGroup ε) where
-  carrier := {m | Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) * ‖evalQuotient ε m g‖ ^ 2)
-    (muG ε)}
+  carrier :=
+    {m | Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) * ‖evalQuotient ε m g‖ ^ 2)
+      (muG ε)}
   zero_mem' := by
     show Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) * ‖evalQuotient ε 0 g‖ ^ 2) (muG ε)
     simp only [map_zero, Pi.zero_apply, norm_zero]
@@ -1416,35 +1425,57 @@ def weightedSquareIntegrable (a : ℝ) : Submodule ℂ (SmoothFunctionsModGroup 
     obtain ⟨v, rfl⟩ := quotient_mk_surjective y
     show Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
       ‖evalQuotient ε (quotientMkAlt u + quotientMkAlt v) g‖ ^ 2) (muG ε)
-    have hx' : Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
-        ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) (muG ε) := hx
-    have hy' : Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
-        ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) (muG ε) := hy
+    have hx' : Integrable
+        (fun g : UJ ε =>
+          Real.exp (2 * a * hh (toM g)) * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)
+        (muG ε) :=
+      hx
+    have hy' : Integrable
+        (fun g : UJ ε =>
+          Real.exp (2 * a * hh (toM g)) * ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)
+        (muG ε) :=
+      hy
     rw [← quotient_mk_add, evalQuotient_mk]
-    have hb : Integrable (fun g : UJ ε => 2 * (Real.exp (2 * a * hh (toM g)) *
-        ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) + 2 * (Real.exp (2 * a * hh (toM g)) *
-        ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)) (muG ε) :=
-      Integrable.add (f := fun g : UJ ε => 2 * (Real.exp (2 * a * hh (toM g)) *
-          ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2))
-        (g := fun g : UJ ε => 2 * (Real.exp (2 * a * hh (toM g)) *
-          ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2))
-        (Integrable.const_mul (f := fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
-          ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) hx' 2)
-        (Integrable.const_mul (f := fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
-          ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) hy' 2)
-    refine hb.mono' (aestronglyMeasurable_weighted_norm_sq a (smoothFunctions_smooth (u + v))) (Eventually.of_forall fun g => ?_)
+    have hb : Integrable
+        (fun g : UJ ε =>
+          2 * (Real.exp (2 * a * hh (toM g)) * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)
+            + 2
+              * (Real.exp (2 * a * hh (toM g)) * ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2))
+        (muG ε) :=
+      Integrable.add
+        (f := fun g : UJ ε =>
+          2 * (Real.exp (2 * a * hh (toM g)) * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2))
+        (g := fun g : UJ ε =>
+          2 * (Real.exp (2 * a * hh (toM g)) * ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2))
+        (Integrable.const_mul
+          (f := fun g : UJ ε =>
+            Real.exp (2 * a * hh (toM g)) * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)
+          hx' 2)
+        (Integrable.const_mul
+          (f := fun g : UJ ε =>
+            Real.exp (2 * a * hh (toM g)) * ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)
+          hy' 2)
+    refine hb.mono' (aestronglyMeasurable_weighted_norm_sq a (smoothFunctions_smooth (u + v)))
+      (Eventually.of_forall fun g => ?_)
     have he := Real.exp_pos (2 * a * hh (toM g))
-    have e1 : ((u + v : smoothFunctionsOnGroup ε) : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) =
-        (u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) + (v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) := rfl
+    have e1
+        : ((u + v : smoothFunctionsOnGroup ε) : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)
+          = (u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)
+            + (v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) :=
+      rfl
     beta_reduce
     rw [e1, Real.norm_eq_abs, abs_of_nonneg (by positivity)]
-    have h1 := norm_add_le ((u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g))
-      ((v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g))
-    have h2 : ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) + (v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2
-        ≤ 2 * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2 +
-          2 * ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2 := by
-      have := norm_nonneg ((u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) +
-        (v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g))
+    have h1 :=
+      norm_add_le ((u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g))
+        ((v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g))
+    have h2
+        : ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) + (v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖
+            ^ 2
+          ≤ 2 * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2
+            + 2 * ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2 := by
+      have :=
+        norm_nonneg
+          ((u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g) + (v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g))
       nlinarith [sq_nonneg (‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ -
         ‖(v : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖)]
     nlinarith
@@ -1453,13 +1484,17 @@ def weightedSquareIntegrable (a : ℝ) : Submodule ℂ (SmoothFunctionsModGroup 
     obtain ⟨u, rfl⟩ := quotient_mk_surjective x
     show Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
       ‖evalQuotient ε (c • quotientMkAlt u) g‖ ^ 2) (muG ε)
-    have hx' : Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) *
-        ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) (muG ε) := hx
+    have hx' : Integrable
+        (fun g : UJ ε =>
+          Real.exp (2 * a * hh (toM g)) * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2)
+        (muG ε) :=
+      hx
     rw [← quotient_mk_smul, evalQuotient_mk]
     refine (hx'.const_mul (‖c‖ ^ 2)).congr (Eventually.of_forall fun g => ?_)
     show ‖c‖ ^ 2 * (Real.exp (2 * a * hh (toM g)) * ‖(u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2) =
       Real.exp (2 * a * hh (toM g)) * ‖c * (u : Matrix (Fin n) (Fin n) ℂ → ℂ) (toM g)‖ ^ 2
-    rw [norm_mul]; ring
+    rw [norm_mul]
+    ring
 
 lemma weighted_square_integrable_filtration (hl : HhLip) (hz : IntRdZero) {W : Submodule ℂ (Matrix (Fin n) (Fin n) ℂ → ℂ)}
     {c : ℂ} {a : ℝ} (ha : 0 ≤ a) (hsm : ∀ w ∈ W, SmoothOnG ε w)
@@ -1502,13 +1537,17 @@ lemma weighted_square_integrable_filtration (hl : HhLip) (hz : IntRdZero) {W : S
 
 theorem square_integrable_of_lipschitz (hl : HhLip) (hz : IntRdZero) : SmoothVectorGrowthBound := by
   intro n ε W c a _ ha hsm hstab hcas hint w₁ w₂ f f' hf hf'
-  have P : ∀ (w : List (Fin n × Fin n)) (f : Matrix (Fin n) (Fin n) ℂ → ℂ), f ∈ W →
-      Integrable (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) * ‖Eword ε w f (toM g)‖ ^ 2)
-        (muG ε) :=
-    fun w f hf => weighted_square_integrable_filtration hl hz ha hsm hstab hcas hint w.length w le_rfl f hf
+  have P
+      : ∀ (w : List (Fin n × Fin n)) (f : Matrix (Fin n) (Fin n) ℂ → ℂ),
+        f ∈ W
+          → Integrable
+            (fun g : UJ ε => Real.exp (2 * a * hh (toM g)) * ‖Eword ε w f (toM g)‖ ^ 2)
+            (muG ε) := fun w f hf =>
+    weighted_square_integrable_filtration hl hz ha hsm hstab hcas hint w.length w le_rfl f hf
   refine ⟨smooth_iterated_lie_derivative (hsm f hf) w₁, P w₁ f hf, fun i j => ?_⟩
-  exact integrable_lie_derivative_pairing hl hz ha (smooth_iterated_lie_derivative (hsm f hf) w₁) (smooth_iterated_lie_derivative (hsm f' hf') w₂)
-    (P w₁ f hf) (P w₂ f' hf') i j (P ((i, j) :: w₁) f hf) (P ((j, i) :: w₂) f' hf')
+  exact integrable_lie_derivative_pairing hl hz ha (smooth_iterated_lie_derivative (hsm f hf) w₁)
+    (smooth_iterated_lie_derivative (hsm f' hf') w₂) (P w₁ f hf) (P w₂ f' hf') i j
+    (P ((i, j) :: w₁) f hf) (P ((j, i) :: w₂) f' hf')
 
 end F4BMain
 

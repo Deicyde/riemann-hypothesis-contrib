@@ -27,16 +27,16 @@ theorem int_isJacobsonRing : IsJacobsonRing ℤ := by
   · have := hP.isMaximal h
     exact Ideal.jacobson_eq_self_of_isMaximal
 
-theorem natCard_eq_pow_length_of_finiteType (F : Type) [Field F] [Algebra.FiniteType ℤ F]
-    (q : ℕ) [CharP F q] :
-    q.Prime ∧ Nat.card F = q ^ (Module.length ℤ F).toNat := by
+theorem natCard_eq_pow_length_of_finiteType
+    (F : Type) [Field F] [Algebra.FiniteType ℤ F] (q : ℕ) [CharP F q]
+    : q.Prime ∧ Nat.card F = q ^ (Module.length ℤ F).toNat := by
   have := int_isJacobsonRing
   have : Module.Finite ℤ F := finite_of_finite_type_of_isJacobsonRing ℤ F
   have hq : q ≠ 0 := by
     rintro rfl
     have : CharZero F := CharP.charP_to_charZero F
-    exact Int.not_isField (isField_of_isIntegral_of_isField
-      (fun a b h ↦ by simpa using h) (Field.toIsField F))
+    exact Int.not_isField
+      (isField_of_isIntegral_of_isField (fun a b h ↦ by simpa using h) (Field.toIsField F))
   have hqp : q.Prime := (CharP.char_is_prime_or_zero F q).resolve_right hq
   have : Fact q.Prime := ⟨hqp⟩
   let : Algebra (ZMod q) F := ZMod.algebra F q
@@ -48,13 +48,15 @@ theorem natCard_eq_pow_length_of_finiteType (F : Type) [Field F] [Algebra.Finite
     Module.length_eq_finrank, ENat.toNat_natCast, Nat.card_eq_fintype_card,
     Module.card_eq_pow_finrank (K := ZMod q), ZMod.card]
 
-theorem OrbitChartResidue.proof (hM : OrbitChartMax.Statement) (hQ : OrbitChartQuot.Statement)
-    (hD : OrbitChartDehom.Statement) : OrbitChartResidue.Statement := by
+theorem OrbitChartResidue.proof
+    (hM : OrbitChartMax.Statement) (hQ : OrbitChartQuot.Statement) (hD : OrbitChartDehom.Statement)
+    : OrbitChartResidue.Statement := by
   intro ι _ _ _ n A x s hx hs V hV c hc
   have hPV : orbitIdeal x ≤ V := le_sup_left.trans hV.1.1.2
   have hrel : Geo.IsRelevant V := hV.2
-  have hxc : ∀ c' : (k : ι) → Fin (n k + 1),
-      (∀ k, (X ⟨k, c' k⟩ : MvPolynomial (Coord n) ℤ) ∉ V) → ∀ k, x k (c' k) ≠ 0 := by
+  have hxc
+      : ∀ c' : (k : ι) → Fin (n k + 1),
+        (∀ k, (X ⟨k, c' k⟩ : MvPolynomial (Coord n) ℤ) ∉ V) → ∀ k, x k (c' k) ≠ 0 := by
     intro c' h k h0
     apply h k
     apply hPV
@@ -73,8 +75,7 @@ theorem OrbitChartResidue.proof (hM : OrbitChartMax.Statement) (hQ : OrbitChartQ
   have : J.IsMaximal := (Ideal.Quotient.maximal_ideal_iff_isField_quotient J).mpr hfield
   let : Field (MvPolynomial (Coord n) ℤ ⧸ J) := Ideal.Quotient.field J
   have hft : Algebra.FiniteType ℤ (MvPolynomial (Coord n) ℤ ⧸ J) :=
-    Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℤ J)
-      (Ideal.Quotient.mkₐ_surjective ℤ J)
+    Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℤ J) (Ideal.Quotient.mkₐ_surjective ℤ J)
   have : CharP (MvPolynomial (Coord n) ℤ ⧸ J) (Geo.charOf V) := by
     constructor
     intro a
@@ -85,10 +86,12 @@ theorem OrbitChartResidue.proof (hM : OrbitChartMax.Statement) (hQ : OrbitChartQ
     rw [← Int.cast_natCast, hJC, Submodule.IsPrincipal.mem_iff_generator_dvd, ← Int.natAbs_dvd,
       Int.natCast_dvd_natCast]
     rfl
-  obtain ⟨-, hcard⟩ := @natCard_eq_pow_length_of_finiteType (MvPolynomial (Coord n) ℤ ⧸ J) _
-    (by convert hft using 1 <;> rfl) (Geo.charOf V) _
-  have hgeo : Geo.geoNum (ι := blockIdx n) 0 V Fin.elim0 =
-      ((Module.length ℤ (MvPolynomial (Coord n) ℤ ⧸ J)).toNat : ℤ) := by
+  obtain ⟨-, hcard⟩ :=
+    @natCard_eq_pow_length_of_finiteType (MvPolynomial (Coord n) ℤ ⧸ J) _
+      (by convert hft using 1 <;> rfl) (Geo.charOf V) _
+  have hgeo
+      : Geo.geoNum (ι := blockIdx n) 0 V Fin.elim0
+        = ((Module.length ℤ (MvPolynomial (Coord n) ℤ ⧸ J)).toNat : ℤ) := by
     simp only [Geo.geoNum, dif_pos hrel]
     rfl
   rw [hgeo, Nat.card_congr e.toEquiv, hcard, Nat.cast_pow, Real.log_pow]

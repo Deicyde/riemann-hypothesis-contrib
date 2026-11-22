@@ -22,9 +22,10 @@ theorem intVec_ne_zero {ι : Type*} {v : ι → ℤ} (hv : v ≠ 0) : intVec v �
 
 end PSymplFirstRow
 
-theorem SymplFirstRow.proof (h1 : SymplMinExists.Statement) (h2 : SymplMinBound.Statement)
-    (h3 : SymplOrbit.Statement) (h4 : SymplShortPrim.Statement) (h5 : SymplGramMem.Statement) :
-    SymplFirstRow.Statement := by
+theorem SymplFirstRow.proof
+    (h1 : SymplMinExists.Statement) (h2 : SymplMinBound.Statement) (h3 : SymplOrbit.Statement)
+    (h4 : SymplShortPrim.Statement) (h5 : SymplGramMem.Statement)
+    : SymplFirstRow.Statement := by
   intro n G hG hpd
   obtain ⟨ρsq, hleast⟩ := h1 (Fin (n + 1) ⊕ Fin (n + 1)) G hpd
   have hdet : G.det = 1 := SymplecticGroup.det_eq_one hG
@@ -37,8 +38,7 @@ theorem SymplFirstRow.proof (h1 : SymplMinExists.Statement) (h2 : SymplMinBound.
   · simp only [Fintype.card_sum, Fintype.card_fin] at hbound
     push_cast at hbound
     linarith
-  · have hmin : ∀ u : Fin (n + 1) ⊕ Fin (n + 1) → ℤ, u ≠ 0 →
-        qf G (intVec v) ≤ qf G (intVec u) := by
+  · have hmin : ∀ u : Fin (n + 1) ⊕ Fin (n + 1) → ℤ, u ≠ 0 → qf G (intVec v) ≤ qf G (intVec u) := by
       intro u hu
       rw [← hvρ]
       exact hleast.2 ⟨u, hu, rfl⟩

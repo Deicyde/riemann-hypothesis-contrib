@@ -12,16 +12,19 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Continuou
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeightCounting GlobalTheory.Pst
-  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.HeightCounting GlobalTheory.Pst GlobalTheory.CuspRep GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory
 
 namespace GlobalTheory.SplitDegOne
 
-theorem exists_unique_other {ι : Type*} [Fintype ι] [DecidableEq ι] (g : ι → ℕ) (a : ι)
-    (hpos : ∀ i, 1 ≤ g i) (hsum : ∑ i, g i = 2) (ha : g a = 1) :
-    ∃ b, b ≠ a ∧ g b = 1 ∧ ∀ c, c = a ∨ c = b := by
+theorem exists_unique_other
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (g : ι → ℕ) (a : ι) (hpos : ∀ i, 1 ≤ g i) (hsum : ∑ i, g i = 2) (ha : g a = 1)
+    : ∃ b, b ≠ a ∧ g b = 1 ∧ ∀ c, c = a ∨ c = b := by
   have h1 : ∑ i ∈ Finset.univ.erase a, g i = 1 := by
     have := Finset.add_sum_erase Finset.univ g (Finset.mem_univ a)
     omega
@@ -36,7 +39,8 @@ theorem exists_unique_other {ι : Type*} [Fintype ι] [DecidableEq ι] (g : ι �
     omega
   obtain ⟨b, hb⟩ := Finset.card_eq_one.1 (le_antisymm hcard hne.card_pos)
   have hbm : b ∈ Finset.univ.erase a := hb ▸ Finset.mem_singleton_self b
-  refine ⟨b, Finset.ne_of_mem_erase hbm, by rw [hb, Finset.sum_singleton] at h1; exact h1, fun c => ?_⟩
+  refine
+    ⟨b, Finset.ne_of_mem_erase hbm, by rw [hb, Finset.sum_singleton] at h1; exact h1, fun c => ?_⟩
   by_cases hc : c = a
   · exact Or.inl hc
   · right
@@ -44,13 +48,19 @@ theorem exists_unique_other {ι : Type*} [Fintype ι] [DecidableEq ι] (g : ι �
     rw [hb] at this
     exact Finset.mem_singleton.1 this
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)),
-    w.asIdeal.inertiaDeg ℤ = 1 → w.asIdeal.ramificationIdx ℤ = 1 →
-    Formalism.MainNotions.SchurIrreducible.IsSplit (E := E) (w.under (𝓞 (maximalRealSubfield E))) ∧
-    (Formalism.L2.Host.aboveF (L := E) (maximalRealSubfield E) (w.under (𝓞 (maximalRealSubfield E)))).card = 2 ∧
-    ∀ w' ∈ Formalism.L2.Host.aboveF (L := E) (maximalRealSubfield E) (w.under (𝓞 (maximalRealSubfield E))),
-      Ideal.absNorm w'.asIdeal = Ideal.absNorm w.asIdeal ∧
-        w'.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)),
+      w.asIdeal.inertiaDeg ℤ = 1 → w.asIdeal.ramificationIdx ℤ = 1
+        → Formalism.MainNotions.SchurIrreducible.IsSplit (E := E)
+            (w.under (𝓞 (maximalRealSubfield E)))
+          ∧ (Formalism.L2.Host.aboveF (L := E) (maximalRealSubfield E)
+              (w.under (𝓞 (maximalRealSubfield E)))).card
+            = 2
+          ∧ ∀ w'
+              ∈ Formalism.L2.Host.aboveF (L := E) (maximalRealSubfield E)
+                (w.under (𝓞 (maximalRealSubfield E))),
+            Ideal.absNorm w'.asIdeal = Ideal.absNorm w.asIdeal
+              ∧ w'.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
   intro E _ _ _ w hf he
   classical
   let v := w.under (𝓞 (maximalRealSubfield E))
@@ -72,32 +82,41 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Heigh
   have hsum := Ideal.sum_ramification_inertia_eq_finrank v.asIdeal (𝓞 E)
   rw [h2] at hsum
   let a : v.asIdeal.primesOver (𝓞 E) := ⟨w.asIdeal, w.isPrime, hwv⟩
-  obtain ⟨b, hba, hb1, hall⟩ := exists_unique_other (fun q : v.asIdeal.primesOver (𝓞 E) =>
-      q.1.ramificationIdx (𝓞 (maximalRealSubfield E)) * q.1.inertiaDeg (𝓞 (maximalRealSubfield E))) a
-    (fun q => by
-      have : q.1.IsPrime := q.2.1
-      exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (Ideal.ramificationIdx_pos (R := _) q.1).ne'
-        (Ideal.inertiaDeg_pos q.1 _).ne'))
-    hsum (by simp only [a, hew, hfw, mul_one])
+  obtain ⟨b, hba, hb1, hall⟩ :=
+    exists_unique_other
+      (fun q : v.asIdeal.primesOver (𝓞 E) =>
+        q.1.ramificationIdx (𝓞 (maximalRealSubfield E))
+          * q.1.inertiaDeg (𝓞 (maximalRealSubfield E)))
+      a
+      (fun q => by
+        have : q.1.IsPrime := q.2.1
+        exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (Ideal.ramificationIdx_pos (R := _) q.1).ne'
+          (Ideal.inertiaDeg_pos q.1 _).ne'))
+      hsum (by simp only [a, hew, hfw, mul_one])
   have hbl : b.1.LiesOver v.asIdeal := b.2.2
   let B : HeightOneSpectrum (𝓞 E) := ⟨b.1, b.2.1, Ideal.ne_bot_of_liesOver_of_ne_bot hv0 b.1⟩
   have hB : B.under (𝓞 (maximalRealSubfield E)) = v :=
     HeightOneSpectrum.ext (Ideal.over_def b.1 v.asIdeal).symm
   have hwB : w ≠ B := fun h => hba (Subtype.ext (congrArg HeightOneSpectrum.asIdeal h).symm)
 
-  have hmem : ∀ u : HeightOneSpectrum (𝓞 E), u.under (𝓞 (maximalRealSubfield E)) = v → u = w ∨ u = B := by
+  have hmem
+      : ∀ u : HeightOneSpectrum (𝓞 E), u.under (𝓞 (maximalRealSubfield E)) = v → u = w ∨ u = B := by
     intro u hu
     have hul : u.asIdeal.LiesOver v.asIdeal := ⟨by rw [← hu]; rfl⟩
     rcases hall ⟨u.asIdeal, u.isPrime, hul⟩ with h | h
     · exact Or.inl (HeightOneSpectrum.ext (congrArg Subtype.val h))
     · exact Or.inr (HeightOneSpectrum.ext (congrArg Subtype.val h))
   have hB1 := mul_eq_one.1 hb1
-  have hnorm : ∀ u : HeightOneSpectrum (𝓞 E), u.under (𝓞 (maximalRealSubfield E)) = v →
-      Ideal.absNorm u.asIdeal = Ideal.absNorm v.asIdeal ∧ u.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
+  have hnorm
+      : ∀ u : HeightOneSpectrum (𝓞 E),
+        u.under (𝓞 (maximalRealSubfield E)) = v
+          → Ideal.absNorm u.asIdeal = Ideal.absNorm v.asIdeal
+            ∧ u.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
     intro u hu
     have hul : u.asIdeal.LiesOver v.asIdeal := ⟨by rw [← hu]; rfl⟩
-    have hf1 : u.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield E)) = 1 ∧
-        u.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
+    have hf1
+        : u.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield E)) = 1
+          ∧ u.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
       rcases hmem u hu with rfl | rfl
       · exact ⟨hfw, hew⟩
       · exact ⟨hB1.2, hB1.1⟩

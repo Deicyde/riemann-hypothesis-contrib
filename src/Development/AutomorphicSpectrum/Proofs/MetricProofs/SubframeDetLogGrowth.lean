@@ -15,16 +15,17 @@ open scoped ComplexOrder MatrixOrder
 
 variable {g k : ℕ}
 
-theorem subframe_map_posSemidef {A : Matrix (Fin g) (Fin g) ℝ} (h : A.PosSemidef) :
-    (A.map Complex.ofReal).PosSemidef := by
+theorem subframe_map_posSemidef {A : Matrix (Fin g) (Fin g) ℝ} (h : A.PosSemidef)
+    : (A.map Complex.ofReal).PosSemidef := by
   have hH : (A.map Complex.ofReal).IsHermitian :=
     h.isHermitian.map _ (fun x => by simp [Complex.conj_ofReal])
   refine Matrix.PosSemidef.of_dotProduct_mulVec_nonneg hH (fun x => ?_)
   have hu := h.dotProduct_mulVec_nonneg (fun i => (x i).re)
   have hv := h.dotProduct_mulVec_nonneg (fun i => (x i).im)
   simp only [dotProduct, mulVec, Pi.star_apply, star_trivial] at hu hv
-  have key : (star x ⬝ᵥ (A.map Complex.ofReal) *ᵥ x).re =
-      ∑ i, ((x i).re * ∑ j, A i j * (x j).re + (x i).im * ∑ j, A i j * (x j).im) := by
+  have key
+      : (star x ⬝ᵥ (A.map Complex.ofReal) *ᵥ x).re
+        = ∑ i, ((x i).re * ∑ j, A i j * (x j).re + (x i).im * ∑ j, A i j * (x j).im) := by
     simp only [dotProduct, mulVec, Complex.re_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [Pi.star_apply, Matrix.map_apply, Complex.mul_re, Complex.re_sum, Complex.im_sum,
@@ -38,20 +39,25 @@ theorem subframe_map_posSemidef {A : Matrix (Fin g) (Fin g) ℝ} (h : A.PosSemid
   rw [key, Finset.sum_add_distrib]
   exact add_nonneg hu hv
 
-theorem subframe_inv_bounds (Y : Matrix (Fin g) (Fin g) ℝ) {c D : ℝ} (hc : 0 < c) (hD : 0 < D)
-    (h1 : (Y - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef)
-    (h2 : (D • (1 : Matrix (Fin g) (Fin g) ℝ) - Y).PosSemidef) :
-    D⁻¹ • (1 : Matrix (Fin g) (Fin g) ℂ) ≤ (Y⁻¹).map Complex.ofReal ∧
-      (Y⁻¹).map Complex.ofReal ≤ c⁻¹ • (1 : Matrix (Fin g) (Fin g) ℂ) := by
-  have hmap : ∀ {P Q : Matrix (Fin g) (Fin g) ℝ}, P ≤ Q →
-      P.map Complex.ofReal ≤ Q.map Complex.ofReal := by
+theorem subframe_inv_bounds
+    (Y : Matrix (Fin g) (Fin g) ℝ)
+    {c D : ℝ} (hc : 0 < c) (hD : 0 < D) (h1 : (Y - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef)
+    (h2 : (D • (1 : Matrix (Fin g) (Fin g) ℝ) - Y).PosSemidef)
+    : D⁻¹ • (1 : Matrix (Fin g) (Fin g) ℂ) ≤ (Y⁻¹).map Complex.ofReal
+      ∧ (Y⁻¹).map Complex.ofReal ≤ c⁻¹ • (1 : Matrix (Fin g) (Fin g) ℂ) := by
+  have hmap
+      : ∀ {P Q : Matrix (Fin g) (Fin g) ℝ},
+        P ≤ Q → P.map Complex.ofReal ≤ Q.map Complex.ofReal := by
     intro P Q hPQ
     rw [Matrix.le_iff] at hPQ ⊢
     have := subframe_map_posSemidef hPQ
     rwa [Matrix.map_sub _ (fun a b => Complex.ofReal_sub a b)] at this
-  have hone : ∀ t : ℝ, (t • (1 : Matrix (Fin g) (Fin g) ℝ)).map Complex.ofReal =
-      t • (1 : Matrix (Fin g) (Fin g) ℂ) := by
-    intro t; ext i j
+  have hone
+      : ∀ t : ℝ,
+        (t • (1 : Matrix (Fin g) (Fin g) ℝ)).map Complex.ofReal
+          = t • (1 : Matrix (Fin g) (Fin g) ℂ) := by
+    intro t
+    ext i j
     by_cases hij : i = j <;> simp [Matrix.one_apply, hij, Complex.real_smul]
   have hc1 : (c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosDef := Matrix.PosDef.one.smul hc
   have hle1 : c • (1 : Matrix (Fin g) (Fin g) ℝ) ≤ Y := Matrix.le_iff.mpr h1
@@ -68,11 +74,13 @@ theorem subframe_inv_bounds (Y : Matrix (Fin g) (Fin g) ℝ) {c D : ℝ} (hc : 0
   · have := hmap hhi
     rwa [hone] at this
 
-theorem subframe_det_bounds (P : Matrix (Fin g) (Fin k) ℂ) (A : Matrix (Fin g) (Fin g) ℂ)
+theorem subframe_det_bounds
+    (P : Matrix (Fin g) (Fin k) ℂ)
+    (A : Matrix (Fin g) (Fin g) ℂ)
     {a b : ℝ} (ha : 0 ≤ a) (h1 : a • (1 : Matrix (Fin g) (Fin g) ℂ) ≤ A)
-    (h2 : A ≤ b • (1 : Matrix (Fin g) (Fin g) ℂ)) :
-    a ^ k * (Pᴴ * P).det.re ≤ (Pᴴ * A * P).det.re ∧
-      (Pᴴ * A * P).det.re ≤ b ^ k * (Pᴴ * P).det.re := by
+    (h2 : A ≤ b • (1 : Matrix (Fin g) (Fin g) ℂ))
+    : a ^ k * (Pᴴ * P).det.re ≤ (Pᴴ * A * P).det.re
+      ∧ (Pᴴ * A * P).det.re ≤ b ^ k * (Pᴴ * P).det.re := by
   have hA : A.PosSemidef := GlobalTheory.posSemidef_of_le (Matrix.PosSemidef.one.smul ha) h1
   have hPP : (Pᴴ * P).PosSemidef := Matrix.posSemidef_conjTranspose_mul_self P
   have hsm : ∀ t : ℝ, Pᴴ * (t • (1 : Matrix (Fin g) (Fin g) ℂ)) * P = t • (Pᴴ * P) := by
@@ -85,8 +93,7 @@ theorem subframe_det_bounds (P : Matrix (Fin g) (Fin k) ℂ) (A : Matrix (Fin g)
     rwa [hsm] at this
   have hdetsm : ∀ t : ℝ, ((t • (Pᴴ * P)).det).re = t ^ k * ((Pᴴ * P).det).re := by
     intro t
-    have he : t • (Pᴴ * P) = (t : ℂ) • (Pᴴ * P) := by
-      ext i j; simp [Complex.real_smul]
+    have he : t • (Pᴴ * P) = (t : ℂ) • (Pᴴ * P) := by ext i j; simp [Complex.real_smul]
     rw [he, Matrix.det_smul, Fintype.card_fin, ← Complex.ofReal_pow, Complex.re_ofReal_mul]
   refine ⟨?_, ?_⟩
   · have := GlobalTheory.pow_mul_re_det_le_of_smul_le hPP ha hlo
@@ -95,11 +102,10 @@ theorem subframe_det_bounds (P : Matrix (Fin g) (Fin k) ℂ) (A : Matrix (Fin g)
     rw [RCLike.re_to_complex, RCLike.re_to_complex, hdetsm] at this
     exact this
 
-theorem subframe_gram_posDef (F : Matrix (Fin g) (Fin k) ℂ) (h : F.rank = k) :
-    ((F.map star)ᴴ * F.map star).PosDef := by
+theorem subframe_gram_posDef (F : Matrix (Fin g) (Fin k) ℂ) (h : F.rank = k)
+    : ((F.map star)ᴴ * F.map star).PosDef := by
   have hr : (F.map star).rank = k := by
-    have he : F.map star = (Fᴴ)ᵀ := by
-      ext i j; simp [Matrix.conjTranspose_apply]
+    have he : F.map star = (Fᴴ)ᵀ := by ext i j; simp [Matrix.conjTranspose_apply]
     rw [he, Matrix.rank_transpose, Matrix.rank_conjTranspose, h]
   have hr' : Module.finrank ℂ (LinearMap.range (F.map star).mulVecLin) = k := hr
   have hsum := LinearMap.finrank_range_add_finrank_ker (F.map star).mulVecLin
@@ -108,20 +114,32 @@ theorem subframe_gram_posDef (F : Matrix (Fin g) (Fin k) ℂ) (h : F.rank = k) :
   have hbot : LinearMap.ker (F.map star).mulVecLin = ⊥ := Submodule.finrank_eq_zero.mp hker0
   have hinj : Function.Injective (F.map star).mulVec := by
     intro v w hvw
-    have h0 : (F.map star).mulVec (v - w) = 0 := by
-      rw [Matrix.mulVec_sub, hvw, sub_self]
+    have h0 : (F.map star).mulVec (v - w) = 0 := by rw [Matrix.mulVec_sub, hvw, sub_self]
     have := (Matrix.ker_mulVecLin_eq_bot_iff.mp hbot) (v - w) h0
     exact sub_eq_zero.mp this
   exact Matrix.PosDef.conjTranspose_mul_self _ hinj
 
-theorem subframe_continuous_det :
-    Continuous fun M : Matrix (Fin g) (Fin k) ℂ => ((Mᵀ * M.map star).det).re := by
-  exact Complex.continuous_re.comp
-    ((continuous_id.matrix_transpose.matrix_mul (continuous_id.matrix_map continuous_star)).matrix_det)
+theorem subframe_continuous_det
+    : Continuous fun M : Matrix (Fin g) (Fin k) ℂ => ((Mᵀ * M.map star).det).re := by
+  exact Complex.continuous_re.comp ((continuous_id.matrix_transpose.matrix_mul
+    (continuous_id.matrix_map continuous_star)).matrix_det)
 
 end SlopeTestRemainingChoices
 
-theorem subframe_det_log_growth : ∀ (g k : ℕ) (X : Type) [TopologicalSpace X] (K : Set X), IsCompact K → ∀ (F : X → Matrix (Fin g) (Fin k) ℂ), ContinuousOn F K → (∀ x ∈ K, (F x).rank = k) → ∀ c C : ℝ, 0 < c → ∃ C' : ℝ, 0 < C' ∧ ∀ x ∈ K, ∀ (Y : Matrix (Fin g) (Fin g) ℝ) (r : ℝ), 1 ≤ r → (Y - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ((C * r) • (1 : Matrix (Fin g) (Fin g) ℝ) - Y).PosSemidef → (let d := (((F x)ᵀ * (Y⁻¹).map Complex.ofReal * (F x).map star).det).re; d ≤ C' ∧ 1 ≤ C' * r ^ k * d) := by
+theorem subframe_det_log_growth
+    : ∀ (g k : ℕ) (X : Type) [TopologicalSpace X] (K : Set X),
+      IsCompact K
+        → ∀ (F : X → Matrix (Fin g) (Fin k) ℂ),
+          ContinuousOn F K → (∀ x ∈ K, (F x).rank = k)
+            → ∀ c C : ℝ,
+              0 < c
+                → ∃ C' : ℝ,
+                  0 < C'
+                    ∧ ∀ x ∈ K, ∀ (Y : Matrix (Fin g) (Fin g) ℝ) (r : ℝ),
+                      1 ≤ r → (Y - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef
+                        → ((C * r) • (1 : Matrix (Fin g) (Fin g) ℝ) - Y).PosSemidef
+                        → (let d := (((F x)ᵀ * (Y⁻¹).map Complex.ofReal * (F x).map star).det).re
+                           d ≤ C' ∧ 1 ≤ C' * r ^ k * d) := by
   intro g k X _ K hK F hF hrank c C hc
   by_cases hne : K.Nonempty
   swap
@@ -152,8 +170,7 @@ theorem subframe_det_log_growth : ∀ (g k : ℕ) (X : Type) [TopologicalSpace X
       rw [hrank x hx] at this
       omega
     subst hk
-    have hd1 : d = 1 := by
-      rw [hd, Matrix.det_isEmpty, Complex.one_re]
+    have hd1 : d = 1 := by rw [hd, Matrix.det_isEmpty, Complex.one_re]
     rw [hd1]
     simp only [pow_zero, one_mul, mul_one] at hA0 hB0 ⊢
     refine ⟨?_, ?_⟩ <;> linarith
@@ -165,8 +182,9 @@ theorem subframe_det_log_growth : ∀ (g k : ℕ) (X : Type) [TopologicalSpace X
     have hr0 : 0 < r := by linarith
     have hC : 0 < C := by nlinarith
     have hinv := subframe_inv_bounds Y hc hCr h1 h2
-    have hb := subframe_det_bounds ((F x).map star) ((Y⁻¹).map Complex.ofReal)
-      (inv_nonneg.2 hCr.le) hinv.1 hinv.2
+    have hb :=
+      subframe_det_bounds ((F x).map star) ((Y⁻¹).map Complex.ofReal) (inv_nonneg.2 hCr.le) hinv.1
+        hinv.2
     rw [hT] at hb
     obtain ⟨hlo, hhi⟩ := hb
     have hGx_le : (((F x)ᵀ * (F x).map star).det).re ≤ |M| := by
@@ -175,7 +193,8 @@ theorem subframe_det_log_growth : ∀ (g k : ℕ) (X : Type) [TopologicalSpace X
       exact le_trans (le_abs_self _) (le_trans this (le_abs_self M))
     have hGx_ge : m ≤ (((F x)ᵀ * (F x).map star).det).re := by
       have := isMinOn_iff.mp hx₀ x hx
-      rw [hm]; exact this
+      rw [hm]
+      exact this
     rw [hd]
     generalize (((F x)ᵀ * (Y⁻¹).map Complex.ofReal * (F x).map star).det).re = D at hlo hhi ⊢
     generalize (((F x)ᵀ * (F x).map star).det).re = Gx at hlo hhi hGx_le hGx_ge
@@ -188,7 +207,9 @@ theorem subframe_det_log_growth : ∀ (g k : ℕ) (X : Type) [TopologicalSpace X
       have hone : |C| ^ k / m * r ^ k * ((C * r)⁻¹ ^ k * m) = 1 := by
         rw [abs_of_pos hC, inv_pow, mul_pow]
         field_simp
-      calc (1 : ℝ) = |C| ^ k / m * r ^ k * ((C * r)⁻¹ ^ k * m) := hone.symm
+      calc
+        (1 : ℝ)
+          = |C| ^ k / m * r ^ k * ((C * r)⁻¹ ^ k * m) := hone.symm
         _ ≤ (c⁻¹ ^ k * |M| + |C| ^ k / m + 1) * r ^ k * D := by
           apply mul_le_mul _ hDlo (mul_nonneg hpk.le hmpos.le)
           · exact mul_nonneg (by linarith) (pow_nonneg hr0.le k)

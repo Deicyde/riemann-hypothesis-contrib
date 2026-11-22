@@ -13,7 +13,6 @@ open MvPolynomial
 
 def MinimalPrimeComap.Statement : Prop :=
   ∀ (K L : Type) [Field K] [Field L] (σ : K →+* L) (ι : Type) (I : Ideal (MvPolynomial ι K)),
-    I.IsPrime → ∀ P ∈ (I.map (MvPolynomial.map σ)).minimalPrimes,
-      P.comap (MvPolynomial.map σ) = I
+    I.IsPrime → ∀ P ∈ (I.map (MvPolynomial.map σ)).minimalPrimes, P.comap (MvPolynomial.map σ) = I
 
 end GroundTheory.Heights₂.Heights

@@ -40,22 +40,32 @@ noncomputable section
 namespace GlobalTheory.HeightCounting.Blocks
 open NumberField IsDedekindDomain Polynomial Filter
 section Polar
-open GlobalTheory.CuspRep GlobalTheory.GalOfCusp GlobalTheory.ThetaPull GlobalTheory.UnitaryBC Formalism.L2.Host Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele (ideleMap continuous_ideleMap ideleMap_principalIdele continuous_adeleMap)
+open GlobalTheory.CuspRep GlobalTheory.GalOfCusp GlobalTheory.ThetaPull GlobalTheory.UnitaryBC
+  Formalism.L2.Host Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele
+  (ideleMap continuous_ideleMap ideleMap_principalIdele continuous_adeleMap)
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a : ℕ}
 end Polar
 section True
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.RowPar GlobalTheory.RowTie GlobalTheory.CuspRep GlobalTheory.WeilDeligne
-variable {hL : _root_.UpperTheory.Zero.LLC.RecTExists} (hF : GlobalTheory.Published.AutomorphicFormsFiniteGL) {D : D7} {T : WDTie D.nd D.naut}
-  (C : _root_.GlobalTheory.HeightCounting.CGTrueT hL D T)
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.RowPar GlobalTheory.RowTie
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne
+variable
+  {hL : _root_.UpperTheory.Zero.LLC.RecTExists}
+  (hF : GlobalTheory.Published.AutomorphicFormsFiniteGL)
+  {D : D7} {T : WDTie D.nd D.naut} (C : _root_.GlobalTheory.HeightCounting.CGTrueT hL D T)
 include hF C in
-theorem cuspFam_alt_alt (hG : _root_.UpperTheory.GalS.CuspUAlt) {l : ℕ} [hp : Fact l.Prime] (ι : Qbar l ≃+* ℂ) :
-    CuspFam D.naut ι := by
+theorem cuspFam_alt_alt
+    (hG : _root_.UpperTheory.GalS.CuspUAlt) {l : ℕ} [hp : Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    : CuspFam D.naut ι := by
   intro a ha π hc s hs
   have := host_isCMField D.host
-  obtain ⟨r, h1, h3⟩ := _root_.GlobalTheory.HeightCounting.Blocks.exists_rep_alt_alt hL hF hG D.nd.Om ι ha (C.e a π).1 ((C.csd a π).1 hc) s fun τ => by
-    have := hs τ
-    rwa [C.inf] at this
+  obtain ⟨r, h1, h3⟩ :=
+    _root_.GlobalTheory.HeightCounting.Blocks.exists_rep_alt_alt hL hF hG D.nd.Om ι ha (C.e a π).1
+      ((C.csd a π).1 hc) s
+      fun τ => by
+        have := hs τ
+        rwa [C.inf] at this
   have hfin : ∀ᶠ w : PlE D.host in cofinite, ((l : ℕ) : 𝓞 D.host.E) ∉ w.asIdeal := by
     have h0 : Ideal.span {((l : ℕ) : 𝓞 D.host.E)} ≠ 0 := by simpa using hp.out.ne_zero
     have hf : {v : PlE D.host | ((l : ℕ) : 𝓞 D.host.E) ∈ v.asIdeal}.Finite :=
@@ -66,7 +76,9 @@ theorem cuspFam_alt_alt (hG : _root_.UpperTheory.GalS.CuspUAlt) {l : ℕ} [hp : 
     exact (continuous_const.sub h1).matrix_det
   · filter_upwards [hfin, D.naut.locG_unr_ae π] with w hl hu B σ hB hσ z
     have hu' := (D.naut.unr_tw _ (s + (1 - (a : ℝ)) / 2)).2 hu
-    have e : T.e w (D.naut.lpTw (D.naut.locG π w) (s + (1 - (a : ℝ)) / 2)) = wdOf (D.nd.plOm.2 w) hl ι r := by
+    have e
+        : T.e w (D.naut.lpTw (D.naut.locG π w) (s + (1 - (a : ℝ)) / 2))
+          = wdOf (D.nd.plOm.2 w) hl ι r := by
       have hu2 := (T.unr w _).1 hu'
       rw [← D.naut.lpTw_add, T.tw, T.tw, C.loc] at hu2 ⊢
       exact ((h3 w hl _ _).eq_unr hu2).symm

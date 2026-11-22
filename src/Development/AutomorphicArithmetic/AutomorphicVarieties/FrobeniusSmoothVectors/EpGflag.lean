@@ -14,12 +14,16 @@ private theorem sg_sub (R : Type) [CommRing R] (i j : ZMod 2) : sg R (i - j) = s
   have key : ∀ a b : ZMod 2, (a - b).val % 2 = (a.val + b.val) % 2 := by decide
   rw [sg, sg, sg, ← pow_add, neg_one_pow_eq_pow_mod_two, key, ← neg_one_pow_eq_pow_mod_two]
 
-private theorem map_sg {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R) (j : ZMod 2) :
-    σ (sg R j) = sg R j := by simp [sg]
+private theorem map_sg
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R) (j : ZMod 2)
+    : σ (sg R j) = sg R j := by
+  simp [sg]
 
-private theorem grM_iff {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R)
-    (α β : Fin 3 → ZMod 2) (M : Matrix (Fin 3) (Fin 3) R) :
-    GrM σ α β M ↔ σ.mapMatrix M = diagonal (fun a => sg R (α a)) * M * diagonal (fun b => sg R (β b)) := by
+private theorem grM_iff
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
+    (σ : R →ₐ[O] R) (α β : Fin 3 → ZMod 2) (M : Matrix (Fin 3) (Fin 3) R)
+    : GrM σ α β M
+      ↔ σ.mapMatrix M = diagonal (fun a => sg R (α a)) * M * diagonal (fun b => sg R (β b)) := by
   unfold GrM
   rw [← Matrix.ext_iff]
   refine forall_congr' fun a => forall_congr' fun b => ?_
@@ -27,30 +31,58 @@ private theorem grM_iff {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ
   rw [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, sg_sub]
   constructor <;> intro h <;> rw [h] <;> ring
 
-private theorem diag_sq (R : Type) [CommRing R] (α : Fin 3 → ZMod 2) :
-    diagonal (fun a => sg R (α a)) * diagonal (fun a => sg R (α a)) = 1 := by
+private theorem diag_sq (R : Type) [CommRing R] (α : Fin 3 → ZMod 2)
+    : diagonal (fun a => sg R (α a)) * diagonal (fun a => sg R (α a)) = 1 := by
   rw [diagonal_mul_diagonal]
   simp only [sg_mul_self]
   exact diagonal_one
 
-private theorem map_diag {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R)
-    (α : Fin 3 → ZMod 2) :
-    σ.mapMatrix (diagonal (fun a => sg R (α a))) = diagonal (fun a => sg R (α a)) := by
+private theorem map_diag
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R) (α : Fin 3 → ZMod 2)
+    : σ.mapMatrix (diagonal (fun a => sg R (α a))) = diagonal (fun a => sg R (α a)) := by
   rw [AlgHom.mapMatrix_apply, Matrix.diagonal_map (map_zero σ)]
   simp only [map_sg]
 
-private theorem exists_sign {R : Type} [CommRing R] [IsLocalRing R] (h2 : IsUnit (2 : R)) (x : R) :
-    ∃ j : ZMod 2, IsUnit (1 + sg R j * x) := by
+private theorem exists_sign {R : Type} [CommRing R] [IsLocalRing R] (h2 : IsUnit (2 : R)) (x : R)
+    : ∃ j : ZMod 2, IsUnit (1 + sg R j * x) := by
   rcases IsLocalRing.isUnit_or_isUnit_of_isUnit_add (a := 1 + x) (b := 1 - x)
-      (by convert h2 using 1; ring) with h | h
+      (by convert h2 using 1; ring)
+    with h | h
   · refine ⟨0, ?_⟩
     simpa [sg] using h
   · refine ⟨1, ?_⟩
     rw [show sg R 1 = -1 from by rw [sg, show (1 : ZMod 2).val = 1 from rfl, pow_one]]
     simpa [sub_eq_add_neg] using h
 
-theorem UpperTheory.V.Fr.ep_gflag :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O], IsUnit (2 : O) → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R), (∀ y, σ (σ y) = y) → ∀ {H : Type} (r : H → Matrix (Fin 3) (Fin 3) R) (g : GL (Fin 3) R), (∀ s, GrM σ pq pq (r s)) → (∀ s, UpT ((g : Matrix (Fin 3) (Fin 3) R) * r s * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R))) → (∀ s i, ((g : Matrix (Fin 3) (Fin 3) R) * r s * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)) i i ∈ evp σ 0) → (∃ s, ∀ i j, i ≠ j → IsUnit (((g : Matrix (Fin 3) (Fin 3) R) * r s * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)) i i - ((g : Matrix (Fin 3) (Fin 3) R) * r s * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)) j j)) → ∃ (u : GL (Fin 3) R) (α : Fin 3 → ZMod 2), UpT (u : Matrix (Fin 3) (Fin 3) R) ∧ GrM σ α pq ((u * g : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
+theorem UpperTheory.V.Fr.ep_gflag
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O],
+      IsUnit (2 : O)
+        → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R),
+          (∀ y, σ (σ y) = y)
+            → ∀ {H : Type} (r : H → Matrix (Fin 3) (Fin 3) R) (g : GL (Fin 3) R),
+              (∀ s, GrM σ pq pq (r s))
+                → (∀ s,
+                  UpT
+                    ((g : Matrix (Fin 3) (Fin 3) R) * r s
+                      * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)))
+                → (∀ s i,
+                  ((g : Matrix (Fin 3) (Fin 3) R) * r s
+                        * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R))
+                      i i
+                    ∈ evp σ 0)
+                → (∃ s, ∀ i j,
+                  i ≠ j
+                    → IsUnit
+                      (((g : Matrix (Fin 3) (Fin 3) R) * r s
+                            * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R))
+                          i i
+                        - ((g : Matrix (Fin 3) (Fin 3) R) * r s
+                            * ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R))
+                          j j))
+                → ∃ (u : GL (Fin 3) R) (α : Fin 3 → ZMod 2),
+                  UpT (u : Matrix (Fin 3) (Fin 3) R)
+                    ∧ GrM σ α pq ((u * g : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
   intro O _ _ _ _ h2 R _ _ _ σ hσ H r g hr hT hd hs
   have h2R : IsUnit (2 : R) := by
     have := h2.map (algebraMap O R)
@@ -72,8 +104,7 @@ theorem UpperTheory.V.Fr.ep_gflag :
   have hσr : σ.mapMatrix (r s0) = P * r s0 * P := (grM_iff σ pq pq (r s0)).1 (hr s0)
   have hσGiG : σ.mapMatrix Gi * σ.mapMatrix G = 1 := by rw [← map_mul, hGiG, map_one]
   obtain ⟨h, hh⟩ : ∃ h, h = G * P * σ.mapMatrix Gi := ⟨_, rfl⟩
-  have hσh : σ.mapMatrix h = σ.mapMatrix G * P * Gi := by
-    rw [hh, map_mul, map_mul, hσP, hSS]
+  have hσh : σ.mapMatrix h = σ.mapMatrix G * P * Gi := by rw [hh, map_mul, map_mul, hσP, hSS]
   have hhσh : h * σ.mapMatrix h = 1 := by
     rw [hσh, hh]
     simp only [Matrix.mul_assoc]
@@ -128,10 +159,11 @@ theorem UpperTheory.V.Fr.ep_gflag :
     rw [hY, map_add (f := _), map_one, map_mul, hσD, Matrix.mul_add, Matrix.mul_one, Matrix.add_mul,
       Matrix.one_mul, ← Matrix.mul_assoc, hhσh, Matrix.one_mul, Matrix.mul_assoc, hDD,
       Matrix.mul_one, add_comm]
-  have hGP : h * σ.mapMatrix G = G * P := by
-    rw [hh, Matrix.mul_assoc, hσGiG, Matrix.mul_one]
+  have hGP : h * σ.mapMatrix G = G * P := by rw [hh, Matrix.mul_assoc, hσGiG, Matrix.mul_one]
   have hYih : Yi * h = D * σ.mapMatrix Yi := by
-    calc Yi * h = Yi * (h * (σ.mapMatrix Y * σ.mapMatrix Yi)) := by rw [hσYσYi, Matrix.mul_one]
+    calc
+      Yi * h
+        = Yi * (h * (σ.mapMatrix Y * σ.mapMatrix Yi)) := by rw [hσYσYi, Matrix.mul_one]
       _ = Yi * (Y * D) * σ.mapMatrix Yi := by rw [← hYeq]; simp only [Matrix.mul_assoc]
       _ = D * σ.mapMatrix Yi := by rw [← Matrix.mul_assoc Yi Y, hYiY, Matrix.one_mul]
   refine ⟨hYu.unit⁻¹, α, hUYi, ?_⟩

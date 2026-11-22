@@ -9,31 +9,35 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.QuadraticFiel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Host GlobalTheory.NT GlobalTheory.Published GlobalTheory.Mem GlobalTheory.Mem.Fld
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Host GlobalTheory.NT
+  GlobalTheory.Published GlobalTheory.Mem GlobalTheory.Mem.Fld
 open scoped nonZeroDivisors IntermediateField
 
 namespace GlobalTheory.Mem.Fld
 
-theorem IsRayField.isRayFieldIn_restrictScalars {K : IntermediateField ℚ ℂ} [NumberField K]
-    {M : IntermediateField K ℂ} [hM : NumberField M] {𝔮 : Ideal (𝓞 K)} (h : IsRayField K M 𝔮) :
-    IsRayFieldIn (K.val : K →+* ℂ) 𝔮 (M.restrictScalars ℚ) := by
+theorem IsRayField.isRayFieldIn_restrictScalars
+    {K : IntermediateField ℚ ℂ} [NumberField K]
+    {M : IntermediateField K ℂ} [hM : NumberField M]
+    {𝔮 : Ideal (𝓞 K)} (h : IsRayField K M 𝔮)
+    : IsRayFieldIn (K.val : K →+* ℂ) 𝔮 (M.restrictScalars ℚ) := by
   have hmem : ∀ x : K, (K.val : K →+* ℂ) x ∈ M.restrictScalars ℚ := fun x => by
     rw [IntermediateField.mem_restrictScalars]
     exact M.algebraMap_mem x
   have : NumberField (M.restrictScalars ℚ) := hM
   refine ⟨hmem, inferInstance, ?_⟩
   letI := algOf (K.val : K →+* ℂ) (M.restrictScalars ℚ) hmem
-  exact h.of_algEquiv
-    { toFun := fun y => ⟨y.1, y.2⟩
-      invFun := fun y => ⟨y.1, y.2⟩
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl
-      map_mul' := fun _ _ => rfl
-      map_add' := fun _ _ => rfl
-      commutes' := fun _ => rfl }
+  exact h.of_algEquiv {
+    toFun := fun y => ⟨y.1, y.2⟩
+    invFun := fun y => ⟨y.1, y.2⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+    map_mul' := fun _ _ => rfl
+    map_add' := fun _ _ => rfl
+    commutes' := fun _ => rfl
+  }
 
-theorem adjoin_weberSet_one (K : Type) [Field K] [CharZero K] [Algebra K ℂ] (L : PeriodPair) :
-    IntermediateField.adjoin K (FieldSize.weberSet L 1) = K⟮(latticeCurve L).j⟯ := by
+theorem adjoin_weberSet_one (K : Type) [Field K] [CharZero K] [Algebra K ℂ] (L : PeriodPair)
+    : IntermediateField.adjoin K (FieldSize.weberSet L 1) = K⟮(latticeCurve L).j⟯ := by
   have hset : FieldSize.weberSet L 1 = {L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)} := by
     ext w
     simp only [FieldSize.weberSet, Nat.cast_one, div_one, Set.mem_insert_iff, Set.mem_ofPred_eq,
@@ -50,8 +54,7 @@ theorem adjoin_weberSet_one (K : Type) [Field K] [CharZero K] [Algebra K ℂ] (L
       latticeCurve_Δ]
     field_simp
     ring
-  have h1728 : ∀ S : IntermediateField K ℂ, (1728 : ℂ) ∈ S := fun S => by
-    simp
+  have h1728 : ∀ S : IntermediateField K ℂ, (1728 : ℂ) ∈ S := fun S => by simp
   rw [hset, hj]
   set w := L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)
   apply le_antisymm
@@ -63,10 +66,14 @@ theorem adjoin_weberSet_one (K : Type) [Field K] [CharZero K] [Algebra K ℂ] (L
   · rw [IntermediateField.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
     exact mul_mem (h1728 _) (IntermediateField.mem_adjoin_simple_self K _)
 
-theorem isRayFieldIn_hilbertField : WeberRayFieldSt → ∀ (d : ℕ) (F : IntermediateField ℚ ℂ) (A : WeierstrassCurve F),
-    d.Prime → d % 4 = 3 → 3 < d → IsGoodCMCurve d F A → ∃ _ : NumberField ℚ⟮sqrtNegNat d⟯,
-      discr ℚ⟮sqrtNegNat d⟯ = -(d : ℤ) ∧ Module.finrank ℚ ℚ⟮sqrtNegNat d⟯ = 2 ∧
-        IsRayFieldIn (ℚ⟮sqrtNegNat d⟯.val : ℚ⟮sqrtNegNat d⟯ →+* ℂ) ⊤ (hilbertField d F) := by
+theorem isRayFieldIn_hilbertField
+    : WeberRayFieldSt
+      → ∀ (d : ℕ) (F : IntermediateField ℚ ℂ) (A : WeierstrassCurve F),
+        d.Prime → d % 4 = 3 → 3 < d → IsGoodCMCurve d F A
+          → ∃ _ : NumberField ℚ⟮sqrtNegNat d⟯,
+            discr ℚ⟮sqrtNegNat d⟯ = -(d : ℤ) ∧ Module.finrank ℚ ℚ⟮sqrtNegNat d⟯ = 2
+              ∧ IsRayFieldIn (ℚ⟮sqrtNegNat d⟯.val : ℚ⟮sqrtNegNat d⟯ →+* ℂ) ⊤
+                (hilbertField d F) := by
   intro hW d F A hd h4 h3 hG
   set x := sqrtNegNat d with hxdef
   have hx : x ^ 2 = -(d : ℂ) := sqrtNegNat_sq d
@@ -101,13 +108,13 @@ theorem isRayFieldIn_hilbertField : WeberRayFieldSt → ∀ (d : ℕ) (F : Inter
         (isIntegral_algHom_iff ((ℚ⟮x⟯).val.toRingHom.toIntAlgHom) Subtype.val_injective).1 hzi
       exact ⟨⟨⟨z, hz⟩, hi⟩, rfl⟩
     · rintro ⟨a, rfl⟩
-      exact ⟨(a : ℚ⟮x⟯).2,
-        (RingOfIntegers.isIntegral_coe a).map ((ℚ⟮x⟯).val.toRingHom.toIntAlgHom)⟩
+      exact ⟨(a : ℚ⟮x⟯).2, (RingOfIntegers.isIntegral_coe a).map ((ℚ⟮x⟯).val.toRingHom.toIntAlgHom)⟩
   have hdlt : discr ℚ⟮x⟯ < -4 := by rw [hdisc]; omega
   obtain ⟨_, hAb, hRay⟩ := hW ℚ⟮x⟯ hfin hdlt L hlat 1 one_pos
   have hone : Ideal.span {((1 : ℕ) : 𝓞 ℚ⟮x⟯)} = ⊤ := by simp
   rw [hone] at hRay
-  have hRF : IsRayField ℚ⟮x⟯ (IntermediateField.adjoin ℚ⟮x⟯ (FieldSize.weberSet L 1)) ⊤ := ⟨hAb, hRay⟩
+  have hRF : IsRayField ℚ⟮x⟯ (IntermediateField.adjoin ℚ⟮x⟯ (FieldSize.weberSet L 1)) ⊤ :=
+    ⟨hAb, hRay⟩
   refine ⟨hNF, hdisc, hfin, ?_⟩
   have hIn := hRF.isRayFieldIn_restrictScalars
   rw [adjoin_weberSet_one] at hIn

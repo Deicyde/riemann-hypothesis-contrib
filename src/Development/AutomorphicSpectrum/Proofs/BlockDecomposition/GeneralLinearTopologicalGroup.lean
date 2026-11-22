@@ -15,9 +15,10 @@ variable {M : Type} [TopologicalSpace M] [Monoid M] [ContinuousMul M] [T2Space M
 
 theorem isClosedEmbedding_embedProduct : IsClosedEmbedding (Units.embedProduct M) := by
   refine ⟨Units.isEmbedding_embedProduct, ?_⟩
-  have hr : Set.range (Units.embedProduct M) =
-      {p : M × Mᵐᵒᵖ | p.1 * MulOpposite.unop p.2 = 1} ∩
-        {p : M × Mᵐᵒᵖ | MulOpposite.unop p.2 * p.1 = 1} := by
+  have hr
+      : Set.range (Units.embedProduct M)
+        = {p : M × Mᵐᵒᵖ | p.1 * MulOpposite.unop p.2 = 1}
+          ∩ {p : M × Mᵐᵒᵖ | MulOpposite.unop p.2 * p.1 = 1} := by
     ext ⟨x, y⟩
     constructor
     · rintro ⟨u, hu⟩
@@ -37,7 +38,8 @@ end Units
 
 section Mat
 
-variable (R : Type) [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
+variable
+  (R : Type) [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
   (ι : Type) [Fintype ι] [DecidableEq ι]
 
 theorem generalLinear_t2Space [T2Space R] : T2Space (GL ι R) :=
@@ -49,8 +51,8 @@ theorem gl_locallyCompact [T2Space R] [LocallyCompactSpace R] : LocallyCompactSp
     (MulOpposite.opHomeomorph (M := Matrix ι ι R)).symm.isClosedEmbedding.locallyCompactSpace
   exact (isClosedEmbedding_embedProduct (M := Matrix ι ι R)).locallyCompactSpace
 
-theorem gl_secondCountable [T2Space R] [SecondCountableTopology R] :
-    SecondCountableTopology (GL ι R) := by
+theorem gl_secondCountable [T2Space R] [SecondCountableTopology R]
+    : SecondCountableTopology (GL ι R) := by
   have : SecondCountableTopology (Matrix ι ι R) :=
     inferInstanceAs (SecondCountableTopology (ι → ι → R))
   have : SecondCountableTopology (Matrix ι ι R)ᵐᵒᵖ :=
@@ -61,10 +63,12 @@ end Mat
 
 open PositivityTheory.RgEis
 
-theorem isClosed_uSub {E R : Type} [Field E] [CommRing R] [TopologicalSpace R]
-    [IsTopologicalRing R] [T2Space R] (A : Ad E R) (hσ : Continuous A.σ) (ε : ℤˣ)
-    (ι : Type) [Fintype ι] [DecidableEq ι] :
-    IsClosed (A.uSub ε ι : Set (GL (ι ⊕ ι) R)) := by
+theorem isClosed_uSub
+    {E R : Type} [Field E] [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [T2Space R]
+    (A : Ad E R) (hσ : Continuous A.σ)
+    (ε : ℤˣ)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    : IsClosed (A.uSub ε ι : Set (GL (ι ⊕ ι) R)) := by
   have hv : Continuous fun g : GL (ι ⊕ ι) R => (g : Matrix (ι ⊕ ι) (ι ⊕ ι) R) :=
     Units.continuous_val
   have hm : Continuous fun g : GL (ι ⊕ ι) R => (g : Matrix (ι ⊕ ι) (ι ⊕ ι) R).map A.σ :=
@@ -79,8 +83,15 @@ theorem grpTop : PositivityTheory.RgEis.GrpTop := by
   have := generalLinear_t2Space R (ι ⊕ ι)
   have := gl_locallyCompact R (ι ⊕ ι)
   have := gl_secondCountable R (ι ⊕ ι)
-  refine ⟨generalLinear_t2Space R ι, gl_locallyCompact R ι, gl_secondCountable R ι, hce.isEmbedding.t2Space,
-    hce.locallyCompactSpace, hce.isEmbedding.secondCountableTopology, ?_⟩
+  refine ⟨
+    generalLinear_t2Space R ι,
+    gl_locallyCompact R ι,
+    gl_secondCountable R ι,
+    hce.isEmbedding.t2Space,
+    hce.locallyCompactSpace,
+    hce.isEmbedding.secondCountableTopology,
+    ?_
+  ⟩
   exact hce.isCompact_preimage (hA.toGoodL.kcpt (ι ⊕ ι))
 
 end GlobalTheory.CompanionTheory.RgEisTop

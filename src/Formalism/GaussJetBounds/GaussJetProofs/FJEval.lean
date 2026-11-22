@@ -45,8 +45,11 @@ end Eval
 
 section Maps
 
-variable {F K : Type} [NormedField F] [CharZero F] [NormedField K] [CharZero K] (φ : F →+* K)
-  {d N0 N1 : ℕ} [NeZero d] {ι : Type} [Fintype ι]
+variable
+  {F K : Type} [NormedField F] [CharZero F] [NormedField K] [CharZero K]
+  (φ : F →+* K)
+  {d N0 N1 : ℕ} [NeZero d]
+  {ι : Type} [Fintype ι]
 
 lemma constantCoeff_linSub (M : ZV d N0 N1 → ι → K) (z : ZV d N0 N1) :
     MvPowerSeries.constantCoeff (linSub M z) = 0 := by

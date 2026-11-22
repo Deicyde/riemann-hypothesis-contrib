@@ -9,7 +9,10 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocCl
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -267,11 +270,12 @@ lemma half {s : S.V ≃ₗ[E] S.V} (hi : s ∈ Formalism.HermitianLatticesTheory
   exact hs.sub_comb _ ⟨c, rfl⟩
 
 def Fix (F : FlagG S r T) (F' : FlagG S r T') (h : S.V ≃ₗ[E] S.V) : Prop :=
-  h ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ a, h (F.fvec a) = F.fvec a) ∧ ∀ a, h (F'.fvec a) = F'.fvec a
+  h ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ a, h (F.fvec a) = F.fvec a)
+    ∧ ∀ a, h (F'.fvec a) = F'.fvec a
 
 def Unip (F : FlagG S r T) (n : S.V ≃ₗ[E] S.V) : Prop :=
-  n ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ j : ℕ, ∀ x ∈ F.Xa (j + 1), n x - x ∈ F.Xa j) ∧
-    ∀ x ∈ orth S F.X, n x - x ∈ F.X
+  n ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ j : ℕ, ∀ x ∈ F.Xa (j + 1), n x - x ∈ F.Xa j)
+    ∧ ∀ x ∈ orth S F.X, n x - x ∈ F.X
 
 lemma mem_orth (U : Submodule E S.V) (x : S.V) : x ∈ orth S U ↔ ∀ u ∈ U, S.hT u x = 0 := by
   simp [orth, Submodule.mem_iInf]
@@ -306,9 +310,11 @@ lemma unip_of {s h : S.V ≃ₗ[E] S.V} (hi : s ∈ Formalism.HermitianLatticesT
     rw [LinearEquiv.mul_apply, map_add (f := _), map_add (f := _), hM' _ h4, h5, add_sub_add_right_eq_sub]
     exact h3
 
-theorem inter_gen (F : FlagG S r T) (F' : FlagG S r T') (hD : (Zhat F F').det ≠ 0) (hG : Gflag F F' ≠ 0)
-    (s : S.V ≃ₗ[E] S.V) (hi : s ∈ Formalism.HermitianLatticesTheory.isom S.hT) (hs : Stab s F) (hs' : Stab s F') :
-    ∃! h, Fix F F' h ∧ Unip F (h⁻¹ * s) ∧ Unip F' (h⁻¹ * s) := by
+theorem inter_gen
+    (F : FlagG S r T) (F' : FlagG S r T') (hD : (Zhat F F').det ≠ 0) (hG : Gflag F F' ≠ 0)
+    (s : S.V ≃ₗ[E] S.V)
+    (hi : s ∈ Formalism.HermitianLatticesTheory.isom S.hT) (hs : Stab s F) (hs' : Stab s F')
+    : ∃! h, Fix F F' h ∧ Unip F (h⁻¹ * s) ∧ Unip F' (h⁻¹ * s) := by
   have hc := isCompl_MW F F' hD hG
   have hD' : (Zhat F' F).det ≠ 0 := by
     rw [zhat_swap F F', Matrix.det_conjTranspose]; exact star_ne_zero.mpr hD
@@ -328,17 +334,29 @@ theorem inter_gen (F : FlagG S r T) (F' : FlagG S r T') (hD : (Zhat F F').det �
     intro x y
     obtain ⟨m, hm, w, hw, rfl⟩ := hdec x
     obtain ⟨m', hm', w', hw', rfl⟩ := hdec y
-    simp only [map_add (f := _), LinearMap.add_apply, h0M _ hm, h0M _ hm', h0W _ hw, h0W _ hw', hi w w',
-      hMW _ hw' _ hm, hMW _ (hsW _ hw') _ hm, hWM _ hw _ hm', hWM _ (hsW _ hw) _ hm']
+    simp only [map_add (f := _), LinearMap.add_apply, h0M _ hm, h0M _ hm', h0W _ hw, h0W _ hw',
+      hi w w', hMW _ hw' _ hm, hMW _ (hsW _ hw') _ hm, hWM _ hw _ hm', hWM _ (hsW _ hw) _ hm']
   have hinj : Function.Injective h0 := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro x hx
     refine S.nondeg.1 x fun y => ?_
-    rw [← hiso, hx]; simp
+    rw [← hiso, hx]
+    simp
   let h : S.V ≃ₗ[E] S.V := LinearEquiv.ofInjectiveEndo h0 hinj
   have hh : h ∈ Formalism.HermitianLatticesTheory.isom S.hT := hiso
-  refine ⟨h, ⟨⟨hh, fun a => h0M _ (range_le_M F F' (fvec_mem F a)),
-    fun a => h0M _ (range_le_M' F F' (fvec_mem F' a))⟩, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    h,
+    ⟨
+      ⟨
+        hh,
+        fun a => h0M _ (range_le_M F F' (fvec_mem F a)),
+        fun a => h0M _ (range_le_M' F F' (fvec_mem F' a))
+      ⟩,
+      ?_,
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · refine unip_of hi hh hs _ _ hc hXM h0M h0W hMW ?_
     rintro _ ⟨⟨c, c'⟩, rfl⟩ ho
     exact half hi hD hs hs' c c' ho
@@ -352,7 +370,9 @@ theorem inter_gen (F : FlagG S r T) (F' : FlagG S r T') (hD : (Zhat F F').det �
     have hgM : ∀ m ∈ Msp F F', g⁻¹ m = m := fun m hm => by
       rw [LinearEquiv.coe_inv, LinearEquiv.symm_apply_eq, hg.onM m hm]
     have h1 : g⁻¹ (s w) ∈ Wsp F F' :=
-      mapsTo_twoFlagFramesOrthogonal_of_isometry (inv_mem hg.1) (fun m hm => by rw [hgM m hm]; exact hm) _ (hsW w hw)
+      mapsTo_twoFlagFramesOrthogonal_of_isometry (inv_mem hg.1)
+        (fun m hm => by rw [hgM m hm]; exact hm)
+        _ (hsW w hw)
     have h2 : g⁻¹ (s w) - w ∈ F.X := hn.2.2 w ((mem_orth _ _).mpr fun u hu => hMW w hw u (hXM hu))
     have h3 : g⁻¹ (s w) - w = 0 := Submodule.disjoint_def.mp hc.disjoint _ (hXM h2) (sub_mem h1 hw)
     rw [sub_eq_zero, LinearEquiv.coe_inv, LinearEquiv.symm_apply_eq] at h3
@@ -367,8 +387,18 @@ lemma det_ne_of_om {Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (h : (ZhatOM Z).de
 
 end Gen
 
-theorem common_stabiliser : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (w : Point D.host.E (D.R.rS + 1)), ZhatOM (ZhatL F F') = ptMat w → Gval F F' ≠ 0 → ∀ s, Adapt s F F → Adapt s F' F' → ∃! h, h ∈ H0 F F' ∧ h⁻¹ * s ∈ NRat F ∧ h⁻¹ * s ∈ NRat F' := by
+theorem common_stabiliser
+    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
+      ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
+          (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+          (w : Point D.host.E (D.R.rS + 1)),
+        ZhatOM (ZhatL F F') = ptMat w → Gval F F' ≠ 0
+          → ∀ s,
+            Adapt s F F → Adapt s F' F'
+              → ∃! h, h ∈ H0 F F' ∧ h⁻¹ * s ∈ NRat F ∧ h⁻¹ * s ∈ NRat F' := by
   intro D X Y u u' F F' w hZ hG s hs hs'
-  exact inter_gen F.fl F'.fl (det_ne_of_om (by rw [hZ]; exact Formalism.L2.SG.Pf.StabilizerIndexVolumes.ptMat_det w)) hG s hs.1 hs.2 hs'.2
+  exact inter_gen F.fl F'.fl
+    (det_ne_of_om (by rw [hZ]; exact Formalism.L2.SG.Pf.StabilizerIndexVolumes.ptMat_det w)) hG s
+    hs.1 hs.2 hs'.2
 
 end GlobalTheory.Unfold.Inter

@@ -8,10 +8,11 @@ namespace GlobalTheory.MinkowskiLinearForms
 
 open MeasureTheory
 
-theorem minkowski_linear_forms {ι : Type} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ)
-    (hA : Matrix.det A ≠ (0 : ℝ)) {t : ℝ} (ht : (0 : ℝ) < t)
-    (hlt : |Matrix.det A| < t ^ Fintype.card ι) :
-    ∃ (z : ι → ℤ), z ≠ (0 : ι → ℤ) ∧ ∀ (j : ι), |∑ i : ι, (↑(z i) : ℝ) * A i j| < t := by
+theorem minkowski_linear_forms
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (hA : Matrix.det A ≠ (0 : ℝ))
+    {t : ℝ} (ht : (0 : ℝ) < t) (hlt : |Matrix.det A| < t ^ Fintype.card ι)
+    : ∃ (z : ι → ℤ), z ≠ (0 : ι → ℤ) ∧ ∀ (j : ι), |∑ i : ι, (↑(z i) : ℝ) * A i j| < t := by
   classical
   have hli : LinearIndependent ℝ (fun i => A i) := Matrix.linearIndependent_rows_of_det_ne_zero hA
   let b : Module.Basis ι ℝ (ι → ℝ) := basisOfPiSpaceOfLinearIndependent hli
@@ -40,11 +41,12 @@ theorem minkowski_linear_forms {ι : Type} [Fintype ι] [DecidableEq ι] (A : Ma
       rw [ENNReal.ofReal_pow (by norm_num)]; simp]
     rw [← ENNReal.ofReal_mul (abs_nonneg _)]
     rw [ENNReal.ofReal_lt_ofReal_iff (by positivity)]
-    rw [mul_pow, mul_comm ((2:ℝ) ^ _)]
+    rw [mul_pow, mul_comm ((2 : ℝ) ^ _)]
     exact mul_lt_mul_of_pos_right hlt (by positivity)
   haveI hcount : Countable (Submodule.span ℤ (Set.range b)) := inferInstance
   haveI : Countable L := hcount
-  obtain ⟨x, hx0, hxs⟩ := exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure hF hsymm hconv hlt'
+  obtain ⟨x, hx0, hxs⟩ :=
+    exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure hF hsymm hconv hlt'
   have hxmem : (x : ι → ℝ) ∈ Submodule.span ℤ (Set.range b) := x.2
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp hxmem
   refine ⟨c, ?_, ?_⟩

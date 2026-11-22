@@ -11,7 +11,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory.QLog.Conv
 
@@ -19,35 +21,39 @@ section SlopeTestRemainingChoices
 
 variable {O E : Type} [CommRing O] [CommRing E] [Algebra O E] {d : ℕ}
 
-theorem exists_lim {p : ℕ} (h : IsFrame p E (RingHom.id O)) (a : ℕ → O) :
-    ∃ L : O, ∀ N : ℕ, ∃ c : O,
-      L = ∑ n ∈ Finset.range N, (p : O) ^ n * a n + (p : O) ^ N * c := by
-  obtain ⟨L, hL⟩ := h.complete.toIsPrecomplete.prec
-    (f := fun N => ∑ n ∈ Finset.range N, (p : O) ^ n * a n) (by
+theorem exists_lim {p : ℕ} (h : IsFrame p E (RingHom.id O)) (a : ℕ → O)
+    : ∃ L : O, ∀ N : ℕ, ∃ c : O, L = ∑ n ∈ Finset.range N, (p : O) ^ n * a n + (p : O) ^ N * c := by
+  obtain ⟨L, hL⟩ :=
+    h.complete.toIsPrecomplete.prec (f := fun N => ∑ n ∈ Finset.range N, (p : O) ^ n * a n) (by
       intro m n hmn
       rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
         Ideal.mem_span_singleton, ← Finset.sum_range_add_sum_Ico _ hmn, sub_add_cancel_left]
-      exact dvd_neg.2 (Finset.dvd_sum fun k hk => dvd_mul_of_dvd_left
-        (pow_dvd_pow _ (Finset.mem_Ico.1 hk).1) _))
+      exact dvd_neg.2 (Finset.dvd_sum fun k hk =>
+        dvd_mul_of_dvd_left (pow_dvd_pow _ (Finset.mem_Ico.1 hk).1) _))
   refine ⟨L, fun N => ?_⟩
-  have hN : (∑ n ∈ Finset.range N, (p : O) ^ n * a n) ≡ L
-      [SMOD (Ideal.span {(p : O)}) ^ N • (⊤ : Submodule O O)] := hL N
+  have hN
+      : (∑ n ∈ Finset.range N, (p : O) ^ n * a n) ≡ L
+        [SMOD (Ideal.span {(p : O)}) ^ N • (⊤ : Submodule O O)] :=
+    hL N
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton] at hN
+      Ideal.mem_span_singleton]
+    at hN
   obtain ⟨c, hc⟩ := hN
   exact ⟨-c, by linear_combination -hc⟩
 
-theorem eq_zero_of_forall {p : ℕ} (h : IsFrame p E (RingHom.id O)) {x : E}
-    (hx : ∀ N : ℕ, ∃ b : O, x = algebraMap O E ((p : O) ^ N * b)) : x = 0 := by
+theorem eq_zero_of_forall
+    {p : ℕ} (h : IsFrame p E (RingHom.id O))
+    {x : E} (hx : ∀ N : ℕ, ∃ b : O, x = algebraMap O E ((p : O) ^ N * b))
+    : x = 0 := by
   obtain ⟨b, hb⟩ := hx 0
-  have h0 : (p : O) ^ 0 * b = 0 := h.eq_zero_of_forall_pow_dvd fun N => by
-    obtain ⟨c, hc⟩ := hx N
-    exact ⟨c, h.inj (hb.symm.trans hc)⟩
+  have h0 : (p : O) ^ 0 * b = 0 :=
+    h.eq_zero_of_forall_pow_dvd fun N => by
+      obtain ⟨c, hc⟩ := hx N
+      exact ⟨c, h.inj (hb.symm.trans hc)⟩
   rw [hb, h0, map_zero]
 
-theorem comb_add_mul {ι : Type} [Fintype ι] (x y : ι → O) (c : O)
-    (e : ι → MvPowerSeries (Fin d) E) :
-    comb (fun i => x i + c * y i) e = comb x e + algebraMap O E c • comb y e := by
+theorem comb_add_mul {ι : Type} [Fintype ι] (x y : ι → O) (c : O) (e : ι → MvPowerSeries (Fin d) E)
+    : comb (fun i => x i + c * y i) e = comb x e + algebraMap O E c • comb y e := by
   unfold comb
   simp only [map_add (f := _), map_mul, add_smul, mul_smul, Finset.sum_add_distrib, Finset.smul_sum]
 
@@ -56,8 +62,8 @@ def IntD (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (g : MvPowerSeries (
 
 variable {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O}
 
-theorem up_const (hμ : ∀ i, constantCoeff (μ i) = 0) (i : Fin d) :
-    constantCoeff (up E μ i) = 0 := by
+theorem up_const (hμ : ∀ i, constantCoeff (μ i) = 0) (i : Fin d)
+    : constantCoeff (up E μ i) = 0 := by
   simp [up, hμ]
 
 theorem IntD.ofQL {g : MvPowerSeries (Fin d) E} (hg : QL μ ⊤ g) : IntD μ g :=
@@ -68,8 +74,10 @@ theorem IntD.zero (hμ : ∀ i, constantCoeff (μ i) = 0) : IntD μ (0 : MvPower
     simpa using formalCoboundary_smul (up_const hμ) (0 : E) (0 : MvPowerSeries (Fin d) E)
   refine ⟨fun i => ⟨0, by simp [lin]⟩, fun α => ⟨0, trivial, by simp [h0]⟩⟩
 
-theorem IntD.add (hμ : ∀ i, constantCoeff (μ i) = 0) {g g' : MvPowerSeries (Fin d) E}
-    (hg : IntD μ g) (hg' : IntD μ g') : IntD μ (g + g') := by
+theorem IntD.add
+    (hμ : ∀ i, constantCoeff (μ i) = 0)
+    {g g' : MvPowerSeries (Fin d) E} (hg : IntD μ g) (hg' : IntD μ g')
+    : IntD μ (g + g') := by
   refine ⟨fun i => ?_, fun α => ?_⟩
   · obtain ⟨b, hb⟩ := hg.1 i
     obtain ⟨b', hb'⟩ := hg'.1 i
@@ -78,10 +86,15 @@ theorem IntD.add (hμ : ∀ i, constantCoeff (μ i) = 0) {g g' : MvPowerSeries (
     rw [hb, hb']
   · obtain ⟨b, -, hb⟩ := hg.2 α
     obtain ⟨b', -, hb'⟩ := hg'.2 α
-    exact ⟨b + b', trivial, by rw [formalCoboundary_add (up_const hμ), map_add (f := _), hb, hb', map_add (f := _)]⟩
+    exact ⟨
+      b + b',
+      trivial,
+      by rw [formalCoboundary_add (up_const hμ), map_add (f := _), hb, hb', map_add (f := _)]
+    ⟩
 
-theorem IntD.smul (hμ : ∀ i, constantCoeff (μ i) = 0) (c : O) {g : MvPowerSeries (Fin d) E}
-    (hg : IntD μ g) : IntD μ (algebraMap O E c • g) := by
+theorem IntD.smul
+    (hμ : ∀ i, constantCoeff (μ i) = 0) (c : O) {g : MvPowerSeries (Fin d) E} (hg : IntD μ g)
+    : IntD μ (algebraMap O E c • g) := by
   refine ⟨fun i => ?_, fun α => ?_⟩
   · obtain ⟨b, hb⟩ := hg.1 i
     refine ⟨c * b, ?_⟩
@@ -90,29 +103,49 @@ theorem IntD.smul (hμ : ∀ i, constantCoeff (μ i) = 0) (c : O) {g : MvPowerSe
   · obtain ⟨b, -, hb⟩ := hg.2 α
     exact ⟨c * b, trivial, by rw [formalCoboundary_smul (up_const hμ), coeff_smul, hb, map_mul]⟩
 
-theorem IntD.sub (hμ : ∀ i, constantCoeff (μ i) = 0) {g g' : MvPowerSeries (Fin d) E}
-    (hg : IntD μ g) (hg' : IntD μ g') : IntD μ (g - g') := by
+theorem IntD.sub
+    (hμ : ∀ i, constantCoeff (μ i) = 0)
+    {g g' : MvPowerSeries (Fin d) E} (hg : IntD μ g) (hg' : IntD μ g')
+    : IntD μ (g - g') := by
   have : g - g' = g + algebraMap O E (-1) • g' := by
     rw [map_neg, map_one, neg_one_smul, sub_eq_add_neg]
   rw [this]
   exact hg.add hμ (hg'.smul hμ _)
 
-theorem IntD.comb (hμ : ∀ i, constantCoeff (μ i) = 0) {ι : Type} [Fintype ι] (b : ι → O)
-    {e : ι → MvPowerSeries (Fin d) E} (he : ∀ i, IntD μ (e i)) : IntD μ (comb b e) :=
-  Finset.sum_induction _ (IntD μ) (fun _ _ h1 h2 => h1.add hμ h2) (IntD.zero hμ)
+theorem IntD.comb
+    (hμ : ∀ i, constantCoeff (μ i) = 0)
+    {ι : Type} [Fintype ι]
+    (b : ι → O)
+    {e : ι → MvPowerSeries (Fin d) E} (he : ∀ i, IntD μ (e i))
+    : IntD μ (comb b e) :=
+  Finset.sum_induction _ (IntD μ)
+    (fun _ _ h1 h2 => h1.add hμ h2)
+    (IntD.zero hμ)
     fun i _ => (he i).smul hμ (b i)
 
-theorem IntD.map (hμ : ∀ i, constantCoeff (μ i) = 0) (s : MvPowerSeries (Fin d) O) :
-    IntD μ (MvPowerSeries.map (algebraMap O E) s) := by
+theorem IntD.map (hμ : ∀ i, constantCoeff (μ i) = 0) (s : MvPowerSeries (Fin d) O)
+    : IntD μ (MvPowerSeries.map (algebraMap O E) s) := by
   refine ⟨fun i => ⟨coeff (Finsupp.single i 1) s, by simp [lin, coeff_map]⟩, ?_⟩
   have := ((map_cob_swap_pull O d μ hμ E (algebraMap O E)).1 s).symm
-  rw [show cob1 (up E μ) (MvPowerSeries.map (algebraMap O E) s) =
-      MvPowerSeries.map (algebraMap O E) (cob1 μ s) from this]
+  rw [show cob1 (up E μ) (MvPowerSeries.map (algebraMap O E) s)
+      = MvPowerSeries.map (algebraMap O E) (cob1 μ s) from
+    this]
   exact In.top_iff.2 ⟨_, rfl⟩
 
 end SlopeTestRemainingChoices
 
-theorem generate_of_step : ∀ (p : ℕ) [Fact p.Prime] (O E : Type) [CommRing O] [CommRing E] [Algebra O E], IsFrame p E (RingHom.id O) → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O), IsLaw μ → ∀ (ι : Type) [Fintype ι] (e : ι → MvPowerSeries (Fin d) E), (∀ i, QL μ ⊤ (e i)) → (∀ f, QL μ ⊤ f → ∃ (b : ι → O) (s : MvPowerSeries (Fin d) O) (f₁ : MvPowerSeries (Fin d) E), QL μ ⊤ f₁ ∧ f = comb b e + map (algebraMap O E) s + (p : E) • f₁) → ∀ f, QL μ ⊤ f → ∃ b : ι → O, In (⊤ : Ideal O) (f - comb b e) := by
+theorem generate_of_step
+    : ∀ (p : ℕ) [Fact p.Prime] (O E : Type) [CommRing O] [CommRing E] [Algebra O E],
+      IsFrame p E (RingHom.id O)
+        → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O),
+          IsLaw μ
+            → ∀ (ι : Type) [Fintype ι] (e : ι → MvPowerSeries (Fin d) E),
+              (∀ i, QL μ ⊤ (e i))
+                → (∀ f,
+                  QL μ ⊤ f
+                    → ∃ (b : ι → O) (s : MvPowerSeries (Fin d) O) (f₁ : MvPowerSeries (Fin d) E),
+                      QL μ ⊤ f₁ ∧ f = comb b e + map (algebraMap O E) s + (p : E) • f₁)
+                → ∀ f, QL μ ⊤ f → ∃ b : ι → O, In (⊤ : Ideal O) (f - comb b e) := by
   intro p _ O E _ _ _ h d μ hμ ι _ e he H f hf
   have hc := hμ.const
   choose! bf sf ff hQ hff using H
@@ -123,12 +156,18 @@ theorem generate_of_step : ∀ (p : ℕ) [Fact p.Prime] (O E : Type) [CommRing O
     induction n with
     | zero => rw [hF0]; exact hf
     | succ n ih => rw [hFs]; exact hQ _ ih
-  have step : ∀ n, F n = comb (bf (F n)) e + map (algebraMap O E) (sf (F n)) + (p : E) • F (n + 1) :=
-    fun n => by rw [hFs]; exact hff _ (hFQ n)
+  have step
+      : ∀ n,
+        F n
+          = comb (bf (F n)) e + map (algebraMap O E) (sf (F n)) + (p : E) • F (n + 1) := fun n => by
+    rw [hFs]; exact hff _ (hFQ n)
   have hpE : ∀ N : ℕ, (p : E) ^ N = algebraMap O E ((p : O) ^ N) := fun N => by
     rw [map_pow, map_natCast]
-  have tele : ∀ N : ℕ, f = comb (fun i => ∑ n ∈ Finset.range N, (p : O) ^ n * bf (F n) i) e +
-      ∑ n ∈ Finset.range N, (p : E) ^ n • map (algebraMap O E) (sf (F n)) + (p : E) ^ N • F N := by
+  have tele
+      : ∀ N : ℕ,
+        f = comb (fun i => ∑ n ∈ Finset.range N, (p : O) ^ n * bf (F n) i) e
+          + ∑ n ∈ Finset.range N, (p : E) ^ n • map (algebraMap O E) (sf (F n))
+          + (p : E) ^ N • F N := by
     intro N
     induction N with
     | zero =>
@@ -143,8 +182,8 @@ theorem generate_of_step : ∀ (p : ℕ) [Fact p.Prime] (O E : Type) [CommRing O
   choose Bv hB using fun i => exists_lim h (fun n => bf (F n) i)
   choose Sc hS using fun α => exists_lim h (fun n => coeff α (sf (F n)))
   obtain ⟨S, hSd⟩ : ∃ S : MvPowerSeries (Fin d) O, ∀ α, coeff α S = Sc α := ⟨Sc, fun _ => rfl⟩
-  have key : ∀ N : ℕ, ∃ g, Conv.IntD μ g ∧
-      f - comb Bv e - map (algebraMap O E) S = (p : E) ^ N • g := by
+  have key
+      : ∀ N : ℕ, ∃ g, Conv.IntD μ g ∧ f - comb Bv e - map (algebraMap O E) S = (p : E) ^ N • g := by
     intro N
     choose cB hcB using fun i => hB i N
     choose cS hcS using fun α => hS α N
@@ -152,20 +191,24 @@ theorem generate_of_step : ∀ (p : ℕ) [Fact p.Prime] (O E : Type) [CommRing O
     refine ⟨F N - comb cB e - map (algebraMap O E) T, ?_, ?_⟩
     · exact ((IntD.ofQL (hFQ N)).sub hc (IntD.comb hc cB fun i => IntD.ofQL (he i))).sub hc
         (IntD.map hc T)
-    · have h1 : comb Bv e = comb (fun i => ∑ n ∈ Finset.range N, (p : O) ^ n * bf (F n) i) e +
-          (p : E) ^ N • comb cB e := by
+    · have h1
+          : comb Bv e
+            = comb (fun i => ∑ n ∈ Finset.range N, (p : O) ^ n * bf (F n) i) e
+              + (p : E) ^ N • comb cB e := by
         rw [hpE, ← comb_add_mul]
         congr 1
         funext i
         exact hcB i
-      have h2 : map (algebraMap O E) S =
-          ∑ n ∈ Finset.range N, (p : E) ^ n • map (algebraMap O E) (sf (F n)) +
-            (p : E) ^ N • map (algebraMap O E) T := by
+      have h2
+          : map (algebraMap O E) S
+            = ∑ n ∈ Finset.range N, (p : E) ^ n • map (algebraMap O E) (sf (F n))
+              + (p : E) ^ N • map (algebraMap O E) T := by
         ext α
         set_option synthInstance.maxHeartbeats 100000 in
-          rw [coeff_map, hSd, hcS α, map_add (f := _), map_add (f := _), coeff_smul, coeff_map, hTd, map_sum (coeff α)]
+          rw [coeff_map, hSd, hcS α, map_add (f := _), map_add (f := _), coeff_smul, coeff_map, hTd,
+            map_sum (coeff α)]
         set_option synthInstance.maxHeartbeats 100000 in
-          simp only [coeff_smul, coeff_map, map_sum, map_mul, map_pow, map_natCast]
+        simp only [coeff_smul, coeff_map, map_sum, map_mul, map_pow, map_natCast]
       rw [h1, h2]
       linear_combination (norm := module) tele N
   have hR : f - comb Bv e - map (algebraMap O E) S = 0 := by

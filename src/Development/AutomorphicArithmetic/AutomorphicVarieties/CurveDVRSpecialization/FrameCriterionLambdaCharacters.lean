@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
 
-theorem UpperTheory.frame_criterion_lambda_characters :
-    UpperTheory.V.Pr.CrLam := by
+theorem UpperTheory.frame_criterion_lambda_characters : UpperTheory.V.Pr.CrLam := by
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ _ _ Φ k v A hA hM
   haveI := Φ.cv v
   haveI := Φ.t2v v
@@ -49,7 +50,8 @@ theorem UpperTheory.frame_criterion_lambda_characters :
         exact hdec
       exact ⟨⟨g, hgd⟩, hg⟩
   let m : Dec (F := L) A ≃* Φ.Gv v :=
-    (MonoidHom.ofInjective he1).trans ((MulEquiv.subgroupCongr hrange).trans (MonoidHom.ofInjective he2).symm)
+    (MonoidHom.ofInjective he1).trans
+      ((MulEquiv.subgroupCongr hrange).trans (MonoidHom.ofInjective he2).symm)
   have hm : ∀ g, e2 (m g) = e1 g := by
     intro g
     have := MonoidHom.ofInjective_apply he2 (x := m g)

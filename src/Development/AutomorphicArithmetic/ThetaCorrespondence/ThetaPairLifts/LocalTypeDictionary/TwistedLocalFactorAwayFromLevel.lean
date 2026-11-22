@@ -14,8 +14,11 @@ section
 namespace TwistAwayFromPlace
 section
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat
 open Formalism.DivisionValues (vw lw)
 open GlobalTheory.SumSize
 namespace GlobalTheory.CompanionTheory.Twist
@@ -23,7 +26,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.L2.Host in
 theorem twist_trivial_away_from_level : _root_.GlobalTheory.FunPr.ThetaLocalInputs → AwayK := by
   intro _
-  refine ⟨0, fun CF _ => ⟨0, fun ε C _ => ⟨0, fun D large₂ _ _ Γ _ _ Pl0 T A Ks _ _ _ R F s ch _ _ _ w PP hP => ?_⟩⟩⟩
+  refine ⟨
+    0,
+    fun CF _ =>
+      ⟨0, fun ε C _ => ⟨0, fun D large₂ _ _ Γ _ _ Pl0 T A Ks _ _ _ R F s ch _ _ _ w PP hP => ?_⟩⟩
+  ⟩
   have hr : ¬ (R.xiH (R.mu w)).UnrAt PP := (s.core.lev.Q_ram (R.mu w) PP).2 (Or.inl hP)
   by_cases hw : w ∈ R.twPl
   · obtain ⟨ψ, Q, hψ, e⟩ := s.mu_on w hw
@@ -39,7 +46,11 @@ theorem twist_trivial_away_from_level : _root_.GlobalTheory.FunPr.ThetaLocalInpu
       change (R.C.delAt (Formalism.EigenvalueLevelCeiling.plc w)).loc PP x * ψ.loc PP x = 1
       rw [a1, a2, mul_one]
     · refine Or.inl (ch.G.pl.mem_S0_of_sum_eq.2 (Or.inr ((S1_mem_OmF D).2 ?_)))
-      have key : ∀ p : ℕ, OverP D.host p PP → (p : 𝓞 D.host.F) ∈ ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)).asIdeal := fun p hp => by
+      have key
+          : ∀ p : ℕ,
+            OverP D.host p PP
+              → (p : 𝓞 D.host.F) ∈ ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F)
+                PP)).asIdeal := fun p hp => by
         change algebraMap _ (𝓞 D.host.E) (p : 𝓞 D.host.F) ∈ PP.asIdeal
         rwa [map_natCast]
       unfold CharFrame.delAt at hd
@@ -56,7 +67,17 @@ end
 end TwistAwayFromPlace
 section
 open GlobalTheory.SumSize GlobalTheory.RowClaim
-theorem _root_.GlobalTheory.Adopt.twisted_local_factor_away_from_level : _root_.GlobalTheory.FunPr.ThetaLocalInputs → AwayK := by
-  first | exact @_root_.TwistAwayFromPlace.GlobalTheory.CompanionTheory.Twist.twist_trivial_away_from_level | exact _root_.TwistAwayFromPlace.GlobalTheory.CompanionTheory.Twist.twist_trivial_away_from_level | (intros; apply _root_.TwistAwayFromPlace.GlobalTheory.CompanionTheory.Twist.twist_trivial_away_from_level <;> assumption)
+theorem _root_.GlobalTheory.Adopt.twisted_local_factor_away_from_level
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs → AwayK := by
+  first
+  | exact
+      @_root_.TwistAwayFromPlace.GlobalTheory.CompanionTheory.Twist.twist_trivial_away_from_level
+  | exact _root_.TwistAwayFromPlace.GlobalTheory.CompanionTheory.Twist.twist_trivial_away_from_level
+  | (
+      intros
+      apply
+          _root_.TwistAwayFromPlace.GlobalTheory.CompanionTheory.Twist.twist_trivial_away_from_level
+        <;> assumption
+    )
 end
 end

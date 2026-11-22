@@ -21,17 +21,16 @@ end Abstract
 open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {R : Type*} [CommRing R] {D : Type*} [AddCommGroup D] [Module R D] in
-private theorem exists_finite_generators_of_isPrincipalIdealRing [IsPrincipalIdealRing R] :
-    ∀ (g : ℕ) (M : Type) [AddCommGroup M] [Module R M] (x : Fin g → M),
-      Submodule.span R (Set.range x) = ⊤ →
-        ∀ N : Submodule R M, ∃ v : Fin g → M, N = Submodule.span R (Set.range v) := by
+private theorem exists_finite_generators_of_isPrincipalIdealRing [IsPrincipalIdealRing R]
+    : ∀ (g : ℕ) (M : Type) [AddCommGroup M] [Module R M] (x : Fin g → M),
+      Submodule.span R (Set.range x) = ⊤
+        → ∀ N : Submodule R M, ∃ v : Fin g → M, N = Submodule.span R (Set.range v) := by
   intro g
   induction g with
   | zero =>
     intro M _ _ x hx N
     refine ⟨Fin.elim0, ?_⟩
-    have hbot : (⊤ : Submodule R M) = ⊥ := by
-      rw [← hx, Set.range_eq_empty, Submodule.span_empty]
+    have hbot : (⊤ : Submodule R M) = ⊥ := by rw [← hx, Set.range_eq_empty, Submodule.span_empty]
     rw [Set.range_eq_empty, Submodule.span_empty, eq_bot_iff, ← hbot]
     exact le_top
   | succ g ih =>
@@ -54,10 +53,12 @@ private theorem exists_finite_generators_of_isPrincipalIdealRing [IsPrincipalIde
       obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 hmtop
       rw [Fin.sum_univ_succ] at hm ⊢
       set q := ∑ i : Fin g, c i.succ • x i.succ with hqdef
-      have hq : q ∈ P := Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+      have hq : q ∈ P :=
+        Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
       have hc0 : c 0 ∈ I := by
         rw [hIdef, Submodule.mem_comap, LinearMap.toSpanSingleton_apply]
-        have := sub_mem (Submodule.mem_sup_left hm : _ ∈ N ⊔ P) (Submodule.mem_sup_right hq : _ ∈ N ⊔ P)
+        have :=
+          sub_mem (Submodule.mem_sup_left hm : _ ∈ N ⊔ P) (Submodule.mem_sup_right hq : _ ∈ N ⊔ P)
         simpa using this
       rw [← Submodule.IsPrincipal.span_singleton_generator I, Submodule.mem_span_singleton] at hc0
       obtain ⟨t, ht⟩ := hc0
@@ -67,13 +68,18 @@ private theorem exists_finite_generators_of_isPrincipalIdealRing [IsPrincipalIde
         rw [hdiff]; exact add_mem hq (Submodule.smul_mem _ _ hp)
       have hdN : c 0 • x 0 + q - t • n ∈ N := sub_mem hm (Submodule.smul_mem _ _ hn)
       have hmem : (⟨_, hdP⟩ : P) ∈ Submodule.span R (Set.range w) := hw ▸ hdN
-      have hle : Submodule.span R (Set.range w) ≤ (Submodule.span R (Set.range (Fin.cons n (fun i => (w i : M)) : Fin (g + 1) → M))).comap P.subtype := by
+      have hle
+          : Submodule.span R (Set.range w)
+            ≤ (Submodule.span R
+              (Set.range (Fin.cons n (fun i => (w i : M)) : Fin (g + 1) → M))).comap P.subtype := by
         rw [Submodule.span_le]
         rintro _ ⟨i, rfl⟩
         exact Submodule.subset_span ⟨i.succ, by simp⟩
       have h1 := hle hmem
       rw [Submodule.mem_comap, Submodule.coe_subtype] at h1
-      have h2 : t • n ∈ Submodule.span R (Set.range (Fin.cons n (fun i => (w i : M)) : Fin (g + 1) → M)) :=
+      have h2
+          : t • n
+            ∈ Submodule.span R (Set.range (Fin.cons n (fun i => (w i : M)) : Fin (g + 1) → M)) :=
         Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, by simp⟩)
       simpa using add_mem h1 h2
     · rw [Submodule.span_le]
@@ -83,10 +89,17 @@ private theorem exists_finite_generators_of_isPrincipalIdealRing [IsPrincipalIde
       · have : w i ∈ N.comap P.subtype := hw ▸ Submodule.subset_span ⟨i, rfl⟩
         simpa using this
 
-
 open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
-theorem _root_.GlobalTheory.SubmoduleCount.card_submodule_and_hom_le : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : _root_.Formalism.MainNotions.S.Loc.LocE F E), ∀ (D : Type) [AddCommGroup D] [Module L.O D] [Finite D] (g : ℕ) (x : Fin g → D), Submodule.span L.O (Set.range x) = ⊤ → Nat.card (Submodule L.O D) ≤ Nat.card D ^ g ∧ ∀ (D' : Type) [AddCommGroup D'] [Module L.O D'] [Finite D'], Nat.card (D →ₗ[L.O] D') ≤ Nat.card D' ^ g := by
+theorem _root_.GlobalTheory.SubmoduleCount.card_submodule_and_hom_le
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+        (L : _root_.Formalism.MainNotions.S.Loc.LocE F E),
+      ∀ (D : Type) [AddCommGroup D] [Module L.O D] [Finite D] (g : ℕ) (x : Fin g → D),
+        Submodule.span L.O (Set.range x) = ⊤
+          → Nat.card (Submodule L.O D) ≤ Nat.card D ^ g
+            ∧ ∀ (D' : Type) [AddCommGroup D'] [Module L.O D'] [Finite D'],
+              Nat.card (D →ₗ[L.O] D') ≤ Nat.card D' ^ g := by
   intro F _ _ _ _ _ E _ _ _ L D _ _ _ g x hx
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (ValuativeRel.valuation F).integer
   haveI : IsPrincipalIdealRing L.O := (_root_.GlobalTheory.UnramOrder.order_facts L ϖ hϖ).2.2.2.1
@@ -95,12 +108,16 @@ theorem _root_.GlobalTheory.SubmoduleCount.card_submodule_and_hom_le : ∀ {F : 
       intro N
       obtain ⟨v, hv⟩ := exists_finite_generators_of_isPrincipalIdealRing g D x hx N
       exact ⟨v, hv.symm⟩
-    calc Nat.card (Submodule L.O D) ≤ Nat.card (Fin g → D) := Nat.card_le_card_of_surjective _ hsurj
+    calc
+      Nat.card (Submodule L.O D)
+        ≤ Nat.card (Fin g → D) := Nat.card_le_card_of_surjective _ hsurj
       _ = Nat.card D ^ g := by simp [Nat.card_fun]
   · have hinj : Function.Injective (fun f : D →ₗ[L.O] D' => fun i => f (x i)) := by
       intro f f' h
       exact LinearMap.ext_on_range hx (fun i => congrFun h i)
-    calc Nat.card (D →ₗ[L.O] D') ≤ Nat.card (Fin g → D') := Nat.card_le_card_of_injective _ hinj
+    calc
+      Nat.card (D →ₗ[L.O] D')
+        ≤ Nat.card (Fin g → D') := Nat.card_le_card_of_injective _ hinj
       _ = Nat.card D' ^ g := by simp [Nat.card_fun]
 
 end GlobalTheory.SubmoduleCount

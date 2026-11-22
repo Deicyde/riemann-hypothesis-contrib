@@ -13,8 +13,10 @@ namespace GlobalTheory.TamePowTeich
 
 variable {Ω : Type} [Field Ω]
 
-theorem valuation_pow_sub_lt (A : ValuationSubring Ω) {x y : Ω} (hx : A.valuation x = 1) (hy : A.valuation y = 1)
-    (hxy : A.valuation (x - y) < 1) : ∀ k : ℕ, A.valuation (x ^ k - y ^ k) < 1 := by
+theorem valuation_pow_sub_lt
+    (A : ValuationSubring Ω)
+    {x y : Ω} (hx : A.valuation x = 1) (hy : A.valuation y = 1) (hxy : A.valuation (x - y) < 1)
+    : ∀ k : ℕ, A.valuation (x ^ k - y ^ k) < 1 := by
   intro k
   induction k with
   | zero => simp
@@ -25,28 +27,32 @@ theorem valuation_pow_sub_lt (A : ValuationSubring Ω) {x y : Ω} (hx : A.valuat
     · rw [map_mul, hx, one_mul]; exact ih
     · rw [map_mul, map_pow, hy, one_pow, mul_one]; exact hxy
 
-theorem valuation_zpow_sub_lt (A : ValuationSubring Ω) {x y : Ω} (hx : A.valuation x = 1) (hy : A.valuation y = 1)
-    (hxy : A.valuation (x - y) < 1) (e : ℤ) : A.valuation (x ^ e - y ^ e) < 1 := by
+theorem valuation_zpow_sub_lt
+    (A : ValuationSubring Ω)
+    {x y : Ω} (hx : A.valuation x = 1) (hy : A.valuation y = 1) (hxy : A.valuation (x - y) < 1)
+    (e : ℤ)
+    : A.valuation (x ^ e - y ^ e) < 1 := by
   cases e with
   | ofNat k => simpa using valuation_pow_sub_lt A hx hy hxy k
   | negSucc k =>
     simp only [zpow_negSucc]
     have hxk : A.valuation (x ^ (k + 1)) = 1 := by rw [map_pow, hx, one_pow]
     have hyk : A.valuation (y ^ (k + 1)) = 1 := by rw [map_pow, hy, one_pow]
-    have hx0 : x ^ (k + 1) ≠ 0 := by
-      intro h0; rw [h0, map_zero] at hxk; exact zero_ne_one hxk
-    have hy0 : y ^ (k + 1) ≠ 0 := by
-      intro h0; rw [h0, map_zero] at hyk; exact zero_ne_one hyk
+    have hx0 : x ^ (k + 1) ≠ 0 := by intro h0; rw [h0, map_zero] at hxk; exact zero_ne_one hxk
+    have hy0 : y ^ (k + 1) ≠ 0 := by intro h0; rw [h0, map_zero] at hyk; exact zero_ne_one hyk
     rw [inv_sub_inv hx0 hy0, map_div₀, map_mul, hxk, hyk, mul_one, div_one, Valuation.map_sub_swap]
     exact valuation_pow_sub_lt A hx hy hxy (k + 1)
 
 end GlobalTheory.TamePowTeich
 
 open GlobalTheory.TamePowTeich in
-theorem GlobalTheory.TamePowTeich.exists_zeta_pow_close : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    (P : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (ζ : Ω),
-    Formalism.ConjugateSelfDual.IsPlaceOver A P → IsPrimitiveRoot ζ (Formalism.ConjugateSelfDual.normV P - 1) → ∀ (u : 𝓞 E) (e : ℤ), u ∉ P.asIdeal →
-    ∃ a : ℕ, A.valuation (ζ ^ a - (algebraMap E Ω (u : E)) ^ e) < 1 := by
+theorem GlobalTheory.TamePowTeich.exists_zeta_pow_close
+    : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] (P : HeightOneSpectrum (𝓞 E))
+        (A : ValuationSubring Ω) (ζ : Ω),
+      Formalism.ConjugateSelfDual.IsPlaceOver A P
+        → IsPrimitiveRoot ζ (Formalism.ConjugateSelfDual.normV P - 1)
+        → ∀ (u : 𝓞 E) (e : ℤ),
+          u ∉ P.asIdeal → ∃ a : ℕ, A.valuation (ζ ^ a - (algebraMap E Ω (u : E)) ^ e) < 1 := by
   intro E Ω _ _ _ _ P A ζ hA hζ u e hu
   classical
   set n := Formalism.ConjugateSelfDual.normV P - 1 with hn_def
@@ -93,8 +99,7 @@ theorem GlobalTheory.TamePowTeich.exists_zeta_pow_close : ∀ {E Ω : Type} [Fie
   haveI : NeZero n := ⟨hn.ne'⟩
   obtain ⟨b, -, hb⟩ := hζ.eq_pow_of_pow_eq_one ((Polynomial.mem_nthRootsFinset hn 1).1 hμ)
   have hb1 : A.valuation (ζ ^ b) = 1 := by rw [map_pow, hζ1, one_pow]
-  have hclose : A.valuation (ζ ^ b - U) < 1 := by
-    rw [Valuation.map_sub_swap, hb]; exact hμU
+  have hclose : A.valuation (ζ ^ b - U) < 1 := by rw [Valuation.map_sub_swap, hb]; exact hμU
   have key := valuation_zpow_sub_lt A hb1 hU1 hclose e
 
   have hζ0 : ζ ≠ 0 := hζ.ne_zero hn.ne'

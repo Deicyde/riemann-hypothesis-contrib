@@ -11,8 +11,9 @@ open Finset Polynomial Formalism.FourierDecayAlt.F7
 
 section
 
-variable {R M : Type} [Ring R] [Algebra ℂ R] [AddCommGroup M] [Module ℂ M] [Module R M]
-  [IsScalarTower ℂ R M]
+variable
+  {R M : Type}
+  [Ring R] [Algebra ℂ R] [AddCommGroup M] [Module ℂ M] [Module R M] [IsScalarTower ℂ R M]
 
 end
 

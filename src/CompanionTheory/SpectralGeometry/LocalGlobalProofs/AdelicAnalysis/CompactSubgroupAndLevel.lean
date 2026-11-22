@@ -9,25 +9,39 @@ open scoped ENNReal NNReal MatrixGroups
 
 namespace GlobalTheory.CompanionTheory.SW.Core
 
-theorem compact_open_sup {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-    {L₁ L₂ : AddSubgroup V} (h₁ : IsCompact (L₁ : Set V)) (o₁ : IsOpen (L₁ : Set V))
-    (h₂ : IsCompact (L₂ : Set V)) :
-    IsCompact ((L₁ ⊔ L₂ : AddSubgroup V) : Set V) ∧ IsOpen ((L₁ ⊔ L₂ : AddSubgroup V) : Set V) := by
+theorem compact_open_sup
+    {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    {L₁ L₂ : AddSubgroup V}
+    (h₁ : IsCompact (L₁ : Set V)) (o₁ : IsOpen (L₁ : Set V)) (h₂ : IsCompact (L₂ : Set V))
+    : IsCompact ((L₁ ⊔ L₂ : AddSubgroup V) : Set V)
+      ∧ IsOpen ((L₁ ⊔ L₂ : AddSubgroup V) : Set V) := by
   refine ⟨?_, AddSubgroup.isOpen_mono le_sup_left o₁⟩
   rw [AddSubgroup.add_normal]
   exact h₁.add h₂
 
-theorem compact_subgroup_and_level :
-    ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] (χ : V → V → ℂ) (μ : Measure V), NADual V χ μ → (∀ K : Set V, IsCompact K → ∃ L : AddSubgroup V, IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ K ⊆ L) ∧ ∀ φ : V → ℂ, SB φ → ∃ L L' : AddSubgroup V, IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ IsCompact (L' : Set V) ∧ IsOpen (L' : Set V) ∧ L' ≤ L ∧ (∀ x, x ∉ L → φ x = 0) ∧ ∀ x, ∀ l ∈ L', φ (x + l) = φ x := by
+theorem compact_subgroup_and_level
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] (χ : V → V → ℂ)
+        (μ : Measure V),
+      NADual V χ μ
+        → (∀ K : Set V,
+            IsCompact K → ∃ L : AddSubgroup V, IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ K ⊆ L)
+          ∧ ∀ φ : V → ℂ,
+            SB φ
+              → ∃ L L' : AddSubgroup V,
+                IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ IsCompact (L' : Set V)
+                  ∧ IsOpen (L' : Set V) ∧ L' ≤ L ∧ (∀ x, x ∉ L → φ x = 0)
+                  ∧ ∀ x, ∀ l ∈ L', φ (x + l) = φ x := by
   intro V _ _ _ χ μ h
   obtain ⟨hG, hT, -, -, -, -, hnb, hcov, -⟩ := h
   haveI := hG
   haveI := hT
-  have cover : ∀ K : Set V, IsCompact K →
-      ∃ L : AddSubgroup V, IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ K ⊆ L := by
+  have cover
+      : ∀ K : Set V,
+        IsCompact K → ∃ L : AddSubgroup V, IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ K ⊆ L := by
     intro K hK
-    refine hK.induction_on (p := fun s => ∃ L : AddSubgroup V, IsCompact (L : Set V) ∧
-      IsOpen (L : Set V) ∧ s ⊆ L) ?_ ?_ ?_ ?_
+    refine hK.induction_on
+      (p := fun s => ∃ L : AddSubgroup V, IsCompact (L : Set V) ∧ IsOpen (L : Set V) ∧ s ⊆ L)
+      ?_ ?_ ?_ ?_
     · obtain ⟨L, c, o, -⟩ := hcov 0
       exact ⟨L, c, o, Set.empty_subset _⟩
     · rintro s t hst ⟨L, c, o, hL⟩

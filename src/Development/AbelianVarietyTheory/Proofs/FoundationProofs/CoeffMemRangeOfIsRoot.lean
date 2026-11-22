@@ -16,8 +16,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.PsRoot
 
-theorem mem_of_isAlgebraic_of_isAlgClosed (E : Subfield ℂ) [IsAlgClosed E] {x : ℂ}
-    (hx : IsAlgebraic E x) : x ∈ E := by
+theorem mem_of_isAlgebraic_of_isAlgClosed
+    (E : Subfield ℂ) [IsAlgClosed E] {x : ℂ} (hx : IsAlgebraic E x)
+    : x ∈ E := by
   have hi : IsIntegral E x := hx.isIntegral
   have h1 : (minpoly E x).natDegree = 1 := by
     have := IsAlgClosed.degree_eq_one_of_irreducible E (minpoly.irreducible hi)
@@ -26,10 +27,11 @@ theorem mem_of_isAlgebraic_of_isAlgClosed (E : Subfield ℂ) [IsAlgClosed E] {x 
   rw [← hy]
   exact y.2
 
-theorem coeff_mem_range_of_isRoot : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ)
-    (b : PowerSeries ℂ) (Q : Polynomial (PowerSeries ℂ)), Q ≠ 0 →
-    (∀ i k, PowerSeries.coeff k (Q.coeff i) ∈ ε.range) → Q.eval b = 0 →
-    ∀ k, PowerSeries.coeff k b ∈ ε.range := by
+theorem coeff_mem_range_of_isRoot
+    : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (b : PowerSeries ℂ)
+        (Q : Polynomial (PowerSeries ℂ)),
+      Q ≠ 0 → (∀ i k, PowerSeries.coeff k (Q.coeff i) ∈ ε.range) → Q.eval b = 0
+        → ∀ k, PowerSeries.coeff k b ∈ ε.range := by
   intro Ω _ _ ε b Q hQ hcoef hb k
   let E : Subfield ℂ := ε.fieldRange
   haveI : IsAlgClosed E := IsAlgClosed.of_ringEquiv Ω E ε.rangeRestrictFieldEquiv
@@ -54,7 +56,9 @@ theorem coeff_mem_range_of_isRoot : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] 
     rintro _ ⟨g, rfl⟩
     refine ⟨PowerSeries.map (g : ℂ →+* ℂ) b, hroot g, ?_⟩
     simp [PowerSeries.coeff_map]
-  obtain ⟨y, hy⟩ := mem_of_isAlgebraic_of_isAlgClosed E (GlobalTheory.T.isAlgebraic_of_finite_complex_automorphism_orbit E _ hfin)
+  obtain ⟨y, hy⟩ :=
+    mem_of_isAlgebraic_of_isAlgClosed E
+      (GlobalTheory.T.isAlgebraic_of_finite_complex_automorphism_orbit E _ hfin)
   exact ⟨y, hy⟩
 
 end GlobalTheory.PsRoot

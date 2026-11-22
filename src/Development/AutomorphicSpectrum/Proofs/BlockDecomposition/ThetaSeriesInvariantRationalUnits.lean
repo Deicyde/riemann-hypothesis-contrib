@@ -5,25 +5,33 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OfE
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global
+  GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
 open scoped TensorProduct ENNReal NNReal Matrix Classical
 
 namespace GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
 
-def unitPermNonzero {E : Type} [Field E] (q : Eˣ) :
-    ({X : Fin 1 → Fin 1 → E | X ≠ 0} : Set _) ≃ ({X : Fin 1 → Fin 1 → E | X ≠ 0} : Set _) where
-  toFun X := ⟨fun a i => (q : E) * X.1 a i, by
-    intro h
-    apply X.2
-    funext a i
-    have h1 : (q : E) * X.1 a i = 0 := congrFun (congrFun h a) i
-    simpa using h1⟩
-  invFun X := ⟨fun a i => ((q⁻¹ : Eˣ) : E) * X.1 a i, by
-    intro h
-    apply X.2
-    funext a i
-    have h1 : ((q⁻¹ : Eˣ) : E) * X.1 a i = 0 := congrFun (congrFun h a) i
-    simpa using h1⟩
+def unitPermNonzero {E : Type} [Field E] (q : Eˣ)
+    : ({X : Fin 1 → Fin 1 → E | X ≠ 0} : Set _) ≃ ({X : Fin 1 → Fin 1 → E | X ≠ 0} : Set _) where
+  toFun X := ⟨
+    fun a i => (q : E) * X.1 a i,
+    by
+      intro h
+      apply X.2
+      funext a i
+      have h1 : (q : E) * X.1 a i = 0 := congrFun (congrFun h a) i
+      simpa using h1
+  ⟩
+  invFun X := ⟨
+    fun a i => ((q⁻¹ : Eˣ) : E) * X.1 a i,
+    by
+      intro h
+      apply X.2
+      funext a i
+      have h1 : ((q⁻¹ : Eˣ) : E) * X.1 a i = 0 := congrFun (congrFun h a) i
+      simpa using h1
+  ⟩
   left_inv X := by
     apply Subtype.ext
     funext a i
@@ -33,7 +41,12 @@ def unitPermNonzero {E : Type} [Field E] (q : Eˣ) :
     funext a i
     simp
 
-theorem Th_ofE_mul : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (φ : (Fin 1 → Fin 1 → Ainf F ⊗[F] E) → ℝ) (A : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin 1 → Fin 1 → Fv F v ⊗[F] E)) (q : Eˣ) (y : (AF F ⊗[F] E)ˣ), Th φ A (ofE q * y) = Th φ A y := by
+theorem Th_ofE_mul
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E]
+        (φ : (Fin 1 → Fin 1 → Ainf F ⊗[F] E) → ℝ)
+        (A : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin 1 → Fin 1 → Fv F v ⊗[F] E)) (q : Eˣ)
+        (y : (AF F ⊗[F] E)ˣ),
+      Th φ A (ofE q * y) = Th φ A y := by
   intro F E _ _ _ _ φ A q y
   unfold Th
   rw [← Equiv.tsum_eq (unitPermNonzero q)

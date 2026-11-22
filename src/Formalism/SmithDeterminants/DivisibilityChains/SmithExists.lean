@@ -8,11 +8,12 @@ namespace Formalism.A
 
 open Module
 
-theorem nonempty_smith_normal_form {R M : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R]
-    [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M] (y : M →ₗ[R] M) :
-    Nonempty (SmithData y (Module.finrank R M)) := by
+theorem nonempty_smith_normal_form
+    {R M : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [AddCommGroup M] [Module R M]
+    [Module.Free R M] [Module.Finite R M]
+    (y : M →ₗ[R] M)
+    : Nonempty (SmithData y (Module.finrank R M)) := by
   classical
-
   let b0 : Module.Basis (Fin (Module.finrank R M)) R M := Module.finBasis R M
   obtain ⟨n, snf⟩ := Submodule.smithNormalForm b0 (LinearMap.range y)
   obtain ⟨k, bK⟩ := Submodule.basisOfPid b0 (LinearMap.ker y)
@@ -31,16 +32,15 @@ theorem nonempty_smith_normal_form {R M : Type} [CommRing R] [IsDomain R] [IsPri
   have hker : ∀ m : M, pK m ∈ LinearMap.ker y := by
     intro m
     rw [LinearMap.mem_ker, hpK, map_sub, hyS, hrr, sub_self]
-  have hrz : ∀ (c : LinearMap.ker y) (z : LinearMap.range y),
-      y.rangeRestrict ((c : M) + s z) = z := by
+  have hrz
+      : ∀ (c : LinearMap.ker y) (z : LinearMap.range y), y.rangeRestrict ((c : M) + s z) = z := by
     intro c z
     apply Subtype.ext
     rw [hrr, map_add (f := _), LinearMap.mem_ker.mp c.2, zero_add, hyS]
 
   let fwd : (LinearMap.ker y × LinearMap.range y) →ₗ[R] M := (LinearMap.ker y).subtype.coprod s
   let bwd : M →ₗ[R] (LinearMap.ker y × LinearMap.range y) :=
-    LinearMap.prod (LinearMap.codRestrict (LinearMap.ker y) pK hker)
-      y.rangeRestrict
+    LinearMap.prod (LinearMap.codRestrict (LinearMap.ker y) pK hker) y.rangeRestrict
   have hf : ∀ (c : LinearMap.ker y) (z : LinearMap.range y), fwd (c, z) = (c : M) + s z := by
     intro c z
     simp [fwd]
@@ -66,26 +66,24 @@ theorem nonempty_smith_normal_form {R M : Type} [CommRing R] [IsDomain R] [IsPri
   let B : Module.Basis (Fin k ⊕ Fin n) R M := (bK.prod snf.bN).map e
   have hB1 : ∀ l, y (B (Sum.inl l)) = 0 := by
     intro l
-    have : B (Sum.inl l) = bK l := by
-      simp [B, e, hf]
+    have : B (Sum.inl l) = bK l := by simp [B, e, hf]
     rw [this]
     exact LinearMap.mem_ker.mp (bK l).2
   have hB2 : ∀ i, y (B (Sum.inr i)) = snf.a i • snf.bM (snf.f i) := by
     intro i
-    have : B (Sum.inr i) = s (snf.bN i) := by
-      simp [B, e, hf]
+    have : B (Sum.inr i) = s (snf.bN i) := by simp [B, e, hf]
     rw [this, hyS, snf.snf i]
 
-  have hcard : k + n = Module.finrank R M := by
-    simpa using (Module.finrank_eq_card_basis B).symm
-  have hcompl : Fintype.card (Fin k) = Fintype.card ↥(Set.range snf.f)ᶜ := by
+  have hcard : k + n = Module.finrank R M := by simpa using (Module.finrank_eq_card_basis B).symm
+  have hcompl : Fintype.card (Fin k) = Fintype.card ↥ (Set.range snf.f)ᶜ := by
     rw [Fintype.card_compl_set, Set.card_range_of_injective snf.f.injective, Fintype.card_fin,
       Fintype.card_fin, Fintype.card_fin]
     omega
-  let τ : Fin k ≃ ↥(Set.range snf.f)ᶜ := Fintype.equivOfCardEq hcompl
+  let τ : Fin k ≃ ↥ (Set.range snf.f)ᶜ := Fintype.equivOfCardEq hcompl
   let σ : Fin k ⊕ Fin n ≃ Fin (Module.finrank R M) :=
-    (Equiv.sumComm _ _).trans ((Equiv.sumCongr (Equiv.ofInjective snf.f snf.f.injective) τ).trans
-      (Equiv.Set.sumCompl (Set.range snf.f)))
+    (Equiv.sumComm _ _).trans
+      ((Equiv.sumCongr (Equiv.ofInjective snf.f snf.f.injective) τ).trans
+        (Equiv.Set.sumCompl (Set.range snf.f)))
   have hσ : ∀ i, σ (Sum.inr i) = snf.f i := by
     intro i
     simp [σ]

@@ -21,7 +21,8 @@ def mfL (L : ℝ) : ℝ := (D.R.m : ℝ) ^ 5 * D.R.f * L
 def kfk : ℝ := (D.R.k : ℝ) * D.R.f * Real.log D.R.k
 
 def SDiag (L C : ℝ) : Prop :=
-  TwoTerm D u (4 * (Real.exp (C * mfL D L) + 1)) (4 * Real.exp (-(kfk D / 2)) + 2 * Real.exp (-kfk D))
+  TwoTerm D u (4 * (Real.exp (C * mfL D L) + 1))
+    (4 * Real.exp (-(kfk D / 2)) + 2 * Real.exp (- kfk D))
 
 def Small (L C : ℝ) : Prop := (d0 D u : ℝ) ≤ D.what₂.Dstar * Real.exp (-(2 * C * mfL D L))
 

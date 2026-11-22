@@ -16,16 +16,17 @@ variable {K : Type} [Field K]
 def AllIn (W : Subring K) {σ : Type} (F : MvPowerSeries σ K) : Prop :=
   ∀ n, MvPowerSeries.coeff n F ∈ W
 
-theorem allIn_mul {W : Subring K} {σ : Type} {F G : MvPowerSeries σ K} (hF : AllIn W F)
-    (hG : AllIn W G) : AllIn W (F * G) := by
+theorem allIn_mul
+    {W : Subring K} {σ : Type} {F G : MvPowerSeries σ K} (hF : AllIn W F) (hG : AllIn W G)
+    : AllIn W (F * G) := by
   classical
   intro n
   rw [MvPowerSeries.coeff_mul]
   exact Subring.sum_mem _ fun x _ => Subring.mul_mem _ (hF _) (hG _)
 
-theorem expMv_eq_subst [CharZero K] {σ : Type} {F : MvPowerSeries σ K}
-    (hF : MvPowerSeries.constantCoeff F = 0) :
-    expMv F = PowerSeries.subst F (PowerSeries.exp K) := by
+theorem expMv_eq_subst
+    [CharZero K] {σ : Type} {F : MvPowerSeries σ K} (hF : MvPowerSeries.constantCoeff F = 0)
+    : expMv F = PowerSeries.subst F (PowerSeries.exp K) := by
   classical
   ext α
   have hs : PowerSeries.HasSubst F := PowerSeries.HasSubst.of_constantCoeff_zero hF
@@ -39,17 +40,17 @@ theorem expMv_eq_subst [CharZero K] {σ : Type} {F : MvPowerSeries σ K}
     by_contra hc
     apply hn
     have hdeg : (α.sum fun _ k => k) = Finsupp.degree α := rfl
-    rw [MvPowerSeries.coeff_eq_zero_of_constantCoeff_nilpotent (m := 1)
-      (by rw [pow_one]; exact hF) (by omega), smul_zero]
+    rw [MvPowerSeries.coeff_eq_zero_of_constantCoeff_nilpotent (m := 1) (by rw [pow_one]; exact hF)
+        (by omega),
+      smul_zero]
 
 section Rename₂
 
 variable {ι ι' : Type} [Fintype ι]
 
-variable (g : Dat K) (hex0 : PowerSeries.constantCoeff g.ex = 0)
-  (hl0 : PowerSeries.constantCoeff g.l = 0)
+variable
+  (g : Dat K) (hex0 : PowerSeries.constantCoeff g.ex = 0) (hl0 : PowerSeries.constantCoeff g.l = 0)
 include hex0 hl0
-
 
 end Rename₂
 

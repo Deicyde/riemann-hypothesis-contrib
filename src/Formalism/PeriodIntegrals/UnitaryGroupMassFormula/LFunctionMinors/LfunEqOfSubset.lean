@@ -14,10 +14,13 @@ namespace PI.WwMainW
 
 open PI.WwMain PI.WwMain.KM
 
-theorem Lfun_eq_of_subset {Lt : Type} (l : ℕ) [Fact l.Prime] (N0 N1 : ℕ)
-    (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]) (P : MvPolynomial (Lt × Fin N0 × Fin N1) ℂ_[l])
-    (s : Finset ((Lt × Fin N0 × Fin N1) →₀ ℕ)) (hs : P.support ⊆ s) :
-    Lfun l N0 N1 Th P = ∑ α ∈ s, AddMonoidAlgebra.coeff P α * wt l N0 N1 Th α := by
+theorem Lfun_eq_of_subset
+    {Lt : Type}
+    (l : ℕ) [Fact l.Prime]
+    (N0 N1 : ℕ) (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
+    (P : MvPolynomial (Lt × Fin N0 × Fin N1) ℂ_[l]) (s : Finset ((Lt × Fin N0 × Fin N1) →₀ ℕ))
+    (hs : P.support ⊆ s)
+    : Lfun l N0 N1 Th P = ∑ α ∈ s, AddMonoidAlgebra.coeff P α * wt l N0 N1 Th α := by
   unfold Lfun
   exact Finset.sum_subset hs (fun α _ h => by
     rw [MvPolynomial.mem_support_iff, not_not] at h
@@ -42,21 +45,27 @@ theorem lLin : LLin := by
       Lfun_eq_of_subset l N0 N1 Th p p.support subset_rfl, Finset.mul_sum]
     simp only [MvPolynomial.coeff_C_mul, mul_assoc]
 
-theorem Lfun_monomial {Lt : Type} (l : ℕ) [Fact l.Prime] (N0 N1 : ℕ)
-    (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]) (α : (Lt × Fin N0 × Fin N1) →₀ ℕ) (c : ℂ_[l]) :
-    Lfun l N0 N1 Th (monomial α c) = c * wt l N0 N1 Th α := by
+theorem Lfun_monomial
+    {Lt : Type}
+    (l : ℕ) [Fact l.Prime]
+    (N0 N1 : ℕ) (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]) (α : (Lt × Fin N0 × Fin N1) →₀ ℕ)
+    (c : ℂ_[l])
+    : Lfun l N0 N1 Th (monomial α c) = c * wt l N0 N1 Th α := by
   classical
   rw [Lfun_eq_of_subset l N0 N1 Th _ {α} MvPolynomial.support_monomial_subset]
   simp
 
-theorem Lfun_sum' {Lt : Type} (l : ℕ) [Fact l.Prime] (N0 N1 : ℕ)
-    (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]) {ι : Type} (s : Finset ι)
-    (f : ι → MvPolynomial (Lt × Fin N0 × Fin N1) ℂ_[l]) :
-    Lfun l N0 N1 Th (∑ i ∈ s, f i) = ∑ i ∈ s, Lfun l N0 N1 Th (f i) := by
+theorem Lfun_sum'
+    {Lt : Type}
+    (l : ℕ) [Fact l.Prime]
+    (N0 N1 : ℕ) (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
+    {ι : Type} (s : Finset ι) (f : ι → MvPolynomial (Lt × Fin N0 × Fin N1) ℂ_[l])
+    : Lfun l N0 N1 Th (∑ i ∈ s, f i) = ∑ i ∈ s, Lfun l N0 N1 Th (f i) := by
   classical
   rw [Lfun_eq_of_subset l N0 N1 Th _ (s.biUnion fun i => (f i).support) MvPolynomial.support_sum]
-  rw [Finset.sum_congr rfl (fun i hi => Lfun_eq_of_subset l N0 N1 Th (f i)
-    (s.biUnion fun i => (f i).support) (Finset.subset_biUnion_of_mem (fun i => (f i).support) hi))]
+  rw [Finset.sum_congr rfl (fun i hi =>
+    Lfun_eq_of_subset l N0 N1 Th (f i) (s.biUnion fun i => (f i).support)
+      (Finset.subset_biUnion_of_mem (fun i => (f i).support) hi))]
   simp only [MvPolynomial.coeff_sum, Finset.sum_mul]
   exact Finset.sum_comm
 
@@ -66,8 +75,9 @@ theorem lH : LH := by
   rw [Lfun_sum']
   simp only [Lfun_monomial]
   unfold applyAt0
-  have hm : ∀ (a : Lt × ℕ × Fin N0 →₀ ℕ) (c : ℂ_[l]),
-      ph (MvPolynomial.monomial a c) = c * ph (MvPolynomial.monomial a 1) := fun a c => by
+  have hm
+      : ∀ (a : Lt × ℕ × Fin N0 →₀ ℕ) (c : ℂ_[l]),
+        ph (MvPolynomial.monomial a c) = c * ph (MvPolynomial.monomial a 1) := fun a c => by
     rw [← smul_eq_mul, ← map_smul, MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -76,23 +86,28 @@ theorem lH : LH := by
   unfold wt
   ring
 
-theorem sumElim_split {α β : Type} (μ : (α ⊕ β) →₀ ℕ) :
-    μ = Finsupp.sumElim (Finsupp.sumFinsuppEquivProdFinsupp μ).1
-      (Finsupp.sumFinsuppEquivProdFinsupp μ).2 := by
+theorem sumElim_split {α β : Type} (μ : (α ⊕ β) →₀ ℕ)
+    : μ
+      = Finsupp.sumElim (Finsupp.sumFinsuppEquivProdFinsupp μ).1
+        (Finsupp.sumFinsuppEquivProdFinsupp μ).2 := by
   ext x
   rcases x with x | x <;> simp
 
-theorem chi_monomial {Lt : Type} (l : ℕ) [Fact l.Prime] (N0 N1 : ℕ) (z : Lt × Fin N0 × Fin N1 → ℂ_[l])
-    (μ : (XZ Lt N0 N1) →₀ ℕ) (n : ℤ) :
-    chi l N0 N1 z (monomial μ n) =
-      C ((n : ℂ_[l]) * (Finsupp.sumFinsuppEquivProdFinsupp μ).2.prod fun w e => z w ^ e) *
-        monomial (Finsupp.sumFinsuppEquivProdFinsupp μ).1 1 := by
+theorem chi_monomial
+    {Lt : Type}
+    (l : ℕ) [Fact l.Prime]
+    (N0 N1 : ℕ) (z : Lt × Fin N0 × Fin N1 → ℂ_[l]) (μ : (XZ Lt N0 N1) →₀ ℕ)
+    (n : ℤ)
+    : chi l N0 N1 z (monomial μ n)
+      = C ((n : ℂ_[l]) * (Finsupp.sumFinsuppEquivProdFinsupp μ).2.prod fun w e => z w ^ e)
+        * monomial (Finsupp.sumFinsuppEquivProdFinsupp μ).1 1 := by
   unfold chi
   set p := Finsupp.sumFinsuppEquivProdFinsupp μ with hp
   have hμ : μ = Finsupp.sumElim p.1 p.2 := sumElim_split μ
   rw [hμ, MvPolynomial.eval₂Hom_monomial, Finsupp.prod_sumElim]
   simp only [Function.comp_def, Sum.elim_inl, Sum.elim_inr, RingHom.coe_comp, Function.comp_apply,
-    MvPolynomial.monomial_eq, map_one, one_mul, map_mul, Finsupp.prod, map_prod, map_pow, eq_intCast]
+    MvPolynomial.monomial_eq, map_one, one_mul, map_mul, Finsupp.prod, map_prod, map_pow,
+    eq_intCast]
   simp only [map_intCast]
   ring
 

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.XmApply
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -16,8 +18,14 @@ namespace GlobalTheory.InertKatFrame
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem latAt_entry_at {n : ℕ} (X : Spc F E n) (v : Pl (F := F)) {z : Fin n → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)}
-    (hz : z ∈ GlobalTheory.InertSph.latAt X v) (i : Fin n) : At (evFin F v) (z i) := by
+theorem latAt_entry_at
+    {n : ℕ} (X : Spc F E n)
+    (v : Pl (F := F))
+    {z : Fin n
+      → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)}
+    (hz : z ∈ GlobalTheory.InertSph.latAt X v)
+    (i : Fin n)
+    : At (evFin F v) (z i) := by
   induction hz using AddSubgroup.closure_induction with
   | mem x hx =>
     obtain ⟨a, ha, -, y, -, rfl⟩ := hx
@@ -30,19 +38,37 @@ theorem latAt_entry_at {n : ℕ} (X : Spc F E n) (v : Pl (F := F)) {z : Fin n �
   | add x y _ _ hx hy => intro u hu; simp [smul_add, hx u hu, hy u hu]
   | neg x _ hx => intro u hu; simp [smul_neg, hx u hu]
 
-theorem mulVec_mem_latAt {n : ℕ} (X : Spc F E n) (v : Pl (F := F)) {L : Type} [Field L]
-    [Valued L (WithZero (Multiplicative ℤ))] (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
-    (hsurj : ∀ z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E), At (evFin F v) z ↔ ∃ x, ι x = z) (hmul : ∀ x y, ι (x * y) = ι x * ι y)
-    (P : GL (Fin n) L) (hP : ∀ x : Fin n → L, (∀ i, x i ∈ Formalism.UG.intL L) ↔
-        (fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ x) i)) ∈ GlobalTheory.InertSph.latAt X v)
+theorem mulVec_mem_latAt
+    {n : ℕ} (X : Spc F E n)
+    (v : Pl (F := F))
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (hsurj
+      : ∀ z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E),
+        At (evFin F v) z ↔ ∃ x, ι x = z)
+    (hmul : ∀ x y, ι (x * y) = ι x * ι y)
+    (P : GL (Fin n) L)
+    (hP : ∀ x : Fin n → L,
+      (∀ i, x i ∈ Formalism.UG.intL L)
+        ↔ (fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ x) i)) ∈ GlobalTheory.InertSph.latAt X v)
     (K : Matrix (Fin n) (Fin n) L) (hK : ∀ i j, K i j ∈ Formalism.UG.intL L)
-    (A : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
-    (hA : A = (1 - ι 1) • (1 : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) +
-          ((P : Matrix (Fin n) (Fin n) L) * K * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)).map ι)
-    (z : Fin n → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (hz : z ∈ GlobalTheory.InertSph.latAt X v) : A *ᵥ z ∈ GlobalTheory.InertSph.latAt X v := by
-  obtain ⟨y, rfl⟩ : ∃ y : Fin n → L, z = fun i => ι (y i) :=
-    ⟨fun i => GlobalTheory.InertLocFrame.pre ι (z i), funext fun i =>
-      (GlobalTheory.InertLocFrame.pre_spec ι ((hsurj _).1 (latAt_entry_at X v hz i))).symm⟩
+    (A : Matrix (Fin n) (Fin n)
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+    (hA : A
+      = (1 - ι 1)
+          • (1 : Matrix (Fin n) (Fin n)
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+        + ((P : Matrix (Fin n) (Fin n) L) * K
+          * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)).map ι)
+    (z : Fin n
+      → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (hz : z ∈ GlobalTheory.InertSph.latAt X v)
+    : A *ᵥ z ∈ GlobalTheory.InertSph.latAt X v := by
+  obtain ⟨y, rfl⟩ : ∃ y : Fin n → L, z = fun i => ι (y i) := ⟨
+    fun i => GlobalTheory.InertLocFrame.pre ι (z i),
+    funext fun i =>
+      (GlobalTheory.InertLocFrame.pre_spec ι ((hsurj _).1 (latAt_entry_at X v hz i))).symm
+  ⟩
   obtain ⟨x, rfl⟩ : ∃ x : Fin n → L, y = (P : Matrix (Fin n) (Fin n) L) *ᵥ x := by
     refine ⟨((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) *ᵥ y, ?_⟩
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
@@ -50,8 +76,9 @@ theorem mulVec_mem_latAt {n : ℕ} (X : Spc F E n) (v : Pl (F := F)) {L : Type} 
   have hKx : ∀ i, (K *ᵥ x) i ∈ Formalism.UG.intL L := fun i => by
     simp only [Matrix.mulVec, dotProduct]
     exact Subring.sum_mem _ fun j _ => Subring.mul_mem _ (hK i j) (hx j)
-  have key : A *ᵥ (fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ x) i)) =
-      fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ (K *ᵥ x)) i) := by
+  have key
+      : A *ᵥ (fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ x) i))
+        = fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ (K *ᵥ x)) i) := by
     set N := (P : Matrix (Fin n) (Fin n) L) * K * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) with hN
     set Y := (P : Matrix (Fin n) (Fin n) L) *ᵥ x with hY
     have h1 : (1 - ι 1) • (fun i => ι (Y i)) = 0 := by
@@ -71,22 +98,52 @@ theorem mulVec_mem_latAt {n : ℕ} (X : Spc F E n) (v : Pl (F := F)) {L : Type} 
   rw [key]
   exact (hP _).1 hKx
 
-theorem mem_KAt_of_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (v : Pl (F := F)) (n : ℕ) (X : Spc F E n) (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)),
-      Function.Injective ι → (∀ z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E), At (evFin F v) z ↔ ∃ x, ι x = z) → (∀ x y, ι (x * y) = ι x * ι y) →
-      (∀ x, x ∈ Formalism.UG.intL L ↔ ι x ∈ AddSubgroup.closure {z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E) | ∃ a : AF F, At (evFin F v) a ∧
-        evFin F v a ∈ v.adicCompletionIntegers F ∧ ∃ o : 𝓞 E, z = a • inclR (F := F) (AF F) (o : E)}) →
-      ∀ P : GL (Fin n) L, (∀ x : Fin n → L, (∀ i, x i ∈ Formalism.UG.intL L) ↔
-        (fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ x) i)) ∈ GlobalTheory.InertSph.latAt X v) →
-      ∀ (g : UA σ X.J) (K K' : Matrix (Fin n) (Fin n) L), (∀ i j, K i j ∈ Formalism.UG.intL L) →
-        (∀ i j, K' i j ∈ Formalism.UG.intL L) →
-        mat g = (1 - ι 1) • (1 : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) +
-          ((P : Matrix (Fin n) (Fin n) L) * K * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)).map ι →
-        mat g⁻¹ = (1 - ι 1) • (1 : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) +
-          ((P : Matrix (Fin n) (Fin n) L) * K' * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)).map ι →
-        g ∈ GlobalTheory.InertSph.KAt σ X v := by
+theorem mem_KAt_of_frame
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (v : Pl (F := F)) (n : ℕ) (X : Spc F E n) (L : Type) [Field L]
+        [Valued L (WithZero (Multiplicative ℤ))]
+        (ι : L
+          →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)),
+      Function.Injective ι
+        → (∀ z
+            : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E),
+          At (evFin F v) z ↔ ∃ x, ι x = z)
+        → (∀ x y, ι (x * y) = ι x * ι y)
+        → (∀ x,
+          x ∈ Formalism.UG.intL L
+            ↔ ι x ∈ AddSubgroup.closure
+              {z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E) | ∃ a : AF F, At (evFin F v) a ∧
+                evFin F v a ∈ v.adicCompletionIntegers F ∧ ∃ o : 𝓞 E, z = a • inclR (F := F) (AF F) (o : E)})
+        → ∀ P : GL (Fin n) L,
+          (∀ x : Fin n → L,
+              (∀ i, x i ∈ Formalism.UG.intL L)
+                ↔ (fun i => ι (((P : Matrix (Fin n) (Fin n) L) *ᵥ x) i))
+                  ∈ GlobalTheory.InertSph.latAt X v)
+            → ∀ (g : UA σ X.J) (K K' : Matrix (Fin n) (Fin n) L),
+              (∀ i j, K i j ∈ Formalism.UG.intL L) → (∀ i j, K' i j ∈ Formalism.UG.intL L)
+                → mat g
+                  = (1 - ι 1)
+                      • (1 : Matrix (Fin n) (Fin n)
+                        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+                          (E := E)))
+                    + ((P : Matrix (Fin n) (Fin n) L) * K
+                      * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)).map ι
+                → mat g⁻¹
+                  = (1 - ι 1)
+                      • (1 : Matrix (Fin n) (Fin n)
+                        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+                          (E := E)))
+                    + ((P : Matrix (Fin n) (Fin n) L) * K'
+                      * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)).map ι
+                → g ∈ GlobalTheory.InertSph.KAt σ X v := by
   intro F E _ _ _ _ _ σ v n X L _ _ ι _hinj hsurj hmul _hint P hP g K K' hK hK' hg hg'
-  refine ⟨?_, fun z hz => ⟨mulVec_mem_latAt X v ι hsurj hmul P hP K hK _ hg z hz,
-    mulVec_mem_latAt X v ι hsurj hmul P hP K' hK' _ hg' z hz⟩⟩
+  refine ⟨
+    ?_,
+    fun z hz => ⟨
+      mulVec_mem_latAt X v ι hsurj hmul P hP K hK _ hg z hz,
+      mulVec_mem_latAt X v ι hsurj hmul P hP K' hK' _ hg' z hz
+    ⟩
+  ⟩
   have hsup : ∀ w u, evFin F v u = 0 → u • ι w = 0 := fun w => (hsurj (ι w)).2 ⟨w, rfl⟩
   intro u hu
   set N := (P : Matrix (Fin n) (Fin n) L) * K * ((P⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)

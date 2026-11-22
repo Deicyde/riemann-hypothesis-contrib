@@ -11,8 +11,10 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.M.cosetSum :
-    ∀ (F : Type) [Field F] [NumberField F] (M₀ : Meas F) (σ) (β u : G1 F → ℝ≥0∞), M.RowSec (F := F) σ → M.NWt β → Measurable u → (∀ (ξ : F) g, u (nU (rt ξ) * g) = u g) → ∫⁻ g, u g * β g ∂M₀.μ = ∫⁻ g in M₀.D, ∑' r, u (ratS F (σ r) * g) ∂M₀.μ := by
+theorem UpperTheory.ConvolutionTheory.R2.M.cosetSum
+    : ∀ (F : Type) [Field F] [NumberField F] (M₀ : Meas F) (σ) (β u : G1 F → ℝ≥0∞),
+      M.RowSec (F := F) σ → M.NWt β → Measurable u → (∀ (ξ : F) g, u (nU (rt ξ) * g) = u g)
+        → ∫⁻ g, u g * β g ∂M₀.μ = ∫⁻ g in M₀.D, ∑' r, u (ratS F (σ r) * g) ∂M₀.μ := by
   intro F _ _ M₀ σ β u hσ hβ hu hinv
   have hc := (UpperTheory.ConvolutionTheory.R2.M.rowCosets F).2 σ hσ
   haveI := M₀.haar
@@ -30,8 +32,10 @@ theorem UpperTheory.ConvolutionTheory.R2.M.cosetSum :
     intro g
     rw [← (Equiv.ofBijective e he).tsum_eq, ENNReal.tsum_prod']
     refine tsum_congr fun r => ?_
-    have h1 : ∀ ξ : F, u ((Equiv.ofBijective e he (r, ξ)) • g) * β ((Equiv.ofBijective e he (r, ξ)) • g)
-        = u (ratS F (σ r) * g) * β (nU (rt ξ) * (ratS F (σ r) * g)) := by
+    have h1
+        : ∀ ξ : F,
+          u ((Equiv.ofBijective e he (r, ξ)) • g) * β ((Equiv.ofBijective e he (r, ξ)) • g)
+            = u (ratS F (σ r) * g) * β (nU (rt ξ) * (ratS F (σ r) * g)) := by
       intro ξ
       have h2 : (Equiv.ofBijective e he (r, ξ)) • g = nU (rt ξ) * (ratS F (σ r) * g) := by
         change (nU (rt ξ) * ratS F (σ r)) * g = _

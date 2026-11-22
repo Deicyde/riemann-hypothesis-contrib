@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1
 open scoped TensorProduct
 
 private lemma val_alg (v : HeightOneSpectrum ℤ) (s : ℚ) :
@@ -71,8 +73,7 @@ private lemma val_ne_zero (p : ℕ) (t : (AfP p)ˣ) (v : AwayP p) :
   rw [h, zero_mul] at hm
   exact zero_ne_one hm
 
-theorem UpperTheory.Gal.G1.pScale :
-    Scale := by
+theorem UpperTheory.Gal.G1.pScale : Scale := by
   intro p t
   classical
   choose q hq0 hq using fun v : AwayP p => exists_gen v.1
@@ -85,8 +86,9 @@ theorem UpperTheory.Gal.G1.pScale :
     exact_mod_cast Nat.pos_of_ne_zero (hq0 v)
   · intro w
     rw [val_alg, map_prod]
-    have hterm : ∀ v ∈ S, w.1.valuation ℚ ((q v : ℚ) ^ (-n v)) =
-        if v = w then WithZero.exp (n v) else 1 := by
+    have hterm
+        : ∀ v ∈ S,
+          w.1.valuation ℚ ((q v : ℚ) ^ (- n v)) = if v = w then WithZero.exp (n v) else 1 := by
       intro v _
       rw [map_zpow₀]
       split_ifs with hvw

@@ -11,12 +11,15 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.MinorPolynomials
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryGroupMassFormula.UsCompose
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryGroupMassFormula.UsCompose
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 lemma cd_eval (q : MvPolynomial (Vr (2 * r + k + 1)) ℂ) : ContDiff ℝ ∞ (fun g : Mat k r => eval (vars g) q) := by
   induction q using MvPolynomial.induction_on

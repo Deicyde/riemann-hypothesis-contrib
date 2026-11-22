@@ -24,8 +24,9 @@ theorem specExists : SpecExists := by
   refine ⟨l ∘ σ, fun i j hij => hmono hij, U.submatrix id σ, ?_, ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, Matrix.conjTranspose_submatrix,
       Matrix.submatrix_mul_equiv, ← Matrix.star_eq_conjTranspose, hUU, Matrix.submatrix_id_id]
-  · have hD : Matrix.diagonal (fun i => ((l ∘ σ) i : ℂ)) =
-        (Matrix.diagonal (fun i => (l i : ℂ))).submatrix σ σ := by
+  · have hD
+        : Matrix.diagonal (fun i => ((l ∘ σ) i : ℂ))
+          = (Matrix.diagonal (fun i => (l i : ℂ))).submatrix σ σ := by
       rw [Matrix.submatrix_diagonal_equiv]
       rfl
     rw [hD, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv,
@@ -44,13 +45,14 @@ theorem hsEq : HSEq := by
     funext i
     simp [Pi.star_apply, Complex.star_def]
   have hAh : Aᴴ = W * D * Wᴴ := by
-    rw [hA, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hDh,
-      Matrix.mul_assoc]
+    rw [hA, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+      hDh, Matrix.mul_assoc]
   have key : (A * Aᴴ).trace = ∑ i, ((d i : ℂ)) ^ 2 := by
     rw [hAh, hA]
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc Wᴴ W, hWW, Matrix.one_mul, Matrix.trace_mul_comm, Matrix.mul_assoc,
-      Matrix.mul_assoc, hWW, Matrix.mul_one, hD, Matrix.diagonal_mul_diagonal, Matrix.trace_diagonal]
+      Matrix.mul_assoc, hWW, Matrix.mul_one, hD, Matrix.diagonal_mul_diagonal,
+      Matrix.trace_diagonal]
     simp [sq]
   have lhs : (A * Aᴴ).trace = ((∑ i, ∑ j, ‖A i j‖ ^ 2 : ℝ) : ℂ) := by
     simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply]

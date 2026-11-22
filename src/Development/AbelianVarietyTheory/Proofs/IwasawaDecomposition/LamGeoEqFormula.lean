@@ -152,8 +152,8 @@ lemma target_step (h : D.Hyp) (hg : D.GapHyp) (i : ℕ) (h1 : 1 ≤ i) (h2 : i <
 
 theorem thetaSide : ThetaSideStatement := by
   intro D h hg
-  refine ⟨fun i _ h2 => theta_param h i h2, fun i _ h2 => lamPrime_param h i h2, dTau_int h,
-    ?_, ?_, ?_⟩
+  refine
+    ⟨fun i _ h2 => theta_param h i h2, fun i _ h2 => lamPrime_param h i h2, dTau_int h, ?_, ?_, ?_⟩
   · intro i _ _
     obtain ⟨d, hd⟩ := dTau_int h
     unfold WeightData.lamPrime WeightData.thetaWt

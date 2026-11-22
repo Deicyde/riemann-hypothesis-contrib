@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensFacts
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -120,38 +122,51 @@ end GlobalTheory.Mum.TensTor
 
 namespace GlobalTheory.Mum.TensTor
 
-theorem vmul_comb {U : Type} [CommGroup U] (s1 s2 t P1 P2 P Q wc wb wb' wcb wcb' wbb' wcbb' w1 : U)
+theorem vmul_comb
+    {U : Type} [CommGroup U]
+    (s1 s2 t P1 P2 P Q wc wb wb' wcb wcb' wbb' wcbb' w1 : U)
     (h1 : s1 * wc * wb = P1 * wcb * w1) (h2 : s2 * wc * wb' = P2 * wcb' * w1)
-    (h3 : t * wcbb' * wc * wb * wb' = Q * wcb * wcb' * wbb' * w1) (h4 : P * Q = P1 * P2) :
-    s1 * s2 / t * wc * wbb' = P * wcbb' * w1 := by
+    (h3 : t * wcbb' * wc * wb * wb' = Q * wcb * wcb' * wbb' * w1) (h4 : P * Q = P1 * P2)
+    : s1 * s2 / t * wc * wbb' = P * wcbb' * w1 := by
   apply Additive.ofMul.injective
   have E := fun {p q : U} (e : p = q) => congrArg Additive.ofMul e
-  have a1 := E h1; have a2 := E h2; have a3 := E h3; have a4 := E h4
+  have a1 := E h1
+  have a2 := E h2
+  have a3 := E h3
+  have a4 := E h4
   simp only [ofMul_mul, ofMul_div] at *
   linear_combination (norm := abel) a1 + a2 - a3 - a4
 
-theorem gtRelV_mul : ∀ (F : Type) [Field F] (N N' : NumD F) {r : ℕ} (W : Matrix (Fin r) (Fin r) ℤ)
-    (φ : N'.A → Fin r → N.A) (e : N'.X → Fin r → N.X) (wv : N'.A → F), TensFacts W φ e wv →
-    ∀ (v' u' : N'.Gt) (vs us : Fin r → N.Gt), GtRelV W φ e wv v' vs → GtRelV W φ e wv u' us →
-      GtRelV W φ e wv (v' * u') (vs * us) := by
+theorem gtRelV_mul
+    : ∀ (F : Type) [Field F] (N N' : NumD F) {r : ℕ} (W : Matrix (Fin r) (Fin r) ℤ)
+        (φ : N'.A → Fin r → N.A) (e : N'.X → Fin r → N.X) (wv : N'.A → F),
+      TensFacts W φ e wv
+        → ∀ (v' u' : N'.Gt) (vs us : Fin r → N.Gt),
+          GtRelV W φ e wv v' vs → GtRelV W φ e wv u' us → GtRelV W φ e wv (v' * u') (vs * us) := by
   intro F _ N N' r W φ e wv hT v' u' vs us hv hu
   obtain ⟨hφ, -, -, -, hφc, hw0, hcub, -⟩ := hT
   refine ⟨fun j => ?_, fun χ' => ?_⟩
   · show φ (v'.b * u'.b) j = (vs j).b * (us j).b
     rw [hφ, hv.1, hu.1]
   · let w : N'.A → Fˣ := fun x => Units.mk0 (wv x) (hw0 x)
-    let Pf : (Fin r → N.Gt) → Fˣ := fun g => ∏ i, ∏ j, ((g j).s (e χ' i) * (g i).s (e χ' j) /
-      (N.θ (N.c (e χ' j)) (g j).b (N.c (e χ' i)) * N.θ (N.c (e χ' j)) (g j).b (g i).b *
-        N.θ (N.c (e χ' i)) (g i).b (N.c (e χ' j) * (g j).b))) ^ W i j
-    let Qf : Fˣ := ∏ i, ∏ j, (N.θ (N.c (e χ' i) * N.c (e χ' j)) ((vs i).b * (vs j).b) ((us i).b * (us j).b) /
-      (N.θ (N.c (e χ' i)) (vs i).b (us i).b * N.θ (N.c (e χ' j)) (vs j).b (us j).b)) ^ W i j
-    have h1 : v'.s χ' * w (N'.c χ') * w v'.b = Pf vs * w (N'.c χ' * v'.b) * w 1 := Units.ext (hv.2 χ')
-    have h2 : u'.s χ' * w (N'.c χ') * w u'.b = Pf us * w (N'.c χ' * u'.b) * w 1 := Units.ext (hu.2 χ')
+    let Pf : (Fin r → N.Gt) → Fˣ := fun g =>
+      ∏ i, ∏ j, ((g j).s (e χ' i) * (g i).s (e χ' j) /
+        (N.θ (N.c (e χ' j)) (g j).b (N.c (e χ' i)) * N.θ (N.c (e χ' j)) (g j).b (g i).b *
+          N.θ (N.c (e χ' i)) (g i).b (N.c (e χ' j) * (g j).b))) ^ W i j
+    let Qf : Fˣ :=
+      ∏ i, ∏ j, (N.θ (N.c (e χ' i) * N.c (e χ' j)) ((vs i).b * (vs j).b) ((us i).b * (us j).b) /
+        (N.θ (N.c (e χ' i)) (vs i).b (us i).b * N.θ (N.c (e χ' j)) (vs j).b (us j).b)) ^ W i j
+    have h1 : v'.s χ' * w (N'.c χ') * w v'.b = Pf vs * w (N'.c χ' * v'.b) * w 1 :=
+      Units.ext (hv.2 χ')
+    have h2 : u'.s χ' * w (N'.c χ') * w u'.b = Pf us * w (N'.c χ' * u'.b) * w 1 :=
+      Units.ext (hu.2 χ')
     have h3 := hcub (N'.c χ') v'.b u'.b
     rw [mul_assoc (N'.c χ') v'.b u'.b] at h3
     simp only [hφc, hv.1, hu.1] at h3
-    have h3' : N'.θ (N'.c χ') v'.b u'.b * w (N'.c χ' * (v'.b * u'.b)) * w (N'.c χ') * w v'.b * w u'.b =
-        Qf * w (N'.c χ' * v'.b) * w (N'.c χ' * u'.b) * w (v'.b * u'.b) * w 1 := Units.ext h3
+    have h3'
+        : N'.θ (N'.c χ') v'.b u'.b * w (N'.c χ' * (v'.b * u'.b)) * w (N'.c χ') * w v'.b * w u'.b
+          = Qf * w (N'.c χ' * v'.b) * w (N'.c χ' * u'.b) * w (v'.b * u'.b) * w 1 :=
+      Units.ext h3
     have h4 : Pf (vs * us) * Qf = Pf vs * Pf us := by
       simp only [Pf, Qf]
       rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
@@ -159,8 +174,9 @@ theorem gtRelV_mul : ∀ (F : Type) [Field F] (N N' : NumD F) {r : ℕ} (W : Mat
       rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun j _ => ?_
       rw [← mul_zpow, ← mul_zpow]
-      exact congrArg (· ^ W i j) (cube_corr N.cub (N.c (e χ' i)) (N.c (e χ' j)) (vs i).b (vs j).b (us i).b (us j).b
-        ((vs j).s (e χ' i)) ((vs i).s (e χ' j)) ((us j).s (e χ' i)) ((us i).s (e χ' j)))
+      exact congrArg (· ^ W i j)
+        (cube_corr N.cub (N.c (e χ' i)) (N.c (e χ' j)) (vs i).b (vs j).b (us i).b (us j).b
+          ((vs j).s (e χ' i)) ((vs i).s (e χ' j)) ((us j).s (e χ' i)) ((us i).s (e χ' j)))
     exact congrArg Units.val (vmul_comb _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ h1 h2 h3' h4)
 
 end GlobalTheory.Mum.TensTor

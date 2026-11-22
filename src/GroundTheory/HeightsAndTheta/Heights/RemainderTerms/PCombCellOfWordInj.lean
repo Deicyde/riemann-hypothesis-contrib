@@ -11,8 +11,9 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Finset Comb
 
-theorem Comb.pcnt_lt_of_lt_of_eq {m n : ℕ} (w : Fin n → Fin m) {s t : Fin n} (hst : s < t)
-    (i : Fin m) (hs : w s = i) : pcnt w s i < pcnt w t i := by
+theorem Comb.pcnt_lt_of_lt_of_eq
+    {m n : ℕ} (w : Fin n → Fin m) {s t : Fin n} (hst : s < t) (i : Fin m) (hs : w s = i)
+    : pcnt w s i < pcnt w t i := by
   unfold pcnt
   apply Finset.card_lt_card
   rw [Finset.ssubset_iff_of_subset]

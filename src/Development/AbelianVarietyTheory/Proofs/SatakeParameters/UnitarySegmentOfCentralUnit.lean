@@ -22,4 +22,3 @@ namespace GlobalTheory.UnitLSeg
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 end GlobalTheory.UnitLSeg
-

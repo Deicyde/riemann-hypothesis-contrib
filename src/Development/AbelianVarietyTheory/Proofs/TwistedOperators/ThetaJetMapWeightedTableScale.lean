@@ -15,8 +15,7 @@ section General
 
 variable {σ : Type} [Fintype σ]
 
-def scaleVar (w : σ → ℂ) : MvPolynomial σ ℂ →ₐ[ℂ] MvPolynomial σ ℂ :=
-  aeval fun v => C (w v) * X v
+def scaleVar (w : σ → ℂ) : MvPolynomial σ ℂ →ₐ[ℂ] MvPolynomial σ ℂ := aeval fun v => C (w v) * X v
 
 lemma monomial_eq_prod (s : σ →₀ ℕ) (r : ℂ) :
     (monomial s r : MvPolynomial σ ℂ) = C r * ∏ v, X v ^ s v := by
@@ -42,9 +41,11 @@ lemma jetLin_monomial (J : (DVar ι a b →₀ ℕ) → ℂ) (m : ((ι × Fin b 
     rw [coe_basisMonomials, smul_monomial, smul_eq_mul, mul_one]
   rw [h, map_smul, jetLin, Module.Basis.constr_basis, smul_monomial, smul_eq_mul]
 
-def wDer (c : ι → ℂ) : (ι × Fin b × Fin b) ⊕ DVar ι a b → ℂ := Sum.elim (fun _ => 1) (fun k => c k.1)
+def wDer (c : ι → ℂ) : (ι × Fin b × Fin b) ⊕ DVar ι a b → ℂ :=
+  Sum.elim (fun _ => 1) (fun k => c k.1)
 
-def wCoord (c : ι → ℂ) : (ι × Fin b × Fin b) ⊕ DVar ι a b → ℂ := Sum.elim (fun k => c k.1) (fun _ => 1)
+def wCoord (c : ι → ℂ) : (ι × Fin b × Fin b) ⊕ DVar ι a b → ℂ :=
+  Sum.elim (fun k => c k.1) (fun _ => 1)
 
 lemma jetLin_scaleDer (c : ι → ℂ) (J : (DVar ι a b →₀ ℕ) → ℂ) (Q : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) ℂ) :
     jetLin J (scaleVar (wDer c) Q) = jetLin (fun m => (∏ k, c k.1 ^ m k) * J m) Q := by
@@ -95,18 +96,25 @@ lemma jetLin_smul_table (u : ℂ) (J : (DVar ι a b →₀ ℕ) → ℂ) (Q : Mv
 
 end Jet
 
-theorem jetMap_weight_scale {ι : Type} [Fintype ι] {a b : ℕ} (u : ℂ) (c : ι → ℂ) (J : (DVar ι a b →₀ ℕ) → ℂ) (nn : ι → ℕ)
-    (P : Formalism.L2.DIV.Pol ℂ ι a) :
-    jetMap (fun m => u * ((m.prod fun k e => c k.1 ^ e) * J m)) nn P =
-      u • Formalism.GradedWeylDivisibility.blockAct ℂ (fun τ => Matrix.diagonal fun _ : Fin b => c τ) (jetMap J nn P) := by
-  have hJ : (fun m : DVar ι a b →₀ ℕ => u * ((m.prod fun k e => c k.1 ^ e) * J m)) =
-      fun m => u * ((∏ k, c k.1 ^ m k) * J m) := by
+theorem jetMap_weight_scale
+    {ι : Type} [Fintype ι]
+    {a b : ℕ}
+    (u : ℂ) (c : ι → ℂ) (J : (DVar ι a b →₀ ℕ) → ℂ) (nn : ι → ℕ) (P : Formalism.L2.DIV.Pol ℂ ι a)
+    : jetMap (fun m => u * ((m.prod fun k e => c k.1 ^ e) * J m)) nn P
+      = u • Formalism.GradedWeylDivisibility.blockAct ℂ
+        (fun τ => Matrix.diagonal fun _ : Fin b => c τ)
+        (jetMap J nn P) := by
+  have hJ
+      : (fun m : DVar ι a b →₀ ℕ => u * ((m.prod fun k e => c k.1 ^ e) * J m))
+        = fun m => u * ((∏ k, c k.1 ^ m k) * J m) := by
     funext m
     rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
   rw [hJ, blockAct_diag]
-  rw [jetMap, jetMap, LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.comp_apply,
-    AlgHom.toLinearMap_apply]
-  have key := DFunLike.congr_fun (scale_subD (a := a) (b := b) c) (LinearMap.mulRight ℂ (∏ τ, frDet ℂ a τ ^ nn τ) P)
+  rw [jetMap, jetMap, LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.comp_apply,
+    LinearMap.comp_apply, AlgHom.toLinearMap_apply]
+  have key :=
+    DFunLike.congr_fun (scale_subD (a := a) (b := b) c)
+      (LinearMap.mulRight ℂ (∏ τ, frDet ℂ a τ ^ nn τ) P)
   rw [AlgHom.comp_apply, AlgHom.comp_apply] at key
   rw [jetLin_smul_table, ← jetLin_scaleDer, key, jetLin_scaleCoord]
 

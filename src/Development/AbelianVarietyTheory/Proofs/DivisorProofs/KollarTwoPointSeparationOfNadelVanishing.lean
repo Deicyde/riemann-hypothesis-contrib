@@ -11,22 +11,26 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Poi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 namespace GlobalTheory
 
-theorem pointSeparationPair_of_vanishing :
-    GlobalTheory.Published.Principalisation → GlobalTheory.Published.NadelVanishingPair → GlobalTheory.Published.NefNumerics →
-      GlobalTheory.Published.PointSeparationPair := by
-  intro hP hV hN X _ _ _ p n hproj hdim M Δ m G r N₀ x₁ x₂ c hM hΔ hklt hm hG hr hnef hbig hC
-    h₁ h₂ hx hc hZ hs
+theorem pointSeparationPair_of_vanishing
+    : GlobalTheory.Published.Principalisation → GlobalTheory.Published.NadelVanishingPair
+      → GlobalTheory.Published.NefNumerics
+      → GlobalTheory.Published.PointSeparationPair := by
+  intro hP hV hN X _ _ _ p n hproj hdim M Δ m G r N₀ x₁ x₂ c hM hΔ hklt hm hG hr hnef hbig hC h₁ h₂
+    hx hc hZ hs
   letI := algebraΓOfHom p
-  obtain ⟨h, hpos, hsum, hh⟩ := GlobalTheory.T.exists_rational_budgets_twoPointInduction n r c hr hc hs
+  obtain ⟨h, hpos, hsum, hh⟩ :=
+    GlobalTheory.T.exists_rational_budgets_twoPointInduction n r c hr hc hs
   have hr' : (0 : ℚ) < (r : ℚ) := by exact_mod_cast hr
-  refine GlobalTheory.T.separate_two_points_nef_big hP hV hN X p n hproj hdim M Δ m G N₀ (1 / (r : ℚ)) h x₁ x₂ hM hΔ hklt hm hG
-    hnef hbig ?_ h₁ h₂ hx hpos ?_ hsum (by positivity)
+  refine GlobalTheory.T.separate_two_points_nef_big hP hV hN X p n hproj hdim M Δ m G N₀
+    (1 / (r : ℚ)) h x₁ x₂ hM hΔ hklt hm hG hnef hbig ?_ h₁ h₂ hx hpos ?_ hsum (by positivity)
   · intro C hCc
     rw [hC C hCc]
     ring

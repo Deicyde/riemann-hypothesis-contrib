@@ -19,8 +19,8 @@ theorem omegaK_sq (d : ℕ) : 4 * omegaK d ^ 2 = 4 * omegaK d - (1 + d) := by
   unfold omegaK
   linear_combination hs
 
-theorem omegaK_lin {d : ℕ} (hd : 0 < d) {t n : ℤ} (h : (t : ℂ) * omegaK d + n = 0) :
-    t = 0 ∧ n = 0 := by
+theorem omegaK_lin {d : ℕ} (hd : 0 < d) {t n : ℤ} (h : (t : ℂ) * omegaK d + n = 0)
+    : t = 0 ∧ n = 0 := by
   have h2 : (t : ℂ) * (1 + Complex.I * ((Real.sqrt d : ℝ) : ℂ)) + 2 * n = 0 := by
     rw [omegaK] at h
     linear_combination 2 * h
@@ -41,10 +41,14 @@ theorem omegaK_lin {d : ℕ} (hd : 0 < d) {t n : ℤ} (h : (t : ℂ) * omegaK d 
   have hn : (n : ℝ) = 0 := by linarith
   exact ⟨by exact_mod_cast ht, by exact_mod_cast hn⟩
 
-theorem cmPoint {d : ℕ} (hd : 0 < d) {L : PeriodPair} (hL : HasCMBy d L) {c : ℂ} {τ : ℍ}
-    (h : IsTauOf L c τ) (x y : ℤ) :
-    ∃ A B C D : ℤ, ((x : ℂ) + y * omegaK d) * τ = A * τ + B ∧ (x : ℂ) + y * omegaK d = C * τ + D ∧
-      4 * (A * D - B * C) = 4 * x ^ 2 + 4 * x * y + y ^ 2 * (1 + d) := by
+theorem cmPoint
+    {d : ℕ} (hd : 0 < d)
+    {L : PeriodPair} (hL : HasCMBy d L)
+    {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ)
+    (x y : ℤ)
+    : ∃ A B C D : ℤ,
+      ((x : ℂ) + y * omegaK d) * τ = A * τ + B ∧ (x : ℂ) + y * omegaK d = C * τ + D
+        ∧ 4 * (A * D - B * C) = 4 * x ^ 2 + 4 * x * y + y ^ 2 * (1 + d) := by
   obtain ⟨hc, hmem⟩ := h
   have hmul : ∀ w ∈ L.lattice, ((x : ℂ) + y * omegaK d) * w ∈ L.lattice := by
     intro w hw
@@ -72,10 +76,12 @@ theorem cmPoint {d : ℕ} (hd : 0 < d) {L : PeriodPair} (hL : HasCMBy d L) {c : 
   have key : ((x : ℂ) + y * omegaK d - A) * ((x : ℂ) + y * omegaK d - D) = B * C := by
     linear_combination ((x : ℂ) + y * omegaK d - A) * e2 + (C : ℂ) * e1
   have hω := omegaK_sq d
-  obtain ⟨ht, hn⟩ := omegaK_lin hd (t := 8 * x * y + 4 * y ^ 2 - 4 * (A + D) * y)
-    (n := 4 * x ^ 2 - y ^ 2 * (1 + d) - 4 * (A + D) * x + 4 * (A * D - B * C)) (by
-      push_cast
-      linear_combination 4 * key - (y : ℂ) ^ 2 * hω)
+  obtain ⟨ht, hn⟩ :=
+    omegaK_lin hd (t := 8 * x * y + 4 * y ^ 2 - 4 * (A + D) * y)
+      (n := 4 * x ^ 2 - y ^ 2 * (1 + d) - 4 * (A + D) * x + 4 * (A * D - B * C))
+      (by
+        push_cast
+        linear_combination 4 * key - (y : ℂ) ^ 2 * hω)
   by_cases hy : y = 0
   · subst hy
     simp only [Int.cast_zero, zero_mul, add_zero] at e1 e2
@@ -92,7 +98,8 @@ theorem cmPoint {d : ℕ} (hd : 0 < d) {L : PeriodPair} (hL : HasCMBy d L) {c : 
     have hA : A = x := by
       have := congrArg Complex.im e1'
       simp only [Complex.sub_im, Complex.intCast_im, Complex.mul_im, Complex.intCast_re,
-        Complex.sub_re] at this
+          Complex.sub_re]
+        at this
       have h0 : ((x : ℝ) - A) * (τ : ℂ).im = 0 := by linarith
       rcases mul_eq_zero.mp h0 with h0 | h0
       · have : (A : ℝ) = x := by linarith

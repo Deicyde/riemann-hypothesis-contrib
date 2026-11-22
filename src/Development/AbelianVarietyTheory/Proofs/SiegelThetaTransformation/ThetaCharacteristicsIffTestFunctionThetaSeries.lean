@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FirstM
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open scoped ComplexConjugate ComplexOrder Real Classical
 
 namespace GlobalTheory.SW.CharLink
@@ -25,10 +26,13 @@ def chi (a b : Fin n → Fin g → ℚ) : TF n g := fun m =>
 theorem isIntegral_iff_int (q : ℚ) : IsIntegral ℤ q ↔ ∃ z : ℤ, (z : ℚ) = q :=
   IsIntegrallyClosed.isIntegral_iff
 
-theorem exists_den (a : Fin n → Fin g → ℚ) :
-    ∃ R : ℕ, 0 < R ∧ ∀ k i, ∃ z : ℤ, (z : ℚ) = R * a k i := by
-  refine ⟨∏ p : Fin n × Fin g, (a p.1 p.2).den, Finset.prod_pos fun p _ => (a p.1 p.2).den_pos,
-    fun k i => ?_⟩
+theorem exists_den (a : Fin n → Fin g → ℚ)
+    : ∃ R : ℕ, 0 < R ∧ ∀ k i, ∃ z : ℤ, (z : ℚ) = R * a k i := by
+  refine ⟨
+    ∏ p : Fin n × Fin g, (a p.1 p.2).den,
+    Finset.prod_pos fun p _ => (a p.1 p.2).den_pos,
+    fun k i => ?_
+  ⟩
   obtain ⟨c, hc⟩ : (a k i).den ∣ ∏ p : Fin n × Fin g, (a p.1 p.2).den :=
     Finset.dvd_prod_of_mem (fun p : Fin n × Fin g => (a p.1 p.2).den) (Finset.mem_univ (k, i))
   refine ⟨c * (a k i).num, ?_⟩
@@ -53,8 +57,9 @@ theorem isSB_chi (a b : Fin n → Fin g → ℚ) : IsSB (chi a b) := by
     rw [hz, hu]
     ring
   · choose w hw using fun k i => (isIntegral_iff_int _).1 (hy k i)
-    have h1 : (∀ k i, IsIntegral ℤ ((x + ((R * S : ℕ) : ℚ) • y) k i - a k i)) ↔
-        ∀ k i, IsIntegral ℤ (x k i - a k i) := by
+    have h1
+        : (∀ k i, IsIntegral ℤ ((x + ((R * S : ℕ) : ℚ) • y) k i - a k i))
+          ↔ ∀ k i, IsIntegral ℤ (x k i - a k i) := by
       refine forall₂_congr fun k i => ?_
       simp only [isIntegral_iff_int, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, ← hw]
       constructor
@@ -62,8 +67,9 @@ theorem isSB_chi (a b : Fin n → Fin g → ℚ) : IsSB (chi a b) := by
         exact ⟨z - R * S * w k i, by push_cast at hz ⊢; linarith⟩
       · rintro ⟨z, hz⟩
         exact ⟨z + R * S * w k i, by push_cast; linarith⟩
-    have h2 : ∑ k, (x + ((R * S : ℕ) : ℚ) • y) k ⬝ᵥ b k =
-        ∑ k, x k ⬝ᵥ b k + ((∑ k, ∑ i, R * w k i * v k i : ℤ) : ℚ) := by
+    have h2
+        : ∑ k, (x + ((R * S : ℕ) : ℚ) • y) k ⬝ᵥ b k
+          = ∑ k, x k ⬝ᵥ b k + ((∑ k, ∑ i, R * w k i * v k i : ℤ) : ℚ) := by
       push_cast
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
@@ -74,12 +80,20 @@ theorem isSB_chi (a b : Fin n → Fin g → ℚ) : IsSB (chi a b) := by
     rw [if_congr h1 rfl rfl, h2, Rat.cast_add, mul_add, Complex.exp_add, Rat.cast_intCast,
       mul_comm (2 * π * I) ((_ : ℤ) : ℂ), Complex.exp_int_mul_two_pi_mul_I, mul_one]
 
-theorem thS_chi (a b : Fin n → Fin g → ℚ) {τ : Matrix (Fin g) (Fin g) ℂ}
-    (hτ : (τ.map Complex.im).PosDef) (ζ : Fin n → Fin g → ℂ) :
-    thS (chi a b) τ ζ = ∏ k, Geo.Tor.thetaChar τ (fun i => ((a k i : ℝ) : ℂ))
-      (fun i => ((b k i : ℝ) : ℂ)) (ζ k) := by
-  have h := CanTh.hasSum_prod_thTerm (τ := fun _ : Fin n => τ)
-    (fun _ => CanTh.mem_thetaDomain hτ) (fun k i => (a k i : ℝ)) (fun k i => (b k i : ℝ)) ζ
+theorem thS_chi
+    (a b : Fin n → Fin g → ℚ)
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : (τ.map Complex.im).PosDef)
+    (ζ : Fin n → Fin g → ℂ)
+    : thS (chi a b) τ ζ
+      = ∏ k, Geo.Tor.thetaChar τ (fun i => ((a k i : ℝ) : ℂ))
+        (fun i => ((b k i : ℝ) : ℂ)) (ζ k) := by
+  have h :=
+    CanTh.hasSum_prod_thTerm
+      (τ := fun _ : Fin n => τ)
+      (fun _ => CanTh.mem_thetaDomain hτ)
+      (fun k i => (a k i : ℝ))
+      (fun k i => (b k i : ℝ))
+      ζ
   rw [← h.tsum_eq, thS]
   let f : (Fin n → Fin g → ℤ) → Matrix (Fin n) (Fin g) ℚ := fun m k i => m k i + a k i
   have hf : Function.Injective f := fun m m' e => by
@@ -94,10 +108,14 @@ theorem thS_chi (a b : Fin n → Fin g → ℚ) {τ : Matrix (Fin g) (Fin g) ℂ
     simp only [CanTh.thTerm]
     rw [chi, if_pos h1, ← Complex.exp_sum, ← Complex.exp_add]
     congr 1
-    have h2 : ∀ k, ((fun i => (m k i : ℂ)) + fun i => (((a k i : ℚ) : ℝ) : ℂ)) = qv (f m k) :=
-      fun k => by funext i; simp [qv, f]
-    have h3 : ∀ k, ((f m k ⬝ᵥ b k : ℚ) : ℂ) = qv (f m k) ⬝ᵥ fun i => (((b k i : ℚ) : ℝ) : ℂ) :=
-      fun k => by simp [qv, dotProduct]
+    have h2
+        : ∀ k,
+          ((fun i => (m k i : ℂ)) + fun i => (((a k i : ℚ) : ℝ) : ℂ)) = qv (f m k) := fun k => by
+      funext i; simp [qv, f]
+    have h3
+        : ∀ k,
+          ((f m k ⬝ᵥ b k : ℚ) : ℂ) = qv (f m k) ⬝ᵥ fun i => (((b k i : ℚ) : ℝ) : ℂ) := fun k => by
+      simp [qv, dotProduct]
     simp only [h2, Rat.cast_sum, h3, dotProduct_add, Finset.mul_sum, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun k _ => by ring
   · intro x hx
@@ -110,8 +128,8 @@ theorem thS_chi (a b : Fin n → Fin g → ℚ) {τ : Matrix (Fin g) (Fin g) ℂ
 def spanChi (n g : ℕ) : Submodule ℂ (TF n g) :=
   Submodule.span ℂ (Set.range fun p : (Fin n → Fin g → ℚ) × (Fin n → Fin g → ℚ) => chi p.1 p.2)
 
-theorem mul_exp_mem {f : TF n g} (hf : f ∈ spanChi n g) (b : Fin n → Fin g → ℚ) :
-    (fun m => f m * cexp (2 * π * I * ((∑ k, m k ⬝ᵥ b k : ℚ) : ℂ))) ∈ spanChi n g := by
+theorem mul_exp_mem {f : TF n g} (hf : f ∈ spanChi n g) (b : Fin n → Fin g → ℚ)
+    : (fun m => f m * cexp (2 * π * I * ((∑ k, m k ⬝ᵥ b k : ℚ) : ℂ))) ∈ spanChi n g := by
   induction hf using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨p, rfl⟩ := hx
@@ -145,15 +163,18 @@ theorem avg_int {R : ℕ} (hR : 0 < R) (z : ℤ) : avg R z = if (R : ℤ) ∣ z 
     rw [this, Complex.exp_int_mul_two_pi_mul_I]
     simp
 
-theorem mul_avg_mem {f : TF n g} (hf : f ∈ spanChi n g) (R : ℕ) (c : ℚ) (k : Fin n) (i : Fin g) :
-    (fun m => f m * avg R (m k i - c)) ∈ spanChi n g := by
-  have h := (spanChi n g).smul_mem (R : ℂ)⁻¹ ((spanChi n g).sum_mem fun s (_ : s ∈ Finset.range R) =>
-    (spanChi n g).smul_mem (cexp (2 * π * I * (-c / R)) ^ s)
-      (mul_exp_mem hf (Pi.single k (Pi.single i ((s : ℚ) / R)))))
+theorem mul_avg_mem {f : TF n g} (hf : f ∈ spanChi n g) (R : ℕ) (c : ℚ) (k : Fin n) (i : Fin g)
+    : (fun m => f m * avg R (m k i - c)) ∈ spanChi n g := by
+  have h :=
+    (spanChi n g).smul_mem (R : ℂ)⁻¹
+      ((spanChi n g).sum_mem fun s (_ : s ∈ Finset.range R) =>
+        (spanChi n g).smul_mem (cexp (2 * π * I * (-c / R)) ^ s)
+          (mul_exp_mem hf (Pi.single k (Pi.single i ((s : ℚ) / R)))))
   convert h using 1
   funext m
-  have h1 : ∀ t : ℚ, ∑ l, m l ⬝ᵥ (Pi.single k (Pi.single i t) : Fin n → Fin g → ℚ) l =
-      m k i * t := fun t => by
+  have h1
+      : ∀ t : ℚ,
+        ∑ l, m l ⬝ᵥ (Pi.single k (Pi.single i t) : Fin n → Fin g → ℚ) l = m k i * t := fun t => by
     rw [Finset.sum_eq_single k]
     · simp
     · intro l _ hl
@@ -167,11 +188,13 @@ theorem mul_avg_mem {f : TF n g} (hf : f ∈ spanChi n g) (R : ℕ) (c : ℚ) (k
   push_cast
   ring
 
-theorem ind_mem {R : ℕ} (hR : 0 < R) (c : Fin n → Fin g → ℚ) :
-    (fun m : Matrix (Fin n) (Fin g) ℚ =>
-      if ∀ k i, ∃ z : ℤ, m k i - c k i = R * z then (1 : ℂ) else 0) ∈ spanChi n g := by
-  have h : ∀ s : Finset (Fin n × Fin g),
-      (fun m => chi c 0 m * ∏ p ∈ s, avg R (m p.1 p.2 - c p.1 p.2)) ∈ spanChi n g := by
+theorem ind_mem {R : ℕ} (hR : 0 < R) (c : Fin n → Fin g → ℚ)
+    : (fun m : Matrix (Fin n) (Fin g) ℚ =>
+        if ∀ k i, ∃ z : ℤ, m k i - c k i = R * z then (1 : ℂ) else 0)
+      ∈ spanChi n g := by
+  have h
+      : ∀ s : Finset (Fin n × Fin g),
+        (fun m => chi c 0 m * ∏ p ∈ s, avg R (m p.1 p.2 - c p.1 p.2)) ∈ spanChi n g := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -184,7 +207,8 @@ theorem ind_mem {R : ℕ} (hR : 0 < R) (c : Fin n → Fin g → ℚ) :
   convert h Finset.univ using 2 with m
   by_cases h1 : ∀ k i, IsIntegral ℤ (m k i - c k i)
   · choose z hz using fun k i => (isIntegral_iff_int _).1 (h1 k i)
-    have h2 : (∀ k i, ∃ w : ℤ, m k i - c k i = R * w) ↔ ∀ p : Fin n × Fin g, (R : ℤ) ∣ z p.1 p.2 := by
+    have h2
+        : (∀ k i, ∃ w : ℤ, m k i - c k i = R * w) ↔ ∀ p : Fin n × Fin g, (R : ℤ) ∣ z p.1 p.2 := by
       rw [Prod.forall]
       refine forall₂_congr fun k i => exists_congr fun w => ?_
       rw [← hz]
@@ -204,8 +228,9 @@ theorem mem_spanChi {φ : TF n g} (hφ : IsSB φ) : φ ∈ spanChi n g := by
   have hz : (0 : ℤ) < R * R := by positivity
   let T : Finset (Fin n → Fin g → ℤ) :=
     Fintype.piFinset fun _ => Fintype.piFinset fun _ => Finset.Ico (0 : ℤ) (R * R)
-  have h := (spanChi n g).sum_mem fun c (_ : c ∈ T) => (spanChi n g).smul_mem
-    (φ fun k i => (c k i : ℚ) / R) (ind_mem hR fun k i => (c k i : ℚ) / R)
+  have h :=
+    (spanChi n g).sum_mem fun c (_ : c ∈ T) =>
+      (spanChi n g).smul_mem (φ fun k i => (c k i : ℚ) / R) (ind_mem hR fun k i => (c k i : ℚ) / R)
   convert h using 1
   funext m
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
@@ -222,7 +247,9 @@ theorem mem_spanChi {φ : TF n g} (hφ : IsSB φ) : φ ∈ spanChi n g := by
       ring
     rw [Finset.sum_eq_single_of_mem (fun k i => z k i % (R * R))]
     · rw [if_pos fun k i => ⟨_, h2 k i⟩, mul_one,
-        ← hp (fun k i => ((z k i % (R * R) : ℤ) : ℚ) / R) (fun k i => ((z k i / (R * R) : ℤ) : ℚ))
+        ← hp
+          (fun k i => ((z k i % (R * R) : ℤ) : ℚ) / R)
+          (fun k i => ((z k i / (R * R) : ℤ) : ℚ))
           fun k i => (isIntegral_iff_int _).2 ⟨_, rfl⟩]
       congr 1
       ext k i
@@ -255,9 +282,11 @@ theorem mem_spanChi {φ : TF n g} (hφ : IsSB φ) : φ ∈ spanChi n g := by
     field_simp at hw
     linear_combination -hw
 
-theorem thS_sum {m : ℕ} (t : Fin m → ℂ) (φ : Fin m → TF n g) (hφ : ∀ j, IsSB (φ j))
-    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ Siegel (Fin g)) (ζ : Fin n → Fin g → ℂ) :
-    thS (∑ j, t j • φ j) τ ζ = ∑ j, t j * thS (φ j) τ ζ := by
+theorem thS_sum
+    {m : ℕ} (t : Fin m → ℂ) (φ : Fin m → TF n g) (hφ : ∀ j, IsSB (φ j))
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ Siegel (Fin g))
+    (ζ : Fin n → Fin g → ℂ)
+    : thS (∑ j, t j • φ j) τ ζ = ∑ j, t j * thS (φ j) τ ζ := by
   unfold thS
   simp only [← tsum_mul_left]
   rw [← Summable.tsum_finsetSum fun j _ =>
@@ -265,45 +294,79 @@ theorem thS_sum {m : ℕ} (t : Fin m → ℂ) (φ : Fin m → TF n g) (hφ : ∀
   refine tsum_congr fun x => ?_
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul, mul_assoc]
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r q0 : ℕ} {X : Data E r}
-  (hr : X.p0 + q0 = r) {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (idx : Fin g ≃ X.Ψ × Fin r)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {r q0 : ℕ} {X : Data E r} (hr : X.p0 + q0 = r)
+  {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ}
+  (idx : Fin g ≃ X.Ψ × Fin r)
 
-theorem thA_chi (hs : IsSympl X bas) {x : Frame X.Ψ r} (hx : x ∈ X.dom) (a b : Fin n → Fin g → ℚ)
-    (z : Fin n → Fin g → ℂ) :
-    thA X bas idx (chi a b) x z = (hMat X bas idx x).det ^ (n / 2) *
-      ∏ k, canFn X bas idx (fun i => (a k i : ℝ)) (fun i => (b k i : ℝ)) x (z k) := by
+theorem thA_chi
+    (hs : IsSympl X bas)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    (a b : Fin n → Fin g → ℚ) (z : Fin n → Fin g → ℂ)
+    : thA X bas idx (chi a b) x z
+      = (hMat X bas idx x).det ^ (n / 2)
+        * ∏ k, canFn X bas idx (fun i => (a k i : ℝ)) (fun i => (b k i : ℝ)) x (z k) := by
   rw [thA, thS_chi a b (tauMat_im_posDef idx hs hx), Finset.mul_sum, Complex.exp_sum, mul_assoc,
     ← Finset.prod_mul_distrib]
   rfl
 
-theorem theta_sum_smul_chi (hs : IsSympl X bas) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {m : ℕ}
-    (a b : Fin m → Fin n → Fin g → ℚ) (t : Fin m → ℂ) (P : Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n)) :
-    thP X hr bas idx (∑ j, t j • chi (a j) (b j)) P x =
-      ∑ j, t j * thFr X hr bas idx n (fun k i => (a j k i : ℝ)) (fun k i => (b j k i : ℝ)) P x := by
-  have h : thA X bas idx (∑ j, t j • chi (a j) (b j)) x = fun z =>
-      ∑ j, (t j * (hMat X bas idx x).det ^ (n / 2)) *
-        ∏ k, canFn X bas idx (fun i => (a j k i : ℝ)) (fun i => (b j k i : ℝ)) x (z k) := by
-    funext z
-    simp only [mul_assoc, ← thA_chi idx hs hx]
-    simp only [thA]
-    rw [thS_sum t _ (fun j => isSB_chi _ _)
-      ⟨tauMat_isSymm idx hs hx, tauMat_im_posDef idx hs hx⟩, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun j _ => by ring
-  rw [thP, h, Jet.polyDeriv_sum_fun P _ _ _
-    (fun j (z : Fin n → Fin g → ℂ) =>
-      ∏ k, canFn X bas idx (fun i => (a j k i : ℝ)) (fun i => (b j k i : ℝ)) x (z k))
-    fun j _ => differentiable_prod_col fun k => differentiable_canFn idx hs hx _ _]
-  exact Finset.sum_congr rfl fun j _ => by rw [thFr, mul_assoc]
+theorem theta_sum_smul_chi
+    (hs : IsSympl X bas)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    {m : ℕ} (a b : Fin m → Fin n → Fin g → ℚ) (t : Fin m → ℂ)
+    (P : Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n))
+    : thP X hr bas idx (∑ j, t j • chi (a j) (b j)) P x
+      = ∑ j, t j * thFr X hr bas idx n (fun k i => (a j k i : ℝ)) (fun k i => (b j k i : ℝ)) P x :=
+  by
+    have h
+        : thA X bas idx (∑ j, t j • chi (a j) (b j)) x
+          = fun z =>
+            ∑ j, (t j * (hMat X bas idx x).det ^ (n / 2)) *
+              ∏ k, canFn X bas idx (fun i => (a j k i : ℝ)) (fun i => (b j k i : ℝ)) x (z k) := by
+      funext z
+      simp only [mul_assoc, ← thA_chi idx hs hx]
+      simp only [thA]
+      rw [thS_sum t _ (fun j => isSB_chi _ _) ⟨tauMat_isSymm idx hs hx, tauMat_im_posDef idx hs hx⟩,
+        Finset.mul_sum]
+      exact Finset.sum_congr rfl fun j _ => by ring
+    rw [thP, h,
+      Jet.polyDeriv_sum_fun P _ _ _
+        (fun j (z : Fin n → Fin g → ℂ) =>
+          ∏ k, canFn X bas idx (fun i => (a j k i : ℝ)) (fun i => (b j k i : ℝ)) x (z k))
+        fun j _ => differentiable_prod_col fun k => differentiable_canFn idx hs hx _ _]
+    exact Finset.sum_congr rfl fun j _ => by rw [thFr, mul_assoc]
 
-theorem harmonicTheta_eq_sum_thetaCharacteristic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → (∀ (a b : Fin n → Fin g → ℚ), ∃ φ : TF n g, IsSB φ ∧ (∀ m : Matrix (Fin n) (Fin g) ℚ, φ m = if ∀ k i, IsIntegral ℤ (m k i - a k i) then cexp (2 * π * I * ((∑ k, m k ⬝ᵥ b k : ℚ) : ℂ)) else 0) ∧ ∀ P, ∀ x ∈ X.dom, thP X hr bas idx φ P x = thFr X hr bas idx n (fun k i => (a k i : ℝ)) (fun k i => (b k i : ℝ)) P x) ∧ ∀ φ : TF n g, IsSB φ → ∃ (m : ℕ) (a b : Fin m → Fin n → Fin g → ℚ) (t : Fin m → ℂ), ∀ P, ∀ x ∈ X.dom, thP X hr bas idx φ P x = ∑ j, t j * thFr X hr bas idx n (fun k i => (a j k i : ℝ)) (fun k i => (b j k i : ℝ)) P x := by
-  intro E _ _ _ r X g q0 hr bas idx n hs _
-  refine ⟨fun a b => ⟨chi a b, isSB_chi a b, fun _ => rfl, fun P x hx => ?_⟩, fun φ hφ => ?_⟩
-  · simpa using theta_sum_smul_chi hr idx hs hx (fun _ : Fin 1 => a) (fun _ => b) (fun _ => 1) P
-  · obtain ⟨m, t, f, rfl⟩ := Submodule.mem_span_set'.1 (mem_spanChi hφ)
-    choose p hp using fun j => (f j).2
-    refine ⟨m, fun j => (p j).1, fun j => (p j).2, t, fun P x hx => ?_⟩
-    rw [← theta_sum_smul_chi hr idx hs hx]
-    simp only [hp]
+theorem harmonicTheta_eq_sum_thetaCharacteristic
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ)
+        (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
+        (n : ℕ),
+      IsSympl X bas → Even n
+        → (∀ (a b : Fin n → Fin g → ℚ), ∃ φ : TF n g,
+            IsSB φ
+              ∧ (∀ m : Matrix (Fin n) (Fin g) ℚ,
+                φ m
+                  = if ∀ k i, IsIntegral ℤ (m k i - a k i) then
+                      cexp (2 * π * I * ((∑ k, m k ⬝ᵥ b k : ℚ) : ℂ))
+                    else
+                      0)
+              ∧ ∀ P, ∀ x ∈ X.dom,
+                thP X hr bas idx φ P x
+                  = thFr X hr bas idx n (fun k i => (a k i : ℝ)) (fun k i => (b k i : ℝ)) P x)
+          ∧ ∀ φ : TF n g,
+            IsSB φ
+              → ∃ (m : ℕ) (a b : Fin m → Fin n → Fin g → ℚ) (t : Fin m → ℂ), ∀ P, ∀ x ∈ X.dom,
+                thP X hr bas idx φ P x
+                  = ∑ j, t j * thFr X hr bas idx n (fun k i => (a j k i : ℝ)) (fun k i => (b j k i : ℝ)) P x :=
+  by
+    intro E _ _ _ r X g q0 hr bas idx n hs _
+    refine ⟨fun a b => ⟨chi a b, isSB_chi a b, fun _ => rfl, fun P x hx => ?_⟩, fun φ hφ => ?_⟩
+    · simpa using theta_sum_smul_chi hr idx hs hx (fun _ : Fin 1 => a) (fun _ => b) (fun _ => 1) P
+    · obtain ⟨m, t, f, rfl⟩ := Submodule.mem_span_set'.1 (mem_spanChi hφ)
+      choose p hp using fun j => (f j).2
+      refine ⟨m, fun j => (p j).1, fun j => (p j).2, t, fun P x hx => ?_⟩
+      rw [← theta_sum_smul_chi hr idx hs hx]
+      simp only [hp]
 
 end
 

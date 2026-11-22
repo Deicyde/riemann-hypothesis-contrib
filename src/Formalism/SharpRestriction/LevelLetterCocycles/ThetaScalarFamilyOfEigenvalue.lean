@@ -20,22 +20,29 @@ namespace Formalism.MainNotions.N
 
 open Formalism.BasicNotions Formalism.MainNotions Filter Topology
 
-theorem export_link_of_family {eps : ℝ} (Fm : FamP eps) (h : Formalism.MainNotions.TwistedPlaces.OrbitValuationBound Fm) : LinkN Fm := by
+theorem export_link_of_family
+    {eps : ℝ} (Fm : FamP eps) (h : Formalism.MainNotions.TwistedPlaces.OrbitValuationBound Fm)
+    : LinkN Fm := by
   obtain ⟨C, x0, hx⟩ := h
   refine ⟨C, x0, fun x hx0 i hsha j hj hS => ?_⟩
   have hp := hx x hx0 i
   unfold TwistedPlaces.aux₃ at hp
   exact hp hsha hS j hj
 
-theorem linkN_of {eps : ℝ} (Fm : FamP eps) (hA : Formalism.MainNotions.TwistedPlaces.AdmF Fm) (hS : Formalism.MainNotions.TwistedPlaces.KudlaFamilyStatement Fm) :
-    LinkN Fm := export_link_of_family Fm (hS hA)
+theorem linkN_of
+    {eps : ℝ} (Fm : FamP eps) (hA : Formalism.MainNotions.TwistedPlaces.AdmF Fm)
+    (hS : Formalism.MainNotions.TwistedPlaces.KudlaFamilyStatement Fm)
+    : LinkN Fm :=
+  export_link_of_family Fm (hS hA)
 
 def ThetaScalarNonzero (D : D7) (μ : D.what₂.Tup) (j : ℕ) : Prop :=
-  ∀ σ : D.what₂.FT, ∃ lam : ℂ, lam ≠ 0 ∧ ∀ f ∈ D.what₂.isot j σ,
-    D.what₂.thetaP μ j (D.what₂.thetaT μ j f) = lam • f
+  ∀ σ : D.what₂.FT, ∃ lam : ℂ,
+    lam ≠ 0 ∧ ∀ f ∈ D.what₂.isot j σ, D.what₂.thetaP μ j (D.what₂.thetaT μ j f) = lam • f
 
-theorem thetaT_injective (D : D7) (μ : D.what₂.Tup) (j : ℕ) (hI : DirectSum.IsInternal (D.what₂.isot j))
-    (h : ThetaScalarNonzero D μ j) : Function.Injective (D.what₂.thetaT μ j) := by
+theorem thetaT_injective
+    (D : D7) (μ : D.what₂.Tup)
+    (j : ℕ) (hI : DirectSum.IsInternal (D.what₂.isot j)) (h : ThetaScalarNonzero D μ j)
+    : Function.Injective (D.what₂.thetaT μ j) := by
   classical
   choose lam hlam0 hlam using h
   set T : Module.End ℂ (D.what₂.Mj j) := (D.what₂.thetaP μ j).comp (D.what₂.thetaT μ j) with hTdef
@@ -43,14 +50,13 @@ theorem thetaT_injective (D : D7) (μ : D.what₂.Tup) (j : ℕ) (hI : DirectSum
     intro σ f hf
     rw [Module.End.mem_eigenspace_iff]
     exact hlam σ f hf
-  have htop : (⊤ : Submodule ℂ (D.what₂.Mj j)) ≤ ⨆ (c : ℂ) (_ : c ≠ 0), Module.End.eigenspace T c := by
+  have htop
+      : (⊤ : Submodule ℂ (D.what₂.Mj j)) ≤ ⨆ (c : ℂ) (_ : c ≠ 0), Module.End.eigenspace T c := by
     rw [← hI.submodule_iSup_eq_top]
     refine iSup_le fun σ => le_trans (hsub σ) ?_
     exact le_iSup₂_of_le (lam σ) (hlam0 σ) le_rfl
   have hind : iSupIndep (Module.End.eigenspace T) := by
-    first
-      | exact Module.End.eigenspaces_iSupIndep T
-      | exact Module.End.eigenspaces_independent T
+    first | exact Module.End.eigenspaces_iSupIndep T | exact Module.End.eigenspaces_independent T
   have hdis : Disjoint (Module.End.eigenspace T 0) ⊤ := (hind 0).mono_right htop
   have hker : LinearMap.ker T = ⊥ := by
     rw [← Module.End.eigenspace_zero]
@@ -60,8 +66,9 @@ theorem thetaT_injective (D : D7) (μ : D.what₂.Tup) (j : ℕ) (hI : DirectSum
 
 def LamPos (D : D7) (μ : D.what₂.Tup) (j : ℕ) : Prop :=
   ∀ σ : D.what₂.FT,
-    (∀ f ∈ D.what₂.isot j σ, D.what₂.thetaP μ j (D.what₂.thetaT μ j f) = ((D.what₂.lamP μ j σ : ℝ) : ℂ) • f) ∧
-    (D.what₂.isot j σ ≠ ⊥ → 0 < D.what₂.lamP μ j σ)
+    (∀ f ∈ D.what₂.isot j σ,
+        D.what₂.thetaP μ j (D.what₂.thetaT μ j f) = ((D.what₂.lamP μ j σ : ℝ) : ℂ) • f)
+      ∧ (D.what₂.isot j σ ≠ ⊥ → 0 < D.what₂.lamP μ j σ)
 
 end Formalism.MainNotions.N
 

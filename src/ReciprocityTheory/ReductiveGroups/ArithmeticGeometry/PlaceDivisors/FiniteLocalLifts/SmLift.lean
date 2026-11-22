@@ -9,19 +9,25 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.Pdiv.FiniteLocalHoms
 
-variable {R : Type} [CommRing R] {A W K : Type} [CommRing A] [CommRing W] [CommRing K]
-  [Algebra R A] [Algebra R W] [Algebra R K]
+variable
+  {R : Type} [CommRing R]
+  {A W K : Type} [CommRing A] [CommRing W] [CommRing K] [Algebra R A] [Algebra R W] [Algebra R K]
 
-theorem exists_lift_nil [Algebra.FormallySmooth R A] [Algebra.FinitePresentation R A]
+theorem exists_lift_nil
+    [Algebra.FormallySmooth R A] [Algebra.FinitePresentation R A]
     (ρ : W →ₐ[R] K) (hsurj : Function.Surjective ρ) (hnil : ∀ a ∈ RingHom.ker ρ, IsNilpotent a)
-    (φ : A →ₐ[R] K) : ∃ ψ : A →ₐ[R] W, ρ.comp ψ = φ := by
+    (φ : A →ₐ[R] K)
+    : ∃ ψ : A →ₐ[R] W, ρ.comp ψ = φ := by
   classical
-  obtain ⟨n, f, hf, hfg⟩ : ∃ (n : ℕ) (f : MvPolynomial (Fin n) R →ₐ[R] A), Function.Surjective f ∧
-      (RingHom.ker f.toRingHom).FG := by
+  obtain ⟨n, f, hf, hfg⟩
+      : ∃ (n : ℕ) (f : MvPolynomial (Fin n) R →ₐ[R] A),
+        Function.Surjective f ∧ (RingHom.ker f.toRingHom).FG := by
     first
     | exact Algebra.FinitePresentation.out
-    | (obtain ⟨n, f, hf, hfg⟩ := Algebra.FinitePresentation.out (R := R) (A := A)
-       exact ⟨n, f, hf, hfg⟩)
+    | (
+        obtain ⟨n, f, hf, hfg⟩ := Algebra.FinitePresentation.out (R := R) (A := A)
+        exact ⟨n, f, hf, hfg⟩
+      )
   choose w hw using fun i : Fin n => hsurj (φ (f (MvPolynomial.X i)))
   let Φ : MvPolynomial (Fin n) R →ₐ[R] W := MvPolynomial.aeval w
   have hΦ : ρ.comp Φ = φ.comp f := by
@@ -53,25 +59,28 @@ theorem exists_lift_nil [Algebra.FormallySmooth R A] [Algebra.FinitePresentation
     intro a ha
     rw [AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
     exact hker ha
-  let g : A →ₐ[R] W ⧸ J := (Ideal.Quotient.liftₐ (RingHom.ker f) ((Ideal.Quotient.mkₐ R J).comp Φ)
-    hcond).comp (Ideal.quotientKerAlgEquivOfSurjective hf).symm.toAlgHom
+  let g : A →ₐ[R] W ⧸ J :=
+    (Ideal.Quotient.liftₐ (RingHom.ker f) ((Ideal.Quotient.mkₐ R J).comp Φ) hcond).comp
+      (Ideal.quotientKerAlgEquivOfSurjective hf).symm.toAlgHom
   refine ⟨Algebra.FormallySmooth.lift J hJnil g, ?_⟩
   apply AlgHom.ext
   intro a
   obtain ⟨p, rfl⟩ := hf a
   have hmk := Algebra.FormallySmooth.mk_lift J hJnil g (f p)
   have e2 : g (f p) = Ideal.Quotient.mk J (Φ p) := by
-    have e0 : (Ideal.quotientKerAlgEquivOfSurjective hf).symm (f p) = Ideal.Quotient.mk (RingHom.ker f) p := by
+    have e0
+        : (Ideal.quotientKerAlgEquivOfSurjective hf).symm (f p)
+          = Ideal.Quotient.mk (RingHom.ker f) p := by
       rw [AlgEquiv.symm_apply_eq]
-      first
-      | rfl
-      | simp
+      first | rfl | simp
     show (Ideal.Quotient.liftₐ (RingHom.ker f) ((Ideal.Quotient.mkₐ R J).comp Φ) hcond)
       ((Ideal.quotientKerAlgEquivOfSurjective hf).symm (f p)) = _
     rw [e0]
     rfl
   have e3 : ρ (Algebra.FormallySmooth.lift J hJnil g (f p)) = ρ (Φ p) := by
-    have h4 : Ideal.Quotient.mk J (Algebra.FormallySmooth.lift J hJnil g (f p)) = Ideal.Quotient.mk J (Φ p) :=
+    have h4
+        : Ideal.Quotient.mk J (Algebra.FormallySmooth.lift J hJnil g (f p))
+          = Ideal.Quotient.mk J (Φ p) :=
       hmk.trans e2
     rw [Ideal.Quotient.eq] at h4
     have h5 := hJker h4

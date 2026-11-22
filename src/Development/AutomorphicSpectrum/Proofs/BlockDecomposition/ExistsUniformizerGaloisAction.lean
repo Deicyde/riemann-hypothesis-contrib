@@ -16,8 +16,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Valuatio
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge
 open scoped Classical
 open ValuativeRel GroundTheory.LocalField GroundTheory.LocalField.FormalGroup
 open scoped GroundTheory.PAdicHodge.CyclNorms
@@ -27,28 +30,31 @@ namespace GlobalTheory.CompanionTheory.LTHodge.UnitAct
 section Ring
 
 variable {l : ℕ} [Fact l.Prime] {K : FinExt l}
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   [Algebra F (Om l)] [ValuativeExtension F (Om l)]
 
-theorem valuation_le_one_iff (x : F) :
-    valuation F x ≤ 1 ↔ ‖algebraMap F (Om l) x‖ ≤ 1 := by
-  rw [← map_one (valuation F), ← (valuation F).vle_iff_le, ← ValuativeExtension.vle_iff_vle (B := Om l),
-    GroundTheory.PAdicHodge.CyclNorms.vle_iff_norm_le, map_one, norm_one]
+theorem valuation_le_one_iff (x : F) : valuation F x ≤ 1 ↔ ‖algebraMap F (Om l) x‖ ≤ 1 := by
+  rw [← map_one (valuation F), ← (valuation F).vle_iff_le,
+    ← ValuativeExtension.vle_iff_vle (B := Om l), GroundTheory.PAdicHodge.CyclNorms.vle_iff_norm_le,
+    map_one, norm_one]
 
-theorem exists_ringEquiv (hR : Set.range (algebraMap F (Om l)) = (K.1 : Set (Om l))) :
-    ∃ ρ : 𝒪[F] ≃+* ↥(OL K), ∀ a : 𝒪[F],
+theorem exists_ringEquiv (hR : Set.range (algebraMap F (Om l)) = (K.1 : Set (Om l)))
+    : ∃ ρ : 𝒪[F] ≃+* ↥(OL K), ∀ a : 𝒪[F],
       (((ρ a : ↥(OL K)) : ↥K.1) : Om l) = algebraMap F (Om l) (a : F) := by
   have hmem : ∀ a : 𝒪[F], algebraMap F (Om l) (a : F) ∈ K.1 := fun a => by
     have h : algebraMap F (Om l) (a : F) ∈ (K.1 : Set (Om l)) := hR ▸ ⟨_, rfl⟩
     exact h
   have hO : ∀ a : 𝒪[F], (⟨_, hmem a⟩ : ↥K.1) ∈ OL K := fun a =>
-    (GlobalTheory.IntNormFinExt.mem_OL_iff_norm_le_one l K _).mpr ((valuation_le_one_iff (a : F)).mp a.2)
-  let f : 𝒪[F] →+* ↥(OL K) :=
-    { toFun := fun a => ⟨⟨_, hmem a⟩, hO a⟩
-      map_one' := Subtype.ext (Subtype.ext (by simp))
-      map_mul' := fun a b => Subtype.ext (Subtype.ext (by simp))
-      map_zero' := Subtype.ext (Subtype.ext (by simp))
-      map_add' := fun a b => Subtype.ext (Subtype.ext (by simp)) }
+    (GlobalTheory.IntNormFinExt.mem_OL_iff_norm_le_one l K _).mpr
+      ((valuation_le_one_iff (a : F)).mp a.2)
+  let f : 𝒪[F] →+* ↥(OL K) := {
+    toFun := fun a => ⟨⟨_, hmem a⟩, hO a⟩
+    map_one' := Subtype.ext (Subtype.ext (by simp))
+    map_mul' := fun a b => Subtype.ext (Subtype.ext (by simp))
+    map_zero' := Subtype.ext (Subtype.ext (by simp))
+    map_add' := fun a b => Subtype.ext (Subtype.ext (by simp))
+  }
   have hinj : Function.Injective f := fun a b hab => by
     have h : algebraMap F (Om l) (a : F) = algebraMap F (Om l) (b : F) :=
       congrArg (fun c : ↥(OL K) => ((c : ↥K.1) : Om l)) hab
@@ -63,30 +69,35 @@ theorem exists_ringEquiv (hR : Set.range (algebraMap F (Om l)) = (K.1 : Set (Om 
     exact ⟨⟨y, (valuation_le_one_iff y).mpr hn⟩, Subtype.ext (Subtype.ext hy)⟩
   exact ⟨RingEquiv.ofBijective f ⟨hinj, hsurj⟩, fun a => rfl⟩
 
-theorem card_quot (ρ : 𝒪[F] ≃+* ↥(OL K)) {π : 𝒪[F]} (hπ : Irreducible π) :
-    Nat.card (↥(OL K) ⧸ Ideal.span {ρ π}) = Nat.card 𝓀[F] := by
+theorem card_quot (ρ : 𝒪[F] ≃+* ↥(OL K)) {π : 𝒪[F]} (hπ : Irreducible π)
+    : Nat.card (↥(OL K) ⧸ Ideal.span {ρ π}) = Nat.card 𝓀[F] := by
   have e1 : (𝒪[F] ⧸ Ideal.span {π}) ≃ (↥(OL K) ⧸ Ideal.span {ρ π}) :=
     (Ideal.quotientEquiv (Ideal.span {π}) (Ideal.span {ρ π}) ρ
       (by rw [Ideal.map_span, Set.image_singleton]; simp)).toEquiv
-  have e2 : 𝓀[F] ≃ (𝒪[F] ⧸ Ideal.span {π}) :=
-    (Ideal.quotEquivOfEq hπ.maximalIdeal_eq).toEquiv
+  have e2 : 𝓀[F] ≃ (𝒪[F] ⧸ Ideal.span {π}) := (Ideal.quotEquivOfEq hπ.maximalIdeal_eq).toEquiv
   exact Nat.card_congr (e2.trans e1).symm
 
-theorem map_ltPoly (ρ : 𝒪[F] ≃+* ↥(OL K)) {π : 𝒪[F]} (hπ : Irreducible π) :
-    PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) (ltPoly π : PowerSeries 𝒪[F]) = ltSeries (ρ π) := by
+theorem map_ltPoly (ρ : 𝒪[F] ≃+* ↥(OL K)) {π : 𝒪[F]} (hπ : Irreducible π)
+    : PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) (ltPoly π : PowerSeries 𝒪[F]) = ltSeries (ρ π) := by
   rw [ltSeries, card_quot ρ hπ, ltPoly]
   simp
 
 end Ring
 
-theorem main : ∀ {l : ℕ} [Fact l.Prime] {K : FinExt l} {χ : ↥(GK K) →* (↥K.1)ˣ}, IsLTChar K χ →
-    ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-    [Algebra F (Om l)] [ValuativeExtension F (Om l)] [Algebra.IsAlgebraic F (Om l)],
-    Set.range (algebraMap F (Om l)) = (K.1 : Set (Om l)) →
-    ∃ (π : 𝒪[F]) (hπ : Irreducible π), ∀ (g : Om l ≃ₐ[F] Om l) (g' : ↥(GK K)), (∀ y, g y = (g' : GQ l) y) →
-      ∃ u : 𝒪[F]ˣ, algebraMap F (Om l) ((u : 𝒪[F]) : F) = (((χ g' : (↥K.1)ˣ) : ↥K.1) : Om l) ∧
-        ∀ n, ∀ x ∈ lubinTateTorsion (Om l) (hπ := hπ) (isLubinTateSeries_ltPoly π) n,
-          lubinTateGalPointMap (hπ := hπ) (isLubinTateSeries_ltPoly π) g x = (u : 𝒪[F]) • x := by
+theorem main
+    : ∀ {l : ℕ} [Fact l.Prime] {K : FinExt l} {χ : ↥(GK K) →* (↥K.1)ˣ},
+      IsLTChar K χ
+        → ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+            [IsNonarchimedeanLocalField F] [Algebra F (Om l)] [ValuativeExtension F (Om l)]
+            [Algebra.IsAlgebraic F (Om l)],
+          Set.range (algebraMap F (Om l)) = (K.1 : Set (Om l))
+            → ∃ (π : 𝒪[F]) (hπ : Irreducible π), ∀ (g : Om l ≃ₐ[F] Om l) (g' : ↥(GK K)),
+              (∀ y, g y = (g' : GQ l) y)
+                → ∃ u : 𝒪[F]ˣ,
+                  algebraMap F (Om l) ((u : 𝒪[F]) : F) = (((χ g' : (↥K.1)ˣ) : ↥K.1) : Om l)
+                    ∧ ∀ n, ∀ x ∈ lubinTateTorsion (Om l) (hπ := hπ) (isLubinTateSeries_ltPoly π) n,
+                      lubinTateGalPointMap (hπ := hπ) (isLubinTateSeries_ltPoly π) g x
+                        = (u : 𝒪[F]) • x := by
   intro l _ K χ hχ F _ _ _ _ _ _ _ hR
   obtain ⟨πK, z, hπK, h0, h1, hs, hch⟩ := hχ
   obtain ⟨ρ, hρ⟩ := exists_ringEquiv (K := K) (F := F) hR
@@ -98,21 +109,22 @@ theorem main : ∀ {l : ℕ} [Fact l.Prime] {K : FinExt l} {χ : ↥(GK K) →* 
   have hcard : Nat.card (↥(OL K) ⧸ Ideal.span {πK}) = Nat.card 𝓀[F] := by
     have h := card_quot ρ hπ
     rwa [hρπ] at h
-  have hcoe : ((πK : ↥K.1) : Om l) = algebraMap F (Om l) (π : F) := by
-    rw [← hρ π, hρπ]
-  have hs' : ∀ n, algebraMap F (Om l) (π : F) * z (n + 1) + z (n + 1) ^ Nat.card 𝓀[F] = z n :=
-    fun n => by
-      rw [← hcoe, ← hcard, add_comm]
-      exact hs n
+  have hcoe : ((πK : ↥K.1) : Om l) = algebraMap F (Om l) (π : F) := by rw [← hρ π, hρπ]
+  have hs'
+      : ∀ n,
+        algebraMap F (Om l) (π : F) * z (n + 1) + z (n + 1) ^ Nat.card 𝓀[F] = z n := fun n => by
+    rw [← hcoe, ← hcard, add_comm]
+    exact hs n
   have hv : ∀ n, valuation (Om l) (z n) < 1 := by
     intro n
     induction n with
     | zero => simp [h0]
     | succ n ih => exact CharEx.valuation_lt_one_of_eq hπ ih (hs' n)
   let Z : ℕ → IdealPoint (Om l) (lubinTateFormalGroup hπ hf) := fun n => IdealPoint.mk (z n) (hv n)
-  have heval : ∀ (a : 𝒪[F]) (h : ↥(GK K)),
-      (((ρ a : ↥(OL K)) : ↥K.1)) = ((χ h : (↥K.1)ˣ) : ↥K.1) →
-      ∀ n, (a • Z n).val = (h : GQ l) (z n) := by
+  have heval
+      : ∀ (a : 𝒪[F]) (h : ↥(GK K)),
+        (((ρ a : ↥(OL K)) : ↥K.1)) = ((χ h : (↥K.1)ˣ) : ↥K.1)
+          → ∀ n, (a • Z n).val = (h : GQ l) (z n) := by
     intro a h ha n
     let Φ : PowerSeries 𝒪[F] := (lubinTateHom hπ hf hf a).toPowerSeries
     let ψ : PowerSeries ↥(OL K) := PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) Φ
@@ -126,12 +138,15 @@ theorem main : ∀ {l : ℕ} [Fact l.Prime] {K : FinExt l} {χ : ↥(GK K) →* 
     have hF0 : PowerSeries.constantCoeff (ltPoly π : PowerSeries 𝒪[F]) = 0 :=
       hf.constantCoeff_eq_zero
     have hsub : PowerSeries.subst ψ (ltSeries πK) = PowerSeries.subst (ltSeries πK) ψ := by
-      have h2 := congrArg (MvPowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)))
-        (subst_lubinTateHom hπ hf hf a)
+      have h2 := congrArg (MvPowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K))) (subst_lubinTateHom hπ hf hf a)
       rw [PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hΦ0),
-        PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF0)] at h2
-      change PowerSeries.subst ψ (PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) (ltPoly π : PowerSeries 𝒪[F])) =
-        PowerSeries.subst (PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) (ltPoly π : PowerSeries 𝒪[F])) ψ at h2
+          PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF0)]
+        at h2
+      change PowerSeries.subst ψ
+            (PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) (ltPoly π : PowerSeries 𝒪[F]))
+          = PowerSeries.subst (PowerSeries.map (ρ : 𝒪[F] →+* ↥(OL K)) (ltPoly π : PowerSeries 𝒪[F]))
+            ψ
+        at h2
       rwa [map_ltPoly ρ hπ, hρπ] at h2
     have hsum := hch h ψ hψ0 hψ1 hsub n
     have hsum2 := CharEx.hasSum_coeff_mul_pow (K := F) Φ (hv n)
@@ -143,18 +158,20 @@ theorem main : ∀ {l : ℕ} [Fact l.Prime] {K : FinExt l} {χ : ↥(GK K) →* 
     rfl
   have hZ0 : Z 0 = 0 := IdealPoint.ext h0
   have hZ1 : Z 1 ≠ 0 := fun h => h1 (congrArg IdealPoint.val h)
-  have hstep : ∀ n, π • Z (n + 1) = Z n := fun n => IdealPoint.ext (by
-    rw [lubinTate_uniformizer_smul_val]
-    change psEval ((ltPoly π : Polynomial 𝒪[F]) : PowerSeries 𝒪[F]) (fun _ => z (n + 1)) = z n
-    rw [psEval_polynomial, aeval_ltPoly]
-    exact hs' n)
+  have hstep : ∀ n, π • Z (n + 1) = Z n := fun n =>
+    IdealPoint.ext (by
+      rw [lubinTate_uniformizer_smul_val]
+      change psEval ((ltPoly π : Polynomial 𝒪[F]) : PowerSeries 𝒪[F]) (fun _ => z (n + 1)) = z n
+      rw [psEval_polynomial, aeval_ltPoly]
+      exact hs' n)
   have hpow : ∀ n, π ^ n • Z (n + 1) = Z 1 := by
     intro n
     induction n with
     | zero => simp
     | succ n ih => rw [pow_succ, mul_smul, hstep, ih]
-  have hunit : ∀ (a : 𝒪[F]) (h : ↥(GK K)),
-      (((ρ a : ↥(OL K)) : ↥K.1)) = ((χ h : (↥K.1)ˣ) : ↥K.1) → IsUnit a := by
+  have hunit
+      : ∀ (a : 𝒪[F]) (h : ↥(GK K)),
+        (((ρ a : ↥(OL K)) : ↥K.1)) = ((χ h : (↥K.1)ˣ) : ↥K.1) → IsUnit a := by
     intro a h ha
     by_contra hnu
     have hm := (IsLocalRing.mem_maximalIdeal a).mpr hnu
@@ -165,10 +182,9 @@ theorem main : ∀ {l : ℕ} [Fact l.Prime] {K : FinExt l} {χ : ↥(GK K) →* 
     rw [h2] at h3
     exact h1 ((map_eq_zero_iff _ (h : GQ l).injective).mp h3.symm)
   refine ⟨π, hπ, fun g g' hg => ?_⟩
-  obtain ⟨u, hu⟩ : ∃ u : 𝒪[F]ˣ,
-      algebraMap F (Om l) ((u : 𝒪[F]) : F) = (((χ g' : (↥K.1)ˣ) : ↥K.1) : Om l) := by
-    have hy : (((χ g' : (↥K.1)ˣ) : ↥K.1) : Om l) ∈ (K.1 : Set (Om l)) :=
-      ((χ g' : (↥K.1)ˣ) : ↥K.1).2
+  obtain ⟨u, hu⟩
+      : ∃ u : 𝒪[F]ˣ, algebraMap F (Om l) ((u : 𝒪[F]) : F) = (((χ g' : (↥K.1)ˣ) : ↥K.1) : Om l) := by
+    have hy : (((χ g' : (↥K.1)ˣ) : ↥K.1) : Om l) ∈ (K.1 : Set (Om l)) := ((χ g' : (↥K.1)ˣ) : ↥K.1).2
     rw [← hR] at hy
     obtain ⟨y, hy⟩ := hy
     have hy0 : y ≠ 0 := by

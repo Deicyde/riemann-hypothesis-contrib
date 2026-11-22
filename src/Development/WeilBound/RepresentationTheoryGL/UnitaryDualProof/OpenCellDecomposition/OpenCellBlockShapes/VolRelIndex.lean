@@ -5,20 +5,26 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Open
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZMir.Leib GlobalTheory.CompanionTheory.Rodier
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZMir.Leib
+  GlobalTheory.CompanionTheory.Rodier
 open scoped Pointwise
 
 namespace PositivityTheory.RgUd.CellB
 
-@[to_additive addRelIndex_ne_zero  ]
-theorem relIndex_ne_zero {G : Type*} [Group G] [TopologicalSpace G] [ContinuousMul G] {U L L₀ : Subgroup G}
-    (hL : L ≤ L₀) (hL₀U : L₀ ≤ U) (hc : IsCompact (L₀ : Set G)) {O : Set G} (hO : IsOpen O)
-    (hOL : O ∩ (U : Set G) = L) : L.relIndex L₀ ≠ 0 := by
+@[to_additive addRelIndex_ne_zero]
+theorem relIndex_ne_zero
+    {G : Type*} [Group G] [TopologicalSpace G] [ContinuousMul G]
+    {U L L₀ : Subgroup G} (hL : L ≤ L₀) (hL₀U : L₀ ≤ U) (hc : IsCompact (L₀ : Set G))
+    {O : Set G} (hO : IsOpen O) (hOL : O ∩ (U : Set G) = L)
+    : L.relIndex L₀ ≠ 0 := by
   have h1 : (1 : G) ∈ O := by
     have : (1 : G) ∈ O ∩ (U : Set G) := by rw [hOL]; exact L.one_mem
     exact this.1
-  obtain ⟨t, htL, htf, hcov⟩ := hc.elim_finite_subcover_image (b := (L₀ : Set G)) (c := fun x => x • O)
-    (fun x _ => hO.smul x) (fun y hy => Set.mem_iUnion₂.2 ⟨y, hy, ⟨1, h1, mul_one y⟩⟩)
+  obtain ⟨t, htL, htf, hcov⟩ :=
+    hc.elim_finite_subcover_image (b := (L₀ : Set G))
+      (c := fun x => x • O)
+      (fun x _ => hO.smul x)
+      (fun y hy => Set.mem_iUnion₂.2 ⟨y, hy, ⟨1, h1, mul_one y⟩⟩)
   have : Finite t := htf.to_subtype
   let φ : t → L₀ ⧸ L.subgroupOf L₀ := fun x => ((⟨x.1, htL x.2⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀)
   have hφ : Function.Surjective φ := by
@@ -42,29 +48,35 @@ theorem relIndex_ne_zero {G : Type*} [Group G] [TopologicalSpace G] [ContinuousM
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 set_option maxHeartbeats 1000000 in
-theorem vol_relIndex (ψ : AddChar k Circle) {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) {W : Type} [AddCommGroup W]
-    [Module ℂ W] (ρ : Representation ℂ (Levi k fun a => Fin (d a)) W) (J : openFns d hd ρ →ₗ[ℂ] W)
+theorem vol_relIndex
+    (ψ : AddChar k Circle)
+    {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N)
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ (Levi k fun a => Fin (d a)) W) (J : openFns d hd ρ →ₗ[ℂ] W)
     (vol : Subgroup (GL (Fin N) k) → ℝ)
-    (hU : ∀ (u : GL (Fin N) k) (hu : u ∈ unipU k d hd) (hb : u ∈ unipB k (Fin N)) (f f' : openFns d hd ρ),
-      (f' : IndSp (stdBlocks d hd) ρ) = parInd (stdBlocks d hd) ρ u f → J f' = (whitChar ψ N ⟨u, hb⟩ : ℂ) • J f)
-    (hV : ∀ L₀ : Subgroup (GL (Fin N) k), L₀ ≤ unipU k d hd → IsCompact (L₀ : Set (GL (Fin N) k)) →
-      (∃ O : Set (GL (Fin N) k), IsOpen O ∧ O ∩ (unipU k d hd : Set (GL (Fin N) k)) = L₀) →
-      0 < vol L₀ ∧ ∀ (f : openFns d hd ρ) (v : W),
-        (∀ (u : GL (Fin N) k) (hb : u ∈ unipB k (Fin N)), u ∈ L₀ →
-          f.1.1.1 (pm k (wOpen d hd) * u) = (whitChar ψ N ⟨u, hb⟩ : ℂ) • v) →
-        (∀ u ∈ unipU k d hd, u ∉ L₀ → f.1.1.1 (pm k (wOpen d hd) * u) = 0) → J f = (vol L₀ : ℂ) • v)
-    {L L₀ : Subgroup (GL (Fin N) k)} (hLL₀ : L ≤ L₀) (hL₀U : L₀ ≤ unipU k d hd)
-    (hL₀c : IsCompact (L₀ : Set (GL (Fin N) k)))
+    (hU : ∀ (u : GL (Fin N) k) (hu : u ∈ unipU k d hd) (hb : u ∈ unipB k (Fin N))
+        (f f' : openFns d hd ρ),
+      (f' : IndSp (stdBlocks d hd) ρ) = parInd (stdBlocks d hd) ρ u f
+        → J f' = (whitChar ψ N ⟨u, hb⟩ : ℂ) • J f)
+    (hV : ∀ L₀ : Subgroup (GL (Fin N) k),
+      L₀ ≤ unipU k d hd → IsCompact (L₀ : Set (GL (Fin N) k))
+        → (∃ O : Set (GL (Fin N) k), IsOpen O ∧ O ∩ (unipU k d hd : Set (GL (Fin N) k)) = L₀)
+        → 0 < vol L₀
+          ∧ ∀ (f : openFns d hd ρ) (v : W),
+            (∀ (u : GL (Fin N) k) (hb : u ∈ unipB k (Fin N)),
+                u ∈ L₀ → f.1.1.1 (pm k (wOpen d hd) * u) = (whitChar ψ N ⟨u, hb⟩ : ℂ) • v)
+              → (∀ u ∈ unipU k d hd, u ∉ L₀ → f.1.1.1 (pm k (wOpen d hd) * u) = 0)
+              → J f = (vol L₀ : ℂ) • v)
+    {L L₀ : Subgroup (GL (Fin N) k)}
+    (hLL₀ : L ≤ L₀) (hL₀U : L₀ ≤ unipU k d hd) (hL₀c : IsCompact (L₀ : Set (GL (Fin N) k)))
     (hL₀O : ∃ O : Set (GL (Fin N) k), IsOpen O ∧ O ∩ (unipU k d hd : Set (GL (Fin N) k)) = L₀)
     (hLc : IsCompact (L : Set (GL (Fin N) k)))
     (hLO : ∃ O : Set (GL (Fin N) k), IsOpen O ∧ O ∩ (unipU k d hd : Set (GL (Fin N) k)) = L)
     (hθ : ∀ (u : GL (Fin N) k) (hb : u ∈ unipB k (Fin N)), u ∈ L₀ → whitChar ψ N ⟨u, hb⟩ = 1)
-    (g : openFns d hd ρ) (v : W) (hv : v ≠ 0)
-    (hg1 : ∀ u ∈ L, g.1.1.1 (pm k (wOpen d hd) * u) = v)
-    (hg0 : ∀ u ∈ unipU k d hd, u ∉ L → g.1.1.1 (pm k (wOpen d hd) * u) = 0) :
-    vol L₀ = (L.relIndex L₀ : ℝ) * vol L := by
+    (g : openFns d hd ρ) (v : W) (hv : v ≠ 0) (hg1 : ∀ u ∈ L, g.1.1.1 (pm k (wOpen d hd) * u) = v)
+    (hg0 : ∀ u ∈ unipU k d hd, u ∉ L → g.1.1.1 (pm k (wOpen d hd) * u) = 0)
+    : vol L₀ = (L.relIndex L₀ : ℝ) * vol L := by
   classical
   have hUB : unipU k d hd ≤ unipB k (Fin N) := inf_le_left
   obtain ⟨O, hO, hOL⟩ := hLO
@@ -76,14 +88,21 @@ theorem vol_relIndex (ψ : AddChar k Circle) {h N : ℕ} (d : Fin h → ℕ) (hd
   have hrB : ∀ q, r q ∈ unipB k (Fin N) := fun q => hUB (hL₀U (hr q))
   let F : L₀ ⧸ L.subgroupOf L₀ → openFns d hd ρ := fun q =>
     ⟨parInd (stdBlocks d hd) ρ (r q) g.1, OpenCoinv.translate_mem d hd ρ (hrB q) g.2⟩
-  let ev : GL (Fin N) k → openFns d hd ρ →+ W := fun y =>
-    { toFun := fun f => f.1.1.1 y, map_zero' := rfl, map_add' := fun _ _ => rfl }
-  have hsum : ∀ y, (∑ q, F q).1.1.1 y = ∑ q, g.1.1.1 (y * r q) := fun y => map_sum (ev y) F Finset.univ
-  have hmem : ∀ (u : GL (Fin N) k) (hu : u ∈ L₀) (q : L₀ ⧸ L.subgroupOf L₀),
-      u * r q ∈ L ↔ q = ((⟨u⁻¹, inv_mem hu⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀) := by
+  let ev : GL (Fin N) k → openFns d hd ρ →+ W := fun y => {
+    toFun := fun f => f.1.1.1 y
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
+  have hsum : ∀ y, (∑ q, F q).1.1.1 y = ∑ q, g.1.1.1 (y * r q) := fun y =>
+    map_sum (ev y) F Finset.univ
+  have hmem
+      : ∀ (u : GL (Fin N) k) (hu : u ∈ L₀) (q : L₀ ⧸ L.subgroupOf L₀),
+        u * r q ∈ L ↔ q = ((⟨u⁻¹, inv_mem hu⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀) := by
     intro u hu q
-    have e : (((⟨u⁻¹, inv_mem hu⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀) = q) ↔
-        (((⟨u⁻¹, inv_mem hu⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀) = ((q.out : L₀) : L₀ ⧸ L.subgroupOf L₀)) := by
+    have e
+        : (((⟨u⁻¹, inv_mem hu⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀) = q)
+          ↔ (((⟨u⁻¹, inv_mem hu⟩ : L₀) : L₀ ⧸ L.subgroupOf L₀)
+            = ((q.out : L₀) : L₀ ⧸ L.subgroupOf L₀)) := by
       rw [QuotientGroup.out_eq']
     rw [eq_comm, e, QuotientGroup.eq, Subgroup.mem_subgroupOf]
     simp [r]

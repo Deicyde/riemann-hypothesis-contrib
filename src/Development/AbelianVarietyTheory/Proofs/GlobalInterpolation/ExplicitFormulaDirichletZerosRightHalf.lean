@@ -21,18 +21,23 @@ namespace GlobalTheory.ExplicitFormulaRight
 
 open GlobalTheory.Mem.An
 
-theorem zfin {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (t T : ℝ) :
-    (zerosIn χ t T).Finite := (ZeroWindow.finite_and_one_le_zmult q χ t T).1
+theorem zfin {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (t T : ℝ) : (zerosIn χ t T).Finite :=
+  (ZeroWindow.finite_and_one_le_zmult q χ t T).1
 
-theorem zsumR_eq {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (t T : ℝ) (f : ℂ → ℝ) :
-    zsumR χ t T f = ∑ ρ ∈ (zfin χ t T).toFinset, (zmult χ ρ : ℝ) * f ρ :=
+theorem zsumR_eq {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (t T : ℝ) (f : ℂ → ℝ)
+    : zsumR χ t T f = ∑ ρ ∈ (zfin χ t T).toFinset, (zmult χ ρ : ℝ) * f ρ :=
   finsum_mem_eq_finite_toFinset_sum _ _
 
-theorem recip_bound : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q),
-    χ.IsPrimitive → ∀ T : ℝ, 2 ≤ T →
-      zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖) ≤ C * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2) ∧
-      zsumR χ 0 T (fun ρ => 1 / ‖ρ‖) ≤
-        C * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2) + C * Real.log (q * T) ^ 2 := by
+theorem recip_bound
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q),
+          χ.IsPrimitive
+            → ∀ T : ℝ,
+              2 ≤ T
+                → zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖) ≤ C * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2)
+                  ∧ zsumR χ 0 T (fun ρ => 1 / ‖ρ‖)
+                    ≤ C * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2) + C * Real.log (q * T) ^ 2 := by
   obtain ⟨C₁, H₁⟩ := zsumR_recip_le zeroCount_holds
   obtain ⟨c, hc, H₂⟩ := GlobalTheory.T.exists_dirichletLFunction_zero_gap_near_one
   refine ⟨|C₁| / c + |C₁| + 1, by positivity, fun q _ χ hχ T hT => ?_⟩
@@ -40,10 +45,12 @@ theorem recip_bound : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (χ : Diri
   have hq : (1 : ℝ) ≤ q := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne q)
   have hl : 0 < Real.log (3 * q) := Real.log_pos (by linarith)
   have hK : 0 < (q : ℝ) ^ 2 * Real.log (3 * q) := by positivity
-  have hA : zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖) ≤
-      (|C₁| / c + |C₁| + 1) * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2) := by
-    have a1 : zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖) ≤
-        ((q : ℝ) ^ 2 * Real.log (3 * q) / c) * zsumR χ 0 1 (fun _ => 1) := by
+  have hA
+      : zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖)
+        ≤ (|C₁| / c + |C₁| + 1) * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2) := by
+    have a1
+        : zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖)
+          ≤ ((q : ℝ) ^ 2 * Real.log (3 * q) / c) * zsumR χ 0 1 (fun _ => 1) := by
       rw [zsumR_eq, zsumR_eq, Finset.mul_sum]
       refine Finset.sum_le_sum fun ρ hρ => ?_
       obtain ⟨r0, r1, ri, rz⟩ := (zfin χ 0 1).mem_toFinset.mp hρ
@@ -61,18 +68,22 @@ theorem recip_bound : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (χ : Diri
       have : 1 / ‖ρ‖ ≤ (q : ℝ) ^ 2 * Real.log (3 * q) / c := by
         have := one_div_le_one_div_of_le (div_pos hc hK) hre
         rwa [one_div_div] at this
-      calc (zmult χ ρ : ℝ) * (1 / ‖ρ‖) ≤ (zmult χ ρ : ℝ) * ((q : ℝ) ^ 2 * Real.log (3 * q) / c) :=
-            mul_le_mul_of_nonneg_left this (by positivity)
+      calc
+        (zmult χ ρ : ℝ) * (1 / ‖ρ‖) ≤ (zmult χ ρ : ℝ) * ((q : ℝ) ^ 2 * Real.log (3 * q) / c) :=
+          mul_le_mul_of_nonneg_left this (by positivity)
         _ = _ := by ring
     have a2 : zsumR χ 0 1 (fun _ => 1) ≤ |C₁| * Real.log (3 * q) :=
       h2.trans (mul_le_mul_of_nonneg_right (le_abs_self _) hl.le)
-    calc _ ≤ ((q : ℝ) ^ 2 * Real.log (3 * q) / c) * (|C₁| * Real.log (3 * q)) :=
-          a1.trans (mul_le_mul_of_nonneg_left a2 (by positivity))
+    calc
+      _ ≤ ((q : ℝ) ^ 2 * Real.log (3 * q) / c) * (|C₁| * Real.log (3 * q)) :=
+        a1.trans (mul_le_mul_of_nonneg_left a2 (by positivity))
       _ = (|C₁| / c) * ((q : ℝ) ^ 2 * Real.log (3 * q) ^ 2) := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_right (by linarith [abs_nonneg C₁]) (by positivity)
   refine ⟨hA, ?_⟩
-  have hB : zsumR χ 0 T (fun ρ => 1 / ‖ρ‖) ≤ zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖) +
-      zsumR χ 0 T (fun ρ => if 1 < |ρ.im| then 1 / ‖ρ‖ else 0) := by
+  have hB
+      : zsumR χ 0 T (fun ρ => 1 / ‖ρ‖)
+        ≤ zsumR χ 0 1 (fun ρ => 1 / ‖ρ‖)
+          + zsumR χ 0 T (fun ρ => if 1 < |ρ.im| then 1 / ‖ρ‖ else 0) := by
     rw [zsumR_eq, zsumR_eq, zsumR_eq]
     have e : (zfin χ 0 1).toFinset = (zfin χ 0 T).toFinset.filter (fun ρ => ¬ 1 < |ρ.im|) := by
       ext ρ
@@ -92,15 +103,15 @@ theorem recip_bound : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (χ : Diri
     linarith [le_abs_self C₁]
   linarith
 
-theorem box_subset {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (T : ℝ) :
-    zerosBox χ (1 / 2) T ⊆ zerosIn χ 0 T := by
+theorem box_subset {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (T : ℝ)
+    : zerosBox χ (1 / 2) T ⊆ zerosIn χ 0 T := by
   rintro ρ ⟨a, b, c, d⟩
   exact ⟨by linarith, b, by simpa using c, d⟩
 
-theorem left_zeros {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (u T : ℝ) (hu : 1 ≤ u) :
-    ‖zsum χ 0 T (fun ρ => (u : ℂ) ^ ρ / ρ) -
-      ∑ᶠ ρ ∈ zerosBox χ (1 / 2) T, (ord χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ)‖ ≤
-      Real.sqrt u * zsumR χ 0 T (fun ρ => 1 / ‖ρ‖) := by
+theorem left_zeros {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (u T : ℝ) (hu : 1 ≤ u)
+    : ‖zsum χ 0 T (fun ρ => (u : ℂ) ^ ρ / ρ) -
+        ∑ᶠ ρ ∈ zerosBox χ (1 / 2) T, (ord χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ)‖
+      ≤ Real.sqrt u * zsumR χ 0 T (fun ρ => 1 / ‖ρ‖) := by
   have hf := (zfin χ 0 T).subset (box_subset χ T)
   have e : hf.toFinset = (zfin χ 0 T).toFinset.filter (fun ρ => 1 / 2 ≤ ρ.re) := by
     ext ρ
@@ -123,14 +134,17 @@ theorem left_zeros {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (u T : �
   · rw [if_neg h, sub_zero, norm_mul, norm_div, Complex.norm_cpow_eq_rpow_re_of_pos hu0,
       Complex.norm_natCast, Real.sqrt_eq_rpow]
     have h1 : u ^ ρ.re ≤ u ^ (1 / 2 : ℝ) := Real.rpow_le_rpow_of_exponent_le hu (not_le.mp h).le
-    calc (zmult χ ρ : ℝ) * (u ^ ρ.re / ‖ρ‖) = u ^ ρ.re * ((zmult χ ρ : ℝ) * (1 / ‖ρ‖)) := by ring
+    calc
+      (zmult χ ρ : ℝ) * (u ^ ρ.re / ‖ρ‖)
+        = u ^ ρ.re * ((zmult χ ρ : ℝ) * (1 / ‖ρ‖)) := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_right h1 (by positivity)
 
-theorem logs {N q u T : ℝ} (hN : 1 ≤ N) (hq : N ≤ q) (hT : 2 ≤ T) (hu : T ≤ u) {L : ℝ}
-    (hL : L = Real.log (q * u * T)) :
-    1 ≤ L ∧ Real.log (N * u * T) ^ 2 ≤ L ^ 2 ∧ Real.log (N * u) ≤ L ^ 2 ∧
-      Real.log (3 * N) ^ 2 ≤ L ^ 2 ∧ Real.log (N * T) ^ 2 ≤ L ^ 2 ∧
-      (Nat.log 2 ⌊u⌋₊ : ℝ) * Real.log q ≤ 2 * L ^ 2 := by
+theorem logs
+    {N q u T : ℝ} (hN : 1 ≤ N) (hq : N ≤ q) (hT : 2 ≤ T) (hu : T ≤ u)
+    {L : ℝ} (hL : L = Real.log (q * u * T))
+    : 1 ≤ L ∧ Real.log (N * u * T) ^ 2 ≤ L ^ 2 ∧ Real.log (N * u) ≤ L ^ 2
+      ∧ Real.log (3 * N) ^ 2 ≤ L ^ 2 ∧ Real.log (N * T) ^ 2 ≤ L ^ 2
+      ∧ (Nat.log 2 ⌊u⌋₊ : ℝ) * Real.log q ≤ 2 * L ^ 2 := by
   have hq1 : 1 ≤ q := hN.trans hq
   have hu2 : 2 ≤ u := hT.trans hu
   have huT : 4 ≤ u * T := by nlinarith
@@ -171,15 +185,16 @@ theorem logs {N q u T : ℝ} (hN : 1 ≤ N) (hq : N ≤ q) (hT : 2 ≤ T) (hu : 
     have a4 : (Nat.log 2 ⌊u⌋₊ : ℝ) ≤ 2 * L := by
       have : (0 : ℝ) ≤ Nat.log 2 ⌊u⌋₊ := by positivity
       nlinarith
-    calc _ ≤ (2 * L) * L := mul_le_mul a4 a1 (Real.log_nonneg hq1) (by linarith)
+    calc
+      _ ≤ (2 * L) * L := mul_le_mul a4 a1 (Real.log_nonneg hq1) (by linarith)
       _ = _ := by ring
 
-theorem combine {A B S s x K E P D Z₁ Z t₁ t₂ l₃ l₄ N q : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B)
-    (hs : 1 ≤ s) (hx : 0 ≤ x) (hK : 0 ≤ K) (hN : 1 ≤ N) (hq : N ≤ q)
-    (hS : S ≤ P + E + D) (hP : P ≤ 2 * K) (hE : E ≤ A * (t₁ + t₂ + Z₁)) (hD : D ≤ s * Z)
-    (h1 : t₁ ≤ x * K) (h2 : t₂ ≤ K) (hl₃ : l₃ ≤ K) (hl₄ : l₄ ≤ K)
-    (hZ₁ : Z₁ ≤ B * (N ^ 2 * l₃)) (hZ : Z ≤ B * (N ^ 2 * l₃) + B * l₄) :
-    S ≤ (2 + A * (2 + B) + 2 * B) * (x + s * q ^ 3) * K := by
+theorem combine
+    {A B S s x K E P D Z₁ Z t₁ t₂ l₃ l₄ N q : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (hs : 1 ≤ s) (hx : 0 ≤ x)
+    (hK : 0 ≤ K) (hN : 1 ≤ N) (hq : N ≤ q) (hS : S ≤ P + E + D) (hP : P ≤ 2 * K)
+    (hE : E ≤ A * (t₁ + t₂ + Z₁)) (hD : D ≤ s * Z) (h1 : t₁ ≤ x * K) (h2 : t₂ ≤ K) (hl₃ : l₃ ≤ K)
+    (hl₄ : l₄ ≤ K) (hZ₁ : Z₁ ≤ B * (N ^ 2 * l₃)) (hZ : Z ≤ B * (N ^ 2 * l₃) + B * l₄)
+    : S ≤ (2 + A * (2 + B) + 2 * B) * (x + s * q ^ 3) * K := by
   have hq1 : 1 ≤ q := hN.trans hq
   have hq3 : 1 ≤ q ^ 3 := one_le_pow₀ hq1
   have hN2 : N ^ 2 ≤ q ^ 3 :=
@@ -198,14 +213,22 @@ theorem combine {A B S s x K E P D Z₁ Z t₁ t₂ l₃ l₄ N q : ℝ} (hA : 0
     have b2 := mul_le_mul_of_nonneg_left (hl₄.trans k1) hB
     linarith
   have z3 : D ≤ 2 * B * M := by
-    calc D ≤ s * (2 * B * (q ^ 3 * K)) := hD.trans (mul_le_mul_of_nonneg_left z2 (by linarith))
+    calc
+      D ≤ s * (2 * B * (q ^ 3 * K)) := hD.trans (mul_le_mul_of_nonneg_left z2 (by linarith))
       _ = 2 * B * (s * (q ^ 3 * K)) := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_left m1 (by positivity)
   have z4 : E ≤ A * (M + M + B * M) := hE.trans (mul_le_mul_of_nonneg_left (by linarith) hA)
   rw [mul_assoc, ← hM]
   linarith
 
-theorem explicit_formula_right : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (u T : ℝ), 2 ≤ T → T ≤ u → (zerosBox χ (1 / 2) T).Finite ∧ ‖(∑ n ∈ Finset.Icc 1 ⌊u⌋₊, ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) - (if χ = 1 then (u : ℂ) else 0) + ∑ᶠ ρ ∈ zerosBox χ (1 / 2) T, (ord χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ)‖ ≤ C * (u / T + Real.sqrt u * (q : ℝ) ^ 3) * Real.log (q * u * T) ^ 2 := by
+theorem explicit_formula_right
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (u T : ℝ),
+          2 ≤ T → T ≤ u
+            → (zerosBox χ (1 / 2) T).Finite
+              ∧ ‖(∑ n ∈ Finset.Icc 1 ⌊u⌋₊, ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) - (if χ = 1 then (u : ℂ) else 0) + ∑ᶠ ρ ∈ zerosBox χ (1 / 2) T, (ord χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ)‖
+                ≤ C * (u / T + Real.sqrt u * (q : ℝ) ^ 3) * Real.log (q * u * T) ^ 2 := by
   obtain ⟨A, HA⟩ := GlobalTheory.T.norm_psi0_add_zsum_le
   obtain ⟨B, hB, HB⟩ := recip_bound
   refine ⟨2 + |A| * (2 + B) + 2 * B, by positivity, fun q _ χ u T hT hu => ?_⟩
@@ -222,10 +245,13 @@ theorem explicit_formula_right : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q]
       rw [← χ.changeLevel_primitiveCharacter, h, map_one]
     · rintro rfl
       exact primitiveCharacter_one
-  have hcmp : ∀ ρ : ℂ, 1 / 2 ≤ ρ.re → ρ.re < 1 →
-      (LFunction χ ρ = 0 ↔ LFunction χ.primitiveCharacter ρ = 0) ∧
-        ord χ ρ = ord χ.primitiveCharacter ρ := fun ρ a b =>
-    GlobalTheory.T.dirichletL_zeros_eq_primitiveCharacter_zeros q χ ρ (by linarith) (Or.inr (by rintro rfl; simp at b))
+  have hcmp
+      : ∀ ρ : ℂ,
+        1 / 2 ≤ ρ.re → ρ.re < 1
+          → (LFunction χ ρ = 0 ↔ LFunction χ.primitiveCharacter ρ = 0)
+            ∧ ord χ ρ = ord χ.primitiveCharacter ρ := fun ρ a b =>
+    GlobalTheory.T.dirichletL_zeros_eq_primitiveCharacter_zeros q χ ρ (by linarith)
+      (Or.inr (by rintro rfl; simp at b))
   have hbox : zerosBox χ (1 / 2) T = zerosBox χ.primitiveCharacter (1 / 2) T := by
     ext ρ
     constructor
@@ -233,18 +259,20 @@ theorem explicit_formula_right : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q]
       exact ⟨a, b, c, (hcmp ρ a b).1.mp d⟩
     · rintro ⟨a, b, c, d⟩
       exact ⟨a, b, c, (hcmp ρ a b).1.mpr d⟩
-  have hsum : ∑ᶠ ρ ∈ zerosBox χ (1 / 2) T, (ord χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ) =
-      ∑ᶠ ρ ∈ zerosBox χ.primitiveCharacter (1 / 2) T,
-        (ord χ.primitiveCharacter ρ : ℂ) * ((u : ℂ) ^ ρ / ρ) :=
+  have hsum
+      : ∑ᶠ ρ ∈ zerosBox χ (1 / 2) T, (ord χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ)
+        = ∑ᶠ ρ ∈ zerosBox χ.primitiveCharacter (1 / 2) T,
+            (ord χ.primitiveCharacter ρ : ℂ) * ((u : ℂ) ^ ρ / ρ) :=
     finsum_mem_congr hbox fun ρ hρ => by rw [(hcmp ρ hρ.1 hρ.2.1).2]
   have hE := HA χ.conductor χ.primitiveCharacter hprim u T hT hu
   obtain ⟨hZ₁, hZ⟩ := HB χ.conductor χ.primitiveCharacter hprim T hT
   have hD := left_zeros χ.primitiveCharacter u T (by linarith)
   have hP := GlobalTheory.MangoldtSeries.norm_sub_primitive_le χ ⌊u⌋₊
   obtain ⟨l0, l1, l2, l3, l4, l5⟩ := logs hN hq hT hu rfl
-  have hpsi : Formalism.MainNotions.GlobalTheoryTheory.psi0 χ.primitiveCharacter u =
-      (∑ n ∈ Finset.Icc 1 ⌊u⌋₊, ((Λ n : ℝ) : ℂ) * χ.primitiveCharacter (n : ZMod χ.conductor)) -
-        (if χ = 1 then (u : ℂ) else 0) := by
+  have hpsi
+      : Formalism.MainNotions.GlobalTheoryTheory.psi0 χ.primitiveCharacter u
+        = (∑ n ∈ Finset.Icc 1 ⌊u⌋₊, ((Λ n : ℝ) : ℂ) * χ.primitiveCharacter (n : ZMod χ.conductor))
+          - (if χ = 1 then (u : ℂ) else 0) := by
     unfold Formalism.MainNotions.GlobalTheoryTheory.psi0
     congr 1
     by_cases h : χ = 1

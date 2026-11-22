@@ -199,9 +199,11 @@ lemma eq_zero_of_mem {k : ℕ} {z : MvPolynomial (PIx p q) ℂ ⊗[ℂ] V} (h1 :
   rw [LinearMap.mem_ker, hfix] at h3
   exact h3
 
-theorem symmetrisation_injective (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (h : IsKLieAct act)
-    (hs : SymbolCongr act) (k : ℕ) (z) (hz : z ∈ symTens p q V k)
-    (hz' : (indRel act).mkQ (LinearMap.rTensor V (symU p q) z) ∈ indFlt act k) : z = 0 := by
+theorem symmetrisation_injective
+    (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (h : IsKLieAct act) (hs : SymbolCongr act)
+    (k : ℕ) (z) (hz : z ∈ symTens p q V k)
+    (hz' : (indRel act).mkQ (LinearMap.rTensor V (symU p q) z) ∈ indFlt act k)
+    : z = 0 := by
   obtain ⟨φ, hφ⟩ := exists_symbol act h
   have hF : ∀ j < k, indF act j ≤ (degLt ℂ (PIx p q) V k).comap φ := by
     intro j hj
@@ -212,20 +214,24 @@ theorem symmetrisation_injective (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (h
     have hU : UgF p q j ≤ (degLt ℂ (PIx p q) V k).comap Lv := by
       refine Submodule.span_le.mpr ?_
       rintro _ ⟨l, hl, rfl⟩
-      have h4 := Submodule.add_mem _ (degLt_mono (show l.length ≤ k by omega) (hφ l v))
-        (degLt_mono (show l.length + 1 ≤ k by omega) (prod_tmul_mem l v))
+      have h4 :=
+        Submodule.add_mem _ (degLt_mono (show l.length ≤ k by omega) (hφ l v))
+          (degLt_mono (show l.length + 1 ≤ k by omega) (prod_tmul_mem l v))
       rw [sub_add_cancel] at h4
       exact h4
     exact hU hu
   have hlow : indFlt act k ≤ (degLt ℂ (PIx p q) V k).comap φ := by
     unfold indFlt
     exact iSup_le fun j => iSup_le fun hj => hF j hj
-  have hsym : ∀ P : MvPolynomial (PIx p q) ℂ, P.IsHomogeneous k → ∀ v : V,
-      φ ((indRel act).mkQ (symU p q P ⊗ₜ[ℂ] v)) - P ⊗ₜ[ℂ] v ∈ degLt ℂ (PIx p q) V k := by
+  have hsym
+      : ∀ P : MvPolynomial (PIx p q) ℂ,
+        P.IsHomogeneous k
+          → ∀ v : V,
+            φ ((indRel act).mkQ (symU p q P ⊗ₜ[ℂ] v)) - P ⊗ₜ[ℂ] v ∈ degLt ℂ (PIx p q) V k := by
     intro P hP v
     let M : MvPolynomial (PIx p q) ℂ →ₗ[ℂ] (MvPolynomial (PIx p q) ℂ ⊗[ℂ] V) :=
-      φ ∘ₗ (indRel act).mkQ ∘ₗ (TensorProduct.mk ℂ (Ug p q) V).flip v ∘ₗ symU p q -
-        (TensorProduct.mk ℂ (MvPolynomial (PIx p q) ℂ) V).flip v
+      φ ∘ₗ (indRel act).mkQ ∘ₗ (TensorProduct.mk ℂ (Ug p q) V).flip v ∘ₗ symU p q
+        - (TensorProduct.mk ℂ (MvPolynomial (PIx p q) ℂ) V).flip v
     have hM : ∀ Q, M Q = φ ((indRel act).mkQ (symU p q Q ⊗ₜ[ℂ] v)) - Q ⊗ₜ[ℂ] v := fun Q => rfl
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hM, P.as_sum, map_sum]
@@ -233,7 +239,9 @@ theorem symmetrisation_injective (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (h
     have hdeg : α.degree = k := by
       rw [Finsupp.degree_eq_weight_one]
       exact hP (mem_support_iff.mp hα)
-    have hmon : monomial α (AddMonoidAlgebra.coeff P α) = AddMonoidAlgebra.coeff P α • monomial α (1 : ℂ) := by
+    have hmon
+        : monomial α (AddMonoidAlgebra.coeff P α)
+          = AddMonoidAlgebra.coeff P α • monomial α (1 : ℂ) := by
       rw [smul_monomial, smul_eq_mul, mul_one]
     rw [hmon, map_smul]
     refine Submodule.smul_mem _ _ ?_
@@ -242,13 +250,17 @@ theorem symmetrisation_injective (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (h
     have hc := hs l v
     have h1 := hφ l v
     rw [hprod, hl, hdeg] at hc h1
-    have h8 : φ ((indRel act).mkQ ((l.map (ugι p q)).prod ⊗ₜ[ℂ] v) -
-        (indRel act).mkQ (symU p q (monomial α 1) ⊗ₜ[ℂ] v)) ∈ degLt ℂ (PIx p q) V k := hlow hc
+    have h8
+        : φ
+            ((indRel act).mkQ ((l.map (ugι p q)).prod ⊗ₜ[ℂ] v)
+              - (indRel act).mkQ (symU p q (monomial α 1) ⊗ₜ[ℂ] v))
+          ∈ degLt ℂ (PIx p q) V k :=
+      hlow hc
     have key := Submodule.sub_mem _ h1 h8
     rw [map_sub, sub_sub_sub_cancel_left] at key
     exact key
-  have hzsym : φ ((indRel act).mkQ (LinearMap.rTensor V (symU p q) z)) - z ∈
-      degLt ℂ (PIx p q) V k := by
+  have hzsym
+      : φ ((indRel act).mkQ (LinearMap.rTensor V (symU p q) z)) - z ∈ degLt ℂ (PIx p q) V k := by
     obtain ⟨w, rfl⟩ := LinearMap.mem_range.mp hz
     clear hz hz'
     induction w using TensorProduct.induction_on with
@@ -276,8 +288,13 @@ theorem pbw_induced : admQ8 := by
   unfold admQ8
   intro p q V _ _ act h
   have hs := symbolCongr p q V act
-  refine ⟨iSup_indF_eq_top p q V act, fun k => ⟨Onto.indF_eq_sup p q V act hs k,
-    fun z hz hz' => Injective.symmetrisation_injective act h hs k z hz hz',
-    fun Y hY z hz => symmetrisation_equivariant p q V act hs k Y hY z hz⟩⟩
+  refine ⟨
+    iSup_indF_eq_top p q V act,
+    fun k => ⟨
+      Onto.indF_eq_sup p q V act hs k,
+      fun z hz hz' => Injective.symmetrisation_injective act h hs k z hz hz',
+      fun Y hY z hz => symmetrisation_equivariant p q V act hs k Y hY z hz
+    ⟩
+  ⟩
 
 end GlobalTheory.InducedPBW

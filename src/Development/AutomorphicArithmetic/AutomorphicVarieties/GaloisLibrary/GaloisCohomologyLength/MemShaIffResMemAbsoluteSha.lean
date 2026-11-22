@@ -7,17 +7,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
 section
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
   {F' Ω' : Type} [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω']
   {l : ℕ} [Fact l.Prime]
 
-private theorem mem_sha_iff_res_mem_absolute_sha (D : LData F Ω l) (e : ℤ) (x : H1 (qzTw D e)) :
-    x ∈ Sha D e ↔ resH1 (qzTw D e) (toGS Ω _) (continuous_toGS Ω _) x ∈
-      ShaAbs ((qzTw D e).comp (toGS Ω _)) (Above F l) := by
+private theorem mem_sha_iff_res_mem_absolute_sha (D : LData F Ω l) (e : ℤ) (x : H1 (qzTw D e))
+    : x ∈ Sha D e
+      ↔ resH1 (qzTw D e) (toGS Ω _) (continuous_toGS Ω _) x
+        ∈ ShaAbs ((qzTw D e).comp (toGS Ω _)) (Above F l) := by
   constructor
   · intro hx
     rw [← map_Sha D e]
@@ -27,14 +30,21 @@ private theorem mem_sha_iff_res_mem_absolute_sha (D : LData F Ω l) (e : ℤ) (x
     obtain ⟨y, hy, hyx⟩ := hx
     rwa [← injective_infl D e hyx]
 
-private theorem pairH1DecompositionMap_qzTw_mem_sha (D : LData F Ω l) (D' : LData F' Ω' l) (e : ℤ) (f : F →+* F') (σ : Ω ≃+* Ω')
-    (hσ : ∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x)) (φ : G F' Ω' →* G F Ω)
-    (hφ : ∀ g x, σ (φ g x) = g (σ x))
-    (ψ : GS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F'))) →* GS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))
+private theorem pairH1DecompositionMap_qzTw_mem_sha
+    (D : LData F Ω l)
+    (D' : LData F' Ω' l)
+    (e : ℤ)
+    (f : F →+* F') (σ : Ω ≃+* Ω') (hσ : ∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x))
+    (φ : G F' Ω' →* G F Ω) (hφ : ∀ g x, σ (φ g x) = g (σ x))
+    (ψ
+      : GS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F'))) →* GS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))
     (hψ : Continuous ψ) (hc : ∀ g, ψ (toGS Ω' _ g) = toGS Ω _ (φ g))
-    (hq : ∀ g m, (LinearMap.id : QZ l →ₗ[ℤ_[l]] QZ l) (qzTw D e (ψ g) m) = qzTw D' e g (LinearMap.id (R := ℤ_[l]) m))
-    (x : H1 (qzTw D e)) (hx : x ∈ Sha D e) :
-    pairH1DecompositionMap (qzTw D e) (qzTw D' e) ψ hψ LinearMap.id continuous_id hq x ∈ Sha D' e := by
+    (hq : ∀ g m,
+      (LinearMap.id : QZ l →ₗ[ℤ_[l]] QZ l) (qzTw D e (ψ g) m)
+        = qzTw D' e g (LinearMap.id (R := ℤ_[l]) m))
+    (x : H1 (qzTw D e)) (hx : x ∈ Sha D e)
+    : pairH1DecompositionMap (qzTw D e) (qzTw D' e) ψ hψ LinearMap.id continuous_id hq x
+      ∈ Sha D' e := by
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   rw [mem_sha_iff_res_mem_absolute_sha] at hx ⊢
   simp only [resH1, pairH1DecompositionMap, Submodule.mapQ_apply] at hx ⊢
@@ -48,8 +58,14 @@ private theorem pairH1DecompositionMap_qzTw_mem_sha (D : LData F Ω l) (D' : LDa
     have h1 := hm (φ g) ((hdec g).2 hg)
     have h2 := hq (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g) m
     simp only [LinearMap.id_apply] at h2
-    change (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g)) = qzTw D e (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g)) m - m at h1
-    change LinearMap.id ((z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (ψ (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g))) = qzTw D' e (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g) m - m
+    change (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (toGS Ω
+          (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g))
+        = qzTw D e (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g)) m - m
+      at h1
+    change LinearMap.id
+        ((z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (ψ (toGS Ω'
+          (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g)))
+      = qzTw D' e (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g) m - m
     rw [LinearMap.id_apply, hc, h1, ← hc, h2]
   · intro v' hv' A' hA'
     obtain ⟨v, A, hA, hab, -, hdec, hine⟩ := placeTransport F Ω F' Ω' f σ hσ φ hφ v' A' hA'
@@ -58,8 +74,14 @@ private theorem pairH1DecompositionMap_qzTw_mem_sha (D : LData F Ω l) (D' : LDa
     have h1 := hm (φ g) ((hine g).2 hg)
     have h2 := hq (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g) m
     simp only [LinearMap.id_apply] at h2
-    change (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g)) = qzTw D e (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g)) m - m at h1
-    change LinearMap.id ((z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (ψ (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g))) = qzTw D' e (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g) m - m
+    change (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (toGS Ω
+          (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g))
+        = qzTw D e (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) (φ g)) m - m
+      at h1
+    change LinearMap.id
+        ((z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 F))) → QZ l) (ψ (toGS Ω'
+          (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g)))
+      = qzTw D' e (toGS Ω' (↑D'.S : Set (HeightOneSpectrum (𝓞 F'))) g) m - m
     rw [LinearMap.id_apply, hc, h1, ← hc, h2]
 
 end

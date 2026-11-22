@@ -9,18 +9,25 @@ namespace ReciprocityTheory.L2DbarEstimates.B
 open MeasureTheory Filter Topology Set Metric
 open scoped Convolution ContDiff ENNReal Pointwise
 
-theorem Kernel.lintegral_ofReal (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] (K : Kernel E μ) :
-    ∫⁻ t, ENNReal.ofReal (K.toFun t) ∂μ = 1 := by
+theorem Kernel.lintegral_ofReal
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (K : Kernel E μ)
+    : ∫⁻ t, ENNReal.ofReal (K.toFun t) ∂μ = 1 := by
   have hint : Integrable K.toFun μ :=
     Integrable.of_integral_ne_zero (by rw [K.integral_eq_one]; exact one_ne_zero)
-  rw [← ofReal_integral_eq_lintegral_ofReal hint (Eventually.of_forall K.nonneg),
-    K.integral_eq_one, ENNReal.ofReal_one]
+  rw [← ofReal_integral_eq_lintegral_ofReal hint (Eventually.of_forall K.nonneg), K.integral_eq_one,
+    ENNReal.ofReal_one]
 
-theorem moll_enorm_sq_le (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] (K : Kernel E μ) {u : E → ℂ} (hu : AEStronglyMeasurable u μ)
-    (x : E) :
-    ‖moll K u x‖ₑ ^ 2 ≤ ∫⁻ t, ENNReal.ofReal (K.toFun t) * ‖u (x - t)‖ₑ ^ 2 ∂μ := by
+theorem moll_enorm_sq_le
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (K : Kernel E μ)
+    {u : E → ℂ} (hu : AEStronglyMeasurable u μ)
+    (x : E)
+    : ‖moll K u x‖ₑ ^ 2 ≤ ∫⁻ t, ENNReal.ofReal (K.toFun t) * ‖u (x - t)‖ₑ ^ 2 ∂μ := by
   have hK0 := K.nonneg
   have hKm : Measurable K.toFun := K.smooth.continuous.measurable
   have h1 : ‖moll K u x‖ₑ ≤ ∫⁻ t, ENNReal.ofReal (K.toFun t) * ‖u (x - t)‖ₑ ∂μ := by
@@ -35,8 +42,7 @@ theorem moll_enorm_sq_le (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] 
   set g : E → ℝ≥0∞ := fun t => ENNReal.ofReal (Real.sqrt (K.toFun t)) * ‖u (x - t)‖ₑ with hgdef
   have hf : AEMeasurable f μ := hKm.sqrt.ennreal_ofReal.aemeasurable
   have hg : AEMeasurable g μ := hf.mul hum
-  have r2 : ∀ z : ℝ≥0∞, z ^ (2 : ℝ) = z ^ 2 := fun z => by
-    rw [← ENNReal.rpow_natCast]; norm_num
+  have r2 : ∀ z : ℝ≥0∞, z ^ (2 : ℝ) = z ^ 2 := fun z => by rw [← ENNReal.rpow_natCast]; norm_num
   have hsq : ∀ t, ENNReal.ofReal (Real.sqrt (K.toFun t)) ^ 2 = ENNReal.ofReal (K.toFun t) := by
     intro t
     rw [← ENNReal.ofReal_pow (Real.sqrt_nonneg _), Real.sq_sqrt (hK0 t)]
@@ -55,16 +61,22 @@ theorem moll_enorm_sq_le (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] 
     simp only [hgdef]
     rw [r2, mul_pow, hsq]
   rw [e1, e2, e3, ENNReal.one_rpow, one_mul] at hH
-  calc ‖moll K u x‖ₑ ^ 2
-      ≤ ((∫⁻ t, ENNReal.ofReal (K.toFun t) * ‖u (x - t)‖ₑ ^ 2 ∂μ) ^ (1 / 2 : ℝ)) ^ 2 :=
-        pow_le_pow_left₀ (by positivity) (h1.trans hH) 2
+  calc
+    ‖moll K u x‖ₑ ^ 2
+        ≤ ((∫⁻ t, ENNReal.ofReal (K.toFun t) * ‖u (x - t)‖ₑ ^ 2 ∂μ) ^ (1 / 2 : ℝ)) ^ 2 :=
+      pow_le_pow_left₀ (by positivity) (h1.trans hH) 2
     _ = ∫⁻ t, ENNReal.ofReal (K.toFun t) * ‖u (x - t)‖ₑ ^ 2 ∂μ := by
-        rw [← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]; norm_num
+      rw [← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]; norm_num
 
-theorem moll_young_sq (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] (K : Kernel E μ) (u : E → ℂ) (s : Set E) (hs : MeasurableSet s)
-    (hu : AEStronglyMeasurable u μ) :
-    ∫⁻ x in s, ‖moll K u x‖ₑ ^ 2 ∂μ ≤ ∫⁻ y in thickening K.r s, ‖u y‖ₑ ^ 2 ∂μ := by
+theorem moll_young_sq
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (K : Kernel E μ)
+    (u : E → ℂ)
+    (s : Set E) (hs : MeasurableSet s)
+    (hu : AEStronglyMeasurable u μ)
+    : ∫⁻ x in s, ‖moll K u x‖ₑ ^ 2 ∂μ ≤ ∫⁻ y in thickening K.r s, ‖u y‖ₑ ^ 2 ∂μ := by
   set T := thickening K.r s with hTdef
   have hT : MeasurableSet T := isOpen_thickening.measurableSet
   have hKm : Measurable K.toFun := K.smooth.continuous.measurable
@@ -75,15 +87,13 @@ theorem moll_young_sq (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [Fi
       (hKm.comp measurable_snd).ennreal_ofReal.aemeasurable.mul (hq.enorm.pow_const 2)
     exact hF0.mono_ac (Measure.restrict_le_self.absolutelyContinuous.prod
       (Measure.AbsolutelyContinuous.refl μ))
-  have htrans : ∀ t, ∫⁻ x in (fun x => x - t) ⁻¹' T, ‖u (x - t)‖ₑ ^ 2 ∂μ =
-      ∫⁻ y in T, ‖u y‖ₑ ^ 2 ∂μ := by
+  have htrans
+      : ∀ t, ∫⁻ x in (fun x => x - t) ⁻¹' T, ‖u (x - t)‖ₑ ^ 2 ∂μ = ∫⁻ y in T, ‖u y‖ₑ ^ 2 ∂μ := by
     intro t
     rw [← lintegral_indicator (hT.preimage (measurable_sub_const t)), ← lintegral_indicator hT,
       ← lintegral_sub_right_eq_self (T.indicator fun y => ‖u y‖ₑ ^ 2) t]
     refine lintegral_congr fun x => ?_
-    first
-    | rfl
-    | (by_cases hx : x - t ∈ T <;> simp [Set.indicator_apply, hx])
+    first | rfl | (by_cases hx : x - t ∈ T <;> simp [Set.indicator_apply, hx])
   have hpt : ∀ t, ∫⁻ x in s, F x t ∂μ ≤ ENNReal.ofReal (K.toFun t) * ∫⁻ y in T, ‖u y‖ₑ ^ 2 ∂μ := by
     intro t
     simp only [hFdef]
@@ -98,16 +108,19 @@ theorem moll_young_sq (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [Fi
       refine mem_thickening_iff.mpr ⟨x, hx, ?_⟩
       rw [mem_ball_zero_iff] at ht
       simpa [dist_eq_norm] using ht
-  calc ∫⁻ x in s, ‖moll K u x‖ₑ ^ 2 ∂μ
-      ≤ ∫⁻ x in s, ∫⁻ t, F x t ∂μ ∂μ :=
-        lintegral_mono fun x => moll_enorm_sq_le E μ K hu x
+  calc
+    ∫⁻ x in s, ‖moll K u x‖ₑ ^ 2 ∂μ
+      ≤ ∫⁻ x in s, ∫⁻ t, F x t ∂μ ∂μ := lintegral_mono fun x => moll_enorm_sq_le E μ K hu x
     _ = ∫⁻ t, ∫⁻ x in s, F x t ∂μ ∂μ := lintegral_lintegral_swap hF
     _ ≤ ∫⁻ t, ENNReal.ofReal (K.toFun t) * ∫⁻ y in T, ‖u y‖ₑ ^ 2 ∂μ ∂μ := lintegral_mono hpt
     _ = ∫⁻ y in T, ‖u y‖ₑ ^ 2 ∂μ := by
-        rw [lintegral_mul_const _ hKm.ennreal_ofReal, Kernel.lintegral_ofReal E μ K, one_mul]
+      rw [lintegral_mul_const _ hKm.ennreal_ofReal, Kernel.lintegral_ofReal E μ K, one_mul]
 
-theorem moll_young (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] : YoungSt E μ := by
+theorem moll_young
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    : YoungSt E μ := by
   intro K u s hs hu
   have h := moll_young_sq E μ K u s hs hu
   have e : ∀ z : ℝ≥0∞, z ^ (ENNReal.toReal 2) = z ^ 2 := fun z => by
@@ -115,11 +128,9 @@ theorem moll_young (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [Finit
   have huT : AEStronglyMeasurable u (μ.restrict (thickening K.r s)) := hu.restrict
   have hmoll : AEStronglyMeasurable (moll K u) μ := by
     have hq := hu.comp_quasiMeasurePreserving (quasiMeasurePreserving_sub μ μ)
-    have hprod : AEStronglyMeasurable
-        (fun p : E × E => K.toFun p.2 • u (p.1 - p.2)) (μ.prod μ) :=
+    have hprod : AEStronglyMeasurable (fun p : E × E => K.toFun p.2 • u (p.1 - p.2)) (μ.prod μ) :=
       (K.smooth.continuous.measurable.comp measurable_snd).aestronglyMeasurable.smul hq
-    change AEStronglyMeasurable
-      (fun x => ∫ t, K.toFun t • u (x - t) ∂μ) μ
+    change AEStronglyMeasurable (fun x => ∫ t, K.toFun t • u (x - t) ∂μ) μ
     exact hprod.integral_prod_right'
   have hmolls : AEStronglyMeasurable (moll K u) (μ.restrict s) := hmoll.restrict
   rw [MeasureTheory.eLpNorm_eq_lintegral_rpow_enorm_toReal (by norm_num) (by norm_num) huT,

@@ -18,7 +18,8 @@ theorem dm_eq (T : ParamsT D L P) : WeightFamilies.dimY D D.R.m = T.Dp := by
   unfold WeightFamilies.dimY Ranks.sigW Ranks.r
   simp [Nat.choose_two_right]
 
-theorem order_le_modulus (T : ParamsT D L P) (S : SizesAt L) (hZ : 10 ^ 60 ≤ zBase L) : T.TO ≤ q0N T := by
+theorem order_le_modulus (T : ParamsT D L P) (S : SizesAt L) (hZ : 10 ^ 60 ≤ zBase L)
+    : T.TO ≤ q0N T := by
   unfold q0N
   have hT40 := T.TO_40
   have hTpos : (0 : ℝ) < (T.TO : ℝ) := by exact_mod_cast (show 0 < T.TO by omega)
@@ -29,7 +30,8 @@ theorem order_le_modulus (T : ParamsT D L P) (S : SizesAt L) (hZ : 10 ^ 60 ≤ z
     rw [T.PP_eq]
     exact one_le_mul_of_one_le_of_one_le T.one_le_CP (Real.one_le_rpow hZ' (by linarith [T.eP_ge]))
   have hbpos : 0 < L.sc.b := by unfold Scale.b; exact Real.exp_pos _
-  have h1 : (T.TO : ℝ) ≤ L.sc.b ^ (1 / 2 : ℝ) := le_trans (le_mul_of_one_le_right hTpos.le hPP) T.TO_PP'
+  have h1 : (T.TO : ℝ) ≤ L.sc.b ^ (1 / 2 : ℝ) :=
+    le_trans (le_mul_of_one_le_right hTpos.le hPP) T.TO_PP'
   have h2 := mul_self_le_mul_self hTpos.le h1
   rw [← Real.rpow_add hbpos] at h2
   norm_num at h2
@@ -50,7 +52,8 @@ abbrev runOf (T : ParamsT D L P) (S : SizesAt L) (hZ : 10 ^ 60 ≤ zBase L) : Ru
   nP_le_nW := T.nW_lo.2.2
   hQ0 := by
     rw [dm_eq T]
-    have := T.TO_nW; have := order_le_modulus T S hZ
+    have := T.TO_nW
+    have := order_le_modulus T S hZ
     omega
 
 def Kc0 : KAdm := ⟨1, 1, 1, 1, 1, 1, 1, 1, 2⟩
@@ -73,8 +76,9 @@ theorem eQ : ((runOf T S hZ).Q : ℝ) = (T.TO : ℝ) + ((T.Dp : ℝ) + 2) + 2 * 
   push_cast
   linarith [eTq T S hZ]
 
-theorem ekl : ((runOf T S hZ).kl : ℝ) =
-    ((T.Dp : ℝ) + 2) * T.nWn + 2 * D.R.r + ((T.TO : ℝ) + ((T.Dp : ℝ) + 2)) * (q0N T : ℝ) := by
+theorem ekl
+    : ((runOf T S hZ).kl : ℝ)
+      = ((T.Dp : ℝ) + 2) * T.nWn + 2 * D.R.r + ((T.TO : ℝ) + ((T.Dp : ℝ) + 2)) * (q0N T : ℝ) := by
   unfold RunN.kl
   push_cast
   rw [eTq T S hZ]
@@ -111,7 +115,8 @@ theorem b_le_kl : L.sc.b ≤ ((runOf T S hZ).kl : ℝ) := by
   nlinarith [mul_nonneg (add_nonneg h0 (by norm_num : (0 : ℝ) ≤ 2)) h1,
     mul_nonneg (add_nonneg h0 (by norm_num : (0 : ℝ) ≤ 2)) h2]
 
-theorem b_le_ka : L.sc.b ≤ (runOf T S hZ).ka.size := (b_le_kl T S hZ).trans (runOf T S hZ).ka_size_ge
+theorem b_le_ka : L.sc.b ≤ (runOf T S hZ).ka.size :=
+  (b_le_kl T S hZ).trans (runOf T S hZ).ka_size_ge
 
 theorem dF_le : (DF (runOf T S hZ).wL : ℝ) ≤ 2 * ((D.R.f : ℝ) * D.R.r) * L.sc.b := by
   refine (rn_of T S hZ).dL ?_
@@ -119,7 +124,8 @@ theorem dF_le : (DF (runOf T S hZ).wL : ℝ) ≤ 2 * ((D.R.f : ℝ) * D.R.r) * L
   rw [eQ] at h
   exact h
 
-theorem g_ge (P : ParameterChoice' D L) (i : Fin 2) : ((D.R.k : ℝ) * L.sc.b) ^ 8 ≤ (D.host.g i : ℝ) := by
+theorem g_ge (P : ParameterChoice' D L) (i : Fin 2)
+    : ((D.R.k : ℝ) * L.sc.b) ^ 8 ≤ (D.host.g i : ℝ) := by
   obtain ⟨Y, h1, -, -, h2⟩ := P.g_Y
   exact h1.trans (h2 i).1
 
@@ -131,21 +137,21 @@ theorem qq_ge (P : ParameterChoice' D L) : ((D.R.k : ℝ) * L.sc.b) ^ 8 ≤ (qq 
 
 theorem eRR : WeightFamilies.RRv D 2 = D.host.rdE ^ 2 := by
   unfold WeightFamilies.RRv
-  first
-  | rfl
-  | simp
+  first | rfl | simp
 
 theorem eg0 : (g0 D : ℝ) = 1250 * D.R.r := by
   unfold g0
   push_cast
   ring
 
-theorem third_hypothesis_of_params : H3 L (NonvanishingSectionCondition T) T.CP T.eP 2 0 (runOf T S hZ).wL T.TO := by
+theorem third_hypothesis_of_params
+    : H3 L (NonvanishingSectionCondition T) T.CP T.eP 2 0 (runOf T S hZ).wL T.TO := by
   have hR := rn_of T S hZ
   have hd0 : (0 : ℝ) ≤ (DF (runOf T S hZ).wL : ℝ) := Nat.cast_nonneg _
   have hd := dF_le T S hZ
   have hq := qq_ge P
-  have hq0 : (0 : ℝ) < (qq D : ℝ) := lt_of_lt_of_le (by have := hR.b_pos; have := hR.k1; positivity) hq
+  have hq0 : (0 : ℝ) < (qq D : ℝ) :=
+    lt_of_lt_of_le (by have := hR.b_pos; have := hR.k1; positivity) hq
   have hb := hR.h3b hd0 hd hq
   have hx1 : 1 ≤ L.sc.x ^ T.Cp := Real.one_le_rpow L.sc.one_lt_alt.le T.Cp_nonneg
   have hfk : (D.R.f : ℝ) ≤ D.R.k := by exact_mod_cast f_le_k D
@@ -168,8 +174,12 @@ theorem third_hypothesis_of_params : H3 L (NonvanishingSectionCondition T) T.CP 
     exact le_mul_of_one_le_right (by positivity) hx1
   · show (T.TO : ℝ) * (WeightFamilies.RRv D 2 * WeightFamilies.PPv D L T.CP T.eP * (DF (runOf T S hZ).wL : ℝ) ^ 2 / (qq D : ℝ)) * g0 D ≤ 1
     rw [eRR, WeightFamilies.PPv_rec T, eg0]
-    have e : (T.TO : ℝ) * (D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2 / (qq D : ℝ)) * (1250 * D.R.r) =
-        ((T.TO : ℝ) * (1250 * D.R.r) * D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2) / (qq D : ℝ) := by ring
+    have e
+        : (T.TO : ℝ) * (D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2 / (qq D : ℝ))
+            * (1250 * D.R.r)
+          = ((T.TO : ℝ) * (1250 * D.R.r) * D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2)
+            / (qq D : ℝ) := by
+      ring
     rw [e, div_le_one hq0]
     exact hb
   · show (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 * WeightFamilies.RRv D 2 ^ 2 *
@@ -177,14 +187,18 @@ theorem third_hypothesis_of_params : H3 L (NonvanishingSectionCondition T) T.CP 
     rw [eRR, WeightFamilies.PPv_rec T]
     have hfm : (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 ≤ (D.R.k : ℝ) ^ 4 := by
       have : (D.R.m : ℝ) ^ 3 ≤ (D.R.k : ℝ) ^ 3 := pow_le_pow_left₀ hm0.le hmk 3
-      calc (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 ≤ (D.R.k : ℝ) * (D.R.k : ℝ) ^ 3 :=
-            mul_le_mul hfk this (by positivity) (by positivity)
+      calc
+        (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3
+          ≤ (D.R.k : ℝ) * (D.R.k : ℝ) ^ 3 := mul_le_mul hfk this (by positivity) (by positivity)
         _ = (D.R.k : ℝ) ^ 4 := by ring
     have he := hR.h3e hd0 hd hq (fm := (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3) (by positivity) hfm
-    have e : (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 * (D.host.rdE ^ 2) ^ 2 *
-        (D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2 / (qq D : ℝ)) =
-        ((D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 * (D.host.rdE ^ 2) ^ 2 *
-        (D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2)) / (qq D : ℝ) := by ring
+    have e
+        : (D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 * (D.host.rdE ^ 2) ^ 2
+            * (D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2 / (qq D : ℝ))
+          = ((D.R.f : ℝ) * (D.R.m : ℝ) ^ 3 * (D.host.rdE ^ 2) ^ 2
+              * (D.host.rdE ^ 2 * T.PP * (DF (runOf T S hZ).wL : ℝ) ^ 2))
+            / (qq D : ℝ) := by
+      ring
     rw [e, div_le_iff₀ hq0]
     linarith
   · rw [dm_eq T]

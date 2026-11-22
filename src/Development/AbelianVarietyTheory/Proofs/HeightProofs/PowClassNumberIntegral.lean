@@ -25,7 +25,8 @@ omit [NumberField E] in
 theorem diag_apply (a : E) : diag F E a = (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] a := rfl
 
 def diagInt : 𝓞 E →+* hatRing F E :=
-  ((diag F E).comp (algebraMap (𝓞 E) E)).codRestrict _ fun x => one_tmul_mem_adelicCompletionOfElementSet F ⟨x, rfl⟩
+  ((diag F E).comp (algebraMap (𝓞 E) E)).codRestrict _ fun x =>
+    one_tmul_mem_adelicCompletionOfElementSet F ⟨x, rfl⟩
 
 theorem exists_denom (z : RA F E) : ∃ N : ℕ, 0 < N ∧ (N : RA F E) * z ∈ hatRing F E := by
   obtain ⟨x, h, hh, rfl⟩ := GlobalTheory.AdIdem.exists_eq_one_tmul_add F E z
@@ -44,8 +45,9 @@ theorem isUnit_nat {N : ℕ} (hN : 0 < N) : IsUnit (N : RA F E) := by
   have := isUnit_diag F E (a := (N : E)) (by exact_mod_cast hN.ne')
   rwa [map_natCast] at this
 
-theorem pow_classNumber_integral (x : hatRing F E) (hx : IsUnit (x : RA F E)) :
-    ∃ b : 𝓞 E, b ≠ 0 ∧ ∃ s t : hatRing F E, x ^ classNumber E = diagInt F E b * s ∧ s * t = 1 := by
+theorem pow_classNumber_integral (x : hatRing F E) (hx : IsUnit (x : RA F E))
+    : ∃ b : 𝓞 E,
+      b ≠ 0 ∧ ∃ s t : hatRing F E, x ^ classNumber E = diagInt F E b * s ∧ s * t = 1 := by
   obtain ⟨u, hu⟩ := hx
   obtain ⟨M, hM, hMu⟩ := exists_denom F E (u⁻¹ : (RA F E)ˣ)
   let I : Ideal (𝓞 E) := (Ideal.span {x}).comap (diagInt F E)
@@ -54,15 +56,16 @@ theorem pow_classNumber_integral (x : hatRing F E) (hx : IsUnit (x : RA F E)) :
     refine ⟨⟨_, hMu⟩, Subtype.ext ?_⟩
     simp only [← hu, Subring.coe_natCast, Subring.coe_mul]
     rw [mul_left_comm, Units.mul_inv, mul_one]
-  have hMI : (M : 𝓞 E) ∈ I := by
-    rw [Ideal.mem_comap, map_natCast]; exact hMx
+  have hMI : (M : 𝓞 E) ∈ I := by rw [Ideal.mem_comap, map_natCast]; exact hMx
   have hI : I.map (diagInt F E) = Ideal.span {x} := by
     refine le_antisymm Ideal.map_comap_le ?_
     rw [Ideal.span_le, Set.singleton_subset_iff]
     obtain ⟨a, w, hw, e⟩ := exists_int_add_nsmul F E M hM x x.2
     have e' : x = diagInt F E a + (M : hatRing F E) * ⟨w, hw⟩ := by
       apply Subtype.ext
-      rw [e, nsmul_eq_mul]; simp; rfl
+      rw [e, nsmul_eq_mul]
+      simp
+      rfl
     have ha : a ∈ I := by
       rw [Ideal.mem_comap, ← sub_eq_iff_eq_add.2 e']
       exact sub_mem (Ideal.mem_span_singleton_self _) (Ideal.mul_mem_right _ _ hMx)
@@ -85,28 +88,30 @@ theorem pow_classNumber_integral (x : hatRing F E) (hx : IsUnit (x : RA F E)) :
     rintro rfl
     exact mem_nonZeroDivisors_iff_ne_zero.1 (pow_mem hI0 (classNumber E)) (by rw [hb]; simp)
   have h3 : Ideal.span {x ^ classNumber E} = Ideal.span {diagInt F E b} := by
-    rw [← Ideal.span_singleton_pow, ← hI, ← Ideal.map_pow, hb, Ideal.submodule_span_eq, Ideal.map_span,
-      Set.image_singleton]
-  obtain ⟨s, hs⟩ := Ideal.mem_span_singleton.1 (h3 ▸ Ideal.mem_span_singleton_self (x ^ classNumber E))
-  obtain ⟨t, ht⟩ := Ideal.mem_span_singleton.1 (h3.symm ▸ Ideal.mem_span_singleton_self (diagInt F E b))
+    rw [← Ideal.span_singleton_pow, ← hI, ← Ideal.map_pow, hb, Ideal.submodule_span_eq,
+      Ideal.map_span, Set.image_singleton]
+  obtain ⟨s, hs⟩ :=
+    Ideal.mem_span_singleton.1 (h3 ▸ Ideal.mem_span_singleton_self (x ^ classNumber E))
+  obtain ⟨t, ht⟩ :=
+    Ideal.mem_span_singleton.1 (h3.symm ▸ Ideal.mem_span_singleton_self (diagInt F E b))
   refine ⟨b, hb0, s, t, hs, Subtype.ext ?_⟩
   have hx' : IsUnit ((x ^ classNumber E : hatRing F E) : RA F E) := by
     rw [SubmonoidClass.coe_pow, ← hu]; exact u.isUnit.pow _
   apply hx'.mul_left_cancel
-  have : x ^ classNumber E * (s * t) = x ^ classNumber E * 1 := by
-    linear_combination (-s) * ht - hs
+  have : x ^ classNumber E * (s * t) = x ^ classNumber E * 1 := by linear_combination (-s) * ht - hs
   exact congrArg Subtype.val this
 
-theorem pow_classNumber (x : (RA F E)ˣ) : ∃ b : E, b ≠ 0 ∧ ∃ s t : hatRing F E,
-    (x : RA F E) ^ classNumber E = diag F E b * s ∧ s * t = 1 := by
+theorem pow_classNumber (x : (RA F E)ˣ)
+    : ∃ b : E,
+      b ≠ 0 ∧ ∃ s t : hatRing F E, (x : RA F E) ^ classNumber E = diag F E b * s ∧ s * t = 1 := by
   obtain ⟨N, hN, hx⟩ := exists_denom F E x
-  obtain ⟨b, hb, s, t, e, hst⟩ := pow_classNumber_integral F E ⟨_, hx⟩ ((isUnit_nat F E hN).mul x.isUnit)
+  obtain ⟨b, hb, s, t, e, hst⟩ :=
+    pow_classNumber_integral F E ⟨_, hx⟩ ((isUnit_nat F E hN).mul x.isUnit)
   have hN' : (N : E) ^ classNumber E ≠ 0 := pow_ne_zero _ (by exact_mod_cast hN.ne')
   refine ⟨(b : E) / (N : E) ^ classNumber E, div_ne_zero (by simpa using hb) hN', s, t, ?_, hst⟩
   apply (isUnit_diag F E hN').mul_left_cancel
   rw [← mul_assoc, ← map_mul, mul_div_cancel₀ _ hN', map_pow, map_natCast, ← mul_pow]
   exact congrArg Subtype.val e
-
 
 variable {F E} (c : E ≃ₐ[F] E)
 
@@ -147,7 +152,14 @@ def congOne (N : ℕ) : Subgroup (RA F E)ˣ where
   one_mem' := ⟨⟨0, zero_mem _, by simp⟩, by simp⟩
   mul_mem' := by
     rintro x y ⟨⟨a, ha, ea⟩, hx⟩ ⟨⟨b, hb, eb⟩, hy⟩
-    refine ⟨⟨a + b + N * (a * b), add_mem (add_mem ha hb) (mul_mem (natCast_mem _ N) (mul_mem ha hb)), ?_⟩, ?_⟩
+    refine ⟨
+      ⟨
+        a + b + N * (a * b),
+        add_mem (add_mem ha hb) (mul_mem (natCast_mem _ N) (mul_mem ha hb)),
+        ?_
+      ⟩,
+      ?_
+    ⟩
     · rw [Units.val_mul]
       linear_combination (y : RA F E) * ea + (1 + N * a) * eb
     · rw [Units.val_mul, map_mul, mul_mul_mul_comm, hx, hy, mul_one]
@@ -160,12 +172,16 @@ def congOne (N : ℕ) : Subgroup (RA F E)ˣ where
     · nth_rewrite 1 [h]
       rw [← map_mul, Units.mul_inv, map_one]
 
-theorem exists_exponent (hc : ∀ y, c (c y) = y) (N : ℕ) (hN : 0 < N) : ∃ m : ℕ, 0 < m ∧
-    ∀ x : (RA F E)ˣ, (x : RA F E) * bar c x = 1 → x ^ m ∈ ratOne c ⊔ congOne c N := by
+theorem exists_exponent (hc : ∀ y, c (c y) = y) (N : ℕ) (hN : 0 < N)
+    : ∃ m : ℕ,
+      0 < m ∧ ∀ x : (RA F E)ˣ, (x : RA F E) * bar c x = 1 → x ^ m ∈ ratOne c ⊔ congOne c N := by
   have := finite_quotient_hatRing F E N hN
   let k := Nat.card (hatRing F E ⧸ Ideal.span {(N : hatRing F E)})ˣ
-  refine ⟨classNumber E * 2 * k, Nat.mul_pos (Nat.mul_pos (classNumber_pos E) two_pos) Nat.card_pos,
-    fun x hx => ?_⟩
+  refine ⟨
+    classNumber E * 2 * k,
+    Nat.mul_pos (Nat.mul_pos (classNumber_pos E) two_pos) Nat.card_pos,
+    fun x hx => ?_
+  ⟩
   obtain ⟨b, hb, s, t, e, hst⟩ := pow_classNumber F E x
   have hst' : (s : RA F E) * t = 1 := congrArg Subtype.val hst
   have hbst : bar c s * bar c t = 1 := by rw [← map_mul, hst', map_one]
@@ -175,11 +191,13 @@ theorem exists_exponent (hc : ∀ y, c (c y) = y) (N : ℕ) (hN : 0 < N) : ∃ m
   have hr : r ∈ ratOne c := by
     refine ⟨⟨_, rfl⟩, ?_⟩
     change diag F E (b / c b) * diag F E (c (b / c b)) = 1
-    rw [← map_mul, map_div₀, hc, div_mul_div_comm, mul_comm b, div_self (mul_ne_zero hcb hb), map_one]
-  let v : (hatRing F E)ˣ := Units.mkOfMulEqOne (s * ⟨_, bar_mem c t.2⟩) (t * ⟨_, bar_mem c s.2⟩)
-    (Subtype.ext (by
-      change (s : RA F E) * bar c t * (t * bar c s) = 1
-      linear_combination (bar c s * bar c t) * hst' + hbst))
+    rw [← map_mul, map_div₀, hc, div_mul_div_comm, mul_comm b, div_self (mul_ne_zero hcb hb),
+      map_one]
+  let v : (hatRing F E)ˣ :=
+    Units.mkOfMulEqOne (s * ⟨_, bar_mem c t.2⟩) (t * ⟨_, bar_mem c s.2⟩)
+      (Subtype.ext (by
+        change (s : RA F E) * bar c t * (t * bar c s) = 1
+        linear_combination (bar c s * bar c t) * hst' + hbst))
   let u : (RA F E)ˣ := Units.map (hatRing F E).subtype.toMonoidHom v
   have hu : (u : RA F E) = s * bar c t := rfl
   have hun : (u : RA F E) * bar c u = 1 := by
@@ -199,10 +217,12 @@ theorem exists_exponent (hc : ∀ y, c (c y) = y) (N : ℕ) (hN : 0 < N) : ∃ m
       - (diag F E (b / c b) * diag F E (c b) * diag F E b * s * s) * hbst
   have huk : u ^ k ∈ congOne c N := by
     refine ⟨?_, by rw [Units.val_pow_eq_pow_val, map_pow, ← mul_pow, hun, one_pow]⟩
-    have h1 : (Units.map (Ideal.Quotient.mk (Ideal.span {(N : hatRing F E)})).toMonoidHom v) ^ k = 1 :=
+    have h1
+        : (Units.map (Ideal.Quotient.mk (Ideal.span {(N : hatRing F E)})).toMonoidHom v) ^ k = 1 :=
       pow_card_eq_one'
-    have h2 : Ideal.Quotient.mk (Ideal.span {(N : hatRing F E)}) ((v : hatRing F E) ^ k) =
-        Ideal.Quotient.mk _ 1 := by
+    have h2
+        : Ideal.Quotient.mk (Ideal.span {(N : hatRing F E)}) ((v : hatRing F E) ^ k)
+          = Ideal.Quotient.mk _ 1 := by
       rw [map_pow, map_one]
       exact (Units.val_pow_eq_pow_val _ _).symm.trans (congrArg Units.val h1)
     obtain ⟨w, hw⟩ := Ideal.mem_span_singleton.1 (Ideal.Quotient.eq.1 h2)
@@ -212,8 +232,11 @@ theorem exists_exponent (hc : ∀ y, c (c y) = y) (N : ℕ) (hN : 0 < N) : ∃ m
   rw [pow_mul, hx2, mul_pow]
   exact Subgroup.mul_mem_sup (pow_mem hr k) huk
 
-theorem mem_of_pow_eq_one {K : IntermediateField ℚ ℂ} {m : ℕ} (hm : 0 < m)
-    (h : ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta m ∈ K) {z : ℂ} (hz : z ^ m = 1) : z ∈ K := by
+theorem mem_of_pow_eq_one
+    {K : IntermediateField ℚ ℂ} {m : ℕ}
+    (hm : 0 < m) (h : ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta m ∈ K)
+    {z : ℂ} (hz : z ^ m = 1)
+    : z ∈ K := by
   have : NeZero m := ⟨hm.ne'⟩
   obtain ⟨i, -, rfl⟩ := (Complex.isPrimitiveRoot_exp m hm.ne').eq_pow_of_pow_eq_one hz
   exact pow_mem h i
@@ -222,7 +245,9 @@ end GlobalTheory.NormOneChar
 
 namespace GlobalTheory.NormOneChar
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Theta GlobalTheory.FinalJoin
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Theta
+  GlobalTheory.FinalJoin
 open scoped TensorProduct
 
 end GlobalTheory.NormOneChar

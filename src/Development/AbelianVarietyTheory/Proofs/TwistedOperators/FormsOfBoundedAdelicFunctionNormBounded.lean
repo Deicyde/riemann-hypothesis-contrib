@@ -23,17 +23,24 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsCon
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
 open MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker GlobalTheory.AdSpan
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker GlobalTheory.AdSpan
 open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.AdSpan.BddForms
 
-theorem fg_of_mem_lats {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {X : Data E r}
-    (Lv : SW.Level X) {L : Lt E r} (hL : L ∈ Lv.lats) : L.FG := by
+theorem fg_of_mem_lats
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} {X : Data E r} (Lv : SW.Level X)
+    {L : Lt E r} (hL : L ∈ Lv.lats)
+    : L.FG := by
   obtain ⟨-, s, hcop, hs, -⟩ := hL
   have hs0 : s ≠ 0 := by
     rintro rfl
@@ -55,8 +62,10 @@ theorem zpow_mul_rpow_sq (t : ℝ) (ht : 0 < t) (l : ℤ) : t ^ l * (t ^ 2) ^ (-
     Real.rpow_intCast]
   exact mul_inv_cancel₀ (zpow_ne_zero _ ht.ne')
 
-theorem diag_ne_zero {E : Type} [Field E] {Ψ : Finset (E →+* ℂ)} {r : ℕ} {b : Frame Ψ r}
-    (hb : b ∈ Bor Ψ r) (τ : Ψ) (i : Fin r) : b τ i i ≠ 0 := by
+theorem diag_ne_zero
+    {E : Type} [Field E]
+    {Ψ : Finset (E →+* ℂ)} {r : ℕ} {b : Frame Ψ r} (hb : b ∈ Bor Ψ r) (τ : Ψ) (i : Fin r)
+    : b τ i i ≠ 0 := by
   obtain ⟨hdet, hlow⟩ := hb τ
   have htri : (mat b τ).BlockTriangular id := fun a c hca => hlow a c hca
   rw [Matrix.det_of_isUpperTriangular htri, Finset.prod_ne_zero_iff] at hdet
@@ -87,9 +96,59 @@ end GlobalTheory.AdSpan.BddForms
 
 namespace GlobalTheory.AdSpan.BddForms
 
-theorem pnorm_le_of_bdd : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)), IsWeak C.ψ S T om → ∀ (Lv : SW.Level C.X) (hn : T.rank ≤ S.rank) (M : ℕ), IdemTwo Lv.w → 0 < M → (M : 𝓞 D.host.E) ∈ Lv.𝔪 → ∀ B, C.IsB B → ∀ f', C.IsBase Lv B f' → ∀ (c : C.X.Ψ → Fin C.q0 → ℕ) (c' : C.X.Ψ → Fin C.X.p0 → ℕ) (z φ : GA D T → ℂ), (∀ a ∈ GinfC T, RealScal C om B a (z a)) → (∀ γ ∈ GQ T, ∀ g, φ (γ * g) = φ g) → (∀ (k : GA D T) (κ : Lv.J), C.LevK Lv k κ → om (1, k) (C.uVec Lv hn f') = C.uVec Lv hn f' ∧ ∀ g, φ (g * k) = φ g) → ∀ (v₀ : Lt D.host.E T.rank → TF S.rank C.g) (μ : GL (Fin T.rank) D.host.E → Lt D.host.E T.rank → ℂ), (∀ L ∈ Lv.lats, IsVac C.X C.bas Lv.w (tens (stdL D.host.E S.rank) (Lv.sh L)) (v₀ L)) → (∀ γ ∈ Lv.grp, ∀ L ∈ Lv.lats, ∀ k : Lv.J, Lv.Red (fun i => (γ : Matrix (Fin T.rank) (Fin T.rank) D.host.E) *ᵥ Lv.β i) k → wG C.X C.bas C.idx γ (v₀ L) = (μ γ L * (Lv.lam k : ℂˣ)) • v₀ (mapL γ L)) → ∀ (ep : GA D S → ℂ) (cf : GA D T → ℂ), (∀ (h : GA D S) (Λ : Lt D.host.E S.rank) (g : GA D T) (L : Lt D.host.E T.rank), h ∈ GfC S → TrivAt S (Ideal.span {(M : 𝓞 D.host.F)}) h → Λ.FG → IsMov (fmtC S h) (stdL D.host.E S.rank) Λ → g ∈ GfC T → TrivAt T (C.under Lv) g → L.FG → IsMov (fmt T g) C.X.Λ L → ‖ep h‖ = 1 ∧ ‖cf g‖ = 1 ∧ om (h, g) (C.Th (C.xB B) (Lv.phi C.bas hn v₀ C.X.Λ (stdL D.host.E S.rank))) = (ep h * cf g) • (C.Th (C.xB B) (Lv.phi C.bas hn v₀ L Λ))) → ∀ gL : Lt D.host.E T.rank → GA D T, (∀ L ∈ Lv.lats, gL L ∈ GfC T ∧ TrivAt T (C.under Lv) (gL L) ∧ IsMov (fmt T (gL L)) C.X.Λ L) → ∀ F : Lt D.host.E T.rank → Frame C.X.Ψ T.rank → ℂ, (∀ L ∈ Lv.lats, DifferentiableOn ℂ (F L) C.X.dom) → (∀ L ∈ Lv.lats, ∀ x ∈ C.X.dom, ∀ b ∈ Bor C.X.Ψ T.rank, F L (rmul x b) = bchar (wtOf C.X C.hr c c' S.rank) b * F L x) → (∀ L ∈ Lv.lats, ∀ a ∈ GinfC T, φ (gL L * a) = z a * (ep 1 * cf (gL L)) * F L (C.xB (C.mvB a B))) → (∃ K : ℝ, ∀ g, ‖φ g‖ ≤ K) → ∃ K : ℝ, ∀ L ∈ Lv.lats, ∀ x ∈ C.X.dom, C.X.pnorm (wtOf C.X C.hr c c' S.rank) (F L) x ≤ K := by
-  intro D S T C om hW Lv hn M hw hM hMm B hB f' _hbase c c' z φ hz _hγ _hk v₀ μ _hvac _hμ ep cf hepcf gL hgL F
-    _hFd hFb hFφ hφb
+theorem pnorm_le_of_bdd
+    : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
+      IsWeak C.ψ S T om
+        → ∀ (Lv : SW.Level C.X) (hn : T.rank ≤ S.rank) (M : ℕ),
+          IdemTwo Lv.w → 0 < M → (M : 𝓞 D.host.E) ∈ Lv.𝔪
+            → ∀ B,
+              C.IsB B
+                → ∀ f',
+                  C.IsBase Lv B f'
+                    → ∀ (c : C.X.Ψ → Fin C.q0 → ℕ) (c' : C.X.Ψ → Fin C.X.p0 → ℕ) (z φ : GA D T → ℂ),
+                      (∀ a ∈ GinfC T, RealScal C om B a (z a)) → (∀ γ ∈ GQ T, ∀ g, φ (γ * g) = φ g)
+                        → (∀ (k : GA D T) (κ : Lv.J),
+                          C.LevK Lv k κ
+                            → om (1, k) (C.uVec Lv hn f') = C.uVec Lv hn f' ∧ ∀ g, φ (g * k) = φ g)
+                        → ∀ (v₀ : Lt D.host.E T.rank → TF S.rank C.g)
+                            (μ : GL (Fin T.rank) D.host.E → Lt D.host.E T.rank → ℂ),
+                          (∀ L ∈ Lv.lats,
+                              IsVac C.X C.bas Lv.w (tens (stdL D.host.E S.rank) (Lv.sh L)) (v₀ L))
+                            → (∀ γ ∈ Lv.grp, ∀ L ∈ Lv.lats, ∀ k : Lv.J,
+                              Lv.Red
+                                  (fun i =>
+                                    (γ : Matrix (Fin T.rank) (Fin T.rank) D.host.E) *ᵥ Lv.β i)
+                                  k
+                                → wG C.X C.bas C.idx γ (v₀ L)
+                                  = (μ γ L * (Lv.lam k : ℂˣ)) • v₀ (mapL γ L))
+                            → ∀ (ep : GA D S → ℂ) (cf : GA D T → ℂ),
+                              (∀ (h : GA D S) (Λ : Lt D.host.E S.rank) (g : GA D T)
+                                    (L : Lt D.host.E T.rank),
+                                  h ∈ GfC S → TrivAt S (Ideal.span {(M : 𝓞 D.host.F)}) h → Λ.FG
+                                    → IsMov (fmtC S h) (stdL D.host.E S.rank) Λ → g ∈ GfC T
+                                    → TrivAt T (C.under Lv) g → L.FG → IsMov (fmt T g) C.X.Λ L
+                                    → ‖ep h‖ = 1 ∧ ‖cf g‖ = 1
+                                      ∧ om (h, g)
+                                          (C.Th (C.xB B)
+                                            (Lv.phi C.bas hn v₀ C.X.Λ (stdL D.host.E S.rank)))
+                                        = (ep h * cf g) • (C.Th (C.xB B) (Lv.phi C.bas hn v₀ L Λ)))
+                                → ∀ gL : Lt D.host.E T.rank → GA D T,
+                                  (∀ L ∈ Lv.lats,
+                                      gL L ∈ GfC T ∧ TrivAt T (C.under Lv) (gL L)
+                                        ∧ IsMov (fmt T (gL L)) C.X.Λ L)
+                                    → ∀ F : Lt D.host.E T.rank → Frame C.X.Ψ T.rank → ℂ,
+                                      (∀ L ∈ Lv.lats, DifferentiableOn ℂ (F L) C.X.dom)
+                                        → (∀ L ∈ Lv.lats, ∀ x ∈ C.X.dom, ∀ b ∈ Bor C.X.Ψ T.rank,
+                                          F L (rmul x b)
+                                            = bchar (wtOf C.X C.hr c c' S.rank) b * F L x)
+                                        → (∀ L ∈ Lv.lats, ∀ a ∈ GinfC T,
+                                          φ (gL L * a)
+                                            = z a * (ep 1 * cf (gL L)) * F L (C.xB (C.mvB a B)))
+                                        → (∃ K : ℝ, ∀ g, ‖φ g‖ ≤ K)
+                                        → ∃ K : ℝ, ∀ L ∈ Lv.lats, ∀ x ∈ C.X.dom,
+                                          C.X.pnorm (wtOf C.X C.hr c c' S.rank) (F L) x ≤ K := by
+  intro D S T C om hW Lv hn M hw hM hMm B hB f' _hbase c c' z φ hz _hγ _hk v₀ μ _hvac _hμ ep cf
+    hepcf gL hgL F _hFd hFb hFφ hφb
   obtain ⟨K, hKφ⟩ := hφb
   obtain ⟨o, b, -, -, hob, -⟩ := GlobalTheory.Ker.exists_orthonormalisation D.host.E T.rank C.X
   have hJ := (GlobalTheory.Ker.onBasis_frame_period D S T C).2
@@ -99,7 +158,8 @@ theorem pnorm_le_of_bdd : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (om : GA D S 
 
   have hz1 : ∀ a ∈ GinfC T, ‖z a‖ = 1 := by
     intro a ha
-    obtain ⟨c0, hc0, hc0'⟩ := GlobalTheory.Ker.RealScalar.om_real_Th D S T C om hW 1 (one_mem _) a ha B hB
+    obtain ⟨c0, hc0, hc0'⟩ :=
+      GlobalTheory.Ker.RealScalar.om_real_Th D S T C om hW 1 (one_mem _) a ha B hB
     have e1 : om (1, a) (C.Th (C.xB B) φ₀) = z a • C.Th (C.xB (C.mvB a B)) φ₀ := hz a ha φ₀ hφ₀
     have e2 := hc0' φ₀ hφ₀
     have : z a = c0 := RealChar.smul_cancel (RealChar.th_ne C (hdom a) hφ₀ hφ₀ne) (e1.symm.trans e2)
@@ -109,8 +169,9 @@ theorem pnorm_le_of_bdd : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (om : GA D S 
   have hec : ∀ L ∈ Lv.lats, ‖ep 1 * cf (gL L)‖ = 1 := by
     intro L hL
     obtain ⟨h1, h2, h3⟩ := hgL L hL
-    obtain ⟨e1, e2, -⟩ := hepcf 1 (stdL _ _) (gL L) L (one_mem _) (Red.trivAt_one _ _) hstdFG
-      (by rw [Red.fmtC_one]; exact Red.isMov_one _) h1 h2 (fg_of_mem_lats Lv hL) h3
+    obtain ⟨e1, e2, -⟩ :=
+      hepcf 1 (stdL _ _) (gL L) L (one_mem _) (Red.trivAt_one _ _) hstdFG
+        (by rw [Red.fmtC_one]; exact Red.isMov_one _) h1 h2 (fg_of_mem_lats Lv hL) h3
     rw [norm_mul, e1, e2, one_mul]
 
   have hFa : ∀ L ∈ Lv.lats, ∀ a ∈ GinfC T, ‖F L (C.xB (C.mvB a B))‖ ≤ K := by
@@ -139,8 +200,10 @@ theorem pnorm_le_of_bdd : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (om : GA D S 
   simp only [Data.pnorm]
   simp only [← hdm]
   rw [hval, norm_mul]
-  calc ‖bchar la (b x)‖ * ‖F L (o x)‖ * ∏ τ, ∏ i, (‖b x τ i i‖ ^ 2) ^ (-(la τ i : ℝ) / 2)
-      = ‖F L (o x)‖ * (‖bchar la (b x)‖ * ∏ τ, ∏ i, (‖b x τ i i‖ ^ 2) ^ (-(la τ i : ℝ) / 2)) := by ring
+  calc
+    ‖bchar la (b x)‖ * ‖F L (o x)‖ * ∏ τ, ∏ i, (‖b x τ i i‖ ^ 2) ^ (-(la τ i : ℝ) / 2)
+        = ‖F L (o x)‖ * (‖bchar la (b x)‖ * ∏ τ, ∏ i, (‖b x τ i i‖ ^ 2) ^ (-(la τ i : ℝ) / 2)) := by
+      ring
     _ = ‖F L (o x)‖ := by rw [hprod, mul_one]
     _ ≤ K := hFo
 

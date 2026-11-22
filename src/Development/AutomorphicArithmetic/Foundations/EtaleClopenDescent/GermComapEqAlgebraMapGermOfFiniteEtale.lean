@@ -7,16 +7,18 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OmegaP
 
 set_option autoImplicit false
 
-open CategoryTheory AlgebraicGeometry GlobalTheory.HodgeCoh GlobalTheory.CechDR ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory AlgebraicGeometry GlobalTheory.HodgeCoh GlobalTheory.CechDR
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 namespace UpperTheory.Cb
 
 section Alg
 
-variable {B B' K L : Type} [CommRing B] [CommRing B'] [IsDomain B] [IsDomain B'] [Field K] [Field L]
-  [Algebra B B'] [Algebra B K] [Algebra K L] [Algebra B' L] [Algebra B L]
-  [IsScalarTower B K L] [IsScalarTower B B' L] [IsFractionRing B K] [IsFractionRing B' L]
+variable
+  {B B' K L : Type} [CommRing B] [CommRing B'] [IsDomain B] [IsDomain B'] [Field K] [Field L]
+  [Algebra B B'] [Algebra B K] [Algebra K L] [Algebra B' L] [Algebra B L] [IsScalarTower B K L]
+  [IsScalarTower B B' L] [IsFractionRing B K] [IsFractionRing B' L]
 
 include K L in
 private theorem injective_algebraMap : Function.Injective (algebraMap B B') := by
@@ -27,8 +29,8 @@ private theorem injective_algebraMap : Function.Injective (algebraMap B B') := b
   exact Function.Injective.of_comp (f := algebraMap B' L) h
 
 include K L in
-private theorem isLocalization_of_integral [Algebra.IsIntegral B B'] :
-    IsLocalization (Algebra.algebraMapSubmonoid B' (nonZeroDivisors B)) L := by
+private theorem isLocalization_of_integral [Algebra.IsIntegral B B']
+    : IsLocalization (Algebra.algebraMapSubmonoid B' (nonZeroDivisors B)) L := by
   have hinj : Function.Injective (algebraMap B B') := injective_algebraMap (K := K) (L := L)
   have hL : Function.Injective (algebraMap B' L) := IsFractionRing.injective B' L
   refine { map_units := ?_, surj := ?_, exists_of_eq := ?_ }
@@ -37,13 +39,14 @@ private theorem isLocalization_of_integral [Algebra.IsIntegral B B'] :
     exact (map_ne_zero_iff _ hL).2 ((map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hr))
   · intro z
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := B') z
-    obtain ⟨r, hr, t, ht⟩ := (Algebra.IsIntegral.isIntegral (R := B) b).isAlgebraic.exists_nonzero_dvd hb
+    obtain ⟨r, hr, t, ht⟩ :=
+      (Algebra.IsIntegral.isIntegral (R := B) b).isAlgebraic.exists_nonzero_dvd hb
     refine ⟨⟨a * t, ⟨algebraMap B B' r, r, mem_nonZeroDivisors_of_ne_zero hr, rfl⟩⟩, ?_⟩
     have hb0 : algebraMap B' L b ≠ 0 := (map_ne_zero_iff _ hL).2 (nonZeroDivisors.ne_zero hb)
     have e : algebraMap B' L (algebraMap B B' r) = algebraMap B' L b * algebraMap B' L t := by
       rw [ht, map_mul]
-    change algebraMap B' L a / algebraMap B' L b * algebraMap B' L (algebraMap B B' r) =
-      algebraMap B' L (a * t)
+    change algebraMap B' L a / algebraMap B' L b * algebraMap B' L (algebraMap B B' r)
+      = algebraMap B' L (a * t)
     rw [e, map_mul]
     field_simp
   · intro x y h
@@ -52,11 +55,12 @@ private theorem isLocalization_of_integral [Algebra.IsIntegral B B'] :
 include K L in
 private theorem isPushout_of_integral [Algebra.IsIntegral B B'] : Algebra.IsPushout B K B' L := by
   have h1 := isLocalization_of_integral (B := B) (B' := B') (K := K) (L := L)
-  have h2 := (isLocalizedModule_iff_isLocalization (S := nonZeroDivisors B) (A := B') (Aₛ := L)).2 h1
+  have h2 :=
+    (isLocalizedModule_iff_isLocalization (S := nonZeroDivisors B) (A := B') (Aₛ := L)).2 h1
   exact ⟨(isLocalizedModule_iff_isBaseChange (nonZeroDivisors B) K _).1 h2⟩
 
-private theorem algebraMap_etTrace [Module.Finite B B'] [Algebra.Etale B B'] (b : B') :
-    algebraMap B K (etTrace B B' b) = Algebra.trace K L (algebraMap B' L b) := by
+private theorem algebraMap_etTrace [Module.Finite B B'] [Algebra.Etale B B'] (b : B')
+    : algebraMap B K (etTrace B B' b) = Algebra.trace K L (algebraMap B' L b) := by
   haveI := projective_of_etale B B'
   haveI hp := isPushout_of_integral (B := B) (B' := B') (K := K) (L := L)
   haveI : Module.Finite K L := Module.Finite.equiv hp.out.equiv
@@ -65,16 +69,18 @@ private theorem algebraMap_etTrace [Module.Finite B B'] [Algebra.Etale B B'] (b 
 
 end Alg
 
-theorem germ_comap_eq_algebraMap_germ_of_finite_etale : ∀ (Z Y : Scheme.{0}) [IsIntegral Z] [IsIntegral Y] (p : Z ⟶ Sp ℂ) (p' : Y ⟶ Sp ℂ)
-    (c : Y ⟶ Z) (hc : c ≫ p = p') [IsFinite c] [Etale c] [Algebra Z.functionField Y.functionField],
-    (∀ (V : Z.Opens) (hV : genericPoint Z ∈ V) (hV' : genericPoint Y ∈ c ⁻¹ᵁ V) (g : Γ(Z, V)),
-      (Y.presheaf.germ (c ⁻¹ᵁ V) (genericPoint Y) hV').hom ((c.app V).hom g) =
-        algebraMap Z.functionField Y.functionField ((Z.presheaf.germ V (genericPoint Z) hV).hom g)) →
-    ∀ (V : Z.Opens) (hV : IsAffineOpen V) (hg : genericPoint Z ∈ V)
-      (hg' : genericPoint Y ∈ c ⁻¹ᵁ V) (b' : Γ(Y, c ⁻¹ᵁ V)),
-      (Z.presheaf.germ V (genericPoint Z) hg).hom (secTrace (f := c) p p' hV b') =
-        Algebra.trace Z.functionField Y.functionField
-          ((Y.presheaf.germ (c ⁻¹ᵁ V) (genericPoint Y) hg').hom b') := by
+theorem germ_comap_eq_algebraMap_germ_of_finite_etale
+    : ∀ (Z Y : Scheme.{0}) [IsIntegral Z] [IsIntegral Y] (p : Z ⟶ Sp ℂ) (p' : Y ⟶ Sp ℂ) (c : Y ⟶ Z)
+        (hc : c ≫ p = p') [IsFinite c] [Etale c] [Algebra Z.functionField Y.functionField],
+      (∀ (V : Z.Opens) (hV : genericPoint Z ∈ V) (hV' : genericPoint Y ∈ c ⁻¹ᵁ V) (g : Γ(Z, V)),
+          (Y.presheaf.germ (c ⁻¹ᵁ V) (genericPoint Y) hV').hom ((c.app V).hom g)
+            = algebraMap Z.functionField Y.functionField
+              ((Z.presheaf.germ V (genericPoint Z) hV).hom g))
+        → ∀ (V : Z.Opens) (hV : IsAffineOpen V) (hg : genericPoint Z ∈ V)
+            (hg' : genericPoint Y ∈ c ⁻¹ᵁ V) (b' : Γ(Y, c ⁻¹ᵁ V)),
+          (Z.presheaf.germ V (genericPoint Z) hg).hom (secTrace (f := c) p p' hV b')
+            = Algebra.trace Z.functionField Y.functionField
+              ((Y.presheaf.germ (c ⁻¹ᵁ V) (genericPoint Y) hg').hom b') := by
   intro Z Y _ _ p p' c _ _ _ _ hg V hVa hV hV' b'
   haveI : Nonempty V := ⟨⟨_, hV⟩⟩
   haveI : Nonempty (c ⁻¹ᵁ V : Y.Opens) := ⟨⟨_, hV'⟩⟩

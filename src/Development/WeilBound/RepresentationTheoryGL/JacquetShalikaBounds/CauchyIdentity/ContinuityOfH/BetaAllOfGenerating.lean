@@ -48,7 +48,8 @@ theorem beta_all_of_generating : BetaGen → SumBd → SchurJT → BetaAll := by
     exact ⟨t, ht2, ht1⟩
   have hB' : 0 < B' := hB.trans hBB'
   let γ : ℝ → Fin m' → ℂˣ := fun t j =>
-    β j * Units.mk0 ((Real.exp (t * ((j : ℕ) : ℝ)) : ℝ) : ℂ) (by exact_mod_cast (Real.exp_pos _).ne')
+    β j
+      * Units.mk0 ((Real.exp (t * ((j : ℕ) : ℝ)) : ℝ) : ℂ) (by exact_mod_cast (Real.exp_pos _).ne')
   let c : ℝ → Fin m' → ℂ := fun t j => ((γ t j : ℂˣ) : ℂ)
   have hγt : ∀ j, Filter.Tendsto (fun t => c t j) (𝓝[>] (0 : ℝ)) (𝓝 (β j : ℂ)) := by
     intro j
@@ -78,7 +79,8 @@ theorem beta_all_of_generating : BetaGen → SumBd → SchurJT → BetaAll := by
         intro heq
         rw [hb] at heq
         have h3 := mul_left_cancel₀ (β j').ne_zero heq
-        have h4 : Real.exp (t * ((j : ℕ) : ℝ)) = Real.exp (t * ((j' : ℕ) : ℝ)) := by exact_mod_cast h3
+        have h4 : Real.exp (t * ((j : ℕ) : ℝ)) = Real.exp (t * ((j' : ℕ) : ℝ)) := by
+          exact_mod_cast h3
         have h5 := Real.exp_injective h4
         have ht' : (0 : ℝ) < t := ht
         have h6 : ((j : ℕ) : ℝ) = ((j' : ℕ) : ℝ) := mul_left_cancel₀ ht'.ne' h5
@@ -92,43 +94,58 @@ theorem beta_all_of_generating : BetaGen → SumBd → SchurJT → BetaAll := by
     jt α (l : Fin m' → ℕ) * jt b (l : Fin m' → ℕ) * X ^ ∑ j : Fin m', (l : Fin m' → ℕ) j
   have hSa := hS m m' A B' ‖X‖ hA hB' (norm_nonneg _) hX'
   have hSb := hS m' m' B' B' 0 hB' hB' le_rfl (by simp)
-  have hbound : ∀ b : Fin m' → ℂ, (∀ j, ‖b j‖ ≤ B') → ∀ l : {l : Fin m' → ℕ // Antitone l},
-      ‖G b l‖ ≤ cjt m A (l : Fin m' → ℕ) * cjt m' B' (l : Fin m' → ℕ) * ‖X‖ ^ ∑ j : Fin m', (l : Fin m' → ℕ) j := by
+  have hbound
+      : ∀ b : Fin m' → ℂ,
+        (∀ j, ‖b j‖ ≤ B')
+          → ∀ l : {l : Fin m' → ℕ // Antitone l},
+            ‖G b l‖
+              ≤ cjt m A (l : Fin m' → ℕ) * cjt m' B' (l : Fin m' → ℕ)
+                * ‖X‖ ^ ∑ j : Fin m', (l : Fin m' → ℕ) j := by
     intro b hb l
     simp only [G, norm_mul, norm_pow]
     have h1 := hSa.2 α hα (l : Fin m' → ℕ)
     have h2 := hSb.2 b hb (l : Fin m' → ℕ)
     have h0 : 0 ≤ cjt m A (l : Fin m' → ℕ) := (norm_nonneg _).trans h1
-    exact mul_le_mul_of_nonneg_right (mul_le_mul h1 h2 (norm_nonneg _) h0) (pow_nonneg (norm_nonneg _) _)
+    exact mul_le_mul_of_nonneg_right (mul_le_mul h1 h2 (norm_nonneg _) h0)
+      (pow_nonneg (norm_nonneg _) _)
   have hsumG : Summable (G fun j => (β j : ℂ)) :=
     Summable.of_norm_bounded hSa.1 (hbound _ fun j => (hβ j).trans hBB'.le)
   have hc : Filter.Tendsto c (𝓝[>] (0 : ℝ)) (𝓝 fun j => (β j : ℂ)) := tendsto_pi_nhds.mpr hγt
-  have hpt : ∀ l, Filter.Tendsto (fun t => G (c t) l) (𝓝[>] (0 : ℝ)) (𝓝 (G (fun j => (β j : ℂ)) l)) := by
+  have hpt
+      : ∀ l, Filter.Tendsto (fun t => G (c t) l) (𝓝[>] (0 : ℝ)) (𝓝 (G (fun j => (β j : ℂ)) l)) := by
     intro l
     have h := ((continuous_jt (m := m') (l : Fin m' → ℕ)).tendsto _).comp hc
     exact (tendsto_const_nhds.mul h).mul tendsto_const_nhds
-  have htsum : Filter.Tendsto (fun t => ∑' l, G (c t) l) (𝓝[>] (0 : ℝ)) (𝓝 (∑' l, G (fun j => (β j : ℂ)) l)) :=
+  have htsum : Filter.Tendsto
+      (fun t => ∑' l, G (c t) l)
+      (𝓝[>] (0 : ℝ)) (𝓝 (∑' l, G (fun j => (β j : ℂ)) l)) :=
     tendsto_tsum_of_dominated_convergence hSa.1 hpt (hγB.mono fun t ht l => hbound _ ht l)
-  have hev : ∀ᶠ t in 𝓝[>] (0 : ℝ), ∏ i : Fin m, ∏ j : Fin m', (1 - α i * c t j * X)⁻¹ = ∑' l, G (c t) l := by
-    filter_upwards [hγB, hdist] with t hb hd
-    exact (hG m m' α (γ t) X A B' hA hB' hα hb hX' hd).tsum_eq.symm
-  have hP : Filter.Tendsto (fun t => ∏ i : Fin m, ∏ j : Fin m', (1 - α i * c t j * X)⁻¹) (𝓝[>] (0 : ℝ))
-      (𝓝 (∏ i : Fin m, ∏ j : Fin m', (1 - α i * (β j : ℂ) * X)⁻¹)) := by
+  have hev
+      : ∀ᶠ t in 𝓝[>] (0 : ℝ), ∏ i : Fin m, ∏ j : Fin m', (1 - α i * c t j * X)⁻¹ = ∑' l, G (c t) l :=
+    by
+      filter_upwards [hγB, hdist] with t hb hd
+      exact (hG m m' α (γ t) X A B' hA hB' hα hb hX' hd).tsum_eq.symm
+  have hP : Filter.Tendsto
+      (fun t => ∏ i : Fin m, ∏ j : Fin m', (1 - α i * c t j * X)⁻¹)
+      (𝓝[>] (0 : ℝ)) (𝓝 (∏ i : Fin m, ∏ j : Fin m', (1 - α i * (β j : ℂ) * X)⁻¹)) := by
     refine tendsto_finsetProd _ fun i _ => tendsto_finsetProd _ fun j _ => ?_
-    refine (tendsto_const_nhds.sub ((tendsto_const_nhds.mul (hγt j)).mul tendsto_const_nhds)).inv₀ ?_
+    refine (tendsto_const_nhds.sub ((tendsto_const_nhds.mul (hγt j)).mul tendsto_const_nhds)).inv₀
+      ?_
     intro h0
     have h1 : α i * (β j : ℂ) * X = 1 := by linear_combination -h0
     have h2 : ‖α i * (β j : ℂ) * X‖ < 1 := by
       rw [norm_mul, norm_mul]
-      calc ‖α i‖ * ‖(β j : ℂ)‖ * ‖X‖ ≤ A * B * ‖X‖ := by
-            gcongr
-            · exact hα i
-            · exact hβ j
+      calc
+        ‖α i‖ * ‖(β j : ℂ)‖ * ‖X‖ ≤ A * B * ‖X‖ := by
+          gcongr
+          · exact hα i
+          · exact hβ j
         _ = ‖X‖ * A * B := by ring
         _ < 1 := hX
     rw [h1, norm_one] at h2
     exact lt_irrefl _ h2
-  have heq : ∑' l, G (fun j => (β j : ℂ)) l = ∏ i : Fin m, ∏ j : Fin m', (1 - α i * (β j : ℂ) * X)⁻¹ :=
+  have heq
+      : ∑' l, G (fun j => (β j : ℂ)) l = ∏ i : Fin m, ∏ j : Fin m', (1 - α i * (β j : ℂ) * X)⁻¹ :=
     tendsto_nhds_unique htsum (hP.congr' hev)
   show HasSum (G fun j => (β j : ℂ)) _
   rw [← heq]

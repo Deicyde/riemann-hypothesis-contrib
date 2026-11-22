@@ -9,15 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.UnitThe
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem zmod_pow_exists_eq_nsmul_of_nsmul_eq_zero (n J : ℕ) (hn : n ≠ 0) (hJ : 2 ≤ J)
-    (t : ZMod (n ^ J)) (ht : n • t = 0) : ∃ s : ZMod (n ^ J), t = n • s := by
+theorem zmod_pow_exists_eq_nsmul_of_nsmul_eq_zero
+    (n J : ℕ) (hn : n ≠ 0) (hJ : 2 ≤ J) (t : ZMod (n ^ J)) (ht : n • t = 0)
+    : ∃ s : ZMod (n ^ J), t = n • s := by
   have : NeZero (n ^ J) := ⟨pow_ne_zero _ hn⟩
   have hv : n ^ J ∣ n * t.val := by
     rw [← ZMod.natCast_eq_zero_iff, Nat.cast_mul, ZMod.natCast_zmod_val, ← nsmul_eq_mul]
@@ -25,21 +27,25 @@ theorem zmod_pow_exists_eq_nsmul_of_nsmul_eq_zero (n J : ℕ) (hn : n ≠ 0) (hJ
   obtain ⟨k, hk⟩ := hv
   have h1 : t.val = n * (n ^ (J - 2) * k) := by
     apply Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero hn)
-    rw [hk, show n ^ J = n * (n * n ^ (J - 2)) by
-      rw [← pow_succ', ← pow_succ']; congr 1; omega]
+    rw [hk, show n ^ J = n * (n * n ^ (J - 2)) by rw [← pow_succ', ← pow_succ']; congr 1; omega]
     ring
   refine ⟨((n ^ (J - 2) * k : ℕ) : ZMod (n ^ J)), ?_⟩
   rw [nsmul_eq_mul, ← Nat.cast_mul, ← h1, ZMod.natCast_zmod_val]
 
-theorem closure_eq_ker_of_meets_torsion_cosets :
-    ∀ (I X : Type) [AddCommGroup X] [Module.Free ℤ X] (n J M : ℕ), n ≠ 0 → 2 ≤ J → M = n ^ J → ∀ (yy : (I → ZMod M) →+ X ⧸ (nsmulAddMonoidHom M : X →+ X).range), Function.Surjective yy → ∀ Z : Set (I → ZMod M), Z ⊆ yy.ker → (∀ a ∈ yy.ker, ∃ b, n • b = 0 ∧ a + b ∈ Z) → AddSubgroup.closure Z = yy.ker := by
+theorem closure_eq_ker_of_meets_torsion_cosets
+    : ∀ (I X : Type) [AddCommGroup X] [Module.Free ℤ X] (n J M : ℕ),
+      n ≠ 0 → 2 ≤ J → M = n ^ J
+        → ∀ (yy : (I → ZMod M) →+ X ⧸ (nsmulAddMonoidHom M : X →+ X).range),
+          Function.Surjective yy
+            → ∀ Z : Set (I → ZMod M),
+              Z ⊆ yy.ker → (∀ a ∈ yy.ker, ∃ b, n • b = 0 ∧ a + b ∈ Z)
+                → AddSubgroup.closure Z = yy.ker := by
   intro I X _ _ n J M hn hJ hM yy hyy Z hZ hcov
   subst hM
   have key : ∀ b : I → ZMod (n ^ J), n • b = 0 → b ∈ yy.ker → ∃ k ∈ yy.ker, n • k = b := by
     intro b hb hbk
     have hc : ∀ i, ∃ s, b i = n • s := fun i =>
-      zmod_pow_exists_eq_nsmul_of_nsmul_eq_zero n J hn hJ (b i) (by
-        simpa using congrFun hb i)
+      zmod_pow_exists_eq_nsmul_of_nsmul_eq_zero n J hn hJ (b i) (by simpa using congrFun hb i)
     choose c hc using hc
     have hbc : b = n • c := funext fun i => by simpa using hc i
     obtain ⟨x, hx⟩ := QuotientAddGroup.mk_surjective (yy c)
@@ -57,8 +63,9 @@ theorem closure_eq_ker_of_meets_torsion_cosets :
     refine ⟨c - n ^ (J - 1) • c', ?_, ?_⟩
     · rw [AddMonoidHom.mem_ker, map_sub, map_nsmul, hc', ← QuotientAddGroup.mk_nsmul, ← hxx, hx,
         sub_self]
-    · have h0 : (n ^ J) • c' = 0 := funext fun i => by
-        simp only [Pi.smul_apply, Pi.zero_apply, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+    · have h0 : (n ^ J) • c' = 0 :=
+        funext fun i => by
+          simp only [Pi.smul_apply, Pi.zero_apply, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
       rw [smul_sub, smul_smul, ← pow_succ', show J - 1 + 1 = J by omega, ← hbc, h0, sub_zero]
   apply le_antisymm
   · exact (AddSubgroup.closure_le _).2 hZ

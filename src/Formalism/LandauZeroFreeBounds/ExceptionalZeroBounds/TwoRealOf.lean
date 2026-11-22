@@ -91,8 +91,7 @@ theorem twoRealCharNoCommonZeroOfBounds : TwoRealOf := by
   have hz₂ := not_not.mp hz₂'
   obtain ⟨L, hL⟩ : ∃ L : ℝ, L = Real.log ((q : ℝ) * 2) := ⟨_, rfl⟩
   have hq : (1 : ℝ) ≤ q := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne q)
-  have hL2 : Real.log 2 ≤ L := by
-    rw [hL]; exact Real.log_le_log (by norm_num) (by linarith)
+  have hL2 : Real.log 2 ≤ L := by rw [hL]; exact Real.log_le_log (by norm_num) (by linarith)
   have hLhalf : 1 / 2 < L := by have := Real.log_two_gt_d9; linarith
   have hL0 : 0 < L := by linarith
   have hAL0 : 0 < 20 * A * L := mul_pos (mul_pos (by norm_num) hA0) hL0
@@ -111,20 +110,26 @@ theorem twoRealCharNoCommonZeroOfBounds : TwoRealOf := by
     linarith
   have hσ : (1 : ℝ) < 1 + 2 * e := by linarith
   have hσ6 : 1 + 2 * e ≤ 6 / 5 := by linarith
-  have hβlt : ∀ χ : DirichletCharacter ℂ q, χ ≠ 1 → ∀ β : ℝ,
-      DirichletCharacter.LFunction χ (β : ℂ) = 0 → β < 1 := by
+  have hβlt
+      : ∀ χ : DirichletCharacter ℂ q,
+        χ ≠ 1 → ∀ β : ℝ, DirichletCharacter.LFunction χ (β : ℂ) = 0 → β < 1 := by
     intro χ hχ β hz
     by_contra h
-    exact DirichletCharacter.LFunction_ne_zero_of_one_le_re χ (Or.inl hχ) (by simpa using not_lt.mp h) hz
-  have hbound : ∀ χ : DirichletCharacter ℂ q, χ ≠ 1 → ∀ β : ℝ,
-      InRegion (1 / (20 * A)) q (β : ℂ) → DirichletCharacter.LFunction χ (β : ℂ) = 0 →
-      (negLD χ ((1 + 2 * e : ℝ) : ℂ)).re ≤ C * L - 20 * A * L / 3 := by
+    exact DirichletCharacter.LFunction_ne_zero_of_one_le_re χ (Or.inl hχ)
+      (by simpa using not_lt.mp h) hz
+  have hbound
+      : ∀ χ : DirichletCharacter ℂ q,
+        χ ≠ 1
+          → ∀ β : ℝ,
+            InRegion (1 / (20 * A)) q (β : ℂ) → DirichletCharacter.LFunction χ (β : ℂ) = 0
+              → (negLD χ ((1 + 2 * e : ℝ) : ℂ)).re ≤ C * L - 20 * A * L / 3 := by
     intro χ hχ β hr hz
     have hb1 := hβlt χ hχ β hz
     have hb0 := hreg β hr
     obtain ⟨Z, m, hZ, hm, -, hb⟩ := hC q χ hχ 0
-    have key := re_negLogDeriv_le_of_real_zero C χ hχ Z m hZ hm β (1 + 2 * e) hσ
-      (by linarith) (by linarith) hb1 hz (hb (1 + 2 * e) hσ hσ6)
+    have key :=
+      re_negLogDeriv_le_of_real_zero C χ hχ Z m hZ hm β (1 + 2 * e) hσ (by linarith) (by linarith)
+        hb1 hz (hb (1 + 2 * e) hσ hσ6)
     rw [← hL] at key
     have h3 : 1 / (3 * e) = 20 * A * L / 3 := by
       rw [div_eq_iff (mul_pos (by norm_num) he0).ne']
@@ -144,17 +149,23 @@ theorem twoRealCharNoCommonZeroOfBounds : TwoRealOf := by
   have h12ne : χ₁ * χ₂ ≠ 1 := by
     intro h
     apply h12
-    calc χ₁ = χ₁ * χ₂ ^ 2 := by rw [h₂, mul_one]
+    calc
+      χ₁
+        = χ₁ * χ₂ ^ 2 := by rw [h₂, mul_one]
       _ = χ₁ * χ₂ * χ₂ := by rw [pow_two, mul_assoc]
       _ = χ₂ := by rw [h, one_mul]
   have h12b : (negLD (χ₁ * χ₂) ((1 + 2 * e : ℝ) : ℂ)).re ≤ C * L := by
     obtain ⟨Z, m, hZ, -, -, hb⟩ := hC q (χ₁ * χ₂) h12ne 0
     have hb' := hb (1 + 2 * e) hσ hσ6
-    have hs := sum_re_one_div_sub_zero_nonneg (χ₁ * χ₂) h12ne Z m
-      (fun ρ hρ => ((hZ ρ).1 hρ).2) (1 + 2 * e) hσ
+    have hs :=
+      sum_re_one_div_sub_zero_nonneg (χ₁ * χ₂) h12ne Z m
+        (fun ρ hρ => ((hZ ρ).1 hρ).2)
+        (1 + 2 * e) hσ
     have hs0 : (((1 + 2 * e : ℝ) : ℂ) + ((0 : ℝ) : ℂ) * I) = ((1 + 2 * e : ℝ) : ℂ) := by simp
-    have hl : (negLD (χ₁ * χ₂) (((1 + 2 * e : ℝ) : ℂ) + ((0 : ℝ) : ℂ) * I)).re =
-        (negLD (χ₁ * χ₂) ((1 + 2 * e : ℝ) : ℂ)).re := by rw [hs0]
+    have hl
+        : (negLD (χ₁ * χ₂) (((1 + 2 * e : ℝ) : ℂ) + ((0 : ℝ) : ℂ) * I)).re
+          = (negLD (χ₁ * χ₂) ((1 + 2 * e : ℝ) : ℂ)).re := by
+      rw [hs0]
     have h02 : |(0 : ℝ)| + 2 = 2 := by norm_num
     rw [h02, ← hL] at hb'
     linarith

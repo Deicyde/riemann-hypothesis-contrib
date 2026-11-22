@@ -14,9 +14,11 @@ open scoped TensorProduct
 
 namespace UpperTheory.ConvolutionTheory.D
 
-private theorem aeval_map_sg {k R : Type} [CommRing k] [CommRing R] [Algebra k R] {n : ℕ} (s : R ≃ₐ[k] R)
-    (γ : GL (Fin n) k) (p : R[X]) :
-    (aeval (up R γ).val p).map s = aeval (up R γ).val (p.map (s : R →+* R)) := by
+private theorem aeval_map_sg
+    {k R : Type} [CommRing k] [CommRing R] [Algebra k R]
+    {n : ℕ}
+    (s : R ≃ₐ[k] R) (γ : GL (Fin n) k) (p : R[X])
+    : (aeval (up R γ).val p).map s = aeval (up R γ).val (p.map (s : R →+* R)) := by
   have hγ : ((up R γ).val).map s = (up R γ).val := by
     ext i j
     simp [up]
@@ -24,14 +26,22 @@ private theorem aeval_map_sg {k R : Type} [CommRing k] [CommRing R] [Algebra k R
   | C r =>
     ext i j
     simp [Matrix.algebraMap_matrix_apply, apply_ite s]
-  | add p q hp hq => rw [map_add (f := _), Polynomial.map_add (f := _), map_add (f := _), ← hp, ← hq, Matrix.map_add _ (map_add s)]
+  | add p q hp hq =>
+    rw [map_add (f := _), Polynomial.map_add (f := _), map_add (f := _), ← hp, ← hq,
+      Matrix.map_add _ (map_add s)]
   | monomial m r h =>
-    rw [pow_succ, ← mul_assoc, map_mul, Matrix.map_mul, h, Polynomial.map_mul (p := C r * X ^ m), map_mul]
+    rw [pow_succ, ← mul_assoc, map_mul, Matrix.map_mul, h, Polynomial.map_mul (p := C r * X ^ m),
+      map_mul]
     simp [hγ]
 
-private theorem nm_aeval {k R : Type} [CommRing k] [CommRing R] [Algebra k R] {n : ℕ} (σ : R ≃ₐ[k] R)
-    (γ : GL (Fin n) k) (p : R[X]) (a : GL (Fin n) R) (ha : a.val = aeval (up R γ).val p) (q : ℕ) :
-    (nm σ q a).val = aeval (up R γ).val (∏ i ∈ Finset.range q, p.map ((σ ^ i : R ≃ₐ[k] R) : R →+* R)) := by
+private theorem nm_aeval
+    {k R : Type} [CommRing k] [CommRing R] [Algebra k R]
+    {n : ℕ}
+    (σ : R ≃ₐ[k] R)
+    (γ : GL (Fin n) k) (p : R[X]) (a : GL (Fin n) R) (ha : a.val = aeval (up R γ).val p)
+    (q : ℕ)
+    : (nm σ q a).val
+      = aeval (up R γ).val (∏ i ∈ Finset.range q, p.map ((σ ^ i : R ≃ₐ[k] R) : R →+* R)) := by
   induction q with
   | zero => simp [nm]
   | succ q ih =>
@@ -40,18 +50,25 @@ private theorem nm_aeval {k R : Type} [CommRing k] [CommRing R] [Algebra k R] {n
       List.prod_cons, List.prod_nil, mul_one, Units.val_mul]
     rfl
 
-private theorem core {k R A T : Type} [Field k] [CommRing R] [Algebra k R] [CommRing A] [CommRing T] [Algebra A T]
-    [Module.Free A T] {n : ℕ} (σ : R ≃ₐ[k] R) (τ : T ≃ₐ[A] T) (q : ℕ) (hσ : IsGal σ q) (hτ : IsGal τ q)
-    (γ : GL (Fin n) k) (hγ : (cp γ).Separable) (j : R →+* T) (α : A) (hj : ∀ r, τ (j r) = j (σ r))
+private theorem core
+    {k R A T : Type}
+    [Field k] [CommRing R] [Algebra k R] [CommRing A] [CommRing T] [Algebra A T] [Module.Free A T]
+    {n : ℕ}
+    (σ : R ≃ₐ[k] R) (τ : T ≃ₐ[A] T) (q : ℕ) (hσ : IsGal σ q) (hτ : IsGal τ q)
+    (γ : GL (Fin n) k) (hγ : (cp γ).Separable)
+    (j : R →+* T)
+    (α : A)
+    (hj : ∀ r, τ (j r) = j (σ r))
     (P : R[X]) (hP : P = (cp γ).map (algebraMap k R))
     (hs : Function.Surjective (eval₂RingHom j (algebraMap A T α)))
-    (h0 : P.eval₂ j (algebraMap A T α) = 0) (φ : T →+* AdjoinRoot P)
-    (hφj : ∀ r, φ (j r) = AdjoinRoot.of P r) (hφα : φ (algebraMap A T α) = AdjoinRoot.root P) :
-    (∃ a : GL (Fin n) R, nm σ q a = up R γ ∧ Commute a (up R γ)) ↔ ∃ z : T, Algebra.norm A z = α := by
+    (h0 : P.eval₂ j (algebraMap A T α) = 0)
+    (φ : T →+* AdjoinRoot P)
+    (hφj : ∀ r, φ (j r) = AdjoinRoot.of P r) (hφα : φ (algebraMap A T α) = AdjoinRoot.root P)
+    : (∃ a : GL (Fin n) R, nm σ q a = up R γ ∧ Commute a (up R γ))
+      ↔ ∃ z : T, Algebra.norm A z = α := by
   haveI := (galBase k R k σ q hσ).1
   set χ := eval₂RingHom j (algebraMap A T α) with hχ
-  have hch : (up R γ).val.charpoly = P := by
-    rw [hP, cp, ← Matrix.charpoly_map]; rfl
+  have hch : (up R γ).val.charpoly = P := by rw [hP, cp, ← Matrix.charpoly_map]; rfl
   obtain ⟨-, hc, hk⟩ := conjSep k R n (up R γ).val (by rw [hch, hP]; exact hγ.map)
   rw [hch] at hk
   have hφ : φ.comp χ = AdjoinRoot.mk P := by
@@ -75,13 +92,17 @@ private theorem core {k R A T : Type} [Field k] [CommRing R] [Algebra k R] [Comm
     | succ i ih => intro r; rw [pow_succ, pow_succ, AlgEquiv.mul_apply, AlgEquiv.mul_apply, hj, ih]
   have hχp : ∀ (i : ℕ) p, (τ ^ i) (χ p) = χ (p.map ((σ ^ i : R ≃ₐ[k] R) : R →+* R)) := by
     intro i p
-    have : ((τ ^ i : T ≃ₐ[A] T) : T →+* T).comp χ = χ.comp (mapRingHom ((σ ^ i : R ≃ₐ[k] R) : R →+* R)) := by
+    have : ((τ ^ i : T ≃ₐ[A] T) : T →+* T).comp χ
+        = χ.comp (mapRingHom ((σ ^ i : R ≃ₐ[k] R) : R →+* R)) := by
       apply Polynomial.ringHom_ext
       · intro r; simpa [hχ] using hjp i r
       · simp [hχ, -AlgEquiv.coe_pow]
     exact DFunLike.congr_fun this p
-  have key : ∀ p, Algebra.norm A (χ p) = α ↔
-      aeval (up R γ).val (∏ i ∈ Finset.range q, p.map ((σ ^ i : R ≃ₐ[k] R) : R →+* R)) = (up R γ).val := by
+  have key
+      : ∀ p,
+        Algebra.norm A (χ p) = α
+          ↔ aeval (up R γ).val (∏ i ∈ Finset.range q, p.map ((σ ^ i : R ≃ₐ[k] R) : R →+* R))
+            = (up R γ).val := by
     intro p
     rw [← hτ.inj.eq_iff, normProd A T τ q hτ]
     simp only [hχp]
@@ -99,8 +120,7 @@ private theorem core {k R A T : Type} [Field k] [CommRing R] [Algebra k R] [Comm
       obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hσ.pos.ne'
       have h2 := h1
       rw [Finset.prod_range_succ', mul_comm, map_mul] at h2
-      have h3 : p.map ((σ ^ 0 : R ≃ₐ[k] R) : R →+* R) = p := by
-        ext i; simp
+      have h3 : p.map ((σ ^ 0 : R ≃ₐ[k] R) : R →+* R) = p := by ext i; simp
       rw [h3] at h2
       have h4 := congrArg Matrix.det h2
       rw [Matrix.det_mul] at h4
@@ -110,36 +130,57 @@ private theorem core {k R A T : Type} [Field k] [CommRing R] [Algebra k R] [Comm
     have : aeval (up R γ).val (p * X) = aeval (up R γ).val (X * p) := by rw [mul_comm]
     simpa using this
 
-private theorem mk_eval {F R T : Type} [CommRing F] [CommRing R] [CommRing T] (p : F[X]) (g : AdjoinRoot p →+* T)
-    (j : R →+* T) (i : F →+* R) (h : ∀ c, g (AdjoinRoot.of p c) = j (i c)) (f : F[X]) :
-    g (AdjoinRoot.mk p f) = (f.map i).eval₂ j (g (AdjoinRoot.root p)) := by
-  have : g.comp (AdjoinRoot.mk p) = (eval₂RingHom j (g (AdjoinRoot.root p))).comp (mapRingHom i) := by
+private theorem mk_eval
+    {F R T : Type} [CommRing F] [CommRing R] [CommRing T]
+    (p : F[X]) (g : AdjoinRoot p →+* T)
+    (j : R →+* T) (i : F →+* R) (h : ∀ c, g (AdjoinRoot.of p c) = j (i c))
+    (f : F[X])
+    : g (AdjoinRoot.mk p f) = (f.map i).eval₂ j (g (AdjoinRoot.root p)) := by
+  have : g.comp (AdjoinRoot.mk p)
+      = (eval₂RingHom j (g (AdjoinRoot.root p))).comp (mapRingHom i) := by
     apply Polynomial.ringHom_ext
     · intro r; simp [h]
     · simp
   exact DFunLike.congr_fun this f
 
-private noncomputable def rootMap {F : Type} [CommRing F] (p : F[X]) (R : Type) [CommRing R] [Algebra F R] (P : R[X])
-    (hP : P = p.map (algebraMap F R)) : AdjoinRoot p →ₐ[F] AdjoinRoot P :=
+private noncomputable def rootMap
+    {F : Type} [CommRing F]
+    (p : F[X])
+    (R : Type) [CommRing R] [Algebra F R]
+    (P : R[X]) (hP : P = p.map (algebraMap F R))
+    : AdjoinRoot p →ₐ[F] AdjoinRoot P :=
   AdjoinRoot.liftAlgHom p (Algebra.ofId F _) (AdjoinRoot.root P) (by
     have := AdjoinRoot.eval₂_root P
     rw [hP, eval₂_map, ← hP] at this
     exact this)
 
-private theorem rootMap_root {F : Type} [CommRing F] (p : F[X]) (R : Type) [CommRing R] [Algebra F R] (P : R[X])
-    (hP : P = p.map (algebraMap F R)) : rootMap p R P hP (AdjoinRoot.root p) = AdjoinRoot.root P :=
+private theorem rootMap_root
+    {F : Type} [CommRing F]
+    (p : F[X])
+    (R : Type) [CommRing R] [Algebra F R]
+    (P : R[X]) (hP : P = p.map (algebraMap F R))
+    : rootMap p R P hP (AdjoinRoot.root p) = AdjoinRoot.root P :=
   AdjoinRoot.liftAlgHom_root ..
 
-private theorem second (F E : Type) [Field F] [Field E] [Algebra F E] (σ : E ≃ₐ[F] E) (q : ℕ) (hσ : IsGal σ q)
-    (n : ℕ) (γ : GL (Fin n) F) (hγ : (cp γ).Separable) :
-    (∃ a : GL (Fin n) E, nm σ q a = up E γ ∧ Commute a (up E γ)) ↔ IsNm F E (AdjoinRoot.root (cp γ)) := by
-  have hm := mk_eval (cp γ) (algebraMap (AdjoinRoot (cp γ)) (AdjoinRoot (cp γ) ⊗[F] E))
-    (inc (AdjoinRoot (cp γ))) (algebraMap F E) (fun c => by
-      rw [← AdjoinRoot.algebraMap_eq, ← IsScalarTower.algebraMap_apply]
-      exact (Algebra.TensorProduct.includeRight.commutes c).symm)
-  refine core σ (ext (AdjoinRoot (cp γ)) σ) q hσ (galExt F E _ σ q hσ) γ hγ (inc _) _ (fun r => by simp [ext, inc])
-    _ rfl ?_ ?_ (Algebra.TensorProduct.lift (rootMap (cp γ) E _ rfl) (AdjoinRoot.ofAlgHom F _)
-      fun _ _ => Commute.all _ _).toRingHom (fun r => by simp [inc]) (by simp [rootMap_root])
+private theorem second
+    (F E : Type) [Field F] [Field E] [Algebra F E]
+    (σ : E ≃ₐ[F] E) (q : ℕ) (hσ : IsGal σ q)
+    (n : ℕ) (γ : GL (Fin n) F) (hγ : (cp γ).Separable)
+    : (∃ a : GL (Fin n) E, nm σ q a = up E γ ∧ Commute a (up E γ))
+      ↔ IsNm F E (AdjoinRoot.root (cp γ)) := by
+  have hm :=
+    mk_eval (cp γ) (algebraMap (AdjoinRoot (cp γ)) (AdjoinRoot (cp γ) ⊗[F] E))
+      (inc (AdjoinRoot (cp γ))) (algebraMap F E)
+      (fun c => by
+        rw [← AdjoinRoot.algebraMap_eq, ← IsScalarTower.algebraMap_apply]
+        exact (Algebra.TensorProduct.includeRight.commutes c).symm)
+  refine core σ (ext (AdjoinRoot (cp γ)) σ) q hσ (galExt F E _ σ q hσ) γ hγ (inc _) _
+    (fun r => by simp [ext, inc])
+    _ rfl ?_ ?_
+    (Algebra.TensorProduct.lift (rootMap (cp γ) E _ rfl) (AdjoinRoot.ofAlgHom F _) fun _ _ =>
+      Commute.all _ _).toRingHom
+    (fun r => by simp [inc])
+    (by simp [rootMap_root])
   · rw [← RingHom.range_eq_top, eq_top_iff]
     rintro t -
     induction t using TensorProduct.induction_on with
@@ -153,27 +194,34 @@ private theorem second (F E : Type) [Field F] [Field E] [Algebra F E] (σ : E �
         simp [inc]
   · rw [← hm]; simp
 
-private theorem first (F E k : Type) [Field F] [Field E] [Algebra F E] [Field k] [Algebra F k] (σ : E ≃ₐ[F] E) (q : ℕ)
-    (hσ : IsGal σ q) (n : ℕ) (γ : GL (Fin n) F) (hγ : (cp γ).Separable) :
-    (∃ a : GL (Fin n) (k ⊗[F] E), nm (ext k σ) q a = up _ (up k γ) ∧ Commute a (up _ (up k γ))) ↔
-      IsNm F E ((1 : k) ⊗ₜ[F] AdjoinRoot.root (cp γ)) := by
-  have hc : cp (up k γ) = (cp γ).map (algebraMap F k) := by
-    rw [cp, cp, ← Matrix.charpoly_map]; rfl
+private theorem first
+    (F E k : Type) [Field F] [Field E] [Algebra F E] [Field k] [Algebra F k]
+    (σ : E ≃ₐ[F] E) (q : ℕ) (hσ : IsGal σ q)
+    (n : ℕ) (γ : GL (Fin n) F) (hγ : (cp γ).Separable)
+    : (∃ a : GL (Fin n) (k ⊗[F] E), nm (ext k σ) q a = up _ (up k γ) ∧ Commute a (up _ (up k γ)))
+      ↔ IsNm F E ((1 : k) ⊗ₜ[F] AdjoinRoot.root (cp γ)) := by
+  have hc : cp (up k γ) = (cp γ).map (algebraMap F k) := by rw [cp, cp, ← Matrix.charpoly_map]; rfl
   let j : k ⊗[F] E →ₐ[F] (k ⊗[F] AdjoinRoot (cp γ)) ⊗[F] E :=
     Algebra.TensorProduct.map Algebra.TensorProduct.includeLeft (AlgHom.id F E)
-  have hm := mk_eval (cp γ) ((algebraMap (k ⊗[F] AdjoinRoot (cp γ)) ((k ⊗[F] AdjoinRoot (cp γ)) ⊗[F] E)).comp
-      (Algebra.TensorProduct.includeRight : AdjoinRoot (cp γ) →ₐ[F] k ⊗[F] AdjoinRoot (cp γ)).toRingHom)
-    j.toRingHom (algebraMap F (k ⊗[F] E)) (fun c => by
-      rw [← AdjoinRoot.algebraMap_eq]
-      simp only [AlgHom.toRingHom_eq_coe, RingHom.comp_apply, RingHom.coe_coe, AlgHom.commutes]
-      rw [← IsScalarTower.algebraMap_apply])
-  refine core (ext k σ) (ext (k ⊗[F] AdjoinRoot (cp γ)) σ) q (galExt F E _ σ q hσ) (galExt F E _ σ q hσ) (up k γ)
-    (hc ▸ hγ.map) j.toRingHom _ ?_ ((cp γ).map (algebraMap F (k ⊗[F] E))) ?_ ?_ ?_
+  have hm :=
+    mk_eval (cp γ)
+      ((algebraMap (k ⊗[F] AdjoinRoot (cp γ)) ((k ⊗[F] AdjoinRoot (cp γ)) ⊗[F] E)).comp
+        (Algebra.TensorProduct.includeRight
+          : AdjoinRoot (cp γ) →ₐ[F] k ⊗[F] AdjoinRoot (cp γ)).toRingHom)
+      j.toRingHom (algebraMap F (k ⊗[F] E))
+      (fun c => by
+        rw [← AdjoinRoot.algebraMap_eq]
+        simp only [AlgHom.toRingHom_eq_coe, RingHom.comp_apply, RingHom.coe_coe, AlgHom.commutes]
+        rw [← IsScalarTower.algebraMap_apply])
+  refine core (ext k σ) (ext (k ⊗[F] AdjoinRoot (cp γ)) σ) q (galExt F E _ σ q hσ)
+    (galExt F E _ σ q hσ) (up k γ) (hc ▸ hγ.map) j.toRingHom _ ?_
+    ((cp γ).map (algebraMap F (k ⊗[F] E))) ?_ ?_ ?_
     (Algebra.TensorProduct.lift
       (Algebra.TensorProduct.lift ((AdjoinRoot.ofAlgHom F _).comp Algebra.TensorProduct.includeLeft)
         (rootMap (cp γ) (k ⊗[F] E) _ rfl) fun _ _ => Commute.all _ _)
       ((AdjoinRoot.ofAlgHom F _).comp Algebra.TensorProduct.includeRight)
-      fun _ _ => Commute.all _ _).toRingHom ?_ (by simp [rootMap_root, ← Algebra.TensorProduct.one_def])
+      fun _ _ => Commute.all _ _).toRingHom
+    ?_ (by simp [rootMap_root, ← Algebra.TensorProduct.one_def])
   · intro r
     induction r using TensorProduct.induction_on with
     | zero => simp
@@ -205,14 +253,14 @@ private theorem first (F E k : Type) [Field F] [Field E] [Algebra F E] [Field k]
 
 end UpperTheory.ConvolutionTheory.D
 
-theorem UpperTheory.ConvolutionTheory.D.nmAlg :
-    UpperTheory.ConvolutionTheory.D.NmAlg := by
+theorem UpperTheory.ConvolutionTheory.D.nmAlg : UpperTheory.ConvolutionTheory.D.NmAlg := by
   intro F E k _ _ _ _ _ σ q hσ n γ hγ
   refine ⟨?_, second F E σ q hσ n γ hγ⟩
   rw [← first F E k σ q hσ n γ hγ]
-  have hc : cp (up k γ) = (cp γ).map (algebraMap F k) := by
-    rw [cp, cp, ← Matrix.charpoly_map]; rfl
-  have he : (cp γ).map ((inc k).comp (algebraMap F E)) = (cp (up k γ)).map (algebraMap k (k ⊗[F] E)) := by
+  have hc : cp (up k γ) = (cp γ).map (algebraMap F k) := by rw [cp, cp, ← Matrix.charpoly_map]; rfl
+  have he
+      : (cp γ).map ((inc k).comp (algebraMap F E))
+        = (cp (up k γ)).map (algebraMap k (k ⊗[F] E)) := by
     rw [hc, Polynomial.map_map, ← IsScalarTower.algebraMap_eq]
     congr 1
     exact RingHom.ext fun c => Algebra.TensorProduct.includeRight.commutes c
@@ -223,4 +271,5 @@ theorem UpperTheory.ConvolutionTheory.D.nmAlg :
     exact ⟨_, hx⟩
   · rintro ⟨a, ha, -⟩
     refine ⟨a, ?_⟩
-    rw [ha, cp, cp, ← Matrix.charpoly_map]; rfl
+    rw [ha, cp, cp, ← Matrix.charpoly_map]
+    rfl

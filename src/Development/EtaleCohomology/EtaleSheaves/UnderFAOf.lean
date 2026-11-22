@@ -26,23 +26,27 @@ theorem fpSmall (X : CommRingCat.{0}) : ObjectProperty.EssentiallySmall.{0} (FP 
 
 attribute [local instance] fact_isRegular_aleph0
 
-theorem fp_le (X : CommRingCat.{0}) : FP X ≤ isCardinalPresentable (Under X) (ℵ₀ : Cardinal.{0}) := by
+theorem fp_le (X : CommRingCat.{0})
+    : FP X ≤ isCardinalPresentable (Under X) (ℵ₀ : Cardinal.{0}) := by
   intro S hS
   have h := CommRingCat.isFinitelyPresentable_under X S hS
   exact h
 
-def FPColim : Prop := ∀ (X : CommRingCat.{0}) (S : Under X),
-  ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J), (FP X).colimitsOfShape J S
+def FPColim : Prop :=
+  ∀ (X : CommRingCat.{0}) (S : Under X), ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J),
+    (FP X).colimitsOfShape J S
 
 theorem UnderFA_of (hC : FPColim) : LateralTheory.E.IECompPf.UnderFA := by
   intro X
   have := fpSmall X
-  have hg : (FP X).IsCardinalFilteredGenerator (ℵ₀ : Cardinal.{0}) :=
-    { le_isCardinalPresentable := fp_le X
-      exists_colimitsOfShape := fun S => by
-        obtain ⟨J, _, _, h⟩ := hC X S
-        refine ⟨J, inferInstance, ?_, h⟩
-        rw [isCardinalFiltered_aleph0_iff]; infer_instance }
+  have hg : (FP X).IsCardinalFilteredGenerator (ℵ₀ : Cardinal.{0}) := {
+    le_isCardinalPresentable := fp_le X
+    exists_colimitsOfShape := fun S => by
+      obtain ⟨J, _, _, h⟩ := hC X S
+      refine ⟨J, inferInstance, ?_, h⟩
+      rw [isCardinalFiltered_aleph0_iff]
+      infer_instance
+  }
   exact { toHasCardinalFilteredGenerator := hg.hasCardinalFilteredGenerator }
 
 end LateralTheory.E.UnderFAPf

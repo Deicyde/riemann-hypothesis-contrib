@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateModuleLe
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -25,7 +27,8 @@ def lker (l : ℕ) : Subgroup M where
   mul_mem' := by
     rintro a b ⟨ha, m, hm⟩ ⟨hb, m', hm'⟩
     refine ⟨by rw [map_mul, ha, hb, _root_.one_mul], m + m', ?_⟩
-    rw [mul_pow, pow_add, pow_mul, hm, one_pow, mul_comm (l ^ m), pow_mul, hm', one_pow, _root_.one_mul]
+    rw [mul_pow, pow_add, pow_mul, hm, one_pow, mul_comm (l ^ m), pow_mul, hm', one_pow,
+      _root_.one_mul]
   one_mem' := ⟨map_one φ, 0, one_pow _⟩
   inv_mem' := by
     rintro a ⟨ha, m, hm⟩
@@ -36,8 +39,8 @@ theorem pow_pow_eq_one {x : M} {m : ℕ} (h : x ^ l ^ m = 1) (j : ℕ) : x ^ l ^
 
 variable {φ}
 
-theorem kill [Finite φ.ker] {k : M} (hk : φ k = 1) {m : ℕ} (hm : k ^ l ^ m = 1) :
-    k ^ l ^ Nat.card φ.ker = 1 := by
+theorem kill [Finite φ.ker] {k : M} (hk : φ k = 1) {m : ℕ} (hm : k ^ l ^ m = 1)
+    : k ^ l ^ Nat.card φ.ker = 1 := by
   have hp : l.Prime := hl.out
   have h1 : orderOf k ∣ Nat.card φ.ker := Subgroup.orderOf_dvd_natCard _ hk
   obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hp).1 (orderOf_dvd_of_pow_eq_one hm)
@@ -46,8 +49,8 @@ theorem kill [Finite φ.ker] {k : M} (hk : φ k = 1) {m : ℕ} (hm : k ^ l ^ m =
     ((Nat.lt_pow_self hp.one_lt).trans_le (Nat.le_of_dvd hpos (hj ▸ h1))).le
   exact orderOf_dvd_iff_pow_eq_one.1 (hj ▸ pow_dvd_pow l h2)
 
-theorem exists_lift (hs : Function.Surjective φ) [Finite φ.ker] (n : ℕ) (y : N) (hy : y ^ l ^ n = 1) :
-    ∃ x : M, φ x = y ∧ ∃ m : ℕ, x ^ l ^ m = 1 := by
+theorem exists_lift (hs : Function.Surjective φ) [Finite φ.ker] (n : ℕ) (y : N) (hy : y ^ l ^ n = 1)
+    : ∃ x : M, φ x = y ∧ ∃ m : ℕ, x ^ l ^ m = 1 := by
   have hp : l.Prime := hl.out
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · rw [pow_zero, pow_one] at hy
@@ -66,8 +69,11 @@ theorem exists_lift (hs : Function.Surjective φ) [Finite φ.ker] (n : ℕ) (y :
   · rw [← pow_mul, show u * w * l ^ (n + e) = l ^ n * Nat.card φ.ker * w by rw [hcu, pow_add]; ring,
       pow_mul, pow_mul, hc, one_pow]
 
-theorem indep [Finite φ.ker] {x x' : M} (h : φ x = φ x') {m m' : ℕ} (hx : x ^ l ^ m = 1)
-    (hx' : x' ^ l ^ m' = 1) : x ^ l ^ Nat.card φ.ker = x' ^ l ^ Nat.card φ.ker := by
+theorem indep
+    [Finite φ.ker]
+    {x x' : M} (h : φ x = φ x')
+    {m m' : ℕ} (hx : x ^ l ^ m = 1) (hx' : x' ^ l ^ m' = 1)
+    : x ^ l ^ Nat.card φ.ker = x' ^ l ^ Nat.card φ.ker := by
   have h1 : φ (x * x'⁻¹) = 1 := by rw [map_mul, map_inv, h, mul_inv_cancel]
   have h2 : (x * x'⁻¹) ^ l ^ (m + m') = 1 := by
     rw [mul_pow, inv_pow, pow_pow_eq_one hx, add_comm, pow_pow_eq_one hx', inv_one, _root_.one_mul]
@@ -79,13 +85,15 @@ include hs
 
 def lift (t : Tate l N) (n : ℕ) : M := (exists_lift hs n (t.lev n) (t.lev_pow n)).choose
 
-theorem lift_spec (t : Tate l N) (n : ℕ) : φ (lift hs t n) = t.lev n ∧ ∃ m : ℕ, lift hs t n ^ l ^ m = 1 :=
+theorem lift_spec (t : Tate l N) (n : ℕ)
+    : φ (lift hs t n) = t.lev n ∧ ∃ m : ℕ, lift hs t n ^ l ^ m = 1 :=
   (exists_lift hs n (t.lev n) (t.lev_pow n)).choose_spec
 
 def del (t : Tate l N) : M := lift hs t (Nat.card φ.ker) ^ l ^ Nat.card φ.ker
 
-theorem del_eq (t : Tate l N) {x : M} (hx : φ x = t.lev (Nat.card φ.ker)) {m : ℕ} (hm : x ^ l ^ m = 1) :
-    del hs t = x ^ l ^ Nat.card φ.ker := by
+theorem del_eq
+    (t : Tate l N) {x : M} (hx : φ x = t.lev (Nat.card φ.ker)) {m : ℕ} (hm : x ^ l ^ m = 1)
+    : del hs t = x ^ l ^ Nat.card φ.ker := by
   obtain ⟨h1, m', h2⟩ := lift_spec hs t (Nat.card φ.ker)
   exact indep (h1.trans hx.symm) h2 hm
 
@@ -99,8 +107,9 @@ def delta : Tate l N →+ Additive (lker φ l) where
   map_zero' := by
     show Additive.ofMul _ = Additive.ofMul (1 : lker φ l)
     congr 1
-    exact Subtype.ext ((del_eq hs 0 (x := 1) (m := 0) (by rw [map_one, Tate.lev_zero]) (one_pow _)).trans
-      (one_pow _))
+    exact Subtype.ext
+      ((del_eq hs 0 (x := 1) (m := 0) (by rw [map_one, Tate.lev_zero]) (one_pow _)).trans
+        (one_pow _))
   map_add' s t := by
     show Additive.ofMul _ = Additive.ofMul (_ * _)
     congr 1
@@ -112,13 +121,19 @@ def delta : Tate l N →+ Additive (lker φ l) where
     · rw [mul_pow, pow_pow_eq_one hs2, add_comm, pow_pow_eq_one ht2, _root_.one_mul]
     · rw [mul_pow]; rfl
 
-theorem delta_surjective (hd : ∀ x : M, ∃ y, y ^ l = x) : Function.Surjective (delta (l := l) hs) := by
+theorem delta_surjective (hd : ∀ x : M, ∃ y, y ^ l = x)
+    : Function.Surjective (delta (l := l) hs) := by
   intro k0
   set a := Nat.card φ.ker
   obtain ⟨⟨k, hk1, m, hm⟩, rfl⟩ : ∃ z : lker φ l, Additive.ofMul z = k0 := ⟨Additive.toMul k0, rfl⟩
   obtain ⟨s, hsa⟩ := GlobalTheory.Published.tate_lev_surj l M hd a k (kill hk1 hm)
-  let t : Tate l N := Tate.mk (fun n => φ (s.lev (n + a))) fun n =>
-    ⟨by rw [← map_pow, add_comm, s.lev_add_pow, hsa, hk1], by rw [← map_pow, add_right_comm, s.lev_succ]⟩
+  let t : Tate l N :=
+    Tate.mk
+      (fun n => φ (s.lev (n + a)))
+      fun n => ⟨
+        by rw [← map_pow, add_comm, s.lev_add_pow, hsa, hk1],
+        by rw [← map_pow, add_right_comm, s.lev_succ]
+      ⟩
   refine ⟨t, ?_⟩
   show Additive.ofMul _ = Additive.ofMul _
   congr 1
@@ -141,15 +156,21 @@ theorem delta_ker : (delta hs).ker = (LinearMap.range (Tate.map l φ)).toAddSubg
   · intro h
     have lv : ∀ n, (lift hs t (n + a) ^ l ^ n) ^ l ^ a = 1 := fun n => by
       obtain ⟨h1, m, h2⟩ := lift_spec hs t (n + a)
-      rw [← h, del_eq hs t (x := lift hs t (n + a) ^ l ^ n) (m := m)
-        (by rw [map_pow, h1, add_comm, t.lev_add_pow]) (by rw [← pow_mul, mul_comm, pow_mul, h2, one_pow])]
-    let y : Tate l M := Tate.mk (fun n => lift hs t (n + a) ^ l ^ a) fun n => by
-      refine ⟨by rw [← pow_mul, mul_comm, pow_mul]; exact lv n, ?_⟩
-      obtain ⟨h1, m, h2⟩ := lift_spec hs t (n + 1 + a)
-      obtain ⟨h1', m', h2'⟩ := lift_spec hs t (n + a)
-      rw [← pow_mul, mul_comm, pow_mul]
-      refine indep (m := m) (m' := m') ?_ (by rw [← pow_mul, mul_comm, pow_mul, h2, one_pow]) h2'
-      rw [map_pow, h1, h1', show n + 1 + a = (n + a) + 1 by omega, t.lev_succ]
+      rw [← h,
+        del_eq hs t (x := lift hs t (n + a) ^ l ^ n) (m := m)
+          (by rw [map_pow, h1, add_comm, t.lev_add_pow])
+          (by rw [← pow_mul, mul_comm, pow_mul, h2, one_pow])]
+    let y : Tate l M :=
+      Tate.mk
+        (fun n => lift hs t (n + a) ^ l ^ a)
+        fun n => by
+          refine ⟨by rw [← pow_mul, mul_comm, pow_mul]; exact lv n, ?_⟩
+          obtain ⟨h1, m, h2⟩ := lift_spec hs t (n + 1 + a)
+          obtain ⟨h1', m', h2'⟩ := lift_spec hs t (n + a)
+          rw [← pow_mul, mul_comm, pow_mul]
+          refine indep (m := m) (m' := m') ?_ (by rw [← pow_mul, mul_comm, pow_mul, h2, one_pow])
+            h2'
+          rw [map_pow, h1, h1', show n + 1 + a = (n + a) + 1 by omega, t.lev_succ]
     refine ⟨y, Tate.ext fun n => ?_⟩
     rw [Tate.lev_map, Tate.lev_mk, map_pow, (lift_spec hs t (n + a)).1, t.lev_add_pow]
   · rintro ⟨y, rfl⟩
@@ -166,15 +187,23 @@ end GlobalTheory.TateCoker
 
 namespace GlobalTheory
 
-
 open GlobalTheory.TateCoker in
-theorem tate_map_coker_card : ∀ (l : ℕ) [Fact l.Prime] (M N : Type) [CommGroup M] [CommGroup N] (φ : M →* N), (∀ x : M, ∃ y, y ^ l = x) → Function.Surjective φ → Finite φ.ker → Function.Injective (Tate.map l φ) ∧ Nat.card (Tate l N ⧸ LinearMap.range (Tate.map l φ)) = Nat.card {x : M // φ x = 1 ∧ ∃ n : ℕ, x ^ l ^ n = 1} := by
+theorem tate_map_coker_card
+    : ∀ (l : ℕ) [Fact l.Prime] (M N : Type) [CommGroup M] [CommGroup N] (φ : M →* N),
+      (∀ x : M, ∃ y, y ^ l = x) → Function.Surjective φ → Finite φ.ker
+        → Function.Injective (Tate.map l φ)
+          ∧ Nat.card (Tate l N ⧸ LinearMap.range (Tate.map l φ))
+            = Nat.card {x : M // φ x = 1 ∧ ∃ n : ℕ, x ^ l ^ n = 1} := by
   intro l _ M N _ _ φ hd hs hf
   refine ⟨map_injective', ?_⟩
-  have e1 : (Tate l N ⧸ LinearMap.range (Tate.map l φ)) ≃
-      (Tate l N ⧸ (LinearMap.range (Tate.map l φ)).toAddSubgroup) := Equiv.refl _
-  rw [Nat.card_congr e1, Nat.card_congr (QuotientAddGroup.quotientAddEquivOfEq (delta_ker hs)).symm.toEquiv,
-    Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective _ (delta_surjective hs hd)).toEquiv]
+  have e1
+      : (Tate l N ⧸ LinearMap.range (Tate.map l φ))
+        ≃ (Tate l N ⧸ (LinearMap.range (Tate.map l φ)).toAddSubgroup) :=
+    Equiv.refl _
+  rw [Nat.card_congr e1,
+    Nat.card_congr (QuotientAddGroup.quotientAddEquivOfEq (delta_ker hs)).symm.toEquiv,
+    Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective _
+      (delta_surjective hs hd)).toEquiv]
   exact Nat.card_congr (Additive.toMul.trans (Equiv.refl _))
 
 end GlobalTheory

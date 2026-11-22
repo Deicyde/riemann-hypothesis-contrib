@@ -9,17 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsDiscret
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
 open scoped TensorProduct
 
 namespace GlobalTheory.EigenCoord
 
-theorem exists_basis_mem_iff {O L V : Type} [CommRing O] [IsDomain O] [Field L] [Algebra O L]
-    [IsFractionRing O L] [AddCommGroup V] [Module L V] [Module O V] [IsScalarTower O L V]
-    (T : Submodule O V) (hfg : T.FG) (hfree : Module.Free O T)
-    (hspan : Submodule.span L (T : Set V) = ⊤) :
-    ∃ (ρ : ℕ) (t : Module.Basis (Fin ρ) L V),
-      ∀ v, v ∈ T ↔ ∀ i, ∃ o : O, algebraMap O L o = t.repr v i := by
+theorem exists_basis_mem_iff
+    {O L V : Type} [CommRing O] [IsDomain O] [Field L] [Algebra O L] [IsFractionRing O L]
+    [AddCommGroup V] [Module L V] [Module O V] [IsScalarTower O L V]
+    (T : Submodule O V)
+    (hfg : T.FG) (hfree : Module.Free O T) (hspan : Submodule.span L (T : Set V) = ⊤)
+    : ∃ (ρ : ℕ) (t : Module.Basis (Fin ρ) L V), ∀ v,
+      v ∈ T ↔ ∀ i, ∃ o : O, algebraMap O L o = t.repr v i := by
   haveI : Module.Finite O T := Module.Finite.iff_fg.mpr hfg
   let c := Module.finBasis O T
   have hli : LinearIndependent O (fun i => (c i : V)) :=
@@ -38,8 +40,7 @@ theorem exists_basis_mem_iff {O L V : Type} [CommRing O] [IsDomain O] [Field L] 
     rw [← hspan, Submodule.span_le]
     intro x hx
     rw [SetLike.mem_coe, show x = ((⟨x, hx⟩ : T) : V) from rfl, hsum]
-    exact Submodule.sum_mem _ fun i _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+    exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   let t := Module.Basis.mk hli' hsp
   have ht : ∀ i, t i = (c i : V) := fun i => Module.Basis.mk_apply hli' hsp i
   refine ⟨_, t, fun v => ⟨fun hv i => ⟨c.repr ⟨v, hv⟩ i, ?_⟩, fun h => ?_⟩⟩
@@ -55,24 +56,28 @@ theorem exists_basis_mem_iff {O L V : Type} [CommRing O] [IsDomain O] [Field L] 
     rw [← ho, algebraMap_smul, ht]
     exact T.smul_mem _ (c i).2
 
-theorem norm_coe_aut_le_one_iff {l : ℕ} [Fact l.Prime] (ι : GQ l) (x : Om l) :
-    ‖((ι x : Om l) : PadicComplex l)‖ ≤ 1 ↔ ‖x‖ ≤ 1 := by
+theorem norm_coe_aut_le_one_iff {l : ℕ} [Fact l.Prime] (ι : GQ l) (x : Om l)
+    : ‖((ι x : Om l) : PadicComplex l)‖ ≤ 1 ↔ ‖x‖ ≤ 1 := by
   rw [PadicComplex.norm_extends, ← isIntegral_padicInt_iff_norm_le_one,
     ← isIntegral_padicInt_iff_norm_le_one]
   exact isIntegral_algHom_iff (ι.toAlgHom.restrictScalars ℤ_[l]) ι.injective
 
-theorem exists_matrix_of_basis {F L C V : Type} [NormedField F] [Field L] [NormedField C]
-    [Algebra F L] [Algebra F C] [AddCommGroup V] [Module L V] [Module F V] [IsScalarTower F L V]
-    (S : Set V) {d ρ : ℕ} (b : Module.Basis (Fin d) F V) (t : Module.Basis (Fin ρ) L V)
-    (φ : L →ₐ[F] C) (hb : ∀ v, v ∈ S ↔ ∀ i, ‖b.repr v i‖ ≤ 1)
-    (hmem : ∀ v, v ∈ S ↔ ∀ i, ‖φ (t.repr v i)‖ ≤ 1) :
-    ∃ Pr : Matrix (Fin ρ) (Fin d) C, (∀ i j, ‖Pr i j‖ ≤ 1) ∧
-      (∀ a : L, Pr * Matrix.of (fun i k : Fin d => algebraMap F C (b.repr (a • b k) i)) =
-        φ a • Pr) ∧
-      ∀ y : Fin d → F, (∀ i, ‖Pr.mulVec (fun a => algebraMap F C (y a)) i‖ ≤ 1) →
-        ∀ a, ‖y a‖ ≤ 1 := by
-  have key : ∀ (y : Fin d → F) (i : Fin ρ),
-      ∑ j, φ (t.repr (b j) i) * algebraMap F C (y j) = φ (t.repr (∑ j, y j • b j) i) := by
+theorem exists_matrix_of_basis
+    {F L C V : Type} [NormedField F] [Field L] [NormedField C] [Algebra F L] [Algebra F C]
+    [AddCommGroup V] [Module L V] [Module F V] [IsScalarTower F L V]
+    (S : Set V)
+    {d ρ : ℕ} (b : Module.Basis (Fin d) F V) (t : Module.Basis (Fin ρ) L V)
+    (φ : L →ₐ[F] C)
+    (hb : ∀ v, v ∈ S ↔ ∀ i, ‖b.repr v i‖ ≤ 1) (hmem : ∀ v, v ∈ S ↔ ∀ i, ‖φ (t.repr v i)‖ ≤ 1)
+    : ∃ Pr : Matrix (Fin ρ) (Fin d) C,
+      (∀ i j, ‖Pr i j‖ ≤ 1)
+        ∧ (∀ a : L,
+          Pr * Matrix.of (fun i k : Fin d => algebraMap F C (b.repr (a • b k) i)) = φ a • Pr)
+        ∧ ∀ y : Fin d → F,
+          (∀ i, ‖Pr.mulVec (fun a => algebraMap F C (y a)) i‖ ≤ 1) → ∀ a, ‖y a‖ ≤ 1 := by
+  have key
+      : ∀ (y : Fin d → F) (i : Fin ρ),
+        ∑ j, φ (t.repr (b j) i) * algebraMap F C (y j) = φ (t.repr (∑ j, y j • b j) i) := by
     intro y i
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finsupp.finsetSum_apply, map_sum]
@@ -94,7 +99,19 @@ theorem exists_matrix_of_basis {F L C V : Type} [NormedField F] [Field L] [Norme
     have := (hb _).mp hv a
     rwa [congrFun (b.repr_sum_self y) a] at this
 
-theorem exists_matrix : ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (d : ℕ) (b : Module.Basis (Fin d) ℚ_[l] T.V), (∀ v : T.V, v ∈ T.L.T ↔ ∀ i, ‖b.repr v i‖ ≤ 1) → ∀ ι : GQ l, ∃ (ρ : ℕ) (Pr : Matrix (Fin ρ) (Fin d) (PadicComplex l)), (∀ i j, ‖Pr i j‖ ≤ 1) ∧ (∀ a : ↥LL.1, Pr * Matrix.of (fun i k : Fin d => algebraMap ℚ_[l] (PadicComplex l) (b.repr (a • b k) i)) = ((ι (a : Om l) : Om l) : PadicComplex l) • Pr) ∧ ∀ y : Fin d → ℚ_[l], (∀ i, ‖Pr.mulVec (fun a => algebraMap ℚ_[l] (PadicComplex l) (y a)) i‖ ≤ 1) → ∀ a, ‖y a‖ ≤ 1 := by
+theorem exists_matrix
+    : ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (d : ℕ)
+        (b : Module.Basis (Fin d) ℚ_[l] T.V),
+      (∀ v : T.V, v ∈ T.L.T ↔ ∀ i, ‖b.repr v i‖ ≤ 1)
+        → ∀ ι : GQ l, ∃ (ρ : ℕ) (Pr : Matrix (Fin ρ) (Fin d) (PadicComplex l)),
+          (∀ i j, ‖Pr i j‖ ≤ 1)
+            ∧ (∀ a : ↥LL.1,
+              Pr * Matrix.of (fun i k : Fin d =>
+                  algebraMap ℚ_[l] (PadicComplex l) (b.repr (a • b k) i))
+                = ((ι (a : Om l) : Om l) : PadicComplex l) • Pr)
+            ∧ ∀ y : Fin d → ℚ_[l],
+              (∀ i, ‖Pr.mulVec (fun a => algebraMap ℚ_[l] (PadicComplex l) (y a)) i‖ ≤ 1)
+                → ∀ a, ‖y a‖ ≤ 1 := by
   intro l _ K LL T d b hb ι
   haveI := LL.2
   haveI : IsFractionRing (OL LL) LL.1 := isFractionRing_integralClosure_padicInt l LL.1

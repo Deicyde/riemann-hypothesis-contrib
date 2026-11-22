@@ -8,16 +8,17 @@ namespace PI.CompDegEF
 
 open IsDedekindDomain NumberField Module Formalism.BasicNotions Formalism.BasicNotions.Loc
 
-noncomputable def normAbv {l : ℕ} [Fact l.Prime] {E : Type} [Field E] (φ : E →+* Om l) :
-    AbsoluteValue E ℝ where
+noncomputable def normAbv {l : ℕ} [Fact l.Prime] {E : Type} [Field E] (φ : E →+* Om l)
+    : AbsoluteValue E ℝ where
   toFun x := ‖φ x‖
   map_mul' x y := by simp
   nonneg' x := norm_nonneg _
   eq_zero' x := by simp
   add_le' x y := by simpa using norm_add_le (φ x) (φ y)
 
-theorem normAbv_apply {l : ℕ} [Fact l.Prime] {E : Type} [Field E] (φ : E →+* Om l) (x : E) :
-    normAbv φ x = ‖φ x‖ := rfl
+theorem normAbv_apply {l : ℕ} [Fact l.Prime] {E : Type} [Field E] (φ : E →+* Om l) (x : E)
+    : normAbv φ x = ‖φ x‖ :=
+  rfl
 
 private lemma frac_lemma' {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) (u : E)
     (hu : v.valuation E u ≤ 1) :
@@ -97,24 +98,31 @@ private lemma le_one_lemma_2 {E : Type} [Field E] [NumberField E] (w : AbsoluteV
     rw [map_inv₀] at h2
     exact absurd h (not_lt.mpr ((inv_le_one₀ hnpos).mp h2))
 
-theorem isEquiv_adicAbv_normAbv {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (φ : E →+* Om l) (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ placesOver E l)
-    (hφ : ∀ x : 𝓞 E, ‖φ (x : E)‖ ≤ 1 ∧ (‖φ (x : E)‖ < 1 ↔ x ∈ v.asIdeal)) :
-    (v.adicAbv (K := E) (b := 2) one_lt_two).IsEquiv (normAbv φ) := by
+theorem isEquiv_adicAbv_normAbv
+    {l : ℕ} [Fact l.Prime]
+    {E : Type} [Field E] [NumberField E]
+    (φ : E →+* Om l) (v : HeightOneSpectrum (𝓞 E))
+    (hv : v ∈ placesOver E l) (hφ : ∀ x : 𝓞 E, ‖φ (x : E)‖ ≤ 1 ∧ (‖φ (x : E)‖ < 1 ↔ x ∈ v.asIdeal))
+    : (v.adicAbv (K := E) (b := 2) one_lt_two).IsEquiv (normAbv φ) := by
   rw [AbsoluteValue.isEquiv_iff_lt_one_iff]
   intro x
   rw [← (le_one_lemma_2 (normAbv φ) v (fun y => hφ y) x).2]
   exact (le_one_lemma_2 (v.adicAbv (K := E) (b := 2) one_lt_two) v
-    (fun y => ⟨v.adicAbv_coe_le_one _ y, v.adicAbv_coe_lt_one_iff _ y⟩) x).2.symm
+    (fun y => ⟨v.adicAbv_coe_le_one _ y, v.adicAbv_coe_lt_one_iff _ y⟩)
+    x).2.symm
 
-theorem intValuation_natCast {l : ℕ} [hl : Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ placesOver E l) :
-    v.intValuation ((l : ℕ) : 𝓞 E) = WithZero.exp (-(v.asIdeal.ramificationIdx ℤ : ℤ)) := by
+theorem intValuation_natCast
+    {l : ℕ} [hl : Fact l.Prime]
+    {E : Type} [Field E] [NumberField E]
+    (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ placesOver E l)
+    : v.intValuation ((l : ℕ) : 𝓞 E) = WithZero.exp (-(v.asIdeal.ramificationIdx ℤ : ℤ)) := by
   classical
   have hl0 : ((l : ℕ) : 𝓞 E) ≠ 0 := Nat.cast_ne_zero.mpr hl.out.ne_zero
   rw [v.intValuation_if_neg hl0]
-  suffices h : (Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {((l : ℕ) : 𝓞 E)})).factors =
-      v.asIdeal.ramificationIdx ℤ by rw [h]
+  suffices h
+      : (Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {((l : ℕ) : 𝓞 E)})).factors
+        = v.asIdeal.ramificationIdx ℤ by
+    rw [h]
   have hle : Ideal.span {((l : ℕ) : ℤ)} ≤ v.asIdeal.under ℤ := by
     rw [Ideal.span_le, Set.singleton_subset_iff]
     show _ ∈ Ideal.comap _ _
@@ -123,8 +131,9 @@ theorem intValuation_natCast {l : ℕ} [hl : Fact l.Prime] {E : Type} [Field E] 
   have hunder : Ideal.span {((l : ℕ) : ℤ)} = v.asIdeal.under ℤ :=
     (Int.ideal_span_isMaximal_of_prime l).eq_of_le (Ideal.comap_ne_top _ v.isPrime.ne_top) hle
   haveI : v.asIdeal.LiesOver (Ideal.span {((l : ℕ) : ℤ)}) := ⟨hunder⟩
-  have hmap : Ideal.map (algebraMap ℤ (𝓞 E)) (Ideal.span {((l : ℕ) : ℤ)}) =
-      Ideal.span {((l : ℕ) : 𝓞 E)} := by
+  have hmap
+      : Ideal.map (algebraMap ℤ (𝓞 E)) (Ideal.span {((l : ℕ) : ℤ)})
+        = Ideal.span {((l : ℕ) : 𝓞 E)} := by
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   have hne : Ideal.map (algebraMap ℤ (𝓞 E)) (Ideal.span {((l : ℕ) : ℤ)}) ≠ ⊥ := by
     rw [hmap, Ne, Ideal.span_singleton_eq_bot]
@@ -137,18 +146,21 @@ theorem intValuation_natCast {l : ℕ} [hl : Fact l.Prime] {E : Type} [Field E] 
 theorem kerProp : KerProp := by
   intro l _ E _ _ φ v hv hφ x
   have hl0 : ((l : ℕ) : E) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero
-  have key := (le_one_lemma_2 (normAbv φ) v (fun y => hφ y) (algebraMap (𝓞 E) E x / ((l : ℕ) : E))).1
+  have key :=
+    (le_one_lemma_2 (normAbv φ) v (fun y => hφ y) (algebraMap (𝓞 E) E x / ((l : ℕ) : E))).1
   rw [← Ideal.dvd_span_singleton, ← v.intValuation_le_pow_iff_dvd, ← intValuation_natCast v hv]
   have hvl : 0 < v.intValuation ((l : ℕ) : 𝓞 E) := by
     rw [intValuation_natCast v hv]; exact zero_lt_iff.mpr WithZero.exp_ne_zero
   have hnl : 0 < ‖((l : ℕ) : Om l)‖ := by
     rw [← map_natCast φ]; exact norm_pos_iff.mpr ((map_ne_zero φ).mpr hl0)
   rw [← div_le_one₀ hvl, ← div_le_one hnl]
-  have e1 : v.intValuation x / v.intValuation ((l : ℕ) : 𝓞 E) =
-      v.valuation E (algebraMap (𝓞 E) E x / ((l : ℕ) : E)) := by
+  have e1
+      : v.intValuation x / v.intValuation ((l : ℕ) : 𝓞 E)
+        = v.valuation E (algebraMap (𝓞 E) E x / ((l : ℕ) : E)) := by
     rw [map_div₀, HeightOneSpectrum.valuation_of_algebraMap, ← map_natCast (algebraMap (𝓞 E) E) l,
       HeightOneSpectrum.valuation_of_algebraMap]
-  have e2 : ‖φ (x : E)‖ / ‖((l : ℕ) : Om l)‖ = normAbv φ (algebraMap (𝓞 E) E x / ((l : ℕ) : E)) := by
+  have e2
+      : ‖φ (x : E)‖ / ‖((l : ℕ) : Om l)‖ = normAbv φ (algebraMap (𝓞 E) E x / ((l : ℕ) : E)) := by
     rw [normAbv_apply, map_div₀, norm_div, map_natCast]
   rw [e1, e2]
   exact key.symm

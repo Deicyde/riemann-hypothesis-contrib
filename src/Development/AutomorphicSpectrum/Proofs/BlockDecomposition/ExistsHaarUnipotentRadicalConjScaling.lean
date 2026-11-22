@@ -11,8 +11,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Stabiliz
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.CompanionTheory.QKAvg
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,29 +24,40 @@ namespace GlobalTheory.CompanionTheory.QKAvg.RadMeas
 
 variable {D : D7} {B W : HSp D} {t : ℕ}
 
-theorem absDet_eq (d : HypDec B W t) (m : GlobalTheory.RegSW.stab d) (g : GA D W) (a : GL (Fin t) (AE D))
-    (hm : (m : GA D B) = d.emb0 g * d.levi a) :
-    GlobalTheory.RegSW.absDet d m = absA D (Matrix.GeneralLinearGroup.det a) := by
+theorem absDet_eq
+    (d : HypDec B W t) (m : GlobalTheory.RegSW.stab d)
+    (g : GA D W) (a : GL (Fin t) (AE D)) (hm : (m : GA D B) = d.emb0 g * d.levi a)
+    : GlobalTheory.RegSW.absDet d m = absA D (Matrix.GeneralLinearGroup.det a) := by
   have h : mt B (m : GA D B) ⬝ d.jX = d.jX ⬝ a.1 := by
-    rw [hm, mt_mul, Matrix.mul_assoc, d.levi_jX, ← Matrix.mul_assoc, d.wittDecomp_anisotropicEmbedding_inclX]
+    rw [hm, mt_mul, Matrix.mul_assoc, d.levi_jX, ← Matrix.mul_assoc,
+      d.wittDecomp_anisotropicEmbedding_inclX]
   have e : GlobalTheory.RegSW.onX d m = a :=
-    Units.ext ((GlobalTheory.RegSW.eq_of_mul_jX d (GlobalTheory.RegSW.mul_jX d m)).trans (GlobalTheory.RegSW.eq_of_mul_jX d h).symm)
+    Units.ext ((GlobalTheory.RegSW.eq_of_mul_jX d (GlobalTheory.RegSW.mul_jX d m)).trans
+      (GlobalTheory.RegSW.eq_of_mul_jX d h).symm)
   simp only [GlobalTheory.RegSW.absDet, MonoidHom.comp_apply, e]
 
-theorem regular_of_haar {A : Type} [AddGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
-    [LocallyCompactSpace A] [SecondCountableTopology A] [T2Space A] [MeasurableSpace A] [BorelSpace A]
-    (μ : Measure A) [μ.IsAddHaarMeasure] : μ.Regular := inferInstance
+theorem regular_of_haar
+    {A : Type} [AddGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [LocallyCompactSpace A]
+    [SecondCountableTopology A] [T2Space A] [MeasurableSpace A] [BorelSpace A]
+    (μ : Measure A) [μ.IsAddHaarMeasure]
+    : μ.Regular :=
+  inferInstance
 
-theorem sFinite_of_haar {A : Type} [AddGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
-    [LocallyCompactSpace A] [SecondCountableTopology A] [MeasurableSpace A] [BorelSpace A]
-    (μ : Measure A) [μ.IsAddHaarMeasure] : SFinite μ := inferInstance
-
+theorem sFinite_of_haar
+    {A : Type} [AddGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [LocallyCompactSpace A]
+    [SecondCountableTopology A] [MeasurableSpace A] [BorelSpace A]
+    (μ : Measure A) [μ.IsAddHaarMeasure]
+    : SFinite μ :=
+  inferInstance
 
 set_option maxHeartbeats 1000000 in
-theorem map_lr {n : ℕ} (a : GL (Fin t) (AE D)) (h : GL (Fin n) (AE D))
-    (hh : absA D (Matrix.GeneralLinearGroup.det h) = 1) (β : Measure (Mx D t n)) (hβ : β.IsAddHaarMeasure) :
-    β.map (fun b : Mx D t n => (a.1 ⬝ b ⬝ h.1 : Mx D t n)) =
-      ((absA D (Matrix.GeneralLinearGroup.det a) ^ n)⁻¹ : ℝ≥0) • β := by
+theorem map_lr
+    {n : ℕ}
+    (a : GL (Fin t) (AE D))
+    (h : GL (Fin n) (AE D)) (hh : absA D (Matrix.GeneralLinearGroup.det h) = 1)
+    (β : Measure (Mx D t n)) (hβ : β.IsAddHaarMeasure)
+    : β.map (fun b : Mx D t n => (a.1 ⬝ b ⬝ h.1 : Mx D t n))
+      = ((absA D (Matrix.GeneralLinearGroup.det a) ^ n)⁻¹ : ℝ≥0) • β := by
   obtain ⟨i1, i2, i3, i4, -, -⟩ := lattice_Mx D t n
   haveI : IsTopologicalAddGroup (Mx D t n) := i1
   haveI : LocallyCompactSpace (Mx D t n) := i2
@@ -52,13 +66,17 @@ theorem map_lr {n : ℕ} (a : GL (Fin t) (AE D)) (h : GL (Fin n) (AE D))
   haveI : BorelSpace (Mx D t n) := ⟨rfl⟩
   haveI := isTopologicalRing_tens (F := D.host.F) (E := D.host.E) (R := AF D.host.F)
   let φ := GlobalTheory.ModuLR.lrCE a h
-  have hc : addEquivAddHaarChar φ = absA D (Matrix.GeneralLinearGroup.det a) ^ n *
-      absA D (Matrix.GeneralLinearGroup.det h) ^ t :=
-    GlobalTheory.ResidueEisenstein.ModMat.addEquivAddHaarChar_lrCE D.host.F D.host.E D.sp.cm.sig (isCMExt_host D) t n a h
+  have hc
+      : addEquivAddHaarChar φ
+        = absA D (Matrix.GeneralLinearGroup.det a) ^ n
+          * absA D (Matrix.GeneralLinearGroup.det h) ^ t :=
+    GlobalTheory.ResidueEisenstein.ModMat.addEquivAddHaarChar_lrCE D.host.F D.host.E D.sp.cm.sig
+      (isCMExt_host D) t n a h
   rw [hh, one_pow, mul_one] at hc
   have e : (fun b : Mx D t n => (a.1 ⬝ b ⬝ h.1 : Mx D t n)) = φ :=
     funext fun y => (GlobalTheory.ModuLR.lrCE_apply a h y).symm
-  have hA : absA D (Matrix.GeneralLinearGroup.det a) ^ n ≠ 0 := pow_ne_zero _ ((Group.isUnit _).map (absA D)).ne_zero
+  have hA : absA D (Matrix.GeneralLinearGroup.det a) ^ n ≠ 0 :=
+    pow_ne_zero _ ((Group.isUnit _).map (absA D)).ne_zero
   haveI := regular_of_haar β
   have key := addEquivAddHaarChar_smul_map β φ
   rw [e, ← hc]
@@ -66,12 +84,14 @@ theorem map_lr {n : ℕ} (a : GL (Fin t) (AE D)) (h : GL (Fin n) (AE D))
   conv_rhs => rw [← key]
   rw [smul_smul, inv_mul_cancel₀ hA, one_smul]
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_radN_measure (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t) [LocallyCompactSpace (radN d)] :
-    ∃ νN : Measure (radN d), νN.IsHaarMeasure ∧ νN.IsMulRightInvariant ∧ ∀ m ∈ levM d,
-      νN.map (fun n : radN d => MulAut.conjNormal m n) =
-        ((GlobalTheory.RegSW.absDet d m ^ (W.rank + t))⁻¹ : ℝ≥0) • νN := by
+theorem exists_radN_measure
+    (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t) [LocallyCompactSpace (radN d)]
+    : ∃ νN : Measure (radN d),
+      νN.IsHaarMeasure ∧ νN.IsMulRightInvariant
+        ∧ ∀ m ∈ levM d,
+          νN.map (fun n : radN d => MulAut.conjNormal m n)
+            = ((GlobalTheory.RegSW.absDet d m ^ (W.rank + t))⁻¹ : ℝ≥0) • νN := by
   obtain ⟨i1, i2, i3, i4, -, -⟩ := lattice_Mx D t W.rank
   obtain ⟨j1, j2, j3, j4, -, -⟩ := lattice_Mx D t t
   haveI : IsTopologicalAddGroup (Mx D t W.rank) := i1
@@ -102,11 +122,16 @@ theorem exists_radN_measure (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t) 
   rintro m ⟨g, a, hm⟩
   let f₁ : skewA D t → skewA D t := skewConj a.1
   let f₂ : Mx D t W.rank → Mx D t W.rank := fun b => (a.1 ⬝ b ⬝ (matHom W g⁻¹).1 : Mx D t W.rank)
-  have hf₁ : Continuous f₁ := Continuous.subtype_mk
-    ((continuous_const.matrix_mul continuous_subtype_val).matrix_mul continuous_const) _
-  have hf₂ : Continuous f₂ := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
-  have hL : ∀ n : radN d, (((MulAut.conjNormal m n : radN d) : GlobalTheory.RegSW.stab d) : GA D B) =
-      (m : GA D B) * ((n : GlobalTheory.RegSW.stab d) : GA D B) * (m : GA D B)⁻¹ := fun n => by
+  have hf₁ : Continuous f₁ :=
+    Continuous.subtype_mk
+      ((continuous_const.matrix_mul continuous_subtype_val).matrix_mul continuous_const) _
+  have hf₂ : Continuous f₂ :=
+    (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
+  have hL
+      : ∀ n : radN d,
+        (((MulAut.conjNormal m n : radN d) : GlobalTheory.RegSW.stab d) : GA D B)
+          = (m : GA D B) * ((n : GlobalTheory.RegSW.stab d) : GA D B)
+            * (m : GA D B)⁻¹ := fun n => by
     rw [MulAut.conjNormal_apply]
     rfl
   have hconj : ∀ p, MulAut.conjNormal m (Ψ p) = Ψ (Prod.map f₁ f₂ p) := by
@@ -124,7 +149,9 @@ theorem exists_radN_measure (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t) 
     rw [this]
     exact (Ψ.continuous.comp ((hf₁.prodMap hf₂).comp Ψ.symm.continuous)).measurable
   have hk := GlobalTheory.T.haar_skew_matrices_conj_scaling D t κ hκ a
-  have hb := map_lr a (matHom W g⁻¹) (GlobalTheory.CompanionTheory.HyperbolicDecompositionLaw.absA_det_matHom g⁻¹) β hβ
+  have hb :=
+    map_lr a (matHom W g⁻¹)
+      (GlobalTheory.CompanionTheory.HyperbolicDecompositionLaw.absA_det_matHom g⁻¹) β hβ
   rw [Measure.map_map hcm Ψ.continuous.measurable]
   have hc : (fun n : radN d => MulAut.conjNormal m n) ∘ Ψ = Ψ ∘ Prod.map f₁ f₂ := by
     funext p
@@ -132,8 +159,8 @@ theorem exists_radN_measure (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t) 
   rw [hc, ← Measure.map_map Ψ.continuous.measurable (hf₁.prodMap hf₂).measurable,
     ← Measure.map_prod_map κ β hf₁.measurable hf₂.measurable]
   change (((κ.map (skewConj a.1)).prod (β.map _)).map Ψ) = _
-  rw [hk, hb, Measure.prod_smul_left, Measure.prod_smul_right, Measure.map_smul, Measure.map_smul, smul_smul,
-    absDet_eq d m g a hm, pow_add, mul_inv, mul_comm]
+  rw [hk, hb, Measure.prod_smul_left, Measure.prod_smul_right, Measure.map_smul, Measure.map_smul,
+    smul_smul, absDet_eq d m g a hm, pow_add, mul_inv, mul_comm]
   all_goals exact Ψ.continuous.measurable.aemeasurable
 
 end GlobalTheory.CompanionTheory.QKAvg.RadMeas

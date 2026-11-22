@@ -9,14 +9,27 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SncChartOfSm
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.SncBase
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.SncBase
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.SncBase.Mdl
 
-theorem differentials_basis_invAdj : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A : Subalgebra ℚ Ω) (g : Ω), g ∈ A → g ≠ 0 → ∀ (e : ℕ) (z : Fin e → A) (z' : Fin e → Mdl.invAdj A g), (∀ i, (z' i : Ω) = z i) → LinearIndependent A (fun i => KaehlerDifferential.D ℚ A (z i)) → Submodule.span A (Set.range fun i => KaehlerDifferential.D ℚ A (z i)) = ⊤ → LinearIndependent (Mdl.invAdj A g) (fun i => KaehlerDifferential.D ℚ (Mdl.invAdj A g) (z' i)) ∧ Submodule.span (Mdl.invAdj A g) (Set.range fun i => KaehlerDifferential.D ℚ (Mdl.invAdj A g) (z' i)) = ⊤ := by
+theorem differentials_basis_invAdj
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A : Subalgebra ℚ Ω) (g : Ω),
+      g ∈ A → g ≠ 0
+        → ∀ (e : ℕ) (z : Fin e → A) (z' : Fin e → Mdl.invAdj A g),
+          (∀ i, (z' i : Ω) = z i) → LinearIndependent A (fun i => KaehlerDifferential.D ℚ A (z i))
+            → Submodule.span A (Set.range fun i => KaehlerDifferential.D ℚ A (z i)) = ⊤
+            → LinearIndependent (Mdl.invAdj A g)
+                (fun i => KaehlerDifferential.D ℚ (Mdl.invAdj A g) (z' i))
+              ∧ Submodule.span (Mdl.invAdj A g)
+                  (Set.range fun i => KaehlerDifferential.D ℚ (Mdl.invAdj A g) (z' i))
+                = ⊤ := by
   intro Ω _ _ A g hg hg0 e z z' hz hli hsp
   have hAB : A ≤ Mdl.invAdj A g := fun x hx =>
     show x ∈ Algebra.adjoin ℚ (insert g⁻¹ (A : Set Ω)) from
@@ -25,21 +38,22 @@ theorem differentials_basis_invAdj : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω]
     show g⁻¹ ∈ Algebra.adjoin ℚ (insert g⁻¹ (A : Set Ω)) from
       Algebra.subset_adjoin (Set.mem_insert _ _)
   have hden : ∀ x ∈ Algebra.adjoin ℚ (insert g⁻¹ (A : Set Ω)), ∃ n : ℕ, x * g ^ n ∈ A := by
-    let S : Subalgebra ℚ Ω :=
-      { carrier := {x | ∃ n : ℕ, x * g ^ n ∈ A}
-        mul_mem' := by
-          rintro x y ⟨n, hn⟩ ⟨m, hm⟩
-          refine ⟨n + m, ?_⟩
-          rw [show x * y * g ^ (n + m) = (x * g ^ n) * (y * g ^ m) by ring]
-          exact A.mul_mem hn hm
-        one_mem' := ⟨0, by simpa using A.one_mem⟩
-        add_mem' := by
-          rintro x y ⟨n, hn⟩ ⟨m, hm⟩
-          refine ⟨n + m, ?_⟩
-          rw [show (x + y) * g ^ (n + m) = (x * g ^ n) * g ^ m + (y * g ^ m) * g ^ n by ring]
-          exact A.add_mem (A.mul_mem hn (A.pow_mem hg m)) (A.mul_mem hm (A.pow_mem hg n))
-        zero_mem' := ⟨0, by simpa using A.zero_mem⟩
-        algebraMap_mem' := fun r => ⟨0, by simpa using A.algebraMap_mem r⟩ }
+    let S : Subalgebra ℚ Ω := {
+      carrier := {x | ∃ n : ℕ, x * g ^ n ∈ A}
+      mul_mem' := by
+        rintro x y ⟨n, hn⟩ ⟨m, hm⟩
+        refine ⟨n + m, ?_⟩
+        rw [show x * y * g ^ (n + m) = (x * g ^ n) * (y * g ^ m) by ring]
+        exact A.mul_mem hn hm
+      one_mem' := ⟨0, by simpa using A.one_mem⟩
+      add_mem' := by
+        rintro x y ⟨n, hn⟩ ⟨m, hm⟩
+        refine ⟨n + m, ?_⟩
+        rw [show (x + y) * g ^ (n + m) = (x * g ^ n) * g ^ m + (y * g ^ m) * g ^ n by ring]
+        exact A.add_mem (A.mul_mem hn (A.pow_mem hg m)) (A.mul_mem hm (A.pow_mem hg n))
+      zero_mem' := ⟨0, by simpa using A.zero_mem⟩
+      algebraMap_mem' := fun r => ⟨0, by simpa using A.algebraMap_mem r⟩
+    }
     have hle : Algebra.adjoin ℚ (insert g⁻¹ (A : Set Ω)) ≤ S := by
       refine Algebra.adjoin_le ?_
       intro x hx
@@ -77,7 +91,9 @@ theorem differentials_basis_invAdj : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω]
     Algebra.FormallyEtale.of_isLocalization (Submonoid.powers g')
   have hzz : ∀ i, algebraMap A (Mdl.invAdj A g) (z i) = z' i := fun i =>
     Subtype.ext ((hinc (z i)).trans (hz i).symm)
-  have key := GlobalTheory.CompanionTheory.Ar.SncRes.coords_of_formallyEtale (S := ↥(Mdl.invAdj A g)) z hli hsp
+  have key :=
+    GlobalTheory.CompanionTheory.Ar.SncRes.coords_of_formallyEtale (S := ↥(Mdl.invAdj A g)) z hli
+      hsp
   simp only [hzz] at key
   exact key
 

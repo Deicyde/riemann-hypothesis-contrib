@@ -16,7 +16,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
 theorem unrSplit_holds : UnrSplit :=
-  unrSplit_of groupStep (unrCharPP (ordPrime (kumMove moveRoot normVal)) charOrd decPow) (freshSplit freshChar_holds) exFld
-    layerOf_holds degOf splitIff
+  unrSplit_of groupStep (unrCharPP (ordPrime (kumMove moveRoot normVal)) charOrd decPow)
+    (freshSplit freshChar_holds) exFld layerOf_holds degOf splitIff
 
 end UpperTheory.Gal.UnramifiedFromSplittingCriterion

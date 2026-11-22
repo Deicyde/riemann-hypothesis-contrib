@@ -14,34 +14,46 @@ namespace GlobalTheory.InfAdeleMixed
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def toMixed [_root_.NumberField.IsTotallyComplex E] {R : Type} [CommRing R]
-    (θ : {w : InfinitePlace E // w.IsComplex} → (R →+* ℂ)) : R →+* mixedSpace E :=
+def toMixed
+    [_root_.NumberField.IsTotallyComplex E]
+    {R : Type} [CommRing R]
+    (θ : {w : InfinitePlace E // w.IsComplex} → (R →+* ℂ))
+    : R →+* mixedSpace E :=
   RingHom.prod
     (Pi.ringHom fun w : {w : InfinitePlace E // w.IsReal} =>
-      (False.elim (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex w.1) w.2) : R →+* ℝ))
+      (False.elim (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex w.1) w.2)
+        : R →+* ℝ))
     (Pi.ringHom θ)
 
-theorem mixed_ext [_root_.NumberField.IsTotallyComplex E] {x y : mixedSpace E} (h : ∀ w, x.2 w = y.2 w) : x = y :=
-  Prod.ext (funext fun w =>
-    (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex w.1) w.2).elim) (funext h)
+theorem mixed_ext
+    [_root_.NumberField.IsTotallyComplex E] {x y : mixedSpace E} (h : ∀ w, x.2 w = y.2 w)
+    : x = y :=
+  Prod.ext
+    (funext fun w =>
+      (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex w.1) w.2).elim)
+    (funext h)
 
-theorem exists_place_over [_root_.NumberField.IsTotallyComplex E] [IsTotallyReal F] (v : InfinitePlace F) :
-    ∃ w : {w : InfinitePlace E // w.IsComplex}, InfinitePlace.mk (w.1.embedding.comp (algebraMap F E)) = v := by
+theorem exists_place_over
+    [_root_.NumberField.IsTotallyComplex E] [IsTotallyReal F] (v : InfinitePlace F)
+    : ∃ w : {w : InfinitePlace E // w.IsComplex},
+      InfinitePlace.mk (w.1.embedding.comp (algebraMap F E)) = v := by
   obtain ⟨w, hw⟩ := InfinitePlace.comap_surjective (k := F) (K := E) v
   refine ⟨⟨w, IsTotallyComplex.isComplex w⟩, ?_⟩
   rw [← InfinitePlace.comap_mk, InfinitePlace.mk_embedding]
   exact hw
 
-theorem exists_equiv_mixedSpace :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-      (σ : E →ₐ[F] E), IsTotallyReal F → IsTotallyComplex E → Module.finrank F E = 2 →
-      (∀ (τ : E →+* ℂ) (x : E), τ (σ x) = star (τ x)) →
-      ∃ θ : InfiniteAdeleRing F ⊗[F] E ≃+* mixedSpace E,
-        (∀ x : E, θ (1 ⊗ₜ[F] x) = mixedEmbedding E x) ∧
-        @Continuous _ _ inferInstance
-          (moduleTopology (InfiniteAdeleRing F) (InfiniteAdeleRing F ⊗[F] E)) θ.symm ∧
-        ∀ u : (mixedSpace E)ˣ, (∀ w, ((u : mixedSpace E).2 w).im = 0) →
-          ∃ a : (InfiniteAdeleRing F)ˣ, θ ((a : InfiniteAdeleRing F) ⊗ₜ[F] 1) = u := by
+theorem exists_equiv_mixedSpace
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsTotallyReal F → IsTotallyComplex E → Module.finrank F E = 2
+        → (∀ (τ : E →+* ℂ) (x : E), τ (σ x) = star (τ x))
+        → ∃ θ : InfiniteAdeleRing F ⊗[F] E ≃+* mixedSpace E,
+          (∀ x : E, θ (1 ⊗ₜ[F] x) = mixedEmbedding E x)
+            ∧ @Continuous _ _ inferInstance
+              (moduleTopology (InfiniteAdeleRing F) (InfiniteAdeleRing F ⊗[F] E)) θ.symm
+            ∧ ∀ u : (mixedSpace E)ˣ,
+              (∀ w, ((u : mixedSpace E).2 w).im = 0)
+                → ∃ a : (InfiniteAdeleRing F)ˣ, θ ((a : InfiniteAdeleRing F) ⊗ₜ[F] 1) = u := by
   intro F E _ _ _ _ _ σ hF hE h2 hσ
   letI : TopologicalSpace (InfiniteAdeleRing F ⊗[F] E) :=
     moduleTopology (InfiniteAdeleRing F) (InfiniteAdeleRing F ⊗[F] E)
@@ -71,18 +83,23 @@ theorem exists_equiv_mixedSpace :
     exact hδ0 (τ.injective (by rw [map_zero]; exact Complex.ext (hre τ) h))
   let r : ∀ v : InfinitePlace F, v.Completion ≃ᵢ ℝ := fun v =>
     InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal v)
-  have hr : ∀ v x, r v x = InfinitePlace.Completion.extensionEmbeddingOfIsReal (IsTotallyReal.isReal v) x :=
+  have hr
+      : ∀ v x,
+        r v x = InfinitePlace.Completion.extensionEmbeddingOfIsReal (IsTotallyReal.isReal v) x :=
     fun _ _ => rfl
   let p : {w : InfinitePlace E // w.IsComplex} → InfinitePlace F := fun w =>
     InfinitePlace.mk (w.1.embedding.comp (algebraMap F E))
   let Θ : InfiniteAdeleRing F ⊗[F] E →+* mixedSpace E := toMixed fun w => θ0 w.1.embedding
   have hΘ : ∀ z w, (Θ z).2 w = θ0 w.1.embedding z := fun _ _ => rfl
-  have hval : ∀ (w) (a b : InfiniteAdeleRing F), (Θ (a ⊗ₜ 1 + b ⊗ₜ δ)).2 w =
-      ⟨r _ (a (p w)), r _ (b (p w)) * (w.1.embedding δ).im⟩ := by
+  have hval
+      : ∀ (w) (a b : InfiniteAdeleRing F),
+        (Θ (a ⊗ₜ 1 + b ⊗ₜ δ)).2 w = ⟨r _ (a (p w)), r _ (b (p w)) * (w.1.embedding δ).im⟩ := by
     intro w a b
-    rw [hΘ, map_add (f := _), hθ, hθ, GlobalTheory.InfAdeleCM.ext_eq_ofReal, GlobalTheory.InfAdeleCM.ext_eq_ofReal, map_one, mul_one]
+    rw [hΘ, map_add (f := _), hθ, hθ, GlobalTheory.InfAdeleCM.ext_eq_ofReal,
+      GlobalTheory.InfAdeleCM.ext_eq_ofReal, map_one, mul_one]
     apply Complex.ext
-    · simp only [Complex.add_re, Complex.ofReal_re, Complex.re_ofReal_mul, hre, mul_zero, add_zero, hr, p]
+    · simp only [Complex.add_re, Complex.ofReal_re, Complex.re_ofReal_mul, hre, mul_zero, add_zero,
+        hr, p]
     · simp only [Complex.add_im, Complex.ofReal_im, Complex.im_ofReal_mul, zero_add, hr, p]
   choose t ht using exists_place_over (F := F) (E := E)
   have ht' : ∀ v, p (t v) = v := ht
@@ -90,11 +107,15 @@ theorem exists_equiv_mixedSpace :
     intro w
     apply Subtype.ext
     rw [← InfinitePlace.mk_embedding (t (p w)).1, ← InfinitePlace.mk_embedding w.1]
-    rcases GlobalTheory.InfAdeleCM.eq_or_conj c hc' hδ0 hcδ hs _ _ (GlobalTheory.InfAdeleCM.mk_eq_iff (ht (p w))) with e | e
+    rcases GlobalTheory.InfAdeleCM.eq_or_conj c hc' hδ0 hcδ hs _ _
+        (GlobalTheory.InfAdeleCM.mk_eq_iff (ht (p w)))
+      with e | e
     · rw [e]
     · rw [e, InfinitePlace.mk_conjugate_eq]
-  let A : (({w : InfinitePlace E // w.IsComplex}) → ℝ) → InfiniteAdeleRing F := fun y v => (r v).symm (y (t v))
-  have hA : Continuous A := continuous_pi fun v => (r v).symm.continuous.comp (continuous_apply (t v))
+  let A : (({w : InfinitePlace E // w.IsComplex}) → ℝ) → InfiniteAdeleRing F := fun y v =>
+    (r v).symm (y (t v))
+  have hA : Continuous A :=
+    continuous_pi fun v => (r v).symm.continuous.comp (continuous_apply (t v))
   have hA' : ∀ y w, r _ (A y (p w)) = y w := by
     intro y w
     simp only [A, IsometryEquiv.apply_symm_apply, htp]
@@ -108,7 +129,8 @@ theorem exists_equiv_mixedSpace :
     have h := hA' (fun w => (z.2 w).im / (w.1.embedding δ).im) w
     exact (congrArg (· * (w.1.embedding δ).im) h).trans (div_mul_cancel₀ _ (him _))
   have hinj : Function.Injective Θ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z hz
     obtain ⟨a, b, rfl⟩ := GlobalTheory.InfAdeleCM.exists_decomp hs z
     have key : ∀ v, a v = 0 ∧ b v = 0 := by
@@ -119,16 +141,20 @@ theorem exists_equiv_mixedSpace :
       have h3 := congrArg Complex.im h
       simp only [Prod.snd_zero, Pi.zero_apply, Complex.zero_re, Complex.zero_im] at h1 h3
       have z0 : r v 0 = 0 := by rw [hr, map_zero]
-      exact ⟨(r v).injective (by rw [z0, ← h1]),
-        (r v).injective (by rw [z0]; exact (mul_eq_zero.1 h3.symm).resolve_right (him _))⟩
+      exact ⟨
+        (r v).injective (by rw [z0, ← h1]),
+        (r v).injective (by rw [z0]; exact (mul_eq_zero.1 h3.symm).resolve_right (him _))
+      ⟩
     have ha : a = 0 := funext fun v => (key v).1
     have hb : b = 0 := funext fun v => (key v).2
     rw [ha, hb, TensorProduct.zero_tmul, TensorProduct.zero_tmul, add_zero]
-  let e : InfiniteAdeleRing F ⊗[F] E ≃+* mixedSpace E := RingEquiv.ofBijective Θ ⟨hinj, fun z => ⟨G z, hG z⟩⟩
+  let e : InfiniteAdeleRing F ⊗[F] E ≃+* mixedSpace E :=
+    RingEquiv.ofBijective Θ ⟨hinj, fun z => ⟨G z, hG z⟩⟩
   have he : ∀ z, e z = Θ z := fun _ => rfl
   have htm : ∀ x : E, Continuous fun a : InfiniteAdeleRing F => a ⊗ₜ[F] x := by
     intro x
-    have : (fun a : InfiniteAdeleRing F => a ⊗ₜ[F] x) = fun a => a • ((1 : InfiniteAdeleRing F) ⊗ₜ[F] x) := by
+    have : (fun a : InfiniteAdeleRing F => a ⊗ₜ[F] x)
+        = fun a => a • ((1 : InfiniteAdeleRing F) ⊗ₜ[F] x) := by
       funext a
       rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
     rw [this]
@@ -140,7 +166,8 @@ theorem exists_equiv_mixedSpace :
       rw [RingEquiv.symm_apply_eq, he, hG]
     rw [this]
     have c1 : Continuous fun z : mixedSpace E => (fun w => (z.2 w).re) := by fun_prop
-    have c2 : Continuous fun z : mixedSpace E => (fun w => (z.2 w).im / (w.1.embedding δ).im) := by fun_prop
+    have c2 : Continuous fun z : mixedSpace E => (fun w => (z.2 w).im / (w.1.embedding δ).im) := by
+      fun_prop
     exact Continuous.fun_add ((htm 1).comp' (hA.comp' c1)) ((htm δ).comp' (hA.comp' c2))
   · have hne : ∀ w, ((u : mixedSpace E).2 w).re ≠ 0 := by
       intro w h

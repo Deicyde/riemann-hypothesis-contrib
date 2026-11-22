@@ -19,7 +19,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartanEigenO
 noncomputable section
 
 open scoped TensorProduct Matrix Classical
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
 
 namespace GlobalTheory.RealLift.FockFirst
 
@@ -27,15 +29,17 @@ section SlopeTestRemainingChoices
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem incM_map_piInf {n m : Type} (J : Matrix n m E) {w : InfinitePlace F} (τ : EmbOver E w) :
-    (incM F J).map (piInf τ) = J.map τ.1 := by
+theorem incM_map_piInf {n m : Type} (J : Matrix n m E) {w : InfinitePlace F} (τ : EmbOver E w)
+    : (incM F J).map (piInf τ) = J.map τ.1 := by
   ext i j
 
   change infEmb τ (compInf F E w ((1 : AF F) ⊗ₜ[F] J i j)) = τ.1 (J i j)
   simp [compInf, infEmb_tmul]
 
-theorem hasExp_div (τ : ∀ w : InfinitePlace F, EmbOver E w) {χ χ' : Chr F E} {m m' : InfinitePlace F → ℤ}
-    (h : HasExp τ χ m) (h' : HasExp τ χ' m') : HasExp τ (χ / χ') (fun w => m w - m' w) := by
+theorem hasExp_div
+    (τ : ∀ w : InfinitePlace F, EmbOver E w)
+    {χ χ' : Chr F E} {m m' : InfinitePlace F → ℤ} (h : HasExp τ χ m) (h' : HasExp τ χ' m')
+    : HasExp τ (χ / χ') (fun w => m w - m' w) := by
   intro z hz
   rw [MonoidHom.div_apply, Circle.coe_div, h z hz, h' z hz, ← Finset.prod_div_distrib]
   refine Finset.prod_congr rfl fun w _ => ?_

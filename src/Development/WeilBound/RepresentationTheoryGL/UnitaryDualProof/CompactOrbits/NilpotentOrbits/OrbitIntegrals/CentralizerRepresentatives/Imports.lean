@@ -12,33 +12,39 @@ namespace PositivityTheory.RgUd.T.Nil.Orb.BReps
 
 variable {k : Type} [Field k] {n : ℕ}
 
-theorem exists_frames (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hc : ∀ a ∈ Z, ∀ b ∈ Z, a * b = b * a)
-    (hr : IsReduced Z) :
-    ∃ (M : Type) (_ : Fintype M) (L : M → Type) (_ : ∀ m, Fintype (L m)) (_ : ∀ m, Nonempty (L m))
-      (R : Z → (m : M) → L m → L m → k) (o : (m : M) → L m → k),
-      ∀ N : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * N = N * z) → IsNilpotent N → ∀ v : Fin n → k,
-        Nonempty (Frame Z M L R o N v) := by
+theorem exists_frames
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    (hc : ∀ a ∈ Z, ∀ b ∈ Z, a * b = b * a) (hr : IsReduced Z)
+    : ∃ (M : Type) (_ : Fintype M) (L : M → Type) (_ : ∀ m, Fintype (L m)) (_ : ∀ m, Nonempty (L m))
+        (R : Z → (m : M) → L m → L m → k) (o : (m : M) → L m → k),
+      ∀ N : Matrix (Fin n) (Fin n) k,
+        (∀ z ∈ Z, z * N = N * z) → IsNilpotent N
+          → ∀ v : Fin n → k, Nonempty (Frame Z M L R o N v) := by
   letI iCR : CommRing Z :=
     { (inferInstance : Ring Z) with mul_comm := fun a b => Subtype.ext (hc a a.2 b b.2) }
   letI iM : Module Z (Fin n → k) := Module.compHom (Fin n → k)
     ((Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) k ≃ₐ[k] Module.End k (Fin n → k)).toRingHom.comp
       Z.val.toRingHom)
-  have hsmul : ∀ (z : Z) (u : Fin n → k), z • u = (z : Matrix (Fin n) (Fin n) k) *ᵥ u := fun z u => rfl
+  have hsmul : ∀ (z : Z) (u : Fin n → k), z • u = (z : Matrix (Fin n) (Fin n) k) *ᵥ u := fun z u =>
+    rfl
   haveI iST : IsScalarTower k Z (Fin n → k) := ⟨fun c z u => by
     rw [hsmul, hsmul, Subalgebra.coe_smul]
     ext i
     simp [mulVec, dotProduct, Finset.mul_sum, mul_assoc]⟩
   obtain ⟨M, fM, L, fL, hne, Rc, o, H⟩ :=
-    @dex_global k _ Z iCR (Subalgebra.algebra Z) inferInstance hr (Fin n → k) _ iM _ iST inferInstance
+    @dex_global k _ Z iCR (Subalgebra.algebra Z) inferInstance hr (Fin n → k) _ iM _ iST
+      inferInstance
   refine ⟨M, fM, L, fL, hne, Rc, o, ?_⟩
   intro N hNZ hNnil v
-  let toZ : (A : Matrix (Fin n) (Fin n) k) → (∀ z ∈ Z, z * A = A * z) → ((Fin n → k) →ₗ[Z] (Fin n → k)) :=
-    fun A hA =>
-      { toFun := fun u => A *ᵥ u
-        map_add' := fun u w => mulVec_add A u w
-        map_smul' := fun z u => by
-          show A *ᵥ ((z : Matrix (Fin n) (Fin n) k) *ᵥ u) = (z : Matrix (Fin n) (Fin n) k) *ᵥ (A *ᵥ u)
-          rw [mulVec_mulVec, mulVec_mulVec, hA z z.2] }
+  let toZ
+      : (A : Matrix (Fin n) (Fin n) k) → (∀ z ∈ Z, z * A = A * z)
+        → ((Fin n → k) →ₗ[Z] (Fin n → k)) := fun A hA => {
+    toFun := fun u => A *ᵥ u
+    map_add' := fun u w => mulVec_add A u w
+    map_smul' := fun z u => by
+      show A *ᵥ ((z : Matrix (Fin n) (Fin n) k) *ᵥ u) = (z : Matrix (Fin n) (Fin n) k) *ᵥ (A *ᵥ u)
+      rw [mulVec_mulVec, mulVec_mulVec, hA z z.2]
+  }
   have hpow : ∀ j : ℕ, ∀ u, ((toZ N hNZ) ^ j) u = (N ^ j) *ᵥ u := by
     intro j
     induction j with
@@ -51,9 +57,11 @@ theorem exists_frames (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hc : ∀ a 
     obtain ⟨K, hK⟩ := hNnil
     exact ⟨K, LinearMap.ext fun u => by rw [hpow, hK, zero_mulVec]; rfl⟩
   obtain ⟨ι, fι, l, s, β, h1, h2, h3, h4, h5, h6⟩ := H (toZ N hNZ) hnil v
-  have hA : ∀ (A : Matrix (Fin n) (Fin n) k), (∀ z ∈ Z, z * A = A * z) → A * N = N * A →
-      ∀ (m : M) (p : L m) (a : ι m) (i : Fin (l m a)), (i : ℕ) < s m a →
-        (β.repr (A *ᵥ v)) ⟨m, (p, ⟨a, i⟩)⟩ = 0 := by
+  have hA
+      : ∀ (A : Matrix (Fin n) (Fin n) k),
+        (∀ z ∈ Z, z * A = A * z) → A * N = N * A
+          → ∀ (m : M) (p : L m) (a : ι m) (i : Fin (l m a)),
+            (i : ℕ) < s m a → (β.repr (A *ᵥ v)) ⟨m, (p, ⟨a, i⟩)⟩ = 0 := by
     intro A hAZ hAN m p a i hi
     refine h6 (toZ A hAZ) (LinearMap.ext fun u => ?_) m p a i hi
     show A *ᵥ (N *ᵥ u) = N *ᵥ (A *ᵥ u)

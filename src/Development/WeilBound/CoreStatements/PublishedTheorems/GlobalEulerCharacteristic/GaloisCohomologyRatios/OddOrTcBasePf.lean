@@ -10,16 +10,20 @@ namespace PositivityTheory.Lit1.GEN.X
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-local instance oddOrTcBaseScalarTower {K L : FiniteSubfield} [Fact (K ≤ L)] :
-    IsScalarTower K.1 L.1 ℚ̄ :=
+local instance oddOrTcBaseScalarTower {K L : FiniteSubfield} [Fact (K ≤ L)]
+    : IsScalarTower K.1 L.1 ℚ̄ :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
 
-variable {K L : FiniteSubfield} [Fact (K ≤ L)] {S : Set (HeightOneSpectrum (𝓞 K.1))} {ℓ : ℕ} [Fact ℓ.Prime]
-  (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S) [Normal K.1 L.1]
+variable
+  {K L : FiniteSubfield} [Fact (K ≤ L)]
+  {S : Set (HeightOneSpectrum (𝓞 K.1))} {ℓ : ℕ} [Fact ℓ.Prime]
+  (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
+  [Normal K.1 L.1]
 
 theorem odd_or_tc_base_pf
     (hcop : Nat.Coprime (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).index ℓ)
-    (hK : ℓ ≠ 2 ∨ IsTotallyComplex L.1) : Odd ℓ ∨ IsTotallyComplex K.1 := by
+    (hK : ℓ ≠ 2 ∨ IsTotallyComplex L.1)
+    : Odd ℓ ∨ IsTotallyComplex K.1 := by
   have hℓ : ℓ.Prime := Fact.out
   by_cases h2 : ℓ = 2
   · right
@@ -31,13 +35,13 @@ theorem odd_or_tc_base_pf
     rw [InfinitePlace.not_isComplex_iff_isReal] at hv
     obtain ⟨w, rfl⟩ := InfinitePlace.comap_surjective (k := K.1) (K := L.1) v
     have hw : w.IsComplex := hTC.isComplex w
-    have hram : ¬ InfinitePlace.IsUnramified K.1 w :=
-      InfinitePlace.not_isUnramified_iff.2 ⟨hw, hv⟩
+    have hram : ¬ InfinitePlace.IsUnramified K.1 w := InfinitePlace.not_isUnramified_iff.2 ⟨hw, hv⟩
     have hcard := InfinitePlace.not_isUnramified_iff_card_stabilizer_eq_two.1 hram
     have hdvd : 2 ∣ Nat.card (L.1 ≃ₐ[K.1] L.1) :=
       hcard ▸ Subgroup.card_subgroup_dvd_card (MulAction.stabilizer (L.1 ≃ₐ[K.1] L.1) w)
-    have hidx : (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).index =
-        Nat.card (L.1 ≃ₐ[K.1] L.1) := by
+    have hidx
+        : (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).index
+          = Nat.card (L.1 ≃ₐ[K.1] L.1) := by
       rw [Subgroup.index]
       exact Nat.card_congr (gsQuotientGalEquiv hL).toEquiv
     rw [hidx] at hcop

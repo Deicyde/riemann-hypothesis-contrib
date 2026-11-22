@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.Surjec
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Module ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.HodgeCoh
+open CategoryTheory AlgebraicGeometry Module ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.HodgeCoh
 
 set_option autoImplicit false
 
@@ -19,10 +20,9 @@ open GlobalTheory.CechDR GlobalTheory.QCoh
 
 variable {k : Type} [Field k] {X : Scheme.{0}} (s : X ⟶ Sp k)
 
-theorem finiteType_sec [LocallyOfFiniteType s] {U : X.Opens} (hU : IsAffineOpen U) :
-    Algebra.FiniteType k (Sec s U) := by
-  have h1 := LocallyOfFiniteType.finiteType_appLE s (isAffineOpen_top (Sp k)) hU
-    (by simp)
+theorem finiteType_sec [LocallyOfFiniteType s] {U : X.Opens} (hU : IsAffineOpen U)
+    : Algebra.FiniteType k (Sec s U) := by
+  have h1 := LocallyOfFiniteType.finiteType_appLE s (isAffineOpen_top (Sp k)) hU (by simp)
   have h2 : ((Scheme.ΓSpecIso (CommRingCat.of k)).inv).hom.FiniteType :=
     RingHom.FiniteType.of_surjective _
       (Scheme.ΓSpecIso (CommRingCat.of k)).commRingCatIsoToRingEquiv.symm.surjective

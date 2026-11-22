@@ -18,16 +18,14 @@ namespace TraceDualMin
 theorem herm_one_eq {n : ℕ} (x y : Fin n → E) : herm 1 x y = ∑ k, x k * cc (y k) := by
   simp [herm, Matrix.one_apply]
 
-theorem herm_smul_left {n : ℕ} (a : E) (x y : Fin n → E) :
-    herm 1 (a • x) y = a * herm 1 x y := by
+theorem herm_smul_left {n : ℕ} (a : E) (x y : Fin n → E) : herm 1 (a • x) y = a * herm 1 x y := by
   simp [herm_one_eq, Finset.mul_sum, mul_assoc]
 
-theorem herm_smul_right {n : ℕ} (a : E) (x y : Fin n → E) :
-    herm 1 x (a • y) = cc a * herm 1 x y := by
+theorem herm_smul_right {n : ℕ} (a : E) (x y : Fin n → E)
+    : herm 1 x (a • y) = cc a * herm 1 x y := by
   simp [herm_one_eq, Finset.mul_sum, cc, mul_left_comm]
 
-theorem cc_cc (a : E) : cc (cc a) = a := by
-  simp [cc]
+theorem cc_cc (a : E) : cc (cc a) = a := by simp [cc]
 
 theorem cc_herm_self {n : ℕ} (x : Fin n → E) : cc (herm 1 x x) = herm 1 x x := by
   simp [herm_one_eq, cc, mul_comm]
@@ -38,14 +36,13 @@ theorem trace_cc (a : E) : Algebra.trace ℚ E (cc a) = Algebra.trace ℚ E a :=
 theorem isIntegral_cc {a : E} (ha : IsIntegral ℤ a) : IsIntegral ℤ (cc a) :=
   ha.map ((IsCMField.complexConj E).restrictScalars ℤ).toAlgHom
 
-theorem embedding_herm_self {n : ℕ} (σ : E →+* ℂ) (x : Fin n → E) :
-    σ (herm 1 x x) = ((∑ k, ‖σ (x k)‖ ^ 2 : ℝ) : ℂ) := by
+theorem embedding_herm_self {n : ℕ} (σ : E →+* ℂ) (x : Fin n → E)
+    : σ (herm 1 x x) = ((∑ k, ‖σ (x k)‖ ^ 2 : ℝ) : ℂ) := by
   simp [herm_one_eq, cc, IsCMField.complexEmbedding_complexConj, Complex.mul_conj']
 
-
 omit [IsCMField E] in
-theorem mem_inv_different {x : E} (hx : ∀ a : 𝓞 E, ∃ k : ℤ, Algebra.trace ℚ E (x * a) = k) :
-    x ∈ (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)⁻¹ := by
+theorem mem_inv_different {x : E} (hx : ∀ a : 𝓞 E, ∃ k : ℤ, Algebra.trace ℚ E (x * a) = k)
+    : x ∈ (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)⁻¹ := by
   rw [← dual_one_eq_inv_differentIdeal, ← FractionalIdeal.mem_coe, FractionalIdeal.coe_dual_one,
     Submodule.mem_traceDual]
   intro a ha
@@ -55,12 +52,12 @@ theorem mem_inv_different {x : E} (hx : ∀ a : 𝓞 E, ∃ k : ℤ, Algebra.tra
 
 end TraceDualMin
 
-
 open TraceDualMin in
-theorem trace_dual_min {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E))
-    (hint : ∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y)) (hdual : ∀ x, (∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y)) → x ∈ Λ)
-    (u : Fin n → E) (hu : u ≠ 0) (htr : ∀ y ∈ Λ, ∃ k : ℤ, Algebra.trace ℚ E (herm 1 u y) = k) :
-    2 * (fdeg E : ℝ) / rdE E ^ 2 ≤ ∑ σ : E →+* ℂ, ∑ k, ‖σ (u k)‖ ^ 2 := by
+theorem trace_dual_min
+    {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E)) (hint : ∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y))
+    (hdual : ∀ x, (∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y)) → x ∈ Λ) (u : Fin n → E) (hu : u ≠ 0)
+    (htr : ∀ y ∈ Λ, ∃ k : ℤ, Algebra.trace ℚ E (herm 1 u y) = k)
+    : 2 * (fdeg E : ℝ) / rdE E ^ 2 ≤ ∑ σ : E →+* ℂ, ∑ k, ‖σ (u k)‖ ^ 2 := by
   set D : FractionalIdeal (𝓞 E)⁰ E := (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E) with hD
   have hD0 : D ≠ 0 := FractionalIdeal.coeIdeal_ne_zero.mpr differentIdeal_ne_bot
 
@@ -104,7 +101,8 @@ theorem trace_dual_min {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E))
     obtain ⟨σ⟩ : Nonempty (E →+* ℂ) := inferInstance
     have := hnorm σ
     rw [h, map_zero, norm_zero, eq_comm,
-      Finset.sum_eq_zero_iff_of_nonneg (fun _ _ => by positivity)] at this
+        Finset.sum_eq_zero_iff_of_nonneg (fun _ _ => by positivity)]
+      at this
     apply hu
     funext k
     simpa using this k (Finset.mem_univ k)

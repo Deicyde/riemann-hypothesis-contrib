@@ -11,9 +11,9 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open MvPolynomial Finset
 
-theorem RootGridLower.sum_fin_pow {M : ℕ} (hM : 0 < M) {ω : ℂ} (hω : IsPrimitiveRoot ω M)
-    {a b : ℕ} (ha : a < M) (hb : b < M) :
-    ∑ t : Fin M, (ω ^ a * (ω ^ b)⁻¹) ^ (t : ℕ) = if a = b then (M : ℂ) else 0 := by
+theorem RootGridLower.sum_fin_pow
+    {M : ℕ} (hM : 0 < M) {ω : ℂ} (hω : IsPrimitiveRoot ω M) {a b : ℕ} (ha : a < M) (hb : b < M)
+    : ∑ t : Fin M, (ω ^ a * (ω ^ b)⁻¹) ^ (t : ℕ) = if a = b then (M : ℂ) else 0 := by
   have hω0 : ω ≠ 0 := hω.ne_zero hM.ne'
   rw [Fin.sum_univ_eq_sum_range (fun t => (ω ^ a * (ω ^ b)⁻¹) ^ t)]
   split_ifs with hab
@@ -32,22 +32,29 @@ theorem RootGridLower.sum_fin_pow {M : ℕ} (hM : 0 < M) {ω : ℂ} (hω : IsPri
       simp
     simp [h1]
 
-theorem RootGridLower.average {e M : ℕ} (hM : 0 < M) {ω : ℂ} (hω : IsPrimitiveRoot ω M)
-    (Q : MvPolynomial (Fin e) ℤ) (hdeg : ∀ i, Q.degreeOf i < M) (j : Fin e →₀ ℕ)
-    (hj : ∀ i, j i < M) :
-    ∑ k : Fin e → Fin M, eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q) *
-        ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ) = (M : ℂ) ^ e * ((Q.coeff j : ℤ) : ℂ) := by
+theorem RootGridLower.average
+    {e M : ℕ} (hM : 0 < M)
+    {ω : ℂ} (hω : IsPrimitiveRoot ω M)
+    (Q : MvPolynomial (Fin e) ℤ) (hdeg : ∀ i, Q.degreeOf i < M)
+    (j : Fin e →₀ ℕ) (hj : ∀ i, j i < M)
+    : ∑ k : Fin e → Fin M, eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q) *
+          ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)
+      = (M : ℂ) ^ e * ((Q.coeff j : ℤ) : ℂ) := by
   classical
   simp_rw [eval_map, eval₂_eq', Finset.sum_mul]
   rw [Finset.sum_comm]
-  have key : ∀ d ∈ Q.support, ∑ k : Fin e → Fin M,
-      (Int.castRingHom ℂ) (Q.coeff d) * (∏ i, (ω ^ (k i : ℕ)) ^ d i) *
-        ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ) =
-      ((Q.coeff d : ℤ) : ℂ) * if d = j then (M : ℂ) ^ e else 0 := by
+  have key
+      : ∀ d ∈ Q.support,
+        ∑ k : Fin e → Fin M,
+            (Int.castRingHom ℂ) (Q.coeff d) * (∏ i, (ω ^ (k i : ℕ)) ^ d i) *
+              ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)
+          = ((Q.coeff d : ℤ) : ℂ) * if d = j then (M : ℂ) ^ e else 0 := by
     intro d hd
     have hdM : ∀ i, d i < M := fun i => lt_of_le_of_lt (monomial_le_degreeOf i hd) (hdeg i)
-    have hprod : ∀ k : Fin e → Fin M, (∏ i, (ω ^ (k i : ℕ)) ^ d i) * ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)
-        = ∏ i, (ω ^ d i * (ω ^ j i)⁻¹) ^ (k i : ℕ) := by
+    have hprod
+        : ∀ k : Fin e → Fin M,
+          (∏ i, (ω ^ (k i : ℕ)) ^ d i) * ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)
+            = ∏ i, (ω ^ d i * (ω ^ j i)⁻¹) ^ (k i : ℕ) := by
       intro k
       rw [← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun i _ => ?_
@@ -70,9 +77,9 @@ theorem RootGridLower.average {e M : ℕ} (hM : 0 < M) {ω : ℂ} (hω : IsPrimi
   · simp [mul_comm]
   · rw [MvPolynomial.notMem_support_iff.mp hjs]; simp
 
-theorem RootGridLower.of_pos {e M : ℕ} (hM : 0 < M) (Q : MvPolynomial (Fin e) ℤ) (hQ : Q ≠ 0)
-    (hdeg : ∀ i, Q.degreeOf i < M) :
-    ∃ ζ : Fin e → ℂ, (∀ i, ζ i ^ M = 1) ∧ 1 ≤ ‖eval ζ (map (Int.castRingHom ℂ) Q)‖ := by
+theorem RootGridLower.of_pos
+    {e M : ℕ} (hM : 0 < M) (Q : MvPolynomial (Fin e) ℤ) (hQ : Q ≠ 0) (hdeg : ∀ i, Q.degreeOf i < M)
+    : ∃ ζ : Fin e → ℂ, (∀ i, ζ i ^ M = 1) ∧ 1 ≤ ‖eval ζ (map (Int.castRingHom ℂ) Q)‖ := by
   classical
   have hω := Complex.isPrimitiveRoot_exp M hM.ne'
   set ω := Complex.exp (2 * Real.pi * Complex.I / M)
@@ -85,8 +92,8 @@ theorem RootGridLower.of_pos {e M : ℕ} (hM : 0 < M) (Q : MvPolynomial (Fin e) 
   have hω1 : ‖ω‖ = 1 := hω.norm'_eq_one hM.ne'
   by_contra hne
   push Not at hne
-  have hlt : ∀ k : Fin e → Fin M,
-      ‖eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q)‖ < 1 := by
+  have hlt
+      : ∀ k : Fin e → Fin M, ‖eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q)‖ < 1 := by
     intro k
     refine hne _ fun i => ?_
     rw [← pow_mul, mul_comm, pow_mul, hω.pow_eq_one, one_pow]
@@ -94,13 +101,15 @@ theorem RootGridLower.of_pos {e M : ℕ} (hM : 0 < M) (Q : MvPolynomial (Fin e) 
     ⟨fun i => ⟨j i, hjM i⟩, Finset.mem_univ _⟩
   have hupper : ‖(M : ℂ) ^ e * ((Q.coeff j : ℤ) : ℂ)‖ < (M : ℝ) ^ e := by
     rw [← RootGridLower.average hM hω Q hdeg j hjM]
-    calc ‖∑ k : Fin e → Fin M, eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q) *
-            ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)‖
-        ≤ ∑ k : Fin e → Fin M, ‖eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q) *
-            ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)‖ := norm_sum_le _ _
+    calc
+      ‖∑ k : Fin e → Fin M, eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q) *
+         ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)‖
+          ≤ ∑ k : Fin e → Fin M, ‖eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q) *
+              ∏ i, ((ω ^ j i)⁻¹) ^ (k i : ℕ)‖ :=
+        norm_sum_le _ _
       _ = ∑ k : Fin e → Fin M, ‖eval (fun i => ω ^ (k i : ℕ)) (map (Int.castRingHom ℂ) Q)‖ := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          simp [norm_prod, hω1]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        simp [norm_prod, hω1]
       _ < ∑ _k : Fin e → Fin M, (1 : ℝ) := Finset.sum_lt_sum_of_nonempty hne' fun k _ => hlt k
       _ = (M : ℝ) ^ e := by simp
   have hlower : (M : ℝ) ^ e ≤ ‖(M : ℂ) ^ e * ((Q.coeff j : ℤ) : ℂ)‖ := by
@@ -111,8 +120,8 @@ theorem RootGridLower.of_pos {e M : ℕ} (hM : 0 < M) (Q : MvPolynomial (Fin e) 
 theorem RootGridLower.proof : RootGridLower.Statement := by
   intro e m Q hQ hdeg
   rcases Nat.eq_zero_or_pos m with rfl | hm
-  · obtain ⟨ζ, -, hζ⟩ := RootGridLower.of_pos Nat.one_pos Q hQ
-      (fun i => lt_trans (hdeg i) Nat.one_pos)
+  · obtain ⟨ζ, -, hζ⟩ :=
+      RootGridLower.of_pos Nat.one_pos Q hQ (fun i => lt_trans (hdeg i) Nat.one_pos)
     exact ⟨ζ, fun i => pow_zero _, hζ⟩
   · exact RootGridLower.of_pos hm Q hQ hdeg
 

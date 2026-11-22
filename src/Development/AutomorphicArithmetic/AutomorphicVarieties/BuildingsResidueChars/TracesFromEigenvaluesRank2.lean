@@ -4,12 +4,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial GlobalTheory.GalOfCusp UpperTheory.V.Af
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+  GlobalTheory.GalOfCusp UpperTheory.V.Af
 
-theorem UpperTheory.traces_from_eigenvalues_rank2 :
-    ∀ (p h e : ℕ), ∀ D : EigData 2 p ![(e : ℤ), -(e : ℤ)] 0, ∃ (T : TrData (p ^ h) e) (u : D.S ≃ T.S), ∀ s, T.t (u s) = 1 + ((D.β s).map fun b => b⁻¹ ^ h).sum := by
+theorem UpperTheory.traces_from_eigenvalues_rank2
+    : ∀ (p h e : ℕ), ∀ D : EigData 2 p ![(e : ℤ), -(e : ℤ)] 0,
+      ∃ (T : TrData (p ^ h) e) (u : D.S ≃ T.S), ∀ s,
+        T.t (u s) = 1 + ((D.β s).map fun b => b⁻¹ ^ h).sum := by
   intro p h e D
-  refine ⟨⟨D.S, D.fin, fun s => 1 + ((D.β s).map fun b => b⁻¹ ^ h).sum, ?_, ?_, ?_⟩, Equiv.refl _, fun s => rfl⟩
+  refine ⟨
+    ⟨D.S, D.fin, fun s => 1 + ((D.β s).map fun b => b⁻¹ ^ h).sum, ?_, ?_, ?_⟩,
+    Equiv.refl _,
+    fun s => rfl
+  ⟩
   · intro σ
     obtain ⟨u, hu⟩ := D.conj σ
     refine ⟨u, fun s => ?_⟩
@@ -21,8 +29,7 @@ theorem UpperTheory.traces_from_eigenvalues_rank2 :
     obtain ⟨x, y, hxy⟩ := Multiset.card_eq_two.1 (D.card s)
     have hx : ‖x‖ = 1 := by simpa using D.pure s x (by rw [hxy]; simp)
     have hy : ‖y‖ = 1 := by simpa using D.pure s y (by rw [hxy]; simp)
-    have e1 : ((D.β s).map fun b => b⁻¹ ^ h).sum = x⁻¹ ^ h + y⁻¹ ^ h := by
-      rw [hxy]; simp
+    have e1 : ((D.β s).map fun b => b⁻¹ ^ h).sum = x⁻¹ ^ h + y⁻¹ ^ h := by rw [hxy]; simp
     have h1 : ‖x⁻¹ ^ h‖ = 1 := by simp [hx]
     have h2 : ‖y⁻¹ ^ h‖ = 1 := by simp [hy]
     rw [e1]
@@ -40,10 +47,10 @@ theorem UpperTheory.traces_from_eigenvalues_rank2 :
     have hx := D.intInv e hm s x (by rw [hxy]; simp)
     have hy := D.intInv e hm s y (by rw [hxy]; simp)
     rw [zpow_natCast] at hx hy
-    have e1 : ((D.β s).map fun b => b⁻¹ ^ h).sum = x⁻¹ ^ h + y⁻¹ ^ h := by
-      rw [hxy]; simp
-    have e2 : (((p ^ h : ℕ) : ℂ)) ^ e * (1 + (x⁻¹ ^ h + y⁻¹ ^ h)) =
-        ((p ^ (h * e) : ℕ) : ℂ) + (((p : ℂ) ^ e * x⁻¹) ^ h + ((p : ℂ) ^ e * y⁻¹) ^ h) := by
+    have e1 : ((D.β s).map fun b => b⁻¹ ^ h).sum = x⁻¹ ^ h + y⁻¹ ^ h := by rw [hxy]; simp
+    have e2
+        : (((p ^ h : ℕ) : ℂ)) ^ e * (1 + (x⁻¹ ^ h + y⁻¹ ^ h))
+          = ((p ^ (h * e) : ℕ) : ℂ) + (((p : ℂ) ^ e * x⁻¹) ^ h + ((p : ℂ) ^ e * y⁻¹) ^ h) := by
       push_cast; ring
     rw [e1, e2]
     refine IsIntegral.add ?_ ((hx.pow h).add (hy.pow h))

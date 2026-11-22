@@ -45,8 +45,11 @@ theorem nondegenerate_gram_tuple : NondegenerateGramTuple := by
     exact this
   obtain ⟨X0, hX⟩ := exists_nondegenerate X.B.I.E X.B.I.n (2 * D.R.rS + 2) hn X.B.I.J hH X.B.I.J_det
   refine ⟨X0, ?_⟩
-  have e : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.gramE X.B.I.cm.sig X.B.I.J X0 = PI.NormGramAtOrigin.gram (starRingEnd _) X.B.I.J X0 := by
+  have e
+      : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.gramE X.B.I.cm.sig X.B.I.J X0
+        = PI.NormGramAtOrigin.gram (starRingEnd _) X.B.I.J X0 := by
     ext a b; rfl
-  rw [e]; exact hX
+  rw [e]
+  exact hX
 
 end Formalism.L2.SG.NGLeaves

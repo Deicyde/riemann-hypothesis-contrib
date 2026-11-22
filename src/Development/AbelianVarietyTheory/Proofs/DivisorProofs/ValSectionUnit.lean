@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.W8AddTrans
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Mum.UnitValuedLeadingSection
@@ -27,31 +29,45 @@ def uK (z : (TK R).left) : Rˣ →* ((TK R).left.presheaf.stalk z)ˣ :=
 
 variable {R}
 
-def TopGood (P : PolAV (Spec (CommRingCat.of R))) (z : (TK R).left) (J : ((TK R).left ⟶ P.A.left) → P.L.ι) : Prop :=
-  Good P.L z J ∧ ∀ x : Spec (CommRingCat.of R) ⟶ P.A.left, x ≫ P.A.hom = 𝟙 _ → x ⁻¹ᵁ P.L.U (J (jK R ≫ x)) = ⊤
+def TopGood
+    (P : PolAV (Spec (CommRingCat.of R))) (z : (TK R).left) (J : ((TK R).left ⟶ P.A.left) → P.L.ι)
+    : Prop :=
+  Good P.L z J
+    ∧ ∀ x : Spec (CommRingCat.of R) ⟶ P.A.left, x ≫ P.A.hom = 𝟙 _ → x ⁻¹ᵁ P.L.U (J (jK R ≫ x)) = ⊤
 
-theorem gm_top_unit {R : Type} [CommRing R] [IsDomain R] (V : (Spec (CommRingCat.of R)).Opens) (hV : V = ⊤)
-    (v : Γ(Spec (CommRingCat.of R), V)ˣ) (z : (TK R).left) : ∃ u : Rˣ, gm (jK R) z V v = uK R z u := by
+theorem gm_top_unit
+    {R : Type} [CommRing R] [IsDomain R]
+    (V : (Spec (CommRingCat.of R)).Opens) (hV : V = ⊤) (v : Γ(Spec (CommRingCat.of R), V)ˣ)
+    (z : (TK R).left)
+    : ∃ u : Rˣ, gm (jK R) z V v = uK R z u := by
   subst hV
   refine ⟨Units.map (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom.toMonoidHom v, Units.ext ?_⟩
   have hz : jK R z ∈ (⊤ : (Spec (CommRingCat.of R)).Opens) := trivial
   simp only [gm, dif_pos hz]
-  have e := congrArg (fun f => f.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom (v : Γ(Spec (CommRingCat.of R), ⊤))))
-    (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (algebraMap R (FractionRing R))))
+  have e :=
+    congrArg
+      (fun f =>
+        f.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom (v : Γ(Spec (CommRingCat.of R), ⊤))))
+      (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (algebraMap R (FractionRing R))))
   simp only [CommRingCat.hom_comp, RingHom.comp_apply] at e
   simp [uK, thK, pullU]
   rw [CommRingCat.hom_ofHom] at e
-  have hv : (Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom
-      (v : Γ(Spec (CommRingCat.of R), ⊤))) = v := by
+  have hv
+      : (Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom
+          ((Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom (v : Γ(Spec (CommRingCat.of R), ⊤)))
+        = v := by
     rw [← CommRingCat.comp_apply, Iso.hom_inv_id]; rfl
   rw [e, hv]
   rfl
 
-theorem val_section_unit {R : Type} [CommRing R] [IsDomain R] (P : PolAV (Spec (CommRingCat.of R)))
-    (z : (TK R).left) (J : ((TK R).left ⟶ P.A.left) → P.L.ι) (hJ : TopGood P z J) {Y : Scheme.{0}} {K : Type}
-    [Fintype K] {φ : K → (Y ⟶ P.A.left)} {ε : K → ℤ} (t : LB.Gen (LB.LinComb P.L φ ε))
-    (q : Spec (CommRingCat.of R) ⟶ Y) (hq : ∀ k, (q ≫ φ k) ≫ P.A.hom = 𝟙 _) :
-    ∃ u : Rˣ, val t (jK R ≫ q) z J = uK R z u := by
+theorem val_section_unit
+    {R : Type} [CommRing R] [IsDomain R]
+    (P : PolAV (Spec (CommRingCat.of R))) (z : (TK R).left)
+    (J : ((TK R).left ⟶ P.A.left) → P.L.ι) (hJ : TopGood P z J)
+    {Y : Scheme.{0}} {K : Type} [Fintype K]
+    {φ : K → (Y ⟶ P.A.left)} {ε : K → ℤ} (t : LB.Gen (LB.LinComb P.L φ ε))
+    (q : Spec (CommRingCat.of R) ⟶ Y) (hq : ∀ k, (q ≫ φ k) ≫ P.A.hom = 𝟙 _)
+    : ∃ u : Rˣ, val t (jK R ≫ q) z J = uK R z u := by
   have htop : q ⁻¹ᵁ LB.wchart P.L φ (fun k => J ((jK R ≫ q) ≫ φ k)) = ⊤ := by
     refine eq_top_iff.2 fun p _ => Set.mem_iInter.2 fun k => ?_
     have h := hJ.2 (q ≫ φ k) (hq k)
@@ -65,22 +81,28 @@ theorem val_section_unit {R : Type} [CommRing R] [IsDomain R] (P : PolAV (Spec (
   obtain ⟨u, hu⟩ := gm_top_unit _ htop (pullU q _ (t.s (fun k => J ((jK R ≫ q) ≫ φ k)))) z
   exact ⟨u, (gm_pull (jK R) q z _ hz _).symm.trans hu⟩
 
-theorem exists_topGood (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (P : PolAV (Spec (CommRingCat.of R)))
-    (z : (TK R).left) : ∃ J, TopGood P z J := by
+theorem exists_topGood
+    (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
+    (P : PolAV (Spec (CommRingCat.of R))) (z : (TK R).left)
+    : ∃ J, TopGood P z J := by
   classical
   haveI : IsProper P.A.hom := P.isAb.proper
   haveI : IsDominant (jK R) := ⟨(PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical
     (algebraMap R (FractionRing R))).2 (by
       rw [(RingHom.injective_iff_ker_eq_bot _).1 (IsFractionRing.injective R (FractionRing R))]
       exact bot_le)⟩
-  have hext : ∀ x x' : Spec (CommRingCat.of R) ⟶ P.A.left, x ≫ P.A.hom = 𝟙 _ → x' ≫ P.A.hom = 𝟙 _ →
-      jK R ≫ x = jK R ≫ x' → x = x' := fun x x' hx hx' h =>
-    ext_of_isDominant_of_isSeparated P.A.hom (hx.trans hx'.symm) (jK R) h
+  have hext
+      : ∀ x x' : Spec (CommRingCat.of R) ⟶ P.A.left,
+        x ≫ P.A.hom = 𝟙 _ → x' ≫ P.A.hom = 𝟙 _ → jK R ≫ x = jK R ≫ x' → x = x' :=
+    fun x x' hx hx' h => ext_of_isDominant_of_isSeparated P.A.hom (hx.trans hx'.symm) (jK R) h
   choose top htop using fun x : Spec (CommRingCat.of R) ⟶ P.A.left =>
     ReciprocityTheory.ChartRestriction.G.DVR.GC.exists_chart_top P.L P.isLB x
   choose d hd using fun φ : (TK R).left ⟶ P.A.left => exists_chart P.isLB (φ z)
-  refine ⟨fun φ => if h : ∃ x, x ≫ P.A.hom = 𝟙 _ ∧ jK R ≫ x = φ then top h.choose else d φ,
-    fun φ => ?_, fun x hx => ?_⟩
+  refine ⟨
+    fun φ => if h : ∃ x, x ≫ P.A.hom = 𝟙 _ ∧ jK R ≫ x = φ then top h.choose else d φ,
+    fun φ => ?_,
+    fun x hx => ?_
+  ⟩
   · by_cases h : ∃ x, x ≫ P.A.hom = 𝟙 _ ∧ jK R ≫ x = φ
     · simp only [dif_pos h]
       have m : jK R z ∈ h.choose ⁻¹ᵁ P.L.U (top h.choose) := by rw [htop]; trivial

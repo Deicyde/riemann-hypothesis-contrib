@@ -11,8 +11,10 @@ open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Desc Polynomial
 
 namespace GlobalTheory.UnitLemma.Desc
 
-theorem dvr_dvd_pow {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {a y : O}
-    (ha : a ∈ IsLocalRing.maximalIdeal O) (hy : y ≠ 0) : ∃ k : ℕ, y ∣ a ^ k := by
+theorem dvr_dvd_pow
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {a y : O} (ha : a ∈ IsLocalRing.maximalIdeal O) (hy : y ≠ 0)
+    : ∃ k : ℕ, y ∣ a ^ k := by
   have hyt : IsDiscreteValuationRing.addVal O y ≠ ⊤ := by
     rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff]
   obtain ⟨n, hn⟩ := WithTop.ne_top_iff_exists.1 hyt
@@ -21,11 +23,13 @@ theorem dvr_dvd_pow {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRin
     exact ha
   refine ⟨n, IsDiscreteValuationRing.addVal_le_iff_dvd.1 ?_⟩
   rw [IsDiscreteValuationRing.addVal_pow, ← hn]
-  calc ((n : ℕ∞)) = n • (1 : ℕ∞) := by simp
+  calc
+    ((n : ℕ∞))
+      = n • (1 : ℕ∞) := by simp
     _ ≤ n • IsDiscreteValuationRing.addVal O a := nsmul_le_nsmul_right ha1 n
 
-theorem smul_pow_integral (K : UQ) (B : InvAlg K) (a : K.O) (ha : K.Small a) (x : B.A) :
-    ∃ k : ℕ, IsIntegral K.O ((al K a ^ k) • x) := by
+theorem smul_pow_integral (K : UQ) (B : InvAlg K) (a : K.O) (ha : K.Small a) (x : B.A)
+    : ∃ k : ℕ, IsIntegral K.O ((al K a ^ k) • x) := by
   have hxE : IsIntegral K.E x := Algebra.IsIntegral.isIntegral x
   obtain ⟨⟨m, hm⟩, hmx⟩ :=
     IsIntegral.exists_multiple_integral_of_isLocalization (nonZeroDivisors K.O) x hxE

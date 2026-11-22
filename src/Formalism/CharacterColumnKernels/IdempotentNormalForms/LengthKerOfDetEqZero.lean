@@ -55,19 +55,20 @@ lemma isUnit_det_AK (A : Matrix ι ι O) (hd : A.det ≠ 0) : IsUnit (AK A).det 
   exact fun h => hd (IsFractionRing.injective O (FractionRing O) (by rw [h, map_zero]))
 
 def phi (A : Matrix ι ι O) : (ι → O) →ₗ[O] (ι → KO O) where
-  toFun x i := Submodule.Quotient.mk (((AK A)⁻¹ *ᵥ (fun j => algebraMap O (FractionRing O) (x j))) i)
+  toFun x i :=
+    Submodule.Quotient.mk (((AK A)⁻¹ *ᵥ (fun j => algebraMap O (FractionRing O) (x j))) i)
   map_add' x y := by
     ext i
-    have : (fun j => algebraMap O (FractionRing O) (x j + y j)) =
-        (fun j => algebraMap O (FractionRing O) (x j)) +
-          (fun j => algebraMap O (FractionRing O) (y j)) := by
+    have : (fun j => algebraMap O (FractionRing O) (x j + y j))
+        = (fun j => algebraMap O (FractionRing O) (x j))
+          + (fun j => algebraMap O (FractionRing O) (y j)) := by
       ext j; simp
     simp only [Pi.add_apply]
     rw [this, Matrix.mulVec_add, Pi.add_apply, Submodule.Quotient.mk_add]
   map_smul' r x := by
     ext i
-    have : (fun j => algebraMap O (FractionRing O) (r • x j)) =
-        algebraMap O (FractionRing O) r • (fun j => algebraMap O (FractionRing O) (x j)) := by
+    have : (fun j => algebraMap O (FractionRing O) (r • x j))
+        = algebraMap O (FractionRing O) r • (fun j => algebraMap O (FractionRing O) (x j)) := by
       ext j; simp
     simp only [Pi.smul_apply, RingHom.id_apply]
     rw [this, Matrix.mulVec_smul, ← Submodule.Quotient.mk_smul]

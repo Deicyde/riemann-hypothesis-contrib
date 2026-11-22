@@ -20,10 +20,11 @@ private lemma char_eq_of_same_coset {G M : Type} [Group G] [CommGroup M]
   rw [map_mul, map_inv, inv_mul_eq_one] at h4
   exact h4
 
-theorem exists_extend_character_trivial_on_normal {G M : Type} [Group G] [CommGroup M]
-    (I Ik H : Subgroup G) (hH : H.Normal) (hdec : ∀ g ∈ I, ∃ s ∈ Ik, s⁻¹ * g ∈ H)
-    (ψ : ↥Ik →* M) (hψ : ∀ s : ↥Ik, (s : G) ∈ H → ψ s = 1) :
-    ∃ χ : ↥I →* M, ∀ (g : ↥I) (s : G) (hs : s ∈ Ik), s⁻¹ * (g : G) ∈ H → χ g = ψ ⟨s, hs⟩ := by
+theorem exists_extend_character_trivial_on_normal
+    {G M : Type} [Group G] [CommGroup M]
+    (I Ik H : Subgroup G) (hH : H.Normal) (hdec : ∀ g ∈ I, ∃ s ∈ Ik, s⁻¹ * g ∈ H) (ψ : ↥Ik →* M)
+    (hψ : ∀ s : ↥Ik, (s : G) ∈ H → ψ s = 1)
+    : ∃ χ : ↥I →* M, ∀ (g : ↥I) (s : G) (hs : s ∈ Ik), s⁻¹ * (g : G) ∈ H → χ g = ψ ⟨s, hs⟩ := by
   classical
   choose f hfIk hfH using hdec
   have key := char_eq_of_same_coset Ik H ψ hψ
@@ -36,8 +37,10 @@ theorem exists_extend_character_trivial_on_normal {G M : Type} [Group G] [CommGr
     have hab : (f a a.2 * f b b.2)⁻¹ * ((a * b : ↥I) : G) ∈ H := by
       show (f a a.2 * f b b.2)⁻¹ * ((a : G) * b) ∈ H
       have hc := hH.conj_mem _ (hfH a a.2) (f b b.2)⁻¹
-      have he : (f a a.2 * f b b.2)⁻¹ * ((a : G) * b)
-          = ((f b b.2)⁻¹ * ((f a a.2)⁻¹ * a) * (f b b.2)⁻¹⁻¹) * ((f b b.2)⁻¹ * b) := by group
+      have he
+          : (f a a.2 * f b b.2)⁻¹ * ((a : G) * b)
+            = ((f b b.2)⁻¹ * ((f a a.2)⁻¹ * a) * (f b b.2)⁻¹⁻¹) * ((f b b.2)⁻¹ * b) := by
+        group
       rw [he]
       exact H.mul_mem hc (hfH b b.2)
     rw [key ((a * b : ↥I) : G) _ (f a a.2 * f b b.2) _ (Ik.mul_mem (hfIk a a.2) (hfIk b b.2))
@@ -46,24 +49,42 @@ theorem exists_extend_character_trivial_on_normal {G M : Type} [Group G] [CommGr
   · intro g s hs hsg
     exact key g _ s _ hs (hfH g g.2) hsg
 
-theorem extend_characters_and_generator : ∀ {G F LL : Type} [Group G] [Field F] [Field LL] (I Ik H : Subgroup G), H.Normal → Ik ≤ I → (∀ g ∈ I, ∃ s ∈ Ik, s⁻¹ * g ∈ H) → ∀ (n : ℕ), 0 < n → ∀ (Ψ : ↥(rootsOfUnity n F) →* (↥Ik →* LLˣ)) (Y : Set F), (∀ y ∈ Y, ∃ u : ↥(rootsOfUnity n F), ((u : Fˣ) : F) = y) → (∀ u : ↥(rootsOfUnity n F), ((u : Fˣ) : F) ∈ Y → ∀ s : ↥Ik, (s : G) ∈ H → Ψ u s = 1) → ∃ ch : F → (↥I →* LLˣ), (∀ u : ↥(rootsOfUnity n F), ((u : Fˣ) : F) ∈ Y → ∀ (g : ↥I) (s : G) (hs : s ∈ Ik), s⁻¹ * (g : G) ∈ H → ch ((u : Fˣ) : F) g = Ψ u ⟨s, hs⟩) ∧ ∃ c : ↥I →* LLˣ, (∀ g, c g ^ n = 1) ∧ ∀ y ∈ Y, ∃ k : ℕ, ∀ g, ch y g = c g ^ k := by
+theorem extend_characters_and_generator
+    : ∀ {G F LL : Type} [Group G] [Field F] [Field LL] (I Ik H : Subgroup G),
+      H.Normal → Ik ≤ I → (∀ g ∈ I, ∃ s ∈ Ik, s⁻¹ * g ∈ H)
+        → ∀ (n : ℕ),
+          0 < n
+            → ∀ (Ψ : ↥(rootsOfUnity n F) →* (↥Ik →* LLˣ)) (Y : Set F),
+              (∀ y ∈ Y, ∃ u : ↥(rootsOfUnity n F), ((u : Fˣ) : F) = y)
+                → (∀ u : ↥(rootsOfUnity n F),
+                  ((u : Fˣ) : F) ∈ Y → ∀ s : ↥Ik, (s : G) ∈ H → Ψ u s = 1)
+                → ∃ ch : F → (↥I →* LLˣ),
+                  (∀ u : ↥(rootsOfUnity n F),
+                      ((u : Fˣ) : F) ∈ Y
+                        → ∀ (g : ↥I) (s : G) (hs : s ∈ Ik),
+                          s⁻¹ * (g : G) ∈ H → ch ((u : Fˣ) : F) g = Ψ u ⟨s, hs⟩)
+                    ∧ ∃ c : ↥I →* LLˣ,
+                      (∀ g, c g ^ n = 1) ∧ ∀ y ∈ Y, ∃ k : ℕ, ∀ g, ch y g = c g ^ k := by
   intro G F LL _ _ _ I Ik H hH _ hdec n hn Ψ Y hY hΨ
   classical
   have : NeZero n := ⟨hn.ne'⟩
-  let K : Subgroup ↥(rootsOfUnity n F) :=
-    { carrier := {u | ∀ s : ↥Ik, (s : G) ∈ H → Ψ u s = 1}
-      mul_mem' := fun {a b} ha hb s hs => by
-        simp only [Set.mem_ofPred_eq] at ha hb
-        rw [map_mul, MonoidHom.mul_apply, ha s hs, hb s hs, mul_one]
-      one_mem' := fun s _ => by rw [map_one, MonoidHom.one_apply]
-      inv_mem' := fun {a} ha s hs => by
-        simp only [Set.mem_ofPred_eq] at ha
-        rw [map_inv, MonoidHom.inv_apply, ha s hs, inv_one] }
+  let K : Subgroup ↥(rootsOfUnity n F) := {
+    carrier := {u | ∀ s : ↥Ik, (s : G) ∈ H → Ψ u s = 1}
+    mul_mem' := fun {a b} ha hb s hs => by
+      simp only [Set.mem_ofPred_eq] at ha hb
+      rw [map_mul, MonoidHom.mul_apply, ha s hs, hb s hs, mul_one]
+    one_mem' := fun s _ => by rw [map_one, MonoidHom.one_apply]
+    inv_mem' := fun {a} ha s hs => by
+      simp only [Set.mem_ofPred_eq] at ha
+      rw [map_inv, MonoidHom.inv_apply, ha s hs, inv_one]
+  }
   obtain ⟨ζ, hζ⟩ := IsCyclic.exists_generator (α := ↥K)
-  obtain ⟨c, hc⟩ := exists_extend_character_trivial_on_normal I Ik H hH hdec
-    (Ψ (ζ : ↥(rootsOfUnity n F))) (fun s hs => ζ.2 s hs)
-  have hk : ∀ y ∈ Y, ∃ k : ℕ, ∀ u : ↥(rootsOfUnity n F), ((u : Fˣ) : F) = y →
-      (ζ : ↥(rootsOfUnity n F)) ^ k = u := by
+  obtain ⟨c, hc⟩ :=
+    exists_extend_character_trivial_on_normal I Ik H hH hdec (Ψ (ζ : ↥(rootsOfUnity n F)))
+      (fun s hs => ζ.2 s hs)
+  have hk
+      : ∀ y ∈ Y, ∃ k : ℕ, ∀ u : ↥(rootsOfUnity n F),
+        ((u : Fˣ) : F) = y → (ζ : ↥(rootsOfUnity n F)) ^ k = u := by
     intro y hy
     obtain ⟨u₀, hu₀⟩ := hY y hy
     have hK : u₀ ∈ K := hΨ u₀ (hu₀ ▸ hy)
@@ -81,8 +102,7 @@ theorem extend_characters_and_generator : ∀ {G F LL : Type} [Group G] [Field F
   refine ⟨fun y => c ^ kk y, ?_, c, ?_, ?_⟩
   · intro u hu g s hs hsg
     show (c ^ kk ((u : Fˣ) : F)) g = Ψ u ⟨s, hs⟩
-    rw [MonoidHom.pow_apply, hc g s hs hsg, ← MonoidHom.pow_apply, ← map_pow,
-      hkk _ hu u rfl]
+    rw [MonoidHom.pow_apply, hc g s hs hsg, ← MonoidHom.pow_apply, ← map_pow, hkk _ hu u rfl]
   · intro g
     obtain ⟨s, hs, hsg⟩ := hdec g g.2
     rw [hc g s hs hsg, ← MonoidHom.pow_apply, ← map_pow, hpow, map_one, MonoidHom.one_apply]

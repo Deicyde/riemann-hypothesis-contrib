@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix
+  IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
 section Transport
 
-variable {R R' Γ Γ' M : Type} [CommRing R] [CommRing R'] [Group Γ] [TopologicalSpace Γ] [Group Γ']
-  [TopologicalSpace Γ'] [AddCommGroup M] [Module R M] [Module R' M] [TopologicalSpace M] [DiscreteTopology M]
-  (ρ : Representation R Γ M) (ρ' : Representation R' Γ' M) (e : Γ' ≃* Γ) (he : Continuous e)
-  (he' : Continuous e.symm) (h : ∀ g m, ρ' g m = ρ (e g) m)
+variable
+  {R R' Γ Γ' M : Type}
+  [CommRing R] [CommRing R'] [Group Γ] [TopologicalSpace Γ] [Group Γ'] [TopologicalSpace Γ']
+  [AddCommGroup M] [Module R M] [Module R' M] [TopologicalSpace M] [DiscreteTopology M]
+  (ρ : Representation R Γ M) (ρ' : Representation R' Γ' M) (e : Γ' ≃* Γ)
+  (he : Continuous e) (he' : Continuous e.symm) (h : ∀ g m, ρ' g m = ρ (e g) m)
 
 include h in
 private theorem invariants_equiv : Nonempty (H0 ρ ≃ H0 ρ') := by
@@ -55,15 +58,20 @@ private theorem first_cohomology_equiv : Nonempty (H1 ρ ≃ H1 ρ') := by
       refine ⟨m, fun g => ?_⟩
       have := hm (e.symm g)
       simpa [h] using this
-  let φ : Z1 ρ ≃ Z1 ρ' :=
-    { toFun := fun f => ⟨fun g => f.1 (e g), (key f.1).1 f.2⟩
-      invFun := fun f => ⟨fun g => f.1 (e.symm g), (key _).2 (by
+  let φ : Z1 ρ ≃ Z1 ρ' := {
+    toFun := fun f => ⟨fun g => f.1 (e g), (key f.1).1 f.2⟩
+    invFun := fun f => ⟨
+      fun g => f.1 (e.symm g),
+      (key _).2 (by
         rw [show (fun g => f.1 (e.symm (e g))) = f.1 from funext fun g => by simp]
-        exact f.2)⟩
-      left_inv := fun f => Subtype.ext (funext fun g => by simp)
-      right_inv := fun f => Subtype.ext (funext fun g => by simp) }
+        exact f.2)
+    ⟩
+    left_inv := fun f => Subtype.ext (funext fun g => by simp)
+    right_inv := fun f => Subtype.ext (funext fun g => by simp)
+  }
   refine ⟨Quotient.congr φ fun a b => ?_⟩
-  rw [Submodule.quotientRel_def, Submodule.quotientRel_def, Submodule.mem_comap, Submodule.mem_comap]
+  rw [Submodule.quotientRel_def, Submodule.quotientRel_def, Submodule.mem_comap,
+    Submodule.mem_comap]
   exact keyB _
 
 include he he' h in
@@ -99,30 +107,46 @@ private theorem second_cohomology_equiv : Nonempty (H2 ρ ≃ H2 ρ') := by
       rw [d1_apply] at this
       rw [d1_apply]
       simpa [h, map_mul] using this
-  let φ : Z2 ρ ≃ Z2 ρ' :=
-    { toFun := fun f => ⟨fun p => f.1 (e p.1, e p.2), (key f.1).1 f.2⟩
-      invFun := fun f => ⟨fun p => f.1 (e.symm p.1, e.symm p.2), (key _).2 (by
+  let φ : Z2 ρ ≃ Z2 ρ' := {
+    toFun := fun f => ⟨fun p => f.1 (e p.1, e p.2), (key f.1).1 f.2⟩
+    invFun := fun f => ⟨
+      fun p => f.1 (e.symm p.1, e.symm p.2),
+      (key _).2 (by
         rw [show (fun p : Γ' × Γ' => f.1 (e.symm (e p.1), e.symm (e p.2))) = f.1 from
           funext fun p => by simp]
-        exact f.2)⟩
-      left_inv := fun f => Subtype.ext (funext fun p => by simp)
-      right_inv := fun f => Subtype.ext (funext fun p => by simp) }
+        exact f.2)
+    ⟩
+    left_inv := fun f => Subtype.ext (funext fun p => by simp)
+    right_inv := fun f => Subtype.ext (funext fun p => by simp)
+  }
   refine ⟨Quotient.congr φ fun a b => ?_⟩
-  rw [Submodule.quotientRel_def, Submodule.quotientRel_def, Submodule.mem_comap, Submodule.mem_comap]
+  rw [Submodule.quotientRel_def, Submodule.quotientRel_def, Submodule.mem_comap,
+    Submodule.mem_comap]
   exact keyB _
 
 end Transport
 
-private def resC (R : Type) {k Γ M : Type} [CommRing R] [CommRing k] [Algebra R k] [Group Γ] [AddCommGroup M]
-    [Module R M] [Module k M] [IsScalarTower R k M] (ρ : Representation k Γ M) : Representation R Γ M where
+private def resC
+    (R : Type)
+    {k Γ M : Type} [CommRing R] [CommRing k] [Algebra R k] [Group Γ] [AddCommGroup M] [Module R M]
+    [Module k M] [IsScalarTower R k M]
+    (ρ : Representation k Γ M)
+    : Representation R Γ M where
   toFun g := (ρ g).restrictScalars R
   map_one' := by ext; simp
   map_mul' g h := by ext; simp
 
-theorem UpperTheory.local_euler_characteristic_of_prime_not_mem :
-    LocalFiniteness → LocalEulerChar → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (k M : Type) [Field k] [Finite k] [CharP k l] [AddCommGroup M] [Module k M] [Module.Finite k M] [TopologicalSpace M] [DiscreteTopology M] [IsTopologicalAddGroup M] [ContinuousConstSMul k M] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 ℚ)), IsPlaceOver A v → ((l : ℕ) : 𝓞 ℚ) ∉ v.asIdeal →
-          ∀ ρ : Representation k (Dec (F := ℚ) A) M, ContAction ρ →
-          Module.Finite k (H1 ρ) ∧ Module.Finite k (H2 ρ) ∧ Module.finrank k (H1 ρ) = Module.finrank k (H0 ρ) + Module.finrank k (H2 ρ) := by
+theorem UpperTheory.local_euler_characteristic_of_prime_not_mem
+    : LocalFiniteness → LocalEulerChar
+      → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (k M : Type)
+          [Field k] [Finite k] [CharP k l] [AddCommGroup M] [Module k M] [Module.Finite k M]
+          [TopologicalSpace M] [DiscreteTopology M] [IsTopologicalAddGroup M]
+          [ContinuousConstSMul k M] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 ℚ)),
+        IsPlaceOver A v → ((l : ℕ) : 𝓞 ℚ) ∉ v.asIdeal
+          → ∀ ρ : Representation k (Dec (F := ℚ) A) M,
+            ContAction ρ
+              → Module.Finite k (H1 ρ) ∧ Module.Finite k (H2 ρ)
+                ∧ Module.finrank k (H1 ρ) = Module.finrank k (H0 ρ) + Module.finrank k (H2 ρ) := by
   intro hfin hec Ω _ _ _ l _ k M _ _ _ _ _ _ _ _ _ _ A v hv hl ρ hc
   haveI : Finite M := Module.finite_of_finite k
   haveI : CharP k (l ^ 1) := by rw [pow_one]; infer_instance
@@ -143,8 +167,9 @@ theorem UpperTheory.local_euler_characteristic_of_prime_not_mem :
   have hcard : Nat.card (H1 ρ) = Nat.card (H0 ρ) * Nat.card (H2 ρ) := by
     rw [← Nat.card_congr e1, ← Nat.card_congr e0, ← Nat.card_congr e2]
     exact hE
-  have pw : ∀ (V : Type) [AddCommGroup V] [Module k V] [Finite V],
-      Nat.card V = Nat.card k ^ Module.finrank k V := by
+  have pw
+      : ∀ (V : Type) [AddCommGroup V] [Module k V] [Finite V],
+        Nat.card V = Nat.card k ^ Module.finrank k V := by
     intro V _ _ _
     haveI := Fintype.ofFinite V
     haveI := Fintype.ofFinite k

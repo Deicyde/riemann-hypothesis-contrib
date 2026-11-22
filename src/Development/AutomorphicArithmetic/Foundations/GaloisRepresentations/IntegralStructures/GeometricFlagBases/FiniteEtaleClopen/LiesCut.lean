@@ -8,8 +8,8 @@ open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain
 open GlobalTheory.GalV (HTower)
 open UpperTheory.Gal.Int.Geo UpperTheory.Gal.Int.Geo.Cut
 
-private theorem fEt_surj {Y X : Scheme.{0}} {f : Y ⟶ X} {d : ℕ} (hf : FEt f d) (hd : 0 < d) (x : X) :
-    ∃ y : Y, f y = x := by
+private theorem fEt_surj {Y X : Scheme.{0}} {f : Y ⟶ X} {d : ℕ} (hf : FEt f d) (hd : 0 < d) (x : X)
+    : ∃ y : Y, f y = x := by
   let K := AlgebraicClosure (X.residueField x)
   let b : Spec (CommRingCat.of K) ⟶ Spec (X.residueField x) :=
     Spec.map (CommRingCat.ofHom (algebraMap (X.residueField x) K))
@@ -28,8 +28,9 @@ private theorem fEt_surj {Y X : Scheme.{0}} {f : Y ⟶ X} {d : ℕ} (hf : FEt f 
   rw [← Scheme.Hom.comp_apply, hy]
   exact h1
 
-private theorem fEt_comp_iso {Y X X' : Scheme.{0}} {f : Y ⟶ X} (e : X ⟶ X') [IsIso e] {d : ℕ}
-    (hf : FEt f d) : FEt (f ≫ e) d := by
+private theorem fEt_comp_iso
+    {Y X X' : Scheme.{0}} {f : Y ⟶ X} (e : X ⟶ X') [IsIso e] {d : ℕ} (hf : FEt f d)
+    : FEt (f ≫ e) d := by
   obtain ⟨h1, h2, h3⟩ := hf
   refine ⟨inferInstance, inferInstance, fun K _ _ x => ?_⟩
   rw [← h3 K (x ≫ inv e)]
@@ -37,8 +38,7 @@ private theorem fEt_comp_iso {Y X X' : Scheme.{0}} {f : Y ⟶ X} (e : X ⟶ X') 
   · rw [← cancel_mono e]; simp [y.2]
   · rw [← Category.assoc, y.2]; simp
 
-theorem UpperTheory.Gal.Int.Geo.Cut.liesCut :
-    UpperTheory.Gal.Int.Geo.Cut.LiesCut := by
+theorem UpperTheory.Gal.Int.Geo.Cut.liesCut : UpperTheory.Gal.Int.Geo.Cut.LiesCut := by
   intro k L O _ _ _ _ H θ C C' j hj hπ g T s t m hL
   obtain ⟨hm, κ, h, ht, hF⟩ := hL
   have first : ∀ x : T, s x ∈ Set.range C.π → t x ∈ Set.range C.π := by
@@ -46,15 +46,13 @@ theorem UpperTheory.Gal.Int.Geo.Cut.liesCut :
     obtain ⟨w, hw1, hw2⟩ := Scheme.Pullback.exists_preimage_pullback z x hz
     obtain ⟨y, rfl⟩ := fEt_surj hF hm w
     refine ⟨H.t g y, ?_⟩
-    have hx : κ y = x := by
-      rw [← hw2, ← Scheme.Hom.comp_apply, pullback.lift_snd]
+    have hx : κ y = x := by rw [← hw2, ← Scheme.Hom.comp_apply, pullback.lift_snd]
     rw [← hx, ← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, ht]
   refine ⟨first, ?_⟩
   intro T' i s' t' hR
   have : IsOpenImmersion i := hR.op
   have : IsOpenImmersion j := hj.op
-  have hrj : ∀ z, C.π z ∈ Set.range j := fun z =>
-    ⟨C'.π z, by rw [← hπ, Scheme.Hom.comp_apply]⟩
+  have hrj : ∀ z, C.π z ∈ Set.range j := fun z => ⟨C'.π z, by rw [← hπ, Scheme.Hom.comp_apply]⟩
   have hκ : Set.range κ ⊆ Set.range i := by
     rintro _ ⟨y, rfl⟩
     rw [hR.rng]
@@ -80,10 +78,12 @@ theorem UpperTheory.Gal.Int.Geo.Cut.liesCut :
     rw [hR.rng]
     refine ⟨?_, ?_⟩
     · show s (pullback.snd C.π s w) ∈ Set.range j
-      rw [hs1]; exact hrj _
+      rw [hs1]
+      exact hrj _
     · show t (pullback.snd C.π s w) ∈ Set.range j
       obtain ⟨z, hz⟩ := first _ hmem
-      rw [← hz]; exact hrj _
+      rw [← hz]
+      exact hrj _
   let σ : pullback C.π s ⟶ T' := IsOpenImmersion.lift i (pullback.snd C.π s) hσ
   have hσ' : σ ≫ i = pullback.snd C.π s := IsOpenImmersion.lift_fac i _ hσ
   have hc : pullback.fst C.π s ≫ C'.π = σ ≫ s' := by

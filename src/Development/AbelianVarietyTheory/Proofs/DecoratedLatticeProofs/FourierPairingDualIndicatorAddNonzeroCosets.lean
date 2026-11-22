@@ -16,15 +16,19 @@ namespace GlobalTheory.FinPl.Comm
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 variable {n : Type} [Fintype n]
 
-
 open Classical in
-theorem integral_vecInd_eq_zero [MeasurableSpace k] [BorelSpace k] (χ : AddChar k Circle) (e : k)
-    (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (L : Submodule 𝒪[k] (n → k)) (η : n → k) {y₀ : n → k}
-    (hy₀ : y₀ ∈ L) (hne : χ (e * (η ⬝ᵥ y₀)) ≠ 1) :
-    ∫ y, vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ) ∂μ = 0 := by
+theorem integral_vecInd_eq_zero
+    [MeasurableSpace k] [BorelSpace k]
+    (χ : AddChar k Circle) (e : k)
+    (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+    (L : Submodule 𝒪[k] (n → k)) (η : n → k)
+    {y₀ : n → k} (hy₀ : y₀ ∈ L) (hne : χ (e * (η ⬝ᵥ y₀)) ≠ 1)
+    : ∫ y, vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ) ∂μ = 0 := by
   have h := integral_add_right_eq_self (μ := μ) (fun y => vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ)) y₀
-  have e2 : ∀ y, vecInd L (y + y₀) * (χ (e * (η ⬝ᵥ (y + y₀))) : ℂ) =
-      (χ (e * (η ⬝ᵥ y₀)) : ℂ) * (vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ)) := fun y => by
+  have e2
+      : ∀ y,
+        vecInd L (y + y₀) * (χ (e * (η ⬝ᵥ (y + y₀))) : ℂ)
+          = (χ (e * (η ⬝ᵥ y₀)) : ℂ) * (vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ)) := fun y => by
     rw [dotProduct_add, mul_add, AddChar.map_add_eq_mul, Circle.coe_mul, vecInd, vecInd,
       if_congr (L.add_mem_iff_left hy₀) rfl rfl]
     ring
@@ -33,9 +37,12 @@ theorem integral_vecInd_eq_zero [MeasurableSpace k] [BorelSpace k] (χ : AddChar
   by_contra h0
   exact hne (Circle.ext (by simpa using (mul_eq_right₀ h0).1 h))
 
-theorem exists_lifts_value (L : Submodule 𝒪[k] (n → k)) {f : Module.Dual 𝓀[k] (Red L)} (hf : f ≠ 0)
-    {F : n → k} (hF : Lifts L F f) (b : 𝓀[k]) :
-    ∃ y₀ ∈ L, ∃ s : 𝒪[k], (s : k) = F ⬝ᵥ y₀ ∧ residue 𝒪[k] s = b := by
+theorem exists_lifts_value
+    (L : Submodule 𝒪[k] (n → k))
+    {f : Module.Dual 𝓀[k] (Red L)} (hf : f ≠ 0)
+    {F : n → k} (hF : Lifts L F f)
+    (b : 𝓀[k])
+    : ∃ y₀ ∈ L, ∃ s : 𝒪[k], (s : k) = F ⬝ᵥ y₀ ∧ residue 𝒪[k] s = b := by
   obtain ⟨x, hx⟩ : ∃ x, f x ≠ 0 := by
     by_contra h
     push Not at h
@@ -44,13 +51,19 @@ theorem exists_lifts_value (L : Submodule 𝒪[k] (n → k)) {f : Module.Dual �
   obtain ⟨t, ht⟩ := residue_surjective (R := 𝒪[k]) (b * (f (Red.mk L y))⁻¹)
   obtain ⟨s, hs, hs'⟩ := hF (t • y)
   refine ⟨_, (t • y).2, s, hs, ?_⟩
-  rw [hs', map_smul, ← Red.residue_smul, map_smul, ht, smul_eq_mul, mul_assoc, inv_mul_cancel₀ hx, mul_one]
+  rw [hs', map_smul, ← Red.residue_smul, map_smul, ht, smul_eq_mul, mul_assoc, inv_mul_cancel₀ hx,
+    mul_one]
 
-theorem integral_vecInd_coset [MeasurableSpace k] [BorelSpace k] (q : Unif k) (χ : AddChar k Circle)
-    (hχ : HasConductor χ 1) (e : k) (he : e = 1 ∨ e = -1) (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
-    (L : Submodule 𝒪[k] (n → k)) {f : Module.Dual 𝓀[k] (Red L)} (hf : f ≠ 0) {F η : n → k}
-    (hF : Lifts L F f) (hη : InDual L (η - q.inv • F)) :
-    ∫ y, vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ) ∂μ = 0 := by
+theorem integral_vecInd_coset
+    [MeasurableSpace k] [BorelSpace k]
+    (q : Unif k)
+    (χ : AddChar k Circle) (hχ : HasConductor χ 1)
+    (e : k) (he : e = 1 ∨ e = -1)
+    (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+    (L : Submodule 𝒪[k] (n → k))
+    {f : Module.Dual 𝓀[k] (Red L)} (hf : f ≠ 0)
+    {F η : n → k} (hF : Lifts L F f) (hη : InDual L (η - q.inv • F))
+    : ∫ y, vecInd L y * (χ (e * (η ⬝ᵥ y)) : ℂ) ∂μ = 0 := by
   obtain ⟨a, ha⟩ : ∃ a, resChar χ hχ q a ≠ 1 := by
     by_contra h
     push Not at h
@@ -71,19 +84,25 @@ theorem integral_vecInd_coset [MeasurableSpace k] [BorelSpace k] (q : Unif k) (�
     change _ = _ * (e * _) + _
     ring
   rw [hsplit, AddChar.map_add_eq_mul, apply_int_eq_one hχ ⟨_, hl⟩, mul_one] at h
-  rw [show a = residue 𝒪[k] (ε * s) by rw [map_mul, hs', ← mul_assoc, hε, one_mul], resChar_residue, h]
+  rw [show a = residue 𝒪[k] (ε * s) by rw [map_mul, hs', ← mul_assoc, hε, one_mul], resChar_residue,
+    h]
   rfl
 
 end GlobalTheory.FinPl.Comm
 
 namespace GlobalTheory.FinPl.Comm
 
-theorem fpair_vecInd_dualInd_add_cosets : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] [DecidableEq n]
-    (q : Unif k) (χ : AddChar k Circle), HasConductor χ 1 → ∀ (e : k), (e = 1 ∨ e = -1) →
-    ∀ (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (L : Submodule 𝒪[k] (n → k)) [L.IsLattice k],
-    fpair χ e μ (vecInd L) (dualInd L + ∑ Q ∈ withLat L, cosetInd q Q.lat Q.red) =
-      fpair χ e μ (vecInd L) (dualInd L) := by
+theorem fpair_vecInd_dualInd_add_cosets
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] [DecidableEq n] (q : Unif k)
+        (χ : AddChar k Circle),
+      HasConductor χ 1
+        → ∀ (e : k),
+          (e = 1 ∨ e = -1)
+            → ∀ (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (L : Submodule 𝒪[k] (n → k))
+                [L.IsLattice k],
+              fpair χ e μ (vecInd L) (dualInd L + ∑ Q ∈ withLat L, cosetInd q Q.lat Q.red)
+                = fpair χ e μ (vecInd L) (dualInd L) := by
   intro k _ _ _ _ _ _ n _ _ q χ hχ e he μ _ L _
   unfold fpair
   congr 1

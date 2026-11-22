@@ -11,25 +11,40 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR GlobalTheory.HodgeCoh
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR
+  GlobalTheory.HodgeCoh
 
 namespace GlobalTheory.CompanionTheory.HodgeFormUnit
 
-theorem gForm_one {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) :
-    CrystallineSemistableComparison.Om.L2.gForm q 1 Fin.elim0 = oneOm K (Sec q ⊤) := by
+theorem gForm_one {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K))
+    : CrystallineSemistableComparison.Om.L2.gForm q 1 Fin.elim0 = oneOm K (Sec q ⊤) := by
   apply Subtype.ext
   simp [CrystallineSemistableComparison.Onto.form, oneOm]
 
-theorem e_oneH {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K))
-    (e : CrystallineSemistableComparison.HT.Hdg q 0 0 ≃ₗ[K] OmU q ⊤ 0) (h : CrystallineSemistableComparison.Om.L2.IsOmT q 0 e) :
-    e (CrystallineSemistableComparison.HT.oneH q) = oneOm K (Sec q ⊤) := by
-  let Λ : CrystallineSemistableComparison.Om.L2.LiftsT q :=
-    { v := fun T g => Function.surjInv Ideal.Quotient.mk_surjective
-        (CrystallineSemistableComparison.Pb.ev (γ := dividedPowersBot K) (p := 0) (q := q) (κ := Ideal.Quotient.mk ⊥) T (CrystallineSemistableComparison.Om.L2.inTop q T) g)
-      hv := fun T g => Function.surjInv_eq _ _ }
+theorem e_oneH
+    {K : Type} [CommRing K]
+    {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K))
+    (e : CrystallineSemistableComparison.HT.Hdg q 0 0 ≃ₗ[K] OmU q ⊤ 0)
+    (h : CrystallineSemistableComparison.Om.L2.IsOmT q 0 e)
+    : e (CrystallineSemistableComparison.HT.oneH q) = oneOm K (Sec q ⊤) := by
+  let Λ : CrystallineSemistableComparison.Om.L2.LiftsT q := {
+    v := fun T g =>
+      Function.surjInv Ideal.Quotient.mk_surjective
+        (CrystallineSemistableComparison.Pb.ev (γ := dividedPowersBot K) (p := 0) (q := q)
+          (κ := Ideal.Quotient.mk ⊥) T (CrystallineSemistableComparison.Om.L2.inTop q T) g)
+    hv := fun T g => Function.surjInv_eq _ _
+  }
   obtain ⟨f, hf, hc, hz⟩ := h 1 Fin.elim0 Λ
-  have hf' : f = (CrystallineSemistableComparison.Pb.toSq (CrystallineSemistableComparison.Pb.thFil (CrystallineSemistableComparison.smFun X q) (0 : ℕ)) (CrystallineSemistableComparison.Pb.thFil (CrystallineSemistableComparison.smFun X q) (((0 : ℕ) : ℤ) + 1))
-      fun T => T.pdPow_zero).pullC 0 (fun s => (1 : (CrystallineSemistableComparison.Pb.thA (CrystallineSemistableComparison.smFun X q)).obj (s.obj (Fin.last 0)))) := by
+  have hf'
+      : f
+        = (CrystallineSemistableComparison.Pb.toSq
+            (CrystallineSemistableComparison.Pb.thFil (CrystallineSemistableComparison.smFun X q)
+              (0 : ℕ))
+            (CrystallineSemistableComparison.Pb.thFil (CrystallineSemistableComparison.smFun X q)
+              (((0 : ℕ) : ℤ) + 1))
+            fun T => T.pdPow_zero).pullC 0 (fun s =>
+          (1 : (CrystallineSemistableComparison.Pb.thA (CrystallineSemistableComparison.smFun X
+            q)).obj (s.obj (Fin.last 0)))) := by
     funext s
     apply Subtype.ext
     refine (hz s).trans ?_
@@ -41,7 +56,9 @@ theorem e_oneH {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRin
     change Λ.form 1 Fin.elim0 s - 1 ∈ (s.obj (Fin.last 0)).pdPow 1
     rw [hv]
     exact (s.obj (Fin.last 0)).J_le_pdPow_one hJ
-  have h1 : CrystallineSemistableComparison.HT.oneH q = e.symm (CrystallineSemistableComparison.Om.L2.gForm q 1 Fin.elim0) := by
+  have h1
+      : CrystallineSemistableComparison.HT.oneH q
+        = e.symm (CrystallineSemistableComparison.Om.L2.gForm q 1 Fin.elim0) := by
     refine Eq.trans ?_ hc.symm
     exact congrArg Submodule.Quotient.mk (Subtype.ext hf'.symm)
   rw [h1, LinearEquiv.apply_symm_apply, gForm_one]

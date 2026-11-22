@@ -12,7 +12,16 @@ open scoped IntermediateField
 
 namespace GlobalTheory.QuadInHost
 
-theorem exists_quadField : ∀ {E : Type} [Field E] [NumberField E] {I : Type} [Fintype I] (d : ℕ) (φ : I → E →+* ℂ), GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsFieldData d φ → d % 4 = 3 → ∀ (Λ : PeriodPair), GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsIntLattice d Λ → ∃ K : IntermediateField ℚ E, Module.finrank ℚ K = 2 ∧ discr K = -(d : ℤ) ∧ ∃ φK : K →+* ℂ, (∀ i, (φ i).comp (algebraMap K E) = φK) ∧ (starRingEnd ℂ).comp φK ≠ φK ∧ IsLatOf φK 1 Λ := by
+theorem exists_quadField
+    : ∀ {E : Type} [Field E] [NumberField E] {I : Type} [Fintype I] (d : ℕ) (φ : I → E →+* ℂ),
+      GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsFieldData d φ → d % 4 = 3
+        → ∀ (Λ : PeriodPair),
+          GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsIntLattice d Λ
+            → ∃ K : IntermediateField ℚ E,
+              Module.finrank ℚ K = 2 ∧ discr K = -(d : ℤ)
+                ∧ ∃ φK : K →+* ℂ,
+                  (∀ i, (φ i).comp (algebraMap K E) = φK) ∧ (starRingEnd ℂ).comp φK ≠ φK
+                    ∧ IsLatOf φK 1 Λ := by
   intro E _ _ I _ d φ hF hd4 Λ hΛ
   obtain ⟨hp, hd, -, -, -, hI, -, w, hw, hφw⟩ := hF
   have hd0 : (0 : ℚ) < d := by exact_mod_cast hp.pos
@@ -23,8 +32,9 @@ theorem exists_quadField : ∀ {E : Type} [Field E] [NumberField E] {I : Type} [
   have hi : IsIntegral ℚ w := ⟨_, hm, he⟩
   have h2 : Module.finrank ℚ ℚ⟮w⟯ = 2 := by
     rw [IntermediateField.adjoin.finrank hi]
-    refine le_antisymm ((Polynomial.natDegree_le_natDegree (minpoly.min ℚ w hm he)).trans
-      (by compute_degree)) ((minpoly.two_le_natDegree_iff hi).2 ?_)
+    refine le_antisymm
+      ((Polynomial.natDegree_le_natDegree (minpoly.min ℚ w hm he)).trans (by compute_degree))
+      ((minpoly.two_le_natDegree_iff hi).2 ?_)
     rintro ⟨q, hq⟩
     have h1 : (algebraMap ℚ E q) ^ 2 = -(d : E) := by rw [hq]; exact hw
     have h3 : q ^ 2 = -(d : ℚ) := (algebraMap ℚ E).injective (by simpa using h1)
@@ -38,9 +48,10 @@ theorem exists_quadField : ∀ {E : Type} [Field E] [NumberField E] {I : Type} [
     exact_mod_cast this.ne'
   refine ⟨ℚ⟮w⟯, h2, GlobalTheory.discr_eq_neg_of_sq_eq h2 hp.squarefree hd4 hr, φK, ?_, ?_, ?_⟩
   · intro i
-    have := (IntermediateField.adjoin.powerBasis hi).algHom_ext
-      (f := ((φ i).comp (algebraMap ℚ⟮w⟯ E)).toRatAlgHom) (g := φK.toRatAlgHom)
-      (by simp only [IntermediateField.adjoin.powerBasis_gen]; exact (hφr i).trans (hφr i₀).symm)
+    have :=
+      (IntermediateField.adjoin.powerBasis hi).algHom_ext
+        (f := ((φ i).comp (algebraMap ℚ⟮w⟯ E)).toRatAlgHom) (g := φK.toRatAlgHom)
+        (by simp only [IntermediateField.adjoin.powerBasis_gen]; exact (hφr i).trans (hφr i₀).symm)
     exact congrArg AlgHom.toRingHom this
   · intro h
     have := congrArg (fun f => f r) h
@@ -52,7 +63,8 @@ theorem exists_quadField : ∀ {E : Type} [Field E] [NumberField E] {I : Type} [
     rcases mul_eq_zero.1 h0 with h0 | h0
     · simp at h0
     · exact hsq h0
-  · obtain ⟨ω, hω2, hgen⟩ := GlobalTheory.exists_integer_generator_of_sq_eq_neg h2 hp.squarefree hd4 hr
+  · obtain ⟨ω, hω2, hgen⟩ :=
+      GlobalTheory.exists_integer_generator_of_sq_eq_neg h2 hp.squarefree hd4 hr
     have hφω : φK ω = (1 + Complex.I * (Real.sqrt d : ℂ)) / 2 := by
       have := congrArg φK hω2
       rw [map_mul, map_add (f := _), map_one, map_ofNat, show φK r = _ from hφr i₀] at this

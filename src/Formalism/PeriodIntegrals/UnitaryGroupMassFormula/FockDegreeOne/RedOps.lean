@@ -16,17 +16,18 @@ open PI.FockOneDegW
 
 variable {p q r s : ℕ}
 
-theorem lowOp_apply (c d : Ix r s) (P : Pol p q r s) :
-    lowOp (p := p) (q := q) c d P = ∑ a : Ix p q, (if linePos ((a, d) : Ln p q r s) = true then
-      pderiv ((a, c) : Ln p q r s) (pderiv ((a, d) : Ln p q r s) P) else 0) := by
+theorem lowOp_apply (c d : Ix r s) (P : Pol p q r s)
+    : lowOp (p := p) (q := q) c d P
+      = ∑ a : Ix p q, (if linePos ((a, d) : Ln p q r s) = true then
+        pderiv ((a, c) : Ln p q r s) (pderiv ((a, d) : Ln p q r s) P) else 0) := by
   unfold lowOp
   rw [LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun a _ => ?_
   split_ifs <;> rfl
 
-theorem hc_lowOp (c d : Ix r s) (e : ℕ) (P : Pol p q r s) :
-    homogeneousComponent e (lowOp (p := p) (q := q) c d P) =
-      lowOp (p := p) (q := q) c d (homogeneousComponent (e + 2) P) := by
+theorem hc_lowOp (c d : Ix r s) (e : ℕ) (P : Pol p q r s)
+    : homogeneousComponent e (lowOp (p := p) (q := q) c d P)
+      = lowOp (p := p) (q := q) c d (homogeneousComponent (e + 2) P) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [lowOp_apply, lowOp_apply, map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -34,13 +35,17 @@ theorem hc_lowOp (c d : Ix r s) (e : ℕ) (P : Pol p q r s) :
   · rw [FockRL.hc_pderiv, FockRL.hc_pderiv]
   · exact map_zero _
 
-theorem hc_comm_of_homog {σ : Type} (T : Module.End ℂ (MvPolynomial σ ℂ))
-    (hT : ∀ (d : ℕ) (P : MvPolynomial σ ℂ), P ∈ homog σ d → T P ∈ homog σ d) (e : ℕ)
-    (P : MvPolynomial σ ℂ) :
-    homogeneousComponent e (T P) = T (homogeneousComponent e P) := by
-  have key : ∀ d, homogeneousComponent e (T (homogeneousComponent d P)) =
-      if e = d then T (homogeneousComponent d P) else 0 := fun d =>
-    homogeneousComponent_of_mem (hT d _ ((mem_homogeneousSubmodule _ _).2 (homogeneousComponent_isHomogeneous d P)))
+theorem hc_comm_of_homog
+    {σ : Type} (T : Module.End ℂ (MvPolynomial σ ℂ))
+    (hT : ∀ (d : ℕ) (P : MvPolynomial σ ℂ), P ∈ homog σ d → T P ∈ homog σ d)
+    (e : ℕ) (P : MvPolynomial σ ℂ)
+    : homogeneousComponent e (T P) = T (homogeneousComponent e P) := by
+  have key
+      : ∀ d,
+        homogeneousComponent e (T (homogeneousComponent d P))
+          = if e = d then T (homogeneousComponent d P) else 0 := fun d =>
+    homogeneousComponent_of_mem (hT d _
+      ((mem_homogeneousSubmodule _ _).2 (homogeneousComponent_isHomogeneous d P)))
   conv_lhs => rw [← sum_homogeneousComponent P]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum]
@@ -51,8 +56,8 @@ theorem hc_comm_of_homog {σ : Type} (T : Module.End ℂ (MvPolynomial σ ℂ))
   · simp only [Finset.mem_range, not_lt] at he
     rw [homogeneousComponent_eq_zero _ _ (by omega), map_zero]
 
-theorem inner_posOp (a b : Ix p q) (hab : sameBlock a b) (P Q : Pol p q r s) :
-    fockInner P (posOp a b Q) = fockInner (posOp b a P) Q := by
+theorem inner_posOp (a b : Ix p q) (hab : sameBlock a b) (P Q : Pol p q r s)
+    : fockInner P (posOp a b Q) = fockInner (posOp b a P) Q := by
   rw [posOp_apply, posOp_apply, fockInner_sum_right, fockInner_sum_left]
   refine Finset.sum_congr rfl fun c _ => ?_
   have hl : linePos ((b, c) : Ln p q r s) = linePos ((a, c) : Ln p q r s) :=
@@ -62,8 +67,8 @@ theorem inner_posOp (a b : Ix p q) (hab : sameBlock a b) (P Q : Pol p q r s) :
   · rw [fockInner_mul_X, fockInner_X_mul]
   · rw [fockInner_zero_right, fockInner_zero_left]
 
-theorem inner_negOp (a b : Ix p q) (hab : sameBlock a b) (P Q : Pol p q r s) :
-    fockInner P (negOp a b Q) = fockInner (negOp b a P) Q := by
+theorem inner_negOp (a b : Ix p q) (hab : sameBlock a b) (P Q : Pol p q r s)
+    : fockInner P (negOp a b Q) = fockInner (negOp b a P) Q := by
   rw [negOp_apply, negOp_apply, fockInner_sum_right, fockInner_sum_left]
   refine Finset.sum_congr rfl fun c _ => ?_
   have hl : linePos ((b, c) : Ln p q r s) = linePos ((a, c) : Ln p q r s) :=
@@ -73,12 +78,13 @@ theorem inner_negOp (a b : Ix p q) (hab : sameBlock a b) (P Q : Pol p q r s) :
   · rw [fockInner_zero_right, fockInner_zero_left]
   · rw [fockInner_mul_X, fockInner_X_mul]
 
-theorem dd_X_mul (m m' l : Ln p q r s) (Q : Pol p q r s) :
-    pderiv m (pderiv m' (X l * Q)) = X l * pderiv m (pderiv m' Q) +
-      (if m' = l then pderiv m Q else 0) + (if m = l then pderiv m' Q else 0) := by
+theorem dd_X_mul (m m' l : Ln p q r s) (Q : Pol p q r s)
+    : pderiv m (pderiv m' (X l * Q))
+      = X l * pderiv m (pderiv m' Q) + (if m' = l then pderiv m Q else 0)
+        + (if m = l then pderiv m' Q else 0) := by
   classical
-  by_cases h1 : m' = l <;> by_cases h2 : m = l <;>
-    simp [h1, h2, Derivation.leibniz, pderiv_X, Pi.single_apply, eq_comm] <;> ring
+  by_cases h1 : m' = l <;> by_cases h2 : m = l
+    <;> simp [h1, h2, Derivation.leibniz, pderiv_X, Pi.single_apply, eq_comm] <;> ring
 
 end PI.FockOneDegW.RedOps
 

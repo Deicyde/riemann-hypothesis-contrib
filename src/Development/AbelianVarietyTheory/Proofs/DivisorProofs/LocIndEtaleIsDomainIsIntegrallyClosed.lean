@@ -44,8 +44,22 @@ lemma isIntegrallyClosed_of_forall_monic_root (T : Type) [CommRing T] [IsDomain 
 
 end LocIndEtale
 
-theorem locIndEtale_isDomain_isIntegrallyClosed :
-    ∀ (T O : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing O] [Algebra T O] [Algebra (Polynomial T) O] [IsScalarTower T (Polynomial T) O] [HenselianLocalRing O] [IsSepClosed (ResidueField O)] (q : ℕ), (IsDomain T ∧ ∀ f : Polynomial T, f.Monic → 0 < f.natDegree → ∃ x : T, f.eval x = 0) → IsUnit (q : T) → 0 < q → (∃ (ι : Type) (_ : Preorder ι) (_ : IsDirected ι (· ≤ ·)) (_ : Nonempty ι) (Si : ι → Subalgebra (Polynomial T) O), Monotone Si ∧ (∀ s : O, ∃ i, s ∈ Si i) ∧ ∀ i, ∃ (A : Type) (_ : CommRing A) (_ : Algebra (Polynomial T) A) (_ : Algebra.Etale (Polynomial T) A) (q : Ideal A) (_ : q.IsPrime), Nonempty (Localization.AtPrime q ≃ₐ[(Polynomial T)] Si i)) → IsDomain (Localization (Algebra.algebraMapSubmonoid O (nonZeroDivisors T))) ∧ IsIntegrallyClosed (Localization (Algebra.algebraMapSubmonoid O (nonZeroDivisors T))) := by
+theorem locIndEtale_isDomain_isIntegrallyClosed
+    : ∀ (T O : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing O] [Algebra T O]
+        [Algebra (Polynomial T) O] [IsScalarTower T (Polynomial T) O] [HenselianLocalRing O]
+        [IsSepClosed (ResidueField O)] (q : ℕ),
+      (IsDomain T ∧ ∀ f : Polynomial T, f.Monic → 0 < f.natDegree → ∃ x : T, f.eval x = 0)
+        → IsUnit (q : T) → 0 < q
+        → (∃ (ι : Type) (_ : Preorder ι) (_ : IsDirected ι (· ≤ ·)) (_ : Nonempty ι)
+            (Si : ι → Subalgebra (Polynomial T) O),
+          Monotone Si ∧ (∀ s : O, ∃ i, s ∈ Si i)
+            ∧ ∀ i,
+              ∃ (A : Type) (_ : CommRing A) (_ : Algebra (Polynomial T) A)
+                  (_ : Algebra.Etale (Polynomial T) A) (q : Ideal A) (_ : q.IsPrime),
+                Nonempty (Localization.AtPrime q ≃ₐ[(Polynomial T)] Si i))
+        → IsDomain (Localization (Algebra.algebraMapSubmonoid O (nonZeroDivisors T)))
+          ∧ IsIntegrallyClosed (Localization (Algebra.algebraMapSubmonoid O
+            (nonZeroDivisors T))) := by
   intro T O _ _ _ _ _ _ _ _ _ n hT _ _ hind
   haveI : IsIntegrallyClosed T := LocIndEtale.isIntegrallyClosed_of_forall_monic_root T hT.2
   obtain ⟨hdom, hic⟩ := indEtale_isDomain_isIntegrallyClosed (Polynomial T) O hind
@@ -55,18 +69,21 @@ theorem locIndEtale_isDomain_isIntegrallyClosed :
     obtain ⟨A, _, _, _, P, _, ⟨e⟩⟩ := hloc (Classical.arbitrary ι)
     haveI : Module.Flat (Polynomial T) (Localization.AtPrime P) := inferInstance
     have hL : Function.Injective (algebraMap (Polynomial T) (Localization.AtPrime P)) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro f hf
       by_contra hne
-      have hreg := Module.Flat.isSMulRegular_of_nonZeroDivisors
-        (M := Localization.AtPrime P) (mem_nonZeroDivisors_of_ne_zero hne)
+      have hreg :=
+        Module.Flat.isSMulRegular_of_nonZeroDivisors (M := Localization.AtPrime P)
+          (mem_nonZeroDivisors_of_ne_zero hne)
       have h1 : f • (1 : Localization.AtPrime P) = f • 0 := by
         rw [Algebra.smul_def, hf, zero_mul, smul_zero]
       exact one_ne_zero (hreg h1)
     have hS : Function.Injective (algebraMap (Polynomial T) O) := by
-      have : (algebraMap (Polynomial T) O) =
-          (Si (Classical.arbitrary ι)).val.toRingHom.comp
-            (e.toRingEquiv.toRingHom.comp (algebraMap (Polynomial T) (Localization.AtPrime P))) := by
+      have : (algebraMap (Polynomial T) O)
+          = (Si (Classical.arbitrary ι)).val.toRingHom.comp
+            (e.toRingEquiv.toRingHom.comp (algebraMap (Polynomial T)
+              (Localization.AtPrime P))) := by
         ext f
         · simp
         · simp
@@ -78,7 +95,6 @@ theorem locIndEtale_isDomain_isIntegrallyClosed :
     rintro _ ⟨t, ht, rfl⟩
     refine mem_nonZeroDivisors_of_ne_zero fun h => nonZeroDivisors.ne_zero ht (hinj ?_)
     rw [h, map_zero]
-  exact ⟨IsLocalization.isDomain_localization hle,
-    isIntegrallyClosed_of_isLocalization _ _ hle⟩
+  exact ⟨IsLocalization.isDomain_localization hle, isIntegrallyClosed_of_isLocalization _ _ hle⟩
 
 end GlobalTheory

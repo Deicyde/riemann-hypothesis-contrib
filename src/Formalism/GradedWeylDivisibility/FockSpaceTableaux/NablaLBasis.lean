@@ -12,7 +12,8 @@ namespace Formalism.GradedWeylDivisibility
 
 theorem nablaLBasis_of (h : RowActMul) : NablaLBasis := by
   intro R K _ _ _ _ hinj k n ν ι b μ hb g hg
-  have hid : ∀ x : MvPolynomial (Fin k × Fin n) K, rowAct K (1 : Matrix (Fin k) (Fin k) K) x = x := by
+  have hid
+      : ∀ x : MvPolynomial (Fin k × Fin n) K, rowAct K (1 : Matrix (Fin k) (Fin k) K) x = x := by
     intro x
     have e1 : rowAct K (n := n) (1 : Matrix (Fin k) (Fin k) K) = AlgHom.id K _ := by
       apply MvPolynomial.algHom_ext
@@ -25,8 +26,11 @@ theorem nablaLBasis_of (h : RowActMul) : NablaLBasis := by
       · simp
     rw [e1]
     rfl
-  have hinvA : ∀ A : Matrix (Fin k) (Fin k) K, IsUnit A.det → ∀ x : MvPolynomial (Fin k × Fin n) K,
-      rowAct K A (rowAct K A⁻¹ x) = x ∧ rowAct K A⁻¹ (rowAct K A x) = x := by
+  have hinvA
+      : ∀ A : Matrix (Fin k) (Fin k) K,
+        IsUnit A.det
+          → ∀ x : MvPolynomial (Fin k × Fin n) K,
+            rowAct K A (rowAct K A⁻¹ x) = x ∧ rowAct K A⁻¹ (rowAct K A x) = x := by
     intro A hA x
     have e1 := congrArg (fun F => F x) (h K k n A A⁻¹)
     have e2 := congrArg (fun F => F x) (h K k n A⁻¹ A)
@@ -47,7 +51,8 @@ theorem nablaLBasis_of (h : RowActMul) : NablaLBasis := by
     exact hφinj e
   refine ⟨?_, ?_⟩
   · exact hb.1.map' L (LinearMap.ker_eq_bot.mpr hLinj)
-  · have e1 : Set.range (fun i => rowAct K g⁻¹ (map (algebraMap R K) (b i))) = L '' Set.range b := by
+  · have e1
+        : Set.range (fun i => rowAct K g⁻¹ (map (algebraMap R K) (b i))) = L '' Set.range b := by
       rw [← Set.range_comp]
       rfl
     rw [e1, ← Submodule.map_span, hb.2.1]

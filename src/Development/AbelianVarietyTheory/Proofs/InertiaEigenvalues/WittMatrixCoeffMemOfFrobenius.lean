@@ -176,17 +176,29 @@ lemma key {n : Type} [Fintype n] (Y : Matrix n n (WittVector p C)) (hY : ∀ i j
 end WittIntegrality
 
 open WittIntegrality in
-theorem witt_matrix_coeff_mem_of_frobenius : ∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [CharP C p] [PerfectRing C p] (A : ValuationSubring C) {n : Type} [Fintype n] (Z : Matrix n n (WittVector p C)) (Y : Matrix n n (WittVector p A)), (Z.map WittVector.frobenius = Y.map (WittVector.map A.subtype) * Z ∨ Z.map WittVector.frobenius = Z * Y.map (WittVector.map A.subtype)) → ∀ i j m, (Z i j).coeff m ∈ A := by
+theorem witt_matrix_coeff_mem_of_frobenius
+    : ∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [CharP C p] [PerfectRing C p]
+        (A : ValuationSubring C) {n : Type} [Fintype n] (Z : Matrix n n (WittVector p C))
+        (Y : Matrix n n (WittVector p A)),
+      (Z.map WittVector.frobenius = Y.map (WittVector.map A.subtype) * Z
+          ∨ Z.map WittVector.frobenius = Z * Y.map (WittVector.map A.subtype))
+        → ∀ i j m, (Z i j).coeff m ∈ A := by
   intro p _ C _ _ _ A n _ Z Y h i j m
   rcases h with h | h
-  · refine key A (Y.map (WittVector.map A.subtype)) (fun i j => ⟨Y i j, rfl⟩) m Z 0
-      (fun _ _ => Subring.zero_mem _) ?_ i j
+  · refine key A (Y.map (WittVector.map A.subtype))
+      (fun i j => ⟨Y i j, rfl⟩)
+      m Z 0
+      (fun _ _ => Subring.zero_mem _)
+      ?_ i j
     intro i j
     have := congrFun (congrFun h i) j
     rw [Matrix.map_apply, Matrix.mul_apply] at this
     rw [this, Matrix.zero_apply, add_zero]
-  · refine key A (Y.map (WittVector.map A.subtype)).transpose (fun i j => ⟨Y j i, rfl⟩) m
-      Z.transpose 0 (fun _ _ => Subring.zero_mem _) ?_ j i
+  · refine key A (Y.map (WittVector.map A.subtype)).transpose
+      (fun i j => ⟨Y j i, rfl⟩)
+      m Z.transpose 0
+      (fun _ _ => Subring.zero_mem _)
+      ?_ j i
     intro i j
     have := congrFun (congrFun h j) i
     rw [Matrix.map_apply, Matrix.mul_apply] at this

@@ -16,16 +16,18 @@ section Cyclicity
 
 variable {G : Type} [Group G]
 
-theorem isCyclic_of_injective_char [Finite G] (χ : Additive G →+ AddCircle (1 : ℚ))
-    (hχ : Function.Injective χ) : IsCyclic G := by
+theorem isCyclic_of_injective_char
+    [Finite G] (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ : Function.Injective χ)
+    : IsCyclic G := by
   classical
   have := Fintype.ofFinite G
   set m := Fintype.card G with hmdef
   rcases Nat.lt_or_ge m 2 with hm | hm
   · have : Subsingleton G := Fintype.card_le_one_iff_subsingleton.1 (by omega)
     infer_instance
-  have hk : ∀ x : G, ∃ k : ℕ, k < m ∧
-      ((((k : ℚ) / m : ℚ)) : AddCircle (1 : ℚ)) = χ (Additive.ofMul x) := by
+  have hk
+      : ∀ x : G, ∃ k : ℕ,
+        k < m ∧ ((((k : ℚ) / m : ℚ)) : AddCircle (1 : ℚ)) = χ (Additive.ofMul x) := by
     intro x
     have hy01 := reprIco_mem (χ (Additive.ofMul x))
     have h0 : (((m : ℚ) * reprIco (χ (Additive.ofMul x)) : ℚ) : AddCircle (1 : ℚ)) = 0 := by
@@ -75,37 +77,35 @@ section Kernel
 
 variable {G : Type} [Group G]
 
-def charComp (S : Subgroup G) [S.Normal] (ψ : Additive (G ⧸ S) →+ AddCircle (1 : ℚ)) :
-    Additive G →+ AddCircle (1 : ℚ) :=
+def charComp (S : Subgroup G) [S.Normal] (ψ : Additive (G ⧸ S) →+ AddCircle (1 : ℚ))
+    : Additive G →+ AddCircle (1 : ℚ) :=
   ψ.comp (MonoidHom.toAdditive (QuotientGroup.mk' S))
 
 def charKer (χ : Additive G →+ AddCircle (1 : ℚ)) : Subgroup G :=
   (AddMonoidHom.toMultiplicativeRight χ).ker
 
-theorem mem_charKer {χ : Additive G →+ AddCircle (1 : ℚ)} {x : G} :
-    x ∈ charKer χ ↔ χ (Additive.ofMul x) = 0 := by
+theorem mem_charKer {χ : Additive G →+ AddCircle (1 : ℚ)} {x : G}
+    : x ∈ charKer χ ↔ χ (Additive.ofMul x) = 0 := by
   rw [charKer, MonoidHom.mem_ker, AddMonoidHom.toMultiplicativeRight_apply_apply, ofAdd_eq_one]
 
-instance (χ : Additive G →+ AddCircle (1 : ℚ)) : (charKer χ).Normal :=
-  MonoidHom.normal_ker _
+instance (χ : Additive G →+ AddCircle (1 : ℚ)) : (charKer χ).Normal := MonoidHom.normal_ker _
 
-def charBar (χ : Additive G →+ AddCircle (1 : ℚ)) :
-    Additive (G ⧸ charKer χ) →+ AddCircle (1 : ℚ) :=
+def charBar (χ : Additive G →+ AddCircle (1 : ℚ)) : Additive (G ⧸ charKer χ) →+ AddCircle (1 : ℚ) :=
   MonoidHom.toAdditiveLeft (QuotientGroup.kerLift (AddMonoidHom.toMultiplicativeRight χ))
 
-theorem charBar_apply (χ : Additive G →+ AddCircle (1 : ℚ)) (x : G) :
-    charBar χ (Additive.ofMul (x : G ⧸ charKer χ)) = χ (Additive.ofMul x) :=
+theorem charBar_apply (χ : Additive G →+ AddCircle (1 : ℚ)) (x : G)
+    : charBar χ (Additive.ofMul (x : G ⧸ charKer χ)) = χ (Additive.ofMul x) :=
   rfl
 
-theorem charBar_injective (χ : Additive G →+ AddCircle (1 : ℚ)) :
-    Function.Injective (charBar χ) := by
+theorem charBar_injective (χ : Additive G →+ AddCircle (1 : ℚ))
+    : Function.Injective (charBar χ) := by
   intro x y h
   apply Additive.toMul.injective
   apply QuotientGroup.kerLift_injective (AddMonoidHom.toMultiplicativeRight χ)
   exact congrArg Multiplicative.ofAdd h
 
-theorem charComp_charBar (χ : Additive G →+ AddCircle (1 : ℚ)) :
-    charComp (charKer χ) (charBar χ) = χ := by
+theorem charComp_charBar (χ : Additive G →+ AddCircle (1 : ℚ))
+    : charComp (charKer χ) (charBar χ) = χ := by
   ext x
   exact charBar_apply χ (Additive.toMul x)
 
@@ -117,10 +117,12 @@ attribute [local instance 2000] Rep.hV2 Submodule.module Submodule.Quotient.modu
 
 variable {G : Type} [Group G] {A : Rep ℤ G} (S : Subgroup G) [S.Normal]
 
-def invariantsToQuotient (a : A.ρ.invariants) : (A.quotientToInvariants S).ρ.invariants :=
-  ⟨⟨a, fun s => a.2 s⟩, fun q => by
+def invariantsToQuotient (a : A.ρ.invariants) : (A.quotientToInvariants S).ρ.invariants := ⟨
+  ⟨a, fun s => a.2 s⟩,
+  fun q => by
     induction q using QuotientGroup.induction_on with
-    | H g => exact Subtype.ext (a.2 g)⟩
+    | H g => exact Subtype.ext (a.2 g)
+⟩
 
 end Inflation
 

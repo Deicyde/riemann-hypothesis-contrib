@@ -14,20 +14,28 @@ namespace GlobalTheory.CompanionTheory.CharacterBiduality
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem indicator_mem_SB {n : ℕ} (A : AddSubgroup (Fin n → k))
-    (hAc : IsCompact (A : Set (Fin n → k))) (hAo : IsOpen (A : Set (Fin n → k))) :
-    (A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) ∈ SB (Fin n → k) := by
+theorem indicator_mem_SB
+    {n : ℕ} (A : AddSubgroup (Fin n → k)) (hAc : IsCompact (A : Set (Fin n → k)))
+    (hAo : IsOpen (A : Set (Fin n → k)))
+    : (A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) ∈ SB (Fin n → k) := by
   have hcl : IsClopen (A : Set (Fin n → k)) := ⟨AddSubgroup.isClosed_of_isOpen A hAo, hAo⟩
-  exact ⟨(LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ)) hcl).isLocallyConstant,
-    HasCompactSupport.intro hAc fun x hx => Set.indicator_of_notMem hx _⟩
+  exact ⟨
+    (LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ)) hcl).isLocallyConstant,
+    HasCompactSupport.intro hAc fun x hx => Set.indicator_of_notMem hx _
+  ⟩
 
-theorem fourier_sub_translate_eq_zero [MeasurableSpace k] [BorelSpace k] {n : ℕ}
-    (ψ : AddChar k Circle) (hψ : Continuous ψ) (μ : Measure (Fin n → k)) [μ.IsAddHaarMeasure]
-    (A : AddSubgroup (Fin n → k)) (hAc : IsCompact (A : Set (Fin n → k)))
-    (hAo : IsOpen (A : Set (Fin n → k))) (x : Fin n → k)
-    (hx : ∀ η : Fin n → k, (∀ a ∈ A, ψ (η ⬝ᵥ a) = 1) → ψ (η ⬝ᵥ x) = 1) (y : Fin n → k) :
-    ∫ z, ((A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) z -
-        (A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) (z + x)) * (ψ (z ⬝ᵥ y) : ℂ) ∂μ = 0 := by
+theorem fourier_sub_translate_eq_zero
+    [MeasurableSpace k] [BorelSpace k]
+    {n : ℕ}
+    (ψ : AddChar k Circle) (hψ : Continuous ψ)
+    (μ : Measure (Fin n → k)) [μ.IsAddHaarMeasure]
+    (A : AddSubgroup (Fin n → k))
+    (hAc : IsCompact (A : Set (Fin n → k))) (hAo : IsOpen (A : Set (Fin n → k)))
+    (x : Fin n → k) (hx : ∀ η : Fin n → k, (∀ a ∈ A, ψ (η ⬝ᵥ a) = 1) → ψ (η ⬝ᵥ x) = 1)
+    (y : Fin n → k)
+    : ∫ z, ((A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) z -
+          (A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) (z + x)) * (ψ (z ⬝ᵥ y) : ℂ) ∂μ
+      = 0 := by
   haveI := secondCountable k
   haveI := t2Space k
   set g : (Fin n → k) → ℂ := (A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) with hgdef
@@ -38,10 +46,11 @@ theorem fourier_sub_translate_eq_zero [MeasurableSpace k] [BorelSpace k] {n : �
     (hg.1.continuous.mul hc).integrable_of_hasCompactSupport hg.2.mul_right
   have hgx : HasCompactSupport fun z => g (z + x) := hg.2.comp_homeomorph (Homeomorph.addRight x)
   have hi2 : Integrable (fun z => g (z + x) * (ψ (z ⬝ᵥ y) : ℂ)) μ :=
-    ((hg.1.continuous.comp (continuous_id.add continuous_const)).mul hc).integrable_of_hasCompactSupport
-      hgx.mul_right
-  have e1 : ∫ z, g (z + x) * (ψ (z ⬝ᵥ y) : ℂ) ∂μ =
-      (ψ (-(x ⬝ᵥ y)) : ℂ) * ∫ z, g z * (ψ (z ⬝ᵥ y) : ℂ) ∂μ := by
+    ((hg.1.continuous.comp (continuous_id.add continuous_const)).mul
+      hc).integrable_of_hasCompactSupport hgx.mul_right
+  have e1
+      : ∫ z, g (z + x) * (ψ (z ⬝ᵥ y) : ℂ) ∂μ
+        = (ψ (-(x ⬝ᵥ y)) : ℂ) * ∫ z, g z * (ψ (z ⬝ᵥ y) : ℂ) ∂μ := by
     have h := integral_add_right_eq_self (μ := μ) (fun w => g w * (ψ ((w - x) ⬝ᵥ y) : ℂ)) x
     simp only [add_sub_cancel_right] at h
     rw [h, ← integral_const_mul]
@@ -60,8 +69,9 @@ theorem fourier_sub_translate_eq_zero [MeasurableSpace k] [BorelSpace k] {n : �
     obtain ⟨a, haA, hne⟩ := hy
     have h0 : ∫ z, g z * (ψ (z ⬝ᵥ y) : ℂ) ∂μ = 0 := by
       have h := integral_add_right_eq_self (μ := μ) (fun w => g w * (ψ (w ⬝ᵥ y) : ℂ)) a
-      have h3 : ∫ z, g (z + a) * (ψ ((z + a) ⬝ᵥ y) : ℂ) ∂μ =
-          (ψ (y ⬝ᵥ a) : ℂ) * ∫ z, g z * (ψ (z ⬝ᵥ y) : ℂ) ∂μ := by
+      have h3
+          : ∫ z, g (z + a) * (ψ ((z + a) ⬝ᵥ y) : ℂ) ∂μ
+            = (ψ (y ⬝ᵥ a) : ℂ) * ∫ z, g z * (ψ (z ⬝ᵥ y) : ℂ) ∂μ := by
         rw [← integral_const_mul]
         refine integral_congr_ae (Filter.Eventually.of_forall fun w => ?_)
         have hga : g (w + a) = g w := by
@@ -78,11 +88,14 @@ theorem fourier_sub_translate_eq_zero [MeasurableSpace k] [BorelSpace k] {n : �
       simpa using (sub_eq_zero.1 h5).symm
     simp [h0]
 
-theorem exists_annihilator_ne : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle), Continuous ψ → ψ ≠ 1 →
-    ∀ (n : ℕ) (A : AddSubgroup (Fin n → k)), IsCompact (A : Set (Fin n → k)) →
-    IsOpen (A : Set (Fin n → k)) → ∀ x : Fin n → k, x ∉ A →
-    ∃ η : Fin n → k, (∀ a ∈ A, ψ (η ⬝ᵥ a) = 1) ∧ ψ (η ⬝ᵥ x) ≠ 1 := by
+theorem exists_annihilator_ne
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle),
+      Continuous ψ → ψ ≠ 1
+        → ∀ (n : ℕ) (A : AddSubgroup (Fin n → k)),
+          IsCompact (A : Set (Fin n → k)) → IsOpen (A : Set (Fin n → k))
+            → ∀ x : Fin n → k,
+              x ∉ A → ∃ η : Fin n → k, (∀ a ∈ A, ψ (η ⬝ᵥ a) = 1) ∧ ψ (η ⬝ᵥ x) ≠ 1 := by
   intro k _ _ _ _ ψ hψ h1 n A hAc hAo x hxA
   by_contra hcon
   push Not at hcon
@@ -94,9 +107,10 @@ theorem exists_annihilator_ne : ∀ (k : Type) [Field k] [ValuativeRel k] [Topol
   let μ : Measure (Fin n → k) := Measure.addHaar
   set g : (Fin n → k) → ℂ := (A : Set (Fin n → k)).indicator (fun _ => (1 : ℂ)) with hgdef
   have hg : g ∈ SB (Fin n → k) := indicator_mem_SB A hAc hAo
-  have hgx : (fun z => g (z + x)) ∈ SB (Fin n → k) :=
-    ⟨hg.1.comp_continuous (continuous_id.add continuous_const),
-      hg.2.comp_homeomorph (Homeomorph.addRight x)⟩
+  have hgx : (fun z => g (z + x)) ∈ SB (Fin n → k) := ⟨
+    hg.1.comp_continuous (continuous_id.add continuous_const),
+    hg.2.comp_homeomorph (Homeomorph.addRight x)
+  ⟩
   have hf : (fun z => g z - g (z + x)) ∈ SB (Fin n → k) := (SB (Fin n → k)).sub_mem hg hgx
   obtain ⟨s, hs⟩ := fourier_inversion_pi μ hc hf
   have hz : ∀ y : Fin n → k, ∫ z, (g z - g (z + x)) * (ψ (z ⬝ᵥ y) : ℂ) ∂μ = 0 :=

@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.krull_dim_quotient_bound :
-    ∀ {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I K : Ideal R) {ι : Type} [Fintype ι] (t : ι → R), (∀ a, t a ∈ maximalIdeal R) → (∀ P : Ideal R, P.IsPrime → I ≤ P → (∀ a, t a ∈ P) → K ≤ P) → ringKrullDim (R ⧸ I) ≤ ringKrullDim (R ⧸ K) + (Fintype.card ι : ℕ) := by
+theorem UpperTheory.V.Fr.krull_dim_quotient_bound
+    : ∀ {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I K : Ideal R) {ι : Type}
+        [Fintype ι] (t : ι → R),
+      (∀ a, t a ∈ maximalIdeal R) → (∀ P : Ideal R, P.IsPrime → I ≤ P → (∀ a, t a ∈ P) → K ≤ P)
+        → ringKrullDim (R ⧸ I) ≤ ringKrullDim (R ⧸ K) + (Fintype.card ι : ℕ) := by
   intro R _ _ _ I K ι _ t ht hP
   classical
   have hjac : (Set.range fun a => Ideal.Quotient.mk I (t a)) ⊆ Ring.jacobson (R ⧸ I) := by
@@ -21,17 +24,20 @@ theorem UpperTheory.V.Fr.krull_dim_quotient_bound :
     have h3 : t a ∈ m.comap (Ideal.Quotient.mk I) := h2 ▸ ht a
     exact h3
   have h1 := ringKrullDim_le_ringKrullDim_quotient_add_encard _ hjac
-  have hspan : Ideal.span (Set.range fun a => Ideal.Quotient.mk I (t a))
-      = (Ideal.span (Set.range t)).map (Ideal.Quotient.mk I) := by
+  have hspan
+      : Ideal.span (Set.range fun a => Ideal.Quotient.mk I (t a))
+        = (Ideal.span (Set.range t)).map (Ideal.Quotient.mk I) := by
     rw [Ideal.map_span, ← Set.range_comp]; rfl
-  have h2 : ringKrullDim ((R ⧸ I) ⧸ Ideal.span (Set.range fun a => Ideal.Quotient.mk I (t a)))
-      = ringKrullDim (R ⧸ (I ⊔ Ideal.span (Set.range t))) := by
+  have h2
+      : ringKrullDim ((R ⧸ I) ⧸ Ideal.span (Set.range fun a => Ideal.Quotient.mk I (t a)))
+        = ringKrullDim (R ⧸ (I ⊔ Ideal.span (Set.range t))) := by
     rw [hspan]
     exact ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotSup I _)
   have h3 : ringKrullDim (R ⧸ (I ⊔ Ideal.span (Set.range t))) ≤ ringKrullDim (R ⧸ K) := by
     rw [ringKrullDim_quotient, ringKrullDim_quotient]
-    have hsub : PrimeSpectrum.zeroLocus (R := R) ((I ⊔ Ideal.span (Set.range t) : Ideal R) : Set R)
-        ⊆ PrimeSpectrum.zeroLocus (R := R) (K : Set R) := by
+    have hsub
+        : PrimeSpectrum.zeroLocus (R := R) ((I ⊔ Ideal.span (Set.range t) : Ideal R) : Set R)
+          ⊆ PrimeSpectrum.zeroLocus (R := R) (K : Set R) := by
       intro p hp
       have hp' : I ⊔ Ideal.span (Set.range t) ≤ p.asIdeal := hp
       refine hP p.asIdeal p.isPrime (le_sup_left.trans hp') fun a => ?_

@@ -8,8 +8,10 @@ namespace GlobalTheory.DedekindSmooth
 
 open Polynomial IsLocalRing
 
-theorem isSmoothAt_bot (k : Type) [Field k] [PerfectField k] (B : Type) [CommRing B] [IsDomain B]
-    [Algebra k B] [Algebra.FiniteType k B] : Algebra.IsSmoothAt k (⊥ : Ideal B) := by
+theorem isSmoothAt_bot
+    (k : Type) [Field k] [PerfectField k]
+    (B : Type) [CommRing B] [IsDomain B] [Algebra k B] [Algebra.FiniteType k B]
+    : Algebra.IsSmoothAt k (⊥ : Ideal B) := by
   have h : IsField (Localization.AtPrime (⊥ : Ideal B)) := by
     rw [IsLocalRing.isField_iff_maximalIdeal_eq, ← Localization.AtPrime.map_eq_maximalIdeal]
     simp
@@ -19,16 +21,20 @@ theorem isSmoothAt_bot (k : Type) [Field k] [PerfectField k] (B : Type) [CommRin
   have : Algebra.EssFiniteType k (Localization.AtPrime (⊥ : Ideal B)) := .comp _ B _
   exact Algebra.FormallySmooth.of_perfectField
 
-theorem exists_uniformiser (B : Type) [CommRing B] [IsDedekindDomain B] (q : Ideal B) [q.IsPrime]
-    (hq : q ≠ ⊥) : ∃ t ∈ q, t ≠ 0 ∧ maximalIdeal (Localization.AtPrime q) =
-      Ideal.span {algebraMap B (Localization.AtPrime q) t} := by
-  have := IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain B hq
-    (Localization.AtPrime q)
+theorem exists_uniformiser
+    (B : Type) [CommRing B] [IsDedekindDomain B] (q : Ideal B) [q.IsPrime] (hq : q ≠ ⊥)
+    : ∃ t ∈ q,
+      t ≠ 0
+        ∧ maximalIdeal (Localization.AtPrime q)
+          = Ideal.span {algebraMap B (Localization.AtPrime q) t} := by
+  have :=
+    IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain B hq (Localization.AtPrime q)
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible (Localization.AtPrime q)
   obtain ⟨⟨t, s⟩, h⟩ := IsLocalization.surj q.primeCompl π
   have hs : IsUnit (algebraMap B (Localization.AtPrime q) s) := IsLocalization.map_units _ s
-  have hm : maximalIdeal (Localization.AtPrime q) =
-      Ideal.span {algebraMap B (Localization.AtPrime q) t} := by
+  have hm
+      : maximalIdeal (Localization.AtPrime q)
+        = Ideal.span {algebraMap B (Localization.AtPrime q) t} := by
     simp only at h
     rw [← h, Ideal.span_singleton_mul_right_unit hs, hπ.maximalIdeal_eq]
   refine ⟨t, ?_, ?_, hm⟩
@@ -38,9 +44,12 @@ theorem exists_uniformiser (B : Type) [CommRing B] [IsDedekindDomain B] (q : Ide
     simp only [map_zero] at h
     exact mul_ne_zero hπ.ne_zero hs.ne_zero h
 
-theorem isSmoothAt_of_ne_bot (k : Type) [Field k] [IsAlgClosed k] (B : Type) [CommRing B]
-    [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B] (q : Ideal B) [hqp : q.IsPrime]
-    (hq : q ≠ ⊥) : Algebra.IsSmoothAt k q := by
+theorem isSmoothAt_of_ne_bot
+    (k : Type) [Field k] [IsAlgClosed k]
+    (B : Type) [CommRing B] [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B]
+    (q : Ideal B) [hqp : q.IsPrime]
+    (hq : q ≠ ⊥)
+    : Algebra.IsSmoothAt k q := by
   obtain ⟨t, htq, ht0, hm⟩ := exists_uniformiser B q hq
   have hqm : q.IsMaximal := hqp.isMaximal hq
   have htr : Transcendental k t := by
@@ -49,9 +58,10 @@ theorem isSmoothAt_of_ne_bot (k : Type) [Field k] [IsAlgClosed k] (B : Type) [Co
     have hu : IsUnit t := hi.isUnit ht0
     exact hqp.ne_top (Ideal.eq_top_of_isUnit_mem _ htq hu)
   letI : Algebra k[X] B := (aeval t : k[X] →ₐ[k] B).toRingHom.toAlgebra
-  have : IsScalarTower k k[X] B := .of_algebraMap_eq fun c => by
-    change _ = aeval t (algebraMap k k[X] c)
-    simp
+  have : IsScalarTower k k[X] B :=
+    .of_algebraMap_eq fun c => by
+      change _ = aeval t (algebraMap k k[X] c)
+      simp
   have hinj : Function.Injective (algebraMap k[X] B) := transcendental_iff_injective.mp htr
   have : FaithfulSMul k[X] B := (faithfulSMul_iff_algebraMap_injective _ _).mpr hinj
   have : Module.Flat k[X] B := inferInstance
@@ -67,10 +77,11 @@ theorem isSmoothAt_of_ne_bot (k : Type) [Field k] [IsAlgClosed k] (B : Type) [Co
     have : Module.Finite k q.ResidueField :=
       Module.Finite.of_surjective (IsScalarTower.toAlgHom k (B ⧸ q) q.ResidueField).toLinearMap
         (Ideal.bijective_algebraMap_quotient_residueField q).2
-    have : IsScalarTower k p.ResidueField q.ResidueField := .of_algebraMap_eq fun c => by
-      rw [IsScalarTower.algebraMap_apply k k[X] p.ResidueField,
-        ← IsScalarTower.algebraMap_apply k[X] p.ResidueField q.ResidueField,
-        ← IsScalarTower.algebraMap_apply]
+    have : IsScalarTower k p.ResidueField q.ResidueField :=
+      .of_algebraMap_eq fun c => by
+        rw [IsScalarTower.algebraMap_apply k k[X] p.ResidueField,
+          ← IsScalarTower.algebraMap_apply k[X] p.ResidueField q.ResidueField,
+          ← IsScalarTower.algebraMap_apply]
     exact Algebra.isSeparable_tower_top_of_isSeparable k _ _
   have hmap : p.map (algebraMap k[X] (Localization.AtPrime q)) = maximalIdeal _ := by
     apply le_antisymm
@@ -89,9 +100,10 @@ theorem isSmoothAt_of_ne_bot (k : Type) [Field k] [IsAlgClosed k] (B : Type) [Co
   have : Algebra.IsEtaleAt k[X] q := .of_isUnramifiedAt_of_flat q
   exact Algebra.FormallySmooth.comp k k[X] _
 
-theorem smooth_of_isDedekindDomain :
-    ∀ (k : Type) [Field k] [IsAlgClosed k] (B : Type) [CommRing B] [IsDedekindDomain B]
-      [Algebra k B] [Algebra.FiniteType k B], Algebra.Smooth k B := by
+theorem smooth_of_isDedekindDomain
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (B : Type) [CommRing B] [IsDedekindDomain B]
+        [Algebra k B] [Algebra.FiniteType k B],
+      Algebra.Smooth k B := by
   intro k _ _ B _ _ _ _
   have : Algebra.FinitePresentation k B :=
     (Algebra.FinitePresentation.of_finiteType (R := k) (A := B)).mp ‹_›

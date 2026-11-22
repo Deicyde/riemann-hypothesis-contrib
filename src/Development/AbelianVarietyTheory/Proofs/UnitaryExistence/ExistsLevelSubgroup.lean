@@ -17,7 +17,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CramerMem
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
 open scoped TensorProduct Topology
 open GlobalTheory.RecDict
@@ -26,8 +29,9 @@ namespace GlobalTheory.RecDict
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem det_gram_ne_zero {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E) :
-    S.gram.det ≠ 0 := by
+theorem det_gram_ne_zero
+    {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E)
+    : S.gram.det ≠ 0 := by
   intro h
   obtain ⟨v, hv, h0⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h
   apply hv
@@ -46,9 +50,13 @@ theorem det_gram_ne_zero {E : Type} [Field E] [NumberField E] [StarRing E] (S : 
     rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hi, smul_zero]
   exact S.frame.equivFun.symm.map_eq_zero_iff.1 hy
 
-theorem det_mul_sigR_det {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : J.det ≠ 0) (g : GL (Fin M) (R ⊗[F] E))
-    (hg : g ∈ HR R σ J) : g.1.det * sigR R σ g.1.det = 1 := by
+theorem det_mul_sigR_det
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    {M : ℕ}
+    (J : Matrix (Fin M) (Fin M) E) (hJ : J.det ≠ 0) (g : GL (Fin M) (R ⊗[F] E)) (hg : g ∈ HR R σ J)
+    : g.1.det * sigR R σ g.1.det = 1 := by
   have h : Formalism.UG.cT (sigR R σ) g.1 * JR R J * g.1 = JR R J := hg
   have h2 := congrArg Matrix.det h
   have hu : IsUnit (JR (F := F) R J).det := by
@@ -62,8 +70,8 @@ theorem det_mul_sigR_det {F E : Type} [Field F] [Field E] [Algebra F E] (R : Typ
   apply hu.mul_left_cancel
   linear_combination h2
 
-theorem det_finHom_norm {D : D7} (V : HSp D) (k : GA D V) :
-    (finHom V k).1.det * sigR (Af D.host.F) D.sp.cm.sig (finHom V k).1.det = 1 := by
+theorem det_finHom_norm {D : D7} (V : HSp D) (k : GA D V)
+    : (finHom V k).1.det * sigR (Af D.host.F) D.sp.cm.sig (finHom V k).1.det = 1 := by
   have h := det_mul_sigR_det (AF D.host.F) D.sp.cm.sig V.gram (det_gram_ne_zero V) (matHom V k) k.2
   let φ := (Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E)).toRingHom
   have e : (finHom V k).1.det = φ (matHom V k).1.det := (φ.map_det _).symm
@@ -75,9 +83,9 @@ theorem det_finHom_norm {D : D7} (V : HSp D) (k : GA D V) :
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
   rw [e, c, ← map_mul, h, map_one]
 
-theorem finHom_inv_mulVec_mem {D : D7} (V : HSp D) (k : GA D V)
-    (hk : ∀ z ∈ latHat V, (finHom V k).1.mulVec z ∈ latHat V) :
-    ∀ z ∈ latHat V, (finHom V k⁻¹).1.mulVec z ∈ latHat V := by
+theorem finHom_inv_mulVec_mem
+    {D : D7} (V : HSp D) (k : GA D V) (hk : ∀ z ∈ latHat V, (finHom V k).1.mulVec z ∈ latHat V)
+    : ∀ z ∈ latHat V, (finHom V k⁻¹).1.mulVec z ∈ latHat V := by
   let L : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) :=
     V.L0.map (V.frame.equivFun.toLinearMap.restrictScalars (𝓞 D.host.E))
   have hL : latHat V = GlobalTheory.AdLat.hat D.host.F (L : Set (Fin V.rank → D.host.E)) := by
@@ -99,7 +107,8 @@ theorem finHom_inv_mulVec_mem {D : D7} (V : HSp D) (k : GA D V)
         V.frame.equivFun.trans ((starLinearEquiv D.host.E).trans V.frame.equivFun.symm)
       let g : V.V →ₗ[D.host.E] Module.Dual D.host.E W :=
         (LinearMap.domRestrict' W).comp (V.hT.comp e.toLinearMap)
-      have hdim : Module.finrank D.host.E (Module.Dual D.host.E W) < Module.finrank D.host.E V.V := by
+      have hdim
+          : Module.finrank D.host.E (Module.Dual D.host.E W) < Module.finrank D.host.E V.V := by
         rw [Subspace.dual_finrank_eq]
         exact Submodule.finrank_lt h
       obtain ⟨x, hx, hx₀⟩ :=
@@ -111,34 +120,46 @@ theorem finHom_inv_mulVec_mem {D : D7} (V : HSp D) (k : GA D V)
           LinearMap.restrictScalars_apply, Submodule.mem_one]
         intro y hy
         have hxy : V.hT (e x) y = 0 :=
-          congrArg (fun f : Module.Dual D.host.E W => f ⟨y, Submodule.subset_span hy⟩)
+          congrArg
+            (fun f : Module.Dual D.host.E W => f ⟨y, Submodule.subset_span hy⟩)
             (LinearMap.mem_ker.mp hx)
         have hyx : V.hT y (e x) = 0 := by
           have hh := V.herm.eq (e x) y
           simpa [hxy] using hh.symm
         simp [map_smul, hyx]
       let i : D.host.E →ₗ[𝓞 D.host.E] V.L0 :=
-        ((LinearMap.toSpanSingleton D.host.E _ (e x)).restrictScalars (𝓞 D.host.E)).codRestrict V.L0 hsmul
+        ((LinearMap.toSpanSingleton D.host.E _ (e x)).restrictScalars (𝓞 D.host.E)).codRestrict V.L0
+          hsmul
       let : Module.Finite (𝓞 D.host.E) V.L0 := Module.Finite.iff_fg.mpr V.standardTuple_isLattice.fg
-      let : Module.Finite (𝓞 D.host.E) D.host.E := Module.Finite.of_injective i fun a b hab =>
-        smul_left_injective D.host.E (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+      let : Module.Finite (𝓞 D.host.E) D.host.E :=
+        Module.Finite.of_injective i fun a b hab =>
+          smul_left_injective D.host.E
+            (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+            (congrArg Subtype.val hab)
       exact RingOfIntegers.not_isField D.host.E
-        (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 D.host.E) D.host.E) (Field.toIsField D.host.E))
-    have : (L : Set (Fin V.rank → D.host.E)) = V.frame.equivFun.toLinearMap '' (V.L0 : Set V.V) := rfl
+        (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 D.host.E) D.host.E)
+          (Field.toIsField D.host.E))
+    have : (L : Set (Fin V.rank → D.host.E)) = V.frame.equivFun.toLinearMap '' (V.L0 : Set V.V) :=
+      rfl
     rw [this, Submodule.span_image, hspan, Submodule.map_top, LinearEquiv.range]
-  let c : D.host.E ≃ₐ[D.host.F] D.host.E :=
-    AlgEquiv.ofBijective D.sp.cm.sig (D.sp.cm.sig.bijective)
+  let c : D.host.E ≃ₐ[D.host.F] D.host.E := AlgEquiv.ofBijective D.sp.cm.sig (D.sp.cm.sig.bijective)
   rw [hL] at hk ⊢
   rw [map_inv]
-  exact GlobalTheory.AdLat.inv_mulVec_mem_hat _ _ _ L (finHom V k) c hfg hsp hk (det_finHom_norm V k)
+  exact GlobalTheory.AdLat.inv_mulVec_mem_hat _ _ _ L (finHom V k) c hfg hsp hk
+    (det_finHom_norm V k)
 
-theorem exists_level_subgroup {G A : Type} [Group G] [CommRing A] {n : ℕ} (f : G →* GL (Fin n) A) (H : Subgroup G)
-    (Λ : AddSubgroup (Fin n → A)) (N : ℕ)
-    (hinv : ∀ k : G, (∀ z ∈ Λ, (f k).1.mulVec z ∈ Λ) → ∀ z ∈ Λ, (f k⁻¹).1.mulVec z ∈ Λ) :
-    ∃ K : Subgroup G, (∀ k, k ∈ K ↔ k ∈ H ∧ ∀ z ∈ Λ, ∃ y ∈ Λ, (f k).1.mulVec z - z = N • y) ∧
-      ∀ k ∈ K, (f k).1.mulVec '' (Λ : Set (Fin n → A)) = Λ := by
-  have hin : ∀ k : G, (∀ z ∈ Λ, ∃ y ∈ Λ, (f k).1.mulVec z - z = N • y) →
-      ∀ z ∈ Λ, (f k).1.mulVec z ∈ Λ := by
+theorem exists_level_subgroup
+    {G A : Type} [Group G] [CommRing A]
+    {n : ℕ} (f : G →* GL (Fin n) A)
+    (H : Subgroup G)
+    (Λ : AddSubgroup (Fin n → A))
+    (N : ℕ) (hinv : ∀ k : G, (∀ z ∈ Λ, (f k).1.mulVec z ∈ Λ) → ∀ z ∈ Λ, (f k⁻¹).1.mulVec z ∈ Λ)
+    : ∃ K : Subgroup G,
+      (∀ k, k ∈ K ↔ k ∈ H ∧ ∀ z ∈ Λ, ∃ y ∈ Λ, (f k).1.mulVec z - z = N • y)
+        ∧ ∀ k ∈ K, (f k).1.mulVec '' (Λ : Set (Fin n → A)) = Λ := by
+  have hin
+      : ∀ k : G,
+        (∀ z ∈ Λ, ∃ y ∈ Λ, (f k).1.mulVec z - z = N • y) → ∀ z ∈ Λ, (f k).1.mulVec z ∈ Λ := by
     intro k hk z hz
     obtain ⟨y, hy, e⟩ := hk z hz
     rw [sub_eq_iff_eq_add.1 e]
@@ -149,10 +170,16 @@ theorem exists_level_subgroup {G A : Type} [Group G] [CommRing A] {n : ℕ} (f :
   have hone : ∀ z, (f 1).1.mulVec z = z := by
     intro z
     rw [map_one, Units.val_one, Matrix.one_mulVec]
-  refine ⟨{ carrier := {k | k ∈ H ∧ ∀ z ∈ Λ, ∃ y ∈ Λ, (f k).1.mulVec z - z = N • y}
-            mul_mem' := ?_
-            one_mem' := ?_
-            inv_mem' := ?_ }, fun k => Iff.rfl, ?_⟩
+  refine ⟨
+    {
+      carrier := {k | k ∈ H ∧ ∀ z ∈ Λ, ∃ y ∈ Λ, (f k).1.mulVec z - z = N • y}
+      mul_mem' := ?_
+      one_mem' := ?_
+      inv_mem' := ?_
+    },
+    fun k => Iff.rfl,
+    ?_
+  ⟩
   · rintro a b ⟨ha, ha'⟩ ⟨hb, hb'⟩
     refine ⟨mul_mem ha hb, fun z hz => ?_⟩
     obtain ⟨y, hy, e⟩ := hb' z hz
@@ -174,7 +201,9 @@ theorem exists_level_subgroup {G A : Type} [Group G] [CommRing A] {n : ℕ} (f :
     · intro z hz
       exact ⟨_, hinv k (hin k hk) z hz, (hmul k k⁻¹ z).symm.trans (by rw [mul_inv_cancel, hone])⟩
 
-theorem exists_isLevelK : ∀ (D : D7) (V : HSp D) (N : ℕ), ∃ Kf : Subgroup (GA D V), IsLevelK V N Kf ∧ ∀ k ∈ Kf, (finHom V k).1.mulVec '' (latHat V : Set _) = latHat V :=
+theorem exists_isLevelK
+    : ∀ (D : D7) (V : HSp D) (N : ℕ), ∃ Kf : Subgroup (GA D V),
+      IsLevelK V N Kf ∧ ∀ k ∈ Kf, (finHom V k).1.mulVec '' (latHat V : Set _) = latHat V :=
   fun _ V N => exists_level_subgroup (finHom V) (GfC V) (latHat V) N (finHom_inv_mulVec_mem V)
 
 end GlobalTheory.RecDict

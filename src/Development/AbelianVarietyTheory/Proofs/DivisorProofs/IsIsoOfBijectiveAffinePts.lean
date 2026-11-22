@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent)
 open ReciprocityTheory.ChartRestriction.G.Semi (mulN)
 open GlobalTheory.DeRham (spOver spOver_comp)
@@ -22,27 +23,34 @@ namespace PDiv
 
 universe u
 
-theorem mono_of_injective_affinePts {X Y : Scheme.{u}} (f : X ⟶ Y)
-    (hinj : ∀ (R : CommRingCat.{u}) (a b : Spec R ⟶ X), a ≫ f = b ≫ f → a = b) : Mono f :=
-  ⟨fun {W} a b h => W.affineOpenCover.openCover.hom_ext a b fun i =>
-    hinj (W.affineOpenCover.X i) (W.affineOpenCover.f i ≫ a) (W.affineOpenCover.f i ≫ b)
-      ((Category.assoc _ _ _).trans ((congrArg _ h).trans (Category.assoc _ _ _).symm))⟩
+theorem mono_of_injective_affinePts
+    {X Y : Scheme.{u}}
+    (f : X ⟶ Y) (hinj : ∀ (R : CommRingCat.{u}) (a b : Spec R ⟶ X), a ≫ f = b ≫ f → a = b)
+    : Mono f :=
+  ⟨fun {W} a b h =>
+    W.affineOpenCover.openCover.hom_ext a b fun i =>
+      hinj (W.affineOpenCover.X i) (W.affineOpenCover.f i ≫ a) (W.affineOpenCover.f i ≫ b)
+        ((Category.assoc _ _ _).trans ((congrArg _ h).trans (Category.assoc _ _ _).symm))⟩
 
-theorem isIso_of_bijective_affinePts {X Y : Scheme.{u}} (f : X ⟶ Y)
-    (h : ∀ (R : CommRingCat.{u}), Function.Bijective fun a : Spec R ⟶ X => a ≫ f) : IsIso f := by
+theorem isIso_of_bijective_affinePts
+    {X Y : Scheme.{u}}
+    (f : X ⟶ Y) (h : ∀ (R : CommRingCat.{u}), Function.Bijective fun a : Spec R ⟶ X => a ≫ f)
+    : IsIso f := by
   have hm : Mono f := mono_of_injective_affinePts f fun R a b e => (h R).1 e
   let 𝒰 : Y.OpenCover := Y.affineOpenCover.openCover
   have hs : ∀ i : 𝒰.I₀, ∃ a : 𝒰.X i ⟶ X, a ≫ f = 𝒰.f i := fun i =>
     (h (Y.affineOpenCover.X i)).2 (Y.affineOpenCover.f i)
   choose g hg using hs
   have hc : ∀ i j : 𝒰.I₀, pullback.fst (𝒰.f i) (𝒰.f j) ≫ g i = pullback.snd (𝒰.f i) (𝒰.f j) ≫ g j :=
-    fun i j => (cancel_mono f).1 (by
-      simp only [Category.assoc, hg]
-      exact pullback.condition)
+    fun i j =>
+      (cancel_mono f).1 (by
+        simp only [Category.assoc, hg]
+        exact pullback.condition)
   let k : Y ⟶ X := 𝒰.glueMorphisms g hc
-  have hk : k ≫ f = 𝟙 Y := 𝒰.hom_ext _ _ fun i => by
-    have e := 𝒰.ι_glueMorphisms g hc i
-    simp only [k, ← Category.assoc, e, hg, Category.comp_id]
+  have hk : k ≫ f = 𝟙 Y :=
+    𝒰.hom_ext _ _ fun i => by
+      have e := 𝒰.ι_glueMorphisms g hc i
+      simp only [k, ← Category.assoc, e, hg, Category.comp_id]
   refine ⟨k, ?_, hk⟩
   exact (cancel_mono f).1 (by simp only [Category.assoc, hk, Category.comp_id, Category.id_comp])
 
@@ -56,13 +64,14 @@ namespace PDiv
 
 variable {O : Type} [CommRing O]
 
-theorem exists_spOver {B D : Type} [CommRing B] [Algebra O B] [CommRing D] [Algebra O D]
-    (v : Over.mk (spMap (algebraMap O B)) ⟶ Over.mk (spMap (algebraMap O D))) :
-    ∃ ψ : D →ₐ[O] B, spOver ψ = v := by
+theorem exists_spOver
+    {B D : Type} [CommRing B] [Algebra O B] [CommRing D] [Algebra O D]
+    (v : Over.mk (spMap (algebraMap O B)) ⟶ Over.mk (spMap (algebraMap O D)))
+    : ∃ ψ : D →ₐ[O] B, spOver ψ = v := by
   let f : Sp B ⟶ Sp D := v.left
   let ψ₀ : D →+* B := (Spec.preimage f).hom
-  have h0 : spMap ψ₀ = f := (congrArg Spec.map (CommRingCat.ofHom_hom _)).trans
-    (Spec.map_preimage f)
+  have h0 : spMap ψ₀ = f :=
+    (congrArg Spec.map (CommRingCat.ofHom_hom _)).trans (Spec.map_preimage f)
   have e : CommRingCat.ofHom (ψ₀.comp (algebraMap O D)) = CommRingCat.ofHom (algebraMap O B) :=
     Spec.map_injective (by
       change spMap (ψ₀.comp (algebraMap O D)) = spMap (algebraMap O B)
@@ -71,8 +80,8 @@ theorem exists_spOver {B D : Type} [CommRing B] [Algebra O B] [CommRing D] [Alge
   have h1 : ψ₀.comp (algebraMap O D) = algebraMap O B := congrArg CommRingCat.Hom.hom e
   exact ⟨{ ψ₀ with commutes' := RingHom.congr_fun h1 }, Over.OverMorphism.ext h0⟩
 
-theorem spMap_preimage_toAlgebra {R : CommRingCat.{0}} (s : Spec R ⟶ Sp O) :
-    @spMap O R _ _ (@algebraMap O R _ _ (Spec.preimage s).hom.toAlgebra) = s :=
+theorem spMap_preimage_toAlgebra {R : CommRingCat.{0}} (s : Spec R ⟶ Sp O)
+    : @spMap O R _ _ (@algebraMap O R _ _ (Spec.preimage s).hom.toAlgebra) = s :=
   (congrArg Spec.map (CommRingCat.ofHom_hom _)).trans (Spec.map_preimage s)
 
 end PDiv
@@ -81,7 +90,9 @@ namespace PDivGroup.TorsionTower
 
 open PDiv ReciprocityTheory.ChartRestriction.G.Semi
 
-variable {p : ℕ} {O : Type} [CommRing O] {G : PDivGroup p O} {A : Over (Sp O)} [GrpObj A]
+variable
+  {p : ℕ} {O : Type} [CommRing O]
+  {G : PDivGroup p O} {A : Over (Sp O)} [GrpObj A]
   (t : TorsionTower G A)
 
 theorem y_comp_mulN (n : ℕ) : t.y n ≫ mulN A (p ^ n) = toUnit _ ≫ η[A] := by
@@ -91,12 +102,11 @@ theorem y_comp_mulN (n : ℕ) : t.y n ≫ mulN A (p ^ n) = toUnit _ ≫ η[A] :=
 def toTorsion (n : ℕ) : SpAlg O (G.A n) ⟶ torsion A (p ^ n) :=
   pullback.lift (t.y n) (toUnit _) (t.y_comp_mulN n)
 
-@[reassoc (attr := simp)] theorem toTorsion_ι (n : ℕ) :
-    t.toTorsion n ≫ torsion.ι A (p ^ n) = t.y n :=
-  pullback.lift_fst _ _ _
+@[reassoc (attr := simp)]
+theorem toTorsion_ι (n : ℕ) : t.toTorsion n ≫ torsion.ι A (p ^ n) = t.y n := pullback.lift_fst _ _ _
 
-theorem toTorsion_left_injective (n : ℕ) (R : CommRingCat.{0}) :
-    Function.Injective fun a : Spec R ⟶ (SpAlg O (G.A n)).left => a ≫ (t.toTorsion n).left := by
+theorem toTorsion_left_injective (n : ℕ) (R : CommRingCat.{0})
+    : Function.Injective fun a : Spec R ⟶ (SpAlg O (G.A n)).left => a ≫ (t.toTorsion n).left := by
   intro a b e
   change a ≫ (t.toTorsion n).left = b ≫ (t.toTorsion n).left at e
   let s := a ≫ (SpAlg O (G.A n)).hom
@@ -110,14 +120,13 @@ theorem toTorsion_left_injective (n : ℕ) (R : CommRingCat.{0}) :
   obtain ⟨ψ, hψ⟩ := exists_spOver b'
   have hy : a' ≫ t.y n = b' ≫ t.y n := by
     have hab : a' ≫ t.toTorsion n = b' ≫ t.toTorsion n := Over.OverMorphism.ext e
-    simpa only [Category.assoc, toTorsion_ι] using
-      congrArg (fun q => q ≫ torsion.ι A (p ^ n)) hab
+    simpa only [Category.assoc, toTorsion_ι] using congrArg (fun q => q ≫ torsion.ι A (p ^ n)) hab
   rw [← hφ, ← hψ] at hy
   have h : φ = ψ := t.inj n R φ ψ hy
   exact congrArg Over.Hom.left (hφ.symm.trans ((congrArg spOver h).trans hψ))
 
-theorem toTorsion_left_surjective (n : ℕ) (R : CommRingCat.{0}) :
-    Function.Surjective fun a : Spec R ⟶ (SpAlg O (G.A n)).left => a ≫ (t.toTorsion n).left := by
+theorem toTorsion_left_surjective (n : ℕ) (R : CommRingCat.{0})
+    : Function.Surjective fun a : Spec R ⟶ (SpAlg O (G.A n)).left => a ≫ (t.toTorsion n).left := by
   intro w
   let s := w ≫ (torsion A (p ^ n)).hom
   let _ : Algebra O R := (Spec.preimage s).hom.toAlgebra
@@ -126,8 +135,8 @@ theorem toTorsion_left_surjective (n : ℕ) (R : CommRingCat.{0}) :
   have hx : (z ≫ torsion.ι A (p ^ n)) ^ p ^ n = 1 := by
     have hc : torsion.ι A (p ^ n) ≫ mulN A (p ^ n) = toUnit _ ≫ η[A] :=
       pullback.condition.trans (congrArg (· ≫ η[A]) (toUnit_unique _ _))
-    rw [← Category.comp_id (z ≫ torsion.ι A (p ^ n)), ← MonObj.comp_pow,
-      ← GrpTangent.mulN_eq_pow, Category.assoc, hc, ← Category.assoc]
+    rw [← Category.comp_id (z ≫ torsion.ι A (p ^ n)), ← MonObj.comp_pow, ← GrpTangent.mulN_eq_pow,
+      Category.assoc, hc, ← Category.assoc]
     exact (congrArg (· ≫ η[A]) (toUnit_unique _ _)).trans rfl
   obtain ⟨φ, hφ⟩ := t.surj n R _ hx
   have e : spOver φ ≫ t.toTorsion n = z := by
@@ -146,12 +155,14 @@ def torsionIso (n : ℕ) : SpAlg O (G.A n) ≅ torsion A (p ^ n) :=
   haveI := t.isIso_toTorsion n
   asIso (t.toTorsion n)
 
-@[reassoc (attr := simp)] theorem torsionIso_hom_ι (n : ℕ) :
-    (t.torsionIso n).hom ≫ torsion.ι A (p ^ n) = t.y n :=
+@[reassoc (attr := simp)]
+theorem torsionIso_hom_ι (n : ℕ) : (t.torsionIso n).hom ≫ torsion.ι A (p ^ n) = t.y n :=
   t.toTorsion_ι n
 
-theorem isPullback_y : ∀ (p : ℕ) (O : Type) [CommRing O] (G : GlobalTheory.PDivGroup p O) (A : Over (Sp O))
-    [GrpObj A] (t : TorsionTower G A) (n : ℕ), IsPullback (t.y n) (toUnit _) (mulN A (p ^ n)) η[A] := by
+theorem isPullback_y
+    : ∀ (p : ℕ) (O : Type) [CommRing O] (G : GlobalTheory.PDivGroup p O) (A : Over (Sp O))
+        [GrpObj A] (t : TorsionTower G A) (n : ℕ),
+      IsPullback (t.y n) (toUnit _) (mulN A (p ^ n)) η[A] := by
   intro p O _ G A _ t n
   exact IsPullback.of_iso_pullback ⟨t.y_comp_mulN n⟩ (t.torsionIso n) (t.torsionIso_hom_ι n)
     (pullback.lift_snd _ _ _)

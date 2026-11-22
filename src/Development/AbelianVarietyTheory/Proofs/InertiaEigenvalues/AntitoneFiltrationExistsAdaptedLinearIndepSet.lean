@@ -8,10 +8,14 @@ namespace GlobalTheory
 
 open Submodule
 
-theorem antitone_filtration_exists_adapted_linearIndep_set {L M : Type} [Field L] [AddCommGroup M] [Module L M]
-    (A : ℤ → Submodule L M) (hA : Antitone A) (hi : ℤ) (hhi : A hi = ⊥) (n : ℕ) :
-    ∃ (s : Set M) (k : M → ℤ), LinearIndepOn L id s ∧ (∀ x ∈ s, hi - n ≤ k x) ∧
-      ∀ a, hi - n ≤ a → A a = span L {x | x ∈ s ∧ a ≤ k x} := by
+theorem antitone_filtration_exists_adapted_linearIndep_set
+    {L M : Type} [Field L] [AddCommGroup M] [Module L M]
+    (A : ℤ → Submodule L M) (hA : Antitone A)
+    (hi : ℤ) (hhi : A hi = ⊥)
+    (n : ℕ)
+    : ∃ (s : Set M) (k : M → ℤ),
+      LinearIndepOn L id s ∧ (∀ x ∈ s, hi - n ≤ k x)
+        ∧ ∀ a, hi - n ≤ a → A a = span L {x | x ∈ s ∧ a ≤ k x} := by
   classical
   induction n with
   | zero =>
@@ -38,8 +42,10 @@ theorem antitone_filtration_exists_adapted_linearIndep_set {L M : Type} [Field L
     refine ⟨t, fun x => if x ∈ s then k x else hi - (n + 1 : ℕ), ht, hkt, fun a ha => ?_⟩
     rcases eq_or_lt_of_le ha with h | h
     · subst h
-      have hset : {x | x ∈ t ∧ hi - ((n + 1 : ℕ) : ℤ) ≤
-          (if x ∈ s then k x else hi - (n + 1 : ℕ))} = t := by
+      have hset
+          : {x | x ∈ t ∧ hi - ((n + 1 : ℕ) : ℤ) ≤
+              (if x ∈ s then k x else hi - (n + 1 : ℕ))}
+            = t := by
         ext x
         exact ⟨fun hx => hx.1, fun hx => ⟨hx, hkt x hx⟩⟩
       rw [hset]
@@ -60,11 +66,12 @@ theorem antitone_filtration_exists_adapted_linearIndep_set {L M : Type} [Field L
         · push_cast at h hkx
           omega
 
-theorem filtration_adapted_basis {L M : Type} [Field L] [AddCommGroup M] [Module L M]
-    (A : ℤ → Submodule L M) (hA : Antitone A) (hfd : FiniteDimensional L ↥(⨆ a, A a))
-    (hsep : ∀ x, (∀ a, x ∈ A a) → x = 0) :
-    ∃ (m : ℕ) (d : Fin m → M) (k : Fin m → ℤ), LinearIndependent L d ∧
-      ∀ a, A a = Submodule.span L (d '' {i | a ≤ k i}) := by
+theorem filtration_adapted_basis
+    {L M : Type} [Field L] [AddCommGroup M] [Module L M]
+    (A : ℤ → Submodule L M)
+    (hA : Antitone A) (hfd : FiniteDimensional L ↥(⨆ a, A a)) (hsep : ∀ x, (∀ a, x ∈ A a) → x = 0)
+    : ∃ (m : ℕ) (d : Fin m → M) (k : Fin m → ℤ),
+      LinearIndependent L d ∧ ∀ a, A a = Submodule.span L (d '' {i | a ≤ k i}) := by
   classical
   have hle : ∀ a, A a ≤ ⨆ b, A b := fun a => le_iSup A a
   have hfa : ∀ a, FiniteDimensional L (A a) := fun a => Submodule.finiteDimensional_of_le (hle a)
@@ -104,7 +111,9 @@ theorem filtration_adapted_basis {L M : Type} [Field L] [AddCommGroup M] [Module
   have hlow : ∀ a, a ≤ a0 - n → A a = A (a0 - n) := by
     intro a ha
     refine le_antisymm ?_ (hA ha)
-    calc A a ≤ ⨆ c, A c := hle a
+    calc
+      A a
+        ≤ ⨆ c, A c := hle a
       _ = A a1 := htop
       _ ≤ A (a0 - n) := hA hn
   have hsU : ∀ x ∈ s, x ∈ (⨆ b, A b : Submodule L M) := by
@@ -118,8 +127,13 @@ theorem filtration_adapted_basis {L M : Type} [Field L] [AddCommGroup M] [Module
   have hfin : s.Finite := Set.finite_coe_iff.1 hli.finite
   have _ := hfin.fintype
   let e : s ≃ Fin (Fintype.card s) := Fintype.equivFin s
-  refine ⟨Fintype.card s, fun i => (e.symm i : M), fun i => k (e.symm i),
-    LinearIndependent.comp hs e.symm e.symm.injective, fun a => ?_⟩
+  refine ⟨
+    Fintype.card s,
+    fun i => (e.symm i : M),
+    fun i => k (e.symm i),
+    LinearIndependent.comp hs e.symm e.symm.injective,
+    fun a => ?_
+  ⟩
   show A a = Submodule.span L ((fun i => (e.symm i : M)) '' {i | a ≤ k (e.symm i)})
   have himg : (fun i => (e.symm i : M)) '' {i | a ≤ k (e.symm i)} = {x | x ∈ s ∧ a ≤ k x} := by
     ext x

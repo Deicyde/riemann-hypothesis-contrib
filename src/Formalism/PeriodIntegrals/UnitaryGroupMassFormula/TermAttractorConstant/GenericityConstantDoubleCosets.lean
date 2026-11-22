@@ -14,17 +14,18 @@ set_option linter.style.haveILetI false
 
 namespace PI.TermAttrConst.UnitaryGroupMassFormula
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef PI.DCRelEquiv PI.DCRelEquiv.UnitaryGroupMassFormula
-  IsDedekindDomain
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef PI.DCRelEquiv PI.DCRelEquiv.UnitaryGroupMassFormula IsDedekindDomain
 
 section GenAll
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem gen_fwd {Λ : Submodule (𝓞 E) S.V} {g : ℕ} {F : LFlag S r T} {x y : LFlag S r T'}
-    (hFl : IsLift Λ F) (hFc : IsFixedConv Λ g F) (hxl : IsLift Λ x) (hxc : IsFixedConv Λ g x)
-    (hyc : IsFixedConv Λ g y) (hya : IsAdmissible Λ g F y) (hxy : DCRel Λ F x y)
-    (hgx : IsGeneric Λ g F x) : IsGeneric Λ g F y := by
+theorem gen_fwd
+    {Λ : Submodule (𝓞 E) S.V} {g : ℕ} {F : LFlag S r T} {x y : LFlag S r T'} (hFl : IsLift Λ F)
+    (hFc : IsFixedConv Λ g F) (hxl : IsLift Λ x) (hxc : IsFixedConv Λ g x) (hyc : IsFixedConv Λ g y)
+    (hya : IsAdmissible Λ g F y) (hxy : DCRel Λ F x y) (hgx : IsGeneric Λ g F x)
+    : IsGeneric Λ g F y := by
   obtain ⟨ξ', hξ'⟩ := hya
   obtain ⟨n, hn, m, hm, hfr, hzt⟩ := hxy
   obtain ⟨ξ, hξ, hgx⟩ := hgx
@@ -38,10 +39,11 @@ theorem gen_fwd {Λ : Submodule (𝓞 E) S.V} {g : ℕ} {F : LFlag S r T} {x y :
   · intro hP
     rw [hB, (hgx P).2 hP, ← locP_gmap, UU_transport hFl hxl hn hm hfr hzt]
 
-theorem genFun_gen (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (Pc : LFlag S r T' → Prop) (g : ℕ)
+theorem genFun_gen
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (Pc : LFlag S r T' → Prop) (g : ℕ)
     (hFl : IsLift Λ F) (hFc : IsFixedConv Λ g F)
-    (hPc : ∀ x, Pc x → IsLift Λ x ∧ IsAdmissible Λ g F x ∧ IsFixedConv Λ g x) :
-    GenFun Λ F Pc g := by
+    (hPc : ∀ x, Pc x → IsLift Λ x ∧ IsAdmissible Λ g F x ∧ IsFixedConv Λ g x)
+    : GenFun Λ F Pc g := by
   intro x y hxy
   have hxy' : DCRel Λ F x.1 y.1 := hxy
   obtain ⟨hxl, hxa, hxc⟩ := hPc x.1 x.2

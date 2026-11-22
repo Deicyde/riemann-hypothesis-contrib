@@ -6,28 +6,35 @@ public import Mathlib
 
 namespace GlobalTheory.ChF
 
-private theorem nonempty_padicInt_ringHom (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O]
-    (I : Ideal O) [IsAdicComplete I O] (hp : (p : O) ∈ I) : Nonempty (ℤ_[p] →+* O) := by
+private theorem nonempty_padicInt_ringHom
+    (p : ℕ) [Fact p.Prime]
+    (O : Type) [CommRing O]
+    (I : Ideal O) [IsAdicComplete I O]
+    (hp : (p : O) ∈ I)
+    : Nonempty (ℤ_[p] →+* O) := by
   have hd : ∀ n : ℕ, ringChar (O ⧸ I ^ n) ∣ p ^ n := fun n => by
     apply ringChar.dvd
     rw [← map_natCast (Ideal.Quotient.mk (I ^ n)), Ideal.Quotient.eq_zero_iff_mem, Nat.cast_pow]
     exact Ideal.pow_mem_pow hp n
   refine ⟨IsAdicComplete.liftRingHom I
-    (fun n => (ZMod.castHom (hd n) (O ⧸ I ^ n)).comp (PadicInt.toZModPow n)) ?_⟩
+    (fun n => (ZMod.castHom (hd n) (O ⧸ I ^ n)).comp (PadicInt.toZModPow n))
+    ?_⟩
   intro m n hle
   rw [← PadicInt.zmod_cast_comp_toZModPow m n hle, ← RingHom.comp_assoc, ← RingHom.comp_assoc]
   congr 1
   exact RingHom.ext_zmod _ _
 
-private theorem padicInt_ringHom_matrix_ext (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O]
-    [IsHausdorff (Ideal.span {(p : O)}) O] (n : ℕ)
-    (f g : ℤ_[p] →+* Matrix (Fin n) (Fin n) O) (c : ℤ_[p]) : f c = g c := by
+private theorem padicInt_ringHom_matrix_ext
+    (p : ℕ) [Fact p.Prime]
+    (O : Type) [CommRing O] [IsHausdorff (Ideal.span {(p : O)}) O]
+    (n : ℕ) (f g : ℤ_[p] →+* Matrix (Fin n) (Fin n) O)
+    (c : ℤ_[p])
+    : f c = g c := by
   ext i j
   rw [← sub_eq_zero]
   refine IsHausdorff.haus (I := Ideal.span {(p : O)}) inferInstance _ fun k => ?_
   obtain ⟨d, hd⟩ := Ideal.mem_span_singleton.mp (PadicInt.appr_spec k c)
-  have hc : c = (c.appr k : ℤ_[p]) + ((p ^ k : ℕ) : ℤ_[p]) * d := by
-    rw [Nat.cast_pow, ← hd]; ring
+  have hc : c = (c.appr k : ℤ_[p]) + ((p ^ k : ℕ) : ℤ_[p]) * d := by rw [Nat.cast_pow, ← hd]; ring
   have h : f c - g c = (p ^ k : ℕ) • (f d - g d) := by
     rw [hc]
     simp only [map_add (f := _), map_mul, map_natCast, nsmul_eq_mul, mul_sub]
@@ -39,17 +46,17 @@ private theorem padicInt_ringHom_matrix_ext (p : ℕ) [Fact p.Prime] (O : Type) 
   rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, h']
   exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
 
-theorem padicInt_algebra_of_isAdicComplete_and_matrix_unique :
-    ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsAdicComplete (Ideal.span {(p : O)}) O],
-      Nonempty (Algebra ℤ_[p] O) ∧ ∀ [Algebra ℤ_[p] O] (n : ℕ)
-        (f : ℤ_[p] →+* Matrix (Fin n) (Fin n) O) (c : ℤ_[p]),
-        f c = algebraMap ℤ_[p] O c • (1 : Matrix (Fin n) (Fin n) O) := by
+theorem padicInt_algebra_of_isAdicComplete_and_matrix_unique
+    : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsAdicComplete (Ideal.span {(p : O)}) O],
+      Nonempty (Algebra ℤ_[p] O)
+        ∧ ∀ [Algebra ℤ_[p] O] (n : ℕ) (f : ℤ_[p] →+* Matrix (Fin n) (Fin n) O) (c : ℤ_[p]),
+          f c = algebraMap ℤ_[p] O c • (1 : Matrix (Fin n) (Fin n) O) := by
   intro p _ O _ _
   refine ⟨?_, fun n f c => ?_⟩
   · obtain ⟨φ⟩ := nonempty_padicInt_ringHom p O _ (Ideal.mem_span_singleton_self _)
     exact ⟨φ.toAlgebra⟩
   · rw [padicInt_ringHom_matrix_ext p O n f
-      ((algebraMap O (Matrix (Fin n) (Fin n) O)).comp (algebraMap ℤ_[p] O)) c,
+        ((algebraMap O (Matrix (Fin n) (Fin n) O)).comp (algebraMap ℤ_[p] O)) c,
       RingHom.comp_apply, Algebra.algebraMap_eq_smul_one (A := Matrix (Fin n) (Fin n) O)]
 
 end GlobalTheory.ChF

@@ -10,7 +10,8 @@ open scoped Quaternion Topology
 
 namespace GlobalTheory
 
-theorem sqOpen_of_two_ne_zero : ∀ (K : Type) [NormedField K] [CompleteSpace K], (2 : K) ≠ 0 → SqOpen K := by
+theorem sqOpen_of_two_ne_zero
+    : ∀ (K : Type) [NormedField K] [CompleteSpace K], (2 : K) ≠ 0 → SqOpen K := by
   intro K _ _ h2 V hV
   obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1 hV
   set c := ‖(2:K)⁻¹‖ with hc
@@ -33,37 +34,37 @@ theorem sqOpen_of_two_ne_zero : ∀ (K : Type) [NormedField K] [CompleteSpace K]
   intro r hr
   have hr' : ‖r - 1‖ ≤ δ := by simpa [dist_eq_norm] using hr
   set f : K → K := fun μ => μ - (μ ^ 2 - r) * (2:K)⁻¹ with hfdef
-  have h22 : (2:K) * 2⁻¹ = 1 := mul_inv_cancel₀ h2
-  have hdiff : ∀ μ₁ μ₂ : K, f μ₁ - f μ₂ = (μ₁ - μ₂) * ((1 - μ₁) + (1 - μ₂)) * (2:K)⁻¹ := by
+  have h22 : (2 : K) * 2⁻¹ = 1 := mul_inv_cancel₀ h2
+  have hdiff : ∀ μ₁ μ₂ : K, f μ₁ - f μ₂ = (μ₁ - μ₂) * ((1 - μ₁) + (1 - μ₂)) * (2 : K)⁻¹ := by
     intro μ₁ μ₂
     simp only [hfdef]
     linear_combination (-(μ₁ - μ₂)) * h22
-  have hf1 : f 1 - 1 = (r - 1) * (2:K)⁻¹ := by
-    simp only [hfdef]; ring
+  have hf1 : f 1 - 1 = (r - 1) * (2 : K)⁻¹ := by simp only [hfdef]; ring
   set s := Metric.closedBall (1:K) ρ with hs
   have hlip : ∀ μ₁ ∈ s, ∀ μ₂ ∈ s, ‖f μ₁ - f μ₂‖ ≤ (1 / 2) * ‖μ₁ - μ₂‖ := by
     intro μ₁ h1 μ₂ h2'
     rw [hdiff, norm_mul, norm_mul]
-    have a1 : ‖1 - μ₁‖ ≤ ρ := by
-      rw [norm_sub_rev]; simpa [hs, dist_eq_norm] using h1
-    have a2 : ‖1 - μ₂‖ ≤ ρ := by
-      rw [norm_sub_rev]; simpa [hs, dist_eq_norm] using h2'
+    have a1 : ‖1 - μ₁‖ ≤ ρ := by rw [norm_sub_rev]; simpa [hs, dist_eq_norm] using h1
+    have a2 : ‖1 - μ₂‖ ≤ ρ := by rw [norm_sub_rev]; simpa [hs, dist_eq_norm] using h2'
     have a3 : ‖(1 - μ₁) + (1 - μ₂)‖ ≤ 2 * ρ := (norm_add_le _ _).trans (by linarith)
     have a4 : 0 ≤ ‖μ₁ - μ₂‖ := norm_nonneg _
     have a5 : 0 ≤ ‖(1 - μ₁) + (1 - μ₂)‖ := norm_nonneg _
-    calc ‖μ₁ - μ₂‖ * ‖(1 - μ₁) + (1 - μ₂)‖ * c ≤ ‖μ₁ - μ₂‖ * (2 * ρ) * c := by gcongr
+    calc
+      ‖μ₁ - μ₂‖ * ‖(1 - μ₁) + (1 - μ₂)‖ * c
+        ≤ ‖μ₁ - μ₂‖ * (2 * ρ) * c := by gcongr
       _ = ‖μ₁ - μ₂‖ * (2 * ρ * c) := by ring
       _ ≤ ‖μ₁ - μ₂‖ * (1 / 2) := by gcongr
       _ = (1 / 2) * ‖μ₁ - μ₂‖ := by ring
-  have h1s : (1:K) ∈ s := Metric.mem_closedBall_self hρ0.le
+  have h1s : (1 : K) ∈ s := Metric.mem_closedBall_self hρ0.le
   have hmaps : Set.MapsTo f s s := by
     intro μ hμ
     have hl := hlip μ hμ 1 h1s
     have hμ' : ‖μ - 1‖ ≤ ρ := by simpa [hs, dist_eq_norm] using hμ
-    have hf1' : ‖f 1 - 1‖ ≤ c * δ := by
-      rw [hf1, norm_mul, mul_comm]; gcongr
+    have hf1' : ‖f 1 - 1‖ ≤ c * δ := by rw [hf1, norm_mul, mul_comm]; gcongr
     have key : ‖f μ - 1‖ ≤ ρ := by
-      calc ‖f μ - 1‖ = ‖(f μ - f 1) + (f 1 - 1)‖ := by congr 1; ring
+      calc
+        ‖f μ - 1‖
+          = ‖(f μ - f 1) + (f 1 - 1)‖ := by congr 1; ring
         _ ≤ ‖f μ - f 1‖ + ‖f 1 - 1‖ := norm_add_le _ _
         _ ≤ (1 / 2) * ρ + c * δ := by gcongr; exact hl.trans (by gcongr)
         _ ≤ ρ := by linarith
@@ -77,11 +78,10 @@ theorem sqOpen_of_two_ne_zero : ∀ (K : Type) [NormedField K] [CompleteSpace K]
       simp only [Set.MapsTo.val_restrict_apply, Subtype.dist_eq, dist_eq_norm]
       push_cast
       exact hlip _ x.2 _ y.2
-  obtain ⟨μ, hμs, hfix, -⟩ :=
-    hcon.exists_fixedPoint' hcomplete hmaps h1s (edist_ne_top _ _)
+  obtain ⟨μ, hμs, hfix, -⟩ := hcon.exists_fixedPoint' hcomplete hmaps h1s (edist_ne_top _ _)
   refine ⟨μ, hball (Metric.closedBall_subset_ball hρε hμs), ?_⟩
   have hfix' : f μ = μ := hfix
-  have hz : (μ ^ 2 - r) * (2:K)⁻¹ = 0 := by
+  have hz : (μ ^ 2 - r) * (2 : K)⁻¹ = 0 := by
     simp only [hfdef] at hfix'
     linear_combination -hfix'
   rcases mul_eq_zero.1 hz with h | h

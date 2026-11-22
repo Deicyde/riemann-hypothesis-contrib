@@ -49,29 +49,33 @@ namespace MultiProjectiveCoordinates
 theorem pull_ratios_algebraic : PullRatiosAlgebraic.Statement :=
   PullRatiosAlgebraic.proof PullConeNull.proof PullConeDegree.proof PullGradedAlgebraic.proof
 
-theorem pull_forms_generic : PullFormsGeneric.Statement := PullFormsGeneric.proof pull_ratios_algebraic
+theorem pull_forms_generic : PullFormsGeneric.Statement :=
+  PullFormsGeneric.proof pull_ratios_algebraic
 
 theorem fibre_pull_integral : FibreNormPullback.Statement :=
   FibreNormPullback.proof_dehom pull_forms_generic
     (FibreNormDehomCharpoly.proof pull_forms_generic pull_ratios_algebraic PullSectionIntegral.proof
       DehomCharpolyForms.proof)
     (FibreNormDehomIntegral.proof FibreNormBadPrimesFinite.proof
-      (FibreNormGoodPrimeIntegral.proof GlobalTheory.T.pullback_cone_null_mod_p_holds PullConeDegreeInt.proof PullSectionIntegralInt.proof
-        DehomNormPIntegral.proof)
-      (FibreNormPrimeBound.proof pull_forms_generic GlobalTheory.T.norm_form_gauss_bound_holds ChartPrimePowerInverse.proof))
+      (FibreNormGoodPrimeIntegral.proof GlobalTheory.T.pullback_cone_null_mod_p_holds
+        PullConeDegreeInt.proof PullSectionIntegralInt.proof DehomNormPIntegral.proof)
+      (FibreNormPrimeBound.proof pull_forms_generic GlobalTheory.T.norm_form_gauss_bound_holds
+        ChartPrimePowerInverse.proof))
     FibreNormDehomRoots.full
 
 theorem grid_separation : GridSeparation.Statement :=
   GridSeparation.proof NormalLocusRep.proof
     (FibreNormBound.proof (ProjAvoidingForm.proof SegreArith.proof)
-      (FibreRepresentatives.proof AvoidFormFinite.proof)
-      (FibreNormMax.proof fibre_pull_integral) MetricMaxComparison.proof)
+      (FibreRepresentatives.proof AvoidFormFinite.proof) (FibreNormMax.proof fibre_pull_integral)
+      MetricMaxComparison.proof)
     RootGridLower.proof
 
 end MultiProjectiveCoordinates
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small Filter Topology in
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small
+  Filter Topology in
 theorem MultiProjectiveCoordinates.packing_statement : PackingStatement :=
   SmallPacking.proof
-    (NmSectionsRankBound.proof (NmSectionsFinite.proof (Conductor.proof SecEq.proof)) SecMRankBound.full)
+    (NmSectionsRankBound.proof (NmSectionsFinite.proof (Conductor.proof SecEq.proof))
+      SecMRankBound.full)
     (SmallSectionsSeparated.proof MultiProjectiveCoordinates.grid_separation)

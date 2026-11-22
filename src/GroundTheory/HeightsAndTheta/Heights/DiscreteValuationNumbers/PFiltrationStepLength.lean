@@ -20,19 +20,22 @@ theorem FiltrationStepLength.proof : FiltrationStepLength.Statement := by
   have hinj : Function.Injective g₁ := by
     rw [← LinearMap.ker_eq_bot, eq_bot_iff]
     intro y hy
-    induction y using Submodule.Quotient.induction_on with | _ c => ?_
+    induction y using Submodule.Quotient.induction_on with
+    | _ c => ?_
     rw [LinearMap.mem_ker] at hy
-    simp only [g₁, Submodule.mapQ_apply, LinearMap.mulRight_apply,
-      Submodule.Quotient.mk_eq_zero] at hy
+    simp only [g₁, Submodule.mapQ_apply, LinearMap.mulRight_apply, Submodule.Quotient.mk_eq_zero]
+      at hy
     simp only [Submodule.mem_bot, Submodule.Quotient.mk_eq_zero]
     exact Submodule.mem_colon_singleton.mpr (by simpa [smul_eq_mul] using hy)
   have hsurj : Function.Surjective g₂ := by
     intro y
-    induction y using Submodule.Quotient.induction_on with | _ a => ?_
+    induction y using Submodule.Quotient.induction_on with
+    | _ a => ?_
     exact ⟨Submodule.Quotient.mk a, rfl⟩
   have hex : Function.Exact g₁ g₂ := by
     intro y
-    induction y using Submodule.Quotient.induction_on with | _ a => ?_
+    induction y using Submodule.Quotient.induction_on with
+    | _ a => ?_
     simp only [g₂, Submodule.mapQ_apply, LinearMap.id_apply, Submodule.Quotient.mk_eq_zero,
       Set.mem_range]
     constructor
@@ -46,16 +49,18 @@ theorem FiltrationStepLength.proof : FiltrationStepLength.Statement := by
       rw [e]
       exact L.neg_mem hl
     · rintro ⟨x, hx⟩
-      induction x using Submodule.Quotient.induction_on with | _ c => ?_
+      induction x using Submodule.Quotient.induction_on with
+      | _ c => ?_
       simp only [g₁, Submodule.mapQ_apply, LinearMap.mulRight_apply] at hx
       rw [Submodule.Quotient.eq] at hx
       have e : a = -(c * f - a) + c * f := by ring
       rw [e]
       exact Submodule.add_mem_sup (L.neg_mem hx) (Ideal.mem_span_singleton'.mpr ⟨c, rfl⟩)
-  have key := Module.length_eq_add_of_exact (R := Localization.AtPrime W)
-    (LocalizedModule.map W.primeCompl g₁) (LocalizedModule.map W.primeCompl g₂)
-    (LocalizedModule.map_injective _ _ hinj) (LocalizedModule.map_surjective _ _ hsurj)
-    (LocalizedModule.map_exact _ _ _ hex)
+  have key :=
+    Module.length_eq_add_of_exact (R := Localization.AtPrime W)
+      (LocalizedModule.map W.primeCompl g₁) (LocalizedModule.map W.primeCompl g₂)
+      (LocalizedModule.map_injective _ _ hinj) (LocalizedModule.map_surjective _ _ hsurj)
+      (LocalizedModule.map_exact _ _ _ hex)
   unfold multAt
   rw [add_comm]
   exact key

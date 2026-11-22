@@ -19,8 +19,12 @@ def Hb (k : ℕ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
   Matrix.diagonal fun j => if j = Fin.last k then -1 else 1
 
 def embWb (k r : ℕ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) : Mx k r := fun i j =>
-  if h : (r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k) then μ ⟨i.val - r, by omega⟩ ⟨j.val - r, by omega⟩
-  else if i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k) then 1 else 0
+  if h : (r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k) then
+    μ ⟨i.val - r, by omega⟩ ⟨j.val - r, by omega⟩
+  else if i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k) then
+    1
+  else
+    0
 
 def UWb (k r : ℕ) : Set (Mx k r) :=
   {g | g ∈ UH (Hpk k r) ∧ ∀ a : Fin r, g *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ g *ᵥ bvec (esI k r a) = bvec (esI k r a)}
@@ -31,8 +35,13 @@ theorem hpk_herm : (Hpk k r)ᴴ = Hpk k r := by
   split_ifs <;> first | (exfalso; omega) | simp | norm_num
 
 theorem uw_clsub (z : Fin (2 * r + k + 1) → ℂ) : ClSub (UWset k r z : Set (Mx k r)) := by
-  refine ⟨⟨uh_one, fun a => ⟨Matrix.one_mulVec _, Matrix.one_mulVec _⟩, Matrix.one_mulVec _⟩, ?_, ?_,
-    fun a ha => isUnit_of_uh ha.1, ?_⟩
+  refine ⟨
+    ⟨uh_one, fun a => ⟨Matrix.one_mulVec _, Matrix.one_mulVec _⟩, Matrix.one_mulVec _⟩,
+    ?_,
+    ?_,
+    fun a ha => isUnit_of_uh ha.1,
+    ?_
+  ⟩
   · intro a ha b hb
     refine ⟨uh_mul ha.1 hb.1, fun c => ⟨?_, ?_⟩, ?_⟩
     · rw [← Matrix.mulVec_mulVec, (hb.2.1 c).1, (ha.2.1 c).1]
@@ -42,14 +51,19 @@ theorem uw_clsub (z : Fin (2 * r + k + 1) → ℂ) : ClSub (UWset k r z : Set (M
     have hu := isUnit_of_uh ha.1
     have fix : ∀ v, a *ᵥ v = v → a⁻¹ *ᵥ v = v := by
       intro v hv
-      calc a⁻¹ *ᵥ v = a⁻¹ *ᵥ (a *ᵥ v) := by rw [hv]
+      calc
+        a⁻¹ *ᵥ v
+          = a⁻¹ *ᵥ (a *ᵥ v) := by rw [hv]
         _ = v := by rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu, Matrix.one_mulVec]
     exact ⟨uh_inv ha.1, fun c => ⟨fix _ (ha.2.1 c).1, fix _ (ha.2.1 c).2⟩, fix _ ha.2.2⟩
   · have hv : ∀ v : Fin (2 * r + k + 1) → ℂ, IsClosed {g : Mx k r | g *ᵥ v = v} := fun v =>
       isClosed_eq (Continuous.matrix_mulVec continuous_id continuous_const) continuous_const
-    have e : (UWset k r z : Set (Mx k r)) = UH (Hpk k r) ∩
-        ((⋂ a : Fin r, ({g : Mx k r | g *ᵥ bvec (eI k r a) = bvec (eI k r a)} ∩
-          {g : Mx k r | g *ᵥ bvec (esI k r a) = bvec (esI k r a)})) ∩ {g : Mx k r | g *ᵥ z = z}) := by
+    have e
+        : (UWset k r z : Set (Mx k r))
+          = UH (Hpk k r)
+            ∩ ((⋂ a : Fin r, ({g : Mx k r | g *ᵥ bvec (eI k r a) = bvec (eI k r a)} ∩
+                {g : Mx k r | g *ᵥ bvec (esI k r a) = bvec (esI k r a)}))
+              ∩ {g : Mx k r | g *ᵥ z = z}) := by
       ext g
       simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_ofPred_eq]
       exact Iff.rfl
@@ -58,7 +72,8 @@ theorem uw_clsub (z : Fin (2 * r + k + 1) → ℂ) : ClSub (UWset k r z : Set (M
 
 abbrev mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val ≤ r + k
 
-def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) := ⟨i.val - r, by have := hi; omega⟩
+def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) :=
+  ⟨i.val - r, by have := hi; omega⟩
 
 lemma wI_midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : wI k r (midx hi) = i := by
   have := hi
@@ -97,7 +112,8 @@ lemma emb_mid (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * r + 
   rw [dite_eq_left ⟨hq, hj⟩]
   rfl
 
-def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m => if i = wI k r m then 1 else 0
+def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m =>
+  if i = wI k r m then 1 else 0
 
 lemma Em_mul_mid {X : Type*} (A : Matrix (Fin (k + 1)) X ℂ) (i : Fin (2 * r + k + 1)) (x : X) (hi : mid k r i) :
     (Em k r * A) i x = A (midx hi) x := by
@@ -533,16 +549,16 @@ lemma herm_wb (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) :
       Matrix.mulVec_mulVec, Em_conjT, EmT_Em, Matrix.one_mulVec]
   rw [← key, Em_EmT_mulVec z hz]
 
-theorem compactW (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) :
-    IsCompact (UWset k r z : Set (Mx k r)) := by
+theorem compactW (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+    : IsCompact (UWset k r z : Set (Mx k r)) := by
   set zb := (Em k r)ᵀ *ᵥ z with hzb
   have hT' : (star zb ⬝ᵥ (Hb k *ᵥ zb)).re < 0 := by
     rw [hzb, ← herm_wb z hz]
     unfold Tz at hT
     linarith
   obtain ⟨R, hR⟩ := col_bound zb hT'
-  have hK0 : IsCompact (Set.pi Set.univ fun _ : Fin (k + 1) => Set.pi Set.univ fun _ : Fin (k + 1) =>
-      Metric.closedBall (0 : ℂ) R) :=
+  have hK0 : IsCompact (Set.pi Set.univ fun _ : Fin (k + 1) =>
+      Set.pi Set.univ fun _ : Fin (k + 1) => Metric.closedBall (0 : ℂ) R) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
   have hK := hK0.image (emb_cont (k := k) (r := r))
   refine IsCompact.of_isClosed_subset hK (uw_clsub z).closed ?_

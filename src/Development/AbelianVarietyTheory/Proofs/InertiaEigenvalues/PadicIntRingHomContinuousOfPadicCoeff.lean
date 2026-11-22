@@ -9,12 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FactorM
 
 @[expose] public section
 
-open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2 GlobalTheory.LocDualInt
+open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+  ReciprocityTheory.ChartRestriction.T2 GlobalTheory.LocDualInt
 
 namespace GlobalTheory
 
-theorem padicInt_ringHom_continuous_of_padicCoeff : ∀ {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [TopologicalSpace O], PadicCoeff p O → ∀ φ : ℤ_[p] →+* O, Continuous φ := by
+theorem padicInt_ringHom_continuous_of_padicCoeff
+    : ∀ {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [TopologicalSpace O],
+      PadicCoeff p O → ∀ φ : ℤ_[p] →+* O, Continuous φ := by
   intro p _ O _ _ _ _ hO φ
   haveI := hO.ring
   refine continuous_of_continuousAt_zero φ ?_

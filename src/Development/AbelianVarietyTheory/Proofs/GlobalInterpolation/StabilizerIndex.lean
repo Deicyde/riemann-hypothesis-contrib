@@ -9,7 +9,8 @@ public import Formalism.LogVandermondeBounds.LogVandermondeProofs.CardStabilizer
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions
+  Formalism.MainNotions.StandardLattice
 open scoped TensorProduct
 
 namespace GlobalTheory.Proof.StabilizerIndex
@@ -27,9 +28,14 @@ lemma index_field (F : Type) [Field F] [Finite F] (k : ℕ) (φ : Fin k → F) (
     ← hc, ← hcm] at h
   exact (Nat.eq_of_mul_eq_mul_left Nat.card_pos h).symm
 
-theorem index_stabRow : ∀ (κ : Type) [CommRing κ] (T k : ℕ), T.Prime → Nat.card κ = T →
-    ∀ φ : Fin k → κ, φ ≠ 0 →
-      (((GlobalTheory.IndefiniteRowSideFullHecke.OverPlaceIntegralForm.stabRow φ).index : ℕ) : ℝ) = (T : ℝ) ^ k - 1 := by
+theorem index_stabRow
+    : ∀ (κ : Type) [CommRing κ] (T k : ℕ),
+      T.Prime → Nat.card κ = T
+        → ∀ φ : Fin k → κ,
+          φ ≠ 0
+            → (((GlobalTheory.IndefiniteRowSideFullHecke.OverPlaceIntegralForm.stabRow φ).index : ℕ)
+                : ℝ)
+              = (T : ℝ) ^ k - 1 := by
   intro κ _ T k hT hcard φ hφ
   haveI : Fact T.Prime := ⟨hT⟩
   haveI : Finite κ := Nat.finite_of_card_ne_zero (hcard ▸ hT.ne_zero)
@@ -37,7 +43,9 @@ theorem index_stabRow : ∀ (κ : Type) [CommRing κ] (T k : ℕ), T.Prime → N
   have e : ZMod T ≃+* κ := ZMod.ringEquivOfPrime κ hT (by rw [← Nat.card_eq_fintype_card, hcard])
   have hF : IsField κ := MulEquiv.isField (Field.toIsField (ZMod T)) e.symm.toMulEquiv
   have h := @index_field κ hF.toField _ k φ hφ
-  have h' : (GlobalTheory.IndefiniteRowSideFullHecke.OverPlaceIntegralForm.stabRow φ).index = T ^ k - 1 := by
+  have h'
+      : (GlobalTheory.IndefiniteRowSideFullHecke.OverPlaceIntegralForm.stabRow φ).index
+        = T ^ k - 1 := by
     rw [← hcard]; exact h
   rw [h', Nat.cast_sub (Nat.one_le_pow _ _ hT.pos)]
   push_cast

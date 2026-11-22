@@ -10,12 +10,13 @@ open scoped Uniformity
 
 namespace GlobalTheory
 
-theorem schwartz_tendsto_apply_of_tendsto_pointwise :
-    ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
-    (S : ℝ → SchwartzMap V ℂ →L[ℂ] SchwartzMap V ℂ),
-    (∀ f, Filter.Tendsto (fun t => S t f) (nhdsWithin 0 {0}ᶜ) (nhds f)) →
-    ∀ (g : ℝ → SchwartzMap V ℂ) (g₀ : SchwartzMap V ℂ), Filter.Tendsto g (nhdsWithin 0 {0}ᶜ) (nhds g₀) →
-      Filter.Tendsto (fun t => S t (g t)) (nhdsWithin 0 {0}ᶜ) (nhds g₀) := by
+theorem schwartz_tendsto_apply_of_tendsto_pointwise
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+        (S : ℝ → SchwartzMap V ℂ →L[ℂ] SchwartzMap V ℂ),
+      (∀ f, Filter.Tendsto (fun t => S t f) (nhdsWithin 0 {0}ᶜ) (nhds f))
+        → ∀ (g : ℝ → SchwartzMap V ℂ) (g₀ : SchwartzMap V ℂ),
+          Filter.Tendsto g (nhdsWithin 0 {0}ᶜ) (nhds g₀)
+            → Filter.Tendsto (fun t => S t (g t)) (nhdsWithin 0 {0}ᶜ) (nhds g₀) := by
   intro V _ _ _ S hS g g₀ hg
   haveI : BarrelledSpace ℂ (SchwartzMap V ℂ) := schwartzMap_barrelledSpace V
   rw [tendsto_iff_seq_tendsto]

@@ -31,6 +31,7 @@ theorem classGroup_ringOfIntegers_divisible : GlobalTheory.NeedB.ClDiv := by
   have hdim : Module.finrank k (A ⧸ Ideal.span {f}) % N = 1 % N := by
     rw [finrank_quotient_span_eq_natDegree_norm (Module.Free.chooseBasis k[X] A) hf0]
     exact hf
-  exact GlobalTheory.T.classGroup_nthPower_of_congruent_points_mod k A N hN (GlobalTheory.T.function_field_class_group_powers k A N h) ⟨f, hf0, hdim⟩ c
+  exact GlobalTheory.T.classGroup_nthPower_of_congruent_points_mod k A N hN
+    (GlobalTheory.T.function_field_class_group_powers k A N h) ⟨f, hf0, hdim⟩ c
 
 end GlobalTheory

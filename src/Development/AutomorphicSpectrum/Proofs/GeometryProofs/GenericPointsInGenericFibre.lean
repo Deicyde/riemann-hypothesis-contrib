@@ -15,12 +15,11 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.CompanionTheory.Ar.M0
 
-theorem genericPoints_subset_range_j :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
-      (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O]
-      (β : O →+* c.F) (Y : Model Xo c β),
-      IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F) →
-        genericPoints Y.X ⊆ Set.range Y.j := by
+theorem genericPoints_subset_range_j
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β),
+      IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F)
+        → genericPoints Y.X ⊆ Set.range Y.j := by
   intro E _ _ _ H D l Xo c O _ β Y hO hFraction v hv
   let := β.toAlgebra
   have : IsFractionRing O c.F := hFraction

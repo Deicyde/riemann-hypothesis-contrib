@@ -13,24 +13,27 @@ namespace GlobalTheory.CocycleDescent
 
 variable {A B : Type} [CommRing A] [CommRing B] [Algebra A B] {d : ℕ}
 
-noncomputable def defect (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) :
-    (Fin d → B) →ₗ[A] (Fin d → B ⊗[A] B) :=
-  (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B).toLinearMap.compLeft (Fin d) -
-    (ε.mulVecLin.restrictScalars A) ∘ₗ
-      (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B).toLinearMap.compLeft (Fin d)
+noncomputable def defect (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B))
+    : (Fin d → B) →ₗ[A] (Fin d → B ⊗[A] B) :=
+  (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B).toLinearMap.compLeft (Fin d)
+    - (ε.mulVecLin.restrictScalars A)
+      ∘ₗ (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B).toLinearMap.compLeft (Fin d)
 
-theorem defect_apply (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (z : Fin d → B) :
-    defect ε z = (fun i => z i ⊗ₜ[A] (1 : B)) - ε.mulVec fun i => (1 : B) ⊗ₜ[A] z i := rfl
+theorem defect_apply (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (z : Fin d → B)
+    : defect ε z = (fun i => z i ⊗ₜ[A] (1 : B)) - ε.mulVec fun i => (1 : B) ⊗ₜ[A] z i :=
+  rfl
 
-theorem lTensor_defect (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (x : B ⊗[A] (Fin d → B)) :
-    piRight A A B (fun _ : Fin d => B ⊗[A] B) ((defect ε).lTensor B x) =
-      (fun i => Algebra.TensorProduct.map (AlgHom.id A B)
-        (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B)
-          (piRight A A B (fun _ : Fin d => B) x i)) -
-      (ε.map (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B))).mulVec
-        (fun i => Algebra.TensorProduct.map (AlgHom.id A B)
-          (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B)
-            (piRight A A B (fun _ : Fin d => B) x i)) := by
+theorem lTensor_defect (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (x : B ⊗[A] (Fin d → B))
+    : piRight A A B (fun _ : Fin d => B ⊗[A] B) ((defect ε).lTensor B x)
+      = (fun i =>
+          Algebra.TensorProduct.map (AlgHom.id A B)
+            (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B)
+            (piRight A A B (fun _ : Fin d => B) x i))
+        - (ε.map (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B))).mulVec
+          (fun i =>
+            Algebra.TensorProduct.map (AlgHom.id A B)
+              (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B)
+              (piRight A A B (fun _ : Fin d => B) x i)) := by
   induction x with
   | add x y hx hy =>
     rw [map_add (f := _), map_add (f := _), hx, hy, map_add (f := _)]
@@ -42,18 +45,22 @@ theorem lTensor_defect (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (x : B ⊗[A] 
     ext i
     simp [defect_apply, Matrix.mulVec, dotProduct, tmul_sub, tmul_sum]
 
-theorem isBaseChange [Module.Flat A B] (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (hε : IsUnit ε)
+theorem isBaseChange
+    [Module.Flat A B]
+    (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (hε : IsUnit ε)
     (hc : ε.map (Algebra.TensorProduct.map (AlgHom.id A B)
-        (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B)) *
-      ε.map (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B)) =
-      ε.map (Algebra.TensorProduct.map (AlgHom.id A B)
-        (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B))) :
-    IsBaseChange B (LinearMap.ker (defect ε)).subtype := by
+          (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B))
+        * ε.map (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B))
+      = ε.map (Algebra.TensorProduct.map (AlgHom.id A B)
+        (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B)))
+    : IsBaseChange B (LinearMap.ker (defect ε)).subtype := by
   set N := LinearMap.ker (defect ε) with hN
   set e := piRight A A B (fun _ : Fin d => B) with he
   have hεinj : Function.Injective ε.mulVec := Matrix.mulVec_injective_of_isUnit hε
-  have key : ∀ x : B ⊗[A] N, (fun i => (N.subtype.liftBaseChange B x) i ⊗ₜ[A] (1 : B)) =
-      ε.mulVec (e (N.subtype.lTensor B x)) := by
+  have key
+      : ∀ x : B ⊗[A] N,
+        (fun i => (N.subtype.liftBaseChange B x) i ⊗ₜ[A] (1 : B))
+          = ε.mulVec (e (N.subtype.lTensor B x)) := by
     intro x
     induction x with
     | add x y hx hy =>
@@ -63,15 +70,16 @@ theorem isBaseChange [Module.Flat A B] (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)
     | tmul b n =>
       have hn : defect ε n.1 = 0 := n.2
       rw [defect_apply, sub_eq_zero] at hn
-      have h1 : e (N.subtype.lTensor B (b ⊗ₜ n)) =
-          (b ⊗ₜ[A] (1 : B)) • fun i => (1 : B) ⊗ₜ[A] n.1 i := by
+      have h1
+          : e (N.subtype.lTensor B (b ⊗ₜ n))
+            = (b ⊗ₜ[A] (1 : B)) • fun i => (1 : B) ⊗ₜ[A] n.1 i := by
         ext i
         simp [he]
       rw [h1, Matrix.mulVec_smul, ← hn]
       ext i
       simp
-  have hleft : ∀ z w : Fin d → B,
-      (fun i => z i ⊗ₜ[A] (1 : B)) = (fun i => w i ⊗ₜ[A] (1 : B)) → z = w := by
+  have hleft
+      : ∀ z w : Fin d → B, (fun i => z i ⊗ₜ[A] (1 : B)) = (fun i => w i ⊗ₜ[A] (1 : B)) → z = w := by
     intro z w h
     ext i
     simpa using congrArg (Algebra.TensorProduct.lmul' A (S := B)) (congrFun h i)
@@ -107,16 +115,17 @@ theorem isBaseChange [Module.Flat A B] (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)
     congr 1
     rw [← e.apply_symm_apply y, ← hx]
 
-theorem descent (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Module.FaithfullyFlat A B]
+theorem descent
+    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Module.FaithfullyFlat A B]
     (d : ℕ) (ε : Matrix (Fin d) (Fin d) (B ⊗[A] B)) (hε : IsUnit ε)
     (hc : ε.map (Algebra.TensorProduct.map (AlgHom.id A B)
-        (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B)) *
-      ε.map (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B)) =
-      ε.map (Algebra.TensorProduct.map (AlgHom.id A B)
+          (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B))
+        * ε.map (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B))
+      = ε.map (Algebra.TensorProduct.map (AlgHom.id A B)
         (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B)))
     (N : Submodule A (Fin d → B))
-    (hN : ∀ z, z ∈ N ↔ (fun i => z i ⊗ₜ[A] (1 : B)) = ε.mulVec fun i => (1 : B) ⊗ₜ[A] z i) :
-    Module.Finite A ↥N ∧ Module.Projective A ↥N ∧ IsBaseChange B N.subtype := by
+    (hN : ∀ z, z ∈ N ↔ (fun i => z i ⊗ₜ[A] (1 : B)) = ε.mulVec fun i => (1 : B) ⊗ₜ[A] z i)
+    : Module.Finite A ↥N ∧ Module.Projective A ↥N ∧ IsBaseChange B N.subtype := by
   have hk : N = LinearMap.ker (defect ε) := by
     ext z
     rw [hN, LinearMap.mem_ker, defect_apply, sub_eq_zero]

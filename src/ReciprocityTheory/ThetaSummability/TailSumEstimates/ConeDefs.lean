@@ -17,11 +17,9 @@ def tailSum {r : ℕ} (y : Fin r → ℝ) (k : Fin r) : ℝ :=
 def partialSum {r : ℕ} (s : Fin r → ℝ) (k : Fin r) : ℝ :=
   ∑ i ∈ univ.filter (fun i : Fin r => i ≤ k), s i
 
-def logCone (r : ℕ) (c : ℝ) : Set (Fin r → ℝ) :=
-  {x | ∀ k, c ≤ gap x k}
+def logCone (r : ℕ) (c : ℝ) : Set (Fin r → ℝ) := {x | ∀ k, c ≤ gap x k}
 
-def lowerBox (r : ℕ) (c : ℝ) : Set (Fin r → ℝ) :=
-  Set.pi Set.univ (fun _ => Set.Ici c)
+def lowerBox (r : ℕ) (c : ℝ) : Set (Fin r → ℝ) := Set.pi Set.univ (fun _ => Set.Ici c)
 
 def multCone (r : ℕ) (c : ℝ) : Set (Fin r → ℝ) :=
   {t | ∀ k : Fin r, (if h : k.val + 1 < r then c * t ⟨k.val + 1, h⟩ else c) ≤ t k}

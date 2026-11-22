@@ -7,10 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 
-private theorem one_le_addVal_toNat_of_ne_zero_of_not_isUnit {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (y : c.O) (h0 : y ≠ 0)
-    (hu : ¬ IsUnit y) : 1 ≤ (IsDiscreteValuationRing.addVal c.O y).toNat := by
+private theorem one_le_addVal_toNat_of_ne_zero_of_not_isUnit
+    {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (y : c.O) (h0 : y ≠ 0) (hu : ¬ IsUnit y)
+    : 1 ≤ (IsDiscreteValuationRing.addVal c.O y).toNat := by
   have h1 : IsDiscreteValuationRing.addVal c.O y ≠ ⊤ := by
     rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff]
   have h2 : IsDiscreteValuationRing.addVal c.O y ≠ 0 := by
@@ -18,33 +20,40 @@ private theorem one_le_addVal_toNat_of_ne_zero_of_not_isUnit {l : ℕ} [Fact l.P
   rw [Nat.one_le_iff_ne_zero, Ne, ENat.toNat_eq_zero]
   tauto
 
-private theorem prime_inv_pow_lt_one_of_one_le {l : ℕ} [Fact l.Prime] (k : ℕ) (hk : 1 ≤ k) :
-    ((l : ℝ)⁻¹) ^ k < 1 := by
+private theorem prime_inv_pow_lt_one_of_one_le {l : ℕ} [Fact l.Prime] (k : ℕ) (hk : 1 ≤ k)
+    : ((l : ℝ)⁻¹) ^ k < 1 := by
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   exact pow_lt_one₀ (by positivity) (inv_lt_one_of_one_lt₀ hl) (by omega)
 
-private theorem base_eO_toNat_ne_zero {l : ℕ} [Fact l.Prime] (c : HV.Coef l) :
-    (Base.eO l c.O).toNat ≠ 0 := by
+private theorem base_eO_toNat_ne_zero {l : ℕ} [Fact l.Prime] (c : HV.Coef l)
+    : (Base.eO l c.O).toNat ≠ 0 := by
   intro he
   obtain ⟨w, hw⟩ := IsDiscreteValuationRing.exists_irreducible c.O
   have h := Base.normO l c.O w hw.ne_zero
   rw [he, pow_zero] at h
-  have hk := prime_inv_pow_lt_one_of_one_le (l := l) _ (one_le_addVal_toNat_of_ne_zero_of_not_isUnit c w hw.ne_zero hw.not_isUnit)
+  have hk :=
+    prime_inv_pow_lt_one_of_one_le (l := l) _
+      (one_le_addVal_toNat_of_ne_zero_of_not_isUnit c w hw.ne_zero hw.not_isUnit)
   linarith
 
-private theorem norm_lt_one_of_not_isUnit {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (y : c.O) (hy : ¬ IsUnit y) :
-    ‖(y : PadicAlgCl l)‖ < 1 := by
+private theorem norm_lt_one_of_not_isUnit
+    {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (y : c.O) (hy : ¬ IsUnit y)
+    : ‖(y : PadicAlgCl l)‖ < 1 := by
   by_cases h0 : y = 0
   · subst h0
     simp
   · have he := base_eO_toNat_ne_zero c
     have h := Base.normO l c.O y h0
-    have hk := prime_inv_pow_lt_one_of_one_le (l := l) _ (one_le_addVal_toNat_of_ne_zero_of_not_isUnit c y h0 hy)
+    have hk :=
+      prime_inv_pow_lt_one_of_one_le (l := l) _
+        (one_le_addVal_toNat_of_ne_zero_of_not_isUnit c y h0 hy)
     rw [← h] at hk
     exact (pow_lt_one_iff_of_nonneg (norm_nonneg _) he).mp hk
 
-private theorem dvd_of_norm_lt {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (a x : c.O)
-    (h : ‖(x : PadicAlgCl l)‖ < ‖(a : PadicAlgCl l)‖) : a ∣ x := by
+private theorem dvd_of_norm_lt
+    {l : ℕ} [Fact l.Prime]
+    (c : HV.Coef l) (a x : c.O) (h : ‖(x : PadicAlgCl l)‖ < ‖(a : PadicAlgCl l)‖)
+    : a ∣ x := by
   by_cases hx : x = 0
   · subst hx
     exact dvd_zero a
@@ -64,8 +73,8 @@ private theorem dvd_of_norm_lt {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (a x : c
   rw [← IsDiscreteValuationRing.addVal_le_iff_dvd, ← ENat.coe_toNat hta, ← ENat.coe_toNat htx]
   exact_mod_cast hlt.le
 
-private theorem ev_dvd {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (a : c.O) (ha : a ≠ 0) (x : c.O) :
-    ∀ᶠ y in nhds x, a ∣ y - x := by
+private theorem ev_dvd {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (a : c.O) (ha : a ≠ 0) (x : c.O)
+    : ∀ᶠ y in nhds x, a ∣ y - x := by
   have ha' : 0 < ‖(a : PadicAlgCl l)‖ := norm_pos_iff.mpr (by exact_mod_cast ha)
   have hc : Continuous (fun y : c.O => ‖(y : PadicAlgCl l) - x‖) :=
     (continuous_subtype_val.sub continuous_const).norm
@@ -79,16 +88,19 @@ private theorem ev_dvd {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (a : c.O) (ha : 
   push_cast
   exact hy
 
-private theorem norm_coef_O_coe_padicAlgCl_le_one {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (y : c.O) :
-    ‖(y : PadicAlgCl l)‖ ≤ 1 := by
+private theorem norm_coef_O_coe_padicAlgCl_le_one {l : ℕ} [Fact l.Prime] (c : HV.Coef l) (y : c.O)
+    : ‖(y : PadicAlgCl l)‖ ≤ 1 := by
   by_cases hu : IsUnit y
   · have h := Base.normO l c.O y hu.ne_zero
     rw [IsDiscreteValuationRing.addVal_eq_zero_iff.mpr hu, ENat.toNat_zero, pow_zero] at h
     exact ((pow_eq_one_iff_of_nonneg (norm_nonneg _) (base_eO_toNat_ne_zero c)).mp h).le
   · exact (norm_lt_one_of_not_isUnit c y hu).le
 
-theorem UpperTheory.V.X.So.adicCont :
-    ∀ (l : ℕ) [Fact l.Prime] (c : HV.Coef l), (∀ a : c.O, a ≠ 0 → Continuous (Lev.mk a)) ∧ ∀ (X : Type) [TopologicalSpace X] (z : X → c.O), Alg.AdicCont (maximalIdeal c.O) z ↔ Continuous z := by
+theorem UpperTheory.V.X.So.adicCont
+    : ∀ (l : ℕ) [Fact l.Prime] (c : HV.Coef l),
+      (∀ a : c.O, a ≠ 0 → Continuous (Lev.mk a))
+        ∧ ∀ (X : Type) [TopologicalSpace X] (z : X → c.O),
+          Alg.AdicCont (maximalIdeal c.O) z ↔ Continuous z := by
   intro l _ c
   refine ⟨fun a ha => ?_, fun X _ z => ?_⟩
   · apply IsLocallyConstant.continuous
@@ -118,8 +130,9 @@ theorem UpperTheory.V.X.So.adicCont :
       have he : ((z g : c.O) : PadicAlgCl l) - z g0 = (w : PadicAlgCl l) ^ N * t := by
         exact_mod_cast congrArg (fun u : c.O => (u : PadicAlgCl l)) ht
       rw [he, norm_mul, norm_pow]
-      calc ‖(w : PadicAlgCl l)‖ ^ N * ‖(t : PadicAlgCl l)‖ ≤ ‖(w : PadicAlgCl l)‖ ^ N * 1 :=
-            mul_le_mul_of_nonneg_left (norm_coef_O_coe_padicAlgCl_le_one c t) (by positivity)
+      calc
+        ‖(w : PadicAlgCl l)‖ ^ N * ‖(t : PadicAlgCl l)‖ ≤ ‖(w : PadicAlgCl l)‖ ^ N * 1 :=
+          mul_le_mul_of_nonneg_left (norm_coef_O_coe_padicAlgCl_le_one c t) (by positivity)
         _ < ε := by
           rw [mul_one]
           exact hN

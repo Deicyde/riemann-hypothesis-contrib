@@ -11,8 +11,8 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.M.wtEx :
-    ∀ (F : Type) [Field F] [NumberField F], ∃ β : G1 F → ℝ≥0∞, M.NWt β := by
+theorem UpperTheory.ConvolutionTheory.R2.M.wtEx
+    : ∀ (F : Type) [Field F] [NumberField F], ∃ β : G1 F → ℝ≥0∞, M.NWt β := by
   intro F _ _
   have hinj : Function.Injective (fun ξ : F => (nU (rt ξ : A F) : G1 F)) := by
     intro a b h
@@ -20,15 +20,16 @@ theorem UpperTheory.ConvolutionTheory.R2.M.wtEx :
       rw [show (nU (rt a : A F) : G1 F) = nU (rt b : A F) from h]
     have h2 : (rt a : A F) = rt b := by simpa [nU] using h1
     exact AdeleRing.algebraMap_injective (𝓞 F) F h2
-  let N : Subgroup (G1 F) :=
-    { carrier := Set.range fun ξ : F => (nU (rt ξ : A F) : G1 F)
-      mul_mem' := by
-        rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
-        exact ⟨a + b, by simp only [rt, map_add (f := _), M.nU_add]⟩
-      one_mem' := ⟨0, by simp only [rt, map_zero, M.nU_zero]⟩
-      inv_mem' := by
-        rintro _ ⟨a, rfl⟩
-        exact ⟨-a, by simp only [rt, map_neg, M.nU_neg]⟩ }
+  let N : Subgroup (G1 F) := {
+    carrier := Set.range fun ξ : F => (nU (rt ξ : A F) : G1 F)
+    mul_mem' := by
+      rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
+      exact ⟨a + b, by simp only [rt, map_add (f := _), M.nU_add]⟩
+    one_mem' := ⟨0, by simp only [rt, map_zero, M.nU_zero]⟩
+    inv_mem' := by
+      rintro _ ⟨a, rfl⟩
+      exact ⟨-a, by simp only [rt, map_neg, M.nU_neg]⟩
+  }
   have hle : N ≤ Gam F := by
     rintro _ ⟨ξ, rfl⟩
     exact M.nU_rt_mem ξ

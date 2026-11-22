@@ -52,33 +52,59 @@ lemma wirtinger_conj_mul_pow {s : ℂ} {b : ℂ → ℂ} {b' : ℂ} (hb : HasDer
   simp
   ring
 
-theorem wirtinger_eichler : ∀ (w : ℕ) (f h : ℍ → ℂ) (p : ℂ[X]), MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f →
-    MDifferentiable 𝓘(ℂ) 𝓘(ℂ) h → ∀ s : ℂ, 0 < s.im → ∃ L : ℂ →L[ℝ] ℂ,
-      HasFDerivAt (fun z : ℂ => (eichler w f (ofComplex z) - (eichler w h (ofComplex z)).map (starRingEnd ℂ) - p).eval z) L s ∧
-      L Complex.I - Complex.I * L 1 = 2 * Complex.I * (s - (starRingEnd ℂ) s) ^ w * (starRingEnd ℂ) (h (ofComplex s)) := by
+theorem wirtinger_eichler
+    : ∀ (w : ℕ) (f h : ℍ → ℂ) (p : ℂ[X]),
+      MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) h
+        → ∀ s : ℂ,
+          0 < s.im
+            → ∃ L : ℂ →L[ℝ] ℂ,
+              HasFDerivAt
+                  (fun z : ℂ =>
+                    (eichler w f (ofComplex z) - (eichler w h (ofComplex z)).map (starRingEnd ℂ)
+                      - p).eval z)
+                  L s
+                ∧ L Complex.I - Complex.I * L 1
+                  = 2 * Complex.I * (s - (starRingEnd ℂ) s) ^ w
+                    * (starRingEnd ℂ) (h (ofComplex s)) := by
   intro w f h p hf hh s hs
-  have he : ∀ (g : ℍ → ℂ) (z : ℂ), 0 < z.im → eichler w g (ofComplex z) =
-      ∑ j ∈ Finset.range (w + 1), C ((w.choose j : ℂ) * GlobalTheory.EichlerChange.ecoef w g j z) * X ^ j := by
-    intro g z hz
-    rw [ofComplex_apply_of_im_pos hz]
-    rfl
-  have hF : P s (fun z => ∑ j ∈ Finset.range (w + 1), (w.choose j : ℂ) * GlobalTheory.EichlerChange.ecoef w f j z * z ^ j)
+  have he
+      : ∀ (g : ℍ → ℂ) (z : ℂ),
+        0 < z.im
+          → eichler w g (ofComplex z)
+            = ∑ j ∈ Finset.range (w + 1), C ((w.choose j : ℂ) * GlobalTheory.EichlerChange.ecoef w g j z) * X ^ j :=
+    by
+      intro g z hz
+      rw [ofComplex_apply_of_im_pos hz]
+      rfl
+  have hF : P s
+      (fun z =>
+        ∑ j ∈ Finset.range (w + 1), (w.choose j : ℂ) * GlobalTheory.EichlerChange.ecoef w f j z * z ^ j)
       (∑ j ∈ Finset.range (w + 1), (0 : ℂ)) :=
-    wirtinger_sum _ _ _ fun j _ => wirtinger_eq_zero_of_hasDerivAt
-      (((GlobalTheory.EichlerChange.hasDerivAt_ecoef w f hf j s hs).const_mul _).mul (hasDerivAt_pow j s))
-  have hH : P s (fun z => ∑ j ∈ Finset.range (w + 1), starRingEnd ℂ ((w.choose j : ℂ) * GlobalTheory.EichlerChange.ecoef w h j z) * z ^ j)
+    wirtinger_sum _ _ _ fun j _ =>
+      wirtinger_eq_zero_of_hasDerivAt
+        (((GlobalTheory.EichlerChange.hasDerivAt_ecoef w f hf j s hs).const_mul _).mul
+          (hasDerivAt_pow j s))
+  have hH : P s
+      (fun z =>
+        ∑ j ∈ Finset.range (w + 1), starRingEnd ℂ ((w.choose j : ℂ) * GlobalTheory.EichlerChange.ecoef w h j z) * z ^ j)
       (∑ j ∈ Finset.range (w + 1), -2 * Complex.I * s ^ j *
         starRingEnd ℂ ((w.choose j : ℂ) * ((h ∘ ofComplex) s * (-s) ^ (w - j)))) :=
-    wirtinger_sum _ _ _ fun j _ => wirtinger_conj_mul_pow ((GlobalTheory.EichlerChange.hasDerivAt_ecoef w h hh j s hs).const_mul _) j
-  obtain ⟨L, hL, hd⟩ := wirtinger_sub (wirtinger_sub hF hH) (wirtinger_eq_zero_of_hasDerivAt (Polynomial.hasDerivAt p s))
+    wirtinger_sum _ _ _ fun j _ =>
+      wirtinger_conj_mul_pow
+        ((GlobalTheory.EichlerChange.hasDerivAt_ecoef w h hh j s hs).const_mul _) j
+  obtain ⟨L, hL, hd⟩ :=
+    wirtinger_sub (wirtinger_sub hF hH)
+      (wirtinger_eq_zero_of_hasDerivAt (Polynomial.hasDerivAt p s))
   refine ⟨L, hL.congr_of_eventuallyEq ?_, ?_⟩
   · filter_upwards [isOpen_upperHalfPlaneSet.mem_nhds hs] with z hz
     rw [he f z hz, he h z hz]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Polynomial.map_sum, eval_finsetSum]
+    simp [Polynomial.map_sum, eval_finsetSum]
   · rw [hd]
-    have hb : (s - (starRingEnd ℂ) s) ^ w = ∑ j ∈ Finset.range (w + 1),
-        s ^ j * (-(starRingEnd ℂ) s) ^ (w - j) * (w.choose j : ℂ) := by
+    have hb
+        : (s - (starRingEnd ℂ) s) ^ w
+          = ∑ j ∈ Finset.range (w + 1),
+            s ^ j * (-(starRingEnd ℂ) s) ^ (w - j) * (w.choose j : ℂ) := by
       rw [sub_eq_add_neg, add_pow]
     rw [hb, Finset.mul_sum, Finset.sum_mul, Finset.sum_const_zero]
     simp only [zero_sub, sub_zero, ← Finset.sum_neg_distrib]

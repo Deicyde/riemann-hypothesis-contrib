@@ -23,22 +23,25 @@ namespace FunctorialResolution.EmbeddedResolution
 
 section
 
-variable (k : Type u) [Field k] [CharZero k] {X S : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    (ι : S ⟶ X) [AlgebraicGeometry.IsClosedImmersion ι]
-    [AlgebraicGeometry.Smooth (ι ≫ p)]
+variable
+  (k : Type u) [Field k] [CharZero k]
+  {X S : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+  (ι : S ⟶ X) [AlgebraicGeometry.IsClosedImmersion ι] [AlgebraicGeometry.Smooth (ι ≫ p)]
 
 theorem base_mem_orderAtLeastLocus_of_mem_comap
-    (m : ℕ) (hm : 1 ≤ m) (A : X.IdealSheafData) (K : ℕ → X.IdealSheafData)
+    (m : ℕ) (hm : 1 ≤ m)
+    (A : X.IdealSheafData) (K : ℕ → X.IdealSheafData)
     (hdom : derivIdealSheafIterate k p (m - 1) A
       ≤ ⨆ l ≤ m - 1, logDerivIdealSheafIterate k p ι.ker (m - 1 - l) (K l))
     (hbal : ∀ l < m, K l ^ m ≤ A ^ (m - l))
-    (y : S) (hy : y ∈ orderAtLeastLocus (A.comap ι) m) :
-    ι.base y ∈ orderAtLeastLocus A m := by
-  have hsupp : ι.base y ∈
-      (⨆ l ≤ m - 1, logDerivIdealSheafIterate k p ι.ker (m - 1 - l) (K l)).support := by
+    (y : S) (hy : y ∈ orderAtLeastLocus (A.comap ι) m)
+    : ι.base y ∈ orderAtLeastLocus A m := by
+  have hsupp
+      : ι.base y
+        ∈ (⨆ l ≤ m - 1, logDerivIdealSheafIterate k p ι.ker (m - 1 - l) (K l)).support := by
     refine mem_support_iSup_le_nat (m - 1)
-      (fun l => logDerivIdealSheafIterate k p ι.ker (m - 1 - l) (K l)) (ι.base y) ?_
+      (fun l => logDerivIdealSheafIterate k p ι.ker (m - 1 - l) (K l))
+      (ι.base y) ?_
     intro l hl
     have hlm : l < m := by omega
     have hml : 1 ≤ m - l := by omega
@@ -50,7 +53,8 @@ theorem base_mem_orderAtLeastLocus_of_mem_comap
         Scheme.IdealSheafData.comap_mono ι (hbal l hlm)
       rwa [Scheme.IdealSheafData.comap_pow, Scheme.IdealSheafData.comap_pow] at h1
     have hy2 : y ∈ orderAtLeastLocus ((K l).comap ι) (m - l) :=
-      orderAtLeastLocus_subset_orderAtLeastLocus_of_pow_le k (ι ≫ p) ((K l).comap ι) (A.comap ι) l m hlm hpow hy
+      orderAtLeastLocus_subset_orderAtLeastLocus_of_pow_le k (ι ≫ p) ((K l).comap ι) (A.comap ι) l m
+        hlm hpow hy
     have hstep := support_derivIdealSheafIterate_eq_orderAtLeastLocus k (ι ≫ p) ((K l).comap ι) hml
     rw [← hstep] at hy2
     have hexp : m - 1 - l = m - l - 1 := by omega

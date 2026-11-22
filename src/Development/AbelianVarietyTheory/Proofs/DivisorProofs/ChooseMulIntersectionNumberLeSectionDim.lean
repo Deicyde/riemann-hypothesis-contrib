@@ -9,15 +9,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZeroDimSuppo
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.HermTools GlobalTheory.Vanishing GlobalTheory.Adelic GlobalTheory.HilbertSamuel GlobalTheory.ChowHt GlobalTheory.TangentOrigin
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.HermTools GlobalTheory.Vanishing
+  GlobalTheory.Adelic GlobalTheory.HilbertSamuel GlobalTheory.ChowHt GlobalTheory.TangentOrigin
 open GlobalTheory.IndefiniteRowSideFullHecke.RadicalPowers
 open GlobalTheory.HSCore GlobalTheory.QCoh
 open GlobalTheory
 
 namespace GlobalTheory.HSCore
 
-theorem choose_mul_interNum_le_hdim : ∀ (k : Type) [Field k] [Infinite k] (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)], IsProjOver (GlobalTheory.strHom k (X := Y)) → ∀ (L : LB Y) (hL : L.IsLB) (N : ℕ) (b : Fin N → L.Sec), (∀ y : Y, ∃ i, y ∈ ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus (b i)) → ∀ (d : ℕ) (F : Y.Modules) [IsFiniteQC F], suppDim F ≤ d → ∀ (j₀ : ℤ), VanishFrom L F j₀ → ∀ m : ℕ, (m.choose d : ℤ) * GlobalTheory.interNum k F (fun _ : Fin d => L) ≤ GlobalTheory.hdim k (GlobalTheory.twistZ F L (j₀ + m)) 0 := by
+theorem choose_mul_interNum_le_hdim
+    : ∀ (k : Type) [Field k] [Infinite k] (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)],
+      IsProjOver (GlobalTheory.strHom k (X := Y))
+        → ∀ (L : LB Y) (hL : L.IsLB) (N : ℕ) (b : Fin N → L.Sec),
+          (∀ y : Y, ∃ i, y ∈ ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus (b i))
+            → ∀ (d : ℕ) (F : Y.Modules) [IsFiniteQC F],
+              suppDim F ≤ d
+                → ∀ (j₀ : ℤ),
+                  VanishFrom L F j₀
+                    → ∀ m : ℕ,
+                      (m.choose d : ℤ) * GlobalTheory.interNum k F (fun _ : Fin d => L)
+                        ≤ GlobalTheory.hdim k (GlobalTheory.twistZ F L (j₀ + m)) 0 := by
   intro k _ _ Y _ hY L hL N b hb d
   have hNo : AlgebraicGeometry.IsNoetherian Y := isNoetherian_of_isProjOver hY
   have hb' : ⨆ i, ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus (b i) = ⊤ :=
@@ -26,16 +39,20 @@ theorem choose_mul_interNum_le_hdim : ∀ (k : Type) [Field k] [Infinite k] (Y :
   induction d with
   | zero =>
     intro F _ hF j₀ _ m
-    rw [interNum_of_isEmpty, GlobalTheory.T.zero_dim_support_euler_char k Y hY L hL F (by simpa using hF)]
+    rw [interNum_of_isEmpty,
+      GlobalTheory.T.zero_dim_support_euler_char k Y hY L hL F (by simpa using hF)]
     simp
   | succ d ih =>
     intro F _ hF j₀ hV m
     obtain ⟨c, hc⟩ := exists_sum_mono_cutHom (k := k) F hL b hb'
     set t : L.Sec := ∑ i, algebraMap k Γ(Y, ⊤) (c i) • b i
     obtain ⟨hV', hr⟩ := GlobalTheory.T.hyperplane_section_vanishing_shift k Y hY L hL F t j₀ hV
-    have hI : GlobalTheory.interNum k F (fun _ : Fin (d + 1) => L) =
-        GlobalTheory.interNum k (GlobalTheory.cut F hL t) (fun _ : Fin d => L) := by
-      rw [← interNum_cons_eq_interNum_cut hL t (P := fun _ : Fin d => L) (fun _ => hL)
+    have hI
+        : GlobalTheory.interNum k F (fun _ : Fin (d + 1) => L)
+          = GlobalTheory.interNum k (GlobalTheory.cut F hL t) (fun _ : Fin d => L) := by
+      rw [← interNum_cons_eq_interNum_cut hL t
+        (P := fun _ : Fin d => L)
+        (fun _ => hL)
         (finiteCohTwists_of_isProjOver hf F hY)]
       congr 1
       funext i

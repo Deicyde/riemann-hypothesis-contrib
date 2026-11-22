@@ -10,8 +10,9 @@ namespace Formalism.BasicNotions
 
 open NumberField
 
-theorem intCast_dvd_of_dvd_integers (E : Type) [Field E] [NumberField E] (a b : ℤ)
-    (h : (b : 𝓞 E) ∣ (a : 𝓞 E)) : b ∣ a := by
+theorem intCast_dvd_of_dvd_integers
+    (E : Type) [Field E] [NumberField E] (a b : ℤ) (h : (b : 𝓞 E) ∣ (a : 𝓞 E))
+    : b ∣ a := by
   have h1 := map_dvd (Algebra.norm ℤ) h
   have ea : (a : 𝓞 E) = algebraMap ℤ (𝓞 E) a := by simp
   have eb : (b : 𝓞 E) = algebraMap ℤ (𝓞 E) b := by simp
@@ -20,9 +21,11 @@ theorem intCast_dvd_of_dvd_integers (E : Type) [Field E] [NumberField E] (a b : 
     rw [RingOfIntegers.rank]; exact (Module.finrank_pos).ne'
   exact (Int.pow_dvd_pow_iff hn).1 h1
 
-theorem dvd_norm_sub_one (E : Type) [Field E] [NumberField E] (σ : E ≃ₐ[ℚ] E) (π : 𝓞 E) (T M : ℕ)
-    (hT : (π : E) * σ (π : E) = (T : E)) (hπ : (π - 1) ∈ Ideal.span {((M : ℕ) : 𝓞 E)}) :
-    (M : ℤ) ∣ (T : ℤ) - 1 := by
+theorem dvd_norm_sub_one
+    (E : Type) [Field E] [NumberField E]
+    (σ : E ≃ₐ[ℚ] E) (π : 𝓞 E) (T M : ℕ)
+    (hT : (π : E) * σ (π : E) = (T : E)) (hπ : (π - 1) ∈ Ideal.span {((M : ℕ) : 𝓞 E)})
+    : (M : ℤ) ∣ (T : ℤ) - 1 := by
   rw [Ideal.mem_span_singleton] at hπ
   obtain ⟨α, hα⟩ := hπ
   have hint : IsIntegral ℤ (σ (α : E)) := map_isIntegral_int σ (RingOfIntegers.isIntegral_coe α)
@@ -33,7 +36,8 @@ theorem dvd_norm_sub_one (E : Type) [Field E] [NumberField E] (σ : E ≃ₐ[ℚ
     linear_combination this
   have e2 : σ (π : E) = 1 + (M : E) * (α' : E) := by
     have hc : (α' : E) = σ (α : E) := rfl
-    rw [e1, hc]; simp
+    rw [e1, hc]
+    simp
   have e3 : (T : E) - 1 = (M : E) * ((α : E) + (α' : E) + (M : E) * (α : E) * (α' : E)) := by
     rw [← hT, e2, e1]; ring
   have h5 : ((M : ℤ) : 𝓞 E) ∣ (((T : ℤ) - 1 : ℤ) : 𝓞 E) := by
@@ -60,7 +64,8 @@ theorem T_modEq (u : D.what₂.Word) : (D.mem u).A.T ≡ 1 [MOD D.modT] :=
 theorem T_modEq_of_dvd (u : D.what₂.Word) {a : ℕ} (ha : a ∣ D.modT) : (D.mem u).A.T ≡ 1 [MOD a] :=
   (D.T_modEq u).of_dvd ha
 
-theorem T_mod_of_dvd (u : D.what₂.Word) {a : ℕ} (ha : a ∣ D.modT) (h1 : 1 < a) : (D.mem u).A.T % a = 1 := by
+theorem T_mod_of_dvd (u : D.what₂.Word) {a : ℕ} (ha : a ∣ D.modT) (h1 : 1 < a)
+    : (D.mem u).A.T % a = 1 := by
   have h := D.T_modEq_of_dvd u ha
   rwa [Nat.ModEq, Nat.mod_eq_of_lt h1] at h
 

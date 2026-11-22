@@ -4,7 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
 namespace UpperTheory.V.ML.PlaceBasics
@@ -47,20 +49,23 @@ private theorem intCast_mem_vQ (n : ℤ) : ((n : ℤ) : 𝓞 ℚ) ∈ (vQ l).asI
 private theorem val_intCast_le_one (A : ValuationSubring Ω) (n : ℤ) : A.valuation (n : Ω) ≤ 1 :=
   (A.valuation_le_one_iff _).mpr (intCast_mem A n)
 
-private theorem not_of_coprime (A : ValuationSubring Ω) {m n : ℤ} (hc : IsCoprime m n)
-    (hm : A.valuation (m : Ω) < 1) : ¬ A.valuation (n : Ω) < 1 := by
+private theorem not_of_coprime
+    (A : ValuationSubring Ω) {m n : ℤ} (hc : IsCoprime m n) (hm : A.valuation (m : Ω) < 1)
+    : ¬ A.valuation (n : Ω) < 1 := by
   intro h
   obtain ⟨a, b, hab⟩ := hc
   have h1 : A.valuation ((a : Ω) * (m : Ω) + (b : Ω) * (n : Ω)) < 1 := by
     refine Valuation.map_add_lt _ ?_ ?_
     · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_intCast_le_one A a)) hm
     · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_intCast_le_one A b)) h
-  have h2 : (a : Ω) * (m : Ω) + (b : Ω) * (n : Ω) = 1 := by exact_mod_cast congrArg (Int.cast : ℤ → Ω) hab
+  have h2 : (a : Ω) * (m : Ω) + (b : Ω) * (n : Ω) = 1 := by
+    exact_mod_cast congrArg (Int.cast : ℤ → Ω) hab
   rw [h2, map_one] at h1
   exact lt_irrefl _ h1
 
-private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ) :
-    A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
+private theorem val_intCast_lt_one_iff
+    (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ)
+    : A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
   constructor
   · intro h
     by_contra hnd
@@ -71,13 +76,17 @@ private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuati
     rw [map_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_right' (val_intCast_le_one A k)) hA
 
-private theorem isPlaceOver_vQ [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) :
-    IsPlaceOver (F := ℚ) A (vQ l) := by
+private theorem isPlaceOver_vQ
+    [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l) := by
   intro x
-  obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = ((n : ℤ) : 𝓞 ℚ) :=
-    ⟨Rat.ringOfIntegersEquiv x, by
+  obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = ((n : ℤ) : 𝓞 ℚ) := ⟨
+    Rat.ringOfIntegersEquiv x,
+    by
       have := Rat.ringOfIntegersEquiv.symm_apply_apply x
-      rw [← this]; simp⟩
+      rw [← this]
+      simp
+  ⟩
   rw [intCast_mem_vQ, ← val_intCast_lt_one_iff A hA]
   simp
 
@@ -87,38 +96,42 @@ section Roots
 
 variable {Ω : Type} [Field Ω] (A : ValuationSubring Ω)
 
-private theorem val_root {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1) {ζ : Ω} (h : ζ ^ m = 1) : A.valuation ζ = 1 := by
+private theorem val_root {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1) {ζ : Ω} (h : ζ ^ m = 1)
+    : A.valuation ζ = 1 := by
   have hm : m ≠ 0 := by
     rintro rfl
     exact hv (by simp)
   have h1 : A.valuation ζ ^ m = 1 := by rw [← map_pow, h, map_one]
   exact (pow_eq_one_iff_left hm).1 h1
 
-private theorem one_sub_pow {η : Ω} (h1 : A.valuation η = 1) (h : A.valuation (η - 1) < 1) (i : ℕ) :
-    A.valuation (1 - η ^ i) < 1 := by
+private theorem one_sub_pow {η : Ω} (h1 : A.valuation η = 1) (h : A.valuation (η - 1) < 1) (i : ℕ)
+    : A.valuation (1 - η ^ i) < 1 := by
   induction i with
   | zero => simp
   | succ i ih =>
     have e : 1 - η ^ (i + 1) = η * (1 - η ^ i) - (η - 1) := by ring
     rw [e]
     refine A.valuation.map_sub_lt ?_ h
-    rw [map_mul, h1, one_mul]; exact ih
+    rw [map_mul, h1, one_mul]
+    exact ih
 
-private theorem root_eq_one {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1) {η : Ω} (hη : η ^ m = 1)
-    (h : A.valuation (η - 1) < 1) : η = 1 := by
+private theorem root_eq_one
+    {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1) {η : Ω} (hη : η ^ m = 1) (h : A.valuation (η - 1) < 1)
+    : η = 1 := by
   by_contra hne
   apply hv
   have hs : ∑ i ∈ Finset.range m, η ^ i = 0 := by
     have := mul_geom_sum η m
     rw [hη, sub_self] at this
     exact (mul_eq_zero.1 this).resolve_left (sub_ne_zero.2 hne)
-  have e : (m : Ω) = ∑ i ∈ Finset.range m, (1 - η ^ i) := by
-    rw [Finset.sum_sub_distrib, hs]; simp
+  have e : (m : Ω) = ∑ i ∈ Finset.range m, (1 - η ^ i) := by rw [Finset.sum_sub_distrib, hs]; simp
   rw [e]
   exact A.valuation.map_sum_lt one_ne_zero fun i _ => one_sub_pow A (val_root A hv hη) h i
 
-private theorem root_eq {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1) {ξ ζ : Ω} (hξ : ξ ^ m = 1) (hζ : ζ ^ m = 1)
-    (h : A.valuation (ξ - ζ) < 1) : ξ = ζ := by
+private theorem root_eq
+    {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1)
+    {ξ ζ : Ω} (hξ : ξ ^ m = 1) (hζ : ζ ^ m = 1) (h : A.valuation (ξ - ζ) < 1)
+    : ξ = ζ := by
   have h1 := val_root A hv hζ
   have h0 : ζ ≠ 0 := by
     rintro rfl
@@ -126,7 +139,8 @@ private theorem root_eq {m : ℕ} (hv : ¬ A.valuation (m : Ω) < 1) {ξ ζ : Ω
   have e : ξ / ζ - 1 = (ξ - ζ) / ζ := by field_simp
   have : ξ / ζ = 1 := by
     refine root_eq_one A hv (by rw [div_pow, hξ, hζ, div_one]) ?_
-    rw [e, map_div₀, h1, div_one]; exact h
+    rw [e, map_div₀, h1, div_one]
+    exact h
   exact (div_eq_one_iff_eq h0).1 this
 
 end Roots
@@ -143,7 +157,8 @@ private theorem smul_le (y : Ω) : (g • A).valuation (g y) ≤ 1 ↔ A.valuati
   rw [ValuationSubring.valuation_le_one_iff, ValuationSubring.valuation_le_one_iff, smul_mem]
 
 private theorem smul_lt (y : Ω) : (g • A).valuation (g y) < 1 ↔ A.valuation y < 1 := by
-  rw [valuation_lt_one_iff', valuation_lt_one_iff', smul_mem, ← map_inv₀, smul_mem, map_eq_zero_iff _ g.injective]
+  rw [valuation_lt_one_iff', valuation_lt_one_iff', smul_mem, ← map_inv₀, smul_mem,
+    map_eq_zero_iff _ g.injective]
 
 private theorem smul_eq (y : Ω) : (g • A).valuation (g y) = 1 ↔ A.valuation y = 1 := by
   rw [eq_iff_le_not_lt, eq_iff_le_not_lt, smul_le, smul_lt]
@@ -151,9 +166,9 @@ private theorem smul_eq (y : Ω) : (g • A).valuation (g y) = 1 ↔ A.valuation
 private theorem dec_iff (x : G ℚ Ω) : x ∈ Dec (F := ℚ) (g • A) ↔ g⁻¹ * x * g ∈ Dec (F := ℚ) A := by
   rw [mem_Dec, mem_Dec, mul_smul, mul_smul, inv_smul_eq_iff]
 
-private theorem pow_iff (x : G ℚ Ω) (q : ℕ) :
-    (∀ y : Ω, (g • A).valuation y ≤ 1 → (g • A).valuation (x y - y ^ q) < 1) ↔
-      ∀ y : Ω, A.valuation y ≤ 1 → A.valuation ((g⁻¹ * x * g) y - y ^ q) < 1 := by
+private theorem pow_iff (x : G ℚ Ω) (q : ℕ)
+    : (∀ y : Ω, (g • A).valuation y ≤ 1 → (g • A).valuation (x y - y ^ q) < 1)
+      ↔ ∀ y : Ω, A.valuation y ≤ 1 → A.valuation ((g⁻¹ * x * g) y - y ^ q) < 1 := by
   rw [g.surjective.forall]
   refine forall_congr' fun y => ?_
   have e : x (g y) - g y ^ q = g ((g⁻¹ * x * g) y - y ^ q) := by
@@ -166,24 +181,48 @@ end Conj
 end UpperTheory.V.ML.PlaceBasics
 
 open UpperTheory.V.ML.PlaceBasics in
-theorem UpperTheory.V.ML.placeBasic :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω],
-    (∀ q : ℕ, q.Prime → ∃ A : ValuationSubring Ω, Over A q) ∧
-    (∀ (A : ValuationSubring Ω) (q : ℕ), q.Prime → Over A q → ∃ φ : G ℚ Ω, IsFrob (F := ℚ) A q φ) ∧
-    (∀ (A : ValuationSubring Ω) (m n : ℕ), Over A (m * n) ↔ Over A m ∨ Over A n) ∧
-    (∀ (A : ValuationSubring Ω) (m n : ℕ), m.Coprime n → Over A m → ¬ Over A n) ∧
-    (∀ (A : ValuationSubring Ω) (k : ℕ), ¬ Over A k → Ine (F := ℚ) A ≤ fixMu ℚ Ω k) ∧
-    (∀ (A : ValuationSubring Ω) (k : ℕ) (ζ : Ω), ¬ Over A k → ζ ^ k = 1 → A.valuation (ζ - 1) < 1 → ζ = 1) ∧
-    (∀ (A : ValuationSubring Ω) (q k : ℕ) (φ : G ℚ Ω), IsFrob (F := ℚ) A q φ → ¬ Over A k → Pows k q φ) ∧
-    (∀ (A A' : ValuationSubring Ω) (q : ℕ), q.Prime → Over A q → Over A' q → ∃ g : G ℚ Ω, A' = g • A) ∧
-    (∀ (A : ValuationSubring Ω) (q : ℕ), q.Prime → Over A q → ∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v ∧ normV v = q ∧ (q : 𝓞 ℚ) ∈ v.asIdeal) ∧
-    ∀ (A : ValuationSubring Ω) (g : G ℚ Ω), (∀ x, x ∈ Dec (F := ℚ) (g • A) ↔ g⁻¹ * x * g ∈ Dec (F := ℚ) A) ∧ (∀ x, x ∈ Ine (F := ℚ) (g • A) ↔ g⁻¹ * x * g ∈ Ine (F := ℚ) A) ∧
-      (∀ q x, IsFrob (F := ℚ) (g • A) q x ↔ IsFrob (F := ℚ) A q (g⁻¹ * x * g)) ∧ (∀ y : Ω, (g • A).valuation (g y) < 1 ↔ A.valuation y < 1) ∧ ∀ y : Ω, (g • A).valuation (g y) = 1 ↔ A.valuation y = 1 := by
+theorem UpperTheory.V.ML.placeBasic
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω],
+      (∀ q : ℕ, q.Prime → ∃ A : ValuationSubring Ω, Over A q)
+        ∧ (∀ (A : ValuationSubring Ω) (q : ℕ),
+          q.Prime → Over A q → ∃ φ : G ℚ Ω, IsFrob (F := ℚ) A q φ)
+        ∧ (∀ (A : ValuationSubring Ω) (m n : ℕ), Over A (m * n) ↔ Over A m ∨ Over A n)
+        ∧ (∀ (A : ValuationSubring Ω) (m n : ℕ), m.Coprime n → Over A m → ¬ Over A n)
+        ∧ (∀ (A : ValuationSubring Ω) (k : ℕ), ¬ Over A k → Ine (F := ℚ) A ≤ fixMu ℚ Ω k)
+        ∧ (∀ (A : ValuationSubring Ω) (k : ℕ) (ζ : Ω),
+          ¬ Over A k → ζ ^ k = 1 → A.valuation (ζ - 1) < 1 → ζ = 1)
+        ∧ (∀ (A : ValuationSubring Ω) (q k : ℕ) (φ : G ℚ Ω),
+          IsFrob (F := ℚ) A q φ → ¬ Over A k → Pows k q φ)
+        ∧ (∀ (A A' : ValuationSubring Ω) (q : ℕ),
+          q.Prime → Over A q → Over A' q → ∃ g : G ℚ Ω, A' = g • A)
+        ∧ (∀ (A : ValuationSubring Ω) (q : ℕ),
+          q.Prime → Over A q
+            → ∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v ∧ normV v = q ∧ (q : 𝓞 ℚ) ∈ v.asIdeal)
+        ∧ ∀ (A : ValuationSubring Ω) (g : G ℚ Ω),
+          (∀ x, x ∈ Dec (F := ℚ) (g • A) ↔ g⁻¹ * x * g ∈ Dec (F := ℚ) A)
+            ∧ (∀ x, x ∈ Ine (F := ℚ) (g • A) ↔ g⁻¹ * x * g ∈ Ine (F := ℚ) A)
+            ∧ (∀ q x, IsFrob (F := ℚ) (g • A) q x ↔ IsFrob (F := ℚ) A q (g⁻¹ * x * g))
+            ∧ (∀ y : Ω, (g • A).valuation (g y) < 1 ↔ A.valuation y < 1)
+            ∧ ∀ y : Ω, (g • A).valuation (g y) = 1 ↔ A.valuation y = 1 := by
   intro Ω _ _ _
-  refine ⟨fun q hq => ?_, fun A q hq hA => ?_, fun A m n => ?_, fun A m n hc hm => ?_, fun A k hk g hg x hx => ?_,
-    fun A k ζ hk hζ h => root_eq_one A hk hζ h, fun A q k φ hφ hk x hx => ?_, fun A A' q hq hA hA' => ?_,
-    fun A q hq hA => ?_, fun A g => ⟨dec_iff A g, fun x => ?_, fun q x => and_congr (dec_iff A g x) (pow_iff A g x q),
-      smul_lt A g, smul_eq A g⟩⟩
+  refine ⟨
+    fun q hq => ?_,
+    fun A q hq hA => ?_,
+    fun A m n => ?_,
+    fun A m n hc hm => ?_,
+    fun A k hk g hg x hx => ?_,
+    fun A k ζ hk hζ h => root_eq_one A hk hζ h,
+    fun A q k φ hφ hk x hx => ?_,
+    fun A A' q hq hA hA' => ?_,
+    fun A q hq hA => ?_,
+    fun A g => ⟨
+      dec_iff A g,
+      fun x => ?_,
+      fun q x => and_congr (dec_iff A g x) (pow_iff A g x q),
+      smul_lt A g,
+      smul_eq A g
+    ⟩
+  ⟩
   · haveI := Fact.mk hq
     obtain ⟨A, hA⟩ := exists_isPlaceOver Ω (vQ q)
     refine ⟨A, ?_⟩
@@ -195,8 +234,12 @@ theorem UpperTheory.V.ML.placeBasic :
   · have hm : A.valuation (m : Ω) ≤ 1 := by simpa using val_intCast_le_one A m
     have hn : A.valuation (n : Ω) ≤ 1 := by simpa using val_intCast_le_one A n
     simp only [Over, Nat.cast_mul, map_mul]
-    refine ⟨fun h => ?_, fun h => h.elim (lt_of_le_of_lt (mul_le_of_le_one_right' hn))
-      (lt_of_le_of_lt (mul_le_of_le_one_left' hm))⟩
+    refine ⟨
+      fun h => ?_,
+      fun h =>
+        h.elim (lt_of_le_of_lt (mul_le_of_le_one_right' hn))
+          (lt_of_le_of_lt (mul_le_of_le_one_left' hm))
+    ⟩
     by_contra h'
     rw [not_or] at h'
     rw [hm.eq_of_not_lt h'.1, hn.eq_of_not_lt h'.2, one_mul] at h
@@ -204,10 +247,11 @@ theorem UpperTheory.V.ML.placeBasic :
   · have := not_of_coprime A (Nat.isCoprime_iff_coprime.2 hc) (by rwa [Int.cast_natCast])
     rwa [Int.cast_natCast] at this
   · exact root_eq A hk (by rw [← map_pow, hx, map_one]) hx (hg.2 x (val_root A hk hx).le)
-  · exact root_eq A hk (by rw [← map_pow, hx, map_one]) (by rw [← pow_mul, mul_comm, pow_mul, hx, one_pow])
-      (hφ.2 x (val_root A hk hx).le)
+  · exact root_eq A hk (by rw [← map_pow, hx, map_one])
+      (by rw [← pow_mul, mul_comm, pow_mul, hx, one_pow]) (hφ.2 x (val_root A hk hx).le)
   · haveI := Fact.mk hq
-    obtain ⟨g, hg⟩ := exists_smul_eq_of_isPlaceOver (F := ℚ) (isPlaceOver_vQ A hA) (isPlaceOver_vQ A' hA')
+    obtain ⟨g, hg⟩ :=
+      exists_smul_eq_of_isPlaceOver (F := ℚ) (isPlaceOver_vQ A hA) (isPlaceOver_vQ A' hA')
     exact ⟨g, hg.symm⟩
   · haveI := Fact.mk hq
     exact ⟨vQ q, isPlaceOver_vQ A hA, normV_vQ q, mem_vQ q⟩

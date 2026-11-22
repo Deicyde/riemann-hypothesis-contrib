@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem jconj_apply {R : Type} [CommRing R] {n : ℕ} (M : Matrix (Fin n) (Fin n) R) (i j : Fin n) :
-    (Jmat (R := R) n * Mᵀ * Jmat (R := R) n) i j = M j.rev i.rev := by
+private theorem jconj_apply
+    {R : Type} [CommRing R] {n : ℕ} (M : Matrix (Fin n) (Fin n) R) (i j : Fin n)
+    : (Jmat (R := R) n * Mᵀ * Jmat (R := R) n) i j = M j.rev i.rev := by
   have h1 : ∀ k, (Jmat (R := R) n * Mᵀ) i k = M k i.rev := by
     intro k
     rw [Matrix.mul_apply, Finset.sum_eq_single i.rev]
@@ -26,8 +27,20 @@ private theorem jconj_apply {R : Type} [CommRing R] {n : ℕ} (M : Matrix (Fin n
     simp [Jmat, this]
   · simp
 
-theorem UpperTheory.V.Fr.pr_norm2 :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O], ∀ (C' : Type) [CommRing C'] [Algebra O C'] [IsCO O C'] (C : Type) [CommRing C] [Algebra O C] (p : C' →ₐ[O] C) (n : ℕ) (Z : Matrix (Fin n) (Fin n) C'), maximalIdeal C' * RingHom.ker p = ⊥ → RingHom.ker p ≤ maximalIdeal C' → thetaLie Z = Z → (∀ i j, i ≠ j → p (Z i j) = 0) → (∀ i j, i ≠ j → res O C' (Z i i) ≠ res O C' (Z j j)) → ∃ h : GL (Fin n) C', (h : Matrix (Fin n) (Fin n) C').map p = 1 ∧ theta h = h ∧ ∀ i j, i ≠ j → ((h : Matrix (Fin n) (Fin n) C') * Z * ((h⁻¹ : GL (Fin n) C') : Matrix (Fin n) (Fin n) C')) i j = 0 := by
+theorem UpperTheory.V.Fr.pr_norm2
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O],
+      ∀ (C' : Type) [CommRing C'] [Algebra O C'] [IsCO O C'] (C : Type) [CommRing C] [Algebra O C]
+          (p : C' →ₐ[O] C) (n : ℕ) (Z : Matrix (Fin n) (Fin n) C'),
+        maximalIdeal C' * RingHom.ker p = ⊥ → RingHom.ker p ≤ maximalIdeal C' → thetaLie Z = Z
+          → (∀ i j, i ≠ j → p (Z i j) = 0) → (∀ i j, i ≠ j → res O C' (Z i i) ≠ res O C' (Z j j))
+          → ∃ h : GL (Fin n) C',
+            (h : Matrix (Fin n) (Fin n) C').map p = 1 ∧ theta h = h
+              ∧ ∀ i j,
+                i ≠ j
+                  → ((h : Matrix (Fin n) (Fin n) C') * Z
+                        * ((h⁻¹ : GL (Fin n) C') : Matrix (Fin n) (Fin n) C'))
+                      i j
+                    = 0 := by
   intro O _ _ C' _ _ _ C _ _ p n Z hmI hIm hZ hoff hdiag
   classical
   have hII : ∀ a b : C', a ∈ RingHom.ker p → b ∈ RingHom.ker p → a * b = 0 := by
@@ -45,13 +58,14 @@ theorem UpperTheory.V.Fr.pr_norm2 :
     have hm : Z i i - Z j j ∈ maximalIdeal C' := (IsLocalRing.mem_maximalIdeal _).2 hu
     rw [← res_eq_zero_iff O C', map_sub, sub_eq_zero] at hm
     exact hdiag i j hij hm
-  have hZr : ∀ i j, Z j.rev i.rev = -Z i j := by
+  have hZr : ∀ i j, Z j.rev i.rev = - Z i j := by
     intro i j
     have hij := congrFun (congrFun hZ i) j
     simp only [thetaLie, Matrix.neg_apply, jconj_apply] at hij
     rw [← hij, neg_neg]
-  obtain ⟨A, hA⟩ : ∃ A : Matrix (Fin n) (Fin n) C', ∀ i j,
-      A i j = if i = j then 0 else Z i j * Ring.inverse (Z i i - Z j j) :=
+  obtain ⟨A, hA⟩
+      : ∃ A : Matrix (Fin n) (Fin n) C', ∀ i j,
+        A i j = if i = j then 0 else Z i j * Ring.inverse (Z i i - Z j j) :=
     ⟨Matrix.of fun i j => if i = j then 0 else Z i j * Ring.inverse (Z i i - Z j j), fun i j => rfl⟩
   have hAI : ∀ i j, A i j ∈ RingHom.ker p := by
     intro i j
@@ -63,7 +77,7 @@ theorem UpperTheory.V.Fr.pr_norm2 :
     ext i j
     rw [Matrix.mul_apply, Matrix.zero_apply]
     exact Finset.sum_eq_zero fun k _ => hII _ _ (hAI i k) (hAI k j)
-  have hAr : ∀ i j, A j.rev i.rev = -A i j := by
+  have hAr : ∀ i j, A j.rev i.rev = - A i j := by
     intro i j
     rw [hA, hA]
     by_cases hij : i = j
@@ -71,7 +85,7 @@ theorem UpperTheory.V.Fr.pr_norm2 :
       simp
     · have hrev : j.rev ≠ i.rev := fun h => hij (Fin.rev_injective h).symm
       rw [if_neg hrev, if_neg hij, hZr i j, hZr j j, hZr i i]
-      have hd : -Z j j - -Z i i = Z i i - Z j j := by ring
+      have hd : - Z j j - - Z i i = Z i i - Z j j := by ring
       rw [hd]
       ring
   have h1 : (1 + A) * (1 - A) = 1 := by

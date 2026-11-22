@@ -23,8 +23,11 @@ structure ClsPkg : Type 1 where
 
 section FormsY
 
-variable {R : Ranks} {LL : Type} [Field LL] [NumberField LL] [StarRing LL] (embLL : LL →+* ℂ)
-  (Pl : Rows.Places LL) {Tau : Type} [Fintype Tau] (hTau : Fintype.card Tau = R.f)
+variable
+  {R : Ranks} {LL : Type} [Field LL] [NumberField LL] [StarRing LL]
+  (embLL : LL →+* ℂ) (Pl : Rows.Places LL)
+  {Tau : Type} [Fintype Tau]
+  (hTau : Fintype.card Tau = R.f)
   {hc : Tau → HCParam R} (C : ColumnChain R Tau hc) [hE : ∀ i, IsEmpty (C.Y i)]
   (A : ColumnsAtT R C) (P : PeriodMap R C)
 
@@ -45,9 +48,12 @@ def formsY : MemberForms LL embLL Pl Tau hc C A P where
   dilT := fun _ _ _ _ => LinearEquiv.refl ℂ _
   dil_one := fun _ _ _ => rfl
   dil_mul := fun _ _ _ _ _ => rfl
-  dil_fv := fun i v a _ => ⟨LinearEquiv.smulOfUnit a⁻¹, LinearMap.ext fun x => by
-    show x ⟨0, R.N_pos i⟩ = (a : A.Fv v) * (((a⁻¹ : (A.Fv v)ˣ) : A.Fv v) * x ⟨0, R.N_pos i⟩)
-    rw [Units.mul_inv_cancel_left]⟩
+  dil_fv := fun i v a _ => ⟨
+    LinearEquiv.smulOfUnit a⁻¹,
+    LinearMap.ext fun x => by
+      show x ⟨0, R.N_pos i⟩ = (a : A.Fv v) * (((a⁻¹ : (A.Fv v)ˣ) : A.Fv v) * x ⟨0, R.N_pos i⟩)
+      rw [Units.mul_inv_cancel_left]
+  ⟩
   dil_stab := fun _ _ _ _ => rfl
   rhoT_dil := fun _ _ _ _ => Subsingleton.elim _ _
   tauOf := fun _ => Fintype.equivOfCardEq (by rw [A.card_vT, hTau])
@@ -61,8 +67,8 @@ def formsY : MemberForms LL embLL Pl Tau hc C A P where
   lat := fun _ => fmZeroHLat LL
   lat_good := fun _ => fmZeroHLat_good LL
   emb := fun _ => 0
-  emb_basis := fun _ => ⟨linearIndependent_empty_type, by
-    rw [Set.range_eq_empty, Submodule.span_empty]⟩
+  emb_basis := fun _ =>
+    ⟨linearIndependent_empty_type, by rw [Set.range_eq_empty, Submodule.span_empty]⟩
   emb_norm := fun i x => by
     rw [fmZeroHLat_maj]
     simp
@@ -119,9 +125,11 @@ abbrev chain3 : ColumnChain R Tau hc where
 
 variable (T : ℕ) [hT : Fact T.Prime]
 
-abbrev classLevelColumnsAt (Dst : ℝ) (hD : 0 < Dst) (du : ℕ) (hdu : 0 < du) (Gam : ℝ) (hG : 1 < Gam) : ColumnsAtT R (chain3 hc K) :=
+abbrev classLevelColumnsAt (Dst : ℝ) (hD : 0 < Dst) (du : ℕ) (hdu : 0 < du) (Gam : ℝ) (hG : 1 < Gam)
+    : ColumnsAtT R (chain3 hc K) :=
   haveI : NeZero T := ⟨hT.out.ne_zero⟩
-  { T := T
+  {
+    T := T
     T_prime := hT.out
     vT := Fin R.f
     card_vT := Fintype.card_fin _
@@ -140,7 +148,8 @@ abbrev classLevelColumnsAt (Dst : ℝ) (hD : 0 < Dst) (du : ℕ) (hdu : 0 < du) 
     Dstar := Dst
     Dstar_pos := hD
     GamP := Gam
-    one_lt_gammaP := hG }
+    one_lt_gammaP := hG
+  }
 
 abbrev period3 : PeriodMap R (chain3 hc K) where
   Mt := Z0
@@ -150,7 +159,8 @@ abbrev period3 : PeriodMap R (chain3 hc K) where
   lowerMap := 0
   period := 0
 
-abbrev mem3 (Dst : ℝ) (hD : 0 < Dst) (du : ℕ) (hdu : 0 < du) (Gam : ℝ) (hG : 1 < Gam) : Member R Tau hc :=
+abbrev mem3 (Dst : ℝ) (hD : 0 < Dst) (du : ℕ) (hdu : 0 < du) (Gam : ℝ) (hG : 1 < Gam)
+    : Member R Tau hc :=
   ⟨chain3 hc K, classLevelColumnsAt hc K T Dst hD du hdu Gam hG, period3 hc K⟩
 
 end Member3
@@ -159,28 +169,34 @@ section Record
 
 variable {R : Ranks} (H : Host R)
 
-variable (hc : Tau2 R → HCParam R) (Del : ℚ) (hDel : 0 < Del)
+variable
+  (hc : Tau2 R → HCParam R) (Del : ℚ) (hDel : 0 < Del)
   (hgap : ∀ (τ : Tau2 R) (l : ℕ) (h : l + 1 < R.k - 1),
     (hc τ).v ⟨l, by omega⟩ - (hc τ).v ⟨l + 1, h⟩ = 4 * Del)
   (hlet : ∀ (τ : Tau2 R) (l : ℕ) (h : l < R.k - 2),
     (hc τ).u ⟨l + 1, by omega⟩ = (hc τ).v ⟨l, by omega⟩ - 1 / 2)
   (cdS : ∀ (n : ℕ) (_ : Fin n → Bool), NNReal) (hcdS : ∀ n ε, 0 < cdS n ε)
-  (dsg : Tau2 R → ℝ) (hdsg : ∀ ρ, 0 < dsg ρ) (etaF : ℝ)
+  (dsg : Tau2 R → ℝ) (hdsg : ∀ ρ, 0 < dsg ρ)
+  (etaF : ℝ)
 
-variable (hv : ℝ) (vol : @HSpace H.E _ _ H.cmStar → ℝ) (hvol : ∀ W, 0 < vol W) (K : ClsPkg)
-  (T : ℕ) [hT : Fact T.Prime] (Dst : ℝ) (hD : 0 < Dst) (du : ℕ) (hdu : 0 < du) (Gam : ℝ) (hG : 1 < Gam)
-  (hwin : (mem3 hc K T Dst hD du hdu Gam hG).A.Tstar ≤ (T : ℝ) ∧
-    (T : ℝ) ≤ (1 + 1 / ((R.f : ℝ) * R.k)) * (mem3 hc K T Dst hD du hdu Gam hG).A.Tstar)
+variable
+  (hv : ℝ)
+  (vol : @HSpace H.E _ _ H.cmStar → ℝ) (hvol : ∀ W, 0 < vol W)
+  (K : ClsPkg)
+  (T : ℕ) [hT : Fact T.Prime]
+  (Dst : ℝ) (hD : 0 < Dst)
+  (du : ℕ) (hdu : 0 < du)
+  (Gam : ℝ) (hG : 1 < Gam)
+  (hwin : (mem3 hc K T Dst hD du hdu Gam hG).A.Tstar ≤ (T : ℝ)
+    ∧ (T : ℝ) ≤ (1 + 1 / ((R.f : ℝ) * R.k)) * (mem3 hc K T Dst hD du hdu Gam hG).A.Tstar)
   (hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E) (ht : THyp H)
   (hlev : T ∈ H.levelPrimes) (hpde : T ≠ H.pde ∧ T ≠ H.pde')
   (pz : 𝓞 H.E) (hK : (pz : H.E) ∈ H.K) (hpz : (pz : H.E) * H.conj (pz : H.E) = (T : H.E))
   (hcong : (pz - 1) ∈ Ideal.span {((H.QS * H.q * H.d * (H.g 0 * H.g 1) ^ 2 : ℕ) : 𝓞 H.E)})
   (lat : letI := H.cmStar; ∀ i, K.cls i → Submodule (𝓞 H.E) ((hostSpacesOfNorm H T pz hpz).X i).V)
   (hlat : letI := H.cmStar; ∀ i c, Submodule.IsLattice H.E (lat i c))
-  (G : LocalGap H)
-  (kb : ∀ j, Tau2 R → Fin (R.sigW j).1 → ℤ) (ks : ∀ j, Tau2 R → Fin (R.sigW j).2 → ℤ)
-
-
+  (G : LocalGap H) (kb : ∀ j, Tau2 R → Fin (R.sigW j).1 → ℤ)
+  (ks : ∀ j, Tau2 R → Fin (R.sigW j).2 → ℤ)
 
 end Record
 

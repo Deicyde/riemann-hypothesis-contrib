@@ -15,11 +15,13 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.WaveSpd
 
-theorem isWave_time_refl : ∀ {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V), IsWave E u → IsWave E fun s => u (-s) := by
+theorem isWave_time_refl
+    : ∀ {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V), IsWave E u → IsWave E fun s => u (-s) := by
   intro n E u hu
   obtain ⟨h1, h2, h3, h4⟩ := hu
   refine ⟨?_, fun t => h2 (-t), ?_, ?_⟩
-  · have hm : Set.MapsTo (fun p : ℝ × Mat n => (-p.1, p.2)) (Set.univ ×ˢ GLs n) (Set.univ ×ˢ GLs n) :=
+  · have hm
+        : Set.MapsTo (fun p : ℝ × Mat n => (-p.1, p.2)) (Set.univ ×ˢ GLs n) (Set.univ ×ˢ GLs n) :=
       fun p hp => ⟨Set.mem_univ _, hp.2⟩
     have hc : ContDiffOn ℝ ∞ (fun p : ℝ × Mat n => (-p.1, p.2)) (Set.univ ×ˢ GLs n) :=
       (contDiff_fst.neg.prodMk contDiff_snd).contDiffOn

@@ -63,26 +63,34 @@ theorem subSlice : SubSlice := by
   have hem : MeasurePreserving e :=
     (volume_preserving_piFinSuccAbove (fun _ : Fin (m + 1) => ℝ) i).symm _
   have he : ∀ p : ℝ × (Fin m → ℝ), e p = i.insertNth p.1 p.2 := fun p => rfl
-  have hDint : IntegrableOn D (Δ (m + 1)) :=
-    (hD.mono hΔW).integrableOn_compact (isCompact_Δ _)
+  have hDint : IntegrableOn D (Δ (m + 1)) := (hD.mono hΔW).integrableOn_compact (isCompact_Δ _)
   have hS : MeasurableSet (e ⁻¹' Δ (m + 1)) := e.measurable (measurableSet_Δ _)
   have hFint : IntegrableOn (fun p => D (e p)) (e ⁻¹' Δ (m + 1)) (volume.prod volume) := by
     rw [← Measure.volume_eq_prod]
     exact (hem.integrableOn_comp_preimage e.measurableEmbedding).2 hDint
-  rw [← hem.map_eq, setIntegral_map_equiv, Measure.volume_eq_prod,
-    ← integral_indicator hS, integral_prod_symm _ ((integrable_indicator_iff hS).2 hFint)]
-  have hA := integrableOn_Δ_insertNth i G W hΔW hG (fun s => 1 - ∑ j, s j)
-    (continuous_const.sub (by fun_prop))
-    (fun s hs => by have := hs.2; linarith) (fun s hs => le_rfl)
-  have hB := integrableOn_Δ_insertNth i G W hΔW hG (fun _ => 0) continuous_const
-    (fun s hs => le_rfl) (fun s hs => by have := hs.2; linarith)
+  rw [← hem.map_eq, setIntegral_map_equiv, Measure.volume_eq_prod, ← integral_indicator hS,
+    integral_prod_symm _ ((integrable_indicator_iff hS).2 hFint)]
+  have hA :=
+    integrableOn_Δ_insertNth i G W hΔW hG
+      (fun s => 1 - ∑ j, s j)
+      (continuous_const.sub (by fun_prop))
+      (fun s hs => by have := hs.2; linarith)
+      (fun s hs => le_rfl)
+  have hB :=
+    integrableOn_Δ_insertNth i G W hΔW hG
+      (fun _ => 0)
+      continuous_const
+      (fun s hs => le_rfl)
+      (fun s hs => by have := hs.2; linarith)
   rw [← integral_sub hA hB, ← integral_indicator (measurableSet_Δ m)]
   refine integral_congr_ae (Filter.Eventually.of_forall fun s => ?_)
   by_cases hs : s ∈ Δ m
   · rw [Set.indicator_of_mem hs]
     have ha : 0 ≤ 1 - ∑ j, s j := by have := hs.2; linarith
-    have h1 : ∀ x, (e ⁻¹' Δ (m + 1)).indicator (fun p => D (e p)) (x, s) =
-        (Icc 0 (1 - ∑ j, s j)).indicator (fun x => D (i.insertNth x s)) x := by
+    have h1
+        : ∀ x,
+          (e ⁻¹' Δ (m + 1)).indicator (fun p => D (e p)) (x, s)
+            = (Icc 0 (1 - ∑ j, s j)).indicator (fun x => D (i.insertNth x s)) x := by
       intro x
       by_cases hx : x ∈ Icc 0 (1 - ∑ j, s j)
       · rw [Set.indicator_of_mem hx, Set.indicator_of_mem]
@@ -97,10 +105,9 @@ theorem subSlice : SubSlice := by
     simp_rw [h1]
     rw [integral_indicator measurableSet_Icc, integral_Icc_eq_integral_Ioc,
       ← intervalIntegral.integral_of_le ha]
-    have hcs : Continuous fun x : ℝ => Fin.insertNth (α := fun _ => ℝ) i x s := by
-      fun_prop
-    have hin : ∀ x ∈ Icc 0 (1 - ∑ j, s j), i.insertNth x s ∈ W :=
-      fun x hx => hΔW ((mem_Δ_insertNth i x s).2 ⟨hs, hx⟩)
+    have hcs : Continuous fun x : ℝ => Fin.insertNth (α := fun _ => ℝ) i x s := by fun_prop
+    have hin : ∀ x ∈ Icc 0 (1 - ∑ j, s j), i.insertNth x s ∈ W := fun x hx =>
+      hΔW ((mem_Δ_insertNth i x s).2 ⟨hs, hx⟩)
     apply intervalIntegral.integral_eq_sub_of_hasDerivAt (f := fun x => G (i.insertNth x s))
     · intro x hx
       rw [Set.uIcc_of_le ha] at hx

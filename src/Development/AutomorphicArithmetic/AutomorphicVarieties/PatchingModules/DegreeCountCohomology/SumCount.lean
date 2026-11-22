@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.sumCount :
-    ∀ (R D M : Type) [CommRing R] [Group D] [AddCommGroup M] [Module R M] [Finite M] (ρ : Representation R D M) (b : AddSubgroup M) (Z : AddSubgroup (D → M)), Finite Z → (∀ y ∈ b, (fun g => ρ g y - y) ∈ Z) → Finite ((Bl ρ).toAddSubgroup ⊔ Z : AddSubgroup (D → M)) ∧ Nat.card ((Bl ρ).toAddSubgroup ⊔ Z : AddSubgroup (D → M)) * Nat.card b ≤ Nat.card M * Nat.card Z := by
+theorem UpperTheory.V.Pa.sumCount
+    : ∀ (R D M : Type) [CommRing R] [Group D] [AddCommGroup M] [Module R M] [Finite M]
+        (ρ : Representation R D M) (b : AddSubgroup M) (Z : AddSubgroup (D → M)),
+      Finite Z → (∀ y ∈ b, (fun g => ρ g y - y) ∈ Z)
+        → Finite ((Bl ρ).toAddSubgroup ⊔ Z : AddSubgroup (D → M))
+          ∧ Nat.card ((Bl ρ).toAddSubgroup ⊔ Z : AddSubgroup (D → M)) * Nat.card b
+            ≤ Nat.card M * Nat.card Z := by
   intro R D M _ _ _ _ _ ρ b Z hZ hb
   let d : M →ₗ[R] (D → M) := LinearMap.pi fun g => ρ g - LinearMap.id
   have hd : ∀ y, d y = fun g => ρ g y - y := fun y => rfl
@@ -30,9 +36,12 @@ theorem UpperTheory.V.Pa.sumCount :
     rw [AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup φ.ker,
       Nat.card_congr (QuotientAddGroup.quotientKerEquivRange φ).toEquiv]
   have h2 : Nat.card b ≤ Nat.card φ.ker := by
-    let ι : b → φ.ker := fun y => ⟨(y.1, -⟨fun g => ρ g y.1 - y.1, hb y.1 y.2⟩), by
-      rw [AddMonoidHom.mem_ker, hφ, hd]
-      exact add_neg_cancel _⟩
+    let ι : b → φ.ker := fun y => ⟨
+      (y.1, -⟨fun g => ρ g y.1 - y.1, hb y.1 y.2⟩),
+      by
+        rw [AddMonoidHom.mem_ker, hφ, hd]
+        exact add_neg_cancel _
+    ⟩
     refine Nat.card_le_card_of_injective ι fun y y' h => ?_
     exact Subtype.ext (congrArg (fun p : φ.ker => p.1.1) h)
   rw [← Nat.card_prod M Z, h1]

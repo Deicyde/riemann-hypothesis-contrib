@@ -5,12 +5,15 @@ public import Mathlib
 @[expose] public section
 
 open TensorProduct in
-private theorem UpperTheory.universal_derivation_surjective {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B]
-    [Algebra A B] [Algebra B A] [IsScalarTower A B A]
-    [Algebra.FormallySmooth A B] [Algebra.EssFiniteType A B] :
-    ∃ (n : ℕ) (d : Derivation A B (Fin n → A)), Function.Surjective d ∧
-      ∀ (R : Type) [AddCommGroup R] [Module A R] [Module B R] [IsScalarTower B A R]
-        (δ : Derivation A B R), ∃ c : Fin n → R, ∀ b, δ b = ∑ i, d b i • c i := by
+private theorem UpperTheory.universal_derivation_surjective
+    {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B] [Algebra B A]
+    [IsScalarTower A B A] [Algebra.FormallySmooth A B] [Algebra.EssFiniteType A B]
+    : ∃ (n : ℕ) (d : Derivation A B (Fin n → A)),
+      Function.Surjective d
+        ∧ ∀ (R : Type) [AddCommGroup R] [Module A R] [Module B R] [IsScalarTower B A R]
+            (δ : Derivation A B R),
+          ∃ c : Fin n → R, ∀ b,
+            δ b = ∑ i, d b i • c i := by
   haveI : Module.Free A (A ⊗[B] Ω[B⁄A]) := Module.free_of_flat_of_isLocalRing
   let e := Module.finBasis A (A ⊗[B] Ω[B⁄A])
   let D0 : Derivation A B (A ⊗[B] Ω[B⁄A]) :=
@@ -29,7 +32,8 @@ private theorem UpperTheory.universal_derivation_surjective {A B : Type} [CommRi
           rw [hD0, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
         rw [this]
         exact Submodule.smul_mem _ _ ⟨b, rfl⟩
-      | zero => intro a; simp
+      | zero =>
+        intro a; simp
       | add x y _ _ hx hy =>
         intro a
         rw [TensorProduct.tmul_add]
@@ -43,8 +47,8 @@ private theorem UpperTheory.universal_derivation_surjective {A B : Type} [CommRi
     induction x with
     | tmul a w => exact h1 w a
     | add x y hx hy => exact add_mem hx hy
-  refine ⟨_, (e.equivFun.toLinearMap.restrictScalars B).compDer D0,
-    e.equivFun.surjective.comp hsurj, ?_⟩
+  refine
+    ⟨_, (e.equivFun.toLinearMap.restrictScalars B).compDer D0, e.equivFun.surjective.comp hsurj, ?_⟩
   intro R _ _ _ _ δ
   haveI : IsScalarTower A B R := ⟨fun a b r => by
     rw [← algebraMap_smul A (a • b) r, ← algebraMap_smul A b r, ← mul_smul]
@@ -52,24 +56,25 @@ private theorem UpperTheory.universal_derivation_surjective {A B : Type} [CommRi
     rw [Algebra.algebraMap_eq_smul_one, smul_assoc, ← Algebra.algebraMap_eq_smul_one, smul_eq_mul]⟩
   let f : A ⊗[B] Ω[B⁄A] →ₗ[A] R := δ.liftKaehlerDifferential.liftBaseChange A
   refine ⟨fun i => f (e i), fun b => ?_⟩
-  have h2 : δ b = f (D0 b) := by
-    simp [f, hD0]
+  have h2 : δ b = f (D0 b) := by simp [f, hD0]
   rw [h2]
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [← e.sum_equivFun (D0 b), map_sum]
   simp only [map_smul]
   rfl
 
-theorem UpperTheory.formally_smooth_surjective_derivation :
-    ∀ {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] (α : A →+* B) (σ : B →+* A),
-        σ.comp α = RingHom.id A → α.FormallySmooth → α.EssFiniteType →
-          ∃ (n : ℕ) (d : B → Fin n → A), Function.Surjective d ∧
-            ∀ (R : Type) [CommRing R] (φ : A →+* R),
+theorem UpperTheory.formally_smooth_surjective_derivation
+    : ∀ {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] (α : A →+* B) (σ : B →+* A),
+      σ.comp α = RingHom.id A → α.FormallySmooth → α.EssFiniteType
+        → ∃ (n : ℕ) (d : B → Fin n → A),
+          Function.Surjective d
+            ∧ ∀ (R : Type) [CommRing R] (φ : A →+* R),
               (∀ c : Fin n → R, ∃ g : B →+* DualNumber R,
-                (∀ a, g (α a) = TrivSqZeroExt.inl (φ a)) ∧ (∀ b, (g b).fst = φ (σ b)) ∧
-                  ∀ b, (g b).snd = ∑ i, φ (d b i) * c i) ∧
-              ∀ g : B →+* DualNumber R, (∀ a, g (α a) = TrivSqZeroExt.inl (φ a)) → (∀ b, (g b).fst = φ (σ b)) →
-                ∃ c : Fin n → R, ∀ b, (g b).snd = ∑ i, φ (d b i) * c i := by
+                  (∀ a, g (α a) = TrivSqZeroExt.inl (φ a)) ∧ (∀ b, (g b).fst = φ (σ b))
+                    ∧ ∀ b, (g b).snd = ∑ i, φ (d b i) * c i)
+                ∧ ∀ g : B →+* DualNumber R,
+                  (∀ a, g (α a) = TrivSqZeroExt.inl (φ a)) → (∀ b, (g b).fst = φ (σ b))
+                    → ∃ c : Fin n → R, ∀ b, (g b).snd = ∑ i, φ (d b i) * c i := by
   intro A B _ _ _ α σ hσ hfs hft
   have hσ' : ∀ a, σ (α a) = a := fun a => RingHom.congr_fun hσ a
   letI : Algebra A B := α.toAlgebra
@@ -82,9 +87,18 @@ theorem UpperTheory.formally_smooth_surjective_derivation :
     rw [d.leibniz]; rfl
   have hα : ∀ a, d (α a) = 0 := fun a => d.map_algebraMap a
   refine ⟨n, d, hd, fun R _ φ => ⟨fun c => ?_, fun g hg1 hg2 => ?_⟩⟩
-  · refine ⟨{ toFun := fun b => TrivSqZeroExt.inl (φ (σ b)) +
-                TrivSqZeroExt.inr (∑ i, φ (d b i) * c i)
-              map_one' := ?_, map_mul' := ?_, map_zero' := ?_, map_add' := ?_ }, ?_, ?_, ?_⟩
+  · refine ⟨
+      {
+        toFun := fun b => TrivSqZeroExt.inl (φ (σ b)) + TrivSqZeroExt.inr (∑ i, φ (d b i) * c i)
+        map_one' := ?_
+        map_mul' := ?_
+        map_zero' := ?_
+        map_add' := ?_
+      },
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · ext <;> simp
     · intro x y
       ext
@@ -103,13 +117,16 @@ theorem UpperTheory.formally_smooth_surjective_derivation :
   · letI : Algebra A R := φ.toAlgebra
     letI : Algebra B R := (φ.comp σ).toAlgebra
     haveI : IsScalarTower B A R := IsScalarTower.of_algebraMap_eq fun b => rfl
-    let δ : Derivation A B R := Derivation.mk'
-      { toFun := fun b => (g b).snd
-        map_add' := fun x y => by simp
-        map_smul' := fun a b => by
-          change (g (α a * b)).snd = φ a * (g b).snd
-          simp [hg1] }
-      (fun x y => by
-        change (g (x * y)).snd = φ (σ x) * (g y).snd + φ (σ y) * (g x).snd
-        simp [hg2, mul_comm])
+    let δ : Derivation A B R :=
+      Derivation.mk'
+        {
+          toFun := fun b => (g b).snd
+          map_add' := fun x y => by simp
+          map_smul' := fun a b => by
+            change (g (α a * b)).snd = φ a * (g b).snd
+            simp [hg1]
+        }
+        (fun x y => by
+          change (g (x * y)).snd = φ (σ x) * (g y).snd + φ (σ y) * (g x).snd
+          simp [hg2, mul_comm])
     exact H R δ

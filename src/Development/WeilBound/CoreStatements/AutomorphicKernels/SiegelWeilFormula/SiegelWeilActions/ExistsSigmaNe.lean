@@ -11,7 +11,8 @@ open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace PositivityTheory.SiegelWeilFormula.Act.CL
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem sigma_sigma_cm (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨w⟩ : Nonempty (InfinitePlace E) := inferInstance

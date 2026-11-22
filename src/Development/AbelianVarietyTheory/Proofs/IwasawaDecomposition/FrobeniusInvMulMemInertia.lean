@@ -5,13 +5,18 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
 
 namespace GlobalTheory
 
-theorem frob_inv_mul_mem_inertia : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] (v : HeightOneSpectrum (𝓞 E))
-    (A : ValuationSubring Ω), IsPlaceOver A v → ∀ τ τ' : G E Ω, IsFrob (F := E) A (normV v) τ →
-    IsFrob (F := E) A (normV v) τ' → τ'⁻¹ * τ ∈ Ine (F := E) A := by
+theorem frob_inv_mul_mem_inertia
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] (v : HeightOneSpectrum (𝓞 E))
+        (A : ValuationSubring Ω),
+      IsPlaceOver A v
+        → ∀ τ τ' : G E Ω,
+          IsFrob (F := E) A (normV v) τ → IsFrob (F := E) A (normV v) τ'
+            → τ'⁻¹ * τ ∈ Ine (F := E) A := by
   intro E Ω _ _ _ _ v A hA τ τ' hτ hτ'
   obtain ⟨hτD, hτF⟩ := hτ
   obtain ⟨hτ'D, hτ'F⟩ := hτ'
@@ -23,8 +28,7 @@ theorem frob_inv_mul_mem_inertia : ∀ (E Ω : Type) [Field E] [NumberField E] [
   set p := ringChar (𝓞 E ⧸ v.asIdeal) with hpdef
   haveI : CharP (𝓞 E ⧸ v.asIdeal) p := ringChar.charP _
   obtain ⟨n, hp, hcard⟩ := FiniteField.card (𝓞 E ⧸ v.asIdeal) p
-  have hq : normV v = p ^ (n : ℕ) := by
-    simp only [normV, Nat.card_eq_fintype_card, hcard]
+  have hq : normV v = p ^ (n : ℕ) := by simp only [normV, Nat.card_eq_fintype_card, hcard]
 
   have hpv : ((p : 𝓞 E)) ∈ v.asIdeal := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
@@ -54,9 +58,12 @@ theorem frob_inv_mul_mem_inertia : ∀ (E Ω : Type) [Field E] [NumberField E] [
   have h2 := hτF x hx
   have h3 : A.valuation (z ^ normV v - x ^ normV v) < 1 := by
     have e : z ^ normV v - x ^ normV v = (τ x - x ^ normV v) - (τ x - z ^ normV v) := by ring
-    rw [e]; exact Valuation.map_sub_lt _ h2 h1
+    rw [e]
+    exact Valuation.map_sub_lt _ h2 h1
 
-  have hres : IsLocalRing.residue A ⟨z, hzA⟩ ^ (p ^ (n : ℕ)) = IsLocalRing.residue A ⟨x, hxA⟩ ^ (p ^ (n : ℕ)) := by
+  have hres
+      : IsLocalRing.residue A ⟨z, hzA⟩ ^ (p ^ (n : ℕ))
+        = IsLocalRing.residue A ⟨x, hxA⟩ ^ (p ^ (n : ℕ)) := by
     rw [← sub_eq_zero, ← map_pow, ← map_pow, ← map_sub, IsLocalRing.residue_eq_zero_iff,
       ValuationSubring.valuation_lt_one_iff]
     rw [← hq]

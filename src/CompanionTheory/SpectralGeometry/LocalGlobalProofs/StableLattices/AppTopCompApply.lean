@@ -170,17 +170,19 @@ lemma effectiveEpi_fst {V T : Scheme.{0}} (G : V ⟶ Y) [Flat G] [LocallyOfFinit
     exact ⟨z, hz⟩⟩
   infer_instance
 
-theorem extend {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)]
-    [LocallyOfFinitePresentation (e ≫ f)]
+theorem extend
+    {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)] [LocallyOfFinitePresentation (e ≫ f)]
     (hZ : ∀ z : Z, f (ι z) ∈ Set.range (e ≫ f)) (hu : IsUnit u)
     (hc : ∀ (W : Scheme.{0}) (a b c : W ⟶ X) (hab : a ≫ f = b ≫ f) (hbc : b ≫ f = c ≫ f),
-      (pullback.lift a c (hab.trans hbc)).appTop u =
-        (pullback.lift a b hab).appTop u * (pullback.lift b c hbc).appTop u)
+      (pullback.lift a c (hab.trans hbc)).appTop u
+        = (pullback.lift a b hab).appTop u * (pullback.lift b c hbc).appTop u)
     (t₀ : Γ(V, ⊤)) (ht₀ : IsUnit t₀)
     (P : ∀ (W : Scheme.{0}) (a b : W ⟶ V) (h : (a ≫ e) ≫ f = (b ≫ e) ≫ f),
-      a.appTop t₀ = (pullback.lift (a ≫ e) (b ≫ e) h).appTop u * b.appTop t₀) :
-    ∃ t : Γ(Z, ⊤), IsUnit t ∧ ∀ (W : Scheme.{0}) (a b : W ⟶ Z) (hab : (a ≫ ι) ≫ f = (b ≫ ι) ≫ f),
-      a.appTop t = (pullback.lift (a ≫ ι) (b ≫ ι) hab).appTop u * b.appTop t := by
+      a.appTop t₀ = (pullback.lift (a ≫ e) (b ≫ e) h).appTop u * b.appTop t₀)
+    : ∃ t : Γ(Z, ⊤),
+      IsUnit t
+        ∧ ∀ (W : Scheme.{0}) (a b : W ⟶ Z) (hab : (a ≫ ι) ≫ f = (b ≫ ι) ≫ f),
+          a.appTop t = (pullback.lift (a ≫ ι) (b ≫ ι) hab).appTop u * b.appTop t := by
   let q : pullback (ι ≫ f) (e ≫ f) ⟶ Z := pullback.fst _ _
   let p : pullback (ι ≫ f) (e ≫ f) ⟶ V := pullback.snd _ _
   have hqp : (q ≫ ι) ≫ f = (p ≫ e) ≫ f := by
@@ -188,16 +190,19 @@ theorem extend {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)]
   have : EffectiveEpi q := effectiveEpi_fst (e ≫ f) (ι ≫ f) (fun z => by simpa using hZ z)
   let v : Γ(pullback (ι ≫ f) (e ≫ f), ⊤) :=
     (pullback.lift (q ≫ ι) (p ≫ e) hqp).appTop u * p.appTop t₀
-  have hvf : ∀ {T : Scheme.{0}} (g : T ⟶ pullback (ι ≫ f) (e ≫ f))
-      (h : ((g ≫ q) ≫ ι) ≫ f = ((g ≫ p) ≫ e) ≫ f),
-      g.appTop v = (pullback.lift ((g ≫ q) ≫ ι) ((g ≫ p) ≫ e) h).appTop u * (g ≫ p).appTop t₀ := by
+  have hvf
+      : ∀ {T : Scheme.{0}} (g : T ⟶ pullback (ι ≫ f) (e ≫ f))
+          (h : ((g ≫ q) ≫ ι) ≫ f = ((g ≫ p) ≫ e) ≫ f),
+        g.appTop v
+          = (pullback.lift ((g ≫ q) ≫ ι) ((g ≫ p) ≫ e) h).appTop u * (g ≫ p).appTop t₀ := by
     intro T g h
     simp only [v, map_mul]
     rw [← lift_appTop_comp f u g _ _ hqp (by simpa using h), appTop_comp_apply g p]
     congr 1
   have hqp' : q ≫ ι ≫ f = p ≫ e ≫ f := by simpa using hqp
-  have hv : ∀ (T : Scheme.{0}) (g₁ g₂ : T ⟶ pullback (ι ≫ f) (e ≫ f)), g₁ ≫ q = g₂ ≫ q →
-      g₁.appTop v = g₂.appTop v := by
+  have hv
+      : ∀ (T : Scheme.{0}) (g₁ g₂ : T ⟶ pullback (ι ≫ f) (e ≫ f)),
+        g₁ ≫ q = g₂ ≫ q → g₁.appTop v = g₂.appTop v := by
     intro T g₁ g₂ hg
     have h₁ : ((g₁ ≫ q) ≫ ι) ≫ f = ((g₁ ≫ p) ≫ e) ≫ f := by simp only [Category.assoc]; rw [hqp']
     have h₂ : ((g₂ ≫ q) ≫ ι) ≫ f = ((g₂ ≫ p) ≫ e) ≫ f := by simp only [Category.assoc]; rw [hqp']
@@ -206,11 +211,12 @@ theorem extend {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)]
     congr 1
     exact lift_congr f u (by rw [hg]) rfl _ _
   obtain ⟨t, ht⟩ := exists_descent q v hv
-  have hvu : IsUnit v := (hu.map (pullback.lift (q ≫ ι) (p ≫ e) hqp).appTop.hom).mul
-    (ht₀.map p.appTop.hom)
+  have hvu : IsUnit v :=
+    (hu.map (pullback.lift (q ≫ ι) (p ≫ e) hqp).appTop.hom).mul (ht₀.map p.appTop.hom)
   obtain ⟨v', hv'⟩ := hvu.exists_right_inv
-  have hv'' : ∀ (T : Scheme.{0}) (g₁ g₂ : T ⟶ pullback (ι ≫ f) (e ≫ f)), g₁ ≫ q = g₂ ≫ q →
-      g₁.appTop v' = g₂.appTop v' := by
+  have hv''
+      : ∀ (T : Scheme.{0}) (g₁ g₂ : T ⟶ pullback (ι ≫ f) (e ≫ f)),
+        g₁ ≫ q = g₂ ≫ q → g₁.appTop v' = g₂.appTop v' := by
     intro T g₁ g₂ hg
     have h0 := hv T g₁ g₂ hg
     have h1 : g₁.appTop v * g₁.appTop v' = 1 := by rw [← map_mul, hv', map_one]
@@ -222,9 +228,10 @@ theorem extend {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)]
     apply appTop_injective q
     rw [map_mul, ht, ht', hv', map_one]
   refine ⟨t, IsUnit.of_mul_eq_one _ htt, ?_⟩
-  have key : ∀ {T : Scheme.{0}} (s : T ⟶ Z) (r : T ⟶ V) (h : s ≫ ι ≫ f = r ≫ e ≫ f)
-      (h' : (s ≫ ι) ≫ f = (r ≫ e) ≫ f),
-      s.appTop t = (pullback.lift (s ≫ ι) (r ≫ e) h').appTop u * r.appTop t₀ := by
+  have key
+      : ∀ {T : Scheme.{0}} (s : T ⟶ Z) (r : T ⟶ V) (h : s ≫ ι ≫ f = r ≫ e ≫ f)
+          (h' : (s ≫ ι) ≫ f = (r ≫ e) ≫ f),
+        s.appTop t = (pullback.lift (s ≫ ι) (r ≫ e) h').appTop u * r.appTop t₀ := by
     intro T s r h h'
     let g : T ⟶ pullback (ι ≫ f) (e ≫ f) := pullback.lift s r h
     have hgq : g ≫ q = s := pullback.lift_fst _ _ _
@@ -238,7 +245,8 @@ theorem extend {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)]
   intro W a b hab
   let π : pullback ((a ≫ ι) ≫ f) (e ≫ f) ⟶ W := pullback.fst _ _
   let r : pullback ((a ≫ ι) ≫ f) (e ≫ f) ⟶ V := pullback.snd _ _
-  have hπ : EffectiveEpi π := effectiveEpi_fst (e ≫ f) ((a ≫ ι) ≫ f) (fun w => by simpa using hZ (a w))
+  have hπ : EffectiveEpi π :=
+    effectiveEpi_fst (e ≫ f) ((a ≫ ι) ≫ f) (fun w => by simpa using hZ (a w))
   have hr : π ≫ (a ≫ ι) ≫ f = r ≫ e ≫ f := pullback.condition
   have ha : (π ≫ a) ≫ ι ≫ f = r ≫ e ≫ f := by simpa using hr
   have hb : (π ≫ b) ≫ ι ≫ f = r ≫ e ≫ f := by
@@ -248,8 +256,9 @@ theorem extend {Z V : Scheme.{0}} (ι : Z ⟶ X) (e : V ⟶ X) [Flat (e ≫ f)]
   have hab' : ((π ≫ a) ≫ ι) ≫ f = ((π ≫ b) ≫ ι) ≫ f := ha'.trans hb'.symm
   apply appTop_injective π
   rw [map_mul, ← appTop_comp_apply π a, ← appTop_comp_apply π b, key _ r ha ha', key _ r hb hb']
-  have h₃ : π.appTop ((pullback.lift (a ≫ ι) (b ≫ ι) hab).appTop u) =
-      (pullback.lift ((π ≫ a) ≫ ι) ((π ≫ b) ≫ ι) hab').appTop u := by
+  have h₃
+      : π.appTop ((pullback.lift (a ≫ ι) (b ≫ ι) hab).appTop u)
+        = (pullback.lift ((π ≫ a) ≫ ι) ((π ≫ b) ≫ ι) hab').appTop u := by
     rw [← lift_appTop_comp f u π (a ≫ ι) (b ≫ ι) hab (by simpa using hab')]
     exact lift_congr f u (by simp) (by simp) _ _
   rw [h₃, ← mul_assoc, ← hc _ _ _ _ hab' hb']
@@ -265,18 +274,18 @@ lemma spec_appTop {R S : Type} [CommRing R] [CommRing S] (ψ : R →+* S) (r : R
       (Scheme.ΓSpecIso (.of S)).inv (ψ r) :=
   (congr($(Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom ψ)) r)).symm
 
-theorem local_unit {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.Flat A B]
+theorem local_unit
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.Flat A B]
     (i : Spec (.of B) ⟶ X) (j : Spec (.of A) ⟶ Y) [Mono j] [IsOpenImmersion i]
-    (hij : Spec.map (CommRingCat.ofHom (algebraMap A B)) ≫ j = i ≫ f)
-    (hu : IsUnit u)
+    (hij : Spec.map (CommRingCat.ofHom (algebraMap A B)) ≫ j = i ≫ f) (hu : IsUnit u)
     (hc : ∀ (W : Scheme.{0}) (a b c : W ⟶ X) (hab : a ≫ f = b ≫ f) (hbc : b ≫ f = c ≫ f),
-      (pullback.lift a c (hab.trans hbc)).appTop u =
-        (pullback.lift a b hab).appTop u * (pullback.lift b c hbc).appTop u)
-    (x : PrimeSpectrum B) :
-    ∃ (V : Scheme.{0}) (e : V ⟶ X) (_ : IsOpenImmersion e) (t₀ : Γ(V, ⊤)),
-      i x ∈ Set.range e ∧ IsUnit t₀ ∧
-      ∀ (W : Scheme.{0}) (a b : W ⟶ V) (h : (a ≫ e) ≫ f = (b ≫ e) ≫ f),
-        a.appTop t₀ = (pullback.lift (a ≫ e) (b ≫ e) h).appTop u * b.appTop t₀ := by
+      (pullback.lift a c (hab.trans hbc)).appTop u
+        = (pullback.lift a b hab).appTop u * (pullback.lift b c hbc).appTop u)
+    (x : PrimeSpectrum B)
+    : ∃ (V : Scheme.{0}) (e : V ⟶ X) (_ : IsOpenImmersion e) (t₀ : Γ(V, ⊤)),
+      i x ∈ Set.range e ∧ IsUnit t₀
+        ∧ ∀ (W : Scheme.{0}) (a b : W ⟶ V) (h : (a ≫ e) ≫ f = (b ≫ e) ≫ f),
+          a.appTop t₀ = (pullback.lift (a ≫ e) (b ≫ e) h).appTop u * b.appTop t₀ := by
   let g := Spec.map (CommRingCat.ofHom (algebraMap A B))
   let sl : Spec (.of (B ⊗[A] B)) ⟶ Spec (.of B) :=
     Spec.map (CommRingCat.ofHom Algebra.TensorProduct.includeLeftRingHom)
@@ -292,37 +301,44 @@ theorem local_unit {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.
     simp only [Category.assoc]
     rw [← hij', reassoc_of% hslr]
   let ρ := pullback.lift (sl ≫ i) (sr ≫ i) hρ
-  have hF : ∀ {W : Scheme.{0}} (c : W ⟶ Spec (.of (B ⊗[A] B))) (a b : W ⟶ X) (h : a ≫ f = b ≫ f),
-      c ≫ sl ≫ i = a → c ≫ sr ≫ i = b → pullback.lift a b h = c ≫ ρ := by
+  have hF
+      : ∀ {W : Scheme.{0}} (c : W ⟶ Spec (.of (B ⊗[A] B))) (a b : W ⟶ X) (h : a ≫ f = b ≫ f),
+        c ≫ sl ≫ i = a → c ≫ sr ≫ i = b → pullback.lift a b h = c ≫ ρ := by
     intro W c a b h ha hb
     apply pullback.hom_ext
     · rw [pullback.lift_fst, Category.assoc, pullback.lift_fst, ha]
     · rw [pullback.lift_snd, Category.assoc, pullback.lift_snd, hb]
   let uB : B ⊗[A] B := (Scheme.ΓSpecIso (.of (B ⊗[A] B))).hom (ρ.appTop u)
-  have huB : ρ.appTop u = (Scheme.ΓSpecIso (.of (B ⊗[A] B))).inv uB := by
-    simp [uB]
+  have huB : ρ.appTop u = (Scheme.ΓSpecIso (.of (B ⊗[A] B))).inv uB := by simp [uB]
   have hBu : IsUnit uB := (hu.map ρ.appTop.hom).map (Scheme.ΓSpecIso (.of (B ⊗[A] B))).hom.hom
   obtain ⟨w, hw⟩ := hBu.exists_right_inv
-  have hcB : ∀ (C : Type) [CommRing C] [Algebra A C] (α β γ : B →ₐ[A] C),
-      pr α γ uB = pr α β uB * pr β γ uB := by
+  have hcB
+      : ∀ (C : Type) [CommRing C] [Algebra A C] (α β γ : B →ₐ[A] C),
+        pr α γ uB = pr α β uB * pr β γ uB := by
     intro C _ _ α β γ
-    have hαg : ∀ α : B →ₐ[A] C, Spec.map (CommRingCat.ofHom α.toRingHom) ≫ g =
-        Spec.map (CommRingCat.ofHom (algebraMap A C)) := by
+    have hαg
+        : ∀ α : B →ₐ[A] C,
+          Spec.map (CommRingCat.ofHom α.toRingHom) ≫ g
+            = Spec.map (CommRingCat.ofHom (algebraMap A C)) := by
       intro α
       rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
       congr 2
       exact α.comp_algebraMap
-    have hf : ∀ α β : B →ₐ[A] C, (Spec.map (CommRingCat.ofHom α.toRingHom) ≫ i) ≫ f =
-        (Spec.map (CommRingCat.ofHom β.toRingHom) ≫ i) ≫ f := by
+    have hf
+        : ∀ α β : B →ₐ[A] C,
+          (Spec.map (CommRingCat.ofHom α.toRingHom) ≫ i) ≫ f
+            = (Spec.map (CommRingCat.ofHom β.toRingHom) ≫ i) ≫ f := by
       intro α β
       simp only [Category.assoc]
       rw [← hij', reassoc_of% (hαg α), reassoc_of% (hαg β)]
-    have L1 : ∀ (α β : B →ₐ[A] C) (h),
-        (pullback.lift (Spec.map (CommRingCat.ofHom α.toRingHom) ≫ i)
-          (Spec.map (CommRingCat.ofHom β.toRingHom) ≫ i) h).appTop u =
-        (Scheme.ΓSpecIso (.of C)).inv (pr α β uB) := by
+    have L1
+        : ∀ (α β : B →ₐ[A] C) (h),
+          (pullback.lift (Spec.map (CommRingCat.ofHom α.toRingHom) ≫ i)
+              (Spec.map (CommRingCat.ofHom β.toRingHom) ≫ i) h).appTop u
+            = (Scheme.ΓSpecIso (.of C)).inv (pr α β uB) := by
       intro α β h
-      rw [hF (Spec.map (CommRingCat.ofHom (pr α β).toRingHom)) _ _ h, appTop_comp_apply, huB, spec_appTop]
+      rw [hF (Spec.map (CommRingCat.ofHom (pr α β).toRingHom)) _ _ h, appTop_comp_apply, huB,
+        spec_appTop]
       · rfl
       · rw [← Category.assoc]
         congr 1
@@ -344,7 +360,8 @@ theorem local_unit {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.
   let l : B →+* Localization.Away n := algebraMap B (Localization.Away n)
   let sn := Spec.map (CommRingCat.ofHom l)
   have : IsOpenImmersion sn := IsOpenImmersion.of_isLocalization n
-  let t₀ : Γ(Spec (.of (Localization.Away n)), ⊤) := (Scheme.ΓSpecIso (.of (Localization.Away n))).inv (l n)
+  let t₀ : Γ(Spec (.of (Localization.Away n)), ⊤) :=
+    (Scheme.ΓSpecIso (.of (Localization.Away n))).inv (l n)
   have ht : sn.appTop ((Scheme.ΓSpecIso (.of B)).inv n) = t₀ := spec_appTop l n
   refine ⟨_, sn ≫ i, inferInstance, t₀, ?_, ?_, ?_⟩
   · have hp : x ∈ Set.range (PrimeSpectrum.comap (algebraMap B (Localization.Away n))) := by
@@ -376,8 +393,8 @@ theorem local_unit {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.
     have htb : b.appTop t₀ = c.appTop ((Scheme.ΓSpecIso _).inv ((1 : B) ⊗ₜ[A] n)) := by
       rw [← ht, ← appTop_comp_apply, ← hcb, appTop_comp_apply, spec_appTop]
       rfl
-    rw [hta, htb, hF c _ _ h (by rw [reassoc_of% hca])
-      (by rw [reassoc_of% hcb]), appTop_comp_apply c ρ, huB, ← map_mul, ← map_mul, hn]
+    rw [hta, htb, hF c _ _ h (by rw [reassoc_of% hca]) (by rw [reassoc_of% hcb]),
+      appTop_comp_apply c ρ, huB, ← map_mul, ← map_mul, hn]
 
 end Local
 
@@ -385,13 +402,15 @@ theorem h90 : CompanionTheory.ObstructionTrivialLocus.H90 := by
   intro X Y f hfl hlfp hsurj u hu hc y
   obtain ⟨x, rfl⟩ := f.surjective y
   obtain ⟨V, hV, hxV, -⟩ := exists_isAffineOpen_mem_and_subset (X := Y) (U := ⊤) (x := f x) trivial
-  obtain ⟨O, hO, hxO, hOV⟩ := exists_isAffineOpen_mem_and_subset (X := X) (U := f ⁻¹ᵁ V) (x := x) hxV
+  obtain ⟨O, hO, hxO, hOV⟩ :=
+    exists_isAffineOpen_mem_and_subset (X := X) (U := f ⁻¹ᵁ V) (x := x) hxV
   have hle : O ≤ f ⁻¹ᵁ V := hOV
   letI := (f.appLE V O hle).hom.toAlgebra
   have hfl' : Module.Flat Γ(Y, V) Γ(X, O) := f.flat_appLE hV hO hle
   have hij := IsAffineOpen.SpecMap_appLE_fromSpec f hV hO hle
-  obtain ⟨V', e, _, t₀, hx, ht₀, P⟩ := local_unit f u (A := Γ(Y, V)) (B := Γ(X, O)) hO.fromSpec
-    hV.fromSpec hij hu hc (hO.primeIdealOf ⟨x, hxO⟩)
+  obtain ⟨V', e, _, t₀, hx, ht₀, P⟩ :=
+    local_unit f u (A := Γ(Y, V)) (B := Γ(X, O)) hO.fromSpec hV.fromSpec hij hu hc
+      (hO.primeIdealOf ⟨x, hxO⟩)
   have hx' : x ∈ Set.range e := by
     have := hO.fromSpec_primeIdealOf ⟨x, hxO⟩
     rwa [this] at hx

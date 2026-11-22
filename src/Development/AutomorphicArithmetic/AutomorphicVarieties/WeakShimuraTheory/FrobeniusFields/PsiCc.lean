@@ -5,12 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 open Formalism.GaloisCohomology UpperTheory.V UpperTheory.Top
 
-private theorem psi_cc (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O]
-    [Algebra ℤ_[l] O] {N : ℕ} [NeZero N] (ψ : DirichletCharacter O N) (e : ℕ) {σ : G ℚ Ω} (h : IsConjOm σ.toRingEquiv)
-    (hψ : PsiEven e ψ) : Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ = 1 := by
+private theorem psi_cc
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    {O : Type} [CommRing O] [Algebra ℤ_[l] O]
+    {N : ℕ} [NeZero N]
+    (ψ : DirichletCharacter O N) (e : ℕ)
+    {σ : G ℚ Ω} (h : IsConjOm σ.toRingEquiv)
+    (hψ : PsiEven e ψ)
+    : Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ = 1 := by
   have h1 : cycZ ℚ Ω l σ = -1 := h.cyc (E := ℚ)
   have h2 : Chr.cls ℚ Ω N σ = -1 := (Chr.clsFacts ℚ Ω N).2.2.2.1 σ h
   have h3 : chiO ℚ Ω l O σ = -1 := by
@@ -21,8 +29,12 @@ private theorem psi_cc (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω
   have h5 : ((-1 : O) ^ e) * (-1) ^ e = 1 := by rw [← mul_pow]; simp
   rw [Units.ext_iff, h4, Units.val_one, hψ, h5]
 
-theorem UpperTheory.V.Ws.xi2 :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), Ctx2 D → (∃ n : ℕ, D.ξ ^ 2 ^ n = 1) ∧ (∀ A, Raw.Away {2} A → Ine (F := ℚ) A ≤ D.ξ.ker) ∧ ∀ σ : G ℚ Ω, IsCC σ → D.Psi σ = 1 := by
+theorem UpperTheory.V.Ws.xi2
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      Ctx2 D
+        → (∃ n : ℕ, D.ξ ^ 2 ^ n = 1) ∧ (∀ A, Raw.Away {2} A → Ine (F := ℚ) A ≤ D.ξ.ker)
+          ∧ ∀ σ : G ℚ Ω, IsCC σ → D.Psi σ = 1 := by
   intro Ω _ _ _ l _ c D hD
   obtain ⟨-, h, t, e, ψ, -, -, -, hψ, -, hO⟩ := hD
   obtain ⟨he, hp, -, _, ξ', ξ₀, -, -, h0, hξ⟩ := hO

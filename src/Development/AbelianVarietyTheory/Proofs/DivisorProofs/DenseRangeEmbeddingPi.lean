@@ -8,12 +8,13 @@ namespace GlobalTheory.DenseEmbeddingProduct
 
 open NumberField NumberField.InfinitePlace
 
-theorem denseRange_embedding_pi {E : Type} [Field E] [NumberField E] [IsCMField E] :
-    DenseRange fun (x : E) (w : InfinitePlace E) ↦ (InfinitePlace.embedding w : E → ℂ) x := by
-  let Φ : InfiniteAdeleRing E → (InfinitePlace E → ℂ) :=
-    fun y w ↦ Completion.extensionEmbedding w (y w)
-  have hc : Continuous Φ := continuous_pi fun w ↦
-    (Completion.isometry_extensionEmbedding w).continuous.comp (continuous_apply w)
+theorem denseRange_embedding_pi {E : Type} [Field E] [NumberField E] [IsCMField E]
+    : DenseRange fun (x : E) (w : InfinitePlace E) ↦ (InfinitePlace.embedding w : E → ℂ) x := by
+  let Φ : InfiniteAdeleRing E → (InfinitePlace E → ℂ) := fun y w ↦
+    Completion.extensionEmbedding w (y w)
+  have hc : Continuous Φ :=
+    continuous_pi fun w ↦
+      (Completion.isometry_extensionEmbedding w).continuous.comp (continuous_apply w)
   have hs : Function.Surjective Φ := by
     intro f
     choose y hy using fun w : InfinitePlace E ↦

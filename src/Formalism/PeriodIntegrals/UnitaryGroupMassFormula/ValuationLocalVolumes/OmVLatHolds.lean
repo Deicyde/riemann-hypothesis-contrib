@@ -9,8 +9,10 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcVal.OmVSt.OmW
 
-open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets Formalism.L2.SG.Sub Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  MeasureTheory NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocVol
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Sub
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain
 
 variable {D : D7} (X : HidaSetting D) (u' : D.what₂.Word) (ψ : AddChar (AF X.B.I.F) ℂ)
 

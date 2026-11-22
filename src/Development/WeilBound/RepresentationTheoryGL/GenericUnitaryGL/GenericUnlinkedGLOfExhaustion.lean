@@ -78,14 +78,20 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.SplitWe
 
 namespace GlobalTheory.RgGu
 
-theorem whitRankIrr : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], GlobalTheory.BZSeg.WhitRankIrr k :=
-  fun k _ _ _ _ => PositivityTheory.rg.gu.whit.whitRankIrr k
+theorem whitRankIrr
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.BZSeg.WhitRankIrr k := fun k _ _ _ _ =>
+  PositivityTheory.rg.gu.whit.whitRankIrr k
 
-theorem whitRankStd : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], GlobalTheory.BZSeg.WhitRankStd k :=
-  fun k _ _ _ _ => whitRankStd_of_heredity k (GlobalTheory.T.whittaker_heredity k) (whitRankIrr k)
+theorem whitRankStd
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.BZSeg.WhitRankStd k := fun k _ _ _ _ =>
+  whitRankStd_of_heredity k (GlobalTheory.T.whittaker_heredity k) (whitRankIrr k)
 
-theorem nuPair : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], GlobalTheory.BZSeg.NuPair k :=
-  fun k _ _ _ _ => GlobalTheory.RgGu.Nup2.nuPair k
+theorem nuPair
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.BZSeg.NuPair k := fun k _ _ _ _ =>
+  GlobalTheory.RgGu.Nup2.nuPair k
 
 end GlobalTheory.RgGu
 

@@ -25,8 +25,7 @@ theorem FreeQuotientScheme_holds : FreeQuotientScheme := by
       obtain ⟨U, hU, hxU⟩ := horb x
       obtain ⟨V, W, hxV, hV, hW, hVW, hinv⟩ :=
         GlobalTheory.T.orbit_affine_neighbourhood G X hG x U hU hxU
-      exact ⟨V, hxV,
-        GlobalTheory.T.free_action_affine_chart G X hG hfree V W hV hW hVW hinv⟩)
+      exact ⟨V, hxV, GlobalTheory.T.free_action_affine_chart G X hG hfree V W hV hW hVW hinv⟩)
   haveI : IsFinite q₀ := hfin
   haveI : Flat q₀ := hflat
   haveI : LocallyOfFinitePresentation q₀ := hfp
@@ -37,15 +36,29 @@ theorem FreeQuotientScheme_holds : FreeQuotientScheme := by
     conv_rhs => rw [← hpb.lift_snd g₁ g₂ hg]
     simp only [Category.assoc]
     first
-      | exact hpb.lift g₁ g₂ hg ≫= ((Over.w _).trans (Over.w _).symm)
-      | (simp only [Over.w]; try rfl)
-  have key : ∀ {Y : Over S} (q : X ⟶ Y), GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfTorsor G q →
-      GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfQuotient G q ∧ GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfTorsor G q := fun _ h => ⟨h.isFppfQuotient, h⟩
-  refine ⟨Over.mk (EffectiveEpi.desc q₀ X.hom hdesc),
-    Over.homMk q₀ (EffectiveEpi.fac q₀ X.hom hdesc), key _ ?_⟩
+    | exact hpb.lift g₁ g₂ hg ≫= ((Over.w _).trans (Over.w _).symm)
+    | (simp only [Over.w]; try rfl)
+  have key
+      : ∀ {Y : Over S} (q : X ⟶ Y),
+        GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfTorsor G q
+          → GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfQuotient G q
+            ∧ GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfTorsor G q := fun _ h =>
+    ⟨h.isFppfQuotient, h⟩
+  refine ⟨
+    Over.mk (EffectiveEpi.desc q₀ X.hom hdesc),
+    Over.homMk q₀ (EffectiveEpi.fac q₀ X.hom hdesc),
+    key _ ?_
+  ⟩
   unfold GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot.IsFppfTorsor
-  refine ⟨IsPullback.of_map_of_faithful (Over.forget S) hpb, PUnit, fun _ => X.left, fun _ => q₀,
-    fun _ => ⟨hflat, hfp⟩, fun y => ?_, fun _ => ⟨𝟙 _, Category.id_comp _⟩⟩
+  refine ⟨
+    IsPullback.of_map_of_faithful (Over.forget S) hpb,
+    PUnit,
+    fun _ => X.left,
+    fun _ => q₀,
+    fun _ => ⟨hflat, hfp⟩,
+    fun y => ?_,
+    fun _ => ⟨𝟙 _, Category.id_comp _⟩
+  ⟩
   obtain ⟨z, hz⟩ := hsurj.surj y
   exact ⟨PUnit.unit, z, hz⟩
 

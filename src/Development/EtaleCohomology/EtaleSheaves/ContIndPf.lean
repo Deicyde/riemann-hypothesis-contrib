@@ -140,9 +140,12 @@ lemma exists_cover (W : X.Opens) (hW : IsCompact (W : Set X)) :
 end opens
 
 section ind
-variable (P : Scheme.{0} → Prop) (hA : ∀ (X : Scheme.{0}) [IsAffine X], P X)
-  (hS : ∀ (X : Scheme.{0}) (U V : X.Opens), IsCompact (U : Set X) → IsCompact (V : Set X) → U ⊔ V = ⊤ →
-    P U.toScheme → P V.toScheme → P (U ⊓ V).toScheme → P X)
+variable
+  (P : Scheme.{0} → Prop) (hA : ∀ (X : Scheme.{0}) [IsAffine X], P X)
+  (hS : ∀ (X : Scheme.{0}) (U V : X.Opens),
+    IsCompact (U : Set X) → IsCompact (V : Set X) → U ⊔ V = ⊤ → P U.toScheme → P V.toScheme
+      → P (U ⊓ V).toScheme
+      → P X)
 include hA hS
 
 omit hS in

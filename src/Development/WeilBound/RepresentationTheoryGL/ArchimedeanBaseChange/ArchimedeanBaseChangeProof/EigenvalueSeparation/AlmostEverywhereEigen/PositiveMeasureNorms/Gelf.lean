@@ -18,14 +18,22 @@ theorem gelf : Gelf := by
   let A : StarSubalgebra ℂ (K →L[ℂ] K) := A0.topologicalClosure
   have : IsClosed (A : Set (K →L[ℂ] K)) := A0.isClosed_topologicalClosure
   let cr : CommRing A := A0.commRingTopologicalClosure hc
-  let _ : CommCStarAlgebra A :=
-    { (inferInstance : CStarAlgebra A) with mul_comm := cr.mul_comm }
+  let _ : CommCStarAlgebra A := { (inferInstance : CStarAlgebra A) with mul_comm := cr.mul_comm }
   let G := gelfandStarTransform A
   have hmem : ∀ b, R b ∈ A := fun b => A0.le_topologicalClosure ⟨b, rfl⟩
-  refine ⟨WeakDual.characterSpace ℂ A, inferInstance, inferInstance, inferInstance,
-    A.subtype.comp G.symm.toStarAlgHom, G.toStarAlgHom.comp (R.codRestrict A hmem), ?_, ?_⟩
+  refine ⟨
+    WeakDual.characterSpace ℂ A,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    A.subtype.comp G.symm.toStarAlgHom,
+    G.toStarAlgHom.comp (R.codRestrict A hmem),
+    ?_,
+    ?_
+  ⟩
   · intro f
-    have h1 : ‖G (G.symm f)‖ = ‖G.symm f‖ := (gelfandTransform_isometry A).norm_map_of_map_zero (map_zero _) _
+    have h1 : ‖G (G.symm f)‖ = ‖G.symm f‖ :=
+      (gelfandTransform_isometry A).norm_map_of_map_zero (map_zero _) _
     rw [G.apply_symm_apply] at h1
     rw [h1]
     rfl

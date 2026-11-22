@@ -5,16 +5,19 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TruncSum
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.Mass.MeanV PositivityTheory.Rg.Mass NumberField IsDedekindDomain MeasureTheory Topology Filter
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.Mass.MeanV PositivityTheory.Rg.Mass NumberField IsDedekindDomain
+  MeasureTheory Topology Filter
 open scoped ENNReal NNReal Classical
 
 namespace GlobalTheory.CompanionTheory.Mass.MeanV.Den
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_pow_mul_le_one (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v)
-    (ha : Valued.v a < 1) (K : Set (Fv F v)) (hK : IsCompact K) :
-    ∃ m : ℕ, ∀ s ∈ K, Valued.v (a ^ m * s) ≤ 1 := by
+theorem exists_pow_mul_le_one
+    (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v) (ha : Valued.v a < 1) (K : Set (Fv F v))
+    (hK : IsCompact K)
+    : ∃ m : ℕ, ∀ s ∈ K, Valued.v (a ^ m * s) ≤ 1 := by
   have h1 : IsOpen {s : Fv F v | Valued.v s < 1} := by
     rw [isOpen_iff_mem_nhds]
     intro x hx
@@ -28,8 +31,7 @@ theorem exists_pow_mul_le_one (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v)
     (continuous_const.mul continuous_id).isOpen_preimage _ h1
   have hcover : ∀ s : Fv F v, ∃ m : ℕ, Valued.v (a ^ m * s) < 1 := by
     intro s
-    have h0 : Tendsto (fun m : ℕ => a ^ m * s) atTop (𝓝 0) := by
-      simpa using h2.mul_const s
+    have h0 : Tendsto (fun m : ℕ => a ^ m * s) atTop (𝓝 0) := by simpa using h2.mul_const s
     have hn : {y : Fv F v | Valued.v y < 1} ∈ 𝓝 (0 : Fv F v) := h1.mem_nhds (by simp)
     exact (h0.eventually hn).exists
   have hmono : Monotone fun m : ℕ => {s : Fv F v | Valued.v (a ^ m * s) < 1} := by
@@ -37,22 +39,30 @@ theorem exists_pow_mul_le_one (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v)
     obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmm'
     show Valued.v (a ^ (m + d) * s) < 1
     rw [show a ^ (m + d) * s = a ^ d * (a ^ m * s) by ring, Valuation.map_mul, map_pow]
-    calc Valued.v a ^ d * Valued.v (a ^ m * s) ≤ 1 * Valued.v (a ^ m * s) := by
-          gcongr
-          first
-            | exact pow_le_one₀ zero_le ha.le
-            | exact pow_le_one₀ zero_le' ha.le
+    calc
+      Valued.v a ^ d * Valued.v (a ^ m * s) ≤ 1 * Valued.v (a ^ m * s) := by
+        gcongr
+        first | exact pow_le_one₀ zero_le ha.le | exact pow_le_one₀ zero_le' ha.le
       _ = Valued.v (a ^ m * s) := one_mul _
       _ < 1 := hs
-  obtain ⟨m, hm⟩ := hK.elim_directed_cover (fun m : ℕ => {s : Fv F v | Valued.v (a ^ m * s) < 1}) hUo
-    (fun s _ => Set.mem_iUnion.mpr (hcover s)) hmono.directed_le
+  obtain ⟨m, hm⟩ :=
+    hK.elim_directed_cover
+      (fun m : ℕ => {s : Fv F v | Valued.v (a ^ m * s) < 1})
+      hUo
+      (fun s _ => Set.mem_iUnion.mpr (hcover s))
+      hmono.directed_le
   exact ⟨m, fun s hs => le_of_lt (hm hs)⟩
 
-theorem exists_nat_lt_one (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ p : ℕ, 0 < p ∧ v.valuation F (p : F) < 1 := by
-  refine ⟨Ideal.absNorm v.asIdeal, Nat.pos_of_ne_zero fun h => v.ne_bot (Ideal.absNorm_eq_zero_iff.mp h), ?_⟩
+theorem exists_nat_lt_one (v : HeightOneSpectrum (𝓞 F))
+    : ∃ p : ℕ, 0 < p ∧ v.valuation F (p : F) < 1 := by
+  refine ⟨
+    Ideal.absNorm v.asIdeal,
+    Nat.pos_of_ne_zero fun h => v.ne_bot (Ideal.absNorm_eq_zero_iff.mp h),
+    ?_
+  ⟩
   have hm : ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 F) ∈ v.asIdeal := Ideal.absNorm_mem _
-  have h : (((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 F) : F) = ((Ideal.absNorm v.asIdeal : ℕ) : F) := by simp
+  have h : (((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 F) : F) = ((Ideal.absNorm v.asIdeal : ℕ) : F) := by
+    simp
   rw [← h]
   exact (HeightOneSpectrum.valuation_lt_one_iff_mem v _).mpr hm
 
@@ -63,19 +73,29 @@ theorem val_nat_le_one (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) : v.valuation 
 
 end GlobalTheory.CompanionTheory.Mass.MeanV.Den
 
-theorem GlobalTheory.CompanionTheory.Mass.MeanV.exists_common_denominator :
-    ∀ (F : Type) [Field F] [NumberField F] (T : Finset (HeightOneSpectrum (𝓞 F))) (K : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fv F v)), (∀ v ∈ T, IsCompact (K v)) → ∃ N : ℕ, 0 < N ∧ ∀ x ∈ IntOut T, (∀ v ∈ T, algebraMap F (Fv F v) x ∈ K v) → ∃ y : 𝓞 F, (y : F) = (N : F) * x := by
+theorem GlobalTheory.CompanionTheory.Mass.MeanV.exists_common_denominator
+    : ∀ (F : Type) [Field F] [NumberField F] (T : Finset (HeightOneSpectrum (𝓞 F)))
+        (K : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fv F v)),
+      (∀ v ∈ T, IsCompact (K v))
+        → ∃ N : ℕ,
+          0 < N
+            ∧ ∀ x ∈ IntOut T,
+              (∀ v ∈ T, algebraMap F (Fv F v) x ∈ K v) → ∃ y : 𝓞 F, (y : F) = (N : F) * x := by
   intro F _ _ T K hK
-  have h3 : ∀ (v : HeightOneSpectrum (𝓞 F)) (x : F), Valued.v (algebraMap F (Fv F v) x) = v.valuation F x := by
+  have h3
+      : ∀ (v : HeightOneSpectrum (𝓞 F)) (x : F),
+        Valued.v (algebraMap F (Fv F v) x) = v.valuation F x := by
     intro v x
     show Valued.v ((x : v.adicCompletion F)) = v.valuation F x
     first
-      | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
-      | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' x
-      | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := v) x
-  have h4 : ∀ x : F, (∀ v : HeightOneSpectrum (𝓞 F), v.valuation F x ≤ 1) → ∃ y : 𝓞 F, (y : F) = x := by
+    | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
+    | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' x
+    | exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := v) x
+  have h4
+      : ∀ x : F, (∀ v : HeightOneSpectrum (𝓞 F), v.valuation F x ≤ 1) → ∃ y : 𝓞 F, (y : F) = x := by
     intro x hx
-    obtain ⟨y, hy⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) (K := F) (x := x) (h := hx)
+    obtain ⟨y, hy⟩ :=
+      HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) (K := F) (x := x) (h := hx)
     exact ⟨y, hy⟩
   have hpl : ∀ (v : HeightOneSpectrum (𝓞 F)) (n k : ℕ), v.valuation F ((n : F) ^ k) ≤ 1 := by
     intro v n k
@@ -99,10 +119,12 @@ theorem GlobalTheory.CompanionTheory.Mass.MeanV.exists_common_denominator :
       have h := hm w hw _ (hxK w hw)
       rw [← map_pow, ← map_mul, h3, map_mul] at h
       exact h
-    calc w.valuation F ((p w : F) ^ m w) * (∏ v ∈ T.erase w, w.valuation F ((p v : F) ^ m v)) *
-          w.valuation F x
-        = (∏ v ∈ T.erase w, w.valuation F ((p v : F) ^ m v)) *
-            (w.valuation F ((p w : F) ^ m w) * w.valuation F x) := by ac_rfl
+    calc
+      w.valuation F ((p w : F) ^ m w) * (∏ v ∈ T.erase w, w.valuation F ((p v : F) ^ m v))
+            * w.valuation F x
+          = (∏ v ∈ T.erase w, w.valuation F ((p v : F) ^ m v))
+            * (w.valuation F ((p w : F) ^ m w) * w.valuation F x) := by
+        ac_rfl
       _ ≤ 1 * 1 := mul_le_mul' hrest hmain
       _ = 1 := one_mul 1
   · have hxw : w.valuation F x ≤ 1 := by
@@ -111,5 +133,7 @@ theorem GlobalTheory.CompanionTheory.Mass.MeanV.exists_common_denominator :
     have hN : w.valuation F (∏ v ∈ T, (p v : F) ^ m v) ≤ 1 := by
       rw [map_prod]
       exact Finset.prod_le_one' fun v _ => hpl w (p v) (m v)
-    calc w.valuation F (∏ v ∈ T, (p v : F) ^ m v) * w.valuation F x ≤ 1 * 1 := mul_le_mul' hN hxw
+    calc
+      w.valuation F (∏ v ∈ T, (p v : F) ^ m v) * w.valuation F x
+        ≤ 1 * 1 := mul_le_mul' hN hxw
       _ = 1 := one_mul 1

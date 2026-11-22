@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 set_option autoImplicit false
 
@@ -13,8 +15,8 @@ noncomputable section
 
 namespace GlobalTheory.QLog.ValEx
 
-theorem nat_bound (p N m : ℕ) (hp : 2 ≤ p) :
-    ∃ M : ℕ, 1 ≤ M ∧ ∀ a v : ℕ, M ≤ a → p ^ v ≤ a → N * (m + v) ≤ a := by
+theorem nat_bound (p N m : ℕ) (hp : 2 ≤ p)
+    : ∃ M : ℕ, 1 ≤ M ∧ ∀ a v : ℕ, M ≤ a → p ^ v ≤ a → N * (m + v) ≤ a := by
   set T := 2 * N + m + 1 with hT
   have hT2 : T < 2 ^ T := Nat.lt_two_pow_self
   have hA : ∀ v, 2 * T ≤ v → N * (m + v) ≤ 2 ^ v := by
@@ -24,23 +26,29 @@ theorem nat_bound (p N m : ℕ) (hp : 2 ≤ p) :
       have hNT : N ≤ T := by omega
       have h1 : N * (m + 2 * T) ≤ T * T := by nlinarith [Nat.mul_le_mul_right m hNT]
       have h2 : T * T ≤ 2 ^ T * 2 ^ T := Nat.mul_le_mul hT2.le hT2.le
-      calc N * (m + 2 * T) ≤ T * T := h1
+      calc
+        N * (m + 2 * T)
+          ≤ T * T := h1
         _ ≤ 2 ^ T * 2 ^ T := h2
         _ = 2 ^ (2 * T) := by rw [← pow_add, two_mul]
     | succ v hv ih =>
       have h3 : N ≤ 2 ^ v := by
         have : 2 ^ T ≤ 2 ^ v := Nat.pow_le_pow_right (by norm_num) (by omega)
         omega
-      rw [pow_succ]; nlinarith
+      rw [pow_succ]
+      nlinarith
   refine ⟨N * (m + 2 * T) + 1, by omega, fun a v ha hv => ?_⟩
   by_cases hvK : 2 * T ≤ v
-  · calc N * (m + v) ≤ 2 ^ v := hA v hvK
+  · calc
+      N * (m + v)
+        ≤ 2 ^ v := hA v hvK
       _ ≤ p ^ v := Nat.pow_le_pow_left hp v
       _ ≤ a := hv
   · have : N * (m + v) ≤ N * (m + 2 * T) := Nat.mul_le_mul_left _ (by omega)
     omega
 
-def img (B : Type) {Q : Type} [CommRing B] [CommRing Q] [Algebra B Q] (p m : ℕ) : AddSubgroup Q where
+def img (B : Type) {Q : Type} [CommRing B] [CommRing Q] [Algebra B Q] (p m : ℕ)
+    : AddSubgroup Q where
   carrier := {x | ∃ b : B, x = algebraMap B Q ((p : B) ^ m * b)}
   zero_mem' := ⟨0, by simp⟩
   add_mem' := by
@@ -57,31 +65,36 @@ def box (σ : Type) [Fintype σ] (n : ℕ) : σ →₀ ℕ := Finsupp.equivFunOn
 def psum (z : σ → B) (f : MvPowerSeries σ Q) (n : ℕ) : Q :=
   MvPolynomial.eval (fun i => algebraMap B Q (z i)) (trunc' Q (box σ n) f)
 
-theorem psum_eq (z : σ → B) (f : MvPowerSeries σ Q) (n : ℕ) :
-    psum z f n = ∑ α ∈ Finset.Iic (box σ n),
-      coeff α f * algebraMap B Q (α.prod fun i e => z i ^ e) := by
+theorem psum_eq (z : σ → B) (f : MvPowerSeries σ Q) (n : ℕ)
+    : psum z f n
+      = ∑ α ∈ Finset.Iic (box σ n),
+        coeff α f * algebraMap B Q (α.prod fun i e => z i ^ e) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [psum, trunc', truncFinset_apply, map_sum, MvPolynomial.eval_monomial]
   refine Finset.sum_congr rfl fun α _ => ?_
   rw [map_finsuppProd]
   simp [map_pow]
 
-theorem exists_lt_of_not_mem_box {n : ℕ} {α : σ →₀ ℕ} (h : α ∉ Finset.Iic (box σ n)) :
-    ∃ i, n < α i := by
+theorem exists_lt_of_not_mem_box {n : ℕ} {α : σ →₀ ℕ} (h : α ∉ Finset.Iic (box σ n))
+    : ∃ i, n < α i := by
   simpa [box, Finset.mem_Iic, Finsupp.le_def] using h
 
 theorem box_mono {n n' : ℕ} (h : n ≤ n') : Finset.Iic (box σ n) ⊆ Finset.Iic (box σ n') :=
   Finset.Iic_subset_Iic.2 (Finsupp.le_def.2 fun i => by simpa [box] using h)
 
-theorem term_mem (p : ℕ) [hp : Fact p.Prime] (hunit : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
-    (z : σ → B) (hz : ∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N) (f : MvPowerSeries σ Q)
-    (hf : DIn (⊤ : Ideal B) f) (m : ℕ) :
-    ∃ M : ℕ, ∀ (α : σ →₀ ℕ) (i : σ), M ≤ α i →
-      coeff α f * algebraMap B Q (α.prod fun i e => z i ^ e) ∈ img B p m := by
+theorem term_mem
+    (p : ℕ) [hp : Fact p.Prime]
+    (hunit : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (z : σ → B) (hz : ∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N)
+    (f : MvPowerSeries σ Q) (hf : DIn (⊤ : Ideal B) f)
+    (m : ℕ)
+    : ∃ M : ℕ, ∀ (α : σ →₀ ℕ) (i : σ),
+      M ≤ α i → coeff α f * algebraMap B Q (α.prod fun i e => z i ^ e) ∈ img B p m := by
   choose Nf hNf using hz
   set N := ∑ i, Nf i
-  have hN : ∀ i, (p : B) ∣ z i ^ N := fun i => (hNf i).trans
-    (pow_dvd_pow _ (Finset.single_le_sum (fun j _ => Nat.zero_le (Nf j)) (Finset.mem_univ i)))
+  have hN : ∀ i, (p : B) ∣ z i ^ N := fun i =>
+    (hNf i).trans
+      (pow_dvd_pow _ (Finset.single_le_sum (fun j _ => Nat.zero_le (Nf j)) (Finset.mem_univ i)))
   obtain ⟨M, hM1, hM⟩ := nat_bound p N m hp.out.two_le
   refine ⟨M, fun α i hi => ?_⟩
   have ha0 : α i ≠ 0 := by omega
@@ -107,10 +120,13 @@ theorem term_mem (p : ℕ) [hp : Fact p.Prime] (hunit : ∀ n : ℕ, Nat.Coprime
   linear_combination ((p : Q) ^ m * algebraMap B Q (↑U⁻¹ : B) * algebraMap B Q r) * hb -
     (coeff α f * (p : Q) ^ (m + v) * algebraMap B Q r) * hUU
 
-theorem cauchy (p : ℕ) [Fact p.Prime] (hunit : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
-    (z : σ → B) (hz : ∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N) (f : MvPowerSeries σ Q)
-    (hf : DIn (⊤ : Ideal B) f) (m : ℕ) :
-    ∃ M : ℕ, ∀ n n' : ℕ, M ≤ n → n ≤ n' → psum z f n' - psum z f n ∈ img B p m := by
+theorem cauchy
+    (p : ℕ) [Fact p.Prime]
+    (hunit : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (z : σ → B) (hz : ∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N)
+    (f : MvPowerSeries σ Q) (hf : DIn (⊤ : Ideal B) f)
+    (m : ℕ)
+    : ∃ M : ℕ, ∀ n n' : ℕ, M ≤ n → n ≤ n' → psum z f n' - psum z f n ∈ img B p m := by
   obtain ⟨M, hM⟩ := term_mem p hunit z hz f hf m
   refine ⟨M, fun n n' hn hnn' => ?_⟩
   rw [psum_eq, psum_eq, ← Finset.sum_sdiff (box_mono hnn'), add_sub_cancel_right]
@@ -122,16 +138,19 @@ end GlobalTheory.QLog.ValEx
 
 namespace GlobalTheory.QLog
 
-
 open ValEx in
-theorem existsUnique_hasVal_of_dIn : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q]
-    [CommRing O] [Algebra B Q] (θ : B →+* O), IsFrame p Q θ → ∀ (σ : Type) [Fintype σ]
-    [DecidableEq σ] (z : σ → B), (∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N) →
-    ∀ f : MvPowerSeries σ Q, DIn (⊤ : Ideal B) f → ∃! q : Q, HasVal p z f q := by
+theorem existsUnique_hasVal_of_dIn
+    : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q] [CommRing O] [Algebra B Q]
+        (θ : B →+* O),
+      IsFrame p Q θ
+        → ∀ (σ : Type) [Fintype σ] [DecidableEq σ] (z : σ → B),
+          (∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N)
+            → ∀ f : MvPowerSeries σ Q, DIn (⊤ : Ideal B) f → ∃! q : Q, HasVal p z f q := by
   intro p _ B O Q _ _ _ _ θ hF σ _ _ z hz f hf
   haveI := hF.complete
-  have hI : ∀ (k : ℕ) (x : B), x ∈ ((Ideal.span {(p : B)}) ^ k • ⊤ : Submodule B B) ↔
-      ∃ e, x = (p : B) ^ k * e := by
+  have hI
+      : ∀ (k : ℕ) (x : B),
+        x ∈ ((Ideal.span {(p : B)}) ^ k • ⊤ : Submodule B B) ↔ ∃ e, x = (p : B) ^ k * e := by
     intro k x
     rw [Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton']
     constructor
@@ -146,8 +165,8 @@ theorem existsUnique_hasVal_of_dIn : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type)
   have h0 : ∀ n, psum z f (K n) - psum z f (K 0) ∈ img B p 0 := fun n =>
     hM 0 (K 0) (K n) (hMK 0) (hKmono (Nat.zero_le n))
   choose b hb using h0
-  have hcau : ∀ {k n : ℕ}, k ≤ n →
-      b k ≡ b n [SMOD ((Ideal.span {(p : B)}) ^ k • ⊤ : Submodule B B)] := by
+  have hcau
+      : ∀ {k n : ℕ}, k ≤ n → b k ≡ b n [SMOD ((Ideal.span {(p : B)}) ^ k • ⊤ : Submodule B B)] := by
     intro k n hkn
     rw [SModEq.sub_mem, hI]
     obtain ⟨e, he⟩ := hM k (K k) (K n) (hMK k) (hKmono hkn)
@@ -173,15 +192,19 @@ theorem existsUnique_hasVal_of_dIn : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type)
       obtain ⟨e, he⟩ := hd n
       exact ⟨e, hF.inj (by rw [← he, hc, pow_zero, one_mul])⟩
     rw [← sub_eq_zero, hc, hc0, mul_zero, map_zero]
-  have hq : HasVal p z f (psum z f (K 0) + algebraMap B Q L) := fun m => ⟨K m, fun N' hN' => by
-    obtain ⟨e1, he1⟩ := (hI m _).1 (SModEq.sub_mem.1 (hL m))
-    obtain ⟨e2, he2⟩ := hM m (K m) N' (hMK m) hN'
-    have hbm := hb m
-    have he1' := congrArg (algebraMap B Q) he1
-    refine ⟨-e1 - e2, ?_⟩
-    change psum z f (K 0) + algebraMap B Q L - psum z f N' = _
-    simp only [pow_zero, one_mul, map_sub, map_mul, map_neg, map_pow, map_natCast] at hbm he1' he2 ⊢
-    linear_combination -hbm - he1' - he2⟩
+  have hq : HasVal p z f (psum z f (K 0) + algebraMap B Q L) := fun m => ⟨
+    K m,
+    fun N' hN' => by
+      obtain ⟨e1, he1⟩ := (hI m _).1 (SModEq.sub_mem.1 (hL m))
+      obtain ⟨e2, he2⟩ := hM m (K m) N' (hMK m) hN'
+      have hbm := hb m
+      have he1' := congrArg (algebraMap B Q) he1
+      refine ⟨-e1 - e2, ?_⟩
+      change psum z f (K 0) + algebraMap B Q L - psum z f N' = _
+      simp only [pow_zero, one_mul, map_sub, map_mul, map_neg, map_pow, map_natCast]
+        at hbm he1' he2 ⊢
+      linear_combination -hbm - he1' - he2
+  ⟩
   exact ⟨_, hq, fun q' hq' => huniq _ _ hq' hq⟩
 
 end GlobalTheory.QLog

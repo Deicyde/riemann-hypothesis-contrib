@@ -19,10 +19,14 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContD
 @[expose] public section
 
 open scoped InnerProductSpace TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField IsDedekindDomain
-open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict Formalism.L2.SG.PoincareInHH.PoincareSetting
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS GlobalTheory.Core.Mi
+open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
+  GlobalTheory.Core.Mi
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MiTop
 
@@ -32,10 +36,11 @@ namespace GlobalTheory.MiTop.LineV
 
 open GlobalTheory.PiTensorInner
 
-theorem tprod_eq_smul_of_prod_inner {ι : Type} [Fintype ι] {E : ι → Type*} [∀ i, NormedAddCommGroup (E i)]
-    [∀ i, InnerProductSpace ℂ (E i)] (a b : ∀ i, E i) (l : ℂ)
-    (h : ∀ x : ∀ i, E i, ∏ i, ⟪a i, x i⟫_ℂ = l * ∏ i, ⟪b i, x i⟫_ℂ) :
-    PiTensorProduct.tprod ℂ a = (starRingEnd ℂ l) • PiTensorProduct.tprod ℂ b := by
+theorem tprod_eq_smul_of_prod_inner
+    {ι : Type} [Fintype ι]
+    {E : ι → Type*} [∀ i, NormedAddCommGroup (E i)] [∀ i, InnerProductSpace ℂ (E i)]
+    (a b : ∀ i, E i) (l : ℂ) (h : ∀ x : ∀ i, E i, ∏ i, ⟪a i, x i⟫_ℂ = l * ∏ i, ⟪b i, x i⟫_ℂ)
+    : PiTensorProduct.tprod ℂ a = (starRingEnd ℂ l) • PiTensorProduct.tprod ℂ b := by
   set w := PiTensorProduct.tprod ℂ a - (starRingEnd ℂ l) • PiTensorProduct.tprod ℂ b with hw
   have hy : ∀ y, ipT y w = 0 := by
     intro y
@@ -53,12 +58,17 @@ end GlobalTheory.MiTop.LineV
 
 namespace GlobalTheory.MiTop.LineV
 
-theorem eq_of_evS_ae {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D)
-    {θ : InfFam D} {S : D.what₂.Tau → Formalism.BasicNotions.TH.SPar} {M : DSModel (D.sp.Y 0) S} {J : Set (GA D (D.sp.Y 0))}
-    {χ : GA D (D.sp.Y 0) → ℂ} (t : GA D (D.sp.Y 0)) {T T' : SmT M →ₗ[ℂ] (GA D (D.sp.Y 0) → ℂ)}
-    (hT : T ∈ MultT θ M J χ) (hT' : T' ∈ MultT θ M J χ) (a b : M.Vec)
-    (he : evS X h t (T (PiTensorProduct.tprod ℂ a)) =ᵐ[muX X] evS X h t (T' (PiTensorProduct.tprod ℂ b))) :
-    T (PiTensorProduct.tprod ℂ a) = T' (PiTensorProduct.tprod ℂ b) := by
+theorem eq_of_evS_ae
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D)
+    {θ : InfFam D} {S : D.what₂.Tau → Formalism.BasicNotions.TH.SPar}
+    {M : DSModel (D.sp.Y 0) S} {J : Set (GA D (D.sp.Y 0))} {χ : GA D (D.sp.Y 0) → ℂ}
+    (t : GA D (D.sp.Y 0))
+    {T T' : SmT M →ₗ[ℂ] (GA D (D.sp.Y 0) → ℂ)} (hT : T ∈ MultT θ M J χ) (hT' : T' ∈ MultT θ M J χ)
+    (a b : M.Vec)
+    (he
+      : evS X h t (T (PiTensorProduct.tprod ℂ a)) =ᵐ[muX X] evS X h t (T' (PiTensorProduct.tprod ℂ b)))
+    : T (PiTensorProduct.tprod ℂ a) = T' (PiTensorProduct.tprod ℂ b) := by
   have hU := (GlobalTheory.MultMem.mem_mult_iff D θ _ _ M J χ _).1 ((mem_multT θ M J χ T).1 hT)
   have hU' := (GlobalTheory.MultMem.mem_mult_iff D θ _ _ M J χ _).1 ((mem_multT θ M J χ T').1 hT')
   have hva : (PiTensorProduct.lift.symm T : MMap M) a = T (PiTensorProduct.tprod ℂ a) := by
@@ -92,7 +102,8 @@ theorem eq_of_evS_ae {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h
     filter_upwards [he'] with x hx
     simp only [φ, Pi.zero_apply, sub_eq_zero]
     exact hx
-  have hz := GlobalTheory.TranslatedEvalInj.eq_zero_of_ae_fund X.B.I X.B.μf X.B.fund_spec hφc hφi hae
+  have hz :=
+    GlobalTheory.TranslatedEvalInj.eq_zero_of_ae_fund X.B.I X.B.μf X.B.fund_spec hφc hφi hae
   funext g
   have e := hz (ι (g * t⁻¹))
   simp only [φ, ContinuousMulEquiv.symm_apply_apply, inv_mul_cancel_right, sub_eq_zero] at e
@@ -102,20 +113,25 @@ end GlobalTheory.MiTop.LineV
 
 namespace GlobalTheory.MiTop.LineV
 
-theorem line_of_eq {D : D7} {V : Formalism.BasicNotions.TH.HSp D} {S : D.what₂.Tau → Formalism.BasicNotions.TH.SPar} {θ : InfFam D} {M : DSModel V S}
-    {J : Set (GA D V)} {χ : GA D V → ℂ} (hP : GlobalTheory.Published.CuspRapidDecay) (hθ : IsInfFam θ)
-    {T T' : SmT M →ₗ[ℂ] (GA D V → ℂ)} (hT : T ∈ MultT θ M J χ) (hT' : T' ∈ MultT θ M J χ) (v₀ v : M.Vec)
-    (h1 : ∀ τ, ‖(v₀ τ : M.H τ)‖ = 1) (hT0 : T ≠ 0)
-    (he : T (PiTensorProduct.tprod ℂ v₀) = T' (PiTensorProduct.tprod ℂ v)) :
-    ∃ l : ℂ, l ≠ 0 ∧ PiTensorProduct.tprod ℂ v₀ = l • PiTensorProduct.tprod ℂ v := by
+theorem line_of_eq
+    {D : D7} {V : Formalism.BasicNotions.TH.HSp D}
+    {S : D.what₂.Tau → Formalism.BasicNotions.TH.SPar}
+    {θ : InfFam D} {M : DSModel V S} {J : Set (GA D V)} {χ : GA D V → ℂ}
+    (hP : GlobalTheory.Published.CuspRapidDecay) (hθ : IsInfFam θ)
+    {T T' : SmT M →ₗ[ℂ] (GA D V → ℂ)} (hT : T ∈ MultT θ M J χ) (hT' : T' ∈ MultT θ M J χ)
+    (v₀ v : M.Vec) (h1 : ∀ τ, ‖(v₀ τ : M.H τ)‖ = 1)
+    (hT0 : T ≠ 0) (he : T (PiTensorProduct.tprod ℂ v₀) = T' (PiTensorProduct.tprod ℂ v))
+    : ∃ l : ℂ, l ≠ 0 ∧ PiTensorProduct.tprod ℂ v₀ = l • PiTensorProduct.tprod ℂ v := by
   obtain ⟨ν, 𝓖, hν, h𝓖⟩ := GlobalTheory.RawLift.exists_haar_fundDomain V
   have hUm := (mem_multT θ M J χ T).1 hT
   have hUm' := (mem_multT θ M J χ T').1 hT'
   have hU := (GlobalTheory.MultMem.mem_mult_iff D θ _ _ M J χ _).1 hUm
   set U : MMap M := PiTensorProduct.lift.symm T with hUd
   set U' : MMap M := PiTensorProduct.lift.symm T' with hUd'
-  have hval : ∀ x, U x = T (PiTensorProduct.tprod ℂ x) := fun x => by simp [U, PiTensorProduct.lift_symm]
-  have hval' : ∀ x, U' x = T' (PiTensorProduct.tprod ℂ x) := fun x => by simp [U', PiTensorProduct.lift_symm]
+  have hval : ∀ x, U x = T (PiTensorProduct.tprod ℂ x) := fun x => by
+    simp [U, PiTensorProduct.lift_symm]
+  have hval' : ∀ x, U' x = T' (PiTensorProduct.tprod ℂ x) := fun x => by
+    simp [U', PiTensorProduct.lift_symm]
   have hUv : U v₀ = U' v := by rw [hval, hval', he]
   have hne : ∀ τ, (v₀ τ : M.H τ) ≠ 0 := fun τ hz => by
     have h1τ := h1 τ
@@ -129,7 +145,9 @@ theorem line_of_eq {D : D7} {V : Formalism.BasicNotions.TH.HSp D} {S : D.what₂
     rw [this, h0, map_zero]
   obtain ⟨c1, hc1⟩ := GlobalTheory.MultFinite.schurMult hP ν 𝓖 hθ hν h𝓖 U hUm U hUm
   obtain ⟨c2, hc2⟩ := GlobalTheory.MultFinite.schurMult hP ν 𝓖 hθ hν h𝓖 U' hUm' U hUm
-  have hpos := GlobalTheory.SchurConst.re_pos_of_isMultIP M ν 𝓖 hν h𝓖 U hc1 v₀ (hU.aut v₀).cont (hU.aut v₀).left hU0
+  have hpos :=
+    GlobalTheory.SchurConst.re_pos_of_isMultIP M ν 𝓖 hν h𝓖 U hc1 v₀ (hU.aut v₀).cont
+      (hU.aut v₀).left hU0
   have hc10 : c1 ≠ 0 := fun hz => by simp [hz] at hpos
   have key : ∀ x : M.Vec, ∏ τ, ⟪v₀ τ, x τ⟫_ℂ = (c2 / c1) * ∏ τ, ⟪v τ, x τ⟫_ℂ := by
     intro x
@@ -149,7 +167,8 @@ theorem line_of_eq {D : D7} {V : Formalism.BasicNotions.TH.HSp D} {S : D.what₂
     refine Finset.prod_eq_one fun τ _ => ?_
     rw [inner_self_eq_norm_sq_to_K]
     show ((‖(v₀ τ : M.H τ)‖ : ℂ)) ^ 2 = 1
-    rw [h1]; simp
+    rw [h1]
+    simp
   rw [this] at hp
   exact zero_ne_one hp
 

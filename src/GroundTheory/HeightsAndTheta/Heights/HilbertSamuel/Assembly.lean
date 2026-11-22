@@ -39,19 +39,24 @@ theorem BlockImageChi.full : GroundTheory.Heights₂.Heights.HilbertSamuel.Block
 theorem ResChiBounds.full : GroundTheory.Heights₂.Heights.HilbertSamuel.ResChiBounds.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.ResChiBounds.proof ResolutionSupBound.full
 
-theorem ProjectionBounds.full : GroundTheory.Heights₂.Heights.HilbertSamuel.ProjectionBounds.Statement :=
+theorem ProjectionBounds.full
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.ProjectionBounds.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.ProjectionBounds.proof ResChiBounds.full
 
-theorem PullFSExtension.full : GroundTheory.Heights₂.Heights.HilbertSamuel.PullFSExtension.Statement :=
+theorem PullFSExtension.full
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.PullFSExtension.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.PullFSExtension.proof ProjFrameBasePtFree.full
 
-theorem RealGramComparison.full : GroundTheory.Heights₂.Heights.HilbertSamuel.RealGramComparison.Statement :=
-  GroundTheory.Heights₂.Heights.HilbertSamuel.RealGramComparison.proof ResolutionSupBound.full ProjectionBounds.full PullFSExtension.full
+theorem RealGramComparison.full
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.RealGramComparison.Statement :=
+  GroundTheory.Heights₂.Heights.HilbertSamuel.RealGramComparison.proof ResolutionSupBound.full
+    ProjectionBounds.full PullFSExtension.full
 
 theorem ResChiIndex.full : GroundTheory.Heights₂.Heights.HilbertSamuel.ResChiIndex.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.ResChiIndex.proof
 
-theorem VeroneseMonoBasis.full : GroundTheory.Heights₂.Heights.HilbertSamuel.VeroneseMonoBasis.Statement :=
+theorem VeroneseMonoBasis.full
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.VeroneseMonoBasis.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.VeroneseMonoBasis.proof
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

@@ -29,15 +29,17 @@ def normSub : AddSubgroup (KbarMult p) := (multOf p L).map (normHom p K L)
 
 def normGrp : Subgroup Kˣ := AddSubgroup.toSubgroup' ((normSub p K L).comap (ofK p K))
 
-theorem mem_normGrp_iff (x : Kˣ) :
-    x ∈ normGrp p K L ↔ ∃ y ∈ multOf p L, normHom p K L y = ofK p K (Additive.ofMul x) := Iff.rfl
+theorem mem_normGrp_iff (x : Kˣ)
+    : x ∈ normGrp p K L ↔ ∃ y ∈ multOf p L, normHom p K L y = ofK p K (Additive.ofMul x) :=
+  Iff.rfl
 
 def IsArtinK (Art : Kˣ →* GKab p K) : Prop :=
-  Continuous Art ∧ Function.Injective Art ∧ DenseRange Art ∧
-  (∀ π : Kˣ, vK p K π = 1 → ∀ g : GK p K, toAbK p K g = Art π → IsFrob p K g) ∧
-  ∀ L, IsAbLK p K L →
-    (∀ g : GK p K, ∃ (x : Kˣ) (g' : GK p K), toAbK p K g' = Art x ∧ g'⁻¹ * g ∈ subG p K L) ∧
-    ∀ (x : Kˣ) (g : GK p K), toAbK p K g = Art x → (g ∈ subG p K L ↔ x ∈ normGrp p K L)
+  Continuous Art ∧ Function.Injective Art ∧ DenseRange Art
+    ∧ (∀ π : Kˣ, vK p K π = 1 → ∀ g : GK p K, toAbK p K g = Art π → IsFrob p K g)
+    ∧ ∀ L,
+      IsAbLK p K L
+        → (∀ g : GK p K, ∃ (x : Kˣ) (g' : GK p K), toAbK p K g' = Art x ∧ g'⁻¹ * g ∈ subG p K L)
+          ∧ ∀ (x : Kˣ) (g : GK p K), toAbK p K g = Art x → (g ∈ subG p K L ↔ x ∈ normGrp p K L)
 
 end
 

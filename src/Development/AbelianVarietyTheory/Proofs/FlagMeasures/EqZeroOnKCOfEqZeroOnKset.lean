@@ -10,19 +10,18 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.Dec.KCIdent
 
-
 open scoped MatrixOrder Matrix.Norms.L2Operator ComplexOrder in
-theorem exists_herm_log {n : ℕ} (y J : Matrix (Fin n) (Fin n) ℂ) (hy : IsUnit y)
-    (hJ : Commute (yᴴ * y) J) :
-    ∃ L : Matrix (Fin n) (Fin n) ℂ, Lᴴ = L ∧ Commute L J ∧ NormedSpace.exp L = yᴴ * y := by
+theorem exists_herm_log
+    {n : ℕ} (y J : Matrix (Fin n) (Fin n) ℂ) (hy : IsUnit y) (hJ : Commute (yᴴ * y) J)
+    : ∃ L : Matrix (Fin n) (Fin n) ℂ, Lᴴ = L ∧ Commute L J ∧ NormedSpace.exp L = yᴴ * y := by
   have h0 : (0 : Matrix (Fin n) (Fin n) ℂ) ≤ yᴴ * y := star_mul_self_nonneg y
   have hu : IsUnit (yᴴ * y) := hy.star.mul hy
   have hsp : IsStrictlyPositive (yᴴ * y) := IsStrictlyPositive.iff_of_unital.mpr ⟨h0, hu⟩
   refine ⟨CFC.log (yᴴ * y), ?_, Commute.cfc_real hJ Real.log, CFC.exp_log (yᴴ * y) hsp⟩
   exact (IsSelfAdjoint.log : IsSelfAdjoint (CFC.log (yᴴ * y)))
 
-theorem differentiable_exp_entry {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
-    Differentiable ℂ (fun z : ℂ => NormedSpace.exp (z • X) i j) := by
+theorem differentiable_exp_entry {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
+    : Differentiable ℂ (fun z : ℂ => NormedSpace.exp (z • X) i j) := by
   let _ : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedRing
   let _ : NormedAlgebra ℂ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra
   intro z
@@ -30,7 +29,14 @@ theorem differentiable_exp_entry {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (i j
     (hasDerivAt_exp_smul_const (𝕂 := ℂ) X z).differentiableAt
   exact (LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℂ ℂ i j)).differentiableAt.comp z hz
 
-theorem eq_zero_on_KC_of_eq_zero_on_Kset : ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] (F : Matrix (Fin n) (Fin n) ℂ → E), DifferentiableOn ℂ (fun y : Fin n → Fin n → ℂ => F (Matrix.of y)) {y | Matrix.of y ∈ GlobalTheory.Dec.KC ε} → (∀ k ∈ Formalism.REAL.Kset ε, F k = 0) → ∀ y ∈ GlobalTheory.Dec.KC ε, F y = 0 := by
+theorem eq_zero_on_KC_of_eq_zero_on_Kset
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
+        [CompleteSpace E] (F : Matrix (Fin n) (Fin n) ℂ → E),
+      DifferentiableOn ℂ
+          (fun y : Fin n → Fin n → ℂ => F (Matrix.of y))
+          {y | Matrix.of y ∈ GlobalTheory.Dec.KC ε}
+        → (∀ k ∈ Formalism.REAL.Kset ε, F k = 0)
+        → ∀ y ∈ GlobalTheory.Dec.KC ε, F y = 0 := by
   intro n ε E _ _ _ F hF hK y hy
   unfold GlobalTheory.Dec.KC at hy
   obtain ⟨hyu, hyJ⟩ := hy
@@ -69,12 +75,12 @@ theorem eq_zero_on_KC_of_eq_zero_on_Kset : ∀ (n : ℕ) (ε : Fin n → Bool) (
   have hhalf : star (-(1 / 2 : ℂ)) = -(1 / 2) := by simp
   have hu1 : uᴴ * u = 1 := by
     rw [hu, Matrix.conjTranspose_mul, hstar, hhalf]
-    have e1 : E' (-(1 / 2)) * yᴴ * (y * E' (-(1 / 2))) = E' (-(1 / 2)) * (yᴴ * y) * E' (-(1 / 2)) := by
+    have e1
+        : E' (-(1 / 2)) * yᴴ * (y * E' (-(1 / 2))) = E' (-(1 / 2)) * (yᴴ * y) * E' (-(1 / 2)) := by
       simp only [mul_assoc]
     have e2 : (-(1 / 2 : ℂ) + 1 + -(1 / 2)) = 0 := by ring
     rw [e1, ← hEone, hmul, hmul, e2, hE0]
-  have huJ : u * Jm ε = Jm ε * u := by
-    rw [hu, mul_assoc, hEJ, ← mul_assoc, hyJ, mul_assoc]
+  have huJ : u * Jm ε = Jm ε * u := by rw [hu, mul_assoc, hEJ, ← mul_assoc, hyJ, mul_assoc]
   have huU : IsUnit u := by
     rw [hu]
     exact hyu.mul (hEu _)
@@ -88,7 +94,8 @@ theorem eq_zero_on_KC_of_eq_zero_on_Kset : ∀ (n : ℕ) (ε : Fin n → Bool) (
     apply hK
     unfold Formalism.REAL.Kset
     refine ⟨?_, ?_⟩
-    · rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, Matrix.conjTranspose_mul, hstar]
+    · rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, Matrix.conjTranspose_mul,
+        hstar]
       have hsw : star ((t : ℂ) * Complex.I) + (t : ℂ) * Complex.I = 0 := by
         rw [Complex.star_def, map_mul, Complex.conj_ofReal, Complex.conj_I]
         ring
@@ -107,16 +114,17 @@ theorem eq_zero_on_KC_of_eq_zero_on_Kset : ∀ (n : ℕ) (ε : Fin n → Bool) (
       (fun w _ => hKC w)).differentiableAt Filter.univ_mem
   have han : AnalyticOnNhd ℂ (fun z : ℂ => F (u * E' z)) Set.univ := fun z _ => hg.analyticAt z
   have hfreq : ∃ᶠ z in nhdsWithin (0 : ℂ) {0}ᶜ, F (u * E' z) = 0 := by
-    have ht : Filter.Tendsto (fun t : ℝ => (t : ℂ) * Complex.I) (nhdsWithin (0 : ℝ) {0}ᶜ)
-        (nhdsWithin (0 : ℂ) {0}ᶜ) := by
+    have ht : Filter.Tendsto
+        (fun t : ℝ => (t : ℂ) * Complex.I)
+        (nhdsWithin (0 : ℝ) {0}ᶜ) (nhdsWithin (0 : ℂ) {0}ᶜ) := by
       refine tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _ ?_ ?_
       · have hcont : Continuous (fun t : ℝ => (t : ℂ) * Complex.I) := by fun_prop
         simpa using (hcont.tendsto 0).mono_left nhdsWithin_le_nhds
       · filter_upwards [self_mem_nhdsWithin] with t ht
         simpa [Complex.I_ne_zero] using ht
     exact ht.frequently (Filter.Eventually.frequently (Filter.Eventually.of_forall hzero))
-  have hall := han.eqOn_zero_of_preconnected_of_frequently_eq_zero isPreconnected_univ
-    (Set.mem_univ 0) hfreq
+  have hall :=
+    han.eqOn_zero_of_preconnected_of_frequently_eq_zero isPreconnected_univ (Set.mem_univ 0) hfreq
   have h12 := hall (Set.mem_univ (1 / 2 : ℂ))
   have hy' : u * E' (1 / 2) = y := by
     have e3 : (-(1 / 2 : ℂ) + 1 / 2) = 0 := by ring

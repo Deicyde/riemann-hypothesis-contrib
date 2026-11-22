@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Regulariz
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -16,7 +17,8 @@ namespace GlobalTheory.EisM.GcdOut
 
 abbrev CopVec (L : ℕ) : Type := {x : ℤ × ℤ // IsCoprime x.1 x.2 ∧ (L : ℤ) ∣ x.1}
 
-def scl (L : ℕ) (p : ℕ+ × CopVec L) : ℤ × ℤ := (((p.1 : ℕ) : ℤ) * p.2.1.1, ((p.1 : ℕ) : ℤ) * p.2.1.2)
+def scl (L : ℕ) (p : ℕ+ × CopVec L) : ℤ × ℤ :=
+  (((p.1 : ℕ) : ℤ) * p.2.1.1, ((p.1 : ℕ) : ℤ) * p.2.1.2)
 
 lemma scl_injective (L : ℕ) : Function.Injective (scl L) := by
   rintro ⟨δ, ⟨⟨a, b⟩, hab, ha⟩⟩ ⟨δ', ⟨⟨a', b'⟩, hab', ha'⟩⟩ h
@@ -58,40 +60,46 @@ lemma cpow_split (j : ℕ) (s : ℝ) (δ : ℕ) (hδ : 0 < δ) :
 end GlobalTheory.EisM.GcdOut
 
 open GlobalTheory.EisM.GcdOut in
-theorem GlobalTheory.EisM.lattice_sum_gcd_out (j L : ℕ) (s : ℝ) (φ : DirichletCharacter ℂ L) (τ : ℍ)
-    (hj : 2 ≤ j) (hs : 0 < s) (hL : 0 < L) :
-    ∑' x : ℤ × ℤ, latF L (fun _ => 1) φ x * trm j s ((x.1 : ℂ) * τ + x.2) =
-      LSeries (fun n => φ n) (j + 2 * s) *
-        ∑' x : {x : ℤ × ℤ // IsCoprime x.1 x.2 ∧ (L : ℤ) ∣ x.1},
-          φ (x.1.2 : ZMod L) * trm j s ((x.1.1 : ℂ) * τ + x.1.2) := by
+theorem GlobalTheory.EisM.lattice_sum_gcd_out
+    (j L : ℕ) (s : ℝ) (φ : DirichletCharacter ℂ L) (τ : ℍ) (hj : 2 ≤ j) (hs : 0 < s) (hL : 0 < L)
+    : ∑' x : ℤ × ℤ, latF L (fun _ => 1) φ x * trm j s ((x.1 : ℂ) * τ + x.2)
+      = LSeries (fun n => φ n) (j + 2 * s)
+        * ∑' x : {x : ℤ × ℤ // IsCoprime x.1 x.2 ∧ (L : ℤ) ∣ x.1},
+            φ (x.1.2 : ZMod L) * trm j s ((x.1.1 : ℂ) * τ + x.1.2) := by
   let F : ℤ × ℤ → ℂ := fun x => latF L (fun _ => 1) φ x * trm j s ((x.1 : ℂ) * τ + x.2)
   let f : ℕ+ → ℂ := fun δ => LSeries.term (fun n => φ n) ((j : ℂ) + 2 * (s : ℂ)) (δ : ℕ)
   let g : CopVec L → ℂ := fun x => φ (x.1.2 : ZMod L) * trm j s ((x.1.1 : ℂ) * τ + x.1.2)
   change ∑' x, F x = LSeries (fun n : ℕ => φ n) ((j : ℂ) + 2 * (s : ℂ)) * ∑' x, g x
-  have hsumT := (GlobalTheory.T.regularizedEisensteinLatticeSum_eq_tsum_of_kills j L s 0 0 τ hj hs hL ⟨0, by simp⟩ (fun x => by simp [Kills])).1
+  have hsumT :=
+    (GlobalTheory.T.regularizedEisensteinLatticeSum_eq_tsum_of_kills j L s 0 0 τ hj hs hL
+      ⟨0, by simp⟩ (fun x => by simp [Kills])).1
   have hgs : Summable fun x => ‖g x‖ := by
-    refine Summable.of_nonneg_of_le (fun _ => norm_nonneg _) (fun x => ?_)
+    refine Summable.of_nonneg_of_le
+      (fun _ => norm_nonneg _)
+      (fun x => ?_)
       (hsumT.comp_injective Subtype.val_injective)
     simp only [g, Function.comp, norm_mul]
     exact mul_le_of_le_one_left (norm_nonneg _) (DirichletCharacter.norm_le_one _ _)
   have hLS : LSeriesSummable (fun n : ℕ => φ n) ((j : ℂ) + 2 * (s : ℂ)) := by
     rw [DirichletCharacter.LSeriesSummable_iff hL.ne']
-    have : (2:ℝ) ≤ j := by exact_mod_cast hj
+    have : (2 : ℝ) ≤ j := by exact_mod_cast hj
     simp
     linarith
-  have hfs : Summable fun δ => ‖f δ‖ :=
-    (summable_norm_iff.2 hLS).comp_injective PNat.coe_injective
+  have hfs : Summable fun δ => ‖f δ‖ := (summable_norm_iff.2 hLS).comp_injective PNat.coe_injective
   have hterm : ∀ p : ℕ+ × CopVec L, F (scl L p) = f p.1 * g p.2 := by
     rintro ⟨δ, ⟨⟨a, b⟩, hab, ha⟩⟩
     have hδ : 0 < (δ : ℕ) := δ.pos
     simp only [F, f, g, scl, latF]
     rw [if_pos (dvd_mul_of_dvd_right ha _), LSeries.term_of_ne_zero hδ.ne', cpow_split j s _ hδ]
-    have e : ((((δ : ℕ) : ℤ) * a : ℤ) : ℂ) * (τ : ℂ) + ((((δ : ℕ) : ℤ) * b : ℤ) : ℂ)
-        = ((δ : ℕ) : ℂ) * ((a : ℂ) * τ + b) := by push_cast; ring
+    have e
+        : ((((δ : ℕ) : ℤ) * a : ℤ) : ℂ) * (τ : ℂ) + ((((δ : ℕ) : ℤ) * b : ℤ) : ℂ)
+          = ((δ : ℕ) : ℂ) * ((a : ℂ) * τ + b) := by
+      push_cast; ring
     rw [e, trm_smul]
-    have e2 : (((((δ : ℕ) : ℤ) * b : ℤ)) : ZMod L) = ((δ : ℕ) : ZMod L) * (b : ZMod L) := by push_cast; ring
+    have e2 : (((((δ : ℕ) : ℤ) * b : ℤ)) : ZMod L) = ((δ : ℕ) : ZMod L) * (b : ZMod L) := by
+      push_cast; ring
     rw [e2, map_mul]
-    have h1 : ((δ:ℕ) : ℂ) ^ j ≠ 0 := pow_ne_zero _ (by exact_mod_cast hδ.ne')
+    have h1 : ((δ : ℕ) : ℂ) ^ j ≠ 0 := pow_ne_zero _ (by exact_mod_cast hδ.ne')
     have h2 : ((((δ : ℕ) : ℝ) ^ (2 * s) : ℝ) : ℂ) ≠ 0 := by
       exact_mod_cast (Real.rpow_pos_of_pos (by exact_mod_cast hδ) _).ne'
     push_cast
@@ -130,13 +138,16 @@ theorem GlobalTheory.EisM.lattice_sum_gcd_out (j L : ℕ) (s : ℝ) (φ : Dirich
     rw [h1, h2, mul_comm a, mul_comm b]
   have hLser : ∑' δ : ℕ+, f δ = LSeries (fun n : ℕ => φ n) ((j : ℂ) + 2 * (s : ℂ)) := by
     unfold LSeries
-    refine (PNat.coe_injective.tsum_eq (f := LSeries.term (fun n : ℕ => φ n) ((j : ℂ) + 2 * (s : ℂ))) ?_)
+    refine (PNat.coe_injective.tsum_eq
+      (f := LSeries.term (fun n : ℕ => φ n) ((j : ℂ) + 2 * (s : ℂ))) ?_)
     intro n hn
     have : n ≠ 0 := by
       rintro rfl
       exact hn (LSeries.term_zero _ _)
     exact ⟨⟨n, Nat.pos_of_ne_zero this⟩, rfl⟩
-  calc ∑' x, F x = ∑' p, F (scl L p) := ((scl_injective L).tsum_eq hsupp).symm
+  calc
+    ∑' x, F x
+      = ∑' p, F (scl L p) := ((scl_injective L).tsum_eq hsupp).symm
     _ = ∑' p : ℕ+ × CopVec L, f p.1 * g p.2 := tsum_congr hterm
     _ = (∑' δ, f δ) * ∑' x, g x := (tsum_mul_tsum_of_summable_norm hfs hgs).symm
     _ = _ := by rw [hLser]

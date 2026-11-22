@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem exists_conj_le {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (U : OpenSubgroup G) (s : Finset G) : ∃ U₁ : OpenSubgroup G, ∀ u ∈ U₁, ∀ x ∈ s, x⁻¹ * u * x ∈ U := by
+private theorem exists_conj_le
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (U : OpenSubgroup G) (s : Finset G)
+    : ∃ U₁ : OpenSubgroup G, ∀ u ∈ U₁, ∀ x ∈ s, x⁻¹ * u * x ∈ U := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨⊤, by simp⟩
@@ -29,23 +32,26 @@ private theorem exists_conj_le {G : Type} [Group G] [TopologicalSpace G] [IsTopo
       rwa [inv_inv] at h3
     · exact hV u h1 x hx
 
-private theorem supN_one {R : Type} [CommRing R] {n : ℕ} : supN (1 : Matrix (Fin n) (Fin n) R) = 0 := by
+private theorem supN_one {R : Type} [CommRing R] {n : ℕ}
+    : supN (1 : Matrix (Fin n) (Fin n) R) = 0 := by
   unfold supN
   refine Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun j _ => ?_
   split_ifs with h
   · exact Matrix.one_apply_ne (by rintro rfl; omega)
   · rfl
 
-private theorem rowM_one {R : Type} [CommRing R] {n : ℕ} (m : Fin n) :
-    rowM m ((1 : Matrix (Fin n) (Fin n) R) m) = 1 := by
+private theorem rowM_one {R : Type} [CommRing R] {n : ℕ} (m : Fin n)
+    : rowM m ((1 : Matrix (Fin n) (Fin n) R) m) = 1 := by
   ext i j
   simp only [rowM, Matrix.of_apply]
   split_ifs with h
   · rw [h.1]
   · rfl
 
-private theorem isWh_comb {R : Type} [CommRing R] {n : ℕ} {ψ : R → ℂ} {W : GL (Fin n) R → ℂ} (hW : IsWh ψ W)
-    (c : GL (Fin n) R →₀ ℂ) : IsWh ψ (comb c W) := by
+private theorem isWh_comb
+    {R : Type} [CommRing R]
+    {n : ℕ} {ψ : R → ℂ} {W : GL (Fin n) R → ℂ} (hW : IsWh ψ W) (c : GL (Fin n) R →₀ ℂ)
+    : IsWh ψ (comb c W) := by
   intro ν hν g
   unfold comb
   rw [Finsupp.mul_sum]
@@ -53,8 +59,9 @@ private theorem isWh_comb {R : Type} [CommRing R] {n : ℕ} {ψ : R → ℂ} {W 
   rw [mul_assoc, hW ν hν]
   ring
 
-theorem UpperTheory.V.Af.Smo.locKir :
-    UpperTheory.V.Af.Smo.ColConj → UpperTheory.V.Af.Smo.RowStep → UpperTheory.V.Af.Smo.LocStep → UpperTheory.V.Af.Smo.LocKir := by
+theorem UpperTheory.V.Af.Smo.locKir
+    : UpperTheory.V.Af.Smo.ColConj → UpperTheory.V.Af.Smo.RowStep → UpperTheory.V.Af.Smo.LocStep
+      → UpperTheory.V.Af.Smo.LocKir := by
   classical
   intro hcol hrow hstep E _ _ w ψ h0 h1 n m hm U
   induction m with
@@ -69,16 +76,22 @@ theorem UpperTheory.V.Af.Smo.locKir :
     let m' : Fin n := ⟨m, by omega⟩
     obtain ⟨c₁, h, hh1, hh, hc₁⟩ := hstep E w ψ h0 h1 n m' hm U₁
     obtain ⟨c, -, hc⟩ := exists_comb_comb c₁ c₀
-    have hσ : ∃ σ : (Fin n → w.adicCompletion E) → GL (Fin n) (w.adicCompletion E),
-        ∀ ξ (s : GL (Fin n) (w.adicCompletion E)), s.val = rowM m' ξ → σ ξ = s := by
-      refine ⟨fun ξ => if e : ∃ s : GL (Fin n) (w.adicCompletion E), s.val = rowM m' ξ then e.choose else 1,
-        fun ξ s hs => ?_⟩
+    have hσ
+        : ∃ σ : (Fin n → w.adicCompletion E) → GL (Fin n) (w.adicCompletion E),
+          ∀ ξ (s : GL (Fin n) (w.adicCompletion E)),
+            s.val = rowM m' ξ → σ ξ = s := by
+      refine ⟨
+        fun ξ =>
+          if e : ∃ s : GL (Fin n) (w.adicCompletion E), s.val = rowM m' ξ then e.choose else 1,
+        fun ξ s hs => ?_
+      ⟩
       have e : ∃ s : GL (Fin n) (w.adicCompletion E), s.val = rowM m' ξ := ⟨s, hs⟩
       simp only [dif_pos e]
       exact Units.ext (e.choose_spec.trans hs.symm)
     obtain ⟨σ, hσ⟩ := hσ
     refine ⟨c, fun p => h (p.val m') * H₀ (p * (σ (p.val m'))⁻¹), ?_, fun W hW hWU p hp => ?_⟩
-    · have : σ ((1 : Matrix (Fin n) (Fin n) (w.adicCompletion E)) m') = 1 := hσ _ 1 (rowM_one m').symm
+    · have : σ ((1 : Matrix (Fin n) (Fin n) (w.adicCompletion E)) m') = 1 :=
+        hσ _ 1 (rowM_one m').symm
       simp only [Units.val_one, hh1, this, inv_one, mul_one, one_mul, hH₀]
     · have hinv : ∀ g, ∀ u ∈ U₁, comb c₀ W (g * u) = comb c₀ W g := by
         intro g u hu

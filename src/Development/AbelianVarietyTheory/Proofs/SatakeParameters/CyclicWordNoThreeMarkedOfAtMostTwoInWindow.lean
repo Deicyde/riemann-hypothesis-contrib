@@ -11,9 +11,10 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory
 
-theorem _root_.GlobalTheory.noThree_of_windowTwo : ∀ {n : ℕ} (th : ZMod n → Prop) (L : ℕ),
-    3 ≤ L → _root_.GlobalTheory.HTW.WindowTwo th L →
-    _root_.GlobalTheory.HTW.NoThree th ∧ ∃ i, ¬ th i := by
+theorem _root_.GlobalTheory.noThree_of_windowTwo
+    : ∀ {n : ℕ} (th : ZMod n → Prop) (L : ℕ),
+      3 ≤ L → _root_.GlobalTheory.HTW.WindowTwo th L
+        → _root_.GlobalTheory.HTW.NoThree th ∧ ∃ i, ¬ th i := by
   intro n th L hL hw
   have key : ∀ i, ¬(th i ∧ th (i + 1) ∧ th (i + 2)) := by
     intro i h

@@ -16,8 +16,8 @@ namespace Formalism.HC
 
 open Formalism.FrobeniusOrbits
 
-theorem jacobi_neg_recip {r p : ℕ} (hr : r % 4 = 3) (hp : p % 2 = 1) :
-    jacobiSym (-(r : ℤ)) p = jacobiSym (p : ℤ) r := by
+theorem jacobi_neg_recip {r p : ℕ} (hr : r % 4 = 3) (hp : p % 2 = 1)
+    : jacobiSym (-(r : ℤ)) p = jacobiSym (p : ℤ) r := by
   have hpo : Odd p := Nat.odd_iff.2 hp
   have hro : Odd r := Nat.odd_iff.2 (by omega)
   rw [jacobiSym.neg _ hpo]
@@ -26,7 +26,8 @@ theorem jacobi_neg_recip {r p : ℕ} (hr : r % 4 = 3) (hp : p % 2 = 1) :
   · rw [ZMod.χ₄_nat_three_mod_four h, jacobiSym.quadratic_reciprocity_three_mod_four hr h]
     ring
 
-theorem jacobi_congr {x y p : ℕ} (hxy : x ≡ y [MOD p]) : jacobiSym (x : ℤ) p = jacobiSym (y : ℤ) p := by
+theorem jacobi_congr {x y p : ℕ} (hxy : x ≡ y [MOD p])
+    : jacobiSym (x : ℤ) p = jacobiSym (y : ℤ) p := by
   have h : ((x % p : ℕ) : ℤ) = ((y % p : ℕ) : ℤ) := congrArg _ hxy
   push_cast at h
   exact jacobiSym.mod_left' h
@@ -64,8 +65,7 @@ theorem d_ne_two : H.d ≠ 2 := by
   have h1 := H.d_mod_sixteen
   rw [h] at h1
   omega
-theorem coprime_q_d : Nat.Coprime H.q H.d :=
-  (Nat.coprime_primes H.q_prime H.d_prime).2 H.q_ne_d
+theorem coprime_q_d : Nat.Coprime H.q H.d := (Nat.coprime_primes H.q_prime H.d_prime).2 H.q_ne_d
 theorem coprime_QS_q : Nat.Coprime H.QS H.q :=
   Nat.Coprime.coprime_dvd_right (dvd_mul_right H.q H.d) H.QS_coprime
 theorem coprime_QS_d : Nat.Coprime H.QS H.d :=
@@ -86,12 +86,15 @@ theorem d_dvd_condN : H.d ∣ H.condN := dvd_mul_left _ _
 theorem tower_dvd_condN : 2 ^ (φ.e + 2) ∣ H.condN := H.tower_dvd.trans H.QS_dvd_condN
 theorem two_dvd_QS : 2 ∣ H.QS := (dvd_pow_self 2 (by omega)).trans H.tower_dvd
 theorem sixteen_dvd_QS : 16 ∣ H.QS :=
-  (show 2 ^ 4 ∣ 2 ^ (φ.e + 2) from Nat.pow_dvd_pow 2 (by have := H.two_le_e; omega)).trans H.tower_dvd
+  (show 2 ^ 4 ∣ 2 ^ (φ.e + 2) from Nat.pow_dvd_pow 2 (by have := H.two_le_e; omega)).trans
+    H.tower_dvd
 theorem two_dvd_condN : 2 ∣ H.condN := H.two_dvd_QS.trans H.QS_dvd_condN
 theorem sixteen_dvd_condN : 16 ∣ H.condN := H.sixteen_dvd_QS.trans H.QS_dvd_condN
 
-theorem q_not_dvd_QS : ¬ H.q ∣ H.QS := (Nat.Prime.coprime_iff_not_dvd H.q_prime).1 H.coprime_QS_q.symm
-theorem d_not_dvd_QS : ¬ H.d ∣ H.QS := (Nat.Prime.coprime_iff_not_dvd H.d_prime).1 H.coprime_QS_d.symm
+theorem q_not_dvd_QS : ¬ H.q ∣ H.QS :=
+  (Nat.Prime.coprime_iff_not_dvd H.q_prime).1 H.coprime_QS_q.symm
+theorem d_not_dvd_QS : ¬ H.d ∣ H.QS :=
+  (Nat.Prime.coprime_iff_not_dvd H.d_prime).1 H.coprime_QS_d.symm
 theorem d_not_dvd_QSq : ¬ H.d ∣ H.QS * H.q :=
   (Nat.Prime.coprime_iff_not_dvd H.d_prime).1 H.coprime_QSq_d.symm
 
@@ -112,10 +115,12 @@ theorem dvd_condN_iff {p : ℕ} (hp : p.Prime) : p ∣ H.condN ↔ p ∣ H.QS �
   rw [hp.dvd_mul, hp.dvd_mul, Nat.prime_dvd_prime_iff_eq hp H.q_prime,
     Nat.prime_dvd_prime_iff_eq hp H.d_prime, or_assoc]
 
-theorem dvd_condN_iff_small {p : ℕ} (hp : p.Prime) : p ∣ H.condN ↔ p ∈ H.small ∨ p = H.q ∨ p = H.d := by
+theorem dvd_condN_iff_small {p : ℕ} (hp : p.Prime)
+    : p ∣ H.condN ↔ p ∈ H.small ∨ p = H.q ∨ p = H.d := by
   rw [H.dvd_condN_iff hp, H.mem_small_iff, and_iff_right hp]
 
-theorem not_dvd_condN_iff {p : ℕ} (hp : p.Prime) : ¬ p ∣ H.condN ↔ ¬ p ∣ H.QS ∧ p ≠ H.q ∧ p ≠ H.d := by
+theorem not_dvd_condN_iff {p : ℕ} (hp : p.Prime)
+    : ¬ p ∣ H.condN ↔ ¬ p ∣ H.QS ∧ p ≠ H.q ∧ p ≠ H.d := by
   rw [H.dvd_condN_iff hp]
   simp only [not_or, ne_eq]
 
@@ -135,11 +140,12 @@ theorem ne_d_of_not_dvd {p : ℕ} (h : ¬ p ∣ H.condN) : p ≠ H.d := by
   exact h H.d_dvd_condN
 
 variable {H} in
-theorem notMem_small_of_not_dvd {p : ℕ} (h : ¬ p ∣ H.condN) : p ∉ H.small :=
-  fun hs => h ((H.mem_small_iff.1 hs).2.trans H.QS_dvd_condN)
+theorem notMem_small_of_not_dvd {p : ℕ} (h : ¬ p ∣ H.condN) : p ∉ H.small := fun hs =>
+  h ((H.mem_small_iff.1 hs).2.trans H.QS_dvd_condN)
 
-theorem not_dvd_condN_of_inert {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) (hj : jacobiSym (-(H.d : ℤ)) p = -1) :
-    ¬ p ∣ H.condN := by
+theorem not_dvd_condN_of_inert
+    {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) (hj : jacobiSym (-(H.d : ℤ)) p = -1)
+    : ¬ p ∣ H.condN := by
   rw [H.not_dvd_condN_iff hp]
   refine ⟨fun hd => ?_, fun hq => ?_, fun hd => ?_⟩
   · rw [H.QS_split p hp h2 hd] at hj
@@ -149,15 +155,12 @@ theorem not_dvd_condN_of_inert {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) (hj : jac
     norm_num at hj
   · subst hd
     rw [jacobiSym.mod_left, show (-(H.d : ℤ)) % (H.d : ℤ) = 0 by simp,
-      jacobiSym.zero_left H.d_prime.one_lt] at hj
+        jacobiSym.zero_left H.d_prime.one_lt]
+      at hj
     norm_num at hj
 
-
-
-
-
-theorem psAt_of_coprime {p : ℕ} (h : Nat.Coprime p H.condN) :
-    H.psAt p = (((H.art (ZMod.unitOfCoprime p h)).1.1 : ℤˣ) : ℤ) := by
+theorem psAt_of_coprime {p : ℕ} (h : Nat.Coprime p H.condN)
+    : H.psAt p = (((H.art (ZMod.unitOfCoprime p h)).1.1 : ℤˣ) : ℤ) := by
   unfold HostRaw.psAt
   rw [dite_eq_left h]
 
@@ -165,22 +168,22 @@ theorem psAt_eq_one_or {p : ℕ} (h : Nat.Coprime p H.condN) : H.psAt p = 1 ∨ 
   rw [H.psAt_of_coprime h]
   rcases Int.units_eq_one_or (H.art (ZMod.unitOfCoprime p h)).1.1 with h1 | h1 <;> simp [h1]
 
-theorem val_unitOfCoprime {p : ℕ} (h : Nat.Coprime p H.condN) :
-    ((ZMod.unitOfCoprime p h : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ p [MOD H.condN] := by
+theorem val_unitOfCoprime {p : ℕ} (h : Nat.Coprime p H.condN)
+    : ((ZMod.unitOfCoprime p h : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ p [MOD H.condN] := by
   rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast]
   exact Nat.mod_modEq p _
 
 theorem odd_of_coprime {p : ℕ} (h : Nat.Coprime p H.condN) : p % 2 = 1 := by
   by_contra hc
   have h2p : 2 ∣ p := by omega
-  exact (Nat.Prime.coprime_iff_not_dvd Nat.prime_two).1 (Nat.Coprime.coprime_dvd_left h2p h) H.two_dvd_condN
-
+  exact (Nat.Prime.coprime_iff_not_dvd Nat.prime_two).1 (Nat.Coprime.coprime_dvd_left h2p h)
+    H.two_dvd_condN
 
 variable {H} in
-theorem PsQ.psAt_eq (hP : H.PsQ) {p : ℕ} (h : Nat.Coprime p H.condN) : H.psAt p = jacobiSym (-(H.q : ℤ)) p := by
+theorem PsQ.psAt_eq (hP : H.PsQ) {p : ℕ} (h : Nat.Coprime p H.condN)
+    : H.psAt p = jacobiSym (-(H.q : ℤ)) p := by
   rw [H.psAt_of_coprime h, hP, jacobi_neg_recip H.q_mod_four (H.odd_of_coprime h)]
   exact jacobi_congr ((H.val_unitOfCoprime h).of_dvd H.q_dvd_condN)
-
 
 theorem sqd_mem_K : H.sqd ∈ H.K := IntermediateField.mem_adjoin_simple_self ℚ H.sqd
 
@@ -225,15 +228,18 @@ theorem conj_sqd : H.conj H.sqd = -H.sqd := by
   rw [H.gal_sqd, H.gal_conj]
   simp [Frame.cc, c0]
 
-theorem hostEmb (ψ : H.E →+* ℂ) :
-    Function.Bijective (fun σ : H.E ≃ₐ[ℚ] H.E => ψ.comp (σ : H.E →+* H.E)) := by
+theorem hostEmb (ψ : H.E →+* ℂ)
+    : Function.Bijective (fun σ : H.E ≃ₐ[ℚ] H.E => ψ.comp (σ : H.E →+* H.E)) := by
   haveI := H.galois
   have hinj : Function.Injective (fun σ : H.E ≃ₐ[ℚ] H.E => ψ.comp (σ : H.E →+* H.E)) := by
     intro σ τ h
     ext x
     exact ψ.injective (congrArg (fun g : H.E →+* ℂ => g x) h)
   rw [Fintype.bijective_iff_injective_and_card]
-  exact ⟨hinj, by rw [Fintype.card_eq_nat_card, IsGalois.card_aut_eq_finrank, NumberField.Embeddings.card]⟩
+  exact ⟨
+    hinj,
+    by rw [Fintype.card_eq_nat_card, IsGalois.card_aut_eq_finrank, NumberField.Embeddings.card]
+  ⟩
 
 end HostRaw
 
@@ -246,23 +252,30 @@ theorem finrank_EK : Module.finrank H.K H.E = 2 * φ.ord := by
   rw [H.finrank_K, H.der.finrank_E] at h
   omega
 
-theorem hostClasses (p : ℕ) [Fact p.Prime] (hp : ¬ p ∣ H.condN)
-    (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E) (hσ : IsArithFrobAt ℤ σ P) :
-    (((H.galE σ).1 = 1 ∨ (H.galE σ).1 = (-1, 1)) ↔ jacobiSym (-(H.d : ℤ)) p = 1) ∧
-    ((H.galE σ).1 = (1, -1) ↔ (jacobiSym (-(H.d : ℤ)) p = -1 ∧ H.psAt p = 1)) ∧
-    ((H.galE σ).1 = c0 ↔ (jacobiSym (-(H.d : ℤ)) p = -1 ∧ H.psAt p = -1)) := by
+theorem hostClasses
+    (p : ℕ) [Fact p.Prime]
+    (hp : ¬ p ∣ H.condN)
+    (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
+    (σ : H.E ≃ₐ[ℚ] H.E) (hσ : IsArithFrobAt ℤ σ P)
+    : (((H.galE σ).1 = 1 ∨ (H.galE σ).1 = (-1, 1)) ↔ jacobiSym (-(H.d : ℤ)) p = 1)
+      ∧ ((H.galE σ).1 = (1, -1) ↔ (jacobiSym (-(H.d : ℤ)) p = -1 ∧ H.psAt p = 1))
+      ∧ ((H.galE σ).1 = c0 ↔ (jacobiSym (-(H.d : ℤ)) p = -1 ∧ H.psAt p = -1)) := by
   obtain ⟨ha, hb, -⟩ := (H.der.frob p hp P).2.2.1 σ hσ
-  rcases Int.units_eq_one_or (H.galE σ).1.1 with h1 | h1 <;>
-    rcases Int.units_eq_one_or (H.galE σ).1.2 with h2 | h2 <;>
-    simp [Prod.ext_iff, c0, h1, h2, ← ha, ← hb]
+  rcases Int.units_eq_one_or (H.galE σ).1.1 with h1 | h1
+    <;> rcases Int.units_eq_one_or (H.galE σ).1.2 with h2 | h2
+    <;> simp [Prod.ext_iff, c0, h1, h2, ← ha, ← hb]
 
-theorem frob_iff (p : ℕ) [Fact p.Prime] (hp : Nat.Coprime p H.condN)
-    (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E) :
-    IsArithFrobAt ℤ σ P ↔ H.galE σ = H.art (ZMod.unitOfCoprime p hp) :=
-  (H.der.frob p ((Nat.Prime.coprime_iff_not_dvd Fact.out).1 hp) P).2.1 σ _ (ZMod.coe_unitOfCoprime p hp)
+theorem frob_iff
+    (p : ℕ) [Fact p.Prime]
+    (hp : Nat.Coprime p H.condN)
+    (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
+    (σ : H.E ≃ₐ[ℚ] H.E)
+    : IsArithFrobAt ℤ σ P ↔ H.galE σ = H.art (ZMod.unitOfCoprime p hp) :=
+  (H.der.frob p ((Nat.Prime.coprime_iff_not_dvd Fact.out).1 hp) P).2.1 σ _
+    (ZMod.coe_unitOfCoprime p hp)
 
-theorem splitK_of_dvd {l : ℕ} (hl : l.Prime) (h : l ∣ H.QS * H.q) :
-    (primesOver (span {(l : ℤ)}) (𝓞 H.K)).ncard = 2 := by
+theorem splitK_of_dvd {l : ℕ} (hl : l.Prime) (h : l ∣ H.QS * H.q)
+    : (primesOver (span {(l : ℤ)}) (𝓞 H.K)).ncard = 2 := by
   rw [H.der.splitK l hl]
   by_cases h2 : l = 2
   · exact Or.inl h2
@@ -273,14 +286,18 @@ theorem splitK_of_dvd {l : ℕ} (hl : l.Prime) (h : l ∣ H.QS * H.q) :
   · subst h'
     exact H.hyp.2.2.2.2
 
-theorem hostFiniteOrder (k g : ℕ) (hg : g.Prime) (M : Matrix (Fin k) (Fin k) H.E) (hM : M ^ g = 1) (hne : M ≠ 1) :
-    g - 1 ≤ 4 * φ.ord * k := by
+theorem hostFiniteOrder
+    (k g : ℕ) (hg : g.Prime) (M : Matrix (Fin k) (Fin k) H.E) (hM : M ^ g = 1) (hne : M ≠ 1)
+    : g - 1 ≤ 4 * φ.ord * k := by
   have h := Orbits.dim_bound k g hg M hM hne
   rw [H.der.finrank_E] at h
   exact h
 
-theorem hostStab (k g : ℕ) (hg : g.Prime) (hlt : 4 * φ.ord * k < g - 1)
-    (Γ : Subgroup (Matrix.GeneralLinearGroup (Fin k) H.E)) (hΓ : ∀ γ ∈ Γ, ∃ m : ℕ, orderOf γ = g ^ m) : Γ = ⊥ := by
+theorem hostStab
+    (k g : ℕ) (hg : g.Prime) (hlt : 4 * φ.ord * k < g - 1)
+    (Γ : Subgroup (Matrix.GeneralLinearGroup (Fin k) H.E))
+    (hΓ : ∀ γ ∈ Γ, ∃ m : ℕ, orderOf γ = g ^ m)
+    : Γ = ⊥ := by
   rw [Subgroup.eq_bot_iff_forall]
   intro γ hγ
   obtain ⟨m, hm⟩ := hΓ γ hγ
@@ -288,13 +305,21 @@ theorem hostStab (k g : ℕ) (hg : g.Prime) (hlt : 4 * φ.ord * k < g - 1)
   | zero => simpa using hm
   | succ m =>
     exfalso
-    have h1 := orderOf_pow_orderOf_div (x := γ) (n := g) (by rw [hm]; exact pow_ne_zero _ hg.ne_zero)
-      (by rw [hm]; exact dvd_pow_self g (Nat.succ_ne_zero m))
+    have h1 :=
+      orderOf_pow_orderOf_div (x := γ) (n := g) (by rw [hm]; exact pow_ne_zero _ hg.ne_zero)
+        (by rw [hm]; exact dvd_pow_self g (Nat.succ_ne_zero m))
     have hpow := pow_orderOf_eq_one (γ ^ (orderOf γ / g))
     rw [h1] at hpow
-    have hMg : (((γ ^ (orderOf γ / g) : Matrix.GeneralLinearGroup (Fin k) H.E)) : Matrix (Fin k) (Fin k) H.E) ^ g = 1 := by
+    have hMg
+        : (((γ ^ (orderOf γ / g) : Matrix.GeneralLinearGroup (Fin k) H.E))
+              : Matrix (Fin k) (Fin k) H.E)
+            ^ g
+          = 1 := by
       rw [← Units.val_pow_eq_pow_val, hpow, Units.val_one]
-    have hne : (((γ ^ (orderOf γ / g) : Matrix.GeneralLinearGroup (Fin k) H.E)) : Matrix (Fin k) (Fin k) H.E) ≠ 1 := by
+    have hne
+        : (((γ ^ (orderOf γ / g) : Matrix.GeneralLinearGroup (Fin k) H.E))
+            : Matrix (Fin k) (Fin k) H.E)
+          ≠ 1 := by
       intro h
       have h0 : γ ^ (orderOf γ / g) = 1 := Units.ext (by rw [Units.val_one]; exact h)
       rw [h0, orderOf_one] at h1

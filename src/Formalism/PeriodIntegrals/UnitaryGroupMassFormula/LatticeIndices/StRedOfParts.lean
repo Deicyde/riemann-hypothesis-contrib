@@ -9,8 +9,9 @@ noncomputable section
 
 namespace MassDataIdxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField
-  IsDedekindDomain Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
 open scoped TensorProduct
 
 section Loc
@@ -46,12 +47,23 @@ def J1 (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p) : Matrix (Fin X.B.I.n) 
   X.B.I.J.map (fun e => th1 X p θ (inclR (FpX X p) e))
 
 def LatBasis (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p) (P : GL (Fin X.B.I.n) (FpX X p)) : Prop :=
-  ∀ x : Fin X.B.I.n → TpX X p, x ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) ↔
-    (∀ i, (Matrix.mulVec ((P⁻¹ : GL (Fin X.B.I.n) (FpX X p)) : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (FpX X p))
-        fun j => th1 X p θ (x j)) i ∈ p.1.adicCompletionIntegers X.B.I.F) ∧
-    (∀ i, (Matrix.mulVec (Matrix.transpose ((P : GL (Fin X.B.I.n) (FpX X p)) : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (FpX X p)) *
-        Matrix.transpose (J1 X p θ))
-        fun j => th2 X p θ (x j)) i ∈ p.1.adicCompletionIntegers X.B.I.F)
+  ∀ x : Fin X.B.I.n → TpX X p,
+    x ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E))
+      ↔ (∀ i,
+          (Matrix.mulVec
+                ((P⁻¹ : GL (Fin X.B.I.n) (FpX X p)) : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (FpX X p))
+                fun j => th1 X p θ (x j))
+              i
+            ∈ p.1.adicCompletionIntegers X.B.I.F)
+        ∧ (∀ i,
+          (Matrix.mulVec
+                (Matrix.transpose
+                    ((P : GL (Fin X.B.I.n) (FpX X p))
+                      : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (FpX X p))
+                  * Matrix.transpose (J1 X p θ))
+                fun j => th2 X p θ (x j))
+              i
+            ∈ p.1.adicCompletionIntegers X.B.I.F)
 
 def StSplitLat : Prop :=
   ∃ θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p, IsSplitEquiv X p θ ∧ ∃ P, LatBasis X p θ P
@@ -62,8 +74,9 @@ def LatCore : Prop :=
   ∀ {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p),
     IsSplitEquiv X p θ → ∀ P, LatBasis X p θ P → StLatGL X p
 
-theorem stRed_of_parts {D : D7} (X : HidaSetting D) (p : TypX X) (hR : StResZ X p) (hS : StSplitLat X p)
-    (hC : LatCore) : StRed X p := by
+theorem stRed_of_parts
+    {D : D7} (X : HidaSetting D) (p : TypX X) (hR : StResZ X p) (hS : StSplitLat X p) (hC : LatCore)
+    : StRed X p := by
   obtain ⟨θ, hθ, P, hP⟩ := hS
   have hL : StLatGL X p := hC X p θ hθ P hP
   obtain ⟨π, hπ, hker⟩ := hR
@@ -78,16 +91,31 @@ theorem stRed_of_parts {D : D7} (X : HidaSetting D) (p : TypX X) (hR : StResZ X 
       ext i j
       exact @Subsingleton.elim _ hs _ _
 
-    let A : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Op X p) :=
-      fun i j => Function.surjInv hπ ((M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))) i j)
-    have hA : ∀ i j, π (A i j) = (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))) i j :=
-      fun i j => Function.surjInv_eq hπ _
-    have hdetM : IsUnit (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))).det :=
-      by
-        first
-          | exact Matrix.isUnits_det_units M
-          | exact (Matrix.isUnit_iff_isUnit_det (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p)))).mp M.isUnit
-    have hmap : π A.det = (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))).det := by
+    let A : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+        (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Op X p) := fun i j =>
+      Function.surjInv hπ
+        ((M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+            (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p)))
+          i j)
+    have hA
+        : ∀ i j,
+          π (A i j)
+            = (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+                (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p)))
+              i j := fun i j =>
+      Function.surjInv_eq hπ _
+    have hdetM : IsUnit
+        (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+          (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))).det := by
+      first
+      | exact Matrix.isUnits_det_units M
+      | exact (Matrix.isUnit_iff_isUnit_det
+          (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+            (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p)))).mp M.isUnit
+    have hmap
+        : π A.det
+          = (M : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+            (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))).det := by
       rw [RingHom.map_det]
       congr 1
       ext i j
@@ -103,9 +131,7 @@ theorem stRed_of_parts {D : D7} (X : HidaSetting D) (p : TypX X) (hR : StResZ X 
       have h1 : A.det * b - 1 ∈ RingHom.ker π := by
         rw [RingHom.mem_ker, RingHom.map_sub, map_mul, hv, map_one, sub_self]
       have h2 : A.det * b ∈ IsLocalRing.maximalIdeal (Op X p) := by
-        first
-          | exact Ideal.mul_mem_right _ _ hm
-          | exact Ideal.mul_mem_right _ hm
+        first | exact Ideal.mul_mem_right _ _ hm | exact Ideal.mul_mem_right _ hm
       have h3 : (1 : Op X p) ∈ IsLocalRing.maximalIdeal (Op X p) := by
         have h4 := Ideal.sub_mem _ h2 (hle h1)
         rwa [sub_sub_cancel] at h4
@@ -118,8 +144,18 @@ theorem stRed_of_parts {D : D7} (X : HidaSetting D) (p : TypX X) (hR : StResZ X 
     exact hA i j
   · intro x
 
-    have key : ∀ i j, π (((ψ x : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Op X p)) - 1) i j) =
-        ((Matrix.GeneralLinearGroup.map π (ψ x) : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))) - 1) i j := by
+    have key
+        : ∀ i j,
+          π
+              (((ψ x : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+                    (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Op X p))
+                  - 1)
+                i j)
+            = ((Matrix.GeneralLinearGroup.map π (ψ x)
+                  : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+                    (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p)))
+                - 1)
+              i j := by
       intro i j
       rw [Matrix.sub_apply, Matrix.sub_apply, map_sub, Matrix.one_apply, Matrix.one_apply]
       split_ifs <;> simp only [map_one, map_zero] <;> rfl
@@ -127,7 +163,11 @@ theorem stRed_of_parts {D : D7} (X : HidaSetting D) (p : TypX X) (hR : StResZ X 
     constructor
     · intro h i j
       rw [RingHom.mem_ker, key]
-      have h' : (Matrix.GeneralLinearGroup.map π (ψ x) : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p))) = 1 := by
+      have h'
+          : (Matrix.GeneralLinearGroup.map π (ψ x)
+              : Matrix (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k)
+                (Formalism.FourierDecayAlt.S3.Idx D.R.rS D.R.k) (ZMod (gOf p)))
+            = 1 := by
         rw [MonoidHom.comp_apply] at h
         rw [h]
         rfl

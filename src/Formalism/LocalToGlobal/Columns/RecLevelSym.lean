@@ -43,18 +43,27 @@ theorem r_le_Y {j : ℕ} (hj : j + 1 ≤ R.m) : R.r ≤ R.N j + (R.m - 1 - j) :=
   exact Nat.le_add_right _ _
 
 def colLevSym (Ch : Chars X Pr R.m) (j : ℕ) : LevFam X.E X.K (R.N j) Pr.vGs := fun w =>
-  if j = 0 then colLev Ch j w
-  else if h1 : j + 1 < R.m then
-    ⟨(HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))).comap
-        (insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl),
-      (lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))).comp
-        ((insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl).subgroupComap _)⟩
-  else if hj : j + 1 = R.m then
-    ⟨HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t j R.rS (r_le_N_of_le hj.ge),
-      lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t j R.rS (r_le_N_of_le hj.ge)⟩
-  else
-    ⟨HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)),
-      lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega))⟩
+  if j = 0 then
+    colLev Ch j w
+  else if h1 : j + 1 < R.m then ⟨
+    (HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
+        (r_le_Y (by omega))).comap
+      (insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j)
+        rfl),
+    (lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
+        (r_le_Y (by omega))).comp
+      ((insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j))
+        (colK_le_N R j) rfl).subgroupComap _)
+  ⟩
+  else if hj : j + 1 = R.m then ⟨
+    HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t j R.rS (r_le_N_of_le hj.ge),
+    lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t j R.rS (r_le_N_of_le hj.ge)
+  ⟩
+  else ⟨
+    HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)),
+    lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS
+      (r_le_N_of_le (by omega))
+  ⟩
 
 variable (hc : Formalism.BasicNotions.CMData X.F X.E) (Ch : Chars X Pr R.m)
 
@@ -64,32 +73,52 @@ section SymTies
 
 open Formalism.BasicNotions (Ranks)
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (hc : Formalism.BasicNotions.CMData X.F X.E) (Ch : Chars X Pr R.m)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (hc : Formalism.BasicNotions.CMData X.F X.E) (Ch : Chars X Pr R.m)
 
-theorem colLevSym_pred {j : ℕ} (hj : j + 1 = R.m) :
-    colLevSym Ch j = parFam (r_le_N_of_le hj.ge) R.t j (rPsymF Ch) (fun w => extChi fun s => Ch.chi s w) := by
+theorem colLevSym_pred {j : ℕ} (hj : j + 1 = R.m)
+    : colLevSym Ch j
+      = parFam (r_le_N_of_le hj.ge) R.t j (rPsymF Ch) (fun w => extChi fun s => Ch.chi s w) := by
   funext w
   unfold colLevSym
   rw [if_neg (by have := R.two_le_m; omega), dite_eq_right (by omega), dite_eq_left hj]
   rfl
 
-theorem colLevSym_top_H {j : ℕ} (hj : R.m ≤ j) (w : Pr.vGs) :
-    (colLevSym Ch j w).H = HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)) := by
+theorem colLevSym_top_H {j : ℕ} (hj : R.m ≤ j) (w : Pr.vGs)
+    : (colLevSym Ch j w).H
+      = HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)) := by
   have h2 := R.two_le_m
   unfold colLevSym
   rw [if_neg (by omega), dite_eq_right (by omega), dite_eq_right (by omega)]
 
-theorem colLevSym_top_lam {j : ℕ} (hj : R.m ≤ j) (w : Pr.vGs) (M : ↥(colLevSym Ch j w).H)
-    (hM : M.1 ∈ HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega))) :
-    (colLevSym Ch j w).lam M =
-      lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)) ⟨M.1, hM⟩ := by
-  have key : ∀ l : Lev (𝓞 X.E ⧸ w.1.asIdeal) X.K (R.N j), l = colLevSym Ch j w → ∀ (M' : ↥l.H) (hM' : M'.1 ∈ HXmsym
-      (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega))),
-      l.lam M' = lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)) ⟨M'.1, hM'⟩ := by
+theorem colLevSym_top_lam
+    {j : ℕ} (hj : R.m ≤ j)
+    (w : Pr.vGs) (M : ↥(colLevSym Ch j w).H)
+    (hM : M.1 ∈ HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)))
+    : (colLevSym Ch j w).lam M
+      = lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS
+        (r_le_N_of_le (by omega)) ⟨M.1, hM⟩ := by
+  have key
+      : ∀ l : Lev (𝓞 X.E ⧸ w.1.asIdeal) X.K (R.N j),
+        l = colLevSym Ch j w
+          → ∀ (M' : ↥l.H)
+              (hM' : M'.1 ∈ HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS
+                (r_le_N_of_le (by omega))),
+            l.lam M'
+              = lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS
+                (r_le_N_of_le (by omega)) ⟨M'.1, hM'⟩ := by
     intro l hl M' hM'
-    have hl' : l = ⟨HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)),
-        lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega))⟩ := by
-      rw [hl]; unfold colLevSym; rw [if_neg (by have := R.two_le_m; omega), dite_eq_right (by omega), dite_eq_right (by omega)]
+    have hl'
+        : l
+          = ⟨
+            HXmsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) R.k R.r R.t R.m R.rS (r_le_N_of_le (by omega)),
+            lamXmsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j) R.k R.r R.t R.m R.rS
+              (r_le_N_of_le (by omega))
+          ⟩ := by
+      rw [hl]
+      unfold colLevSym
+      rw [if_neg (by have := R.two_le_m; omega), dite_eq_right (by omega), dite_eq_right (by omega)]
     subst hl'
     rfl
   exact key _ rfl M hM
@@ -103,26 +132,48 @@ theorem colLevSym_zero : colLevSym Ch 0 = colLev Ch 0 := by
   funext w
   simp [colLevSym]
 
-theorem colLevSym_mid_H {j : ℕ} (h0 : j ≠ 0) (h1 : j + 1 < R.m) (w : Pr.vGs) :
-    (colLevSym Ch j w).H = (HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))).comap
-      (insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl) := by
+theorem colLevSym_mid_H {j : ℕ} (h0 : j ≠ 0) (h1 : j + 1 < R.m) (w : Pr.vGs)
+    : (colLevSym Ch j w).H
+      = (HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
+          (r_le_Y (by omega))).comap
+        (insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j))
+          (colK_le_N R j) rfl) := by
   unfold colLevSym
   rw [if_neg h0, dite_eq_left h1]
 
-theorem colLevSym_mid_lam {j : ℕ} (h0 : j ≠ 0) (h1 : j + 1 < R.m) (w : Pr.vGs) (M : ↥(colLevSym Ch j w).H)
-    (hM : insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl M.1 ∈
-      HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))) :
-    (colLevSym Ch j w).lam M = lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
-      (r_le_Y (by omega)) ⟨_, hM⟩ := by
-  have key : ∀ l : Lev (𝓞 X.E ⧸ w.1.asIdeal) X.K (R.N j), l = colLevSym Ch j w → ∀ (M' : ↥l.H) (hM' : insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j)
-      (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl M'.1 ∈
-      HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))),
-      l.lam M' = lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega)) ⟨_, hM'⟩ := by
+theorem colLevSym_mid_lam
+    {j : ℕ} (h0 : j ≠ 0) (h1 : j + 1 < R.m)
+    (w : Pr.vGs) (M : ↥(colLevSym Ch j w).H)
+    (hM : insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j))
+        (colK_le_N R j) rfl M.1
+      ∈ HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega)))
+    : (colLevSym Ch j w).lam M
+      = lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
+        (r_le_Y (by omega)) ⟨_, hM⟩ := by
+  have key
+      : ∀ l : Lev (𝓞 X.E ⧸ w.1.asIdeal) X.K (R.N j),
+        l = colLevSym Ch j w
+          → ∀ (M' : ↥l.H)
+              (hM' : insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j))
+                  (colK_le_N R j) rfl M'.1
+                ∈ HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
+                  (r_le_Y (by omega))),
+            l.lam M'
+              = lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t
+                j R.rS (r_le_Y (by omega)) ⟨_, hM'⟩ := by
     intro l hl M' hM'
-    have hl' : l = ⟨(HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))).comap
-          (insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl),
-        (lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS (r_le_Y (by omega))).comp
-          ((insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j)) (colK_le_N R j) rfl).subgroupComap _)⟩ := by
+    have hl'
+        : l
+          = ⟨
+            (HJsym (𝓞 X.E ⧸ w.1.asIdeal) (R.N j + (R.m - 1 - j)) R.k R.r R.t j R.rS
+                (r_le_Y (by omega))).comap
+              (insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j))
+                (colK_le_N R j) rfl),
+            (lamJsym (Ch.psi0 w) (extChi fun s => Ch.chi s w) (R.N j + (R.m - 1 - j)) R.k R.r R.t j
+                R.rS (r_le_Y (by omega))).comp
+              ((insGL (𝓞 X.E ⧸ w.1.asIdeal) (R.N j) (R.m - 1 - j) R.k (R.N j + (R.m - 1 - j))
+                (colK_le_N R j) rfl).subgroupComap _)
+          ⟩ := by
       rw [hl]; unfold colLevSym; rw [if_neg h0, dite_eq_left h1]
     subst hl'
     rfl
@@ -137,8 +188,9 @@ variable {κ : Type} [CommRing κ] {K : Type} [Field K]
 theorem HPsym_eq_unipSym (r k rS : ℕ) : HPsym κ r k rS = Formalism.L2.DIV.unipSym κ r rS k := by
   ext M
   show ((_ ∧ _) ∧ _) ↔ ((_ ∧ _) ∧ _)
-  have e1 : (M : Matrix (Fin r) (Fin r) κ).BlockTriangular (fun i => fine r [] i.val) ↔
-      (M : Matrix (Fin r) (Fin r) κ).BlockTriangular (fun i => i.val) := by
+  have e1
+      : (M : Matrix (Fin r) (Fin r) κ).BlockTriangular (fun i => fine r [] i.val)
+        ↔ (M : Matrix (Fin r) (Fin r) κ).BlockTriangular (fun i => i.val) := by
     have : (fun i : Fin r => fine r [] i.val) = (fun i => i.val) := funext fun i => fine_self_lt i.2
     rw [this]
   constructor
@@ -147,13 +199,14 @@ theorem HPsym_eq_unipSym (r k rS : ℕ) : HPsym κ r k rS = Formalism.L2.DIV.uni
   · rintro ⟨⟨h1, h2⟩, h3⟩
     exact ⟨⟨e1.mpr h1, fun i _ => h2 i⟩, h3⟩
 
-theorem HPsymF_eq_comap_unipSym (r k rS : ℕ) :
-    HPsymF κ r k rS = (Formalism.L2.DIV.unipSym κ r rS k).comap (toSymOrd κ r k rS) := by
+theorem HPsymF_eq_comap_unipSym (r k rS : ℕ)
+    : HPsymF κ r k rS = (Formalism.L2.DIV.unipSym κ r rS k).comap (toSymOrd κ r k rS) := by
   rw [HPsymF, HPsym_eq_unipSym]
 
-theorem sym_sum_split {r k rS : ℕ} (M : GL (Fin r) κ) :
-    supSum r (SPsym r k rS) (M : Matrix (Fin r) (Fin r) κ) + offSum k rS (M : Matrix (Fin r) (Fin r) κ) =
-      Formalism.L2.DIV.edgeSum (Formalism.L2.DIV.symEdge rS k) M := by
+theorem sym_sum_split {r k rS : ℕ} (M : GL (Fin r) κ)
+    : supSum r (SPsym r k rS) (M : Matrix (Fin r) (Fin r) κ)
+        + offSum k rS (M : Matrix (Fin r) (Fin r) κ)
+      = Formalism.L2.DIV.edgeSum (Formalism.L2.DIV.symEdge rS k) M := by
   unfold supSum offSum Formalism.L2.DIV.edgeSum
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -170,17 +223,21 @@ theorem sym_sum_split {r k rS : ℕ} (M : GL (Fin r) κ) :
     simp only [SPsym, Finset.mem_filter, Finset.mem_range]
     split_ifs <;> first | (exfalso; omega) | simp
 
-theorem chiSym_eq_symHom (ψ : AddChar κ K) (r k rS : ℕ) (M : ↥(HPsym κ r k rS)) (hM : M.1 ∈ Formalism.L2.DIV.unipSym κ r rS k) :
-    ((chiSym ψ r k rS M : Kˣ) : K) = ((Formalism.L2.DIV.addCharHom ψ (Formalism.L2.DIV.symHom κ r rS k) ⟨M.1, hM⟩ : Kˣ) : K) := by
+theorem chiSym_eq_symHom
+    (ψ : AddChar κ K)
+    (r k rS : ℕ) (M : ↥(HPsym κ r k rS)) (hM : M.1 ∈ Formalism.L2.DIV.unipSym κ r rS k)
+    : ((chiSym ψ r k rS M : Kˣ) : K)
+      = ((Formalism.L2.DIV.addCharHom ψ (Formalism.L2.DIV.symHom κ r rS k) ⟨M.1, hM⟩ : Kˣ)
+        : K) := by
   show ψ (supSum r (SPsym r k rS) (M.1 : Matrix (Fin r) (Fin r) κ)) * ψ (offSum k rS (M.1 : Matrix (Fin r) (Fin r) κ)) =
     ψ (Formalism.L2.DIV.edgeSum (Formalism.L2.DIV.symEdge rS k) M.1)
   rw [← AddChar.map_add_eq_mul, sym_sum_split]
 
 def SPsymF (n k : ℕ) : Finset ℕ := (Finset.range (n - 1)).filter fun i => i + 1 ≠ k
 
-theorem symEdge_symPerm_iff {n k rS : ℕ} (hn : n = k + 2 * rS + 1) (i j : Fin n) :
-    Formalism.L2.DIV.symEdge rS k (symPerm n k rS i) (symPerm n k rS j) ↔
-      (i.val + 1 = j.val ∧ j.val < n ∧ i.val ∈ SPsymF n k) := by
+theorem symEdge_symPerm_iff {n k rS : ℕ} (hn : n = k + 2 * rS + 1) (i j : Fin n)
+    : Formalism.L2.DIV.symEdge rS k (symPerm n k rS i) (symPerm n k rS j)
+      ↔ (i.val + 1 = j.val ∧ j.val < n ∧ i.val ∈ SPsymF n k) := by
   have h : k + rS ≤ n := by omega
   unfold Formalism.L2.DIV.symEdge
   rw [symPerm_val h, symPerm_val h]
@@ -190,8 +247,10 @@ theorem symEdge_symPerm_iff {n k rS : ℕ} (hn : n = k + 2 * rS + 1) (i j : Fin 
   unfold symIdx
   split_ifs <;> omega
 
-theorem chiSymF_val {n k rS : ℕ} (hn : n = k + 2 * rS + 1) (ψ : AddChar κ K) (M : ↥(HPsymF κ n k rS)) :
-    ((chiSymF ψ n k rS M : Kˣ) : K) = ψ (supSum n (SPsymF n k) (M.1 : Matrix (Fin n) (Fin n) κ)) := by
+theorem chiSymF_val
+    {n k rS : ℕ} (hn : n = k + 2 * rS + 1) (ψ : AddChar κ K) (M : ↥(HPsymF κ n k rS))
+    : ((chiSymF ψ n k rS M : Kˣ) : K)
+      = ψ (supSum n (SPsymF n k) (M.1 : Matrix (Fin n) (Fin n) κ)) := by
   have hM : toSymOrd κ n k rS M.1 ∈ Formalism.L2.DIV.unipSym κ n rS k := by
     have := M.2
     rw [mem_HPsymF, HPsym_eq_unipSym] at this

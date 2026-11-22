@@ -8,18 +8,27 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Ci PositivityTheory.Rg.Fx
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq UpperTheory.V.Z.IntegralApplyAeEq UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Ci
+  PositivityTheory.Rg.Fx
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq UpperTheory.V.Z.IntegralApplyAeEq
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 open scoped InnerProductSpace
 
 section Abstract
 
-variable {H V W : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H V W : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   [NormedAddCommGroup V] [InnerProductSpace ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W]
 
-private theorem comm_of_ker (U : H ≃ₗᵢ[ℂ] H) (Q : H →L[ℂ] H) (hs : IsSelfAdjoint Q) (hi : Q ∘L Q = Q)
-    (hk : ∀ h, Q (U h) = 0 ↔ Q h = 0) (h : H) : U (Q h) = Q (U h) := by
+private theorem comm_of_ker
+    (U : H ≃ₗᵢ[ℂ] H) (Q : H →L[ℂ] H)
+    (hs : IsSelfAdjoint Q) (hi : Q ∘L Q = Q) (hk : ∀ h, Q (U h) = 0 ↔ Q h = 0)
+    (h : H)
+    : U (Q h) = Q (U h) := by
   have hQ : ∀ x, Q (Q x) = Q x := fun x => by
     have := congrArg (fun A : H →L[ℂ] H => A x) hi
     simpa using this
@@ -39,22 +48,31 @@ private theorem comm_of_ker (U : H ≃ₗᵢ[ℂ] H) (Q : H →L[ℂ] H) (hs : I
     rw [h2, ← hsym, hw0, inner_zero_left, sub_self]
   exact sub_eq_zero.1 (inner_self_eq_zero.1 h3)
 
-private theorem lift_ex (s : V ≃ₗᵢ[ℂ] W) (u : L V) : ∃ v : L W, ∀ᵐ x : ℝ, v x = s (u x) :=
-  ⟨(s.toContinuousLinearEquiv : V →L[ℂ] W).compLp u, (s.toContinuousLinearEquiv : V →L[ℂ] W).coeFn_compLp u⟩
+private theorem lift_ex (s : V ≃ₗᵢ[ℂ] W) (u : L V) : ∃ v : L W, ∀ᵐ x : ℝ, v x = s (u x) := ⟨
+  (s.toContinuousLinearEquiv : V →L[ℂ] W).compLp u,
+  (s.toContinuousLinearEquiv : V →L[ℂ] W).coeFn_compLp u
+⟩
 
 private theorem lift_ex' (s : V ≃ₗᵢ[ℂ] W) (v : L W) : ∃ u : L V, ∀ᵐ x : ℝ, v x = s (u x) := by
   obtain ⟨u, hu⟩ := lift_ex s.symm v
   exact ⟨u, hu.mono fun x hx => by rw [hx, s.apply_symm_apply]⟩
 
-private theorem abs_main (J : L V →ₗᵢ[ℂ] H) (J' : L W →ₗᵢ[ℂ] H) (U : H ≃ₗᵢ[ℂ] H) (s : V ≃ₗᵢ[ℂ] W) (t : W ≃ₗᵢ[ℂ] V)
+private theorem abs_main
+    (J : L V →ₗᵢ[ℂ] H) (J' : L W →ₗᵢ[ℂ] H) (U : H ≃ₗᵢ[ℂ] H) (s : V ≃ₗᵢ[ℂ] W) (t : W ≃ₗᵢ[ℂ] V)
     (hs : ∀ (u : L V) (v : L W), (∀ᵐ x : ℝ, v x = s (u x)) → U (J u) = J' v)
-    (ht : ∀ (v : L W) (u : L V), (∀ᵐ x : ℝ, u x = t (v x)) → U (J' v) = J u) :
-    (∀ P : H →L[ℂ] H, IsOrthogonalProjectionTwoLines J J' P → ∀ h, U (P h) = P (U h)) ∧
-    ∀ (T : ℝ) (Λ : H →L[ℂ] H), (IsSelfAdjoint Λ ∧ Λ ∘L Λ = Λ ∧ ∀ h : H, Λ h = 0 ↔
-      ∃ (u : L V) (v : L W), (∀ᵐ x : ℝ, x ≤ T → u x = 0) ∧ (∀ᵐ x : ℝ, x ≤ T → v x = 0) ∧ h = J u + J' v) →
-      ∀ h, U (Λ h) = Λ (U h) := by
-  refine ⟨fun P ⟨h1, h2, h3⟩ => comm_of_ker U P h1 h2 fun h => ?_,
-    fun T Λ ⟨h1, h2, h3⟩ => comm_of_ker U Λ h1 h2 fun h => ?_⟩
+    (ht : ∀ (v : L W) (u : L V), (∀ᵐ x : ℝ, u x = t (v x)) → U (J' v) = J u)
+    : (∀ P : H →L[ℂ] H, IsOrthogonalProjectionTwoLines J J' P → ∀ h, U (P h) = P (U h))
+      ∧ ∀ (T : ℝ) (Λ : H →L[ℂ] H),
+        (IsSelfAdjoint Λ ∧ Λ ∘L Λ = Λ
+            ∧ ∀ h : H,
+              Λ h = 0
+                ↔ ∃ (u : L V) (v : L W),
+                  (∀ᵐ x : ℝ, x ≤ T → u x = 0) ∧ (∀ᵐ x : ℝ, x ≤ T → v x = 0) ∧ h = J u + J' v)
+          → ∀ h, U (Λ h) = Λ (U h) := by
+  refine ⟨
+    fun P ⟨h1, h2, h3⟩ => comm_of_ker U P h1 h2 fun h => ?_,
+    fun T Λ ⟨h1, h2, h3⟩ => comm_of_ker U Λ h1 h2 fun h => ?_
+  ⟩
   · rw [h3, h3]
     constructor
     · rintro ⟨a, b⟩
@@ -93,19 +111,23 @@ private theorem abs_main (J : L V →ₗᵢ[ℂ] H) (J' : L W →ₗᵢ[ℂ] H) 
 
 end Abstract
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.twistP :
-    ∀ {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
-      {μ : Measure (normOneGL (K := E) (n := (2 + 2)))} [μ.IsHaarMeasure] {θ : Twist μ}
-      {𝔢 : Side θ 2} (𝔵 : _root_.UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.Fam 𝔢),
-      θ.U ∘L 𝔵.P = 𝔵.P ∘L θ.U ∧
-      ∀ (T : ℝ) (Λ : L2 μ →L[ℂ] L2 μ), IsTrunc 𝔵.A.J 𝔵.A'.J T Λ → θ.U ∘L Λ = Λ ∘L θ.U := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.twistP
+    : ∀ {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+        {μ : Measure (normOneGL (K := E) (n := (2 + 2)))} [μ.IsHaarMeasure] {θ : Twist μ}
+        {𝔢 : Side θ 2} (𝔵 : _root_.UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.Fam 𝔢),
+      θ.U ∘L 𝔵.P = 𝔵.P ∘L θ.U
+        ∧ ∀ (T : ℝ) (Λ : L2 μ →L[ℂ] L2 μ), IsTrunc 𝔵.A.J 𝔵.A'.J T Λ → θ.U ∘L Λ = Λ ∘L θ.U := by
   intro E _ _ _ μ _ θ 𝔢 𝔵
   obtain ⟨U, hU, -, -⟩ := UpperTheory.ConvolutionTheory.C.twistUnitary E (2 + 2) μ θ
   have hU' : ∀ h, θ.U h = U h := fun h => by rw [← hU]; rfl
-  obtain ⟨t, -, ht⟩ := UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.convU E μ (BW.mu1 E 2) 𝔵.τ₂ 𝔵.τ₁ ⟨𝔵.pair.irr₂, 𝔵.pair.irr₁, 𝔵.pair.orth.symm⟩
-    𝔵.D 𝔵.d' 𝔵.d 𝔵.A' 𝔵.A 𝔵.σ θ 𝔵.θ₂ 𝔵.gal 𝔵.gal₂ 𝔵.stable 𝔵.swap₂ 𝔵.swap₁
-  obtain ⟨a, b⟩ := abs_main 𝔵.A.J 𝔵.A'.J U 𝔵.s t (fun u v h => by rw [← hU']; exact 𝔵.s_op u v h)
-    (fun v u h => by rw [← hU']; exact ht v u h)
+  obtain ⟨t, -, ht⟩ :=
+    UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.convU E μ (BW.mu1 E 2) 𝔵.τ₂ 𝔵.τ₁
+      ⟨𝔵.pair.irr₂, 𝔵.pair.irr₁, 𝔵.pair.orth.symm⟩ 𝔵.D 𝔵.d' 𝔵.d 𝔵.A' 𝔵.A 𝔵.σ θ 𝔵.θ₂ 𝔵.gal 𝔵.gal₂
+      𝔵.stable 𝔵.swap₂ 𝔵.swap₁
+  obtain ⟨a, b⟩ :=
+    abs_main 𝔵.A.J 𝔵.A'.J U 𝔵.s t
+      (fun u v h => by rw [← hU']; exact 𝔵.s_op u v h)
+      (fun v u h => by rw [← hU']; exact ht v u h)
   refine ⟨ContinuousLinearMap.ext fun h => ?_, fun T Λ hΛ => ContinuousLinearMap.ext fun h => ?_⟩
   · simp only [ContinuousLinearMap.comp_apply, hU']
     exact a _ 𝔵.isP h

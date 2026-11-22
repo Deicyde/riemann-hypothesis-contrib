@@ -10,15 +10,17 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma
 
-theorem isLat_of_comap_inl_of_map_snd (K : UQ) (B₁ B₂ : InvAlg K) (M : Submodule K.O (B₁.A × B₂.A))
+theorem isLat_of_comap_inl_of_map_snd
+    (K : UQ) (B₁ B₂ : InvAlg K) (M : Submodule K.O (B₁.A × B₂.A))
     (h₁ : IsLat K.O K.E (M.comap (LinearMap.inl K.O B₁.A B₂.A)))
-    (h₂ : IsLat K.O K.E (M.map (LinearMap.snd K.O B₁.A B₂.A))) : IsLat K.O K.E M := by
+    (h₂ : IsLat K.O K.E (M.map (LinearMap.snd K.O B₁.A B₂.A)))
+    : IsLat K.O K.E M := by
   obtain ⟨f₁, s₁⟩ := h₁
   obtain ⟨f₂, s₂⟩ := h₂
   refine ⟨?_, ?_⟩
   · refine Submodule.fg_of_fg_map_of_fg_inf_ker (LinearMap.snd K.O B₁.A B₂.A) f₂ ?_
-    have : M ⊓ LinearMap.ker (LinearMap.snd K.O B₁.A B₂.A) =
-        (M.comap (LinearMap.inl K.O B₁.A B₂.A)).map (LinearMap.inl K.O B₁.A B₂.A) := by
+    have : M ⊓ LinearMap.ker (LinearMap.snd K.O B₁.A B₂.A)
+        = (M.comap (LinearMap.inl K.O B₁.A B₂.A)).map (LinearMap.inl K.O B₁.A B₂.A) := by
       ext ⟨a, b⟩
       simp only [Submodule.mem_inf, LinearMap.mem_ker, LinearMap.snd_apply, Submodule.mem_map,
         Submodule.mem_comap, LinearMap.inl_apply]
@@ -34,10 +36,15 @@ theorem isLat_of_comap_inl_of_map_snd (K : UQ) (B₁ B₂ : InvAlg K) (M : Submo
   · set S := Submodule.span K.E (M : Set (B₁.A × B₂.A)) with hS
     have hinl : ∀ a : B₁.A, ((a, 0) : B₁.A × B₂.A) ∈ S := by
       intro a
-      have ha : a ∈ Submodule.span K.E ((M.comap (LinearMap.inl K.O B₁.A B₂.A) : Submodule K.O B₁.A) : Set B₁.A) := by
+      have ha
+          : a ∈ Submodule.span K.E
+            ((M.comap (LinearMap.inl K.O B₁.A B₂.A) : Submodule K.O B₁.A) : Set B₁.A) := by
         rw [s₁]; trivial
-      have hle : (Submodule.span K.E ((M.comap (LinearMap.inl K.O B₁.A B₂.A) : Submodule K.O B₁.A) : Set B₁.A)).map
-          (LinearMap.inl K.E B₁.A B₂.A) ≤ S := by
+      have hle
+          : (Submodule.span K.E
+                ((M.comap (LinearMap.inl K.O B₁.A B₂.A) : Submodule K.O B₁.A) : Set B₁.A)).map
+              (LinearMap.inl K.E B₁.A B₂.A)
+            ≤ S := by
         rw [Submodule.map_span]
         apply Submodule.span_mono
         rintro _ ⟨c, hc, rfl⟩

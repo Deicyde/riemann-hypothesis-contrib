@@ -26,11 +26,16 @@ private lemma card_stabilizer_smul_eq' {G α : Type} [Group G] [MulAction G α] 
     ENat.card (stabilizer G (g • a)) = ENat.card (stabilizer G a) :=
   (ENat.card_congr (stabilizerEquivStabilizer (g := g) rfl).toEquiv).symm
 
-
 open NumberField Matrix in
 open scoped ENNReal Classical in
 open MulAction in
-theorem _root_.GlobalTheory.Mass.OrbTransport.main : ∀ (G G' α β : Type) [Group G] [Group G'] [MulAction G α] [MulAction G' β] (φ : G ≃* G') (f : α → β) (X : Set α) (Y : Set β) (N : β → ℝ≥0∞), _root_.GlobalTheory.Mass.Stable G X → _root_.GlobalTheory.Mass.Stable G' Y → Set.BijOn f X Y → (∀ (g : G), ∀ x ∈ X, f (g • x) = φ g • f x) → (∀ (g : G') y, N (g • y) = N y) → _root_.GlobalTheory.Mass.orbSum G X (fun x => N (f x)) = _root_.GlobalTheory.Mass.orbSum G' Y N := by
+theorem _root_.GlobalTheory.Mass.OrbTransport.main
+    : ∀ (G G' α β : Type) [Group G] [Group G'] [MulAction G α] [MulAction G' β] (φ : G ≃* G')
+        (f : α → β) (X : Set α) (Y : Set β) (N : β → ℝ≥0∞),
+      _root_.GlobalTheory.Mass.Stable G X → _root_.GlobalTheory.Mass.Stable G' Y → Set.BijOn f X Y
+        → (∀ (g : G), ∀ x ∈ X, f (g • x) = φ g • f x) → (∀ (g : G') y, N (g • y) = N y)
+        → _root_.GlobalTheory.Mass.orbSum G X (fun x => N (f x))
+          = _root_.GlobalTheory.Mass.orbSum G' Y N := by
   intro G G' α β _ _ _ _ φ f X Y N hX hY hf hequiv hN
   have hcard : ∀ x ∈ X, ENat.card (stabilizer G' (f x)) = ENat.card (stabilizer G x) := by
     intro x hx
@@ -38,8 +43,9 @@ theorem _root_.GlobalTheory.Mass.OrbTransport.main : ∀ (G G' α β : Type) [Gr
     simp only [mem_stabilizer_iff, MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv]
     rw [← hequiv g x hx]
     exact ⟨fun h => by rw [h], fun h => hf.injOn (hX g x hx) hx h⟩
-  have hout : ∀ q : {q : orbitRel.Quotient G α // q.out ∈ X},
-      (Quotient.mk (orbitRel G' β) (f q.1.out)).out ∈ Y := by
+  have hout
+      : ∀ q : {q : orbitRel.Quotient G α // q.out ∈ X},
+        (Quotient.mk (orbitRel G' β) (f q.1.out)).out ∈ Y := by
     intro q
     obtain ⟨g, hg⟩ := exists_smul_eq_orbit_out (G := G') (f q.1.out)
     rw [← hg]

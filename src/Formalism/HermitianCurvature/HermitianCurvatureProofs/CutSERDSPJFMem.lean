@@ -13,16 +13,24 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 theorem spectral_pairing_orbital_membership : RDSPJFMem := by
   intro k r Wp Wq _ _ _ _ _ _ D F hF hcs hts
   have hpos : ∀ g ∈ tsupport F, (0 : ℝ) < Gf k r D.z D.z' g := fun g hg => (hts hg).2.2
-  obtain ⟨ε, hε, hεle⟩ := hcs.isCompact.exists_forall_le' (PositiveOrbitOpen.gf_cont D.z D.z').continuousOn hpos
+  obtain ⟨ε, hε, hεle⟩ :=
+    hcs.isCompact.exists_forall_le' (PositiveOrbitOpen.gf_cont D.z D.z').continuousOn hpos
   have hnice : NiceAll D F := by
-    refine ⟨ε, hε, hF, fun A m => compact_support_finite_class k r _ F (tsupport F) hF hcs.isCompact ?_ A m, ?_⟩
+    refine ⟨
+      ε,
+      hε,
+      hF,
+      fun A m => compact_support_finite_class k r _ F (tsupport F) hF hcs.isCompact ?_ A m,
+      ?_
+    ⟩
     · intro g hg
       by_contra h
       exact hg (subset_tsupport _ h)

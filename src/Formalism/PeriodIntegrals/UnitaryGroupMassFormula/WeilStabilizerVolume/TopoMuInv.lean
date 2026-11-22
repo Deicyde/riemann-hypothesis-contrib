@@ -17,18 +17,23 @@ noncomputable section
 
 namespace PI.VolStabW.TopoMuInv
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Matrix NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Matrix NumberField
+  IsDedekindDomain
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
-  [SecondCountableTopology R] (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  (R : Type)
+  [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] [SecondCountableTopology R]
+  (σ : E →ₐ[F] E)
+  {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
 
 end PI.VolStabW.TopoMuInv
 
 namespace PI.VolStabW
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW
 open scoped TensorProduct
 
 end PI.VolStabW

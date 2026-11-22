@@ -8,10 +8,10 @@ open MeasureTheory Set TopologicalSpace
 
 namespace GlobalTheory
 
-theorem discreteSubgroup_countable_and_exists_strict_fundamentalDomain : ∀ {G : Type} [Group G]
-    [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G] [MeasurableSpace G]
-    [BorelSpace G] (Γ : Subgroup G) [DiscreteTopology Γ],
-    Countable Γ ∧ ∃ D : Set G, MeasurableSet D ∧ ∀ g : G, ∃! γ : Γ, (γ : G) * g ∈ D := by
+theorem discreteSubgroup_countable_and_exists_strict_fundamentalDomain
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+        [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G) [DiscreteTopology Γ],
+      Countable Γ ∧ ∃ D : Set G, MeasurableSet D ∧ ∀ g : G, ∃! γ : Γ, (γ : G) * g ∈ D := by
   intro G _ _ _ _ _ _ Γ _
   refine ⟨TopologicalSpace.separableSpace_iff_countable.1 inferInstance, ?_⟩
 
@@ -55,11 +55,10 @@ theorem discreteSubgroup_countable_and_exists_strict_fundamentalDomain : ∀ {G 
   let Sat : ℕ → Set G := fun m => {x | ∃ γ : Γ, (γ : G) * x ∈ f m}
   have hSat : ∀ m, IsOpen (Sat m) := by
     intro m
-    have : Sat m = ⋃ γ : Γ, (fun x => (γ : G) * x) ⁻¹' f m := by
-      ext x; simp [Sat]
+    have : Sat m = ⋃ γ : Γ, (fun x => (γ : G) * x) ⁻¹' f m := by ext x; simp [Sat]
     rw [this]
-    exact isOpen_iUnion fun γ => ((isBasis_countableBasis G).isOpen (hfS m).1).preimage
-      (continuous_const_mul _)
+    exact isOpen_iUnion fun γ =>
+      ((isBasis_countableBasis G).isOpen (hfS m).1).preimage (continuous_const_mul _)
   let D : Set G := ⋃ n, (f n ∩ ⋂ m ∈ Finset.range n, (Sat m)ᶜ)
   refine ⟨D, ?_, ?_⟩
   · refine MeasurableSet.iUnion fun n => ?_
@@ -73,7 +72,8 @@ theorem discreteSubgroup_countable_and_exists_strict_fundamentalDomain : ∀ {G 
       exact ⟨n, 1, by simpa using hgW⟩
     classical
     obtain ⟨γ, hγ⟩ := Nat.find_spec hex
-    have hmem : ∀ (δ : Γ) n, (δ : G) * g ∈ f n → (∀ m < n, (δ : G) * g ∉ Sat m) → (δ : G) * g ∈ D := by
+    have hmem
+        : ∀ (δ : Γ) n, (δ : G) * g ∈ f n → (∀ m < n, (δ : G) * g ∉ Sat m) → (δ : G) * g ∈ D := by
       intro δ n h1 h2
       refine mem_iUnion.2 ⟨n, h1, ?_⟩
       simp only [mem_iInter, Finset.mem_range, mem_compl_iff]
@@ -83,25 +83,30 @@ theorem discreteSubgroup_countable_and_exists_strict_fundamentalDomain : ∀ {G 
       refine Nat.find_min hex hm ⟨δ * γ, ?_⟩
       simpa [mul_assoc] using hδ
     · intro δ hδ
-      have hD : ∀ (ε : Γ), (ε : G) * g ∈ D → ∃ n, (ε : G) * g ∈ f n ∧ ∀ m < n, (ε : G) * g ∉ Sat m := by
+      have hD
+          : ∀ (ε : Γ), (ε : G) * g ∈ D → ∃ n, (ε : G) * g ∈ f n ∧ ∀ m < n, (ε : G) * g ∉ Sat m := by
         intro ε hε
         obtain ⟨n, h1, h2⟩ := mem_iUnion.1 hε
         refine ⟨n, h1, fun m hm => ?_⟩
         simp only [mem_iInter, Finset.mem_range, mem_compl_iff] at h2
         exact h2 m hm
       obtain ⟨n1, h11, h12⟩ := hD δ hδ
-      obtain ⟨n2, h21, h22⟩ := hD γ (hmem γ _ hγ fun m hm hS => by
-        obtain ⟨δ', hδ'⟩ := hS
-        exact Nat.find_min hex hm ⟨δ' * γ, by simpa [mul_assoc] using hδ'⟩)
+      obtain ⟨n2, h21, h22⟩ :=
+        hD γ
+          (hmem γ _ hγ fun m hm hS => by
+            obtain ⟨δ', hδ'⟩ := hS
+            exact Nat.find_min hex hm ⟨δ' * γ, by simpa [mul_assoc] using hδ'⟩)
       have hn : n1 = n2 := by
         rcases lt_trichotomy n1 n2 with h | h | h
         · exact absurd ⟨δ * γ⁻¹, by simpa [mul_assoc] using h11⟩ (h22 n1 h)
         · exact h
         · exact absurd ⟨γ * δ⁻¹, by simpa [mul_assoc] using h21⟩ (h12 n2 h)
       subst hn
-      have hP := (hfS n1).2 _ h11 _ h21 (by
-        have : ((δ : G) * g) * ((γ : G) * g)⁻¹ = ((δ * γ⁻¹ : Γ) : G) := by simp [mul_assoc]
-        rw [this]; exact (δ * γ⁻¹).2)
+      have hP :=
+        (hfS n1).2 _ h11 _ h21 (by
+          have : ((δ : G) * g) * ((γ : G) * g)⁻¹ = ((δ * γ⁻¹ : Γ) : G) := by simp [mul_assoc]
+          rw [this]
+          exact (δ * γ⁻¹).2)
       exact Subtype.ext (mul_right_cancel hP)
 
 end GlobalTheory

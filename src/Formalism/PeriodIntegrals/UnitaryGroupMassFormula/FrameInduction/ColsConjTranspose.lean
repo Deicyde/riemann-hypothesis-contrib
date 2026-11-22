@@ -9,8 +9,8 @@ open Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.Fo
 noncomputable section
 namespace PI.FrameInd.UPosW
 
-def cols (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r) :
-    Matrix (Fin (2 * r + k + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ :=
+def cols (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ :=
   Matrix.of fun p j => gramVec k r z z' γ j p
 
 lemma cols_conjTranspose (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r) :
@@ -93,7 +93,7 @@ theorem uPos_of (hN : NegBound) : UPos := by
     intro a
     show (cols k r z z' γ * Q) *ᵥ Sum.elim 0 a = _
     rw [Matrix.mulVec_mulVec]
-  have hLre : ∀ a, (herm (Hpk k r) (L a) (L a)).re = -∑ b, Complex.normSq (a b) := by
+  have hLre : ∀ a, (herm (Hpk k r) (L a) (L a)).re = - ∑ b, Complex.normSq (a b) := by
     intro a
     rw [hLa, herm_cols, ← blk_re a, ← hQG, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec,
       Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
@@ -104,15 +104,17 @@ theorem uPos_of (hN : NegBound) : UPos := by
     L.coprod (LinearMap.toSpanSingleton ℂ _ v)
   have hM : ∀ p, M p = L p.1 + p.2 • v := fun p => by
     simp [M, LinearMap.coprod_apply, LinearMap.toSpanSingleton_apply]
-  have hMre : ∀ p, (herm (Hpk k r) (M p) (M p)).re =
-      -∑ b, Complex.normSq (p.1 b) + Complex.normSq p.2 * (herm (Hpk k r) v v).re := by
+  have hMre
+      : ∀ p,
+        (herm (Hpk k r) (M p) (M p)).re
+          = - ∑ b, Complex.normSq (p.1 b) + Complex.normSq p.2 * (herm (Hpk k r) v v).re := by
     intro p
     have ht : star p.2 * p.2 = (Complex.normSq p.2 : ℂ) := by
       rw [Complex.normSq_eq_conj_mul_self]; rfl
     rw [hM, herm_add_smul _ _ _ _ (hperp p.1).1 (hperp p.1).2, Complex.add_re, hLre, ht,
       Complex.re_ofReal_mul]
-  have hsum : ∀ a : Fin (r + 1) → ℂ, 0 ≤ ∑ b, Complex.normSq (a b) :=
-    fun a => Finset.sum_nonneg fun b _ => Complex.normSq_nonneg _
+  have hsum : ∀ a : Fin (r + 1) → ℂ, 0 ≤ ∑ b, Complex.normSq (a b) := fun a =>
+    Finset.sum_nonneg fun b _ => Complex.normSq_nonneg _
   have hnp : ∀ x ∈ LinearMap.range M, (herm (Hpk k r) x x).re ≤ 0 := by
     rintro x ⟨p, rfl⟩
     rw [hMre]
@@ -133,8 +135,9 @@ theorem uPos_of (hN : NegBound) : UPos := by
     have hs0 : ∑ b, Complex.normSq (p.1 b) = 0 := by linarith
     have ha : p.1 = 0 := by
       funext b
-      have hb := (Finset.sum_eq_zero_iff_of_nonneg
-        (fun b _ => Complex.normSq_nonneg (p.1 b))).1 hs0 b (Finset.mem_univ b)
+      have hb :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun b _ => Complex.normSq_nonneg (p.1 b))).1 hs0 b
+          (Finset.mem_univ b)
       simpa using hb
     have ht : p.2 • v = 0 := by
       rw [hM, ha, map_zero, zero_add] at hp0

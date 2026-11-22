@@ -15,18 +15,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsE
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.SmGL GlobalTheory.DiscSpec
 open scoped ContDiff
 
 namespace GlobalTheory.DiscSMO
 
-variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a c N : ℕ} {n : Fin c → ℕ}
-  {π π' : ∀ i, CuspSub E (n i)}
-
+variable
+  {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+  {a c N : ℕ} {n : Fin c → ℕ} {π π' : ∀ i, CuspSub E (n i)}
 
 def prodForm (φ : ∀ i, (π i).V) : (∀ i, GA E (n i)) → ℂ := fun m => ∏ i, (φ i).1.1 (m i)
 
-structure IsTensorOf (T : ∀ i, (π i).V →ₗ[ℂ] (π' i).V) (Θ : Module.End ℂ ((∀ i, GA E (n i)) → ℂ)) : Prop where
+structure IsTensorOf (T : ∀ i, (π i).V →ₗ[ℂ] (π' i).V) (Θ : Module.End ℂ ((∀ i, GA E (n i)) → ℂ))
+    : Prop where
   comm : ∀ i o φ, T i ((π i).op o φ) = (π' i).op o (T i φ)
   prod : ∀ φ, Θ (prodForm φ) = prodForm fun i => T i (φ i)
 
@@ -38,16 +40,14 @@ end IsTensorOf
 
 variable {h : ∑ i, n i = N}
 
-
-
-
 namespace IsTensorOf
 
 variable {T : ∀ i, (π i).V →ₗ[ℂ] (π' i).V} {Θ : Module.End ℂ ((∀ i, GA E (n i)) → ℂ)}
 
 end IsTensorOf
 
-theorem mem_Sm_of_one {f : GA E a → ℂ} (hf : ∀ g, ContDiffAt ℝ ∞ (chart f g) (oneL E a)) : f ∈ Sm E a := by
+theorem mem_Sm_of_one {f : GA E a → ℂ} (hf : ∀ g, ContDiffAt ℝ ∞ (chart f g) (oneL E a))
+    : f ∈ Sm E a := by
   rintro g x ⟨y, hy⟩
   obtain rfl : x = toL y.val := hy.symm
   have e : chart f g = chart f (g * infGL E a y) ∘ lmul (toL (y⁻¹).val) := by
@@ -58,9 +58,10 @@ theorem mem_Sm_of_one {f : GA E a → ℂ} (hf : ∀ g, ContDiffAt ℝ ∞ (char
   rw [e1]
   exact hf _
 
-theorem contDiffAt_chart_mul {f : GA E a → ℂ} {g : GA E a} {y : GL (Fin a) (Cinf E)}
-    (hf : ContDiffAt ℝ ∞ (chart (fun x => f (x * infGL E a y)) g) (oneL E a)) :
-    ContDiffAt ℝ ∞ (chart f (g * infGL E a y)) (oneL E a) := by
+theorem contDiffAt_chart_mul
+    {f : GA E a → ℂ} {g : GA E a} {y : GL (Fin a) (Cinf E)}
+    (hf : ContDiffAt ℝ ∞ (chart (fun x => f (x * infGL E a y)) g) (oneL E a))
+    : ContDiffAt ℝ ∞ (chart f (g * infGL E a y)) (oneL E a) := by
   have e : chart f g = chart (fun x => f (x * infGL E a y)) g ∘ rmul (toL (y⁻¹).val) := by
     rw [← chart_rt_inf]
     simp only [mul_assoc, ← map_mul, inv_mul_cancel, map_one, mul_one]
@@ -73,14 +74,11 @@ theorem contDiffAt_chart_mul {f : GA E a → ℂ} {g : GA E a} {y : GL (Fin a) (
   rw [e1]
   exact hf
 
-
 namespace IsTensorOf
 
 variable {T : ∀ i, (π i).V →ₗ[ℂ] (π' i).V} {Θ : Module.End ℂ ((∀ i, GA E (n i)) → ℂ)}
 
-
 end IsTensorOf
-
 
 end GlobalTheory.DiscSMO
 

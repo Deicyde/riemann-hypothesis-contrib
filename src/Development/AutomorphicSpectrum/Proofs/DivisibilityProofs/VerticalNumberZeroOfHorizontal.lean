@@ -13,10 +13,12 @@ open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.Compan
 
 namespace GlobalTheory.CompanionTheory.Ar.Num
 
-theorem relDim_lt_of_dim_lt {F : Type} [Field F] {K : Type} [Fintype K] [DecidableEq K]
-    {ι : K → Type} (I : Ideal (MRing ι F)) (n : ℕ)
-    (h : ringKrullDim (MRing ι F ⧸ I) < ((n + Fintype.card K : ℕ) : WithBot ℕ∞)) :
-    GroundTheory.Heights₂.Heights.FieldNumbers.relDim I < ((n : ℕ) : WithBot (WithTop ℤ)) := by
+theorem relDim_lt_of_dim_lt
+    {F : Type} [Field F]
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} (I : Ideal (MRing ι F))
+    (n : ℕ) (h : ringKrullDim (MRing ι F ⧸ I) < ((n + Fintype.card K : ℕ) : WithBot ℕ∞))
+    : GroundTheory.Heights₂.Heights.FieldNumbers.relDim I < ((n : ℕ) : WithBot (WithTop ℤ)) := by
   unfold GroundTheory.Heights₂.Heights.FieldNumbers.relDim
   generalize ringKrullDim (MRing ι F ⧸ I) = a at h ⊢
   induction a using WithBot.recBotCoe with
@@ -31,12 +33,13 @@ theorem relDim_lt_of_dim_lt {F : Type} [Field F] {K : Type} [Fintype K] [Decidab
       have h' : ((m : ℕ) : ℕ∞) < ((n + Fintype.card K : ℕ) : ℕ∞) := by exact_mod_cast h
       have h'' : m < n + Fintype.card K := by exact_mod_cast h'
       have hlt : (m : ℤ) - Fintype.card K < n := by omega
-      change (((((m : ℤ) - Fintype.card K : ℤ) : WithTop ℤ)) : WithBot (WithTop ℤ)) <
-        (((n : ℤ) : WithTop ℤ) : WithBot (WithTop ℤ))
+      change (((((m : ℤ) - Fintype.card K : ℤ) : WithTop ℤ)) : WithBot (WithTop ℤ))
+        < (((n : ℤ) : WithTop ℤ) : WithBot (WithTop ℤ))
       exact_mod_cast hlt
 
-theorem dim_lt_of_two_drops {a b : WithBot ℕ∞} {n : ℕ} (h₁ : a + 1 ≤ b)
-    (h₂ : b + 1 ≤ ((n + 1 : ℕ) : WithBot ℕ∞)) : a < (n : WithBot ℕ∞) := by
+theorem dim_lt_of_two_drops
+    {a b : WithBot ℕ∞} {n : ℕ} (h₁ : a + 1 ≤ b) (h₂ : b + 1 ≤ ((n + 1 : ℕ) : WithBot ℕ∞))
+    : a < (n : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot => exact WithBot.bot_lt_coe _
   | coe a =>
@@ -58,35 +61,50 @@ theorem dim_lt_of_two_drops {a b : WithBot ℕ∞} {n : ℕ} (h₁ : a + 1 ≤ b
         simp at h₃
       exact_mod_cast h₄
 
-theorem specialIdeal_dim_add_one_le {O : Type} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] {ϖ : O} (hϖ : Irreducible ϖ) {K : Type} [Fintype K] [DecidableEq K]
-    {ι : K → Type} [∀ k, Fintype (ι k)] (W : Ideal (MRing ι O)) [W.IsPrime]
-    (hW : (C ϖ : MRing ι O) ∉ W) :
-    ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal W) + 1 ≤
-      ringKrullDim (MRing ι O ⧸ W) := by
+theorem specialIdeal_dim_add_one_le
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (W : Ideal (MRing ι O)) [W.IsPrime]
+    (hW : (C ϖ : MRing ι O) ∉ W)
+    : ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal W) + 1
+      ≤ ringKrullDim (MRing ι O ⧸ W) := by
   have hres : IsLocalRing.residue O ϖ = 0 :=
-    (IsLocalRing.residue_eq_zero_iff ϖ).2
-      ((IsLocalRing.mem_maximalIdeal ϖ).2 hϖ.not_isUnit)
+    (IsLocalRing.residue_eq_zero_iff ϖ).2 ((IsLocalRing.mem_maximalIdeal ϖ).2 hϖ.not_isUnit)
   have hsp : specialIdeal (W ⊔ Ideal.span {(C ϖ : MRing ι O)}) = specialIdeal W := by
     unfold specialIdeal
     rw [Ideal.map_sup, Ideal.map_span, Set.image_singleton, MvPolynomial.map_C, hres, map_zero]
     simp
-  have hdim := SpecialQuotDim.full O ϖ hϖ K ι (W ⊔ Ideal.span {(C ϖ : MRing ι O)})
-    (Ideal.mem_sup_right (Ideal.subset_span rfl))
+  have hdim :=
+    SpecialQuotDim.full O ϖ hϖ K ι (W ⊔ Ideal.span {(C ϖ : MRing ι O)})
+      (Ideal.mem_sup_right (Ideal.subset_span rfl))
   rw [hsp] at hdim
   rw [hdim]
   have hne : Ideal.Quotient.mk W (C ϖ) ≠ 0 := fun h => hW (Ideal.Quotient.eq_zero_iff_mem.1 h)
   have h1 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor (mem_nonZeroDivisors_of_ne_zero hne)
-  have he : ringKrullDim ((MRing ι O ⧸ W) ⧸ Ideal.span {Ideal.Quotient.mk W (C ϖ : MRing ι O)}) =
-      ringKrullDim (MRing ι O ⧸ (W ⊔ Ideal.span {(C ϖ : MRing ι O)})) := by
+  have he
+      : ringKrullDim ((MRing ι O ⧸ W) ⧸ Ideal.span {Ideal.Quotient.mk W (C ϖ : MRing ι O)})
+        = ringKrullDim (MRing ι O ⧸ (W ⊔ Ideal.span {(C ϖ : MRing ι O)})) := by
     refine ringKrullDim_eq_of_ringEquiv ?_
-    have hm : (Ideal.span {(C ϖ : MRing ι O)}).map (Ideal.Quotient.mk W) =
-        Ideal.span {Ideal.Quotient.mk W (C ϖ : MRing ι O)} := by
+    have hm
+        : (Ideal.span {(C ϖ : MRing ι O)}).map (Ideal.Quotient.mk W)
+          = Ideal.span {Ideal.Quotient.mk W (C ϖ : MRing ι O)} := by
       rw [Ideal.map_span, Set.image_singleton]
     exact (Ideal.quotEquivOfEq hm.symm).trans (DoubleQuot.quotQuotEquivQuotSup _ _)
   rwa [he] at h1
 
-theorem horizontal_vNumL_eq_zero : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O), Irreducible ϖ → ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι O)) (d : ℕ), IsModelOver P d → ∀ (a : K → ℕ) (f : MRing ι O), IsMultiHomog f a → f ∉ P → ∀ W, divCycle P f W ≠ 0 → (C ϖ : MRing ι O) ∉ W → ∀ l : List (K → ℤ), l.length = d → vNumL W l = 0 := by
+theorem horizontal_vNumL_eq_zero
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+            (P : Ideal (MRing ι O)) (d : ℕ),
+          IsModelOver P d
+            → ∀ (a : K → ℕ) (f : MRing ι O),
+              IsMultiHomog f a → f ∉ P
+                → ∀ W,
+                  divCycle P f W ≠ 0 → (C ϖ : MRing ι O) ∉ W
+                    → ∀ l : List (K → ℤ), l.length = d → vNumL W l = 0 := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP a f hf hfP W hW hϖW l hl
   have hPp : P.IsPrime := hP.multiProj.isPrime
   unfold divCycle at hW

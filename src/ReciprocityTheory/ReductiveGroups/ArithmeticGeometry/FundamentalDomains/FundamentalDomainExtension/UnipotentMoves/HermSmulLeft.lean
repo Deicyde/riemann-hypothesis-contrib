@@ -22,7 +22,8 @@ theorem sExt : SExt E := by
   classical
   have hsmul_mem : ∀ (α : 𝓞 E) (x : Fin r → E), x ∈ X.Λp ξ → (α : E) • x ∈ X.Λp ξ := by
     intro α x hx
-    simp only [Data.Λp, AddSubgroup.mem_inf, Submodule.mem_toAddSubgroup, AddMonoidHom.mem_ker] at hx ⊢
+    simp only [Data.Λp, AddSubgroup.mem_inf, Submodule.mem_toAddSubgroup, AddMonoidHom.mem_ker]
+      at hx ⊢
     obtain ⟨h1, h2⟩ := hx
     refine ⟨?_, ?_⟩
     · have h3 := X.Λ.smul_mem α h1
@@ -30,26 +31,29 @@ theorem sExt : SExt E := by
     · change herm X.Gm ((α : E) • x) ξ = 0
       change herm X.Gm x ξ = 0 at h2
       rw [herm_smul_left', h2, mul_zero]
-  let N0 : Submodule (𝓞 E) (Fin r → E) :=
-    { carrier := X.Λp ξ
-      add_mem' := fun ha hb => (X.Λp ξ).add_mem ha hb
-      zero_mem' := (X.Λp ξ).zero_mem
-      smul_mem' := fun α x hx => by
-        rw [algebra_compatible_smul E α x]
-        exact hsmul_mem α x hx }
-  let fL : N0 →ₗ[𝓞 E] E :=
-    { toFun := fun x => f x
-      map_add' := fun x y => hadd x x.2 y y.2
-      map_smul' := fun α x => by
-        change f (α • (x : Fin r → E)) = α • f x
-        rw [algebra_compatible_smul E α (x : Fin r → E), hsm α x x.2, Algebra.smul_def] }
+  let N0 : Submodule (𝓞 E) (Fin r → E) := {
+    carrier := X.Λp ξ
+    add_mem' := fun ha hb => (X.Λp ξ).add_mem ha hb
+    zero_mem' := (X.Λp ξ).zero_mem
+    smul_mem' := fun α x hx => by
+      rw [algebra_compatible_smul E α x]
+      exact hsmul_mem α x hx
+  }
+  let fL : N0 →ₗ[𝓞 E] E := {
+    toFun := fun x => f x
+    map_add' := fun x y => hadd x x.2 y y.2
+    map_smul' := fun α x => by
+      change f (α • (x : Fin r → E)) = α • f x
+      rw [algebra_compatible_smul E α (x : Fin r → E), hsm α x x.2, Algebra.smul_def]
+  }
   obtain ⟨s, hsM, hspan, hli⟩ := exists_linearIndependent E (X.Λp ξ : Set (Fin r → E))
   have hli' : LinearIndepOn E id s := hli
   let B := Module.Basis.extend (K := E) (s := s) hli'
   let F : (Fin r → E) →ₗ[E] E := B.constr E (fun v => if (v : Fin r → E) ∈ s then f v else 0)
   have hFs : ∀ v ∈ s, F v = f v := by
     intro v hv
-    have hv' : v ∈ LinearIndepOn.extend hli' (Set.subset_univ s) := Module.Basis.subset_extend hli' hv
+    have hv' : v ∈ LinearIndepOn.extend hli' (Set.subset_univ s) :=
+      Module.Basis.subset_extend hli' hv
     have h1 := B.constr_basis E (fun v => if (v : Fin r → E) ∈ s then f v else 0) ⟨v, hv'⟩
     have h2 : B ⟨v, hv'⟩ = v := by simp [B, Module.Basis.coe_extend]
     rw [h2] at h1
@@ -73,7 +77,8 @@ theorem sExt : SExt E := by
       rw [← hsum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, hFs _ (g i).2, smul_eq_mul]
-  have hdμ : algebraMap (𝓞 E) E (d : 𝓞 E) • μ = ∑ i, algebraMap (𝓞 E) E (a i) • (g i : Fin r → E) := by
+  have hdμ
+      : algebraMap (𝓞 E) E (d : 𝓞 E) • μ = ∑ i, algebraMap (𝓞 E) E (a i) • (g i : Fin r → E) := by
     rw [← hsum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [ha i, smul_smul, Algebra.smul_def (d : 𝓞 E) (c i)]

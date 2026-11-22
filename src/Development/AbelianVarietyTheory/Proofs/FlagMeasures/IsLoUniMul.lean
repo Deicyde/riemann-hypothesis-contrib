@@ -13,8 +13,11 @@ namespace GlobalTheory.LowerUnipotentMul
 
 open Matrix
 
-theorem isLoUni_mul {R : Type*} [CommRing R] {n : ℕ} {l l' : Matrix (Fin n) (Fin n) R}
-    (hl : Formalism.MainNotions.S.IsLoUni l) (hl' : Formalism.MainNotions.S.IsLoUni l') : Formalism.MainNotions.S.IsLoUni (l * l') := by
+theorem isLoUni_mul
+    {R : Type*} [CommRing R]
+    {n : ℕ} {l l' : Matrix (Fin n) (Fin n) R}
+    (hl : Formalism.MainNotions.S.IsLoUni l) (hl' : Formalism.MainNotions.S.IsLoUni l')
+    : Formalism.MainNotions.S.IsLoUni (l * l') := by
   intro i j
   constructor
   · intro hij
@@ -33,8 +36,10 @@ theorem isLoUni_mul {R : Type*} [CommRing R] {n : ℕ} {l l' : Matrix (Fin n) (F
       · rw [(hl i k).1 h, zero_mul]
     · intro h; exact absurd (Finset.mem_univ i) h
 
-theorem main : ∀ {R : Type u_1} [inst : CommRing R] {n : ℕ} {l l' : Matrix (Fin n) (Fin n) R},
-    Formalism.MainNotions.S.IsLoUni l → Formalism.MainNotions.S.IsLoUni l' → Formalism.MainNotions.S.IsLoUni (l * l') :=
-  fun hl hl' => isLoUni_mul hl hl'
+theorem main
+    : ∀ {R : Type u_1} [inst : CommRing R] {n : ℕ} {l l' : Matrix (Fin n) (Fin n) R},
+      Formalism.MainNotions.S.IsLoUni l → Formalism.MainNotions.S.IsLoUni l'
+        → Formalism.MainNotions.S.IsLoUni (l * l') := fun hl hl' =>
+  isLoUni_mul hl hl'
 
 end GlobalTheory.LowerUnipotentMul

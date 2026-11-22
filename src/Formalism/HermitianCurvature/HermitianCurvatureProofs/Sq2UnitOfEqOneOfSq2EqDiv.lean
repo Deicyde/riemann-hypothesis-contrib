@@ -12,12 +12,15 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def utv {k r m : ℕ} (ε T : ℝ) (Gp : Mat k r → ℝ) (om : Mat k r → Fin m → ℂ) (g : Mat k r) : Fin m → ℂ :=
-  fun a => (Real.sqrt T : ℂ) * (Phh ε ((Gp g : ℝ) : ℂ) * om g a)
+def utv {k r m : ℕ} (ε T : ℝ) (Gp : Mat k r → ℝ) (om : Mat k r → Fin m → ℂ) (g : Mat k r)
+    : Fin m → ℂ := fun a =>
+  (Real.sqrt T : ℂ) * (Phh ε ((Gp g : ℝ) : ℂ) * om g a)
 
 lemma utv_eq {k r m : ℕ} {ε T : ℝ} (hε : 0 < ε) (hT : 0 < T) (Gp : Mat k r → ℝ) (om : Mat k r → Fin m → ℂ)
     {g : Mat k r} (hg : ε / 2 < Gp g) : C6.unitOf T (Gp g) (om g) = utv ε T Gp om g := by
@@ -93,7 +96,9 @@ end Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -111,18 +116,27 @@ theorem c6_fib_cost_of_pieces : C6.FibCostOfParts := by
   have hψ : ContDiff ℝ ∞ (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) := hu1.prodMk hu2
   have hOε : IsOpen {g : Mat k r | ε / 2 < Gp g} := isOpen_lt continuous_const hGc
 
-  have hsph : ∀ g ∈ GV k r, ε / 2 < Gp g →
-      C6.unitOf T (Gp g) (om g) = utv ε T Gp om g ∧ C6.unitOf T' (Gp g) (om' g) = utv ε T' Gp om' g ∧
-      (C6.unitOf T (Gp g) (om g), C6.unitOf T' (Gp g) (om' g)) ∈
-        {w : (Fin m → ℂ) × (Fin m' → ℂ) | C6.sq2 w.1 = 1 ∧ C6.sq2 w.2 = 1} := by
+  have hsph
+      : ∀ g ∈ GV k r,
+        ε / 2 < Gp g
+          → C6.unitOf T (Gp g) (om g) = utv ε T Gp om g
+            ∧ C6.unitOf T' (Gp g) (om' g) = utv ε T' Gp om' g
+            ∧ (C6.unitOf T (Gp g) (om g), C6.unitOf T' (Gp g) (om' g))
+              ∈ {w : (Fin m → ℂ) × (Fin m' → ℂ) | C6.sq2 w.1 = 1 ∧ C6.sq2 w.2 = 1} := by
     intro g hg hgt
     have hpos : 0 < Gp g := by linarith
-    exact ⟨utv_eq hε hT Gp om hgt, utv_eq hε hT' Gp om' hgt, sq2_unitOf_eq_one_of_sq2_eq_div hT hpos (hsq g hg),
-      sq2_unitOf_eq_one_of_sq2_eq_div hT' hpos (hsq' g hg)⟩
+    exact ⟨
+      utv_eq hε hT Gp om hgt,
+      utv_eq hε hT' Gp om' hgt,
+      sq2_unitOf_eq_one_of_sq2_eq_div hT hpos (hsq g hg),
+      sq2_unitOf_eq_one_of_sq2_eq_div hT' hpos (hsq' g hg)
+    ⟩
   obtain ⟨Φ, hΦ, hΦK, hΦb⟩ := bump_ext _ O (spheres_compact m m') hO hKO Pi hPi
 
-  have hwl : ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) →
-      ∀ x ∈ wL u ++ wR v, inLie k r x.2 := by
+  have hwl
+      : ∀ u v : List (Mat k r),
+        (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X)
+          → ∀ x ∈ wL u ++ wR v, inLie k r x.2 := by
     intro u v hu hv x hx
     rcases List.mem_append.mp hx with hx | hx
     · simp only [wL, List.mem_map] at hx
@@ -140,54 +154,79 @@ theorem c6_fib_cost_of_pieces : C6.FibCostOfParts := by
   have hCM : ∀ j ≤ i, C1 j ≤ M ∧ C2 j ≤ M := by
     intro j hj
     have hmem : j ∈ Finset.range (i + 1) := Finset.mem_range.mpr (by omega)
-    have hle := Finset.single_le_sum (f := fun j => |C1 j| + |C2 j|)
-      (fun j _ => add_nonneg (abs_nonneg _) (abs_nonneg _)) hmem
+    have hle :=
+      Finset.single_le_sum
+        (f := fun j => |C1 j| + |C2 j|)
+        (fun j _ => add_nonneg (abs_nonneg _) (abs_nonneg _))
+        hmem
     rw [← hM] at hle
-    exact ⟨by linarith [le_abs_self (C1 j), abs_nonneg (C2 j)], by linarith [le_abs_self (C2 j), abs_nonneg (C1 j)]⟩
-  have H : ∀ w, admitted i w → w ≠ [] → ∀ g ∈ {g : Mat k r | g ∈ GV k r ∧ ε ≤ Gp g},
-      ‖Dw w (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) g‖ ≤
-        M * gN g ^ (2 * (r + 1) * w.length + (r + 1)) := by
+    exact ⟨
+      by linarith [le_abs_self (C1 j), abs_nonneg (C2 j)],
+      by linarith [le_abs_self (C2 j), abs_nonneg (C1 j)]
+    ⟩
+  have H
+      : ∀ w,
+        admitted i w → w ≠ []
+          → ∀ g ∈ {g : Mat k r | g ∈ GV k r ∧ ε ≤ Gp g},
+            ‖Dw w (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) g‖
+              ≤ M * gN g ^ (2 * (r + 1) * w.length + (r + 1)) := by
     rintro w ⟨u, v, hu, hv, hl, rfl⟩ - g ⟨hg, hge⟩
     have hgt : ε / 2 < Gp g := by linarith
     have hw := hwl u v hu hv
     have huv : C6.UnitWords k r u v (u.length + v.length) := ⟨hu, hv, rfl⟩
-    have e1 : Dw (wL u ++ wR v) (utv ε T Gp om) g =
-        Dw (wL u ++ wR v) (fun g' => C6.unitOf T (Gp g') (om g')) g :=
+    have e1
+        : Dw (wL u ++ wR v) (utv ε T Gp om) g
+          = Dw (wL u ++ wR v) (fun g' => C6.unitOf T (Gp g') (om g')) g :=
       Dw_congr_loc hw hOε (fun g' hg' hg'O => ((hsph g' hg' hg'O).1).symm) g hg hgt
-    have e2 : Dw (wL u ++ wR v) (utv ε T' Gp om') g =
-        Dw (wL u ++ wR v) (fun g' => C6.unitOf T' (Gp g') (om' g')) g :=
+    have e2
+        : Dw (wL u ++ wR v) (utv ε T' Gp om') g
+          = Dw (wL u ++ wR v) (fun g' => C6.unitOf T' (Gp g') (om' g')) g :=
       Dw_congr_loc hw hOε (fun g' hg' hg'O => ((hsph g' hg' hg'O).2.1).symm) g hg hgt
-    have f1 : Dw (wL u ++ wR v) (utv ε T Gp om) g =
-        (Dw (wL u ++ wR v) (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) g).1 := by
-      have h := congrFun (dw_clm (ContinuousLinearMap.fst ℝ (Fin m → ℂ) (Fin m' → ℂ)) (wL u ++ wR v) hψ) g
+    have f1
+        : Dw (wL u ++ wR v) (utv ε T Gp om) g
+          = (Dw (wL u ++ wR v) (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) g).1 := by
+      have h :=
+        congrFun (dw_clm (ContinuousLinearMap.fst ℝ (Fin m → ℂ) (Fin m' → ℂ)) (wL u ++ wR v) hψ) g
       simpa using h
-    have f2 : Dw (wL u ++ wR v) (utv ε T' Gp om') g =
-        (Dw (wL u ++ wR v) (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) g).2 := by
-      have h := congrFun (dw_clm (ContinuousLinearMap.snd ℝ (Fin m → ℂ) (Fin m' → ℂ)) (wL u ++ wR v) hψ) g
+    have f2
+        : Dw (wL u ++ wR v) (utv ε T' Gp om') g
+          = (Dw (wL u ++ wR v) (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) g).2 := by
+      have h :=
+        congrFun (dw_clm (ContinuousLinearMap.snd ℝ (Fin m → ℂ) (Fin m' → ℂ)) (wL u ++ wR v) hψ) g
       simpa using h
     have b1 := hC1 _ u v huv g hg hge
     have b2 := hC2 _ u v huv g hg hge
     rw [dLR_eq, ← e1, f1] at b1
     rw [dLR_eq, ← e2, f2] at b2
-    have hexp : (r + 1) * (2 * (u.length + v.length) + 1) =
-        2 * (r + 1) * (wL u ++ wR v).length + (r + 1) := by
+    have hexp
+        : (r + 1) * (2 * (u.length + v.length) + 1)
+          = 2 * (r + 1) * (wL u ++ wR v).length + (r + 1) := by
       rw [hlen]; ring
     rw [hexp] at b1 b2
     have hY : 0 ≤ gN g ^ (2 * (r + 1) * (wL u ++ wR v).length + (r + 1)) :=
       pow_nonneg (le_trans zero_le_one (gN_ge_one hg)) _
     obtain ⟨m1, m2⟩ := hCM _ hl
     rw [Prod.norm_def]
-    exact max_le (b1.trans (mul_le_mul_of_nonneg_right m1 hY)) (b2.trans (mul_le_mul_of_nonneg_right m2 hY))
-  obtain ⟨C, -, hC⟩ := fdb (fun g => (utv ε T Gp om g, utv ε T' Gp om' g)) hψ
-    {g : Mat k r | g ∈ GV k r ∧ ε ≤ Gp g} _
-    (fun g hg => by rw [← (hsph g hg.1 (by linarith [hg.2])).1, ← (hsph g hg.1 (by linarith [hg.2])).2.1]
-                    exact (hsph g hg.1 (by linarith [hg.2])).2.2)
-    gN (fun g hg => gN_ge_one hg.1) (2 * (r + 1)) (r + 1) M i H i E Φ hΦ hΦb
+    exact max_le (b1.trans (mul_le_mul_of_nonneg_right m1 hY))
+      (b2.trans (mul_le_mul_of_nonneg_right m2 hY))
+  obtain ⟨C, -, hC⟩ :=
+    fdb
+      (fun g => (utv ε T Gp om g, utv ε T' Gp om' g))
+      hψ {g : Mat k r | g ∈ GV k r ∧ ε ≤ Gp g} _
+      (fun g hg => by
+        rw [← (hsph g hg.1 (by linarith [hg.2])).1, ← (hsph g hg.1 (by linarith [hg.2])).2.1]
+        exact (hsph g hg.1 (by linarith [hg.2])).2.2)
+      gN
+      (fun g hg => gN_ge_one hg.1)
+      (2 * (r + 1)) (r + 1) M i H i E Φ hΦ hΦb
   refine ⟨C, fun u v huv g hg hge => ?_⟩
   have hw := hwl u v huv.1 huv.2.1
   rw [dLR_eq]
-  have e : Dw (wL u ++ wR v) (fun g' => Pi (C6.unitOf T (Gp g') (om g'), C6.unitOf T' (Gp g') (om' g'))) g =
-      Dw (wL u ++ wR v) (fun g' => Φ (utv ε T Gp om g', utv ε T' Gp om' g')) g := by
+  have e
+      : Dw (wL u ++ wR v)
+          (fun g' => Pi (C6.unitOf T (Gp g') (om g'), C6.unitOf T' (Gp g') (om' g')))
+          g
+        = Dw (wL u ++ wR v) (fun g' => Φ (utv ε T Gp om g', utv ε T' Gp om' g')) g := by
     refine Dw_congr_loc hw hOε (fun g' hg' hg'O => ?_) g hg (show ε / 2 < Gp g by linarith)
     obtain ⟨h1, h2, h3⟩ := hsph g' hg' hg'O
     rw [← hΦK _ h3, h1, h2]

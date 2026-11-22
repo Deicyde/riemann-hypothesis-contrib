@@ -12,9 +12,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MeasureTheory
 
-theorem ballProd_subset_polydisc {n k : ℕ} (h : HermNorm n) (C : ℝ) (hC0 : 0 ≤ C)
-    (hC : ∀ (v : Fin n → ℂ) (j : Fin n), ‖v j‖ ≤ C * h.norm v) :
-    ballProd h k ⊆ LogInt.polydisc _ C := by
+theorem ballProd_subset_polydisc
+    {n k : ℕ} (h : HermNorm n)
+    (C : ℝ) (hC0 : 0 ≤ C) (hC : ∀ (v : Fin n → ℂ) (j : Fin n), ‖v j‖ ≤ C * h.norm v)
+    : ballProd h k ⊆ LogInt.polydisc _ C := by
   intro u hu
   simp only [LogInt.polydisc, Set.mem_univ_pi, Metric.mem_closedBall, dist_zero_right]
   intro ij
@@ -27,6 +28,7 @@ theorem MahlerIntegrand.proof : MahlerIntegrand.Statement := by
     funext u ij
     simp [nrmGroups, LogInt.normT]
   rw [e]
-  exact (LogInt.logNormT h C hC0 hC Finset.univ f hf).1.mono_set (ballProd_subset_polydisc h C hC0 hC)
+  exact (LogInt.logNormT h C hC0 hC Finset.univ f hf).1.mono_set (ballProd_subset_polydisc h C hC0
+    hC)
 
 end GroundTheory.Heights₂.Heights

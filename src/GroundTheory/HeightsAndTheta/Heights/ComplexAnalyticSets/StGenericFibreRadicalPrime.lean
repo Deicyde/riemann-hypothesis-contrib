@@ -14,8 +14,9 @@ noncomputable section
 
 def GenericFibreRadicalPrime.Statement : Prop :=
   ∀ (σ : Type) [Finite σ] (ι : Type) [Finite ι] (K : Ideal (MvPolynomial ι (MvPolynomial σ ℂ))),
-    K.IsPrime → ∃ F : MvPolynomial σ ℂ, F ≠ 0 ∧ ∀ t : σ → ℂ, eval t F ≠ 0 →
-      (K.map (MvPolynomial.map (eval t))).IsRadical
+    K.IsPrime
+      → ∃ F : MvPolynomial σ ℂ,
+        F ≠ 0 ∧ ∀ t : σ → ℂ, eval t F ≠ 0 → (K.map (MvPolynomial.map (eval t))).IsRadical
 
 end
 

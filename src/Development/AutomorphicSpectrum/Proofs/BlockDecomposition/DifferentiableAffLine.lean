@@ -67,9 +67,11 @@ lemma lineHol_chg {F : ℂ × ℂ → X} {Ω : Set (ℝ × ℝ)} (hF : LineHol F
   simp only [mem_tube_chg, chg_line]
   exact h
 
-theorem TubeGood_chg {T : Type} [TopologicalSpace T] {F : ℂ × ℂ → T → X} {Ω : Set (ℝ × ℝ)}
-    (hF : TubeGood F Ω) (α₁ β₁ γ₁ α₂ β₂ γ₂ : ℝ) :
-    TubeGood (fun l g => F (chg α₁ β₁ γ₁ α₂ β₂ γ₂ l) g) (chgR α₁ β₁ γ₁ α₂ β₂ γ₂ ⁻¹' Ω) := by
+theorem TubeGood_chg
+    {T : Type} [TopologicalSpace T]
+    {F : ℂ × ℂ → T → X} {Ω : Set (ℝ × ℝ)} (hF : TubeGood F Ω)
+    (α₁ β₁ γ₁ α₂ β₂ γ₂ : ℝ)
+    : TubeGood (fun l g => F (chg α₁ β₁ γ₁ α₂ β₂ γ₂ l) g) (chgR α₁ β₁ γ₁ α₂ β₂ γ₂ ⁻¹' Ω) := by
   refine ⟨fun g => lineHol_chg (hF.hol g) _ _ _ _ _ _, ?_, ?_⟩
   · have hc : Continuous fun y : (ℂ × ℂ) × T => (chg α₁ β₁ γ₁ α₂ β₂ γ₂ y.1, y.2) :=
       ((continuous_chg _ _ _ _ _ _).comp continuous_fst).prodMk continuous_snd
@@ -77,8 +79,9 @@ theorem TubeGood_chg {T : Type} [TopologicalSpace T] {F : ℂ × ℂ → T → X
     rintro ⟨l, g⟩ ⟨hl, -⟩
     exact ⟨mem_tube_chg.1 hl, Set.mem_univ _⟩
   · intro C hC hCc g
-    obtain ⟨U, hU, M, hM⟩ := hF.bdd (chgR α₁ β₁ γ₁ α₂ β₂ γ₂ '' C)
-      (by rintro _ ⟨x, hx, rfl⟩; exact hC hx) (hCc.image (continuous_chgR _ _ _ _ _ _)) g
+    obtain ⟨U, hU, M, hM⟩ :=
+      hF.bdd (chgR α₁ β₁ γ₁ α₂ β₂ γ₂ '' C) (by rintro _ ⟨x, hx, rfl⟩; exact hC hx)
+        (hCc.image (continuous_chgR _ _ _ _ _ _)) g
     refine ⟨U, hU, M, fun l hl g' hg' => hM _ ?_ g' hg'⟩
     have : (l.1.re, l.2.re) ∈ C := hl
     refine ⟨_, this, ?_⟩
@@ -102,10 +105,12 @@ lemma exists_bounds {C : Set (ℝ × ℝ)} (hC : IsCompact C) (hne : C.Nonempty)
   obtain ⟨y, hy, hy'⟩ := hC.exists_isMaxOn hne hf.continuousOn
   exact ⟨x, hx, y, hy, fun u hu => ⟨hx' hu, hy' hu⟩⟩
 
-theorem Fac_left {f : ℂ → X} {a : ℝ} (hf : LeftGood f a) (α β γ : ℝ) {Ω : Set (ℝ × ℝ)}
-    (h : ∀ x ∈ Ω, affR α β γ x < a) : Fac (fun l => f (aff α β γ l)) Ω := by
-  have hre : ∀ l ∈ tube Ω, (aff α β γ l).re < a := fun l hl => by
-    rw [aff_re]; exact h _ hl
+theorem Fac_left
+    {f : ℂ → X} {a : ℝ} (hf : LeftGood f a)
+    (α β γ : ℝ)
+    {Ω : Set (ℝ × ℝ)} (h : ∀ x ∈ Ω, affR α β γ x < a)
+    : Fac (fun l => f (aff α β γ l)) Ω := by
+  have hre : ∀ l ∈ tube Ω, (aff α β γ l).re < a := fun l hl => by rw [aff_re]; exact h _ hl
   refine ⟨fun p v => ?_, ?_, fun C hC hCc => ?_⟩
   · refine hf.1.comp (differentiable_aff_line α β γ p v).differentiableOn ?_
     intro τ hτ
@@ -119,8 +124,8 @@ theorem Fac_left {f : ℂ → X} {a : ℝ} (hf : LeftGood f a) (α β γ : ℝ) 
       · rw [aff_re]; exact (hxy _ hl).1
       · rw [aff_re]; exact (hxy _ hl).2
 
-theorem Fac_strip {f : ℂ → X} (hf : StripEntire f) (α β γ : ℝ) (Ω : Set (ℝ × ℝ)) :
-    Fac (fun l => f (aff α β γ l)) Ω := by
+theorem Fac_strip {f : ℂ → X} (hf : StripEntire f) (α β γ : ℝ) (Ω : Set (ℝ × ℝ))
+    : Fac (fun l => f (aff α β γ l)) Ω := by
   refine ⟨fun p v => ?_, ?_, fun C _ hCc => ?_⟩
   · exact (hf.1.comp (differentiable_aff_line α β γ p v)).differentiableOn
   · exact (hf.1.continuous.comp (continuous_aff _ _ _)).continuousOn
@@ -132,8 +137,8 @@ theorem Fac_strip {f : ℂ → X} (hf : StripEntire f) (α β γ : ℝ) (Ω : Se
       · rw [aff_re]; exact (hxy _ hl).1
       · rw [aff_re]; exact (hxy _ hl).2
 
-theorem Fac_smul {f : ℂ × ℂ → ℂ} {A : ℂ × ℂ → X} {Ω : Set (ℝ × ℝ)} (hf : Fac f Ω) (hA : Fac A Ω) :
-    Fac (fun l => f l • A l) Ω := by
+theorem Fac_smul {f : ℂ × ℂ → ℂ} {A : ℂ × ℂ → X} {Ω : Set (ℝ × ℝ)} (hf : Fac f Ω) (hA : Fac A Ω)
+    : Fac (fun l => f l • A l) Ω := by
   refine ⟨fun p v => (hf.hol p v).smul (hA.hol p v), hf.cont.smul hA.cont, fun C hC hCc => ?_⟩
   obtain ⟨M₁, h₁⟩ := hf.bdd C hC hCc
   obtain ⟨M₂, h₂⟩ := hA.bdd C hC hCc
@@ -142,13 +147,14 @@ theorem Fac_smul {f : ℂ × ℂ → ℂ} {A : ℂ × ℂ → X} {Ω : Set (ℝ 
   exact mul_le_mul ((h₁ l hl).trans (le_abs_self _)) ((h₂ l hl).trans (le_abs_self _))
     (norm_nonneg _) (abs_nonneg _)
 
-theorem Fac_mul {f f' : ℂ × ℂ → ℂ} {Ω : Set (ℝ × ℝ)} (hf : Fac f Ω) (hf' : Fac f' Ω) :
-    Fac (fun l => f l * f' l) Ω :=
+theorem Fac_mul {f f' : ℂ × ℂ → ℂ} {Ω : Set (ℝ × ℝ)} (hf : Fac f Ω) (hf' : Fac f' Ω)
+    : Fac (fun l => f l * f' l) Ω :=
   Fac_smul hf hf'
 
-theorem TubeGood_smul {T : Type} [TopologicalSpace T] {F : ℂ × ℂ → T → X} {Ω : Set (ℝ × ℝ)}
-    {f : ℂ × ℂ → ℂ} (hf : Fac f Ω) (hF : TubeGood F Ω) :
-    TubeGood (fun l g => f l • F l g) Ω := by
+theorem TubeGood_smul
+    {T : Type} [TopologicalSpace T]
+    {F : ℂ × ℂ → T → X} {Ω : Set (ℝ × ℝ)} {f : ℂ × ℂ → ℂ} (hf : Fac f Ω) (hF : TubeGood F Ω)
+    : TubeGood (fun l g => f l • F l g) Ω := by
   refine ⟨fun g p v => (hf.hol p v).smul (hF.hol g p v), ?_, fun C hC hCc g => ?_⟩
   · refine ContinuousOn.smul (hf.cont.comp continuousOn_fst ?_) hF.cont
     rintro ⟨l, g⟩ ⟨hl, -⟩
@@ -164,30 +170,35 @@ end Good
 
 section Comp
 
-variable {E₁ E₂ E₃ : Type} [NormedAddCommGroup E₁] [NormedSpace ℂ E₁] [NormedAddCommGroup E₂]
+variable
+  {E₁ E₂ E₃ : Type} [NormedAddCommGroup E₁] [NormedSpace ℂ E₁] [NormedAddCommGroup E₂]
   [NormedSpace ℂ E₂] [NormedAddCommGroup E₃] [NormedSpace ℂ E₃]
 
-theorem Fac_comp {A : ℂ × ℂ → E₂ →L[ℂ] E₃} {B : ℂ × ℂ → E₁ →L[ℂ] E₂} {Ω : Set (ℝ × ℝ)}
-    (hA : Fac A Ω) (hB : Fac B Ω) : Fac (fun l => (A l).comp (B l)) Ω := by
-  refine ⟨fun p v => (hA.hol p v).clm_comp (hB.hol p v), hA.cont.clm_comp hB.cont,
-    fun C hC hCc => ?_⟩
+theorem Fac_comp
+    {A : ℂ × ℂ → E₂ →L[ℂ] E₃} {B : ℂ × ℂ → E₁ →L[ℂ] E₂} {Ω : Set (ℝ × ℝ)}
+    (hA : Fac A Ω) (hB : Fac B Ω)
+    : Fac (fun l => (A l).comp (B l)) Ω := by
+  refine
+    ⟨fun p v => (hA.hol p v).clm_comp (hB.hol p v), hA.cont.clm_comp hB.cont, fun C hC hCc => ?_⟩
   obtain ⟨M₁, h₁⟩ := hA.bdd C hC hCc
   obtain ⟨M₂, h₂⟩ := hB.bdd C hC hCc
   refine ⟨|M₁| * |M₂|, fun l hl => (ContinuousLinearMap.opNorm_comp_le _ _).trans ?_⟩
   exact mul_le_mul ((h₁ l hl).trans (le_abs_self _)) ((h₂ l hl).trans (le_abs_self _))
     (norm_nonneg _) (abs_nonneg _)
 
-theorem TubeGood_comp {T : Type} [TopologicalSpace T] {F : ℂ × ℂ → T → E₂ →L[ℂ] E₃}
-    {A : ℂ × ℂ → E₁ →L[ℂ] E₂} {Ω : Set (ℝ × ℝ)} (hF : TubeGood F Ω) (hA : Fac A Ω) :
-    TubeGood (fun l g => (F l g).comp (A l)) Ω := by
+theorem TubeGood_comp
+    {T : Type} [TopologicalSpace T]
+    {F : ℂ × ℂ → T → E₂ →L[ℂ] E₃} {A : ℂ × ℂ → E₁ →L[ℂ] E₂} {Ω : Set (ℝ × ℝ)}
+    (hF : TubeGood F Ω) (hA : Fac A Ω)
+    : TubeGood (fun l g => (F l g).comp (A l)) Ω := by
   refine ⟨fun g p v => (hF.hol g p v).clm_comp (hA.hol p v), ?_, fun C hC hCc g => ?_⟩
   · refine ContinuousOn.clm_comp hF.cont (hA.cont.comp continuousOn_fst ?_)
     rintro ⟨l, g⟩ ⟨hl, -⟩
     exact hl
   · obtain ⟨U, hU, M₁, h₁⟩ := hF.bdd C hC hCc g
     obtain ⟨M₂, h₂⟩ := hA.bdd C hC hCc
-    refine ⟨U, hU, |M₁| * |M₂|, fun l hl g' hg' =>
-      (ContinuousLinearMap.opNorm_comp_le _ _).trans ?_⟩
+    refine
+      ⟨U, hU, |M₁| * |M₂|, fun l hl g' hg' => (ContinuousLinearMap.opNorm_comp_le _ _).trans ?_⟩
     exact mul_le_mul ((h₁ l hl g' hg').trans (le_abs_self _)) ((h₂ l hl).trans (le_abs_self _))
       (norm_nonneg _) (abs_nonneg _)
 

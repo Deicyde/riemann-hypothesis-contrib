@@ -4,19 +4,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem plat_core {V : Type} [AddCommGroup V] [Module ℚ V] (p : ℕ) (hp : p ≠ 0) (M : AddSubgroup V)
-    (s : Finset V) (k : ℕ) (hs : Submodule.span ℚ (s : Set V) = ⊤)
-    (hsat : ∀ (m : ℕ) x, m.Coprime p → m • x ∈ M → x ∈ M)
-    (h1 : ∀ x ∈ s, p ^ k • x ∈ M)
-    (h2 : ∀ x ∈ M, ∃ m : ℕ, m.Coprime p ∧ (m * p ^ k) • x ∈ AddSubgroup.closure (s : Set V)) :
-    ∃ t : Finset V, Submodule.span ℚ (t : Set V) = ⊤ ∧
-      ∀ w, w ∈ M ↔ ∃ m : ℕ, m.Coprime p ∧ m • w ∈ AddSubgroup.closure (t : Set V) := by
+private theorem plat_core
+    {V : Type} [AddCommGroup V] [Module ℚ V]
+    (p : ℕ) (hp : p ≠ 0)
+    (M : AddSubgroup V) (s : Finset V) (k : ℕ) (hs : Submodule.span ℚ (s : Set V) = ⊤)
+    (hsat : ∀ (m : ℕ) x, m.Coprime p → m • x ∈ M → x ∈ M) (h1 : ∀ x ∈ s, p ^ k • x ∈ M)
+    (h2 : ∀ x ∈ M, ∃ m : ℕ, m.Coprime p ∧ (m * p ^ k) • x ∈ AddSubgroup.closure (s : Set V))
+    : ∃ t : Finset V,
+      Submodule.span ℚ (t : Set V) = ⊤
+        ∧ ∀ w, w ∈ M ↔ ∃ m : ℕ, m.Coprime p ∧ m • w ∈ AddSubgroup.closure (t : Set V) := by
   have hpk : ((p : ℚ) ^ k) ≠ 0 := pow_ne_zero _ (by exact_mod_cast hp)
   set q : ℚ := ((p : ℚ) ^ k)⁻¹ with hq
   let f : V →ₗ[ℤ] V := (LinearMap.lsmul ℚ V q).toAddMonoidHom.toIntLinearMap
@@ -71,7 +76,6 @@ private theorem plat_core {V : Type} [AddCommGroup V] [Module ℚ V] (p : ℕ) (
     rw [e]
     exact hsW _ hmem
 
-theorem UpperTheory.Gal.W2.pLatOf_of :
-    UpperTheory.Gal.W2.PLatOf := by
+theorem UpperTheory.Gal.W2.pLatOf_of : UpperTheory.Gal.W2.PLatOf := by
   intro p _ D M s k hs hO hsat h1 h2
   exact ⟨hO, plat_core p (Fact.out : p.Prime).ne_zero M s k hs hsat h1 h2⟩

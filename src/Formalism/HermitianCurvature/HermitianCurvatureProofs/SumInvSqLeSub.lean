@@ -380,12 +380,15 @@ open Finset Formalism.FourierDecayAlt.Sz Formalism.FourierDecayAlt.P.Sz4
 theorem vandermondeNonTop : Formalism.FourierDecayAlt.Sz.VandNonTop := by
   intro c de hc hw ht
   have hk := hc.hk
-  have hcast : ((c.k - 1 : ℕ) : ℝ) + 1 = c.k := by
-    rw [Nat.cast_sub (by omega)]; simp
+  have hcast : ((c.k - 1 : ℕ) : ℝ) + 1 = c.k := by rw [Nat.cast_sub (by omega)]; simp
   have hb := rde_bound (c.k - 1) (by omega) de hw.1
   rw [hcast] at hb
-  exact ⟨vand_pos _ _ fun i j _ hij _ => v_anti c hc i j hij,
-    vand_words_ratio c de hw (c.k - 1) (by omega) (Or.inr ht), hb.1, hb.2⟩
+  exact ⟨
+    vand_pos _ _ fun i j _ hij _ => v_anti c hc i j hij,
+    vand_words_ratio c de hw (c.k - 1) (by omega) (Or.inr ht),
+    hb.1,
+    hb.2
+  ⟩
 
 theorem vandermondeTop : Formalism.FourierDecayAlt.Sz.VandTop := by
   intro c de hc hw
@@ -394,18 +397,25 @@ theorem vandermondeTop : Formalism.FourierDecayAlt.Sz.VandTop := by
     rw [Nat.cast_sub (by omega)]; push_cast; ring
   have hb := rde_bound (c.k - 2) (by omega) de hw.1
   rw [hcast] at hb
-  refine ⟨vand_pos _ _ fun i j _ hij _ => v_anti c hc i j hij,
-    vand_words_ratio c de hw (c.k - 2) (by omega) (Or.inl (by omega)), hb.1, hb.2, ?_⟩
+  refine ⟨
+    vand_pos _ _ fun i j _ hij _ => v_anti c hc i j hij,
+    vand_words_ratio c de hw (c.k - 2) (by omega) (Or.inl (by omega)),
+    hb.1,
+    hb.2,
+    ?_
+  ⟩
   have h := vand_succ_top (c.k - 2) c.v
   have e : c.k - 2 + 1 = c.k - 1 := by omega
-  have h2 : ∏ i ∈ Icc 1 (c.k - 2), (c.v i - c.v (c.k - 2 + 1)) =
-      (4 * c.Del) ^ (c.k - 2) * ((c.k - 2).factorial : ℝ) := by
+  have h2
+      : ∏ i ∈ Icc 1 (c.k - 2), (c.v i - c.v (c.k - 2 + 1))
+        = (4 * c.Del) ^ (c.k - 2) * ((c.k - 2).factorial : ℝ) := by
     rw [← prod_refl (c.k - 2)]
     simp only [v_sub]
     rw [Finset.prod_mul_distrib, Finset.prod_const, Nat.card_Icc]
     simp
   rw [h2, e] at h
-  rw [h]; ring
+  rw [h]
+  ring
 
 end Formalism.FourierDecayAlt.P
 
@@ -554,18 +564,20 @@ theorem edgeFactors : Formalism.FourierDecayAlt.Sz.EdgeFactors := by
     have := kDel_pos c hc
     linarith [hc.ha]
   constructor
-  · calc (c.a - c.v 1) ^ (c.k - 1) = ∏ _i ∈ Icc 2 c.k, (c.a - c.v 1) := by
-          rw [Finset.prod_const, hcard]
+  · calc
+      (c.a - c.v 1) ^ (c.k - 1)
+        = ∏ _i ∈ Icc 2 c.k, (c.a - c.v 1) := by rw [Finset.prod_const, hcard]
       _ ≤ _ := by
-          refine Finset.prod_le_prod₀ (fun _ _ => hpos) fun i hi => ?_
-          rw [mem_Icc] at hi
-          exact (edge_factor c de hc hw i hi.1 hi.2 (Or.inr ht)).1
-  · calc _ ≤ ∏ _i ∈ Icc 2 c.k, (2 * (c.a - c.v 1)) := by
-          refine Finset.prod_le_prod₀ (fun i hi => ?_) fun i hi => ?_
-          · rw [mem_Icc] at hi
-            exact hpos.trans (edge_factor c de hc hw i hi.1 hi.2 (Or.inr ht)).1
-          · rw [mem_Icc] at hi
-            exact (edge_factor c de hc hw i hi.1 hi.2 (Or.inr ht)).2
+        refine Finset.prod_le_prod₀ (fun _ _ => hpos) fun i hi => ?_
+        rw [mem_Icc] at hi
+        exact (edge_factor c de hc hw i hi.1 hi.2 (Or.inr ht)).1
+  · calc
+      _ ≤ ∏ _i ∈ Icc 2 c.k, (2 * (c.a - c.v 1)) := by
+        refine Finset.prod_le_prod₀ (fun i hi => ?_) fun i hi => ?_
+        · rw [mem_Icc] at hi
+          exact hpos.trans (edge_factor c de hc hw i hi.1 hi.2 (Or.inr ht)).1
+        · rw [mem_Icc] at hi
+          exact (edge_factor c de hc hw i hi.1 hi.2 (Or.inr ht)).2
       _ = _ := by rw [Finset.prod_const, hcard]
 
 end Formalism.FourierDecayAlt.P

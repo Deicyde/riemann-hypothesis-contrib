@@ -8,11 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 open UpperTheory.V.Lit.Geo
 
-theorem UpperTheory.V.Lit.Geo.corrBd :
-    CorrBd := by
+theorem UpperTheory.V.Lit.Geo.corrBd : CorrBd := by
   intro E _ _ _ a U Ξ C q
   obtain ⟨B, hB, hM⟩ := matBd E a Ξ C
   obtain ⟨r, hr⟩ := oneReal E a Ξ
@@ -31,8 +31,10 @@ theorem UpperTheory.V.Lit.Geo.corrBd :
     simp only [hX, LinearEquiv.apply_symm_apply, map_smul, smul_smul]
     rw [← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel_right]
     norm_num
-  have hcv := centreVal E a U Ξ r hr q α hα X 1 t
-    (GroundTheory.Automorphic.CuspidalSpectrum.retractOne (g * infGL E a h) : KernelIndexFullLattice.G1 E a).1
+  have hcv :=
+    centreVal E a U Ξ r hr q α hα X 1 t
+      (GroundTheory.Automorphic.CuspidalSpectrum.retractOne (g * infGL E a h)
+        : KernelIndexFullLattice.G1 E a).1
   rw [map_one, one_mul] at hcv
   rw [hv', e, hcv] at hc
   rw [hc, Matrix.mulVec_mulVec, ← map_mul, inv_mul_cancel_left]
@@ -59,6 +61,7 @@ theorem UpperTheory.V.Lit.Geo.corrBd :
     rw [h5]
     linarith
   have hb := (hbd X).trans (mul_le_mul_of_nonneg_left hp hM0)
-  calc _ ≤ B * (Real.exp (|r| * T) * (M * (B ^ q * ∏ i, ‖v i‖))) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul hexp hb (norm_nonneg _) (Real.exp_pos _).le) hB
+  calc
+    _ ≤ B * (Real.exp (|r| * T) * (M * (B ^ q * ∏ i, ‖v i‖))) :=
+      mul_le_mul_of_nonneg_left (mul_le_mul hexp hb (norm_nonneg _) (Real.exp_pos _).le) hB
     _ = _ := by ring

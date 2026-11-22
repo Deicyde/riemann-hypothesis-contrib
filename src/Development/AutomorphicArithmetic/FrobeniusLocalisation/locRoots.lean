@@ -14,9 +14,13 @@ open scoped Pointwise
 section
 open Formalism.HC.Der Formalism.TwoAdicCyclotomicDecomposition
 
-private theorem stab_iff (N : ℕ) [NeZero N] (l : ℕ) [Fact l.Prime] (Q : Ideal (𝓞 (Cond.Cyc N))) [Q.IsPrime]
-    [Q.LiesOver (span {(l : ℤ)})] (u : (ZMod N)ˣ) :
-    tauN N u ∈ MulAction.stabilizer _ Q ↔ ∃ k : ℕ, (u : ZMod N).val ≡ l ^ k [MOD ordCompl[l] N] := by
+private theorem stab_iff
+    (N : ℕ) [NeZero N]
+    (l : ℕ) [Fact l.Prime]
+    (Q : Ideal (𝓞 (Cond.Cyc N))) [Q.IsPrime] [Q.LiesOver (span {(l : ℤ)})]
+    (u : (ZMod N)ˣ)
+    : tauN N u ∈ MulAction.stabilizer _ Q
+      ↔ ∃ k : ℕ, (u : ZMod N).val ≡ l ^ k [MOD ordCompl[l] N] := by
   set M := ordCompl[l] N with hM
   have hMN : M ∣ N := Nat.ordCompl_dvd N l
   have hlM : l.Coprime M := Nat.coprime_ordCompl (Fact.out : l.Prime) (NeZero.ne N)
@@ -46,29 +50,45 @@ private theorem stab_iff (N : ℕ) [NeZero N] (l : ℕ) [Fact l.Prime] (Q : Idea
     rw [hu, map_mul, map_pow]
     exact Subgroup.mul_mem _ hwst (Subgroup.pow_mem _ hFst k)
 
-private theorem act_of (N : ℕ) [NeZero N] {K : Type*} [Field K] (J : Cond.Cyc N →+* K) (σ : K →+* K) (u : (ZMod N)ˣ)
-    (h : ∀ x, σ (J x) = J (tauN N u x)) (x : K) (hx : x ^ N = 1) : σ x = x ^ (u : ZMod N).val := by
-  have hζ := (zO_prim N).map_of_injective (f := algebraMap (𝓞 (Cond.Cyc N)) (Cond.Cyc N))
-    (FaithfulSMul.algebraMap_injective _ _)
+private theorem act_of
+    (N : ℕ) [NeZero N]
+    {K : Type*} [Field K]
+    (J : Cond.Cyc N →+* K) (σ : K →+* K) (u : (ZMod N)ˣ) (h : ∀ x, σ (J x) = J (tauN N u x))
+    (x : K) (hx : x ^ N = 1)
+    : σ x = x ^ (u : ZMod N).val := by
+  have hζ :=
+    (zO_prim N).map_of_injective (f := algebraMap (𝓞 (Cond.Cyc N)) (Cond.Cyc N))
+      (FaithfulSMul.algebraMap_injective _ _)
   have hJ := hζ.map_of_injective J.injective
   obtain ⟨i, -, rfl⟩ := hJ.eq_pow_of_pow_eq_one hx
   have hg : IsCyclotomicExtension.Rat.galEquivZMod N (Cond.Cyc N) (tauN N u) = u :=
     MulEquiv.apply_symm_apply _ _
-  have hτ : tauN N u (algebraMap (𝓞 (Cond.Cyc N)) (Cond.Cyc N) (zO N)) =
-      (algebraMap (𝓞 (Cond.Cyc N)) (Cond.Cyc N) (zO N)) ^ (u : ZMod N).val := by
-    rw [IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N (Cond.Cyc N) (tauN N u) hζ.pow_eq_one,
+  have hτ
+      : tauN N u (algebraMap (𝓞 (Cond.Cyc N)) (Cond.Cyc N) (zO N))
+        = (algebraMap (𝓞 (Cond.Cyc N)) (Cond.Cyc N) (zO N)) ^ (u : ZMod N).val := by
+    rw [IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N (Cond.Cyc N) (tauN N u)
+        hζ.pow_eq_one,
       hg]
   rw [map_pow, h, hτ, map_pow]
   ring
 
 end
 
-theorem UpperTheory.HF.loc_roots :
-    ∀ (l : ℕ) [Fact l.Prime] (M : ℕ), 0 < M → (∀ σ : (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l), ∃ (u : (ZMod M)ˣ) (j : ℕ), (u : ZMod M).val ≡ l ^ j [MOD ordCompl[l] M] ∧ ∀ x : PadicAlgCl l, x ^ M = 1 → σ x = x ^ (u : ZMod M).val) ∧ ∀ (u : (ZMod M)ˣ) (j : ℕ), (u : ZMod M).val ≡ l ^ j [MOD ordCompl[l] M] → ∃ σ : (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l), ∀ x : PadicAlgCl l, x ^ M = 1 → σ x = x ^ (u : ZMod M).val := by
+theorem UpperTheory.HF.loc_roots
+    : ∀ (l : ℕ) [Fact l.Prime] (M : ℕ),
+      0 < M
+        → (∀ σ : (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l), ∃ (u : (ZMod M)ˣ) (j : ℕ),
+            (u : ZMod M).val ≡ l ^ j [MOD ordCompl[l] M]
+              ∧ ∀ x : PadicAlgCl l, x ^ M = 1 → σ x = x ^ (u : ZMod M).val)
+          ∧ ∀ (u : (ZMod M)ˣ) (j : ℕ),
+            (u : ZMod M).val ≡ l ^ j [MOD ordCompl[l] M]
+              → ∃ σ : (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l), ∀ x : PadicAlgCl l,
+                x ^ M = 1 → σ x = x ^ (u : ZMod M).val := by
   intro l _ M hM
   haveI : NeZero M := ⟨hM.ne'⟩
   haveI := Formalism.HC.Der.cyc_isGalois M
-  let J : Cond.Cyc M →+* PadicAlgCl l := (IsAlgClosed.lift : Cond.Cyc M →ₐ[ℚ] PadicAlgCl l).toRingHom
+  let J : Cond.Cyc M →+* PadicAlgCl l :=
+    (IsAlgClosed.lift : Cond.Cyc M →ₐ[ℚ] PadicAlgCl l).toRingHom
   obtain ⟨P, hPp, hPlo, -, hstab, hsurj, -⟩ := UpperTheory.HF.loc_onto l (Cond.Cyc M) J
   haveI := hPp
   haveI := hPlo

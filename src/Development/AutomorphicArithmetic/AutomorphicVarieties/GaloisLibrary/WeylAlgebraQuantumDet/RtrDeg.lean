@@ -6,11 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix UpperTheory.V.Weyl
 
-theorem UpperTheory.V.Weyl.rtrDeg :
-    ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ) (f : Pol n), (rtr g f).totalDegree ≤ f.totalDegree := by
+theorem UpperTheory.V.Weyl.rtrDeg
+    : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ) (f : Pol n),
+      (rtr g f).totalDegree ≤ f.totalDegree := by
   intro n g f
-  have hY : ∀ ij : Fin n × Fin n,
-      (∑ k, MvPolynomial.X (ij.1, k) * MvPolynomial.C (g k ij.2) : MvPolynomial (Fin n × Fin n) ℂ).totalDegree ≤ 1 := by
+  have hY
+      : ∀ ij : Fin n × Fin n,
+        (∑ k, MvPolynomial.X (ij.1, k) * MvPolynomial.C (g k ij.2)
+            : MvPolynomial (Fin n × Fin n) ℂ).totalDegree
+          ≤ 1 := by
     intro ij
     refine (MvPolynomial.totalDegree_finsetSum _ _).trans (Finset.sup_le fun k _ => ?_)
     refine (MvPolynomial.totalDegree_mul _ _).trans ?_
@@ -25,5 +29,7 @@ theorem UpperTheory.V.Weyl.rtrDeg :
   unfold Finsupp.prod Finsupp.sum
   refine (MvPolynomial.totalDegree_finsetProd _ _).trans (Finset.sum_le_sum fun i _ => ?_)
   refine (MvPolynomial.totalDegree_pow _ _).trans ?_
-  calc s i * _ ≤ s i * 1 := Nat.mul_le_mul_left _ (hY i)
+  calc
+    s i * _
+      ≤ s i * 1 := Nat.mul_le_mul_left _ (hY i)
     _ = s i := mul_one _

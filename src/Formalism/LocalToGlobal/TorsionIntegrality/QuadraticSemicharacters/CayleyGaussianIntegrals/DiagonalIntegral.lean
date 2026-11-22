@@ -14,13 +14,17 @@ open MeasureTheory
 
 namespace Formalism.L2.Th1.H
 
-theorem continuous_altE {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (H : Sesq V)
-    (hH : IsHerm H) (v : V) : Continuous fun z => altE H v z := by
+theorem continuous_altE
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+    (H : Sesq V) (hH : IsHerm H)
+    (v : V)
+    : Continuous fun z => altE H v z := by
   have hlin : Continuous fun z => H z v := by
-    let f : V →ₗ[ℂ] ℂ :=
-      { toFun := fun z => H z v
-        map_add' := fun a b => by simp
-        map_smul' := fun c a => by simp }
+    let f : V →ₗ[ℂ] ℂ := {
+      toFun := fun z => H z v
+      map_add' := fun a b => by simp
+      map_smul' := fun c a => by simp
+    }
     exact f.continuous_of_finiteDimensional
   have hfun : (fun z => altE H v z) = fun z => -(H z v).im := by
     funext z
@@ -30,12 +34,14 @@ theorem continuous_altE {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [
   exact (Complex.continuous_im.comp hlin).neg
 
 def diagCoef {V : Type*} [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (y x : V) : ℂ :=
-  α y * α x * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H y x : ℂ)) *
-    Complex.exp (-(Real.pi : ℂ) * H (y + x) (y + x) / 2)
+  α y * α x * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H y x : ℂ))
+    * Complex.exp (-(Real.pi : ℂ) * H (y + x) (y + x) / 2)
 
-theorem diag_expansion {V : Type} [AddCommGroup V] [Module ℂ V] (H : Sesq V) (hH : IsHerm H) (α : V → ℂ)
-    (Λ : AddSubgroup V) (y z : V) :
-    α y * opU H y (fun v => kerP H α Λ v z) z * (wt H z : ℂ)
+theorem diag_expansion
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (H : Sesq V) (hH : IsHerm H)
+    (α : V → ℂ) (Λ : AddSubgroup V) (y z : V)
+    : α y * opU H y (fun v => kerP H α Λ v z) z * (wt H z : ℂ)
       = ∑' x : Λ, diagCoef H α y (x : V) *
           Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H (y + (x : V)) z : ℂ)) := by
   rw [wt_eq_cexp H hH z]
@@ -43,13 +49,13 @@ theorem diag_expansion {V : Type} [AddCommGroup V] [Module ℂ V] (H : Sesq V) (
   rw [← tsum_mul_right, ← tsum_mul_left, ← tsum_mul_right]
   refine tsum_congr (fun x => ?_)
   unfold diagCoef
-  have hP : (Real.pi : ℂ) * H (z + y + (x : V)) z
-      + (-(Real.pi : ℂ) * H (z + y) (x : V) - Real.pi * H (x : V) (x : V) / 2)
-      + (-(Real.pi : ℂ) * H z y - Real.pi * H y y / 2)
-      + (-(Real.pi : ℂ) * H z z)
-      = -(Real.pi : ℂ) * Complex.I * (altE H y (x : V) : ℂ)
-        + (-(Real.pi : ℂ) * H (y + (x : V)) (y + (x : V)) / 2)
-        + 2 * (Real.pi : ℂ) * Complex.I * (altE H (y + (x : V)) z : ℂ) := by
+  have hP
+      : (Real.pi : ℂ) * H (z + y + (x : V)) z
+          + (-(Real.pi : ℂ) * H (z + y) (x : V) - Real.pi * H (x : V) (x : V) / 2)
+          + (-(Real.pi : ℂ) * H z y - Real.pi * H y y / 2) + (-(Real.pi : ℂ) * H z z)
+        = -(Real.pi : ℂ) * Complex.I * (altE H y (x : V) : ℂ)
+          + (-(Real.pi : ℂ) * H (y + (x : V)) (y + (x : V)) / 2)
+          + 2 * (Real.pi : ℂ) * Complex.I * (altE H (y + (x : V)) z : ℂ) := by
     simp only [map_add (f := _), LinearMap.add_apply, altE]
     rw [hH y z, hH (x : V) z, hH y (x : V)]
     apply Complex.ext <;> simp <;> ring
@@ -62,16 +68,17 @@ theorem norm_char (t : ℝ) : ‖Complex.exp (2 * (Real.pi : ℂ) * Complex.I * 
     push_cast; ring
   rw [this, Complex.norm_exp_ofReal_mul_I]
 
-theorem norm_diagCoef {V : Type*} [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (y x : V)
-    (hy : α y = 1 ∨ α y = -1) (hx : α x = 1 ∨ α x = -1) :
-    ‖diagCoef H α y x‖ = Real.exp (-(Real.pi / 2) * (H (y + x) (y + x)).re) := by
-  have hn : ∀ a : ℂ, (a = 1 ∨ a = -1) → ‖a‖ = 1 := by
-    rintro a (rfl | rfl) <;> simp
+theorem norm_diagCoef
+    {V : Type*} [AddCommGroup V] [Module ℂ V]
+    (H : Sesq V)
+    (α : V → ℂ) (y x : V) (hy : α y = 1 ∨ α y = -1) (hx : α x = 1 ∨ α x = -1)
+    : ‖diagCoef H α y x‖ = Real.exp (-(Real.pi / 2) * (H (y + x) (y + x)).re) := by
+  have hn : ∀ a : ℂ, (a = 1 ∨ a = -1) → ‖a‖ = 1 := by rintro a (rfl | rfl) <;> simp
   unfold diagCoef
   rw [norm_mul, norm_mul, norm_mul, hn _ hy, hn _ hx, Complex.norm_exp, Complex.norm_exp]
-  have h1 : (-(Real.pi : ℂ) * Complex.I * (altE H y x : ℂ)).re = 0 := by
-    simp
-  have h2 : (-(Real.pi : ℂ) * H (y + x) (y + x) / 2).re = -(Real.pi / 2) * (H (y + x) (y + x)).re := by
+  have h1 : (-(Real.pi : ℂ) * Complex.I * (altE H y x : ℂ)).re = 0 := by simp
+  have h2
+      : (-(Real.pi : ℂ) * H (y + x) (y + x) / 2).re = -(Real.pi / 2) * (H (y + x) (y + x)).re := by
     simp
     ring
   rw [h1, h2]
@@ -89,7 +96,9 @@ theorem diagonalIntegral : DiagIntegral := by
   simp only [hexp]
   have hαy : α y = 1 ∨ α y = -1 := hC₂.1 y hy
   obtain ⟨c, C, hc, hC', hcC⟩ := formNormEquiv V H hH hPos
-  have hnorm : ∀ (x : Λ) (z : V), ‖F x z‖ = Real.exp (-(Real.pi / 2) * (H (y + (x : V)) (y + (x : V))).re) := by
+  have hnorm
+      : ∀ (x : Λ) (z : V),
+        ‖F x z‖ = Real.exp (-(Real.pi / 2) * (H (y + (x : V)) (y + (x : V))).re) := by
     intro x z
     simp only [hF]
     rw [norm_mul, norm_char, mul_one, norm_diagCoef H α y x hαy (hC.1 x x.2)]
@@ -101,8 +110,7 @@ theorem diagonalIntegral : DiagIntegral := by
     refine le_trans ?_ h1
     apply Real.exp_le_exp.mpr
     have h2 := (hcC (y + (x : V))).1
-    have h3 : ‖(x : V) - -y‖ = ‖y + (x : V)‖ := by
-      rw [sub_neg_eq_add, add_comm]
+    have h3 : ‖(x : V) - -y‖ = ‖y + (x : V)‖ := by rw [sub_neg_eq_add, add_comm]
     rw [h3]
     nlinarith [Real.pi_pos]
   have hfin : μ D' < ⊤ := hB.measure_lt_top
@@ -142,7 +150,8 @@ theorem diagonalIntegral : DiagIntegral := by
     split_ifs with hx
     · rw [hx, add_neg_cancel, hd, one_mul]
       simp [altE, Measure.real]
-    · have hne : y + (x : V) ≠ 0 := fun h => hx (eq_neg_iff_add_eq_zero.mpr (by rw [add_comm]; exact h))
+    · have hne : y + (x : V) ≠ 0 := fun h =>
+        hx (eq_neg_iff_add_eq_zero.mpr (by rw [add_comm]; exact h))
       have hy' : y ∈ dualLat H Λ₂ := by
         rw [hS₂]
         exact hy
@@ -159,10 +168,11 @@ theorem diagonalIntegral : DiagIntegral := by
   · have hiff : ∀ x : Λ, ((x : V) = -y) ↔ x = ⟨-y, neg_mem hyΛ⟩ := fun x => by
       simp [Subtype.ext_iff]
     simp [hiff]
-  · have hno : ∀ x : Λ, (x : V) ≠ -y := fun x h => hyΛ (by
-      have hx2 := x.2
-      rw [h] at hx2
-      simpa using hx2)
+  · have hno : ∀ x : Λ, (x : V) ≠ -y := fun x h =>
+      hyΛ (by
+        have hx2 := x.2
+        rw [h] at hx2
+        simpa using hx2)
     simp [hno]
 
 theorem KerPNonzero_of (hD : DiagIntegral) : KerPNonzero := by
@@ -173,10 +183,10 @@ theorem KerPNonzero_of (hD : DiagIntegral) : KerPNonzero := by
   haveI : BorelSpace V := ⟨rfl⟩
   obtain ⟨D, hD1, hD2, hD3, -⟩ :=
     fundamentalDomainExists V MeasureTheory.Measure.addHaar (Λ ⊓ Λ) (by rw [inf_idem]; exact hL)
-  have hint := hD V MeasureTheory.Measure.addHaar H Λ Λ α hH hPos hL hS hS hC hC D hD1 hD2 0 (zero_mem _)
+  have hint :=
+    hD V MeasureTheory.Measure.addHaar H Λ Λ α hH hPos hL hS hS hC hC D hD1 hD2 0 (zero_mem _)
   simp [opU, hne] at hint
-  have h0 : (MeasureTheory.Measure.addHaar D).toReal = 0 := by
-    exact_mod_cast hint.symm
+  have h0 : (MeasureTheory.Measure.addHaar D).toReal = 0 := by exact_mod_cast hint.symm
   linarith
 
 end Formalism.L2.Th1.H

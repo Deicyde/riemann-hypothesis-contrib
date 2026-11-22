@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -22,8 +24,9 @@ noncomputable section
 
 namespace GlobalTheory.DiagLoc
 
-theorem formallyEtale_eval₂Hom_of_trBasis {F : Type} [Field F] (c : ℂ →+* F) {r : ℕ}
-    {τ : Fin r → F} (hτ : TrBasis c τ) : (MvPolynomial.eval₂Hom c τ).FormallyEtale := by
+theorem formallyEtale_eval₂Hom_of_trBasis
+    {F : Type} [Field F] (c : ℂ →+* F) {r : ℕ} {τ : Fin r → F} (hτ : TrBasis c τ)
+    : (MvPolynomial.eval₂Hom c τ).FormallyEtale := by
   letI := c.toAlgebra
   have hτ' : IsTranscendenceBasis ℂ τ := hτ
   have hv := hτ'.1
@@ -59,9 +62,9 @@ theorem formallyEtale_eval₂Hom_of_trBasis {F : Type} [Field F] (c : ℂ →+* 
     rw [← this]
     rfl
 
-theorem exists_basis_omega_of_trBasis {F : Type} [Field F] (c : ℂ →+* F) {n : ℕ}
-    {x : Fin n → F} (hx : TrBasis c x) :
-    ∃ b : Module.Basis (Fin n) F (Omega c), ∀ i, b i = dFun c (x i) := by
+theorem exists_basis_omega_of_trBasis
+    {F : Type} [Field F] (c : ℂ →+* F) {n : ℕ} {x : Fin n → F} (hx : TrBasis c x)
+    : ∃ b : Module.Basis (Fin n) F (Omega c), ∀ i, b i = dFun c (x i) := by
   letI := c.toAlgebra
   have hx' : IsTranscendenceBasis ℂ x := hx
   haveI := hx'.isAlgebraic_field
@@ -73,14 +76,18 @@ end GlobalTheory.DiagLoc
 
 namespace GlobalTheory.DiagLoc
 
-theorem isFreeGen_dForm_graph : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K]
-  [Algebra ℂ κ'] [Algebra ℂ L] [Algebra (K ⊗[ℂ] κ') L] [IsScalarTower ℂ (K ⊗[ℂ] κ') L]
-  [IsFractionRing (K ⊗[ℂ] κ') L] (σ : K →ₐ[ℂ] κ') (n k' : ℕ) (x : Fin n → K) (τ' : Fin k' → κ')
-  (hc : ∀ a, algebraMap ℂ L a ∈ GlobalTheory.DiagLoc.loc L σ),
-  Algebra.EssFiniteType ℂ K → Algebra.EssFiniteType ℂ κ' →
-  TrBasis (algebraMap ℂ K) x → TrBasis (algebraMap ℂ κ') τ' →
-  IsFreeGen (GlobalTheory.DiagLoc.loc L σ) (dForm ((algebraMap ℂ L).codRestrict (GlobalTheory.DiagLoc.loc L σ) hc)
-    (Fin.append (fun i => GlobalTheory.DiagLoc.toLoc L σ (1 ⊗ₜ[ℂ] τ' i)) (fun i => GlobalTheory.DiagLoc.toLoc L σ (x i ⊗ₜ[ℂ] 1)))) := by
+theorem isFreeGen_dForm_graph
+    : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K] [Algebra ℂ κ'] [Algebra ℂ L]
+        [Algebra (K ⊗[ℂ] κ') L] [IsScalarTower ℂ (K ⊗[ℂ] κ') L] [IsFractionRing (K ⊗[ℂ] κ') L]
+        (σ : K →ₐ[ℂ] κ') (n k' : ℕ) (x : Fin n → K) (τ' : Fin k' → κ')
+        (hc : ∀ a, algebraMap ℂ L a ∈ GlobalTheory.DiagLoc.loc L σ),
+      Algebra.EssFiniteType ℂ K → Algebra.EssFiniteType ℂ κ' → TrBasis (algebraMap ℂ K) x
+        → TrBasis (algebraMap ℂ κ') τ'
+        → IsFreeGen (GlobalTheory.DiagLoc.loc L σ)
+          (dForm ((algebraMap ℂ L).codRestrict (GlobalTheory.DiagLoc.loc L σ) hc)
+            (Fin.append
+              (fun i => GlobalTheory.DiagLoc.toLoc L σ (1 ⊗ₜ[ℂ] τ' i))
+              (fun i => GlobalTheory.DiagLoc.toLoc L σ (x i ⊗ₜ[ℂ] 1)))) := by
   intro K κ' L _ _ _ _ _ _ _ _ _ σ n k' x τ' hc _ _ hx hτ
   let β := (algebraMap ℂ L).codRestrict (loc L σ) hc
   let ρ : K →+* loc L σ := (toLoc L σ).comp Algebra.TensorProduct.includeLeftRingHom
@@ -89,8 +96,9 @@ theorem isFreeGen_dForm_graph : ∀ {K κ' L : Type} [Field K] [Field κ'] [Fiel
     change algebraMap (K ⊗[ℂ] κ') L (algebraMap ℂ K a ⊗ₜ[ℂ] (1 : κ')) = algebraMap ℂ L a
     rw [← Algebra.TensorProduct.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
   obtain ⟨b, hb⟩ := exists_basis_omega_of_trBasis (algebraMap ℂ K) hx
-  have hg := formallyEtale_mvPolynomial_eval₂_tensor (R := K) τ'
-    (formallyEtale_eval₂Hom_of_trBasis (algebraMap ℂ κ') hτ)
+  have hg :=
+    formallyEtale_mvPolynomial_eval₂_tensor (R := K) τ'
+      (formallyEtale_eval₂Hom_of_trBasis (algebraMap ℂ κ') hτ)
   have hl : (toLoc L σ).FormallyEtale :=
     RingHom.formallyEtale_algebraMap.2 (Algebra.FormallyEtale.of_isLocalization (ker σ).primeCompl)
   have hφ : (MvPolynomial.eval₂Hom ρ (fun i => toLoc L σ (1 ⊗ₜ[ℂ] τ' i))).FormallyEtale := by
@@ -100,7 +108,9 @@ theorem isFreeGen_dForm_graph : ∀ {K κ' L : Type} [Field K] [Field κ'] [Fiel
       simp [ρ]
     · intro i
       simp
-  exact GlobalTheory.TopFrameEt.isFreeGen_dForm_of_formallyEtale_mvPolynomial (algebraMap ℂ K) β ρ hρ x b hb
-    (fun i => toLoc L σ (1 ⊗ₜ[ℂ] τ' i)) hφ
+  exact GlobalTheory.TopFrameEt.isFreeGen_dForm_of_formallyEtale_mvPolynomial (algebraMap ℂ K) β ρ
+    hρ x b hb
+    (fun i => toLoc L σ (1 ⊗ₜ[ℂ] τ' i))
+    hφ
 
 end GlobalTheory.DiagLoc

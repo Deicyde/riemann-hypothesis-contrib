@@ -17,24 +17,40 @@ noncomputable section
 
 namespace GlobalTheory.UnitLemma.FibSum
 
-theorem fib_card (K : UQ) (B₁ B₂ : InvAlg K) (hg₁ : B₁.σ B₁.g = B₁.g) (hg₂ : B₂.σ B₂.g = B₂.g)
-    (hres : resultant B₁.P B₂.P ≠ 0)
-    (M₁ : Submodule K.O B₁.A) (M₂ : Submodule K.O B₂.A) (h₁ : M₁ ∈ B₁.Lin) (h₂ : M₂ ∈ B₂.Lin) :
-    (Nat.card {M : Submodule K.O (B₁.A × B₂.A) // M ∈ (B₁.prod B₂).Lin ∧
-        M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁ ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂} : ℚ) =
-      (K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P) := by
-  have hI := GlobalTheory.T.card_stable_lattices_alt K.O K.E B₁.A B₂.A B₁.g B₂.g hres M₁ M₂ h₁.1 h₂.1 h₁.2.1 h₂.2.1
+theorem fib_card
+    (K : UQ) (B₁ B₂ : InvAlg K) (hg₁ : B₁.σ B₁.g = B₁.g) (hg₂ : B₂.σ B₂.g = B₂.g)
+    (hres : resultant B₁.P B₂.P ≠ 0) (M₁ : Submodule K.O B₁.A) (M₂ : Submodule K.O B₂.A)
+    (h₁ : M₁ ∈ B₁.Lin) (h₂ : M₂ ∈ B₂.Lin)
+    : (Nat.card
+          {M : Submodule K.O (B₁.A × B₂.A) // M ∈ (B₁.prod B₂).Lin
+            ∧ M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁ ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂}
+        : ℚ)
+      = (K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P) := by
+  have hI :=
+    GlobalTheory.T.card_stable_lattices_alt K.O K.E B₁.A B₂.A B₁.g B₂.g hres M₁ M₂ h₁.1 h₂.1 h₁.2.1
+      h₂.2.1
   have hH := GlobalTheory.T.card_sigma_stable_prod_lattice_ext_sq K B₁ B₂ hg₁ hg₂ M₁ M₂ h₁ h₂
-  have e : {M : Submodule K.O (B₁.A × B₂.A) // M ∈ (B₁.prod B₂).Lin ∧
-        M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁ ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂} ≃
-      {M : Submodule K.O (B₁.A × B₂.A) // ((∀ y ∈ M, (B₁.g, B₂.g) * y ∈ M) ∧
-        ∀ y ∈ M, (B₁.σ y.1, B₂.σ y.2) ∈ M) ∧
-        M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁ ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂} :=
-    { toFun := fun M => ⟨M.1, ⟨M.2.1.2.1, M.2.1.2.2⟩, M.2.2⟩
-      invFun := fun M => ⟨M.1, ⟨GlobalTheory.T.isFullLattice_prod_of_comap_inl_map_snd K B₁ B₂ M.1 (by rw [M.2.2.1]; exact h₁.1)
-          (by rw [M.2.2.2]; exact h₂.1), M.2.1.1, M.2.1.2⟩, M.2.2⟩
-      left_inv := fun M => rfl
-      right_inv := fun M => rfl }
+  have e
+      : {M : Submodule K.O (B₁.A × B₂.A) // M ∈ (B₁.prod B₂).Lin
+          ∧ M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁ ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂}
+        ≃ {M : Submodule K.O (B₁.A × B₂.A)
+          // ((∀ y ∈ M, (B₁.g, B₂.g) * y ∈ M) ∧ ∀ y ∈ M, (B₁.σ y.1, B₂.σ y.2) ∈ M)
+            ∧ M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁
+            ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂} := {
+    toFun := fun M => ⟨M.1, ⟨M.2.1.2.1, M.2.1.2.2⟩, M.2.2⟩
+    invFun := fun M => ⟨
+      M.1,
+      ⟨
+        GlobalTheory.T.isFullLattice_prod_of_comap_inl_map_snd K B₁ B₂ M.1
+          (by rw [M.2.2.1]; exact h₁.1) (by rw [M.2.2.2]; exact h₂.1),
+        M.2.1.1,
+        M.2.1.2
+      ⟩,
+      M.2.2
+    ⟩
+    left_inv := fun M => rfl
+    right_inv := fun M => rfl
+  }
   rw [Nat.card_congr e]
   have hq2 : (Nat.card (IsLocalRing.ResidueField K.O) : ℚ) = (K.q : ℚ) ^ 2 := by
     rw [K.card_res]; push_cast; ring
@@ -43,11 +59,18 @@ theorem fib_card (K : UQ) (B₁ B₂ : InvAlg K) (hg₁ : B₁.σ B₁.g = B₁.
     have : 0 < Nat.card (IsLocalRing.ResidueField K.O) := Nat.card_pos
     rw [K.card_res] at this
     exact_mod_cast pos_of_ne_zero (fun h => by simp [h] at this)
-  have hsq : ((Nat.card {M : Submodule K.O (B₁.A × B₂.A) // ((∀ y ∈ M, (B₁.g, B₂.g) * y ∈ M) ∧
-        ∀ y ∈ M, (B₁.σ y.1, B₂.σ y.2) ∈ M) ∧
-        M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁ ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂} : ℚ)) ^ 2 =
-      ((K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P)) ^ 2 := by
-    have hpw : ((K.q : ℚ) ^ 2) ^ val K.O (resultant B₁.P B₂.P) = ((K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P)) ^ 2 := by
+  have hsq
+      : ((Nat.card
+              {M : Submodule K.O (B₁.A × B₂.A)
+                // ((∀ y ∈ M, (B₁.g, B₂.g) * y ∈ M) ∧ ∀ y ∈ M, (B₁.σ y.1, B₂.σ y.2) ∈ M)
+                  ∧ M.comap (LinearMap.inl K.O B₁.A B₂.A) = M₁
+                  ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = M₂}
+            : ℚ))
+          ^ 2
+        = ((K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P)) ^ 2 := by
+    have hpw
+        : ((K.q : ℚ) ^ 2) ^ val K.O (resultant B₁.P B₂.P)
+          = ((K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P)) ^ 2 := by
       rw [← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, mul_comm]
     have hP₁ : (LinearMap.mulLeft K.E B₁.g).charpoly = B₁.P := rfl
     have hP₂ : (LinearMap.mulLeft K.E B₂.g).charpoly = B₂.P := rfl
@@ -56,16 +79,30 @@ theorem fib_card (K : UQ) (B₁ B₂ : InvAlg K) (hg₁ : B₁.σ B₁.g = B₁.
     exact_mod_cast hH
   exact (pow_left_inj₀ (by positivity) (zpow_pos hqpos _).le two_ne_zero).1 hsq
 
-theorem fibsum : ∀ (K : UQ) (B₁ B₂ : InvAlg K), B₁.σ B₁.g = B₁.g → B₂.σ B₂.g = B₂.g → (B₁.P * B₂.P).Separable → ∀ (φ₁ : Submodule K.O B₁.A → ℚ) (φ₂ : Submodule K.O B₂.A → ℚ), {M ∈ B₁.Lin | φ₁ M ≠ 0}.Finite → {M ∈ B₂.Lin | φ₂ M ≠ 0}.Finite → {M ∈ (B₁.prod B₂).Lin | φ₁ (M.comap (LinearMap.inl K.O B₁.A B₂.A)) * φ₂ (M.map (LinearMap.snd K.O B₁.A B₂.A)) ≠ 0}.Finite ∧ ∑ᶠ M ∈ (B₁.prod B₂).Lin, φ₁ (M.comap (LinearMap.inl K.O B₁.A B₂.A)) * φ₂ (M.map (LinearMap.snd K.O B₁.A B₂.A)) = (K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P) * ((∑ᶠ M ∈ B₁.Lin, φ₁ M) * ∑ᶠ M ∈ B₂.Lin, φ₂ M) := by
+theorem fibsum
+    : ∀ (K : UQ) (B₁ B₂ : InvAlg K),
+      B₁.σ B₁.g = B₁.g → B₂.σ B₂.g = B₂.g → (B₁.P * B₂.P).Separable
+        → ∀ (φ₁ : Submodule K.O B₁.A → ℚ) (φ₂ : Submodule K.O B₂.A → ℚ),
+          {M ∈ B₁.Lin | φ₁ M ≠ 0}.Finite → {M ∈ B₂.Lin | φ₂ M ≠ 0}.Finite
+            → {M ∈ (B₁.prod B₂).Lin | φ₁ (M.comap (LinearMap.inl K.O B₁.A B₂.A)) * φ₂ (M.map (LinearMap.snd K.O B₁.A B₂.A)) ≠ 0}.Finite
+              ∧ ∑ᶠ M ∈ (B₁.prod B₂).Lin, φ₁ (M.comap (LinearMap.inl K.O B₁.A B₂.A)) * φ₂ (M.map (LinearMap.snd K.O B₁.A B₂.A))
+                = (K.q : ℚ) ^ val K.O (resultant B₁.P B₂.P)
+                  * ((∑ᶠ M ∈ B₁.Lin, φ₁ M) * ∑ᶠ M ∈ B₂.Lin, φ₂ M) := by
   intro K B₁ B₂ hg₁ hg₂ hsep φ₁ φ₂ hf₁ hf₂
   have hres : resultant B₁.P B₂.P ≠ 0 := resultant_ne_zero _ _ hsep.isCoprime
   set v := val K.O (resultant B₁.P B₂.P) with hv
   set π : Submodule K.O (B₁.prod B₂).A → Submodule K.O B₁.A × Submodule K.O B₂.A := fun M =>
     (M.comap (LinearMap.inl K.O B₁.A B₂.A), M.map (LinearMap.snd K.O B₁.A B₂.A)) with hπ
-  suffices key : ∀ F : Submodule K.O (B₁.prod B₂).A → ℚ, (∀ M, F M =
-      φ₁ (M.comap (LinearMap.inl K.O B₁.A B₂.A)) * φ₂ (M.map (LinearMap.snd K.O B₁.A B₂.A))) →
-      {M | M ∈ (B₁.prod B₂).Lin ∧ F M ≠ 0}.Finite ∧ ∑ᶠ M ∈ (B₁.prod B₂).Lin, F M =
-        (K.q : ℚ) ^ v * ((∑ᶠ M ∈ B₁.Lin, φ₁ M) * ∑ᶠ M ∈ B₂.Lin, φ₂ M) from key _ (fun _ => rfl)
+  suffices key
+      : ∀ F : Submodule K.O (B₁.prod B₂).A → ℚ,
+        (∀ M,
+            F M
+              = φ₁ (M.comap (LinearMap.inl K.O B₁.A B₂.A))
+                * φ₂ (M.map (LinearMap.snd K.O B₁.A B₂.A)))
+          → {M | M ∈ (B₁.prod B₂).Lin ∧ F M ≠ 0}.Finite
+            ∧ ∑ᶠ M ∈ (B₁.prod B₂).Lin, F M
+              = (K.q : ℚ) ^ v * ((∑ᶠ M ∈ B₁.Lin, φ₁ M) * ∑ᶠ M ∈ B₂.Lin, φ₂ M) from
+    key _ (fun _ => rfl)
   intro F hF
   set s₁ := hf₁.toFinset
   set s₂ := hf₂.toFinset
@@ -79,29 +116,41 @@ theorem fibsum : ∀ (K : UQ) (B₁ B₂ : InvAlg K), B₁.σ B₁.g = B₁.g �
       have : 0 < Nat.card (IsLocalRing.ResidueField K.O) := Nat.card_pos
       rw [K.card_res] at this
       exact_mod_cast pos_of_ne_zero (fun h => by simp [h] at this)
-    have hne : Nat.card {M : Submodule K.O (B₁.A × B₂.A) // M ∈ (B₁.prod B₂).Lin ∧
-        M.comap (LinearMap.inl K.O B₁.A B₂.A) = p.1 ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = p.2} ≠ 0 := by
+    have hne
+        : Nat.card
+            {M : Submodule K.O (B₁.A × B₂.A)
+              // M ∈ (B₁.prod B₂).Lin ∧ M.comap (LinearMap.inl K.O B₁.A B₂.A) = p.1
+                ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = p.2}
+          ≠ 0 := by
       intro h0
       rw [h0] at hc
       exact (zpow_pos hqpos v).ne' (by simpa using hc.symm)
     have := Nat.finite_of_card_ne_zero hne
     refine (Set.finite_coe_iff.1 ?_)
-    have e : {M | M ∈ (B₁.prod B₂).Lin ∧ π M = p} = {M | M ∈ (B₁.prod B₂).Lin ∧
-        M.comap (LinearMap.inl K.O B₁.A B₂.A) = p.1 ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = p.2} := by
-      ext M; simp only [Set.mem_setOf_eq, hπ, Prod.ext_iff]
-    rw [e]; exact this
+    have e
+        : {M | M ∈ (B₁.prod B₂).Lin ∧ π M = p}
+          = {M | M ∈ (B₁.prod B₂).Lin ∧
+            M.comap (LinearMap.inl K.O B₁.A B₂.A) = p.1 ∧ M.map (LinearMap.snd K.O B₁.A B₂.A) = p.2} :=
+      by ext M; simp only [Set.mem_setOf_eq, hπ, Prod.ext_iff]
+    rw [e]
+    exact this
   set W := {M | M ∈ (B₁.prod B₂).Lin ∧ π M ∈ s₁ ×ˢ s₂} with hW
   have hWfin : W.Finite := by
-    refine (Set.Finite.biUnion (t := fun p => {M | M ∈ (B₁.prod B₂).Lin ∧ π M = p})
+    refine (Set.Finite.biUnion
+      (t := fun p => {M | M ∈ (B₁.prod B₂).Lin ∧ π M = p})
       (s₁ ×ˢ s₂).finite_toSet hfibfin).subset ?_
     intro M hM
-    exact Set.mem_biUnion (x := π M) hM.2 (show M ∈ {M' | M' ∈ (B₁.prod B₂).Lin ∧ π M' = π M} from ⟨hM.1, rfl⟩)
+    exact Set.mem_biUnion (x := π M) hM.2
+      (show M ∈ {M' | M' ∈ (B₁.prod B₂).Lin ∧ π M' = π M} from ⟨hM.1, rfl⟩)
   have hsupp : ∀ M ∈ (B₁.prod B₂).Lin, F M ≠ 0 → M ∈ W := by
     intro M hM hFM
     have hl := GlobalTheory.T.lieLattice_prod_comap_inl_and_map_snd K B₁ B₂ M hM
     rw [hF M] at hFM
-    refine ⟨hM, Finset.mem_product.2 ⟨(hs₁ _).2 ⟨hl.1, left_ne_zero_of_mul hFM⟩,
-      (hs₂ _).2 ⟨hl.2, right_ne_zero_of_mul hFM⟩⟩⟩
+    refine ⟨
+      hM,
+      Finset.mem_product.2
+        ⟨(hs₁ _).2 ⟨hl.1, left_ne_zero_of_mul hFM⟩, (hs₂ _).2 ⟨hl.2, right_ne_zero_of_mul hFM⟩⟩
+    ⟩
   refine ⟨hWfin.subset fun M hM => hsupp M hM.1 hM.2, ?_⟩
   have hL : ∑ᶠ M ∈ (B₁.prod B₂).Lin, F M = ∑ M ∈ hWfin.toFinset, F M := by
     have hset : (B₁.prod B₂).Lin ∩ Function.support F = W ∩ Function.support F := by
@@ -111,21 +160,25 @@ theorem fibsum : ∀ (K : UQ) (B₁ B₂ : InvAlg K), B₁.σ B₁.g = B₁.g �
     rw [← finsum_mem_eq_finite_toFinset_sum _ hWfin, ← finsum_mem_inter_support,
       ← finsum_mem_inter_support (s := W), hset]
   have h1 : ∑ᶠ M ∈ B₁.Lin, φ₁ M = ∑ M ∈ s₁, φ₁ M := by
-    have hset : B₁.Lin ∩ Function.support φ₁ = {M | M ∈ B₁.Lin ∧ φ₁ M ≠ 0} ∩ Function.support φ₁ := by
+    have hset
+        : B₁.Lin ∩ Function.support φ₁ = {M | M ∈ B₁.Lin ∧ φ₁ M ≠ 0} ∩ Function.support φ₁ := by
       ext M
       simp only [Set.mem_inter_iff, Function.mem_support, Set.mem_setOf_eq]
       exact ⟨fun h => ⟨⟨h.1, h.2⟩, h.2⟩, fun h => ⟨h.1.1, h.2⟩⟩
     rw [← finsum_mem_eq_finite_toFinset_sum _ hf₁, ← finsum_mem_inter_support,
       ← finsum_mem_inter_support (s := {M | M ∈ B₁.Lin ∧ φ₁ M ≠ 0}), hset]
   have h2 : ∑ᶠ M ∈ B₂.Lin, φ₂ M = ∑ M ∈ s₂, φ₂ M := by
-    have hset : B₂.Lin ∩ Function.support φ₂ = {M | M ∈ B₂.Lin ∧ φ₂ M ≠ 0} ∩ Function.support φ₂ := by
+    have hset
+        : B₂.Lin ∩ Function.support φ₂ = {M | M ∈ B₂.Lin ∧ φ₂ M ≠ 0} ∩ Function.support φ₂ := by
       ext M
       simp only [Set.mem_inter_iff, Function.mem_support, Set.mem_setOf_eq]
       exact ⟨fun h => ⟨⟨h.1, h.2⟩, h.2⟩, fun h => ⟨h.1.1, h.2⟩⟩
     rw [← finsum_mem_eq_finite_toFinset_sum _ hf₂, ← finsum_mem_inter_support,
       ← finsum_mem_inter_support (s := {M | M ∈ B₂.Lin ∧ φ₂ M ≠ 0}), hset]
-  rw [hL, h1, h2, ← Finset.sum_fiberwise_of_maps_to (s := hWfin.toFinset) (t := s₁ ×ˢ s₂) (g := π)
-    (fun M hM => ((Set.Finite.mem_toFinset hWfin).1 hM).2), Finset.sum_mul_sum, ← Finset.sum_product', Finset.mul_sum]
+  rw [hL, h1, h2,
+    ← Finset.sum_fiberwise_of_maps_to (s := hWfin.toFinset) (t := s₁ ×ˢ s₂) (g := π)
+      (fun M hM => ((Set.Finite.mem_toFinset hWfin).1 hM).2),
+    Finset.sum_mul_sum, ← Finset.sum_product', Finset.mul_sum]
   refine Finset.sum_congr rfl fun p hp => ?_
   have hin : ∀ M ∈ hWfin.toFinset.filter (fun M => π M = p), F M = φ₁ p.1 * φ₂ p.2 := by
     intro M hM
@@ -146,6 +199,8 @@ theorem fibsum : ∀ (K : UQ) (B₁ B₂ : InvAlg K), B₁.σ B₁.g = B₁.g �
   · rintro ⟨⟨h, _⟩, h'⟩; exact ⟨h, h'⟩
   · rintro ⟨h, h'⟩
     refine ⟨⟨h, ?_⟩, h'⟩
-    rw [Finset.mem_product]; rw [h'.1, h'.2]; exact Finset.mem_product.1 hp
+    rw [Finset.mem_product]
+    rw [h'.1, h'.2]
+    exact Finset.mem_product.1 hp
 
 end GlobalTheory.UnitLemma.FibSum

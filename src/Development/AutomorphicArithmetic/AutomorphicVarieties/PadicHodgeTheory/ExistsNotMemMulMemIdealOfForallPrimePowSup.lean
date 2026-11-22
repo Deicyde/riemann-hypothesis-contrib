@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing UpperTheory.V.Alg
 
-private theorem a3one_of_factSplit_of_countCont (R : Type) [CommRing R] [IsNoetherianRing R] (I p : Ideal R) [hp : p.IsPrime]
-    (a : R) (h : ∀ N : ℕ, ∃ s, s ∉ p ∧ s * a ∈ p ^ N ⊔ I) : ∃ y, y ∉ p ∧ y * a ∈ I := by
+private theorem a3one_of_factSplit_of_countCont
+    (R : Type) [CommRing R] [IsNoetherianRing R]
+    (I p : Ideal R) [hp : p.IsPrime]
+    (a : R) (h : ∀ N : ℕ, ∃ s, s ∉ p ∧ s * a ∈ p ^ N ⊔ I)
+    : ∃ y, y ∉ p ∧ y * a ∈ I := by
   by_cases hIp : I ≤ p
   swap
   · obtain ⟨y, hyI, hyp⟩ := Set.not_subset.mp hIp
@@ -15,21 +18,25 @@ private theorem a3one_of_factSplit_of_countCont (R : Type) [CommRing R] [IsNoeth
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
   haveI : IsNoetherianRing (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) :=
     IsLocalization.isNoetherianRing (p.map (Ideal.Quotient.mk I)).primeCompl _ inferInstance
-  have hKrull := Ideal.iInf_pow_eq_bot_of_isLocalRing
-    (IsLocalRing.maximalIdeal (Localization.AtPrime (p.map (Ideal.Quotient.mk I))))
-    (IsLocalRing.maximalIdeal.isMaximal _).ne_top
-  have hmem : algebraMap (R ⧸ I) (Localization.AtPrime (p.map (Ideal.Quotient.mk I)))
-      (Ideal.Quotient.mk I a) ∈ ⨅ i : ℕ,
-        IsLocalRing.maximalIdeal (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) ^ i := by
+  have hKrull :=
+    Ideal.iInf_pow_eq_bot_of_isLocalRing
+      (IsLocalRing.maximalIdeal (Localization.AtPrime (p.map (Ideal.Quotient.mk I))))
+      (IsLocalRing.maximalIdeal.isMaximal _).ne_top
+  have hmem
+      : algebraMap (R ⧸ I) (Localization.AtPrime (p.map (Ideal.Quotient.mk I)))
+          (Ideal.Quotient.mk I a)
+        ∈ ⨅ i : ℕ,
+          IsLocalRing.maximalIdeal (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) ^ i := by
     rw [Submodule.mem_iInf]
     intro N
     obtain ⟨s, hs, hsa⟩ := h N
     have h1 : Ideal.Quotient.mk I (s * a) ∈ (p.map (Ideal.Quotient.mk I)) ^ N := by
       rw [← Ideal.map_pow, Ideal.mem_quotient_iff_mem_sup]
       exact hsa
-    have h2 : algebraMap (R ⧸ I) (Localization.AtPrime (p.map (Ideal.Quotient.mk I)))
-        (Ideal.Quotient.mk I (s * a)) ∈
-          IsLocalRing.maximalIdeal (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) ^ N := by
+    have h2
+        : algebraMap (R ⧸ I) (Localization.AtPrime (p.map (Ideal.Quotient.mk I)))
+            (Ideal.Quotient.mk I (s * a))
+          ∈ IsLocalRing.maximalIdeal (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) ^ N := by
       rw [← Localization.AtPrime.map_eq_maximalIdeal, ← Ideal.map_pow]
       exact Ideal.mem_map_of_mem _ h1
     have hs' : Ideal.Quotient.mk I s ∉ p.map (Ideal.Quotient.mk I) := by
@@ -43,8 +50,9 @@ private theorem a3one_of_factSplit_of_countCont (R : Type) [CommRing R] [IsNoeth
     have := Ideal.mul_mem_left _ (↑u⁻¹ : Localization.AtPrime (p.map (Ideal.Quotient.mk I))) h2
     rwa [← hu, ← mul_assoc, Units.inv_mul, one_mul] at this
   rw [hKrull, Submodule.mem_bot] at hmem
-  obtain ⟨⟨c, hc⟩, hca⟩ := (IsLocalization.map_eq_zero_iff (p.map (Ideal.Quotient.mk I)).primeCompl
-    (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) _).mp hmem
+  obtain ⟨⟨c, hc⟩, hca⟩ :=
+    (IsLocalization.map_eq_zero_iff (p.map (Ideal.Quotient.mk I)).primeCompl
+      (Localization.AtPrime (p.map (Ideal.Quotient.mk I))) _).mp hmem
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective c
   have hc' : Ideal.Quotient.mk I y ∉ p.map (Ideal.Quotient.mk I) := hc
   refine ⟨y, fun hy => hc' (Ideal.mem_map_of_mem _ hy), ?_⟩
@@ -52,8 +60,10 @@ private theorem a3one_of_factSplit_of_countCont (R : Type) [CommRing R] [IsNoeth
   rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem] at hca'
   exact hca'
 
-theorem UpperTheory.exists_not_mem_mul_mem_ideal_of_forall_prime_pow_sup :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I p P : Ideal R), p.IsPrime → I ≤ p → (∀ a ∈ P, ∀ N : ℕ, ∃ s, s ∉ p ∧ s * a ∈ p ^ N ⊔ I) → ∃ y, y ∉ p ∧ ∀ a ∈ P, y * a ∈ I := by
+theorem UpperTheory.exists_not_mem_mul_mem_ideal_of_forall_prime_pow_sup
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I p P : Ideal R),
+      p.IsPrime → I ≤ p → (∀ a ∈ P, ∀ N : ℕ, ∃ s, s ∉ p ∧ s * a ∈ p ^ N ⊔ I)
+        → ∃ y, y ∉ p ∧ ∀ a ∈ P, y * a ∈ I := by
   classical
   intro R _ _ I p P hp hIp hP
   haveI := hp
@@ -66,7 +76,8 @@ theorem UpperTheory.exists_not_mem_mul_mem_ideal_of_forall_prime_pow_sup :
     | insert b T hb ih =>
       intro hT
       obtain ⟨y1, hy1, hy1'⟩ := ih (fun z hz => hT (Finset.mem_insert_of_mem hz))
-      obtain ⟨y2, hy2, hy2'⟩ := a3one_of_factSplit_of_countCont R I p b (hP b (hT (Finset.mem_insert_self b T)))
+      obtain ⟨y2, hy2, hy2'⟩ :=
+        a3one_of_factSplit_of_countCont R I p b (hP b (hT (Finset.mem_insert_self b T)))
       refine ⟨y1 * y2, fun h => (hp.mem_or_mem h).elim hy1 hy2, ?_⟩
       intro z hz
       rcases Finset.mem_insert.mp hz with rfl | hz

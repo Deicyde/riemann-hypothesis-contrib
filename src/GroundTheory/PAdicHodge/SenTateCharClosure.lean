@@ -24,8 +24,7 @@ def inertiaGal (K : IntermediateField ℚ_[p] (PadicAlgCl p)) : Subgroup Gal(Pad
   one_mem' := fun y _ => by simp
   mul_mem' := fun {σ τ} hσ hτ y hy => by
     have hτy : ‖τ y‖ ≤ 1 := by rwa [norm_gal_apply]
-    have e : (σ * τ) y - y = (σ (τ y) - τ y) + (τ y - y) := by
-      rw [AlgEquiv.mul_apply]; ring
+    have e : (σ * τ) y - y = (σ (τ y) - τ y) + (τ y - y) := by rw [AlgEquiv.mul_apply]; ring
     rw [e]
     exact lt_of_le_of_lt ((PadicAlgCl.isNonarchimedean p) _ _) (max_lt (hσ _ hτy) (hτ y hy))
   inv_mem' := fun {σ} hσ y hy => by
@@ -34,17 +33,18 @@ def inertiaGal (K : IntermediateField ℚ_[p] (PadicAlgCl p)) : Subgroup Gal(Pad
     rw [← norm_gal_apply σ, e, norm_neg]
     exact hσ y hy
 
-theorem mem_inertiaGal {K : IntermediateField ℚ_[p] (PadicAlgCl p)} {σ : Gal(PadicAlgCl p/K)} :
-    σ ∈ inertiaGal K ↔ ∀ y : PadicAlgCl p, ‖y‖ ≤ 1 → ‖σ y - y‖ < 1 := Iff.rfl
+theorem mem_inertiaGal {K : IntermediateField ℚ_[p] (PadicAlgCl p)} {σ : Gal(PadicAlgCl p/K)}
+    : σ ∈ inertiaGal K ↔ ∀ y : PadicAlgCl p, ‖y‖ ≤ 1 → ‖σ y - y‖ < 1 :=
+  Iff.rfl
 
 namespace SenTateChar
 
 open SenTateChar
 
-theorem exists_mem_inertiaGal_unitsOneAdd_two (K : IntermediateField ℚ_[p] (PadicAlgCl p))
-    (η : Gal(PadicAlgCl p/K) →* ℤ_[p]ˣ) (hη : Continuous η)
-    (hinf : (η '' (inertiaGal K : Set Gal(PadicAlgCl p/K))).Infinite) :
-    ∃ τ ∈ inertiaGal K, η τ ∈ unitsOneAdd p 2 ∧ η τ ≠ 1 := by
+theorem exists_mem_inertiaGal_unitsOneAdd_two
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (η : Gal(PadicAlgCl p/K) →* ℤ_[p]ˣ)
+    (hη : Continuous η) (hinf : (η '' (inertiaGal K : Set Gal(PadicAlgCl p/K))).Infinite)
+    : ∃ τ ∈ inertiaGal K, η τ ∈ unitsOneAdd p 2 ∧ η τ ≠ 1 := by
   by_contra hne
   push Not at hne
   apply hinf
@@ -52,7 +52,6 @@ theorem exists_mem_inertiaGal_unitsOneAdd_two (K : IntermediateField ℚ_[p] (Pa
   have hU : IsOpen (U : Set Gal(PadicAlgCl p/K)) := (isOpen_unitsOneAdd 2).preimage hη
   have hfin : Finite (Gal(PadicAlgCl p/K) ⧸ U) := Subgroup.quotient_finite_of_isOpen U hU
   classical
-
   let f : Gal(PadicAlgCl p/K) ⧸ U → ℤ_[p]ˣ := fun c =>
     if h : ∃ τ ∈ inertiaGal K, (τ : Gal(PadicAlgCl p/K) ⧸ U) = c then η h.choose else 1
   refine (Set.finite_range f).subset ?_
@@ -67,18 +66,17 @@ theorem exists_mem_inertiaGal_unitsOneAdd_two (K : IntermediateField ℚ_[p] (Pa
   rw [map_mul, map_inv, inv_mul_eq_one] at h1
   exact h1
 
-theorem eq_zero_of_tower (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
+theorem eq_zero_of_tower
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
     (η : Gal(PadicAlgCl p/K) →* ℤ_[p]ˣ)
-    (M : ℕ → IntermediateField K (PadicAlgCl p)) (hM : Monotone M)
-    [∀ k, FiniteDimensional K (M k)]
+    (M : ℕ → IntermediateField K (PadicAlgCl p)) (hM : Monotone M) [∀ k, FiniteDimensional K (M k)]
     (hstab : ∀ (σ : Gal(PadicAlgCl p/K)) (k : ℕ), ∀ y ∈ M k, σ y ∈ M k)
     (hker : ∀ σ : Gal(PadicAlgCl p/K), (∀ k, σ ∈ (M k).fixingSubgroup) → η σ = 1)
-    (C : ℝ) (n₁ : ℕ)
-    (hbound : ∀ n, n₁ ≤ n → ∀ m, ∀ y ∈ M m, ‖normTrace (M n) y‖ ≤ C * ‖y‖)
+    (C : ℝ) (n₁ : ℕ) (hbound : ∀ n, n₁ ≤ n → ∀ m, ∀ y ∈ M m, ‖normTrace (M n) y‖ ≤ C * ‖y‖)
     (hgen : ∀ n, n₁ ≤ n → ∃ γ ∈ (M n).fixingSubgroup, η γ ≠ 1)
     {x : ℂ_[p]}
-    (hx : ∀ σ : Gal(PadicAlgCl p/K), algebraMap ℚ_[p] ℂ_[p] ((η σ : ℤ_[p]) : ℚ_[p]) * (σ • x) = x) :
-    x = 0 := by
+    (hx : ∀ σ : Gal(PadicAlgCl p/K), algebraMap ℚ_[p] ℂ_[p] ((η σ : ℤ_[p]) : ℚ_[p]) * (σ • x) = x)
+    : x = 0 := by
   classical
   set Ms : IntermediateField K (PadicAlgCl p) := ⨆ k, M k with hMs
   set E : IntermediateField ℚ_[p] (PadicAlgCl p) := Ms.restrictScalars ℚ_[p] with hE
@@ -94,13 +92,15 @@ theorem eq_zero_of_tower (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteD
   have hxc : x ∈ closureInCp E := by
     have hfixed : ∀ σ ∈ Ms.fixingSubgroup, σ • x = x := by
       intro σ hσ
-      have h1 : η σ = 1 := hker σ fun k => by
-        rw [IntermediateField.mem_fixingSubgroup_iff] at hσ ⊢
-        exact fun y hy => hσ y (le_iSup M k hy)
+      have h1 : η σ = 1 :=
+        hker σ fun k => by
+          rw [IntermediateField.mem_fixingSubgroup_iff] at hσ ⊢
+          exact fun y hy => hσ y (le_iSup M k hy)
       have := hx σ
       rwa [h1, Units.val_one, PadicInt.coe_one, map_one, one_mul] at this
-    have h := fixedPoints_closedSubgroup_eq_closure Ms.fixingSubgroup
-      (InfiniteGalois.fixingSubgroup_isClosed Ms)
+    have h :=
+      fixedPoints_closedSubgroup_eq_closure Ms.fixingSubgroup
+        (InfiniteGalois.fixingSubgroup_isClosed Ms)
     have hx' : x ∈ {x : ℂ_[p] | ∀ σ ∈ Ms.fixingSubgroup, σ • x = x} := hfixed
     rw [h, InfiniteGalois.fixedField_fixingSubgroup] at hx'
     exact hx'
@@ -110,7 +110,8 @@ theorem eq_zero_of_tower (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteD
     rwa [normTrace_of_mem _ (one_mem _), norm_one, mul_one] at h
   have hC0 : 0 ≤ C := zero_le_one.trans hC1
 
-  have hadd : ∀ n, ∀ y ∈ E, ∀ z ∈ E, normTrace (M n) (y + z) = normTrace (M n) y + normTrace (M n) z :=
+  have hadd
+      : ∀ n, ∀ y ∈ E, ∀ z ∈ E, normTrace (M n) (y + z) = normTrace (M n) y + normTrace (M n) z :=
     fun n y _ z _ => normTrace_add _ y z
   have hbd : ∀ n, n₁ ≤ n → ∀ y ∈ E, ‖normTrace (M n) y‖ ≤ C * ‖y‖ := by
     intro n hn y hy
@@ -120,8 +121,9 @@ theorem eq_zero_of_tower (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteD
     intro σ y hy
     obtain ⟨m, hm⟩ := hmemE hy
     exact hME (hstab σ m y hm)
-  have hcomm : ∀ (σ : Gal(PadicAlgCl p/K)) (n : ℕ) (y : PadicAlgCl p),
-      normTrace (M n) (σ y) = σ (normTrace (M n) y) := by
+  have hcomm
+      : ∀ (σ : Gal(PadicAlgCl p/K)) (n : ℕ) (y : PadicAlgCl p),
+        normTrace (M n) (σ y) = σ (normTrace (M n) y) := by
     intro σ n y
     refine normTrace_map_of_map_eq (M n) σ ?_ y
     apply le_antisymm
@@ -148,16 +150,19 @@ theorem eq_zero_of_tower (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteD
     obtain ⟨b, hb, hbx⟩ := extendToClosure_mem (hadd n) (hbd n hn) hmaps hxc
 
     set q : ℚ_[p] := ((η γ : ℤ_[p]) : ℚ_[p])
-    have hq : algebraMap ℚ_[p] ℂ_[p] q = ((algebraMap ℚ_[p] (PadicAlgCl p) q : PadicAlgCl p) : ℂ_[p]) :=
+    have hq
+        : algebraMap ℚ_[p] ℂ_[p] q = ((algebraMap ℚ_[p] (PadicAlgCl p) q : PadicAlgCl p) : ℂ_[p]) :=
       rfl
     have hqk : algebraMap ℚ_[p] (PadicAlgCl p) q ∈ k' := k'.algebraMap_mem q
     have hγx : γ • x ∈ closureInCp E := smul_mem_closureInCp γ (hmapsE γ) hxc
-    have key : extendToClosure E (normTrace (M n)) x =
-        algebraMap ℚ_[p] ℂ_[p] q * extendToClosure E (normTrace (M n)) x := by
+    have key
+        : extendToClosure E (normTrace (M n)) x
+          = algebraMap ℚ_[p] ℂ_[p] q * extendToClosure E (normTrace (M n)) x := by
       conv_lhs => rw [← hx γ]
       rw [hq, extendToClosure_mul (hadd n) (hbd n hn) hkE hmul hqk hγx,
         extendToClosure_smul (hadd n) (hbd n hn) γ (hmapsE γ) (fun y _ => hcomm γ n y) hxc, ← hbx,
-        gal_smul_coe, (IntermediateField.mem_fixingSubgroup_iff _ _).1 hγ b ((mem_restrictScalars _).1 hb)]
+        gal_smul_coe,
+        (IntermediateField.mem_fixingSubgroup_iff _ _).1 hγ b ((mem_restrictScalars _).1 hb)]
     have hq1 : algebraMap ℚ_[p] ℂ_[p] q ≠ 1 := by
       rw [Ne, ← map_one (algebraMap ℚ_[p] ℂ_[p]), (algebraMap ℚ_[p] ℂ_[p]).injective.eq_iff]
       intro h
@@ -178,27 +183,30 @@ theorem eq_zero_of_tower (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteD
     have hsub : (y : ℂ_[p]) - x ∈ closureInCp E := sub_mem_closureInCp hyc hxc
     have hadd' := hadd m'
     have hbd' := hbd m' (le_max_right _ _)
-    have h1 : extendToClosure E (normTrace (M m')) (y : ℂ_[p]) =
-        extendToClosure E (normTrace (M m')) ((y : ℂ_[p]) - x) +
-          extendToClosure E (normTrace (M m')) x := by
+    have h1
+        : extendToClosure E (normTrace (M m')) (y : ℂ_[p])
+          = extendToClosure E (normTrace (M m')) ((y : ℂ_[p]) - x)
+            + extendToClosure E (normTrace (M m')) x := by
       rw [extendToClosure_sub hadd' hbd' hyc hxc]
       ring
     rw [extendToClosure_coe hadd' hbd' hy, normTrace_of_mem _ hym, hR m' (le_max_right _ _),
-      add_zero] at h1
+        add_zero]
+      at h1
     have h2 : ‖(y : ℂ_[p])‖ ≤ C * ε := by
       rw [h1]
       refine (norm_extendToClosure_le hadd' hbd' hsub).trans ?_
       rw [← dist_eq_norm, dist_comm]
       exact mul_le_mul_of_nonneg_left hxy.le hC0
-    calc ‖x‖ = ‖(x - y) + y‖ := by rw [sub_add_cancel]
+    calc
+      ‖x‖
+        = ‖(x - y) + y‖ := by rw [sub_add_cancel]
       _ ≤ ‖x - (y : ℂ_[p])‖ + ‖(y : ℂ_[p])‖ := norm_add_le _ _
       _ ≤ ε + C * ε := add_le_add (by rw [← dist_eq_norm]; exact hxy.le) h2
       _ = (1 + C) * ε := by ring
   by_contra hx0
   have hpos : 0 < ‖x‖ := norm_pos_iff.2 hx0
   have h := hbound' (‖x‖ / (2 * (1 + C))) (by positivity)
-  have h' : (1 + C) * (‖x‖ / (2 * (1 + C))) = ‖x‖ / 2 := by
-    field_simp
+  have h' : (1 + C) * (‖x‖ / (2 * (1 + C))) = ‖x‖ / 2 := by field_simp
   rw [h'] at h
   linarith
 

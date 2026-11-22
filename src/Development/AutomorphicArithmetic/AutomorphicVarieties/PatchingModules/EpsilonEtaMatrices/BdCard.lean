@@ -10,10 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem lc_mat {Γ R : Type} [TopologicalSpace Γ] {n : ℕ} (f : Γ → Matrix (Fin n) (Fin n) R)
-    (h : ∀ i j, IsLocallyConstant fun g => f g i j) : IsLocallyConstant f := by
+private theorem lc_mat
+    {Γ R : Type} [TopologicalSpace Γ]
+    {n : ℕ} (f : Γ → Matrix (Fin n) (Fin n) R) (h : ∀ i j, IsLocallyConstant fun g => f g i j)
+    : IsLocallyConstant f := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro g0
   have : ∀ᶠ g in nhds g0, ∀ i j, f g i j = f g0 i j :=
@@ -21,8 +24,10 @@ private theorem lc_mat {Γ R : Type} [TopologicalSpace Γ] {n : ℕ} (f : Γ →
   filter_upwards [this] with g hg
   exact Matrix.ext hg
 
-private theorem block_le₂ {R Γ M : Type} [CommRing R] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) (h : LC ρ) : Bl ρ ≤ Zl ρ := by
+private theorem block_le₂
+    {R Γ M : Type} [CommRing R] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) (h : LC ρ)
+    : Bl ρ ≤ Zl ρ := by
   intro z hz
   obtain ⟨m, hm⟩ := (mem_Bl ρ).1 hz
   obtain rfl : z = fun g => ρ g m - m := funext hm
@@ -30,15 +35,20 @@ private theorem block_le₂ {R Γ M : Type} [CommRing R] [Group Γ] [Topological
   simp only [map_mul, map_sub, Module.End.mul_apply]
   abel
 
-private theorem bd_card {l : ℕ} [Fact l.Prime] (F : GFrame l) {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
+private theorem bd_card
+    {l : ℕ} [Fact l.Prime]
+    (F : GFrame l)
+    {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
     {n : ℕ} (ρ : F.G₀ → Matrix (Fin n) (Fin n) R) (V : Submodule A (Matrix (Fin n) (Fin n) R))
-    (rep : Representation A F.Γ V) (had : IsAd F ρ (fun _ => 1) V rep) (hlc : LC rep) :
-    (Bd F ρ V).ncard = {z | z ∈ Bl rep ∧ z F.c = 0}.ncard := by
+    (rep : Representation A F.Γ V) (had : IsAd F ρ (fun _ => 1) V rep) (hlc : LC rep)
+    : (Bd F ρ V).ncard = {z | z ∈ Bl rep ∧ z F.c = 0}.ncard := by
   have hP := (polZ l F A R n ρ _ V rep had).2
   obtain ⟨a1, a2⟩ := had
   simp only [one_smul] at a1 a2
-  have e : Bd F ρ V = (fun (y : F.Γ → V) (g : F.G₀) => (y g : Matrix (Fin n) (Fin n) R)) ''
-      {z | z ∈ Bl rep ∧ z F.c = 0} := by
+  have e
+      : Bd F ρ V
+        = (fun (y : F.Γ → V) (g : F.G₀) => (y g : Matrix (Fin n) (Fin n) R))
+          '' {z | z ∈ Bl rep ∧ z F.c = 0} := by
     ext z
     constructor
     · rintro ⟨Y, hY, hT, rfl⟩

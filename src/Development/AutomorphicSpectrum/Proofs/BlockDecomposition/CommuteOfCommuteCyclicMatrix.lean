@@ -5,15 +5,19 @@ public import GroundTheory.AutomorphicForms.AnisotropicHeight
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4 GlobalTheory.CompanionTheory.TorusCh
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4
+  GlobalTheory.CompanionTheory.TorusCh
 open scoped Pointwise
 
 namespace GlobalTheory.CompanionTheory.TorusCh
 
-theorem map_aeval_commute_of_commute {K R : Type} [Field K] [CommRing R] [Algebra K R] {n : ℕ}
-    (γ : Matrix (Fin n) (Fin n) K) (X : Matrix (Fin n) (Fin n) R)
-    (hX : X * γ.map (algebraMap K R) = γ.map (algebraMap K R) * X) (h : K[X]) :
-    X * (aeval γ h).map (algebraMap K R) = (aeval γ h).map (algebraMap K R) * X := by
+theorem map_aeval_commute_of_commute
+    {K R : Type} [Field K] [CommRing R] [Algebra K R]
+    {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (X : Matrix (Fin n) (Fin n) R)
+    (hX : X * γ.map (algebraMap K R) = γ.map (algebraMap K R) * X)
+    (h : K[X])
+    : X * (aeval γ h).map (algebraMap K R) = (aeval γ h).map (algebraMap K R) * X := by
   have hc : Commute X (γ.map (algebraMap K R)) := hX
   have key : ∀ h : K[X], Commute X (((algebraMap K R).mapMatrix (m := Fin n)) (aeval γ h)) := by
     intro h
@@ -26,20 +30,23 @@ theorem map_aeval_commute_of_commute {K R : Type} [Field K] [CommRing R] [Algebr
       have h1 : ((algebraMap K R).mapMatrix (m := Fin n)) γ = γ.map (algebraMap K R) := rfl
       rw [h1]
       refine Commute.mul_right ?_ (hc.pow_right k)
-      have h2 : ((algebraMap K R).mapMatrix (m := Fin n)) (algebraMap K (Matrix (Fin n) (Fin n) K) a)
-          = (algebraMap K R a) • (1 : Matrix (Fin n) (Fin n) R) := by
+      have h2
+          : ((algebraMap K R).mapMatrix (m := Fin n)) (algebraMap K (Matrix (Fin n) (Fin n) K) a)
+            = (algebraMap K R a) • (1 : Matrix (Fin n) (Fin n) R) := by
         ext i j
         simp [Matrix.algebraMap_matrix_apply, Matrix.one_apply, Algebra.algebraMap_eq_smul_one]
       rw [h2]
       exact (Commute.one_right X).smul_right _
   exact key h
 
-theorem commute_of_commute_cyclic (K : Type) [Field K] (R : Type) [CommRing R] [Algebra K R] (n : ℕ)
-    (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K)
-    (hv : ∀ y : Fin n → K, ∃ h : K[X], y = aeval γ h *ᵥ v)
-    (X Y : Matrix (Fin n) (Fin n) R)
+theorem commute_of_commute_cyclic
+    (K : Type) [Field K]
+    (R : Type) [CommRing R] [Algebra K R]
+    (n : ℕ) (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K)
+    (hv : ∀ y : Fin n → K, ∃ h : K[X], y = aeval γ h *ᵥ v) (X Y : Matrix (Fin n) (Fin n) R)
     (hX : X * γ.map (algebraMap K R) = γ.map (algebraMap K R) * X)
-    (hY : Y * γ.map (algebraMap K R) = γ.map (algebraMap K R) * Y) : X * Y = Y * X := by
+    (hY : Y * γ.map (algebraMap K R) = γ.map (algebraMap K R) * Y)
+    : X * Y = Y * X := by
   classical
   choose h hh using fun j : Fin n => hv (Pi.single j 1)
   set φ := algebraMap K R with hφ

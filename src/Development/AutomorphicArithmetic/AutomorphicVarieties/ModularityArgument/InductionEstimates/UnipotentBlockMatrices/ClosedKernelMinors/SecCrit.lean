@@ -10,24 +10,36 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private theorem reps_right {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
-    {v : L2 μ} {φ : G1 K n → ℂ} (h : Reps μ v φ) (g : G1 K n) :
-    Reps μ (rightRegularRep (Gam K n) μ g v) (fun y => φ (y * g)) := by
-  have h1 := MeasureTheory.QuasiMeasurePreserving.ae (quasiMeasurePreserving_mk (Gam K n) μ) (coeFn_rightRegularRep (Gam K n) μ g v)
-  have h2 := MeasureTheory.QuasiMeasurePreserving.ae (measurePreserving_mul_right μ g).quasiMeasurePreserving h
+private theorem reps_right
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
+    {v : L2 μ} {φ : G1 K n → ℂ} (h : Reps μ v φ)
+    (g : G1 K n)
+    : Reps μ (rightRegularRep (Gam K n) μ g v) (fun y => φ (y * g)) := by
+  have h1 :=
+    MeasureTheory.QuasiMeasurePreserving.ae (quasiMeasurePreserving_mk (Gam K n) μ)
+      (coeFn_rightRegularRep (Gam K n) μ g v)
+  have h2 :=
+    MeasureTheory.QuasiMeasurePreserving.ae (measurePreserving_mul_right μ g).quasiMeasurePreserving
+      h
   filter_upwards [h1, h2] with y e1 e2
   rw [e1]
   exact e2
 
-private theorem reps_sum {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
-    (τ : Submodule ℂ (L2 μ)) {ι : Type} (s : Finset ι) (φ : ι → G1 K n → ℂ) (c : ι → ℂ)
-    (h : ∀ i, ∃ v ∈ τ, Reps μ v (φ i)) : ∃ v ∈ τ, Reps μ v (fun y => ∑ i ∈ s, c i * φ i y) := by
+private theorem reps_sum
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
+    (τ : Submodule ℂ (L2 μ))
+    {ι : Type} (s : Finset ι) (φ : ι → G1 K n → ℂ) (c : ι → ℂ) (h : ∀ i, ∃ v ∈ τ, Reps μ v (φ i))
+    : ∃ v ∈ τ, Reps μ v (fun y => ∑ i ∈ s, c i * φ i y) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -46,14 +58,15 @@ private theorem zt_zero {K : Type} [Field K] [NumberField K] : zt K 0 = 1 := by
   have : (⟨Real.exp 0, Real.exp_pos 0⟩ : {r : ℝ // 0 < r}) = 1 := Subtype.ext (by simp)
   rw [zt, this, map_one]
 
-private theorem lv_zero {K : Type} [Field K] [NumberField K] (m₁ m₂ : G1 K 2) :
-    ((lv m₁ m₂ 0 : G1 K (2 + 2)) : AdelicGLn.AdelicGL K (2 + 2)) =
-      blk (m₁ : AdelicGLn.AdelicGL K 2) (m₂ : AdelicGLn.AdelicGL K 2) := by
+private theorem lv_zero {K : Type} [Field K] [NumberField K] (m₁ m₂ : G1 K 2)
+    : ((lv m₁ m₂ 0 : G1 K (2 + 2)) : AdelicGLn.AdelicGL K (2 + 2))
+      = blk (m₁ : AdelicGLn.AdelicGL K 2) (m₂ : AdelicGLn.AdelicGL K 2) := by
   rw [blkLaws.1, neg_zero, zt_zero, mul_one, mul_one]
 
-private theorem lv_ray {K : Type} [Field K] [NumberField K] (r : {r : ℝ // 0 < r}) (t : ℝ) (h : r.1 = Real.exp t) :
-    ((lv 1 1 t : G1 K (2 + 2)) : AdelicGLn.AdelicGL K (2 + 2)) =
-      blk (centralSection K 2 r) (centralSection K 2 r⁻¹) := by
+private theorem lv_ray
+    {K : Type} [Field K] [NumberField K] (r : {r : ℝ // 0 < r}) (t : ℝ) (h : r.1 = Real.exp t)
+    : ((lv 1 1 t : G1 K (2 + 2)) : AdelicGLn.AdelicGL K (2 + 2))
+      = blk (centralSection K 2 r) (centralSection K 2 r⁻¹) := by
   have h1 : (⟨Real.exp t, Real.exp_pos t⟩ : {r : ℝ // 0 < r}) = r := Subtype.ext h.symm
   have h2 : (⟨Real.exp (-t), Real.exp_pos (-t)⟩ : {r : ℝ // 0 < r}) = r⁻¹ := by
     apply Subtype.ext
@@ -62,9 +75,16 @@ private theorem lv_ray {K : Type} [Field K] [NumberField K] (r : {r : ℝ // 0 <
   rw [blkLaws.1, zt, zt, h1, h2]
   simp
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.secCrit :
-    ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ₂)) (D : TypeDat K (2 + 2)), CuspIrr μ₂ τ₁ → CuspIrr μ₂ τ₂ → ∀ f : G1 K (2 + 2) → ℂ, D.Fix f →
-      (IsSec τ₁ τ₂ f ↔ Continuous f ∧ (∃ C : ℝ, ∀ g, ‖f g‖ ≤ C) ∧ (∀ X g, f (nn X * g) = f g) ∧ (∀ t g, f (lv 1 1 t * g) = f g) ∧ Slices τ₁ τ₂ f) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.secCrit
+    : ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ₂))
+        (D : TypeDat K (2 + 2)),
+      CuspIrr μ₂ τ₁ → CuspIrr μ₂ τ₂
+        → ∀ f : G1 K (2 + 2) → ℂ,
+          D.Fix f
+            → (IsSec τ₁ τ₂ f
+              ↔ Continuous f ∧ (∃ C : ℝ, ∀ g, ‖f g‖ ≤ C) ∧ (∀ X g, f (nn X * g) = f g)
+                ∧ (∀ t g, f (lv 1 1 t * g) = f g) ∧ Slices τ₁ τ₂ f) := by
   intro K _ _ _ μ₂ _ τ₁ τ₂ D h₁ h₂ f hf
   constructor
   · intro hs
@@ -91,20 +111,29 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.secCrit :
       obtain ⟨hk₁, hk₂⟩ := hE f hc hf hsl k hk
       have hT' := hT (fun m₁ m₂ => f (lv m₁ m₂ 0 * k)) hk₁ hk₂
       set c : Fin a → Fin b → ℂ := fun i j => ∑ p, ∑ q, s i p * u j q * f (lv (x i p) (y j q) 0 * k) with hcdef
-      refine ⟨a * b, fun l m => c (finProdFinEquiv.symm l).1 (finProdFinEquiv.symm l).2 * φ (finProdFinEquiv.symm l).1 (m * n₁),
-        fun l m => ψ (finProdFinEquiv.symm l).2 (m * n₂), fun l => ⟨?_, ?_⟩, fun l => ⟨?_, ?_⟩, fun m₁ m₂ z hz => ?_⟩
+      refine ⟨
+        a * b,
+        fun l m =>
+          c (finProdFinEquiv.symm l).1 (finProdFinEquiv.symm l).2
+            * φ (finProdFinEquiv.symm l).1 (m * n₁),
+        fun l m => ψ (finProdFinEquiv.symm l).2 (m * n₂),
+        fun l => ⟨?_, ?_⟩,
+        fun l => ⟨?_, ?_⟩,
+        fun m₁ m₂ z hz => ?_
+      ⟩
       · exact continuous_const.mul ((hR₁ _ (hφ _)).cont.comp (continuous_mul_const n₁))
       · obtain ⟨v, hv, hq⟩ := (hR₁ _ (hφ (finProdFinEquiv.symm l).1)).rep
-        have := reps_sum μ₂ τ₁ (Finset.univ : Finset Unit) (fun _ m => φ (finProdFinEquiv.symm l).1 (m * n₁))
-          (fun _ => c (finProdFinEquiv.symm l).1 (finProdFinEquiv.symm l).2)
-          (fun _ => ⟨_, h₁.inv n₁ v hv, reps_right μ₂ hq n₁⟩)
+        have :=
+          reps_sum μ₂ τ₁ (Finset.univ : Finset Unit)
+            (fun _ m => φ (finProdFinEquiv.symm l).1 (m * n₁))
+            (fun _ => c (finProdFinEquiv.symm l).1 (finProdFinEquiv.symm l).2)
+            (fun _ => ⟨_, h₁.inv n₁ v hv, reps_right μ₂ hq n₁⟩)
         simpa only [Finset.univ_unique, Finset.sum_singleton] using this
       · exact (hR₂ _ (hψ _)).cont.comp (continuous_mul_const n₂)
       · obtain ⟨v, hv, hq⟩ := (hR₂ _ (hψ (finProdFinEquiv.symm l).2)).rep
         exact ⟨_, h₂.inv n₂ v hv, reps_right μ₂ hq n₂⟩
       · obtain ⟨e, he, -⟩ := adMeas m₁ m₂ 0
-        have h1 : lv m₁ m₂ 0 * nn X = nn (e.symm X) * lv m₁ m₂ 0 := by
-          rw [he, e.apply_symm_apply]
+        have h1 : lv m₁ m₂ 0 * nn X = nn (e.symm X) * lv m₁ m₂ 0 := by rw [he, e.apply_symm_apply]
         have h2 : lv m₁ m₂ 0 * lv n₁ n₂ t = lv 1 1 t * lv (m₁ * n₁) (m₂ * n₂) 0 := by
           rw [blkLaws.2.1, blkLaws.2.1]; simp
         have hz' : z = nn (e.symm X) * (lv 1 1 t * (lv (m₁ * n₁) (m₂ * n₂) 0 * k)) := by

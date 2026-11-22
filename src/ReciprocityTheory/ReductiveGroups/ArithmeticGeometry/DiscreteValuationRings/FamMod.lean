@@ -29,8 +29,8 @@ theorem sec_ext {s t : LB.Sec L} (h : ∀ i, s.f i = t.f i) : s = t := by
   subst e
   rfl
 
-theorem resTop_res {W W' : X.Opens} (h : W' ≤ W) (c : Γ(X, ⊤)) :
-    (X.presheaf.map (homOfLE h).op).hom (resTop W c) = resTop W' c := by
+theorem resTop_res {W W' : X.Opens} (h : W' ≤ W) (c : Γ(X, ⊤))
+    : (X.presheaf.map (homOfLE h).op).hom (resTop W c) = resTop W' c := by
   simp only [resTop]
   rw [← RingHom.comp_apply, ← CommRingCat.hom_comp, ← Functor.map_comp]
   rfl
@@ -49,26 +49,29 @@ def secNeg (s : LB.Sec L) : LB.Sec L where
 
 def secScale (c : Γ(X, ⊤)) (s : LB.Sec L) : LB.Sec L where
   f := fun i => resTop _ c * s.f i
-  compat := fun i j => by
-    rw [map_mul, s.compat, resTop_res, map_mul, resTop_res, mul_left_comm]
+  compat := fun i j => by rw [map_mul, s.compat, resTop_res, map_mul, resTop_res, mul_left_comm]
 
 end SecOps
 
 section Fam
 
-variable {R : Type} [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F]
-  [Algebra (FractionRing R) F]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  (D : DegPre R)
+  (F : Type) [Field F] [Algebra (FractionRing R) F]
 
 def gF : F →+* Γ((DegPre.BF D F).left, ⊤) :=
   (fst (TF (R := R) F) D.P.A).left.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom
 
-theorem constBF_eq (ζ : F) (W : (DegPre.BF D F).left.Opens) :
-    DegPre.constBF D F ζ W = resTop W (gF D F ζ) := rfl
+theorem constBF_eq (ζ : F) (W : (DegPre.BF D F).left.Opens)
+    : DegPre.constBF D F ζ W = resTop W (gF D F ζ) :=
+  rfl
 
-theorem trF_const (mu : D.X) (ζ : F) (W : (DegPre.BF D F).left.Opens) :
-    ((DegPre.trF D F mu).left.app W).hom (resTop W (gF D F ζ)) = resTop _ (gF D F ζ) := by
-  have hfp : (DegPre.trF D F mu).left ≫ (fst (TF (R := R) F) D.P.A).left =
-      (fst (TF (R := R) F) D.P.A).left := by
+theorem trF_const (mu : D.X) (ζ : F) (W : (DegPre.BF D F).left.Opens)
+    : ((DegPre.trF D F mu).left.app W).hom (resTop W (gF D F ζ)) = resTop _ (gF D F ζ) := by
+  have hfp
+      : (DegPre.trF D F mu).left ≫ (fst (TF (R := R) F) D.P.A).left
+        = (fst (TF (R := R) F) D.P.A).left := by
     rw [← Over.comp_left]
     simp [DegPre.trF]
   simp only [resTop, gF, RingHom.comp_apply]
@@ -78,18 +81,15 @@ theorem trF_const (mu : D.X) (ζ : F) (W : (DegPre.BF D F).left.Opens) :
   clear_value f p c0
   clear hf hp hc0
   have e3 : Scheme.Hom.app p ⊤ ≫ Scheme.Hom.app f ⊤ = Scheme.Hom.app (f ≫ p) ⊤ := by
-    first
-      | exact (Scheme.Hom.comp_app f p ⊤).symm
-      | exact (Scheme.comp_app f p ⊤).symm
-      | simp
-  have e2 : Scheme.Hom.app (f ≫ p) ⊤ = Scheme.Hom.app p ⊤ ≫
-      (D.BF F).left.presheaf.map (eqToHom (by rw [hfp])).op := by
-    first
-      | exact Scheme.Hom.congr_app hfp ⊤
-      | exact Scheme.congr_app hfp ⊤
-  have key : Scheme.Hom.appTop p ≫ (D.BF F).left.presheaf.map (homOfLE (le_top : W ≤ ⊤)).op ≫
-      Scheme.Hom.app f W =
-      Scheme.Hom.appTop p ≫ (D.BF F).left.presheaf.map (homOfLE (le_top : f ⁻¹ᵁ W ≤ ⊤)).op := by
+    first | exact (Scheme.Hom.comp_app f p ⊤).symm | exact (Scheme.comp_app f p ⊤).symm | simp
+  have e2
+      : Scheme.Hom.app (f ≫ p) ⊤
+        = Scheme.Hom.app p ⊤ ≫ (D.BF F).left.presheaf.map (eqToHom (by rw [hfp])).op := by
+    first | exact Scheme.Hom.congr_app hfp ⊤ | exact Scheme.congr_app hfp ⊤
+  have key
+      : Scheme.Hom.appTop p ≫ (D.BF F).left.presheaf.map (homOfLE (le_top : W ≤ ⊤)).op
+          ≫ Scheme.Hom.app f W
+        = Scheme.Hom.appTop p ≫ (D.BF F).left.presheaf.map (homOfLE (le_top : f ⁻¹ᵁ W ≤ ⊤)).op := by
     rw [Scheme.Hom.naturality, ← Category.assoc]
     erw [e3, e2]
     erw [Category.assoc, ← Functor.map_comp]
@@ -106,34 +106,52 @@ theorem fam_ext {s t : Fam D F k} (h : ∀ α j, (s.s α).f j = (t.s α).f j) : 
   rfl
 
 instance : Zero (Fam D F k) where
-  zero := ⟨fun _ => SecOps.secZero, fun mu α u hu hc j₁ j₂ j₃ hcoh => by
-    show _ = _
-    erw [map_zero, map_zero, map_zero, zero_mul]⟩
+  zero := ⟨
+    fun _ => SecOps.secZero,
+    fun mu α u hu hc j₁ j₂ j₃ hcoh => by
+      show _ = _
+      erw [map_zero, map_zero, map_zero, zero_mul]
+  ⟩
 
 instance : Add (Fam D F k) where
-  add s t := ⟨fun α => SecOps.secAdd (s.s α) (t.s α), fun mu α u hu hc j₁ j₂ j₃ hcoh => by
-    have h1 := s.fe mu α u hu hc j₁ j₂ j₃ hcoh
-    have h2 := t.fe mu α u hu hc j₁ j₂ j₃ hcoh
-    show _ = _
-    erw [map_add, map_add, map_add, h1, h2, add_mul]⟩
+  add s t := ⟨
+    fun α => SecOps.secAdd (s.s α) (t.s α),
+    fun mu α u hu hc j₁ j₂ j₃ hcoh => by
+      have h1 := s.fe mu α u hu hc j₁ j₂ j₃ hcoh
+      have h2 := t.fe mu α u hu hc j₁ j₂ j₃ hcoh
+      show _ = _
+      erw [map_add, map_add, map_add, h1, h2, add_mul]
+  ⟩
 
 instance : Neg (Fam D F k) where
-  neg s := ⟨fun α => SecOps.secNeg (s.s α), fun mu α u hu hc j₁ j₂ j₃ hcoh => by
-    have h1 := s.fe mu α u hu hc j₁ j₂ j₃ hcoh
-    show _ = _
-    erw [map_neg, map_neg, map_neg, h1, neg_mul]⟩
+  neg s := ⟨
+    fun α => SecOps.secNeg (s.s α),
+    fun mu α u hu hc j₁ j₂ j₃ hcoh => by
+      have h1 := s.fe mu α u hu hc j₁ j₂ j₃ hcoh
+      show _ = _
+      erw [map_neg, map_neg, map_neg, h1, neg_mul]
+  ⟩
 
 instance : SMul F (Fam D F k) where
-  smul ζ s := ⟨fun α => SecOps.secScale (gF D F ζ) (s.s α), fun mu α u hu hc j₁ j₂ j₃ hcoh => by
-    have h1 := s.fe mu α u hu hc j₁ j₂ j₃ hcoh
-    show _ = _
-    erw [map_mul, map_mul, map_mul, h1, SecOps.resTop_res, trF_const, SecOps.resTop_res, _root_.mul_assoc]⟩
+  smul ζ s := ⟨
+    fun α => SecOps.secScale (gF D F ζ) (s.s α),
+    fun mu α u hu hc j₁ j₂ j₃ hcoh => by
+      have h1 := s.fe mu α u hu hc j₁ j₂ j₃ hcoh
+      show _ = _
+      erw [map_mul, map_mul, map_mul, h1, SecOps.resTop_res, trF_const, SecOps.resTop_res,
+        _root_.mul_assoc]
+  ⟩
 
-@[simp] theorem zero_f (α : D.X) (j) : ((0 : Fam D F k).s α).f j = 0 := rfl
-@[simp] theorem add_f (s t : Fam D F k) (α : D.X) (j) : ((s + t).s α).f j = (s.s α).f j + (t.s α).f j := rfl
-@[simp] theorem neg_f (s : Fam D F k) (α : D.X) (j) : ((-s).s α).f j = - (s.s α).f j := rfl
-@[simp] theorem smul_f (ζ : F) (s : Fam D F k) (α : D.X) (j) :
-    ((ζ • s).s α).f j = resTop _ (gF D F ζ) * (s.s α).f j := rfl
+@[simp]
+theorem zero_f (α : D.X) (j) : ((0 : Fam D F k).s α).f j = 0 := rfl
+@[simp]
+theorem add_f (s t : Fam D F k) (α : D.X) (j) : ((s + t).s α).f j = (s.s α).f j + (t.s α).f j := rfl
+@[simp]
+theorem neg_f (s : Fam D F k) (α : D.X) (j) : ((-s).s α).f j = - (s.s α).f j := rfl
+@[simp]
+theorem smul_f (ζ : F) (s : Fam D F k) (α : D.X) (j)
+    : ((ζ • s).s α).f j = resTop _ (gF D F ζ) * (s.s α).f j :=
+  rfl
 
 instance : AddCommGroup (Fam D F k) where
   add_assoc a b c := fam_ext fun α j => by simp only [add_f, add_assoc]
@@ -149,7 +167,8 @@ instance : Module F (Fam D F k) where
   mul_smul x y a := fam_ext fun α j => by simp only [smul_f, map_mul, resTop, _root_.mul_assoc]
   smul_zero x := fam_ext fun α j => by simp only [smul_f, zero_f, mul_zero]
   smul_add x a b := fam_ext fun α j => by simp only [smul_f, add_f, mul_add]
-  add_smul x y a := fam_ext fun α j => by simp only [smul_f, add_f, map_add (f := _), resTop, add_mul]
+  add_smul x y a :=
+    fam_ext fun α j => by simp only [smul_f, add_f, map_add (f := _), resTop, add_mul]
   zero_smul a := fam_ext fun α j => by simp only [smul_f, zero_f, map_zero, resTop, zero_mul]
 
 theorem isSmul_iff (ζ : F) (s s' : Fam D F k) : Fam.IsSmul D F ζ s s' ↔ s' = ζ • s := by

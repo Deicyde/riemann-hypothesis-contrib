@@ -9,9 +9,10 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut Polynomial
 
 namespace LateralTheory.E.LocalIntegralClosureRoots
 
-theorem root_mem (A K : Type) [CommRing A] [IsDomain A] [Field K] [Algebra A K] (h : GlobalTheory.EtC.AIC A) :
-    ∀ (n : ℕ) (p : A[X]), p.natDegree = n → p.Monic → ∀ x : K, aeval x p = 0 →
-      ∃ a : A, algebraMap A K a = x := by
+theorem root_mem
+    (A K : Type) [CommRing A] [IsDomain A] [Field K] [Algebra A K] (h : GlobalTheory.EtC.AIC A)
+    : ∀ (n : ℕ) (p : A[X]),
+      p.natDegree = n → p.Monic → ∀ x : K, aeval x p = 0 → ∃ a : A, algebraMap A K a = x := by
   intro n
   induction n with
   | zero =>
@@ -33,8 +34,8 @@ theorem root_mem (A K : Type) [CommRing A] [IsDomain A] [Field K] [Algebra A K] 
       exact h1.symm
     · exact ih _ hqd hq x h1
 
-theorem isIntegrallyClosed_of_aic (A : Type) [CommRing A] [IsDomain A] (h : GlobalTheory.EtC.AIC A) :
-    IsIntegrallyClosed A := by
+theorem isIntegrallyClosed_of_aic (A : Type) [CommRing A] [IsDomain A] (h : GlobalTheory.EtC.AIC A)
+    : IsIntegrallyClosed A := by
   rw [isIntegrallyClosed_iff (FractionRing A)]
   intro x ⟨p, hp, hx⟩
   exact root_mem A (FractionRing A) h _ p rfl hp x (by rw [aeval_def]; exact hx)
@@ -58,9 +59,11 @@ theorem LocAIC_of : NormPf.AICPf.LocAIC := by
     let y : PrimeSpectrum Γ(X, V) := ⟨P, hP.isPrime⟩
     have hy : hV.fromSpec y ∈ V := by
       show hV.fromSpec y ∈ (V : Set X)
-      rw [← hV.range_fromSpec]; exact ⟨y, rfl⟩
+      rw [← hV.range_fromSpec]
+      exact ⟨y, rfl⟩
     let := TopCat.Presheaf.algebra_section_stalk X.presheaf (⟨hV.fromSpec y, hy⟩ : V)
-    have : IsLocalization.AtPrime (X.presheaf.stalk (hV.fromSpec y)) P := hV.isLocalization_stalk' y hy
+    have : IsLocalization.AtPrime (X.presheaf.stalk (hV.fromSpec y)) P :=
+      hV.isLocalization_stalk' y hy
     have := hst (hV.fromSpec y)
     exact IsIntegrallyClosed.of_equiv (IsLocalization.algEquiv P.primeCompl
       (X.presheaf.stalk (hV.fromSpec y)) (Localization.AtPrime P)).toRingEquiv
@@ -72,8 +75,8 @@ theorem LocAIC_of : NormPf.AICPf.LocAIC := by
     exact NormPf.FFPf.algClosed_of_aic _ _ hA
   have := functionField_isFractionRing_of_isAffineOpen X V hV
   intro p hp hd
-  obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (p.map (algebraMap Γ(X, V) X.functionField))
-    (by
+  obtain ⟨z, hz⟩ :=
+    IsAlgClosed.exists_root (p.map (algebraMap Γ(X, V) X.functionField)) (by
       rw [degree_map_eq_of_injective (IsFractionRing.injective Γ(X, V) X.functionField),
         degree_eq_natDegree hp.ne_zero]
       exact_mod_cast hd.ne')

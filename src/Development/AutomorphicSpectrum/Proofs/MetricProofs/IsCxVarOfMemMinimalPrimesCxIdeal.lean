@@ -20,14 +20,15 @@ set_option maxSynthPendingDepth 1
 
 namespace GlobalTheory.CompanionTheory.Ar.Pub.CxComp
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Pub.CxInt Filter Topology
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  GlobalTheory.CompanionTheory.Ar.Pub.CxInt Filter Topology
 open ReciprocityTheory.AnForm.R (conePts)
 
-theorem isCxVar_of_mem_minimalPrimes_cxIdeal :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (P : Ideal (MRing ι)) (d : ℕ), IsArithVar P (d + 1) →
-    ∀ Q ∈ (cxIdeal P).minimalPrimes, IsCxVar Q d ∧
-      Q.comap (map (Int.castRingHom ℂ) : MRing ι →+* MRingOver ℂ ι) = P := by
+theorem isCxVar_of_mem_minimalPrimes_cxIdeal
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (d : ℕ),
+      IsArithVar P (d + 1)
+        → ∀ Q ∈ (cxIdeal P).minimalPrimes,
+          IsCxVar Q d ∧ Q.comap (map (Int.castRingHom ℂ) : MRing ι →+* MRingOver ℂ ι) = P := by
   classical
   intro K _ ι _ P d hP Q hQ
   obtain ⟨hK, ⟨hPp, hPm, hPr⟩, hPh, hdim⟩ := hP
@@ -40,7 +41,8 @@ theorem isCxVar_of_mem_minimalPrimes_cxIdeal :
     obtain ⟨a, ha⟩ := hT f hf
     exact ⟨a, fun m hm k => ha m (support_map_subset _ _ hm) k⟩
   have hQm : IsMultiHomogIdeal Q :=
-    GroundTheory.Heights₂.Heights.HilbertSamuel.GenNearCover.isMultiHomogIdeal_of_mem_minimalPrimes hCm hQ
+    GroundTheory.Heights₂.Heights.HilbertSamuel.GenNearCover.isMultiHomogIdeal_of_mem_minimalPrimes
+      hCm hQ
   have hQr : IsRelevant Q := fun k => by
     obtain ⟨i, hi⟩ := hPr k
     refine ⟨i, fun hX => hi ?_⟩
@@ -51,9 +53,11 @@ theorem isCxVar_of_mem_minimalPrimes_cxIdeal :
     rw [hPh] at this
     exact this
   obtain ⟨hQp, -, hQdim⟩ := ReciprocityTheory.AnForm.R.extQ_spec P hP'
-  have hmapP : cxIdeal P =
-      (ReciprocityTheory.AnForm.R.extQ P).map (MvPolynomial.map (algebraMap ℚ ℂ)) := by
-    rw [cxIdeal, GroundTheory.Heights₂.Heights.Targets.ConeComplexBaseChange.map_int_complex_eq, ← Ideal.map_map]
+  have hmapP
+      : cxIdeal P
+        = (ReciprocityTheory.AnForm.R.extQ P).map (MvPolynomial.map (algebraMap ℚ ℂ)) := by
+    rw [cxIdeal, GroundTheory.Heights₂.Heights.Targets.ConeComplexBaseChange.map_int_complex_eq,
+      ← Ideal.map_map]
     rfl
   have hQ' := hQ
   rw [hmapP] at hQ'

@@ -11,18 +11,21 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.RestC
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker
+  Classical
 
 variable {D : D7}
 
-theorem norm_le_one_of_int {k : Type} [NormedField k] [IsUltrametricDist k] {y : k}
-    (hy : IsIntegral ℤ y) : ‖y‖ ≤ 1 := by
+theorem norm_le_one_of_int
+    {k : Type} [NormedField k] [IsUltrametricDist k] {y : k} (hy : IsIntegral ℤ y)
+    : ‖y‖ ≤ 1 := by
   by_contra hlt
   push_neg at hlt
   obtain ⟨P, hPm, hPy⟩ := hy
   rw [hPm.as_sum] at hPy
-  simp only [Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum, Polynomial.eval₂_mul,
-    Polynomial.eval₂_C] at hPy
+  simp only [Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum,
+      Polynomial.eval₂_mul, Polynomial.eval₂_C]
+    at hPy
   have h1 := eq_neg_of_add_eq_zero_left hPy
   have hn0 : P.natDegree ≠ 0 := by
     intro h0
@@ -32,39 +35,42 @@ theorem norm_le_one_of_int {k : Type} [NormedField k] [IsUltrametricDist k] {y :
     intro z
     rw [eq_intCast]
     exact IsUltrametricDist.norm_intCast_le_one k z
-  have hbound : ‖∑ i ∈ Finset.range P.natDegree, (Int.castRingHom k) (P.coeff i) * y ^ i‖ ≤ ‖y‖ ^ (P.natDegree - 1) := by
+  have hbound
+      : ‖∑ i ∈ Finset.range P.natDegree, (Int.castRingHom k) (P.coeff i) * y ^ i‖
+        ≤ ‖y‖ ^ (P.natDegree - 1) := by
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
     intro i hi
     rw [norm_mul, norm_pow]
     have hi' : i ≤ P.natDegree - 1 := by
       rw [Finset.mem_range] at hi
       omega
-    calc ‖(Int.castRingHom k) (P.coeff i)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (P.natDegree - 1) := by
-          apply mul_le_mul (hc _) (pow_le_pow_right₀ hlt.le hi') (by positivity) zero_le_one
+    calc
+      ‖(Int.castRingHom k) (P.coeff i)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (P.natDegree - 1) := by
+        apply mul_le_mul (hc _) (pow_le_pow_right₀ hlt.le hi') (by positivity) zero_le_one
       _ = ‖y‖ ^ (P.natDegree - 1) := one_mul _
   have h2 : ‖y‖ ^ P.natDegree ≤ ‖y‖ ^ (P.natDegree - 1) := by
     rw [← norm_pow, h1, norm_neg]
     have he : algebraMap ℤ k = Int.castRingHom k := RingHom.ext_int _ _
     simpa only [Polynomial.eval₂_finsetSum, Polynomial.eval₂_mul, Polynomial.eval₂_C,
-      Polynomial.eval₂_X_pow, he] using hbound
+        Polynomial.eval₂_X_pow, he]
+      using hbound
   have h3 : ‖y‖ ^ (P.natDegree - 1) < ‖y‖ ^ P.natDegree := pow_lt_pow_right₀ hlt (by omega)
   linarith
 
-theorem norm_nat_coprime (p : ℕ) [Fact p.Prime] {s : ℕ} (h : Nat.Coprime s p) : ‖(s : ℂ_[p])‖ = 1 := by
+theorem norm_nat_coprime (p : ℕ) [Fact p.Prime] {s : ℕ} (h : Nat.Coprime s p)
+    : ‖(s : ℂ_[p])‖ = 1 := by
   have hs : ¬ p ∣ s := (Nat.Prime.coprime_iff_not_dvd (Fact.out : p.Prime)).mp h.symm
   have hQ : ‖(s : ℚ_[p])‖ = 1 := by
     have h1 : ‖((s : ℤ) : ℚ_[p])‖ ≤ 1 := by
-      first
-        | exact Padic.norm_int_le_one _
-        | exact padicNormE.norm_int_le_one _
+      first | exact Padic.norm_int_le_one _ | exact padicNormE.norm_int_le_one _
     have h2 : ¬ ‖((s : ℤ) : ℚ_[p])‖ < 1 := by
       first
-        | rw [Padic.norm_int_lt_one_iff_dvd]; exact_mod_cast hs
-        | rw [Padic.norm_intCast_lt_one_iff_dvd]; exact_mod_cast hs
-        | rw [Padic.norm_intCast_lt_one_iff]; exact_mod_cast hs
-        | rw [padicNormE.norm_intCast_lt_one_iff_dvd]; exact_mod_cast hs
-        | (intro hlt; apply hs; exact_mod_cast (Padic.norm_int_lt_one_iff_dvd (s : ℤ)).mp hlt)
-        | (intro hlt; apply hs; exact_mod_cast (Padic.norm_intCast_lt_one_iff_dvd (s : ℤ)).mp hlt)
+      | rw [Padic.norm_int_lt_one_iff_dvd]; exact_mod_cast hs
+      | rw [Padic.norm_intCast_lt_one_iff_dvd]; exact_mod_cast hs
+      | rw [Padic.norm_intCast_lt_one_iff]; exact_mod_cast hs
+      | rw [padicNormE.norm_intCast_lt_one_iff_dvd]; exact_mod_cast hs
+      | (intro hlt; apply hs; exact_mod_cast (Padic.norm_int_lt_one_iff_dvd (s : ℤ)).mp hlt)
+      | (intro hlt; apply hs; exact_mod_cast (Padic.norm_intCast_lt_one_iff_dvd (s : ℤ)).mp hlt)
     have e : ((s : ℤ) : ℚ_[p]) = (s : ℚ_[p]) := by simp
     rw [← e]
     exact le_antisymm h1 (not_lt.mp h2)
@@ -77,32 +83,33 @@ theorem emb_mem (τ : D.what₂.Tau) (x : D.host.E) : embT D τ x ∈ Qbar := by
   have hy : IsAlgebraic ℚ ((D.host.emb ↑(D.eTau τ)) x) :=
     (hx.map (D.host.emb ↑(D.eTau τ)).toRatAlgHom).isAlgebraic
   first
-    | exact mem_algebraicClosure_iff.mpr hy
-    | exact IntermediateField.mem_algebraicClosure_iff.mpr hy
-    | exact (mem_algebraicClosure_iff' ).mpr hy.isIntegral
+  | exact mem_algebraicClosure_iff.mpr hy
+  | exact IntermediateField.mem_algebraicClosure_iff.mpr hy
+  | exact (mem_algebraicClosure_iff').mpr hy.isIntegral
 
 def embQ (τ : D.what₂.Tau) : D.host.E →+* Qbar := (embT D τ).codRestrict Qbar (emb_mem τ)
 
-theorem norm_lam_int {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (τ : D.what₂.Tau) {x : D.host.E}
-    (hx : x ∈ (1 : IdE D)) : ‖lam (embQ τ x)‖ ≤ 1 := by
+theorem norm_lam_int
+    {p : ℕ} [Fact p.Prime]
+    (lam : Qbar →+* ℂ_[p]) (τ : D.what₂.Tau)
+    {x : D.host.E} (hx : x ∈ (1 : IdE D))
+    : ‖lam (embQ τ x)‖ ≤ 1 := by
   obtain ⟨a, rfl⟩ := Submodule.mem_one.mp hx
   apply norm_le_one_of_int
   have ha : IsIntegral ℤ (algebraMap (𝓞 D.host.E) D.host.E a) := by
     first
-      | exact NumberField.RingOfIntegers.isIntegral_coe a
-      | exact a.2
-      | exact isIntegral_algebraMap.tower_top
+    | exact NumberField.RingOfIntegers.isIntegral_coe a
+    | exact a.2
+    | exact isIntegral_algebraMap.tower_top
   obtain ⟨P, hm, hP⟩ := ha
   refine ⟨P, hm, ?_⟩
   have e1 := congrArg (lam.comp (embQ τ)) hP
   rw [Polynomial.hom_eval₂, map_zero] at e1
   convert e1 using 2
-  all_goals first
-    | exact RingHom.ext_int _ _
-    | rfl
+  all_goals first | exact RingHom.ext_int _ _ | rfl
 
-theorem oneAt_pow_mem {𝔞 : IdE D} {s : ℕ} (h1 : ∀ x ∈ 𝔞, (s : D.host.E) * x ∈ (1 : IdE D)) (k : ℕ) :
-    ∀ x ∈ 𝔞 ^ k, (s : D.host.E) ^ k * x ∈ (1 : IdE D) := by
+theorem oneAt_pow_mem {𝔞 : IdE D} {s : ℕ} (h1 : ∀ x ∈ 𝔞, (s : D.host.E) * x ∈ (1 : IdE D)) (k : ℕ)
+    : ∀ x ∈ 𝔞 ^ k, (s : D.host.E) ^ k * x ∈ (1 : IdE D) := by
   induction k with
   | zero =>
     intro x hx
@@ -111,7 +118,10 @@ theorem oneAt_pow_mem {𝔞 : IdE D} {s : ℕ} (h1 : ∀ x ∈ 𝔞, (s : D.host
     intro x hx
     rw [pow_succ] at hx
     refine Submodule.mul_induction_on hx (fun a ha b hb => ?_) (fun y z hy hz => ?_)
-    · have e : (s : D.host.E) ^ (k + 1) * (a * b) = ((s : D.host.E) ^ k * a) * ((s : D.host.E) * b) := by ring
+    · have e
+          : (s : D.host.E) ^ (k + 1) * (a * b)
+            = ((s : D.host.E) ^ k * a) * ((s : D.host.E) * b) := by
+        ring
       rw [e]
       have hm := Submodule.mul_mem_mul (ih a ha) (h1 b hb)
       rwa [one_mul] at hm
@@ -145,13 +155,16 @@ theorem lemmaU : LemmaU D := by
     intro τ
     have a1 := norm_lam_int lam τ hA
     have b1 := norm_lam_int lam τ hB
-    have hprod : lam (embQ τ ((s : D.host.E) ^ k * z)) * lam (embQ τ ((s : D.host.E) ^ k * z⁻¹)) =
-        (s : ℂ_[p]) ^ (2 * k) := by
+    have hprod
+        : lam (embQ τ ((s : D.host.E) ^ k * z)) * lam (embQ τ ((s : D.host.E) ^ k * z⁻¹))
+          = (s : ℂ_[p]) ^ (2 * k) := by
       rw [← map_mul, ← map_mul]
       have e : (s : D.host.E) ^ k * z * ((s : D.host.E) ^ k * z⁻¹) = (s : D.host.E) ^ (2 * k) := by
         field_simp; ring
       rw [e, map_pow, map_pow, map_natCast, map_natCast]
-    have hnorm : ‖lam (embQ τ ((s : D.host.E) ^ k * z))‖ * ‖lam (embQ τ ((s : D.host.E) ^ k * z⁻¹))‖ = 1 := by
+    have hnorm
+        : ‖lam (embQ τ ((s : D.host.E) ^ k * z))‖ * ‖lam (embQ τ ((s : D.host.E) ^ k * z⁻¹))‖
+          = 1 := by
       rw [← norm_mul, hprod, norm_pow, hn, one_pow]
     have hA1 : ‖lam (embQ τ ((s : D.host.E) ^ k * z))‖ = 1 := by
       have n0 := norm_nonneg (lam (embQ τ ((s : D.host.E) ^ k * z)))
@@ -181,16 +194,22 @@ theorem lemmaU : LemmaU D := by
     exact Finset.prod_eq_one fun τ _ => by rw [map_inv₀, norm_inv, hτ τ, inv_one]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by omega)).mp hk1
 
-theorem smul_mulVec' {N : ℕ} (c : D.host.E) (A : Matrix (Fin N) (Fin N) D.host.E) (v : Fin N → D.host.E) :
-    (c • A).mulVec v = c • A.mulVec v := by
+theorem smul_mulVec'
+    {N : ℕ} (c : D.host.E) (A : Matrix (Fin N) (Fin N) D.host.E) (v : Fin N → D.host.E)
+    : (c • A).mulVec v = c • A.mulVec v := by
   first
-    | exact Matrix.smul_mulVec_assoc c A v
-    | (ext i; simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc])
+  | exact Matrix.smul_mulVec_assoc c A v
+  | (ext i; simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc])
 
-theorem entry_mem_of_std {N : ℕ} {M : Matrix (Fin N) (Fin N) D.host.E}
-    (hM : ∀ v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N, M.mulVec v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N) (i j : Fin N) :
-    M i j ∈ (1 : IdE D) := by
-  have hv : (Pi.single j (1 : D.host.E) : Fin N → D.host.E) ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
+theorem entry_mem_of_std
+    {N : ℕ} {M : Matrix (Fin N) (Fin N) D.host.E}
+    (hM : ∀ v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N,
+      M.mulVec v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N)
+    (i j : Fin N)
+    : M i j ∈ (1 : IdE D) := by
+  have hv
+      : (Pi.single j (1 : D.host.E) : Fin N → D.host.E)
+        ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
     unfold Formalism.MainNotions.StandardLatticesGL3.stdL
     rw [Submodule.mem_pi]
     intro k _
@@ -205,15 +224,21 @@ theorem entry_mem_of_std {N : ℕ} {M : Matrix (Fin N) (Fin N) D.host.E}
   rw [Submodule.mem_pi] at hw
   simpa [Matrix.mulVec, dotProduct, Pi.single_apply] using hw i trivial
 
-theorem det_int_of_std {N : ℕ} {M : Matrix (Fin N) (Fin N) D.host.E}
-    (hM : ∀ v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N, M.mulVec v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N) : M.det ∈ (1 : IdE D) := by
+theorem det_int_of_std
+    {N : ℕ} {M : Matrix (Fin N) (Fin N) D.host.E}
+    (hM : ∀ v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N,
+      M.mulVec v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N)
+    : M.det ∈ (1 : IdE D) := by
   have h := fun i j => Submodule.mem_one.mp (entry_mem_of_std hM i j)
   choose A hA using h
   have hMA : M = (algebraMap (𝓞 D.host.E) D.host.E).mapMatrix A := by
     ext i j
     exact (hA i j).symm
   rw [hMA]
-  exact Submodule.mem_one.mpr ⟨Matrix.det (A : Matrix (Fin N) (Fin N) (𝓞 D.host.E)), RingHom.map_det _ (A : Matrix (Fin N) (Fin N) (𝓞 D.host.E))⟩
+  exact Submodule.mem_one.mpr ⟨
+    Matrix.det (A : Matrix (Fin N) (Fin N) (𝓞 D.host.E)),
+    RingHom.map_det _ (A : Matrix (Fin N) (Fin N) (𝓞 D.host.E))
+  ⟩
 
 theorem detOneAt : DetOneAt D := by
   intro p N L hL
@@ -221,10 +246,13 @@ theorem detOneAt : DetOneAt D := by
   refine ⟨s ^ N, Nat.Coprime.pow_left N hs, ?_, ?_⟩
   · intro x hx
     unfold detId at hx
-    refine Submodule.span_induction (p := fun x _ => ((s ^ N : ℕ) : D.host.E) * x ∈ (1 : IdE D)) ?_ ?_ ?_ ?_ hx
+    refine Submodule.span_induction
+      (p := fun x _ => ((s ^ N : ℕ) : D.host.E) * x ∈ (1 : IdE D))
+      ?_ ?_ ?_ ?_ hx
     · rintro x ⟨A, hA, rfl⟩
-      have hsA : ∀ v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N,
-          ((s : D.host.E) • A).mulVec v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
+      have hsA
+          : ∀ v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N,
+            ((s : D.host.E) • A).mulVec v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
         intro v hv
         rw [smul_mulVec']
         exact h2 _ (hA v hv)
@@ -250,27 +278,37 @@ theorem chiFacUnit : ChiFacUnit D := by
   let _ := D.host.cmStar
   obtain ⟨hN, hN', hsdL, hsdL'⟩ := hAdm
   have n1 : N1 D (detId D (Formalism.MainNotions.StandardLatticesGL3.stdL D N) L) :=
-    relative_determinant_norm_one D N _ _ hN (Formalism.MainNotions.GlobalTheoryTheory.Inhab.stdL_isSD D N) hsdL
+    relative_determinant_norm_one D N _ _ hN
+      (Formalism.MainNotions.GlobalTheoryTheory.Inhab.stdL_isSD D N) hsdL
   have n1' : N1 D (detId D (Formalism.MainNotions.StandardLatticesGL3.stdL D N') L') :=
-    relative_determinant_norm_one D N' _ _ hN' (Formalism.MainNotions.GlobalTheoryTheory.Inhab.stdL_isSD D N') hsdL'
+    relative_determinant_norm_one D N' _ _ hN'
+      (Formalism.MainNotions.GlobalTheoryTheory.Inhab.stdL_isSD D N') hsdL'
   obtain ⟨m1, u1⟩ := lemmaU χ hχ p lam _ n1 (detOneAt p N L hL)
   obtain ⟨m2, u2⟩ := lemmaU χ hχ p lam _ n1' (detOneAt p N' L' hL')
   set a : Qbar := ⟨_, m1⟩ with ha
   set b : Qbar := ⟨_, m2⟩ with hb
-  have hcf : Base.chiFac χ N N' L L' =
-      ((a ^ (((N' / 2 : ℕ) : ℤ)) * b ^ (-((N / 2 : ℕ) : ℤ)) : Qbar) : ℂ) := by
+  have hcf
+      : Base.chiFac χ N N' L L'
+        = ((a ^ (((N' / 2 : ℕ) : ℤ)) * b ^ (-((N / 2 : ℕ) : ℤ)) : Qbar) : ℂ) := by
     change _ = Qbar.val (a ^ (((N' / 2 : ℕ) : ℤ)) * b ^ (-((N / 2 : ℕ) : ℤ)))
     rw [map_mul, map_zpow₀, map_zpow₀]
     try rfl
   have hmem : Base.chiFac χ N N' L L' ∈ Qbar := by rw [hcf]; exact Subtype.property _
   refine ⟨hmem, ?_⟩
-  have hl : lamC lam (Base.chiFac χ N N' L L') = lam (a ^ (((N' / 2 : ℕ) : ℤ)) * b ^ (-((N / 2 : ℕ) : ℤ))) := by
+  have hl
+      : lamC lam (Base.chiFac χ N N' L L')
+        = lam (a ^ (((N' / 2 : ℕ) : ℤ)) * b ^ (-((N / 2 : ℕ) : ℤ))) := by
     simp only [lamC, dif_pos hmem]
     congr 1
     try exact Subtype.ext hcf
-  have hla : lam a = lamC lam (χ (detId D (Formalism.MainNotions.StandardLatticesGL3.stdL D N) L)) := by simp only [lamC, dif_pos m1]; try rfl
-  have hlb : lam b = lamC lam (χ (detId D (Formalism.MainNotions.StandardLatticesGL3.stdL D N') L')) := by simp only [lamC, dif_pos m2]; try rfl
-  rw [hl, map_mul, map_zpow₀, map_zpow₀, norm_mul, norm_zpow, norm_zpow, hla, hlb, u1, u2, one_zpow, one_zpow,
-    one_mul]
+  have hla
+      : lam a = lamC lam (χ (detId D (Formalism.MainNotions.StandardLatticesGL3.stdL D N) L)) := by
+    simp only [lamC, dif_pos m1]; try rfl
+  have hlb
+      : lam b
+        = lamC lam (χ (detId D (Formalism.MainNotions.StandardLatticesGL3.stdL D N') L')) := by
+    simp only [lamC, dif_pos m2]; try rfl
+  rw [hl, map_mul, map_zpow₀, map_zpow₀, norm_mul, norm_zpow, norm_zpow, hla, hlb, u1, u2, one_zpow,
+    one_zpow, one_mul]
 
 end Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.RestC

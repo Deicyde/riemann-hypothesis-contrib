@@ -13,10 +13,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.ConvHecke
 
-theorem conv_isHecke : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H]
-    (K L : Subgroup H) (f₁ f₂ : H → ℂ), L ≤ K → L.relIndex K ≠ 0 → IsHecke L f₁ → IsHecke L f₂ →
-    IsHecke L (fun y => hint K fun z => f₁ z * f₂ (z⁻¹ * y)) ∧
-      ∀ y, (hint K fun z => f₁ z * f₂ (z⁻¹ * y)) ≠ 0 → ∃ z, f₁ z ≠ 0 ∧ f₂ (z⁻¹ * y) ≠ 0 := by
+theorem conv_isHecke
+    : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H]
+        (K L : Subgroup H) (f₁ f₂ : H → ℂ),
+      L ≤ K → L.relIndex K ≠ 0 → IsHecke L f₁ → IsHecke L f₂
+        → IsHecke L (fun y => hint K fun z => f₁ z * f₂ (z⁻¹ * y))
+          ∧ ∀ y, (hint K fun z => f₁ z * f₂ (z⁻¹ * y)) ≠ 0 → ∃ z, f₁ z ≠ 0 ∧ f₂ (z⁻¹ * y) ≠ 0 := by
   intro H _ _ _ _ K L f₁ f₂ hLK hfin h₁ h₂
   have hu : ∀ y, L ≤ rStab (fun z => f₁ z * f₂ (z⁻¹ * y)) := by
     intro y l hl x
@@ -24,9 +26,10 @@ theorem conv_isHecke : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologi
     have e : (x * l)⁻¹ * y = l⁻¹ * (x⁻¹ * y) := by group
     rw [e, (h₁.2 l hl x).2, (h₂.2 l⁻¹ (L.inv_mem hl) _).1]
   have hlev := fun y =>
-    GlobalTheory.CompanionTheory.HintLevel.hint_eq_level H K L (fun z => f₁ z * f₂ (z⁻¹ * y)) hLK (hu y) hfin
-  have hnz : ∀ y, (hint K fun z => f₁ z * f₂ (z⁻¹ * y)) ≠ 0 →
-      ∃ z, f₁ z ≠ 0 ∧ f₂ (z⁻¹ * y) ≠ 0 := by
+    GlobalTheory.CompanionTheory.HintLevel.hint_eq_level H K L
+      (fun z => f₁ z * f₂ (z⁻¹ * y))
+      hLK (hu y) hfin
+  have hnz : ∀ y, (hint K fun z => f₁ z * f₂ (z⁻¹ * y)) ≠ 0 → ∃ z, f₁ z ≠ 0 ∧ f₂ (z⁻¹ * y) ≠ 0 := by
     intro y hy
     by_contra hcon
     push_neg at hcon
@@ -39,8 +42,7 @@ theorem conv_isHecke : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologi
       · simp [hcon _ h]
     simp [hz]
   refine ⟨⟨?_, ?_⟩, hnz⟩
-  · refine HasCompactSupport.of_support_subset_isCompact
-      (h₁.1.isCompact.mul h₂.1.isCompact) ?_
+  · refine HasCompactSupport.of_support_subset_isCompact (h₁.1.isCompact.mul h₂.1.isCompact) ?_
     intro y hy
     obtain ⟨z, hz1, hz2⟩ := hnz y hy
     exact Set.mem_mul.2 ⟨z, subset_tsupport _ hz1, z⁻¹ * y, subset_tsupport _ hz2, by group⟩

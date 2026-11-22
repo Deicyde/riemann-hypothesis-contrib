@@ -20,11 +20,12 @@ namespace GlobalTheory
 
 namespace CoverPlaces
 
-variable {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A]
-  [Algebra O A] {ϖ : O}
+variable
+  {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
+  {ϖ : O}
 
-theorem ord_pos_iff (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (a : As O A) :
-    0 < ord ϖ ζ (a : A) ↔ a ∈ ζ.asIdeal := by
+theorem ord_pos_iff (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (a : As O A)
+    : 0 < ord ϖ ζ (a : A) ↔ a ∈ ζ.asIdeal := by
   rw [ord_of_mem ζ h a.2, ← not_iff_not, ← vL_eq_zero_iff]
   change ¬ 0 < (vL ζ a).map (Nat.cast : ℕ → ℤ) ↔ _
   generalize vL ζ a = v
@@ -34,9 +35,12 @@ theorem ord_pos_iff (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (a : As
     rw [ENat.map_natCast, ← WithTop.coe_zero, WithTop.coe_lt_coe]
     simp
 
-theorem surjective_of_detect [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) {T : Type} [Finite T]
-    (Z : T → Pts O A) (hZ : ∀ x, (∀ t, 0 ≤ ord ϖ (Z t) x) → x ∈ As O A) :
-    Function.Surjective Z := by
+theorem surjective_of_detect
+    [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ)
+    {T : Type} [Finite T]
+    (Z : T → Pts O A) (hZ : ∀ x, (∀ t, 0 ≤ ord ϖ (Z t) x) → x ∈ As O A)
+    : Function.Surjective Z := by
   classical
   cases nonempty_fintype T
   intro ζ
@@ -52,8 +56,7 @@ theorem surjective_of_detect [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A)
     rw [Ideal.IsPrime.prod_mem_iff]
     rintro ⟨t, -, ht⟩
     exact ha' t ht
-  have hbt : ∀ t, ∏ t, a t ∈ (Z t).asIdeal := fun t =>
-    Ideal.prod_mem _ (Finset.mem_univ t) (ha t)
+  have hbt : ∀ t, ∏ t, a t ∈ (Z t).asIdeal := fun t => Ideal.prod_mem _ (Finset.mem_univ t) (ha t)
   generalize ∏ t, a t = b at hb hbt
   obtain ⟨v, hv⟩ := h.isUnit.exists_right_inv
   set n : ℕ := ∑ t, ep ϖ (Z t) with hn
@@ -90,10 +93,12 @@ theorem surjective_of_detect [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A)
     rw [← mul_assoc, hv, one_mul]
   exact hb (ζ.isMaximal.isPrime.mem_of_pow_mem n (hp ▸ Ideal.mul_mem_right _ _ (unif_mem h ζ)))
 
-theorem isIntegral_of_forall {R A ι : Type} [CommRing R] [CommRing A] [Algebra R A] [Finite ι]
-    {S : ι → Type} [∀ c, CommRing (S c)] [∀ c, Algebra R (S c)] (Ψ : ∀ c, A →ₐ[R] S c)
-    (hΨ : ∀ a, (∀ c, Ψ c a = 0) → a = 0) (x : A) (hx : ∀ c, IsIntegral R (Ψ c x)) :
-    IsIntegral R x := by
+theorem isIntegral_of_forall
+    {R A ι : Type} [CommRing R] [CommRing A] [Algebra R A] [Finite ι]
+    {S : ι → Type} [∀ c, CommRing (S c)] [∀ c, Algebra R (S c)]
+    (Ψ : ∀ c, A →ₐ[R] S c) (hΨ : ∀ a, (∀ c, Ψ c a = 0) → a = 0)
+    (x : A) (hx : ∀ c, IsIntegral R (Ψ c x))
+    : IsIntegral R x := by
   classical
   cases nonempty_fintype ι
   choose p hp hp0 using hx
@@ -103,25 +108,52 @@ theorem isIntegral_of_forall {R A ι : Type} [CommRing R] [CommRing A] [Algebra 
 
 end CoverPlaces
 
-
 open IsLocalRing ResDegPlace in
-theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R'] [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R'] [IsLocalHom (algebraMap R R')] [Field F] [Algebra R F] [IsFractionRing R F] [Field F'] [Algebra R' F'] [IsFractionRing R' F'] [Algebra F F'] [Algebra R F'] [IsScalarTower R F F'] [IsScalarTower R R' F'], Ideal.map (algebraMap R R') (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal R' → Function.Surjective (IsLocalRing.ResidueField.map (algebraMap R R')) → ∀ (ι : Type) [Finite ι] (L : ι → Type) [∀ c, Field (L c)] [∀ c, Algebra F (L c)] [∀ c, FiniteDimensional F (L c)] [∀ c, Algebra.IsSeparable F (L c)] [∀ c, Algebra R (L c)] [∀ c, IsScalarTower R F (L c)] (A : Type) [CommRing A] [Algebra R' A] (ϖ : R'), IsUnif (A := A) ϖ → ∀ [∀ ζ : Pts R' A, IsDVRAt ζ] (Ψ : ∀ c, A →ₐ[R'] F' ⊗[F] L c), (∀ c, Function.Surjective (Ψ c)) → (∀ a, (∀ c, Ψ c a = 0) → a = 0) → (∀ c c', c ≠ c' → ∃ a, Ψ c a = 0 ∧ Ψ c' a = 1) → ∃ e : Pts R' A ≃ Σ c, ValPl.PlacesOver R (L c), ∀ ζ, fdeg ζ = (letI := resAlg (F := F) (e ζ).2.1; Module.finrank (IsLocalRing.ResidueField ((vRing (e ζ).2.1).comap (algebraMap F (L (e ζ).1)))) (IsLocalRing.ResidueField (vRing (e ζ).2.1))) ∧ ∃ u : AddValuation (F' ⊗[F] L (e ζ).1) (WithTop ℤ), (∀ g, u ((1 : F') ⊗ₜ[F] g) = (e ζ).2.1 g) ∧ ∀ a, ord ϖ ζ a = u (Ψ (e ζ).1 a) := by
+theorem exists_equiv_pts_places_baseChange
+    : ∀ (R R' F F' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R']
+        [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R']
+        [IsLocalHom (algebraMap R R')] [Field F] [Algebra R F] [IsFractionRing R F] [Field F']
+        [Algebra R' F'] [IsFractionRing R' F'] [Algebra F F'] [Algebra R F'] [IsScalarTower R F F']
+        [IsScalarTower R R' F'],
+      Ideal.map (algebraMap R R') (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal R'
+        → Function.Surjective (IsLocalRing.ResidueField.map (algebraMap R R'))
+        → ∀ (ι : Type) [Finite ι] (L : ι → Type) [∀ c, Field (L c)] [∀ c, Algebra F (L c)]
+            [∀ c, FiniteDimensional F (L c)] [∀ c, Algebra.IsSeparable F (L c)]
+            [∀ c, Algebra R (L c)] [∀ c, IsScalarTower R F (L c)] (A : Type) [CommRing A]
+            [Algebra R' A] (ϖ : R'),
+          IsUnif (A := A) ϖ
+            → ∀ [∀ ζ : Pts R' A, IsDVRAt ζ] (Ψ : ∀ c, A →ₐ[R'] F' ⊗[F] L c),
+              (∀ c, Function.Surjective (Ψ c)) → (∀ a, (∀ c, Ψ c a = 0) → a = 0)
+                → (∀ c c', c ≠ c' → ∃ a, Ψ c a = 0 ∧ Ψ c' a = 1)
+                → ∃ e : Pts R' A ≃ Σ c, ValPl.PlacesOver R (L c), ∀ ζ,
+                  fdeg ζ
+                      = (letI := resAlg (F := F) (e ζ).2.1
+                         Module.finrank
+                           (IsLocalRing.ResidueField ((vRing (e ζ).2.1).comap
+                             (algebraMap F (L (e ζ).1))))
+                           (IsLocalRing.ResidueField (vRing (e ζ).2.1)))
+                    ∧ ∃ u : AddValuation (F' ⊗[F] L (e ζ).1) (WithTop ℤ),
+                      (∀ g, u ((1 : F') ⊗ₜ[F] g) = (e ζ).2.1 g)
+                        ∧ ∀ a, ord ϖ ζ a = u (Ψ (e ζ).1 a) := by
   intro R R' F F' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hmax hres ι _ L _ _ _ _ _ _ A _ _ ϖ hϖ hD Ψ
     hsurj hinj hsep
   choose w' hw1 hw2 hw3 hw4 using fun c =>
     exists_unique_place_baseChange R R' F F' hmax hres (L c)
       (isIntegral_iff_mem_span_one_tmul_integralClosure R R' F F' hmax hres (L c))
-  have existsPoint (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ As R' A, 0 ≤ u a)
-      (hpos : 0 < u (algebraMap R' A ϖ)) (h1 : ∃ a, u a = 1) :
-      ∃ ζ : Pts R' A, ∀ a, ord ϖ ζ a = u a := by
+  have existsPoint
+      (u : AddValuation A (WithTop ℤ))
+      (h0 : ∀ a ∈ As R' A, 0 ≤ u a) (hpos : 0 < u (algebraMap R' A ϖ)) (h1 : ∃ a, u a = 1)
+      : ∃ ζ : Pts R' A, ∀ a, ord ϖ ζ a = u a := by
     haveI hP := valCentreOn_isPrime (As R' A) u h0
     have hcm : ((valCentreOn (As R' A) u h0).comap (algebraMap R' (As R' A))).IsMaximal := by
-      have hle : IsLocalRing.maximalIdeal R' ≤
-          (valCentreOn (As R' A) u h0).comap (algebraMap R' (As R' A)) := by
+      have hle
+          : IsLocalRing.maximalIdeal R'
+            ≤ (valCentreOn (As R' A) u h0).comap (algebraMap R' (As R' A)) := by
         rw [hϖ.irreducible.maximalIdeal_eq, Ideal.span_singleton_le_iff_mem, Ideal.mem_comap,
           mem_valCentreOn]
         exact hpos
-      have := (IsLocalRing.maximalIdeal.isMaximal R').eq_of_le (Ideal.IsPrime.ne_top inferInstance) hle
+      have :=
+        (IsLocalRing.maximalIdeal.isMaximal R').eq_of_le (Ideal.IsPrime.ne_top inferInstance) hle
       rw [← this]
       infer_instance
     have hmax : (valCentreOn (As R' A) u h0).IsMaximal :=
@@ -142,8 +174,9 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
     have hπpos : 0 < u (π : A) := by
       by_contra hc
       exact hπ.not_isUnit ((IsLocalization.AtPrime.isUnit_to_map_iff (Loc ζ) ζ.asIdeal π).2 hc)
-    have key : ∀ a : As R' A, (vL ζ a = ⊤ ∧ u (a : A) = ⊤) ∨
-        ∃ n : ℕ, vL ζ a = n ∧ u (a : A) = n • u (π : A) := by
+    have key
+        : ∀ a : As R' A,
+          (vL ζ a = ⊤ ∧ u (a : A) = ⊤) ∨ ∃ n : ℕ, vL ζ a = n ∧ u (a : A) = n • u (π : A) := by
       intro a
       by_cases ha : algebraMap (As R' A) (Loc ζ) a = 0
       · refine Or.inl ⟨(vL_eq_top_iff ζ a).2 ha, ?_⟩
@@ -177,8 +210,9 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
     have hM0 : 0 < M := by
       rw [← hM] at hπpos
       exact_mod_cast hπpos
-    have key2 : ∀ x : A, (ord ϖ ζ x = ⊤ ∧ u x = ⊤) ∨
-        ∃ z : ℤ, ord ϖ ζ x = z ∧ u x = ((z * M : ℤ) : WithTop ℤ) := by
+    have key2
+        : ∀ x : A,
+          (ord ϖ ζ x = ⊤ ∧ u x = ⊤) ∨ ∃ z : ℤ, ord ϖ ζ x = z ∧ u x = ((z * M : ℤ) : WithTop ℤ) := by
       intro x
       obtain ⟨k, hk⟩ := hϖ.denom x
       have e1 := ord_pow_smul ζ hϖ k x
@@ -223,8 +257,9 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
     · rw [h2, h3]
     · rw [h2, h3, hM1, mul_one]
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible R
-  have hex : ∀ t : Σ c, ValPl.PlacesOver R (L c), ∃ ζ : Pts R' A,
-      ∀ a, ord ϖ ζ a = w' t.1 t.2 (Ψ t.1 a) := by
+  have hex
+      : ∀ t : Σ c, ValPl.PlacesOver R (L c), ∃ ζ : Pts R' A, ∀ a,
+        ord ϖ ζ a = w' t.1 t.2 (Ψ t.1 a) := by
     rintro ⟨c, w⟩
     refine existsPoint ((w' c w).comap (Ψ c).toRingHom) ?_ ?_ ?_
     · intro a ha
@@ -246,8 +281,7 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
   choose Z hZ using hex
   have hZinj : Function.Injective Z := by
     rintro ⟨c, w⟩ ⟨c', w₂⟩ he
-    have h1 : ∀ a, w' c w (Ψ c a) = w' c' w₂ (Ψ c' a) := fun a => by
-      rw [← hZ ⟨c, w⟩ a, he, hZ]
+    have h1 : ∀ a, w' c w (Ψ c a) = w' c' w₂ (Ψ c' a) := fun a => by rw [← hZ ⟨c, w⟩ a, he, hZ]
     obtain rfl : c = c' := by
       by_contra hc
       obtain ⟨a, h0, h1'⟩ := hsep c c' hc
@@ -276,20 +310,23 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
   subst hζ
   obtain ⟨c, w⟩ := t
   refine ⟨?_, w' c w, hw1 c w, hZ ⟨c, w⟩⟩
-  have existsApprox (ζ : Pts R' A) [IsDVRAt ζ] (x : A) (hx : 0 ≤ ord ϖ ζ x) :
-      ∃ a : As R' A, 0 < ord ϖ ζ ((a : A) - x) := by
+  have existsApprox (ζ : Pts R' A) [IsDVRAt ζ] (x : A) (hx : 0 ≤ ord ϖ ζ x)
+      : ∃ a : As R' A, 0 < ord ϖ ζ ((a : A) - x) := by
     obtain ⟨n, hn⟩ := hϖ.denom x
     have h1 := hx
     rw [ord_eq ζ hϖ hn, ordAt_nonneg_iff ζ hϖ, vL_eq_addVal, vL_eq_addVal,
-      IsDiscreteValuationRing.addVal_le_iff_dvd] at h1
+        IsDiscreteValuationRing.addVal_le_iff_dvd]
+      at h1
     obtain ⟨c, hc⟩ := h1
     obtain ⟨⟨b, s⟩, rfl⟩ := IsLocalization.mk'_surjective ζ.asIdeal.primeCompl c
-    have h2 : algebraMap (As R' A) (Loc ζ) (⟨ϖ ^ n • x, hn⟩ * (s : As R' A)) =
-        algebraMap (As R' A) (Loc ζ) (algebraMap R' (As R' A) ϖ ^ n * b) := by
+    have h2
+        : algebraMap (As R' A) (Loc ζ) (⟨ϖ ^ n • x, hn⟩ * (s : As R' A))
+          = algebraMap (As R' A) (Loc ζ) (algebraMap R' (As R' A) ϖ ^ n * b) := by
       rw [map_mul, hc, mul_assoc, IsLocalization.mk'_spec, ← map_mul]
     obtain ⟨t, ht⟩ := (IsLocalization.eq_iff_exists ζ.asIdeal.primeCompl (Loc ζ)).1 h2
-    have h3 : (algebraMap R' A ϖ) ^ n * ((((t : As R' A) : A) * ((s : As R' A) : A)) * x) =
-        (algebraMap R' A ϖ) ^ n * (((t : As R' A) : A) * (b : A)) := by
+    have h3
+        : (algebraMap R' A ϖ) ^ n * ((((t : As R' A) : A) * ((s : As R' A) : A)) * x)
+          = (algebraMap R' A ϖ) ^ n * (((t : As R' A) : A) * (b : A)) := by
       have := congrArg Subtype.val ht
       simp only [MulMemClass.coe_mul, SubmonoidClass.coe_pow, Algebra.smul_def, map_pow] at this
       have e : ((algebraMap R' (As R' A) ϖ : As R' A) : A) = algebraMap R' A ϖ := rfl
@@ -300,65 +337,74 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
     refine ⟨d * (t * b), ?_⟩
     have h5 : ((d * (t * b) : As R' A) : A) - x = ((-i : As R' A) : A) * x := by
       have := congrArg Subtype.val hdi
-      simp only [AddMemClass.coe_add, MulMemClass.coe_mul, OneMemClass.coe_one,
-        NegMemClass.coe_neg] at this ⊢
+      simp only [AddMemClass.coe_add, MulMemClass.coe_mul, OneMemClass.coe_one, NegMemClass.coe_neg]
+        at this ⊢
       linear_combination x * this - (d : A) * h4
     rw [h5, ord_mul ζ hϖ]
     exact add_pos_of_pos_of_nonneg ((CoverPlaces.ord_pos_iff hϖ ζ _).2 (ζ.asIdeal.neg_mem hi)) hx
-  have residueDegree {K : Type} [Field K] [Algebra F K] [Algebra R K] [IsScalarTower R F K]
-      (ζ : Pts R' A) [IsDVRAt ζ] (w : AddValuation K (WithTop ℤ)) (hw : w ∈ ValPl.PlacesOver R K)
-      {S : Type} [CommRing S] (u : AddValuation S (WithTop ℤ)) (Ψ : A →+* S) (jK : K →+* S)
-      (hΨ : Function.Surjective Ψ)
+  have residueDegree
+      {K : Type} [Field K] [Algebra F K] [Algebra R K] [IsScalarTower R F K]
+      (ζ : Pts R' A) [IsDVRAt ζ]
+      (w : AddValuation K (WithTop ℤ)) (hw : w ∈ ValPl.PlacesOver R K)
+      {S : Type} [CommRing S]
+      (u : AddValuation S (WithTop ℤ)) (Ψ : A →+* S) (jK : K →+* S) (hΨ : Function.Surjective Ψ)
       (hcomp : ∀ r : R, Ψ (algebraMap R' A (algebraMap R R' r)) = jK (algebraMap R K r))
       (hι : ∀ g, u (jK g) = w g) (hord : ∀ a, ord ϖ ζ a = u (Ψ a))
-      (happrox : ∀ x, 0 ≤ u x → ∃ g, 0 ≤ w g ∧ 0 < u (x - jK g)) :
-      fdeg ζ = (letI := resAlg (F := F) w
-        Module.finrank (ResidueField ((vRing w).comap (algebraMap F K))) (ResidueField (vRing w))) := by
+      (happrox : ∀ x, 0 ≤ u x → ∃ g, 0 ≤ w g ∧ 0 < u (x - jK g))
+      : fdeg ζ
+        = (letI := resAlg (F := F) w
+           Module.finrank (ResidueField ((vRing w).comap (algebraMap F K)))
+             (ResidueField (vRing w))) := by
     letI := resAlg (F := F) w
-    let T : Subring (As R' A × vRing w) :=
-      { carrier := {z | 0 < u (Ψ (z.1 : A) - jK (z.2 : K))}
-        mul_mem' := by
-          intro z z' hz hz'
-          change 0 < u (Ψ ((z.1 : A) * z'.1) - jK ((z.2 : K) * z'.2))
-          have e : Ψ ((z.1 : A) * z'.1) - jK ((z.2 : K) * z'.2) =
-              (Ψ (z'.1 : A) - jK (z'.2 : K)) * Ψ z.1 + (Ψ (z.1 : A) - jK (z.2 : K)) * jK z'.2 := by
-            rw [map_mul, map_mul]; ring
-          rw [e]
-          refine u.map_lt_add ?_ ?_
-          · rw [u.map_mul, ← hord]
-            exact add_pos_of_pos_of_nonneg hz' (ord_nonneg ζ hϖ z.1.2)
-          · rw [u.map_mul, hι]
-            exact add_pos_of_pos_of_nonneg hz z'.2.2
-        one_mem' := by
-          change 0 < u (Ψ 1 - jK 1)
-          simp
-        add_mem' := by
-          intro z z' hz hz'
-          change 0 < u (Ψ ((z.1 : A) + z'.1) - jK ((z.2 : K) + z'.2))
-          rw [map_add (f := _), map_add (f := _), add_sub_add_comm]
-          exact u.map_lt_add hz hz'
-        zero_mem' := by
-          change 0 < u (Ψ 0 - jK 0)
-          simp
-        neg_mem' := by
-          intro z hz
-          change 0 < u (Ψ (-(z.1 : A)) - jK (-(z.2 : K)))
-          rw [map_neg, map_neg, ← neg_sub', u.map_neg]
-          exact hz }
+    let T : Subring (As R' A × vRing w) := {
+      carrier := {z | 0 < u (Ψ (z.1 : A) - jK (z.2 : K))}
+      mul_mem' := by
+        intro z z' hz hz'
+        change 0 < u (Ψ ((z.1 : A) * z'.1) - jK ((z.2 : K) * z'.2))
+        have e
+            : Ψ ((z.1 : A) * z'.1) - jK ((z.2 : K) * z'.2)
+              = (Ψ (z'.1 : A) - jK (z'.2 : K)) * Ψ z.1
+                + (Ψ (z.1 : A) - jK (z.2 : K)) * jK z'.2 := by
+          rw [map_mul, map_mul]; ring
+        rw [e]
+        refine u.map_lt_add ?_ ?_
+        · rw [u.map_mul, ← hord]
+          exact add_pos_of_pos_of_nonneg hz' (ord_nonneg ζ hϖ z.1.2)
+        · rw [u.map_mul, hι]
+          exact add_pos_of_pos_of_nonneg hz z'.2.2
+      one_mem' := by
+        change 0 < u (Ψ 1 - jK 1)
+        simp
+      add_mem' := by
+        intro z z' hz hz'
+        change 0 < u (Ψ ((z.1 : A) + z'.1) - jK ((z.2 : K) + z'.2))
+        rw [map_add (f := _), map_add (f := _), add_sub_add_comm]
+        exact u.map_lt_add hz hz'
+      zero_mem' := by
+        change 0 < u (Ψ 0 - jK 0)
+        simp
+      neg_mem' := by
+        intro z hz
+        change 0 < u (Ψ (-(z.1 : A)) - jK (-(z.2 : K)))
+        rw [map_neg, map_neg, ← neg_sub', u.map_neg]
+        exact hz
+    }
     have hT : ∀ z : T, 0 < u (Ψ (z.1.1 : A) - jK (z.1.2 : K)) := fun z => z.2
     let jw : R →+* vRing w := (algebraMap R K).codRestrict (vRing w) (fun r => (hw.2 r).1)
-    let j : R →+* T := (((algebraMap R' (As R' A)).comp (algebraMap R R')).prod jw).codRestrict T
-      (fun r => by
+    let j : R →+* T :=
+      (((algebraMap R' (As R' A)).comp (algebraMap R R')).prod jw).codRestrict T (fun r => by
         change 0 < u (Ψ (algebraMap R' A (algebraMap R R' r)) - jK (algebraMap R K r))
-        rw [hcomp, sub_self]; simp)
+        rw [hcomp, sub_self]
+        simp)
     have hOw : ∀ a : R, algebraMap R F a ∈ (vRing w).comap (algebraMap F K) := fun a => by
       rw [ValuationSubring.mem_comap, ← IsScalarTower.algebraMap_apply]
       exact (hw.2 a).1
     let φ : R →+* (vRing w).comap (algebraMap F K) := (algebraMap R F).codRestrict _ hOw
-    let p : T →+* ResidueField (Loc ζ) := ((residue (Loc ζ)).comp (algebraMap (As R' A) (Loc ζ))).comp
-      ((RingHom.fst _ _).comp T.subtype)
-    let q : T →+* ResidueField (vRing w) := (residue (vRing w)).comp
-      ((RingHom.snd _ _).comp T.subtype)
+    let p : T →+* ResidueField (Loc ζ) :=
+      ((residue (Loc ζ)).comp (algebraMap (As R' A) (Loc ζ))).comp
+        ((RingHom.fst _ _).comp T.subtype)
+    let q : T →+* ResidueField (vRing w) :=
+      (residue (vRing w)).comp ((RingHom.snd _ _).comp T.subtype)
     refine finrank_eq_of_surjective j ((residue R').comp (algebraMap R R')) ((residue _).comp φ) p q
       ?_ ?_ ?_ ?_ ?_ ?_ ?_
     · intro y
@@ -383,19 +429,21 @@ theorem exists_equiv_pts_places_baseChange : ∀ (R R' F F' : Type) [CommRing R]
     · intro z
       change residue (Loc ζ) (algebraMap (As R' A) (Loc ζ) z.1.1) = 0 ↔ residue (vRing w) z.1.2 = 0
       rw [residue_eq_zero_iff, residue_eq_zero_iff, mem_maximalIdeal_vRing,
-        IsLocalization.AtPrime.to_map_mem_maximal_iff (Loc ζ) ζ.asIdeal, ← CoverPlaces.ord_pos_iff hϖ, hord, ← hι]
+        IsLocalization.AtPrime.to_map_mem_maximal_iff (Loc ζ) ζ.asIdeal,
+        ← CoverPlaces.ord_pos_iff hϖ, hord, ← hι]
       refine ⟨pos_of_sub_pos u ?_, pos_of_sub_pos u (hT z)⟩
       rw [← neg_sub, u.map_neg]
       exact hT z
     · intro r
       rfl
     · intro r
-      change residue (vRing w) (comapIncl (vRing w) (algebraMap F K) (φ r)) = residue (vRing w) (jw r)
+      change residue (vRing w) (comapIncl (vRing w) (algebraMap F K) (φ r))
+        = residue (vRing w) (jw r)
       congr 1
       exact Subtype.ext (IsScalarTower.algebraMap_apply R F K r).symm
   refine residueDegree _ w.1 w.2 (w' c w) (Ψ c).toRingHom
-    (Algebra.TensorProduct.includeRight : L c →ₐ[F] F' ⊗[F] L c).toRingHom (hsurj c) ?_
-    (hw1 c w) (hZ ⟨c, w⟩) (hw3 c w)
+    (Algebra.TensorProduct.includeRight : L c →ₐ[F] F' ⊗[F] L c).toRingHom (hsurj c) ?_ (hw1 c w)
+    (hZ ⟨c, w⟩) (hw3 c w)
   intro r
   exact ((Ψ c).commutes _).trans (PlaceExt.algebraMap_eq_one_tmul r)
 

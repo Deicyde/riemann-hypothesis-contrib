@@ -15,22 +15,21 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem emb_mul' (g g' : D.R.GG) (x : D.host.E) :
-    D.host.emb (g * g') x = D.host.emb g (D.host.sigmaOf g' x) := by
+theorem emb_mul' (g g' : D.R.GG) (x : D.host.E)
+    : D.host.emb (g * g') x = D.host.emb g (D.host.sigmaOf g' x) := by
   simp only [Host.emb, Host.sigmaOf, map_mul, RingHom.comp_apply]
   rfl
 
-theorem conj_comp_emb (g : D.R.GG) :
-    (starRingEnd ℂ).comp (D.host.emb g) = D.host.emb (g * D.R.cc) := by
+theorem conj_comp_emb (g : D.R.GG)
+    : (starRingEnd ℂ).comp (D.host.emb g) = D.host.emb (g * D.R.cc) := by
   ext x
   rw [RingHom.comp_apply, emb_mul', ← D.host.conjE_apply (D.host.emb g)]
   rfl
 
-theorem cc_mul_cc : D.R.cc * D.R.cc = 1 := by
-  simp [Formalism.HC.Frame.cc, c0, Prod.ext_iff]
+theorem cc_mul_cc : D.R.cc * D.R.cc = 1 := by simp [Formalism.HC.Frame.cc, c0, Prod.ext_iff]
 
-theorem ArchLab.emb_eq (A : ArchLab D) (τ : D.what₂.Tau) :
-    A.emb τ = D.host.emb ((D.eTau (A.perm τ)).1 * (if A.side then 1 else D.R.cc)) := by
+theorem ArchLab.emb_eq (A : ArchLab D) (τ : D.what₂.Tau)
+    : A.emb τ = D.host.emb ((D.eTau (A.perm τ)).1 * (if A.side then 1 else D.R.cc)) := by
   rcases A with ⟨p, s⟩
   cases s
   · simp [ArchLab.emb, tauE, conj_comp_emb]
@@ -50,7 +49,8 @@ theorem labExists : LabExists D := by
     rw [emb_mul', hγ]
     rfl
   by_cases hγP : γ ∈ D.R.Psi
-  · let f : D.what₂.Tau → D.what₂.Tau := fun τ => D.eTau.symm ⟨γ * (D.eTau τ).1, mul_mem hγP (D.eTau τ).2⟩
+  · let f : D.what₂.Tau → D.what₂.Tau := fun τ =>
+      D.eTau.symm ⟨γ * (D.eTau τ).1, mul_mem hγP (D.eTau τ).2⟩
     have hf : Function.Injective f := by
       intro a b hab
       have e1 := congrArg (fun x => (D.eTau x).1) hab

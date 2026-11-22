@@ -43,7 +43,8 @@ theorem killedCore : KilledCore := by
         induction j with
         | zero => rw [zero_add, pow_one]
         | succ j ih =>
-          calc I ≤ I ^ 2 := aug_le_sq Δ ε hL hR
+          calc
+            I ≤ I ^ 2 := aug_le_sq Δ ε hL hR
             _ = I * I := pow_two I
             _ ≤ I * I ^ (j + 1) := Ideal.mul_mono_right ih
             _ = I ^ (j + 1 + 1) := (pow_succ' I (j + 1)).symm

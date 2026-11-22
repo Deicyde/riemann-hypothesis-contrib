@@ -18,66 +18,76 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicN
 
 def lin {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E) : S.V := ∑ i, c i • u i
 
-theorem hT_lin_right {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E) (x : S.V) :
-    S.hT x (lin u c) = ∑ i, c i * S.hT x (u i) := by
+theorem hT_lin_right {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E) (x : S.V)
+    : S.hT x (lin u c) = ∑ i, c i * S.hT x (u i) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [lin, map_sum, map_smul, smul_eq_mul]
+  simp [lin, map_sum, map_smul, smul_eq_mul]
 
-theorem hT_lin_left {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E) (x : S.V) :
-    S.hT (lin u c) x = ∑ i, star (c i) * S.hT (u i) x := by
+theorem hT_lin_left {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E) (x : S.V)
+    : S.hT (lin u c) x = ∑ i, star (c i) * S.hT (u i) x := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [lin, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-    starRingEnd_apply]
+  simp only [lin, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
+    smul_eq_mul, starRingEnd_apply]
 
-theorem hT_lin_lin {ι : Type*} [Fintype ι] (u : ι → S.V) (c d : ι → E) :
-    S.hT (lin u c) (lin u d) = ∑ i, ∑ j, star (c i) * d j * S.hT (u i) (u j) := by
+theorem hT_lin_lin {ι : Type*} [Fintype ι] (u : ι → S.V) (c d : ι → E)
+    : S.hT (lin u c) (lin u d) = ∑ i, ∑ j, star (c i) * d j * S.hT (u i) (u j) := by
   rw [hT_lin_left]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hT_lin_right, Finset.mul_sum]
   exact Finset.sum_congr rfl fun j _ => by ring
 
-theorem lin_add {ι : Type*} [Fintype ι] (u : ι → S.V) (c d : ι → E) : lin u (c + d) = lin u c + lin u d := by
+theorem lin_add {ι : Type*} [Fintype ι] (u : ι → S.V) (c d : ι → E)
+    : lin u (c + d) = lin u c + lin u d := by
   simp [lin, add_smul, Finset.sum_add_distrib]
 
-theorem lin_smul {ι : Type*} [Fintype ι] (u : ι → S.V) (t : E) (c : ι → E) : lin u (t • c) = t • lin u c := by
+theorem lin_smul {ι : Type*} [Fintype ι] (u : ι → S.V) (t : E) (c : ι → E)
+    : lin u (t • c) = t • lin u c := by
   simp [lin, smul_smul, Finset.smul_sum]
 
-theorem lin_sub {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E) : lin u c ∈ Submodule.span E (Set.range u) :=
+theorem lin_sub {ι : Type*} [Fintype ι] (u : ι → S.V) (c : ι → E)
+    : lin u c ∈ Submodule.span E (Set.range u) :=
   Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
 def pc {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (v : S.V) : ι → E :=
   (gram S u u)⁻¹ *ᵥ fun k => S.hT (u k) v
 
-theorem pc_add {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (x y : S.V) :
-    pc u (x + y) = pc u x + pc u y := by
+theorem pc_add {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (x y : S.V)
+    : pc u (x + y) = pc u x + pc u y := by
   unfold pc
   rw [← Matrix.mulVec_add]
   congr 1
   funext k
   exact map_add (S.hT (u k)) x y
 
-theorem pc_smul {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (t : E) (x : S.V) :
-    pc u (t • x) = t • pc u x := by
+theorem pc_smul {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (t : E) (x : S.V)
+    : pc u (t • x) = t • pc u x := by
   unfold pc
   rw [← Matrix.mulVec_smul]
   congr 1
   funext k
   exact map_smul (S.hT (u k)) t x
 
-theorem hT_u_lin {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (c : ι → E) (k : ι) :
-    S.hT (u k) (lin u c) = (gram S u u *ᵥ c) k := by
+theorem hT_u_lin {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (c : ι → E) (k : ι)
+    : S.hT (u k) (lin u c) = (gram S u u *ᵥ c) k := by
   rw [hT_lin_right]
   simp [Matrix.mulVec, dotProduct, gram, mul_comm]
 
-theorem hT_u_rem {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (hdet : (gram S u u).det ≠ 0) (v : S.V)
-    (k : ι) : S.hT (u k) (v - lin u (pc u v)) = 0 := by
+theorem hT_u_rem
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (u : ι → S.V) (hdet : (gram S u u).det ≠ 0)
+    (v : S.V) (k : ι)
+    : S.hT (u k) (v - lin u (pc u v)) = 0 := by
   rw [map_sub, hT_u_lin]
   unfold pc
-  rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hdet), Matrix.one_mulVec]
+  rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hdet),
+    Matrix.one_mulVec]
   simp
 
-theorem hT_span_rem {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (hdet : (gram S u u).det ≠ 0) (v z : S.V)
-    (hz : z ∈ Submodule.span E (Set.range u)) : S.hT z (v - lin u (pc u v)) = 0 ∧ S.hT (v - lin u (pc u v)) z = 0 := by
+theorem hT_span_rem
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (u : ι → S.V) (hdet : (gram S u u).det ≠ 0)
+    (v z : S.V) (hz : z ∈ Submodule.span E (Set.range u))
+    : S.hT z (v - lin u (pc u v)) = 0 ∧ S.hT (v - lin u (pc u v)) z = 0 := by
   have first : S.hT z (v - lin u (pc u v)) = 0 := by
     induction hz using Submodule.span_induction with
     | mem x hx =>
@@ -92,35 +102,42 @@ theorem hT_span_rem {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) 
 
 def isoG {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) : S.V →ₗ[E] S.V where
   toFun v := v - lin u (pc u v) + lin u' (pc u v)
-  map_add' x y := by
-    rw [pc_add, lin_add, lin_add]; abel
-  map_smul' t x := by
-    rw [pc_smul, lin_smul, lin_smul, RingHom.id_apply, smul_add, smul_sub]
+  map_add' x y := by rw [pc_add, lin_add, lin_add]; abel
+  map_smul' t x := by rw [pc_smul, lin_smul, lin_smul, RingHom.id_apply, smul_add, smul_sub]
 
-theorem isoG_apply {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) (v : S.V) :
-    isoG u u' v = v - lin u (pc u v) + lin u' (pc u v) := rfl
+theorem isoG_apply {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) (v : S.V)
+    : isoG u u' v = v - lin u (pc u v) + lin u' (pc u v) :=
+  rfl
 
-theorem pc_self {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (hdet : (gram S u u).det ≠ 0) (m : ι) :
-    pc u (u m) = Pi.single m 1 := by
+theorem pc_self
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (hdet : (gram S u u).det ≠ 0) (m : ι)
+    : pc u (u m) = Pi.single m 1 := by
   have hcol : (fun k => S.hT (u k) (u m)) = gram S u u *ᵥ Pi.single m 1 := by
     funext k
     simp [Matrix.mulVec, dotProduct, gram, Pi.single_apply]
   unfold pc
-  rw [hcol, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr hdet), Matrix.one_mulVec]
+  rw [hcol, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr hdet),
+    Matrix.one_mulVec]
 
-theorem lin_single {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (m : ι) : lin u (Pi.single m 1) = u m := by
+theorem lin_single {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) (m : ι)
+    : lin u (Pi.single m 1) = u m := by
   simp [lin, Pi.single_apply, ite_smul]
 
-private theorem hT_isoG_of_gram_eq {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) (hG : gram S u' u' = gram S u u)
-    (hdet : (gram S u u).det ≠ 0) (hsp : ∀ i, u' i ∈ Submodule.span E (Set.range u)) (x y : S.V) :
-    S.hT (isoG u u' x) (isoG u u' y) = S.hT x y := by
-  have hlin : ∀ (w : ι → S.V) (c : ι → E), (∀ i, w i ∈ Submodule.span E (Set.range u)) →
-      lin w c ∈ Submodule.span E (Set.range u) := by
+private theorem hT_isoG_of_gram_eq
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (u u' : ι → S.V) (hG : gram S u' u' = gram S u u) (hdet : (gram S u u).det ≠ 0)
+    (hsp : ∀ i, u' i ∈ Submodule.span E (Set.range u))
+    (x y : S.V)
+    : S.hT (isoG u u' x) (isoG u u' y) = S.hT x y := by
+  have hlin
+      : ∀ (w : ι → S.V) (c : ι → E),
+        (∀ i, w i ∈ Submodule.span E (Set.range u)) → lin w c ∈ Submodule.span E (Set.range u) := by
     intro w c hw
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hw i)
   have hu : ∀ i, u i ∈ Submodule.span E (Set.range u) := fun i => Submodule.subset_span ⟨i, rfl⟩
-  have hgram : ∀ (w : ι → S.V) (c d : ι → E), S.hT (lin w c) (lin w d) =
-      ∑ i, ∑ j, star (c i) * d j * gram S w w i j := by
+  have hgram
+      : ∀ (w : ι → S.V) (c d : ι → E),
+        S.hT (lin w c) (lin w d) = ∑ i, ∑ j, star (c i) * d j * gram S w w i j := by
     intro w c d
     rw [hT_lin_lin]
     simp [gram]
@@ -139,11 +156,14 @@ private theorem hT_isoG_of_gram_eq {ι : Type*} [Fintype ι] [DecidableEq ι] (u
   simp only [map_add (f := _), LinearMap.add_apply]
   rw [A1, A2, B1, B2, hgram u', hgram u, hG]
 
-theorem isom_ext {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) (hG : gram S u' u' = gram S u u)
-    (hdet : (gram S u u).det ≠ 0) (hsp : ∀ i, u' i ∈ Submodule.span E (Set.range u)) :
-    ∃ g : S.V ≃ₗ[E] S.V, (∀ x y, S.hT (g x) (g y) = S.hT x y) ∧ (∀ i, g (u i) = u' i) ∧
-      (∀ w, (∀ k, S.hT (u k) w = 0) → g w = w) ∧
-      ∀ v, g v = v + ∑ k, S.hT (u k) v • ∑ m, (gram S u u)⁻¹ m k • (u' m - u m) := by
+theorem isom_ext
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (u u' : ι → S.V) (hG : gram S u' u' = gram S u u) (hdet : (gram S u u).det ≠ 0)
+    (hsp : ∀ i, u' i ∈ Submodule.span E (Set.range u))
+    : ∃ g : S.V ≃ₗ[E] S.V,
+      (∀ x y, S.hT (g x) (g y) = S.hT x y) ∧ (∀ i, g (u i) = u' i)
+        ∧ (∀ w, (∀ k, S.hT (u k) w = 0) → g w = w)
+        ∧ ∀ v, g v = v + ∑ k, S.hT (u k) v • ∑ m, (gram S u u)⁻¹ m k • (u' m - u m) := by
   haveI := S.fd
   have hinj : Function.Injective (isoG u u') := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -169,8 +189,9 @@ theorem isom_ext {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) 
     simp [lin]
   · intro v
     simp only [LinearEquiv.ofBijective_apply, isoG_apply]
-    have key : lin u' (pc u v) - lin u (pc u v) =
-        ∑ k, S.hT (u k) v • ∑ m, (gram S u u)⁻¹ m k • (u' m - u m) := by
+    have key
+        : lin u' (pc u v) - lin u (pc u v)
+          = ∑ k, S.hT (u k) v • ∑ m, (gram S u u)⁻¹ m k • (u' m - u m) := by
       simp only [lin, pc, Matrix.mulVec, dotProduct, ← Finset.sum_sub_distrib, ← smul_sub,
         Finset.sum_smul, Finset.smul_sum, smul_smul]
       rw [Finset.sum_comm]

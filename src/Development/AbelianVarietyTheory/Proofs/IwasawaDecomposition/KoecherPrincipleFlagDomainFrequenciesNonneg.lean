@@ -8,19 +8,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.CuspFrom Filter Topology
+open NumberField Complex ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.CuspFrom Filter Topology
 
 namespace GlobalTheory.Koecher
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-
 open MajorantConjugateTransfer TwoSidedBoostBounds MinimumGrowthBounds FractionalSliceDomains in
-theorem fj_le_slice (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) (ξ : Fin r → E) (hξ : X.IsIso ξ)
-    (ν : X.Ψ → ℝ) (x : Frame X.Ψ r) (hx : x ∈ X.dom) (y : X.Ψ → ℝ) (M : ℝ)
-    (hy : ∀ τ, 0 < X.tt ξ x τ + y τ)
-    (hM : ∀ u : X.Ψ → ℝ, ‖P (X.flow ξ (fun τ => (u τ : ℂ) + (y τ : ℂ) * Complex.I) x)‖ ≤ M) :
-    ‖X.fj la ξ ν P x‖ * Real.exp (-4 * Real.pi * ∑ τ, ν τ * y τ) ≤ M := by
+theorem fj_le_slice
+    (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P)
+    (ξ : Fin r → E) (hξ : X.IsIso ξ)
+    (ν : X.Ψ → ℝ)
+    (x : Frame X.Ψ r) (hx : x ∈ X.dom)
+    (y : X.Ψ → ℝ) (M : ℝ) (hy : ∀ τ, 0 < X.tt ξ x τ + y τ)
+    (hM : ∀ u : X.Ψ → ℝ, ‖P (X.flow ξ (fun τ => (u τ : ℂ) + (y τ : ℂ) * Complex.I) x)‖ ≤ M)
+    : ‖X.fj la ξ ν P x‖ * Real.exp (-4 * Real.pi * ∑ τ, ν τ * y τ) ≤ M := by
   classical
   obtain ⟨bs, hω⟩ := FlowMeanContinuity.exists_basis X la
   have hωp : ∀ j, bs j ∈ X.periods la := by
@@ -44,8 +47,7 @@ theorem fj_le_slice (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la
   choose k hk using hf
   rw [FlowMeanContinuity.fj_eq_fourCoeff X la P hP hξ hx bs hω ν k hk]
   change ‖ReciprocityTheory.L2DbarEstimates.Y.fourCoeff (hfun X P ξ x bs) 0 k‖ * _ ≤ _
-  have hm : ∀ τ, 0 < X.maj x τ (Data.emb τ.1 ξ) :=
-    fun τ => X.maj_pos hx τ (emb_ne_zero τ.1 hξ.2.2)
+  have hm : ∀ τ, 0 < X.maj x τ (Data.emb τ.1 ξ) := fun τ => X.maj_pos hx τ (emb_ne_zero τ.1 hξ.2.2)
   have hc := c_pos X
   set b' : Fin (Fintype.card X.Ψ) → ℝ := fun j => bs.repr y j with hb'
   have hb'ω : ∀ τ, ∑ j, b' j * bs j τ = y τ := hrepr y
@@ -56,17 +58,21 @@ theorem fj_le_slice (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la
     rw [hb'ω]
     have h1 := mul_pos (hc τ) (hm τ)
     have h2 := mul_pos (hy τ) h1
-    have e : (X.tt ξ x τ + y τ) * (X.c τ * X.maj x τ (Data.emb τ.1 ξ)) =
-        1 + X.c τ * y τ * X.maj x τ (Data.emb τ.1 ξ) := by
+    have e
+        : (X.tt ξ x τ + y τ) * (X.c τ * X.maj x τ (Data.emb τ.1 ξ))
+          = 1 + X.c τ * y τ * X.maj x τ (Data.emb τ.1 ξ) := by
       rw [Data.tt, add_mul, one_div_mul_cancel h1.ne']
       ring
     rwa [e] at h2
-  have hind := ReciprocityTheory.L2DbarEstimates.Y.four_indep (Fintype.card X.Ψ) (FractionalSliceDomains.Om X ξ x bs) (hfun X P ξ x bs)
-    (Om_open_conn X bs hx).1 (Om_open_conn X bs hx).2 (hfun_diff X bs P la hP hx hξ)
-    (hfun_periodic X bs P la hP hx hξ hω) 0 (zero_mem_Om X bs hx hξ) b' hb'Ω k
+  have hind :=
+    ReciprocityTheory.L2DbarEstimates.Y.four_indep (Fintype.card X.Ψ)
+      (FractionalSliceDomains.Om X ξ x bs) (hfun X P ξ x bs) (Om_open_conn X bs hx).1
+      (Om_open_conn X bs hx).2 (hfun_diff X bs P la hP hx hξ) (hfun_periodic X bs P la hP hx hξ hω)
+      0 (zero_mem_Om X bs hx hξ) b' hb'Ω k
   rw [hind]
-  have hslice : ∀ t : Fin (Fintype.card X.Ψ) → ℝ,
-      ‖hfun X P ξ x bs (fun k => (t k : ℂ) + (b' k : ℂ) * Complex.I)‖ ≤ M := by
+  have hslice
+      : ∀ t : Fin (Fintype.card X.Ψ) → ℝ,
+        ‖hfun X P ξ x bs (fun k => (t k : ℂ) + (b' k : ℂ) * Complex.I)‖ ≤ M := by
     intro t
     have h := hM (fun τ => ∑ j, t j * bs j τ)
     unfold hfun
@@ -76,7 +82,9 @@ theorem fj_le_slice (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la
     push_cast
     rw [Finset.sum_mul, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun j _ => by ring
-  have hbd := ReciprocityTheory.L2DbarEstimates.Y.four_bound (Fintype.card X.Ψ) (hfun X P ξ x bs) b' k _ hslice
+  have hbd :=
+    ReciprocityTheory.L2DbarEstimates.Y.four_bound (Fintype.card X.Ψ) (hfun X P ξ x bs) b' k _
+      hslice
   have hsum : ∑ j, (k j : ℝ) * b' j = 2 * ∑ τ, ν τ * ∑ j, b' j * bs j τ := by
     simp only [← hk, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
@@ -110,8 +118,10 @@ theorem exists_ne (h : 1 < Module.finrank ℚ E / 2) (τ₀ : X.Ψ) : ∃ τ₁ 
   rw [Finset.card_univ, NumberField.Embeddings.card] at h1
   omega
 
-theorem eq_zero_of_exp_le {a b c K A : ℝ} (ha : 0 ≤ a) (hb : 0 < b)
-    (h : ∀ L : ℝ, 1 ≤ L → a * Real.exp (b * L - c) ≤ K * L ^ A) : a = 0 := by
+theorem eq_zero_of_exp_le
+    {a b c K A : ℝ}
+    (ha : 0 ≤ a) (hb : 0 < b) (h : ∀ L : ℝ, 1 ≤ L → a * Real.exp (b * L - c) ≤ K * L ^ A)
+    : a = 0 := by
   have ht := (tendsto_rpow_mul_exp_neg_mul_atTop_nhds_zero A b hb).const_mul (K * Real.exp c)
   rw [mul_zero] at ht
   refine le_antisymm (ge_of_tendsto ht ?_) ha
@@ -127,11 +137,13 @@ end GlobalTheory.Koecher
 
 namespace GlobalTheory
 
-
 open Koecher FjCauchy in
-theorem freqNonneg_of_thickBdd : OrbitThickSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ), 1 < Module.finrank ℚ E / 2 → X.IsSec la P →
-    ThickBdd X (X.pnorm la P) → FreqNonneg X la P := by
+theorem freqNonneg_of_thickBdd
+    : OrbitThickSt
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (la : Wt X.Ψ r)
+          (P : Frame X.Ψ r → ℂ),
+        1 < Module.finrank ℚ E / 2 → X.IsSec la P → ThickBdd X (X.pnorm la P)
+          → FreqNonneg X la P := by
   intro hO E _ _ _ r X la P hE hP hT ξ hξ ν x hx hne τ₀
   classical
   by_contra hneg
@@ -143,8 +155,8 @@ theorem freqNonneg_of_thickBdd : OrbitThickSt → ∀ (E : Type) [Field E] [Numb
   have hn := FlowCoefficientBounds.nfac_pos X hx la
   apply hne
   rw [← norm_eq_zero]
-  refine eq_zero_of_exp_le (b := 4 * Real.pi * (-ν τ₀ * X.tt ξ x τ₀))
-    (c := 4 * Real.pi * (-ν τ₀ * X.tt ξ x τ₀ + |ν τ₁| * X.tt ξ x τ₁)) (K := |S| / X.nfac la x)
+  refine eq_zero_of_exp_le (b := 4 * Real.pi * (- ν τ₀ * X.tt ξ x τ₀))
+    (c := 4 * Real.pi * (- ν τ₀ * X.tt ξ x τ₀ + |ν τ₁| * X.tt ξ x τ₁)) (K := |S| / X.nfac la x)
     (A := ∑ τ, |X.spread la τ / 2|) (norm_nonneg _)
     (mul_pos (by positivity) (mul_pos (by linarith) (ht _))) fun L hL => ?_
   have hL0 : 0 < L := by linarith
@@ -172,7 +184,8 @@ theorem freqNonneg_of_thickBdd : OrbitThickSt → ∀ (E : Type) [Field E] [Numb
   have hy : ∀ τ, 0 < X.tt ξ x τ + y τ := fun τ => by rw [hty]; exact mul_pos (hq0 τ) (ht τ)
   refine le_trans ?_ (fj_le_slice X la P hP ξ hξ ν x hx y _ hy fun u => ?_)
   · refine mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr ?_) (norm_nonneg _)
-    have e : ∑ τ, ν τ * y τ = ν τ₀ * ((L - 1) * X.tt ξ x τ₀) + ν τ₁ * ((L⁻¹ - 1) * X.tt ξ x τ₁) := by
+    have e
+        : ∑ τ, ν τ * y τ = ν τ₀ * ((L - 1) * X.tt ξ x τ₀) + ν τ₁ * ((L⁻¹ - 1) * X.tt ξ x τ₁) := by
       rw [Fintype.sum_eq_add τ₀ τ₁ h10.symm]
       · simp [y, q, h10, h10.symm]
       · rintro τ ⟨h1, h2⟩
@@ -194,8 +207,9 @@ theorem freqNonneg_of_thickBdd : OrbitThickSt → ∀ (E : Type) [Field E] [Numb
       rw [Finset.prod_mul_distrib, hqp, one_mul]
     have hb : ‖P (X.flow ξ s x)‖ * X.nfac la (X.flow ξ s x) ≤ S := hS _ hd (hth s hd hprod)
     have hn' := FlowCoefficientBounds.nfac_pos X hd la
-    have hN : X.nfac la x / X.nfac la (X.flow ξ s x) ≤
-        ∏ τ, max (1 + (s τ).im / X.tt ξ x τ) (1 + (s τ).im / X.tt ξ x τ)⁻¹ ^ (X.spread la τ / 2) :=
+    have hN
+        : X.nfac la x / X.nfac la (X.flow ξ s x)
+          ≤ ∏ τ, max (1 + (s τ).im / X.tt ξ x τ) (1 + (s τ).im / X.tt ξ x τ)⁻¹ ^ (X.spread la τ / 2) :=
       (m3bNorm_holds r X _ (isIsoV_embV X hξ) la x hx s hd).2
     have hqe : ∀ τ, 1 + (s τ).im / X.tt ξ x τ = q τ := fun τ => by
       rw [him]
@@ -205,12 +219,15 @@ theorem freqNonneg_of_thickBdd : OrbitThickSt → ∀ (E : Type) [Field E] [Numb
     simp only [hqe] at hN
     have hN2 : ∏ τ, max (q τ) (q τ)⁻¹ ^ (X.spread la τ / 2) ≤ L ^ ∑ τ, |X.spread la τ / 2| := by
       rw [Real.rpow_sum_of_pos hL0]
-      refine Finset.prod_le_prod₀ (fun τ _ => Real.rpow_nonneg (zero_le_one.trans (hq1 τ)) _) fun τ _ => ?_
+      refine Finset.prod_le_prod₀
+        (fun τ _ => Real.rpow_nonneg (zero_le_one.trans (hq1 τ)) _)
+        fun τ _ => ?_
       exact (Real.rpow_le_rpow_of_exponent_le (hq1 τ) (le_abs_self _)).trans
         (Real.rpow_le_rpow (zero_le_one.trans (hq1 τ)) (hqm τ) (abs_nonneg _))
-    calc ‖P (X.flow ξ s x)‖ ≤ |S| / X.nfac la (X.flow ξ s x) := by
-          rw [le_div_iff₀ hn']
-          exact hb.trans (le_abs_self S)
+    calc
+      ‖P (X.flow ξ s x)‖ ≤ |S| / X.nfac la (X.flow ξ s x) := by
+        rw [le_div_iff₀ hn']
+        exact hb.trans (le_abs_self S)
       _ = |S| / X.nfac la x * (X.nfac la x / X.nfac la (X.flow ξ s x)) := by field_simp
       _ ≤ _ := mul_le_mul_of_nonneg_left (hN.trans hN2) (by positivity)
 

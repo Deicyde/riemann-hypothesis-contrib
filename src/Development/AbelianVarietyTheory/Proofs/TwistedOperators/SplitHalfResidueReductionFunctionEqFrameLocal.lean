@@ -7,7 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SplitPlac
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor GlobalTheory.StepVec
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
+  GlobalTheory.StepVec
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -24,22 +28,25 @@ theorem toEAf_surjective : Function.Surjective (toEAf D) := by
   obtain ⟨z, hz⟩ := hs ((Algebra.TensorProduct.comm D.host.F (Af D.host.F) D.host.E).symm y)
   refine ⟨z, ?_⟩
   change (Algebra.TensorProduct.comm D.host.F (Af D.host.F) D.host.E) (finPart D z) = y
-  rw [hz]; exact AlgEquiv.apply_symm_apply _ _
+  rw [hz]
+  exact AlgEquiv.apply_symm_apply _ _
 
-theorem gl_map_val {n : ℕ} {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (g : GL (Fin n) R) :
-    (Matrix.GeneralLinearGroup.map f g).val = g.val.map f := rfl
+theorem gl_map_val {n : ℕ} {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (g : GL (Fin n) R)
+    : (Matrix.GeneralLinearGroup.map f g).val = g.val.map f :=
+  rfl
 
 end GlobalTheory.StepVec.HalfCmp
-
 
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
 open GlobalTheory.StepVec.HalfCmp in
-theorem GlobalTheory.StepVec.onHalf_viaRed_eq_locFn : ∀ (D : D7) (v : FinPl D) (φ : SplitProj D v) (e : AE D) (PP : Formalism.L2.DIV.Pl D.host.E)
-    (r : v.adicCompletionIntegers D.host.F →+* Formalism.L2.DIV.kP PP), IsIdemOf φ e → IsProjAt φ PP → IsRedMap φ PP r →
-    ∀ (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D))
-    (ω : Matrix (Fin T.rank) (Fin S.rank) (Formalism.L2.DIV.kP PP) → ℂ),
-      onHalf φ S T (frCo φ βS) (frCo φ βT) e (viaRed r ω) = locFn S T βS βT e PP ω := by
+theorem GlobalTheory.StepVec.onHalf_viaRed_eq_locFn
+    : ∀ (D : D7) (v : FinPl D) (φ : SplitProj D v) (e : AE D) (PP : Formalism.L2.DIV.Pl D.host.E)
+        (r : v.adicCompletionIntegers D.host.F →+* Formalism.L2.DIV.kP PP),
+      IsIdemOf φ e → IsProjAt φ PP → IsRedMap φ PP r
+        → ∀ (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D))
+            (ω : Matrix (Fin T.rank) (Fin S.rank) (Formalism.L2.DIV.kP PP) → ℂ),
+          onHalf φ S T (frCo φ βS) (frCo φ βT) e (viaRed r ω) = locFn S T βS βT e PP ω := by
   intro D v φ e PP r he hP hr S T βS βT ω
   obtain ⟨hchart, hcomp, -⟩ := GlobalTheory.SplitProjChart.chart_rdA D v φ e he
   funext t
@@ -59,7 +66,8 @@ theorem GlobalTheory.StepVec.onHalf_viaRed_eq_locFn : ∀ (D : D7) (v : FinPl D)
   have hfix : ∀ i j, toEAf D e * N i j = N i j := by
     intro i j
     have : toEAf D e • N = N := by
-      rw [hNdef]; unfold frMapO
+      rw [hNdef]
+      unfold frMapO
       rw [← Matrix.smul_mul, ← Matrix.mul_smul]
       congr 2
       ext k l

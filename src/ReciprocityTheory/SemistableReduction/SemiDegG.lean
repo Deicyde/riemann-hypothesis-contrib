@@ -11,29 +11,33 @@ namespace ReciprocityTheory.MultiplicativeHeights.SemiPt
 open Matrix NumberField ComplexConjugate
 open scoped ComplexOrder
 
-theorem herm_cGP {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
-    (P : Matrix (Fin r) (Fin r) K) (a b : Fin r) :
-    S.c (((P.map S.c)ᵀ * S.G * P) a b) = ((P.map S.c)ᵀ * S.G * P) b a := by
+theorem herm_cGP
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} (S : HermForm K r) (P : Matrix (Fin r) (Fin r) K) (a b : Fin r)
+    : S.c (((P.map S.c)ᵀ * S.G * P) a b) = ((P.map S.c)ᵀ * S.G * P) b a := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul,
-    S.c_invol, S.G_herm, Finset.sum_mul]
+      S.c_invol, S.G_herm, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem g_fix {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
-    (P : Matrix (Fin r) (Fin r) K) (m : ℕ) (g : Fin r → K)
-    (hJ : (P.map S.c)ᵀ * S.G * P = wittMat r m g) (i : Fin r) (h1 : m ≤ (i : ℕ))
-    (h2 : (i : ℕ) + m < r) : S.c (g i) = g i := by
+theorem g_fix
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} (S : HermForm K r) (P : Matrix (Fin r) (Fin r) K)
+    (m : ℕ) (g : Fin r → K) (hJ : (P.map S.c)ᵀ * S.G * P = wittMat r m g)
+    (i : Fin r) (h1 : m ≤ (i : ℕ)) (h2 : (i : ℕ) + m < r)
+    : S.c (g i) = g i := by
   have h := herm_cGP S P i i
   rw [hJ] at h
   simpa [wittMat, Matrix.of_apply, not_lt.2 h1, h1, h2] using h
 
-theorem exists_adapted_majorant {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
-    (P : Matrix (Fin r) (Fin r) K) (m : ℕ) (g : Fin r → K) (dd : Fin r → ℝ)
+theorem exists_adapted_majorant
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} (S : HermForm K r) (P : Matrix (Fin r) (Fin r) K)
+    (m : ℕ) (g : Fin r → K) (dd : Fin r → ℝ)
     (hP : P.det ≠ 0) (h2m : 2 * m ≤ r) (hJ : (P.map S.c)ᵀ * S.G * P = wittMat r m g)
-    (hdd : ∀ i, 0 < dd i) (hg : ∀ i : Fin r, m ≤ (i : ℕ) → (i : ℕ) + m < r → g i ≠ 0) :
-    ∃ M : Majorant S, ∀ σ,
-      M.H σ = ((P⁻¹).map σ)ᴴ * diagMet (adMet r m g dd) σ * (P⁻¹).map σ := by
+    (hdd : ∀ i, 0 < dd i) (hg : ∀ i : Fin r, m ≤ (i : ℕ) → (i : ℕ) + m < r → g i ≠ 0)
+    : ∃ M : Majorant S, ∀ σ, M.H σ = ((P⁻¹).map σ)ᴴ * diagMet (adMet r m g dd) σ * (P⁻¹).map σ := by
   classical
   have hPu : IsUnit P.det := isUnit_iff_ne_zero.2 hP
   have hPP : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P hPu
@@ -43,14 +47,16 @@ theorem exists_adapted_majorant {K : Type} [Field K] [NumberField K] {r : ℕ} (
     have h1 : ((P⁻¹).map S.c)ᵀ * (P.map S.c)ᵀ = 1 := by
       rw [← Matrix.transpose_mul, ← Matrix.map_mul, hPP,
         Matrix.map_one _ (map_zero S.c) (map_one S.c), Matrix.transpose_one]
-    calc S.G = ((P⁻¹).map S.c)ᵀ * (P.map S.c)ᵀ * S.G * (P * P⁻¹) := by
-          rw [h1, hPP, Matrix.one_mul, Matrix.mul_one]
+    calc
+      S.G = ((P⁻¹).map S.c)ᵀ * (P.map S.c)ᵀ * S.G * (P * P⁻¹) := by
+        rw [h1, hPP, Matrix.one_mul, Matrix.mul_one]
       _ = _ := by simp only [Matrix.mul_assoc]
 
-  have key : ∀ σ : K →+* ℂ,
-      let A := (P⁻¹).map σ
-      let D := diagMet (adMet r m g dd) σ
-      (Aᴴ * D * A).PosDef ∧ Aᴴ * D * A * (S.G.map σ)⁻¹ * (Aᴴ * D * A) = S.G.map σ := by
+  have key
+      : ∀ σ : K →+* ℂ,
+        let A := (P⁻¹).map σ
+        let D := diagMet (adMet r m g dd) σ
+        (Aᴴ * D * A).PosDef ∧ Aᴴ * D * A * (S.G.map σ)⁻¹ * (Aᴴ * D * A) = S.G.map σ := by
     intro σ A D
     set Ai := P.map σ with hAi
     have e1 : A * Ai = 1 := by
@@ -62,8 +68,7 @@ theorem exists_adapted_majorant {K : Type} [Field K] [NumberField K] {r : ℕ} (
     have e3 : Aiᴴ * Aᴴ = 1 := by rw [← Matrix.conjTranspose_mul, e1, Matrix.conjTranspose_one]
     have e4 : Aᴴ * Aiᴴ = 1 := by rw [← Matrix.conjTranspose_mul, e2, Matrix.conjTranspose_one]
     have hpos : ∀ i, 0 < adMet r m g dd σ i := adMet_pos r m g dd hdd hg σ
-    let Dinv : Matrix (Fin r) (Fin r) ℂ :=
-      diagonal fun i => (((adMet r m g dd σ i : ℝ) : ℂ))⁻¹
+    let Dinv : Matrix (Fin r) (Fin r) ℂ := diagonal fun i => (((adMet r m g dd σ i : ℝ) : ℂ))⁻¹
     have e5 : D * Dinv = 1 := by
       simp only [D, Dinv, diagMet, Matrix.diagonal_mul_diagonal]
       rw [← Matrix.diagonal_one]
@@ -90,41 +95,54 @@ theorem exists_adapted_majorant {K : Type} [Field K] [NumberField K] {r : ℕ} (
     set H := Aᴴ * D * A with hH
     set Hinv := Ai * Dinv * Aiᴴ with hHinv
     have hHH : H * Hinv = 1 := by
-      calc H * Hinv = Aᴴ * D * (A * Ai) * Dinv * Aiᴴ := by simp only [H, Hinv, Matrix.mul_assoc]
+      calc
+        H * Hinv
+          = Aᴴ * D * (A * Ai) * Dinv * Aiᴴ := by simp only [H, Hinv, Matrix.mul_assoc]
         _ = Aᴴ * (D * Dinv) * Aiᴴ := by rw [e1, Matrix.mul_one]; simp only [Matrix.mul_assoc]
         _ = 1 := by rw [e5, Matrix.mul_one, e4]
     have hHH' : Hinv * H = 1 := mul_eq_one_comm.1 hHH
     have hYHY : Y * Hinv * Y = H := by
       rw [hGσ]
-      calc Aᴴ * Jσ * A * Hinv * (Aᴴ * Jσ * A)
-          = Aᴴ * Jσ * (A * Ai) * Dinv * (Aiᴴ * Aᴴ) * Jσ * A := by
-            simp only [Hinv, Matrix.mul_assoc]
+      calc
+        Aᴴ * Jσ * A * Hinv * (Aᴴ * Jσ * A)
+          = Aᴴ * Jσ * (A * Ai) * Dinv * (Aiᴴ * Aᴴ) * Jσ * A := by simp only [Hinv, Matrix.mul_assoc]
         _ = Aᴴ * (Jσ * Dinv * Jσ) * A := by
-            rw [e1, e3, Matrix.mul_one, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+          rw [e1, e3, Matrix.mul_one, Matrix.mul_one]; simp only [Matrix.mul_assoc]
         _ = H := by rw [hKey]
     have hYinv : Y⁻¹ = Hinv * Y * Hinv := by
       apply Matrix.inv_eq_left_inv
-      calc Hinv * Y * Hinv * Y = Hinv * (Y * Hinv * Y) := by simp only [Matrix.mul_assoc]
+      calc
+        Hinv * Y * Hinv * Y
+          = Hinv * (Y * Hinv * Y) := by simp only [Matrix.mul_assoc]
         _ = 1 := by rw [hYHY, hHH']
     refine ⟨?_, ?_⟩
     · have hD : D.PosDef := by
         simp only [D, diagMet]
         exact Matrix.posDef_diagonal_iff.2 fun i => by exact_mod_cast hpos i
-      have hAu : IsUnit A := (Matrix.isUnit_iff_isUnit_det A).2
-        (Matrix.isUnit_det_of_right_inverse e1)
+      have hAu : IsUnit A :=
+        (Matrix.isUnit_iff_isUnit_det A).2 (Matrix.isUnit_det_of_right_inverse e1)
       exact hD.conjTranspose_mul_mul_same (Matrix.mulVec_injective_of_isUnit hAu)
     · rw [hYinv]
-      calc H * (Hinv * Y * Hinv) * H = (H * Hinv) * Y * (Hinv * H) := by
-            simp only [Matrix.mul_assoc]
+      calc
+        H * (Hinv * Y * Hinv) * H
+          = (H * Hinv) * Y * (Hinv * H) := by simp only [Matrix.mul_assoc]
         _ = Y := by rw [hHH, hHH', Matrix.one_mul, Matrix.mul_one]
-  refine ⟨⟨fun σ => ((P⁻¹).map σ)ᴴ * diagMet (adMet r m g dd) σ * (P⁻¹).map σ,
-    fun σ => (key σ).1, fun σ => (key σ).2, ?_⟩, fun σ => rfl⟩
+  refine ⟨
+    ⟨
+      fun σ => ((P⁻¹).map σ)ᴴ * diagMet (adMet r m g dd) σ * (P⁻¹).map σ,
+      fun σ => (key σ).1,
+      fun σ => (key σ).2,
+      ?_
+    ⟩,
+    fun σ => rfl
+  ⟩
   intro σ
   have hmap : (P⁻¹).map ((starRingEnd ℂ).comp σ) = ((P⁻¹).map σ).map (starRingEnd ℂ) := by
     rw [Matrix.map_map]
     rfl
-  have hDc : diagMet (adMet r m g dd) ((starRingEnd ℂ).comp σ) =
-      (diagMet (adMet r m g dd) σ).map (starRingEnd ℂ) := by
+  have hDc
+      : diagMet (adMet r m g dd) ((starRingEnd ℂ).comp σ)
+        = (diagMet (adMet r m g dd) σ).map (starRingEnd ℂ) := by
     simp only [diagMet, adMet_conj]
     rw [Matrix.diagonal_map (map_zero _)]
     congr 1

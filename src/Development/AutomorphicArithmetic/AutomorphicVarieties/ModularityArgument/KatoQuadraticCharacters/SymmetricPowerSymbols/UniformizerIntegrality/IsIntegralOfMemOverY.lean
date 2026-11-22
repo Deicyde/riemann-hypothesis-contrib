@@ -13,12 +13,12 @@ namespace UpperTheory.V.Z.Kato.Sym.PT
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-private theorem isIntegral_of_mem_overY (X : Tower Ω ε) (x : X.K) (h : ∀ W, X.OverY W → x ∈ W) :
-    IsIntegral (Algebra.adjoin Ω {X.jK}) x := by
+private theorem isIntegral_of_mem_overY (X : Tower Ω ε) (x : X.K) (h : ∀ W, X.OverY W → x ∈ W)
+    : IsIntegral (Algebra.adjoin Ω {X.jK}) x := by
   by_contra hx
-  obtain ⟨V, hRV, hxV⟩ := Subring.exists_le_valuationSubring_of_isIntegrallyClosedIn
-    (K := X.K) (x := x) (R := (integralClosure (Algebra.adjoin Ω {X.jK}) X.K).toSubring)
-    (fun hm => hx hm)
+  obtain ⟨V, hRV, hxV⟩ :=
+    Subring.exists_le_valuationSubring_of_isIntegrallyClosedIn (K := X.K) (x := x)
+      (R := (integralClosure (Algebra.adjoin Ω {X.jK}) X.K).toSubring) (fun hm => hx hm)
   apply hxV
   refine h V ⟨fun c => hRV ?_, hRV ?_⟩
   · change algebraMap Ω X.K c ∈ integralClosure (Algebra.adjoin Ω {X.jK}) X.K

@@ -12,18 +12,21 @@ namespace ReciprocityTheory.PGsh.Up.FrobeniusGroupField
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-theorem smul_top_self (k : ℕ) :
-    ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] ℤ_[p]) = (maximalIdeal ℤ_[p]) ^ k := by
+theorem smul_top_self (k : ℕ)
+    : ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] ℤ_[p]) = (maximalIdeal ℤ_[p]) ^ k := by
   rw [smul_eq_mul, Ideal.mul_top]
 
-theorem mem_pow_smul_top_iff {M : Type} [AddCommGroup M] [Module ℤ_[p] M] {ι : Type} [Fintype ι]
-    (b : Module.Basis ι ℤ_[p] M) (k : ℕ) (x : M) :
-    x ∈ ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] M) ↔
-      ∀ i, b.repr x i ∈ (maximalIdeal ℤ_[p]) ^ k := by
+theorem mem_pow_smul_top_iff
+    {M : Type} [AddCommGroup M] [Module ℤ_[p] M]
+    {ι : Type} [Fintype ι]
+    (b : Module.Basis ι ℤ_[p] M) (k : ℕ) (x : M)
+    : x ∈ ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] M)
+      ↔ ∀ i, b.repr x i ∈ (maximalIdeal ℤ_[p]) ^ k := by
   constructor
   · intro hx i
-    have hle : ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] M) ≤
-        Submodule.comap (b.coord i) ((maximalIdeal ℤ_[p]) ^ k) :=
+    have hle
+        : ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] M)
+          ≤ Submodule.comap (b.coord i) ((maximalIdeal ℤ_[p]) ^ k) :=
       Submodule.smul_le.2 fun r hr m _ => by
         rw [Submodule.mem_comap, map_smul, smul_eq_mul]
         exact Ideal.mul_mem_right _ _ hr
@@ -32,14 +35,17 @@ theorem mem_pow_smul_top_iff {M : Type} [AddCommGroup M] [Module ℤ_[p] M] {ι 
     rw [← b.sum_repr x]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (h i) Submodule.mem_top
 
-theorem isPrecomplete_of_basis {M : Type} [AddCommGroup M] [Module ℤ_[p] M] {ι : Type} [Fintype ι]
-    (b : Module.Basis ι ℤ_[p] M) : IsPrecomplete (maximalIdeal ℤ_[p]) M := by
+theorem isPrecomplete_of_basis
+    {M : Type} [AddCommGroup M] [Module ℤ_[p] M] {ι : Type} [Fintype ι] (b : Module.Basis ι ℤ_[p] M)
+    : IsPrecomplete (maximalIdeal ℤ_[p]) M := by
   rw [isPrecomplete_iff]
   intro F hF
   have hP := (inferInstance : IsPrecomplete (maximalIdeal ℤ_[p]) ℤ_[p])
   rw [isPrecomplete_iff] at hP
-  have hc : ∀ i, ∃ L : ℤ_[p], ∀ k, b.repr (F k) i ≡ L
-      [SMOD ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] ℤ_[p])] := by
+  have hc
+      : ∀ i, ∃ L : ℤ_[p], ∀ k,
+        b.repr (F k) i ≡ L
+          [SMOD ((maximalIdeal ℤ_[p]) ^ k • ⊤ : Submodule ℤ_[p] ℤ_[p])] := by
     intro i
     refine hP (fun k => b.repr (F k) i) fun {m n} hmn => ?_
     have := hF hmn
@@ -58,23 +64,29 @@ theorem isPrecomplete_of_basis {M : Type} [AddCommGroup M] [Module ℤ_[p] M] {�
   rw [map_sub, Finsupp.sub_apply, hr]
   exact this
 
-theorem span_p_eq (S : Type) [CommRing S] [Algebra ℤ_[p] S] :
-    (maximalIdeal ℤ_[p]).map (algebraMap ℤ_[p] S) = Ideal.span {(p : S)} := by
+theorem span_p_eq (S : Type) [CommRing S] [Algebra ℤ_[p] S]
+    : (maximalIdeal ℤ_[p]).map (algebraMap ℤ_[p] S) = Ideal.span {(p : S)} := by
   rw [PadicInt.maximalIdeal_eq_span_p, Ideal.map_span, Set.image_singleton, map_natCast]
 
-theorem isAdicComplete_of_basis (S : Type) [CommRing S] [Algebra ℤ_[p] S] {ι : Type} [Fintype ι]
-    (b : Module.Basis ι ℤ_[p] S) : IsAdicComplete (Ideal.span {(p : S)}) S := by
+theorem isAdicComplete_of_basis
+    (S : Type) [CommRing S] [Algebra ℤ_[p] S] {ι : Type} [Fintype ι] (b : Module.Basis ι ℤ_[p] S)
+    : IsAdicComplete (Ideal.span {(p : S)}) S := by
   have : Module.Finite ℤ_[p] S := Module.Finite.of_basis b
   have hH : IsHausdorff (maximalIdeal ℤ_[p]) S := inferInstance
   have hP : IsPrecomplete (maximalIdeal ℤ_[p]) S := isPrecomplete_of_basis b
   rw [← span_p_eq S]
-  exact { toIsHausdorff := IsHausdorff.map_algebraMap_iff.2 hH
-          toIsPrecomplete := IsPrecomplete.map_algebraMap_iff.2 hP }
+  exact {
+    toIsHausdorff := IsHausdorff.map_algebraMap_iff.2 hH
+    toIsPrecomplete := IsPrecomplete.map_algebraMap_iff.2 hP
+  }
 
-theorem hensel (f : ℤ_[p][X]) (hf : f.Monic) {m : ℕ} (hm0 : 0 < m) (hmp : ¬ p ∣ m) (Q0 : ℤ_[p][X])
-    (h0 : ∃ K : ℤ_[p][X], AdjoinRoot.mk f (Q0 ^ m - 1) = (p : AdjoinRoot f) * AdjoinRoot.mk f K) :
-    ∃ Q K : ℤ_[p][X], f ∣ Q ^ m - 1 ∧
-      AdjoinRoot.mk f (Q - Q0) = (p : AdjoinRoot f) * AdjoinRoot.mk f K := by
+theorem hensel
+    (f : ℤ_[p][X]) (hf : f.Monic)
+    {m : ℕ} (hm0 : 0 < m) (hmp : ¬ p ∣ m)
+    (Q0 : ℤ_[p][X])
+    (h0 : ∃ K : ℤ_[p][X], AdjoinRoot.mk f (Q0 ^ m - 1) = (p : AdjoinRoot f) * AdjoinRoot.mk f K)
+    : ∃ Q K : ℤ_[p][X],
+      f ∣ Q ^ m - 1 ∧ AdjoinRoot.mk f (Q - Q0) = (p : AdjoinRoot f) * AdjoinRoot.mk f K := by
   let S := AdjoinRoot f
   let J : Ideal S := Ideal.span {(p : S)}
   have : IsAdicComplete J S := isAdicComplete_of_basis S (AdjoinRoot.powerBasis' hf).basis
@@ -93,8 +105,7 @@ theorem hensel (f : ℤ_[p][X]) (hf : f.Monic) {m : ℕ} (hm0 : 0 < m) (hmp : ¬
       exact Ideal.Quotient.eq_zero_iff_mem.2 ha0
     exact IsUnit.of_pow_eq_one h1 hm0.ne'
   have hum : IsUnit (m : S ⧸ J) := by
-    have hcop : Nat.Coprime m p :=
-      Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hp.out).2 hmp)
+    have hcop : Nat.Coprime m p := Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hp.out).2 hmp)
     have hg := Nat.gcd_eq_gcd_ab m p
     rw [hcop, Nat.cast_one] at hg
     have hp0 : (p : S ⧸ J) = 0 := by
@@ -102,8 +113,8 @@ theorem hensel (f : ℤ_[p][X]) (hf : f.Monic) {m : ℕ} (hm0 : 0 < m) (hmp : ¬
       exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span rfl)
     refine IsUnit.of_mul_eq_one ((Nat.gcdA m p : ℤ) : S ⧸ J) ?_
     have := congrArg (fun z : ℤ => (z : S ⧸ J)) hg
-    simp only [Int.cast_one, Int.cast_add, Int.cast_mul, Int.cast_natCast, hp0, zero_mul,
-      add_zero] at this
+    simp only [Int.cast_one, Int.cast_add, Int.cast_mul, Int.cast_natCast, hp0, zero_mul, add_zero]
+      at this
     exact this.symm
   have hder : IsUnit (Ideal.Quotient.mk J ((X ^ m - C (1 : S)).derivative.eval a0)) := by
     simp only [derivative_sub, derivative_X_pow, derivative_C, sub_zero, eval_mul, eval_natCast,
@@ -119,8 +130,8 @@ theorem hensel (f : ℤ_[p][X]) (hf : f.Monic) {m : ℕ} (hm0 : 0 < m) (hmp : ¬
     simpa [IsRoot, sub_eq_zero] using ha
   · rw [map_sub, ← hs, mul_comm]
 
-theorem finite_quot (f : ℤ_[p][X]) (hf : f.Monic) :
-    Finite (AdjoinRoot f ⧸ Ideal.span {(p : AdjoinRoot f)}) := by
+theorem finite_quot (f : ℤ_[p][X]) (hf : f.Monic)
+    : Finite (AdjoinRoot f ⧸ Ideal.span {(p : AdjoinRoot f)}) := by
   have : NeZero p := ⟨hp.out.ne_zero⟩
   let S := AdjoinRoot f
   let J : Ideal S := Ideal.span {(p : S)}
@@ -132,8 +143,9 @@ theorem finite_quot (f : ℤ_[p][X]) (hf : f.Monic) :
   refine ⟨fun i => PadicInt.toZMod (b.repr s i), ?_⟩
   simp only [Φ]
   rw [Ideal.Quotient.eq]
-  have key : (∑ i, (((PadicInt.toZMod (b.repr s i)).val : ℕ) : ℤ_[p]) • b i) - s =
-      ∑ i, ((((PadicInt.toZMod (b.repr s i)).val : ℕ) : ℤ_[p]) - b.repr s i) • b i := by
+  have key
+      : (∑ i, (((PadicInt.toZMod (b.repr s i)).val : ℕ) : ℤ_[p]) • b i) - s
+        = ∑ i, ((((PadicInt.toZMod (b.repr s i)).val : ℕ) : ℤ_[p]) - b.repr s i) • b i := by
     simp only [sub_smul, Finset.sum_sub_distrib, b.sum_repr]
   rw [key]
   refine Ideal.sum_mem _ fun i _ => ?_
@@ -145,8 +157,8 @@ theorem finite_quot (f : ℤ_[p][X]) (hf : f.Monic) :
   rw [this, neg_smul, mul_comm, mul_smul, Nat.cast_smul_eq_nsmul, nsmul_eq_mul]
   exact J.neg_mem (Ideal.mul_mem_right _ _ (Ideal.subset_span rfl))
 
-theorem exists_pow_idem {S : Type} [Monoid S] [Finite S] (x : S) :
-    ∃ M : ℕ, 0 < M ∧ x ^ (2 * M) = x ^ M := by
+theorem exists_pow_idem {S : Type} [Monoid S] [Finite S] (x : S)
+    : ∃ M : ℕ, 0 < M ∧ x ^ (2 * M) = x ^ M := by
   obtain ⟨a, b, hab, he⟩ := Finite.exists_ne_map_eq_of_infinite (fun n : ℕ => x ^ n)
   wlog h : a < b generalizing a b
   · exact this b a hab.symm he.symm (lt_of_le_of_ne (not_lt.1 h) hab.symm)
@@ -155,7 +167,9 @@ theorem exists_pow_idem {S : Type} [Monoid S] [Finite S] (x : S) :
   have hstep : ∀ n, a ≤ n → x ^ (n + d) = x ^ n := by
     intro n hn
     have : n + d = (n - a) + b := by omega
-    rw [this, pow_add, ← he, ← pow_add]; congr 1; omega
+    rw [this, pow_add, ← he, ← pow_add]
+    congr 1
+    omega
   have hk : ∀ k n, a ≤ n → x ^ (n + k * d) = x ^ n := by
     intro k
     induction k with

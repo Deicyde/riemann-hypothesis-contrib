@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.SelfDu
 
 namespace GlobalTheory.StabOrbit
 
-theorem stabTransitive : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeStabilizers.StabTransitive :=
-  GlobalTheory.Proof.SelfDualStabilizer.stabTransitive_iff.1 (stabTransitive_of_lemmas GlobalTheory.T.selfDual_lattices_unramified_place_no_hypothesis)
+theorem stabTransitive
+    : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeStabilizers.StabTransitive :=
+  GlobalTheory.Proof.SelfDualStabilizer.stabTransitive_iff.1 (stabTransitive_of_lemmas
+    GlobalTheory.T.selfDual_lattices_unramified_place_no_hypothesis)
 
 end GlobalTheory.StabOrbit

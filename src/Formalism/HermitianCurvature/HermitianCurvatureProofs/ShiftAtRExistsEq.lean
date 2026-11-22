@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CellIdentity
 
 namespace Formalism.FourierDecayAlt.P.CutBPEq
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TBB Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.CutBP Formalism.FourierDecayAlt.P.CutBP2
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TBB Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.P.CutBP Formalism.FourierDecayAlt.P.CutBP2
 
 noncomputable section
 
@@ -16,9 +17,10 @@ def uPlus (u : ℕ → ℝ) (l n₀ : ℕ) : ℕ → ℝ := fun i => if i = l + 
 
 def uMinus (u : ℕ → ℝ) (l n₀ : ℕ) : ℕ → ℝ := fun i => if i = l then u i - n₀ else u i
 
-structure WigData (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) {Wq : Type} [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (π' : B.Mat k r → (Wq →L[ℂ] Wq)) (u : ℕ → ℝ) (l n₀ : ℕ)
-    (b : ℝ) where
+structure WigData
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
+    {Wq : Type} [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    (π' : B.Mat k r → (Wq →L[ℂ] Wq)) (u : ℕ → ℝ) (l n₀ : ℕ) (b : ℝ) where
   Wqp : Type
   Wqm : Type
   [iNp : NormedAddCommGroup Wqp]
@@ -44,26 +46,30 @@ structure WigData (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) {Wq : Type} [
 attribute [instance] WigData.iNp WigData.iIp WigData.iFp WigData.iNm WigData.iIm WigData.iFm
 
 def WigExists : Prop :=
-  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (Wq : Type) [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
-    [FiniteDimensional ℂ Wq] (π' : B.Mat k r → (Wq →L[ℂ] Wq)) (u : ℕ → ℝ) (l n₀ : ℕ) (b : ℝ),
-    inWb k r z → inWb k r z' → 0 < Tz k r z → 0 < Tz k r z' → Q.IsType k r z' π' u →
-    (∀ i ∈ Finset.Ico 1 k, u (i + 1) + 1 ≤ u i) →
-    1 ≤ l → l < k → (2 * n₀ + 1 : ℝ) ≤ u l - u (l + 1) → 3 ≤ b → (∀ i ∈ Finset.Icc 1 k, |u i| ≤ b) →
-    Nonempty (WigData k r z z' π' u l n₀ b)
+  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (Wq : Type) [NormedAddCommGroup Wq]
+      [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (π' : B.Mat k r → (Wq →L[ℂ] Wq)) (u : ℕ → ℝ)
+      (l n₀ : ℕ) (b : ℝ),
+    inWb k r z → inWb k r z' → 0 < Tz k r z → 0 < Tz k r z' → Q.IsType k r z' π' u
+      → (∀ i ∈ Finset.Ico 1 k, u (i + 1) + 1 ≤ u i) → 1 ≤ l → l < k
+      → (2 * n₀ + 1 : ℝ) ≤ u l - u (l + 1) → 3 ≤ b → (∀ i ∈ Finset.Icc 1 k, |u i| ≤ b)
+      → Nonempty (WigData k r z z' π' u l n₀ b)
 
 def PlaceSwapExists : Prop :=
-  ∀ (P : M.Par) (Wp Wq Wq' : Type)
-    [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
-    [NormedAddCommGroup Wq'] [InnerProductSpace ℂ Wq'] [FiniteDimensional ℂ Wq']
-    (p : KB.Pl P Wp Wq) (u'' : ℕ → ℝ) (π'' : B.Mat P.k P.r → (Wq' →L[ℂ] Wq')) (l0 : ℕ),
-    Q.IsType P.k P.r p.T.base.z' π'' u'' → (shP P P.u u'').OK → 1 ≤ l0 → l0 ≤ P.k →
-    ∃ q : KB.Pl (shP P P.u u'') Wp Wq', SwapTie p q ∧ q.T.base.π' = π'' ∧ q.l0 = l0
+  ∀ (P : M.Par) (Wp Wq Wq' : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+      [FiniteDimensional ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+      [FiniteDimensional ℂ Wq] [NormedAddCommGroup Wq'] [InnerProductSpace ℂ Wq']
+      [FiniteDimensional ℂ Wq'] (p : KB.Pl P Wp Wq) (u'' : ℕ → ℝ)
+      (π'' : B.Mat P.k P.r → (Wq' →L[ℂ] Wq')) (l0 : ℕ),
+    Q.IsType P.k P.r p.T.base.z' π'' u'' → (shP P P.u u'').OK → 1 ≤ l0 → l0 ≤ P.k
+      → ∃ q : KB.Pl (shP P P.u u'') Wp Wq', SwapTie p q ∧ q.T.base.π' = π'' ∧ q.l0 = l0
 
-theorem okPlus (P : M.Par) (l n₀ : ℕ) (hOK : P.OK) (hu : P.u = P.u') (hl1 : 1 ≤ l) (hlk : l < P.k)
-    (hposition : (2 * n₀ + 1 : ℝ) ≤ P.u' l - P.u' (l + 1)) : (shP P P.u (uPlus P.u' l n₀)).OK := by
-  have key : ∀ a b c d : ℝ, a + 1 ≤ c → a + 1 ≤ d → b + 1 ≤ c → b + 1 ≤ d →
-      max a b + 1 / 2 ≤ min c d - 1 / 2 := by
+theorem okPlus
+    (P : M.Par) (l n₀ : ℕ) (hOK : P.OK) (hu : P.u = P.u') (hl1 : 1 ≤ l) (hlk : l < P.k)
+    (hposition : (2 * n₀ + 1 : ℝ) ≤ P.u' l - P.u' (l + 1))
+    : (shP P P.u (uPlus P.u' l n₀)).OK := by
+  have key
+      : ∀ a b c d : ℝ,
+        a + 1 ≤ c → a + 1 ≤ d → b + 1 ≤ c → b + 1 ≤ d → max a b + 1 / 2 ≤ min c d - 1 / 2 := by
     intro a b c d h1 h2 h3 h4
     have ha : a + 1 ≤ min c d := le_min h1 h2
     have hb : b + 1 ≤ min c d := le_min h3 h4
@@ -81,24 +87,28 @@ theorem okPlus (P : M.Par) (l n₀ : ℕ) (hOK : P.OK) (hu : P.u = P.u') (hl1 : 
       simp only [shP, uPlus, if_neg h]
       exact hn
   · have hg := hOK.gap i hi
-    simp only [Formalism.FourierDecayAlt.M.Par.lo, Formalism.FourierDecayAlt.M.Par.hi, shP, uPlus] at hg ⊢
+    simp only [Formalism.FourierDecayAlt.M.Par.lo, Formalism.FourierDecayAlt.M.Par.hi, shP, uPlus]
+      at hg ⊢
     rw [hu] at hg ⊢
     simp only [max_self, min_self] at hg
     by_cases h1 : i = l
     · subst h1
-      simp only [if_true, show ¬ (i = i + 1) by omega, if_false]
+      simp only [if_true, show ¬(i = i + 1) by omega, if_false]
       exact key _ _ _ _ (by linarith) (by linarith) (by linarith) (by linarith)
     · by_cases h2 : i = l + 1
       · subst h2
-        simp only [show ¬ (l + 1 + 1 = l + 1) by omega, if_false, if_true]
+        simp only [show ¬(l + 1 + 1 = l + 1) by omega, if_false, if_true]
         exact key _ _ _ _ (by linarith) (by linarith) (by linarith) (by linarith)
-      · simp only [show ¬ (i + 1 = l + 1) by omega, if_false, if_neg h2]
+      · simp only [show ¬(i + 1 = l + 1) by omega, if_false, if_neg h2]
         exact key _ _ _ _ (by linarith) (by linarith) (by linarith) (by linarith)
 
-theorem okMinus (P : M.Par) (l n₀ : ℕ) (hOK : P.OK) (hu : P.u = P.u') (hl1 : 1 ≤ l) (hlk : l < P.k)
-    (hposition : (2 * n₀ + 1 : ℝ) ≤ P.u' l - P.u' (l + 1)) : (shP P P.u (uMinus P.u' l n₀)).OK := by
-  have key : ∀ a b c d : ℝ, a + 1 ≤ c → a + 1 ≤ d → b + 1 ≤ c → b + 1 ≤ d →
-      max a b + 1 / 2 ≤ min c d - 1 / 2 := by
+theorem okMinus
+    (P : M.Par) (l n₀ : ℕ) (hOK : P.OK) (hu : P.u = P.u') (hl1 : 1 ≤ l) (hlk : l < P.k)
+    (hposition : (2 * n₀ + 1 : ℝ) ≤ P.u' l - P.u' (l + 1))
+    : (shP P P.u (uMinus P.u' l n₀)).OK := by
+  have key
+      : ∀ a b c d : ℝ,
+        a + 1 ≤ c → a + 1 ≤ d → b + 1 ≤ c → b + 1 ≤ d → max a b + 1 / 2 ≤ min c d - 1 / 2 := by
     intro a b c d h1 h2 h3 h4
     have ha : a + 1 ≤ min c d := le_min h1 h2
     have hb : b + 1 ≤ min c d := le_min h3 h4
@@ -116,16 +126,17 @@ theorem okMinus (P : M.Par) (l n₀ : ℕ) (hOK : P.OK) (hu : P.u = P.u') (hl1 :
       simp only [shP, uMinus, if_neg h]
       exact hn
   · have hg := hOK.gap i hi
-    simp only [Formalism.FourierDecayAlt.M.Par.lo, Formalism.FourierDecayAlt.M.Par.hi, shP, uMinus] at hg ⊢
+    simp only [Formalism.FourierDecayAlt.M.Par.lo, Formalism.FourierDecayAlt.M.Par.hi, shP, uMinus]
+      at hg ⊢
     rw [hu] at hg ⊢
     simp only [max_self, min_self] at hg
     by_cases h1 : i = l
     · subst h1
-      simp only [if_true, show ¬ (i + 1 = i) by omega, if_false]
+      simp only [if_true, show ¬(i + 1 = i) by omega, if_false]
       exact key _ _ _ _ (by linarith) (by linarith) (by linarith) (by linarith)
     · by_cases h2 : i + 1 = l
       · subst h2
-        simp only [show ¬ (i = i + 1) by omega, if_false, if_true]
+        simp only [show ¬(i = i + 1) by omega, if_false, if_true]
         exact key _ _ _ _ (by linarith) (by linarith) (by linarith) (by linarith)
       · simp only [if_neg h1, if_neg h2]
         exact key _ _ _ _ (by linarith) (by linarith) (by linarith) (by linarith)

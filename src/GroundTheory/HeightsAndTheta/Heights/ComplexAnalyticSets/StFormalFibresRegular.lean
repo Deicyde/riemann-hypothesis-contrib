@@ -10,9 +10,12 @@ set_option maxSynthPendingDepth 1
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 def FormalFibresRegular.Statement : Prop :=
-  ∀ (k A : Type) [Field k] [CommRing A] [Algebra k A], Algebra.FiniteType k A →
-    ∀ (m : Ideal A), m.IsMaximal → ∀ (P : Ideal (AdicCompletion m A)) [P.IsPrime],
-      IsRegularLocalRing (primeFibreLocalRing A P)
+  ∀ (k A : Type) [Field k] [CommRing A] [Algebra k A],
+    Algebra.FiniteType k A
+      → ∀ (m : Ideal A),
+        m.IsMaximal
+          → ∀ (P : Ideal (AdicCompletion m A)) [P.IsPrime],
+            IsRegularLocalRing (primeFibreLocalRing A P)
 
 noncomputable def polyOriginIdeal : Ideal (MvPolynomial (Fin 1) ℂ) :=
   RingHom.ker (MvPolynomial.eval (0 : Fin 1 → ℂ))

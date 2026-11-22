@@ -7,14 +7,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_charbij :
-    ∀ {N : ℕ} [NeZero N] {K Ω : Type} [Field K] [Field Ω] [HasEnoughRootsOfUnity K (Monoid.exponent (ZMod N)ˣ)] (f : K →+* Ω) (P : Set (Subgroup (ZMod N)ˣ)), Set.BijOn (fun χ : DirichletCharacter K N => (χ.ringHomComp f : DirichletCharacter Ω N)) (charSet K P) (charSet Ω P) := by
+theorem UpperTheory.V.Bern.b_charbij
+    : ∀ {N : ℕ} [NeZero N] {K Ω : Type} [Field K] [Field Ω]
+        [HasEnoughRootsOfUnity K (Monoid.exponent (ZMod N)ˣ)] (f : K →+* Ω)
+        (P : Set (Subgroup (ZMod N)ˣ)),
+      Set.BijOn
+        (fun χ : DirichletCharacter K N => (χ.ringHomComp f : DirichletCharacter Ω N))
+        (charSet K P) (charSet Ω P) := by
   intro N _ K Ω _ _ _ f P
   have hf : Function.Injective f := f.injective
-  have hker : ∀ χ : DirichletCharacter K N, (MulChar.toUnitHom (χ.ringHomComp f)).ker = (MulChar.toUnitHom χ).ker := by
+  have hker
+      : ∀ χ : DirichletCharacter K N,
+        (MulChar.toUnitHom (χ.ringHomComp f)).ker = (MulChar.toUnitHom χ).ker := by
     intro χ
     ext u
-    simp only [MonoidHom.mem_ker, Units.ext_iff, MulChar.coe_toUnitHom, Units.val_one, MulChar.ringHomComp_apply]
+    simp only [MonoidHom.mem_ker, Units.ext_iff, MulChar.coe_toUnitHom, Units.val_one,
+      MulChar.ringHomComp_apply]
     constructor
     · intro h
       exact hf (h.trans (map_one f).symm)
@@ -38,9 +46,10 @@ theorem UpperTheory.V.Bern.b_charbij :
     have hmem : ∀ u, MulChar.toUnitHom χ' u ∈ rootsOfUnity (Monoid.exponent (ZMod N)ˣ) Ω := by
       intro u
       rw [mem_rootsOfUnity, ← map_pow, Monoid.pow_exponent_eq_one, map_one]
-    let ψ : (ZMod N)ˣ →* Kˣ := (rootsOfUnity (Monoid.exponent (ZMod N)ˣ) K).subtype.comp
-      ((rootsOfUnityEquivOfPrimitiveRoots hf hne).symm.toMonoidHom.comp
-        ((MulChar.toUnitHom χ').codRestrict _ hmem))
+    let ψ : (ZMod N)ˣ →* Kˣ :=
+      (rootsOfUnity (Monoid.exponent (ZMod N)ˣ) K).subtype.comp
+        ((rootsOfUnityEquivOfPrimitiveRoots hf hne).symm.toMonoidHom.comp
+          ((MulChar.toUnitHom χ').codRestrict _ hmem))
     have hcomp : (MulChar.ofUnitHom ψ).ringHomComp f = χ' := by
       ext u
       rw [MulChar.ringHomComp_apply, MulChar.ofUnitHom_coe]

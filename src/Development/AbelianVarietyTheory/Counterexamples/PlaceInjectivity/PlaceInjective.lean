@@ -8,16 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HaarUpqEqOfOm
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions.StandardLattice Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField MeasureTheory
+open Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField MeasureTheory
 
 namespace GlobalTheory.VolRatioCheck
 
-theorem embOf_mem (D : D7) (ρ : D.what₂.Tau) :
-    embOf D ρ ∈ D.host.cmType :=
+theorem embOf_mem (D : D7) (ρ : D.what₂.Tau) : embOf D ρ ∈ D.host.cmType :=
   ((factEmb D.R D.host).2 _).2 (D.eTau ρ).2
 
-theorem place_injective (D : D7) :
-    Function.Injective fun ρ : D.what₂.Tau => InfinitePlace.mk (embOf D ρ) := by
+theorem place_injective (D : D7)
+    : Function.Injective fun ρ : D.what₂.Tau => InfinitePlace.mk (embOf D ρ) := by
   intro ρ ρ' h
   have hb := (factEmb D.R D.host).1
   rcases InfinitePlace.mk_eq_iff.1 h with h1 | h1
@@ -28,8 +28,8 @@ theorem place_injective (D : D7) :
     rw [← h1] at e2
     exact (D.host.der.cmType.1 _).1 e1 e2
 
-theorem place_bijective (D : D7) :
-    Function.Bijective fun ρ : D.what₂.Tau => InfinitePlace.mk (embOf D ρ) := by
+theorem place_bijective (D : D7)
+    : Function.Bijective fun ρ : D.what₂.Tau => InfinitePlace.mk (embOf D ρ) := by
   have h1 : Nat.card D.what₂.Tau = D.R.f := by
     rw [Nat.card_congr D.eTau]; exact (factCardPsi D.R D.host).1
   have h2 : Nat.card (InfinitePlace D.host.E) = D.R.f := by

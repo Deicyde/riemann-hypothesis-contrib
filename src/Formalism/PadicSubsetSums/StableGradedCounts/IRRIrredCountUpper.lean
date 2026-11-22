@@ -10,8 +10,9 @@ namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 
 variable {K : Type} [Field K] {N : ℕ}
 
-theorem monicOf_degree_lt (c : Fin N → K) :
-    (∑ i : Fin N, C (c i) * X ^ (i : ℕ)).degree < (N : WithBot ℕ) := degree_sum_fin_lt c
+theorem monicOf_degree_lt (c : Fin N → K)
+    : (∑ i : Fin N, C (c i) * X ^ (i : ℕ)).degree < (N : WithBot ℕ) :=
+  degree_sum_fin_lt c
 
 theorem monicOf_monic (c : Fin N → K) : (monicOf c).Monic := by
   rw [monicOf]
@@ -38,8 +39,8 @@ theorem monicOf_injective : Function.Injective (monicOf : (Fin N → K) → K[X]
   funext i
   rw [← monicOf_coeff c i, ← monicOf_coeff d i, h]
 
-theorem monicOf_coeffs {p : K[X]} (hp : p.Monic) (hN : p.natDegree = N) :
-    monicOf (fun i : Fin N => p.coeff i) = p := by
+theorem monicOf_coeffs {p : K[X]} (hp : p.Monic) (hN : p.natDegree = N)
+    : monicOf (fun i : Fin N => p.coeff i) = p := by
   subst hN
   rw [monicOf, Fin.sum_univ_eq_sum_range (fun i => C (p.coeff i) * X ^ i)]
   exact hp.as_sum.symm
@@ -60,8 +61,9 @@ theorem irreducible_count_upper : IrredCountUpper := by
         AdjoinRoot.powerBasis_dim, hfd]
     rw [← AdjoinRoot.mk_eq_zero, map_sub, map_pow, AdjoinRoot.mk_X, ← hcard, FiniteField.pow_card,
       sub_self]
-  have main : ∀ S : Finset (Fin d → K), (∀ c ∈ S, Irreducible (monicOf c)) →
-      d * S.card ≤ Fintype.card K ^ d := by
+  have main
+      : ∀ S : Finset (Fin d → K),
+        (∀ c ∈ S, Irreducible (monicOf c)) → d * S.card ≤ Fintype.card K ^ d := by
     intro S hS
     have hcop : ∀ c ∈ S, ∀ c' ∈ S, c ≠ c' → IsCoprime (monicOf c) (monicOf c') := by
       intro c hc c' hc' hne
@@ -72,11 +74,13 @@ theorem irreducible_count_upper : IrredCountUpper := by
       exact eq_of_monic_of_associated (monicOf_monic c) (monicOf_monic c')
         ((hS c hc).associated_of_dvd (hS c' hc') hdv)
     have hprod : ∏ c ∈ S, monicOf c ∣ X ^ (Fintype.card K ^ d) - X :=
-      Finset.prod_dvd_of_coprime (fun c hc c' hc' hne => hcop c hc c' hc' hne)
+      Finset.prod_dvd_of_coprime
+        (fun c hc c' hc' hne => hcop c hc c' hc' hne)
         (fun c hc => hdvd _ (hS c hc) (monicOf_natDegree c))
     have hdeg : (∏ c ∈ S, monicOf c).natDegree = d * S.card := by
       rw [natDegree_prod_of_monic _ _ (fun c _ => monicOf_monic c),
-        Finset.sum_congr rfl (fun c _ => monicOf_natDegree c), Finset.sum_const, smul_eq_mul, mul_comm]
+        Finset.sum_congr rfl (fun c _ => monicOf_natDegree c), Finset.sum_const, smul_eq_mul,
+        mul_comm]
     have hle := natDegree_le_of_dvd hprod (FiniteField.X_pow_card_pow_sub_X_ne_zero K hd0 hq1)
     rw [hdeg, FiniteField.X_pow_card_pow_sub_X_natDegree_eq K hd0 hq1] at hle
     exact hle

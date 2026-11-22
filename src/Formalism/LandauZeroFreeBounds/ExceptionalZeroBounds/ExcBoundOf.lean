@@ -34,7 +34,8 @@ theorem exceptional_zero_bound_of : ExcBoundOf := by
   obtain ⟨c0, hc0, hS'⟩ := hS (ε / 3) hε3
   obtain ⟨C, hC⟩ := hL
   obtain ⟨K, hK, hKb⟩ := log_le_const_mul_rpow (ε / 3) hε3
-  obtain ⟨M, hM, hCM⟩ : ∃ M : ℝ, 0 < M ∧ C ≤ M := ⟨max C 1, lt_max_of_lt_right one_pos, le_max_left _ _⟩
+  obtain ⟨M, hM, hCM⟩ : ∃ M : ℝ, 0 < M ∧ C ≤ M :=
+    ⟨max C 1, lt_max_of_lt_right one_pos, le_max_left _ _⟩
   have hcpos : 0 < min (1 / K) (c0 / (M * K ^ 2)) :=
     lt_min (div_pos one_pos hK) (div_pos hc0 (mul_pos hM (pow_pos hK 2)))
   refine ⟨min (1 / K) (c0 / (M * K ^ 2)), hcpos, ?_⟩
@@ -63,8 +64,9 @@ theorem exceptional_zero_bound_of : ExcBoundOf := by
   by_cases hcase : β ≤ 1 - 1 / Real.log (3 * q)
   · have key : c * Real.log (3 * q) ≤ u ^ 3 := by
       have hu3 : u ≤ u ^ 3 := le_self_pow₀ hu1 (by norm_num)
-      calc c * Real.log (3 * q) ≤ (1 / K) * (K * u) :=
-            mul_le_mul hcK hlogK hlog_pos.le (div_pos one_pos hK).le
+      calc
+        c * Real.log (3 * q)
+          ≤ (1 / K) * (K * u) := mul_le_mul hcK hlogK hlog_pos.le (div_pos one_pos hK).le
         _ = u := by field_simp
         _ ≤ u ^ 3 := hu3
     have h1 : c * (u ^ 3)⁻¹ ≤ 1 / Real.log (3 * q) := by
@@ -73,12 +75,15 @@ theorem exceptional_zero_bound_of : ExcBoundOf := by
     linarith
   · simp only [not_le] at hcase
     have hdiff := DirichletCharacter.differentiable_LFunction hχ1
-    have hmvt : ‖(fun t : ℝ => DirichletCharacter.LFunction χ (t : ℂ)) 1 -
-        (fun t : ℝ => DirichletCharacter.LFunction χ (t : ℂ)) β‖ ≤
-        (C * Real.log (3 * q) ^ 2) * (1 - β) := by
+    have hmvt
+        : ‖(fun t : ℝ => DirichletCharacter.LFunction χ (t : ℂ)) 1 -
+            (fun t : ℝ => DirichletCharacter.LFunction χ (t : ℂ)) β‖
+          ≤ (C * Real.log (3 * q) ^ 2) * (1 - β) := by
       refine norm_image_sub_le_of_norm_deriv_le_segment'
-        (f := fun t : ℝ => DirichletCharacter.LFunction χ (t : ℂ)) (a := β) (b := 1)
-        (f' := fun t : ℝ => deriv (DirichletCharacter.LFunction χ) (t : ℂ)) ?_ ?_ 1 ⟨hβ1.le, le_refl _⟩
+        (f := fun t : ℝ => DirichletCharacter.LFunction χ (t : ℂ))
+        (a := β) (b := 1)
+        (f' := fun t : ℝ => deriv (DirichletCharacter.LFunction χ) (t : ℂ))
+        ?_ ?_ 1 ⟨hβ1.le, le_refl _⟩
       · intro t _
         exact ((hdiff (t : ℂ)).hasDerivAt.comp_ofReal).hasDerivWithinAt
       · intro t ht
@@ -97,8 +102,9 @@ theorem exceptional_zero_bound_of : ExcBoundOf := by
       linarith
     have hMKu : 0 < M * K ^ 2 * u ^ 3 := mul_pos (mul_pos hM (pow_pos hK 2)) (pow_pos hu0 3)
     have hfin : c * (u ^ 3)⁻¹ ≤ 1 - β := by
-      calc c * (u ^ 3)⁻¹ ≤ c0 / (M * K ^ 2) * (u ^ 3)⁻¹ :=
-            mul_le_mul_of_nonneg_right hc2 (inv_nonneg.2 (pow_pos hu0 3).le)
+      calc
+        c * (u ^ 3)⁻¹ ≤ c0 / (M * K ^ 2) * (u ^ 3)⁻¹ :=
+          mul_le_mul_of_nonneg_right hc2 (inv_nonneg.2 (pow_pos hu0 3).le)
         _ = c0 / (M * K ^ 2 * u ^ 3) := by field_simp
         _ ≤ 1 - β := by
           rw [div_le_iff₀ hMKu]

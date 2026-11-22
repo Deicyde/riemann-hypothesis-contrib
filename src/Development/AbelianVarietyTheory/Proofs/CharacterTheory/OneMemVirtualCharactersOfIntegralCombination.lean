@@ -11,7 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.VirtualCha
 open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 namespace GlobalTheory.BI
 
-theorem one_mem_of_integral_combination : ∀ (G : Type) [Group G] [Finite G] (S : AddSubgroup (G → ℂ)), S ≤ Virt ℂ ℂ G → ∀ (ι : Type) [Fintype ι] (r : ι → ℂ) (s : ι → G → ℂ), (∀ i, IsIntegral ℤ (r i)) → (∀ i, s i ∈ S) → (∀ g, ∑ i, r i * s i g = 1) → (1 : G → ℂ) ∈ S := by
+theorem one_mem_of_integral_combination
+    : ∀ (G : Type) [Group G] [Finite G] (S : AddSubgroup (G → ℂ)),
+      S ≤ Virt ℂ ℂ G
+        → ∀ (ι : Type) [Fintype ι] (r : ι → ℂ) (s : ι → G → ℂ),
+          (∀ i, IsIntegral ℤ (r i)) → (∀ i, s i ∈ S) → (∀ g, ∑ i, r i * s i g = 1)
+            → (1 : G → ℂ) ∈ S := by
   intro G _ _ S hS ι _ r s hr hs hsum
   classical
   have := Fintype.ofFinite G
@@ -36,7 +41,10 @@ theorem one_mem_of_integral_combination : ∀ (G : Type) [Group G] [Finite G] (S
     intro g
     simp [hf, Finset.sum_apply]
   have h3 : ∑ g, f g * star (f g) = 0 := by
-    have e : ∀ g, f g * star (f g) = ∑ i, (c i : ℂ) * (s i g * star (f g)) - (1 : G → ℂ) g * star (f g) := by
+    have e
+        : ∀ g,
+          f g * star (f g)
+            = ∑ i, (c i : ℂ) * (s i g * star (f g)) - (1 : G → ℂ) g * star (f g) := by
       intro g
       conv_lhs => enter [1]; rw [hfg g]
       simp only [sub_mul, Finset.sum_mul, mul_assoc, Pi.one_apply]
@@ -46,13 +54,17 @@ theorem one_mem_of_integral_combination : ∀ (G : Type) [Group G] [Finite G] (S
     rw [← Finset.mul_sum, hm, mul_assoc]
   have h4 : ∑ g, Complex.normSq (f g) = 0 := by
     have : ((∑ g, Complex.normSq (f g) : ℝ) : ℂ) = 0 := by
-      rw [← h3]; push_cast
+      rw [← h3]
+      push_cast
       refine Finset.sum_congr rfl fun g _ => ?_
-      rw [← Complex.mul_conj]; rfl
+      rw [← Complex.mul_conj]
+      rfl
     exact_mod_cast this
   have h5 : f = 0 := by
     funext g
-    have := (Finset.sum_eq_zero_iff_of_nonneg (fun g _ => Complex.normSq_nonneg (f g))).1 h4 g (Finset.mem_univ g)
+    have :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun g _ => Complex.normSq_nonneg (f g))).1 h4 g
+        (Finset.mem_univ g)
     exact Complex.normSq_eq_zero.1 this
   have : (∑ i, c i • s i) = 1 := sub_eq_zero.1 (hf.symm.trans h5)
   exact this ▸ hcomb

@@ -16,18 +16,24 @@ open scoped TensorProduct
 namespace GlobalTheory.BaseCmp
 
 section
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] {n : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  {n : ℕ}
 
-theorem isOfFinOrder_hom_of_finite {G : Type} [Group G] [Finite G] (f : G →* ℂˣ) (g : G) : IsOfFinOrder (f g) :=
+theorem isOfFinOrder_hom_of_finite {G : Type} [Group G] [Finite G] (f : G →* ℂˣ) (g : G)
+    : IsOfFinOrder (f g) :=
   f.isOfFinOrder (isOfFinOrder_of_finite g)
 
-theorem levFn_isOfFinOrder (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) (L : LevDat E ℂ n)
-    (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) : IsOfFinOrder (levFn β L x) := by
+theorem levFn_isOfFinOrder
+    (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) (L : LevDat E ℂ n)
+    (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+    : IsOfFinOrder (levFn β L x) := by
   classical
   have hPP : ∀ PP : Pl E, Finite (kP PP) := fun PP =>
     Ideal.finiteQuotientOfFreeOfNeBot PP.asIdeal PP.ne_bot
   have hU : ∀ PP : Pl E, Finite (kP PP)ˣ := fun PP => Finite.of_injective _ Units.val_injective
-  have hG : ∀ (PP : Pl E) (r : ℕ), Finite (GL (Fin r) (kP PP)) := fun PP r => Finite.of_injective _ Units.val_injective
+  have hG : ∀ (PP : Pl E) (r : ℕ), Finite (GL (Fin r) (kP PP)) := fun PP r =>
+    Finite.of_injective _ Units.val_injective
   have hG0 : Finite (G0 L.Pg L.r) := Pi.finite
   rw [← CommGroup.mem_torsion]
   unfold levFn

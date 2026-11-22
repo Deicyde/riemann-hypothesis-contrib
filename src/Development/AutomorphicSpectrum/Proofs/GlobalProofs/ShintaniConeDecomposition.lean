@@ -11,17 +11,19 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
+open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
-theorem sum_equivFin_symm {F M : Type} [AddCommMonoid M] (s : Finset F) (f : F → M) :
-    ∑ i : Fin s.card, f (s.equivFin.symm i : F) = ∑ y ∈ s, f y := by
+theorem sum_equivFin_symm {F M : Type} [AddCommMonoid M] (s : Finset F) (f : F → M)
+    : ∑ i : Fin s.card, f (s.equivFin.symm i : F) = ∑ y ∈ s, f y := by
   rw [← Finset.sum_coe_sort s f]
   exact Equiv.sum_comp s.equivFin.symm (fun y : s => f (y : F))
 
-theorem openCone_equivFin {F : Type} [Field F] [CharZero F] (s : Finset F) :
-    openCone (fun i : Fin s.card => (s.equivFin.symm i : F)) = coneOn s := by
+theorem openCone_equivFin {F : Type} [Field F] [CharZero F] (s : Finset F)
+    : openCone (fun i : Fin s.card => (s.equivFin.symm i : F)) = coneOn s := by
   classical
   ext x
   constructor
@@ -41,26 +43,38 @@ theorem openCone_equivFin {F : Type} [Field F] [CharZero F] (s : Finset F) :
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Rat.smul_def]
 
-theorem tile_family {F : Type} [Field F] [NumberField F] (P : Set F) (Q : Set F → Prop) (C : Set F) (h : Tile P Q C) :
-    (0 : F) ∉ C →
-    ∃ (ι : Type) (_ : Fintype ι) (r : ι → ℕ) (v : ∀ c, Fin (r c) → F), (∀ c, 0 < r c) ∧
-      (∀ c, LinearIndependent ℚ (v c)) ∧ (∀ c i, v c i ∈ P) ∧ (∀ c, openCone (v c) ⊆ C) ∧
-      ∀ x ∈ C, ∃! c, x ∈ openCone (v c) := by
+theorem tile_family
+    {F : Type} [Field F] [NumberField F] (P : Set F) (Q : Set F → Prop) (C : Set F) (h : Tile P Q C)
+    : (0 : F) ∉ C
+      → ∃ (ι : Type) (_ : Fintype ι) (r : ι → ℕ) (v : ∀ c, Fin (r c) → F),
+        (∀ c, 0 < r c) ∧ (∀ c, LinearIndependent ℚ (v c)) ∧ (∀ c i, v c i ∈ P)
+          ∧ (∀ c, openCone (v c) ⊆ C) ∧ ∀ x ∈ C, ∃! c, x ∈ openCone (v c) := by
   induction h with
   | empty =>
     intro _
-    exact ⟨Empty, inferInstance, fun c => c.elim, fun c => c.elim, fun c => c.elim, fun c => c.elim,
-      fun c => c.elim, fun c => c.elim, fun x hx => hx.elim⟩
+    exact ⟨
+      Empty,
+      inferInstance,
+      fun c => c.elim,
+      fun c => c.elim,
+      fun c => c.elim,
+      fun c => c.elim,
+      fun c => c.elim,
+      fun c => c.elim,
+      fun x hx => hx.elim
+    ⟩
   | cone s hli hP hQ =>
     intro h0
     have hcone := openCone_equivFin s
-    refine ⟨Unit, inferInstance, fun _ => s.card, fun _ i => (s.equivFin.symm i : F), ?_, ?_, ?_, ?_, ?_⟩
+    refine
+      ⟨Unit, inferInstance, fun _ => s.card, fun _ i => (s.equivFin.symm i : F), ?_, ?_, ?_, ?_, ?_⟩
     · intro _
       refine Finset.card_pos.mpr (Finset.nonempty_iff_ne_empty.mpr ?_)
       rintro rfl
       exact h0 ⟨fun _ => 0, by simp, by simp⟩
     · intro _
-      have hinj : Function.Injective (fun i : Fin s.card => (⟨(s.equivFin.symm i : F), (s.equivFin.symm i).2⟩ : (s : Set F))) := by
+      have hinj : Function.Injective (fun i : Fin s.card =>
+          (⟨(s.equivFin.symm i : F), (s.equivFin.symm i).2⟩ : (s : Set F))) := by
         intro i j hij
         exact s.equivFin.symm.injective (Subtype.ext (congrArg Subtype.val hij))
       exact LinearIndependent.comp hli _ hinj
@@ -74,10 +88,20 @@ theorem tile_family {F : Type} [Field F] [NumberField F] (P : Set F) (Q : Set F 
     intro h0
     obtain ⟨ι₁, f₁, r₁, v₁, hr₁, hl₁, hp₁, hs₁, hu₁⟩ := ihA (fun h => h0 (Or.inl h))
     obtain ⟨ι₂, f₂, r₂, v₂, hr₂, hl₂, hp₂, hs₂, hu₂⟩ := ihB (fun h => h0 (Or.inr h))
-    refine ⟨ι₁ ⊕ ι₂, inferInstance, Sum.elim r₁ r₂,
-      fun c => match c with
+    refine ⟨
+      ι₁ ⊕ ι₂,
+      inferInstance,
+      Sum.elim r₁ r₂,
+      fun c =>
+        match c with
         | Sum.inl a => v₁ a
-        | Sum.inr b => v₂ b, ?_, ?_, ?_, ?_, ?_⟩
+        | Sum.inr b => v₂ b,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · rintro (a | b)
       · exact hr₁ a
       · exact hr₂ b
@@ -102,10 +126,12 @@ theorem tile_family {F : Type} [Field F] [NumberField F] (P : Set F) (Q : Set F 
         · exact (Set.disjoint_left.mp hAB (hs₁ a' h') hx).elim
         · exact congrArg Sum.inr (hu b' h')
 
-theorem tile_family_closed : ∀ {F : Type} [Field F] [NumberField F] (P : Set F) (Q : Set F → Prop) (C : Set F), Tile P Q C → (0 : F) ∉ C →
-    ∃ (ι : Type) (_ : Fintype ι) (r : ι → ℕ) (v : ∀ c, Fin (r c) → F), (∀ c, 0 < r c) ∧
-      (∀ c, LinearIndependent ℚ (v c)) ∧ (∀ c i, v c i ∈ P) ∧ (∀ c, openCone (v c) ⊆ C) ∧
-      ∀ x ∈ C, ∃! c, x ∈ openCone (v c) :=
-  fun P Q C h => tile_family P Q C h
+theorem tile_family_closed
+    : ∀ {F : Type} [Field F] [NumberField F] (P : Set F) (Q : Set F → Prop) (C : Set F),
+      Tile P Q C → (0 : F) ∉ C
+        → ∃ (ι : Type) (_ : Fintype ι) (r : ι → ℕ) (v : ∀ c, Fin (r c) → F),
+          (∀ c, 0 < r c) ∧ (∀ c, LinearIndependent ℚ (v c)) ∧ (∀ c i, v c i ∈ P)
+            ∧ (∀ c, openCone (v c) ⊆ C) ∧ ∀ x ∈ C, ∃! c, x ∈ openCone (v c) := fun P Q C h =>
+  tile_family P Q C h
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones

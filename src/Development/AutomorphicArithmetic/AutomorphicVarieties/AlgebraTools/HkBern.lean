@@ -7,8 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open MvPolynomial Equiv UpperTheory.V.AlgebraTools.Hk
 
-private theorem UpperTheory.V.AlgebraTools.hkBern_reg {R : Type} [CommRing R] {n : ℕ} {a c : Fin n} (hac : a ≠ c)
-    (y : MvPolynomial (Fin n) R) (h : (X a - X c) * y = 0) : y = 0 := by
+private theorem UpperTheory.V.AlgebraTools.hkBern_reg
+    {R : Type} [CommRing R]
+    {n : ℕ} {a c : Fin n} (hac : a ≠ c) (y : MvPolynomial (Fin n) R) (h : (X a - X c) * y = 0)
+    : y = 0 := by
   let φ : MvPolynomial (Fin n) R →ₐ[R] MvPolynomial (Fin n) R :=
     aeval fun j => if j = a then X a + X c else X j
   let ψ : MvPolynomial (Fin n) R →ₐ[R] MvPolynomial (Fin n) R :=
@@ -26,19 +28,29 @@ private theorem UpperTheory.V.AlgebraTools.hkBern_reg {R : Type} [CommRing R] {n
   rw [AlgHom.comp_apply, h3, map_zero, AlgHom.id_apply] at h4
   exact h4.symm
 
-theorem UpperTheory.V.AlgebraTools.hkBern :
-    ∀ (R : Type) [CommRing R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H] (b : Bern n q H),
-      (∀ (a c : Fin n), a.val + 1 = c.val → ∀ x : MvPolynomial (Fin n) R, ∃ y : MvPolynomial (Fin n) R, (X a - X c) * y = x - rename (swap a c) x ∧
-        b.T (swap a c) * b.th x = b.th (rename (swap a c) x) * b.T (swap a c) + (q - 1) • b.th (X a * y)) ∧
-      ∀ z : MvPolynomial (Fin n) R, z.IsSymmetric → ∀ w, b.T w * b.th z = b.th z * b.T w := by
+theorem UpperTheory.V.AlgebraTools.hkBern
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H] (b : Bern n q H),
+      (∀ (a c : Fin n),
+          a.val + 1 = c.val
+            → ∀ x : MvPolynomial (Fin n) R, ∃ y : MvPolynomial (Fin n) R,
+              (X a - X c) * y = x - rename (swap a c) x
+                ∧ b.T (swap a c) * b.th x
+                  = b.th (rename (swap a c) x) * b.T (swap a c) + (q - 1) • b.th (X a * y))
+        ∧ ∀ z : MvPolynomial (Fin n) R, z.IsSymmetric → ∀ w, b.T w * b.th z = b.th z * b.T w := by
   intro R _ n q H _ _ b
-  have main : ∀ (a c : Fin n), a.val + 1 = c.val → ∀ x : MvPolynomial (Fin n) R, ∃ y : MvPolynomial (Fin n) R,
-      (X a - X c) * y = x - rename (swap a c) x ∧
-        b.T (swap a c) * b.th x = b.th (rename (swap a c) x) * b.T (swap a c) + (q - 1) • b.th (X a * y) := by
+  have main
+      : ∀ (a c : Fin n),
+        a.val + 1 = c.val
+          → ∀ x : MvPolynomial (Fin n) R, ∃ y : MvPolynomial (Fin n) R,
+            (X a - X c) * y = x - rename (swap a c) x
+              ∧ b.T (swap a c) * b.th x
+                = b.th (rename (swap a c) x) * b.T (swap a c) + (q - 1) • b.th (X a * y) := by
     intro a c hac
-    have hX : ∀ j : Fin n, ∃ y : MvPolynomial (Fin n) R,
-        (X a - X c) * y = X j - rename (swap a c) (X j) ∧
-        b.T (swap a c) * b.th (X j) = b.th (rename (swap a c) (X j)) * b.T (swap a c) + (q - 1) • b.th (X a * y) := by
+    have hX
+        : ∀ j : Fin n, ∃ y : MvPolynomial (Fin n) R,
+          (X a - X c) * y = X j - rename (swap a c) (X j)
+            ∧ b.T (swap a c) * b.th (X j)
+              = b.th (rename (swap a c) (X j)) * b.T (swap a c) + (q - 1) • b.th (X a * y) := by
       intro j
       by_cases ha : j = a
       · subst ha
@@ -57,25 +69,29 @@ theorem UpperTheory.V.AlgebraTools.hkBern :
     induction x using MvPolynomial.induction_on with
     | C r =>
       refine ⟨0, by simp, ?_⟩
-      rw [rename_C, mul_zero, map_zero, smul_zero, add_zero, ← MvPolynomial.algebraMap_eq, AlgHom.commutes,
-        Algebra.commutes]
+      rw [rename_C, mul_zero, map_zero, smul_zero, add_zero, ← MvPolynomial.algebraMap_eq,
+        AlgHom.commutes, Algebra.commutes]
     | add p p' hp hp' =>
       obtain ⟨y, h1, h2⟩ := hp
       obtain ⟨y', h1', h2'⟩ := hp'
       refine ⟨y + y', ?_, ?_⟩
       · rw [mul_add, h1, h1', map_add (f := _)]; ring
-      · rw [map_add (f := _), map_add (f := _), map_add (f := _), mul_add, h2, h2', mul_add, map_add (f := _), add_mul, smul_add]; abel
+      · rw [map_add (f := _), map_add (f := _), map_add (f := _), mul_add, h2, h2', mul_add,
+          map_add (f := _), add_mul, smul_add]
+        abel
     | mul_X p j hp =>
       obtain ⟨y, h1, h2⟩ := hp
       obtain ⟨y', h1', h2'⟩ := hX j
       refine ⟨y * X j + rename (swap a c) p * y', ?_, ?_⟩
       · rw [map_mul]
         linear_combination (X j) * h1 + rename (swap a c) p * h1'
-      · have e : X a * (y * X j + rename (swap a c) p * y') =
-            (X a * y) * X j + rename (swap a c) p * (X a * y') := by ring
-        rw [e, map_add (f := _), map_mul b.th (X a * y), map_mul b.th _ (X a * y'), map_mul (rename _), map_mul b.th p,
-          map_mul b.th (rename _ p), ← mul_assoc, h2, add_mul, mul_assoc, h2', mul_add, smul_add, smul_mul_assoc,
-          mul_smul_comm, mul_assoc]
+      · have e
+            : X a * (y * X j + rename (swap a c) p * y')
+              = (X a * y) * X j + rename (swap a c) p * (X a * y') := by
+          ring
+        rw [e, map_add (f := _), map_mul b.th (X a * y), map_mul b.th _ (X a * y'),
+          map_mul (rename _), map_mul b.th p, map_mul b.th (rename _ p), ← mul_assoc, h2, add_mul,
+          mul_assoc, h2', mul_add, smul_add, smul_mul_assoc, mul_smul_comm, mul_assoc]
         abel
   refine ⟨main, fun z hz => ?_⟩
   refine UpperTheory.V.AlgebraTools.hkInd n (fun w => b.T w * b.th z = b.th z * b.T w) ?_ ?_
@@ -87,5 +103,6 @@ theorem UpperTheory.V.AlgebraTools.hkBern :
       omega
     rw [hz (swap a c)] at h1 h2
     rw [sub_self] at h1
-    rw [UpperTheory.V.AlgebraTools.hkBern_reg hne y h1, mul_zero, map_zero, smul_zero, add_zero] at h2
+    rw [UpperTheory.V.AlgebraTools.hkBern_reg hne y h1, mul_zero, map_zero, smul_zero, add_zero]
+      at h2
     rw [b.T_mul a c hac w hw, mul_assoc, ih, ← mul_assoc, h2, mul_assoc]

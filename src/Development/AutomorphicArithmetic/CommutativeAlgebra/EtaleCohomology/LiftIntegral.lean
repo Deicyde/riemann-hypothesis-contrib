@@ -300,10 +300,9 @@ end Sch
 
 end UpperTheory.Ru.crystallineComparison
 
-
 open CategoryTheory Limits AlgebraicGeometry UpperTheory.Gal.crystallineComparison in
-theorem UpperTheory.Ru.crystallineComparison.splitEx :
-    UpperTheory.Ru.crystallineComparison.SplitEx := by
+theorem UpperTheory.Ru.crystallineComparison.splitEx
+    : UpperTheory.Ru.crystallineComparison.SplitEx := by
   intro l hl Y T U _ hnz hcl hsec y
   let R := Localization.Away (l : U)
   let x : Spec (CommRingCat.of R) ⟶ Y := awayPt l U ≫ y
@@ -327,20 +326,24 @@ theorem UpperTheory.Ru.crystallineComparison.splitEx :
     exact this
   let x' : Spec (CommRingCat.of R) ⟶ V.toScheme := IsOpenImmersion.lift V.ι x hV
   have hx' : x' ≫ V.ι = x := IsOpenImmersion.lift_fac _ _ _
-  have sq : IsPullback (pullback.fst (T.p ∣_ V) x' ≫ (T.p ⁻¹ᵁ V).ι) (pullback.snd (T.p ∣_ V) x') T.p x := by
+  have sq : IsPullback (pullback.fst (T.p ∣_ V) x' ≫ (T.p ⁻¹ᵁ V).ι) (pullback.snd (T.p ∣_ V) x') T.p
+      x := by
     rw [← hx']
-    exact (IsPullback.of_hasPullback (T.p ∣_ V) x').paste_horiz (isPullback_morphismRestrict T.p V).flip
+    exact (IsPullback.of_hasPullback (T.p ∣_ V) x').paste_horiz
+      (isPullback_morphismRestrict T.p V).flip
   have het0 : Etale (T.p ∣_ V) := T.et
   have het1 : Etale (pullback.snd (T.p ∣_ V) x') := inferInstance
   have het : Etale (pullback.snd T.p x) := by
-    have : pullback.snd T.p x = sq.isoPullback.inv ≫ pullback.snd (T.p ∣_ V) x' := by
-      simp
+    have : pullback.snd T.p x = sq.isoPullback.inv ≫ pullback.snd (T.p ∣_ V) x' := by simp
     rw [this]
     infer_instance
   have hfin0 : IsFinite T.p := T.fin
-  have hdeg : ∀ (K : Type) [Field K] [IsAlgClosed K] [Algebra R K],
-      Nat.card {w : Spec (CommRingCat.of K) ⟶ pullback T.p x //
-        w ≫ pullback.snd T.p x = Spec.map (CommRingCat.ofHom (algebraMap R K))} = T.d := by
+  have hdeg
+      : ∀ (K : Type) [Field K] [IsAlgClosed K] [Algebra R K],
+        Nat.card
+            {w : Spec (CommRingCat.of K) ⟶ pullback T.p x
+              // w ≫ pullback.snd T.p x = Spec.map (CommRingCat.ofHom (algebraMap R K))}
+          = T.d := by
     intro K _ _ _
     have hl0 : ((l : ℕ) : K) ≠ 0 := by
       have := hunit.map (algebraMap R K)
@@ -357,14 +360,17 @@ theorem UpperTheory.Ru.crystallineComparison.splitEx :
   obtain ⟨s, hs, hiso⟩ := split_sch hsec T.d (pullback.snd T.p x) hdeg
   have hinj : Function.Injective (algebraMap U R) :=
     IsLocalization.injective R (Submonoid.powers_le.2 hnz)
-  have hext : ∀ i, ∃ t' : Spec (CommRingCat.of U) ⟶ pullback T.p y,
-      t' ≫ pullback.snd T.p y = 𝟙 _ ∧ awayPt l U ≫ t' ≫ pullback.fst T.p y = s i ≫ pullback.fst T.p x := by
+  have hext
+      : ∀ i, ∃ t' : Spec (CommRingCat.of U) ⟶ pullback T.p y,
+        t' ≫ pullback.snd T.p y = 𝟙 _
+          ∧ awayPt l U ≫ t' ≫ pullback.fst T.p y = s i ≫ pullback.fst T.p x := by
     intro i
     have hc : s i ≫ pullback.fst T.p x ≫ T.p = awayPt l U ≫ y := by
       rw [pullback.condition, ← Category.assoc, hs, Category.id_comp]
-    obtain ⟨t', h1, h2⟩ := extend_pt (algebraMap U R) hinj hcl (pullback.snd T.p y)
-      (pullback.lift (s i ≫ pullback.fst T.p x) (awayPt l U) (by rw [Category.assoc, hc]))
-      (pullback.lift_snd _ _ _)
+    obtain ⟨t', h1, h2⟩ :=
+      extend_pt (algebraMap U R) hinj hcl (pullback.snd T.p y)
+        (pullback.lift (s i ≫ pullback.fst T.p x) (awayPt l U) (by rw [Category.assoc, hc]))
+        (pullback.lift_snd _ _ _)
     refine ⟨t', h1, ?_⟩
     rw [← Category.assoc, h2, pullback.lift_fst]
   choose t' ht1 ht2 using hext

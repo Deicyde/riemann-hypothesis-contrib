@@ -9,29 +9,42 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open UpperTheory.ConvolutionTheory.R2.Fo (pl)
 open scoped Classical
 
 namespace UpperTheory.ConvolutionTheory.R2.Ff.VectorFieldDerivatives
 
-private theorem herm_der (P : ℝ → Matrix (Fin 2) (Fin 2) ℂ) (P' H : Matrix (Fin 2) (Fin 2) ℂ) (h0 : P 0 = 1)
-    (hP : ∀ i j, HasDerivAt (fun t => P t i j) (P' i j) 0) (i j : Fin 2) :
-    HasDerivAt (fun t => (P t * H * (P t)ᴴ) i j) ((P' * H + H * P'ᴴ) i j) 0 := by
-  have hval : ∀ i j : Fin 2,
-      P' i 0 * H 0 0 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 0) + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 0 * H 0 0 * star (P' j 0) +
-        (P' i 1 * H 1 0 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 0) + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 1 * H 1 0 * star (P' j 0)) +
-      (P' i 0 * H 0 1 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 1) + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 0 * H 0 1 * star (P' j 1) +
-        (P' i 1 * H 1 1 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 1) + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 1 * H 1 1 * star (P' j 1))) =
-      (P' * H + H * P'ᴴ) i j := by
+private theorem herm_der
+    (P : ℝ → Matrix (Fin 2) (Fin 2) ℂ)
+    (P' H : Matrix (Fin 2) (Fin 2) ℂ)
+    (h0 : P 0 = 1) (hP : ∀ i j, HasDerivAt (fun t => P t i j) (P' i j) 0) (i j : Fin 2)
+    : HasDerivAt (fun t => (P t * H * (P t)ᴴ) i j) ((P' * H + H * P'ᴴ) i j) 0 := by
+  have hval
+      : ∀ i j : Fin 2,
+        P' i 0 * H 0 0 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 0)
+            + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 0 * H 0 0 * star (P' j 0)
+            + (P' i 1 * H 1 0 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 0)
+              + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 1 * H 1 0 * star (P' j 0))
+            + (P' i 0 * H 0 1 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 1)
+              + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 0 * H 0 1 * star (P' j 1)
+              + (P' i 1 * H 1 1 * star ((1 : Matrix (Fin 2) (Fin 2) ℂ) j 1)
+                + (1 : Matrix (Fin 2) (Fin 2) ℂ) i 1 * H 1 1 * star (P' j 1)))
+          = (P' * H + H * P'ᴴ) i j := by
     simp only [Fin.forall_fin_two]
     simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.conjTranspose_apply]
     refine ⟨⟨?_, ?_⟩, ?_, ?_⟩ <;> ring
-  have hc : ∀ a b, HasDerivAt (fun t => star (P t a b)) (star (P' a b)) 0 := fun a b => (hP a b).star
-  have hh : ∀ a b, HasDerivAt (fun t => P t i a * H a b * star (P t j b))
-      (P' i a * H a b * star (P 0 j b) + P 0 i a * H a b * star (P' j b)) 0 :=
-    fun a b => ((hP i a).mul_const (H a b)).mul (hc j b)
+  have hc : ∀ a b, HasDerivAt (fun t => star (P t a b)) (star (P' a b)) 0 := fun a b =>
+    (hP a b).star
+  have hh
+      : ∀ a b,
+        HasDerivAt
+          (fun t => P t i a * H a b * star (P t j b))
+          (P' i a * H a b * star (P 0 j b) + P 0 i a * H a b * star (P' j b)) 0 := fun a b =>
+    ((hP i a).mul_const (H a b)).mul (hc j b)
   have hs := (((hh 0 0).add (hh 1 0)).add ((hh 0 1).add (hh 1 1)))
   refine (hs.congr_deriv ?_).congr_of_eventuallyEq (Eventually.of_forall fun t => ?_)
   · rw [h0]
@@ -41,19 +54,24 @@ private theorem herm_der (P : ℝ → Matrix (Fin 2) (Fin 2) ℂ) (P' H : Matrix
 
 variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
-private theorem hm_entries {s : ℂ} {w : InfinitePlace F} (u : Fin 4 → TR.Rinf F) :
-    Hm s w u 0 0 = (u 1 w : ℝ) ∧ Hm s w u 1 1 = (u 0 w : ℝ) ∧ Hm s w u 0 1 = (u 2 w : ℝ) + s * (u 3 w : ℝ) ∧
-      Hm s w u 1 0 = (u 2 w : ℝ) - s * (u 3 w : ℝ) := by
+private theorem hm_entries {s : ℂ} {w : InfinitePlace F} (u : Fin 4 → TR.Rinf F)
+    : Hm s w u 0 0 = (u 1 w : ℝ) ∧ Hm s w u 1 1 = (u 0 w : ℝ)
+      ∧ Hm s w u 0 1 = (u 2 w : ℝ) + s * (u 3 w : ℝ)
+      ∧ Hm s w u 1 0 = (u 2 w : ℝ) - s * (u 3 w : ℝ) := by
   simp [Hm]
 
-private theorem coord_der {s : ℂ} (hs : s ≠ 0) (w : InfinitePlace F) (a : ℝ → Fin 4 → TR.Rinf F)
-    (Q : ℝ → Matrix (Fin 2) (Fin 2) ℂ) (q : Matrix (Fin 2) (Fin 2) ℂ) (hQ : ∀ t, Hm s w (a t) = Q t)
-    (hq : ∀ i j, HasDerivAt (fun t => Q t i j) (q i j) 0) (i : Fin 4) :
-    ∃ d : ℝ, HasDerivAt (fun t => a t i w) d 0 := by
+private theorem coord_der
+    {s : ℂ} (hs : s ≠ 0)
+    (w : InfinitePlace F) (a : ℝ → Fin 4 → TR.Rinf F) (Q : ℝ → Matrix (Fin 2) (Fin 2) ℂ)
+    (q : Matrix (Fin 2) (Fin 2) ℂ)
+    (hQ : ∀ t, Hm s w (a t) = Q t) (hq : ∀ i j, HasDerivAt (fun t => Q t i j) (q i j) 0) (i : Fin 4)
+    : ∃ d : ℝ, HasDerivAt (fun t => a t i w) d 0 := by
   have e00 : ∀ t, Q t 0 0 = (a t 1 w : ℝ) := fun t => by rw [← hQ]; exact (hm_entries _).1
   have e11 : ∀ t, Q t 1 1 = (a t 0 w : ℝ) := fun t => by rw [← hQ]; exact (hm_entries _).2.1
-  have e01 : ∀ t, Q t 0 1 = (a t 2 w : ℝ) + s * (a t 3 w : ℝ) := fun t => by rw [← hQ]; exact (hm_entries _).2.2.1
-  have e10 : ∀ t, Q t 1 0 = (a t 2 w : ℝ) - s * (a t 3 w : ℝ) := fun t => by rw [← hQ]; exact (hm_entries _).2.2.2
+  have e01 : ∀ t, Q t 0 1 = (a t 2 w : ℝ) + s * (a t 3 w : ℝ) := fun t => by
+    rw [← hQ]; exact (hm_entries _).2.2.1
+  have e10 : ∀ t, Q t 1 0 = (a t 2 w : ℝ) - s * (a t 3 w : ℝ) := fun t => by
+    rw [← hQ]; exact (hm_entries _).2.2.2
   suffices h : ∃ c : ℂ, HasDerivAt (fun t => ((a t i w : ℝ) : ℂ)) c 0 by
     obtain ⟨c, hc⟩ := h
     refine ⟨c.re, ?_⟩
@@ -62,28 +80,42 @@ private theorem coord_der {s : ℂ} (hs : s ≠ 0) (w : InfinitePlace F) (a : �
   fin_cases i
   · exact ⟨_, (hq 1 1).congr_of_eventuallyEq (Eventually.of_forall fun t => (e11 t).symm)⟩
   · exact ⟨_, (hq 0 0).congr_of_eventuallyEq (Eventually.of_forall fun t => (e00 t).symm)⟩
-  · refine ⟨_, (((hq 0 1).add (hq 1 0)).const_mul (2⁻¹ : ℂ)).congr_of_eventuallyEq (Eventually.of_forall fun t => ?_)⟩
+  · refine ⟨
+      _,
+      (((hq 0 1).add (hq 1 0)).const_mul (2⁻¹ : ℂ)).congr_of_eventuallyEq
+        (Eventually.of_forall fun t => ?_)
+    ⟩
     simp only [Pi.add_apply, e01, e10]
     change ((a t 2 w : ℝ) : ℂ) = _
     ring
-  · refine ⟨_, (((hq 0 1).sub (hq 1 0)).const_mul ((2 * s)⁻¹ : ℂ)).congr_of_eventuallyEq (Eventually.of_forall fun t => ?_)⟩
+  · refine ⟨
+      _,
+      (((hq 0 1).sub (hq 1 0)).const_mul ((2 * s)⁻¹ : ℂ)).congr_of_eventuallyEq
+        (Eventually.of_forall fun t => ?_)
+    ⟩
     simp only [Pi.sub_apply, e01, e10]
     change ((a t 3 w : ℝ) : ℂ) = _
     field_simp
     ring
 
-private theorem hm_der {s : ℂ} (w : InfinitePlace F) (a : ℝ → Fin 4 → TR.Rinf F) (d : Fin 4 → TR.Rinf F)
-    (Q : ℝ → Matrix (Fin 2) (Fin 2) ℂ) (q : Matrix (Fin 2) (Fin 2) ℂ) (hQ : ∀ t, Hm s w (a t) = Q t)
-    (hq : ∀ i j, HasDerivAt (fun t => Q t i j) (q i j) 0)
-    (hd : ∀ i, HasDerivAt (fun t => a t i w) (d i w) 0) : Hm s w d = q := by
-  have hc : ∀ i, HasDerivAt (fun t => ((a t i w : ℝ) : ℂ)) ((d i w : ℝ) : ℂ) 0 := fun i => (hd i).ofReal_comp
+private theorem hm_der
+    {s : ℂ}
+    (w : InfinitePlace F) (a : ℝ → Fin 4 → TR.Rinf F) (d : Fin 4 → TR.Rinf F)
+    (Q : ℝ → Matrix (Fin 2) (Fin 2) ℂ) (q : Matrix (Fin 2) (Fin 2) ℂ)
+    (hQ : ∀ t, Hm s w (a t) = Q t) (hq : ∀ i j, HasDerivAt (fun t => Q t i j) (q i j) 0)
+    (hd : ∀ i, HasDerivAt (fun t => a t i w) (d i w) 0)
+    : Hm s w d = q := by
+  have hc : ∀ i, HasDerivAt (fun t => ((a t i w : ℝ) : ℂ)) ((d i w : ℝ) : ℂ) 0 := fun i =>
+    (hd i).ofReal_comp
   have e00 : (fun t => Q t 0 0) = fun t => ((a t 1 w : ℝ) : ℂ) :=
     funext fun t => by rw [← hQ]; exact (hm_entries _).1
   have e11 : (fun t => Q t 1 1) = fun t => ((a t 0 w : ℝ) : ℂ) :=
     funext fun t => by rw [← hQ]; exact (hm_entries _).2.1
-  have e01 : (fun t => Q t 0 1) = (fun t => ((a t 2 w : ℝ) : ℂ)) + fun t => s * ((a t 3 w : ℝ) : ℂ) :=
+  have e01
+      : (fun t => Q t 0 1) = (fun t => ((a t 2 w : ℝ) : ℂ)) + fun t => s * ((a t 3 w : ℝ) : ℂ) :=
     funext fun t => by rw [← hQ]; exact (hm_entries _).2.2.1
-  have e10 : (fun t => Q t 1 0) = (fun t => ((a t 2 w : ℝ) : ℂ)) - fun t => s * ((a t 3 w : ℝ) : ℂ) :=
+  have e10
+      : (fun t => Q t 1 0) = (fun t => ((a t 2 w : ℝ) : ℂ)) - fun t => s * ((a t 3 w : ℝ) : ℂ) :=
     funext fun t => by rw [← hQ]; exact (hm_entries _).2.2.2
   have h00 := hq 0 0
   have h11 := hq 1 1
@@ -106,8 +138,10 @@ private theorem hm_der {s : ℂ} (w : InfinitePlace F) (a : ℝ → Fin 4 → TR
 end UpperTheory.ConvolutionTheory.R2.Ff.VectorFieldDerivatives
 
 open UpperTheory.ConvolutionTheory.R2.Ff.VectorFieldDerivatives in
-theorem UpperTheory.ConvolutionTheory.R2.Ff.vfDer :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E), VfDer D := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.vfDer
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E),
+      VfDer D := by
   intro F E _ _ _ _ _ _ _ D Y v
   obtain ⟨hadd, -, hder, -, -⟩ := exPar E Y
   have hA := actInf F E D
@@ -121,7 +155,9 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.vfDer :
   let a : ℝ → Fin 4 → TR.Rinf F := fun t i => TR.pInf F (D.act (infGL E 2 (ex Y t))⁻¹ v i)
   let a0 : Fin 4 → TR.Rinf F := fun i => TR.pInf F (v i)
   let P : (E →+* ℂ) → ℝ → Matrix (Fin 2) (Fin 2) ℂ := fun τ t => (ex Y (-t)).val.map (coord τ)
-  have hHm : ∀ τ t, Hm (τ D.θ) (pl F τ) (a t) = P τ t * Hm (τ D.θ) (pl F τ) a0 * (P τ t)ᴴ := fun τ t => by
+  have hHm
+      : ∀ τ t,
+        Hm (τ D.θ) (pl F τ) (a t) = P τ t * Hm (τ D.θ) (pl F τ) a0 * (P τ t)ᴴ := fun τ t => by
     have h := (hA (ex Y (-t)) v).2 τ
     simp only [a, P]
     rw [← map_inv, hinv]
@@ -129,18 +165,27 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.vfDer :
   have hP0 : ∀ τ, P τ 0 = 1 := fun τ => by
     simp only [P, neg_zero, hex0]
     exact Matrix.map_one _ (map_zero _) (map_one _)
-  have hPd : ∀ τ i j, HasDerivAt (fun t => P τ t i j) ((-(Matrix.of Y).map (coord τ)) i j) 0 := fun τ i j => by
-    let c : Cinf E →L[ℝ] ℂ := LinearMap.mkContinuous
-      { toFun := coord τ, map_add' := map_add _, map_smul' := UpperTheory.V.FieldIso.coord_smul τ } 1
-      (fun x => by simpa using UpperTheory.V.FieldIso.norm_coord_le τ x)
-    have h1 : HasDerivAt (fun t => (ex Y t).val i j) (Y i j) 0 := hasDerivAt_pi.1 (hasDerivAt_pi.1 hder i) j
+  have hPd
+      : ∀ τ i j,
+        HasDerivAt (fun t => P τ t i j) ((- (Matrix.of Y).map (coord τ)) i j) 0 := fun τ i j => by
+    let c : Cinf E →L[ℝ] ℂ :=
+      LinearMap.mkContinuous
+        {
+          toFun := coord τ
+          map_add' := map_add _
+          map_smul' := UpperTheory.V.FieldIso.coord_smul τ
+        }
+        1 (fun x => by simpa using UpperTheory.V.FieldIso.norm_coord_le τ x)
+    have h1 : HasDerivAt (fun t => (ex Y t).val i j) (Y i j) 0 :=
+      hasDerivAt_pi.1 (hasDerivAt_pi.1 hder i) j
     have h2 : HasDerivAt (fun t => c ((ex Y t).val i j)) (c (Y i j)) (-(0 : ℝ)) := by
       rw [neg_zero]
       exact c.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h1
     have h3 := HasDerivAt.scomp (0 : ℝ) h2 (hasDerivAt_neg (0 : ℝ))
     refine (h3.congr_deriv ?_)
     simp [c]
-  have hQ := fun τ => herm_der (P τ) (-(Matrix.of Y).map (coord τ)) (Hm (τ D.θ) (pl F τ) a0) (hP0 τ) (hPd τ)
+  have hQ := fun τ =>
+    herm_der (P τ) (- (Matrix.of Y).map (coord τ)) (Hm (τ D.θ) (pl F τ) a0) (hP0 τ) (hPd τ)
   have hs : ∀ τ : E →+* ℂ, τ D.θ ≠ 0 := fun τ => (map_ne_zero τ).2 D.θ_ne_zero
   have hex : ∀ (w : InfinitePlace F) i, ∃ d : ℝ, HasDerivAt (fun t => a t i w) d 0 := by
     intro w i

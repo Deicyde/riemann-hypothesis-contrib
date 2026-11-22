@@ -9,9 +9,9 @@ open IsLocalRing TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem Submodule.exists_pow_smul_mem_of_forall_exists :
-    ∀ (S : Type) [CommRing S] (I : Ideal S) (M : Type) [AddCommGroup M] [Module S M]
-      [Module.Finite S M] (N : Submodule S M),
+theorem Submodule.exists_pow_smul_mem_of_forall_exists
+    : ∀ (S : Type) [CommRing S] (I : Ideal S) (M : Type) [AddCommGroup M] [Module S M]
+        [Module.Finite S M] (N : Submodule S M),
       (∀ y : M, ∃ k : ℕ, ∀ a ∈ I ^ k, a • y ∈ N) → ∃ k : ℕ, ∀ a ∈ I ^ k, ∀ y : M, a • y ∈ N := by
   intro S _ I M _ _ _ N h
   choose f hf using h

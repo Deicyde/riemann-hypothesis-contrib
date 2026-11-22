@@ -15,12 +15,22 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ChernDensitySh
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
+open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
 
-theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet : ∀ (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Module.Finite ℤ k] (X : Scheme.{0}) (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ), IsProjOver p → ∀ (σ : k →+* ℂ) (D : ℕ) (B : LB X) (φ : ∀ σ : k →+* ℂ, Weight p σ B) (ψ : Weight t τ B), WOver φ ψ → (∀ σ, (φ σ).IsCInf) → ψ.IsCInf → ∀ (ε : ℤˣ) (S : Set (CxPts p σ)), MeasurableSet S → ψ.chernPart D ε (sheet t τ '' S) = (φ σ).chernPart D ε S := by
+theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet
+    : ∀ (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Module.Finite ℤ k] (X : Scheme.{0})
+        (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ),
+      IsProjOver p
+        → ∀ (σ : k →+* ℂ) (D : ℕ) (B : LB X) (φ : ∀ σ : k →+* ℂ, Weight p σ B) (ψ : Weight t τ B),
+          WOver φ ψ → (∀ σ, (φ σ).IsCInf) → ψ.IsCInf
+            → ∀ (ε : ℤˣ) (S : Set (CxPts p σ)),
+              MeasurableSet S → ψ.chernPart D ε (sheet t τ '' S) = (φ σ).chernPart D ε S := by
   intro k _ _ _ _ X p t τ hp σ D B φ ψ hW hφ hψ ε S hS
   have hSC : ∀ σ' : k →+* ℂ, SecondCountableTopology (CxPts p σ') := by
     obtain ⟨N, i, hi, hpe⟩ := hp
@@ -42,10 +52,11 @@ theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet : ∀ (k : Type) [
     exact Set.eq_univ_of_forall fun y => Set.mem_iUnion.2 ⟨emb p y, unsheet p y, sheet_unsheet p y⟩
   have hemb : Topology.IsOpenEmbedding (sheet t τ : CxPts p σ → CxPts t τ) :=
     (GlobalTheory.T.sheet_isOpenEmbedding_range k X p t τ σ).1
-  have hme : MeasurableEmbedding (sheet t τ : CxPts p σ → CxPts t τ) :=
-    hemb.measurableEmbedding
-  have key : ∀ (c : AlgChart p σ D) (A : Set (CxPts p σ)), MeasurableSet A → A ⊆ c.e.source →
-      ψ.chernPart D ε (sheet t τ '' A) = (φ σ).chernPart D ε A := by
+  have hme : MeasurableEmbedding (sheet t τ : CxPts p σ → CxPts t τ) := hemb.measurableEmbedding
+  have key
+      : ∀ (c : AlgChart p σ D) (A : Set (CxPts p σ)),
+        MeasurableSet A → A ⊆ c.e.source
+          → ψ.chernPart D ε (sheet t τ '' A) = (φ σ).chernPart D ε A := by
     intro c A hA hAc
     obtain ⟨c', hc's, hc'e⟩ := GlobalTheory.T.exists_algChart_over_integers k X p t τ σ D c
     have hcomp : ∀ y ∈ c.e.source, sheet t τ y ∈ c'.e.source ∧ c'.e (sheet t τ y) = c.e y :=
@@ -60,7 +71,8 @@ theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet : ∀ (k : Type) [
       rw [Set.image_image]
       exact Set.image_congr fun y hy => (hcomp y (hAc hy)).2
     rw [himg]
-    refine MeasureTheory.setLIntegral_congr_fun (GlobalTheory.ChartGlue.measurableSet_image c.e hA hAc) ?_
+    refine MeasureTheory.setLIntegral_congr_fun
+      (GlobalTheory.ChartGlue.measurableSet_image c.e hA hAc) ?_
     rintro _ ⟨y, hy, rfl⟩
     dsimp only
     have h1 : c.e.symm (c.e y) = y := c.e.left_inv (hAc hy)
@@ -68,18 +80,21 @@ theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet : ∀ (k : Type) [
       rw [← (hcomp y (hAc hy)).2]
       exact c'.e.left_inv (hcomp y (hAc hy)).1
     rw [h1, h2, hdens y (hAc hy)]
-  have hμA : ∀ A : Set (CxPts p σ),
-      Measure.comap (sheet t τ) (ψ.chernPart D ε) A = ψ.chernPart D ε (sheet t τ '' A) :=
-    fun A => hme.comap_apply _ A
+  have hμA
+      : ∀ A : Set (CxPts p σ),
+        Measure.comap (sheet t τ) (ψ.chernPart D ε) A = ψ.chernPart D ε (sheet t τ '' A) := fun A =>
+    hme.comap_apply _ A
   have hUo : IsOpen (⋃ c : AlgChart p σ D, c.e.source) := isOpen_iUnion fun c => c.e.open_source
   have hUm : MeasurableSet (⋃ c : AlgChart p σ D, c.e.source) := hUo.measurableSet
   have hzν : ((φ σ).chernPart D ε).restrict (⋃ c : AlgChart p σ D, c.e.source)ᶜ = 0 := by
-    refine Measure.restrict_eq_zero.2 (GlobalTheory.Weight.chernPart_eq_zero ε hUm.compl fun c => ?_)
+    refine Measure.restrict_eq_zero.2 (GlobalTheory.Weight.chernPart_eq_zero ε hUm.compl fun c =>
+      ?_)
     rw [Set.disjoint_left]
     intro y hy hy'
     exact hy' (Set.mem_iUnion.2 ⟨c, hy⟩)
-  have hzμ : (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict
-      (⋃ c : AlgChart p σ D, c.e.source)ᶜ = 0 := by
+  have hzμ
+      : (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict (⋃ c : AlgChart p σ D, c.e.source)ᶜ
+        = 0 := by
     refine Measure.restrict_eq_zero.2 ?_
     rw [hμA]
     refine GlobalTheory.Weight.chernPart_eq_zero ε (hme.measurableSet_image' hUm.compl) fun c' => ?_
@@ -87,11 +102,13 @@ theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet : ∀ (k : Type) [
     rintro _ hz ⟨y, hy, rfl⟩
     obtain ⟨c, hcs, -⟩ := GlobalTheory.T.exists_algChart_from_integers k X p t τ σ D c' ⟨y⟩
     exact hy (Set.mem_iUnion.2 ⟨c, by rw [hcs]; exact hz⟩)
-  have hU : (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict
-      (⋃ c : AlgChart p σ D, c.e.source) = ((φ σ).chernPart D ε).restrict
-      (⋃ c : AlgChart p σ D, c.e.source) := by
-    obtain ⟨T, hTc, hTU⟩ := TopologicalSpace.isOpen_iUnion_countable
-      (fun c : AlgChart p σ D => c.e.source) fun c => c.e.open_source
+  have hU
+      : (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict (⋃ c : AlgChart p σ D, c.e.source)
+        = ((φ σ).chernPart D ε).restrict (⋃ c : AlgChart p σ D, c.e.source) := by
+    obtain ⟨T, hTc, hTU⟩ :=
+      TopologicalSpace.isOpen_iUnion_countable
+        (fun c : AlgChart p σ D => c.e.source)
+        fun c => c.e.open_source
     have hU' : (⋃ c : AlgChart p σ D, c.e.source) = ⋃ c : T, (c : AlgChart p σ D).e.source := by
       rw [Set.iUnion_subtype]
       exact hTU.symm
@@ -104,10 +121,13 @@ theorem GlobalTheory.CompanionTheory.Ar.BaseZ.chernPart_sheet : ∀ (k : Type) [
     rw [Measure.restrict_apply hA, Measure.restrict_apply hA, hμA]
     exact key c _ hAm Set.inter_subset_right
   have hμν : Measure.comap (sheet t τ) (ψ.chernPart D ε) = (φ σ).chernPart D ε := by
-    calc Measure.comap (sheet t τ) (ψ.chernPart D ε)
-        = (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict (⋃ c : AlgChart p σ D, c.e.source)
-          + (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict
-            (⋃ c : AlgChart p σ D, c.e.source)ᶜ := (Measure.restrict_add_restrict_compl hUm).symm
+    calc
+      Measure.comap (sheet t τ) (ψ.chernPart D ε)
+          = (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict
+              (⋃ c : AlgChart p σ D, c.e.source)
+            + (Measure.comap (sheet t τ) (ψ.chernPart D ε)).restrict
+              (⋃ c : AlgChart p σ D, c.e.source)ᶜ :=
+        (Measure.restrict_add_restrict_compl hUm).symm
       _ = ((φ σ).chernPart D ε).restrict (⋃ c : AlgChart p σ D, c.e.source)
           + ((φ σ).chernPart D ε).restrict (⋃ c : AlgChart p σ D, c.e.source)ᶜ := by
         rw [hU, hzμ, hzν]

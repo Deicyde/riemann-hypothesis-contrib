@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem aux {ι : Type*} [DecidableEq ι] (t : Finset ι) (f : ι → ℂ)
-    (hf : ∀ i ∈ t, f i ≠ 0) (j : ℕ) (hj : j ≤ t.card) :
-    (t.val.map (fun i => (f i)⁻¹)).esymm j * (t.val.map f).prod
+private theorem aux
+    {ι : Type*} [DecidableEq ι]
+    (t : Finset ι) (f : ι → ℂ) (hf : ∀ i ∈ t, f i ≠ 0)
+    (j : ℕ) (hj : j ≤ t.card)
+    : (t.val.map (fun i => (f i)⁻¹)).esymm j * (t.val.map f).prod
       = (t.val.map f).esymm (t.card - j) := by
   rw [Finset.esymm_map_val, Finset.esymm_map_val, Finset.sum_mul]
   refine Finset.sum_nbij' (fun u => t \ u) (fun u => t \ u) ?_ ?_ ?_ ?_ ?_
@@ -30,20 +32,25 @@ private theorem aux {ι : Type*} [DecidableEq ι] (t : Finset ι) (f : ι → �
     rw [h1, Finset.prod_inv_distrib]
     field_simp
 
-theorem UpperTheory.Reformulated.B.EsymmMapInvMulProd.esymm_inv :
-    ∀ (s : Multiset ℂ),
-    (∀ x ∈ s, x ≠ (0 : ℂ)) →
-      ∀ j ≤ s.card, (Multiset.map (fun (x : ℂ) ↦ x⁻¹) s).esymm j * s.prod = s.esymm (s.card - j) := by
+theorem UpperTheory.Reformulated.B.EsymmMapInvMulProd.esymm_inv
+    : ∀ (s : Multiset ℂ),
+      (∀ x ∈ s, x ≠ (0 : ℂ))
+        → ∀ j ≤ s.card,
+          (Multiset.map (fun (x : ℂ) ↦ x⁻¹) s).esymm j * s.prod = s.esymm (s.card - j) := by
   intro s hs j hj
   classical
   have e : (Finset.univ : Finset s.ToType).val.map (fun x : s.ToType => (x : ℂ)) = s :=
     Multiset.map_univ_coe s
   have c : (Finset.univ : Finset s.ToType).card = s.card := by
     rw [Finset.card_univ, Multiset.card_coe]
-  have h := aux (Finset.univ : Finset s.ToType) (fun x : s.ToType => (x : ℂ))
-    (fun i _ => hs _ (Multiset.coe_mem)) j (by rw [c]; exact hj)
-  have e2 : (Finset.univ : Finset s.ToType).val.map (fun x : s.ToType => ((x : ℂ))⁻¹)
-      = s.map (fun x : ℂ => x⁻¹) := by
+  have h :=
+    aux (Finset.univ : Finset s.ToType)
+      (fun x : s.ToType => (x : ℂ))
+      (fun i _ => hs _ (Multiset.coe_mem))
+      j (by rw [c]; exact hj)
+  have e2
+      : (Finset.univ : Finset s.ToType).val.map (fun x : s.ToType => ((x : ℂ))⁻¹)
+        = s.map (fun x : ℂ => x⁻¹) := by
     conv_rhs => rw [← e]
     rw [Multiset.map_map]
     rfl

@@ -17,9 +17,11 @@ theorem partBase : PartBase := by
   haveI : ProperSpace V := FiniteDimensional.proper_real V
   haveI : LocallyCompactSpace Y' := Y'.isOpen.locallyCompactSpace
   haveI : SecondCountableTopology V := inferInstance
-  obtain ⟨f, hf⟩ := SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, V) (M := Y') isClosed_univ
-    (fun j => ((↑) : Y' → V) ⁻¹' D j) (fun j => (hD j).preimage continuous_subtype_val)
-    (fun x _ => Set.mem_iUnion.2 ⟨(x : V), hDp x x.2⟩)
+  obtain ⟨f, hf⟩ :=
+    SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, V) (M := Y') isClosed_univ
+      (fun j => ((↑) : Y' → V) ⁻¹' D j)
+      (fun j => (hD j).preimage continuous_subtype_val)
+      (fun x _ => Set.mem_iUnion.2 ⟨(x : V), hDp x x.2⟩)
   classical
   refine ⟨fun j p => if h : p ∈ Y then f j ⟨p, h⟩ else 0, ?_, ?_, ?_, ?_⟩
   · intro j x hx

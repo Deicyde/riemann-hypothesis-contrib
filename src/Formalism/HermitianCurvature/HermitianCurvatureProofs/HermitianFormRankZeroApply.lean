@@ -11,7 +11,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ZhatSectionE
 
 namespace Formalism.FourierDecayAlt.P.StabilizerDisintegration.HC
 
-open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.Ux2
+open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.Ux2
 open scoped ComplexConjugate
 
 noncomputable section
@@ -80,11 +81,15 @@ def mulC (x1 x2 : RC k j ρ) : RC k j ρ :=
 
 theorem rn_mul (x1 x2 : RC k j ρ) : Rn k j ρ x1 * Rn k j ρ x2 = Rn k j ρ (mulC x1 x2) := by
   rw [Ux3.rn_eq, Ux3.rn_eq, Ux3.rn_eq, block3_mul]
-  have hof : (Matrix.of (x1.1 + x2.1) : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ) = Matrix.of x1.1 + Matrix.of x2.1 := rfl
+  have hof
+      : (Matrix.of (x1.1 + x2.1) : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ)
+        = Matrix.of x1.1 + Matrix.of x2.1 :=
+    rfl
   simp only [mulC, hof, skewOf_add, kap, skewOf_skc (kap_skew _ _)]
-  refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;> (try simp only [hof, conjTranspose_add]) <;>
-    simp [-Matrix.of_add_of, Matrix.mul_assoc, Matrix.mul_add, Matrix.add_mul, conjTranspose_add, Matrix.mul_sub, Matrix.sub_mul,
-      Matrix.mul_smul, Matrix.smul_mul] <;> module
+  refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;> (try simp only [hof, conjTranspose_add])
+    <;> simp [-Matrix.of_add_of, Matrix.mul_assoc, Matrix.mul_add, Matrix.add_mul,
+      conjTranspose_add, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul]
+    <;> module
 
 end law
 
@@ -97,7 +102,8 @@ lemma mulVec_eB (M : B.Mat k (r + 0)) (y : Fin (2 * r + k + 1) → ℂ) (p : Ix 
   simp only [Matrix.mulVec, dotProduct]
   exact (Equiv.sum_comp (eB k r 0) (fun q => M (eB k r 0 p) q * y q)).symm
 
-def yb (y : Fin (2 * r + k + 1) → ℂ) (v : Fin (2 * 0 + k + 1)) : ℂ := y (eB k r 0 (Sum.inl (Sum.inr v)))
+def yb (y : Fin (2 * r + k + 1) → ℂ) (v : Fin (2 * 0 + k + 1)) : ℂ :=
+  y (eB k r 0 (Sum.inl (Sum.inr v)))
 
 lemma wb_ll {y : Fin (2 * r + k + 1) → ℂ} (hy : inWb k r y) (a : Fin r) : y (eB k r 0 (Sum.inl (Sum.inl a))) = 0 :=
   hy _ (Or.inl (by rw [eB_ll]; exact a.isLt))
@@ -105,7 +111,8 @@ lemma wb_ll {y : Fin (2 * r + k + 1) → ℂ} (hy : inWb k r y) (a : Fin r) : y 
 lemma wb_r {y : Fin (2 * r + k + 1) → ℂ} (hy : inWb k r y) (a : Fin r) : y (eB k r 0 (Sum.inr a)) = 0 :=
   hy _ (Or.inr (by rw [eB_r]; omega))
 
-def a12 (x : RC k r 0) : Matrix (Fin r) (Fin (2 * 0 + k + 1)) ℂ := -(G.wMat r * (Matrix.of x.1)ᴴ * Hpk k 0)
+def a12 (x : RC k r 0) : Matrix (Fin r) (Fin (2 * 0 + k + 1)) ℂ :=
+  -(G.wMat r * (Matrix.of x.1)ᴴ * Hpk k 0)
 
 lemma rn_mulVec (x : RC k r 0) {y : Fin (2 * r + k + 1) → ℂ} (hy : inWb k r y) :
     (∀ a, (Rn k r 0 x *ᵥ y) (eB k r 0 (Sum.inl (Sum.inl a))) = (a12 x *ᵥ yb y) a) ∧
@@ -203,8 +210,9 @@ lemma hb_last_ne {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) : hb z (
 def lastRow (z : Fin (2 * r + k + 1) → ℂ) (c : Fin (2 * 0 + k) → Fin r → ℂ) (a : Fin r) : ℂ :=
   -(∑ i, c i a * conj (hb z i.castSucc)) / conj (hb z (Fin.last (2 * 0 + k)))
 
-def extC (z : Fin (2 * r + k + 1) → ℂ) (c : Fin (2 * 0 + k) → Fin r → ℂ) : Fin (2 * 0 + k + 1) → Fin r → ℂ :=
-  fun v a => Fin.lastCases (lastRow z c a) (fun i => c i a) v
+def extC (z : Fin (2 * r + k + 1) → ℂ) (c : Fin (2 * 0 + k) → Fin r → ℂ)
+    : Fin (2 * 0 + k + 1) → Fin r → ℂ := fun v a =>
+  Fin.lastCases (lastRow z c a) (fun i => c i a) v
 
 lemma extC_add (z : Fin (2 * r + k + 1) → ℂ) (c c' : Fin (2 * 0 + k) → Fin r → ℂ) :
     extC z (c + c') = extC z c + extC z c' := by
@@ -274,8 +282,11 @@ def E (z : Fin (2 * r + k + 1) → ℂ) (x : X0 k r) : B.Mat k r := Rn k r 0 (em
 def mulX (z : Fin (2 * r + k + 1) → ℂ) (x1 x2 : X0 k r) : X0 k r :=
   (x1.1 + x2.1, x1.2 + x2.2 + kap (Matrix.of (extC z x1.1)) (Matrix.of (extC z x2.1)))
 
-theorem E_mul (z : Fin (2 * r + k + 1) → ℂ) (x1 x2 : X0 k r) : E z x1 * E z x2 = E z (mulX z x1 x2) := by
-  unfold E; rw [rn_mul]; congr 1
+theorem E_mul (z : Fin (2 * r + k + 1) → ℂ) (x1 x2 : X0 k r)
+    : E z x1 * E z x2 = E z (mulX z x1 x2) := by
+  unfold E
+  rw [rn_mul]
+  congr 1
   simp only [mulC, embX, mulX, extC_add]
 
 lemma w_mulVec_inj {d : ℕ} {v : Fin d → ℂ} (h : G.wMat d *ᵥ v = 0) : v = 0 := by
@@ -283,8 +294,8 @@ lemma w_mulVec_inj {d : ℕ} {v : Fin d → ℂ} (h : G.wMat d *ᵥ v = 0) : v =
   simp only [Matrix.mulVec_mulVec, wMat_sq, Matrix.one_mulVec, Matrix.mulVec_zero] at this
   exact this
 
-theorem rn_fix_z_iff {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (x : RC k r 0) :
-    Rn k r 0 x *ᵥ z = z ↔ Cstr z x.1 := by
+theorem rn_fix_z_iff {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (x : RC k r 0)
+    : Rn k r 0 x *ᵥ z = z ↔ Cstr z x.1 := by
   obtain ⟨h1, h2, h3⟩ := rn_mulVec x hz.1
   have ha : a12 x *ᵥ yb z = -(G.wMat r *ᵥ ((Matrix.of x.1)ᴴ *ᵥ hb z)) := by
     simp only [a12, hb, Matrix.neg_mulVec, Matrix.mulVec_mulVec, Matrix.mul_assoc]
@@ -313,7 +324,8 @@ lemma stabilizer_fixes_flag_vector {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.St
   rw [((Formalism.FourierDecayAlt.P.unipotent_map_frame k r z hz).1 n hS).1 b, hn.2]
   simp [Matrix.one_apply]
 
-theorem E_mem {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (x : X0 k r) : E z x ∈ C2.N0set k r z := by
+theorem E_mem {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (x : X0 k r)
+    : E z x ∈ C2.N0set k r z := by
   have hN : E z x ∈ Nset k r := rset_sub_nset (rn_rset (embX z x))
   refine ⟨hN, Formalism.FourierDecayAlt.P.Dx2.VV.uMap_fix hz fun b => ?_⟩
   unfold fvec
@@ -321,8 +333,9 @@ theorem E_mem {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (x : X0 k r
   · exact rn_col _ ⟨b.val, hb⟩
   · exact (rn_fix_z_iff hz _).2 (cstr_extC hz x.1)
 
-theorem stabilizer_subset_range {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {n : B.Mat k r}
-    (hn : n ∈ C2.N0set k r z) : ∃ x, E z x = n := by
+theorem stabilizer_subset_range
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {n : B.Mat k r} (hn : n ∈ C2.N0set k r z)
+    : ∃ x, E z x = n := by
   have hR : n ∈ Rset k r 0 := by
     refine ⟨hn.1.1, fun i b hb => ?_, fun i b hb1 hb2 hi => hn.1.2.2 i b hb1 (by omega) hi⟩
     have hf := stabilizer_fixes_flag_vector hz hn ⟨b.val, by omega⟩
@@ -335,7 +348,9 @@ theorem stabilizer_subset_range {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ 
   obtain ⟨x, rfl⟩ := rset_sub_range hR
   have hz' : Rn k r 0 x *ᵥ z = z := by
     have := stabilizer_fixes_flag_vector hz hn (Fin.last r)
-    unfold fvec at this; rw [dite_eq_right (by simp)] at this; exact this
+    unfold fvec at this
+    rw [dite_eq_right (by simp)] at this
+    exact this
   have hc := (cstr_iff hz x.1).1 ((rn_fix_z_iff hz x).1 hz')
   refine ⟨(fun i a => x.1 i.castSucc a, x.2), ?_⟩
   unfold E embX
@@ -348,18 +363,24 @@ section haar
 
 variable {k r : ℕ}
 
-theorem cont_uMap (z : Fin (2 * r + k + 1) → ℂ) : Continuous fun x : Mt k r => C2.uMap k r z (Matrix.of x) := by
+theorem cont_uMap (z : Fin (2 * r + k + 1) → ℂ)
+    : Continuous fun x : Mt k r => C2.uMap k r z (Matrix.of x) := by
   refine continuous_pi fun a => continuous_pi fun b => ?_
   show Continuous fun x : Mt k r => C2.uMap k r z (Matrix.of x) a b
   unfold C2.uMap
   split_ifs with h
-  · exact (B2x5.continuous_herm _).comp ((Continuous.matrix_mulVec continuous_id continuous_const).prodMk continuous_const)
-  · exact ((B2x5.continuous_herm _).comp ((Continuous.matrix_mulVec continuous_id continuous_const).prodMk
-      continuous_const)).div_const _
+  · exact (B2x5.continuous_herm _).comp
+      ((Continuous.matrix_mulVec continuous_id continuous_const).prodMk continuous_const)
+  · exact ((B2x5.continuous_herm _).comp
+      ((Continuous.matrix_mulVec continuous_id continuous_const).prodMk
+        continuous_const)).div_const _
 
-theorem isClosed_setOf_of_mem_n0set (z : Fin (2 * r + k + 1) → ℂ) : IsClosed {x : Mt k r | Matrix.of x ∈ C2.N0set k r z} := by
-  have h1 : IsClosed {x : Mt k r | Matrix.of x ∈ Nset k r} := (Formalism.FourierDecayAlt.P.unipotent_radical_closed k r).closed
-  have h2 : IsClosed {x : Mt k r | C2.uMap k r z (Matrix.of x) = 1} := isClosed_eq (cont_uMap z) continuous_const
+theorem isClosed_setOf_of_mem_n0set (z : Fin (2 * r + k + 1) → ℂ)
+    : IsClosed {x : Mt k r | Matrix.of x ∈ C2.N0set k r z} := by
+  have h1 : IsClosed {x : Mt k r | Matrix.of x ∈ Nset k r} :=
+    (Formalism.FourierDecayAlt.P.unipotent_radical_closed k r).closed
+  have h2 : IsClosed {x : Mt k r | C2.uMap k r z (Matrix.of x) = 1} :=
+    isClosed_eq (cont_uMap z) continuous_const
   exact h1.inter h2
 
 theorem cont_extC (z : Fin (2 * r + k + 1) → ℂ) : Continuous (extC (k := k) (r := r) z) := by
@@ -371,8 +392,9 @@ theorem cont_extC (z : Fin (2 * r + k + 1) → ℂ) : Continuous (extC (k := k) 
   · simp only [extC, Fin.lastCases_castSucc]
     exact continuous_apply_apply i a
 
-theorem cont_ofExtC (z : Fin (2 * r + k + 1) → ℂ) :
-    Continuous fun c : Fin (2 * 0 + k) → Fin r → ℂ => (Matrix.of (extC z c) : Matrix (Fin (2 * 0 + k + 1)) (Fin r) ℂ) :=
+theorem cont_ofExtC (z : Fin (2 * r + k + 1) → ℂ)
+    : Continuous fun c : Fin (2 * 0 + k) → Fin r → ℂ =>
+      (Matrix.of (extC z c) : Matrix (Fin (2 * 0 + k + 1)) (Fin r) ℂ) :=
   cont_extC z
 
 theorem cont_skc {j : ℕ} : Continuous fun M : Matrix (Fin j) (Fin j) ℂ => skc M := by
@@ -381,8 +403,10 @@ theorem cont_skc {j : ℕ} : Continuous fun M : Matrix (Fin j) (Fin j) ℂ => sk
   · exact continuous_apply_apply p.1.1 p.1.2
   · exact Complex.continuous_im.comp (continuous_apply_apply a a)
 
-theorem cont_kap {X : Type*} [TopologicalSpace X] {f g : X → Matrix (Fin (2 * 0 + k + 1)) (Fin r) ℂ}
-    (hf : Continuous f) (hg : Continuous g) : Continuous fun x => kap (f x) (g x) := by
+theorem cont_kap
+    {X : Type*} [TopologicalSpace X]
+    {f g : X → Matrix (Fin (2 * 0 + k + 1)) (Fin r) ℂ} (hf : Continuous f) (hg : Continuous g)
+    : Continuous fun x => kap (f x) (g x) := by
   unfold kap
   exact cont_skc.comp ((((hg.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul hf).sub
     ((hf.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul hg)).const_smul (1 / 2 : ℂ))
@@ -397,57 +421,74 @@ def Et (z : Fin (2 * r + k + 1) → ℂ) (x : X0 k r) : Mt k r := Matrix.of.symm
 
 theorem cont_Et (z : Fin (2 * r + k + 1) → ℂ) : Continuous (Et (k := k) (r := r) z) := by
   have h := Formalism.FourierDecayAlt.P.Dx2.SplitF.rn_cont (k := k) r 0
-  have he : Continuous fun x : X0 k r => embX z x := (cont_extC z).comp continuous_fst |>.prodMk continuous_snd
+  have he : Continuous fun x : X0 k r => embX z x :=
+    (cont_extC z).comp continuous_fst |>.prodMk continuous_snd
   exact h.comp he
 
-theorem mp_mulX_left (z : Fin (2 * r + k + 1) → ℂ) (x0 : X0 k r) :
-    MeasurePreserving (mulX z x0) volume volume := by
+theorem mp_mulX_left (z : Fin (2 * r + k + 1) → ℂ) (x0 : X0 k r)
+    : MeasurePreserving (mulX z x0) volume volume := by
   have hk : Continuous fun c : Fin (2 * 0 + k) → Fin r → ℂ =>
-      kap (Matrix.of (extC z x0.1)) (Matrix.of (extC z c)) := cont_kap continuous_const (cont_ofExtC z)
-  have := MeasurePreserving.skew_product (μa := (volume : Measure (Fin (2 * 0 + k) → Fin r → ℂ)))
-    (μc := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
-    (μd := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
-    (measurePreserving_add_left volume x0.1)
-    (g := fun c q => (x0.2 + kap (Matrix.of (extC z x0.1)) (Matrix.of (extC z c))) + q)
-    (((continuous_const.add (hk.comp continuous_fst)).add continuous_snd).measurable)
-    (Filter.Eventually.of_forall fun c => map_add_left_eq_self volume _)
-  have e : mulX z x0 = fun p : X0 k r =>
-      (x0.1 + p.1, (x0.2 + kap (Matrix.of (extC z x0.1)) (Matrix.of (extC z p.1))) + p.2) := by
+      kap (Matrix.of (extC z x0.1)) (Matrix.of (extC z c)) :=
+    cont_kap continuous_const (cont_ofExtC z)
+  have :=
+    MeasurePreserving.skew_product (μa := (volume : Measure (Fin (2 * 0 + k) → Fin r → ℂ)))
+      (μc := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
+      (μd := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
+      (measurePreserving_add_left volume x0.1)
+      (g := fun c q => (x0.2 + kap (Matrix.of (extC z x0.1)) (Matrix.of (extC z c))) + q)
+      (((continuous_const.add (hk.comp continuous_fst)).add continuous_snd).measurable)
+      (Filter.Eventually.of_forall fun c => map_add_left_eq_self volume _)
+  have e
+      : mulX z x0
+        = fun p : X0 k r =>
+          (x0.1 + p.1, (x0.2 + kap (Matrix.of (extC z x0.1)) (Matrix.of (extC z p.1))) + p.2) := by
     funext x; simp only [mulX]; refine Prod.ext rfl ?_; show x0.2 + x.2 + _ = (x0.2 + _) + x.2; abel
-  rw [e, Measure.volume_eq_prod]; exact this
+  rw [e, Measure.volume_eq_prod]
+  exact this
 
-theorem mp_mulX_right (z : Fin (2 * r + k + 1) → ℂ) (x0 : X0 k r) :
-    MeasurePreserving (fun x => mulX z x x0) volume volume := by
+theorem mp_mulX_right (z : Fin (2 * r + k + 1) → ℂ) (x0 : X0 k r)
+    : MeasurePreserving (fun x => mulX z x x0) volume volume := by
   have hk : Continuous fun c : Fin (2 * 0 + k) → Fin r → ℂ =>
-      kap (Matrix.of (extC z c)) (Matrix.of (extC z x0.1)) := cont_kap (cont_ofExtC z) continuous_const
-  have := MeasurePreserving.skew_product (μa := (volume : Measure (Fin (2 * 0 + k) → Fin r → ℂ)))
-    (μc := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
-    (μd := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
-    (measurePreserving_add_left volume x0.1)
-    (g := fun c q => (x0.2 + kap (Matrix.of (extC z c)) (Matrix.of (extC z x0.1))) + q)
-    (((continuous_const.add (hk.comp continuous_fst)).add continuous_snd).measurable)
-    (Filter.Eventually.of_forall fun c => map_add_left_eq_self volume _)
-  have e : (fun x => mulX z x x0) = fun p : X0 k r =>
-      (x0.1 + p.1, (x0.2 + kap (Matrix.of (extC z p.1)) (Matrix.of (extC z x0.1))) + p.2) := by
-    funext x; simp only [mulX]; refine Prod.ext (add_comm _ _) ?_
-    show x.2 + x0.2 + _ = (x0.2 + _) + x.2; abel
-  rw [e, Measure.volume_eq_prod]; exact this
+      kap (Matrix.of (extC z c)) (Matrix.of (extC z x0.1)) :=
+    cont_kap (cont_ofExtC z) continuous_const
+  have :=
+    MeasurePreserving.skew_product (μa := (volume : Measure (Fin (2 * 0 + k) → Fin r → ℂ)))
+      (μc := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
+      (μd := (volume : Measure ((G.UT r → ℂ) × (Fin r → ℝ))))
+      (measurePreserving_add_left volume x0.1)
+      (g := fun c q => (x0.2 + kap (Matrix.of (extC z c)) (Matrix.of (extC z x0.1))) + q)
+      (((continuous_const.add (hk.comp continuous_fst)).add continuous_snd).measurable)
+      (Filter.Eventually.of_forall fun c => map_add_left_eq_self volume _)
+  have e
+      : (fun x => mulX z x x0)
+        = fun p : X0 k r =>
+          (x0.1 + p.1, (x0.2 + kap (Matrix.of (extC z p.1)) (Matrix.of (extC z x0.1))) + p.2) := by
+    funext x
+    simp only [mulX]
+    refine Prod.ext (add_comm _ _) ?_
+    show x.2 + x0.2 + _ = (x0.2 + _) + x.2
+    abel
+  rw [e, Measure.volume_eq_prod]
+  exact this
 
 def cOf (M : Mt k r) : Matrix (Fin (2 * 0 + k + 1)) (Fin r) ℂ :=
   Matrix.of fun v a => M (eB k r 0 (Sum.inl (Sum.inr v))) (eB k r 0 (Sum.inr a))
 
 def sOf (M : Mt k r) : Matrix (Fin r) (Fin r) ℂ :=
-  G.wMat r * (Matrix.of fun a b => M (eB k r 0 (Sum.inl (Sum.inl a))) (eB k r 0 (Sum.inr b))) +
-    (1 / 2 : ℂ) • ((cOf M)ᴴ * Hpk k 0 * cOf M)
+  G.wMat r * (Matrix.of fun a b => M (eB k r 0 (Sum.inl (Sum.inl a))) (eB k r 0 (Sum.inr b)))
+    + (1 / 2 : ℂ) • ((cOf M)ᴴ * Hpk k 0 * cOf M)
 
 def Rd (M : Mt k r) : X0 k r := (fun i a => cOf M i.castSucc a, skc (sOf M))
 
 theorem cont_Rd : Continuous (Rd (k := k) (r := r)) := by
   have hc : Continuous (cOf (k := k) (r := r)) :=
-    continuous_pi fun v => continuous_pi fun a => by simp only [cOf, Matrix.of_apply]; exact continuous_apply_apply _ _
+    continuous_pi fun v =>
+      continuous_pi fun a => by simp only [cOf, Matrix.of_apply]; exact continuous_apply_apply _ _
   have h13 : Continuous fun M : Mt k r =>
-      (Matrix.of fun a b => M (eB k r 0 (Sum.inl (Sum.inl a))) (eB k r 0 (Sum.inr b)) : Matrix (Fin r) (Fin r) ℂ) :=
-    continuous_pi fun a => continuous_pi fun b => by simp only [Matrix.of_apply]; exact continuous_apply_apply _ _
+      (Matrix.of fun a b => M (eB k r 0 (Sum.inl (Sum.inl a))) (eB k r 0 (Sum.inr b))
+        : Matrix (Fin r) (Fin r) ℂ) :=
+    continuous_pi fun a =>
+      continuous_pi fun b => by simp only [Matrix.of_apply]; exact continuous_apply_apply _ _
   refine Continuous.prodMk (continuous_pi fun i => continuous_pi fun a => ?_) (cont_skc.comp ?_)
   · exact (continuous_apply a).comp ((continuous_apply i.castSucc).comp hc)
   · exact (continuous_const.matrix_mul h13).add
@@ -463,34 +504,42 @@ theorem Rd_Et (z : Fin (2 * r + k + 1) → ℂ) (x : X0 k r) : Rd (Et z x) = x :
   have hc : cOf (Et z x) = Matrix.of (extC z x.1) := by
     ext v a; simp [cOf, Et, E, embX, Ux3.rn_eq, block3_apply]
   have hs : sOf (Et z x) = skewOf x.2 := by
-    have h13 : (Matrix.of fun a b => (Et z x) (eB k r 0 (Sum.inl (Sum.inl a))) (eB k r 0 (Sum.inr b)) :
-        Matrix (Fin r) (Fin r) ℂ) = G.wMat r * ((-(1 / 2 : ℂ)) • ((Matrix.of (extC z x.1))ᴴ * Hpk k 0 *
-          Matrix.of (extC z x.1)) + skewOf x.2) := by
+    have h13
+        : (Matrix.of fun a b => (Et z x) (eB k r 0 (Sum.inl (Sum.inl a))) (eB k r 0 (Sum.inr b))
+            : Matrix (Fin r) (Fin r) ℂ)
+          = G.wMat r
+            * ((-(1 / 2 : ℂ)) • ((Matrix.of (extC z x.1))ᴴ * Hpk k 0 * Matrix.of (extC z x.1))
+              + skewOf x.2) := by
       ext a b; simp [Et, E, embX, Ux3.rn_eq, block3_apply]
-    unfold sOf; rw [h13, hc, wMat_sq_assoc]
+    unfold sOf
+    rw [h13, hc, wMat_sq_assoc]
     module
-  unfold Rd; rw [hs, skc_skewOf]
+  unfold Rd
+  rw [hs, skc_skewOf]
   refine Prod.ext ?_ rfl
-  funext i a; rw [hc]; simp [extC]
+  funext i a
+  rw [hc]
+  simp [extC]
 
 def mu0 (z : Fin (2 * r + k + 1) → ℂ) : Measure (Mt k r) := (volume : Measure (X0 k r)).map (Et z)
 
-theorem isHaar_stabilizer_measure {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) : B.IsHaarOn (C2.N0set k r z) (mu0 z) := by
+theorem isHaar_stabilizer_measure {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z)
+    : B.IsHaarOn (C2.N0set k r z) (mu0 z) := by
   have hm : Measurable (Et (k := k) (r := r) z) := (cont_Et z).measurable
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · show mu0 z ({x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ) = 0
     unfold mu0
     rw [Measure.map_apply hm (isClosed_setOf_of_mem_n0set z).measurableSet.compl]
     have : Et z ⁻¹' {x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ = ∅ := by
-      ext x; simp only [Set.mem_preimage, Set.mem_compl_iff, Set.mem_empty_iff_false, iff_false, not_not]
+      ext x
+      simp only [Set.mem_preimage, Set.mem_compl_iff, Set.mem_empty_iff_false, iff_false, not_not]
       exact E_mem hz x
     rw [this, measure_empty]
   · intro a ha
     obtain ⟨x0, rfl⟩ := stabilizer_subset_range hz ha
     unfold mu0
     rw [Measure.map_map (Formalism.FourierDecayAlt.P.Dx2.OrbJ.contL _).measurable hm]
-    have e : lmulM (E z x0) ∘ Et z = Et z ∘ mulX z x0 := by
-      funext x; exact E_mul z x0 x
+    have e : lmulM (E z x0) ∘ Et z = Et z ∘ mulX z x0 := by funext x; exact E_mul z x0 x
     rw [e, ← Measure.map_map hm (mp_mulX_left z x0).measurable, (mp_mulX_left z x0).map_eq]
   · intro a ha
     obtain ⟨x0, rfl⟩ := stabilizer_subset_range hz ha
@@ -509,8 +558,11 @@ theorem isHaar_stabilizer_measure {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.Std
   · unfold mu0
     refine (Measure.map_ne_zero_iff hm.aemeasurable).mpr ?_
     intro h0
-    have := (Measure.IsOpenPosMeasure.open_pos (μ := (volume : Measure (X0 k r))) Set.univ isOpen_univ Set.univ_nonempty)
-    rw [h0] at this; exact this rfl
+    have :=
+      (Measure.IsOpenPosMeasure.open_pos (μ := (volume : Measure (X0 k r))) Set.univ isOpen_univ
+        Set.univ_nonempty)
+    rw [h0] at this
+    exact this rfl
 
 end haar
 
@@ -572,10 +624,17 @@ lemma inv_GV {g : B.Mat k r} (hg : g ∈ B.GV k r) : g⁻¹ = Hpk k r * gᴴ * H
   rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, h, hH]
 
 def mXa (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) : B.Mat k r := fun i j =>
-  if hi : i.val < r then (if hj : j.val < r then vX ⟨i.val, hi⟩ ⟨j.val, hj⟩ else 0)
+  if hi : i.val < r then
+    (if hj : j.val < r then vX ⟨i.val, hi⟩ ⟨j.val, hj⟩ else 0)
   else if hi' : r + k < i.val then
-    (if hj' : r + k < j.val then (vXᴴ).adjugate ⟨2 * r + k - i.val, by omega⟩ ⟨2 * r + k - j.val, by omega⟩ else 0)
-  else if i = j then 1 else 0
+    (if hj' : r + k < j.val then
+       (vXᴴ).adjugate ⟨2 * r + k - i.val, by omega⟩ ⟨2 * r + k - j.val, by omega⟩
+     else
+       0)
+  else if i = j then
+    1
+  else
+    0
 
 lemma mX_eq {vX : Matrix (Fin r) (Fin r) ℂ} (h : vX.det = 1) : C2.mX k r vX = mXa k r vX := by
   have hi : (vXᴴ)⁻¹ = (vXᴴ).adjugate := by
@@ -615,12 +674,14 @@ lemma sub_upper_mem (u : G.UT (r + 1) → ℂ) :
   have h := upper_mem u
   refine ⟨fun i j hij => h.1 _ _ (Fin.castSucc_lt_castSucc_iff.mpr hij), fun i => h.2 _⟩
 
-theorem cont_tauU (z : Fin (2 * r + k + 1) → ℂ) :
-    Continuous fun u : G.UT (r + 1) → ℂ => C2.tauM k r z (G.upper u) := by
+theorem cont_tauU (z : Fin (2 * r + k + 1) → ℂ)
+    : Continuous fun u : G.UT (r + 1) → ℂ => C2.tauM k r z (G.upper u) := by
   have hup : Continuous (G.upper (d := r + 1)) := Formalism.FourierDecayAlt.P.Dx2.SL.cont_upper
-  have e : (fun u : G.UT (r + 1) → ℂ => C2.tauM k r z (G.upper u)) = fun u =>
-      C2.nEich k r z (fun a => G.upper u a.castSucc (Fin.last r)) *
-        mXa k r ((G.upper u).submatrix Fin.castSucc Fin.castSucc) := by
+  have e
+      : (fun u : G.UT (r + 1) → ℂ => C2.tauM k r z (G.upper u))
+        = fun u =>
+          C2.nEich k r z (fun a => G.upper u a.castSucc (Fin.last r))
+            * mXa k r ((G.upper u).submatrix Fin.castSucc Fin.castSucc) := by
     funext u
     unfold C2.tauM
     rw [mX_eq (det_UT (sub_upper_mem u))]
@@ -679,11 +740,16 @@ lemma mul_upper_sub {m : ℕ} {A : Matrix (Fin m) (Fin m) ℂ} (hA : A ∈ C2.UT
     simp [G.upper, G.strictUpper, hij, ne_of_lt hij, Matrix.one_apply]
   rw [hx]; ring
 
-theorem mp_UTleft {m : ℕ} {A : Matrix (Fin m) (Fin m) ℂ} (hA : A ∈ C2.UTset m) :
-    MeasurePreserving (fun u : G.UT m → ℂ => StabilizerDisintegration.utc (A * G.upper u)) volume volume := by
-  refine Formalism.FourierDecayAlt.P.ShearMeasurability.shear_mp (fun q : G.UT m => q.1.2.val - q.1.1.val) _ ?_ ?_
+theorem mp_UTleft {m : ℕ} {A : Matrix (Fin m) (Fin m) ℂ} (hA : A ∈ C2.UTset m)
+    : MeasurePreserving
+      (fun u : G.UT m → ℂ => StabilizerDisintegration.utc (A * G.upper u))
+      volume volume := by
+  refine Formalism.FourierDecayAlt.P.ShearMeasurability.shear_mp
+    (fun q : G.UT m => q.1.2.val - q.1.1.val)
+    _ ?_ ?_
   · refine Measurable.of_eval fun q => ?_
-    exact ((continuous_const.matrix_mul Formalism.FourierDecayAlt.P.Dx2.SL.cont_upper).matrix_elem q.1.1 q.1.2).measurable
+    exact ((continuous_const.matrix_mul Formalism.FourierDecayAlt.P.Dx2.SL.cont_upper).matrix_elem
+      q.1.1 q.1.2).measurable
   · intro q x y hxy
     show (A * G.upper x) q.1.1 q.1.2 - x q = (A * G.upper y) q.1.1 q.1.2 - y q
     rw [mul_upper_sub hA, mul_upper_sub hA]
@@ -753,9 +819,11 @@ lemma Phi_S {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {a : B.Mat k 
   rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
     Matrix.mul_nonsing_inv _ ((Formalism.FourierDecayAlt.P.unipotent_radical_closed k r).unit _ hT1), Matrix.one_mul, Matrix.mul_assoc]
 
-theorem disint {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {μ0 μN : Measure (Mt k r)}
-    (h0 : B.IsHaarOn (C2.N0set k r z) μ0) (hN : B.IsHaarOn (Nset k r) μN) :
-    ∃ c : NNReal, 0 < c ∧ μN = c • ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0).map (Phi z) := by
+theorem disint
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z)
+    {μ0 μN : Measure (Mt k r)} (h0 : B.IsHaarOn (C2.N0set k r z) μ0) (hN : B.IsHaarOn (Nset k r) μN)
+    : ∃ c : NNReal,
+      0 < c ∧ μN = c • ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0).map (Phi z) := by
   have hNc := Formalism.FourierDecayAlt.P.unipotent_radical_closed k r
   haveI := Formalism.FourierDecayAlt.P.Dx2.OrbJ.sigmaF h0
   haveI := Formalism.FourierDecayAlt.P.Dx2.OrbJ.fmoc h0
@@ -764,8 +832,10 @@ theorem disint {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {μ0 μN :
   have hNcl : IsClosed {x : Mt k r | Matrix.of x ∈ Nset k r} := hNc.closed
   have hN0cl : IsClosed {x : Mt k r | Matrix.of x ∈ C2.N0set k r z} := isClosed_setOf_of_mem_n0set z
   have h0c : μ0 {x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ = 0 := h0.conc
-  have hbad : ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0)
-      (Set.univ ×ˢ {x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ) = 0 := by
+  have hbad
+      : ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0)
+          (Set.univ ×ˢ {x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ)
+        = 0 := by
     rw [Measure.prod_prod, h0c, mul_zero]
 
   have hconc : P {x : Mt k r | Matrix.of x ∈ Nset k r}ᶜ = 0 := by
@@ -777,17 +847,25 @@ theorem disint {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {μ0 μN :
   have hleft : ∀ a ∈ Nset k r, P.map (lmulM a) = P := by
     intro a ha
     have hA := uMap_UT hz ha
-    have hS : MeasurePreserving (fun p : (G.UT (r + 1) → ℂ) × Mt k r =>
-        (StabilizerDisintegration.utc (C2.uMap k r z a * G.upper p.1), lmulM (bC z a p.1) p.2))
-        ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0) ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0) := by
-      refine MeasurePreserving.skew_product (mp_UTleft hA) (g := fun u n => lmulM (bC z a u) n) ?_
-        (Filter.Eventually.of_forall fun u => h0.left _ (bC_mem hz ha u))
-      have hcb : Continuous fun p : (G.UT (r + 1) → ℂ) × Mt k r => (lmulM (bC z a p.1) p.2 : Mt k r) :=
+    have hS : MeasurePreserving
+        (fun p : (G.UT (r + 1) → ℂ) × Mt k r =>
+          (StabilizerDisintegration.utc (C2.uMap k r z a * G.upper p.1), lmulM (bC z a p.1) p.2))
+        ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0)
+        ((volume : Measure (G.UT (r + 1) → ℂ)).prod μ0) := by
+      refine MeasurePreserving.skew_product (mp_UTleft hA)
+        (g := fun u n => lmulM (bC z a u) n)
+        ?_ (Filter.Eventually.of_forall fun u => h0.left _ (bC_mem hz ha u))
+      have hcb
+          : Continuous fun p : (G.UT (r + 1) → ℂ) × Mt k r => (lmulM (bC z a p.1) p.2 : Mt k r) :=
         ((cont_bC z a ha hz).comp continuous_fst).matrix_mul continuous_snd
       exact hcb.measurable
     rw [hP, Measure.map_map (Formalism.FourierDecayAlt.P.Dx2.OrbJ.contL a).measurable hPm]
-    have e : lmulM a ∘ Phi z = Phi z ∘ fun p : (G.UT (r + 1) → ℂ) × Mt k r =>
-        (StabilizerDisintegration.utc (C2.uMap k r z a * G.upper p.1), lmulM (bC z a p.1) p.2) := by
+    have e
+        : lmulM a ∘ Phi z
+          = Phi z ∘ fun p : (G.UT (r + 1) → ℂ) × Mt k r => (
+            StabilizerDisintegration.utc (C2.uMap k r z a * G.upper p.1),
+            lmulM (bC z a p.1) p.2
+          ) := by
       funext p; exact (Phi_S hz ha p).symm
     rw [e, ← Measure.map_map hPm hS.measurable, hS.map_eq]
 
@@ -801,7 +879,10 @@ theorem disint {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {μ0 μN :
     have hf2 : Continuous f2 :=
       ((continuous_const.matrix_mul ((cont_tauU z).comp hf1).matrix_conjTranspose).matrix_mul
         continuous_const).matrix_mul continuous_id
-    have hsub : Phi z ⁻¹' K ⊆ ((f1 '' K) ×ˢ (f2 '' K)) ∪ (Set.univ ×ˢ {x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ) := by
+    have hsub
+        : Phi z ⁻¹' K
+          ⊆ ((f1 '' K) ×ˢ (f2 '' K))
+            ∪ (Set.univ ×ˢ {x : Mt k r | Matrix.of x ∈ C2.N0set k r z}ᶜ) := by
       intro p hp
       by_cases h2 : Matrix.of p.2 ∈ C2.N0set k r z
       · left
@@ -819,7 +900,9 @@ theorem disint {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {μ0 μN :
     refine (measure_mono hsub).trans_lt ((measure_union_le _ _).trans_lt ?_)
     rw [hbad, add_zero, Measure.prod_prod]
     exact ENNReal.mul_lt_top ((hK.image hf1).measure_lt_top) ((hK.image hf2).measure_lt_top)
-  obtain ⟨c, hc⟩ := Formalism.FourierDecayAlt.P.haar_measure_unique_up_to_scalar k r (Nset k r) μN P hNc hN hconc hleft hfin
+  obtain ⟨c, hc⟩ :=
+    Formalism.FourierDecayAlt.P.haar_measure_unique_up_to_scalar k r (Nset k r) μN P hNc hN hconc
+      hleft hfin
   have hP0 : P ≠ 0 := by
     rw [hP]
     refine (Measure.map_ne_zero_iff hPm.aemeasurable).mpr ?_
@@ -831,8 +914,7 @@ theorem disint {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {μ0 μN :
       (Measure.IsOpenPosMeasure.open_pos Set.univ isOpen_univ Set.univ_nonempty)
     have hm : μ0 Set.univ ≠ 0 := Measure.measure_univ_ne_zero.mpr h0.ne_zero
     exact mul_ne_zero hv hm this
-  have hc0 : c ≠ 0 := by
-    rintro rfl; rw [zero_smul] at hc; exact hP0 hc
+  have hc0 : c ≠ 0 := by rintro rfl; rw [zero_smul] at hc; exact hP0 hc
   refine ⟨c⁻¹, inv_pos.mpr (pos_iff_ne_zero.mpr hc0), ?_⟩
   rw [hc, smul_smul, inv_mul_cancel₀ hc0, one_smul]
 
@@ -844,7 +926,8 @@ end Formalism.FourierDecayAlt.P.StabilizerDisintegration.HC
 
 namespace Formalism.FourierDecayAlt.P.StabilizerDisintegration
 
-theorem exists_haar_stabilizer : ExistsHaarStabilizer := fun k r z hz => ⟨HC.mu0 z, HC.isHaar_stabilizer_measure hz⟩
+theorem exists_haar_stabilizer : ExistsHaarStabilizer := fun k r z hz =>
+  ⟨HC.mu0 z, HC.isHaar_stabilizer_measure hz⟩
 
 theorem disintN : DisintN := fun k r z hz μ0 μN h0 hN => HC.disint hz h0 hN
 

@@ -25,8 +25,7 @@ section Bounded
 
 variable {K n : Type*} [NormedField K]
 
-def EntriesBounded (M : Matrix n n K) (c : ℝ) : Prop :=
-  ∀ i j, ‖M i j‖ ≤ c
+def EntriesBounded (M : Matrix n n K) (c : ℝ) : Prop := ∀ i j, ‖M i j‖ ≤ c
 
 end Bounded
 
@@ -61,8 +60,8 @@ def sigmaSplit (j : ι) : (Σ i, F i) ≃ F j ⊕ (Σ i : {i // i ≠ j}, F i.1)
 theorem sigmaSplit_self (j : ι) (x : F j) : sigmaSplit F j ⟨j, x⟩ = Sum.inl x :=
   (Equiv.apply_eq_iff_eq_symm_apply _).2 rfl
 
-theorem sigmaSplit_of_ne {i j : ι} (h : i ≠ j) (x : F i) :
-    sigmaSplit F j ⟨i, x⟩ = Sum.inr ⟨⟨i, h⟩, x⟩ :=
+theorem sigmaSplit_of_ne {i j : ι} (h : i ≠ j) (x : F i)
+    : sigmaSplit F j ⟨i, x⟩ = Sum.inr ⟨⟨i, h⟩, x⟩ :=
   (Equiv.apply_eq_iff_eq_symm_apply _).2 rfl
 
 end Split

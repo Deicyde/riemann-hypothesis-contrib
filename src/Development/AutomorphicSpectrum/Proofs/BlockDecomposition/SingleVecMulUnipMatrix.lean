@@ -9,16 +9,17 @@ noncomputable section
 
 open NumberField Filter Topology Matrix
 open scoped NumberField.AdeleRing
-open GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-  GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+open GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+  GroundTheory.Automorphic.CuspidalSpectrum
 open PositivityTheory.Rg.Rs.An
 
 namespace GlobalTheory.CompanionTheory.SiegelEscape
 
 variable {K : Type} [Field K] [NumberField K] {n : ℕ}
 
-theorem exists_eq_of_mem_lat {γ : AdelicGLn.AdelicGL K n} (hγ : γ ∈ lat K n) :
-    ∃ (γ₀ : GL (Fin n) K) (u : IdeleGroup K),
+theorem exists_eq_of_mem_lat {γ : AdelicGLn.AdelicGL K n} (hγ : γ ∈ lat K n)
+    : ∃ (γ₀ : GL (Fin n) K) (u : IdeleGroup K),
       γ = AdelicGLn.diagonal K n γ₀ * scalarUnits K n u := by
   set s : IdeleGroup K := posIdele (Real.exp 1) (Real.exp_pos _) with hs
   have hz : (tor K fun _ : Fin n => (1 : ℝ)) = scalarUnits K n s := rfl
@@ -27,17 +28,21 @@ theorem exists_eq_of_mem_lat {γ : AdelicGLn.AdelicGL K n} (hγ : γ ∈ lat K n
     obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.1 hx
     rw [hz, ← map_zpow, ← scalarUnits_mul_comm, mul_inv_cancel_right, map_zpow]
     exact Subgroup.zpow_mem_zpowers _ _
-  have h := Subgroup.mul_normal (AdelicGLn.diagonal K n).range
-    (Subgroup.zpowers (tor K fun _ : Fin n => (1 : ℝ)))
-  have hγ' : γ ∈ (↑((AdelicGLn.diagonal K n).range ⊔
-      Subgroup.zpowers (tor K fun _ : Fin n => (1 : ℝ))) : Set (AdelicGLn.AdelicGL K n)) := hγ
+  have h :=
+    Subgroup.mul_normal (AdelicGLn.diagonal K n).range
+      (Subgroup.zpowers (tor K fun _ : Fin n => (1 : ℝ)))
+  have hγ'
+      : γ
+        ∈ (↑((AdelicGLn.diagonal K n).range ⊔ Subgroup.zpowers (tor K fun _ : Fin n => (1 : ℝ)))
+          : Set (AdelicGLn.AdelicGL K n)) :=
+    hγ
   rw [h] at hγ'
   obtain ⟨a, ⟨γ₀, rfl⟩, b, hb, rfl⟩ := Set.mem_mul.1 hγ'
   obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.1 hb
   exact ⟨γ₀, s ^ k, by rw [hz, map_zpow]⟩
 
-theorem detModule_scalarUnits (u : IdeleGroup K) :
-    (detModule K n (scalarUnits K n u) : ℝ) = (ideleModule K u : ℝ) ^ n := by
+theorem detModule_scalarUnits (u : IdeleGroup K)
+    : (detModule K n (scalarUnits K n u) : ℝ) = (ideleModule K u : ℝ) ^ n := by
   rw [detModule, MonoidHom.comp_apply, scalarUnits_apply, det_diagUnits, map_prod,
     coe_finset_prod_pos]
   simp
@@ -48,10 +53,12 @@ theorem detModule_unipGL {r : ℕ} (X : UPos n r → 𝔸[K]) : detModule K n (u
 theorem detModule_diagonal (γ₀ : GL (Fin n) K) : detModule K n (AdelicGLn.diagonal K n γ₀) = 1 :=
   mem_normOneGL_iff_detModule.1 (rationalGL_le_normOneGL ⟨γ₀, rfl⟩)
 
-theorem detModule_aR {r : ℕ} (hr : r ≤ n) (t : ℝ) :
-    (detModule K n (aR K n r t) : ℝ) = Real.exp (r * t) ^ Module.finrank ℚ K := by
-  have h := ideleModule_det_diagUnits_posIdele (K := K) (n := n)
-    (fun i : Fin n => Real.exp (if (i : ℕ) < r then t else 0)) (fun _ => Real.exp_pos _)
+theorem detModule_aR {r : ℕ} (hr : r ≤ n) (t : ℝ)
+    : (detModule K n (aR K n r t) : ℝ) = Real.exp (r * t) ^ Module.finrank ℚ K := by
+  have h :=
+    ideleModule_det_diagUnits_posIdele (K := K) (n := n)
+      (fun i : Fin n => Real.exp (if (i : ℕ) < r then t else 0))
+      (fun _ => Real.exp_pos _)
   have h2 : ∏ i : Fin n, Real.exp (if (i : ℕ) < r then t else 0) = Real.exp (r * t) := by
     rw [← Real.exp_sum]
     congr 1
@@ -67,17 +74,18 @@ theorem ratVec_single (l : Fin n) : ratVec (Pi.single l (1 : K)) = Pi.single l (
   · subst h; simp [ratVec]
   · simp [ratVec, h]
 
-theorem single_vecMul_unipMatrix {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ)) (X : UPos n r → 𝔸[K]) :
-    Pi.single l (1 : 𝔸[K]) ᵥ* unipMatrix X = Pi.single l (1 : 𝔸[K]) := by
-  have h : ¬ ((l : ℕ) < r) := by omega
+theorem single_vecMul_unipMatrix {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ)) (X : UPos n r → 𝔸[K])
+    : Pi.single l (1 : 𝔸[K]) ᵥ* unipMatrix X = Pi.single l (1 : 𝔸[K]) := by
+  have h : ¬((l : ℕ) < r) := by omega
   ext1 j
   rw [Matrix.single_one_vecMul]
   simp [unipMatrix, blockEntry_apply, h, Matrix.one_apply, Pi.single_apply, eq_comm]
 
-theorem single_vecMul_aR {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ)) (t : ℝ) :
-    Pi.single l (1 : 𝔸[K]) ᵥ* ((aR K n r t : AdelicGLn.AdelicGL K n) : Matrix (Fin n) (Fin n) 𝔸[K]) =
-      Pi.single l (1 : 𝔸[K]) := by
-  have h : ¬ ((l : ℕ) < r) := by omega
+theorem single_vecMul_aR {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ)) (t : ℝ)
+    : Pi.single l (1 : 𝔸[K])
+        ᵥ* ((aR K n r t : AdelicGLn.AdelicGL K n) : Matrix (Fin n) (Fin n) 𝔸[K])
+      = Pi.single l (1 : 𝔸[K]) := by
+  have h : ¬((l : ℕ) < r) := by omega
   have h1 : ∀ (ρ : ℝ) (hρ : 0 < ρ), ρ = 1 → posIdele (K := K) ρ hρ = 1 := by
     rintro _ _ rfl
     exact map_one (posIdeleHom K)
@@ -90,18 +98,21 @@ theorem single_vecMul_aR {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ)) (t : ℝ) 
     simp
   · simp [Pi.single_apply, hj]
 
-theorem height_eq {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ)) (γ₀ : GL (Fin n) K) (u : IdeleGroup K)
-    (X : UPos n r → 𝔸[K]) (t : ℝ) (q : AdelicGLn.AdelicGL K n) :
-    Reduction.height (AdelicGLn.diagonal K n γ₀ * scalarUnits K n u * (unipGL X * aR K n r t * q))
-        (Pi.single l (1 : K) ᵥ* ((γ₀⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) =
-      (ideleModule K u : ℝ) *
-        adelicNorm (Pi.single l (1 : 𝔸[K]) ᵥ* (q : Matrix (Fin n) (Fin n) 𝔸[K])) := by
+theorem height_eq
+    {r : ℕ} {l : Fin n} (hl : r ≤ (l : ℕ))
+    (γ₀ : GL (Fin n) K) (u : IdeleGroup K) (X : UPos n r → 𝔸[K]) (t : ℝ)
+    (q : AdelicGLn.AdelicGL K n)
+    : Reduction.height (AdelicGLn.diagonal K n γ₀ * scalarUnits K n u * (unipGL X * aR K n r t * q))
+        (Pi.single l (1 : K) ᵥ* ((γ₀⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K))
+      = (ideleModule K u : ℝ)
+        * adelicNorm (Pi.single l (1 : 𝔸[K]) ᵥ* (q : Matrix (Fin n) (Fin n) 𝔸[K])) := by
   rw [mul_assoc, height_diagonal_mul, Matrix.vecMul_vecMul, ← Units.val_mul, inv_mul_cancel,
     Units.val_one, Matrix.vecMul_one, Reduction.height, ratVec_single, Units.val_mul, Units.val_mul,
     Units.val_mul, ← Matrix.vecMul_vecMul, ← Matrix.vecMul_vecMul, ← Matrix.vecMul_vecMul,
     coe_unipGL, scalarUnits_apply, coe_diagUnits]
-  have h0 : Pi.single l (1 : 𝔸[K]) ᵥ* Matrix.diagonal (fun _ : Fin n => ((u : IdeleGroup K) : 𝔸[K])) =
-      ((u : IdeleGroup K) : 𝔸[K]) • Pi.single l (1 : 𝔸[K]) := by
+  have h0
+      : Pi.single l (1 : 𝔸[K]) ᵥ* Matrix.diagonal (fun _ : Fin n => ((u : IdeleGroup K) : 𝔸[K]))
+        = ((u : IdeleGroup K) : 𝔸[K]) • Pi.single l (1 : 𝔸[K]) := by
     ext1 j
     rw [Matrix.vecMul_diagonal]
     simp [mul_comm]
@@ -140,8 +151,7 @@ theorem escape : Escape := by
   have hd0 : d ≠ 0 := Module.finrank_pos.ne'
   have hr0 : (0 : ℝ) < r := Nat.cast_pos.2 hr
   have htend : Tendsto (fun t : ℝ => Real.exp (r * t) ^ d) atTop atTop :=
-    (tendsto_pow_atTop hd0).comp
-      (Real.tendsto_exp_atTop.comp (tendsto_id.const_mul_atTop hr0))
+    (tendsto_pow_atTop hd0).comp (Real.tendsto_exp_atTop.comp (tendsto_id.const_mul_atTop hr0))
   filter_upwards [htend.eventually_gt_atTop (B / (c ^ n * b))] with t ht γ hγ X _ q hq hmem
   obtain ⟨γ₀, u, rfl⟩ := exists_eq_of_mem_lat hγ
   set E : ℝ := (ideleModule K u : ℝ) with hE
@@ -170,8 +180,8 @@ theorem escape : Escape := by
   have hcn : 0 < c ^ n := pow_pos hcpos _
   have h4 : c ^ n * (Real.exp (r * t) ^ d * b) ≤ B := by
     refine le_trans ?_ hle
-    exact mul_le_mul (pow_le_pow_left₀ hcpos.le hcE n)
-      (mul_le_mul_of_nonneg_left hbq hexp.le) (mul_pos hexp hb).le (pow_pos hEpos _).le
+    exact mul_le_mul (pow_le_pow_left₀ hcpos.le hcE n) (mul_le_mul_of_nonneg_left hbq hexp.le)
+      (mul_pos hexp hb).le (pow_pos hEpos _).le
   rw [div_lt_iff₀ (mul_pos hcn hb)] at ht
   nlinarith [ht, h4]
 

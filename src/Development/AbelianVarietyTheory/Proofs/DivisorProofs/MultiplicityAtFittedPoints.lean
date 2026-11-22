@@ -30,12 +30,12 @@ open GlobalTheory.SignedHC
 
 variable (D : D7) (C : ℝ) (τ : D.what₂.Tau)
 
-theorem weightX_zero_bounds {x : ℚ} (hx : x ∈ (num D C τ).weightX 0) :
-    ((num D C τ).v D.R.k : ℚ) - 1 / 2 ≤ x ∧ x ≤ (num D C τ).a 0 := by
+theorem weightX_zero_bounds {x : ℚ} (hx : x ∈ (num D C τ).weightX 0)
+    : ((num D C τ).v D.R.k : ℚ) - 1 / 2 ≤ x ∧ x ≤ (num D C τ).a 0 := by
   have hk : 2 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
   have hg : (0 : ℚ) ≤ (num D C τ).ga := by positivity
-  have v_le_two {i : ℕ} (h1 : 2 ≤ i) (h2 : i ≤ D.R.k) :
-      ((num D C τ).v i : ℚ) ≤ (num D C τ).v 2 := by
+  have v_le_two {i : ℕ} (h1 : 2 ≤ i) (h2 : i ≤ D.R.k)
+      : ((num D C τ).v i : ℚ) ≤ (num D C τ).v 2 := by
     rcases h1.eq_or_lt with rfl | h
     · exact le_rfl
     · exact_mod_cast ((num D C τ).v_anti 2 i le_rfl h h2).le
@@ -44,7 +44,8 @@ theorem weightX_zero_bounds {x : ℚ} (hx : x ∈ (num D C τ).weightX 0) :
     · exact le_rfl
     · linarith [a_add_le (G := num D C τ) h]
   have hvk := v_le_two hk le_rfl
-  have ham : (num D C τ).a (num D C τ).m = (num D C τ).v 2 + (num D C τ).ga + 1 / 2 := (num D C τ).a_m
+  have ham : (num D C τ).a (num D C τ).m = (num D C τ).v 2 + (num D C τ).ga + 1 / 2 :=
+    (num D C τ).a_m
   have hlow : ∀ i, i ≤ D.R.m → ((num D C τ).v D.R.k : ℚ) - 1 / 2 ≤ (num D C τ).a i := fun i hi => by
     have := a_le hi
     have e : (num D C τ).m = D.R.m := rfl
@@ -72,15 +73,19 @@ theorem weightX_zero_bounds {x : ℚ} (hx : x ∈ (num D C τ).weightX 0) :
     exact ⟨(hlow i h2).trans hb.1.le, by linarith [hb.2]⟩
   · omega
 
-theorem La_sub_le (i j : Fin (rankP D D.R.m)) :
-    (((La D C τ).w i - (La D C τ).w j : ℤ) : ℚ) ≤
-      (((num D C τ).v 2 - (num D C τ).v D.R.k : ℤ) : ℚ) + 1 + ((D.R.m : ℚ) + 1) * (gap D C : ℚ) + (rankP D D.R.m : ℚ) := by
+theorem La_sub_le (i j : Fin (rankP D D.R.m))
+    : (((La D C τ).w i - (La D C τ).w j : ℤ) : ℚ)
+      ≤ (((num D C τ).v 2 - (num D C τ).v D.R.k : ℤ) : ℚ) + 1 + ((D.R.m : ℚ) + 1) * (gap D C : ℚ)
+        + (rankP D D.R.m : ℚ) := by
   push_cast
   rw [La_cast, La_cast]
   simp only [highestWeight]
   have hi := weightX_zero_bounds D C τ (descEnum_mem _ (card_weight D C τ) i)
   have hj := weightX_zero_bounds D C τ (descEnum_mem _ (card_weight D C τ) j)
-  have ea : (num D C τ).a 0 = (num D C τ).v 2 + 1 / 2 + ((D.R.m : ℚ) + 1 - ((0 : ℕ) : ℚ)) * (gap D C : ℚ) := rfl
+  have ea
+      : (num D C τ).a 0
+        = (num D C τ).v 2 + 1 / 2 + ((D.R.m : ℚ) + 1 - ((0 : ℕ) : ℚ)) * (gap D C : ℚ) :=
+    rfl
   have hi' : ((i : ℕ) : ℚ) ≤ (rankP D D.R.m : ℚ) := by exact_mod_cast i.2.le
   have hj' : (0 : ℚ) ≤ ((j : ℕ) : ℚ) := by positivity
   rw [ea] at hi hj
@@ -91,7 +96,10 @@ end Spread
 
 section Leaf
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
 
 theorem np_eq {p : PtAt ex Csz} {CF : ℝ} (d : FunIn p CF) : ((rankP D D.R.m : ℕ) : ℝ) = d.O.np := by
   have hm := D.R.two_le_m
@@ -105,8 +113,11 @@ theorem np_eq {p : PtAt ex Csz} {CF : ℝ} (d : FunIn p CF) : ((rankP D D.R.m : 
   push_cast
   ring
 
-theorem leafMM_of_test {p : PtAt ex Csz} {CF : ℝ} (d : FunIn p CF) (a : SlopeTestRemainingChoices p d.G d.W d.n) (h : TieTest d a) {C : ℝ}
-    (hC : 1 ≤ C) : Formalism.L2.Indef.Tree.LeafMM d.O C := by
+theorem leafMM_of_test
+    {p : PtAt ex Csz} {CF : ℝ}
+    (d : FunIn p CF) (a : SlopeTestRemainingChoices p d.G d.W d.n) (h : TieTest d a)
+    {C : ℝ} (hC : 1 ≤ C)
+    : Formalism.L2.Indef.Tree.LeafMM d.O C := by
   obtain ⟨v₀, hv⟩ := (GlobalTheory.ptField_main D).2.1
   have hga : (gap D 1 : ℝ) ≤ d.O.ga C := by
     rw [← GlobalTheory.BigTop.Fun.Model.ga_eq d 1]
@@ -118,7 +129,8 @@ theorem leafMM_of_test {p : PtAt ex Csz} {CF : ℝ} (d : FunIn p CF) (a : SlopeT
     rw [hRp]
     have : (1 : ℝ) ≤ ((D.R.m : ℝ) + 1) * ((d.O.ga C : ℝ) + 1) := by
       have h1 : (1 : ℝ) ≤ (D.R.m : ℝ) + 1 := by linarith [(Nat.cast_nonneg D.R.m : (0 : ℝ) ≤ D.R.m)]
-      have h2 : (1 : ℝ) ≤ (d.O.ga C : ℝ) + 1 := by linarith [(Nat.cast_nonneg (d.O.ga C) : (0 : ℝ) ≤ d.O.ga C)]
+      have h2 : (1 : ℝ) ≤ (d.O.ga C : ℝ) + 1 := by
+        linarith [(Nat.cast_nonneg (d.O.ga C) : (0 : ℝ) ≤ d.O.ga C)]
       nlinarith
     have : (0 : ℝ) ≤ d.O.Lc := Nat.cast_nonneg _
     linarith
@@ -129,23 +141,34 @@ theorem leafMM_of_test {p : PtAt ex Csz} {CF : ℝ} (d : FunIn p CF) (a : SlopeT
     have hr := (Rat.cast_le (K := ℝ)).2 hq
     push_cast at hr
     have hL : ((num D 1 τ).v 2 - (num D 1 τ).v D.R.k).toNat ≤ cloudLen D :=
-      Finset.le_sup (f := fun τ => ((GlobalTheory.SignedHC.GridData.ofHCParam (D.hc τ) 0 0 0).v 2 -
-        (GlobalTheory.SignedHC.GridData.ofHCParam (D.hc τ) 0 0 0).v D.R.k).toNat) (Finset.mem_univ τ)
+      Finset.le_sup
+        (f := fun τ =>
+          ((GlobalTheory.SignedHC.GridData.ofHCParam (D.hc τ) 0 0 0).v 2
+            - (GlobalTheory.SignedHC.GridData.ofHCParam (D.hc τ) 0 0 0).v D.R.k).toNat)
+        (Finset.mem_univ τ)
     have hL' : (((num D 1 τ).v 2 : ℝ) - (num D 1 τ).v D.R.k) ≤ d.O.Lc := by
       rw [GlobalTheory.BigTop.Fun.Model.Lc_eq d]
       have h1 := Int.self_le_toNat ((num D 1 τ).v 2 - (num D 1 τ).v D.R.k)
-      have h2 : (((num D 1 τ).v 2 - (num D 1 τ).v D.R.k : ℤ) : ℝ) ≤ (((num D 1 τ).v 2 - (num D 1 τ).v D.R.k).toNat : ℤ) := by
+      have h2
+          : (((num D 1 τ).v 2 - (num D 1 τ).v D.R.k : ℤ) : ℝ)
+            ≤ (((num D 1 τ).v 2 - (num D 1 τ).v D.R.k).toNat : ℤ) := by
         exact_mod_cast h1
-      have h3 : ((((num D 1 τ).v 2 - (num D 1 τ).v D.R.k).toNat : ℕ) : ℝ) ≤ (cloudLen D : ℝ) := by exact_mod_cast hL
+      have h3 : ((((num D 1 τ).v 2 - (num D 1 τ).v D.R.k).toNat : ℕ) : ℝ) ≤ (cloudLen D : ℝ) := by
+        exact_mod_cast hL
       push_cast at h2
       linarith
-    have hmul := mul_le_mul_of_nonneg_left (by linarith : (gap D 1 : ℝ) + 1 ≤ (d.O.ga C : ℝ) + 1) hm0
-    have hexp : ((D.R.m : ℝ) + 1) * ((gap D 1 : ℝ) + 1) = ((D.R.m : ℝ) + 1) * (gap D 1 : ℝ) + ((D.R.m : ℝ) + 1) := by ring
+    have hmul :=
+      mul_le_mul_of_nonneg_left (by linarith : (gap D 1 : ℝ) + 1 ≤ (d.O.ga C : ℝ) + 1) hm0
+    have hexp
+        : ((D.R.m : ℝ) + 1) * ((gap D 1 : ℝ) + 1)
+          = ((D.R.m : ℝ) + 1) * (gap D 1 : ℝ) + ((D.R.m : ℝ) + 1) := by
+      ring
     have hm1 : (0 : ℝ) ≤ (D.R.m : ℝ) := Nat.cast_nonneg _
     rw [hRp, ← np_eq d]
     push_cast
     linarith
-  obtain ⟨h1, h2, h3, h4⟩ := IsTestLat.gridTestLattice_largestSlope_bound GlobalTheory.TestLat.slope_holds.2 hv hR1 hSp h
+  obtain ⟨h1, h2, h3, h4⟩ :=
+    IsTestLat.gridTestLattice_largestSlope_bound GlobalTheory.TestLat.slope_holds.2 hv hR1 hSp h
   refine ⟨h1, h2, h3, h4.trans (le_of_eq ?_)⟩
   unfold GlobalTheory.TestLat.bound Formalism.L2.Indef.Tree.FunData.EMM
   rw [rank_Xp, np_eq d, D.what₂.card_Tau]

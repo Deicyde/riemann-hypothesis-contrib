@@ -8,14 +8,16 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem exists_partition_one_integral_at_places (L : Type) [Field L] [NumberField L]
+theorem exists_partition_one_integral_at_places
+    (L : Type) [Field L] [NumberField L]
     (S : Finset (HeightOneSpectrum (𝓞 L))) (hS : S.Nonempty) (Y : S → Finset L)
-    (hY : ∀ la, ∀ y ∈ Y la, la.1.valuation L y ≤ 1) :
-    ∃ e : S → L, ∑ la, e la = 1 ∧
-      ∀ la, ∀ y ∈ Y la, ∀ la' ∈ S, la'.valuation L (e la * y) ≤ 1 := by
+    (hY : ∀ la, ∀ y ∈ Y la, la.1.valuation L y ≤ 1)
+    : ∃ e : S → L,
+      ∑ la, e la = 1 ∧ ∀ la, ∀ y ∈ Y la, ∀ la' ∈ S, la'.valuation L (e la * y) ≤ 1 := by
   classical
-  have hb : ∀ (_la : S) (y : L) (la' : HeightOneSpectrum (𝓞 L)),
-      ∃ n : ℕ, WithZero.exp (-(n : ℤ)) * la'.valuation L y ≤ 1 := by
+  have hb
+      : ∀ (_la : S) (y : L) (la' : HeightOneSpectrum (𝓞 L)), ∃ n : ℕ,
+        WithZero.exp (-(n : ℤ)) * la'.valuation L y ≤ 1 := by
     intro _ y la'
     by_cases hy : la'.valuation L y = 0
     · exact ⟨0, by simp [hy]⟩
@@ -27,19 +29,26 @@ theorem exists_partition_one_integral_at_places (L : Type) [Field L] [NumberFiel
   let N : ℕ := ∑ la : S, ∑ y ∈ Y la, ∑ la' ∈ S, n la y la'
   have hN : ∀ la, ∀ y ∈ Y la, ∀ la' ∈ S, n la y la' ≤ N := by
     intro la y hy la' hla'
-    calc n la y la' ≤ ∑ la'' ∈ S, n la y la'' :=
-          Finset.single_le_sum (f := fun la'' => n la y la'') (fun _ _ => Nat.zero_le _) hla'
+    calc
+      n la y la' ≤ ∑ la'' ∈ S, n la y la'' :=
+        Finset.single_le_sum (f := fun la'' => n la y la'') (fun _ _ => Nat.zero_le _) hla'
       _ ≤ ∑ y' ∈ Y la, ∑ la'' ∈ S, n la y' la'' :=
-          Finset.single_le_sum (f := fun y' => ∑ la'' ∈ S, n la y' la'') (fun _ _ => Nat.zero_le _) hy
-      _ ≤ N := Finset.single_le_sum (f := fun la => ∑ y' ∈ Y la, ∑ la'' ∈ S, n la y' la'')
-            (fun _ _ => Nat.zero_le _) (Finset.mem_univ la)
+        Finset.single_le_sum (f := fun y' => ∑ la'' ∈ S, n la y' la'') (fun _ _ => Nat.zero_le _) hy
+      _ ≤ N :=
+        Finset.single_le_sum
+          (f := fun la => ∑ y' ∈ Y la, ∑ la'' ∈ S, n la y' la'')
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_univ la)
   let J : S → Ideal (𝓞 L) := fun la => ∏ la' ∈ S.erase la.1, la'.asIdeal ^ N
   have htop : ⨆ la ∈ (Finset.univ : Finset S), J la = ⊤ := by
     by_contra h
     obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal _ h
     have hJM : ∀ la : S, J la ≤ M := fun la =>
-      le_trans (le_iSup₂_of_le (f := fun la (_ : la ∈ (Finset.univ : Finset S)) => J la)
-        la (Finset.mem_univ _) le_rfl) hle
+      le_trans
+        (le_iSup₂_of_le
+          (f := fun la (_ : la ∈ (Finset.univ : Finset S)) => J la)
+          la (Finset.mem_univ _) le_rfl)
+        hle
     obtain ⟨la0, hla0⟩ := hS
     obtain ⟨la1, hla1, h1⟩ := (Ideal.IsPrime.prod_le hM.isPrime).1 (hJM ⟨la0, hla0⟩)
     have hle1 : la1.asIdeal ≤ M := hM.isPrime.le_of_pow_le h1
@@ -58,8 +67,9 @@ theorem exists_partition_one_integral_at_places (L : Type) [Field L] [NumberFiel
     rw [map_mul]
     by_cases h : la' = la.1
     · subst h
-      calc la.1.valuation L ((μ la : 𝓞 L) : L) * la.1.valuation L y ≤ 1 * 1 :=
-            mul_le_mul' (HeightOneSpectrum.valuation_le_one _ _) (hY la y hy)
+      calc
+        la.1.valuation L ((μ la : 𝓞 L) : L) * la.1.valuation L y
+          ≤ 1 * 1 := mul_le_mul' (HeightOneSpectrum.valuation_le_one _ _) (hY la y hy)
         _ = 1 := one_mul 1
     · have hmem : (μ la : 𝓞 L) ∈ la'.asIdeal ^ N := by
         have hm : (μ la : 𝓞 L) ∈ J la := (μ la).2
@@ -70,16 +80,17 @@ theorem exists_partition_one_integral_at_places (L : Type) [Field L] [NumberFiel
           exact le_trans Ideal.mul_le_inf inf_le_left
         exact this hm
       have hv : la'.valuation L ((μ la : 𝓞 L) : L) ≤ WithZero.exp (-(N : ℤ)) := by
-        rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_le_pow_iff_dvd,
-          Ideal.dvd_span_singleton]
+        rw [HeightOneSpectrum.valuation_of_algebraMap,
+          HeightOneSpectrum.intValuation_le_pow_iff_dvd, Ideal.dvd_span_singleton]
         exact hmem
-      calc la'.valuation L ((μ la : 𝓞 L) : L) * la'.valuation L y
+      calc
+        la'.valuation L ((μ la : 𝓞 L) : L) * la'.valuation L y
           ≤ WithZero.exp (-(N : ℤ)) * la'.valuation L y := mul_le_mul' hv le_rfl
         _ ≤ WithZero.exp (-(n la y la' : ℤ)) * la'.valuation L y := by
-            refine mul_le_mul' ?_ le_rfl
-            rw [WithZero.exp_le_exp]
-            have := hN la y hy la' hla'
-            omega
+          refine mul_le_mul' ?_ le_rfl
+          rw [WithZero.exp_le_exp]
+          have := hN la y hy la' hla'
+          omega
         _ ≤ 1 := hn la y la'
 
 end GlobalTheory

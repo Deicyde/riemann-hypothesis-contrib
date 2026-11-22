@@ -8,14 +8,15 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp.P_lamBasic
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem exists_triv (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ) :
-    ∃ c : ℕ, ∀ u : 𝒪[k]ˣ, (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c → res μ u = 1 := by
+theorem exists_triv (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ)
+    : ∃ c : ℕ, ∀ u : 𝒪[k]ˣ, (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c → res μ u = 1 := by
   have hA : MulArchimedean (ValueGroupWithZero k) :=
     ValuativeRel.isRankLeOne_iff_mulArchimedean.mp inferInstance
   have hker : (μ.ker : Set kˣ) ∈ nhds (1 : kˣ) := hμ.mem_nhds (one_mem _)
@@ -38,21 +39,30 @@ theorem exists_triv (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ) :
       push_cast at this
       exact this
     rw [h1, map_mul, map_pow]
-    calc valuation k (ϖ : k) ^ c * valuation k (z : k) ≤ valuation k (ϖ : k) ^ c * 1 := by gcongr
+    calc
+      valuation k (ϖ : k) ^ c * valuation k (z : k)
+        ≤ valuation k (ϖ : k) ^ c * 1 := by gcongr
       _ = valuation k (ϖ : k) ^ c := mul_one _
       _ < γ := hc
   exact hUsub (hγ hv)
 
-theorem triv_cond (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ) (u : 𝒪[k]ˣ)
-    (hu : (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ cond (res μ)) : res μ u = 1 := by
+theorem triv_cond
+    (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ)
+    (u : 𝒪[k]ˣ) (hu : (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ cond (res μ))
+    : res μ u = 1 := by
   obtain ⟨c, hc⟩ := exists_triv μ hμ
-  exact Nat.sInf_mem (s := {c | ∀ u : 𝒪[k]ˣ, (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c → res μ u = 1})
+  exact Nat.sInf_mem
+    (s := {c | ∀ u : 𝒪[k]ˣ, (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c → res μ u = 1})
     ⟨c, hc⟩ u hu
 
-theorem minor_unit {n r : ℕ} (hr : 1 ≤ r) {g : GL (Fin n) k} (hg : g ∈ KC k n r) {ι : Type} {_ : Fintype ι}
-    {_ : DecidableEq ι} (f : ι → Fin n) (hf : Function.Injective f) :
-    ∃ u : 𝒪[k]ˣ, ((g : Matrix (Fin n) (Fin n) k).submatrix f f).det = algebraMap 𝒪[k] k u ∧
-      (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ r := by
+theorem minor_unit
+    {n r : ℕ} (hr : 1 ≤ r)
+    {g : GL (Fin n) k} (hg : g ∈ KC k n r)
+    {ι : Type} {_ : Fintype ι} {_ : DecidableEq ι}
+    (f : ι → Fin n) (hf : Function.Injective f)
+    : ∃ u : 𝒪[k]ˣ,
+      ((g : Matrix (Fin n) (Fin n) k).submatrix f f).det = algebraMap 𝒪[k] k u
+        ∧ (u : 𝒪[k]) - 1 ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ r := by
   obtain ⟨⟨h, rfl⟩, hc⟩ := hg
   set I := IsLocalRing.maximalIdeal 𝒪[k] ^ r
   set M : Matrix ι ι 𝒪[k] := (h : Matrix (Fin n) (Fin n) 𝒪[k]).submatrix f f with hM
@@ -89,7 +99,8 @@ theorem minor_unit {n r : ℕ} (hr : 1 ≤ r) {g : GL (Fin n) k} (hg : g ∈ KC 
   · rw [IsUnit.unit_spec]
     exact hD
 
-theorem chk_unit (μ : kˣ →* ℂˣ) (u : 𝒪[k]ˣ) : chk μ (algebraMap 𝒪[k] k u) = ((res μ u : ℂˣ) : ℂ) := by
+theorem chk_unit (μ : kˣ →* ℂˣ) (u : 𝒪[k]ˣ)
+    : chk μ (algebraMap 𝒪[k] k u) = ((res μ u : ℂˣ) : ℂ) := by
   have h0 : algebraMap 𝒪[k] k u ≠ 0 := by
     intro h
     exact u.ne_zero (Subtype.val_injective (by simpa using h))
@@ -112,18 +123,22 @@ theorem step_lamBasic {n : ℕ} (G : Grp k n) : LambdaBasicProp G := by
     intro g hg
     unfold lam
     refine Finset.prod_eq_one fun a _ => ?_
-    obtain ⟨u, hu, hu1⟩ := minor_unit hlev hg (Subtype.val : {i : Fin n // G.bl i ≤ a} → Fin n)
-      Subtype.val_injective
+    obtain ⟨u, hu, hu1⟩ :=
+      minor_unit hlev hg (Subtype.val : {i : Fin n // G.bl i ≤ a} → Fin n) Subtype.val_injective
     have hΔ : G.Δ a g = algebraMap 𝒪[k] k u := hu
     rw [hΔ, chk_unit]
     unfold μnext
     split_ifs with h
-    · have hle : IsLocalRing.maximalIdeal 𝒪[k] ^ G.lev ≤ IsLocalRing.maximalIdeal 𝒪[k] ^ cc G.μ a ⟨a + 1, h⟩ :=
+    · have hle
+          : IsLocalRing.maximalIdeal 𝒪[k] ^ G.lev
+            ≤ IsLocalRing.maximalIdeal 𝒪[k] ^ cc G.μ a ⟨a + 1, h⟩ :=
         Ideal.pow_le_pow_right (hlt a _).le
       rw [hq a ⟨a + 1, h⟩ u (hle hu1)]
       rfl
     · rw [div_one]
-      have hle : IsLocalRing.maximalIdeal 𝒪[k] ^ G.lev ≤ IsLocalRing.maximalIdeal 𝒪[k] ^ cond (res (G.μ a)) :=
+      have hle
+          : IsLocalRing.maximalIdeal 𝒪[k] ^ G.lev
+            ≤ IsLocalRing.maximalIdeal 𝒪[k] ^ cond (res (G.μ a)) :=
         Ideal.pow_le_pow_right (hcond a).le
       rw [triv_cond (G.μ a) (G.smooth a) u (hle hu1)]
       rfl

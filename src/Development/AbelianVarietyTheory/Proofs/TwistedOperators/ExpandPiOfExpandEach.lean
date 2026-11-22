@@ -6,12 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem expand_pi_of_expand_each {ι : Type} [Fintype ι] [DecidableEq ι] {X : ι → Type} (K : ∀ i, Set (X i)) (m : ι → ℕ)
-    (k : ∀ i, Fin (m i) → X i) (hk : ∀ i j, k i j ∈ K i) (c : ∀ i, Fin (m i) → X i → ℂ)
+theorem expand_pi_of_expand_each
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {X : ι → Type} (K : ∀ i, Set (X i))
+    (m : ι → ℕ) (k : ∀ i, Fin (m i) → X i) (hk : ∀ i j, k i j ∈ K i) (c : ∀ i, Fin (m i) → X i → ℂ)
     (f : (∀ i, X i) → ℂ)
-    (hf : ∀ i (g : ∀ i, X i), (∀ i, g i ∈ K i) → f g = ∑ j, f (Function.update g i (k i j)) * c i j (g i))
-    (g : ∀ i, X i) (hg : ∀ i, g i ∈ K i) :
-    f g = ∑ J : (∀ i, Fin (m i)), f (fun i => k i (J i)) * ∏ i, c i (J i) (g i) := by
+    (hf : ∀ i (g : ∀ i, X i),
+      (∀ i, g i ∈ K i) → f g = ∑ j, f (Function.update g i (k i j)) * c i j (g i))
+    (g : ∀ i, X i) (hg : ∀ i, g i ∈ K i)
+    : f g = ∑ J : (∀ i, Fin (m i)), f (fun i => k i (J i)) * ∏ i, c i (J i) (g i) := by
   classical
   by_cases hm : ∃ i, m i = 0
   · obtain ⟨i0, hi0⟩ := hm
@@ -25,16 +28,18 @@ theorem expand_pi_of_expand_each {ι : Type} [Fintype ι] [DecidableEq ι] {X : 
   push_neg at hm
   let j0 : ∀ i, Fin (m i) := fun i => ⟨0, Nat.pos_of_ne_zero (hm i)⟩
   let T : Finset ι → ∀ i, Finset (Fin (m i)) := fun s i => if i ∈ s then Finset.univ else {j0 i}
-  let H : Finset ι → (∀ i, Fin (m i)) → (∀ i, X i) → (∀ i, X i) :=
-    fun s J g i => if i ∈ s then k i (J i) else g i
+  let H : Finset ι → (∀ i, Fin (m i)) → (∀ i, X i) → (∀ i, X i) := fun s J g i =>
+    if i ∈ s then k i (J i) else g i
   have hmem : ∀ s (J : ∀ i, Fin (m i)), J ∈ Fintype.piFinset (T s) ↔ ∀ i, i ∉ s → J i = j0 i := by
     intro s J
     rw [Fintype.mem_piFinset]
     apply forall_congr'
     intro i
     by_cases hi : i ∈ s <;> simp [T, hi]
-  have key : ∀ s : Finset ι, ∀ g : ∀ i, X i, (∀ i, g i ∈ K i) →
-      f g = ∑ J ∈ Fintype.piFinset (T s), f (H s J g) * ∏ i ∈ s, c i (J i) (g i) := by
+  have key
+      : ∀ s : Finset ι, ∀ g : ∀ i, X i,
+        (∀ i, g i ∈ K i)
+          → f g = ∑ J ∈ Fintype.piFinset (T s), f (H s J g) * ∏ i ∈ s, c i (J i) (g i) := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -50,13 +55,16 @@ theorem expand_pi_of_expand_each {ι : Type} [Fintype ι] [DecidableEq ι] {X : 
         split_ifs
         exacts [hk _ _, hg i]
       rw [ih g hg]
-      have step : ∀ J ∈ Fintype.piFinset (T s), f (H s J g) * ∏ i ∈ s, c i (J i) (g i)
-          = ∑ j, f (H (insert a s) (Function.update J a j) g)
-              * ∏ i ∈ insert a s, c i (Function.update J a j i) (g i) := by
+      have step
+          : ∀ J ∈ Fintype.piFinset (T s),
+            f (H s J g) * ∏ i ∈ s, c i (J i) (g i)
+              = ∑ j, f (H (insert a s) (Function.update J a j) g)
+                  * ∏ i ∈ insert a s, c i (Function.update J a j i) (g i) := by
         intro J _
         rw [hf a _ (hHK J), Finset.sum_mul]
         refine Finset.sum_congr rfl fun j _ => ?_
-        have e1 : Function.update (H s J g) a (k a j) = H (insert a s) (Function.update J a j) g := by
+        have e1
+            : Function.update (H s J g) a (k a j) = H (insert a s) (Function.update J a j) g := by
           funext i
           by_cases hia : i = a
           · subst hia
@@ -71,8 +79,10 @@ theorem expand_pi_of_expand_each {ι : Type} [Fintype ι] [DecidableEq ι] {X : 
         rw [e3]
         ring
       rw [Finset.sum_congr rfl step, ← Finset.sum_product']
-      refine Finset.sum_nbij' (fun p => Function.update p.1 a p.2)
-        (fun J' => (Function.update J' a (j0 a), J' a)) ?_ ?_ ?_ ?_ ?_
+      refine Finset.sum_nbij'
+        (fun p => Function.update p.1 a p.2)
+        (fun J' => (Function.update J' a (j0 a), J' a))
+        ?_ ?_ ?_ ?_ ?_
       · rintro ⟨J, j⟩ hp
         simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_product, hmem] at hp
         simp only [Finset.mem_coe, hmem]

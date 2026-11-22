@@ -8,8 +8,10 @@ open Matrix Polynomial
 
 namespace GlobalTheory
 
-theorem poly_eval_eq_eval_zero_of_eq_inv {k : Type} [Field k] [Infinite k] (p q : k[X]) (c : k)
-    (h : ∀ x : k, x ≠ 0 → p.eval x = c * q.eval x⁻¹) : ∀ x : k, p.eval x = p.eval 0 := by
+theorem poly_eval_eq_eval_zero_of_eq_inv
+    {k : Type} [Field k] [Infinite k]
+    (p q : k[X]) (c : k) (h : ∀ x : k, x ≠ 0 → p.eval x = c * q.eval x⁻¹)
+    : ∀ x : k, p.eval x = p.eval 0 := by
   set N := q.natDegree
   have key : X ^ N * p = C c * reflect N q := by
     apply eq_of_infinite_eval_eq
@@ -44,8 +46,8 @@ def swapLine (i j : Fin m) (t : k) : Matrix (Fin m) (Fin m) k :=
 def upperFactor (i j : Fin m) (x : k) : Matrix (Fin m) (Fin m) k :=
   diagonal (Function.update (Function.update (1 : Fin m → k) j x⁻¹) i (-x)) * transvection j i x
 
-theorem transvection_isUpper {i j : Fin m} (hji : j < i) (x : k) :
-    (transvection j i x).BlockTriangular id := by
+theorem transvection_isUpper {i j : Fin m} (hji : j < i) (x : k)
+    : (transvection j i x).BlockTriangular id := by
   intro a b hba
   simp only [id] at hba
   simp only [transvection, Matrix.add_apply, one_apply_ne (ne_of_gt hba), single_apply, zero_add]
@@ -54,20 +56,20 @@ theorem transvection_isUpper {i j : Fin m} (hji : j < i) (x : k) :
     exact absurd hba (not_lt.mpr hji.le)
   · rfl
 
-theorem upperFactor_isUpper {i j : Fin m} (hji : j < i) (x : k) :
-    (upperFactor i j x).BlockTriangular id :=
+theorem upperFactor_isUpper {i j : Fin m} (hji : j < i) (x : k)
+    : (upperFactor i j x).BlockTriangular id :=
   (blockTriangular_diagonal _).mul (transvection_isUpper hji x)
 
-theorem upperFactor_det {i j : Fin m} (hji : j < i) {x : k} (hx : x ≠ 0) :
-    (upperFactor i j x).det = -1 := by
+theorem upperFactor_det {i j : Fin m} (hji : j < i) {x : k} (hx : x ≠ 0)
+    : (upperFactor i j x).det = -1 := by
   have hij : i ≠ j := ne_of_gt hji
   rw [upperFactor, det_mul, det_transvection_of_ne j i (ne_of_lt hji), det_diagonal,
     Finset.prod_update_of_mem (Finset.mem_univ i),
     Finset.prod_update_of_mem (by simp [hij.symm] : j ∈ Finset.univ \ {i})]
   simp [hx]
 
-theorem transvection_mul_upperFactor {i j : Fin m} (hji : j < i) {x : k} (hx : x ≠ 0) :
-    transvection i j x * upperFactor i j x = swapLine i j x⁻¹ := by
+theorem transvection_mul_upperFactor {i j : Fin m} (hji : j < i) {x : k} (hx : x ≠ 0)
+    : transvection i j x * upperFactor i j x = swapLine i j x⁻¹ := by
   have hij : i ≠ j := ne_of_gt hji
   ext a b
   rw [transvection, Matrix.add_mul, Matrix.one_mul, Matrix.add_apply]
@@ -105,20 +107,22 @@ end Lower
 section Main
 variable {k : Type} [Field k] [Infinite k] {m : ℕ}
 
-theorem rightInv_lower_transvection (ψ Φ : Matrix (Fin m) (Fin m) k → k) (r : k → k)
+theorem rightInv_lower_transvection
+    (ψ Φ : Matrix (Fin m) (Fin m) k → k) (r : k → k)
     (hΦ : ∀ A₀ D : Matrix (Fin m) (Fin m) k, ∃ p : Polynomial k, ∀ x : k, Φ (A₀ + x • D) = p.eval x)
     (hψ : ∀ A : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → ψ A = r A.det * Φ A)
-    (hT : ∀ A T : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → T.det ≠ 0 → T.BlockTriangular id →
-      ψ (A * T) = ψ A)
-    (A : Matrix (Fin m) (Fin m) k) (hA : A.det ≠ 0) {i j : Fin m} (hji : j < i) (x : k) :
-    ψ (A * transvection i j x) = ψ A := by
+    (hT : ∀ A T : Matrix (Fin m) (Fin m) k,
+      A.det ≠ 0 → T.det ≠ 0 → T.BlockTriangular id → ψ (A * T) = ψ A)
+    (A : Matrix (Fin m) (Fin m) k) (hA : A.det ≠ 0)
+    {i j : Fin m} (hji : j < i)
+    (x : k)
+    : ψ (A * transvection i j x) = ψ A := by
   have hij : i ≠ j := ne_of_gt hji
   have hl : ∀ y : k, (transvection i j y).det = 1 := fun y => det_transvection_of_ne i j hij y
-  have hAl : ∀ y : k, (A * transvection i j y).det = A.det := fun y => by
-    rw [det_mul, hl, mul_one]
+  have hAl : ∀ y : k, (A * transvection i j y).det = A.det := fun y => by rw [det_mul, hl, mul_one]
   obtain ⟨p, hp⟩ := hΦ A (A * single i j 1)
-  obtain ⟨q, hq⟩ := hΦ (A * (1 - single j j 1 - single i i 1 + single j i 1 + single i j 1))
-    (A * single j j 1)
+  obtain ⟨q, hq⟩ :=
+    hΦ (A * (1 - single j j 1 - single i i 1 + single j i 1 + single i j 1)) (A * single j j 1)
   have e1 : ∀ y : k, ψ (A * transvection i j y) = r A.det * p.eval y := by
     intro y
     rw [hψ _ (by rw [hAl]; exact hA), hAl, ← hp]
@@ -137,20 +141,22 @@ theorem rightInv_lower_transvection (ψ Φ : Matrix (Fin m) (Fin m) k → k) (r 
       Matrix.mul_smul]
   by_cases hr : r A.det = 0
   · rw [e1, hr, zero_mul, hψ A hA, hr, zero_mul]
-  have hconst := poly_eval_eq_eval_zero_of_eq_inv p q (r (-A.det) / r A.det) (fun y hy => by
-    rw [div_mul_eq_mul_div, eq_div_iff hr, mul_comm, e2 y hy])
+  have hconst :=
+    poly_eval_eq_eval_zero_of_eq_inv p q (r (-A.det) / r A.det)
+      (fun y hy => by rw [div_mul_eq_mul_div, eq_div_iff hr, mul_comm, e2 y hy])
   rw [e1, hconst x, hψ A hA, ← hp, zero_smul, add_zero]
 
-theorem rightInv_of_upperTriangular_rightInv :
-    ∀ {k : Type} [Field k] [Infinite k] {m : ℕ} (ψ Φ : Matrix (Fin m) (Fin m) k → k) (r : k → k),
-      (∀ A₀ D : Matrix (Fin m) (Fin m) k, ∃ p : Polynomial k, ∀ x : k, Φ (A₀ + x • D) = p.eval x) →
-      (∀ A : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → ψ A = r A.det * Φ A) →
-      (∀ A T : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → T.det ≠ 0 → T.BlockTriangular id →
-        ψ (A * T) = ψ A) →
-      ∀ A B : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → B.det ≠ 0 → ψ (A * B) = ψ A := by
+theorem rightInv_of_upperTriangular_rightInv
+    : ∀ {k : Type} [Field k] [Infinite k] {m : ℕ} (ψ Φ : Matrix (Fin m) (Fin m) k → k) (r : k → k),
+      (∀ A₀ D : Matrix (Fin m) (Fin m) k, ∃ p : Polynomial k, ∀ x : k, Φ (A₀ + x • D) = p.eval x)
+        → (∀ A : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → ψ A = r A.det * Φ A)
+        → (∀ A T : Matrix (Fin m) (Fin m) k,
+          A.det ≠ 0 → T.det ≠ 0 → T.BlockTriangular id → ψ (A * T) = ψ A)
+        → ∀ A B : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → B.det ≠ 0 → ψ (A * B) = ψ A := by
   intro k _ _ m ψ Φ r hΦ hψ hT A B hA hB
   refine diagonal_transvection_induction_of_det_ne_zero
-    (fun B => ∀ A : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → ψ (A * B) = ψ A) B hB ?_ ?_ ?_ A hA
+    (fun B => ∀ A : Matrix (Fin m) (Fin m) k, A.det ≠ 0 → ψ (A * B) = ψ A)
+    B hB ?_ ?_ ?_ A hA
   · intro D hD A hA
     exact hT A _ hA hD (blockTriangular_diagonal D)
   · intro t A hA

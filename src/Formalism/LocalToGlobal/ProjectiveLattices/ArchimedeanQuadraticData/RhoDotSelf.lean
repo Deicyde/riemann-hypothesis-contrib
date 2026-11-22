@@ -36,15 +36,15 @@ theorem rho_zero : rho eqv (0 : ι → Fin r → ℂ) = 0 := by
   funext k
   simp [rho]
 
-theorem rho_sum {κ : Type} (s : Finset κ) (w : κ → ι → Fin r → ℂ) :
-    rho eqv (∑ j ∈ s, w j) = ∑ j ∈ s, rho eqv (w j) := by
+theorem rho_sum {κ : Type} (s : Finset κ) (w : κ → ι → Fin r → ℂ)
+    : rho eqv (∑ j ∈ s, w j) = ∑ j ∈ s, rho eqv (w j) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [rho_zero]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, rho_add, ih]
 
-theorem rho_dot (w w' : ι → Fin r → ℂ) :
-    rho eqv w ⬝ᵥ rho eqv w' = ∑ i, ∑ a, (conj (w i a) * w' i a).re := by
+theorem rho_dot (w w' : ι → Fin r → ℂ)
+    : rho eqv w ⬝ᵥ rho eqv w' = ∑ i, ∑ a, (conj (w i a) * w' i a).re := by
   unfold dotProduct
   rw [← eqv.symm.sum_comp]
   simp only [rho, Equiv.apply_symm_apply, Fintype.sum_prod_type, Fin.sum_univ_two]

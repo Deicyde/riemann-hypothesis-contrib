@@ -10,17 +10,21 @@ open DividedPowers CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.DPFiltration
 
-theorem dpow_mem_span_pow {B : Type} [CommRing B] [Algebra ℚ B] {x : B}
-    (δ : DividedPowers (Ideal.span {x})) (k : ℕ) {y : B} (hy : y ∈ Ideal.span {x}) :
-    δ.dpow k y ∈ Ideal.span {x ^ k} := by
+theorem dpow_mem_span_pow
+    {B : Type} [CommRing B] [Algebra ℚ B]
+    {x : B} (δ : DividedPowers (Ideal.span {x}))
+    (k : ℕ)
+    {y : B} (hy : y ∈ Ideal.span {x})
+    : δ.dpow k y ∈ Ideal.span {x ^ k} := by
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hy
   rw [DividedPowers.RatAlgebra.dpow_eq_inv_fact_smul _ δ hy, Algebra.smul_def, mul_pow]
   exact Ideal.mul_mem_left _ _ (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _))
 
-theorem list_prod_dpow_mem {B : Type} [CommRing B] [Algebra ℚ B] {x : B}
-    (δ : DividedPowers (Ideal.span {x})) (l : List (ℕ × B))
-    (hl : ∀ q ∈ l, q.2 ∈ Ideal.span {x}) :
-    (l.map fun q => δ.dpow q.1 q.2).prod ∈ Ideal.span {x ^ (l.map Prod.fst).sum} := by
+theorem list_prod_dpow_mem
+    {B : Type} [CommRing B] [Algebra ℚ B]
+    {x : B} (δ : DividedPowers (Ideal.span {x}))
+    (l : List (ℕ × B)) (hl : ∀ q ∈ l, q.2 ∈ Ideal.span {x})
+    : (l.map fun q => δ.dpow q.1 q.2).prod ∈ Ideal.span {x ^ (l.map Prod.fst).sum} := by
   induction l with
   | nil => simp
   | cons q l ih =>
@@ -30,9 +34,9 @@ theorem list_prod_dpow_mem {B : Type} [CommRing B] [Algebra ℚ B] {x : B}
     rw [Ideal.mem_span_singleton] at h1 h2 ⊢
     exact mul_dvd_mul h1 h2
 
-theorem dividedPowerFiltration_span_singleton {B : Type} [CommRing B] [Algebra ℚ B] (x : B)
-    (δ : DividedPowers (Ideal.span {x})) (r : ℕ) :
-    CrystallineSemistableComparison.Pb.pdP δ r = Ideal.span {x ^ r} := by
+theorem dividedPowerFiltration_span_singleton
+    {B : Type} [CommRing B] [Algebra ℚ B] (x : B) (δ : DividedPowers (Ideal.span {x})) (r : ℕ)
+    : CrystallineSemistableComparison.Pb.pdP δ r = Ideal.span {x ^ r} := by
   apply le_antisymm
   · unfold CrystallineSemistableComparison.Pb.pdP
     rw [Ideal.span_le]
@@ -51,8 +55,8 @@ theorem dividedPowerFiltration_span_singleton {B : Type} [CommRing B] [Algebra �
     · simp
     · simp [δ.dpow_one (Ideal.mem_span_singleton_self x)]
 
-theorem pdP_γB {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (r : ℕ) :
-    pdP (Lat.γB f ξ) r = Ideal.span {f ξ ^ r} :=
+theorem pdP_γB {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (r : ℕ)
+    : pdP (Lat.γB f ξ) r = Ideal.span {f ξ ^ r} :=
   dividedPowerFiltration_span_singleton (f ξ) (Lat.γB f ξ) r
 
 end GlobalTheory.CompanionTheory.DPFiltration

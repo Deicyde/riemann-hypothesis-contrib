@@ -10,13 +10,18 @@ open scoped TensorProduct
 
 namespace GlobalTheory.EtC
 
-theorem firstAndFinite_fg_over_first : ∀ (R A : Type) [CommRing R] [CommRing A] [Algebra R A] (k : ℕ) (F : Finset A), ∃ F' : Finset (firstAndFinite R A k F), Algebra.adjoin R (Set.range (firstIncl R A k F) ∪ (F' : Set (firstAndFinite R A k F))) = ⊤ := by
+theorem firstAndFinite_fg_over_first
+    : ∀ (R A : Type) [CommRing R] [CommRing A] [Algebra R A] (k : ℕ) (F : Finset A),
+      ∃ F' : Finset (firstAndFinite R A k F),
+        Algebra.adjoin R (Set.range (firstIncl R A k F) ∪ (F' : Set (firstAndFinite R A k F)))
+          = ⊤ := by
   intro R A _ _ _ k F
   classical
   set S := firstAndFinite R A k F with hS
-  let g : Fin (k + 1) × F → S := fun p =>
-    ⟨PiTensorProduct.singleAlgHom (R := R) (A := fun _ : Fin (k + 1) => A) p.1 p.2.1,
-      Algebra.subset_adjoin (Or.inr (Set.mem_iUnion.2 ⟨p.1, p.2.1, p.2.2, rfl⟩))⟩
+  let g : Fin (k + 1) × F → S := fun p => ⟨
+    PiTensorProduct.singleAlgHom (R := R) (A := fun _ : Fin (k + 1) => A) p.1 p.2.1,
+    Algebra.subset_adjoin (Or.inr (Set.mem_iUnion.2 ⟨p.1, p.2.1, p.2.2, rfl⟩))
+  ⟩
   refine ⟨Finset.univ.image g, ?_⟩
   apply Subalgebra.map_injective (f := S.val) Subtype.val_injective
   rw [AlgHom.map_adjoin, Algebra.map_top, Subalgebra.range_val]

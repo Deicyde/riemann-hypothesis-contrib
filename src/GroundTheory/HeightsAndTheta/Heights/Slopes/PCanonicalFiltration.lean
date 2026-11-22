@@ -34,8 +34,8 @@ def saturation (G : Submodule (𝓞 K) E.carrier) : Submodule (𝓞 K) E.carrier
     rw [smul_comm]
     exact G.smul_mem c hx
 
-theorem le_saturation (G : Submodule (𝓞 K) E.carrier) : G ≤ saturation E G :=
-  fun x hx ↦ ⟨1, one_ne_zero, by rw [one_smul]; exact hx⟩
+theorem le_saturation (G : Submodule (𝓞 K) E.carrier) : G ≤ saturation E G := fun x hx ↦
+  ⟨1, one_ne_zero, by rw [one_smul]; exact hx⟩
 
 theorem rank_saturation (G : Submodule (𝓞 K) E.carrier) : E.rank (saturation E G) = E.rank G := by
   set S := saturation E G
@@ -54,8 +54,9 @@ theorem rank_saturation (G : Submodule (𝓞 K) E.carrier) : E.rank (saturation 
   have hS : Module.finrank (𝓞 K) S = E.rank S := rfl
   omega
 
-theorem degree_le_of_le_of_rank_eq {G S : Submodule (𝓞 K) E.carrier} (hGS : G ≤ S)
-    (hr : E.rank G = E.rank S) : E.degree G ≤ E.degree S := by
+theorem degree_le_of_le_of_rank_eq
+    {G S : Submodule (𝓞 K) E.carrier} (hGS : G ≤ S) (hr : E.rank G = E.rank S)
+    : E.degree G ≤ E.degree S := by
   obtain ⟨s, hs⟩ := E.exists_linearIndependent_rank G
   let t : Fin (E.rank G) → S := fun i ↦ Submodule.inclusion hGS (s i)
   have ht : LinearIndependent (𝓞 K) t :=
@@ -63,12 +64,14 @@ theorem degree_le_of_le_of_rank_eq {G S : Submodule (𝓞 K) E.carrier} (hGS : G
   rw [E.degree_eq_of_linearIndependent G hs (Fintype.card_fin _),
     E.degree_eq_of_linearIndependent S ht (by rw [Fintype.card_fin]; exact hr)]
   refine sub_le_sub_right ?_ _
-  have hspan : Submodule.span (𝓞 K) (Set.range t) =
-      (Submodule.span (𝓞 K) (Set.range s)).map (Submodule.inclusion hGS) := by
+  have hspan
+      : Submodule.span (𝓞 K) (Set.range t)
+        = (Submodule.span (𝓞 K) (Set.range s)).map (Submodule.inclusion hGS) := by
     rw [Submodule.map_span, ← Set.range_comp]
     rfl
-  have hle : Submodule.span (𝓞 K) (Set.range s) ≤
-      (Submodule.span (𝓞 K) (Set.range t)).comap (Submodule.inclusion hGS) := by
+  have hle
+      : Submodule.span (𝓞 K) (Set.range s)
+        ≤ (Submodule.span (𝓞 K) (Set.range t)).comap (Submodule.inclusion hGS) := by
     rw [hspan]
     exact Submodule.le_comap_map _ _
   let φ := Submodule.mapQ _ _ (Submodule.inclusion hGS) hle
@@ -87,20 +90,24 @@ theorem degree_le_of_le_of_rank_eq {G S : Submodule (𝓞 K) E.carrier} (hGS : G
   have hpos : 0 < Nat.card (G ⧸ Submodule.span (𝓞 K) (Set.range s)) := Nat.card_pos
   exact Real.log_le_log (by exact_mod_cast hpos) (by exact_mod_cast hcard)
 
-structure IsCanonicalFrom (F : Submodule (𝓞 K) E.carrier) {m : ℕ}
-    (f : Fin (m + 1) → Submodule (𝓞 K) E.carrier) : Prop where
+structure IsCanonicalFrom
+    (F : Submodule (𝓞 K) E.carrier) {m : ℕ} (f : Fin (m + 1) → Submodule (𝓞 K) E.carrier)
+    : Prop where
   bot : f 0 = F
   top : f (Fin.last m) = ⊤
   strictMono : StrictMono f
   saturated : ∀ i, E.Saturated (f i)
-  semistable : ∀ (i : Fin m) (G : Submodule (𝓞 K) E.carrier), f i.castSucc < G → G ≤ f i.succ →
-    E.relSlope (f i.castSucc) G ≤ E.relSlope (f i.castSucc) (f i.succ)
+  semistable
+    : ∀ (i : Fin m) (G : Submodule (𝓞 K) E.carrier),
+      f i.castSucc < G → G ≤ f i.succ
+        → E.relSlope (f i.castSucc) G ≤ E.relSlope (f i.castSucc) (f i.succ)
   anti : StrictAnti fun i : Fin m ↦ E.relSlope (f i.castSucc) (f i.succ)
 
-theorem isCanonicalFrom_bot_iff {m : ℕ} (f : Fin (m + 1) → Submodule (𝓞 K) E.carrier) :
-    IsCanonicalFrom E ⊥ f ↔ E.IsCanonicalFiltration f :=
-  ⟨fun h ↦ ⟨h.bot, h.top, h.strictMono, h.saturated, h.semistable, h.anti⟩,
-    fun h ↦ ⟨h.bot, h.top, h.strictMono, h.saturated, h.semistable, h.anti⟩⟩
+theorem isCanonicalFrom_bot_iff {m : ℕ} (f : Fin (m + 1) → Submodule (𝓞 K) E.carrier)
+    : IsCanonicalFrom E ⊥ f ↔ E.IsCanonicalFiltration f := ⟨
+  fun h ↦ ⟨h.bot, h.top, h.strictMono, h.saturated, h.semistable, h.anti⟩,
+  fun h ↦ ⟨h.bot, h.top, h.strictMono, h.saturated, h.semistable, h.anti⟩
+⟩
 
 end CanonicalFiltration
 

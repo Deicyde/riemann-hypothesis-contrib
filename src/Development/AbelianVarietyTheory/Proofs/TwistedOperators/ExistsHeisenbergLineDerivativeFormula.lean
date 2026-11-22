@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFin
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun
 open GlobalTheory.ArchUniq MeasureTheory
 open scoped SchwartzMap Classical
 
@@ -23,10 +25,14 @@ open GlobalTheory.HeisDeriv
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem actsD_heisLine_heisD {E : Type} [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-    {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W) (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ)
-    (u : Matrix (Fin n) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) (f : SInf F (Fin n × Fin d)) :
-    ActsD (evI F) (M.heisLine ψ u) f
+theorem actsD_heisLine_heisD
+    {E : Type} [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W)
+    (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ)
+    (u : Matrix (Fin n) (Fin d)
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+    (f : SInf F (Fin n × Fin d))
+    : ActsD (evI F) (M.heisLine ψ u) f
       (heisD F (fun i => evI F ((M.co.e u).1 i)) (M.co.e u).2 f) := by
   set x₁ := (M.co.e u).1 with hx₁
   set y₁ := (M.co.e u).2 with hy₁
@@ -35,11 +41,15 @@ theorem actsD_heisLine_heisD {E : Type} [Field E] [NumberField E] [Algebra F E] 
   set z : Fin n × Fin d → mixedEmbedding.mixedSpace F := fun i => evI F (x i) with hz
   set P : ℝ := trForm F y₁ z with hP
   set Q : ℝ := Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F (⅟(2 : AF F) * (x₁ ⬝ᵥ y₁))) with hQ
-  have hline : ∀ t : ℝ, M.heisLine ψ u t (tens (evI F) f r) x =
-      Complex.exp (-(2 * Real.pi * Complex.I) * ((t * (P + t * Q) : ℝ) : ℂ)) * (f (z + t • v) * r x) := by
+  have hline
+      : ∀ t : ℝ,
+        M.heisLine ψ u t (tens (evI F) f r) x
+          = Complex.exp (-(2 * Real.pi * Complex.I) * ((t * (P + t * Q) : ℝ) : ℂ))
+            * (f (z + t • v) * r x) := by
     intro t
     have he : M.co.e (realAd F t • u) = realAd F t • M.co.e u := map_smul _ _ _
-    simp only [Model.heisLine, Darboux.rho, he, schr, tens, Prod.smul_fst, Prod.smul_snd, ← hx₁, ← hy₁]
+    simp only [Model.heisLine, Darboux.rho, he, schr, tens, Prod.smul_fst, Prod.smul_snd, ← hx₁,
+      ← hy₁]
     have hAt1 : At (evI F) (realAd F t • x₁) := fun a ha => by
       rw [smul_smul, mul_realAd_eq_zero ha, zero_smul]
     rw [hr.1 x _ hAt1]
@@ -51,15 +61,19 @@ theorem actsD_heisLine_heisD {E : Type} [Field E] [NumberField E] [Algebra F E] 
     have hxy : evI F (x ⬝ᵥ y₁) = ∑ i, z i * evI F (y₁ i) := by
       simp only [dotProduct, evI_sum, evI_mul, hz]
     have htr : Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F A) = t * (P + t * Q) := by
-      rw [hA, evI_mul, evI_add, evI_mul, GlobalTheory.HeisDeriv.evI_realAd, ← Algebra.smul_def, ← Algebra.smul_def, map_smul, map_add (f := _),
-        map_smul, hxy, hP, trForm_apply, hQ, smul_eq_mul, smul_eq_mul]
+      rw [hA, evI_mul, evI_add, evI_mul, GlobalTheory.HeisDeriv.evI_realAd, ← Algebra.smul_def,
+        ← Algebra.smul_def, map_smul, map_add (f := _), map_smul, hxy, hP, trForm_apply, hQ,
+        smul_eq_mul, smul_eq_mul]
     have harg : (fun i => evI F ((x + realAd F t • x₁) i)) = z + t • v := by
       funext i
-      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, evI_add, evI_mul, GlobalTheory.HeisDeriv.evI_realAd, hz, hv]
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, evI_add, evI_mul,
+        GlobalTheory.HeisDeriv.evI_realAd, hz, hv]
       rw [Algebra.smul_def]
     rw [hψ.2.2 A hAt2, htr, harg]
   have h1 : HasDerivAt (fun t : ℝ => t * (P + t * Q)) P 0 := by
-    have := (hasDerivAt_id (0 : ℝ)).mul ((hasDerivAt_const (0 : ℝ) P).add ((hasDerivAt_id (0 : ℝ)).mul_const Q))
+    have :=
+      (hasDerivAt_id (0 : ℝ)).mul
+        ((hasDerivAt_const (0 : ℝ) P).add ((hasDerivAt_id (0 : ℝ)).mul_const Q))
     exact this.congr_deriv (by simp)
   have h2 := (h1.ofReal_comp.const_mul (-(2 * Real.pi * Complex.I))).cexp
   have h3 : HasDerivAt (fun t : ℝ => z + t • v) v 0 := by
@@ -73,11 +87,13 @@ theorem actsD_heisLine_heisD {E : Type} [Field E] [NumberField E] [Algebra F E] 
   simp
   ring
 
-theorem at_liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) : At (evI F) (liftV (F := F) y) := by
+theorem at_liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F)
+    : At (evI F) (liftV (F := F) y) := by
   intro a ha
   funext i
   refine Prod.ext ?_ ?_
-  · have h1 : a.1 = 0 := (map_eq_zero_iff _ (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective).mp ha
+  · have h1 : a.1 = 0 :=
+      (map_eq_zero_iff _ (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective).mp ha
     show a.1 * ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i)) = 0
     rw [h1, zero_mul]
   · show a.2 * 0 = 0
@@ -85,14 +101,23 @@ theorem at_liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) : At (evI 
 
 end GlobalTheory.HeisDerivArch
 
-
 open GlobalTheory.HeisDeriv GlobalTheory.HeisDerivArch in
-theorem GlobalTheory.HeisDerivArch.exists_heisLine_actsD_eq : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-    {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W) (ψ : AddChar (AF F) ℂ), IsStd ψ →
-    ∀ v : (Fin n × Fin d → mixedEmbedding.mixedSpace F) × (Fin n × Fin d → mixedEmbedding.mixedSpace F),
-    ∃ u : Matrix (Fin n) (Fin d) (AE F E), At (evI F) u ∧ ∀ f g : SInf F (Fin n × Fin d),
-      ActsD (evI F) (M.heisLine ψ u) ⇑f ⇑g → ∀ y, g y =
-        fderiv ℝ (⇑f) y v.1 - 2 * Real.pi * Complex.I * (trP F (Fin n × Fin d) y v.2 : ℂ) * f y := by
+theorem GlobalTheory.HeisDerivArch.exists_heisLine_actsD_eq
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W)
+        (ψ : AddChar (AF F) ℂ),
+      IsStd ψ
+        → ∀ v
+            : (Fin n × Fin d → mixedEmbedding.mixedSpace F)
+              × (Fin n × Fin d → mixedEmbedding.mixedSpace F),
+          ∃ u : Matrix (Fin n) (Fin d) (AE F E),
+            At (evI F) u
+              ∧ ∀ f g : SInf F (Fin n × Fin d),
+                ActsD (evI F) (M.heisLine ψ u) ⇑f ⇑g
+                  → ∀ y,
+                    g y
+                      = fderiv ℝ (⇑f) y v.1
+                        - 2 * Real.pi * Complex.I * (trP F (Fin n × Fin d) y v.2 : ℂ) * f y := by
   intro F E _ _ _ _ _ σ n d X W M ψ hψ v
   set u := M.co.e.symm (liftV v.1, liftV v.2) with hu
   have heu : M.co.e u = (liftV v.1, liftV v.2) := by rw [hu, LinearEquiv.apply_symm_apply]
@@ -116,6 +141,7 @@ theorem GlobalTheory.HeisDerivArch.exists_heisLine_actsD_eq : ∀ {F E : Type} [
     rw [huniq', heisD_apply, mult_apply, heu]
     have hv1 : (fun i => evI F ((liftV (F := F) v.1) i)) = v.1 := Coord.loc_lift v.1
     simp only [hv1, trForm_apply]
-    have hv2 : ∀ i, evI F ((liftV (F := F) v.2) i) = v.2 i := fun i => congrFun (Coord.loc_lift v.2) i
+    have hv2 : ∀ i, evI F ((liftV (F := F) v.2) i) = v.2 i := fun i =>
+      congrFun (Coord.loc_lift v.2) i
     simp only [hv2, trP]
     ring

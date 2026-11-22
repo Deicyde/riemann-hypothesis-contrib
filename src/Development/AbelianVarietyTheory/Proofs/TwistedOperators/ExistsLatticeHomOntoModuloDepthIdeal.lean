@@ -19,8 +19,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIndepe
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.Grow
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.Grow
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.SepRows GlobalTheory.CoreOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -33,16 +37,16 @@ open NumberField
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem selfDual_isFullLattice {D : D7} : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
-    IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
+theorem selfDual_isFullLattice {D : D7}
+    : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
+      IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
   intro V Λ hΛ
   haveI : Submodule.IsLattice D.host.E Λ := hΛ.1
   refine ⟨?_⟩
   obtain ⟨s, hs⟩ := hΛ.1.fg
   apply eq_top_iff.mpr
   intro y _
-  let f : (Fin V.rank → D.host.E) → D.host.E := fun x =>
-    ∑ i, ∑ j, star (x i) * V.gram i j * y j
+  let f : (Fin V.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * V.gram i j * y j
   obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) s f
   have ha0 : (algebraMap (𝓞 D.host.E) D.host.E a) ≠ 0 := by
     exact (FaithfulSMul.algebraMap_injective _ _).ne (mem_nonZeroDivisors_iff_ne_zero.mp a.2)
@@ -58,14 +62,16 @@ theorem selfDual_isFullLattice {D : D7} : ∀ (V : HSp D) (Λ : Submodule (𝓞 
     smul_mem' := by
       rintro c x ⟨b, hb⟩
       refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩
-      simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul, RingOfIntegers.mapRingHom_apply, star_mul]
+      simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul,
+        RingOfIntegers.mapRingHom_apply, star_mul]
       simp only [Finset.mul_sum]
       apply Finset.sum_congr rfl
       intro i _
       apply Finset.sum_congr rfl
       intro j _
       change star (c : D.host.E) * _ = _
-      ring }
+      ring
+  }
   have hsP : (s : Set (Fin V.rank → D.host.E)) ⊆ P := by
     intro x hx
     obtain ⟨b, hb⟩ := ha x hx
@@ -84,18 +90,24 @@ theorem selfDual_isFullLattice {D : D7} : ∀ (V : HSp D) (Λ : Submodule (𝓞 
     apply Finset.sum_congr rfl
     intro j _
     ring
-  have hy' : (algebraMap (𝓞 D.host.E) D.host.E a) • y ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
+  have hy'
+      : (algebraMap (𝓞 D.host.E) D.host.E a) • y
+        ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
     Submodule.subset_span hy
-  have := (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
-    (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy' 
-  change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ •
-    ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _ at this
+  have :=
+    (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
+      (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy'
+  change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ • ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _
+    at this
   rw [← smul_assoc, smul_eq_mul, inv_mul_cancel₀ ha0, one_smul] at this
   exact this
 
-theorem exists_basis_in_lattice {n : ℕ} (Λ : Submodule (𝓞 K) (Fin n → K)) [hΛ : Λ.IsFullLattice K] (N : ℕ) (hN : 2 ≤ N) :
-    ∃ b : Module.Basis (Fin n) K (Fin n → K), (∀ i, b i ∈ Λ) ∧ ∃ c : 𝓞 K, IsCoprime c (N : 𝓞 K) ∧
-      ∀ w ∈ Λ, (c : K) • w ∈ Submodule.span (𝓞 K) (Set.range b) := by
+theorem exists_basis_in_lattice
+    {n : ℕ} (Λ : Submodule (𝓞 K) (Fin n → K)) [hΛ : Λ.IsFullLattice K] (N : ℕ) (hN : 2 ≤ N)
+    : ∃ b : Module.Basis (Fin n) K (Fin n → K),
+      (∀ i, b i ∈ Λ)
+        ∧ ∃ c : 𝓞 K,
+          IsCoprime c (N : 𝓞 K) ∧ ∀ w ∈ Λ, (c : K) • w ∈ Submodule.span (𝓞 K) (Set.range b) := by
   haveI : Module.Finite (𝓞 K) Λ := Module.Finite.iff_fg.2 hΛ.fg
   haveI : Module.Finite ℤ Λ := Module.Finite.trans (𝓞 K) Λ
   haveI : HasUniqueDiv Λ := ⟨fun k hk a b h => Subtype.ext
@@ -127,7 +139,8 @@ theorem exists_basis_in_lattice {n : ℕ} (Λ : Submodule (𝓞 K) (Fin n → K)
   refine ⟨b0, fun i => ?_, c, hcop, fun w hw => ?_⟩
   · rw [Module.Basis.mk_apply]; exact (x i).2
   · have : Set.range b0 = Set.range x' := by rw [Module.Basis.coe_mk]
-    rw [this]; exact hmem w hw
+    rw [this]
+    exact hmem w hw
 
 end GlobalTheory.OntoModPf
 
@@ -137,12 +150,16 @@ open NumberField
 
 variable {K : Type} [Field K] [NumberField K]
 
-
 open Matrix in
-theorem exists_onto_mod {n n' : ℕ} (hnn : n ≤ n') (Λ : Submodule (𝓞 K) (Fin n → K)) (Λ' : Submodule (𝓞 K) (Fin n' → K))
-    [Λ.IsFullLattice K] [Λ'.IsFullLattice K] (𝔪 : Ideal (𝓞 K)) (h𝔪 : 𝔪 ≠ ⊥) :
-    ∃ x : Matrix (Fin n) (Fin n') K, (∀ w ∈ Λ', x *ᵥ w ∈ Λ) ∧ ∃ y : Matrix (Fin n') (Fin n) K, (∀ v ∈ Λ, y *ᵥ v ∈ Λ') ∧
-      ∃ a ∈ 𝔪, x * y - 1 = (a : K) • (1 : Matrix (Fin n) (Fin n) K) := by
+theorem exists_onto_mod
+    {n n' : ℕ} (hnn : n ≤ n') (Λ : Submodule (𝓞 K) (Fin n → K)) (Λ' : Submodule (𝓞 K) (Fin n' → K))
+    [Λ.IsFullLattice K] [Λ'.IsFullLattice K]
+    (𝔪 : Ideal (𝓞 K)) (h𝔪 : 𝔪 ≠ ⊥)
+    : ∃ x : Matrix (Fin n) (Fin n') K,
+      (∀ w ∈ Λ', x *ᵥ w ∈ Λ)
+        ∧ ∃ y : Matrix (Fin n') (Fin n) K,
+          (∀ v ∈ Λ, y *ᵥ v ∈ Λ')
+            ∧ ∃ a ∈ 𝔪, x * y - 1 = (a : K) • (1 : Matrix (Fin n) (Fin n) K) := by
   classical
   set N : ℕ := 2 * Ideal.absNorm 𝔪 with hNdef
   have hN0 : Ideal.absNorm 𝔪 ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
@@ -153,7 +170,8 @@ theorem exists_onto_mod {n n' : ℕ} (hnn : n ≤ n') (Λ : Submodule (𝓞 K) (
   obtain ⟨b, hb, c, hc, hcb⟩ := exists_basis_in_lattice Λ N hN
   obtain ⟨b', hb', c', hc', hcb'⟩ := exists_basis_in_lattice Λ' N hN
   obtain ⟨u, v, huv⟩ := hc.mul_left hc'
-  let φ : (Fin n' → K) →ₗ[K] (Fin n → K) := b'.constr K fun j => if h : (j : ℕ) < n then b ⟨j, h⟩ else 0
+  let φ : (Fin n' → K) →ₗ[K] (Fin n → K) :=
+    b'.constr K fun j => if h : (j : ℕ) < n then b ⟨j, h⟩ else 0
   let ψ : (Fin n → K) →ₗ[K] (Fin n' → K) := b.constr K fun i => b' (Fin.castLE hnn i)
   have hφψ : φ ∘ₗ ψ = LinearMap.id := by
     refine b.ext fun i => ?_
@@ -174,23 +192,35 @@ theorem exists_onto_mod {n n' : ℕ} (hnn : n ≤ n') (Λ : Submodule (𝓞 K) (
     show ψ (b i) ∈ Λ'
     simp only [ψ, Module.Basis.constr_basis]
     exact hb' _
-  refine ⟨LinearMap.toMatrix' (((u * c' : 𝓞 K) : K) • φ), fun w hw => ?_,
-    LinearMap.toMatrix' ((c : K) • ψ), fun w hw => ?_, u * c * c' - 1, ?_, ?_⟩
+  refine ⟨
+    LinearMap.toMatrix' (((u * c' : 𝓞 K) : K) • φ),
+    fun w hw => ?_,
+    LinearMap.toMatrix' ((c : K) • ψ),
+    fun w hw => ?_,
+    u * c * c' - 1,
+    ?_,
+    ?_
+  ⟩
   · rw [LinearMap.toMatrix'_mulVec, LinearMap.smul_apply]
     have h1 : φ ((c' : K) • w) ∈ Λ := hφ (hcb' w hw)
     have h2 := Λ.smul_mem u h1
     rw [← algebraMap_smul K u, map_smul, smul_smul] at h2
     convert h2 using 2
-    push_cast; ring
+    push_cast
+    ring
   · rw [LinearMap.toMatrix'_mulVec, LinearMap.smul_apply, ← map_smul]
     exact hψ (hcb w hw)
   · have : u * c * c' - 1 = -(v * (N : 𝓞 K)) := by linear_combination huv
     rw [this]
     exact neg_mem (Ideal.mul_mem_left _ _ hNm)
   · rw [← LinearMap.toMatrix'_comp]
-    have e : (((u * c' : 𝓞 K) : K) • φ) ∘ₗ ((c : K) • ψ) = ((u * c * c' : 𝓞 K) : K) • LinearMap.id := by
+    have e
+        : (((u * c' : 𝓞 K) : K) • φ) ∘ₗ ((c : K) • ψ)
+          = ((u * c * c' : 𝓞 K) : K) • LinearMap.id := by
       rw [LinearMap.smul_comp, LinearMap.comp_smul, hφψ, smul_smul]
-      congr 1; push_cast; ring
+      congr 1
+      push_cast
+      ring
     rw [e, map_smul, LinearMap.toMatrix'_id]
     push_cast
     rw [sub_smul, one_smul]
@@ -214,9 +244,13 @@ theorem ontoModEx : OntoModEx := by
   obtain ⟨x, hx, y, hy, a, ha, hxy⟩ :=
     exists_onto_mod hle (G.Λ (.core i)) (G.Λ (.core (i + 1))) G.modul (G.pl.modul_ne_bot sc)
   refine ⟨x, hx, y, hy, ?_⟩
-  have h1m : (1 : Matrix (Fin (G.V (.core i)).rank) (Fin (G.V (.core i)).rank) D.host.E) ∈
-      homLat (G.Λ (.core i)) (G.Λ (.core i)) := fun v hv => by simpa using hv
-  have e : x * y - 1 = a • (1 : Matrix (Fin (G.V (.core i)).rank) (Fin (G.V (.core i)).rank) D.host.E) := by
+  have h1m
+      : (1 : Matrix (Fin (G.V (.core i)).rank) (Fin (G.V (.core i)).rank) D.host.E)
+        ∈ homLat (G.Λ (.core i)) (G.Λ (.core i)) := fun v hv => by
+    simpa using hv
+  have e
+      : x * y - 1
+        = a • (1 : Matrix (Fin (G.V (.core i)).rank) (Fin (G.V (.core i)).rank) D.host.E) := by
     rw [hxy]; exact algebraMap_smul D.host.E a _
   rw [e]
   exact Submodule.smul_mem_smul ha h1m

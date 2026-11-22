@@ -28,12 +28,15 @@ theorem unitP : UnitP := by
     rw [Valuation.mem_integer_iff, map_inv₀, hcv, inv_one]
   refine ⟨algebraMap A.Fp A.Ep (A.ιF (algebraMap (𝓞 F) F d))⁻¹, ?_, ?_⟩
   · rw [A.O_def]
-    have hu : algebraMap A.Fp A.Ep (A.ιF (algebraMap (𝓞 F) F d))⁻¹ =
-        algebraMap 𝒪[A.Fp] A.Ep ⟨_, hinv⟩ := rfl
+    have hu
+        : algebraMap A.Fp A.Ep (A.ιF (algebraMap (𝓞 F) F d))⁻¹
+          = algebraMap 𝒪[A.Fp] A.Ep ⟨_, hinv⟩ :=
+      rfl
     rw [hu]
     exact isIntegral_algebraMap
-  · have hd' : A.ιE ((algebraMap (𝓞 F) (𝓞 E) d : 𝓞 E) : E) =
-        algebraMap A.Fp A.Ep (A.ιF (algebraMap (𝓞 F) F d)) := by
+  · have hd'
+        : A.ιE ((algebraMap (𝓞 F) (𝓞 E) d : 𝓞 E) : E)
+          = algebraMap A.Fp A.Ep (A.ιF (algebraMap (𝓞 F) F d)) := by
       rw [← A.compat]
       rfl
     rw [hd', ← map_mul, inv_mul_cancel₀ hc0, map_one]
@@ -49,7 +52,8 @@ theorem avoidP : AvoidP := by
   obtain ⟨Q, hIQ, hQ, hQp⟩ := Ideal.exists_ideal_over_prime_of_isIntegral p.asIdeal I hle
   have hinj : Function.Injective (algebraMap (𝓞 F) (𝓞 E)) := by
     intro a b hab
-    have hE : algebraMap F E (a : F) = algebraMap F E (b : F) := congrArg (fun x : 𝓞 E => (x : E)) hab
+    have hE : algebraMap F E (a : F) = algebraMap F E (b : F) :=
+      congrArg (fun x : 𝓞 E => (x : E)) hab
     exact Subtype.ext ((algebraMap F E).injective hE)
   have hQ0 : Q ≠ ⊥ := by
     rintro rfl

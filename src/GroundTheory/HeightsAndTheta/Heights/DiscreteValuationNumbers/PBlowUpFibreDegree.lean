@@ -16,9 +16,10 @@ noncomputable section
 
 universe u
 
-theorem BlowUpFibreDegree.proof (ha : HomLocRingLocal.Statement.{u}) (hb : DivCycleHomLoc.Statement.{u})
-    (hc : FiniteBirationalLength.Statement.{u}) (hd : BlowUpFibreSemilocal.Statement.{u}) :
-    BlowUpFibreDegree.Statement.{u} := by
+theorem BlowUpFibreDegree.proof
+    (ha : HomLocRingLocal.Statement.{u}) (hb : DivCycleHomLoc.Statement.{u})
+    (hc : FiniteBirationalLength.Statement.{u}) (hd : BlowUpFibreSemilocal.Statement.{u})
+    : BlowUpFibreDegree.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ J _ P n hP N u hu hu' c x hx hxP W hϖW hdiv
   have hsupp : W ∈ (P ⊔ Ideal.span {x}).minimalPrimes ∧ IsRelevant W := by
     by_contra h
@@ -27,9 +28,11 @@ theorem BlowUpFibreDegree.proof (ha : HomLocRingLocal.Statement.{u}) (hb : DivCy
   have := hP.multiProj.isPrime
   obtain ⟨i, hi⟩ := powMonomial_not_mem hWp hsupp.2 c
   have hg : IsMultiHomog (powMonomial c i : MRing ι O) c := isMultiHomog_powMonomial c i
-  have hz : algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P x) /
-      algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P))
-        (Ideal.Quotient.mk P (powMonomial c i)) ∈ homLocRing P W :=
+  have hz
+      : algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P x)
+          / algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P))
+            (Ideal.Quotient.mk P (powMonomial c i))
+        ∈ homLocRing P W :=
     Subring.subset_closure ⟨c, x, _, hx, hg, hi, rfl⟩
   obtain ⟨hloc, hnoeth, hdim⟩ := ha O K ι P hP.multiProj c x hx hxP W hsupp.1 hsupp.2
   have := hloc
@@ -52,12 +55,15 @@ theorem BlowUpFibreDegree.proof (ha : HomLocRingLocal.Statement.{u}) (hb : DivCy
     rw [dite_eq_left hsupp]
   have := Fintype.ofFinite {𝔫 : Ideal B // 𝔫.IsMaximal}
 
-  have hterm : ∀ 𝔫 : {𝔫 : Ideal B // 𝔫.IsMaximal},
-      (have := 𝔫.2.isPrime;
-       Module.length (Localization.AtPrime 𝔫.1)
-         (Localization.AtPrime 𝔫.1 ⧸ Ideal.span {(algebraMap B (Localization.AtPrime 𝔫.1)
-           (algebraMap (homLocRing P W) B ⟨_, hz⟩))})) * (𝔫.1.inertiaDeg (homLocRing P W) : ℕ∞) =
-        (((divCycle (blowUpOf P u) (liftForm x) (e 𝔫).1).toNat * specialRelDeg (e 𝔫).1 : ℕ) : ℕ∞) := by
+  have hterm
+      : ∀ 𝔫 : {𝔫 : Ideal B // 𝔫.IsMaximal},
+        (have := 𝔫.2.isPrime
+         Module.length (Localization.AtPrime 𝔫.1)
+           (Localization.AtPrime 𝔫.1 ⧸ Ideal.span {(algebraMap B (Localization.AtPrime 𝔫.1)
+             (algebraMap (homLocRing P W) B ⟨_, hz⟩))}))
+            * (𝔫.1.inertiaDeg (homLocRing P W) : ℕ∞)
+          = (((divCycle (blowUpOf P u) (liftForm x) (e 𝔫).1).toNat * specialRelDeg (e 𝔫).1 : ℕ)
+            : ℕ∞) := by
     intro 𝔫
     rw [(he 𝔫).1, (he 𝔫).2, Nat.cast_mul]
   rw [finsum_congr hterm, finsum_eq_sum_of_fintype, ← Nat.cast_sum] at hlen
@@ -65,12 +71,15 @@ theorem BlowUpFibreDegree.proof (ha : HomLocRingLocal.Statement.{u}) (hb : DivCy
 
   classical
   let p : Ideal (MRing (extIdx ι J) O) → Prop := fun W' =>
-    W' ∈ (blowUpOf P u ⊔ Ideal.span {liftForm x}).minimalPrimes ∧ IsRelevant W' ∧
-      W'.comap (liftForm (ι := ι) (J := J) (R := O)) = W
-  have hite : ∀ W' : Ideal (MRing (extIdx ι J) O),
-      (if W'.comap (liftForm (ι := ι) (J := J) (R := O)) = W then
-        divCycle (blowUpOf P u) (liftForm x) W' * (specialRelDeg W' : ℤ) else 0) =
-      ∑ᶠ (_ : p W'), divCycle (blowUpOf P u) (liftForm x) W' * (specialRelDeg W' : ℤ) := by
+    W' ∈ (blowUpOf P u ⊔ Ideal.span {liftForm x}).minimalPrimes ∧ IsRelevant W'
+      ∧ W'.comap (liftForm (ι := ι) (J := J) (R := O)) = W
+  have hite
+      : ∀ W' : Ideal (MRing (extIdx ι J) O),
+        (if W'.comap (liftForm (ι := ι) (J := J) (R := O)) = W then
+           divCycle (blowUpOf P u) (liftForm x) W' * (specialRelDeg W' : ℤ)
+         else
+           0)
+          = ∑ᶠ (_ : p W'), divCycle (blowUpOf P u) (liftForm x) W' * (specialRelDeg W' : ℤ) := by
     intro W'
     rw [finsum_eq_if]
     by_cases hc' : W'.comap (liftForm (ι := ι) (J := J) (R := O)) = W
@@ -83,8 +92,8 @@ theorem BlowUpFibreDegree.proof (ha : HomLocRingLocal.Statement.{u}) (hb : DivCy
           exact fun h => hp ⟨h.1, h.2, hc'⟩
         rw [h0, zero_mul]
     · rw [if_neg hc', if_neg (fun h => hc' h.2.2)]
-  rw [finsum_congr hite, ← finsum_subtype_eq_finsum_cond p,
-    ← finsum_comp_equiv e, finsum_eq_sum_of_fintype]
+  rw [finsum_congr hite, ← finsum_subtype_eq_finsum_cond p, ← finsum_comp_equiv e,
+    finsum_eq_sum_of_fintype]
   refine Finset.sum_congr rfl fun 𝔫 _ => ?_
   have h0 : 0 ≤ divCycle (blowUpOf P u) (liftForm x) (e 𝔫).1 := by
     unfold divCycle

@@ -24,17 +24,20 @@ private lemma tele {R : Type*} [CommRing R] (π : R) (f : ℕ → R)
 
 end PrecompleteLimitOfPowDvd
 
-theorem UpperTheory.Reformulated.B.Yra6.main.{u_1} :
-    ∀ {R : Type u_1} [inst : CommRing R] {π : R},
-      IsPrecomplete (Ideal.span {π}) R →
-        ∀ (f : ℕ → R), (∀ (n : ℕ), π ^ n ∣ f (n + (1 : ℕ)) - f n) → ∃ (L : R), ∀ (n : ℕ), π ^ n ∣ f n - L := by
+theorem UpperTheory.Reformulated.B.Yra6.main.{u_1}
+    : ∀ {R : Type u_1} [inst : CommRing R] {π : R},
+      IsPrecomplete (Ideal.span {π}) R
+        → ∀ (f : ℕ → R),
+          (∀ (n : ℕ), π ^ n ∣ f (n + (1 : ℕ)) - f n) → ∃ (L : R), ∀ (n : ℕ), π ^ n ∣ f n - L := by
   intro R _ π hP f h
-  obtain ⟨L, hL⟩ := hP.prec' f (by
-    intro m n hmn
-    rw [SModEq.sub_mem, PrecompleteLimitOfPowDvd.memPow]
-    obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
-    have := PrecompleteLimitOfPowDvd.tele π f h m k
-    rw [← neg_sub]; exact (dvd_neg).2 this)
+  obtain ⟨L, hL⟩ :=
+    hP.prec' f (by
+      intro m n hmn
+      rw [SModEq.sub_mem, PrecompleteLimitOfPowDvd.memPow]
+      obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
+      have := PrecompleteLimitOfPowDvd.tele π f h m k
+      rw [← neg_sub]
+      exact (dvd_neg).2 this)
   refine ⟨L, fun n => ?_⟩
   have := hL n
   rw [SModEq.sub_mem, PrecompleteLimitOfPowDvd.memPow] at this

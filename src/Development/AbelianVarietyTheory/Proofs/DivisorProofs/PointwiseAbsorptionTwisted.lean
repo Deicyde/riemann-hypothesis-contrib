@@ -7,18 +7,20 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory
 
-theorem pointwise_absorption_twisted :
-    ∀ (T x u g t k1 k2 E : ℝ), 0 ≤ u → 0 ≤ g → 0 < k2 → 0 < E → |t| ≤ 3 / 4 →
-      wT T x / 8 ≤ (1 - k1 ^ 2 / k2) * E →
-      ((-T - 1 ≤ x ∧ x ≤ -T + 1) → E / k2 ≤ 16 / 3 ∧ wT T x / 8 ≤ (1 - 5 * (k1 ^ 2 / k2)) * E) →
-      (¬ (-T - 1 ≤ x ∧ x ≤ -T + 1) → t = 0) →
-      (Real.sqrt (t ^ 2 * g ^ 2 / k2) + u * Real.sqrt (k1 ^ 2 / k2)) ^ 2 * E + u ^ 2 * (wT T x / 8)
-        ≤ u ^ 2 * E + (if (-T - 1 ≤ x ∧ x ≤ -T + 1) then 15 / 4 * g ^ 2 else 0) := by
+theorem pointwise_absorption_twisted
+    : ∀ (T x u g t k1 k2 E : ℝ),
+      0 ≤ u → 0 ≤ g → 0 < k2 → 0 < E → |t| ≤ 3 / 4 → wT T x / 8 ≤ (1 - k1 ^ 2 / k2) * E
+        → ((-T - 1 ≤ x ∧ x ≤ -T + 1) → E / k2 ≤ 16 / 3 ∧ wT T x / 8 ≤ (1 - 5 * (k1 ^ 2 / k2)) * E)
+        → (¬(-T - 1 ≤ x ∧ x ≤ -T + 1) → t = 0)
+        → (Real.sqrt (t ^ 2 * g ^ 2 / k2) + u * Real.sqrt (k1 ^ 2 / k2)) ^ 2 * E
+            + u ^ 2 * (wT T x / 8)
+          ≤ u ^ 2 * E + (if (-T - 1 ≤ x ∧ x ≤ -T + 1) then 15 / 4 * g ^ 2 else 0) := by
   intro T x u g t k1 k2 E hu hg hk2 hE ht hw hwin hoff
   have ha : 0 ≤ t ^ 2 * g ^ 2 / k2 := by positivity
   have hb : 0 ≤ k1 ^ 2 / k2 := by positivity
@@ -37,12 +39,14 @@ theorem pointwise_absorption_twisted :
     have haE : t ^ 2 * g ^ 2 / k2 * E ≤ 3 * g ^ 2 := by
       have e : t ^ 2 * g ^ 2 / k2 * E = t ^ 2 * g ^ 2 * (E / k2) := by ring
       rw [e]
-      calc t ^ 2 * g ^ 2 * (E / k2) ≤ (9 / 16) * g ^ 2 * (16 / 3) := by
-            apply mul_le_mul (mul_le_mul_of_nonneg_right ht2 (sq_nonneg g)) h1
-              (by positivity) (by positivity)
+      calc
+        t ^ 2 * g ^ 2 * (E / k2) ≤ (9 / 16) * g ^ 2 * (16 / 3) := by
+          apply mul_le_mul (mul_le_mul_of_nonneg_right ht2 (sq_nonneg g)) h1 (by positivity)
+            (by positivity)
         _ = 3 * g ^ 2 := by ring
-    have key : (Real.sqrt (t ^ 2 * g ^ 2 / k2) + u * Real.sqrt (k1 ^ 2 / k2)) ^ 2
-        ≤ 5 / 4 * (t ^ 2 * g ^ 2 / k2) + 5 * (k1 ^ 2 / k2) * u ^ 2 := by
+    have key
+        : (Real.sqrt (t ^ 2 * g ^ 2 / k2) + u * Real.sqrt (k1 ^ 2 / k2)) ^ 2
+          ≤ 5 / 4 * (t ^ 2 * g ^ 2 / k2) + 5 * (k1 ^ 2 / k2) * u ^ 2 := by
       nlinarith [sq_nonneg (Real.sqrt (t ^ 2 * g ^ 2 / k2) / 2 - 2 * u * Real.sqrt (k1 ^ 2 / k2))]
     have k1' := mul_le_mul_of_nonneg_right key hE.le
     have k2' := mul_le_mul_of_nonneg_left h2 (sq_nonneg u)
@@ -50,7 +54,7 @@ theorem pointwise_absorption_twisted :
   · rw [if_neg h]
     have t0 := hoff h
     subst t0
-    have z : Real.sqrt ((0:ℝ) ^ 2 * g ^ 2 / k2) = 0 := by simp
+    have z : Real.sqrt ((0 : ℝ) ^ 2 * g ^ 2 / k2) = 0 := by simp
     rw [z]
     have k2' := mul_le_mul_of_nonneg_left hw (sq_nonneg u)
     have e : (0 + u * Real.sqrt (k1 ^ 2 / k2)) ^ 2 * E = u ^ 2 * (k1 ^ 2 / k2) * E := by

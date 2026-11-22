@@ -9,19 +9,24 @@ open MeasureTheory
 
 namespace GlobalTheory.CoordBox
 
-theorem volume_coordBox_le (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-    [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] (K : Type) [Fintype K]
-    (w : K → V) (t : ℝ) (ht : 0 ≤ t) (hK : Fintype.card K = Module.finrank ℝ V) :
-    MeasureTheory.volume {y : V | ∃ c : K → ℝ, (∀ k, |c k| ≤ t) ∧ y = ∑ k, c k • w k}
+theorem volume_coordBox_le
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+    [MeasurableSpace V] [BorelSpace V]
+    (K : Type) [Fintype K]
+    (w : K → V)
+    (t : ℝ) (ht : 0 ≤ t)
+    (hK : Fintype.card K = Module.finrank ℝ V)
+    : MeasureTheory.volume {y : V | ∃ c : K → ℝ, (∀ k, |c k| ≤ t) ∧ y = ∑ k, c k • w k}
       ≤ ENNReal.ofReal ((2 * t) ^ Fintype.card K * ∏ k, ‖w k‖) := by
   classical
   set n := Fintype.card K with hn
   let o : OrthonormalBasis K ℝ V :=
     (stdOrthonormalBasis ℝ V).reindex (Fintype.equivFinOfCardEq hK).symm
   let v : K → V := fun k => (2 * t) • w k
-  let a : V := -∑ k, t • w k
-  have hsub : {y : V | ∃ c : K → ℝ, (∀ k, |c k| ≤ t) ∧ y = ∑ k, c k • w k}
-      ⊆ (fun x => x + a) '' parallelepiped v := by
+  let a : V := - ∑ k, t • w k
+  have hsub
+      : {y : V | ∃ c : K → ℝ, (∀ k, |c k| ≤ t) ∧ y = ∑ k, c k • w k}
+        ⊆ (fun x => x + a) '' parallelepiped v := by
     rintro y ⟨c, hc, rfl⟩
     set s : K → ℝ := fun k => (c k + t) / (2 * t) with hs
     have hkey : ∀ k, s k * (2 * t) = c k + t := by
@@ -52,17 +57,17 @@ theorem volume_coordBox_le (V : Type) [NormedAddCommGroup V] [InnerProductSpace 
     have hsm : o.toBasis.det v = (∏ _k : K, (2 * t)) • o.toBasis.det w :=
       o.toBasis.det.toMultilinearMap.map_smul_univ (fun _ => 2 * t) w
     rw [hsm, Finset.prod_const, Finset.card_univ, smul_eq_mul, abs_mul, abs_pow,
-      abs_of_nonneg (by linarith : (0:ℝ) ≤ 2 * t)]
+      abs_of_nonneg (by linarith : (0 : ℝ) ≤ 2 * t)]
   have hdet : |o.toBasis.det w| ≤ ∏ k, ‖w k‖ := by
     have := GlobalTheory.Hadamard.norm_orthonormalBasis_det_le (𝕜 := ℝ) o w
     simpa [Real.norm_eq_abs] using this
-  calc volume {y : V | ∃ c : K → ℝ, (∀ k, |c k| ≤ t) ∧ y = ∑ k, c k • w k}
+  calc
+    volume {y : V | ∃ c : K → ℝ, (∀ k, |c k| ≤ t) ∧ y = ∑ k, c k • w k}
       ≤ volume ((fun x => x + a) '' parallelepiped v) := measure_mono hsub
-    _ = volume (parallelepiped v) := by
-        rw [Set.image_add_right, measure_preimage_add_right]
+    _ = volume (parallelepiped v) := by rw [Set.image_add_right, measure_preimage_add_right]
     _ = ENNReal.ofReal ((2 * t) ^ n * |o.toBasis.det w|) := hvol
     _ ≤ ENNReal.ofReal ((2 * t) ^ Fintype.card K * ∏ k, ‖w k‖) := by
-        apply ENNReal.ofReal_le_ofReal
-        exact mul_le_mul_of_nonneg_left hdet (pow_nonneg (by linarith) _)
+      apply ENNReal.ofReal_le_ofReal
+      exact mul_le_mul_of_nonneg_left hdet (pow_nonneg (by linarith) _)
 
 end GlobalTheory.CoordBox

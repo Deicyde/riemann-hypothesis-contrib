@@ -20,8 +20,8 @@ def UpU (U : Matrix (Fin N) (Fin N) K) : Prop := ∀ i j, (j < i → U i j = 0) 
 theorem loU_bt {L : Matrix (Fin N) (Fin N) K} (h : LoU L) : L.BlockTriangular OrderDual.toDual :=
   fun i j hij => (h i j).1 hij
 
-theorem upU_bt {U : Matrix (Fin N) (Fin N) K} (h : UpU U) : U.BlockTriangular id :=
-  fun i j hij => (h i j).1 hij
+theorem upU_bt {U : Matrix (Fin N) (Fin N) K} (h : UpU U) : U.BlockTriangular id := fun i j hij =>
+  (h i j).1 hij
 
 theorem loU_det {L : Matrix (Fin N) (Fin N) K} (h : LoU L) : L.det = 1 := by
   rw [det_of_isLowerTriangular L (loU_bt h)]
@@ -44,12 +44,26 @@ theorem loU_mul {A B : Matrix (Fin N) (Fin N) K} (hA : LoU A) (hB : LoU B) : LoU
   · simp
 
 theorem upU_mul {A B : Matrix (Fin N) (Fin N) K} (hA : UpU A) (hB : UpU B) : UpU (A * B) := by
-  first | exact UpperTheory.Reformulated.B.Qh21.upU_mul .. | (apply UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption) | (intros; apply UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption) | (apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption) | (apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B hA hB | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B hA | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K
+  first
+  | exact UpperTheory.Reformulated.B.Qh21.upU_mul ..
+  | (apply UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
+  | (intros; apply UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
+  | (intros; apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.Qh21.upU_mul <;> first | assumption | infer_instance)
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B hA hB
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B hA
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A B
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N A
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_› N
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K ‹_›
+  | exact @UpperTheory.Reformulated.B.Qh21.upU_mul K
 
 theorem loU_inv {L : Matrix (Fin N) (Fin N) K} (h : LoU L) : LoU L⁻¹ := by
   have hu : IsUnit L.det := by rw [loU_det h]; exact isUnit_one
   haveI := invertibleOfIsUnitDet L hu
-  have hbt : L⁻¹.BlockTriangular OrderDual.toDual := blockTriangular_inv_of_blockTriangular (loU_bt h)
+  have hbt : L⁻¹.BlockTriangular OrderDual.toDual :=
+    blockTriangular_inv_of_blockTriangular (loU_bt h)
   intro i j
   refine ⟨fun hij => hbt hij, fun hij => ?_⟩
   subst hij
@@ -78,7 +92,9 @@ theorem upU_inv {U : Matrix (Fin N) (Fin N) K} (h : UpU U) : UpU U⁻¹ := by
     · rw [hbt h', mul_zero]
   · simp
 
-theorem eq_self_of_le {f : Fin N → Fin N} (hf : Function.Injective f) (hle : ∀ a, f a ≤ a) (a : Fin N) : f a = a := by
+theorem eq_self_of_le
+    {f : Fin N → Fin N} (hf : Function.Injective f) (hle : ∀ a, f a ≤ a) (a : Fin N)
+    : f a = a := by
   suffices h : ∀ n (a : Fin N), a.val = n → f a = a from h _ a rfl
   intro n
   induction n using Nat.strong_induction_on with
@@ -90,10 +106,14 @@ theorem eq_self_of_le {f : Fin N → Fin N} (hf : Function.Injective f) (hle : �
       exact (ne_of_lt hlt) (hf h1)
     · exact heq
 
-def mono (π : Fin N → Fin N) (c : Fin N → K) : Matrix (Fin N) (Fin N) K := fun a b => if b = π a then c a else 0
+def mono (π : Fin N → Fin N) (c : Fin N → K) : Matrix (Fin N) (Fin N) K := fun a b =>
+  if b = π a then c a else 0
 
-theorem mul_mono_apply (A : Matrix (Fin N) (Fin N) K) {π : Fin N → Fin N} (hπ : ∀ a, π (π a) = a) (c : Fin N → K)
-    (a b : Fin N) : (A * mono π c) a b = A a (π b) * c (π b) := by
+theorem mul_mono_apply
+    (A : Matrix (Fin N) (Fin N) K)
+    {π : Fin N → Fin N} (hπ : ∀ a, π (π a) = a)
+    (c : Fin N → K) (a b : Fin N)
+    : (A * mono π c) a b = A a (π b) * c (π b) := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (π b)]
   · simp [mono, hπ]
   · intro k _ hk
@@ -101,21 +121,26 @@ theorem mul_mono_apply (A : Matrix (Fin N) (Fin N) K) {π : Fin N → Fin N} (h�
     simp [mono, this]
   · simp
 
-theorem mono_mul_apply (A : Matrix (Fin N) (Fin N) K) (π : Fin N → Fin N) (c : Fin N → K) (a b : Fin N) :
-    (mono π c * A) a b = c a * A (π a) b := by
+theorem mono_mul_apply
+    (A : Matrix (Fin N) (Fin N) K) (π : Fin N → Fin N) (c : Fin N → K) (a b : Fin N)
+    : (mono π c * A) a b = c a * A (π a) b := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (π a)]
   · simp [mono]
   · intro k _ hk
     simp [mono, hk]
   · simp
 
-theorem mono_uniq {π ρ : Fin N → Fin N} (hπ : ∀ a, π (π a) = a) (hρ : ∀ a, ρ (ρ a) = a) {c d : Fin N → K}
-    (hd : ∀ a, d a ≠ 0) {L₁ L₂ U₁ U₂ : Matrix (Fin N) (Fin N) K} (hL₁ : LoU L₁) (hL₂ : LoU L₂)
-    (hU₁ : UpU U₁) (hU₂ : UpU U₂) (h : L₁ * mono π c * U₁ = L₂ * mono ρ d * U₂) : π = ρ ∧ c = d := by
+theorem mono_uniq
+    {π ρ : Fin N → Fin N} (hπ : ∀ a, π (π a) = a) (hρ : ∀ a, ρ (ρ a) = a)
+    {c d : Fin N → K} (hd : ∀ a, d a ≠ 0)
+    {L₁ L₂ U₁ U₂ : Matrix (Fin N) (Fin N) K} (hL₁ : LoU L₁) (hL₂ : LoU L₂) (hU₁ : UpU U₁)
+    (hU₂ : UpU U₂) (h : L₁ * mono π c * U₁ = L₂ * mono ρ d * U₂)
+    : π = ρ ∧ c = d := by
   have hu1 : IsUnit U₁.det := by rw [upU_det hU₁]; exact isUnit_one
   have hu2 : IsUnit L₂.det := by rw [loU_det hL₂]; exact isUnit_one
   have key : L₂⁻¹ * L₁ * mono π c = mono ρ d * (U₂ * U₁⁻¹) := by
-    have h' : L₁ * (mono π c * U₁) = L₂ * (mono ρ d * U₂) := by simpa only [Matrix.mul_assoc] using h
+    have h' : L₁ * (mono π c * U₁) = L₂ * (mono ρ d * U₂) := by
+      simpa only [Matrix.mul_assoc] using h
     have e1 : L₂⁻¹ * L₁ * mono π c = L₂⁻¹ * ((L₁ * (mono π c * U₁)) * U₁⁻¹) := by
       simp only [Matrix.mul_assoc, mul_nonsing_inv _ hu1, Matrix.mul_one]
     have e2 : L₂⁻¹ * ((L₂ * (mono ρ d * U₂)) * U₁⁻¹) = mono ρ d * (U₂ * U₁⁻¹) := by
@@ -165,8 +190,8 @@ def pval : List (K × ℕ) → ℕ → K
   | [], _ => 0
   | (t, s) :: bs, i => if i < s then t else pval bs (i - s)
 
-theorem ptEntry_eq (bs : List (K × ℕ)) (i j : ℕ) (hi : i < (bs.map Prod.snd).sum) :
-    ptEntry bs i j = if j = pperm bs i then pval bs i else 0 := by
+theorem ptEntry_eq (bs : List (K × ℕ)) (i j : ℕ) (hi : i < (bs.map Prod.snd).sum)
+    : ptEntry bs i j = if j = pperm bs i then pval bs i else 0 := by
   induction bs generalizing i j with
   | nil => simp at hi
   | cons b bs ih =>
@@ -178,7 +203,7 @@ theorem ptEntry_eq (bs : List (K × ℕ)) (i j : ℕ) (hi : i < (bs.map Prod.snd
         by_cases h : i + j + 1 = s
         · rw [if_pos h, if_pos (by omega)]
         · rw [if_neg h, if_neg (by omega)]
-      · have hn : ¬ (s ≤ i ∧ s ≤ j) := by omega
+      · have hn : ¬(s ≤ i ∧ s ≤ j) := by omega
         simp only [ptEntry, pperm, pval, his, hjs, and_false, if_false, if_true, hn]
         rw [if_neg (by omega)]
     · by_cases hjs : s ≤ j
@@ -191,8 +216,9 @@ theorem ptEntry_eq (bs : List (K × ℕ)) (i j : ℕ) (hi : i < (bs.map Prod.snd
       · simp only [ptEntry, pperm, pval, his, false_and, if_false, hjs, and_false]
         rw [if_neg (by omega)]
 
-theorem pperm_lt (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : ℕ) (hi : i < (bs.map Prod.snd).sum) :
-    pperm bs i < (bs.map Prod.snd).sum := by
+theorem pperm_lt
+    (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : ℕ) (hi : i < (bs.map Prod.snd).sum)
+    : pperm bs i < (bs.map Prod.snd).sum := by
   induction bs generalizing i with
   | nil => simp at hi
   | cons b bs ih =>
@@ -206,8 +232,9 @@ theorem pperm_lt (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : �
     · have := ih hpos' (i - s) (by omega)
       omega
 
-theorem pperm_pperm (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : ℕ) (hi : i < (bs.map Prod.snd).sum) :
-    pperm bs (pperm bs i) = i := by
+theorem pperm_pperm
+    (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i : ℕ) (hi : i < (bs.map Prod.snd).sum)
+    : pperm bs (pperm bs i) = i := by
   induction bs generalizing i with
   | nil => simp at hi
   | cons b bs ih =>
@@ -222,8 +249,9 @@ theorem pperm_pperm (bs : List (K × ℕ)) (hpos : ∀ b ∈ bs, 1 ≤ b.2) (i :
       rw [if_neg (by omega), Nat.add_sub_cancel_left, ih hpos' (i - s) (by omega)]
       omega
 
-theorem pval_ne (bs : List (K × ℕ)) (ht : ∀ b ∈ bs, b.1 ≠ 0) (i : ℕ) (hi : i < (bs.map Prod.snd).sum) :
-    pval bs i ≠ 0 := by
+theorem pval_ne
+    (bs : List (K × ℕ)) (ht : ∀ b ∈ bs, b.1 ≠ 0) (i : ℕ) (hi : i < (bs.map Prod.snd).sum)
+    : pval bs i ≠ 0 := by
   induction bs generalizing i with
   | nil => simp at hi
   | cons b bs ih =>
@@ -235,10 +263,12 @@ theorem pval_ne (bs : List (K × ℕ)) (ht : ∀ b ∈ bs, b.1 ≠ 0) (i : ℕ) 
     · exact ht (t, s) (by simp)
     · exact ih ht' (i - s) (by omega)
 
-theorem blocks_eq_of (bs : List (K × ℕ)) (cs : List (K × ℕ)) (hb : ∀ b ∈ bs, 1 ≤ b.2) (hc : ∀ c ∈ cs, 1 ≤ c.2)
+theorem blocks_eq_of
+    (bs : List (K × ℕ)) (cs : List (K × ℕ)) (hb : ∀ b ∈ bs, 1 ≤ b.2) (hc : ∀ c ∈ cs, 1 ≤ c.2)
     (hsum : (bs.map Prod.snd).sum = (cs.map Prod.snd).sum)
     (hp : ∀ i < (bs.map Prod.snd).sum, pperm bs i = pperm cs i)
-    (hv : ∀ i < (bs.map Prod.snd).sum, pval bs i = pval cs i) : bs = cs := by
+    (hv : ∀ i < (bs.map Prod.snd).sum, pval bs i = pval cs i)
+    : bs = cs := by
   induction bs generalizing cs with
   | nil =>
     cases cs with
@@ -270,16 +300,19 @@ theorem blocks_eq_of (bs : List (K × ℕ)) (cs : List (K × ℕ)) (hb : ∀ b �
       have htail : bs = cs := by
         refine ih cs hb' hc' (by omega) (fun i hi => ?_) (fun i hi => ?_)
         · have := hp (s + i) (by omega)
-          simp only [pperm, show ¬ (s + i < s) by omega, if_false, Nat.add_sub_cancel_left] at this
+          simp only [pperm, show ¬(s + i < s) by omega, if_false, Nat.add_sub_cancel_left] at this
           omega
         · have := hv (s + i) (by omega)
-          simpa only [pval, show ¬ (s + i < s) by omega, if_false, Nat.add_sub_cancel_left] using this
+          simpa only [pval, show ¬(s + i < s) by omega, if_false, Nat.add_sub_cancel_left] using
+            this
       rw [htail]
 
-def pinv (p : Point K N) (a : Fin N) : Fin N :=
-  ⟨pperm p.1 a.val, by
+def pinv (p : Point K N) (a : Fin N) : Fin N := ⟨
+  pperm p.1 a.val,
+  by
     have := pperm_lt p.1 (fun b hb => (p.2.1 b hb).2) a.val (by rw [p.2.2]; exact a.isLt)
-    rwa [p.2.2] at this⟩
+    rwa [p.2.2] at this
+⟩
 
 theorem pinv_pinv (p : Point K N) (a : Fin N) : pinv p (pinv p a) = a := by
   apply Fin.ext
@@ -292,17 +325,23 @@ theorem ptMat_eq_mono (p : Point K N) : ptMat p = mono (pinv p) (fun a => pval p
   congr 1
   simp [Fin.ext_iff]
 
-theorem isInCell_uniq {Z : Matrix (Fin N) (Fin N) K} {p q : Point K N} (hp : IsInCell Z p) (hq : IsInCell Z q) :
-    p = q := by
+theorem isInCell_uniq
+    {Z : Matrix (Fin N) (Fin N) K} {p q : Point K N} (hp : IsInCell Z p) (hq : IsInCell Z q)
+    : p = q := by
   obtain ⟨L₁, U₁, hL₁, hU₁, e₁⟩ := hp
   obtain ⟨L₂, U₂, hL₂, hU₂, e₂⟩ := hq
   rw [ptMat_eq_mono] at e₁ e₂
-  obtain ⟨hπ, hc⟩ := mono_uniq (pinv_pinv p) (pinv_pinv q)
-    (fun a => pval_ne q.1 (fun b hb => (q.2.1 b hb).1) a.val (by rw [q.2.2]; exact a.isLt))
-    hL₁ hL₂ hU₁ hU₂ (e₁.symm.trans e₂)
+  obtain ⟨hπ, hc⟩ :=
+    mono_uniq (pinv_pinv p) (pinv_pinv q)
+      (fun a => pval_ne q.1 (fun b hb => (q.2.1 b hb).1) a.val (by rw [q.2.2]; exact a.isLt))
+      hL₁ hL₂ hU₁ hU₂ (e₁.symm.trans e₂)
   apply Subtype.ext
-  refine blocks_eq_of p.1 q.1 (fun b hb => (p.2.1 b hb).2) (fun b hb => (q.2.1 b hb).2) (by rw [p.2.2, q.2.2])
-    (fun i hi => ?_) (fun i hi => ?_)
+  refine blocks_eq_of p.1 q.1
+    (fun b hb => (p.2.1 b hb).2)
+    (fun b hb => (q.2.1 b hb).2)
+    (by rw [p.2.2, q.2.2])
+    (fun i hi => ?_)
+    (fun i hi => ?_)
   · rw [p.2.2] at hi
     have := congrArg Fin.val (congrFun hπ ⟨i, hi⟩)
     simpa [pinv] using this

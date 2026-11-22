@@ -11,8 +11,12 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.LevChiE
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.UG
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.UG
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.KJInf Formalism.L2.Ker
@@ -21,5 +25,12 @@ open GlobalTheory.Mem.Col2.AdT
 open Filter Topology
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_badPrime_over_chart_bad_place : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (a : I.ι) (v : HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F)), v ∈ Formalism.L2.Forms.badG (I.rec7 l Z) ∨ I.UnderQ a v → ∃ P : SBof I a, Formalism.L2.Col.IsOver v (GlobalTheory.TwU.seamP (sm I l Z) P.1) := by
+theorem _root_.GlobalTheory.T.exists_badPrime_over_chart_bad_place
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (a : I.ι)
+            (v : HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F)),
+          v ∈ Formalism.L2.Forms.badG (I.rec7 l Z) ∨ I.UnderQ a v
+            → ∃ P : SBof I a,
+              Formalism.L2.Col.IsOver v (GlobalTheory.TwU.seamP (sm I l Z) P.1) := by
   exact @GlobalTheory.Mem.Col2.AdT.exists_SBof_over_sub

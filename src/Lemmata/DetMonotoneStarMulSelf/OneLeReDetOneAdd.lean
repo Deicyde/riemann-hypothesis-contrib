@@ -73,8 +73,7 @@ private lemma det_mono {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℂ) (hB : B.PosS
     rw [hdA, Complex.mul_re, hu0, zero_mul, sub_zero]
     nlinarith [hw.1]
 
-theorem goal1 :
-  ∀ (n : Nat), ReciprocityTheory.L2DbarEstimates.DetMonoStatement n := by
+theorem goal1 : ∀ (n : Nat), ReciprocityTheory.L2DbarEstimates.DetMonoStatement n := by
   intro n
   unfold ReciprocityTheory.L2DbarEstimates.DetMonoStatement
   intro A B hB hAB

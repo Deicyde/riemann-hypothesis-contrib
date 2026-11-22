@@ -6,8 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsDiscret
 
 @[expose] public section
 
-theorem UpperTheory.V.Pr.dimOf :
-    UpperTheory.V.Pr.DimOf := by
+theorem UpperTheory.V.Pr.dimOf : UpperTheory.V.Pr.DimOf := by
   intro O Λ B _ _ _ _ _ _ _ φ J m ⟨e⟩ hfin htf Z hZ
   haveI : NoZeroDivisors O := IsDomain.to_noZeroDivisors O
   haveI : IsPrincipalIdealRing O := IsDiscreteValuationRing.toIsPrincipalIdealRing
@@ -37,13 +36,15 @@ theorem UpperTheory.V.Pr.dimOf :
   have hq : ringKrullDim (B ⧸ P.comap (Ideal.Quotient.mk J)) = ringKrullDim ((B ⧸ J) ⧸ P) := by
     have hs : Function.Surjective ((Ideal.Quotient.mk P).comp (Ideal.Quotient.mk J)) :=
       Ideal.Quotient.mk_surjective.comp Ideal.Quotient.mk_surjective
-    have hk : P.comap (Ideal.Quotient.mk J)
-        = RingHom.ker ((Ideal.Quotient.mk P).comp (Ideal.Quotient.mk J)) := by
+    have hk
+        : P.comap (Ideal.Quotient.mk J)
+          = RingHom.ker ((Ideal.Quotient.mk P).comp (Ideal.Quotient.mk J)) := by
       ext x
       rw [RingHom.mem_ker, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_comap]
     rw [hk]
     exact ringKrullDim_eq_of_ringEquiv (RingHom.quotientKerEquivOfSurjective hs)
   show ringKrullDim _ = _
   rw [hq, h, ringKrullDim_eq_of_ringEquiv e.toRingEquiv,
-    GlobalTheory.FormalIsogeny.ringKrullDim_mvPowerSeries, IsDiscreteValuationRing.ringKrullDim_eq_one]
+    GlobalTheory.FormalIsogeny.ringKrullDim_mvPowerSeries,
+    IsDiscreteValuationRing.ringKrullDim_eq_one]
   rw [Nat.card_eq_fintype_card, Fintype.card_fin, Nat.cast_add, Nat.cast_one]

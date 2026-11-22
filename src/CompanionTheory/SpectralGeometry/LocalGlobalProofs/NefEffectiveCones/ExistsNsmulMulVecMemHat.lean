@@ -12,8 +12,8 @@ open scoped TensorProduct Matrix
 
 namespace GlobalTheory.CompanionTheory.HatBound
 
-theorem exists_nat_mul_integer (K : Type) [Field K] [NumberField K] (x : K) :
-    ∃ m : ℕ, 0 < m ∧ ∃ r : 𝓞 K, (r : K) = m * x := by
+theorem exists_nat_mul_integer (K : Type) [Field K] [NumberField K] (x : K)
+    : ∃ m : ℕ, 0 < m ∧ ∃ r : 𝓞 K, (r : K) = m * x := by
   have hx : IsAlgebraic ℤ x :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ K).2 (Algebra.IsAlgebraic.isAlgebraic x)
   obtain ⟨y, hy, h⟩ := hx.exists_integral_multiple
@@ -34,9 +34,11 @@ theorem exists_nat_mul_integer (K : Type) [Field K] [NumberField K] (x : K) :
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ}
 
-theorem exists_nsmul_mem_lattice [NumberField E] (L : Submodule (𝓞 E) (Fin n → E))
-    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (x : Fin n → E) :
-    ∃ m : ℕ, 0 < m ∧ m • x ∈ L := by
+theorem exists_nsmul_mem_lattice
+    [NumberField E]
+    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤)
+    (x : Fin n → E)
+    : ∃ m : ℕ, 0 < m ∧ m • x ∈ L := by
   have hx : x ∈ Submodule.span E (L : Set (Fin n → E)) := hL ▸ Submodule.mem_top
   induction hx using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_pos, by simpa using hx⟩

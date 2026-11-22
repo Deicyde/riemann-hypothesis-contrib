@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EmbeddingXiZe
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff
 
 namespace GlobalTheory.DualPairCompare
@@ -22,7 +24,8 @@ end Gen
 
 open GlobalTheory.IndefiniteRowSideFullHecke
 
-instance topRing (D : D7) : IsTopologicalRing (AE D) := IsModuleTopology.isTopologicalRing (AF D.host.F) _
+instance topRing (D : D7) : IsTopologicalRing (AE D) :=
+  IsModuleTopology.isTopologicalRing (AF D.host.F) _
 
 end GlobalTheory.DualPairCompare
 

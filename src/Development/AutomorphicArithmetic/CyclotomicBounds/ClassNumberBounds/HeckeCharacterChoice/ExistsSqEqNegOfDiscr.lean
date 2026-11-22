@@ -21,8 +21,11 @@ namespace KStar.Choice
 
 open KStar.Ram DirichletCharacter
 
-private theorem exists_sq_eq_neg_of_quadratic_discr {K : Type*} [Field K] [NumberField K]
-    (hK : Module.finrank ℚ K = 2) {d : ℕ} (hKd : discr K = -(d : ℤ)) : ∃ δ : K, δ ^ 2 = -(d : K) := by
+private theorem exists_sq_eq_neg_of_quadratic_discr
+    {K : Type*} [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    {d : ℕ} (hKd : discr K = -(d : ℤ))
+    : ∃ δ : K, δ ^ 2 = -(d : K) := by
   obtain ⟨x, hx⟩ : ∃ x : K, ∀ c : ℚ, c • (1 : K) ≠ x := by
     by_contra h
     push_neg at h
@@ -37,7 +40,8 @@ private theorem exists_sq_eq_neg_of_quadratic_discr {K : Type*} [Field K] [Numbe
       exact ⟨hst, rfl⟩
     · exfalso
       apply hx (-(s / t))
-      rw [neg_smul, neg_eq_iff_add_eq_zero, ← one_smul ℚ x, ← inv_mul_cancel₀ ht, mul_smul, div_eq_inv_mul, mul_smul, ← smul_add, hst, smul_zero]
+      rw [neg_smul, neg_eq_iff_add_eq_zero, ← one_smul ℚ x, ← inv_mul_cancel₀ ht, mul_smul,
+        div_eq_inv_mul, mul_smul, ← smul_add, hst, smul_zero]
   let b := basisOfLinearIndependentOfCardEqFinrank li (by simp [hK])
   have hb : ⇑b = ![(1 : K), x] := coe_basisOfLinearIndependentOfCardEqFinrank _ _
   set A := b.repr (x ^ 2) 0
@@ -86,8 +90,11 @@ private theorem exists_sq_eq_neg_of_quadratic_discr {K : Type*} [Field K] [Numbe
   simp only [Rat.cast_mul, Rat.cast_pow, Rat.cast_add, Rat.cast_ofNat]
   linear_combination (4 * (P.det : K) ^ 2) * hx2
 
-private theorem isTotallyComplex_of_quadratic_neg_discr {K : Type*} [Field K] [NumberField K]
-    (hK : Module.finrank ℚ K = 2) {d : ℕ} (hd : d ≠ 0) (hKd : discr K = -(d : ℤ)) : IsTotallyComplex K := by
+private theorem isTotallyComplex_of_quadratic_neg_discr
+    {K : Type*} [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    {d : ℕ} (hd : d ≠ 0) (hKd : discr K = -(d : ℤ))
+    : IsTotallyComplex K := by
   have hs := NumberField.sign_discr (K := K)
   rw [hKd] at hs
   have hneg : (-(d : ℤ)).sign = -1 := Int.sign_eq_neg_one_of_neg (by omega)
@@ -98,12 +105,16 @@ private theorem isTotallyComplex_of_quadratic_neg_discr {K : Type*} [Field K] [N
   apply NumberField.nrRealPlaces_eq_zero_iff.mp
   omega
 
-theorem exists_sq_eq_neg_of_discr {K : Type*} [Field K] [NumberField K]
-    (hK : Module.finrank ℚ K = 2) {d : ℕ} (hd : d ≠ 0) (hKd : discr K = -(d : ℤ)) :
-    (∃ δ : K, δ ^ 2 = -(d : K)) ∧ IsTotallyComplex K := ⟨exists_sq_eq_neg_of_quadratic_discr hK hKd, isTotallyComplex_of_quadratic_neg_discr hK hd hKd⟩
+theorem exists_sq_eq_neg_of_discr
+    {K : Type*} [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    {d : ℕ} (hd : d ≠ 0) (hKd : discr K = -(d : ℤ))
+    : (∃ δ : K, δ ^ 2 = -(d : K)) ∧ IsTotallyComplex K :=
+  ⟨exists_sq_eq_neg_of_quadratic_discr hK hKd, isTotallyComplex_of_quadratic_neg_discr hK hd hKd⟩
 
-variable {N : ℕ} [NeZero N] {n d q₁ : ℕ} {ch ps : DirichletCharacter ℂ N}
-  {Y : Subgroup (DirichletCharacter ℂ N)}
-  {L : Type} [Field L] [NumberField L] [IsCyclotomicExtension {N} ℚ L]
+variable
+  {N : ℕ} [NeZero N]
+  {n d q₁ : ℕ} {ch ps : DirichletCharacter ℂ N} {Y : Subgroup (DirichletCharacter ℂ N)} {L : Type}
+  [Field L] [NumberField L] [IsCyclotomicExtension {N} ℚ L]
 
 end KStar.Choice

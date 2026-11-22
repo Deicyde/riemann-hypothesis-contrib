@@ -14,20 +14,27 @@ namespace Formalism.L2.SG.Pf.CovolIdx
 
 variable {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
 
-theorem fd_sub (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0) (A B : Subgroup G) [Countable A]
+theorem fd_sub
+    (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0)
+    (A B : Subgroup G) [Countable A]
     (hinv : ∀ s ∈ A, μ.map (fun x => s * x) = μ) (hAR : ∀ s ∈ A, ∀ r ∈ R, s * r ∈ R)
     (KA : Set G) (hKA : MeasurableSet KA) (hKAu : ∀ r ∈ R, ∃! s, s ∈ A ∧ s * r ∈ KA)
-    (hfin : B.relIndex A ≠ 0) :
-    ∃ KC : Set G, MeasurableSet KC ∧ (∀ r ∈ R, ∃! s, s ∈ A ⊓ B ∧ s * r ∈ KC) ∧
-      μ KC = (B.relIndex A : ℝ≥0∞) * μ KA := by
+    (hfin : B.relIndex A ≠ 0)
+    : ∃ KC : Set G,
+      MeasurableSet KC ∧ (∀ r ∈ R, ∃! s, s ∈ A ⊓ B ∧ s * r ∈ KC)
+        ∧ μ KC = (B.relIndex A : ℝ≥0∞) * μ KA := by
   classical
   haveI : Finite (A ⧸ B.subgroupOf A) :=
     Nat.finite_of_card_ne_zero (by rw [← Subgroup.index_eq_card]; exact hfin)
   letI : Fintype (A ⧸ B.subgroupOf A) := Fintype.ofFinite _
-  have hmk : ∀ q : A ⧸ B.subgroupOf A, ((Quotient.out q : A) : A ⧸ B.subgroupOf A) = q :=
-    fun q => QuotientGroup.out_eq' q
-  refine ⟨⋃ q : A ⧸ B.subgroupOf A, (fun x => ((Quotient.out q : A) : G) * x) ⁻¹' KA,
-    MeasurableSet.iUnion fun q => measurable_const_mul _ hKA, ?_, ?_⟩
+  have hmk : ∀ q : A ⧸ B.subgroupOf A, ((Quotient.out q : A) : A ⧸ B.subgroupOf A) = q := fun q =>
+    QuotientGroup.out_eq' q
+  refine ⟨
+    ⋃ q : A ⧸ B.subgroupOf A, (fun x => ((Quotient.out q : A) : G) * x) ⁻¹' KA,
+    MeasurableSet.iUnion fun q => measurable_const_mul _ hKA,
+    ?_,
+    ?_
+  ⟩
   · intro r hr
     obtain ⟨a, ⟨ha, har⟩, hau⟩ := hKAu r hr
     obtain ⟨q, hq⟩ : ∃ q : A ⧸ B.subgroupOf A, q = ((⟨a, ha⟩ : A) : A ⧸ B.subgroupOf A) := ⟨_, rfl⟩
@@ -35,7 +42,11 @@ theorem fd_sub (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0) (A B : Subgroup G
       have h1 := QuotientGroup.eq.mp ((hmk q).trans hq)
       rw [Subgroup.mem_subgroupOf] at h1
       simpa using h1
-    refine ⟨((Quotient.out q : A) : G)⁻¹ * a, ⟨⟨A.mul_mem (A.inv_mem (Quotient.out q).2) ha, hqB⟩, ?_⟩, ?_⟩
+    refine ⟨
+      ((Quotient.out q : A) : G)⁻¹ * a,
+      ⟨⟨A.mul_mem (A.inv_mem (Quotient.out q).2) ha, hqB⟩, ?_⟩,
+      ?_
+    ⟩
     · refine Set.mem_iUnion.mpr ⟨q, ?_⟩
       show ((Quotient.out q : A) : G) * (((Quotient.out q : A) : G)⁻¹ * a * r) ∈ KA
       rw [mul_assoc, mul_inv_cancel_left]
@@ -66,25 +77,32 @@ theorem fd_sub (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0) (A B : Subgroup G
       intro x hx hxR
       apply hne
       have e := (hKAu x hxR).unique ⟨(Quotient.out q).2, hx.1⟩ ⟨(Quotient.out q').2, hx.2⟩
-      have e' := congrArg (fun z : A => (z : A ⧸ B.subgroupOf A)) (Subtype.ext e : Quotient.out q = Quotient.out q')
+      have e' :=
+        congrArg
+          (fun z : A => (z : A ⧸ B.subgroupOf A))
+          (Subtype.ext e : Quotient.out q = Quotient.out q')
       simp only [hmk] at e'
       exact e'
-    have hmeas : ∀ q : A ⧸ B.subgroupOf A,
-        μ ((fun x => ((Quotient.out q : A) : G) * x) ⁻¹' KA) = μ KA := by
+    have hmeas
+        : ∀ q : A ⧸ B.subgroupOf A,
+          μ ((fun x => ((Quotient.out q : A) : G) * x) ⁻¹' KA) = μ KA := by
       intro q
       rw [← Measure.map_apply (measurable_const_mul _) hKA, hinv _ (Quotient.out q).2]
-    rw [measure_iUnion₀ hdisj (fun q => (measurable_const_mul _ hKA).nullMeasurableSet), tsum_fintype]
+    rw [measure_iUnion₀ hdisj (fun q => (measurable_const_mul _ hKA).nullMeasurableSet),
+      tsum_fintype]
     simp only [hmeas, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
     congr 1
     rw [Subgroup.relIndex, Subgroup.index_eq_card, Nat.card_eq_fintype_card]
 
-theorem covol_commens (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0) (A B : Subgroup G) [Countable A] [Countable B]
+theorem covol_commens
+    (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0)
+    (A B : Subgroup G) [Countable A] [Countable B]
     (hinvA : ∀ s ∈ A, μ.map (fun x => s * x) = μ) (hinvB : ∀ s ∈ B, μ.map (fun x => s * x) = μ)
     (hAR : ∀ s ∈ A, ∀ r ∈ R, s * r ∈ R) (hBR : ∀ s ∈ B, ∀ r ∈ R, s * r ∈ R)
     (KA KB : Set G) (hKA : MeasurableSet KA) (hKB : MeasurableSet KB)
     (hKAu : ∀ r ∈ R, ∃! s, s ∈ A ∧ s * r ∈ KA) (hKBu : ∀ r ∈ R, ∃! s, s ∈ B ∧ s * r ∈ KB)
-    (hfinA : B.relIndex A ≠ 0) (hfinB : A.relIndex B ≠ 0) :
-    μ KA * (B.relIndex A : ℝ≥0∞) = μ KB * (A.relIndex B : ℝ≥0∞) := by
+    (hfinA : B.relIndex A ≠ 0) (hfinB : A.relIndex B ≠ 0)
+    : μ KA * (B.relIndex A : ℝ≥0∞) = μ KB * (A.relIndex B : ℝ≥0∞) := by
   classical
   obtain ⟨K1, hK1m, hK1u, hK1μ⟩ := fd_sub μ R hR A B hinvA hAR KA hKA hKAu hfinA
   obtain ⟨K2, hK2m, hK2u, hK2μ⟩ := fd_sub μ R hR B A hinvB hBR KB hKB hKBu hfinB
@@ -99,8 +117,10 @@ theorem covol_commens (μ : Measure G) (R : Set G) (hR : μ Rᶜ = 0) (A B : Sub
     show μ ((fun x => (c : G) * x) ⁻¹' s) = μ s
     rw [← Measure.map_apply (measurable_const_mul _) hs, hinvA _ c.2.1]⟩
   have hRa : ∀ᵐ x ∂μ, x ∈ R := ae_iff.mpr hR
-  have mkfd : ∀ K : Set G, MeasurableSet K → (∀ r ∈ R, ∃! s, s ∈ A ⊓ B ∧ s * r ∈ K) →
-      IsFundamentalDomain ↥(A ⊓ B) K μ := by
+  have mkfd
+      : ∀ K : Set G,
+        MeasurableSet K → (∀ r ∈ R, ∃! s, s ∈ A ⊓ B ∧ s * r ∈ K)
+          → IsFundamentalDomain ↥(A ⊓ B) K μ := by
     intro K hK hu
     refine ⟨hK.nullMeasurableSet, ?_, ?_⟩
     · filter_upwards [hRa] with x hx

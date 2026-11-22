@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Ker
+open NumberField IsDedekindDomain Formalism.L2.Col Formalism.HermitianLatticesTheory
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Ker
 
 noncomputable section
 
 namespace GlobalTheory.ColPeriod
 
-theorem valuation_finOrder_apply {G K : Type} [Group G] [Field K] [NumberField K] (ξ : G →* Kˣ) (hξ : IsOfFinOrder ξ)
-    (w : HeightOneSpectrum (𝓞 K)) (y : G) : w.valuation K ((ξ y : Kˣ) : K) = 1 := by
+theorem valuation_finOrder_apply
+    {G K : Type} [Group G] [Field K] [NumberField K]
+    (ξ : G →* Kˣ) (hξ : IsOfFinOrder ξ)
+    (w : HeightOneSpectrum (𝓞 K)) (y : G)
+    : w.valuation K ((ξ y : Kˣ) : K) = 1 := by
   obtain ⟨n, hn, h⟩ := isOfFinOrder_iff_pow_eq_one.1 hξ
   have h1 : (ξ y) ^ n = 1 := by
     have := congrArg (fun φ : G →* Kˣ => φ y) h
@@ -40,7 +44,8 @@ theorem twistUnit : TwistUnit := by
   · unfold qValC
     split_ifs with h
     · obtain ⟨y, y₀, h1, h2, h3, h4⟩ :=
-        GlobalTheory.SuppIdele.exists_supported_idele F E P v ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) hv
+        GlobalTheory.SuppIdele.exists_supported_idele F E P v ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E)
+          hv
       rw [← h.choose_spec v hv y y₀ h1 h2 h3 h4]
       exact valuation_finOrder_apply _ hfin w y
     · simp
