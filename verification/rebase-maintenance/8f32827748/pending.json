@@ -1,0 +1,22 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/SatakeDualWeyl/AdelicIwasawaHecke/Levelaf.lean",
+      "stages": {
+        "1": "a82305067315c15f9bd280d1167ce411cf54a34a",
+        "2": "a2e5396df9915818694d44be8d94693a4e83830f",
+        "3": "ea8a7eec1036c7df357d0f58f7dad6e620e910d7"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "3d9738845ce2bf26fae1abe569fdde999ec9e76c",
+  "checkpoint_head": "f5a1d5739f5ff6999a52568c5954d35ababd0ddf",
+  "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-78"
+}
