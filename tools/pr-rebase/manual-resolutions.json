@@ -30,6 +30,11 @@
             "path": "README.md",
             "ours": "ffbeeaaa86179e657b72bcb202a216ef535419c3",
             "resolution": "resolutions/88-current-readme.md"
+          },
+          {
+            "path": "README.md",
+            "ours": "833e95fc8b64abdd895817844cb32c1d51d17066",
+            "resolution": "resolutions/88-current-readme-main611.md"
           }
         ]
       }
