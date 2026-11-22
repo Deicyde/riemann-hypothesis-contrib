@@ -70,8 +70,8 @@ theorem sx_dual {n' : ℕ} (B : OmBasis p n') (hev : Even n') (a b : Fin n') (ha
     simp only [Function.comp_apply]
     have hsig : ∑ r, sigW p ((sigW p)^[2 * i.val] (B.omS r)) * sigW p ((sigW p)^[2 * i'.val] (B.om r)) =
         sigW p (∑ r, (sigW p)^[2 * i.val] (B.omS r) * (sigW p)^[2 * i'.val] (B.om r)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun r _ => (map_mul _ _ _).symm
     rw [hsig, hE]
     by_cases h : a = b
@@ -116,8 +116,8 @@ theorem sx_frob_sum {ι α K' : Type} [Field K'] (R : Subring K') (s : Finset α
       simp only [y', dif_pos hi]
       exact hy i hi
     have h2 := congrArg (MvPowerSeries.map R.subtype) hr
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_pow, map_sum, map_add (f := _), map_mul, map_natCast] at h2
+
+    simp only [map_pow, map_sum, map_add (f := _), map_mul, map_natCast] at h2
     have e3 : ∑ i ∈ s, (MvPowerSeries.map R.subtype (y' i)) ^ p = ∑ i ∈ s, x i ^ p :=
       Finset.sum_congr rfl fun i hi => by rw [hsum i hi]
     rw [Finset.sum_congr rfl hsum, e3] at h2

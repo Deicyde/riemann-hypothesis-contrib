@@ -68,7 +68,7 @@ end Gen
 
 variable {C0 CE1 CE2 : ℝ} {X : flipOneThree.Inst}
 
-set_option maxHeartbeats 800000 in
+
 theorem lvlDimCondition : RestLvlDim C0 CE1 CE2 X := by
   classical
   intro aTop _ aPlus _ b _ x hx

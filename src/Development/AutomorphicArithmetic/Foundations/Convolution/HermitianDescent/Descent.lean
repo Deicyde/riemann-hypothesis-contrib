@@ -44,15 +44,15 @@ theorem descent : Descent := by
     | succ j ih => rw [pow_succ', Module.End.mul_apply, ih, hn]
   have hT : ∀ m : M, (∑ j ∈ Finset.range q, s ^ j) m ∈ LinearMap.eqLocus s LinearMap.id := by
     intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.mem_eqLocus, LinearMap.id_apply, LinearMap.sum_apply, map_sum,
-      ← sum_pow_fix s q hq fun a => a m]
+
+    rw [LinearMap.mem_eqLocus, LinearMap.id_apply, LinearMap.sum_apply, map_sum,
+    ← sum_pow_fix s q hq fun a => a m]
     exact Finset.sum_congr rfl fun j _ => by rw [pow_succ', Module.End.mul_apply]
   have htr : ∀ r : R, ∃ c : k, algebraMap k R c = ∑ j ∈ Finset.range q, (σ ^ j) r := by
     intro r
     refine hG.fix _ ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← sum_pow_fix σ q hG.pow fun a => a r]
+
+    rw [map_sum, ← sum_pow_fix σ q hG.pow fun a => a r]
     exact Finset.sum_congr rfl fun j _ => by rw [pow_succ', AlgEquiv.mul_apply]
   choose c hc using htr
   let T : M →ₗ[k] LinearMap.eqLocus s LinearMap.id := LinearMap.codRestrict _ _ hT

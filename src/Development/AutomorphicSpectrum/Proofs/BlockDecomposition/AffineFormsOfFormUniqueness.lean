@@ -60,11 +60,11 @@ theorem ring_diff {K A B : Type} [CommRing K] [CommRing A] [CommRing B] [Algebra
     ring
   have hδ : ∀ x, δ x = Ideal.Quotient.mk J' (f' x - f x) := fun x => rfl
   have h := congrArg δ.liftKaehlerDifferential hp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at h
+
+  rw [map_sum] at h
   simp only [map_smul, Derivation.liftKaehlerDifferential_comp_D, hδ, hsm] at h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum] at h
+
+  rw [← map_sum] at h
   exact Ideal.Quotient.eq.1 h
 
 theorem form_expand {K A : Type} [CommRing K] [CommRing A] [Algebra K A] {d a : ℕ}
@@ -522,7 +522,7 @@ theorem exists_lifts {V : Z.Opens} {s d : ℕ} (hle : SS q 1 s V ≤ inU q V) (E
     rfl
 
 
-set_option maxHeartbeats 3000000 in
+
 theorem affOm : FormUniq → AffOm := by
   intro hU K _ _ Z q V d ⟨c⟩ a
   have hle : SS q 1 (a + 1) V ≤ inU q V := fun T hT => FrameEx.inU_of_SS T hT

@@ -119,8 +119,8 @@ theorem UpperTheory.ConvolutionTheory.H.eigBasis :
     set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro x hx
     rw [← B.sum_repr x] at hx ⊢
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hB] at hx
+
+    simp only [map_sum, map_smul, hB] at hx
     have := Fintype.linearIndependent_iff.1 hlc (fun σ => B.repr x σ) hx
     simp [this]
   refine ⟨B, fun σ a ha => ?_, fun σ => ?_, ?_⟩
@@ -138,5 +138,5 @@ theorem UpperTheory.ConvolutionTheory.H.eigBasis :
   · apply hΦinj
     funext a
     rw [hΦ, hu _ a.toAdd.2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hB, hv, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hχ]
+
+    simp only [map_sum, map_smul, hB, hv, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hχ]

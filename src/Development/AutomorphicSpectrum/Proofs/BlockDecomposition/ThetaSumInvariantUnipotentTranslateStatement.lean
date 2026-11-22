@@ -11,7 +11,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.EC
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.theta_sum_invariant_unipotent_translate : ∀ (D : D7) (n : ℕ) (V : HSp D) ψ χ θ μ ω,
   PositivityTheory.GramSchwartzFunctions.HidaSetting D n V ψ χ θ μ ω →
   ∀ (g : G D n) (b : Matrix (Fin n) (Fin n) D.host.E), mat g = blk4 1 (b.map (incA D)) 0 1 →
@@ -27,7 +27,7 @@ theorem _root_.GlobalTheory.T.theta_sum_invariant_unipotent_translate : ∀ (D :
     rw [rat_mul, rat_mul, rat_mul, rat_conjTranspose, gA]
   have htrace (M : Matrix (Fin n) (Fin n) D.host.E) :
       Matrix.trace (M.map (incA D)) = incA D (Matrix.trace M) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.trace, Matrix.diag, Matrix.map_apply, map_sum]
+
+    simp only [Matrix.trace, Matrix.diag, Matrix.map_apply, map_sum]
   rw [hW.unip g (b.map (incA D)) hg Φ (ξ.map (incA D)), hmul, htrace,
     GlobalTheory.CompanionTheory.ThetaInv.halfTr_incA, hψ.2.2.1, one_mul]

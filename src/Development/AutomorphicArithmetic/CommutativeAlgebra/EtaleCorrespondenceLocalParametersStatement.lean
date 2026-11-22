@@ -219,8 +219,8 @@ theorem UpperTheory.etaleCorrespondence_local_parameters_statement :
     · apply gm_inj s' hgY
       have h := congrArg Subtype.val hcg
       simp only [Subalgebra.coe_mul, AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul] at h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_mul, map_sum]
+
+      rw [map_mul, map_sum]
       simp only [map_mul]
       refine Eq.trans ?_ (h.trans ?_)
       · exact congrArg (· * gm s' hgY u) hc'
@@ -230,8 +230,8 @@ theorem UpperTheory.etaleCorrespondence_local_parameters_statement :
   obtain ⟨UA, VA, hA1, hA2, tA, hyA, hUA, hVA, φA, hφs, hφ1, hφ2, hφk⟩ := hA
   have pdVA : Pd d y VA := by
     refine ⟨φA, hφs, fun v => ⟨∑ l, v l • D ℂ (Sec s' VA) (Sec.res s' hA1 (appSec s s' c1 UA (tA l))), ?_⟩, hφk⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul, hφ1]
     ext i
     simp [Finset.sum_apply, Pi.single_apply]
@@ -319,8 +319,8 @@ theorem UpperTheory.etaleCorrespondence_local_parameters_statement :
     exact (gm_res s' hWle hgY hgW _).trans (germT l)
   have hcq : Sec.res s' hWle c * u m = ∑ l, Sec.res s' hWle (q l) * t l := by
     apply gm_inj s' hgW
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul, map_sum, gm_res s' hWle hgY hgW, hju, hc', hcq0]
+
+    rw [map_mul, map_sum, gm_res s' hWle hgY hgW, hju, hc', hcq0]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_mul, gm_res s' hWle hgY hgW, htl, hq]
   have ec : CxPts.ev s' (RingHom.id ℂ) (c1 ⁻¹ᵁ U 0) c y = e ⟨c0, hc0⟩ := by

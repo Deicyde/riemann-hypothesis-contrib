@@ -56,8 +56,8 @@ theorem intAt_inv_mul {E : Type} [Field E] [NumberField E] (P : HeightOneSpectru
   field_simp
   linear_combination -h1
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem integral_div_iff : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (es : Pl D.host.E → AE D) (ϖ : Pl D.host.E → 𝓞 D.host.E), (∀ PP ∈ Q, Formalism.L2.NTheta.IsIdemAt (es PP) PP) → (∑ PP ∈ Q, es PP) * cA D (∑ PP ∈ Q, es PP) = 0 → (∀ PP ∈ Q, ϖ PP ∈ PP.asIdeal ∧ ϖ PP ∉ PP.asIdeal ^ 2) → ∀ N : EAf D, ∀ hN : N ∈ Formalism.L2.Herm.intAf D.host.F D.host.E, toEAf D (∑ PP ∈ Q, es PP) * N = N → (toEAf D (∑ PP ∈ Q, es PP * incA D ((ϖ PP : D.host.E)⁻¹)) * N ∈ Formalism.L2.Herm.intAf D.host.F D.host.E ↔ ∀ PP ∈ Q, resS D.host.F PP ⟨N, hN⟩ = 0) := by
   intro D Q es ϖ hid horth hϖ N hN hfix
   have hE : ∀ P ∈ Q, toEAf D (es P) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E :=
@@ -105,8 +105,8 @@ theorem integral_div_iff : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (es : Pl D.ho
       have hs : ((∑ P ∈ Q, eI P * oToS D.host.F D.host.E (ϖ P) :
           Formalism.L2.Herm.intAf D.host.F D.host.E) : EAf D) =
           toEAf D (∑ P ∈ Q, es P * incA D ((ϖ P : D.host.E))) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         push_cast
         apply Finset.sum_congr rfl
         intro P hP
@@ -124,8 +124,8 @@ theorem integral_div_iff : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (es : Pl D.ho
       simp only [eI, dif_pos hP]
       exact GlobalTheory.TameProd.resS_idem_eq_zero (hid P hP) hPe _
   · intro hres
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_mul]
+
+    rw [map_sum, Finset.sum_mul]
     refine Subring.sum_mem _ fun P hP => ?_
     have hmem : (⟨N, hN⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) ∈
         Ideal.map (oToS D.host.F D.host.E) P.asIdeal :=

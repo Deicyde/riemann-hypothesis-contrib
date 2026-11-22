@@ -159,7 +159,7 @@ theorem carried_of_eval (hW : R.models_HW) (hg : R.models_gW) {i : Fin D.R.m} {�
   exact (h u).trans (congrArg (c * ·) (actW_apply R i g hk σ _ v u).symm)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem isGeoAct_levRep (ht : TieIn T R κ v₀) (hW : R.models_HW) (hg : R.models_gW) (i : Fin D.R.m) {Tp : Type} {tup : Tp → T0}
     (O : OMDat T.toCore R i Tp tup) (hL : ActLev (Xo := T.Q.Xo ((i : ℕ) + 1)) T.Q.c O.lev2)
     (hk : ∀ g, ∃ k, Lev.IsLevelLift (Wc D i) (R.βW i) (R.datWp i R.triv) (R.eG g) k)

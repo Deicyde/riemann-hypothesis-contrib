@@ -13,8 +13,8 @@ open GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData (lastKer)
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.FinPl.SelfDualCompl
 
@@ -138,9 +138,9 @@ theorem selfDual_latV : ∀ (D : D7) (S : HSp D) (LS : Lat S), IsSelfDualC S LS 
       _ = ∑ j, idem D P * y j * incA D (∑ i, s i a * ∑ k, star (s' i k) * HSpace.gram S k j) := by
           simp only [hdual]
       _ = _ := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hA, t, cA_test, map_sum, map_mul, Finset.mul_sum,
-            Finset.sum_mul]
+
+          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hA, t, cA_test, map_sum, map_mul, Finset.mul_sum,
+          Finset.sum_mul]
           rw [Finset.sum_comm]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [Finset.sum_comm]

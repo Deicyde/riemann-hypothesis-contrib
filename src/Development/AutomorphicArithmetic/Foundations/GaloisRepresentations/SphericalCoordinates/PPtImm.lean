@@ -20,7 +20,7 @@ private theorem flat_of_eventuallyEq {V : Type} [NormedAddCommGroup V] [NormedSp
   rw [hfd]
   exact hf U f (h0 ▸ hU)
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.W2.ptImm_of :
     UpperTheory.Gal.W2.FlatComp → UpperTheory.Gal.W2.FlatPre → UpperTheory.Gal.W2.PtFibre → UpperTheory.Gal.W2.ExpImm → UpperTheory.Gal.W2.PtImm := by
   intro hComp hPre hPF hExp O _ bar g ρ D X s A _ S k m B P b₀ hB hb₀ hP hu z₀ w hw

@@ -53,8 +53,8 @@ theorem coeff_lin {M : ℕ} (x : Fin M → C) (α : Fin M →₀ ℕ) :
     coeff α (∑ m, x m • (X m : MvPowerSeries (Fin M) C)) =
       ∑ m, if α = Finsupp.single m 1 then x m else 0 := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [coeff_smul, coeff_X]
   split_ifs <;> simp
@@ -125,8 +125,8 @@ theorem lgSum_change {d M : ℕ} (p : ℕ) (l c : Fin d → ℕ → Fin d → C)
   have hc : ∀ (c : Fin d → ℕ → Fin d → C) b, coeff α (lgSum p c t b) =
       ∑ n ∈ Finset.range (Finsupp.degree α + 1), ∑ a, c a n b * coeff α (t a ^ (p ^ n)) :=
     fun _ _ => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, hc]
+
+  rw [map_sum, hc]
   simp only [coeff_smul, hc, h, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm (s := Finset.univ)]
   refine Finset.sum_congr rfl fun n _ => ?_

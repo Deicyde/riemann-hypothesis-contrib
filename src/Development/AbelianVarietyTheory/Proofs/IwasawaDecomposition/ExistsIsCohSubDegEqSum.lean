@@ -85,8 +85,8 @@ theorem IsTriangular.res (H : IsTriangular v rk e g) (j j' : J) (a : α) {V : C.
   refine ⟨fun b => resG C (le_inf h h') (cf b), by dsimp only; rw [h1], fun b hb hr => by dsimp only; rw [h2 b hb hr, map_zero], ?_⟩
   have e1 : resM F h' (v j' (e j' a)) = resM F (le_inf h h') (resM F inf_le_right (v j' (e j' a))) := by
     rw [resM_resM]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e1, h3, map_sum]
+
+  rw [e1, h3, map_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [resM_smul, resM_resM]
 
@@ -138,8 +138,8 @@ theorem IsTriangular.repr_eq (H : IsTriangular v rk e g) (hv : ∀ j, IsFrame (v
         (e j').injective.eq_iff]
     change ((hv j).basis h).repr (resM F h' (v j' (e j' b))) (e j a) =
       resG C (le_inf h h') (g a j j') * ((hv j').basis h').repr (resM F h' (v j' (e j' b))) (e j' a)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hr, h3, map_sum, Finset.sum_apply']
+
+    rw [hr, h3, map_sum, Finset.sum_apply']
     simp only [hB, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply,
       (e j).injective.eq_iff, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
       Finset.mem_univ, if_true]
@@ -178,8 +178,8 @@ theorem IsTriangular.isVB (H : IsTriangular v rk e g) (hT : ⨆ j, T j = ⊤)
       (Fintype.linearCombination Γ(C, V) (fun k => resM (sub hv e S).toMod h (w k)) c) =
         ∑ k, c k • (hv j).basis h (ι' k) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Fintype.linearCombination_apply, ← GlobalTheory.QCoh.appLinear_apply, map_sum]
+
+    rw [Fintype.linearCombination_apply, ← GlobalTheory.QCoh.appLinear_apply, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, GlobalTheory.QCoh.appLinear_apply, hinc]
   have hli : LinearIndependent Γ(C, V) (fun k => (hv j).basis h (ι' k)) :=

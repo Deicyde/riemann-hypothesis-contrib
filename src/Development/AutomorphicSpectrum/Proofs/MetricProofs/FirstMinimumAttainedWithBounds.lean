@@ -410,8 +410,8 @@ theorem exists_subspace (R : RiemLat E g Λ) {Ψ : Type} [Fintype Ψ] [Nonempty 
   have hbase : ∀ (a : 𝓞 E) (i : Fin r), per R (a • v i) ∈ W := by
     intro a i
     have ha : a = ∑ k, (b.repr a k) • b k := (b.sum_repr a).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ha, Finset.sum_smul, map_sum]
+
+    rw [ha, Finset.sum_smul, map_sum]
     refine W.sum_mem fun k _ => ?_
     rw [smul_assoc, map_zsmul]
     exact hzs _ _ (Submodule.subset_span ⟨(k, i), rfl⟩)

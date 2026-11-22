@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqBot
 open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC Formalism.UG Formalism.BasicNotions GlobalTheory.DefU
 
 open Formalism.L2.DIV GlobalTheory.CoefIrred in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.dualWeylModule_tensor_coefficient_universal :
     ∀ (ι : Type) [Fintype ι] (n : ℕ) (lam : ι → DomWeight n) (V : Type) [AddCommGroup V]
       [Module ℂ V] (F : (∀ v, nablaSq ℂ n (lam v)) →ₘₗ[ℂ] V),

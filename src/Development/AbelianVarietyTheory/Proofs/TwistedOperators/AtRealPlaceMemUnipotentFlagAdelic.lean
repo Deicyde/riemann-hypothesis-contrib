@@ -37,7 +37,7 @@ def single (σ : (D.what₂.Tau → ℂ) →+ AE D) (τ : D.what₂.Tau) : ℂ �
 theorem single_apply (σ : (D.what₂.Tau → ℂ) →+ AE D) (τ : D.what₂.Tau) (c : ℂ) :
     single σ τ c = σ (Pi.single τ c) := rfl
 
-set_option maxHeartbeats 2000000 in
+
 theorem chart_mul_incA {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ)
     (z : D.what₂.Tau → ℂ) (y : D.host.E) :
     σ z * incA D y = σ (fun τ => z τ * tauE D τ y) := by
@@ -67,8 +67,8 @@ theorem map_mulVec_single {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE 
     (τ : D.what₂.Tau) {m k : ℕ} (M : Matrix (Fin m) (Fin k) D.host.E) (c : Fin k → ℂ) :
     (M.map (incA D)) *ᵥ (fun j => single σ τ (c j)) = fun i => single σ τ ((M.map (tauE D τ) *ᵥ c) i) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum]
+
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [mul_comm, single_mul_incA hσ, mul_comm]
 
@@ -87,8 +87,8 @@ theorem subOne_mulVec {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (
     unfold subOne
     rw [Matrix.sub_apply, GlobalTheory.PointAtPlaceHom.entry_eq hσ B τ hh i j, add_sub_cancel_left, Matrix.sub_apply]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, hent, ratV, single_mul_incA hσ, ← map_sum]
+
+  simp only [Matrix.mulVec, dotProduct, hent, ratV, single_mul_incA hσ, ← map_sum]
 
 theorem conj_gram (B : HSp D) {ρ : ℕ} (e : Matrix (Fin B.rank) (Fin ρ) D.host.E) (τ : D.what₂.Tau) :
     (e.map (tauE D τ))ᴴ * gramAt D B τ =

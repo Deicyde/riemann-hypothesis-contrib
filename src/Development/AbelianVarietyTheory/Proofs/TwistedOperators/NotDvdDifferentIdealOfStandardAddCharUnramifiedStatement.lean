@@ -22,6 +22,6 @@ open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheor
 open GlobalTheory.RouteSeesaw GlobalTheory.ChainFr
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.not_dvd_differentIdeal_of_standardAddChar_unramified : ∀ {F : Type} [Field F] [NumberField F] {ψ : AddChar (AF F) ℂ}, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → ∀ {v : HeightOneSpectrum (𝓞 F)}, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.PsiUnr ψ v → ¬ v.asIdeal ∣ differentIdeal ℤ (𝓞 F) := by
   first | exact @GlobalTheory.PsiDifferent.not_dvd_different_of_psiUnr | exact GlobalTheory.PsiDifferent.not_dvd_different_of_psiUnr | (intros; apply GlobalTheory.PsiDifferent.not_dvd_different_of_psiUnr <;> assumption)

@@ -127,8 +127,8 @@ theorem exists_expansion (hL : IsSelfDualC S L) :
   refine ⟨m, s, s', hs, hs', fun y a => ?_⟩
   have h1 : ∀ b, ∑ l, incA D (row S (s' l) b) * y b * incA D (s l a) = if a = b then y b else 0 := fun b => by
     have h2 : ∑ l, incA D (row S (s' l) b) * y b * incA D (s l a) = incA D (∑ l, s l a * row S (s' l) b) * y b := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_mul]
+
+      rw [map_sum, Finset.sum_mul]
       exact Finset.sum_congr rfl fun l _ => by rw [RingHom.map_mul]; ring
     rw [h2]
     unfold row
@@ -222,8 +222,8 @@ theorem mt_sec (β : Frame p S n) (g : GL n k) (y : Fin S.rank → k) :
     mt S (β.gl g) *ᵥ (fun i => p.sec (y i)) = fun i => p.sec (((β.b * g.val * β.b') *ᵥ y) i) := by
   funext i
   rw [← β.gl_mat g]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [sec_mul, p.sec_pr, mul_comm p.e, mul_assoc, e_mul_sec]
 
@@ -231,8 +231,8 @@ theorem mt_csec (h : GA D S) (z : Fin S.rank → k) :
     mt S h *ᵥ (fun i => cA D (p.sec (z i))) =
       fun i => cA D (p.sec ((((mt S h).map (fun a => p.pr (cA D a))) *ᵥ z) i)) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [sec_mul, p.sec_pr, mul_comm p.e, mul_assoc, e_mul_sec, map_mul, cA_cA]
 
@@ -243,20 +243,20 @@ theorem csec_mem_idAt (c : k) : cA D (p.sec c) ∈ idAt D (· = p.v) := by
 
 theorem pairing_sec (s : Fin S.rank → D.host.E) (u : Fin S.rank → k) :
     pairing S s (fun i => p.sec (u i)) = p.sec (∑ b, p.pr (incA D (row S s b)) * u b) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [mul_comm, sec_mul_right, mul_comm]
 
 theorem pairing_csec (s : Fin S.rank → D.host.E) (z : Fin S.rank → k) :
     pairing S s (fun i => cA D (p.sec (z i))) =
       cA D (p.sec (∑ i, ∑ j, p.pr (incA D (s i)) * p.pr (cA D (incA D (S.gram i j))) * z j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_comm, map_sum, map_sum]
+
+  rw [Finset.sum_comm, map_sum, map_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   have h : ∑ i, p.pr (incA D (s i)) * p.pr (cA D (incA D (S.gram i b))) = p.pr (cA D (incA D (row S s b))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [row, map_sum, RingHom.map_mul, cA_incA (star _), star_star]
+
+    simp only [row, map_sum, RingHom.map_mul, cA_incA (star _), star_star]
   rw [← Finset.sum_mul, h, mul_comm (p.pr _), ← sec_mul_right, RingHom.map_mul, cA_cA, mul_comm]
 
 theorem sec_inc_mem {L : Lat S} {s : Fin S.rank → D.host.E} (hs : s ∈ L) :
@@ -272,8 +272,8 @@ theorem exists_gen {L : Lat S} (hL : IsSelfDualC S L) :
   refine ⟨m, s, fun l u => ∑ b, p.pr (incA D (row S (s' l) b)) * u b, hs, fun u => ?_, fun u hu l => ?_⟩
   · funext a
     have h := congrArg p.pr (hd (fun i => p.sec (u i)) a)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [pairing_sec, map_sum p.pr, RingHom.map_mul, p.pr_sec] at h
+
+    simp only [pairing_sec, map_sum p.pr, RingHom.map_mul, p.pr_sec] at h
     rw [Finset.sum_apply]
     exact h
   · rw [p.int_iff, ← pairing_sec]

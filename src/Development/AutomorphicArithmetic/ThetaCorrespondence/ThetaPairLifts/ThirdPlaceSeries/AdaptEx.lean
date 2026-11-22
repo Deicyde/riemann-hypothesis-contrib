@@ -7,15 +7,15 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
 noncomputable section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 open Formalism.BasicNotions Formalism.MainNotions Formalism.IndefR.Links Formalism.L2.Host GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp GlobalTheory.SeriesTie
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 namespace GlobalTheory.BigOn.Exp.Adapt
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}

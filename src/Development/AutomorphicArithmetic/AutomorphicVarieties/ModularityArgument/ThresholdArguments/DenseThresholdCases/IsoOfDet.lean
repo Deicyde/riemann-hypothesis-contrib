@@ -102,7 +102,7 @@ private theorem absPt (hC : _root_.UpperTheory.V.Z.Ord.CoreOrdAlt) {L Ω : Type}
   refine ⟨ω, h1, fun i => ?_⟩
   have := h2 i
   rwa [push_comp _ f.toRingHom y.toRingHom x hy] at this
-set_option maxHeartbeats 1000000 in
+
 private theorem core (H : _root_.UpperTheory.V.Af.HypothesesH') {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω]
     [Algebra L Ω] [IsAlgClosure L Ω] {s : HidaSetting l L Ω} {n : ℕ} (hn : 1 ≤ n) {V : s.Lev} {Q : QData V} {c : Coef l}
     {r : Resid V.frame c.O n} {ι : Qbar l ≃+* ℂ} {B : UniversalOrdinaryDeterminantRing r} {Λ : LamObj r} {R : _root_.UpperTheory.V.Hi.CaseU.UnitaryHeckeData Q ι Λ} {K : (hset Q R.τ₀).Lev}
@@ -124,7 +124,7 @@ private theorem core (H : _root_.UpperTheory.V.Af.HypothesesH') {l : ℕ} [Fact 
   change x.D.comap V.pr = _
   rw [hD]
   exact (AlgebraTools.Det.repApi (W.mat Y.r)).2.2.2.2.2.2.1 V.pr
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.Z.Ord.endOrd_of_printsH :
     _root_.UpperTheory.V.Af.HypothesesH' → _root_.UpperTheory.V.Z.Ord.EndOrdAlt := by
   intro H l _ L Ω _ _ _ _ _ _ s n hn V Q c r ι B Λ R K J hJ x h ρ hx ha hρ hi

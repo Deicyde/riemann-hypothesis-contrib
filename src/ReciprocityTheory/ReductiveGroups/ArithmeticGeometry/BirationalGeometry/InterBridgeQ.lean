@@ -69,8 +69,8 @@ theorem exists_homog_of_cone {n : ℕ} {c : MvPolynomial (Fin n) ℂ} (hc : c �
   have hscale : ∀ (m : ℕ) (t : ℂ) (v : Fin n → ℂ),
       eval (fun i => t * v i) (homogeneousComponent m c) = t ^ m * eval v (homogeneousComponent m c) := by
     intro m t v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [homogeneousComponent_apply, map_sum, map_sum, Finset.mul_sum]
+
+    rw [homogeneousComponent_apply, map_sum, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun d hd => ?_
     rw [Finset.mem_filter] at hd
     have hdeg : ∑ i ∈ d.support, d i = m := by
@@ -88,8 +88,8 @@ theorem exists_homog_of_cone {n : ℕ} {c : MvPolynomial (Fin n) ℂ} (hc : c �
     have hQ : ∀ t : ℂ, t ≠ 0 → Q.eval t = 0 := by
       intro t ht
       have h0 := hcT _ (hT v hv t ht)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← sum_homogeneousComponent c, map_sum] at h0
+
+      rw [← sum_homogeneousComponent c, map_sum] at h0
       simp only [Q, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C,
         Polynomial.eval_pow, Polynomial.eval_X]
       rw [← h0]
@@ -209,8 +209,8 @@ theorem normPoly_of (hM : PCMinContractStatement) : NormPolyStatement := by
     rw [hψ]
   have hevalH : ∀ z, eval z H = ∑ j ∈ S, eval (Ψ (segre z)) (c j) * eval (segre z) F ^ (j - k0) := by
     intro z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hHdef, map_sum]
+
+    rw [hHdef, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, map_pow, hbind, hF]
   have hmul : ∀ z ∈ mcPts P, eval z (map (Int.castRingHom ℂ) (f' ^ k0)) * eval z H = 0 := by

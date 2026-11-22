@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FibreDenseAf
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_closure_annihilator_primes_inter_fibre : ∀ (X T : Scheme.{0}) (p : X ⟶ T) (W : X.Opens) (U : X.Opens) (V : T.Opens),
     IsAffineOpen U → IsAffineOpen V → ∀ (e : U ≤ p ⁻¹ᵁ V),
     (∀ x : X, x ∈ closure ((W : Set X) ∩ p ⁻¹' {p x})) →

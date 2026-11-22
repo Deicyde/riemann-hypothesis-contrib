@@ -18,7 +18,7 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.EvalW
 open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
 open GlobalTheory.CompanionTheory.Ar.PB.FibN ReciprocityTheory.ChartRestriction.G.AI GroundTheory.Heights₂.Heights.Inter
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mixed_discriminant_one_row_expansion : ∀ (d : ℕ) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ) (H : Matrix (Fin d) (Fin d) ℂ)
     (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ),
     (∀ (c : Fin d → Fin 3 → ℝ) (v : Fin d → ℝ),

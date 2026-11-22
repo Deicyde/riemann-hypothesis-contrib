@@ -210,9 +210,9 @@ theorem bdL_isK (E1 E2 : Fin n → Fin n → Module.End ℂ V) :
 theorem frC_bd (B : Finset (Lt n)) (E1 E2 : Fin n → Fin n → Module.End ℂ V) (y : Cn n V) :
     frC B (bd (allT n) (kA E1 E2) y) = bdL isK E1 E2 (frC B y) := by
   rw [bdL_isK]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [bd, cpt, true_and, if_true, LinearMap.add_apply, LinearMap.sum_apply, map_add (f := _), map_sum,
-    Module.End.mul_apply]
+
+  simp only [bd, cpt, true_and, if_true, LinearMap.add_apply, LinearMap.sum_apply, map_add (f := _), map_sum,
+  Module.End.mul_apply]
   congr 1
   · refine Finset.sum_congr rfl fun i _ => ?_
     rw [frC_lift, frC_ann]

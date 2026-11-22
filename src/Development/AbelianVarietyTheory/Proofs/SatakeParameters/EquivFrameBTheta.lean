@@ -45,8 +45,8 @@ theorem mapT_yMat (v : X.Pl) (s : Fin (X.G.P.n' v)) :
   simp only [Matrix.map_apply, Matrix.mul_apply, yMat, mapT, MvPolynomial.map_C]
   rw [show (tau0 X Kc j W : XspC (X.Pj (j + 1)) Kc →+* XspC (X.Pj (j + 1)) Kc) (MvPolynomial.X (idxS X j ⟨v, (s, (b, t))⟩)) =
     frF X Kc j W (idxS X j ⟨v, (s, (b, t))⟩) from MvPolynomial.aeval_X _ _]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [frF, idxS, map_sum, map_mul, cD, RingHom.comp_apply, Fin.cast_cast, Fin.cast_eq_self]
+
+  simp only [frF, idxS, map_sum, map_mul, cD, RingHom.comp_apply, Fin.cast_cast, Fin.cast_eq_self]
   rfl
 
 end GlobalTheory.FrameB
@@ -166,7 +166,7 @@ def sS (X : Sys p) (Kc : Type) [Field Kc] (j : ℕ) (κ : ∀ v : X.Pl, Fin (X.G
     if IsOddPos b.2 then (κ b.1 b.2 ^ (NN X.G.P.m X.t j - 1)) ^
       ((NN X.G.P.m X.t j : ℤ) * cMu X j b.1 b.2 - szMu X j b.1 b.2).toNat else 1
 
-set_option maxHeartbeats 1000000 in
+
 theorem thU_subD (h : FrRel X Kc j U W κ) (G : (X.Pj j).Xsp) (hO : OddDeg X j G) :
     thU X Kc j U (subD X Kc j G) = cD X Kc j (sS X Kc j κ) * mapT X Kc j W (subD X Kc j G) := by
   have hC : ∀ a : X.G.Kf, thU X Kc j U (subD X Kc j (MvPolynomial.C a)) = mapT X Kc j W (subD X Kc j (MvPolynomial.C a)) := by

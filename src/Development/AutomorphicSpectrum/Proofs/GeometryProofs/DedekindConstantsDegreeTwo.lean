@@ -331,8 +331,8 @@ theorem cone_eq {h : MvPolynomial (Σ k, J k) O} {b : K → ℕ}
   classical
   conv_lhs => rw [← support_sum_monomial_coeff h]
   conv_rhs => rw [← support_sum_monomial_coeff h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, map_sum, Finset.sum_mul]
+
+  rw [map_sum, map_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun d hd => ?_
   have hw : Finsupp.weight (blockWeight J) d = b := hh (mem_support_iff.1 hd)
   rw [GroundTheory.Heights₂.Heights.NumbersDVR.pointConeMap, aeval_monomial, aeval_monomial, cone_prod, hw, map_mul]

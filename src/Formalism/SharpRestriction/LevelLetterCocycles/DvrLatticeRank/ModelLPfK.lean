@@ -11,7 +11,7 @@ namespace Formalism.MainNotions.N.Ln34.MLK
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
 
 
-set_option maxHeartbeats 800000 in
+
 theorem lev_Eat_simple (D : D7) (HW : HWOf D.loc) (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (K LL : FinExt l)
     (hG : Good K 1 LL) (π' : LetA ↥(OL LL) (finrank ℚ_[l] ↥(K0 K)))
     (E : ZMod (finrank ℚ_[l] ↥(K0 K)) → Polynomial ↥(OL LL))
@@ -88,8 +88,8 @@ theorem lev_Eat_simple (D : D7) (HW : HWOf D.loc) (l : ℕ) [Fact l.Prime] (hl :
       _ = _ := by rw [hlq]; ring
   · rw [map_mul]
     refine mul_ne_zero ((u⁻¹).isUnit.map PowerSeries.constantCoeff).ne_zero ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul, hF1c, one_mul, map_sum]
+
+    rw [map_mul, hF1c, one_mul, map_sum]
     simpa [hF0] using hl0
 
 end Formalism.MainNotions.N.Ln34.MLK

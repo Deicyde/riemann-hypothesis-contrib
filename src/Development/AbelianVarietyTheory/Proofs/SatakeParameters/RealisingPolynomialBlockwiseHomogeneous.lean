@@ -45,8 +45,8 @@ theorem evFr_scale (D : D7) {n : ℕ} (ν : D.what₂.Tau → Fin n → ℕ) (Q 
     rw [eval_aeval_gen]
     apply congrArg (fun F => MvPolynomial.eval F Q)
     funext k
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, eval_C, eval_X, hβ]
+
+    simp only [map_sum, map_mul, eval_C, eval_X, hβ]
     by_cases hk : k.1 = τ₀
     · simp [hk, Matrix.one_apply, mul_comm]
     · simp [hk, Matrix.one_apply]
@@ -107,8 +107,8 @@ theorem valZ_scale {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7) (pos : (Σ v : 
     · have e : posJ X D pos i ⟨x.1, x.2.1⟩ ≠ τ₀ := fun e => hb (by rw [← e]; simp)
       simp [e, hb]
   unfold valZ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MvPolynomial.eval_eq, map_sum]
+
+  rw [MvPolynomial.eval_eq, map_sum]
   apply Finset.sum_congr rfl
   intro m _
   rw [eval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]

@@ -102,7 +102,7 @@ local macro "copyIsV% " h:term:max : term =>
   `(⟨by exact_by_kernel ($h).rank, by exact_by_kernel ($h).sigOK,
     by exact_by_kernel ($h).sig, by exact_by_kernel ($h).sd⟩)
 
-set_option maxHeartbeats 16000000 in
+
 theorem carryG : CarryG := by
   intro X X' T T' L L' μ₀ μ₀' ι hA sc G
   obtain ⟨B, Cc, Wr, Vd, Ss, Nn, Gj⟩ := X

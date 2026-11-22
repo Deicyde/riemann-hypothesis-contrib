@@ -96,7 +96,7 @@ theorem decoOf_lat {X : Formalism.L2.Col.Fields} (hc : CMData X.F X.E) (n : ℕ)
   rfl
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem exists_root_reading (X : Stages) {px : PreX X.B.toPre} (I : ColIn X.B px) (hX : X.B.fields.Ok) (U : Set I.ι)
     (Xg : Finset (Gc X.B px → X.B.LL)) (tr : TrI X.B px) {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks X.toD7.what₂.LL]
     (R : RealDat X.toD7 (famR X I hX U Xg tr).A Ks) (hI : I.Ok) (hL : LevOf X I U R.toLevCh) (i : Fin X.toD7.R.m)

@@ -11,20 +11,20 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.ExportSeries
 
 theorem idemAt_mul_idem_add_conj {D : D7} {P Q' : Finset (Pl D.host.E)} (hP : SplitSet P) (hQ : Q' ⊆ P)
     {PP : Pl D.host.E} (hPP : PP ∈ P) (hPQ : PP ∉ Q') : idemAt PP * (idem Q' + cA D (idem Q')) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [mul_add, idem, map_sum, Finset.mul_sum, Finset.mul_sum]
+
+  rw [mul_add, idem, map_sum, Finset.mul_sum, Finset.mul_sum]
   rw [Finset.sum_eq_zero fun q hq => hP.mul_eq_zero hPP (hQ hq) (fun e => hPQ (e ▸ hq)),
     Finset.sum_eq_zero fun q hq => hP.mul_conj hPP (hQ hq), add_zero]
 
 
-set_option maxHeartbeats 6000000 in
+
 theorem redFn_eq_one_of_suppAt : ∀ {D : D7} {V : HSp D} (β : GL (Fin V.rank) (Lev.EAf D)) {P Q' : Finset (Pl D.host.E)}, SplitSet P → Q' ⊆ P → ∀ {PP : Pl D.host.E}, PP ∈ P → PP ∉ Q' → ∀ {κ : GA D V}, Lev.finE V κ ∈ St β → SuppAt (idem Q') V κ → redFn β PP (Lev.finE V κ) = 1 := by
   intro D V β P Q' hP hQ PP hPP hPQ κ hS hSupp
   obtain ⟨y, hy⟩ := hS

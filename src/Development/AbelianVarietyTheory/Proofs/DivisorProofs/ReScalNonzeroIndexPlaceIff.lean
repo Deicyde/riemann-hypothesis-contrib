@@ -67,7 +67,7 @@ theorem iw_reScalCx {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefB
 theorem zs_reScalCx {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {B : DefAmb Bs} (X : CxData B)
     (lam : Bs.J → Bs.Tup → Bs.Ix → InfinitePlace K → ℝ) (κ : InfinitePlace K → ℝ) : (reScalCx X lam κ).zs = X.zs := rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem toCx_reScal (R : RealDat D A Ks) (F : Face D A) (lam : type_of% R.lam) (kap : ℝ) :
     (reScal R lam kap).toCx F = reScalCx (R.toCx F) lam (fun _ => kap) := rfl
 

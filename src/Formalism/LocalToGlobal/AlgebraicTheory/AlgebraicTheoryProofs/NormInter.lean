@@ -231,8 +231,8 @@ theorem hermitian_fourth_block (h : Matrix n n ℂ) (hH : IsHerm (matH h)) : IsH
       simp [Ne.symm hb]
     · simp
   intro x y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [key, key, map_sum]
+
+  rw [key, key, map_sum]
   exact Finset.sum_congr rfl fun a _ => hH _ _
 
 theorem semicharacter_fourth_power (h : Matrix n n ℂ) {Λ : AddSubgroup (n → ℂ)} {α : (n → ℂ) → ℂ}

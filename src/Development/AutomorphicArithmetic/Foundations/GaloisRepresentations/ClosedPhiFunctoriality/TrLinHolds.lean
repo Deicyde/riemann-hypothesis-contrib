@@ -17,8 +17,8 @@ theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.trLin_holds :
   have hexp : ∀ (y : W) (i : Fin a), ψ y i = ∑ m, κ (bW.repr y m) * ψ (bW m) i := by
     intro y i
     conv_lhs => rw [← bW.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [hψ, Pi.smul_apply, smul_eq_mul]
   let X : Matrix (Fin a) (Fin a) B := Matrix.of fun i m => ψ (bW m) i
@@ -43,9 +43,9 @@ theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.trLin_holds :
     have hTX : ∀ y : W, ψ (T y) i = ∑ m, (X * Tm) i m * κ (bW.repr y m) := by
       intro y
       rw [hexp (T y) i]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hrepr, map_sum, map_mul, Matrix.mul_apply, X, Tm, Matrix.of_apply,
-        Matrix.map_apply, Finset.mul_sum, Finset.sum_mul]
+
+      simp only [hrepr, map_sum, map_mul, Matrix.mul_apply, X, Tm, Matrix.of_apply,
+      Matrix.map_apply, Finset.mul_sum, Finset.sum_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun m _ => Finset.sum_congr rfl fun m' _ => by ring
     rw [Matrix.mul_apply]
@@ -54,8 +54,8 @@ theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.trLin_holds :
     refine Finset.sum_congr rfl fun m _ => Finset.sum_congr rfl fun j _ => by ring
   have htr : Matrix.trace Tm = κ (LinearMap.trace k W T) := by
     rw [LinearMap.trace_eq_matrix_trace k bW T]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, Tm, map_sum]
+
+    simp [Matrix.trace, Tm, map_sum]
   calc ∑ i, ∑ j, w j * ψ (T (x j i)) i = Matrix.trace (X * Tm * X') := by
         simp only [Matrix.trace, Matrix.diag_apply, hentry]
     _ = Matrix.trace (X' * X * Tm) := by

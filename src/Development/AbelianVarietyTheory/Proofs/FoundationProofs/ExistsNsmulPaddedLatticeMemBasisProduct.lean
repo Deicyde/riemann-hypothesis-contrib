@@ -81,9 +81,9 @@ theorem exists_nsmul_mem (D : D7) (hD : admG1 D) (cc : Ideal (𝓞 D.host.K)) (�
     funext τ s t
     have h1 : ∀ i, (κ i • b i) s t = (κ i : D.host.E) * b i s t := fun i => rfl
     have h2 := hD.1 τ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [embV, tor0, Pi.smul_apply, Finset.sum_apply, Matrix.sum_apply, h1, map_sum, map_mul, h2,
-      smul_eq_mul, Finset.mul_sum]
+
+    simp only [embV, tor0, Pi.smul_apply, Finset.sum_apply, Matrix.sum_apply, h1, map_sum, map_mul, h2,
+    smul_eq_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
   rw [e]
   refine AddSubgroup.sum_mem _ fun i _ => ?_

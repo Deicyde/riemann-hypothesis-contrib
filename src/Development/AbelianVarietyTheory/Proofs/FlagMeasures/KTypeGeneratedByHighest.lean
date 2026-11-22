@@ -259,11 +259,11 @@ theorem not_cdom (Λ : Fin n → ℝ) {a b : Fin n} (hab : a < b) : ¬ CDom ε (
       ∑ i, ∑ j, ((c i j : ℕ) : ℝ) * (((i : ℕ) : ℝ) - ((j : ℕ) : ℝ)) := by
     have h1 := congrArg φ heq
     rw [hneg, map_neg, hφr] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]
+
+    rw [h1, map_sum]
     refine Finset.sum_congr rfl (fun i _ => ?_)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [map_smul, hφr, smul_eq_mul]
   have hle : ∑ i, ∑ j, ((c i j : ℕ) : ℝ) * (((i : ℕ) : ℝ) - ((j : ℕ) : ℝ)) ≤ 0 := by

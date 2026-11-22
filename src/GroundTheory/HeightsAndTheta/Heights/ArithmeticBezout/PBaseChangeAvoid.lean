@@ -45,7 +45,7 @@ theorem BaseChangeAvoid.proof : BaseChangeAvoid.Statement := by
   apply hu
   rw [← hc, Ideal.mem_comap]
   convert h using 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [linForm, map_sum]
+
+  simp [linForm, map_sum]
 
 end GroundTheory.Heights₂.Heights

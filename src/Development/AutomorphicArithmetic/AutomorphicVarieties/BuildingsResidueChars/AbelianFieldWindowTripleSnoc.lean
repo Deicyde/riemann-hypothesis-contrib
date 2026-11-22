@@ -32,8 +32,8 @@ theorem UpperTheory.abelianField_window_triple_snoc :
     have hw : w = f x + c • s := by rw [hx]; abel
     rw [hw]
     refine Submodule.add_mem _ ?_ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨Fin.last n, by simp⟩))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b'.sum_repr x, map_sum]
+
+    rw [← b'.sum_repr x, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [map_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i.castSucc, by simp⟩)
@@ -43,19 +43,19 @@ theorem UpperTheory.abelianField_window_triple_snoc :
   have hfx : ∀ x : W', f x = ∑ i, (b'.repr x i) • b i.castSucc := by
     intro x
     conv_lhs => rw [← b'.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul, hbc]
   have hrepr1 : ∀ (x : W') (i : Fin n), b.repr (f x) i.castSucc = b'.repr x i := by
     intro x i
     rw [hfx]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finsupp.single_apply, Fin.castSucc_inj]
+
+    simp [map_sum, Finsupp.single_apply, Fin.castSucc_inj]
   have hrepr2 : ∀ x : W', b.repr (f x) (Fin.last n) = 0 := by
     intro x
     rw [hfx]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+
+    simp [map_sum]
   refine ⟨b, fun a => ⟨?_, ?_⟩⟩
   · intro i j hji
     rw [LinearMap.toMatrix_apply]

@@ -168,8 +168,8 @@ theorem map_act (c : ℤ_[l]) (a : PowerSeries O) :
 
 omit [Algebra ℤ_[l] O] [Algebra ℤ_[l] L] [IsScalarTower ℤ_[l] O L] [Fact l.Prime] in
 theorem map_QQ (s : ℕ) : PowerSeries.map (algebraMap O L) (QQ l O s) = QQ l L s := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [QQ, XX, map_sum]
+
+  simp [QQ, XX, map_sum]
 
 theorem const_act (c : ℤ_[l]) (a : PowerSeries O) : constantCoeff (act l O c a) = constantCoeff a := by
   obtain ⟨b, hb⟩ : X ∣ a - C (constantCoeff a) := by rw [X_dvd_iff]; simp
@@ -246,8 +246,8 @@ theorem letφ_pow (n : ℕ) (φ : O⟦X⟧ →ₐ[O] O⟦X⟧) (q : O⟦X⟧) (h
     intro k
     rw [pow_succ', AlgHom.mul_apply]
     change φ ((letφ (n := n) φ ^ j) (fun _ => q) (k - 1)) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ih, map_sum]
+
+    rw [ih, map_sum]
     simp only [map_pow, map_add (f := _), map_one, hφ, hq, add_sub_cancel, ← pow_mul, pow_succ', mul_assoc]
 
 
@@ -297,7 +297,7 @@ end Generic
 
 
 open GlobalTheory.Cyc.Cont in
-set_option maxHeartbeats 1000000 in
+
 theorem letterwise (s r n m m' : ℕ) [NeZero n] (hs : 1 ≤ s) (h2 : l = 2 → 2 ≤ s) {I : Type} [CommGroup I]
     (c : I → ℤ_[l]ˣ) (i₀ : I) (hu : ‖(c i₀ : ℤ_[l]) - 1‖ = (l : ℝ) ^ (-(s : ℤ))) (Q : LetA ↥(OL LL) n)
     (hQ : ∀ k, Q k = QQ l ↥(OL LL) s) (Gm : I → Matrix (Fin r) (Fin r) (LetA ↥(OL LL) n))
@@ -475,7 +475,7 @@ theorem exists_char (Γ : GamS P K s LL) : ∃ c : Γ.Gam → ℤ_[l]ˣ, ‖(c �
   rw [h, ← Real.rpow_intCast]; push_cast; rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem pinned (R : WSer Γ) : ∃ c : Γ.Gam → ℤ_[l]ˣ, ‖(c Γ.gam : ℤ_[l]) - 1‖ = (l : ℝ) ^ (-(s : ℤ)) ∧
     R.φ₀ = phi l _ ∧ (∀ g, R.γ₀ g = act l _ (c g)) ∧ ∀ k, R.Q k = QQ l ↥(OL LL) s := by
   obtain ⟨c, hu, hc⟩ := exists_char Γ
@@ -493,7 +493,7 @@ namespace GlobalTheory.HWL
 open InvCont
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_invariant_basis_conv : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s : ℕ) (LL : FinExt l), Good K s LL → ∀ (Γ : GamS P K s LL) (R : WSer Γ), ∀ (r m m' : ℕ) (Gm : Γ.Gam → Matrix (Fin r) (Fin r) (LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)))) (Pm Pm' : Matrix (Fin r) (Fin r) (LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)))), (∀ g h, Gm (g * h) = Gm g * (Gm h).map (letγ (R.γ₀ g))) → (∀ g i j k, PowerSeries.constantCoeff (Gm g i j k) = if i = j then 1 else 0) → Pm * Pm' = (R.Q ^ m') • (1 : Matrix (Fin r) (Fin r) (LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)))) → (∀ g, (letγ (R.γ₀ g) R.Q ^ m) • (Pm * (Gm g).map (letφ R.φ₀)) = (R.Q ^ m) • (Gm g * Pm.map (letγ (R.γ₀ g)))) → ∃ (U V : Matrix (Fin r) (Fin r) (LetA ↥LL.1 (Module.finrank ℚ_[l] ↥(K0 K)))) (w : ℕ), U * V = 1 ∧ (∀ i j k, PowerSeries.constantCoeff (U i j k) = if i = j then 1 else 0) ∧ (∀ i j k, Conv (logS LL ^ w * U i j k) ∧ Conv (logS LL ^ w * V i j k)) ∧ (∀ g, (Gm g).map toLL * U.map (fun a k => PowerSeries.subst (PowerSeries.map (algebraMap ↥(OL LL) ↥LL.1) (R.γ₀ g PowerSeries.X)) (a k)) = U) ∧ ∃ Cm : Matrix (Fin r) (Fin r) (ZMod (Module.finrank ℚ_[l] ↥(K0 K)) → ↥LL.1), Pm.map toLL * U.map (fun a k => PowerSeries.subst ((1 + PowerSeries.X) ^ l - 1 : PowerSeries ↥LL.1) (a (k - 1))) = (toLL R.Q ^ m) • (U * Cm.map (fun c k => PowerSeries.C (c k))) := by
   intro l _ P K s LL hgood Γ R r m m' Gm Pm Pm' hmul h0 hP hGP
   haveI : FiniteDimensional ℚ_[l] ↥K.1 := K.2

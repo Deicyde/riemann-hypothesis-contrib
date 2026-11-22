@@ -78,12 +78,12 @@ theorem glue_ratios {R C : Type} [CommRing R] (Ω : C → Type) [∀ Z, Field (�
   choose! p hp q hq h1 h2 using hK'
   refine ⟨K, ∑ Z ∈ S, p Z, sum_mem hp, ∑ Z ∈ S, q Z, sum_mem hq, fun Z hZ => ?_⟩
   have ep : e Z (∑ Z ∈ S, p Z) = e Z (p Z) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_single_of_mem Z hZ fun b hb hne => (h2 b hb Z hne.symm).1
   have eq : e Z (∑ Z ∈ S, q Z) = e Z (q Z) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_single_of_mem Z hZ fun b hb hne => (h2 b hb Z hne.symm).2
   rw [ep, eq]
   exact h1 Z hZ
@@ -164,15 +164,15 @@ theorem exists_gen_ne_zero {D : D7} {B : WeightFamilies.Prov D} {P : ModuliInteg
   by_contra hc
   push Not at hc
   apply hs.s0.ne_zero
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Formalism.MainNotions.Gaps.EtaleWeightGaps.sec, map_sum]
+
+  rw [Formalism.MainNotions.Gaps.EtaleWeightGaps.sec, map_sum]
   refine Finset.sum_eq_zero fun k _ => ?_
   rw [Algebra.smul_def, map_mul]
   exact mul_eq_zero_of_right _ (hc k)
 
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem exists_ratio {D : D7} {T : Top D} (h : LawsP T) {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
     (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF)
     (hC : CompSplitSt h j hG) (hB : BIRSt h j hj hG G) (S : Finset (Comp (T.Q.Xo j) T.Q.c))
@@ -220,8 +220,8 @@ theorem exists_ratio {D : D7} {T : Top D} (h : LawsP T) {j : ℕ} (hj : InR D j)
   exact congrArg (fun t => a Z * t) (evCAlg_apply hG hT Z _)
 
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem eSec_of_valSep {D : D7} {T : Top D} (h : LawsP T) {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
     (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF)
     (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO))
@@ -262,8 +262,8 @@ theorem eSec_of_valSep {D : D7} {T : Top D} (h : LawsP T) {j : ℕ} (hj : InR D 
 end GlobalTheory.ValZeroSection
 
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem GlobalTheory.eSec_of_curveHyp : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c) (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) (ka wL wF : WeightFamilies.Wt D j) (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (S : Scal (recB h.toLawsCore)) (g0 : (recB h.toLawsCore).Cusp j wF) (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO)), CurveHyp h j hj hG ka wL wF G S g0 → GenValInjSt h j hG → CompSplitSt h j hG → BIRSt h j hj hG G → ESecSt (E := extAll h j hj) (hM := intAtExt_extAll h j hj) G la :=
   fun D T h j hj hG hT ka wL wF G S g0 la hH hV hC hB =>
     GlobalTheory.ValZeroSection.eSec_of_valSep h hj hG hT G la hC hB

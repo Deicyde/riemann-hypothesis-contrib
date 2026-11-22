@@ -44,7 +44,7 @@ end
 section
 open NumberField MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.L2.Theta Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.AllWt GlobalTheory.LevGeo
 open scoped ENNReal
-set_option synthInstance.maxHeartbeats 400000
+
 namespace GlobalTheory.LamMuMax
 end GlobalTheory.LamMuMax
 end
@@ -155,7 +155,7 @@ theorem _root_.UpperTheory.Lit.Tam.tamagawa_number_formula : _root_.GlobalTheory
 end GlobalTheory.BergRank
 end
 section
-set_option synthInstance.maxHeartbeats 400000
+
 noncomputable section
 open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR.Links ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
 namespace GlobalTheory.CovTop.LamCore

@@ -18,7 +18,7 @@ open GlobalTheory.StdUnn PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace PositivityTheory.Rg.Rsw.Kplug
 
-set_option maxHeartbeats 1000000 in
+
 theorem residue_vanishes_of_siegel_eisenstein : K0 → K1 → K2 → SimplePoleRescaling → ContinuousInvariantCoefficients → KillingPolyConst → ContinuationThroughChart → K4 →
     GlobalTheory.Published.SiegelEisensteinContinuation → PositivityTheory.Rg.Rsw.ResCore → ResidueVanishing := by
   intro k0 k1 k2 k2b k2c k3a k3b k4 hP hC D ψ θ A cA a hDef _ B W t hd _ _ hW0 _ hA h2 hlt χ omB omW hWB hWW ν 𝓕 hν m hm u hu hinv hK φ hφ hKφ

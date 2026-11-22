@@ -50,9 +50,9 @@ theorem continuous_cmb {D : ℕ} (hX : IsArithVar p D) (P : Pair p) (m : ℕ) {�
       (∑ a, ∑ b, c a * (starRingEnd ℂ) (c b) *
         (val P m 1 σ y (f a) * (starRingEnd ℂ) (val P m 1 σ y (f b)))).re := by
     funext y
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [cmb, ← Complex.normSq_eq_norm_sq, ← Complex.ofReal_re (Complex.normSq _), ← Complex.mul_conj, map_sum,
-      Finset.sum_mul_sum]
+
+    rw [cmb, ← Complex.normSq_eq_norm_sq, ← Complex.ofReal_re (Complex.normSq _), ← Complex.mul_conj, map_sum,
+    Finset.sum_mul_sum]
     congr 1
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     simp only [vals, map_mul]

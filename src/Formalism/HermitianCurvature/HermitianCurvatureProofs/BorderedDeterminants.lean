@@ -155,13 +155,13 @@ theorem sumBorder {n : ℕ} (Y H : Fin n → Module.End ℂ V) (M : Fin n → Fi
       Y x (∑ i, ((-1 : ℂ) ^ ((w : ℕ) + (x : ℕ))) • M w x (Ψ i w)) := by
     intro w x
     rw [icast_apply, Module.End.mul_apply, Module.End.mul_apply, ← h1 w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finset.smul_sum, Int.cast_pow, Int.cast_neg, Int.cast_one]
+
+    simp only [map_sum, map_smul, Finset.smul_sum, Int.cast_pow, Int.cast_neg, Int.cast_one]
   simp only [LinearMap.sum_apply, key]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl (fun x _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum (Y x), Finset.sum_comm]
+
+  rw [← map_sum (Y x), Finset.sum_comm]
   congr 1
   exact Finset.sum_congr rfl (fun i _ => h3 i x)
 

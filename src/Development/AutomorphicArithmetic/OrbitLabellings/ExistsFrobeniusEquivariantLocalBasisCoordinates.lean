@@ -181,8 +181,8 @@ private theorem cols_of_trace (D : D7) {p : ℕ} [Fact p.Prime] (lam : Qbar →+
       = ∑ τ : D.what₂.Tau, lam (embQ τ Y) := by
         rw [Fintype.sum_prod_type]
         refine Finset.sum_congr rfl fun τ _ => ?_
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [lamB, lamBc, hl, hY, map_sum, map_mul]
+
+        simp only [lamB, lamBc, hl, hY, map_sum, map_mul]
         exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
     _ = lam (∑ τ : D.what₂.Tau, embQ τ Y) := (map_sum lam _ _).symm
     _ = if i = i' then 1 else 0 := by
@@ -333,20 +333,20 @@ private theorem frob_moves_coords : ∀ (D : D7) (p : ℕ) [Fact p.Prime] (lam :
   have hPc := hP.2.1 hcl
   have hP'c := hP'.2.1 hcl
   refine ⟨fun z a b₀ i => ?_, fun w a b₀ i => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [gK, hK, hfun, map_sum, map_mul]
-      refine Finset.sum_congr rfl fun b₁ _ => Finset.sum_congr rfl fun a₁ _ => ?_
-      rw [hs, hs, conj_conj, hinv, K1 P hPc z]
-      have e2 := congrFun (congrFun (K2 P' hP'c z) b₁) b₀
-      simp only [Matrix.map_apply, Matrix.transpose_apply] at e2 ⊢
-      rw [e2]; ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [gK, hK, hfun, map_sum, map_mul]
-      refine Finset.sum_congr rfl fun b₁ _ => Finset.sum_congr rfl fun a₁ _ => ?_
-      rw [hs, hs, hinv, K1 P' hP'c w]
-      have e2 := congrFun (congrFun (K2 P hPc w) a₁) a
-      simp only [Matrix.map_apply, Matrix.transpose_apply] at e2 ⊢
-      rw [e2]; ring
+
+  · simp only [gK, hK, hfun, map_sum, map_mul]
+    refine Finset.sum_congr rfl fun b₁ _ => Finset.sum_congr rfl fun a₁ _ => ?_
+    rw [hs, hs, conj_conj, hinv, K1 P hPc z]
+    have e2 := congrFun (congrFun (K2 P' hP'c z) b₁) b₀
+    simp only [Matrix.map_apply, Matrix.transpose_apply] at e2 ⊢
+    rw [e2]; ring
+
+  · simp only [gK, hK, hfun, map_sum, map_mul]
+    refine Finset.sum_congr rfl fun b₁ _ => Finset.sum_congr rfl fun a₁ _ => ?_
+    rw [hs, hs, hinv, K1 P' hP'c w]
+    have e2 := congrFun (congrFun (K2 P hPc w) a₁) a
+    simp only [Matrix.map_apply, Matrix.transpose_apply] at e2 ⊢
+    rw [e2]; ring
 
 private theorem sum_bilin {R : Type*} [CommRing R] {ι κ μ : Type*} [Fintype ι] [Fintype κ] [Fintype μ]
     (F : κ → R) (G : μ → R) (X : ι → κ → R) (Y : ι → μ → R) :
@@ -573,8 +573,8 @@ private theorem norm_hK_le_one : ∀ (D : D7) (p : ℕ) [Fact p.Prime] (lam : Qb
   have e : hK D lam P P' b w a b₀ i = ρ (((P' τ)⁻¹ * b i * P τ) b₀ a) := by
     unfold hK
     rw [← hτ, hρK, hinv]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, map_mul, Finset.sum_mul]
+
+    simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, map_mul, Finset.sum_mul]
     rw [Finset.sum_comm]
   show ‖((hK D lam P P' b w a b₀ i : MaximalUnramifiedExtension p) : ℂ_[p])‖ ≤ 1
   rw [e, hρC]

@@ -13,6 +13,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.FlatPlace GlobalTheory.LocMod GlobalTheory.SplitWeil
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.flatDictionary_lastTwoSteps_at_place : Big fun ch => ChrP ch → ArrP ch → LocP ch → BesP ch → JacP ch → LastP ch := by
   first | exact @GlobalTheory.FlatPlace.lastStep_eventually | exact GlobalTheory.FlatPlace.lastStep_eventually | (intros; apply GlobalTheory.FlatPlace.lastStep_eventually <;> assumption)

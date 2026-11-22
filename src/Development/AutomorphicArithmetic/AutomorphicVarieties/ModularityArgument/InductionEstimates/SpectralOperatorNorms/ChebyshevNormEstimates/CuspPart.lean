@@ -152,7 +152,7 @@ private theorem reassoc' (A G Q U T : H →L[ℂ] H) : (A ∘L Q ∘L U ∘L G) 
 
 end SlopeTestRemainingChoices
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.cuspPart :
     ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (n l : ℕ), 0 < n →
       ∀ (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (θ : Twist μ) (𝔰 : Side θ l) (ev : PR K n →+* (LL μ →L[ℂ] LL μ)),

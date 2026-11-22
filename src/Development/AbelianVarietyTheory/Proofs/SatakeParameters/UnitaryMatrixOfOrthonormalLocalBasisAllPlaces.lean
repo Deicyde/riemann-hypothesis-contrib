@@ -245,8 +245,8 @@ variable {K : Type} [Field K] {κ ν ι : Type} [Fintype κ] [Fintype ν] [Finty
 theorem subst_lin {a : ν → MvPowerSeries ι K} (hs : MvPowerSeries.HasSubst a) (w : ν → K) :
     MvPowerSeries.subst a (∑ j, MvPowerSeries.C (w j) * MvPowerSeries.X j : MvPowerSeries ν K) =
       ∑ j, MvPowerSeries.C (w j) * a j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPowerSeries.coe_substAlgHom hs, map_sum]
+
+  rw [← MvPowerSeries.coe_substAlgHom hs, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [MvPowerSeries.coe_substAlgHom hs, MvPowerSeries.subst_mul hs, MvPowerSeries.subst_X hs, MvPowerSeries.subst_C]
 
@@ -282,8 +282,8 @@ theorem subst_atLin {s : Type} [Fintype s] [Finite s] (m : s → ν → ℂ_[p])
   simp_rw [Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← mul_assoc, ← map_mul, h k j, map_sum, Finset.sum_mul]
+
+  rw [← mul_assoc, ← map_mul, h k j, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, mul_assoc]
 
@@ -317,8 +317,8 @@ theorem rho_yy (i : Fin r) (j : (Bool × HH D) × Fin N × Fin N') :
     rho D lam (tauPl D j.1) (yy D P P' b i j) = ∑ k, lamBc D lam b k i * cA D lam P P' j k := by
   rw [Fintype.sum_prod_type, Finset.sum_eq_single (tauPl D j.1)]
   · rw [Fintype.sum_prod_type]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [yy, map_sum, map_mul, cA, if_true, lamBc_eq]
+
+    simp only [yy, map_sum, map_mul, cA, if_true, lamBc_eq]
     refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
     ring
   · intro t _ ht
@@ -330,8 +330,8 @@ theorem rho_conj_yy (i : Fin r) (j : (Bool × HH D) × Fin N × Fin N') :
     rho D lam (tauPl D j.1) (D.host.conj (yy D P P' b i j)) = ∑ k, lamB D lam b k i * cB D lam P P' j k := by
   rw [Fintype.sum_prod_type, Finset.sum_eq_single (tauPl D j.1)]
   · rw [Fintype.sum_prod_type]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [yy, map_sum, map_mul, cB, if_true, lamB_eq, conj_conj]
+
+    simp only [yy, map_sum, map_mul, cB, if_true, lamB_eq, conj_conj]
     refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
     ring
   · intro t _ ht
@@ -342,8 +342,8 @@ theorem rho_conj_yy (i : Fin r) (j : (Bool × HH D) × Fin N × Fin N') :
 theorem conj_yy (i : Fin r) (j : (Bool × HH D) × Fin N × Fin N') :
     D.host.conj (yy D P P' b i j) =
       (((P' (tauPl D j.1)).map D.host.conj).transpose * b i * P (tauPl D j.1)) j.2.2 j.2.1 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [yy, map_sum, map_mul, conj_conj, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Finset.sum_mul]
+
+  simp only [yy, map_sum, map_mul, conj_conj, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
   ring
@@ -385,8 +385,8 @@ theorem sum_cB_cA (hU : ∀ z, ((P (tauPl D z)).map D.host.conj).transpose * P (
           rho D lam (tauPl D z) (∑ x, D.host.conj (P (tauPl D z) x a') * P (tauPl D z) x a) := by
       rw [Fintype.sum_prod_type, Finset.sum_eq_single (tauPl D z)]
       · rw [Fintype.sum_prod_type]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, map_sum, Finset.sum_mul_sum]
+
+        rw [map_sum, map_sum, Finset.sum_mul_sum]
         refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
         simp only [map_mul, cA, cB, if_true]
         ring

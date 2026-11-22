@@ -63,8 +63,8 @@ theorem eval_trunc'_subst_eq_sum :
   simp_rw [Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun α _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [eval_trunc'_eq_sum, map_sum, Finset.mul_sum]
+
+  rw [eval_trunc'_eq_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun β _ => ?_
   rw [map_mul, map_prod]
   simp_rw [map_pow]

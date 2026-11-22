@@ -64,11 +64,11 @@ theorem comp_smul (η : Y →ₗ[ℤ] ℝ) (σ : E →+* ℂ) (u : 𝓞 E) (a : 
   have hk : ∀ j, ∑ i, (((RingOfIntegers.basis E).repr (RingOfIntegers.basis E i * u) j : ℤ) : ℂ)
       * σ (ed E i) = σ (ed E j) * σ (u : E) := fun j => by
     have := congrArg σ (key_exp u j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, map_mul, map_intCast] using this
+
+    simpa [map_sum, map_mul, map_intCast] using this
   unfold comp
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [smul_expand u _ a, map_sum, map_zsmul, zsmul_eq_mul]
+
+  simp_rw [smul_expand u _ a, map_sum, map_zsmul, zsmul_eq_mul]
   push_cast
   simp_rw [Finset.sum_mul]
   rw [Finset.sum_comm, Finset.mul_sum]
@@ -89,9 +89,9 @@ theorem sum_comp (η : Y →ₗ[ℤ] ℝ) (a : Y) : ∑ σ : E →+* ℂ, comp �
   rw [Finset.sum_comm]
   simp_rw [← Finset.mul_sum, htr, htr1]
   conv_rhs => rw [← h1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, zsmul_eq_mul, Complex.ofReal_sum, Complex.ofReal_mul,
-    Complex.ofReal_intCast, Rat.cast_intCast]
+
+  simp only [map_sum, map_zsmul, zsmul_eq_mul, Complex.ofReal_sum, Complex.ofReal_mul,
+  Complex.ofReal_intCast, Rat.cast_intCast]
   exact Finset.sum_congr rfl fun i _ => by ring
 
 def smulZ (u : 𝓞 E) : Y →ₗ[ℤ] Y where

@@ -205,7 +205,7 @@ private theorem fT_Phi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ
 
 end UpperTheory.V.Z.Sym.Unl
 
-set_option maxHeartbeats 1000000 in
+
 open UpperTheory.V.Z.Sym.Unl in
 theorem UpperTheory.V.Z.Sym.Unl.eigLiftC :
     UpperTheory.V.Z.Sym.Unl.EigLiftC := by

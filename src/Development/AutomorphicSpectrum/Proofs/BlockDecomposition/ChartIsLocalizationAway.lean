@@ -41,8 +41,8 @@ theorem one_bij (hL : OneLow) (hR : OneRes) {R : Type} [CommRing R] {ι : Type} 
     intro m x
     rw [Cos.d_apply, Cos.d_apply]
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hδ, Finset.sum_apply, Pi.smul_apply, φ, map_sum, map_zsmul]
+
+    simp only [hδ, Finset.sum_apply, Pi.smul_apply, φ, map_sum, map_zsmul]
   have hφ1 : ∀ m x y, φ m (x - y) = φ m x - φ m y := fun m x y => funext fun i => map_sub _ _ _
   obtain ⟨-, hinj, hex, hup⟩ := hP
   have hres : (A.coh a).cech.cx.ResUpTo 1 (LinearMap.ker ((A.coh a).cech.d 0)).subtype := by
@@ -352,7 +352,7 @@ theorem chart_exists (K : Type) [Field K] (W Z Y : Scheme.{0}) (q : Z ⟶ Spec (
 
 section Main
 
-set_option maxHeartbeats 4000000 in
+
 theorem chartBij_of : ChartFormsCechExact → SiteLaws → OneLow → OneRes → CovDesc → ZarRel → AffOm → OmNat → OmRes → AffRel → FormLaws →
     ChartLaws → ChartBij := by
   intro hH hS hL hR hC hZ hA hN hOR hAR hF hCL K _ _ W Z Y q i _ π d hd V hc hQ hQ' a h h' n

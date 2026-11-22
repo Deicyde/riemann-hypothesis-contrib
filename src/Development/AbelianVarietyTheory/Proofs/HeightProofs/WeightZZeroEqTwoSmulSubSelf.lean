@@ -16,8 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.LawBddDa
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 noncomputable section
 

@@ -37,8 +37,8 @@ open MvPolynomial in
 theorem eval_polyOf {K : Type} [Fintype K] [DecidableEq K]
     (φ : Matrix (Fin q → ι) (Fin q → ι) ℂ →ₗ[ℂ] ℂ) (M : K → Matrix ι ι ℂ) (c : K → ℂ) :
     eval c (polyOf φ M) = φ (tp q (∑ k, c k • M k)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [tp_sum, map_sum, polyOf, map_sum]
+
+  rw [tp_sum, map_sum, polyOf, map_sum]
   refine Finset.sum_congr rfl fun f _ => ?_
   rw [map_smul, smul_eq_mul, map_mul, eval_C, map_prod]
   simp only [eval_X]
@@ -340,8 +340,8 @@ theorem sym_zero (φ : Matrix (Fin q → ι) (Fin q → ι) ℂ →ₗ[ℂ] ℂ)
       nu_iff]
     exact ⟨fun h => ⟨Equiv.ofBijective f h, rfl⟩, fun ⟨σ, hσ⟩ => hσ ▸ σ.bijective⟩
   rw [hfil, Finset.sum_map] at hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa only [map_sum, Function.Embedding.coeFn_mk] using hc
+
+  simpa only [map_sum, Function.Embedding.coeFn_mk] using hc
 
 end Sym
 
@@ -364,8 +364,8 @@ theorem sw2 : PlacePermOperatorCommutantSpan := by
   apply hφZ
   have hfac : ((Nat.factorial q : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (Nat.factorial_ne_zero q)
   have hdec := congrArg φ (decomp Z (sym_of_comm Z hZ))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_smul, smul_eq_mul, map_sum] at hdec
+
+  rw [map_smul, smul_eq_mul, map_sum] at hdec
   have hterm : ∀ I J, φ (Z I J • symU I J) = 0 := by
     intro I J
     rw [map_smul, smul_eq_mul]
@@ -385,8 +385,8 @@ theorem sw2 : PlacePermOperatorCommutantSpan := by
       have hs := sym_zero φ (fun j => Matrix.single (I j) (J j) (1 : ℂ)) h0
       rw [sum_perm_mt _ I J fun _ => rfl] at hs
       rw [hs, mul_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, hterm, Finset.sum_const_zero] at hdec
+
+  simp only [map_sum, hterm, Finset.sum_const_zero] at hdec
   exact (mul_eq_zero.1 hdec).resolve_left hfac
 
 end PositivityTheory.KB.BlockInvariants

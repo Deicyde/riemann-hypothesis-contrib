@@ -21,7 +21,7 @@ open scoped TensorProduct Matrix
 open GlobalTheory.ShortMove GlobalTheory.ShortMoveIso GlobalTheory.TwistTie
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem frBor_of_isometry {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
     {Dw : Datum H} {l : Geo.Tor.Level H} {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {g : ℕ}
     (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
@@ -68,7 +68,7 @@ theorem frBor_of_isometry {E : Type} [Field E] [NumberField E] [IsCMField E] {H 
     exact d
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_dict_comp {D : D7} (V : HSp D) {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H}
     {l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ} (hr : V.rank = r)
     (U : Unf Xo c σ r) (dict : GA D V → Σ k, Frame (U.X k).Ψ r)

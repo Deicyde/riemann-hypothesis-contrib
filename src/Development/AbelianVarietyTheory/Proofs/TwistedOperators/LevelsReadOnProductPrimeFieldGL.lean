@@ -57,11 +57,11 @@ theorem memK_map (e : κ ≃+* κ') (b : Bool) (s k : ℕ) (u : Fin r → Fin r 
 theorem sumK_map (e : κ ≃+* κ') (b : Bool) (s k : ℕ) (u : Fin r → Fin r → κ) :
     sumK b s k (fun a c => e (u a c)) = e (sumK b s k u) := by
   unfold sumK
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
   split_ifs <;> simp
 

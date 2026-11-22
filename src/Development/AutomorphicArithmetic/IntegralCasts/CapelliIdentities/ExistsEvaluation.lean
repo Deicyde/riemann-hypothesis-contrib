@@ -12,8 +12,8 @@ theorem UpperTheory.Reformulated.B.ExistsEvaluation.exists_eval :
   intro C Ω J _ _ _ f
   classical
   have hsum : ∑ j : J, f (Pi.single j 1) = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     have h : (∑ j : J, (Pi.single j (1 : C) : J → C)) = 1 := by
       simpa using Finset.univ_sum_single (1 : J → C)
     rw [h, map_one]

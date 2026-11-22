@@ -133,9 +133,9 @@ theorem HelpSng_mix_mul {m o q : Type} [Fintype o] (A : Matrix m o (Af I.F ⊗[I
     (L : Matrix o q (Fv I.F p ⊗[I.F] I.E)) :
     mixM I p A K * mixM I p B L = mixM I p (A * B) (K * L) := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mixM, Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
-    map_sum, Finset.mul_sum, HelpSng_theta_mul]
+
+  simp only [mixM, Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
+  map_sum, Finset.mul_sum, HelpSng_theta_mul]
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun k _ => ?_)
   linear_combination (A i k * B k j) * idempotent_complement_idem I p + A i k * idempotent_complement_mul I p (L k j) +

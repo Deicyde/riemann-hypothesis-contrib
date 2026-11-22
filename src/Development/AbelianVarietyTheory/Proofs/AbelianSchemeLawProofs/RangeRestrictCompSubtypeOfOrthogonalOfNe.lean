@@ -512,9 +512,9 @@ theorem degProj_totalTensorEquiv (n : ℕ) (z : (∀ s, A.obj s) ⊗[K] (∀ t, 
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
   | tmul x y =>
     funext w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.sum_apply, map_sum, Finset.sum_apply, degProj_apply,
-      card_parts]
+
+    rw [LinearMap.sum_apply, map_sum, Finset.sum_apply, degProj_apply,
+    card_parts]
     have h : ∀ p : ℕ × ℕ, totalTensorEquiv A B
         (TensorProduct.map (degProj A p.1) (degProj B p.2) (x ⊗ₜ y)) w =
         if ((part (inlEmb ι κ) w).card, (part (inrEmb ι κ) w).card) = p then

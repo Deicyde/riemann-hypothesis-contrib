@@ -133,7 +133,7 @@ theorem mem_intAf_iff (q : SplitPt D k) {PP : Formalism.L2.DIV.Pl D.host.E} (he 
       rw [sub_mul, one_mul, sub_add_cancel]
     rw [this]; exact add_mem h1 h2
 
-set_option maxHeartbeats 1000000 in
+
 theorem resS_off (q : SplitPt D k) {PP : Formalism.L2.DIV.Pl D.host.E} (he : Formalism.L2.NTheta.IsIdemAt q.e PP)
     (PP' : Formalism.L2.DIV.Pl D.host.E) (hne : PP' ≠ PP) (z : EAf D) (hz : z ∈ Formalism.L2.Herm.intAf D.host.F D.host.E)
     (hz' : (1 - toEAf D q.e) * z ∈ Formalism.L2.Herm.intAf D.host.F D.host.E) :

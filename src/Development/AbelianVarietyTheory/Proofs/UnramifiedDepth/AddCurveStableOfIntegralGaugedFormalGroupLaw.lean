@@ -161,8 +161,8 @@ theorem subst_killCompl {τ : Type} {γ : κ → MvPowerSeries τ C} (hγ : ∀ 
 theorem sg_eq (X : RawChart C d I κ) (v : κ → C) :
     X.sg v = -∑ i, v i • killCompl (fstEmb κ) (pderiv (R := C) ((1 : Fin 2), i) X.h) := by
   ext μ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_neg, map_sum]
+
+  rw [map_neg, map_sum]
   show -∑ i, v i * coeff
     (μ.mapDomain (fun x : κ => ((0 : Fin 2), x)) + Finsupp.single ((1 : Fin 2), i) 1) X.h = _
   congr 1
@@ -341,9 +341,9 @@ theorem intS_cocycle {X : RawChart C d I κ} {V : VF C} (h : RLaw X V) {τ : Typ
   intro μ
   have := VF.Ge.sum (s := Finset.univ) fun i _ => (hv i).mul_int (key i μ)
   convert this using 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_add (f := _), map_neg, map_sum, coeff_smul, mul_sub, mul_add, Finset.sum_sub_distrib,
-    Finset.sum_add_distrib]
+
+  simp only [map_sub, map_add (f := _), map_neg, map_sum, coeff_smul, mul_sub, mul_add, Finset.sum_sub_distrib,
+  Finset.sum_add_distrib]
   ring
 
 theorem intS_iff {V : VF C} {f : PowerSeries C} :

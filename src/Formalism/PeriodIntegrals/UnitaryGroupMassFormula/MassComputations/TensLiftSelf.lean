@@ -28,8 +28,8 @@ theorem pv_mulVec (v : HeightOneSpectrum (𝓞 F)) (m : Matrix (Fin n) (Fin n) (
     (x : Fin n → Af F ⊗[F] E) :
     pv v (m *ᵥ x) = (m.map (tensMap (E := E) (evalV F v))) *ᵥ pv v x := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [pv, Matrix.mulVec, dotProduct, map_sum]
+
+  simp [pv, Matrix.mulVec, dotProduct, map_sum]
 
 open Classical in
 theorem singleV_smul (v : HeightOneSpectrum (𝓞 F)) (c : F) (y : Fv F v) :

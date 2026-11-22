@@ -49,7 +49,7 @@ theorem mt_inv_eq (V : HSp D) (hg : V.gram = 1) (g : GA D V) : mt V g⁻¹ = ((m
     _ = _ := by rw [Matrix.mul_assoc, h2, Matrix.mul_one]
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem int_of_moves (V : HSp D) (g : GA D V) (N : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E))
     (hM : Moves V rfl g N) (x : Fin V.rank → D.host.E) (hx : x ∈ N) (i : Fin V.rank) :
     finPart D ((mt V g⁻¹ *ᵥ fun k => incA D (x k)) i) ∈ intAE D := by
@@ -57,8 +57,8 @@ theorem int_of_moves (V : HSp D) (g : GA D V) (N : Submodule (𝓞 D.host.E) (Fi
   have := (hM x).1 hx i
   have e : toEAf D ((mt V g⁻¹ *ᵥ fun k => incA D (x k)) i) = (finM V rfl g⁻¹ *ᵥ fun j => eToEAf D (x j)) i := by
     simp only [Matrix.mulVec, dotProduct]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_mul]
     rfl
@@ -75,14 +75,14 @@ namespace GlobalTheory.LatMoveStd
 variable {D : D7}
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem int_conj (V : HSp D) (hg : V.gram = 1) (g : GA D V) (N : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E))
     (hM : Moves V rfl g N) (s : Fin V.rank → D.host.E) (hs : s ∈ N) (j : Fin V.rank) :
     finPart D (∑ l, cA D (incA D (s l)) * mt V g l j) ∈ intAE D := by
   rw [← GlobalTheory.FinPl.FrameLat.cA_int_iff]
   have e : cA D (∑ l, cA D (incA D (s l)) * mt V g l j) = (mt V g⁻¹ *ᵥ fun k => incA D (s k)) j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mt_inv_eq V hg g, map_sum]
+
+    rw [mt_inv_eq V hg g, map_sum]
     simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.map_apply]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_mul, cA_cA'', mul_comm]
@@ -129,7 +129,7 @@ theorem row_one {n : ℕ} (s : Fin n → D.host.E) (l : Fin n) :
     (fun h => absurd (Finset.mem_univ l) h), Matrix.one_apply_eq, mul_one]
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem gen_mem (S T : HSp D) (hgS : S.gram = 1) (hgT : T.gram = 1) (g : GA D S) (h : GA D T)
     (N : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (N' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
     (hN : Moves S rfl g N) (hN' : Moves T rfl h N') (α : Af D.host.F) (hα : α ∈ intAf D.host.F) (c : D.host.E)

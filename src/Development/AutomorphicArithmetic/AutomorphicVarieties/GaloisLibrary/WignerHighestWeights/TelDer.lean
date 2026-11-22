@@ -51,6 +51,6 @@ theorem UpperTheory.V.AlgRepEndIrreducible.telDer :
     rw [Fin.sum_univ_succ]
     simp only [tel_succ, Fin.tail_update_zero, Fin.tail_update_succ, Function.update_self,
       Function.update_of_ne (Fin.succ_ne_zero _).symm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), h0, h3, h4, hf, map_add (f := _), map_add (f := _), map_sum, Finset.sum_add_distrib]
+
+    rw [map_add (f := _), h0, h3, h4, hf, map_add (f := _), map_add (f := _), map_sum, Finset.sum_add_distrib]
     abel

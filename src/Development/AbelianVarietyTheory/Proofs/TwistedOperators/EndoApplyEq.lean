@@ -20,8 +20,8 @@ theorem endo_apply_eq (h : ∀ (i j : ι), i ≠ j → ∀ (f : M i →ₗ[R] M 
     g x i = g (Pi.single i (x i)) i := by
   have hx : x = ∑ j, Pi.single j (x j) := (Finset.univ_sum_single x).symm
   conv_lhs => rw [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_apply, Finset.sum_eq_single i]
+
+  rw [map_sum, Finset.sum_apply, Finset.sum_eq_single i]
   · intro j _ hji
     have h0 := h j i hji ((LinearMap.proj i).comp (g.comp (LinearMap.single R M j)))
     exact LinearMap.congr_fun h0 (x j)

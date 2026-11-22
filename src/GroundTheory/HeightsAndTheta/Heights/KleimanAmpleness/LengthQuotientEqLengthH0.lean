@@ -129,13 +129,13 @@ theorem d_mk (F₁ F₂ : SubSystem S x Ω) (u : Cech.Idx (support x) 0 → Ω) 
       ∑ j : J.1.1, Cech.sgn J.1.1 j • F₁.res _ J.1 (Cech.face_subset J j) ⟨u (Cech.face J j), hu _⟩ := by
     apply Subtype.ext
     simp [SubSystem.res]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, ← Submodule.mkQ_apply, map_sum]
+
+  rw [this, ← Submodule.mkQ_apply, map_sum]
   simp only [map_zsmul]
   rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_toCochain_eq (F₁ F₂ : SubSystem S x Ω)
     (hlift : ∀ s : Chart x → Ω, (∀ I, s I ∈ F₁.sub I) →
       (∀ I₁ I₂ : Chart x, I₁.1 ⊆ I₂.1 → s I₁ - s I₂ ∈ F₂.sub I₂) →
@@ -226,7 +226,7 @@ theorem exists_toCochain_eq (F₁ F₂ : SubSystem S x Ω)
   exact hts _
 
 
-set_option maxHeartbeats 400000 in
+
 theorem length_secs_eq (F₁ F₂ : SubSystem S x Ω)
     (hlift : ∀ s : Chart x → Ω, (∀ I, s I ∈ F₁.sub I) →
       (∀ I₁ I₂ : Chart x, I₁.1 ⊆ I₂.1 → s I₁ - s I₂ ∈ F₂.sub I₂) →

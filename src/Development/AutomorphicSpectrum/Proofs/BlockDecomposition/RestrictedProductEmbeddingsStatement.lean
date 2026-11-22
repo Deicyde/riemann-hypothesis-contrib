@@ -17,7 +17,7 @@ open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.restricted_product_embeddings : ∀ {ι Γ : Type} [Group Γ] {Hl : ι → Type} [∀ i, Group (Hl i)] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [∀ i, TopologicalSpace (Hl i)] [∀ i, T2Space (Hl i)]
     (p : ∀ i, Γ →* Hl i) (e : ∀ i, Hl i →* Γ) (K : Subgroup Γ) (KH : ∀ i, Subgroup (Hl i))
     (hpc : ∀ i, Continuous (p i)) (hec : ∀ i, Continuous (e i))

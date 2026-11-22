@@ -102,8 +102,8 @@ theorem GlobalTheory.totalDegree_le_of_integral_at_infinity : ∀ {K : Type} [Fi
     rw [map_zero]
     have : aeval y (B + A) =
         y j ^ (q * n + N * n) * ((∑ k ∈ Finset.range n, c k * s ^ k) + s ^ n) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [mul_add, Finset.mul_sum, map_add (f := _), map_sum]
+
+      rw [mul_add, Finset.mul_sum, map_add (f := _), map_sum]
       congr 1
       · refine Finset.sum_congr rfl fun k hk => ?_
         have hk' := Finset.mem_range.mp hk

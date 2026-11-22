@@ -30,8 +30,8 @@ theorem hform_herm (J : Matrix (Fin n) (Fin n) E) (hJ : Formalism.UG.IsHerm (sta
     have := congrFun (congrFun hJ j) i
     simpa [Formalism.UG.cT] using this
   unfold Formalism.UG.hform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, starRingEnd_self_apply, hJ']
+
+  simp only [map_sum, map_mul, starRingEnd_self_apply, hJ']
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   ring
@@ -80,8 +80,8 @@ theorem dualL_oLat (k : ℕ) : dualL (oLat E k) = oLat E k := by
     obtain ⟨x, rfl⟩ := (mem_oLat t).mp ht
     obtain ⟨y, rfl⟩ := (mem_oLat s).mp hs
     refine RingHom.mem_range.mpr ⟨∑ c, y c * x c, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [dotProduct, map_sum, map_mul]
+
+    simp [dotProduct, map_sum, map_mul]
 
 theorem card_quot_relIndex {M : Type*} [AddCommGroup M] [Module (𝓞 E) M] (S B : Submodule (𝓞 E) M) :
     Nat.card (B ⧸ S.comap B.subtype) = S.toAddSubgroup.relIndex B.toAddSubgroup := rfl

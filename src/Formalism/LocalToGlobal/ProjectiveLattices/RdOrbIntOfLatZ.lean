@@ -117,8 +117,8 @@ theorem iso_F (X : Data E r) (cu : CuspFD X ρ) (τ : E →+* ℂ) :
     Matrix.zero_apply, Finset.sum_mul]
   have h := congrArg τ (cu.3 a b)
   unfold ReciprocityTheory.ChartRestriction.G.FD.herm at h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_zero, emb_cc'] at h
+
+  simp only [map_sum, map_mul, map_zero, emb_cc'] at h
   rw [Finset.sum_comm]
   exact h
 
@@ -128,9 +128,9 @@ theorem skew_beta (X : Data E r) (cu : CuspFD X ρ) (hb : ∀ k, IsSkew (zBas X 
   have h' := hb
   unfold IsSkew at h'
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cM, Matrix.map_apply, Matrix.neg_apply, Matrix.transpose_apply, Matrix.sum_apply, Matrix.smul_apply,
-    smul_eq_mul, map_sum, map_mul, Complex.conj_ofReal, ← emb_cc', h', map_neg, mul_neg, Finset.sum_neg_distrib]
+
+  simp only [cM, Matrix.map_apply, Matrix.neg_apply, Matrix.transpose_apply, Matrix.sum_apply, Matrix.smul_apply,
+  smul_eq_mul, map_sum, map_mul, Complex.conj_ofReal, ← emb_cc', h', map_neg, mul_neg, Finset.sum_neg_distrib]
 
 theorem zBas_skew (X : Data E r) (cu : CuspFD X ρ) (h : ∃ bs, IsZBasis X cu bs) (k : Fin (nZ X ρ)) :
     IsSkew (zBas X cu k) := by

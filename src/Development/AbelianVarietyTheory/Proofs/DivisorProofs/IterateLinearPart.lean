@@ -53,8 +53,8 @@ theorem eq_const_add_sum (F : MvPowerSeries (Fin d) R) :
     F = C (constantCoeff F) + ∑ j, X j * part F j := by
   classical
   ext β
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, coeff_C]
+
+  rw [map_add (f := _), map_sum, coeff_C]
   simp only [coeff_X_mul_part]
   by_cases hβ : β = 0
   · subst hβ
@@ -92,8 +92,8 @@ theorem iterate_linear_part : ∀ (p : ℕ) [Fact (Nat.Prime p)] (R : Type) [ins
   refine ⟨∑ j, r j, ?_⟩
   have hF : constantCoeff ((D ^ p) F) = ∑ j, constantCoeff ((D ^ p) (X j * part F j)) := by
     conv_lhs => rw [eq_const_add_sum F]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), hDC, zero_add, map_sum, map_sum]
+
+    rw [map_add (f := _), hDC, zero_add, map_sum, map_sum]
   simp only [hD]
   rw [hF, Finset.mul_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_

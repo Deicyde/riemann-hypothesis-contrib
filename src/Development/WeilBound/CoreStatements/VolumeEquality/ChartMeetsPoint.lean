@@ -115,7 +115,7 @@ theorem exists_point_hom {κ : Type} {x : κ → Ω} (T : CoordTie ℤ ξ x) (c 
     rw [map_mul]
     exact TiePoints.valAt_mul T.gen iha ihb
 
-set_option maxHeartbeats 2000000 in
+
 theorem exists_point {K : Type} [Fintype K] {J : K → Type} {y : (Σ k, J k) → Ω}
     (T : CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩))
     (w : (Σ k, J k) → ℂ) (hu : ∀ k, ∃ c, IsUnit (w ⟨k, c⟩)) (hk : ∀ g ∈ mCoordIdeal y, aeval w g = 0) :

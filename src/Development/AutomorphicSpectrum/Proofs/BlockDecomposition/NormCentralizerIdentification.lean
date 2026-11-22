@@ -63,8 +63,8 @@ theorem exists_dual {k E : Type*} [Field k] [Field E] [Algebra k E] {ℓ : ℕ} 
     have hall : ∀ z : E, ∑ i, v i * (σ ^ (i : ℕ)) z = 0 := by
       intro z
       rw [← b.sum_repr z]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Finset.mul_sum]
+
+      simp only [map_sum, map_smul, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_eq_zero fun j _ => ?_
       have := congrArg (fun w => b.repr z j • w) (hvj j)
@@ -202,8 +202,8 @@ theorem exists_res_det_ne_zero [FiniteDimensional k E] [IsGalois k E] [Infinite 
     simp only [y, res, Finset.smul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_smul]
+
+    rw [map_sum, Finset.sum_smul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, smul_smul, Algebra.smul_def (t j)]
   rwa [this]

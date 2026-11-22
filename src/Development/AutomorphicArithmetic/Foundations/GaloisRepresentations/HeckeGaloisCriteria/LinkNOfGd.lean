@@ -17,7 +17,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Number
 variable {eps : ℝ}
 
 
-set_option maxHeartbeats 800000 in
+
 def gd (Fm : FamP eps) (c : ∀ x (i : Fm.Ix x), CutD (Fm.D x i)) : FamP eps :=
   { Fm with
     D := fun x i => (raw (c x i)).rec'

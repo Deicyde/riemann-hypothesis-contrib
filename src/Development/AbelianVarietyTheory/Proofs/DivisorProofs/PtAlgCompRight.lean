@@ -31,8 +31,8 @@ theorem main : ∀ (R D : Type) [CommRing R] [CommRing D] [Algebra R D] (B : Ove
   · unfold IsCoc at hb ⊢
     intro E _ _ E' _ _ E'' _ _ φ ψ z _
     have hα := ptAlg_comp (D := D) φ (z ≫ fst (SpAlg R D) B)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [sumMul, hα, map_sum, map_mul, AlgHom.comp_apply, Category.assoc]
+
+    simp only [sumMul, hα, map_sum, map_mul, AlgHom.comp_apply, Category.assoc]
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ ↦ ?_
     have h := hb i E E' E'' φ ψ (z ≫ snd _ _) (sm_whole _)

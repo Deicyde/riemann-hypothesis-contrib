@@ -10,8 +10,8 @@ open Formalism.BasicNotions NumberField IsDedekindDomain Module Module.End Forma
 
 namespace Formalism.L2.Fam.NPC
 
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 section Gen
 

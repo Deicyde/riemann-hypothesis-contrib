@@ -116,12 +116,12 @@ theorem UpperTheory.V.AlgebraTools.leviLevel :
     rfl
   · show (hk2 ρ I I' 1 (hk2 ρ I' I' m v) : M) = hk2 ρ I I m (hk2 ρ I I' 1 v)
     rw [sJ, sI, sJ]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [id, mul_one, map_sum]
+
+    simp only [id, mul_one, map_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j hj => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [sI' j (ht j hj), map_sum]
+
+    rw [sI' j (ht j hj), map_sum]
     refine Finset.sum_congr rfl fun u _ => ?_
     rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_assoc u, hJ j (ht j hj)]
     congr 2

@@ -16,7 +16,7 @@ private theorem cont_diag {Γ : Type} [Group Γ] [TopologicalSpace Γ] {l : ℕ}
     (continuous_const.mul (hr.comp continuous_subtype_val)).mul continuous_const
   exact ((Units.continuous_val.comp h1).matrix_elem i i).congr fun s => (hg s).2 i
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Lev.flagPol :
     UpperTheory.V.Lev.FlagPol := by
   rintro F Ω _ _ _ _ _ l _ ι n M hM m r hr w A h O _ _ _ Bw hj κ ⟨χ, hχ, hfl, hI⟩ hp

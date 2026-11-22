@@ -14,7 +14,7 @@ namespace Formalism.MainNotions.N.Ln34
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
 
-set_option maxHeartbeats 1000000 in
+
 theorem modelqlink_pf : ModelQLinkStep := by
   intro D HW F Cm CA CB CK hA hML l hpf hl K LL hG π' E hR h' hh' T hT hJ c
   have hL := hML l hl K LL hG π' E hR h' hh' T hT hJ c

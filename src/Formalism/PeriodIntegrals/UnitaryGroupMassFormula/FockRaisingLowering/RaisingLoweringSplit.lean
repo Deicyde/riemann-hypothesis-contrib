@@ -63,9 +63,9 @@ theorem plus_eq (R L : Module.End ℂ (MvPolynomial σ ℂ))
       apply homogeneousComponent_eq_zero
       omega
     rw [h0, map_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [FockH1Action.plusPart, finsum_congr hterm, finsum_eq_sum_of_support_subset _ hsupp,
-    ← map_sum R, sum_homogeneousComponent]
+
+  rw [FockH1Action.plusPart, finsum_congr hterm, finsum_eq_sum_of_support_subset _ hsupp,
+  ← map_sum R, sum_homogeneousComponent]
 
 private theorem apply_homogeneousComponent_eq_zero_of_lt_two (L : Module.End ℂ (MvPolynomial σ ℂ))
     (hL : ∀ (e : ℕ) (P : MvPolynomial σ ℂ),
@@ -110,8 +110,8 @@ theorem minus_eq (R L : Module.End ℂ (MvPolynomial σ ℂ))
         simp only [zero_add, apply_homogeneousComponent_eq_zero_of_lt_two L hL P 1 (by norm_num), add_zero]
         try rfl
     _ = L P := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_sum L, sum_hc_of_le P (P.totalDegree + 1 + 1 + 1) (by omega)]
+
+        rw [← map_sum L, sum_hc_of_le P (P.totalDegree + 1 + 1 + 1) (by omega)]
 
 theorem raisingLoweringSplit : FockRL.PMSplit := by
   intro σ R L hR hL P

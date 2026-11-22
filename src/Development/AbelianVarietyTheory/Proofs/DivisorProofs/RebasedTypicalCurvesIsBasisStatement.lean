@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogFGLDepthS
 @[expose] public section
 
 open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.DepthStages
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rebased_typical_curves_isBasis : ∀ (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ),
     p.Prime → v (p : C) = 1 → ∀ (d h : ℕ) (ty : Fin d → ZMod h) (G : LogFGL v d)
       (γ : Fin d → Fin d → PowerSeries C) (X : Matrix (Fin d) (Fin d) C),

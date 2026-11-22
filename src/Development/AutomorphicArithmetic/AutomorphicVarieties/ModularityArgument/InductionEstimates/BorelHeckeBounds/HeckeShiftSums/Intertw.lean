@@ -260,7 +260,7 @@ private theorem lvc₁ (a : G1 K 2) : Continuous fun m : G1 K 2 => lv m a 0 := b
 
 end UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.Cell
 
-set_option maxHeartbeats 1000000 in
+
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.Cell in
 theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.intertw :
     ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ₂)) (D : TypeDat K (2 + 2)), CuspIrr μ₂ τ₁ → CuspIrr μ₂ τ₂ →

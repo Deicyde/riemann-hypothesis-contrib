@@ -32,7 +32,7 @@ public import Development.AbelianVarietyTheory.Counterexamples.JetSurvey.Unimodu
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 set_option linter.unusedSectionVars false
 
 noncomputable section

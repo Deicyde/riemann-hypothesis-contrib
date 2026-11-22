@@ -131,8 +131,8 @@ theorem normF_hd (n : ℕ) (F : (Fin (n + 1) → G) → M.V) :
   classical
   haveI : Fintype (Quotient (QuotientGroup.rightRel U)) := Fintype.ofFinite _
   funext x
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [normF_eq, hd, map_sum, map_zsmul, Finset.smul_sum]
+
+  simp only [normF_eq, hd, map_sum, map_zsmul, Finset.smul_sum]
   exact Finset.sum_comm
 
 variable {M U}

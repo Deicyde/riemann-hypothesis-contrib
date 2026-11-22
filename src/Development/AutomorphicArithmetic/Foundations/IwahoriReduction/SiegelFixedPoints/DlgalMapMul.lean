@@ -42,7 +42,7 @@ private theorem prim_hahnSeries_map_of_prim_comap {Ω : Type} [Field Ω] [Algebr
   · rw [HahnSeries.map_coeff, ← map_inv₀]
     exact (hA _).1 hr
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Kd.L.dlgal :
     ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [CharZero Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (A A' : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω), (∀ x, x ∈ A' ↔ s x ∈ A) → ∀ (n : ℕ) (a : ℚ) (f : X.K) (φ : HahnSeries ℚ Ω), IsDl X A' l n a f φ → IsDl X A l n a (X.gal s f) (HahnSeries.map φ (s : Ω →+* Ω)) := by
   intro Ω _ _ _ _ ε X l _ A A' s hA n q f φ h

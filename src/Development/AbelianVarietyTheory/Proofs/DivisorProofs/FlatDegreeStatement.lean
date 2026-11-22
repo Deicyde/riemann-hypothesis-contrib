@@ -177,7 +177,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogPeriodEqK
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore GlobalTheory.CovTop GlobalTheory.BigTop
 

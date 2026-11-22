@@ -259,7 +259,7 @@ theorem globalSections_rank_one_obj (hT : SecTwistSt) (o : Obj D l b s) {R : Typ
       rigid := ⟨t.PP.rig, t.PP.rigGen⟩
       sym := fun _ => ⟨⊤, trivial, gen_of_iso ((isGen_iff ws).1 gs') _⟩ }
 
-set_option maxHeartbeats 2000000 in
+
 theorem gen_baseChangeR (hS : SecBaseChangeAnySt) (hT : SecTwistSt) (o : Obj D l b s) {S K : Type} [CommRing S] [CommRing K]
     {x : Sp S ⟶ X} {t : SAB H (Sp S)} (m₀ : SABMap t o.t x) (θ : LB.Sec t.PP.L)
     (hθ : ∀ σ : LB.Sec t.PP.L, ∃ a : S, ∀ i, σ.f i = constFn t.G.hom _ a * θ.f i) (ψ : S →+* K) {t' : SAB H (Sp K)}

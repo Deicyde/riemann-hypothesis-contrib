@@ -161,8 +161,8 @@ def linVal (w : Fin i → K) : ProjField K i :=
 
 theorem linVal_eq (w : Fin i → K) :
     linVal w = ∑ j, constK K i (w j) * algebraMap (MvPolynomial (Fin i) K) (ProjField K i) (X j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [linVal, map_sum, map_mul]
+
+  simp [linVal, map_sum, map_mul]
 
 theorem linVal_smul (a : K) (w : Fin i → K) : linVal (a • w) = constK K i a * linVal w := by
   rw [linVal_eq, linVal_eq, Finset.mul_sum]
@@ -194,8 +194,8 @@ theorem exists_combo (b : Module.Basis T ℤ (dualLattice F)) (w : Fin i → K) 
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
   have h2 := congrArg (constK K i) (hj j)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_mul, map_intCast, map_sum] at h2
+
+  simp only [map_mul, map_intCast, map_sum] at h2
   rw [← mul_assoc, h2, Finset.sum_mul]
   exact Finset.sum_congr rfl fun t _ => mul_assoc _ _ _
 
@@ -265,8 +265,8 @@ theorem exists_point (b : Module.Basis T ℤ (dualLattice F)) {L : Type} [Field 
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [linVal_single, mul_div_assoc]
     have h2 := congrArg ψ e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hψ] at h2
+
+    rw [map_sum, hψ] at h2
     simp only [map_mul] at h2
     rw [show ev2 (X ⟨(), t⟩) = z ⟨(), t⟩ from eval₂_X _ _ _] at h2
     rw [← h2]

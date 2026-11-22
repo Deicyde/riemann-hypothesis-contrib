@@ -29,9 +29,9 @@ theorem betaV_add {D : D7} (X : HidaSetting D) (v : InfinitePlace X.B.I.F) (Y Z 
 theorem betaV_rmul {D : D7} (X : HidaSetting D) (v : InfinitePlace X.B.I.F) (a : MfI X) (Y : TupI X) :
     betaV X v (rmulT X a Y) = betaV X v Y * a.map (PI.AprimeInfU.thetaInf X v) := by
   ext i b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [betaV, Matrix.of_apply, Matrix.mul_apply, Matrix.map_apply, rmulT, Matrix.mulVec, dotProduct,
-    map_sum, map_mul, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [betaV, Matrix.of_apply, Matrix.mul_apply, Matrix.map_apply, rmulT, Matrix.mulVec, dotProduct,
+  map_sum, map_mul, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ => ?_
   ring

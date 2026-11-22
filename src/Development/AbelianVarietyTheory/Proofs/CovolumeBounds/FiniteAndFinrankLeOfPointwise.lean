@@ -19,8 +19,8 @@ theorem norm_sq_le_sum_mul {E : Type*} [SeminormedAddCommGroup E] [NormedSpace �
     ‖l f‖ ^ 2 ≤ (∑ i, ‖l (b i)‖ ^ 2) * ‖f‖ ^ 2 := by
   have h1 : l f = ∑ i, ⟪b i, f⟫_ℂ • l (b i) := by
     conv_lhs => rw [← b.sum_repr' f]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul]
+
+    simp [map_sum, map_smul]
   have h2 : ‖l f‖ ≤ ∑ i, ‖l (b i)‖ * ‖⟪b i, f⟫_ℂ‖ := by
     rw [h1]
     refine (norm_sum_le _ _).trans (le_of_eq ?_)
@@ -39,13 +39,13 @@ theorem sum_norm_sq_eq (b : OrthonormalBasis ι ℂ V) (c : OrthonormalBasis κ 
     have hb : ∀ i, ⟪l (b i), l (b i)⟫_ℂ = ∑ j, ⟪b i, c j⟫_ℂ * ⟪l (c j), l (b i)⟫_ℂ := by
       intro i
       conv_lhs => enter [2]; rw [← c.sum_repr' (b i)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, map_smul, sum_inner, inner_smul_left, mul_comm]
+
+      simp [map_sum, map_smul, sum_inner, inner_smul_left, mul_comm]
     have hc : ∀ j, ⟪l (c j), l (c j)⟫_ℂ = ∑ i, ⟪b i, c j⟫_ℂ * ⟪l (c j), l (b i)⟫_ℂ := by
       intro j
       conv_lhs => enter [3]; rw [← b.sum_repr' (c j)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, map_smul, inner_sum, inner_smul_right]
+
+      simp [map_sum, map_smul, inner_sum, inner_smul_right]
     simp_rw [hb, hc]
     exact Finset.sum_comm
   simp_rw [inner_self_eq_norm_sq_to_K] at key

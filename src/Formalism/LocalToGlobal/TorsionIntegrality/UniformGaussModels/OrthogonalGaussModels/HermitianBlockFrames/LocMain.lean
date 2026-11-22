@@ -12,7 +12,7 @@ open Matrix
 namespace Formalism.L2.Th1.Top.FrP.UnitaryGroupMassFormula.HermFrame.Loc
 open Formalism.L2.Th1.Top.FrP Jac
 
-set_option maxHeartbeats 400000 in
+
 theorem local_core' : LocCore := by
   intro l _ dK σ δ h5 hld hin hσ hδ hσδ n _ _ M₁ M₂ R₁ R₂ c hc hGram hmv
   set S := setup h5 dK hld hin σ hσ δ hδ hσδ with hS
@@ -87,8 +87,8 @@ theorem local_core' : LocCore := by
   have hΓH : S.Herm Γ := by
     intro w w'
     rw [hΓU]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hSσ, Matrix.mul_apply, transpose_apply, Matrix.map_apply, map_sum, map_mul]
+
+    simp only [hSσ, Matrix.mul_apply, transpose_apply, Matrix.map_apply, map_sum, map_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     have h := S.hσσ _ (hUO 0 k w)
     rw [hSσ] at h

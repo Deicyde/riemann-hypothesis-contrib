@@ -60,8 +60,8 @@ theorem lattice_adapted_basis_exists : LatticeAdaptedBasisExists := by
       refine h2.symm.trans (Finset.sum_congr rfl fun j _ => ?_)
       rw [Module.Basis.extendOfIsFullLattice_apply, algebraMap_smul]
     refine ⟨c i, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hc, map_sum]
+
+    rw [hc, map_sum]
     simp only [map_smul, Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply, smul_eq_mul,
       mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ite_true]
 

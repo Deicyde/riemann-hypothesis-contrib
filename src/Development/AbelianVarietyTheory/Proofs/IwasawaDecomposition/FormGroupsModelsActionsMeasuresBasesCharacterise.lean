@@ -272,7 +272,7 @@ end GlobalTheory.Mem.R3.Rw.ModWExt
 end
 
 open GlobalTheory.Mem.R3.Rw.ModWExt in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.modW_of_rSideW : ∀ {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwDat B} {T' : TwDat B'} {w : ColW B f T} {w' : ColW B' f' T'}
   {Z : w.Lt} {Z' : w'.Lt} {hX : B.fields.Ok} {hX' : B'.fields.Ok} {Wt : Set B.places.Pl}
   {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks (w'.st Z').toD7.what₂.LL] {Xg : Finset (Gc B' w'.px → B'.LL)} {tr : TrI B' w'.px}

@@ -66,7 +66,7 @@ end General
 
 
 open GlobalTheory.CharTransport in
-set_option maxHeartbeats 800000 in
+
 theorem exists_hom_tmul (D : D7) : ∃ Θ : AE D →+* AdeleRing (𝓞 D.host.E) D.host.E, Continuous Θ ∧
     (∀ a x, Θ (a ⊗ₜ[D.host.F] x) = GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.adeleMap D.host.F D.host.E a * algebraMap D.host.E _ x) ∧
     (∀ x, Θ (incA D x) = algebraMap D.host.E _ x) ∧

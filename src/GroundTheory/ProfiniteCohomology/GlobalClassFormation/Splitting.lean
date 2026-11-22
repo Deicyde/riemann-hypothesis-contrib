@@ -58,7 +58,7 @@ theorem exists_placeOfEmbedding_eq (w : PlacesOver E.1 v) :
   rfl
 
 
-set_option maxHeartbeats 2000000 in
+
 variable (v) in
 theorem exists_unitsLocalRes_unitsResField_eq_zero_of_placeOfEmbedding
     (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure (v.adicCompletion K.1)) (x : cohomology (unitsLimitRep K) 2)
@@ -126,7 +126,7 @@ theorem exists_infPlaceOfEmbedding_eq (w : v.placesOver E.1) :
   rfl
 
 
-set_option maxHeartbeats 8000000 in
+
 theorem exists_unitsLocalRes_unitsResField_eq_zero_of_infPlaceOfEmbedding
     (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure v.Completion) (x : cohomology (unitsLimitRep K) 2)
     (hx : (unitsLocalRes v.Completion ι 2).hom x = 0) :

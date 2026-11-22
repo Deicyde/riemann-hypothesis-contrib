@@ -25,7 +25,7 @@ open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.Si
 open NumberField
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl GlobalTheory.CompanionTheory.SW.Core
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.disjoint_translates_volume_bound : ∀ (G : Type) [AddCommGroup G] [MeasurableSpace G] [MeasurableAdd G] (μ : Measure G)
     [μ.IsAddLeftInvariant] (L : AddSubgroup G) (S : Set G), MeasurableSet S → S ⊆ L →
     ∀ (ι : Type) [Fintype ι] (f : ι → G), (∀ i, f i ∈ L) →

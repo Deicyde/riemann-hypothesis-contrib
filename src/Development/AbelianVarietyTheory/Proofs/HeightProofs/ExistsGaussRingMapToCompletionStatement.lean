@@ -35,7 +35,7 @@ local instance gaussStatementKpAlgebra : Algebra (X.Kl la) (Kp X la N) :=
     ((IsFractionRing.injective (Op X la N) (FractionRing (Op X la N))).comp
       (Op.algebraMap_injective X la N))).toAlgebra
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_gaussRing_map_to_completion :
     ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ)
       (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (N D' N' : ℕ)

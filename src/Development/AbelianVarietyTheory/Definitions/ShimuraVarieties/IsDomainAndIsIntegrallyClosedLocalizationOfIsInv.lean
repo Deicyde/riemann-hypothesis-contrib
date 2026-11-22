@@ -172,9 +172,9 @@ theorem isInvariant_of_isBaseChange_of_sum_eq_one {c : A} (hc : ∑ g : G, g •
     induction x using hb.inductionOn with
     | tmul a =>
       change algebraMap B' A' (τ (f a)) = ∑ g : G, g • (f c * f a)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hτf, ← IsScalarTower.algebraMap_apply, ← f.commutes, FreeQuotient.algebraMap_ringTrace,
-        map_sum]
+
+      rw [hτf, ← IsScalarTower.algebraMap_apply, ← f.commutes, FreeQuotient.algebraMap_ringTrace,
+      map_sum]
       simp only [hf, map_mul]
     | smul b x hx =>
       rw [map_smul, smul_eq_mul, map_mul, hx, ← Algebra.smul_def, Finset.smul_sum]
@@ -190,8 +190,8 @@ theorem isInvariant_of_isBaseChange_of_sum_eq_one {c : A} (hc : ∑ g : G, g •
   · have hx' (g : G) : g • x = x := hx g
     rw [hτ]
     simp only [smul_mul', hx', ← hf]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_mul, ← map_sum, hc, map_one, one_mul]
+
+    rw [← Finset.sum_mul, ← map_sum, hc, map_one, one_mul]
 
 end Ring
 

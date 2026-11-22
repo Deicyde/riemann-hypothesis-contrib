@@ -82,8 +82,8 @@ private theorem ke_enum {n r : ℕ} (d : Fin r → ℕ) (hd : ∀ i, 0 < d i) (h
     rfl
   have h3 : ∀ (α : Type) [Fintype α] (f : α → ℂ), Finset.univ.val.map f = ∑ a, {f a} := by
     intro α _ f
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_multiset_singleton, ← Multiset.coe_mapAddMonoidHom, map_sum]
+
+    rw [← Finset.sum_multiset_singleton, ← Multiset.coe_mapAddMonoidHom, map_sum]
     simp
   rw [h2, h3, Fintype.sum_sigma]
   refine Finset.sum_congr rfl fun i _ => ?_

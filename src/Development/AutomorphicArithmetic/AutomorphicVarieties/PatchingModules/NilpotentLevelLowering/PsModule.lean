@@ -82,9 +82,9 @@ private theorem psm_rad {Λ B M : Type} [CommRing Λ] [CommRing B] [Algebra Λ B
     exact hr i
   obtain ⟨p, hp, -, hc, h0⟩ :=
     LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero Λ (ι b ^ r) I h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_pow, Polynomial.aeval_algHom_apply, map_eq_zero_iff _ hι, hp.as_sum, map_add (f := _), map_sum,
-    add_eq_zero_iff_eq_neg, map_pow, Polynomial.aeval_X, ← pow_mul] at h0
+
+  rw [← map_pow, Polynomial.aeval_algHom_apply, map_eq_zero_iff _ hι, hp.as_sum, map_add (f := _), map_sum,
+  add_eq_zero_iff_eq_neg, map_pow, Polynomial.aeval_X, ← pow_mul] at h0
   refine ⟨_, h0 ▸ neg_mem (Ideal.sum_mem _ fun k hk => ?_)⟩
   rw [map_mul, Polynomial.aeval_C]
   refine Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ ?_)

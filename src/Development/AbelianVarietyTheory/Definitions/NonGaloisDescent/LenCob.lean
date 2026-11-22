@@ -14,8 +14,8 @@ open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotio
 variable {D : D7} (i : D.nd.Loc)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 2000000 in
+
+
 def lenCob {k : ℕ} (M : GE D.nd →* Matrix (Fin k) (Fin k) (D.nd.O i))
     (C : Submodule (D.nd.O i) (GE D.nd → KOG (D.nd.O i) k)) : ℕ∞ :=
   Module.length (D.nd.O i) ↥(C ⊓ (ReciprocityTheory.Gal.B1 (WKG M) : Submodule (D.nd.O i) (GE D.nd → KOG (D.nd.O i) k)))

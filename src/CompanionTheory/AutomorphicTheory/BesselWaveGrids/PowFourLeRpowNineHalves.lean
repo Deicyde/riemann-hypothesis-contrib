@@ -124,7 +124,7 @@ def WBp (Cb : ℝ) : Prop :=
         ENNReal.ofReal (b ^ (C₅ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 5) * max 1 (1 / TBB.Gp p γ) ^ (40 * (P.r + 1) ^ 2)) *
           TBB.jN2 p f
 
-set_option maxHeartbeats 1600000 in
+
 theorem wBp_of {t : ∀ n : ℕ, (Fin n → Bool) → ℝ} {Ct : ℝ} (hCt : 0 ≤ Ct)
     (ht : ∀ n ε, 1 ≤ n → t n ε ≤ Ct * (n : ℝ) ^ 3) (hZ : ZuckT t) (hZd : ZuckDualT t) (hS : LimSteps)
     (hD : EndDiffW t) (hQ : EndEqW t) (hK : PI.KFinSmooth) (H : In91) (hU : UniqG) (Cb : ℝ) : WBp Cb := by

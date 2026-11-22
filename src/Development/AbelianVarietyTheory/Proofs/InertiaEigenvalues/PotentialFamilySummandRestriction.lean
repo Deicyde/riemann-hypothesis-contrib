@@ -16,8 +16,8 @@ noncomputable section
 namespace GlobalTheory.SummandDual
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem isDR_of_summand (D : D7) (hFont : FontaineAtPlacesOverL (D := D)) (hP : PotDRL D.loc) (i : D.nd.Loc)
     (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))) (hr : GoodR D.nd i r)
     (Xs : Set (D.nd.X i)) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i)) (n : ℕ)
@@ -83,8 +83,8 @@ theorem exists_rep (φ : (Fin a → Fin n → LL) →ₗ[LL] LL) :
     simp [Finset.sum_apply, Pi.single_apply, ite_apply, Finset.sum_ite_eq, Finset.sum_ite_eq']
   conv_lhs => rw [hu]
   rw [pr_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, dotProduct]
+
+  simp [map_sum, dotProduct]
 
 theorem eq_zero_of_pr (u' : Fin a → Fin n → LL) (h : ∀ u, pr LL a n u u' = 0) : u' = 0 := by
   funext b k
@@ -157,8 +157,8 @@ theorem finrank_eq_of_perfect {LL : Type} [Field LL] {V V' : Type} [AddCommGroup
   | (intros; exact _root_.GlobalTheory.NondegenerateFinrank.main ..)
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem dual_of_summand (D : D7) (i : D.nd.Loc)
     (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))) (hr : GoodR D.nd i r)
     (Xs : Set (D.nd.X i)) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
@@ -205,8 +205,8 @@ theorem dual_of_summand (D : D7) (i : D.nd.Loc)
     exact Subtype.ext (funext hv)
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem xdual : ∀ (D : D7), FontaineAtPlacesOverL (D := D) → PotDRL D.loc → ∀ (i : D.nd.Loc)
     (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))), GoodR D.nd i r →
     ∀ (Xs : Set (D.nd.X i)) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i)) (n : ℕ),

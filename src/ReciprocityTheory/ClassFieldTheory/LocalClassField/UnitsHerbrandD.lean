@@ -53,9 +53,9 @@ theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : 
       Summable.of_norm_bounded ((summable_geometric_of_lt_one (by norm_num) (by norm_num)).mul_left ρ) hx'
     refine ⟨(Phi K L).symm (∑' k, Phi K L (x k)), fun n => ?_⟩
     change ‖Phi K L ((Phi K L).symm (∑' k, Phi K L (x k)) - ∑ k ∈ range n, x k)‖ ≤ ρ * (1 / 2 : ℝ) ^ n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, ContinuousLinearEquiv.apply_symm_apply, map_sum,
-      ← hsum.sum_add_tsum_nat_add n, add_sub_cancel_left]
+
+    rw [map_sub, ContinuousLinearEquiv.apply_symm_apply, map_sum,
+    ← hsum.sum_add_tsum_nat_add n, add_sub_cancel_left]
     refine IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg (rad_nonneg hρ n) fun k => ?_
     refine (hx' (k + n)).trans ?_
     gcongr ρ * ?_

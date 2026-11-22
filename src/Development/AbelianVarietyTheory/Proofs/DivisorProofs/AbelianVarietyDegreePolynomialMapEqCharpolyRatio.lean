@@ -44,8 +44,8 @@ theorem map_eq_charpoly_vmap : ∀ (K : Type) [Field K] (l : ℕ) [Fact l.Prime]
     rw [hΦe m]
     have hz (k : ℤ) (g : End A) : (k • g).asHom = k • g.asHom :=
       map_zsmul End.addEquiv k g
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [δ, map_sum, map_zsmul, End.sum_asHom, hz]
+
+    simp only [δ, map_sum, map_zsmul, End.sum_asHom, hz]
   have hPn : ∀ n : ℤ, P.eval (n : ℚ) = δ (Polynomial.C n - Polynomial.X) := by
     intro n
     rw [hP n]

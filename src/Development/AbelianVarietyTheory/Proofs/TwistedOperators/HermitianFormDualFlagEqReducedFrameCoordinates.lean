@@ -159,9 +159,9 @@ theorem read_gen {A K : Type} [CommRing A] [CommRing K] (S : Subring A) (φ : S 
     (hg : gg ∈ S) (hz : (M *ᵥ z) p ∈ S) (hδ : ∀ q, φ ⟨_, hG q⟩ = if p = q then 1 else 0)
     (hd0 : ∀ i, φ ⟨_, hd i⟩ = 0) (hg0 : φ ⟨_, hg⟩ = 0) :
     φ ⟨_, hc p⟩ = φ ⟨_, hup⟩ := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [key_gen S M u c G d o gg z hu p hup hc hG hd ho hg hz, map_add (f := _), map_add (f := _), map_sum, map_sum, map_mul, hg0, zero_mul,
-    add_zero]
+
+  rw [key_gen S M u c G d o gg z hu p hup hc hG hd ho hg hz, map_add (f := _), map_add (f := _), map_sum, map_sum, map_mul, hg0, zero_mul,
+  add_zero]
   simp only [map_mul, hd0, zero_mul, Finset.sum_const_zero, add_zero, hδ, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
     Finset.mem_univ, if_true]
 
@@ -174,7 +174,7 @@ theorem redV_of {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
     (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) (PP : Pl E) (v : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) (j : Fin n)
     (h : ((β⁻¹).val *ᵥ v) j ∈ Formalism.L2.Herm.intAf F E) : redV β PP v j = resS F PP ⟨_, h⟩ := dif_pos h
 
-set_option maxHeartbeats 1000000 in
+
 open Formalism.L2.SG.Pf.unitaryCongruence Formalism.L2.SG.Pf.BunEx.Unip in
 theorem coef_read : ∀ {D : D7} (g : ℕ) (e0 f0 : Fin D.R.rS → VA (II D)) (z0 : VA (II D)) (bw bwd : Fin D.R.k → VA (II D)) (ew : EAf D), Formalism.L2.SG.Pf.BunEx.Unip.FH (II D) g e0 f0 z0 bw bwd ew → ∀ (β : GL (Fin (Yc D 0).rank) (EAf D)) (PP : Pl D.host.E) (w : Bool), IsFrame β (II D).L → LocAt g e0 f0 z0 bw bwd ew β PP w → ∀ u ∈ (II D).Lf, (∀ p (h1 : hA (II D) (flagV D.R.rS D.R.k (Yc D 0).rank f0 e0 (dualOrRevBasis w bw bwd) (-z0) p) u ∈ Formalism.L2.Herm.intAf D.host.F D.host.E), resS D.host.F PP ⟨_, h1⟩ = redV β PP u p) ∧ (∀ i (h1 : hA (II D) ((if w then bw else bwd) i) u ∈ Formalism.L2.Herm.intAf D.host.F D.host.E), resS D.host.F PP ⟨_, h1⟩ = 0) := by
   intro D g e0 f0 z0 bw bwd ew hF β PP w hβ hL u hu

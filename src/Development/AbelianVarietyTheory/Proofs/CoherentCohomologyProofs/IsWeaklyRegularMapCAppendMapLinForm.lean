@@ -142,10 +142,10 @@ theorem linFormHom_X_of_notMem (u : J → R) {S : Set ι} {j₀ : J} {x : ι × 
 theorem linFormHom_linForm [DecidableEq J] (u v : J → R) {S : Set ι} (j₀ : J) {i : ι}
     (hi : i ∈ S) : linFormHom u S j₀ (linForm v i) =
       linForm (fun j => if j = j₀ then v j₀ * u j₀ else v j₀ * u j + v j) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_eq v i j₀, map_add (f := _), map_mul, linFormHom_X_of_mem u j₀ hi, map_sum,
-    linForm_eq u i j₀, linForm_eq _ i j₀, if_pos rfl, algHom_C, algebraMap_eq, mul_add,
-    Finset.mul_sum, add_assoc, ← Finset.sum_add_distrib, C_mul, mul_assoc]
+
+  rw [linForm_eq v i j₀, map_add (f := _), map_mul, linFormHom_X_of_mem u j₀ hi, map_sum,
+  linForm_eq u i j₀, linForm_eq _ i j₀, if_pos rfl, algHom_C, algebraMap_eq, mul_add,
+  Finset.mul_sum, add_assoc, ← Finset.sum_add_distrib, C_mul, mul_assoc]
   congr 1
   refine Finset.sum_congr rfl fun j hj => ?_
   have hj' := Finset.ne_of_mem_erase hj

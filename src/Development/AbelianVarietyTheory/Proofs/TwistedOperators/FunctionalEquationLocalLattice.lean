@@ -101,8 +101,8 @@ theorem pair_int (p : SplitPt D k) {w : HeightOneSpectrum (𝓞 D.host.E)} (he :
     obtain ⟨b, hb⟩ := (hΛ.2 x).1 hx t ht
     convert pr_tmul_int p he hα b using 1
     rw [hb, tmul_eq', Finset.sum_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [one_mul, map_sum, map_mul, Finset.mul_sum]
+
+    simp only [one_mul, map_sum, map_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => ?_
     rw [tmul_eq' _ (x _), map_mul]
     ring
@@ -162,7 +162,7 @@ theorem rowVal_col {A R : Type} [CommRing A] [CommRing R] (f : A →+* R) (g : A
   simp only [hj, mul_left_comm]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem functional_mem (p : SplitPt D k) {w : HeightOneSpectrum (𝓞 D.host.E)} (he : Formalism.L2.NTheta.IsIdemAt p.e w)
     {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {Λ : Lat T} (hΛ : IsSelfDualC T Λ) {n : Type} [Fintype n] [DecidableEq n]
     (β : Frame p T n) (hβ : β.IsLat Λ (Submodule.pi Set.univ fun _ => (1 : Submodule 𝒪[k] k)))
@@ -185,8 +185,8 @@ theorem functional_mem (p : SplitPt D k) {w : HeightOneSpectrum (𝓞 D.host.E)}
     have e : ∀ j, (∑ m, (pairA D.host.F 0 α ⊗ₜ[D.host.F] (c * t j * ∑ l, star (s l) * S.gram l m) : AE D) * incA D (ε m)) =
         (pairA D.host.F 0 α ⊗ₜ[D.host.F] (1 : D.host.E)) *
           (incA D (c * ∑ m, (∑ l, star (s l) * S.gram l m) * ε m) * incA D (t j)) := fun j => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_mul, Finset.mul_sum, Finset.sum_mul, map_sum, Finset.mul_sum]
+
+      rw [← map_mul, Finset.mul_sum, Finset.sum_mul, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [tmul_eq', mul_assoc, ← map_mul]
       congr 2

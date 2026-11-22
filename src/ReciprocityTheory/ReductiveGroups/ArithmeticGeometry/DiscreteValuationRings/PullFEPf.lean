@@ -109,7 +109,7 @@ theorem ros_pow (hG : GlobalFnsSt) (f g : D.P.A ⟶ D.P.A) [IsMonHom f] [IsMonHo
     simp only [ofMul_mul] at a₁ a₂ ⊢
     linear_combination (norm := abel) a₁ + a₂
 
-set_option maxHeartbeats 800000 in
+
 theorem sq_add (hG : GlobalFnsSt) (f g : D.P.A ⟶ D.P.A) [IsMonHom f] [IsMonHom g] (N : ℕ) (hfg : g ≫ f = 𝟙 D.P.A ^ (N + 1))
     (u₂ : LB.Gen (LB.LinComb D.P.L (rosatiφ D.P.A g f) rosatiε)) (hu₂ : u₂.IsGen)
     (n₂ : LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ u₂ (zero2 D.P.A)) (LB.oneGen D.P.L))
@@ -204,7 +204,7 @@ section Main
 variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {D : DegData V (maximalIdeal V)} {F : Type} [Field F]
   [Algebra (FractionRing V) F] {O : Type} [CommRing O] [StarRing O] [Module O D.toPre.X]
 
-set_option maxHeartbeats 800000 in
+
 theorem pull_val (hG : GlobalFnsSt) (oa : D.toPre.OAct O) (a : O) (N k : ℕ) (χ : D.toPre.X)
     (u₁ : LB.Gen (LB.LinComb D.toPre.P.L (rosatiφ D.toPre.P.A (oa.onB.act (star a)) (oa.onB.act a)) rosatiε)) (hu₁ : u₁.IsGen)
     (n₁ : LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ u₁ (zero2 D.toPre.P.A)) (LB.oneGen D.toPre.P.L))
@@ -275,7 +275,7 @@ theorem pull_val (hG : GlobalFnsSt) (oa : D.toPre.OAct O) (a : O) (N k : ℕ) (�
     rw [z₁, z₂, s₁ _ y I hI, mul_eq_left.1 e.symm, one_pow, _root_.one_mul, _root_.one_mul]
     rfl
 
-set_option maxHeartbeats 1600000 in
+
 theorem famFE_of_pullAl (hG : GlobalFnsSt) (oa : D.toPre.OAct O) (w0 : O) (hw : TraceFormTwistIso D.toPre oa w0) (a : O) (N : ℕ)
     (hN : a * star a = (N : O)) (hN1 : 1 ≤ N) (k : ℕ) (s : Fam D.toPre F k)
     (s' : ∀ β : D.toPre.X, LB.Sec (LB.LinComb D.toPre.P.L (DegPre.famφ D.toPre F β) (DegPre.famε (k * N))))

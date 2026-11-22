@@ -55,8 +55,8 @@ theorem basis_of_free (T : LocLat G Qp LL O) (S : Submodule (LetA O n) (W.DD T))
   · rw [Fintype.linearIndependent_iff]
     intro g hg
     have h1 := congrArg S.subtype hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h1
+
+    rw [map_sum, map_zero] at h1
     have h2 : g = 0 := (hu 0 S.zero_mem).unique h1.symm (by simp)
     intro i; rw [h2]; rfl
   · intro x _
@@ -64,8 +64,8 @@ theorem basis_of_free (T : LocLat G Qp LL O) (S : Submodule (LetA O n) (W.DD T))
     rw [Submodule.mem_span_range_iff_exists_fun]
     refine ⟨a, Subtype.ext ?_⟩
     change S.subtype _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact ha.symm
 
 theorem basis_rank [Nontrivial W.EE] (T : LocLat G Qp LL O) (S : Submodule (LetA O n) (W.DD T))
@@ -101,8 +101,8 @@ theorem sand_of
     intro y hy
     refine ⟨fun j => b.repr ⟨y, hy⟩ j, ?_⟩
     have := congrArg S.subtype (b.sum_repr ⟨y, hy⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     exact this.symm
   have hexpE : ∀ y : W.DD T, ∃ c : Fin (Module.finrank O ↥T.L.T) → W.EE,
       y = ∑ j, c j • (b j : W.DD T) := by
@@ -115,15 +115,15 @@ theorem sand_of
       (w : Fin (Module.finrank O ↥T.L.T) → W.DD T),
       E.jD T (∑ j, c j • w j) = ∑ j, inclR (E.io (c j)) • E.jD T (w j) := by
     intro c w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun j _ => jD_smulA E T _ _
   have hjE : ∀ (c : Fin (Module.finrank O ↥T.L.T) → W.EE)
       (w : Fin (Module.finrank O ↥T.L.T) → W.DD T),
       E.jD T (∑ j, c j • w j) = ∑ j, E.ioE (c j) • E.jD T (w j) := by
     intro c w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun j _ => E.jD_smul T _ _
   have hsp : ⊤ ≤ Submodule.span RW (Set.range fun i => E.jD T (b i : W.DD T)) := by
     rw [← E.jD_span T, Submodule.span_le]
@@ -167,8 +167,8 @@ theorem sand_of
         refine Submodule.span_le.mpr ?_
         rintro _ ⟨z, hz, rfl⟩
         obtain ⟨c, rfl⟩ := hexp z hz
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         refine Submodule.sum_mem _ fun j _ => ?_
         rw [φD_smulA]
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -195,8 +195,8 @@ theorem sand_of
         intro a k
         simp [ta, TWincl, Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul']
       conv_lhs => rw [← ta.sum_repr w]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, hk, Finset.smul_sum, Finset.sum_smul, map_mul]
+
+      simp only [map_sum, hk, Finset.smul_sum, Finset.sum_smul, map_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [smul_comm, hcc k, Finset.smul_sum]
@@ -242,7 +242,7 @@ theorem compare
 end Generic
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem main : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; let E := ((F l).E K s LL h).tie; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ N₁ : Submodule (AA K LL) (W.DD T), FreeA W T N₁ → IsBaseChange W.EE N₁.subtype → (∀ x ∈ N₁, ∃ k : ℕ, W.Q ^ k • W.φD T x ∈ N₁) → (∀ y ∈ N₁, ∃ k : ℕ, W.Q ^ k • y ∈ φspan W T N₁) → ∃ a : ℕ, (∀ x ∈ N₁, W.X ^ a • x ∈ W.N T) ∧ ∀ x ∈ W.N T, W.X ^ a • x ∈ N₁ := by
   intro D HW F l _ K s LL h
   have hio := GlobalTheory.NL.IoXQ.main D HW F l K s LL h

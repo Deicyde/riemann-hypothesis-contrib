@@ -32,9 +32,9 @@ lemma hJ_rv (I : Formalism.MainNotions.S.AutInst) (v : InfinitePlace I.F) (x y :
     rw [Matrix.mulVec_mulVec, hJm, ← Matrix.mulVec_mulVec, Matrix.star_mulVec,
       ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hPP, Matrix.one_mulVec]
   rw [key]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [u, w, Formalism.UG.hform, dotProduct, Matrix.mulVec, Matrix.map_apply, map_sum, map_mul,
-    Pi.star_apply, Finset.mul_sum, starRingEnd_apply, phi_star, mul_assoc]
+
+  simp only [u, w, Formalism.UG.hform, dotProduct, Matrix.mulVec, Matrix.map_apply, map_sum, map_mul,
+  Pi.star_apply, Finset.mul_sum, starRingEnd_apply, phi_star, mul_assoc]
 
 lemma phi_ite (I : Formalism.MainNotions.S.AutInst) (v : InfinitePlace I.F) {r : ℕ} (a b : Fin r) :
     I.φ v (if a = b then (1 : I.E) else 0) = if a = b then 1 else 0 := by

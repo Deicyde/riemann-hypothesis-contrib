@@ -236,9 +236,9 @@ private theorem Gd.cl_closed [Nontrivial S] (h : Gd p i)
     Ideal.sum_mem _ fun k _ => Ideal.mul_mem_right _ _ (hc k)
   convert Ideal.add_mem _ h1 h2 using 1
   rw [Polynomial.eval_eq_sum_range, Finset.sum_range_succ, hP.coeff_natDegree, Finset.sum_range]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_finsetSum,
-    Polynomial.eval_mul, Polynomial.eval_C, map_add, map_pow, map_sum, map_mul, sub_mul, Finset.sum_sub_distrib]
+
+  simp only [Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_finsetSum,
+  Polynomial.eval_mul, Polynomial.eval_C, map_add, map_pow, map_sum, map_mul, sub_mul, Finset.sum_sub_distrib]
   ring
 
 end Closure

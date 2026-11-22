@@ -97,8 +97,8 @@ theorem kHom {β γ : Type} [Fintype β] [Fintype γ] (b : β → P) (a r : P �
           Finset.sum_congr rfl fun s _ => Finset.sum_comm
       _ = _ := Finset.sum_comm
   rw [step3]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [← map_sum, hinv, map_neg, ← Module.End.mul_apply, hsq']
+
+  simp_rw [← map_sum, hinv, map_neg, ← Module.End.mul_apply, hsq']
   simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.sum_apply,
     Finset.sum_sub_distrib, Finset.sum_neg_distrib]
   abel
@@ -125,8 +125,8 @@ theorem kT_nonneg {β : Type} [Fintype β] (B : M →ₗ[ℂ] M →ₗ⋆[ℂ] �
     have h2 : (∑ J : Fin (n + 1) → β, B (ω (b ∘ J)) (kD T (kDel T' b ω) (b ∘ J))) =
         starRingEnd ℂ (kIp B b (kD T (kDel T' b ω)) ω) := by
       unfold kIp
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun J _ => hB _ _
     rw [h2, kIp_kD B b T T' hTT (kDel T' b ω) ω, Complex.conj_re, Complex.mul_re]
     have : (((n : ℂ) + 1)).im = 0 := by simp

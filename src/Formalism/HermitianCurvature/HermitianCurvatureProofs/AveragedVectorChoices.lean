@@ -6,7 +6,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FirstKernelP
 
 @[expose] public section
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -389,8 +389,8 @@ theorem cutNormEval_main : CutNormEval := by
     rw [Finset.sum_congr rfl fun p _ => Finset.sum_comm, Finset.sum_comm]
     apply Finset.sum_congr rfl
     intro y _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_mul_sum]
+
+    rw [map_sum, Finset.sum_mul_sum]
     simp only [Finset.mul_sum]
   rw [swap]
   have ind : ∀ y ∈ T, c * ∑ p ∈ D.A ×ˢ D.B, ψ (((Quotient.out y : K) - z₁) * (p.1 + p.2)) =

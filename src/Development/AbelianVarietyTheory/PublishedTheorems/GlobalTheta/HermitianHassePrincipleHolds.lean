@@ -235,9 +235,9 @@ theorem exists_represent (hc : ∀ t, σ (σ t) = t)
   rw [Fintype.sum_option, Fintype.sum_sum_type] at hw0
   have hw1 := congrArg (algebraMap F E) hw0
   have hw2 : algebraMap F E (w none) ≠ 0 := (map_ne_zero _).2 hw
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [a, Option.elim, Sum.elim_inl, Sum.elim_inr, map_add (f := _), map_mul, map_neg, map_pow, map_sum,
-    hγ', hκ', hd, map_zero] at hw1
+
+  simp only [a, Option.elim, Sum.elim_inl, Sum.elim_inr, map_add (f := _), map_mul, map_neg, map_pow, map_sum,
+  hγ', hκ', hd, map_zero] at hw1
   refine ⟨fun i => (algebraMap F E (w (some (Sum.inl i))) +
     algebraMap F E (w (some (Sum.inr i))) * θ) / algebraMap F E (w none), ?_⟩
   simp only [dotProduct, Matrix.mulVec_diagonal, Function.comp_apply, map_div₀, map_add (f := _), map_mul,

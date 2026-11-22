@@ -24,8 +24,8 @@ private theorem alt_expand {V W M : Type} [AddCommGroup V] [Module ℝ V] [AddCo
   have h : (fun i => e.symm (u i)) = fun i => ∑ k, b.repr (u i) k • e.symm (b k) := by
     funext i
     conv_lhs => rw [← b.sum_repr (u i)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul]
+
+    simp only [map_sum, map_smul]
   rw [h]
   refine (α.toMultilinearMap.map_sum (fun i k => b.repr (u i) k • e.symm (b k))).trans ?_
   exact Finset.sum_congr rfl fun I _ => α.map_smul_univ _ _
@@ -66,8 +66,8 @@ theorem UpperTheory.V.Lit.Geo.Cs.corrForm :
     have e4 : ∀ (I : Fin q → Fin (Module.finrank ℝ (HV E a))) (r : ℝ) (y : GA E a),
         ev (r • α fun i => hv.symm (b (I i))) y = (r : ℂ) • ev (α fun i => hv.symm (b (I i))) y := fun I r y => by
       rw [← algebraMap_smul ℂ r, map_smul]; rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [Finset.sum_apply, e4, Matrix.mulVec, dotProduct, Pi.smul_apply, ← ev_eq_cmp,
       Fintype.sum_prod_type, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]

@@ -26,8 +26,8 @@ private theorem lin_pow_eq_eval_sum_multinomial {ι : Type} [Fintype ι] [Decida
           ((Nat.multinomial Finset.univ k : ℝ) *
             Ψ (MvPolynomial.monomial (Finsupp.equivFunOnFinite.symm k) 1))) := by
   unfold _root_.GlobalTheory.ArInt.lin
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_pow_eq_sum_piAntidiag, map_sum, map_sum]
+
+  rw [Finset.sum_pow_eq_sum_piAntidiag, map_sum, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   have hk : ∏ i, (MvPolynomial.C (r i) * MvPolynomial.X i) ^ k i =
       MvPolynomial.C (∏ i, r i ^ k i) *
@@ -80,8 +80,8 @@ private theorem eq_zero_of_isHomogeneous_of_forall_lin_pow_eq_zero {ι : Type} [
       simp
     · intro h
       exact absurd hmem h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [P.as_sum, map_sum]
+
+  rw [P.as_sum, map_sum]
   refine Finset.sum_eq_zero fun d hd => ?_
   have hw := hP (MvPolynomial.mem_support_iff.mp hd)
   have hsm : MvPolynomial.monomial d (AddMonoidAlgebra.coeff P d) =
@@ -113,8 +113,8 @@ theorem _root_.GlobalTheory.ArInt.Model.isArFun_unique {k : Type} [CommRing k] {
       exact sub_eq_zero.mp (eq_zero_of_isHomogeneous_of_forall_lin_pow_eq_zero (Φ - Φ') (D + 1) hpow hP)
     · rw [h2 P d hd hP, h2' P d hd hP]
   refine LinearMap.ext fun P => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPolynomial.sum_homogeneousComponent P, map_sum, map_sum]
+
+  rw [← MvPolynomial.sum_homogeneousComponent P, map_sum, map_sum]
   exact Finset.sum_congr rfl fun j _ =>
     hhom _ j (MvPolynomial.homogeneousComponent_isHomogeneous j P)
 

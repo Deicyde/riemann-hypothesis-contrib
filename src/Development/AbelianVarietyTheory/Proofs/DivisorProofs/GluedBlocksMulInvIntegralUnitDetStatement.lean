@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogFGLDepthS
 @[expose] public section
 
 open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.DepthStages
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.glued_blocks_mul_inv_integral_unit_det : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (d : ℕ) (ι : Type) (lab : Fin d → ι)
     (S : ι → Finset (Fin d)) (x y : ι → Matrix (Fin d) (Fin d) C),
     (∀ i a, a ∈ S i → lab a = i) →

@@ -298,8 +298,8 @@ theorem bt_span_units {ι : Type*} (u w : ι → (D.s.atP p).Ep) (v : ι → Vp 
 
 theorem bt_bc_sum {ι : Type*} (s : Finset ι) (c : ι → D.host.E) (v : ι → (VS D).V) :
     baseChange₂ D p (∑ i ∈ s, c i • v i) = ∑ i ∈ s, (D.s.atP p).ιE (c i) • baseChange₂ D p (v i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]; simp only [baseChange_smul₂]
+
+  rw [map_sum]; simp only [baseChange_smul₂]
 
 theorem bt_frameAct_comp {n : ℕ} (v : Fin n → (VS D).V) (A B : Matrix (Fin n) (Fin n) (𝓞 D.host.E)) :
     frameAct (frameAct v A) B = frameAct v (A * B) := by
@@ -555,8 +555,8 @@ theorem bt_coord {T : D.host.E} (F : FlagG (VS D) D.R.rS T) (b : Fin D.R.rS) :
     intro x
     show ∑ i, (D.s.atP p).ιE (lam ((VS D).frame i)) * (D.s.atP p).ιE ((VS D).frame.repr x i) = _
     conv_rhs => rw [← (VS D).frame.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, smul_eq_mul, map_mul, mul_comm]
   rw [key, hl a]
@@ -786,7 +786,7 @@ theorem bt_typed_sec (p : PlF D) {T T' : ℕ} (F0 : FlagG (VS D) D.R.rS (T : D.h
   ring
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem bt_typed_O (hD : LocDiffC D Z) (p : PlF D) {T T' : ℕ} (F0 : FlagG (VS D) D.R.rS (T : D.host.E))
     (Λ : Submodule (𝓞 D.host.E) (VS D).V) (F' : LFlag (D.sp.Y 0) D.R.rS (T' : D.host.E)) (Tn T'n : ℕ)
     (hXL : XLam Λ (lf D F0) = XS D F0)
@@ -879,7 +879,7 @@ theorem bt_typed_Ep (p : PlF D) {T T' : ℕ} (F0 : FlagG (VS D) D.R.rS (T : D.ho
         (Submodule.smul_mem _ _ (Submodule.subset_span (Or.inr ⟨a, rfl⟩)))
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem bbTie_core (hE : LocEqC D Z) (hS : LocSatC D Z) (hD : LocDiffC D Z) : BBTie D Z := by
   intro u u' F0 Λ F' hR hPD hMI p
   have hFix := hR.2.1
@@ -1008,13 +1008,13 @@ theorem bt_bc_linIndep {ι : Type*} [Fintype ι] (v : ι → (VS D).V) (hv : Lin
     intro x
     show ∑ k, (D.s.atP p).ιE (lam ((VS D).frame k)) * (D.s.atP p).ιE ((VS D).frame.repr x k) = _
     conv_rhs => rw [← (VS D).frame.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, smul_eq_mul, map_mul, mul_comm]
   have h2 := congrArg Φ hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_zero] at h2
+
+  rw [map_sum, map_zero] at h2
   simp only [map_smul, key, hl, smul_eq_mul] at h2
   simpa [apply_ite, Finset.sum_ite_eq'] using h2
 
@@ -1234,8 +1234,8 @@ theorem bt_det_unitri_sub {n l : ℕ} (hl : l ≤ n) {R : Type*} [CommRing R] (U
 theorem bt_brS_frameAct {n : ℕ} (v : Fin n → (VS D).V) (m : Matrix (Fin n) (Fin n) (𝓞 D.host.E)) (b : Fin n)
     (x : (VS D).V) :
     brS (VS D) (frameAct v m b) x = ∑ c, brS (VS D) (v c) x * ((m c b : 𝓞 D.host.E) : D.host.E) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [brS, frameAct, map_sum, map_smul, smul_eq_mul]
+
+  simp only [brS, frameAct, map_sum, map_smul, smul_eq_mul]
   refine Finset.sum_congr rfl fun c _ => ?_
   ring
 
@@ -1352,8 +1352,8 @@ theorem bt_selfDual (hDu : LocUnimodC D Z) (p : PlF D) (Λ : Submodule (𝓞 D.h
     have key : (VS D).hT (∑ j, star (φ ((VS D).frame j)) • bs j) = φ := by
       apply (VS D).frame.ext
       intro i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, LinearMap.sum_apply]
+
+      rw [map_sum, LinearMap.sum_apply]
       have hs : ∀ j, (VS D).hT (star (φ ((VS D).frame j)) • bs j) ((VS D).frame i) =
           φ ((VS D).frame j) * (if i = j then 1 else 0) := by
         intro j
@@ -1708,7 +1708,7 @@ theorem bt_isTerm (hE : LocEqC D Z) (hS : LocSatC D Z) (hD : LocDiffC D Z) (hDu 
     exact Submodule.subset_span ⟨_, hmem, rfl⟩
 
 
-set_option maxHeartbeats 800000 in
+
 theorem frameGenLoc_core (hE : LocEqC D Z) (hS : LocSatC D Z) (hD : LocDiffC D Z) (hDu : LocUnimodC D Z)
     {u u' : D.what₂.Word} (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E))
     (Λ : Submodule (𝓞 D.host.E) (VS D).V) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))

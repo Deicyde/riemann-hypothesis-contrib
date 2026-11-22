@@ -80,9 +80,9 @@ theorem exists_tensor_standard_rep :
     simp [hB.2.1]
   · intro a ha b hb
     refine ContinuousLinearMap.ext fun y => PiLp.ext fun c => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ContinuousLinearMap.comp_apply, tenOp_apply, hπ.1.2 a ha b hb, map_sum, map_smul,
-      Finset.smul_sum, smul_smul]
+
+    simp only [ContinuousLinearMap.comp_apply, tenOp_apply, hπ.1.2 a ha b hb, map_sum, map_smul,
+    Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun d _ => ?_
     rw [← Finset.sum_smul]

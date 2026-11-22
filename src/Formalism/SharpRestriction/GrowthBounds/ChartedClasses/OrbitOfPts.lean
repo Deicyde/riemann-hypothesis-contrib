@@ -50,7 +50,7 @@ theorem pt_smul (i : G.comp) (g : ∀ v, GL (Fin (G.P.m + 1)) (G.P.Qq v)) (y : G
   exact hx'
 
 
-set_option maxHeartbeats 2000000 in
+
 include H hW hHc hA hΓ in
 theorem orbit_of_pts (hci : CompInj S A) (hon : ∀ i, GamOnto S A i) (i i' : G.comp) (L L' : G.P.Tup)
     (g g' : ∀ v, GL (Fin (G.P.m + 1)) (G.P.Qq v))

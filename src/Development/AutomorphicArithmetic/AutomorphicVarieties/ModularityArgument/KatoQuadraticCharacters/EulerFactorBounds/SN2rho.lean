@@ -184,8 +184,8 @@ theorem UpperTheory.V.Z.Kato.Nb.sN2rho :
   simp only [b]
   have hre : ∑ t, rhoK W e ψ s *ᵥ b2 ((t, y) * kT l r p s)
       = rhoK W e ψ s *ᵥ ∑ t, b2 (t, y * (cycMod ℚ Ω l r s)⁻¹) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Matrix.mulVecLin_apply, map_sum]
+
+    rw [← Matrix.mulVecLin_apply, map_sum]
     exact Fintype.sum_equiv (Equiv.mulRight (cycM p s)⁻¹) _ _ (fun t => rfl)
   rw [show y * i * (cycMod ℚ Ω l r s)⁻¹ = y * (cycMod ℚ Ω l r s)⁻¹ * i from mul_right_comm _ _ _,
     show y * i ^ 2 * (cycMod ℚ Ω l r s)⁻¹ = y * (cycMod ℚ Ω l r s)⁻¹ * i ^ 2 from mul_right_comm _ _ _]

@@ -42,9 +42,9 @@ lemma transMap_reesDeg_smul {V : X.Opens} (hV : IsAffineOpen V) (n d : ℕ) (r :
       ∑ j : Fin (d + 1), (idealPowOfMem I F ((r : Polynomial A).coeff (n + (d + 1) + 1 - j))
         (coeff_mem_pow_of_le I r (by omega))).app V (reesCoef I hF hV j s) := by
   apply idealPowι_app_injective I (n + 1)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, transMap_ι, idealPowι_reesDeg,
-    reesCoef_reesInr_smul, map_sum]
+
+  rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, transMap_ι, idealPowι_reesDeg,
+  reesCoef_reesInr_smul, map_sum]
   simp_rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, idealPowOfMem_ι]
   rw [← Finset.Nat.sum_antidiagonal_swap]
   simp only [Prod.fst_swap, Prod.snd_swap]
@@ -65,7 +65,7 @@ variable {ι : Type u} (𝔘 : ι → X.Opens)
   (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a))) [Finite ι] (p : ℕ)
 
 
-set_option maxHeartbeats 4000000 in
+
 include hF hU in
 theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup 𝔘 = ⊤) :
     ∃ c, ∀ n (y : cechH (modulesAb (idealPow I F (n + c + 1))).obj 𝔘 p),
@@ -93,8 +93,8 @@ theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup �
   obtain ⟨f, -, hf⟩ := hκ
   have hy' : y = (reesDegFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p (∑ g ∈ S, f g • g) := by
     rw [hf, reesDegFam_reesIncFam]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hy', map_sum, map_sum]
+
+  rw [hy', map_sum, map_sum]
   refine Finset.sum_eq_zero fun g hg => ?_
   have hgker : reesΦ I hF 𝔘 hU p g = 0 :=
     LinearMap.mem_ker.1 (hS ▸ Submodule.subset_span hg)
@@ -119,10 +119,10 @@ theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup �
       rw [Finset.sum_apply]
       exact transMap_reesDeg_smul I hF (isAffineOpen_inter 𝔘 hU t) n d r (σ g t)
         (fun j hj => hNb g j (by omega) t)
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum]
-        exact Finset.sum_eq_zero fun j _ => by
-          rw [← push_d, ← CechFamily.cochain_d, hσ g, map_zero, map_zero]
+
+    · rw [map_sum]
+      exact Finset.sum_eq_zero fun j _ => by
+        rw [← push_d, ← CechFamily.cochain_d, hσ g, map_zero, map_zero]
   exact key (f g)
 
 end

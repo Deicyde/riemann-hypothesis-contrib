@@ -109,8 +109,8 @@ theorem exists_sum_eq_zero_abs (n : ℕ) {X Y : Type} [AddCommGroup X] [Module �
   refine ⟨T.image Subtype.val, hTn.image _, ?_⟩
   rw [Finset.sum_image (fun a _ b _ h => Subtype.ext h)]
   refine hinj _ fun κ hκ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   have hsmooth : IsSmooth (MonoidHom.comp ρ (mulH κ)) := fun v =>
     (hρ v).preimage (continuous_mulH κ)
   have key := GlobalTheory.T.sum_over_compact_cosets_jacquet_kernel (MonoidHom.comp ρ (mulH κ)) hsmooth (Lc n c) hcomp (F κ x)
@@ -177,7 +177,7 @@ end
 
 end GlobalTheory.CompanionTheory.BZPsiPG.FibKer
 
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.CompanionTheory.BZPsiPG.FibKer.mem_twKer_of_fibInt_eq_zero : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (i t : ℕ) {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] (τ : Representation ℂ (Mir k i) V) (σ : Representation ℂ (GL (Fin t) k) W), IsSmooth τ → IsSmooth σ → ∀ [MeasurableSpace (Fin t → k)] [BorelSpace (Fin t → k)] (μ : MeasureTheory.Measure (Fin t → k)) [μ.IsAddHaarMeasure], ∀ f : cIndSpace (HPG k i t) (hRep τ σ), (∀ g, fibInt μ f g = 0) → f ∈ twKer (prodPG τ σ) (MirUin k (i + t)) 1 := by
   intro k _ _ _ _ i t V W _ _ _ _ τ σ hτ hσ _ _ μ _ f hf
   classical

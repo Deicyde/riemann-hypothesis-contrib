@@ -38,9 +38,9 @@ theorem rel_map : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : �
   subst e1 e2
   ext i j
   have h2 := congrFun (congrFun h i) j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.map_apply, Matrix.smul_apply, Matrix.mul_apply, map_mul, map_pow, map_sum, smul_eq_mul,
-    hFk.ext, RingHom.comp_apply] at h2 ⊢
+
+  simp only [Matrix.map_apply, Matrix.smul_apply, Matrix.mul_apply, map_mul, map_pow, map_sum, smul_eq_mul,
+  hFk.ext, RingHom.comp_apply] at h2 ⊢
   exact h2
 
 end GlobalTheory.BSP.Height

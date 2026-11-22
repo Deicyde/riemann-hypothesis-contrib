@@ -324,8 +324,8 @@ theorem mem_flagN {e : AE D} {P : Finset (Pl D.host.E)} (he : IsIdemSum e P) {S 
   have q1 : ∀ {q : ℕ} (M : Mx D S.rank S.rank) (J : Mx D S.rank q) (w : Pl D.host.E),
       (∀ i j, piAt w (blk d.p0 M J i j) = 0) → ∀ i j, piAt w (blk (HMul.hMul (adj d.j0) (gA S)) M J i j) = 0 :=
     fun M J w h i j => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [q0, Matrix.mul_apply, map_sum]
+
+      rw [q0, Matrix.mul_apply, map_sum]
       exact Finset.sum_eq_zero fun l _ => by rw [map_mul, h, mul_zero]
   have q2 : ∀ {q : ℕ} (M : Mx D S.rank S.rank) (J : Mx D S.rank q),
       blk (HMul.hMul (adj d.j0) (gA S)) M J = 0 → blk d.p0 M J = 0 := fun M J h => by
@@ -660,7 +660,7 @@ theorem conjLevel_eq (G : GridData L sc) (t : T) (w : Pl D.host.E) {j : ℕ} (h1
   exact (givenLevel_eq G t w h1 hj.le) ▸ Iff.rfl
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem idxRatio_row {μ₀ : T} (hL : L.Is μ₀) (S : GridChoice W U) {t : T} (ht : t ∈ U) {j : ℕ} (hi : j ∈ idx D)
     (hj : j ≤ D.R.m) (hj' : j < D.R.m)
     (hlat : ∀ x g, HasLoc t S.B hj x g → (∀ w, g w ∈ givenLevel G t w.1 (D.R.m, j)) → x ∈ latGrp G j)
@@ -708,7 +708,7 @@ theorem idxRatio_row {μ₀ : T} (hL : L.Is μ₀) (S : GridChoice W U) {t : T} 
 end Main
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem cell_volume_mul_coef : Big fun {D} _ _ _ _ _ _ _ _ _ _ _ ch => ∀ (s : ℤˣ), ∀ j ∈ idx D,
     ∀ la : Measure ((GlobalTheory.CellMass.rowN ch.G j).subgroupOf (GfC (ch.G.V (.grid D.R.m j)))), la.IsHaarMeasure →
       ∃ V₀ : ℝ, 0 < V₀ ∧ ∀ t (β : CosFam ch.G t) (b : Pts ch.G), IsRep t ch.S.B s β b →

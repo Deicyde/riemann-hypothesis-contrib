@@ -35,8 +35,8 @@ variable {r : ℕ} {τ : K}
 theorem trace_mul_eq_sum (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ)) (x a : K) :
     Algebra.trace F K (x * a) = ∑ j, bb.repr x j * Algebra.trace F K (τ ^ (j : ℕ) * a) := by
   conv_lhs => rw [← bb.sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Finset.sum_mul, smul_mul_assoc, map_sum, hb]
+
+  simp [Finset.sum_mul, smul_mul_assoc, map_sum, hb]
 
 end Gen
 
@@ -124,9 +124,9 @@ theorem invK_regular_iff_isUnit :
   have hH : ∀ v : Fin r → F, hankel (A.invK τ p lam a) *ᵥ v = Ψ (a * bb.equivFun.symm v) := by
     intro v
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hankel, Matrix.mulVec, dotProduct, Matrix.of_apply, hmom, hΨ,
-      Module.Basis.equivFun_symm_apply, hb, Finset.mul_sum, map_sum, mul_smul_comm, map_smul, smul_eq_mul]
+
+    simp only [hankel, Matrix.mulVec, dotProduct, Matrix.of_apply, hmom, hΨ,
+    Module.Basis.equivFun_symm_apply, hb, Finset.mul_sum, map_sum, mul_smul_comm, map_smul, smul_eq_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [pow_add]; ring_nf
   have hcomp : Function.Injective (hankel (A.invK τ p lam a)).mulVec ↔ Function.Injective (fun y : A.K => a * y) := by

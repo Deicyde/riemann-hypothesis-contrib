@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdeal
 
 open GlobalTheory
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.dieudonne_baseChange_basis :
     ∀ (p : ℕ) [Fact p.Prime]
       (P : ∀ (k : Type) [CommRing k], PDivGroup p k → Prop)

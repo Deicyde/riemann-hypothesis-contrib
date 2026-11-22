@@ -33,7 +33,7 @@ theorem mem_ptSha_iff' {G ι : Type} [Group G] [TopologicalSpace G] [IsTopologic
   rw [mem_ptSha, funext_iff]
   rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem shaIso_of_rep (K : IntermediateField ℚ (AlgebraicClosure ℚ)) [NumberField K]
     (S : Finset (HeightOneSpectrum (𝓞 K))) (Av : S → ValuationSubring (AlgebraicClosure ℚ))
     (e : GS (AlgebraicClosure ℚ) (S : Set (HeightOneSpectrum (𝓞 K))) ≃ₜ*

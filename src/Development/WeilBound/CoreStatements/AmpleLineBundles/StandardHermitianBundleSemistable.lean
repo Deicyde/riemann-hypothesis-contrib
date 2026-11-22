@@ -116,7 +116,7 @@ private theorem exists_injective_quotient_span_map {M N : Type} [AddCommGroup M]
   obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.1 hxy
   exact Submodule.mem_span_singleton.2 ⟨c, hφ (by rw [map_smul, map_sub]; exact hc)⟩
 
-set_option maxHeartbeats 400000 in
+
 theorem integers_deg_le (G : Submodule (𝓞 K) (HermitianBundle.integers K).carrier) :
     (HermitianBundle.integers K).degree G ≤ 0 := by
   by_cases hG : G = ⊥

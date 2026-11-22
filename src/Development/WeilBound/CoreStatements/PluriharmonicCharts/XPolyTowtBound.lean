@@ -36,8 +36,8 @@ theorem gen {σ : Type} [Fintype σ] (f : σ → MvPolynomial σ ℝ) (hf : ∀ 
       exact (mem_support_iff.mp hd) (hQ.coeff_eq_zero (by omega))
     have e : (aeval f Q).coeff m = ∑ d ∈ Q.support, Q.coeff d * (image d).coeff m := by
       conv_lhs => rw [Q.as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, coeff_sum]
+
+      rw [map_sum, coeff_sum]
       refine Finset.sum_congr rfl fun d _ => ?_
       have hmonomial : monomial d (Q.coeff d) = C (Q.coeff d) * monomial d (1 : ℝ) := by
         rw [C_mul_monomial, mul_one]

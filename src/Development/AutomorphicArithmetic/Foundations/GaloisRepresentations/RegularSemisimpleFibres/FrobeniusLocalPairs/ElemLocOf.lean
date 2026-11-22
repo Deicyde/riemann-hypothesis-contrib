@@ -40,7 +40,7 @@ private theorem alg {A : Type} [CommGroup A] (d a b u v t : A) : d * a / u / t =
   simp only [ofMul_mul, ofMul_div, ofMul_inv]
   abel
 
-set_option maxHeartbeats 1600000 in
+
 theorem elemLoc_of (hS : SuppE) (hO : OneField) (hR : Reps) (hN : NormOpen) (hD : NormDiag) (hA : Align) (hV : VolRatio)
     (hB : ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n : ℕ)
       (r : ValueGroupWithZero E), 0 < r → r < 1 → ∃ K : Subgroup (GL (Fin n) E), (K : Set (GL (Fin n) E)) = ball n r ∧

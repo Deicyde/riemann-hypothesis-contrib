@@ -9,8 +9,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V UpperTheory.V.Hi
@@ -308,7 +308,7 @@ theorem hecke_operator_preserves_part {L Ω : Type} [Field L] [NumberField L] [F
   · refine Y.Y.smul_mem _ ?_
     exact finsum_induction (p := fun φ : Module.End ℂ (Fin H.m → H.X.Fn ℂ d) => φ F ∈ Y.Y) (zero_mem _)
       (fun _ _ => add_mem) fun q => h1 _ F hF
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Hi.partAct0_alt :
     _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureRankNHypothesis → ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (c : Coef l) (H : HSet L Ω l n c), H.Ax →
     ∀ (A : Type) [CommRing A] [Algebra c.O A] [Alg.IsCO c.O A] (θ : H.X.I.T →* Aˣ), H.IsWt θ →

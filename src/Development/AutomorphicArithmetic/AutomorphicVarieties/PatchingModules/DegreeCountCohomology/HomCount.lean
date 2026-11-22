@@ -32,8 +32,8 @@ private theorem free_hom_zero {l : ℕ} [Fact l.Prime] {M : Type} [AddCommGroup 
     ext j
     · simp [Prod.fst_sum, Finset.univ_sum_single]
     · simp [Prod.snd_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hs, map_add (f := _), map_sum, e2, add_zero]
+
+  rw [hs, map_add (f := _), map_sum, e2, add_zero]
   exact Finset.sum_eq_zero fun i _ => e1 i (u i)
 
 private theorem eq_zero_of_eq_self_add_self {M : Type} [AddCommGroup M] (a : M) (h : a = a + a) : a = 0 := by
