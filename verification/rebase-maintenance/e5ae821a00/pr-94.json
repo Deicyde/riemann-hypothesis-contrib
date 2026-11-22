@@ -1,0 +1,32 @@
+{
+  "number": 94,
+  "title": "Reuse the quadratic Hasse norm theorem for the negative-one norm equation",
+  "original_head": "ae11f0f2b01356117a3acb5a4fb888c322bc7b8e",
+  "original_repo": "hhh2210/riemann-hypothesis",
+  "original_branch": "reuse-quadratic-hasse-norm",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormIndexQuadratic.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "rebased_head": "3c974cb1efc4c49293ed4972dfecad4292d4c954",
+  "diff_check": false,
+  "diff_check_output": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormIndexQuadratic.lean:86: new blank line at EOF.\n",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "1 file changed, 35 insertions(+), 1703 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-94-e5ae821a00-45040725443-manual",
+  "status": "rebased"
+}

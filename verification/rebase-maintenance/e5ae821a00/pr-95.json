@@ -1,0 +1,44 @@
+{
+  "number": 95,
+  "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+  "original_head": "018e327c93d07383f5542b97741ca17548db2a7e",
+  "original_repo": "Osgood001/riemann-hypothesis",
+  "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 4,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean",
+      "reason": "three-way-replay-through-module-header"
+    }
+  ],
+  "rebased_head": "ef84b7207d4ea518983fa2fc505897f4e3832074",
+  "diff_check": false,
+  "diff_check_output": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean:103: new blank line at EOF.\n",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "26 files changed, 591 insertions(+), 1370 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-95-e5ae821a00-45040725443-manual",
+  "status": "rebased"
+}
