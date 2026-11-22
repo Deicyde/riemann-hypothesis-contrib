@@ -16,10 +16,13 @@ that, for all coprime `a, q ≥ 1`, the least prime congruent to `a` modulo `q` 
 
 The theorem is due to
 [U. V. Linnik, *On the least prime in an arithmetic progression. I. The basic theorem*][linnik1944].
-It is recalled in this form, with effective constants, in
-[T. Xylouris, *On Linnik's constant* (equation (1.5))][xylouris2009], which proves the bound with
-`L = 5.2` (Theorem 1.1). Linnik's paper was not read in preparing this reference. This reference
-is a reader's proposal and has not been checked by a mathematician. -/
+It is recalled in this form, with effectively computable constants, at the start of
+[T. Xylouris, *On the least prime in an arithmetic progression and estimates for the zeros of
+Dirichlet L-functions* (Section 1, p. 65)][xylouris2011], which proves the bound with `L = 5.18`
+(Theorem 1.1). The same statement is equation (1.5) of the earlier text
+[T. Xylouris, *On Linnik's constant*][xylouris2009], which has `L = 5.2`. Linnik's paper was not
+read in preparing this reference. This reference is a reader's proposal and has not been checked
+by a mathematician. -/
 @[wikidata Q2703389]
 def Linnik : Prop :=
   ∃ C L : ℝ, 0 < C ∧ 0 < L ∧ ∀ a q : ℕ, 1 ≤ a → 1 ≤ q → a.Coprime q →
