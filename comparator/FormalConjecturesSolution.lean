@@ -5,7 +5,7 @@ import FormalConjecturesBridge
 # The formal-conjectures statements, proved from the submission
 
 This file is not part of the submission. It is the solution module of the second Comparator
-setup, `formal-conjectures/comparator.json`, whose challenge is
+setup, `comparator/formal-conjectures.json`, whose challenge is
 `FormalConjectures/Millennium/RiemannHypothesis.lean` in
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) itself.
 
