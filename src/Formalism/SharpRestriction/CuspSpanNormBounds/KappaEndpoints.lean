@@ -1657,8 +1657,8 @@ theorem ng_frame_back (Fr : FrameD H r) {g : V ≃ₗ[E] V} (hg : g ∈ Fr.NSet)
   obtain ⟨row, -, -, h⟩ := N_row Fr (NSet_inv Fr hg) a
   refine ⟨row, ?_⟩
   have h1 : g ((g⁻¹ : V ≃ₗ[E] V) (Fr.f a)) = Fr.f a := LinearEquiv.apply_symm_apply g _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← h1, h, map_sum]
+
+  rw [← h1, h, map_sum]
   exact Finset.sum_congr rfl (fun b _ => by rw [map_smul])
 
 theorem ng_orth_back (Fr : FrameD H r) {g : V ≃ₗ[E] V} (hg : g ∈ Fr.NSet) {k : V}

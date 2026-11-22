@@ -12,7 +12,7 @@ attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Ho
 open scoped TensorProduct
 
 noncomputable section
-set_option maxHeartbeats 2000000
+
 namespace GlobalTheory.Mem.Col2.RatFrPt
 open GlobalTheory.Mem.Col2.PtExist
 
@@ -61,8 +61,8 @@ theorem glEquiv_mem_iff {P : HeightOneSpectrum (𝓞 E)} {g : GL (Fin n) (AfE F 
       have e2 : ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) *ᵥ glEquiv γ x = x := by
         rw [glEquiv_apply, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
       conv_rhs => rw [← e2]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Formalism.L2.Col.pullV, Matrix.mulVec, dotProduct, map_sum, map_mul, hi, adAt_inclE]
+
+      simp only [Formalism.L2.Col.pullV, Matrix.mulVec, dotProduct, map_sum, map_mul, hi, adAt_inclE]
     rwa [e] at h1
   · intro hx
     obtain ⟨f, hf⟩ := CharValCompare.exists_isFr P hN
@@ -83,8 +83,8 @@ theorem glEquiv_mem_iff {P : HeightOneSpectrum (𝓞 E)} {g : GL (Fin n) (AfE F 
           exacts [one_mem _, zero_mem _]
         have h2 := valued_symm_le (u := fun l => (g : Matrix (Fin n) (Fin n) (AfE F E)) l j) hf
           hmem i
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [h, ← map_mul, ← map_sum] at h2
+
+        simp only [h, ← map_mul, ← map_sum] at h2
         rw [hA, Matrix.mul_apply]
         exact h2
       have e3 : f.symm (glEquiv γ x) = A *ᵥ x := by
@@ -92,8 +92,8 @@ theorem glEquiv_mem_iff {P : HeightOneSpectrum (𝓞 E)} {g : GL (Fin n) (AfE F 
         rw [← mat_mulVec, hA, ← Matrix.mulVec_mulVec, glEquiv_apply]
         rfl
       rw [e3]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
       refine Valuation.map_sum_le _ fun j _ => ?_
       rw [map_mul]
       exact mul_le_one' (hA1 j) ((GlobalTheory.Mem.ColAd.mem_stdAt_val.1 hx) j)

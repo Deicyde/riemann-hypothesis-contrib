@@ -79,9 +79,9 @@ theorem zhat_movesTo {T T' : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R.rS T) (F0' : L
   have e1 : Zhat F.fl F'.fl a b = (VS D).hT (ρ (frame F a)) (ρ (frame F' b)) := by
     rw [hρ']; rfl
   rw [e1, hU a, hU' b]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Zhat, brS, Matrix.mul_apply, Matrix.conjTranspose_apply, map_sum, LinearMap.sum_apply,
-    map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
+
+  simp only [Zhat, brS, Matrix.mul_apply, Matrix.conjTranspose_apply, map_sum, LinearMap.sum_apply,
+  map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
   simp only [RingHom.id_apply, frame, Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun c _ => ?_
   ring

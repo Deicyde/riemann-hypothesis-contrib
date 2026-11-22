@@ -22,9 +22,9 @@ theorem UpperTheory.Gal.InertialTypesAlt.avgMap :
       exact hne (LinearMap.ext h)
     intro h0
     have h1 := congrArg (fun L => ev (L x)) h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.comp_apply, map_sum,
-      LinearMap.zero_apply, map_zero] at h1
+
+    simp only [LinearMap.sum_apply, LinearMap.comp_apply, map_sum,
+    LinearMap.zero_apply, map_zero] at h1
     have key : ∀ g : G, ev (ρ g⁻¹ (Φ (ψ (η g x)))) = if g ∈ H then ev (Φ (ψ x)) else 0 := by
       intro g
       split_ifs with hg
@@ -43,8 +43,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.avgMap :
     · exact hc (by exact_mod_cast h1)
     · exact hx (hinj _ h1)
   · intro k x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.comp_apply, map_sum]
+
+    simp only [LinearMap.sum_apply, LinearMap.comp_apply, map_sum]
     refine Fintype.sum_equiv (Equiv.mulRight k) _ _ (fun g => ?_)
     simp only [Equiv.coe_mulRight, map_mul, Module.End.mul_apply, mul_inv_rev,
       Representation.self_inv_apply]

@@ -70,7 +70,7 @@ theorem mem_qbar_of_pow {z : ℂ} {N : ℕ} (hN : 0 < N) (h : z ^ N = 1) : z ∈
   exact mem_algebraicClosure_iff.2 hi.isAlgebraic
 
 
-set_option maxHeartbeats 1600000 in
+
 open Classical in
 theorem model_coset {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
     (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
@@ -145,8 +145,8 @@ theorem model_coset {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
     have := hTm.vac
     rwa [one_smul] at this
   have hTΨ : Tm Ψ = (R.card : ℂ)⁻¹ • ∑ r ∈ R, heisO ψ S T r f₀ := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hΨ, map_smul, map_sum]
+
+    rw [hΨ, map_smul, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun r hr => ?_
     rw [hTm.modul _ (GlobalTheory.isSBHalf_halfInd e Λ) r (hR1 r hr).1, hvac]

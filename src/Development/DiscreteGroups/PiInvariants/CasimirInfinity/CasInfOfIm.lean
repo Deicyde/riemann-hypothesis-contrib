@@ -12,7 +12,7 @@ open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
 open PositivityTheory.RgTw (Mat G)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

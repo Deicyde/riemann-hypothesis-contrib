@@ -968,8 +968,8 @@ theorem crit_alt [NeZero r] {K : ℕ} [NeZero K] (R : Type) [CommRing R] [IsDoma
   have hsum : rename (plVar (K := K)) A₀ * rename (tanVar (r := r)) G₀ = ∑ d' ∈ T', ∑ d'' ∈ T'',
       rename (plVar (K := K)) (polComp R r d' A₀) * rename (tanVar (r := r)) (polComp R K d'' G₀) := by
     conv_lhs => rw [hT', hT'']
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, Finset.sum_mul_sum]
+
+    rw [map_sum, map_sum, Finset.sum_mul_sum]
   rw [SetLike.mem_coe, hsum]
   refine Submodule.sum_mem _ fun b' _ => Submodule.sum_mem _ fun b'' _ => ?_
   by_cases hg0 : polComp R K b'' G₀ = 0
@@ -1378,8 +1378,8 @@ theorem li_ext {R : Type} [CommRing R] {σ τ α β : Type} (u : α → MvPolyno
   have step : ∀ m : σ →₀ ℕ, ∑ b ∈ s.image Prod.snd, (∑ a ∈ s.image Prod.fst, g' a b * AddMonoidAlgebra.coeff (u a) m) • v b = 0 := by
     intro m
     have h1 := congrArg (fun P => AddMonoidAlgebra.coeff (sumAlgEquiv R σ τ P) m) hs'
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, coeff_sum, coeff_smul, li_key, map_zero, AddMonoidAlgebra.coeff_zero] at h1
+
+    simp only [map_sum, map_smul, coeff_sum, coeff_smul, li_key, map_zero, AddMonoidAlgebra.coeff_zero] at h1
     change _ = 0 at h1
     rw [Finset.sum_comm] at h1
     rw [← h1]
@@ -1670,14 +1670,14 @@ theorem lift_extOne_map {n : ℕ} {P P' : Type} [CommRing P] [CommRing P'] (g : 
 theorem lift_wedgeR_map {n : ℕ} {P P' : Type} [CommRing P] [CommRing P'] (g : P →+* P') (x : Fin n → P)
     (K : Finset (Fin n) → P) (J : Finset (Fin n)) :
     g (wedgeR x K J) = wedgeR (fun m => g (x m)) (fun J => g (K J)) J := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [wedgeR, map_sum]
+
+  simp [wedgeR, map_sum]
 
 theorem lift_contrR_map {n : ℕ} {P P' : Type} [CommRing P] [CommRing P'] (g : P →+* P') (x : Fin n → P)
     (K : Finset (Fin n) → P) (J : Finset (Fin n)) :
     g (contrR x K J) = contrR (fun m => g (x m)) (fun J => g (K J)) J := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [contrR, map_sum]
+
+  simp [contrR, map_sum]
 
 theorem lift_colStep_map {n : ℕ} {P P' : Type} [CommRing P] [CommRing P'] (g : P →+* P') (c : ℤ) (hP hN : ℕ)
     (x : Fin n → P) (K : Finset (Fin n) → P) (J : Finset (Fin n)) :

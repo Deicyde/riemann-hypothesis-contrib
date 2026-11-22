@@ -77,10 +77,10 @@ theorem differentiableAt_of_coef {E W : Type*} [NormedAddCommGroup E] [NormedSpa
     funext y
     ext v
     conv_lhs => rw [← b.sum_repr' v, ← b.sum_repr' (f y _)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, inner_sum, inner_smul_right, _root_.sum_apply,
-      _root_.smul_apply, ContinuousLinearMap.smulRight_apply, innerSL_apply_apply,
-      Finset.sum_smul, smul_smul]
+
+    simp only [map_sum, map_smul, inner_sum, inner_smul_right, _root_.sum_apply,
+    _root_.smul_apply, ContinuousLinearMap.smulRight_apply, innerSL_apply_apply,
+    Finset.sum_smul, smul_smul]
     simp only [mul_comm]
   rw [e]
   refine DifferentiableAt.fun_sum fun i _ => DifferentiableAt.fun_sum fun j _ => ?_

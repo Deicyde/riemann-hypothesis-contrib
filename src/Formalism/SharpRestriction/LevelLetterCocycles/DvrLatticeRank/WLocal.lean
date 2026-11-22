@@ -312,7 +312,7 @@ theorem w_avg (T₁ T₂ : LocLat G Qp LL O) (F : LatHom T₁.L T₂.L) (π' : L
 
 end WLocal
 
-set_option maxHeartbeats 1000000 in
+
 theorem w_pf : Formalism.MainNotions.N.Ln34.WStep := by
   intro D HW F Cm CA CB CK hA l hlp hl K LL hG π' E hR T₁ T₂ Fm h' hT₁ hT₂ hOnto hJ
   have hpl : ((D.loc l).PD K).p = l := (D.loc l).PD_p K

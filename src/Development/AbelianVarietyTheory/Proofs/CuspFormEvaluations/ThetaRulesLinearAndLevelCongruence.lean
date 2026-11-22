@@ -71,9 +71,9 @@ theorem thExpr_linear (nab : NabV Xo c) {S : Type} [CommRing S] [Algebra c.F S] 
   rw [thExpr_eq_sum_superset nab y F hP U Finset.subset_union_left]
   simp only [fun i => thExpr_eq_sum_superset nab y F (hQ i) U (hQU i)]
   subst hsum
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul, map_sum, map_mul, Finset.sum_mul,
-    Finset.mul_sum]
+
+  simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul, map_sum, map_mul, Finset.sum_mul,
+  Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun m _ => by ring
 
@@ -93,8 +93,8 @@ theorem thValAt_linear (hC : ChartIndepSt2) [StarRing (𝓞 E)] (nab : NabV Xo c
         RingHom.FaithfullyFlat.of_bijective Function.bijective_id, hrefl, hV, rfl⟩
   apply hff.injective
   show φ v = φ (∑ i, algebraMap c.F S (cf i) * vi i)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [he, thExpr_linear nab y' F cf Q hQ hP hsum, map_sum]
+
+  rw [he, thExpr_linear nab y' F cf Q hQ hP hsum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, AlgHom.commutes, e1 i]
 

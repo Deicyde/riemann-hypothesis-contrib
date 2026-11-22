@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeri
 
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_adelicRep_extending_archimedeanSchwartzRep : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (G : Type) [Group G]
     (ρ : G →* (SInf F κ →L[ℂ] SInf F κ)),
     ∃ ω₀ : G →* Module.End ℂ ((κ → AF F) → ℂ), ∀ (g : G) (f : SInf F κ) (h : (κ → Af F) → ℂ),

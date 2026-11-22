@@ -157,8 +157,8 @@ theorem trace_dualVec (a : F) (ha : a ≠ 0) (m : Fin (nn κ F) → ℤ) (l : Fi
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [Algebra.smul_def, Algebra.smul_def]
       field_simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum]
+
+    rw [e1, map_sum]
     have hd : ∀ j, Algebra.trace ℚ F ((Algebra.traceForm ℚ F).dualBasis (traceForm_nondegenerate ℚ F)
         (integralBasis F) j * ((RingOfIntegers.basis F j₀ : 𝓞 F) : F)) = if j₀ = j then 1 else 0 := by
       intro j
@@ -185,15 +185,15 @@ theorem char_identity (a : F) (ha : a ≠ 0) (m : Fin (nn κ F) → ℤ) (x : κ
     intro l
     have e : ∑ i, realBasis κ a ha l i * mixedEmbedding F (dualVec κ a m i) =
         mixedEmbedding F (∑ i, (a * ((intBasis κ F l i : 𝓞 F) : F)) * dualVec κ a m i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [realBasis_apply, map_sum, map_mul]
+
+      simp only [realBasis_apply, map_sum, map_mul]
     rw [e, GlobalTheory.PsiNontriv.trace_mixedEmbedding, trace_dualVec κ a ha m l]
     push_cast
     rfl
   conv_rhs => rw [← (realBasis κ a ha).sum_repr x]
   simp only [Finset.sum_apply, Pi.smul_apply, Finset.sum_mul, smul_mul_assoc]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_comm, map_sum, ← Finset.sum_neg_distrib]
+
+  rw [Finset.sum_comm, map_sum, ← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [← Finset.smul_sum, map_smul, smul_eq_mul, hl]
   ring
@@ -233,14 +233,14 @@ theorem main_lat : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype
       rw [hξ']
       have e : ∑ i, a * (((∑ l, (intBasis κ F).repr z l • intBasis κ F l) i : 𝓞 F) : F) * dualVec κ a m i =
           ∑ l, (intBasis κ F).repr z l • ∑ i, (a * ((intBasis κ F l i : 𝓞 F) : F)) * dualVec κ a m i := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_zsmul, Finset.mul_sum, Finset.sum_mul,
-          Finset.smul_sum]
+
+        simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_zsmul, Finset.mul_sum, Finset.sum_mul,
+        Finset.smul_sum]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun i _ => ?_
         rw [mul_smul_comm, smul_mul_assoc]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [e, map_sum]
+
+      rw [e, map_sum]
       push_cast
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [map_zsmul, trace_dualVec κ a ha m l, zsmul_eq_mul]

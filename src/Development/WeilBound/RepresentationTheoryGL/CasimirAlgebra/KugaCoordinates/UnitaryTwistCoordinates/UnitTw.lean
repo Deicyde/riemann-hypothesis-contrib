@@ -25,8 +25,8 @@ theorem conj_sum_coord {E : Type} [Field E] [NumberField E] [_root_.NumberField.
   have h1 := GlobalTheory.CompanionTheory.HeckeAlg.dchi_eq_sum (Model.absC E 1) z
   have h2 := GlobalTheory.GKCoh.Tests.dchi_absC (E := E) 1 z
   simp only [Model.expo_absC, one_mul] at h1 h2
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← h1, h2, map_sum]
+
+  rw [← h1, h2, map_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
   rw [map_mul, Complex.conj_ofReal, map_ofNat]
 
@@ -70,8 +70,8 @@ theorem unitTw_holds : PositivityTheory.Rg.Cz.UnitTw := by
     simp only [Model.expo_absC, ← Finset.mul_sum]
     congr 1
     refine Finset.sum_congr rfl fun τ _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.trace, map_sum]
+
+    rw [Matrix.trace, map_sum]
     rfl
   refine ⟨H, -2 * s.re, fun φ ψ => ?_, fun φ hφ => ?_, fun X φ ψ => ?_⟩
   · rw [hH, hH, inner_conj_symm]
@@ -87,8 +87,8 @@ theorem unitTw_holds : PositivityTheory.Rg.Cz.UnitTw := by
       GlobalTheory.CompanionTheory.PeterssonSkew.lie_skew_adjoint E a μ π' hm hb X (U ψ) (U φ)
     rw [hH, hH, hH, hU, hU, inner_sub_left, inner_sub_right, inner_smul_left, inner_smul_right, sk, htr]
     have hr : starRingEnd ℂ (∑ τ : E →+* ℂ, ∑ i, coord τ (X i i)) = ∑ τ : E →+* ℂ, ∑ i, coord τ (X i i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum] using conj_sum_coord (E := E) (∑ i, X i i)
+
+      simpa only [map_sum] using conj_sum_coord (E := E) (∑ i, X i i)
     set t := ∑ τ : E →+* ℂ, ∑ i, coord τ (X i i) with ht
     have hc : starRingEnd ℂ (s * t) = starRingEnd ℂ s * t := by rw [map_mul, hr]
     rw [hc]

@@ -15,7 +15,7 @@ namespace Formalism.L2.SG.RealObj.EnergyConvJ
 variable {D : D7}
 
 
-set_option maxHeartbeats 800000 in
+
 variable [Fact Formalism.L2.SG.SplitPrimeNormLemmas.CoefWeightedLoc] [Fact Formalism.FourierDecayAlt.ThreeDimData.DecLow] in
 theorem locQuad1_G_holds (hI : Formalism.FourierDecayAlt.ThreeDimData.Inputs) : LocQuad1_G := by
   intro D hG X w μSl νl C hQ v

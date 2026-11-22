@@ -46,10 +46,10 @@ theorem UpperTheory.exists_sum_baseChange_of_commute_baseChange :
     apply bV.ext_elem
     intro i
     have h1 := congrArg (fun x => B.repr x i) hw
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.sum_apply', B,
-      Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
-      smul_eq_mul, map_zero, Finsupp.coe_zero, Pi.zero_apply] at h1
+
+    simp only [map_sum, Finset.sum_apply', B,
+    Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
+    smul_eq_mul, map_zero, Finsupp.coe_zero, Pi.zero_apply] at h1
     have h2 : ∑ l, bV.repr (w l) i • r l = 0 := by
       rw [← h1]
       refine Finset.sum_congr rfl fun l _ => ?_
@@ -78,8 +78,8 @@ theorem UpperTheory.exists_sum_baseChange_of_commute_baseChange :
       intro v
       have e := LinearMap.congr_fun (hT i) (1 ⊗ₜ v)
       simp only [LinearMap.comp_apply, LinearMap.baseChange_tmul] at e
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hT1, hT1, map_sum] at e
+
+      rw [hT1, hT1, map_sum] at e
       simp only [LinearMap.baseChange_tmul] at e
       simp only [TensorProduct.tmul_sub, Finset.sum_sub_distrib, e, sub_self]
     ext v

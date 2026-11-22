@@ -12,8 +12,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 
@@ -123,8 +123,8 @@ theorem mv_smul (c : FractionRing (D.ntw.O i)) (y : D.nexp.Fm i ((j : ℕ) + 1) 
 theorem mv_sum {ι : Type} (s : Finset ι) (y : ι → D.nexp.Fm i ((j : ℕ) + 1) b) :
     mv YS hρ i j b (∑ k ∈ s, y k) = ∑ k ∈ s, mv YS hρ i j b (y k) := by
   unfold mv
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact map_sum (evH YS hρ i j b) _ _
 
 theorem postOn_eWf_sum (σ : D.what₂.LL →+* ℂ) (M : MMap (Rl.MW j σ)) :
@@ -151,8 +151,8 @@ theorem mv_eG (hU : Rl.toRealDat.LUnif)
     rw [h]
     exact (hρ.e_LL0 i b _).trans (D.nStage_trivialCharacter_coeff_eq g)
   have hs : sg0 D A3.A = D.what₂.embLL := GlobalTheory.SeriesTie.ActProof.sg0_eq_embLL Rl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, mv_sum, map_sum, postOn_eWf_sum]
+
+  rw [h1, mv_sum, map_sum, postOn_eWf_sum]
   refine (Fintype.sum_equiv (Rl.eG.trans cG).toEquiv _ _ fun γ => ?_).symm
   rw [mv_smul, map_smul, mv_act YS hρ i j b hU, hc]
   simp only [MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulEquiv.trans_apply, MulEquiv.symm_apply_apply]

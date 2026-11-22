@@ -212,5 +212,5 @@ theorem UpperTheory.Gal.InertialTypesAlt.cuspIso :
     simp
   · intro x
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+    simp [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, map_sum, map_mul]

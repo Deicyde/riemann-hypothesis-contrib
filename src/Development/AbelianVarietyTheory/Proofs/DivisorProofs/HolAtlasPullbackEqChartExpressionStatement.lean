@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PullbackComp
 open GlobalTheory GlobalTheory.CxForm GlobalTheory.GoodMetric
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff ComplexConjugate Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.holAtlas_pullback_eq_chart_expression : ∀ (M M' : Type) [TopologicalSpace M] [TopologicalSpace M'] (n n' : ℕ) (A : HolAtlas M n) (A' : HolAtlas M' n')
     (f : M' → M) (α : A.Fld), A.IsHolo A' f → A.IsForm α →
     ∀ (x : A'.Pt) (i : A.ι) (h : f x.pt ∈ (A.e i).source),

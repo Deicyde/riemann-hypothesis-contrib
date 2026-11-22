@@ -469,7 +469,7 @@ end Main
 
 end UpperTheory.EigenspaceProjectionTraces
 
-set_option maxHeartbeats 2000000 in
+
 open UpperTheory.EigenspaceProjectionTraces in
 theorem UpperTheory.exists_pos_const_eigenspace_bound_of_split_CMDatum :
     ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E ≃ₐ[F] E) (n : ℕ), 0 < n →

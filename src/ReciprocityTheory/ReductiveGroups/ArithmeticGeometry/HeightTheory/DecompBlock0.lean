@@ -26,7 +26,7 @@ noncomputable abbrev sub0 (x : Fin (d.N + 1) → K) : KTp K d.D d.N →ₐ[K] KT
     if v.1 = 0 then MvPolynomial.C (x v.2) else MvPolynomial.X v)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem finYX4 (hd : d.AxH 𝒜) (h : d.S1) (c : ι) :
     letI := d.algLE h c
     letI := (VariableBasisExtension.liftY (L := d.FracFieldPositiveRowsBase) (E := d.FracFieldPositiveRowsOmega c) (σ := Fin (d.N + 1))).toAlgebra
@@ -66,7 +66,7 @@ theorem finYX4 (hd : d.AxH 𝒜) (h : d.S1) (c : ι) :
   exact Module.Finite.of_equiv_equiv d.eLX4 (d.eEX4 c)
     (RingHom.ext fun q => (d.fieldEquiv_compat_liftY h c q).symm)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem decomp_block0 (hd : d.AxH 𝒜) (h : d.S1) (c : ι) :
     ∃ (L E : Type) (_ : Field L) (_ : Field E) (_ : Algebra L E) (_ : FiniteDimensional L E)
       (eL : KTf K d.D d.N ≃+* FractionRing (MvPolynomial (Fin (d.N + 1)) L))

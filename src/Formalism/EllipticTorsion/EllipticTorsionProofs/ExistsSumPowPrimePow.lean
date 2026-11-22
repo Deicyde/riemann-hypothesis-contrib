@@ -46,8 +46,8 @@ theorem frobenius_expansion : FrobExpand := by
         - ∑ e, C (b e) * X e ^ (p ^ j)
       = ∑ e, C (a e ^ (p ^ j) - b e) * X e ^ (p ^ j)
         + C (p : K) * map R.subtype r := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hmap, ← map_pow, hr, map_add (f := _), map_sum, map_mul, map_natCast]
+
+    rw [hmap, ← map_pow, hr, map_add (f := _), map_sum, map_mul, map_natCast]
     simp only [map_pow, map_mul, map_C, map_X, mul_pow, map_sub, sub_mul,
       Finset.sum_sub_distrib, map_natCast]
     simp [a']

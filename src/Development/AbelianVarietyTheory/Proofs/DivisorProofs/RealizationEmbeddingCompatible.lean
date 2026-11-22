@@ -17,8 +17,8 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMas
 open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option autoImplicit false
@@ -80,8 +80,8 @@ theorem readExt_injective
   obtain ⟨d, hd, c, e⟩ := key x
   have h1 : ∑ a, eL (c a) • rd (v a) = 0 := by
     have := congrArg (readExt rd eL hL) e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← algebraMap_smul L d x, readExt_smul, hx, smul_zero, map_sum] at this
+
+    rw [← algebraMap_smul L d x, readExt_smul, hx, smul_zero, map_sum] at this
     exact this.symm
   have h2 : ∀ a, c a = 0 := fun a => eL.injective
     ((Fintype.linearIndependent_iff.1 (hF _ v v.linearIndependent) _ h1 a).trans (map_zero _).symm)

@@ -22,7 +22,7 @@ open GlobalTheory.AscFin
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace GlobalTheory.DepthIdeal
 

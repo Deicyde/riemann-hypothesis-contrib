@@ -36,9 +36,9 @@ private theorem eq_zero_of_semilinear_eq_zero_of_linearIndependent {K V W ι : T
   classical
   have hsum : Finsupp.linearCombination ℂ (fun k => f (b k)) ((b.repr z).mapRange σ (map_zero σ)) = f z := by
     conv_rhs => rw [← b.linearCombination_repr z]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.linearCombination_apply, Finsupp.linearCombination_apply,
-      Finsupp.sum_mapRange_index (by intros; simp), Finsupp.sum, Finsupp.sum, map_sum]
+
+    rw [Finsupp.linearCombination_apply, Finsupp.linearCombination_apply,
+    Finsupp.sum_mapRange_index (by intros; simp), Finsupp.sum, Finsupp.sum, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smulₛₗ]
   have h0 := linearIndependent_iff.mp hli _ (hsum.trans hz)
@@ -64,8 +64,8 @@ private theorem exists_rational_solution_of_semilinear {K E : Type*} [Field K] [
     have hz : z = ∑ l, z l • Pi.single l (1 : ℂ) := by
       ext m; simp [Finset.sum_apply, Pi.single_apply]
     conv_lhs => rw [hz]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, ← ha, smul_eq_mul]
+
+    simp only [map_sum, map_smul, ← ha, smul_eq_mul]
     exact Finset.sum_congr rfl fun l _ => mul_comm _ _
   have hinj : LinearMap.ker (Matrix.of a).mulVecLin = ⊥ := by
     rw [LinearMap.ker_eq_bot']
@@ -102,8 +102,8 @@ private theorem exists_rational_solution_of_semilinear {K E : Type*} [Field K] [
   intro l
   refine ⟨((LinearMap.toMatrix' g).mulVec c) l, ?_⟩
   rw [hy']
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
+
+  simp [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
 
 theorem liftMat_inj (hK : X.KFormL) (hZ : X.CrdZL cr b) (hT : Formalism.IndefR.Rat.LiftTestB X b) (hKF : X.KForm b)
     (hEW : X.EWnorm b) (hnP : 0 < X.nP b) (j : Bs.J) (t : Bs.Tup) (hinjL : Function.Injective (cr.toL X.zs b j t))
@@ -166,8 +166,8 @@ theorem liftMat_inj (hK : X.KFormL) (hZ : X.CrdZL cr b) (hT : Formalism.IndefR.R
         cpt Bs.v0.embedding ((X.liftMat cr b j t).mulVec x) := by
       rw [← hmap]
       ext l
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [cpt, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum]
+
+      simp [cpt, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum]
     rw [this, hx]
     have h0 : cpt Bs.v0.embedding (0 : Fin (X.dW b j) → K) = 0 := by ext m; simp [cpt]
     rw [h0, map_zero]
@@ -215,7 +215,7 @@ private theorem mem_iInf_ker_of_eigen {K W G : Type*} [Field K] [AddCommGroup W]
 end General
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem posScal_of_galD : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3) {s : ℕ}, A3.fam3.Ok3 s → R.WeakCharacterisation F → R.toRealDat.ExAt → (0 < R.kap ∧ ∀ i t p, 0 < R.lam3 i t p A3.A.v0) → (R.toCx3 F).GalD F.cr false → R.toRealDat.LUnif → Formalism.IndefR.Rat.LiftTestB (R.toCx3 F) false → R.PGEquiv F → R.PPos := by
   intro D G _ _ Pl0 I0 T A3 Ks _ _ _ R F s hOk hC hE hpos0 hGal hU hT hGE
   obtain ⟨hkap, hlam0⟩ := hpos0

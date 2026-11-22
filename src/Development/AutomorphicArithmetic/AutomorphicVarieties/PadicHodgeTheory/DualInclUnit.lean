@@ -184,7 +184,7 @@ private theorem fin (P : LocalPublishedTheorems) {l : ℕ} [Fact l.Prime] {G : T
 
 end UpperTheory.V.Loc.DualInclusionBarsotti
 
-set_option maxHeartbeats 800000 in
+
 open UpperTheory.V.Loc UpperTheory.V.Loc.DualInclusionBarsotti in
 theorem UpperTheory.V.Loc.pr6Bar :
     UpperTheory.V.Loc.LocalPublishedTheorems → ∀ {l : ℕ} [Fact l.Prime] {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] (φ : H →* GQ l), Topology.IsOpenEmbedding φ → ∀ {n : ℕ} (r : H →* GL (Fin n) (Qbar l)), Continuous r → ∀ y ∈ Z1 (UpperTheory.V.Loc.adGL r), ∀ r' : H →* GL (Fin n) (DualNumber (Qbar l)), (∀ g i j, (r' g : Matrix (Fin n) (Fin n) (DualNumber (Qbar l))) i j = ⟨(r g : Matrix (Fin n) (Fin n) (Qbar l)) i j, (y g * (r g : Matrix (Fin n) (Fin n) (Qbar l))) i j⟩) → ∀ (κ : Fin n → H →* (DualNumber (Qbar l))ˣ) (m : Fin n → ℤ), HasFlag r' κ → StrictAnti m → ∀ U : Subgroup H, IsOpen (U : Set H) → (∀ i, ∀ g ∈ U, φ g ∈ UpperTheory.V.Loc.Iq l → ((κ i g : (DualNumber (Qbar l))ˣ) : DualNumber (Qbar l)) = algebraMap (Qbar l) (DualNumber (Qbar l)) (((UpperTheory.V.Loc.cycA l l (Qbar l) (φ g)) ^ m i : (Qbar l)ˣ) : Qbar l)) → (∀ i j, i < j → m j + 2 ≤ m i ∨ ∃ g ∈ U, (κ i g : DualNumber (Qbar l)).fst ≠ (κ j g : DualNumber (Qbar l)).fst * (UpperTheory.V.Loc.cycA l l (Qbar l) (φ g) : Qbar l)) → y ∈ UpperTheory.V.Loc.finiteCocycles φ (UpperTheory.V.Loc.adGL r) := by

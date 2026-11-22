@@ -15,13 +15,13 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.R
 open PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.BcB.F
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 attribute [local instance] PositivityTheory.Rg.BcB.F.borelG PositivityTheory.Rg.BcB.F.borelF PositivityTheory.Rg.BcB.F.borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.BaseChangeIdentities.GelfandReading
 
-set_option maxHeartbeats 2000000 in
+
 theorem ident_of (hD : DerVal) (hI : InfMatch) : BC.Ident := by
   intro hR E _ _ _ n π S T F₀ F i χ hχ O
   have e0 : (F.t₀ i).val O.χa O.χb = 1 := (O.eigArch (.inl ()) (F.t₀ i) rfl rfl).symm.trans (hχ.2.1 (.inl ()))

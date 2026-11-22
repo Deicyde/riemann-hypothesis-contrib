@@ -27,10 +27,10 @@ theorem sesqGram_of_eq_sum (B : V →ₛₗ[σ] V →ₛₗ[ComplexEmbedding.con
     [Fintype ι] {e : ι → V} {f : κ → V} {g : Matrix κ ι K} (hf : ∀ i, f i = ∑ j, g i j • e j) :
     sesqGram B f = g.map σ * sesqGram B e * (g.map σ)ᴴ := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sesqGram_apply, hf, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply,
-    Matrix.conjTranspose_apply, ComplexEmbedding.conjugate_coe_eq, Finset.sum_mul, Finset.mul_sum]
+
+  simp only [sesqGram_apply, hf, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply,
+  Matrix.conjTranspose_apply, ComplexEmbedding.conjugate_coe_eq, Finset.sum_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
   rw [RCLike.star_def]
   ring
@@ -98,8 +98,8 @@ noncomputable def diag {ι : Type*} [Fintype ι] (d : (K →+* ℂ) → ι → �
       simp only [Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
       exact Finset.sum_congr rfl fun i _ => by ring)
     (fun σ x y => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, Complex.conj_conj, Complex.conj_ofReal]
+
+      simp only [map_sum, map_mul, Complex.conj_conj, Complex.conj_ofReal]
       exact Finset.sum_congr rfl fun i _ => by ring)
     (fun σ => by
       classical
@@ -173,8 +173,8 @@ theorem posSemidef_gram (σ : K →+* ℂ) {ι : Type*} [Finite ι] (e : ι → 
     Matrix.of fun i j => b.repr ⟨e i, Submodule.subset_span ⟨i, rfl⟩⟩ j
   have hf : ∀ i, e i = ∑ j, g i j • (b j : V) := fun i => by
     have := congrArg W.subtype (b.sum_repr ⟨e i, Submodule.subset_span ⟨i, rfl⟩⟩).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     exact this
   rw [h.gram_of_eq_sum σ hf]
   exact (h.posDef_gram σ hb).posSemidef.mul_mul_conjTranspose_same _

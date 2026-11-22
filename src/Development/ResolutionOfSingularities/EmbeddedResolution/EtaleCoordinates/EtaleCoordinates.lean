@@ -101,8 +101,8 @@ theorem eq_sum_smul_partialDeriv [Fintype ι] (D : Derivation k S S) :
       = ∑ i : ι, (basisKaehler k ι S).repr (KaehlerDifferential.D k S s) i
           • basisKaehler k ι S i :=
     ((basisKaehler k ι S).sum_repr (KaehlerDifferential.D k S s)).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, h2, map_sum]
+
+  rw [h1, h2, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, basisKaehler_apply, Derivation.liftKaehlerDifferential_comp_D, smul_eq_mul,
     ← partialDeriv_apply]

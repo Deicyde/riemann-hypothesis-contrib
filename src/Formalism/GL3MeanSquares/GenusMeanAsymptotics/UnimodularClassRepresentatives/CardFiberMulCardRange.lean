@@ -174,8 +174,8 @@ theorem range_linPart (hσ : ∀ a, σ (σ a) = a) {I : Ideal A} (hI : ∀ a ∈
     calc ∑ i, (σ (y i) * ((⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩ : I) : A) +
           σ ((⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩ : I) : A) * y i)
         = ∑ i, σ (y i) * (y i * (m * v)) + σ (∑ i, σ (y i) * (y i * (m * v))) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [Finset.sum_add_distrib, map_sum]
+
+          rw [Finset.sum_add_distrib, map_sum]
           congr 1
           refine Finset.sum_congr rfl (fun i _ => ?_)
           simp only [map_mul, hσ]
@@ -231,8 +231,8 @@ theorem card_lift [Finite A] (hπ : Function.Surjective π) (hστ : ∀ a, π (
   let Φ : {x : Fin M → A // ∑ i, σ (x i) * x i = n} → {x : Fin M → B // ∑ i, τ (x i) * x i = π n} :=
     fun x => ⟨fun i => π (x.1 i), by
       have h1 : ∑ i, τ (π (x.1 i)) * π (x.1 i) = π (∑ i, σ (x.1 i) * x.1 i) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         exact Finset.sum_congr rfl (fun i _ => by rw [map_mul, hστ])
       rw [h1, x.2]⟩
   refine card_eq_mul_of_fibers Φ _ (fun yb => ?_)
@@ -240,14 +240,14 @@ theorem card_lift [Finite A] (hπ : Function.Surjective π) (hστ : ∀ a, π (
   let y : Fin M → A := fun i => lift (yb.1 i)
   have hyπ : ∀ i, π (y i) = yb.1 i := fun i => hlift _
   have hwI : n - ∑ i, σ (y i) * y i ∈ I := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hmemI, map_sub, map_sum]
+
+    rw [hmemI, map_sub, map_sum]
     have h1 : ∑ i, π (σ (y i) * y i) = ∑ i, τ (yb.1 i) * yb.1 i :=
       Finset.sum_congr rfl (fun i _ => by rw [map_mul, hστ, hyπ])
     rw [h1, yb.2, sub_self]
   have hwσ : σ (n - ∑ i, σ (y i) * y i) = n - ∑ i, σ (y i) * y i := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, hn, map_sum]
+
+    rw [map_sub, hn, map_sum]
     congr 1
     exact Finset.sum_congr rfl (fun i _ => by rw [map_mul, hσ, mul_comm])
   have hwR : n - ∑ i, σ (y i) * y i ∈ (linPart σ I y).range := by

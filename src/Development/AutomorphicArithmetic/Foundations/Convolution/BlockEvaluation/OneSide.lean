@@ -177,7 +177,7 @@ private theorem final_arith (C τ u q r k zN zN' x y : ℝ) (hτ : 0 ≤ τ) (hu
 
 end SlopeTestRemainingChoices
 
-set_option maxHeartbeats 1600000 in
+
 open GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum PositivityTheory.Rg.Fx PositivityTheory.Rg.Tf.Core in
 theorem UpperTheory.ConvolutionTheory.Ci.oneSide :
     K.Kern2 → PolyBdAll → SmoothDecay → DecayTraceClass → CuspTrBand → CuspidalMultiplicityOneTotallyComplex → EvEx → OneSide := by

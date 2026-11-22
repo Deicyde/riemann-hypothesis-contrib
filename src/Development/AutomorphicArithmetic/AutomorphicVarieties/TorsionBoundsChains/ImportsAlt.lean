@@ -16,8 +16,8 @@ theorem UpperTheory.V.KH.kill :
   let v : S →₀ ℤ := ∑ s : S, Finsupp.single s 1
   have hv : ∀ g : S, perm S S g v = v := by
     intro g
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [v, map_sum, perm_single]
+
+    simp only [v, map_sum, perm_single]
     exact Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun _ => rfl)
   let fi : (Rep.trivial ℤ S ℤ).ρ.IntertwiningMap (permRep S S).ρ :=
     ⟨LinearMap.toSpanSingleton ℤ _ v, fun g => by
@@ -32,9 +32,9 @@ theorem UpperTheory.V.KH.kill :
       (Rep.Hom.hom (Rep.ofHom gi)) ((Rep.Hom.hom (Rep.ofHom fi)) a) = Nat.card S • a := by
     intro a
     change aug S (a • v) = Nat.card S • a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [v, map_smul, map_sum, aug_single, Finset.sum_const, Finset.card_univ, smul_eq_mul,
-      nsmul_eq_mul, Nat.card_eq_fintype_card, mul_one]
+
+    simp only [v, map_smul, map_sum, aug_single, Finset.sum_const, Finset.card_univ, smul_eq_mul,
+    nsmul_eq_mul, Nat.card_eq_fintype_card, mul_one]
     ring
   have hsub : Subsingleton (groupHomology (permRep S S) (j + 1)) := by
     obtain ⟨e⟩ := shapiro S S (1 : S) (j + 1)

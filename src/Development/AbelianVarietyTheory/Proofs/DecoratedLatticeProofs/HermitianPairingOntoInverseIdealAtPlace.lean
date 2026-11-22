@@ -30,8 +30,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SeeSaw.HzOnto
 
@@ -113,8 +113,8 @@ theorem hermAt_neg (S : HSp D) (w x : Fin S.rank → AE D) : hermAt S w (-x) = -
 theorem cA_sum_eq (S : HSp D) (Z y : Fin S.rank → AE D) :
     cA D (∑ l, (∑ m, cA D (Z m) * gA S m l) * y l) = hermAt S Z y := by
   have hg : ∀ m l, cA D (gA S m l) = gA S l m := fun m l => congrFun (congrFun (adj_gA S) l) m
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, cA_cA, hermAt, Finset.sum_mul, hg]
+
+  simp only [map_sum, map_mul, cA_cA, hermAt, Finset.sum_mul, hg]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 

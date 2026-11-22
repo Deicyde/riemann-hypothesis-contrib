@@ -98,20 +98,20 @@ theorem cc_fockS (Y : Matrix (Fin a) (Fin a) ℂ) :
     MvPolynomial.constantCoeff (fockS τ ε ε' Y (1 : PolF D b a)) = ∑ j, Y j j * (sgn (ε j) * (idx ε' : ℂ) / 2) := by
   classical
   unfold fockS
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.add_apply, map_sum, map_add (f := _)]
+
+  simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.add_apply, map_sum, map_add (f := _)]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Finset.sum_eq_single j]
   · rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.constantCoeff_C, ← sum_half]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low, if_true]
+
+    simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low, if_true]
     congr 1
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [MvPolynomial.smul_eq_C_mul]
   · intro k _ hk
     rw [MvPolynomial.smul_eq_C_mul, map_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low]
+
+    simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low]
     simp [Ne.symm hk]
   · simp
 
@@ -119,20 +119,20 @@ theorem cc_fockT (Y : Matrix (Fin b) (Fin b) ℂ) :
     MvPolynomial.constantCoeff (fockT τ ε ε' Y (1 : PolF D b a)) = ∑ i, Y i i * (sgn (ε' i) * (idx ε : ℂ) / 2) := by
   classical
   unfold fockT
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.add_apply, map_sum, map_add (f := _)]
+
+  simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.add_apply, map_sum, map_add (f := _)]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_eq_single i]
   · rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.constantCoeff_C, ← sum_half]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low, if_true]
+
+    simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low, if_true]
     congr 1
     refine Finset.sum_congr rfl fun j _ => ?_
     simp [MvPolynomial.smul_eq_C_mul, ne_comm, eq_comm]
   · intro k _ hk
     rw [MvPolynomial.smul_eq_C_mul, map_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low]
+
+    simp only [LinearMap.sum_apply, LinearMap.add_apply, map_sum, map_add (f := _), cc_rai_low]
     simp [Ne.symm hk]
   · simp
 

@@ -30,8 +30,8 @@ theorem exists_sub_one_pow {p : ℕ} (hp : p.Prime) {B : Type} [CommRing B] (x :
   have hdvd : C (p : ℤ) ∣ ((X - 1 : ℤ[X]) ^ (p - 1) - ∑ i ∈ Finset.range p, (X : ℤ[X]) ^ i) := by
     have hmap : ((X - 1 : ℤ[X]) ^ (p - 1) - ∑ i ∈ Finset.range p, (X : ℤ[X]) ^ i).map
         (Int.castRingHom (ZMod p)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [Polynomial.map_sum] using hmod
+
+      simpa [Polynomial.map_sum] using hmod
     rw [Polynomial.C_dvd_iff_dvd_coeff]
     intro i
     have h5 := congrArg (fun f : (ZMod p)[X] ↦ f.coeff i) hmap
@@ -40,8 +40,8 @@ theorem exists_sub_one_pow {p : ℕ} (hp : p.Prime) {B : Type} [CommRing B] (x :
   obtain ⟨g, hg⟩ := hdvd
   refine ⟨-aeval x g, ?_⟩
   have := congrArg (aeval x) hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_pow, aeval_X, map_one, map_sum, map_mul, aeval_C] at this
+
+  simp only [map_sub, map_pow, aeval_X, map_one, map_sum, map_mul, aeval_C] at this
   simp only [algebraMap_int_eq, eq_intCast, Int.cast_natCast] at this
   linear_combination this
 

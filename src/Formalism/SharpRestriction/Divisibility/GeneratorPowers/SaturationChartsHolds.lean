@@ -140,7 +140,7 @@ section Main
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
 
-set_option maxHeartbeats 1000000 in
+
 open ReciprocityTheory.ChartRestriction.G.Chart (tcoord tan_ext prodPts prodPts_tan) in
 theorem saturation_charts_holds : ChartSaturated Xo c := by
   intro T io y C τ
@@ -237,8 +237,8 @@ theorem saturation_charts_holds : ChartSaturated Xo c := by
     intro g
     obtain ⟨h, hh⟩ := prodPts_tan hx g ub hubt
     refine ⟨h, hh.trans ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [hubc i, map_smul]
 
   have hli : LinearIndependent T.V u := by
@@ -309,8 +309,8 @@ theorem saturation_charts_holds : ChartSaturated Xo c := by
         rw [ReciprocityTheory.ChartRestriction.G.Chart.tcoord_scale hx a hwb, eq] at e3
         rw [e3]
         simp only [hubec, smul_comm (g _) z, ← Finset.smul_sum]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [smul_comm a z, ← map_smul, ← hg, map_sum]
+
+        rw [smul_comm a z, ← map_smul, ← hg, map_sum]
         simp only [map_smul]
       have key' : tcoord hx _ hwb = z • L v := smul_right_injective _ ha key
       apply tan_ext hx hwb (ReciprocityTheory.ChartRestriction.G.Chart.isTan_scale z hwt)

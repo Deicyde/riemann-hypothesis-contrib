@@ -90,8 +90,8 @@ private theorem int_nhds {K : Type} [NontriviallyNormedField K] [CompleteSpace K
   have hsplit : l x = l o + ∑ i, (x i - o i) • l (e i) := by
     have h1 : x - o = ∑ i, (x - o) i • e i := pi_eq_sum_univ (x - o)
     have h2 : l (x - o) = ∑ i, (x i - o i) • l (e i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h1, map_sum]
+
+      rw [h1, map_sum]
       simp [map_smul]
     rw [← h2, ← map_add (f := _), add_sub_cancel]
   rw [hsplit]

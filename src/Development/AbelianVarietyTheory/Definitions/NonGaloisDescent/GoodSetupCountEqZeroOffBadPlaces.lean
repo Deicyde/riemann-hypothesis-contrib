@@ -17,8 +17,8 @@ open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx)
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SeriesTie
 
@@ -249,8 +249,8 @@ theorem Faithful.injective_rdK (h : Faithful rd) (hρ : ρ.Good) (k : ℕ) : Fun
   obtain ⟨d, hd, c, e⟩ := key x
   have h1 : ∑ a, ρ.eOk i b k (c a) • rd (v a) = 0 := by
     have := congrArg (rdK rd hρ k) e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← algebraMap_smul (X.Ok i k) d x, map_smulₛₗ, hx, smul_zero, map_sum] at this
+
+    rw [← algebraMap_smul (X.Ok i k) d x, map_smulₛₗ, hx, smul_zero, map_sum] at this
     exact this.symm
   have h2 : ∀ a, c a = 0 := fun a => ρ.eOk_injective i b k
     ((Fintype.linearIndependent_iff.1 (h _ v v.linearIndependent) _ h1 a).trans (map_zero _).symm)

@@ -38,9 +38,9 @@ theorem exists_euclidean {M : ℕ} [FiniteDimensional ℚ V] (hM : finrank ℚ V
   refine ⟨φ, fun x y => ?_⟩
   have hB : B x y = ∑ j, v.repr x j * v.repr y j * B (v j) (v j) := by
     conv_lhs => rw [← v.sum_repr x, ← v.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-      Finset.mul_sum]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+    Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Finset.sum_eq_single j]
     · ring
@@ -126,8 +126,8 @@ theorem transference_rat {M : ℕ} (b : Basis (Fin M) ℚ V)
   have hyv : ∀ i, φ (∑ j, (m i j : ℚ) • b j) = y i := by
     intro i
     refine InnerProductSpace.ext_inner_right_basis b' fun k => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hm, hb', map_sum, sum_inner]
+
+    rw [hm, hb', map_sum, sum_inner]
     simp only [map_smul, ← Rat.cast_smul_eq_qsmul ℝ, real_inner_smul_left, hd3, mul_ite, mul_one,
       mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, Rat.cast_intCast]
   refine ⟨fun i => ∑ j, (m i j : ℚ) • b j, fun i => ?_, ?_, fun i => ?_⟩
@@ -137,8 +137,8 @@ theorem transference_rat {M : ℕ} (b : Basis (Fin M) ℚ V)
   · rw [Fintype.linearIndependent_iff]
     intro g hg i
     have h := congrArg φ hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h
+
+    rw [map_sum, map_zero] at h
     simp only [map_smul, hyv, ← Rat.cast_smul_eq_qsmul ℝ] at h
     have := (Fintype.linearIndependent_iff.mp hyli) (fun i => (g i : ℝ)) h i
     exact_mod_cast this

@@ -46,17 +46,17 @@ theorem posDef_of_dual {V : Type} [AddCommGroup V] [Module ℂ V] (h : V →ₗ�
     simp
   · set u : V := ∑ k, c k • x k with hu
     have e : star c ⬝ᵥ (Matrix.of fun p q => h (x p) (x q)).mulVec c = h u u := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hu, map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, dotProduct, Matrix.mulVec,
-        Matrix.of_apply, Finset.mul_sum, Pi.star_apply, smul_eq_mul, RingHom.id_apply]
+
+      simp only [hu, map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, dotProduct, Matrix.mulVec,
+      Matrix.of_apply, Finset.mul_sum, Pi.star_apply, smul_eq_mul, RingHom.id_apply]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       simp only [RCLike.star_def]
       ring
     have hu0 : u ≠ 0 := fun h0 => hc (funext fun j => by
       have := congrArg (g j) h0
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [hu, map_sum, hg, Finset.sum_ite_eq] using this)
+
+      simpa [hu, map_sum, hg, Finset.sum_ite_eq] using this)
     rw [e, Complex.pos_iff]
     refine ⟨hp u hu0, ?_⟩
     have := (Complex.conj_eq_iff_im.1 (hh u u).symm)
@@ -112,8 +112,8 @@ theorem exists_dual_sum (𝔐 : HodgeCpt Y S y) (hind : iSupIndep 𝔐.Vgen) (q 
         have e2 : pr x = ∑ k, ((c' k : regAt 𝔐.ξ q) : Ω) • bb k := by
           rw [show x = ((⟨x, hxW⟩ : ↥(𝔐.Vgen a ⊔ 𝔐.Vgen b)) : 𝔐.Li) from rfl, hpr, ← hc']
           exact Finset.sum_congr rfl fun k _ => e1 k
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [LinearMap.comp_apply, e2, map_sum, map_smul, hgb, LinearMap.proj_apply]
+
+        simp only [LinearMap.comp_apply, e2, map_sum, map_smul, hgb, LinearMap.proj_apply]
         simp only [Pi.smul_apply, smul_eq_mul]
         refine sum_mem fun k _ => mul_mem (c' k).2 ?_
         rw [Pi.single_apply]

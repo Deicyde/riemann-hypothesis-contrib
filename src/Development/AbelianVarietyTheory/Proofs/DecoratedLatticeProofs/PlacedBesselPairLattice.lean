@@ -16,8 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.EqO
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.LineIdeal
 

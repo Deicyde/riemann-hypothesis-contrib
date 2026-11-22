@@ -84,8 +84,8 @@ theorem decW_of_matrix (S : Sit) (E : S.Comparison₂)
   have hexp : ∀ x : S.W.DD T, E.jD T x = ∑ i, E.ioE (bD.repr x i) • E.jD T (bD i) := by
     intro x
     conv_lhs => rw [← bD.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => E.jD_smul T _ _
   have hspan : Submodule.span S.RW (Set.range fun i => E.jD T (bD i)) = ⊤ := by
     rw [eq_top_iff, ← E.jD_span T, Submodule.span_le]
@@ -112,8 +112,8 @@ theorem decW_of_matrix (S : Sit) (E : S.Comparison₂)
   have hact : ∀ g ∈ Hker S, ∀ v : Fin d → S.RW,
       TWact (S.gR g) T g (∑ i, v i • E.jD T (bD i)) = ∑ i, S.gR g (v i) • E.jD T (bD i) := by
     intro g hg v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [actS, hfix g hg]
   have hinv : ∀ v : Fin d → S.RW,
       (∑ i, v i • E.jD T (bD i)) ∈ Htl S T ↔ ∀ i, ∀ g ∈ Hker S, S.gR g (v i) = v i := by
@@ -132,8 +132,8 @@ theorem decW_of_matrix (S : Sit) (E : S.Comparison₂)
   have hφ : ∀ z : Fin d → S.RW, TWmap S.φR T (∑ k, z k • E.jD T (bD k)) =
       ∑ i, (∑ k, E.ioE (bD.repr (S.W.φD T (bD k)) i) * S.φR (z k)) • E.jD T (bD i) := by
     intro z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [mapS, hk, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -150,8 +150,8 @@ theorem decW_of_matrix (S : Sit) (E : S.Comparison₂)
     · intro hv
       choose e he using hv
       refine ⟨∑ i, e i • bD i, ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun i _ => by rw [E.jD_smul, he i]
 
   obtain ⟨h1, h2⟩ := h d (Matrix.of fun i k => bD.repr (S.W.φD T (bD k)) i)

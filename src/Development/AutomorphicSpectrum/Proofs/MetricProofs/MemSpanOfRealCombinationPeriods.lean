@@ -24,8 +24,8 @@ theorem mem_span_part_of_period_real_comb :
 
   have hPx : P x = ∑ j, ((b.repr x j : ℤ) : ℝ) • P (b j) := by
     conv_lhs => rw [← b.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_zsmul, Int.cast_smul_eq_zsmul]
 

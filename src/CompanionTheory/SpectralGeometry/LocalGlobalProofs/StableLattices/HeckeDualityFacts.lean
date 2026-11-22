@@ -93,8 +93,8 @@ theorem hasChar_tw {X : GMod n} {χ : Fin n → ℂ} (h : HasChar X χ) : HasCha
 theorem capelliC_map {A B : Type*} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] (φ : A →ₐ[ℂ] B)
     (E : Fin n → Fin n → A) (x : ℂ) : φ (capelliC E x) = capelliC (fun a b => φ (E a b)) x := by
   unfold capelliC cminor
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [map_zsmul, map_list_prod, List.map_ofFn]
   have e : (⇑φ ∘ fun j : Fin n => capEntry E (x - ((j : ℕ) : ℂ)) (id (σ j)) (id j)) =
@@ -158,7 +158,7 @@ theorem tw_tens (X : GMod n) (a b : Fin n) (y : Fin n → X.V) :
   rw [ReciprocityTheory.ChartRestriction.DS.Lap.Capelli.tensVd_apply']
   exact e3 (X.E a b (y i)) (if i = b then y a else 0)
 
-set_option maxHeartbeats 200000 in
+
 theorem iso_back (X : GMod n) (z : ℂ) (hB : ∀ a b, ∀ x ∈ backSub X z, (tensD X).E a b x ∈ backSub X z) :
     Iso (tw (step (tw X) (-z))) (back X z hB) := by
   let S : Submodule ℂ (Fin n → X.V) := stepSub (tw X) (-z)

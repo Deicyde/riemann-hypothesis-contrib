@@ -26,8 +26,8 @@ private theorem avg {Q N : Type} [Group Q] [Fintype Q] [AddCommGroup N] [Module 
       have : ∑ i, ξ g⁻¹ v i • (Pi.single i 1 : Fin d → ℂ) = ξ g⁻¹ v := by
         ext j
         simp [Finset.sum_apply, Pi.single_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← map_smul, ← map_sum]
+
+      simp only [← map_smul, ← map_sum]
       rw [this, ← he, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
     have h2 : ∑ g : Q, f v = 0 := by
       rw [← Finset.sum_congr rfl fun g _ => h1 g, Finset.sum_comm]
@@ -123,8 +123,8 @@ theorem UpperTheory.V.Hi.typeLoc : ∀ (O : Type) [CommRing O] [IsDomain O] [IsP
   obtain ⟨m, τ, hτ⟩ := UpperTheory.exists_integral_rep_detecting_invariant_subspace O (K ⧸ U) I (fun g x hx π hπ v => by
       rw [← Equiv.sum_comp (Equiv.mulLeft g)]
       have := congrArg (RQ π g) (hx π hπ v)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, map_zero] at this
+
+      simp only [map_sum, map_smul, map_zero] at this
       simpa only [Equiv.coe_mulLeft, inv_mul_cancel_left, map_mul, Module.End.mul_apply] using this)
     (UpperTheory.le_span_integralValued_of_galoisStable O (K ⧸ U) I fun γ x hx π' hπ' v' => by
       obtain ⟨π, f, hf, he⟩ := twist γ.toRingEquiv π'
@@ -133,8 +133,8 @@ theorem UpperTheory.V.Hi.typeLoc : ∀ (O : Type) [CommRing O] [IsDomain O] [IsP
         rw [f.apply_symm_apply]
         exact v'.2 u
       have h1 := congrArg (fun y : N π => f y) (hx π (fun h => hπ' (hγ γ π π' f hf he h)) ⟨_, hv⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, hf, Submodule.coe_zero, map_zero] at h1
+
+      simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, hf, Submodule.coe_zero, map_zero] at h1
       refine Subtype.ext ?_
       rw [Submodule.coe_sum, Submodule.coe_zero, ← h1]
       refine Finset.sum_congr rfl fun g _ => ?_

@@ -40,8 +40,8 @@ private theorem tri (d : ℕ) : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [
       simp only [hb']
       rw [Submodule.coe_sum] at this
       exact this.symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, map_sum, Finsupp.finsetSum_apply]
+
+    rw [e, map_sum, Finsupp.finsetSum_apply]
     refine Finset.sum_eq_zero fun k _ => ?_
     rw [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply]
     split_ifs with hk
@@ -88,8 +88,8 @@ private theorem homogeneous_trace_diagonal {d : ℕ} (n : ℕ) (g : GL (Fin d) �
         Finsupp.prod_fintype _ _ (by simp)]
       simp [Fintype.prod_prod_type, mul_pow, Finset.prod_mul_distrib, mul_comm]
     rw [this, MvPolynomial.coeff_monomial, if_pos rfl]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [symPowTrace_eq_sum_coeff, hsymm, map_sum]
+
+  rw [symPowTrace_eq_sum_coeff, hsymm, map_sum]
   simp only [e]
   symm
   refine Finset.sum_bij (fun s _ => Finsupp.equivFunOnFinite.symm fun p : Unit × Fin d => s.1.count p.2) (fun s _ => mem_homogeneousExponentsOneBlock.2 ?_)

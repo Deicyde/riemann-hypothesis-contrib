@@ -250,7 +250,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.ConvolutionTheory.L1
 
-set_option maxHeartbeats 2000000 in
+
 theorem UpperTheory.exists_bound_dim_simultaneousLocalEigenspace_of_openCompact :
     ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), 0 < n → ∀ (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
         (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] (J : ∀ w : Pl K, Subgroup (Gw n w)) (χ : ∀ w : Pl K, Gw n w → ℂ),

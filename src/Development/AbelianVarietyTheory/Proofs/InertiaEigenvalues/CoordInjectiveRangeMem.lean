@@ -35,8 +35,8 @@ theorem coord_injective_range_mem : ∀ {G : Type} [Group G] [TopologicalSpace G
   have hγ : ∀ δ ∈ W.DelF, ∀ y : Fin r → W.EE, W.γD T δ (∑ k, y k • (b k : W.DD T)) =
       ∑ k, W.γE δ (y k) • (b k : W.DD T) := by
     intro δ hδ y
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [W.γD_smul, (hb k).2 δ hδ]
   have hinv : ∀ x, ∀ δ ∈ W.DelF, W.γD T δ (coord W R jE T (fun k => (b k : W.DD T)) x) =
@@ -69,8 +69,8 @@ theorem coord_injective_range_mem : ∀ {G : Type} [Group G] [TopologicalSpace G
       have h1 : ∑ k, algebraMap (LetA O n) W.EE (a k) • (b k : W.DD T) =
           ∑ k, jE (fun i => x i k) • (b k : W.DD T) := by
         have := congrArg (W.N T).subtype (b.sum_repr ⟨_, hN⟩)
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum] at this
+
+        rw [map_sum] at this
         simp only [algebraMap_smul]
         exact this
       have h2 := huniq _ _ h1

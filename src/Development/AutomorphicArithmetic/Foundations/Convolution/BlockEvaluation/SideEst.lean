@@ -40,7 +40,7 @@ private theorem arith (C w zN zi q r kM e B E1 E2 kk f g1 g2 : ℝ) (hw : 0 ≤ 
     _ ≤ |C| * (E1 * g1 * (g2 * (B * e) + kk * g2 * (B * e / f)) + kk * g2 * (g1 * E2) * (B * e)) := by gcongr
     _ = _ := by ring
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.ConvolutionTheory.Ci.sideEst :
     OneSide → EvVal → TruncSpec → ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (n l : ℕ), 0 < n →
       ∀ (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (θ : Twist μ) (𝔰 : Side θ l) (ev : PR K n →+* (LL μ →L[ℂ] LL μ)),

@@ -22,7 +22,7 @@ theorem desc_sq {I B : Type} {W Z Y Y' : Scheme.{0}} (cls : I → B) (f : I → 
   refine Limits.Sigma.hom_ext _ _ fun c => ?_
   simp only [Limits.Sigma.ι_desc_assoc, Limits.Sigma.ι_desc, Category.assoc, h]
 
-set_option maxHeartbeats 200000 in
+
 theorem liesAbs_of (hP : LPts) (hC : LCount) (hI : LIdx) (hS : SigmaFEt) : LiesAbs := by
   intro p _ D G L E _ _ gb k T N J A _ g θ O _ _ C j K₀ K₁ Y' π' s d hK hN hq0 hq1 hc hs hcos ht
   have trc : ∀ {i i' : T.X.ι} (x y : G.GAf) (e : x = y) (a : x ∈ T.X.Δ)

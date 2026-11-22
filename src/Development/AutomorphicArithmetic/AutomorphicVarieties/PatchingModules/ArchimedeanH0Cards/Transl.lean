@@ -156,7 +156,7 @@ private theorem sum_diag {A X ι : Type} [CommRing A] [CommRing X] [Algebra A X]
 
 end SlopeTestRemainingChoices
 
-set_option maxHeartbeats 300000 in
+
 theorem UpperTheory.V.Pa.B2.transl :
     ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ) (x : NP G0.frame n) (k : Kap x) (X : Type) [CommRing X] [Algebra x.A X] [Finite X] (D : Dat x.A (plOf G)) (e : ℕ) (z : Fin e → Fin k.g → G.G₀ → Matrix (Fin n) (Fin n) X), l ≠ 2 → (∃ m : ℕ, algebraMap x.A X (x.t ^ m) = 0) → IsOd h x X D → (∀ u, UrAx l (L.Ju u)) → (∀ i j, z i j ∈ SelP h x X) → ∃ ξ : Fin e → D.selmerSecondCocycles, ∀ c : Fin e → x.A, ((∑ i, c i • ξ i : D.selmerSecondCocycles) : D.C2) ∈ D.selmerSecondCoboundaries → ∃ Ψ ∈ Sel2 h X k, ∀ j γ a b, (Ψ γ a b).ep' j = (∑ i, c i • z i j γ) a b := by
   rintro l _ L G G0 h n x k X _ _ _ D e z hl ⟨m, hm⟩ o hur hz
@@ -315,8 +315,8 @@ theorem UpperTheory.V.Pa.B2.transl :
           dY G.frame (fun g => k.ρ1 X (h.p₀ g)) (∑ i, c i • Ys i v + iota k o m' : W2 n x.A X k.g x.a) (G.φ v g) = E := by
         rw [dY, ← ha, ← Submodule.coe_sub, ← Submodule.coe_sub, ← hE]
         congr 1
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_add (f := _), map_sum, map_smul, smul_sub, Finset.sum_sub_distrib]
+
+        simp only [map_add (f := _), map_sum, map_smul, smul_sub, Finset.sum_sub_distrib]
         abel
       show (∀ i j, j < i → (k.wi1 X v * (((Ψ (G.φ v g) : W2 n x.A X k.g x.a) : Matrix (Fin n) (Fin n) (DD X k.g)) - _) *
         k.w1 X v) i j = 0) ∧ (_ → ∀ i, (k.wi1 X v * (((Ψ (G.φ v g) : W2 n x.A X k.g x.a) :

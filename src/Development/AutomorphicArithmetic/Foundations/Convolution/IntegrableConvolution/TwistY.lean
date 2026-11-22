@@ -127,7 +127,7 @@ private theorem gen_int (μ : Measure (normOneGL (K := E) (n := n))) [μ.IsHaarM
 end UpperTheory.ConvolutionTheory.L1.TY
 
 open UpperTheory.ConvolutionTheory.L1 UpperTheory.ConvolutionTheory.L1.TY in
-set_option maxHeartbeats 6400000 in
+
 theorem UpperTheory.ConvolutionTheory.L1.twistY :
     UpperTheory.ConvolutionTheory.L1.TwistY := by
   intro F E _ _ _ _ _ _ σ hσ m n hm hn μ _ θ hθ D s hs hposition νE _ νF _ b a aE aF hA q w₀ hq T V hV hVU hrk

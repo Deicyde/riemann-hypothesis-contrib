@@ -86,8 +86,8 @@ theorem generic (p : ℕ) (d : ℕ → S) (r0 : R) (f : S →ₐ[R] C) (g : W �
   have hL : Algebra.TensorProduct.lift f g (fun _ _ => Commute.all _ _) (z - gsum d w) = 0 := by
     obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 hw
     rw [← hy, map_mul, map_natCast, hC, mul_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, hz, zero_sub, neg_eq_zero, gsum, Finsupp.sum, map_sum] at hL
+
+  rw [map_sub, hz, zero_sub, neg_eq_zero, gsum, Finsupp.sum, map_sum] at hL
   have hsum : ∑ k ∈ w.support, f (d k) * g (w k) = 0 := by
     rw [← hL]
     refine Finset.sum_congr rfl fun k _ => ?_

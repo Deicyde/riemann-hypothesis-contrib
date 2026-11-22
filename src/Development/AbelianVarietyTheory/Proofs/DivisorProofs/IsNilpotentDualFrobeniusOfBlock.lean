@@ -46,8 +46,8 @@ theorem isNil_of_block : ∀ (B O : Type) [CommRing B] [CommRing O] (θ : B →+
       ρ (((U.transpose⁻¹ * blk d k 1 (p : B)).mulVec fun j => σ (w j)) r) =
         ∑ j, ρ (U⁻¹ (Sum.inl j) r) * ρ (w (Sum.inl j)) ^ p := by
     intro w r
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mulVec_transpose_inv_blk_apply, map_add (f := _), map_mul, hρp, zero_mul, add_zero, map_sum]
+
+    rw [mulVec_transpose_inv_blk_apply, map_add (f := _), map_mul, hρp, zero_mul, add_zero, map_sum]
     simp only [map_mul, hρσ]
   have hinl : ∀ a j, ρ (U⁻¹ (Sum.inl j) (Sum.inl a)) = ρ (c a j) := by
     intro a j

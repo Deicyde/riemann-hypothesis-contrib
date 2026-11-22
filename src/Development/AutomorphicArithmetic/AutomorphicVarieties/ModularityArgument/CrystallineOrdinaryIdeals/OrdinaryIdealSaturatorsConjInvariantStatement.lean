@@ -7,7 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ordinaryIdeal_saturators_conj_invariant :
     ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
       (D : Dat3 l O) {C : Type} [CommRing C] [Algebra O C]

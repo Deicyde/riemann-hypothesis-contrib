@@ -8,7 +8,7 @@ public import Development.AutomorphicSpectrum.Statements.GeometryStatements.IsPo
 
 open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct NumberField GlobalTheory GlobalTheory.PDivGroup GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.BT GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G.Semi
 open Coalgebra Bialgebra PositivityTheory.HtPt.Twpdiv in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.divisible_group_tower_compatibility :
     ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
       (v : Valuation C NNReal) (O : Type) [CommRing O] [IsDomain O] [Algebra O C]

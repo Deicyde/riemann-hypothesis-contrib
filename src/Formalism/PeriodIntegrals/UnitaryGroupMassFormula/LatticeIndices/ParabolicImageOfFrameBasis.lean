@@ -50,7 +50,7 @@ theorem latGL_genX {K T : Type} [Field K] [CommRing T] [Algebra K T] (O : Valuat
   · rw [MassDataIdxCore.psi_ker_iff]
     exact ⟨fun hw => hKB c (m h) (hmU h) (hK h) hw, fun hl => MassDataIdxCore.ker_fwd O θ J P c (m h) hl⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem latCoreX_holds : LatCoreX := by
   intro D X p θ hθ Q hQ K hK
   obtain ⟨P, hPdef⟩ : ∃ P, P = reindex₂ X p Q := ⟨_, rfl⟩

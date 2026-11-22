@@ -81,8 +81,8 @@ theorem exists_poly_rowSubst_coef (τ : ι) (k l : Fin m) (f : Pol ι m n) (φ :
       · have h1 : ∀ b, eval (fun x => (1 : Matrix (Fin m) (Fin m) ℂ) x.1 x.2) (P b) = φ (p * X (ρ, b, c)) := by
           intro b
           rw [← hP b 1, rowSubst_one]; rfl
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [rowLie_mul, rowLie_X_self, map_add (f := _), map_sum, map_sum]
+
+        rw [rowLie_mul, rowLie_X_self, map_add (f := _), map_sum, map_sum]
         simp only [Derivation.leibniz, smul_eq_mul, map_add (f := _), map_mul, eval_X, ← hP', h1, Finset.sum_add_distrib,
           pderiv_X]
         congr 1
@@ -105,14 +105,14 @@ theorem rowLie_mem_span_rowSub {J : Type} [Fintype J] (f : J → Pol ι m n) (τ
   have hs : ∀ x : J → Pol ι m n, φ x = ∑ j, (φ ∘ₗ LinearMap.single ℂ (fun _ : J => Pol ι m n) j) (x j) := by
     intro x
     conv_lhs => rw [← Finset.univ_sum_single x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]; rfl
+
+    rw [map_sum]; rfl
   choose Q hQ hQ' using fun j =>
     exists_poly_rowSubst_coef τ k l (f j) (φ ∘ₗ LinearMap.single ℂ (fun _ : J => Pol ι m n) j)
   have h0 : ∑ j, Q j = 0 := by
     refine GlobalTheory.Branching.eq_zero_of_vanish_unitaryGroup m _ fun u hu => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [← hQ]
     have hm : φ (fun j => rowSub n τ ⟨u, hu⟩ (f j)) ∈ (⊥ : Submodule ℂ ℂ) :=
       hφ0 ▸ Submodule.mem_map_of_mem (Submodule.subset_span ⟨⟨u, hu⟩, rfl⟩)
@@ -121,8 +121,8 @@ theorem rowLie_mem_span_rowSub {J : Type} [Fintype J] (f : J → Pol ι m n) (τ
   apply hφ
   rw [hs]
   simp only [hQ']
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_sum, h0, map_zero, map_zero]
+
+  rw [← map_sum, ← map_sum, h0, map_zero, map_zero]
 
 end RowLie
 

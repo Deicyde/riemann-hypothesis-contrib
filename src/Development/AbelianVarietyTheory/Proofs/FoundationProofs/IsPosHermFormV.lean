@@ -52,12 +52,12 @@ theorem _root_.GlobalTheory.UnitaryTheta.isPosHerm_formV (D : _root_.Formalism.B
     (N N' : ℕ) (h : 0 < _root_.Formalism.MainNotions.TaylorLogMetric.area T.abelian₂) :
     _root_.GlobalTheory.UnitaryTheta.IsPosHerm (_root_.GlobalTheory.UnitaryTheta.formV D T N N') := by
   refine ⟨fun z w => ?_, fun z hz => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [_root_.GlobalTheory.UnitaryTheta.formV, LinearMap.mk₂'ₛₗ_apply, _root_.Formalism.MainNotions.TaylorLogMetric.Hf, map_div₀, map_sum, map_mul,
-      Complex.conj_conj, Complex.conj_ofReal]
-      congr 1
-      refine Finset.sum_congr rfl fun τ _ => Finset.sum_congr rfl fun i _ =>
-        Finset.sum_congr rfl fun j _ => mul_comm _ _
+
+  · simp only [_root_.GlobalTheory.UnitaryTheta.formV, LinearMap.mk₂'ₛₗ_apply, _root_.Formalism.MainNotions.TaylorLogMetric.Hf, map_div₀, map_sum, map_mul,
+    Complex.conj_conj, Complex.conj_ofReal]
+    congr 1
+    refine Finset.sum_congr rfl fun τ _ => Finset.sum_congr rfl fun i _ =>
+      Finset.sum_congr rfl fun j _ => mul_comm _ _
   · have hsum : ∀ τ i j, z τ i j * conj (z τ i j) = ((Complex.normSq (z τ i j) : ℝ) : ℂ) :=
       fun τ i j => Complex.mul_conj _
     simp only [_root_.GlobalTheory.UnitaryTheta.formV, LinearMap.mk₂'ₛₗ_apply, _root_.Formalism.MainNotions.TaylorLogMetric.Hf, hsum]

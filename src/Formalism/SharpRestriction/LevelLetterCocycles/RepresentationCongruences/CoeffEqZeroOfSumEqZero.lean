@@ -35,9 +35,9 @@ theorem coeff_poly {D : ℕ} (a : Fin D → O) (n : ℕ) :
 theorem coe_poly {D : ℕ} (a : Fin D → O) :
     ((poly a : Polynomial O) : O⟦X⟧) = ∑ i : Fin D, C (a i) * X ^ (i : ℕ) := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Polynomial.coeff_coe, poly, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow,
-    map_sum, PowerSeries.coeff_C_mul_X_pow]
+
+  simp only [Polynomial.coeff_coe, poly, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow,
+  map_sum, PowerSeries.coeff_C_mul_X_pow]
 
 theorem degree_poly_lt {D : ℕ} (a : Fin D → O) : (poly a).degree < D :=
   Polynomial.degree_sum_fin_lt a

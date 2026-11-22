@@ -35,7 +35,7 @@ private theorem fg_image {A B : Type} [Group A] [TopologicalSpace A] [IsTopologi
     Subgroup.coe_map]
   exact image_closure_subset_closure_image hc ⟨a, ha, rfl⟩
 
-set_option maxHeartbeats 200000 in
+
 private theorem co_local {O R R' : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
     [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') : IsLocalHom f.toRingHom := by
   haveI := IsCO.toIsLocalRing O (R := R)

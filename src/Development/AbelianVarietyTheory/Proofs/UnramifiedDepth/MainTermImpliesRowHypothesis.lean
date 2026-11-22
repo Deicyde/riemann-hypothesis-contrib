@@ -60,8 +60,8 @@ theorem kill_hPullW {I : Fin 2 → Type} [∀ g, Fintype (I g)] {n0 n : ℕ} (hn
   rw [killCompl_subst _ _ (fun k => by simp)]
   congr 1
   funext w
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, map_sum, sum_castLE hn (fun b => killCompl (eps hn) (e' b w • X (Sum.inr b)))]
+
+  rw [map_add (f := _), map_sum, map_sum, sum_castLE hn (fun b => killCompl (eps hn) (e' b w • X (Sum.inr b)))]
   · simp only [map_smul, kill_inl, kill_inr]
   · intro b hb
     rw [map_smul, kill_inr_zero hn b hb, smul_zero]
@@ -69,14 +69,14 @@ theorem kill_hPullW {I : Fin 2 → Type} [∀ g, Fintype (I g)] {n0 n : ℕ} (hn
 theorem kill_mainM (V : VF C) (i : ℕ) {n0 n : ℕ} (hn : n0 ≤ n) (Φ : Fin n → Fin n0 → C) :
     killCompl (eps hn) (mainM V i Φ) = mainM V i (fun b c => Φ (Fin.castLE hn b) c) := by
   unfold mainM
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_smul, map_sum, sum_castLE hn]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sum, map_smul, map_mul, map_pow, kill_inl, kill_inr]
+
+  rw [map_smul, map_sum, sum_castLE hn]
+
+  · simp only [map_sum, map_smul, map_mul, map_pow, kill_inl, kill_inr]
   · intro b hb
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, map_mul, kill_inr_zero hn b hb, mul_zero, smul_zero,
-      Finset.sum_const_zero]
+
+    simp only [map_sum, map_smul, map_mul, kill_inr_zero hn b hb, mul_zero, smul_zero,
+    Finset.sum_const_zero]
 
 theorem sum_inl_eps {n0 n : ℕ} (hn : n0 ≤ n) (μ : Fin n0 ⊕ Fin n0 →₀ ℕ) :
     ∑ c, (Finsupp.embDomain (eps hn) μ) (Sum.inl c) = ∑ c, μ (Sum.inl c) :=
@@ -143,9 +143,9 @@ theorem rows_main (V : VF C) (i n0 : ℕ) :
         (X (Sum.inl (b, c)) ^ (V.l ^ i) * X (Sum.inr (b, c)) : MvPowerSeries (PVar n0) C)) := by
   unfold mainM
   refine Eq.trans (Finset.sum_congr rfl fun ρ _ => ?_) (Finset.smul_sum).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ite_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, if_true, map_smul, map_sum,
-    map_mul, map_pow, rename_X, neg_smul, one_smul, map_neg, Finset.sum_neg_distrib, smul_neg]
+
+  simp only [ite_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, if_true, map_smul, map_sum,
+  map_mul, map_pow, rename_X, neg_smul, one_smul, map_neg, Finset.sum_neg_distrib, smul_neg]
   rfl
 
 end GlobalTheory.MainToRows
@@ -175,16 +175,16 @@ theorem GlobalTheory.mainTerm_to_rowHypothesis :
     refine Finset.sum_congr rfl fun ρ _ => ?_
     rw [← map_add (f := _), hH, add_sub_cancel]
   · intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, le_add_iff, map_sum]
+
+    rw [h1, le_add_iff, map_sum]
     refine V.v.map_le_sum fun ρ _ => ?_
     rcases coeff_row ρ H m with h | ⟨μ, h, hL, hR, -⟩
     · rw [h, V.v.map_zero]; exact le_top
     · rw [h, hco, ← le_add_iff, hL, hR, ← sum_inl_eps hn, ← sum_inr_eps hn]
       exact hwt _
   · intro m hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum] at hm
+
+    rw [h1, map_sum] at hm
     obtain ⟨ρ, -, hρ⟩ := Finset.exists_ne_zero_of_sum_ne_zero hm
     rcases coeff_row ρ H m with h | ⟨μ, h, -, hR, -⟩
     · exact absurd h hρ

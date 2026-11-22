@@ -62,8 +62,8 @@ theorem charpoly_of_semilinear {F L A : Type} [Field F] [Field L] [CommRing A] [
   let v : Fin d → (Fin n → L) := fun i => ψ (b i)
   have hsum : ∀ c : Fin d → L, ∑ i, c i • v i = ψ (∑ i, e.symm (c i) • b i) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hψ, e.apply_symm_apply]
   have hli : LinearIndependent L v := by
@@ -75,8 +75,8 @@ theorem charpoly_of_semilinear {F L A : Type} [Field F] [Field L] [CommRing A] [
   have hsp : ⊤ ≤ Submodule.span L (Set.range v) := by
     intro x _
     obtain ⟨a, rfl⟩ := ψ.surjective x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr a, map_sum]
+
+    rw [← b.sum_repr a, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [hψ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -90,8 +90,8 @@ theorem charpoly_of_semilinear {F L A : Type} [Field F] [Field L] [CommRing A] [
       show g *ᵥ ψ (b j) = _
       rw [← hu]
       conv_lhs => rw [← b.sum_repr (u * b j)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [hψ, hb']
     rw [h1, b'.repr_sum_self]

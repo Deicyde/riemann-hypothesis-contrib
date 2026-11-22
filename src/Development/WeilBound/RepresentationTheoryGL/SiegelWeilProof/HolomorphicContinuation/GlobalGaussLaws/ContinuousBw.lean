@@ -29,12 +29,12 @@ open Classical
 
 variable {D : D7} {n m : ℕ}
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem compAt_add (θ : InfFam D) (τ : D.what₂.Tau) (a b : Mx D m n) :
     compAt θ τ (a + b) = compAt θ τ a + compAt θ τ b := by
   ext i j; simp only [compAt, Matrix.map_apply, Matrix.add_apply, RingHom.map_add (f := _)]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem finMap_add (a b : Mx D m n) : (a + b).map (finPart D) = a.map (finPart D) + b.map (finPart D) := by
   ext i j; simp only [Matrix.map_apply, Matrix.add_apply, RingHom.map_add (f := _)]
 

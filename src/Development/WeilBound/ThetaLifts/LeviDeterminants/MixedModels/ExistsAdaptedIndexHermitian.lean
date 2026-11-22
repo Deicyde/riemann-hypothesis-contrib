@@ -17,7 +17,7 @@ namespace PositivityTheory.Mix
 
 open Adapt
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_adapted_index_hermitian : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
     (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (r s r' s' : ℕ), B.IsGood σ → X.IsHerm σ B r s → W.IsSkew σ B r' s' →
     ∀ (n₁ : ℕ) (X₁ : Spc F E n₁) (H : Plane E n n₁) (j₀ j₁ : ℕ) (M₁ : Model σ X₁ W) (r₁ s₁ : ℕ), X₁.IsHerm σ B r₁ s₁ →
@@ -72,11 +72,11 @@ theorem exists_adapted_index_hermitian : ∀ (F E : Type) [Field F] [NumberField
   let p : Matrix (Fin n) (Fin d) (AE F E) → Fin d × Fin 2 → AF F := fun z k => βA.repr (b z k.1) k.2
   let q : Matrix (Fin n) (Fin d) (AE F E) → Fin d × Fin 2 → AF F := fun z k => -Tr (βA k.2 * D z k.1)
   have hpq : ∀ z z', p z ⬝ᵥ q z' = -Tr (b z ⬝ᵥ D z') := fun z z' => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, Fintype.sum_prod_type, map_sum, ← Finset.sum_neg_distrib]
+
+    simp only [dotProduct, Fintype.sum_prod_type, map_sum, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [← βA.sum_repr (b z k), Finset.sum_mul, map_sum, ← Finset.sum_neg_distrib]
+
+    conv_rhs => rw [← βA.sum_repr (b z k), Finset.sum_mul, map_sum, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [smul_mul_assoc, map_smul, smul_eq_mul, ← mul_neg]
   have hTr : ∀ z, Tr (cA σ z) = Tr z := GlobalTheory.VacCocycle.trace_conj (cA σ) (cA_cA hB)
@@ -118,8 +118,8 @@ theorem exists_adapted_index_hermitian : ∀ (F E : Type) [Field F] [NumberField
     have hy : b (incM F x) = fun k => inclR (F := F) (AF F) ((Q * x) (.inr 1) k) := by simp only [b, ← incM_mul]; rfl
     have hy' : D (incM F x) = fun k => inclR (F := F) (AF F) (∑ l, W.J k l * σ ((Q * x) (.inr 0) l)) := by
       funext k
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [D, ← incM_mul, map_sum, map_mul]
+
+      simp only [D, ← incM_mul, map_sum, map_mul]
       rfl
     refine ⟨glue ε (fun k => β.repr ((Q * x) (.inr 1) k.1) k.2) u,
       glue ε (fun k => -Algebra.trace F E (β k.2 * ∑ l, W.J k.1 l * σ ((Q * x) (.inr 0) l))) w, ?_⟩

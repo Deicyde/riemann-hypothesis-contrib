@@ -22,8 +22,8 @@ private theorem stage1_riesz (D : Formalism.BasicNotions.D7) (φ : (VS D).V →�
   have key : (VS D).hT (∑ j, star (φ ((VS D).frame j)) • bs j) = φ := by
     apply (VS D).frame.ext
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply]
+
+    rw [map_sum, LinearMap.sum_apply]
     have hs : ∀ j, (VS D).hT (star (φ ((VS D).frame j)) • bs j) ((VS D).frame i) =
         φ ((VS D).frame j) * (if i = j then 1 else 0) := by
       intro j

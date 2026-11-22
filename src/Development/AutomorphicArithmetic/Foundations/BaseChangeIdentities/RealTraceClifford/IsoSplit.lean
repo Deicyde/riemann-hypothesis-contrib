@@ -90,7 +90,7 @@ private theorem wt_comp (F : Fin n → Fin n → Module.End ℂ V) {S₁ S₂ : 
     exact ⟨sub_eq_zero.mp hz.1, sub_eq_zero.mp hz.2⟩
   exact ⟨fun a => (key a).1, fun a => (key a).2⟩
 
-set_option maxHeartbeats 200000 in
+
 private theorem hw_comp (F : Fin n → Fin n → Module.End ℂ V) {S₁ S₂ : Submodule ℂ V} (hd : Disjoint S₁ S₂)
     (s1 : Stb F S₁) (s2 : Stb F S₂) {μ : Wt n} {y₁ y₂ : V} (h₁ : y₁ ∈ S₁) (h₂ : y₂ ∈ S₂)
     (h : KHighest (fun _ => true) F μ (y₁ + y₂)) :

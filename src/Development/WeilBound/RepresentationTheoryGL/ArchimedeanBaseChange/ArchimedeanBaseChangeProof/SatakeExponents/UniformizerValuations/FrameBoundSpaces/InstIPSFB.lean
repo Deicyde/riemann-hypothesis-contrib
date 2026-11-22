@@ -13,7 +13,7 @@ open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.SpectralAccumulation
 open PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.Bc.ArchbcB.B
@@ -67,8 +67,8 @@ def ug : F.Γ → U.UGen E n
   | .inr (.inl x) => .inl (F.dval x)
   | .inr (.inr x) => .inr ⟨x.1.1, F.d.hU x.1.1 x.2.1⟩
 
-set_option synthInstance.maxHeartbeats 1000000 in
-set_option maxHeartbeats 2000000 in
+
+
 instance instIPS_FB (i : F₀.C.ι) : InnerProductSpace ℂ (F.B i).Hb := inferInstance
 instance instCS_FB (i : F₀.C.ι) : CompleteSpace (F.B i).Hb := inferInstance
 
@@ -81,8 +81,8 @@ structure Struct : Prop where
   βcomm : ∀ i x, Commute (F.β i).op (F.g x i).op ∧ Commute (F.β i).op (star (F.g x i).op)
 
 
-set_option synthInstance.maxHeartbeats 1000000 in
-set_option maxHeartbeats 2000000 in
+
+
 def toGenIn (hD : DiagAlg) (h : F.Struct) : GenIn π S T F₀.K F₀.W where
   ι := F₀.C.ι
   B := F.B

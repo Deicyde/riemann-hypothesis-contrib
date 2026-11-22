@@ -20,8 +20,8 @@ variable {F R : Type} [CommRing F] [CommRing R] {n : ℕ}
 private theorem mapd_mul (a : R →+* F) (d : R →+ F) (hd : ∀ y z, d (y * z) = a y * d z + d y * a z)
     (Y Z : Matrix (Fin n) (Fin n) R) : (Y * Z).map d = Y.map a * Z.map d + Y.map d * Z.map a := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.map_apply, Matrix.mul_apply, map_sum, hd, Finset.sum_add_distrib, Matrix.add_apply]
+
+  simp only [Matrix.map_apply, Matrix.mul_apply, map_sum, hd, Finset.sum_add_distrib, Matrix.add_apply]
 
 private def toDual (a : R →+* F) (d : R →+ F) (hd : ∀ y z, d (y * z) = a y * d z + d y * a z) (h1 : d 1 = 0) :
     R →+* DualNumber F where
@@ -189,7 +189,7 @@ private theorem locDual {F R H : Type} [Field F] [Infinite F] [CommRing R] [Grou
   simp only [h4, h5, mul_one, sub_self] at h2
   exact congrArg TrivSqZeroExt.snd h2
 
-set_option maxHeartbeats 400000 in
+
 private theorem selGen {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} (h : G.Hom G0) {n : ℕ} (x : NP G0.frame n)
     {e : ℕ} (u : G.G₀ → Matrix (Fin n) (Fin n) (DD x.Fr e)) (ψ : ∀ v, Fin n → L.Gv v →* (DD x.Fr e)ˣ)
     (hu : DefU h x u ψ) (d : DD x.Fr e →+ x.Fr) (hd : ∀ y z, d (y * z) = y.a * d z + d y * z.a)

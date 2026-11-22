@@ -108,7 +108,7 @@ private lemma mem_stab {G : Type} [Group G] (U : Subgroup G) (x g : G) :
   rw [mem_stabilizer_iff, MulAction.Quotient.smul_mk, QuotientGroup.eq, ← U.inv_mem_iff]
   simp [mul_assoc]
 
-set_option maxHeartbeats 800000 in
+
 theorem orbProd : OrbProd := by
   intro I G T _ _ Gv Tv _ _ K U C₀ C P Q ι ιv θ θv f fv δ hι hθ hf hinv hδ S hS hout
   classical

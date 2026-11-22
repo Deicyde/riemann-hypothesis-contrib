@@ -15,8 +15,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing Filter GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
@@ -27,7 +27,7 @@ open UpperTheory.V.Z.J.D
 open UpperTheory.V.Z.Desc.V0
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 private theorem ce_teich_ex (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O]
     [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l] :
     ∃ τ : ResidueField O →* O, ∀ x, residue O (τ x) = x := by
@@ -147,7 +147,7 @@ private theorem ce_cnt {M J : Type} [AddCommGroup M] [Module ℂ M] [Fintype J] 
       rw [h'', bot_inf_eq]
   rw [hsum, Nat.cast_sum, Finset.sum_congr rfl fun i _ => h6 i, ← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, ← hk,
     Nat.card_eq_fintype_card, Fintype.card_subtype]
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Z.Desc.V0.count_e_of_sph_same_at_same_bc_dims :
     UpperTheory.V.Z.J.D.WtEx → UpperTheory.V.Z.J.D.Decomp → ZDecE → UpperTheory.V.Z.J.D.ZEq → _root_.UpperTheory.V.Z.J.D.SphSameAlt → _root_.UpperTheory.V.Z.J.D.AtSameAlt → _root_.UpperTheory.V.Z.J.D.BcOfAlt → YDimE → UpperTheory.V.Z.J.D.CompsEx → UpperTheory.V.Z.J.D.Slope → _root_.UpperTheory.V.Z.J.D.Ord1Alt → UpperTheory.V.Z.J.D.EigPi → _root_.UpperTheory.V.Z.Desc.V0.CountEAlt := by
   intro hWt hDec hZD _ hSph hAt hBc hYD _ hSl hO1 hEP PH hM hCO l _ L Ω _ _ _ _ _ _ s n hn V hV h4 ι lam

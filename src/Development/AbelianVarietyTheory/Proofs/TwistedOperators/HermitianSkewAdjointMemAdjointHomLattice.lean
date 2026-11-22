@@ -12,7 +12,7 @@ open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK Mo
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 

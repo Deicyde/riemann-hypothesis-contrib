@@ -113,9 +113,9 @@ theorem exists_isUnit_det_toBlocks_add_mul {R : Type} [CommRing R] [IsLocalRing 
   have hm : (IsLocalRing.residue R).mapMatrix (H.toBlocks₁₁ + Matrix.of X * H.toBlocks₂₁) =
       Hb.toBlocks₁₁ + Xb * Hb.toBlocks₂₁ := by
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [RingHom.mapMatrix_apply, Matrix.mul_apply, map_sum, hX, hHb_def, Matrix.toBlocks₁₁,
-      Matrix.toBlocks₂₁]
+
+    simp [RingHom.mapMatrix_apply, Matrix.mul_apply, map_sum, hX, hHb_def, Matrix.toBlocks₁₁,
+    Matrix.toBlocks₂₁]
   rw [hm]
   exact hXb
 

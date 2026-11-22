@@ -104,8 +104,8 @@ theorem lift_swap {K : Type} [Field K] [Algebra K Ω] (j₀ : Fin (N + 1)) (x : 
     · subst hi
       simp [he, eS]
     · have hei : e i ≠ 0 := fun h' => hi (e.injective (h'.trans he.symm))
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [hi, hei, eS, map_sum, map_neg]
+
+      simp [hi, hei, eS, map_sum, map_neg]
   · rw [Pimg_succAbove, Pimg_succAbove, rename_X]
     rfl
 
@@ -133,8 +133,8 @@ theorem lift_transl {K : Type} [Field K] [Algebra K Ω] (j₀ : Fin (N + 1)) (x 
   rcases Fin.eq_self_or_eq_succAbove j₀ j with rfl | ⟨k, rfl⟩ <;> by_cases hi : i = 0
   · subst hi
     simp [Pimg_self, translS, blk, col, MvPolynomial.algebraMap_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp [Pimg_self, translS, blk, col, hi, map_sum, map_neg]
+
+  · simp [Pimg_self, translS, blk, col, hi, map_sum, map_neg]
   · subst hi
     simp [Pimg_succAbove, translS, blk, col, MvPolynomial.algebraMap_apply]
   · simp [Pimg_succAbove, translS, blk, col, hi]

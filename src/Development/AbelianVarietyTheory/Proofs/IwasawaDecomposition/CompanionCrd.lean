@@ -38,9 +38,9 @@ theorem std_of_gram (S : HSpace E) {m : ℕ} (h : S.rank = m) (hg : S.gram.reind
     have := congrFun (congrFun hg a) b
     simpa [HSpace.gram, Matrix.one_apply] using this
   conv_rhs => rw [← S.frame.sum_repr x, ← S.frame.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ₂, LinearMap.map_smul, LinearMap.sum_apply, hg',
-    smul_eq_mul, mul_ite, mul_one, mul_zero]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ₂, LinearMap.map_smul, LinearMap.sum_apply, hg',
+  smul_eq_mul, mul_ite, mul_one, mul_zero]
   simp [stdH, Crd.co, starRingEnd_apply]
 
 omit [NumberField E] in
@@ -88,7 +88,7 @@ end Gen
 end GlobalTheory.Mem.Col2.MemLat
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem GlobalTheory.Mem.Col2.TC.memLatAt_std : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (O : GL3Theta.LiftObj (I.rec7 l Z) ((I.rec7 l Z).mem u).C), (∀ i c, (O.lat i c).1 = ((I.stp u I.mu0 i).rep c).1.1.deco.1.N) → MemLatAt O (X.piT u) := by
   intro B X I hI hP l Z u O hlat
   obtain ⟨-, -, -, hsp⟩ := spaces_in_coordinates I hI hP l Z

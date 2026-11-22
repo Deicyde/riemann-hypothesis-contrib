@@ -76,9 +76,9 @@ theorem intS_lin {q : ℕ} (ω : Form (HS L N) q) (A : HS L N →L[ℝ] HS L N) 
   unfold intS
   congr 1
   ext t
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, map_add (f := _), map_sum, map_smul, map_sub,
-    Function.comp_def]
+
+  simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, map_add (f := _), map_sum, map_smul, map_sub,
+  Function.comp_def]
 
 section One
 

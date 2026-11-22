@@ -106,11 +106,11 @@ theorem good_transport {K K' G G' : Type} [Field K] [Field K'] [CharZero K] [Cha
     apply MonoidAlgebra.ext
     ext t
     apply σ'.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hX2', coeff_idemOf, Finset.sum_image fun a _ b _ h => hinj h, map_sum]
+
+    rw [hX2', coeff_idemOf, Finset.sum_image fun a _ b _ h => hinj h, map_sum]
     have := hX2 (e.symm t)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [coeff_idemOf, map_sum] at this
+
+    rw [coeff_idemOf, map_sum] at this
     rw [← hc (e.symm t), MulEquiv.apply_symm_apply] at this
     rw [← this]
     refine Finset.sum_congr rfl fun χ _ => ?_
@@ -151,7 +151,7 @@ end GlobalTheory.Mem.R3.DefLatBC
 namespace GlobalTheory.Mem.R3.DefLatBC
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem goodIdempotents_agree_extendedData {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwDat B} {T' : TwDat B'} {w : ColW B f T}
     {w' : ColW B' f' T'} {Z : w.Lt} {Z' : w'.Lt} {hX : B.fields.Ok} {hX' : B'.fields.Ok} {Wt : Set B.places.Pl}
     {Wt' : Set B'.places.Pl} (z : Dat (w.st Z) w.I hX T Wt) (z' : Dat (w'.st Z') w'.I hX' T' Wt')

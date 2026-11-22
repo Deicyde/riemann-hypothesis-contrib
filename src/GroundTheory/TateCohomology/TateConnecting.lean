@@ -205,7 +205,7 @@ variable (Q : ShortComplex (ShortComplex (Rep k G)))
 
 include hR₂ hC₂ in
 set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 800000 in
+
 theorem tδ_comp_tδ (p : ℤ) :
     tδ hC₃ p (p + 1) rfl ≫ tδ hR₁ (p + 1) (p + 1 + 1) rfl =
       -(tδ hR₃ p (p + 1) rfl ≫ tδ hC₁ (p + 1) (p + 1 + 1) rfl) := by

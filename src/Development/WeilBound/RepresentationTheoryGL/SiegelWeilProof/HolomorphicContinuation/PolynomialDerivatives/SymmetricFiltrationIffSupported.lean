@@ -234,8 +234,8 @@ theorem opL_pair (ε : Fin m → Bool) (c : ℝ) (hc : c ≠ 0) (a b : Fin m) :
 
 theorem symK_pair (ε : Fin m → Bool) (i j : Fin n) (a b : Fin m) : symK ε i j (pairSym (n := n) ε a b) = 0 := by
   unfold pairSym
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [Derivation.leibniz, smul_eq_mul]
   unfold vecVar covVar
   cases ha : ε a <;> cases hb : ε b <;>

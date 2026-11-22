@@ -147,8 +147,8 @@ theorem ggE_mem_eig {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgro
   obtain ⟨hone, hmul, -⟩ := hMk
   rw [gg_mem_eig]
   intro u0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ggE_apply, map_sum, Finset.smul_sum]
+
+  rw [ggE_apply, map_sum, Finset.smul_sum]
   refine Fintype.sum_equiv (Equiv.mulLeft u0) _ _ (fun u => ?_)
   simp only [Equiv.coe_mulLeft, Subgroup.coe_mul, mul_inv_rev]
   rw [map_smul, hmul _ (U.inv_mem u.2) _ (U.inv_mem u0.2), smul_smul, map_mul,
@@ -261,9 +261,9 @@ theorem lemmaGG_of (hSc : IdxScaleIn) : LemmaGG := by
       rw [Submodule.mem_bot]
       ext i
       have h1 : ggE ρ U ψ (ρ (rep i)⁻¹ (S f)) = (N : K) • (f i : Z) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [S, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
-          Submodule.subtype_apply, map_sum]
+
+        simp only [S, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
+        Submodule.subtype_apply, map_sum]
         rw [Finset.sum_congr rfl (fun j _ => hkey i j _ (f j).2)]
         simp
       rw [hf, map_zero, map_zero] at h1

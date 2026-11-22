@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsionFreeO
 
 open IsLocalRing Polynomial
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.integralClosureOverGenericFibre_hartogs : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] [IsNoetherianRing R],
     GlobalTheory.GoodEtale.Hart A R R →
     Function.Injective (algebraMap R (GlobalTheory.LocAcyc.GenFib A R)) →

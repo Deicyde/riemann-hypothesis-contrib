@@ -182,8 +182,8 @@ theorem oneAt : GlobalTheory.GapIn.Hyp → ∀ (k r : ℕ) (L : Formalism.MainNo
     intro T
     ext η
     conv_lhs => rw [← e.sum_repr' η]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [ContinuousLinearMap.sum_apply, map_sum]
+
+    simp [ContinuousLinearMap.sum_apply, map_sum]
   have hFe : ∀ g ∈ UH (Hpk k r), F g = ∑ i, ∑ j, coefF L (x i) (y i) (X i (e j)) (e j) g := by
     intro g hg
     rw [hF g hg]
@@ -212,8 +212,8 @@ theorem oneAt : GlobalTheory.GapIn.Hyp → ∀ (k r : ℕ) (L : Formalism.MainNo
   simp only [hc]
   rw [← Finset.sum_smul]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← e.sum_repr' (l' (y i)), map_sum, inner_sum]
+
+  conv_rhs => rw [← e.sum_repr' (l' (y i)), map_sum, inner_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, inner_smul_right, mul_comm]
 

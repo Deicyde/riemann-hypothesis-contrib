@@ -14,7 +14,7 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions
 
 open Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds Formalism.ZeroFreeDirichlet
 
-set_option maxHeartbeats 1000000 in
+
 theorem deuring_heilbronn_finish_turan : DHFinish2Of := by
   intro hTur hIneq hPrime
   obtain ⟨CT, a, hCT, ha, hT2⟩ := hTur

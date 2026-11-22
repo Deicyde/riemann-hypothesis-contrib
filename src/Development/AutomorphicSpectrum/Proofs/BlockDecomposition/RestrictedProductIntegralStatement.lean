@@ -19,7 +19,7 @@ open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.restricted_product_integral : ∀ {ι Γ : Type} [Group Γ] {Hl : ι → Type} [∀ i, Group (Hl i)] (p : ∀ i, Γ →* Hl i) (e : ∀ i, Hl i →* Γ) (K : Subgroup Γ) (KH V : ∀ i, Subgroup (Hl i))
     (f : ∀ i, Hl i → ℂ)
     (hpe : ∀ i m, p i (e i m) = m) (hpe' : ∀ i j m, i ≠ j → p j (e i m) = 1)

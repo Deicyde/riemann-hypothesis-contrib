@@ -55,9 +55,9 @@ theorem exists_valBar_ne_zero {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j 
   by_contra hc
   push Not at hc
   have := congrArg (finEmb F v τ) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_one, Finset.sum_eq_zero fun j _ => by
-    rw [map_mul, (Valuation.zero_iff _).1 (hc j), mul_zero]] at this
+
+  rw [map_sum, map_one, Finset.sum_eq_zero fun j _ => by
+  rw [map_mul, (Valuation.zero_iff _).1 (hc j), mul_zero]] at this
   exact zero_ne_one this
 
 theorem mem_intLoc_of_stable {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1) {c : Fv F v ⊗[F] E}
@@ -132,7 +132,7 @@ theorem smul_mem_latLoc_iff {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL
 end Local
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem smul_mem_latV_iff : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (Λ : GlobalTheory.FinPl.Lat V), Submodule.IsFullLattice D.host.E Λ → ∀ (v : GlobalTheory.FinPl.Pl D) (ε : Fin V.rank → D.host.E), ε ≠ 0 → ∀ (c : AE D) (s : Matrix (Fin V.rank) (Fin V.rank) (AE D)), IsUnit s → (∀ a ∈ GlobalTheory.FinPl.idAt D (· = v), (Matrix.mulVec (s) (fun i => c * (a * Formalism.L2.Theta.incA D (ε i))) ∈ GlobalTheory.FinPl.latV V Λ (· = v) ↔ Matrix.mulVec (s) (fun i => a * Formalism.L2.Theta.incA D (ε i)) ∈ GlobalTheory.FinPl.latV V Λ (· = v))) → ∀ y : Fin V.rank → AE D, (∀ i, y i ∈ GlobalTheory.FinPl.idAt D (· = v)) → (y ∈ GlobalTheory.FinPl.latV V Λ (· = v) ↔ c • y ∈ GlobalTheory.FinPl.latV V Λ (· = v)) := by
   intro D V Λ hΛ v ε hε c s hs h y hy
   have hfg : Λ.FG := by
@@ -153,8 +153,8 @@ theorem smul_mem_latV_iff : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (
       ← map_mul, inv_mul_cancel₀ hi, map_one]
   have hl' : (fun i => π (l i)) ⬝ᵥ (fun i => π (w i)) = 1 := by
     rw [← map_one π, ← hl]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_sum, map_mul]
+
+    simp only [dotProduct, map_sum, map_mul]
   have hsm : ∀ (a : AE D) (z : Fin V.rank → AE D), (fun i => π ((a • z) i)) = π a • fun i => π (z i) :=
     fun a z => funext fun i => map_mul π a (z i)
   rw [hπ y hy, hπ (c • y) fun i => Ideal.mul_mem_left _ _ (hy i), hsm]

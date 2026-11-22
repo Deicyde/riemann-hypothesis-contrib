@@ -16,6 +16,6 @@ open GlobalTheory.RegSch (ikS projS Lvl)
 open PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
 open GlobalTheory.CompanionTheory.ColumnSplitting
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.law_of_orbit_measure : Law := by
   first | exact @GlobalTheory.CompanionTheory.ColumnSplitting.LawPf.law | exact GlobalTheory.CompanionTheory.ColumnSplitting.LawPf.law | (intros; apply GlobalTheory.CompanionTheory.ColumnSplitting.LawPf.law <;> assumption)

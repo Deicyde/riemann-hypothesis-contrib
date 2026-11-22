@@ -16,8 +16,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 4000000
+
+
 
 variable {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}
 
@@ -100,7 +100,7 @@ local elab "exact_by_kernel " term:term : tactic =>
     | .ok false => throwError "expected{indentExpr target}\nbut the term has type{indentExpr actual}"
     | .error error => throwError (error.toMessageData (← getOptions))
 
-set_option maxHeartbeats 8000000 in
+
 def ysL : NExpRealS (datL x L).R (datL x L).cG (SL L l.rat) := by
   let Y : NExpRealS (datL x L).R (datL x L).cG (ratL L l.rat.S) := {
     fi := by with_unfolding_all exact (l.b.YS.fi :)

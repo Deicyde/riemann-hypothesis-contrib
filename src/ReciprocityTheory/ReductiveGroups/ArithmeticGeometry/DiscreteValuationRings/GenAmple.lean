@@ -56,7 +56,7 @@ lemma gm_pull_g' {Z : Scheme.{0}} {X : Scheme.{0}} (L : LB X) (f : Y ⟶ X) (r :
     (Set.mem_iInter.2 fun _ => ha) (Set.mem_iInter.2 fun _ => hb)).trans (by simp)
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor in
-set_option maxHeartbeats 1000000 in
+
 theorem flatIso_isGen (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) (hw : w.IsGen) {K : Type} [Fintype K] (ε : K → ℤ) :
     (flatIso L₁ L₂ f₁ f₂ w ε).IsGen := by
   have hP := (isGen_iff w).1 hw

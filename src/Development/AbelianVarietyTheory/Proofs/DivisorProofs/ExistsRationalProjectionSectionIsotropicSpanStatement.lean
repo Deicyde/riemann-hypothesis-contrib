@@ -11,7 +11,7 @@ open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.IndefR.DatumF
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_rational_projection_section_isotropicSpan : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
     (S : Submodule (AF F) ((κ → AF F) × (κ → AF F))),
     S ≤ Submodule.span (AF F) {s | s ∈ S ∧ ∃ y z : κ → F,

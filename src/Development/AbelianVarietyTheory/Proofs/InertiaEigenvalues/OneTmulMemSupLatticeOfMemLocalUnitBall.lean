@@ -14,8 +14,8 @@ open scoped TensorProduct
 
 set_option autoImplicit false
 noncomputable section
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.GeoTie
 

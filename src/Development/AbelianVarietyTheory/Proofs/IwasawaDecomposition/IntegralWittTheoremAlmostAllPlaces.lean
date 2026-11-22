@@ -47,8 +47,8 @@ theorem exists_isUnit_sub {O : Type} [CommRing O] (s : O →+* O) (hs : ∀ z, s
   obtain ⟨c, hc⟩ := Ideal.mem_span_range_iff_exists_fun.1 ((Ideal.eq_top_iff_one _).1 htop)
   have hc' : ∑ i, s (c i) * (D i * s (D i)) = 1 := by
     have := congrArg s hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hs, map_one] at this
+
+    simp only [map_sum, map_mul, hs, map_one] at this
     rw [← this]
     exact Finset.sum_congr rfl fun i _ => by ring
   obtain ⟨i, hi⟩ := hloc (fun i => (c i + s (c i)) * (D i * s (D i)))
@@ -71,8 +71,8 @@ theorem exists_unitary {A : Type} [CommRing A] {M : ℕ} (s : A →+* A) (hs : �
     exact Finset.sum_comm
   have hsym : ∀ p q : Fin M → A, s (Formalism.UG.hform s J p q) = Formalism.UG.hform s J q p := by
     intro p q
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Formalism.UG.hform, map_sum, map_mul, hs]
+
+    simp only [Formalism.UG.hform, map_sum, map_mul, hs]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     rw [hJ]; ring
@@ -102,9 +102,9 @@ theorem exists_unitary {A : Type} [CommRing A] {M : ℕ} (s : A →+* A) (hs : �
     exact Finset.sum_congr rfl fun k _ => by ring
   have hPJ : Formalism.UG.cT s P * J = J * P := by
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hP, hl, Formalism.UG.cT, Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.transpose_apply,
-      Matrix.map_apply, Matrix.vecMul, dotProduct, map_mul, map_sum, hs, hJ, Finset.mul_sum, Finset.sum_mul]
+
+    simp only [hP, hl, Formalism.UG.cT, Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.transpose_apply,
+    Matrix.map_apply, Matrix.vecMul, dotProduct, map_mul, map_sum, hs, hJ, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun k' _ => by ring
   have hcc : c * s c * (l ⬝ᵥ w) = c + s c := by
@@ -312,8 +312,8 @@ theorem witt_integral : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
   have hxx : Formalism.UG.hform (sigR (Fv F v) σ) (JR (Fv F v) J) (ratTup (F := F) (Fv F v) x 0)
       (ratTup (F := F) (Fv F v) x 0) = algebraMap (Fv F v) _ (algebraMap F (Fv F v) β) := by
     have e := congrArg (inclR (F := F) (Fv F v)) hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hE, Formalism.UG.hform, map_sum, map_mul] at e
+
+    simp only [hE, Formalism.UG.hform, map_sum, map_mul] at e
     refine Eq.trans e ?_
     rw [← IsScalarTower.algebraMap_apply]
     exact (Algebra.TensorProduct.includeRight : E →ₐ[F] Fv F v ⊗[F] E).commutes β

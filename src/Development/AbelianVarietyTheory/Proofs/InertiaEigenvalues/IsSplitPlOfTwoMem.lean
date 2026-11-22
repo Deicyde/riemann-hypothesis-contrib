@@ -27,9 +27,9 @@ theorem emb_hD (S : HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = sta
     τ (S.hD x x) = star (fun a => τ (S.frame.repr x a)) ⬝ᵥ
       (S.gram.map τ *ᵥ fun a => τ (S.frame.repr x a)) := by
   rw [HSpace.hD, hT_expand]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hτ, dotProduct, mulVec, Finset.mul_sum, Pi.star_apply, Matrix.map_apply,
-    mul_assoc]
+
+  simp only [map_sum, map_mul, hτ, dotProduct, mulVec, Finset.mul_sum, Pi.star_apply, Matrix.map_apply,
+  mul_assoc]
   rfl
 
 theorem denseRange_emb [_root_.NumberField.IsTotallyComplex E] (τ : E →+* ℂ) : DenseRange τ := by

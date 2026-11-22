@@ -14,8 +14,8 @@ open Formalism.AUTREP (GAf)
 open GlobalTheory.FormInner (frameEquiv)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.HwTransfer
 
@@ -47,9 +47,9 @@ theorem defect_map {S S' : Type} [CommRing S] [CommRing S'] (ψ : S →+* S') (�
     (τ : L →+* K) {ι : Type} [Fintype ι] (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K)
     (lam : Fin n → ℤ) (X Y : Matrix (Fin n) (Fin n) S) (i : ι) :
     ψ (defect φ c τ P v lam X Y i) = defect (ψ.comp φ) c τ P v lam (X.map ψ) (Y.map ψ) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [defect, map_sub, map_mul, map_prod, map_pow, map_sum, hom_eval₂, Matrix.map_apply,
-    RingHom.comp_apply]
+
+  simp only [defect, map_sub, map_mul, map_prod, map_pow, map_sum, hom_eval₂, Matrix.map_apply,
+  RingHom.comp_apply]
   rw [← evS_map]
   rfl
 
@@ -201,8 +201,8 @@ theorem GlobalTheory.hwAt_of_hwAtF : ∀ (L : Type) [Field L] [NumberField L] [I
     rw [← hspan]
     refine Submodule.span_le.2 ?_
     rintro _ ⟨w, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr w, map_sum]
+
+    rw [← b.sum_repr w, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [LinearMap.map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -214,12 +214,12 @@ theorem GlobalTheory.hwAt_of_hwAtF : ∀ (L : Type) [Field L] [NumberField L] [I
   · intro γ γ₀ hγ
     have h1 := hP γ γ₀ hγ
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.toMatrix_apply, Module.Basis.mk_apply, ← hint, ← b.sum_repr (ρ γ (b j)), map_sum]
+
+    rw [LinearMap.toMatrix_apply, Module.Basis.mk_apply, ← hint, ← b.sum_repr (ρ γ (b j)), map_sum]
     simp only [LinearMap.map_smulₛₗ]
     have hb' : ∀ k, ω (b k) = b' k := fun k => (Module.Basis.mk_apply hli hsp k).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hb', map_sum, map_smul, Module.Basis.repr_self]
+
+    simp only [hb', map_sum, map_smul, Module.Basis.repr_self]
     rw [Finsupp.finsetSum_apply]
     simp only [Finsupp.smul_apply, Finsupp.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero,
       Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]

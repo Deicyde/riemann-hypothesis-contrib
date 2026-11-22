@@ -314,7 +314,7 @@ theorem inj_N (hs : Function.Surjective (toO F)) (hcl : Closed1 F = ⊤) (c : To
   exact h2
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem surj_step (hcl : Closed1 F = ⊤) (τ : H1 F →ₗ[R] cechDeRhamTotalCocyclesOne F)
     (hτ : ∀ v, H1.mk F (cechDeRhamTotalCocyclesOne.fn F (τ v)) = v) (mu : Z1 F ⊗[R] Glob1 F →ₗ[R] A1 F)
     (hmu : ∀ (f : Z1 F) (w : Glob1 F) (T T' : C) (φ : T ⟶ T'), mu (f ⊗ₜ w) T T' φ = f.1 T T' φ • w.1 T')
@@ -369,7 +369,7 @@ theorem surj_step (hcl : Closed1 F = ⊤) (τ : H1 F →ₗ[R] cechDeRhamTotalCo
   rw [e3, map_add (f := _), map_add (f := _), map_add (f := _), e1, e2, add_zero, add_zero, add_comm]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem wedgeHyp_of (hproj : Module.Projective R (H1 F)) (hcl : Closed1 F = ⊤)
     (hs : Function.Surjective (toO F)) (hW : Wedge F) (halt : ∀ c, cupHyp F c c = 0)
     (mu : Z1 F ⊗[R] Glob1 F →ₗ[R] A1 F)

@@ -23,8 +23,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
 
-set_option maxHeartbeats 1600000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 noncomputable section
 
@@ -80,8 +80,8 @@ theorem mul_pow_of_mul_eq {e a w : R} (h : e * a = e * w) (n : ℕ) : e * a ^ n 
 theorem map_comp (c : R →+* R) (hc : ∀ x, c (c x) = x) (u v : ι → R) :
     c (comp s p (fun i => c (p i)) u v) = comp s p (fun i => c (p i)) (fun i => c (v i)) (fun i => c (u i)) := by
   unfold comp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_one, map_sum]
+
+  rw [map_add (f := _), map_one, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [map_add (f := _), map_mul, map_sub, map_one, hc]
@@ -186,8 +186,8 @@ theorem centralScalar : ∀ (D : D7) (V : HSp D) (Q : Finset (Pl D.host.E)) (es 
   · have : a - 1 = ∑ PP ∈ Q, (es PP * (incA D ((ϖ PP : D.host.E)⁻¹) - 1) +
       cA D (es PP) * (incA D (star (ϖ PP : D.host.E)) - 1)) := by rw [ha, add_sub_cancel_left]
     conv_rhs => rw [this]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← Finset.sum_add_distrib, Finset.sum_mul]
+
+    rw [map_sum, ← Finset.sum_add_distrib, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i hi => ?_
     rw [add_mul, mul_sub, mul_sub, ha', hp _ _ i hi, hq _ _ i hi]
     ring
@@ -201,8 +201,8 @@ theorem centralScalar : ∀ (D : D7) (V : HSp D) (Q : Finset (Pl D.host.E)) (es 
       simp only [comp, sub_self, mul_zero, zero_add]
     refine ⟨Units.mkOfMulEqOne _ _ hu, ?_, hv⟩
     change comp Q es (fun i => cA D (es i)) (fun _ => 1) (fun PP => incA D (star (ϖ PP : D.host.E)) ^ V.rank) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hv, hz, Matrix.det_diagonal, Finset.prod_const, Finset.card_univ, Fintype.card_fin, map_sum, Finset.sum_mul]
+
+    rw [hv, hz, Matrix.det_diagonal, Finset.prod_const, Finset.card_univ, Fintype.card_fin, map_sum, Finset.sum_mul]
     have : ∀ i ∈ Q, cA D (es i) * a ^ V.rank = cA D (es i) * incA D (star (ϖ i : D.host.E)) ^ V.rank :=
       fun i hi => mul_pow_of_mul_eq (hq _ _ i hi) _
     rw [Finset.sum_congr rfl this]

@@ -70,7 +70,7 @@ open GlobalTheory.Mem.Top.TwChar (plUnder RootIso FrobPick avoidPlaces subset_av
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 2000000
+
 
 namespace GlobalTheory.HeightCounting.Up
 

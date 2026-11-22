@@ -10,8 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CapCo
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.CuspRep
 

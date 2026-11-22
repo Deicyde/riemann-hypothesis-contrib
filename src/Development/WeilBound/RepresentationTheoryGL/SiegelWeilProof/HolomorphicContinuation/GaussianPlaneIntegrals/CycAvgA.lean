@@ -57,13 +57,13 @@ theorem subR_comp (v w : Matrix (Fin m) (Fin m) ℂ) : (subR (n := n) v).comp (s
   rintro ⟨a, i, _ | _⟩
   · set_option synthInstance.maxHeartbeats 100000 in
       simp only [AlgHom.comp_apply, subR_X_false, map_sum, map_mul, subR_C]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.mul_sum, Matrix.mul_apply, map_sum, Finset.sum_mul, ← mul_assoc, ← C_mul]
+
+    simp only [Finset.mul_sum, Matrix.mul_apply, map_sum, Finset.sum_mul, ← mul_assoc, ← C_mul]
     exact Finset.sum_comm
   · set_option synthInstance.maxHeartbeats 100000 in
       simp only [AlgHom.comp_apply, subR_X_true, map_sum, map_mul, subR_C]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.mul_sum, Matrix.mul_apply, star_sum, star_mul', map_sum, Finset.sum_mul, ← mul_assoc, ← C_mul]
+
+    simp only [Finset.mul_sum, Matrix.mul_apply, star_sum, star_mul', map_sum, Finset.sum_mul, ← mul_assoc, ← C_mul]
     exact Finset.sum_comm
 
 theorem subR_subR (v w : Matrix (Fin m) (Fin m) ℂ) (P : PX m n) : subR v (subR w P) = subR (w * v) P := by

@@ -269,8 +269,8 @@ theorem zhat_vc (Zd : LocDat D) (p : PlF D) (γ : TermDef.Term D u u' F0 what₂
   ext a b
   rw [Matrix.mul_apply]
   simp only [tLoc]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [zhat_loc, Matrix.mul_apply, map_sum, Finset.mul_sum]
+
+  rw [zhat_loc, Matrix.mul_apply, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [zhat_locF', vc, Matrix.of_apply, map_mul (D.s.atP p).ιE]
   linear_combination (-((TermLoc.sgnP' D p b * frFac Zd.δ p b) *

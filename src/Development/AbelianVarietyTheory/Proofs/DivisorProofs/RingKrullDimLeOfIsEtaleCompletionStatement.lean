@@ -16,6 +16,6 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ringKrullDim_le_of_isEtaleCompletion' : ∀ (O A : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [CommRing A] [IsLocalRing A] [IsNoetherianRing A] (ψ : O →+* A) [IsLocalHom ψ], IsEtaleCompletion ψ → ringKrullDim A ≤ ringKrullDim O := by
   first | exact @GlobalTheory.ringKrullDim_le_of_isEtaleCompletion | exact GlobalTheory.ringKrullDim_le_of_isEtaleCompletion | (intros; apply GlobalTheory.ringKrullDim_le_of_isEtaleCompletion <;> assumption)

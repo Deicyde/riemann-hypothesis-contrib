@@ -100,8 +100,8 @@ theorem exists_sec (θ : InfFam D) (hθ : IsInfFam θ) (τ : D.what₂.Tau) (m n
     intro τ' u
     rw [e]
     simp only [S]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [map_sum, map_add (f := _)]
+
+    simp_rw [map_sum, map_add (f := _)]
     simp_rw [← e, (hL _).2.2]
     split_ifs with h
     · ext a' i'
@@ -114,8 +114,8 @@ theorem exists_sec (θ : InfFam D) (hθ : IsInfFam θ) (τ : D.what₂.Tau) (m n
     intro u
     rw [ef]
     simp only [S]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [map_sum, map_add (f := _)]
+
+    simp_rw [map_sum, map_add (f := _)]
     simp_rw [← ef, (hL _).2.1]
     simp
   refine ⟨S, fun x u => ?_, fun x u τ' h => ?_, fun x u => ?_⟩

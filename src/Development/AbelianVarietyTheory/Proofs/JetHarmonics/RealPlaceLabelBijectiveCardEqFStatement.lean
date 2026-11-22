@@ -11,6 +11,6 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.realPlaceLabel_bijective_card_eq_f : ∀ (D : D7), Function.Bijective (plOf D) ∧ Fintype.card D.what₂.Tau = D.R.f := by
   first | exact @GlobalTheory.RunDepth.plOf_bijective_card | exact GlobalTheory.RunDepth.plOf_bijective_card | (intros; apply GlobalTheory.RunDepth.plOf_bijective_card <;> assumption)

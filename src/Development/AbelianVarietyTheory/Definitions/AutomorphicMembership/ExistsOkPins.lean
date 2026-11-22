@@ -65,8 +65,8 @@ end Gen
 theorem ipC_herm (l : I.Laws) (u : B.Word) (x y) :
     starRingEnd ℂ (((I.cols l).fm u).ipC 0 y x) = ((I.cols l).fm u).ipC 0 x y := by
   unfold MemberForms.ipC
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [map_mul]
   congr 1

@@ -51,7 +51,7 @@ theorem val_lt_one_iff {v : HeightOneSpectrum (𝓞 D.host.F)} (x : Fv D.host.F 
   rw [← not_le, ← not_le, h]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem redFn_entry_eq_zero_iff {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)} {g : GA D V}
     (hS : Lev.finE V g ∈ St β) {v : HeightOneSpectrum (𝓞 D.host.F)} {φ : SplitProj D v} {PP : Pl D.host.E}
     (hφ : IsProjAt φ PP) (a b : Fin V.rank) :

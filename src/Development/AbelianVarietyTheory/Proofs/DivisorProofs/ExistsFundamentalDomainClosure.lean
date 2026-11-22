@@ -104,7 +104,7 @@ theorem countable_ratU (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n
   apply Subtype.ext; apply Subtype.ext
   rw [← hf x, ← hf y, hxy]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem measurable_mul_left (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (g : UA σ J) :
     Measurable (g * ·) := by
   haveI : BorelSpace (UA σ J) := ⟨rfl⟩

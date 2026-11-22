@@ -299,8 +299,8 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
   have hgx : ∀ x, g x = ∑ j, b'.repr x (Fin.natAdd _ j) • famQ j := by
     intro x
     conv_lhs => rw [hsplit x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum, map_sum]
+
+    rw [map_add (f := _), map_sum, map_sum]
     simp [famQ, hg0]
   have happ : ∀ c : Fin (finrank K U) → K, ∑ l, c l • b' (Fin.natAdd _ l) =
       ∑ p, (Fin.append (0 : Fin (finrank K W) → K) c p) • b' p := by
@@ -311,8 +311,8 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
     rw [Fintype.linearIndependent_iff]
     intro c hc j
     have hz : ∑ l, c l • b' (Fin.natAdd _ l) ∈ W := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hker, map_sum]
+
+      rw [← hker, map_sum]
       simpa [famQ] using hc
     have hrep : b'.repr (∑ l, c l • b' (Fin.natAdd _ l)) (Fin.natAdd _ j) = c j := by
       rw [happ, b'.repr_sum_self]
@@ -376,8 +376,8 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
         · simp only [Fin.append_right]
           exact hy j
       · show g _ = y
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         simp only [map_smul]
         conv_rhs => rw [← bQ.sum_repr y]
         simp only [hbQ, famQ]

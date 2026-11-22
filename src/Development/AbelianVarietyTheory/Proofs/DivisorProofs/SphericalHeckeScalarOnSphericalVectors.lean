@@ -112,8 +112,8 @@ theorem abs_scalar (ρ : G →* Module.End ℂ M) (S : Submodule ℂ M) (hS : �
   have hRF : ∀ a ∈ Loc, ∀ x ∈ F, ∑ γ ∈ R a, ρ γ x ∈ F := by
     intro a ha x hx
     refine ⟨S.sum_mem fun γ _ => hS γ x hx.1, fun k hk => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     have := (hR a ha).sum_eq (hR a ha) hk (fun g => ρ g x)
       (fun y l hl => by rw [map_mul, Module.End.mul_apply, hx.2 l hl])
     simpa only [map_mul, Module.End.mul_apply] using this
@@ -269,8 +269,8 @@ theorem extendByZeroThroughUnitaryFrame_hecke (Q : principalLevelFrame.RowPsi V 
     (x : Formalism.AUTREP.GAf D.host.E n → ℂ) :
     ext0 Q (principalLevelFrame.Hecke₃ Q R x) = ∑ γ ∈ R, rtA V γ (ext0 Q x) := by
   unfold principalLevelFrame.Hecke₃
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [principalLevelFrame.heckeG_apply, map_sum]
+
+  rw [principalLevelFrame.heckeG_apply, map_sum]
   refine Finset.sum_congr rfl fun γ hγ => ?_
   obtain ⟨y, rfl⟩ := hR γ hγ
   rw [pre_psi, extendByZeroThroughUnitaryFrame_right_translate]
@@ -446,8 +446,8 @@ theorem spherical_scalar : ∀ {D : D7} {V : HSp D} {n : ℕ} (hF : D.host.F = m
         exact hopfix _ x hx.2
     ·
       intro b hb x _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hTB, hTB, map_sum]
+
+      rw [hTB, hTB, map_sum]
       refine Finset.sum_congr rfl fun γ hγ => ?_
       rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
       congr 2

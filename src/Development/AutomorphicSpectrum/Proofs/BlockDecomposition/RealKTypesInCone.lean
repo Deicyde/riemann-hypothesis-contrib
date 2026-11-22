@@ -151,15 +151,15 @@ theorem epow_sumF (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin 
   | succ m ih =>
     simp only [epow, ih, sumF]
     simp only [← map_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     exact congrArg dsum (Prod.ext (by simp [Prod.fst_sum]) (by simp [Prod.snd_sum]))
 
 theorem gelA_sumF (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin n → Module.End ℂ W) (m : ℕ) :
     gelA (sumF E F) m = dsum (gelA E m, gelA F m) := by
   simp only [gelA, epow_sumF]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum]
+
+  rw [← map_sum]
   exact congrArg dsum (Prod.ext (by simp [Prod.fst_sum]) (by simp [Prod.snd_sum]))
 
 theorem barF_sumF (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin n → Module.End ℂ W) :

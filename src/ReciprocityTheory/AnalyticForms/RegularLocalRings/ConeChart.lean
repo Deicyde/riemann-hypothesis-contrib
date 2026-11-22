@@ -47,7 +47,7 @@ theorem ringKrullDim_locAt_chart_le {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
   exact ⟨Ideal.Quotient.mk _ a, rfl⟩
 
 
-set_option maxHeartbeats 600000 in
+
 theorem le_ringKrullDim_locAt_chart {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (e : ℕ)
     (hdim : ∀ Q ∈ P.minimalPrimes,
       ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ Q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞))
@@ -146,7 +146,7 @@ theorem ringKrullDim_locAt_chart (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (hP
   le_antisymm (ringKrullDim_locAt_chart_le hP e hdim p z hz) (le_ringKrullDim_locAt_chart e hdim p z hz)
 
 
-set_option maxHeartbeats 400000 in
+
 theorem isRegularLocalRing_locAt_chart (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (e : ℕ)
     (hdim : ∀ Q ∈ P.minimalPrimes,
       ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ Q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞))
@@ -219,8 +219,8 @@ theorem isRegularLocalRing_locAt_chart (P : Ideal (MvPolynomial (Σ k, ι k) ℂ
       · intro k' hk'
         simp [blockWt, hk']
     have h := congrArg (eval z) hw.sum_weight_X_mul_pderiv
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [hlam, grad, map_sum, nsmul_eq_mul, mul_assoc, hz _ (hGI i)] using h
+
+    simpa [hlam, grad, map_sum, nsmul_eq_mul, mul_assoc, hz _ (hGI i)] using h
   have hlamX : ∀ k k', lam k (grad (X ⟨k', p k'⟩ - 1)) = if k' = k then 1 else 0 := by
     intro k k'
     rw [hlam, Finset.sum_eq_single ⟨k', p k'⟩]
@@ -236,10 +236,10 @@ theorem isRegularLocalRing_locAt_chart (P : Ideal (MvPolynomial (Σ k, ι k) ℂ
     have hK : ∀ k, g (Sum.inr k) = 0 := by
       intro k
       have h := congrArg (lam k) hg
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_add (f := _), map_sum, map_smul, map_zero, smul_eq_mul, v, Sum.elim_inl, Sum.elim_inr,
-        hlamG, hlamX, mul_zero, Finset.sum_const_zero, zero_add, mul_ite, mul_one,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
+
+      simp only [map_add (f := _), map_sum, map_smul, map_zero, smul_eq_mul, v, Sum.elim_inl, Sum.elim_inr,
+      hlamG, hlamX, mul_zero, Finset.sum_const_zero, zero_add, mul_ite, mul_one,
+      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
       exact h
     have hg2 : ∑ i, g (Sum.inl i) • grad (G (a i)) = 0 := by
       simpa only [v, Sum.elim_inl, Sum.elim_inr, hK, zero_smul, Finset.sum_const_zero, add_zero]

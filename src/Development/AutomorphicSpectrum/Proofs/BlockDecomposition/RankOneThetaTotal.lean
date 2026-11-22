@@ -98,7 +98,7 @@ theorem gram_rank_one_eq_one : gA (V1 D) = (1 : Mx D (V1 D).rank (V1 D).rank) :=
   rw [gram_rank_one_one]
   exact Matrix.map_one _ (map_zero _) (map_one _)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem incA_algebraMap (c : D.host.F) :
     incA D (algebraMap D.host.F D.host.E c) = (algebraMap D.host.F (AF D.host.F) c) • (1 : AE D) := by
   show (1 : AF D.host.F) ⊗ₜ[D.host.F] (algebraMap D.host.F D.host.E c) =

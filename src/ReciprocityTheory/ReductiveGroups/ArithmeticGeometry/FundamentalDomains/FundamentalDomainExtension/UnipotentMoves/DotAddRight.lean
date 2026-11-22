@@ -21,8 +21,8 @@ lemma dot_add_right {n : ℕ} (u w w' : Fin n → ℂ) : dot u (w + w') = dot u 
   simp only [dot, Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
 
 lemma conj_dot {n : ℕ} (u w : Fin n → ℂ) : conj (dot u w) = dot w u := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dot, map_sum, map_mul, Complex.conj_conj]
+
+  simp only [dot, map_sum, map_mul, Complex.conj_conj]
   exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
 
 lemma re_dot_comm {n : ℕ} (u w : Fin n → ℂ) : (dot u w).re = (dot w u).re := by
@@ -43,9 +43,9 @@ lemma nsq_add {n : ℕ} (u w : Fin n → ℂ) : nsq (u + w) = nsq u + nsq w + 2 
 
 lemma dot_adj {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℂ) (a : Fin n → ℂ) (b : Fin m → ℂ) :
     dot (A *ᵥ a) b = dot a (Aᴴ *ᵥ b) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dot, Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply, map_sum, map_mul,
-    Finset.sum_mul, Finset.mul_sum]
+
+  simp only [dot, Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply, map_sum, map_mul,
+  Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   simp only [RCLike.star_def, Complex.conj_conj]
@@ -144,8 +144,8 @@ lemma hermC_ortho {x : Frame X.Ψ r} (ho : X.IsOrtho x) (τ : X.Ψ) (u w : Fin r
   have hlin : ∀ U : Fin r → ℂ, hermC τ.1 X.Gm U (mat x τ *ᵥ w) =
       ∑ b, conj (w b) * hermC τ.1 X.Gm U (col (mat x τ) b) := by
     intro U
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hermC, col, Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum]
+
+    simp only [hermC, col, Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum]
     rw [sum_three_rotate]
     refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun i _ =>
       Finset.sum_congr rfl fun j _ => ?_

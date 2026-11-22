@@ -51,7 +51,7 @@ theorem finrank_of_card {F V : Type} [Field F] [Finite F] [AddCommGroup V] [Modu
   exact (Nat.pow_right_injective h1 h2).symm
 
 
-set_option maxHeartbeats 800000 in
+
 theorem finrank_red {E : Type} [Field E] [NumberField E] {n : ℕ} (N : Submodule (𝓞 E) (Fin n → E))
     (hN : Submodule.IsFullLattice E N) (P : HeightOneSpectrum (𝓞 E)) :
     Module.finrank (Res P) (TDat.Red N P) = n := by
@@ -68,7 +68,7 @@ theorem finrank_red {E : Type} [Field E] [NumberField E] {n : ℕ} (N : Submodul
   exact finrank_of_card (F := Res P) h
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem ranks : ∀ {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K] {n : ℕ} {S : GStep E K n} {ST : Finset (HeightOneSpectrum (𝓞 E))} (A : TDat S ST) (T : ℕ), S.Ok → A.Ok T → (∀ P c, Module.finrank (Res P.1) (A.lv P c) = n) ∧ ∀ P c, Module.finrank (Res P.1) (A.lk P c) = n := by
   intro E K _ _ _ _ n S ST A T _ h
   exact ⟨fun P c => finrank_red _ (h.N_lat c.1 (S.rep c)) P.1,

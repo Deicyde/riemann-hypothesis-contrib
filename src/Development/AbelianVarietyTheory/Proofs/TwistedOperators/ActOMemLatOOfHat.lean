@@ -23,8 +23,8 @@ theorem idemSum_mul_eq_zero {P P' : Finset (Pl D.host.E)} {e e' : AE D} (he : Is
     (hPP : ∀ w ∈ P, ∀ w' ∈ P', w ≠ w' ∧ ¬ Formalism.IndefR.Lev.IsConjPl (D := D) w w') : e * (e' + cA D e') = 0 := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
   obtain ⟨⟨es', hes', rfl⟩, -⟩ := he'
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Finset.sum_add_distrib, Finset.mul_sum]
+
+  rw [map_sum, ← Finset.sum_add_distrib, Finset.mul_sum]
   refine Finset.sum_eq_zero fun w' hw' => ?_
   rw [Finset.sum_mul]
   refine Finset.sum_eq_zero fun w hw => ?_
@@ -72,8 +72,8 @@ namespace GlobalTheory.StdHalfLat
 
 open Matrix
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 variable {D : D7}
 
@@ -131,8 +131,8 @@ namespace GlobalTheory.StdHalfLat
 
 open Matrix
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 theorem hat_moves {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {U : Set T} (N : Std G U)
     {X : Node} (hX : DefNode D.R.m X) :
@@ -164,8 +164,8 @@ namespace GlobalTheory.LastVertexMove
 
 open GlobalTheory.StdHalfLat
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 theorem isSBHalf_stdLat : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil} {U : Set T}
     (S : GridChoice W U) {t : T}, t ∈ U → ∀ {p : Pair T}, DefPair D.R.m p → ∀ d : FinDatum G t p,

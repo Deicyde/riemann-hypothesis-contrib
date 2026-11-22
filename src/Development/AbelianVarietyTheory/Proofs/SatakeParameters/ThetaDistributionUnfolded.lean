@@ -98,9 +98,9 @@ theorem liftL_subD (h : a ≤ b) {β : ι → Matrix (Fin b) (Fin b) K} (hβ : I
     apply MvPolynomial.algHom_ext
     rintro ⟨τ, α, s⟩
     have hs : s.1 < b := lt_of_lt_of_le s.2 h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, subD, colSub, aeval_X, dif_pos hs, map_sum, map_mul, liftL, Sum.elim_inl, Sum.elim_inr, rename_X,
-      algHom_C, algebraMap_eq]
+
+    simp only [AlgHom.comp_apply, subD, colSub, aeval_X, dif_pos hs, map_sum, map_mul, liftL, Sum.elim_inl, Sum.elim_inr, rename_X,
+    algHom_C, algebraMap_eq]
     have h1 : ∀ r : Fin a, (r : ℕ) < b := fun r => lt_of_lt_of_le r.2 h
     simp only [dif_pos (h1 _)]
     simp only [Finset.sum_mul, Finset.mul_sum]
@@ -320,8 +320,8 @@ theorem colSc_hom {ν : Fin n → ℕ} {F : MvPolynomial (Fin r × Fin n) K} (hF
   classical
   conv_lhs => rw [F.as_sum]
   conv_rhs => rw [F.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.smul_sum]
+
+  rw [map_sum, Finset.smul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   rw [colSc_monomial]
   congr 2
@@ -357,8 +357,8 @@ theorem colOne_eq (β : Matrix (Fin n) (Fin n) K) (hβ : ∀ w s, s < w → β w
   simp only [colOne, colSc, colAddS, AlgHom.comp_apply, aeval_X]
   split_ifs with h
   · rw [sum_split t _ fun w hw => by rw [hβ w t hw, C_0, zero_mul]]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), aeval_X, if_pos h, map_sum]
+
+    rw [map_add (f := _), aeval_X, if_pos h, map_sum]
     congr 1
     · obtain ⟨a, s⟩ := v
       simp only at h
@@ -386,8 +386,8 @@ theorem colSub1_cut (β : Matrix (Fin n) (Fin n) K) (t : Fin n) (hid : ∀ s, s 
   simp only [colSub1, colOne, AlgHom.comp_apply, aeval_X]
   split_ifs with h
   · subst h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [map_mul, algHom_C, aeval_X]
     by_cases hw : s < w

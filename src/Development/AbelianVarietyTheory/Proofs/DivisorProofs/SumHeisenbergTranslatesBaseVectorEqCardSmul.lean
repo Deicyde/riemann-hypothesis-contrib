@@ -14,8 +14,8 @@ open Formalism.IndefR.Fin Formalism.IndefR.Fin.LevelGroupLemmas
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.HeisTranslSum
 
@@ -45,8 +45,8 @@ theorem half_duality {D : D7} {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar 
     rw [Finset.mul_sum, Finset.sum_congr rfl hmul, ← hsum]
   have hc1 : cA D e * cA D e = cA D e := by rw [← RingHom.map_mul, he1]
   have hinf : infPart D e = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum]
+
+    rw [hsum, map_sum]
     exact Finset.sum_eq_zero fun P hP => GlobalTheory.SplitScalar.infPart_splitIdem (hes P hP).1
   have hfin : x.map (infPart D) = 0 := by
     ext i j
@@ -68,8 +68,8 @@ theorem sum_heisO_base_eq : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStd
       Tm (fun t => ψ (symplO S T t u) * halfInd e (latAll S T ΛS ΛT) t) := by
     intro u hu
     rw [← hvac, hM.modul _ hSB u (hRr u hu).2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_congr rfl h1, ← map_sum, ← map_smul]
+
+  rw [Finset.sum_congr rfl h1, ← map_sum, ← map_smul]
   congr 1
   funext t
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]

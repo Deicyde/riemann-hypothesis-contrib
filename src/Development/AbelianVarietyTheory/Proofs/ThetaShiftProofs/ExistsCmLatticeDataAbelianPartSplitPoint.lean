@@ -293,8 +293,8 @@ theorem apply_eq_zero {g g' : ℕ} {M : Type} (ty : Fin g → (E →+* ℂ)) (ty
     exact mul_right_cancel₀ h h3
   have h4 : ∀ w : Fin g → ℂ, π w i = ∑ j, w j * π (Pi.single j 1) i := fun w => by
     conv_lhs => rw [pi_eq_sum_univ' w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finset.sum_apply]
+
+    simp [map_sum, Finset.sum_apply]
   have h5 : π z i = c * π t i := by
     rw [h4, h4 t, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -382,8 +382,8 @@ theorem exists_cmLat (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) {
         · refine Finset.sum_congr rfl fun j _ => ?_
           funext k; simp; ring
       have h6 := congrArg L h5
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_nsmul, hLv, map_add (f := _), map_smul, hL, smul_zero, zero_add, map_sum] at h6
+
+      rw [map_nsmul, hLv, map_add (f := _), map_smul, hL, smul_zero, zero_add, map_sum] at h6
       refine h6.trans (Finset.sum_congr rfl fun j _ => ?_)
       rw [map_nsmul, map_nsmul, hf]
       simp only [LinearEquiv.apply_symm_apply]

@@ -83,12 +83,12 @@ theorem exists_comb {V F κ : Type} [CommRing V] [Field F] [Finite κ] (φ : V �
     obtain ⟨b, hb⟩ := (Submodule.mem_span_range_iff_exists_fun V).1 hm
     refine ⟨b, fun e he => ?_⟩
     have h2 : JetSer.toJet n (∑ i, b i • gi i) = JetSer.toJet n (MvPowerSeries.monomial m (1 : V)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hb, ← JetSer.toJetHom_apply, map_sum]
+
+      rw [← hb, ← JetSer.toJetHom_apply, map_sum]
       exact Finset.sum_congr rfl fun i _ => by rw [map_smul, JetSer.toJetHom_apply]
     have h3 := (JetSer.toJet_eq_iff n _ _).1 h2 e (by omega)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [MvPowerSeries.coeff_monomial, map_sum] at h3
+
+    rw [MvPowerSeries.coeff_monomial, map_sum] at h3
     simpa using h3
   choose b hb using h
   let S := (Finsupp.finite_of_degree_le (σ := κ) n).toFinset
@@ -108,8 +108,8 @@ theorem exists_comb {V F κ : Type} [CommRing V] [Field F] [Finite κ] (φ : V �
         if mo = m then MvPowerSeries.coeff m g else 0 := by
       intro m _
       simp only [_root_.mul_assoc, ← map_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Finset.mul_sum, ← map_sum, hb m mo hmo]
+
+      rw [← Finset.mul_sum, ← map_sum, hb m mo hmo]
       split_ifs <;> simp
     rw [Finset.sum_congr rfl this, Finset.sum_ite_eq, if_pos]
     simpa [S] using hmo
@@ -268,9 +268,9 @@ theorem jets : Laws → Laws4 → TwistBCSpanStatement → JetSer.JetAlgSt → J
     have e1 : ∀ i, JetSer.toJet n (S i * (w⁻¹).val) = ψ (a i) * (ψ u'.val * JetSer.toJetHom V _ n (w⁻¹).val) := fun i => by
       rw [← JetSer.toJetHom_apply, map_mul, JetSer.toJetHom_apply n (S i), hSa, map_mul, _root_.mul_assoc]
     simp only [e1, ← smul_mul_assoc, ← map_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_mul, ← map_sum, hc, ← _root_.mul_assoc, ← map_mul, Units.inv_mul_cancel_right, ht',
-      _root_.mul_assoc, ← map_mul, Units.mul_inv, map_one, _root_.mul_one]
+
+    rw [← Finset.sum_mul, ← map_sum, hc, ← _root_.mul_assoc, ← map_mul, Units.inv_mul_cancel_right, ht',
+    _root_.mul_assoc, ← map_mul, Units.mul_inv, map_one, _root_.mul_one]
   have hθ := fun i => (hΦ i).elim fun Φ hΦ' =>
     FamBaseChange.main hL.globalFns V (maximalIdeal V) y.P.D q Φ (f i) hΦ' F
   choose θ hθ using hθ

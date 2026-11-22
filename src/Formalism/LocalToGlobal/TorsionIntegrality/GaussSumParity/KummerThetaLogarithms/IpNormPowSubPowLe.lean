@@ -111,8 +111,8 @@ theorem ip_map_lgF {K : Type} [Field K] (l : ℕ) (φ : K →+* K) :
   ext n
   rw [PowerSeries.coeff_map]
   unfold lgF
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PowerSeries.coeff_mk, map_sum]
+
+  rw [PowerSeries.coeff_mk, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   split_ifs
   · rw [map_inv₀, map_pow, map_natCast]

@@ -11,7 +11,7 @@ public import GroundTheory.AutomorphicForms.AutomorphicFormSpaces.GKStable
 
 open NumberField GlobalTheory.CuspRep GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 open scoped NumberField.AdeleRing
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.arch_lie_derivative_exists : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (φ : Sm E a) (hs : φ.1 ∈ AutomorphicForm.archSmooth E a), IsAutForm φ → (∀ [MeasurableSpace (AutomorphicForm.archGroup E a)] [BorelSpace (AutomorphicForm.archGroup E a)]
     (μ : MeasureTheory.Measure (AutomorphicForm.archGroup E a)) [μ.IsHaarMeasure]
     (k : ℕ) (J : Fin k → Fin (CuspidalSpectrum.archDim E a)),

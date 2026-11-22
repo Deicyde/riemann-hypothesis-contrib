@@ -147,7 +147,7 @@ theorem eq_of_half {ε : AE D} {g k : GA D B} (g1 : SuppAt ε B g) (k1 : SuppAt 
   rw [Matrix.mulVec_smul, Matrix.mulVec_smul, mulVec_inv_cancel, ← mulVec_mul] at this
   rw [smul_sub, this, sub_self]
 
-set_option maxHeartbeats 800000 in
+
 theorem exSet_sub (d : BesselDatum A B ι) {ε : AE D} (h1 : ε * ε = ε) (h0 : ε * cA D ε = 0) (i) {g : GA D B}
     (hg : g ∈ d.ExSet ε i) : g ∈ kGrp d h0 i := by
   obtain ⟨g1, g2, g3, g4, y, g5⟩ := hg

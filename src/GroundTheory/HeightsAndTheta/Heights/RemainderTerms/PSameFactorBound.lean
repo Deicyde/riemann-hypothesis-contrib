@@ -86,8 +86,8 @@ theorem SameFactorBound.proof (hF : SameFactorFormula.Statement) (hS : SchurSign
 
   have hSeq : S = ∑ nu ∈ partitionsOf r k, C (chi nu) * Sν nu := by
     apply Flag.powerSumHom_injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hSP, map_sum]
+
+    rw [hSP, map_sum]
     refine Finset.sum_congr rfl fun nu hnu => ?_
     rw [map_mul, hSν1 nu hnu]
     congr 1

@@ -16,7 +16,7 @@ open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open PositivityTheory.Rg.BcN.F2 (mconv)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.BcB.F
 

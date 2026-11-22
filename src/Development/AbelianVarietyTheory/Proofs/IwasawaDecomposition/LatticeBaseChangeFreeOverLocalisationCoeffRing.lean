@@ -23,8 +23,8 @@ theorem bcEnd_comp (s : A →+* O) (e : (ι → A) →ₗ[A] (ι → A)) (r : ι
     ext i; simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [hr]
   ext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [bcEnd, Finset.sum_apply, map_sum]
+
+  simp [bcEnd, Finset.sum_apply, map_sum]
 
 theorem free_quot [IsDomain O] [IsPrincipalIdealRing O] (s : A →+* O) (N : Submodule A (ι → A))
     (e : (ι → A) →ₗ[A] (ι → A)) (he1 : ∀ x, e x ∈ N) (he2 : ∀ x ∈ N, e x = x) :
@@ -118,8 +118,8 @@ theorem latRel_torsionFree (D : D7) (hinj : Function.Injective D.what₂.OtoLL) 
   exact (smul_eq_zero.1 hx).resolve_left hne
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem bjC_free : ∀ (D : D7) (B : LocBase0 D.host D.what₂) (hI : OsInt B), (Function.Injective D.what₂.OtoLL ∧ ∃ F : Subfield D.what₂.LL, ∀ x, x ∈ D.what₂.OtoLL.range ↔ x ∈ F ∧ IsIntegral ℤ x) → ∀ i, Module.Free (OOf B i) (BjC B hI i) := by
   intro D B hI hO i
   classical

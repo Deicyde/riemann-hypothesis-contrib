@@ -347,9 +347,9 @@ theorem exists_fourier (hΨ : IsType Ψ) (N R : ℕ) (hR : 0 < R) :
       funext τ
       congr 1
       ext a b
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hΦ, hβy, Matrix.sum_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
-        map_mul, map_sum, map_natCast, map_intCast, Finset.mul_sum]
+
+      simp only [hΦ, hβy, Matrix.sum_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
+      map_mul, map_sum, map_natCast, map_intCast, Finset.mul_sum]
       exact Finset.sum_congr rfl fun i _ => by ring)
   refine ⟨a, fun ν Y hY => ?_, fun Z hZ' => ?_⟩
   · have hre : (fun i => (((co Y i).re : ℝ) : ℂ)) = co Y := by

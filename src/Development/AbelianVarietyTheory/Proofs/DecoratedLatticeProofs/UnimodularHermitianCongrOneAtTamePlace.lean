@@ -62,8 +62,8 @@ theorem exists_congr_one (c : A →+* A) (hc : ∀ x, c (c x) = x) (hcO : ∀ a 
   have map_mul_val : ∀ X Y : Matrix (Fin n) (Fin n) R, (X * Y).map val = X.map val * Y.map val := by
     intro X Y
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.map_apply, Matrix.mul_apply, map_sum]
+
+    simp only [Matrix.map_apply, Matrix.mul_apply, map_sum]
     rfl
   have map_one_val : (1 : Matrix (Fin n) (Fin n) R).map val = ε • (1 : Matrix (Fin n) (Fin n) A) := by
     ext i j
@@ -114,7 +114,7 @@ theorem exists_congr_one (c : A →+* A) (hc : ∀ x, c (c x) = x) (hcO : ∀ a 
 
 end Abstract
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 variable {D : D7}
 

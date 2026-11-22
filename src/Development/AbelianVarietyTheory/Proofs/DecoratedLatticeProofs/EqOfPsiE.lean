@@ -12,7 +12,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1600000
+
 
 namespace GlobalTheory.FirstVec
 
@@ -214,8 +214,8 @@ theorem first_eq {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) {�
     rw [psiBes_levi, psiUni, h1, hadd, h5, psiBes, simpleSum, h2, h4, hadd, dotProduct_zero, add_zero, map_one, one_mul] at h3
     rw [map_one, mul_one, ← h3]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [upSum, map_sum, Finset.mul_sum, Matrix.of_apply]
+
+    simp only [upSum, map_sum, Finset.mul_sum, Matrix.of_apply]
     exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by split_ifs <;> simp
 
 end GlobalTheory.FirstVec

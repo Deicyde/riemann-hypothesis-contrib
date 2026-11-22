@@ -7,7 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open NumberField UpperTheory.V UpperTheory.V.KT UpperTheory.V.Af.BA
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.real_structure_action_of_real_involution :
     UpperTheory.V.Af.BA.ReInv → UpperTheory.V.Af.BA.ActRe := by
   intro hR L _ _ N σ hσ

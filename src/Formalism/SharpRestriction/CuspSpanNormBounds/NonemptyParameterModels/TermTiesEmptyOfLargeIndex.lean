@@ -118,8 +118,8 @@ theorem tie_gram_det_ne {E : Type} [Field E] [NumberField E] [StarRing E] (S : F
     intro i
     have hi := congrFun hv i
     simp only [Matrix.mulVec, dotProduct, HSpace.gram, Pi.zero_apply] at hi
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul, smul_eq_mul]
     rw [← hi]
     exact Finset.sum_congr rfl (fun j _ => mul_comm _ _)

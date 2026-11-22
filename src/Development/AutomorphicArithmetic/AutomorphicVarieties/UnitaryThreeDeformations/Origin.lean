@@ -27,8 +27,8 @@ private theorem UpperTheory.V.UnitaryThreeInertia.map_eq_zero_of_cc {O A σ : Ty
     fun i m => rfl
   have hdec : p = ∑ i, MvPowerSeries.X i * q i := by
     ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp_rw [hX, hq]
     by_cases hn : n = 0
     · subst hn
@@ -55,8 +55,8 @@ private theorem UpperTheory.V.UnitaryThreeInertia.map_eq_zero_of_cc {O A σ : Ty
         · rw [if_neg hble]
       · intro h
         exact absurd (Finset.mem_univ j) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hdec, map_sum]
+
+  rw [hdec, map_sum]
   apply Finset.sum_eq_zero
   intro i _
   rw [map_mul, hφ, zero_mul]

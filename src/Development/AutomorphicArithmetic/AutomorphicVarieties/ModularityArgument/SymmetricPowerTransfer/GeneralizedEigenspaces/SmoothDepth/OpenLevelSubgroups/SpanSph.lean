@@ -164,8 +164,8 @@ theorem UpperTheory.V.Z.Sym.Al.spanSph :
         nsmul_eq_mul]
     rw [e1, Finset.sum_congr rfl fun q _ => hψsum _, Finset.sum_comm]
     refine Finset.sum_congr rfl fun g _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.mul_sum, map_sum]
+
+    rw [← Finset.mul_sum, map_sum]
     refine congrArg (c g * ·) (Finset.sum_congr rfl fun q _ => ?_)
     have hm : (rep q * x g) * y g = y g * (rep q * x g) :=
       f1 _ ((locU n w).mul_mem (hrepl q) (hx g)) _ (hy g)

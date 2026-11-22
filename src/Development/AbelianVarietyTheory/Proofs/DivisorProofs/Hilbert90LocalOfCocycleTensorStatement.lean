@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsUn
 @[expose] public section
 
 open TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hilbert90_of_cocycle_faithfullyFlat_tensor : ∀ (R S : Type) [CommRing R] [CommRing S] [Algebra R S] [IsNoetherianRing R] [Module.Finite R S]
     [Module.FaithfullyFlat R S] (c : (S ⊗[R] S)ˣ),
     Algebra.TensorProduct.includeLeft (R := R) (S := R) (A := S ⊗[R] S) (B := S) (c : S ⊗[R] S) *

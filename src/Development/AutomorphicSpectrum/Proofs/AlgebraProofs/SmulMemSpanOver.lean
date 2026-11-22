@@ -84,8 +84,8 @@ theorem local_step (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →ₗ[Ω
       refine ⟨M, AddSubgroup.subset_closure ⟨a, ha, f ^ M • (f ^ N • e - σ (q e)), ⟨?_, ?_⟩, ?_⟩⟩
       · rw [smul_sub]
         refine sub_mem (hL _ (R.pow_mem hf _) _ (hL _ (R.pow_mem hf _) _ he)) ?_
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hce, map_sum, Finset.smul_sum]
+
+        rw [hce, map_sum, Finset.smul_sum]
         refine sum_mem fun j _ => ?_
         rw [map_smul, smul_smul, hσ]
         exact hL _ (hp' j) _ (ht j)

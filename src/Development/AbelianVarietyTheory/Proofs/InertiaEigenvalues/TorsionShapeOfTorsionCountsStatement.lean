@@ -12,7 +12,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevRepZ
 @[expose] public section
 
 open ReciprocityTheory.Gal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.torsion_shape_of_torsion_counts : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Finite (IsLocalRing.ResidueField O)]
     {ϖ : O}, Irreducible ϖ → ∀ {X : Type} [AddCommGroup X] [Module O X] (Hc : Submodule O X) (d a : ℕ)
     {F : Type} [AddCommGroup F] [Module O F] [Finite F], (Hc ≃ₗ[O] (Fin a → Formalism.NG.KO O) × F) →

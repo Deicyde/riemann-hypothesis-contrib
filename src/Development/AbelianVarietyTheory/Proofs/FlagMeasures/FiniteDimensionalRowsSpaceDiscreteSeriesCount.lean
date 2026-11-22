@@ -137,8 +137,8 @@ theorem bessel (B : RowsAut) (C : ℝ) (t : B.I.GA → ℝ) (w : B.Hs) (hw : ‖
     Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (hT i))
   have hAk : ∀ k ∈ B.I.Kg B.g, B.R (1, k) (A w) = A w := by
     intro k hk'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hAw, map_sum]
+
+    rw [hAw, map_sum]
     refine Finset.sum_congr rfl (fun i _ => ?_)
     rw [map_smul, hk i k hk']
   obtain ⟨f, hf, hfb⟩ := hC A hAmem hAk
@@ -160,8 +160,8 @@ theorem bessel (B : RowsAut) (C : ℝ) (t : B.I.GA → ℝ) (w : B.Hs) (hw : ‖
     ⟨fun i => by simp [hiso, hw], fun i j hij => horth i j hij w w⟩
   have hAn : ‖A w‖ ^ 2 = S := by
     rw [@norm_sq_eq_re_inner ℂ, hAw, hon.inner_sum c c Finset.univ, hSdef]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl (fun i _ => ?_)
     have e1 : (starRingEnd ℂ) (c i) * c i = ((‖F i x‖ ^ 2 : ℝ) : ℂ) := by
       rw [RCLike.conj_mul, hc]

@@ -36,7 +36,7 @@ private structure HI {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ
   i : ℕ
   hi : i ≤ n
 
-set_option maxHeartbeats 1600000 in
+
 theorem pFormGU_of (hExt : ExtEig2) (hCl : ClassFin) (hXi : XiZeta) (hKer : KerFormU) (hHk : HeckePres) (hSat : SatVal)
     (hMem : LocMem) (hComm : LocComm) (hOp : LevOpen) (hU : OfUBij) : FormGU := by
   intro E _ _ _ n x ζ hζ π W j Up w₀ hw₀ S Kw hS χ hχ f hf hf0 hfix
@@ -136,8 +136,8 @@ theorem pFormGU_of (hExt : ExtEig2) (hCl : ClassFin) (hXi : XiZeta) (hKer : KerF
         let L : algForms W →ₗ[ℂ] Module.Dual ℂ W.Sp :=
           { toFun := fun F => algForms.val F u.1, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
         have e3 := congrArg L e
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, map_smul] at e3
+
+        rw [map_sum, map_smul] at e3
         rw [hφu]
         exact e3)
   refine ⟨Φ, ψ, ⟨hΦ0, hΦ.1, fun k hk h g => ?_, fun w hw h1 h2 B hB => ⟨hΦ0, ?_, (hsv w hw h1 h2 B hB).2.2.1, fun p hp i hi => ?_⟩⟩, hψ.1⟩

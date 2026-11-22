@@ -21,8 +21,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 noncomputable section
 
@@ -121,8 +121,8 @@ theorem exists_coef_sum : ∀ (D : D7) (Γ : Type) [Group Γ] [Fintype Γ] (Pl0 
   refine ⟨m, fun t => o t, v, fun t => (o t).2, hv1, sub_eq_zero.1 (GlobalTheory.T.harmonic_polynomial_eq_zero_of_function D _ _ (ρ.B i j b).w (ρ.B i j b).F.BS hB.wt hm _
     (sub_mem (Submodule.smul_mem _ _ hP1) (sum_mem fun t _ => Submodule.smul_mem _ _
       (BaseRat.ioP_mem_valSpace hcore hio hv hB hBo hu _))) ?_)⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_smul, map_sum, ← hsum, Finset.smul_sum, sub_eq_zero]
+
+  rw [map_sub, map_smul, map_sum, ← hsum, Finset.smul_sum, sub_eq_zero]
   refine Finset.sum_congr rfl fun t _ => ?_
   rw [map_smul, hs (v t), ← hv2 t, ← hG t, smul_comm]
   rfl
@@ -217,8 +217,8 @@ theorem inv_smul_mem_range_of_readable {ρ : Setup D.ntw} (hρ : ρ.Good) (i : D
     field_simp
   choose x hx using key
   refine ⟨∑ t, x t, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.smul_sum]
+
+  rw [map_sum, Finset.smul_sum]
   exact Finset.sum_congr rfl fun t _ => hx t
 
 end Range
@@ -504,8 +504,8 @@ theorem ratTwist_of_isRatScalar (hRF : GlobalTheory.NT.RayField) {T : CoreJ D} [
       (ρ.B i j b).gen (ρ.om i j b 1) (ρ.tw i b k Q ψ) (h * hQ') (Rl.ioP j (PiTensorProduct.tprod ℂ u) (c0L j (v t')))) := by
     have e : c • (ρ.B i j b).gen (ρ.om i j b 1) (ρ.tw i b k Q ψ) (h * hQ') P = ∑ t', o t' •
         (ρ.B i j b).gen (ρ.om i j b 1) (ρ.tw i b k Q ψ) (h * hQ') (Rl.ioP j (PiTensorProduct.tprod ℂ u) (c0L j (v t'))) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_smul, hcP, map_sum]
+
+      rw [← map_smul, hcP, map_sum]
       exact Finset.sum_congr rfl fun t' _ => map_smul _ _ _
     have e2 : ∑ t', o t' • (ph • (ρ.B i j b).gen (ρ.om i j b 1) (ρ.tw i b k Q ψ) (h * hQ')
         (Rl.ioP j (PiTensorProduct.tprod ℂ u) (c0L j (v t')))) = ph • ∑ t', o t' •

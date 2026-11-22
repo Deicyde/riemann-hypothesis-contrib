@@ -45,7 +45,7 @@ theorem PositivityTheory.Rg.Rsw.exists_tau {F E : Type} [Field F] [NumberField F
       rw [e a x, map_smul, Prod.smul_snd, smul_eq_mul, hτ, hx]
     | add y z hy hz => simp only [map_add (f := _), Prod.snd_add, hy, hz]
 
-set_option maxHeartbeats 1000000 in
+
 theorem PositivityTheory.Rg.Rsw.jacquet_piatetski_first_bound : GoodPlacesOutsideFiniteSet := by
   intro D r ψ hψ χ hχ hr S
   obtain ⟨v, hvS, P, hP1, hP2, hP3⟩ := PositivityTheory.Rg.Rsw.L.LJPos.placeEx D ψ hψ χ hχ r hr S

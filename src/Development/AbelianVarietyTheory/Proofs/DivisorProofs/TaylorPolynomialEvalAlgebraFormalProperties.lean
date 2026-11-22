@@ -85,7 +85,7 @@ theorem _root_.GlobalTheory.PeriodFamily.taylor_formal_properties : ∀ {I : Typ
       iteratedFDeriv_const_smul_apply' hf.contDiffAt, ContinuousMultilinearMap.smul_apply,
       smul_eq_mul, smul_smul, mul_left_comm]
   · unfold _root_.GlobalTheory.PeriodFamily.taylor
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_prod]
+
+    simp [map_sum, map_prod]
 
 end GlobalTheory.PeriodFamily
