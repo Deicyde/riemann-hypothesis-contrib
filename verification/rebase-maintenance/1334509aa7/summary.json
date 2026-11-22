@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-55",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/WeakShimuraTheory/FibreTraces/FibTrdeg.lean",
+          "stages": {
+            "1": "a605ac474f9453e2d581822fd03f8cfa24617973",
+            "2": "9cf7027168db3da536ec54ee99d7a92a8f9ac941",
+            "3": "fab1da3d393dcd07ab2bc6d890bbd80f2d23de24"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "244ae97b9e4148e075ea4df7666948cd03b40877",
+      "checkpoint_head": "d9788356da8ebb66afac5bc47a8acf208153ba43"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
