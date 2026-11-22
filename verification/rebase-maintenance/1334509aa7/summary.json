@@ -1,0 +1,71 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45043825687-remaining",
+  "results": [
+    {
+      "number": 54,
+      "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+      "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+      "original_repo": "by-eureka/riemann-hypothesis",
+      "original_branch": "eureka/upstream-proof-refactors",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 8,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatLieB.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/WeilStabilizerVolume/TopoPolish.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/TopoPolish.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/DiscreteSubgroupCountableAndExistsStrictFundamen.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TorusHaarMeasure/ExistsStrictMeasurableFundamentalSetOfDiscrete.lean",
+          "reason": "three-way-replay-through-module-header"
+        }
+      ],
+      "status": "conflict",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KerLeSpanImageKerOfSemilinear.lean",
+          "stages": {
+            "1": "5a75c347df3ed9128b716ef852afd2ab72daa494",
+            "2": "509bccfaabfa6d5e8f72e04b4fe1a83753a4d53f",
+            "3": "891dff5c6cb2570576a04885cb9c36b7ced27cb1"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "521094c924cddaa3530c9a2aa5aeaff90257a7ae",
+      "log_tail": "[detached HEAD 7ef847e718] Derive the measurable fundamental domain from the discrete subgroup criterion\n Author: DebarghaG <maildebargha@gmail.com>\n 1 file changed, 9 insertions(+), 79 deletions(-)\nAuto-merging src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KerLeSpanImageKerOfSemilinear.lean\nCONFLICT (content): Merge conflict in src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KerLeSpanImageKerOfSemilinear.lean\nRebasing (15/174)\nRebasing (16/174)\nRebasing (17/174)\nRebasing (18/174)\nRebasing (19/174)\nerror: could not apply 521094c924... Use the kernel complement directly in the semilinear span proof\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 521094c924... # Use the kernel complement directly in the semilinear span proof\n",
+      "checkpoint_head": "eae9ce4504d4f9fe9f7c06f8837f2060a0ac27dd",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-1334509aa7-45043825687-remaining"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
