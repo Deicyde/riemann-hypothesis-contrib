@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsPolFamOfGrpFam.lean",
+      "stages": {
+        "1": "8038d10db21ccffa320a1c63d50e3a0e52aeeb26",
+        "2": "2191e30dc5562ff39de1ebde171159b83168b7f6",
+        "3": "6584f61c98359661b59658f24d733c29d0275e78"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "887cf693f8926160400d4e4e8a4f29acac45a914",
+  "checkpoint_head": "9c247076520a37c5abe290c455bde2dd5cabdad3"
+}
