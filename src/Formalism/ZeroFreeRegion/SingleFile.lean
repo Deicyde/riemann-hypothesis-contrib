@@ -99,6 +99,7 @@ lemma landau {f x} B :
         linarith)
       (by simpa [closure_ball])) (by grind) (inl rfl) <| by cases n <;> grind
     have := differentiableAt hg <| closedBall_mem_nhds 0 <| by norm_num
+    rw [show ((fun x => x - q) * g) = fun z => (z - q) * g z by funext z; rfl]
     rw [logDeriv_mul] <;> first | fun_prop | simp_all [logDeriv_apply]
     grw [half_le_self <| by linarith] at ih0
     linarith
