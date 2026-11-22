@@ -1,5 +1,6 @@
 module
 
+public import Mathlib
 public import Mathlib.NumberTheory.NumberField.Basic
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.WeilRepEquivOfCharpolyEqStatement

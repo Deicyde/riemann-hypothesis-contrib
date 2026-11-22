@@ -1,5 +1,6 @@
 module
 
+public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.FormsAre
 import Mathlib.Algebra.Order.Floor.Extended

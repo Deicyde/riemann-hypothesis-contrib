@@ -1,5 +1,6 @@
 module
 
+public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NotOrdGeOfNotMem
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SharpOverIff

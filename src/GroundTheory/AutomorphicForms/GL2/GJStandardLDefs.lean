@@ -6,7 +6,7 @@ public import GroundTheory.AutomorphicForms.GL2.GJLocalZeta
 public import GroundTheory.AutomorphicForms.GL2.GJMatrixCoord
 public import GroundTheory.GlobalFields.Adele.IntegersLattice
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
-import GroundTheory.AutomorphicForms.GL2.GJFEInducedLevi
+public import GroundTheory.AutomorphicForms.GL2.GJFEInducedLevi
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic

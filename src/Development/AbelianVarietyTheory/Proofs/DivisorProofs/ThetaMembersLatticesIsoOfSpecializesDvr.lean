@@ -1,5 +1,6 @@
 module
 
+public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HasTraitsOnOfHasTraitsP
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EndOnId
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TorMatch

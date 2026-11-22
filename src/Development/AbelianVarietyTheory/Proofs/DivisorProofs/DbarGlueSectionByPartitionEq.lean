@@ -1,5 +1,7 @@
 module
 
+public import ReciprocityTheory.L2DbarEstimates.NormFibrations.ImportsAlt
+public import ReciprocityTheory.L2DbarEstimates.NormFibrations.LseSmoothRIffReal
 public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield

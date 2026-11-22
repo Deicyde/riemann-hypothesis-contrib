@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 public import Mathlib.Basic.Complex.Basic
 public import Mathlib.Order.Interval.Finset.Nat
