@@ -1,0 +1,54 @@
+{
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "created": "2026-11-22",
+  "prs": [
+    {
+      "n": 87,
+      "title": "Shorten checked proofs across 816 Lean modules",
+      "head": "dbbf5d8bdf07025202ee4954437d41481ae69847",
+      "branch": "proof-shortening/verified-disjoint-20261122",
+      "repo": "graohene10-spec/riemann-hypothesis",
+      "base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "mergeable": null,
+      "state": "unknown",
+      "files": 816,
+      "commits": 1,
+      "add": 4509,
+      "del": 9560,
+      "can_modify": true,
+      "draft": false
+    },
+    {
+      "n": 98,
+      "title": "Minimize and privatize imports (stacked on #79)",
+      "head": "86692ef803d35b2ad0ea1ec0ebddadd3f860b33c",
+      "branch": "port-lean-4.36-imports",
+      "repo": "Vilin97/rh-lc",
+      "base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "mergeable": null,
+      "state": "unknown",
+      "files": 0,
+      "commits": 7,
+      "add": 0,
+      "del": 0,
+      "can_modify": true,
+      "draft": true
+    },
+    {
+      "n": 86,
+      "title": "Report vm.max_map_count at job start, fix the AWS template, clarify doctor output",
+      "head": "9422ada52f367cf8b1da05ce8df9ca0b7ff727a0",
+      "branch": "ci/job-start-map-count-preflight",
+      "repo": "leanprover-community/riemann-hypothesis",
+      "base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "mergeable": true,
+      "state": "clean",
+      "files": 5,
+      "commits": 4,
+      "add": 192,
+      "del": 8,
+      "can_modify": false,
+      "draft": false
+    }
+  ]
+}
