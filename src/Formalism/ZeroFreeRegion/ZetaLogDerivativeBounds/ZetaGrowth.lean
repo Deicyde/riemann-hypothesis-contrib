@@ -6,7 +6,6 @@ public import Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.ZetaInvBound
 
 @[expose] public section
 
-
 open Complex Filter Topology
 
 noncomputable section
